@@ -141,7 +141,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 -- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 8200
+set_option linter.style.longFile 8300
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -8146,3 +8146,13 @@ through `T' = huSub`, constituent kernel transfer), and the degree-`0` `A(T)`-su
 differences — the "pairwise orthogonality of `η`, `λ^{τ₁}`, `θ^{τ₁}`" of Peterfalvi (13.4). -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.conj_eq_of_norm_one_conj_antisym
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.inner_eq_zero_of_conj_diff_orthogonal
+
+/-! **Peterfalvi (12.6) `frobenius_typeI_coherent`, axiom-clean** (lane c, 2026-07-14, issue
+9077 carve-out item 2 + HUB RULING #4′).  The (6.8)(c1) structural input `sibleyTarget_frobI`
+is now honestly constructed — the TI bound collapsed to `L` through the (8.15) normalizer
+identification, the (12.1) Dade datum transported exactly (`tau_eq` on the nose), and the
+`card_L_odd` faithfulness fix (`hodd` hypothesis) approved by RULING #4′ — closing the last
+gap of the (12.6) case split: all three coherence routes (a) TI/(6.8), (b) abelian rank-2
+(5.7), (c) cyclic-quotient (6.5.c) are real. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.sibleyTarget_frobI
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.frobenius_typeI_coherent
