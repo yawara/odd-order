@@ -8070,12 +8070,33 @@ assembled Section 16 inputs depend only on Lean/mathlib's standard three axioms.
 2026-07-14, issue 2035).  The degree-`p·a` irreducible cut of the `T`-instance §9 family: the
 (9.8.d) base count with conjugacy doubling, the (5.7)∘(5.3.a) uniform-degree coherence
 re-grounded onto plain induction via `tInstance_dade_eq_induce`, and the assembled caseA-`T`
-`h0` entry point.  (The full-family `sSet_coherent_indT_caseA`/`sSet_coherent_indT_A` carry the
-one intended sorried obligation `sSet_caseA_nineElevenRefutation_T`, mirroring the `S`-side
-(9.11.1)–(9.11.8) construction site.) -/
+`h0` entry point. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSetIrrDegT_pa_two_le_ncard
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSetIrrDegT_coherent_indT
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSetIrrDegT_pa_coherent_indT_caseA
+
+/-! **Peterfalvi (9.11) at `T` — the full refuter chain, axiom-clean** (lane b, 2026-07-14,
+issue 2035 refuter-`T` campaign).  The complete `T`-mirror of the discharged `S`-side
+(9.11.1)–(9.11.8) chain: the (5.6) pair bound, the (9.11.1) extraction, the (9.11.4) Coq
+gap-patch support + Mackey-norm bundle, the (9.11.7)–(9.11.8) budget refutation, the
+(9.11.5)–(9.11.8) norm bound and equality refutation, the assembled equality-configuration
+refuter (formerly the one intended sorried obligation), the full-family `𝒯`-coherence
+dispatches, the (13.3.c)-`T` pinned carrier, and the bundled `τ₁T` ν-row pin. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.nineElevenPairBoundT
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.nineElevenSTwoExtractionT
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.nineElevenAlphaSupportT
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.nineElevenFourNormInputsT
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.nineElevenSevenEightRefutationT
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.nineElevenNormBoundT
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.nineElevenEqualityRefutationT
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.sSet_caseA_nineElevenRefutation_T
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSet_coherent_indT_caseA
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSet_coherent_indT_A
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.sSet_coherent_indT_A_pinned
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.tau1T_ofHonest_nuRow_eta_row
 
 /-! **Peterfalvi (13.3.c)-`T` ν-row pin machinery, first layer, axiom-clean** (lane b,
 2026-07-14, issue 2035 #41 step 4-5).  The coherence-generic row-independence
