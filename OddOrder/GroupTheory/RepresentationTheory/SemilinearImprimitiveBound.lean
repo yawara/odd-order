@@ -7,6 +7,7 @@ import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Data.Fintype.Pi
 import Mathlib.Data.Finite.Prod
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
+import Mathlib.GroupTheory.Coset.Card
 
 /-!
 # The imprimitive order bound: `|U| ≤ (p − 1)^(q−1)`
@@ -56,6 +57,44 @@ theorem card_le_pow_sub_one_of_injective_imprimitive
     have := card_le_pow_of_injective_to_pi hf
     rwa [hcardA] at this
   exact hb.trans (Nat.pow_le_pow_left ha _)
+
+/-- **Ratio-embedding order divisibility**: under the block-scalar hypotheses of
+`card_le_pow_of_block_scalars`, the order of `Ubar` divides `|A|^n`.
+
+The ratio map is a group homomorphism
+`x ↦ (φ_{i+1}(x) / φ_0(x))_i : Ubar →* (Fin n → A)`.  The `hconst` hypothesis makes it
+injective, so Lagrange gives the divisibility of finite group orders.  Unlike the cardinality-only
+bound below, this form retains prime-factor information; Peterfalvi (13.13) uses it to remove the
+2-primary part of `(p - 1)^(q - 1)` for an odd-order source group. -/
+theorem card_dvd_pow_of_block_scalars {Ubar A : Type*} [CommGroup Ubar] [Finite Ubar]
+    [CommGroup A] [Finite A]
+    {n : ℕ} (φ : Fin (n + 1) → (Ubar →* A))
+    (hconst : ∀ x : Ubar, (∀ i : Fin (n + 1), φ i x = φ 0 x) → x = 1) :
+    Nat.card Ubar ∣ Nat.card A ^ n := by
+  let ψ : Ubar →* (Fin n → A) := {
+    toFun x i := φ i.succ x / φ 0 x
+    map_one' := by
+      ext i
+      simp
+    map_mul' x y := by
+      ext i
+      simp only [Pi.mul_apply, map_mul, div_eq_mul_inv, mul_inv_rev]
+      ac_rfl }
+  have hinj : Function.Injective ψ := by
+    intro x y hxy
+    have hxy' : ∀ i : Fin n, φ i.succ x / φ 0 x = φ i.succ y / φ 0 y :=
+      fun i => congrFun hxy i
+    have hz : x * y⁻¹ = 1 := by
+      apply hconst
+      refine Fin.cases rfl (fun j => ?_)
+      have h : φ j.succ x * φ 0 y = φ j.succ y * φ 0 x :=
+        (div_eq_div_iff_mul_eq_mul).mp (hxy' j)
+      show φ j.succ (x * y⁻¹) = φ 0 (x * y⁻¹)
+      rw [map_mul, map_mul, map_inv, map_inv, ← div_eq_mul_inv, ← div_eq_mul_inv,
+        div_eq_div_iff_mul_eq_mul, mul_comm (φ 0 x)]
+      exact h
+    exact mul_inv_eq_one.mp hz
+  simpa [Nat.card_pi] using Subgroup.card_dvd_of_injective ψ hinj
 
 /-- **Ratio embedding from block scalars** (the injectivity core of Peterfalvi (9.7)(a)'s `psi`,
 `PFsection9.v:442`): given a finite commutative group `Ū` with `q = n+1` scalar characters
