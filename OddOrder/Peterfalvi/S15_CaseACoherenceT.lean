@@ -233,7 +233,7 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
     exact Nat.cast_injective h3
   have hαsupp : ((γ - ψ₁ : ClassFunction ↥hyp.T ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T :=
-    hyp.nineElevenAlphaSupportT hG hvd hT2 chars caseA ⟨0, hq0⟩ hψ₁sSet hψ₁deg
+    hyp.nineElevenAlphaSupportT hG hvd chars caseA ⟨0, hq0⟩ hψ₁sSet hψ₁deg
   -- `α^τ ∈ ℤ[Irr G]`, norm preservation
   have hταZIrr : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hT2)
       ((hyp.dadeHypT hG hT2).fullDadeIsometryData (hyp.dadeHypT_hconj hG hT2)) (γ - ψ₁)

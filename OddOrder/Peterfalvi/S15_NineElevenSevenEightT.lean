@@ -280,7 +280,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
       = OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) := hCUprime
   have hclass := OddOrder.Peterfalvi.S11.nineElevenThree_orbit_split hG caseA hS₁'sub
     (fun χ hχ hn => hS3deg χ ⟨hsubC hχ, hn⟩) hS2deg hCU hcount
-  obtain ⟨N, hnormN, -⟩ := hyp.nineElevenFourNormInputsT hG hvd hT2 chars caseA hdich hCUprime hcount
+  obtain ⟨N, hnormN, -⟩ := hyp.nineElevenFourNormInputsT hG hvd chars caseA hdich hCUprime hcount
   have hqp : ((hyp.toTypesIIIIIIVSetupT hG hvd).q).Prime :=
     (hyp.toTypesIIIIIIVSetupT hG hvd).nontrivial.2.1
   have hqodd : Odd (hyp.toTypesIIIIIIVSetupT hG hvd).q :=
