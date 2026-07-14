@@ -244,14 +244,14 @@ theorem uActionHom_range_comm [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSe
   exact Subtype.ext (hComm a b)
 
 open scoped Classical in
-/-- **Peterfalvi (9.7.a): the imprimitive `u`-bound** `u ≤ (p^q − 1)/(p − 1)`.  From the case-(a)
-Clifford block data (`CliffordCaseAData`), the image `Ū = U/C_U(H̄)` embeds into `ℤ_{p-1}^{q-1}` via
-the block scalars, bounding `|Ū| = u`.  Discharges the `hReducible` branch of
-`card_le_cyclotomicQuotient_of_faithful_fpf`, hence `basic_structure.u_bound` (issue 9000). -/
-theorem caseA_u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+/-- **Peterfalvi (9.7.a): imprimitive block-scalar order divisibility.**  From the case-(a) Clifford
+data, the image `Ū = U/C_U(H̄)` embeds as a subgroup of `((𝔽_p)ˣ)^{q-1}`; hence its order
+`u = |Ū|` divides `(p - 1)^{q-1}`.  This strengthened form retains the odd-part information used
+in Peterfalvi (13.13). -/
+theorem caseA_u_dvd_pred_pow [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief)
     (caseA : CliffordCaseAData chars) :
-    chars.u ≤ (chief.p ^ data.q - 1) / (chief.p - 1) := by
+    chars.u ∣ (chief.p - 1) ^ (data.q - 1) := by
   haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
   haveI : chief.N.Normal := chief.N_normal
   -- `CommGroup H̄` and `CommGroup Ū` built over the *canonical* `Group` instances (via an explicit
@@ -268,9 +268,9 @@ theorem caseA_u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesI
       mul_comm := uActionHom_range_comm chief }
   have hq1 : (data.q - 1) + 1 = data.q := Nat.sub_add_cancel data.nontrivial.2.1.pos
   -- apply the generic block engine at `n = q - 1`, reindexing `Fin q ≃ Fin ((q-1)+1)`
-  have hbound : Nat.card ↥(MonoidHom.range (uActionHom data chief))
-      ≤ (chief.p ^ ((data.q - 1) + 1) - 1) / (chief.p - 1) :=
-    card_le_cyclotomicQuotient_of_blocks (p := chief.p) (n := data.q - 1)
+  have hdiv : Nat.card ↥(MonoidHom.range (uActionHom data chief))
+      ∣ (chief.p - 1) ^ (data.q - 1) :=
+    card_dvd_pred_pow_of_blocks (p := chief.p) (n := data.q - 1)
       (elabRepresentation chief.p (MonoidHom.range (uActionHom data chief)).subtype)
       (fun i => aInvariantSubrep
         (isAInvariant_range_subtype (caseA.Hpart_aInvariant (finCongr hq1 i))))
@@ -311,9 +311,22 @@ theorem caseA_u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesI
             rw [hg]
             exact (commute_mulAut_of_elabRepresentation_eq_smul_id _ u _ hsmul σ).symm)
         exact Subtype.ext (hg ▸ hone))
-  rw [hq1] at hbound
   rw [chars.u_eq_card_quotient]
-  exact hbound
+  exact hdiv
+
+/-- **Peterfalvi (9.7.a): the imprimitive `u`-bound** `u ≤ (p^q − 1)/(p − 1)`.  This is the
+cardinality consequence of `caseA_u_dvd_pred_pow`, followed by the elementary cyclotomic bound
+`(p - 1)^{q-1} ≤ (p^q - 1)/(p - 1)`. -/
+theorem caseA_u_le_cyclotomicQuotient [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} (chars : Section11CharacterData data chief)
+    (caseA : CliffordCaseAData chars) :
+    chars.u ≤ (chief.p ^ data.q - 1) / (chief.p - 1) := by
+  have hpow : 0 < (chief.p - 1) ^ (data.q - 1) :=
+    pow_pos (Nat.sub_pos_of_lt chief.p_prime.one_lt) _
+  have hle : chars.u ≤ (chief.p - 1) ^ (data.q - 1) :=
+    Nat.le_of_dvd hpow (caseA_u_dvd_pred_pow chars caseA)
+  exact hle.trans (pow_sub_one_le_cyclotomicQuotient (p := chief.p) (q := data.q)
+    chief.p_prime.two_le data.nontrivial.2.1.one_le)
 
 /-- **Peterfalvi (9.7): the `u`-bound `u ≤ (p^q − 1)/(p − 1)`, unconditionally.**  The Clifford
 dichotomy (`chiefFactor_clifford_U_dichotomy`) splits the `U`-action on the chief factor `H̄`:

@@ -631,6 +631,22 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 46) — ★★ c Campaign B も完了 (0115 両 campaign 当日完遂)。3 レーン合流、census 42→41**:
+  **a=4** (`9b5c33ba`〜`c1a3f72e` = claim 9098 (block-scalar divisibility infra、claim-before-build ✓) →
+  case A block bound の divisibility 強化 + two-primary factor 除去。新 leaf S11_CaseAOddPartBound +
+  GroupTheory 2 file。b-owned HypothesisBasics への touch は**自 leaf の import 1 行のみ** (mechanical、
+  受理)。sorry 0/0。merge)。
+  **b=3** (`cd621023`〜`e11e4aa5` = **tau1T_ofHonest bundling (#41 step 5 前半)** + (1.5.a)-T membership
+  layer + theta-package conjunct 2-4 producers complete。新 leaf S15_Tau1T +700 (配線済)、AxiomsCheck
+  追従。sorry 0/0。merge)。
+  **c=4** (`13fe64d5` = ★ **0115 Campaign B 完了 — T-side (9.7.b) field model を 9097 adapter
+  (a の ConjugationFieldModel) で discharge、`t_side_caseB_fieldModel` 実証明 (SubgroupM 2→1)**。
+  + docs 3: Campaign B 完了記録・次 frontier = (14.14) OrthogonalitySwitchData producer (Coq LM_cases
+  port) の組立設計 census・b 宛 V_inf_centralizer_Q_eq_bot discharge note。merge)。
+  build green **4209 jobs** (+2 = S15_Tau1T/S11_CaseAOddPartBound 実 elaborate) / AxiomsCheck OK /
+  census **42→41 (実 −1)** / 新 axiom なし / 逸脱なし (a の cross-touch は import-only) / orphan clean。
+  push 済。**0115 の c 両 campaign が再起動当日に完遂** — c は自律的に次 frontier ((14.14)) を設計済み。
+  SubgroupM 残 1 (hu_full) は a の (13.15) landing 待ち = 既知 pipeline。
 - **2026-07-14 (tick 45) — ★★ 3 レーン同時 landing: census 46→42 (実 −4)。c Campaign A 完了**:
   **a=1** (`6f6e3414` = **(13.12) PC Hall obligation 実証明** (OrderDetermination 移管 4 sorry の 2 本目、
   実 discharge −1、残 = (13.13)/(13.15) の de-opacify 2 本)。merge)。

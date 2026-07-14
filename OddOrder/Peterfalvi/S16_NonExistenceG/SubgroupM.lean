@@ -1,3 +1,4 @@
+import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
 import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupMCore
 
 /-!
@@ -225,31 +226,38 @@ theorem s_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     exact Subtype.ext (by simpa using hcomm)
   exact Subgroup.mem_subgroupOf.mp hgP
 
-/-- **Gated `(9.7.b)` T-side field model** (issue 9078 / 9000 sphere): the T-side field-algebra
-package assembled into a `TFieldModelData hyp.base` via the proven producer `tFieldModelData_of_repr`
-(`SemilinearFieldModel.fieldModelEmbedding`, `E = Q`, `C = V`).  The `V`-conjugation closure `hVQ`
-on `Q` is *proven* here (`V ≤ T = N_G(Q)`, `normalizer_Q_eq_T`), and the `Q ⊓ V = ⊥` disjointness
-is the ungated `Q_inf_V_eq_bot` field; the σ-assembly, injectivity, kernel/complement identification
-are all discharged by the engine.  The **single remaining `sorry`** is *exactly* the field-data
-existence — an additive iso `Additive ↥Q ≃+ 𝔽_{q^p}` (from `exists_field_semilinear`, `Q`
-elementary-abelian + `V`-irreducible) with a norm-one Singer character `μ : ↥V →* 𝔽_{q^p}ˣ`
-(`μ.range = V*`) satisfying the `(14.2)(a)`-dual equivariance — supplied by the `(9.7.b)` resolution
-for `T` (the case-B/issue-9000 obligation, dual to the S-side
-`field_normalizer_of_U_characteristic_of_inputs`). -/
+/-- **The `(9.7.b)` T-side field model** (issue 9078 / 9000 sphere, issue 0115 Campaign B): the
+T-side field-algebra package assembled into a `TFieldModelData hyp.base` via the proven producer
+`tFieldModelData_of_repr` (`SemidirectFieldModel.fieldModelEmbedding`, `E = Q`, `C = V`).
+
+**Now proven** by instantiating the lane-a shared adapter
+`ConjugationFieldModel.exists_normOne_galoisField_conjugation_repr` (issue 9097) at
+`(r, s, E, C) = (q, p, Q, V)`.  Its inputs are supplied as follows:
+
+* `D = ⊥`, the `v`-value `v = (q^p−1)/(q−1)`, and `|Q| = q^p` — the (13.4)/(14.4) case-(9.7.b)
+  facts `S15.T_caseB_facts_unconditional`; via `D_eq`/`d_eq_card_D`/`card_V_eq_vd` these give the
+  faithfulness `V ⊓ C_G(Q) = ⊥` and `|V| = (q^p−1)/(q−1)` (no branch issue on the `T`-side:
+  `q ≡ 1 (mod p)` is impossible for `q < p`);
+* `V` abelian — the unconditional (13.2.a)-for-`T` `isMulCommutative_V_unconditional`;
+* `Q` elementary abelian — `Q_elementaryAbelian_T` from the (14.9) `T_typeII` (the one input
+  still threading the type-II structure, hence the `hnoV`/`hncH0C` parameters);
+* `V ≤ N_G(Q)` — `V ≤ T' ≤ T = N_G(Q)` (`normalizer_Q_eq_T`). -/
 theorem t_side_caseB_fieldModel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) : Nonempty (TFieldModelData hyp.base) := by
   letI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
   -- `V` normalizes `Q`: `V ≤ T' ≤ T = N_G(Q)` (`normalizer_Q_eq_T`).
+  have hVN : hyp.base.V ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
+    intro g hg
+    rw [OddOrder.Peterfalvi.S15.normalizer_Q_eq_T hG hyp.base]
+    exact ((show hyp.base.V ≤ derivedInG hyp.base.T by
+      rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right).trans (Subgroup.map_subtype_le _)) hg
   have hVQ : ∀ (v : ↥hyp.base.V) (x : ↥hyp.base.Q),
       (v : G) * (x : G) * (v : G)⁻¹ ∈ hyp.base.Q := by
     intro v x
-    have hVT : hyp.base.V ≤ hyp.base.T :=
-      (show hyp.base.V ≤ derivedInG hyp.base.T by
-        rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right).trans (Subgroup.map_subtype_le _)
-    have hvN : (v : G) ∈ Subgroup.normalizer (hyp.base.Q : Set G) := by
-      rw [OddOrder.Peterfalvi.S15.normalizer_Q_eq_T hG hyp.base]; exact hVT v.2
-    exact (Subgroup.mem_set_normalizer_iff.mp hvN (x : G)).mp x.2
-  -- gated `(9.7.b)` field-algebra package `(e, μ, hcompat)` for `T`
+    exact (Subgroup.mem_set_normalizer_iff.mp (hVN v.2) (x : G)).mp x.2
+  -- `(9.7.b)` field-algebra package `(e, μ, hcompat)` for `T`, via the 9097 adapter
   obtain ⟨e, μ, hμ_inj, hμ_range, hcompat⟩ :
       ∃ (e : Additive ↥hyp.base.Q ≃+ GaloisField hyp.base.q hyp.base.p)
         (μ : ↥hyp.base.V →* (GaloisField hyp.base.q hyp.base.p)ˣ)
@@ -259,7 +267,29 @@ theorem t_side_caseB_fieldModel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
           e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, hVQ v x⟩ : ↥hyp.base.Q))
             = ((μ v : (GaloisField hyp.base.q hyp.base.p)ˣ) : GaloisField hyp.base.q hyp.base.p) *
                 e (Additive.ofMul x) := by
-    sorry
+    -- (13.4)/(14.4): `D = ⊥`, the `v`-value, `|Q| = q^p`.
+    obtain ⟨hDbot, hv, hcardQ⟩ :=
+      OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base
+    have hQ_elemAb : IsElementaryAbelian hyp.base.q ↥hyp.base.Q :=
+      OddOrder.Peterfalvi.S15.Q_elementaryAbelian_T hG hyp.base (T_typeII hG hnoV hncH0C hyp)
+    have hVcomm : IsMulCommutative ↥hyp.base.V :=
+      hyp.base.isMulCommutative_V_unconditional hG
+    -- faithfulness `V ⊓ C_G(Q) = ⊥` and `|V| = v` from `D = ⊥` (`d = 1`).
+    have hfaith : hyp.base.V ⊓ Subgroup.centralizer (hyp.base.Q : Set G) = ⊥ := by
+      rw [← hyp.base.D_eq]; exact hDbot
+    have hd1 : hyp.base.d = 1 := by
+      rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+    have hcardV : Nat.card ↥hyp.base.V =
+        (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
+      rw [hyp.base.card_V_eq_vd, hd1, mul_one, hv]
+    obtain ⟨e, μ, hμinj, hμrange, hcompat₀⟩ :=
+      OddOrder.RepresentationTheory.ConjugationFieldModel.exists_normOne_galoisField_conjugation_repr
+        hyp.base.q_prime hyp.base.p_prime hyp.base.p_odd hQ_elemAb hVcomm hVN hcardQ hcardV hfaith
+    refine ⟨e, μ, hμinj, hμrange, fun v x => ?_⟩
+    have h := hcompat₀ v x
+    rwa [show OddOrder.RepresentationTheory.ConjugationFieldModel.conjugate hVN v x
+        = (⟨(v : G) * (x : G) * (v : G)⁻¹, hVQ v x⟩ : ↥hyp.base.Q) from
+      Subtype.ext (by simp)] at h
   exact tFieldModelData_of_repr hyp.base e μ hμ_inj hμ_range hVQ hcompat
 
 /-- **Peterfalvi (14.4)+(13.12), the T-side Frobenius kernel** — `C_{T'}(x) ≤ Q` for
@@ -269,11 +299,13 @@ minimal (14.4) carrier `TFieldModelData` from `t_side_caseB_fieldModel` (injecti
 `σ : F_{q^p} ⋊ V* →* G` with kernel `Q`, complement `V`) through the proven transport
 `TFieldModelData.derived_inf_centralizer_le_Q`. -/
 theorem t_side_frobenius_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) :
     ∀ x ∈ sharpSubgroup hyp.base.Q,
       derivedInG hyp.base.T ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.Q := by
   intro x hx
-  obtain ⟨data⟩ := t_side_caseB_fieldModel hG hyp
+  obtain ⟨data⟩ := t_side_caseB_fieldModel hG hnoV hncH0C hyp
   exact data.derived_inf_centralizer_le_Q hx
 
 /-- **Peterfalvi (14.11.3), support half**: every element of the generic set `G₀` has order
@@ -288,7 +320,7 @@ theorem MHypothesis.G0_orderOf_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSim
     Nat.Coprime (orderOf g) (hyp.base.p * hyp.base.q) := by
   obtain ⟨hreg, hP, hQ⟩ := Mdata.G0_avoid g hg
   exact orderOf_coprime_pq_of_not_mem_conj hG hyp.base (T_typeII hG hnoV hncH0C hyp)
-    (s_side_frobenius_kernel hG hyp) (t_side_frobenius_kernel hG hyp) hreg hP hQ
+    (s_side_frobenius_kernel hG hyp) (t_side_frobenius_kernel hG hnoV hncH0C hyp) hreg hP hQ
 
 /-- **Peterfalvi (3.9.a,c) for the `η`-grid on the generic set `G₀`** (faithful §3 Dade obligation).
 For `g ∈ G₀` (an element of order prime to `pq` lying outside `Ã(M)`):
