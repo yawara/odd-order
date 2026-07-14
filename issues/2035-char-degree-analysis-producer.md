@@ -2362,3 +2362,32 @@ dirr bricks (A,B) = (core.tau1S λ, core.tau1S λ̄)、(C,D) = (τ₁T θT, τ�
 conj-antisym = induce_conj + characterKernel_conj (S03:395 ✓)、非実 =
 not_isReal_of_ne_trivial_irreducible_of_odd_card (S03:156 ✓)、h0 = inner_induce_H_QD_eq_zero
 + indH/indK_sub 支持。
+
+## 2026-07-14 更新 #74 (lane b, /loop iter 37) — ✅✅✅ θ-package 本体組立完了 (#41 step 5-6 の核心)
+
+**`tSide_theta_package_of_not_caseB_core` の monolithic sorry を実証明 (~330 行) に置換**
+(build green、full build 4209 jobs 9.8s、S16 下流 green):
+
+- 供給: hnoV = no_typeV_maximal_unconditional (axiom-clean) / hvd = vd_ne_one / pins =
+  nuGridSupply (sorried a-owned) / Tdata = reconciled_typePData_T / chief = exists_chief /
+  **hT2 = 新 gate `T_isTypeP2_gate`** (precisely-named sorried、honest 供給 = S16.T_isTypeP2
+  の layer-inversion 0116 類、docstring 記録済)。
+- θ-witness (thetaWitness_of_not_caseB) → θT := Ind_K θ、anchor row r := ⟨1⟩。
+- conjunct 2 = indK_sub_nuRow_support ✓ / conjunct 3 = zSpan+degree-0 → extends_on_supported
+  → map_sub → nuRow_eta_row pin (r'、δ') / conjunct 4 = tau1T_ofHonest_induce_inner_eta /
+  **conjunct 5 = dirr bricks 全結線**: (A,B) = (τ₁S λ, τ₁S λ̄) core fields 経由
+  (inner_induce/apply_induce_sub/mem_ZIrr ×(thetaL, thetaL.conj))、(C,D) = (τ₁T θT, τ₁T θ̄T)
+  carrier 直 (extension_inner_eq/mem_ZIrr)、非実 = not_isReal_of_ne_trivial_of_odd_card'
+  (度数 uq/vp ≠ 1)、conj-antisym = induce_conj + conj algebra、h0 =
+  inner_induce_H_QD_eq_zero (disjoint support)。
+- **File 内 sorry 残 2 のみ**: T_isTypeP2_gate (新、0116 類) + T_caseB_facts_no_lambda
+  (既存 no-λ Galois 分岐、T-mirror (13.9)-(13.12) gated)。
+- 実装 lessons: (i) λ̄ = lam.lambda.conj は λ を部分項に含む → rw は conj-composite
+  (hlamconj) を先に。 (ii) induce_conj の向き = (Ind θ).conj = Ind (θ.conj)。
+  (iii) file 内前方参照 → package chain (package + lambda_forces + T_caseB_facts_unconditional)
+  を θ-witness block の後方へ python 一括移設 ([[lean-systematic-refactor-script]])。
+
+これで #41 step 5+6 が実質完了 (τ₁T bundling ✓ + conjunct 全結線 ✓ + S/T cross 直交 ✓)。
+残 = step 7 package assembly は既存 consumer chain (lambda_forces → T_caseB_facts_unconditional
+→ S16) が既に配線済みのため、**T-side campaign の残 gate は refuter-T / nuGridSupply (a) /
+T_isTypeP2_gate (0116) / T_caseB_facts_no_lambda の 4 named-obligation に collapse**。
