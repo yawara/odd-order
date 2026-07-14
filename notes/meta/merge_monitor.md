@@ -631,6 +631,25 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 44、ミニ — c 初 commit) — c 再稼働後の first landing: hu_full statement 修正**:
+  **c=1** (`3450746f` = **0115 監査 caveat への即応**: SubgroupM `hu_full` の statement バグ
+  (p ≡ 1 (mod q) 枝と矛盾する無条件 u-値主張) を branch-independent な (9.7.b) gate に修正
+  (+63/−48、faithfulness 修正)。operator = Claude session (Fable、15:57 起動、issue 0105 の codex
+  運用から変更 — 0105 に注記要)。merge)。a=0 / b=0 (両者稼働中)。
+  build green **4207 jobs** / AxiomsCheck OK / census **46 不変** (統計 +1/−2 は restate に伴う
+  移動、comment-strip net 0) / 新 axiom なし / 逸脱なし。push 済。c は続けて Campaign A
+  (ComparingLM) を編集中。**3 レーン + hub の full pipeline が完全稼働**。
+- **2026-07-14 (tick 43) — ★ 再設計後の初 tick: 3 レーン全て稼働状態に復帰。a (13.11) 実証明 + b caseA-T (9.11) 本体**:
+  **a=1** (`e775eced` = ★ **(13.11) numeric_bounds 実証明** — issue 0115 の OrderDetermination b→a
+  移管を a が即消化した初 landing (sorry 実 discharge −1)。同 file 編集は移管済みゆえ非逸脱。merge)。
+  **b=3** (`5054d391`/`5d9e8a36`/`6af94346` = **caseA-T (9.11) base coherence on Ind_T^G** +
+  assembly/dispatch `sSet_coherent_indT_A` + 新 leaf `S15_NuRowPin` +267 (ν-row pin machinery layer 1、
+  配線済・faithful pin scaffold +1)。merge)。
+  **c=再稼働確認**: live process (16:21〜) が `SubgroupM.lean` を編集中 = **0115 Campaign B に着手**。
+  dirty は稼働中につき非接触。main 同期済 (behind 0)。
+  build green **4207 jobs** (+1 = NuRowPin 実 elaborate) / AxiomsCheck OK / census **46 不変**
+  (a −1 実証明 + b +1 scaffold) / 新 axiom なし / 逸脱なし / orphan clean。push 済。
+  ⟹ 0115 再設計が 1 tick で全面稼働: a=OrderDetermination / b=2035 T-side / c=Campaign B。
 - **2026-07-14 (tick 42) — a+b 合流: (9.7.b) conjugation field model (shared leaf) + caseA-T base-cut coherence**:
   **a=1** (`fcb25e47` = ★ **norm-one conjugation field model 構築** — (9.7.b) faithful carrier の新
   shared leaf `GroupTheory/RepresentationTheory/ConjugationFieldModel.lean` +199 (sorry 0)。
