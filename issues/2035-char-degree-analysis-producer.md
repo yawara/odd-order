@@ -2628,3 +2628,16 @@ architecture task」の裁定どおり)。⟹ **c_eq_one → caseA_parameters �
 - 残 bricks: dadeHypT / tInstance_dade_eq_induce / R-family / pin / Tau1T / θ-package chain の
   hT2 param を IsTypeP へ re-thread (機械的、per-site 表に従う; Msigma-等式 site は
   keep-IsTypeP2 で分岐)。
+
+## 2026-07-14 更新 #83 (lane b, /loop iter 9) — hT2 弱化: per-site 表確定 + Dade 層 root 全弱化
+
+**per-site inventory (hT2 binders ~72 / call sites ~181、9 files)**:
+| 層 | 判定 |
+|---|---|
+| Dade 層 root 3 件 (ASet producer / normedTI core / **A0Set producer**) | **弱化済** ✓ (`e442b8fe` + `2c96b8d8`) — endgame は hP2.1 のみ使用、pair は typeP_exists_kappa_hall_pair |
+| 供給 chain (dadeHypT/tInstance×2/R-family/pin/NuRowPin/Tau1T/θ-package/CaseACoherenceT/PairBoundT/SevenEightT) | **弱化対象** (isTypeII_of_isTypeP2 不使用、pass-through のみ) — mega-sweep 待ち |
+| **StepsT gap-patch `mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf_T`** | **唯一の genuine-math root 残** — hHMs (Q = M_σ 等式、II-only) を σ'-枝 (U₁ の σ-free 性: π(U₁)∩σ=∅ の導出が hσH = σ-primes∣\|H\| 依存) で使用。一般 P fix = **正規 σ-Hall 吸収** (Mσ = normal σ-Hall ⟹ 全 σ-部分群 ≤ Mσ) + U₁ ⊓ Mσ = ⊥ 系 or (κ∪σ)ᶜ-Hall 性から π(U₁) ⊆ σᶜ を直接 |
+| (14.9)-conclusional 群 (swap の hT2 [S_typeP2 field 供給] / S15_SAndT・SAndTGrid の dichotomy 系 / CDS summit の T_isTypeP2_gate summon) | **keep IsTypeP2** (9096 設計どおり (14.9) 側供給) — sweep 後、summit の gate summon が chain から消えることで 0116 Finding-2 の knot 解消 |
+
+**実施順 (二重 churn 回避)**: gap-patch fix (次 brick、genuine math) → **単一 mega-sweep** (~72 binder + 181 call site を python 一括、per-file build 検証) → summit summon 除去。
+FeitThompson.lean ×4 (.1 追従、a-owned、statement 不変) self-flag: `2c96b8d8`。
