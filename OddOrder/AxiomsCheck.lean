@@ -8041,3 +8041,11 @@ assembled Section 16 inputs depend only on Lean/mathlib's standard three axioms.
 #assert_only_allowed_axioms OddOrder.section16MaximalPair_of_isMinimalSimpleOdd
 #assert_only_allowed_axioms OddOrder.section16Inputs_of_isMinimalSimpleOdd
 #assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_isMinimalSimpleOdd
+
+/-! **Peterfalvi (4.6) type-`P₂` Dade producer on the canonical `muS` instance, axiom-clean**
+(lane a, 2026-07-14, issues 2038/9081).  The honest `A₀(S)` Dade data now constructs the full
+`Hypothesis46`; its Dade-free core remains separately guarded as the exact prerequisite of the
+(4.7)/(4.8)-(1) support engine. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.hyp46Smp
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.hyp46SmpCore
