@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
@@ -446,6 +447,135 @@ theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
           * (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) := hHmul.trans hImul.symm
   rw [div_div_eq_mul_div, div_eq_iff hcI]
   linear_combination (θ₀.toClassFunction 1 ^ 2 * (H.index : ℂ)) * hAB
+
+open scoped Classical in
+/-- **The abelian rebase identity** (Peterfalvi (13.5)/(7.7.a) rebase input, issue 2035 #79):
+for an abelian normal `H ⊴ G`, the distinct induced irreducibles weighted by their inverse
+squared norms sum to zero at every `g ≠ 1`.  Summing over the whole of `Irr H` gives the
+induction of the regular character (supported at `1` — second orthogonality), and each induced
+image `χ = Ind θ₀` absorbs its fibre of size `[G : I_G(θ₀)]`
+(`card_filter_induce_eq_index_inertia`), which cancels against `‖χ‖² = |I_G(θ₀)|/|H|`
+(`card_mul_inner_self_induce_eq_card_inertia`) to the `θ₀`-independent constant `[G:H]`. -/
+theorem sum_image_induce_div_normSq_apply_eq_zero
+    (hab : ∀ θ : IrreducibleCharacter ↥H, θ.toClassFunction 1 = 1)
+    {g : G} (hg : g ≠ 1) :
+    ∑ χ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).image
+        (fun θ => induce H θ.toClassFunction),
+      χ g / ClassFunction.inner χ χ = 0 := by
+  classical
+  -- (1) second orthogonality at the abelian `H`: `∑_{θ ∈ Irr H} θ(y) = 0` for `y ≠ 1`
+  have hIrr : ∀ y : ↥H, y ≠ 1 →
+      ∑ θ : IrreducibleCharacter ↥H, θ.toClassFunction y = 0 := by
+    intro y hy
+    have hnc : ¬ IsConj y (1 : ↥H) := by
+      intro hc
+      obtain ⟨c, hc⟩ := hc
+      exact hy (by simpa [SemiconjBy] using hc)
+    have h := column_orthogonality_not_conjugate (G := ↥H) hnc
+    calc ∑ θ : IrreducibleCharacter ↥H, θ.toClassFunction y
+        = ∑ θ : IrreducibleCharacter ↥H,
+            (θ.toClassFunction y) * star (θ.toClassFunction 1) := by
+          refine Finset.sum_congr rfl fun θ _ => ?_
+          rw [hab θ, star_one, mul_one]
+      _ = 0 := h
+  -- (2) the full-`Irr H` sum of induced characters vanishes at `g`
+  have hkey : ∑ θ : IrreducibleCharacter ↥H, induce H θ.toClassFunction g = 0 := by
+    calc ∑ θ : IrreducibleCharacter ↥H, induce H θ.toClassFunction g
+        = ∑ θ : IrreducibleCharacter ↥H,
+            ⅟(Nat.card ↥H : ℂ) * ∑ x : G, induceTerm H θ.toClassFunction x g := by
+          simp only [induce_apply]
+      _ = ⅟(Nat.card ↥H : ℂ) * ∑ x : G, ∑ θ : IrreducibleCharacter ↥H,
+            induceTerm H θ.toClassFunction x g := by
+          rw [← Finset.mul_sum, Finset.sum_comm]
+      _ = 0 := by
+          rw [mul_eq_zero]
+          right
+          refine Finset.sum_eq_zero fun x _ => ?_
+          by_cases hx : x⁻¹ * g * x ∈ H
+          · have hy : (⟨x⁻¹ * g * x, hx⟩ : ↥H) ≠ 1 := by
+              intro h
+              apply hg
+              have h1 : x⁻¹ * g * x = 1 := congrArg Subtype.val h
+              have h2 : g = x * (x⁻¹ * g * x) * x⁻¹ := by group
+              rw [h2, h1]
+              group
+            calc ∑ θ : IrreducibleCharacter ↥H, induceTerm H θ.toClassFunction x g
+                = ∑ θ : IrreducibleCharacter ↥H,
+                    θ.toClassFunction ⟨x⁻¹ * g * x, hx⟩ := by
+                  refine Finset.sum_congr rfl fun θ _ => ?_
+                  simp [induceTerm, hx]
+              _ = 0 := hIrr _ hy
+          · refine Finset.sum_eq_zero fun θ _ => ?_
+            simp [induceTerm, hx]
+  -- (3) fibrewise collapse: the image-sum with `1/‖χ‖²` weights is `(|H|/|G|)·(full sum)`
+  have hcH : (Nat.card ↥H : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+  have hcG : (Nat.card G : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+  have hfib := Finset.sum_fiberwise_of_maps_to
+    (fun θ (hθ : θ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H))) =>
+      Finset.mem_image_of_mem (fun θ => induce H θ.toClassFunction) hθ)
+    (fun θ => induce H θ.toClassFunction g)
+  have himg : ∀ χ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).image
+      (fun θ => induce H θ.toClassFunction),
+      χ g / ClassFunction.inner χ χ
+        = (Nat.card ↥H : ℂ) / (Nat.card G : ℂ)
+            * ∑ θ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).filter
+                (fun θ => induce H θ.toClassFunction = χ),
+              induce H θ.toClassFunction g := by
+    intro χ hχ
+    obtain ⟨θ₀, hθ₀T, rfl⟩ := Finset.mem_image.mp hχ
+    have hcI : (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) ≠ 0 := by
+      rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+    have hfibsum : ∑ θ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).filter
+        (fun θ => induce H θ.toClassFunction = induce H θ₀.toClassFunction),
+        induce H θ.toClassFunction g
+        = ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
+            * induce H θ₀.toClassFunction g := by
+      have hconst : ∀ θ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).filter
+          (fun θ => induce H θ.toClassFunction = induce H θ₀.toClassFunction),
+          induce H θ.toClassFunction g = induce H θ₀.toClassFunction g := by
+        intro θ hθ
+        rw [(Finset.mem_filter.mp hθ).2]
+      rw [Finset.sum_congr rfl hconst, Finset.sum_const,
+        card_filter_induce_eq_index_inertia Finset.univ
+          (fun _ _ _ => Finset.mem_univ _) θ₀ hθ₀T,
+        nsmul_eq_mul]
+    rw [hfibsum]
+    have hinner : ClassFunction.inner (induce H θ₀.toClassFunction)
+        (induce H θ₀.toClassFunction)
+        = (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ)
+            / (Nat.card ↥H : ℂ) := by
+      rw [eq_div_iff hcH, mul_comm]
+      exact card_mul_inner_self_induce_eq_card_inertia θ₀
+    rw [hinner]
+    have hImul : ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
+        * (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ)
+        = (Nat.card G : ℂ) := by
+      rw [← Nat.cast_mul, Subgroup.index_mul_card]
+    rw [div_div_eq_mul_div, div_mul_eq_mul_div, div_eq_div_iff hcI hcG]
+    linear_combination (-(induce H θ₀.toClassFunction g) * (Nat.card ↥H : ℂ)) * hImul
+  calc (∑ χ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).image
+        (fun θ => induce H θ.toClassFunction),
+        χ g / ClassFunction.inner χ χ)
+      = ∑ χ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).image
+          (fun θ => induce H θ.toClassFunction),
+          ((Nat.card ↥H : ℂ) / (Nat.card G : ℂ)
+            * ∑ θ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).filter
+                (fun θ => induce H θ.toClassFunction = χ),
+              induce H θ.toClassFunction g) :=
+        Finset.sum_congr rfl himg
+    _ = (Nat.card ↥H : ℂ) / (Nat.card G : ℂ)
+          * ∑ χ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).image
+              (fun θ => induce H θ.toClassFunction),
+            ∑ θ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).filter
+                (fun θ => induce H θ.toClassFunction = χ),
+              induce H θ.toClassFunction g := by
+        rw [Finset.mul_sum]
+    _ = (Nat.card ↥H : ℂ) / (Nat.card G : ℂ)
+          * ∑ θ : IrreducibleCharacter ↥H, induce H θ.toClassFunction g := by
+        rw [hfib]
+    _ = 0 := by rw [hkey, mul_zero]
 
 /-- Integer-vector combinatorics: if nonzero integer coefficients on a finite set have squares
 summing to `1`, the set is a singleton with coefficient `±1`. (The `∑ = 1` analogue of
