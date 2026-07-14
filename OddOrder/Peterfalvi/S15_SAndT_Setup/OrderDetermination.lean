@@ -96,6 +96,21 @@ theorem m_value_q_three_gt_49_hundredths {p : ℕ} (hp : 5 ≤ p) :
   rw [hexpr]
   linarith [hsmall]
 
+/-- Exponential estimate used in **Peterfalvi (13.11.c)**: for `n ≥ 5`,
+`n² ≤ 3^(n-1)`.  The induction step is `(n+1)² ≤ 3n²`. -/
+private theorem sq_le_three_pow_pred_of_five_le {n : ℕ} (hn : 5 ≤ n) :
+    n ^ 2 ≤ 3 ^ (n - 1) := by
+  induction n, hn using Nat.le_induction with
+  | base => norm_num
+  | succ n hn ih =>
+      have hstep : (n + 1) ^ 2 ≤ 3 * n ^ 2 := by nlinarith
+      calc
+        (n + 1) ^ 2 ≤ 3 * n ^ 2 := hstep
+        _ ≤ 3 * 3 ^ (n - 1) := Nat.mul_le_mul_left 3 ih
+        _ = 3 ^ (n + 1 - 1) := by
+          rw [show n + 1 - 1 = (n - 1) + 1 by omega, pow_succ]
+          ring
+
 /-- **Numerical core shared by Peterfalvi (13.12) and (13.15)**: the upper estimate
 `m < q·p / ((2q+1)(p-1))` — obtained from `c ≥ 2q+1` (13.12) resp. the divisor `x ≥ 2q+1`
 (13.15) together with the analytic inequality (13.10) and `u ≤ (p^q-1)/(p-1)` (13.2.c) — combined
@@ -340,10 +355,9 @@ theorem Hypothesis.two_mul_q_dvd_c_pred [Finite G] (hG : OddOrder.BG.IsMinimalSi
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
 `m_value_gt_four_fifths` / `m_value_gt_seven_tenths` applied through the now
 concrete value `m_eq` (they need only `p ≥ 3`, supplied by `three_le_p`).  The
-`q = 3` value bound is available as `m_value_q_three_gt_49_hundredths` under
-`p ≥ 5`, which Section 16 supplies from `q < p`; this bundled Section 15
-statement still keeps the branch open because its `u/c` bound is the analytic
-inequality (13.10). -/
+`q = 3` branch uses `p ≠ q` and oddness to get `p ≥ 5`; its `m`-bound is
+`m_value_q_three_gt_49_hundredths`, while the `u/c` bound combines the analytic
+inequality (13.10) with `p² ≤ 3^(p-1)`. -/
 theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
@@ -353,9 +367,49 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (hyp.u : ℚ) / (hyp.c : ℚ) > (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6)) := by
   refine ⟨hyp.m_gt_four_fifths_of_seven_le_q,
     hyp.m_gt_seven_tenths_of_five_le_q, fun hq3 => ?_⟩
-  · -- `q = 3`: the `m`-only API needs `p ≥ 5`, and the bundled `u/c` bound
-    -- still needs the analytic inequality (13.10).
-    sorry
+  have hp5 : 5 ≤ hyp.p := by
+    have hp3 := hyp.three_le_p
+    have hpne3 : hyp.p ≠ 3 := by
+      intro hp3eq
+      exact hyp.p_ne_q (hp3eq.trans hq3.symm)
+    obtain ⟨k, hk⟩ := hyp.p_odd
+    omega
+  have hm49 := hyp.m_gt_49_hundredths_of_q_eq_three_of_five_le_p hq3 hp5
+  obtain ⟨_, _, h1310⟩ := analytic_inequality _hG hyp
+  rw [hq3] at h1310
+  norm_num at h1310
+  have hpPow : hyp.p ^ 2 ≤ 3 ^ (hyp.p - 1) :=
+    sq_le_three_pow_pred_of_five_le hp5
+  have hpPowR : (hyp.p : ℚ) ^ 2 ≤ (3 : ℚ) ^ (hyp.p - 1) := by
+    exact_mod_cast hpPow
+  have hmval := hyp.m_eq
+  rw [hq3] at hmval
+  norm_num at hmval
+  have hmval' : hyp.m = (1 : ℚ) / 2 - 1 / (2 * (3 : ℚ) ^ (hyp.p - 1)) := by
+    rw [hmval]
+    have hpow : (3 : ℚ) ^ hyp.p = 3 * (3 : ℚ) ^ (hyp.p - 1) := by
+      conv_lhs => rw [show hyp.p = (hyp.p - 1) + 1 by omega, pow_succ]
+      ring
+    rw [hpow]
+    field_simp
+    ring
+  have hden : (0 : ℚ) < (3 : ℚ) ^ (hyp.p - 1) := by positivity
+  have hfrac : (hyp.p : ℚ) ^ 2 / (3 : ℚ) ^ (hyp.p - 1) ≤ 1 := by
+    rw [div_le_one hden]
+    exact hpPowR
+  have hlower : (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6) ≤
+      hyp.m * (((hyp.p ^ 2 : ℕ) : ℚ)) / 3 := by
+    have hp2pos : 1 ≤ hyp.p ^ 2 := Nat.one_le_pow _ _ hyp.p_prime.pos
+    rw [hmval']
+    push_cast [Nat.cast_sub hp2pos]
+    have hid : ((1 : ℚ) / 2 - 1 / (2 * (3 : ℚ) ^ (hyp.p - 1))) *
+          (hyp.p : ℚ) ^ 2 / 3 =
+        ((hyp.p : ℚ) ^ 2 - (hyp.p : ℚ) ^ 2 / (3 : ℚ) ^ (hyp.p - 1)) / 6 := by
+      field_simp [hden.ne']
+      ring
+    rw [hid]
+    linarith [hfrac]
+  exact ⟨hm49, lt_of_le_of_lt hlower h1310⟩
 
 /-- **Peterfalvi (13.12), numeric elimination** (04.15 p.85): the (13.10)+(13.2.c) upper bound
 `m < q(p^q − 1)/(c · p^(q−1) · (p − 1))`, together with the fixed-point-free lower bound `c ≥ 2q+1`
