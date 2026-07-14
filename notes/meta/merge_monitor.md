@@ -641,6 +641,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick 57, 新監視セッション開始) — a: (14.6) Ω₁(Z(R)) 位数 leaf / b: (13.2.e)-for-T QD_sharp gate 討伐。census 37→36**:
+  **監視スコープ変更 (ユーザー指示)**: 本セッションは **a/b のみ監視、c は明示停止中** (c の
+  `main..c` 6 commits は全て空 sync merge = 実内容ゼロ、マージ不要)。
+  **a=1** (`aecc7341` = Pf **(14.6)** Ω₁(Z(R)) 位数 — 新 leaf `S15_CaseAOmegaCenter.lean`
+  (246 行 sorry-free、claim 1036)。c=1, q=3 入力で 2-座標 scalar 作用 faithful → rank U ≤ 2 →
+  |Ω₁(Z(R))| ∈ {r, r²}。**tick 56 CaseASylowCenter と同型の file 単位 a 所有 carve-out**
+  (名目 S15 = b 域だが内容 = a の caseA campaign)。S15_SAndT import 1 行 = 機械的配線。merge)。
+  **b=5** (`bfa04e9d` 系 = ★ **(13.2.e)-for-T `QD_sharp_centralizer_le_T` (CountingLayer) の
+  sorry を実証明討伐** (honest A(T)-support 経由、signature 不変、2035 #87) + `Q_sharp_hypothesis76_base`
+  T-side chosen-base (7.6) datum (CharacterDegreeEngines additive、2035 #88 = T-side twin brick 1/3)。
+  merge)。build green 4221 jobs ×2 / AxiomsCheck OK / census **37→36 (実証明による減)** /
+  新 axiom なし / 逸脱なし / size flag なし。push 済。
 - **2026-07-15 (tick 56) — a: (14.6) caseA Sylow center (新 leaf、S15 内容ベース carve-out)。census 37**:
   **a=1** (`b4e95807` = Pf **(14.6)** caseA Sylow center trap — 新 leaf `S15_CaseASylowCenter.lean`
   (197 行 sorry-free、claim 1035)。名目 S15 = b 域だが内容 = a の caseA campaign ⟹ **file 単位

@@ -1046,4 +1046,41 @@ theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G] [Fintype G]
     (sub_eq_zero.mp hdv).symm
   exact hlamv.trans hμv
 
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **The (13.5)/(7.6) datum for `(T, Q^#)` with a chosen `𝒯₁`-base** (issue 2035 更新 #22
+発見 2, the `T`-side twin of `H_sharp_hypothesis76_base`): the `Q_sharp_hypothesis76` mirror
+through `hypothesis76OfDadeBase`, pinning `ζ₀ = Ind_Q^T φ₀` for a *given* `φ₀` —
+Peterfalvi's per-application base choice for the `T`-side (13.5) of the (13.8)-for-`T`
+estimate (`ζ₀ ∈ 𝒯₁`, i.e. `Q ⊄ Ker φ₀`; the trivial-base instance leaves the (13.5.a/b/c)
+coefficient claims genuinely undetermined, exactly as on the `S`-side). -/
+noncomputable def Q_sharp_hypothesis76_base [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.T)) :
+    OddOrder.Peterfalvi.S09.Hypothesis76 G
+      (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T := by
+  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase
+    (Q_sharp_hypothesis71 hG hyp hvd)
+    (((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
+      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.isDadeIsometry) hyp.Q ?_ ?_ rfl φ₀
+  · rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  · intro l h hh
+    have hnorm : Subgroup.normalizer (hyp.Q : Set G) = hyp.T := normalizer_Q_eq_T hG hyp
+    have hlnorm : (l : G) ∈ Subgroup.normalizer (hyp.Q : Set G) := by
+      rw [hnorm]; exact l.2
+    exact (Subgroup.mem_set_normalizer_iff.mp hlnorm h).mp hh
+
+open scoped FiniteInduce in
+/-- **The chosen-base `(T, Q^#)` family pins `ζ₀ = Ind_Q^T φ₀`** (mirror of
+`H_sharp_hypothesis76_base_zeta_zero`). -/
+theorem Q_sharp_hypothesis76_base_zeta_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.T)) :
+    (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta 0
+      = ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+          (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) := by
+  unfold Q_sharp_hypothesis76_base
+  exact OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase_zeta_zero _ _ _ _ _ _ _
+
 end OddOrder.Peterfalvi.S15
