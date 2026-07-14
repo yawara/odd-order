@@ -8082,3 +8082,12 @@ one intended sorried obligation `sSet_caseA_nineElevenRefutation_T`, mirroring t
 (the `A₀(T)`-Dade regular vanishing + the (3.7)–(3.8) norm-two engine). -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.coherentIndT_nuRow_diff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.coherentIndT_image_inner_eta_eq_zero
+
+/-! **Peterfalvi (13.3.c)-`T` ν-row pin dichotomy, axiom-clean** (lane b, 2026-07-14, issue
+2035 #41 step 4).  Any coherent extension of `𝒯` on `Ind_T^G` sends a reducible ν-row either to
+the aligned `η`-row or to the negated conjugate row (γ-trick + (3.7) rectangle relation with
+row-0 corners + `‖·‖² = p`); the clean pivot pin propagates to all rows through the
+row-independence. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.coherentIndT_nuRow_pin_of_irr
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot

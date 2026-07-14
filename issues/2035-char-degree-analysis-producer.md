@@ -2205,3 +2205,23 @@ AxiomsCheck: import を S15_TSetMemberRFamily → S15_NuRowPin に置換 (推移
 + `sSet_reducible_eq_nuRowSum` ✓ + `sSet_memberRFamily_T_imageSet_of_red` ✓ +
 `S16.inner_eta_grid_relation` (generic ✓) + eta_orthonormal ✓) → `..._eq_etaRow_of_pivot` →
 all-reducible glue → `sSet_coherent_indT_A_pinned`。
+
+## 2026-07-14 更新 #67 (lane b, /loop iter 29-30) — ✅✅ (13.3.c)-T ν-row pin 完成 (#41 step 4 完)
+
+S15_NuRowPin.lean 836 行 (全 sorry-free・axiom-clean・各 build 一発 green):
+- γ-trick pair: `coherentIndT_extension_irr_vanish_regular` (irr image の Ŵ^G 消滅) +
+  `coherentIndT_nuRow_vanish_regular` (γ = ξ(1)·ν_i − (p·v)·ξ の A(T)-support + dadeT0 消滅)
+- `etaRow_inner`/`etaRow_inner_self` (η-row p·[r=s])
+- `sSet_coherent_extension_eq_sum_memberRFamily_T` ((5.5)-T、CharacterPsiDecomposition 経由)
+- **`coherentIndT_nuRow_pin_of_irr`** (pin 本体 ~250 行): E ⊆ {η_{ij}} ∪ {−η_{sj}} 分解 →
+  membership 指標 → **(3.7) rectangle relation は S/T 対称** (row-0 corner を消して
+  column-uniform 化 — swap/transpose 不要が判明、tauT_nu_cross の swap 経由と対照的) →
+  ‖c(ν_i)‖² = p で全行 pick。
+- `coherentIndT_nuRow_eq_etaRow_of_pivot` (pivot 伝播、行独立性経由)
+
+AxiomsCheck 2 endpoint 追加 (4192 jobs green)。main 再同期 (c レーン初 landing 取り込み、非競合)。
+
+残 (#41 step 4 の pinned assembly → step 5): all-reducible glue
+(`exists_pinned_coherent_sSet_of_all_reducible` の T-mirror、S 版 = CaseBReducibleCoherence:762)
+→ `sSet_coherent_indT_A_pinned` (dispatch + pin bundling、S 版 = CaseACoherence:720) →
+step 5 τ₁T 定義 + conjunct 4 assembly。
