@@ -2658,3 +2658,18 @@ FeitThompson.lean ×4 (.1 追従、a-owned、statement 不変) self-flag: `2c96b
   残 = 機械的 mega-sweep (~60 binders / ~181 call sites → IsTypeP; (14.9)-conclusional 群
   [swap / dichotomy consumers / CDS summit] は keep-IsTypeP2)。sweep 完了で CDS summit の
   `T_isTypeP2_gate` summon が供給 chain から消え、0116 Finding-2 の knot 解消。
+
+## 2026-07-14 更新 #85 (lane b, /loop iter 11) — hT2 部分 sweep 着地 + 硬い境界の発見
+
+- **`76b3e3a6`**: Dade/A0/grid 供給層 (~15 decls) を IsTypeP 化 — TSideDegrees
+  (dadeHypT ×2 + **新 producer `Hypothesis.T_isTypeP`** [T_nonI + 分類、hnoV 不要]) /
+  HonestTypeP2A0 全 10 decls / SAndTGrid tauTbetaGrid。境界 `.1` 全所挿入。
+- **⚠ 硬い境界の発見 (設計上重要)**: `tauT_nu_cross` / `tauT_nuRow_diff_eq`
+  (BridgeCharacter、T-side prime-TI cross-relation) の現証明は **swap 経由** ((3.8) rigidity
+  を S-side transpose で輸送) で、swap は S_typeP2 field ゆえ真に IsTypeP2 を要求。
+  reducible R-family が cross を消費するため、**中間 chain 全体 (TSetMemberRFamily →
+  PairBoundT → StepsT → SevenEightT → CaseACoherenceT → NuRowPin → Tau1T) は暫定 hT2 keep**。
+- **残 brick = cross pair の de-swap**: Coq PFsection13 は FTtype ∈ {2,3,4} で一様に
+  cross-relation を直接証明 (S-side `tauS_mu_cross` の T-mirror を swap を使わず直に) —
+  これが sweep 残余 (~45 binders) の唯一の unlock。de-swap 後に sweep 再適用 →
+  CDS summit の T_isTypeP2_gate summon 切除 → 0116 Finding-2 完了。
