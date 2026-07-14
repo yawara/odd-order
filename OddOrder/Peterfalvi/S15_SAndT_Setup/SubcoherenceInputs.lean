@@ -981,16 +981,14 @@ theorem escaping_honestTypeP2ASet_eq_empty [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 M) :
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP M) :
     OddOrder.GroupTheory.escapingCentralizerSet M (honestTypeP2ASet M) = ∅ := by
   classical
   rw [Set.eq_empty_iff_forall_notMem]
   rintro a ⟨haA, haesc⟩
   -- the matched `κ`-Hall / `(κ∪σ)′`-Hall pair, for the `σ`-sharp confinement (8.13.b)
-  obtain ⟨K₀, U₀, hKM, hUM, hUne, hK, hU, -, -⟩ :=
-    OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair hG hM hP2
-  have hKne : K₀ ≠ ⊥ :=
-    kappaHall_ne_bot_of_isTypeP (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hP2) hK
+  obtain ⟨K₀, U₀, hKM, hUM, hKne, hK, hU⟩ :=
+    typeP_exists_kappa_hall_pair hG hM hTP
   have haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
     escaping_honestTypeP2ASet_mem_sigmaSharp hG hM hKM hUM hKne hK hU ⟨haA, haesc⟩
   -- BG Theorem D(4): the unique neighbour `N ⊇ C_G(a)` with the escape structure
@@ -1020,9 +1018,9 @@ theorem escaping_honestTypeP2ASet_eq_empty [Finite G]
       exact Subtype.ext (Subgroup.mem_centralizer_singleton_iff.mp hzC).symm
     exact hxAN.2 (SetLike.mem_coe.mpr
       (by rw [← hker]; exact Subgroup.mem_subgroupOf.mp haker))
-  · -- `N` type `P₂`: the escape package makes `M` type `F`, contradicting type `P₂`.
+  · -- `N` type `P₂`: the escape package makes `M` type `F`, contradicting type `P`.
     obtain ⟨hFM, -⟩ := hP2imp hNP2
-    exact OddOrder.BG.Ch4.S14.not_isTypeP_and_isTypeF ⟨hP2.1, hFM⟩
+    exact OddOrder.BG.Ch4.S14.not_isTypeP_and_isTypeF ⟨hTP, hFM⟩
 
 /-- **Peterfalvi (8.15) for the type-`P₂` support `A(S)`: the Dade (2.2) support hypotheses hold.**
 The honest (13.2.e) foundation.  Assembles the `σ`-decomposition-generic engine
@@ -1200,7 +1198,7 @@ theorem Hypothesis.no_escaping_honestTypeP2ASet [Finite G]
     ∀ a ∈ honestTypeP2ASet hyp.S,
       a ∉ OddOrder.GroupTheory.escapingCentralizerSet hyp.S (honestTypeP2ASet hyp.S) := by
   intro a _ ha
-  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2] at ha
+  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2.1] at ha
   exact Set.notMem_empty a ha
 
 /-- **(13.2.e) for the `S`-instance, stabilizer form: every `S`-instance Dade stabilizer is
