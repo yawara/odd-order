@@ -1717,3 +1717,23 @@ cSub_eq_D)。
   Dade/直交計算 — S-side の tau1S_induce_inner_eta 系 mirror + ν_r^τ = δ'∑η formula (§4/§6-T)
 - conjunct 5 (⟨τ₁S λ, θG⟩ = 0): (13.2.e) disjoint support 直交
 次 iteration: conjunct 4 の ν-η formula (Ind_T(ν_{rj} 差) と η の関係、nu_definition + Dade 経由) を精査。
+
+## 2026-07-14 更新 #40 (lane b, /loop iter 4) — (13.4) conjunct 2 (support estimate) 実証明
+
+`tSide_theta_package` の conjunct 2 を閉じた (TSideDegrees、sorry-free):
+- **`K_subgroupOf_T_normal`**: K = QD ⊴ T。Q = T_F Fitting Hall + D = V ⊓ C_G(Q) の T-正規性
+  (`typePData_C_normalized_by_M` reconciled T-instance、D は F(T) の π(Q)'-part) + normal sup。
+- **`indK_sub_nuRow_support`**: `(Ind_K^T θ − ν_r).support ⊆ (QD)^#`。両項とも normal K からの
+  induce (`nu_i_isIndQD`) → K 外で消滅 (`induce_apply_eq_zero_of_not_mem_normal`)、1 では両者
+  degree v·p (`K_index_eq_vp`) で相殺。
+
+### tSide_theta_package 残り conjunct 状況 (再掲+更新)
+- conjunct 1 (δ'=±1) ✓ / conjunct 2 (support) ✓ #40 / conjunct 3 (Ind formula) = θG 定義消化 ✓方針
+- **conjunct 4 (∀ij ⟨η_{ij}, θG⟩ = 0) = 残る本丸**: θG = Ind(θT−ν_r) + δ'∑η_{rj} の η-直交
+  ⟺ ⟨η_{ij}, Ind_T^G(θT−ν_r)⟩ = −δ'[i=r]。原文 route は τ₁-T formula (ν_r^{τ₁} = δ'∑η_{rj})
+  + θ^τ ⊥ η ((5.3.b)-T) — **T-side (9.11) coherence (`sSet_coherent_indT_A_pinned` 相当) の構築
+  が必要** (S-side 機構 sSet_coherent_indS_{caseA,caseB} + coherentIndS_image_inner_eta_eq_zero
+  の T-instance 化; S-side 自体に mixed-family lift の sorried-cite residual あり)。
+- conjunct 5 (⟨τ₁Sλ, θG⟩ = 0): (13.2.e) S/T cross disjoint-support 直交。
+
+次 iteration: S-side coherence 機構の generic 性精査 → T-instance 化の設計判断。
