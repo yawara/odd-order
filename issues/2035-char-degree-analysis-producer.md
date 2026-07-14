@@ -2692,3 +2692,36 @@ FeitThompson.lean ×4 (.1 追従、a-owned、statement 不変) self-flag: `2c96b
 - **hub 0116 宛**: sequencing (i) の hT2 弱化は**実装完了** (裁定 #82 → root #82-84 →
   sweep #85-86)。Route T の threading param 型は確定 (供給 chain = IsTypeP、conclusional =
   IsTypeP2 keep)。(ii) (a の OrderDetermination cluster 静穏化) 成立確認後に Route T 実施可。
+
+## 2026-07-15 更新 #87 (lane b, /loop 再開 iter 1) — (13.2.e)-for-T QD_sharp 討伐 (0116 step 4 の genuine math)
+
+- **`bee4bef9`**: `QD_sharp_centralizer_le_T` (CountingLayer:691 sorry) を **axiom-clean 討伐**。
+  - **`mem_honestTypeP2ASet_of_mem_Q_sup_D`** (新、genuine math): (QD)^# ⊆ A(T)。
+    z = q·d 分解 (T-normalized Q) + **D = C_V(Q) が Q を centralize** (D_eq) → q ≠ 1 なら
+    witness = q 自身、q = 1 なら witness = 任意 x ∈ Q^#。**Hall 論法不要の直接証明** (~35 行)。
+  - discharge chain: membership → `escaping_honestTypeP2ASet_eq_empty` ((13.2.e) core) +
+    `no_typeV_maximal_unconditional` (Pf (10.10) — **axiom-clean 済と実測確認**、S12_Noncoherence
+    docstring の「(6.5) gate 残る」は stale) + `isTypeP_of_isTypeNonI`。
+  - **0116 step 4 想定からの簡略化**: A₀(T) でなく A(T) で足りる (membership が A-part に直接入る)
+    → HonestTypeP2A0 2 補題 (conjClassSetIn_typePV_centralizer_le_M / escaping_A0_eq_empty) の
+    SubcoherenceInputs 上移は**不要**、TypePData 引数も不要、signature 不変 (hnoV param 不要 —
+    (10.10) が場内 discharge)。
+- **連鎖 axiom-clean 化**: `inner_induce_H_QD_eq_zero` ((13.2.e) S/T cross-orthogonality、CDS:77)
+  が clean に。`T_caseB_facts_unconditional` の残 sorryAx は既知の別 gap
+  (T_caseB_facts_no_lambda / nuGridSupply 系) のみ。
+- b-owned 実 sorry 10 → 9。full build green 4219 jobs / AxiomsCheck OK。
+
+**census 再確認 (comment-strip、本 iteration 冒頭)**: b-owned 実 sorry 10 (討伐前) の内訳 =
+T_isTypeP2_gate (keep 設計) / V_inf_centralizer_Q_eq_bot (c carve-out 9077) / nuGridSupply
+(9096 rewiring、hub arbitration) / tSide_theta_package_of_not_caseB + exists_muT_index +
+exists_etaT_alphaFun_one_int (Route T で削除/移設予定、hub) / **QD_sharp (本 #87 で討伐)** /
+character_degree_analysis (9094 deprecated、Route T gated) / caseB_order_u_data / sibleyTarget_S
+(次 iteration で gate 判定)。
+
+**9094 ⑤ flip 残 (NormEstimates 5 sites) の調査確定 (本 iteration)**: 5 定理の無条件 statement は
+S15 レベル (q<p 無し) で**証明不能** — no-λ∧θ-有ケースで T-side caseB values が §13 の道具で
+確定しない (counting 等式 (13.10.3) の右辺定数 (q−1)/(pq^p) が T-caseB values を織り込む;
+Pf (13.4) は「λ有∧θ有→矛盾」のみで、λ 無のとき T-side は未定)。9094 §3-2 但し書きの
+「T-side v-value 依存」ケースに該当。**解決は 0116 Route T ((hD,hv) param threading + S16 summit
+discharge) と不可分** — b 単独の dichotomy 移行では閉じない。Route T (hub、sequencing (ii) =
+a の OrderDetermination cluster 静穏化待ち) の実施時に同時解決される設計。
