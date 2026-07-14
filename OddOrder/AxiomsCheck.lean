@@ -126,6 +126,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
+import OddOrder.Peterfalvi.S11_GaloisFieldModel
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
@@ -7056,6 +7057,15 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseB_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy
+
+/-! **Peterfalvi (9.7.b) chief-factor Galois-field model, axiom-clean** (lane a, issue 1031).
+The actual case-(b) irreducibility proof feeds the shared faithful irreducible Singer constructor,
+giving `H/H₀ ≃+ GF(p^q)` and an injective scalar realization of `Ū`.  When `C_U(H/H₀) = 1`, the
+model transports along `U.subgroupOf (U ⊔ W₁) ≃ U`; no legacy opaque `field_model` is used. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.uActionHom_injective_of_cSub_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_of_cSub_eq_bot
 
 -- Peterfalvi §13 (= repo `S13_MaximalIII_IV`, types III/IV) structural cluster.  After de-opacifying
 -- the `Hypothesis` scaffold (the `C = C_U(H)` field and the deleted opaque conclusion-Props), the
