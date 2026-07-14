@@ -2030,3 +2030,13 @@ forall_dadeHypT0_H_eq_bot #53 経由)。
 ⟹ `tauT_nuRow_diff_eq` (S-side `tauS_muColumn_diff_eq` mirror: τ_T(ν_r − ν̄_r) = ∑_j(η_{rj}−η_{sj})、
 A/A₀ Dade 一致 + cross 総和) の部材完備。残: rows_ne-T + nuRow_diff_eq + ofRows family 本体 +
 dispatch + orthogonal + engine。
+
+## 2026-07-14 更新 #56 (lane b, /loop iter 17) — rows_ne-T + tauT_nuRow_diff_eq landed
+
+- `sSet_reducible_conj_not_irr_T` / **`sSet_reducible_rows_ne`** (TSideDegrees): reducible
+  𝒯-member とその conjugate の ν-行相異 (no-real 経由)。
+- **`tauT_nuRow_diff_eq`** (BridgeCharacter): τ_T(η − η̄) = ∑_j(η_{rj} − η_{sj}) — A/A₀ Dade
+  一致 (tInstance bridges #55) + `tauT_nu_cross` (#54) の列総和。
+
+R-family 残: `ofRows` 本体 (S-side `sSet_reducible_memberRFamily_ofColumns` の
+OrthonormalCharacterImageFamily 構築 mirror、~100 行) → dispatch → `_orthogonal` → (5.7) engine。
