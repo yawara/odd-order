@@ -623,6 +623,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 39) — ★ b 合流: 9086 差し戻しに模範対応 + T-side 2035 campaign 大幅前進 / a docs**:
+  **b=de-dup 済 tip `d5d6f0d2` を合流** (b は 9086 裁定を同期 merge `8675a186` 内で即消化 — dup leaf
+  drop、cite 発生前に解消。net diff は TSideDegrees +314 (実 sorry 0) + issues のみで dup-free 確認済。
+  数学: `6f84ff33` = **(13.2.a)-at-T `isMulCommutative_V` 無条件化** ((14.9) 入力なし — type-II/III
+  witness + SZ transport、type-IV は (11.9.c) 排除、type-V は (10.10))、`6a6db61d` = caseB-T uniform
+  degree p·v、`999e8c47` = (4.7)-at-T member support trio、`6c4fbb7b` = dadeHypT (A(T)-Dade datum、
+  hT2-parametric) + oddCardT、`d5d6f0d2` = (5.3.a)-at-T conjugate-diff support pair。#43-#49 記録)。
+  **a=1** (`b48ada04` = superseded T-side TypePData issue close。dirty 2 file は稼働中につき非接触)。c=0。
+  build green **4204 jobs** / AxiomsCheck OK / census **46 不変** (+1 hit は docstring「sorry-free」、
+  comment-strip で実 0 確認) / 新 axiom なし / 逸脱なし / orphan clean。push 済。
+  ⚠ 注記: `main..b` 履歴に dup SHA (2ca52edf) は残るが tree は dup-free (drop 済) — 以後の tick は
+  net diff で判定。**isMulCommutative_V 無条件化は c の旧 hold gate の 1 つ (V abelian 系) に波及する
+  可能性** — c 再開判定の材料として次 tick で確認。
 - **2026-07-14 (tick 38) — a 合流 (AxiomsCheck guard 登録) + b **partial** 合流 (step 1 genuine / ⚠ dup leaf 差し戻し = 9086 裁定)**:
   **a=4** (`07787735`/`5907e03a` = tick 37 follow-up: **section16 producer chain 12 宣言 + type-P2 Dade
   bundle の AxiomsCheck assert 登録** (+29)、`fd980c5b`/`887ef16d` = 9087 記録 + stale spine-root 診断
