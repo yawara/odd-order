@@ -2786,3 +2786,25 @@ hub 再確定順序 (0116 tick 55 自己訂正: b の #22 campaign 先行 → hu
 - **残 brick 3/3**: `exists_etaT_alphaFun_one_int` core 版 — T-side (13.5.a) 整数性
   (α|_Q ∈ ℤ[Irr Q]、hQcomm で Q abelian、S-side eta10_cCoeff_int / H_sharp_alphaCF_restrict_mem_ZIrr
   パターンの mirror)。landing で #22 T-side twin 修理完了 = hub full flip (0116) のトリガー成立。
+
+## 2026-07-15 更新 #91 (lane b, /loop iter 6) — ★★ #22 T-side twin campaign 完了 (brick 1-3 全 landed)
+
+- **`f2c3b831`**: Engines prefix-split (1634 行 watch 解消 — S-side 15 decls を
+  S15_CharacterDegreeEnginesSSide.lean へ、module 名不変・下流不変、宣言数保存検証済)。
+- **`7c9b4141`** (brick 3/3): `exists_etaT_alphaFun_one_int_core` + 補助 3 補題
+  (うち 2 本 generic — hypothesis76AlphaFun_one_int は S-side と共用可能な形)。
+  sorry 0 / axiom-clean / full build green 4222 jobs。
+- **⟹ #22 rebase campaign の T-side twin 修理完了**: NormEstimates の sorried atom 2 本
+  (exists_muT_index :238 / exists_etaT_alphaFun_one_int :259) の honest core 供給
+  (`exists_muT_index_core` / `exists_etaT_alphaFun_one_int_core`、共に hD + hQcomm param、
+  Q_sharp_hypothesis76_base family) が discharge leaf 側 (S15_CharacterDegreeEngines) に完備。
+
+**hub 0116 宛 flag: full flip のトリガー成立**。tick 55 自己訂正の再確定順序 (1) = 「b の #22
+rebase campaign の NormEstimates/CountingLayer 到達 landing」は本 update で成立:
+- S-side atom 層 = #25/#26 (cCoeff_base ×2 + NormEstimates:806 core 版)
+- T-side atom 層 = #88-#91 (Q_sharp_hypothesis76_base + tau_eq_induce + muT index + etaT 整数性)
+- 全て core/lam + (hD, hQcomm) param 型で restate 済 — hub full flip (obtain-site の
+  core/lam + (hD,hv) param 化 + 討伐済 atom cite 置換 + discharge leaf + legacy retire) を実施可。
+- 注: T-side atom の param は (hD : D = ⊥) + (hQcomm : IsMulCommutative Q)。hQcomm は
+  (13.2.b)-T の可換部分で、Q_elementaryAbelian_T (hTTypeII gated) から S16 レベルで
+  discharge 可能 (threading param に追加するか S16 hoist かは hub 裁量)。
