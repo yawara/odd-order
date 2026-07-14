@@ -56,6 +56,30 @@ theorem card_le_cyclotomicQuotient_of_faithful_fpf
     exact card_le_cyclotomicQuotient_of_faithful_irreducible_fpf hq hcardM hfaith σ hfpf
   · exact hReducible hsimple
 
+/-- **Block-scalar order divisibility** (Peterfalvi (9.7)(a)): under the same imprimitive block
+hypotheses as `card_le_cyclotomicQuotient_of_blocks`, the order of `U` divides `(p - 1)^n`.
+
+This retains the prime-factor information discarded by the cardinality bound.  In Peterfalvi
+(13.13), `U` has odd order, so the 2-primary part of `(p - 1)^n` can subsequently be removed. -/
+theorem card_dvd_pred_pow_of_blocks {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation
+                (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1) :
+    Nat.card U ∣ (p - 1) ^ n := by
+  have hdvd : Nat.card U ∣ Nat.card (ZMod p)ˣ ^ n :=
+    card_dvd_pow_of_block_scalars
+      (fun i => lineScalarChar (B i).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard i)))
+      hconst
+  have hunits : Nat.card (ZMod p)ˣ = p - 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
+  rwa [hunits] at hdvd
 /-- **Non-Galois `u`-bound from an imprimitive block decomposition** (Peterfalvi (9.7)(a),
 module-level entry point): if the abelian `U`-action on `M` restricts to `q = n+1` order-`p`
 subrepresentations `B i` (each an `𝔽_p`-line — the imprimitivity blocks `H1^w`) with **no
