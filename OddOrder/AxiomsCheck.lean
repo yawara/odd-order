@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
@@ -7709,6 +7710,18 @@ commuting with a nontrivial additive point lies in the kernel) and its `σ`-tran
 reconciliation closes.) -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.commute_inl_mem_range_inl
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.derived_inf_centralizer_le_P
+
+/-! **Peterfalvi (9.7.b) faithful conjugation field carrier, axiom-clean** (issue 9097, lane a).
+The generic `ConjugationFieldModel` bridge constructs the actual additive `GF(r^s)` carrier and
+multiplicative complement character from an elementary-abelian kernel with a faithful abelian
+conjugation action. The first endpoint identifies every injective cyclotomic-order image with
+the norm-one units; the second packages that equality together with Singer's field construction
+and equivariance. These are the missing upstream inputs shared by the `P/U` and `Q/V` semilinear
+models. -/
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ConjugationFieldModel.range_eq_normOneUnits_of_injective_card
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ConjugationFieldModel.exists_normOne_galoisField_conjugation_repr
 
 /-! **Peterfalvi (14.4)/(9.7.b) T-side field model, axiom-clean core** (issue 9078, lane c).
 The side-agnostic embedding `SemilinearFieldModel.fieldModelEmbedding` (injective
