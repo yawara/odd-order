@@ -1,6 +1,7 @@
 import OddOrder.Peterfalvi.S15_SAndT_Setup.SubcoherenceInputs
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
+import OddOrder.Peterfalvi.S11_CaseAOddPartBound
 import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 
 /-!
