@@ -2768,3 +2768,21 @@ hub 再確定順序 (0116 tick 55 自己訂正: b の #22 campaign 先行 → hu
   | **red K-induction → ν-row 分類** | **✗ 唯一の未 landed** (sSet_reducible_eq_nuRowSum は T'-induced 用; K-induced 版が要る — induce_K_mem_zSpan_sSet_irr_T :386 の証明が同素材 [constituent 展開+distinct-source 直交] を含むので流用可) |
 - **設計確定**: exists_muT_index core 版の引数 = (core 不要 — τ₁T carrier 直) hnoV/pins/hvd/hTP/Tdata/hU/hW1/hW2/chief + **hD : hyp.D = ⊥** (K=Q 化、(13.4) 帰結、Route T param と整合) + **hQcomm : IsMulCommutative ↥hyp.Q** (d≡1 + (13.5.a) 整数性; Q_elementaryAbelian_T は hTTypeII gated ゆえ直接 param が honest) + chosen base φ₀ (Q⊄Ker、Ind irr)。
   distinguished index = ν_r の family index (r = nuRow formula で r'=1 になる行: clean→r=1/δ=1、flip→r=2/δ=−1)。他 index: irr→⊥η、red→ν_s (s≠r) → η_{s'} (s'≠1) ⊥ η₁₀。
+
+## 2026-07-15 更新 #90 (lane b, /loop iter 4-5) — ★ brick 2 CLOSED: exists_muT_index_core 完全証明 (sorryAx 無し)
+
+- **`d8d09251`** (subagent 実装 + lane-b レビュー/再検証): `Hypothesis.exists_muT_index_core`
+  (S15_CharacterDegreeEngines 末尾、+548 行) — **(13.8)-for-T distinguished index の 7 conjuncts
+  を sorry 0 で実証明、#print axioms = 標準 3 のみ (sorryAx すら無し)**。
+  - 設計 (#89) どおり: hD : D = ⊥ + hQcomm : IsMulCommutative Q を明示 param、
+    distinguished index = ν-row (nuRow formula の clean/flip 分岐)、
+    cCoeff = 2a bridge + coherence extends + η-orthonormality、
+    他 index 消滅 = 2 段 constituent 展開 + distinct-source 非負整数計数。
+  - **red 分類補題 (旧 2b) は不要と確定** — 計数論法が red/irr split を内包。
+  - 中断 1 回 (API session limit 02:20 reset) → SendMessage 再開で完遂。
+- **⚠ size flag**: S15_CharacterDegreeEngines 1634 行 (>1500 watch) — 次の追記前に
+  prefix-split (凍結 S-side クラスタ induce_H_mem_zSpan_sSet_irr〜eta10_cCoeff_base_eq_zero を
+  sibling へ)。brick 3 着手前に実施する。
+- **残 brick 3/3**: `exists_etaT_alphaFun_one_int` core 版 — T-side (13.5.a) 整数性
+  (α|_Q ∈ ℤ[Irr Q]、hQcomm で Q abelian、S-side eta10_cCoeff_int / H_sharp_alphaCF_restrict_mem_ZIrr
+  パターンの mirror)。landing で #22 T-side twin 修理完了 = hub full flip (0116) のトリガー成立。
