@@ -8207,3 +8207,12 @@ consequently has order `r` or `r²`. -/
   OddOrder.Peterfalvi.S15.omega1Center_card_eq_prime_or_sq_of_rank_U_le_two
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.caseA_omega1Center_card_eq_prime_or_sq_of_parameters
+
+/-! **Peterfalvi (14.6), fixed-point-free action on `Ω₁(Z(R))`.**  A subgroup of
+the Frobenius complement normalizing the Sylow subgroup also normalizes its characteristic
+center layer.  Frobenius orbit counting gives `p ∣ |Ω₁(Z(R))| - 1`, hence `p ∣ r² - 1`;
+the (14.5) type-I-over-normalizer carrier supplies the concrete conjugate `W₂^y`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.prime_dvd_sq_sub_one_of_frobenius_omega1Center
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.TypeIOverNormalizerData.prime_dvd_sq_sub_one_of_omega1Center
