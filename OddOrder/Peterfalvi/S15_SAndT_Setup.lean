@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
 import OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit
+import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 import OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
