@@ -60,3 +60,20 @@ lifting + Gorenstein/Wielandt assembly + `coprime_card_Q_card_VW2` dual)。該�
     現在 lane c 所有ゆえ cross-lane 調整は不要)。
   - 残る cross-lane は **FeitThompson.lean constructor の供給のみ** (lane a 所有) —
     lane a への手渡し 1 点で済み、**hub tick でも代行可**。
+
+## ✅ CLOSED (2026-07-14 lane a audit): 恒久 carrier 案を撤回し、honest witness route へ置換済み
+
+本 issue が提案した `S15.Hypothesis.Tdata` の恒久 field 追加は採用しない。spine 上の free carrier を
+増やす設計は撤回され、必要な T-side type-`P` datum は定理
+`OddOrder.Peterfalvi.S15.reconciled_typePData_T` がその都度**実構成**する設計に置換された。
+この witness と直接の配置結果 `W1_le_Q` は 2026-07-14 の `#print axioms` 再検査でいずれも
+`[propext, Classical.choice, Quot.sound]` のみ (`sorryAx` なし)。実構成の完了履歴と Coq 対応は
+closed issue 9073 に集約されている。したがって FeitThompson constructor に `Tdata` を thread する
+本 issue 固有の checklist は **superseded** であり、未実施作業として残さない。
+
+ただし旧「完了条件」に併記した (13.16) 全体まで完了した、という判定ではない。
+`normalizer_W1_structure` / `normalizer_W1` は現在も `sorryAx` を継承し、その最小 local root は
+(13.12) T-side の `V_inf_centralizer_Q_eq_bot` (`normalizer_V_inf_W1_eq_bot` 経由) である。
+これは carrier threading とは独立の character/centralizer obligation として open issue 9013
+(`t-side-13-15-general`) が追跡している。よって本 issue は「完了」ではなく
+**設計撤回 + honest route への置換 + 残責務の既存 issue への分離確認**として閉じる。
