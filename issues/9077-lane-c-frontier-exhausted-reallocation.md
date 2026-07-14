@@ -448,3 +448,21 @@ census の結果:
 **HUB への要請**: c の次 assignment の裁定 (候補: (i) b 過負荷分の carve-out — 例:
 `sibleyTarget_frobI` 単発 or V_inf_centralizer_Q_eq_bot discharge の実施権、(ii) a の
 s_side_field_repr pipeline の一部、(iii) その他)。裁定まで c は hub tick を polling。
+
+## 🧭 HUB RULING #3 (2026-07-14 夕、要請 #2 への裁定): 候補 (i) 採用 — b quiet file 2 宣言の carve-out を c に付与
+
+**c の次 assignment = b-owned quiet file の個別 2 宣言 (proof-only carve-out)**:
+1. `V_inf_centralizer_Q_eq_bot` (S15_SAndTBasic.lean:839) — c 自身が 0115 に discharge route を
+   note 済み (`T_caseB_facts_unconditional` + `D_eq`)。b が本日 landing した (13.4) theta-package
+   assembly / T_caseB 系の**消費** (assembly work) であり b の active 作業と重複しない。
+2. `sibleyTarget_frobI` (S14_MaximalI/FrobeniusStructure.lean:117) — docstring に証明 sketch あり
+   (TI → dade.H=⊥ → SibleyTarget)、(12.17)→(12.7) chain root (9087 注記)。単発 obligation。
+
+**根拠**: 両 file とも b の本日 hot set (Tau1T/NuRowPin/TSetMemberRFamily/CharacterDegreeSupply/
+SubcoherenceInputs/TSideDegrees) と非交差の quiet file。b は 2035 #41 step 5 続行に専念。
+候補 (ii) (s_side_field_repr pipeline) は **却下** — a が 0115 実施報告で「次 frontier =
+(13.15) caseB_order_u」と宣言済みで衝突する (a→c pipeline は a の landing 待ちが正)。
+
+**条件** (9087 carve-out と同型): (1) 当該 2 宣言の proof 充填以外の編集禁止 (statement/
+signature 不変; 必要な helper は c-owned or 新 shared leaf claim へ)、(2) 宣言ごと単独 commit +
+message self-flag、(3) landing で失効、(4) AxiomsCheck 追従 + 結果を本 issue と 2035 に記録。

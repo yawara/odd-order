@@ -631,6 +631,22 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-14 (tick 47、最終 sweep) — 監視停止 (ユーザー「いったん区切ります」) + 9077 RULING #3**:
+  cron `88a50cb0` を CronDelete。⛔ 停止 (問題起因) ではないので**自動再開しない** — 次回はユーザー指示で
+  現行モデル対応ペース (Fable=30分 `13,43`) で再作成。最終 sweep: **a=1** (`0a75fb65` = ★ **(13.13)
+  caseA parameter determination 実証明** — opaque Prop を real CliffordCaseAData に置換、9098 の
+  divisibility 算術 engine で q=3 ∧ u=(p−1)²/4。OrderDetermination 3/4 本目)。**b=3** (`83da2170` 系 =
+  ★ **(13.4) theta-package assembly — monolithic sorry を faithful restate + bricks で置換**)。
+  **c=6** (`3d4e4eee` (14.14) producer → `078402d7` **自己検出 revert** (census 誤り: 既存 landed の重複。
+  consumer 側から遡らない grep の失敗と自己分析) + 9077 **reallocation 要請 #2**)。
+  0115 で a/c の追記が append-append conflict → 両報告保持で解決。build green **4209 jobs** /
+  AxiomsCheck OK / census **41→40 (実 −1)** / 新 axiom なし / orphan clean。push 済。
+  ★ **9077 HUB RULING #3**: c の次 = b quiet file 2 宣言の proof-only carve-out
+  (`V_inf_centralizer_Q_eq_bot` + `sibleyTarget_frobI`)。候補 (ii) は a の (13.15) 宣言と衝突ゆえ却下。
+  **停止時点**: main = 本 commit (push 済・tree clean)、`main..{a,b,c}` = 0 (sweep 完了、以後の
+  レーン新 commit は次回 hub 再開時に合流)、census 40 (朝 49 → 実 −9 の 1 日)。
+  再開時の hub TODO: (1) レーン新 commit の合流、(2) 0116 relayer の実施判断 (b の (13.4) cluster
+  close 後トリガー — theta-package assembly 済みにつき近い)、(3) NuRowPin 1261 行の size watch。
 - **2026-07-14 (tick 46) — ★★ c Campaign B も完了 (0115 両 campaign 当日完遂)。3 レーン合流、census 42→41**:
   **a=4** (`9b5c33ba`〜`c1a3f72e` = claim 9098 (block-scalar divisibility infra、claim-before-build ✓) →
   case A block bound の divisibility 強化 + two-primary factor 除去。新 leaf S11_CaseAOddPartBound +
