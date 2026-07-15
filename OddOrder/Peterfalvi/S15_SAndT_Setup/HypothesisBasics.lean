@@ -1369,31 +1369,4 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
   exact ⟨hStype, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
 
-/-- **Structural input for Peterfalvi (13.2.d) — ⚠ VESTIGIAL, do not complete as stated**
-(hub ruling 2026-07-02; provenance: closed issues 1004/4014).
-
-The S-side maximal-coherent Dade route (`tauS`/`Sset`/`A0S`) is **off the FT path**: the §13/§16
-contradiction is routed through the W-side grid `eta = tau3 ∘ omega` and the carrier supplies
-`tauS = 0` as a placeholder, so nothing on the spine consumes this witness.  Building it as
-stated would prove an unconsumed S-side statement.  Anyone touching the (13.5)–(13.9) cascade
-must first restate it W-side or retire it — see the 2026-07-02 hub section of
-`notes/peterfalvi/s16_w4_char_cascade.md` (and note (6.8) `S08.sibleySetup_is_coherent` itself
-is already proven; the old "once lane B supplies (6.8)" framing is obsolete). -/
-noncomputable def sibleyTarget_S [Fintype G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
-    [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
-    CoherenceWiring.SibleyTarget hyp.tauS hyp.Sset hyp.A0S := sorry
-
-/-- **Peterfalvi (13.2.d)**: the family `S` is coherent — ⚠ VESTIGIAL endpoint (0 spine cites).
-
-Wired to the proven (6.8) capstone `S08.sibleySetup_is_coherent` through the coherence-wiring
-bridge; the only gap is `sibleyTarget_S`, which is ruled **do-not-complete-as-stated** (see its
-docstring — the spine routes through the W-side `eta` grid, `tauS = 0` placeholder).  Kept for
-statement fidelity to Pf (13.2.d); do not invest proof effort here. -/
-theorem S_coherent [Finite G] [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
-    [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tauS hyp.Sset hyp.A0S) :=
-  CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_S hG hyp)
-
 end OddOrder.Peterfalvi.S15
