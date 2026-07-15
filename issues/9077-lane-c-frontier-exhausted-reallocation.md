@@ -565,3 +565,31 @@ trigger: (α) Route T 実施後の「c 再 engage (V_inf)」flag、(β) a の 90
 - **item 1 (V_inf) の trigger 更新**: 「hub の Route T」→「**lane a の 0116 full flip landing**」
   (実行 owner 移譲のため)。landing tick で hub が本 issue に「c 再 engage (V_inf)」flag を出す。
 - trigger β (s_side_field_repr) は a の 0117 討伐で消化済み (moot)。
+
+## ✅ 2026-07-15 lane-c: C-1 完了 — `caseB_order_u_data` compatibility bridge retire
+
+issue 0118 c-1 の指示どおり、`CaseBOrderUData` / `caseB_order_u_data` を削除し、consumer 2 箇所を
+honest producer へ再配線した (本節と同一の単独 feature commit):
+
+- `caseB_for_S` は `exists_chiefFactorData` と `clifford_dichotomy` から実際の Clifford dichotomy を
+  構成する。case A は `caseA_parameters` + `c_eq_one` + S-side `TypeIOverNormalizerData` による
+  矛盾で排除し、case B では得られた `CliffordCaseBData` の `Nonempty` certificate と proven
+  `caseB_order_u` の 2 つの位数等式を保持する。旧 `True` compatibility carrier は消滅。
+- `T_isTypeP2` 側の旧 dummy bridge call は、同じ不等式を直接与える unconditional theorem
+  `Hypothesis.u_le_cyclotomicQuotient` に置換。この theorem は AxiomsCheck で
+  `[propext, Classical.choice, Quot.sound]` のみと認証済み。
+- b-owned quiet file `S15_SAndT_Setup/CaseBOrder.lean` は RULING #5 が明示した deletion
+  carve-out の範囲だけ編集し、上記 structure/theorem の削除以外は変更していない。
+
+**検証**: main 再同期後 `lake build OddOrder` green (4225 jobs)、
+`lake build OddOrder.AxiomsCheck` green (4210 jobs)、旧 2 識別子の `OddOrder/` 内参照 0、
+`git diff --check` clean。
+
+**axiom trace の限定**: `caseB_order_u` / `caseB_for_S` 自体は、既知の上流未証明 obligation
+(`c_eq_one`, `numeric_bounds`, `analytic_inequality`) に由来する `sorryAx` をなお継承する。
+これは今回削除した compatibility bridge とは別 root であり、本節は両 theorem の
+axiom-clean を主張しない。今回 bridge の代替として T-side が直接使う
+`u_le_cyclotomicQuotient` だけを permanent AxiomsCheck に追加した。
+
+**self-flag**: c-1 は上記 b-file deletion carve-out を含む単独 commit。次 frontier は issue 0118
+c-2 (BG vestigial cleanup: `theoremA_maximal_structure` retire、S14 frozen 注記、stale docstring 修正)。

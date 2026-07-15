@@ -376,24 +376,4 @@ theorem caseB_order_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.p_odd hyp.q_odd hux hu_ne_one hu_cop_q hx0
     hyp.m_gt_seven_tenths_of_five_le_q hyp.m_gt_four_fifths_of_seven_le_q h11c hanalytic
 
-/-- Compatibility carrier for the Section 16 `(14.6)` scaffold.  Its `caseB_for_S` proposition is
-still the downstream qualitative gate; the honest (13.15) theorem above consumes
-`CliffordCaseBData` directly. -/
-structure CaseBOrderUData (hyp : Hypothesis (G := G)) (caseB_for_S : Prop) where
-  caseB_holds : caseB_for_S
-  u_eq_of_p_modEq_one :
-    hyp.p ≡ 1 [MOD hyp.q] →
-      hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))
-  u_eq_of_not_modEq_one :
-    ¬ hyp.p ≡ 1 [MOD hyp.q] →
-      hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)
-
-/-- Temporary compatibility bridge for the Section 16 `(14.6)` scaffold.  This is not the
-(13.15) proof: the latter is `caseB_order_u` above.  The remaining obligation here is exactly to
-replace the downstream opaque proposition by the genuine `CliffordCaseBData` certificate. -/
-theorem caseB_order_u_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {caseB_for_S : Prop} (hcase : caseB_for_S) :
-    CaseBOrderUData hyp caseB_for_S := by
-  sorry
-
 end OddOrder.Peterfalvi.S15

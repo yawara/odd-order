@@ -896,8 +896,8 @@ The two deep pieces are isolated as `T_typeIII_ratio_le` (character body) and
 `T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8): its
 pure cyclotomic comparison lives upstream in `KeyInequalityArithmetic`, while the two group-theoretic
 order inputs are the direct (13.4) producer `T_side_caseB_facts` and the (13.15) producer
-`S15.caseB_order_u_data`.  Thus no forward reference through the later `key_inequality` theorem is
-needed. -/
+`Hypothesis.u_le_cyclotomicQuotient`.  Thus no forward reference through the later
+`key_inequality` theorem is needed. -/
 theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
@@ -920,20 +920,10 @@ theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.base.p_prime hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
   -- Its T-side order input is the direct (13.4) producer, which is upstream of `T_isTypeP2`.
   have hvfull := (T_side_caseB_facts hG hyp).2
-  -- The S-side order input is exactly the two-branch conclusion of (13.15).
-  let Sord := OddOrder.Peterfalvi.S15.caseB_order_u_data hG hyp.base (caseB_for_S := True) trivial
+  -- The required S-side upper bound is the unconditional cyclotomic quotient estimate.
   have hu_le_full :
-      hyp.base.u ≤ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
-    by_cases hmod : hyp.base.p ≡ 1 [MOD hyp.base.q]
-    · rw [Sord.u_eq_of_p_modEq_one hmod]
-      have hp1_pos : 0 < hyp.base.p - 1 := by
-        have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
-        omega
-      have hden_le : hyp.base.p - 1 ≤ hyp.base.q * (hyp.base.p - 1) := by
-        have hqpos : 1 ≤ hyp.base.q := hyp.base.q_prime.one_le
-        nlinarith [Nat.mul_le_mul_right (hyp.base.p - 1) hqpos]
-      exact Nat.div_le_div_left hden_le hp1_pos
-    · rw [Sord.u_eq_of_not_modEq_one hmod]
+      hyp.base.u ≤ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+    hyp.base.u_le_cyclotomicQuotient hG
   have hqpos : (0 : ℚ) < hyp.base.q := by
     exact_mod_cast hyp.base.q_prime.pos
   have hu_sub : ((hyp.base.u - 1 : ℕ) : ℚ) ≤
