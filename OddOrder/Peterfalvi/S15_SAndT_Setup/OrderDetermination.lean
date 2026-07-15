@@ -1297,25 +1297,37 @@ The second pointwise `μ`-value input of the exact `β`-support
 `q·μ_{0j}(z) = μ_j(z) = 0` on `S′ − P` (which avoids the `W`-conjugates since
 `W ∩ S′ = W₂ ≤ P`). -/
 
-/-- **`C = ⊥`** — the subgroup-level form of the (13.2.e) regularity `c = 1` (`c_eq_one`,
-Coq `FTtypeP_reg_Fcore`). -/
+/-- **`C = ⊥` from (13.12)** — the subgroup-level form of the regularity `c = 1`
+(Coq `FTtypeP_reg_Fcore`).  The explicit input keeps downstream (13.18) consumers independent of
+the legacy character-degree carrier. -/
+theorem Hypothesis.C_eq_bot_of_c_eq_one [Finite G] (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1) : hyp.C = ⊥ :=
+  Subgroup.card_eq_one.mp (by rw [← hyp.c_eq_card_C]; exact hc1)
+
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
 theorem Hypothesis.C_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : hyp.C = ⊥ :=
-  Subgroup.card_eq_one.mp (by rw [← hyp.c_eq_card_C]; exact c_eq_one hG hyp)
+  hyp.C_eq_bot_of_c_eq_one (c_eq_one hG hyp)
 
-/-- **`H = P`** — with `C = ⊥` the (13.5) subgroup `H = P C` collapses to `P`. -/
-theorem Hypothesis.H_eq_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : hyp.H = hyp.P := by
+/-- **`H = P` from (13.12)** — with `C = ⊥` the (13.5) subgroup `H = P C` collapses to `P`. -/
+theorem Hypothesis.H_eq_P_of_c_eq_one [Finite G] (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1) : hyp.H = hyp.P := by
   show hyp.P ⊔ hyp.C = hyp.P
-  rw [hyp.C_eq_bot hG, sup_bot_eq]
+  rw [hyp.C_eq_bot_of_c_eq_one hc1, sup_bot_eq]
 
-/-- **`q ∤ |S′|`**: `|S′| = p^q·(u·c) = p^q·u` (`card_deriv_S_eq`, `c = 1`), with `q ∤ p^q`
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem Hypothesis.H_eq_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.H = hyp.P :=
+  hyp.H_eq_P_of_c_eq_one (c_eq_one hG hyp)
+
+/-- **`q ∤ |S′|` from (13.12)**: `|S′| = p^q·(u·c) = p^q·u`, with `q ∤ p^q`
 (`p ≠ q`) and `q ∤ u` (`u ≡ 1 (mod q)`, `u_modEq_one`). -/
-theorem Hypothesis.not_q_dvd_card_derived [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
+theorem Hypothesis.not_q_dvd_card_derived_of_c_eq_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1) :
     ¬ hyp.q ∣ Nat.card ↥(OddOrder.GroupTheory.derivedInG hyp.S) := by
   rw [hyp.card_deriv_S_eq, hyp.card_P_eq hG hyp.Sdata_W2_eq, hyp.card_U_eq_uc,
-    c_eq_one hG hyp, mul_one]
+    hc1, mul_one]
   intro hdvd
   rcases (Nat.Prime.dvd_mul hyp.q_prime).mp hdvd with h | h
   · exact hyp.p_ne_q ((Nat.prime_dvd_prime_iff_eq hyp.q_prime hyp.p_prime).mp
@@ -1327,10 +1339,17 @@ theorem Hypothesis.not_q_dvd_card_derived [Finite G] (hG : OddOrder.BG.IsMinimal
     rw [hk, Nat.mul_mod_right, h1q] at hmod
     omega
 
-/-- **`W₁ ⊓ S′ = ⊥`**: an element of the intersection has order dividing both `q` (`|W₁| = q`)
-and `|S′|`, and `q ∤ |S′|` (`not_q_dvd_card_derived`) with `q` prime forces order `1`. -/
-theorem Hypothesis.W1_inf_derived_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem Hypothesis.not_q_dvd_card_derived [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ¬ hyp.q ∣ Nat.card ↥(OddOrder.GroupTheory.derivedInG hyp.S) :=
+  hyp.not_q_dvd_card_derived_of_c_eq_one hG (c_eq_one hG hyp)
+
+/-- **`W₁ ⊓ S′ = ⊥` from (13.12)**: an element of the intersection has order dividing both `q`
+and `|S′|`; `q ∤ |S′|` with `q` prime forces order `1`. -/
+theorem Hypothesis.W1_inf_derived_eq_bot_of_c_eq_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1) :
     hyp.W1 ⊓ OddOrder.GroupTheory.derivedInG hyp.S = ⊥ := by
   rw [Subgroup.eq_bot_iff_forall]
   intro x hx
@@ -1344,21 +1363,28 @@ theorem Hypothesis.W1_inf_derived_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalS
     rwa [← Subgroup.orderOf_coe] at h
   rcases (Nat.dvd_prime hyp.q_prime).mp hord_q with h1 | hq
   · exact orderOf_eq_one_iff.mp h1
-  · exact absurd (hq ▸ hord_D) (hyp.not_q_dvd_card_derived hG)
+  · exact absurd (hq ▸ hord_D) (hyp.not_q_dvd_card_derived_of_c_eq_one hG hc1)
+
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem Hypothesis.W1_inf_derived_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.W1 ⊓ OddOrder.GroupTheory.derivedInG hyp.S = ⊥ :=
+  hyp.W1_inf_derived_eq_bot_of_c_eq_one hG (c_eq_one hG hyp)
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`supp(μ_j) ⊆ P`** ((13.3.a)+(13.12), the `seqInd_on` step of Coq `PVSbeta`): the column
 sum `μ_j = Ind_{H}^S θ` (`mu_j_isIndPC`) with `H = P` (`H_eq_P`), and `P ◁ S` confines the
 induced support to `P` (`support_induce_subset_of_normal`). -/
-theorem Hypothesis.mu_colSum_support_subset_P [Finite G]
+theorem Hypothesis.mu_colSum_support_subset_P_of_c_eq_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1)
     (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
     ((∑ i : Fin hyp.q, hyp.mu i j) : ClassFunction ↥hyp.S ℂ).support ⊆
       hyp.H.subgroupOf hyp.S := by
   classical
   obtain ⟨θ, _hθirr, _hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG j hj
   haveI hPnorm : (hyp.H.subgroupOf hyp.S).Normal := by
-    rw [hyp.H_eq_P hG]
+    rw [hyp.H_eq_P_of_c_eq_one hc1]
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer ?_).mpr ?_
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
@@ -1367,6 +1393,15 @@ theorem Hypothesis.mu_colSum_support_subset_P [Finite G]
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   rw [hθeq]
   exact ClassFunction.support_induce_subset_of_normal _ θ
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem Hypothesis.mu_colSum_support_subset_P [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
+    ((∑ i : Fin hyp.q, hyp.mu i j) : ClassFunction ↥hyp.S ℂ).support ⊆
+      hyp.H.subgroupOf hyp.S :=
+  hyp.mu_colSum_support_subset_P_of_c_eq_one hG (c_eq_one hG hyp) j hj
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.18.a), the `S′−P` vanishing (`hmuD`)**: `μ_{0j}(z) = 0` for
@@ -1380,8 +1415,9 @@ conjugation-stable in `S`), and `W ∩ S′ ≤ P` (`W₁ ⊓ S′ = ⊥` splits
 `W₂ ≤ P`), forcing `z ∈ P` (`S ≤ N_G(P)`) — contradiction.  Hence
 `q·μ_{0j}(z) = ∑ᵢ μ_{ij}(z) = μ_j(z) = 0` (`mu_colSum_support_subset_P` with `H = P`), and
 `q ≠ 0` cancels. -/
-theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
+theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P_of_c_eq_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1)
     (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩)
     (z : ↥hyp.S) (hzD : (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.S)
     (hzP : (z : G) ∉ hyp.P) :
@@ -1422,7 +1458,7 @@ theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
       exact Subgroup.mul_mem _ hwD (Subgroup.inv_mem _ (hPle (W2_le_P hG hyp hbW2)))
     have ha1 : (a : G) = 1 := by
       have hmem2 : (a : G) ∈ hyp.W1 ⊓ OddOrder.GroupTheory.derivedInG hyp.S := ⟨haW1, haD⟩
-      rwa [hyp.W1_inf_derived_eq_bot hG, Subgroup.mem_bot] at hmem2
+      rwa [hyp.W1_inf_derived_eq_bot_of_c_eq_one hG hc1, Subgroup.mem_bot] at hmem2
     have hwP : (w : G) ∈ hyp.P := by
       rw [← habG, ha1, one_mul]
       exact W2_le_P hG hyp hbW2
@@ -1455,15 +1491,26 @@ theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
   have hsum : (∑ i : Fin hyp.q, hyp.mu i j) z = 0 := by
     by_contra h
     apply hzP
-    have hmem := hyp.mu_colSum_support_subset_P hG j hj
+    have hmem := hyp.mu_colSum_support_subset_P_of_c_eq_one hG hc1 j hj
       (ClassFunction.mem_support.mpr h)
     have hmem' : (z : G) ∈ hyp.H := Subgroup.mem_subgroupOf.mp hmem
-    rwa [hyp.H_eq_P hG] at hmem'
+    rwa [hyp.H_eq_P_of_c_eq_one hc1] at hmem'
   rw [ClassFunction.finset_sum_apply,
     Finset.sum_congr rfl (fun i _ => hall i), Finset.sum_const, Finset.card_univ,
     Fintype.card_fin, nsmul_eq_mul] at hsum
   have hq0 : (hyp.q : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.q_prime.pos.ne'
   exact (mul_eq_zero.mp hsum).resolve_left hq0
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩)
+    (z : ↥hyp.S) (hzD : (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.S)
+    (hzP : (z : G) ∉ hyp.P) :
+    hyp.mu ⟨0, hyp.q_prime.pos⟩ j z = 0 :=
+  hyp.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P_of_c_eq_one hG
+    (c_eq_one hG hyp) j hj z hzD hzP
 
 
 end OddOrder.Peterfalvi.S15

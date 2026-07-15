@@ -273,8 +273,9 @@ prime order `p`) is normal in the Frobenius complement `E` (Huppert V.8.18b,
 `normal_of_card_prime_of_isFrobeniusGroup_of_odd`), so `E ≤ N_G(W₂)`, and (13.16) `normalizer_W2`
 gives `N_G(W₂) = P ⊔ W₁`.  (The Frobenius/Wielandt content of (13.16) is isolated in
 `normalizer_W2_structure`.) -/
-theorem complement_le_PW1 [Finite G]
+theorem complement_le_PW1_of_c_eq_one [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1)
     {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
     frob.complement.map L.subtype ≤ hyp.P ⊔ hyp.W1 := by
@@ -329,10 +330,18 @@ theorem complement_le_PW1 [Finite G]
       rw [Subgroup.mem_subgroupOf] at hfin
       simpa using hfin
   -- (13.16): `N_G(W₂) = C_G(W₂) = P W₁`.
-  have h1316 := normalizer_W2 _hG hyp
+  have h1316 := normalizer_W2_of_c_eq_one _hG hyp hc1
   calc E.map L.subtype ≤ Subgroup.normalizer (hyp.W2 : Set G) := hEN
     _ = Subgroup.centralizer (hyp.W2 : Set G) := h1316.1
     _ = hyp.P ⊔ hyp.W1 := h1316.2
+
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem complement_le_PW1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ≤ hyp.P ⊔ hyp.W1 :=
+  complement_le_PW1_of_c_eq_one hG hyp (c_eq_one hG hyp) frob hW2E
 
 /-- **`S`-side of the (13.17.c) `W₁`-structure**: `W₁ ≤ N_G(P)`, `P ⊓ W₁ = ⊥`, and `q ∤ |P|`.
 
@@ -377,9 +386,9 @@ theorem P_W1_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 `E ⊓ P = W₂` and `E ⊄ P`, the complement order is `p q`.  This is the sorry-free arithmetic core
 of `complement_card_p_or_pq_V` (the faithful dichotomy form; the deprecated unconditional
 `complement_card_eq_pq_V` family was deleted per hub issue 3004 ruling 3). -/
-theorem complement_card_eq_pq_V_of_structure [Finite G]
+theorem complement_card_eq_pq_V_of_structure_of_c_eq_one [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW2E : hyp.W2 ≤ frob.complement.map L.subtype)
     (hInf : frob.complement.map L.subtype ⊓ hyp.P = hyp.W2)
@@ -387,7 +396,7 @@ theorem complement_card_eq_pq_V_of_structure [Finite G]
     Nat.card ↥frob.complement = hyp.p * hyp.q := by
   set Em := frob.complement.map L.subtype with hEm
   set Hg := hyp.P ⊔ hyp.W1 with hHg
-  have hEH : Em ≤ Hg := complement_le_PW1 _hG hyp frob hW2E
+  have hEH : Em ≤ Hg := complement_le_PW1_of_c_eq_one _hG hyp hc1 frob hW2E
   obtain ⟨hWnorm, hdisj, _⟩ := P_W1_structure _hG hyp
   have hPleH : hyp.P ≤ Hg := le_sup_left
   have hInfCard : Nat.card ↥(Em ⊓ hyp.P) = hyp.p := by rw [hInf]; exact hyp.p_eq_card_W2.symm
@@ -420,12 +429,25 @@ theorem complement_card_eq_pq_V_of_structure [Finite G]
     Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
       L.subtype_injective).toEquiv, hEmcard]
 
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem complement_card_eq_pq_V_of_structure [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype)
+    (hInf : frob.complement.map L.subtype ⊓ hyp.P = hyp.W2)
+    (hnle : ¬ frob.complement.map L.subtype ≤ hyp.P) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q :=
+  complement_card_eq_pq_V_of_structure_of_c_eq_one hG hyp (c_eq_one hG hyp)
+    frob hW2E hInf hnle
+
 /-- **Peterfalvi (13.17.c), V-side dual — the complement-order dichotomy** (hub issue 3004,
 ruling 3): the `W₂`-containing Frobenius complement of the type-I maximal `L` over `N_G(V)` has
 order `p` (the `L = H ⋊ W₂` branch) or `p q` (the `L = H ⋊ (W₂W₁^y)` branch).  The faithful
 V-side export: unlike the S-side, the small branch cannot be excluded before (14.11). -/
-theorem complement_card_p_or_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+theorem complement_card_p_or_pq_V_of_c_eq_one [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hc1 : hyp.c = 1) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
     Nat.card ↥frob.complement = hyp.p ∨ Nat.card ↥frob.complement = hyp.p * hyp.q := by
@@ -434,7 +456,16 @@ theorem complement_card_p_or_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleO
     rw [Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
       L.subtype_injective).toEquiv, hW2]
     exact hyp.p_eq_card_W2.symm
-  · exact Or.inr (complement_card_eq_pq_V_of_structure _hG hyp frob hW2E hInf hnle)
+  · exact Or.inr
+      (complement_card_eq_pq_V_of_structure_of_c_eq_one _hG hyp hc1 frob hW2E hInf hnle)
+
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem complement_card_p_or_pq_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    Nat.card ↥frob.complement = hyp.p ∨ Nat.card ↥frob.complement = hyp.p * hyp.q :=
+  complement_card_p_or_pq_V_of_c_eq_one hG hyp (c_eq_one hG hyp) frob hW2E
 
 /-- **Frobenius index bridge** (Pf (14.11), structural): for a type-I maximal `M` with
 `TypeIFrobeniusData`, the index `|M : M_F|` of the Fitting kernel equals the order of the Frobenius
@@ -454,9 +485,10 @@ ruling 3): for `T` of type II, there is a type-I maximal subgroup `M` over `N_G(
 complement dichotomy `complement_card_p_or_pq_V`; the resolution to `p q` happens only inside
 (14.11): the `K ≠ V` branch by the (14.11.2) character argument, the `K = V` branch by excluding
 `E = W₂` in the §14 context).  The restructured §16 `exists_MHypothesis` cites this form. -/
-theorem exists_M_structural_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem exists_M_structural_dichotomy_of_c_eq_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) (hTII : IsTypeII hyp.T) :
     ∃ (M : Subgroup G) (_typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
       M ∈ maximalSubgroups G ∧
         Subgroup.normalizer (hyp.V : Set G) ≤ M ∧
@@ -468,6 +500,17 @@ theorem exists_M_structural_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   obtain ⟨typeIHyp⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG hLmax hLtypeI
   refine ⟨L, typeIHyp, hLmax, hNVL, ?_⟩
   rw [typeIFrobenius_kernel_index_eq_complement frob]
-  exact complement_card_p_or_pq_V hG hyp frob hW2E
+  exact complement_card_p_or_pq_V_of_c_eq_one hG hyp hc1 frob hW2E
+
+/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
+theorem exists_M_structural_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
+    ∃ (M : Subgroup G) (_typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
+      M ∈ maximalSubgroups G ∧
+        Subgroup.normalizer (hyp.V : Set G) ≤ M ∧
+          (((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p ∨
+            ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p * hyp.q) :=
+  exists_M_structural_dichotomy_of_c_eq_one hG hnoV hyp (c_eq_one hG hyp) hTII
 
 end OddOrder.Peterfalvi.S15
