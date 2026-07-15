@@ -249,3 +249,49 @@ main に入った。**b は b-5 を開始してよい**: S15 Supply 層 ~8 consu
 `pins : NuGridSupplyData hyp` param 形へ restate し、c-owned S16 caller には `hyp.nuGridSupply`
 を渡す配線を通知 (c への rewire 依頼は 9096 経由で)。generic sorried
 `S15.Hypothesis.nuGridSupply` は consumer 0 到達後に retire (b-5 完了条件)。
+
+## 🚧 b-5 Phase A (2026-07-15, lane b) — S15 consumer chain explicit-pins 化
+
+b-owned S15 chain の内部は canonical carrier を受け取る explicit
+`pins : NuGridSupplyData hyp` へ切替済み:
+
+- T-side degree/θ chain:
+  `d_eq_one` → `T_side_D_eq_bot` / `T_caseB_v_eq_full` →
+  `T_caseB_facts_of_q_lt_p`、および
+  `tSide_theta_package_of_not_caseB_core` → `lambda_forces_T_caseB_core`。
+- (13.19)/(14.5) chain:
+  `typeIBetaL_eta_col_constant` / `typeI_caseC_dual_dichotomy` →
+  `typeIOrthogonalityGridData_of_coherent78` → `typeI_orthogonality_dichotomy` →
+  `complement_not_le_Q` → `complement_card_eq_pq` →
+  `typeI_overNormalizer_complement` → `typeII_overNormalizer_frobenius`。
+- standalone `deltaPrime_eq_one_T` も explicit `pins` 化。
+
+cross-lane の各 commit を build-green に保つため、S16 から直接呼ばれる境界 5 theorem
+(`T_caseB_facts_unconditional`, `typeI_caseC_dual_dichotomy`,
+`typeIOrthogonalityGridData_of_coherent78`, `typeI_orthogonality_dichotomy`,
+`typeII_overNormalizer_frobenius`) の**末尾だけ**、現時点では
+`hyp.nuGridSupply` を default とする一時 optParam を置いた。これは互換用の恒久 API ではない。
+`[[lean-optparam-default-contaminates-axioms]]` の既知問題どおり、default を使う現行 S16 caller
+はまだ generic sorried producer を継承するため、b-5 の完了・root #4 の除去とは数えない。
+
+### c-owned S16 rewire (named argument を追加)
+
+以下の 6 call site で `(pins := hyp.nuGridSupply)` を渡す:
+
+1. `S16_NonExistenceG/TTypeII.lean`:
+   `T_caseB_facts_unconditional`
+2. `S16_NonExistenceG/SubgroupM.lean`:
+   `T_caseB_facts_unconditional`
+3. `S16_NonExistenceG/ComparingLM.lean`:
+   `typeI_caseC_dual_dichotomy`
+4. `S16_NonExistenceG/SubgroupMCore.lean`:
+   `typeIOrthogonalityGridData_of_coherent78`
+5. `S16_NonExistenceG/BetaVanishing.lean`:
+   `typeI_orthogonality_dichotomy`
+6. `S16_NonExistenceG/SubgroupL.lean`:
+   `typeII_overNormalizer_frobenius`
+
+c rewire landing 後、b が即座に 5 default と
+`S15.Hypothesis.nuGridSupply` declaration を削除し、consumer 0 を grep + full build +
+AxiomsCheck で検証して 9096 を close する。Phase A 検証:
+`lake build OddOrder` green (4227 jobs、AxiomsCheck OK)。
