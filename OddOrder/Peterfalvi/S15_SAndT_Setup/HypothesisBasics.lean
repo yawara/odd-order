@@ -549,23 +549,6 @@ theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
   rintro φ ⟨χ, -, rfl⟩
   exact ⟨χ, rfl⟩
 
-/-- **Peterfalvi (13.2.a), the §9 setup on `S` from the honest type alternative.**
-
-Unlike the legacy `toTypesIIIIIIVSetupS`, this constructor does not read the stronger carrier
-field `S_typeP2`.  A type-II or type-III witness supplies the witness-independent (8.6)
-nontrivial core, transported to the carried `Sdata` by `TypePNontrivialCore.transfer`; the type
-alternative itself is retained in the §9 setup. -/
-noncomputable def Hypothesis.toTypesIIIIIIVSetupS_of_typeII_or_typeIII [Finite G]
-    (hyp : Hypothesis (G := G)) (htype : IsTypeII hyp.S ∨ IsTypeIII hyp.S) :
-    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup hyp.S where
-  maximal := hyp.S_maximal
-  typeP := hyp.Sdata
-  nontrivial := by
-    rcases htype with hII | hIII
-    · exact hII.some.common.transfer hyp.Sdata
-    · exact hIII.some.common.transfer hyp.Sdata
-  type_alt := htype.elim Or.inl (fun hIII => Or.inr (Or.inl hIII))
-
 /-- **Peterfalvi (13.2.a), ordered refinement**: if `q < p`, then `S` is of Type II.
 
 Use the intrinsic κ-Hall factor `Sdata.W1`.  The generic type-`P` bridge identifies the order of
@@ -617,7 +600,7 @@ theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases OddOrder.Peterfalvi.S13.isTypeII_or_isTypeIII_of_isTypeNonI
       hG hyp.S_maximal hyp.S_nonI with hSII | hSIII
   · -- Type II: (9.3) on the carried type-`P` datum.
-    let setup := hyp.toTypesIIIIIIVSetupS_of_typeII_or_typeIII (Or.inl hSII)
+    let setup := hyp.toTypesIIIIIIVSetupS hG
     have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
       setup).1 hSII
     have hord2 := hord.2
@@ -1344,7 +1327,7 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hStype : IsTypeII hyp.S ∨ IsTypeIII hyp.S :=
     OddOrder.Peterfalvi.S13.isTypeII_or_isTypeIII_of_isTypeNonI
       _hG hyp.S_maximal hyp.S_nonI
-  let setup := hyp.toTypesIIIIIIVSetupS_of_typeII_or_typeIII hStype
+  let setup := hyp.toTypesIIIIIIVSetupS _hG
   have hSdataUne := setup.nontrivial.1
   change hyp.Sdata.U ≠ ⊥ at hSdataUne
   -- (13.2.a) `U W₁` Frobenius: sorry-free from the carrier `Sdata` (`typeP_uW1_frobenius`,
