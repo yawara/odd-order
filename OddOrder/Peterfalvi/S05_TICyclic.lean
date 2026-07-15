@@ -824,16 +824,19 @@ noncomputable def omegaProdChar (hyp : TICyclicHypothesis G) (χ₁ : (hyp.W1.su
 theorem omegaProdChar_one_left (hyp : TICyclicHypothesis G)
     (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
     hyp.omegaProdChar 1 χ₂ = χ₂.comp hyp.wSnd := by
-  rw [omegaProdChar, MonoidHom.one_comp, one_mul]
+  rw [omegaProdChar, MonoidHom.one_comp]
+  exact one_mul (χ₂.comp hyp.wSnd)
 
 theorem omegaProdChar_one_right (hyp : TICyclicHypothesis G)
     (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) :
     hyp.omegaProdChar χ₁ 1 = χ₁.comp hyp.wFst := by
-  rw [omegaProdChar, MonoidHom.one_comp, mul_one]
+  rw [omegaProdChar, MonoidHom.one_comp]
+  exact mul_one (χ₁.comp hyp.wFst)
 
 theorem omegaProdChar_one_one (hyp : TICyclicHypothesis G) :
     hyp.omegaProdChar 1 1 = 1 := by
-  rw [omegaProdChar, MonoidHom.one_comp, MonoidHom.one_comp, one_mul]
+  rw [omegaProdChar, MonoidHom.one_comp, MonoidHom.one_comp]
+  exact one_mul (1 : hyp.W →* ℂˣ)
 
 /-- **`omegaProdChar` is bimultiplicative** (`Ŵ₁ × Ŵ₂ → Ŵ` is a group homomorphism): since the dual
 codomain `ℂˣ` is abelian, `ω_{(χ₁χ₁'),(χ₂χ₂')} = ω_{χ₁,χ₂} · ω_{χ₁',χ₂'}`.  With

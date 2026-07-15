@@ -164,11 +164,16 @@ theorem induce_eq_sum_mul_linearClassFunction [Finite K] [Fintype K]
     have hq : (f₁ * f₂⁻¹) ^ H.index = 1 :=
       pow_index_eq_one_of_forall_coe_eq_one htriv
     have hd' : (f₁ * f₂⁻¹) ^ d = 1 := by
-      rw [mul_pow, inv_pow, hpow, mul_inv_cancel]
+      calc
+        (f₁ * f₂⁻¹) ^ d = f₁ ^ d * (f₂⁻¹) ^ d := mul_pow f₁ f₂⁻¹ d
+        _ = f₁ ^ d * (f₂ ^ d)⁻¹ := congrArg (f₁ ^ d * ·) (inv_pow f₂ d)
+        _ = f₂ ^ d * (f₂ ^ d)⁻¹ := congrArg (· * (f₂ ^ d)⁻¹) hpow
+        _ = 1 := mul_inv_cancel (f₂ ^ d)
     have hf : f₁ * f₂⁻¹ = 1 := by
-      rw [← orderOf_eq_one_iff]
-      exact Nat.dvd_one.mp (hcop ▸
-        Nat.dvd_gcd (orderOf_dvd_of_pow_eq_one hq) (orderOf_dvd_of_pow_eq_one hd'))
+      exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp (hcop ▸
+        Nat.dvd_gcd
+          (orderOf_dvd_of_pow_eq_one (x := f₁ * f₂⁻¹) (n := H.index) hq)
+          (orderOf_dvd_of_pow_eq_one (x := f₁ * f₂⁻¹) (n := d) hd')))
     have hf12 : f₁ = f₂ := mul_inv_eq_one.mp hf
     rw [hf₁, hf₂] at hf12
     exact (MonoidHom.cancel_right (QuotientGroup.mk'_surjective H)).mp hf12

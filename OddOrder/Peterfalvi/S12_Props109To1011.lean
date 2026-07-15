@@ -85,7 +85,9 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
       rw [hb, show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by apply Fin.ext; simp,
         finCardEquivCharacterGroup_zero]
   -- `k = 0 ↔ j = 0` (the Coq `aut_Iirr_eq0`)
-  have hk0 : k = 0 ↔ j = 0 := by rw [← hzero k, ← hzero j, hχ₂k, inv_eq_one]
+  have hk0 : k = 0 ↔ j = 0 := by
+    rw [← hzero k, ← hzero j, hχ₂k]
+    exact @inv_eq_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ (χ₂ j)
   -- §5 `G`-level TI-cyclic hypothesis (for `σ`) and the `W ≤ M ≤ G` transport
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
   haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
@@ -113,7 +115,8 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
   -- `ξ_j⁻¹ = ξ_k` (`omegaProdChar` inverts coordinatewise; the trivial row factor is fixed)
   have hχ1inv : (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1)))⁻¹
       = h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1)) := by
-    rw [hχ1]; exact inv_one
+    rw [hχ1]
+    exact @inv_one ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _
   have hξinv : (ξ j)⁻¹ = ξ k := by
     have hprod : (h.sdiffTICyclicHypothesis.omegaProdChar
           (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1))) (χ₂ j))⁻¹
@@ -138,7 +141,10 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
   -- the row-`0` index is fixed by the (4.9)(a) row inversion
   have hrow0 : OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm (0 : Fin hyp.w1))
       = finCongr hcardW1.symm (0 : Fin hyp.w1) := by
-    rw [OddOrder.Peterfalvi.S06.rowInv, hχ1, inv_one]
+    have h_inv_one :
+        ((1 : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)⁻¹) = 1 :=
+      @inv_one ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _
+    rw [OddOrder.Peterfalvi.S06.rowInv, hχ1, h_inv_one]
     exact h.w1CharEquiv.symm_apply_eq.mpr hχ1.symm
   -- μ-side: `μ̄_{0j} = μ_{0k}` ((4.9)(a) conjugation closure at the fixed row `0`)
   have hμconj : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (hyp.muGrid hG hodd 0 j)
@@ -1169,4 +1175,3 @@ theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup
     (hyp.inducedFamily_degree_w1_conj_ne hG hφirr hφ1)
 
 end OddOrder.Peterfalvi.S12
-

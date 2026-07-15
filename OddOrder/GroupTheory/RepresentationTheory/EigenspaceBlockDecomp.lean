@@ -77,6 +77,7 @@ between equal-dimensional spaces, hence bijective. -/
 theorem isInternal_cyclicHomBlockFin {epsilon : F} {g : Module.End F V} {h : ℕ}
     [FiniteDimensional F V] (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h)) :
     DirectSum.IsInternal (fun p : Fin h × Fin h => cyclicHomBlockFin epsilon g p.1 p.2) := by
+  classical
   have hsurj : Function.Surjective (DirectSum.coeLinearMap
       (fun p : Fin h × Fin h => cyclicHomBlockFin epsilon g p.1 p.2)) := by
     rw [← LinearMap.range_eq_top, DirectSum.range_coeLinearMap, iSup_cyclicHomBlockFin_eq_top hV]
@@ -95,7 +96,14 @@ theorem isInternal_cyclicHomBlockFin {epsilon : F} {g : Module.End F V} {h : ℕ
       (fun p => cyclicHomBlockFin epsilon g p.1 p.2)) :=
     Module.Finite.equiv (DirectSum.linearEquivFunOnFintype F (Fin h × Fin h)
       (fun p => cyclicHomBlockFin epsilon g p.1 p.2)).symm
-  exact ⟨(LinearMap.injective_iff_surjective_of_finrank_eq_finrank hfin).mpr hsurj, hsurj⟩
+  refine ⟨?_, hsurj⟩
+  intro x y hxy
+  apply (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+    (K := F)
+    (f := DirectSum.coeLinearMap (R := F)
+      (fun p : Fin h × Fin h => cyclicHomBlockFin epsilon g p.1 p.2)) hfin).mpr hsurj
+  simpa only [DirectSum.coeLinearMap_eq_dfinsuppSum,
+    DirectSum.coeAddMonoidHom_eq_dfinsuppSum] using hxy
 
 open Module in
 open Module in

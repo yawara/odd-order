@@ -839,6 +839,7 @@ For the genuinely norm-general families (reducible `μ`-columns, whose `R`-datum
 `CharacterDifferenceImage`), the caseB assembly calls `uniform_degree_coherence_of_families`
 directly with the `S06.certainTypeR` / Dade `R`-data. -/
 theorem uniform_degree_coherence_of_subcoherent
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
     (hyp : Hypothesis (L := L) (G := G) S A)
     (hSfin : S.Finite)
     {η₁ : ClassFunction L ℂ} (hη₁ : η₁ ∈ S)

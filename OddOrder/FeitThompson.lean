@@ -469,27 +469,24 @@ theorem omegaSChar_column_eq_pow (j : Fin tp.p) :
     omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ j =
       omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨1, tp.p_prime.one_lt⟩ ^ (j : ℕ) := by
   let χ := chi2enum hG mp tp ⟨1, tp.p_prime.one_lt⟩
-  let χ₀ := (mp.certainTypeS hG).w1CharEquiv
-    (eqQ hG mp tp ⟨0, tp.q_prime.pos⟩)
   have hpow : chi2enum hG mp tp j = χ ^ (j : ℕ) := by
     simp [χ, chi2enum, OddOrder.Peterfalvi.S06.cyclicPowEnum_apply]
   have hzero : eqQ hG mp tp ⟨0, tp.q_prime.pos⟩ = 0 := by
     apply Fin.ext
     simp [eqQ]
-  have hχ₀ : χ₀ = 1 := by
-    simp [χ₀, hzero]
+  have hχ₀ : (mp.certainTypeS hG).w1CharEquiv
+      (eqQ hG mp tp ⟨0, tp.q_prime.pos⟩) =
+        (1 : ((mp.certainTypeS hG).sdiffTICyclicHypothesis.W1.subgroupOf
+          (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) := by
+    rw [hzero]
+    exact (mp.certainTypeS hG).w1CharEquiv_zero
   unfold omegaSChar
-  rw [hpow]
+  rw [hpow, hχ₀,
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_left,
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_left]
   apply MonoidHom.ext
   intro w
-  simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar,
-    MonoidHom.comp_apply, MonoidHom.mul_apply]
-  change χ₀ _ * (χ ^ (j : ℕ)) _ =
-    (((χ₀.comp (mp.certainTypeS hG).sdiffTICyclicHypothesis.wFst *
-      χ.comp (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd).comp
-        (gridEquivE hG mp tp).toMonoidHom) ^ (j : ℕ)) w
-  rw [hχ₀]
-  simp only [MonoidHom.one_apply, one_mul, MonoidHom.one_comp]
+  simp only [MonoidHom.comp_apply]
   exact (MonoidHom.pow_apply χ (j : ℕ) _).trans
     (MonoidHom.pow_apply
       ((χ.comp (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd).comp
@@ -1037,7 +1034,8 @@ theorem orderOf_omegaSChar_row_base :
         omegaS_col_zero_apply_of_mem_W2 hG mp tp _ w hw, one_pow]
   have hzero :
       omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩ = 1 := by
-    simpa using omegaSChar_row_eq_pow hG mp tp ⟨0, tp.q_prime.pos⟩
+    rw [omegaSChar_row_eq_pow]
+    exact @pow_zero (↥tp.W →* ℂˣ) _ _
   have hne : ξ ≠ 1 := by
     intro hξ
     have hξprime : omegaSChar hG mp tp ⟨1, tp.q_prime.one_lt⟩
@@ -1071,7 +1069,8 @@ theorem orderOf_omegaSChar_column_base :
       exact omegaS_pow_p_of_mem_W2 hG mp tp _ _ w hw
   have hzero :
       omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩ = 1 := by
-    simpa using omegaSChar_column_eq_pow hG mp tp ⟨0, tp.p_prime.pos⟩
+    rw [omegaSChar_column_eq_pow]
+    exact @pow_zero (↥tp.W →* ℂˣ) _ _
   have hne : ξ ≠ 1 := by
     intro hξ
     have hξprime : omegaSChar hG mp tp ⟨0, tp.q_prime.pos⟩

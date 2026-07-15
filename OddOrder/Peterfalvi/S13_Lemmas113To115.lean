@@ -1044,7 +1044,9 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
       : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 := by
     rw [hconjcol]
     exact (OddOrder.Peterfalvi.S06.columnDiff_support_subset (hyp.toHypothesis46 hG hG.odd)
-      (inv_ne_one.mpr hχ₂) hχ₂ hdegsym).trans
+      ((@inv_ne_one (((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+        ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ)
+        _ χ₂).mpr hχ₂) hχ₂ hdegsym).trans
       (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
   -- member-side: anchor differences are `A₀`-supported (from the `S₁`-level hypothesis)
   have hmemdegdiffsupp : ∀ x ∈ s,

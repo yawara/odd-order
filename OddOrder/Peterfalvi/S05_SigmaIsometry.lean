@@ -1035,7 +1035,11 @@ theorem exists_mapRingEquiv_chiFam_left_move (hyp : TICyclicHypothesis G) [Finty
   have hkcast : (k : ℤ) = kz % (orderOf p : ℤ) :=
     Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hordpos.ne'))
   have hp'k : p ^ k = p' := by
-    rw [← hkz, ← zpow_natCast, hkcast, zpow_mod_orderOf]
+    calc
+      p ^ k = p ^ (k : ℤ) := (zpow_natCast p k).symm
+      _ = p ^ (kz % (orderOf p : ℤ)) := congrArg (p ^ ·) hkcast
+      _ = p ^ kz := zpow_mod_orderOf p kz
+      _ = p' := hkz
   -- the product character `ξ = ω_{(p,1)}` has the same order as `p` (`wFst` is surjective)
   set ξ : hyp.W →* ℂˣ := hyp.omegaProdChar p 1 with hξdef
   have hξ_eq : ξ = p.comp hyp.wFst := hyp.omegaProdChar_one_right p
@@ -1101,7 +1105,11 @@ theorem exists_mapRingEquiv_chiFam_right_move (hyp : TICyclicHypothesis G) [Fint
   have hkcast : (k : ℤ) = kz % (orderOf q : ℤ) :=
     Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hordpos.ne'))
   have hq'k : q ^ k = q' := by
-    rw [← hkz, ← zpow_natCast, hkcast, zpow_mod_orderOf]
+    calc
+      q ^ k = q ^ (k : ℤ) := (zpow_natCast q k).symm
+      _ = q ^ (kz % (orderOf q : ℤ)) := congrArg (q ^ ·) hkcast
+      _ = q ^ kz := zpow_mod_orderOf q kz
+      _ = q' := hkz
   set ξ : hyp.W →* ℂˣ := hyp.omegaProdChar 1 q with hξdef
   have hξ_eq : ξ = q.comp hyp.wSnd := hyp.omegaProdChar_one_left q
   have hsurj : Function.Surjective hyp.wSnd := by
@@ -1292,4 +1300,3 @@ theorem exists_intCast_sigma_omega_apply (hyp : TICyclicHypothesis G) [Fintype h
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
-

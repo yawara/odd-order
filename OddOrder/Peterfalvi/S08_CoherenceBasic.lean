@@ -287,7 +287,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePower
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
     {ι κ : Type} {s : Finset ι} {tailSet : Finset κ}
     {χmem : ι → IrreducibleCharacter ↥L}
-    {i₁ : ι} {p idx d₁ dχ q qtot c total θχ mχ mq : ℕ}
+    {i₁ : ι} {p idx d₁ dχ q qtot c total θχ m mχ mq D : ℕ}
     {dmem : ι → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
     (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
       ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)
@@ -365,7 +365,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
     {ι κ : Type} {s : Finset ι} {tailSet : Finset κ}
     {χmem : ι → IrreducibleCharacter ↥L}
-    {i₁ : ι} {p idx d₁ dχ qtot c total θ₁ θχ m₁ mχ mq : ℕ}
+    {i₁ : ι} {p idx d₁ dχ qtot c total θ₁ θχ m₁ mχ mq D : ℕ}
     {dmem θmem mmem : ι → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
     (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
       ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)

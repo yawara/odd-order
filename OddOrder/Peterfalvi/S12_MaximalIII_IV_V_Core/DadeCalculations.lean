@@ -980,7 +980,9 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
       = OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i)
     simp
   -- `χ₂⁻¹ = χ₂` (column `0` is trivial).
-  have hχ₂inv : χ₂⁻¹ = χ₂ := by rw [hχ₂, inv_one]
+  have hχ₂inv : χ₂⁻¹ = χ₂ := by
+    rw [hχ₂]
+    exact @inv_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _
   -- key: `mapRingEquiv conj (ω_{a0}^σ) = ω_{a'0}^σ` for a row `a` with translated index `a'`.
   have hconj : ∀ a : Fin hyp.w1,
       ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (hyp.alignedOmegaSigmaGrid hG hodd a 0)
@@ -1052,7 +1054,10 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
       show finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i)) = i
       rw [hz]
       have hrow0 : OddOrder.Peterfalvi.S06.rowInv h (0 : Fin (Nat.card h.W1)) = 0 := by
-        rw [OddOrder.Peterfalvi.S06.rowInv, h.w1CharEquiv_zero, inv_one]
+        have h_inv_one :
+            ((1 : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)⁻¹) = 1 :=
+          @inv_one ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _
+        rw [OddOrder.Peterfalvi.S06.rowInv, h.w1CharEquiv_zero, h_inv_one]
         exact h.w1CharEquiv.symm_apply_eq.mpr h.w1CharEquiv_zero.symm
       rw [hrow0, hi0]; simp
   · -- involution: applying the construction to `i'` returns `i`.
@@ -1214,5 +1219,4 @@ theorem tau1_values_and_norm_bound [Finite G]
 
 
 end OddOrder.Peterfalvi.S12
-
 

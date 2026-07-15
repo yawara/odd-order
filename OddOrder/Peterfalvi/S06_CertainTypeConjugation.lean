@@ -105,7 +105,10 @@ noncomputable def rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
 /-- `rowInv` is an **involution** (`(w1CharEquiv i)⁻¹` inverts), hence a permutation of the rows. -/
 theorem rowInv_rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
     rowInv h (rowInv h i) = i := by
-  simp only [rowInv, Equiv.apply_symm_apply, inv_inv, Equiv.symm_apply_apply]
+  rw [rowInv, w1CharEquiv_rowInv]
+  have h_inv_inv : ((h.w1CharEquiv i)⁻¹)⁻¹ = h.w1CharEquiv i :=
+    @inv_inv ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ (h.w1CharEquiv i)
+  rw [h_inv_inv, Equiv.symm_apply_apply]
 
 /-- The row-inversion **permutation** `i ↦ rowInv i` (an involution). -/
 noncomputable def rowInvEquiv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] :
@@ -291,7 +294,10 @@ theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h
 `w1CharEquiv_zero`, and `1⁻¹ = 1`). -/
 @[simp] theorem rowInv_zero (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] :
     rowInv h 0 = 0 := by
-  rw [rowInv, Hypothesis.w1CharEquiv_zero, inv_one, ← Hypothesis.w1CharEquiv_zero (h := h),
-    Equiv.symm_apply_apply]
+  rw [rowInv, Hypothesis.w1CharEquiv_zero]
+  have h_inv_one :
+      ((1 : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)⁻¹) = 1 :=
+    @inv_one ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _
+  rw [h_inv_one, ← Hypothesis.w1CharEquiv_zero (h := h), Equiv.symm_apply_apply]
 
 end OddOrder.Peterfalvi.S06

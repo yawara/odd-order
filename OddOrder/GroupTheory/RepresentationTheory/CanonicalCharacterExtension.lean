@@ -259,33 +259,80 @@ theorem extension_unique_of_not_dvd_orderOf_determinant [Finite K]
               IsIrreducibleCharacter (χ₁ * linearClassFunction β)).determinant := by
             congr 1
         _ = β ^ d * hχ₁.determinant := h2 _
-    rw [h1, mul_assoc, mul_inv_cancel, mul_one]
+    calc
+      β ^ d = (β ^ d * hχ₁.determinant) * hχ₁.determinant⁻¹ :=
+        (mul_inv_cancel_right (β ^ d) hχ₁.determinant).symm
+      _ = hχ₂.determinant * hχ₁.determinant⁻¹ :=
+        congrArg (· * hχ₁.determinant⁻¹) h1.symm
   have hβd1 : β ^ d = 1 := by
     have hdvd_p : orderOf (β ^ d) ∣ p := by
       refine orderOf_dvd_of_pow_eq_one ?_
-      rw [← pow_mul, mul_comm d p, pow_mul, hβp, one_pow]
+      calc
+        (β ^ d) ^ p = β ^ (d * p) := (pow_mul β d p).symm
+        _ = β ^ (p * d) := by rw [Nat.mul_comm d p]
+        _ = (β ^ p) ^ d := pow_mul β p d
+        _ = (1 : K →* ℂˣ) ^ d := congrArg (· ^ d) hβp
+        _ = 1 := @one_pow (K →* ℂˣ) _ d
     have hdvd_o : orderOf (β ^ d)
         ∣ orderOf hχ₂.determinant * orderOf hχ₁.determinant := by
       refine orderOf_dvd_of_pow_eq_one ?_
-      rw [hβd, mul_pow]
+      rw [hβd]
       have e1 : hχ₂.determinant
           ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) = 1 := by
-        rw [pow_mul, pow_orderOf_eq_one, one_pow]
+        calc
+          hχ₂.determinant
+              ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) =
+              (hχ₂.determinant ^ orderOf hχ₂.determinant)
+                ^ orderOf hχ₁.determinant :=
+            pow_mul hχ₂.determinant (orderOf hχ₂.determinant)
+              (orderOf hχ₁.determinant)
+          _ = (1 : K →* ℂˣ) ^ orderOf hχ₁.determinant :=
+            congrArg (· ^ orderOf hχ₁.determinant)
+              (pow_orderOf_eq_one hχ₂.determinant)
+          _ = 1 := @one_pow (K →* ℂˣ) _ (orderOf hχ₁.determinant)
       have e2 : (hχ₁.determinant⁻¹)
           ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) = 1 := by
-        rw [inv_pow, mul_comm, pow_mul, pow_orderOf_eq_one, one_pow, inv_one]
-      rw [e1, e2, one_mul]
+        calc
+          (hχ₁.determinant⁻¹)
+              ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) =
+              (hχ₁.determinant⁻¹)
+                ^ (orderOf hχ₁.determinant * orderOf hχ₂.determinant) := by
+                  rw [Nat.mul_comm]
+          _ = ((hχ₁.determinant⁻¹) ^ orderOf hχ₁.determinant)
+                ^ orderOf hχ₂.determinant :=
+            pow_mul hχ₁.determinant⁻¹ (orderOf hχ₁.determinant)
+              (orderOf hχ₂.determinant)
+          _ = ((hχ₁.determinant ^ orderOf hχ₁.determinant)⁻¹)
+                ^ orderOf hχ₂.determinant :=
+            congrArg (· ^ orderOf hχ₂.determinant)
+              (inv_pow hχ₁.determinant (orderOf hχ₁.determinant))
+          _ = ((1 : K →* ℂˣ)⁻¹) ^ orderOf hχ₂.determinant :=
+            congrArg (fun z : K →* ℂˣ => z⁻¹ ^ orderOf hχ₂.determinant)
+              (pow_orderOf_eq_one hχ₁.determinant)
+          _ = (1 : K →* ℂˣ) ^ orderOf hχ₂.determinant :=
+            congrArg (· ^ orderOf hχ₂.determinant) (@inv_one (K →* ℂˣ) _)
+          _ = 1 := @one_pow (K →* ℂˣ) _ (orderOf hχ₂.determinant)
+      calc
+        (hχ₂.determinant * hχ₁.determinant⁻¹)
+            ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) =
+            hχ₂.determinant ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) *
+              (hχ₁.determinant⁻¹)
+                ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) :=
+          mul_pow hχ₂.determinant hχ₁.determinant⁻¹
+            (orderOf hχ₂.determinant * orderOf hχ₁.determinant)
+        _ = 1 * 1 := congrArg₂ (· * ·) e1 e2
+        _ = 1 := @one_mul (K →* ℂˣ) _ (1 : K →* ℂˣ)
     have hcop : Nat.Coprime p (orderOf hχ₂.determinant * orderOf hχ₁.determinant) :=
       hp.coprime_iff_not_dvd.mpr (fun hcon => (hp.dvd_mul.mp hcon).elim ho₂ ho₁)
-    rw [← orderOf_eq_one_iff]
-    exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdvd_p hdvd_o)
+    exact orderOf_eq_one_iff.mp
+      (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdvd_p hdvd_o))
   -- `p ∤ d` upgrades `β^d = 1`, `β^p = 1` to `β = 1`
   have hβ1 : β = 1 := by
     have hdvd_d : orderOf β ∣ d := orderOf_dvd_of_pow_eq_one hβd1
     have hdvd_p : orderOf β ∣ p := orderOf_dvd_of_pow_eq_one hβp
     have hcop : Nat.Coprime p d := hp.coprime_iff_not_dvd.mpr hpd
-    rw [← orderOf_eq_one_iff]
-    exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdvd_p hdvd_d)
+    exact orderOf_eq_one_iff.mp
+      (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdvd_p hdvd_d))
   rw [hβeq, hβ1, ClassFunction.mul_linearClassFunction_one]
 
 /-- **The canonical extension preserves the determinantal order** (Isaacs *CT* 6.25(c); issue

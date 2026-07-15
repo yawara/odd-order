@@ -5,11 +5,10 @@ defaultTargets = ["OddOrder"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
-relaxedAutoImplicit = false
+autoImplicit = false
 weak.linter.mathlibStandardSet = true
 weak.linter.style.longFile = 2000 # 分割上限 (CLAUDE.md「ファイル粒度」、mathlib は 1500)
 weak.linter.style.longFileDefValue = 2000 # bound=defValue で「bound 過大」誤警告を抑止
-maxSynthPendingDepth = 3
 
 [[require]]
 name = "mathlib"

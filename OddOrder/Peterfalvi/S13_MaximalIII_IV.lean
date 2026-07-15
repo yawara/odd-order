@@ -452,7 +452,11 @@ noncomputable def caseB_adjoinOneColumnPair [Finite G]
         (hyp.base.toHypothesis46 hG hG.odd) χ₂).conj x = 0 := fun x hx => by
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
     exact hyp.base.columnSum_inner_irr_member_eq_zero hG hyp.type_alt hyp.params
-      (hyp.params_mu_eq hG hG.odd) (inv_ne_one.mpr hχ₂) (hmemIKFH x (Finset.mem_coe.mp hx))
+      (hyp.params_mu_eq hG hG.odd)
+      ((@inv_ne_one (((hyp.base.toHypothesis46 hG hG.odd).W2.subgroupOf
+        ((hyp.base.toHypothesis46 hG hG.odd).W1 ⊔
+          (hyp.base.toHypothesis46 hG hG.odd).W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
+      (hmemIKFH x (Finset.mem_coe.mp hx))
       (hirr x (Finset.mem_coe.mp hx))
   -- anchor differences are `A₀`-supported over the cut (equal degrees, scaled-difference support)
   have hmemIKFbot : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
@@ -927,7 +931,10 @@ noncomputable def caseB_chainStep [Finite G]
     by_cases hcut : x ∈ (↑(irrCut_finite hyp hyp.H0Cprime d).toFinset
         : Set (ClassFunction ↥M ℂ))
     · exact hyp.base.columnSum_inner_irr_member_eq_zero hG hyp.type_alt hyp.params
-        (hyp.params_mu_eq hG hG.odd) (inv_ne_one.mpr hχ₂)
+        (hyp.params_mu_eq hG hG.odd)
+        ((@inv_ne_one (((hyp.base.toHypothesis46 hG hG.odd).W2.subgroupOf
+          ((hyp.base.toHypothesis46 hG hG.odd).W1 ⊔
+            (hyp.base.toHypothesis46 hG hG.odd).W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
         (hmemIKFH x (hS₁sub hx)) (hirr x (Finset.mem_coe.mp hcut))
     · obtain ⟨χ₂', rfl⟩ := hS₁mu x hx hcut
       refine hyp.base.columnSum_inner_columnSum_eq_zero hG (fun heq => hnotin' ?_)
@@ -1204,4 +1211,3 @@ noncomputable def caseB_coherent_sOf_H0Cprime_of_mixed [Finite G]
       hfresh.1 hfresh.2
 
 end OddOrder.Peterfalvi.S13
-

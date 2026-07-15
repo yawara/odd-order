@@ -1164,7 +1164,17 @@ theorem Hypothesis.exists_conj_column [Finite G]
   refine ⟨j', ?_, ?_, ?_⟩
   · -- `j' ≠ 0`
     intro he
-    exact hχ₂jne (inv_eq_one.mp (hj'χ ▸ (hχ₂one j').mpr he))
+    apply hχ₂jne
+    have hjinvone : (χ₂ j)⁻¹ =
+        (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+      hj'χ ▸ (hχ₂one j').mpr he
+    have hinv := congrArg
+      (fun z : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ => z⁻¹) hjinvone
+    have hinvinv : ((χ₂ j)⁻¹)⁻¹ = χ₂ j :=
+      @inv_inv ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ (χ₂ j)
+    have hinvone : ((1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)⁻¹) = 1 :=
+      @inv_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _
+    simpa only [hinvinv, hinvone] using hinv
   · -- `j' ≠ j`
     intro he
     exact hinvne (hj'χ ▸ (congrArg χ₂ he))

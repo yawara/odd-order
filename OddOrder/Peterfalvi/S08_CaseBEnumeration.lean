@@ -67,7 +67,8 @@ theorem certainTypeSet_closedUnderConjugate
   intro f hf
   obtain ⟨χ₂, hχ₂, hdeg, rfl⟩ := hf
   refine ⟨χ₂⁻¹, ?_, ?_, ?_⟩
-  · simpa using hχ₂
+  · exact
+      ((@inv_ne_one ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
   · -- the inverse column has the original column's degree (`columnSum_inv_apply_one`), so still `= k`.
     rw [OddOrder.Peterfalvi.S06.columnSum_inv_apply_one, hdeg]
   · exact OddOrder.Peterfalvi.S06.columnSum_conj_eq h46 χ₂
@@ -280,7 +281,8 @@ noncomputable def caseB_member_psiDecomposition
         - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
       rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
-      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂
+        ((@inv_ne_one ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
         (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
     -- transport the `columnSum χ₂`-decomposition to `x` along `hcol` (term-level `▸`, no dependency
     -- cycle, unlike `rw [← hcol]` which would try to abstract `x` under the `x`-dependent `χ₂`).
@@ -381,7 +383,8 @@ noncomputable def caseB_member_orthoDatum
         - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
       rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
-      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂
+        ((@inv_ne_one ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
         (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
     -- the coupled datum at `columnSum χ₂`, transported to `x` along `hcol`.
     exact hcol ▸ (⟨OddOrder.Peterfalvi.S06.certainTypeMemberDecomposition h46 hχ₂
@@ -479,7 +482,8 @@ noncomputable def caseB_member_orthoDatum_columnBreak
         - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
       rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
-      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂
+        ((@inv_ne_one ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
         (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
     -- disjointness of the member column from the break column (and its inverse).
     have hne1 : χ₂ ≠ χ₂b := fun he => hxneq (by rw [← hcol, he])
@@ -741,7 +745,8 @@ theorem caseB_breakChar_fields_columnBreak
     hyp.columnSum_mem_S h46 hHK hχ₂b
   have hμbarS : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ∈ hyp.S := by
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
-    exact hyp.columnSum_mem_S h46 hHK (inv_ne_one.mpr hχ₂b)
+    exact hyp.columnSum_mem_S h46 hHK
+      ((@inv_ne_one ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) _ χ₂b).mpr hχ₂b)
   -- self/cross norms via `columnFamily_mu_sum_inner` (`= if χ₂=χ₂' then w₁ else 0`).
   have hψψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) ≠ 0 := by
@@ -773,7 +778,8 @@ theorem caseB_breakChar_fields_columnBreak
       - OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
-    exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 (inv_ne_one.mpr hχ₂b) hχ₂b
+    exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46
+      ((@inv_ne_one ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) _ χ₂b).mpr hχ₂b) hχ₂b
       (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂b)
   have hortho : ∀ φ, φ ∈ hyp.S → φ ∉ S₁ → ∀ χ ∈ S₁, ClassFunction.inner φ χ = 0 :=
     fun φ hφS hφnotS1 χ hχ =>

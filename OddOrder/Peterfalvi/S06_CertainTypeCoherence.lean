@@ -485,7 +485,8 @@ theorem certainType_nonzero (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     {k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hk : k ≠ 1) :
     ∃ φ : ClassFunction ↥L ℂ,
       φ ∈ S07.zSupportedSpan (certainTypeSet h k) (S04.supportInSubgroup A L) ∧ φ ≠ 0 := by
-  have hk_inv : k⁻¹ ≠ 1 := fun heq => hk (inv_eq_one.mp heq)
+  have hk_inv : k⁻¹ ≠ 1 :=
+    (@inv_ne_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ k).mpr hk
   refine ⟨columnSum h k⁻¹ - columnSum h k, ⟨?_, ?_⟩, ?_⟩
   · exact Submodule.sub_mem _
       (Submodule.subset_span (columnSum_mem_certainTypeSet h hk_inv (columnSum_inv_apply_one h k)))
@@ -670,7 +671,8 @@ noncomputable def certainTypeR (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   image_eq := by
     rw [columnSum_conj_eq, Finset.sum_image
       (fun p _ q _ hpq => certainTypeRImage_injective h (column_inv_ne_self h hχ₂).symm hpq)]
-    exact dadeICM_columnDiff_eq_sum h hχ₂ (inv_ne_one.mpr hχ₂) hdeg
+    exact dadeICM_columnDiff_eq_sum h hχ₂
+      ((@inv_ne_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ χ₂).mpr hχ₂) hdeg
 
 open scoped Classical in
 /-- **(5.2.e) cross-orthogonality of two distinct certain-type column families `R(μ_j) ⊥ R(μ_k)`.**
@@ -708,7 +710,10 @@ theorem certainTypeR_imageSet_orthogonal_certainTypeR (h : Hypothesis46 A L)
       mul_neg, neg_mul, neg_neg]
   · rw [if_neg (fun hcon => hne1 hcon.1)]; ring
   · rw [if_neg (fun hcon => hne2 hcon.1)]; ring
-  · rw [if_neg (fun hcon => hne2 (by rw [← hcon.1, inv_inv]))]; ring
+  · rw [if_neg (fun hcon => hne2 (by
+      rw [← hcon.1,
+        (@inv_inv ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ χ₂)]))]
+    ring
   · rw [if_neg (fun hcon => hne1 (inv_injective hcon.1))]; ring
 
 /-- **Per-constituent `CharacterPsiDecomposition` for a reducible certain-type member `μ_j`**
@@ -743,7 +748,9 @@ noncomputable def certainTypeDecompositionDa (h : Hypothesis46 A L) [NeZero (Nat
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
     rcases hs with rfl | rfl
     · rw [columnSum_conj_eq]
-      exact (columnDiff_support_subset h hχ₂ (inv_ne_one.mpr hχ₂) hdeg).trans
+      exact (columnDiff_support_subset h hχ₂
+        ((@inv_ne_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
+        hdeg).trans
         (S04.supportInSubgroup_mono Set.subset_union_left)
     · exact hμη₁supp
   have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
@@ -853,7 +860,8 @@ noncomputable def certainTypeSeedDecomposition (h : Hypothesis46 A L) [NeZero (N
   have hμT : columnSum h χ₂ ∈ certainTypeSet h χ₂ :=
     columnSum_mem_certainTypeSet h hχ₂ rfl
   have hμbarT : columnSum h χ₂⁻¹ ∈ certainTypeSet h χ₂ :=
-    columnSum_mem_certainTypeSet h (inv_ne_one.mpr hχ₂) hdeg.symm
+    columnSum_mem_certainTypeSet h
+      ((@inv_ne_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ χ₂).mpr hχ₂) hdeg.symm
   -- the (5.4) sponsoring lattice `ℤ[{μ − μ̄, μ − 0}]` sits inside `ℤ[𝒯]`
   have hle : Submodule.span ℤ ({columnSum h χ₂ - (columnSum h χ₂).conj, columnSum h χ₂ - 0} :
       Set (ClassFunction ↥L ℂ)) ≤ Submodule.span ℤ (certainTypeSet h χ₂) := by
@@ -871,7 +879,8 @@ noncomputable def certainTypeSeedDecomposition (h : Hypothesis46 A L) [NeZero (N
   have hagree' : certainTypeExtension h (columnSum h χ₂ - (columnSum h χ₂).conj)
       = τ' (columnSum h χ₂ - (columnSum h χ₂).conj) := by
     rw [hagree, columnSum_conj_eq]
-    exact certainTypeExtension_columnDiff_eq_dade h hχ₂ (inv_ne_one.mpr hχ₂) hdeg
+    exact certainTypeExtension_columnDiff_eq_dade h hχ₂
+      ((@inv_ne_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ χ₂).mpr hχ₂) hdeg
   exact S07.CharacterPsiDecomposition.ofProjection
     ({ imageSet := (certainTypeR h hχ₂ hdeg).imageSet
        mem_ZIrr := (certainTypeR h hχ₂ hdeg).mem_ZIrr
@@ -915,7 +924,7 @@ theorem certainTypeRImage_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     rw [show (-((h.columnFamily χ₂).sign : ℂ)) = ((-(h.columnFamily χ₂).sign : ℤ) : ℂ) from by
         push_cast; ring,
       Int.cast_smul_eq_zsmul, ClassFunction.mapRingEquiv_zsmul, certainTypeOmegaSigma_conj_eq,
-      inv_inv]
+      (@inv_inv ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ χ₂)]
     rw [show ((-(h.columnFamily χ₂).sign : ℤ)) • certainTypeOmegaSigma h χ₂
           (rowInv h.toHypothesis i)
         = -(((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂

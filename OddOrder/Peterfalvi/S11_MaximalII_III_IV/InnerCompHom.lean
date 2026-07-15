@@ -338,7 +338,8 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
   have hψhomeq : ψhom = hcPairHom chief θbar lam := by
     have hunfold : hcPairHom chief θbar lam
         = θbar.comp (hcHom chief) * hcLambdaHom chief lam := rfl
-    rw [hunfold, hφfac, hφdef, inv_mul_cancel_right]
+    rw [hunfold, hφfac, hφdef]
+    exact (inv_mul_cancel_right ψhom (hcLambdaHom chief lam)).symm
   have hψeq' : ψ = hcPsiPair chief θbar lam := by
     apply IrreducibleCharacter.ext
     rw [← hψhom, hcPsiPair, hψhomeq]

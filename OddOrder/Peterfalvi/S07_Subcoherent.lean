@@ -124,7 +124,7 @@ keeps this assembler independent of the particular `IntegralCharacterMap`
 packaging.  See `dadeCharacterDifferenceImageOfDiff` (`S07_Coherence.lean`) for
 the canonical way these three are produced. -/
 
-variable {S : Set (ClassFunction L ℂ)}
+variable {S : Set (ClassFunction L ℂ)} {A : Set L}
 
 /-- **Peterfalvi (5.3)(a), assembler form (`irr_subcoherent`).**
 

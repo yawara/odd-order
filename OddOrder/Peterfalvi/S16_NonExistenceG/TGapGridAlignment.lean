@@ -188,11 +188,19 @@ theorem alignedOmegaSourceCharacter_eq_mul_axes [Finite G]
       OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup_zero]
   rw [hsource i j, hsource i 0, hsource 0 j]
   rw [hrow0, hcol0]
-  have hp := h.sdiffTICyclicHypothesis.omegaProdChar_mul
-    (h.w1CharEquiv (finCongr hcardW1.symm i)) 1 1 (χ₂ j)
-  simp only [mul_one, one_mul] at hp
-  rw [hp]
-  rfl
+  let row : (h.sdiffTICyclicHypothesis.W1.subgroupOf
+      h.sdiffTICyclicHypothesis.W) →* ℂˣ :=
+    h.w1CharEquiv (finCongr hcardW1.symm i)
+  let col : (h.sdiffTICyclicHypothesis.W2.subgroupOf
+      h.sdiffTICyclicHypothesis.W) →* ℂˣ := χ₂ j
+  have hp := h.sdiffTICyclicHypothesis.omegaProdChar_mul row 1 1 col
+  have hrowmul : row * 1 = row := mul_one row
+  have hcolmul : 1 * col = col := one_mul col
+  rw [hrowmul, hcolmul] at hp
+  have hpcomp := congrArg
+    (fun f : h.sdiffTICyclicHypothesis.W →* ℂˣ => f.comp e.toMonoidHom) hp
+  rw [MonoidHom.mul_comp] at hpcomp
+  exact hpcomp
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- The source row-zero character is trivial on the first type-P factor.
@@ -720,10 +728,12 @@ theorem omegaMonoidHom_alignedOmegaProductIndex [Finite G]
     alignedOmegaSourceCharacterOnBase hG base s12 hW hodd i j
   rw [
     omegaMonoidHom_alignedOmegaColumnIndex hG base s12 hW hW1 hW2 hodd j,
-    omegaMonoidHom_alignedOmegaRowIndex hG base s12 hW hW1 hW2 hodd i,
-    mul_comm]
-  exact (alignedOmegaSourceCharacterOnBase_eq_mul_axes
-    hG base s12 hW hodd i j).symm
+    omegaMonoidHom_alignedOmegaRowIndex hG base s12 hW hW1 hW2 hodd i]
+  exact (@mul_comm (↥base.W →* ℂˣ) _
+      (alignedOmegaSourceCharacterOnBase hG base s12 hW hodd 0 j)
+      (alignedOmegaSourceCharacterOnBase hG base s12 hW hodd i 0)).trans
+    (alignedOmegaSourceCharacterOnBase_eq_mul_axes
+      hG base s12 hW hodd i j).symm
 
 /-- The factorwise product construction selects the same full omega entry as
 the direct source-character pointer. -/

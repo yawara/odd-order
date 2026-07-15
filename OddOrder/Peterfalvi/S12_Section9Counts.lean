@@ -1089,7 +1089,9 @@ noncomputable def Hypothesis.columnBreakDa [Finite G]
       (((1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)) = 0 := by
     rw [one_smul, OddOrder.Peterfalvi.S06.columnSum_conj_eq]
     exact hyp.columnSum_inner_irr_member_eq_zero hG htype params hmu
-      (inv_ne_one.mpr hχ₂) hχ₁ hχ₁irr
+      ((@inv_ne_one (((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+        ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ)
+        _ χ₂).mpr hχ₂) hχ₁ hχ₁irr
   exact OddOrder.Peterfalvi.S06.certainTypeDecompositionDa (hyp.toHypothesis46 hG hG.odd)
     hχ₂ hdeg hsupp1 htau1_mema hχψ hχbarψ
 
@@ -1179,4 +1181,3 @@ theorem Hypothesis.columnSum_injective [Finite G]
   exact Nat.cast_ne_zero.mpr Nat.card_pos.ne' hw1.symm
 
 end OddOrder.Peterfalvi.S12
-
