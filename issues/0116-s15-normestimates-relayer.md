@@ -360,3 +360,19 @@ discharge した後、mid-layer/S16 consumer を順次付け替え、legacy wrap
 **次 frontier**: downstream supply leaf で `analytic_inequality_of_caseB_facts` を一度構成し、
 四本の明示版を `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` から供給する。
 その API を基点に mid-layer/S16 consumer の param threading を進める。
+
+## ✅ lane a progress (2026-07-15) — Core order relayer complete
+
+新 leaf `S15_CaseBEndgameSupply/OrderRelayer.lean` で、Core (13.10) endpoint を
+(13.11)–(13.15) の四本へ接続した:
+
+- `CharacterDegreeCore.numeric_bounds_of_caseB_facts`
+- `CharacterDegreeCore.c_eq_one_of_caseB_facts`
+- `CharacterDegreeCore.caseA_parameters_of_caseB_facts`
+- `CharacterDegreeCore.caseB_order_u_of_caseB_facts`
+
+全 API は `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` を入力に取り、
+`CharacterDegreeData`/`NormCascadeData` を参照しない。leaf build green、hub export 済み。
+
+**次 frontier**: 文書順で最上流の `c_eq_one` mid-layer consumer から明示版を追加し、
+Core supply を末端まで thread する。旧名は downstream 移行完了まで互換境界として保持する。
