@@ -802,18 +802,19 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
         (_hG.solvable_of_mem_maximalSubgroups hyp.T_maximal) hVleT
         (isHall_subgroupOf_primeFactors_of_coprime_index hVleT hVhall_cop) hg hNVL) hNVT
 
-/-- **Peterfalvi (13.17.c), Huppert step.**  If `W₁` lies in a Frobenius complement `E` of the
-type-I subgroup `L`, then `E ⊆ Q W₂`.
+/-- **Peterfalvi (13.17.c), explicit-`D = ⊥` Huppert step.**  If `W₁` lies in a Frobenius
+complement `E` of the type-I subgroup `L`, then `E ⊆ Q W₂`.
 
 *Proof (Pf p.82):* `E` is a Frobenius complement of **odd** order (`E ≤ L ≤ G`, `|G|` odd), so by
 Huppert ([H] Kapitel V Satz 8.18 b), `normal_of_card_prime_of_isFrobeniusGroup_of_odd`) its
 prime-order subgroup `W₁` (`|W₁| = q`) is normal in `E`.  Hence `E ⊆ N_G(W₁) = C_G(W₁) = Q W₂`
-by (13.16) (`normalizer_W1`).  This is the step of (13.17.c) consuming the new Frobenius-complement
+by (13.16) (`normalizer_W1_of_D_eq_bot`).  This is the step of (13.17.c) consuming the new
+Frobenius-complement
 structure theory; the remaining order analysis (`|E| ∈ {q, p q}`, cyclic Sylows by [BG] 3.9, and
 the `(14.5)` exclusion of `E = W₁`) builds on this containment. -/
-theorem complement_le_QW2 [Finite G]
+theorem complement_le_QW2_of_D_eq_bot [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hTTypeII : IsTypeII hyp.T)
+    (hTTypeII : IsTypeII hyp.T) (hDbot : hyp.D = ⊥)
     {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
     frob.complement.map L.subtype ≤ hyp.Q ⊔ hyp.W2 := by
@@ -870,7 +871,7 @@ theorem complement_le_QW2 [Finite G]
       rw [Subgroup.mem_subgroupOf] at hfin
       simpa using hfin
   -- (13.16): `N_G(W₁) = C_G(W₁) = Q W₂`.
-  have h1316 := normalizer_W1 _hG hyp hTTypeII
+  have h1316 := normalizer_W1_of_D_eq_bot _hG hyp hTTypeII hDbot
   calc E.map L.subtype ≤ Subgroup.normalizer (hyp.W1 : Set G) := hEN
     _ = Subgroup.centralizer (hyp.W1 : Set G) := h1316.1
     _ = hyp.Q ⊔ hyp.W2 := h1316.2

@@ -1036,7 +1036,8 @@ theorem complement_not_le_Q_of_c_eq_one_and_d_eq_one [Finite G]
 /-- **Peterfalvi (14.5) order consequence.**  Under the (14.5) hypotheses the `W₁`-containing
 Frobenius complement `E` of `L` has order `p q`.
 
-*Proof (Pf p.82/p.87).*  `E ⊆ Q W₂` (`complement_le_QW2`), and `Q ⋊ W₂` has `Q ◁ Q W₂` with
+*Proof (Pf p.82/p.87).*  `E ⊆ Q W₂` (`complement_le_QW2_of_D_eq_bot`), and `Q ⋊ W₂` has
+`Q ◁ Q W₂` with
 `[Q W₂ : Q] = |W₂| = p` (`Q_W2_structure`).  The relative index `[E : E ∩ Q]` divides
 `[Q W₂ : Q] = p` (normal-subgroup relative index inside `↥(Q W₂)`) and is `≠ 1` by the (14.5)
 exclusion `E ⊄ Q` (`complement_not_le_Q`), hence `= p`; with `E ∩ Q = W₁` of order `q`
@@ -1062,7 +1063,10 @@ theorem complement_card_eq_pq_of_c_eq_one_and_d_eq_one [Finite G]
   have hnle := complement_not_le_Q_of_c_eq_one_and_d_eq_one
     _hG hnoV hyp hc1 hd1 hTTypeII hqp hNUS hLmax hLI hNUL hUH frob hW1E pins
   -- `E ⊆ Q W₂` (Huppert step) and the `Q ⋊ W₂` structure.
-  have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp hTTypeII frob hW1E
+  have hDbot : hyp.D = ⊥ :=
+    Subgroup.card_eq_one.mp (by rw [← hyp.d_eq_card_D]; exact hd1)
+  have hEH : Em ≤ Hg :=
+    complement_le_QW2_of_D_eq_bot _hG hyp hTTypeII hDbot frob hW1E
   obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp hTTypeII
   have hQleH : hyp.Q ≤ Hg := le_sup_left
   -- `|E ∩ Q| = |W₁| = q`.
@@ -1108,7 +1112,8 @@ subgroup `L` over `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y
 
 Assembled from the order argument (`complement_card_eq_pq`) and the group-theoretic `∃ y`
 extraction (`exists_mem_conj_W2_le_of_dvd_card`, Schur–Zassenhaus), the latter fed `E ⊆ Q W₂`
-by the Huppert step (`complement_le_QW2`).  The `W₁ ⊆ E` hypothesis records Peterfalvi's choice
+by the Huppert step (`complement_le_QW2_of_D_eq_bot`).  The `W₁ ⊆ E` hypothesis records
+Peterfalvi's choice
 "let `E` be a complement to `H` in `L` such that `W₁ ⊂ E`". -/
 theorem typeI_overNormalizer_complement_of_c_eq_one_and_d_eq_one [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1130,7 +1135,9 @@ theorem typeI_overNormalizer_complement_of_c_eq_one_and_d_eq_one [Finite G]
     _hG hnoV hyp hc1 hd1 hTTypeII hqp hNUS hLmax hLI hNUL hUH frob hW1E pins
   refine ⟨hcard, ?_⟩
   obtain ⟨hWnorm, hdisj, hpQ⟩ := Q_W2_structure _hG hyp hTTypeII
-  have hEQW2 := complement_le_QW2 _hG hyp hTTypeII frob hW1E
+  have hDbot : hyp.D = ⊥ :=
+    Subgroup.card_eq_one.mp (by rw [← hyp.d_eq_card_D]; exact hd1)
+  have hEQW2 := complement_le_QW2_of_D_eq_bot _hG hyp hTTypeII hDbot frob hW1E
   -- `Q` is solvable: `Q = T_F ≤ T < ⊤`.
   haveI hQsolv : IsSolvable ↥hyp.Q := by
     have hQT : hyp.Q ≤ hyp.T := by

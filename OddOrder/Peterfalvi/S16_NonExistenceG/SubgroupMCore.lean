@@ -632,7 +632,7 @@ theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
     have hVcard : Nat.card ↥hyp.base.V = hyp.base.v := by
       have hDbot : hyp.base.D = ⊥ := by
         rw [hyp.base.D_eq]
-        exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot _hG hyp.base hTII
+        exact hyp.V_inf_centralizer_Q_eq_bot _hG
       have hd1 : hyp.base.d = 1 := by rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
       rw [hyp.base.card_V_eq_vd, hd1, mul_one]
     -- `v ∣ k` from `V ≤ K`; set `x = k / v`.

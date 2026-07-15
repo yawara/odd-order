@@ -20,9 +20,9 @@ primes `q < p`.  BG Appendix C proves that any such configuration forces
 
 This file is the BG-side scaffold for that last interface.  Lemmas C.1 and C.2
 are wired to the concrete finite-field norm-set development in
-`OddOrder.BG.AppC.NormSet`; Lemma C.3 is still the generator-relation argument
-that needs the concrete embedding data from hypothesis (B).  The final bridge to
-Peterfalvi Section 16 is already connected.
+`OddOrder.BG.AppC.NormSet`; Lemma C.3 consumes the concrete generator relation
+constructed in Peterfalvi's field-normalizer data.  The final bridge to
+Peterfalvi Section 16 is connected and axiom-clean.
 -/
 
 namespace OddOrder.BG.AppC

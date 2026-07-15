@@ -267,8 +267,9 @@ theorem complement_inf_P_structure_dichotomy [Finite G]
   · right
     exact ⟨hInf, hle⟩
 
-/-- **`S`-side dual of `complement_le_QW2`** (V-side Huppert step): the `W₂`-containing Frobenius
-complement `E` satisfies `E ≤ P W₁`.  Mirror of `complement_le_QW2` with `W₁/Q ↔ W₂/P`: `W₂` (of
+/-- **`S`-side dual of `complement_le_QW2_of_D_eq_bot`** (V-side Huppert step): the
+`W₂`-containing Frobenius complement `E` satisfies `E ≤ P W₁`.  Mirror of
+`complement_le_QW2_of_D_eq_bot` with `W₁/Q ↔ W₂/P`: `W₂` (of
 prime order `p`) is normal in the Frobenius complement `E` (Huppert V.8.18b,
 `normal_of_card_prime_of_isFrobeniusGroup_of_odd`), so `E ≤ N_G(W₂)`, and (13.16) `normalizer_W2`
 gives `N_G(W₂) = P ⊔ W₁`.  (The Frobenius/Wielandt content of (13.16) is isolated in

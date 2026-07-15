@@ -782,7 +782,8 @@ theorem normalizer_W2_structure_of_c_eq_one [Finite G]
   exact normalizer_W2_within_S_of_c_eq_one hG hyp hc1 (Subgroup.mem_inf.mpr ⟨hg, hgS⟩)
 
 /-- **Peterfalvi (13.16), `W₂`-side**: `N_G(W₂) = C_G(W₂) = P ⊔ W₁` (the `S↔T`, `W₁↔W₂`, `P↔Q`
-dual of `normalizer_W1`; the form stated directly in Coq `FTtypeP_norm_cent_compl`).
+dual of `normalizer_W1_of_D_eq_bot`; the form stated directly in Coq
+`FTtypeP_norm_cent_compl`).
 
 Proved from `normalizer_W2_structure` by the antisymmetric chain
 `P ⊔ W₁ ≤ C_G(W₂) ≤ N_G(W₂) ≤ P ⊔ W₁`:

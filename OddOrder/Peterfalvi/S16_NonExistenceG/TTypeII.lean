@@ -38,7 +38,8 @@ carriers that the honest §16 build still owes, each cited from its own construc
 `T_typeIII_ratio_le` call site:
 
 * `hcount : (calT1.card : ℚ) = (v−1)/p` — the coherent count (proven `T_typeIII_calT1_card` in `|V|`
-  form) **after** the (13.12) `d = 1` substitution `v = |V|` (`S15.V_inf_centralizer_Q_eq_bot`, lane-b);
+  form) **after** the (13.12) `d = 1` substitution `v = |V|`
+  (`Hypothesis.V_inf_centralizer_Q_eq_bot`);
 * `horth` — orthonormality of the `τ₁`-images (the `calT1` **coherence** carrier, proven skeleton
   `T_typeIII_calT1_coherent` fed a T-side `S07.Hypothesis` Dade package);
 * `hdecomp`/`hΓ₁`/`hx` — the `S`-side `βₛ` bridge gap `Γ = ∑ x_ζ·τ₁ζ + Γ₁` (`Γ₁ ⊥ τ₁ζ`), with the
@@ -199,6 +200,16 @@ theorem T_side_caseB_facts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base hyp.q_lt_p
       (pins := hyp.nuGridSupply)
   exact ⟨hD, hv⟩
+
+/-- **Peterfalvi (13.12), `T`-side `d = 1` in the Section 16 context** (issue 9077):
+`V ⊓ C_G(Q) = ⊥`.  The honest (13.4) character-degree producer supplies `D = ⊥`, and the
+canonical identity `D = V ⊓ C_G(Q)` turns it into the faithful-action statement.  This downstream
+placement avoids the genuine import cycle from `S15_SAndTBasic` to the character-degree layer. -/
+theorem Hypothesis.V_inf_centralizer_Q_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.base.V ⊓ Subgroup.centralizer (hyp.base.Q : Set G) = ⊥ := by
+  rw [← hyp.base.D_eq]
+  exact (T_side_caseB_facts hG hyp).1
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- The (13.18) gap `Γ` is a virtual character.  Its Dade term is virtual because
