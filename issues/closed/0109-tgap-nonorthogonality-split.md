@@ -39,3 +39,17 @@ PF 3.3 omega-grid exhaustion 系と (11.8) eta rigidity/residual classifier 系�
 ## 完了条件
 
 TGapNonorthogonality.lean ≤ ~1500 行、build green 維持、c の active work 非破壊。
+
+## 完了 (2026-07-15)
+
+- [x] 実ファイルでは issue 起票時の想定と順序が逆だったため、先頭で namespace まで
+      完結する member residual 構成・非直交性移送クラスタを
+      `TGapMemberResidual.lean` へ flat prefix-split した。
+- [x] 元 module 名は維持し、`TGapNonorthogonality.lean` は新 leaf を import して
+      arbitrary-grid dichotomy、eta rigidity、omega exhaustion を収録する。
+- [x] 行数は新 leaf 517 行、親 1147 行で、ともに 1500 行以下。
+- [x] 分割前後の top-level 宣言 multiset は完全一致し、両 leaf の `sorry` は 0。
+- [x] `lake build OddOrder.Peterfalvi.S16_NonExistenceG.TGapNonorthogonality`
+      成功 (4197 jobs)。
+- [x] `lake build OddOrder` 成功 (4247 jobs)。
+- [x] `OddOrder.AxiomsCheck` は allowlist 外 axiom なし。
