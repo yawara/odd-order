@@ -72,3 +72,22 @@ merge bca9bd9f (9092 mu_reducible_dichotomy carrier field) の size watch で:
 
 両 file は spine carrier で **lane-a の active frontier** (spine legacy-sorry rewire 進行中) ゆえ、
 分割は a の spine 作業が settle した後に hub が凍結境界で実施 (2000 hard 未達で deferred)。
+
+## 完了 (2026-07-15)
+
+- [x] `FeitThompsonSetup.lean` の carrier・maximal-pair・type-`P` 構成を
+      `FeitThompsonSection16Core.lean` へ分割し、既存 module は
+      canonical character-grid alignment API を保持した。
+- [x] `FeitThompson.lean` の閉じた `Section16CharacterData` 証明クラスタを
+      `FeitThompsonCharacterData.lean` へ分割し、既存 module は
+      producer／assembly／minimal-counterexample reduction を保持した。
+- [x] 既存 module 名と downstream import は不変。新 leaf は既存 module から
+      transitive に再 export される。
+- [x] 最終行数は core 1156、setup 507、character-data 1166、top-level 575。
+      全 leaf が 1500 行以下。
+- [x] 各分割前後の top-level 宣言 multiset は完全一致し、対象 `sorry` は 0。
+- [x] Setup + direct consumers の focused build 成功 (4223 jobs)、
+      `OddOrder.FeitThompson` の focused build 成功 (4225 jobs)。
+- [x] `lake build OddOrder` 成功 (4249 jobs)。`OddOrder.AxiomsCheck` は
+      最終 `feitThompson` まで allowlist 外 axiom なし。
+- [x] upstream Setup 分割は commit `a912619f`。
