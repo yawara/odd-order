@@ -1166,7 +1166,7 @@ theorem cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one {p q r : ℕ}
       Polynomial.IsRoot (Polynomial.cyclotomic q (ZMod r))
         (Nat.castRingHom (ZMod r) p) := by
     rw [Polynomial.IsRoot.def, Polynomial.cyclotomic_prime]
-    rw [Polynomial.eval_finset_sum]
+    rw [Polynomial.eval_finsetSum]
     simp only [Polynomial.eval_pow, Polynomial.eval_X]
     simpa [Nat.cast_sum, Nat.cast_pow] using
       (ZMod.natCast_eq_zero_iff (∑ k ∈ Finset.range q, p ^ k) r).mpr hrdvd_sum

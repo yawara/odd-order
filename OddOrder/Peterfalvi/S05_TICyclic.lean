@@ -305,18 +305,18 @@ namespace TICyclicHypothesis
 /- 3.3: The linear-character family `ω` of the cyclic group `W` (pp. 16-17) -/
 
 /-- **Peterfalvi (3.1)/(3.3)**: `W` is commutative.  It is cyclic by `W_cyclic`, and a cyclic
-group is abelian (`commutative_of_cyclic_center_quotient` applied to the identity map).  This is
+group is abelian (`MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`).  This is
 what makes every irreducible character of `W` linear, so that the `ω_{ij}` of (3.3) exhaust
 `Irr(W)` (`omegaEquiv`). -/
 theorem isMulCommutative_W (hyp : TICyclicHypothesis G) : IsMulCommutative hyp.W :=
   haveI := hyp.W_cyclic
-  ⟨⟨fun a b =>
-    commutative_of_cyclic_center_quotient (MonoidHom.id hyp.W)
-      (by
-        intro x hx
-        rw [MonoidHom.mem_ker, MonoidHom.id_apply] at hx
-        rw [hx]
-        exact Subgroup.one_mem _) a b⟩⟩
+  MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+    (MonoidHom.id hyp.W)
+    (by
+      intro x hx
+      rw [MonoidHom.mem_ker, MonoidHom.id_apply] at hx
+      rw [hx]
+      exact Subgroup.one_mem _)
 
 /-- **Peterfalvi (3.3)**: the irreducible character `ω(χ)` of `W` attached to a linear character
 `χ : W →* ℂˣ`.  Since `W` is abelian, every irreducible character of `W` is of this form

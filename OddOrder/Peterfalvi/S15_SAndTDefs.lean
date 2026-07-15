@@ -926,7 +926,7 @@ theorem exists_conj_typeP_U_of_coprime [Finite G]
   have hUcompl : (hyp.P.subgroupOf (derivedInG hyp.S)).IsComplement'
       (hyp.U.subgroupOf (derivedInG hyp.S)) := by
     apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
-    · exact disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop'.symm)
+    · exact Subgroup.disjoint_of_coprime_natCard hcop'.symm
     · have hmul := Subgroup.normal_mul (hyp.P.subgroupOf (derivedInG hyp.S))
         (hyp.U.subgroupOf (derivedInG hyp.S))
       rw [hPnUn_sup, Subgroup.coe_top] at hmul
@@ -1009,7 +1009,7 @@ for the odd primes `p, q ≥ 3`, so `W` cannot be covered by `W₁ ∪ W₂`.  S
 field of `MHypothesis`. -/
 theorem W_sdiff_nonempty [Finite G] (hyp : Hypothesis (G := G)) :
     ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))).Nonempty := by
-  rw [Set.diff_nonempty]
+  rw [Set.sdiff_nonempty]
   intro hsub
   have hWc : (hyp.W : Set G).ncard = hyp.p * hyp.q := by
     rw [← Nat.card_coe_set_eq]; simp only [SetLike.coe_sort_coe]; exact card_W_eq_pq hyp
@@ -1026,7 +1026,7 @@ theorem W_sdiff_nonempty [Finite G] (hyp : Hypothesis (G := G)) :
   have hp3 : 3 ≤ hyp.p := hyp.three_le_p
   have hq3 : 3 ≤ hyp.q := hyp.three_le_q
   have hkey : hyp.p * hyp.q ≤ hyp.q + hyp.p := le_trans hle hunion
-  have h3q : 3 * hyp.q ≤ hyp.p * hyp.q := mul_le_mul_right' hp3 hyp.q
+  have h3q : 3 * hyp.q ≤ hyp.p * hyp.q := mul_le_mul_left hp3 hyp.q
   have h3p : hyp.p * 3 ≤ hyp.p * hyp.q := mul_le_mul_right hq3 hyp.p
   omega
 

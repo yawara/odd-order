@@ -990,7 +990,7 @@ theorem exists_typeP2_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hc2 : (ZFamilyFinset M K).card ≤ 2 * ((ZFamilyFinset M K).card - 1) := by omega
     have hstep : (ZFamilyFinset M K).card * (K ⊔ Kstar).index
         ≤ 2 * (((ZFamilyFinset M K).card - 1) * (K ⊔ Kstar).index) := by
-      rw [← mul_assoc]; exact mul_le_mul_right' hc2 _
+      rw [← mul_assoc]; exact mul_le_mul_left hc2 _
     omega
   -- expansion fact relating `𝓕.card·[G:Z]` and `(𝓕.card−1)·[G:Z]`
   have hexp : (ZFamilyFinset M K).card * (K ⊔ Kstar).index

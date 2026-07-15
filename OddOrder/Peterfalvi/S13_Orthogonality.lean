@@ -917,7 +917,7 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
       obtain ⟨c⟩ := coherent_sOf_H0C hG hyp hncH0C htype
       exact ⟨c, coherent_sOf_H0C_extension_muColumnSum_pin_of_irr hG hyp c coh hζHC hw2
         hθsupp (hcol ⟨1, hw2⟩ hk1) hξ hξirr hncH0C htype⟩
-    · push_neg at hirr
+    · push Not at hirr
       exact exists_pinned_coherent_sOf_H0C_of_all_reducible hG hyp
         (coherent_sOf_H0C hG hyp hncH0C htype).some hw2 hcol hirr hncH0C htype
   obtain ⟨ν, hagreeSHC, hagreeSof⟩ := exists_glue_nu_H0C hyp coh hsofC

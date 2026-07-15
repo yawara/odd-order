@@ -600,7 +600,7 @@ theorem ncard_sdiff_biUnion_subgroup [Finite G] {ι : Type*} {s : Finset ι} (hs
   have hsub : (⋃ i ∈ s, (S i : Set G)) ⊆ (Z : Set G) :=
     Set.iUnion₂_subset (fun i hi => SetLike.coe_subset_coe.mpr (hSZ i hi))
   have hIE := ncard_biUnion_subgroup_add_card hs S hpair
-  have hdiff := Set.ncard_diff_add_ncard_of_subset hsub
+  have hdiff := Set.ncard_sdiff_add_ncard_of_subset hsub
   have hZcard : Nat.card ↥Z = (Z : Set G).ncard := Nat.card_coe_set_eq (Z : Set G)
   omega
 

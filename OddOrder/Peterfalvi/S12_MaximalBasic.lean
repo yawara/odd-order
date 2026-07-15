@@ -477,7 +477,7 @@ theorem exists_prime_dvd_orderOf_of_mem_typePV [Finite G] {M : Subgroup G}
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   obtain ⟨hvW, hvnot⟩ := hv
   rw [Set.mem_union] at hvnot
-  push_neg at hvnot
+  push Not at hvnot
   obtain ⟨v₁, hv₁, v₂, hv₂, rfl⟩ :=
     data.exists_mul_eq_of_mem_W (SetLike.mem_coe.mp hvW)
   have hv₁ne : v₁ ≠ 1 := by
@@ -711,7 +711,7 @@ theorem Hypothesis.g1_card_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hy
         + (Finset.univ.filter (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport
             ∧ ¬ (orderOf g).Coprime hyp.w1)).card := by
     rw [← Finset.filter_filter, ← Finset.filter_filter,
-      Finset.filter_card_add_filter_neg_card_eq_card]
+      Finset.card_filter_add_card_filter_not]
   -- support monotonicity: the restricted support sits inside the full one
   have hRF : hyp.toHypothesis71.hyp.dadeSupport ⊆ hyp.dadeData.dade.dadeSupport := by
     intro x hx

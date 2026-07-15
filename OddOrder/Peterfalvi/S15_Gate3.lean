@@ -138,7 +138,7 @@ theorem tConjugate_fitting_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       exact hk
     have hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥hyp.U) := by
       rw [hLFcard]; exact hcopUq.symm.pow_left hyp.p
-    exact Subgroup.inf_eq_bot_of_coprime hcop
+    exact (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   exact ⟨hLFcard, hW1leLF, hLFU⟩
 
 /-- **Peterfalvi (8.17.a) coprimality (B2)**: for a type-`I` maximal subgroup `L` that is *not*
@@ -293,7 +293,7 @@ theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hcopLFq : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.q :=
     Nat.Coprime.coprime_dvd_right (dvd_mul_left hyp.q hyp.p) hcop
   have hW1LF : hyp.W1 ⊓ maxNilpotentNormalHall L = ⊥ :=
-    Subgroup.inf_eq_bot_of_coprime (by rw [← hyp.q_eq_card_W1]; exact hcopLFq.symm)
+    (Subgroup.disjoint_of_coprime_natCard (by rw [← hyp.q_eq_card_W1]; exact hcopLFq.symm)).eq_bot
   -- piece 5: `U ⊓ L_F ≠ ⊥` (else the Frobenius `U W₁` acts fixed-point-freely on `L_F`).
   have hUmeets : hyp.U ⊓ maxNilpotentNormalHall L ≠ ⊥ := by
     intro hbot
@@ -395,7 +395,7 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hcopLFp : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.p :=
     Nat.Coprime.coprime_dvd_right (dvd_mul_right hyp.p hyp.q) hcop
   have hW2LF : hyp.W2 ⊓ maxNilpotentNormalHall L = ⊥ :=
-    Subgroup.inf_eq_bot_of_coprime (by rw [← hyp.p_eq_card_W2]; exact hcopLFp.symm)
+    (Subgroup.disjoint_of_coprime_natCard (by rw [← hyp.p_eq_card_W2]; exact hcopLFp.symm)).eq_bot
   have hVmeets : hyp.V ⊓ maxNilpotentNormalHall L ≠ ⊥ := by
     intro hbot
     have hcopV : Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥(maxNilpotentNormalHall L)) :=
@@ -683,7 +683,7 @@ theorem sConjugate_fitting_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       exact hk
     have hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥hyp.V) := by
       rw [hLFcard]; exact hcopVp.symm.pow_left hyp.q
-    exact Subgroup.inf_eq_bot_of_coprime hcop
+    exact (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   exact ⟨hLFcard, hW2leLF, hLFV⟩
 
 /-- **`T`-side dual of `exists_typeI_maximal_overNormalizer_U`** (Pf (13.17.a/b), V-side): for `T`
@@ -924,7 +924,8 @@ theorem Q_W2_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.p_prime.dvd_of_dvd_pow hdvd))
   -- Conjunct 2: `Q ⊓ W₂ = ⊥`, from coprimality `|Q| ⟂ p = |W₂|`.
   refine ⟨hWnorm, ?_, hpQ⟩
-  apply Subgroup.inf_eq_bot_of_coprime
+  apply Disjoint.eq_bot
+  apply Subgroup.disjoint_of_coprime_natCard
   rw [← hyp.p_eq_card_W2]
   exact (hyp.p_prime.coprime_iff_not_dvd.mpr hpQ).symm
 

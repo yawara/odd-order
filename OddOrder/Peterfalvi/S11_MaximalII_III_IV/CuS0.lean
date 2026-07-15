@@ -499,7 +499,7 @@ theorem exists_source_char_caseA [Finite G] {M : Subgroup G}
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := isMulCommutative_iff.mp inferInstance }
   haveI := Fact.mk chief.p_prime
-  haveI : W.Normal := Subgroup.normal_of_comm W
+  haveI : W.Normal := Subgroup.normal_of_isMulCommutative W
   letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
   -- `|H̄/W| = p`: `S₀` complements `W`, so `[H̄ : W] = |S₀| = p`.
   have hcompl : Subgroup.IsComplement' caseA.S0 W :=
@@ -956,7 +956,7 @@ theorem exists_source_char_hom_caseA [Finite G] {M : Subgroup G}
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := isMulCommutative_iff.mp inferInstance }
   haveI := Fact.mk chief.p_prime
-  haveI : W.Normal := Subgroup.normal_of_comm W
+  haveI : W.Normal := Subgroup.normal_of_isMulCommutative W
   letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
   have hcompl : Subgroup.IsComplement' caseA.S0 W :=
     Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
@@ -1021,7 +1021,7 @@ theorem exists_source_char_hom_caseA_nonRegular [Finite G] {M : Subgroup G}
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := isMulCommutative_iff.mp inferInstance }
   haveI := Fact.mk chief.p_prime
-  haveI : W.Normal := Subgroup.normal_of_comm W
+  haveI : W.Normal := Subgroup.normal_of_isMulCommutative W
   letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
   have hcompl : Subgroup.IsComplement' caseA.S0 W :=
     Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)

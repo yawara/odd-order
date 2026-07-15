@@ -1291,7 +1291,7 @@ theorem caseA_Xmu_card_eq [Finite G] {M : Subgroup G}
     · rintro ⟨hφS, hφred⟩
       obtain ⟨θbar, hreg, rfl⟩ := caseA_reducible_source_eq_hcZeta caseA hG φ hφS hφred
       exact ⟨_, ⟨⟨θbar, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hreg⟩, rfl⟩, hφred⟩, rfl⟩
-  rw [← Set.ncard_coe_finset Xmu, ← Set.ncard_image_of_injOn hinj, himg,
+  rw [← Set.ncard_coe_finset Xmu, ← hinj.ncard_image, himg,
     reducible_count_sOf_H0 hG chief]
 
 set_option linter.style.openClassical false in

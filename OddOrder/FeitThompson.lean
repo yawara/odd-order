@@ -645,7 +645,7 @@ theorem eqQ_finNeg (i : Fin tp.q) :
             % Nat.card ↥(mp.certainTypeS hG).W1,
           Nat.mod_lt _ (Nat.pos_of_ne_zero (NeZero.ne _))⟩ := by
   apply Fin.ext
-  simp only [eqQ, finCongr_apply, Fin.coe_cast, OddOrder.Peterfalvi.S15.finNeg]
+  simp only [eqQ, finCongr_apply, Fin.val_cast, OddOrder.Peterfalvi.S15.finNeg]
   rw [cardCertainTypeS_W1 hG mp tp]
 
 /-- **Index negation is character inversion for the S-side grid characters** (Peterfalvi (3.5):

@@ -770,7 +770,7 @@ theorem typePData_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) 
   have hunion : ((data.W1 : Set G) ∪ (data.W2 : Set G)).ncard
       = Nat.card ↥data.W1 + Nat.card ↥data.W2 - 1 := by
     have h2pos : 1 ≤ Nat.card ↥data.W2 := Nat.card_pos
-    rw [← Set.union_diff_self (s := (data.W1 : Set G)) (t := (data.W2 : Set G)),
+    rw [← Set.union_sdiff_self (s := (data.W1 : Set G)) (t := (data.W2 : Set G)),
       Set.ncard_union_eq disjoint_sdiff_self_right (Set.toFinite _) (Set.toFinite _), hW2diff,
       Set.ncard_sdiff (Set.singleton_subset_iff.mpr data.W2.one_mem), Set.ncard_singleton,
       hcW1, hcW2]

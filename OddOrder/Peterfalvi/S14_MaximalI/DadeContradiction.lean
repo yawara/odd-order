@@ -294,7 +294,7 @@ theorem witness_x_mem_typeIA [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis data.L) :
     data.x ∈ OddOrder.GroupTheory.typeIA data.L hyp.typeI := by
   rw [witness_typeIA_eq_sharp hG hnoV data hyp]
-  refine Set.mem_diff_of_mem ?_ (by simpa using data.x_ne_one)
+  refine Set.mem_sdiff_of_mem ?_ (by simpa using data.x_ne_one)
   rw [SetLike.mem_coe, hyp.typeI.typeF.H_eq]
   exact witness_P0_le_kernel hG hnoV data data.x_mem_P0
 

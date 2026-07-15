@@ -195,7 +195,7 @@ theorem caseA_realizedComplement_uW_le_normalizer [Finite G] {M : Subgroup G}
   -- `WH := W.comap (mk' N) ⊴ H` (preimage of a subgroup of the abelian `H̄`).
   set WH : Subgroup ↥data.H := W.comap (QuotientGroup.mk' chief.N) with hWH
   haveI hWHn : WH.Normal := by
-    rw [hWH]; exact (Subgroup.normal_of_comm W).comap _
+    rw [hWH]; exact (Subgroup.normal_of_isMulCommutative W).comap _
   -- `H` normalizes `caseA_realizedComplement = WH.map subtype`.
   have hH_norm : data.H
       ≤ Subgroup.normalizer ((caseA_realizedComplement chief W : Subgroup G) : Set G) := by
@@ -414,7 +414,7 @@ theorem caseA_hInHu_le_realizedS0_sup_realizedComplement [Finite G] {M : Subgrou
   haveI hS0n : ((((caseA_realizedComplement chief S₀).subgroupOf M).subgroupOf
       (huSub data)).subgroupOf (hInHu data)).Normal := by
     rw [caseA_realizedComplement_subgroupOf_hInHu_eq_comap chief S₀]
-    exact (Subgroup.normal_of_comm S₀).comap _
+    exact (Subgroup.normal_of_isMulCommutative S₀).comap _
   intro x hx
   have hxs : (⟨x, hx⟩ : ↥(hInHu data))
       ∈ (((caseA_realizedComplement chief S₀).subgroupOf M).subgroupOf (huSub data)).subgroupOf

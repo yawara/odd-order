@@ -1517,14 +1517,14 @@ theorem Hypothesis.SHCSet_subset_Sset [Finite G] {M : Subgroup G} (hyp : Hypothe
 
 open scoped FiniteInduce in
 /-- **`S(C) = S(HC) ∪ (S(C) − S(HC))`** (the set-level decomposition `S = S₁ ∪ S₂` of the (11.8.6)
-union): `S(HC) ⊆ S` (`SHCSet_subset_Sset`), so `S = S(HC) ∪ (S ∖ S(HC))` by `Set.union_diff_cancel`.
+union): `S(HC) ⊆ S` (`SHCSet_subset_Sset`), so `S = S(HC) ∪ (S ∖ S(HC))` by `Set.union_sdiff_cancel`.
 This is the exact `rw` that turns the (11.8.6) goal `IsCoherent τ S A₀` into the union form
 `IsCoherent τ (S(HC) ∪ S₂) A₀` the S07 gluing engine
 (`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`) concludes — with `X = S(HC)`
 (coherent by `coh`), `Y = S₂ = S ∖ S(HC)` (coherent by (9.11)/(11.7)). -/
 theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.Sset = hyp.SHCSet ∪ (hyp.Sset \ hyp.SHCSet) :=
-  (Set.union_diff_cancel hyp.SHCSet_subset_Sset).symm
+  (Set.union_sdiff_cancel hyp.SHCSet_subset_Sset).symm
 
 
 open scoped Classical FiniteInduce in

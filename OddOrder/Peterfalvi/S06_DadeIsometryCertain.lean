@@ -42,11 +42,11 @@ theorem commute_of_mem_of_isCyclic {L : Type*} [Group L] {H : Subgroup L}
     (hH : IsCyclic H) {x y : L} (hx : x ∈ H) (hy : y ∈ H) : Commute x y := by
   haveI := hH
   have hcomm : (⟨x, hx⟩ : H) * ⟨y, hy⟩ = ⟨y, hy⟩ * ⟨x, hx⟩ :=
-    commutative_of_cyclic_center_quotient (MonoidHom.id H)
+    (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center (MonoidHom.id H)
       (fun z hz => by
         rw [MonoidHom.mem_ker, MonoidHom.id_apply] at hz
         rw [hz]
-        exact Subgroup.one_mem _)
+        exact Subgroup.one_mem _)).is_comm.comm
       ⟨x, hx⟩ ⟨y, hy⟩
   exact Subtype.ext_iff.mp hcomm
 

@@ -15,12 +15,12 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
 
 ## やること
 
-- [ ] `Subgroup.inf_eq_bot_of_coprime` (~68 sites) → `Subgroup.disjoint_of_coprime_natCard` + `.eq_bot` (H ⊓ K = ⊥ が要る site) / `Disjoint` のまま使える site は直接
-- [ ] `commutative_of_cyclic_center_quotient` (~24 sites) → `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` + `.is_comm.comm` (wave 修正済み site のパターン参照: git log -S)
-- [ ] `IsPGroup.commutative_of_card_eq_prime_sq` (~12 sites) → `isMulCommutative_of_card_eq_prime_sq` + `isMulCommutative_iff.mp` (wave2 ElementaryAbelian の置換例参照)
-- [ ] `Subgroup.normal_of_comm` (~7 sites) → `Subgroup.normal_of_isMulCommutative` (wave5 Ch04 の置換例参照)
-- [ ] 置換は形が site ごとに違うため機械置換不可 — file 単位で agent fan-out が適当
-- [ ] 残存 deprecation warning ゼロ化の確認 (full build log から grep)
+- [x] `Subgroup.inf_eq_bot_of_coprime` (~68 sites) → `Subgroup.disjoint_of_coprime_natCard` + `.eq_bot` (H ⊓ K = ⊥ が要る site) / `Disjoint` のまま使える site は直接
+- [x] `commutative_of_cyclic_center_quotient` (~24 sites) → `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` + `.is_comm.comm` (wave 修正済み site のパターン参照: git log -S)
+- [x] `IsPGroup.commutative_of_card_eq_prime_sq` (~12 sites) → `isMulCommutative_of_card_eq_prime_sq` + `isMulCommutative_iff.mp` (wave2 ElementaryAbelian の置換例参照)
+- [x] `Subgroup.normal_of_comm` (~7 sites) → `Subgroup.normal_of_isMulCommutative` (wave5 Ch04 の置換例参照)
+- [x] site ごとに返り値の利用形が異なるため、file 単位で個別に移行・検証
+- [x] 残存 deprecation warning ゼロ化の確認 (full build log から grep)
 
 ## 進捗 (2026-07-15)
 
@@ -81,6 +81,19 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
   `IsPGroup.commutative_of_card_eq_prime_sq` 0、`Subgroup.normal_of_comm` 5。
 - focused 検証: 上記 14 modules を対象にした `lake build` 成功
   (3210 jobs)。
+- eighth wave: Peterfalvi §§5–6, §10, §11, §15 の 15 code sites と 1 doc reference を
+  新 API へ移行し、対象旧名 4 種を `OddOrder/**` 全体でゼロ化。
+- focused 検証: 変更した 8 modules を対象にした `lake build` 成功 (4131 jobs)。
+- final deprecation sweep: full build が報告した別系統の deprecated API 16 code sites と
+  1 doc reference を正式な後継名へ移行。対象は Set/Finset/Polynomial/Fin/tactic API。
+- 旧名の raw Lean-source occurrences は対象 4 種と final sweep 12 種のすべてで 0。
+- focused 検証: final sweep の変更 modules を対象にした `lake build` 成功 (4199 jobs)。
+- 最終検証: `lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
+  full build log の `has been deprecated` は 0 件。
+- `OddOrder.feitThompson` の依存公理は allowlist 内の 3 種のみ。
+
+完了時点で、mathlib v4.32 bump 後に repo 由来で残っていた deprecated warning は
+すべて解消された。既存の style/lint/sorry warning は本 issue の対象外。
 
 ## 完了条件
 

@@ -965,7 +965,7 @@ theorem exists_conj_typeP_V_of_coprime [Finite G]
   have hVcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
       (hyp.V.subgroupOf (derivedInG hyp.T)) := by
     apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
-    · exact disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop'.symm)
+    · exact Subgroup.disjoint_of_coprime_natCard hcop'.symm
     · have hmul := Subgroup.normal_mul (hyp.Q.subgroupOf (derivedInG hyp.T))
         (hyp.V.subgroupOf (derivedInG hyp.T))
       rw [hQnVn_sup, Subgroup.coe_top] at hmul

@@ -842,7 +842,7 @@ theorem ncard_sharpSubgroup_add_one {P : Subgroup G} [Finite ↥P] :
   have hc : Nat.card ↥P = (P : Set G).ncard := by
     rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
   rw [hc, OddOrder.GroupTheory.sharpSubgroup, ← Set.ncard_singleton (1 : G),
-    Set.ncard_diff_add_ncard_of_subset (Set.singleton_subset_iff.mpr P.one_mem)]
+    Set.ncard_sdiff_add_ncard_of_subset (Set.singleton_subset_iff.mpr P.one_mem)]
 
 /-- **`|W − (W₁ ∪ W₂)| + |W₁| + |W₂| = |W| + 1`** — the cardinality of the exceptional set, by
 inclusion–exclusion with `W₁ ∩ W₂ = {1}` (`hdisj`).  The numerator of the `W`-orbit term
@@ -853,7 +853,7 @@ theorem ncard_sdiff_sup_add_eq [Finite G] {W W1 W2 : Subgroup G}
       = Nat.card ↥W + 1 := by
   have hsub : ((W1 : Set G) ∪ (W2 : Set G)) ⊆ (W : Set G) :=
     Set.union_subset (SetLike.coe_subset_coe.mpr hW1le) (SetLike.coe_subset_coe.mpr hW2le)
-  have h1 := Set.ncard_diff_add_ncard_of_subset hsub
+  have h1 := Set.ncard_sdiff_add_ncard_of_subset hsub
   have h2 := Set.ncard_union_add_ncard_inter (W1 : Set G) (W2 : Set G)
   have h3 : ((W1 : Set G) ∩ (W2 : Set G)).ncard = 1 := by
     rw [← Subgroup.coe_inf, hdisj, Subgroup.coe_bot, Set.ncard_singleton]

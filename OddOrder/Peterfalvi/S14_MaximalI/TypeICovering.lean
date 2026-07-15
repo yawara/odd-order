@@ -320,7 +320,7 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         have hcard_eq : Nat.card ↥(data.cover i₀) = Nat.card G - 1 := by
           rw [Nat.card_coe_set_eq, ← hunion]
           show ((↑(⊤ : Subgroup G) : Set G) \ {1}).ncard = Nat.card G - 1
-          rw [Subgroup.coe_top, Set.ncard_diff_singleton_of_mem (Set.mem_univ 1), Set.ncard_univ]
+          rw [Subgroup.coe_top, Set.ncard_sdiff_singleton_of_mem (Set.mem_univ 1), Set.ncard_univ]
         rw [data.cover_card i₀] at hcard_eq
         -- Arithmetic contradiction.
         have hmain_le : mainSubgroup (data.reps i₀) (data.tau i₀) ≤ data.reps i₀ :=

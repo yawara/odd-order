@@ -172,7 +172,7 @@ theorem isHall_kappaSigmaCompl_of_isTypeP2_complement [Finite G]
           ⊓ U₀.subgroupOf (derivedInG M)
           = (OddOrder.BG.Ch3.S10.Msigma M ⊓ U₀).subgroupOf (derivedInG M) from
         (Subgroup.comap_inf _ _ _).symm,
-      Subgroup.inf_eq_bot_of_coprime hcopU₀, Subgroup.bot_subgroupOf]
+      (Subgroup.disjoint_of_coprime_natCard hcopU₀).eq_bot, Subgroup.bot_subgroupOf]
   have hcU := Subgroup.card_mul_card_of_complement_normal hinfU hsupU
   have hcU₀ := Subgroup.card_mul_card_of_complement_normal hinfU₀ hsupU₀
   have hcard : Nat.card ↥(U.subgroupOf (derivedInG M)) = Nat.card ↥(U₀.subgroupOf (derivedInG M)) :=
