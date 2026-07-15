@@ -37,12 +37,12 @@ BG Appendix C contradiction:
 
 * `noMinimalSimpleOdd_of_section16` / `noMinimalSimpleOdd` — the **wired final
   contradiction**: `BG.AppC.final_contradiction` derives `False` from that
-  configuration.  This is the current `sorryAx` boundary: unresolved BG/Peterfalvi
-  inputs cited by the final-contradiction chain live below this bridge, not in the
-  `Section16Inputs` producer.
+  configuration.  The Section 16 field-normalizer producer and BG Appendix C chain
+  are fully constructed and axiom-clean.
 
 `feitThompson` combines the reduction with this final-contradiction bridge and
-therefore inherits exactly its remaining dependencies.
+depends only on Lean/mathlib's standard axioms (`propext`, `Classical.choice`,
+`Quot.sound`).
 -/
 
 namespace OddOrder
@@ -57,9 +57,8 @@ universe u
 
 /-! ## The already-wired final contradiction -/
 
-/-- The currently scaffolded final-contradiction bridge: once the BG minimal
-counterexample and Peterfalvi Section 16 hypotheses are available, BG Appendix C
-closes the contradiction. -/
+/-- The axiom-clean final-contradiction bridge: from the BG minimal-counterexample and
+Peterfalvi Section 16 hypotheses, BG Appendix C closes the contradiction. -/
 theorem noMinimalSimpleOdd_of_section16 {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)

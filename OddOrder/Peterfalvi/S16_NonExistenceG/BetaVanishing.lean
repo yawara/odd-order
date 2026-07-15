@@ -338,7 +338,7 @@ theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
     have hDbot : hyp.base.D = ⊥ := by
       rw [hyp.base.D_eq]
-      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot hG hyp.base hTII
+      exact hyp.V_inf_centralizer_Q_eq_bot hG
     have hd1 : hyp.base.d = 1 := by rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
     rw [hyp.base.card_V_eq_vd, hd1, mul_one]
     exact (T_side_caseB_facts hG hyp).2
@@ -408,7 +408,7 @@ theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact ⟨c.2, Subgroup.mem_centralizer_iff.mpr (fun y hy => (hcomm ⟨y, hy⟩).symm)⟩
     have hDbot : hyp.base.D = ⊥ := by
       rw [hyp.base.D_eq]
-      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot hG hyp.base hTII
+      exact hyp.V_inf_centralizer_Q_eq_bot hG
     rw [hDbot, Subgroup.mem_bot] at hmem
     exact Subtype.ext hmem
   obtain ⟨e0, μ, hμinj, _⟩ :=

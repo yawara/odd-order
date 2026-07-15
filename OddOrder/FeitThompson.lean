@@ -1600,14 +1600,13 @@ The named Bender–Glauberman and Peterfalvi producers construct
 `Section16Inputs G`, and the axiom-clean `sectionSixteenHypothesis_of_inputs`
 assembles those inputs into the field-normalizer configuration of Peterfalvi (14.2).
 
-Axiom audit (2026-07-14): this definition and
+Axiom audit (2026-07-15): this definition and
 `section16Inputs_of_isMinimalSimpleOdd` depend only on `propext`,
 `Classical.choice`, and `Quot.sound`.  In particular, the former gated input-menu
 obligation is no longer the FT frontier.
 
-The downstream `noMinimalSimpleOdd_of_section16` bridge is present, but currently
-inherits `sorryAx` from the unresolved BG/Peterfalvi dependencies of
-`BG.AppC.final_contradiction`; that is the remaining capstone boundary. -/
+The downstream `noMinimalSimpleOdd_of_section16` bridge, BG Appendix C final contradiction,
+and `feitThompson` have now been audited against the same standard-three-axiom boundary. -/
 noncomputable def sectionSixteenHypothesis_of_isMinimalSimpleOdd
     {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G) :
     Peterfalvi.S16.Hypothesis (G := G) :=
@@ -1706,8 +1705,8 @@ theorem feitThompson_of_noMinimalSimpleOdd
 
 This combines the `sorry`-free minimal-counterexample reduction
 (`feitThompson_of_noMinimalSimpleOdd`) with the non-existence of a minimal simple
-group of odd order (`noMinimalSimpleOdd`), the latter currently resting on the
-single upstream obligation `sectionSixteenHypothesis_of_isMinimalSimpleOdd`. -/
+group of odd order (`noMinimalSimpleOdd`).  The complete theorem is axiom-clean:
+`#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`. -/
 theorem feitThompson {G : Type*} [Group G] [Finite G]
     (hodd : Odd (Nat.card G)) :
     IsSolvable G :=

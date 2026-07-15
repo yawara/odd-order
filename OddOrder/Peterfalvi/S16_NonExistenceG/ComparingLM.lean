@@ -992,7 +992,7 @@ theorem orthogonality_switch_pairing_bounds [Finite G]
     have hTII : IsTypeII hyp.base.T := T_typeII _hG hnoV hncH0C hyp
     have hDbot : hyp.base.D = ⊥ := by
       rw [hyp.base.D_eq]
-      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot _hG hyp.base hTII
+      exact hyp.V_inf_centralizer_Q_eq_bot _hG
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
   have hcardM : Nat.card ↥dataM.kernelIn = hyp.base.v := by
     have h1 : Nat.card ↥dataM.kernelIn = Nat.card ↥dataM.kernel :=
@@ -1260,7 +1260,7 @@ theorem base_card_T_eq [Finite G] (hyp : Hypothesis (G := G))
 `|T| = |Q|·|V|·|W₂|` (`base_card_T_eq`) with `|V| = v·d`, `d = 1` (`V_inf_centralizer_Q_eq_bot`,
 `D = V ⊓ C_G(Q) = ⊥`), `|W₂| = p`.  Supplies `MHypothesis`'s `card_normalizer_Q_eq`. -/
 theorem base_card_normalizer_Q_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.base.T) :
+    (hyp : Hypothesis (G := G)) (_hTII : IsTypeII hyp.base.T) :
     Nat.card ↥(Subgroup.normalizer (hyp.base.Q : Set G))
       = Nat.card ↥hyp.base.Q * hyp.base.v * hyp.base.p := by
   obtain ⟨tpd, hU, hW1, hW2⟩ := OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base
@@ -1280,7 +1280,7 @@ theorem base_card_normalizer_Q_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   have hd1 : hyp.base.d = 1 := by
     have hDbot : hyp.base.D = ⊥ := by
       rw [hyp.base.D_eq]
-      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot hG hyp.base hTII
+      exact hyp.V_inf_centralizer_Q_eq_bot hG
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
   rw [hNQ, ← base_card_T_eq hyp tpd hU hW1, hyp.base.card_V_eq_vd, hd1, mul_one,
     hyp.base.p_eq_card_W2]

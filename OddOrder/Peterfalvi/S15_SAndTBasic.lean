@@ -74,7 +74,8 @@ via `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)); the forme
 `W2_le_P` (`W₂ ≤ P`), but read off the `T`-side type-`P` decomposition (`reconciled_typePData_T`)
 rather than the coprime-index order count: the intrinsic dual cyclic factor
 `data.W2 = C_{T'}(W₂#) = W₁` sits inside `data.H = maxNilpotentNormalHall T = Q`
-(`data.W2_le`, `data.H_eq`, `Q_eq_TF`).  This is conjunct (1) of the (13.16) `normalizer_W1_structure`
+(`data.W2_le`, `data.H_eq`, `Q_eq_TF`).  This is conjunct (1) of the (13.16)
+`normalizer_W1_structure_of_D_eq_bot`
 and is consumed by the `W₁`-side Maschke/Wielandt confinement (the dual of the `W₂`-side, where
 `normalizer_U_inf_W2_eq_bot_of_data` uses `W2_le_P` at the analogous step). -/
 theorem W1_le_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -739,40 +740,24 @@ theorem Q_elementaryAbelian_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       ((QuotientGroup.quotientMulEquivOfEq hN).trans QuotientGroup.quotientBot) h
   rwa [hHeq] at hEA
 
-/-- **Peterfalvi (13.12) `d = 1`, `T`-side dual of `U_inf_centralizer_P_eq_bot`**: `V ⊓ C_G(Q) = ⊥`
-— no nonidentity element of the complement `V` centralizes the Fitting kernel `Q = T_F` (i.e. `V`
-acts faithfully on `Q`).  The `T`-side `d = |D| = 1` finish, dual of the `S`-side `c = 1` (`c_eq_one`,
-`C_eq_bot`, `U_inf_centralizer_P_eq_bot`).  Isolated as the `T`-side residual gated on the (14.9)
-`T_typeII` structure; supplies the `hDbot` input of `normalizer_V_inf_W1_eq_bot_of_data`. -/
-theorem V_inf_centralizer_Q_eq_bot [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (_hTTypeII : IsTypeII hyp.T) :
-    hyp.V ⊓ Subgroup.centralizer (hyp.Q : Set G) = ⊥ := sorry
-
-/-- **Peterfalvi (13.16), the `W₁`-side core** (`V ⊓ N_G(W₁) = ⊥`), `T`-side dual of
-`normalizer_U_inf_W2_eq_bot`.  Assembles the proven core `normalizer_V_inf_W1_eq_bot_of_data` from the
-ungated coprime-action datum (`coprime_card_Q_card_VW2`) and the two (14.9)-gated `T`-side structural
-residuals `Q_elementaryAbelian_T` and `V_inf_centralizer_Q_eq_bot`.  Consumed by the (13.16)
-`W₁`-confinement `normalizer_W1_within_T` (the Maschke/Wielandt core of `normalizer_W1_structure`). -/
-theorem normalizer_V_inf_W1_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
-    hyp.V ⊓ Subgroup.normalizer (hyp.W1 : Set G) = ⊥ :=
-  normalizer_V_inf_W1_eq_bot_of_data hG hyp hTTypeII (coprime_card_Q_card_VW2 hG hyp)
-    (Q_elementaryAbelian_T hG hyp hTTypeII) (V_inf_centralizer_Q_eq_bot hG hyp hTTypeII)
-
-/-- **Peterfalvi (13.16), Maschke/Wielandt core for the `W₁`-side**: `N_G(W₁) ⊓ T ≤ Q ⊔ W₂`.
+/-- **Peterfalvi (13.16), explicit-`D = ⊥` Maschke/Wielandt core for the `W₁`-side**:
+`N_G(W₁) ⊓ T ≤ Q ⊔ W₂`.
 
 The `T`-side dual of `normalizer_W2_within_S`.  The `T`-internal residual of the (13.16)
 `W₁`-confinement (after the TI reduction `N_G(W₁) ≤ T` of `normalizer_W1_le_T`).  Reduced by the
-**Dedekind modular law** to the core `N_V(W₁) = ⊥` (`normalizer_V_inf_W1_eq_bot`): writing
+**Dedekind modular law** to the core `N_V(W₁) = ⊥`
+(`normalizer_V_inf_W1_eq_bot_of_data`): writing
 `T = (Q ⊔ V) ⊔ W₂` (`T_deriv_eq_QV` + the reconciled complement `M' ⋊ W₂ = T`), and using
 `Q, W₂ ≤ C_G(W₁) ≤ N_G(W₁)` (`Q` elementary abelian, `W = W₁ × W₂` abelian), modularity peels off
 `W₂` and `Q`. -/
-theorem normalizer_W1_within_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+theorem normalizer_W1_within_T_of_D_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T) (hDbot : hyp.D = ⊥) :
     Subgroup.normalizer (hyp.W1 : Set G) ⊓ hyp.T ≤ hyp.Q ⊔ hyp.W2 := by
   obtain ⟨tpd, _, htpdW1, _⟩ := reconciled_typePData_T hG hyp
   have hK : hyp.V ⊓ Subgroup.normalizer (hyp.W1 : Set G) = ⊥ :=
-    normalizer_V_inf_W1_eq_bot hG hyp hTTypeII
+    normalizer_V_inf_W1_eq_bot_of_data hG hyp hTTypeII (coprime_card_Q_card_VW2 hG hyp)
+      (Q_elementaryAbelian_T hG hyp hTTypeII) (by rw [← hyp.D_eq]; exact hDbot)
   -- `W₂ ≤ C_G(W₁)`: `W = W₁ × W₂` is abelian.
   have hW2_le_C : hyp.W2 ≤ Subgroup.centralizer (hyp.W1 : Set G) := by
     intro x hx
@@ -851,17 +836,21 @@ theorem normalizer_W1_within_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   exact Subgroup.mul_mem _ (Subgroup.mem_sup_right (SetLike.mem_coe.mp hw))
     (Subgroup.mem_sup_left hmQ)
 
-/-- **Peterfalvi (13.16), structural core for the `W₁`-side** (conjunct 3 of `normalizer_W1_structure`):
+/-- **Peterfalvi (13.16), structural core for the `W₁`-side** (conjunct 3 of
+`normalizer_W1_structure_of_D_eq_bot`):
 the Frobenius/Wielandt containment `N_G(W₁) ≤ Q ⊔ W₂`.  Assembles the TI reduction `N_G(W₁) ≤ T`
 (`normalizer_W1_le_T`, proven) and the Maschke/Wielandt core `N_G(W₁) ⊓ T ≤ Q ⊔ W₂`
-(`normalizer_W1_within_T`): every `g ∈ N_G(W₁)` lies in `T`, hence in `N_G(W₁) ⊓ T ≤ Q ⊔ W₂`.
+(`normalizer_W1_within_T_of_D_eq_bot`): every `g ∈ N_G(W₁)` lies in `T`, hence in
+`N_G(W₁) ⊓ T ≤ Q ⊔ W₂`.
 `T`-side dual of `normalizer_W2_structure`; gated on (14.9) `T_typeII` via the `W₁`-side core. -/
-theorem normalizer_W1_le_QW2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+theorem normalizer_W1_le_QW2_of_D_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T) (hDbot : hyp.D = ⊥) :
     Subgroup.normalizer (hyp.W1 : Set G) ≤ hyp.Q ⊔ hyp.W2 := by
   intro g hg
   have hgT : g ∈ hyp.T := normalizer_W1_le_T hG hyp hTTypeII hg
-  exact normalizer_W1_within_T hG hyp hTTypeII (Subgroup.mem_inf.mpr ⟨hg, hgT⟩)
+  exact normalizer_W1_within_T_of_D_eq_bot hG hyp hTTypeII hDbot
+    (Subgroup.mem_inf.mpr ⟨hg, hgT⟩)
 
 /-- **Peterfalvi (13.16), structural core** (Coq `FTtypeP_norm_cent_compl`, `PFsection13.v:1519`), the
 three atomic facts carrying the content of (13.16), **assembled** for the (14.9) type-II member `T`:
@@ -870,22 +859,23 @@ three atomic facts carrying the content of (13.16), **assembled** for the (14.9)
   inside the `T`-Fitting kernel `Q = T_F`;
 * `Q` abelian — from `Q_elementaryAbelian_T` (the one deep §14 σ-residual, dual of the `S`-side
   `P_elementaryAbelian`, itself sorried);
-* `N_G(W₁) ≤ Q ⊔ W₂` (`normalizer_W1_le_QW2`, proven) — the TI reduction `normalizer_W1_le_T` +
-  the Maschke/Wielandt core `normalizer_W1_within_T`.
+* `N_G(W₁) ≤ Q ⊔ W₂` (`normalizer_W1_le_QW2_of_D_eq_bot`, proven) — the TI reduction
+  `normalizer_W1_le_T` + the Maschke/Wielandt core `normalizer_W1_within_T_of_D_eq_bot`.
 
 `IsTypeII T` is threaded from `exists_LHypothesis` (§16, via (14.9) `T_typeII`); conjuncts 1 and 3 are
 sorry-free, so the residual is exactly conjunct 2. -/
-theorem normalizer_W1_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+theorem normalizer_W1_structure_of_D_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T) (hDbot : hyp.D = ⊥) :
     hyp.W1 ≤ hyp.Q ∧ IsMulCommutative ↥hyp.Q ∧
       Subgroup.normalizer (hyp.W1 : Set G) ≤ hyp.Q ⊔ hyp.W2 :=
   ⟨W1_le_Q hG hyp,
     IsMulCommutative.of_comm (Q_elementaryAbelian_T hG hyp hTTypeII).comm,
-    normalizer_W1_le_QW2 hG hyp hTTypeII⟩
+    normalizer_W1_le_QW2_of_D_eq_bot hG hyp hTTypeII hDbot⟩
 
 /-- **Peterfalvi (13.16)**: `N_G(W₁) = C_G(W₁) = Q ⊔ W₂`.
 
-Proved from the structural core `normalizer_W1_structure` by the antisymmetric chain
+Proved from the structural core `normalizer_W1_structure_of_D_eq_bot` by the antisymmetric chain
 `Q ⊔ W₂ ≤ C_G(W₁) ≤ N_G(W₁) ≤ Q ⊔ W₂`, which collapses all three subgroups:
 
 * `W₂ ≤ C_G(W₁)` because `W = W₁ × W₂` is abelian (`W1_commutes_W2`);
@@ -893,13 +883,13 @@ Proved from the structural core `normalizer_W1_structure` by the antisymmetric c
 * `C_G(W₁) ≤ N_G(W₁)` always (`centralizer_le_normalizer`);
 * `N_G(W₁) ≤ Q ⊔ W₂` is the Frobenius/Wielandt containment (the core).
 
-Consumed by (13.17.c) at `normalizer_W1` uses below (the `W₁W₂^y`-alternative of the Frobenius
-complement). -/
-theorem normalizer_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+Consumed by the explicit-`D = ⊥` (13.17.c) Huppert step. -/
+theorem normalizer_W1_of_D_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) (hDbot : hyp.D = ⊥) :
     Subgroup.normalizer (hyp.W1 : Set G) = Subgroup.centralizer (hyp.W1 : Set G) ∧
       Subgroup.centralizer (hyp.W1 : Set G) = hyp.Q ⊔ hyp.W2 := by
-  obtain ⟨hW1_le_Q, hQ_comm, hN_le⟩ := normalizer_W1_structure hG hyp hTTypeII
+  obtain ⟨hW1_le_Q, hQ_comm, hN_le⟩ :=
+    normalizer_W1_structure_of_D_eq_bot hG hyp hTTypeII hDbot
   -- `W₂ ≤ C_G(W₁)`: `W = W₁ × W₂` is abelian, so `W₂` centralizes `W₁`.
   have hW2_le_C : hyp.W2 ≤ Subgroup.centralizer (hyp.W1 : Set G) := by
     intro y hy

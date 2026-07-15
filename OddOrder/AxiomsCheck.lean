@@ -143,7 +143,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 -- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 8300
+set_option linter.style.longFile 8500
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -3368,15 +3368,14 @@ set_option linter.style.longLine false in
 
 -- Minimal-counterexample reduction: *if* no minimal simple group of odd order exists,
 -- *then* every finite group of odd order is solvable. Pure group theory (strong induction
--- on `|G|` + `solvable_of_ker_le_range`); the only remaining gap of `feitThompson` itself is
--- the upstream `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (BG §7–16 + Peterfalvi §10–16).
+-- on `|G|` + `solvable_of_ker_le_range`).  The complete downstream chain is guarded again
+-- at the end of this file after the Section 16 producers.
 #assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
 
--- Gated-endpoint skeleton for the single upstream obligation: the assembly
+-- Section 16 assembly boundary:
 -- `sectionSixteenHypothesis_of_inputs` builds `Peterfalvi.S16.Hypothesis` from an explicit
 -- `Section16Inputs` menu *without* `sorry` (it derives `η = τ₃∘ω`, `m`, oddness, `finiteG`).
--- The only remaining gap of `sectionSixteenHypothesis_of_isMinimalSimpleOdd` is producing that
--- menu — i.e. the §7–16 spine.  This assertion locks in that the assembly itself is axiom-clean.
+-- This assertion locks in that the assembly itself remains axiom-clean.
 #assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_inputs
 
 -- Pure T-side ν-grid facts threaded through the named-input carrier and assembled at the same
@@ -8284,3 +8283,20 @@ the assembled T-side case-(b) facts to Lean/mathlib's standard three axioms. -/
   OddOrder.Peterfalvi.S15.Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_of_q_lt_p_core
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional
+
+/-! **Feit–Thompson end-to-end axiom audit** (2026-07-15, issues 9077/0118/0121).
+The honest T-side `(13.12)` producer supplies `D = ⊥` downstream of the character-degree layer;
+the explicit-`D = ⊥` `(13.16)`/Huppert chain avoids the genuine §15 import cycle.  Rebuilding the
+BG Appendix C bridge then certifies the complete path from Peterfalvi §16 through the
+minimal-counterexample reduction.  Every endpoint below depends only on Lean/mathlib's standard
+three axioms (`propext`, `Classical.choice`, `Quot.sound`), in particular not on `sorryAx`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.Hypothesis.V_inf_centralizer_Q_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.normalizer_W1_of_D_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.complement_le_QW2_of_D_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.nonexistence_of_G
+#assert_only_allowed_axioms OddOrder.BG.AppC.final_contradiction
+#assert_only_allowed_axioms OddOrder.noMinimalSimpleOdd_of_section16
+#assert_only_allowed_axioms OddOrder.noMinimalSimpleOdd
+#assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
+#assert_only_allowed_axioms OddOrder.feitThompson
