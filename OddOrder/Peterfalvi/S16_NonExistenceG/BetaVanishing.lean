@@ -55,7 +55,7 @@ theorem u_dvd_h [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.base.u ∣ nc.h := by
   rw [nc.h_eq_card_H]
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
-    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base, mul_one]
+    rw [hyp.base.card_U_eq_uc, hyp.base.c_eq_one_of_lambda_dichotomy _hG, mul_one]
   have hU_le_H : hyp.base.U ≤ nc.Ldata.H := by
     rw [← nc.Ldata.typeI_data_H_eq]
     exact nc.Ldata.typeI_data.U_le_H
@@ -105,7 +105,7 @@ theorem u_modEq_one_mod_q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.base.u ≡ 1 [MOD hyp.base.q] := by
   rcases OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base with ⟨data, _hdata⟩
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
-    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base, mul_one]
+    rw [hyp.base.card_U_eq_uc, hyp.base.c_eq_one_of_lambda_dichotomy _hG, mul_one]
   have hU_sub_card :
       Nat.card ↥(hyp.base.U.subgroupOf (hyp.base.U ⊔ hyp.base.W1)) =
         Nat.card ↥hyp.base.U :=
@@ -136,7 +136,7 @@ theorem u_modEq_one_mod_p_of_fpf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     rw [hyp.base.p_eq_card_W2]
     exact (Nat.card_congr (Subgroup.equivSMul (MulAut.conj y) hyp.base.W2).toEquiv).symm
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
-    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base, mul_one]
+    rw [hyp.base.card_U_eq_uc, hyp.base.c_eq_one_of_lambda_dichotomy hG, mul_one]
   have h := card_modEq_one_of_prime_normalizing_fpf hyp.base.p_prime hW2y_card hW2y_norm hfpf
   rwa [hU_card] at h
 
@@ -1209,10 +1209,15 @@ theorem exists_typeI_eta_axes_odd_of_caseB_gap
         (∀ i : Fin hyp.base.q, (i : ℕ) ≠ 0 →
           OddOrder.Peterfalvi.S15.OddIntegerInner orth.betaL
             (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
-  rcases OddOrder.Peterfalvi.S15.typeI_orthogonality_dichotomy
-      _hG hnoV hyp.base
-      (((OddOrder.BG.Ch4.S16.proposition_type_classification _hG
-          hyp.base.T_maximal).2.1).mp (T_typeII _hG hnoV hncH0C hyp))
+  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
+    ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG
+      hyp.base.T_maximal).2.1).mp (T_typeII _hG hnoV hncH0C hyp)
+  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy _hG
+  have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts _hG hyp).1
+  have hd1 : hyp.base.d = 1 := by
+    rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+  rcases OddOrder.Peterfalvi.S15.typeI_orthogonality_dichotomy_of_c_eq_one_and_d_eq_one
+      _hG hnoV hyp.base hc1 hd1 hT2
       nc.Ldata.L_maximal nc.Ldata.isTypeI (pins := hyp.nuGridSupply) with
     ⟨orth, horth⟩
   exact ⟨orth, typeI_eta_axes_odd_of_caseB_gap orth horth.2.2.2.1 horth.2.2.2.2

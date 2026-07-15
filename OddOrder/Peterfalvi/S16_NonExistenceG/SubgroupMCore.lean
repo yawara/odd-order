@@ -842,7 +842,8 @@ structure BetaMGridParityAlternatives [Finite G]
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19), synchronized M-side grid source.**
 
-Lane b's corrected `TypeIOrthogonalityGridData` producer `typeIOrthogonalityGridData_of_coherent78`
+The explicit `TypeIOrthogonalityGridData` producer
+`typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one`
 (Pf (13.19), landed 2026-07-12) now fixes the family `Lset := dataL.typeIHyp.Sset` and chooses the
 distinguished degree-`e` member via `exists_Sset_apply_one_eq_index`, so its `phi_mem` **is** the
 required `phi ∈ typeIHyp.Sset` membership.  This theorem therefore just instantiates that producer
@@ -855,7 +856,7 @@ theorem exists_betaMGridData [Finite G]
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.coherent78,
       grid.phi ∈ Mdata.typeIHyp.Sset := by
-  -- Lane b's faithful (13.19) producer `typeIOrthogonalityGridData_of_coherent78` now fixes
+  -- The faithful explicit (13.19) producer now fixes
   -- `Lset := dataL.typeIHyp.Sset` with `phi := choose (exists_Sset_apply_one_eq_index …)`, so the
   -- chosen member is *in* `Sset` by construction.  Its `IsTypeP2 T` input is supplied here exactly
   -- as the (14.9) type determination gives it (`T_typeII` ⟹ (16.*) classification), the same way
@@ -863,8 +864,12 @@ theorem exists_betaMGridData [Finite G]
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp
       (T_typeII _hG hnoV hncH0C hyp)
-  exact ⟨OddOrder.Peterfalvi.S15.typeIOrthogonalityGridData_of_coherent78 _hG hnoV hyp.base hT2
-      Mdata.coherent78 (pins := hyp.nuGridSupply),
+  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy _hG
+  have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts _hG hyp).1
+  have hd1 : hyp.base.d = 1 := by
+    rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+  exact ⟨OddOrder.Peterfalvi.S15.typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one
+      _hG hnoV hyp.base hc1 hd1 hT2 Mdata.coherent78 (pins := hyp.nuGridSupply),
     (Classical.choose_spec (OddOrder.Peterfalvi.S15.exists_Sset_apply_one_eq_index _hG hnoV
       Mdata.coherent78.typeIHyp)).1⟩
 
