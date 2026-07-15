@@ -159,7 +159,7 @@ theorem centralizer_le_S_of_mem_sharp_P [Finite G] (hG : OddOrder.BG.IsMinimalSi
     rw [hyp.P_eq_SF]
     exact OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG
       hyp.S_maximal
-      (OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2)
+      (OddOrder.Peterfalvi.S13.fittingIsTI_of_isTypeNonI hG hyp.S_maximal hyp.S_nonI)
   have hle := OddOrder.GroupTheory.IsTISubset.centralizer_le hTI hx
   rwa [normalizer_P_eq_S hG hyp] at hle
 

@@ -373,15 +373,9 @@ The fpf input to the (13.12) `c ≡ 1 (mod q)` step (Coq `dv_2q_c1`). -/
 theorem Hypothesis.W1_fpf_C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ w ∈ hyp.W1, w ≠ 1 → ∀ c ∈ hyp.C, c ≠ 1 → w * c * w⁻¹ ≠ c := by
-  have hSII : IsTypeII hyp.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
-  have tdata : TypeIIData hyp.S := hSII.some
-  have hUne : hyp.Sdata.U ≠ ⊥ := by
-    intro hbot
-    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
-      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
-    rw [hbot, Subgroup.card_bot] at h1
-    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  let setup := hyp.toTypesIIIIIIVSetupS hG
+  have hUne := setup.nontrivial.1
+  change hyp.Sdata.U ≠ ⊥ at hUne
   have frob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hUne
   rw [hyp.Sdata_U_eq, hyp.Sdata_W1_eq] at frob
   have hCU : hyp.C ≤ hyp.U := by rw [hyp.C_eq]; exact inf_le_left

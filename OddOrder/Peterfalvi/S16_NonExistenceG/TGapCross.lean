@@ -426,24 +426,15 @@ theorem p_dvd_orderOf_of_mem_sharpP_union_typePV [Finite G]
       exact hyP.2 (congrArg Subtype.val h))
     rwa [← Subgroup.orderOf_coe] at hdiv
   · obtain ⟨v, hv, m, hmS, hmv⟩ := hyV
-    obtain ⟨r, hrord, hrσ⟩ :=
+    obtain ⟨r, hrord, _hrσ, hrW2⟩ :=
       OddOrder.Peterfalvi.S15.exists_sigma_prime_dvd_orderOf_typePV
         hG hyp.base.S_maximal hyp.base.Sdata hv
-    have hMsS : OddOrder.BG.Ch3.S10.Msigma hyp.base.S = hyp.base.P := by
-      rw [← OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
-        hG hyp.base.S_maximal
-          (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2
-            hG hyp.base.S_maximal hyp.base.S_typeP2))]
-      exact hyp.base.P_eq_SF.symm
-    have hrP : r ∈ (Nat.card ↥hyp.base.P).primeFactors := by
-      rw [← hMsS]
-      exact (OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma
-        hG hyp.base.S_maximal r).mpr hrσ
-    rw [hyp.base.card_P_eq hG hyp.base.Sdata_W2_eq,
-      Nat.primeFactors_prime_pow hyp.base.q_prime.pos.ne' hyp.base.p_prime,
-      Finset.mem_singleton] at hrP
+    rw [hyp.base.Sdata_W2_eq, ← hyp.base.p_eq_card_W2] at hrW2
+    have hrp : r = hyp.base.p :=
+      (Nat.prime_dvd_prime_iff_eq (Nat.mem_primeFactors.mp hrord).1
+        hyp.base.p_prime).mp hrW2
     have hpv : hyp.base.p ∣ orderOf v :=
-      hrP ▸ Nat.dvd_of_mem_primeFactors hrord
+      hrp ▸ Nat.dvd_of_mem_primeFactors hrord
     have hord : orderOf y = orderOf v := by
       rw [← hmv]
       simpa [MulAut.conj_apply] using

@@ -7748,15 +7748,16 @@ The side-agnostic embedding `SemilinearFieldModel.fieldModelEmbedding` (injectiv
 `hcompatLift_of_equivariant`, together with the T-side producer `tFieldModelData_of_repr`
 (instantiating `E = Q`, `C = V`, `r = q`, `s = p`) and its `σ`-transport
 `TFieldModelData.derived_inf_centralizer_le_Q` (`C_{T'}(x) ≤ Q` for `x ∈ Q#`) — the T-side mirror
-of the `P`-side engine above.  All `sorry`-free.  (`t_side_caseB_fieldModel` itself is now proven
-via the 9097 `ConjugationFieldModel` adapter (issue 0115 Campaign B) but inherits `sorryAx`
-transitively from `S15.T_caseB_facts_unconditional`'s upstream θ-package and the (14.9)
-`T_typeII` chain, so it is not asserted here; it joins when those close.) -/
+of the `P`-side engine above.  The symmetric swap construction now supplies the unconditional
+T-side case-(9.7.b) facts without the former asymmetric `S_typeP2` gate, so the assembled field
+model and its Frobenius-kernel consequence are axiom-clean as well. -/
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.SemilinearFieldModel.fieldModelEmbedding
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.tFieldModelData_of_repr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.TFieldModelData.derived_inf_centralizer_le_Q
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.t_side_caseB_fieldModel
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.t_side_frobenius_kernel
 
 /-! **Peterfalvi (10.8) unconditional + (10.10) case-(a)/(c) engines, axiom-clean**
 (issues 1020/1021, lane a).  The unconditional (10.8) `S_not_coherent_unconditional`
@@ -8271,3 +8272,15 @@ the former (13.12) ↔ (14.9) proof cycle. -/
   OddOrder.Peterfalvi.S15.CharacterDegreeCore.caseA_parameters_of_caseB_facts
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.Hypothesis.c_eq_one_of_lambda_dichotomy
+
+/-! **Peterfalvi (13.12)–(14.4), symmetric T-side Core chain.**
+The §13 carrier and `Hypothesis.swap` are now genuinely symmetric in `S` and `T`: the swap uses
+the unconditional type-`P`/commutativity facts from `T_nonI`, so the old downstream
+`IsTypeP2 T` gate is absent.  These assertions pin the swapped `d = 1`, full Singer order, and
+the assembled T-side case-(b) facts to Lean/mathlib's standard three axioms. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.d_eq_one_of_swapped_lambda_dichotomy
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_of_q_lt_p_core
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional

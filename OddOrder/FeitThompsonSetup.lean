@@ -116,11 +116,6 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
-  /-- **Peterfalvi (13.2.a) type determination (S-side)**: `S` is of BG type `P₂` (Peterfalvi type
-  II).  Sourced from the §16 maximal pair (`Section16MaximalPair.S_typeP2`, fixed by the κ-Hall
-  ordering `q < p`); threaded into `S15.Hypothesis` so §15 can read off `IsTypeII S` sorry-free
-  (`isTypeII_of_isTypeP2`). -/
-  S_typeP2 : OddOrder.BG.Ch4.S14.IsTypeP2 S
   theorem88_caseB :
     ∀ M : Subgroup G, M ∈ maximalSubgroups G →
       IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨

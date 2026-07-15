@@ -438,8 +438,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 (`S05.orthonormalGrid_diff_rigidity` takes arbitrary distinct grid points), instantiated at a
 fixed *column* `j₀` with distinct rows `i₁ ≠ i₂`.  This is the `T`-side
 column-fixed/row-difference shape consumed by `tauT_nu_cross` directly at `hyp` — previously
-obtained by transposing through `Hypothesis.swap`, which needlessly demanded `IsTypeP2 T`
-(the swap's `S_typeP2` field). -/
+obtained by transposing through an older asymmetric `Hypothesis.swap` interface. -/
 theorem eta_diff_rigidity_col [Finite G]
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G))
     {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G) (hX2 : ClassFunction.inner X X = 2)

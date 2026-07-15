@@ -1349,7 +1349,6 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     S_nonI := mp.S_nonI
     T_nonI := mp.T_nonI
     one_typeII := mp.one_typeII
-    S_typeP2 := mp.S_typeP2
     theorem88_caseB := mp.theorem88_caseB
     W_eq_inter := tp.W_eq_inter
     W_eq_join := tp.W_eq_join
@@ -1479,7 +1478,6 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       S_nonI := inp.S_nonI
       T_nonI := inp.T_nonI
       one_typeII := inp.one_typeII
-      S_typeP2 := inp.S_typeP2
       theorem88_caseB := inp.theorem88_caseB
       W_eq_inter := inp.W_eq_inter
       W_eq_join := inp.W_eq_join

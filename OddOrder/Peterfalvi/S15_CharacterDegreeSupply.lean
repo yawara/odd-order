@@ -26,18 +26,6 @@ open OddOrder.Isaacs
 variable {G : Type*} [Group G]
 
 open scoped FiniteInduce in
-/-- **`T` is type-`P₂` — the (13.2.b)-at-`T` classification gate** (precisely-named
-layer-inverted cite, issue 2035 #41 / 0116-class): the honest producer is `S16.T_isTypeP2`
-(`S16_NonExistenceG/TTypeII.lean`, via the type classification and the (11.9) non-Galois
-exclusion chain), which sits **downstream** of this file in the import DAG (the S16 leaves
-import this supply layer).  Same inversion class as the issue 0116 inventory; discharged when
-the hub relocates the producer or resolves the inversion. -/
-theorem Hypothesis.T_isTypeP2_gate [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := by
-  sorry
-
-open scoped FiniteInduce in
 /-- **Differences of degree-one `K`-inductions are supported in `(QD)^#`** (the general-`θ'`
 form of `indK_sub_nuRow_support`; the θ-package conjunct-2 companion for the conjugate pair
 `Ind_K θ − Ind_K θ̄`): both terms vanish off the normal `K = QD` and share the degree
@@ -1190,12 +1178,11 @@ theorem Hypothesis.d_eq_one_of_swapped_lambda_dichotomy [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (pins : NuGridSupplyData hyp) :
     hyp.d = 1 := by
-  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
   have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
-  let hyp' : Hypothesis (G := G) := hyp.swap hT2 hV Tdata hU hW1 hW2 pins
+  let hyp' : Hypothesis (G := G) := hyp.swap hV Tdata hU hW1 hW2 pins
   have pins' : NuGridSupplyData hyp' :=
-    hyp.nuGridSupply_swap hT2 hV Tdata hU hW1 hW2 pins
+    hyp.nuGridSupply_swap hV Tdata hU hW1 hW2 pins
   obtain ⟨core'⟩ := hyp'.characterDegreeCore_nonempty hG
   have hc1 : hyp'.c = 1 := by
     rcases lambdaCluster_or_caseB hG hyp' with hlam | ⟨hCbot, _hu⟩
@@ -1223,12 +1210,11 @@ theorem Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hqp : hyp.q < hyp.p) (pins : NuGridSupplyData hyp) :
     hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
-  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
   have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
-  let hyp' : Hypothesis (G := G) := hyp.swap hT2 hV Tdata hU hW1 hW2 pins
+  let hyp' : Hypothesis (G := G) := hyp.swap hV Tdata hU hW1 hW2 pins
   have pins' : NuGridSupplyData hyp' :=
-    hyp.nuGridSupply_swap hT2 hV Tdata hU hW1 hW2 pins
+    hyp.nuGridSupply_swap hV Tdata hU hW1 hW2 pins
   obtain ⟨core'⟩ := hyp'.characterDegreeCore_nonempty hG
   obtain ⟨chief', -⟩ :=
     OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp'.toTypesIIIIIIVSetupS hG)
