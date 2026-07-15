@@ -683,6 +683,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #16、Opus hub cron) — ★★★ a: 0116 FULL FLIP LANDING — roots #1/#2/#3/#7 一括 retire。census 32→28**:
+  main=`14dc8964` clean・census 32。a=1 genuine ahead (14 file! b=3 main-sync skip / c=0 skip)。
+  **a (visit)** = `20a8672e` "complete Core full flip" を merge `8e27ce8f`: 0116 flip の **assembly commit**。
+  honest Core chain への cut-over + legacy retire を完遂し flip 4 root を一括除去 —
+  #1 exists_muT_index / #2 exists_etaT_alphaFun_one_int / #3 character_degree_analysis /
+  #7 tSide_theta_package_of_not_caseB+lambda_forces_T_caseB が全て消滅 (grep 0 確認)。
+  sorry **11 削除・0 追加** = flip payoff (regression でなく root retire)。conflict なし。scope clean。
+  build **4234 jobs green**・AxiomsCheck OK・新 axiom なし・census **32→28** (−4)。push `14dc8964..8e27ce8f`。
+  **⟹ gate 解放**: 残 root #4 (nuGridSupply, b-5 pt2) / #5 (V_inf, c-3) / #7-half (T_isTypeP2_gate, b-2) の
+  後続タスクが ungated 化。**⚠ 集約判断 (0121) への影響**: flip = serial 律速 & delicate な山場が完了ゆえ、
+  「ultra を flip に集中」根拠は消化済。残 post-flip work (c-3/b-2/9103/c-4) は別 file で並列可 → A 単独集約 vs
+  3 レーン再稼働の trade がフラット化。ユーザーに flag (session 判断は保留のまま)。
 - **2026-07-15 (tick #14、Opus hub cron) — ★ a: 0116 flip swap-order route を Core へ cut (root #4 swap 経路 honest 化)。census 32 不変**:
   main=`6cc5c54c` clean・census 32。a=1 genuine ahead (b=2 main-sync only skip / c=0 skip)。
   **a (visit)** = `1c2a6161` を merge `498a05db`: tick #12 flag の root #4 swap 経路を honest 化。
