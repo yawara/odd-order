@@ -683,16 +683,70 @@ theorem Hypothesis.card_T_eq_deriv_mul_p [Finite G] (hG : OddOrder.BG.IsMinimalS
     hW1, ← hyp.p_eq_card_W2] at h
   exact h.symm
 
+/-- **`(QD)^# ⊆ A(T)` membership** ((13.2.e) structural input, issue 0116 step 4): every
+nonidentity element of `K = QD` lies in the honest type-`P` support `A(T)`.  Split `z = q·d`
+along the `T`-normalized `Q` (`exists_mul_of_mem_sup_of_normalized`); `d ∈ D = C_V(Q)`
+centralizes `Q` (`D_eq`), so for `q ≠ 1` the pair `(q, z)` witnesses `z ∈ C_{T'}(q)^#` with
+`q ∈ Q^# ⊆ T_σ^#` (`maxNilpotentNormalHall_le_Msigma`), while for `q = 1` (so `z = d ∈ D^#`)
+any `x ∈ Q^#` (`Q_ne_bot`) serves as the `T_σ^#`-witness. -/
+theorem Hypothesis.mem_honestTypeP2ASet_of_mem_Q_sup_D [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {z : G} (hz : z ∈ hyp.Q ⊔ hyp.D) (hz1 : z ≠ 1) :
+    z ∈ honestTypeP2ASet hyp.T := by
+  have hQT' : hyp.Q ≤ derivedInG hyp.T := hyp.T_deriv_eq_QV ▸ le_sup_left
+  have hDV : hyp.D ≤ hyp.V := hyp.D_eq ▸ inf_le_left
+  have hVT' : hyp.V ≤ derivedInG hyp.T := hyp.T_deriv_eq_QV ▸ le_sup_right
+  have hQT : hyp.Q ≤ hyp.T := hQT'.trans (Subgroup.map_subtype_le _)
+  have hDT : hyp.D ≤ hyp.T := (hDV.trans hVT').trans (Subgroup.map_subtype_le _)
+  have hTnorm : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hyp.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
+  have hzT' : z ∈ derivedInG hyp.T := (sup_le hQT' (hDV.trans hVT')) hz
+  have hQMs : hyp.Q ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T := by
+    rw [hyp.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.T_maximal
+  obtain ⟨q, hq, d, hd, rfl⟩ :=
+    OddOrder.Peterfalvi.S13.exists_mul_of_mem_sup_of_normalized hQT hDT hTnorm hz
+  have hdC : d ∈ Subgroup.centralizer (hyp.Q : Set G) :=
+    (Subgroup.mem_inf.mp (hyp.D_eq ▸ hd)).2
+  by_cases hq1 : q = 1
+  · -- `z = d ∈ D^#`: any `x ∈ Q^#` is the `T_σ^#`-witness (`D` centralizes all of `Q`)
+    obtain ⟨x, hx1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hyp.Q_ne_bot
+    refine mem_honestTypeP2ASet.mpr ⟨hzT', hz1, (x : G),
+      ⟨hQMs x.2, fun h => hx1 (Subtype.ext h)⟩, ?_⟩
+    rw [hq1, one_mul]
+    exact Subgroup.centralizer_le (Set.singleton_subset_iff.mpr x.2) hdC
+  · -- `q ≠ 1`: `q` itself is the witness — `q` and `d` both centralize `q`
+    refine mem_honestTypeP2ASet.mpr ⟨hzT', hz1, q, ⟨hQMs hq, hq1⟩, ?_⟩
+    exact Subgroup.mul_mem _
+      (Subgroup.mem_centralizer_singleton_iff.mpr rfl)
+      (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hq) hdC)
+
 /-- **(13.2.e)-for-`T`, `K^# = (QD)^#` TI-centralizer gate** ((13.4) structural gate, issue 9013
-追記⁶ (c)): every nonidentity element of `K = QD ⊆ A₀(T)` has its `G`-centralizer inside `T` —
-the `A₀(T)` TI-subset property of (13.2.e) applied to the `K^#`-points.  The proven
-`Q_sharp_isTISubset` is the `D = ⊥` special case; the general form (live in the (13.4)
-contradiction branch, where `D` may be nontrivial) needs the `A₀(T)`-TI materialization. -/
+追記⁶ (c)): every nonidentity element of `K = QD` has its `G`-centralizer inside `T`.
+Discharged through the honest `A(T)`-support (issue 0116 step 4): `(QD)^# ⊆ A(T)`
+(`mem_honestTypeP2ASet_of_mem_Q_sup_D`), and no `A(T)`-point escapes a type-`P` maximal
+(`escaping_honestTypeP2ASet_eq_empty`, the proven (13.2.e) core via BG Theorem D(4)); the
+type-V exclusion feeding the latter is Peterfalvi (10.10)
+(`no_typeV_maximal_unconditional`, whose remaining upstream gap is the (6.5) gate, issue
+2022), and `T` is type `P` from `T_nonI` (`isTypeP_of_isTypeNonI`). -/
 theorem QD_sharp_centralizer_le_T [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ∀ z : ↥hyp.T, (z : G) ∈ hyp.Q ⊔ hyp.D → z ≠ 1 →
       Subgroup.centralizer ({(z : G)} : Set G) ≤ hyp.T := by
-  sorry
+  intro z hzQD hz1
+  have hz1' : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext h)
+  have hmemA : (z : G) ∈ honestTypeP2ASet hyp.T :=
+    hyp.mem_honestTypeP2ASet_of_mem_Q_sup_D _hG hzQD hz1'
+  have hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI _hG hyp.T_maximal hyp.T_nonI
+  by_contra hesc
+  have hz_esc : (z : G) ∈
+      OddOrder.GroupTheory.escapingCentralizerSet hyp.T (honestTypeP2ASet hyp.T) :=
+    ⟨hmemA, hesc⟩
+  rw [escaping_honestTypeP2ASet_eq_empty _hG
+    (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional _hG) hyp.T_maximal hTP] at hz_esc
+  exact Set.notMem_empty _ hz_esc
 
 /-- **No conjugate of `P` fits inside `T`** ((13.4) structural gate, issue 9013 追記⁶ (c),
 discharged type-free post-9073): `|P| = p^q` (13.2.b) exceeds the `p`-part `p = |W₂|` of
@@ -994,6 +1048,65 @@ noncomputable def Q_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
     have hlnorm : (l : G) ∈ Subgroup.normalizer (hyp.Q : Set G) := by
       rw [hnorm]; exact l.2
     exact (Subgroup.mem_set_normalizer_iff.mp hlnorm h).mp hh
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.2.e)/(7.2)-for-`T`: the `(T, Q^#)` Dade isometry is `Ind_T^G`** (mirror of
+`H_sharp_tau_eq_induce`, issue 2035 #22 T-side twin): for the TI-subset construction (all local
+subgroups trivial) the Dade map and the induction agree pointwise — on the conjugacy saturation
+of `Q^#` both take the base value, and both vanish off it.  This is the link between the
+`T`-side (7.7.a) coefficients `c_i = ⟨τψ_i, χ⟩` and the τ₁T-coherence
+(`coherentIndT_pinned .extends_on_supported`). -/
+theorem Q_sharp_tau_eq_induce [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T) :
+    (Q_sharp_hypothesis71 hG hyp hvd).τ α
+      = ClassFunction.induce hyp.T (α : ClassFunction ↥hyp.T ℂ) := by
+  classical
+  have hQT : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  have hAL : OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) ⊆ (hyp.T : Set G) := fun x hx =>
+    hQT (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1
+  have hsupp : ∀ w : ↥hyp.T, (w : G) ∉ OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) →
+      (α : ClassFunction ↥hyp.T ℂ) w = 0 := by
+    intro w hw
+    by_contra hne
+    exact hw (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp
+      (α.2 (ClassFunction.mem_support.mpr hne)))
+  have hstab : ∀ l ∈ hyp.T,
+      MulAut.conj l • (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G))
+        = OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) := by
+    intro l hl
+    ext x
+    constructor
+    · rintro ⟨a, ha, rfl⟩
+      simp only [MulAut.smul_def, MulAut.conj_apply]
+      exact T_normalizes_Q_sharp hG hyp ⟨l, hl⟩ ha
+    · intro hx
+      refine ⟨l⁻¹ * x * l, ?_, ?_⟩
+      · have := T_normalizes_Q_sharp hG hyp (⟨l, hl⟩ : ↥hyp.T)⁻¹ hx
+        simpa using this
+      · simp only [MulAut.smul_def, MulAut.conj_apply]
+        group
+  ext g
+  by_cases hg : g ∈ OddOrder.GroupTheory.conjClassSet
+      (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G))
+  · obtain ⟨a, ha, y, hy⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hg
+    rw [OddOrder.Peterfalvi.S04.map_eq_of_isConj_of_forall_H_eq_bot
+        (Q_sharp_hypothesis71 hG hyp hvd).isDadeMap (fun _ => rfl) α ha
+        (isConj_iff.mpr ⟨y, hy⟩),
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_mem_conj (Q_sharp_isTISubset hG hyp hvd)
+        hAL hstab (α : ClassFunction ↥hyp.T ℂ) hsupp ha hy.symm]
+  · have hg' : g ∉ Group.conjugatesOfSet (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) := by
+      intro hmem
+      obtain ⟨a, ha, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hmem
+      obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      exact hg (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩)
+    rw [OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+        (Q_sharp_hypothesis71 hG hyp hvd).isDadeMap (fun _ => rfl) α hg',
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_not_mem_conjClassSet
+        (α : ClassFunction ↥hyp.T ℂ) hsupp hg]
 
 /-- **`G₀` is cyclic-closed**: closed under `x ↦ x^k` for `k` coprime to `|G|` — the hypothesis
 shape of the Galois integrality `exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed` (and of

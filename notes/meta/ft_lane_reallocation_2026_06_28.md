@@ -375,3 +375,26 @@ Algebra/Isaacs へ additive shared claim、claim-before-build 継続)。
 FT 経路に接続するかを **定期確認** (特に typeP_Galois 9000 / BG local analysis の consumer になるか)。0-consumer
 それ自体は停止理由にしないが、FT-relevance 追跡を続け、明らかに spine と無関係な generic API 量産に転じたら
 再度 flag。正本 = 本節 + merge_monitor d 行/note。
+
+## 3 レーン再設計 (2026-07-15, ユーザー発議「a 完遂 → 設計し直し」→ hub 裁定) — FT endgame 3 workstream 化
+
+**正本 = [`issues/0118-lane-redesign-2026-07-15-endgame.md`](../../issues/0118-lane-redesign-2026-07-15-endgame.md)** (詳細な root 台帳・裁定根拠・順序条件は issue 側)。要約:
+
+- **状況**: lane a が割当 frontier 完遂 (9087 FINAL、S03–S13 + FeitThompson.lean 実 sorry 0)。
+  hub 3-agent 監査 (wf_54ad9ca3、#print axioms authoritative) で **feitThompson の残 dirty root =
+  7 本**と確定 (NormEstimates atoms ×2 / character_degree_analysis / nuGridSupply / V_inf /
+  caseB_order_u_data bridge / T_isTypeP2_gate+CountingLayer legacy)。BG 3 本 + sibleyTarget_S は
+  consumer-0 vestigial (spine 外)。
+- **新割当 (workstream 単位、所有 map は不変・carve-out のみ追加)**:
+  - **a** = (a-1) 9096 ν-carrier threading (FeitThompson{,Setup}.lean、即) → (a-2) **0116 full flip
+    実行 (hub から移譲)** — carve-out: NormEstimates/CountingLayer/Machinery135 の flip-scope 編集権。
+    開始条件 = b の δ′ drop landing。
+  - **b** = (b-1) δ′ restate-drop 実装 (最優先) → (b-2) T_isTypeP2_gate resolution → (b-3)
+    sibleyTarget_S restate-or-retire → (b-4) CDS 分割 → (b-5) ν consumer 切替。
+    NormEstimates/CountingLayer hold は a の flip landing まで継続。
+  - **c** = (c-1) caseB_order_u_data bridge retire (即、CaseBOrder 削除 carve-out) → (c-2) BG
+    vestigial 整理 (即) → (c-3) V_inf discharge-leaf 充填 (a の flip 後) → (c-4) feitThompson
+    最終 axiom trace = FT axiom-clean 判定。
+- **hub**: 監視 tick 継続、landing flags (b-1→a-2 / a-1→b-5 / a-2→c-3)、hub0116 worktree 撤収。
+- **見通し**: 3 workstream 完了で feitThompson axiom-clean (= FT 完全形式化 headline) が射程。
+  doneness は c-4 の再 trace で判定 (sorry 数でない)。

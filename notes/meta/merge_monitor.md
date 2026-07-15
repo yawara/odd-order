@@ -23,14 +23,17 @@
 > S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
 > 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
-## レーン (2026-07-07 current: a/b/c — ⚰ lane d 退役)
+## レーン (2026-07-15 current: a/b/c — issue 0118 再設計 = FT endgame 3 workstream)
 
-| lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
+| lane | branch | worktree | クラスタ (2026-07-15 issue 0118) | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
-| **a** | `a` | `odd-order-a` | α **S12 (11.8) unique feitThompson sorry** + §7 on-path norm (2026-07-04 再々編) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
-| **b** | `b` | `odd-order-b` | β **§16 endgame char cascade = S15 (13.9)-(13.19)** (2026-07-04 再々編; §12 Dade は完遂・cite-only) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
-| **c** | `c` | `odd-order-c` | γ 🤖 **codex 5.6 運用 (2026-07-10, issue 0105)** · **S16 非存在 + ♻ 2026-07-07 REACTIVATE (issue 0098 パッケージ 5 件)**: typeP_pair port (§8 新 shared leaf) / semilinear (9.7.b) field-model leaf / S-side βₛ bridge carve-out (S15_SAndT.lean:3616 BetaData 領域) / §14 Γ-bridge assembly / hcard2 verify | `Peterfalvi/S16_NonExistenceG.lean` + 構成的 Clifford (9002 完了) + carve-out: reconciled_typePData_T 残 field (S15_SAndT_Setup:4520/:4590) ・BetaData 領域 (S15_SAndT:3616) + 新 shared leaf (claim-before-build) | 3000 |
+| **a** | `a` | `odd-order-a` | **(a-1) 9096 ν-carrier threading → (a-2) 0116 full flip 実行 (hub 移譲)** → (a-3) chain clean 化 assert | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) + **flip-scope carve-out: `S15_SAndT_Setup/{NormEstimates,CountingLayer,Machinery135}.lean`** | 1000 |
+| **b** | `b` | `odd-order-b` | **(b-1) δ′ restate-drop 実装 (最優先) → (b-2) T_isTypeP2_gate resolution → (b-3) sibleyTarget_S restate/retire → (b-4) CDS 分割 → (b-5) ν consumer 切替** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096。**⚠ hold: NormEstimates/CountingLayer は a の flip landing まで touch 禁止** | 2000 |
+| **c** | `c` | `odd-order-c` | **(c-1) caseB_order_u_data bridge retire (即) → (c-2) BG vestigial 整理 (即) → (c-3) V_inf discharge-leaf 充填 (a flip 後) → (c-4) feitThompson 最終 axiom trace** · operator = codex 5.6 or Claude (0105 KEEP) | `Peterfalvi/S16_NonExistenceG.lean(+/**)` + 既存 carve-out + **削除 carve-out: CaseBOrder.lean の bridge 2 宣言 (0118 条件付き)** | 3000 |
 | ~~**d**~~ | — | — | ⚰ **退役 (2026-07-07, ユーザー裁定)** — codex 運用 shared-infra レーン。worktree/branch 削除済 | — | — |
+
+> 旧クラスタ記述 (2026-07-04/07-07 再々編) は git 履歴参照。**再設計の正本 = `issues/0118`** +
+> `ft_lane_reallocation_2026_06_28.md`「3 レーン再設計 (2026-07-15)」節。
 
 > **🤖 lane c = codex 5.6 (GPT-5.6) 運用 (2026-07-10, ユーザー裁定, issue 0105)**: lane c の operator を
 > Claude から codex 5.6 に切替 (trial)。**所有・issue base (3000)・合流ゲートは不変** (build green /
@@ -641,6 +644,86 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (再設計セッション) — ★★★ 3 レーン再設計 (issue 0118) + b docs 合流。census 35 不変**:
+  ユーザー発議「a 完遂 → 3 レーン設計し直し」を受け hub が 3-agent 監査 (wf_54ad9ca3:
+  #print axioms probe / on-path census / lane 実装状況) → **issue 0118 裁定**。
+  合流: **b=1** (`820b6699` docs-only = 2035 #92 δ′ restate-drop 裁定。2035 の追記 conflict は
+  両節保持で解決、`d4eca84b`)。**a=0** (完遂済)。**c=0** (空 sync merge のみ、マージ不要)。
+  **監査確定**: feitThompson の残 dirty root = **7 本** (NormEstimates atoms ×2 /
+  character_degree_analysis / nuGridSupply / V_inf / caseB_order_u_data / T_isTypeP2_gate +
+  CountingLayer legacy)。BG 3 本 + sibleyTarget_S = consumer-0 vestigial (spine 外)。
+  δ′ restate-drop は**裁定のみで未実装** (b-1 に割当)。9096 bundle split は landing 確認。
+  canonical ν producer は FeitThompson.lean:1583 に proven 済と確認。
+  **再設計**: a = ν-carrier → 0116 full flip 実行 (hub から移譲、hub0116 worktree 撤収) /
+  b = δ′ drop → gate resolution → sibleyTarget_S → CDS 分割 → ν consumer 切替 /
+  c = bridge retire + BG 整理 (即) → V_inf (flip 後) → 最終 axiom trace。
+  landing flags: b-1→a-2 / a-1→b-5 / a-2→c-3。詳細 = issue 0118。push 済。
+- **2026-07-15 (tick 61) — ★★ b: #22 T-side twin 完了 = 0116 full flip トリガー成立。census 35**:
+  **a=0**。**b=5** (`1708d7cd` 系 = **(13.8)-for-T `exists_muT_index_core` 完全証明**
+  (+548 行、7 conjuncts sorry 0、#print axioms 標準 3 のみ、2035 #90 brick 2) +
+  **(13.5.a)-for-T `exists_etaT_alphaFun_one_int_core`** (sorry 0、#91 brick 3) +
+  **Engines prefix-split** (1634 行 watch 自主解消 → 新 sibling
+  `S15_CharacterDegreeEnginesSSide.lean` 1049 行、Engines 841 行に縮小)。merge)。
+  build green 4225 jobs / AxiomsCheck OK / census **35 不変** / 新 axiom なし / 逸脱なし。
+  push 済。
+  **⟹ hub action: 0116 full flip トリガー成立** (b #91 flag)。S-side atom (#25/#26) +
+  T-side atom (#88-#91) が全て core+(hD,hQcomm) param 型で完備 — hub が obtain-site の
+  core/lam param 化 + 討伐済 atom cite 置換 + discharge leaf + legacy retire を実施可。
+  T-side param の hQcomm discharge (threading param 追加 vs S16 hoist) は hub 裁量。
+  本 tick 後に hub が 0116 flip を開始する。
+- **2026-07-15 (tick 60) — ★ a: s_side_field_repr 討伐 (0117 完遂)。census 36→35**:
+  **a=3** (`588d4314` 系 = ★ **c 所有 gate `S16.s_side_field_repr` (SubgroupM:170) の bare
+  sorry を実証明討伐** — statement 完全不変・proof-only、hnoV (10.10) + H0C refuter (11.3) +
+  `exists_LHypothesis` で side conditions 放電 → a の (14.6) dispatcher cite。issue 0117
+  (hub 割当 = a campaign 継続) の完遂で**非逸脱**。dispatcher は事前に条件付け直し
+  (case (b) は c=1 のみ、sharp (13.13) は case-(a) certificate のみ要求) + rename
+  `sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters` (tick 59 直後・外部 consumer
+  なし)。s_side_frobenius_kernel は docstring 更新のみ。0117/9087/9093 → closed。merge)。
+  **b=0**。build green 4224 jobs / AxiomsCheck OK / census **36→35 (実証明減)** /
+  新 axiom なし / size flag なし。push 済。
+- **2026-07-15 (tick 59) — a: (14.6) S-side Galois field model (claim 9102)。census 36**:
+  **a=1** (`817dbddd` = 新 leaf `S15_SSideGaloisFieldModel.lean` (210 行 sorry-free、
+  **9000 番台 claim 9102**、non-dup audit 付き): (9.7.b) Singer realization (9097/9100) +
+  caseA contradiction (1038) を組み上げた **(14.6) S-side Clifford dichotomy dispatcher**。
+  c 所有 consumer `S16.s_side_field_repr` (SubgroupM:170 bare sorry) は非接触、thin-cite
+  probe 成功 (`simpa using sSide_galoisField_repr_of_parameters_and_typeIOverNormalizerData …`)
+  を hub/c 宛に通知。merge)。**b=0**。build green 4224 jobs / AxiomsCheck OK /
+  census **36 不変** / 新 axiom なし / 逸脱なし / size flag なし。push 済。
+  **⟹ hub follow-up**: c 停止中につき `s_side_field_repr` の proof-only thin cite
+  (canonical TypeIOverNormalizerData + (13.12)/(13.13) parameter 等式の供給) を hub が
+  実施するか次 tick までに判断 (a の probe 報告あり、statement 不変・de-gate のみ)。
+- **2026-07-15 (tick 58) — a: caseA 最終算術矛盾 (leaf 2 枚) / b: (7.2)-for-T Dade=Ind bridge。census 36**:
+  **a=4** (`bc561ebc` 系 feature 2 = **(14.6) caseA campaign 続行**: 新 leaf
+  `S15_CaseAOmegaFixedPointFree.lean` (153 行、center action FPF 計数、claim 1037) +
+  `S15_CaseAContradiction.lean` (106 行、**caseA prime contradiction を閉じる最終算術**、
+  claim 1038)。file 単位 a 所有 carve-out 同型継続。S15_SAndT import 2 行 = 機械的配線。merge)。
+  **b=3** (`7f95fdcf` 系 = `Q_sharp_tau_eq_induce` (CountingLayer +59 additive、
+  (13.2.e)/(7.2)-for-T Dade=Ind bridge、H_sharp 版の機械的 mirror、2035 #88 brick 2a —
+  muT cCoeff 部品 map 完成、残 = red 分類のみ)。merge)。⚠ b の 3-dot は multiple merge bases
+  警告 (base 97f20c18 選択で tick 57 済み分を過大表示) — trial-merge staged で実 delta 確認
+  (手順どおり誤検出排除)。build green 4223 jobs ×2 / AxiomsCheck OK / census **36 不変** /
+  新 axiom なし / 逸脱なし / size flag なし。push 済。
+- **2026-07-15 (tick 57, 新監視セッション開始) — a: (14.6) Ω₁(Z(R)) 位数 leaf / b: (13.2.e)-for-T QD_sharp gate 討伐。census 37→36**:
+  **監視スコープ変更 (ユーザー指示)**: 本セッションは **a/b のみ監視、c は明示停止中** (c の
+  `main..c` 6 commits は全て空 sync merge = 実内容ゼロ、マージ不要)。
+  **a=1** (`aecc7341` = Pf **(14.6)** Ω₁(Z(R)) 位数 — 新 leaf `S15_CaseAOmegaCenter.lean`
+  (246 行 sorry-free、claim 1036)。c=1, q=3 入力で 2-座標 scalar 作用 faithful → rank U ≤ 2 →
+  |Ω₁(Z(R))| ∈ {r, r²}。**tick 56 CaseASylowCenter と同型の file 単位 a 所有 carve-out**
+  (名目 S15 = b 域だが内容 = a の caseA campaign)。S15_SAndT import 1 行 = 機械的配線。merge)。
+  **b=5** (`bfa04e9d` 系 = ★ **(13.2.e)-for-T `QD_sharp_centralizer_le_T` (CountingLayer) の
+  sorry を実証明討伐** (honest A(T)-support 経由、signature 不変、2035 #87) + `Q_sharp_hypothesis76_base`
+  T-side chosen-base (7.6) datum (CharacterDegreeEngines additive、2035 #88 = T-side twin brick 1/3)。
+  merge)。build green 4221 jobs ×2 / AxiomsCheck OK / census **37→36 (実証明による減)** /
+  新 axiom なし / 逸脱なし / size flag なし。push 済。
+- **2026-07-15 (tick 56) — a: (14.6) caseA Sylow center (新 leaf、S15 内容ベース carve-out)。census 37**:
+  **a=1** (`b4e95807` = Pf **(14.6)** caseA Sylow center trap — 新 leaf `S15_CaseASylowCenter.lean`
+  (197 行 sorry-free、claim 1035)。名目 S15 = b 域だが内容 = a の caseA campaign ⟹ **file 単位
+  a 所有 carve-out** (CaseBOrder tick 48 と同型)。S15_SAndT への import 1 行 = 機械的配線。
+  merge)。**b=0** (#22 rebase campaign 進行中と推定)。**c=0** (hold)。
+  build green 4220 jobs (+1) / AxiomsCheck OK / census **37 不変** / 新 axiom なし。push 済。
+  ⚠ 0116 は tick 55 直後に **Phase 1 claim を自己訂正で撤回** (5 obtain-site が uninhabitable
+  CDD interface に atom ごと縛られ、triple 単独 flip では honest 供給を構成できない) — 順序 =
+  b #22 (hold 解除済、即進行可) → hub full flip。正本 = 0116 自己訂正節 + 2035 HUB 追記。
 - **2026-07-15 (tick 55) — ★★ b: full hT2 sweep 完了 = 0116 条件 (i) 実装完了。Route T Phase 1 を hub が claim。census 37**:
   **a=1** (`93b737f5` = ambient caseA Sylow 構成、claim 1034。merge)。
   **b=2** (`a896c657` = ★★ **de-swap + full hT2 sweep — T_isTypeP2_gate を供給 chain から excise**。

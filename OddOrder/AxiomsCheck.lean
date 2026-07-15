@@ -8187,3 +8187,60 @@ the noncyclic `R₀ ∈ Syl_r(U)` extends to a Sylow `r`-subgroup while retainin
 centralizer witness. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.exists_sylow_over_U_with_centralizer_witness_of_not_isCyclic
+
+/-! **Peterfalvi (14.6), Sylow center trapping.**  The named complement `U` is Hall in `S`;
+the BG Prop. 1.16 witness belongs to the honest type-`P₂` TI-set, so its ambient centralizer
+lies in `S`.  Sylow maximality identifies `C_R(x)` with `R₀`, hence `Z(R) ≤ R₀`. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.coprime_card_U_index_S
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.sylow_center_le_U_sylow_of_centralizer_witness
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.exists_sylow_over_U_with_trapped_center_of_not_isCyclic
+
+/-! **Peterfalvi (14.6), order of `Ω₁(Z(R))`.**  Under the explicit (13.12)/(13.13)
+inputs `c = 1` and `q = 3`, the two-coordinate scalar action on the actual `U` is faithful,
+so `rank U ≤ 2`.  The nontrivial elementary abelian subgroup `Ω₁(Z(R)) ≤ R₀ ≤ U`
+consequently has order `r` or `r²`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_rank_U_le_two_of_c_eq_one_q_eq_three
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.omega1Center_card_eq_prime_or_sq_of_rank_U_le_two
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_omega1Center_card_eq_prime_or_sq_of_parameters
+
+/-! **Peterfalvi (14.6), fixed-point-free action on `Ω₁(Z(R))`.**  A subgroup of
+the Frobenius complement normalizing the Sylow subgroup also normalizes its characteristic
+center layer.  Frobenius orbit counting gives `p ∣ |Ω₁(Z(R))| - 1`, hence `p ∣ r² - 1`;
+the (14.5) type-I-over-normalizer carrier supplies the concrete conjugate `W₂^y`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.prime_dvd_sq_sub_one_of_frobenius_omega1Center
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.TypeIOverNormalizerData.prime_dvd_sq_sub_one_of_omega1Center
+
+/-! **Peterfalvi (14.6), final case-A contradiction.**  A prime
+`r ∣ (p - 1) / 2` has a noncyclic Sylow subgroup in `U`; center trapping and the
+fixed-point-free `W₂^y` action give `p ∣ r² - 1`.  Odd-prime comparison gives
+`p < r`, contradicting `r ≤ (p - 1) / 2`.  The case-A parameter equalities are
+explicit inputs, so this capstone does not use the issue-0116 analytic producer. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.false_of_odd_primes_dvd_half_and_sq_sub_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseA_false_of_parameters_and_typeIOverNormalizerData
+
+/-! **Peterfalvi (14.6), S-side Galois-field model.**  In Clifford case (9.7.b),
+the §9 Singer realization transports from the chief quotient to the named groups
+`P` and `U` because `H₀ = ⊥`, `H = P`, and `C_U(P) = 1`.  The branch-independent
+endpoint eliminates case (9.7.a) using the prime contradiction above.  The sharp
+parameters are required only conditionally on an actual case-(a) certificate;
+that producer and the type-I-over-normalizer carrier remain explicit, so no
+issue-0116 analytic producer is hidden. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.U_le_normalizer_P
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.conj_mem_P
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.caseB_exists_sSide_galoisField_repr_of_c_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_parameters_and_typeIOverNormalizerData

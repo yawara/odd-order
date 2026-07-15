@@ -194,3 +194,68 @@ hub は毎 tick 追跡。
 
 教訓: threading 設計は obtain-site の **atom interface の型**まで読んでから claim する
 (triple の所在だけでは不十分)。
+## ✅ b 実施報告 (2026-07-15, lane b /loop) — step 4 の genuine math 討伐 + Route T への補足
+
+**Finding 3 step 4 の本質 ((QD)^# ⊆ A₀(T) membership) を実証明、`QD_sharp_centralizer_le_T` を
+axiom-clean 討伐した** (commit `bee4bef9`、issue 2035 #87):
+
+- `mem_honestTypeP2ASet_of_mem_Q_sup_D`: (QD)^# ⊆ **A(T)** (A₀ でなく A に直接入る —
+  z = q·d 分解で d ∈ D = C_V(Q) が Q を centralize、witness は q 自身 or 任意 Q^#-点)。
+- ⟹ step 4 の「hT2 parameterize + HonestTypeP2A0 2 補題上移」は**不要になった**:
+  A(T)-escaping-empty (SubcoherenceInputs:980、既に上流) + Pf (10.10)
+  `no_typeV_maximal_unconditional` (axiom-clean と実測確認) で signature 不変のまま in-place
+  discharge 完了。hub の Route T step 4 は **step 1-3 のみに縮小**。
+- 連鎖: `inner_induce_H_QD_eq_zero` も axiom-clean 化。CountingLayer 実 sorry は
+  `tSide_theta_package_of_not_caseB` (step 3 削除対象) のみ。
+
+**Route T step 2 への補足 (b 調査、2026-07-15)**: NormEstimates 5 定理の character_degree_analysis
+obtain は、no-λ∧θ-有ケースで T-side caseB values が §13 内で確定しないため、**S15 レベルの
+dichotomy 移行では閉じない** (9094 §3-2 但し書きの「T-side v-value 依存」に該当、2035 #87 に詳細)。
+Route T の (hD, hv) param threading が唯一の解 — b は Route T 実施を妨げる作業をしない。
+sequencing (i) は #82-86 で完了済み、(ii) 成立確認は hub 判断のまま。
+
+**(時系列注、b 2026-07-15)**: 上の b 報告は tick 55 自己訂正より**後**に landed。自己訂正の
+「full flip に QD_sharp 移設を含める」項目は本討伐 (bee4bef9、signature 不変 in-place discharge)
+で解決済み — full flip から除外してよい。b は再確定順序どおり #22 rebase campaign へ進む。
+
+## 🚧 HUB FULL FLIP — IN PROGRESS (2026-07-15 tick 61 直後、hub claim)
+
+**トリガー成立を確認** (b 2035 #91 flag、tick 61 merge `c6667e0c`): #22 rebase campaign 完了 —
+S-side atom (#25/#26) + T-side atom (#88-#91 = Q_sharp_hypothesis76_base / tau_eq_induce /
+exists_muT_index_core / exists_etaT_alphaFun_one_int_core) が全て core + (hD, hQcomm) param 型で
+discharge leaf 側 (S15_CharacterDegreeEngines[SSide]) に完備。sequencing (ii) も成立
+(a は OrderDetermination を直近 8 tick 非接触 = quiet 化、かつ additive+legacy-wrapper 方式で
+無変更に生き続ける)。
+
+**hub 作業宣言 (scope = 再確定順序 (2) の full flip)**:
+1. NormEstimates 5 obtain-site (:295/:455/:493/:571/:706) の core/lam + (hD,hv) param 化
+   (additive 新 decl + 旧 signature は legacy wrapper 温存)
+2. 討伐済み atom の cite 置換 (sorried atom `exists_muT_index` :238 /
+   `exists_etaT_alphaFun_one_int` :259 → Engines core 版 cite; hQcomm の discharge 方針は
+   実装時に確定 = threading param 追加 or S16 hoist、hub 裁量条項)
+3. 新 discharge leaf (`S15_CaseBEndgameSupply.lean` 予定、CDS import) で
+   `T_caseB_facts_unconditional` cite による一括 discharge
+4. legacy retire (CountingLayer `tSide_theta_package_of_not_caseB` + `lambda_forces_T_caseB`
+   削除 = 実 sorry −1) — a の 3 obtain-site param 版移行後に最終化 (それまで wrapper 温存)
+
+**anti-collision (lane 宛)**:
+- **b 宛**: full flip landing まで `S15_SAndT_Setup/{NormEstimates,CountingLayer}.lean` への
+  touch を控えること (2035 にも記載)。Engines[SSide] / その他 b file は通常どおり。
+- **a 宛**: 変更なし (legacy wrapper が生きるため OrderDetermination の 3 obtain-site は無変更で
+  可)。flip landing 後に param 版への機械的移行 request を再掲する。
+
+作業は hub worktree (branch `hub0116`) で行い、green 後に通常ゲートで main 合流。進捗は本 issue
+に追記。
+
+## 🧭 HUB 移譲 (2026-07-15, issue 0118 再設計) — full flip の実行 owner を hub→lane a に移譲
+
+3 レーン再設計 (issue 0118) により、**full flip の実行を lane a に移譲**する (設計正本 = 本 issue の
+「🚧 HUB FULL FLIP」節のまま scope 不変; hub は設計 authority と landing flag を保持)。理由 =
+a が free + 同型パターン 3 連続実証 + lane cadence が hub tick より速い (0118 根拠節)。
+
+- **hub0116 worktree/branch は撤収** (commit 0 のまま)。a は自 worktree (odd-order-a) で実施。
+- **順序条件**: a は先に (a-1) 9096 ν-carrier threading を実施し、flip の Core-typed param 化は
+  **b の δ′ restate-drop (0118 b-1) landing 後**に開始。
+- **b 宛 anti-collision は継続** (NormEstimates/CountingLayer touch 禁止、相手が hub→a に変わるのみ)。
+- hQcomm 裁量条項 (threading param vs S16 hoist) も a に委譲 (Q_elementaryAbelian_T proven 確認済
+  ゆえ hTTypeII thread 推奨)。

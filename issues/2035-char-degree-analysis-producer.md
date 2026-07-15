@@ -2700,3 +2700,142 @@ FeitThompson.lean ×4 (.1 追従、a-owned、statement 不変) self-flag: `2c96b
 **「NormEstimates:806 / CountingLayer:1805 は hub landing 後に」の hold は無効 — b は #22 を
 順序どおり進めてよい**。hub は #22 の NormEstimates/CountingLayer 到達後に full flip
 (obtain-site param 化 + discharge leaf + legacy retire) を実施する。
+
+## 2026-07-15 更新 #87 (lane b, /loop 再開 iter 1) — (13.2.e)-for-T QD_sharp 討伐 (0116 step 4 の genuine math)
+
+- **`bee4bef9`**: `QD_sharp_centralizer_le_T` (CountingLayer:691 sorry) を **axiom-clean 討伐**。
+  - **`mem_honestTypeP2ASet_of_mem_Q_sup_D`** (新、genuine math): (QD)^# ⊆ A(T)。
+    z = q·d 分解 (T-normalized Q) + **D = C_V(Q) が Q を centralize** (D_eq) → q ≠ 1 なら
+    witness = q 自身、q = 1 なら witness = 任意 x ∈ Q^#。**Hall 論法不要の直接証明** (~35 行)。
+  - discharge chain: membership → `escaping_honestTypeP2ASet_eq_empty` ((13.2.e) core) +
+    `no_typeV_maximal_unconditional` (Pf (10.10) — **axiom-clean 済と実測確認**、S12_Noncoherence
+    docstring の「(6.5) gate 残る」は stale) + `isTypeP_of_isTypeNonI`。
+  - **0116 step 4 想定からの簡略化**: A₀(T) でなく A(T) で足りる (membership が A-part に直接入る)
+    → HonestTypeP2A0 2 補題 (conjClassSetIn_typePV_centralizer_le_M / escaping_A0_eq_empty) の
+    SubcoherenceInputs 上移は**不要**、TypePData 引数も不要、signature 不変 (hnoV param 不要 —
+    (10.10) が場内 discharge)。
+- **連鎖 axiom-clean 化**: `inner_induce_H_QD_eq_zero` ((13.2.e) S/T cross-orthogonality、CDS:77)
+  が clean に。`T_caseB_facts_unconditional` の残 sorryAx は既知の別 gap
+  (T_caseB_facts_no_lambda / nuGridSupply 系) のみ。
+- b-owned 実 sorry 10 → 9。full build green 4219 jobs / AxiomsCheck OK。
+
+**census 再確認 (comment-strip、本 iteration 冒頭)**: b-owned 実 sorry 10 (討伐前) の内訳 =
+T_isTypeP2_gate (keep 設計) / V_inf_centralizer_Q_eq_bot (c carve-out 9077) / nuGridSupply
+(9096 rewiring、hub arbitration) / tSide_theta_package_of_not_caseB + exists_muT_index +
+exists_etaT_alphaFun_one_int (Route T で削除/移設予定、hub) / **QD_sharp (本 #87 で討伐)** /
+character_degree_analysis (9094 deprecated、Route T gated) / caseB_order_u_data / sibleyTarget_S
+(次 iteration で gate 判定)。
+
+**9094 ⑤ flip 残 (NormEstimates 5 sites) の調査確定 (本 iteration)**: 5 定理の無条件 statement は
+S15 レベル (q<p 無し) で**証明不能** — no-λ∧θ-有ケースで T-side caseB values が §13 の道具で
+確定しない (counting 等式 (13.10.3) の右辺定数 (q−1)/(pq^p) が T-caseB values を織り込む;
+Pf (13.4) は「λ有∧θ有→矛盾」のみで、λ 無のとき T-side は未定)。9094 §3-2 但し書きの
+「T-side v-value 依存」ケースに該当。**解決は 0116 Route T ((hD,hv) param threading + S16 summit
+discharge) と不可分** — b 単独の dichotomy 移行では閉じない。Route T (hub、sequencing (ii) =
+a の OrderDetermination cluster 静穏化待ち) の実施時に同時解決される設計。
+
+## 2026-07-15 更新 #88 (lane b, /loop iter 2) — #22 T-side twin 修理開始: Q_sharp_hypothesis76_base landed
+
+hub 再確定順序 (0116 tick 55 自己訂正: b の #22 campaign 先行 → hub full flip) に従い、
+**T-side atom 層の restate campaign** に着手。main merge (conflict 2 件解決、hub 追記保持) 済。
+
+- **`9bfa61b1`** (brick 1/3): `Q_sharp_hypothesis76_base` + `_zeta_zero`
+  (S15_CharacterDegreeEngines) — (T, Q^#) の (7.6) family を chosen-base 化
+  (hypothesis76OfDadeBase、ζ₀ = Ind_Q^T φ₀ pin)。S-side #25 の機械的 mirror、sorry-free。
+- **設計確定 (T-side atom の gate 構造)**: `exists_muT_index` (NormEstimates:238) の
+  ζ_{i₁} = ν-row-sum は **QD-induced** (`nu_i_isIndQD`) — Q_sharp family (Ind_Q^T) に
+  入るのは **D = ⊥ の下でのみ** (K = QD = Q)。∴ core 版 restate は
+  **(hD : hyp.D = ⊥) param 込み**が book-faithful 形 (Route T の (hD,hv) threading と整合、
+  (13.8)-T は Pf でも (13.4) D=1 の後で使用)。
+- 残 bricks: **2/3** = muT cCoeff 版 (exists_muT_index core restate — (13.3.c)-at-T
+  ν-row τ₁T formula [NuRowPin/Tau1T landed 済] を Q_sharp_base family の cCoeff に接続、
+  ‖ν_i‖² = p / ν_i(1) = pv は nu_apply_one_eq_v 系) / **3/3** = etaT integrality
+  (exists_etaT_alphaFun_one_int core 版、Q elementary abelian (13.2.b)-T mirror →
+  α|_Q ∈ ℤ[Irr Q]、S-side eta10_cCoeff_int パターン)。
+
+## 2026-07-15 更新 #89 (lane b, /loop iter 3) — brick 2a landed + muT cCoeff の部品完全 map
+
+- **`3f9b57f6`** (sub-brick 2a): `Q_sharp_tau_eq_induce` (CountingLayer) —
+  (13.2.e)/(7.2)-for-T「(T,Q^#) TI-Dade = Ind_T^G」。H_sharp_tau_eq_induce の mirror、一発 green。
+- **muT cCoeff (brick 2 本体) の部品調査完了 — ほぼ全部 landed 済と判明**:
+  | 部品 | 状態 |
+  |---|---|
+  | τ = Ind bridge | ✓ 2a (本 commit) |
+  | τ₁T = Ind on K-induced diff | ✓ `tau1T_ofHonest_apply_induce_sub` (S15_Tau1T:660) |
+  | irr K-induction ⊥ η | ✓ `tau1T_ofHonest_induce_inner_eta` (:625、zSpanIrr 経由) |
+  | ν-row τ₁T formula | ✓ `tau1T_ofHonest_nuRow_eta_row` (:114) |
+  | ν-row = K-linear induced | ✓ `nu_i_isIndQD` + `nu_apply_one_eq_v` + `K_index_eq_vp` |
+  | **red K-induction → ν-row 分類** | **✗ 唯一の未 landed** (sSet_reducible_eq_nuRowSum は T'-induced 用; K-induced 版が要る — induce_K_mem_zSpan_sSet_irr_T :386 の証明が同素材 [constituent 展開+distinct-source 直交] を含むので流用可) |
+- **設計確定**: exists_muT_index core 版の引数 = (core 不要 — τ₁T carrier 直) hnoV/pins/hvd/hTP/Tdata/hU/hW1/hW2/chief + **hD : hyp.D = ⊥** (K=Q 化、(13.4) 帰結、Route T param と整合) + **hQcomm : IsMulCommutative ↥hyp.Q** (d≡1 + (13.5.a) 整数性; Q_elementaryAbelian_T は hTTypeII gated ゆえ直接 param が honest) + chosen base φ₀ (Q⊄Ker、Ind irr)。
+  distinguished index = ν_r の family index (r = nuRow formula で r'=1 になる行: clean→r=1/δ=1、flip→r=2/δ=−1)。他 index: irr→⊥η、red→ν_s (s≠r) → η_{s'} (s'≠1) ⊥ η₁₀。
+
+## 2026-07-15 更新 #90 (lane b, /loop iter 4-5) — ★ brick 2 CLOSED: exists_muT_index_core 完全証明 (sorryAx 無し)
+
+- **`d8d09251`** (subagent 実装 + lane-b レビュー/再検証): `Hypothesis.exists_muT_index_core`
+  (S15_CharacterDegreeEngines 末尾、+548 行) — **(13.8)-for-T distinguished index の 7 conjuncts
+  を sorry 0 で実証明、#print axioms = 標準 3 のみ (sorryAx すら無し)**。
+  - 設計 (#89) どおり: hD : D = ⊥ + hQcomm : IsMulCommutative Q を明示 param、
+    distinguished index = ν-row (nuRow formula の clean/flip 分岐)、
+    cCoeff = 2a bridge + coherence extends + η-orthonormality、
+    他 index 消滅 = 2 段 constituent 展開 + distinct-source 非負整数計数。
+  - **red 分類補題 (旧 2b) は不要と確定** — 計数論法が red/irr split を内包。
+  - 中断 1 回 (API session limit 02:20 reset) → SendMessage 再開で完遂。
+- **⚠ size flag**: S15_CharacterDegreeEngines 1634 行 (>1500 watch) — 次の追記前に
+  prefix-split (凍結 S-side クラスタ induce_H_mem_zSpan_sSet_irr〜eta10_cCoeff_base_eq_zero を
+  sibling へ)。brick 3 着手前に実施する。
+- **残 brick 3/3**: `exists_etaT_alphaFun_one_int` core 版 — T-side (13.5.a) 整数性
+  (α|_Q ∈ ℤ[Irr Q]、hQcomm で Q abelian、S-side eta10_cCoeff_int / H_sharp_alphaCF_restrict_mem_ZIrr
+  パターンの mirror)。landing で #22 T-side twin 修理完了 = hub full flip (0116) のトリガー成立。
+
+## 2026-07-15 更新 #91 (lane b, /loop iter 6) — ★★ #22 T-side twin campaign 完了 (brick 1-3 全 landed)
+
+- **`f2c3b831`**: Engines prefix-split (1634 行 watch 解消 — S-side 15 decls を
+  S15_CharacterDegreeEnginesSSide.lean へ、module 名不変・下流不変、宣言数保存検証済)。
+- **`7c9b4141`** (brick 3/3): `exists_etaT_alphaFun_one_int_core` + 補助 3 補題
+  (うち 2 本 generic — hypothesis76AlphaFun_one_int は S-side と共用可能な形)。
+  sorry 0 / axiom-clean / full build green 4222 jobs。
+- **⟹ #22 rebase campaign の T-side twin 修理完了**: NormEstimates の sorried atom 2 本
+  (exists_muT_index :238 / exists_etaT_alphaFun_one_int :259) の honest core 供給
+  (`exists_muT_index_core` / `exists_etaT_alphaFun_one_int_core`、共に hD + hQcomm param、
+  Q_sharp_hypothesis76_base family) が discharge leaf 側 (S15_CharacterDegreeEngines) に完備。
+
+**hub 0116 宛 flag: full flip のトリガー成立**。tick 55 自己訂正の再確定順序 (1) = 「b の #22
+rebase campaign の NormEstimates/CountingLayer 到達 landing」は本 update で成立:
+- S-side atom 層 = #25/#26 (cCoeff_base ×2 + NormEstimates:806 core 版)
+- T-side atom 層 = #88-#91 (Q_sharp_hypothesis76_base + tau_eq_induce + muT index + etaT 整数性)
+- 全て core/lam + (hD, hQcomm) param 型で restate 済 — hub full flip (obtain-site の
+  core/lam + (hD,hv) param 化 + 討伐済 atom cite 置換 + discharge leaf + legacy retire) を実施可。
+- 注: T-side atom の param は (hD : D = ⊥) + (hQcomm : IsMulCommutative Q)。hQcomm は
+  (13.2.b)-T の可換部分で、Q_elementaryAbelian_T (hTTypeII gated) から S16 レベルで
+  discharge 可能 (threading param に追加するか S16 hoist かは hub 裁量)。
+
+## 2026-07-15 HUB 追記 (tick 61 直後) — 0116 full flip IN PROGRESS、b への anti-collision request
+
+#91 の flag を受け **hub full flip を開始** (0116「🚧 HUB FULL FLIP — IN PROGRESS」節参照)。
+**b 宛 request: flip landing まで `S15_SAndT_Setup/{NormEstimates,CountingLayer}.lean` への
+touch を控える** (Engines[SSide]・S15_Tau1T 等その他 b file は通常どおり)。landing は
+merge_monitor 現状メモで通知する。
+
+## 2026-07-15 更新 #92 (lane b, /loop iter 7) — ★ mu_tau1red port campaign は消滅 (調査 subagent + 裁定)
+
+**2038 続⁷ の「mu_tau1red (13.6)-(13.9) port = major effort」は stale と確定** (subagent 調査、#print axioms 実測):
+- `mu_tau1red` は **phantom 識別子** (coq/theories に不存在; 実対象 = `typeP_TIred_coherent`/`FTtypeP_coherence` PFsection13.v:338/:349)。
+- (13.3.c) 系 3 fields の S-side honest 供給 (`tau1S_ofHonest_muColumn_formula` / `_mu_col_eta_col_one` / `delta_eq_one_S`) は **全て landed・axiom-clean 実測** (2035 #8-#18 の carrier-pin 再設計で完了していた)。gap#1 (sS1S) / gap#2 (support-widening) も closed。
+- (13.6)-(13.10) norm machinery も S/T 両 mirror landed (Coq :715-727 の教科書 gap 修正は #90 の計数論法が T-mirror 実装済)。Coq↔Lean 対応表は subagent レポート (transcript) 参照。
+- **`characterDegreeCore_nonempty` の sorryAx root は `nuGridSupply` ただ 1 本** (δ′-half 経由) と実測確定。
+- 残 work = (i) hub 0116 full flip (トリガー #91 成立済) (ii) 9096 ν-pins threading (hub arbitration) (iii) 下記裁定。
+
+**lane-b 裁定 (設計分岐 1)**: `delta_eq_one` の **δ′-half を Core から restate-drop する (案 a 採用)** —
+consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (restate-drop)、δ′ 内容は
+`deltaPrime_eq_one_T` として供給側に残存 (将来の T-mirror 消費者出現時は 1 行で再追加可)。
+効果: `characterDegreeCore_nonempty` が Brick B (9096) を待たず**即 axiom-clean 化**。
+分岐 2 (hQcomm discharge 位置) / 3 (Brick A タイミング) は hub 裁量のまま。
+
+## 2026-07-15 HUB 追記 (issue 0118 再設計) — anti-collision の相手変更 + b の次 work
+
+- **0116 full flip の実行 owner は hub→lane a に移譲** (issue 0118)。b への request
+  「flip landing まで NormEstimates/CountingLayer touch 禁止」は**相手を a として継続**。
+- **b の次 work (0118 裁定)**: (b-1) #92 δ′ restate-drop の**実装** (裁定のみで未実装と監査確定、
+  最優先 — a の flip 開始条件) → (b-2) T_isTypeP2_gate resolution → (b-3) sibleyTarget_S
+  restate-or-retire → (b-4) CDS 分割 → (b-5) ν-supply consumer 切替 (a-1 landing 後)。
+  詳細 = issues/0118。

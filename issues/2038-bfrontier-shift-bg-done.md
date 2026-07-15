@@ -2585,3 +2585,10 @@ on-path (AMENDMENT で訂正)・S-instance ungated (本訂正) — いずれも�
 **bottleneck 再評価**: b は ungated (1017) ゆえ a 待ちでない。**残る真の a-gate = c の hVcomm/field-data
 (typeP_Galois T = a の σ-theory) と b の pc_le (13.12)**。a は今 (6.5) type-V を landing 済 → 文書順で
 typeP_Galois/(9.11 M-instance の残 or σ-theory) へ。c は依然 gated-endpoint (typeP_Galois T 待ち)。
+
+## ⚠ SUPERSEDE 注記 (2026-07-15, lane b) — 続⁷ の「mu_tau1red (13.6)-(13.9) port = major effort」は stale
+
+2035 #92 の調査で確定: `mu_tau1red` は Coq に存在しない phantom 識別子 (実対象 = FTtypeP_coherence 系)、
+かつ (13.3.c)/(13.6)-(13.10) の S/T 両 mirror は 2035 #8-#91 で landed・axiom-clean 済。
+「fresh port が要る」という本 issue 続⁷ (2026-07-12) の記述を根拠に作業を計画しないこと。
+正 = 2035 #92 (残り = 0116 full flip + 9096 ν-pins + δ′ restate-drop)。
