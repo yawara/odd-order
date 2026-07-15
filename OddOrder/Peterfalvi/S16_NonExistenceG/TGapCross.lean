@@ -618,7 +618,7 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero [Finite G]
     ClassFunction.inner (tSideDadeMap hyp hG φ)
       (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
   tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_c_eq_one hG hnoV hyp
-    (hyp.base.c_eq_one_of_lambda_dichotomy hG) dataT hP1 hφsupp
+    (hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply) dataT hP1 hφsupp
 
 /-- The inner product of two virtual characters is symmetric: its value is
 an integer, hence fixed by complex conjugation. -/

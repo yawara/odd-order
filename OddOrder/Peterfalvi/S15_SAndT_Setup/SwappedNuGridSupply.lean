@@ -10,7 +10,7 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisSwap
 
 The `S ↔ T` swap transposes the original `μ`-grid into its `ν`-grid.  Consequently the
 already-carried `μ`-grid facts give a `NuGridSupplyData` bundle for the swapped hypothesis,
-without appealing to the legacy generic `Hypothesis.nuGridSupply` producer.
+starting from the explicitly supplied canonical bundle and requiring no generic producer.
 -/
 
 namespace OddOrder.Peterfalvi.S15

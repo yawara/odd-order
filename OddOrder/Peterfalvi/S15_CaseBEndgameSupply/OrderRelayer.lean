@@ -29,7 +29,7 @@ by the Core analytic endpoint.  This avoids the circular route through the later
 faithful Galois branch already gives `C = ⊥`. -/
 theorem Hypothesis.c_eq_one_of_lambda_dichotomy [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply hG) :
+    (pins : NuGridSupplyData hyp) :
     hyp.c = 1 := by
   obtain ⟨core⟩ := hyp.characterDegreeCore_nonempty hG
   rcases lambdaCluster_or_caseB hG hyp with hlam | ⟨hCbot, _hu⟩
@@ -37,7 +37,7 @@ theorem Hypothesis.c_eq_one_of_lambda_dichotomy [Finite G]
     obtain ⟨hD, hv, _hQ⟩ := lambda_forces_T_caseB_core hG core lam pins
     have hQcomm : IsMulCommutative ↥hyp.Q :=
       IsMulCommutative.of_comm (hyp.Q_elementaryAbelian hG).comm
-    exact core.c_eq_one_of_caseB_facts hG lam hD hv hQcomm
+    exact core.c_eq_one_of_caseB_facts hG lam hD hv hQcomm pins
   · exact hyp.c_eq_card_C.trans (Subgroup.card_eq_one.mpr hCbot)
 
 /-- **Peterfalvi (13.13), honest Clifford-case form**: an actual case-(9.7.a)
@@ -48,7 +48,7 @@ theorem Hypothesis.caseA_parameters_of_clifford_caseA [Finite G]
     {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
       (hyp.mkSection11CharacterDataS hG chief))
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply hG) :
+    (pins : NuGridSupplyData hyp) :
     hyp.q = 3 ∧ hyp.u = (hyp.p - 1) ^ 2 / 4 := by
   obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := lambdaWitness_of_caseA hG hyp chief caseA
   obtain ⟨lam⟩ := hyp.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind
@@ -56,7 +56,7 @@ theorem Hypothesis.caseA_parameters_of_clifford_caseA [Finite G]
   obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core lam pins
   have hQcomm : IsMulCommutative ↥hyp.Q :=
     IsMulCommutative.of_comm (hyp.Q_elementaryAbelian hG).comm
-  exact core.caseA_parameters_of_caseB_facts hG lam hD hv hQcomm caseA
+  exact core.caseA_parameters_of_caseB_facts hG lam hD hv hQcomm pins caseA
 
 /-- **Peterfalvi (13.15), honest λ-dichotomy form**: an actual Clifford case-(9.7.b)
 certificate has the two Singer-order alternatives without using the legacy character-degree
@@ -69,7 +69,7 @@ theorem Hypothesis.caseB_order_u_of_lambda_dichotomy [Finite G]
     {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
       (hyp.mkSection11CharacterDataS hG chief))
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply hG) :
+    (pins : NuGridSupplyData hyp) :
     (hyp.p ≡ 1 [MOD hyp.q] →
         hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))) ∧
       (¬ hyp.p ≡ 1 [MOD hyp.q] →
@@ -88,7 +88,7 @@ theorem Hypothesis.caseB_order_u_of_lambda_dichotomy [Finite G]
     obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core lam pins
     have hQcomm : IsMulCommutative ↥hyp.Q :=
       IsMulCommutative.of_comm (hyp.Q_elementaryAbelian hG).comm
-    exact core.caseB_order_u_of_caseB_facts hG lam hD hv hQcomm caseB
+    exact core.caseB_order_u_of_caseB_facts hG lam hD hv hQcomm pins caseB
   · refine ⟨?_, fun _ => hufull⟩
     intro hmod
     have hqdvd : hyp.q ∣ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) :=

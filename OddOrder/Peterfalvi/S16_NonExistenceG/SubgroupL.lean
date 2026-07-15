@@ -30,7 +30,8 @@ theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Subgroup.le_centralizer (H := hyp.base.P)
   have hC_bot : hyp.base.C = ⊥ := by
     apply Subgroup.eq_bot_of_card_eq
-    rw [← hyp.base.c_eq_card_C, hyp.base.c_eq_one_of_lambda_dichotomy hG]
+    rw [← hyp.base.c_eq_card_C,
+      hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply]
   rw [eq_bot_iff, ← hC_bot, hyp.base.C_eq]
   exact le_inf inf_le_right (inf_le_left.trans hP_le_cent)
 
@@ -62,7 +63,8 @@ theorem exists_LHypothesis [Finite G]
           (P_inf_U_eq_bot _hG hyp)))
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp hTII
-  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy _hG
+  have hc1 : hyp.base.c = 1 :=
+    hyp.base.c_eq_one_of_lambda_dichotomy _hG hyp.nuGridSupply
   have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts _hG hyp).1
   have hd1 : hyp.base.d = 1 := by
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
@@ -214,7 +216,8 @@ theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨hq, hu⟩ := hyp.base.caseA_parameters_of_clifford_caseA
       _hG caseA (pins := hyp.nuGridSupply)
     exact (OddOrder.Peterfalvi.S15.caseA_false_of_parameters_and_typeIOverNormalizerData
-      _hG hyp.base caseA (hyp.base.c_eq_one_of_lambda_dichotomy _hG) hq hu
+      _hG hyp.base caseA
+        (hyp.base.c_eq_one_of_lambda_dichotomy _hG hyp.nuGridSupply) hq hu
       Ldata.typeI_data).elim
   · obtain ⟨caseB⟩ := hB
     let caseB_formula : Prop := Nonempty
@@ -739,7 +742,8 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact ⟨c.2, Subgroup.mem_centralizer_iff.mpr (fun y hy => (hcomm ⟨y, hy⟩).symm)⟩
     have hCbot : hyp.base.C = ⊥ := by
       apply Subgroup.eq_bot_of_card_eq
-      rw [← hyp.base.c_eq_card_C, hyp.base.c_eq_one_of_lambda_dichotomy hG]
+      rw [← hyp.base.c_eq_card_C,
+        hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply]
     rw [hCbot, Subgroup.mem_bot] at hmem
     exact Subtype.ext hmem
   obtain ⟨e0, μ, hμinj, hcompat0⟩ :=

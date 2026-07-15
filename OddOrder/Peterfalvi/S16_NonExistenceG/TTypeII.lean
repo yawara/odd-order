@@ -329,7 +329,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- identification ((3.9)(a) rigidity).  Upstream gates persist only transitively through the cited
   -- sorried lemmas (Type-P₁ `A₀`-normed-TI, (13.18.a) β-support, §11 zero-column projection).
   classical
-  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy hG
+  have hc1 : hyp.base.c = 1 :=
+    hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')

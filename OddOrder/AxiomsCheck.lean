@@ -8256,3 +8256,18 @@ in `deltaPrime_eq_one_T`, so the core producer is axiom-clean without waiting fo
 ν-carrier threading (issue 9096). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.Hypothesis.characterDegreeCore_nonempty
+
+/-! **Peterfalvi (13.10)–(13.13), issue 0116 Core full-flip chain.**
+The analytic estimate and its order consequences now consume the honest
+`CharacterDegreeCore` route with an explicit canonical ν-grid supply.  In particular, the
+unconditional `c = 1` endpoint uses the λ-dichotomy and the upstream type-`P` structure of
+`Q`, not the later type-II conclusion, so these assertions also guard against reintroducing
+the former (13.12) ↔ (14.9) proof cycle. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.CharacterDegreeCore.analytic_inequality_of_caseB_facts
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.CharacterDegreeCore.c_eq_one_of_caseB_facts
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.CharacterDegreeCore.caseA_parameters_of_caseB_facts
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.c_eq_one_of_lambda_dichotomy

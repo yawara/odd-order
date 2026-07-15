@@ -187,7 +187,7 @@ theorem s_side_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   simpa using
     OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
       hG hyp.base
-        (hyp.base.c_eq_one_of_lambda_dichotomy hG)
+        (hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply)
         (fun caseA =>
           hyp.base.caseA_parameters_of_clifford_caseA
             hG caseA (pins := hyp.nuGridSupply))
