@@ -304,3 +304,25 @@ T-side の book-faithful correction を `CharacterDegreeData` なしで再構成
 
 **次 frontier**: hub 経由で λ/η₁₀ Core packages を使い、NormEstimates の analytic 5-site を
 `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` param 版へ relayer する。
+
+## ✅ lane a progress (2026-07-15) — H-side η₁₀ (13.5)/(13.7) package complete
+
+固定 trivial base に依存していた legacy (13.7) を、Core が供給する `P`-nonkernel chosen base
+で再構成した:
+
+- abstract (7.6) datum に `hypothesis76AlphaCF`、Mackey orbit restriction、
+  normalized restriction / correction の `ZIrr` API を追加。downstream に重複していた
+  normalized-restriction proof は上流実装へ統合し、`hypothesis76AlphaFun_one_int` も再利用。
+- `CharacterDegreeCore.exists_hSharpBase` を λ 非依存で抽出し、
+  `eta10_cCoeff_base_eq_zero` により chosen family の全 nonkernel coefficient を消去。
+- primitive-root congruenceから correction の identity value 非零を証明し、restriction の
+  virtual-character 性、Parseval、(13.5.c) inflation、`H` abelian equality case を
+  `exists_caseB_data_eta10_H_core` に束ねた。
+- abstract norm engine から `eta10_Hsharp_norm_lower_core` (13.7) を導出。
+  入力は `CharacterDegreeCore` のみで、legacy `CharacterDegreeData` は不使用。
+
+新 leaf 286 行、`sorry`/新 `axiom` なし、leaf build green。
+
+**次 frontier**: (13.6) λ + (13.7) H-side η₁₀ + (13.8) Q-side η₁₀ の Core norm bounds を使い、
+`analyticEstimate_lambda` / `analyticEstimate_eta` / counting cover から
+`analytic_inequality` までを explicit Case-B facts 版として下流 supply leaf に実装する。

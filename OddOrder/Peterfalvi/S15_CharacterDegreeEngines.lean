@@ -684,75 +684,6 @@ variable {A : Set G} {L : Subgroup G}
 
 open scoped Classical in
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
-/-- **`(1/‖ζ_i‖²)·Res_H ζ_i` is a virtual character of `H`** over an abstract (7.6) datum —
-the generic form of `H_sharp_inv_normSq_restrict_zeta_mem_ZIrr` (the "`Res ζ_i/‖ζ_i‖²` is a
-character" step of Peterfalvi (13.5.a)): `ζ_i = Ind_K^L θ_i` (`zeta_induced`), so by the Mackey
-orbit form (`card_smul_restrict_induce_eq_inertia_smul_orbitSum`) and the inertia norm
-(`card_mul_inner_self_induce_eq_card_inertia`), `Res_K ζ_i = ‖ζ_i‖² · (sum of the distinct
-conjugates of θ_i)` — an ℕ-combination of irreducibles (`orbitSum_mem_ZIrr`). -/
-theorem hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G]
-    [Invertible (Nat.card G : ℂ)]
-    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (i : Fin (H76.n + 1)) :
-    (H76.zetaNormSq i)⁻¹ •
-        ClassFunction.restrict (H76.H.subgroupOf L) (H76.zeta i)
-      ∈ ZIrr ↥(H76.H.subgroupOf L) := by
-  classical
-  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
-  haveI hKnorm : K.Normal :=
-    OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
-  obtain ⟨θ₀, hθ₀⟩ := H76.zeta_induced i
-  -- Bridge the canonical `Fintype`/`Invertible` instances of the `zeta_induced` field
-  -- (both subsingleton classes) to the ambient scoped ones.
-  have hθ : H76.zeta i = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
-    rw [hθ₀]
-  -- The Mackey orbit form, divided by `|K|`.
-  have hK0 : (Nat.card ↥K : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
-  have horbit := OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
-    (G := ↥L) (H := K) (k := ℂ) (θ₀ : ClassFunction ↥K ℂ)
-  have hinertia := OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
-    (G := ↥L) (H := K) θ₀
-  -- `‖ζ_i‖² ≠ 0` (it is `|I|/|K|` with `|I| ≥ 1`).
-  have hnormval : (Nat.card ↥K : ℂ) * H76.zetaNormSq i
-      = (Nat.card ↥(ClassFunction.inertia (G := ↥L)
-          (θ₀ : ClassFunction ↥K ℂ)) : ℂ) := by
-    rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hθ]
-    exact hinertia
-  have hI0 : (Nat.card ↥(ClassFunction.inertia (G := ↥L)
-      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) ≠ 0 := by
-    exact_mod_cast Nat.card_pos.ne'
-  have hnorm0 : H76.zetaNormSq i ≠ 0 := by
-    intro h0
-    rw [h0, mul_zero] at hnormval
-    exact hI0 hnormval.symm
-  -- `Res ζ_i = ‖ζ_i‖² • orbitSum θ₀`, hence `(1/‖ζ_i‖²)·Res ζ_i` is the orbit sum.
-  have hIKnorm : ((Nat.card ↥K : ℂ))⁻¹ * (Nat.card ↥(ClassFunction.inertia (G := ↥L)
-      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) = H76.zetaNormSq i := by
-    rw [← hnormval]
-    field_simp
-  have hres : ClassFunction.restrict K (H76.zeta i)
-      = H76.zetaNormSq i •
-          ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
-            ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
-    have h1 : (Nat.card ↥K : ℂ) • ClassFunction.restrict K (H76.zeta i)
-        = ((Nat.card ↥(ClassFunction.inertia (G := ↥L)
-            (θ₀ : ClassFunction ↥K ℂ)) : ℕ) : ℂ) • ∑ ψ ∈ Finset.univ.image
-              (fun x : ↥L => ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
-      rw [← Nat.cast_smul_eq_nsmul (R := ℂ)] at horbit
-      rw [hθ]
-      exact horbit
-    have h2 := congrArg (fun φ => ((Nat.card ↥K : ℂ))⁻¹ • φ) h1
-    simp only [smul_smul, inv_mul_cancel₀ hK0, one_smul] at h2
-    rw [h2, hIKnorm]
-  have hmain : (H76.zetaNormSq i)⁻¹ •
-      ClassFunction.restrict K (H76.zeta i)
-      = ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
-          ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
-    rw [hres, smul_smul, inv_mul_cancel₀ hnorm0, one_smul]
-  rw [hmain]
-  exact OddOrder.RepresentationTheory.orbitSum_mem_ZIrr (G := ↥L) θ₀
-
-open scoped Classical in
-open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Generic (13.5.a) integrality of the correction at `1`**: with integer (7.7.a) coefficients
 `c_i ∈ ℤ`, the `P'`-kernel tail `α = hypothesis76AlphaFun` restricts on `K = H76.H` to
 `∑ c_i • ((1/‖ζ_i‖²)·Res ζ_i) ∈ ℤ[Irr K]` (each normalized restriction is the conjugate-orbit
@@ -767,41 +698,10 @@ theorem hypothesis76AlphaFun_one_int [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hc : ∀ i : Fin (H76.n + 1), ∃ z : ℤ, H76.cCoeff χ i = (z : ℂ)) :
     ∃ α1 : ℤ, hypothesis76AlphaFun H76 P' χ 1 = (α1 : ℂ) := by
   classical
-  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
-  -- The tail as a class function on `↥L`.
-  set alphaCF : ClassFunction ↥L ℂ :=
-    ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
-          (fun i => (P' : Set ↥L) ⊆
-            OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
-        (star (H76.cCoeff χ i) / H76.zetaNormSq i) • H76.zeta i with halphaCF
-  have happly : ∀ x : ↥L, alphaCF x = hypothesis76AlphaFun H76 P' χ x := by
-    intro x
-    rw [halphaCF, OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
-      hypothesis76AlphaFun]
-    exact Finset.sum_congr rfl (fun i _ => by rw [ClassFunction.smul_apply])
-  -- Restriction is pointwise, so it commutes with the defining sum.
-  have hlin : ClassFunction.restrict K alphaCF
-      = ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
-            (fun i => (P' : Set ↥L) ⊆
-              OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
-          (star (H76.cCoeff χ i) / H76.zetaNormSq i) •
-            ClassFunction.restrict K (H76.zeta i) := by
-    ext x
-    rw [ClassFunction.restrict_apply, halphaCF,
-      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
-      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
-    exact Finset.sum_congr rfl (fun i _ => by
-      rw [ClassFunction.smul_apply, ClassFunction.smul_apply, ClassFunction.restrict_apply])
-  -- `Res_K α ∈ ℤ[Irr K]`: integer coefficients times the normalized restrictions.
-  have hres : ClassFunction.restrict K alphaCF ∈ ZIrr ↥K := by
-    rw [hlin]
-    refine Submodule.sum_mem _ (fun i _ => ?_)
-    obtain ⟨z, hz⟩ := hc i
-    rw [hz, star_intCast, div_eq_mul_inv, mul_smul, Int.cast_smul_eq_zsmul]
-    exact Submodule.smul_mem _ z (hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr H76 i)
+  have hres := hypothesis76AlphaCF_restrict_mem_ZIrr H76 P' χ hc
   obtain ⟨z, hz⟩ := OddOrder.Algebra.exists_int_apply_one_of_mem_ZIrr hres
   refine ⟨z, ?_⟩
-  rw [← happly 1, ← hz, ClassFunction.restrict_apply, OneMemClass.coe_one]
+  simpa [ClassFunction.restrict_apply] using hz
 
 end GenericAlphaIntegrality
 
