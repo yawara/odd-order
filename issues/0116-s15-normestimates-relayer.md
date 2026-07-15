@@ -376,3 +376,18 @@ discharge した後、mid-layer/S16 consumer を順次付け替え、legacy wrap
 
 **次 frontier**: 文書順で最上流の `c_eq_one` mid-layer consumer から明示版を追加し、
 Core supply を末端まで thread する。旧名は downstream 移行完了まで互換境界として保持する。
+
+## ✅ lane a progress (2026-07-15) — honest unconditional `c = 1` endpoint
+
+`Hypothesis.c_eq_one_of_T_typeII` を `OrderRelayer` に追加した。legacy の無条件 λ-carrier を
+使わず、Peterfalvi (13.3.b) の正しい dichotomy で (13.12) を組み立てる:
+
+- λ-cluster branch: unconditional `CharacterDegreeCore` +
+  `lambda_forces_T_caseB_core` から `(hD,hv)`、`Q_elementaryAbelian_T` から `hQcomm` を得て、
+  Core (13.10) → `c_eq_one_of_caseB_facts` を適用。
+- no-λ Galois branch: `lambdaCluster_or_caseB` が直接 `C = ⊥` を返すため、`c = |C| = 1`。
+
+入力は genuine な `IsTypeII T` と canonical `NuGridSupplyData` のみ。leaf build green。
+
+**次 frontier**: Core より上流の `C_eq_bot` / `U_inf_centralizer_P_eq_bot` /
+BridgeCharacter consumers を `hc1 : c = 1` 明示版へ分離し、S16 側から本 endpoint を注入する。
