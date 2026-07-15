@@ -1269,12 +1269,14 @@ theorem typeP1_conjugate_and_typeP_twoClasses [Finite G]
 `𝒞_G(M̃ᵢ)` over class representatives `Mᵢ ∈ 𝓜` — together with one extra `𝒞_G(Ẑ)` piece when
 `𝓜_𝓟` is nonempty.
 
-**Faithfulness note (2026-06-14):** the Lean surface covers by `sigmaConjugacySaturation =
-𝒞_G(M_σ^#)` instead of BG's `𝒞_G(M̃)` (see `sigmaSharp`). Because `M_σ^# ⊊ M̃`, covering `G^#`
-by the *smaller* pieces is **stronger than — and false relative to — BG**: the `ℓ_σ = 2`
-twisted elements `x x'` (`x' ∈ R(x)^#`) lie in some `𝒞_G(M̃ᵢ)` but in no `𝒞_G(M_σ^#ⱼ)`, so the
-covering fails for them. A faithful statement needs the (gated) `M̃`; do not prove this
-surface as-is. See `notes/bg/s14_typeP_counting.md`. -/
+**FROZEN MIS-ENCODING — DO NOT PROVE OR REPAIR IN PLACE (2026-07-15).**  This Lean surface
+covers by `sigmaConjugacySaturation = 𝒞_G(M_σ^#)` instead of BG's `𝒞_G(M̃)` (see `sigmaSharp`).
+Because `M_σ^# ⊊ M̃`, covering `G^#` by the smaller pieces is false relative to BG: the
+`ℓ_σ = 2` twisted elements `x x'` (`x' ∈ R(x)^#`) lie in some `𝒞_G(M̃ᵢ)` but in no
+`𝒞_G(M_σ^#ⱼ)`.  The declaration has no consumers and is retained only as a frozen record of the
+bad surface.  Faithful coverage is provided by the `Mtilde`/`zTilde` theorems used by
+`exists_sigmaDecomposition_length_le_two`; new consumers must use those APIs.  See
+`notes/bg/s14_typeP_counting.md`. -/
 theorem nonidentity_covered_by_sigma_pieces [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     (∀ x : G, x ≠ 1 → ∃ M : Subgroup G,
@@ -1294,7 +1296,7 @@ theorem nonidentity_covered_by_sigma_pieces [Finite G]
 `κ(Mref)`-element; since `Kref` consists of `σ(Mref*)`-elements for the non-conjugate partner `Mref*`
 (type-P duality), `sigma_cover_decomposition` gives the two-element `σ`-decomposition `{k, k*}`.
 
-**Proof recipe (verified 2026-07-01, no deep gap — only a mechanical split remains):**
+**Implementation (completed 2026-07-01):**
 `typeP_duality hG hMref hMPref hKMref hKref hKstarref` supplies the partner `Mstar` with
 `hK_eq : Kref = M_σ(Mstar) ⊓ C(Kstar)` (so `Kref ≤ M_σ(Mstar)` by `inf_le_left` — the partner-`σ`
 membership is *immediate*, not a residual), `hnc : ¬ IsConjugateSubgroup Mref Mstar`, and `hZcyc`
@@ -1303,11 +1305,10 @@ membership is *immediate*, not a residual), `hnc : ¬ IsConjugateSubgroup Mref M
 hMref (·) (Kref ≤ M_σ Mstar applied to k) hk1 (Kstarref ≤ M_σ Mref applied to k*) hcomm` gives
 `sigmaDecomposition (k·k*) = insert k ({k*} \ {1})`, of `ncard ≤ 2`.
 
-**Only mechanical gap (`sorry`):** the `k·k*` split — `z ∈ (Kref ⊔ Kstarref)` with `Kstarref`
-central there.  `Subgroup.mem_sup` (CommGroup `↥(Kref⊔Kstarref)` via `hZcyc.commGroup`) hit an
-instance diamond; redo via `Subgroup.mem_sup_of_normal_left` after establishing
-`(Kstarref.subgroupOf (Kref⊔Kstarref)).Normal` from centrality.  The `M̃`-piece
-(`sigmaLength_le_two_of_mem_Mtilde`) and the Cor 14.10 cover/conjugation plumbing are sorry-free. -/
+The `k·k*` split is implemented with `Subgroup.mem_sup_of_normal_left` after establishing
+`(Kref.subgroupOf (Kref ⊔ Kstarref)).Normal` from the centralizer inclusion.  The `M̃`-piece
+(`sigmaLength_le_two_of_mem_Mtilde`) and the Cor 14.10 cover/conjugation plumbing are likewise
+complete. -/
 theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {Mref Kref Kstarref Uref : Subgroup G}
     (hMref : Mref ∈ maximalSubgroups G) (hMPref : IsTypeP Mref) (hKMref : Kref ≤ Mref)
@@ -1368,4 +1369,3 @@ theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
     _ ≤ 2 := by omega
 
 end OddOrder.BG.Ch4.S14
-

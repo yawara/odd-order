@@ -5,6 +5,11 @@
 > 残 3 sorry = `theoremA_maximal_structure` / `theoremB_U_and_A_tame` / `aSets_support_slice` の
 > overstatement 宣言 (do-not-prove-as-is、faithful variant あり = memory [[ft-settled-findings]])。
 > 以下は履歴。
+>
+> **2026-07-15 更新**: bare `theoremA_maximal_structure` overstatement は consumer 0 を再確認後に
+> 宣言ごと retire。canonical Theorem A は
+> `theoremA_maximal_structure_faithful`。残る `theoremB_U_and_A_tame` /
+> `aSets_support_slice` は引き続き frozen legacy surface であり、faithful APIs を使用する。
 
 **スコープ**: BG §16 "The Main Results" (pp.123-134, mmd L4256-4449).
 **結果数**: Theorem A-E の 5 個の主要定理 + Theorem I, II + Proposition 16.1 (基礎補題, 型分類を統合).

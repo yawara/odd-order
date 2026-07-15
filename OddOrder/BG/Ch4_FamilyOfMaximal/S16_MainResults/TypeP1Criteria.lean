@@ -172,7 +172,8 @@ the Hall `(κ(M) ∪ σ(M))ᶜ`-complement `U` is trivial.  Type `P₁` means `�
 (`IsTypeP1.2`), so `π(M) ⊆ κ(M) ∪ σ(M)` and the prime set `(κ(M) ∪ σ(M))ᶜ` meets `π(M)` only in
 `∅`; a Hall `(κ ∪ σ)ᶜ`-subgroup of `M` therefore has order coprime to `|M|`, i.e. trivial.
 
-This is the `U = ⊥` conjunct of Theorem A(8) (`theoremA_maximal_structure`), now **derivable from
+This is the `U = ⊥` conjunct of the faithful Theorem A
+(`theoremA_maximal_structure_faithful`), now **derivable from
 `Thm 15.2 (mf_ne_msigma_typeP1_structure)`** via `isTypeP1_of_mf_ne_msigma`: `M_F ≠ M_σ ⟹ IsTypeP1 ⟹
 U = ⊥`.  Together with `|K| = p` (also a Thm 15.2 output) this leaves only `FittingIsTI M` for the
 full A(8).  Stated for the relative `U.subgroupOf M` (which is what the Hall hypothesis constrains);
@@ -613,7 +614,7 @@ out the `M_F ≠ M_σ` branch); `M = U M_σ` from Theorem A(3) with `K = ⊥`; `
 invariance of the generating set `{U ⊓ C_G(x) : x ∈ M_σ#}` (`conj_smul_centralizerGeneratedBySigma`,
 as `M_σ ◁ M`).  **Axiom-clean**: A(3) is `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` and the A(8)
 `U = ⊥` exclusion routes through `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` (Thm 15.2), not
-the `sorry` standalone `theoremA_maximal_structure`; `typeP_auxiliary_structure` is itself clean. -/
+the retired bare overstatement; `typeP_auxiliary_structure` is itself clean. -/
 theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKbot : K = ⊥)
@@ -622,8 +623,7 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     OddOrder.GroupTheory.IsTypeF M := by
   classical
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
-  -- Theorem A(3) decomposition `M = K U M_σ` (axiom-clean, via `hKM`/`hUM`; avoids the `sorry`
-  -- standalone `theoremA_maximal_structure`).
+  -- Theorem A(3) decomposition `M = K U M_σ` (axiom-clean via the faithful `hKM`/`hUM` inputs).
   have hA3 : M = K ⊔ U ⊔ Mσ := typeP_maximal_eq_kappaHall_sup_U_sup_Msigma hG hM hKM hUM hK hU
   -- `M_F = M_σ`: `U ≠ ⊥` excludes the type-`P₁` `U = ⊥` (Theorem A(8), via Thm 15.2).
   have hMFMσ : S15.MF M = Mσ := by
