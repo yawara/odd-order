@@ -287,3 +287,20 @@ Full flip の S-side λ atom を `CharacterDegreeData` なしで再構成した:
 **次 frontier**: T-side `η₁₀` correction/norm package を Core + `(hD, hQcomm)` 型で束ね、
 NormEstimates 5 obtain-sites の param 版へ接続する。その後 OrderDetermination consumers を
 param 版へ移し、legacy `CharacterDegreeData` wrappers/carrier を retire する。
+
+## ✅ lane a progress (2026-07-15) — chosen-base η₁₀ (13.5)/(13.8) package complete
+
+T-side の book-faithful correction を `CharacterDegreeData` なしで再構成した:
+
+- Coq `PFsection13.v` が補う (13.8) の行間どおり、`η₁₀` と直交する別の reducible `ν`-rowを
+  chosen base に選択した (clean branch は row 2、3-row flip branch は row 1)。
+- `exists_muT_index_core` の engine を「base が irreducibly induced **または** base coefficient が
+  zero」へ一般化し、旧 signature は compatibility theorem として保持した。正 index は
+  `δ = ±1` と zero base coefficient の矛盾から得るため、虚偽の irreducibility 仮定は不要。
+- chosen index から正規化 `ζ = p⁻¹ζᵢ`、`Q`-kernel correction `α`、point formula、
+  `|T'|-v²` first term、cross term、inflation を組み立て、abstract Case-B engine により
+  `eta10_Qsharp_norm_lower_core` を証明した。
+- 新 leaf は 393 行、`sorry`/新 `axiom` なし、leaf build green。
+
+**次 frontier**: hub 経由で λ/η₁₀ Core packages を使い、NormEstimates の analytic 5-site を
+`CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` param 版へ relayer する。

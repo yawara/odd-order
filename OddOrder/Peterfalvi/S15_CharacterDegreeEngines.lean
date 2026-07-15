@@ -67,10 +67,11 @@ open scoped FiniteInduce in
 set_option maxHeartbeats 1600000 in
 -- The (7.6)-family bookkeeping (constituent expansion + per-index coefficient computation)
 -- elaborates as a single large proof term; the default budget covers only part of it.
-/-- **The `T`-side (13.3.c) distinguished index over a chosen base** (Peterfalvi (13.8)-for-`T`,
-the core restatement of `exists_muT_index` — issue 2035 #22 T-side twin, #89 設計):
+/-- **The `T`-side (13.3.c) distinguished index over a chosen base, general form**
+(Peterfalvi (13.8)-for-`T`, issue 0116):
 with the (7.6) family `Q_sharp_hypothesis76_base` based at `ζ₀ = Ind_Q^T φ₀` (`Q ⊄ Ker φ₀`,
-`Ind φ₀` irreducible), under `D = ⊥` (so `K = QD = Q`) there is a family index `i₁` carrying a
+and either `Ind φ₀` irreducible or its `η₁₀` coefficient zero), under `D = ⊥` (so
+`K = QD = Q`) there is a family index `i₁` carrying a
 ν-row (`ζ_{i₁} = ν_r = ∑_j ν_{rj}`) with `⟨τψ_{i₁}, η₁₀⟩ = δ = ±1`, and every other
 `Q`-nonkernel coefficient vanishes; `‖ζ_{i₁}‖² = p` and `ζ_{i₁}(1) = pv`.
 
@@ -80,7 +81,7 @@ which imports `S15_Tau1T` (the reverse import would be a cycle).  The commutativ
 the (14.9)-gated `Q_elementaryAbelian_T`) enters as the explicit input `hQcomm`: it pins the
 family degrees (`ζ_i(1) = [T:Q]`, so `d ≡ 1`) and the degree-one hypotheses of the (13.2.e)
 bridge `tau1T_ofHonest_apply_induce_sub`. -/
-theorem Hypothesis.exists_muT_index_core [Finite G]
+theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
@@ -96,9 +97,14 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
         Set ↥(hyp.Q.subgroupOf hyp.T)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel
         (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)))
-    (hφ₀irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
-      (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
-        (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) :
+    (hφ₀base :
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter
+          (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+            (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)) ∨
+        ClassFunction.inner
+          (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
+            (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+              (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) hyp.eta10 = 0) :
     ∃ (i₁ : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1)) (δ : ℤ), 0 < i₁ ∧
       ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
         OddOrder.Peterfalvi.S03.characterKernel
@@ -315,6 +321,14 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
     rw [OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hKQ θ] at h
     rw [show hyp.eta10 = hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ from rfl,
       OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
+  have hφ₀eta : ClassFunction.inner
+      (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
+        (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+          (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) hyp.eta10 = 0 := by
+    rcases hφ₀base with hφ₀irr | hφ₀orth
+    · exact hetaQbrick (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)
+        φ₀.isIrreducible hφ₀Q hφ₀irr
+    · exact hφ₀orth
   -- distinct `Q`-inductions are orthogonal
   have hInd0 : ∀ θ ψ : OddOrder.RepresentationTheory.IrreducibleCharacter
       ↥(hyp.Q.subgroupOf hyp.T),
@@ -502,9 +516,16 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
   have hi₁pos : 0 < i₁ := by
     rw [Fin.pos_iff_ne_zero]
     intro h0
-    apply hyp.nuRow_not_irreducible pins r
-    rw [← hζi₁, h0, hζ0]
-    exact hφ₀irr
+    have hbaseEq : (∑ j : Fin hyp.p, hyp.nu r j)
+        = ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+            (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) := by
+      rw [← hζi₁, h0, hζ0]
+    have hinnerEq := congrArg
+      (fun χ : ClassFunction ↥hyp.T ℂ => ClassFunction.inner
+        (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief χ) hyp.eta10)
+      hbaseEq
+    rw [hkeyr, hφ₀eta] at hinnerEq
+    rcases hδpm with hδ | hδ <;> rw [hδ] at hinnerEq <;> norm_num at hinnerEq
   -- family degrees are constant (`Q` abelian) ⟹ `d ≡ 1`
   have hzeta_one : ∀ j : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1),
       (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta j 1
@@ -545,7 +566,7 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
       ← hbridgeQ θrQ (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) hθrQirr
         φ₀.isIrreducible hθrQfull hφ₀Q,
       map_sub, ClassFunction.inner_sub_left, ← hνeqQ, hkeyr,
-      hetaQbrick (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) φ₀.isIrreducible hφ₀Q hφ₀irr,
+      hφ₀eta,
       sub_zero]
   -- conjunct 5: all other `Q`-nonkernel coefficients vanish
   have hmid : ∀ i : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1), 0 < i → i ≠ i₁ →
@@ -589,7 +610,7 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
       ← hbridgeQ θiQ (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)
         hθiQirr φ₀.isIrreducible hθiQfull hφ₀Q,
       map_sub, ClassFunction.inner_sub_left,
-      hetaQbrick (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) φ₀.isIrreducible hφ₀Q hφ₀irr,
+      hφ₀eta,
       hTau1IndEta θiQ hθiQirr hθiQfull hne,
       sub_zero]
   -- conjuncts 6, 7 and the sign square
@@ -608,6 +629,46 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
   refine ⟨i₁, δ, hi₁pos, ?_, hδ2, hc1, hmid, hnormSq, hdegVal⟩
   rw [hζi₁]
   exact hQkerNu
+
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The `T`-side (13.3.c) distinguished index over an irreducibly induced base**
+(Peterfalvi (13.8)-for-`T`, issue 2035 #90): compatibility form of
+`exists_muT_index_core_of_base_condition`. -/
+theorem Hypothesis.exists_muT_index_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hD : hyp.D = ⊥)
+    (hQcomm : IsMulCommutative ↥hyp.Q)
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.T))
+    (hφ₀Q : ¬ (((hyp.Q.subgroupOf hyp.T).subgroupOf (hyp.Q.subgroupOf hyp.T) :
+        Set ↥(hyp.Q.subgroupOf hyp.T)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)))
+    (hφ₀irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+        (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) :
+    ∃ (i₁ : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1)) (δ : ℤ), 0 < i₁ ∧
+      ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i₁)) ∧
+      δ ^ 2 = 1 ∧
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).cCoeff hyp.eta10 i₁ = (δ : ℂ) ∧
+      (∀ i : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1), 0 < i → i ≠ i₁ →
+        ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i)) →
+        (Q_sharp_hypothesis76_base hG hyp hvd φ₀).cCoeff hyp.eta10 i = 0) ∧
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zetaNormSq i₁ = (hyp.p : ℂ) ∧
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i₁ 1 = ((hyp.p * hyp.v : ℕ) : ℂ) := by
+  exact hyp.exists_muT_index_core_of_base_condition hG hnoV pins hvd hTP Tdata hU hW1 hW2
+    chief hD hQcomm φ₀ hφ₀Q (Or.inl hφ₀irr)
 
 section GenericAlphaIntegrality
 
