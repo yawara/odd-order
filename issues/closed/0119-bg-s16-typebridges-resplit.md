@@ -40,3 +40,12 @@ created: 2026-07-15
 - `issues/closed/0078-s16-mainresults-split.md`
 - `issues/closed/0118-lane-redesign-2026-07-15-endgame.md` (c-2)
 - merge commit `72847361`
+
+## ✅ 完了 (2026-07-15)
+
+- c-2 完了後の凍結条件を再確認し、type-V forward cluster を安全な宣言境界で分割。
+- `S16_MainResults/TypeVSinger.lean` (605 行) に Singer structure と Prop. 16.1(d) forward bridge を移した。
+- 親 `TypeBridges.lean` は reverse classification / Theorem A cluster を保持して 977 行。
+- 分割前後の宣言名 multiset は完全一致し、機械移動により signature と下流 module 名を保存。
+- 当該 cluster の実 `sorry` は 0 → 0、BG hub・Peterfalvi downstream の import closure も維持。
+- focused build 3208 jobs、`lake build OddOrder OddOrder.AxiomsCheck` 4246 jobs 完走・AxiomsCheck OK。
