@@ -467,6 +467,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 条件は (i) Core correction と互換入口の配線に直結、(ii) b の別 active 宣言に非接触、
 > (iii) signature 破壊・新 axiom・sorry regression なし、(iv) build green。merge `38054779` の
 > genuine proven output を保全する軌道修正であり、両 file 全体の所有移管ではない。0116 full flip 完了で失効。
+> **⟹ carve-out 拡張 (hub 裁定 2026-07-15 tick #6、merge `4ca952f5`)**: 上記に加え
+> `S15_SAndT_Setup/TSideDegrees.lean` の **additive 宣言 `Hypothesis.Q_elementaryAbelian`** (一般 type-P
+> の (13.2.b)-for-T Q elementary-abelian、(14.9) 以前に §9 chief-factor collapse で構成、sorry-free) を
+> 0116 full flip 完了まで lane a に限定付与する。同 file は名目 b territory (2035 char cascade landing 先)
+> だが本宣言は 0116 が producer として明記 (issue 0116:108-109/152 の hQ 場内 discharge) する on-path work。
+> 条件: (i) 純 additive (既存 b 宣言の statement/proof 改変は逸脱)、(ii) sorry/axiom regression なし、
+> (iii) build green。⟹ step 1.5 で a が TSideDegrees に本宣言 (+同 flip cluster の additive 追加) を
+> 足しても逸脱でない (b が編集したら従来どおり b 領域; a が既存 b 宣言を改変したら逸脱)。0116 full flip 完了で失効。
 
 > **🚦 現行 = visit-time trial merge (ユーザー裁定 2026-07-15; tick-wide pre-freeze を置換)**:
 > tick 冒頭で全レーン tip を一括凍結しない。レーンを一つずつ訪問し、未マージがあれば pre-merge
@@ -660,6 +668,23 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (15分 tick #6、Opus hub — 新監視セッション、全レーン codex 運用) — ★ a: 0116 type-II cycle 除去。census 32 不変**:
+  ユーザー「各レーンを監視します。各レーンは現在すべて codex で回っています」で監視再開。
+  main=`86341340` clean・origin 同期を確認 (`bin/count-sorry` 32)。
+  **a (visit)** = 訪問時 tip `1243559d` を trial merge したが live-branch race で `MERGE_HEAD` は
+  `193999c6` (= 同 feature + main-sync merge、staged .lean diff は 1243559d と同一の 4 file/+37-12) に固定。
+  a の次 commit `525435ab` は取り込まれず次回訪問へ。0116 full-flip の core work:
+  `c_eq_one_of_T_typeII` を (14.9)-gated `hTTypeII` 依存から解放し `c_eq_one_of_lambda_dichotomy`
+  にリネーム、commutativity を一般 type-P の新規 `Hypothesis.Q_elementaryAbelian` (TSideDegrees.lean
+  +25 sorry-free) から供給して (13.12)↔(14.9) 循環を回避。CharacterDegreeEngines/CountingLayer は
+  docstring のみ。**scope**: TSideDegrees.lean は名目 b territory (2035 char cascade の landing 先) だが
+  a の追加は純 additive・sorry-free・0116 flip の明記 producer (0116:108-109/152) ゆえ **0116 限定
+  decl-unit carve-out で保全** (tick #5 の S15_CharacterDegreeEngines/DegreesFirstSplit carve-out と
+  同型、下記 0116 carve-out 拡張)。b は当該 file 非 active (0 ahead)、既存 b 宣言無改変。
+  merge `4ca952f5`、full build/AxiomsCheck **4232 jobs green**、census **32** 不変、新 axiom/sorry
+  regression なし。**b** = `main..b` 空で skip (no work)。**c** = `main..c` は main-sync merge のみで
+  tree diff 空、skip (0116 full-flip landing 待ちで HOLD、tick #4/#5 と同状態)。
+  push `86341340..4ca952f5`。**運用**: 監視 cron を Opus 対応 15 分 `7,22,37,52` で再作成。
 - **2026-07-15 (15分 tick #5、Codex hub) — ★★ B current → A current 合流、census 33→32**:
   ユーザー指示どおり C を先に確認。訪問時の c は main 同期 merge のみで `main...c` tree diff が空、
   したがって empty merge は作らなかった。issue 9077/0118 を再監査し、c-1/c-2 は完了済み、
