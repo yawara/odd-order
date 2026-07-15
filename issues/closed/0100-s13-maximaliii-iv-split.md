@@ -53,3 +53,5 @@ created: 2026-07-08
   両 S13 file とも a の active frontier (S13 char-核) ゆえ分割は依然保留。
 - 9075 (norm-general engine + caseB rewire) は CLOSE 済。次の S13 frontier が落ち着いた段階で
   hub が両 file の凍結クラスタ (§13.1-13.x landed 部) を上流 leaf へ prefix-split する。
+
+## ✅ CLOSED (hub 裁定 2026-07-15 tick #8): S13_MaximalIII_IV 1207行 (<1500), split 完了。実施 owner=hub の split 完了確認済。

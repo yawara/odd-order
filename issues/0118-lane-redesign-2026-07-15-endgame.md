@@ -151,3 +151,54 @@ issue 9096 記載の c-owned S16 call-site rewire 待ち。
 - issues/0115 (前回再設計)、0116 (flip 設計正本)、9096 (ν-carrier)、9077 (c hold)、
   2035 (b campaign)、closed/9087 (lane a 完遂)
 - notes/meta/ft_lane_reallocation_2026_06_28.md「3 レーン再設計 (2026-07-15)」節
+
+## 🧭 HUB 中間裁定 (2026-07-15 tick #8, Opus hub) — B/C block 精査 + 役割補正
+
+ユーザー「B, C がブロックされています。役割は？HUB 裁定が必要なものを」を受け、hub 4 並列監査
+(b-frontier / c-frontier / a-flip / pending-rulings) で全レーンの gating 実態を確認・裁定した。
+
+### 結論: B/C の block は**設計どおりで正当** (idle-wait は busywork でない)
+
+- **a**: 0116 full flip を**継続中・近接だが未 landing**。honest 置換 chain (S15_CaseBEndgameSupply/ +
+  `_core` twins + OrderDetermination param split + `c_eq_one_of_lambda_dichotomy`) は全て sorry-free
+  で構築済。残り = mid-layer consumer への c=1 threading (数 tick) + **cut-over + legacy-retire の 1
+  assembly commit** (これが flip root #1/#2/#3/#7-half を一括除去)。数学的ブロッカーなし・機械的配線のみ。
+- **b**: 3 owned FT-path sorry (`T_isTypeP2_gate` #7 / `V_inf` #5=c-3 carve-out / `nuGridSupply` #4) は
+  **全て a flip または c-site に gated**。upstream の genuine math は 2035 #82-#91 で**完全に discharge 済**
+  (hT2 sweep / core twins / QD_sharp / δ′)。**新規 ungated skeleton は残っていない** → idle-wait が正当。
+- **c**: **c 所有 file の実 sorry = ゼロ** (c-1/c-2 完了、S16 の sorry token は全て docstring)。唯一の
+  c-assignable FT sorry = #5 V_inf (b-owned SAndTBasic の c carve-out) は a flip に gated。V_inf の
+  skeleton-ahead は技術的に可能だが (i) producer `T_side_D_eq_bot` が pre-flip で sorryAx-dirty、
+  (ii) 除去に SAndTBasic normalizer_W1 chain の threading = a flip と衝突、ゆえ **dirty churn で非推奨**。
+- **FT endgame は a の serial flip に収束**しており、flip は分割すると signature churn を招く (0118 の
+  a 単独割当理由) ため parallelize 不可。∴ b/c の gated 状態は「上流枯渇の自然な収束」であって
+  mis-assignment でない。
+
+### 是正 1: c-2.5 挿入 (0118 coordination gap) — root #4 の c-owned rewrite
+
+**b-5 Phase B の c 所有 6-site rewrite が c task 一覧から漏れていた** (9096 に記録あるが 0118 c-1..c-4
+に非掲載)。これは ungated on-path work (a-1 honest carrier landed) → **c-2.5 として c の即時タスクに挿入**。
+詳細・6 site・検証要件 = issue 9096「HUB RULING (tick #8)」。landing で b-5 Phase B (b が default+generic
+削除) → **root #4 除去**。c-frontier 監査はこれを surface しなかった (c 所有 sorry 削減に scope 限定;
+本 work は b 所有 sorry #4 を削減、work は c files) — hub が cross-lane 視点で拾った。
+
+### 是正 2: c の flip 待ち中の productive option = c-4 diagnostic prep
+
+c-2.5 landing 後も flip landing まで idle になるため、**c-4 の diagnostic 前倒し** (現 main の
+`#print axioms feitThompson`/`nonexistence_of_G`/`noMinimalSimpleOdd` の authoritative edge-probe で
+どの root が流入中かを列挙) を許可。これは verification bookkeeping (sorry 削減でない) だが flip 後の
+c-4 総仕上げの土台になり、閉じ残し root の早期検出に効く。busywork でなく endgame 検証の前倒し。
+
+### 是正 3: 9103 Phase 2 を landing-flag chain に組込 (b からの hub flag 受理)
+
+issue 9103 (S_typeP2 field removal) Phase 2 は a-flip + c-owned sites 交差ゆえ b-2 と同 gated。
+0118 の landing-flag 運用に **Phase 2 kickoff を追加**: **a flip cut-over landing → (b-2 body = S_typeP2
+field 削除 + T_isTypeP2_gate 削除) + (9103 Phase 2)** を同時 kickoff。root #4 (9096) は本 campaign と独立
+(swap の pins 入力)。
+
+### landing-flag 更新版 (hub 追跡)
+
+- **a-1 (ν-carrier) landed** → c-2.5 (9096 6-site rewrite) kickoff = **今** (本裁定で発火)。
+- **c-2.5 landed** → b-5 Phase B (b が default+generic 削除) kickoff → root #4 除去。
+- **a-2 (0116 flip cut-over+retire) landed** → c-3 (V_inf discharge) + b-2 body + 9103 Phase 2 kickoff。
+- **全 WS 完了** → c-4 最終 axiom trace (diagnostic 前倒し分を本番化)。

@@ -295,3 +295,38 @@ c rewire landing 後、b が即座に 5 default と
 `S15.Hypothesis.nuGridSupply` declaration を削除し、consumer 0 を grep + full build +
 AxiomsCheck で検証して 9096 を close する。Phase A 検証:
 `lake build OddOrder` green (4227 jobs、AxiomsCheck OK)。
+
+## 🧭 HUB RULING (2026-07-15 tick #8, Opus hub 自律裁定) — c-owned 6-site rewrite を c の即時タスク化 (0118 coordination gap 是正)
+
+**発端**: ユーザー「B, C がブロックされています。各レーンの役割は？HUB 裁定が必要なものを」。hub 4 並列監査
+(b-frontier / c-frontier / a-flip / pending-rulings) で判明した coordination gap を裁定する。
+
+**認定**: b-5 Phase B (root #4 `nuGridSupply` retire) の残工程 = **c 所有 6 S16 call-site の pins rewrite**
+は、**issue 0118 の c タスク一覧 (c-1..c-4) に載っておらず宙に浮いていた**。これは ungated な on-path work:
+- a-1 (5da9b274) が S16-level `Hypothesis` に **honest carrier field**
+  `nuGridSupply : NuGridSupplyData base` (S16_CoreLemmas.lean:47) を追加済 = a flip 非依存で landing 済。
+- 現状 6 site は boundary theorem を **pins 無し**で呼び sorried default `hyp.base.nuGridSupply hG`
+  (root #4) を継承。`(pins := hyp.nuGridSupply)` (honest S16 field) を渡せば spine から root #4 の
+  sorried default が外れる (churn でなく genuine — hub が carrier field の honest 性を確認済)。
+
+**裁定 (c への割当、= 新 c-2.5)**: lane c は以下 6 site を rewrite せよ (0118 c task に挿入):
+1. `S16_NonExistenceG/TTypeII.lean` : `T_caseB_facts_unconditional`
+2. `S16_NonExistenceG/SubgroupM.lean` : `T_caseB_facts_unconditional`
+3. `S16_NonExistenceG/ComparingLM.lean` : `typeI_caseC_dual_dichotomy`
+4. `S16_NonExistenceG/SubgroupMCore.lean` : `typeIOrthogonalityGridData_of_coherent78`
+5. `S16_NonExistenceG/BetaVanishing.lean` : `typeI_orthogonality_dichotomy`
+6. `S16_NonExistenceG/SubgroupL.lean` : `typeII_overNormalizer_frobenius`
+各呼出に `(pins := hyp.nuGridSupply)` (honest S16 carrier field) を渡す。landing 後 b (b-5 Phase B) が
+5 optParam default + generic `S15.Hypothesis.nuGridSupply` (HypothesisSwap:134) を削除し **root #4 除去**。
+**検証必須**: c/b とも `lake build OddOrder OddOrder.AxiomsCheck` で当該 endpoint の #print axioms から
+sorryAx (root #4 由来) が消えることを確認 (単なる依存シャッフルでないことの ground truth)。
+
+**a flip との調整**: a の 0116 flip cut-over は同じ S16 files (SubgroupM/ComparingLM/BetaVanishing/SubgroupL)
+で c=1 threading を予定するが、pins named-arg 挿入は c=1 cite 変更と**別引数・別 root** (#4 vs #1/#2/#3)
+ゆえ textual 衝突リスクは低い。並行進行可、軽微 conflict は hub が merge 時に解決 (AxiomsCheck/OddOrder
+独立追記と同クラス)。順序依存なし。
+
+**根拠 (policy)**: gated lane も ungated on-path work に engage する ([[feedback-no-avoiding-hard-parts]])。
+本件は c 唯一の genuine ungated near-term item で、landing すれば FT root を 1 本 (#4) 実際に除去する。
+c-frontier 監査が本件を surface しなかったのは「c 所有 sorry 削減」に scope 限定したため (本 rewrite は
+b 所有 sorry #4 を削減するが work 自体は c files) — hub が cross-lane 視点で拾って割当。

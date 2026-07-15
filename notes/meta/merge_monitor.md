@@ -291,6 +291,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 逸脱; b はこの entry point を専有維持)。判定 = decl 単位 (混在 leaf)。merge-safety 全通過確認済
 > (build green 4177 / sorry 65→65 / 新 axiom なし / b entry point preserved decl 16→16 / b 非 ahead で
 > collision なし)。**(10.8) 閉包 landing で失効**。詳細 = issues/0101「HUB RECONCILIATION」節。
+> **❌ 失効確認 (hub 裁定 2026-07-15 tick #8)**: trigger の (10.8) knot = **issue 1025 CLOSED**
+> (`issues/closed/1025-*`)、9087 も CLOSED。⟹ 上記 0101 RECONCILIATION (a への S11_NineElevenCaseA
+> 一時編集権) は**失効**。以後 a が S11_NineElevenCaseA を編集したら通常どおり逸脱、**恒久所有 = b**
+> (0101 本体 carve-out どおり; Phase E machinery も b 所有として扱う — a は 10.8 閉包で当該 threading を
+> 完遂済、追加編集の必要なし)。b は entry point + Phase E 宣言とも専有。
 > **carve-out (issue 2035, hub 裁定 2026-07-14 監視 tick 20 — merge 側で記録)**:
 > `OddOrder/Peterfalvi/S11_MaximalII_III_IV/InnerCompHom.lean` の **caseB-Xi / `CliffordCaseBData`
 > reverse-characterization 系宣言** (`caseB_xiOf_H0C_eq_induce_hcPsi` / `caseB_xiOf_H0Cprime_eq_induce_hcPsiPair` /
@@ -678,6 +683,32 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #8、Opus hub — ユーザー要請「B/C block + 役割 + 全 HUB 裁定」) — ★★ 合流なし・cross-lane 裁定 tick**:
+  ユーザー発議で hub 4 並列監査 (b-frontier / c-frontier / a-flip / pending-rulings) を実施し、全レーンの
+  gating 実態を確認・裁定。**Lean 変更なし** (issue/notes のみ)。
+  **役割正本 = issue 0118**。**結論: B/C の block は設計どおりで正当** (a の serial 0116 flip に endgame
+  収束、b/c の ungated upstream は完全枯渇 = 2035 #82-91 + c prime-TI/field-model で discharge 済、
+  idle-wait は busywork でない)。**a flip は近接だが未 landing** (honest 置換 chain 全 sorry-free 構築済、
+  残 = 数 threading tick + cut-over+retire の 1 assembly commit)。
+  **裁定 (全て hub 自律、AskUserQuestion 不使用)**:
+  1. **c-2.5 挿入 (0118 gap 是正)**: b-5 Phase B の c 所有 6-site pins rewrite (root #4) が c task 一覧から
+     漏れていた → c の即時タスク化 (ungated、a-1 honest carrier landed 済、hub が carrier clean 性確認)。
+     詳細 = 9096「HUB RULING tick #8」。landing で b が default+generic 削除 → root #4 除去。
+  2. **c-4 diagnostic 前倒し許可** (flip 待ち中の c productive option、verification prep)。
+  3. **9103 Phase 2 を landing-flag chain に組込** (b-2 body と同 gated、a flip cut-over で kickoff)。
+  4. **resolved split 3 件 close**: 0074 (S01_Solvable 1426<1500) / 0100 (S13_MaximalIII_IV 1207) /
+     0112 (HypothesisBasics 1355) — 全て split 完了・閾値未満。
+  5. **失効 carve-out マーク**: 0101 RECONCILIATION (a への S11_NineElevenCaseA 一時編集権) = trigger
+     (10.8)/issue 1025 CLOSED ゆえ**失効**、恒久所有 b へ復帰。9087 RULING #4 は 07-14 に失効済 (既マーク)。
+  6. **S03f_Thm36 (3822 行)**: 単一巨大宣言 `thm36_aux` (~3.7k 行) ゆえ分割不能 = file 冒頭に明示
+     override (`linter.style.longFile 4000`) 済 → **sanctioned exception と裁定** (AxiomsCheck 機械列挙と
+     同クラス、split issue 不要)。frozen sorry-free。
+  7. **0119 (TypeBridges 1542 行 split)**: hub-owned queue に維持 (<2000、非緊急、frozen BG 境界で随時実施)。
+     次点 = 0070 (S08_CaseBAssembly 1992 = hard limit 最接近)。
+  8. **3004 unsound-carrier 懸念 = 解決済確認** (MHypothesis 無条件 field 4 本削除・(14.10) 再 sorry-free 化、
+     b dichotomy restate landed) → STOP 該当なし。9085 (c dedup) は c work に bundle、0120 (lakefile) は
+     post-flip all-idle に defer。
+  詳細 = issues/0118「HUB 中間裁定 tick #8」+ 9096「HUB RULING tick #8」。**cron 継続** (15分 `7,22,37,52`)。
 - **2026-07-15 (15分 tick #7、Opus hub) — ★ a: 0116 c=1 threading ((13.16) W2-side + complement)。census 32 不変**:
   main=`ff9919cc` clean・origin 同期・census 32。**a (visit)** = tip `27c405e9` を trial merge
   (race なし)、3 feature commit (mu vanishing / W2 normalizer / complement structure、いずれも
