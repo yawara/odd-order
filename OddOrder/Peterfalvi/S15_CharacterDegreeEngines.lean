@@ -77,8 +77,8 @@ and either `Ind φ₀` irreducible or its `η₁₀` coefficient zero), under `D
 
 Lives here (not `S15_Tau1T`) because `Q_sharp_hypothesis76_base` is declared in this file,
 which imports `S15_Tau1T` (the reverse import would be a cycle).  The commutativity of `Q`
-(the abelian half of the (13.2.b)-for-`T` "Q elementary abelian", whose §13-internal route is
-the (14.9)-gated `Q_elementaryAbelian_T`) enters as the explicit input `hQcomm`: it pins the
+(the abelian half of the (13.2.b)-for-`T` `Q_elementaryAbelian`, constructed from the general
+type-`P` chief-factor collapse) enters as the explicit input `hQcomm`: it pins the
 family degrees (`ζ_i(1) = [T:Q]`, so `d ≡ 1`) and the degree-one hypotheses of the (13.2.e)
 bridge `tau1T_ofHonest_apply_induce_sub`. -/
 theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
@@ -783,8 +783,8 @@ open scoped FiniteInduce in
 restatement of `exists_etaT_alphaFun_one_int` (Peterfalvi (13.5.a)-for-`T` integrality,
 issue 2035 #22 T-side twin): `α(1) ∈ ℤ` for the `Q`-kernel tail `α = hypothesis76AlphaFun` of
 the `(T, Q^#)` (7.7.a) decomposition of `η₁₀`.  The commutativity of `Q` (the abelian half of
-the (13.2.b)-for-`T` "Q elementary abelian", whose §13-internal route is the (14.9)-gated
-`Q_elementaryAbelian_T`) enters as the explicit input `hQcomm`: it makes `α|_Q ∈ ℤ[Irr Q]`
+the (13.2.b)-for-`T` `Q_elementaryAbelian`, available before (14.9)) enters as the explicit
+input `hQcomm`: it makes `α|_Q ∈ ℤ[Irr Q]`
 via the integer (7.7.a) coefficients (`Q_sharp_hypothesis76_base_cCoeff_int`, using
 `η₁₀ ∈ ℤ[Irr G]` = `eta10_mem_ZIrr`) through the generic route
 (`hypothesis76AlphaFun_one_int`). -/

@@ -377,7 +377,7 @@ discharge した後、mid-layer/S16 consumer を順次付け替え、legacy wrap
 **次 frontier**: 文書順で最上流の `c_eq_one` mid-layer consumer から明示版を追加し、
 Core supply を末端まで thread する。旧名は downstream 移行完了まで互換境界として保持する。
 
-## ✅ lane a progress (2026-07-15) — honest unconditional `c = 1` endpoint
+## ✅ lane a progress (2026-07-15) — type-II-conditional `c = 1` endpoint
 
 `Hypothesis.c_eq_one_of_T_typeII` を `OrderRelayer` に追加した。legacy の無条件 λ-carrier を
 使わず、Peterfalvi (13.3.b) の正しい dichotomy で (13.12) を組み立てる:
@@ -388,6 +388,36 @@ Core supply を末端まで thread する。旧名は downstream 移行完了ま
 - no-λ Galois branch: `lambdaCluster_or_caseB` が直接 `C = ⊥` を返すため、`c = |C| = 1`。
 
 入力は genuine な `IsTypeII T` と canonical `NuGridSupplyData` のみ。leaf build green。
+ただし後続の依存監査で、現在の `S16.T_typeII` が `betaGrid_A0_support` → 旧
+`c_eq_one` を経由することが判明したため、これは最終的な無条件供給点ではなく循環診断用の
+中間 endpoint である。
 
-**次 frontier**: Core より上流の `C_eq_bot` / `U_inf_centralizer_P_eq_bot` /
-BridgeCharacter consumers を `hc1 : c = 1` 明示版へ分離し、S16 側から本 endpoint を注入する。
+## ✅ lane a progress (2026-07-15) — type-II cycle removed from `c = 1`
+
+Coq `PFsection13.FTtypeP_facts` / `FTtypeP_Fitting_abelian` を再確認し、(13.10) が必要とする
+`Q` 可換性は (14.9) type-II ではなく上流の一般 type-`P` 構造から得るのが正しいことを確認。
+Lean 側でその既存 chief-factor spine を束ねた:
+
+- `Hypothesis.Q_elementaryAbelian`: unconditional `card_Q_eq_qp` と
+  `toTypesIIIIIIVSetupT_chief_N_eq_bot` により `Q/N = Q`、`chiefFactorT_p_eq` により chief prime
+  `= q` として、`Q` の elementary-abelian 構造を構成。
+- `Hypothesis.c_eq_one_of_lambda_dichotomy`: λ branch は上記 `Q` 可換性と Core (13.10)、
+  no-λ branch は `C = ⊥` を用いる。`IsTypeII T` 入力を完全に削除。
+
+これで (13.12) は (14.9) を cite せず、逆に (14.9) の bridge-character body へ供給可能な
+真の上流 endpoint になった。
+
+**次 frontier**: `C_eq_bot` / `U_inf_centralizer_P_eq_bot` / BridgeCharacter の consumer 鎖を
+`hc1 : c = 1` 明示版へ分離し、この endpoint を S16 側へ thread する。
+
+## HUB RULING (2026-07-15, Codex hub)
+
+Core η₁₀ correction / full-flip relayerに直結する
+`S15_CharacterDegreeEngines.lean` と `S15_SAndT_Setup/DegreesFirstSplit.lean` の proof/API hunk は、
+0116 完了まで lane a の限定 carve-out とする。merge `38054779` の変更は genuine proven output で、
+b の active hunk と非交差、公開旧 API も互換入口として維持されているため保全する。両 file 全体の所有移管ではなく、
+unrelated な編集は引き続き lane b 所有。0116 full flip 完了で失効する。
+
+公理監査では、明示解析不等式から (13.11)–(13.15) へ進む算術 API は axiom-clean。
+Q-side η₁₀ norm bound を通る Core 上位 endpoint は既存 `nuGridSupply` prerequisite の `sorryAx` を継承するが、
+本 range に新規 `sorry` / `axiom` / regression はない。この既存依存は full flip 後続で解消する。

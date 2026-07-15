@@ -27,7 +27,7 @@
 
 | lane | branch | worktree | クラスタ (2026-07-15 issue 0118) | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
-| **a** | `a` | `odd-order-a` | **(a-1) 9096 ν-carrier threading → (a-2) 0116 full flip 実行 (hub 移譲)** → (a-3) chain clean 化 assert | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) + **flip-scope carve-out: `S15_SAndT_Setup/{NormEstimates,CountingLayer,Machinery135}.lean`** | 1000 |
+| **a** | `a` | `odd-order-a` | **(a-1) 9096 ν-carrier threading → (a-2) 0116 full flip 実行 (hub 移譲)** → (a-3) chain clean 化 assert | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) + **flip-scope carve-out: `S15_SAndT_Setup/{NormEstimates,CountingLayer,Machinery135,DegreesFirstSplit}.lean` + `S15_CharacterDegreeEngines.lean`** (0116 直結 hunk のみ、full flip 完了で失効) | 1000 |
 | **b** | `b` | `odd-order-b` | **(b-1) δ′ restate-drop 実装 (最優先) → (b-2) T_isTypeP2_gate resolution → (b-3) sibleyTarget_S restate/retire → (b-4) CDS 分割 → (b-5) ν consumer 切替** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096。**⚠ hold: NormEstimates/CountingLayer は a の flip landing まで touch 禁止** | 2000 |
 | **c** | `c` | `odd-order-c` | **(c-1) caseB_order_u_data bridge retire (即) → (c-2) BG vestigial 整理 (即) → (c-3) V_inf discharge-leaf 充填 (a flip 後) → (c-4) feitThompson 最終 axiom trace** · operator = codex 5.6 or Claude (0105 KEEP) | `Peterfalvi/S16_NonExistenceG.lean(+/**)` + 既存 carve-out + **削除 carve-out: CaseBOrder.lean の bridge 2 宣言 (0118 条件付き)** | 3000 |
 | ~~**d**~~ | — | — | ⚰ **退役 (2026-07-07, ユーザー裁定)** — codex 運用 shared-infra レーン。worktree/branch 削除済 | — | — |
@@ -461,20 +461,54 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 込みで build green、(iv) issue 2034/3002 で self-flag。**2034/3002 完了で失効**。Hypothesis76 以外の
 > S09_NonexistenceCertain 編集は従来どおり逸脱。
 
-1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
+> **carve-out (issue 0116, hub 裁定 2026-07-15 Codex tick #5)**: lane a の Core η₁₀ correction / full-flip
+> relayer が直接必要とする `S15_CharacterDegreeEngines.lean` と
+> `S15_SAndT_Setup/DegreesFirstSplit.lean` の proof/API hunk を、0116 完了まで lane a に限定付与する。
+> 条件は (i) Core correction と互換入口の配線に直結、(ii) b の別 active 宣言に非接触、
+> (iii) signature 破壊・新 axiom・sorry regression なし、(iv) build green。merge `38054779` の
+> genuine proven output を保全する軌道修正であり、両 file 全体の所有移管ではない。0116 full flip 完了で失効。
+> **⟹ carve-out 拡張 (hub 裁定 2026-07-15 tick #6、merge `4ca952f5`)**: 上記に加え
+> `S15_SAndT_Setup/TSideDegrees.lean` の **additive 宣言 `Hypothesis.Q_elementaryAbelian`** (一般 type-P
+> の (13.2.b)-for-T Q elementary-abelian、(14.9) 以前に §9 chief-factor collapse で構成、sorry-free) を
+> 0116 full flip 完了まで lane a に限定付与する。同 file は名目 b territory (2035 char cascade landing 先)
+> だが本宣言は 0116 が producer として明記 (issue 0116:108-109/152 の hQ 場内 discharge) する on-path work。
+> 条件: (i) 純 additive (既存 b 宣言の statement/proof 改変は逸脱)、(ii) sorry/axiom regression なし、
+> (iii) build green。⟹ step 1.5 で a が TSideDegrees に本宣言 (+同 flip cluster の additive 追加) を
+> 足しても逸脱でない (b が編集したら従来どおり b 領域; a が既存 b 宣言を改変したら逸脱)。0116 full flip 完了で失効。
+> **⟹ carve-out 拡張 #2 (hub 裁定 2026-07-15 tick #7、merge `5a29403d`)**: `S15_SAndTDefs.lean` の
+> **(13.16) W2-side c=1 threading** (`U_inf_centralizer_P_eq_bot` / `normalizer_U_inf_W2_eq_bot(_of_data)` /
+> `normalizer_W2_within_S` / `normalizer_W2_structure` / `normalizer_W2` の `_of_c_eq_one` 明示 param 変種
+> 追加 + 旧 signature の compatibility-entry 化) を 0116 full flip 完了まで lane a に限定付与する。同 file は
+> 名目 b territory (S15_SAndT prefix-split) だが、これら (13.16) mid-layer consumer は 0116:112 が
+> full-flip target と明記する on-path 宣言。条件 (全て満たす): (i) **既存 b 宣言の signature を compat entry
+> として温存** (下流無破壊、原名は 1 定義ずつ残存)、(ii) 追加は `_of_c_eq_one` 明示 param 変種のみで
+> 既存 statement/proof の意味不変、(iii) sorry/axiom regression なし、(iv) build green。⟹ step 1.5 で a が
+> S15_SAndTDefs の c=1 threading 系宣言を編集しても逸脱でない (b が編集したら従来どおり b 領域; a が
+> compat entry を壊す・既存 b 宣言の statement を改変したら逸脱)。0116 full flip 完了で失効。
+
+> **🚦 現行 = visit-time trial merge (ユーザー裁定 2026-07-15; tick-wide pre-freeze を置換)**:
+> tick 冒頭で全レーン tip を一括凍結しない。レーンを一つずつ訪問し、未マージがあれば pre-merge
+> sorry 数を取った直後に `git merge --no-ff --no-commit <branch>` を行う。その時点の exact snapshot は
+> `MERGE_HEAD` に固定されるため、scope / claim / axiom / sorry / root / build の全検査を
+> `MERGE_HEAD` と staged tree に対して行う。検査中に branch が進んでも取り込まれず、次回訪問へ回る。
+> 各 lane の commit 後は main clean を確認してから次 lane を訪問する。
+
+1. 各レーンを訪問した時点で未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
+   未マージがあれば `bin/count-sorry` を記録し、直ちに
+   `git merge --no-ff --no-commit <branch>` → `tip=$(git rev-parse MERGE_HEAD)` とする。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
-   **マージ前**に**そのレーンが実際に変更したファイル**を取得し、上記 🔒 所有マップに照らす。
-   **⚠ 必ず 3-dot `main...<branch>`（merge-base からの branch 側差分）を使う** — 2-dot `main..<branch>`
+   **visit-time trial merge 直後**に**そのレーンが実際に変更したファイル**を取得し、上記 🔒 所有マップに照らす。
+   **⚠ 必ず 3-dot `main...MERGE_HEAD`（merge-base からの取り込み側差分）を使う** — 2-dot `main..MERGE_HEAD`
    は端点差分で「レーンが main に遅れている分（他レーンの merge で main 側だけ進んだ S05/S06/S11 等）」を
    **誤検出**する（line 192 の罠と同根; 2026-06-22 実害 = lane-f/b が 2-dot で false-positive 逸脱判定）。
    **自所有でも共有でもない `.lean`（典型: 他レーンの Pf/BG S-ファイル）を含むなら範囲逸脱** → そのレーンは
-   **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
-   `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
+   `git merge --abort` し、⛔ に従いループ停止（`CronDelete` + 報告 + 以降の tick を行わない）。
+   報告には逸脱ファイル名 + lane + 所有者を明記。例:
    ```
    owned_re='^OddOrder/Peterfalvi/S(0[3-9]|1[0-6])|^OddOrder/BG/|^OddOrder/FeitThompson'  # 全 Pf S03-16 + BG を許容; per-lane 厳密判定は 🔒 マップ (a=S03-13+FeitThompson+S07 ν-constructor carve-out 9016 / b=S14_MaximalI+coherence+carve-out 0090/0096+BG §15/§16 node 9017 / c=S15-16; BG は大部分共有凍結だが §15/§16 node = b active 9017)
    shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/Isaacs/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra/Isaacs=汎用/基盤 infra (全 lane 加算可; Isaacs は 2026-07-04 hub 裁定で shared foundation、additive のみ)。FeitThompson は regex 互換で残すが実際は lane a 所有 — a 以外の FT 編集は 🔒 マップ注記どおり hub flag
-   git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
+   git diff --name-only main...MERGE_HEAD -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
    逸脱なし（空）→ step 1.6 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
 1.6. **shared-infra 重複検出（claim-before-build 運用、ユーザー裁定 2026-07-01）**:
@@ -492,11 +526,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
    検出したら **STOP + 報告**（より完成度の高い方を残し、他方を cite に rebase させる指示。浪費は ~1 tick に
    有界）。空 → step 2 へ。**grandfather**: 2026-07-01 前 landing 済 leaf（`GaloisRationalInteger.lean` 等）は対象外。
 2. **a → b → c の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
-   - マージ前の実 sorry 数を記録: `bin/count-sorry`
+   - step 1 で記録した pre-merge 実 sorry 数を使用: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
        旧 `grep '(^|[^a-zA-Z-])sorry'` は 259 と過大計上したが count-sorry は 146 ≈ 実 141。
        絶対数の ground truth は build 警告 `lake build OddOrder 2>&1 | grep -c 'uses .sorry.'`）
-   - `git merge --no-ff --no-commit <branch>`
+   - `git rev-parse MERGE_HEAD` が visit-time `tip` と一致することを確認し、以後は staged tree を検査する。
    - **コンフリクト時**:
      - `AxiomsCheck.lean` / `OddOrder.lean` の**独立追記衝突** = 両ブロック保持で解決して続行
        （A=keystone 系の `#assert_only_allowed_axioms`、B=Peterfalvi 系の同コマンドは別定理ゆえ両方有効）
@@ -558,14 +592,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 注意
 
-- **⚠ live-branch merge race (2026-07-12 tick 15 実害 → 手順化)**: レーンは 60s wakeup で数分おきに
+- **⚠ live-branch merge race (2026-07-12 tick 15 実害 → 2026-07-15 手順更新)**: レーンは 60s wakeup で数分おきに
   commit するため、hub の step 1.5 scope-check と `git merge <branch>` の**間**に新 commit が積まれると、
   merge は check していない commit まで取り込む (実例: a@29b08747 を check → merge 時に a が 700ba71f を
   積んでおり merge 38df2e1d の第 2 親が 700ba71f になった; 遡及チェックで clean を確認・build/AxiomsCheck は
-  merged tree に対して有効だったので実害なし)。**防止: step 1 で各レーンの tip SHA を pin し
-  (`tip=$(git rev-parse <branch>)`)、以後の 1.5/1.6 diff も merge も全て `$tip` に対して行う**
-  (`git merge --no-ff --no-commit $tip`)。merge 後に branch が進んでいても pinned SHA 分だけが対象になり、
-  超過分は次 tick に自然に回る。commit message の `@<sha>` も pin した SHA を書く。
+  merged tree に対して有効だったので実害なし)。当初は tick 冒頭の一括 SHA pin で防止したが、
+  **現行は各 lane 訪問直後に branch を trial mergeし、その `MERGE_HEAD` を exact tip として固定する**。
+  以後の 1.5/1.6 diff と build は `MERGE_HEAD` / staged tree に対して行う。branch の超過分は次回訪問へ回り、
+  commit message の `@<sha>` には `MERGE_HEAD` の SHA を書く。
 - A と B は `AxiomsCheck.lean` 末尾を共有 hotspot として両方追記 → **マージ毎にコンフリクトしうる**が、
   独立ブロック（別定理の axiom ガード）なので両保持で機械的に解決可。先頭 import 部も同様。
 - `git merge --abort` は `--no-commit` で止めた状態でもコンフリクト状態でも有効。
@@ -644,6 +678,59 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (15分 tick #7、Opus hub) — ★ a: 0116 c=1 threading ((13.16) W2-side + complement)。census 32 不変**:
+  main=`ff9919cc` clean・origin 同期・census 32。**a (visit)** = tip `27c405e9` を trial merge
+  (race なし)、3 feature commit (mu vanishing / W2 normalizer / complement structure、いずれも
+  0116 c-one threading)。各 endpoint 定理を `_of_c_eq_one` (明示 `hc1 : hyp.c = 1` 版) + 旧 signature の
+  **compatibility entry (legacy wrapper)** に分割 = 0116 full-flip の legacy-wrapper 方式そのもの。
+  touched 3 file = OrderDetermination.lean (a 所有、0115 b→a 移管) / S15_ComplementStructure.lean
+  (a 所有、§14 capstone) / S15_SAndTDefs.lean (下記 carve-out)。**全 original 定理 signature を
+  compat entry で温存** (grep 検証: 各原名 1 定義残存 → 下流無破壊)、sorry/axiom 追加 0、census 32→32。
+  **scope**: S15_SAndTDefs.lean は名目 b (S15_SAndT prefix-split) だが (13.16) mid-layer consumer
+  (`U_inf_centralizer_P_eq_bot` 等) は 0116:112 が full-flip target と明記 → **0116 限定 carve-out で保全**
+  (tick #6 と同型、下記拡張)。b 非 active (0 ahead)。merge `5a29403d`、full build/AxiomsCheck
+  **4232 jobs green**。**b** = `main..b` 空 skip。**c** = tree diff 空 skip (HOLD、0116 full-flip landing 待ち)。
+  push `ff9919cc..(hub rec)`。
+- **2026-07-15 (15分 tick #6、Opus hub — 新監視セッション、全レーン codex 運用) — ★ a: 0116 type-II cycle 除去。census 32 不変**:
+  ユーザー「各レーンを監視します。各レーンは現在すべて codex で回っています」で監視再開。
+  main=`86341340` clean・origin 同期を確認 (`bin/count-sorry` 32)。
+  **a (visit)** = 訪問時 tip `1243559d` を trial merge したが live-branch race で `MERGE_HEAD` は
+  `193999c6` (= 同 feature + main-sync merge、staged .lean diff は 1243559d と同一の 4 file/+37-12) に固定。
+  a の次 commit `525435ab` は取り込まれず次回訪問へ。0116 full-flip の core work:
+  `c_eq_one_of_T_typeII` を (14.9)-gated `hTTypeII` 依存から解放し `c_eq_one_of_lambda_dichotomy`
+  にリネーム、commutativity を一般 type-P の新規 `Hypothesis.Q_elementaryAbelian` (TSideDegrees.lean
+  +25 sorry-free) から供給して (13.12)↔(14.9) 循環を回避。CharacterDegreeEngines/CountingLayer は
+  docstring のみ。**scope**: TSideDegrees.lean は名目 b territory (2035 char cascade の landing 先) だが
+  a の追加は純 additive・sorry-free・0116 flip の明記 producer (0116:108-109/152) ゆえ **0116 限定
+  decl-unit carve-out で保全** (tick #5 の S15_CharacterDegreeEngines/DegreesFirstSplit carve-out と
+  同型、下記 0116 carve-out 拡張)。b は当該 file 非 active (0 ahead)、既存 b 宣言無改変。
+  merge `4ca952f5`、full build/AxiomsCheck **4232 jobs green**、census **32** 不変、新 axiom/sorry
+  regression なし。**b** = `main..b` 空で skip (no work)。**c** = `main..c` は main-sync merge のみで
+  tree diff 空、skip (0116 full-flip landing 待ちで HOLD、tick #4/#5 と同状態)。
+  push `86341340..4ca952f5`。**運用**: 監視 cron を Opus 対応 15 分 `7,22,37,52` で再作成。
+- **2026-07-15 (15分 tick #5、Codex hub) — ★★ B current → A current 合流、census 33→32**:
+  ユーザー指示どおり C を先に確認。訪問時の c は main 同期 merge のみで `main...c` tree diff が空、
+  したがって empty merge は作らなかった。issue 9077/0118 を再監査し、c-1/c-2 は完了済み、
+  c-3 の再開条件は **0116 full flip landing** であることを確認。A はなお compatibility consumer の
+  明示仮説化を継続中なので C は HOLD のままが正しい。
+  重要 issue 0120 はユーザー指示で先に独立 commit (`5cf7ebcc` + 詳細化 `f986b914`)。
+  **A (first visit)** = `6616d78e` を merge `38054779`:
+  Core η₁₀ Q/H correction package と direct support API。追加 14 宣言は source `sorry`/新 axiom 0。
+  a が b-owned `S15_CharacterDegreeEngines` / `DegreesFirstSplit` に置いた genuine direct-support
+  hunk は成果保全方針により 0116 限定 carve-out と裁定。
+  **B (current visit)** = clean branch `fb85d97a` を trial mergeし、merge `a93c3709`:
+  type-P2 consumer 依存・vestigial S-side endpoint の retireに加え、S-side Dade/support を honest type-P
+  分類へ一般化。追加 `sorry`/axiom/admit 0、consumer 削除整合、census **33→32**。
+  full build / AxiomsCheck **4230 jobs green**。
+  **A (current visit)** = clean branch `f388d5f0` を trial mergeし、merge `69e61d2f`:
+  新 leaf `AnalyticRelayer` / `OrderRelayer` で Core (13.6)–(13.10) を
+  (13.11)–(13.15) へ接続し、旧公開 signature は compatibility entry として保持。
+  source `sorry`/axiom/admit 0。明示 analytic-inequality → arithmetic API は axiom-clean、
+  Q-side η₁₀ norm bound を通る Core 上位 endpoint のみ既存 `nuGridSupply` prerequisite の
+  `sorryAx` を継承（新規 regression ではない）。統合状態で full build / AxiomsCheck
+  **4232 jobs green**、最終 census **32**、touched leaf は最大 1469 行。
+  **運用更新**: tick-wide pre-freeze を廃止し、各 lane 訪問直後の trial merge が作る
+  `MERGE_HEAD` を exact 検査対象にする。push は lane ごとに行わず、全 lane + log 完了後の一回に集約。
 - **2026-07-15 (20分 tick #4、Codex hub) — ★★ a: 0116 Core λ correction / b: 9096 b-5 Phase A。census 33 不変**:
   tick 開始時に main=`7308e3cf` clean・`origin/main` 同期を確認し、lane tip を
   **a=`1b35327a` / b=`e2492d56` / c=`9f002989`** に固定。freeze 後の lane 進行と
