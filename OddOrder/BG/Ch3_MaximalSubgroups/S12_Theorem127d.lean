@@ -416,7 +416,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
       group
   -- order bookkeeping: `|E₀| = |E| / p` for `E₀ := E₁ ⊔ (X ⊔ E₃)`.
   have hX_E₃_bot : X ⊓ E₃ = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
     intro r hr hrX hrE₃
     have hrp : r = p := by
       have h1 : r ∣ p ^ (Nat.card ↥E).factorization p :=
@@ -434,7 +434,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
   have hcard_XE₃ : Nat.card ↥(X ⊔ E₃ : Subgroup G) = Nat.card ↥X * Nat.card ↥E₃ :=
     card_sup_eq_mul_of_le_normalizer_of_disjoint hX_norm_E₃ hX_E₃_bot
   have hE₁_XE₃_bot : E₁ ⊓ (X ⊔ E₃) = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
     intro r hr hrE₁ hrXE₃
     have hr1 : r ∈ tau1 M := h.E₁_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv],
@@ -469,12 +469,12 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
     rw [← hA₀X_sup,
       card_sup_eq_mul_of_le_normalizer_of_disjoint hA₀_norm_X hA₀X_bot, hA₀card]
   -- `|E| = |E₁| · |E₂| · |E₃|`.
-  have hE₁E₂_bot : E₁ ⊓ E₂ = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hE₁E₂_bot : E₁ ⊓ E₂ = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   have hcard_E₁E₂ : Nat.card ↥(E₁ ⊔ E₂ : Subgroup G)
       = Nat.card ↥E₁ * Nat.card ↥E₂ :=
     card_sup_eq_mul_of_le_normalizer_of_disjoint hE₁_norm_E₂ hE₁E₂_bot
   have hE₁₂_E₃_bot : (E₁ ⊔ E₂) ⊓ E₃ = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
     intro r hr hrE₁₂ hrE₃
     have hr3 : r ∈ tau3 M := h.E₃_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv],

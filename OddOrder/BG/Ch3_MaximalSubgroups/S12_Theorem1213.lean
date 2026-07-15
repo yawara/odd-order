@@ -729,8 +729,9 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
         intro hcyc
         haveI := hcyc
         have hcomm_Q : ∀ a b : ↥Q, a * b = b * a :=
-          commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center ↥Q))
-            (QuotientGroup.ker_mk' _).le
+          (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+            (QuotientGroup.mk' (Subgroup.center ↥Q))
+            (QuotientGroup.ker_mk' _).le).is_comm.comm
         haveI : IsMulCommutative ↥Q := ⟨⟨hcomm_Q⟩⟩
         have hbot : commutator ↥Q = ⊥ := commutator_eq_bot ↥Q
         rw [hQ_es.isExtraspecial.commutator_eq_center] at hbot

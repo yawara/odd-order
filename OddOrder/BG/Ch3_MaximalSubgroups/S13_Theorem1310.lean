@@ -500,7 +500,7 @@ theorem exists_tau3_sylowM_regular_of_not_centralize [Finite G] (hG : IsMinimalS
   -- full Sylow `q`-subgroup of `↥E₃`.
   letI : CommGroup ↥E₃ := IsCyclic.commGroup
   obtain ⟨S₃⟩ : Nonempty (Sylow q ↥E₃) := inferInstance
-  haveI : (S₃ : Subgroup ↥E₃).Normal := Subgroup.normal_of_comm _
+  haveI : (S₃ : Subgroup ↥E₃).Normal := Subgroup.normal_of_isMulCommutative _
   haveI : Unique (Sylow q ↥E₃) := S₃.unique_of_normal inferInstance
   set Q : Subgroup G := (S₃ : Subgroup ↥E₃).map E₃.subtype with hQdef
   have hQE3 : Q ≤ E₃ := Subgroup.map_subtype_le _

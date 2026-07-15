@@ -176,7 +176,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       exact hr
     exact h.E₃_hall.1 r h1
   have hE₂E₃_bot : E₂ ⊓ E₃ = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
     intro r hr h1 h2
     have hr2 := hE₂pi r (Nat.mem_primeFactors.mpr ⟨hr, h1, Nat.card_pos.ne'⟩)
     have hr3 := hE₃pi r (Nat.mem_primeFactors.mpr ⟨hr, h2, Nat.card_pos.ne'⟩)
@@ -548,8 +548,8 @@ theorem fittingInG_le_centralizer_opiCoreInG [Finite G] {E : Subgroup G} {π : S
             exact le_inf (Subgroup.commutator_le_left _ _)
               (Subgroup.commutator_le_right _ _)
         _ ≤ ⊥ := by
-            refine le_of_eq (Subgroup.inf_eq_bot_of_coprime
-              (coprime_of_forall_prime_not_dvd ?_))
+            refine le_of_eq (Subgroup.disjoint_of_coprime_natCard
+              (coprime_of_forall_prime_not_dvd ?_)).eq_bot
             intro r hr h1 h2
             have hr1 : r ∈ πᶜ := S10.oPiCore_isHall_of_isNilpotent (K := ↥FE) πᶜ |>.1 r
               (Nat.mem_primeFactors.mpr ⟨hr, h1, Nat.card_pos.ne'⟩)
@@ -637,7 +637,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [h4]
         exact E₃.mul_mem h2 (E₃.inv_mem hb)
     refine h1.trans (le_of_eq ?_)
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
     intro r hr h1' h2'
     have hr2 := hE₂hallG.1 r (Nat.mem_primeFactors.mpr ⟨hr, h1', Nat.card_pos.ne'⟩)
     have hr3 : r ∈ tau3 M := by
@@ -808,7 +808,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
         conj_smul_eq_self_of_mem_normalizer (hNS_norm_HK hn)]
     -- Proposition 10.11(d): `M ≤ N_G(⁅K,X⁆)`.
     have hE₂E₃_bot : E₂ ⊓ E₃ = ⊥ := by
-      refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+      refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
       intro r hr h1' h2'
       have hr2 := hE₂hallG.1 r (Nat.mem_primeFactors.mpr ⟨hr, h1', Nat.card_pos.ne'⟩)
       have hr3 : r ∈ tau3 M := by

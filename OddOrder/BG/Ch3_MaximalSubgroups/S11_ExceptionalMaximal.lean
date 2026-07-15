@@ -742,7 +742,7 @@ theorem Msigma_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
   have hcop : Nat.Coprime (Nat.card ↥(S10.Msigma M)) (Nat.card ↥Ag) := by
     rw [hAgcard]; exact ((Nat.Prime.coprime_iff_not_dvd h.prime).mpr hp_ndvd).symm
   have hdisj : Disjoint (S10.Msigma M) Ag :=
-    disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop)
+    Subgroup.disjoint_of_coprime_natCard hcop
   -- `A₀^g ⊆ M ⊆ N_G(M_σ)` (since `M_σ ⊴ M`).
   have hMnormMsM : M ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := by
     rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG]

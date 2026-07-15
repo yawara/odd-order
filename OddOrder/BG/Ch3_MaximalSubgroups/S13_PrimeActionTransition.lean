@@ -164,7 +164,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     have hcardE : Nat.card ↥E = Nat.card ↥E₁ * Nat.card ↥E₃ := by
       rw [hEsup]
       exact card_sup_eq_mul_of_le_normalizer_of_disjoint hE1NE3
-        (Subgroup.inf_eq_bot_of_coprime hcop13)
+        (Subgroup.disjoint_of_coprime_natCard hcop13).eq_bot
     have hqE : q ∣ Nat.card ↥E := by
       have := Subgroup.card_dvd_of_le hXE; rwa [hXcard] at this
     have hqE1 : q ∣ Nat.card ↥E₁ := by
@@ -201,7 +201,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     set D : Subgroup G := P₀ ⊔ E₃ with hDdef
     have hcopP₀E3 : Nat.Coprime (Nat.card ↥P₀) (Nat.card ↥E₃) :=
       hP₀card ▸ (hqp.coprime_iff_not_dvd.mpr hqE3)
-    have hP₀E3bot : P₀ ⊓ E₃ = ⊥ := Subgroup.inf_eq_bot_of_coprime hcopP₀E3
+    have hP₀E3bot : P₀ ⊓ E₃ = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcopP₀E3).eq_bot
     have hcomm : ∀ (m : ↥P₀) (n : ↥E₃), Commute (P₀.subtype m) (E₃.subtype n) := by
       intro m n
       show (m : G) * (n : G) = (n : G) * (m : G)
@@ -246,7 +246,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     -- both `X` and `P₀` are disjoint from `E₃` (orders coprime), so inject into the quotient.
     have hcopXE3 : Nat.Coprime (Nat.card ↥X) (Nat.card ↥E₃) :=
       hXcard ▸ (hqp.coprime_iff_not_dvd.mpr hqE3)
-    have hXE3bot : X ⊓ E₃ = ⊥ := Subgroup.inf_eq_bot_of_coprime hcopXE3
+    have hXE3bot : X ⊓ E₃ = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcopXE3).eq_bot
     -- helper: card of the image of a subgroup `K ≤ E` disjoint from `E₃` equals `|K|`.
     have hcardmap : ∀ (K : Subgroup G), K ≤ E → K ⊓ E₃ = ⊥ →
         Nat.card ↥((K.subgroupOf E).map mk) = Nat.card ↥(K.subgroupOf E) := by
@@ -863,7 +863,7 @@ theorem mem_sigma_of_tau1_tau3_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
       hPcQ.trans (Subgroup.centralizer_le_normalizer _)
     have hcopPQ : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q) := by
       rw [hPcardp, hQcard]; exact (Nat.coprime_primes Fact.out Fact.out).mpr hpne_q
-    have hPQinf : P ⊓ Q = ⊥ := Subgroup.inf_eq_bot_of_coprime hcopPQ
+    have hPQinf : P ⊓ Q = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcopPQ).eq_bot
     have hcardPQ : Nat.card ↥PQ = p * q := by
       rw [hPQdef, card_sup_eq_mul_of_le_normalizer_of_disjoint hPNQ hPQinf, hPcardp, hQcard]
     intro s hs

@@ -271,7 +271,8 @@ theorem exists_orderOf_eq_rpow_in_complement [Finite G] {E E₀ A₀ : Subgroup 
   have hcardA₀sub : Nat.card ↥(A₀.subgroupOf E) = Nat.card ↥A₀ :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA₀E).toEquiv
   have hg_inf : Subgroup.zpowers g ⊓ A₀.subgroupOf E = ⊥ := by
-    apply Subgroup.inf_eq_bot_of_coprime
+    apply Disjoint.eq_bot
+    apply Subgroup.disjoint_of_coprime_natCard
     rw [Nat.card_zpowers, hg, hcardA₀sub]
     exact hcop.pow_left _
   -- the quotient map injects `⟨g⟩` (coprime to `A₀`), so it preserves the order of `g`.

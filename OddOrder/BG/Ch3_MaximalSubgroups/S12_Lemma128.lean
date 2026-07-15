@@ -148,7 +148,7 @@ theorem oPiCore_sup_compl_eq_top (K : Type*) [Group K] [Finite K]
     have hr2 : r ∈ πᶜ := hall2.1 r (Nat.mem_primeFactors.mpr ⟨hr, h2, Nat.card_pos.ne'⟩)
     exact hr2 hr1
   have hbot : Ch03.oPiCore π K ⊓ Ch03.oPiCore πᶜ K = ⊥ :=
-    Subgroup.inf_eq_bot_of_coprime hcop
+    (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   -- the factorization of `|O_π| · |O_π'|` agrees with that of `|K|` at every prime
   have hcard : Nat.card ↥(Ch03.oPiCore π K) * Nat.card ↥(Ch03.oPiCore πᶜ K)
       = Nat.card K := by
@@ -314,7 +314,7 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
               exact le_inf (Subgroup.commutator_le_left _ _)
                 (Subgroup.commutator_le_right _ _)
           _ ≤ ⊥ := by
-              refine le_of_eq (Subgroup.inf_eq_bot_of_coprime ?_)
+              refine le_of_eq (Subgroup.disjoint_of_coprime_natCard ?_).eq_bot
               refine coprime_of_forall_prime_not_dvd ?_
               intro r hr h1 h2
               have hr2 : r ∈ ({q} : Set ℕ) := hB_pi r
@@ -466,7 +466,7 @@ theorem sylow_eq_opiCore_fittingInG_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd 
             exact le_inf (Subgroup.commutator_le_left _ _)
               (Subgroup.commutator_le_right _ _)
         _ ≤ ⊥ := by
-            refine le_of_eq (Subgroup.inf_eq_bot_of_coprime ?_)
+            refine le_of_eq (Subgroup.disjoint_of_coprime_natCard ?_).eq_bot
             refine coprime_of_forall_prime_not_dvd ?_
             intro r hr h1 h2
             have hr1 : r ∈ (({q} : Set ℕ))ᶜ :=

@@ -67,6 +67,14 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
 - `lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
   `OddOrder.feitThompson` の依存公理は allowlist 内の 3 種のみ。
 
+- sixth wave: BG Ch.3 §§10–13 の 25 code sites を新 API へ移行し、
+  `OddOrder/BG/Ch3_MaximalSubgroups/**` の対象旧名 4 種をゼロ化。
+- wave 後の raw Lean-source occurrences は
+  `inf_eq_bot_of_coprime` 30、`commutative_of_cyclic_center_quotient` 3、
+  `IsPGroup.commutative_of_card_eq_prime_sq` 0、`Subgroup.normal_of_comm` 5。
+- focused 検証: 上記 12 modules を対象にした `lake build` 成功
+  (3154 jobs)。
+
 ## 完了条件
 
 full build green + `has been deprecated` warning が repo 由来 0 件。

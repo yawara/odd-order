@@ -812,8 +812,8 @@ theorem pSubgroup_centralizes_Msigma_inf [Finite G] (hG : IsMinimalSimpleOdd G)
     · exact fun hrσ => Set.eq_empty_iff_forall_notMem.mp hασ r ⟨hα, hrσ⟩
     · rw [Set.mem_singleton_iff] at hp'; rw [hp']; exact hpσM
   have hinf_bot : S10.Msigma M ⊓ Ka = ⊥ :=
-    Subgroup.inf_eq_bot_of_coprime
-      (coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl (S10.Msigma_isPiGroup M) hKa_pi')
+    (Subgroup.disjoint_of_coprime_natCard
+      (coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl (S10.Msigma_isPiGroup M) hKa_pi')).eq_bot
   -- `⁅M_σ ⊓ M*, P⁆ ⊆ M_σ ⊓ K_a = ⊥`.
   have hcomm_Msig : ⁅S10.Msigma M ⊓ Mstar, P⁆ ≤ S10.Msigma M :=
     (Subgroup.commutator_mono inf_le_left (hPM.trans inf_le_left)).trans

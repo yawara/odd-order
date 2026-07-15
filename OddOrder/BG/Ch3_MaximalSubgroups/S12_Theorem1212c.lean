@@ -127,7 +127,8 @@ theorem card_finsetSup_eq_prod [Finite G] {H : Subgroup G} (T : Finset ℕ) (Z :
       rw [hk]
       exact Nat.Coprime.pow_right _
         ((Nat.coprime_primes (hTp q hqmem) (hTp p (hsubT' hp))).mpr (fun he => hq (he ▸ hp)))
-    have hdisj : Z q ⊓ (T'.sup Z : Subgroup G) = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+    have hdisj : Z q ⊓ (T'.sup Z : Subgroup G) = ⊥ :=
+      (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
     rw [Finset.sup_insert, card_sup_eq_mul_of_le_normalizer_of_disjoint hqN hdisj, hcardT',
       Finset.prod_insert hq]
 
@@ -414,7 +415,7 @@ theorem frobFact_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `ZZ ⊓ K = ⊥` by coprimality (`ZZ` a `τ₂`-group, `K` a `τ₂'`-group).
   have hcop : Nat.Coprime (Nat.card ↥ZZ) (Nat.card ↥K) :=
     Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl Nat.card_pos.ne' Nat.card_pos.ne' hZZpi hKpi
-  have hZZKdisj : ZZ ⊓ K = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hZZKdisj : ZZ ⊓ K = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   -- `E₀ = ZZ ⊔ K`.
   set E₀ : Subgroup G := ZZ ⊔ K with hE₀def
   have hE₀E : E₀ ≤ E := sup_le hZZE hKE

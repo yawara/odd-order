@@ -289,7 +289,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
           rw [h4]
           exact A.mul_mem h2 (A.inv_mem hb)
       refine le_bot_iff.mp (h1.trans (le_of_eq ?_))
-      refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+      refine (Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)).eq_bot
       intro r hr_prime hr_E₃ hr_A
       have hr3 : r ∈ tau3 M := by
         apply h.E₃_hall.1 r

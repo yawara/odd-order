@@ -976,7 +976,7 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
     · exact hK₀_p' p (Nat.mem_primeFactors.mpr ⟨Fact.out, hK₀d, Nat.card_pos.ne'⟩) rfl
     · exact hMσ_p' p (Nat.mem_primeFactors.mpr ⟨Fact.out, hMσd, Nat.card_pos.ne'⟩) rfl
   have hdisj : Disjoint (K₀ ⊔ Msigma M) P := by
-    refine disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime ?_)
+    refine Subgroup.disjoint_of_coprime_natCard ?_
     rw [hPcard]; exact ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hL_p').symm
   -- Degenerate case: `K₀ ⊔ M_σ = 1` forces `K₀ = 1` and all conclusions are trivial.
   by_cases hLbot : (K₀ ⊔ Msigma M) = ⊥
@@ -993,7 +993,7 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
   -- Main case.  Step 3-4: `P` acts fixed-point-freely on `K₀ ⊔ M_σ`, so it is nilpotent (Thm 3.7).
   have hPne : P ≠ ⊥ := by
     intro h; rw [h, Subgroup.card_bot] at hPcard; exact (Fact.out : p.Prime).one_lt.ne hPcard
-  have hK₀_inf_Mσ : K₀ ⊓ Msigma M = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop_K₀Mσ
+  have hK₀_inf_Mσ : K₀ ⊓ Msigma M = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop_K₀Mσ).eq_bot
   have hFPF : ∀ r ∈ P, r ≠ 1 → ∀ n ∈ (K₀ ⊔ Msigma M), n ≠ 1 → r * n * r⁻¹ ≠ n := by
     intro r hrP hr1 n hnL hn1 hcontra
     -- Decompose `n = k * m` with `k ∈ K₀`, `m ∈ M_σ`.
