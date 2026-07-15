@@ -170,7 +170,8 @@ A finite group `G` of order `p³` (`p` prime) that is nonabelian is extraspecial
 
 *Proof outline.* The centre has order `p^k`, `0 < k ≤ 3` (`card_center_eq_prime_pow`); `k = 3` makes
 `Z = ⊤` (so `G` abelian) and `k = 2` makes `G/Z` cyclic (hence `G` abelian,
-`commutative_of_cyclic_center_quotient`), both excluded, so `|Z| = p`.  Then `G/Z` has order `p²`,
+`MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`), both excluded, so `|Z| = p`.
+Then `G/Z` has order `p²`,
 hence abelian, giving `[G, G] ≤ Z`; nontriviality of `[G, G]` (nonabelian) and `|Z| = p` prime force
 `[G, G] = Z`.  Finally `Z = [G, G] ≤ Φ(G)` (`commutator_sup_pow_closure_le_frattini`), and `Φ(G)` is
 proper (`frattini_le_coatom`); were `|Φ| = p²` then `|G/Φ| = p` so `G/Φ` is cyclic, forcing `G`
@@ -210,8 +211,8 @@ theorem of_card_eq_prime_cube [Finite G] [Fact p.Prime]
         have hmul : Nat.card (G ⧸ Subgroup.center G) * p ^ 2 = p * p ^ 2 := by rw [← heq]; ring
         exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) hmul
       haveI : IsCyclic (G ⧸ Subgroup.center G) := isCyclic_of_prime_card hcardQ
-      exact hnonab (commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center G))
-        (QuotientGroup.ker_mk' _).le)
+      exact hnonab ((MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+        (QuotientGroup.mk' (Subgroup.center G)) (QuotientGroup.ker_mk' _).le).is_comm.comm)
     have hk1 : k = 1 := by omega
     rw [hk, hk1, pow_one]
   -- Step 2: `[G, G] = Z(G)`.
@@ -223,10 +224,10 @@ theorem of_card_eq_prime_cube [Finite G] [Fact p.Prime]
   have hcomm_le_center : commutator G ≤ Subgroup.center G := by
     rw [commutator_def, Subgroup.commutator_le]
     intro x _ y _
-    have hQcomm := IsPGroup.commutative_of_card_eq_prime_sq hcardQ2
+    have hQcomm := IsPGroup.isMulCommutative_of_card_eq_prime_sq hcardQ2
     have hpi : (QuotientGroup.mk' (Subgroup.center G)) ⁅x, y⁆ = 1 := by
       rw [map_commutatorElement, commutatorElement_eq_one_iff_commute]
-      exact hQcomm _ _
+      exact (isMulCommutative_iff.mp hQcomm) _ _
     exact (QuotientGroup.eq_one_iff _).mp hpi
   have hcomm_ne_bot : commutator G ≠ ⊥ := by
     obtain ⟨a, b, hab⟩ : ∃ a b : G, a * b ≠ b * a := by

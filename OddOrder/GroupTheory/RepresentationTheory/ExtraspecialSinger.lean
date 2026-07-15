@@ -488,9 +488,9 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
     exact hndvd (OddOrder.RepresentationTheory.card_dvd_sub_one_of_faithful_line
       W.toRepresentation hWdim hfaithW)
   -- Singer realization: `V ≅ 𝔽_{p²}` with `μ : K ↪ 𝔽_{p²}ˣ`.
-  have hcommK : ∀ a b : K, a * b = b * a := fun a b =>
-    commutative_of_cyclic_center_quotient (MonoidHom.id K)
-      (by rw [MonoidHom.ker_id]; exact bot_le) a b
+  have hcommK : ∀ a b : K, a * b = b * a :=
+    ((MonoidHom.id K).isMulCommutative_of_isCyclic_of_ker_le_center
+      (by rw [MonoidHom.ker_id]; exact bot_le)).is_comm.comm
   letI : Module (MonoidAlgebra (ZMod p) K) (Additive (P ⧸ commutator P)) :=
     Module.compHom (Additive (P ⧸ commutator P)) (ρ.asAlgebraHom).toRingHom
   have hsmul : ∀ (k : K) (x : Additive (P ⧸ commutator P)),

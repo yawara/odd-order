@@ -37,6 +37,13 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
   `IsPGroup.commutative_of_card_eq_prime_sq` 12、`Subgroup.normal_of_comm` 6。
 - focused 検証: `lake build OddOrder.BG.Ch1_Preliminary.S03f_Thm36`
   成功 (3064 jobs)、`lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
+- third wave: shared `GroupTheory` (`IsExtraspecial` / `ExtraspecialSinger`) の
+  3 code sites + 1 doc reference を新 API へ移行し、同ディレクトリの旧名をゼロ化。
+- wave 後の raw Lean-source occurrences は
+  `inf_eq_bot_of_coprime` 53、`commutative_of_cyclic_center_quotient` 20、
+  `IsPGroup.commutative_of_card_eq_prime_sq` 11、`Subgroup.normal_of_comm` 6。
+- focused 検証: 上記 2 modules を対象にした `lake build` 成功
+  (2378 jobs)、`lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
 
 ## 完了条件
 
