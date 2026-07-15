@@ -977,6 +977,17 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_
       (Classical.choose_spec (exists_Sset_apply_one_eq_index _hG hnoV dataL.typeIHyp)).2
       (pins := pins) }
 
+private theorem legacy_d_eq_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T) (pins : NuGridSupplyData hyp) :
+    hyp.d = 1 := by
+  obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
+  let hV : IsMulCommutative ↥hyp.V := isMulCommutative_V hG hyp
+    ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.T_maximal).2.1.mpr hT2)
+  have h := c_eq_one hG (hyp.swap hT2 hV Tdata hU hW1 hW2 pins)
+  change hyp.d = 1 at h
+  exact h
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- Compatibility producer while (13.19) migrates to explicit (13.12) inputs on both sides. -/
 noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
@@ -987,21 +998,9 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
     TypeIOrthogonalityGridData hyp dataL := by
-  let Tdata := Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)
-  have hU : Tdata.U = hyp.V :=
-    (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).1
-  have hW1 : Tdata.W1 = hyp.W2 :=
-    (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.1
-  have hW2 : Tdata.W2 = hyp.W1 :=
-    (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.2
-  let hV : IsMulCommutative ↥hyp.V := isMulCommutative_V _hG hyp
-    ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.T_maximal).2.1.mpr hT2)
-  have hd1 : hyp.d = 1 := by
-    have h := c_eq_one _hG (hyp.swap hT2 hV Tdata hU hW1 hW2 pins)
-    change hyp.d = 1 at h
-    exact h
   exact typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one
-    _hG hnoV hyp (c_eq_one _hG hyp) hd1 hT2 dataL (pins := pins)
+    _hG hnoV hyp (c_eq_one _hG hyp) (legacy_d_eq_one _hG hyp hT2 pins)
+      hT2 dataL (pins := pins)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.19)**: a type-I maximal subgroup has `𝓛^{τ₁}` orthogonal to the `eta_ij`,
@@ -1097,21 +1096,9 @@ theorem typeI_orthogonality_dichotomy [Finite G]
         data.betaL_eta_independent ∧
           (data.caseC1 ∨ data.caseC2) ∧
             (data.caseC1_dual ∨ data.caseC2_dual) := by
-  let Tdata := Classical.choose (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)
-  have hU : Tdata.U = hyp.V :=
-    (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).1
-  have hW1 : Tdata.W1 = hyp.W2 :=
-    (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.1
-  have hW2 : Tdata.W2 = hyp.W1 :=
-    (Classical.choose_spec (OddOrder.Peterfalvi.S15.reconciled_typePData_T _hG hyp)).2.2
-  let hV : IsMulCommutative ↥hyp.V := isMulCommutative_V _hG hyp
-    ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.T_maximal).2.1.mpr hT2)
-  have hd1 : hyp.d = 1 := by
-    have h := c_eq_one _hG (hyp.swap hT2 hV Tdata hU hW1 hW2 pins)
-    change hyp.d = 1 at h
-    exact h
   exact typeI_orthogonality_dichotomy_of_c_eq_one_and_d_eq_one
-    _hG hnoV hyp (c_eq_one _hG hyp) hd1 hT2 hLmax hLI (pins := pins)
+    _hG hnoV hyp (c_eq_one _hG hyp) (legacy_d_eq_one _hG hyp hT2 pins)
+      hT2 hLmax hLI (pins := pins)
 
 /-! ### Peterfalvi (14.5): exclusion of the small complement `E = W₁`
 
@@ -1135,9 +1122,11 @@ Fitting-kernel index of `L` is `e = |W₁| = q < p`.  The (13.19.c) dichotomy
 `p ≤ e`), so the (c1) bound `(|H|−1)/e ≤ (u−1)/q` holds with `e = q`, giving `|H| ≤ u`.  With
 `U ≤ H` ((13.17.b), hypothesis `hUH`) and `u ≤ |U|` this forces `H = U`, so
 `L = H ⋊ E = U W₁ ≤ S` — contradicting `N_G(U) ≤ L` and `N_G(U) ⊄ S`. -/
-theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem complement_not_le_Q_of_c_eq_one_and_d_eq_one [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) (hd1 : hyp.d = 1)
+    (hTTypeII : IsTypeII hyp.T)
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hqp : hyp.q < hyp.p)
     (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
@@ -1165,8 +1154,8 @@ theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- the (13.19) grid data for `L`
   obtain ⟨dataL⟩ := OddOrder.Peterfalvi.S16.TypeICoherent78Data.nonempty _hG hnoV hLmax hLI
   have hHL : dataL.typeIHyp.H = maxNilpotentNormalHall L := dataL.typeIHyp.typeI.typeF.H_eq
-  set g := typeIOrthogonalityGridData_of_coherent78 _hG hnoV hyp hT2 dataL
-    (pins := pins) with hgdef
+  set g := typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one
+    _hG hnoV hyp hc1 hd1 hT2 dataL (pins := pins) with hgdef
   have he_q : g.e = hyp.q := by rw [← g.e_eq_index, hindex]
   -- case (c2) is impossible: `p ≤ e = q < p`
   rcases g.caseC with ⟨-, hbound⟩ | ⟨-, hpe⟩
@@ -1225,6 +1214,24 @@ theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact hW1S
   exact hNUS (hNUL.trans hLS)
 
+/-- Compatibility entry point while (14.5) migrates to explicit (13.12) inputs. -/
+theorem complement_not_le_Q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hqp : hyp.q < hyp.p)
+    (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
+    {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
+    (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
+    (hUH : hyp.U ≤ maxNilpotentNormalHall L)
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype)
+    (pins : NuGridSupplyData hyp) :
+    ¬ frob.complement.map L.subtype ≤ hyp.Q :=
+  complement_not_le_Q_of_c_eq_one_and_d_eq_one _hG hnoV hyp
+    (c_eq_one _hG hyp) (legacy_d_eq_one _hG hyp hT2 pins) hTTypeII hT2 hqp hNUS
+    hLmax hLI hNUL hUH frob hW1E pins
+
 /-- **Peterfalvi (14.5) order consequence.**  Under the (14.5) hypotheses the `W₁`-containing
 Frobenius complement `E` of `L` has order `p q`.
 
@@ -1233,9 +1240,11 @@ Frobenius complement `E` of `L` has order `p q`.
 `[Q W₂ : Q] = p` (normal-subgroup relative index inside `↥(Q W₂)`) and is `≠ 1` by the (14.5)
 exclusion `E ⊄ Q` (`complement_not_le_Q`), hence `= p`; with `E ∩ Q = W₁` of order `q`
 (`complement_inf_Q_eq_W1`), `|E| = |E ∩ Q| · [E : E ∩ Q] = q p`. -/
-theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem complement_card_eq_pq_of_c_eq_one_and_d_eq_one [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) (hd1 : hyp.d = 1)
+    (hTTypeII : IsTypeII hyp.T)
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hqp : hyp.q < hyp.p)
     (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
@@ -1250,8 +1259,8 @@ theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
   set Hg := hyp.Q ⊔ hyp.W2 with hHg
   -- `E ∩ Q = W₁` (proven (13.17.c) half); the (14.5) exclusion `E ⊄ Q`.
   have hInf := complement_inf_Q_eq_W1 _hG hyp hTTypeII frob hW1E
-  have hnle := complement_not_le_Q _hG hnoV hyp hTTypeII hT2 hqp hNUS hLmax hLI hNUL hUH
-    frob hW1E pins
+  have hnle := complement_not_le_Q_of_c_eq_one_and_d_eq_one
+    _hG hnoV hyp hc1 hd1 hTTypeII hT2 hqp hNUS hLmax hLI hNUL hUH frob hW1E pins
   -- `E ⊆ Q W₂` (Huppert step) and the `Q ⋊ W₂` structure.
   have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp hTTypeII frob hW1E
   obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp hTTypeII
@@ -1294,6 +1303,24 @@ theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
       L.subtype_injective).toEquiv, hEmcard]
   exact mul_comm _ _
 
+/-- Compatibility entry point while (14.5) migrates to explicit (13.12) inputs. -/
+theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hqp : hyp.q < hyp.p)
+    (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
+    {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
+    (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
+    (hUH : hyp.U ≤ maxNilpotentNormalHall L)
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype)
+    (pins : NuGridSupplyData hyp) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q :=
+  complement_card_eq_pq_of_c_eq_one_and_d_eq_one _hG hnoV hyp
+    (c_eq_one _hG hyp) (legacy_d_eq_one _hG hyp hT2 pins) hTTypeII hT2 hqp hNUS
+    hLmax hLI hNUL hUH frob hW1E pins
+
 /-- **Peterfalvi (14.5), full form**: the `W₁`-containing Frobenius complement of the type-I
 subgroup `L` over `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).
 
@@ -1301,10 +1328,10 @@ Assembled from the order argument (`complement_card_eq_pq`) and the group-theore
 extraction (`exists_mem_conj_W2_le_of_dvd_card`, Schur–Zassenhaus), the latter fed `E ⊆ Q W₂`
 by the Huppert step (`complement_le_QW2`).  The `W₁ ⊆ E` hypothesis records Peterfalvi's choice
 "let `E` be a complement to `H` in `L` such that `W₁ ⊂ E`". -/
-theorem typeI_overNormalizer_complement [Finite G]
+theorem typeI_overNormalizer_complement_of_c_eq_one_and_d_eq_one [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G))
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) (hd1 : hyp.d = 1)
     (hTTypeII : IsTypeII hyp.T)
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hqp : hyp.q < hyp.p)
@@ -1318,8 +1345,8 @@ theorem typeI_overNormalizer_complement [Finite G]
     Nat.card ↥frob.complement = hyp.p * hyp.q ∧
       ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
         frob.complement.map L.subtype := by
-  have hcard := complement_card_eq_pq _hG hnoV hyp hTTypeII hT2 hqp hNUS hLmax hLI hNUL hUH
-    frob hW1E pins
+  have hcard := complement_card_eq_pq_of_c_eq_one_and_d_eq_one
+    _hG hnoV hyp hc1 hd1 hTTypeII hT2 hqp hNUS hLmax hLI hNUL hUH frob hW1E pins
   refine ⟨hcard, ?_⟩
   obtain ⟨hWnorm, hdisj, hpQ⟩ := Q_W2_structure _hG hyp hTTypeII
   have hEQW2 := complement_le_QW2 _hG hyp hTTypeII frob hW1E
@@ -1337,6 +1364,28 @@ theorem typeI_overNormalizer_complement [Finite G]
   exact exists_mem_conj_W2_le_of_dvd_card hWnorm hQsolv hdisj hyp.p_prime
     hyp.p_eq_card_W2.symm hpQ hEQW2 hpE
 
+/-- Compatibility entry point while (14.5) migrates to explicit (13.12) inputs. -/
+theorem typeI_overNormalizer_complement [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hqp : hyp.q < hyp.p)
+    (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
+    {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
+    (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
+    (hUH : hyp.U ≤ maxNilpotentNormalHall L)
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype)
+    (pins : NuGridSupplyData hyp) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q ∧
+      ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
+        frob.complement.map L.subtype :=
+  typeI_overNormalizer_complement_of_c_eq_one_and_d_eq_one _hG hnoV hyp
+    (c_eq_one _hG hyp) (legacy_d_eq_one _hG hyp hT2 pins) hTTypeII hT2 hqp hNUS
+    hLmax hLI hNUL hUH frob hW1E pins
+
 /-- **Peterfalvi (14.5), packaged**: if `S` is type II (with the §14 normalization `q < p` and
 the type-II consequence `N_G(U) ⊄ S`), a maximal subgroup over `N_G(U)` is type-I Frobenius,
 contains `U` in its kernel, and its `W₁`-containing complement has order `p q` with a conjugate
@@ -1344,10 +1393,10 @@ contains `U` in its kernel, and its `W₁`-containing complement has order `p q`
 `exists_typeI_maximal_overNormalizer_U`), a `W₁`-containing Frobenius decomposition
 (`exists_typeIFrobeniusData_W1_le`), and the (14.5) complement structure
 (`typeI_overNormalizer_complement`). -/
-theorem typeII_overNormalizer_frobenius [Finite G]
+theorem typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G))
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) (hd1 : hyp.d = 1)
     (hSTypeII : IsTypeII hyp.S) (hTTypeII : IsTypeII hyp.T)
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hqp : hyp.q < hyp.p)
@@ -1358,8 +1407,25 @@ theorem typeII_overNormalizer_frobenius [Finite G]
   obtain ⟨L, hLmax, hLtypeI, hNUL, hUH⟩ :=
     exists_typeI_maximal_overNormalizer_U _hG hnoV hyp hSTypeII hTTypeII
   obtain ⟨frob, hker, hW1E⟩ := exists_typeIFrobeniusData_W1_le _hG hnoV hyp hLmax hLtypeI hNUL
-  obtain ⟨hcard, hy⟩ := typeI_overNormalizer_complement _hG hnoV hyp hTTypeII hT2 hqp hNUS
-    hLmax hLtypeI hNUL hUH frob hW1E pins
+  obtain ⟨hcard, hy⟩ := typeI_overNormalizer_complement_of_c_eq_one_and_d_eq_one
+    _hG hnoV hyp hc1 hd1 hTTypeII hT2 hqp hNUS
+      hLmax hLtypeI hNUL hUH frob hW1E pins
   exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNUL, frob, hUH, hcard, hy⟩, hker, hUH⟩
+
+/-- Compatibility entry point while (14.5) migrates to explicit (13.12) inputs. -/
+theorem typeII_overNormalizer_frobenius [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (hSTypeII : IsTypeII hyp.S) (hTTypeII : IsTypeII hyp.T)
+    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (hqp : hyp.q < hyp.p)
+    (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
+    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    ∃ data : TypeIOverNormalizerData hyp,
+      data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) :=
+  typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one _hG hnoV hyp
+    (c_eq_one _hG hyp) (legacy_d_eq_one _hG hyp hT2 pins)
+      hSTypeII hTTypeII hT2 hqp hNUS (pins := pins)
 
 end OddOrder.Peterfalvi.S15
