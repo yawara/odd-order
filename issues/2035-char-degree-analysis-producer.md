@@ -2857,3 +2857,18 @@ consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (rest
 
 **a 宛 flag: a-2 (0116 full flip) の順序条件 (b-1 landing) 成立** — Core-typed param 化を開始可。
 次 = b-2 (T_isTypeP2_gate resolution、issues/0118)。
+
+## 2026-07-15 更新 #94 (lane b, /loop iter 2) — b-2 裁定: S_typeP2 field 削除 campaign (issue 9103) + Phase 0 landed
+
+**0118 b-2 の分析確定** (詳細 = issues/9103):
+- 「hTTypeII explicit param 化」は**論理循環で不成立** (T_isTypeP2 (14.9) の証明が
+  T_side_caseB_facts → T_caseB_facts_unconditional を入力に取る — TTypeII:190 の警告どおり)。
+- honest 解 = **`Hypothesis.S_typeP2` field の削除** (Pf (13.1)/Coq typeP-context への忠実化)。
+  swap が完全対称になり gate `T_isTypeP2_gate` と hT2 param が消滅。残 sorryAx 源 =
+  nuGridSupply (root #4) のみになる。
+- consumer 全数精査 (2 subagent): M_F=M_σ 依存 4 sites (genuine work、#84 T-side fix の
+  逆輸入) / II 位数分岐 1 site / 共通 core 機械置換 ~10 sites / FT 層供給行削除。
+- **Phase 0 landed**: `isTypeII_or_isTypeIII_of_isTypeNonI` + `fittingIsTI_of_isTypeNonI`
+  (S13_NonGaloisExclusion、(13.2.a)/(13.2.e) の per-subgroup 対称形、build green)。
+- Phase 1 (b-owned) 継続中。Phase 2 (field 削除本体) は CountingLayer hold 解除
+  (a-flip landing) + a/c-owned 4 sites の調整後 — hub の landing flag 運用への組込みを提案。
