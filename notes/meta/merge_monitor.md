@@ -691,6 +691,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #19、Opus hub — A 単独初の genuine merge) — ★★ A: root #4 nu-grid supply retire (9096 close)。census 28→27**:
+  main=`12a1cbb1` clean・census 28。A ahead=3 (feature 2 + main-sync 1)。**A** = `22b4d461` を merge `d10fca33`:
+  generic sorried `Hypothesis.nuGridSupply` (HypothesisSwap:133, root #4) 削除 + 全 consumer を honest
+  SwappedNuGridSupply/S16 carrier へ確定 (b-5 pt2 + a-side OrderRelayer/Eta10Correction migration 完了)、
+  issue 9096 close (→ closed/)。conflict なし・新 axiom/sorry regression なし・census **28→27** (−1)。
+  build **4234 jobs green**・AxiomsCheck OK (`c_eq_one_of_lambda_dichotomy` axiom-clean assert)。
+  push `12a1cbb1..d10fca33`。**残 root**: #5 V_inf (c-3) / #7-half T_isTypeP2_gate (b-2/9103) / c-4 最終 trace。
+  (tick #18 = A main-sync only で変化なし。)
 - **2026-07-15 (tick #17、Opus hub — ユーザー「A 単独で走る、監視は A のみ」) — ★★ 集約実行: b/c 退役、A 単独体制へ**:
   ユーザー確定 (0121)。**b/c 退役実行**: genuine 未マージ 0・WIP 0 を再確認 → worktree 手動削除
   (`git worktree remove` は submodule `coq/` で拒否 → `rm -rf` + `git worktree prune`、共有 symlink
