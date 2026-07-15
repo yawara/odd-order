@@ -2830,3 +2830,12 @@ consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (rest
 `deltaPrime_eq_one_T` として供給側に残存 (将来の T-mirror 消費者出現時は 1 行で再追加可)。
 効果: `characterDegreeCore_nonempty` が Brick B (9096) を待たず**即 axiom-clean 化**。
 分岐 2 (hQcomm discharge 位置) / 3 (Brick A タイミング) は hub 裁量のまま。
+
+## 2026-07-15 HUB 追記 (issue 0118 再設計) — anti-collision の相手変更 + b の次 work
+
+- **0116 full flip の実行 owner は hub→lane a に移譲** (issue 0118)。b への request
+  「flip landing まで NormEstimates/CountingLayer touch 禁止」は**相手を a として継続**。
+- **b の次 work (0118 裁定)**: (b-1) #92 δ′ restate-drop の**実装** (裁定のみで未実装と監査確定、
+  最優先 — a の flip 開始条件) → (b-2) T_isTypeP2_gate resolution → (b-3) sibleyTarget_S
+  restate-or-retire → (b-4) CDS 分割 → (b-5) ν-supply consumer 切替 (a-1 landing 後)。
+  詳細 = issues/0118。

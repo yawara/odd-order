@@ -554,3 +554,14 @@ ComparingLM:1322 — いずれも c cluster の coherence 供給) の sorry-root
 item 1 (V_inf) = HOLD 継続 (0116 Route T 待ち)。c は gated-endpoint hold へ復帰 —
 trigger: (α) Route T 実施後の「c 再 engage (V_inf)」flag、(β) a の 9000/9097 pipeline landing
 → `s_side_field_repr` (c-owned SubgroupM の最後の local sorry)。
+
+## 🧭 HUB RULING #5 (2026-07-15, issue 0118 再設計) — c の hold 解除: 即着手 2 件 + 更新済み trigger
+
+3 レーン再設計 (issue 0118) に伴い c の gated-endpoint hold を**部分解除**:
+
+- **即着手可 (ungated と監査確定)**: (c-1) `caseB_order_u_data` bridge retire (SubgroupL:200 /
+  TTypeII:924 rewire → bridge 削除、CaseBOrder への削除 carve-out 付与) / (c-2) BG vestigial 整理
+  (theoremA_maximal_structure retire + S14 2 本の注記 + stale docstring 修正)。詳細 = 0118。
+- **item 1 (V_inf) の trigger 更新**: 「hub の Route T」→「**lane a の 0116 full flip landing**」
+  (実行 owner 移譲のため)。landing tick で hub が本 issue に「c 再 engage (V_inf)」flag を出す。
+- trigger β (s_side_field_repr) は a の 0117 討伐で消化済み (moot)。

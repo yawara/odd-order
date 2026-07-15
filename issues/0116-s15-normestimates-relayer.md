@@ -246,3 +246,16 @@ discharge leaf 側 (S15_CharacterDegreeEngines[SSide]) に完備。sequencing (i
 
 作業は hub worktree (branch `hub0116`) で行い、green 後に通常ゲートで main 合流。進捗は本 issue
 に追記。
+
+## 🧭 HUB 移譲 (2026-07-15, issue 0118 再設計) — full flip の実行 owner を hub→lane a に移譲
+
+3 レーン再設計 (issue 0118) により、**full flip の実行を lane a に移譲**する (設計正本 = 本 issue の
+「🚧 HUB FULL FLIP」節のまま scope 不変; hub は設計 authority と landing flag を保持)。理由 =
+a が free + 同型パターン 3 連続実証 + lane cadence が hub tick より速い (0118 根拠節)。
+
+- **hub0116 worktree/branch は撤収** (commit 0 のまま)。a は自 worktree (odd-order-a) で実施。
+- **順序条件**: a は先に (a-1) 9096 ν-carrier threading を実施し、flip の Core-typed param 化は
+  **b の δ′ restate-drop (0118 b-1) landing 後**に開始。
+- **b 宛 anti-collision は継続** (NormEstimates/CountingLayer touch 禁止、相手が hub→a に変わるのみ)。
+- hQcomm 裁量条項 (threading param vs S16 hoist) も a に委譲 (Q_elementaryAbelian_T proven 確認済
+  ゆえ hTTypeII thread 推奨)。

@@ -200,3 +200,13 @@ Section 16 construction だけが pure ν-grid facts を供給する。
 `Hypothesis.swap` の `hV` 引数はこれで直接埋められる (consumer 側の hT2-dictionary 経由も
 そのまま有効)。audit の「V_commutative = post-(14.9) fact」判定は audit 時点では正しかったが
 現在は解消 (bundle から外す API 設計自体は grid/structural 分離として引き続き正)。
+
+## 🧭 HUB 追記 (2026-07-15, issue 0118 再設計) — bundle split landing 確認 + a-1/b-5 kickoff
+
+- **RULING item 2 (bundle split) の landing を監査で確認** (NuGridSupplyData に V_commutative 無し、
+  `Hypothesis.swap` は独立 `hV` 引数で `S_U_commutative := hV` 配線済み)。
+- **RULING item 3 (a の follow) を 0118 (a-1) として正式 kickoff**: canonical producer
+  `sectionSixteenNuGridSupplyData_of_inputs` (FeitThompson.lean:1583、proven 確認済) を carrier
+  threading で FT-layer から供給。generic `Hypothesis.nuGridSupply` は row-translation gap ゆえ
+  そのまま討伐不能 — carrier 入力 explicit param 形へ restate し、Supply 層 ~8 consumer の切替は
+  **b (0118 b-5、a-1 landing 後)**。分担境界と新 signature は本 issue に記録して相互通知。
