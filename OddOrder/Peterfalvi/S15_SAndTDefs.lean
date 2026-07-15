@@ -207,15 +207,6 @@ theorem normalizer_W2_le_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hTI g ⟨a, ha_sharp, hga_sharp⟩
   rwa [hNorm] at hgN
 
-/-- **Peterfalvi (13.12) `c = 1`, as `C = ⊥`**: the centralizer datum `C = U ⊓ C_G(P)` is trivial.
-Since `c := |C| = 1` (`c_eq_one`), `C` is the trivial subgroup.  This is the regularity *finish* of
-the (13.16) `W₂`-confinement Maschke/Wielandt core: the residual kernel `N_U(W₂)` centralizes
-`P = S_F` (Maschke + Wielandt), hence lies in `U ⊓ C_G(P) = C = 1`. -/
-theorem C_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : hyp.C = ⊥ := by
-  have hcard : Nat.card ↥hyp.C = 1 := by rw [← hyp.c_eq_card_C, c_eq_one hG hyp]
-  exact Subgroup.card_eq_one.mp hcard
-
 /-- **Peterfalvi (13.12) `c = 1`, usable form**: `U ⊓ C_G(P) = ⊥` — no nonidentity element of the
 complement `U` centralizes the Fitting kernel `P = S_F` (`U` acts faithfully on `P`).  Immediate from
 `C_eq_bot` and `C = U ⊓ C_G(P)` (`C_eq`).  The Maschke/Wielandt core of (13.16) concludes
@@ -225,12 +216,6 @@ theorem U_inf_centralizer_P_eq_bot_of_c_eq_one [Finite G]
     hyp.U ⊓ Subgroup.centralizer (hyp.P : Set G) = ⊥ := by
   rw [← hyp.C_eq]
   exact hyp.C_eq_bot_of_c_eq_one hc1
-
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem U_inf_centralizer_P_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    hyp.U ⊓ Subgroup.centralizer (hyp.P : Set G) = ⊥ :=
-  U_inf_centralizer_P_eq_bot_of_c_eq_one hyp (c_eq_one hG hyp)
 
 /-- **Peterfalvi (13.16), Frobenius fixed-point-freeness of `W₁` on `U`**: `C_U(W₁) = ⊥` — no
 nonidentity element of the complement `U` centralizes `W₁`.
@@ -650,14 +635,6 @@ theorem normalizer_U_inf_W2_eq_bot_of_data_and_c_eq_one [Finite G]
   rw [U_inf_centralizer_P_eq_bot_of_c_eq_one hyp hc1] at this
   exact le_bot_iff.mp this
 
-/-- Compatibility entry point for the data-parametrized (13.16) core. -/
-theorem normalizer_U_inf_W2_eq_bot_of_data [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hcop : Nat.Coprime (Nat.card ↥hyp.P) (Nat.card ↥(hyp.U ⊔ hyp.W1)))
-    (hrec : hyp.Sdata.W2 = hyp.W2) :
-    hyp.U ⊓ Subgroup.normalizer (hyp.W2 : Set G) = ⊥ :=
-  normalizer_U_inf_W2_eq_bot_of_data_and_c_eq_one hG hyp (c_eq_one hG hyp) hcop hrec
-
 /-- **Peterfalvi (13.16), the Maschke/Wielandt core proper**: `N_U(W₂) = 1`, i.e.
 `U ⊓ N_G(W₂) = ⊥` — no nonidentity element of the complement `U` normalizes `W₂`.
 
@@ -697,12 +674,6 @@ theorem normalizer_U_inf_W2_eq_bot_of_c_eq_one [Finite G]
   -- §16 construction via `typePData_of_kappaHall_hallComplement_W2`).
   normalizer_U_inf_W2_eq_bot_of_data_and_c_eq_one hG hyp hc1
     (coprime_card_P_card_UW1 hG hyp) hyp.Sdata_W2_eq
-
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem normalizer_U_inf_W2_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    hyp.U ⊓ Subgroup.normalizer (hyp.W2 : Set G) = ⊥ :=
-  normalizer_U_inf_W2_eq_bot_of_c_eq_one hG hyp (c_eq_one hG hyp)
 
 /-- **Peterfalvi (13.16), Maschke/Wielandt core for the `W₂`-side**: `N_G(W₂) ⊓ S ≤ P ⊔ W₁`.
 
@@ -798,12 +769,6 @@ theorem normalizer_W2_within_S_of_c_eq_one [Finite G]
   exact Subgroup.mul_mem _ (Subgroup.mem_sup_right (SetLike.mem_coe.mp hw))
     (Subgroup.mem_sup_left hmP)
 
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem normalizer_W2_within_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    Subgroup.normalizer (hyp.W2 : Set G) ⊓ hyp.S ≤ hyp.P ⊔ hyp.W1 :=
-  normalizer_W2_within_S_of_c_eq_one hG hyp (c_eq_one hG hyp)
-
 /-- **Peterfalvi (13.16), structural core for the `W₂`-side**: the Frobenius/Wielandt containment
 `N_G(W₂) ≤ P ⊔ W₁`.  Assembled from the TI reduction `N_G(W₂) ≤ S` (`normalizer_W2_le_S`, proven)
 and the Maschke/Wielandt core `N_G(W₂) ⊓ S ≤ P ⊔ W₁` (`normalizer_W2_within_S`, the isolated
@@ -815,12 +780,6 @@ theorem normalizer_W2_structure_of_c_eq_one [Finite G]
   intro g hg
   have hgS : g ∈ hyp.S := normalizer_W2_le_S hG hyp hg
   exact normalizer_W2_within_S_of_c_eq_one hG hyp hc1 (Subgroup.mem_inf.mpr ⟨hg, hgS⟩)
-
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem normalizer_W2_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.P ⊔ hyp.W1 :=
-  normalizer_W2_structure_of_c_eq_one hG hyp (c_eq_one hG hyp)
 
 /-- **Peterfalvi (13.16), `W₂`-side**: `N_G(W₂) = C_G(W₂) = P ⊔ W₁` (the `S↔T`, `W₁↔W₂`, `P↔Q`
 dual of `normalizer_W1`; the form stated directly in Coq `FTtypeP_norm_cent_compl`).
@@ -864,13 +823,6 @@ theorem normalizer_W2_of_c_eq_one [Finite G]
       Subgroup.normalizer (hyp.W2 : Set G) := Subgroup.centralizer_le_normalizer _
   exact ⟨le_antisymm (hN_le.trans hPW1_le_C) hC_le_N,
     le_antisymm (hC_le_N.trans hN_le) hPW1_le_C⟩
-
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem normalizer_W2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    Subgroup.normalizer (hyp.W2 : Set G) = Subgroup.centralizer (hyp.W2 : Set G) ∧
-      Subgroup.centralizer (hyp.W2 : Set G) = hyp.P ⊔ hyp.W1 :=
-  normalizer_W2_of_c_eq_one hG hyp (c_eq_one hG hyp)
 
 /-- Carrier for Peterfalvi (13.17), the type-I maximal subgroup over
 `N_G(U)`. -/

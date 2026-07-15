@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.BetaVanishing
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
 
 /-!
 # TAIL
@@ -1316,8 +1317,10 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
               (1 : ℝ) - (h78.complementIndex : ℝ) / (h78.kernelOrder : ℝ)
                 ≤ h78.zetaNuRhoNormSq := by
   classical
+  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy hG
   obtain ⟨M, typeIHyp, hMmax, hnormV, hindexCases⟩ :=
-    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy hG hnoV hyp.base hTII
+    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy_of_c_eq_one
+      hG hnoV hyp.base hc1 hTII
   obtain ⟨fdata, _⟩ :=
     OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hMmax ⟨typeIHyp.typeI⟩
   refine ⟨M, typeIHyp, hMmax, hnormV, hindexCases, ?_⟩
@@ -1522,8 +1525,10 @@ theorem exists_MHypothesis [Finite G]
     (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
   have hTII : IsTypeII hyp.base.T := T_typeII _hG hnoV hncH0C hyp
+  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy _hG
   obtain ⟨M, structuralHyp, hM_max, hnorm_V, hindexCases⟩ :=
-    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy _hG hnoV hyp.base hTII
+    OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy_of_c_eq_one
+      _hG hnoV hyp.base hc1 hTII
   obtain ⟨dataM⟩ :=
     TypeICoherent78Data.nonempty _hG hnoV hM_max ⟨structuralHyp.typeI⟩
   refine ⟨{

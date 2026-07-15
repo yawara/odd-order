@@ -378,18 +378,4 @@ theorem caseB_order_u_of_analytic_inequality [Finite G]
     hyp.p_odd hyp.q_odd hux hu_ne_one hu_cop_q hx0
     hyp.m_gt_seven_tenths_of_five_le_q hyp.m_gt_four_fifths_of_seven_le_q h11c hanalytic
 
-/-- Compatibility entry point for (13.15), supplied by the legacy (13.10) carrier during the
-explicit-inequality migration. -/
-theorem caseB_order_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G))
-    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
-      (hyp.mkSection11CharacterDataS hG chief)) :
-    (hyp.p ≡ 1 [MOD hyp.q] →
-        hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))) ∧
-      (¬ hyp.p ≡ 1 [MOD hyp.q] →
-        hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)) := by
-  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
-  exact caseB_order_u_of_analytic_inequality hG hyp h1310 caseB
-
 end OddOrder.Peterfalvi.S15

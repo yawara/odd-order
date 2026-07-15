@@ -570,18 +570,6 @@ theorem numeric_bounds_of_analytic_inequality [Finite G]
     linarith [hfrac]
   exact ⟨hm49, lt_of_le_of_lt hlower h1310⟩
 
-/-- Compatibility entry point for (13.11), supplied by the legacy (13.10) carrier during the
-explicit-inequality migration. -/
-theorem numeric_bounds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
-      (5 ≤ hyp.q → hyp.m > (7 / 10 : ℚ)) ∧
-      (hyp.q = 3 →
-        hyp.m > (49 / 100 : ℚ) ∧
-          (hyp.u : ℚ) / (hyp.c : ℚ) > (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6)) := by
-  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
-  exact numeric_bounds_of_analytic_inequality hyp h1310
-
 /-- **Peterfalvi (13.12), numeric elimination** (04.15 p.85): the (13.10)+(13.2.c) upper bound
 `m < q(p^q − 1)/(c · p^(q−1) · (p − 1))`, together with the fixed-point-free lower bound `c ≥ 2q+1`
 (with `2q ∣ c − 1`) and the (13.11) lower bounds on `m`, forces `p = 5`, `q = 3`, `c = 7`.
@@ -902,14 +890,6 @@ theorem c_eq_one_of_analytic_inequality [Finite G] (hG : OddOrder.BG.IsMinimalSi
     hyp.m_eq hbound
   exact c_eq_one_final_case hG hyp hp5 hq3 hc7
 
-/-- Compatibility entry point for (13.12), supplied by the legacy (13.10) carrier during the
-explicit-inequality migration. -/
-theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    hyp.c = 1 := by
-  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
-  exact c_eq_one_of_analytic_inequality hG hyp h1310
-
 /-- **Peterfalvi (13.13)**: if case (9.7.a) holds for `S`, then
 `q = 3` and `u = (p - 1)^2 / 4`.
 
@@ -954,17 +934,6 @@ theorem caseA_parameters_of_analytic_inequality [Finite G]
     simpa using h
   exact caseA_numeric_parameters hyp.three_le_p hyp.q_prime hyp.q_ne_two hpeven
     hyp.m_gt_seven_tenths_of_five_le_q h13c h1310' hdiv
-
-/-- Compatibility entry point for (13.13), supplied by the legacy (13.10) carrier during the
-explicit-inequality migration. -/
-theorem caseA_parameters [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G))
-    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
-      (hyp.mkSection11CharacterDataS hG chief)) :
-    hyp.q = 3 ∧ hyp.u = (hyp.p - 1) ^ 2 / 4 := by
-  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
-  exact caseA_parameters_of_analytic_inequality hG hyp h1310 caseA
 
 /-- **Peterfalvi (14.6), sharp-parameter Sylow noncyclicity for the `S`-side `U`.**
 At the (13.13) parameters `q = 3` and `u = (p - 1)² / 4`, for every prime
@@ -1014,20 +983,6 @@ theorem caseA_sylow_U_not_isCyclic_of_parameters [Finite G]
     (R : Subgroup ↥hyp.U).map f by rfl] at hRsetup
   exact hRsetup <| isCyclic_of_surjective _
     (f.subgroupMap_surjective (R : Subgroup ↥hyp.U))
-
-/-- **Peterfalvi (14.6), case-(9.7.a) Sylow noncyclicity for the `S`-side `U`.**
-If case (a) holds, then for every prime `r ∣ (p - 1) / 2`, every Sylow `r`-subgroup of
-Peterfalvi's actual subgroup `U` is noncyclic.  This is the direct consumer of the (13.13)
-parameter determination. -/
-theorem caseA_sylow_U_not_isCyclic [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
-      (hyp.mkSection11CharacterDataS hG chief))
-    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
-    (R : Sylow r ↥hyp.U) : ¬ IsCyclic ↥(R : Subgroup ↥hyp.U) := by
-  obtain ⟨hq, hu⟩ := caseA_parameters hG hyp caseA
-  exact caseA_sylow_U_not_isCyclic_of_parameters hG hyp caseA hq hu hr hrhalf R
 
 /-- **Peterfalvi (14.6), BG Prop. 1.16 witness.**  Let `R₀` be a noncyclic Sylow
 `r`-subgroup of the `S`-side complement `U`, where `r ∣ (p - 1) / 2`.  Then some
@@ -1098,20 +1053,6 @@ theorem caseA_exists_sylow_mem_inf_centralizer_ne_bot_of_parameters [Finite G]
       hyp.P ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
   apply exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic hG hyp hr hrhalf R
   exact caseA_sylow_U_not_isCyclic_of_parameters hG hyp caseA hq hu hr hrhalf R
-
-/-- **Peterfalvi (14.6), case-(9.7.a) centralizer witness.**  This consumer obtains the
-sharp (13.13) parameters from `caseA_parameters`. -/
-theorem caseA_exists_sylow_mem_inf_centralizer_ne_bot [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
-    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
-      (hyp.mkSection11CharacterDataS hG chief))
-    {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (hyp.p - 1) / 2)
-    (R : Sylow r ↥hyp.U) :
-    ∃ x ∈ (R : Subgroup ↥hyp.U).map hyp.U.subtype, x ≠ (1 : G) ∧
-      hyp.P ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
-  apply exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic hG hyp hr hrhalf R
-  exact caseA_sylow_U_not_isCyclic hG hyp caseA hr hrhalf R
 
 /-- **Peterfalvi (14.6), ambient Sylow carrier.**  If `R₀ ∈ Syl_r(U)` is noncyclic and
 `U ≤ K`, then there is `R ∈ Syl_r(K)` containing the image of `R₀`; simultaneously retain the
@@ -1304,21 +1245,11 @@ theorem Hypothesis.C_eq_bot_of_c_eq_one [Finite G] (hyp : Hypothesis (G := G))
     (hc1 : hyp.c = 1) : hyp.C = ⊥ :=
   Subgroup.card_eq_one.mp (by rw [← hyp.c_eq_card_C]; exact hc1)
 
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem Hypothesis.C_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : hyp.C = ⊥ :=
-  hyp.C_eq_bot_of_c_eq_one (c_eq_one hG hyp)
-
 /-- **`H = P` from (13.12)** — with `C = ⊥` the (13.5) subgroup `H = P C` collapses to `P`. -/
 theorem Hypothesis.H_eq_P_of_c_eq_one [Finite G] (hyp : Hypothesis (G := G))
     (hc1 : hyp.c = 1) : hyp.H = hyp.P := by
   show hyp.P ⊔ hyp.C = hyp.P
   rw [hyp.C_eq_bot_of_c_eq_one hc1, sup_bot_eq]
-
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem Hypothesis.H_eq_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : hyp.H = hyp.P :=
-  hyp.H_eq_P_of_c_eq_one (c_eq_one hG hyp)
 
 /-- **`q ∤ |S′|` from (13.12)**: `|S′| = p^q·(u·c) = p^q·u`, with `q ∤ p^q`
 (`p ≠ q`) and `q ∤ u` (`u ≡ 1 (mod q)`, `u_modEq_one`). -/
@@ -1339,12 +1270,6 @@ theorem Hypothesis.not_q_dvd_card_derived_of_c_eq_one [Finite G]
     rw [hk, Nat.mul_mod_right, h1q] at hmod
     omega
 
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem Hypothesis.not_q_dvd_card_derived [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    ¬ hyp.q ∣ Nat.card ↥(OddOrder.GroupTheory.derivedInG hyp.S) :=
-  hyp.not_q_dvd_card_derived_of_c_eq_one hG (c_eq_one hG hyp)
-
 /-- **`W₁ ⊓ S′ = ⊥` from (13.12)**: an element of the intersection has order dividing both `q`
 and `|S′|`; `q ∤ |S′|` with `q` prime forces order `1`. -/
 theorem Hypothesis.W1_inf_derived_eq_bot_of_c_eq_one [Finite G]
@@ -1364,12 +1289,6 @@ theorem Hypothesis.W1_inf_derived_eq_bot_of_c_eq_one [Finite G]
   rcases (Nat.dvd_prime hyp.q_prime).mp hord_q with h1 | hq
   · exact orderOf_eq_one_iff.mp h1
   · exact absurd (hq ▸ hord_D) (hyp.not_q_dvd_card_derived_of_c_eq_one hG hc1)
-
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem Hypothesis.W1_inf_derived_eq_bot [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    hyp.W1 ⊓ OddOrder.GroupTheory.derivedInG hyp.S = ⊥ :=
-  hyp.W1_inf_derived_eq_bot_of_c_eq_one hG (c_eq_one hG hyp)
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`supp(μ_j) ⊆ P`** ((13.3.a)+(13.12), the `seqInd_on` step of Coq `PVSbeta`): the column
@@ -1393,15 +1312,6 @@ theorem Hypothesis.mu_colSum_support_subset_P_of_c_eq_one [Finite G]
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   rw [hθeq]
   exact ClassFunction.support_induce_subset_of_normal _ θ
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem Hypothesis.mu_colSum_support_subset_P [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
-    ((∑ i : Fin hyp.q, hyp.mu i j) : ClassFunction ↥hyp.S ℂ).support ⊆
-      hyp.H.subgroupOf hyp.S :=
-  hyp.mu_colSum_support_subset_P_of_c_eq_one hG (c_eq_one hG hyp) j hj
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.18.a), the `S′−P` vanishing (`hmuD`)**: `μ_{0j}(z) = 0` for
@@ -1500,17 +1410,5 @@ theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P_of_c_eq_one [F
     Fintype.card_fin, nsmul_eq_mul] at hsum
   have hq0 : (hyp.q : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.q_prime.pos.ne'
   exact (mul_eq_zero.mp hsum).resolve_left hq0
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while the (13.12) consumer chain migrates to explicit `c = 1`. -/
-theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩)
-    (z : ↥hyp.S) (hzD : (z : G) ∈ OddOrder.GroupTheory.derivedInG hyp.S)
-    (hzP : (z : G) ∉ hyp.P) :
-    hyp.mu ⟨0, hyp.q_prime.pos⟩ j z = 0 :=
-  hyp.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P_of_c_eq_one hG
-    (c_eq_one hG hyp) j hj z hzD hzP
-
 
 end OddOrder.Peterfalvi.S15

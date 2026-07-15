@@ -861,23 +861,13 @@ theorem H_sharp_alphaCF_restrict_mem_ZIrr [Fintype G] [Invertible (Nat.card G : 
   rw [hz, star_intCast, div_eq_mul_inv, mul_smul, Int.cast_smul_eq_zsmul]
   exact Submodule.smul_mem _ z (H_sharp_inv_normSq_restrict_zeta_mem_ZIrr hG hyp i)
 
-/-- Carrier for the norm cascade (13.6)--(13.10). -/
-structure NormCascadeData (hyp : Hypothesis (G := G)) where
-  chars : CharacterDegreeData hyp
-  lambda_norm_lower : Prop
-  eta10_norm_lower : Prop
-  eta01_norm_lower : Prop
-  global_cover : Prop
-  global_norm_lower : Prop
-  analytic_inequality : Prop
-
 /-! ### The (13.10) atoms
 
-The (13.6)–(13.9) estimates are stated for shared rational atoms: `slam`/`seta` are the `G₀`
+The Core (13.6)–(13.9) relayers use shared rational atoms: `slam`/`seta` are the `G₀`
 squared-norm sums of `λ^{τ₁}`/`η₁₀` (rational by the Galois integrality
 `OddOrder.Algebra.exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed`), and `g0`/`HS` are counting
-ratios.  Materializing them as definitions lets the four estimates be stated (and attacked) as
-independent producers while `analyticInequalityEstimates` assembles them `sorry`-free. -/
+ratios.  Materializing them here lets the downstream Core relayer state each estimate over the
+same exact quantities without introducing an opaque cascade carrier. -/
 
 /-- The generic set `G₀` of (13.9) as a `Finset`. -/
 noncomputable def Hypothesis.G0Finset [Finite G] (hyp : Hypothesis (G := G)) : Finset G :=

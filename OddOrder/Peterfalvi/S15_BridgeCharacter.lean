@@ -245,13 +245,6 @@ theorem PW1_index_eq_u_of_c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     _ = (hyp.p ^ hyp.q * hyp.q) * hyp.u := by ring
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem PW1_index_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S).index = hyp.u :=
-  PW1_index_eq_u_of_c_eq_one hG hyp (c_eq_one hG hyp)
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (13.18.a), the bridge character vanishes at `1`**: `β_j(1) = 0` — the two
 degrees agree, `Ind_{PW₁}^S 1 (1) = [S:PW₁] = u = μ_{0j}(1)` (`PW1_index_eq_u`,
 `mu_apply_one_eq_u`). -/
@@ -264,13 +257,6 @@ theorem betaGrid_apply_one_eq_zero_of_c_eq_one [Finite G]
     ClassFunction.induce_apply_one, PW1_index_eq_u_of_c_eq_one hG hyp hc1,
     trivialClassFunction_apply,
     mul_one, hyp.mu_apply_one_eq_u hG ⟨0, hyp.q_prime.pos⟩ j hj0, sub_self]
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem betaGrid_apply_one_eq_zero [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    betaGrid hyp j 1 = 0 :=
-  betaGrid_apply_one_eq_zero_of_c_eq_one hG hyp (c_eq_one hG hyp) j hj
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.b), Frobenius half** (`FiniteInduce`-instance form): `‖Ind_{PW₁}^S 1‖²_S = (u−1)/q + 1`.
@@ -408,14 +394,6 @@ theorem indPW1_inner_self_of_c_eq_one [Finite G]
   intro _ _
   convert indPW1_inner_self_aux _hG hyp hc1 using 2
   exact Subsingleton.elim _ _
-
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem indPW1_inner_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
-      ClassFunction.inner (indPW1 hyp) (indPW1 hyp)
-        = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 1 : ℚ) : ℂ) :=
-  indPW1_inner_self_of_c_eq_one hG hyp (c_eq_one hG hyp)
 
 open OddOrder.Isaacs in
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -699,17 +677,6 @@ theorem betaGrid_support_of_c_eq_one [Finite G]
       rw [← hconjG]
       group
 
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem betaGrid_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    (betaGrid hyp j).support ⊆
-      {z : ↥hyp.S |
-        (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.P ∪
-          OddOrder.GroupTheory.conjClassSetIn hyp.S
-            (OddOrder.GroupTheory.typePV hyp.S hyp.Sdata)} :=
-  betaGrid_support_of_c_eq_one hG hyp (c_eq_one hG hyp) j hj
-
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`P ⊄ ker μ_{0j}`** (Pf (13.18.b) kernel step, `S`-side).  For `j ≠ 0`, the base-row grid
 irreducible `μ_{0j}` does not have the Fitting kernel `P` in its character kernel.
@@ -836,14 +803,6 @@ theorem betaGrid_norm_of_c_eq_one [Finite G]
     ClassFunction.inner_sub_right, hII, hIμ, hμI, hμμ]
   push_cast
   ring
-
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem betaGrid_norm [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    ∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
-      ClassFunction.inner (betaGrid hyp j) (betaGrid hyp j)
-        = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ) :=
-  betaGrid_norm_of_c_eq_one hG hyp (c_eq_one hG hyp) j hj
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(4.8)/(5.3) prime-`TI` Dade cross-relation, `S`-side row-`0` form**:
@@ -1108,14 +1067,6 @@ theorem betaGrid_A0_support_of_c_eq_one [Finite G]
   exact sharpP_union_V_subset_A0 hG hyp (betaGrid_support_of_c_eq_one hG hyp hc1 j hj hz)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem betaGrid_A0_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    (betaGrid hyp j).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
-  betaGrid_A0_support_of_c_eq_one hG hyp (c_eq_one hG hyp) j hj
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c)** `⟨Γ, 1_G⟩ = 0`.
 
 **De-scaffolded** (issue 9076): the `'A0(S)` `normedTI` content the old docstring flagged as
@@ -1225,16 +1176,6 @@ theorem gammaGrid_orthogonal_one_of_c_eq_one [Finite G]
   convert gammaGrid_orthogonal_one_aux hG hnoV hyp hc1 using 2 <;> exact Subsingleton.elim _ _
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem gammaGrid_orthogonal_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) :
-    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      ClassFunction.inner (GammaGrid hG hyp)
-        (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 :=
-  gammaGrid_orthogonal_one_of_c_eq_one hG hnoV hyp (c_eq_one hG hyp)
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ` — fully proven (Coq `GammaReal`,
 `PFsection13.v:1911`).
 
@@ -1292,14 +1233,6 @@ theorem gammaGrid_real_of_c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   exact gammaGrid_defGamma hG hnoV hyp j' hj'0
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem gammaGrid_real [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) :
-    (GammaGrid hG hyp).conj = GammaGrid hG hyp :=
-  gammaGrid_real_of_c_eq_one hG hnoV hyp (c_eq_one hG hyp)
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The (13.18) residual `Γ` is a virtual character**: each constituent of
 `Γ = τ_S(β_{#1}) − 1_G + η_{01}` lies in `ℤ[Irr G]` — the Dade image via the `'A0` Dade=Ind
 bridge (`sInstance_dade0_eq_induce` + `induce_mem_ZIrr`, with `β_{#1} ∈ ℤ[Irr S]` from
@@ -1340,14 +1273,6 @@ theorem gammaGrid_mem_ZIrr_of_c_eq_one [Finite G]
     exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.mem_ZIrr htriv
   · rw [hyp.eta_eq_tau_omega]
     exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr _ j1)
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem gammaGrid_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) :
-    GammaGrid hG hyp ∈ OddOrder.RepresentationTheory.ZIrr G :=
-  gammaGrid_mem_ZIrr_of_c_eq_one hG hnoV hyp (c_eq_one hG hyp)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- Core of the **(13.18.d) residual-norm bound**, with the `FiniteInduce`-scoped instances
@@ -1566,18 +1491,6 @@ theorem gammaGrid_Y_norm_bound_of_c_eq_one [Finite G]
   convert h using 3
   exact Subsingleton.elim _ _
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem gammaGrid_Y_norm_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) :
-    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-      ∀ (X Y : ClassFunction G ℂ), GammaGrid hG hyp = X + Y →
-        ClassFunction.inner X Y = 0 →
-        (∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) →
-        (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ) :=
-  gammaGrid_Y_norm_bound_of_c_eq_one hG hnoV hyp (c_eq_one hG hyp)
-
 /-- **Faithful §13 producer for Peterfalvi (13.18).**  The (13.18) virtual characters `β_j`/`Γ`
 and their genuine properties (support (13.18.a), the (13.18.b) norm `‖β_j‖² = (u−1)/q + 2`,
 orthogonality of `Γ` to `1_G`, reality, and the (13.18.d) `‖Y‖²` residual bound) are supplied here.
@@ -1604,15 +1517,6 @@ noncomputable def betaData_of_grid_of_c_eq_one [Finite G]
   Gamma_orthogonal_one := gammaGrid_orthogonal_one_of_c_eq_one hG hnoV hyp hc1
   Gamma_real := gammaGrid_real_of_c_eq_one hG hnoV hyp hc1
   Y_norm_bound := gammaGrid_Y_norm_bound_of_c_eq_one hG hnoV hyp hc1
-
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-noncomputable def betaData_of_grid [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G))
-    (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
-    BetaData hyp :=
-  betaData_of_grid_of_c_eq_one hG hnoV hyp (c_eq_one hG hyp) j hj
 
 /-- **Peterfalvi (13.18)**: the virtual character `beta_j` has controlled
 support, norm, and orthogonal remainder.
@@ -1661,32 +1565,6 @@ theorem beta_support_norm_and_remainder_of_c_eq_one [Finite G]
       ⟨1, by omega⟩ (by simp)).Gamma_real,
     (betaData_of_grid_of_c_eq_one _hG hnoV hyp hc1
       ⟨1, by omega⟩ (by simp)).Y_norm_bound⟩
-
-/-- Compatibility entry point while (13.18) migrates to explicit (13.12) input. -/
-theorem beta_support_norm_and_remainder [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hyp : Hypothesis (G := G)) :
-    ∃ data : BetaData hyp,
-      (data.beta.support ⊆
-        {z : ↥hyp.S |
-          (z : G) ∈ OddOrder.GroupTheory.sharpSubgroup hyp.P ∪
-            OddOrder.GroupTheory.conjClassSetIn hyp.S
-              (OddOrder.GroupTheory.typePV hyp.S hyp.Sdata)}) ∧
-        (∀ [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)],
-          ClassFunction.inner data.beta data.beta
-            = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ)) ∧
-        (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-          ClassFunction.inner data.Gamma
-            (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0) ∧
-        data.Gamma.conj = data.Gamma ∧
-        (∀ [Fintype G] [Invertible (Nat.card G : ℂ)],
-          ∀ (X Y : ClassFunction G ℂ), data.Gamma = X + Y →
-            ClassFunction.inner X Y = 0 →
-            (∀ (i : Fin hyp.q) (k : Fin hyp.p), ClassFunction.inner Y (hyp.eta i k) = 0) →
-            (ClassFunction.inner Y Y).re ≤ ((hyp.u : ℚ) - 1) / (hyp.q : ℚ)) :=
-  beta_support_norm_and_remainder_of_c_eq_one _hG hnoV hyp (c_eq_one _hG hyp)
-
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(4.8)/(5.3) prime-`TI` Dade cross-relation, `T`-side full-grid form** (mirror of
