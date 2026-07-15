@@ -253,7 +253,8 @@ input that excludes `V^S` from the pure-`κ` set `𝒞_G(K₀#)`. -/
 theorem exists_sigma_prime_dvd_orderOf_typePV [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (data : TypePData M) {v : G} (hv : v ∈ typePV M data) :
-    ∃ p ∈ (orderOf v).primeFactors, p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    ∃ p ∈ (orderOf v).primeFactors,
+      p ∈ OddOrder.BG.Ch3.S10.sigma M ∧ p ∣ Nat.card ↥data.W2 := by
   simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, hvnW1, _hvnW2⟩ := hv
   haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
@@ -302,8 +303,9 @@ theorem exists_sigma_prime_dvd_orderOf_typePV [Finite G]
     OddOrder.BG.Ch4.S14.isPiElement_sigma_of_mem_Msigma hbMσ
   have hbord1 : orderOf ((b : ↥data.W) : G) ≠ 1 := fun h => hb1 (orderOf_eq_one_iff.mp h)
   obtain ⟨p, hpp, hpdvdb⟩ := (orderOf ((b : ↥data.W) : G)).exists_prime_and_dvd hbord1
-  refine ⟨p, Nat.mem_primeFactors.mpr ⟨hpp, hpdvdb.trans hbdvd, (orderOf_pos v).ne'⟩, ?_⟩
-  exact hbσ p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvdb, (orderOf_pos _).ne'⟩)
+  refine ⟨p, Nat.mem_primeFactors.mpr ⟨hpp, hpdvdb.trans hbdvd, (orderOf_pos v).ne'⟩, ?_, ?_⟩
+  · exact hbσ p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvdb, (orderOf_pos _).ne'⟩)
+  · exact hpdvdb.trans (data.W2.orderOf_dvd_natCard hbW2)
 
 /-- **`𝒞_G(K₀#)`-points are nonidentity `κ`-elements** (issue 9076 piece 4c): every `G`-conjugate of
 a nontrivial element of the `κ(M)`-Hall `K₀` is a nonidentity `κ(M)`-element.  A `k ∈ K₀#` has
@@ -417,7 +419,7 @@ theorem conjClassSetIn_typePV_subset_A0Set [Finite G]
     intro hconj
     rw [mem_conjClassSet_conj_iff] at hconj
     obtain ⟨hvκ, -⟩ := kappaHall_conjClassSet_isPiElement hKM hK hconj
-    obtain ⟨p, hpf, hpσ⟩ := exists_sigma_prime_dvd_orderOf_typePV hG hM data hv
+    obtain ⟨p, hpf, hpσ, -⟩ := exists_sigma_prime_dvd_orderOf_typePV hG hM data hv
     exact OddOrder.BG.Ch4.S14.kappa_subset_sigmaCompl (hvκ p hpf) hpσ
 
 /-- **`A₀(S) ⊆ A0Set M K₀`** (issue 9076 piece 4c): the honest type-`P₂` support embeds into BG's

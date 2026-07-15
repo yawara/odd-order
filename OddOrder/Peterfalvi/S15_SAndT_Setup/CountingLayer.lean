@@ -162,16 +162,10 @@ theorem Hypothesis.q_not_dvd_card_H [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     have hqp : hyp.q ∣ hyp.p := Nat.Prime.dvd_of_dvd_pow hyp.q_prime hq
     exact hyp.p_ne_q ((Nat.prime_dvd_prime_iff_eq hyp.q_prime hyp.p_prime).mp hqp).symm
   · -- `q ∤ |U|`: `U W₁` Frobenius has coprime kernel/complement.
-    -- `U ≠ ⊥` via the type-II witness on `S` (as in `basic_structure`).
-    have hSII : IsTypeII hyp.S :=
-      OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
-    have tdata : TypeIIData hyp.S := hSII.some
-    have hSdataUne : hyp.Sdata.U ≠ ⊥ := by
-      intro hbot
-      have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
-        rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
-      rw [hbot, Subgroup.card_bot] at h1
-      exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+    -- `U ≠ ⊥` via the type-II/type-III common core (as in `basic_structure`).
+    let setup := hyp.toTypesIIIIIIVSetupS hG
+    have hSdataUne := setup.nontrivial.1
+    change hyp.Sdata.U ≠ ⊥ at hSdataUne
     have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
     have hcop := hfrob.coprime_card_kernel_complement
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left :
@@ -504,15 +498,9 @@ uses only the (proven) `U W₁` Frobenius structure, not the case-(b) Singer fie
 theorem Hypothesis.u_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : hyp.u ≡ 1 [MOD hyp.q] := by
   haveI := hyp.finiteG
-  have hSII : IsTypeII hyp.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
-  have tdata : TypeIIData hyp.S := hSII.some
-  have hSdataUne : hyp.Sdata.U ≠ ⊥ := by
-    intro hbot
-    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
-      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
-    rw [hbot, Subgroup.card_bot] at h1
-    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  let setup := hyp.toTypesIIIIIIVSetupS hG
+  have hSdataUne := setup.nontrivial.1
+  change hyp.Sdata.U ≠ ⊥ at hSdataUne
   have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
   have hUW1leS : hyp.Sdata.U ⊔ hyp.Sdata.W1 ≤ hyp.S :=
     sup_le (hyp.Sdata.U_le.trans (Subgroup.map_subtype_le _)) hyp.Sdata.W1_le

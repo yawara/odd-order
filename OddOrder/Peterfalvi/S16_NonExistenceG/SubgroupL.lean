@@ -61,8 +61,6 @@ theorem exists_LHypothesis [Finite G]
       (OddOrder.Peterfalvi.S15.exists_conj_typeP_U_of_coprime _hG hyp.base tdata
         (OddOrder.Peterfalvi.S15.coprime_card_U_card_P_of_disjoint hyp.base tdata
           (P_inf_U_eq_bot _hG hyp)))
-  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
-    ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp hTII
   have hc1 : hyp.base.c = 1 :=
     hyp.base.c_eq_one_of_lambda_dichotomy _hG hyp.nuGridSupply
   have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts _hG hyp).1
@@ -70,7 +68,7 @@ theorem exists_LHypothesis [Finite G]
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
   obtain ⟨typeI_data, _, _⟩ :=
     OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one
-      _hG hnoV hyp.base hc1 hd1 ⟨tdata⟩ hTII hT2 hyp.q_lt_p hNUS (pins := hyp.nuGridSupply)
+      _hG hnoV hyp.base hc1 hd1 ⟨tdata⟩ hTII hyp.q_lt_p hNUS (pins := hyp.nuGridSupply)
   exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
     typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩
 

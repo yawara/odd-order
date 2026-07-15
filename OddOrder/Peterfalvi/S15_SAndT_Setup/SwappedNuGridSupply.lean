@@ -31,12 +31,11 @@ the same `W`, `W₁`, and `W₂` as the original `Sdata`; hence it defines the s
 `typePV` and the same honest `A₀` support. -/
 theorem Hypothesis.nuGridSupply_swap [Finite G]
     (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hV : IsMulCommutative ↥hyp.V)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (pins : NuGridSupplyData hyp) :
-    NuGridSupplyData (hyp.swap hT2 hV Tdata hU hW1 hW2 pins) := by
+    NuGridSupplyData (hyp.swap hV Tdata hU hW1 hW2 pins) := by
   refine {
     nu_irreducible := fun i j => hyp.mu_irreducible j i
     nu_row_injective := fun i => hyp.mu_col_injective i

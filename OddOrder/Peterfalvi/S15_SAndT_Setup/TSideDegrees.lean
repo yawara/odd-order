@@ -1161,9 +1161,8 @@ theorem Hypothesis.oddCardT [Finite G]
 
 /-- **`T` is of type `P`** (issue 2035 #85, the 0116 (i) ungated producer): `T` is non-type-I
 (`T_nonI`), and every branch of the Peterfalvi taxonomy (II/III/IV/V) is a BG type-`P` class
-(`proposition_type_classification`: II ↔ `P₂`, III∨IV / V ↔ `P₁`-side).  This is what the
-weakened (general type-`P`) `τ₁T`/Dade supply chain consumes in place of the (14.9)-circular
-`T_isTypeP2_gate`. -/
+(`proposition_type_classification`: II ↔ `P₂`, III∨IV / V ↔ `P₁`-side).  This is the
+general type-`P` input used by the `τ₁T`/Dade supply chain and by the symmetric §13 swap. -/
 theorem Hypothesis.T_isTypeP [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.BG.Ch4.S14.IsTypeP hyp.T := by

@@ -788,17 +788,15 @@ theorem typeIBetaL_eta_row_constant_of_c_eq_one [Finite G]
 `typeIBetaL_eta_row_constant` instance at `hyp.swap` (Coq's re-instantiation of the section
 with the pair roles interchanged).  The swap's `η`-grid is the transpose, so its row-`0`
 constancy *is* the column constancy of `hyp.eta`; `β_L^τ` is `hyp`-independent, so no
-transport is needed on the left argument.  Takes the (14.9)-conclusional `IsTypeP2 T` (like
-`typeI_caseC_dual_dichotomy`); the reconciled `TypePData T` comes from
+transport is needed on the left argument.  The reconciled `TypePData T` comes from
 `reconciled_typePData_T`, the ν-side grid supply is the explicit `pins` parameter (issue
 9096 / 0118 b-5: the canonical `S16.Hypothesis.nuGridSupply` carrier at the Section-16
-consumers), and the swap's structural `IsMulCommutative ↥V` input is derived from `hT2` via
-the BG type dictionary and `isMulCommutative_V` (issue 9096 bundle split). -/
+consumers), and the swap's structural `IsMulCommutative ↥V` input is supplied by the
+unconditional symmetric non-type-I construction. -/
 theorem typeIBetaL_eta_col_constant_of_d_eq_one [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (hd1 : hyp.d = 1)
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (pins : NuGridSupplyData hyp)
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
@@ -811,13 +809,12 @@ theorem typeIBetaL_eta_col_constant_of_d_eq_one [Finite G]
   intro _ _ i i' hi hi'
   classical
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T _hG hyp
-  have hV : IsMulCommutative ↥hyp.V := isMulCommutative_V _hG hyp
-    ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.T_maximal).2.1.mpr hT2)
-  have hc1swap : (hyp.swap hT2 hV Tdata hU hW1 hW2 pins).c = 1 := by
+  have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional _hG
+  have hc1swap : (hyp.swap hV Tdata hU hW1 hW2 pins).c = 1 := by
     change hyp.d = 1
     exact hd1
   exact typeIBetaL_eta_row_constant_of_c_eq_one _hG hnoV
-    (hyp.swap hT2 hV Tdata hU hW1 hW2 pins)
+    (hyp.swap hV Tdata hU hW1 hW2 pins)
     hc1swap
     typeISetup φ _hφ _hdeg i i' hi hi'
 

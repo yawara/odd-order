@@ -107,12 +107,6 @@ structure Hypothesis where
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
-  /-- **Peterfalvi (13.2.a) type determination (S-side)**: `S` is of BG type `P₂` (Peterfalvi
-  type II).  This is the §16 carrier datum (`Section16MaximalPair.S_typeP2`, fixed by the κ-Hall
-  ordering `q < p`, threaded through `Section16Inputs`) that lets (13.2.a)'s "`S` is type II"
-  be read off sorry-free via `isTypeII_of_isTypeP2`; it pins the determinate side of the otherwise
-  disjunctive `one_typeII`. -/
-  S_typeP2 : OddOrder.BG.Ch4.S14.IsTypeP2 S
   theorem88_caseB :
     ∀ M : Subgroup G, M ∈ maximalSubgroups G →
       IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
@@ -512,8 +506,8 @@ structure BasicStructureGated (hyp : Hypothesis (G := G)) where
   tauS_eq_induction_holds : tauS_eq_induction
 
 /-- **`S` is of type `P`**: the carried `S_nonI` taxonomy alternative lies in the BG type-`P`
-class.  This is the common structural input for the `S`-side Dade support constructions; it avoids
-the stronger, temporary `S_typeP2` carrier. -/
+class.  This is the common structural input for the `S`-side Dade support constructions and is
+faithful to the symmetric (13.1) carrier. -/
 theorem Hypothesis.S_isTypeP [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.BG.Ch4.S14.IsTypeP hyp.S :=

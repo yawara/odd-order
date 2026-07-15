@@ -22,7 +22,8 @@ consequences of this residue grid — **not** of the §12 `Hypothesis.muGrid` (w
 gated on the type-III/IV/V = `IsTypeP1` Dade datum, whereas `S` is type-`P2`).  The resolution
 recorded here: the residue grid `mu2 = (columnFamily χ₂).mu` is built purely from the certain-type
 `S06.Hypothesis` (the `.toHypothesis` part of the §6/§10 machinery), which is **type-uniform** — it
-needs only `TypePData S`, `S ∈ maximalSubgroups G`, `IsTypeP S` (which `S` has via `S_typeP2`), and
+needs only `TypePData S`, `S ∈ maximalSubgroups G`, and `IsTypeP S` (obtained from the symmetric
+`S_nonI` carrier), and
 the Hall coprimality.  So the same `columnFamily.mu` grid that §12 uses for type-`P1` maximals is
 available for the type-`P2` group `S`, via `typePData_toS06Hypothesis`, with **no** `IsTypeP1` need.
 
@@ -49,14 +50,14 @@ variable {G : Type*} [Group G]
 open scoped FiniteInduce in
 /-- **The certain-type `S06.Hypothesis` of the `S`-side (type-uniform).**  From the type-`P` datum
 `hyp.Sdata : TypePData S` and `S`'s maximality + type-`P` status (`IsTypeP S`, obtained from the
-type-`P2` field `S_typeP2` — no `IsTypeP1` needed), `typePData_toS06Hypothesis` supplies the §6
+carried `S_nonI` alternative — no `IsTypeP1` needed), `typePData_toS06Hypothesis` supplies the §6
 certain-type Hypothesis on `↥S`.  This is the common source of the `μ`-grid (`columnFamily.mu`)
 that §12 uses for type-`P1` maximals, here made available for the type-`P2` group `S`. -/
 noncomputable def Hypothesis.s06S [Finite G] (hyp : Hypothesis (G := G))
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) : OddOrder.Peterfalvi.S06.Hypothesis ↥hyp.S :=
   OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis hyp.Sdata hG.odd
     (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime hG hyp.S_maximal
-      (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hyp.S_typeP2) hyp.Sdata)
+      (OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.S_maximal hyp.S_nonI) hyp.Sdata)
 
 open scoped FiniteInduce in
 /-- **The `S`-side prime-TI residue datum** (Peterfalvi (4.3.b)/(4.5.a), §13 `μ`-grid).  The

@@ -141,43 +141,40 @@ theorem card_kernel_coprime_pq [Finite G]
     {M : Subgroup G} (hMmax : M ∈ maximalSubgroups G) (dataM : TypeICoherent78Data M) :
     Nat.Coprime (Nat.card ↥dataM.kernel) (hyp.base.p * hyp.base.q) := by
   classical
-  -- `M`, `S`, `T` are maximal; `M` type I, `S`/`T` type II
+  -- `M`, `S`, `T` are maximal; `M` is type I and `S`/`T` are type non-I.
   have hMI : IsTypeI M := ⟨dataM.typeIHyp.typeI⟩
-  have hSII : IsTypeII hyp.base.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.base.S_maximal hyp.base.S_typeP2
-  have hTII : IsTypeII hyp.base.T := T_typeII hG hnoV hncH0C hyp
-  -- `M_F = M_σ`, `S_σ = P`, `T_σ = Q`
+  -- `M_F = M_σ`; for `S` and `T` the general inclusions `F(-) ≤ (-)_σ` suffice.
   have hMF : dataM.kernel = OddOrder.BG.Ch3.S10.Msigma M := by
     change dataM.typeIHyp.typeI.typeF.H = _
     rw [dataM.typeIHyp.typeI.typeF.H_eq]
     exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
       hG hMmax (Or.inl hMI)
-  have hMsS : OddOrder.BG.Ch3.S10.Msigma hyp.base.S = hyp.base.P := by
-    rw [← OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
-      hG hyp.base.S_maximal (Or.inr hSII)]
-    exact hyp.base.P_eq_SF.symm
-  have hMsT : OddOrder.BG.Ch3.S10.Msigma hyp.base.T = hyp.base.Q := by
-    rw [← OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
-      hG hyp.base.T_maximal (Or.inr hTII)]
-    exact hyp.base.Q_eq_TF.symm
-  -- `p ∈ σ(S)` (as `p = |W₂| ∣ |P| = |S_σ|`), `q ∈ σ(T)`
+  have hPleS : hyp.base.P ≤ OddOrder.BG.Ch3.S10.Msigma hyp.base.S := by
+    rw [hyp.base.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.base.S_maximal
+  have hQleT : hyp.base.Q ≤ OddOrder.BG.Ch3.S10.Msigma hyp.base.T := by
+    rw [hyp.base.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.base.T_maximal
+  -- `p ∈ σ(S)` via `W₂ ≤ P ≤ S_σ`; similarly `q ∈ σ(T)` via `W₁ ≤ Q ≤ T_σ`.
   have hpσS : hyp.base.p ∈ OddOrder.BG.Ch3.S10.sigma hyp.base.S := by
-    rw [← OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hyp.base.S_maximal, hMsS]
+    rw [← OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hyp.base.S_maximal]
     refine Nat.mem_primeFactors.mpr ⟨hyp.base.p_prime, ?_, Nat.card_pos.ne'⟩
     rw [hyp.base.p_eq_card_W2]
-    exact Subgroup.card_dvd_of_le (OddOrder.Peterfalvi.S15.W2_le_P hG hyp.base)
+    exact Subgroup.card_dvd_of_le
+      ((OddOrder.Peterfalvi.S15.W2_le_P hG hyp.base).trans hPleS)
   have hqσT : hyp.base.q ∈ OddOrder.BG.Ch3.S10.sigma hyp.base.T := by
-    rw [← OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hyp.base.T_maximal, hMsT]
+    rw [← OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hyp.base.T_maximal]
     refine Nat.mem_primeFactors.mpr ⟨hyp.base.q_prime, ?_, Nat.card_pos.ne'⟩
     rw [hyp.base.q_eq_card_W1]
-    exact Subgroup.card_dvd_of_le (OddOrder.Peterfalvi.S15.W1_le_Q hG hyp.base)
+    exact Subgroup.card_dvd_of_le
+      ((OddOrder.Peterfalvi.S15.W1_le_Q hG hyp.base).trans hQleT)
   -- `M` is not conjugate to `S` or `T` (type I vs type non-I) ⟹ `σ`-disjointness
   have hMnS : ¬ ∃ g : G, MulAut.conj g • M = hyp.base.S :=
     OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI hG hMI hyp.base.S_maximal
-      (Or.inl hSII)
+      hyp.base.S_nonI
   have hMnT : ¬ ∃ g : G, MulAut.conj g • M = hyp.base.T :=
     OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI hG hMI hyp.base.T_maximal
-      (Or.inl hTII)
+      hyp.base.T_nonI
   have hdS := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hMmax hyp.base.S_maximal hMnS
   have hdT := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hMmax hyp.base.T_maximal hMnT
   -- hence `p, q ∉ σ(M) = π(|M_F|)`, so `p, q ∤ |M_F|`

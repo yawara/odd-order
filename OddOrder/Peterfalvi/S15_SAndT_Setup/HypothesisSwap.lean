@@ -64,8 +64,8 @@ corresponding `μ`-field, so `Hypothesis.swap` can consume them verbatim:
 The bundle is **purely grid-theoretic** (issue 9096 API audit): every field is a property of
 the canonical certain-type character grid, dischargeable at the FT-layer construction site
 with no (14.9) input.  The structural fact `IsMulCommutative ↥V` (Peterfalvi (13.2.a) at `T`)
-is deliberately *not* a field — it is a post-(14.9) type-II fact, supplied to
-`Hypothesis.swap` as the separate argument `hV` alongside the (14.9)-conclusional `hT2`. -/
+is deliberately *not* a field and is supplied separately to `Hypothesis.swap`; its canonical
+producer is unconditional from the symmetric non-type-I setup. -/
 structure NuGridSupplyData [Finite G] (hyp : Hypothesis (G := G)) : Prop where
   /-- **Peterfalvi (13.1.e) at `T`**: each `ν_{ij}` is an irreducible character of `T`. -/
   nu_irreducible : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
@@ -128,13 +128,9 @@ open scoped FiniteInduce in
 `C ↔ D`, `W₁ ↔ W₂`, `q ↔ p`, `u ↔ v`, `c ↔ d`, `Sset ↔ Tset`, `τ_S ↔ τ_T`, `δ ↔ δ'`,
 `μ ↔ ν` and transposes the `ω`/`η`-grids.  Inputs:
 
-* `hT2` — `IsTypeP2 T`, the (14.9)-conclusional dual of the carrier field `S_typeP2`
-  (exactly the parameter `tauTbetaGrid`/`typeI_caseC_dual_dichotomy` already take);
 * `hV` — `IsMulCommutative ↥V`, Peterfalvi (13.2.a) at `T` (BG Lemma 15.1(b) for the
-  `(κ∪σ)'`-Hall complement of `T`), the swap's `S_U_commutative`.  Like `hT2` this is
-  (14.9)-conclusional: consumers derive it from `hT2` via the BG type dictionary
-  (`proposition_type_classification` (b): `IsTypeII T ↔ IsTypeP2 T`) and
-  `isMulCommutative_V` — it is *not* part of the grid bundle `pins` (issue 9096);
+  `(κ∪σ)'`-Hall complement of `T`), the swap's `S_U_commutative`.  It is available
+  unconditionally from `T_nonI` and is not part of the grid bundle `pins` (issue 9096);
 * `Tdata` with the `reconciled_typePData_T` reconciliations — the swap's `Sdata`;
 * `pins : NuGridSupplyData hyp` — the ν-side §4/§6 grid facts (the swap's `μ`-side fields).
 
@@ -148,7 +144,6 @@ Every `∀ hyp`-theorem of the S-side (13.18)/(13.19) layer then holds at `hyp.s
 giving the `T`-side duals (`typeIBetaL_eta_col_constant`, `typeI_caseC_dual_dichotomy`)
 with no further proof beyond index transport. -/
 noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
-    (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hV : IsMulCommutative ↥hyp.V)
     (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
     (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
@@ -171,7 +166,6 @@ noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
   S_nonI := hyp.T_nonI
   T_nonI := hyp.S_nonI
   one_typeII := hyp.one_typeII.symm
-  S_typeP2 := hT2
   theorem88_caseB := fun M hM => (hyp.theorem88_caseB M hM).imp_right Or.symm
   W_eq_inter := by rw [hyp.W_eq_inter, inf_comm]
   W_eq_join := by rw [hyp.W_eq_join, sup_comm]

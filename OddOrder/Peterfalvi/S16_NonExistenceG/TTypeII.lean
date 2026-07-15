@@ -887,10 +887,10 @@ theorem T_isTypeIII_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   -- `T` is Type III or IV; exclude IV by the (11.9) residual.
   exact (hcIII_IV.mpr ⟨hP1, hMF⟩).resolve_right (T_not_isTypeIV_of_isTypeP1 hG hyp hP1)
 
-/-- **Peterfalvi (14.9), reduced to its canonical residual** — the `T`-side dual of the `S`-side
-`(13.2.a)` carrier field `S_typeP2`.  `T` is of BG type `P₂` (`κ(T) ≠ σ'(T)`; Coq `PFsection14`
-`FTtypeP_min_typeII : FTtype T == 2`).  The `IsTypeP T` conjunct is discharged honestly from `T_nonI`
-(`isTypeP_of_isTypeNonI`).
+/-- **Peterfalvi (14.9), reduced to its canonical residual.**  Starting from the symmetric
+(13.1) non-type-I carrier, `T` is sharpened to BG type `P₂` (`κ(T) ≠ σ'(T)`; Coq `PFsection14`
+`FTtypeP_min_typeII : FTtype T == 2`).  The `IsTypeP T` conjunct is discharged honestly from
+`T_nonI` (`isTypeP_of_isTypeNonI`).
 
 The residual `κ(T) ≠ σ'(T)` is proved by the (14.9) contradiction, following Coq
 `FTtypeP_min_typeII` (`apply: contraLR v1p_gt_u1q => notTtype2`): were `κ(T) = σ'(T)` (i.e.
@@ -945,9 +945,9 @@ theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact lt_of_le_of_lt hu_div hratio
   exact absurd hle (not_le.mpr hgt)
 
-/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Dual to the `S`-side `(13.2.a)` line
-`isTypeII_of_isTypeP2 … S_maximal S_typeP2`: `T` is of type `P₂` (`T_isTypeP2`), and *every* type-`P₂`
-maximal subgroup is type II by the proven BG bridge `isTypeII_of_isTypeP2`.  That bridge discharges
+/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  `T` is of type `P₂`
+(`T_isTypeP2`), and *every* type-`P₂` maximal subgroup is type II by the proven BG bridge
+`isTypeII_of_isTypeP2`.  That bridge discharges
 the deep `M'`-type-`F` structure — `IsTypeF (derivedInG T)` and `(T')_F = T_F` — internally
 (`isTypeF_derivedInG_of_isTypeP2`), so the sole residual of (14.9) is the type-`P₂` fact `T_isTypeP2`.
 (Placed ahead of `exists_LHypothesis` so the §14 `T`-side chain — `typeII_overNormalizer_frobenius`

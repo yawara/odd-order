@@ -399,14 +399,13 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     have hφdeg : dataL.zeta 0 (1 : ↥L)
         = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
       rw [← hker]; exact dataL.deg0
-    have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := T_isTypeP2 hG hnoV hncH0C hyp
     have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts hG hyp).1
     have hd1 : hyp.base.d = 1 := by
       rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
     obtain ⟨Tdata, hU, hW1, hW2⟩ :=
       OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base
     rcases OddOrder.Peterfalvi.S15.typeI_caseC_dual_dichotomy_of_d_eq_one
-        hG hnoV hyp.base hd1 hT2 Tdata hU hW1 hW2 dataL
+        hG hnoV hyp.base hd1 Tdata hU hW1 hW2 dataL
         (dataL.zeta 0) hφmem hφdeg (pins := hyp.nuGridSupply) with
       ⟨-, hbound⟩ | ⟨hodd, -⟩
     · exact absurd hbound (not_le.mpr hub_v)
@@ -1147,7 +1146,7 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
 
 /-- **Peterfalvi §8 / BG 15.7(a)**: the type-`P` Fitting core `P = S_F` is a TI-subgroup of `G`.
-`S` is type-`P₂` (`S_typeP2`), so `F(S)` is TI (`fittingIsTI_of_isTypeP2`), whence the Fitting core
+The symmetric `S_nonI` carrier gives the type-II/type-III TI conclusion, whence the Fitting core
 `S_F#` is TI (`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`; `sharpSubgroup = ·∖{1}`
 matches `Subgroup.IsTI`).  Supplies the `P_isTI` field of `MHypothesis`. -/
 theorem base_P_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1155,7 +1154,8 @@ theorem base_P_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [hyp.base.P_eq_SF]
   exact OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG
     hyp.base.S_maximal
-    (OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.base.S_maximal hyp.base.S_typeP2)
+    (OddOrder.Peterfalvi.S13.fittingIsTI_of_isTypeNonI
+      hG hyp.base.S_maximal hyp.base.S_nonI)
 
 /-- **Peterfalvi §8, `T`-side**: the type-`P` Fitting core `Q = T_F` is a TI-subgroup of `G`.
 `T`-side dual of `base_P_isTI` via `fittingIsTI_T` (`T` type II ⟹ type-`P₂`).  Supplies the `Q_isTI`
