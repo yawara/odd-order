@@ -267,3 +267,23 @@ b-1 が landing (`fa6fd706`、merge `1e5fb55a`): `CharacterDegreeCore.delta_eq_o
 は **axiom-clean 実測** (AxiomsCheck assert 追加済・green)。0118 の順序条件 (b-1 → a-2) 成立 —
 **lane a は full flip の Core-typed param 化を開始してよい**。obtain-site の core param は
 post-drop の Core 型 (δ′ なし) を基準にすること。
+
+## ✅ lane a progress (2026-07-15) — chosen-base λ (13.5)/(13.6) package complete
+
+Full flip の S-side λ atom を `CharacterDegreeData` なしで再構成した:
+
+- `HSharpChosenBase`: reducible μ-column から nonkernel base `φ₀` を選び、
+  `ζ₀ = Ind φ₀ ≠ λ` と正 index `ζᵢ = λ`, `cᵢ = 1` を Core coherence から供給。
+- `LambdaCorrection`: generic `hypothesis76AlphaFun` API を直接使い、chosen-base 固有の
+  cCoeff integrality、mixed-product 上の `λ` / `λ^{τ₁}` 消滅、`α(1) ∈ ℤ`、primitive-root
+  congruence `α(1) = qb`、(13.5.c) inflation を実証明。
+- 上記を `exists_caseB_data_lambda_core` に束ね、abstract Case-B norm engine から
+  `lambda_tau1_sharp_norm_lower_core` (Peterfalvi (13.6)) を導出。chosen base は exported API
+  から隠し、入力は `CharacterDegreeCore + LambdaClusterData` のみ。
+- 当初追加した S-specific point/alpha wrappers は既存 generic API との重複と判明したため削除。
+  新 leaf 169/572 lines、`sorry`/新 `axiom` なし、`lake build OddOrder` 4228 jobs +
+  AxiomsCheck green。
+
+**次 frontier**: T-side `η₁₀` correction/norm package を Core + `(hD, hQcomm)` 型で束ね、
+NormEstimates 5 obtain-sites の param 版へ接続する。その後 OrderDetermination consumers を
+param 版へ移し、legacy `CharacterDegreeData` wrappers/carrier を retire する。
