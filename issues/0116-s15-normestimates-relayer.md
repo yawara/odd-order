@@ -326,3 +326,23 @@ T-side の book-faithful correction を `CharacterDegreeData` なしで再構成
 **次 frontier**: (13.6) λ + (13.7) H-side η₁₀ + (13.8) Q-side η₁₀ の Core norm bounds を使い、
 `analyticEstimate_lambda` / `analyticEstimate_eta` / counting cover から
 `analytic_inequality` までを explicit Case-B facts 版として下流 supply leaf に実装する。
+
+## ✅ lane a progress (2026-07-15) — Core analytic relayer (13.9)/(13.10) complete
+
+三つの Core norm package を Peterfalvi §13 の解析鎖へ接続し、legacy
+`CharacterDegreeData` を使わない (13.10) endpoint を構成した:
+
+- `analyticEstimate_lambda_core` と `analyticEstimate_eta_core` で (13.10.1)/(13.10.2) を
+  `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` から証明。
+- `analyticCounting_disjointCover_of_caseB_facts`、`G0_nonvanishing_dichotomy_core`、
+  `analyticEstimate_galois_core` で counting cover と Galois orbit estimate を Core 化。
+- `analyticInequalityEstimates_core` を経て
+  `analytic_inequality_of_caseB_facts` に四本の評価を束ね、旧 `analytic_inequality` と同じ
+  strict rational inequality を explicit Case-B facts から直接供給。
+
+新 leaf `S15_CaseBEndgameSupply/AnalyticRelayer.lean` は legacy carrier を import せず、
+`sorry`/新 `axiom` なし、leaf build green。
+
+**次 frontier**: `OrderDetermination` の三 obtain-site と `CaseBOrder` consumer を、循環を
+作らない明示 analytic-inequality 仮定版へ分離する。下流 supply leaf が Core endpoint で仮定を
+discharge した後、mid-layer/S16 consumer を順次付け替え、legacy wrappers/carrier を retire する。
