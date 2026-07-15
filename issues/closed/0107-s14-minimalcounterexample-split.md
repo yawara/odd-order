@@ -35,3 +35,12 @@ MinimalCounterexample.lean が 1,500 行未満に戻り、full build green + Axi
 - issues/closed/0084-s14-maximali-split.md (S14_MaximalI の directory 化)
 - issues/2038-bfrontier-shift-bg-done.md (b の active frontier)
 - notes/meta/merge_monitor.md step 4 (サイズ watch) / CLAUDE.md「ファイル粒度」
+
+## ✅ 完了 (2026-07-15)
+
+- issue #2038 が closed で旧 hB/hC frontier が凍結済みであることを確認。
+- (12.10)--(12.11) を `S14_MaximalI/WitnessFrobenius.lean` (544 行) へ切り出した。
+- 親 `MinimalCounterexample.lean` は (12.12) 以降の representation/numeric cluster を保持して 1073 行。
+- 分割前後の宣言名 multiset は完全一致し、機械移動により signature と下流 module 名を保存。
+- 当該 cluster の実 `sorry` は 0 → 0、hub/root import closure も維持。
+- focused build 4105 jobs、`lake build OddOrder OddOrder.AxiomsCheck` 4245 jobs 完走・AxiomsCheck OK。
