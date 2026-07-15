@@ -34,3 +34,12 @@ created: 2026-07-12
 - CLAUDE.md「ファイル粒度」(2026-07-09 節: 1500 watch / 2000 hard / dir 化第一)
 - issue 1025 (foundational (11.4)-(11.7) parametrize)、9087 (lane A direction = (10.8) 閉包)
 - merge 7e6e6408 (1671 行到達)
+
+## ✅ 完了 (2026-07-15)
+
+- issue #1025 / #9087 の完了記録を再監査し、旧 active frontier の凍結条件成立を確認。
+- (11.6) の kernel-bound cluster を `S13_CoreStructure/KernelBounds.lean` (766 行) へ切り出した。
+- 親 `S13_CoreStructure.lean` は centralization / (11.7) / coherence cluster を保持して 882 行。
+- 分割前後の宣言名 multiset は完全一致し、機械移動により signature と下流 module 名を保存。
+- 当該 cluster の実 `sorry` は 0 → 0、`OddOrder.lean` の root closure も維持。
+- focused build 4067 jobs、`lake build OddOrder OddOrder.AxiomsCheck` 4244 jobs 完走・AxiomsCheck OK。
