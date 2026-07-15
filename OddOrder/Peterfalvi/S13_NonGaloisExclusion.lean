@@ -1023,4 +1023,52 @@ theorem no_typeIV_maximal {G : Type*} [Group G] [Finite G]
   rintro ⟨M, hMmax, hMIV⟩
   exact not_isTypeIV_of_mem_maximalSubgroups hG hMmax hMIV
 
+/-- **Peterfalvi (13.2.a), the per-subgroup type determination**: every non-type-I maximal
+subgroup of a minimal simple odd group is of Type II or Type III.  The BG type dictionary
+(`proposition_type_classification`) sends the type-`P` structure (`isTypeP_of_isTypeNonI`) to
+II--V; Type V is excluded universally by the unconditional Theorem (10.10)
+(`no_typeV_maximal_unconditional`), Type IV by the (11.9.c) universal exclusion above.
+
+This is the honest per-`M` content of (13.2.a)'s "`S` is of Type II or Type III" — symmetric
+in the (13.1) pair (both `S` and `T` qualify, via `S_nonI`/`T_nonI`), matching Coq
+`PFsection13`'s `FTtype ∈ {2,3,4}` section context narrowed by the type-IV exclusion.  The
+κ-ordered refinement "if `q < p` then `S` is of Type II" is the separate
+`isTypeP2_of_typeP_kappaHall_lt` (`S13_TypeDetermination`). -/
+theorem isTypeII_or_isTypeIII_of_isTypeNonI {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hnonI : IsTypeNonI M) :
+    IsTypeII M ∨ IsTypeIII M := by
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP M :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hM hnonI
+  obtain ⟨-, hbII, hcIII_IV, hdV, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hM
+  rcases OddOrder.BG.Ch4.S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP with hP1 | hP2
+  · -- type `P₁`: type V is excluded by (10.10), so `M_F ≠ M_σ` and `M` is III or IV;
+    -- type IV is excluded by (11.9.c).
+    have hMF : OddOrder.BG.Ch4.S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M := fun h =>
+      OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG ⟨M, hM, hdV.mpr ⟨hP1, h⟩⟩
+    exact Or.inr ((hcIII_IV.mpr ⟨hP1, hMF⟩).resolve_right
+      (not_isTypeIV_of_mem_maximalSubgroups hG hM))
+  · exact Or.inl (hbII.mpr hP2)
+
+/-- **BG Theorem 15.7(a)/(b) for the non-type-I maximals — `F(M)` is TI**: the Fitting subgroup
+of a non-type-I maximal subgroup of a minimal simple odd group is a TI-subgroup of `G`.  On the
+Type-II branch this is the type-`P₂` clause (`fittingIsTI_of_isTypeP2`); on the Type-III branch
+the classification gives `M_F ≠ M_σ` and Theorem 15.7(a)'s contrapositive
+(`fitting_isTI_of_mf_ne_msigma`) concludes.
+
+This is the (13.2.e) `TI`-input in the symmetric form the (13.1) pair needs: the
+`IsTypeP2`-only summon (`fittingIsTI_of_isTypeP2` at the carrier `S_typeP2`) is not available
+at the swapped `T`-side instance, whereas `T_nonI` is a (13.1) field. -/
+theorem fittingIsTI_of_isTypeNonI {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hnonI : IsTypeNonI M) :
+    OddOrder.BG.Ch4.S15.FittingIsTI M := by
+  obtain ⟨-, hbII, hcIII_IV, -, -, -⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hM
+  rcases isTypeII_or_isTypeIII_of_isTypeNonI hG hM hnonI with hII | hIII
+  · exact OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hM (hbII.mp hII)
+  · exact OddOrder.BG.Ch4.S15.fitting_isTI_of_mf_ne_msigma hG hM
+      (hcIII_IV.mp (Or.inl hIII)).2
+
 end OddOrder.Peterfalvi.S13

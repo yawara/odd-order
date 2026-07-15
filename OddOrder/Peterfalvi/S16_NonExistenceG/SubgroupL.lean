@@ -1,4 +1,5 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TTypeII
+import OddOrder.Peterfalvi.S15_CaseAContradiction
 
 /-!
 # Peterfalvi §14: the subgroup L and the T/S case-B data
@@ -142,7 +143,13 @@ theorem exists_y_L_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 structure CaseBForSData (hyp : Hypothesis (G := G)) where
   caseB_formula : Prop
   caseB_holds : caseB_formula
-  order : OddOrder.Peterfalvi.S15.CaseBOrderUData hyp.base caseB_formula
+  order_u_eq_of_p_modEq_one :
+    hyp.base.p ≡ 1 [MOD hyp.base.q] →
+      hyp.base.u =
+        (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.q * (hyp.base.p - 1))
+  order_u_eq_of_not_modEq_one :
+    ¬ hyp.base.p ≡ 1 [MOD hyp.base.q] →
+      hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)
   U_rank_obstruction : Prop
   U_rank_obstruction_holds : U_rank_obstruction
 
@@ -154,7 +161,7 @@ theorem u_eq_of_p_modEq_one {hyp : Hypothesis (G := G)} (data : CaseBForSData hy
     hyp.base.p ≡ 1 [MOD hyp.base.q] →
       hyp.base.u =
         (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.q * (hyp.base.p - 1)) :=
-  data.order.u_eq_of_p_modEq_one
+  data.order_u_eq_of_p_modEq_one
 
 /-- In the S-side case-(9.7.b) conclusion of **Peterfalvi (14.6)**, the
 non-`p ≡ 1 mod q` branch gives the full cyclotomic value of `u`. -/
@@ -162,7 +169,7 @@ theorem u_eq_of_not_modEq_one {hyp : Hypothesis (G := G)}
     (data : CaseBForSData hyp) :
     ¬ hyp.base.p ≡ 1 [MOD hyp.base.q] →
       hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
-  data.order.u_eq_of_not_modEq_one
+  data.order_u_eq_of_not_modEq_one
 
 /-- In the S-side case-(9.7.b) conclusion of **Peterfalvi (14.6)**, `u` is at
 most the full cyclotomic quotient.  The `p ≡ 1 mod q` branch divides that
@@ -185,19 +192,33 @@ end CaseBForSData
 
 /-- **Peterfalvi (14.6)**: case (9.7.b) holds for `S`.
 
-Following the opaque-`Prop` convention of this file (see `caseB_for_T`), the qualitative
-case-(9.7.b) proposition `caseB_formula` is carried trivially (no consumer reads it — the
-downstream cascade reads only the numeric `order` data).  The numeric content — the `u`-order
-of (13.15) — is supplied by `S15.caseB_order_u_data` (the §13 obligation, currently a named
-upstream `sorry`); citing it wires the S-side `u`-value into the (14.8)/(14.11) cascade exactly
-as `caseB_for_T` wires the T-side `D = ⊥`/`v` value via `T_side_caseB_facts`.  The full
-group-theoretic (14.6) argument (the rank-2 Sylow contradiction ruling out case (9.7.a), via
-(13.13)/(9.7.a)/[BG] 1.16/(13.2.e)/(13.17)) is §13/§9 character/structure theory upstream. -/
+The Clifford dichotomy supplies either case (9.7.a) or an actual `CliffordCaseBData`
+certificate.  The case-A branch is impossible by the completed type-I-over-normalizer
+contradiction, using the `(13.13)` parameters and `c = 1`.  In the remaining branch,
+`caseB_order_u` supplies the two alternatives for the order `u`; the qualitative field stores
+the genuine nonempty case-B certificate rather than an opaque compatibility proposition. -/
 theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (_Ldata : LHypothesis hyp) :
-    ∃ data : CaseBForSData hyp, data.caseB_formula :=
-  ⟨⟨True, trivial,
-      OddOrder.Peterfalvi.S15.caseB_order_u_data _hG hyp.base trivial, True, trivial⟩, trivial⟩
+    (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) :
+    ∃ data : CaseBForSData hyp, data.caseB_formula := by
+  classical
+  obtain ⟨chief, -⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG
+      (hyp.base.toTypesIIIIIIVSetupS _hG)
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy _hG
+      (hyp.base.mkSection11CharacterDataS _hG chief) with hA | hB
+  · obtain ⟨caseA⟩ := hA
+    obtain ⟨hq, hu⟩ := OddOrder.Peterfalvi.S15.caseA_parameters _hG hyp.base caseA
+    exact (OddOrder.Peterfalvi.S15.caseA_false_of_parameters_and_typeIOverNormalizerData
+      _hG hyp.base caseA (OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base) hq hu
+      Ldata.typeI_data).elim
+  · obtain ⟨caseB⟩ := hB
+    let caseB_formula : Prop := Nonempty
+      (OddOrder.Peterfalvi.S11.CliffordCaseBData
+        (hyp.base.mkSection11CharacterDataS _hG chief))
+    have hcaseB : caseB_formula := ⟨caseB⟩
+    obtain ⟨hu_mod, hu_not_mod⟩ :=
+      OddOrder.Peterfalvi.S15.caseB_order_u _hG hyp.base caseB
+    exact ⟨⟨caseB_formula, hcaseB, hu_mod, hu_not_mod, True, trivial⟩, hcaseB⟩
 
 /-- Over `ℕ`, the geometric-sum identity `(p − 1) · ∑_{i<q} pⁱ = p^q − 1`. -/
 private theorem pred_mul_geomSum (p q : ℕ) (hp : 1 ≤ p) :
@@ -957,4 +978,3 @@ and the part-(14.2.b) normalizer lemma `W2conj_le_normalizer_U_of_LHypothesis`. 
 `field_normalizer_of_L_conj_M`. -/
 
 end OddOrder.Peterfalvi.S16
-

@@ -854,7 +854,10 @@ lane-c §15 か = cross-lane 判断。lane-f が Prop 16.1 を進行中ゆえ、
 - **`numeric_bounds` の q=3 conjunct** (narrow sorry): m-bound (m>49/100) は **p≥5 が要** (q=p=3 で m=4/9<49/100 と破綻)。§15 は q<p も p≠q も field に持たず (§16 は (14.1) の `q_lt_p` から p_ne_q/five_le_p を導くが §15 には無い)。p≠q は (13.1) mmd に明示されず §10-§12 由来。u/c bound (u/c>(p²-1)/6) は **analytic_inequality (13.10) 待ち** (character theory)。→ **p≠q (or q<p) を Hypothesis に追加すれば q=3 m-bound は landable** (u/c は別途)。
 - **character-theoretic norm 系 (13.5)-(13.10)**: lambda/eta norm lower bounds, global_character_bound, analytic_inequality — §3-§8 (Dade/coherence/TI) の深い指標論依存。`m` は pin 済だが norm cascade 本体は未。
 - **c_eq_one (13.12)**: numeric_bounds + analytic + caseA に依存、blocked。
-- **caseB_order_u (13.15)**: §16 の `caseB_for_S` が `CaseBOrderUData` 経由で消費。u の値確定は (13.14) facts + character-theoretic な u 下界が要 (blocked)。
+- **caseB_order_u (13.15)**: 2026-07-15 時点で本体は実装済み。§16 の `caseB_for_S` は
+  実 `CliffordCaseBData` を直接渡して消費し、旧 `CaseBOrderUData` compatibility bridge は
+  削除済み。なお本定理の axiom trace は `c_eq_one` / `numeric_bounds` /
+  `analytic_inequality` に残る既存上流 obligation を推移的に含む。
 - **normalizer_W1 (13.16) / typeII_overNormalizer (13.17) / 18,19**: group/character theory, blocked。
 
 **次の tractable 候補**: p≠q を (13.1) field 追加 (mmd 由来要確認だが FT 設定で valid) → q=3 m-bound 完成 + 他 §15 proof も恩恵。それ以外の実前進は §3-§8 character theory のスキャフォールド解消が必要。

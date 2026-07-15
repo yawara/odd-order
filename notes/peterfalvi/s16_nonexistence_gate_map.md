@@ -140,6 +140,15 @@ full build + AxiomsCheck 緑 3881 jobs)。S16 実 sorry **13 → 11**、`bin/cou
   `complement_card_eq_pq` field で enrich (`LHypothesis.typeI_complement_card_eq_pq` の V-side dual)。
   唯一の constructor `exists_MHypothesis` (既 sorry) が供給ゆえ index 半は直接帰結化。
 
+### 更新 (2026-07-15, C-1 — (14.6) compatibility bridge 撤去)
+
+上の 2026-06-22 scaffold は撤去済み。`caseB_for_S` は chief factor に対する Clifford dichotomy
+を実行し、case (9.7.a) を完成済みの type-I-over-normalizer contradiction で排除、残る
+`CliffordCaseBData` を `caseB_order_u` に直接渡す。`CaseBForSData.caseB_formula` はもはや
+`True` でなく、その実 certificate の `Nonempty`。`CaseBOrderUData` / `caseB_order_u_data`
+は宣言ごと削除された。`T_isTypeP2` が必要とする S-side 上界は、循環を避けて独立な
+`Hypothesis.u_le_cyclotomicQuotient` (AxiomsCheck 済み) から供給する。
+
 ### ⚠ 精密 gate 特定 (lane-h ask、新規): `exists_MHypothesis` (14.10) の V-side 構造構築
 
 `exists_LHypothesis` は **sorry-free** だが、その dual `exists_MHypothesis` (旧 3324) は構造部すら
