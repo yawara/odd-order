@@ -1,6 +1,6 @@
 # main 合流モニター — a/b/c レーン自動合流の運用手順
 
-> 横断運用ドキュメント。**監視ペースは hub のモデルで決まる (ユーザー 2026-07-09 明文化)**: **Fable 使用中 = 30 分間隔 `13,43 * * * *`** (速度考慮) / **Opus 使用中 = 15 分間隔 `7,22,37,52 * * * *`** (:00/:30 回避・均等割り)。履歴: 2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行モデルに対応するペースで**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**監視ペース: 現行 = 20 分間隔 `7,27,47 * * * *` (ユーザー指示 2026-07-15、issue 0118 endgame 体制)**。それ以前はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。履歴: 2026-07-15 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行モデルに対応するペースで**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
