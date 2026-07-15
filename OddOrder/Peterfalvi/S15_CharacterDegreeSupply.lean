@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
-import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayerCore
+import OddOrder.Peterfalvi.S15_SAndT_Setup.SwappedNuGridSupply
 
 /-!
 # Peterfalvi §13 (pp. 75–86) — the (13.3.b)/(13.4) dichotomy supplies
@@ -1261,6 +1262,98 @@ theorem lambda_forces_T_caseB_core [Finite G]
 
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (13.12), swapped Core form**: `d = 1` without the legacy unconditional
+character-degree carrier.  The swap's `ν`-grid is supplied honestly by the original `μ`-grid;
+the λ-branch uses Core (13.10), while the no-λ branch already has the swap's `C = ⊥`. -/
+theorem Hypothesis.d_eq_one_of_swapped_lambda_dichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) :
+    hyp.d = 1 := by
+  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
+  have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
+  obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
+  let hyp' : Hypothesis (G := G) := hyp.swap hT2 hV Tdata hU hW1 hW2 pins
+  have pins' : NuGridSupplyData hyp' :=
+    hyp.nuGridSupply_swap hT2 hV Tdata hU hW1 hW2 pins
+  obtain ⟨core'⟩ := hyp'.characterDegreeCore_nonempty hG
+  have hc1 : hyp'.c = 1 := by
+    rcases lambdaCluster_or_caseB hG hyp' with hlam | ⟨hCbot, _hu⟩
+    · obtain ⟨lam'⟩ := hlam
+      obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core' lam' pins'
+      have hQcomm : IsMulCommutative ↥hyp'.Q :=
+        IsMulCommutative.of_comm (hyp'.Q_elementaryAbelian hG).comm
+      exact core'.c_eq_one_of_caseB_facts hG lam' hD hv hQcomm
+    · exact hyp'.c_eq_card_C.trans (Subgroup.card_eq_one.mpr hCbot)
+  exact hc1
+
+/-- **Peterfalvi (13.12), swapped Core subgroup form**: `D = ⊥`. -/
+theorem Hypothesis.T_side_D_eq_bot_of_swapped_lambda_dichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) :
+    hyp.D = ⊥ := by
+  have hd := hyp.d_eq_one_of_swapped_lambda_dichotomy hG pins
+  rw [hyp.d_eq_card_D] at hd
+  exact Subgroup.card_eq_one.mp hd
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.13)/(13.15) at the swap**: under `q < p`, the `T`-side Singer
+parameter has the full order, using only the Core analytic relayer. -/
+theorem Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hqp : hyp.q < hyp.p) (pins : NuGridSupplyData hyp) :
+    hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
+  have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
+  have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
+  obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
+  let hyp' : Hypothesis (G := G) := hyp.swap hT2 hV Tdata hU hW1 hW2 pins
+  have pins' : NuGridSupplyData hyp' :=
+    hyp.nuGridSupply_swap hT2 hV Tdata hU hW1 hW2 pins
+  obtain ⟨core'⟩ := hyp'.characterDegreeCore_nonempty hG
+  obtain ⟨chief', -⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp'.toTypesIIIIIIVSetupS hG)
+  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
+      (hyp'.mkSection11CharacterDataS hG chief') with hA | hB
+  · obtain ⟨caseA⟩ := hA
+    obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := lambdaWitness_of_caseA hG hyp' chief' caseA
+    obtain ⟨lam'⟩ := hyp'.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind
+    obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core' lam' pins'
+    have hQcomm : IsMulCommutative ↥hyp'.Q :=
+      IsMulCommutative.of_comm (hyp'.Q_elementaryAbelian hG).comm
+    obtain ⟨hq3, -⟩ :=
+      core'.caseA_parameters_of_caseB_facts hG lam' hD hv hQcomm caseA
+    have hp3 : hyp.p = 3 := hq3
+    have h3q : 3 ≤ hyp.q := hyp.three_le_q
+    omega
+  · obtain ⟨caseB⟩ := hB
+    have hnotmod : ¬ hyp'.p ≡ 1 [MOD hyp'.q] := by
+      show ¬ hyp.q ≡ 1 [MOD hyp.p]
+      intro hmod
+      have hq_mod : hyp.q % hyp.p = hyp.q := Nat.mod_eq_of_lt hqp
+      have h1_mod : 1 % hyp.p = 1 :=
+        Nat.mod_eq_of_lt (lt_of_lt_of_le (by norm_num) hyp.three_le_p)
+      have h3q : 3 ≤ hyp.q := hyp.three_le_q
+      have := hmod
+      unfold Nat.ModEq at this
+      omega
+    rcases lambdaCluster_or_caseB hG hyp' with hlam | ⟨_hCbot, hufull⟩
+    · obtain ⟨lam'⟩ := hlam
+      obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core' lam' pins'
+      have hQcomm : IsMulCommutative ↥hyp'.Q :=
+        IsMulCommutative.of_comm (hyp'.Q_elementaryAbelian hG).comm
+      exact (core'.caseB_order_u_of_caseB_facts hG lam' hD hv hQcomm caseB).2 hnotmod
+    · exact hufull
+
+/-- **The `T`-side (13.4)/(14.4) facts under `q < p`, Core-only form**. -/
+theorem T_caseB_facts_of_q_lt_p_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hqp : hyp.q < hyp.p) (pins : NuGridSupplyData hyp) :
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p :=
+  ⟨hyp.T_side_D_eq_bot_of_swapped_lambda_dichotomy hG pins,
+    hyp.T_caseB_v_eq_full_of_swapped_lambda_dichotomy hG hqp pins,
+    hyp.card_Q_eq_qp hG⟩
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (13.4)/(14.4), `T`-side case (9.7.b), unconditional via the (13.3.b) dichotomy**
 (issue 9094 RULING 案 A + §4): `D = ⊥`, `v = (q^p−1)/(q−1)` and `|Q| = q^p`, obtained **without**
 the overstated unconditional λ-cluster of the legacy `character_degree_analysis`.
@@ -1281,6 +1374,6 @@ theorem T_caseB_facts_unconditional [Finite G]
   · obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := hlam
     obtain ⟨lam⟩ := hyp.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind
     exact lambda_forces_T_caseB_core hG core lam pins
-  · exact T_caseB_facts_of_q_lt_p hG hyp hqp pins
+  · exact T_caseB_facts_of_q_lt_p_core hG hyp hqp pins
 
 end OddOrder.Peterfalvi.S15
