@@ -5,6 +5,10 @@
 > `sigmaLength_one_frobenius_type` の 2 点のみ** (両方 do-not-prove mis-encoding、off-spine =
 > memory [[ft-settled-findings]])。PAUSE 裁定 (2026-06-14)・L1769 残リスト
 > (14.8/14.10/14.11/14.12 は証明済)・旧 lane 名 (D/F/G/H) は全て履歴。
+>
+> **2026-07-15 更新**: 上記 2 宣言は consumer 0 の **frozen historical surfaces**。
+> in-place で証明・修理しない。14.9 の faithful `Mtilde`/`zTilde` covering APIs と 14.13 の
+> `S16.non_disjoint_signalizer_frobenius` は実装済みで、新 consumer はそちらを使う。
 
 > Lane F mini-roadmap. 正本ファイル = `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean`。
 > mmd `references/bg/local-analysis.mmd` L3787–4158 (pp. 105–116)。

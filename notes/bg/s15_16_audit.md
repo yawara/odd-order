@@ -6,6 +6,10 @@
 > Prop 16.1 のみ消費で sorry-free)。**Thm A の proof-time 復元プラン (§7/§12) は撤回** —
 > `theoremA_maximal_structure` は do-not-prove-as-is
 > (faithful = `theoremA_maximal_structure_faithful` S16:~4844)。以下は履歴。
+>
+> **2026-07-15 更新**: bare `theoremA_maximal_structure` は全 consumer の faithful 版移行を
+> 再確認して retire 済み。canonical API = `theoremA_maximal_structure_faithful`。以下の bare
+> monolith 復元案は引き続き撤回済みの履歴として読む。
 
 Lane G を §13 → BG §15+§16 に再配置した直後の着工前監査。目的は LAUNCH の
 「scaffold の faithful 化 + §14 非依存補題」を実行可能な形に落とすこと。
