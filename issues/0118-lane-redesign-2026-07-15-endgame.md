@@ -83,10 +83,18 @@ producer 3 本 / `typeI_caseC_bound_c1`/`_c2` / `gap_coefficients_nonzero_of_del
    証明循環」制約に注意 — cite でなく param 化が正)。
 3. (b-3) `sibleyTarget_S` + `S_coherent` の W-side restate-or-retire (2026-07-02 hub 裁定の執行、
    HypothesisBasics、consumer-0 確認済)。
-4. (b-4) CDS 2239 行分割 (mandate 継続、0116 記載)。
+4. **(b-4) ✅ 再設計前に landing 済**: `6546bc02` で
+   `S15_CharacterDegreeSupply` → `S15_CharacterDegreeEngines` を prefix-split 済み。
+   その後 `f2c3b831` で Engines の S-side 層も分離され、現行 3 files は
+   1286 / 841 / 1052 行で全て上限内。新たな分割は不要。
 5. (b-5) a-1 landing 後: Supply 層 ~8 consumer を threaded ν-supply へ切替、generic sorried
    `Hypothesis.nuGridSupply` を retire (9096 完結)。
 - **hold 継続**: `S15_SAndT_Setup/{NormEstimates,CountingLayer}.lean` は a の flip landing まで touch 禁止。
+
+**lane b status (2026-07-15)**: b-1 `fa6fd706` 完了。b-2 は Phase 1 `a524da36` を landing、
+field 削除本体は a flip + c-owned sites の追従待ち。b-3 は consumer-zero S-side placeholder を
+`2dcab177` で retire。b-4 は上記の通り既完了。b-5 は Phase A `c87438fc` 完了、Phase B は
+issue 9096 記載の c-owned S16 call-site rewire 待ち。
 
 ### lane c — WS3 S16 de-bridging + endgame 検証 (即着手 2 件 + flip 後 2 件)
 

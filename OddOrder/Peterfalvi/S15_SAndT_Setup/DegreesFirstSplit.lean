@@ -116,6 +116,29 @@ noncomputable def hypothesis76AlphaFun [Fintype G] [Invertible (Nat.card G : ℂ
 
 open scoped Classical in
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The generic (13.5.a) correction as a class function on `↥L`.  This is the
+class-function realization of `hypothesis76AlphaFun`, needed when restricting the correction
+to the normal subgroup `H76.H.subgroupOf L`. -/
+noncomputable def hypothesis76AlphaCF [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ) : ClassFunction ↥L ℂ :=
+  ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+        (fun i => (P' : Set ↥L) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+      (star (H76.cCoeff χ i) / H76.zetaNormSq i) • H76.zeta i
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+@[simp] theorem hypothesis76AlphaCF_apply [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ) (a : ↥L) :
+    hypothesis76AlphaCF H76 P' χ a = hypothesis76AlphaFun H76 P' χ a := by
+  rw [hypothesis76AlphaCF, hypothesis76AlphaFun,
+    OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
+  exact Finset.sum_congr rfl (fun i _ => by rw [ClassFunction.smul_apply])
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- The generic correction is constant on `P'`. -/
 theorem hypothesis76AlphaFun_const [Fintype G] [Invertible (Nat.card G : ℂ)]
     (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
@@ -179,6 +202,131 @@ theorem hypothesis76AlphaFun_inflation [Fintype G] [Invertible (Nat.card G : ℂ
     ring
   rw [hsharp, ← hsupp]
   exact hcore
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- For an abstract (7.6) datum, restriction of a family member to its inducing normal
+subgroup is its squared norm times the orbit sum of an inducing irreducible character. -/
+theorem hypothesis76_restrict_zeta_eq_orbitSum [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L)
+    (j : Fin (H76.n + 1)) :
+    ∃ θ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(H76.H.subgroupOf L),
+      H76.zeta j = ClassFunction.induce (H76.H.subgroupOf L)
+          (θ : ClassFunction ↥(H76.H.subgroupOf L) ℂ) ∧
+      (haveI : (H76.H.subgroupOf L).Normal :=
+        OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
+      ClassFunction.restrict (H76.H.subgroupOf L) (H76.zeta j)
+        = H76.zetaNormSq j •
+            ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
+              ClassFunction.conjBy x⁻¹
+                (θ : ClassFunction ↥(H76.H.subgroupOf L) ℂ)), ψ) := by
+  classical
+  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
+  haveI hKnorm : K.Normal :=
+    OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
+  obtain ⟨θ₀, hθ₀⟩ := H76.zeta_induced j
+  have hθ : H76.zeta j = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
+    rw [hθ₀]
+  refine ⟨θ₀, hθ, ?_⟩
+  have hK0 : (Nat.card ↥K : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
+  have horbit := OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
+    (G := ↥L) (H := K) (k := ℂ) (θ₀ : ClassFunction ↥K ℂ)
+  have hinertia := OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+    (G := ↥L) (H := K) θ₀
+  have hnormval : (Nat.card ↥K : ℂ) * H76.zetaNormSq j
+      = (Nat.card ↥(ClassFunction.inertia (G := ↥L)
+          (θ₀ : ClassFunction ↥K ℂ)) : ℂ) := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hθ]
+    exact hinertia
+  have hIKnorm : ((Nat.card ↥K : ℂ))⁻¹ *
+      (Nat.card ↥(ClassFunction.inertia (G := ↥L)
+        (θ₀ : ClassFunction ↥K ℂ)) : ℂ) = H76.zetaNormSq j := by
+    rw [← hnormval]
+    field_simp
+  have h1 : (Nat.card ↥K : ℂ) • ClassFunction.restrict K (H76.zeta j)
+      = ((Nat.card ↥(ClassFunction.inertia (G := ↥L)
+          (θ₀ : ClassFunction ↥K ℂ)) : ℕ) : ℂ) •
+          ∑ ψ ∈ Finset.univ.image
+            (fun x : ↥L => ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
+    rw [← Nat.cast_smul_eq_nsmul (R := ℂ)] at horbit
+    rw [hθ]
+    exact horbit
+  have h2 := congrArg (fun φ => ((Nat.card ↥K : ℂ))⁻¹ • φ) h1
+  simp only [smul_smul, inv_mul_cancel₀ hK0, one_smul] at h2
+  rw [h2, hIKnorm]
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The normalized restriction `Res ζ_i / ‖ζ_i‖²` of an abstract (7.6) family member is a
+virtual character: it is the orbit sum of the inducing irreducible character. -/
+theorem hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L)
+    (i : Fin (H76.n + 1)) :
+    (H76.zetaNormSq i)⁻¹ •
+        ClassFunction.restrict (H76.H.subgroupOf L) (H76.zeta i)
+      ∈ ZIrr ↥(H76.H.subgroupOf L) := by
+  classical
+  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
+  haveI hKnorm : K.Normal :=
+    OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
+  obtain ⟨θ₀, hθ₀⟩ := H76.zeta_induced i
+  have hθ : H76.zeta i = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
+    rw [hθ₀]
+  have hinertia := OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+    (G := ↥L) (H := K) θ₀
+  have hnormval : (Nat.card ↥K : ℂ) * H76.zetaNormSq i
+      = (Nat.card ↥(ClassFunction.inertia (G := ↥L)
+          (θ₀ : ClassFunction ↥K ℂ)) : ℂ) := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hθ]
+    exact hinertia
+  have hI0 : (Nat.card ↥(ClassFunction.inertia (G := ↥L)
+      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) ≠ 0 := by
+    exact_mod_cast Nat.card_pos.ne'
+  have hnorm0 : H76.zetaNormSq i ≠ 0 := by
+    intro h0
+    rw [h0, mul_zero] at hnormval
+    exact hI0 hnormval.symm
+  obtain ⟨θ, -, hres⟩ := hypothesis76_restrict_zeta_eq_orbitSum H76 i
+  have hmain : (H76.zetaNormSq i)⁻¹ •
+      ClassFunction.restrict K (H76.zeta i)
+      = ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
+          ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥K ℂ)), ψ := by
+    rw [hres, smul_smul, inv_mul_cancel₀ hnorm0, one_smul]
+  rw [hmain]
+  exact OddOrder.RepresentationTheory.orbitSum_mem_ZIrr (G := ↥L) θ
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- If the (7.7.a) coefficients are integral, the generic `P'`-kernel correction restricts
+to a virtual character of `H76.H`. -/
+theorem hypothesis76AlphaCF_restrict_mem_ZIrr [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
+    (χ : ClassFunction G ℂ)
+    (hc : ∀ i, ∃ z : ℤ, H76.cCoeff χ i = (z : ℂ)) :
+    ClassFunction.restrict (H76.H.subgroupOf L) (hypothesis76AlphaCF H76 P' χ)
+      ∈ ZIrr ↥(H76.H.subgroupOf L) := by
+  classical
+  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
+  have hlin : ClassFunction.restrict K (hypothesis76AlphaCF H76 P' χ)
+      = ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+            (fun i => (P' : Set ↥L) ⊆
+              OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+          (star (H76.cCoeff χ i) / H76.zetaNormSq i) •
+            ClassFunction.restrict K (H76.zeta i) := by
+    ext x
+    rw [ClassFunction.restrict_apply, hypothesis76AlphaCF,
+      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
+      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
+    exact Finset.sum_congr rfl (fun i _ => by
+      rw [ClassFunction.smul_apply, ClassFunction.smul_apply, ClassFunction.restrict_apply])
+  rw [hlin]
+  refine Submodule.sum_mem _ (fun i _ => ?_)
+  obtain ⟨z, hz⟩ := hc i
+  rw [hz, star_intCast, div_eq_mul_inv, mul_smul, Int.cast_smul_eq_zsmul]
+  exact Submodule.smul_mem _ z (hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr H76 i)
 
 open scoped Classical in
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
@@ -918,4 +1066,3 @@ the local sum (`IsTISubset.sum_conjClassSet`, issue 9011).  The `H`-side TI inpu
 `H_sharp_isTISubset`; the `Q`-side is its `T`-mirror below. -/
 
 end OddOrder.Peterfalvi.S15
-

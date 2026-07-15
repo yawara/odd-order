@@ -51,8 +51,8 @@ theorem Hypothesis.K_le_T [Finite G] (hyp : Hypothesis (G := G)) : hyp.K ≤ hyp
 
 /-- **`|K| = |Q|·d`** (Peterfalvi (13.2), `T`-side): `K = QD` with `Q ⊓ D = ⊥` (`D ≤ V` and
 `Q ⊓ V = ⊥`) and `Q ◁ K`.  Mirror of `card_H_eq` — but *without* evaluating `|Q|`
-(the `S`-side's `|P| = p^q` needs the carried `S_typeP2`; the `T`-analogue is (14.9)-gated,
-and the downstream index `[T:K] = v·p` cancels `|Q|` anyway). -/
+(the type-uniform `S`-side evaluation and its `T`-analogue are separate results, while the
+downstream index `[T:K] = v·p` cancels `|Q|` anyway). -/
 theorem Hypothesis.card_K_val [Finite G] (hyp : Hypothesis (G := G)) :
     Nat.card ↥hyp.K = Nat.card ↥hyp.Q * hyp.d := by
   haveI := hyp.finiteG
@@ -232,8 +232,8 @@ each closed —
   (`no_typeV_maximal_unconditional`).
 
 This is exactly Peterfalvi's "(13.2.b) holds for `T` as well as `S`" ((13.1) makes `S` and
-`T` play the same role): the `S`-side reads it off the carried `S_typeP2`, the `T`-side runs
-the honest classification.  It un-gates the §9-on-`T` chief-kernel triviality (the
+`T` play the same role): both sides now run the honest type-II/type-III classification.  It
+un-gates the §9-on-`T` chief-kernel triviality (the
 `nu_apply_one_eq_v` gate). -/
 theorem Hypothesis.card_Q_eq_qp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
@@ -300,8 +300,8 @@ theorem Hypothesis.card_Q_eq_qp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
 /-- **The `T`-instance chief kernel `N` is trivial**: `Q = T_F` has order `q^p`
 (`card_Q_eq_qp`, unconditional), and the chief factor `Q̄ = Q/H₀ ≅ ↥Q ⧸ N` already has order
 `(chief.p)^p` (`chiefFactor_quotient_card`), so `chief.p = q` and `|N| = 1`.  Mirror of
-`toTypesIIIIIIVSetupS_chief_N_eq_bot` — the `S`-side reads `|P| = p^q` off the carried
-`S_typeP2`; here `card_Q_eq_qp` supplies the `T`-side order with no carrier. -/
+`toTypesIIIIIIVSetupS_chief_N_eq_bot`; `card_Q_eq_qp` supplies the `T`-side order through the
+same honest type classification used on the `S` side. -/
 theorem Hypothesis.toTypesIIIIIIVSetupT_chief_N_eq_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)

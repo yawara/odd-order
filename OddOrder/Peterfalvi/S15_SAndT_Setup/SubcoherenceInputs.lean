@@ -511,31 +511,34 @@ structure BasicStructureGated (hyp : Hypothesis (G := G)) where
   tauS_eq_induction : Prop
   tauS_eq_induction_holds : tauS_eq_induction
 
-/-- **The §9 type-II setup on `S`** (Peterfalvi (13.2.a) → (9.2)): the `TypesIIIIIIVSetup`
-carrier for `S`, from the κ-Hall type-P₂ witness.  `maximal`/`typeP` are the carried
-`S_maximal`/`Sdata`; the nontrivial core is witness-independent (`U ≠ ⊥` via the canonical index
-`[S' : S_F]`, `|W₁| = q` prime, and the `A₀`-TI clause depends only on `S`); `type_alt` is
-type II (`isTypeII_of_isTypeP2`).  Note the §9 machinery's `H` is `Sdata.H = S_F = P`, so the
+/-- **`S` is of type `P`**: the carried `S_nonI` taxonomy alternative lies in the BG type-`P`
+class.  This is the common structural input for the `S`-side Dade support constructions; it avoids
+the stronger, temporary `S_typeP2` carrier. -/
+theorem Hypothesis.S_isTypeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.BG.Ch4.S14.IsTypeP hyp.S :=
+  OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.S_maximal hyp.S_nonI
+
+/-- **The §9 type-II/type-III setup on `S`** (Peterfalvi (13.2.a) → (9.2)): the
+`TypesIIIIIIVSetup` carrier for `S`, from the honest taxonomy alternative supplied by `S_nonI`.
+`maximal`/`typeP` are the carried `S_maximal`/`Sdata`; the nontrivial core is witness-independent
+and transported to `Sdata`; `type_alt` retains the actual type-II/type-III branch.  Note the §9
+machinery's `H` is `Sdata.H = S_F = P`, so the
 §9 inertia subgroup `HC` is `PC = hyp.H` — the (13.3.a) `Ind_{PC}(linear)` shape.  Opens the §9
 Clifford/degree machinery ((9.7)–(9.9), the `hcPsi`-induction analysis) on `S`. -/
 noncomputable def Hypothesis.toTypesIIIIIIVSetupS [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup hyp.S := by
-  have hSII : IsTypeII hyp.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
-  have tdata : TypeIIData hyp.S := hSII.some
-  have hUne : hyp.Sdata.U ≠ ⊥ := by
-    intro hbot
-    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
-      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
-    rw [hbot, Subgroup.card_bot] at h1
-    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
-  have hW1prime : (Nat.card ↥hyp.Sdata.W1).Prime := by
-    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]; exact hyp.q_prime
+  have htype : IsTypeII hyp.S ∨ IsTypeIII hyp.S :=
+    OddOrder.Peterfalvi.S13.isTypeII_or_isTypeIII_of_isTypeNonI
+      hG hyp.S_maximal hyp.S_nonI
   exact { maximal := hyp.S_maximal
           typeP := hyp.Sdata
-          nontrivial := ⟨hUne, hW1prime, tdata.common.2.2⟩
-          type_alt := Or.inl hSII }
+          nontrivial := by
+            rcases htype with hII | hIII
+            · exact hII.some.common.transfer hyp.Sdata
+            · exact hIII.some.common.transfer hyp.Sdata
+          type_alt := htype.elim Or.inl (fun hIII => Or.inr (Or.inl hIII)) }
 
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **§9 character data on `S`** (S12-mk mirror; degree-only placeholders): `u = |Ū|` is
@@ -1065,8 +1068,8 @@ theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
       fun h => honestTypeP2ASet_conj_mem hm h⟩
 
 /-- **(13.2.e) `S`-instance Dade hypothesis** (issue 1017 update #10, step 1): the `Hypothesis`-level
-instantiation of `dadeSupportHypothesisData_honestTypeP2ASet` at the type-`P₂` maximal `S`
-(via `hyp.S_maximal`/`hyp.S_typeP2`), packaging the honest §16 support
+instantiation of `dadeSupportHypothesisData_honestTypeP2ASet` at the type-`P` maximal `S`
+(via `hyp.S_maximal`/`hyp.S_isTypeP`), packaging the honest §16 support
 `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` (`honestTypeP2ASet hyp.S`) as an `S04.Hypothesis`.  This is the concrete
 `S04` Dade datum for `S` (previously only available as the standalone theorem taking `hM`/`hP2`); its
 `.fullDadeIsometryData` (given the support's `HConjInvariant`) materialises the Dade isometry
@@ -1078,7 +1081,7 @@ inherited shared BG §16 Theorem-II pins, at exact parity with the accepted on-p
 noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.S) hyp.S :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2.1).some.dade
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal (hyp.S_isTypeP hG)).some.dade
 
 /-- **(13.2.e) `S`-instance Dade `H`-conjugation invariance** (issue 1017): the `HConjInvariant` of
 `dadeHypS`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15), the
@@ -1089,7 +1092,7 @@ so the isometry `dadeHypS.fullDadeIsometryData dadeHypS_hconj` is well-defined. 
 theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     (hyp.dadeHypS hG).HConjInvariant :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2.1).some.hconj
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal (hyp.S_isTypeP hG)).some.hconj
 
 open scoped FiniteInduce in
 /-- **(13.2.e) `S`-instance `dade = Ind` bridge** (issue 1017): for the honest type-`P₂` maximal `S`,
@@ -1139,7 +1142,8 @@ theorem Hypothesis.dadeHypS_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (a : {a : G // a ∈ honestTypeP2ASet hyp.S}) :
     (hyp.dadeHypS hG).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.S (honestTypeP2ASet hyp.S) a.1 :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal hyp.S_typeP2.1).some.H_eq_ftSupportKernel a
+  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal
+    (hyp.S_isTypeP hG)).some.H_eq_ftSupportKernel a
 
 /-- **(Rung B, reduction) No escaping `A(S)`-points ⟹ all `S`-instance Dade stabilizers vanish.**
 For the honest type-`P₂` support, `dadeHypS.H a = ftSupportKernel S (A(S)) a`
@@ -1188,9 +1192,9 @@ theorem Hypothesis.isTISubset_honestTypeP2ASet_iff_forall_dadeHypS_H_eq_bot [Fin
   -- The reverse direction is Peterfalvi (2.3): trivial Dade stabilizers ⟹ TI.
   exact (hyp.dadeHypS hG).isTISubset_of_forall_H_eq_bot hH
 
-/-- **(Rung C at `Hypothesis` level): no `A(S)`-point escapes `S`.**  The general type-`P₂`
+/-- **(Rung C at `Hypothesis` level): no `A(S)`-point escapes `S`.**  The general type-`P`
 escaping exclusion `escaping_honestTypeP2ASet_eq_empty` instantiated at the carrier's `S`
-(`hyp.S_maximal`, `hyp.S_typeP2`) — the single input Rung B was reduced to. -/
+(`hyp.S_maximal`, `hyp.S_isTypeP`) — the single input Rung B was reduced to. -/
 theorem Hypothesis.no_escaping_honestTypeP2ASet [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
@@ -1198,7 +1202,7 @@ theorem Hypothesis.no_escaping_honestTypeP2ASet [Finite G]
     ∀ a ∈ honestTypeP2ASet hyp.S,
       a ∉ OddOrder.GroupTheory.escapingCentralizerSet hyp.S (honestTypeP2ASet hyp.S) := by
   intro a _ ha
-  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2.1] at ha
+  rw [escaping_honestTypeP2ASet_eq_empty hG hnoV hyp.S_maximal (hyp.S_isTypeP hG)] at ha
   exact Set.notMem_empty a ha
 
 /-- **(13.2.e) for the `S`-instance, stabilizer form: every `S`-instance Dade stabilizer is
@@ -1303,39 +1307,15 @@ theorem Hypothesis.cprimeSharpS_eq_empty (hyp : Hypothesis (G := G)) :
   rw [hyp.Cprime_eq_bot, Subgroup.mem_bot] at hx
   exact hxne (Subtype.ext hx)
 
-/-- **`(C')^# ⊆ A(S)` (as an `S`-support)** (issue 1017): the honest §9 coherence support `(C')^#`
-is contained in the `S`-restriction of the Dade support `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#`.  `C' = [C,C]
-≤ C ≤ U ≤ S' = derivedInG S` gives the derived-membership; and `C ≤ C_S(P)` (from `C = U ⊓ C_S(P)`)
-with `P = S_σ` (type-II `maxNilpotentNormalHall S = M_σ`) puts every `(C')^#`-element in `C_{S'}(z)`
-for any `z ∈ S_σ^#` (nonempty by `Msigma_ne_bot`).  This bridges the coherence support to the Dade
-support — the `hdiffsupp` half the (5.3.a) R-datum `dadeCharacterDifferenceImageOfDiff` needs (its
-support hypothesis is w.r.t. `A(S)`, while the §9 family differences are `(C')^#`-supported). -/
+/-- **`(C')^# ⊆ A(S)` (as an `S`-support)** (issue 1017): the honest §9 coherence support is empty
+because `C` is abelian (`cprimeSharpS_eq_empty`), hence is contained in the Dade support without a
+type-II identification `S_F = S_σ`. -/
 theorem Hypothesis.cprimeSharpS_subset_supportA [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     hyp.cprimeSharpS ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
-  have hPeq : hyp.P = OddOrder.BG.Ch3.S10.Msigma hyp.S := by
-    rw [hyp.P_eq_SF]
-    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hyp.S_maximal
-      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2))
-  have hCcentP : hyp.C ≤ Subgroup.centralizer (hyp.P : Set G) := by
-    rw [hyp.C_eq]; exact inf_le_right
-  have hCderiv : hyp.C ≤ derivedInG hyp.S := by
-    rw [hyp.S_deriv_eq_PU, hyp.C_eq]; exact le_trans inf_le_left le_sup_right
-  have hCpC : hyp.Cprime ≤ hyp.C := Subgroup.map_subtype_le _
-  obtain ⟨z, hz1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
-    (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hyp.S_maximal)
-  have hz1' : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext h)
-  intro x hx
-  rw [hyp.mem_cprimeSharpS] at hx
-  obtain ⟨hxCp, hxne⟩ := hx
-  have hxC : (x : G) ∈ hyp.C := hCpC hxCp
-  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, mem_honestTypeP2ASet]
-  refine ⟨hCderiv hxC, fun h => hxne (Subtype.ext h), (z : G),
-    (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr z.2, fun h => hz1' (Set.mem_singleton_iff.mp h)⟩, ?_⟩
-  rw [Subgroup.mem_centralizer_singleton_iff]
-  have hzP : (z : G) ∈ hyp.P := by rw [hPeq]; exact z.2
-  exact (Subgroup.mem_centralizer_iff.mp (hCcentP hxC) (z : G) hzP).symm
+  rw [hyp.cprimeSharpS_eq_empty]
+  exact Set.empty_subset _
 
 open OddOrder.Peterfalvi.S11 in
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -1352,14 +1332,14 @@ induced-support lemma `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_c
 * `support_induce_subset_conjugatesIntoSet`: a nonvanishing point `x` of `Ind_{HU}^S ξ` is
   `S`-conjugate to a point `w ∈ HU` of `Supp ξ`;
 * the (4.7) **core** (Peterfalvi (1.2), `irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`
-  contrapositive) forces a nontrivial `d ∈ H = P = S_σ` centralizing `w`, and the covering
+  contrapositive) forces a nontrivial `d ∈ H = P = S_F ≤ S_σ` centralizing `w`, and the covering
   condition puts `w ∈ A(S)` (via `mem_honestTypeP2ASet`: `w ∈ S' = M'`, `w ≠ 1`, `w` centralizes
   `d ∈ S_σ#`);
 * `honestTypeP2ASet_conj_mem` ((4.7)'s `L_normalizes_A` replacement): `A(S)` is `S`-conjugation
   invariant, so the image of `x` lies in `A(S) ∪ {1}` too.
 
-The `H = P = S_σ` identification is exactly the `hyp.P_eq_SF` + type-II
-`maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II` chain used in `cprimeSharpS_subset_supportA`. -/
+The inclusion `P = S_F ≤ S_σ` is the general `maxNilpotentNormalHall_le_Msigma` theorem, so this
+support argument is uniform across the type-II/type-III alternative. -/
 theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub (hyp.toTypesIIIIIIVSetupS hG))}
@@ -1368,15 +1348,13 @@ theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
         (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
   classical
-  -- `H = P = S_σ` (type-II Fitting = maximal nilpotent normal Hall = `Msigma`).
+  -- `H = P = S_F ≤ S_σ`.
   have hHP : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
     show hyp.Sdata.H = hyp.P
     rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
-  have hPeq : hyp.P = OddOrder.BG.Ch3.S10.Msigma hyp.S := by
+  have hPle : hyp.P ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
     rw [hyp.P_eq_SF]
-    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
-      hyp.S_maximal
-      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2))
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
   -- the (4.7) core: a nonvanishing `w ∈ HU` with `(w:S) ≠ 1` maps into `A(S)`.
   have hcore : ∀ w : ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)),
       (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ) w ≠ 0 →
@@ -1415,7 +1393,7 @@ theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
     · -- `d ∈ S_σ# = (Msigma S)#`.
       refine (Set.mem_sdiff _).mpr ⟨?_, fun he => hdG_ne (Set.mem_singleton_iff.mp he)⟩
       have hdP : ((d : ↥hyp.S) : G) ∈ hyp.P := hHP ▸ hdH_G
-      exact SetLike.mem_coe.mpr (hPeq ▸ hdP)
+      exact SetLike.mem_coe.mpr (hPle hdP)
     · -- `w` centralizes `d`.
       rw [Subgroup.mem_centralizer_singleton_iff]
       exact hcommG.symm
