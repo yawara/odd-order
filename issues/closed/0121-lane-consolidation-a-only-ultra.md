@@ -72,11 +72,22 @@ flip landing 後、post-flip 並列 work (c-3/b-2/9103/c-4 は別 file で並列
 
 ## 完了条件
 
-- [ ] b/c 退役 (worktree+branch 削除、所有マップ更新)
-- [ ] A = codex 5.6 ultra 単独レーンで稼働、hub 簡素 tick で監視
-- [ ] (最終) flip landing → 4 root 除去 → c-4 で `feitThompson` axiom-clean 判定
+- [x] b/c 退役 (worktree+branch 削除、所有マップ更新)
+- [x] A = codex 5.6 ultra 単独レーンで稼働、hub 簡素 tick で監視
+- [x] (最終) flip landing → 4 root 除去 → c-4 で `feitThompson` axiom-clean 判定
 
 ## 参照
 
 - issue 0118 (3 レーン再設計、本 issue で A 単独へ集約 = 部分 supersede)、0116 (flip 設計)、9096 (root #4)、
   merge_monitor tick #8-#14。lane-d 退役 (merge_monitor ⚰ 2026-07-07) = 退役手順の先例。
+
+## ✅ 2026-07-15 A単独集約・FT endgame 完了
+
+- branch/worktree audit: worktree は `main` と `a` の2本、作業 branch は `a` のみで、`b` / `c`
+  branch と worktree は退役済み。A は Ultra 単独レーンとして稼働した。
+- Core full flip (`20a8672e`) 後、root #4 (`796ab950`)、root #7 (`6ec691de`)、root #5
+  (`cfe33c3e`) を順に実供給へ置換した。
+- 最終 `OddOrder.feitThompson` は authoritative axiom trace と permanent `AxiomsCheck` の双方で
+  標準3公理のみ。full `lake build OddOrder` 4234 jobs green。
+- 集約目的を達成したため再展開は不要。本 task 以降、A レーンの `main` 同期はユーザーが明示した
+  ときだけ行うという現行運用に従う。

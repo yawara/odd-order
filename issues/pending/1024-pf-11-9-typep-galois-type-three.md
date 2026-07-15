@@ -280,5 +280,5 @@ lane c が TTypeII (S16) の `hVcomm` discharge に cite したいが、`S13_Non
 transitively import (S13_TypeDetermination 経由) するため **file-level cycle** で cite 不可
 (hub 検証済)。**hub 裁定 = 選択肢 (A): 当該 5 補題を S16-free な新 leaf (例 `S13_TypeIVExclusionCore.lean`,
 import は S13_TypeIIIGalois + S11_MaximalII_III_IV + NilpotentAbelianization のみ = closure に S16 無し)
-へ抽出。** 詳細タスク・要検証点 (proof が S13_TypeDetermination 固有内容を使うか) = issues/9077
+へ抽出。** 詳細タスク・要検証点 (proof が S13_TypeDetermination 固有内容を使うか) = issues/closed/9077
 「HUB RULING #3」節。**割当 = lane a** (territory 内)。landing で c の hVcomm sorry が 1 本消える。

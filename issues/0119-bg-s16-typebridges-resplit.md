@@ -38,5 +38,5 @@ created: 2026-07-15
 
 - `notes/meta/merge_monitor.md` step 4 (size watch)
 - `issues/closed/0078-s16-mainresults-split.md`
-- `issues/0118-lane-redesign-2026-07-15-endgame.md` (c-2)
+- `issues/closed/0118-lane-redesign-2026-07-15-endgame.md` (c-2)
 - merge commit `72847361`

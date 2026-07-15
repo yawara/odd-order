@@ -5,8 +5,9 @@
 > 引き続き有効。本ファイルが上書きするのは **lane↔front の対応づけと運用原則**のみ。
 > `ft_path_policy.md` §5 の lane 割当表 / `merge_monitor.md` の 🔒 所有マップは本ファイルへ従属。
 >
-> **レーン改名 (2026-06-28)**: `lane-{b,c,f,h}` → **`a,b,c,d`** (worktree も `odd-order-{a,b,c,d}` に rename、
-> `.lake/build` cache 流用)。
+> **現行 (2026-07-15)**: issue 0121 により **A (`a`) 単独**へ集約。`b` / `c` / `d` は退役し、
+> worktree は `main` と `/home/ywr/odd-order-a` のみ。旧複数レーン表は裁定履歴として残す。
+> A worktree の `git merge main` はユーザーが明示したときだけ行う。
 
 ---
 
@@ -41,14 +42,17 @@
 
 ---
 
-## 1. レーン所有マップ (🔒 ownership; 2026-07-07 ⚰ lane d 退役 → a/b/c 3 レーン)
+## 1. レーン所有マップ (🔒 ownership; 2026-07-15 A単独)
 
 | lane | worktree | クラスタ | 主所有ファイル | ODD_ISSUE_BASE |
 |---|---|---|---|---|
-| **a** | `odd-order-a` | **α** Pf §10–13 中央指標核 **+ σ-theory tail/dedup** | `Peterfalvi/S(0[3-9]|1[0-3])*` 全体 (= S03–S13; 例外 = b carve-out 0090 `S09_CertificateDischarge` / 0096 S10 §8 Dade-support 宣言群 / coherence infra `S07_Coherence*`+`S08_PGroupReduction` = b) + `FeitThompson.lean` **全体** (d 退役で fold) + σ-theory tail (S11 dup 3定理 retire→generic leaf cite + assembly, issue 9000 承継)。prefix-split の `*_Core` leaf は親の owner に従う (例 S12_MaximalIII_IV_V_Core = a) | 1000 |
-| **b** | `odd-order-b` | **β** §16 endgame char cascade = S15 (13.9)-(13.19) **+ S14/coherence cite-only** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` (c→b, 2026-07-04) + `Peterfalvi/S14_MaximalI.lean` + coherence infra (`S07_Coherence*` / `S08_PGroupReduction`) + carve-out 0090/0096 | 2000 |
-| **c** | `odd-order-c` | **γ** S16 非存在 = W-side (14.x) norm cascade + parity contradiction **+ Clifford** | `Peterfalvi/S16_NonExistenceG.lean` (S15 は b へ移管、c は import cite) + 構成的 Clifford (issue 9002) + `S15_SAndT_Setup.lean` の T-side `reconciled_typePData_T` carve-out (issue 9013) | 3000 |
-| ~~**d**~~ | — | ⚰ **退役 (2026-07-07, ユーザー裁定)** | worktree/branch 削除済。FT frontier (Pf 72 + BG 15 実 sorry) に codex 単独 closeable な genuine・on-path・非衝突・非gated sorry 不在と確定 (詳細 = merge_monitor ⚰ 節)。再活性化トリガー: T-side dual の gate 開通 or a/b/c の helper pull-request。 | (4000) |
+| **A (`a`)** | `/home/ywr/odd-order-a` | 単独 active lane | 全 active FT territory。旧 a/b/c の所有、旧 carve-out、Pf/BG S-file と FT assembly を統合 | 1000 |
+| ~~**b**~~ | — | ⚰ 退役 (2026-07-15) | — | — |
+| ~~**c**~~ | — | ⚰ 退役 (2026-07-15) | — | — |
+| ~~**d**~~ | — | ⚰ 退役 (2026-07-07) | — | — |
+
+単独 lane のため cross-lane territory / hold / carve-out は全て失効。shared-infra の
+claim-before-build (9000 range) と FT-path policy は引き続き適用する。以下は再配分履歴。
 
 > **⚠⚠ 2026-07-02 3 レーン再編 (ユーザー裁定) — lane d 退役**: char endgame が「4 独立クラスタ」でなく密結合
 > パイプライン (coherence→σ-theory→§10-13→§13-16→S16) と判明。ungated frontier は上流集中で下流 (c/d) が
@@ -378,7 +382,7 @@ FT 経路に接続するかを **定期確認** (特に typeP_Galois 9000 / BG l
 
 ## 3 レーン再設計 (2026-07-15, ユーザー発議「a 完遂 → 設計し直し」→ hub 裁定) — FT endgame 3 workstream 化
 
-**正本 = [`issues/0118-lane-redesign-2026-07-15-endgame.md`](../../issues/0118-lane-redesign-2026-07-15-endgame.md)** (詳細な root 台帳・裁定根拠・順序条件は issue 側)。要約:
+**正本 = [`issues/closed/0118-lane-redesign-2026-07-15-endgame.md`](../../issues/closed/0118-lane-redesign-2026-07-15-endgame.md)** (詳細な root 台帳・裁定根拠・順序条件は issue 側)。要約:
 
 - **状況**: lane a が割当 frontier 完遂 (9087 FINAL、S03–S13 + FeitThompson.lean 実 sorry 0)。
   hub 3-agent 監査 (wf_54ad9ca3、#print axioms authoritative) で **feitThompson の残 dirty root =

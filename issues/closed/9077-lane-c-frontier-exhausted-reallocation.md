@@ -619,3 +619,20 @@ term-level caller 0、`git diff --check` clean。新 axiom・signature 変更な
 **self-flag**: c-2 は vestigial cleanup の単独 commit。issue 0118 の次 frontier c-3
 (`V_inf_centralizer_Q_eq_bot` の下流 discharge leaf + S16 rewire) は lane a の 0116 full flip
 landing 後に hub が本 issue へ出す「c 再 engage (V_inf)」flag を trigger とする。
+
+## ✅ 2026-07-15 A単独 lane: c-3 / c-4 完了
+
+A単独集約により本 issue の c-3/c-4 scope を A が継承し、`cfe33c3e` で完了した。
+
+- `S16.Hypothesis.V_inf_centralizer_Q_eq_bot` は `D_eq` で書き換えた後、proven
+  `T_side_caseB_facts hG hyp` の `D = ⊥` conjunct から証明する。旧 S15 の無条件・過強な
+  `V_inf_centralizer_Q_eq_bot` は retire した。
+- Huppert/normalizer chain は `normalizer_W1_of_D_eq_bot` と
+  `complement_le_QW2_of_D_eq_bot` という explicit-`D = ⊥` API に整理し、§14 と §16 の各 consumer
+  が手元の genuine `D = ⊥` を渡す形へ再配線した。
+- permanent `AxiomsCheck` は上記2 API、S16 の faithful-action theorem、
+  `nonexistence_of_G`、`BG.AppC.final_contradiction`、`noMinimalSimpleOdd`、
+  `feitThompson_of_noMinimalSimpleOdd`、`feitThompson` を全て標準3公理のみと認証した。
+- `lake build OddOrder.AxiomsCheck` 4218 jobs、full `lake build OddOrder` 4234 jobs green。
+
+これで本 issue が追跡した gated V-side frontier と最終 axiom audit は完了した。

@@ -1,12 +1,16 @@
-# main 合流モニター — a/b/c レーン自動合流の運用手順
+# main 合流モニター — A単独レーン自動合流の運用手順
 
 > 横断運用ドキュメント。**監視ペース: 現行 = 15 分間隔 `7,22,37,52 * * * *` (ユーザー指示 2026-07-15、Codex hub 継続)**。明示指定がない場合はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。履歴: 2026-07-15 Codex hub で 20 分→15 分 (ユーザー再指示)、同日 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行の明示ユーザー指定 (なければモデル対応ペース) で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
 >
-> **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**
-> (ゲートなし・signature contract 方式)。本ファイルは hub 側の合流手順 + gotcha 集。
+> **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**。
+> 現行は issue 0121 の **A単独**。本ファイルは hub 側の合流手順 + gotcha 集。
+>
+> **同期方向の区別 (ユーザー指示 2026-07-15)**: A worktree からの `git merge main` は
+> **ユーザーが明示したときだけ**行う。hub が A の completed commit を green gate 後に main へ
+> `--no-ff` 合流する運用とは別方向であり、後者は監視が有効な間は従来どおり自動。
 
 > **🔀 一時 cross-lane carve-out (issue 8022) — ❌ 失効 (2026-07-02 lane d 退役)**: lane d への
 > S09/S14_MaximalI 一時編集権、および a/b/c への「S09 FrobeniusFamily/FamilyHypothesis71・
@@ -23,16 +27,19 @@
 > S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
 > 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
-## レーン (2026-07-15 current: a/b/c — issue 0118 再設計 = FT endgame 3 workstream)
+## レーン (2026-07-15 current: A単独 — issue 0121)
 
-| lane | branch | worktree | クラスタ (2026-07-15 issue 0118) | 主所有 .lean | issue base |
+| lane | branch | worktree | 現行役割 | 所有 | issue base |
 |---|---|---|---|---|---|
-| **a** | `a` | `odd-order-a` | **(a-1) 9096 ν-carrier threading → (a-2) 0116 full flip 実行 (hub 移譲)** → (a-3) chain clean 化 assert | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) + **flip-scope carve-out: `S15_SAndT_Setup/{NormEstimates,CountingLayer,Machinery135,DegreesFirstSplit}.lean` + `S15_CharacterDegreeEngines.lean`** (0116 直結 hunk のみ、full flip 完了で失効) | 1000 |
-| **b** | `b` | `odd-order-b` | **(b-1) δ′ restate-drop 実装 (最優先) → (b-2) T_isTypeP2_gate resolution → (b-3) sibleyTarget_S restate/retire → (b-4) CDS 分割 → (b-5) ν consumer 切替** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean` + `S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096。**⚠ hold: NormEstimates/CountingLayer は a の flip landing まで touch 禁止** | 2000 |
-| **c** | `c` | `odd-order-c` | **(c-1) caseB_order_u_data bridge retire (即) → (c-2) BG vestigial 整理 (即) → (c-3) V_inf discharge-leaf 充填 (a flip 後) → (c-4) feitThompson 最終 axiom trace** · operator = codex 5.6 or Claude (0105 KEEP) | `Peterfalvi/S16_NonExistenceG.lean(+/**)` + 既存 carve-out + **削除 carve-out: CaseBOrder.lean の bridge 2 宣言 (0118 条件付き)** | 3000 |
-| ~~**d**~~ | — | — | ⚰ **退役 (2026-07-07, ユーザー裁定)** — codex 運用 shared-infra レーン。worktree/branch 削除済 | — | — |
+| **A** | `a` | `/home/ywr/odd-order-a` | Ultra 単独作業レーン。FT endgame は `cfe33c3e` まで完了 | 全 active FT territory。旧 b/c territory と carve-out は A へ統合 | 1000 |
+| ~~**b**~~ | — | — | ⚰ 退役 (2026-07-15) | — | — |
+| ~~**c**~~ | — | — | ⚰ 退役 (2026-07-15) | — | — |
+| ~~**d**~~ | — | — | ⚰ 退役 (2026-07-07) | — | — |
 
-> 旧クラスタ記述 (2026-07-04/07-07 再々編) は git 履歴参照。**再設計の正本 = `issues/0118`** +
+branch/worktree audit は `a` と `main` のみ。FT endgame の旧 3-workstream と全 carve-out は完了・失効。
+以下の a/b/c/d 記述は裁定履歴としてのみ保存し、現行 ownership/range-check には使わない。
+
+> 旧クラスタ記述 (2026-07-04/07-07 再々編) は git 履歴参照。**再設計の正本 = `issues/closed/0118`** +
 > `ft_lane_reallocation_2026_06_28.md`「3 レーン再設計 (2026-07-15)」節。
 
 > **🤖 lane c = codex 5.6 (GPT-5.6) 運用 (2026-07-10, ユーザー裁定, issue 0105)**: lane c の operator を
@@ -311,7 +318,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > (4) sorry-free・純 additive (+328/-0)・build green 4197 / AxiomsCheck OK 2399 / 新 axiom なし。b は S15 caseB
 > wiring (set-artifact) を自ら revert し InnerCompHom lemma のみ保持 (2035 #34 self-flag) = 「軌道修正で保全」自己適用。
 > ⟹ step 1.5 で b が InnerCompHom の caseB-Xi/CliffordCaseBData 宣言を編集しても逸脱でない (a が編集したら逸脱;
-> dir の (11.9.c) `ThetaCountAssembly` 系は従来どおり decl-unit で a 領域)。詳細 = issues/2035 #34。
+> dir の (11.9.c) `ThetaCountAssembly` 系は従来どおり decl-unit で a 領域)。詳細 = issues/closed/2035 #34。
 > **carve-out (issue 9076, hub 裁定 2026-07-08 監視 tick)**: `OddOrder/Peterfalvi/S05_GridRigidity.lean`
 > (lane c が新規作成、Pf (3.8) abstract norm-2 rigidity engine `orthonormalGrid_diff_rigidity` = S05 σ-image
 > と S15 η-grid を de-dup する module-generic 核) は名目上 lane a の S05 regex に掛かるが、issue 9076
@@ -755,7 +762,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   8. **3004 unsound-carrier 懸念 = 解決済確認** (MHypothesis 無条件 field 4 本削除・(14.10) 再 sorry-free 化、
      b dichotomy restate landed) → STOP 該当なし。9085 (c dedup) は c work に bundle、0120 (lakefile) は
      post-flip all-idle に defer。
-  詳細 = issues/0118「HUB 中間裁定 tick #8」+ 9096「HUB RULING tick #8」。**cron 継続** (15分 `7,22,37,52`)。
+  詳細 = issues/closed/0118「HUB 中間裁定 tick #8」+ 9096「HUB RULING tick #8」。**cron 継続** (15分 `7,22,37,52`)。
 - **2026-07-15 (15分 tick #7、Opus hub) — ★ a: 0116 c=1 threading ((13.16) W2-side + complement)。census 32 不変**:
   main=`ff9919cc` clean・origin 同期・census 32。**a (visit)** = tip `27c405e9` を trial merge
   (race なし)、3 feature commit (mu vanishing / W2 normalizer / complement structure、いずれも
@@ -1078,7 +1085,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   **b=5** (`825ebdd9`〜`aa5ecb5a` = **refuter-T campaign 開始** — #74 4-obligation の refuter-T
   (S15_TSetMemberRFamily:1017) mirror。新 leaf 3 本 sorry-free: NineElevenPairBoundT 641 /
   NineElevenStepsT 677 / NineElevenSevenEightT 656、OddOrder.lean 配線済。NuRowPin 微修正。
-  issues/2035 で hub #75 vs b #75 の独立追記衝突 → 両保持 + b 側 #76 振り直し。merge)。c=0。
+  issues/closed/2035 で hub #75 vs b #75 の独立追記衝突 → 両保持 + b 側 #76 振り直し。merge)。c=0。
   build green **4210→4213 jobs** (+4 = 新 leaf 実 elaborate) / AxiomsCheck OK / census **40 不変**
   (a: −1 実 discharge +1 scaffold) / 新 axiom なし / 逸脱なし / orphan なし。push 済。
   **0116 追跡**: 条件 (ii) は「a の OrderDetermination cluster quiet 化」→ 移管 4 本完遂で実質成立に

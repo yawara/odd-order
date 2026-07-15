@@ -50,4 +50,4 @@ hidden-sorry producer `analytic_inequality` を参照しない。
 
 - Peterfalvi (14.6), `references/peterfalvi/04.16_pp_87_92_Non-existence_of_G.mmd`
 - Coq `coq/theories/PFsection14.v`, `m12` から節末
-- issues/0116, 1035, 1036, 1037
+- issues/closed/0116, 1035, 1036, 1037
