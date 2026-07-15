@@ -697,6 +697,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #23、Opus hub — ユーザー「A を最終マージして退役」) — ✅ A 最終マージ + 退役、監視終了**:
+  A=`5b281134` (docs-only: endgame issue 一斉 close + ROADMAP/notes) を merge `986e39ad`。docs conflict 2 件
+  (merge_monitor バナー / 0121 checklist) を hub 解決 (両立/詳細版保持)。.lean 不変・census 25・build 省略。
+  **A 退役**: WIP 0・全 genuine work マージ済確認 → `rm -rf` worktree + `git branch -D a` (tip reflog
+  `5b281134`、共有 mathlib 無傷)。**全レーン退役完了** (残: main のみ)。**監視 cron `32aaee3e` を CronDelete で停止。**
+  push `114247a4..986e39ad`。⟹ **FT axiom-clean 達成 (tick #22) → プロジェクト中核 landing、監視ループ終了。**
+  再開 (off-path scaffold or 3 冊網羅の別フェーズ) 時は worktree 追加 + cron 再作成。
 - **2026-07-15 (tick #22、Opus hub — A 単独) — ★★★ FEIT–THOMPSON AXIOM-CLEAN 達成: root #5 V_inf discharge。census 26→25**:
   main=`08da2260` clean・census 26。A ahead=1。**A** = `cfe33c3e` "discharge T-side faithful action (9077)" を
   merge `f5ab3129`: 最後の spine dirty root #5 `V_inf_centralizer_Q_eq_bot` ((13.12) d=1 T-side dual) を
