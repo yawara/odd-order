@@ -644,6 +644,35 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (20分 tick #4、Codex hub) — ★★ a: 0116 Core λ correction / b: 9096 b-5 Phase A。census 33 不変**:
+  tick 開始時に main=`7308e3cf` clean・`origin/main` 同期を確認し、lane tip を
+  **a=`1b35327a` / b=`e2492d56` / c=`9f002989`** に固定。freeze 後の lane 進行と
+  未コミット WIP は本 tick に混ぜていない。
+  **a=2** (feature `1da0ae60` + main sync merge 1): issue 0116 の Core λ-correction package。
+  新 root-wired leaf `S15_CaseBEndgameSupply/LambdaCorrection.lean` に proven theorem 9 本を実装し、
+  chosen-base の redundant wrapper 5 本を除去。新 theorem 9 本は個別 `#print axioms` で
+  `[propext, Classical.choice, Quot.sound]` のみ、`sorry` / 新 `axiom` なしと確認して
+  merge **`45f20460`**。
+  **b=4** (feature `c87438fc` + main sync merge 3): issue 9096 b-5 Phase A として
+  canonical `NuGridSupplyData` を b-owned S15 chain へ明示的に threading。
+  S16-facing boundary 5 本には downstream 機械追従までの一時 `optParam`
+  `pins := hyp.nuGridSupply ...` を保持するため、これらの `#print axioms` は既存 producer 由来の
+  `sorryAx` をなお表示する。**diff 中の `sorry` / `axiom` / `admit` 追加は 0、
+  census は 33 のまま**であり、新規 sorry / regression ではない。Phase B で c-owned S16 call site を
+  named `pins` に切替後、この既定値と generic sorried producer を除去する計画どおりと裁定し
+  merge **`9a4fdecd`**。
+  **hub gotcha**: `#print axioms` は宣言 type 内の `optParam` default 依存も辿るため、
+  proof body が explicit carrier を使っていても default が sorried producer を参照する間は
+  exported constant は axiom-clean と表示されない。判定は staged diff の新規 sorry 有無・census・
+  Phase 契約を併用する。
+  **c=3** (main sync merge 3 のみ): `main...c` tree diff は空のため merge せず。
+  各 exact `MERGE_HEAD` / staged path / claim / scope / root closure / duplicate を照合し、
+  統合状態で `lake build OddOrder OddOrder.AxiomsCheck` **4228 jobs green**、
+  AxiomsCheck 全 allowlist OK。touched leaf は全て 1500 行未満で size issue なし。
+  push **`7308e3cf..9a4fdecd`** 成功。
+  freeze 後の現 lane tip は a=`cc2be3c9` / b=`be635d1e` / c=`9f002989`、
+  未合流 `main..{a,b,c}` = **3 / 1 / 3**。a は Eta10 correction feature 1 + sync 2、
+  b は sync 1、c は sync 3。a/b の未コミット WIP は非接触のまま次 tick で新規 freeze する。
 - **2026-07-15 (20分 tick #3、Codex hub 引越し後初回) — ★ a: 0116 correction layer / b: 9103 Phase 1 / c: 0118 c-2。census 34→33**:
   tick 開始時に main clean・`origin/main` 同期を確認し、lane tip を **a=`92293b7c` /
   b=`f6ff529a` / c=`9b9986b9`** に固定。以後の lane 進行は本 tick に混ぜていない。
