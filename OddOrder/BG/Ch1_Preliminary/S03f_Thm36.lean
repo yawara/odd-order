@@ -618,9 +618,9 @@ private theorem thm36_aux : ∀ (n : ℕ)
       rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hVU, ← hKdef,
         ← MonoidHom.range_eq_map, U.range_subtype] at h1
     have hVK_inf : V ⊓ K = ⊥ :=
-      Subgroup.inf_eq_bot_of_coprime (by
+      (Subgroup.disjoint_of_coprime_natCard (by
         rw [hVa, hKcard]
-        exact Nat.Coprime.pow_left a (hp.coprime_iff_not_dvd.mpr hK'p'))
+        exact Nat.Coprime.pow_left a (hp.coprime_iff_not_dvd.mpr hK'p'))).eq_bot
     -- `N := N_{↥H}(K)` is `R`-invariant; pick an `R`-invariant Sylow `p`-subgroup `P` of `N`
     -- (Theorem 3.23(a) = `exists_aInvariant_sylow`).
     set N : Subgroup ↥H := Subgroup.normalizer (K : Set ↥H) with hNdef
@@ -1942,7 +1942,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         rw [hKG, Subgroup.card_map_of_injective H.subtype_injective, hKcard] at h2
         exact hK'p' (hd.trans h2)
       have hinf_bot : X ⊓ OpG = ⊥ := by
-        refine Subgroup.inf_eq_bot_of_coprime ?_
+        refine (Subgroup.disjoint_of_coprime_natCard ?_).eq_bot
         obtain ⟨k, hk⟩ := hOpGp.exists_card_eq
         rw [hk]
         exact Nat.Coprime.pow_right k (hp.coprime_iff_not_dvd.mpr hXp').symm
@@ -2054,7 +2054,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       exact hK'p' (hd.trans h3)
     have hPG_p'_disj : ∀ Y : Subgroup G, Y ≤ KG →
         Disjoint Y (P.map H.subtype : Subgroup G) := fun Y hYK =>
-      disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime (hcop_KG_PG Y hYK))
+      Subgroup.disjoint_of_coprime_natCard (hcop_KG_PG Y hYK)
     have hVG_disj : ∀ Y : Subgroup G, Y ≤ KG →
         Disjoint VG (Y ⊔ (P.map H.subtype) : Subgroup G) := by
       intro Y hYK
@@ -2530,7 +2530,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         rw [hc, hf]
       · rw [hcomm, hfrat]
     -- pin the `Normal` instance locally: with `IsMulCommutative (K/K')` in scope below, the
-    -- bare search wanders into `Subgroup.normal_of_comm` (`CommGroup ↥KG`) and times out
+    -- bare search wanders into `Subgroup.normal_of_isMulCommutative` and times out
     haveI hK'norm : (commutator ↥KG).Normal := inferInstance
     have hK'_inv : OddOrder.Isaacs.Ch03.IsAInvariant φA (commutator ↥KG) :=
       OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φA
@@ -3671,9 +3671,9 @@ private theorem thm36_aux : ∀ (n : ℕ)
       · exact absurd rfl (fun h => hj2 h)
       · exact absurd hjle2 (by omega)
     have hKcomm : ∀ a b : ↥KG, a * b = b * a := by
-      refine commutative_of_cyclic_center_quotient
-        (QuotientGroup.mk' (Subgroup.center ↥KG)) ?_
-      rw [QuotientGroup.ker_mk']
+      exact (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+        (QuotientGroup.mk' (Subgroup.center ↥KG)) (by
+          rw [QuotientGroup.ker_mk'])).is_comm.comm
     have h336 : (⁅KG, KG⁆ : Subgroup G) = ⊥ := by
       have hc : commutator ↥KG = ⊥ := by
         rw [commutator_def, Subgroup.commutator_eq_bot_iff_le_centralizer]

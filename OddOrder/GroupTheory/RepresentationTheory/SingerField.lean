@@ -535,7 +535,7 @@ The fixed-point-free half of Peterfalvi (9.7)(b) supplies a *trivial intersectio
 `Ū ∩ 𝔽ₚ* = 1` inside the cyclic multiplicative group of the Singer field; the divisibility
 `|Ū| ∣ (p^q-1)/(p-1)` then needs `|Ū|` coprime to `p-1`.  In a cyclic group, a trivial
 intersection of two subgroups *does* force coprime orders (the converse of
-`Subgroup.inf_eq_bot_of_coprime`, which fails in general groups). -/
+`Subgroup.disjoint_of_coprime_natCard`, which fails in general groups). -/
 
 /-- In a finite cyclic group, two subgroups with trivial intersection have coprime orders.
 

@@ -30,6 +30,13 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
   (58 code sites + `SingerField.lean` の説明 comment 1件)。
 - 検証: `lake build OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement`
   成功 (2371 jobs)、`lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
+- second wave: BG §3.6 (`S03f_Prelim` / `S03f_Thm36`) の 6 code sites と、
+  `S03f_Thm36` / `SingerField` の 2 doc references を新 API へ移行。
+- wave 後の raw Lean-source occurrences は
+  `inf_eq_bot_of_coprime` 53、`commutative_of_cyclic_center_quotient` 23、
+  `IsPGroup.commutative_of_card_eq_prime_sq` 12、`Subgroup.normal_of_comm` 6。
+- focused 検証: `lake build OddOrder.BG.Ch1_Preliminary.S03f_Thm36`
+  成功 (3064 jobs)、`lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
 
 ## 完了条件
 

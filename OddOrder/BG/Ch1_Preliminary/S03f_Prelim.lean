@@ -144,7 +144,7 @@ theorem oPiCore_compl_quotient_frattini_fitting_eq_bot
     exact Nat.Coprime.pow_left k (hp.out.coprime_iff_not_dvd.mpr hO_p')
   have hcomm_bot : (⁅Vbar, Ō⁆ : Subgroup (Hb ⧸ Phi)) = ⊥ := by
     have hle : (⁅Vbar, Ō⁆ : Subgroup (Hb ⧸ Phi)) ≤ Vbar ⊓ Ō := Subgroup.commutator_le_inf Vbar Ō
-    rw [Subgroup.inf_eq_bot_of_coprime hcop] at hle
+    rw [(Subgroup.disjoint_of_coprime_natCard hcop).eq_bot] at hle
     exact le_bot_iff.mp hle
   -- `⁅V, W⁆ ≤ Φ(V)` (pull back the commutator).
   have hVW_le_Phi : (⁅V, W⁆ : Subgroup Hb) ≤ Phi := by
@@ -462,7 +462,7 @@ theorem oPiCore_compl_eq_bot_of_isPGroup_centralizer_le {p : ℕ} [hp : Fact p.P
     exact Nat.Coprime.pow_left k (hp.out.coprime_iff_not_dvd.mpr hOp')
   have hcomm : (⁅O, N⁆ : Subgroup W) = ⊥ := by
     have hle : (⁅N, O⁆ : Subgroup W) ≤ N ⊓ O := Subgroup.commutator_le_inf N O
-    rw [Subgroup.inf_eq_bot_of_coprime hcop] at hle
+    rw [(Subgroup.disjoint_of_coprime_natCard hcop).eq_bot] at hle
     rw [Subgroup.commutator_comm]
     exact le_bot_iff.mp hle
   have hO_le_N : O ≤ N :=
