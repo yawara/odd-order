@@ -2872,3 +2872,19 @@ consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (rest
   (S13_NonGaloisExclusion、(13.2.a)/(13.2.e) の per-subgroup 対称形、build green)。
 - Phase 1 (b-owned) 継続中。Phase 2 (field 削除本体) は CountingLayer hold 解除
   (a-flip landing) + a/c-owned 4 sites の調整後 — hub の landing flag 運用への組込みを提案。
+
+## 2026-07-15 更新 #95 (lane a) — ★ root #7 CLOSED: asymmetric S_typeP2 gate を撤去
+
+- **`6ec691de`** (issue 9103 Phase 2): `Hypothesis.S_typeP2` / `Section16Inputs.S_typeP2`
+  を削除し、`Hypothesis.swap` と `nuGridSupply_swap` を `hT2` 不要の対称構成にした。
+- `T_isTypeP2_gate` を retire。`d_eq_one_of_swapped_lambda_dichotomy` →
+  `T_caseB_facts_unconditional` の supply chain は、`T_nonI` と既存の unconditional
+  V-可換性を使う symmetric swap へ直接接続した。
+- 残 consumer は II/III 共通 core、一般 type-P / Fitting-TI、Fitting への包含へ再配線。
+  Type II 固有の `M_F = Mσ` を一般化せず、必要な W₂-divisibility は直接証明した。
+- **AxiomsCheck 標準3公理**: `d_eq_one_of_swapped_lambda_dichotomy`、
+  `T_caseB_v_eq_full_of_swapped_lambda_dichotomy`、`T_caseB_facts_of_q_lt_p_core`、
+  `T_caseB_facts_unconditional`、さらに downstream の `t_side_caseB_fieldModel`、
+  `t_side_frobenius_kernel` まで PASS。
+- full `lake build OddOrder` 4234 jobs green。これで root #7 は field の構成可能性を
+  保ったまま閉鎖され、循環していた (14.9)-conclusional input は supply chain から消滅した。

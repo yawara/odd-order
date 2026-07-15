@@ -124,13 +124,31 @@ Phase 1 の b-owned direct consumers を `S_typeP2`-free 化した。
 検証: `S15_SAndTDefs` + `Machinery135`、`S15_SAndTBasic` + `S15_Gate3` の leaf builds green。
 full `lake build OddOrder` も 4228 jobs で green（AxiomsCheck OK）。
 
+## Phase 2 実施報告 (lane a, 2026-07-15)
+
+Phase 2 を commit **`6ec691de`** で完了した。
+
+- `S15.Hypothesis.S_typeP2` と対応する `Section16Inputs.S_typeP2` を削除し、
+  `Hypothesis.swap` / `nuGridSupply_swap` から `hT2` 引数を除去した。swap 後の type-P
+  supply は対称な `T_nonI`、可換性は既存の unconditional producer から取得する。
+- `T_isTypeP2_gate` を削除し、`d_eq_one_of_swapped_lambda_dichotomy`、
+  `T_caseB_v_eq_full_of_swapped_lambda_dichotomy`、`T_caseB_facts_of_q_lt_p_core`、
+  `T_caseB_facts_unconditional` を symmetric swap へ直接再配線した。
+- 残っていた a/c-owned consumers は II/III 共通 core、一般 type-P / Fitting-TI API、
+  および `P,Q ≤ Fitting ≤ Mσ` の包含に置換した。Type II 固有の等式を一般 case へ
+  誤って持ち上げず、必要箇所では W₂ への素数位数 divisibility を直接構成した。
+- AxiomsCheck で上記 4 endpoints に加え、下流の
+  `t_side_caseB_fieldModel` / `t_side_frobenius_kernel` まで **標準3公理のみ**を確認した。
+- 検証: `lake build OddOrder.AxiomsCheck` 4218 jobs、`lake build OddOrder` 4234 jobs、
+  `git diff --check` はすべて green。
+
 ## 完了条件
 
 - [x] Phase 0: 新部品 2 本 landed (S13_NonGaloisExclusion、build green)
 - [x] Phase 1: b-owned consumer の S_typeP2-free 化 (各 build green、AxiomsCheck 不変)
-- [ ] Phase 2: field 削除 + gate/param 削除、`d_eq_one`/`T_caseB_v_eq_full` が
-  sorry-free 化 (残 sorryAx = nuGridSupply のみ)、AxiomsCheck assert 追加
-- [ ] issue 2035 の root #7 前半を closed 記録
+- [x] Phase 2: field 削除 + gate/param 削除、`d_eq_one`/`T_caseB_v_eq_full` の
+  symmetric supply 化、AxiomsCheck assert 追加
+- [x] issue 2035 の root #7 前半を closed 記録
 
 ## 参照
 
