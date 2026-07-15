@@ -1,4 +1,12 @@
-# main 合流モニター — a/b/c レーン自動合流の運用手順
+# main 合流モニター — A 単独レーン監視の運用手順 (2026-07-15 集約)
+
+> **🟢 現行構成 = A 単独 (codex 5.6 ultra) + hub 監視のみ (ユーザー裁定 2026-07-15、issue 0121)**:
+> parallelism 枯渇 (flip serial 律速 + b/c ungated 0 + c↔a 衝突) ゆえ **b/c を退役** (worktree+branch 削除済、
+> tips reflog: b=`b14d552a` c=`eeda401a`)、**A のみが全 FT 作業を serial 実行**。⟹ **hub tick は A のみ訪問**、
+> **step 1.5 scope-check / 1.6 dedup / carve-out 裁定 / cross-lane conflict 解決は全て不要** (単一オーナー =
+> 逸脱概念が消滅、A が全 Pf/BG S-file + FeitThompson を所有)。green gate (build + AxiomsCheck + regression なし +
+> 新 axiom なし) のみ維持。b/c を訪問しない。**再展開時**は `git worktree add` で復活 (集約は可逆、issue 0121
+> 再展開トリガー節)。以下の a/b/c 3 レーン手順は**履歴** (再展開時に参照)。
 
 > 横断運用ドキュメント。**監視ペース: 現行 = 15 分間隔 `7,22,37,52 * * * *` (ユーザー指示 2026-07-15、Codex hub 継続)**。明示指定がない場合はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。履歴: 2026-07-15 Codex hub で 20 分→15 分 (ユーザー再指示)、同日 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行の明示ユーザー指定 (なければモデル対応ペース) で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
@@ -683,6 +691,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #17、Opus hub — ユーザー「A 単独で走る、監視は A のみ」) — ★★ 集約実行: b/c 退役、A 単独体制へ**:
+  ユーザー確定 (0121)。**b/c 退役実行**: genuine 未マージ 0・WIP 0 を再確認 → worktree 手動削除
+  (`git worktree remove` は submodule `coq/` で拒否 → `rm -rf` + `git worktree prune`、共有 symlink
+  mathlib/references は無傷確認) + `git branch -D b c` (tips reflog: b=`b14d552a` c=`eeda401a`)。
+  build cache 計 ~3GB 回収。残: main + a worktree のみ。**A merge** = a tip `f5ca4134` は
+  `Merge branch 'main' into a` 単独で **behind main (empty merge、genuine 0)** → trial merge staged 0 で
+  `git merge --abort` (a は main に 2 遅れ、次 iteration で flip landing + 0121 を再同期)。census 28 不変。
+  **⟹ 以後 hub tick は A のみ・簡素化** (scope/dedup/carve-out/conflict 解決 不要、green gate のみ)。
 - **2026-07-15 (tick #16、Opus hub cron) — ★★★ a: 0116 FULL FLIP LANDING — roots #1/#2/#3/#7 一括 retire。census 32→28**:
   main=`14dc8964` clean・census 32。a=1 genuine ahead (14 file! b=3 main-sync skip / c=0 skip)。
   **a (visit)** = `20a8672e` "complete Core full flip" を merge `8e27ce8f`: 0116 flip の **assembly commit**。

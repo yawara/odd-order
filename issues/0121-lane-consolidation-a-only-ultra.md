@@ -72,8 +72,8 @@ flip landing 後、post-flip 並列 work (c-3/b-2/9103/c-4 は別 file で並列
 
 ## 完了条件
 
-- [ ] b/c 退役 (worktree+branch 削除、所有マップ更新)
-- [ ] A = codex 5.6 ultra 単独レーンで稼働、hub 簡素 tick で監視
+- [x] b/c 退役 (worktree+branch 削除済 tick #17、tips reflog b=b14d552a/c=eeda401a; 所有マップ = merge_monitor 冒頭バナーで A 単独へ更新)
+- [x] A = codex 5.6 ultra 単独レーンで稼働 (ユーザー切替済)、hub 簡素 tick で監視 (tick #17〜)
 - [ ] (最終) flip landing → 4 root 除去 → c-4 で `feitThompson` axiom-clean 判定
 
 ## 参照
