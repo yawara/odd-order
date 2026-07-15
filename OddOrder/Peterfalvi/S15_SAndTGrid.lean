@@ -784,15 +784,17 @@ theorem typeIBetaL_eta_row_constant [Finite G]
 with the pair roles interchanged).  The swap's `η`-grid is the transpose, so its row-`0`
 constancy *is* the column constancy of `hyp.eta`; `β_L^τ` is `hyp`-independent, so no
 transport is needed on the left argument.  Takes the (14.9)-conclusional `IsTypeP2 T` (like
-`typeI_caseC_dual_dichotomy`); the reconciled `TypePData T` and the ν-side grid supply come
-from `reconciled_typePData_T` and the `nuGridSupply` pin, and the swap's structural
-`IsMulCommutative ↥V` input is derived from `hT2` via the BG type dictionary and
-`isMulCommutative_V` (issue 9096 bundle split). -/
+`typeI_caseC_dual_dichotomy`); the reconciled `TypePData T` comes from
+`reconciled_typePData_T`, the ν-side grid supply is the explicit `pins` parameter (issue
+9096 / 0118 b-5: the canonical `S16.Hypothesis.nuGridSupply` carrier at the Section-16
+consumers), and the swap's structural `IsMulCommutative ↥V` input is derived from `hT2` via
+the BG type dictionary and `isMulCommutative_V` (issue 9096 bundle split). -/
 theorem typeIBetaL_eta_col_constant [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
+    (pins : NuGridSupplyData hyp)
     {L : Subgroup G} (typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ typeISetup.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ)) :
@@ -807,7 +809,7 @@ theorem typeIBetaL_eta_col_constant [Finite G]
   have hV : IsMulCommutative ↥hyp.V := isMulCommutative_V _hG hyp
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.T_maximal).2.1.mpr hT2)
   exact typeIBetaL_eta_row_constant _hG hnoV
-    (hyp.swap hT2 hV Tdata hU hW1 hW2 (hyp.nuGridSupply _hG))
+    (hyp.swap hT2 hV Tdata hU hW1 hW2 pins)
     typeISetup φ _hφ _hdeg i i' hi hi'
 
 

@@ -521,15 +521,17 @@ the (4.4)-at-`T` base sign (`NuGridSupplyData.deltaPrime_zero_eq_one`); off the 
 `ν_{i0}(1) = δ'_i + p·a` against the **proven** Frobenius congruence `v ≡ 1 (mod p)`
 (`v_modEq_one`) and the **proven** (13.3.a)-at-`T` per-entry degree `nu_apply_one_eq_v`
 (via `card_Q_eq_qp`, the unconditional `|Q| = q^p`), exactly as `delta_eq_one_of_ne_zero`
-runs the `S`-side.  The ν-grid facts enter through the sorried producer `nuGridSupply`
-(a-owned canonical threading, issue 9096) — the assembly itself is sorry-free. -/
+runs the `S`-side.  The ν-grid facts enter through the explicit `pins` parameter
+(issue 9096 / 0118 b-5: supplied by the canonical `S16.Hypothesis.nuGridSupply` carrier at
+the Section-16 consumers) — the assembly itself is sorry-free, hence axiom-clean. -/
 theorem Hypothesis.deltaPrime_eq_one_T [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp)
     (i : Fin hyp.q) : hyp.deltaPrime i = 1 := by
   by_cases hi : i = ⟨0, hyp.q_prime.pos⟩
   · rw [hi]
-    exact (hyp.nuGridSupply _hG).deltaPrime_zero_eq_one
-  · exact hyp.deltaPrime_eq_one_of_ne_zero_T _hG (hyp.nuGridSupply _hG) i hi
+    exact pins.deltaPrime_zero_eq_one
+  · exact hyp.deltaPrime_eq_one_of_ne_zero_T _hG pins i hi
 
 open scoped FiniteInduce in
 /-- **The λ-free core producer** (issue 9094 RULING 案 A): every field of

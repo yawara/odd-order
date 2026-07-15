@@ -140,23 +140,25 @@ def LambdaWitness [Finite G] (hyp : Hypothesis (G := G)) : Prop :=
 `S`-side (13.12) `c_eq_one` at the swapped hypothesis — `swap.c := hyp.d` by the 9096
 threading, so the conclusion is definitional.  Swap inputs: `hT2` from the (13.2.b)-at-`T`
 gate (`T_isTypeP2_gate`, 0116-class), the unconditional abelian `V`, the reconciled type-`P`
-datum, and the ν-grid supply (`nuGridSupply`, the a-owned 9096 producer obligation) — the
-same internal summons as the λ-branch (`tSide_theta_package` chain). -/
+datum, and the explicit ν-grid supply `pins` — the same inputs as the λ-branch
+(`tSide_theta_package` chain). -/
 theorem Hypothesis.d_eq_one [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) :
     hyp.d = 1 := by
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
   have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
-  exact c_eq_one hG (hyp.swap hT2 hV Tdata hU hW1 hW2 (hyp.nuGridSupply hG))
+  exact c_eq_one hG (hyp.swap hT2 hV Tdata hU hW1 hW2 pins)
 
 /-- **`D = ⊥` — Peterfalvi (13.12) at `T`, subgroup form** (issue 2035 #77): `d = 1`
 (`d_eq_one`, the swap instantiation of `c_eq_one`) transported through
 `d_eq_card_D`. -/
 theorem Hypothesis.T_side_D_eq_bot [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (pins : NuGridSupplyData hyp) :
     hyp.D = ⊥ := by
-  have hd := hyp.d_eq_one hG
+  have hd := hyp.d_eq_one hG pins
   rw [hyp.d_eq_card_D] at hd
   exact Subgroup.card_eq_one.mp hd
 
@@ -169,12 +171,12 @@ full cyclotomic value.  Discharged by the swap instantiation over lane-a's (13.1
 chain. -/
 theorem Hypothesis.T_caseB_v_eq_full [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hqp : hyp.q < hyp.p) :
+    (hqp : hyp.q < hyp.p) (pins : NuGridSupplyData hyp) :
     hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T := hyp.T_isTypeP2_gate hG
   have hV : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
-  let hyp' : Hypothesis (G := G) := hyp.swap hT2 hV Tdata hU hW1 hW2 (hyp.nuGridSupply hG)
+  let hyp' : Hypothesis (G := G) := hyp.swap hT2 hV Tdata hU hW1 hW2 pins
   haveI := hyp'.finiteG
   obtain ⟨chief', -⟩ :=
     OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp'.toTypesIIIIIIVSetupS hG)
@@ -208,10 +210,10 @@ case (9.7.b)-for-`T`, `D = ⊥` and the full `v` from `q < p` alone, with no λ-
 `v`-value are the precisely-named swap-route gates above. -/
 theorem T_caseB_facts_of_q_lt_p [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hqp : hyp.q < hyp.p) :
+    (hqp : hyp.q < hyp.p) (pins : NuGridSupplyData hyp) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p :=
-  ⟨hyp.T_side_D_eq_bot hG, hyp.T_caseB_v_eq_full hG hqp, hyp.card_Q_eq_qp hG⟩
+  ⟨hyp.T_side_D_eq_bot hG pins, hyp.T_caseB_v_eq_full hG hqp pins, hyp.card_Q_eq_qp hG⟩
 
 open OddOrder.Peterfalvi.S11 in
 /-- **(9.8.c) with the regular seed exposed**: the degree-`qu` irreducible member of `𝒮(H₀C)` from
@@ -861,6 +863,7 @@ S-side (13.3) engines (issue 9013 追記⁶). -/
 theorem tSide_theta_package_of_not_caseB_core [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp)
+    (pins : NuGridSupplyData hyp)
     (_hne : ¬ (hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p)) :
     ∃ (θT : ClassFunction ↥hyp.T ℂ) (r r' : Fin hyp.q) (δ' : ℤ) (θG : ClassFunction G ℂ),
@@ -880,7 +883,6 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
   have hnoV := OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional _hG
   have hvd : hyp.v * hyp.d ≠ 1 := hyp.vd_ne_one _hG
   have hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T := hyp.T_isTypeP _hG
-  set pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG with hpins
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T _hG hyp
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG
     (hyp.toTypesIIIIIIVSetupT _hG hvd)
@@ -1187,14 +1189,15 @@ character induced from a linear character of `PC`), then case (9.7.b) holds for 
 the λ-cluster thread the guarded `tau1S_apply_induce_sub`/`tau1S_induce_inner_eta`. -/
 theorem lambda_forces_T_caseB_core [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
-    (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp) :
+    (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp)
+    (pins : NuGridSupplyData hyp) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   haveI := hyp.finiteG
   by_contra hne
   -- T-side θ-package from the (13.3.b,c)-for-`T` gate.
   obtain ⟨θT, r, r', δ', θG, hδ', hβsupp, hβform, hηθ, hLamTheta⟩ :=
-    tSide_theta_package_of_not_caseB_core hG core lam hne
+    tSide_theta_package_of_not_caseB_core hG core lam pins hne
   -- S-side (13.3) data with the `𝒮₁`-witnesses.
   obtain ⟨thetaL, hthetaLirr, hthetaL1, hlamEq, x₀, hx₀P, hx₀ker⟩ :=
     lam.lambda_induced_from_PC_linear
@@ -1269,14 +1272,15 @@ against the unconditional `CharacterDegreeCore`; the no-λ branch is the (Galois
 (`S16 … T_side_caseB_facts`) cites in place of the uninhabitable monolithic producer. -/
 theorem T_caseB_facts_unconditional [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hqp : hyp.q < hyp.p) :
+    (hqp : hyp.q < hyp.p)
+    (pins : NuGridSupplyData hyp := hyp.nuGridSupply hG) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   obtain ⟨core⟩ := hyp.characterDegreeCore_nonempty hG
   by_cases hlam : LambdaWitness hyp
   · obtain ⟨θ, hθ, hθ1, hθP, hind⟩ := hlam
     obtain ⟨lam⟩ := hyp.lambdaClusterData_of_irr_witness hG θ hθ hθ1 hθP hind
-    exact lambda_forces_T_caseB_core hG core lam
-  · exact T_caseB_facts_of_q_lt_p hG hyp hqp
+    exact lambda_forces_T_caseB_core hG core lam pins
+  · exact T_caseB_facts_of_q_lt_p hG hyp hqp pins
 
 end OddOrder.Peterfalvi.S15
