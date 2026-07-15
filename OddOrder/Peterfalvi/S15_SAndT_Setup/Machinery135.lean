@@ -300,8 +300,12 @@ structure CharacterDegreeCore (hyp : Hypothesis (G := G)) where
               Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
             OddOrder.Peterfalvi.S03.characterKernel θ) ∧
           (∑ i : Fin hyp.q, hyp.mu i j) = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
-  /-- **(13.3.c)**: the signs `δ_j`, `δ'_i` are all `1`. -/
-  delta_eq_one : (∀ j : Fin hyp.p, hyp.delta j = 1) ∧ (∀ i : Fin hyp.q, hyp.deltaPrime i = 1)
+  /-- **(13.3.c), the `S`-side signs**: the `δ_j` are all `1`.
+
+  δ′-half (`∀ i, hyp.deltaPrime i = 1`) は consumer 0 (issue 2035 #92 実測) につき
+  restate-drop; 供給は `deltaPrime_eq_one_T` (`S15_CharacterDegreeEnginesSSide`) に残存、
+  T-mirror 消費者が現れたら field として再追加する. -/
+  delta_eq_one : ∀ j : Fin hyp.p, hyp.delta j = 1
   /-- **(13.3.c)**: the `τ₁`-images of the nonzero column sums are the `η`-column sums. -/
   mu_tau1_formula :
     (∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
