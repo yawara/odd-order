@@ -566,8 +566,8 @@ theorem dadeSupportHypothesisData_honestTypeP2A0Set [Fintype G] [Finite G]
     exact honestTypeP2A0Set_conj_mem data hm
 
 /-- **(13.18) `S`-instance `'A0`-Dade hypothesis**: the `Hypothesis`-level instantiation of
-`dadeSupportHypothesisData_honestTypeP2A0Set` at the type-`P₂` maximal `S` (via `hyp.S_maximal`/
-`hyp.S_typeP2`/`hyp.Sdata`), packaging the honest full support `A₀(S) = A(S) ∪ V^S` as an
+`dadeSupportHypothesisData_honestTypeP2A0Set` at the type-`P` maximal `S` (via `hyp.S_maximal`/
+`hyp.S_isTypeP`/`hyp.Sdata`), packaging the honest full support `A₀(S) = A(S) ∪ V^S` as an
 `S04.Hypothesis`.  This is the `S`-side Dade datum for the (13.18) cross-relation
 `τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}` — the `μ`-column differences are `A₀(S)`-supported (the
 `V_S`-part falls outside `A(S) ⊆ S'`), so the `A(S)`-Dade `dadeHypS` cannot see them; `dadeHypS0`
@@ -576,7 +576,8 @@ is the correction.  (Its `.fullDadeIsometryData` inherits the one deep `'A0`-`no
 noncomputable def Hypothesis.dadeHypS0 [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
-  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2.1 hyp.Sdata).some.dade
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal (hyp.S_isTypeP hG)
+    hyp.Sdata).some.dade
 
 /-- **(13.18) `S`-instance `'A0`-Dade `H`-conjugation invariance**: the `HConjInvariant` of
 `dadeHypS0`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15)).  This
@@ -585,13 +586,13 @@ is the `hconj` input for `dadeHypS0.fullDadeIsometryData`, so the `'A0`-Dade iso
 theorem Hypothesis.dadeHypS0_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     (hyp.dadeHypS0 hG).HConjInvariant :=
-  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2.1 hyp.Sdata).some.hconj
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal (hyp.S_isTypeP hG)
+    hyp.Sdata).some.hconj
 
 /-- **`T`-instance `'A0`-Dade hypothesis** (the S↔T mirror of `dadeHypS0`): the honest
 `A₀(T) = A(T) ∪ (V_T)^T` Dade datum for `T`, from the generic type-`P₂` construction
-`dadeSupportHypothesisData_honestTypeP2A0Set` at `T`.  Unlike the `S`-side (where `IsTypeP2 S`
-is the carrier field `hyp.S_typeP2`), `IsTypeP2 T` is a **(14.9) conclusion** (`IsTypeII T`,
-via the BG type dictionary), so it is taken as a parameter together with a `T`-side reconciled
+`dadeSupportHypothesisData_honestTypeP2A0Set` at `T`.  The constructor itself needs only
+`IsTypeP T`, so it is taken as a parameter together with a `T`-side reconciled
 `TypePData` (supplied by `reconciled_typePData_T`).  This is the `τ_T` underlying the (14.3.b)
 bridge image `τ_T(β_T)` (`tauTbetaGrid`). -/
 noncomputable def Hypothesis.dadeHypT0 [Fintype G] [Finite G]
@@ -616,7 +617,7 @@ theorem Hypothesis.dadeHypS0_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (a : {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}) :
     (hyp.dadeHypS0 hG).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.S (honestTypeP2A0Set hyp.S hyp.Sdata) a.1 :=
-  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal hyp.S_typeP2.1
+  (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal (hyp.S_isTypeP hG)
     hyp.Sdata).some.H_eq_ftSupportKernel a
 
 /-- **All `'A0(S)`-instance Dade stabilizers vanish** (the (13.2.e) `A₀` `normedTI` conclusion): since
@@ -631,7 +632,8 @@ theorem Hypothesis.forall_dadeHypS0_H_eq_bot [Fintype G] [Finite G]
     ∀ a : {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata}, (hyp.dadeHypS0 hG).H a = ⊥ := by
   intro a
   rw [hyp.dadeHypS0_H_eq_ftSupportKernel hG a]
-  have hempty := escaping_honestTypeP2A0Set_eq_empty hG hnoV hyp.S_maximal hyp.S_typeP2.1 hyp.Sdata
+  have hempty := escaping_honestTypeP2A0Set_eq_empty hG hnoV hyp.S_maximal
+    (hyp.S_isTypeP hG) hyp.Sdata
   exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping
     (fun hesc => Set.notMem_empty a.1 (hempty ▸ hesc))
 
@@ -668,8 +670,8 @@ theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The type-`P₂` `Hypothesis46`-for-`S`** (issue 9076 piece 4c-4; the (13.18) pin-2/3 route).
 Assembles the §6 certain-type `Hypothesis46 (honestTypeP2ASet S) ↥S` from the type-uniform
-constructor `hypothesis46OfTypePData` (`S13_PrimeTIResidueBridge`): the type-`P₂` datum `hyp.Sdata`
-(with `IsTypeP S` from `S_typeP2`), the honest `A(S)`-support with its `'A0(S)`-Dade `dadeHypS0`, and
+constructor `hypothesis46OfTypePData` (`S13_PrimeTIResidueBridge`): the type-`P` datum `hyp.Sdata`
+(with `IsTypeP S` from `S_nonI`), the honest `A(S)`-support with its `'A0(S)`-Dade `dadeHypS0`, and
 the kernel-family subgroup `subH = M_σ` — for which the covering `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` holds
 (`mem_honestTypeP2ASet`).  This supplies the `certainTypeDiffSupported` /
 `certainType_diff_dade_apply_eq_of_mem_V` residue facts behind the `(13.18)` support/`V`-value pins
@@ -680,7 +682,7 @@ noncomputable def Hypothesis.hyp46S [Finite G] (hyp : Hypothesis (G := G))
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     OddOrder.Peterfalvi.S06.Hypothesis46 (honestTypeP2ASet hyp.S) hyp.S :=
   hypothesis46OfTypePData hG hyp.S_maximal
-    (OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 hyp.S_typeP2) hyp.Sdata hG.odd
+    (hyp.S_isTypeP hG) hyp.Sdata hG.odd
     (honestTypeP2ASet hyp.S) (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
     (fun l _ ha => honestTypeP2ASet_conj_mem l.2 ha)
     ((OddOrder.BG.Ch3.S10.Msigma hyp.S).subgroupOf hyp.S)

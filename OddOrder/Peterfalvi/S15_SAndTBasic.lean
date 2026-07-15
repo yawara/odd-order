@@ -19,98 +19,6 @@ open scoped Pointwise
 variable {G : Type*} [Group G]
 
 
-/-- **Peterfalvi (13.2.a), `U` abelian (non-gated carrier form)**: the complement `U` of the
-type-`P₂` member `S` is commutative — independent of the §16-gated `basic_structure_gated`.
-
-`S` is type II (`isTypeII_of_isTypeP2`), so it has a `TypeIIData` witness `tdata` whose complement
-`tdata.typeP.U` is commutative (`TypeIIData.U_commutative`).  Both that witness's `U` and the
-carrier's `U = Sdata.U` are complements of `M_F = S_F = P` in `M' = [S,S]`, hence `M'`-conjugate
-(Schur–Zassenhaus, `|P|` coprime to `|U|`, `IsComplement'.exists_conj_of_coprime`); conjugation is
-an isomorphism, so commutativity transfers to `hyp.U`.  This de-opacifies the `U_commutative` field
-of `basic_structure_gated`: downstream consumers can cite this directly instead of the §16-gated
-`BasicStructureData.U_commutative`. -/
-theorem isMulCommutative_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : IsMulCommutative ↥hyp.U := by
-  have hSII : IsTypeII hyp.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 _hG hyp.S_maximal hyp.S_typeP2
-  obtain ⟨tdata⟩ := hSII
-  -- `P ⊓ U = ⊥` from the carrier's derived complement (the `hdisj` input to coprimality).
-  have hdisj : hyp.P ⊓ hyp.U = ⊥ := by
-    have key : hyp.Sdata.H ⊓ hyp.Sdata.U = ⊥ := by
-      have hd := disjoint_iff.mp hyp.Sdata.derived_complement.disjoint
-      rw [eq_bot_iff]
-      rintro x ⟨hxH, hxU⟩
-      have hxD : x ∈ derivedInG hyp.S := hyp.Sdata.H_le hxH
-      have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.S)) ∈
-          (hyp.Sdata.H.subgroupOf (derivedInG hyp.S)) ⊓
-            (hyp.Sdata.U.subgroupOf (derivedInG hyp.S)) :=
-        ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
-      rw [hd, Subgroup.mem_bot] at hmem
-      rw [Subgroup.mem_bot]
-      simpa using Subtype.ext_iff.mp hmem
-    rw [hyp.P_eq_SF, ← hyp.Sdata.H_eq, ← hyp.Sdata_U_eq]
-    exact key
-  -- the `M' = [S,S]` setup (mirrors `coprime_card_U_card_P_of_disjoint`).
-  have hPH : hyp.P = tdata.typeP.H := by rw [hyp.P_eq_SF, tdata.typeP.H_eq]
-  have hP_le : hyp.P ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_left
-  have hU_le : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
-  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
-  have hP_le_S : hyp.P ≤ hyp.S := by
-    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
-  have hS_le_NP : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
-    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  haveI hPn_normal : (hyp.P.subgroupOf (derivedInG hyp.S)).Normal :=
-    (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le).mpr (hM'_le_S.trans hS_le_NP)
-  -- `U` complements `P` in `M'`.
-  have hUcompl : (hyp.P.subgroupOf (derivedInG hyp.S)).IsComplement'
-      (hyp.U.subgroupOf (derivedInG hyp.S)) := by
-    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
-    · rw [disjoint_iff]
-      ext ⟨x, hx⟩
-      simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot, Subtype.ext_iff,
-        OneMemClass.coe_one]
-      refine ⟨fun ⟨hxP, hxU⟩ => ?_, fun h => by simp [h]⟩
-      have hxPU : x ∈ (hyp.P ⊓ hyp.U : Subgroup G) := ⟨hxP, hxU⟩
-      rwa [hdisj, Subgroup.mem_bot] at hxPU
-    · have hsup : (hyp.P.subgroupOf (derivedInG hyp.S)) ⊔
-          (hyp.U.subgroupOf (derivedInG hyp.S)) = ⊤ := by
-        rw [← Subgroup.subgroupOf_sup hP_le hU_le, hyp.S_deriv_eq_PU.symm, Subgroup.subgroupOf_self]
-      have hmul := Subgroup.normal_mul (hyp.P.subgroupOf (derivedInG hyp.S))
-        (hyp.U.subgroupOf (derivedInG hyp.S))
-      rw [hsup, Subgroup.coe_top] at hmul
-      exact hmul.symm
-  -- `tdata.typeP.U` complements `P` in `M'` (after `H = P`).
-  have hU'compl : (hyp.P.subgroupOf (derivedInG hyp.S)).IsComplement'
-      (tdata.typeP.U.subgroupOf (derivedInG hyp.S)) := by
-    rw [hPH]; exact tdata.typeP.derived_complement
-  -- coprimality and solvability for Schur–Zassenhaus conjugacy of the two complements.
-  have hcop : Nat.Coprime (Nat.card ↥(hyp.P.subgroupOf (derivedInG hyp.S)))
-      ((hyp.P.subgroupOf (derivedInG hyp.S)).index) := by
-    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le).toEquiv, hUcompl.symm.index_eq_card,
-      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU_le).toEquiv]
-    exact (coprime_card_U_card_P_of_disjoint hyp tdata hdisj).symm
-  have hP_lt_top : hyp.P < ⊤ :=
-    lt_of_le_of_lt hP_le_S (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.S_maximal).1)
-  haveI hPsolv : IsSolvable ↥hyp.P := _hG.solvable_of_lt_top hyp.P hP_lt_top
-  have hsolv : IsSolvable ↥(hyp.P.subgroupOf (derivedInG hyp.S)) ∨
-      IsSolvable (↥(derivedInG hyp.S) ⧸ hyp.P.subgroupOf (derivedInG hyp.S)) :=
-    Or.inl (solvable_of_solvable_injective
-      (f := (Subgroup.subgroupOfEquivOfLe hP_le).toMonoidHom)
-      (Subgroup.subgroupOfEquivOfLe hP_le).injective)
-  -- the two complements are `M'`-conjugate by an element of `P`.
-  obtain ⟨n, _hnP, hn⟩ :=
-    Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hUcompl hU'compl
-  -- transfer commutativity along the chain of isomorphisms.
-  have h2 : IsMulCommutative ↥(tdata.typeP.U.subgroupOf (derivedInG hyp.S)) :=
-    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
-      (Subgroup.subgroupOfEquivOfLe tdata.typeP.U_le).symm tdata.U_commutative
-  rw [← hn] at h2
-  have h4 : IsMulCommutative ↥(hyp.U.subgroupOf (derivedInG hyp.S)) :=
-    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
-      (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective).symm h2
-  exact OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
-    (Subgroup.subgroupOfEquivOfLe hU_le) h4
-
 /-- **`T`-side dual of `coprime_card_U_card_P_of_disjoint`** (Pf (13.2.a), V-side): for the type-II
 member `T` with a `TypeIIData` witness `tdata` and `Q ⊓ V = ⊥`, the complement order `|V|` is
 coprime to `|Q| = |T_F|`.  The `V`-side analogue used by the V-side of (13.17)/(14.10). -/
@@ -176,12 +84,12 @@ theorem W1_le_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [← htpdW1, ← hHeq]
   exact le_trans tpd.W2_le inf_le_left
 
-/-- **`T`-side Fitting-TI source** (Pf (13.16), dual of the `S`-side `fittingIsTI_of_isTypeP2`):
+/-- **`T`-side Fitting-TI source** (Pf (13.16), dual of the `S`-side type-uniform TI result):
 `F(T)^#` is a TI-subset of `G` (with normalizer `T`).
 
-On the `W₂`-side, `normalizer_W2_le_S` reduces `N_G(W₂) ≤ S` using BG Theorem 15.7(a) applied to `S`'s
-type-`P₂` carrier `S_typeP2` (`fittingIsTI_of_isTypeP2`).  The `W₁`-side dual applies the same
-Theorem 15.7(a) to `T`: the (14.9) conclusion `IsTypeII T`, together with the BG type dictionary
+On the `W₂`-side, `normalizer_W2_le_S` reduces `N_G(W₂) ≤ S` using the type-uniform
+`S13.fittingIsTI_of_isTypeNonI`.  The `W₁`-side dual applies BG Theorem 15.7(a) to `T`: the
+(14.9) conclusion `IsTypeII T`, together with the BG type dictionary
 `proposition_type_classification` (`IsTypeII M ↔ IsTypeP2 M`), makes `T` **type-`P₂`**, so
 `fittingIsTI_of_isTypeP2` applies directly.  (The `q < p` κ-Hall ordering pins the *matched-pair*
 labelling `S`/`T`, not the type: both members of a type-`P₂` pair are type-`P₂` — the earlier belief
@@ -335,8 +243,8 @@ theorem conj_W2_mem_centralizer_W1 [Finite G] (_hG : OddOrder.BG.IsMinimalSimple
       _ = y := by group
   exact (mul_inv_eq_iff_eq_mul.mp hn').symm
 
-/-- **`T`-side dual of `isMulCommutative_U`** (Pf (13.2.a), V-side): the complement `V` of the
-type-II member `T` is commutative.  Mirror of `isMulCommutative_U`; `IsTypeII T` is a hypothesis
+/-- **`T`-side analogue of the carried `S_U_commutative` fact** (Pf (13.2.a), V-side): the complement
+`V` of the type-II member `T` is commutative.  Here `IsTypeII T` is a hypothesis
 (the (14.9) `T_typeII` conclusion, supplied by the caller).  Sources the `T`-side type-`P` structure
 from the off-spine `reconciled_typePData_T` (not the withdrawn `Tdata` carrier). -/
 theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1173,4 +1081,3 @@ theorem isHall_subgroupOf_primeFactors_of_coprime_index [Finite G] {V H : Subgro
   exact absurd (Nat.dvd_one.mp hp1) hp.1.ne_one
 
 end OddOrder.Peterfalvi.S15
-
