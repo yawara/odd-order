@@ -683,6 +683,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #14、Opus hub cron) — ★ a: 0116 flip swap-order route を Core へ cut (root #4 swap 経路 honest 化)。census 32 不変**:
+  main=`6cc5c54c` clean・census 32。a=1 genuine ahead (b=2 main-sync only skip / c=0 skip)。
+  **a (visit)** = `1c2a6161` を merge `498a05db`: tick #12 flag の root #4 swap 経路を honest 化。
+  新 leaf `SwappedNuGridSupply.lean` (swap honest ν-supply) + `OrderRelayerCore.lean` (Core-only relayer) +
+  CDS に honest Core-based swap order facts を additive 追加。**flip carve-out** (a が b-owned CDS +
+  S15_SAndT_Setup 新 leaf を触るが純 additive・既存 b 宣言無改変・on-path)。新 leaf root closure OK
+  (CDS/OrderRelayer import)。conflict なし。build **4234 jobs** green (+2 新 leaf)・AxiomsCheck OK・census 32→32。
+  push `6cc5c54c..498a05db`。**tick #13 = 変化なし** (全レーン genuine 0、build 未実行)。
 - **2026-07-15 (tick #12、Opus hub cron) — ★ b: b-5 Phase B pt1 (explicit nu-grid supply、b-owned)。census 32 不変**:
   main=`2d480c63` clean・census 32。b=1 ahead (a/c=0 skip)。**b (visit)** = `ac1b1e10` を merge `7ea6dff3`:
   tick #9 の 9096 kickoff を受け、S15_SAndT/CDS の boundary theorem から sorried optParam default
