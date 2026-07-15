@@ -644,6 +644,28 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (20分 tick #3、Codex hub 引越し後初回) — ★ a: 0116 correction layer / b: 9103 Phase 1 / c: 0118 c-2。census 34→33**:
+  tick 開始時に main clean・`origin/main` 同期を確認し、lane tip を **a=`92293b7c` /
+  b=`f6ff529a` / c=`9b9986b9`** に固定。以後の lane 進行は本 tick に混ぜていない。
+  **a=3** (feature `99354ff4` + main sync merge 2): 0116 chosen-base H-sharp correction layer
+  (新 root-wired discharge leaf 353 行、proven 宣言 10、本体 `sorry` 0、新 axiom なし)。
+  scope/0116 full-flip carve-out と root closure を確認し merge `3e1d1bc2`。
+  **b=2** (feature `1318870e` + main sync merge 1): issue 9103 Phase 1 として S-side
+  `M_F ≤ M_sigma` の 3 proof site を type II 専用から一般 type P へ拡張。signature・宣言集合・
+  `sorry` 不変、指定 3 file のみと確認し merge `c07133ef`。
+  **c=1** (`9b9986b9`): 0118 c-2 — consumer-zero の legacy
+  `theoremA_maximal_structure` を削除し、残る誤符号化 surface 2 本を docs 上で freeze。
+  term consumer 0 を独立 grep し、faithful theorem は保持、signature 変更・新 axiom なしと確認して
+  merge `72847361`。この削除により census **34→33**。
+  各 lane とも exact `MERGE_HEAD` / staged path / 3-dot delta を照合後、統合状態で
+  `lake build OddOrder OddOrder.AxiomsCheck` **4227 jobs green**、AxiomsCheck 全 allowlist OK。
+  scope 逸脱・shared claim 衝突・root orphan・`sorry` regression なし。
+  **size watch**: c の `S16_MainResults/TypeBridges.lean` が `+8/-7` で **1542 行**に増加
+  ⟹ hub-owned issue **0119** 起票。ほかの 1500 行超 touched leaf は全て非成長
+  (`TheoremsAE` net -31 / `TypeP1Criteria` net 0 / b の `S15_BridgeCharacter` net -2) のため
+  trigger 対象外。push `447b3172..72847361` 成功。
+  freeze 後の現 lane tip は a=`1b35327a` / b=`ae687944` / c=`a1852179`、未合流
+  `main..{a,b,c}` = **2 / 3 / 2**。a/b の未コミット WIP は非接触のまま、次 tick で新規 freeze する。
 - **2026-07-15 (20分 tick #2) — ★★ b: 9103 Phase 0 / c: 0118 c-1 bridge retire。census 35→34**:
   **b=1** (`d978bee6` = (13.2.a)/(13.2.e) per-subgroup 対称形 `isTypeII_or_isTypeIII_of_isTypeNonI`
   + `fittingIsTI_of_isTypeNonI` (proven 部品のみ消費、S13_NonGaloisExclusion への additive 追加)。
