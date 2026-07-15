@@ -62,14 +62,14 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
 **Lean status (2026-05-26)**:
 - `OddOrder.RepresentationTheory.RealIrreducibleCharacter G` names the subtype
   `{χ ∈ Irr(G) | χ̄ = χ}`.
-- `OddOrder.Peterfalvi.S03.card_realIrreducibleCharacters_eq_one_of_odd_card`
-  records the cardinal form of (1.1):
+- `OddOrder.RepresentationTheory.card_realIrreducibleCharacters_eq_one_of_odd_card`
+  records the conditional Brauer-permutation cardinal form of (1.1):
   `Nat.card (RealIrreducibleCharacter G) = 1` for odd `Nat.card G`.
 - `trivialClassFunction`, `trivialIrreducibleCharacter`, and
   `trivialRealIrreducibleCharacter` now name the trivial character at the
   class-function / irreducible / real-irreducible levels.
-- `OddOrder.Peterfalvi.S03.not_isReal_of_ne_trivial_irreducible_of_odd_card`
-  records the pointwise textbook form (`χ ≠ 1_G → χ̄ ≠ χ`).  As with the
+- `OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card`
+  records the corresponding pointwise form (`χ ≠ 1_G → χ̄ ≠ χ`).  As with the
   cardinal form, its proof depends on the routed Brauer permutation lemma
   proof core.
 - `OddOrder.Peterfalvi.S03.characterDegree`, `SameDegreeFamily`, and

@@ -1461,20 +1461,13 @@ theorem centralizer_le_normalizer {G : Type*} [Group G] (H : Subgroup G) :
     have hy_eq : y = x * y * x⁻¹ := mul_right_cancel h_eq
     rw [hy_eq]; exact hxyx
 
-/-- **Isaacs Lem 7.7 (a)** (image of normalizer under p'-quotient).
+/-! **Isaacs Lem 7.7 (a)** (image of normalizer under p'-quotient).
 
 `N ⊴ G` で `p ∤ |N|`, `P` が `G` の非自明 `p`-部分群とすると, `f := mk' N` について
 `N_Ḡ(P̄) = (N_G(P)).map f`.
 
-This is exactly Isaacs Lemma 2.17 in the quotient form needed in Ch.7. -/
-theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ}
-    [Fact p.Prime] (hp_coprime : ¬ p ∣ Nat.card N)
-    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
-    Subgroup.normalizer
-        ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
-      = (Subgroup.normalizer P).map (QuotientGroup.mk' N) :=
-  OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel
-    hp_coprime hP_neBot hP_pgroup
+This is exactly Isaacs Lemma 2.17 in the quotient form needed in Ch.7. Consumers below use
+`OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel` directly. -/
 
 /-- **Isaacs Lem 7.7 (b)** (image of centralizer under p'-quotient).
 
@@ -1579,7 +1572,8 @@ theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
     (Subgroup.centralizer
         ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
       = (Subgroup.centralizer (P : Set G)).map (QuotientGroup.mk' N)) :=
-  ⟨normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup,
+  ⟨OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel
+      hp_coprime hP_neBot hP_pgroup,
     centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup⟩
 
 /-- Transport `OddOrder.Isaacs.Ch05.HasNormalPComplement` across a `MulEquiv`.
@@ -1721,7 +1715,9 @@ theorem hasNormalPComplement_normalizer_map_of_coprime_kernel
   have hEq :
       Subgroup.normalizer ((P.map f : Subgroup (G ⧸ N)) : Set (G ⧸ N)) =
         (Subgroup.normalizer P).map f := by
-    simpa [f] using normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
+    simpa [f] using
+      OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel
+        hp_coprime hP_neBot hP_pgroup
   exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hEq.symm) hImage
 
 /-- If `N ⊴ G` is a normal `p'`-subgroup, then a normal `p`-complement in

@@ -27,6 +27,11 @@ and the isometry difference-pair lemma.
 The current slice records shared predicates and submodules used by §4-§8 while
 the deferred character-theory statements remain routed to those Wave 1a modules.
 
+In particular, the cardinal and pointwise Brauer-permutation forms of Peterfalvi (1.1) are
+`OddOrder.RepresentationTheory.card_realIrreducibleCharacters_eq_one_of_odd_card` and
+`OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card`; this file uses the shared
+results directly rather than re-exporting renamed copies.
+
 Reference note: `notes/peterfalvi/s03_preliminary_character.md`.
 -/
 
@@ -123,49 +128,6 @@ theorem hasNoRealCharacters_nontrivialIrreducibleClassFunctions [Finite G]
     HasNoRealCharacters (nontrivialIrreducibleClassFunctions G) := by
   rintro φ ⟨χ, hχ, rfl⟩
   exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hχ
-
-/-- **Peterfalvi (1.1)**, cardinal form.
-
-If `G` has odd order, then there is exactly one real irreducible complex
-character.  The sharper textbook phrasing says that every nontrivial
-irreducible character is non-real; identifying this unique real character with
-the trivial character is routed to the later trivial-character API.
-
-The hypotheses `idx`, `hrow`, `σ`, `h_real_irr`, `h_compat` package the
-data needed by Brauer's permutation lemma: character-table indexing, weighted
-row orthogonality, the conjugation involution `χ ↦ χ̄`, its fixed-point
-characterization, and the compatibility with class inversion.  Constructing
-these from mathlib's representation theory is the remaining external gap. -/
-theorem card_realIrreducibleCharacters_eq_one_of_odd_card [Finite G]
-    (idx : CharacterTableIndexing G)
-    (hrow : CharacterTableWeightedRowOrthogonality idx)
-    (σ : Equiv.Perm (IrreducibleCharacter G))
-    (h_real_irr : ∀ χ : IrreducibleCharacter G,
-      σ χ = χ ↔ ClassFunction.IsReal (χ : ClassFunction G ℂ))
-    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
-      characterTableEntry (σ χ) C = characterTableEntry χ (ConjClasses.inv C))
-    (hodd : Odd (Nat.card G)) :
-    Nat.card (RealIrreducibleCharacter G) = 1 :=
-  OddOrder.RepresentationTheory.card_realIrreducibleCharacters_eq_one_of_odd_card
-    idx hrow σ h_real_irr h_compat hodd
-
-/-- **Peterfalvi (1.1)**, pointwise form.
-
-If `G` has odd order, then every nontrivial irreducible complex character is
-non-real. -/
-theorem not_isReal_of_ne_trivial_irreducible_of_odd_card [Finite G]
-    (idx : CharacterTableIndexing G)
-    (hrow : CharacterTableWeightedRowOrthogonality idx)
-    (σ : Equiv.Perm (IrreducibleCharacter G))
-    (h_real_irr : ∀ χ : IrreducibleCharacter G,
-      σ χ = χ ↔ ClassFunction.IsReal (χ : ClassFunction G ℂ))
-    (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
-      characterTableEntry (σ χ) C = characterTableEntry χ (ConjClasses.inv C))
-    (hodd : Odd (Nat.card G)) {χ : IrreducibleCharacter G}
-    (hχ : χ ≠ trivialIrreducibleCharacter G) :
-    ¬ ClassFunction.IsReal (χ : ClassFunction G ℂ) :=
-  OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card
-    idx hrow σ h_real_irr h_compat hodd hχ
 
 /-- The degree of a complex class function, i.e. its value at the identity.
 

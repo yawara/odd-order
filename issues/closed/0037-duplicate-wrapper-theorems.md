@@ -40,39 +40,39 @@ docstring で明示的に正当化されている:
 各 wrapper の callsite を 直接呼び出しに置換 → wrapper 本体を削除 → `lake build
 OddOrder` で確認. 1 件 1 commit を推奨 (CLAUDE.md commit 規約).
 
-- [ ] **#1** [S01_Solvable.lean:521-525](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:521)
+- [x] **#1** [S01_Solvable.lean:521-525](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:521)
   `quotient_frattini_isElementaryAbelian`
   → [FrattiniPGroup.lean:161](OddOrder/GroupTheory/FrattiniPGroup.lean:161)
   `OddOrder.GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian`
   - 同一 statement, body は `:= OddOrder.GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian hR`
   - **caller**: 外部 0 件 (`S01_Solvable.lean` 内でのみ宣言, 同ファイル内に caller
     も無し).
-- [ ] **#2** [S01_Solvable.lean:531-535](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:531)
+- [x] **#2** [S01_Solvable.lean:531-535](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:531)
   `isElementaryAbelian_of_frattini_eq_bot`
   → [FrattiniPGroup.lean:188](OddOrder/GroupTheory/FrattiniPGroup.lean:188)
   - 同一 statement, body は 1 行直呼び出し
   - **caller**: 同ファイル [L558](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:558) で 1 回
     (`frattini_eq_bot_iff_isElementaryAbelian` 内). 置換要.
-- [ ] **#3** [S01_Solvable.lean:569-573](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:569)
+- [x] **#3** [S01_Solvable.lean:569-573](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:569)
   `commutator_sup_pow_closure_le_frattini`
   → [FrattiniPGroup.lean:211](OddOrder/GroupTheory/FrattiniPGroup.lean:211)
   - 同一 statement, body は 1 行直呼び出し
   - **caller**: 同ファイル [L629](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:629) で 1 回
     (`commutator_sup_pow_closure_eq_frattini` 内). 置換要.
-- [ ] **#4** [S03_PreliminaryCharacter.lean:98-109](OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:98)
+- [x] **#4** [S03_PreliminaryCharacter.lean:98-109](OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:98)
   `card_realIrreducibleCharacters_eq_one_of_odd_card`
   → [BrauerPermutation.lean:347](OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean:347)
   `OddOrder.RepresentationTheory.card_realIrreducibleCharacters_eq_one_of_odd_card`
   - 同一 statement, body は 1 行直呼び出し
   - **caller**: 外部 0 件.
-- [ ] **#5** [S03_PreliminaryCharacter.lean:115-127](OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:115)
+- [x] **#5** [S03_PreliminaryCharacter.lean:115-127](OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:115)
   `not_isReal_of_ne_trivial_irreducible_of_odd_card`
   → [BrauerPermutation.lean:383](OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean:383)
   `OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card`
   - 名前が微妙に違う (`_irreducible_` が挿入されている) が, 仮定・結論ともに完全
     一致. body は 1 行直呼び出し.
   - **caller**: 外部 0 件.
-- [ ] **#6** [Ch07/Main.lean:3532-3539](OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3532)
+- [x] **#6** [Ch07/Main.lean:3532-3539](OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3532)
   `normalizer_map_of_coprime_kernel`
   → [Ch02/Main.lean:2957](OddOrder/Isaacs/Ch02_Subnormality/Main.lean:2957)
   `OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel`
@@ -85,14 +85,14 @@ OddOrder` で確認. 1 件 1 commit を推奨 (CLAUDE.md commit 規約).
 
 ### 後始末
 
-- [ ] wrapper 削除後, 教科書名 ↔ shared module 名の対応を docstring または
+- [x] wrapper 削除後, 教科書名 ↔ shared module 名の対応を docstring または
   `notes/` の対応表に残す (CLAUDE.md 規約).
   - BG §1 Lem 1.7 (b)(c)(d) ↔ `OddOrder.GroupTheory.IsPGroup.*`: 
     `notes/bg/s01_solvable.md` (or section docstring at the wrapper site).
   - Peterfalvi (1.1) ↔ `OddOrder.RepresentationTheory.*Brauer*`:
     `notes/peterfalvi/s03_preliminary_character.md`.
   - Isaacs Lem 7.7 (a) ↔ Lem 2.17: Ch07 Main.lean の §7B 冒頭 docstring.
-- [ ] `lake build OddOrder` をクリーンで通す.
+- [x] `lake build OddOrder` をクリーンで通す.
 
 ## 完了条件
 
@@ -119,3 +119,15 @@ OddOrder` で確認. 1 件 1 commit を推奨 (CLAUDE.md commit 規約).
 - **#1–#5 の line 番号は drift**: 現在は #1–#3 が `S01_Solvable.lean:1595/1605/1643` 付近、
   #4–#5 が `S03_PreliminaryCharacter.lean:138/155` 付近。**実行時に必ず再 grep** して
   callsite を確認すること (本文の行番号を信用しない)。
+
+## 完了メモ (2026-07-15)
+
+#1–#5 の wrapper を削除し、残る内部 callsite を shared theorem の直接参照へ置換した。
+BG Lemma 1.7 と shared Frattini API の対応は §1C docstring、Peterfalvi (1.1) と shared
+Brauer-permutation API の対応は module docstring と
+`notes/peterfalvi/s03_preliminary_character.md` に記録した。2026-07-02 注記は `Main.lean`
+のみを確認しており、file split 後の leaf に #6 wrapper が残っていたため、これも削除して
+2 callsite を Ch02 の shared theorem 直参照へ置換した。
+
+検証: focused build、`lake build OddOrder OddOrder.AxiomsCheck` (4234 jobs)、
+`OddOrder.feitThompson` の axiom allowlist check がすべて成功。
