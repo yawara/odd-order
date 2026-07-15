@@ -194,3 +194,14 @@ moore57 は pin を `582ae6bd` へ bump し batch 1 を消費した (moore57 com
    K.Normal` (∃ 形でなく、order-q 部分群がそのまま THE normal Sylow になる形)。
   これなら Order275 サイトは 30 行 → 1 call。優先度は低 (現サイトは green の閉じた結果) —
   次に p²q 形の新規サイトが立ったときで良い。
+
+## pending 移行 (2026-07-15 hub 再監査)
+
+batch 1 の P1-1/P1-2/P3-5 は実装・full build・AxiomsCheck 済みで、
+moore57 側の pin bump と消費検証も完了した。即時 work order は残っていない。
+
+残件は sharpened `p²q` normality adapter、CyclicPermEigenCount 一般化、
+(1.10) 合成 corollary、fixedSubgroup API など、いずれも consumer 実需を
+トリガーとする queue であり、現 FT path からは要求されていない。
+したがって source-of-truth を `issues/pending/` へ移し、FT または
+moore57 consumer の trigger 発火時に再 activate する。
