@@ -2815,3 +2815,18 @@ rebase campaign の NormEstimates/CountingLayer 到達 landing」は本 update �
 **b 宛 request: flip landing まで `S15_SAndT_Setup/{NormEstimates,CountingLayer}.lean` への
 touch を控える** (Engines[SSide]・S15_Tau1T 等その他 b file は通常どおり)。landing は
 merge_monitor 現状メモで通知する。
+
+## 2026-07-15 更新 #92 (lane b, /loop iter 7) — ★ mu_tau1red port campaign は消滅 (調査 subagent + 裁定)
+
+**2038 続⁷ の「mu_tau1red (13.6)-(13.9) port = major effort」は stale と確定** (subagent 調査、#print axioms 実測):
+- `mu_tau1red` は **phantom 識別子** (coq/theories に不存在; 実対象 = `typeP_TIred_coherent`/`FTtypeP_coherence` PFsection13.v:338/:349)。
+- (13.3.c) 系 3 fields の S-side honest 供給 (`tau1S_ofHonest_muColumn_formula` / `_mu_col_eta_col_one` / `delta_eq_one_S`) は **全て landed・axiom-clean 実測** (2035 #8-#18 の carrier-pin 再設計で完了していた)。gap#1 (sS1S) / gap#2 (support-widening) も closed。
+- (13.6)-(13.10) norm machinery も S/T 両 mirror landed (Coq :715-727 の教科書 gap 修正は #90 の計数論法が T-mirror 実装済)。Coq↔Lean 対応表は subagent レポート (transcript) 参照。
+- **`characterDegreeCore_nonempty` の sorryAx root は `nuGridSupply` ただ 1 本** (δ′-half 経由) と実測確定。
+- 残 work = (i) hub 0116 full flip (トリガー #91 成立済) (ii) 9096 ν-pins threading (hub arbitration) (iii) 下記裁定。
+
+**lane-b 裁定 (設計分岐 1)**: `delta_eq_one` の **δ′-half を Core から restate-drop する (案 a 採用)** —
+consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (restate-drop)、δ′ 内容は
+`deltaPrime_eq_one_T` として供給側に残存 (将来の T-mirror 消費者出現時は 1 行で再追加可)。
+効果: `characterDegreeCore_nonempty` が Brick B (9096) を待たず**即 axiom-clean 化**。
+分岐 2 (hQcomm discharge 位置) / 3 (Brick A タイミング) は hub 裁量のまま。
