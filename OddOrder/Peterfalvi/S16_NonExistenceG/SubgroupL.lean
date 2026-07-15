@@ -199,8 +199,8 @@ end CaseBForSData
 The Clifford dichotomy supplies either case (9.7.a) or an actual `CliffordCaseBData`
 certificate.  The case-A branch is impossible by the completed type-I-over-normalizer
 contradiction, using the `(13.13)` parameters and `c = 1`.  In the remaining branch,
-`caseB_order_u` supplies the two alternatives for the order `u`; the qualitative field stores
-the genuine nonempty case-B certificate rather than an opaque compatibility proposition. -/
+the Core λ-dichotomy order endpoint supplies the two alternatives for `u`; the qualitative field
+stores the genuine nonempty case-B certificate rather than an opaque compatibility proposition. -/
 theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) :
     ∃ data : CaseBForSData hyp, data.caseB_formula := by
@@ -211,7 +211,8 @@ theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases OddOrder.Peterfalvi.S11.clifford_dichotomy _hG
       (hyp.base.mkSection11CharacterDataS _hG chief) with hA | hB
   · obtain ⟨caseA⟩ := hA
-    obtain ⟨hq, hu⟩ := OddOrder.Peterfalvi.S15.caseA_parameters _hG hyp.base caseA
+    obtain ⟨hq, hu⟩ := hyp.base.caseA_parameters_of_clifford_caseA
+      _hG caseA (pins := hyp.nuGridSupply)
     exact (OddOrder.Peterfalvi.S15.caseA_false_of_parameters_and_typeIOverNormalizerData
       _hG hyp.base caseA (hyp.base.c_eq_one_of_lambda_dichotomy _hG) hq hu
       Ldata.typeI_data).elim
@@ -221,7 +222,8 @@ theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (hyp.base.mkSection11CharacterDataS _hG chief))
     have hcaseB : caseB_formula := ⟨caseB⟩
     obtain ⟨hu_mod, hu_not_mod⟩ :=
-      OddOrder.Peterfalvi.S15.caseB_order_u _hG hyp.base caseB
+      hyp.base.caseB_order_u_of_lambda_dichotomy
+        _hG caseB (pins := hyp.nuGridSupply)
     exact ⟨⟨caseB_formula, hcaseB, hu_mod, hu_not_mod, True, trivial⟩, hcaseB⟩
 
 /-- Over `ℕ`, the geometric-sum identity `(p − 1) · ∑_{i<q} pⁱ = p^q − 1`. -/

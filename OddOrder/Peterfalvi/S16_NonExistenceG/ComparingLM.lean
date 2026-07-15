@@ -145,10 +145,12 @@ structure LSideGridCoeffData [Finite G] (hyp : Hypothesis (G := G))
   /-- **Principal coefficient** `m_00 = 1` (Coq `a00 = 1`).  **PROVEN in-place**. -/
   m_principal : m ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1
   /-- **Off-principal row parity** (Coq `a0j`): `m_0j` odd — **PROVEN in the producer** from the
-  S-side (13.19.c) dichotomy (`typeI_caseC_dichotomy`, (c1) refuted by the strict gap). -/
+  S-side (13.19.c) dichotomy (`typeI_caseC_dichotomy_of_c_eq_one`, (c1) refuted by the strict
+  gap). -/
   m_row_odd : ∀ j, j ≠ ⟨0, hyp.base.p_prime.pos⟩ → Odd (m ⟨0, hyp.base.q_prime.pos⟩ j)
   /-- **Off-principal column parity** (Coq `ai0`): `m_i0` odd — **PROVEN in the producer** from
-  the T-side dual dichotomy (`typeI_caseC_dual_dichotomy`, (c1)-dual refuted by the strict gap). -/
+  the T-side dual dichotomy (`typeI_caseC_dual_dichotomy_of_d_eq_one`, (c1)-dual refuted by the
+  strict gap). -/
   m_col_odd : ∀ i, i ≠ ⟨0, hyp.base.q_prime.pos⟩ → Odd (m i ⟨0, hyp.base.p_prime.pos⟩)
   /-- **Bessel bound** (Coq `ub_e`): `Σ m_ij² ≤ p q` — **PROVEN in the producer**
   (`betaL_grid_coeff_bessel`). -/
@@ -316,7 +318,8 @@ Bessel bound `Σ m² ≤ p q`, `betaL_grid_coeff_bessel`, from the full-family g
 `caseB_eta_orthogonal_nu_zeta_at` + the (7.8.b) residual bound `‖Γ_L‖² ≤ e − 1`, using the carried
 `hepq : e_L = p q`), and — issue 0115 Campaign A — the two off-principal parities
 `m_row_odd`/`m_col_odd`, now **proven** from the landed (13.19.c) dichotomies
-`S15.typeI_caseC_dichotomy`/`typeI_caseC_dual_dichotomy` at the distinguished member `ζ_0`:
+`S15.typeI_caseC_dichotomy_of_c_eq_one`/`typeI_caseC_dual_dichotomy_of_d_eq_one` at the
+distinguished member `ζ_0`:
 the (c1) branches are refuted by the Coq-(14.11.2)-style strict gap hypotheses `hub_u`/`hub_v`
 (`(u−1)/q < (h−1)/e`, `(v−1)/p < (h−1)/e` — supplied by the caller from the (14.14) gap chain),
 and the (c2) branches are exactly the parities, transported through the bridge
@@ -364,7 +367,9 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     have hφdeg : dataL.zeta 0 (1 : ↥L)
         = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
       rw [← hker]; exact dataL.deg0
-    rcases OddOrder.Peterfalvi.S15.typeI_caseC_dichotomy hG hnoV hyp.base dataL
+    have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy hG
+    rcases OddOrder.Peterfalvi.S15.typeI_caseC_dichotomy_of_c_eq_one
+        hG hnoV hyp.base hc1 dataL
         (dataL.zeta 0) hφmem hφdeg with ⟨-, hbound⟩ | ⟨hodd, -⟩
     · exact absurd hbound (not_le.mpr hub_u)
     · obtain ⟨n, hn_odd, hn_eq⟩ := hodd j (fun h0 => hj (Fin.ext h0))
@@ -393,10 +398,14 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
         = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
       rw [← hker]; exact dataL.deg0
     have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T := T_isTypeP2 hG hnoV hncH0C hyp
+    have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts hG hyp).1
+    have hd1 : hyp.base.d = 1 := by
+      rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
     obtain ⟨Tdata, hU, hW1, hW2⟩ :=
       OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base
-    rcases OddOrder.Peterfalvi.S15.typeI_caseC_dual_dichotomy hG hnoV hyp.base hT2 Tdata
-        hU hW1 hW2 dataL (dataL.zeta 0) hφmem hφdeg (pins := hyp.nuGridSupply) with
+    rcases OddOrder.Peterfalvi.S15.typeI_caseC_dual_dichotomy_of_d_eq_one
+        hG hnoV hyp.base hd1 hT2 Tdata hU hW1 hW2 dataL
+        (dataL.zeta 0) hφmem hφdeg (pins := hyp.nuGridSupply) with
       ⟨-, hbound⟩ | ⟨hodd, -⟩
     · exact absurd hbound (not_le.mpr hub_v)
     · obtain ⟨n, hn_odd, hn_eq⟩ := hodd i (fun h0 => hi (Fin.ext h0))
@@ -1114,7 +1123,7 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hu_full := u_final_value _hG hnoV hncH0C hyp nc
   rcases nc.h_modEq_one_mod_p_and_q _hG with ⟨hh_mod_p, hh_mod_q⟩
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
-    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base, mul_one]
+    rw [hyp.base.card_U_eq_uc, hyp.base.c_eq_one_of_lambda_dichotomy _hG, mul_one]
   have hU_le_H : hyp.base.U ≤ nc.Ldata.H := by
     rw [← nc.Ldata.typeI_data_H_eq]
     exact nc.Ldata.typeI_data.U_le_H
@@ -1199,7 +1208,7 @@ theorem base_card_S_eq [Finite G] (hyp : Hypothesis (G := G)) :
 /-- **Peterfalvi (14.11.4)**: `|N_G(P)| = |P| · u · q`.  The Fitting core `P = S_F` is normal in
 the maximal `S` and nontrivial (`W₂ ≤ P`), so `N_G(P) = S`
 (`normalizer_eq_self_of_subgroupOf_normal_of_ne_bot`); then `|S| = |P|·|U|·|W₁|` (`base_card_S_eq`)
-with `|U| = u·c`, `c = 1` (`S15.c_eq_one`), `|W₁| = q`.  Supplies `MHypothesis`'s
+with `|U| = u·c`, `c = 1` (`c_eq_one_of_lambda_dichotomy`), `|W₁| = q`.  Supplies `MHypothesis`'s
 `card_normalizer_P_eq`. -/
 theorem base_card_normalizer_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
@@ -1217,7 +1226,7 @@ theorem base_card_normalizer_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       hyp.base.S_maximal (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _)
       (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal _) hPne
   rw [hNP, ← base_card_S_eq hyp, hyp.base.card_U_eq_uc,
-    OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base, mul_one, hyp.base.q_eq_card_W1]
+    hyp.base.c_eq_one_of_lambda_dichotomy hG, mul_one, hyp.base.q_eq_card_W1]
 
 /-- **Order factorization of the type-`P` maximal `T`** (T-side dual of `base_card_S_eq`):
 `|Q| · |V| · |W₂| = |T|`, from a reconciled `TypePData T` (`tpd.U = V`, `tpd.W1 = W₂`, `Q = T_F`)
