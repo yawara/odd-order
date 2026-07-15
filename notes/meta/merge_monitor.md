@@ -691,6 +691,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #22、Opus hub — A 単独) — ★★★ FEIT–THOMPSON AXIOM-CLEAN 達成: root #5 V_inf discharge。census 26→25**:
+  main=`08da2260` clean・census 26。A ahead=1。**A** = `cfe33c3e` "discharge T-side faithful action (9077)" を
+  merge `f5ab3129`: 最後の spine dirty root #5 `V_inf_centralizer_Q_eq_bot` ((13.12) d=1 T-side dual) を
+  discharge (単一オーナーで DAG-collision なく in-lane honest 実証明、13 file) + `#assert_only_allowed_axioms
+  OddOrder.feitThompson` (AxiomsCheck:8302) 追加。**独立検証 `#print axioms OddOrder.feitThompson` =
+  [propext, Classical.choice, Quot.sound]** = 標準 3 公理のみ・sorryAx なし ⟹ **`feitThompson` の推移閉包に
+  sorry ゼロ** (c-4 axiom-clean 判定 PASS)。census **26→25** (−1)、残 25 は全て off-path (Appendices/BG AppD-E/
+  off-spine scaffold、feitThompson 非依存)。build **4234 jobs green**・AxiomsCheck OK・新 axiom/regression なし。
+  push `08da2260..f5ab3129`。**⟹ FT 形式化の headline (feitThompson sorry-free) 達成。** A の残作業 = off-path
+  scaffold の整理 or 3 冊網羅の別フェーズ (FT 経路は完了)。
 - **2026-07-15 (tick #21、Opus hub — A 単独) — A: docs-only (9103 close + 2035 更新)。census 26 不変**:
   A=`fc1b265f` は issues のみ (9103→closed、2035 更新)、.lean 0 → build 省略・直接 commit `bca42a5f`。
   push `2cf00ef3..bca42a5f`。残 root: #5 V_inf / c-4 trace。
