@@ -291,6 +291,7 @@ import OddOrder.Peterfalvi.S15_NineElevenSevenEight
 import OddOrder.Peterfalvi.S15_CaseACoherence
 import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
 import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply
 import OddOrder.Peterfalvi.S15_TSetMemberRFamily
 import OddOrder.Peterfalvi.S15_NineElevenPairBoundT
 import OddOrder.Peterfalvi.S15_NineElevenStepsT
