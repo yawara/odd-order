@@ -5,7 +5,6 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.AnalyticRelayer
 import OddOrder.Peterfalvi.S15_CharacterDegreeSupply
-import OddOrder.Peterfalvi.S15_SAndTBasic
 import OddOrder.Peterfalvi.S15_SAndT_Setup.CaseBOrder
 
 /-!
@@ -49,15 +48,16 @@ theorem CharacterDegreeCore.c_eq_one_of_caseB_facts [Finite G]
   exact c_eq_one_of_analytic_inequality hG hyp
     (core.analytic_inequality_of_caseB_facts hG lam hD hv hQcomm)
 
-/-- **Peterfalvi (13.12), honest dichotomy form**: if `T` is type II, then `c = 1`.
+/-- **Peterfalvi (13.12), honest dichotomy form**: `c = 1`.
 
 This is the unconditional replacement for the legacy monolithic character-degree carrier.
 If the (13.3.b) λ-cluster exists, `lambda_forces_T_caseB_core` supplies the `T`-side case-B
-facts and `Q_elementaryAbelian_T` supplies the commutativity needed by the Core analytic
-endpoint.  If no λ-cluster exists, the faithful Galois branch already gives `C = ⊥`. -/
-theorem Hypothesis.c_eq_one_of_T_typeII [Finite G]
+facts and the general type-`P` theorem `Q_elementaryAbelian` supplies the commutativity needed
+by the Core analytic endpoint.  This avoids the circular route through the later (14.9)
+`T_typeII`, whose character proof itself consumes (13.12).  If no λ-cluster exists, the
+faithful Galois branch already gives `C = ⊥`. -/
+theorem Hypothesis.c_eq_one_of_lambda_dichotomy [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hTTypeII : OddOrder.GroupTheory.IsTypeII hyp.T)
     (pins : NuGridSupplyData hyp := hyp.nuGridSupply hG) :
     hyp.c = 1 := by
   obtain ⟨core⟩ := hyp.characterDegreeCore_nonempty hG
@@ -65,7 +65,7 @@ theorem Hypothesis.c_eq_one_of_T_typeII [Finite G]
   · obtain ⟨lam⟩ := hlam
     obtain ⟨hD, hv, _hQ⟩ := lambda_forces_T_caseB_core hG core lam pins
     have hQcomm : IsMulCommutative ↥hyp.Q :=
-      IsMulCommutative.of_comm (Q_elementaryAbelian_T hG hyp hTTypeII).comm
+      IsMulCommutative.of_comm (hyp.Q_elementaryAbelian hG).comm
     exact core.c_eq_one_of_caseB_facts hG lam hD hv hQcomm
   · exact hyp.c_eq_card_C.trans (Subgroup.card_eq_one.mpr hCbot)
 

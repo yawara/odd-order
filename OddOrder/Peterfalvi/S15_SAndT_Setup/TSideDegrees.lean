@@ -761,6 +761,31 @@ theorem Hypothesis.chiefFactorT_p_eq [Finite G]
   exact (Nat.prime_dvd_prime_iff_eq chief.p_prime hyp.q_prime).mp
     (chief.p_prime.dvd_of_dvd_pow hdvd)
 
+/-- **Peterfalvi (13.2.b) at `T`, structure part**: `Q = T_F` is elementary abelian of
+exponent `q`.
+
+This is the `T`-side mirror of `Hypothesis.P_elementaryAbelian`.  It uses the general
+type-`P`/type-II–IV setup on `T`, not the later (14.9) conclusion that `T` is type II:
+`card_Q_eq_qp` makes the §9 chief kernel trivial, so the elementary-abelian chief factor
+`Q/N` is `Q` itself, and `chiefFactorT_p_eq` identifies its prime with `q`. -/
+theorem Hypothesis.Q_elementaryAbelian [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    IsElementaryAbelian hyp.q ↥hyp.Q := by
+  classical
+  have hvd : hyp.v * hyp.d ≠ 1 := hyp.vd_ne_one hG
+  obtain ⟨chief, _⟩ :=
+    OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupT hG hvd)
+  have hN : chief.N = ⊥ := hyp.toTypesIIIIIIVSetupT_chief_N_eq_bot hG hvd chief
+  have hp : chief.p = hyp.q := hyp.chiefFactorT_p_eq hG hvd chief
+  have hEA : IsElementaryAbelian hyp.q ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H := by
+    have h := chief.quotient_elementaryAbelian
+    rw [hp] at h
+    exact OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+      ((QuotientGroup.quotientMulEquivOfEq hN).trans QuotientGroup.quotientBot) h
+  have hHeq : ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q :=
+    hyp.toTypesIIIIIIVSetupT_H_eq hG hvd
+  rwa [hHeq] at hEA
+
 /-- **`T`-instance `u` identity**: the `V`-action image order `chars.u = |V̄| = [V : D] = v`.
 Mirror of `mkSection11CharacterDataS_u_eq`, via `cSub = D` and `|V| = v·d`. -/
 theorem Hypothesis.mkSection11CharacterDataT_v_eq [Finite G]

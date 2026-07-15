@@ -33,7 +33,7 @@ and its kernel is `H = T_F = Q` (`toTypesIIIIIIVSetupT_H_eq`).  Nontriviality: `
 datum-independent, read off any non-V type witness (`T_typeII_or_III_or_IV`).  Opens the §9
 machinery ((9.7)–(9.9), `typeII_III_IV_order_relations`, the `hcPsi` degree analysis) on `T` —
 the (13.3.b)-on-`T` route of the (13.4) θ-package.  Mirrors `toTypesIIIIIIVSetupS`; extracts the
-inline construction of `Q_elementaryAbelian_T` (`S15_SAndT`) without its `IsTypeII` hypothesis. -/
+chief-factor setup later used by the unconditional `Q_elementaryAbelian`. -/
 noncomputable def Hypothesis.toTypesIIIIIIVSetupT [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1) :
