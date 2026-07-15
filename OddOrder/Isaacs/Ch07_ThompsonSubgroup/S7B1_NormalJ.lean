@@ -218,8 +218,9 @@ theorem AbarInf_LBar_eq_bot
     have hπeq : ({q : ℕ | q ∉ ({p} : Set ℕ)} : Set ℕ) = {q | q ≠ p} := by
       ext q; simp
     rw [hπeq]; exact hLbar_pi
-  -- Apply `inf_eq_bot_of_coprime` + `coprime_of_isPiGroup_of_isPiGroup_compl`.
-  apply Subgroup.inf_eq_bot_of_coprime
+  -- Apply `disjoint_of_coprime_natCard` + `coprime_of_isPiGroup_of_isPiGroup_compl`.
+  apply Disjoint.eq_bot
+  apply Subgroup.disjoint_of_coprime_natCard
   exact OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
     Nat.card_pos.ne' Nat.card_pos.ne' hAbar_pi hLbar_pi'
 

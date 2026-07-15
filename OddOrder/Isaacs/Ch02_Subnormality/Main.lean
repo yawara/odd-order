@@ -460,7 +460,8 @@ theorem map_ne_bot_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p :
   have h_coprime_PN : Nat.Coprime (Nat.card ↥P) (Nat.card ↥N) := by
     rw [hP_card]
     exact Nat.Coprime.pow_left _ (hp_prime.coprime_iff_not_dvd.mpr hp_coprime)
-  have hP_inf_N : P ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime h_coprime_PN
+  have hP_inf_N : P ⊓ N = ⊥ :=
+    (Subgroup.disjoint_of_coprime_natCard h_coprime_PN).eq_bot
   -- Step 2: |P.map f| = |P|.
   have h_card_eq : Nat.card ↥(P.map (QuotientGroup.mk' N)) = Nat.card ↥P :=
     card_map_mk'_eq_of_inf_eq_bot hP_inf_N
@@ -499,7 +500,8 @@ theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] 
   have h_coprime_PN : Nat.Coprime (Nat.card ↥P) (Nat.card ↥N) := by
     rw [hP_card]
     exact Nat.Coprime.pow_left _ (hp_prime.coprime_iff_not_dvd.mpr hp_coprime)
-  have hP_inf_N : P ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime h_coprime_PN
+  have hP_inf_N : P ⊓ N = ⊥ :=
+    (Subgroup.disjoint_of_coprime_natCard h_coprime_PN).eq_bot
   -- Names.
   set Pbar : Subgroup (G ⧸ N) := P.map f with hPbar_def
   set Mbar : Subgroup (G ⧸ N) := Subgroup.normalizer (Pbar : Subgroup (G ⧸ N)) with hMbar_def

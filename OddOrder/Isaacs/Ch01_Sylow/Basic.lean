@@ -725,7 +725,7 @@ theorem Sylow.normal_of_isNilpotent [Finite G] [Group.IsNilpotent G]
 /-- **Isaacs Lemma 1.27**.  `H i : ι → Subgroup G` が有限族で各 `H i` が正規部分群,
 かつ位数 (`Nat.card`) が対ごとに互いに素ならば, 族 `H` は `iSupIndep` (内部直積構造).
 
-証明: 互いに素 ⇒ `Subgroup.inf_eq_bot_of_coprime` で `Disjoint`,
+証明: 互いに素 ⇒ `Subgroup.disjoint_of_coprime_natCard` で `Disjoint`,
 正規 + Disjoint ⇒ `commute_of_normal_of_disjoint` で `Pairwise Commute`,
 最後に mathlib `Subgroup.independent_of_coprime_order` を適用. -/
 theorem iSupIndep_of_coprime_card_of_normal {ι : Type*} [Finite ι]
@@ -734,7 +734,7 @@ theorem iSupIndep_of_coprime_card_of_normal {ι : Type*} [Finite ι]
     iSupIndep H := by
   -- Step 1: Disjoint from coprime cards.
   have hdisj : ∀ i j, i ≠ j → Disjoint (H i) (H j) := fun i j hij =>
-    disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime (hcoprime hij))
+    Subgroup.disjoint_of_coprime_natCard (hcoprime hij)
   -- Step 2: Pairwise commute from disjoint + normal.
   have hcomm : Pairwise fun i j : ι =>
       ∀ x y : G, x ∈ H i → y ∈ H j → Commute x y := by

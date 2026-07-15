@@ -443,7 +443,7 @@ theorem sylow_eq_bot_of_le_oPiCore_compl
     OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
       Nat.card_pos.ne' Nat.card_pos.ne' hP_pi hP_pi'
   have hInf : (P : Subgroup G) ⊓ (P : Subgroup G) = ⊥ :=
-    Subgroup.inf_eq_bot_of_coprime hcop
+    (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   simpa using hInf
 
 private theorem card_sl2_zmod_prime {p : ℕ} [Fact p.Prime] :

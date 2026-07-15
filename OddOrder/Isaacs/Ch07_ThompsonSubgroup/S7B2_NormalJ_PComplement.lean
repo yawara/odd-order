@@ -85,7 +85,7 @@ theorem oPiCorePrime_subgroup_eq_bot_of_opCore_le
     have hp_cop : Nat.Coprime p (Nat.card M) :=
       (Fact.out : p.Prime).coprime_iff_not_dvd.mpr hp_not_dvd_M
     exact (hp_cop.symm).pow_right k
-  have h_disj : Disjoint M Usub := disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcoprime)
+  have h_disj : Disjoint M Usub := Subgroup.disjoint_of_coprime_natCard hcoprime
   -- `M` commutes with `Usub` (both normal, disjoint).
   have h_comm : ∀ m ∈ M, ∀ u ∈ Usub, (m : ↥H) * u = u * m := fun m hm u hu =>
     Subgroup.commute_of_normal_of_disjoint M Usub
@@ -1495,7 +1495,8 @@ theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal]
   have h_coprime_PN : Nat.Coprime (Nat.card ↥P) (Nat.card ↥N) := by
     rw [hP_card]
     exact Nat.Coprime.pow_left _ (hp_prime.coprime_iff_not_dvd.mpr hp_coprime)
-  have hP_inf_N : P ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime h_coprime_PN
+  have hP_inf_N : P ⊓ N = ⊥ :=
+    (Subgroup.disjoint_of_coprime_natCard h_coprime_PN).eq_bot
   -- ker f = N
   have hf_ker : f.ker = N := QuotientGroup.ker_mk' N
   refine le_antisymm ?_ ?_
@@ -1763,7 +1764,8 @@ theorem thompsonJ_map_of_coprime_kernel
   have h_coprime_PN : Nat.Coprime (Nat.card ↥P) (Nat.card ↥N) := by
     rw [hP_card]
     exact Nat.Coprime.pow_left _ (hp_prime.coprime_iff_not_dvd.mpr hp_coprime)
-  have hP_inf_N : P ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime h_coprime_PN
+  have hP_inf_N : P ⊓ N = ⊥ :=
+    (Subgroup.disjoint_of_coprime_natCard h_coprime_PN).eq_bot
   have hqP_inj : Function.Injective qP := by
     rw [← MonoidHom.ker_eq_bot_iff, Subgroup.eq_bot_iff_forall]
     intro x hx

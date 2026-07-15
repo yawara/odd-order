@@ -22,6 +22,15 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
 - [ ] 置換は形が site ごとに違うため機械置換不可 — file 単位で agent fan-out が適当
 - [ ] 残存 deprecation warning ゼロ化の確認 (full build log から grep)
 
+## 進捗 (2026-07-15)
+
+- first wave: `OddOrder/Mathlib/SchurZassenhausConj.lean` と `OddOrder/Isaacs/**` の
+  9 code sites + 2 doc references を新 API へ移行。
+- wave 後の旧名は Mathlib/Isaacs 配下 0、repo 全体 59 occurrences
+  (58 code sites + `SingerField.lean` の説明 comment 1件)。
+- 検証: `lake build OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B2_NormalJ_PComplement`
+  成功 (2371 jobs)、`lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
+
 ## 完了条件
 
 full build green + `has been deprecated` warning が repo 由来 0 件。

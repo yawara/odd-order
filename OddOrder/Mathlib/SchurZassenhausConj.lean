@@ -52,7 +52,7 @@ theorem IsComplement'.map_mk' {N K : Subgroup G} [Finite G] [N.Normal]
     IsComplement' (N.map (QuotientGroup.mk' L)) (K.map (QuotientGroup.mk' L)) := by
   apply isComplement'_of_disjoint_and_mul_eq_univ
   · -- Disjoint via coprime cardinality.
-    refine disjoint_iff.mpr (inf_eq_bot_of_coprime ?_)
+    refine disjoint_of_coprime_natCard ?_
     refine h_cop.coprime_dvd_left ?_ |>.coprime_dvd_right ?_
     · exact Subgroup.card_map_dvd _ _
     · exact Subgroup.card_map_dvd _ _
