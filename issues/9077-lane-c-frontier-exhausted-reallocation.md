@@ -593,3 +593,29 @@ axiom-clean を主張しない。今回 bridge の代替として T-side が直�
 
 **self-flag**: c-1 は上記 b-file deletion carve-out を含む単独 commit。次 frontier は issue 0118
 c-2 (BG vestigial cleanup: `theoremA_maximal_structure` retire、S14 frozen 注記、stale docstring 修正)。
+
+## ✅ 2026-07-15 lane-c: C-2 完了 — BG vestigial surfaces 整理
+
+issue 0118 c-2 の指示どおり、faithful successor が定着した BG Theorem A の旧 surface と、
+statement-level に誤っている S14 の historical surfaces を整理した:
+
+- bare `theoremA_maximal_structure` は `OddOrder/**/*.lean` の exact-name audit で consumer 0 を
+  再確認し、宣言ごと retire。`theoremA_maximal_structure_faithful` を唯一の monolithic Theorem A
+  API とし、standalone conjunct helpers / AxiomsCheck / 周辺 docstring もこの canonical route に統一。
+- `nonidentity_covered_by_sigma_pieces` と `sigmaLength_one_frobenius_type` は statement が BG/Coq
+  原文を表さないため、**FROZEN MIS-ENCODING — DO NOT PROVE OR REPAIR IN PLACE** と明記。term-level
+  consumer は 0 (source occurrence は各 declaration と、後者を説明する S16 docstring 1 件のみ)。
+  新 consumer は proved faithful APIs (`Mtilde`/`zTilde` cover と
+  `S16.non_disjoint_signalizer_frobenius`) を使う。
+- `sigmaLength_le_two_of_mem_zTilde_of_isTypeP` と
+  `exists_sigmaDecomposition_length_le_two` の旧「残 gap / gated」説明を、既に完成している
+  `mem_sup_of_normal_left` split と per-piece bound plumbing に合わせて更新。関連 S14/S16 notes も
+  historical status を反映した。
+
+**検証**: main 再同期後 `lake build OddOrder` green (4225 jobs)、S14 + S16 +
+`OddOrder.AxiomsCheck` target build green (4210 jobs)、旧 Theorem A exact name 0、frozen 2 宣言の
+term-level caller 0、`git diff --check` clean。新 axiom・signature 変更なし。
+
+**self-flag**: c-2 は vestigial cleanup の単独 commit。issue 0118 の次 frontier c-3
+(`V_inf_centralizer_Q_eq_bot` の下流 discharge leaf + S16 rewire) は lane a の 0116 full flip
+landing 後に hub が本 issue へ出す「c 再 engage (V_inf)」flag を trigger とする。

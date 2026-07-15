@@ -18,46 +18,14 @@ variable {G : Type*} [Group G]
 
 /-! ## Theorems A--E -/
 
-/-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
-unique `M_sigma`, cyclic `K`, a `K`-invariant complement `U`, centralizer product
-with `Kstar`, derived/Fitting layering, and the extreme case
-`M_F != M_sigma`.
-
-⚠ **OVERSTATEMENT — do not prove as-is.**  The conclusion (conjuncts A(3) `M = K U M_σ`, A(4)
-`C_U(k) = 1`, A(8) `U = ⊥`) needs `K ≤ M` and `U ≤ M`, which the bare Hall conditions on
-`K.subgroupOf M` / `U.subgroupOf M` do **not** force.  The faithfulness-corrected, fully `sorry`-free
-counterpart is `theoremA_maximal_structure_faithful` (adds `hKM : K ≤ M`, `hUM : U ≤ M`).  This bare
-form is kept only for its existing (cross-lane) callers; new consumers cite the faithful version. -/
-theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
-    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
-    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
-      (U.subgroupOf M)) :
-    Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.Msigma M) ∧
-      IsCyclic ↥K ∧
-      M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
-      -- BG Thm A(3): `UM_σ ⊴ M`, i.e. `M` normalizes `UM_σ` (was a trivial self-normalizing
-      -- `UM_σ ≤ N(UM_σ)`; faithfulness fix, Lane G).
-      M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
-      (∀ k ∈ K, k ≠ 1 → U ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) ∧
-      Kstar ≠ ⊥ ∧
-      (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧
-      S15.MF M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
-      OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M ∧
-      derivedInG (derivedInG M) ≤ S15.fittingInAmbient M ∧
-      (S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
-        U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
-  sorry
-
 /-- **BG Theorem A(3) decomposition** (mmd L4276): `M = K U M_σ`.  For a maximal `M` with Hall
 `κ`-subgroup `K ≤ M` and Hall `(κ ∪ σ)'`-subgroup `U ≤ M`, the three factors join to all of `M`.
 
 Type-F (`K = ⊥`): `M = U M_σ` from the `K = ⊥` `SubgroupESetup` (`E_compl_sup`).  Type-P (`K ≠ ⊥`):
 `M' = U M_σ` and `M'` complements `K` in `M` (`typeP_auxiliary_structure`, Lemma 15.1(b)/Theorem
 14.7(h)), so `M = M' K = (U M_σ) K`; the complement's `H ⊔ K = ⊤` is pushed from `M` to `G` via
-`Subgroup.map M.subtype`.  This is the `sorry`-free standalone form of conjunct 3 of
-`theoremA_maximal_structure`. -/
+`Subgroup.map M.subtype`.  This is the standalone proof of conjunct 3 used by
+`theoremA_maximal_structure_faithful`. -/
 theorem typeP_maximal_eq_kappaHall_sup_U_sup_Msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hKM : K ≤ M) (hUM : U ≤ M) (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
@@ -83,7 +51,8 @@ theorem typeP_maximal_eq_kappaHall_sup_U_sup_Msigma [Finite G]
 
 /-- **BG Theorem A — the ungated conjuncts** (mmd L4274), as a standalone `sorry`-free lemma.
 
-Bundles the conjuncts of `theoremA_maximal_structure` whose upstreams are all proved transitively
+Bundles the conjuncts used by `theoremA_maximal_structure_faithful` whose upstreams are all proved
+transitively
 (mirroring `theoremB_U_sylow_abelian_rank_le_two` / `sigma_reps_pairwise_disjoint`):
 
 * A(1) `M_σ` is a `σ(M)`-Hall subgroup (`Msigma_isHall`);
@@ -94,9 +63,10 @@ Bundles the conjuncts of `theoremA_maximal_structure` whose upstreams are all pr
   element form `C_M(k) = K ⊔ K*` for `K ≠ ⊥`, `k ∈ K#` (`typeP_centralizer_kappaElement_eq`);
 * A(6) `M_F ≤ M_σ ≤ M'` (`maxNilpotentNormalHall_le_Msigma`, `Msigma_le_derived`).
 
-The remaining monolith conjuncts (`M = K U M_σ`, `M'' ≤ F(M)`, the `M_F ≠ M_σ` extreme A(8)) are
-left to `theoremA_maximal_structure`/`theoremA8_structure`: A(3)-decomposition needs the
-complement→join plumbing and A(7) routes through the still-`sorry` type-`P₁` chief-factor inputs.
+The remaining faithful-monolith conjuncts are supplied separately: `M = K U M_σ` by
+`typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`, `M'' ≤ F(M)` by
+`derivedDerived_le_fittingInAmbient`, and the `M_F ≠ M_σ` extreme A(8) by
+`theoremA8_structure`.
 
 As with the Theorem B(1) precedent the explicit `hKM : K ≤ M`, `hUM : U ≤ M` are added (part of the
 BG setup `M = K U M_σ` but not forced by the Hall conditions on `K.subgroupOf M`/`U.subgroupOf M`). -/
@@ -1656,4 +1626,3 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact mem_conjClassSet.mpr ⟨y, Or.inr hyA0, 1, by group⟩
 
 end OddOrder.BG.Ch4.S16
-

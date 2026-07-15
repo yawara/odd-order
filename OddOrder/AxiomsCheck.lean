@@ -6275,7 +6275,7 @@ Fully unconditional, axiom-clean. -/
 
 /-! **BG Theorem A — ungated conjuncts** (`S16_MainResults`, `theoremA_ungated_conjuncts`):
 `M_σ` is a `σ`-Hall, `Kstar ≠ ⊥`, and `M_F ≤ M_σ ≤ M'`.  Standalone bundle of the four conjuncts of
-`theoremA_maximal_structure` whose upstreams are all proved transitively; the genuinely new content
+the faithful Theorem A whose upstreams are all proved transitively; the genuinely new content
 is `Kstar ≠ ⊥`, unblocked once Proposition 14.2 (`S14.typeP_structure`) landed sorry-free.
 Fully unconditional, axiom-clean. -/
 
@@ -6574,7 +6574,7 @@ Axiom-clean. -/
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
 Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
 (`typeP_auxiliary_structure`), pushed from `M` to `G` by `subgroupOf_sup`/`subgroupOf_eq_top`.
-Standalone `sorry`-free form of conjunct 3 of `theoremA_maximal_structure`.  Axiom-clean. -/
+Standalone form of conjunct 3 of `theoremA_maximal_structure_faithful`.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_maximal_eq_kappaHall_sup_U_sup_Msigma
 
@@ -6586,8 +6586,8 @@ cites Theorem 15.2 (`mf_ne_msigma_typeP1_structure`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.derivedDerived_le_fittingInAmbient
 
 /-! **BG Theorem A — faithful monolith** (`S16_MainResults`, `theoremA_maximal_structure_faithful`):
-all 11 conjuncts of BG Theorem A, `sorry`-free.  The faithfulness-corrected counterpart of the
-`sorry` `theoremA_maximal_structure` (adds the explicit `K ≤ M`, `U ≤ M` of the BG setup
+all 11 conjuncts of BG Theorem A, `sorry`-free.  This canonical form includes the explicit
+`K ≤ M`, `U ≤ M` of the BG setup
 `M = K U M_σ`, making A(3)/A(4)/A(8) provable).  Assembled from `theoremA_ungated_conjuncts`,
 `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`, `derivedDerived_le_fittingInAmbient`, and
 `theoremA8_structure`.  Axiom-clean. -/
@@ -6693,7 +6693,7 @@ and the wrapper `isTypeF_groupTheory_of_isTypeF`: both former gates are closed �
 (BG Theorem 15.7(e)) by the per-prime witness `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`
 (registered above), and the Theorem A dependency by routing `typeFData_of_kappa_eq_bot`'s A(3)/A(8)
 through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`
-(Thm 15.2) instead of the `sorry` standalone `theoremA_maximal_structure`. -/
+(Thm 15.2) instead of the retired bare overstatement. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI
