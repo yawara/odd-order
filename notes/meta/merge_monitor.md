@@ -683,6 +683,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #11、Opus hub — ユーザー「Aマージして」) — ★ a: 0116 flip order-consumer cut + L-M wiring。census 32 不変**:
+  main=`b43c13e0` clean・census 32。a=4 ahead (b/c=0 skip)。**a (visit)** = `04f5d320` を merge `dc7445ff`:
+  order consumer を honest Core relayer へ cut (OrderRelayer に新 honest endpoint
+  `caseA_parameters_of_clifford_caseA` (13.13) / `caseB_order_u_of_lambda_dichotomy` (13.15) 追加) +
+  ComparingLM/SubgroupL/SubgroupM の c=1 wiring。**conflict なし** (a が c tick#9 pins 取り込み済ベースで作業)。
+  build 4232 green・AxiomsCheck OK・census 32→32。push `b43c13e0..dc7445ff`。
 - **2026-07-15 (tick #10、Opus hub cron) — ★ a: 0116 flip S16 cut-over 継続 (BetaVanishing/SubgroupM(Core))。census 32 不変**:
   main=`3a72fc56` clean・census 32。a=4 ahead (b/c=0 skip)。**a (visit)** = `71bafba9` を merge `894af692`:
   c=1 cut-over を BetaVanishing/SubgroupMCore/SubgroupM に threading (`_of_c_eq_one_and_d_eq_one` boundary +
