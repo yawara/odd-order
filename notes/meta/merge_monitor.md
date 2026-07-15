@@ -683,6 +683,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #10、Opus hub cron) — ★ a: 0116 flip S16 cut-over 継続 (BetaVanishing/SubgroupM(Core))。census 32 不変**:
+  main=`3a72fc56` clean・census 32。a=4 ahead (b/c=0 skip)。**a (visit)** = `71bafba9` を merge `894af692`:
+  c=1 cut-over を BetaVanishing/SubgroupMCore/SubgroupM に threading (`_of_c_eq_one_and_d_eq_one` boundary +
+  compat entry)。**conflict 2 件** (BetaVanishing `typeI_orthogonality_dichotomy` / SubgroupMCore
+  `typeIOrthogonalityGridData_of_coherent78`) = tick #9 SubgroupL と同型 (a リネーム vs main に入った c の
+  tick #9 pins が同 call)。hub が両立解決 (a 新名 + c honest pins、pins optParam 受理・型整合確認)。SubgroupM
+  auto-merge。build 4232 green・AxiomsCheck OK・census 32→32。push `3a72fc56..894af692`。
+  **📌 recurring 調整点**: a の flip cut-over が c の tick #9 pins rewrite と同 S16 files で交差 → 各 tick で
+  同型 conflict (a 新名 + c pins で両立解決)。a が S16 全 site の c=1 cut-over を終えるまで継続する見込み
+  (mechanical、STOP でない)。
 - **2026-07-15 (tick #9、Opus hub — ユーザー「Cが進んだからマージして」) — ★★ a flip S16 cut-over + c: 9096 c-2.5 landing (conflict 解決)。census 32 不変**:
   main=`47584c84` clean・census 32。a=9 ahead / c=7 ahead (b=0)。**a と c が S16 files を両方編集** (overlap =
   SubgroupL/TTypeII) = tick #8 の 9096 裁定で予見した調整点。
