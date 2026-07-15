@@ -63,3 +63,24 @@ S08 系の各ファイルが概ね 1,500 行以下に収まり、full build gree
   | `S08_CaseBCoherence2.lean` | 2187 (issue 0068) |
   | `S08_CaseBAssembly.lean` | 1988 (issue 0070) |
   | `S08_CaseBCoherence.lean` | 1516 |
+
+## ✅ 完了 (2026-07-15)
+
+凍結済み S08 coherence cluster を topic-coherent な8組へ再分割した。
+
+| 親 module (分割後) | 新しい上流 leaf |
+|---|---|
+| `S08_CaseBCoherence2.lean` (689) | `ConstituentPinning.lean` (1076) |
+| `S08_CaseBAssembly.lean` (994) | `BranchBundles.lean` (1032) |
+| `S08_YsetInner.lean` (702) | `CharacterBreaks.lean` (1055) |
+| `S08_CoherenceCorePart1.lean` (682) | `CoherentAdjoin.lean` (1044) |
+| `S08_YsetConjugation.lean` (1125) | `InducedFamilies.lean` (534) |
+| `S08_DegreeSums.lean` (931) | `CoherenceGlue.lean` (730) |
+| `S08_CoherenceCorePart2.lean` (330) | `SibleyBounds.lean` (1326) |
+| `S08_CaseBCoherence.lean` (800) | `CentralCongruence.lean` (755) |
+
+- S08 全体を再監査し、最大 1497 行・1500 行超 0 件を確認。
+- 8組すべてで宣言 multiset が分割前後一致し、当該ファイル群の実 `sorry` は 0 → 0。
+- repository 全体の実 `sorry` は 25 で不変、root import closure も維持。
+- `lake build OddOrder OddOrder.AxiomsCheck`: 4243 jobs 完走、AxiomsCheck OK。
+- 個別 issue #0068 / #0070 も本 batch で完了。

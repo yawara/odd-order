@@ -54,3 +54,10 @@ created: 2026-06-16
 - **実行可 (hub batch)**。ただし `S08_PGroupReduction` / `S07_Coherence*` (lane b active)
   は本 batch の対象外。
 - 行数 refresh (2026-07-02): `S08_CaseBAssembly.lean` = **1988 行**。
+
+## ✅ 完了 (2026-07-15)
+
+- `S08_CaseBAssembly/BranchBundles.lean` (1032 行) を上流 leaf として切り出した。
+- 親 `S08_CaseBAssembly.lean` は 994 行となり、下流 module 名と import closure を維持した。
+- 宣言 multiset は分割前後で一致し、当該クラスタの実 `sorry` は 0 → 0。
+- `lake build OddOrder OddOrder.AxiomsCheck`: 4243 jobs 完走、AxiomsCheck OK。
