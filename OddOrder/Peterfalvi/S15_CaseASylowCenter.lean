@@ -126,14 +126,11 @@ theorem sylow_center_le_U_sylow_of_centralizer_witness [Finite G]
   obtain ⟨z, hz1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hxP
   obtain ⟨hzP, hzCx⟩ := Subgroup.mem_inf.mp z.2
   have hzG1 : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext h)
-  have hPeq : hyp.P = OddOrder.BG.Ch3.S10.Msigma hyp.S := by
+  have hPle_Ms : hyp.P ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
     rw [hyp.P_eq_SF]
-    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
-      hyp.S_maximal
-      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2
-        hG hyp.S_maximal hyp.S_typeP2))
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
   have hxA : x ∈ honestTypeP2ASet hyp.S := by
-    refine mem_honestTypeP2ASet.mpr ⟨?_, hx1, (z : G), ⟨hPeq ▸ hzP, ?_⟩, ?_⟩
+    refine mem_honestTypeP2ASet.mpr ⟨?_, hx1, (z : G), ⟨hPle_Ms hzP, ?_⟩, ?_⟩
     · have hUderived : hyp.U ≤ derivedInG hyp.S := by
         rw [hyp.S_deriv_eq_PU]
         exact le_sup_right

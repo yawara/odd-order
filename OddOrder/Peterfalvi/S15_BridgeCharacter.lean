@@ -1014,25 +1014,23 @@ theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 Fitting kernel `P^#` and the `S`-class-closure of the cyclic-TI set `V = W − (W₁ ∪ W₂)` both land
 in the honest `A₀(S) = A(S) ∪ V^S`.  The `V^S` part is the definitional right component (after the
 `Sdata.W1/W2` synchronization); `P^#` lands in `A(S) = centralizerSupport (S_σ^#) S'` because
-`P = S_F = S_σ` (type `P₂`, `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`), `P ≤ S' = P ⊔ U`,
-and every element self-centralizes. -/
+`P = S_F ≤ S_σ` (`maxNilpotentNormalHall_le_Msigma`, every maximal — general type `P`),
+`P ≤ S' = P ⊔ U`, and every element self-centralizes. -/
 theorem sharpP_union_V_subset_A0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     sharpSubgroup hyp.P ∪
         conjClassSetIn hyp.S (typePV hyp.S hyp.Sdata)
       ⊆ honestTypeP2A0Set hyp.S hyp.Sdata := by
-  have hPeq : hyp.P = OddOrder.BG.Ch3.S10.Msigma hyp.S := by
+  have hPle_Ms : hyp.P ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
     rw [hyp.P_eq_SF]
-    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
-      hyp.S_maximal
-      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2))
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
   intro z hz
   rcases hz with hzP | hzV
   · -- `P^# ⊆ A(S) ⊆ A₀(S)`.
     refine honestTypeP2ASet_subset_A0Set hyp.Sdata ?_
     obtain ⟨hzP_mem, hz1⟩ := hzP
     rw [Set.mem_singleton_iff] at hz1
-    refine mem_honestTypeP2ASet.mpr ⟨?_, hz1, z, ⟨hPeq ▸ hzP_mem, ?_⟩, ?_⟩
+    refine mem_honestTypeP2ASet.mpr ⟨?_, hz1, z, ⟨hPle_Ms hzP_mem, ?_⟩, ?_⟩
     · have hPle : hyp.P ≤ derivedInG hyp.S := by
         rw [hyp.S_deriv_eq_PU]; exact le_sup_left
       exact hPle hzP_mem
