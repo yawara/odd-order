@@ -371,3 +371,17 @@ retire した landing 後、b が即 `Hypothesis.nuGridSupply` を削除して 9
 
 検証: `lake build OddOrder.Peterfalvi.S15_SAndT
 OddOrder.Peterfalvi.S15_CharacterDegreeSupply` green (4161 jobs)。
+
+## ⏳ b-5 Phase B pt1 landed (tick #12, merge 7ea6dff3) — root #4 完了は a 依存
+
+b が b-owned (S15_SAndT/CDS) の sorried optParam default `:= hyp.nuGridSupply` を全除去し
+pins 必須化 (build green)。**残: generic `Hypothesis.nuGridSupply` (HypothesisSwap:133, root #4)
+は a 所有の flip leaf が default 参照ゆえ削除不可**:
+- `S15_CaseBEndgameSupply/OrderRelayer.lean:61/111/132` : `(pins : … := hyp.nuGridSupply hG)`
+- `S15_CaseBEndgameSupply/Eta10Correction.lean:225` : `set pins := hyp.nuGridSupply hG`
+
+**⟹ a 宛 (flip 最終 assembly に組込)**: これら a-owned leaf の default を honest supply へ移行
+(explicit param 化 or S16 carrier cite) すれば generic `nuGridSupply` decl の consumer 0 → b が
+削除で **root #4 除去 + census -1 + 9096 close**。flip の cut-over+retire assembly と同 commit で
+実施が自然 (OrderRelayer は既に flip discharge leaf)。それまで generic decl は残置 (spine は S16
+経由で honest carrier を使うが、a-owned relayer の default 経路が root #4 を保持)。

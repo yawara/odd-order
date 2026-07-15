@@ -683,6 +683,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #12、Opus hub cron) — ★ b: b-5 Phase B pt1 (explicit nu-grid supply、b-owned)。census 32 不変**:
+  main=`2d480c63` clean・census 32。b=1 ahead (a/c=0 skip)。**b (visit)** = `ac1b1e10` を merge `7ea6dff3`:
+  tick #9 の 9096 kickoff を受け、S15_SAndT/CDS の boundary theorem から sorried optParam default
+  `:= hyp.nuGridSupply` を除去し pins 必須明示引数化。conflict なし・scope clean (b-owned S15)。
+  build 4232 green・AxiomsCheck OK・census 32→32・regression なし。push `2d480c63..7ea6dff3`。
+  **⚠ root #4 未完 (a 依存を発見)**: generic `Hypothesis.nuGridSupply` (HypothesisSwap:133, sorried) は
+  **a 所有の OrderRelayer:61/111/132 + Eta10Correction:225 が依然 default `:= hyp.nuGridSupply hG` で参照**
+  するため残存 → census 減らず・generic decl 削除不可。root #4 完全除去は **a が flip 最終 assembly で
+  これら a-owned leaf を explicit honest pins へ移行後** (9096 に a 宛 flag 追記)。
 - **2026-07-15 (tick #11、Opus hub — ユーザー「Aマージして」) — ★ a: 0116 flip order-consumer cut + L-M wiring。census 32 不変**:
   main=`b43c13e0` clean・census 32。a=4 ahead (b/c=0 skip)。**a (visit)** = `04f5d320` を merge `dc7445ff`:
   order consumer を honest Core relayer へ cut (OrderRelayer に新 honest endpoint
