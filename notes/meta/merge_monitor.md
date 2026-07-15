@@ -691,6 +691,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #20、Opus hub — A 単独) — ★★ A: root #7-half T_isTypeP2_gate retire (9103 Ph2)。census 27→26**:
+  main=`01398184` clean・census 27。A ahead=1 (feature 1)。**A** = `6ec691de` を merge `1cea306e`:
+  layer-inverted `T_isTypeP2_gate` (CDS) + asymmetric `S_typeP2` cascade を削除 (9103 Phase 2 / 旧 b-2)、
+  23 file で consumer を honest 型判定へ確定。`T_caseB_facts_unconditional` axiom-clean assert 済。
+  conflict なし・新 axiom/regression なし・census **27→26** (−1)。build **4234 jobs green**・AxiomsCheck OK。
+  push `01398184..1cea306e`。**残 root: #5 V_inf (旧 c-3) / c-4 最終 trace のみ**。
 - **2026-07-15 (tick #19、Opus hub — A 単独初の genuine merge) — ★★ A: root #4 nu-grid supply retire (9096 close)。census 28→27**:
   main=`12a1cbb1` clean・census 28。A ahead=3 (feature 2 + main-sync 1)。**A** = `22b4d461` を merge `d10fca33`:
   generic sorried `Hypothesis.nuGridSupply` (HypothesisSwap:133, root #4) 削除 + 全 consumer を honest
