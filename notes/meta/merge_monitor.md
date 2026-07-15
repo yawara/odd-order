@@ -1,6 +1,6 @@
 # main 合流モニター — a/b/c レーン自動合流の運用手順
 
-> 横断運用ドキュメント。**監視ペース: 現行 = 20 分間隔 `7,27,47 * * * *` (ユーザー指示 2026-07-15、issue 0118 endgame 体制)**。それ以前はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。履歴: 2026-07-15 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行モデルに対応するペースで**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**監視ペース: 現行 = 15 分間隔 `7,22,37,52 * * * *` (ユーザー指示 2026-07-15、Codex hub 継続)**。明示指定がない場合はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。履歴: 2026-07-15 Codex hub で 20 分→15 分 (ユーザー再指示)、同日 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行の明示ユーザー指定 (なければモデル対応ペース) で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
@@ -644,6 +644,35 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (20分 tick #4、Codex hub) — ★★ a: 0116 Core λ correction / b: 9096 b-5 Phase A。census 33 不変**:
+  tick 開始時に main=`7308e3cf` clean・`origin/main` 同期を確認し、lane tip を
+  **a=`1b35327a` / b=`e2492d56` / c=`9f002989`** に固定。freeze 後の lane 進行と
+  未コミット WIP は本 tick に混ぜていない。
+  **a=2** (feature `1da0ae60` + main sync merge 1): issue 0116 の Core λ-correction package。
+  新 root-wired leaf `S15_CaseBEndgameSupply/LambdaCorrection.lean` に proven theorem 9 本を実装し、
+  chosen-base の redundant wrapper 5 本を除去。新 theorem 9 本は個別 `#print axioms` で
+  `[propext, Classical.choice, Quot.sound]` のみ、`sorry` / 新 `axiom` なしと確認して
+  merge **`45f20460`**。
+  **b=4** (feature `c87438fc` + main sync merge 3): issue 9096 b-5 Phase A として
+  canonical `NuGridSupplyData` を b-owned S15 chain へ明示的に threading。
+  S16-facing boundary 5 本には downstream 機械追従までの一時 `optParam`
+  `pins := hyp.nuGridSupply ...` を保持するため、これらの `#print axioms` は既存 producer 由来の
+  `sorryAx` をなお表示する。**diff 中の `sorry` / `axiom` / `admit` 追加は 0、
+  census は 33 のまま**であり、新規 sorry / regression ではない。Phase B で c-owned S16 call site を
+  named `pins` に切替後、この既定値と generic sorried producer を除去する計画どおりと裁定し
+  merge **`9a4fdecd`**。
+  **hub gotcha**: `#print axioms` は宣言 type 内の `optParam` default 依存も辿るため、
+  proof body が explicit carrier を使っていても default が sorried producer を参照する間は
+  exported constant は axiom-clean と表示されない。判定は staged diff の新規 sorry 有無・census・
+  Phase 契約を併用する。
+  **c=3** (main sync merge 3 のみ): `main...c` tree diff は空のため merge せず。
+  各 exact `MERGE_HEAD` / staged path / claim / scope / root closure / duplicate を照合し、
+  統合状態で `lake build OddOrder OddOrder.AxiomsCheck` **4228 jobs green**、
+  AxiomsCheck 全 allowlist OK。touched leaf は全て 1500 行未満で size issue なし。
+  push **`7308e3cf..9a4fdecd`** 成功。
+  freeze 後の現 lane tip は a=`cc2be3c9` / b=`be635d1e` / c=`9f002989`、
+  未合流 `main..{a,b,c}` = **3 / 1 / 3**。a は Eta10 correction feature 1 + sync 2、
+  b は sync 1、c は sync 3。a/b の未コミット WIP は非接触のまま次 tick で新規 freeze する。
 - **2026-07-15 (20分 tick #3、Codex hub 引越し後初回) — ★ a: 0116 correction layer / b: 9103 Phase 1 / c: 0118 c-2。census 34→33**:
   tick 開始時に main clean・`origin/main` 同期を確認し、lane tip を **a=`92293b7c` /
   b=`f6ff529a` / c=`9b9986b9`** に固定。以後の lane 進行は本 tick に混ぜていない。
