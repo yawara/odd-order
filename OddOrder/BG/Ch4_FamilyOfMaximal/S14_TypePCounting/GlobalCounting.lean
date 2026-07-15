@@ -781,14 +781,16 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
 multi-maximal sigma-length-one situation, `M` is Frobenius type, `tau_2(M)` is
 empty, and `M` is a Frobenius group with kernel `M_sigma`.
 
-⚠ **STATEMENT MIS-ENCODED (do not prove vacuously, 2026-06-30)**: the Coq original
+⚠ **FROZEN MIS-ENCODING — DO NOT PROVE OR REPAIR IN PLACE (2026-07-15).**  The Coq original
 (`non_disjoint_signalizer_Frobenius`, BGsection14:2412) hypothesises `1 < |𝓜_σ(x)|` and `M` *not*
 a `σ(N[x])′`-group (`N[x]` = the signalizer neighbour).  The Lean hypotheses `M, N ∈ 𝓜_σ(x)` with
 `¬ IsConjugateSubgroup M N` are **inconsistent**: by Theorem 13.9 non-conjugate maximals have
 `σ(M) ∩ σ(N) = ∅`, but `x ∈ M_σ ∩ N_σ` with `x ≠ 1` forces a common prime — so the premise is
 vacuous (the two elements of `𝓜_σ(x)` are conjugate, not non-conjugate).  A faithful restatement
 replaces `{N, hN, hMN, hinter}` by `1 < (𝓜_σ(x)).ncard` and the `σ(N[x])′`-group condition.
-Orphaned (no consumers); not on the FT path.  See issue 8020. -/
+This declaration has no consumers and is retained only as a frozen record of the bad surface.
+The proved faithful API is `S16.non_disjoint_signalizer_frobenius`; new consumers must use it.
+See issue 8020. -/
 theorem sigmaLength_one_frobenius_type [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
     {x : G} (hx : x ≠ 1) (hlen : D.length x = 1)
@@ -811,8 +813,8 @@ Assembled from the faithful `G#` cover.  The genuine `SigmaDecompositionData` is
 for `g ≠ 1` the cover (`exists_mem_conjClassSet_Mtilde_or_fixed_zTilde` when a type-P maximal exists,
 else `sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`) places `g` in `𝒞_G(M̃)` or
 `𝒞_G(Ẑ)`; conjugation-invariance (`sigmaLength_conj`) reduces to the per-piece bounds
-`sigmaLength_le_two_of_mem_Mtilde` (sorry-free) and `sigmaLength_le_two_of_mem_zTilde_of_isTypeP`
-(gated on the type-P partner-duality residual). -/
+`sigmaLength_le_two_of_mem_Mtilde` and
+`sigmaLength_le_two_of_mem_zTilde_of_isTypeP`. -/
 theorem exists_sigmaDecomposition_length_le_two [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ∃ D : SigmaDecompositionData G, ∀ g : G, D.length g ≤ 2 := by
@@ -1057,6 +1059,4 @@ theorem signalizer_msigma_sup_inf_partner_eq [Finite G]
         sup_le_sup_left (le_inf hEsetup.E_le hEMst) _
 
 end OddOrder.BG.Ch4.S14
-
-
 

@@ -1176,7 +1176,8 @@ theorem isTypeP_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 (`isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`), while `|K| = p` prime is read off Theorem
 15.2's structure conjunction directly.
 
-This discharges two of the three conjuncts of Theorem A(8) in `theoremA_maximal_structure`; the
+This discharges two of the three conjuncts of Theorem A(8) in
+`theoremA_maximal_structure_faithful`; the
 remaining `FittingIsTI M` (`F(M)` a TI-subgroup of `G`) is the genuinely deep §15 content (Theorem A
 proper, via the §9–§10 uniqueness/fusion machinery) and is *not* supplied here. -/
 theorem theoremA8_complement_eq_bot_and_kappa_prime [Finite G]
@@ -1197,7 +1198,8 @@ theorem theoremA8_complement_eq_bot_and_kappa_prime [Finite G]
 is trivial, `F(M)` is a TI-subgroup of `G`, and `|K| = p` is prime.  Combines the
 `FittingIsTI`-free part (`theoremA8_complement_eq_bot_and_kappa_prime`, via Theorem 15.2) with the
 `FittingIsTI` clause (`S15.fitting_isTI_of_mf_ne_msigma`, the contrapositive of the `M_F = M_σ`
-conclusion of Theorem 15.7(a)).  This is the full conjunction `theoremA_maximal_structure` carries
+conclusion of Theorem 15.7(a)).  This is the full conjunction
+`theoremA_maximal_structure_faithful` carries
 for the `M_F ≠ M_σ` case; it is `sorry`-free modulo the single deep §15 rank-theoretic residual
 `S15.piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` (Theorem 15.7(a) core). -/
 theorem theoremA8_structure [Finite G]
@@ -1490,8 +1492,8 @@ theorem derivedDerived_le_fittingInAmbient [Finite G]
 
 /-- **BG Theorem A — the faithful monolith** (mmd L4346-4355), all 11 conjuncts `sorry`-free.
 
-This is the faithfulness-corrected counterpart of `theoremA_maximal_structure`: it adds the explicit
-`hKM : K ≤ M` and `hUM : U ≤ M` that the BG setup `M = K U M_σ` carries but the bare Hall
+This is the canonical faithful form of BG Theorem A.  It includes the explicit `hKM : K ≤ M` and
+`hUM : U ≤ M` that the BG setup `M = K U M_σ` carries but the bare Hall
 conditions on `K.subgroupOf M` / `U.subgroupOf M` do not force, so conjuncts A(3) (`M = K U M_σ`),
 A(4) (`C_U(k) = 1`), and A(8) (`U = 1`) become provable.  Every conjunct is discharged by a
 standalone lemma — none gated:
@@ -1503,8 +1505,8 @@ standalone lemma — none gated:
 * A(8) `M_F ≠ M_σ ⟹ U = 1 ∧ F(M)` TI `∧ |K|` prime — `theoremA8_structure` (`U.subgroupOf M = ⊥`
   upgraded to `U = ⊥` via `hUM`).
 
-The `sorry` `theoremA_maximal_structure` is kept as-is for its existing (cross-lane) callers; new
-consumers wanting a proved Theorem A cite this faithful form. -/
+The former bare overstatement omitted `hKM`/`hUM` and was retired after all consumers migrated;
+this theorem is the sole monolithic Theorem A API. -/
 theorem theoremA_maximal_structure_faithful [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
@@ -1538,4 +1540,3 @@ theorem theoremA_maximal_structure_faithful [Finite G]
   exact h.symm
 
 end OddOrder.BG.Ch4.S16
-
