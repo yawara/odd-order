@@ -67,10 +67,11 @@ open scoped FiniteInduce in
 set_option maxHeartbeats 1600000 in
 -- The (7.6)-family bookkeeping (constituent expansion + per-index coefficient computation)
 -- elaborates as a single large proof term; the default budget covers only part of it.
-/-- **The `T`-side (13.3.c) distinguished index over a chosen base** (Peterfalvi (13.8)-for-`T`,
-the core restatement of `exists_muT_index` — issue 2035 #22 T-side twin, #89 設計):
+/-- **The `T`-side (13.3.c) distinguished index over a chosen base, general form**
+(Peterfalvi (13.8)-for-`T`, issue 0116):
 with the (7.6) family `Q_sharp_hypothesis76_base` based at `ζ₀ = Ind_Q^T φ₀` (`Q ⊄ Ker φ₀`,
-`Ind φ₀` irreducible), under `D = ⊥` (so `K = QD = Q`) there is a family index `i₁` carrying a
+and either `Ind φ₀` irreducible or its `η₁₀` coefficient zero), under `D = ⊥` (so
+`K = QD = Q`) there is a family index `i₁` carrying a
 ν-row (`ζ_{i₁} = ν_r = ∑_j ν_{rj}`) with `⟨τψ_{i₁}, η₁₀⟩ = δ = ±1`, and every other
 `Q`-nonkernel coefficient vanishes; `‖ζ_{i₁}‖² = p` and `ζ_{i₁}(1) = pv`.
 
@@ -80,7 +81,7 @@ which imports `S15_Tau1T` (the reverse import would be a cycle).  The commutativ
 the (14.9)-gated `Q_elementaryAbelian_T`) enters as the explicit input `hQcomm`: it pins the
 family degrees (`ζ_i(1) = [T:Q]`, so `d ≡ 1`) and the degree-one hypotheses of the (13.2.e)
 bridge `tau1T_ofHonest_apply_induce_sub`. -/
-theorem Hypothesis.exists_muT_index_core [Finite G]
+theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
@@ -96,9 +97,14 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
         Set ↥(hyp.Q.subgroupOf hyp.T)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel
         (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)))
-    (hφ₀irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
-      (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
-        (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) :
+    (hφ₀base :
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter
+          (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+            (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)) ∨
+        ClassFunction.inner
+          (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
+            (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+              (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) hyp.eta10 = 0) :
     ∃ (i₁ : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1)) (δ : ℤ), 0 < i₁ ∧
       ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
         OddOrder.Peterfalvi.S03.characterKernel
@@ -315,6 +321,14 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
     rw [OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hKQ θ] at h
     rw [show hyp.eta10 = hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ from rfl,
       OddOrder.RepresentationTheory.inner_conj_symm, h, star_zero]
+  have hφ₀eta : ClassFunction.inner
+      (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief
+        (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+          (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) hyp.eta10 = 0 := by
+    rcases hφ₀base with hφ₀irr | hφ₀orth
+    · exact hetaQbrick (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)
+        φ₀.isIrreducible hφ₀Q hφ₀irr
+    · exact hφ₀orth
   -- distinct `Q`-inductions are orthogonal
   have hInd0 : ∀ θ ψ : OddOrder.RepresentationTheory.IrreducibleCharacter
       ↥(hyp.Q.subgroupOf hyp.T),
@@ -502,9 +516,16 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
   have hi₁pos : 0 < i₁ := by
     rw [Fin.pos_iff_ne_zero]
     intro h0
-    apply hyp.nuRow_not_irreducible pins r
-    rw [← hζi₁, h0, hζ0]
-    exact hφ₀irr
+    have hbaseEq : (∑ j : Fin hyp.p, hyp.nu r j)
+        = ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+            (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) := by
+      rw [← hζi₁, h0, hζ0]
+    have hinnerEq := congrArg
+      (fun χ : ClassFunction ↥hyp.T ℂ => ClassFunction.inner
+        (hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief χ) hyp.eta10)
+      hbaseEq
+    rw [hkeyr, hφ₀eta] at hinnerEq
+    rcases hδpm with hδ | hδ <;> rw [hδ] at hinnerEq <;> norm_num at hinnerEq
   -- family degrees are constant (`Q` abelian) ⟹ `d ≡ 1`
   have hzeta_one : ∀ j : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1),
       (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta j 1
@@ -545,7 +566,7 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
       ← hbridgeQ θrQ (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) hθrQirr
         φ₀.isIrreducible hθrQfull hφ₀Q,
       map_sub, ClassFunction.inner_sub_left, ← hνeqQ, hkeyr,
-      hetaQbrick (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) φ₀.isIrreducible hφ₀Q hφ₀irr,
+      hφ₀eta,
       sub_zero]
   -- conjunct 5: all other `Q`-nonkernel coefficients vanish
   have hmid : ∀ i : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1), 0 < i → i ≠ i₁ →
@@ -589,7 +610,7 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
       ← hbridgeQ θiQ (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)
         hθiQirr φ₀.isIrreducible hθiQfull hφ₀Q,
       map_sub, ClassFunction.inner_sub_left,
-      hetaQbrick (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ) φ₀.isIrreducible hφ₀Q hφ₀irr,
+      hφ₀eta,
       hTau1IndEta θiQ hθiQirr hθiQfull hne,
       sub_zero]
   -- conjuncts 6, 7 and the sign square
@@ -609,6 +630,46 @@ theorem Hypothesis.exists_muT_index_core [Finite G]
   rw [hζi₁]
   exact hQkerNu
 
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
+/-- **The `T`-side (13.3.c) distinguished index over an irreducibly induced base**
+(Peterfalvi (13.8)-for-`T`, issue 2035 #90): compatibility form of
+`exists_muT_index_core_of_base_condition`. -/
+theorem Hypothesis.exists_muT_index_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
+    (hvd : hyp.v * hyp.d ≠ 1)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
+    (Tdata : TypePData hyp.T) (hU : Tdata.U = hyp.V)
+    (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
+    (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
+    (hD : hyp.D = ⊥)
+    (hQcomm : IsMulCommutative ↥hyp.Q)
+    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.T))
+    (hφ₀Q : ¬ (((hyp.Q.subgroupOf hyp.T).subgroupOf (hyp.Q.subgroupOf hyp.T) :
+        Set ↥(hyp.Q.subgroupOf hyp.T)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ)))
+    (hφ₀irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+      (ClassFunction.induce (hyp.Q.subgroupOf hyp.T)
+        (φ₀ : ClassFunction ↥(hyp.Q.subgroupOf hyp.T) ℂ))) :
+    ∃ (i₁ : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1)) (δ : ℤ), 0 < i₁ ∧
+      ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i₁)) ∧
+      δ ^ 2 = 1 ∧
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).cCoeff hyp.eta10 i₁ = (δ : ℂ) ∧
+      (∀ i : Fin ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).n + 1), 0 < i → i ≠ i₁ →
+        ¬ ((hyp.Q.subgroupOf hyp.T : Set ↥hyp.T) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i)) →
+        (Q_sharp_hypothesis76_base hG hyp hvd φ₀).cCoeff hyp.eta10 i = 0) ∧
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zetaNormSq i₁ = (hyp.p : ℂ) ∧
+      (Q_sharp_hypothesis76_base hG hyp hvd φ₀).zeta i₁ 1 = ((hyp.p * hyp.v : ℕ) : ℂ) := by
+  exact hyp.exists_muT_index_core_of_base_condition hG hnoV pins hvd hTP Tdata hU hW1 hW2
+    chief hD hQcomm φ₀ hφ₀Q (Or.inl hφ₀irr)
+
 section GenericAlphaIntegrality
 
 /-! ### The (13.5.a) integrality over an abstract (7.6) datum
@@ -620,75 +681,6 @@ Generic forms of the `α(1) ∈ ℤ` integrality of the correction term `hypothe
 `Q_sharp_hypothesis76_base`, `P' = Q.subgroupOf T`). -/
 
 variable {A : Set G} {L : Subgroup G}
-
-open scoped Classical in
-open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
-/-- **`(1/‖ζ_i‖²)·Res_H ζ_i` is a virtual character of `H`** over an abstract (7.6) datum —
-the generic form of `H_sharp_inv_normSq_restrict_zeta_mem_ZIrr` (the "`Res ζ_i/‖ζ_i‖²` is a
-character" step of Peterfalvi (13.5.a)): `ζ_i = Ind_K^L θ_i` (`zeta_induced`), so by the Mackey
-orbit form (`card_smul_restrict_induce_eq_inertia_smul_orbitSum`) and the inertia norm
-(`card_mul_inner_self_induce_eq_card_inertia`), `Res_K ζ_i = ‖ζ_i‖² · (sum of the distinct
-conjugates of θ_i)` — an ℕ-combination of irreducibles (`orbitSum_mem_ZIrr`). -/
-theorem hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G]
-    [Invertible (Nat.card G : ℂ)]
-    (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (i : Fin (H76.n + 1)) :
-    (H76.zetaNormSq i)⁻¹ •
-        ClassFunction.restrict (H76.H.subgroupOf L) (H76.zeta i)
-      ∈ ZIrr ↥(H76.H.subgroupOf L) := by
-  classical
-  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
-  haveI hKnorm : K.Normal :=
-    OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
-  obtain ⟨θ₀, hθ₀⟩ := H76.zeta_induced i
-  -- Bridge the canonical `Fintype`/`Invertible` instances of the `zeta_induced` field
-  -- (both subsingleton classes) to the ambient scoped ones.
-  have hθ : H76.zeta i = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
-    rw [hθ₀]
-  -- The Mackey orbit form, divided by `|K|`.
-  have hK0 : (Nat.card ↥K : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
-  have horbit := OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
-    (G := ↥L) (H := K) (k := ℂ) (θ₀ : ClassFunction ↥K ℂ)
-  have hinertia := OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
-    (G := ↥L) (H := K) θ₀
-  -- `‖ζ_i‖² ≠ 0` (it is `|I|/|K|` with `|I| ≥ 1`).
-  have hnormval : (Nat.card ↥K : ℂ) * H76.zetaNormSq i
-      = (Nat.card ↥(ClassFunction.inertia (G := ↥L)
-          (θ₀ : ClassFunction ↥K ℂ)) : ℂ) := by
-    rw [OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq, hθ]
-    exact hinertia
-  have hI0 : (Nat.card ↥(ClassFunction.inertia (G := ↥L)
-      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) ≠ 0 := by
-    exact_mod_cast Nat.card_pos.ne'
-  have hnorm0 : H76.zetaNormSq i ≠ 0 := by
-    intro h0
-    rw [h0, mul_zero] at hnormval
-    exact hI0 hnormval.symm
-  -- `Res ζ_i = ‖ζ_i‖² • orbitSum θ₀`, hence `(1/‖ζ_i‖²)·Res ζ_i` is the orbit sum.
-  have hIKnorm : ((Nat.card ↥K : ℂ))⁻¹ * (Nat.card ↥(ClassFunction.inertia (G := ↥L)
-      (θ₀ : ClassFunction ↥K ℂ)) : ℂ) = H76.zetaNormSq i := by
-    rw [← hnormval]
-    field_simp
-  have hres : ClassFunction.restrict K (H76.zeta i)
-      = H76.zetaNormSq i •
-          ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
-            ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
-    have h1 : (Nat.card ↥K : ℂ) • ClassFunction.restrict K (H76.zeta i)
-        = ((Nat.card ↥(ClassFunction.inertia (G := ↥L)
-            (θ₀ : ClassFunction ↥K ℂ)) : ℕ) : ℂ) • ∑ ψ ∈ Finset.univ.image
-              (fun x : ↥L => ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
-      rw [← Nat.cast_smul_eq_nsmul (R := ℂ)] at horbit
-      rw [hθ]
-      exact horbit
-    have h2 := congrArg (fun φ => ((Nat.card ↥K : ℂ))⁻¹ • φ) h1
-    simp only [smul_smul, inv_mul_cancel₀ hK0, one_smul] at h2
-    rw [h2, hIKnorm]
-  have hmain : (H76.zetaNormSq i)⁻¹ •
-      ClassFunction.restrict K (H76.zeta i)
-      = ∑ ψ ∈ Finset.univ.image (fun x : ↥L =>
-          ClassFunction.conjBy x⁻¹ (θ₀ : ClassFunction ↥K ℂ)), ψ := by
-    rw [hres, smul_smul, inv_mul_cancel₀ hnorm0, one_smul]
-  rw [hmain]
-  exact OddOrder.RepresentationTheory.orbitSum_mem_ZIrr (G := ↥L) θ₀
 
 open scoped Classical in
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
@@ -706,41 +698,10 @@ theorem hypothesis76AlphaFun_one_int [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hc : ∀ i : Fin (H76.n + 1), ∃ z : ℤ, H76.cCoeff χ i = (z : ℂ)) :
     ∃ α1 : ℤ, hypothesis76AlphaFun H76 P' χ 1 = (α1 : ℂ) := by
   classical
-  set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
-  -- The tail as a class function on `↥L`.
-  set alphaCF : ClassFunction ↥L ℂ :=
-    ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
-          (fun i => (P' : Set ↥L) ⊆
-            OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
-        (star (H76.cCoeff χ i) / H76.zetaNormSq i) • H76.zeta i with halphaCF
-  have happly : ∀ x : ↥L, alphaCF x = hypothesis76AlphaFun H76 P' χ x := by
-    intro x
-    rw [halphaCF, OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
-      hypothesis76AlphaFun]
-    exact Finset.sum_congr rfl (fun i _ => by rw [ClassFunction.smul_apply])
-  -- Restriction is pointwise, so it commutes with the defining sum.
-  have hlin : ClassFunction.restrict K alphaCF
-      = ∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
-            (fun i => (P' : Set ↥L) ⊆
-              OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
-          (star (H76.cCoeff χ i) / H76.zetaNormSq i) •
-            ClassFunction.restrict K (H76.zeta i) := by
-    ext x
-    rw [ClassFunction.restrict_apply, halphaCF,
-      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply,
-      OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply]
-    exact Finset.sum_congr rfl (fun i _ => by
-      rw [ClassFunction.smul_apply, ClassFunction.smul_apply, ClassFunction.restrict_apply])
-  -- `Res_K α ∈ ℤ[Irr K]`: integer coefficients times the normalized restrictions.
-  have hres : ClassFunction.restrict K alphaCF ∈ ZIrr ↥K := by
-    rw [hlin]
-    refine Submodule.sum_mem _ (fun i _ => ?_)
-    obtain ⟨z, hz⟩ := hc i
-    rw [hz, star_intCast, div_eq_mul_inv, mul_smul, Int.cast_smul_eq_zsmul]
-    exact Submodule.smul_mem _ z (hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr H76 i)
+  have hres := hypothesis76AlphaCF_restrict_mem_ZIrr H76 P' χ hc
   obtain ⟨z, hz⟩ := OddOrder.Algebra.exists_int_apply_one_of_mem_ZIrr hres
   refine ⟨z, ?_⟩
-  rw [← happly 1, ← hz, ClassFunction.restrict_apply, OneMemClass.coe_one]
+  simpa [ClassFunction.restrict_apply] using hz
 
 end GenericAlphaIntegrality
 

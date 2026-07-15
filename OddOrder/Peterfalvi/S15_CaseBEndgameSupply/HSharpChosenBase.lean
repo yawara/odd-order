@@ -29,6 +29,24 @@ variable {G : Type*} [Group G]
 section /- (13.3)–(13.5): chosen-base `H^#` correction data (pp. 78–82) -/
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (13.3.a), a chosen `𝒮₁` base**: the distinguished reducible
+`μ`-column in `CharacterDegreeCore` contains a linear irreducible character of
+`H = PC` whose kernel does not contain `P`.  This base is enough for the
+`η₁₀` correction; no conditional `λ` datum is needed. -/
+theorem CharacterDegreeCore.exists_hSharpBase [Finite G]
+    {hyp : Hypothesis (G := G)} (core : CharacterDegreeCore hyp) :
+    ∃ φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter
+        ↥(hyp.H.subgroupOf hyp.S),
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (φ₀ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)) := by
+  haveI := hyp.finiteG
+  obtain ⟨j, δ, θ, hj, hδ, hθirr, hθ1, hθP, hμeq, hμτ⟩ :=
+    core.mu_col_tau1_eta_col_one
+  exact ⟨⟨θ, hθirr⟩, hθP⟩
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (13.3.a), chosen `𝒶₁` base for (13.5)**: the distinguished reducible
 `μ`-column in `CharacterDegreeCore` supplies a `P`-nonkernel irreducible character `φ₀` of
 `H = PC`.  Its induction is different from the irreducible `λ`; otherwise the column sum

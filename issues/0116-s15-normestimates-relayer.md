@@ -287,3 +287,42 @@ Full flip の S-side λ atom を `CharacterDegreeData` なしで再構成した:
 **次 frontier**: T-side `η₁₀` correction/norm package を Core + `(hD, hQcomm)` 型で束ね、
 NormEstimates 5 obtain-sites の param 版へ接続する。その後 OrderDetermination consumers を
 param 版へ移し、legacy `CharacterDegreeData` wrappers/carrier を retire する。
+
+## ✅ lane a progress (2026-07-15) — chosen-base η₁₀ (13.5)/(13.8) package complete
+
+T-side の book-faithful correction を `CharacterDegreeData` なしで再構成した:
+
+- Coq `PFsection13.v` が補う (13.8) の行間どおり、`η₁₀` と直交する別の reducible `ν`-rowを
+  chosen base に選択した (clean branch は row 2、3-row flip branch は row 1)。
+- `exists_muT_index_core` の engine を「base が irreducibly induced **または** base coefficient が
+  zero」へ一般化し、旧 signature は compatibility theorem として保持した。正 index は
+  `δ = ±1` と zero base coefficient の矛盾から得るため、虚偽の irreducibility 仮定は不要。
+- chosen index から正規化 `ζ = p⁻¹ζᵢ`、`Q`-kernel correction `α`、point formula、
+  `|T'|-v²` first term、cross term、inflation を組み立て、abstract Case-B engine により
+  `eta10_Qsharp_norm_lower_core` を証明した。
+- 新 leaf は 393 行、`sorry`/新 `axiom` なし、leaf build green。
+
+**次 frontier**: hub 経由で λ/η₁₀ Core packages を使い、NormEstimates の analytic 5-site を
+`CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` param 版へ relayer する。
+
+## ✅ lane a progress (2026-07-15) — H-side η₁₀ (13.5)/(13.7) package complete
+
+固定 trivial base に依存していた legacy (13.7) を、Core が供給する `P`-nonkernel chosen base
+で再構成した:
+
+- abstract (7.6) datum に `hypothesis76AlphaCF`、Mackey orbit restriction、
+  normalized restriction / correction の `ZIrr` API を追加。downstream に重複していた
+  normalized-restriction proof は上流実装へ統合し、`hypothesis76AlphaFun_one_int` も再利用。
+- `CharacterDegreeCore.exists_hSharpBase` を λ 非依存で抽出し、
+  `eta10_cCoeff_base_eq_zero` により chosen family の全 nonkernel coefficient を消去。
+- primitive-root congruenceから correction の identity value 非零を証明し、restriction の
+  virtual-character 性、Parseval、(13.5.c) inflation、`H` abelian equality case を
+  `exists_caseB_data_eta10_H_core` に束ねた。
+- abstract norm engine から `eta10_Hsharp_norm_lower_core` (13.7) を導出。
+  入力は `CharacterDegreeCore` のみで、legacy `CharacterDegreeData` は不使用。
+
+新 leaf 286 行、`sorry`/新 `axiom` なし、leaf build green。
+
+**次 frontier**: (13.6) λ + (13.7) H-side η₁₀ + (13.8) Q-side η₁₀ の Core norm bounds を使い、
+`analyticEstimate_lambda` / `analyticEstimate_eta` / counting cover から
+`analytic_inequality` までを explicit Case-B facts 版として下流 supply leaf に実装する。
