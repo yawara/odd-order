@@ -644,6 +644,22 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (20分 tick #2) — ★★ b: 9103 Phase 0 / c: 0118 c-1 bridge retire。census 35→34**:
+  **b=1** (`d978bee6` = (13.2.a)/(13.2.e) per-subgroup 対称形 `isTypeII_or_isTypeIII_of_isTypeNonI`
+  + `fittingIsTI_of_isTypeNonI` (proven 部品のみ消費、S13_NonGaloisExclusion への additive 追加)。
+  **hub 裁定**: a-owned S13 file への追記だが 9103 claim + additive-only + topically 正配置ゆえ
+  **carve-out 受理**。さらに b は 0118 推奨の hTTypeII param 化を**論理循環で不成立と確定**
+  (TTypeII:199 call site で供給不能) — 代替 = `Hypothesis.S_typeP2` field 削除 (Pf (13.1) 対称化、
+  Coq PFsection13/14 対照済み、issue 9103) を hub 承認、b-2 は 9103 route で継続。merge `2def161f`)。
+  **c=1** (`1e035de7` = **c-1 完遂**: `caseB_order_u_data`/`CaseBOrderUData` bridge 削除、
+  SubgroupL/TTypeII の consumer 2 箇所を proven `caseB_order_u` + 実 Clifford dichotomy へ rewire、
+  T_isTypeP2 の dummy call は新 proven `u_le_cyclotomicQuotient` (axiom-clean assert 済) に置換。
+  carve-out 条件 (rewire 先行・単独 commit・self-flag・signature 非接触) 全遵守。merge `e8ea8990`)。
+  **a=0** (a-2 full flip 作業中と推定)。build green 4225 jobs / 4m05s、AxiomsCheck OK、error 0、
+  **census 35→34 (bridge sorry の実削減、root #6 消滅)**、新 axiom なし。push 済。
+  残 root (0118 台帳): #1/#2 (NormEstimates atoms)・#3 (character_degree_analysis)・#7 後半
+  (CountingLayer legacy) = a-2 flip / #4 (generic nuGridSupply) = b-5 / #5 (V_inf) = c-3 (flip 後) /
+  #7 前半 (T_isTypeP2_gate) = b-2 (9103 route)。
 - **2026-07-15 (20分 tick #1) — ★ a: 0118 a-1 (canonical ν-carrier threading) landed。census 35 不変**:
   **a=1** (`5da9b274` = `S16.Hypothesis` に `nuGridSupply` carrier field 追加 +
   `sectionSixteenHypothesis_of_inputs` が Section16Inputs の既証明 10 fields から直接構成 +
