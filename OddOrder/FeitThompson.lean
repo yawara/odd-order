@@ -1572,6 +1572,17 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       eta_intCast_of_coprime := inp.eta_intCast_of_coprime
       eta_pair_of_coprime := inp.eta_pair_of_coprime
       eta_principal_of_coprime := inp.eta_principal_of_coprime }
+  nuGridSupply :=
+    { nu_irreducible := inp.nu_irreducible
+      nu_row_injective := inp.nu_row_injective
+      nu_orthonormal := inp.nu_orthonormal
+      nu_degree_modEq_deltaPrime := inp.nu_degree_modEq_deltaPrime
+      deltaPrime_zero_eq_one := inp.deltaPrime_zero_eq_one
+      nu_rowSum_eq_induce := inp.nu_rowSum_eq_induce
+      nu_reducible_dichotomy := inp.nu_reducible_dichotomy
+      nu_diff_support := inp.nu_diff_support
+      nu_apply_of_not_mem_W1 := inp.nu_apply_of_not_mem_W1
+      nu_conj := inp.nu_conj }
   q_lt_p := inp.q_lt_p
 
 /-- **Canonical pure ν-grid supply from named Section 16 inputs** (issue 1030).
@@ -1584,17 +1595,7 @@ theorem sectionSixteenNuGridSupplyData_of_inputs
     {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G))
     (inp : Section16Inputs G) :
     Peterfalvi.S15.NuGridSupplyData (sectionSixteenHypothesis_of_inputs hodd inp).base := by
-  exact
-    { nu_irreducible := inp.nu_irreducible
-      nu_row_injective := inp.nu_row_injective
-      nu_orthonormal := inp.nu_orthonormal
-      nu_degree_modEq_deltaPrime := inp.nu_degree_modEq_deltaPrime
-      deltaPrime_zero_eq_one := inp.deltaPrime_zero_eq_one
-      nu_rowSum_eq_induce := inp.nu_rowSum_eq_induce
-      nu_reducible_dichotomy := inp.nu_reducible_dichotomy
-      nu_diff_support := inp.nu_diff_support
-      nu_apply_of_not_mem_W1 := inp.nu_apply_of_not_mem_W1
-      nu_conj := inp.nu_conj }
+  exact (sectionSixteenHypothesis_of_inputs hodd inp).nuGridSupply
 
 /-- **Canonical Section 16 configuration from a minimal simple odd-order group.**
 The named Bender–Glauberman and Peterfalvi producers construct
