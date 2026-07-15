@@ -326,3 +326,68 @@ T-side の book-faithful correction を `CharacterDegreeData` なしで再構成
 **次 frontier**: (13.6) λ + (13.7) H-side η₁₀ + (13.8) Q-side η₁₀ の Core norm bounds を使い、
 `analyticEstimate_lambda` / `analyticEstimate_eta` / counting cover から
 `analytic_inequality` までを explicit Case-B facts 版として下流 supply leaf に実装する。
+
+## ✅ lane a progress (2026-07-15) — Core analytic relayer (13.9)/(13.10) complete
+
+三つの Core norm package を Peterfalvi §13 の解析鎖へ接続し、legacy
+`CharacterDegreeData` を使わない (13.10) endpoint を構成した:
+
+- `analyticEstimate_lambda_core` と `analyticEstimate_eta_core` で (13.10.1)/(13.10.2) を
+  `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` から証明。
+- `analyticCounting_disjointCover_of_caseB_facts`、`G0_nonvanishing_dichotomy_core`、
+  `analyticEstimate_galois_core` で counting cover と Galois orbit estimate を Core 化。
+- `analyticInequalityEstimates_core` を経て
+  `analytic_inequality_of_caseB_facts` に四本の評価を束ね、旧 `analytic_inequality` と同じ
+  strict rational inequality を explicit Case-B facts から直接供給。
+
+新 leaf `S15_CaseBEndgameSupply/AnalyticRelayer.lean` は legacy carrier を import せず、
+`sorry`/新 `axiom` なし、leaf build green。
+
+**次 frontier**: `OrderDetermination` の三 obtain-site と `CaseBOrder` consumer を、循環を
+作らない明示 analytic-inequality 仮定版へ分離する。下流 supply leaf が Core endpoint で仮定を
+discharge した後、mid-layer/S16 consumer を順次付け替え、legacy wrappers/carrier を retire する。
+
+## ✅ lane a progress (2026-07-15) — order consumers split at the (13.10) boundary
+
+`OrderDetermination`/`CaseBOrder` の算術本体から legacy carrier 依存を切り離した:
+
+- `numeric_bounds_of_analytic_inequality`、`c_eq_one_of_analytic_inequality`、
+  `caseA_parameters_of_analytic_inequality`、`caseB_order_u_of_analytic_inequality` を追加。
+- 四本は (13.10) の strict rational inequality を明示引数に取り、相互の呼出しも明示版だけを使う。
+- 既存名は移行中の互換入口としてのみ残し、各 wrapper 内の一箇所で旧 `analytic_inequality` を
+  unpack する形に縮退。既存 downstream DAG は signature 不変で green。
+
+**次 frontier**: downstream supply leaf で `analytic_inequality_of_caseB_facts` を一度構成し、
+四本の明示版を `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` から供給する。
+その API を基点に mid-layer/S16 consumer の param threading を進める。
+
+## ✅ lane a progress (2026-07-15) — Core order relayer complete
+
+新 leaf `S15_CaseBEndgameSupply/OrderRelayer.lean` で、Core (13.10) endpoint を
+(13.11)–(13.15) の四本へ接続した:
+
+- `CharacterDegreeCore.numeric_bounds_of_caseB_facts`
+- `CharacterDegreeCore.c_eq_one_of_caseB_facts`
+- `CharacterDegreeCore.caseA_parameters_of_caseB_facts`
+- `CharacterDegreeCore.caseB_order_u_of_caseB_facts`
+
+全 API は `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` を入力に取り、
+`CharacterDegreeData`/`NormCascadeData` を参照しない。leaf build green、hub export 済み。
+
+**次 frontier**: 文書順で最上流の `c_eq_one` mid-layer consumer から明示版を追加し、
+Core supply を末端まで thread する。旧名は downstream 移行完了まで互換境界として保持する。
+
+## ✅ lane a progress (2026-07-15) — honest unconditional `c = 1` endpoint
+
+`Hypothesis.c_eq_one_of_T_typeII` を `OrderRelayer` に追加した。legacy の無条件 λ-carrier を
+使わず、Peterfalvi (13.3.b) の正しい dichotomy で (13.12) を組み立てる:
+
+- λ-cluster branch: unconditional `CharacterDegreeCore` +
+  `lambda_forces_T_caseB_core` から `(hD,hv)`、`Q_elementaryAbelian_T` から `hQcomm` を得て、
+  Core (13.10) → `c_eq_one_of_caseB_facts` を適用。
+- no-λ Galois branch: `lambdaCluster_or_caseB` が直接 `C = ⊥` を返すため、`c = |C| = 1`。
+
+入力は genuine な `IsTypeII T` と canonical `NuGridSupplyData` のみ。leaf build green。
+
+**次 frontier**: Core より上流の `C_eq_bot` / `U_inf_centralizer_P_eq_bot` /
+BridgeCharacter consumers を `hc1 : c = 1` 明示版へ分離し、S16 側から本 endpoint を注入する。

@@ -286,8 +286,11 @@ branch.
 The case-(b) certificate supplies `u ∣ (p^q - 1)/(p - 1)`, hence a cofactor `x`.  The remaining
 inputs of `caseB_order_u_value` are the already-proved (13.10)--(13.14) facts: `c = 1`, the lower
 bounds for `m`, `u ≡ 1 (mod q)`, and the oddness of the cyclotomic quotient. -/
-theorem caseB_order_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem caseB_order_u_of_analytic_inequality [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
+    (h1310 : (hyp.u : ℚ) / (hyp.c : ℚ) >
+      hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ))
     {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
       (hyp.mkSection11CharacterDataS hG chief)) :
@@ -295,7 +298,7 @@ theorem caseB_order_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))) ∧
       (¬ hyp.p ≡ 1 [MOD hyp.q] →
         hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)) := by
-  have hc1 := c_eq_one hG hyp
+  have hc1 := c_eq_one_of_analytic_inequality hG hyp h1310
   have hdiv := caseB.u_dvd_norm_quotient
   rw [hyp.mkSection11CharacterDataS_u_eq hG chief,
     hyp.chiefFactorS_p_eq hG chief, hyp.toTypesIIIIIIVSetupS_q_eq hG] at hdiv
@@ -329,13 +332,12 @@ theorem caseB_order_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have h11c : hyp.q = 3 →
       ((hyp.p : ℚ) ^ 2 - 1) / 6 < (hyp.u : ℚ) := by
     intro hq3
-    have h := ((numeric_bounds hG hyp).2.2 hq3).2
+    have h := ((numeric_bounds_of_analytic_inequality hyp h1310).2.2 hq3).2
     rw [hc1] at h
     norm_num at h
     have hp2one : 1 ≤ hyp.p ^ 2 := Nat.one_le_pow _ _ hyp.p_prime.pos
     push_cast [Nat.cast_sub hp2one] at h
     exact h
-  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
   rw [hc1] at h1310
   norm_num at h1310
   have hp1 : 1 ≤ hyp.p := hyp.p_prime.one_le
@@ -375,5 +377,19 @@ theorem caseB_order_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact caseB_order_u_value hyp.p_prime hyp.q_prime hyp.three_le_p hyp.q_ne_two hyp.p_ne_q
     hyp.p_odd hyp.q_odd hux hu_ne_one hu_cop_q hx0
     hyp.m_gt_seven_tenths_of_five_le_q hyp.m_gt_four_fifths_of_seven_le_q h11c hanalytic
+
+/-- Compatibility entry point for (13.15), supplied by the legacy (13.10) carrier during the
+explicit-inequality migration. -/
+theorem caseB_order_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (caseB : OddOrder.Peterfalvi.S11.CliffordCaseBData
+      (hyp.mkSection11CharacterDataS hG chief)) :
+    (hyp.p ≡ 1 [MOD hyp.q] →
+        hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.q * (hyp.p - 1))) ∧
+      (¬ hyp.p ≡ 1 [MOD hyp.q] →
+        hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1)) := by
+  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
+  exact caseB_order_u_of_analytic_inequality hG hyp h1310 caseB
 
 end OddOrder.Peterfalvi.S15
