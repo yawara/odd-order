@@ -316,7 +316,7 @@ theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   -- piece 6: `U ⊆ C_L(U ∩ L_F) ⊆ L_F` since `U` is abelian and `L_F` is the Frobenius kernel.
   have hUab : IsMulCommutative ↥(hyp.U.subgroupOf L) :=
     OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
-      (Subgroup.subgroupOfEquivOfLe hUleL).symm (isMulCommutative_U hG hyp)
+      (Subgroup.subgroupOfEquivOfLe hUleL).symm hyp.S_U_commutative
   have hinf : (hyp.U.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L) ≠ ⊥ := by
     rw [show (hyp.U.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L)
         = (hyp.U ⊓ maxNilpotentNormalHall L).subgroupOf L from (Subgroup.comap_inf _ _ _).symm]

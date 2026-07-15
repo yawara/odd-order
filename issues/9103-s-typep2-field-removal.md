@@ -82,10 +82,32 @@ swap が完全対称になり、gate `T_isTypeP2_gate` と hT2 param は消滅�
   (0118) に Phase 2 の kickoff を組み込むこと (b-5 と同様の gated 項目扱い) を提案。
 - root #4 (`nuGridSupply`) は本 campaign と独立に残る (swap の pins 入力; a-1/9096)。
 
+## Phase 1 実施報告 (lane b, 2026-07-15)
+
+Phase 1 の b-owned direct consumers を `S_typeP2`-free 化した。
+
+- `HypothesisBasics`: carried `Sdata` 上の II/III 共通 setup constructor を追加し、`card_P_eq`
+  を II branch (9.3) / III branch (11.7 + unconditional noncoherence) に分岐した。さらに
+  intrinsic `Sdata.W1` と generic `|M_σ ∩ C(W₁)| = |W₂|` bridge から
+  `Hypothesis.isTypeII_of_q_lt_p` を構成し、`basic_structure.q_lt_p_forces_typeII` を実証明へ
+  付け替えた。
+- `SAndTBasic`: 旧 `isMulCommutative_U` は `S_typeP2` から同じ carried fact を再導出する
+  consumer-one の重複 surface だったため retire。唯一の caller (`S15_Gate3`) は canonical
+  producer が BG 15.1(b) から実構成する `hyp.S_U_commutative` を直接使用する。これにより
+  wrapper を残さず (13.2.a) の genuine supply を保存した。
+- `SAndTDefs.normalizer_W2_le_S` / `Machinery135.H_sharp_isTISubset` は
+  `S13.fittingIsTI_of_isTypeNonI` へ置換した。
+- 先行 landing 済みの M_F=M_σ 3 sites と合わせ、Phase 1 明記対象の direct read はゼロ。
+  残存は Phase 2 の field/swap 自体、a-owned `OrderDetermination`、a-flip hold 中の
+  `CountingLayer`、c-owned sites、および Phase 2 で同時に切り替える supply/support 群のみ。
+
+検証: `S15_SAndTDefs` + `Machinery135`、`S15_SAndTBasic` + `S15_Gate3` の leaf builds green。
+full `lake build OddOrder` も 4228 jobs で green（AxiomsCheck OK）。
+
 ## 完了条件
 
 - [x] Phase 0: 新部品 2 本 landed (S13_NonGaloisExclusion、build green)
-- [ ] Phase 1: b-owned consumer の S_typeP2-free 化 (各 build green、AxiomsCheck 不変)
+- [x] Phase 1: b-owned consumer の S_typeP2-free 化 (各 build green、AxiomsCheck 不変)
 - [ ] Phase 2: field 削除 + gate/param 削除、`d_eq_one`/`T_caseB_v_eq_full` が
   sorry-free 化 (残 sorryAx = nuGridSupply のみ)、AxiomsCheck assert 追加
 - [ ] issue 2035 の root #7 前半を closed 記録

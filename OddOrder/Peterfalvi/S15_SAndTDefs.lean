@@ -161,15 +161,17 @@ needs `W2 <= P` at `Setup` level).  Downstream references are unchanged (same na
 /-- **Peterfalvi (13.16), TI reduction for the `W₂`-side**: `N_G(W₂) ≤ S`.
 
 `W₂ ≤ P = S_F ≤ F(S)` (`W2_le_P` + `maxNilpotentNormalHall_le_fittingInG`), and `F(S)^#` is a
-TI-subset whose normalizer is `S` (BG Theorem 15.7(a), `fittingIsTI_of_isTypeP2` from the type-`P₂`
-carrier `S_typeP2`; `normalizer_fittingInAmbient_eq_self`).  Any `g` normalizing `W₂` sends a
+TI-subset whose normalizer is `S` (BG Theorem 15.7(a), in the type-uniform form
+`S13.fittingIsTI_of_isTypeNonI`; the normalizer identity
+`normalizer_fittingInAmbient_eq_self`).  Any `g` normalizing `W₂` sends a
 nonidentity `a ∈ W₂ ⊆ F(S)^#` to `g a g⁻¹ ∈ W₂ ⊆ F(S)^#`, so the TI condition places
 `g ∈ N_G(F(S)) = S`.  This is the first (TI) half of the (13.16) `W₂`-confinement; the residual
 `N_G(W₂) ⊓ S ≤ P ⊔ W₁` is the Maschke/Wielandt core (`normalizer_W2_within_S`). -/
 theorem normalizer_W2_le_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.S := by
-  have hTI := OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have hTI := OddOrder.Peterfalvi.S13.fittingIsTI_of_isTypeNonI
+    hG hyp.S_maximal hyp.S_nonI
   have hNorm := OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.S_maximal
   -- `W₂ ≤ P ≤ F(S)`.
   have hW2F : hyp.W2 ≤ OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S := by
