@@ -47,6 +47,14 @@ variable {G : Type*} [Group G]
 `q < p`. -/
 structure Hypothesis where
   base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)
+  /-- **Peterfalvi (4.3)--(4.9), canonical T-side ν-grid supply.**
+
+  Section 16 is the first layer where the abstract grid in `base` is identified with the
+  canonical certain-type construction.  Keeping that identification as an explicit carrier
+  field avoids the false generic assertion that every `S15.Hypothesis` determines its ν-grid
+  up to row translation (issue 9096). -/
+  nuGridSupply :
+    @OddOrder.Peterfalvi.S15.NuGridSupplyData G _ base.finiteG base
   q_lt_p : base.q < base.p
 
 namespace Hypothesis
