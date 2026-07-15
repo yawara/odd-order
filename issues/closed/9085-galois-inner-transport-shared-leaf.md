@@ -34,4 +34,12 @@ shared 版は `OddOrder.RepresentationTheory.ClassFunction`)。
 ## 完了条件
 
 - [x] leaf 作成 + 2 定理 sorry-free + AxiomsCheck 登録 (lane a)
-- [ ] c 側 dedup (hub 裁定待ち)
+- [x] c 側 dedup (hub 実施)
+
+## 実施記録 (2026-07-15, hub)
+
+- S16 の重複 2 定理を削除し、`tSideDadeMap_inner_galois_eq_intCast` を shared
+  `ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add` へ直接配線。
+- 重複 2 定理の AxiomsCheck 登録を削除。shared 2 定理の既存登録を正本として維持。
+- focused build 成功 (4190 jobs)、full build + AxiomsCheck 成功 (4234 jobs)。
+  shared 2 定理と `OddOrder.feitThompson` は allowlist 内の 3 公理のみに依存。

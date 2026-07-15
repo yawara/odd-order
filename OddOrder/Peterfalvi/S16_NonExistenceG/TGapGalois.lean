@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapProjectionResidual
 import OddOrder.Peterfalvi.S07_CoherenceGalois
-import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 
 /-!
 # Peterfalvi (11.9)(a): Galois transport of the T-side bridge
@@ -20,50 +20,6 @@ namespace OddOrder.Peterfalvi.S16
 open OddOrder.RepresentationTheory
 
 
-/-- A coefficient automorphism preserves the inner product of two virtual characters.
-Unlike `ClassFunction.mapRingEquiv_inner`, no global commutation with complex conjugation is
-needed: virtual-character values satisfy `chi(g^-1) = star (chi(g))`, and the common inner
-product is a rational integer. -/
-theorem inner_mapRingEquiv_eq_of_mem_ZIrr
-    {L : Type*} [Group L] [Finite L] [Fintype L]
-    [Invertible (Nat.card L : Complex)]
-    (sigma : Complex ≃+* Complex) {phi eta : ClassFunction L Complex}
-    (hphi : phi ∈ ZIrr L) (heta : eta ∈ ZIrr L) :
-    ClassFunction.inner (ClassFunction.mapRingEquiv sigma phi)
-        (ClassFunction.mapRingEquiv sigma eta) =
-      ClassFunction.inner phi eta := by
-  have hstar (g : L) :
-      star (ClassFunction.mapRingEquiv sigma eta g) = sigma (star (eta g)) := by
-    rw [← OddOrder.Algebra.apply_inv_eq_star_of_mem_ZIrr
-      (ClassFunction.mapRingEquiv_mem_ZIrr sigma heta) g,
-      ClassFunction.mapRingEquiv_apply,
-      OddOrder.Algebra.apply_inv_eq_star_of_mem_ZIrr heta g]
-  obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int hphi heta
-  have hsum :
-      ClassFunction.innerSum (ClassFunction.mapRingEquiv sigma phi)
-          (ClassFunction.mapRingEquiv sigma eta) =
-        sigma (ClassFunction.innerSum phi eta) := by
-    rw [ClassFunction.innerSum, ClassFunction.innerSum, map_sum]
-    refine Finset.sum_congr rfl fun g _ => ?_
-    change sigma (phi g) * star (sigma (eta g)) =
-      sigma (phi g * star (eta g))
-    have hg := hstar g
-    change star (sigma (eta g)) = sigma (star (eta g)) at hg
-    rw [hg, map_mul]
-  calc
-    ClassFunction.inner (ClassFunction.mapRingEquiv sigma phi)
-        (ClassFunction.mapRingEquiv sigma eta) =
-        sigma (ClassFunction.inner phi eta) := by
-      rw [ClassFunction.inner, ClassFunction.inner, hsum]
-      have hcoef : sigma (⅟(Nat.card L : Complex)) = ⅟(Nat.card L : Complex) := by
-        simp [invOf_eq_inv, map_inv₀, map_natCast]
-      calc
-        ⅟(Nat.card L : Complex) * sigma (ClassFunction.innerSum phi eta) =
-            sigma (⅟(Nat.card L : Complex)) *
-              sigma (ClassFunction.innerSum phi eta) := by rw [hcoef]
-        _ = sigma (⅟(Nat.card L : Complex) *
-              ClassFunction.innerSum phi eta) := (map_mul sigma _ _).symm
-    _ = ClassFunction.inner phi eta := by rw [hm]; simp
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- The canonical prime-TI anchor `primeTIred 0 = Ind 1` is fixed by every
@@ -80,22 +36,6 @@ theorem primeTIred_zero_mapRingEquiv
   ext x
   simp [ClassFunction.mapRingEquiv_apply, trivialClassFunction_apply]
 
-/-- If a Galois transport changes `φ` only by a correction orthogonal to the
-transported test function, then every integral coefficient of `φ` is unchanged. -/
-theorem inner_eq_intCast_of_mapRingEquiv_eq_add
-    {L : Type*} [Group L] [Fintype L]
-    [Invertible (Nat.card L : ℂ)]
-    (σc : ℂ ≃+* ℂ)
-    {φ η η' correction : ClassFunction L ℂ} (m : ℤ)
-    (hφZ : φ ∈ ZIrr L) (hηZ : η ∈ ZIrr L)
-    (hφ : ClassFunction.mapRingEquiv σc φ = φ + correction)
-    (hη : ClassFunction.mapRingEquiv σc η = η')
-    (hm : ClassFunction.inner φ η = (m : ℂ))
-    (hcorrection : ClassFunction.inner correction η' = 0) :
-    ClassFunction.inner φ η' = (m : ℂ) := by
-  have htransport := inner_mapRingEquiv_eq_of_mem_ZIrr σc hφZ hηZ
-  rw [hφ, hη, ClassFunction.inner_add_left, hcorrection, add_zero, hm] at htransport
-  simpa using htransport
 
 variable {G : Type*} [Group G]
 
@@ -189,7 +129,7 @@ theorem tSideDadeMap_inner_galois_eq_intCast [Finite G]
         (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)
     (horth : ∀ ξ ∈ S, ClassFunction.inner (coh.extension ξ) η' = 0) :
     ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ)) η' = (m : ℂ) := by
-  apply inner_eq_intCast_of_mapRingEquiv_eq_add σc m
+  apply ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add σc m
   · simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
         (tSideDadeSupport_nonempty hG hyp).some.dade

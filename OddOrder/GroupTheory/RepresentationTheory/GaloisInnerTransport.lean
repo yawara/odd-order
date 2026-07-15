@@ -28,7 +28,7 @@ The coefficientwise action of a ring automorphism `σ : ℂ ≃+* ℂ` on class 
 These are the generic halves of the T-side Galois-transport arguments of
 `OddOrder.Peterfalvi.S16` (`TGapGalois.lean`), hoisted to a shared leaf so that the `M`-side
 (11.9.a) row-projection analysis (Peterfalvi §11, issues 1024/9085) can import them without the
-S16 closure; the S16 copies are cite-reducible to these (issue 9085, hub dedup).
+S16 closure; the S16 consumers cite this shared API directly (issue 9085).
 -/
 
 namespace OddOrder.RepresentationTheory.ClassFunction
