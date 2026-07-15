@@ -385,3 +385,21 @@ pins 必須化 (build green)。**残: generic `Hypothesis.nuGridSupply` (Hypothe
 削除で **root #4 除去 + census -1 + 9096 close**。flip の cut-over+retire assembly と同 commit で
 実施が自然 (OrderRelayer は既に flip discharge leaf)。それまで generic decl は残置 (spine は S16
 経由で honest carrier を使うが、a-owned relayer の default 経路が root #4 を保持)。
+
+## ✅ Phase B pt2 / root #4 CLOSED (2026-07-15, A-only Ultra)
+
+A lane が残る flip leaf を canonical supply の明示引数へ切り替え、generic producer を撤去した
+(`796ab950`):
+
+- `Eta10Correction` → `AnalyticRelayer` → `OrderRelayerCore` → `OrderRelayer` の全経路に
+  `pins : NuGridSupplyData hyp` を明示 threading。
+- S16 の全 caller は honest carrier `hyp.nuGridSupply` を渡し、暗黙 default はゼロ。
+- sorried theorem `S15.Hypothesis.nuGridSupply` を削除。row-translation gap のある generic
+  hypothesis から bundle を捏造する API は残していない。
+- grep census は generic producer/default consumer 0。FT 経路上の未証明箇所は既知の
+  root #7 (`T_isTypeP2_gate`) と root #5 (`V_inf_centralizer_Q_eq_bot`) の2本のみ。
+- `AxiomsCheck` に (13.10)–(13.13) Core chain の4 endpoint を登録し、いずれも標準3公理のみ。
+- `lake build OddOrder.AxiomsCheck` green (4218 jobs)、`lake build OddOrder` green (4234 jobs)。
+
+以上で本 issue の close 条件（explicit canonical supply、generic declaration の consumer 0 と
+削除、full build/AxiomsCheck green）を全て満たした。
