@@ -533,7 +533,8 @@ theorem Hypothesis.W1_isKappaHall_S [Finite G] (hG : OddOrder.BG.IsMinimalSimple
 /-- **Fact B (`S`-side): `M_σ(S) ⊓ C_G(W₁) = W₂`** (the (8.4.d) centralizer law for `S`, ungated).
 `⊆`: `M_σ(S) ≤ S'` (`Msigma_le_derived`), then `S' ⊓ C(W₁) = W₂` is the carried datum
 `Sdata.derivedInG_inf_centralizer_W1_eq` (reconciled via `Sdata_W1_eq`/`Sdata_W2_eq`).  `⊇`:
-`W₂ = Sdata.W2 ≤ Sdata.H = M_F(S) = M_σ(S)` (type-II `S`, `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`)
+`W₂ = Sdata.W2 ≤ Sdata.H = M_F(S) ≤ M_σ(S)` (the general
+`maxNilpotentNormalHall_le_Msigma` inclusion)
 and `W₂ ≤ C(W₁)` (`W1_commutes_W2`).  This is the `Kstar = W₂` identification that lets
 `typeP_duality`/`typeP_partner_structure` on `S` output Fact B (`W₁ = M_σ(Mstar) ⊓ C(W₂)`) for the
 partner. -/
@@ -545,18 +546,16 @@ theorem Hypothesis.Msigma_S_inf_centralizer_W1_eq_W2 [Finite G]
     have h := hyp.Sdata.derivedInG_inf_centralizer_W1_eq
     rw [hyp.Sdata_W1_eq, hyp.Sdata_W2_eq] at h
     exact h
-  have hMFeq : maxNilpotentNormalHall hyp.S = OddOrder.BG.Ch3.S10.Msigma hyp.S :=
-    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hyp.S_maximal
-      (Or.inr (OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2))
   refine le_antisymm ?_ (le_inf ?_ ?_)
   · calc OddOrder.BG.Ch3.S10.Msigma hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G)
         ≤ derivedInG hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G) :=
           inf_le_inf_right _ (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.S_maximal)
       _ = hyp.W2 := hSder
-  · rw [← hMFeq]
-    calc hyp.W2 = hyp.Sdata.W2 := hyp.Sdata_W2_eq.symm
+  · calc hyp.W2 = hyp.Sdata.W2 := hyp.Sdata_W2_eq.symm
       _ ≤ hyp.Sdata.H := le_trans hyp.Sdata.W2_le inf_le_left
       _ = maxNilpotentNormalHall hyp.S := hyp.Sdata.H_eq
+      _ ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S :=
+        OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
   · intro y hy
     rw [Subgroup.mem_centralizer_iff]
     intro x hx
@@ -808,9 +807,8 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     -- §13 (`IsTypeII hyp.T` lives in `S16` = import-downstream; see `T_typeII`):
     --   • `hyp.W1 ≤ hyp.Q`: needs `hyp.q ∣ Nat.card ↥hyp.Q`; every route (`card_Q_eq`,
     --     `exists_sylow_coe_eq_Q`, `pgroup_le_of_normal_coprime_index` dualizing `W2_le_P`) requires
-    --     `IsTypeII hyp.T` — `q ∣ |Q|` is provably NOT derivable from `hG`+`hyp` alone.  (The S-side
-    --     `W2_le_P` is likewise NOT type-free: it consumes `|P| = p^q` from `card_P_eq`, which uses
-    --     the *carried* `S_typeP2` field.  `T` has no analogous carrier.)
+    --     `IsTypeII hyp.T` — `q ∣ |Q|` is provably NOT derivable from `hG`+`hyp` alone.  The S-side
+    --     `W2_le_P` instead consumes the type-uniform `|P| = p^q` theorem `card_P_eq`.
     --   • `hyp.W1 ≤ secondDerivedInAmbient hyp.T`: needs the intrinsic identification
     --     `hyp.W1 = tpd.W2 = C_{T'}(W₂#)` for a type-`P` datum `tpd` whose `.W1 = W₂`.  The datum
     --     `d` from `exists_typePData_U_eq_V` only pins `d.U = V`, `d.H = Q` (the Schur–Zassenhaus

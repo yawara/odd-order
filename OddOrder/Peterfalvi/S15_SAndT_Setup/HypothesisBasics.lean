@@ -549,13 +549,43 @@ theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
   rintro φ ⟨χ, -, rfl⟩
   exact ⟨χ, rfl⟩
 
+/-- **Peterfalvi (13.2.a), ordered refinement**: if `q < p`, then `S` is of Type II.
+
+Use the intrinsic κ-Hall factor `Sdata.W1`.  The generic type-`P` bridge identifies the order of
+`M_σ(S) ∩ C_G(Sdata.W1)` with the order of `Sdata.W2`; the carried reconciliations turn the
+hypothesis `q < p` into precisely the strict κ-ordering required by
+`isTypeP2_of_typeP_kappaHall_lt`. -/
+theorem Hypothesis.isTypeII_of_q_lt_p [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hqp : hyp.q < hyp.p) : IsTypeII hyp.S := by
+  have hSP : OddOrder.BG.Ch4.S14.IsTypeP hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.S_maximal hyp.S_nonI
+  letI : IsCyclic ↥hyp.Sdata.W1 := hyp.Sdata.W1_cyclic
+  have hW1hall := OddOrder.Peterfalvi.S12.typePData_W1_isHallSubgroup_kappa
+    hG hyp.S_maximal hSP hyp.Sdata
+  have hbridge := OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2 hG
+    hyp.S_maximal hSP hyp.Sdata.W1_le hW1hall hyp.Sdata
+  have hlt : Nat.card ↥hyp.Sdata.W1 <
+      Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma hyp.S ⊓
+        Subgroup.centralizer (hyp.Sdata.W1 : Set G)) := by
+    rw [hbridge, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq,
+      ← hyp.q_eq_card_W1, ← hyp.p_eq_card_W2]
+    exact hqp
+  have hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.S :=
+    OddOrder.isTypeP2_of_typeP_kappaHall_lt hG hyp.S_maximal hSP hyp.Sdata.W1_le
+      hW1hall rfl hlt
+  exact OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hP2
+
 
 /-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
 
-This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
-from the κ-Hall carrier `S_typeP2` (`isTypeII_of_isTypeP2`), so §11's Wielandt fixed-point order
-relation `typeII_III_IV_order_relations` (Peterfalvi (9.3)) applies to the type-II setup on `S` with
-`typeP := Sdata`, giving `|S_F| = |W₂|^q`.
+This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  By (13.2.a),
+`S` is of Type II or Type III (`isTypeII_or_isTypeIII_of_isTypeNonI`).  In Type II, §11's
+Wielandt fixed-point order relation `typeII_III_IV_order_relations` (Peterfalvi (9.3)) gives
+`|S_F| = |W₂|^q`.  In Type III, Peterfalvi (11.7) gives the same order through
+`card_H_eq_of_base` and the unconditional (11.3) noncoherence theorem; the chosen §12 datum's
+two type-`P` factors are reconciled with the carried `Sdata` by the derived-index identity and
+the generic `|M_σ ∩ C(K)| = |W₂|` bridge.
 
 The one input not derivable from the bare `Hypothesis` fields is the reconciliation `Sdata.W2 = W2`
 between the *intrinsic* type-`P` `W₂` of `S` (`Sdata.W2 = C_{S'}(W₁#)`) and the abstract `W₂`
@@ -567,17 +597,50 @@ its proof.  See issue 3001 for threading it through the carrier (then `basic_str
 theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hSdataW2 : hyp.Sdata.W2 = hyp.W2) :
     Nat.card ↥hyp.P = hyp.p ^ hyp.q := by
-  have hSII : IsTypeII hyp.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
-  -- (9.3) Wielandt order relation for the type-II setup on `S` (`toTypesIIIIIIVSetupS`).
-  have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
-    (hyp.toTypesIIIIIIVSetupS hG)).1 hSII
-  have hord2 : Nat.card ↥hyp.Sdata.H
-      = Nat.card ↥hyp.Sdata.W2 ^ Nat.card ↥hyp.Sdata.W1 := hord.2
-  have hW2card : Nat.card ↥hyp.Sdata.W2 = hyp.p := by
-    rw [hSdataW2, ← hyp.p_eq_card_W2]
-  rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
-  exact hord2
+  rcases OddOrder.Peterfalvi.S13.isTypeII_or_isTypeIII_of_isTypeNonI
+      hG hyp.S_maximal hyp.S_nonI with hSII | hSIII
+  · -- Type II: (9.3) on the carried type-`P` datum.
+    let setup := hyp.toTypesIIIIIIVSetupS hG
+    have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
+      setup).1 hSII
+    have hord2 := hord.2
+    change Nat.card ↥setup.typeP.H =
+      Nat.card ↥setup.typeP.W2 ^ Nat.card ↥setup.typeP.W1 at hord2
+    change Nat.card ↥hyp.Sdata.H =
+      Nat.card ↥hyp.Sdata.W2 ^ Nat.card ↥hyp.Sdata.W1 at hord2
+    have hW2card : Nat.card ↥hyp.Sdata.W2 = hyp.p := by
+      rw [hSdataW2, ← hyp.p_eq_card_W2]
+    rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq,
+      ← hyp.q_eq_card_W1] at hord2
+    exact hord2
+  · -- Type III: (11.7), with the chosen §12 datum reconciled to `Sdata` by intrinsic orders.
+    obtain ⟨base12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG
+      hyp.S_maximal (Or.inl hSIII)
+    have hcard := OddOrder.Peterfalvi.S13.card_H_eq_of_base hG base12 (Or.inl hSIII)
+      (fun s13 => OddOrder.Peterfalvi.S13.S_H0C_not_coherent_unconditional hG s13)
+    have hHP : base12.typeP.H = hyp.P := by
+      rw [base12.typeP.H_eq, ← hyp.P_eq_SF]
+    have hw1 : base12.w1 = hyp.q := by
+      show Nat.card ↥base12.typeP.W1 = hyp.q
+      rw [base12.typeP.card_W1_eq_derived_index,
+        ← hyp.Sdata.card_W1_eq_derived_index, hyp.Sdata_W1_eq,
+        ← hyp.q_eq_card_W1]
+    have hSP : OddOrder.BG.Ch4.S14.IsTypeP hyp.S :=
+      OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI hG hyp.S_maximal hyp.S_nonI
+    letI : IsCyclic ↥hyp.Sdata.W1 := hyp.Sdata.W1_cyclic
+    have hW1hall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+        (OddOrder.BG.Ch4.S14.kappa hyp.S) (hyp.Sdata.W1.subgroupOf hyp.S) :=
+      OddOrder.Peterfalvi.S12.typePData_W1_isHallSubgroup_kappa
+        hG hyp.S_maximal hSP hyp.Sdata
+    have hbase := OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2 hG
+      hyp.S_maximal hSP hyp.Sdata.W1_le hW1hall base12.typeP
+    have hdata := OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2 hG
+      hyp.S_maximal hSP hyp.Sdata.W1_le hW1hall hyp.Sdata
+    have hw2 : base12.w2 = hyp.p := by
+      show Nat.card ↥base12.typeP.W2 = hyp.p
+      rw [← hbase, hdata, hSdataW2, ← hyp.p_eq_card_W2]
+    rw [hHP, hw1, hw2] at hcard
+    exact hcard
 
 /-- **The `S`-instance chief kernel `N` is trivial**: `P = S_F` has order `p^q`
 (`card_P_eq`), and the chief factor `H̄ = P/H₀ ≅ ↥P ⧸ N` already has order `(chief.p)^q`
@@ -1249,28 +1312,24 @@ noncomputable def basic_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSi
 /-- **Peterfalvi (13.2.a--c,e)**: `S` is type II or III, `P` is elementary
 abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset.
 
-The **type determination** (13.2.a) is discharged `sorry`-free from the §16 carrier `S_typeP2`
-(`isTypeII_of_isTypeP2`): `S` is type II, hence the `IsTypeII ∨ IsTypeIII` and `q < p → IsTypeII`
-fields hold with the type-II side.  The remaining `M_F`-structure data (13.2.b,c,e) is read off the
-faithful §16-gated producer `basic_structure_gated`. -/
+The **type determination** (13.2.a) is discharged without the stronger `S_typeP2` carrier:
+`isTypeII_or_isTypeIII_of_isTypeNonI` gives the unconditional alternative, while
+`Hypothesis.isTypeII_of_q_lt_p` applies the genuine κ-ordering theorem when `q < p`.  The
+remaining `M_F`-structure data (13.2.b,c,e) is read off the faithful §16-gated producer
+`basic_structure_gated`. -/
 theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ data : BasicStructureData hyp,
       (IsTypeII hyp.S ∨ IsTypeIII hyp.S) ∧ IsElementaryAbelian hyp.p ↥hyp.P ∧
         Nat.card ↥hyp.P = hyp.p ^ hyp.q ∧
         hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ∧ data.A0S_TI := by
-  -- (13.2.a) type determination: `S` is type II, sorry-free from the carrier `S_typeP2`.
-  have hSII : IsTypeII hyp.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 _hG hyp.S_maximal hyp.S_typeP2
-  -- `U ≠ ⊥`: the carrier `Sdata.U` has the same order as the type-II witness's `typeP.U`
-  -- (`card_U_eq_index = [M' : M_F]`), and the latter is `≠ ⊥` (`TypePNontrivialCore`).
-  have tdata : TypeIIData hyp.S := hSII.some
-  have hSdataUne : hyp.Sdata.U ≠ ⊥ := by
-    intro hbot
-    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
-      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
-    rw [hbot, Subgroup.card_bot] at h1
-    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  -- (13.2.a): the honest II/III alternative; its witness-independent core gives `Sdata.U ≠ ⊥`.
+  have hStype : IsTypeII hyp.S ∨ IsTypeIII hyp.S :=
+    OddOrder.Peterfalvi.S13.isTypeII_or_isTypeIII_of_isTypeNonI
+      _hG hyp.S_maximal hyp.S_nonI
+  let setup := hyp.toTypesIIIIIIVSetupS _hG
+  have hSdataUne := setup.nontrivial.1
+  change hyp.Sdata.U ≠ ⊥ at hSdataUne
   -- (13.2.a) `U W₁` Frobenius: sorry-free from the carrier `Sdata` (`typeP_uW1_frobenius`,
   -- reconciled `Sdata.U = U`, `Sdata.W1 = W1`).
   have hUW1frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
@@ -1280,8 +1339,8 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rwa [hyp.Sdata_U_eq, hyp.Sdata_W1_eq] at h
   -- (13.2.b,c,e) `M_F`-structure: the localized faithful §16 producer.
   let core := basic_structure_gated _hG hyp
-  refine ⟨{ S_typeII_or_typeIII := Or.inl hSII
-            q_lt_p_forces_typeII := fun _ => hSII
+  refine ⟨{ S_typeII_or_typeIII := hStype
+            q_lt_p_forces_typeII := hyp.isTypeII_of_q_lt_p _hG
             U_commutative := core.U_commutative
             UW1_frobenius := hUW1frob
             P_elementaryAbelian := core.P_elementaryAbelian
@@ -1291,34 +1350,6 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             A0S_TI_holds := core.A0S_TI_holds
             tauS_eq_induction := core.tauS_eq_induction
             tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
-  exact ⟨Or.inl hSII, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
-
-/-- **Structural input for Peterfalvi (13.2.d) — ⚠ VESTIGIAL, do not complete as stated**
-(hub ruling 2026-07-02; provenance: closed issues 1004/4014).
-
-The S-side maximal-coherent Dade route (`tauS`/`Sset`/`A0S`) is **off the FT path**: the §13/§16
-contradiction is routed through the W-side grid `eta = tau3 ∘ omega` and the carrier supplies
-`tauS = 0` as a placeholder, so nothing on the spine consumes this witness.  Building it as
-stated would prove an unconsumed S-side statement.  Anyone touching the (13.5)–(13.9) cascade
-must first restate it W-side or retire it — see the 2026-07-02 hub section of
-`notes/peterfalvi/s16_w4_char_cascade.md` (and note (6.8) `S08.sibleySetup_is_coherent` itself
-is already proven; the old "once lane B supplies (6.8)" framing is obsolete). -/
-noncomputable def sibleyTarget_S [Fintype G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
-    [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
-    CoherenceWiring.SibleyTarget hyp.tauS hyp.Sset hyp.A0S := sorry
-
-/-- **Peterfalvi (13.2.d)**: the family `S` is coherent — ⚠ VESTIGIAL endpoint (0 spine cites).
-
-Wired to the proven (6.8) capstone `S08.sibleySetup_is_coherent` through the coherence-wiring
-bridge; the only gap is `sibleyTarget_S`, which is ruled **do-not-complete-as-stated** (see its
-docstring — the spine routes through the W-side `eta` grid, `tauS = 0` placeholder).  Kept for
-statement fidelity to Pf (13.2.d); do not invest proof effort here. -/
-theorem S_coherent [Finite G] [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
-    [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tauS hyp.Sset hyp.A0S) :=
-  CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_S hG hyp)
+  exact ⟨hStype, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
 
 end OddOrder.Peterfalvi.S15
-

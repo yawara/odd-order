@@ -56,7 +56,7 @@ swap が完全対称になり、gate `T_isTypeP2_gate` と hT2 param は消滅�
 | **q_lt_p_forces_typeII field** | HypothesisBasics:1264 (`basic_structure`) | κ-ordering 部品 `isTypeP2_of_typeP_kappaHall_lt` (S13_TypeDetermination、proven) で導出 |
 | **共通 core のみ (typeP/common/U_commutative)** | OrderDetermination:377 (a-owned) / CountingLayer:167,508 (**a-flip まで touch 禁止**) / SAndTBasic:35 / HypothesisBasics:1264 の hSdataUne | `isTypeII_or_isTypeIII_of_isTypeNonI` + 共通 core 射影へ機械置換 (TypeIIIData に同名 field) |
 | **FittingIsTI 結論** | SAndTDefs:172 / Machinery135:1102 / G0Coprime:162 (c-owned) | `fittingIsTI_of_isTypeNonI` へ機械置換 |
-| **IsTypeP のみ (.1 等)** | HonestTypeP2A0 ×5 | `isTypeP_of_isTypeNonI hG S_maximal S_nonI` へ機械置換 |
+| **IsTypeP のみ (.1 等)** | SubcoherenceInputs の Dade/support 群 + HonestTypeP2A0 ×5 | `isTypeP_of_isTypeNonI hG S_maximal S_nonI` へ置換 |
 | **供給側 (field へ入れる側)** | FeitThompson:1352,1482 / FeitThompsonSetup / S13_TypeDetermination:269 / S12_TypeIIGridTranspose:663 (a-owned 含む) | field 削除に伴い供給行を削除 (機械的) |
 
 ### Phase 分割 (file 所有と 0118 hold の制約)
@@ -82,10 +82,52 @@ swap が完全対称になり、gate `T_isTypeP2_gate` と hT2 param は消滅�
   (0118) に Phase 2 の kickoff を組み込むこと (b-5 と同様の gated 項目扱い) を提案。
 - root #4 (`nuGridSupply`) は本 campaign と独立に残る (swap の pins 入力; a-1/9096)。
 
+## Phase 1 実施報告 (lane b, 2026-07-15)
+
+Phase 1 の b-owned direct consumers を `S_typeP2`-free 化した。
+
+- `HypothesisBasics`: carried `Sdata` 上の II/III 共通 setup constructor を追加し、`card_P_eq`
+  を II branch (9.3) / III branch (11.7 + unconditional noncoherence) に分岐した。さらに
+  intrinsic `Sdata.W1` と generic `|M_σ ∩ C(W₁)| = |W₂|` bridge から
+  `Hypothesis.isTypeII_of_q_lt_p` を構成し、`basic_structure.q_lt_p_forces_typeII` を実証明へ
+  付け替えた。
+- `SAndTBasic`: 旧 `isMulCommutative_U` は `S_typeP2` から同じ carried fact を再導出する
+  consumer-one の重複 surface だったため retire。唯一の caller (`S15_Gate3`) は canonical
+  producer が BG 15.1(b) から実構成する `hyp.S_U_commutative` を直接使用する。これにより
+  wrapper を残さず (13.2.a) の genuine supply を保存した。
+- `SAndTDefs.normalizer_W2_le_S` / `Machinery135.H_sharp_isTISubset` は
+  `S13.fittingIsTI_of_isTypeNonI` へ置換した。
+- 先行 landing 済みの M_F=M_σ 3 sites と合わせ、Phase 1 明記対象の direct read はゼロ。
+  残存は Phase 2 の field/swap 自体、a-owned `OrderDetermination`、a-flip hold 中の
+  `CountingLayer`、c-owned sites、および Phase 2 で同時に切り替える supply/support 群のみ。
+
+### Phase 1b: b-owned support/setup consumers (lane b, 2026-07-15)
+
+追加の全数監査で見つかった b-owned support/setup consumers も type-uniform 化した。
+
+- 正本 `toTypesIIIIIIVSetupS` 自体を `S_nonI → IsTypeII S ∨ IsTypeIII S` と
+  `TypePNontrivialCore.transfer` で構成し直し、後段にあった重複 constructor を retire。
+- `Hypothesis.S_isTypeP` (`S_nonI → IsTypeP S`) を共通 API として、`dadeHypS`、`dadeHypS0`、
+  escaping exclusion、`hyp46S` を含む Dade/support supply から `S_typeP2` read を除去。
+- `cprimeSharpS_subset_supportA` は既証明 `cprimeSharpS_eq_empty` から直接従うため、不要な
+  `S_F = S_σ` 同一視を削除。`sSet_member_support_subset_A` は一般に成り立つ包含
+  `S_F ≤ S_σ` へ弱化した。
+- `Msigma_S_inf_centralizer_W1_eq_W2` の逆包含も
+  `W₂ ≤ S_F ≤ S_σ` で証明し、Type II 固有の等式を除去。
+
+この結果、今回監査した b-owned 4 files (`SubcoherenceInputs` / `HypothesisBasics` /
+`PairStructure` / `HonestTypeP2A0`) の `hyp.S_typeP2` read はゼロ。残るコード上の read は
+所有境界どおり `OrderDetermination`、a-flip hold の `CountingLayer`、c-owned files のみ。
+
+検証: 上記 4 files を含む leaf build 4125 jobs green。
+
+検証: `S15_SAndTDefs` + `Machinery135`、`S15_SAndTBasic` + `S15_Gate3` の leaf builds green。
+full `lake build OddOrder` も 4228 jobs で green（AxiomsCheck OK）。
+
 ## 完了条件
 
 - [x] Phase 0: 新部品 2 本 landed (S13_NonGaloisExclusion、build green)
-- [ ] Phase 1: b-owned consumer の S_typeP2-free 化 (各 build green、AxiomsCheck 不変)
+- [x] Phase 1: b-owned consumer の S_typeP2-free 化 (各 build green、AxiomsCheck 不変)
 - [ ] Phase 2: field 削除 + gate/param 削除、`d_eq_one`/`T_caseB_v_eq_full` が
   sorry-free 化 (残 sorryAx = nuGridSupply のみ)、AxiomsCheck assert 追加
 - [ ] issue 2035 の root #7 前半を closed 記録
