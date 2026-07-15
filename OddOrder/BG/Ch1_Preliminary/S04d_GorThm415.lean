@@ -671,7 +671,8 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
           haveI := hcyc
           -- cyclic ⇒ abelian ⇒ `center ↥K = ⊤`, so everything is `≤ center`.
           have hcomm_K : ∀ a b : ↥K, a * b = b * a :=
-            commutative_of_cyclic_center_quotient (MonoidHom.id ↥K) (by simp)
+            (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+              (MonoidHom.id ↥K) (by simp)).is_comm.comm
           have hcenter_top : Subgroup.center ↥K = ⊤ := by
             rw [eq_top_iff]
             intro z _
@@ -1065,8 +1066,9 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
       (QuotientGroup.quotientMulEquivOfEq hf_ker).surjective
   have hE_comm : ∀ a ∈ E, ∀ b ∈ E, a * b = b * a := by
     intro a ha b hb
-    have := commutative_of_cyclic_center_quotient (QuotientGroup.mk' (H.subgroupOf E))
-      (le_trans (le_of_eq (QuotientGroup.ker_mk' _)) hHsub_le_center) ⟨a, ha⟩ ⟨b, hb⟩
+    have := (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+      (QuotientGroup.mk' (H.subgroupOf E))
+      (le_trans (le_of_eq (QuotientGroup.ker_mk' _)) hHsub_le_center)).is_comm.comm ⟨a, ha⟩ ⟨b, hb⟩
     exact congrArg Subtype.val this
   haveI hE_mulcomm : IsMulCommutative ↥E := ⟨⟨fun a b => Subtype.ext (hE_comm a a.2 b b.2)⟩⟩
   -- `E` is elementary abelian (`E ≤ D` exp `p`).

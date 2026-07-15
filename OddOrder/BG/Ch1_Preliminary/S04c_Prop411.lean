@@ -727,8 +727,9 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
     haveI := hcyc
     apply hnc
     intro x y
-    exact commutative_of_cyclic_center_quotient (QuotientGroup.mk' Z)
-      (le_trans (le_of_eq (QuotientGroup.ker_mk' Z)) hZ_le_center) x y
+    exact (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+      (QuotientGroup.mk' Z)
+      (le_trans (le_of_eq (QuotientGroup.ker_mk' Z)) hZ_le_center)).is_comm.comm x y
   -- ⟨STEP 5b⟩ `mk'Z a ≠ 1` (i.e. `a ∉ Z`): else `K = ⟨a,z⟩ = Z`, so `R/Z ≅ R/K` cyclic,
   -- contradicting `R/Z` non-cyclic.
   have haZ_ne : QuotientGroup.mk' Z a ≠ 1 := by

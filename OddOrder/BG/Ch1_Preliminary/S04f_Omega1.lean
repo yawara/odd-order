@@ -749,8 +749,9 @@ theorem center_card_eq_prime_of_noncomm_card_prime_cube
     have hcyc : IsCyclic (G ⧸ Subgroup.center G) := isCyclic_of_prime_card hquot_card
     haveI := hcyc
     have hcomm : ∀ x y : G, x * y = y * x :=
-      commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center G))
-        (le_of_eq (QuotientGroup.ker_mk' (Subgroup.center G)))
+      (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+        (QuotientGroup.mk' (Subgroup.center G))
+        (le_of_eq (QuotientGroup.ker_mk' (Subgroup.center G)))).is_comm.comm
     exact hnoncomm (IsMulCommutative.of_comm hcomm)
   · exfalso
     have hcenter_card_top : Nat.card (Subgroup.center G) = Nat.card G := by
@@ -793,7 +794,8 @@ theorem isExtraspecial_of_noncomm_card_prime_cube_exp_prime
         _ = (p ^ 2) * p := by ring
     exact Nat.eq_of_mul_eq_mul_right hp.pos hmul
   have hquot_comm : ∀ x y : G ⧸ Subgroup.center G, x * y = y * x :=
-    IsPGroup.commutative_of_card_eq_prime_sq (p := p) hquot_center_card
+    isMulCommutative_iff.mp
+      (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hquot_center_card)
   have hcomm_le_center : _root_.commutator G ≤ Subgroup.center G :=
     (Subgroup.Normal.quotient_commutative_iff_commutator_le
       (N := Subgroup.center G)).mp ⟨⟨hquot_comm⟩⟩
@@ -963,7 +965,8 @@ theorem blackburn_noncentral_commutator_isElementaryAbelian
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   have hT_le_S : T ≤ S := hT_facts.2.1.le
   have hT_comm : ∀ x y : T, x * y = y * x :=
-    IsPGroup.commutative_of_card_eq_prime_sq (p := p) hT_facts.2.2
+    isMulCommutative_iff.mp
+      (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hT_facts.2.2)
   refine ⟨hT_comm, ?_⟩
   intro x
   have hxpow : (⟨(x : R), hT_le_S x.2⟩ : S) ^ p = 1 :=

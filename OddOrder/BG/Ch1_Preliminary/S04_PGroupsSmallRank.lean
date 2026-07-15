@@ -663,7 +663,7 @@ hence the `1 ≤ j` hypothesis).
 Proof by strong induction on `|G|`, both `G` and `j` generalised:
 * `Subsingleton G`: class `= 0 ≤ j`.
 * `Nontrivial G`, `j = 1`: `|G| ≤ p²`, so `G` is abelian (order `1`, `p`, or `p²`;
-  the `p²` case is `IsPGroup.commutative_of_card_eq_prime_sq`), giving `Z(G) = ⊤` and
+  the `p²` case is `IsPGroup.isMulCommutative_of_card_eq_prime_sq`), giving `Z(G) = ⊤` and
   `cl(G) ≤ 1`.
 * `Nontrivial G`, `j ≥ 2`: `|Z(G)| = pᵏ` with `k ≥ 1` (`card_center_eq_prime_pow`), so
   `|G/Z| ≤ p^((j-1)+1)`; the inductive hypothesis (on `j - 1 ≥ 1`) gives
@@ -695,7 +695,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
     · -- `j = 1`: `|R'| ≤ p²` ⇒ `R'` abelian ⇒ `cl(R') ≤ 1`.
       have hj_eq : j = 1 := by omega
       subst hj_eq
-      -- `R'` is commutative: `m ∈ {1, 2}` and `commutative_of_card_eq_prime_sq` / cyclic.
+      -- `R'` is commutative: `m ∈ {1, 2}` and `isMulCommutative_of_card_eq_prime_sq` / cyclic.
       have hcomm : ∀ a b : R', a * b = b * a := by
         have hm_le : m ≤ 2 := by
           have hpm : p ^ m ≤ p ^ 2 := by rw [← hm]; exact hcardR'
@@ -709,7 +709,8 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
           obtain ⟨l, rfl⟩ := hg b
           exact zpow_mul_comm g i l
         · -- `|R'| = p²`: commutative.
-          exact IsPGroup.commutative_of_card_eq_prime_sq hm
+          exact isMulCommutative_iff.mp
+            (IsPGroup.isMulCommutative_of_card_eq_prime_sq hm)
       -- `Z(R') = ⊤`, so `upperCentralSeries R' 1 = ⊤`, giving `cl(R') ≤ 1`.
       rw [← Subgroup.upperCentralSeries_eq_top_iff_nilpotencyClass_le, Subgroup.upperCentralSeries_one, eq_top_iff]
       intro z _
@@ -1381,7 +1382,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
   -- `commutator R' ≤ Ω₁(R')` from `R'/Ω₁(R')` abelian (order p²).
   have hcomm_le : _root_.commutator R' ≤ Omega R' p 1 := by
     haveI : IsMulCommutative (R' ⧸ Omega R' p 1) :=
-      IsMulCommutative.of_comm (IsPGroup.commutative_of_card_eq_prime_sq hRΩcard)
+      IsPGroup.isMulCommutative_of_card_eq_prime_sq hRΩcard
     exact (Subgroup.Normal.quotient_commutative_iff_commutator_le).mp ‹_›
   have hpow_hom : ∀ x y : R', (x * y) ^ p = x ^ p * y ^ p := fun x y =>
     pow_mul_eq_mul_pow_of_commutator_le_omega1 hR' hodd (Or.inr ⟨hp3, hc3⟩) hcomm_le x y

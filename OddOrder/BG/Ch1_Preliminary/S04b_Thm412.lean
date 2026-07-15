@@ -44,7 +44,7 @@ Because we assume `[R, A] = R` outright (`actionCommutator φ = ⊤`), the textb
    `X = S`, whence `Ω₁(R/S) = Ω₁(R)·S/S`, of order `|Ω₁(R)| / |Ω₁(S)| = p² / p = p`, so `R/S` is
    cyclic (`isCyclic_of_card_omega1_le_prime` again).
 4. `S ⊆ Z(R)` and `R/S` cyclic ⇒ `R/Z(R)` cyclic ⇒ `R` abelian (Lemma 4.1,
-   `commutative_of_cyclic_center_quotient`).
+   `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`).
 
 ## References
 
@@ -248,8 +248,10 @@ theorem isMulCommutative_of_metacyclic_actionCommutator_eq_top
     exact ⟨QuotientGroup.mk r, by rw [QuotientGroup.map_mk]; rfl⟩
   have hRZ_cyc : IsCyclic (R ⧸ Subgroup.center R) :=
     isCyclic_of_surjective _ hmap_surj
-  exact ⟨⟨commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center R))
-    (le_of_eq (QuotientGroup.ker_mk' (Subgroup.center R)))⟩⟩
+  letI : IsCyclic (R ⧸ Subgroup.center R) := hRZ_cyc
+  exact MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+    (QuotientGroup.mk' (Subgroup.center R))
+    (le_of_eq (QuotientGroup.ker_mk' (Subgroup.center R)))
 
 set_option maxHeartbeats 1000000 in
 -- `actionCommutator_restrict_self_eq_top` (the internal `[T, A] = T`) unifies a deeply nested

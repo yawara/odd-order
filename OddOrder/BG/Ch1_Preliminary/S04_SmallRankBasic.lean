@@ -1276,7 +1276,8 @@ theorem commutator_le_center_of_cyclic_index_prime
       exact Nat.eq_of_mul_eq_mul_left (pow_pos hp_prime.pos _) this
     rw [← Subgroup.index_eq_card]; exact hNidx
   have hquot_comm : ∀ a b : R ⧸ N, a * b = b * a :=
-    IsPGroup.commutative_of_card_eq_prime_sq (p := p) hcard_quot
+    isMulCommutative_iff.mp
+      (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hcard_quot)
   -- `commutator R ≤ N ≤ Z(R)`.
   have hcomm_le_N : _root_.commutator R ≤ N :=
     hN_normal.quotient_commutative_iff_commutator_le.mp ⟨⟨hquot_comm⟩⟩
