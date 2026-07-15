@@ -475,6 +475,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 条件: (i) 純 additive (既存 b 宣言の statement/proof 改変は逸脱)、(ii) sorry/axiom regression なし、
 > (iii) build green。⟹ step 1.5 で a が TSideDegrees に本宣言 (+同 flip cluster の additive 追加) を
 > 足しても逸脱でない (b が編集したら従来どおり b 領域; a が既存 b 宣言を改変したら逸脱)。0116 full flip 完了で失効。
+> **⟹ carve-out 拡張 #2 (hub 裁定 2026-07-15 tick #7、merge `5a29403d`)**: `S15_SAndTDefs.lean` の
+> **(13.16) W2-side c=1 threading** (`U_inf_centralizer_P_eq_bot` / `normalizer_U_inf_W2_eq_bot(_of_data)` /
+> `normalizer_W2_within_S` / `normalizer_W2_structure` / `normalizer_W2` の `_of_c_eq_one` 明示 param 変種
+> 追加 + 旧 signature の compatibility-entry 化) を 0116 full flip 完了まで lane a に限定付与する。同 file は
+> 名目 b territory (S15_SAndT prefix-split) だが、これら (13.16) mid-layer consumer は 0116:112 が
+> full-flip target と明記する on-path 宣言。条件 (全て満たす): (i) **既存 b 宣言の signature を compat entry
+> として温存** (下流無破壊、原名は 1 定義ずつ残存)、(ii) 追加は `_of_c_eq_one` 明示 param 変種のみで
+> 既存 statement/proof の意味不変、(iii) sorry/axiom regression なし、(iv) build green。⟹ step 1.5 で a が
+> S15_SAndTDefs の c=1 threading 系宣言を編集しても逸脱でない (b が編集したら従来どおり b 領域; a が
+> compat entry を壊す・既存 b 宣言の statement を改変したら逸脱)。0116 full flip 完了で失効。
 
 > **🚦 現行 = visit-time trial merge (ユーザー裁定 2026-07-15; tick-wide pre-freeze を置換)**:
 > tick 冒頭で全レーン tip を一括凍結しない。レーンを一つずつ訪問し、未マージがあれば pre-merge
@@ -668,6 +678,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (15分 tick #7、Opus hub) — ★ a: 0116 c=1 threading ((13.16) W2-side + complement)。census 32 不変**:
+  main=`ff9919cc` clean・origin 同期・census 32。**a (visit)** = tip `27c405e9` を trial merge
+  (race なし)、3 feature commit (mu vanishing / W2 normalizer / complement structure、いずれも
+  0116 c-one threading)。各 endpoint 定理を `_of_c_eq_one` (明示 `hc1 : hyp.c = 1` 版) + 旧 signature の
+  **compatibility entry (legacy wrapper)** に分割 = 0116 full-flip の legacy-wrapper 方式そのもの。
+  touched 3 file = OrderDetermination.lean (a 所有、0115 b→a 移管) / S15_ComplementStructure.lean
+  (a 所有、§14 capstone) / S15_SAndTDefs.lean (下記 carve-out)。**全 original 定理 signature を
+  compat entry で温存** (grep 検証: 各原名 1 定義残存 → 下流無破壊)、sorry/axiom 追加 0、census 32→32。
+  **scope**: S15_SAndTDefs.lean は名目 b (S15_SAndT prefix-split) だが (13.16) mid-layer consumer
+  (`U_inf_centralizer_P_eq_bot` 等) は 0116:112 が full-flip target と明記 → **0116 限定 carve-out で保全**
+  (tick #6 と同型、下記拡張)。b 非 active (0 ahead)。merge `5a29403d`、full build/AxiomsCheck
+  **4232 jobs green**。**b** = `main..b` 空 skip。**c** = tree diff 空 skip (HOLD、0116 full-flip landing 待ち)。
+  push `ff9919cc..(hub rec)`。
 - **2026-07-15 (15分 tick #6、Opus hub — 新監視セッション、全レーン codex 運用) — ★ a: 0116 type-II cycle 除去。census 32 不変**:
   ユーザー「各レーンを監視します。各レーンは現在すべて codex で回っています」で監視再開。
   main=`86341340` clean・origin 同期を確認 (`bin/count-sorry` 32)。
