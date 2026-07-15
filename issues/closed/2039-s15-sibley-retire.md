@@ -38,6 +38,6 @@ FT spine の carrier では `tauS = 0` が placeholder であり、Lean 上の�
 
 ## 参照
 
-- issues/0118 b-3
+- issues/closed/0118 b-3
 - issues/closed/1004、issues/closed/4014
 - notes/peterfalvi/s16_w4_char_cascade.md (2026-07-02 hub ruling)

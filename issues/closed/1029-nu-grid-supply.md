@@ -55,6 +55,6 @@ canonical certain-Type-T の全 **grid field** が sorry-free / allowed-axiom-on
 ## 参照
 
 - `issues/9096-b-frontier-gated-direction.md`
-- `issues/2035-char-degree-analysis-producer.md`
+- `issues/closed/2035-char-degree-analysis-producer.md`
 - `OddOrder/FeitThompson.lean`
 - `OddOrder/Peterfalvi/S15_SAndT_Setup/HypothesisSwap.lean`

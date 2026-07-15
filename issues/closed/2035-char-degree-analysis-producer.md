@@ -2838,7 +2838,7 @@ consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (rest
 - **b の次 work (0118 裁定)**: (b-1) #92 δ′ restate-drop の**実装** (裁定のみで未実装と監査確定、
   最優先 — a の flip 開始条件) → (b-2) T_isTypeP2_gate resolution → (b-3) sibleyTarget_S
   restate-or-retire → (b-4) CDS 分割 → (b-5) ν-supply consumer 切替 (a-1 landing 後)。
-  詳細 = issues/0118。
+  詳細 = issues/closed/0118。
 
 ## 2026-07-15 更新 #93 (lane b 再開 iter 1) — b-1 完了: δ′ restate-drop 実装 landed
 
@@ -2856,7 +2856,7 @@ consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (rest
 - build: Machinery135 / EnginesSSide / CharacterDegreeSupply / TTypeII / AxiomsCheck 全 green。
 
 **a 宛 flag: a-2 (0116 full flip) の順序条件 (b-1 landing) 成立** — Core-typed param 化を開始可。
-次 = b-2 (T_isTypeP2_gate resolution、issues/0118)。
+次 = b-2 (T_isTypeP2_gate resolution、issues/closed/0118)。
 
 ## 2026-07-15 更新 #94 (lane b, /loop iter 2) — b-2 裁定: S_typeP2 field 削除 campaign (issue 9103) + Phase 0 landed
 
@@ -2888,3 +2888,16 @@ consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (rest
   `t_side_frobenius_kernel` まで PASS。
 - full `lake build OddOrder` 4234 jobs green。これで root #7 は field の構成可能性を
   保ったまま閉鎖され、循環していた (14.9)-conclusional input は supply chain から消滅した。
+
+## 2026-07-15 更新 #96 — campaign 完了、最終 FT trace clean
+
+- 本 campaign が構築した `exists_muT_index_core` / `exists_etaT_alphaFun_one_int_core`、S/T-side
+  norm machinery、δ restate と symmetric type-P supply は `20a8672e` の full flip で §16 spine に
+  接続され、旧 `character_degree_analysis` carrier は retire 済み。
+- canonical ν-grid threading (`796ab950`) と T-side faithful-action discharge (`cfe33c3e`) まで
+  landing し、campaign 由来の全 downstream root が実構成可能になった。
+- final trace は `S16.nonexistence_of_G`、`BG.AppC.final_contradiction`、
+  `OddOrder.noMinimalSimpleOdd`、`OddOrder.feitThompson` の全てで標準3公理のみ。
+  `OddOrder.AxiomsCheck` と full `OddOrder` build も green。
+
+したがって、character-degree producer campaign は end-to-end consumer への実配線まで完了した。

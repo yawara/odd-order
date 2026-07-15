@@ -55,6 +55,6 @@ upstream の de-opacification は各 owner の既存 issue に残る。
 
 - issues/closed/9102-s-side-galois-field-model.md
 - issues/closed/1038-case-a-final-arithmetic-contradiction.md
-- issues/0116-s15-normestimates-relayer.md
+- issues/closed/0116-s15-normestimates-relayer.md
 - notes/meta/merge_monitor.md tick 59
 - `OddOrder/Peterfalvi/S15_SSideGaloisFieldModel.lean`

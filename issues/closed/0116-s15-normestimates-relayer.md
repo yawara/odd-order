@@ -421,3 +421,20 @@ unrelated な編集は引き続き lane b 所有。0116 full flip 完了で失�
 公理監査では、明示解析不等式から (13.11)–(13.15) へ進む算術 API は axiom-clean。
 Q-side η₁₀ norm bound を通る Core 上位 endpoint は既存 `nuGridSupply` prerequisite の `sorryAx` を継承するが、
 本 range に新規 `sorry` / `axiom` / regression はない。この既存依存は full flip 後続で解消する。
+
+## ✅ 2026-07-15 完了 — Core full flip と legacy relayer 撤去
+
+- `20a8672e` で (13.4)–(13.10) の Core relayer から §16 consumer までを cut-over し、
+  `exists_muT_index` / `exists_etaT_alphaFun_one_int` / `character_degree_analysis` と旧
+  `tSide_theta_package_of_not_caseB` / `lambda_forces_T_caseB` surface を retire した。
+- `796ab950` で generic `Hypothesis.nuGridSupply` を撤去した。現存する
+  `S16.Hypothesis.nuGridSupply` field は FT-layer の proven producer から実構成される canonical
+  carrier であり、旧 free theorem ではない。
+- 後続の `6ec691de` と `cfe33c3e` で asymmetric type-P2 gate と T-side faithful-action root も
+  実供給へ接続され、flip の downstream 全体が閉じた。
+- exact-name audit では上記 legacy root 宣言は `OddOrder/**/*.lean` に残っていない。
+  `OddOrder.feitThompson` の authoritative axiom trace は
+  `[propext, Classical.choice, Quot.sound]` の標準3公理のみ。
+- `lake build OddOrder.AxiomsCheck` (4218 jobs) と full `lake build OddOrder` (4234 jobs) は green。
+
+以上により、本 issue の relayer/flip architecture は honest carrier と実証明で完了した。

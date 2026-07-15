@@ -141,9 +141,9 @@ issue 9096 記載の c-owned S16 call-site rewire 待ち。
 
 ## 完了条件
 
-- [ ] a-1/a-2/a-3、b-1〜b-5、c-1〜c-4 の全項目 landing
-- [ ] `feitThompson` の #print axioms が標準 3 公理のみ (c-4 で判定)
-- [ ] 0116 / 9096 / 9077 / 2035 の各 issue を対応する landing で close
+- [x] a-1/a-2/a-3、b-1〜b-5、c-1〜c-4 の全項目 landing
+- [x] `feitThompson` の #print axioms が標準 3 公理のみ (c-4 で判定)
+- [x] 0116 / 9096 / 9077 / 2035 の各 issue を対応する landing で close
 
 ## 参照
 
@@ -202,3 +202,24 @@ field 削除 + T_isTypeP2_gate 削除) + (9103 Phase 2)** を同時 kickoff。ro
 - **c-2.5 landed** → b-5 Phase B (b が default+generic 削除) kickoff → root #4 除去。
 - **a-2 (0116 flip cut-over+retire) landed** → c-3 (V_inf discharge) + b-2 body + 9103 Phase 2 kickoff。
 - **全 WS 完了** → c-4 最終 axiom trace (diagnostic 前倒し分を本番化)。
+
+## ✅ 2026-07-15 ENDGAME 完了 — 7 dirty roots 全て実供給へ置換
+
+A単独集約後も上記 workstream の論理的な順序を保ち、残項目を serial に完了した。
+
+- root #1/#2/#3 と #7 legacy half: Core full flip `20a8672e`。
+- root #4: canonical ν-grid carrier の consumer cut-over と generic theorem retire
+  (`796ab950`; issue 9096)。
+- root #7 gate half: symmetric swap による `S_typeP2` / `T_isTypeP2_gate` retire
+  (`6ec691de`; issue 9103)。
+- root #5: S16 の T-side case-B facts から faithful-action kernel を実証明し、S15 の過強な
+  generic surface を explicit-`D = ⊥` API に置換 (`cfe33c3e`; issue 9077)。
+- root #6 と BG vestigial cleanup は c-1/c-2 の既記録どおり landing 済み。
+
+c-4 の authoritative trace は、`S16.nonexistence_of_G` → `BG.AppC.final_contradiction` →
+`noMinimalSimpleOdd` → `feitThompson_of_noMinimalSimpleOdd` → `feitThompson` の全段で
+`[propext, Classical.choice, Quot.sound]` の標準3公理のみ。これらを permanent
+`AxiomsCheck` guard に登録し、`lake build OddOrder.AxiomsCheck` (4218 jobs) と full
+`lake build OddOrder` (4234 jobs) が green であることを確認した。
+
+本 issue の FT endgame 3-workstream は完了し、関連 issue 0116 / 9096 / 9077 / 2035 を close する。

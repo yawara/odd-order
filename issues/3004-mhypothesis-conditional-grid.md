@@ -121,7 +121,7 @@ Hub 裁定を main から取り込み、C-owned の faithfulness repair と b la
 ## 参照
 
 - issues/3002-grid-property-carrier-enrichment.md
-- issues/9077-lane-c-frontier-exhausted-reallocation.md
+- issues/closed/9077-lane-c-frontier-exhausted-reallocation.md
 - notes/peterfalvi/s16_nonexistence_gate_map.md
 - Peterfalvi (13.19), (14.10), (14.11.1)--(14.11.2)
 - Coq PFsection13.v:1987-1993, PFsection14.v:173-251, PFsection14.v:884-928

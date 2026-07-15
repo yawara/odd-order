@@ -45,4 +45,4 @@ counting API `IsFrobeniusGroup.card_modEq_one_of_invariant_le_kernel_ambient` „Å
 
 - Peterfalvi (14.6), `references/peterfalvi/04.16_pp_87_92_Non-existence_of_G.mmd`
 - Coq `coq/theories/PFsection14.v`, `chR1H`, `nR1W2y`, `regR1W2y`
-- issues/0116, 1036
+- issues/closed/0116, 1036

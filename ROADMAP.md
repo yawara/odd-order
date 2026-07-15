@@ -4,6 +4,12 @@
 
 有限群論の **Feit-Thompson 定理**「位数が奇数の有限群はすべて可解である」の **Lean 4 による完全形式化**。AI エージェント駆動の長期プロジェクト。
 
+> **FT theorem milestone (2026-07-15)**: `OddOrder.feitThompson` は end-to-end の
+> authoritative axiom trace と permanent `AxiomsCheck` の双方で
+> `[propext, Classical.choice, Quot.sound]` の標準3公理のみに依存する。これは FT 経路の
+> honest carrier / proof spine が完成したことを意味する。3冊の経路外章節・補章まで含む
+> 全文形式化は引き続き長期スコープであり、この milestone と区別する。
+
 ## スコープ: 3 冊を全部形式化する
 
 | 略称 | 書名 | 役割 |
@@ -28,9 +34,9 @@
 | 0 | Lean プロジェクト初期化 (Lean 4.29.1 + mathlib v4.29.1) | ✅ 2026-05-21 |
 | 1 | **Isaacs** Ch.1–10 + Appendix の Lean 化 | 🔄 Ch.1–7 sorry-free 完成 (FT 経路完了; Thm 7.6/7.8 含む 168 flagship axiom-clean)。Ch.8–10 は FT 経路外で保留 |
 | 2a | **BG** Ch.I–IV + 補助 Appendices の Lean 化 | ✅ **FROZEN-COMPLETE (2026-07-02)**: §1–§16 spine + App.A/B/C とも FT が必要とする部分は sorry-free・axiom-clean (spine 消費 = Prop 16.1 のみ)。forward axiom **0 本**。残 15 sorry (S14 2 / S15 2 / S16 3 / AppD 3 / AppE 5) は**全て off-spine 凍結** (overstatement do-not-prove / docstring 消費のみ / 経路外 — [[ft-settled-findings]])。**BG に active frontier は無い** |
-| 2b | **Peterfalvi** 主章 + 補章 の Lean 化 | 🔄 **§3–§9 指標論コア完成** (S03–S08 帯 実 sorry 0、(6.8) Sibley 含む)。**現フロンティア = §9–§16 の実 sorry 74** (3 レーン a/b/c、正本 = `notes/meta/ft_lane_reallocation_2026_06_28.md`)。BG 出力は `S10_BGInterface` bridge 経由で消費 (**ungated** — signature contract 方式)。⚠ (7.10) `card_G0_lower_bound` は **FT 経路上** (theorem88 route が消費、issue 0044 裁定 2026-07-02 = lane a)。〔2026-07-02 更新〕 |
-| 3 | 最終矛盾の結合 (BG App.C ≅ Peterfalvi の対応物) | ✅ **App.C 完全形式化** — `theoremC` / `final_contradiction` sorry-free + axiom-clean。残 carrier producer = `field_normalizer_structure` (Pf §14.2、lane c、issue 4001) |
-| 4 | `FeitThompson` メイン定理ステートメント & 完全結合 | 🔄 **FT 層の配線は完了** — `FeitThompson.lean` 実 sorry **0** (`sectionSixteenHypothesis_of_isMinimalSimpleOdd` は 3-producer flat assembly で sorry-free)。残 obligation は Pf §9–§16 の分散実 sorry 74 に住む。**唯一の bare FT-spine sorry** = `S12.exists_zeta_residual_not_orthogonal` (Pf 11.8)。sorry 計測: `bin/count-sorry` = **115** / comment-strip 実数 = **103** (2026-07-02) |
+| 2b | **Peterfalvi** 主章 + 補章 の Lean 化 | 🔄 **FT 経路 §§3–§16 完成 (2026-07-15)** — §13 character-degree Core、§14 structure、§15–§16 endgame を実供給へ接続し、FT consumer まで axiom-clean。経路外の補章・historical mis-encoding は長期の全文形式化フェーズに残る。 |
+| 3 | 最終矛盾の結合 (BG App.C ≅ Peterfalvi の対応物) | ✅ **App.C 完全形式化** — `theoremC` / `final_contradiction` は sorry-free かつ標準3公理のみ。Pf §16 の `nonexistence_of_G` から実配線済み。 |
+| 4 | `FeitThompson` メイン定理ステートメント & 完全結合 | ✅ **2026-07-15 完成** — `nonexistence_of_G` → `BG.AppC.final_contradiction` → `noMinimalSimpleOdd` → `feitThompson_of_noMinimalSimpleOdd` → `feitThompson` の全段を authoritative trace + permanent `AxiomsCheck` で検証。依存は標準3公理のみ。 |
 
 Phase 2a と 2b は Phase 1 が概ね終わった後、独立に並行進行可。
 

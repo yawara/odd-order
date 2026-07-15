@@ -152,7 +152,8 @@ Phase 2 を commit **`6ec691de`** で完了した。
 
 ## 参照
 
-- issues/0118 (b-2 の割当) / 0116 (Finding 2) / 2035 #82-86 (hT2 弱化 campaign)・#94 (本裁定記録)
+- issues/closed/0118 (b-2 の割当) / closed/0116 (Finding 2) /
+  closed/2035 #82-86 (hT2 弱化 campaign)・#94 (本裁定記録)
 - coq/theories/PFsection14.v:519-530 (`galT`/`oV`) / PFsection13.v:1431 (`FTtypeP_nonGalois_facts`)
 - references/peterfalvi/04.15 (13.1)/(13.2)/(13.13)/(13.15)、04.16 (14.4)/(14.9)
 - 精査レポート: 2 subagent (isTypeII consumer 8 sites、2026-07-15 session b)
