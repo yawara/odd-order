@@ -511,8 +511,9 @@ theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
     χ.isIrreducible x.2 hxkerInd
   simpa using h
 
-/-- **Peterfalvi (13.3.c), the `T`-side signs `δ'_i = 1`** — the δ'-half of the
-`delta_eq_one` field.
+/-- **Peterfalvi (13.3.c), the `T`-side signs `δ'_i = 1`** — formerly the δ′-half of the
+`CharacterDegreeCore.delta_eq_one` field (restate-drop, issue 2035 #92: consumer 0 実測);
+kept as the standing `T`-side supply — T-mirror 消費者が現れたら field として再追加する.
 
 **Assembled** (issue 2035, T-side reopening after the 9096 bundle split): the anchor row is
 the (4.4)-at-`T` base sign (`NuGridSupplyData.deltaPrime_zero_eq_one`); off the anchor it is
@@ -534,8 +535,9 @@ open scoped FiniteInduce in
 /-- **The λ-free core producer** (issue 9094 RULING 案 A): every field of
 `CharacterDegreeCore` from the landed engines — `τ₁ = tau1S_ofHonest` with its five guarded
 field supplies, the (13.3.a) `𝒮₁`-witnessed `μ`-facts (`mu_j_isIndPC_not_ker`,
-`tau1S_ofHonest_mu_col_eta_col_one`), the (13.3.c) signs (`delta_eq_one_S` +
-the ν-gated `deltaPrime_eq_one_T`), and the (13.3.c) column formula
+`tau1S_ofHonest_mu_col_eta_col_one`), the (13.3.c) `S`-side signs (`delta_eq_one_S`; the
+δ′-half is restate-dropped from the field, issue 2035 #92 — supply stays in
+`deltaPrime_eq_one_T`), and the (13.3.c) column formula
 (`tau1S_ofHonest_muColumn_formula`). -/
 noncomputable def Hypothesis.characterDegreeCore [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -563,8 +565,7 @@ noncomputable def Hypothesis.characterDegreeCore [Finite G]
   mu_j_linear_induced := fun j hj => by
     obtain ⟨θ, hθirr, hθ1, hμeq, hθP⟩ := hyp.mu_j_isIndPC_not_ker hG j hj
     exact ⟨θ, hθirr, hθ1, hθP, hμeq⟩
-  delta_eq_one :=
-    ⟨fun j => hyp.delta_eq_one_S hG j, fun i => hyp.deltaPrime_eq_one_T hG i⟩
+  delta_eq_one := fun j => hyp.delta_eq_one_S hG j
   mu_tau1_formula := hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief
 
 /-- **The λ-free core, unconditionally** (issue 9094 RULING 案 A): `CharacterDegreeCore` is

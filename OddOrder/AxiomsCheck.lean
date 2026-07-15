@@ -133,6 +133,7 @@ import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 import OddOrder.Peterfalvi.S15_Tau1T
+import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -8244,3 +8245,13 @@ issue-0116 analytic producer is hidden. -/
   OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S15.sSide_galoisField_repr_of_parameters_and_typeIOverNormalizerData
+
+/-! **Peterfalvi (13.3), the λ-free core** (issue 9094 案 A + issue 2035 #92).
+`CharacterDegreeCore` is inhabited unconditionally: `τ₁ = tau1S_ofHonest` with its five
+guarded field supplies, the (13.3.a) `𝒮₁`-witnessed `μ`-facts, the (13.3.c) `S`-side
+signs `δ_j = 1`, and the (13.3.c) column formula.  The δ′-half of (13.3.c) is
+restate-dropped from the field (consumer 0, issue 2035 #92) with the standing supply kept
+in `deltaPrime_eq_one_T`, so the core producer is axiom-clean without waiting for the
+ν-carrier threading (issue 9096). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.characterDegreeCore_nonempty
