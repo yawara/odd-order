@@ -189,7 +189,8 @@ theorem s_side_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       hG hyp.base
         (hyp.base.c_eq_one_of_lambda_dichotomy hG)
         (fun caseA =>
-          OddOrder.Peterfalvi.S15.caseA_parameters hG hyp.base caseA)
+          hyp.base.caseA_parameters_of_clifford_caseA
+            hG caseA (pins := hyp.nuGridSupply))
         Ldata.typeI_data
 
 /-- **Peterfalvi (14.6)+(13.12), the S-side Frobenius kernel** — `C_{S'}(x) ≤ P` for
