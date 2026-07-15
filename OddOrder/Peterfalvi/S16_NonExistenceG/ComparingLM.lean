@@ -396,7 +396,8 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     obtain ⟨Tdata, hU, hW1, hW2⟩ :=
       OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base
     rcases OddOrder.Peterfalvi.S15.typeI_caseC_dual_dichotomy hG hnoV hyp.base hT2 Tdata
-        hU hW1 hW2 dataL (dataL.zeta 0) hφmem hφdeg with ⟨-, hbound⟩ | ⟨hodd, -⟩
+        hU hW1 hW2 dataL (dataL.zeta 0) hφmem hφdeg (pins := hyp.nuGridSupply) with
+      ⟨-, hbound⟩ | ⟨hodd, -⟩
     · exact absurd hbound (not_le.mpr hub_v)
     · obtain ⟨n, hn_odd, hn_eq⟩ := hodd i (fun h0 => hi (Fin.ext h0))
       have hspec := Classical.choose_spec (betaL_grid_coeff_int hG dataL

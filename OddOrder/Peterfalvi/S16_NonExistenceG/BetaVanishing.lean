@@ -1218,7 +1218,7 @@ theorem exists_typeI_eta_axes_odd_of_caseB_gap
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
   rcases OddOrder.Peterfalvi.S15.typeI_orthogonality_dichotomy_of_c_eq_one_and_d_eq_one
       _hG hnoV hyp.base hc1 hd1 hT2
-      nc.Ldata.L_maximal nc.Ldata.isTypeI with
+      nc.Ldata.L_maximal nc.Ldata.isTypeI (pins := hyp.nuGridSupply) with
     ⟨orth, horth⟩
   exact ⟨orth, typeI_eta_axes_odd_of_caseB_gap orth horth.2.2.2.1 horth.2.2.2.2
     (hH_of_orth orth) (he_of_orth orth) hhv hvu⟩

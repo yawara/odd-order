@@ -68,7 +68,7 @@ theorem exists_LHypothesis [Finite G]
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
   obtain ⟨typeI_data, _, _⟩ :=
     OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one
-      _hG hnoV hyp.base hc1 hd1 ⟨tdata⟩ hTII hT2 hyp.q_lt_p hNUS
+      _hG hnoV hyp.base hc1 hd1 ⟨tdata⟩ hTII hT2 hyp.q_lt_p hNUS (pins := hyp.nuGridSupply)
   exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
     typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩
 

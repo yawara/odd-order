@@ -869,7 +869,7 @@ theorem exists_betaMGridData [Finite G]
   have hd1 : hyp.base.d = 1 := by
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
   exact ⟨OddOrder.Peterfalvi.S15.typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one
-      _hG hnoV hyp.base hc1 hd1 hT2 Mdata.coherent78,
+      _hG hnoV hyp.base hc1 hd1 hT2 Mdata.coherent78 (pins := hyp.nuGridSupply),
     (Classical.choose_spec (OddOrder.Peterfalvi.S15.exists_Sset_apply_one_eq_index _hG hnoV
       Mdata.coherent78.typeIHyp)).1⟩
 

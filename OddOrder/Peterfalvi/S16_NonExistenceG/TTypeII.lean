@@ -197,6 +197,7 @@ theorem T_side_caseB_facts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- the uninhabitable unconditional-λ producer `character_degree_analysis`.
   obtain ⟨hD, hv, _hQ⟩ :=
     OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional hG hyp.base hyp.q_lt_p
+      (pins := hyp.nuGridSupply)
   exact ⟨hD, hv⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
