@@ -2839,3 +2839,21 @@ consumer 0 (grep 実測、field を読む実 code 皆無)、2034 precedent (rest
   最優先 — a の flip 開始条件) → (b-2) T_isTypeP2_gate resolution → (b-3) sibleyTarget_S
   restate-or-retire → (b-4) CDS 分割 → (b-5) ν-supply consumer 切替 (a-1 landing 後)。
   詳細 = issues/0118。
+
+## 2026-07-15 更新 #93 (lane b 再開 iter 1) — b-1 完了: δ′ restate-drop 実装 landed
+
+#92 裁定 (案 a) の実装 (0118 b-1、a-2 flip の順序条件):
+- `CharacterDegreeCore.delta_eq_one` (Machinery135:308): `(∀ j, δ_j = 1) ∧ (∀ i, δ'_i = 1)`
+  → `∀ j, δ_j = 1` (δ′ conjunct 除去、docstring に restate-drop 経緯 + 再追加条件を記録)。
+- `characterDegreeCore` constructor (EnginesSSide:568): `⟨delta_eq_one_S, deltaPrime_eq_one_T⟩`
+  → `delta_eq_one_S` のみ。`deltaPrime_eq_one_T` は standing supply として残存 (theorem 本体
+  無変更、docstring のみ「formerly the δ′-half」に更新)。
+- **AxiomsCheck assert 追加**: `characterDegreeCore_nonempty` — **標準 3 公理のみで PASS 実測**
+  (`#print axioms` probe + `#assert_only_allowed_axioms` build 両方確認)。#92 予測どおり
+  nuGridSupply (9096) を待たず axiom-clean 化。
+- field-access consumer 0 の再確認: `.delta_eq_one` grep → EnginesSSide constructor のみ
+  (Machinery135:185 の conjunctive 版は legacy `CharacterDegreeData` field で a-2 retire 対象、非接触)。
+- build: Machinery135 / EnginesSSide / CharacterDegreeSupply / TTypeII / AxiomsCheck 全 green。
+
+**a 宛 flag: a-2 (0116 full flip) の順序条件 (b-1 landing) 成立** — Core-typed param 化を開始可。
+次 = b-2 (T_isTypeP2_gate resolution、issues/0118)。

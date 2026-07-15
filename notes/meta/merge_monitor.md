@@ -1,6 +1,6 @@
 # main 合流モニター — a/b/c レーン自動合流の運用手順
 
-> 横断運用ドキュメント。**監視ペースは hub のモデルで決まる (ユーザー 2026-07-09 明文化)**: **Fable 使用中 = 30 分間隔 `13,43 * * * *`** (速度考慮) / **Opus 使用中 = 15 分間隔 `7,22,37,52 * * * *`** (:00/:30 回避・均等割り)。履歴: 2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行モデルに対応するペースで**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**監視ペース: 現行 = 20 分間隔 `7,27,47 * * * *` (ユーザー指示 2026-07-15、issue 0118 endgame 体制)**。それ以前はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。履歴: 2026-07-15 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行モデルに対応するペースで**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
@@ -644,6 +644,22 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (20分 tick #1) — ★ a: 0118 a-1 (canonical ν-carrier threading) landed。census 35 不変**:
+  **a=1** (`5da9b274` = `S16.Hypothesis` に `nuGridSupply` carrier field 追加 +
+  `sectionSixteenHypothesis_of_inputs` が Section16Inputs の既証明 10 fields から直接構成 +
+  `sectionSixteenNuGridSupplyData_of_inputs` を carrier projection の薄い readout 化 (9096 設計
+  どおり generic S15.Hypothesis は強化しない)。merge `8a145612`)。**b=0 / c=空 sync merge のみ**。
+  build green 4225 jobs / 1m54s、AxiomsCheck OK、error 0、sorry 増減 0、新 axiom なし、
+  逸脱なし (b-owned consumer file・generic 宣言に非接触と diff 確認)。push 済。
+  **⟹ 0118 flag (a-1 → b-5) 成立 — 9096 に「b-5 (consumer 切替) 開始可」flag 発出**。
+  a の次 = a-2 full flip (b-1 flag は前 tick で発出済み、開始条件成立済)。
+- **2026-07-15 (再設計後 tick, ユーザー指示合流) — ★ b: 0118 b-1 (δ′ restate-drop) landed。census 35 不変**:
+  **b=1** (`fa6fd706` = `CharacterDegreeCore.delta_eq_one` の δ′-half restate-drop (consumer 0
+  実測、供給は `deltaPrime_eq_one_T` に残存) + constructor 調整 + **`characterDegreeCore_nonempty`
+  の AxiomsCheck assert 追加 = axiom-clean 化** (2035 #93)。merge `1e5fb55a`)。
+  build green 4225 jobs / 3m13s、AxiomsCheck 全 assert OK (新 assert 含む)、hard error 0、
+  sorry 増減 0、新 axiom なし、逸脱なし (scope = 想定 3 file + docs)。push 済。
+  **⟹ 0118 順序条件 (b-1 → a-2) 成立 — 0116 に「a-2 (full flip) 開始可」flag 発出**。
 - **2026-07-15 (再設計セッション) — ★★★ 3 レーン再設計 (issue 0118) + b docs 合流。census 35 不変**:
   ユーザー発議「a 完遂 → 3 レーン設計し直し」を受け hub が 3-agent 監査 (wf_54ad9ca3:
   #print axioms probe / on-path census / lane 実装状況) → **issue 0118 裁定**。

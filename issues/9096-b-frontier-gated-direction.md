@@ -210,3 +210,42 @@ Section 16 construction だけが pure ν-grid facts を供給する。
   threading で FT-layer から供給。generic `Hypothesis.nuGridSupply` は row-translation gap ゆえ
   そのまま討伐不能 — carrier 入力 explicit param 形へ restate し、Supply 層 ~8 consumer の切替は
   **b (0118 b-5、a-1 landing 後)**。分担境界と新 signature は本 issue に記録して相互通知。
+
+## ✅ a-1 実施報告 (2026-07-15, lane a) — canonical ν-supply carrier threading landed
+
+issue 0118 (a-1) の carrier/producer 側を実装した。generic `S15.Hypothesis` は強化せず、
+canonical Section 16 context にだけ pure ν-grid package を保持する:
+
+```lean
+structure OddOrder.Peterfalvi.S16.Hypothesis where
+  base : OddOrder.Peterfalvi.S15.Hypothesis (G := G)
+  nuGridSupply :
+    @OddOrder.Peterfalvi.S15.NuGridSupplyData G _ base.finiteG base
+  q_lt_p : base.q < base.p
+```
+
+`sectionSixteenHypothesis_of_inputs` は `Section16Inputs` の既証明 10 fields から
+`nuGridSupply` を直接構成する。既存
+`sectionSixteenNuGridSupplyData_of_inputs` は同 carrier projection を返す薄い readout に整理した。
+したがって `sectionSixteenHypothesis_of_isMinimalSimpleOdd hG` からも
+`.nuGridSupply` が axiom-clean に得られる。
+
+- 検証: `lake build OddOrder.FeitThompson` green (4202 jobs)。
+- 公理監査: `lake build OddOrder.AxiomsCheck` green (4210 jobs); 既存 assertions
+  `sectionSixteenHypothesis_of_inputs` / `sectionSixteenNuGridSupplyData_of_inputs` /
+  `sectionSixteenHypothesis_of_isMinimalSimpleOdd` は全て標準 3 公理のみ。
+- **b-5 handoff**: S15 consumer chain は explicit `pins : NuGridSupplyData hyp` を受ける形へ
+  restate し、c-owned S16 callers が `hyp.nuGridSupply` を渡す。generic sorried theorem
+  `S15.Hypothesis.nuGridSupply` は consumer 0 到達後に retire する。a は b-owned consumer files
+  および同 theorem declaration には触れていない。
+
+本変更で a-1 は完了。9096 全体の close 条件は b-5 consumer rewiring + generic theorem retire。
+
+## 🚩 FLAG (2026-07-15 hub): a-1 landed — **b-5 (S15 consumer 切替) 開始可**
+
+a-1 が landing (`5da9b274`、merge `8a145612`、full build 4225 jobs green + AxiomsCheck OK):
+`S16.Hypothesis.nuGridSupply` carrier field + `sectionSixteenHypothesis_of_inputs` 構成供給が
+main に入った。**b は b-5 を開始してよい**: S15 Supply 層 ~8 consumer を explicit
+`pins : NuGridSupplyData hyp` param 形へ restate し、c-owned S16 caller には `hyp.nuGridSupply`
+を渡す配線を通知 (c への rewire 依頼は 9096 経由で)。generic sorried
+`S15.Hypothesis.nuGridSupply` は consumer 0 到達後に retire (b-5 完了条件)。
