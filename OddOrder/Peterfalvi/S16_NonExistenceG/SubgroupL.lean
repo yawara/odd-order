@@ -18,8 +18,8 @@ open scoped BigOperators
 variable {G : Type*} [Group G]
 
 /-- **(14.7) `hPU_disj` input**: `P ∩ U = 1`.  Since `P` is elementary abelian it
-centralizes itself, so `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` by (13.12) `c = 1`.  Cites the
-(sorried) §13 producers `basic_structure` and `c_eq_one`. -/
+centralizes itself, so `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` by (13.12) `c = 1`, supplied by
+the Core λ-dichotomy endpoint. -/
 theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.base.P ⊓ hyp.base.U = ⊥ := by
@@ -30,12 +30,12 @@ theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Subgroup.le_centralizer (H := hyp.base.P)
   have hC_bot : hyp.base.C = ⊥ := by
     apply Subgroup.eq_bot_of_card_eq
-    rw [← hyp.base.c_eq_card_C, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base]
+    rw [← hyp.base.c_eq_card_C, hyp.base.c_eq_one_of_lambda_dichotomy hG]
   rw [eq_bot_iff, ← hC_bot, hyp.base.C_eq]
   exact le_inf inf_le_right (inf_le_left.trans hP_le_cent)
 
 /-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` exists.  Constructed by
-citing the (14.5)-threaded `S15.typeII_overNormalizer_frobenius` for the
+citing `S15.typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one` for the
 type-I-over-normalizer Frobenius data (`S` is type II by `basic_structure` + (14.1) `q < p`);
 the complement order `|E| = p q` is a field `complement_card_eq_pq` of that data ((14.5) —
 the small (13.17.c) alternative `E = W₁` is excluded there via the (13.19.c) dichotomy under
@@ -62,9 +62,13 @@ theorem exists_LHypothesis [Finite G]
           (P_inf_U_eq_bot _hG hyp)))
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp hTII
+  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy _hG
+  have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts _hG hyp).1
+  have hd1 : hyp.base.d = 1 := by
+    rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
   obtain ⟨typeI_data, _, _⟩ :=
-    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hnoV hyp.base ⟨tdata⟩ hTII hT2
-      hyp.q_lt_p hNUS
+    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one
+      _hG hnoV hyp.base hc1 hd1 ⟨tdata⟩ hTII hT2 hyp.q_lt_p hNUS
   exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
     typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩
 
@@ -209,7 +213,7 @@ theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · obtain ⟨caseA⟩ := hA
     obtain ⟨hq, hu⟩ := OddOrder.Peterfalvi.S15.caseA_parameters _hG hyp.base caseA
     exact (OddOrder.Peterfalvi.S15.caseA_false_of_parameters_and_typeIOverNormalizerData
-      _hG hyp.base caseA (OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base) hq hu
+      _hG hyp.base caseA (hyp.base.c_eq_one_of_lambda_dichotomy _hG) hq hu
       Ldata.typeI_data).elim
   · obtain ⟨caseB⟩ := hB
     let caseB_formula : Prop := Nonempty
@@ -733,7 +737,7 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact ⟨c.2, Subgroup.mem_centralizer_iff.mpr (fun y hy => (hcomm ⟨y, hy⟩).symm)⟩
     have hCbot : hyp.base.C = ⊥ := by
       apply Subgroup.eq_bot_of_card_eq
-      rw [← hyp.base.c_eq_card_C, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base]
+      rw [← hyp.base.c_eq_card_C, hyp.base.c_eq_one_of_lambda_dichotomy hG]
     rw [hCbot, Subgroup.mem_bot] at hmem
     exact Subtype.ext hmem
   obtain ⟨e0, μ, hμinj, hcompat0⟩ :=

@@ -205,10 +205,11 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 subtracting `1_G` and adding `η_{0,#1}` preserves `ZIrr` membership.
 
 This proof deliberately exposes its existing upstream gate: the only non-formal input is
-`S15.betaGrid_A0_support`, whose prime-TI value producer is lane-b's (13.18) frontier. -/
-private theorem sSideGamma_mem_ZIrr [Finite G]
+`S15.betaGrid_A0_support_of_c_eq_one`, with (13.12) threaded explicitly from the Core
+endpoint. -/
+private theorem sSideGamma_mem_ZIrr_of_c_eq_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
+    (hyp : Hypothesis (G := G)) (hc1 : hyp.base.c = 1) :
     OddOrder.Peterfalvi.S15.GammaGrid hG hyp.base ∈ ZIrr G := by
   classical
   let PW1 := (hyp.base.P ⊔ hyp.base.W1).subgroupOf hyp.base.S
@@ -227,7 +228,8 @@ private theorem sSideGamma_mem_ZIrr [Finite G]
     simpa [OddOrder.Peterfalvi.S15.tauSbetaGrid, j] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
         (hyp.base.dadeHypS0 hG) (hyp.base.dadeHypS0_hconj hG)
-        (OddOrder.Peterfalvi.S15.betaGrid_A0_support hG hyp.base j (by simp [j])) hbetaZ)
+        (OddOrder.Peterfalvi.S15.betaGrid_A0_support_of_c_eq_one
+          hG hyp.base hc1 j (by simp [j])) hbetaZ)
   have honeZ : (trivialIrreducibleCharacter G : ClassFunction G ℂ) ∈ ZIrr G :=
     (trivialIrreducibleCharacter G).mem_ZIrr
   have hetaZ : hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j ∈ ZIrr G :=
@@ -326,6 +328,7 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- identification ((3.9)(a) rigidity).  Upstream gates persist only transitively through the cited
   -- sorried lemmas (Type-P₁ `A₀`-normed-TI, (13.18.a) β-support, §11 zero-column projection).
   classical
+  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy hG
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
@@ -449,11 +452,11 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- The genuine (13.18) gap is the concrete `GammaGrid`.  Its virtuality follows from the
   -- supported S-side Dade image; reality and principal orthogonality are the faithful BetaData
   -- fields.  The coherent images are virtual characters by the coherent-extension contract.
-  let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid hG hnoV hyp.base
-    ⟨1, hyp.base.p_prime.one_lt⟩ (by simp)
+  let betaData := OddOrder.Peterfalvi.S15.betaData_of_grid_of_c_eq_one
+    hG hnoV hyp.base hc1 ⟨1, hyp.base.p_prime.one_lt⟩ (by simp)
   have hGammaZ : betaData.Gamma ∈ ZIrr G := by
-    simpa [betaData, OddOrder.Peterfalvi.S15.betaData_of_grid] using
-      (sSideGamma_mem_ZIrr hG hyp)
+    simpa [betaData, OddOrder.Peterfalvi.S15.betaData_of_grid_of_c_eq_one] using
+      (sSideGamma_mem_ZIrr_of_c_eq_one hG hyp hc1)
   have hGammaR : ClassFunction.IsReal betaData.Gamma :=
     betaData.Gamma_real
   have hGamma1 : ClassFunction.inner betaData.Gamma
@@ -698,7 +701,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hcross :
           ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
             (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
-        tSideDadeMap_inner_tauSbetaGrid_eq_zero hG hnoV hyp dataT hP1 hβsupp
+        tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_c_eq_one
+          hG hnoV hyp hc1 dataT hP1 hβsupp
       have hτβeta : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
           (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩
             ⟨1, by have := hyp.base.three_le_p; omega⟩) = 0 := by

@@ -1,5 +1,6 @@
 import OddOrder.Peterfalvi.S16_NonExistenceG.TGapDelta
 import OddOrder.Peterfalvi.S16_GridExpansion
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
 
 /-!
 # Peterfalvi (14.9): assembly of the S/T gap identity
@@ -578,8 +579,31 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.9), unconditional cross-Dade orthogonality.**
 
 The S-side exact support is supplied by the fully proved `(13.18.a)` theorem
-`S15.betaGrid_support`; all group structure, normed-TI, Dade=Ind, and support-separation steps
-are therefore discharged. -/
+`S15.betaGrid_support_of_c_eq_one`, with (13.12) supplied by the upstream Core endpoint
+`Hypothesis.c_eq_one_of_lambda_dichotomy`; all group structure, normed-TI, Dade=Ind, and
+support-separation steps are therefore discharged. -/
+theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_c_eq_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G,
+      M ∈ OddOrder.GroupTheory.maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (hc1 : hyp.base.c = 1)
+    [fintypeG : Fintype G] [invertibleG : Invertible (Nat.card G : ℂ)]
+    (dataT : OddOrder.GroupTheory.TypePData hyp.base.T)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 hyp.base.T)
+    {φ : ClassFunction ↥hyp.base.T ℂ}
+    (hφsupp : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
+    ClassFunction.inner (tSideDadeMap hyp hG φ)
+      (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
+  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support hG hnoV hyp dataT hP1
+    (OddOrder.Peterfalvi.S15.betaGrid_support_of_c_eq_one hG hyp.base
+      hc1
+      ⟨1, by have := hyp.base.three_le_p; omega⟩ (by norm_num))
+    hφsupp
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Compatibility entry point supplied by the upstream Core (13.12) endpoint. -/
 theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G,
@@ -593,10 +617,8 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero [Finite G]
       (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T) :
     ClassFunction.inner (tSideDadeMap hyp hG φ)
       (OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base) = 0 :=
-  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_beta_support hG hnoV hyp dataT hP1
-    (OddOrder.Peterfalvi.S15.betaGrid_support hG hyp.base
-      ⟨1, by have := hyp.base.three_le_p; omega⟩ (by norm_num))
-    hφsupp
+  tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_c_eq_one hG hnoV hyp
+    (hyp.base.c_eq_one_of_lambda_dichotomy hG) dataT hP1 hφsupp
 
 /-- The inner product of two virtual characters is symmetric: its value is
 an integer, hence fixed by complex conjugation. -/

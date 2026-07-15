@@ -75,8 +75,8 @@ given the (14.7) fixed-point-free congruence `u ≡ 1 mod p` (the `W₂^y`-on-`U
 `W₂ ≤ P`, and part (14.2)(b), the field-normalizer data exists.  The value argument
 `u_eq_full_of_caseB_of_u_modEq_one_mod_p` turns `u ≡ 1 mod p` into `u = (p^q-1)/(p-1)` and
 `q ∤ (p-1)` (using the case-(b) certificate `caseB_for_S Ldata`), which then feed
-`field_normalizer_of_U_characteristic_of_inputs`.  Carries no `sorry`; gated only through the §13
-producers (`basic_structure`/`c_eq_one`, via the assembly) and `caseB_for_S` (Lane B). -/
+`field_normalizer_of_U_characteristic_of_inputs`.  The cardinal substitution uses the Core
+λ-dichotomy endpoint for (13.12). -/
 theorem field_normalizer_of_U_characteristic_of_fpf [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp)
@@ -91,7 +91,7 @@ theorem field_normalizer_of_U_characteristic_of_fpf [Finite G]
   obtain ⟨hu_full, hnot_mod⟩ := u_eq_full_of_caseB_of_u_modEq_one_mod_p Sdata hu_mod_p
   -- bridge `|U| = u` via (13.12) `c = 1`
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
-    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base, mul_one]
+    rw [hyp.base.card_U_eq_uc, hyp.base.c_eq_one_of_lambda_dichotomy hG, mul_one]
   have hcyc : Nat.Coprime
       ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) (hyp.base.p - 1) :=
     OddOrder.Peterfalvi.S15.cyclotomic_quotient_coprime_of_not_modEq_one
