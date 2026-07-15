@@ -1273,7 +1273,7 @@ against the unconditional `CharacterDegreeCore`; the no-λ branch is the (Galois
 theorem T_caseB_facts_unconditional [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hqp : hyp.q < hyp.p)
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply hG) :
+    (pins : NuGridSupplyData hyp) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   obtain ⟨core⟩ := hyp.characterDegreeCore_nonempty hG

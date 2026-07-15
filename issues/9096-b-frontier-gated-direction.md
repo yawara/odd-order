@@ -345,3 +345,29 @@ lane c が 6 S16 site の pins rewrite を landing (a-1 honest carrier `(pins :=
    該当 endpoint の #print axioms から消えることを検証 (単なるシャッフルでない ground truth)。
 完了で 9096 close + census −1 (root #4 実除去)。⚠ NormEstimates/CountingLayer は a flip hold 継続ゆえ
 触らない (b-5 Phase B は S15_SAndT/CDS/HypothesisSwap のみ = b-owned・非 hold)。
+
+## 🚧 b-5 Phase B1 (2026-07-15, lane b) — b-owned default 全撤去、残 consumer は a flip
+
+c-2.5 landing を受け、S16 の honest carrier が明示的に渡される境界から一時 default を撤去した。
+Phase A (`c87438fc`) が置いた5箇所に加え、その後 a の (13.12) threading が b-owned
+`S15_SAndT.lean` に追加した4 compatibility entry も explicit
+`pins : NuGridSupplyData hyp` に統一した。したがって b-owned
+`S15_SAndT.lean` / `S15_CharacterDegreeSupply.lean` の generic default consumer はゼロ。
+
+現 main (`b43c13e0`) の全数 grep では generic sorried producer
+`Hypothesis.nuGridSupply` の実 consumer が次の2箇所だけ残る:
+
+1. a flip leaf `S15_CaseBEndgameSupply/OrderRelayer.lean` の
+   `Hypothesis.c_eq_one_of_lambda_dichotomy` optParam default。
+2. a flip leaf `S15_CaseBEndgameSupply/Eta10Correction.lean` の
+   `Hypothesis.exists_caseB_data_eta10_T_core` 内の direct `set pins`。
+
+未合流の a 最新 (`04f5d320`) では `OrderRelayer.lean` の explicit relayer 導入過程で
+同 default が計3 theorem に現れ、`Eta10Correction.lean` と合わせて一時的に4 consumer ある。
+いずれも 0116 full-flip の active leaf で、b-5 kickoff が明示した
+`S15_SAndT/CDS/HypothesisSwap` scope 外。よって generic declaration はまだ consumer 0 でなく、
+本 Phase B1 では削除しない。a の cut-over/legacy-retire がこれらを explicit pins 化または
+retire した landing 後、b が即 `Hypothesis.nuGridSupply` を削除して 9096 を close する。
+
+検証: `lake build OddOrder.Peterfalvi.S15_SAndT
+OddOrder.Peterfalvi.S15_CharacterDegreeSupply` green (4161 jobs)。
