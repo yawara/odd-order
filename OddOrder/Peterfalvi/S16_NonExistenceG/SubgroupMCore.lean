@@ -864,7 +864,7 @@ theorem exists_betaMGridData [Finite G]
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp
       (T_typeII _hG hnoV hncH0C hyp)
   exact ⟨OddOrder.Peterfalvi.S15.typeIOrthogonalityGridData_of_coherent78 _hG hnoV hyp.base hT2
-      Mdata.coherent78,
+      Mdata.coherent78 (pins := hyp.nuGridSupply),
     (Classical.choose_spec (OddOrder.Peterfalvi.S15.exists_Sset_apply_one_eq_index _hG hnoV
       Mdata.coherent78.typeIHyp)).1⟩
 
