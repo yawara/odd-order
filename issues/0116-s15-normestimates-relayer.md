@@ -346,3 +346,17 @@ T-side の book-faithful correction を `CharacterDegreeData` なしで再構成
 **次 frontier**: `OrderDetermination` の三 obtain-site と `CaseBOrder` consumer を、循環を
 作らない明示 analytic-inequality 仮定版へ分離する。下流 supply leaf が Core endpoint で仮定を
 discharge した後、mid-layer/S16 consumer を順次付け替え、legacy wrappers/carrier を retire する。
+
+## ✅ lane a progress (2026-07-15) — order consumers split at the (13.10) boundary
+
+`OrderDetermination`/`CaseBOrder` の算術本体から legacy carrier 依存を切り離した:
+
+- `numeric_bounds_of_analytic_inequality`、`c_eq_one_of_analytic_inequality`、
+  `caseA_parameters_of_analytic_inequality`、`caseB_order_u_of_analytic_inequality` を追加。
+- 四本は (13.10) の strict rational inequality を明示引数に取り、相互の呼出しも明示版だけを使う。
+- 既存名は移行中の互換入口としてのみ残し、各 wrapper 内の一箇所で旧 `analytic_inequality` を
+  unpack する形に縮退。既存 downstream DAG は signature 不変で green。
+
+**次 frontier**: downstream supply leaf で `analytic_inequality_of_caseB_facts` を一度構成し、
+四本の明示版を `CharacterDegreeCore + LambdaClusterData + (hD,hv,hQcomm)` から供給する。
+その API を基点に mid-layer/S16 consumer の param threading を進める。

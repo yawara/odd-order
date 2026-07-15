@@ -516,8 +516,10 @@ concrete value `m_eq` (they need only `p ≥ 3`, supplied by `three_le_p`).  The
 `q = 3` branch uses `p ≠ q` and oddness to get `p ≥ 5`; its `m`-bound is
 `m_value_q_three_gt_49_hundredths`, while the `u/c` bound combines the analytic
 inequality (13.10) with `p² ≤ 3^(p-1)`. -/
-theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
+theorem numeric_bounds_of_analytic_inequality [Finite G]
+    (hyp : Hypothesis (G := G))
+    (h1310 : (hyp.u : ℚ) / (hyp.c : ℚ) >
+      hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ)) :
     (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
       (5 ≤ hyp.q → hyp.m > (7 / 10 : ℚ)) ∧
       (hyp.q = 3 →
@@ -533,7 +535,6 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨k, hk⟩ := hyp.p_odd
     omega
   have hm49 := hyp.m_gt_49_hundredths_of_q_eq_three_of_five_le_p hq3 hp5
-  obtain ⟨_, _, h1310⟩ := analytic_inequality _hG hyp
   rw [hq3] at h1310
   norm_num at h1310
   have hpPow : hyp.p ^ 2 ≤ 3 ^ (hyp.p - 1) :=
@@ -568,6 +569,18 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hid]
     linarith [hfrac]
   exact ⟨hm49, lt_of_le_of_lt hlower h1310⟩
+
+/-- Compatibility entry point for (13.11), supplied by the legacy (13.10) carrier during the
+explicit-inequality migration. -/
+theorem numeric_bounds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
+      (5 ≤ hyp.q → hyp.m > (7 / 10 : ℚ)) ∧
+      (hyp.q = 3 →
+        hyp.m > (49 / 100 : ℚ) ∧
+          (hyp.u : ℚ) / (hyp.c : ℚ) > (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6)) := by
+  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
+  exact numeric_bounds_of_analytic_inequality hyp h1310
 
 /-- **Peterfalvi (13.12), numeric elimination** (04.15 p.85): the (13.10)+(13.2.c) upper bound
 `m < q(p^q − 1)/(c · p^(q−1) · (p − 1))`, together with the fixed-point-free lower bound `c ≥ 2q+1`
@@ -842,8 +855,10 @@ The numeric elimination `c_eq_one_forces_params` — fed the (13.10) analytic in
 `u ≤ (p^q-1)/(p-1)`), the fixed-point-free lower bound `c ≥ 2q+1` (`two_mul_q_dvd_c_pred`), and the
 (13.11) `m`-bounds — forces `p = 5, q = 3, c = 7`, ruled out by the isolated structural residual
 `c_eq_one_final_case`. -/
-theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
+theorem c_eq_one_of_analytic_inequality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (h1310 : (hyp.u : ℚ) / (hyp.c : ℚ) >
+      hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ)) :
     hyp.c = 1 := by
   by_contra hne
   -- `c > 1`; with `2q ∣ c − 1` (`two_mul_q_dvd_c_pred`) this forces `c ≥ 2q + 1`.
@@ -853,7 +868,6 @@ theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2q : 2 * hyp.q ≤ hyp.c - 1 := Nat.le_of_dvd (by omega) (hyp.two_mul_q_dvd_c_pred hG)
     omega
   -- (13.10) analytic inequality: `u/c > m · p^(q-1) / q`.
-  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
   have hWcast : ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) = (hyp.p : ℚ) ^ (hyp.q - 1) := by push_cast; ring
   rw [hWcast] at h1310
   -- (13.2.c) Singer bound: `u ≤ (p^q - 1)/(p - 1)`, hence `u · (p-1) ≤ p^q - 1`.
@@ -888,19 +902,30 @@ theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.m_eq hbound
   exact c_eq_one_final_case hG hyp hp5 hq3 hc7
 
+/-- Compatibility entry point for (13.12), supplied by the legacy (13.10) carrier during the
+explicit-inequality migration. -/
+theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.c = 1 := by
+  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
+  exact c_eq_one_of_analytic_inequality hG hyp h1310
+
 /-- **Peterfalvi (13.13)**: if case (9.7.a) holds for `S`, then
 `q = 3` and `u = (p - 1)^2 / 4`.
 
 The hypothesis is the genuine §11 `CliffordCaseAData` for the `S`-side chief factor.  Its block
 decomposition supplies `u ∣ ((p - 1)/2)^(q - 1)`; (13.10), (13.11), and `c = 1` then feed the
 pure elimination `caseA_numeric_parameters`. -/
-theorem caseA_parameters [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem caseA_parameters_of_analytic_inequality [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
+    (h1310 : (hyp.u : ℚ) / (hyp.c : ℚ) >
+      hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ))
     {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
       (hyp.mkSection11CharacterDataS hG chief)) :
     hyp.q = 3 ∧ hyp.u = (hyp.p - 1) ^ 2 / 4 := by
-  have hc1 := c_eq_one hG hyp
+  have hc1 := c_eq_one_of_analytic_inequality hG hyp h1310
   have hdiv := OddOrder.Peterfalvi.S11.caseA_u_dvd_half_pred_pow hG
     (hyp.mkSection11CharacterDataS hG chief) caseA
   rw [hyp.mkSection11CharacterDataS_u_eq hG chief,
@@ -909,9 +934,9 @@ theorem caseA_parameters [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h := even_iff_two_dvd.mp
       (OddOrder.Peterfalvi.S11.chiefFactor_p_sub_one_even (chief := chief) hG)
     rwa [hyp.chiefFactorS_p_eq hG chief] at h
-  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
-  rw [hc1] at h1310
-  norm_num at h1310
+  have h1310c := h1310
+  rw [hc1] at h1310c
+  norm_num at h1310c
   have h1310' : (hyp.u : ℚ) >
       hyp.m * (((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ)) / (hyp.q : ℚ) := by
     have hpowcast : (((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ)) =
@@ -919,16 +944,27 @@ theorem caseA_parameters [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       push_cast
       ring
     rw [hpowcast]
-    exact h1310
+    exact h1310c
   have h13c : hyp.q = 3 →
       (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6) < (hyp.u : ℚ) := by
     intro hq3
-    obtain ⟨_, _, hnum⟩ := numeric_bounds hG hyp
+    obtain ⟨_, _, hnum⟩ := numeric_bounds_of_analytic_inequality hyp h1310
     have h := (hnum hq3).2
     rw [hc1] at h
     simpa using h
   exact caseA_numeric_parameters hyp.three_le_p hyp.q_prime hyp.q_ne_two hpeven
     hyp.m_gt_seven_tenths_of_five_le_q h13c h1310' hdiv
+
+/-- Compatibility entry point for (13.13), supplied by the legacy (13.10) carrier during the
+explicit-inequality migration. -/
+theorem caseA_parameters [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
+      (hyp.mkSection11CharacterDataS hG chief)) :
+    hyp.q = 3 ∧ hyp.u = (hyp.p - 1) ^ 2 / 4 := by
+  obtain ⟨_, _, h1310⟩ := analytic_inequality hG hyp
+  exact caseA_parameters_of_analytic_inequality hG hyp h1310 caseA
 
 /-- **Peterfalvi (14.6), sharp-parameter Sylow noncyclicity for the `S`-side `U`.**
 At the (13.13) parameters `q = 3` and `u = (p - 1)² / 4`, for every prime
