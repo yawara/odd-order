@@ -21,14 +21,24 @@ created: 2026-07-10
 
 ## やること
 
-- [ ] hub: a の (8.18.b) 供給が一段落したタイミング (または 2000 行接近で即時) で、
-      冒頭の凍結クラスタ (Dade map 定義 + 基本 API 等、a の現 frontier が編集しない部分) を
-      新 leaf へ prefix-split (記述的英語名、内容で命名)
-- [ ] build green + AxiomsCheck OK を確認、a へ issue/notes で通知
+- [x] 冒頭の凍結済み (2.10) Möbius assembly クラスタを、記述的英語名の directory leaf
+      `S04_DadeIsometry/MobiusAssembly.lean` へ prefix-split
+- [x] build green + AxiomsCheck OK を確認し、本 issue に main 統合結果を記録
 
 ## 完了条件
 
 S04_DadeIsometry.lean が 1,500 行未満に戻り、full build green + AxiomsCheck OK。
+
+## 実施記録 (2026-07-15, hub)
+
+- `MobiusAssembly.lean` 597 行を新設し、親 `S04_DadeIsometry.lean` は 1007 行へ縮小。
+  旧 module 名と全 downstream import は不変で、親から新 leaf を import。
+- 分割前後の宣言名 multiset 一致、root closure 到達、`bin/count-sorry` 25 不変、
+  `git diff --check` clean を機械確認。分割境界前に private 宣言なし。
+- focused build `OddOrder.Peterfalvi.S04_DadeIsometry` 成功 (3237 jobs)。
+- `lake build OddOrder OddOrder.AxiomsCheck` 成功 (4235 jobs)。
+  `OddOrder.feitThompson` は allowlist 内の 3 公理のみに依存。
+
 
 ## 参照
 
