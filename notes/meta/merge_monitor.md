@@ -644,6 +644,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (再設計後 tick, ユーザー指示合流) — ★ b: 0118 b-1 (δ′ restate-drop) landed。census 35 不変**:
+  **b=1** (`fa6fd706` = `CharacterDegreeCore.delta_eq_one` の δ′-half restate-drop (consumer 0
+  実測、供給は `deltaPrime_eq_one_T` に残存) + constructor 調整 + **`characterDegreeCore_nonempty`
+  の AxiomsCheck assert 追加 = axiom-clean 化** (2035 #93)。merge `1e5fb55a`)。
+  build green 4225 jobs / 3m13s、AxiomsCheck 全 assert OK (新 assert 含む)、hard error 0、
+  sorry 増減 0、新 axiom なし、逸脱なし (scope = 想定 3 file + docs)。push 済。
+  **⟹ 0118 順序条件 (b-1 → a-2) 成立 — 0116 に「a-2 (full flip) 開始可」flag 発出**。
 - **2026-07-15 (再設計セッション) — ★★★ 3 レーン再設計 (issue 0118) + b docs 合流。census 35 不変**:
   ユーザー発議「a 完遂 → 3 レーン設計し直し」を受け hub が 3-agent 監査 (wf_54ad9ca3:
   #print axioms probe / on-path census / lane 実装状況) → **issue 0118 裁定**。

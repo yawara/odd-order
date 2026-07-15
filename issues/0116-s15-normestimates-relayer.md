@@ -259,3 +259,11 @@ a が free + 同型パターン 3 連続実証 + lane cadence が hub tick よ�
 - **b 宛 anti-collision は継続** (NormEstimates/CountingLayer touch 禁止、相手が hub→a に変わるのみ)。
 - hQcomm 裁量条項 (threading param vs S16 hoist) も a に委譲 (Q_elementaryAbelian_T proven 確認済
   ゆえ hTTypeII thread 推奨)。
+
+## 🚩 FLAG (2026-07-15 hub): b-1 (δ′ restate-drop) landed — **a-2 (full flip) 開始可**
+
+b-1 が landing (`fa6fd706`、merge `1e5fb55a`): `CharacterDegreeCore.delta_eq_one` は S-side
+のみの単文になり (δ′-half は `deltaPrime_eq_one_T` 供給に残存)、`characterDegreeCore_nonempty`
+は **axiom-clean 実測** (AxiomsCheck assert 追加済・green)。0118 の順序条件 (b-1 → a-2) 成立 —
+**lane a は full flip の Core-typed param 化を開始してよい**。obtain-site の core param は
+post-drop の Core 型 (δ′ なし) を基準にすること。
