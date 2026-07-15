@@ -864,7 +864,8 @@ theorem exists_betaMGridData [Finite G]
   have hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.base.T :=
     ((OddOrder.BG.Ch4.S16.proposition_type_classification _hG hyp.base.T_maximal).2.1).mp
       (T_typeII _hG hnoV hncH0C hyp)
-  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy _hG
+  have hc1 : hyp.base.c = 1 :=
+    hyp.base.c_eq_one_of_lambda_dichotomy _hG hyp.nuGridSupply
   have hDbot : hyp.base.D = ⊥ := (T_side_caseB_facts _hG hyp).1
   have hd1 : hyp.base.d = 1 := by
     rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]

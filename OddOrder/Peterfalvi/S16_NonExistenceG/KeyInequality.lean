@@ -91,7 +91,8 @@ theorem field_normalizer_of_U_characteristic_of_fpf [Finite G]
   obtain ⟨hu_full, hnot_mod⟩ := u_eq_full_of_caseB_of_u_modEq_one_mod_p Sdata hu_mod_p
   -- bridge `|U| = u` via (13.12) `c = 1`
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
-    rw [hyp.base.card_U_eq_uc, hyp.base.c_eq_one_of_lambda_dichotomy hG, mul_one]
+    rw [hyp.base.card_U_eq_uc,
+      hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply, mul_one]
   have hcyc : Nat.Coprime
       ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) (hyp.base.p - 1) :=
     OddOrder.Peterfalvi.S15.cyclotomic_quotient_coprime_of_not_modEq_one

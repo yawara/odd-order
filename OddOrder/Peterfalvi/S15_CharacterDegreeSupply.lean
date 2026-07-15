@@ -1203,7 +1203,7 @@ theorem Hypothesis.d_eq_one_of_swapped_lambda_dichotomy [Finite G]
       obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core' lam' pins'
       have hQcomm : IsMulCommutative ↥hyp'.Q :=
         IsMulCommutative.of_comm (hyp'.Q_elementaryAbelian hG).comm
-      exact core'.c_eq_one_of_caseB_facts hG lam' hD hv hQcomm
+      exact core'.c_eq_one_of_caseB_facts hG lam' hD hv hQcomm pins'
     · exact hyp'.c_eq_card_C.trans (Subgroup.card_eq_one.mpr hCbot)
   exact hc1
 
@@ -1241,7 +1241,7 @@ theorem Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy [Finite G]
     have hQcomm : IsMulCommutative ↥hyp'.Q :=
       IsMulCommutative.of_comm (hyp'.Q_elementaryAbelian hG).comm
     obtain ⟨hq3, -⟩ :=
-      core'.caseA_parameters_of_caseB_facts hG lam' hD hv hQcomm caseA
+      core'.caseA_parameters_of_caseB_facts hG lam' hD hv hQcomm pins' caseA
     have hp3 : hyp.p = 3 := hq3
     have h3q : 3 ≤ hyp.q := hyp.three_le_q
     omega
@@ -1261,7 +1261,7 @@ theorem Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy [Finite G]
       obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core' lam' pins'
       have hQcomm : IsMulCommutative ↥hyp'.Q :=
         IsMulCommutative.of_comm (hyp'.Q_elementaryAbelian hG).comm
-      exact (core'.caseB_order_u_of_caseB_facts hG lam' hD hv hQcomm caseB).2 hnotmod
+      exact (core'.caseB_order_u_of_caseB_facts hG lam' hD hv hQcomm pins' caseB).2 hnotmod
     · exact hufull
 
 /-- **The `T`-side (13.4)/(14.4) facts under `q < p`, Core-only form**. -/

@@ -368,7 +368,8 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     have hφdeg : dataL.zeta 0 (1 : ↥L)
         = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
       rw [← hker]; exact dataL.deg0
-    have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy hG
+    have hc1 : hyp.base.c = 1 :=
+      hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply
     rcases OddOrder.Peterfalvi.S15.typeI_caseC_dichotomy_of_c_eq_one
         hG hnoV hyp.base hc1 dataL
         (dataL.zeta 0) hφmem hφdeg with ⟨-, hbound⟩ | ⟨hodd, -⟩
@@ -1124,7 +1125,8 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hu_full := u_final_value _hG hnoV hncH0C hyp nc
   rcases nc.h_modEq_one_mod_p_and_q _hG with ⟨hh_mod_p, hh_mod_q⟩
   have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
-    rw [hyp.base.card_U_eq_uc, hyp.base.c_eq_one_of_lambda_dichotomy _hG, mul_one]
+    rw [hyp.base.card_U_eq_uc,
+      hyp.base.c_eq_one_of_lambda_dichotomy _hG hyp.nuGridSupply, mul_one]
   have hU_le_H : hyp.base.U ≤ nc.Ldata.H := by
     rw [← nc.Ldata.typeI_data_H_eq]
     exact nc.Ldata.typeI_data.U_le_H
@@ -1227,7 +1229,8 @@ theorem base_card_normalizer_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       hyp.base.S_maximal (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _)
       (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal _) hPne
   rw [hNP, ← base_card_S_eq hyp, hyp.base.card_U_eq_uc,
-    hyp.base.c_eq_one_of_lambda_dichotomy hG, mul_one, hyp.base.q_eq_card_W1]
+    hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply, mul_one,
+    hyp.base.q_eq_card_W1]
 
 /-- **Order factorization of the type-`P` maximal `T`** (T-side dual of `base_card_S_eq`):
 `|Q| · |V| · |W₂| = |T|`, from a reconciled `TypePData T` (`tpd.U = V`, `tpd.W1 = W₂`, `Q = T_F`)
@@ -1317,7 +1320,8 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
               (1 : ℝ) - (h78.complementIndex : ℝ) / (h78.kernelOrder : ℝ)
                 ≤ h78.zetaNuRhoNormSq := by
   classical
-  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy hG
+  have hc1 : hyp.base.c = 1 :=
+    hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply
   obtain ⟨M, typeIHyp, hMmax, hnormV, hindexCases⟩ :=
     OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy_of_c_eq_one
       hG hnoV hyp.base hc1 hTII
@@ -1525,7 +1529,8 @@ theorem exists_MHypothesis [Finite G]
     (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
   have hTII : IsTypeII hyp.base.T := T_typeII _hG hnoV hncH0C hyp
-  have hc1 : hyp.base.c = 1 := hyp.base.c_eq_one_of_lambda_dichotomy _hG
+  have hc1 : hyp.base.c = 1 :=
+    hyp.base.c_eq_one_of_lambda_dichotomy _hG hyp.nuGridSupply
   obtain ⟨M, structuralHyp, hM_max, hnorm_V, hindexCases⟩ :=
     OddOrder.Peterfalvi.S15.exists_M_structural_dichotomy_of_c_eq_one
       _hG hnoV hyp.base hc1 hTII

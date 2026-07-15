@@ -206,7 +206,8 @@ distinguished row `ζ`, the `Q`-kernel tail `α`, the point formula on `Q^#`, th
 term `|T'| - v²`, and the `(q^p-1)α(1)²` inflation bound. -/
 theorem Hypothesis.exists_caseB_data_eta10_T_core [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hD : hyp.D = ⊥) (hQcomm : IsMulCommutative ↥hyp.Q) :
+    (hD : hyp.D = ⊥) (hQcomm : IsMulCommutative ↥hyp.Q)
+    (pins : NuGridSupplyData hyp) :
     ∃ (ζ α : ↥hyp.T → ℂ) (α1 δ : ℤ),
       (∀ x : ↥hyp.T, x ∉ hyp.Q.subgroupOf hyp.T → ζ x = 0) ∧
       (∑ x ∈ Finset.univ.filter (· ∈ hyp.Q.subgroupOf hyp.T),
@@ -222,7 +223,6 @@ theorem Hypothesis.exists_caseB_data_eta10_T_core [Finite G]
   have hnoV := OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG
   have hvd : hyp.v * hyp.d ≠ 1 := hyp.vd_ne_one hG
   have hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T := hyp.T_isTypeP hG
-  set pins : NuGridSupplyData hyp := hyp.nuGridSupply hG with hpins
   obtain ⟨Tdata, hU, hW1, hW2⟩ := reconciled_typePData_T hG hyp
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
     (hyp.toTypesIIIIIIVSetupT hG hvd)
@@ -362,12 +362,12 @@ theorem Hypothesis.eta10_Qsharp_norm_lower_core [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hD : hyp.D = ⊥)
     (hv : hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1))
-    (hQcomm : IsMulCommutative ↥hyp.Q) :
+    (hQcomm : IsMulCommutative ↥hyp.Q) (pins : NuGridSupplyData hyp) :
     (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, ‖hyp.eta10 x‖ ^ 2 := by
   classical
   obtain ⟨ζ, α, α1, δ, hvanish, hinner, hχ, hfirstTerm, hcross, hδ, hinfl⟩ :=
-    hyp.exists_caseB_data_eta10_T_core hG hD hQcomm
+    hyp.exists_caseB_data_eta10_T_core hG hD hQcomm pins
   have hQT : hyp.Q ≤ hyp.T := by
     rw [hyp.Q_eq_TF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T

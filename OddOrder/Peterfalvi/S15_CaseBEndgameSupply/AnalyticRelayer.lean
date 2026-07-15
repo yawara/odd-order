@@ -111,7 +111,7 @@ theorem CharacterDegreeCore.analyticEstimate_eta_core [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (core : CharacterDegreeCore hyp)
     (hD : hyp.D = ⊥) (hv : hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1))
-    (hQcomm : IsMulCommutative ↥hyp.Q) :
+    (hQcomm : IsMulCommutative ↥hyp.Q) (pins : NuGridSupplyData hyp) :
     (1 : ℚ) ≥ 1 / (Nat.card G : ℚ)
         + normSqSumQ hyp.G0Finset hyp.eta10 / (Nat.card G : ℚ)
         + ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ)
@@ -126,7 +126,7 @@ theorem CharacterDegreeCore.analyticEstimate_eta_core [Finite G]
   have hone : (1 : ℝ) ≤ ‖hyp.eta10 1‖ ^ 2 :=
     OddOrder.RepresentationTheory.one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one hZ hn
   have hsharpH := core.eta10_Hsharp_norm_lower_core hG
-  have hsharpQ := hyp.eta10_Qsharp_norm_lower_core hG hD hv hQcomm
+  have hsharpQ := hyp.eta10_Qsharp_norm_lower_core hG hD hv hQcomm pins
   have hGal := OddOrder.Algebra.exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed hZ
     hyp.G0Finset_cyclicClosed
   have hspec := normSqSumQ_spec hGal
@@ -515,7 +515,7 @@ theorem CharacterDegreeCore.analyticInequalityEstimates_core [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp)
     (hD : hyp.D = ⊥) (hv : hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1))
-    (hQcomm : IsMulCommutative ↥hyp.Q) :
+    (hQcomm : IsMulCommutative ↥hyp.Q) (pins : NuGridSupplyData hyp) :
     ∃ slam seta g0 HS : ℚ,
       (1 : ℚ) ≥ 1 / (Nat.card G : ℚ) + slam + 1
           - (hyp.u : ℚ) * (hyp.q : ℚ) / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ hyp.q) ∧
@@ -530,7 +530,7 @@ theorem CharacterDegreeCore.analyticInequalityEstimates_core [Finite G]
     (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ),
     ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ),
     core.analyticEstimate_lambda_core hG lam hD hv,
-    core.analyticEstimate_eta_core hG hD hv hQcomm,
+    core.analyticEstimate_eta_core hG hD hv hQcomm pins,
     hyp.analyticCounting_disjointCover_of_caseB_facts hG hD hv,
     core.analyticEstimate_galois_core hG lam⟩
 
@@ -543,11 +543,11 @@ theorem CharacterDegreeCore.analytic_inequality_of_caseB_facts [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp)
     (hD : hyp.D = ⊥) (hv : hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1))
-    (hQcomm : IsMulCommutative ↥hyp.Q) :
+    (hQcomm : IsMulCommutative ↥hyp.Q) (pins : NuGridSupplyData hyp) :
     (hyp.u : ℚ) / (hyp.c : ℚ) >
       hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ) := by
   obtain ⟨slam, seta, g0, HS, h1, h2, h3, h139b⟩ :=
-    core.analyticInequalityEstimates_core hG lam hD hv hQcomm
+    core.analyticInequalityEstimates_core hG lam hD hv hQcomm pins
   have hc0 : 0 < hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
   have hgi : (0 : ℚ) < 1 / (Nat.card G : ℚ) := by
     have : 0 < Nat.card G := Nat.card_pos

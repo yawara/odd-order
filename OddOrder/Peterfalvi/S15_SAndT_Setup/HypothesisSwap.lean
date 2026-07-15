@@ -29,10 +29,11 @@ grounding fields (`mu_orthonormal`, `mu_diff_support`, …): the §4/§6 prime-T
 canonical `nuT` grid are landed in `FeitThompsonNuGrid.lean` (`nuT_orthonormal` /
 `nuT_diff_support` / `nuT_apply_of_not_mem_W1` / `nuT_conj`, … — `mp.certainTypeT hG` is
 already constructed with the factor roles swapped, `W₁ = K*`, `W₂ = K`), so the producer
-discharge is their threading through the FT-layer carrier plus the `hyp.nu ≡ nuT`
-identification at the construction site (a-owned carrier files).  Until that threading lands,
-the supply is the single sorried producer `Hypothesis.nuGridSupply`.  The post-(14.9)
-structural fact `IsMulCommutative ↥V` is *not* in the bundle — see `Hypothesis.swap`'s `hV`.
+is the FT-layer construction of `S16.Hypothesis.nuGridSupply`, where `hyp.nu ≡ nuT` is
+definitionally fixed.  A generic S15 hypothesis cannot manufacture this bundle because its
+`nu_definition` determines only row differences; every consumer therefore receives the
+canonical bundle explicitly.  The structural fact `IsMulCommutative ↥V` is *not* in the
+bundle — see `Hypothesis.swap`'s separate `hV` argument.
 -/
 
 namespace OddOrder.Peterfalvi.S15
@@ -120,18 +121,6 @@ structure NuGridSupplyData [Finite G] (hyp : Hypothesis (G := G)) : Prop where
   /-- **Peterfalvi (4.9.a) at `T`**: CF-level conjugation symmetry `ν̄_{ij} = ν_{−i,−j}`. -/
   nu_conj : ∀ (i : Fin hyp.q) (j : Fin hyp.p),
     (hyp.nu i j).conj = hyp.nu (finNeg hyp.q_prime.pos i) (finNeg hyp.p_prime.pos j)
-
-/-- **The ν-side grid supply, producer obligation**: the `T`-side certain-type facts for the
-abstract `ν`-grid.  Discharge route (issue 2038 iter 26): the FT-layer producer identifies
-`hyp.nu` with the `certainTypeT` grid (`Section16CharacterData.nuT`, roles already swapped:
-`W₁ = K*`, `W₂ = K`) and reads each field off the `T`-instance of the proven `muS_*` supply
-chain — `nuT_orthonormal`/`nuT_diff_support` (via a `hyp46TmpCore` mirror at
-`mp.certainTypeT hG`)/`nuT_apply_of_not_mem_W1`/`nuT_conj` — threaded through the carrier
-structures like the `μ`-side (9081 pattern).  The carrier files are a-owned
-(`FeitThompson{,Setup}.lean`), so the threading is a coordinated field addition with
-constructor supply (precedent: the `S_U_commutative`/`Sdata_W2_eq` additions). -/
-theorem Hypothesis.nuGridSupply [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : NuGridSupplyData hyp := sorry
 
 open scoped FiniteInduce in
 /-- **The S↔T swap of the (13.1) hypothesis** (the Coq re-instantiation of
