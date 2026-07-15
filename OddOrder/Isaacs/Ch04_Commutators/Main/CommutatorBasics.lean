@@ -653,13 +653,14 @@ theorem commutator_top_subgroup_le_commutator (A : Subgroup G) :
 
 (本 statement は前半. 後半 `G' ≅ A / (A ∩ Z(G))` の同型は別途 statement 化予定.)
 
-**証明** (Isaacs p.118): `commutative_of_cyclic_center_quotient` 経由.
+**証明** (Isaacs p.118): `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` 経由.
 - (≥) 部分 = `commutator_top_subgroup_le_commutator` (上記, 仮定不要).
 - (≤) 部分: `Q := G/⁅A, ⊤⁆` が abelian を示す.
   - lift `f : Q →* G/A` (mk' A の lift, 可能なのは `⁅A, ⊤⁆ ≤ A` (Lem 4.3 + A 正規)).
   - `f.ker = image(A) in Q ≤ center(Q)` (`⁅a, g⁆ ∈ ⁅A, ⊤⁆` で Q では `ag = ga`).
   - codomain `G/A` cyclic (hypothesis).
-  - `commutative_of_cyclic_center_quotient` ⇒ Q commutative ⇒ commutator G ≤ ⁅A, ⊤⁆. -/
+  - `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`
+    ⇒ Q commutative ⇒ commutator G ≤ ⁅A, ⊤⁆. -/
 theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
     {A : Subgroup G} [A.Normal] [Finite G]
     (_hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
@@ -1054,7 +1055,7 @@ surjective `f` での `(lcs G n).map f = lcs H n` (旧自前 helper
 `|A ⊓ Z(P)| = p` ⇒ `Group.nilpotencyClass P = 1` (i.e., P abelian, nontrivial).
 
 `|A| = |A ⊓ Z(P)| = p` ⇒ `A ⊆ Z(P)` (両者 ⊆ A で等カード ⇒ 等). P/A cyclic +
-`A ⊆ Z(P)` ⇒ P abelian (`commutative_of_cyclic_center_quotient`). -/
+`A ⊆ Z(P)` ⇒ P abelian (`MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`). -/
 theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prime_card_p
     {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime] (hP : IsPGroup p P)
     {A : Subgroup P} [A.Normal]

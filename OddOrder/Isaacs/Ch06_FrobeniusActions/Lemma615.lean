@@ -72,7 +72,8 @@ private lemma commutator_le_center_of_index_pow_two
   have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
     rw [← Subgroup.index_eq_card]; exact h_idx
   have h_quot_comm : ∀ a b : T ⧸ Subgroup.center T, a * b = b * a :=
-    IsPGroup.commutative_of_card_eq_prime_sq (p := p) h_card_quot
+    isMulCommutative_iff.mp
+      (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) h_card_quot)
   exact hZnorm.quotient_commutative_iff_commutator_le.mp ⟨⟨h_quot_comm⟩⟩
 
 /-- **Step 0 of Lem 6.15**: under the hypothesis `Z(T) ≤ C` and `|T : Z(T)| = p²`, `C` is
@@ -87,7 +88,8 @@ private lemma normal_of_center_le_of_center_index_pow_two
   have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
     rw [← Subgroup.index_eq_card]; exact h_idx
   have hQuot_comm : ∀ a b : T ⧸ Subgroup.center T, a * b = b * a :=
-    IsPGroup.commutative_of_card_eq_prime_sq (p := p) h_card_quot
+    isMulCommutative_iff.mp
+      (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) h_card_quot)
   -- Image of C under the quotient map: C/Z(T) ≤ T/Z(T).
   let C' : Subgroup (T ⧸ Subgroup.center T) := C.map (QuotientGroup.mk' (Subgroup.center T))
   haveI hC'Norm : C'.Normal := by
@@ -135,7 +137,7 @@ theorem quotient_commutator_commutative
 the quotient `T/T'` is not cyclic.
 
 This isolates Isaacs's observation that, once `T' ≤ Z(T)`, cyclicity of `T/T'` would make
-`T` itself abelian by `commutative_of_cyclic_center_quotient`, contradicting
+`T` itself abelian by `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`, contradicting
 `|T : Z(T)| = p²`. -/
 theorem quotient_commutator_not_isCyclic_of_center_index_prime_sq
     {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
@@ -148,7 +150,7 @@ theorem quotient_commutator_not_isCyclic_of_center_index_prime_sq
     rw [QuotientGroup.ker_mk']
     exact commutator_le_center_of_index_pow_two h_idx
   haveI : IsCyclic (T ⧸ _root_.commutator T) := h_cyc
-  exact hxy (commutative_of_cyclic_center_quotient f hker x y)
+  exact hxy ((f.isMulCommutative_of_isCyclic_of_ker_le_center hker).is_comm.comm x y)
 
 /-- **Lem 6.15 `p = 2` setup**: the image of Isaacs's cyclic subgroup `C` in `T/T'`
 is cyclic of index `2`.
@@ -269,8 +271,9 @@ private lemma pow_p_mem_center_of_index_pow_two_odd
     let f : T →* T ⧸ Subgroup.center T := QuotientGroup.mk' (Subgroup.center T)
     have hker : f.ker ≤ Subgroup.center T := by
       rw [QuotientGroup.ker_mk']
+    letI : IsCyclic (T ⧸ Subgroup.center T) := h_cyc
     have h_comm : ∀ a b : T, a * b = b * a :=
-      @commutative_of_cyclic_center_quotient T _ _ _ h_cyc f hker
+      (f.isMulCommutative_of_isCyclic_of_ker_le_center hker).is_comm.comm
     exact hab (h_comm a b)
   -- T/Z(T) of order p² noncyclic ⇒ exponent = p.
   haveI hp_prime : Fact p.Prime := hp
@@ -474,7 +477,7 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
     -- We need: ∀ x y ∈ K, xy = yx; and ∀ x ∈ K, x^p = 1.
     -- The second is by definition of K. The first: K ⊆ Z(T)? No, that's stronger than needed.
     -- Actually: K has order p², so K of prime-square order is abelian (by mathlib
-    -- `IsPGroup.commutative_of_card_eq_prime_sq`).
+    -- `IsPGroup.isMulCommutative_of_card_eq_prime_sq`).
     -- But we need K's order. We have |K| ≥ p² and |K| ≤ p², so |K| = p².
     have h_card_ge : p ^ 2 ≤ Nat.card K :=
       card_setOfPowEqOne_ge_pow_two_of_index_pow_two_odd hp_odd h_idx hC h_commp
@@ -483,7 +486,8 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
     have h_card : Nat.card K = p ^ 2 := le_antisymm h_card_le h_card_ge
     refine ⟨?_, ?_⟩
     · -- commute
-      exact IsPGroup.commutative_of_card_eq_prime_sq (p := p) (G := K) h_card
+      exact isMulCommutative_iff.mp
+        (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) (G := K) h_card)
     · -- ∀ x : K, x^p = 1
       intro x
       apply Subtype.ext

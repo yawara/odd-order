@@ -45,6 +45,17 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
 - focused 検証: 上記 2 modules を対象にした `lake build` 成功
   (2378 jobs)、`lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
 
+- fourth wave: Isaacs Ch.4–6 の 8 code sites と 7 doc references を新 API へ
+  移行し、`OddOrder/Isaacs/**` の対象旧名 4 種をゼロ化。
+- wave 後の raw Lean-source occurrences は
+  `inf_eq_bot_of_coprime` 53、`commutative_of_cyclic_center_quotient` 10、
+  `IsPGroup.commutative_of_card_eq_prime_sq` 6、`Subgroup.normal_of_comm` 6。
+- focused 検証:
+  `lake build OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition OddOrder.Isaacs.Ch06_FrobeniusActions.Lemma615`
+  成功 (2282 jobs)。
+- `lake build OddOrder OddOrder.AxiomsCheck` 成功 (4234 jobs)。
+  `OddOrder.feitThompson` の依存公理は allowlist 内の 3 種のみ。
+
 ## 完了条件
 
 full build green + `has been deprecated` warning が repo 由来 0 件。

@@ -203,7 +203,7 @@ Thm 5.3 の hypothesis weakening (具体的 Z で `p ∣ |Z| → p ∣ |Γ' ∩ 
 Schur multiplier 文脈: Γ = `G` の中心拡大 (`Γ/Z ≅ G`, `Z ≤ Γ' ∩ Z(Γ)`), `Z` の取りうる最大
 群が Schur multiplier `M(G)`. このとき "`p ∣ |M(G)|` ⇒ Sylow_p(`G`) noncyclic" が
 得られる. ここでは前段の Sylow_p(Γ) 非可換のみ実装. (Γ/Z の Sylow noncyclic への
-変換は `Cyclic.commutative_of_cyclic_center_quotient` + `P ∩ Z ≤ Z(P)` 経由で追加可.) -/
+変換は `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` + `P ∩ Z ≤ Z(P)` 経由で追加可.) -/
 theorem not_isMulCommutative_sylow_of_le_commutator_inf_center
     [Finite G] {p : ℕ} [Fact p.Prime] {Z : Subgroup G}
     (hZ : Z ≤ commutator G ⊓ Subgroup.center G)

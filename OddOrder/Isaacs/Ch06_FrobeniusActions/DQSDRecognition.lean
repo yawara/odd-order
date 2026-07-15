@@ -365,7 +365,7 @@ theorem false_of_unique_subgroups_card_two_of_semiDihedral_of_not_isCyclic
 This is the formal version of the first paragraph of the proof of Thm 6.12.  Ch.1 Lemma 1.23
 supplies the normal intermediate subgroup of prime relative index; since `B ≤ C_P(C)`,
 `C` is central in `B`, and the prime quotient `B/C` is cyclic, so `B` is abelian by
-`commutative_of_cyclic_center_quotient`. -/
+`MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`. -/
 theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
     {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
     (hP : IsPGroup p P)
@@ -399,10 +399,10 @@ theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
     isCyclic_of_prime_card h_card_quot
   have hB_comm : ∀ x y : B, x * y = y * x := by
     haveI : IsCyclic (B ⧸ C.subgroupOf B) := h_cyclic_quot
-    exact commutative_of_cyclic_center_quotient
+    exact (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
       (QuotientGroup.mk' (C.subgroupOf B)) (by
         rw [QuotientGroup.ker_mk']
-        exact hC_sub_le_center)
+        exact hC_sub_le_center)).is_comm.comm
   exact ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel, ⟨⟨hB_comm⟩⟩⟩
 
 /-- **Isaacs Thm 6.12 setup**: in a finite group, choose a maximal normal abelian
@@ -666,7 +666,8 @@ theorem center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMul
       rw [QuotientGroup.ker_mk']
       exact le_of_eq hEq.symm
     have hT_comm : ∀ x y : T, x * y = y * x :=
-      commutative_of_cyclic_center_quotient (QuotientGroup.mk' (C.subgroupOf T)) hker_le
+      (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+        (QuotientGroup.mk' (C.subgroupOf T)) hker_le).is_comm.comm
     exact hT_not_comm ⟨⟨hT_comm⟩⟩
   exact lt_of_le_of_ne hZ_le_C hne
 
@@ -1424,7 +1425,8 @@ private lemma two_le_exponent_of_nonabelian_index_two
     rw [h_idx, Nat.card_zpowers, h_order, hk_eq] at h
     omega
   obtain ⟨x, y, hxy⟩ := h_nonab
-  exact hxy (IsPGroup.commutative_of_card_eq_prime_sq (p := 2) hcard x y)
+  exact hxy ((isMulCommutative_iff.mp
+    (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := 2) hcard)) x y)
 
 private lemma commutative_of_index_two_zpowers_of_commute_generator
     {P : Type*} [Group P] (c a : P)
