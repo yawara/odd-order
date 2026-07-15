@@ -409,3 +409,15 @@ Lean 側でその既存 chief-factor spine を束ねた:
 
 **次 frontier**: `C_eq_bot` / `U_inf_centralizer_P_eq_bot` / BridgeCharacter の consumer 鎖を
 `hc1 : c = 1` 明示版へ分離し、この endpoint を S16 側へ thread する。
+
+## HUB RULING (2026-07-15, Codex hub)
+
+Core η₁₀ correction / full-flip relayerに直結する
+`S15_CharacterDegreeEngines.lean` と `S15_SAndT_Setup/DegreesFirstSplit.lean` の proof/API hunk は、
+0116 完了まで lane a の限定 carve-out とする。merge `38054779` の変更は genuine proven output で、
+b の active hunk と非交差、公開旧 API も互換入口として維持されているため保全する。両 file 全体の所有移管ではなく、
+unrelated な編集は引き続き lane b 所有。0116 full flip 完了で失効する。
+
+公理監査では、明示解析不等式から (13.11)–(13.15) へ進む算術 API は axiom-clean。
+Q-side η₁₀ norm bound を通る Core 上位 endpoint は既存 `nuGridSupply` prerequisite の `sorryAx` を継承するが、
+本 range に新規 `sorry` / `axiom` / regression はない。この既存依存は full flip 後続で解消する。
