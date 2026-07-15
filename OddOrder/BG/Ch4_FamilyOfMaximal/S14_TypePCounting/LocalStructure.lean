@@ -196,7 +196,8 @@ theorem centralizer_msigma_isPiSubgroup_kappa_compl [Finite G]
     (Subgroup.le_centralizer_iff.mp (inf_le_right : Kstar ≤ Subgroup.centralizer (K : Set G))).trans
       (Subgroup.centralizer_le_normalizer _)
   have hMσK_bot : OddOrder.BG.Ch3.S10.Msigma M ⊓ K = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    apply Disjoint.eq_bot
+    refine Subgroup.disjoint_of_coprime_natCard (Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
       (π := OddOrder.BG.Ch3.S10.sigma M) Nat.card_pos.ne' Nat.card_pos.ne'
       (fun r hr => OddOrder.BG.Ch3.S10.Msigma_isPiGroup M r hr) (fun r hr => ?_))
     exact kappa_subset_sigmaCompl (hKHall.1 r (by
@@ -361,7 +362,8 @@ theorem centralizer_hall_isPiSubgroup_kappa_compl [Finite G]
       (inf_le_right : Kstar ≤ Subgroup.centralizer (K : Set G))).trans
       (Subgroup.centralizer_le_normalizer _)
   have hMσK_bot : OddOrder.BG.Ch3.S10.Msigma M ⊓ K = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    apply Disjoint.eq_bot
+    refine Subgroup.disjoint_of_coprime_natCard (Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
       (π := OddOrder.BG.Ch3.S10.sigma M) Nat.card_pos.ne' Nat.card_pos.ne'
       (fun r hr => OddOrder.BG.Ch3.S10.Msigma_isPiGroup M r hr) (fun r hr => ?_))
     exact kappa_subset_sigmaCompl (hKHall.1 r (by
@@ -918,7 +920,8 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         by have := congrArg Subtype.val hab; simpa using this⟩
     -- `K ∩ M_σ = ⊥` (`K` is a `κ(M) ⊆ σ(M)'`-group, `M_σ` a `σ(M)`-group).
     have hKMσbot : K ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥ := by
-      refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+      apply Disjoint.eq_bot
+      refine Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)
       intro r hr hrK hrMσ
       have hrκ : r ∈ kappa M := hK.1 r (by
         rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]

@@ -74,6 +74,13 @@ shim は動作継続中のため据え置いた。次回 bump で削除される
   `IsPGroup.commutative_of_card_eq_prime_sq` 0、`Subgroup.normal_of_comm` 5。
 - focused 検証: 上記 12 modules を対象にした `lake build` 成功
   (3154 jobs)。
+- seventh wave: BG Ch.4 §§14–16 の 22 code sites を新 API へ移行し、
+  `OddOrder/BG/Ch4_FamilyOfMaximal/**` の対象旧名 4 種をゼロ化。
+- wave 後の raw Lean-source occurrences は
+  `inf_eq_bot_of_coprime` 8、`commutative_of_cyclic_center_quotient` 3、
+  `IsPGroup.commutative_of_card_eq_prime_sq` 0、`Subgroup.normal_of_comm` 5。
+- focused 検証: 上記 14 modules を対象にした `lake build` 成功
+  (3210 jobs)。
 
 ## 完了条件
 

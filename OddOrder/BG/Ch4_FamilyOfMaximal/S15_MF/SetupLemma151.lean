@@ -795,7 +795,7 @@ theorem typeP_hall_derived_eq_and_abelian [Finite G] (hG : OddOrder.BG.IsMinimal
         have hpMσ : p ∈ (Nat.card ↥(Mσ.subgroupOf M)).primeFactors := by
           rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
         exact hpcompl (Or.inr (hMσHall.1 p hpMσ))
-    exact Subgroup.inf_eq_bot_of_coprime hcop
+    exact (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   -- `U ≤ M'`: `|U|` (a κ'-number) is coprime to `[M:M'] = |K|` (a κ-number).
   have hU_le_M' : U ≤ derivedInG M := by
     have hM'norm : ((derivedInG M).subgroupOf M).Normal := by
@@ -1576,7 +1576,7 @@ theorem typeP_hall_frobenius_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimple
             rwa [Nat.card_congr
               (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
           exact hqcompl (Or.inr (hMσHall.1 q hqMσ))
-      rw [inf_comm]; exact Subgroup.inf_eq_bot_of_coprime hcop
+      rw [inf_comm]; exact (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
     exact frobenius_factor_of_regular_components hG hM hUM hUne hUab hUinf
       (fun p hp => typeP_hall_regular_component_at_prime hG hM hUM hUab hU hp)
 

@@ -269,7 +269,7 @@ theorem typeP2_mf_internal_fitting_decomposition [Finite G]
         have hpMσ : p ∈ (Nat.card ↥(Mσ.subgroupOf M)).primeFactors := by
           rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσ_le_M).toEquiv]
         exact hpcompl (Or.inr (hMσHall.1 p hpMσ))
-    exact Subgroup.inf_eq_bot_of_coprime hcop
+    exact (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   -- `Y := O_{σ'}(F(M))`, the `τ₂`-part of `F(M)`.
   set Y := opiCoreInG σᶜ F with hYdef
   have hY_le_M : Y ≤ M :=

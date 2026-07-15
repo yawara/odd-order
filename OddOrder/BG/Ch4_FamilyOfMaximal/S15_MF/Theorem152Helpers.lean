@@ -1368,7 +1368,7 @@ theorem sylow_le_Msigma_of_le_centralizer_sylow [Finite G]
       have hcop : Nat.Coprime (Nat.card ↥Qbar) (Nat.card ↥A) := by
         rw [hm, Nat.coprime_pow_left_iff (Nat.pos_of_ne_zero hm0)]
         exact (Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hq_ndvd_A
-      exact Subgroup.inf_eq_bot_of_coprime hcop
+      exact (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
     -- `X ≤ C` (from `C = A ⊔ X`).
     have hX_C : X ≤ C := le_sup_right.trans hCeq.ge
     -- Work inside `↥C`, with `a = A∩C`, `x = X∩C`, `Qc = Qbar∩C` as subgroups of `↥C`.

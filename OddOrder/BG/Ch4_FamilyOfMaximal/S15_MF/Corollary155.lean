@@ -1029,9 +1029,9 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (Set.mem_compl_iff _ _).mp (hYpi r hr)
     -- `Y ⊓ A = ⊥` (coprime orders).
     have hY_inf_A : Y ⊓ A = ⊥ :=
-      Subgroup.inf_eq_bot_of_coprime
+      (Subgroup.disjoint_of_coprime_natCard
         ((Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl Nat.card_pos.ne' Nat.card_pos.ne'
-          hA_pi hY_pi').symm)
+          hA_pi hY_pi').symm)).eq_bot
     -- Embed `Y` into the cyclic quotient `C/A` (`C/A` is a quotient image of the cyclic `X`).
     have haxtop : A.subgroupOf C ⊔ X.subgroupOf C = ⊤ := by
       rw [← Subgroup.subgroupOf_sup hA_C hX_C, show A ⊔ X = C from hCeq.symm,

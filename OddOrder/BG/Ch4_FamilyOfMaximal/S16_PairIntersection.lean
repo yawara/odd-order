@@ -96,7 +96,8 @@ theorem typeP_pair_inf_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hσdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.sigma Mstar) :=
     OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hM hMstar hnc
   have hMsigInf : OddOrder.BG.Ch3.S10.Msigma M ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = ⊥ := by
-    apply Subgroup.inf_eq_bot_of_coprime
+    apply Disjoint.eq_bot
+    apply Subgroup.disjoint_of_coprime_natCard
     rw [← Nat.disjoint_primeFactors Nat.card_pos.ne' Nat.card_pos.ne']
     refine Finset.disjoint_left.mpr (fun q hqM hqMstar => ?_)
     exact Set.disjoint_left.mp hσdisj

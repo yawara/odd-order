@@ -852,7 +852,8 @@ theorem typeP_hall_inf_centralizer_kappaElement_eq_bot [Finite G]
     rw [← hCM, ← inf_assoc, inf_eq_left.mpr hUM]
   rw [hstep]
   -- `|U|` and `|K ⊔ K*| = |K|·|K*|` are coprime: `(κ∪σ)'` vs `κ∪σ`.
-  apply Subgroup.inf_eq_bot_of_coprime
+  apply Disjoint.eq_bot
+  apply Subgroup.disjoint_of_coprime_natCard
   have hcard : Nat.card ↥(K ⊔ Kstar) = Nat.card ↥K * Nat.card ↥Kstar :=
     card_kappaHall_sup_Kstar hKM hK hKstar
   refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl

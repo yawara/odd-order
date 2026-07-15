@@ -435,7 +435,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
       exact Ch04.commutator_le_of_le_normalizer hHnHsDq
     -- `M_σ(H) ⊓ Oq = ⊥` (`σ(H)` vs `{q}`, `q ∉ σ(H)`), so `|HsDq| = |M_σ(H)|·|Oq|`.
     have hMsOqbot : OddOrder.BG.Ch3.S10.Msigma H ⊓ Oq = ⊥ := by
-      apply Subgroup.inf_eq_bot_of_coprime
+      apply Disjoint.eq_bot
+      apply Subgroup.disjoint_of_coprime_natCard
       refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := OddOrder.BG.Ch3.S10.sigma H)
         Nat.card_pos.ne' Nat.card_pos.ne' (fun p hp => OddOrder.BG.Ch3.S10.Msigma_isPiGroup H p hp)
         (fun p hp hpσ => ?_)

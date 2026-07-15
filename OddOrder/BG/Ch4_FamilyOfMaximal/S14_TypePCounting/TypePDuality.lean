@@ -943,7 +943,7 @@ theorem typeP_derivedInG_isComplement_kappaHall [Finite G]
           (inf_le_inf_left (derivedInG M) hKleEbar).trans
             (by rw [inf_comm]; exact h'.inf_derivedInG_le_derivedInG)
         have hbot2 : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ⊓ K = ⊥ := by
-          rw [inf_comm]; exact Subgroup.inf_eq_bot_of_coprime hcopKU
+          rw [inf_comm]; exact (Subgroup.disjoint_of_coprime_natCard hcopKU).eq_bot
         exact le_bot_iff.mp ((le_inf (hle1.trans hdEbar.le) inf_le_right).trans hbot2.le)
       -- `M' ⊔ K = M` (`U ⊔ K = Ebar`, `M_σ ⊔ Ebar = M`).
       have hUKsup : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ⊔ K = Ebar := by

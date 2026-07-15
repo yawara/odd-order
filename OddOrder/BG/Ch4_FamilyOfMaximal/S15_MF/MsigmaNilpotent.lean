@@ -375,7 +375,8 @@ theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
     rintro rfl; exact hB hr
   -- `A ⊓ O_{q′} = ⊥` (`q`-group vs `q′`-group).
   have hAO : A ⊓ opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime
+    apply Disjoint.eq_bot
+    refine Subgroup.disjoint_of_coprime_natCard
       (coprime_of_forall_prime_not_dvd (fun r hr hrA hrO => ?_))
     have hrq : r = q := by
       have hπA : Subgroup.IsPiSubgroup ({q} : Set ℕ) A :=

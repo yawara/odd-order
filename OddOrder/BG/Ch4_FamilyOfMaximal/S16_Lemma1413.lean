@@ -217,7 +217,8 @@ theorem kstar_isHall_sigmaM_of_partner [Finite G] (hG : OddOrder.BG.IsMinimalSim
     exact (Subgroup.commutator_mono hKMstarσ le_rfl).trans
       (hcomm_le (hYMstar.trans hMstar_normMσ))
   have hMMdisj : OddOrder.BG.Ch3.S10.Msigma M ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = ⊥ := by
-    apply Subgroup.inf_eq_bot_of_coprime
+    apply Disjoint.eq_bot
+    apply Subgroup.disjoint_of_coprime_natCard
     refine coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl
       (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M) (fun r hr => ?_)
     exact fun hrM => Set.disjoint_left.mp

@@ -108,7 +108,7 @@ theorem kappaHall_inf_Kstar_eq_bot [Finite G] {M K Kstar : Subgroup G} (hKM : K 
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     K ⊓ Kstar = ⊥ :=
-  Subgroup.inf_eq_bot_of_coprime (coprime_card_kappaHall_Kstar hKM hK hKstar)
+  (Subgroup.disjoint_of_coprime_natCard (coprime_card_kappaHall_Kstar hKM hK hKstar)).eq_bot
 
 /-- **BG 14.7, `K*` centralizes `K`**: every element of `K` commutes with every element of
 `K* = C_{M_σ}(K)` (which lies in `C_G(K)`). -/
@@ -454,7 +454,8 @@ theorem typeP_swap_Z_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact le_inf (hXiCXstar.trans (Subgroup.centralizer_le_normalizer _))
       (hXiMiσ.trans (OddOrder.BG.Ch3.S10.Msigma_le Mi))
   have hKiMσbot : Ki ⊓ OddOrder.BG.Ch3.S10.Msigma Mi = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    apply Disjoint.eq_bot
+    refine Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)
     intro r hr hrKi hrMσ
     exact (kappaHall_isPiSubgroup_sigmaCompl hKiMi hKi r
         (Nat.mem_primeFactors.mpr ⟨hr, hrKi, Nat.card_pos.ne'⟩))
@@ -641,7 +642,8 @@ theorem typeP_neighbor_Kstar_eq_Z_inf_Msigma [Finite G]
   refine le_antisymm (le_inf (hZeq ▸ le_sup_right) inf_le_left) ?_
   rw [hZeq]
   have hKNMσbot : KN ⊓ OddOrder.BG.Ch3.S10.Msigma N = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    apply Disjoint.eq_bot
+    refine Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)
     intro r hr hrKN hrMσ
     exact (kappaHall_isPiSubgroup_sigmaCompl hKNN hKN r
         (Nat.mem_primeFactors.mpr ⟨hr, hrKN, Nat.card_pos.ne'⟩))
@@ -835,7 +837,8 @@ theorem typeP_family_nonconjugate [Finite G]
   have hcommK₁Z₁ : ∀ x ∈ K₁, ∀ y ∈ Z₁, Commute x y := fun x hx y hy =>
     Subgroup.mem_centralizer_iff.mp (hZ₁CK₁ hy) x hx
   have hdisjK₁Z₁ : K₁ ⊓ Z₁ = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    apply Disjoint.eq_bot
+    refine Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)
     intro r hr hrK₁ hrZ₁
     exact kappaHall_isPiSubgroup_sigmaCompl hK₁M₁ hK₁ r
         (Nat.mem_primeFactors.mpr ⟨hr, hrK₁, Nat.card_pos.ne'⟩)
@@ -1097,7 +1100,8 @@ theorem typeP_family_Kstar_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   have hnc := typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU hN₁ hN₂ hne
   have hσdisj := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hN₁max hN₂max hnc
   have hMσdisj : OddOrder.BG.Ch3.S10.Msigma N₁ ⊓ OddOrder.BG.Ch3.S10.Msigma N₂ = ⊥ := by
-    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    apply Disjoint.eq_bot
+    refine Subgroup.disjoint_of_coprime_natCard (coprime_of_forall_prime_not_dvd ?_)
     intro r hr hr₁ hr₂
     exact Set.disjoint_left.mp hσdisj
       (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₁ r

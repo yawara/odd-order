@@ -150,7 +150,7 @@ theorem isPiElementCompl_mem_left_of_commute [Finite G] {A B Z : Subgroup G} {π
     intro p hp hpA hpB
     exact (hAπc p (Nat.mem_primeFactors.mpr ⟨hp, hpA, Nat.card_pos.ne'⟩))
       (hBπ p (Nat.mem_primeFactors.mpr ⟨hp, hpB, Nat.card_pos.ne'⟩))
-  have hdisj : A ⊓ B = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hdisj : A ⊓ B = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   have hnorm : Z ≤ Subgroup.normalizer (A : Set G) := by
     rw [hswap]; exact (sup_le_normalizer_inf_of_commute hcent).trans inf_le_left
   haveI hAnZ : (A.subgroupOf Z).Normal :=
@@ -1020,7 +1020,7 @@ theorem isPiSubgroup_le_left_of_commute [Finite G] {A B Z L : Subgroup G} {π : 
     intro p hp hpA hpB
     exact (hAπc p (Nat.mem_primeFactors.mpr ⟨hp, hpA, Nat.card_pos.ne'⟩))
       (hBπ p (Nat.mem_primeFactors.mpr ⟨hp, hpB, Nat.card_pos.ne'⟩))
-  have hdisj : A ⊓ B = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hdisj : A ⊓ B = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   have hnorm : Z ≤ Subgroup.normalizer (A : Set G) := by
     rw [hswap]; exact (sup_le_normalizer_inf_of_commute hcent).trans inf_le_left
   haveI hAnZ : (A.subgroupOf Z).Normal :=

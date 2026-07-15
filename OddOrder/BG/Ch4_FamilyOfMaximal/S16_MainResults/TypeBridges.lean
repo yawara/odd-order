@@ -920,7 +920,7 @@ theorem typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived [Finite G
   have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N) := by
     rw [hk, hNcard]
     exact Nat.Coprime.pow_left k ((hq.coprime_iff_not_dvd).mpr hndvd)
-  have hAN : A ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hAN : A ⊓ N = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   -- `A` injects into the cyclic `↥M ⧸ N`.
   set φ : ↥A →* (↥M ⧸ N) := (QuotientGroup.mk' N).comp A.subtype with hφ
   have hφinj : Function.Injective φ := by
