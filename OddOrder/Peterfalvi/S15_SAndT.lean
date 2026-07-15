@@ -878,7 +878,7 @@ theorem typeI_caseC_dual_dichotomy_of_d_eq_one [Finite G]
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ dataL.typeIHyp.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     (OddIntegerInner (tauTbetaGrid _hG hyp hT2.1 Tdata) (dataL.coh.extension φ) ∧
       (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
           / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
@@ -905,7 +905,7 @@ theorem typeI_caseC_dual_dichotomy [Finite G]
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     (φ : ClassFunction ↥L ℂ) (_hφ : φ ∈ dataL.typeIHyp.Sset)
     (_hdeg : φ 1 = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ))
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     (OddIntegerInner (tauTbetaGrid _hG hyp hT2.1 Tdata) (dataL.coh.extension φ) ∧
       (((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)
           / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
@@ -934,7 +934,7 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_
     (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) (hd1 : hyp.d = 1)
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     TypeIOrthogonalityGridData hyp dataL :=
   { e := ((maxNilpotentNormalHall L).subgroupOf L).index
     e_eq_index := rfl
@@ -996,7 +996,7 @@ noncomputable def typeIOrthogonalityGridData_of_coherent78 [Finite G]
     (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {L : Subgroup G} (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     TypeIOrthogonalityGridData hyp dataL := by
   exact typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one
     _hG hnoV hyp (c_eq_one _hG hyp) (legacy_d_eq_one _hG hyp hT2 pins)
@@ -1025,7 +1025,7 @@ theorem typeI_orthogonality_dichotomy_of_c_eq_one_and_d_eq_one [Finite G]
     (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) (hd1 : hyp.d = 1)
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     ∃ data : TypeIOrthogonalityData hyp L,
       data.disjoint_support ∧ data.Ltau_orthogonal_eta ∧
         data.betaL_eta_independent ∧
@@ -1090,7 +1090,7 @@ theorem typeI_orthogonality_dichotomy [Finite G]
     (hyp : Hypothesis (G := G))
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     ∃ data : TypeIOrthogonalityData hyp L,
       data.disjoint_support ∧ data.Ltau_orthogonal_eta ∧
         data.betaL_eta_independent ∧
@@ -1401,7 +1401,7 @@ theorem typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one [Finite G]
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hqp : hyp.q < hyp.p)
     (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     ∃ data : TypeIOverNormalizerData hyp,
       data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) := by
   obtain ⟨L, hLmax, hLtypeI, hNUL, hUH⟩ :=
@@ -1421,7 +1421,7 @@ theorem typeII_overNormalizer_frobenius [Finite G]
     (hT2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T)
     (hqp : hyp.q < hyp.p)
     (hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S)
-    (pins : NuGridSupplyData hyp := hyp.nuGridSupply _hG) :
+    (pins : NuGridSupplyData hyp) :
     ∃ data : TypeIOverNormalizerData hyp,
       data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) :=
   typeII_overNormalizer_frobenius_of_c_eq_one_and_d_eq_one _hG hnoV hyp
