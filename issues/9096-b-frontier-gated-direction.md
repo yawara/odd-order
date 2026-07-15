@@ -240,3 +240,12 @@ structure OddOrder.Peterfalvi.S16.Hypothesis where
   および同 theorem declaration には触れていない。
 
 本変更で a-1 は完了。9096 全体の close 条件は b-5 consumer rewiring + generic theorem retire。
+
+## 🚩 FLAG (2026-07-15 hub): a-1 landed — **b-5 (S15 consumer 切替) 開始可**
+
+a-1 が landing (`5da9b274`、merge `8a145612`、full build 4225 jobs green + AxiomsCheck OK):
+`S16.Hypothesis.nuGridSupply` carrier field + `sectionSixteenHypothesis_of_inputs` 構成供給が
+main に入った。**b は b-5 を開始してよい**: S15 Supply 層 ~8 consumer を explicit
+`pins : NuGridSupplyData hyp` param 形へ restate し、c-owned S16 caller には `hyp.nuGridSupply`
+を渡す配線を通知 (c への rewire 依頼は 9096 経由で)。generic sorried
+`S15.Hypothesis.nuGridSupply` は consumer 0 到達後に retire (b-5 完了条件)。

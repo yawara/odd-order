@@ -644,6 +644,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (20分 tick #1) — ★ a: 0118 a-1 (canonical ν-carrier threading) landed。census 35 不変**:
+  **a=1** (`5da9b274` = `S16.Hypothesis` に `nuGridSupply` carrier field 追加 +
+  `sectionSixteenHypothesis_of_inputs` が Section16Inputs の既証明 10 fields から直接構成 +
+  `sectionSixteenNuGridSupplyData_of_inputs` を carrier projection の薄い readout 化 (9096 設計
+  どおり generic S15.Hypothesis は強化しない)。merge `8a145612`)。**b=0 / c=空 sync merge のみ**。
+  build green 4225 jobs / 1m54s、AxiomsCheck OK、error 0、sorry 増減 0、新 axiom なし、
+  逸脱なし (b-owned consumer file・generic 宣言に非接触と diff 確認)。push 済。
+  **⟹ 0118 flag (a-1 → b-5) 成立 — 9096 に「b-5 (consumer 切替) 開始可」flag 発出**。
+  a の次 = a-2 full flip (b-1 flag は前 tick で発出済み、開始条件成立済)。
 - **2026-07-15 (再設計後 tick, ユーザー指示合流) — ★ b: 0118 b-1 (δ′ restate-drop) landed。census 35 不変**:
   **b=1** (`fa6fd706` = `CharacterDegreeCore.delta_eq_one` の δ′-half restate-drop (consumer 0
   実測、供給は `deltaPrime_eq_one_T` に残存) + constructor 調整 + **`characterDegreeCore_nonempty`
