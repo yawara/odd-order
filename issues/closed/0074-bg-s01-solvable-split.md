@@ -39,3 +39,5 @@ S01_Solvable.lean が ≤1,500 行の topic-coherent な複数ファイルに分
 - merge_monitor サイズ watch: notes/meta/merge_monitor.md step 4
 - 同種 (frontier 系) の S08/S15 split: issues/0073 (S08 cluster), issues/0071 (S15_MF)
 - 検出 commit: 69c51ef7 (Merge 'lane-f' S15 Thm 15.2 step 3)
+
+## ✅ CLOSED (hub 裁定 2026-07-15 tick #8): S01_Solvable 1426行 (<1500), split 完了 (sibling S01_FrattiniBurnside)。実施 owner=hub の split 完了確認済。

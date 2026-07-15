@@ -35,3 +35,5 @@ CLAUDE.md 粒度規約の **1500 行 watch 閾値**超過 (2000 行 hard 上限�
 - CLAUDE.md「ファイル粒度」(2026-07-09 節: 1500 watch / 2000 hard / dir 化第一)
 - 同型 deferred split issue = 0110 (S13_CoreStructure)、0111 (S15_SAndT、closed)
 - issue 1017 (b の (9.11) S-instance campaign)、merge 26bf4190 (1689 行到達)
+
+## ✅ CLOSED (hub 裁定 2026-07-15 tick #8): HypothesisBasics 1355行 (<1500), 閾値未満。実施 owner=hub の split 完了確認済。
