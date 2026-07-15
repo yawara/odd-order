@@ -683,6 +683,20 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #9、Opus hub — ユーザー「Cが進んだからマージして」) — ★★ a flip S16 cut-over + c: 9096 c-2.5 landing (conflict 解決)。census 32 不変**:
+  main=`47584c84` clean・census 32。a=9 ahead / c=7 ahead (b=0)。**a と c が S16 files を両方編集** (overlap =
+  SubgroupL/TTypeII) = tick #8 の 9096 裁定で予見した調整点。
+  **a (visit)** = `f36cf7eb` を merge `0f3f8167`: 0116 flip の **S16 cut-over** (legacy `S15.c_eq_one` →
+  honest `c_eq_one_of_lambda_dichotomy`、(14.5) boundary theorem を `_of_c_eq_one(_and_d_eq_one)` へ
+  threading + compat entry 温存)。c 所有 S16 files (SubgroupL/TTypeII/TGapCross/KeyInequality) への
+  proof-only rewire は **flip carve-out で保全** (statement 不変・compat entry 温存)。build 4232 green。
+  **c (visit)** = `a5c35ee7` を merge `570d3aad`: **9096 c-2.5** (tick #8 割当) = 6 S16 site に honest
+  carrier `(pins := hyp.nuGridSupply)` を配線。**conflict 1 件** (SubgroupL exists_LHypothesis: a の
+  `typeII_overNormalizer_frobenius` リネーム vs c の pins) を hub が両立解決 (a 新名 call + c honest pins、
+  theorem が両パラメータ受理・型整合確認)。他 5 file auto-merge。build 4232 green・AxiomsCheck OK・census 32→32
+  (root #4 の generic sorry 除去は次の b-5 Phase B = b が generic decl 削除で完了)。**b** = 0 ahead skip。
+  push `47584c84..570d3aad`。**landing-flag 発火 (tick #8 chain)**: **c-2.5 landed → b-5 Phase B 解禁**
+  (b は 5 optParam default + generic `S15.Hypothesis.nuGridSupply` 削除で root #4 除去可 — 9096 に kickoff flag)。
 - **2026-07-15 (tick #8、Opus hub — ユーザー要請「B/C block + 役割 + 全 HUB 裁定」) — ★★ 合流なし・cross-lane 裁定 tick**:
   ユーザー発議で hub 4 並列監査 (b-frontier / c-frontier / a-flip / pending-rulings) を実施し、全レーンの
   gating 実態を確認・裁定。**Lean 変更なし** (issue/notes のみ)。

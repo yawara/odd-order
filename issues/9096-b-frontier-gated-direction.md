@@ -330,3 +330,18 @@ sorryAx (root #4 由来) が消えることを確認 (単なる依存シャッ�
 本件は c 唯一の genuine ungated near-term item で、landing すれば FT root を 1 本 (#4) 実際に除去する。
 c-frontier 監査が本件を surface しなかったのは「c 所有 sorry 削減」に scope 限定したため (本 rewrite は
 b 所有 sorry #4 を削減するが work 自体は c files) — hub が cross-lane 視点で拾って割当。
+
+## ✅ c-2.5 LANDED (2026-07-15 tick #9, merge 570d3aad) — b-5 Phase B 解禁 flag
+
+lane c が 6 S16 site の pins rewrite を landing (a-1 honest carrier `(pins := hyp.nuGridSupply)` を
+6 boundary call に配線)。hub が a の flip cut-over (SubgroupL の typeII_overNormalizer_frobenius リネーム)
+との 1 conflict を両立解決 (a 新名 + c honest pins)。full build 4232 green・AxiomsCheck OK。
+
+**⟹ b 宛 kickoff (b-5 Phase B、b の次 main sync で本節を読むこと)**: 6 S16 site は honest carrier を
+明示 pass 済 → b は以下を実施して root #4 を除去せよ:
+1. S15_SAndT/CDS の 5 optParam default (`pins := hyp.nuGridSupply hG`) を削除 (もう不要)。
+2. generic sorried `S15.Hypothesis.nuGridSupply` (HypothesisSwap:134) を削除。
+3. consumer 0 を grep 確認 + `lake build OddOrder OddOrder.AxiomsCheck` で root #4 由来 sorryAx が
+   該当 endpoint の #print axioms から消えることを検証 (単なるシャッフルでない ground truth)。
+完了で 9096 close + census −1 (root #4 実除去)。⚠ NormEstimates/CountingLayer は a flip hold 継続ゆえ
+触らない (b-5 Phase B は S15_SAndT/CDS/HypothesisSwap のみ = b-owned・非 hold)。
