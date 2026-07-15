@@ -691,6 +691,9 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-15 (tick #21、Opus hub — A 単独) — A: docs-only (9103 close + 2035 更新)。census 26 不変**:
+  A=`fc1b265f` は issues のみ (9103→closed、2035 更新)、.lean 0 → build 省略・直接 commit `bca42a5f`。
+  push `2cf00ef3..bca42a5f`。残 root: #5 V_inf / c-4 trace。
 - **2026-07-15 (tick #20、Opus hub — A 単独) — ★★ A: root #7-half T_isTypeP2_gate retire (9103 Ph2)。census 27→26**:
   main=`01398184` clean・census 27。A ahead=1 (feature 1)。**A** = `6ec691de` を merge `1cea306e`:
   layer-inverted `T_isTypeP2_gate` (CDS) + asymmetric `S_typeP2` cascade を削除 (9103 Phase 2 / 旧 b-2)、
