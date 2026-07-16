@@ -716,6 +716,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #7、Fable hub) — ✅ a (Thm 3.26 core) + b (Thm 8.23) 合流、census 23 不変**:
+  **a** = `07b35751` (Thm 3.26 core clauses A-invariant class correspondence、Ch04 ForwardFromCh03
+  986 行) + AxiomsCheck 追記 を merge `e7948443`: build **4296 jobs green**。**b** = 2 commits
+  (Thm 8.23 Sylow bound: groundwork + 本体、新 leaf PCycleJordan.lean 184 行) を merge `92b1fb83`:
+  build **4299 jobs green**。**c** = 変化なし。sorry 23 不変・新 axiom なし・AxiomsCheck OK。
+  push `6352130e..92b1fb83`。
 - **2026-07-17 (tick #6、Fable hub) — ✅ a (Thm 3.22) + c (Lemma 10.6) 合流、census 23 不変**:
   **a** = `f36730bf` (Thm 3.22 full strength π-length ≤ 1) + AxiomsCheck 追記 (+5) を merge
   `f166c7fe`: build **4295 jobs green**。⚠ **サイズ watch: Ch03 Main.lean 1405 行 (1500 目前)** —
