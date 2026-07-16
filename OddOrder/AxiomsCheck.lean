@@ -727,6 +727,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.isPiSeparable_of_subnormal_ladder
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.isPiSeparable_of_normal_of_quotient
 
+-- Ch.3 (Split Extensions): Thm 3.22 完全形 — abelian π-Hall ⇒ G/O_{π',π} は π'-群
+-- (genuine π-length ≤ 1; Hall-Higman 1.2.3 経由).
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch03.quotient_oPiPrimePiCore_isPiGroup_compl_of_abelian_pi_hall
+
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
 -- any two complements of N are conjugate by an element of N.
