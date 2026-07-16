@@ -48,7 +48,7 @@ variable {G : Type*} [Group G]
 π-群 (or π'-群) となり `O_π(G/Fᵢ) ⊔ O_π'(G/Fᵢ)` に入るので,
 `K (i+1) ≤ comap = Fᵢ₊₁`. -/
 theorem le_piFittingSeries_of_ladder [Finite G] (π : Set ℕ) {K : ℕ → Subgroup G}
-    (hnorm : ∀ i, (K i).Normal) (hmono : ∀ i, K i ≤ K (i + 1)) (hbot : K 0 = ⊥)
+    (hnorm : ∀ i, (K i).Normal) (hbot : K 0 = ⊥)
     (hfac : ∀ i, (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∈ π) ∨
       (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∉ π)) :
     ∀ i, K i ≤ piFittingSeries π G i := by
@@ -97,14 +97,14 @@ theorem le_piFittingSeries_of_ladder [Finite G] (π : Set ℕ) {K : ℕ → Subg
 Isaacs の定義 (p.90, normal series with π/π' factors) から本リポジトリの
 upper-series 定義への橋 (Lemma 3.18 の all-normal 特殊形). -/
 theorem isPiSeparable_of_normal_ladder [Finite G] (π : Set ℕ) {K : ℕ → Subgroup G}
-    {r : ℕ} (hnorm : ∀ i, (K i).Normal) (hmono : ∀ i, K i ≤ K (i + 1))
+    {r : ℕ} (hnorm : ∀ i, (K i).Normal)
     (hbot : K 0 = ⊥) (htop : K r = ⊤)
     (hfac : ∀ i, (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∈ π) ∨
       (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∉ π)) :
     IsPiSeparable π G := by
   refine ⟨r, ?_⟩
   have h1 : K r ≤ piFittingSeries π G r :=
-    le_piFittingSeries_of_ladder π hnorm hmono hbot hfac r
+    le_piFittingSeries_of_ladder π hnorm hbot hfac r
   rw [htop] at h1
   exact top_le_iff.mp h1
 
@@ -118,11 +118,7 @@ theorem isPiSeparable_of_isPiGroup [Finite G] {π : Set ℕ} (hG : IsPiGroup π 
     rcases Nat.eq_zero_or_pos i with h | h
     · simp only [hK, h, if_pos]; infer_instance
     · simp only [hK, Nat.pos_iff_ne_zero.mp h, if_false]; infer_instance
-  refine isPiSeparable_of_normal_ladder π (r := 1) hnorm ?_ ?_ ?_ ?_
-  · intro i
-    rcases Nat.eq_zero_or_pos i with h | h
-    · simp [hK, h]
-    · simp [hK, Nat.pos_iff_ne_zero.mp h]
+  refine isPiSeparable_of_normal_ladder π (r := 1) hnorm ?_ ?_ ?_
   · simp [hK]
   · simp [hK]
   · intro i
@@ -235,6 +231,87 @@ theorem exists_normal_ladder_of_isPiSeparable [Finite G] (π : Set ℕ)
         Subgroup.index_dvd_card (O.subgroupOf O')
       exact oPiCore.isPiGroup {q | q ∉ π} p
         (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
+
+/-- **原子拡大** (Lemma 3.18 への中間段): `A ⊴ G` が π-群 or π'-群で `G/A` が
+π-separable なら `G` も π-separable.
+
+証明: `G/A` の ladder (`exists_normal_ladder_of_isPiSeparable`) を `mk' A` で
+引き戻し, 最下段に `⊥ ≤ A` を前置する. 因子は `relIndex_comap` +
+`map_comap` (全射) で商側にそのまま移る. -/
+theorem isPiSeparable_of_isPiGroup_normal_of_quotient [Finite G] {π : Set ℕ}
+    {A : Subgroup G} [A.Normal]
+    (hA : Subgroup.IsPiGroup π A ∨ Subgroup.IsPiGroup {p | p ∉ π} A)
+    (hquot : IsPiSeparable π (G ⧸ A)) :
+    IsPiSeparable π G := by
+  haveI := hquot
+  obtain ⟨S, r, hSnorm, hSmono, hSbot, hStop, hSfac⟩ :=
+    exists_normal_ladder_of_isPiSeparable (G := G ⧸ A) π
+  have hbase : Subgroup.comap (QuotientGroup.mk' A) (S 0) = A := by
+    rw [hSbot, MonoidHom.comap_bot, QuotientGroup.ker_mk']
+  refine isPiSeparable_of_normal_ladder π
+    (K := fun i => match i with
+      | 0 => ⊥
+      | i + 1 => Subgroup.comap (QuotientGroup.mk' A) (S i))
+    (r := r + 1) ?_ rfl ?_ ?_
+  · intro i
+    match i with
+    | 0 => infer_instance
+    | i + 1 =>
+      haveI := hSnorm i
+      exact Subgroup.Normal.comap inferInstance _
+  · change Subgroup.comap (QuotientGroup.mk' A) (S r) = ⊤
+    rw [hStop]
+    exact Subgroup.comap_top _
+  · intro i
+    match i with
+    | 0 =>
+      -- 最下段の因子 = |A|.
+      have hrel : (⊥ : Subgroup G).relIndex
+          (Subgroup.comap (QuotientGroup.mk' A) (S 0)) = Nat.card ↥A := by
+        rw [hbase, Subgroup.relIndex_bot_left]
+      change (∀ p ∈ ((⊥ : Subgroup G).relIndex
+            (Subgroup.comap (QuotientGroup.mk' A) (S 0))).primeFactors, p ∈ π) ∨
+          (∀ p ∈ ((⊥ : Subgroup G).relIndex
+            (Subgroup.comap (QuotientGroup.mk' A) (S 0))).primeFactors, p ∉ π)
+      rw [hrel]
+      exact hA
+    | i + 1 =>
+      -- 上段の因子は商側の因子と一致.
+      have heq : (Subgroup.comap (QuotientGroup.mk' A) (S i)).relIndex
+          (Subgroup.comap (QuotientGroup.mk' A) (S (i + 1))) =
+          (S i).relIndex (S (i + 1)) := by
+        rw [Subgroup.relIndex_comap,
+          Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective A)]
+      change (∀ p ∈ ((Subgroup.comap (QuotientGroup.mk' A) (S i)).relIndex
+            (Subgroup.comap (QuotientGroup.mk' A) (S (i + 1)))).primeFactors, p ∈ π) ∨
+          (∀ p ∈ ((Subgroup.comap (QuotientGroup.mk' A) (S i)).relIndex
+            (Subgroup.comap (QuotientGroup.mk' A) (S (i + 1)))).primeFactors, p ∉ π)
+      rw [heq]
+      exact hSfac i
+
+/-- **`IsPiSeparable` は群同型で保存される**: ladder が同型でそのまま移送できる
+(因子位数は `relIndex_map_map_of_injective` で不変). -/
+theorem isPiSeparable_of_mulEquiv {H : Type*} [Group H] [Finite G] [Finite H]
+    (e : G ≃* H) {π : Set ℕ} (hG : IsPiSeparable π G) :
+    IsPiSeparable π H := by
+  haveI := hG
+  obtain ⟨K, r, hnorm, hmono, hbot, htop, hfac⟩ :=
+    exists_normal_ladder_of_isPiSeparable (G := G) π
+  refine isPiSeparable_of_normal_ladder π
+    (K := fun i => (K i).map e.toMonoidHom) (r := r) ?_ ?_ ?_ ?_
+  · intro i
+    haveI := hnorm i
+    exact (hnorm i).map e.toMonoidHom e.surjective
+  · rw [hbot]
+    exact Subgroup.map_bot e.toMonoidHom
+  · rw [htop]
+    exact Subgroup.map_top_of_surjective e.toMonoidHom e.surjective
+  · intro i
+    have heq : ((K i).map e.toMonoidHom).relIndex ((K (i + 1)).map e.toMonoidHom) =
+        (K i).relIndex (K (i + 1)) :=
+      Subgroup.relIndex_map_map_of_injective _ _ e.injective
+    rw [heq]
+    exact hfac i
 
 end -- 3D Lemma 3.18
 
