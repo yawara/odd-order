@@ -716,6 +716,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #4、Fable hub) — ✅ a (Lem 3.18 groundwork) + c (Thm 10.4 完成) 合流、census 23 不変**:
+  **a** = 2 commits (Lem 3.18 groundwork: upper series domination + ladder existence、新 leaf
+  PiSeparableSeries.lean 241 行) を merge `25ada188`: build **4293 jobs green**。**c** = 3 commits
+  (Thm 10.4 C_p≀C_p recognition **sorry-free 完成** WreathRecognition.lean 833 行 + notes 整備 +
+  shared 支持補題 ElementaryAbelian +23 / PRank +43 純 additive) を merge `3d171f50`: build
+  **4294 jobs green**。**b** = 変化なし。sorry 23 不変・新 axiom なし・AxiomsCheck OK
+  (feitThompson allowlist 明示ログ)。push `e3d89132..3d171f50`。
 - **2026-07-17 (tick #3、Fable hub) — ✅ a 合流 (Ch07 forward 討ち)、b/c 変化なし、census 23 不変**:
   **a** = `dcfb8f90` (Ch07 ForwardFromCh03 の forward 宣言実証明化 = Thm 3.15 Hall-E converse via
   Burnside、+198/-48、207 行) + AxiomsCheck 独立追記 (Thm 3.17 等 assert 追加) を merge `48caf172`:
