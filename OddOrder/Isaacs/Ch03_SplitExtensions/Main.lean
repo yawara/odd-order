@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch03_SplitExtensions.CrossedHomomorphism
+import OddOrder.Isaacs.Ch03_SplitExtensions.PiSeparableSeries
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
