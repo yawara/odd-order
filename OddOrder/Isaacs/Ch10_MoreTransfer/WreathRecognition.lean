@@ -1039,4 +1039,208 @@ theorem exists_surjective_wreath_of_conj_list_prod_ne_one
 
 end
 
+
+section /- 10A: the nilpotence class of `C_p ≀ C_p` is `p` (p. 296) -/
+
+open RegularWreathProduct
+
+variable (p : ℕ) [hp : Fact p.Prime]
+
+/-- The base subgroup of `C_p ≀ C_p`: the kernel of the projection `rightHom`
+onto the acting factor. -/
+private def wreathBase : Subgroup
+    (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) :=
+  (RegularWreathProduct.rightHom
+    (D := Multiplicative (ZMod p)) (Q := Multiplicative (ZMod p))).ker
+
+/-- The distinguished single-coordinate generator of the base subgroup. -/
+private def wreathGen : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p) :=
+  ⟨Pi.mulSingle 1 (Multiplicative.ofAdd 1), 1⟩
+
+/-- Multiplication of base elements is componentwise on the left factor. -/
+private lemma wreathBase_mul (f g : Multiplicative (ZMod p) → Multiplicative (ZMod p)) :
+    (⟨f, 1⟩ * ⟨g, 1⟩ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p))
+      = ⟨f * g, 1⟩ := by
+  rw [RegularWreathProduct.mul_def]
+  congr 1
+  · funext x
+    simp
+  · simp
+
+private lemma wreathBase_pow (f : Multiplicative (ZMod p) → Multiplicative (ZMod p))
+    (m : ℕ) :
+    ((⟨f, 1⟩ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) ^ m)
+      = ⟨f ^ m, 1⟩ := by
+  induction m with
+  | zero =>
+    rw [pow_zero, pow_zero]
+    ext <;> rfl
+  | succ m ih =>
+    rw [pow_succ, ih, wreathBase_mul, ← pow_succ]
+
+/-- Conjugation by `inl q₀` shifts the left component. -/
+private lemma inl_conj_base (q₀ : Multiplicative (ZMod p))
+    (f : Multiplicative (ZMod p) → Multiplicative (ZMod p)) :
+    (RegularWreathProduct.inl q₀ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p))
+        * ⟨f, 1⟩ * (RegularWreathProduct.inl q₀)⁻¹
+      = ⟨fun x => f (q₀⁻¹ * x), 1⟩ := by
+  have h1 : (RegularWreathProduct.inl q₀ :
+      Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) = ⟨1, q₀⟩ := rfl
+  have h2 : ((⟨1, q₀⟩ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)))⁻¹
+      = ⟨1, q₀⁻¹⟩ := by
+    ext <;> simp [RegularWreathProduct.inv_left, RegularWreathProduct.inv_right]
+  rw [h1, h2, RegularWreathProduct.mul_def, RegularWreathProduct.mul_def]
+  congr 1
+  · funext x
+    simp
+  · simp
+
+private lemma wreathBase_index : (wreathBase p).index = p := by
+  have hsurj : Function.Surjective (RegularWreathProduct.rightHom
+      (D := Multiplicative (ZMod p)) (Q := Multiplicative (ZMod p))) := by
+    intro q
+    exact ⟨RegularWreathProduct.inl q, RegularWreathProduct.fun_id q⟩
+  rw [wreathBase, Subgroup.index_ker]
+  rw [MonoidHom.range_eq_top_of_surjective _ hsurj]
+  have h2 : Nat.card (↥(⊤ : Subgroup (Multiplicative (ZMod p))))
+      = Nat.card (Multiplicative (ZMod p)) :=
+    Nat.card_congr Subgroup.topEquiv.toEquiv
+  rw [h2, Nat.card_congr Multiplicative.toAdd, Nat.card_zmod]
+
+private lemma wreathBase_isElementaryAbelian :
+    (wreathBase p).IsElementaryAbelian p := by
+  constructor
+  · rintro ⟨⟨f, qf⟩, hf⟩ ⟨⟨g, qg⟩, hg⟩
+    have hqf : qf = 1 := hf
+    have hqg : qg = 1 := hg
+    subst hqf
+    subst hqg
+    refine Subtype.ext ?_
+    change (⟨f, 1⟩ * ⟨g, 1⟩ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p))
+      = ⟨g, 1⟩ * ⟨f, 1⟩
+    rw [wreathBase_mul, wreathBase_mul, mul_comm]
+  · rintro ⟨⟨f, qf⟩, hf⟩
+    have hqf : qf = 1 := hf
+    subst hqf
+    refine Subtype.ext ?_
+    change ((⟨f, 1⟩ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) ^ p) = 1
+    rw [wreathBase_pow]
+    have hfp : f ^ p = 1 := by
+      funext x
+      change (f x) ^ p = 1
+      have h1 := ZModModule.char_nsmul_eq_zero (n := p) (Multiplicative.toAdd (f x))
+      apply Multiplicative.toAdd.injective
+      have h2 : Multiplicative.toAdd ((f x) ^ p)
+          = p • Multiplicative.toAdd (f x) := rfl
+      rw [h2, h1]
+      rfl
+    rw [hfp]
+    rfl
+
+private lemma wreathBase_card : Nat.card (wreathBase p) = p ^ p := by
+  have hp_prime : p.Prime := hp.out
+  have hcardW : Nat.card (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p))
+      = p ^ (p + 1) := by
+    rw [RegularWreathProduct.card]
+    have h1 : Nat.card (Multiplicative (ZMod p)) = p := by
+      rw [Nat.card_congr Multiplicative.toAdd, Nat.card_zmod]
+    rw [h1, pow_succ]
+  have h1 := Subgroup.card_mul_index (wreathBase p)
+  rw [wreathBase_index, hcardW, pow_succ] at h1
+  exact Nat.eq_of_mul_eq_mul_right hp_prime.pos h1
+
+set_option maxHeartbeats 1000000 in
+-- comparing wreath-product components up to defeq (`congr 1` + `funext`) forces
+-- repeated whnf of the `RegularWreathProduct` mul/action instances
+/-- Every single-coordinate base element is a conjugated power of the
+generator `wreathGen`. -/
+private lemma mulSingle_mem_normalClosure (q : Multiplicative (ZMod p))
+    (d : Multiplicative (ZMod p)) :
+    (⟨Pi.mulSingle q d, 1⟩ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p))
+      ∈ Subgroup.normalClosure {wreathGen p} := by
+  -- d is a power of the additive generator
+  have hval : ∃ m : ℕ, (Multiplicative.ofAdd (1 : ZMod p)) ^ m = d := by
+    refine ⟨(Multiplicative.toAdd d).val, ?_⟩
+    apply Multiplicative.toAdd.injective
+    rw [toAdd_pow, toAdd_ofAdd, nsmul_eq_mul, mul_one]
+    exact ZMod.natCast_rightInverse _
+  obtain ⟨m, hm⟩ := hval
+  have hconj : (RegularWreathProduct.inl q :
+        Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) * (wreathGen p ^ m)
+        * (RegularWreathProduct.inl q)⁻¹
+      = ⟨Pi.mulSingle q d, 1⟩ := by
+    rw [wreathGen, wreathBase_pow, inl_conj_base]
+    congr 1
+    funext x
+    rw [← Pi.mulSingle_pow]
+    by_cases hx : x = q
+    · rw [hx, show (q⁻¹ * q : Multiplicative (ZMod p)) = 1 from inv_mul_cancel q,
+        Pi.mulSingle_eq_same, Pi.mulSingle_eq_same, hm]
+    · have hx' : q⁻¹ * x ≠ 1 := by
+        intro h4
+        apply hx
+        have h5 : q * (q⁻¹ * x) = q * 1 := by rw [h4]
+        rwa [mul_one, ← mul_assoc, mul_inv_cancel, one_mul] at h5
+      rw [Pi.mulSingle_eq_of_ne hx', Pi.mulSingle_eq_of_ne hx]
+  have hgen_mem : wreathGen p ∈ Subgroup.normalClosure {wreathGen p} :=
+    Subgroup.subset_normalClosure (Set.mem_singleton _)
+  have hpow_mem : wreathGen p ^ m ∈ Subgroup.normalClosure {wreathGen p} :=
+    Subgroup.pow_mem _ hgen_mem m
+  have hconj_mem := Subgroup.normalClosure_normal.conj_mem _ hpow_mem
+    (RegularWreathProduct.inl q)
+  exact hconj ▸ hconj_mem
+
+/-- The base subgroup is the normal closure of the single generator. -/
+private lemma wreathBase_eq_normalClosure :
+    wreathBase p = Subgroup.normalClosure {wreathGen p} := by
+  classical
+  haveI : (wreathBase p).Normal := by
+    rw [wreathBase]
+    infer_instance
+  have hsub : Subgroup.normalClosure {wreathGen p} ≤ wreathBase p := by
+    apply Subgroup.normalClosure_le_normal
+    intro w hw
+    rw [Set.mem_singleton_iff] at hw
+    subst hw
+    change (wreathGen p).right = 1
+    rfl
+  refine le_antisymm ?_ hsub
+  rintro ⟨f, qf⟩ hmem
+  have hqf : qf = 1 := hmem
+  subst hqf
+  -- embed the commutative function group along g ↦ ⟨g, 1⟩ and decompose f
+  set β : (Multiplicative (ZMod p) → Multiplicative (ZMod p))
+      →* Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p) :=
+    { toFun := fun g => ⟨g, 1⟩
+      map_one' := rfl
+      map_mul' := fun g₁ g₂ => (wreathBase_mul p g₁ g₂).symm } with hβ_def
+  have hdecomp : (⟨f, 1⟩ : Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p))
+      = β (∏ q, Pi.mulSingle q (f q)) := by
+    rw [Finset.univ_prod_mulSingle]
+    rfl
+  rw [hdecomp]
+  exact Subgroup.mem_comap.mp (Subgroup.prod_mem _ fun q _ =>
+    Subgroup.mem_comap.mpr (mulSingle_mem_normalClosure p q (f q)))
+
+/-- **The nilpotence class of `C_p ≀ C_p` is exactly `p`** (Isaacs p. 296): the
+base subgroup is elementary abelian of order `p^p` and index `p`, and it is
+generated by the conjugacy class of a single coordinate function, so
+Lemma 10.3(c) applies with `t = p`. -/
+theorem nilpotencyClass_wreath :
+    Group.nilpotencyClass (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) = p := by
+  have hp_prime : p.Prime := hp.out
+  have hcardW : Nat.card (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p))
+      = p ^ (p + 1) := by
+    rw [RegularWreathProduct.card]
+    have h1 : Nat.card (Multiplicative (ZMod p)) = p := by
+      rw [Nat.card_congr Multiplicative.toAdd, Nat.card_zmod]
+    rw [h1, pow_succ]
+  have hW_pgroup : IsPGroup p (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) :=
+    IsPGroup.of_card hcardW
+  exact nilpotencyClass_eq_of_elementaryAbelian_normalClosure_index_prime
+    hW_pgroup (wreathBase_index p) (wreathBase_isElementaryAbelian p)
+    hp_prime.two_le (wreathBase_card p) (wreathBase_eq_normalClosure p)
+
+end
+
 end OddOrder.Isaacs.Ch10
