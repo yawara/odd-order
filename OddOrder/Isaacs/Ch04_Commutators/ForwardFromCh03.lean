@@ -1047,6 +1047,91 @@ noncomputable def aInvariantConjClassesEquiv {φ : A →* MulAut G}
          conjClasses_map_fixedSubgroup_surjective_of_aInvariant hCop hSolv c.property
        exact ⟨d, Subtype.ext hd⟩⟩
 
+open OddOrder.GroupTheory in
+/-- `C_G(A)` に含まれる部分群は自動的に A-不変 (元ごとに固定されるため). -/
+theorem isAInvariant_of_le_fixedSubgroup {φ : A →* MulAut G} {D : Subgroup G}
+    (hDC : D ≤ fixedSubgroup φ (⊤ : Subgroup A)) : IsAInvariant φ D := by
+  intro a
+  ext g
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  have hfix : ∀ x ∈ D, ∀ b : A, (φ b) x = x := fun x hx b => hDC hx b trivial
+  constructor
+  · intro hg
+    have h1 := hfix _ hg a
+    rw [MulAut.smul_def, MulAut.apply_inv_self] at h1
+    rwa [MulAut.smul_def, ← h1] at hg
+  · intro hg
+    rw [MulAut.smul_def, ← map_inv]
+    rw [hfix g hg a⁻¹]
+    exact hg
+
+open OddOrder.GroupTheory in
+/-- **Isaacs Lemma 3.32** (cardinality 形): coprime + solvable 仮定下, A-不変な
+`P ∈ Syl_p(G)` に対し `|P ∩ C_G(A)|` は `|C_G(A)|` の full `p`-part.
+すなわち `P ∩ C ∈ Syl_p(C)`. Hartley–Turull (Thm 3.31) の固定点数計算の核.
+
+証明 (p.105): `C` の Sylow `S` は `C` 内ゆえ A-不変, Cor 3.25
+(`aInvariant_pSubgroup_le_aInvariant_sylow`) で A-不変 Sylow `Q ⊇ S`,
+Thm 3.23(b) (`aInvariant_sylow_conj`) で `Q^c = P` (`c ∈ C`). すると
+`P ∩ C ⊇ (Q ∩ C)^c ⊇ S^c` は Sylow `S^c` を含む `C` の `p`-部分群. -/
+theorem card_inf_fixedSubgroup_of_aInvariant_sylow {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [hp : Fact p.Prime]
+    {P : Sylow p G} (hP_inv : IsAInvariant φ (P : Subgroup G)) :
+    Nat.card ↥((P : Subgroup G) ⊓ fixedSubgroup φ (⊤ : Subgroup A)) =
+      p ^ (Nat.card ↥(fixedSubgroup φ (⊤ : Subgroup A))).factorization p := by
+  classical
+  set C : Subgroup G := fixedSubgroup φ (⊤ : Subgroup A) with hC_def
+  obtain ⟨S⟩ : Nonempty (Sylow p ↥C) := inferInstance
+  set S' : Subgroup G := (S : Subgroup ↥C).map C.subtype with hS'_def
+  have hS'_le_C : S' ≤ C := Subgroup.map_subtype_le _
+  -- A-不変 Sylow `Q ⊇ S'` を取り, `P` へ `C`-元で共役.
+  obtain ⟨Q, hQ_inv, hS'_le_Q⟩ :=
+    aInvariant_pSubgroup_le_aInvariant_sylow hCop hSolv
+      (S.isPGroup'.map C.subtype) (isAInvariant_of_le_fixedSubgroup hS'_le_C)
+  obtain ⟨c, hc_fix, hc_conj⟩ := aInvariant_sylow_conj hCop hSolv hQ_inv hP_inv
+  have hc_mem : c ∈ C := fun l _ => hc_fix l
+  -- `S'^c ≤ P ⊓ C`.
+  have hSc_le : MulAut.conj c • S' ≤ (P : Subgroup G) ⊓ C := by
+    rw [le_inf_iff]
+    refine ⟨?_, ?_⟩
+    · rw [← hc_conj]
+      intro g hg
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hg ⊢
+      exact hS'_le_Q hg
+    · intro g hg
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hg
+      have hg₀ : (MulAut.conj c)⁻¹ • g ∈ C := hS'_le_C hg
+      have hgeq : g = c * ((MulAut.conj c)⁻¹ • g) * c⁻¹ := by
+        rw [MulAut.smul_def, MulAut.conj_inv_apply]
+        group
+      rw [hgeq]
+      exact C.mul_mem (C.mul_mem hc_mem hg₀) (C.inv_mem hc_mem)
+  -- 位数勘定: `|S'^c| = p`-part of `|C|` ≤ `|P ⊓ C|` ≤ `p`-part of `|C|`.
+  have hcard_S' : Nat.card ↥S' = p ^ (Nat.card ↥C).factorization p := by
+    have h1 : Nat.card ↥S' = Nat.card (S : Subgroup ↥C) :=
+      Nat.card_congr
+        (Subgroup.equivMapOfInjective _ C.subtype C.subtype_injective).symm.toEquiv
+    rw [h1]
+    exact S.card_eq_multiplicity
+  have hge : p ^ (Nat.card ↥C).factorization p ≤
+      Nat.card ↥((P : Subgroup G) ⊓ C) := by
+    calc p ^ (Nat.card ↥C).factorization p
+        = Nat.card ↥(MulAut.conj c • S') := by
+          rw [Nat.card_congr (Subgroup.equivSMul (MulAut.conj c) S').symm.toEquiv,
+            hcard_S']
+      _ ≤ Nat.card ↥((P : Subgroup G) ⊓ C) :=
+          Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hSc_le)
+  have hdvd : Nat.card ↥((P : Subgroup G) ⊓ C) ∣ Nat.card ↥C :=
+    Subgroup.card_dvd_of_le inf_le_right
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp (P.isPGroup'.to_inf_left (K := C))
+  have hle : Nat.card ↥((P : Subgroup G) ⊓ C) ≤
+      p ^ (Nat.card ↥C).factorization p := by
+    rw [hn] at hdvd ⊢
+    exact Nat.pow_le_pow_right hp.out.one_lt.le
+      ((Nat.Prime.pow_dvd_iff_le_factorization hp.out Nat.card_pos.ne').mp hdvd)
+  exact le_antisymm hle hge
+
 end ConjClassCorrespondence
 
 end OddOrder.Isaacs.Ch04
