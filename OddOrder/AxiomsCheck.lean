@@ -722,6 +722,11 @@ set_option linter.style.longLine false in
 -- p-complement 存在 ⇒ G solvable.  Burnside (Thm 7.8) + Wielandt (Thm 3.17) 経由.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch07.isSolvable_of_pcomplement_exists
 
+-- Ch.3 (Split Extensions): Lemma 3.18 — subnormal π/π' series ⇒ π-separable
+-- (upper-series 定義への橋; 支配補題 + 拡大閉包 isPiSeparable_of_normal_of_quotient 経由).
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.isPiSeparable_of_subnormal_ladder
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.isPiSeparable_of_normal_of_quotient
+
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
 -- any two complements of N are conjugate by an element of N.
