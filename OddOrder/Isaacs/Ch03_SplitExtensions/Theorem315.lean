@@ -97,10 +97,189 @@ theorem set_mul_eq_univ_of_coprime_index [Finite G] {H K : Subgroup G}
   refine Set.eq_of_subset_of_ncard_le (Set.subset_univ _) ?_
   rw [Set.ncard_univ, ← Nat.card_coe_set_eq, hHK]
 
-/-! **Isaacs Thm 3.17 Wielandt**: 3 部分群 pairwise coprime index + solvable ⇒ G solvable.
+/-- **Isaacs Thm 3.17 補助段** (Wielandt): coprime index の可解部分群 `K` の指数を
+割らない素数 `p` の非自明 `p`-部分群 `M` が `H` で正規化されているとき, 全ての
+非自明正規部分群による商が可解なら `G` は可解.
 
-**Forward dep**: 単純群の場合分けで Burnside `p^a q^b` 必要. Ch.7 完成後に back-fill.
-所在: `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` (placeholder). -/
+証明 (p.89 後段): `p ∤ |G:K|` より `K` の Sylow `p`-部分群は `G` の Sylow. Sylow
+共役性で `M ≤ ᵍK =: K'`. Lemma 3.16 (集合積) で `G = K'H`; 任意の共役 `c m c⁻¹` は
+`c = v u` (`v ∈ K'`, `u ∈ H`) と分解して `v (u m u⁻¹) v⁻¹ ∈ K'`. よって正規閉包
+`M^G ≤ K'` は非自明可解正規, `G/M^G` は仮定より可解, 拡大閉包で `G` 可解.
+
+注: 教科書と異なり `M ≤ H` は不要 (`H`-正規化と `M ≠ ⊥` のみ使う). -/
+private theorem solvable_of_coprime_index_aux [Finite G] {H K : Subgroup G} {p : ℕ}
+    [Fact p.Prime]
+    (hcop : Nat.Coprime H.index K.index) (hKsol : IsSolvable K) (hpK : ¬ p ∣ K.index)
+    {M : Subgroup G} (hM_ne : M ≠ ⊥) (hMp : IsPGroup p M)
+    (hM_norm : ∀ u ∈ H, ∀ m ∈ M, u * m * u⁻¹ ∈ M)
+    (hquot : ∀ (N : Subgroup G) [N.Normal], N ≠ ⊥ → IsSolvable (G ⧸ N)) :
+    IsSolvable G := by
+  classical
+  -- Step 1: `K` contains a full Sylow `p`-subgroup `R` of `G` (as `p ∤ |G:K|`).
+  obtain ⟨Q⟩ : Nonempty (Sylow p ↥K) := inferInstance
+  have hQ'_le_K : (Q : Subgroup ↥K).map K.subtype ≤ K := Subgroup.map_subtype_le _
+  have hcardQ' : Nat.card ↥((Q : Subgroup ↥K).map K.subtype) =
+      p ^ (Nat.card G).factorization p := by
+    have h1 : Nat.card ↥((Q : Subgroup ↥K).map K.subtype) = Nat.card (Q : Subgroup ↥K) :=
+      Nat.card_congr
+        (Subgroup.equivMapOfInjective _ K.subtype K.subtype_injective).symm.toEquiv
+    have h2 : (Nat.card G).factorization p = (Nat.card ↥K).factorization p := by
+      rw [← Subgroup.card_mul_index K,
+        Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hpK, add_zero]
+    rw [h1, h2]
+    exact Q.card_eq_multiplicity
+  obtain ⟨R, hQ'R⟩ := (Q.isPGroup'.map K.subtype).exists_le_sylow
+  have hRQ' : (R : Subgroup G) = (Q : Subgroup ↥K).map K.subtype := by
+    refine (Subgroup.eq_of_le_of_card_ge hQ'R ?_).symm
+    have h4 : Nat.card ↥(R : Subgroup G) = p ^ (Nat.card G).factorization p :=
+      R.card_eq_multiplicity
+    rw [hcardQ', h4]
+  have hR_le_K : (R : Subgroup G) ≤ K := hRQ' ▸ hQ'_le_K
+  -- Step 2: conjugate `R` onto a Sylow subgroup containing `M`; set `K' := ᵍK ⊇ M`.
+  obtain ⟨P, hMP⟩ := hMp.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G R P
+  set K' : Subgroup G := MulAut.conj g • K with hK'def
+  have hM_le_K' : M ≤ K' := by
+    intro m hm
+    have h1 : m ∈ (P : Subgroup G) := hMP hm
+    rw [← hg, Sylow.coe_subgroup_smul,
+      Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at h1
+    rw [hK'def, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    exact hR_le_K h1
+  -- `K'` is solvable with the same index as `K`.
+  have hK'card : Nat.card ↥K' = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.equivSMul (MulAut.conj g) K).symm.toEquiv
+  have hK'index : K'.index = K.index := by
+    have h1 : Nat.card ↥K' * K'.index = Nat.card ↥K * K.index := by
+      rw [Subgroup.card_mul_index, Subgroup.card_mul_index]
+    rw [hK'card] at h1
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h1
+  haveI hK'sol : IsSolvable ↥K' := by
+    haveI := hKsol
+    exact solvable_of_surjective
+      (f := (Subgroup.equivSMul (MulAut.conj g) K).toMonoidHom)
+      (Subgroup.equivSMul (MulAut.conj g) K).surjective
+  -- Step 3: `G = K'H` as a set product (Lemma 3.16).
+  have hdecomp : (K' : Set G) * (H : Set G) = Set.univ :=
+    set_mul_eq_univ_of_coprime_index (by rw [hK'index]; exact hcop.symm)
+  -- Step 4: every `G`-conjugate of `M` lands in `K'`, so `M^G ≤ K'`.
+  have hNC_le : Subgroup.normalClosure (M : Set G) ≤ K' := by
+    refine (Subgroup.closure_le _).mpr ?_
+    intro a ha
+    obtain ⟨m, hmM, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp ha
+    obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+    have hcU : c ∈ (K' : Set G) * (H : Set G) := by rw [hdecomp]; exact Set.mem_univ c
+    obtain ⟨v, hv, u, hu, hvu⟩ := Set.mem_mul.mp hcU
+    have hkey : a = v * (u * m * u⁻¹) * v⁻¹ := by
+      rw [← hc, ← hvu]; group
+    rw [SetLike.mem_coe, hkey]
+    exact K'.mul_mem (K'.mul_mem hv (hM_le_K' (hM_norm u hu m hmM))) (K'.inv_mem hv)
+  -- Step 5: `M^G` is a nontrivial solvable normal subgroup; conclude by extension.
+  haveI hN_normal : (Subgroup.normalClosure (M : Set G)).Normal :=
+    Subgroup.normalClosure_normal
+  have hN_ne : Subgroup.normalClosure (M : Set G) ≠ ⊥ := fun h =>
+    hM_ne (le_bot_iff.mp (h ▸ Subgroup.le_normalClosure))
+  haveI hN_sol : IsSolvable ↥(Subgroup.normalClosure (M : Set G)) :=
+    solvable_of_surjective
+      (f := (Subgroup.subgroupOfEquivOfLe hNC_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hNC_le).surjective
+  haveI hQ_sol : IsSolvable (G ⧸ Subgroup.normalClosure (M : Set G)) :=
+    hquot _ hN_ne
+  exact solvable_of_ker_le_range (Subgroup.normalClosure (M : Set G)).subtype
+    (QuotientGroup.mk' (Subgroup.normalClosure (M : Set G)))
+    (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
+
+/-- **Isaacs Thm 3.17** (Wielandt): `H, K, L ≤ G` の指数が pairwise coprime で
+各々可解なら `G` は可解.
+
+証明 (p.89): `|G|` に関する強帰納法. 非自明正規部分群 `N` があれば像
+`H̄, K̄, L̄ ≤ G/N` が仮定を継承 (指数は割り切りで coprime 保存) し帰納法で
+`G/N` 可解. `H = 1` なら `|G:K| ∣ |G| = |G:H|` と coprime で `K = G` 可解.
+さもなくば `H` の minimal normal `M₀` (Lemma 3.11 で `p`-群) を取り, `p` は
+`|G:K|`, `|G:L|` の高々一方しか割らないので, 割らない側に
+`solvable_of_coprime_index_aux` を適用.
+
+注: 教科書証明は Burnside `p^a q^b` を使わない (旧 placeholder の記載は誤り;
+Burnside が要るのは Thm 3.15 の 2-素数基底のみ). -/
+theorem isSolvable_of_pairwise_coprime_index.{u} {G : Type u} [Group G] [Finite G]
+    {H K L : Subgroup G}
+    (hHK : Nat.Coprime H.index K.index)
+    (hHL : Nat.Coprime H.index L.index)
+    (hKL : Nat.Coprime K.index L.index)
+    (hH : IsSolvable H) (hK : IsSolvable K) (hL : IsSolvable L) :
+    IsSolvable G := by
+  classical
+  let motive : ℕ → Prop := fun n =>
+    ∀ (G' : Type u) [Group G'] [Finite G'], Nat.card G' = n →
+      ∀ H K L : Subgroup G',
+        Nat.Coprime H.index K.index → Nat.Coprime H.index L.index →
+        Nat.Coprime K.index L.index →
+        IsSolvable H → IsSolvable K → IsSolvable L → IsSolvable G'
+  suffices hmain : motive (Nat.card G) by
+    exact hmain G rfl H K L hHK hHL hKL hH hK hL
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih G' _ _ hcard H K L hHK hHL hKL hH hK hL
+  -- Quotient closure: every quotient by a nontrivial normal subgroup is solvable.
+  have hquot : ∀ (N : Subgroup G') [N.Normal], N ≠ ⊥ → IsSolvable (G' ⧸ N) := by
+    intro N hN hNbot
+    haveI := hN
+    have hlt : Nat.card (G' ⧸ N) < n := by
+      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNbot
+      calc Nat.card (G' ⧸ N)
+          < Nat.card (G' ⧸ N) * Nat.card ↥N :=
+            (lt_mul_iff_one_lt_right Nat.card_pos).mpr Finite.one_lt_card
+        _ = n := by rw [← Subgroup.card_eq_card_quotient_mul_card_subgroup N, hcard]
+    have hdvdH : (H.map (QuotientGroup.mk' N)).index ∣ H.index :=
+      Subgroup.index_map_dvd H (QuotientGroup.mk'_surjective N)
+    have hdvdK : (K.map (QuotientGroup.mk' N)).index ∣ K.index :=
+      Subgroup.index_map_dvd K (QuotientGroup.mk'_surjective N)
+    have hdvdL : (L.map (QuotientGroup.mk' N)).index ∣ L.index :=
+      Subgroup.index_map_dvd L (QuotientGroup.mk'_surjective N)
+    haveI := hH; haveI := hK; haveI := hL
+    exact ih _ hlt (G' ⧸ N) rfl _ _ _
+      (Nat.Coprime.coprime_dvd_right hdvdK (Nat.Coprime.coprime_dvd_left hdvdH hHK))
+      (Nat.Coprime.coprime_dvd_right hdvdL (Nat.Coprime.coprime_dvd_left hdvdH hHL))
+      (Nat.Coprime.coprime_dvd_right hdvdL (Nat.Coprime.coprime_dvd_left hdvdK hKL))
+      (solvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective H))
+      (solvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective K))
+      (solvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective L))
+  by_cases hHbot : H = ⊥
+  · -- `|G:K|` divides `|G| = |G:H|` and is coprime to it, so `K = G`.
+    have hKdvd : K.index ∣ H.index := by
+      rw [hHbot, Subgroup.index_bot]
+      exact Subgroup.index_dvd_card K
+    have hKtop : K = ⊤ :=
+      Subgroup.index_eq_one.mp (Nat.eq_one_of_dvd_coprimes hHK hKdvd dvd_rfl)
+    haveI : IsSolvable (⊤ : Subgroup G') := hKtop ▸ hK
+    exact solvable_of_surjective
+      (f := (Subgroup.topEquiv (G := G')).toMonoidHom)
+      (Subgroup.topEquiv (G := G')).surjective
+  · -- Take a minimal normal subgroup `M₀` of `H`: a `p`-group by Lemma 3.11.
+    haveI := hH
+    haveI hHnt : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hHbot
+    obtain ⟨M₀, hM₀min, -⟩ :=
+      OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal
+        (⊤ : Subgroup ↥H) top_ne_bot
+    haveI hM₀N : M₀.Normal := hM₀min.1
+    obtain ⟨p, hp_prime, hElem⟩ := solvable_minimal_normal_isElementaryAbelian hM₀min
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have hM₀p : IsPGroup p M₀ := fun x =>
+      ⟨1, by rw [pow_one]; exact hElem.pow_eq_one x⟩
+    have hM_ne : M₀.map H.subtype ≠ ⊥ := by
+      rw [Ne, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff]
+      exact hM₀min.2.1
+    have hM_norm : ∀ u ∈ H, ∀ m ∈ M₀.map H.subtype, u * m * u⁻¹ ∈ M₀.map H.subtype := by
+      rintro u hu m ⟨m₀, hm₀, rfl⟩
+      exact ⟨⟨u, hu⟩ * m₀ * ⟨u, hu⟩⁻¹, hM₀N.conj_mem m₀ hm₀ ⟨u, hu⟩, rfl⟩
+    -- `p` divides at most one of `|G:K|`, `|G:L|`; apply the core step to the other.
+    by_cases hpK : p ∣ K.index
+    · have hpL : ¬ p ∣ L.index := fun hpL =>
+        hp_prime.ne_one (Nat.eq_one_of_dvd_coprimes hKL hpK hpL)
+      exact solvable_of_coprime_index_aux hHL hL hpL hM_ne (hM₀p.map H.subtype)
+        hM_norm hquot
+    · exact solvable_of_coprime_index_aux hHK hK hpK hM_ne (hM₀p.map H.subtype)
+        hM_norm hquot
 
 end -- 3C
 
