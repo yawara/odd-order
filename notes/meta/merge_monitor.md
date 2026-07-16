@@ -716,6 +716,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #3、Fable hub) — ✅ a 合流 (Ch07 forward 討ち)、b/c 変化なし、census 23 不変**:
+  **a** = `dcfb8f90` (Ch07 ForwardFromCh03 の forward 宣言実証明化 = Thm 3.15 Hall-E converse via
+  Burnside、+198/-48、207 行) + AxiomsCheck 独立追記 (Thm 3.17 等 assert 追加) を merge `48caf172`:
+  build **4292 jobs green**・AxiomsCheck OK (feitThompson 3 axioms allowlist 明示ログ確認)。
+  **b/c** = 変化なし。sorry 23 不変・新 axiom なし。push `15505b80..48caf172`。
 - **2026-07-17 (tick #2、Fable hub) — ✅ a+b 合流、c 変化なし、census 23 不変**:
   **a** = `06ae3107` (Ch03 Thm 3.17 Wielandt three-subgroup solvability、Theorem315.lean 1157→1336 行) を
   merge `01b7ce06`: build **4290 jobs green**。⚠ サイズ watch: Theorem315.lean 1336 行 (1500 接近、次の主結果は
