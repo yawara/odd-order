@@ -298,6 +298,84 @@ theorem semidirectProduct_isMultiplyPretransitive_quotient_inrRange {k : ℕ}
     exact hcalc.symm
   exact IsPretransitive.of_embedding (f := f) hf
 
+/-! Supporting API for Cor 8.6: the coset space of `A` in `H ⋊ A` is in
+bijection with `H`, and the coset action is faithful when the action of `A`
+on `H` is.  (Isaacs uses these in Cor 8.7 to conclude that `V ⋊ GL(n,2)` is
+a *permutation group* of degree `2^n`.) -/
+
+lemma semidirectProduct_mem_inrRange_iff {x : G₀} :
+    x ∈ (inr : A →* G₀).range ↔ x.left = 1 := by
+  constructor
+  · rintro ⟨a, rfl⟩
+    exact left_inr a
+  · intro h
+    refine ⟨x.right, ?_⟩
+    ext
+    · rw [left_inr, h]
+    · rw [right_inr]
+
+lemma semidirectProduct_inr_mul_inl (a : A) (h : H) :
+    (inr a * inl h : G₀) = inl (MulDistribMulAction.toMulAut A H a h) * inr a := by
+  rw [inl_aut, map_inv]
+  group
+
+/-- The coset space of `A` in `H ⋊ A` is in bijection with `H`, via
+`h ↦ ⟦inl h⟧`.  (In Isaacs's terms: the degree of the coset action of
+`H ⋊ A` is `|H|`.) -/
+noncomputable def semidirectProductQuotientInrEquiv :
+    H ≃ G₀ ⧸ (inr : A →* G₀).range := by
+  refine Equiv.ofBijective (fun h => ((inl h : G₀) : G₀ ⧸ (inr : A →* G₀).range))
+    ⟨fun h h' hhh' => ?_, fun β => ?_⟩
+  · rw [QuotientGroup.eq, ← map_inv, ← map_mul,
+      semidirectProduct_mem_inrRange_iff, left_inl] at hhh'
+    exact inv_mul_eq_one.mp hhh'
+  · obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective β
+    refine ⟨g.left, ?_⟩
+    conv_rhs => rw [← inl_left_mul_inr_right g]
+    rw [QuotientGroup.mk_mul_of_mem _ (MonoidHom.mem_range.mpr ⟨g.right, rfl⟩)]
+
+@[simp]
+lemma semidirectProductQuotientInrEquiv_apply (h : H) :
+    semidirectProductQuotientInrEquiv A H h
+      = ((inl h : G₀) : G₀ ⧸ (inr : A →* G₀).range) :=
+  rfl
+
+/-- If the action of `A` on `H` is faithful, then the action of `H ⋊ A` on
+the coset space of `A` is faithful.  (Kernel argument of Isaacs Cor 8.7: the
+kernel `K` lies in `A` and is normal, so `[H, K] ≤ H ∩ K = 1`, forcing `K`
+to act trivially on `H`.) -/
+theorem semidirectProduct_quotient_inrRange_faithfulSMul [FaithfulSMul A H] :
+    FaithfulSMul G₀ (G₀ ⧸ (inr : A →* G₀).range) where
+  eq_of_smul_eq_smul {g₁ g₂} hfix := by
+    set K : Subgroup G₀ := (inr : A →* G₀).range with hK
+    -- reduce to: `g := g₂⁻¹ * g₁` acts trivially, hence is `1`
+    suffices htriv : ∀ g : G₀, (∀ x : G₀ ⧸ K, g • x = x) → g = 1 by
+      have := htriv (g₂⁻¹ * g₁) fun x => by
+        rw [mul_smul, hfix x, inv_smul_smul]
+      rwa [inv_mul_eq_one, eq_comm] at this
+    intro g hg
+    -- `g` stabilizes the base coset, so `g = inr a`
+    have hmem : g ∈ K := by
+      rw [hK, ← MulAction.stabilizer_quotient ((inr : A →* G₀).range)]
+      exact hg ((1 : G₀) : G₀ ⧸ K)
+    obtain ⟨a, rfl⟩ := hmem
+    -- `g` fixes every `⟦inl h⟧`, so `a` fixes every `h`
+    have ha : ∀ h : H, a • h = h := by
+      intro h
+      have := hg ((inl h : G₀) : G₀ ⧸ K)
+      rw [MulAction.Quotient.smul_mk, smul_eq_mul,
+        semidirectProduct_inr_mul_inl,
+        QuotientGroup.mk_mul_of_mem _ (MonoidHom.mem_range.mpr ⟨a, rfl⟩)]
+        at this
+      exact (semidirectProductQuotientInrEquiv A H).injective this
+    rw [← map_one (inr : A →* G₀)]
+    congr 1
+    exact FaithfulSMul.eq_of_smul_eq_smul fun h => by rw [ha h, one_smul]
+
+lemma semidirectProduct_natCard_quotient_inrRange :
+    Nat.card (G₀ ⧸ (inr : A →* G₀).range) = Nat.card H :=
+  (Nat.card_congr (semidirectProductQuotientInrEquiv A H)).symm
+
 end SemidirectProduct
 
 end OddOrder.Isaacs.Ch08
