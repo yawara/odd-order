@@ -505,5 +505,6 @@ notes/
 
 ## 補足ドキュメント
 
+- **全 3 冊完全形式化フェーズ (2026-07-16 開始) のギャップ調査正本**: [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) — feitThompson axiom-clean 達成 (2026-07-15) 後の全 815 結果インベントリ (実作業ギャップ 214 件) + 推奨順序
 - mathlib カバレッジ詳細 (どの mathlib 資産が使えるか、何が欠けているか): [`notes/meta/mathlib_coverage.md`](notes/meta/mathlib_coverage.md)
 - プロジェクトセットアップ状態: メモリ `project_setup_state.md` 参照
