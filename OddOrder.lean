@@ -127,6 +127,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.PCycleJordan
 import OddOrder.Isaacs.Ch08_PermutationGroups.Bochert
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransvectionGeneration
 import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
+import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
