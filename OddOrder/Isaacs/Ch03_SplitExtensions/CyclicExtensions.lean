@@ -410,6 +410,334 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
     rw [← (SemidirectProduct.inr : Multiplicative ℤ →* CyclicExtPreG N σ).map_inv] at *
     exact h_inl_aut.symm
 
+/-! ### Isaacs Thm 3.35 (extension isomorphism, existence)
+
+`cyclic_quotient_extension_unique` (uniqueness 半分, 上) の existence 半分.
+`N ⊴ G`, `N₀ ⊴ G₀` が共に位数 `m` の巡回商 (生成元 `gN`, `g₀N₀`) を持ち,
+`ν : ↥N ≃* ↥N₀` が power data (`ν (g^m) = g₀^m`) と conjugation data
+(`ν (x^g) = (ν x)^(g₀)`) に整合するとき, `ν` は `g ↦ g₀` なる同型 `θ : G ≃* G₀` に延長する.
+
+証明は Thm 3.36 の標準模型 `(↥N ⋊_σ ℤ) ⧸ ⟨(a⁻¹, m)⟩` (同ファイル上の private 部品) 経由:
+
+* **補題 A** (`cyclicModelEquiv`): データ (gen, card, `g^m ∈ N`) を満たす `(G, N, g)` は
+  標準模型 (`σ := MulAut.conjNormal g`, `a := g^m`) と同型. `SemidirectProduct.lift` の
+  `Φ : ↥N ⋊ ℤ →* G` が relator `K = ⟨((g^m)⁻¹, m)⟩` を消して商に降下し, 分解
+  `u = x · gⁱ` で全射, `orderOf (gN) = m` から `ker Φ ≤ K` で単射.
+* **補題 B** (`cyclicModelCongr`): `ν` の整合データは標準模型間の同型を誘導
+  (`SemidirectProduct.congr` + relator の対応 `K ↦ K₀`).
+* **組み立て**: `θ = (補題 A for G)⁻¹ ≫ 補題 B ≫ (補題 A for G₀)`. -/
+
+/-- Conjugation by `g`, restricted to a normal subgroup `N` containing `g ^ m`,
+fixes `g ^ m` (as an element of `↥N`). -/
+private lemma conjNormal_fixes_self_pow {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {m : ℕ} (g : G) (hgm : g ^ m ∈ N) :
+    MulAut.conjNormal g (⟨g ^ m, hgm⟩ : ↥N) = ⟨g ^ m, hgm⟩ := by
+  apply Subtype.ext
+  rw [MulAut.conjNormal_apply]
+  change g * g ^ m * g⁻¹ = g ^ m
+  group
+
+/-- `(MulAut.conjNormal g) ^ m = MulAut.conj ⟨g ^ m, _⟩` as automorphisms of `↥N`. -/
+private lemma conjNormal_pow_eq_conj {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {m : ℕ} (g : G) (hgm : g ^ m ∈ N) :
+    MulAut.conjNormal g ^ m = MulAut.conj (⟨g ^ m, hgm⟩ : ↥N) := by
+  rw [← map_pow]
+  exact MulAut.conjNormal_val (h := (⟨g ^ m, hgm⟩ : ↥N))
+
+/-- Left component of the model relator `(a⁻¹, m)`. -/
+private lemma cyclicExtK_left {N : Type*} [Group N] (m : ℕ) (a : N) (σ : MulAut N) :
+    (cyclicExtK m a σ).left = a⁻¹ := by
+  change (SemidirectProduct.inl a⁻¹ *
+    SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)) : CyclicExtPreG N σ).left = a⁻¹
+  simp [SemidirectProduct.mul_left]
+
+/-- Right component of the model relator `(a⁻¹, m)`. -/
+private lemma cyclicExtK_right {N : Type*} [Group N] (m : ℕ) (a : N) (σ : MulAut N) :
+    (cyclicExtK m a σ).right = Multiplicative.ofAdd (m : ℤ) := by
+  change (SemidirectProduct.inl a⁻¹ *
+    SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)) : CyclicExtPreG N σ).right = _
+  simp [SemidirectProduct.mul_right]
+
+/-- Powers of the model relator: `(a⁻¹, m) ^ j = (a^(-j), j·m)` (its two components
+commute since `σ^m = conj a` fixes `a⁻¹`). -/
+private lemma cyclicExtK_zpow {N : Type*} [Group N] (m : ℕ) (a : N) (σ : MulAut N)
+    (hσm : σ ^ m = MulAut.conj a) (j : ℤ) :
+    cyclicExtK m a σ ^ j =
+      SemidirectProduct.inl (a ^ (-j)) *
+        SemidirectProduct.inr (Multiplicative.ofAdd (j * (m : ℤ))) := by
+  have hφ : (cyclicExtPhi σ) (Multiplicative.ofAdd (m : ℤ)) a⁻¹ = a⁻¹ := by
+    change (σ ^ ((m : ℕ) : ℤ)) a⁻¹ = a⁻¹
+    rw [zpow_natCast, hσm]
+    change a * a⁻¹ * a⁻¹ = a⁻¹
+    rw [mul_inv_cancel, one_mul]
+  have hcomm : Commute (SemidirectProduct.inl a⁻¹ : CyclicExtPreG N σ)
+      (SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ))) := by
+    have h := SemidirectProduct.inl_aut (φ := cyclicExtPhi σ)
+      (Multiplicative.ofAdd (m : ℤ)) a⁻¹
+    rw [hφ] at h
+    -- h : inl a⁻¹ = inr (ofAdd m) * inl a⁻¹ * inr (ofAdd m)⁻¹
+    change SemidirectProduct.inl a⁻¹ * SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)) =
+      SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)) * SemidirectProduct.inl a⁻¹
+    conv_lhs => rw [h]
+    rw [map_inv SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)), inv_mul_cancel_right]
+  calc cyclicExtK m a σ ^ j
+      = (SemidirectProduct.inl a⁻¹ *
+          SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)) : CyclicExtPreG N σ) ^ j := rfl
+    _ = (SemidirectProduct.inl a⁻¹ : CyclicExtPreG N σ) ^ j *
+          SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)) ^ j := hcomm.mul_zpow j
+    _ = SemidirectProduct.inl (a ^ (-j)) *
+          SemidirectProduct.inr (Multiplicative.ofAdd (j * (m : ℤ))) := by
+        rw [← map_zpow SemidirectProduct.inl a⁻¹ j,
+            ← map_zpow SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)) j,
+            inv_zpow, ← zpow_neg, ← ofAdd_zsmul, smul_eq_mul]
+
+/-- Recognition homomorphism `Φ : ↥N ⋊_{conj g} ℤ →* G`, `(x, k) ↦ ↑x * g ^ k`,
+from the pre-quotient model into an ambient group with `N ⊴ G`. -/
+private noncomputable def cyclicModelHom {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    (g : G) : CyclicExtPreG ↥N (MulAut.conjNormal g) →* G :=
+  SemidirectProduct.lift N.subtype (zpowersHom G g) fun t => by
+    ext x
+    change ((MulAut.conjNormal g ^ t.toAdd) x : G) = MulAut.conj (g ^ t.toAdd) (x : G)
+    rw [← map_zpow MulAut.conjNormal g t.toAdd, MulAut.conjNormal_apply, MulAut.conj_apply]
+
+private lemma cyclicModelHom_apply {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    (g : G) (p : CyclicExtPreG ↥N (MulAut.conjNormal g)) :
+    cyclicModelHom g p = (p.left : G) * g ^ p.right.toAdd := rfl
+
+/-- `Φ` kills the relator subgroup `K` (as `Φ (a⁻¹, m) = (g^m)⁻¹ * g^m = 1`). -/
+private lemma cyclicExtKSubgroup_le_ker_cyclicModelHom {G : Type*} [Group G]
+    {N : Subgroup G} [N.Normal] {m : ℕ} (g : G) (hgm : g ^ m ∈ N) :
+    cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g) ≤
+      (cyclicModelHom (N := N) g).ker := by
+  have hK1 : cyclicModelHom (N := N) g
+      (cyclicExtK m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)) = 1 := by
+    rw [cyclicModelHom_apply, cyclicExtK_left, cyclicExtK_right]
+    change (g ^ m)⁻¹ * g ^ ((m : ℕ) : ℤ) = 1
+    rw [zpow_natCast, inv_mul_cancel]
+  intro p hp
+  rw [Subgroup.mem_zpowers_iff] at hp
+  obtain ⟨j, rfl⟩ := hp
+  rw [MonoidHom.mem_ker, map_zpow, hK1, one_zpow]
+
+/-- `Φ` is surjective: every `u ∈ G` decomposes as `u = x · gⁱ` with `x ∈ N`
+(same idiom as in `cyclic_quotient_extension_unique`). -/
+private lemma cyclicModelHom_surjective {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    (g : G) (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤) :
+    Function.Surjective (cyclicModelHom (N := N) g) := by
+  intro u
+  have hu_mem : (u : G ⧸ N) ∈ Subgroup.zpowers ((g : G ⧸ N)) := hg_gen ▸ Subgroup.mem_top _
+  rw [Subgroup.mem_zpowers_iff] at hu_mem
+  obtain ⟨i, hi⟩ := hu_mem
+  have hx_mem : u * (g ^ i)⁻¹ ∈ N := by
+    rw [← QuotientGroup.eq_one_iff, QuotientGroup.mk_mul, QuotientGroup.mk_inv,
+        QuotientGroup.mk_zpow, ← hi]
+    group
+  refine ⟨⟨⟨u * (g ^ i)⁻¹, hx_mem⟩, Multiplicative.ofAdd i⟩, ?_⟩
+  rw [cyclicModelHom_apply]
+  change u * (g ^ i)⁻¹ * g ^ i = u
+  exact inv_mul_cancel_right u (g ^ i)
+
+/-- `ker Φ ≤ K`: if `↑x * g ^ k = 1` then `(gN)^k = 1`, so `m ∣ k` (from
+`orderOf (gN) = |G/N| = m`), and `(x, k)` is the corresponding power of the relator. -/
+private lemma cyclicModelHom_ker_le {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {m : ℕ} (g : G) (hgm : g ^ m ∈ N)
+    (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤) (hcard : Nat.card (G ⧸ N) = m) :
+    (cyclicModelHom (N := N) g).ker ≤
+      cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g) := by
+  intro p hp
+  rw [MonoidHom.mem_ker, cyclicModelHom_apply] at hp
+  -- `(gN) ^ k = 1` in `G ⧸ N` for `k := p.right.toAdd`.
+  have hgk : ((g : G ⧸ N)) ^ p.right.toAdd = 1 := by
+    rw [← QuotientGroup.mk_zpow, QuotientGroup.eq_one_iff, eq_inv_of_mul_eq_one_right hp]
+    exact inv_mem p.left.2
+  -- `orderOf (gN) = m`, hence `m ∣ k`.
+  have hdvd : ((m : ℕ) : ℤ) ∣ p.right.toAdd := by
+    have hord : orderOf ((g : G ⧸ N)) = m := by
+      rw [orderOf_eq_card_of_zpowers_eq_top hg_gen, hcard]
+    rw [← hord]
+    exact orderOf_dvd_iff_zpow_eq_one.mpr hgk
+  obtain ⟨j, hj⟩ := hdvd
+  -- `p = (a⁻¹, m) ^ j` componentwise.
+  rw [Subgroup.mem_zpowers_iff]
+  refine ⟨j, ?_⟩
+  rw [cyclicExtK_zpow m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)
+      (conjNormal_pow_eq_conj g hgm) j]
+  have hp_right : Multiplicative.ofAdd (j * (m : ℤ)) = p.right := by
+    rw [mul_comm, ← hj, ofAdd_toAdd]
+  have hp_left : (p.left : G) = (((⟨g ^ m, hgm⟩ : ↥N) ^ (-j) : ↥N) : G) := by
+    rw [eq_inv_of_mul_eq_one_left hp, hj, SubgroupClass.coe_zpow]
+    change (g ^ (((m : ℕ) : ℤ) * j))⁻¹ = (g ^ m) ^ (-j)
+    rw [← zpow_neg, ← zpow_natCast g m, ← zpow_mul, mul_neg]
+  conv_rhs => rw [← SemidirectProduct.inl_left_mul_inr_right p]
+  rw [hp_right, Subtype.ext hp_left]
+
+/-- **補題 A (model recognition)**: `(G, N, g)` with cyclic-quotient data
+(`zpowers (gN) = ⊤`, `|G/N| = m`, `g^m ∈ N`) is isomorphic to the standard model
+`(↥N ⋊_{conj g} ℤ) ⧸ ⟨((g^m)⁻¹, m)⟩` of Thm 3.36. -/
+private noncomputable def cyclicModelEquiv {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {m : ℕ} (g : G) (hgm : g ^ m ∈ N)
+    (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤) (hcard : Nat.card (G ⧸ N) = m)
+    [(cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)).Normal] :
+    (CyclicExtPreG ↥N (MulAut.conjNormal g) ⧸
+        cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)) ≃* G :=
+  MulEquiv.ofBijective
+    (QuotientGroup.lift _ (cyclicModelHom g) (cyclicExtKSubgroup_le_ker_cyclicModelHom g hgm))
+    ⟨(injective_iff_map_eq_one _).mpr fun q hq => by
+        obtain ⟨p, rfl⟩ := QuotientGroup.mk_surjective q
+        rw [QuotientGroup.lift_mk'] at hq
+        exact (QuotientGroup.eq_one_iff _).mpr
+          (cyclicModelHom_ker_le g hgm hg_gen hcard (MonoidHom.mem_ker.mpr hq)),
+      fun u => by
+        obtain ⟨p, hp⟩ := cyclicModelHom_surjective g hg_gen u
+        exact ⟨QuotientGroup.mk p, by rwa [QuotientGroup.lift_mk']⟩⟩
+
+private lemma cyclicModelEquiv_mk {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {m : ℕ} (g : G) (hgm : g ^ m ∈ N)
+    (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤) (hcard : Nat.card (G ⧸ N) = m)
+    [(cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)).Normal]
+    (p : CyclicExtPreG ↥N (MulAut.conjNormal g)) :
+    cyclicModelEquiv g hgm hg_gen hcard (QuotientGroup.mk p) = cyclicModelHom g p := rfl
+
+private lemma cyclicModelEquiv_mk_inl {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {m : ℕ} (g : G) (hgm : g ^ m ∈ N)
+    (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤) (hcard : Nat.card (G ⧸ N) = m)
+    [(cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)).Normal] (x : ↥N) :
+    cyclicModelEquiv g hgm hg_gen hcard
+      (QuotientGroup.mk (SemidirectProduct.inl x)) = (x : G) := by
+  rw [cyclicModelEquiv_mk, cyclicModelHom_apply]
+  change (x : G) * g ^ (0 : ℤ) = (x : G)
+  rw [zpow_zero, mul_one]
+
+private lemma cyclicModelEquiv_mk_inr_one {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {m : ℕ} (g : G) (hgm : g ^ m ∈ N)
+    (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤) (hcard : Nat.card (G ⧸ N) = m)
+    [(cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)).Normal] :
+    cyclicModelEquiv g hgm hg_gen hcard
+      (QuotientGroup.mk (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)))) = g := by
+  rw [cyclicModelEquiv_mk, cyclicModelHom_apply]
+  change (1 : G) * g ^ (1 : ℤ) = g
+  rw [zpow_one, one_mul]
+
+/-- The intertwining `ν ∘ (conj g) = (conj g₀) ∘ ν` in bundled `MulAut.congr` form. -/
+private lemma mulAutCongr_conjNormal {G G₀ : Type*} [Group G] [Group G₀]
+    {N : Subgroup G} [N.Normal] {N₀ : Subgroup G₀} [N₀.Normal]
+    (ν : ↥N ≃* ↥N₀) (g : G) (g₀ : G₀)
+    (hint : ∀ x : ↥N, ν (MulAut.conjNormal g x) = MulAut.conjNormal g₀ (ν x)) :
+    MulAut.congr ν (MulAut.conjNormal g) = MulAut.conjNormal g₀ := by
+  refine MulEquiv.ext fun y => ?_
+  change ν (MulAut.conjNormal g (ν.symm y)) = MulAut.conjNormal g₀ y
+  rw [hint (ν.symm y), MulEquiv.apply_symm_apply]
+
+/-- **補題 B (ν-transport)**: `ν : ↥N ≃* ↥N₀` intertwining the conjugation actions
+induces an isomorphism of the pre-quotient models. -/
+private noncomputable def cyclicModelCongr {G G₀ : Type*} [Group G] [Group G₀]
+    {N : Subgroup G} [N.Normal] {N₀ : Subgroup G₀} [N₀.Normal]
+    (ν : ↥N ≃* ↥N₀) (g : G) (g₀ : G₀)
+    (hint : ∀ x : ↥N, ν (MulAut.conjNormal g x) = MulAut.conjNormal g₀ (ν x)) :
+    CyclicExtPreG ↥N (MulAut.conjNormal g) ≃* CyclicExtPreG ↥N₀ (MulAut.conjNormal g₀) :=
+  SemidirectProduct.congr ν (MulEquiv.refl (Multiplicative ℤ)) fun t => by
+    refine MulEquiv.ext fun x => ?_
+    change ν ((MulAut.conjNormal g ^ t.toAdd) x) = (MulAut.conjNormal g₀ ^ t.toAdd) (ν x)
+    rw [← mulAutCongr_conjNormal ν g g₀ hint,
+        ← map_zpow (MulAut.congr ν) (MulAut.conjNormal g) t.toAdd]
+    change ν ((MulAut.conjNormal g ^ t.toAdd) x) =
+      ν ((MulAut.conjNormal g ^ t.toAdd) (ν.symm (ν x)))
+    rw [MulEquiv.symm_apply_apply]
+
+private lemma cyclicModelCongr_inl {G G₀ : Type*} [Group G] [Group G₀]
+    {N : Subgroup G} [N.Normal] {N₀ : Subgroup G₀} [N₀.Normal]
+    (ν : ↥N ≃* ↥N₀) (g : G) (g₀ : G₀)
+    (hint : ∀ x : ↥N, ν (MulAut.conjNormal g x) = MulAut.conjNormal g₀ (ν x)) (x : ↥N) :
+    cyclicModelCongr ν g g₀ hint (SemidirectProduct.inl x) =
+      SemidirectProduct.inl (ν x) := rfl
+
+private lemma cyclicModelCongr_inr {G G₀ : Type*} [Group G] [Group G₀]
+    {N : Subgroup G} [N.Normal] {N₀ : Subgroup G₀} [N₀.Normal]
+    (ν : ↥N ≃* ↥N₀) (g : G) (g₀ : G₀)
+    (hint : ∀ x : ↥N, ν (MulAut.conjNormal g x) = MulAut.conjNormal g₀ (ν x))
+    (t : Multiplicative ℤ) :
+    cyclicModelCongr ν g g₀ hint (SemidirectProduct.inr t) = SemidirectProduct.inr t := by
+  apply SemidirectProduct.ext
+  · change ν 1 = 1
+    exact map_one ν
+  · rfl
+
+/-- The ν-transport sends the relator `((g^m)⁻¹, m)` to `((g₀^m)⁻¹, m)`. -/
+private lemma cyclicModelCongr_apply_cyclicExtK {G G₀ : Type*} [Group G] [Group G₀]
+    {N : Subgroup G} [N.Normal] {N₀ : Subgroup G₀} [N₀.Normal]
+    (ν : ↥N ≃* ↥N₀) (g : G) (g₀ : G₀)
+    (hint : ∀ x : ↥N, ν (MulAut.conjNormal g x) = MulAut.conjNormal g₀ (ν x))
+    {m : ℕ} (hgm : g ^ m ∈ N) (hg₀m : g₀ ^ m ∈ N₀)
+    (hνa : ν ⟨g ^ m, hgm⟩ = ⟨g₀ ^ m, hg₀m⟩) :
+    cyclicModelCongr ν g g₀ hint
+        (cyclicExtK m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)) =
+      cyclicExtK m (⟨g₀ ^ m, hg₀m⟩ : ↥N₀) (MulAut.conjNormal g₀) := by
+  change cyclicModelCongr ν g g₀ hint
+      (SemidirectProduct.inl (⟨g ^ m, hgm⟩ : ↥N)⁻¹ *
+        SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ))) = _
+  rw [map_mul, cyclicModelCongr_inl, cyclicModelCongr_inr,
+      map_inv ν (⟨g ^ m, hgm⟩ : ↥N), hνa]
+  rfl
+
+/-- **Isaacs Thm 3.35 (existence)** ⭐: `N ⊴ G`, `N₀ ⊴ G₀` で両商が位数 `m` の巡回群
+(生成元 `gN`, `g₀N₀`, `g^m ∈ N`, `g₀^m ∈ N₀`) のとき, 同型 `ν : ↥N ≃* ↥N₀` が
+
+* power data: `ν (g ^ m) = g₀ ^ m` (`hmatch_pow`), and
+* conjugation data: `ν (g x g⁻¹) = g₀ (ν x) g₀⁻¹` (`hmatch_conj`; 共役は
+  `MulAut.conjNormal` で表現),
+
+に整合するなら, `ν` を延長し `g ↦ g₀` を満たす同型 `θ : G ≃* G₀` が存在する.
+`cyclic_quotient_extension_unique` (uniqueness 半分) と合わせて Isaacs Thm 3.35 が完結.
+
+証明: 両側を Thm 3.36 の標準模型 `(↥N ⋊ ℤ) ⧸ ⟨((g^m)⁻¹, m)⟩` と同一視し
+(`cyclicModelEquiv`, 補題 A), `ν` が誘導する模型間同型 (`cyclicModelCongr` +
+`QuotientGroup.congr`, 補題 B) を挟んで合成する. -/
+theorem cyclic_quotient_extension_iso_exists
+    {G G₀ : Type*} [Group G] [Group G₀]
+    {N : Subgroup G} [N.Normal] {N₀ : Subgroup G₀} [N₀.Normal]
+    (ν : ↥N ≃* ↥N₀) {g : G} {g₀ : G₀} {m : ℕ} (_hm : 0 < m)
+    (hg_gen : Subgroup.zpowers ((g : G ⧸ N)) = ⊤) (hcard : Nat.card (G ⧸ N) = m)
+    (hg₀_gen : Subgroup.zpowers ((g₀ : G₀ ⧸ N₀)) = ⊤) (hcard₀ : Nat.card (G₀ ⧸ N₀) = m)
+    (hgm : g ^ m ∈ N) (hg₀m : g₀ ^ m ∈ N₀)
+    (hmatch_pow : ((ν ⟨g ^ m, hgm⟩ : ↥N₀) : G₀) = g₀ ^ m)
+    (hmatch_conj : ∀ x : ↥N,
+      ((ν (MulAut.conjNormal g x) : ↥N₀) : G₀) = g₀ * ((ν x : ↥N₀) : G₀) * g₀⁻¹) :
+    ∃ θ : G ≃* G₀, (∀ x : ↥N, θ (x : G) = ((ν x : ↥N₀) : G₀)) ∧ θ g = g₀ := by
+  -- bundled forms of the matching data
+  have hint : ∀ x : ↥N, ν (MulAut.conjNormal g x) = MulAut.conjNormal g₀ (ν x) := fun x => by
+    apply Subtype.ext
+    rw [hmatch_conj x, MulAut.conjNormal_apply]
+  have hνa : ν ⟨g ^ m, hgm⟩ = ⟨g₀ ^ m, hg₀m⟩ := Subtype.ext hmatch_pow
+  -- normality of the two model relator subgroups (via Thm 3.36 infrastructure)
+  haveI : (cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)).Normal :=
+    cyclicExtKSubgroup_normal _ _ _ (conjNormal_fixes_self_pow g hgm)
+      (conjNormal_pow_eq_conj g hgm)
+  haveI : (cyclicExtKSubgroup m (⟨g₀ ^ m, hg₀m⟩ : ↥N₀) (MulAut.conjNormal g₀)).Normal :=
+    cyclicExtKSubgroup_normal _ _ _ (conjNormal_fixes_self_pow g₀ hg₀m)
+      (conjNormal_pow_eq_conj g₀ hg₀m)
+  -- the ν-transport respects the relator subgroups
+  have hmap : Subgroup.map (cyclicModelCongr ν g g₀ hint :
+        CyclicExtPreG ↥N (MulAut.conjNormal g) →* CyclicExtPreG ↥N₀ (MulAut.conjNormal g₀))
+      (cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)) =
+      cyclicExtKSubgroup m (⟨g₀ ^ m, hg₀m⟩ : ↥N₀) (MulAut.conjNormal g₀) := by
+    rw [MonoidHom.map_zpowers]
+    exact congrArg Subgroup.zpowers
+      (cyclicModelCongr_apply_cyclicExtK ν g g₀ hint hgm hg₀m hνa)
+  refine ⟨(cyclicModelEquiv g hgm hg_gen hcard).symm.trans
+    ((QuotientGroup.congr _ _ (cyclicModelCongr ν g g₀ hint) hmap).trans
+      (cyclicModelEquiv g₀ hg₀m hg₀_gen hcard₀)), fun x => ?_, ?_⟩
+  · -- extends ν on N
+    simp only [MulEquiv.trans_apply]
+    rw [(MulEquiv.symm_apply_eq _).mpr (cyclicModelEquiv_mk_inl g hgm hg_gen hcard x).symm,
+        QuotientGroup.congr_mk, cyclicModelCongr_inl]
+    exact cyclicModelEquiv_mk_inl g₀ hg₀m hg₀_gen hcard₀ (ν x)
+  · -- sends g to g₀
+    simp only [MulEquiv.trans_apply]
+    rw [(MulEquiv.symm_apply_eq _).mpr
+          (cyclicModelEquiv_mk_inr_one g hgm hg_gen hcard).symm,
+        QuotientGroup.congr_mk, cyclicModelCongr_inr]
+    exact cyclicModelEquiv_mk_inr_one g₀ hg₀m hg₀_gen hcard₀
+
 end -- 3F
 
 end OddOrder.Isaacs.Ch03
