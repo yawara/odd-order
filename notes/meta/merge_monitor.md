@@ -1,10 +1,23 @@
-# main 合流モニター — 運用手順 (2026-07-15 FT axiom-clean 達成 → 全レーン退役)
+# main 合流モニター — 運用手順 (2026-07-17 全 3 冊フェーズ監視再開)
 
 > **♻ 2026-07-16 再開準備: 全 3 冊完全形式化フェーズ**。レーン配分の正本 =
 > [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md) (a = Isaacs 本文 / b = Ch.8+Suzuki 系 /
 > c = Ch.10+BG 残+Pf 残; issue base a=1000/b=2000/c=3000 不変)。scope 正本 =
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
+>
+> **▶ 2026-07-17 監視再開 (Fable hub)**: レーン a/b/c worktree 再作成済み・全て main tip `b5742b91` から
+> 開始 (未マージ 0)。監視 cron 再作成 = 15 分 `7,22,37,52` (現行明示ユーザー指定 2026-07-15 を継承)。
+> **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
+> FT endgame の履歴であり、新フェーズの range-check には使わない):
+> ```
+> a_re='^OddOrder/Isaacs/'   # ただし Ch08_PermutationGroups/・Ch10_MoreTransfer/ は除外 (= b/c 所有)
+> b_re='^OddOrder/Isaacs/Ch08_PermutationGroups/|^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
+> c_re='^OddOrder/Isaacs/Ch10_MoreTransfer/|^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
+> shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
+> ```
+> Pf Appendices の旧「凍結 scaffold (どのレーンも編集しない)」は失効 — 新フェーズでは b (Suzuki 系) /
+> c (NearFields/Huppert/SemilinearField/FeitSibley) が実 statement 置換で所有 (reallocation note §0-1)。
 >
 > **✅ 2026-07-15 CLOSED: `feitThompson` axiom-clean 達成 (tick #22) → 全レーン a/b/c 退役、監視終了。**
 > `#print axioms OddOrder.feitThompson` = [propext, Classical.choice, Quot.sound] (sorryAx なし)。
