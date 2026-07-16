@@ -431,3 +431,27 @@ A-invariant Hall (Isaacs 3.23 の流れ) も精神的には必要だが、BG は
 * **3.31 Hartley-Turull** — Isaacs 独自結果. **BG / Peterfalvi で by-name 引用 0 件**
   (2026-05-23 audit grep 確認). Ch.4-10 でも by-name cite 無し. ⇒ **Phase 4 までも skip 可**,
   Phase 1 完成度のためのみ.
+
+## 2026-07-17 全 3 冊フェーズ: Ch.3 survey ギャップ一掃 (レーン a)
+
+survey (`notes/meta/three_books_full_survey_2026_07_16.md`) の Ch.3 15 件のうち本日クローズ:
+
+| 結果 | 実装 | 所在 |
+|---|---|---|
+| Lem 3.16 (index clause + 集合積) | `relIndex_eq_index_of_coprime_index`, `set_mul_eq_univ_of_coprime_index` | `Theorem315.lean` |
+| Thm 3.17 Wielandt | `isSolvable_of_pairwise_coprime_index` (**Burnside 不要** — 旧 placeholder の記載は誤りだった) | `Theorem315.lean` |
+| Thm 3.15 Hall E 逆 | `isSolvable_of_pcomplement_exists` (Burnside + 3.17 経由) | `Ch07/ForwardFromCh03.lean` (owner=Ch.7) |
+| Lem 3.18 | `isPiSeparable_of_subnormal_ladder` + ladder 特徴付け一式 (支配補題 / 存在 / 原子拡大 / iso 転送 / **拡大閉包** `isPiSeparable_of_normal_of_quotient`) | 新 leaf `PiSeparableSeries.lean` |
+| Thm 3.22 完全形 | `quotient_oPiPrimePiCore_isPiGroup_compl_of_abelian_pi_hall` (genuine π-length ≤ 1; BG `HasPiLengthOne` は comap_top 一行) | `Main.lean` |
+| Thm 3.26 | 核心 2 clause + `aInvariantConjClassesEquiv` (bijection packaging) | `Ch04/ForwardFromCh03.lean` |
+| Lem 3.32 | `card_inf_fixedSubgroup_of_aInvariant_sylow` | `Ch04/ForwardFromCh03.lean` |
+| Lem 3.33 | `exists_equivariant_equiv_of_card_fixedPoints_eq` (Finite A 不要の軽い一般化) | 新 leaf `Ch04/HartleyTurull.lean` |
+| Thm 3.31 | `exists_abelian_fixedPoint_replacement` (+ solvable 段 / 積公式; \|H\|=\|G\| 強化) | `Ch04/HartleyTurull.lean` |
+| Thm 3.36 補完 | `Nat.card (G ⧸ N₀) = m` 節追加 | `CyclicExtensions.lean` (§3F を Main から分割) |
+
+**残り (進行中/未着手)**: Thm 3.34 (agent 実装中 → `HartleyTurull.lean`)、Thm 3.35 existence 半分
+(agent 実装中 → `CyclicExtensions.lean`)、wreath 一般形 (§3A、未着手 — mathlib は regular のみ)。
+
+インフラ副産物: `GroupTheory/FixedSubgroup.lean` (fixedSubgroup を CoprimeAction から upstream 分割,
+issue 9106)、AxiomsCheck に 3.15/3.17/3.18/拡大閉包/3.22 を登録済み (full build green 実測 13-14 分)。
+旧 note の「3.31 は skip 可」判断は全 3 冊フェーズで失効 (survey が正本)。
