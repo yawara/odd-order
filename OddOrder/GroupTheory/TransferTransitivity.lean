@@ -47,6 +47,19 @@ lemma transferRes_apply (hHK : H ≤ K) (ϕ : ↥H →* A) (x : ↥(H.subgroupOf
     transferRes hHK ϕ x = ϕ ⟨(x : ↥K), x.2⟩ :=
   rfl
 
+/-- Naturality of the transfer in the coefficient homomorphism:
+`transfer (ψ ∘ ϕ) = ψ ∘ transfer ϕ` for `ψ : A →* B` between commutative groups.
+(Products commute with `ψ` in the defining `diff`.) -/
+theorem transfer_comp_left {B : Type*} [CommGroup B] [H.FiniteIndex]
+    (ψ : A →* B) (ϕ : ↥H →* A) :
+    MonoidHom.transfer (ψ.comp ϕ) = ψ.comp (MonoidHom.transfer ϕ) := by
+  ext g
+  rw [MonoidHom.comp_apply, MonoidHom.transfer_def (ψ.comp ϕ) default g,
+    MonoidHom.transfer_def ϕ default g]
+  unfold Subgroup.leftTransversals.diff
+  rw [map_prod]
+  rfl
+
 variable (hHK : H ≤ K)
 
 /-- The composite section of `G ⧸ H` induced by a section `f` of `G ⧸ K` and a
