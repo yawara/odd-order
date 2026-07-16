@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Pointwise.Set.Card
+import Mathlib.LinearAlgebra.Eigenspace.Zero
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.GroupTheory.ElementaryAbelian
 
@@ -275,6 +276,64 @@ theorem nilpotencyClass_eq_of_elementaryAbelian_normalClosure_index_prime
     t hP (elemAb_comm hEA) hCyc hcard ?_
   rw [inf_eq_right.mpr hZle]
   exact hZcard
+
+end
+
+section /- 10A: Theorem 10.4 support — the (T−1)-nilpotency argument (pp. 298-299) -/
+
+open Polynomial
+
+variable (p) in
+/-- Over `ZMod p` (`p` prime), `(X - 1)^(p-1) = ∑_{i<p} X^i`: both sides times
+`X - 1` give `X^p - 1` (freshman's dream / geometric sum), and `(ZMod p)[X]` is
+a domain. Used in the proof of Isaacs Thm 10.4. -/
+private lemma X_sub_one_pow_pred_eq_geom_sum :
+    ((X : (ZMod p)[X]) - 1) ^ (p - 1) = ∑ i ∈ Finset.range p, (X : (ZMod p)[X]) ^ i := by
+  have hp1 : 1 ≤ p := hp.out.one_le
+  have hpow : ((X : (ZMod p)[X]) - 1) ^ p = X ^ p - 1 := by
+    rw [sub_pow_char]; simp
+  have hcancel : (((X : (ZMod p)[X]) - 1) ^ (p - 1)) * (X - 1)
+      = (∑ i ∈ Finset.range p, (X : (ZMod p)[X]) ^ i) * (X - 1) := by
+    rw [← pow_succ, Nat.sub_add_cancel hp1, hpow, geom_sum_mul]
+  have hX1 : ((X : (ZMod p)[X]) - 1) ≠ 0 := by
+    simpa using Polynomial.X_sub_C_ne_zero (1 : ZMod p)
+  exact mul_right_cancel₀ hX1 hcancel
+
+/-- **Isaacs Thm 10.4, linear-algebra core**: if `T` is an endomorphism of a
+finite-dimensional `ZMod p`-vector space `M` with `T^p = 1` and
+`dim M < p`, then `∑_{i<p} T^i = 0`.
+
+**証明** (Isaacs p.299): `N := T - 1` は `N^p = T^p - 1 = 0` (char `p`) で冪零。
+Cayley–Hamilton (`IsNilpotent.charpoly_eq_X_pow_finrank`) から `N^{dim M} = 0`、
+`dim M ≤ p - 1` ゆえ `N^{p-1} = 0`。一方 `(X-1)^{p-1} = ∑ X^i` を `T` で評価して
+`0 = N^{p-1} = ∑ T^i`。 -/
+theorem geom_sum_end_eq_zero_of_pow_prime_eq_one_of_finrank_lt
+    {M : Type*} [AddCommGroup M] [Module (ZMod p) M] [Module.Finite (ZMod p) M]
+    {T : Module.End (ZMod p) M} (hT : T ^ p = 1)
+    (hrank : Module.finrank (ZMod p) M < p) :
+    ∑ i ∈ Finset.range p, T ^ i = 0 := by
+  have hpoly : ((X : (ZMod p)[X]) - 1) ^ p = X ^ p - 1 := by
+    rw [sub_pow_char]; simp
+  have hNp : (T - 1) ^ p = 0 := by
+    have h := congrArg (aeval T) hpoly
+    simp only [map_pow, map_sub, aeval_X, map_one] at h
+    rw [h, hT, sub_self]
+  have hCH : (T - 1) ^ Module.finrank (ZMod p) M = 0 := by
+    have hchar := IsNilpotent.charpoly_eq_X_pow_finrank (φ := T - 1) ⟨p, hNp⟩
+    calc (T - 1) ^ Module.finrank (ZMod p) M
+        = aeval (T - 1) ((X : (ZMod p)[X]) ^ Module.finrank (ZMod p) M) := by
+          rw [map_pow, aeval_X]
+      _ = aeval (T - 1) (LinearMap.charpoly (T - 1)) := by rw [hchar]
+      _ = 0 := LinearMap.aeval_self_charpoly _
+  have hNp1 : (T - 1) ^ (p - 1) = 0 := by
+    have hsplit : (T - 1) ^ (p - 1)
+        = (T - 1) ^ Module.finrank (ZMod p) M
+          * (T - 1) ^ (p - 1 - Module.finrank (ZMod p) M) := by
+      rw [← pow_add, Nat.add_sub_cancel' (by omega)]
+    rw [hsplit, hCH, zero_mul]
+  have hgeom := congrArg (aeval T) (X_sub_one_pow_pred_eq_geom_sum p)
+  simp only [map_pow, map_sub, aeval_X, map_one, map_sum] at hgeom
+  rw [← hgeom, hNp1]
 
 end
 
