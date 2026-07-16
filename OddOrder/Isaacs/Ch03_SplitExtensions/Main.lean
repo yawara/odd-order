@@ -1234,7 +1234,8 @@ private lemma cyclicExtKSubgroup_normal {N : Type*} [Group N]
 
 /-- **Isaacs Thm 3.36 (cyclic extension existence)** ⭐:
 given `N`, `m > 0`, `a ∈ N`, `σ ∈ Aut(N)` with `σ a = a` and `σ^m = MulAut.conj a`,
-there exists a group `G` with `N ⊴ G` (via iso `ι`), `G/N` cyclic of order `m` generator `g`,
+there exists a group `G` with `N ⊴ G` (via iso `ι`), `G/N` cyclic **of order exactly `m`**
+(clauses `zpowers ḡ = ⊤` and `Nat.card (G ⧸ N₀) = m`), generator `g`,
 `g^m = ι a` and `g · ι x · g⁻¹ = ι (σ x)`.
 
 Construction: `G := (N ⋊_σ ℤ) / ⟨(a⁻¹, m)⟩`. The element `(a⁻¹, m)` is central (proven in
@@ -1245,6 +1246,7 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
     ∃ (G : Type u) (_ : Group G) (N₀ : Subgroup G) (_ : N₀.Normal)
       (ι : N ≃* ↥N₀) (g : G),
       Subgroup.zpowers ((g : G ⧸ N₀)) = ⊤ ∧
+      Nat.card (G ⧸ N₀) = m ∧
       g ^ m = (ι a : G) ∧
       ∀ x : N, g * (ι x : G) * g⁻¹ = (ι (σ x) : G) := by
   haveI hK_norm : (cyclicExtKSubgroup m a σ).Normal :=
@@ -1313,8 +1315,8 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
   let ι : N ≃* ↥N₀ := MonoidHom.ofInjective h_inj
   -- g := ⟦inr (ofAdd 1)⟧.
   let g : G := QuotientGroup.mk' _ (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)))
-  refine ⟨G, inferInstance, N₀, hN₀_norm, ι, g, ?_, ?_, ?_⟩
-  · -- zpowers ⟦g⟧ = ⊤ in G/N₀: every G/N₀ element lifts to preG, decompose y = inl·inr;
+  have hz : Subgroup.zpowers ((g : G ⧸ N₀)) = ⊤ := by
+    -- every G/N₀ element lifts to preG, decompose y = inl·inr;
     -- inl part vanishes in G/N₀, inr part is ⟦g⟧^(y.right.toAdd).
     rw [Subgroup.eq_top_iff']
     intro z
@@ -1340,7 +1342,7 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
       map_zpow (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)),
       map_zpow (QuotientGroup.mk' N₀)]
     exact Subgroup.zpow_mem_zpowers _ _
-  · -- g^m = ι a.
+  have hgm : g ^ m = (ι a : G) := by
     -- g^m = mk' K (inr (ofAdd m)). (ι a : G) = mk' K (inl a).
     -- (inr (ofAdd m))⁻¹ * inl a = (a, ofAdd(-m)) = cExt⁻¹ ∈ K (using σ^k a = a ∀ k).
     have h_iota_a : (ι a : G) = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
@@ -1371,6 +1373,68 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
           SemidirectProduct.right_inl, SemidirectProduct.right_inr, one_mul, mul_one]
     rw [h_eq_inv]
     exact Subgroup.inv_mem _ (Subgroup.mem_zpowers _)
+  refine ⟨G, inferInstance, N₀, hN₀_norm, ι, g, hz, ?_, hgm, ?_⟩
+  · -- |G/N₀| = m: ḡ の位数が m (両側整除) で, zpowers ḡ = ⊤ と Nat.card_zpowers.
+    have hgbar_pow_m : ((g : G ⧸ N₀)) ^ m = 1 := by
+      have h1 : ((g : G ⧸ N₀)) ^ m = ((g ^ m : G) : G ⧸ N₀) := by
+        rw [← QuotientGroup.mk'_apply, ← map_pow, QuotientGroup.mk'_apply]
+      rw [h1, hgm, QuotientGroup.eq_one_iff]
+      exact SetLike.coe_mem (ι a)
+    have hdvd_m : orderOf ((g : G ⧸ N₀)) ∣ m := orderOf_dvd_of_pow_eq_one hgbar_pow_m
+    have h_ord_ne : orderOf ((g : G ⧸ N₀)) ≠ 0 := by
+      intro h0
+      rw [h0] at hdvd_m
+      exact Nat.pos_iff_ne_zero.mp _hm (Nat.eq_zero_of_zero_dvd hdvd_m)
+    have hm_dvd : m ∣ orderOf ((g : G ⧸ N₀)) := by
+      -- ḡ^k = 1 → g^k ∈ N₀ → inr(ofAdd k) ≡_K inl x → 右成分比較で m ∣ k.
+      have hk := pow_orderOf_eq_one ((g : G ⧸ N₀))
+      set k : ℕ := orderOf ((g : G ⧸ N₀)) with hk_def
+      have h1 : ((g ^ k : G) : G ⧸ N₀) = 1 := by
+        rw [← QuotientGroup.mk'_apply, map_pow, QuotientGroup.mk'_apply]
+        exact hk
+      rw [QuotientGroup.eq_one_iff] at h1
+      obtain ⟨x, hx⟩ := h1
+      have h_g_pow_k : (g ^ k : G) = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+          (SemidirectProduct.inr (Multiplicative.ofAdd (k : ℤ))) := by
+        change (QuotientGroup.mk' _
+          (SemidirectProduct.inr (Multiplicative.ofAdd (1 : ℤ)))) ^ k = _
+        rw [← map_pow]; congr 1
+        rw [← map_pow]; congr 1
+        rw [← ofAdd_nsmul]; congr 1; simp
+      have hx' : QuotientGroup.mk' (cyclicExtKSubgroup m a σ) (SemidirectProduct.inl x) =
+          QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
+            (SemidirectProduct.inr (Multiplicative.ofAdd (k : ℤ))) := by
+        rw [← h_g_pow_k]; exact hx
+      rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at hx'
+      rw [Subgroup.mem_zpowers_iff] at hx'
+      obtain ⟨j, hj⟩ := hx'
+      -- 右成分: ofAdd k = ofAdd (j * m).
+      have h_right := congrArg
+        (SemidirectProduct.rightHom : CyclicExtPreG N σ →* Multiplicative ℤ) hj
+      have h_K_right : SemidirectProduct.rightHom (cyclicExtK m a σ) =
+          Multiplicative.ofAdd (m : ℤ) := by
+        change (SemidirectProduct.inl a⁻¹ * SemidirectProduct.inr _ :
+          CyclicExtPreG N σ).right = _
+        simp
+      rw [map_zpow, h_K_right, map_mul, map_inv] at h_right
+      have h_lhs : (SemidirectProduct.rightHom
+            ((SemidirectProduct.inl x : CyclicExtPreG N σ)))⁻¹ *
+          SemidirectProduct.rightHom
+            (SemidirectProduct.inr (Multiplicative.ofAdd (k : ℤ)) : CyclicExtPreG N σ) =
+          Multiplicative.ofAdd (k : ℤ) := by
+        simp
+      rw [h_lhs, ← ofAdd_zsmul] at h_right
+      have h_int : (k : ℤ) = j * m := by
+        have := congrArg Multiplicative.toAdd h_right
+        simpa [smul_eq_mul] using this.symm
+      have : (m : ℤ) ∣ (k : ℤ) := ⟨j, by rw [h_int]; ring⟩
+      exact_mod_cast this
+    have h_ord : orderOf ((g : G ⧸ N₀)) = m := Nat.dvd_antisymm hdvd_m hm_dvd
+    calc Nat.card (G ⧸ N₀)
+        = Nat.card ↥(⊤ : Subgroup (G ⧸ N₀)) := Subgroup.card_top.symm
+      _ = Nat.card ↥(Subgroup.zpowers ((g : G ⧸ N₀))) := by rw [hz]
+      _ = orderOf ((g : G ⧸ N₀)) := Nat.card_zpowers _
+      _ = m := h_ord
   · -- Conjugation: g · ι x · g⁻¹ = ι (σ x) via SemidirectProduct.inl_aut.
     intro x
     have h_iota_x : (ι x : G) = QuotientGroup.mk' (cyclicExtKSubgroup m a σ)
