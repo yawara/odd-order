@@ -5,16 +5,27 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Transfer
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.GroupTheory.TransferTransitivity
+import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
-# Isaacs §10A — transfer evaluation on a normal subgroup of prime index (pp. 300-301)
+# Isaacs §10A — transfer evaluation at prime index and wreath criteria (pp. 300-302)
 
 Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 10 "More Transfer
-Theory", §10A 中盤: 指数 `p` の正規部分群への pretransfer の明示計算。
+Theory", §10A 中盤: 指数 `p` の正規部分群への pretransfer の明示計算と、
+そこから得られる `C_p ≀ C_p` 準同型像判定。
 
 * **Lemma 10.6**: `M ⊴ P`, `|P : M| = p`, `V : P → M` pretransfer のとき
   (a) `x ∈ M` なら `V(x) ≡ ∏_{t ∈ T} xᵗ mod M'` (`T` は任意の transversal),
   (b) `x ∉ M` なら `V(x) ≡ x^p mod M'`。
+* **Lemma 10.7** (`exists_surjective_wreath_of_transfer_notMem_frattini`):
+  `P` 有限 p-群, `M ⊴ P` 指数 `p`, `V(x) ∉ Φ(M)` (`x ∈ M`) ⇒
+  `C_p ≀ C_p` は `P` の準同型像。
+* **Theorem 10.9**
+  (`exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini`):
+  `S < P`, `V : P →* S^{ab}`, `R = ⟨s ∈ S ∣ o(s) < o(x)⟩`,
+  `V(x) ∉ R·Φ(S)` ⇒ `C_p ≀ C_p` は `P` の準同型像。
+  (10.6(b) + 10.7 + transitivity `transfer_transfer` の合成。)
 
 ## Lean 化の方針
 
@@ -523,6 +534,168 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
   obtain ⟨φ, hφ⟩ := exists_surjective_wreath_of_conj_list_prod_ne_one
     (hP.to_quotient N) hidx' hEA' haA' haZ' hu' hlist'
   exact ⟨φ.comp π, hφ.comp hπsurj⟩
+
+/-- **Isaacs Theorem 10.9**: let `P` be a finite `p`-group, `S < P` a proper
+subgroup, `x ∈ P`, and `V = transfer (Abelianization.of) : P →* S^{ab}` the
+transfer. Write `R = ⟨s ∈ S ∣ o(s) < o(x)⟩`. If `V x` lies outside the image of
+`R·Φ(S)`, then `C_p ≀ C_p` is a homomorphic image of `P`.
+
+**証明** (Isaacs pp. 301-302): `S ≤ M ⋖ P` (極大部分群、正規・指数 `p`) を取り、
+transitivity (`transfer_transfer`) で `V = W₀ ∘ U` 型に分解
+(`W₀ := transfer : ↥M →* S^{ab}` レベルの合成)。
+(1) `U(x) ∈ Φ(M)` (mod `M'`) なら `Φ(M) ≤ M'·M^p` から `U(x)` は `M^{ab}` の
+`p` 乗で、`V x = W₁(U x) = (of s₂)^p = of (s₂^p) ∈ Φ(S)` の像 — 仮定に矛盾。
+(2) `U(x) ∉ Φ(M)` かつ `x ∈ M` なら Lemma 10.7 で結論。
+(3) `x ∉ M` なら 10.6(b) で `V x = W₀(x^p)`; 軌道公式 (transfer-evaluation) の
+各因子は `x^p` の冪の共役 — 位数 `< o(x)` の `S`-元 — なので `V x ∈ R` の像
+— 仮定に矛盾。 -/
+theorem exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini
+    (hP : IsPGroup p P) {S : Subgroup P} (hS : S ≠ ⊤) {x : P}
+    (hV : MonoidHom.transfer (Abelianization.of (G := ↥S)) x
+      ∉ ((Subgroup.closure {s : ↥S | orderOf (s : P) < orderOf x}
+          ⊔ frattini ↥S).map (Abelianization.of (G := ↥S)))) :
+    ∃ φ : P →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)),
+      Function.Surjective φ := by
+  classical
+  have hp_prime : p.Prime := hp.out
+  -- a maximal subgroup M ⊇ S; it is normal of index p
+  obtain ⟨M, hM_coatom, hSM⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom S).resolve_left hS
+  haveI hM_normal : M.Normal := hM_coatom.normal_of_isPGroup hP
+  have hM_idx : M.index = p := by
+    rw [Subgroup.index_eq_card]
+    exact hM_coatom.card_quotient_of_isPGroup hP
+  have hM_pgroup : IsPGroup p ↥M := hP.to_subgroup M
+  have hS_pgroup : IsPGroup p ↥S := hP.to_subgroup S
+  -- transitivity: V = transfer W₀ with W₀ the M-level transfer to S^{ab}
+  set W₀ : ↥M →* Abelianization ↥S :=
+    MonoidHom.transfer (transferRes hSM (Abelianization.of (G := ↥S))) with hW₀_def
+  have hVW : MonoidHom.transfer (Abelianization.of (G := ↥S)) x
+      = MonoidHom.transfer W₀ x := by
+    rw [hW₀_def, transfer_transfer hSM (Abelianization.of (G := ↥S))]
+  by_cases hUx : MonoidHom.transfer (Abelianization.of (G := ↥M)) x
+      ∈ (frattini ↥M).map (Abelianization.of (G := ↥M))
+  · -- Case (1): U(x) ∈ Φ(M) forces V x into the image of Φ(S) — contradiction
+    exfalso
+    apply hV
+    -- W₀ factors through M^{ab}
+    set W₁ : Abelianization ↥M →* Abelianization ↥S := Abelianization.lift W₀ with hW₁_def
+    have hfac : W₀ = W₁.comp (Abelianization.of (G := ↥M)) := by
+      ext m
+      simp [hW₁_def]
+    have hnat : MonoidHom.transfer W₀ x
+        = W₁ (MonoidHom.transfer (Abelianization.of (G := ↥M)) x) := by
+      conv_lhs => rw [hfac]
+      rw [OddOrder.GroupTheory.transfer_comp_left]
+      rfl
+    -- the image of Φ(M) in M^{ab} consists of p-th powers
+    have hrev : frattini ↥M ≤ _root_.commutator ↥M
+        ⊔ Subgroup.normalClosure (Set.range (fun y : ↥M => y ^ p)) := by
+      haveI hnc : (Subgroup.normalClosure
+          (Set.range (fun y : ↥M => y ^ p))).Normal := Subgroup.normalClosure_normal
+      apply OddOrder.Isaacs.Ch04.frattini_le_of_isElementaryAbelian_quotient_of_pgroup
+        hM_pgroup
+      constructor
+      · have hcomm_le : _root_.commutator ↥M ≤ _root_.commutator ↥M
+            ⊔ Subgroup.normalClosure (Set.range (fun y : ↥M => y ^ p)) := le_sup_left
+        exact (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
+          hcomm_le).is_comm.comm
+      · intro q
+        induction q using QuotientGroup.induction_on with
+        | H m =>
+          rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+          exact Subgroup.mem_sup_right
+            (Subgroup.subset_normalClosure ⟨m, rfl⟩)
+    have hpow_mem : MonoidHom.transfer (Abelianization.of (G := ↥M)) x
+        ∈ (powMonoidHom p : Abelianization ↥M →* Abelianization ↥M).range := by
+      obtain ⟨m₀, hm₀_frat, hm₀⟩ := Subgroup.mem_map.mp hUx
+      rw [← hm₀]
+      have h1 : (_root_.commutator ↥M
+            ⊔ Subgroup.normalClosure (Set.range (fun y : ↥M => y ^ p))).map
+              (Abelianization.of (G := ↥M))
+          ≤ (powMonoidHom p : Abelianization ↥M →* Abelianization ↥M).range := by
+        rw [Subgroup.map_sup]
+        apply sup_le
+        · intro z hz
+          obtain ⟨c, hc, rfl⟩ := Subgroup.mem_map.mp hz
+          have hc1 : Abelianization.of c = 1 := by
+            rw [← QuotientGroup.eq_one_iff c] at hc
+            exact hc
+          rw [hc1]
+          exact one_mem _
+        · rw [Subgroup.map_le_iff_le_comap]
+          apply Subgroup.normalClosure_le_normal
+          rintro _ ⟨y, rfl⟩
+          exact ⟨Abelianization.of y, by rw [powMonoidHom_apply, ← map_pow]⟩
+      exact h1 (Subgroup.mem_map_of_mem _ (hrev hm₀_frat))
+    obtain ⟨w, hw⟩ := hpow_mem
+    obtain ⟨s₂, hs₂'⟩ := Quotient.exists_rep (W₁ w)
+    have hs₂ : Abelianization.of s₂ = W₁ w := hs₂'
+    have hfinal : MonoidHom.transfer (Abelianization.of (G := ↥S)) x
+        = Abelianization.of (s₂ ^ p) := by
+      rw [hVW, hnat, ← hw, powMonoidHom_apply, map_pow, ← hs₂, ← map_pow]
+    rw [hfinal]
+    refine Subgroup.map_mono le_sup_right (Subgroup.mem_map_of_mem _ ?_)
+    exact OddOrder.GroupTheory.IsPGroup.pow_mem_frattini hS_pgroup s₂
+  · by_cases hxM : x ∈ M
+    · -- Case (2): Lemma 10.7
+      exact exists_surjective_wreath_of_transfer_notMem_frattini hP hM_idx hxM hUx
+    · -- Case (3): x ∉ M — V x lands in the image of R, contradiction
+      exfalso
+      apply hV
+      have hx_ne : x ≠ 1 := fun h => hxM (h ▸ M.one_mem)
+      -- orderOf (x^p) < orderOf x
+      have hxp_lt : orderOf (x ^ p) < orderOf x := by
+        obtain ⟨k, hk⟩ := hP x
+        obtain ⟨b, hb_le, hb⟩ := (Nat.dvd_prime_pow hp_prime).mp
+          (orderOf_dvd_of_pow_eq_one hk)
+        have hb_pos : 0 < b := by
+          rcases Nat.eq_zero_or_pos b with h0 | h
+          · exfalso
+            rw [h0, pow_zero] at hb
+            exact hx_ne (orderOf_eq_one_iff.mp hb)
+          · exact h
+        rw [orderOf_pow, hb]
+        have hgcd : Nat.gcd (p ^ b) p = p := by
+          rw [Nat.gcd_comm]
+          exact Nat.gcd_eq_left (dvd_pow_self p (by omega))
+        rw [hgcd]
+        calc p ^ b / p = p ^ (b - 1) := by
+              rw [← Nat.pow_div (by omega) hp_prime.pos, pow_one]
+          _ < p ^ b := Nat.pow_lt_pow_right hp_prime.one_lt (by omega)
+      -- V x = W₀ ⟨x^p⟩ by 10.6(b), and the orbit formula lands in the image of R
+      have hVx_pow : MonoidHom.transfer W₀ x
+          = W₀ ⟨x ^ p, hM_idx ▸ M.pow_index_mem x⟩ :=
+        transfer_eq_pow_of_notMem hM_idx W₀ hxM
+      -- any conjugate of a power of x^p has order < orderOf x (as an element of P)
+      have horder_bound : ∀ (r : ↥M) (n : ℕ),
+          orderOf (((r⁻¹ * (⟨x ^ p, hM_idx ▸ M.pow_index_mem x⟩ : ↥M) ^ n * r : ↥M) : P))
+            < orderOf x := by
+        intro r n
+        have hcoe : (((r⁻¹ * (⟨x ^ p, hM_idx ▸ M.pow_index_mem x⟩ : ↥M) ^ n * r : ↥M) : P))
+            = ((r : P))⁻¹ * (x ^ p) ^ n * (r : P) := rfl
+        rw [hcoe]
+        have h2 := orderOf_injective (MulAut.conj ((r : P))⁻¹).toMonoidHom
+          (MulAut.conj ((r : P))⁻¹).injective ((x ^ p) ^ n)
+        have h3 : (MulAut.conj ((r : P))⁻¹).toMonoidHom ((x ^ p) ^ n)
+            = ((r : P))⁻¹ * (x ^ p) ^ n * (r : P) := by
+          show ((r : P))⁻¹ * (x ^ p) ^ n * (((r : P))⁻¹)⁻¹ = _
+          rw [inv_inv]
+        rw [h3] at h2
+        rw [h2]
+        calc orderOf ((x ^ p) ^ n) ≤ orderOf (x ^ p) :=
+              Nat.le_of_dvd (orderOf_pos _) (orderOf_pow_dvd n)
+          _ < orderOf x := hxp_lt
+      rw [hVW, hVx_pow, hW₀_def]
+      letI := Fintype.ofFinite
+        (Quotient (MulAction.orbitRel (Subgroup.zpowers
+          (⟨x ^ p, hM_idx ▸ M.pow_index_mem x⟩ : ↥M)) (↥M ⧸ S.subgroupOf M)))
+      rw [MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot]
+      refine Subgroup.map_mono le_sup_left ?_
+      apply Subgroup.prod_mem
+      intro q _
+      rw [transferRes_apply]
+      exact Subgroup.mem_map_of_mem _ (Subgroup.subset_closure (horder_bound _ _))
 
 end
 
