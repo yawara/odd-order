@@ -579,7 +579,7 @@ private lemma conj_pow_injOn {A : Subgroup P} [A.Normal]
   · exact (key j i hle hi hij.symm).symm
 
 /-- A subgroup of prime index is proper: there is an element outside it. -/
-private lemma exists_notMem_of_index_prime {A : Subgroup P} (hidx : A.index = p) :
+lemma exists_notMem_of_index_prime {A : Subgroup P} (hidx : A.index = p) :
     ∃ u : P, u ∉ A := by
   have hA_ne_top : A ≠ ⊤ := by
     intro htop
@@ -1021,6 +1021,21 @@ theorem exists_surjective_wreath_of_noncommProd_conjClass_ne_one
     rw [← noncommProd_conjClass_eq_list_prod hidx hEA haA haZ hu]
     exact hprod
   exact cor105_aux (Nat.card P) hP hidx hEA haA haZ hu hlist le_rfl
+
+/-- **Isaacs Corollary 10.5, enumerated form**: as
+`exists_surjective_wreath_of_noncommProd_conjClass_ne_one`, but with the class
+product given as the ordered product `∏_{i<p} a^{uⁱ}` for a chosen `u ∉ A`.
+(This is the form produced by the transfer computation of Lemma 10.6 and
+consumed by Lemma 10.7.) -/
+theorem exists_surjective_wreath_of_conj_list_prod_ne_one
+    (hP : IsPGroup p P) {A : Subgroup P} [A.Normal]
+    (hidx : A.index = p) (hEA : A.IsElementaryAbelian p)
+    {a : P} (haA : a ∈ A) (haZ : a ∉ Subgroup.center P)
+    {u : P} (hu : u ∉ A)
+    (hlist : ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).prod ≠ 1) :
+    ∃ φ : P →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)),
+      Function.Surjective φ :=
+  cor105_aux (Nat.card P) hP hidx hEA haA haZ hu hlist le_rfl
 
 end
 
