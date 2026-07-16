@@ -52,7 +52,7 @@ def nonzeroSubMulAction : SubMulAction G V where
   carrier := {v | v ≠ 0}
   smul_mem' g _ hv := (smul_ne_zero_iff_ne g).2 hv
 
-instance : MulAction G {v : V // v ≠ 0} :=
+instance instMulActionNonzero : MulAction G {v : V // v ≠ 0} :=
   inferInstanceAs <| MulAction G (nonzeroSubMulAction G V)
 
 variable {G V}

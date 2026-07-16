@@ -65,7 +65,7 @@ def nonidentitySubMulAction : SubMulAction Γ H where
   smul_mem' g _ hh := fun h1 =>
     hh (MulAction.injective g (h1.trans (smul_one g).symm))
 
-instance : MulAction Γ {h : H // h ≠ 1} :=
+instance instMulActionNonidentity : MulAction Γ {h : H // h ≠ 1} :=
   inferInstanceAs <| MulAction Γ (nonidentitySubMulAction Γ H)
 
 variable {Γ H}
