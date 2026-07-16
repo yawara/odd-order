@@ -716,6 +716,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #15、Fable hub) — ✅ a (notes) + b (Thm 8.33) + c (Cor 10.2 + Lem 10.13a/10.14) 全 3 レーン合流、census 23 不変**:
+  **a** = `dbd08939` (ch03_split.md survey-gap sweep 記録、notes のみ) を merge `4266165a` (build 省略)。
+  **b** = `5a862641` (**Thm 8.33 PSL(n,q) is simple**、PSLSimple.lean 364 行新設 + OddOrder.lean import)
+  を merge `d156907f`: build **4310 jobs green**。**c** = 4 commits (**Cor 10.2** class(P)<p ⟹ N_G(P)
+  controls p-transfer / **Lem 10.13(a)+10.14** wreath-no-metacyclic-image、IsMetacyclic shared leaf 追記
+  / issue 3006 close + 3007 起票) を merge `1e759f67`: build **4310 jobs green** (13m10s —
+  IsMetacyclic が BG 上流ゆえ再ビルド大)。sorry 23 不変・新 axiom なし・AxiomsCheck OK・新規 shared
+  leaf なし (IsMetacyclic は既存)。size watch: WreathRecognition 1298 行 (⚠ 1500 接近、未超過)。
 - **2026-07-17 (tick #14、Fable hub) — ✅ a (Thm 3.31 + Main 分割) + c 合流、census 23 不変**:
   (cron queue に tick prompt 5 件が蓄積着火 → 1 tick として処理。) **a** = 3 commits (Thm 3.31
   Hartley-Turull abelian replacement / Thm 3.36 |G/N|=m clause / **Ch03 Main 1405→1075 行 =
