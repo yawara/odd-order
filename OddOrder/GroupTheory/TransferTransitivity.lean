@@ -60,6 +60,22 @@ theorem transfer_comp_left {B : Type*} [CommGroup B] [H.FiniteIndex]
   rw [map_prod]
   rfl
 
+/-- The transfer takes values in the range of the coefficient map: each value
+is a product of `ϕ`-values (the defining `diff`). -/
+theorem transfer_apply_mem_range {H : Subgroup G} [H.FiniteIndex]
+    (ϕ : ↥H →* A) (g : G) :
+    MonoidHom.transfer ϕ g ∈ ϕ.range := by
+  rw [MonoidHom.transfer_def ϕ default g]
+  unfold Subgroup.leftTransversals.diff
+  exact Subgroup.prod_mem _ fun q _ => ⟨_, rfl⟩
+
+/-- The range of the transfer is contained in the range of the coefficient
+map. -/
+theorem transfer_range_le {H : Subgroup G} [H.FiniteIndex] (ϕ : ↥H →* A) :
+    (MonoidHom.transfer ϕ).range ≤ ϕ.range := by
+  rintro - ⟨g, rfl⟩
+  exact transfer_apply_mem_range ϕ g
+
 /-- Transfer along a subgroup of index one evaluates, up to an inner
 conjugation of the argument, as the coefficient map itself: there is `r : G`
 with `transfer ϕ g = ϕ (r⁻¹ g r)`. (Used for the trivial double coset in
