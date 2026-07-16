@@ -885,4 +885,102 @@ theorem aFaithful_quotient_frattini
 
 end FrattiniAction
 
+section ConjClassCorrespondence
+
+/-! ## §3E.5 Isaacs Thm 3.26 — A-不変共役類と `C_G(A)` の類の対応 (pp. 99-100)
+
+coprime action 下で `K ↦ K ∩ C_G(A)` は A-不変共役類から `C_G(A)` の共役類への
+全単射を与える. 数学的核心は次の 2 clause (いずれも Glauberman 3.24 の共役類
+への適用):
+
+* **nonemptiness** (`exists_fixed_isConj_of_aInvariant_class`): A-不変類は
+  A-固定元を含む (3.24(a); `K ∩ C ≠ ∅`).
+* **no fusion** (`exists_fixed_conj_of_isConj_of_fixed`): A-固定元同士が `G`
+  共役なら `C_G(A)` の元で共役 (3.24(b); `K ∩ C` は `C` の単一類).
+
+単射性 (共役類は交われば一致)・全射性 (`c ∈ C` の類は `c = φ a c ∈ K ∩ K^a` で
+A-不変) は仮定不要の bookkeeping なのでこの 2 clause が書籍強度の内容. -/
+
+variable {A : Type*} [Group A] [Finite A] [Finite G]
+
+/-- **Isaacs Thm 3.26 (nonemptiness clause)**: coprime + solvable 仮定下で,
+A-不変な共役類 (代表 `x₀`; 不変性 = 各 `φ a x₀` が `x₀` と共役) は A-固定元を含む.
+
+証明: `Ω := x₀ の共役類` に `G` が共役で transitive に, `A` が `φ` で作用し
+compatibility は自己同型性から自明. Glauberman 3.24(a)
+(`glauberman_fixed_point_exists`) で A-固定元を得る. -/
+theorem exists_fixed_isConj_of_aInvariant_class
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {x₀ : G} (hinv : ∀ a : A, IsConj x₀ ((φ a) x₀)) :
+    ∃ c : G, IsConj x₀ c ∧ ∀ a : A, (φ a) c = c := by
+  classical
+  letI : MulAction G {x : G // IsConj x₀ x} := {
+    smul := fun g x => ⟨g * x.val * g⁻¹, x.property.trans (isConj_iff.mpr ⟨g, rfl⟩)⟩
+    one_smul := fun x => Subtype.ext (show (1 : G) * x.val * (1 : G)⁻¹ = x.val by simp)
+    mul_smul := fun g h x => Subtype.ext (by
+      show g * h * x.val * (g * h)⁻¹ = g * (h * x.val * h⁻¹) * g⁻¹
+      group) }
+  letI : MulAction A {x : G // IsConj x₀ x} := {
+    smul := fun a x => ⟨(φ a) x.val,
+      by exact (hinv a).trans ((φ a).toMonoidHom.map_isConj x.property)⟩
+    one_smul := fun x => Subtype.ext (show (φ 1) x.val = x.val by simp)
+    mul_smul := fun a b x => Subtype.ext
+      (show (φ (a * b)) x.val = (φ a) ((φ b) x.val) by simp [map_mul]) }
+  have hcompat : IsCompatibleMulAction φ {x : G // IsConj x₀ x} := by
+    intro a g x
+    refine Subtype.ext ?_
+    show (φ a) (g * x.val * g⁻¹) = (φ a) g * (φ a) x.val * ((φ a) g)⁻¹
+    simp [map_mul]
+  haveI : Nonempty {x : G // IsConj x₀ x} := ⟨⟨x₀, IsConj.refl x₀⟩⟩
+  have htrans : MulAction.IsPretransitive G {x : G // IsConj x₀ x} := by
+    constructor
+    intro x y
+    obtain ⟨g, hg⟩ := isConj_iff.mp (x.property.symm.trans y.property)
+    exact ⟨g, Subtype.ext hg⟩
+  obtain ⟨α, hα⟩ := glauberman_fixed_point_exists hCop hSolv hcompat htrans
+  exact ⟨α.val, α.property, fun a => Subtype.ext_iff.mp (hα a)⟩
+
+/-- **Isaacs Thm 3.26 (no-fusion clause)**: coprime + solvable 仮定下で,
+A-固定な `x, y` が `G` で共役なら, A-固定な元 `c` (∈ `C_G(A)`) で共役.
+
+「`C_G(A)` の相異なる類は `G` で fuse しない」の正体. 証明: `x` の共役類上で
+Glauberman 3.24(b) (`glauberman_fixed_points_conj`). -/
+theorem exists_fixed_conj_of_isConj_of_fixed
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {x y : G} (hx : ∀ a : A, (φ a) x = x) (hy : ∀ a : A, (φ a) y = y)
+    (hxy : IsConj x y) :
+    ∃ c : G, (∀ a : A, (φ a) c = c) ∧ c * x * c⁻¹ = y := by
+  classical
+  have hinv : ∀ a : A, IsConj x ((φ a) x) := fun a => by rw [hx a]
+  letI : MulAction G {z : G // IsConj x z} := {
+    smul := fun g z => ⟨g * z.val * g⁻¹, z.property.trans (isConj_iff.mpr ⟨g, rfl⟩)⟩
+    one_smul := fun z => Subtype.ext (show (1 : G) * z.val * (1 : G)⁻¹ = z.val by simp)
+    mul_smul := fun g h z => Subtype.ext (by
+      show g * h * z.val * (g * h)⁻¹ = g * (h * z.val * h⁻¹) * g⁻¹
+      group) }
+  letI : MulAction A {z : G // IsConj x z} := {
+    smul := fun a z => ⟨(φ a) z.val,
+      by exact (hinv a).trans ((φ a).toMonoidHom.map_isConj z.property)⟩
+    one_smul := fun z => Subtype.ext (show (φ 1) z.val = z.val by simp)
+    mul_smul := fun a b z => Subtype.ext
+      (show (φ (a * b)) z.val = (φ a) ((φ b) z.val) by simp [map_mul]) }
+  have hcompat : IsCompatibleMulAction φ {z : G // IsConj x z} := by
+    intro a g z
+    refine Subtype.ext ?_
+    show (φ a) (g * z.val * g⁻¹) = (φ a) g * (φ a) z.val * ((φ a) g)⁻¹
+    simp [map_mul]
+  have htrans : MulAction.IsPretransitive G {z : G // IsConj x z} := by
+    constructor
+    intro z w
+    obtain ⟨g, hg⟩ := isConj_iff.mp (z.property.symm.trans w.property)
+    exact ⟨g, Subtype.ext hg⟩
+  obtain ⟨c, hc_fixed, hc_smul⟩ := glauberman_fixed_points_conj hCop hSolv hcompat htrans
+    (α := ⟨x, IsConj.refl x⟩) (β := ⟨y, hxy⟩)
+    (fun a => Subtype.ext (hx a)) (fun a => Subtype.ext (hy a))
+  exact ⟨c, hc_fixed, Subtype.ext_iff.mp hc_smul⟩
+
+end ConjClassCorrespondence
+
 end OddOrder.Isaacs.Ch04
