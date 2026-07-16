@@ -503,4 +503,33 @@ theorem exists_surjective_wreath_of_transfer_range_lt (P : Sylow p G)
   -- Step 6: conclude by the main reduction
   exact yoshida_of_mackey_factor_notMem P hN_def hPN hM_idx hn_min hnPg hxN hq₂_notin
 
+/-- **Isaacs Corollary 10.2** (Hall–Wielandt strengthening, via Yoshida): if the
+nilpotence class of the Sylow `p`-subgroup `P` is less than `p`, then `N_G(P)`
+controls `p`-transfer: the image of the `G`-transfer to `P^{ab}` equals the
+image of the `N`-level transfer.
+
+**証明**: 常に `v(G) ⊆ w(N)` (transitivity + `transfer_range_le`)。等しくなければ
+真包含で Yoshida 10.1 が `C_p ≀ C_p ↞ P` を与えるが、`C_p ≀ C_p` の nilpotency
+class は `p` (`nilpotencyClass_wreath`) で準同型像の class は落ちないため
+`p ≤ class(P) < p` の矛盾。 -/
+theorem transfer_range_eq_of_nilpotencyClass_lt (P : Sylow p G)
+    (hclass : Group.nilpotencyClass ↥(P : Subgroup G) < p) :
+    (MonoidHom.transfer (Abelianization.of (G := ↥(P : Subgroup G)))).range
+      = (MonoidHom.transfer (transferRes Subgroup.le_normalizer
+          (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
+  by_contra hne
+  have hle : (MonoidHom.transfer
+        (Abelianization.of (G := ↥(P : Subgroup G)))).range
+      ≤ (MonoidHom.transfer (transferRes Subgroup.le_normalizer
+          (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
+    rw [← transfer_transfer Subgroup.le_normalizer
+      (Abelianization.of (G := ↥(P : Subgroup G)))]
+    exact OddOrder.GroupTheory.transfer_range_le _
+  have hlt := lt_of_le_of_ne hle hne
+  obtain ⟨φ, hφ⟩ := exists_surjective_wreath_of_transfer_range_lt P hlt
+  haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.2.isNilpotent
+  have hbound := Group.nilpotencyClass_le_of_surjective φ hφ
+  rw [nilpotencyClass_wreath p] at hbound
+  omega
+
 end OddOrder.Isaacs.Ch10
