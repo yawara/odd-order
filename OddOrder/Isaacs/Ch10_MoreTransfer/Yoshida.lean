@@ -123,6 +123,79 @@ lemma mem_sylow_of_orderOf_prime_pow {N₀ : Type*} [Group N₀] [Finite N₀]
     Subgroup.mem_sup_left (Subgroup.mem_zpowers n)
   rwa [heq] at h1
 
+/-- Conjugation by an element of the normalizer fixes the subgroup:
+`conjSubgroup y H = H` for `y ∈ N_G(H)`. In particular this applies to any
+subgroup and `y ∈ H` itself. -/
+lemma conjSubgroup_eq_self_of_mem_normalizer {H : Subgroup G} {y : G}
+    (hy : y ∈ Subgroup.normalizer (H : Set G)) : conjSubgroup y H = H := by
+  ext g
+  rw [mem_conjSubgroup]
+  exact (Subgroup.mem_normalizer_iff''.mp hy g).symm
+
+/-- If a Sylow subgroup satisfies `↑P ≤ x N x⁻¹` for `N := N_G(P)`, then
+`x ∈ N`: the conjugate `x⁻¹ P x` is a Sylow subgroup contained in `N`, where
+`P` is a *normal* Sylow subgroup, so `x⁻¹ P x = P` by maximality. -/
+lemma mem_normalizer_of_sylow_le_conj (P : Sylow p G) {x : G}
+    (hle : (P : Subgroup G)
+      ≤ conjSubgroup x (Subgroup.normalizer ((P : Subgroup G) : Set G))) :
+    x ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) := by
+  set N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hN_def
+  -- the conjugate x⁻¹ P x lies in N
+  have hconj_le : conjSubgroup x⁻¹ (P : Subgroup G) ≤ N := by
+    rintro g hg
+    rw [mem_conjSubgroup, inv_inv] at hg
+    -- x * g * x⁻¹ ∈ P; and ↑P ≤ x N x⁻¹ gives g ∈ N
+    have h1 : x * g * x⁻¹ ∈ conjSubgroup x N := hle hg
+    rw [mem_conjSubgroup] at h1
+    have h2 : x⁻¹ * (x * g * x⁻¹) * x = g := by group
+    rwa [h2] at h1
+  -- inside ↥N, the image of x⁻¹ P x is a p-subgroup; join with the normal
+  -- Sylow P and use maximality
+  have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
+  set P₀ : Sylow p ↥N := P.subtype hP_le_N with hP₀_def
+  haveI : (P₀ : Subgroup ↥N).Normal := by
+    rw [hP₀_def]
+    show ((P : Subgroup G).subgroupOf N).Normal
+    infer_instance
+  have hinj : Function.Injective (MulAut.conj x⁻¹).toMonoidHom :=
+    (MulAut.conj x⁻¹).injective
+  have hpg0 : IsPGroup p ↥(conjSubgroup x⁻¹ (P : Subgroup G)) :=
+    P.2.of_equiv (Subgroup.equivMapOfInjective _ _ hinj)
+  have hpg : IsPGroup p ↥((conjSubgroup x⁻¹ (P : Subgroup G)).subgroupOf N) :=
+    hpg0.of_equiv (Subgroup.subgroupOfEquivOfLe hconj_le).symm
+  -- join with the normal Sylow P₀ and use maximality
+  have hsup : IsPGroup p
+      ↥((conjSubgroup x⁻¹ (P : Subgroup G)).subgroupOf N ⊔ (P₀ : Subgroup ↥N)) :=
+    IsPGroup.to_sup_of_normal_right hpg P₀.2
+  have heq := P₀.3 hsup le_sup_right
+  have hconj_le_P :
+      (conjSubgroup x⁻¹ (P : Subgroup G)).subgroupOf N ≤ (P₀ : Subgroup ↥N) := by
+    rw [← heq]
+    exact le_sup_left
+  -- back in G: x⁻¹ P x ≤ P, hence equality by cardinality
+  have hle_P : conjSubgroup x⁻¹ (P : Subgroup G) ≤ (P : Subgroup G) := by
+    intro g hg
+    have h3 : (⟨g, hconj_le hg⟩ : ↥N)
+        ∈ (conjSubgroup x⁻¹ (P : Subgroup G)).subgroupOf N := by
+      rw [Subgroup.mem_subgroupOf]
+      exact hg
+    have h4 := hconj_le_P h3
+    rw [hP₀_def] at h4
+    have h5 : (⟨g, hconj_le hg⟩ : ↥N) ∈ (P : Subgroup G).subgroupOf N := h4
+    rwa [Subgroup.mem_subgroupOf] at h5
+  have hcard : Nat.card ↥(P : Subgroup G)
+      ≤ Nat.card ↥(conjSubgroup x⁻¹ (P : Subgroup G)) :=
+    le_of_eq (Nat.card_congr
+      (Subgroup.equivMapOfInjective (P : Subgroup G) _ hinj).toEquiv)
+  have heq2 : conjSubgroup x⁻¹ (P : Subgroup G) = (P : Subgroup G) :=
+    Subgroup.eq_of_le_of_card_ge hle_P hcard
+  -- conjugation by x⁻¹ fixing P means x normalizes P
+  rw [Subgroup.mem_normalizer_iff]
+  intro h
+  have h6 := SetLike.ext_iff.mp heq2 h
+  rw [mem_conjSubgroup, inv_inv] at h6
+  exact h6.symm
+
 end YoshidaSetup
 
 end OddOrder.Isaacs.Ch10
