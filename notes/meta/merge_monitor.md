@@ -716,6 +716,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #5、Fable hub) — ✅ a (Lemma 3.18 完成) + b (Thm 8.9 完成) 合流、census 23 不変**:
+  **a** = 3 commits (Lemma 3.18 subnormal π/π′ series ⟺ π-separability、PiSeparableSeries.lean
+  241→619 行) を merge `2e75a198`: build **4294 jobs green**。⚠ サイズ watch: Ch03 Main.lean 1338 行
+  (1500 接近)。**b** = 2 commits (Thm 8.9 Passman-Isaacs half-transitive 615 行 + Lem 8.24/8.25
+  cycle lemmas 新 leaf CycleCommutators.lean 169 行) を merge `a479c23a`: build **4295 jobs green**。
+  **c** = 変化なし。sorry 23 不変・新 axiom なし・AxiomsCheck OK。push `c4036deb..a479c23a`。
 - **2026-07-17 (tick #4、Fable hub) — ✅ a (Lem 3.18 groundwork) + c (Thm 10.4 完成) 合流、census 23 不変**:
   **a** = 2 commits (Lem 3.18 groundwork: upper series domination + ladder existence、新 leaf
   PiSeparableSeries.lean 241 行) を merge `25ada188`: build **4293 jobs green**。**c** = 3 commits
