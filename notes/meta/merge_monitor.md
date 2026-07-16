@@ -716,6 +716,26 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #4、Fable hub) — ✅ a (Lem 3.18 groundwork) + c (Thm 10.4 完成) 合流、census 23 不変**:
+  **a** = 2 commits (Lem 3.18 groundwork: upper series domination + ladder existence、新 leaf
+  PiSeparableSeries.lean 241 行) を merge `25ada188`: build **4293 jobs green**。**c** = 3 commits
+  (Thm 10.4 C_p≀C_p recognition **sorry-free 完成** WreathRecognition.lean 833 行 + notes 整備 +
+  shared 支持補題 ElementaryAbelian +23 / PRank +43 純 additive) を merge `3d171f50`: build
+  **4294 jobs green**。**b** = 変化なし。sorry 23 不変・新 axiom なし・AxiomsCheck OK
+  (feitThompson allowlist 明示ログ)。push `e3d89132..3d171f50`。
+- **2026-07-17 (tick #3、Fable hub) — ✅ a 合流 (Ch07 forward 討ち)、b/c 変化なし、census 23 不変**:
+  **a** = `dcfb8f90` (Ch07 ForwardFromCh03 の forward 宣言実証明化 = Thm 3.15 Hall-E converse via
+  Burnside、+198/-48、207 行) + AxiomsCheck 独立追記 (Thm 3.17 等 assert 追加) を merge `48caf172`:
+  build **4292 jobs green**・AxiomsCheck OK (feitThompson 3 axioms allowlist 明示ログ確認)。
+  **b/c** = 変化なし。sorry 23 不変・新 axiom なし。push `15505b80..48caf172`。
+- **2026-07-17 (tick #2、Fable hub) — ✅ a+b 合流、c 変化なし、census 23 不変**:
+  **a** = `06ae3107` (Ch03 Thm 3.17 Wielandt three-subgroup solvability、Theorem315.lean 1157→1336 行) を
+  merge `01b7ce06`: build **4290 jobs green**。⚠ サイズ watch: Theorem315.lean 1336 行 (1500 接近、次の主結果は
+  新 leaf 推奨)。**b** = `bb13667a` (Ch08 Lem 8.8 TransitiveAutomorphisms) + visit 後 `c67d0c99`
+  (HalfTransitive.lean + 配線、live-race で MERGE_HEAD pin) を merge `53e04dc8`: build **4292 jobs green**、
+  dup spot-check 陰性・root closure OK。**c** = 変化なし。全ゲート通過 (sorry 23 不変・新 axiom なし・
+  AxiomsCheck OK)。push `56d50152..53e04dc8`。build 出力の longFile linter note は既存 per-file 例外
+  (AxiomsCheck 8500 / S03f_Thm36 4000) 由来の cosmetic、gate 非該当。
 - **2026-07-17 (新フェーズ tick #1、Fable hub — 監視再開) — ✅ a/b/c 全レーン初回合流、census 23 不変、cron `827d901b` 再作成**:
   再開時 main (`3771ac15`) に **staged 未コミットの Ch02 DihedralBasics +256 行**を発見 → patch-id/blob 検証で
   **lane a `d25cb3ef` の完全複製**と確定 (blob 0ed981d3/ce48ac4d 一致) → 破棄 (内容は a の merge で流入、損失なし)。

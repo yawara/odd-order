@@ -129,6 +129,49 @@ theorem IsElementaryAbelian.log_card_eq_finrank [Fact p.Prime] [Finite G]
   letI := h.zmodModule
   rw [h.card_eq_pow_finrank, Nat.log_pow (Fact.out : p.Prime).one_lt]
 
+/-- Every additive subgroup of a `ZMod p`-module (`p` prime) has a lattice
+complement: transport `Submodule.exists_isCompl` through the order isomorphism
+`AddSubgroup.toZModSubmodule`. (Abstract-module half of
+`IsElementaryAbelian.exists_isComplement'`; keeping the module abstract avoids
+the `letI`-bound-instance synthesis trap documented at `addAutEquivGL`.) -/
+theorem exists_addSubgroup_sup_top_inf_bot {p : ℕ} [Fact p.Prime] {M : Type*}
+    [AddCommGroup M] [Module (ZMod p) M] (H : AddSubgroup M) :
+    ∃ K : AddSubgroup M, H ⊔ K = ⊤ ∧ H ⊓ K = ⊥ := by
+  let e : AddSubgroup M ≃o Submodule (ZMod p) M := AddSubgroup.toZModSubmodule p
+  obtain ⟨K', hK'⟩ := Submodule.exists_isCompl (e H)
+  refine ⟨e.symm K', ?_, ?_⟩
+  · have h1 : e (H ⊔ e.symm K') = ⊤ := by
+      rw [map_sup, e.apply_symm_apply, hK'.sup_eq_top]
+    simpa using congrArg e.symm h1
+  · have h1 : e (H ⊓ e.symm K') = ⊥ := by
+      rw [map_inf, e.apply_symm_apply, hK'.inf_eq_bot]
+    simpa using congrArg e.symm h1
+
+/-- **Complement in an elementary abelian group**: every subgroup of an elementary
+abelian `p`-group (`p` prime) has a complement. Via the `zmodModule` bridge this is
+the existence of a complementary subspace over `F_p` (`Submodule.exists_isCompl`).
+Used by Isaacs Thm 10.4 (splitting off the center) and generally wherever an
+elementary abelian normal subgroup needs to be decomposed. -/
+theorem IsElementaryAbelian.exists_isComplement' [Fact p.Prime]
+    (hG : IsElementaryAbelian p G) (H : Subgroup G) :
+    ∃ K : Subgroup G, H.IsComplement' K := by
+  letI : IsMulCommutative G := IsMulCommutative.of_comm hG.comm
+  letI : CommGroup G := inferInstance
+  letI := hG.zmodModule
+  obtain ⟨K', hsup', hinf'⟩ :=
+    exists_addSubgroup_sup_top_inf_bot (p := p) (Subgroup.toAddSubgroup H)
+  refine ⟨Subgroup.toAddSubgroup.symm K', ?_⟩
+  have hsup : H ⊔ Subgroup.toAddSubgroup.symm K' = ⊤ := by
+    have h1 : Subgroup.toAddSubgroup (H ⊔ Subgroup.toAddSubgroup.symm K') = ⊤ := by
+      rw [map_sup, OrderIso.apply_symm_apply, hsup']
+    simpa using congrArg Subgroup.toAddSubgroup.symm h1
+  have hinf : H ⊓ Subgroup.toAddSubgroup.symm K' = ⊥ := by
+    have h1 : Subgroup.toAddSubgroup (H ⊓ Subgroup.toAddSubgroup.symm K') = ⊥ := by
+      rw [map_inf, OrderIso.apply_symm_apply, hinf']
+    simpa using congrArg Subgroup.toAddSubgroup.symm h1
+  refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf) ?_
+  rw [← Subgroup.mul_normal, hsup, Subgroup.coe_top]
+
 end Bridge
 
 section AutGL
