@@ -196,6 +196,178 @@ lemma mem_normalizer_of_sylow_le_conj (P : Sylow p G) {x : G}
   rw [mem_conjSubgroup, inv_inv] at h6
   exact h6.symm
 
+/-- A subgroup of prime index is a coatom of the subgroup lattice. -/
+private lemma isCoatom_of_index_prime'' {H₀ : Type*} [Group H₀] {Q : Subgroup H₀}
+    (hidx : Q.index = p) : IsCoatom Q := by
+  have hp_prime : p.Prime := hp.out
+  constructor
+  · intro htop
+    rw [htop, Subgroup.index_top] at hidx
+    exact hp_prime.one_lt.ne' hidx.symm
+  · intro X hQX
+    have hmul := Subgroup.relIndex_mul_index hQX.le
+    rw [hidx] at hmul
+    rcases hp_prime.eq_one_or_self_of_dvd X.index (Dvd.intro_left _ hmul) with h1 | hXp
+    · exact Subgroup.index_eq_one.mp h1
+    · exfalso
+      have hrel : Q.relIndex X = 1 := by
+        rw [hXp] at hmul
+        exact Nat.eq_of_mul_eq_mul_right hp_prime.pos
+          (by rw [one_mul]; exact hmul)
+      exact hQX.not_ge (Subgroup.relIndex_eq_one.mp hrel)
+
+/-- **Yoshida, main reduction step**: if the Mackey factor at a representative
+`x ∉ N = N_G(P)` lies outside the image of `M` (where `M ⊴ N` has index `p` and
+`n ∈ P ∖ M` has minimal order), then the `S₀ = (xNx⁻¹ ⊓ P)`-transfer of `n`
+avoids `R·Φ(S₀)` and Theorem 10.9 yields `C_p ≀ C_p` as an image of `P`.
+
+The Frattini bound is obtained via a kernel argument: the composite
+`↥S₀ → ↥(xNx⁻¹) ≃ ↥N → ↥N ⧸ M` has kernel of index dividing `p`, so the kernel
+contains `Φ(S₀)`; membership in the kernel means the conjugate `x⁻¹ s x` lies in
+`M`. The `R` bound is the minimality of `n`. -/
+private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
+    {N : Subgroup G} (hN_def : N = Subgroup.normalizer ((P : Subgroup G) : Set G))
+    (hPN : (P : Subgroup G) ≤ N)
+    {M : Subgroup ↥N} [M.Normal] (hM_idx : M.index = p)
+    {n : ↥N} (hn_min : ∀ m : ↥N, m ∉ M → orderOf n ≤ orderOf m)
+    (hnPg : ((n : ↥N) : G) ∈ (P : Subgroup G))
+    {x : G} (hxN : x ∉ N)
+    (hfac : MonoidHom.transfer
+        (mackeyRes (K := (P : Subgroup G)) (Abelianization.of (G := ↥N)) x)
+        ⟨((n : ↥N) : G), hnPg⟩
+      ∉ M.map (Abelianization.of (G := ↥N))) :
+    ∃ φ : ↥(P : Subgroup G) →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)),
+      Function.Surjective φ := by
+  classical
+  set Pg : Subgroup G := (P : Subgroup G) with hPg_def
+  set S₀ : Subgroup ↥Pg := (conjSubgroup x N ⊓ Pg).subgroupOf Pg with hS₀_def
+  set nhat : ↥Pg := ⟨((n : ↥N) : G), hnPg⟩ with hnhat_def
+  -- S₀ is proper: otherwise x would normalize P
+  have hS₀_ne_top : S₀ ≠ ⊤ := by
+    intro htop
+    rw [hS₀_def, Subgroup.subgroupOf_eq_top] at htop
+    apply hxN
+    rw [hN_def]
+    exact mem_normalizer_of_sylow_le_conj P (by
+      rw [← hN_def]
+      exact le_trans htop inf_le_left)
+  -- the S₀-values conjugate into N
+  have hmem_conj : ∀ s : ↥S₀, x⁻¹ * ((s : ↥Pg) : G) * x ∈ N := by
+    intro s
+    have h1 : ((s : ↥Pg) : G) ∈ conjSubgroup x N ⊓ Pg := s.2
+    exact mem_conjSubgroup.mp h1.1
+  -- Theorem 10.9 will conclude, provided the S₀-transfer avoids R·Φ(S₀)
+  refine exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini
+    (P := ↥Pg) P.2 hS₀_ne_top (x := nhat) ?_
+  intro h109
+  apply hfac
+  -- factor the Mackey coefficient through the abelianization of S₀
+  set ρ : Abelianization ↥S₀ →* Abelianization ↥N :=
+    Abelianization.lift (mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x)
+    with hρ_def
+  have hfac_eq : MonoidHom.transfer
+      (mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x) nhat
+      = ρ (MonoidHom.transfer (Abelianization.of (G := ↥S₀)) nhat) := by
+    have h1 : mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x
+        = ρ.comp (Abelianization.of (G := ↥S₀)) := by
+      ext s
+      simp [hρ_def]
+    conv_lhs => rw [h1]
+    rw [OddOrder.GroupTheory.transfer_comp_left]
+    rfl
+  rw [hfac_eq]
+  -- it suffices that ρ maps the R·Φ image into the image of M
+  have himage : ((Subgroup.closure {s : ↥S₀ | orderOf ((s : ↥Pg)) < orderOf nhat}
+        ⊔ frattini ↥S₀).map (Abelianization.of (G := ↥S₀))).map ρ
+      ≤ M.map (Abelianization.of (G := ↥N)) := by
+    rw [Subgroup.map_map]
+    have hcomp : ρ.comp (Abelianization.of (G := ↥S₀))
+        = mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x := by
+      ext s
+      simp [hρ_def]
+    rw [hcomp, Subgroup.map_sup]
+    apply sup_le
+    · -- R-part: generators have small order, so their conjugates lie in M
+      rw [MonoidHom.map_closure]
+      rw [Subgroup.closure_le]
+      rintro - ⟨s, hs_lt, rfl⟩
+      show mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x s
+        ∈ M.map (Abelianization.of (G := ↥N))
+      have hzmem : x⁻¹ * ((s : ↥Pg) : G) * x ∈ N := hmem_conj s
+      have hzM : (⟨x⁻¹ * ((s : ↥Pg) : G) * x, hzmem⟩ : ↥N) ∈ M := by
+        by_contra hout
+        have h2 := hn_min _ hout
+        -- order bridges through the subtype/conjugation embeddings
+        have hordN : ∀ z : ↥N, orderOf z = orderOf ((z : G)) := fun z =>
+          (orderOf_injective N.subtype N.subtype_injective z).symm
+        have hordP : ∀ z : ↥Pg, orderOf z = orderOf ((z : G)) := fun z =>
+          (orderOf_injective Pg.subtype Pg.subtype_injective z).symm
+        have hconj_ord : orderOf (x⁻¹ * ((s : ↥Pg) : G) * x)
+            = orderOf (((s : ↥Pg) : G)) := by
+          have h5 := orderOf_injective (MulAut.conj x⁻¹).toMonoidHom
+            (MulAut.conj x⁻¹).injective (((s : ↥Pg) : G))
+          have h6 : (MulAut.conj x⁻¹).toMonoidHom (((s : ↥Pg) : G))
+              = x⁻¹ * ((s : ↥Pg) : G) * x := by
+            show x⁻¹ * _ * x⁻¹⁻¹ = _
+            rw [inv_inv]
+          rw [h6] at h5
+          exact h5
+        have h3 : orderOf (⟨x⁻¹ * ((s : ↥Pg) : G) * x, hzmem⟩ : ↥N)
+            = orderOf ((s : ↥Pg)) := by
+          rw [hordN, hordP]
+          exact hconj_ord
+        have h7 : orderOf n = orderOf nhat := by
+          rw [hordN n, hordP nhat]
+        have hs_lt' : orderOf ((s : ↥Pg)) < orderOf nhat := hs_lt
+        rw [← h3] at hs_lt'
+        rw [h7] at h2
+        omega
+      exact Subgroup.mem_map_of_mem _ hzM
+    · -- Φ-part: the kernel of S₀ → N ⧸ M has index dividing p
+      -- the inclusion of S₀ into the conjugate subgroup
+      set φ₀ : ↥S₀ →* ↥(conjSubgroup x N) :=
+        { toFun := fun s => ⟨((s : ↥Pg) : G), s.2.1⟩
+          map_one' := rfl
+          map_mul' := fun _ _ => rfl } with hφ₀_def
+      -- the conjugation isomorphism ↥N ≃* ↥(xNx⁻¹)
+      set e : ↥N ≃* ↥(conjSubgroup x N) :=
+        Subgroup.equivMapOfInjective N (MulAut.conj x).toMonoidHom
+          (MulAut.conj x).injective with he_def
+      set ψ : ↥S₀ →* ↥N ⧸ M :=
+        (QuotientGroup.mk' M).comp (e.symm.toMonoidHom.comp φ₀) with hψ_def
+      -- Φ(S₀) ≤ ker ψ
+      have hker_idx : ψ.ker.index ∣ p := by
+        rw [Subgroup.index_ker]
+        have h10 := Subgroup.card_subgroup_dvd_card ψ.range
+        rwa [show Nat.card (↥N ⧸ M) = p by
+          rw [← Subgroup.index_eq_card, hM_idx]] at h10
+      have hΦ_ker : frattini ↥S₀ ≤ ψ.ker := by
+        rcases (Nat.Prime.eq_one_or_self_of_dvd hp.out _ hker_idx) with h11 | h11
+        · rw [Subgroup.index_eq_one.mp h11]
+          exact le_top
+        · exact frattini_le_coatom (isCoatom_of_index_prime'' h11)
+      -- membership in the kernel means the conjugate lies in M
+      rw [Subgroup.map_le_iff_le_comap]
+      intro s hsΦ
+      rw [Subgroup.mem_comap]
+      have hker := hΦ_ker hsΦ
+      rw [MonoidHom.mem_ker, hψ_def] at hker
+      have hM_mem : e.symm (φ₀ s) ∈ M := by
+        have h12 : (QuotientGroup.mk' M) (e.symm (φ₀ s)) = 1 := hker
+        exact (QuotientGroup.eq_one_iff _).mp h12
+      -- the kernel membership identifies the conjugate value inside M
+      have hval : (⟨x⁻¹ * ((s : ↥Pg) : G) * x, hmem_conj s⟩ : ↥N) = e.symm (φ₀ s) := by
+        apply e.injective
+        rw [MulEquiv.apply_symm_apply]
+        refine Subtype.ext ?_
+        show x * (x⁻¹ * ((s : ↥Pg) : G) * x) * x⁻¹ = ((s : ↥Pg) : G)
+        group
+      have hvalue : mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x s
+          = Abelianization.of ⟨x⁻¹ * ((s : ↥Pg) : G) * x, hmem_conj s⟩ := rfl
+      rw [hvalue, hval]
+      exact Subgroup.mem_map_of_mem _ hM_mem
+  exact himage (Subgroup.mem_map_of_mem ρ h109)
+
 end YoshidaSetup
 
 end OddOrder.Isaacs.Ch10
