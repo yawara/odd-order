@@ -716,6 +716,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #10、Fable hub) — ✅ c 合流 (Thm 10.10 Mackey 実証明)、census 24→23 (−1)**:
+  **c** = `fdc79dd2` (Isaacs Thm 10.10 Mackey transfer 実証明 sorry-free、tick #8 scaffold discharge、
+  claim 9105 close) + `fe9e1fa1` (Lemma 10.11 index-p subgroup from transfer-control failure、
+  TransferIndexPrime 796 行) を merge `85193e17`: build **4304 jobs green**。**a/b** = 変化なし。
+  census **24→23** (scaffold discharge)・新 axiom なし・AxiomsCheck OK。push `76f2ccfd..85193e17`。
 - **2026-07-17 (tick #9、Fable hub) — ✅ a (Lemma 3.32) + b (Thm 8.23 完成) 合流、census 24 不変**:
   **a** = `3a95d1c3` (Lemma 3.32 A-invariant Sylow ∩ C_G(A)、Ch04 ForwardFromCh03 1137 行) を merge
   `fc4d0c67`: build **4303 jobs green**。**b** = `8cb89a7b` (Thm 8.23 p-cycle Jordan **完成**、
