@@ -716,6 +716,13 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #14、Fable hub) — ✅ a (Thm 3.31 + Main 分割) + c 合流、census 23 不変**:
+  (cron queue に tick prompt 5 件が蓄積着火 → 1 tick として処理。) **a** = 3 commits (Thm 3.31
+  Hartley-Turull abelian replacement / Thm 3.36 |G/N|=m clause / **Ch03 Main 1405→1075 行 =
+  CyclicExtensions.lean 415 行切り出しで size watch 解消**) を merge `783640be`: build **4308 jobs
+  green**。**c** = `6892f940` (transfer_apply_mem_range / transfer_range_le、shared 純 additive) +
+  issue 3006 (Cor 10.2 WIP 知見) を merge `fa0a3987`: build **4308 jobs green**。**b** = 変化なし。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK。push `9357e575..fa0a3987`。
 - **2026-07-17 (tick #12-13、Fable hub) — ✅ b 合流 (Thm 8.32)、census 23 不変**:
   tick #12 = 変化なし (b の空 main-sync merge のみ → staged 0 で abort 見送り)。tick #13:
   **b** = `eaf03f78` (Thm 8.32 SL(n,q) is perfect、TransvectionGeneration 309→469 行) を merge
