@@ -716,6 +716,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (新フェーズ tick #1、Fable hub — 監視再開) — ✅ a/b/c 全レーン初回合流、census 23 不変、cron `827d901b` 再作成**:
+  再開時 main (`3771ac15`) に **staged 未コミットの Ch02 DihedralBasics +256 行**を発見 → patch-id/blob 検証で
+  **lane a `d25cb3ef` の完全複製**と確定 (blob 0ed981d3/ce48ac4d 一致) → 破棄 (内容は a の merge で流入、損失なし)。
+  **a** = 3 commits (Ch02 Lemma 2.14 dihedral packaging / Ch03 Lemma 3.6 crossed homs + 3.7/3.5 対応 / Lemma 3.16
+  coprime-index counting) を merge `1881d989`: build **4251 jobs green**。**b** = 4 commits (Ch08 Cor 8.4 GL 2-transitive /
+  Thm 8.5 + Cor 8.6 regular normal / coset-space API / AffineGroup hub) を merge `c0b451a0`: visit 後に b が
+  `4c11cfdb` (AffineGroup.lean + OddOrder.lean 配線) を積んで root closure を自己解決 (hub 機械的修正不要)、
+  build **4287 jobs green**。**c** = 2 feature commits (Ch10 Lemma 10.3 WreathRecognition + Thm 10.4 linear-algebra
+  core) を merge `052e95dc`: OddOrder.lean 独立追記衝突 (b の Ch08 vs c の Ch10 import) は両保持解決、新 decl 6 件の
+  dup spot-check 陰性、build **4290 jobs green**。全レーン: step 1.5 新フェーズ regex 適合・step 1.6 dup なし・
+  sorry **23 不変**・新 axiom なし・AxiomsCheck OK。push `3771ac15..052e95dc`。**監視 cron 再作成 = `827d901b`
+  (15 分 `7,22,37,52`、2026-07-15 ユーザー指定継承)**。サイズ watch: 新規 leaf 最大 = Theorem315.lean 1157 行
+  (規約内、1500 接近 watch)。
 - **2026-07-15 (tick #23、Opus hub — ユーザー「A を最終マージして退役」) — ✅ A 最終マージ + 退役、監視終了**:
   A=`5b281134` (docs-only: endgame issue 一斉 close + ROADMAP/notes) を merge `986e39ad`。docs conflict 2 件
   (merge_monitor バナー / 0121 checklist) を hub 解決 (両立/詳細版保持)。.lean 不変・census 25・build 省略。
