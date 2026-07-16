@@ -121,6 +121,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch08_PermutationGroups.AffineGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransitiveAutomorphisms
 import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
+import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
