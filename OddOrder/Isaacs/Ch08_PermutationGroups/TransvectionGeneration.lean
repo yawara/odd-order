@@ -27,6 +27,8 @@ namespace OddOrder.Isaacs.Ch08
 
 open Matrix
 
+open scoped commutatorElement
+
 variable {n : Type*} [DecidableEq n] [Fintype n] {𝕜 : Type*} [Field 𝕜]
 
 /-- The transvections inside the special linear group. -/
@@ -305,5 +307,163 @@ theorem closure_transvections_eq_top :
   rw [hMeq]
   exact Subgroup.mul_mem _
     (Subgroup.mul_mem _ (hmemL L) (diagonalSL_mem_closure D hdet)) (hmemL L')
+
+/-! ### Isaacs Thm 8.32 — `SL(n, 𝕜)` is perfect -/
+
+section Perfect
+
+variable {i j k : n}
+
+set_option linter.unusedSimpArgs false in
+/-- For distinct `i, k, j`: `tᵢₖ(α) tₖⱼ(1) = tᵢⱼ(α) (tₖⱼ(1) tᵢₖ(α))`, the
+inverse-free form of the commutator identity `⁅tᵢₖ(α), tₖⱼ(1)⁆ = tᵢⱼ(α)`. -/
+private lemma transvection_mul_transvection_comm_identity
+    (hij : i ≠ j) (hik : i ≠ k) (hkj : k ≠ j) (α : 𝕜) :
+    transvection i k α * transvection k j 1 =
+      transvection i j α * (transvection k j 1 * transvection i k α) := by
+  have hji : j ≠ i := hij.symm
+  have hki : k ≠ i := hik.symm
+  have hjk : j ≠ k := hkj.symm
+  ext r s
+  by_cases hri : r = i <;> by_cases hrj : r = j <;> by_cases hrk : r = k <;>
+    by_cases hsi : s = i <;> by_cases hsj : s = j <;> by_cases hsk : s = k <;>
+    simp_all [transvection, Matrix.mul_apply, Matrix.single_apply,
+      Matrix.one_apply, Matrix.add_apply, Finset.sum_add_distrib,
+      Finset.sum_ite_eq, Finset.sum_ite_eq', add_mul, mul_add, ite_and,
+      mul_comm, eq_comm]
+
+set_option linter.unusedSimpArgs false in
+set_option linter.unnecessarySeqFocus false in
+/-- Conjugating `tᵢⱼ(γ)` by `diag(β⁻¹ at i, β at j)` scales the parameter by
+`β⁻²`, in inverse-free form. -/
+private lemma diagonal_pair_mul_transvection (hij : i ≠ j) {β : 𝕜}
+    (hβ : β ≠ 0) (γ : 𝕜) :
+    diagonal (Function.update (Function.update (1 : n → 𝕜) i β⁻¹) j β) *
+        transvection i j γ =
+      transvection i j (β⁻¹ * β⁻¹ * γ) *
+        diagonal (Function.update (Function.update (1 : n → 𝕜) i β⁻¹) j β) := by
+  have hji : j ≠ i := hij.symm
+  ext r s
+  rw [diagonal_mul, mul_diagonal]
+  by_cases hri : r = i <;> by_cases hrj : r = j <;>
+    by_cases hsi : s = i <;> by_cases hsj : s = j <;>
+    simp_all [transvection, Matrix.single_apply, Matrix.one_apply,
+      Matrix.add_apply, Function.update_apply, mul_ite, ite_mul, mul_comm,
+      mul_assoc, eq_comm] <;>
+    field_simp
+
+/-- The inverse of a transvection is the opposite transvection. -/
+private lemma transvectionSL_inv (hij : i ≠ j) (c : 𝕜) :
+    (transvectionSL i j hij c)⁻¹ = transvectionSL i j hij (-c) := by
+  apply inv_eq_of_mul_eq_one_left
+  apply Subtype.ext
+  simp only [Matrix.SpecialLinearGroup.coe_mul,
+    Matrix.SpecialLinearGroup.coe_one]
+  change transvection i j (-c) * transvection i j c = 1
+  rw [transvection_mul_transvection_same _ _ hij, neg_add_cancel,
+    transvection_zero]
+
+/-- The product of the pair vector `(β⁻¹ at i, β at j, 1 elsewhere)` is 1. -/
+private lemma prod_pairVec (hij : i ≠ j) {a b : 𝕜} (hab : b * a = 1) :
+    ∏ x, Function.update (Function.update (1 : n → 𝕜) i a) j b x = 1 := by
+  classical
+  rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ j),
+    ← Finset.mul_prod_erase _ _
+      (Finset.mem_erase.mpr ⟨hij, Finset.mem_univ i⟩)]
+  rw [Function.update_self, Function.update_of_ne hij, Function.update_self]
+  rw [Finset.prod_eq_one fun x hx => by
+    obtain ⟨hxi, hx2⟩ := Finset.mem_erase.mp hx
+    rw [Function.update_of_ne (Finset.mem_erase.mp hx2).1,
+      Function.update_of_ne hxi]
+    rfl]
+  rw [mul_one, hab]
+
+/-- **Isaacs Thm 8.32** — `SL(n, 𝕜)` is perfect when the index type has at
+least three elements, or when the field contains a unit `β` with `β² ≠ 1`
+(for a finite field of order `q`, the latter is exactly `q > 3`; the book
+states the result for `n ≥ 3` or `n = 2, q > 3`). -/
+theorem commutator_specialLinearGroup_eq_top
+    (h : 3 ≤ Nat.card n ∨ ∃ β : 𝕜, β ≠ 0 ∧ β ^ 2 ≠ 1) :
+    commutator (Matrix.SpecialLinearGroup n 𝕜) = ⊤ := by
+  classical
+  rw [eq_top_iff, ← closure_transvections_eq_top (n := n) (𝕜 := 𝕜),
+    Subgroup.closure_le]
+  rintro t ⟨i, j, hij, c, hc⟩
+  have ht : t = transvectionSL i j hij c := Subtype.ext hc
+  rw [ht]
+  rcases h with h3 | ⟨β, hβ0, hβ1⟩
+  · -- a third index exists: the `⁅tᵢₖ(c), tₖⱼ(1)⁆` identity
+    obtain ⟨k, hik, hkj⟩ : ∃ k : n, i ≠ k ∧ k ≠ j := by
+      by_contra hcon
+      have hall : (Finset.univ : Finset n) ⊆ {i, j} := by
+        intro x _
+        by_contra hx
+        simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hx
+        exact hcon ⟨x, Ne.symm hx.1, hx.2⟩
+      have h1 := Finset.card_le_card hall
+      have h2 : ({i, j} : Finset n).card ≤ 2 := by
+        have := Finset.card_insert_le i ({j} : Finset n)
+        simp only [Finset.card_singleton] at this
+        omega
+      rw [Finset.card_univ, ← Nat.card_eq_fintype_card] at h1
+      omega
+    have hXY : transvectionSL i k hik c * transvectionSL k j hkj 1 =
+        transvectionSL i j hij c *
+          (transvectionSL k j hkj 1 * transvectionSL i k hik c) := by
+      apply Subtype.ext
+      simp only [Matrix.SpecialLinearGroup.coe_mul]
+      exact transvection_mul_transvection_comm_identity hij hik hkj c
+    have hT : transvectionSL i j hij c =
+        ⁅transvectionSL i k hik c, transvectionSL k j hkj 1⁆ := by
+      rw [commutatorElement_def]
+      have h2 : transvectionSL i j hij c =
+          (transvectionSL i k hik c * transvectionSL k j hkj 1) *
+            (transvectionSL k j hkj 1 * transvectionSL i k hik c)⁻¹ :=
+        eq_mul_inv_of_mul_eq hXY.symm
+      rw [h2, mul_inv_rev]
+      group
+    rw [hT]
+    exact SetLike.mem_coe.mpr (Subgroup.commutator_mem_commutator
+      (Subgroup.mem_top _) (Subgroup.mem_top _))
+  · -- diagonal conjugation: `⁅diag(β⁻¹, β), tᵢⱼ(γ)⁆ = tᵢⱼ((β⁻² - 1) γ)`
+    have hden : β⁻¹ * β⁻¹ - 1 ≠ 0 := by
+      intro h0
+      apply hβ1
+      have h1 : β⁻¹ * β⁻¹ = 1 := sub_eq_zero.mp h0
+      have h2 : (β⁻¹ * β⁻¹)⁻¹ = 1 := by rw [h1, inv_one]
+      rw [mul_inv, inv_inv] at h2
+      rw [pow_two]
+      exact h2
+    set γ : 𝕜 := c / (β⁻¹ * β⁻¹ - 1) with hγ
+    set B : Matrix.SpecialLinearGroup n 𝕜 :=
+      diagonalSL (Function.update (Function.update (1 : n → 𝕜) i β⁻¹) j β)
+        (prod_pairVec hij (mul_inv_cancel₀ hβ0)) with hB
+    set C : Matrix.SpecialLinearGroup n 𝕜 := transvectionSL i j hij γ with hC
+    have hbc : B * C = transvectionSL i j hij (β⁻¹ * β⁻¹ * γ) * B := by
+      apply Subtype.ext
+      simp only [Matrix.SpecialLinearGroup.coe_mul]
+      exact diagonal_pair_mul_transvection hij hβ0 γ
+    have hcommBC : ⁅B, C⁆ = transvectionSL i j hij (β⁻¹ * β⁻¹ * γ) * C⁻¹ := by
+      rw [commutatorElement_def]
+      have h2 : B * C * B⁻¹ = transvectionSL i j hij (β⁻¹ * β⁻¹ * γ) := by
+        rw [hbc]
+        group
+      rw [← h2]
+    have hfin : ⁅B, C⁆ = transvectionSL i j hij c := by
+      rw [hcommBC, hC, transvectionSL_inv]
+      apply Subtype.ext
+      simp only [Matrix.SpecialLinearGroup.coe_mul]
+      change transvection i j (β⁻¹ * β⁻¹ * γ) * transvection i j (-γ) =
+        transvection i j c
+      rw [transvection_mul_transvection_same _ _ hij]
+      congr 1
+      rw [hγ]
+      field_simp
+      ring
+    rw [← hfin]
+    exact SetLike.mem_coe.mpr (Subgroup.commutator_mem_commutator
+      (Subgroup.mem_top _) (Subgroup.mem_top _))
+
+end Perfect
 
 end OddOrder.Isaacs.Ch08
