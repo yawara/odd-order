@@ -60,6 +60,30 @@ theorem transfer_comp_left {B : Type*} [CommGroup B] [H.FiniteIndex]
   rw [map_prod]
   rfl
 
+/-- Transfer along a subgroup of index one evaluates, up to an inner
+conjugation of the argument, as the coefficient map itself: there is `r : G`
+with `transfer ϕ g = ϕ (r⁻¹ g r)`. (Used for the trivial double coset in
+Yoshida's theorem, where the conjugation is then absorbed by normality.) -/
+theorem exists_transfer_eq_conj_of_index_eq_one {H : Subgroup G} [H.FiniteIndex]
+    (hidx : H.index = 1) (ϕ : ↥H →* A) (g : G) :
+    ∃ r : G, MonoidHom.transfer ϕ g
+      = ϕ ⟨r⁻¹ * g * r, by rw [Subgroup.index_eq_one.mp hidx]; trivial⟩ := by
+  classical
+  letI := H.fintypeQuotientOfFiniteIndex
+  haveI hsub : Subsingleton (G ⧸ H) := by
+    have h1 : Nat.card (G ⧸ H) = 1 := by rw [← Subgroup.index_eq_card, hidx]
+    exact (Nat.card_eq_one_iff_unique.mp h1).1
+  rw [MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot]
+  haveI : Subsingleton (Quotient (MulAction.orbitRel
+      (Subgroup.zpowers g) (G ⧸ H))) := Quotient.instSubsingletonQuotient _
+  rw [Fintype.prod_subsingleton _
+    (Quotient.mk (MulAction.orbitRel (Subgroup.zpowers g) (G ⧸ H))
+      (((1 : G) : G ⧸ H)))]
+  refine ⟨(Quotient.mk (MulAction.orbitRel (Subgroup.zpowers g) (G ⧸ H))
+      (((1 : G) : G ⧸ H))).out.out, congrArg ϕ (Subtype.ext ?_)⟩
+  show _ * g ^ Function.minimalPeriod _ _ * _ = _
+  rw [Function.minimalPeriod_eq_one_of_subsingleton, pow_one]
+
 variable (hHK : H ≤ K)
 
 /-- The composite section of `G ⧸ H` induced by a section `f` of `G ⧸ K` and a

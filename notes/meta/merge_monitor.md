@@ -716,6 +716,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #11、Fable hub) — ✅ a/b/c 3 レーン合流、census 23 不変**:
+  **a** = `8fe5da06` (Lemma 3.33 equivariant bijection、HartleyTurull.lean 新設 352 行) を merge
+  `4606659b`: **孤立 leaf → hub step 3b 配線 + 再 build** (孤立時は直前 build が leaf を検証しない点に注意、
+  4305 jobs green で再検証)。**b** = `c625fabe` (Thm 8.31 SL(n,q) transvection generation、309 行自力配線)
+  を merge `2b9a84a8`: build **4306 jobs green**。**c** = 2 commits (Yoshida setup + step lemmas、
+  Yoshida.lean 506 行、Thm 10.1 へ向け) を merge `6cb59750`: **Yoshida 孤立 → hub step 3b 配線**、build
+  **4307 jobs green**。sorry 23 不変・新 axiom なし・AxiomsCheck OK。push `ba1260f7..6cb59750`。
+  ⚠ 傾向 note: 新 leaf の root closure 配線漏れが a/c で頻発 (tick #6 c / #8 c / #11 a+c) — レーン側の
+  新 leaf checklist に「hub 任せにせず自 branch で wiring まで commit」を期待するが、step 3b 機械的修正で
+  吸収可能な範囲。
 - **2026-07-17 (tick #10、Fable hub) — ✅ c 合流 (Thm 10.10 Mackey 実証明)、census 24→23 (−1)**:
   **c** = `fdc79dd2` (Isaacs Thm 10.10 Mackey transfer 実証明 sorry-free、tick #8 scaffold discharge、
   claim 9105 close) + `fe9e1fa1` (Lemma 10.11 index-p subgroup from transfer-control failure、

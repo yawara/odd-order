@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 import OddOrder.Isaacs.Ch10_MoreTransfer.TransferIndexPrime
 
 /-!

@@ -3,16 +3,29 @@
 > 🚧 **形式化進行中 (lane c, 2026-07-17〜)** — 旧「FT 経路外 deferred」は 2026-07-16 の
 > 全 3 冊フェーズ移行で失効。着手順は上流優先+文書順 (§10A → §10B → §10C)。
 >
-> - ✅ **Lemma 10.3** (a)(b)(c) — `Ch10_MoreTransfer/WreathRecognition.lean` (sorry-free)
-> - ✅ **Theorem 10.4** `C_p ≀ C_p` 認識 — 同 leaf,
->   `nonempty_mulEquiv_wreath_of_noncommProd_conjClass_ne_one` (sorry-free)。
->   共役類積は `Finset.noncommProd`、`C_p ≀ C_p` は
->   `Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)`。
->   mathlib `Sylow.mulEquivIteratedWreathProduct` + 新規橋
->   `iteratedWreathProductTwoMulEquiv` を使用。
->   副産物 (shared): `PRank.lean` に `IsElementaryAbelian.exists_isComplement'`
->   (elementary abelian の任意部分群に補部分群)。
-> - ⏭ 次: **Cor 10.5** (準同型像版; P/Z 帰納) → 10.6/10.7 (pretransfer) → …
+> **§10A 完全形式化済 (2026-07-17, 全て sorry-free)** — Cor 10.2 のみ残:
+>
+> - ✅ **Lem 10.3** (a)(b)(c) — `WreathRecognition.lean`
+> - ✅ **Thm 10.4** `C_p ≀ C_p` 認識 — 同 leaf
+>   (`nonempty_mulEquiv_wreath_of_noncommProd_conjClass_ne_one`)
+> - ✅ **Cor 10.5** 準同型像版 — 同 leaf (P/Z 帰納 `cor105_aux`)
+> - ✅ **Lem 10.6** (a)(b) transfer 明示計算 — `TransferIndexPrime.lean`
+>   (p-群仮定なしに一般化)
+> - ✅ **Lem 10.7** Frattini 判定 — 同 leaf
+> - ✅ **Thm 10.8** transitivity — shared `GroupTheory/TransferTransitivity.lean`
+>   (`transfer_transfer`; mathlib 未収載、upstream 候補)
+> - ✅ **Thm 10.9** R·Φ(S) 判定 — `TransferIndexPrime.lean`
+> - ✅ **Thm 10.10** Mackey transfer — shared `GroupTheory/MackeyTransfer.lean`
+>   (`transfer_eq_prod_doubleCoset`; mathlib 未収載、upstream 候補)
+> - ✅ **Lem 10.11** — `TransferIndexPrime.lean`
+> - ✅ **Thm 10.1 (Yoshida)** — `Yoshida.lean`
+>   (`exists_surjective_wreath_of_transfer_range_lt`)
+> - ⏭ 次: **Cor 10.2** (class < p ⇒ 制御) → §10B (Huppert metacyclic)
+>
+> 「N が p-transfer を制御しない」の Lean 形 = transfer 像の真包含
+> (`v.range < w'.range`)。副産物 shared infra: `PRank.exists_isComplement'`,
+> `ElementaryAbelian.map_hom`, `transfer_comp_left`,
+> `exists_transfer_eq_conj_of_index_eq_one`。
 >
 > 以下の本文は 2026-05-23 audit 時点の調査 (被引用 0 等の事実は有効、
 > 「skip 推奨」結論のみ失効)。
