@@ -529,6 +529,29 @@ theorem IsElementaryAbelian.map {p : ℕ} {N : Type*} [Group N] {H : Subgroup G}
   OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
     (Subgroup.equivMapOfInjective H f hf) hH
 
+/-- The image `H.map f` of an elementary abelian subgroup under *any* homomorphism
+is elementary abelian: commutativity and exponent `p` pass to images. (Generalizes
+`IsElementaryAbelian.map`, which assumes injectivity; needed e.g. for quotient maps
+in Isaacs Cor 10.5.) -/
+theorem IsElementaryAbelian.map_hom {p : ℕ} {N : Type*} [Group N] {H : Subgroup G}
+    (f : G →* N) (hH : H.IsElementaryAbelian p) :
+    (H.map f).IsElementaryAbelian p := by
+  constructor
+  · rintro ⟨x, hx⟩ ⟨y, hy⟩
+    obtain ⟨x', hx', rfl⟩ := Subgroup.mem_map.mp hx
+    obtain ⟨y', hy', rfl⟩ := Subgroup.mem_map.mp hy
+    have hcomm : x' * y' = y' * x' :=
+      Subtype.ext_iff.mp (hH.1 ⟨x', hx'⟩ ⟨y', hy'⟩)
+    refine Subtype.ext ?_
+    show f x' * f y' = f y' * f x'
+    rw [← map_mul, ← map_mul, hcomm]
+  · rintro ⟨x, hx⟩
+    obtain ⟨x', hx', rfl⟩ := Subgroup.mem_map.mp hx
+    have hpow : x' ^ p = 1 := Subtype.ext_iff.mp (hH.2 ⟨x', hx'⟩)
+    refine Subtype.ext ?_
+    show (f x') ^ p = 1
+    rw [← map_pow, hpow, map_one]
+
 /-- Pulling back along an injective hom: if `H.map f` is elementary abelian, so
 is `H` (via the same iso `↥H ≃* ↥(H.map f)`). -/
 theorem IsElementaryAbelian.of_map {p : ℕ} {N : Type*} [Group N] {H : Subgroup G}

@@ -578,6 +578,43 @@ private lemma conj_pow_injOn {A : Subgroup P} [A.Normal]
   · exact key i j hle hj hij
   · exact (key j i hle hi hij.symm).symm
 
+/-- A subgroup of prime index is proper: there is an element outside it. -/
+private lemma exists_notMem_of_index_prime {A : Subgroup P} (hidx : A.index = p) :
+    ∃ u : P, u ∉ A := by
+  have hA_ne_top : A ≠ ⊤ := by
+    intro htop
+    rw [htop, Subgroup.index_top] at hidx
+    exact hp.out.one_lt.ne' hidx.symm
+  obtain ⟨u, -, hu⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hA_ne_top)
+  exact ⟨u, hu⟩
+
+/-- The `Finset.noncommProd` of the conjugacy class of a noncentral `a ∈ A` equals
+the list product `∏_{i<p} a^{uⁱ}` for any `u ∉ A` (class enumeration
+`conjClass_toFinset_eq_image` + injectivity `conj_pow_injOn`). Shared bridge for
+Thm 10.4 and Cor 10.5. -/
+private lemma noncommProd_conjClass_eq_list_prod {A : Subgroup P} [A.Normal]
+    (hidx : A.index = p) (hEA : A.IsElementaryAbelian p)
+    {a : P} (haA : a ∈ A) (haZ : a ∉ Subgroup.center P) {u : P} (hu : u ∉ A) :
+    (Set.toFinite {b | IsConj a b}).toFinset.noncommProd id
+        (conjClass_pairwise_commute hEA haA)
+      = ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).prod := by
+  classical
+  have hAb : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := elemAb_comm hEA
+  have hset : (Set.toFinite {b | IsConj a b}).toFinset
+      = ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).toFinset := by
+    rw [conjClass_toFinset_eq_image hidx hAb haA hu]
+    ext b
+    simp only [Finset.mem_image, Finset.mem_range, List.mem_toFinset, List.mem_map,
+      List.mem_range]
+  have hnodup : ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).Nodup := by
+    refine List.Nodup.map_on ?_ (List.nodup_range)
+    intro i hi j hj hij
+    exact conj_pow_injOn hidx hAb haA haZ hu
+      (by rw [Finset.coe_range]; exact List.mem_range.mp hi)
+      (by rw [Finset.coe_range]; exact List.mem_range.mp hj) hij
+  rw [Finset.noncommProd_congr hset (fun _ _ => rfl)]
+  rw [Finset.noncommProd_toFinset _ _ _ hnodup, List.map_id]
+
 /-- **Isaacs Thm 10.4, order bound**: if the product `∏_{i<p} a^{u^i}` of the
 conjugates of `a ∈ A` by powers of `u ∉ A` is nontrivial, then `|A| = p^m` with
 `m ≥ p`: conjugation by `u` is a linear operator `T` on the `F_p`-vector space `A`
@@ -798,35 +835,192 @@ theorem nonempty_mulEquiv_wreath_of_noncommProd_conjClass_ne_one
     by_contra hnot
     exact haZ (le_center_of_center_not_le hidx hAb hnot haA)
   -- fix u ∉ A
-  have hA_ne_top : A ≠ ⊤ := by
-    intro htop
-    rw [htop, Subgroup.index_top] at hidx
-    exact hp_prime.one_lt.ne' hidx.symm
-  obtain ⟨u, -, hu⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hA_ne_top)
+  obtain ⟨u, hu⟩ := exists_notMem_of_index_prime hidx
   have hupA : u ^ p ∈ A := (pow_mem_iff_dvd hidx hu p).mpr dvd_rfl
   -- the class product in list form ∏_{i<p} a^{u^i}
   have hlistne : ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).prod ≠ 1 := by
-    intro h0
-    apply hprod
-    have hset : (Set.toFinite {b | IsConj a b}).toFinset
-        = ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).toFinset := by
-      rw [conjClass_toFinset_eq_image hidx hAb haA hu]
-      ext b
-      simp only [Finset.mem_image, Finset.mem_range, List.mem_toFinset, List.mem_map,
-        List.mem_range]
-    have hnodup : ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).Nodup := by
-      refine List.Nodup.map_on ?_ (List.nodup_range)
-      intro i hi j hj hij
-      exact conj_pow_injOn hidx hAb haA haZ hu
-        (by rw [Finset.coe_range]; exact List.mem_range.mp hi)
-        (by rw [Finset.coe_range]; exact List.mem_range.mp hj) hij
-    rw [Finset.noncommProd_congr hset (fun _ _ => rfl)]
-    rw [Finset.noncommProd_toFinset _ _ _ hnodup, List.map_id]
-    exact h0
+    rw [← noncommProd_conjClass_eq_list_prod hidx hEA haA haZ hu]
+    exact hprod
   -- |A| = p^m with m ≥ p, and conclude via the Sylow embedding
   obtain ⟨m, hm, hcardA⟩ :=
     exists_card_eq_pow_ge_of_conj_list_prod_ne_one hEA haA hupA hlistne
   exact nonempty_mulEquiv_wreath_of_card_pow hP hidx hEA hZ hZle hm hcardA
+
+end
+
+section /- 10A: Corollary 10.5 (p. 299) -/
+
+/-- Induction engine for Isaacs Cor 10.5, recursing on an upper bound for
+`Nat.card Q`: either `|Z(Q)| = p` and Theorem 10.4 applies directly, or
+`|Z(Q)| ≥ p²` and one divides out a central subgroup `⟨z⟩` of order `p` avoiding
+the class product `b`, preserving all hypotheses (Isaacs p. 299). -/
+private theorem cor105_aux (n : ℕ) :
+    ∀ {Q : Type*} [Group Q] [Finite Q],
+    ∀ (_ : IsPGroup p Q) {A : Subgroup Q} [A.Normal]
+      (_ : A.index = p) (_ : A.IsElementaryAbelian p)
+      {a : Q} (_ : a ∈ A) (_ : a ∉ Subgroup.center Q)
+      {u : Q} (_ : u ∉ A)
+      (_ : ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).prod ≠ 1),
+      Nat.card Q ≤ n →
+      ∃ φ : Q →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)),
+        Function.Surjective φ := by
+  induction n with
+  | zero =>
+    intro Q _ _ _ A _ _ _ a _ _ u _ _ hle
+    have : 0 < Nat.card Q := Nat.card_pos
+    omega
+  | succ n ih =>
+    intro Q _ _ hQ A _ hidx hEA a haA haZ u hu hlist hle
+    classical
+    have hp_prime : p.Prime := hp.out
+    have hAb : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := elemAb_comm hEA
+    have hZle : Subgroup.center Q ≤ A := by
+      by_contra hnot
+      exact haZ (le_center_of_center_not_le hidx hAb hnot haA)
+    by_cases hZp : Nat.card (Subgroup.center Q) = p
+    · -- |Z(Q)| = p: Theorem 10.4 pipeline applies directly
+      have hupA : u ^ p ∈ A := (pow_mem_iff_dvd hidx hu p).mpr dvd_rfl
+      obtain ⟨m, hm, hcardA⟩ :=
+        exists_card_eq_pow_ge_of_conj_list_prod_ne_one hEA haA hupA hlist
+      obtain ⟨e⟩ := nonempty_mulEquiv_wreath_of_card_pow hQ hidx hEA hZp hZle hm hcardA
+      exact ⟨e.toMonoidHom, e.surjective⟩
+    · -- |Z(Q)| ≥ p²: divide out a central ⟨z⟩ of order p avoiding the class product
+      set b := ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).prod with hb_def
+      have hbA : b ∈ A := by
+        apply Subgroup.list_prod_mem
+        intro x hx
+        obtain ⟨i, -, rfl⟩ := List.mem_map.mp hx
+        exact ‹A.Normal›.conj_mem a haA _
+      have hb_ne : b ≠ 1 := hlist
+      have hb_pow : b ^ p = 1 := Subtype.ext_iff.mp (hEA.2 ⟨b, hbA⟩)
+      have hb_ord : orderOf b = p := by
+        rcases hp_prime.eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hb_pow)
+          with h1 | h
+        · exact absurd (orderOf_eq_one_iff.mp h1) hb_ne
+        · exact h
+      -- the center has order ≥ p²
+      have ha_ne : a ≠ 1 := fun h => haZ (h ▸ Subgroup.one_mem _)
+      haveI : Nontrivial Q := ⟨⟨a, 1, ha_ne⟩⟩
+      haveI := hQ.center_nontrivial
+      obtain ⟨k, hk_pos, hkcard⟩ :=
+        ((hQ.to_subgroup (Subgroup.center Q)).nontrivial_iff_card).mp ‹_›
+      have hk2 : 2 ≤ k := by
+        by_contra h
+        have hk1 : k = 1 := by omega
+        exact hZp (by rw [hkcard, hk1, pow_one])
+      have hcardZ_ge : p ^ 2 ≤ Nat.card (Subgroup.center Q) := by
+        rw [hkcard]
+        exact Nat.pow_le_pow_right hp_prime.pos hk2
+      -- choose z ∈ Z(Q) outside ⟨b⟩; it has order p and b ∉ ⟨z⟩
+      have hnotle : ¬ Subgroup.center Q ≤ Subgroup.zpowers b := by
+        intro hle'
+        have h1 := Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hle')
+        rw [Nat.card_zpowers, hb_ord] at h1
+        have hp2 : p < p ^ 2 := by
+          calc p = p ^ 1 := (pow_one p).symm
+            _ < p ^ 2 := Nat.pow_lt_pow_right hp_prime.one_lt (by omega)
+        omega
+      obtain ⟨z, hz_cent, hz_nb⟩ := SetLike.not_le_iff_exists.mp hnotle
+      have hz_ne : z ≠ 1 := fun h => hz_nb (h ▸ Subgroup.one_mem _)
+      have hzA : z ∈ A := hZle hz_cent
+      have hz_pow : z ^ p = 1 := Subtype.ext_iff.mp (hEA.2 ⟨z, hzA⟩)
+      have hz_ord : orderOf z = p := by
+        rcases hp_prime.eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hz_pow)
+          with h1 | h
+        · exact absurd (orderOf_eq_one_iff.mp h1) hz_ne
+        · exact h
+      set Z := Subgroup.zpowers z with hZ_def
+      have hZ_le_cent : Z ≤ Subgroup.center Q := Subgroup.zpowers_le.mpr hz_cent
+      haveI hZnormal : Z.Normal := by
+        constructor
+        intro g hg x
+        have h1 : x * g * x⁻¹ = g := by
+          rw [Subgroup.mem_center_iff.mp (hZ_le_cent hg) x]; group
+        rwa [h1]
+      have hcardZeq : Nat.card Z = p := by rw [hZ_def, Nat.card_zpowers, hz_ord]
+      have hbZ : b ∉ Z := by
+        intro hbz
+        have hle1 : Subgroup.zpowers b ≤ Z := Subgroup.zpowers_le.mpr hbz
+        have heq : Subgroup.zpowers b = Z := by
+          apply Subgroup.eq_of_le_of_card_ge hle1
+          rw [hcardZeq, Nat.card_zpowers, hb_ord]
+        exact hz_nb (heq ▸ Subgroup.mem_zpowers z)
+      -- pass to the quotient Q ⧸ Z
+      set π : Q →* Q ⧸ Z := QuotientGroup.mk' Z with hπ_def
+      have hπsurj : Function.Surjective π := QuotientGroup.mk'_surjective Z
+      have hkerπ : π.ker = Z := QuotientGroup.ker_mk' Z
+      have hZ_le_A : Z ≤ A := Subgroup.zpowers_le.mpr hzA
+      haveI : (A.map π).Normal := Subgroup.Normal.map ‹A.Normal› π hπsurj
+      have hidx' : (A.map π).index = p := by
+        rw [A.index_map_eq hπsurj (by rw [hkerπ]; exact hZ_le_A), hidx]
+      have hEA' : (A.map π).IsElementaryAbelian p :=
+        Subgroup.IsElementaryAbelian.map_hom π hEA
+      have haA' : π a ∈ A.map π := Subgroup.mem_map_of_mem π haA
+      have hu' : π u ∉ A.map π := by
+        intro hmem
+        obtain ⟨w, hwA, hw⟩ := Subgroup.mem_map.mp hmem
+        have hker : w⁻¹ * u ∈ Z := by
+          rw [← hkerπ, MonoidHom.mem_ker, map_mul, map_inv, hw, inv_mul_cancel]
+        exact hu (by simpa using A.mul_mem hwA (hZ_le_A hker))
+      -- the image of the conjugate list is the conjugate list of the images
+      have hmap_list : ((List.range p).map
+          (fun i => (π u) ^ i * (π a) * ((π u) ^ i)⁻¹)).prod = π b := by
+        rw [hb_def, map_list_prod, List.map_map]
+        congr 1
+      have hπb_ne : π b ≠ 1 := by
+        intro h1
+        exact hbZ (by rw [← hkerπ]; exact π.mem_ker.mpr h1)
+      have hlist' : ((List.range p).map
+          (fun i => (π u) ^ i * (π a) * ((π u) ^ i)⁻¹)).prod ≠ 1 := by
+        rw [hmap_list]; exact hπb_ne
+      -- π a is noncentral: otherwise π b = (π a)^p = π (a^p) = 1
+      have haZ' : π a ∉ Subgroup.center (Q ⧸ Z) := by
+        intro hcent
+        apply hπb_ne
+        rw [← hmap_list]
+        have hconst : ((List.range p).map
+            (fun i => (π u) ^ i * (π a) * ((π u) ^ i)⁻¹))
+            = List.replicate p (π a) := by
+          rw [show List.replicate p (π a) = (List.range p).map (fun _ => π a) by
+            rw [List.map_const', List.length_range]]
+          refine List.map_congr_left fun i _ => ?_
+          rw [Subgroup.mem_center_iff.mp hcent ((π u) ^ i)]
+          group
+        rw [hconst, List.prod_replicate]
+        have hpa : a ^ p = 1 := Subtype.ext_iff.mp (hEA.2 ⟨a, haA⟩)
+        rw [← map_pow, hpa, map_one]
+      -- the quotient is strictly smaller: |Q ⧸ Z| = |Q| / p ≤ n
+      have hcard_le : Nat.card (Q ⧸ Z) ≤ n := by
+        have h1 : Nat.card Z * Z.index = Nat.card Q := Subgroup.card_mul_index Z
+        rw [hcardZeq, Subgroup.index_eq_card] at h1
+        have hq_pos : 0 < Nat.card (Q ⧸ Z) := Nat.card_pos
+        have hp2 : 2 ≤ p := hp_prime.two_le
+        have h2 : 2 * Nat.card (Q ⧸ Z) ≤ p * Nat.card (Q ⧸ Z) :=
+          Nat.mul_le_mul_right _ hp2
+        omega
+      obtain ⟨φ, hφ⟩ := ih (hQ.to_quotient Z) hidx' hEA' haA' haZ' hu' hlist' hcard_le
+      exact ⟨φ.comp π, hφ.comp hπsurj⟩
+
+/-- **Isaacs Corollary 10.5**: let `P` be a `p`-group with a normal elementary
+abelian subgroup `A` of index `p`, and let `a ∈ A` be noncentral such that the
+product of the `p` elements of its conjugacy class is not the identity. Then
+`C_p ≀ C_p` is a homomorphic image of `P`.
+
+(Induction on `|P|`: if `|Z(P)| = p` this is Theorem 10.4; otherwise divide out a
+central subgroup of order `p` avoiding the class product and recurse.) -/
+theorem exists_surjective_wreath_of_noncommProd_conjClass_ne_one
+    (hP : IsPGroup p P) {A : Subgroup P} [A.Normal]
+    (hidx : A.index = p) (hEA : A.IsElementaryAbelian p)
+    {a : P} (haA : a ∈ A) (haZ : a ∉ Subgroup.center P)
+    (hprod : (Set.toFinite {b | IsConj a b}).toFinset.noncommProd id
+      (conjClass_pairwise_commute hEA haA) ≠ 1) :
+    ∃ φ : P →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)),
+      Function.Surjective φ := by
+  obtain ⟨u, hu⟩ := exists_notMem_of_index_prime hidx
+  have hlist : ((List.range p).map (fun i => u ^ i * a * (u ^ i)⁻¹)).prod ≠ 1 := by
+    rw [← noncommProd_conjClass_eq_list_prod hidx hEA haA haZ hu]
+    exact hprod
+  exact cor105_aux (Nat.card P) hP hidx hEA haA haZ hu hlist le_rfl
 
 end
 
