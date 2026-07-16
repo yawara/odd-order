@@ -39,3 +39,8 @@ created: 2026-07-17
 
 事前検索: repo 内 `transfer` transitivity/comp 該当なし。mathlib Transfer.lean
 に diff/leftTransversal API はあるが tower 合成なし。
+
+## 完了 (2026-07-17)
+
+`OddOrder/GroupTheory/TransferTransitivity.lean` (346 行, sorry-free) として
+commit 2809c5fc で実装完了。主定理 = `OddOrder.GroupTheory.transfer_transfer`。
