@@ -36,6 +36,67 @@ theorem sup_eq_top_of_coprime_index {H K : Subgroup G}
   have h_dvd : (H ⊔ K).index ∣ 1 := h ▸ Nat.dvd_gcd h1 h2
   exact Subgroup.index_eq_one.mp (Nat.dvd_one.mp h_dvd)
 
+/-- **Isaacs Lemma 3.16 補助**: `|G:H|`, `|G:K|` が coprime なら
+`|G : H ∩ K| = |G:H| · |G:K|`.
+
+証明: `|G:H|`, `|G:K|` はともに `|G : H∩K|` を割り切るので coprime より積も割り切る.
+逆向きの評価は `G/(H∩K) ↪ G/H × G/K` (mathlib `Subgroup.index_inf_le`). -/
+theorem index_inf_eq_mul_of_coprime_index [Finite G] {H K : Subgroup G}
+    (h : Nat.Coprime H.index K.index) :
+    (H ⊓ K).index = H.index * K.index := by
+  have h1 : H.index ∣ (H ⊓ K).index := Subgroup.index_dvd_of_le inf_le_left
+  have h2 : K.index ∣ (H ⊓ K).index := Subgroup.index_dvd_of_le inf_le_right
+  have h_dvd : H.index * K.index ∣ (H ⊓ K).index :=
+    Nat.Coprime.mul_dvd_of_dvd_of_dvd h h1 h2
+  have h_pos : 0 < (H ⊓ K).index :=
+    Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  exact Nat.le_antisymm Subgroup.index_inf_le (Nat.le_of_dvd h_pos h_dvd)
+
+/-- **Isaacs Lemma 3.16 (index clause)**: `|G:H|`, `|G:K|` が coprime なら
+`|H : H ∩ K| = |G:K|` (mathlib 表記では `K.relIndex H`). -/
+theorem relIndex_eq_index_of_coprime_index [Finite G] {H K : Subgroup G}
+    (h : Nat.Coprime H.index K.index) :
+    K.relIndex H = K.index := by
+  have e1 : K.relIndex H * H.index = (H ⊓ K).index := by
+    rw [← Subgroup.inf_relIndex_left]
+    exact Subgroup.relIndex_mul_index inf_le_left
+  rw [index_inf_eq_mul_of_coprime_index h, Nat.mul_comm H.index K.index] at e1
+  have h_pos : 0 < H.index := Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  exact Nat.eq_of_mul_eq_mul_right h_pos e1
+
+/-- **Isaacs Lemma 3.16 (set product)**: `|G:H|`, `|G:K|` が coprime なら `G = HK`
+(**集合積**として; `sup_eq_top_of_coprime_index` より強い). Thm 3.17 の
+`x = uv` 分解で使う. 証明は書籍どおり計数:
+`|HK| · |H∩K| = |H| · |K|` (Ch.2 `card_set_mul_card_inf`) と
+`|G : H∩K| = |G:H||G:K|` から `|HK| = |G|`. -/
+theorem set_mul_eq_univ_of_coprime_index [Finite G] {H K : Subgroup G}
+    (h : Nat.Coprime H.index K.index) :
+    (H : Set G) * (K : Set G) = Set.univ := by
+  have hcard := OddOrder.Isaacs.Ch02.card_set_mul_card_inf H K
+  have e1 : Nat.card ↥H * H.index = Nat.card G := Subgroup.card_mul_index H
+  have e2 : Nat.card ↥K * K.index = Nat.card G := Subgroup.card_mul_index K
+  have e3 : Nat.card ↥(H ⊓ K) * (H ⊓ K).index = Nat.card G :=
+    Subgroup.card_mul_index (H ⊓ K)
+  rw [index_inf_eq_mul_of_coprime_index h] at e3
+  have h_idx_pos : 0 < H.index * K.index :=
+    Nat.mul_pos (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite)
+      (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite)
+  -- `|H| · |K| = |G| · |H∩K|`
+  have key : Nat.card ↥H * Nat.card ↥K = Nat.card G * Nat.card ↥(H ⊓ K) := by
+    have hmul : (Nat.card ↥H * Nat.card ↥K) * (H.index * K.index) =
+        (Nat.card G * Nat.card ↥(H ⊓ K)) * (H.index * K.index) := by
+      calc (Nat.card ↥H * Nat.card ↥K) * (H.index * K.index)
+          = (Nat.card ↥H * H.index) * (Nat.card ↥K * K.index) := by ring
+        _ = Nat.card G * Nat.card G := by rw [e1, e2]
+        _ = Nat.card G * (Nat.card ↥(H ⊓ K) * (H.index * K.index)) := by rw [e3]
+        _ = (Nat.card G * Nat.card ↥(H ⊓ K)) * (H.index * K.index) := by ring
+    exact Nat.eq_of_mul_eq_mul_right h_idx_pos hmul
+  rw [key] at hcard
+  have hHK : Nat.card ↥((H : Set G) * (K : Set G)) = Nat.card G :=
+    Nat.eq_of_mul_eq_mul_right Nat.card_pos hcard
+  refine Set.eq_of_subset_of_ncard_le (Set.subset_univ _) ?_
+  rw [Set.ncard_univ, ← Nat.card_coe_set_eq, hHK]
+
 /-! **Isaacs Thm 3.17 Wielandt**: 3 部分群 pairwise coprime index + solvable ⇒ G solvable.
 
 **Forward dep**: 単純群の場合分けで Burnside `p^a q^b` 必要. Ch.7 完成後に back-fill.
