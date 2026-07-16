@@ -29,9 +29,7 @@ mathlib v4.29.1 にはこの概念 (∃ cyclic normal `N ⊴ G` で `G ⧸ N` cy
 ## Design notes
 
 * `Prop` 定義 (構造体ではない); 補題で `∃` を unpack.
-* 部分群への閉包 (every subgroup of a metacyclic group is metacyclic) は **非自明** で
-  別途証明要; 本 module では未収載.
-* 商群への閉包は trivial だが対応 `N` の構成が必要 — 後の補強で.
+* 閉包性 (Isaacs Lem 10.13): 部分群 = `subgroup`, 準同型像 (⊇ 商群) = `of_surjective`.
 * 将来 mathlib upstream 視野で `OddOrder/Mathlib/IsMetacyclic.lean` 候補.
 
 ## References
@@ -86,6 +84,35 @@ theorem isCyclic_commutator (hmeta : IsMetacyclic G) : IsCyclic (commutator G) :
   haveI : IsCyclic ↥((commutator G).subgroupOf N) := Subgroup.isCyclic _
   exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hle).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hle).surjective
+
+/-- **Isaacs Lemma 10.13(a)** (homomorphic-image form): the image of a metacyclic
+group under a surjective homomorphism is metacyclic; taking `f = QuotientGroup.mk' U`
+recovers the textbook statement that every quotient of a metacyclic group is
+metacyclic.
+
+If `N ⊴ G` is cyclic with `G ⧸ N` cyclic, then `N.map f ⊴ H` is cyclic (image of a
+cyclic group) and `H ⧸ N.map f` is a surjective image of `G ⧸ N` (the composite
+`G → H → H ⧸ N.map f` kills `N`), hence cyclic. -/
+theorem of_surjective {H : Type*} [Group H] {f : G →* H} (hf : Function.Surjective f)
+    (h : IsMetacyclic G) : IsMetacyclic H := by
+  obtain ⟨N, hN, hN_cyc, hQ_cyc⟩ := h
+  haveI := hN
+  haveI : IsCyclic N := hN_cyc
+  haveI : IsCyclic (G ⧸ N) := hQ_cyc
+  haveI : (N.map f).Normal := Subgroup.Normal.map hN f hf
+  refine ⟨N.map f, inferInstance, ?_, ?_⟩
+  · exact isCyclic_of_surjective (f.subgroupMap N) (f.subgroupMap_surjective N)
+  · -- `G ⧸ N` surjects onto `H ⧸ N.map f` via the descent of `mk' (N.map f) ∘ f`.
+    have hker : N ≤ ((QuotientGroup.mk' (N.map f)).comp f).ker := by
+      intro x hx
+      simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+        QuotientGroup.eq_one_iff]
+      exact Subgroup.mem_map_of_mem f hx
+    refine isCyclic_of_surjective (QuotientGroup.lift N _ hker) ?_
+    intro y
+    obtain ⟨h', rfl⟩ := QuotientGroup.mk'_surjective (N.map f) y
+    obtain ⟨g, rfl⟩ := hf h'
+    exact ⟨QuotientGroup.mk g, rfl⟩
 
 /-- **Every subgroup of a metacyclic group is metacyclic.**
 

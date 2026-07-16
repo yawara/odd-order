@@ -8,6 +8,7 @@ import Mathlib.LinearAlgebra.Eigenspace.Zero
 import Mathlib.GroupTheory.RegularWreathProduct
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.CriticalSubgroup
 
@@ -1240,6 +1241,57 @@ theorem nilpotencyClass_wreath :
   exact nilpotencyClass_eq_of_elementaryAbelian_normalClosure_index_prime
     hW_pgroup (wreathBase_index p) (wreathBase_isElementaryAbelian p)
     hp_prime.two_le (wreathBase_card p) (wreathBase_eq_normalClosure p)
+
+/- 10B: `C_p ≀ C_p` is not an image of a metacyclic group (Lemma 10.14, p. 305) -/
+
+/-- **Isaacs Lemma 10.14** (core): for `p > 2` the wreath product `C_p ≀ C_p` is
+not metacyclic. Its derived subgroup is elementary abelian of order `p^(p-1) > p`
+by Lemma 10.3(b), hence not cyclic — but metacyclic groups have cyclic derived
+subgroups. -/
+theorem not_isMetacyclic_wreath (hp2 : 2 < p) :
+    ¬ IsMetacyclic (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) := by
+  intro hmeta
+  have hp_prime : p.Prime := hp.out
+  have hW_pgroup : IsPGroup p (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) := by
+    refine IsPGroup.of_card (n := p + 1) ?_
+    rw [RegularWreathProduct.card, Nat.card_congr Multiplicative.toAdd, Nat.card_zmod,
+      pow_succ]
+  -- `|W'| = p^(p-1)` and `W'` is elementary abelian (Lemma 10.3(b))
+  have hcard := card_commutator_eq_of_elementaryAbelian_normalClosure_index_prime
+    hW_pgroup (wreathBase_index p) (wreathBase_isElementaryAbelian p)
+    hp_prime.two_le (wreathBase_card p) (wreathBase_eq_normalClosure p)
+  have hEA := isElementaryAbelian_commutator_of_elementaryAbelian_normalClosure_index_prime
+    (wreathBase_index p) (wreathBase_isElementaryAbelian p) (wreathBase_eq_normalClosure p)
+  -- metacyclic ⇒ `W'` cyclic, so `|W'| = orderOf g ∣ p` for a generator `g`
+  obtain ⟨g, hg⟩ := hmeta.isCyclic_commutator.exists_generator
+  have htop : Subgroup.zpowers g = ⊤ := top_unique fun x _ => hg x
+  have hcard_eq : Nat.card
+      (_root_.commutator (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)))
+      = orderOf g := by
+    rw [← Nat.card_zpowers g, htop]
+    exact (Nat.card_congr Subgroup.topEquiv.toEquiv).symm
+  have hdvd : p ^ (p - 1) ∣ p := by
+    rw [← hcard, hcard_eq]
+    exact orderOf_dvd_of_pow_eq_one (hEA.2 g)
+  -- but `p - 1 ≥ 2` forces `p^2 ≤ p^(p-1) ≤ p`, absurd
+  have hle : p ^ (p - 1) ≤ p := Nat.le_of_dvd hp_prime.pos hdvd
+  have hsq : p ^ 2 ≤ p ^ (p - 1) :=
+    Nat.pow_le_pow_right hp_prime.one_lt.le (by omega)
+  have : p * p ≤ p * 1 := by
+    calc p * p = p ^ 2 := (sq p).symm
+      _ ≤ p := le_trans hsq hle
+      _ = p * 1 := (mul_one p).symm
+  have := Nat.le_of_mul_le_mul_left this hp_prime.pos
+  omega
+
+/-- **Isaacs Lemma 10.14**: for `p > 2` the wreath product `C_p ≀ C_p` is not a
+homomorphic image of a metacyclic group (combine the core with Lemma 10.13(a),
+`IsMetacyclic.of_surjective`). -/
+theorem not_surjective_wreath_of_isMetacyclic {M : Type*} [Group M]
+    (hmeta : IsMetacyclic M) (hp2 : 2 < p)
+    (φ : M →* Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)) :
+    ¬ Function.Surjective φ := fun hφ =>
+  not_isMetacyclic_wreath p hp2 (hmeta.of_surjective hφ)
 
 end
 
