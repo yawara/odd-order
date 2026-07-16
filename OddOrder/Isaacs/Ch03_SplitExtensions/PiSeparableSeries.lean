@@ -313,6 +313,199 @@ theorem isPiSeparable_of_mulEquiv {H : Type*} [Group H] [Finite G] [Finite H]
     rw [heq]
     exact hfac i
 
+/-! ### disjunction lemma の `[IsPiSeparable]` 版 -/
+
+/-- If `O_π(G) = ⊥`, then also `O_π(G/⊥) = ⊥`.
+
+This is the quotient-by-`⊥` bridge used to transfer the first nontrivial
+`piFittingSeries` step back from `G ⧸ ⊥` to `G`. -/
+private theorem oPiCore_quotient_bot_eq_bot_of_oPiCore_eq_bot
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ)
+    (hbot : oPiCore π G = ⊥) :
+    oPiCore π (G ⧸ (⊥ : Subgroup G)) = ⊥ := by
+  let q : G →* G ⧸ (⊥ : Subgroup G) := QuotientGroup.mk' (⊥ : Subgroup G)
+  have hq_surj : Function.Surjective q := QuotientGroup.mk'_surjective _
+  have hq_inj : Function.Injective q := by
+    have hker : q.ker = ⊥ := by
+      dsimp [q]
+      exact QuotientGroup.ker_mk' (⊥ : Subgroup G)
+    exact (MonoidHom.ker_eq_bot_iff q).mp hker
+  apply Subgroup.comap_injective hq_surj
+  apply le_antisymm
+  · rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+    exact (oPiCore.comap_le_of_injective π q hq_inj).trans (le_of_eq hbot)
+  · rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+    exact bot_le
+
+/-- **π-separable disjunction**: a finite nontrivial π-separable group has a nontrivial
+first π-Fitting layer, i.e. `O_π(G) ⊔ O_{π'}(G) ≠ ⊥`. -/
+theorem oPiCore_sup_ne_bot_of_isPiSeparable
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ) [Nontrivial G] [IsPiSeparable π G] :
+    (oPiCore π G ⊔ oPiCore {p | p ∉ π} G) ≠ ⊥ := by
+  have hF1_ne_bot : piFittingSeries π G 1 ≠ ⊥ := by
+    intro hF1
+    obtain ⟨n, hn⟩ := IsPiSeparable.exists_top (π := π) (G := G)
+    have hQsup_bot : (oPiCore π (G ⧸ (⊥ : Subgroup G)) ⊔
+        oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G))) = ⊥ := by
+      apply Subgroup.comap_injective (QuotientGroup.mk'_surjective (⊥ : Subgroup G))
+      rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+      -- `piFittingSeries π G 1` は定義 (`piFittingSeries_succ`/`_zero` とも `rfl`) より
+      -- ちょうどこの comap (bump 後は simp 経由だと instance 経路がずれるので defeq で渡す).
+      exact hF1
+    have h_all_bot : ∀ n, piFittingSeries π G n = ⊥ := by
+      intro n
+      induction n with
+      | zero =>
+        exact piFittingSeries_zero π G
+      | succ n ih =>
+        let e : G ⧸ piFittingSeries π G n ≃* G ⧸ (⊥ : Subgroup G) :=
+          QuotientGroup.quotientMulEquivOfEq ih
+        let Sₙ : Subgroup (G ⧸ piFittingSeries π G n) :=
+          oPiCore π (G ⧸ piFittingSeries π G n) ⊔
+            oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n)
+        have hSₙ_map : Sₙ.map e.toMonoidHom =
+            oPiCore π (G ⧸ (⊥ : Subgroup G)) ⊔
+              oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G)) := by
+          dsimp [Sₙ, e]
+          rw [Subgroup.map_sup, oPiCore.map_eq_of_mulEquiv π,
+            oPiCore.map_eq_of_mulEquiv {p | p ∉ π}]
+        have hSₙ_bot : Sₙ = ⊥ := by
+          refine (Subgroup.map_eq_bot_iff_of_injective (f := e.toMonoidHom)
+            (H := Sₙ) e.injective).mp ?_
+          rw [hSₙ_map, hQsup_bot]
+        rw [piFittingSeries_succ]
+        change Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G n)) Sₙ = ⊥
+        rw [hSₙ_bot, MonoidHom.comap_bot, QuotientGroup.ker_mk', ih]
+    have htop_bot : (⊤ : Subgroup G) = ⊥ := by
+      rw [← hn, h_all_bot n]
+    exact top_ne_bot htop_bot
+  have hF0_lt : piFittingSeries π G 0 < piFittingSeries π G 1 := by
+    refine lt_of_le_of_ne (piFittingSeries_le_succ π G 0) ?_
+    intro hEq
+    exact hF1_ne_bot (by rw [← hEq, piFittingSeries_zero])
+  have hQsup0 :=
+    (piFittingSeries_lt_succ_iff π (G := G) 0).mp hF0_lt
+  have hQsup : (oPiCore π (G ⧸ (⊥ : Subgroup G)) ⊔
+      oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G))) ≠ ⊥ := by
+    -- `piFittingSeries π G 0 = ⊥` は `rfl` (bump 後は simp 経由だと instance 経路が
+    -- ずれるので defeq で渡す).
+    exact hQsup0
+  intro hsup_bot
+  have hπ_bot : oPiCore π G = ⊥ := by
+    apply le_antisymm ?_ bot_le
+    rw [← hsup_bot]
+    exact le_sup_left
+  have hπ'_bot : oPiCore {p | p ∉ π} G = ⊥ := by
+    apply le_antisymm ?_ bot_le
+    rw [← hsup_bot]
+    exact le_sup_right
+  have hQπ_bot : oPiCore π (G ⧸ (⊥ : Subgroup G)) = ⊥ :=
+    oPiCore_quotient_bot_eq_bot_of_oPiCore_eq_bot π hπ_bot
+  have hQπ'_bot : oPiCore {p | p ∉ π} (G ⧸ (⊥ : Subgroup G)) = ⊥ :=
+    oPiCore_quotient_bot_eq_bot_of_oPiCore_eq_bot {p | p ∉ π} hπ'_bot
+  exact hQsup (by rw [hQπ_bot, hQπ'_bot, bot_sup_eq])
+
+/-- **π-separable disjunction**, split form:
+`O_π(G) ≠ ⊥ ∨ O_{π'}(G) ≠ ⊥`. -/
+theorem exists_oPiCore_ne_bot_or_oPi'Core_ne_bot_of_isPiSeparable
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ) [Nontrivial G] [IsPiSeparable π G] :
+    oPiCore π G ≠ ⊥ ∨ oPiCore {p | p ∉ π} G ≠ ⊥ := by
+  have hsup := oPiCore_sup_ne_bot_of_isPiSeparable (G := G) π
+  by_cases hπ : oPiCore π G = ⊥
+  · right
+    intro hπ'
+    exact hsup (by rw [hπ, hπ', bot_sup_eq])
+  · exact Or.inl hπ
+
+/-- **拡大閉包**: `N ⊴ G` で `↥N` も `G/N` も π-separable なら `G` も π-separable.
+
+証明: `|G|` の強帰納法. `N = ⊥` なら `G ≅ G/⊥` で転送. さもなくば `↥N` の
+`O_π(N)` か `O_π'(N)` の非自明な方 `A` を取る
+(`oPiCore_sup_ne_bot_of_isPiSeparable`). `A` は `N` で characteristic ゆえ
+`A' := A.map N.subtype ⊴ G` (`normal_of_characteristic_of_normal`).
+`G/A'` では `N/A'` が π-separable (第 1 同型 + quotient 閉包) で
+`(G/A')/(N/A') ≅ G/N` (第 3 同型) も π-separable なので帰納法で `G/A'` が
+π-separable. `A'` は π-群 or π'-群なので原子拡大
+(`isPiSeparable_of_isPiGroup_normal_of_quotient`) で `G` が π-separable. -/
+theorem isPiSeparable_of_normal_of_quotient.{u} {G : Type u} [Group G] [Finite G]
+    {π : Set ℕ} {N : Subgroup G} [N.Normal]
+    (hN : IsPiSeparable π ↥N) (hQ : IsPiSeparable π (G ⧸ N)) :
+    IsPiSeparable π G := by
+  classical
+  let motive : ℕ → Prop := fun n =>
+    ∀ (G' : Type u) [Group G'] [Finite G'], Nat.card G' = n →
+      ∀ (N : Subgroup G') [N.Normal],
+        IsPiSeparable π ↥N → IsPiSeparable π (G' ⧸ N) → IsPiSeparable π G'
+  suffices hmain : motive (Nat.card G) by exact hmain G rfl N hN hQ
+  refine Nat.strong_induction_on (Nat.card G) ?_
+  intro n ih G' _ _ hcard N _ hN hQ
+  by_cases hbot : N = ⊥
+  · subst hbot
+    exact isPiSeparable_of_mulEquiv (QuotientGroup.quotientBot (G := G')) hQ
+  · haveI := hN
+    haveI hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hbot
+    have hsup := oPiCore_sup_ne_bot_of_isPiSeparable (G := ↥N) π
+    -- 非自明な characteristic π-群 or π'-群 `A ≤ N` を選ぶ.
+    obtain ⟨A, hA_pi, hA_ne, hA_char⟩ :
+        ∃ A : Subgroup ↥N,
+          (Subgroup.IsPiGroup π A ∨ Subgroup.IsPiGroup {p | p ∉ π} A) ∧
+          A ≠ ⊥ ∧ A.Characteristic := by
+      by_cases h1 : oPiCore π ↥N = ⊥
+      · refine ⟨oPiCore {p | p ∉ π} ↥N, Or.inr (oPiCore.isPiGroup _), ?_, inferInstance⟩
+        intro h2
+        exact hsup (by rw [h1, h2, sup_idem])
+      · exact ⟨oPiCore π ↥N, Or.inl (oPiCore.isPiGroup _), h1, inferInstance⟩
+    haveI := hA_char
+    haveI hA'_normal : (A.map N.subtype).Normal :=
+      ConjAct.normal_of_characteristic_of_normal
+    have hA'_ne : A.map N.subtype ≠ ⊥ := by
+      rw [Ne, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff]
+      exact hA_ne
+    have hA'_pi : Subgroup.IsPiGroup π (A.map N.subtype) ∨
+        Subgroup.IsPiGroup {p | p ∉ π} (A.map N.subtype) := by
+      have hcardEq : Nat.card ↥(A.map N.subtype) = Nat.card ↥A :=
+        Nat.card_congr
+          (Subgroup.equivMapOfInjective A N.subtype N.subtype_injective).symm.toEquiv
+      refine hA_pi.imp (fun h p hp => ?_) (fun h p hp => ?_)
+      · rw [hcardEq] at hp; exact h p hp
+      · rw [hcardEq] at hp; exact h p hp
+    -- `N/A'` は π-separable (第 1 同型 + quotient 閉包).
+    set f₀ : ↥N →* G' ⧸ A.map N.subtype :=
+      (QuotientGroup.mk' (A.map N.subtype)).comp N.subtype with hf₀
+    have hker : f₀.ker = A := by
+      rw [hf₀, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']
+      exact Subgroup.comap_map_eq_self_of_injective N.subtype_injective A
+    have hrange : f₀.range = N.map (QuotientGroup.mk' (A.map N.subtype)) := by
+      rw [hf₀, MonoidHom.range_comp, Subgroup.range_subtype]
+    haveI hNsub_sep : IsPiSeparable π (↥N ⧸ f₀.ker) :=
+      isPiSeparable_of_mulEquiv
+        (QuotientGroup.quotientMulEquivOfEq hker.symm)
+        (quotient_isPiSeparable π ↥N A)
+    haveI hN'_normal : (N.map (QuotientGroup.mk' (A.map N.subtype))).Normal :=
+      Subgroup.Normal.map ‹N.Normal› _ (QuotientGroup.mk'_surjective _)
+    haveI hN'_sep : IsPiSeparable π ↥(N.map (QuotientGroup.mk' (A.map N.subtype))) :=
+      isPiSeparable_of_mulEquiv
+        ((QuotientGroup.quotientKerEquivRange f₀).trans
+          (MulEquiv.subgroupCongr hrange)) hNsub_sep
+    -- `(G/A')/(N/A') ≅ G/N` は π-separable (第 3 同型).
+    haveI hQQ_sep : IsPiSeparable π
+        ((G' ⧸ A.map N.subtype) ⧸ N.map (QuotientGroup.mk' (A.map N.subtype))) :=
+      isPiSeparable_of_mulEquiv
+        (QuotientGroup.quotientQuotientEquivQuotient (A.map N.subtype) N
+          (Subgroup.map_subtype_le A)).symm hQ
+    -- 帰納法で `G/A'` が π-separable → 原子拡大で締める.
+    have hlt : Nat.card (G' ⧸ A.map N.subtype) < n := by
+      haveI : Nontrivial ↥(A.map N.subtype) :=
+        (Subgroup.nontrivial_iff_ne_bot _).mpr hA'_ne
+      calc Nat.card (G' ⧸ A.map N.subtype)
+          < Nat.card (G' ⧸ A.map N.subtype) * Nat.card ↥(A.map N.subtype) :=
+            (lt_mul_iff_one_lt_right Nat.card_pos).mpr Finite.one_lt_card
+        _ = n := by
+            rw [← Subgroup.card_eq_card_quotient_mul_card_subgroup (A.map N.subtype),
+              hcard]
+    exact isPiSeparable_of_isPiGroup_normal_of_quotient hA'_pi
+      (ih _ hlt (G' ⧸ A.map N.subtype) rfl _ hN'_sep hQQ_sep)
+
 end -- 3D Lemma 3.18
 
 end OddOrder.Isaacs.Ch03
