@@ -1,5 +1,5 @@
 ---
-id: 9XXX
+id: 9107
 slug: prime-order-subgroup-lemmas
 title: "shared: PrimeOrderSubgroups.lean — 位数 p 部分群の基礎 2 補題 (lane c claim)"
 created: 2026-07-17
