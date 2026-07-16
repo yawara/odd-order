@@ -43,6 +43,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
@@ -731,6 +732,18 @@ set_option linter.style.longLine false in
 -- (genuine π-length ≤ 1; Hall-Higman 1.2.3 経由).
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch03.quotient_oPiPrimePiCore_isPiGroup_compl_of_abelian_pi_hall
+
+-- Ch.3 §3E (Ch.4 owner): Thm 3.26 — A-不変共役類 ↔ C_G(A) の類の全単射 (Glauberman 経由).
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aInvariantConjClassesEquiv
+
+-- Ch.3 §3E Hartley-Turull クラスタ: Lem 3.32 / Lem 3.33 / Thm 3.31 / Thm 3.34.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.card_inf_fixedSubgroup_of_aInvariant_sylow
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.exists_equivariant_equiv_of_card_fixedPoints_eq
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.exists_abelian_fixedPoint_replacement
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.exists_orbit_card_mul_of_coprime_orbit_card
 
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
