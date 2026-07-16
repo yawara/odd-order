@@ -45,5 +45,7 @@ repo 内該当なし。
 ## 状態
 
 - [x] claim (2026-07-17)
-- [ ] skeleton (statement + design, sorried)
-- [ ] 証明本体
+- [x] skeleton (statement + design, sorried) — `OddOrder/GroupTheory/MackeyTransfer.lean`
+      (`conjSubgroup`/`mem_conjSubgroup`/`mackeyRes` は実証明、主定理 statement は
+      型付け済・sorry 1)
+- [ ] 証明本体 (fibration 論法; leaf 冒頭の証明計画 §1-4 参照)
