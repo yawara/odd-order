@@ -6,27 +6,40 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.GroupAction.Jordan
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: the `p`-cycle Jordan theorem (Thm 8.23)
 
 Formalizes **Isaacs Thm 8.23** (pp. 236–237; Wielandt 13.9): a primitive
 subgroup `G ≤ Sym(Ω)` containing a `p`-cycle with `p` prime and
-`p ≤ |Ω| - 3` contains the alternating group.  This is mathlib's
+`p ≤ |Ω| - 3` contains the alternating group
+(`alternatingGroup_le_of_isPreprimitive_of_isCycle_mem`).  This is mathlib's
 `proof_wanted alternatingGroup_le_of_isPreprimitive_of_isCycle_mem`
 (`Mathlib.GroupTheory.GroupAction.Jordan`).
 
-Current contents: the groundwork —
+Proof structure (following Isaacs, with the quotient arguments replaced by
+element-level corrections):
 
-* agreement-transport lemmas: if permutations agree on an invariant set,
-  so do their inverses, products, commutators and powers
-  (`commutator_apply_eq_of_agree`, `pow_apply_eq_of_agree`);
-* the realization lemma (`exists_agree_of_isMultiplyPretransitive`): an
-  `|S|`-transitive subgroup of `Perm α` contains an element agreeing with
-  any prescribed permutation on `S`.
-
-The main theorem (Frattini/Sylow correction, centralizer of the `p`-cycle
-via `IsCycle.commute_iff`, and the `x^p` three-cycle) follows in this file.
+* agreement-transport lemmas: permutations agreeing on an invariant set
+  have agreeing inverses, products, commutators and powers;
+* `exists_agree_of_isMultiplyPretransitive`: an `|S|`-transitive subgroup
+  of `Perm α` realizes any prescribed permutation on `S` — applicable since
+  Jordan's criterion (`IsPreprimitive.isMultiplyPreprimitive`) makes `G`
+  highly transitive on the fixed points `Λ = supportᶜ` of the `p`-cycle `g`;
+* `card_inf_fixing_dvd_factorial`: the pointwise stabilizer
+  `F = G ⊓ fix(Λ)` embeds in `Perm (support g)`, so `|F| ∣ p!` and `⟨g⟩` is
+  a full Sylow `p`-subgroup of `F`;
+* `exists_mul_mem_normalizer_zpowers`: Sylow conjugation inside `F` corrects
+  a realizing element to one normalizing `⟨g⟩` (Isaacs's Frattini argument);
+* `commute_commutator_of_mem_normalizer`: `Aut ⟨g⟩` is abelian, so the
+  commutator `x` of two corrected realizations centralizes `g`;
+* main assembly: `x` agrees on `Λ` with the commutator `t` of two swaps,
+  a `3`-cycle by Lem 8.25; `x` commutes with `g`, so by
+  `IsCycle.commute_iff` its restriction to the support is a power of `g`
+  and `x ^ p` fixes the support pointwise; hence `x ^ p = t ^ p`, again a
+  `3`-cycle since `3 ∤ p`, and the `3`-cycle Jordan theorem applies.
+  (`p = 3` is the `3`-cycle Jordan theorem directly.)
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -325,5 +338,271 @@ private lemma commute_commutator_of_mem_normalizer {g x₁ x₂ : M}
   exact (Subgroup.mem_centralizer_iff.mp hker g (Subgroup.mem_zpowers g)).symm
 
 end SylowConj
+
+/-! ### Isaacs Thm 8.23 -/
+
+section Main
+
+variable [DecidableEq α] [Fintype α] {G : Subgroup (Perm α)}
+
+/-- **Isaacs Thm 8.23** (Wielandt 13.9) — a primitive subgroup of `Perm α`
+containing a cycle of prime order `p ≤ |α| - 3` contains the alternating
+group.  This is mathlib's `proof_wanted
+alternatingGroup_le_of_isPreprimitive_of_isCycle_mem`. -/
+theorem alternatingGroup_le_of_isPreprimitive_of_isCycle_mem
+    (hG : IsPreprimitive G α)
+    {p : ℕ} (hp : p.Prime) (hp' : p + 3 ≤ Nat.card α)
+    {g : Perm α} (hgc : g.IsCycle) (hgp : g.support.card = p)
+    (hg : g ∈ G) : alternatingGroup α ≤ G := by
+  classical
+  rcases eq_or_ne p 3 with rfl | hp3
+  · -- `p = 3`: `g` is itself a three-cycle
+    exact Equiv.Perm.alternatingGroup_le_of_isPreprimitive_of_isThreeCycle_mem hG
+      (card_support_eq_three_iff.mp hgp) hg
+  -- main case `p ≠ 3`
+  have h2p := hp.two_le
+  have hcardα : p + 3 ≤ Nat.card α := hp'
+  obtain ⟨n, hn⟩ : ∃ n, Nat.card α - p = n + 1 :=
+    ⟨Nat.card α - p - 1, by omega⟩
+  -- (a) `G` is `|supportᶜ|`-transitive
+  have hMPP : IsMultiplyPreprimitive G α (n + 2) := by
+    apply hG.isMultiplyPreprimitive (s := (g.supportᶜ : Set α))
+    · apply Nat.add_left_cancel
+      rw [Set.ncard_add_ncard_compl, Set.ncard_coe_finset, hgp]
+      omega
+    · omega
+    · have := isPretransitive_of_isCycle_mem hgc hg
+      apply IsPreprimitive.of_prime_card
+      suffices hcard :
+          Nat.card (SubMulAction.ofFixingSubgroup G ((g.support : Set α)ᶜ)) = p by
+        rw [hcard]; exact hp
+      rw [Nat.card_eq_fintype_card, Fintype.card_subtype, ← hgp]
+      apply congr_arg
+      ext b
+      simp [SubMulAction.mem_ofFixingSubgroup_iff]
+  have hMT : IsMultiplyPretransitive G α (g.supportᶜ : Finset α).card := by
+    haveI := hMPP.isMultiplyPretransitive
+    have hcc : (g.supportᶜ : Finset α).card = n + 1 := by
+      rw [Finset.card_compl, hgp, ← Nat.card_eq_fintype_card]
+      omega
+    rw [hcc]
+    exact isMultiplyPretransitive_of_le (m := n + 1) (n := n + 2)
+      (by omega) (by omega)
+  -- (b) three distinct fixed points and the two realizing swaps
+  obtain ⟨a, ha, b, hb, c, hc, hab, hac, hbc⟩ :
+      ∃ a ∈ (g.supportᶜ : Finset α), ∃ b ∈ (g.supportᶜ : Finset α),
+        ∃ c ∈ (g.supportᶜ : Finset α), a ≠ b ∧ a ≠ c ∧ b ≠ c := by
+    have h3 : 2 < (g.supportᶜ : Finset α).card := by
+      rw [Finset.card_compl, hgp, ← Nat.card_eq_fintype_card]
+      omega
+    obtain ⟨a, b, c, ha, hb, hc, h₁, h₂, h₃⟩ := Finset.two_lt_card_iff.mp h3
+    exact ⟨a, ha, b, hb, c, hc, h₁, h₂, h₃⟩
+  -- membership bookkeeping for the pointwise stabilizer `F`
+  set F : Subgroup (Perm α) :=
+    G ⊓ fixingSubgroup (Perm α) ((↑g.supportᶜ : Set α)) with hFdef
+  have hgF : g ∈ F := by
+    rw [hFdef, Subgroup.mem_inf]
+    refine ⟨hg, ?_⟩
+    rw [mem_fixingSubgroup_iff]
+    intro y hy
+    exact notMem_support.mp (by simpa using hy)
+  have hordg : orderOf g = p := hgc.orderOf.trans hgp
+  have hcardF : Nat.card F ∣ Nat.factorial p := by
+    have := card_inf_fixing_dvd_factorial G g
+    rwa [hgp] at this
+  have hFle : F ≤ G := inf_le_left
+  have hFfix : ∀ σ ∈ F, ∀ b' ∈ (g.supportᶜ : Finset α), (σ : Perm α) b' = b' := by
+    intro σ hσ b' hb'
+    exact fixes_compl_of_mem_inf_fixing hσ b' (Finset.mem_compl.mp hb')
+  -- invariance of `supportᶜ` under a permutation mapping it into itself
+  have hkinv : ∀ k : Perm α,
+      (∀ b' ∈ (g.supportᶜ : Finset α), k b' ∈ (g.supportᶜ : Finset α)) →
+      ∀ b' : α, b' ∈ (g.supportᶜ : Finset α) ↔ k b' ∈ (g.supportᶜ : Finset α) := by
+    intro k hk b'
+    have himg : (g.supportᶜ : Finset α).image k = (g.supportᶜ : Finset α) := by
+      apply Finset.eq_of_subset_of_card_le
+      · intro y hy
+        obtain ⟨z, hz, rfl⟩ := Finset.mem_image.mp hy
+        exact hk z hz
+      · rw [Finset.card_image_of_injective _ k.injective]
+    refine ⟨hk b', fun hkb => ?_⟩
+    rw [← himg] at hkb
+    obtain ⟨z, hz, hzb⟩ := Finset.mem_image.mp hkb
+    rwa [← k.injective hzb]
+  -- a permutation mapping `supportᶜ` into itself conjugates `F` into `F`
+  have hconjF : ∀ k : Perm α, k ∈ G →
+      (∀ b' ∈ (g.supportᶜ : Finset α), k b' ∈ (g.supportᶜ : Finset α)) →
+      ∀ q ∈ F, k * q * k⁻¹ ∈ F := by
+    intro k hkG hk q hq
+    rw [hFdef, Subgroup.mem_inf]
+    refine ⟨G.mul_mem (G.mul_mem hkG (hFle hq)) (G.inv_mem hkG), ?_⟩
+    rw [mem_fixingSubgroup_iff]
+    intro y hy
+    have hy' : y ∈ (g.supportᶜ : Finset α) := by simpa using hy
+    have h1 : k⁻¹ y ∈ (g.supportᶜ : Finset α) :=
+      (hkinv k hk (k⁻¹ y)).mpr (by simpa using hy')
+    have h2 : q (k⁻¹ y) = k⁻¹ y := hFfix q hq _ h1
+    change k (q (k⁻¹ y)) = y
+    rw [h2]
+    simp
+  -- support inclusion for permutations supported in `supportᶜ`
+  have hτmaps : ∀ τ : Perm α, τ.support ⊆ (g.supportᶜ : Finset α) →
+      ∀ b' ∈ (g.supportᶜ : Finset α), τ b' ∈ (g.supportᶜ : Finset α) := by
+    intro τ hτ b' hb'
+    by_cases hbs : b' ∈ τ.support
+    · exact hτ (apply_mem_support.mpr hbs)
+    · rw [notMem_support.mp hbs]
+      exact hb'
+  -- realize a permutation supported in `supportᶜ` by an element of `G`
+  -- normalizing `⟨g⟩` and agreeing with it there
+  have hrealize : ∀ τ : Perm α, τ.support ⊆ (g.supportᶜ : Finset α) →
+      ∃ x : Perm α, x ∈ G ∧
+        x ∈ Subgroup.normalizer (Subgroup.zpowers g) ∧
+        ∀ b' ∈ (g.supportᶜ : Finset α), x b' = τ b' := by
+    intro τ hτ
+    obtain ⟨k, hkG, hkagree⟩ := exists_agree_of_isMultiplyPretransitive hMT τ
+    have hkmaps : ∀ b' ∈ (g.supportᶜ : Finset α),
+        k b' ∈ (g.supportᶜ : Finset α) := by
+      intro b' hb'
+      rw [hkagree b' hb']
+      exact hτmaps τ hτ b' hb'
+    obtain ⟨h, hhF, hnorm⟩ := exists_mul_mem_normalizer_zpowers hp hgF hordg
+      hcardF (hconjF k hkG hkmaps)
+    refine ⟨h * k, G.mul_mem (hFle hhF) hkG, hnorm, fun b' hb' => ?_⟩
+    have h1 : k b' = τ b' := hkagree b' hb'
+    have h2 : τ b' ∈ (g.supportᶜ : Finset α) := hτmaps τ hτ b' hb'
+    change h (k b') = τ b'
+    rw [h1]
+    exact hFfix h hhF _ h2
+  -- the two swaps and their realizations
+  have hτ₁supp : (Equiv.swap a b).support ⊆ (g.supportᶜ : Finset α) := by
+    rw [support_swap hab]
+    intro y hy
+    rcases Finset.mem_insert.mp hy with rfl | hy
+    · exact ha
+    · rwa [Finset.mem_singleton.mp hy]
+  have hτ₂supp : (Equiv.swap a c).support ⊆ (g.supportᶜ : Finset α) := by
+    rw [support_swap hac]
+    intro y hy
+    rcases Finset.mem_insert.mp hy with rfl | hy
+    · exact ha
+    · rwa [Finset.mem_singleton.mp hy]
+  obtain ⟨x₁, hx₁G, hx₁n, hx₁a⟩ := hrealize (Equiv.swap a b) hτ₁supp
+  obtain ⟨x₂, hx₂G, hx₂n, hx₂a⟩ := hrealize (Equiv.swap a c) hτ₂supp
+  -- (c) the commutator and its `p`-th power
+  set t : Perm α := ⁅Equiv.swap a b, Equiv.swap a c⁆ with htdef
+  have htsupp : t.support ⊆ (g.supportᶜ : Finset α) := by
+    rw [htdef, commutatorElement_def]
+    refine le_trans (support_mul_le _ _) (sup_le (le_trans (support_mul_le _ _)
+      (sup_le (le_trans (support_mul_le _ _) (sup_le hτ₁supp hτ₂supp)) ?_)) ?_)
+    · rw [support_inv]
+      exact hτ₁supp
+    · rw [support_inv]
+      exact hτ₂supp
+  have hthree : t.IsThreeCycle := by
+    apply isThreeCycle_commutator_of_unique_common_moved
+      (a := a) (x := Equiv.swap a b) (y := Equiv.swap a c)
+    · rw [Equiv.swap_apply_left]
+      exact Ne.symm hab
+    · rw [Equiv.swap_apply_left]
+      exact Ne.symm hac
+    · intro b' hb'
+      by_cases hbb : b' = b
+      · right
+        subst hbb
+        exact Equiv.swap_apply_of_ne_of_ne hb' hbc
+      · left
+        exact Equiv.swap_apply_of_ne_of_ne hb' hbb
+  set x : Perm α := ⁅x₁, x₂⁆ with hxdef
+  have hxG : x ∈ G := by
+    rw [hxdef, commutatorElement_def]
+    exact G.mul_mem (G.mul_mem (G.mul_mem hx₁G hx₂G) (G.inv_mem hx₁G))
+      (G.inv_mem hx₂G)
+  have hxg : Commute x g := commute_commutator_of_mem_normalizer hx₁n hx₂n
+  -- `x` agrees with `t` on `supportᶜ`
+  have hΛ₁ : ∀ b', b' ∈ ((g.supportᶜ : Finset α) : Set α) ↔
+      Equiv.swap a b b' ∈ ((g.supportᶜ : Finset α) : Set α) := by
+    intro b'
+    simpa using hkinv (Equiv.swap a b) (hτmaps _ hτ₁supp) b'
+  have hΛ₂ : ∀ b', b' ∈ ((g.supportᶜ : Finset α) : Set α) ↔
+      Equiv.swap a c b' ∈ ((g.supportᶜ : Finset α) : Set α) := by
+    intro b'
+    simpa using hkinv (Equiv.swap a c) (hτmaps _ hτ₂supp) b'
+  have hxt : ∀ b' ∈ ((g.supportᶜ : Finset α) : Set α), x b' = t b' := by
+    rw [hxdef, htdef]
+    exact commutator_apply_eq_of_agree hΛ₁ hΛ₂
+      (fun b' hb' => hx₁a b' (by simpa using hb'))
+      (fun b' hb' => hx₂a b' (by simpa using hb'))
+  -- `x ^ p` is trivial on the support …
+  obtain ⟨hxsupp, hmem⟩ := hgc.commute_iff.mp hxg
+  obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp hmem
+  have hxgj : ∀ b' ∈ ((g.support : Finset α) : Set α), x b' = (g ^ j) b' := by
+    intro b' hb'
+    have hb'' : b' ∈ g.support := by simpa using hb'
+    rw [hj]
+    rw [ofSubtype_apply_of_mem (x.subtypePerm hxsupp) hb'']
+    rfl
+  have hgjinv : ∀ b', b' ∈ ((g.support : Finset α) : Set α) ↔
+      (g ^ j) b' ∈ ((g.support : Finset α) : Set α) := by
+    intro b'
+    simp
+  have hxp_supp : ∀ b' ∈ g.support, (x ^ p) b' = b' := by
+    intro b' hb'
+    have := pow_apply_eq_of_agree hgjinv hxgj p b' (by simpa using hb')
+    rw [this]
+    have hgp1 : (g ^ j) ^ p = 1 := by
+      have hg1 : g ^ p = 1 := by
+        rw [← hordg]
+        exact pow_orderOf_eq_one g
+      rw [← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hg1,
+        one_zpow]
+    rw [hgp1]
+    rfl
+  -- … and agrees with `t ^ p` on the complement
+  have htinv : ∀ y, y ∈ ((g.supportᶜ : Finset α) : Set α) ↔
+      t y ∈ ((g.supportᶜ : Finset α) : Set α) := by
+    intro y
+    simpa using hkinv t (hτmaps t htsupp) y
+  have hxp_compl : ∀ b' ∈ (g.supportᶜ : Finset α), (x ^ p) b' = (t ^ p) b' :=
+    fun b' hb' => pow_apply_eq_of_agree htinv hxt p b' (by simpa using hb')
+  -- hence `x ^ p = t ^ p`, a three-cycle
+  have hxp : x ^ p = t ^ p := by
+    ext b'
+    by_cases hb' : b' ∈ g.support
+    · rw [hxp_supp b' hb']
+      have : b' ∉ (t ^ p).support := fun hc =>
+        Finset.mem_compl.mp (htsupp (support_pow_le t p hc)) hb'
+      exact (notMem_support.mp this).symm
+    · exact hxp_compl b' (Finset.mem_compl.mpr hb')
+  have hp3' : ¬ 3 ∣ p := by
+    intro hdvd
+    rcases (Nat.Prime.eq_one_or_self_of_dvd hp 3 hdvd) with h | h
+    · omega
+    · exact hp3 h.symm
+  have htp : (t ^ p).IsThreeCycle := by
+    have horder : orderOf t = 3 := hthree.orderOf
+    have hmod : t ^ p = t ^ (p % 3) := by
+      rw [← horder]
+      exact (pow_mod_orderOf t p).symm
+    have hmod3 : p % 3 = 1 ∨ p % 3 = 2 := by omega
+    rcases hmod3 with h | h
+    · rw [hmod, h, pow_one]
+      exact hthree
+    · rw [hmod, h]
+      have ht2 : t ^ 2 = t⁻¹ := by
+        apply eq_inv_of_mul_eq_one_left
+        have h31 : t ^ 3 = 1 := by
+          rw [← horder]
+          exact pow_orderOf_eq_one t
+        have h32 : t ^ 2 * t = t ^ 3 := by
+          rw [← pow_succ]
+        rw [h32, h31]
+      rw [ht2]
+      exact hthree.inv
+  rw [← hxp] at htp
+  exact Equiv.Perm.alternatingGroup_le_of_isPreprimitive_of_isThreeCycle_mem hG
+    htp (G.pow_mem hxG p)
+
+end Main
 
 end OddOrder.Isaacs.Ch08
