@@ -370,4 +370,137 @@ private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
 
 end YoshidaSetup
 
+/-- **Isaacs Theorem 10.1 (Yoshida's theorem)**: let `P` be a Sylow
+`p`-subgroup of the finite group `G` and `N = N_G(P)`. If `N` does not control
+`p`-transfer — expressed as the image of the `G`-transfer to `P^{ab}` being
+properly contained in the image of the `N`-level transfer — then `C_p ≀ C_p`
+is a homomorphic image of `P`.
+
+**組み立て**: Lemma 10.11 で `M ⊴ N` (指数 `p`, 全 transfer 値が像に入る) を
+取り、`N ∖ M` の位数最小元 `n` (p-冪位数 → `n ∈ P`) で Mackey transfer を展開。
+自明 double coset の因子は `n` の `N`-共役の像で `M` の像に入らない
+(指数 1 の transfer 評価 + `M ⊴ N`)。よって別の代表 `x ∉ N` の因子も像の外で、
+`yoshida_of_mackey_factor_notMem` (Thm 10.9 への還元) が結論を与える。 -/
+theorem exists_surjective_wreath_of_transfer_range_lt (P : Sylow p G)
+    (hlt : (MonoidHom.transfer
+        (Abelianization.of (G := ↥(P : Subgroup G)))).range
+      < (MonoidHom.transfer (transferRes Subgroup.le_normalizer
+          (Abelianization.of (G := ↥(P : Subgroup G))))).range) :
+    ∃ φ : ↥(P : Subgroup G) →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)),
+      Function.Surjective φ := by
+  classical
+  have hp_prime : p.Prime := hp.out
+  set Pg : Subgroup G := (P : Subgroup G) with hPg_def
+  set N : Subgroup G := Subgroup.normalizer (Pg : Set G) with hN_def
+  have hPN : Pg ≤ N := Subgroup.le_normalizer
+  -- Step 1: Lemma 10.11
+  obtain ⟨M, hM_normal, hM_idx, hVM⟩ :=
+    exists_normal_index_prime_transfer_mem (P := Pg) (N := N) P.2 hPN hlt
+  -- N' ≤ M and the pullback of the image of M
+  have hcomm_le : _root_.commutator ↥N ≤ M := by
+    have hQcard : Nat.card (↥N ⧸ M) = p := by
+      rw [← Subgroup.index_eq_card, hM_idx]
+    haveI : IsCyclic (↥N ⧸ M) := isCyclic_of_prime_card hQcard
+    letI : CommGroup (↥N ⧸ M) := IsCyclic.commGroup
+    exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨mul_comm⟩⟩
+  have hker_le : (Abelianization.of (G := ↥N)).ker ≤ M := by
+    intro z hz
+    rw [MonoidHom.mem_ker] at hz
+    have h1 : z ∈ _root_.commutator ↥N := by
+      rw [← QuotientGroup.eq_one_iff z]
+      exact hz
+    exact hcomm_le h1
+  have hM_pull : ∀ z : ↥N,
+      Abelianization.of (G := ↥N) z ∈ M.map (Abelianization.of (G := ↥N)) ↔ z ∈ M := by
+    intro z
+    constructor
+    · intro hmem
+      have h1 : z ∈ (M.map (Abelianization.of (G := ↥N))).comap
+          (Abelianization.of (G := ↥N)) := hmem
+      rw [Subgroup.comap_map_eq, sup_of_le_left hker_le] at h1
+      exact h1
+    · exact fun h => Subgroup.mem_map_of_mem _ h
+  -- Step 2: minimal-order n outside M; it is a p-element, hence in P
+  have hM_ne_top : M ≠ ⊤ := by
+    intro htop
+    rw [htop, Subgroup.index_top] at hM_idx
+    exact hp_prime.one_lt.ne' hM_idx.symm
+  obtain ⟨n, hnM, hn_min⟩ := exists_minimal_orderOf_notMem hM_ne_top
+  obtain ⟨a, ha⟩ := orderOf_eq_prime_pow_of_minimal_notMem hM_idx hnM hn_min
+  set P₀ : Sylow p ↥N := P.subtype hPN with hP₀_def
+  haveI : (P₀ : Subgroup ↥N).Normal := by
+    rw [hP₀_def]
+    show (Pg.subgroupOf N).Normal
+    rw [hN_def, hPg_def]
+    infer_instance
+  have hnP₀ : n ∈ (P₀ : Subgroup ↥N) := mem_sylow_of_orderOf_prime_pow P₀ ha
+  have hnPg : ((n : ↥N) : G) ∈ Pg := hnP₀
+  -- Step 3: expand the transfer at n by the Mackey formula
+  haveI : Finite (DoubleCoset.Quotient (Pg : Set G) N) := Quotient.finite _
+  letI : Fintype (DoubleCoset.Quotient (Pg : Set G) N) := Fintype.ofFinite _
+  have htotal := hVM ((n : ↥N) : G)
+  rw [transfer_eq_prod_doubleCoset (H := N) (K := Pg)
+    (Abelianization.of (G := ↥N)) hnPg] at htotal
+  -- Step 4: the trivial double-coset factor lies outside the image of M
+  set q₁ : DoubleCoset.Quotient (Pg : Set G) N := DoubleCoset.mk Pg N 1 with hq₁_def
+  have hyN : q₁.out ∈ N := by
+    obtain ⟨h₀, k₀, hh₀, hk₀, hout⟩ := DoubleCoset.mk_out_eq_mul Pg N 1
+    rw [hq₁_def, hout]
+    exact N.mul_mem (N.mul_mem (hPN hh₀) N.one_mem) hk₀
+  have hJy_idx : ((conjSubgroup q₁.out N ⊓ Pg).subgroupOf Pg).index = 1 := by
+    rw [conjSubgroup_eq_self_of_mem_normalizer (Subgroup.le_normalizer hyN),
+      inf_eq_right.mpr hPN, Subgroup.subgroupOf_self, Subgroup.index_top]
+  have hfactor_y : MonoidHom.transfer
+      (mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) q₁.out)
+      ⟨((n : ↥N) : G), hnPg⟩
+      ∉ M.map (Abelianization.of (G := ↥N)) := by
+    obtain ⟨r, hr⟩ := OddOrder.GroupTheory.exists_transfer_eq_conj_of_index_eq_one
+      hJy_idx (mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) q₁.out)
+      ⟨((n : ↥N) : G), hnPg⟩
+    rw [hr]
+    -- the value is the image of an N-conjugate of n
+    have hzN : (((r : ↥Pg) : G)) * q₁.out ∈ N := N.mul_mem (hPN r.2) hyN
+    set zhat : ↥N := ⟨((r : ↥Pg) : G) * q₁.out, hzN⟩ with hzhat_def
+    have hwN : q₁.out⁻¹ * ((r⁻¹ * ⟨((n : ↥N) : G), hnPg⟩ * r : ↥Pg) : G) * q₁.out
+        ∈ N := by
+      have h2 : q₁.out⁻¹ * ((r⁻¹ * ⟨((n : ↥N) : G), hnPg⟩ * r : ↥Pg) : G) * q₁.out
+          = zhat⁻¹ * n * zhat := by
+        rw [hzhat_def]
+        push_cast
+        group
+      rw [h2]
+      exact (zhat⁻¹ * n * zhat).2
+    have hvalue : mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) q₁.out
+        (⟨r⁻¹ * ⟨((n : ↥N) : G), hnPg⟩ * r, by
+          rw [Subgroup.index_eq_one.mp hJy_idx]; trivial⟩)
+        = Abelianization.of (G := ↥N)
+            ⟨q₁.out⁻¹ * ((r⁻¹ * ⟨((n : ↥N) : G), hnPg⟩ * r : ↥Pg) : G) * q₁.out,
+              hwN⟩ := rfl
+    rw [hvalue, hM_pull]
+    -- the conjugate ẑ⁻¹ n ẑ lies outside M since M ⊴ N and n ∉ M
+    have hw_eq : (⟨q₁.out⁻¹ * ((r⁻¹ * ⟨((n : ↥N) : G), hnPg⟩ * r : ↥Pg) : G) * q₁.out,
+          hwN⟩ : ↥N)
+        = zhat⁻¹ * n * zhat := by
+      refine Subtype.ext ?_
+      rw [hzhat_def]
+      push_cast
+      group
+    rw [hw_eq]
+    intro hmem
+    apply hnM
+    have h3 := hM_normal.conj_mem _ hmem zhat
+    have h4 : zhat * (zhat⁻¹ * n * zhat) * zhat⁻¹ = n := by group
+    rwa [h4] at h3
+  -- Step 5: some factor at a representative outside N avoids the image of M
+  obtain ⟨q₂, hq₂_ne, hq₂_notin⟩ := exists_ne_notMem_of_prod_mem htotal hfactor_y
+  have hxN : q₂.out ∉ N := by
+    intro hxN'
+    apply hq₂_ne
+    have h5 : DoubleCoset.mk Pg N q₂.out = DoubleCoset.mk Pg N 1 := by
+      rw [DoubleCoset.eq]
+      exact ⟨1, Pg.one_mem, q₂.out⁻¹, N.inv_mem hxN', by group⟩
+    rw [hq₁_def, ← h5, DoubleCoset.out_eq']
+  -- Step 6: conclude by the main reduction
+  exact yoshida_of_mackey_factor_notMem P hN_def hPN hM_idx hn_min hnPg hxN hq₂_notin
+
 end OddOrder.Isaacs.Ch10
