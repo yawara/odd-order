@@ -123,4 +123,62 @@ private lemma exists_agree_of_isMultiplyPretransitive
   rw [hb1, hb2] at happ
   exact happ
 
+/-! ### The pointwise stabilizer of the fixed points of `g` -/
+
+section FixingSubgroup
+
+variable [DecidableEq α] [Fintype α]
+
+/-- A permutation fixing the complement of `g.support` pointwise preserves
+`g.support`. -/
+private lemma mem_support_iff_of_fixes_compl {g σ : Perm α}
+    (hσ : ∀ b ∉ g.support, σ b = b) (b : α) :
+    b ∈ g.support ↔ σ b ∈ g.support := by
+  constructor
+  · intro hb
+    by_contra hc
+    have h2 : σ b = b := σ.injective (hσ _ hc)
+    exact hc (h2.symm ▸ hb)
+  · intro hb
+    by_contra hc
+    exact hc (hσ b hc ▸ hb)
+
+/-- Elements of `G ⊓ fixingSubgroup (supportᶜ)` fix the complement of the
+support pointwise. -/
+private lemma fixes_compl_of_mem_inf_fixing {G : Subgroup (Perm α)} {g : Perm α}
+    {σ : Perm α} (hσ : σ ∈ G ⊓ fixingSubgroup (Perm α) ((↑g.supportᶜ : Set α)))
+    (b : α) (hb : b ∉ g.support) : σ b = b := by
+  have h2 := (Subgroup.mem_inf.mp hσ).2
+  rw [mem_fixingSubgroup_iff] at h2
+  exact h2 b (by simpa using hb)
+
+/-- **Isaacs Thm 8.23, step (Sylow bound)** — the pointwise stabilizer
+`F = G ⊓ fix(supportᶜ)` acts faithfully on the support, so its order
+divides `|support g|!`. -/
+private lemma card_inf_fixing_dvd_factorial (G : Subgroup (Perm α)) (g : Perm α) :
+    Nat.card ↥(G ⊓ fixingSubgroup (Perm α) ((↑g.supportᶜ : Set α)))
+      ∣ Nat.factorial g.support.card := by
+  classical
+  set F := G ⊓ fixingSubgroup (Perm α) ((↑g.supportᶜ : Set α)) with hFdef
+  set Φ : ↥F →* Perm {b // b ∈ g.support} := MonoidHom.mk'
+    (fun σ => (σ : Perm α).subtypePerm fun b =>
+      (mem_support_iff_of_fixes_compl (fixes_compl_of_mem_inf_fixing σ.2) b).symm)
+    (fun σ₁ σ₂ => by ext b; rfl) with hΦdef
+  have hinj : Function.Injective Φ := by
+    intro σ₁ σ₂ h
+    ext b
+    by_cases hb : b ∈ g.support
+    · have h2 := congrArg (fun π : Perm {b // b ∈ g.support} => (π ⟨b, hb⟩ : α)) h
+      exact h2
+    · rw [fixes_compl_of_mem_inf_fixing σ₁.2 b hb,
+        fixes_compl_of_mem_inf_fixing σ₂.2 b hb]
+  calc Nat.card ↥F
+      = Nat.card Φ.range := Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv
+    _ ∣ Nat.card (Perm {b // b ∈ g.support}) :=
+        Subgroup.card_subgroup_dvd_card _
+    _ = Nat.factorial g.support.card := by
+        rw [Nat.card_perm, Nat.card_eq_fintype_card, Fintype.card_coe]
+
+end FixingSubgroup
+
 end OddOrder.Isaacs.Ch08
