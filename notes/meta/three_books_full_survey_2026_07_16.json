@@ -6193,7 +6193,7 @@
       "OddOrder.BG.Ch4.S16.theoremE_sigma_partition_and_counting",
       "OddOrder.BG.Ch4.S14.conjClassSet_T_Mtilde_disjoint"
      ],
-     "notes": "[critic 注記 2026-07-16] formalized は妥当 (faithful cover 群 SigmaLengthOne.lean:441 / KappaHallCommutator.lean:787,806 / CentralizerSup.lean:710 が sorry-free) だが、TypePDuality.lean:1280 に **BG Corollary 14.9** docstring 付きの sorried 宣言が凍結 mis-encoding として残存 (consumer 0)。sorry census との突合用に明記。"
+     "notes": "[2026-07-16 後始末済] mis-encoded sorried surface (nonidentity_covered_by_sigma_pieces) を削除。faithful cover API 群 (Mtilde/zTilde) が正本で sorry-free。"
     },
     {
      "id": "Cor 14.10",
@@ -6237,12 +6237,12 @@
      "id": "Lem 14.13",
      "kind": "lemma",
      "name": "(a) σ(N(x)) ∩ π(M) ≠ ∅ forces M ∈ 𝓜_F, τ₂(M) = ∅, M Frobenius with kernel M_σ; (b) N(y)-conjugacy into N is realized by an element of M",
-     "status": "partial",
-     "effort": "S",
+     "status": "formalized",
+     "effort": "none",
      "lean_names": [
       "OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius"
      ],
-     "notes": "(a) fully proved in S16_Lemma1413.lean (sorry-free), faithful to Coq non_disjoint_signalizer_Frobenius (BGsection14:2412): the second maximal is the signalizer neighbour N[x] = FT_signalizerBase x, τ₂-freeness stated prime-wise because repo tau2 admits composite exponents. (b) is MISSING — label re-verified in slim pass and NOT refuted: all repo '14.13' citations are (a) or the frozen surface; descriptive-content greps (FT_signalizerBase conjugation, ∃ m ∈ M conjugator patterns, MulAut.conj • FT_signalizerBase) across OddOrder/ incl. GroupTheory/** find only conjugation-EQUIVARIANCE lemmas (FT_signalizer_conj_smul_of_escaping etc. in Peterfalvi/S10, the Coq FT_signalizer_baseJ analog) — a different statement; Coq BGsection14.v:2409 confirms Coq formalizes only (a). BG's proof of (b) is 5 lines from Thm 14.4(b)(e), so ~S effort with all 14.4 machinery available. ⚠ The other of the repo's 2 remaining S14 sorries is here: sigmaLength_one_frobenius_type (GlobalCounting.lean:781, sorry at 808) — a frozen mis-encoded surface of (a) whose hypotheses (two NON-conjugate members of 𝓜_σ(x)) are mutually inconsistent by Thm 13.9 (the premise is vacuous), zero consumers, marked DO-NOT-PROVE (issue 8020); it is an off-path variant blocking no book result."
+     "notes": "[2026-07-16 後始末済] faithful 版 S16.non_disjoint_signalizer_frobenius (S16_Lemma1413.lean) が証明済。vacuous-premise の sorried surface (sigmaLength_one_frobenius_type) は削除 (issue 8020)。"
     },
     {
      "id": "Def M̃/R(x)",
@@ -6857,7 +6857,7 @@
      "status": "missing",
      "effort": "XL",
      "lean_names": [],
-     "notes": "CONFIRMED missing (grep for Norton / p <= 3 strengthening: zero hits repo-wide). Pure literature pointer to external work [12]; the book gives no proof and it is not needed for Theorem C or FT. Not a formalization target for this project (out of the three-book scope); effort XL only nominal (a separate substantial paper)."
+     "notes": "[ユーザー裁定 2026-07-16: 恒久対象外でなく低優先繰延 — いずれやる] CONFIRMED missing (grep for Norton / p <= 3 strengthening: zero hits repo-wide). Pure literature pointer to external work [12]; the book gives no proof and it is not needed for Theorem C or FT. Not a formalization target for this project (out of the three-book scope); effort XL only nominal (a separate substantial paper)."
     },
     {
      "id": "Rem (V)",
@@ -7018,7 +7018,7 @@
      "status": "missing",
      "effort": "XL",
      "lean_names": [],
-     "notes": "CONFIRMED missing (no hits repo-wide). Open research problem stated at the end of App.C (see Remark IV); no proof exists in the literature, so it is not a formalization target. Listed only for completeness; effort rating is not meaningful. The adjacent easy fact the book's C.3 Note gives (E=E^{-1} is immediate when p=3) IS formalized and verified present: OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_p_eq_three (AppC_NormSet.lean:1282)."
+     "notes": "[ユーザー裁定 2026-07-16: 恒久対象外でなく低優先繰延 — いずれやる] CONFIRMED missing (no hits repo-wide). Open research problem stated at the end of App.C (see Remark IV); no proof exists in the literature, so it is not a formalization target. Listed only for completeness; effort rating is not meaningful. The adjacent easy fact the book's C.3 Note gives (E=E^{-1} is immediate when p=3) IS formalized and verified present: OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_p_eq_three (AppC_NormSet.lean:1282)."
     }
    ],
    "summary": "BG Appendix C is essentially complete: Theorem C and Lemmas C.1-C.3 are all machine-checked, sorry-free, and axiom-clean, with the final bridge (final_contradiction) wiring Theorem C against Peterfalvi Section 16's field-normalizer data to kill the minimal counterexample. Lemmas C.1 and C.2 are at full (or slightly better than) book strength on the concrete field GaloisField p q — notably the q>=5 branch of C.2 is a complete class-sum/character-theoretic proof (Frobenius character classification, structure constants, column orthogonality, Cauchy-Schwarz error bound), and the Lean C.2 never even uses condition (A). The factoring is inverted relative to the book and is the one surprise: the finite-field and character halves live in OddOrder/BG/AppC_*.lean, while the generators-and-relations group argument of Lemma C.3 (Steps 1-4, Remarks (X)/(XI) via Isaacs Thm 4.34 coprime decomposition) is proved on the Peterfalvi side (S16_AppendixC3/S16_CoreSetup/S16_CoreBounds/S16_NonExistenceGCore) on the transported configuration, with FieldNormalizerData genuinely constructed (fieldNormalizerData_of_repr), not posited. The only specialization: Theorem C, hypothesis (B), and Lemma C.3 are stated for the S16 configuration (Q elementary abelian q-group, p,q odd, inside the odd minimal counterexample) rather than the book's abstract standalone form with an arbitrary finite abelian p'-group Q — full strength for FT, but the abstract Theorem C (e.g. the SL(2,2^q) instance) is not expressible. Genuine gaps are marginal: the illustrative SL(2,2^q) example (Remark II), the trivial odd-primes wlog (Remark V), and the out-of-scope literature items (Remark IV / Problem 1). Slim verification pass: all four flagged missing labels (Rem II, IV, V, Prob 1) were confirmed by content-based grep (the repo's only SL(2) material is the unrelated Isaacs Ch07 Lem 7.4), and the load-bearing statements theoremC/final_contradiction, NormSet.lemmaC1 (AppC_NormSet.lean:1459), and NormSet.lemmaC2 (actually housed in AppC_LemmaC2.lean:25, with (A) literally an unused argument) were read and confirmed at the claimed strength — no status changes, only note refinements (final_contradiction's extra S16 standing hypotheses hnoV/hncH0C, and the AppC_LemmaC2.lean location).",
@@ -10486,5 +10486,9 @@
    "_short": "Pf App: FeitSibley",
    "_book": "Peterfalvi"
   }
+ ],
+ "user_decisions_2026_07_16": [
+  "特殊化債務 54 件はできる限り一般化する (docstring 注記逃げは一般化が無意味な場合のみ)",
+  "BG App.C Rem (IV) / Prob 1 は恒久対象外にせず低優先繰延 (いずれやる)。現フェーズ effort 集計からは除外のまま"
  ]
 }

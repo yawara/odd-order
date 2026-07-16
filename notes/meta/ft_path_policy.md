@@ -1,6 +1,15 @@
 # FT 形式化 — 経路 policy + signature 先行整備（canonical, 2026-06-15）
 
-> **このファイルが「何が FT 経路上か / どこを触るか / どう並列化するか」の正本。**
+> **⚠ フェーズ移行 (2026-07-16)**: `feitThompson` axiom-clean 完成 (2026-07-15) を受け、ユーザー指示で
+> **全 3 冊完全形式化フェーズ**へ移行。**本ファイルの「FT 経路限定」部分 (§0 item 1・item 4 の限定 bullet・
+> §3 の on/off-path 分類) は失効** — 現フェーズの scope 正本 =
+> [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)、レーン配分 =
+> [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md)。**存続する原則**: §0 item 2 (signature
+> 先行 pin)・item 3 (doneness = 構成可能性)・item 4 の順序 (上流優先+文書順; 「FT 経路」→「3 冊スコープ」に
+> 読み替え、冊間の文書順 = Isaacs → BG → Pf)・item 5–8 (frontier 自律・claim-before-build・off-spine 手順・
+> 重複裁定)。
+>
+> **このファイルが「何が FT 経路上か / どこを触るか / どう並列化するか」の正本。**(旧フェーズ)
 > 毎セッション再発する「これは FT に必要なのか?」の混乱を止めるための単一参照点。
 > 横断スナップショット（[`ft_master_roadmap_2026_05_29.md`](ft_master_roadmap_2026_05_29.md),
 > [`feitthompson_critical_path_2026_06_03.md`](feitthompson_critical_path_2026_06_03.md),
@@ -12,8 +21,8 @@
 
 ## 0. 方針（TL;DR）
 
-1. **作業は FT critical path 上に限定する。** off-path（= 3 冊完全形式化スコープのうち
-   honest な FT 証明が推移的に必要としない部分）は FT が閉じるまで凍結。新規着手しない。
+1. ~~**作業は FT critical path 上に限定する。**~~ **⚠ 2026-07-16 失効** (FT 完成 → 全 3 冊フェーズ、冒頭注記)。
+   off-path という区分自体が解消 — 3 冊の全番号付き結果が in-scope (低優先繰延 2 件のみ後回し)。
 2. **FT 経路上の Peterfalvi character-API signature は先行して pin する。**
    §10–16 spine が opaque field を「§3–§9 の faithful signature への cite」に置換できる状態を作る
    → downstream は stable interface を cite、upstream（B）は独立に proof を埋める → **並列化が効く**。
@@ -34,7 +43,8 @@
    - **文書順タイブレーク**: 着手可能な選択肢が複数あるとき（どれも上流端）は、
      **教科書（BG / Peterfalvi）上で出現が早いもの**（番号の若い §/定理/補題）から着手する。
      線型 spine（BG §1→§16, Pf §3→§16）では「上流＝文書で早い」がほぼ一致する。
-   - **FT 経路限定**: 対象は item 1 の on-path のみ。off-path は凍結（順序判断の対象外）。
+   - ~~**FT 経路限定**: 対象は item 1 の on-path のみ。off-path は凍結（順序判断の対象外）。~~
+     **⚠ 2026-07-16 失効** — 対象は 3 冊スコープ全体（冊間の文書順 = Isaacs → BG → Pf）。
    - これは**作業の選択順序**の規則であり、doneness 判定（item 3）とは独立。
 5. **レーン内 frontier 選択は自律判断する（聞きに来ない）。**（ユーザー裁定 2026-07-01）
    「次に何を触るか」は item 4（上流優先 + 文書順）で一意に決まる ⟹ **frontier 選択で hub/ユーザーに
@@ -147,7 +157,7 @@ Isaacs✅ ─ BG AppA/B✅ ─ BG §1-16 ─┐
 
 ---
 
-## 3. on-path / off-path 分類 + 判定原則
+## 3. on-path / off-path 分類 + 判定原則 — ⚠ 2026-07-16 失効 (全 3 冊フェーズで区分解消; 以下は履歴)
 
 **判定原則**: 「`sectionSixteenHypothesis_of_isMinimalSimpleOdd` の **honest** な構成が推移的に必要とするか」。
 これは **math architecture 上の判断**であって、現在の import / consume 状況ではない。
@@ -172,8 +182,8 @@ Isaacs✅ ─ BG AppA/B✅ ─ BG §1-16 ─┐
   (3.8) trichotomy の §10–16 非依存部分、(7.10) 等）。
 - Isaacs / BG の FT route 外の網羅、3 冊完全形式化の残り。
 
-> ⚠ 「3 冊全部形式化」は CLAUDE.md のプロジェクト長期スコープであり続けるが、**FT を閉じる作業とは
-> 別フェーズ**。当面は FT 経路に限定（ユーザー方針 2026-06-15）。off-path は凍結であって放棄ではない。
+> ⚠ 旧文 (2026-06-15): 「3 冊全部形式化」は長期スコープだが FT を閉じる作業とは別フェーズ、当面 FT 経路限定。
+> **→ 2026-07-16: その「別フェーズ」に正式移行 (FT 完成)。凍結は解除、3 冊の全結果が in-scope。**
 
 ---
 

@@ -2,7 +2,7 @@
 
 > このファイルは **CLAUDE.md** が正本. `AGENTS.md` は CLAUDE.md への symlink (Claude Code / codex 共通).
 
-このリポジトリ (`odd-order`) は **Feit-Thompson 定理 (奇数位数定理) の Lean 4 完全形式化**を AI エージェント駆動で長期的に進めるプロジェクト。詳細な計画とチェックリストは [ROADMAP.md](ROADMAP.md) を参照。
+このリポジトリ (`odd-order`) は **Feit-Thompson 定理 (奇数位数定理) の Lean 4 完全形式化**を AI エージェント駆動で長期的に進めるプロジェクト。**FT 本体 (`feitThompson`) は 2026-07-15 に axiom-clean で完成** (`propext`/`Classical.choice`/`Quot.sound` のみ、AxiomsCheck 監査済)。現在は下記 3 冊の**全体を形式化するフェーズ (2026-07-16〜)**。詳細な計画とチェックリストは [ROADMAP.md](ROADMAP.md) を参照。
 
 ## スコープ: 3 冊を全部形式化する
 
@@ -10,13 +10,15 @@
 2. **Bender–Glauberman**, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994) — FT 局所解析 + 最終矛盾
 3. **Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000) — FT 指標理論
 
+**現フェーズ (2026-07-16〜) の scope 正本 = ギャップ調査 note** [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) (3 冊の全 815 番号付き結果を列挙・被覆判定; 実作業ギャップ 214 件 + 特殊化債務 54 件)。レーン配分の正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。
+
 PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは PDF を直接読まず、まず該当の `.mmd` を grep / Read してトークン効率を上げる。
 
 **Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`.mmd`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
 
-## 進捗の測り方 — FT への実質的証明の積み上げ (sorry 数ではない)
+## 進捗の測り方 — 実質的証明の積み上げ (sorry 数ではない)
 
-このプロジェクトの目的は **Feit–Thompson 定理の honest な証明を積み上げること**。**短期的に `sorry` の数を減らすことは目的でも指標でもない。** 進捗は「honest な FT 証明がいずれ推移的に必要とする本物の数学を前進させたか」で測る。
+このプロジェクトの目的は **3 冊の honest な形式化を積み上げること** (FT 本体は完成済み — 同じ原則のまま 3 冊の残りに当たる)。**短期的に `sorry` の数を減らすことは目的でも指標でもない。** 進捗は「教科書の本物の数学を教科書強度で前進させたか」で測る。
 
 - **sorry カウントで進捗を測らない (両方向で誤る)**:
   - hard content を未充足の仮説や free field (opaque な構造フィールド) に hoist すれば、何も証明せずに `sorry` は消える。「sorry-free」「AxiomsCheck OK」は doneness を意味しない。doneness は **仮説・carrier の構成可能性**で判定する。
@@ -25,8 +27,8 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 - assigned な honest-architecture prerequisite は、今 FT critical path から外れて見えても hedge せず淡々と完遂する。「deferred-payoff (報酬が後払い) だから」「今 consumer 0 だから」は deprioritize の理由にならない。
 - **「quick win / shallow entry / 難易度」は着手判断の基準でない (ユーザー 2026-06-30)**。各レーンは**その目的 (= 担当クラスタの FT 経路を閉じる) にかなう work** を、難しくても・clean な近道が無くても・1 iteration で landing しなくても**正面から進める**。「quick win が無い」「shallow entry が無い」「deep char で多反復」は**手を止めて flag/ask する理由にならない**(調査偏重に逃げるのも同断)。frontier が deep なら deep なまま engage し、本物の数学 (norm estimate・coherence・char body) を実際に**証明**する。止めてよいのは「想定違反 (unsound carrier・新 axiom・signature 無断変更)」「真に判断を要する設計分岐」のみ ([[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]])。
   - **同様に「gated かどうか・token/session コスト・infra 規模・payoff の遠さ」も一切の着手/継続判断基準でない (ユーザー 2026-07-06、本規約からの推論を明示要求)**。複数 downstream を unblock する genuine な**未形式化 prerequisite** (例: mathcomp prime-TI residue API の port) は、**規模が大きく・多 session を要し・token を消費しても、方向性確認せず淡々と build する**。「~N session の major infra 投資だから ask/pause」「token 重いから確認」「de-opacify で headline sorry が減らないから」は**すべて誤り**。**「真に判断を要する設計分岐」= 相互排他的で不可逆な設計選択のみ** (どの carrier 設計を採るか等) を指し、**コスト・規模・難易度・gated・payoff の遠さは一切含まない**。判断は毎回**本規約から推論**し、規約が不完全/ミスリードなら**規約自体を訂正する** (本項がその実施例) ([[feedback-cost-scope-not-a-criterion]])。
-- **FT 経路限定**は維持 (FT を閉じるのに無関係な「3 冊網羅」の残りは当面しない; 上記スコープは長期目標であり続けるが別フェーズ)。ただし「FT 経路の中で何を優先するか」も sorry 削減量でなく**実質的証明の積み上げ**で測る。
-- **作業順序 = 上流優先 + 文書順タイブレーク** (全レーン共通の標準方針, ユーザー 2026-06-22)。各レーンは依存の**上流から**進める。着手可能な選択肢が複数あるときは、**教科書 (BG / Peterfalvi) 上で出現が早いもの**(番号の若い §/定理/補題) から着手する。対象は **FT 経路上のものに限る**(上記)。下流の gated endpoint を先回りで skeleton 化するのは上流が真に block されているときの保険に留め、基本は上流 prerequisite を先に埋める。正本 = [`notes/meta/ft_path_policy.md`](notes/meta/ft_path_policy.md) §0。
+- **旧「FT 経路限定」は 2026-07-16 に失効** (FT axiom-clean 完成 → 全 3 冊フェーズ、ユーザー指示)。対象は 3 冊の全番号付き結果 (正本 = 上記ギャップ調査 note)。**特殊化債務 (`formalized_specialized`) はできる限り一般化する** — docstring 注記で済ませてよいのは一般化が数学的に無意味な場合のみ (ユーザー 2026-07-16)。文献引用のみで本文に証明が無い結果・open problem (BG App.C Rem (IV) / Prob 1) は**恒久対象外にせず低優先繰延** ([[feedback-generalize-specialized-fully]])。opaque-Prop scaffold は形式化と数えない (従来どおり)。
+- **作業順序 = 上流優先 + 文書順タイブレーク** (全レーン共通の標準方針, ユーザー 2026-06-22)。各レーンは依存の**上流から**進める。着手可能な選択肢が複数あるときは、**教科書上で出現が早いもの**(番号の若い §/定理/補題; 冊間の文書順 = Isaacs → BG → Peterfalvi) から着手する。対象は **3 冊スコープ全体** (旧 FT 経路限定は失効; 上記)。下流の gated endpoint を先回りで skeleton 化するのは上流が真に block されているときの保険に留め、基本は上流 prerequisite を先に埋める。正本 = [`notes/meta/ft_path_policy.md`](notes/meta/ft_path_policy.md) §0 (冒頭のフェーズ移行注記込み)。
 - **レーン内 frontier 選択は自律判断する — 聞きに来ない** (ユーザー裁定 2026-07-01, 正本 `ft_path_policy.md` §0 policy 5-6)。「次に何を触るか」は上流優先+文書順で一意に決まる → hub/ユーザーに frontier 選択で聞かない・報告して止まらない (停止は STOP 条件・真の設計分岐のみ)。**(A)** 自レーン最上流 sorry が他レーンに gated でも、**さらに上流の ungated な genuine math (未所有 shared infra を含む) に降りて実証明する** (gated endpoint は sorried-cite skeleton で前倒し)。**(B)** 未所有 leaf (`OddOrder/Algebra|GroupTheory/**`) の新設は consumer が他レーンでも in-scope (territorial なのは所有 file のみ)。**(C)** shared infra は **claim-before-build**: 着手前に検索 (既存を再構築しない) → 9000 番台 issue で claim → 全レーンは着手前に open 9000 issue を scan → hub が重複検出 ([[feedback-quick-win-not-a-criterion]] [[verify-port-state-by-number-not-coq-name]])。
 - **hub は cross-lane の食い違い・レーン方針を自律裁定する — ユーザーに聞きに来ない** (ユーザー 2026-07-06)。レーンが frontier を自律判断するのと対称。hub は **(a) レーン間の診断の食い違い** (「X は repo に在るか」「どちらの grep/診断が正しいか」等) と **(b) レーン方針・cross-lane 設計判断** (carve-out 付与・ファイルの keep/delete・所有/優先順位・重複解消) を、**自ら必要な調査を行って** (code-level grep・Coq trace・subagent fan-out — 調査もユーザーに投げない) 裁定し、結果を issue/notes に記録する。**この種の裁定に AskUserQuestion を使わない** (「食い違いがある/方針が割れている」自体は escalation 理由でない — 調査して裁定せよ)。ユーザー escalation は narrow に予約: (i) 新 `axiom` 宣言、(ii) unsound carrier・signature 無断変更、(iii) build 破壊・sorry regression・想定外 git 状態 (= merge-safety STOP、halt+報告)、(iv) 既存規約+徹底調査を尽くしてなお真に underdetermined かつ不可逆・影響大の戦略選択 (稀)。判断は本規約から推論し、規約が不完全なら訂正する。正本 = `merge_monitor.md` 🧭 節 ([[hub-arbitrates-cross-lane-autonomously]])。
 - **レーンの genuine output は役割逸脱時も無駄にしない — 軌道修正で保全する (ユーザー 2026-07-06)**。レーンが自律進行で**本物の成果** (実証明・実構成・sorry-free work) を出したが割当役割/territory を**はみ出した**場合、hub の対応は **trajectory 修正で成果を保全する**こと: 正しい file/leaf へ**移設** / **carve-out 付与** / **owner 再割当** / 下流**再配線**。**discard・revert・「作り直せ」ではない**。役割逸脱の是正は「どこに置くか・誰が持つか」の修正であって genuine な math の破棄でない (territorial ルールは coordination 保護のためで、成果を gate-keep するためでない)。**「軌道修正できれば十分」**。⚠ **これは保全でなく STOP の別カテゴリ**: unsound carrier・新 `axiom`・sorry regression (証明済→sorry)・signature 無断改変 は genuine problem ゆえ halt+報告 (そもそも保全すべき成果でない)。実例 (2026-07-06 lane b の役割逸脱を全て保全): `S07_Subcoherent` = carve-out / `mu2Grid` = S05→PrimeTIResidue 移設 / `PrimeTIResidue` 削除 = 撤回。[[hub-arbitrates-cross-lane-autonomously]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
@@ -147,7 +149,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
   **(3) 取り込んだら `git rev-list --count HEAD..main` が 0 を確認**。コンフリクトは自所有ファイルなら解決、
   他レーン由来なら notes/issue で hub へ。これは LAUNCH.md の「🔄 起動時 main 同期」ブロックの上位正本
   (LAUNCH.md は git-excluded ゆえ、常時ロードされる本規約が確実な拠り所)。
-- worktree path = `/home/ywr/odd-order-<slug>` (sibling), branch 名も `<slug>` (現行 = 単文字レーン `a`/`b`/`c`; 正本 = [`notes/meta/ft_lane_reallocation_2026_06_28.md`](notes/meta/ft_lane_reallocation_2026_06_28.md))
+- worktree path = `/home/ywr/odd-order-<slug>` (sibling), branch 名も `<slug>` (現行 = 単文字レーン `a`/`b`/`c`; 正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。レーンは 2026-07-15 に全退役済みで、再開時は同 note §3 の再作成手順)
 - `.lake/packages` と `references` は main から **symlink で共有** (mathlib 6.5GB + 初回ビルド数分を節約)
 - `.lake/build/` は worktree ごとに独立 (並行 `lake build` 安全)
 - **`lake update` は worktree で走らせない** (共有 mathlib rev を壊す)

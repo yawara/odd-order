@@ -1,5 +1,11 @@
 # main 合流モニター — 運用手順 (2026-07-15 FT axiom-clean 達成 → 全レーン退役)
 
+> **♻ 2026-07-16 再開準備: 全 3 冊完全形式化フェーズ**。レーン配分の正本 =
+> [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md) (a = Isaacs 本文 / b = Ch.8+Suzuki 系 /
+> c = Ch.10+BG 残+Pf 残; issue base a=1000/b=2000/c=3000 不変)。scope 正本 =
+> [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
+> 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
+>
 > **✅ 2026-07-15 CLOSED: `feitThompson` axiom-clean 達成 (tick #22) → 全レーン a/b/c 退役、監視終了。**
 > `#print axioms OddOrder.feitThompson` = [propext, Classical.choice, Quot.sound] (sorryAx なし)。
 > 経緯: b/c 退役 (tick #17、issue 0121) → A 単独 codex 5.6 ultra で残 root 除去 (#4/#7-half/#5) →

@@ -1,6 +1,10 @@
 # FT レーン再配分 (2026-06-28, canonical) — ゲートなし・signature contract 方式
 
-> **このファイルが「レーン配分 + 運用原則」の正本** (2026-06-28〜)。
+> **⚠ SUPERSEDED (2026-07-16)**: FT axiom-clean 完成 → 全 3 冊フェーズ移行に伴い、レーン配分の正本は
+> [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md) へ移行。本ファイルの §0 運用原則は
+> 新 note が参照継承する (履歴として温存)。
+>
+> **このファイルが「レーン配分 + 運用原則」の正本** (2026-06-28〜2026-07-16)。
 > 旧 `ft_frontier_remap_2026_06_25.md` の **honest FT 経路の構造** (Arm A / Arm B、on-path ~27 宣言) は
 > 引き続き有効。本ファイルが上書きするのは **lane↔front の対応づけと運用原則**のみ。
 > `ft_path_policy.md` §5 の lane 割当表 / `merge_monitor.md` の 🔒 所有マップは本ファイルへ従属。

@@ -356,7 +356,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
 |---|---|---|---|---|
-| Lem 14.13 | 部分 | S | (a) σ(N(x)) ∩ π(M) ≠ ∅ forces M ∈ 𝓜_F, τ₂(M) = ∅, M Frobenius with kernel M_σ; (b) N(y)-co… | (a) fully proved in S16_Lemma1413.lean (sorry-free), faithful to Coq non_disjoint_signalizer_Frobenius (BGsection14:2412): the second maximal is the signalizer neighbour N[x] = FT_signalizerBase x, τ₂-freeness stated pri… |
+| Lem 14.13 | 済 (2026-07-16 後始末) | none | (a) σ(N(x)) ∩ π(M) ≠ ∅ forces M ∈ 𝓜_F, τ₂(M) = ∅, M Frobenius with kernel M_σ; (b) N(y)-co… | (a) fully proved in S16_Lemma1413.lean (sorry-free), faithful to Coq non_disjoint_signalizer_Frobenius (BGsection14:2412): the second maximal is the signalizer neighbour N[x] = FT_signalizerBase x, τ₂-freeness stated pri… |
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
@@ -397,9 +397,9 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | 結果 | 状態 | 規模 | 内容 | メモ |
 |---|---|---|---|---|
 | Rem (II) | 未 | M | Peterfalvi's example: hypothesis of Theorem C is satisfied by p=2, G=SL(2,2^q) with explic… | CONFIRMED missing after content-based refutation attempt: the only SL(2)/SpecialLinearGroup material in the repo is Isaacs Ch07 S7A1_JpGL2p.lean (Lem 7.4 unique involution in SL(2,F), over ZMod p) — no SL(2,2^q), no Galo… |
-| Rem (IV) **※対象外候補** | 未 | XL | Norton-Glauberman extension: Theorem C conclusion can be strengthened to p <= 3 | CONFIRMED missing (grep for Norton / p <= 3 strengthening: zero hits repo-wide). Pure literature pointer to external work [12]; the book gives no proof and it is not needed for Theorem C or FT. Not a formalization target… |
+| Rem (IV) **※低優先繰延** | 未 | XL | Norton-Glauberman extension: Theorem C conclusion can be strengthened to p <= 3 | CONFIRMED missing (grep for Norton / p <= 3 strengthening: zero hits repo-wide). Pure literature pointer to external work [12]; the book gives no proof and it is not needed for Theorem C or FT. Not a formalization target… |
 | Rem (V) | 未 | S | By (A) one may assume p and q are odd | CONFIRMED missing: no p=2/q=2 wlog reduction lemma in any AppC file or elsewhere. The trivial reduction (p=2 gives p<=q outright; q=2 with (A) forces p=2) is not formalized because it is unnecessary in the repo factoring… |
-| Prob 1 **※対象外候補** | 未 | XL | Can p = 3 in Theorem C? | CONFIRMED missing (no hits repo-wide). Open research problem stated at the end of App.C (see Remark IV); no proof exists in the literature, so it is not a formalization target. Listed only for completeness; effort rating… |
+| Prob 1 **※低優先繰延** | 未 | XL | Can p = 3 in Theorem C? | CONFIRMED missing (no hits repo-wide). Open research problem stated at the end of App.C (see Remark IV); no proof exists in the literature, so it is not a formalization target. Listed only for completeness; effort rating… |
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
@@ -676,19 +676,22 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 7. **Pf 付録 (53 未 + 部分)** — 最大の塊 = **Suzuki 定理 (32 件, XL 4 = Sz(q)/PSU3(q) 特性化)**。
    ほか Suzuki2Groups (8)、FeitSibley (13)、NearFields (4)、Huppert (残 2)。Suzuki 本体は Isaacs Ch.8 に依存。
 
-## 対象外裁定
+## 低優先繰延 (旧「対象外裁定」— ユーザー裁定 2026-07-16 で上書き)
 
-- **BG App.C Rem (IV)** (Norton–Glauberman p ≤ 3 強化) と **Prob 1** (p = 3 可能性, open problem) は**形式化対象外**と裁定:
-  本文に証明が無い文献引用・未解決問題は「3 冊を形式化する」の範囲外 (Gorenstein "**G**" 引用の扱いと同型の原則)。
-  effort 集計からも除外済み (※対象外候補マーク)。
+- **BG App.C Rem (IV)** (Norton–Glauberman p ≤ 3 強化、文献 [12] に証明あり) と **Prob 1** (p = 3 可能性, open problem)
+  は**恒久対象外にしない — 優先順位は低いがいずれやる** (ユーザー 2026-07-16)。現フェーズの effort 集計 (214 件) からは
+  除外したままだが、scope 内の繰延項目として保持 (表中の ※低優先繰延 マーク)。Rem (IV) は文献証明ありなので形式化労力
+  (XL 級)、Prob 1 は文献にも証明が無い research 級 — 着手時期は文献状況を見て判断。
 - Isaacs の Problems (章末演習) は本調査のスコープ外 (番号付き本文結果のみ)。ただし本文が後で引用する演習
   (例: Hall D = Problem 3C.1) は本文側の結果として被覆済みであることを確認した。
 
-## 特殊化債務 (54 件) の扱い
+## 特殊化債務 (54 件) の扱い — できる限り一般化 (ユーザー裁定 2026-07-16)
 
 `formalized_specialized` は「FT 文脈では十分だった狭い形」(odd/solvable 限定、単一 case のみ等)。全冊被覆の基準は
-**原文強度**なので、着手時に (a) 教科書の一般性を要求どおり回復するか、(b) 原文自体が実質その特殊形しか使っておらず
-docstring 注記で足りるか、を結果ごとに判定する。各 unit の「特殊化債務」リスト参照。
+**原文強度**であり、**デフォルトの処置は教科書の一般性への引き上げ (できる限り一般化)**。docstring 注記で済ませて
+よいのは一般化が数学的に無意味な場合 (原文自体がその特殊形しか主張しない等) のみ。レーンは担当 unit に着手する際、
+その unit の特殊化債務の一般化を作業項目に含める (番号順)。各 unit の「特殊化債務」リスト参照。
+[[feedback-generalize-specialized-fully]]
 
 ## 推奨順序 (上流優先 + 文書順) と次アクション
 
@@ -699,7 +702,7 @@ docstring 注記で足りるか、を結果ごとに判定する。各 unit の�
   → BG §2→§16→App.C 残→App.D→App.E → Pf 本文 partial → Pf 付録 (NearFields/Huppert が小さく独立、Suzuki 本体は Ch.8 後)。
 - 並列レーン向きの独立クラスタ: {Isaacs Ch.2–6 小ギャップ}, {Isaacs Ch.8 + Pf Suzuki 系}, {Isaacs Ch.9}, {Isaacs Ch.10},
   {BG 残 + Pf 本文 partial}, {Pf 小付録群}。具体のレーン配分は次段で裁定。
-- 次アクション (調査フェーズの残務):
-  1. ft_path_policy.md §0 と CLAUDE.md「進捗の測り方」の FT 経路限定文言をフェーズ移行に合わせて改訂
-  2. レーン再配分 (3 レーン × 上記クラスタ) を決めて reallocation note を更新
-  3. BG §14 TypePDuality.lean:1280 の凍結 mis-encoding (sorried **BG Cor 14.9** 表記) の後始末 (faithful cover へ付け替え or 削除) — sorry census の恒常ノイズ源
+- 次アクション (調査フェーズの残務) — **全 3 件 2026-07-16 実施済**:
+  1. ✅ ft_path_policy.md §0 と CLAUDE.md の FT 経路限定文言を改訂 (フェーズ移行注記 + 特殊化一般化デフォルト + 低優先繰延)
+  2. ✅ レーン再配分 → 正本 [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md) (a = Isaacs 本文完備化 / b = Ch.8+Suzuki チェーン / c = Ch.10+BG 残+Pf 残)
+  3. ✅ S14 凍結 mis-encoding 2 件 (`nonidentity_covered_by_sigma_pieces`, `sigmaLength_one_frobenius_type`) を**削除** — どちらも consumer 0 で faithful 版は証明済 (Mtilde/zTilde cover API 群 / `S16.non_disjoint_signalizer_frobenius`)。実 sorry 25 → 23 (記録 = notes/bg/s14_typeP_counting.md)
