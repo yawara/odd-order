@@ -48,6 +48,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
@@ -712,6 +713,14 @@ set_option linter.style.longLine false in
 -- theory).  Steps 1-9 + Step 3 の faithful-action 分岐まで full discharge; §7D 内に
 -- sorry / project-axiom 残無し ⇒ 真に unconditional.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch07.burnside_p_pow_q_pow
+
+-- Ch.3 (Split Extensions): Thm 3.17 Wielandt — H, K, L pairwise coprime index,
+-- 各 solvable ⇒ G solvable.  Burnside 不要 (教科書 p.89 の帰納法そのまま).
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.isSolvable_of_pairwise_coprime_index
+
+-- Ch.7 owner の Ch.3 forward dep: Thm 3.15 (converse of Hall E) — 全素数 p の
+-- p-complement 存在 ⇒ G solvable.  Burnside (Thm 7.8) + Wielandt (Thm 3.17) 経由.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch07.isSolvable_of_pcomplement_exists
 
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
 -- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
