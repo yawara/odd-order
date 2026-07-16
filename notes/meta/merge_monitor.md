@@ -716,6 +716,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #12-13、Fable hub) — ✅ b 合流 (Thm 8.32)、census 23 不変**:
+  tick #12 = 変化なし (b の空 main-sync merge のみ → staged 0 で abort 見送り)。tick #13:
+  **b** = `eaf03f78` (Thm 8.32 SL(n,q) is perfect、TransvectionGeneration 309→469 行) を merge
+  `b0be8d69`: build **4307 jobs green**。**a/c** = 変化なし。sorry 23 不変・新 axiom なし・
+  AxiomsCheck OK。push `c65a47d6..b0be8d69`。
 - **2026-07-17 (tick #11、Fable hub) — ✅ a/b/c 3 レーン合流、census 23 不変**:
   **a** = `8fe5da06` (Lemma 3.33 equivariant bijection、HartleyTurull.lean 新設 352 行) を merge
   `4606659b`: **孤立 leaf → hub step 3b 配線 + 再 build** (孤立時は直前 build が leaf を検証しない点に注意、
