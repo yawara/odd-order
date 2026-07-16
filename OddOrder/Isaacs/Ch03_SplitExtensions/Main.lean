@@ -650,6 +650,73 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSepara
   have hle_ker : ⁅K, K⁆ ≤ q.ker := (Subgroup.map_eq_bot_iff ⁅K, K⁆).mp hmap_comm
   simpa [K, q, N, QuotientGroup.ker_mk'] using hle_ker
 
+/-- **Isaacs Thm 3.22 (完全形; π-length ≤ 1)**: `G` π-separable + abelian π-Hall ⇒
+`G/O_{π',π}(G)` は π'-群. すなわち `O_{π'} ≤ O_{π',π} ≤ ⊤` の 3 層で `G` が尽きる
+(π-length ≤ 1). BG の `HasPiLengthOne` (= `O_{π',π,π'} = ⊤`) はここから
+`oPiCore_compl_quotient_oPiPrimePiCore_eq_top_of_abelian_pi_hall` + `comap_top` で従う.
+
+証明 (p.94): `Ḡ := G/O_{π'}(G)` では `O_{π'}(Ḡ) = ⊥`
+(`oPiCore_quotient_self_eq_bot`) なので Hall–Higman 1.2.3 (Thm 3.21) が効き
+`C_Ḡ(O_π(Ḡ)) ≤ O_π(Ḡ)`. Ḡ の π-Hall `H̄` は abelian で `O_π(Ḡ) ≤ H̄` ゆえ
+`H̄ ≤ C_Ḡ(O_π(Ḡ)) ≤ O_π(Ḡ)`, よって `H̄ = O_π(Ḡ)`. 従って
+`|G : O_{π',π}| = |Ḡ : O_π(Ḡ)| = |Ḡ : H̄|` は π'-数. -/
+theorem quotient_oPiPrimePiCore_isPiGroup_compl_of_abelian_pi_hall [Finite G]
+    (π : Set ℕ) [IsPiSeparable π G]
+    (hAb : ∀ (H : Subgroup G) (_ : IsHallSubgroup π H), ∀ a ∈ H, ∀ b ∈ H,
+      a * b = b * a) :
+    IsPiGroup {p | p ∉ π} (G ⧸ oPiPrimePiCore π G) := by
+  set N : Subgroup G := oPiCore {p | p ∉ π} G with hN_def
+  set q : G →* G ⧸ N := QuotientGroup.mk' N with hq_def
+  set O : Subgroup (G ⧸ N) := oPiCore π (G ⧸ N) with hO_def
+  -- Hall–Higman 1.2.3 が `Ḡ = G/N` に適用可能.
+  have hπ'_bot : oPiCore {p | p ∉ π} (G ⧸ N) = ⊥ :=
+    oPiCore_quotient_self_eq_bot {p | p ∉ π}
+  have hHH : Subgroup.centralizer (O : Set (G ⧸ N)) ≤ O :=
+    hall_higman_1_2_3 π hπ'_bot
+  -- Ḡ の π-Hall `H̄` は abelian で `O = H̄`.
+  obtain ⟨H, hH⟩ := hall_exists_of_piSeparable π (G := G)
+  have hHbar : IsHallSubgroup π (H.map q) := hH.map_quotient
+  have hO_le_Hbar : O ≤ H.map q :=
+    Subgroup.IsPiGroup.normal_le_hall (oPiCore.isPiGroup π) hHbar
+  have hHbar_ab : ∀ a ∈ H.map q, ∀ b ∈ H.map q, a * b = b * a := by
+    intro a ha b hb
+    rcases ha with ⟨a₀, ha₀, rfl⟩
+    rcases hb with ⟨b₀, hb₀, rfl⟩
+    simpa using congrArg q (hAb H hH a₀ ha₀ b₀ hb₀)
+  have hHbar_le_O : H.map q ≤ O := by
+    refine le_trans ?_ hHH
+    intro h hh
+    rw [Subgroup.mem_centralizer_iff]
+    intro o ho
+    exact hHbar_ab o (hO_le_Hbar ho) h hh
+  have hO_eq : O = H.map q := le_antisymm hO_le_Hbar hHbar_le_O
+  -- `|G : O_{π',π}| = |Ḡ : H̄|` は π'-数.
+  have hidx : (oPiPrimePiCore π G).index = (H.map q).index := by
+    rw [oPiPrimePiCore, Subgroup.index_comap,
+      MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective N),
+      Subgroup.relIndex_top_right, ← hO_eq]
+  intro p hp
+  have hcard : Nat.card (G ⧸ oPiPrimePiCore π G) = (H.map q).index := by
+    rw [← hidx]; rfl
+  rw [hcard] at hp
+  exact hHbar.2 p hp
+
+/-- **Isaacs Thm 3.22 の BG 接続形**: abelian π-Hall なら
+`O_{π'}(G/O_{π',π}(G)) = ⊤`. BG `HasPiLengthOne` (`O_{π',π,π'}(G) = ⊤`) は
+この等式の `comap` (`Subgroup.comap_top`) で直ちに従う. -/
+theorem oPiCore_compl_quotient_oPiPrimePiCore_eq_top_of_abelian_pi_hall [Finite G]
+    (π : Set ℕ) [IsPiSeparable π G]
+    (hAb : ∀ (H : Subgroup G) (_ : IsHallSubgroup π H), ∀ a ∈ H, ∀ b ∈ H,
+      a * b = b * a) :
+    oPiCore {p | p ∉ π} (G ⧸ oPiPrimePiCore π G) = ⊤ := by
+  refine le_antisymm le_top ?_
+  refine Subgroup.IsPiGroup.le_oPiCore ?_
+  intro p hp
+  have hcard : Nat.card ↥(⊤ : Subgroup (G ⧸ oPiPrimePiCore π G)) =
+      Nat.card (G ⧸ oPiPrimePiCore π G) := Subgroup.card_top
+  rw [hcard] at hp
+  exact quotient_oPiPrimePiCore_isPiGroup_compl_of_abelian_pi_hall π hAb p hp
+
 end -- 3D
 
 section /- 3E: Coprime action (pp. 96-104) -/
