@@ -716,6 +716,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #6、Fable hub) — ✅ a (Thm 3.22) + c (Lemma 10.6) 合流、census 23 不変**:
+  **a** = `f36730bf` (Thm 3.22 full strength π-length ≤ 1) + AxiomsCheck 追記 (+5) を merge
+  `f166c7fe`: build **4295 jobs green**。⚠ **サイズ watch: Ch03 Main.lean 1405 行 (1500 目前)** —
+  a は次の主結果から新 leaf 必須 (規約どおり)。**c** = `09dd8773` (Lemma 10.6 transfer evaluation
+  at prime index、TransferIndexPrime.lean 269 行) + `2df3b016` (issue 3005/9104) を merge `bfdd6f5d`:
+  **TransferIndexPrime が root closure 孤立** → hub が Ch10 Main.lean へ import 追記 (step 3b
+  機械的修正)、build **4296 jobs green**。9104 = shared-infra claim (Isaacs 10.8 transfer
+  transitivity leaf、open 9000 唯一・重複なし)。**b** = 変化なし。sorry 23 不変・新 axiom なし。
+  push `abe6aec9..bfdd6f5d`。
 - **2026-07-17 (tick #5、Fable hub) — ✅ a (Lemma 3.18 完成) + b (Thm 8.9 完成) 合流、census 23 不変**:
   **a** = 3 commits (Lemma 3.18 subnormal π/π′ series ⟺ π-separability、PiSeparableSeries.lean
   241→619 行) を merge `2e75a198`: build **4294 jobs green**。⚠ サイズ watch: Ch03 Main.lean 1338 行
