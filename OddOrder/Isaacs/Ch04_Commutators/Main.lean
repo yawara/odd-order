@@ -7,3 +7,4 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorBasics
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 import OddOrder.Isaacs.Ch04_Commutators.Main.ChainNilpotent
+import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
