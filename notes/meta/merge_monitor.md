@@ -716,6 +716,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #9、Fable hub) — ✅ a (Lemma 3.32) + b (Thm 8.23 完成) 合流、census 24 不変**:
+  **a** = `3a95d1c3` (Lemma 3.32 A-invariant Sylow ∩ C_G(A)、Ch04 ForwardFromCh03 1137 行) を merge
+  `fc4d0c67`: build **4303 jobs green**。**b** = `8cb89a7b` (Thm 8.23 p-cycle Jordan **完成**、
+  PCycleJordan 608 行) + `4f873067` (Bochert.lean 新設 187 行、自力配線) を merge `215ded59`:
+  build **4304 jobs green**。**c** = 変化なし。sorry 24 不変・新 axiom なし・AxiomsCheck OK。
+  push `02ee7749..215ded59`。
 - **2026-07-17 (tick #8、Fable hub) — ✅ a (Thm 3.26 完成 + fixedSubgroup 移設) + c (Thm 10.8 + Mackey scaffold) 合流、census 23→24 (scaffold ALLOW)**:
   **a** = `34c5ff93` (Thm 3.26 bijection packaging + fixedSubgroup を CoprimeAction→新 upstream leaf
   GroupTheory/FixedSubgroup.lean へ移設、import 循環回避) を merge `e5e6f00c`: build **4300 jobs green**。
