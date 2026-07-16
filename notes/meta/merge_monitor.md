@@ -716,6 +716,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #8、Fable hub) — ✅ a (Thm 3.26 完成 + fixedSubgroup 移設) + c (Thm 10.8 + Mackey scaffold) 合流、census 23→24 (scaffold ALLOW)**:
+  **a** = `34c5ff93` (Thm 3.26 bijection packaging + fixedSubgroup を CoprimeAction→新 upstream leaf
+  GroupTheory/FixedSubgroup.lean へ移設、import 循環回避) を merge `e5e6f00c`: build **4300 jobs green**。
+  **c** = `2809c5fc` (Isaacs Thm 10.8 transfer transitivity sorry-free、TransferTransitivity.lean 346 行、
+  claim 9104 close) + `b1c6d10e` (MackeyTransfer.lean scaffold: transfer_eq_prod_doubleCoset 新 decl sorry、
+  open claim 9105 追跡 = ALLOW) を merge `e6c851cc`: **MackeyTransfer 孤立 → hub step 3b 配線**、build
+  **4303 jobs green**。census 23→24 (+1 = 新 decl faithful scaffold、regression なし)。**b** = 変化なし。
+  **⚠ 採番衝突の裁定**: a と c が SEQUENCE.9000 並行 bump で共に 9104 を採番 (slug 別・内容別件、dup claim
+  ではない) → hub が a 側 `9104-fixedsubgroup-upstream-split` を **9106 へ renumber** (SEQUENCE.9000 → 9106)。
+  push `9ecd77cc..e6c851cc` + docs。
 - **2026-07-17 (tick #7、Fable hub) — ✅ a (Thm 3.26 core) + b (Thm 8.23) 合流、census 23 不変**:
   **a** = `07b35751` (Thm 3.26 core clauses A-invariant class correspondence、Ch04 ForwardFromCh03
   986 行) + AxiomsCheck 追記 を merge `e7948443`: build **4296 jobs green**。**b** = 2 commits
