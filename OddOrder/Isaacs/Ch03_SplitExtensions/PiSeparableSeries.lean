@@ -138,6 +138,104 @@ theorem isPiSeparable_of_isPiGroup [Finite G] {π : Set ℕ} (hG : IsPiGroup π 
         Subgroup.relIndex_self, Nat.primeFactors_one] at hp
       exact absurd hp (Finset.notMem_empty p)
 
+/-- 上部 π-Fitting series の **π-半段**: `Fₘ` と `Fₘ₊₁` の間に挟まる
+`comap (mk' Fₘ) (O_π(G/Fₘ))`. ladder 構成 (`exists_normal_ladder_of_isPiSeparable`)
+で `Fₘ₊₁/Fₘ = O_π ⊔ O_π'` (π-群でも π'-群でもない) を π/π' の 2 因子に割るために使う. -/
+private def piHalfStep (π : Set ℕ) (G : Type*) [Group G] (m : ℕ) : Subgroup G :=
+  Subgroup.comap (QuotientGroup.mk' (piFittingSeries π G m))
+    (oPiCore π (G ⧸ piFittingSeries π G m))
+
+/-- **π-separable ⇒ 正規 π/π'-ladder が存在** (`isPiSeparable_of_normal_ladder` の逆):
+`G` が π-separable なら, 全項 `G`-正規な増大列 `⊥ = K 0 ≤ ⋯ ≤ K r = ⊤` で各因子位数の
+素因子が全て π 内 or 全て π 外のものが取れる.
+
+構成: 上部列 `Fₘ` の各段を `Fₘ ≤ comap(O_π(G/Fₘ)) ≤ Fₘ₊₁` と 2 分割 (interleave).
+第 1 因子 ≅ `O_π(G/Fₘ)` は π-群, 第 2 因子は第 2 同型定理で `O_π'(G/Fₘ)` の商ゆえ
+π'-群. -/
+theorem exists_normal_ladder_of_isPiSeparable [Finite G] (π : Set ℕ)
+    [IsPiSeparable π G] :
+    ∃ (K : ℕ → Subgroup G) (r : ℕ),
+      (∀ i, (K i).Normal) ∧ (∀ i, K i ≤ K (i + 1)) ∧ K 0 = ⊥ ∧ K r = ⊤ ∧
+      ∀ i, (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∈ π) ∨
+        (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∉ π) := by
+  classical
+  obtain ⟨n, hn⟩ := IsPiSeparable.exists_top (π := π) (G := G)
+  refine ⟨fun i => if i % 2 = 0 then piFittingSeries π G (i / 2)
+      else piHalfStep π G (i / 2), 2 * n, ?_, ?_, ?_, ?_, ?_⟩
+  · -- 正規性.
+    intro i
+    by_cases h : i % 2 = 0
+    · simpa only [if_pos h] using piFittingSeries.normal π G (i / 2)
+    · simp only [if_neg h]
+      exact Subgroup.Normal.comap inferInstance _
+  · -- 単調性.
+    intro i
+    by_cases h : i % 2 = 0
+    · have h1 : (i + 1) % 2 ≠ 0 := by omega
+      have h2 : (i + 1) / 2 = i / 2 := by omega
+      simp only [if_pos h, if_neg h1, h2]
+      -- Fₘ = ker (mk' Fₘ) ≤ comap (mk' Fₘ) (O_π).
+      intro g hg
+      rw [piHalfStep, Subgroup.mem_comap,
+        show (QuotientGroup.mk' (piFittingSeries π G (i / 2)) g :
+          G ⧸ piFittingSeries π G (i / 2)) = 1 from (QuotientGroup.eq_one_iff g).mpr hg]
+      exact Subgroup.one_mem _
+    · have h1 : (i + 1) % 2 = 0 := by omega
+      have h2 : (i + 1) / 2 = i / 2 + 1 := by omega
+      simp only [if_neg h, if_pos h1, h2]
+      rw [piHalfStep, piFittingSeries_succ]
+      exact Subgroup.comap_mono le_sup_left
+  · -- K 0 = ⊥.
+    simp [piFittingSeries_zero]
+  · -- K (2n) = ⊤.
+    have h1 : 2 * n % 2 = 0 := by omega
+    have h2 : 2 * n / 2 = n := by omega
+    simp only [if_pos h1, h2]
+    exact hn
+  · -- 因子の π/π' 性.
+    intro i
+    set m : ℕ := i / 2 with hm
+    set f : G →* G ⧸ piFittingSeries π G m := QuotientGroup.mk' (piFittingSeries π G m)
+      with hf
+    have hf_surj : Function.Surjective f := QuotientGroup.mk'_surjective _
+    by_cases h : i % 2 = 0
+    · -- 因子 ≅ O_π(G/Fₘ): π-群.
+      left
+      have h1 : (i + 1) % 2 ≠ 0 := by omega
+      have h2 : (i + 1) / 2 = m := by omega
+      simp only [if_pos h, if_neg h1, h2]
+      intro p hp
+      have hcomp : piFittingSeries π G m = Subgroup.comap f ⊥ := by
+        rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+      rw [hcomp, piHalfStep, Subgroup.relIndex_comap, Subgroup.relIndex_bot_left,
+        Subgroup.map_comap_eq_self_of_surjective hf_surj] at hp
+      exact oPiCore.isPiGroup π p hp
+    · -- 因子 ≅ O_π ⊔ O_π' / O_π: π'-群の商ゆえ π'-群.
+      right
+      have h1 : (i + 1) % 2 = 0 := by omega
+      have h2 : (i + 1) / 2 = m + 1 := by omega
+      simp only [if_neg h, if_pos h1, h2]
+      intro p hp
+      set O : Subgroup (G ⧸ piFittingSeries π G m) :=
+        oPiCore π (G ⧸ piFittingSeries π G m) with hO
+      set O' : Subgroup (G ⧸ piFittingSeries π G m) :=
+        oPiCore {q | q ∉ π} (G ⧸ piFittingSeries π G m) with hO'
+      have hstep : piFittingSeries π G (m + 1) = Subgroup.comap f (O ⊔ O') :=
+        piFittingSeries_succ π G m
+      rw [piHalfStep, hstep, Subgroup.relIndex_comap,
+        Subgroup.map_comap_eq_self_of_surjective hf_surj] at hp
+      -- hp : p ∈ (O.relIndex (O ⊔ O')).primeFactors — 第 2 同型定理で |O'| を割る.
+      have hcard : O.relIndex (O ⊔ O') = O.relIndex O' := by
+        have he := QuotientGroup.quotientInfEquivProdNormalQuotient O' O
+        have hcongr := Nat.card_congr he.toEquiv
+        rw [sup_comm O' O] at hcongr
+        exact hcongr.symm
+      rw [hcard] at hp
+      have hdvd : O.relIndex O' ∣ Nat.card ↥O' :=
+        Subgroup.index_dvd_card (O.subgroupOf O')
+      exact oPiCore.isPiGroup {q | q ∉ π} p
+        (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
+
 end -- 3D Lemma 3.18
 
 end OddOrder.Isaacs.Ch03
