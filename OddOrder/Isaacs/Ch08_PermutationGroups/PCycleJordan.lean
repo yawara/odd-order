@@ -181,4 +181,149 @@ private lemma card_inf_fixing_dvd_factorial (G : Subgroup (Perm α)) (g : Perm �
 
 end FixingSubgroup
 
+/-! ### Sylow conjugation and the abelian-automorphism centralizer step -/
+
+section SylowConj
+
+open scoped Pointwise
+
+variable {M : Type*} [Group M] [Finite M]
+
+/-- **Isaacs Thm 8.23, Frattini correction** — if `F` contains an element
+`g` of prime order `p` and `|F| ∣ p!`, then `⟨g⟩` is a full Sylow
+`p`-subgroup of `F`, so any `k` conjugating `F` into itself can be corrected
+by an element `h ∈ F` so that `h * k` normalizes `⟨g⟩`. -/
+private lemma exists_mul_mem_normalizer_zpowers {p : ℕ} (hp : p.Prime)
+    {F : Subgroup M} {g : M} (hgF : g ∈ F) (hord : orderOf g = p)
+    (hcard : Nat.card F ∣ Nat.factorial p)
+    {k : M} (hk : ∀ q ∈ F, k * q * k⁻¹ ∈ F) :
+    ∃ h ∈ F, h * k ∈ Subgroup.normalizer (Subgroup.zpowers g) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hcard0 : Nat.card F ≠ 0 := Nat.card_pos.ne'
+  -- `p` divides `|F|` exactly once
+  have hordF : orderOf (⟨g, hgF⟩ : F) = p :=
+    (orderOf_injective F.subtype F.subtype_injective ⟨g, hgF⟩).symm.trans hord
+  have hpF : p ∣ Nat.card F := hordF ▸ orderOf_dvd_natCard (⟨g, hgF⟩ : F)
+  have hp2F : ¬ p * p ∣ Nat.card F := by
+    intro hc
+    have h1 : p * p ∣ Nat.factorial p := hc.trans hcard
+    have h2 : Nat.factorial p = p * Nat.factorial (p - 1) :=
+      (Nat.mul_factorial_pred hp.pos.ne').symm
+    rw [h2] at h1
+    have h3 : p ∣ Nat.factorial (p - 1) :=
+      (Nat.mul_dvd_mul_iff_left hp.pos).mp h1
+    have h4 := (Nat.Prime.dvd_factorial hp).mp h3
+    have h5 := hp.pos
+    omega
+  have hfact : (Nat.card F).factorization p = 1 := by
+    have h1 : 1 ≤ (Nat.card F).factorization p :=
+      (Nat.Prime.pow_dvd_iff_le_factorization hp hcard0).mp (by simpa using hpF)
+    have h2 : ¬ 2 ≤ (Nat.card F).factorization p := by
+      rw [← Nat.Prime.pow_dvd_iff_le_factorization hp hcard0]
+      simpa [pow_two] using hp2F
+    omega
+  -- the two conjugate order-`p` subgroups, as Sylow subgroups of `F`
+  have hPle : Subgroup.zpowers g ≤ F := Subgroup.zpowers_le.mpr hgF
+  have hgF' : k * g * k⁻¹ ∈ F := hk g hgF
+  have hordg' : orderOf (k * g * k⁻¹) = p := by
+    have h1 := orderOf_injective (MulAut.conj k).toMonoidHom
+      (MulAut.conj k).injective g
+    simpa [MulAut.conj_apply, hord] using h1
+  have hQle : Subgroup.zpowers (k * g * k⁻¹) ≤ F := Subgroup.zpowers_le.mpr hgF'
+  have hcardP : Nat.card ((Subgroup.zpowers g).subgroupOf F) = p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPle).toEquiv,
+      Nat.card_zpowers, hord]
+  have hcardQ : Nat.card ((Subgroup.zpowers (k * g * k⁻¹)).subgroupOf F) = p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQle).toEquiv,
+      Nat.card_zpowers, hordg']
+  set SP : Sylow p ↥F := Sylow.ofCard _ (by rw [hcardP, hfact, pow_one])
+    with hSP
+  set SQ : Sylow p ↥F := Sylow.ofCard _ (by rw [hcardQ, hfact, pow_one])
+    with hSQ
+  obtain ⟨h, hh⟩ := MulAction.exists_smul_eq (M := ↥F) SQ SP
+  have hsub : MulAut.conj h • (SQ : Subgroup ↥F) = (SP : Subgroup ↥F) := by
+    rw [← Sylow.coe_subgroup_smul, hh]
+  have hSPcoe : (SP : Subgroup ↥F) = (Subgroup.zpowers g).subgroupOf F := by
+    rw [hSP, Sylow.coe_ofCard]
+  have hSQcoe : (SQ : Subgroup ↥F) =
+      (Subgroup.zpowers (k * g * k⁻¹)).subgroupOf F := by
+    rw [hSQ, Sylow.coe_ofCard]
+  refine ⟨↑h, h.2, Subgroup.mem_normalizer_iff.mpr fun w => ?_⟩
+  constructor
+  · -- `w ∈ ⟨g⟩ → (h k) w (h k)⁻¹ ∈ ⟨g⟩`
+    intro hw
+    obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hw
+    have hkw : k * w * k⁻¹ ∈ Subgroup.zpowers (k * g * k⁻¹) := by
+      rw [← hn, ← conj_zpow]
+      exact Subgroup.zpow_mem _ (Subgroup.mem_zpowers _) n
+    have hkwF : k * w * k⁻¹ ∈ F := hk w (hPle hw)
+    have hu : (⟨k * w * k⁻¹, hkwF⟩ : ↥F) ∈ (SQ : Subgroup ↥F) := by
+      rw [hSQcoe]
+      exact Subgroup.mem_subgroupOf.mpr hkw
+    have hv : MulAut.conj h • (⟨k * w * k⁻¹, hkwF⟩ : ↥F) ∈ (SP : Subgroup ↥F) := by
+      rw [← hsub]
+      exact Subgroup.smul_mem_pointwise_smul _ _ _ hu
+    rw [hSPcoe] at hv
+    have hv' := Subgroup.mem_subgroupOf.mp hv
+    have hval : ((MulAut.conj h • (⟨k * w * k⁻¹, hkwF⟩ : ↥F) : ↥F) : M) =
+        ↑h * (k * w * k⁻¹) * (↑h)⁻¹ := rfl
+    rw [hval] at hv'
+    have hrw : ↑h * k * w * (↑h * k)⁻¹ = ↑h * (k * w * k⁻¹) * (↑h)⁻¹ := by
+      group
+    rwa [hrw]
+  · -- `(h k) w (h k)⁻¹ ∈ ⟨g⟩ → w ∈ ⟨g⟩`
+    intro hw
+    have hwF : ↑h * k * w * (↑h * k)⁻¹ ∈ F := hPle hw
+    have hv : (⟨↑h * k * w * (↑h * k)⁻¹, hwF⟩ : ↥F) ∈ (SP : Subgroup ↥F) := by
+      rw [hSPcoe]
+      exact Subgroup.mem_subgroupOf.mpr hw
+    have hu : (MulAut.conj h)⁻¹ • (⟨↑h * k * w * (↑h * k)⁻¹, hwF⟩ : ↥F) ∈
+        (SQ : Subgroup ↥F) := by
+      rw [← Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsub]
+      exact hv
+    rw [hSQcoe] at hu
+    have hu' := Subgroup.mem_subgroupOf.mp hu
+    have hval : (((MulAut.conj h)⁻¹ • (⟨↑h * k * w * (↑h * k)⁻¹, hwF⟩ : ↥F) : ↥F) : M) =
+        (↑h)⁻¹ * (↑h * k * w * (↑h * k)⁻¹) * ↑h := rfl
+    rw [hval] at hu'
+    have hrw : (↑h : M)⁻¹ * (↑h * k * w * (↑h * k)⁻¹) * ↑h = k * w * k⁻¹ := by
+      group
+    rw [hrw] at hu'
+    obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hu'
+    rw [conj_zpow] at hn
+    have : g ^ n = w := by
+      have := mul_left_cancel (a := k) (mul_right_cancel (b := k⁻¹) hn)
+      exact this
+    exact this ▸ Subgroup.zpow_mem _ (Subgroup.mem_zpowers g) n
+
+omit [Finite M] in
+/-- **Isaacs Thm 8.23, centralizer step** — the automorphism group of the
+cyclic group `⟨g⟩` is abelian, so the commutator of two elements
+normalizing `⟨g⟩` centralizes it. -/
+private lemma commute_commutator_of_mem_normalizer {g x₁ x₂ : M}
+    (h₁ : x₁ ∈ Subgroup.normalizer (Subgroup.zpowers g : Set M))
+    (h₂ : x₂ ∈ Subgroup.normalizer (Subgroup.zpowers g : Set M)) :
+    Commute ⁅x₁, x₂⁆ g := by
+  classical
+  haveI : IsCyclic ↥(Subgroup.zpowers g) := by
+    refine ⟨⟨⟨g, Subgroup.mem_zpowers g⟩, fun w => ?_⟩⟩
+    obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp w.2
+    exact ⟨n, Subtype.ext (by simpa using hn)⟩
+  set φ := (Subgroup.zpowers g).normalizerMonoidHom with hφ
+  set c : ↥(Subgroup.normalizer (Subgroup.zpowers g : Set M)) :=
+    ⁅(⟨x₁, h₁⟩ : ↥(Subgroup.normalizer (Subgroup.zpowers g : Set M))),
+      ⟨x₂, h₂⟩⁆ with hc
+  have hker : c ∈ φ.ker := by
+    rw [MonoidHom.mem_ker, hc, map_commutatorElement]
+    refine commutatorElement_eq_one_iff_mul_comm.mpr ?_
+    apply (IsCyclic.mulAutMulEquiv _).injective
+    rw [map_mul, map_mul, mul_comm]
+  rw [hφ, Subgroup.normalizerMonoidHom_ker, Subgroup.mem_subgroupOf] at hker
+  have hval : (c : M) = ⁅x₁, x₂⁆ := rfl
+  rw [hval] at hker
+  exact (Subgroup.mem_centralizer_iff.mp hker g (Subgroup.mem_zpowers g)).symm
+
+end SylowConj
+
 end OddOrder.Isaacs.Ch08
