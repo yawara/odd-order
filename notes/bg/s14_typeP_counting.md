@@ -1778,3 +1778,20 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 
 **⟹ §14 Type-P duality long pole DONE。§15/§16 (Lane G) の `typeP_duality` cite 群 (S15_MF:785/795/2170, S16:530) が実証明上に。** 残 S14 sorry = Cor 14.8 (`typeP1_conjugate_and_typeP_twoClasses`, 14.7(f)(g) から従う・未着手)、Cor 14.9 (faithful には gated M̃ 要・"do not prove as-is")、Cor 14.10 (`exists_sigmaDecomposition_length_le_two` = ℓ_σ≤2、**σ-decomposition theory [BG §1, 未形式化] が必須前提**)、Lem 14.11/Cor 14.12 (§13 gated)。**いずれも part(h) 経路外**; Cor 14.10 は FT-critical だが σ-decomp gate で別の大物。
 - ⚠ **再調査するな**: crux `[U,K]=U` は `le_commutator_of_coprime_inf_centralizer_eq_bot` (S08) で既存。統一補題は `commutator_eq_sup_commutator_of_isComplement'` (S14) で既存。両方とも repo 内既出だった。
+
+## 2026-07-16 — 凍結 mis-encoding 2 件を削除 (全 3 冊フェーズの後始末)
+
+2026-07-15 に「FROZEN MIS-ENCODING (consumer 0, faithful 版は証明済)」として凍結記録されていた
+sorried 宣言 2 件を削除した (sorry census の恒常ノイズ源のため; ユーザー承認 2026-07-16):
+
+- `TypePDuality.lean` 旧 `nonidentity_covered_by_sigma_pieces` — **BG Cor 14.9** を
+  `sigmaConjugacySaturation = 𝒞_G(M_σ^#)` で cover する形は BG に対して**偽** (`M_σ^# ⊊ M̃`;
+  ℓ_σ = 2 の twisted 元が漏れる)。faithful 版 = `Mtilde`/`zTilde` cover API 群
+  (`exists_mem_conjClassSet_Mtilde_or_fixed_zTilde` + SigmaLengthOne / KappaHallCommutator /
+  CentralizerSup の per-piece bounds、`exists_sigmaDecomposition_length_le_two` が消費)。
+- `GlobalCounting.lean` 旧 `sigmaLength_one_frobenius_type` — **BG Lem 14.13** の
+  `M, N ∈ 𝓜_σ(x)` 非共役前提は vacuous (Thm 13.9 と矛盾; issue 8020)。faithful 版 =
+  `S16.non_disjoint_signalizer_frobenius` (`S16_Lemma1413.lean`、証明済・AxiomsCheck 登録)。
+
+どちらも削除位置に対応コメント (faithful 版への pointer) を残した。これで S14 の実 sorry は 0、
+repo 全体の実 sorry は 25 → 23 (残 = BG App.D/E + Pf Appendices の scaffold 群のみ)。

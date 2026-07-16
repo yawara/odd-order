@@ -1265,30 +1265,13 @@ theorem typeP1_conjugate_and_typeP_twoClasses [Finite G]
     · rintro H ⟨hHmax, hHP⟩
       exact typeP_covering hG hMmax hMP hKM hK hKstar hU hMstarmem hMstarne hpart hHmax hHP
 
-/-- **BG Corollary 14.9** (mmd L3997): `G^#` is the disjoint union of the conjugacy pieces
-`𝒞_G(M̃ᵢ)` over class representatives `Mᵢ ∈ 𝓜` — together with one extra `𝒞_G(Ẑ)` piece when
-`𝓜_𝓟` is nonempty.
-
-**FROZEN MIS-ENCODING — DO NOT PROVE OR REPAIR IN PLACE (2026-07-15).**  This Lean surface
-covers by `sigmaConjugacySaturation = 𝒞_G(M_σ^#)` instead of BG's `𝒞_G(M̃)` (see `sigmaSharp`).
-Because `M_σ^# ⊊ M̃`, covering `G^#` by the smaller pieces is false relative to BG: the
-`ℓ_σ = 2` twisted elements `x x'` (`x' ∈ R(x)^#`) lie in some `𝒞_G(M̃ᵢ)` but in no
-`𝒞_G(M_σ^#ⱼ)`.  The declaration has no consumers and is retained only as a frozen record of the
-bad surface.  Faithful coverage is provided by the `Mtilde`/`zTilde` theorems used by
-`exists_sigmaDecomposition_length_le_two`; new consumers must use those APIs.  See
-`notes/bg/s14_typeP_counting.md`. -/
-theorem nonidentity_covered_by_sigma_pieces [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
-    (∀ x : G, x ≠ 1 → ∃ M : Subgroup G,
-      M ∈ maximalSubgroups G ∧ IsTypeF M ∧ x ∈ sigmaConjugacySaturation M) ∨
-    (∃ M Mstar K Kstar : Subgroup G,
-      M ∈ maximalSubgroups G ∧ Mstar ∈ maximalSubgroups G ∧
-      IsTypeP M ∧ IsTypeP Mstar ∧
-      ∀ x : G, x ≠ 1 →
-        x ∈ conjClassSet (zTilde K Kstar) ∨
-        ∃ H : Subgroup G,
-          H ∈ maximalSubgroups G ∧ IsTypeF H ∧ x ∈ sigmaConjugacySaturation H) := by
-  sorry
+/- **BG Corollary 14.9** (mmd L3997) is formalized by the faithful `Mtilde`/`zTilde` cover APIs:
+`exists_mem_conjClassSet_Mtilde_or_fixed_zTilde` and the per-piece results in `SigmaLengthOne`,
+`KappaHallCommutator`, `CentralizerSup` (consumed by `exists_sigmaDecomposition_length_le_two`).
+A mis-encoded sorried surface (`nonidentity_covered_by_sigma_pieces`, covering by
+`sigmaConjugacySaturation = 𝒞_G(M_σ^#)` instead of BG's `𝒞_G(M̃)` — false relative to BG since
+`M_σ^# ⊊ M̃`) was deleted on 2026-07-16 (it had no consumers; record:
+`notes/bg/s14_typeP_counting.md`). -/
 
 /-- **`Ẑ` elements have `σ`-length at most two** (the type-P exceptional half of BG Cor 14.10).  A
 `z ∈ Ẑ = zTilde Kref Kstarref = (Kref ⊔ Kstarref) ∖ (Kref ∪ Kstarref)` factors as `z = k·k*` with

@@ -778,34 +778,13 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     typeP2_neighbor_is_typeF_of_mem hG hM hP2 hKM hUM hK hU hUab hr hRU hR hKNU hH
   exact ⟨H, hH, hF, hUMsH, hMH, hnorm⟩
 
-/-- **BG Lemma 14.13** (mmd L4059): extension of Theorem 14.4.  In the specified
-multi-maximal sigma-length-one situation, `M` is Frobenius type, `tau_2(M)` is
-empty, and `M` is a Frobenius group with kernel `M_sigma`.
-
-⚠ **FROZEN MIS-ENCODING — DO NOT PROVE OR REPAIR IN PLACE (2026-07-15).**  The Coq original
-(`non_disjoint_signalizer_Frobenius`, BGsection14:2412) hypothesises `1 < |𝓜_σ(x)|` and `M` *not*
-a `σ(N[x])′`-group (`N[x]` = the signalizer neighbour).  The Lean hypotheses `M, N ∈ 𝓜_σ(x)` with
-`¬ IsConjugateSubgroup M N` are **inconsistent**: by Theorem 13.9 non-conjugate maximals have
-`σ(M) ∩ σ(N) = ∅`, but `x ∈ M_σ ∩ N_σ` with `x ≠ 1` forces a common prime — so the premise is
-vacuous (the two elements of `𝓜_σ(x)` are conjugate, not non-conjugate).  A faithful restatement
-replaces `{N, hN, hMN, hinter}` by `1 < (𝓜_σ(x)).ncard` and the `σ(N[x])′`-group condition.
-This declaration has no consumers and is retained only as a frozen record of the bad surface.
-The proved faithful API is `S16.non_disjoint_signalizer_frobenius`; new consumers must use it.
-See issue 8020. -/
-theorem sigmaLength_one_frobenius_type [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
-    {x : G} (hx : x ≠ 1) (hlen : D.length x = 1)
-    {M N : Subgroup G} (hM : M ∈ maximalSigmaSubgroupsOfElement x)
-    (hN : N ∈ maximalSigmaSubgroupsOfElement x)
-    (hMN : ¬ IsConjugateSubgroup M N)
-    (hinter : (OddOrder.BG.Ch3.S10.sigma N ∩ piSet M).Nonempty) :
-    IsTypeF M ∧ tau2 M = ∅ ∧
-      ∃ U : Subgroup G,
-        Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
-          (U.subgroupOf M) ∧
-        OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
-          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (U.subgroupOf M) := by
-  sorry
+/- **BG Lemma 14.13** (mmd L4059) is formalized faithfully as
+`S16.non_disjoint_signalizer_frobenius` (`S16_Lemma1413.lean`), following the Coq original
+(`non_disjoint_signalizer_Frobenius`, BGsection14:2412) with the signalizer neighbour `N[x]`.
+A mis-encoded sorried surface (`sigmaLength_one_frobenius_type`, whose `M, N ∈ 𝓜_σ(x)`
+non-conjugate premise is vacuous — by Theorem 13.9 non-conjugate maximals have
+`σ(M) ∩ σ(N) = ∅`, contradicting `x ∈ M_σ ∩ N_σ`, `x ≠ 1`) was deleted on 2026-07-16
+(it had no consumers; issue 8020). -/
 
 /-- **BG Corollary 14.10** (mmd L4008): global `σ`-length bound `ℓ_σ(g) ≤ 2`.
 

@@ -282,8 +282,9 @@ BGsection14:2412), faithful form: for `x ∈ M_σ^#` with more than one `σ`-max
 meets `π(M)` (`N[x] = FT_signalizerBase x` the signalizer neighbour), then `M` is of type `F`,
 no prime lies in `τ₂(M)`, and `M` is a Frobenius group with kernel `M_σ`.
 
-This is the faithful restatement flagged on the mis-encoded `S14.sigmaLength_one_frobenius_type`
-(issue 8020, whose `M, N ∈ 𝓜_σ(x)` non-conjugate premise is vacuous): the second maximal is the
+This is the faithful restatement of the former mis-encoded S14 surface
+`sigmaLength_one_frobenius_type` (deleted 2026-07-16; issue 8020 — its `M, N ∈ 𝓜_σ(x)`
+non-conjugate premise was vacuous): the second maximal is the
 *signalizer neighbour* `N[x]` over `C_G(x)`, not a second `σ`-maximal.  The `ℓ_σ(x) = 1`
 hypothesis of the Coq original is dropped as derivable (`S14.Msigma_ell1`), and the Coq
 `\tau2(M)^'.-group M` conclusion is stated prime-wise (`∀ p, p.Prime → p ∉ τ₂ M`) because the
