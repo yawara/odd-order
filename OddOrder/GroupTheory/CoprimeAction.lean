@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.SemidirectProduct
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.FixedSubgroup
 import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
@@ -93,22 +94,8 @@ section WielandtFixedPoint
 
 variable {L H : Type*} [Group L] [Group H]
 
-/-- The subgroup `C_H(K)` of points of `H` fixed by every element of a subgroup `K ≤ L`,
-under an action `φ : L →* MulAut H`.  This is a subgroup of `H` because each `φ l` is a
-group automorphism. -/
-def fixedSubgroup (φ : L →* MulAut H) (K : Subgroup L) : Subgroup H where
-  carrier := {h | ∀ l ∈ K, φ l h = h}
-  one_mem' l _ := map_one (φ l)
-  mul_mem' ha hb l hl := by rw [map_mul, ha l hl, hb l hl]
-  inv_mem' ha l hl := by rw [map_inv, ha l hl]
-
-@[simp] theorem mem_fixedSubgroup {φ : L →* MulAut H} {K : Subgroup L} {x : H} :
-    x ∈ fixedSubgroup φ K ↔ ∀ l ∈ K, φ l x = x := Iff.rfl
-
-/-- Fixing the elements of a *larger* subgroup yields a *smaller* fixed subgroup. -/
-theorem fixedSubgroup_antitone (φ : L →* MulAut H) {K K' : Subgroup L} (h : K ≤ K') :
-    fixedSubgroup φ K' ≤ fixedSubgroup φ K :=
-  fun _ hx l hl => hx l (h hl)
+-- `fixedSubgroup` / `mem_fixedSubgroup` / `fixedSubgroup_antitone` は
+-- `OddOrder/GroupTheory/FixedSubgroup.lean` へ upstream 分割 (issue 9104).
 
 /-- A carrier for **Peterfalvi (9.1)**: a coprime action `φ` of a Frobenius group
 `L = U ⋊ E` (kernel `U`, complement `E`) on a finite solvable group `H`.
