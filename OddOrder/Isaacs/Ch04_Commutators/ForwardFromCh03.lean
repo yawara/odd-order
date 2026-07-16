@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.FixedSubgroup
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
@@ -980,6 +981,71 @@ theorem exists_fixed_conj_of_isConj_of_fixed
     (α := ⟨x, IsConj.refl x⟩) (β := ⟨y, hxy⟩)
     (fun a => Subtype.ext (hx a)) (fun a => Subtype.ext (hy a))
   exact ⟨c, hc_fixed, Subtype.ext_iff.mp hc_smul⟩
+
+open OddOrder.GroupTheory in
+/-- `C_G(A) = fixedSubgroup φ ⊤` の類を `G` へ送った像は A-不変
+(well-definedness / range 側). 代表が A-固定なので類は各 `φ a` で固定される. -/
+theorem conjClasses_map_fixedSubgroup_aInvariant {φ : A →* MulAut G}
+    (d : ConjClasses ↥(fixedSubgroup φ (⊤ : Subgroup A))) (a : A) :
+    (d.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype).map (φ a).toMonoidHom
+      = d.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype := by
+  obtain ⟨y, rfl⟩ := d.exists_rep
+  show ConjClasses.mk ((φ a) y.val) = ConjClasses.mk y.val
+  rw [y.property a trivial]
+
+open OddOrder.GroupTheory in
+/-- **Isaacs Thm 3.26 (単射性)**: `C_G(A)` の類は `G` の類へ**単射**に写る
+(no fusion; `exists_fixed_conj_of_isConj_of_fixed` の packaging). -/
+theorem conjClasses_map_fixedSubgroup_injective {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    Function.Injective
+      (ConjClasses.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype) := by
+  intro d₁ d₂ h
+  obtain ⟨y₁, rfl⟩ := d₁.exists_rep
+  obtain ⟨y₂, rfl⟩ := d₂.exists_rep
+  have hG : IsConj y₁.val y₂.val := ConjClasses.mk_eq_mk_iff_isConj.mp h
+  obtain ⟨c, hc_fix, hc⟩ := exists_fixed_conj_of_isConj_of_fixed hCop hSolv
+    (fun a => y₁.property a trivial) (fun a => y₂.property a trivial) hG
+  refine ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr
+    ⟨⟨c, fun l _ => hc_fix l⟩, Subtype.ext ?_⟩)
+  exact hc
+
+open OddOrder.GroupTheory in
+/-- **Isaacs Thm 3.26 (全射性)**: A-不変な `G` の類は `C_G(A)` の類の像
+(`exists_fixed_isConj_of_aInvariant_class` の packaging). -/
+theorem conjClasses_map_fixedSubgroup_surjective_of_aInvariant {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {c : ConjClasses G} (hc : ∀ a : A, c.map (φ a).toMonoidHom = c) :
+    ∃ d : ConjClasses ↥(fixedSubgroup φ (⊤ : Subgroup A)),
+      d.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype = c := by
+  obtain ⟨x₀, rfl⟩ := c.exists_rep
+  have hinv : ∀ a : A, IsConj x₀ ((φ a) x₀) := fun a =>
+    (ConjClasses.mk_eq_mk_iff_isConj.mp (hc a)).symm
+  obtain ⟨x, hx_conj, hx_fix⟩ :=
+    exists_fixed_isConj_of_aInvariant_class hCop hSolv hinv
+  exact ⟨ConjClasses.mk ⟨x, fun l _ => hx_fix l⟩,
+    ConjClasses.mk_eq_mk_iff_isConj.mpr hx_conj.symm⟩
+
+open OddOrder.GroupTheory in
+/-- **Isaacs Thm 3.26** (bijection 形): coprime + solvable 仮定下,
+`C_G(A) = fixedSubgroup φ ⊤` の共役類全体は, `G` へ送る canonical な写像で
+**`G` の A-不変共役類全体と全単射**. 書籍の `K ↦ K ∩ C` はこの逆写像. -/
+noncomputable def aInvariantConjClassesEquiv {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    ConjClasses ↥(fixedSubgroup φ (⊤ : Subgroup A)) ≃
+      {c : ConjClasses G // ∀ a : A, c.map (φ a).toMonoidHom = c} :=
+  Equiv.ofBijective
+    (fun d => ⟨d.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype,
+      conjClasses_map_fixedSubgroup_aInvariant d⟩)
+    ⟨fun d₁ d₂ h => conjClasses_map_fixedSubgroup_injective hCop hSolv
+        (congrArg Subtype.val h),
+     fun c => by
+       obtain ⟨d, hd⟩ :=
+         conjClasses_map_fixedSubgroup_surjective_of_aInvariant hCop hSolv c.property
+       exact ⟨d, Subtype.ext hd⟩⟩
 
 end ConjClassCorrespondence
 
