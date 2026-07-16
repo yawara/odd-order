@@ -716,6 +716,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #2、Fable hub) — ✅ a+b 合流、c 変化なし、census 23 不変**:
+  **a** = `06ae3107` (Ch03 Thm 3.17 Wielandt three-subgroup solvability、Theorem315.lean 1157→1336 行) を
+  merge `01b7ce06`: build **4290 jobs green**。⚠ サイズ watch: Theorem315.lean 1336 行 (1500 接近、次の主結果は
+  新 leaf 推奨)。**b** = `bb13667a` (Ch08 Lem 8.8 TransitiveAutomorphisms) + visit 後 `c67d0c99`
+  (HalfTransitive.lean + 配線、live-race で MERGE_HEAD pin) を merge `53e04dc8`: build **4292 jobs green**、
+  dup spot-check 陰性・root closure OK。**c** = 変化なし。全ゲート通過 (sorry 23 不変・新 axiom なし・
+  AxiomsCheck OK)。push `56d50152..53e04dc8`。build 出力の longFile linter note は既存 per-file 例外
+  (AxiomsCheck 8500 / S03f_Thm36 4000) 由来の cosmetic、gate 非該当。
 - **2026-07-17 (新フェーズ tick #1、Fable hub — 監視再開) — ✅ a/b/c 全レーン初回合流、census 23 不変、cron `827d901b` 再作成**:
   再開時 main (`3771ac15`) に **staged 未コミットの Ch02 DihedralBasics +256 行**を発見 → patch-id/blob 検証で
   **lane a `d25cb3ef` の完全複製**と確定 (blob 0ed981d3/ce48ac4d 一致) → 破棄 (内容は a の merge で流入、損失なし)。
