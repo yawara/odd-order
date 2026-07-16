@@ -506,6 +506,114 @@ theorem isPiSeparable_of_normal_of_quotient.{u} {G : Type u} [Group G] [Finite G
     exact isPiSeparable_of_isPiGroup_normal_of_quotient hA'_pi
       (ih _ hlt (G' ⧸ A.map N.subtype) rfl _ hN'_sep hQQ_sep)
 
+/-- **Isaacs Lemma 3.18**: `⊥ = K 0 ⊴ K 1 ⊴ ⋯ ⊴ K r = ⊤` を **subnormal 列**
+(隣接項のみ正規: `(K i).subgroupOf (K (i+1))` が normal) とし, 各因子位数
+`(K i).relIndex (K (i+1))` の素因子が全て π 内 or 全て π 外とする. このとき
+`G` は π-separable.
+
+教科書 (p.90) は「π-separable の characteristic 列で精密化」する証明だが,
+ここでは列長 `r` の帰納 + 拡大閉包 (`isPiSeparable_of_normal_of_quotient`) で
+組み立てる: `N := K r ⊴ G` に制限列 `(K (min i r)).subgroupOf N` を落として
+帰納法で `↥N` が π-separable, 最上段因子 `|G:N|` は π-数 or π'-数なので
+`G/N` は π-群 or π'-群 → π-separable, 拡大閉包で `G` が π-separable. -/
+theorem isPiSeparable_of_subnormal_ladder.{u} {G : Type u} [Group G] [Finite G]
+    (π : Set ℕ) {K : ℕ → Subgroup G} {r : ℕ}
+    (hmono : ∀ i, K i ≤ K (i + 1))
+    (hnorm : ∀ i, ((K i).subgroupOf (K (i + 1))).Normal)
+    (hbot : K 0 = ⊥) (htop : K r = ⊤)
+    (hfac : ∀ i, (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∈ π) ∨
+      (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∉ π)) :
+    IsPiSeparable π G := by
+  classical
+  suffices hmain : ∀ r : ℕ,
+      ∀ (G' : Type u) [Group G'] [Finite G'] (K : ℕ → Subgroup G'),
+        (∀ i, K i ≤ K (i + 1)) →
+        (∀ i, ((K i).subgroupOf (K (i + 1))).Normal) →
+        K 0 = ⊥ → K r = ⊤ →
+        (∀ i, (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∈ π) ∨
+          (∀ p ∈ ((K i).relIndex (K (i + 1))).primeFactors, p ∉ π)) →
+        IsPiSeparable π G' by
+    exact hmain r G K hmono hnorm hbot htop hfac
+  intro r
+  induction r with
+  | zero =>
+    intro G' _ _ K _ _ hbot htop _
+    exact ⟨0, (piFittingSeries_zero π G').trans (hbot ▸ htop)⟩
+  | succ r ih =>
+    intro G' _ _ K hmono hnorm hbot htop hfac
+    have hchain : Monotone K := monotone_nat_of_le_succ hmono
+    -- `N := K r` は `G'` で正規 (`K (r+1) = ⊤`).
+    haveI hN_normal : (K r).Normal := by
+      have hnr := hnorm r
+      constructor
+      intro n hn g
+      have hg' : g ∈ K (r + 1) := by rw [htop]; trivial
+      have hn'' : (⟨n, by rw [htop]; trivial⟩ : ↥(K (r + 1))) ∈
+          (K r).subgroupOf (K (r + 1)) := by
+        rw [Subgroup.mem_subgroupOf]; exact hn
+      have hconj := hnr.conj_mem _ hn'' ⟨g, hg'⟩
+      rw [Subgroup.mem_subgroupOf] at hconj
+      exact hconj
+    -- 制限列で `↥(K r)` は π-separable (帰納法).
+    have hN_sep : IsPiSeparable π ↥(K r) := by
+      refine ih ↥(K r) (fun i => (K (min i r)).subgroupOf (K r)) ?_ ?_ ?_ ?_ ?_
+      · intro i
+        exact Subgroup.comap_mono (hchain (by omega : min i r ≤ min (i + 1) r))
+      · intro i
+        by_cases h : i + 1 ≤ r
+        · -- i + 1 ≤ r: 元の subnormality を iso 経由で転送.
+          have h1 : min i r = i := by omega
+          have h2 : min (i + 1) r = i + 1 := by omega
+          rw [h1, h2]
+          have hKN : K (i + 1) ≤ K r := hchain (by omega)
+          have hset : ((K i).subgroupOf (K r)).subgroupOf
+              ((K (i + 1)).subgroupOf (K r)) =
+              ((K i).subgroupOf (K (i + 1))).comap
+                (Subgroup.subgroupOfEquivOfLe hKN).toMonoidHom := by
+            ext x
+            exact Iff.rfl
+          rw [hset]
+          haveI := hnorm i
+          exact Subgroup.Normal.comap inferInstance _
+        · -- i ≥ r: 両項一致 (⊤) で自明.
+          have h1 : min i r = r := by omega
+          have h2 : min (i + 1) r = r := by omega
+          rw [h1, h2, Subgroup.subgroupOf_self]
+          infer_instance
+      · rw [show min 0 r = 0 from by omega, hbot, Subgroup.bot_subgroupOf]
+      · rw [min_self, Subgroup.subgroupOf_self]
+      · intro i
+        by_cases h : i + 1 ≤ r
+        · have h1 : min i r = i := by omega
+          have h2 : min (i + 1) r = i + 1 := by omega
+          rw [h1, h2, Subgroup.relIndex_subgroupOf (hchain (by omega : i + 1 ≤ r))]
+          exact hfac i
+        · have h1 : min i r = r := by omega
+          have h2 : min (i + 1) r = r := by omega
+          rw [h1, h2]
+          left
+          intro p hp
+          rw [Subgroup.relIndex_self, Nat.primeFactors_one] at hp
+          exact absurd hp (Finset.notMem_empty p)
+    -- 最上段因子 `|G' : K r|` は π-数 or π'-数 → `G'/K r` は π-separable.
+    have hidx : (K r).relIndex (K (r + 1)) = (K r).index := by
+      rw [htop, Subgroup.relIndex_top_right]
+    have hQfac := hfac r
+    rw [hidx] at hQfac
+    have hQ_sep : IsPiSeparable π (G' ⧸ K r) := by
+      have hcardQ : Nat.card (G' ⧸ K r) = (K r).index := rfl
+      rcases hQfac with hπ | hπ'
+      · exact isPiSeparable_of_isPiGroup fun p hp => hπ p (by rwa [hcardQ] at hp)
+      · have h1 : IsPiSeparable {p | p ∉ π} (G' ⧸ K r) :=
+          isPiSeparable_of_isPiGroup fun p hp => hπ' p (by rwa [hcardQ] at hp)
+        have h2 := isPiSeparable_compl {p | p ∉ π} (G' ⧸ K r) h1
+        have hππ : {p : ℕ | p ∉ {q : ℕ | q ∉ π}} = π := by
+          ext p
+          simp
+        rwa [hππ] at h2
+    -- 拡大閉包で締める.
+    exact isPiSeparable_of_normal_of_quotient hN_sep hQ_sep
+
 end -- 3D Lemma 3.18
 
 end OddOrder.Isaacs.Ch03
