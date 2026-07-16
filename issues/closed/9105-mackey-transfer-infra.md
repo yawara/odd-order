@@ -45,7 +45,8 @@ repo 内該当なし。
 ## 状態
 
 - [x] claim (2026-07-17)
-- [x] skeleton (statement + design, sorried) — `OddOrder/GroupTheory/MackeyTransfer.lean`
-      (`conjSubgroup`/`mem_conjSubgroup`/`mackeyRes` は実証明、主定理 statement は
-      型付け済・sorry 1)
-- [ ] 証明本体 (fibration 論法; leaf 冒頭の証明計画 §1-4 参照)
+- [x] skeleton (statement + design)
+- [x] 証明本体 — 完了 (2026-07-17)。`transfer_eq_prod_doubleCoset` sorry-free。
+      fibration equiv `dosetFiberEquiv` (Equiv.ofBijective)、K-equivariance、
+      合成 section `mackeySection`、diff 積分解 `diff_mackeySection`、
+      `smulSection` (TransferTransitivity から再利用) で組み立て。

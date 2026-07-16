@@ -699,4 +699,98 @@ theorem exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini
 
 end
 
+section /- 10A: Lemma 10.11 (p. 303) -/
+
+open OddOrder.GroupTheory
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Isaacs Lemma 10.11** (generalized): let `P ≤ N ≤ G` with `G` finite and
+`P` a `p`-group, and suppose the image of the `G`-transfer to `P^{ab}` is
+*properly* contained in the image of the `N`-level transfer (for `P` Sylow this
+is exactly the failure of `p`-transfer control, since `v(G) ⊆ w(N)` always
+holds by transitivity). Then there is `M ⊴ N` of index `p` such that every
+transfer value `U(g) ∈ N^{ab}`, `g ∈ G`, lies in the image of `M`.
+
+**証明** (Isaacs p.303): `w(N) = w'.range` は有限 p-群で `v(G)` を真に含むので、
+`v(G)` の像を含む coatom `L₀ ⊴ w(N)` (指数 `p`) が取れる。対応定理
+(`M := w'⁻¹(L)`) で `M ⊴ N`, `|N : M| = p`。`w' = ŵ ∘ of_N` と分解すれば
+transitivity `transfer_transfer` と自然性 `transfer_comp_left` から
+`ŵ(U(g)) = v(g) ∈ L`、すなわち `U(g) ∈ M` の像。 -/
+theorem exists_normal_index_prime_transfer_mem
+    {P N : Subgroup G} (hP : IsPGroup p ↥P) (hPN : P ≤ N)
+    (hlt : (MonoidHom.transfer (Abelianization.of (G := ↥P))).range
+      < (MonoidHom.transfer (transferRes hPN (Abelianization.of (G := ↥P)))).range) :
+    ∃ M : Subgroup ↥N, M.Normal ∧ M.index = p ∧
+      ∀ g : G, MonoidHom.transfer (Abelianization.of (G := ↥N)) g
+        ∈ M.map (Abelianization.of (G := ↥N)) := by
+  classical
+  set ϕP : ↥P →* Abelianization ↥P := Abelianization.of with hϕP_def
+  set w' : ↥N →* Abelianization ↥P :=
+    MonoidHom.transfer (transferRes hPN ϕP) with hw'_def
+  set v : G →* Abelianization ↥P := MonoidHom.transfer ϕP with hv_def
+  -- the image w(N) is a finite p-group
+  haveI : Finite (Abelianization ↥P) := Quotient.finite _
+  have hAbP : IsPGroup p (Abelianization ↥P) := hP.to_quotient _
+  have hW : IsPGroup p ↥(w'.range) := hAbP.to_subgroup _
+  -- v(G) sits inside w(N) properly; take a coatom L₀ above it
+  have hproper : (v.range).subgroupOf w'.range ≠ ⊤ := by
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact hlt.not_ge htop
+  obtain ⟨L₀, hL₀_coatom, hL₀_ge⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom _).resolve_left hproper
+  haveI hL₀_normal : L₀.Normal := hL₀_coatom.normal_of_isPGroup hW
+  have hL₀_idx : L₀.index = p := by
+    rw [Subgroup.index_eq_card]
+    exact hL₀_coatom.card_quotient_of_isPGroup hW
+  -- pull the coatom back to N
+  set L : Subgroup (Abelianization ↥P) := L₀.map w'.range.subtype with hL_def
+  set M : Subgroup ↥N := L.comap w' with hM_def
+  haveI hL_normal : L.Normal := Subgroup.normal_of_isMulCommutative L
+  haveI hM_normal : M.Normal := Subgroup.Normal.comap hL_normal w'
+  have hM_idx : M.index = p := by
+    rw [hM_def, Subgroup.index_comap]
+    have h1 : L.subgroupOf w'.range = L₀ := by
+      rw [hL_def]
+      exact Subgroup.comap_map_eq_self_of_injective w'.range.subtype_injective L₀
+    rw [show L.relIndex w'.range = (L.subgroupOf w'.range).index from rfl, h1, hL₀_idx]
+  refine ⟨M, hM_normal, hM_idx, ?_⟩
+  intro g
+  -- factor w' through the abelianization of N
+  set what : Abelianization ↥N →* Abelianization ↥P := Abelianization.lift w'
+    with hwhat_def
+  have hfac : w' = what.comp (Abelianization.of (G := ↥N)) := by
+    ext m
+    simp [hwhat_def]
+  have hkey : what (MonoidHom.transfer (Abelianization.of (G := ↥N)) g) = v g := by
+    have h1 : MonoidHom.transfer w' g = v g := by
+      rw [hw'_def, hv_def]
+      rw [transfer_transfer hPN ϕP]
+    rw [← h1]
+    conv_rhs => rw [hfac]
+    rw [OddOrder.GroupTheory.transfer_comp_left]
+    rfl
+  -- v g lies in L
+  have hvL : v g ∈ L := by
+    have h2 : v.range ≤ L := by
+      intro z hz
+      have hzW : z ∈ w'.range := hlt.le hz
+      have h3 : (⟨z, hzW⟩ : ↥(w'.range)) ∈ L₀ := by
+        apply hL₀_ge
+        rw [Subgroup.mem_subgroupOf]
+        exact hz
+      exact ⟨⟨z, hzW⟩, h3, rfl⟩
+    exact h2 ⟨g, rfl⟩
+  -- conclude: the transfer value lies in the image of M
+  have hsurj : Function.Surjective (Abelianization.of (G := ↥N)) := fun z =>
+    Quotient.exists_rep z
+  have hmap : M.map (Abelianization.of (G := ↥N)) = L.comap what := by
+    rw [hM_def, hfac, ← Subgroup.comap_comap]
+    exact Subgroup.map_comap_eq_self_of_surjective hsurj _
+  rw [hmap, Subgroup.mem_comap, hkey]
+  exact hvL
+
+end
+
 end OddOrder.Isaacs.Ch10
