@@ -4,22 +4,41 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Isaacs §3E: Hartley–Turull cluster (Lemmas 3.31–3.34, pp. 105-108)
 
-この leaf は Hartley–Turull 定理 (Thm 3.31) とその支持補題群のうち,
-まず **Lemma 3.33** (equivariant bijection lemma) を実装する:
-全部分群 `B ≤ A` の固定点数が一致する 2 つの有限 `A`-集合の間には
-`A`-equivariant 全単射が存在する (純組合せ; 群論的前提なし).
+この leaf は Hartley–Turull 定理 (Thm 3.31) とその支持補題群を実装する:
+
+* **Lemma 3.33** (equivariant bijection lemma): 全部分群 `B ≤ A` の固定点数が一致する
+  2 つの有限 `A`-集合の間には `A`-equivariant 全単射が存在する (純組合せ).
+* **Theorem 3.31** (Hartley–Turull): `A` が `G` に coprime に作用する
+  (どちらかが solvable) とき, **abelian** な群 `H` への `A`-作用で全部分群 `B ≤ A`
+  の固定点数が `G` と一致するものが存在する (しかも `|H| = |G|`).
 
 ## 主要結果
 
 | Isaacs # | Lean | 状態 |
 |---|---|---|
+| Thm 3.31 | `exists_abelian_fixedPoint_replacement` | ✅ |
+| Thm 3.31 step 1 | `exists_solvable_fixedPoint_replacement` | ✅ |
 | Lem 3.33 | `exists_equivariant_equiv_of_card_fixedPoints_eq` | ✅ |
 
-## 証明構造 (Isaacs pp. 105-106)
+## Thm 3.31 の証明構造 (Isaacs pp. 105-107)
+
+2 段構成. **Step 1** (`exists_solvable_fixedPoint_replacement`): `|G|` の各素因子 `p` に
+A-不変 Sylow `P_p` を選び (Thm 3.23(a)), `N := Π_p P_p` に成分ごとの `A`-作用を入れる.
+Lemma 3.32 を各 `B ≤ A` の制限作用に適用すると `|C_{P_p}(B)| = |P_p ∩ C_G(B)|` は
+`|C_G(B)|` の full `p`-part であり, 全素因子にわたる積で `|C_N(B)| = |C_G(B)|`.
+`N` は p-群の積ゆえ nilpotent (特に solvable). **Step 2**
+(`exists_abelian_replacement_aux`): solvable `N` に対し `|N|` の強帰納法.
+`N` 非可換なら `K := N' × (N/N')` に成分ごと作用を入れる. Cor 3.28 (coprime 固定点の
+商への全射性) から `|C_N(B)| = |N' ∩ C_N(B)| · |C_{N/N'}(B)|`
+(`card_fixedSubgroup_eq_mul_of_normal`) なので, `N'` と `N/N'` (いずれも位数減) の
+abelian 置換の積が `N` の abelian 置換になる.
+
+## Lem 3.33 の証明構造 (Isaacs pp. 105-106)
 
 `|Ω|` の強帰納法 (`exists_equivariant_equiv_aux`, motive は `ℕ` 上に取り
 `Ω`, `Λ` を型ごと一般化する).
@@ -346,6 +365,367 @@ theorem exists_equivariant_equiv_of_card_fixedPoints_eq
       exact ⟨fun h b hb => h ⟨b, hb⟩, fun h b => h b.1 b.2⟩)
   rw [← hΩ, ← hΛ]
   exact hcount B
+
+end
+
+section /- 3E: Theorem 3.31 Hartley–Turull (pp. 105-107) -/
+
+open OddOrder.GroupTheory (fixedSubgroup)
+open _root_.OddOrder.Isaacs.Ch03 (IsAInvariant)
+open scoped commutatorElement
+
+/-! ### 支持補題: 制限作用・積作用の固定点 -/
+
+/-- `A`-不変部分群は制限作用 `φ ∘ B.subtype` でも不変. -/
+private theorem isAInvariant_comp_subtype {G : Type*} [Group G] {φ : A →* MulAut G}
+    {N : Subgroup G} (hN : IsAInvariant φ N) (B : Subgroup A) :
+    IsAInvariant (φ.comp B.subtype) N :=
+  fun b => hN (B.subtype b)
+
+/-- 橋渡し: 制限作用 `φ ∘ B.subtype` の全体固定部分群は `fixedSubgroup φ B`. -/
+private theorem fixedSubgroup_comp_subtype_top {G : Type*} [Group G] (φ : A →* MulAut G)
+    (B : Subgroup A) :
+    fixedSubgroup (φ.comp B.subtype) (⊤ : Subgroup ↥B) = fixedSubgroup φ B := by
+  ext g
+  constructor
+  · intro h l hl
+    exact h ⟨l, hl⟩ trivial
+  · intro h b _
+    exact h b.1 b.2
+
+/-- `A`-不変部分群 `N` への制限作用の `B`-固定点は `N ⊓ C_G(B)` と同数
+(実際には部分群として一致する; カード形で使う). -/
+theorem card_fixedSubgroup_restrict {G : Type*} [Group G] {φ : A →* MulAut G}
+    {N : Subgroup G} (hN : IsAInvariant φ N) (B : Subgroup A) :
+    Nat.card ↥(fixedSubgroup hN.restrict B) = Nat.card ↥(N ⊓ fixedSubgroup φ B) :=
+  Nat.card_congr
+    { toFun := fun x => ⟨x.1.1,
+        Subgroup.mem_inf.mpr ⟨x.1.2, fun l hl => congrArg Subtype.val (x.2 l hl)⟩⟩
+      invFun := fun y => ⟨⟨y.1, (Subgroup.mem_inf.mp y.2).1⟩,
+        fun l hl => Subtype.ext ((Subgroup.mem_inf.mp y.2).2 l hl)⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+
+/-- 成分ごとの `MulAut` 作用の binary 積. -/
+private def prodMulAutHom {H₁ H₂ : Type*} [Group H₁] [Group H₂]
+    (ψ₁ : A →* MulAut H₁) (ψ₂ : A →* MulAut H₂) : A →* MulAut (H₁ × H₂) where
+  toFun a := (ψ₁ a).prodCongr (ψ₂ a)
+  map_one' := MulEquiv.ext fun x => by
+    change ((ψ₁ 1) x.1, (ψ₂ 1) x.2) = x
+    rw [map_one, map_one]
+    rfl
+  map_mul' a b := MulEquiv.ext fun x => by
+    change ((ψ₁ (a * b)) x.1, (ψ₂ (a * b)) x.2) =
+      ((ψ₁ a) ((ψ₁ b) x.1), (ψ₂ a) ((ψ₂ b) x.2))
+    rw [map_mul, map_mul]
+    rfl
+
+/-- Binary 積作用の固定点数は成分の固定点数の積. -/
+private theorem card_fixedSubgroup_prodMulAutHom {H₁ H₂ : Type*} [Group H₁] [Group H₂]
+    (ψ₁ : A →* MulAut H₁) (ψ₂ : A →* MulAut H₂) (B : Subgroup A) :
+    Nat.card ↥(fixedSubgroup (prodMulAutHom ψ₁ ψ₂) B) =
+      Nat.card ↥(fixedSubgroup ψ₁ B) * Nat.card ↥(fixedSubgroup ψ₂ B) := by
+  rw [← Nat.card_prod]
+  exact Nat.card_congr
+    { toFun := fun x => (⟨x.1.1, fun l hl => congrArg Prod.fst (x.2 l hl)⟩,
+        ⟨x.1.2, fun l hl => congrArg Prod.snd (x.2 l hl)⟩)
+      invFun := fun y => ⟨(y.1.1, y.2.1),
+        fun l hl => Prod.ext (y.1.2 l hl) (y.2.2 l hl)⟩
+      left_inv := fun x => rfl
+      right_inv := fun y => rfl }
+
+/-- 成分ごとの `MulAut` 作用の (依存) 有限積. -/
+private def piMulAutHom {ι : Type*} {M : ι → Type*} [∀ i, Group (M i)]
+    (ψ : ∀ i, A →* MulAut (M i)) : A →* MulAut (∀ i, M i) where
+  toFun a := MulEquiv.piCongrRight fun i => ψ i a
+  map_one' := MulEquiv.ext fun x => funext fun i => by
+    change (ψ i 1) (x i) = x i
+    rw [map_one]
+    rfl
+  map_mul' a b := MulEquiv.ext fun x => funext fun i => by
+    change (ψ i (a * b)) (x i) = (ψ i a) ((ψ i b) (x i))
+    rw [map_mul]
+    rfl
+
+/-- 積作用の固定点数は成分の固定点数の積 (依存 Pi 版). -/
+private theorem card_fixedSubgroup_piMulAutHom {ι : Type*} [Fintype ι] {M : ι → Type*}
+    [∀ i, Group (M i)] (ψ : ∀ i, A →* MulAut (M i)) (B : Subgroup A) :
+    Nat.card ↥(fixedSubgroup (piMulAutHom ψ) B) =
+      ∏ i, Nat.card ↥(fixedSubgroup (ψ i) B) := by
+  rw [← Nat.card_pi]
+  exact Nat.card_congr
+    { toFun := fun x i => ⟨x.1 i, fun l hl => congrFun (x.2 l hl) i⟩
+      invFun := fun y => ⟨fun i => (y i).1, fun l hl => funext fun i => (y i).2 l hl⟩
+      left_inv := fun x => rfl
+      right_inv := fun y => rfl }
+
+/-- 数値補助: `m ∣ n`, `n ≠ 0` なら `n` の全素因子にわたる `m` の p-part の積は `m`.
+(`m` の素因子は全て `n` の素因子で, 残りは `p^0 = 1`.) -/
+private theorem prod_primeFactors_pow_factorization_eq {n : ℕ} (hn : n ≠ 0) {m : ℕ}
+    (hm : m ∣ n) : ∏ p ∈ n.primeFactors, p ^ m.factorization p = m := by
+  have hm0 : m ≠ 0 := fun h => hn (zero_dvd_iff.mp (h ▸ hm))
+  have hsub : m.factorization.support ⊆ n.primeFactors := by
+    rw [Nat.support_factorization]
+    exact Nat.primeFactors_mono hm hn
+  have h : m.factorization.prod (fun p k => p ^ k) =
+      ∏ p ∈ n.primeFactors, p ^ m.factorization p :=
+    Finsupp.prod_of_support_subset m.factorization hsub (fun p k => p ^ k)
+      fun p _ => pow_zero p
+  rw [← h]
+  exact Nat.prod_factorization_pow_eq_self hm0
+
+/-! ### Step 1: nilpotent 化 (A-不変 Sylow の直積) -/
+
+/-- **Isaacs Thm 3.31, Step 1** (p. 106): coprime + solvable 作用 `φ : A →* MulAut G`
+に対し, **solvable** (実際には nilpotent) な群 `H` への作用 `ψ` で全部分群 `B ≤ A` の
+固定点数が `G` と一致し `|H| = |G|` となるものが存在する.
+
+**証明**: `|G|` の各素因子 `p` に A-不変 Sylow `P_p` を選び (Thm 3.23(a)),
+`H := Π_p P_p` に成分ごとの作用を入れる. Lemma 3.32 より各 `B` で
+`|C_{P_p}(B)| = |P_p ∩ C_G(B)|` は `|C_G(B)|` の full `p`-part なので, 積は
+`|C_G(B)|` に一致する. -/
+theorem exists_solvable_fixedPoint_replacement [Finite A]
+    {G : Type u} [Group G] [Finite G] (φ : A →* MulAut G)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    ∃ (H : Type u) (_ : Group H) (_ : Finite H) (ψ : A →* MulAut H),
+      IsSolvable H ∧ Nat.card H = Nat.card G ∧
+      ∀ B : Subgroup A,
+        Nat.card ↥(fixedSubgroup φ B) = Nat.card ↥(fixedSubgroup ψ B) := by
+  classical
+  have hPP : ∀ p : (Nat.card G).primeFactors,
+      ∃ P : Sylow (p : ℕ) G, IsAInvariant φ (P : Subgroup G) := fun p => by
+    haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+    exact exists_aInvariant_sylow hCop hSolv p
+  choose P hP using hPP
+  refine ⟨∀ p : (Nat.card G).primeFactors, ↥(P p : Subgroup G), inferInstance, inferInstance,
+    piMulAutHom fun p => (hP p).restrict, ?_, ?_, ?_⟩
+  · -- solvability: each factor is a p-group, hence nilpotent; a finite product of
+    -- nilpotent groups is nilpotent, hence solvable.
+    haveI : ∀ p : (Nat.card G).primeFactors, Group.IsNilpotent ↥(P p : Subgroup G) := by
+      intro p
+      haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+      exact (P p).isPGroup'.isNilpotent
+    infer_instance
+  · -- cardinality: ∏_p |P_p| = ∏_p p-part of |G| = |G|.
+    calc Nat.card (∀ p : (Nat.card G).primeFactors, ↥(P p : Subgroup G))
+        = ∏ p : (Nat.card G).primeFactors, Nat.card ↥(P p : Subgroup G) := Nat.card_pi
+      _ = ∏ p : (Nat.card G).primeFactors, (p : ℕ) ^ (Nat.card G).factorization (p : ℕ) := by
+          refine Finset.prod_congr rfl fun p _ => ?_
+          haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+          exact (P p).card_eq_multiplicity
+      _ = ∏ p ∈ (Nat.card G).primeFactors, p ^ (Nat.card G).factorization p :=
+          Finset.prod_finset_coe (fun p => p ^ (Nat.card G).factorization p) _
+      _ = Nat.card G := prod_primeFactors_pow_factorization_eq Nat.card_pos.ne' dvd_rfl
+  · -- fixed-point counts: Lemma 3.32 applied to the restricted B-action, prime by prime.
+    intro B
+    have hCopB : Nat.Coprime (Nat.card ↥B) (Nat.card G) :=
+      hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card B)
+    have hSolvB : IsSolvable ↥B ∨ IsSolvable G := by
+      rcases hSolv with hA | hG
+      · exact Or.inl (by haveI := hA; infer_instance)
+      · exact Or.inr hG
+    have hdvdC : Nat.card ↥(fixedSubgroup φ B) ∣ Nat.card G :=
+      Subgroup.card_subgroup_dvd_card _
+    calc Nat.card ↥(fixedSubgroup φ B)
+        = ∏ p ∈ (Nat.card G).primeFactors,
+            p ^ (Nat.card ↥(fixedSubgroup φ B)).factorization p :=
+          (prod_primeFactors_pow_factorization_eq Nat.card_pos.ne' hdvdC).symm
+      _ = ∏ p : (Nat.card G).primeFactors,
+            (p : ℕ) ^ (Nat.card ↥(fixedSubgroup φ B)).factorization (p : ℕ) :=
+          (Finset.prod_finset_coe
+            (fun p => p ^ (Nat.card ↥(fixedSubgroup φ B)).factorization p) _).symm
+      _ = ∏ p : (Nat.card G).primeFactors,
+            Nat.card ↥(fixedSubgroup ((hP p).restrict) B) := by
+          refine Finset.prod_congr rfl fun p _ => ?_
+          haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+          have h332 := card_inf_fixedSubgroup_of_aInvariant_sylow
+            (φ := φ.comp B.subtype) hCopB hSolvB (isAInvariant_comp_subtype (hP p) B)
+          rw [fixedSubgroup_comp_subtype_top] at h332
+          rw [card_fixedSubgroup_restrict (hP p) B, h332]
+      _ = Nat.card ↥(fixedSubgroup (piMulAutHom fun p => (hP p).restrict) B) :=
+          (card_fixedSubgroup_piMulAutHom _ B).symm
+
+/-! ### Step 2: abelian 化 (導来部分群と商の積, 位数の強帰納法) -/
+
+/-- **固定点数の積公式** (Isaacs p. 107 の核; Cor 3.28 の帰結): coprime + solvable 作用と
+`A`-不変正規部分群 `N ⊴ G` に対し `|C_G(B)| = |N ∩ C_G(B)| · |C_{G/N}(B)|`.
+
+**証明**: 制限 `C_G(B) → G/N` の核は `N ∩ C_G(B)`, 像は `C_{G/N}(B)` (像 ⊇ は
+Cor 3.28 = `coprime_fixedPoints_quotient` の `B`-制限作用への適用) で第一同型定理. -/
+theorem card_fixedSubgroup_eq_mul_of_normal [Finite A]
+    {G : Type u} [Group G] [Finite G] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} [N.Normal] (hN : IsAInvariant φ N) (B : Subgroup A) :
+    Nat.card ↥(fixedSubgroup φ B) =
+      Nat.card ↥(N ⊓ fixedSubgroup φ B) *
+        Nat.card ↥(fixedSubgroup hN.quotientMulAutHom B) := by
+  classical
+  have hCopB : Nat.Coprime (Nat.card ↥B) (Nat.card G) :=
+    hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card B)
+  have hSolvB : IsSolvable ↥B ∨ IsSolvable G := by
+    rcases hSolv with hA | hG
+    · exact Or.inl (by haveI := hA; infer_instance)
+    · exact Or.inr hG
+  let f : ↥(fixedSubgroup φ B) →* G ⧸ N :=
+    (QuotientGroup.mk' N).comp (fixedSubgroup φ B).subtype
+  -- range f = C_{G/N}(B); the ⊇ inclusion is Cor 3.28 for the restricted B-action.
+  have hrange : f.range = fixedSubgroup hN.quotientMulAutHom B := by
+    ext q
+    constructor
+    · rintro ⟨⟨c, hc⟩, rfl⟩
+      intro l hl
+      change hN.quotientMulAutHom l (QuotientGroup.mk' N c) = QuotientGroup.mk' N c
+      rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk', hc l hl]
+    · intro hq
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N q
+      have hg_fix : ∀ b : ↥B, ∃ n ∈ N, (φ b.1) g = g * n := by
+        intro b
+        have hb := hq b.1 b.2
+        rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
+          QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at hb
+        exact ⟨g⁻¹ * (φ b.1) g, by simpa using N.inv_mem hb, by group⟩
+      obtain ⟨c, hc_fix, n, hn_mem, hcn⟩ :=
+        coprime_fixedPoints_quotient (φ := φ.comp B.subtype) hCopB hSolvB
+          (isAInvariant_comp_subtype hN B) hg_fix
+      refine ⟨⟨c, fun l hl => hc_fix ⟨l, hl⟩⟩, ?_⟩
+      change QuotientGroup.mk' N c = QuotientGroup.mk' N g
+      rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq, hcn]
+      simpa using N.inv_mem hn_mem
+  -- ker f ≃ N ⊓ C_G(B).
+  have hker_card : Nat.card ↥f.ker = Nat.card ↥(N ⊓ fixedSubgroup φ B) := by
+    have hmem : ∀ x : ↥(fixedSubgroup φ B), x ∈ f.ker ↔ (x : G) ∈ N := by
+      intro x
+      rw [MonoidHom.mem_ker]
+      change QuotientGroup.mk' N (x : G) = 1 ↔ _
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact Nat.card_congr
+      { toFun := fun x => ⟨x.1.1, Subgroup.mem_inf.mpr ⟨(hmem x.1).mp x.2, x.1.2⟩⟩
+        invFun := fun y => ⟨⟨y.1, (Subgroup.mem_inf.mp y.2).2⟩,
+          (hmem ⟨y.1, (Subgroup.mem_inf.mp y.2).2⟩).mpr (Subgroup.mem_inf.mp y.2).1⟩
+        left_inv := fun x => rfl
+        right_inv := fun y => rfl }
+  have hquot_card : Nat.card (↥(fixedSubgroup φ B) ⧸ f.ker) =
+      Nat.card ↥(fixedSubgroup hN.quotientMulAutHom B) := by
+    rw [← hrange]
+    exact Nat.card_congr (QuotientGroup.quotientKerEquivRange f).toEquiv
+  calc Nat.card ↥(fixedSubgroup φ B)
+      = Nat.card (↥(fixedSubgroup φ B) ⧸ f.ker) * Nat.card ↥f.ker :=
+        Subgroup.card_eq_card_quotient_mul_card_subgroup f.ker
+    _ = Nat.card ↥(fixedSubgroup hN.quotientMulAutHom B) *
+          Nat.card ↥(N ⊓ fixedSubgroup φ B) := by rw [hquot_card, hker_card]
+    _ = Nat.card ↥(N ⊓ fixedSubgroup φ B) *
+          Nat.card ↥(fixedSubgroup hN.quotientMulAutHom B) := Nat.mul_comm _ _
+
+/-- Thm 3.31, Step 2 の帰納法エンジン: solvable な `G` は位数の強帰納法で abelian 置換
+をもつ. 非可換なら `G' × (G/G')` (成分位数はいずれも真に減る) に帰着し, 固定点数は
+`card_fixedSubgroup_eq_mul_of_normal` で分解する. -/
+private theorem exists_abelian_replacement_aux [Finite A] (n : ℕ) :
+    ∀ (G : Type u) [Group G] [Finite G] [IsSolvable G] (φ : A →* MulAut G),
+      Nat.card G = n →
+      Nat.Coprime (Nat.card A) (Nat.card G) →
+      ∃ (H : Type u) (_ : CommGroup H) (_ : Finite H) (ψ : A →* MulAut H),
+        Nat.card H = Nat.card G ∧
+        ∀ B : Subgroup A,
+          Nat.card ↥(fixedSubgroup φ B) = Nat.card ↥(fixedSubgroup ψ B) := by
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro G _ _ _ φ hn hCop
+    by_cases habel : commutator G = ⊥
+    · -- G is abelian: take H := G itself.
+      have hcomm : ∀ x y : G, x * y = y * x := by
+        intro x y
+        have hxy : ⁅x, y⁆ ∈ commutator G :=
+          Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y)
+        rw [habel, Subgroup.mem_bot] at hxy
+        exact commutatorElement_eq_one_iff_mul_comm.mp hxy
+      refine ⟨G, { ‹Group G› with mul_comm := hcomm }, ‹Finite G›, φ, rfl, ?_⟩
+      intro B
+      rfl
+    · -- G is nonabelian: recurse on G' and G/G'.
+      have hN_inv : IsAInvariant φ (commutator G) :=
+        OddOrder.Isaacs.Ch03.IsAInvariant.commutator_self φ
+      -- commutator G ≠ ⊤ (else the derived series never reaches ⊥).
+      have hN_ne_top : commutator G ≠ ⊤ := by
+        intro htop
+        have hall : ∀ k, derivedSeries G k = ⊤ := by
+          intro k
+          induction k with
+          | zero => exact derivedSeries_zero G
+          | succ k ihk => rw [derivedSeries_succ, ihk]; exact htop
+        obtain ⟨k, hk⟩ := IsSolvable.solvable (G := G)
+        rw [hall k] at hk
+        exact habel (le_bot_iff.mp (hk ▸ le_top))
+      -- both components have strictly smaller order.
+      have hlt₁ : Nat.card ↥(commutator G) < n := by
+        rcases lt_or_eq_of_le (Subgroup.card_le_card_group (commutator G)) with h | h
+        · omega
+        · exact absurd (Subgroup.eq_top_of_card_eq _ h) hN_ne_top
+      have hprod := Subgroup.card_eq_card_quotient_mul_card_subgroup (commutator G)
+      have hlt₂ : Nat.card (G ⧸ commutator G) < n := by
+        have h1 : 1 < Nat.card ↥(commutator G) :=
+          (Subgroup.one_lt_card_iff_ne_bot (commutator G)).mpr habel
+        have hq_pos : 0 < Nat.card (G ⧸ commutator G) := Nat.card_pos
+        calc Nat.card (G ⧸ commutator G)
+            < Nat.card (G ⧸ commutator G) * Nat.card ↥(commutator G) :=
+              (lt_mul_iff_one_lt_right hq_pos).mpr h1
+          _ = Nat.card G := hprod.symm
+          _ = n := hn
+      -- coprimality descends to both components.
+      have hCop_sub : Nat.Coprime (Nat.card A) (Nat.card ↥(commutator G)) :=
+        hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card _)
+      have hCop_quot : Nat.Coprime (Nat.card A) (Nat.card (G ⧸ commutator G)) :=
+        hCop.coprime_dvd_right (Subgroup.card_quotient_dvd_card _)
+      -- recursive calls.
+      obtain ⟨H₁, instH₁, instF₁, ψ₁, hcard₁, hfix₁⟩ :=
+        ih (Nat.card ↥(commutator G)) hlt₁ ↥(commutator G) hN_inv.restrict rfl hCop_sub
+      obtain ⟨H₂, instF₂', instF₂, ψ₂, hcard₂, hfix₂⟩ :=
+        ih (Nat.card (G ⧸ commutator G)) hlt₂ (G ⧸ commutator G)
+          hN_inv.quotientMulAutHom rfl hCop_quot
+      letI := instH₁
+      letI := instF₁
+      letI := instF₂'
+      letI := instF₂
+      refine ⟨H₁ × H₂, inferInstance, inferInstance, prodMulAutHom ψ₁ ψ₂, ?_, ?_⟩
+      · rw [Nat.card_prod, hcard₁, hcard₂, mul_comm]
+        exact (Subgroup.card_eq_card_quotient_mul_card_subgroup (commutator G)).symm
+      · intro B
+        rw [card_fixedSubgroup_prodMulAutHom ψ₁ ψ₂ B, ← hfix₁ B, ← hfix₂ B,
+          card_fixedSubgroup_restrict hN_inv B]
+        exact card_fixedSubgroup_eq_mul_of_normal hCop (Or.inr ‹IsSolvable G›) hN_inv B
+
+/-- **Isaacs Thm 3.31** (Hartley–Turull, pp. 105-107): `A` が有限群 `G` に coprime に
+自己同型作用し (`(|A|, |G|) = 1`), `A` か `G` の一方が solvable なら, **abelian** な
+有限群 `H` への作用 `ψ : A →* MulAut H` で
+
+* `|H| = |G|`, かつ
+* 全ての部分群 `B ≤ A` について `|C_G(B)| = |C_H(B)|`
+
+を満たすものが存在する.
+
+**証明** (Isaacs pp. 106-107): 2 段. Step 1 (`exists_solvable_fixedPoint_replacement`)
+で `G` を A-不変 Sylow の直積 (nilpotent, 特に solvable) に置換し (Lemma 3.32 で
+固定点数保存), Step 2 (`exists_abelian_replacement_aux`) で solvable 群を位数の
+強帰納法により `G' × (G/G')` を経て abelian 群に置換する (Cor 3.28 由来の積公式
+`card_fixedSubgroup_eq_mul_of_normal` で固定点数保存). -/
+theorem exists_abelian_fixedPoint_replacement [Finite A]
+    {G : Type u} [Group G] [Finite G] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    ∃ (H : Type u) (_ : CommGroup H) (_ : Finite H) (ψ : A →* MulAut H),
+      Nat.card H = Nat.card G ∧
+      ∀ B : Subgroup A,
+        Nat.card ↥(fixedSubgroup φ B) = Nat.card ↥(fixedSubgroup ψ B) := by
+  obtain ⟨N, instN, instNF, ψN, hsolvN, hcardN, hfixN⟩ :=
+    exists_solvable_fixedPoint_replacement φ hCop hSolv
+  letI := instN
+  letI := instNF
+  haveI := hsolvN
+  obtain ⟨H, instH, instHF, ψH, hcardH, hfixH⟩ :=
+    exists_abelian_replacement_aux (Nat.card N) N ψN rfl (by rw [hcardN]; exact hCop)
+  exact ⟨H, instH, instHF, ψH, by rw [hcardH, hcardN],
+    fun B => (hfixN B).trans (hfixH B)⟩
 
 end
 
