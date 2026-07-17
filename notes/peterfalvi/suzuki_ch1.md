@@ -32,25 +32,24 @@
    - **⚠ Lemma (b) `⟨Z⟩ ⊴ X` は未** (Prop 5 に不要ゆえ後回し)。証明: `Y` は `Z` を正規化
      (`y∈Y,z∈Z ⇒ yzy⁻¹∈Z`: `t(yzy⁻¹)t=(tyt)(tzt)(ty⁻¹t)=y z⁻¹ y⁻¹=(yzy⁻¹)⁻¹`)、
      `Z⊆⟨Z⟩`、`X=YZ` (Lemma a) より `X` が `⟨Z⟩=closure(invertedBy X t)` を正規化。
-1. **Prop 5 (p.101)** — `V=C_D(s)` ✅ / `W=C_D(H∩I)` 未。
-   - ✅ **`s`/`r` naming 完了** (`DistinguishedInvolution.lean`): `distinguishedInvolution`,
-     `structureConjugator` (`existsUnique_...`.exists.choose)、`structure_equation`、
-     `eq_distinguishedPair_of_structure` (一意性)。
-   - ✅ **`V=C_D(s)` 完了** (`CentralizerStructure.lean`): `V_le_centralizer_distinguishedInvolution`
-     (⊆) + `V_eq_centralizer_distinguishedInvolution` (=)。counting は `orbit_distinguishedInvolution_eq`
-     (`sᴰ=H∩I`) + Lemma(a) `|D|=|V||K|` + Prop 3 `|K|=|H∩I|` + orbit-stab (ConjAct, stabilizer=C_D(s))。
-     specialization identity `hyp.KSet = invertedBy hyp.D hyp.t` は定義的一致で Lemma(a) 直接適用。
-   - **⚠ `W=C_D(H∩I)` 未 (次)**: `W:=V⊓centralizer KSet = C_V(K)` (定義)。`V=C_D(s)` より
-     `W = D ⊓ centralizer {s} ⊓ centralizer KSet`。目標 `W = D ⊓ centralizer (H∩I set)`。
-     - ⊆: s,K を中心化 ⇒ 各 `s^k=k⁻¹sk` を中心化 (積)。容易。
-     - ⊇ (要点): `d∈D` が `H∩I` を中心化 ⇒ `d` は `s∈H∩I` を中心化 ⇒ `d∈C_D(s)=V` (V=C_D(s) 使用)
-       ⇒ `V` は `K` を正規化 (`v∈V,k∈K ⇒ vkv⁻¹∈K`: `t(vkv⁻¹)t=(tvt)(tkt)(tv⁻¹t)=v k⁻¹ v⁻¹`,
-       v は t と可換 tvt=v) ⇒ `dkd⁻¹∈K` かつ `s^{dkd⁻¹}=s^k` (d が s^k と s を中心化) ⇒
-       **Prop 3 の `k↦s^k` 単射性**で `dkd⁻¹=k` ⇒ `d∈C_D(K)`。
-     - **要 exposure**: Prop 3 injectivity は `image_conj_KSet_eq_involutions_H` 内部の `hinjK`
-       (未公開)。`InvolutionClass.lean` に `injOn_conj_KSet` 等で公開 lemma 化 or 再導出が必要。
-       V normalizes K も新 lemma (`vkv⁻¹∈K`) で用意。
-2. **Prop 6 (p.101–102)** — `X⊆D` で `|Ω_X|≥3` の下での構造 (Prop 1(a) 型二重推移)。
+1. ✅ **Prop 5 (p.101) 完了** — `V=C_D(s)` + `W=C_D(H∩I)`。
+   - `DistinguishedInvolution.lean`: `distinguishedInvolution`, `structureConjugator`,
+     `structure_equation`, `eq_distinguishedPair_of_structure` (一意性)。
+   - `CentralizerStructure.lean`: `V_eq_centralizer_distinguishedInvolution` (counting は
+     `orbit_distinguishedInvolution_eq` + Lemma(a) `|D|=|V||K|` + Prop 3 + orbit-stab) /
+     `W_eq_centralizer_involutions_H` (`W = D ⊓ centralizer (H∩I involutions set)`;
+     ⊇ は `conj_mem_KSet_of_mem_V` (V normalizes K) + `injOn_conj_KSet` で `wkw⁻¹=k`)。
+   - `InvolutionClass.lean`: Prop 3 injectivity を `injOn_conj_KSet` として公開 lemma 化。
+2. **Prop 6 (p.101–102) 未 (次)** — `X⊆D`, `|Ω_X|≥3`:
+   (a) `C_G(X)` は `Ω_X` 上二重可移 + `C_H(X)=C_Q(X)⋊C_D(X)`。証明: Q regular on Ω−{H},
+       `H₁∈Ω_X−{H}` に `y∈Q, H^{ty}=H₁` → `x∈X` で `H^{ty}=H₁ˣ=H^{tyx}=H^{tx⁻¹yx}`
+       (x∈D⊆H^t で `H^{tx⁻¹}=H^t`) → regularity で `y=x⁻¹yx` → `C_Q(X)` regular on
+       `Ω_X−{H}`。対称に `C_{Q^t}(X)` transitive on `Ω_X−{H^t}` → 2-transitive。
+   (b) `|C_Q(X)|` 偶数。証明: (a)→`|C_G(X)|` 偶 (2-trans, |Ω_X|(|Ω_X|−1) | order) →
+       involution `u∈C_G(X)` → `u∈H'`, Prop 1(b) `X⊆C_G(u)⊆H'` → `H'∈Ω_X` →
+       transitivity で `|C_H(X)|=|C_{H'}(X)|` 偶 → `C_D(X)` 奇 (D 奇) → `C_Q(X)` 偶。
+   (c) `X` は D-conjugate to subgroup of `V`。証明: (b)+Prop 3 → `s^k∈C_Q(X)` →
+       `X⊆C_D(s^k)=Vᵏ` (Prop 5)。
 3. 以降 Ch.I §2 (`Cor`: S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
 4. **Lemma (b) `⟨Z⟩◁X` 未** (InvertedProduct.lean, Prop 5 に不要で後回し; §0 参照)。
