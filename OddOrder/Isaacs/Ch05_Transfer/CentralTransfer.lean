@@ -112,7 +112,7 @@ theorem not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center
       _ = g₀⁻¹ * (g₀ * z₀.val ^ k) := by rw [hcomm]
       _ = z₀.val ^ k := by group
   have hv_z_val : (v z₀.val).val = z₀.val ^ (P : Subgroup G).index := by
-    show ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
+    change ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
         ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
           (MonoidHom.id (P : Subgroup G)) _) z₀.val).val = _
     rw [@MonoidHom.transfer_eq_pow G _ (P : Subgroup G) (P : Subgroup G)

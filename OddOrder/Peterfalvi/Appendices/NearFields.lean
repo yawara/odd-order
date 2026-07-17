@@ -59,8 +59,8 @@ additive by the right distributive law, and bijective because `a` is invertible.
 def rightMul (a : F) (ha : a ≠ 0) : F ≃+ F where
   toFun x := x * a
   invFun x := x * a⁻¹
-  left_inv x := by show (x * a) * a⁻¹ = x; rw [mul_assoc, mul_inv_cancel₀ ha, mul_one]
-  right_inv x := by show (x * a⁻¹) * a = x; rw [mul_assoc, inv_mul_cancel₀ ha, mul_one]
+  left_inv x := by change (x * a) * a⁻¹ = x; rw [mul_assoc, mul_inv_cancel₀ ha, mul_one]
+  right_inv x := by change (x * a⁻¹) * a = x; rw [mul_assoc, inv_mul_cancel₀ ha, mul_one]
   map_add' x y := NearField.add_mul x y a
 
 @[simp] theorem rightMul_apply (a : F) (ha : a ≠ 0) (x : F) : rightMul a ha x = x * a := rfl
@@ -71,7 +71,7 @@ theorem addOrderOf_eq_of_ne_zero (x y : F) (hx : x ≠ 0) (hy : y ≠ 0) :
     addOrderOf x = addOrderOf y := by
   have hne : x⁻¹ * y ≠ 0 := mul_ne_zero (inv_ne_zero hx) hy
   have hxy : y = (rightMul (x⁻¹ * y) hne) x := by
-    show y = x * (x⁻¹ * y); rw [← mul_assoc, mul_inv_cancel₀ hx, one_mul]
+    change y = x * (x⁻¹ * y); rw [← mul_assoc, mul_inv_cancel₀ hx, one_mul]
   rw [hxy]
   exact (addOrderOf_injective (rightMul (x⁻¹ * y) hne).toAddMonoidHom
     (rightMul (x⁻¹ * y) hne).injective x).symm
@@ -128,12 +128,12 @@ noncomputable def rightMulAction (A : Subgroup Fˣ)
   map_one' := by
     ext x
     apply Multiplicative.toAdd.injective
-    show Multiplicative.toAdd x * (((1 : A) : Fˣ) : F) = Multiplicative.toAdd x
+    change Multiplicative.toAdd x * (((1 : A) : Fˣ) : F) = Multiplicative.toAdd x
     rw [OneMemClass.coe_one, Units.val_one, mul_one]
   map_mul' u v := by
     ext x
     apply Multiplicative.toAdd.injective
-    show Multiplicative.toAdd x * (((u * v : A) : Fˣ) : F)
+    change Multiplicative.toAdd x * (((u * v : A) : Fˣ) : F)
       = Multiplicative.toAdd x * (((v : Fˣ) : F)) * (((u : Fˣ) : F))
     have hc' : ((u : Fˣ) : F) * ((v : Fˣ) : F) = ((v : Fˣ) : F) * ((u : Fˣ) : F) := by
       rw [← Units.val_mul, ← Units.val_mul, hcomm u v]
@@ -571,7 +571,7 @@ noncomputable instance : NearField (Twisted d) :=
     zero_mul := d.zero_twMul
     mul_zero := d.twMul_zero
     inv_zero := by
-      show d.twAut (d.twExp (0 : K)) (0 : K)⁻¹ = (0 : K)
+      change d.twAut (d.twExp (0 : K)) (0 : K)⁻¹ = (0 : K)
       simp
     mul_inv_cancel := fun a ha => d.twMul_twInv ha
     exists_pair_ne := ⟨(0 : K), (1 : K), (zero_ne_one : (0 : K) ≠ 1)⟩

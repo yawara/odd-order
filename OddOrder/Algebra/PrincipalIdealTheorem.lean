@@ -1289,7 +1289,7 @@ theorem exists_annihilator_transferXi [Finite G] (h : _root_.commutator G ≤ K)
   have hεc : sectionWeightedSum G K e f = c • sectionSum G K f := by
     have hec : e = fun _ => c := funext hconst
     rw [hec, sectionWeightedSum, sectionSum]
-    show ∑ q : G ⧸ K, MonoidAlgebra.single (f q) c
+    change ∑ q : G ⧸ K, MonoidAlgebra.single (f q) c
         = c • ∑ q : G ⧸ K, MonoidAlgebra.of ℤ G (f q)
     refine Eq.trans (Finset.sum_congr rfl fun q _ => ?_) Finset.smul_sum.symm
     rw [MonoidAlgebra.of_apply, MonoidAlgebra.smul_single', mul_one]

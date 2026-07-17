@@ -158,7 +158,7 @@ lemma mem_normalizer_of_sylow_le_conj (P : Sylow p G) {x : G}
   set P₀ : Sylow p ↥N := P.subtype hP_le_N with hP₀_def
   haveI : (P₀ : Subgroup ↥N).Normal := by
     rw [hP₀_def]
-    show ((P : Subgroup G).subgroupOf N).Normal
+    change ((P : Subgroup G).subgroupOf N).Normal
     infer_instance
   have hinj : Function.Injective (MulAut.conj x⁻¹).toMonoidHom :=
     (MulAut.conj x⁻¹).injective
@@ -294,7 +294,7 @@ private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
       rw [MonoidHom.map_closure]
       rw [Subgroup.closure_le]
       rintro - ⟨s, hs_lt, rfl⟩
-      show mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x s
+      change mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x s
         ∈ M.map (Abelianization.of (G := ↥N))
       have hzmem : x⁻¹ * ((s : ↥Pg) : G) * x ∈ N := hmem_conj s
       have hzM : (⟨x⁻¹ * ((s : ↥Pg) : G) * x, hzmem⟩ : ↥N) ∈ M := by
@@ -311,7 +311,7 @@ private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
             (MulAut.conj x⁻¹).injective (((s : ↥Pg) : G))
           have h6 : (MulAut.conj x⁻¹).toMonoidHom (((s : ↥Pg) : G))
               = x⁻¹ * ((s : ↥Pg) : G) * x := by
-            show x⁻¹ * _ * x⁻¹⁻¹ = _
+            change x⁻¹ * _ * x⁻¹⁻¹ = _
             rw [inv_inv]
           rw [h6] at h5
           exact h5
@@ -363,7 +363,7 @@ private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
         apply e.injective
         rw [MulEquiv.apply_symm_apply]
         refine Subtype.ext ?_
-        show x * (x⁻¹ * ((s : ↥Pg) : G) * x) * x⁻¹ = ((s : ↥Pg) : G)
+        change x * (x⁻¹ * ((s : ↥Pg) : G) * x) * x⁻¹ = ((s : ↥Pg) : G)
         group
       have hvalue : mackeyRes (K := Pg) (Abelianization.of (G := ↥N)) x s
           = Abelianization.of ⟨x⁻¹ * ((s : ↥Pg) : G) * x, hmem_conj s⟩ := rfl
@@ -433,7 +433,7 @@ theorem exists_surjective_wreath_of_transfer_range_lt (P : Sylow p G)
   set P₀ : Sylow p ↥N := P.subtype hPN with hP₀_def
   haveI : (P₀ : Subgroup ↥N).Normal := by
     rw [hP₀_def]
-    show (Pg.subgroupOf N).Normal
+    change (Pg.subgroupOf N).Normal
     rw [hN_def, hPg_def]
     infer_instance
   have hnP₀ : n ∈ (P₀ : Subgroup ↥N) := mem_sylow_of_orderOf_prime_pow P₀ ha

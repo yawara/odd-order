@@ -896,17 +896,17 @@ private noncomputable def dihedralIsoOfInverting
   have hfwd_mul : ∀ x y : DihedralGroup N, fwd (x * y) = fwd x * fwd y := by
     rintro (i | i) (j | j) <;> simp only [fwd]
     · -- r i * r j = r (i+j)
-      show c ^ (i + j).val = c ^ i.val * c ^ j.val
+      change c ^ (i + j).val = c ^ i.val * c ^ j.val
       exact hc_addval i j
     · -- r i * sr j = sr (j - i)
-      show a * c ^ (j - i).val = c ^ i.val * (a * c ^ j.val)
+      change a * c ^ (j - i).val = c ^ i.val * (a * c ^ j.val)
       rw [← mul_assoc]
       exact (h_sr_r i j).symm
     · -- sr i * r j = sr (i + j)
-      show a * c ^ (i + j).val = a * c ^ i.val * c ^ j.val
+      change a * c ^ (i + j).val = a * c ^ i.val * c ^ j.val
       rw [mul_assoc, ← hc_addval]
     · -- sr i * sr j = r (j - i)
-      show c ^ (j - i).val = a * c ^ i.val * (a * c ^ j.val)
+      change c ^ (j - i).val = a * c ^ i.val * (a * c ^ j.val)
       rw [mul_assoc, ← mul_assoc (c ^ i.val), h_sr_r, ← mul_assoc]
       rw [show a * a = 1 from by rw [← sq, h_a_sq], one_mul]
   -- Assemble.
