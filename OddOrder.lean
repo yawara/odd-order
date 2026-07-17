@@ -1,3 +1,4 @@
+import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.GroupTheory.AInvariantComplement
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.CentralProduct
