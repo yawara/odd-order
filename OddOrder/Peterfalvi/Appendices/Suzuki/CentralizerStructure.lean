@@ -5,6 +5,9 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
+import Mathlib.GroupTheory.GroupAction.ConjAct
+import Mathlib.GroupTheory.GroupAction.Quotient
+import Mathlib.GroupTheory.Index
 
 /-!
 # Peterfalvi Part II, Ch. I §1: Proposition 5 (`V = C_D(s)`, `W = C_D(H∩I)`)
@@ -92,6 +95,114 @@ theorem V_le_centralizer_distinguishedInvolution :
     rw [show v * (v⁻¹ * s * v) = s * v from by group] at h2
     exact h2.symm
   exact Subgroup.mem_inf.mpr ⟨hvD, Subgroup.mem_centralizer_singleton_iff.mpr hcomm⟩
+
+/-! ## `V = C_D(s)` (p. 101) -/
+
+/-- `sᴰ = H ∩ I`: the `D`-conjugacy class of the distinguished involution is
+exactly the set of involutions of `H` (Prop 2(a)/Prop 3). -/
+theorem orbit_distinguishedInvolution_eq
+    (act : MulAction (↥hyp.D) G)
+    (hsmul : ∀ d : ↥hyp.D, d • hyp.distinguishedInvolution =
+      (↑d : G) * hyp.distinguishedInvolution * (↑d : G)⁻¹) :
+    MulAction.orbit (↥hyp.D) hyp.distinguishedInvolution =
+      {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
+  set s := hyp.distinguishedInvolution with hs
+  have hsH : s ∈ hyp.H := hyp.distinguishedInvolution_mem_H
+  have hs2 : s ^ 2 = 1 := hyp.distinguishedInvolution_sq
+  have hs1 : s ≠ 1 := hyp.distinguishedInvolution_ne_one
+  ext w
+  simp only [MulAction.mem_orbit_iff, Set.mem_setOf_eq]
+  constructor
+  · rintro ⟨d, rfl⟩
+    have hdH : (↑d : G) ∈ hyp.H := hyp.D_le_H d.2
+    rw [hsmul d]
+    refine ⟨?_, ?_, ?_⟩
+    · rw [sq]
+      calc (↑d * s * (↑d)⁻¹) * (↑d * s * (↑d)⁻¹) = ↑d * (s * s) * (↑d)⁻¹ := by group
+        _ = 1 := by rw [← sq, hs2]; group
+    · intro h
+      apply hs1
+      have h2 : (↑d : G)⁻¹ * (↑d * s * (↑d)⁻¹) * ↑d = (↑d : G)⁻¹ * 1 * ↑d := by rw [h]
+      rw [show (↑d : G)⁻¹ * (↑d * s * (↑d)⁻¹) * ↑d = s from by group,
+        show (↑d : G)⁻¹ * 1 * ↑d = 1 from by group] at h2
+      exact h2
+    · exact mul_mem (mul_mem hdH hsH) (inv_mem hdH)
+  · rintro ⟨hw2, hw1, hwH⟩
+    have himg := hyp.image_conj_KSet_eq_involutions_H hsH hs2 hs1
+    have hw : w ∈ (fun k : G => k⁻¹ * s * k) '' hyp.KSet := by
+      rw [himg]; exact ⟨hw2, hw1, hwH⟩
+    obtain ⟨k, hkK, hkw⟩ := hw
+    refine ⟨⟨k⁻¹, hyp.D.inv_mem hkK.1⟩, ?_⟩
+    rw [hsmul]
+    show (k⁻¹ : G) * s * (k⁻¹)⁻¹ = w
+    rw [inv_inv]; exact hkw
+
+/-- **Peterfalvi Part II, Ch. I Prop 5** (p. 101) — `V = C_D(s)`.  Combining
+`V ⊆ C_D(s)` with `|D| = |V||K|` (Lemma (a)), `|K| = |H∩I|` (Prop 3) and
+`|D| = |H∩I|·|C_D(s)|` (orbit–stabilizer, `sᴰ = H∩I`). -/
+theorem V_eq_centralizer_distinguishedInvolution :
+    hyp.V = hyp.D ⊓ Subgroup.centralizer {hyp.distinguishedInvolution} := by
+  classical
+  set s := hyp.distinguishedInvolution with hs
+  have hsH : s ∈ hyp.H := hyp.distinguishedInvolution_mem_H
+  have hs2 : s ^ 2 = 1 := hyp.distinguishedInvolution_sq
+  -- the D-conjugation action
+  letI act : MulAction (↥hyp.D) G :=
+    MulAction.compHom G (ConjAct.toConjAct.toMonoidHom.comp hyp.D.subtype)
+  have hsmul : ∀ d : ↥hyp.D, d • s = (↑d : G) * s * (↑d : G)⁻¹ :=
+    fun d => ConjAct.toConjAct_smul _ _
+  -- (I) Lemma (a): |D| = |V| * |K|
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  have hnorm : ∀ x ∈ hyp.D, hyp.t * x * hyp.t ∈ hyp.D := by
+    intro x hx
+    have := hyp.t_conj_mem_D hx
+    rwa [hyp.t_inv_eq] at this
+  have hLemma : Nat.card ↥hyp.D = Nat.card ↥hyp.V * hyp.KSet.ncard :=
+    card_eq_card_centralizer_mul_ncard_invertedBy (X := hyp.D) (t := hyp.t)
+      htt hyp.D_odd hnorm
+  -- (II) |K| = |H∩I|
+  have hKHI : hyp.KSet.ncard = {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard :=
+    hyp.ncard_KSet_eq
+  -- stabilizer = C_D(s), so |stab| = |C_D(s)|
+  have hstab_eq : MulAction.stabilizer (↥hyp.D) s =
+      (Subgroup.centralizer {s}).subgroupOf hyp.D := by
+    ext d
+    rw [MulAction.mem_stabilizer_iff, hsmul d, Subgroup.mem_subgroupOf,
+      Subgroup.mem_centralizer_singleton_iff, mul_inv_eq_iff_eq_mul]
+  have hstabcard : Nat.card (MulAction.stabilizer (↥hyp.D) s) =
+      Nat.card ↥(hyp.D ⊓ Subgroup.centralizer {s}) := by
+    rw [hstab_eq, ← Subgroup.inf_subgroupOf_left]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
+  -- (III) orbit = H∩I, so |orbit| = |H∩I|
+  have horbit_card : Nat.card (MulAction.orbit (↥hyp.D) s) =
+      {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard := by
+    rw [hyp.orbit_distinguishedInvolution_eq act hsmul, Nat.card_coe_set_eq]
+  -- orbit–stabilizer: |D| = |orbit| * |stab|
+  have horbit_index : Nat.card (MulAction.orbit (↥hyp.D) s) =
+      (MulAction.stabilizer (↥hyp.D) s).index := by
+    rw [Subgroup.index_eq_card]
+    exact Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (↥hyp.D) s)
+  have hcount : Nat.card ↥hyp.D =
+      {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard *
+        Nat.card ↥(hyp.D ⊓ Subgroup.centralizer {s}) := by
+    rw [← horbit_card, ← hstabcard, horbit_index,
+      (MulAction.stabilizer (↥hyp.D) s).index_mul_card]
+  -- combine: |V| = |C_D(s)|
+  have hHIpos : 0 < {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard := by
+    apply Set.ncard_pos (Set.toFinite _) |>.mpr
+    exact ⟨s, hs2, hyp.distinguishedInvolution_ne_one, hsH⟩
+  have hVcard : Nat.card ↥hyp.V = Nat.card ↥(hyp.D ⊓ Subgroup.centralizer {s}) := by
+    have h1 : Nat.card ↥hyp.V * {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard
+        = Nat.card ↥(hyp.D ⊓ Subgroup.centralizer {s}) *
+          {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard := by
+      rw [mul_comm (Nat.card ↥(hyp.D ⊓ _)), ← hcount, hLemma, hKHI]
+    exact Nat.eq_of_mul_eq_mul_right hHIpos h1
+  -- V ⊆ C_D(s) and equal card ⟹ equal
+  have hle := hyp.V_le_centralizer_distinguishedInvolution
+  apply SetLike.coe_injective
+  apply Set.eq_of_subset_of_ncard_le (SetLike.coe_subset_coe.mpr hle) ?_ (Set.toFinite _)
+  rw [← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq]
+  exact le_of_eq hVcard.symm
 
 end Hypothesis
 
