@@ -433,6 +433,11 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable
 
+-- Ch.9 (More on Subnormality): Lem 9.6 — a minimal normal subgroup of a finite group is
+-- abelian or semisimple.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms
