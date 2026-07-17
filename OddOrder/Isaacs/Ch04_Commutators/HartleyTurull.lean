@@ -24,6 +24,7 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 | Thm 3.31 | `exists_abelian_fixedPoint_replacement` | ✅ |
 | Thm 3.31 step 1 | `exists_solvable_fixedPoint_replacement` | ✅ |
 | Lem 3.33 | `exists_equivariant_equiv_of_card_fixedPoints_eq` | ✅ |
+| Thm 3.34 | `exists_orbit_card_mul_of_coprime_orbit_card` | ✅ |
 
 ## Thm 3.31 の証明構造 (Isaacs pp. 105-107)
 
@@ -726,6 +727,452 @@ theorem exists_abelian_fixedPoint_replacement [Finite A]
     exists_abelian_replacement_aux (Nat.card N) N ψN rfl (by rw [hcardN]; exact hCop)
   exact ⟨H, instH, instHF, ψH, by rw [hcardH, hcardN],
     fun B => (hfixN B).trans (hfixH B)⟩
+
+end
+
+section /- 3E: Theorem 3.34 coprime orbit sizes multiply (pp. 107-108) -/
+
+open OddOrder.GroupTheory (fixedSubgroup)
+open _root_.OddOrder.Isaacs.Ch03 (IsAInvariant)
+open scoped Pointwise
+
+/-! ### 支持補題: 群作用下の積の fiber 分解 -/
+
+/-- 補助 (fiber 分解): 有限群 `T` が可換モノイド `H` に作用するとき, 全群にわたる積
+`∏_{t : T} t • u` は軌道上の積の固定化群位数乗に等しい:
+`∏_{t : T} t • u = (∏_{v ∈ T•u} v) ^ |Stab_T(u)|`.
+(quotient map の fiber = 剰余類で括り, 各 fiber 上で値が一定であることを使う.)
+Thm 3.34 の τ-論法 (p. 108) の核. -/
+private theorem prod_smul_eq_prod_orbit_pow {T : Type*} [Group T] [Fintype T]
+    {H : Type*} [CommMonoid H] [MulAction T H] (u : H)
+    [Fintype ↥(MulAction.orbit T u)] :
+    ∏ t : T, t • u =
+      (∏ v : ↥(MulAction.orbit T u), (v : H)) ^ Nat.card ↥(MulAction.stabilizer T u) := by
+  classical
+  -- (a) reindex along the sigma decomposition of T into fibers of the quotient map.
+  have h1 : ∏ t : T, t • u =
+      ∏ p : Σ q : T ⧸ MulAction.stabilizer T u,
+        {t : T // QuotientGroup.mk t = q}, (p.2.1 : T) • u :=
+    (Equiv.prod_comp
+      (Equiv.sigmaFiberEquiv (QuotientGroup.mk : T → T ⧸ MulAction.stabilizer T u))
+      (fun t : T => t • u)).symm
+  have h2 : ∏ p : Σ q : T ⧸ MulAction.stabilizer T u,
+      {t : T // QuotientGroup.mk t = q}, (p.2.1 : T) • u =
+      ∏ q : T ⧸ MulAction.stabilizer T u,
+        ∏ tf : {t : T // QuotientGroup.mk t = q}, (tf.1 : T) • u := by
+    rw [← Finset.univ_sigma_univ, Finset.prod_sigma]
+  -- (b) on each fiber the factor is the constant `q.out • u`, and fibers have |Stab| elements.
+  have hfib : ∀ q : T ⧸ MulAction.stabilizer T u,
+      ∏ tf : {t : T // QuotientGroup.mk t = q}, (tf.1 : T) • u =
+        (q.out • u) ^ Nat.card ↥(MulAction.stabilizer T u) := by
+    intro q
+    have hconst : ∀ tf : {t : T // QuotientGroup.mk t = q}, (tf.1 : T) • u = q.out • u := by
+      intro tf
+      have hmem : q.out⁻¹ * tf.1 ∈ MulAction.stabilizer T u :=
+        QuotientGroup.eq.mp ((QuotientGroup.out_eq' q).trans tf.2.symm)
+      calc (tf.1 : T) • u = (q.out * (q.out⁻¹ * tf.1)) • u := by
+            rw [← mul_assoc, mul_inv_cancel, one_mul]
+        _ = q.out • ((q.out⁻¹ * tf.1) • u) := mul_smul _ _ _
+        _ = q.out • u := by rw [MulAction.mem_stabilizer_iff.mp hmem]
+    have hcard : Fintype.card {t : T // QuotientGroup.mk t = q} =
+        Nat.card ↥(MulAction.stabilizer T u) := by
+      rw [← Nat.card_eq_fintype_card]
+      exact Nat.card_congr
+        { toFun := fun tf => ⟨q.out⁻¹ * tf.1,
+            QuotientGroup.eq.mp ((QuotientGroup.out_eq' q).trans tf.2.symm)⟩
+          invFun := fun s => ⟨q.out * s.1, by
+            have h : ((q.out : T) : T ⧸ MulAction.stabilizer T u) = ↑(q.out * s.1) :=
+              QuotientGroup.eq.mpr (by
+                rw [← mul_assoc, inv_mul_cancel, one_mul]
+                exact s.2)
+            rw [← h]
+            exact QuotientGroup.out_eq' q⟩
+          left_inv := fun tf => Subtype.ext (by
+            change q.out * (q.out⁻¹ * tf.1) = tf.1
+            rw [← mul_assoc, mul_inv_cancel, one_mul])
+          right_inv := fun s => Subtype.ext (by
+            change q.out⁻¹ * (q.out * s.1) = s.1
+            rw [← mul_assoc, inv_mul_cancel, one_mul]) }
+    calc ∏ tf : {t : T // QuotientGroup.mk t = q}, (tf.1 : T) • u
+        = ∏ _tf : {t : T // QuotientGroup.mk t = q}, q.out • u :=
+          Finset.prod_congr rfl fun tf _ => hconst tf
+      _ = (q.out • u) ^ Nat.card ↥(MulAction.stabilizer T u) := by
+          rw [Finset.prod_const, Finset.card_univ, hcard]
+  -- (c) reindex the quotient product over the orbit.
+  have h5 : ∏ q : T ⧸ MulAction.stabilizer T u, q.out • u =
+      ∏ v : ↥(MulAction.orbit T u), (v : H) := by
+    rw [← Equiv.prod_comp (MulAction.orbitEquivQuotientStabilizer T u).symm
+        (fun v : ↥(MulAction.orbit T u) => (v : H))]
+    refine Finset.prod_congr rfl fun q _ => ?_
+    conv_rhs => rw [← QuotientGroup.out_eq' q]
+    exact (MulAction.orbitEquivQuotientStabilizer_symm_apply T u q.out).symm
+  calc ∏ t : T, t • u
+      = ∏ p : Σ q : T ⧸ MulAction.stabilizer T u,
+          {t : T // QuotientGroup.mk t = q}, (p.2.1 : T) • u := h1
+    _ = ∏ q : T ⧸ MulAction.stabilizer T u,
+          ∏ tf : {t : T // QuotientGroup.mk t = q}, (tf.1 : T) • u := h2
+    _ = ∏ q : T ⧸ MulAction.stabilizer T u,
+          (q.out • u) ^ Nat.card ↥(MulAction.stabilizer T u) :=
+        Finset.prod_congr rfl fun q _ => hfib q
+    _ = (∏ q : T ⧸ MulAction.stabilizer T u, q.out • u) ^
+          Nat.card ↥(MulAction.stabilizer T u) := Finset.prod_pow _ _ _
+    _ = (∏ v : ↥(MulAction.orbit T u), (v : H)) ^
+          Nat.card ↥(MulAction.stabilizer T u) := by rw [h5]
+
+/-- 補助: `e : H ≃* H` が有限集合 `s` を setwise に保つなら `s` の全要素の積を固定する. -/
+private theorem mulEquiv_prod_set_coe {H : Type*} [CommMonoid H] (e : H ≃* H)
+    {s : Set H} [Fintype ↥s] (hs : ∀ v ∈ s, e v ∈ s) :
+    e (∏ v : ↥s, (v : H)) = ∏ v : ↥s, (v : H) := by
+  rw [map_prod]
+  have hbij : Function.Bijective (fun v : ↥s => (⟨e v.1, hs v.1 v.2⟩ : ↥s)) :=
+    Finite.injective_iff_bijective.mp fun v w h =>
+      Subtype.ext (e.injective (congrArg Subtype.val h))
+  exact Equiv.prod_comp (Equiv.ofBijective _ hbij) (fun v : ↥s => (v : H))
+
+/-- 補助: `s` が `|H|` と coprime なら, `y ^ s ∈ K` から `y ∈ K` が従う
+(商群 `H/K` での位数論法; `H` abelian で `K` は自動的に正規). -/
+private theorem mem_of_pow_mem_of_coprime {H : Type*} [CommGroup H] [Finite H]
+    (K : Subgroup H) {y : H} {s : ℕ} (hs : Nat.Coprime s (Nat.card H))
+    (h : y ^ s ∈ K) : y ∈ K := by
+  have h1 : (QuotientGroup.mk' K) y ^ s = 1 := by
+    rw [← map_pow]
+    exact (QuotientGroup.eq_one_iff _).mpr h
+  have h2 : orderOf ((QuotientGroup.mk' K) y) ∣ s := orderOf_dvd_of_pow_eq_one h1
+  have h3 : orderOf ((QuotientGroup.mk' K) y) ∣ Nat.card H :=
+    (orderOf_dvd_natCard _).trans (Subgroup.card_quotient_dvd_card K)
+  have h4 : (QuotientGroup.mk' K) y = 1 :=
+    orderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_coprimes hs h2 h3)
+  exact (QuotientGroup.eq_one_iff y).mp h4
+
+/-- **Isaacs Thm 3.34, Step 2 の τ-論法** (p. 108): abelian `H` 上の coprime 作用で,
+`A` が `stab(y)·stab(x)` に分解するとき, `x * y` を固定する元は `y` を固定する.
+
+**証明**: `T := stab_A(y)`, `τ(g) := ∏_{t ∈ T} ψ_t(g)` は準同型 (abelian).
+分解から `T` は `X := A•x` に推移的に作用するので, fiber 分解
+(`prod_smul_eq_prod_orbit_pow`) により `τ(u)` (`u ∈ X`) は `A`-不変集合 `X` 上の積の冪
+= `A`-固定元. よって `τ(⟨X⟩) ⊆ C_H(A)`. `Z := ⟨X⟩ ⊓ ⟨A•y⟩` は `A`-不変で,
+`B := {b | ψ_b(y)·y⁻¹ ∈ Z}` は `stab(y)` と `a` を含む部分群. Thm 3.27 を `B` の制限作用と
+剰余類 `Zy` に適用して `B`-固定元 `c = y·t` (`t ∈ Z`) を得る.
+`y^{|T|} = τ(y) = τ(c)·τ(t)⁻¹ = c^{|T|}·τ(t)⁻¹` は `B`-固定, `|T|` は `|H|` と coprime
+なので `y` 自身が `B`-固定 (`mem_of_pow_mem_of_coprime`), 特に `ψ_a(y) = y`. -/
+private theorem apply_snd_eq_self_of_apply_mul_eq_self [Finite A] {H : Type*} [CommGroup H]
+    [Finite H] {ψ : A →* MulAut H} (hCop : Nat.Coprime (Nat.card A) (Nat.card H)) {x y : H}
+    (hdec : ∀ a : A, ∃ t s : A, ψ t y = y ∧ ψ s x = x ∧ a = t * s)
+    {a : A} (ha : ψ a (x * y) = x * y) : ψ a y = y := by
+  classical
+  letI : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
+  letI : Fintype A := Fintype.ofFinite A
+  letI : Fintype H := Fintype.ofFinite H
+  -- orbits are A-invariant sets
+  have hinv : ∀ (w : H) (b : A) (v : H),
+      v ∈ MulAction.orbit A w → ψ b v ∈ MulAction.orbit A w := by
+    intro w b v hv
+    obtain ⟨c, rfl⟩ := MulAction.mem_orbit_iff.mp hv
+    exact ⟨b * c, mul_smul b c w⟩
+  -- τ : the product of the stab(y)-translates, as a homomorphism (H abelian)
+  let τ : H →* H :=
+    { toFun := fun g => ∏ t : ↥(MulAction.stabilizer A y), ψ t.1 g
+      map_one' := Finset.prod_eq_one fun t _ => map_one (ψ t.1)
+      map_mul' := fun g h => by
+        simp only [map_mul]
+        exact Finset.prod_mul_distrib }
+  -- T := stab(y) acts transitively on X := orbit(x), by the decomposition A = T·S.
+  have horbT : ∀ u ∈ MulAction.orbit A x,
+      MulAction.orbit ↥(MulAction.stabilizer A y) u = MulAction.orbit A x := by
+    intro u hu
+    obtain ⟨a₀, rfl⟩ := MulAction.mem_orbit_iff.mp hu
+    apply Set.Subset.antisymm
+    · rintro v ⟨t, rfl⟩
+      exact ⟨(t : A) * a₀, mul_smul (t : A) a₀ x⟩
+    · rintro v ⟨b, rfl⟩
+      obtain ⟨tb, sb, htb, hsb, rfl⟩ := hdec b
+      obtain ⟨t0, s0, ht0, hs0, ha0⟩ := hdec a₀
+      refine ⟨⟨tb, MulAction.mem_stabilizer_iff.mpr htb⟩ *
+        ⟨t0, MulAction.mem_stabilizer_iff.mpr ht0⟩⁻¹, ?_⟩
+      change (tb * t0⁻¹ : A) • (a₀ • x) = (tb * sb) • x
+      rw [ha0, ← mul_smul, show tb * t0⁻¹ * (t0 * s0) = tb * s0 by group,
+        mul_smul, mul_smul, show s0 • x = x from hs0, show sb • x = x from hsb]
+  -- τ maps the orbit of x into the A-fixed elements (fiber decomposition).
+  have hτX : ∀ u ∈ MulAction.orbit A x, ∀ b : A, ψ b (τ u) = τ u := by
+    intro u hu b
+    have hpow := prod_smul_eq_prod_orbit_pow (T := ↥(MulAction.stabilizer A y)) u
+    rw [horbT u hu] at hpow
+    have hτu : τ u = ∏ t : ↥(MulAction.stabilizer A y), t • u :=
+      Finset.prod_congr rfl fun t _ => rfl
+    rw [hτu, hpow, map_pow]
+    congr 1
+    exact mulEquiv_prod_set_coe (ψ b) fun v hv => hinv x b v hv
+  -- closures of orbits are A-invariant subgroups.
+  have hclos : ∀ (w : H) (b : A), ∀ h ∈ Subgroup.closure (MulAction.orbit A w),
+      ψ b h ∈ Subgroup.closure (MulAction.orbit A w) := by
+    intro w b h hh
+    have hmap : (Subgroup.closure (MulAction.orbit A w)).map (ψ b).toMonoidHom ≤
+        Subgroup.closure (MulAction.orbit A w) := by
+      rw [MonoidHom.map_closure]
+      refine Subgroup.closure_mono ?_
+      rintro _ ⟨v, hv, rfl⟩
+      exact hinv w b v hv
+    exact hmap ⟨h, hh, rfl⟩
+  -- Z := ⟨orbit x⟩ ⊓ ⟨orbit y⟩, an A-invariant subgroup.
+  set Z : Subgroup H := Subgroup.closure (MulAction.orbit A x) ⊓
+    Subgroup.closure (MulAction.orbit A y) with hZdef
+  have hZ_inv : ∀ (b : A), ∀ h ∈ Z, ψ b h ∈ Z := by
+    intro b h hh
+    rw [hZdef, Subgroup.mem_inf] at hh ⊢
+    exact ⟨hclos x b h hh.1, hclos y b h hh.2⟩
+  -- τ maps Z into the A-fixed elements.
+  have hτZ : ∀ h ∈ Z, ∀ b : A, ψ b (τ h) = τ h := by
+    intro h hh b
+    have hle : Subgroup.closure (MulAction.orbit A x) ≤
+        (fixedSubgroup ψ (⊤ : Subgroup A)).comap τ := by
+      rw [Subgroup.closure_le]
+      intro u hu
+      change τ u ∈ fixedSubgroup ψ ⊤
+      intro l _
+      exact hτX u hu l
+    have := hle (Subgroup.mem_inf.mp hh).1
+    rw [Subgroup.mem_comap] at this
+    exact this b trivial
+  -- B := {b | ψ_b(y) y⁻¹ ∈ Z} is a subgroup containing stab(y) and a.
+  let B : Subgroup A :=
+    { carrier := {b : A | ψ b y * y⁻¹ ∈ Z}
+      one_mem' := by
+        change ψ 1 y * y⁻¹ ∈ Z
+        rw [map_one]
+        change y * y⁻¹ ∈ Z
+        rw [mul_inv_cancel]
+        exact Z.one_mem
+      mul_mem' := fun {b c} hb hc => by
+        change ψ (b * c) y * y⁻¹ ∈ Z
+        have key : ψ (b * c) y * y⁻¹ = ψ b (ψ c y * y⁻¹) * (ψ b y * y⁻¹) := by
+          rw [map_mul ψ b c, map_mul (ψ b), map_inv (ψ b)]
+          change ψ b (ψ c y) * y⁻¹ = ψ b (ψ c y) * (ψ b y)⁻¹ * (ψ b y * y⁻¹)
+          group
+        rw [key]
+        exact Z.mul_mem (hZ_inv b _ hc) hb
+      inv_mem' := fun {b} hb => by
+        change ψ b⁻¹ y * y⁻¹ ∈ Z
+        have key : ψ b (ψ b⁻¹ y * y⁻¹) = (ψ b y * y⁻¹)⁻¹ := by
+          rw [map_mul, map_inv (ψ b) y, map_inv ψ b, MulAut.apply_inv_self]
+          group
+        have h1 : ψ b (ψ b⁻¹ y * y⁻¹) ∈ Z := key ▸ Z.inv_mem hb
+        have h2 := hZ_inv b⁻¹ _ h1
+        rw [map_inv ψ b, MulAut.inv_apply_self] at h2
+        rwa [map_inv ψ b] }
+  have hSyB : ∀ t : A, ψ t y = y → t ∈ B := by
+    intro t ht
+    change ψ t y * y⁻¹ ∈ Z
+    rw [ht, mul_inv_cancel]
+    exact Z.one_mem
+  have haB : a ∈ B := by
+    change ψ a y * y⁻¹ ∈ Z
+    have hw : ψ a y * y⁻¹ = (ψ a x)⁻¹ * x := by
+      have hxy := ha
+      rw [map_mul] at hxy
+      have h1 : ψ a y = (ψ a x)⁻¹ * (x * y) := by rw [← hxy]; group
+      rw [h1]
+      group
+    rw [hZdef]
+    refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+    · rw [hw]
+      exact Subgroup.mul_mem _
+        (Subgroup.inv_mem _
+          (Subgroup.subset_closure (hinv x a x (MulAction.mem_orbit_self x))))
+        (Subgroup.subset_closure (MulAction.mem_orbit_self x))
+    · exact Subgroup.mul_mem _
+        (Subgroup.subset_closure (hinv y a y (MulAction.mem_orbit_self y)))
+        (Subgroup.inv_mem _ (Subgroup.subset_closure (MulAction.mem_orbit_self y)))
+  -- Thm 3.27 for the restricted B-action on the coset Z·y: a B-fixed element c = y·t.
+  have hCopBZ : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Z) :=
+    (hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card B)).coprime_dvd_right
+      (Subgroup.card_subgroup_dvd_card Z)
+  have hZinv' : IsAInvariant (ψ.comp B.subtype) Z := by
+    rw [_root_.OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro b h hh
+    exact hZ_inv b.1 h hh
+  have hcoset : ∀ b : ↥B, ∃ t ∈ Z, (ψ.comp B.subtype) b y = y * t := by
+    intro b
+    refine ⟨y⁻¹ * ψ b.1 y, ?_, by change ψ b.1 y = y * (y⁻¹ * ψ b.1 y); group⟩
+    have hb2 : ψ b.1 y * y⁻¹ ∈ Z := b.2
+    rwa [mul_comm] at hb2
+  obtain ⟨c, ⟨t, htZ, hct⟩, hc_fix⟩ :=
+    aInvariant_coset_mem_centralizer_of_coprime_subgroup (φ := ψ.comp B.subtype)
+      hCopBZ (Or.inr inferInstance) hZinv' hcoset
+  -- τ(y) = y^{|T|} is B-fixed, since τ(c) = c^{|T|} and τ(t) is A-fixed.
+  have hτy : τ y = y ^ Fintype.card ↥(MulAction.stabilizer A y) := by
+    calc τ y = ∏ t' : ↥(MulAction.stabilizer A y), ψ t'.1 y := rfl
+      _ = ∏ _t' : ↥(MulAction.stabilizer A y), y :=
+          Finset.prod_congr rfl fun t' _ => MulAction.mem_stabilizer_iff.mp t'.2
+      _ = y ^ Fintype.card ↥(MulAction.stabilizer A y) := by
+          rw [Finset.prod_const, Finset.card_univ]
+  have hτc : τ c = c ^ Fintype.card ↥(MulAction.stabilizer A y) := by
+    have hfix : ∀ t' : ↥(MulAction.stabilizer A y), ψ t'.1 c = c := fun t' =>
+      hc_fix ⟨t'.1, hSyB t'.1 (MulAction.mem_stabilizer_iff.mp t'.2)⟩
+    calc τ c = ∏ t' : ↥(MulAction.stabilizer A y), ψ t'.1 c := rfl
+      _ = ∏ _t' : ↥(MulAction.stabilizer A y), c :=
+          Finset.prod_congr rfl fun t' _ => hfix t'
+      _ = c ^ Fintype.card ↥(MulAction.stabilizer A y) := by
+          rw [Finset.prod_const, Finset.card_univ]
+  have hτt : ∀ b : A, ψ b (τ t) = τ t := fun b => hτZ t htZ b
+  have hy_pow_mem : y ^ Fintype.card ↥(MulAction.stabilizer A y) ∈ fixedSubgroup ψ B := by
+    have hyct : y = c * t⁻¹ := by rw [hct]; group
+    have hsplit : y ^ Fintype.card ↥(MulAction.stabilizer A y) = τ c * (τ t)⁻¹ := by
+      rw [← hτy, hyct, map_mul, map_inv]
+    rw [hsplit]
+    intro l hl
+    have hcl : ψ l c = c := hc_fix ⟨l, hl⟩
+    rw [map_mul, map_inv, hτt l, hτc, map_pow, hcl]
+  have hs_cop : Nat.Coprime (Fintype.card ↥(MulAction.stabilizer A y)) (Nat.card H) := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+  have hy_mem : y ∈ fixedSubgroup ψ B :=
+    mem_of_pow_mem_of_coprime _ hs_cop hy_pow_mem
+  exact hy_mem a haB
+
+/-! ### Thm 3.34: abelian case, then the general case via Thm 3.31 + Lem 3.33 -/
+
+/-- **Isaacs Thm 3.34, abelian case** (pp. 107-108): abelian `H` 上の coprime 作用で,
+サイズ `m`, `n` (`m ⊥ n`) の軌道の代表 `x`, `y` から, `z := x * y` の軌道サイズが `mn`.
+
+**証明**: orbit-stabilizer で軌道サイズ = 固定化群 index. `m ⊥ n` なので Lemma 3.16 から
+`A = stab(y)·stab(x) = stab(x)·stab(y)` (集合積) かつ
+`|A : stab(x) ⊓ stab(y)| = mn`. τ-論法 (`apply_snd_eq_self_of_apply_mul_eq_self`) を
+両向きに使うと `stab(xy) = stab(x) ⊓ stab(y)`. -/
+private theorem exists_orbit_card_mul_abelian [Finite A] {H : Type u} [CommGroup H]
+    [Finite H] {ψ : A →* MulAut H} (hCop : Nat.Coprime (Nat.card A) (Nat.card H))
+    {m n : ℕ} (hmn : Nat.Coprime m n) {x y : H}
+    (hx : Nat.card ↥(Set.range fun a : A => (ψ a) x) = m)
+    (hy : Nat.card ↥(Set.range fun a : A => (ψ a) y) = n) :
+    ∃ z : H, Nat.card ↥(Set.range fun a : A => (ψ a) z) = m * n := by
+  classical
+  letI : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
+  have hidx : ∀ w : H, (MulAction.stabilizer A w).index =
+      Nat.card ↥(Set.range fun a : A => (ψ a) w) := by
+    intro w
+    rw [Subgroup.index_eq_card]
+    exact (Nat.card_congr (MulAction.orbitEquivQuotientStabilizer A w)).symm
+  have hix : (MulAction.stabilizer A x).index = m := by rw [hidx]; exact hx
+  have hiy : (MulAction.stabilizer A y).index = n := by rw [hidx]; exact hy
+  have hcop_xy : Nat.Coprime (MulAction.stabilizer A x).index
+      (MulAction.stabilizer A y).index := by
+    rw [hix, hiy]; exact hmn
+  -- Lemma 3.16 (set-product clause): A = stab(y)·stab(x) and A = stab(x)·stab(y).
+  have hdec1 : ∀ a : A, ∃ t s : A, ψ t y = y ∧ ψ s x = x ∧ a = t * s := by
+    intro a
+    have huniv := OddOrder.Isaacs.Ch03.set_mul_eq_univ_of_coprime_index hcop_xy.symm
+    have hmem : a ∈ (MulAction.stabilizer A y : Set A) *
+        (MulAction.stabilizer A x : Set A) := by
+      rw [huniv]; trivial
+    obtain ⟨t, ht, s, hs, hts⟩ := Set.mem_mul.mp hmem
+    exact ⟨t, s, MulAction.mem_stabilizer_iff.mp ht,
+      MulAction.mem_stabilizer_iff.mp hs, hts.symm⟩
+  have hdec2 : ∀ a : A, ∃ t s : A, ψ t x = x ∧ ψ s y = y ∧ a = t * s := by
+    intro a
+    have huniv := OddOrder.Isaacs.Ch03.set_mul_eq_univ_of_coprime_index hcop_xy
+    have hmem : a ∈ (MulAction.stabilizer A x : Set A) *
+        (MulAction.stabilizer A y : Set A) := by
+      rw [huniv]; trivial
+    obtain ⟨t, ht, s, hs, hts⟩ := Set.mem_mul.mp hmem
+    exact ⟨t, s, MulAction.mem_stabilizer_iff.mp ht,
+      MulAction.mem_stabilizer_iff.mp hs, hts.symm⟩
+  -- stab(x·y) = stab(x) ⊓ stab(y) via the τ-argument, applied in both directions.
+  have hstab_eq : MulAction.stabilizer A (x * y) =
+      MulAction.stabilizer A x ⊓ MulAction.stabilizer A y := by
+    ext a
+    rw [Subgroup.mem_inf]
+    constructor
+    · intro h
+      have h' : ψ a (x * y) = x * y := h
+      have hy' : ψ a y = y := apply_snd_eq_self_of_apply_mul_eq_self hCop hdec1 h'
+      have hx' : ψ a x = x := by
+        refine apply_snd_eq_self_of_apply_mul_eq_self hCop hdec2 ?_
+        rw [mul_comm y x]
+        exact h'
+      exact ⟨hx', hy'⟩
+    · rintro ⟨h1, h2⟩
+      have h1' : ψ a x = x := h1
+      have h2' : ψ a y = y := h2
+      change ψ a (x * y) = x * y
+      rw [map_mul, h1', h2']
+  refine ⟨x * y, ?_⟩
+  rw [← hidx (x * y), hstab_eq,
+    OddOrder.Isaacs.Ch03.index_inf_eq_mul_of_coprime_index hcop_xy, hix, hiy]
+
+/-- 補助: equivariant 全単射は軌道を同サイズの軌道に写す. -/
+private theorem card_range_mulAut_comp_equiv {G' H' : Type*} [Group G'] [Group H']
+    (φ' : A →* MulAut G') (ψ' : A →* MulAut H') (f : G' ≃ H')
+    (hf : ∀ (a : A) (g : G'), f ((φ' a) g) = (ψ' a) (f g)) (g : G') :
+    Nat.card ↥(Set.range fun a : A => (ψ' a) (f g)) =
+      Nat.card ↥(Set.range fun a : A => (φ' a) g) := by
+  have himg : (Set.range fun a : A => (ψ' a) (f g)) =
+      f '' Set.range fun a : A => (φ' a) g := by
+    ext w
+    constructor
+    · rintro ⟨a, rfl⟩
+      exact ⟨(φ' a) g, ⟨a, rfl⟩, hf a g⟩
+    · rintro ⟨_, ⟨a, rfl⟩, rfl⟩
+      exact ⟨a, (hf a g).symm⟩
+  rw [himg]
+  exact (Nat.card_congr (Equiv.Set.image f _ f.injective)).symm
+
+/-- **Isaacs Thm 3.34** (pp. 107-108): `A` が有限群 `G` に coprime に自己同型作用し
+(`(|A|,|G|) = 1`, 一方が solvable), サイズ `m` とサイズ `n` の `A`-軌道が存在して
+`m ⊥ n` なら, サイズ `m * n` の軌道も存在する.
+
+**証明**: Thm 3.31 で abelian `H` (`|H| = |G|`, 全 `B ≤ A` の固定点数一致) に置換し,
+Lem 3.33 の equivariant 全単射で軌道サイズの集合が `G` と `H` で一致することを見る
+(`card_range_mulAut_comp_equiv`). abelian の場合は orbit-stabilizer + Lemma 3.16 +
+τ-論法で `stab(xy) = stab(x) ⊓ stab(y)` から従う (`exists_orbit_card_mul_abelian`). -/
+theorem exists_orbit_card_mul_of_coprime_orbit_card [Finite A]
+    {G : Type u} [Group G] [Finite G] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G) {m n : ℕ} (hmn : Nat.Coprime m n)
+    (hm : ∃ x : G, Nat.card ↥(Set.range fun a : A => (φ a) x) = m)
+    (hn : ∃ y : G, Nat.card ↥(Set.range fun a : A => (φ a) y) = n) :
+    ∃ z : G, Nat.card ↥(Set.range fun a : A => (φ a) z) = m * n := by
+  classical
+  obtain ⟨x, hx⟩ := hm
+  obtain ⟨y, hy⟩ := hn
+  -- Step 0: replace G by an abelian H via Thm 3.31.
+  obtain ⟨H, instH, instHF, ψ, hcardH, hfix⟩ :=
+    exists_abelian_fixedPoint_replacement hCop hSolv
+  letI := instH
+  letI := instHF
+  letI actG : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  letI actH : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
+  -- fixed-point counts agree, in the MulAction.fixedPoints form required by Lem 3.33.
+  have hcount : ∀ B : Subgroup A,
+      Nat.card (MulAction.fixedPoints B G) = Nat.card (MulAction.fixedPoints B H) := by
+    intro B
+    have h1 : Nat.card (MulAction.fixedPoints B G) = Nat.card ↥(fixedSubgroup φ B) :=
+      Nat.card_congr (Equiv.subtypeEquivRight fun g => by
+        rw [MulAction.mem_fixedPoints]
+        exact ⟨fun h l hl => h ⟨l, hl⟩, fun h b => h b.1 b.2⟩)
+    have h2 : Nat.card (MulAction.fixedPoints B H) = Nat.card ↥(fixedSubgroup ψ B) :=
+      Nat.card_congr (Equiv.subtypeEquivRight fun w => by
+        rw [MulAction.mem_fixedPoints]
+        exact ⟨fun h l hl => h ⟨l, hl⟩, fun h b => h b.1 b.2⟩)
+    rw [h1, h2]
+    exact hfix B
+  -- Lem 3.33: an A-equivariant bijection f : G ≃ H.
+  obtain ⟨f, hf⟩ := exists_equivariant_equiv_of_card_fixedPoints_eq hcount
+  have hf' : ∀ (a : A) (w : H), f.symm ((ψ a) w) = (φ a) (f.symm w) := by
+    intro a w
+    apply f.injective
+    rw [Equiv.apply_symm_apply]
+    have h := hf a (f.symm w)
+    rw [Equiv.apply_symm_apply] at h
+    exact h.symm
+  -- transport the two orbits to H, solve there, and pull the witness back.
+  have hxH : Nat.card ↥(Set.range fun a : A => (ψ a) (f x)) = m :=
+    (card_range_mulAut_comp_equiv φ ψ f hf x).trans hx
+  have hyH : Nat.card ↥(Set.range fun a : A => (ψ a) (f y)) = n :=
+    (card_range_mulAut_comp_equiv φ ψ f hf y).trans hy
+  obtain ⟨z', hz'⟩ := exists_orbit_card_mul_abelian (ψ := ψ)
+    (by rw [hcardH]; exact hCop) hmn hxH hyH
+  refine ⟨f.symm z', ?_⟩
+  rw [← hz']
+  exact card_range_mulAut_comp_equiv ψ φ f.symm hf' z'
 
 end
 

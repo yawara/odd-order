@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch03_SplitExtensions.CrossedHomomorphism
 import OddOrder.Isaacs.Ch03_SplitExtensions.CyclicExtensions
+import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiSeparableSeries
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
