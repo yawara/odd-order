@@ -18,13 +18,13 @@ Borel construction.
 
 ## やること
 
-- [ ] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Borel.lean`.
-- [ ] Construct the root-torus semidirect product using `torusScaleHom`.
-- [ ] Define its homomorphism into `standardPermGroup` and prove injectivity.
-- [ ] Define the standard Borel as the range and expose its unique normal form.
-- [ ] Prove the Borel fixes infinity and contains the root and torus images.
-- [ ] Prove its exact order `q^2 * (q - 1)`.
-- [ ] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
+- [x] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Borel.lean`.
+- [x] Construct the root-torus semidirect product using `torusScaleHom`.
+- [x] Define its homomorphism into `standardPermGroup` and prove injectivity.
+- [x] Define the standard Borel as the range and expose its unique normal form.
+- [x] Prove the Borel fixes infinity and contains the root and torus images.
+- [x] Prove its exact order `q^2 * (q - 1)`.
+- [x] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
 
 ## 完了条件
 

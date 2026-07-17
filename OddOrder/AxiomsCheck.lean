@@ -16,6 +16,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -452,6 +453,18 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isPretransitive
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_infinityStabilizer_isPretransitive
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isMultiplyPretransitive
+
+-- The faithful root-torus semidirect product and standard Borel subgroup.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.BorelModel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.borelHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.borelHom_apply
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.borelHom_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_mem_standardBorel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_mem_standardBorel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.mem_standardBorel_iff_existsUnique_root_torus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_le_infinityStabilizer
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardBorel
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A

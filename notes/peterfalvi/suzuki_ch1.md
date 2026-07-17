@@ -150,9 +150,12 @@
      three generator families in that concrete finite permutation group, and proves its
      standard action doubly transitive via the regular affine root action and the
      infinity-origin Weyl swap.
-   - Next upstream layer: construct the rank-one Borel/Bruhat infrastructure for this
-     generated group, derive its exact order `q^2 * (q^2 + 1) * (q - 1)` and simplicity,
-     then feed the concrete simple target and degree into Lemma 1. After Sz(q), construct
-     the PSU(3,q) target of degree `q^3 + 1`.
+   - `GroupTheory/SpecificGroups/Suzuki/Borel.lean` realizes the root-torus subgroup
+     as a faithful semidirect product, proves unique root-times-torus normal form, shows
+     that it fixes infinity, and computes its exact order `q^2 * (q - 1)`.
+   - Next upstream layer: prove the rank-one Bruhat factorization for this generated group,
+     derive its exact order `q^2 * (q^2 + 1) * (q - 1)` and simplicity, then feed the
+     concrete simple target and degree into Lemma 1. After Sz(q), construct the PSU(3,q)
+     target of degree `q^3 + 1`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
