@@ -68,6 +68,7 @@ import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
 import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
+import OddOrder.BG.Ch1_Preliminary.S04g_Cor419
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
@@ -4391,6 +4392,11 @@ set_option linter.style.longLine false in
 -- base change to `AlgebraicClosure F`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
+
+-- BG Corollary 4.19 (general form): for a finite solvable odd-order `G` and a normal subgroup `G*`
+-- with `r_p(G*) ≤ 2`, the derived subgroup `G'` centralizes every `p`-group chief factor `U/V` of
+-- `G` with `U ⊆ G*` (via the O_{p'}(G*)=1 reduction on top of the reduced rank-2 endpoint).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal
 
 -- BG Theorem 4.20(b): for a finite solvable odd-order `G` with `r(F(G)) ≤ 2`, a Sylow subgroup `S`,
 -- and a characteristic `T ≤ S` with `T ⊆ S'`, the subgroup `T` is normal in `G`.
