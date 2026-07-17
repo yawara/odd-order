@@ -60,7 +60,7 @@ private lemma reflTransGen_or_symm {r : Ω → Ω → Prop} {a b : Ω}
   | tail _ hbc ih => exact Relation.ReflTransGen.trans (.single hbc.symm) ih
 
 /-- A path from inside `B` to outside `B` contains an edge leaving `B`. -/
-private lemma exists_exit {r : Ω → Ω → Prop} {B : Set Ω} {a b : Ω}
+lemma exists_exit {r : Ω → Ω → Prop} {B : Set Ω} {a b : Ω}
     (h : Relation.ReflTransGen r a b) (ha : a ∈ B) :
     b ∉ B → ∃ γ ∈ B, ∃ δ, δ ∉ B ∧ r γ δ := by
   induction h with
