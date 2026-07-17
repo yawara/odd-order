@@ -48,3 +48,9 @@ H p'-group; internal direct product 形 or `∃ H, ...`) で sorry-free・axiom-
 
 - BG mmd L1489-1494、Gorenstein Thm 7.6.5、Coq `SCN_Sylow_cent_dprod`
 - 既存: `GroupTheory/SCN.lean` (IsSCN, 4.4(a))
+
+## ✅ 完了 (2026-07-18)
+
+`S04_Prop44b.centralizer_eq_dprod_of_isSCN_of_sylow` — sorry-free・axiom-clean・AxiomsCheck 登録・
+full build green (4308 jobs)。新 reusable helper `sylow_relIndex_normal_not_dvd` (Sylow-in-normal、
+mathlib 未収載) 追加。survey 正本 Prop 4.4「済」。BG §4 の次 = Lem 4.5 (M)。
