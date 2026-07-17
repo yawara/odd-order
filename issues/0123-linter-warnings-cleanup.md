@@ -52,9 +52,27 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
       (commit e14a69de、3 subagent + hub cascade 追补 4)。warnings 4761→4174。
       残置 1 件: `S07_Coherence/PsiDecomposition.lean:191` (sole-arg `simp only [if_pos rfl]`、
       個別攻略要)。Isaacs Ch06 の 11 件は a の active 領域ゆえ除外 (frontier 移動後に追补)。
-- [ ] wave 5a 実行中 (2026-07-17): `show`→`change` batch 1 = **812 sites / 214 files**
-      (列精密スクリプト置換、applied 812 / skipped 0)。除外 57 sites = active 近傍
-      (Ch05/Ch06/Ch10/NearFields) — batch 2 で frontier 移動後に処理。build 検証中。
+- [x] wave 5a: `show`→`change` batch 1 = **812 sites / 214 files** 解消
+      (commit c9feaf83、列精密スクリプト、applied 812 / skipped 0)。除外 57 sites =
+      active 近傍 (Ch05/Ch06/Ch10/NearFields) → batch 2 で frontier 移動後。
+      同 commit で wave-1 取りこぼし (FeitThompsonCharacterData:441 unused simp arg、
+      `git add 'OddOrder/**/*.lean'` glob が top-level を漏らした) も回収。
+      ⚠ **glob 教訓**: commit は `git add -A -- 'OddOrder/'` を使う (top-level ファイルを
+      漏らさない) — cron prompt にも反映済。warnings 4761→3363。
+
+## 残キュー (2026-07-17 時点、unique 3363)
+
+| 件数 | linter | wave |
+|---|---|---|
+| ~2386 | longLine (>100 桁) | wave 4 (dir 単位、S15/S08/S11/S12+BG Ch4 集中) |
+| 152 | 未使用 section variable 自動 include | wave 2 (`omit` 追記) |
+| 60 | header "Copyright too short!" | wave 3 (prepend script 準備済) |
+| 57 | `show`→`change` active 近傍 | wave 5b (frontier 移動後) |
+| ~70 | Variable name not referenced | wave 2 (`_`-prefix) |
+| 53 | maxHeartbeats コメント/scope | wave 3 |
+| 14 | open scoped Classical | wave 5 (要個別判断) |
+| 18 | declaration uses sorry | 対象外 (frontier) |
+| 1 | PsiDecomposition:191 sole-arg | 個別 |
 - [ ] wave 2: binder 衛生 (unused section vars / Variable name) (~220 件)
 - [ ] wave 3: header/docstring/maxHeartbeats (~120 件)
 - [ ] wave 4: longLine 2741 件 — dir 単位 (BG → Pf S* → Isaacs 完了章 → shared)
