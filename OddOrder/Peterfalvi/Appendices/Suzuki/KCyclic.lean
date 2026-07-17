@@ -344,6 +344,39 @@ lemma tau_mk_eq_iff_mem_V (d : ↥hyp.D) :
     rw [htauD, inv_mul_cancel]
     simpa using hyp.W.one_mem
 
+/-! ## `C_Ā(τ) = 1` (p. 103) -/
+
+/-- **Peterfalvi Part II, Ch. I §2** (p. 103): a `τ`-fixed element of `Ā = F(D̄)` is
+trivial.  Such an element lies in `V̄` (`tau_mk_eq_iff_mem_V`), whose elements fix the
+distinguished point `s ∈ Q₀^#` (`V ⊆ C_D(s)`, §1 Prop 5); but `Ā` acts fixed-point-
+freely on `Q₀` (Appendix I, Proposition 1), so it must be `1`. -/
+lemma tau_fixed_fitting_eq_one {x : hyp.Dbar} (hxF : x ∈ fitting hyp.Dbar)
+    (hxτ : hyp.tau x = x) : x = 1 := by
+  by_contra hx1
+  obtain ⟨v, rfl⟩ := QuotientGroup.mk_surjective x
+  -- `v ∈ V`, hence `v` centralizes the distinguished involution `s`.
+  have hvV : (v : G) ∈ hyp.V := (hyp.tau_mk_eq_iff_mem_V v).mp hxτ
+  have hvs : (v : G) ∈ Subgroup.centralizer {hyp.distinguishedInvolution} := by
+    rw [hyp.V_eq_centralizer_distinguishedInvolution] at hvV
+    exact (Subgroup.mem_inf.mp hvV).2
+  have hcomm : Commute (v : G) hyp.distinguishedInvolution :=
+    Subgroup.mem_centralizer_singleton_iff.mp hvs
+  have hsQ : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  -- `x = mk v` fixes the nonidentity point `s ∈ Q₀`.
+  have hfix : hyp.conjQ0bar (QuotientGroup.mk v) ⟨hyp.distinguishedInvolution, hsQ⟩ =
+      ⟨hyp.distinguishedInvolution, hsQ⟩ := by
+    rw [hyp.conjQ0bar_mk]
+    refine Subtype.ext ?_
+    rw [hyp.conjQ0_apply_coe, hcomm.eq]
+    group
+  -- fixed-point-freeness of `Ā` (Appendix I Prop 1) gives a contradiction.
+  have hfpf := hyp.fitting_Dbar_cyclic_fpf_abelian.2.1 (QuotientGroup.mk v) hxF hx1
+  have hmem : (⟨hyp.distinguishedInvolution, hsQ⟩ : ↥hyp.Q0) ∈
+      actionFixedBy hyp.conjQ0bar (QuotientGroup.mk v) := hfix
+  rw [hfpf, Subgroup.mem_bot] at hmem
+  exact hyp.distinguishedInvolution_ne_one (by simpa using congrArg Subtype.val hmem)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
