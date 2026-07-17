@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch05_Transfer.Basic
 import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
 import OddOrder.Isaacs.Ch05_Transfer.NilpotentMaximal
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 import OddOrder.Isaacs.Ch05_Transfer.SylowTwoDirectFactor
 
 /-!
