@@ -191,7 +191,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 8500
+set_option linter.style.longFile 8700
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -6921,6 +6921,34 @@ identifies `A ∩ V = W` from the trivial `τ`-fixed locus in `F(D̄)`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingPreimage_inf_V
+
+/-! Applying §1 Lemma (a) to the full preimage `A` gives `A = KW`; the
+quotient-preimage cardinal formula then gives `|F(D̄)| = |K|`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingPreimageInG_eq_KSet_mul_W
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_fitting_Dbar_eq_ncard_KSet
+
+/-! A generator of cyclic `F(D̄)` lifts through `A = KW` to an element of `K`.
+The order identity forces `K = ⟨k⟩`; bundling `K` as its closure yields the
+cyclic subgroup normal in `D` asserted by Proposition 2. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_KSet_generator
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_le_D
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_normal
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_K
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_isCyclic
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field

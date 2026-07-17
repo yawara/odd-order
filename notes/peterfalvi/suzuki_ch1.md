@@ -1,4 +1,4 @@
-# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §1 frontier
+# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §2 frontier
 
 正本ソース = `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`
 (pp. 100–107, "General Properties of G")。Coq crib は**無い** (math-comp/odd-order
@@ -29,9 +29,6 @@
    `invertedProdEquiv : Y × Z ≃ X` (explicit-inverse: `x↦(xz⁻¹,z)`, `z=w^{(|X|+1)/2}`,
    `w=(t x⁻¹ t)x`) + `card_eq_card_centralizer_mul_ncard_invertedBy : |X|=|Y||Z|`。
    奇数位数 squaring 素材 (`sq_pow_half`/`pow_half_sq`/`pow_card_eq_one_of_mem`) も汎用で内包。
-   - **⚠ Lemma (b) `⟨Z⟩ ⊴ X` は未** (Prop 5 に不要ゆえ後回し)。証明: `Y` は `Z` を正規化
-     (`y∈Y,z∈Z ⇒ yzy⁻¹∈Z`: `t(yzy⁻¹)t=(tyt)(tzt)(ty⁻¹t)=y z⁻¹ y⁻¹=(yzy⁻¹)⁻¹`)、
-     `Z⊆⟨Z⟩`、`X=YZ` (Lemma a) より `X` が `⟨Z⟩=closure(invertedBy X t)` を正規化。
 1. ✅ **Prop 5 (p.101) 完了** — `V=C_D(s)` + `W=C_D(H∩I)`。
    - `DistinguishedInvolution.lean`: `distinguishedInvolution`, `structureConjugator`,
      `structure_equation`, `eq_distinguishedPair_of_structure` (一意性)。
@@ -65,7 +62,7 @@
        `exists_mem_center_of_normal_ne_bot_of_isNilpotent` + Cauchy) →
        `involutions_H_subset_centralizer_Q` (H∩I ⊆ Z(Q)) → **`Q0 : Subgroup G`**
        ({x∈H | x²=1}) + elementary abelian API (`commute_of_mem_Q0` 等)。
-5. **§2 Prop 2 進行中** — K は D の cyclic normal 部分群 (p.103)。新 leaf `KCyclic.lean`。
+5. ✅ **§2 Prop 2 完了** — K は D の cyclic normal 部分群 (p.103)。leaf `KCyclic.lean`。
    - ✅ **基盤完了**: `conjQ0`/`ker_conjQ0` (核=W=C_D(H∩I))/`Dbar`=D/W/`conjQ0bar`
      faithful/`conjQ0bar_transitive` (Q₀^# 可移, §1 Prop 3)/`odd_card_Dbar`→
      `IsSolvable Dbar` (FT 本体)/`fitting_Dbar_cyclic_fpf_abelian` (**App I Prop 1 適用**)。
@@ -94,8 +91,15 @@
      `fittingPreimage_inf_V`): A を D→D̄ の F(D̄) の full preimage として構成。K の
      元は商で τ-反転されるため Ā=J に入り、A∩V の像は Ā 内で τ-固定なので 1、従って
      A∩V=W。axiom-clean。
-   - **次**: §1 Lemma (a) を A に適用して **A=KW, |Ā|=|K|**。次いで Ā の cyclicity
-     と K→K̄ の単射から **K=⟨k⟩ cyclic**、§1 Lemma (b) から K◁D。
+   - ✅ **A=KW / |Ā|=|K|** (`fittingPreimageInG_eq_KSet_mul_W` /
+     `card_fitting_Dbar_eq_ncard_KSet`): A の ambient-group model に §1 Lemma (a) を適用。
+     `A∩V=W` と inverted locus `=K` から A=KW を得て、full-preimage の位数公式で
+     `|F(D̄)|=|K|`。axiom-clean。
+   - ✅ **K=⟨k⟩ cyclic / K◁D** (`exists_KSet_generator` / `coe_K` /
+     `K_isCyclic` / `K_normal`): cyclic Ā の generator の representative `d∈A` を
+     A=KW で `d=kw` と分解して `k∈K` を lift。`|Ā|=|K|` と `⟨k⟩⊆K` から
+     `K=⟨k⟩`。`K := closure KSet` の carrier を同定し、§1 Lemma (b) で D 内正規性。
+     axiom-clean。**→ §2 Prop 2 完了。**
    - ✅ **App I gate closure (2026-07-18)**: BG Lemma 4.5(a) の正規 type-`(p,p)`
      prerequisite と Huppert の order-`p` fixed-space decomposition の双方が
      sorry-free で着地 (issue 2004 / 2040 完了)。
