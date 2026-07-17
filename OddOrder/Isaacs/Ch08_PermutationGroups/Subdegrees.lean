@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.OrbitalGraph
 import Mathlib.GroupTheory.GroupAction.Quotient
+import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
 import Mathlib.GroupTheory.Index
 
 /-!
@@ -418,5 +419,349 @@ theorem subdegree_eq_one_of_coprime_of_max [Finite G] [IsPreprimitive G Ω]
   exact hm1 h9
 
 end Theorem838
+
+/-! ### Isaacs Thm 8.40 — Manning's theorem -/
+
+section Theorem840
+
+variable [Finite Ω]
+
+/-- **Isaacs Thm 8.40** (Manning; p. 248) — let a finite group `G` act
+primitively on `Ω`, let `n ≥ 3` be the largest subdegree, and suppose a
+point stabilizer acts `2`-transitively on some suborbit of size `n`.  Then
+`|Ω| = n + 1` and `G` is `3`-transitive on `Ω`.
+
+Proof: let `S = Δ(α)` be the given suborbit and `X` the orbital of a pair
+of distinct points of `S`.  By `2`-transitivity every arrow between
+distinct points of `S` is an `X`-arrow, and `X` is self-paired.  Then
+`X(b₀) ⊇ S \ {b₀}` for `b₀ ∈ S`, and since `n - 1` is coprime to `n` and
+is not `1`, Thm 8.38 shows `n - 1` is not a subdegree, so `|X(b₀)| = n`
+and there is a unique `γ ∈ X(b₀) \ S`.  The two-point stabilizer of
+`α, b₀` fixes `γ`, whence arrows out of `γ` cover `S \ {b₀}` and every
+two distinct points of any `X(δ)` are `X`-joined.  Connectivity of the
+`X`-graph (Thm 8.35) then forces `{b₀} ∪ X(b₀) = Ω`, so
+`|Ω| = n + 1`, `S = Ω \ {α}`, and `G_α` is `2`-transitive on
+`Ω \ {α}`, i.e. `G` is `3`-transitive (Lem 8.2). -/
+theorem natCard_eq_and_isMultiplyPretransitive_of_two_trans_suborbit
+    [Finite G] [IsPreprimitive G Ω] (α : Ω) {n : ℕ} {β₀ : Ω}
+    (hn : Set.ncard (orbit (stabilizer G α) β₀) = n)
+    (hmax : ∀ δ : Ω, Set.ncard (orbit (stabilizer G α) δ) ≤ n)
+    (hn3 : 3 ≤ n)
+    (h2t : ∀ b c b' c' : Ω, b ∈ orbit (stabilizer G α) β₀ →
+      c ∈ orbit (stabilizer G α) β₀ → b' ∈ orbit (stabilizer G α) β₀ →
+      c' ∈ orbit (stabilizer G α) β₀ → b ≠ c → b' ≠ c' →
+      ∃ g ∈ stabilizer G α, g • b = b' ∧ g • c = c') :
+    Nat.card Ω = n + 1 ∧ IsMultiplyPretransitive G Ω 3 := by
+  classical
+  set S : Set Ω := orbit (stabilizer G α) β₀ with hSdef
+  -- `α ∉ S`
+  have hαS : α ∉ S := by
+    intro hα
+    have h2 : S = {α} := by
+      rw [hSdef, ← orbit_eq_iff.mpr hα, orbit_stabilizer_self]
+    rw [h2, Set.ncard_singleton] at hn
+    omega
+  -- two distinct points of `S`, and the auxiliary orbital `X`
+  have h2card : 1 < Set.ncard S := by omega
+  obtain ⟨b₀, c₀, hb₀, hc₀, hb₀c₀⟩ :=
+    (Set.one_lt_ncard_iff (Set.toFinite _)).mp h2card
+  set X : Set (Ω × Ω) := orbit G (b₀, c₀) with hXdef
+  -- `S` is invariant under the stabilizer of `α`
+  have hSinv : ∀ g ∈ stabilizer G α, ∀ u ∈ S, g • u ∈ S := by
+    intro g hg u hu
+    have h2 := mem_orbit u (⟨g, hg⟩ : stabilizer G α)
+    rw [orbit_eq_iff.mpr hu] at h2
+    exact h2
+  -- every arrow between distinct points of `S` is an `X`-arrow
+  have hjoin : ∀ x y : Ω, x ∈ S → y ∈ S → x ≠ y → (x, y) ∈ X := by
+    intro x y hx hy hxy
+    obtain ⟨g, hg, hgb, hgc⟩ := h2t b₀ c₀ x y hb₀ hc₀ hx hy hb₀c₀ hxy
+    have h2 := smul_pair_mem_orbit g (mem_orbit_self (b₀, c₀))
+    rw [hgb, hgc] at h2
+    exact h2
+  -- `X` is non-diagonal…
+  have hXne : ∀ x y : Ω, (x, y) ∈ X → x ≠ y := by
+    intro x y hxy
+    obtain ⟨g, hg⟩ := hxy
+    have hg' : g • (b₀, c₀) = (x, y) := hg
+    rw [Prod.smul_mk, Prod.mk_inj] at hg'
+    intro hxy'
+    exact hb₀c₀ (MulAction.injective g (by
+      change g • b₀ = g • c₀
+      rw [hg'.1, hg'.2, hxy']))
+  -- …and self-paired
+  have hpairX : ∀ x y : Ω, (x, y) ∈ X → (y, x) ∈ X := by
+    intro x y hxy
+    obtain ⟨g, hg⟩ := hxy
+    have hg' : g • (b₀, c₀) = (x, y) := hg
+    rw [Prod.smul_mk, Prod.mk_inj] at hg'
+    have h2 := smul_pair_mem_orbit g (hjoin c₀ b₀ hc₀ hb₀ (Ne.symm hb₀c₀))
+    rw [hg'.1, hg'.2] at h2
+    exact h2
+  -- `X(b₀) ⊇ S \ {b₀}`
+  have hXβsub : S \ {b₀} ⊆ orbitalAt X b₀ := by
+    intro y hy
+    rw [mem_orbitalAt_iff]
+    exact hjoin b₀ y hb₀ hy.1 (fun h => hy.2 h.symm)
+  have hcardX : ∀ δ : Ω,
+      Set.ncard (orbitalAt X δ) = Set.ncard (orbitalAt X b₀) := by
+    intro δ
+    rw [hXdef]
+    exact ncard_orbitalAt_eq (b₀, c₀) b₀ δ
+  -- `|X(b₀)| = n`, using Thm 8.38 to exclude `n - 1`
+  have hXb₀card : Set.ncard (orbitalAt X b₀) = n := by
+    have hge : n - 1 ≤ Set.ncard (orbitalAt X b₀) := by
+      have h2 := Set.ncard_le_ncard hXβsub (Set.toFinite _)
+      rwa [Set.ncard_sdiff_singleton_of_mem hb₀, hn] at h2
+    have hne0 : (orbitalAt X α).Nonempty := by
+      apply Set.nonempty_of_ncard_ne_zero
+      rw [hcardX α]
+      omega
+    obtain ⟨w, hw⟩ := hne0
+    have hXw : X = orbit G (α, w) := by
+      rw [mem_orbitalAt_iff] at hw
+      rw [hXdef, ← orbit_eq_iff.mpr hw]
+    have hsub : orbitalAt X α = orbit (stabilizer G α) w := by
+      rw [hXw, orbitalAt_orbit_eq]
+    have hle : Set.ncard (orbitalAt X b₀) ≤ n := by
+      rw [← hcardX α, hsub]
+      exact hmax w
+    rcases Nat.lt_or_ge (Set.ncard (orbitalAt X b₀)) n with hlt | hge2
+    · exfalso
+      have hm' : Set.ncard (orbit (stabilizer G α) w) = n - 1 := by
+        rw [← hsub, hcardX α]
+        omega
+      have hcop : Nat.Coprime (n - 1) n := by
+        have h2 : Nat.Coprime (n - 1) ((n - 1) + 1) := by
+          rw [Nat.coprime_self_add_right]
+          exact Nat.gcd_one_right _
+        rwa [Nat.sub_add_cancel (by omega : 1 ≤ n)] at h2
+      have h1 := subdegree_eq_one_of_coprime_of_max α hn hmax hm' hcop
+      omega
+    · exact Nat.le_antisymm hle hge2
+  -- the unique point `γ` of `X(b₀)` outside `S`
+  have hb₀X : b₀ ∉ orbitalAt X b₀ := by
+    rw [mem_orbitalAt_iff]
+    intro h2
+    exact hXne b₀ b₀ h2 rfl
+  obtain ⟨γ, hγ⟩ : ∃ γ, orbitalAt X b₀ \ (S \ {b₀}) = {γ} := by
+    rw [← Set.ncard_eq_one, Set.ncard_sdiff hXβsub (Set.toFinite _),
+      Set.ncard_sdiff_singleton_of_mem hb₀, hXb₀card, hn]
+    omega
+  have hγX : γ ∈ orbitalAt X b₀ := by
+    have h2 : γ ∈ ({γ} : Set Ω) := rfl
+    rw [← hγ] at h2
+    exact h2.1
+  have hγb₀ : γ ≠ b₀ := by
+    intro h4
+    subst h4
+    exact hb₀X hγX
+  have hγS : γ ∉ S := by
+    intro h2
+    have h3 : γ ∈ ({γ} : Set Ω) := rfl
+    rw [← hγ] at h3
+    exact h3.2 ⟨h2, fun h5 => hγb₀ h5⟩
+  -- `X(b₀) = (S \ {b₀}) ∪ {γ}`
+  have hdecomp : orbitalAt X b₀ = insert γ (S \ {b₀}) := by
+    ext z
+    constructor
+    · intro hz
+      by_cases hz2 : z ∈ S \ {b₀}
+      · exact Set.mem_insert_of_mem _ hz2
+      · have h3 : z ∈ orbitalAt X b₀ \ (S \ {b₀}) := ⟨hz, hz2⟩
+        rw [hγ] at h3
+        have h4 : z = γ := h3
+        rw [h4]
+        exact Set.mem_insert _ _
+    · intro hz
+      rcases Set.mem_insert_iff.mp hz with rfl | hz2
+      · exact hγX
+      · exact hXβsub hz2
+  -- the two-point stabilizer of `α, b₀` fixes `γ`
+  have hfixγ : ∀ g ∈ stabilizer G α, g • b₀ = b₀ → g • γ = γ := by
+    intro g hg hgb₀
+    have h2 : g • γ ∈ orbitalAt X b₀ := by
+      rw [mem_orbitalAt_iff]
+      have h3 := smul_pair_mem_orbit g (mem_orbitalAt_iff.mp hγX)
+      rwa [hgb₀] at h3
+    rw [hdecomp] at h2
+    rcases Set.mem_insert_iff.mp h2 with h3 | h3
+    · exact h3
+    · exfalso
+      apply hγS
+      have h4 := hSinv g⁻¹ (inv_mem hg) (g • γ) h3.1
+      rwa [inv_smul_smul] at h4
+  -- `X(b₀)` is the suborbit of `γ` at `b₀`
+  have hXb₀orb : orbitalAt X b₀ = orbit (stabilizer G b₀) γ := by
+    have h2 : X = orbit G (b₀, γ) := by
+      rw [hXdef, ← orbit_eq_iff.mpr (mem_orbitalAt_iff.mp hγX)]
+    rw [h2, orbitalAt_orbit_eq]
+  -- joining within a suborbit
+  have hjoinorb : ∀ x y : Ω, x ∈ orbit (stabilizer G b₀) γ →
+      y ∈ orbit (stabilizer G b₀) γ → ∃ k : stabilizer G b₀, k • x = y := by
+    intro x y hx hy
+    rw [← orbit_eq_iff.mpr hx] at hy
+    obtain ⟨k, hk⟩ := hy
+    exact ⟨k, hk⟩
+  -- arrows out of `γ` reach all of `S \ {b₀}`
+  have hγarrow : ∀ y' ∈ S \ {b₀}, (γ, y') ∈ X := by
+    have h1lt : 1 < Set.ncard (S \ {b₀}) := by
+      rw [Set.ncard_sdiff_singleton_of_mem hb₀, hn]
+      omega
+    obtain ⟨u, v, hu, hv, huv⟩ :=
+      (Set.one_lt_ncard_iff (Set.toFinite _)).mp h1lt
+    have hseed : (u, v) ∈ X := hjoin u v hu.1 hv.1 huv
+    obtain ⟨k₂, hk₂⟩ := hjoinorb u γ
+      (by rw [← hXb₀orb]; exact hXβsub hu) (mem_orbit_self _)
+    have hv'orb : k₂ • v ∈ orbit (stabilizer G b₀) γ := by
+      have hvX : v ∈ orbit (stabilizer G b₀) γ := by
+        rw [← hXb₀orb]
+        exact hXβsub hv
+      rw [MulAction.mem_orbit_iff] at hvX ⊢
+      obtain ⟨k', hk'⟩ := hvX
+      exact ⟨k₂ * k', by rw [mul_smul, hk']⟩
+    have hv'ne : k₂ • v ≠ γ := by
+      intro h2
+      rw [← hk₂] at h2
+      exact huv (MulAction.injective k₂ h2).symm
+    have hv'S : k₂ • v ∈ S \ {b₀} := by
+      have h2 : k₂ • v ∈ orbitalAt X b₀ := by
+        rw [hXb₀orb]
+        exact hv'orb
+      rw [hdecomp] at h2
+      rcases Set.mem_insert_iff.mp h2 with h3 | h3
+      · exact absurd h3 hv'ne
+      · exact h3
+    have hv'X : (γ, k₂ • v) ∈ X := by
+      have h2 := smul_pair_mem_orbit (↑k₂ : G) hseed
+      have h3 : (↑k₂ : G) • u = γ := hk₂
+      have h4 : (↑k₂ : G) • v = k₂ • v := rfl
+      rw [h3, h4] at h2
+      exact h2
+    intro y' hy'
+    obtain ⟨g, hg, hgb₀, hgv⟩ := h2t b₀ (k₂ • v) b₀ y' hb₀ hv'S.1 hb₀ hy'.1
+      (fun h => hv'S.2 h.symm) (fun h => hy'.2 h.symm)
+    have hgγ : g • γ = γ := hfixγ g hg hgb₀
+    have h2 := smul_pair_mem_orbit g hv'X
+    rw [hgγ, hgv] at h2
+    exact h2
+  -- every two distinct points of `X(b₀)` are `X`-joined
+  have hQ : ∀ x y : Ω, x ∈ orbitalAt X b₀ → y ∈ orbitalAt X b₀ → x ≠ y →
+      (x, y) ∈ X := by
+    intro x y hx hy hxy
+    obtain ⟨k, hk⟩ := hjoinorb γ x (mem_orbit_self _)
+      (by rw [← hXb₀orb]; exact hx)
+    have hy' : k⁻¹ • y ∈ orbit (stabilizer G b₀) γ := by
+      have h2 : y ∈ orbit (stabilizer G b₀) γ := by
+        rw [← hXb₀orb]
+        exact hy
+      rw [MulAction.mem_orbit_iff] at h2 ⊢
+      obtain ⟨k', hk'⟩ := h2
+      exact ⟨k⁻¹ * k', by rw [mul_smul, hk']⟩
+    have hyγ : k⁻¹ • y ≠ γ := by
+      intro h2
+      apply hxy
+      rw [← hk, ← h2, smul_inv_smul]
+    have hy'' : k⁻¹ • y ∈ S \ {b₀} := by
+      have h2 : k⁻¹ • y ∈ orbitalAt X b₀ := by
+        rw [hXb₀orb]
+        exact hy'
+      rw [hdecomp] at h2
+      rcases Set.mem_insert_iff.mp h2 with h3 | h3
+      · exact absurd h3 hyγ
+      · exact h3
+    have h3 := hγarrow (k⁻¹ • y) hy''
+    have h4 := smul_pair_mem_orbit (↑k : G) h3
+    have h5 : (↑k : G) • γ = x := hk
+    have h6 : (↑k : G) • k⁻¹ • y = y := by
+      change k • k⁻¹ • y = y
+      rw [smul_inv_smul]
+    rw [h5, h6] at h4
+    exact h4
+  -- transport: every two distinct points of any `X(δ)` are `X`-joined
+  have hP : ∀ δ x y : Ω, x ∈ orbitalAt X δ → y ∈ orbitalAt X δ → x ≠ y →
+      (x, y) ∈ X := by
+    intro δ x y hx hy hxy
+    obtain ⟨g, hg⟩ := exists_smul_eq G b₀ δ
+    rw [mem_orbitalAt_iff] at hx hy
+    have hx' : g⁻¹ • x ∈ orbitalAt X b₀ := by
+      rw [mem_orbitalAt_iff]
+      have h2 := smul_pair_mem_orbit g⁻¹ hx
+      rwa [← hg, inv_smul_smul] at h2
+    have hy2 : g⁻¹ • y ∈ orbitalAt X b₀ := by
+      rw [mem_orbitalAt_iff]
+      have h2 := smul_pair_mem_orbit g⁻¹ hy
+      rwa [← hg, inv_smul_smul] at h2
+    have hne2 : g⁻¹ • x ≠ g⁻¹ • y := fun h2 => hxy (MulAction.injective g⁻¹ h2)
+    have h3 := hQ _ _ hx' hy2 hne2
+    have h4 := smul_pair_mem_orbit g h3
+    rwa [smul_inv_smul, smul_inv_smul] at h4
+  -- connectivity forces `{b₀} ∪ X(b₀) = Ω`
+  have hT : insert b₀ (orbitalAt X b₀) = Set.univ := by
+    by_contra hne
+    obtain ⟨ω, hω⟩ : ∃ ω, ω ∉ insert b₀ (orbitalAt X b₀) := by
+      by_contra h2
+      push Not at h2
+      exact hne (Set.eq_univ_of_forall h2)
+    obtain ⟨δ, hδ, ε, hε, hedge⟩ := exists_exit
+      (orbital_connected_of_isPreprimitive (G := G)
+        (show (b₀, c₀).1 ≠ (b₀, c₀).2 from hb₀c₀) b₀ ω)
+      (Set.mem_insert b₀ _) hω
+    have hδb₀ : δ ≠ b₀ := by
+      rintro rfl
+      exact hε (Set.mem_insert_of_mem _ (mem_orbitalAt_iff.mpr hedge))
+    have hδX : δ ∈ orbitalAt X b₀ := by
+      rcases Set.mem_insert_iff.mp hδ with h2 | h2
+      · exact absurd h2 hδb₀
+      · exact h2
+    have hb₀δ : b₀ ∈ orbitalAt X δ :=
+      mem_orbitalAt_iff.mpr (hpairX b₀ δ (mem_orbitalAt_iff.mp hδX))
+    have hεX : ε ∈ orbitalAt X δ := mem_orbitalAt_iff.mpr hedge
+    have hb₀ε : b₀ ≠ ε := by
+      rintro rfl
+      exact hε (Set.mem_insert _ _)
+    have h5 := hP δ b₀ ε hb₀δ hεX hb₀ε
+    exact hε (Set.mem_insert_of_mem _ (mem_orbitalAt_iff.mpr h5))
+  -- cardinality: `|Ω| = n + 1`
+  have hcardΩ : Nat.card Ω = n + 1 := by
+    rw [← Set.ncard_univ, ← hT,
+      Set.ncard_insert_of_notMem hb₀X (Set.toFinite _), hXb₀card]
+  -- hence `S = Ω \ {α}`
+  have hScompl : S = Set.univ \ {α} := by
+    apply Set.eq_of_subset_of_ncard_le
+    · intro z hz
+      exact ⟨Set.mem_univ z,
+        fun h2 => hαS ((Set.mem_singleton_iff.mp h2) ▸ hz)⟩
+    · rw [Set.ncard_sdiff_singleton_of_mem (Set.mem_univ α), Set.ncard_univ,
+        hcardΩ, hn]
+      omega
+    · exact Set.toFinite _
+  -- `3`-transitivity via the stabilizer bridge (Lem 8.2)
+  refine ⟨hcardΩ, ?_⟩
+  rw [show (3 : ℕ) = Nat.succ 2 from rfl,
+    SubMulAction.ofStabilizer.isMultiplyPretransitive (a := α),
+    is_two_pretransitive_iff]
+  intro x y z w hxy hzw
+  have hmem : ∀ p : SubMulAction.ofStabilizer G α, (p : Ω) ∈ S := by
+    intro p
+    rw [hScompl]
+    exact ⟨Set.mem_univ _,
+      fun h2 => SubMulAction.neq_of_mem_ofStabilizer G α
+        (Set.mem_singleton_iff.mp h2)⟩
+  have hxyne : (x : Ω) ≠ (y : Ω) := fun h2 => hxy (Subtype.coe_injective h2)
+  have hzwne : (z : Ω) ≠ (w : Ω) := fun h2 => hzw (Subtype.coe_injective h2)
+  obtain ⟨g, hg, hgxz, hgyw⟩ :=
+    h2t x y z w (hmem x) (hmem y) (hmem z) (hmem w) hxyne hzwne
+  refine ⟨⟨g, hg⟩, ?_, ?_⟩
+  · apply Subtype.coe_injective
+    change (↑((⟨g, hg⟩ : stabilizer G α) • x) : Ω) = ↑z
+    rw [SubMulAction.val_smul]
+    exact hgxz
+  · apply Subtype.coe_injective
+    change (↑((⟨g, hg⟩ : stabilizer G α) • y) : Ω) = ↑w
+    rw [SubMulAction.val_smul]
+    exact hgyw
+
+end Theorem840
 
 end OddOrder.Isaacs.Ch08
