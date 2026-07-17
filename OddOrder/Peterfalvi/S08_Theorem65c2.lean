@@ -245,7 +245,8 @@ theorem six_three_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
         simp only [hs_def, Set.mem_setOf_eq]
         exact ⟨hBnorm, hMB, hBltA.le.trans hAH₁, hBcoh⟩
       exact lt_irrefl _ (hBltA.trans_le (hAmin hBs hBltA.le))
-    have hbnd := six_three_index_bound_c2 hyp h46 hHK hW1 hBltA.le hAH₁ hAcomm2 hcentral hAcoh hSBncoh
+    have hbnd := six_three_index_bound_c2 hyp h46 hHK hW1 hBltA.le hAH₁ hAcomm2 hcentral hAcoh
+      hSBncoh
     omega
   rw [← hAeqM]
   exact hAcoh

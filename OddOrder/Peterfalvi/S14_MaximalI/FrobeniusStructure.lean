@@ -283,7 +283,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 case-(b) reduction: for a Frobenius `L` with kernel `H`, `Ind_H^L θ` (`θ ≠ 1`) is irreducible
 (`isIrreducibleCharacter_induce_of_frobeniusGroup`).  This feeds the unit-norm, orthogonality, and
 `ZIrr`-membership inputs of `coherent_of_constant_degree`. -/
-theorem Sset_isIrreducibleCharacter [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+theorem Sset_isIrreducibleCharacter [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {C : Subgroup ↥L}
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
     IsIrreducibleCharacter χ := by
@@ -502,7 +503,8 @@ theorem SsubFiltration_commutator_apply_one_eq_index [Finite G] {L : Subgroup G}
     haveI : IsMulCommutative (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
         commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
       inferInstanceAs (IsMulCommutative (Abelianization ↥((hyp.typeI.typeF.H).subgroupOf L)))
-    refine OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+    refine
+      OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
       (N := commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) θ ?_
     rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self ((hyp.typeI.typeF.H).subgroupOf L)]
     exact hker
@@ -1076,7 +1078,7 @@ theorem exists_mem_SsubFiltration_degree_index [Finite G] {L : Subgroup G} (hyp 
   haveI := hyp.finiteG
   haveI : (A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)).Normal := (‹A.Normal›).subgroupOf _
   obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
-    OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
+   OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
       (A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) h
   refine ⟨ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction, ?_, ?_⟩
   · simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq]; exact ⟨θ, hθne, hθker, rfl⟩
@@ -1099,7 +1101,8 @@ theorem Sset_six_two_index_bound [Finite G] {L : Subgroup G} (hyp : Hypothesis L
     (hAcomm : commutator (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
       A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) ≠ ⊤)
     (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A) hyp.A))
-    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B) hyp.A)) :
+    (hSBncoh :
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B) hyp.A)) :
     ∃ θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
       (↑(B.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :
           Set ↥((hyp.typeI.typeF.H).subgroupOf L)) ⊆
@@ -1267,7 +1270,8 @@ theorem Sset_differenceImages_orthogonal [Finite G] {L : Subgroup G} (hyp : Hypo
       (Sset_differenceImage hyp hodd hfrob hab hAH hχ) := by
   have hφc := Sset_closedUnderConjugate hyp hφ
   have hχc := Sset_closedUnderConjugate hyp hχ
-  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+  refine
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
     _ _ ?_
   rw [← (Sset_differenceImage hyp hodd hfrob hab hAH hφ).image_conjugateDifference,
       ← (Sset_differenceImage hyp hodd hfrob hab hAH hχ).image_conjugateDifference]
@@ -1389,7 +1393,8 @@ theorem SsubFiltration_commutator_differenceImages_orthogonal [Finite G] {L : Su
   have hχS := hyp.SsubFiltration_subset_Sset hχ
   have hφcS := hyp.SsubFiltration_subset_Sset hφc
   have hχcS := hyp.SsubFiltration_subset_Sset hχc
-  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+  refine
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
     _ _ ?_
   rw [← (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hφ).image_conjugateDifference,
       ← (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hχ).image_conjugateDifference]
@@ -1461,7 +1466,8 @@ theorem frobenius_typeI_coherent_of_abelianKernel [Finite G]
   haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
   haveI : Nontrivial (IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
     Finite.one_lt_card_iff_nontrivial.mp
-      (by rw [card_irreducibleCharacter_eq]; exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
+      (by rw [card_irreducibleCharacter_eq];
+          exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
   obtain ⟨θ, hθ⟩ := exists_ne (trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
   set χ0 := ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction with hχ0
   have hχ0S : χ0 ∈ hyp.Sset := by

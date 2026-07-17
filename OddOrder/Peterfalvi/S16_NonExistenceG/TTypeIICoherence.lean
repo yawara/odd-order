@@ -89,7 +89,8 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
       (derivedInG hyp.base.T) hAK x
   -- Each member of `calT1_set` is `Ind_K θ` for a non-principal `θ ∈ 𝒯`.
   have hmem_form : ∀ a ∈ calT1_set, ∃ θ ∈ 𝒯,
-      a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction := by
+      a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        θ.toClassFunction := by
     intro a ha
     rw [hcalT1, Finset.mem_coe, Finset.mem_image] at ha
     obtain ⟨θ, hθ, rfl⟩ := ha
@@ -98,7 +99,8 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
   have hInd_ne_triv : ∀ θ (hθ : θ ∈ 𝒯),
       (⟨ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction,
         isIrreducibleCharacter_induce_of_inertia_eq
-          (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ (hinertia θ hθ)⟩ :
+          (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T)
+          θ (hinertia θ hθ)⟩ :
         IrreducibleCharacter ↥hyp.base.T) ≠ trivialIrreducibleCharacter _ := by
     intro θ hθ hcontra
     -- `Res_K 1 = 1`, so `⟨Ind_K θ, 1⟩ = ⟨θ, Res 1⟩ = ⟨θ, 1⟩ = 0` (`θ ≠ 1`), contradicting `= 1`.
@@ -130,7 +132,8 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
     exact not_isReal_of_ne_trivial_of_odd_card' (G := ↥hyp.base.T) hodd
       (χ := ⟨ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction,
         isIrreducibleCharacter_induce_of_inertia_eq
-          (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ (hinertia θ hθ)⟩)
+          (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T)
+          θ (hinertia θ hθ)⟩)
       (hInd_ne_triv θ hθ)
   -- (b) `S03.PairwiseOrthogonal calT1_set`: distinct irreducible members are orthogonal.
   have hortho : OddOrder.Peterfalvi.S03.PairwiseOrthogonal calT1_set := by
@@ -142,9 +145,11 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
     have hψirr := isIrreducibleCharacter_induce_of_inertia_eq
       (G := ↥hyp.base.T) (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ' (hinertia θ' hθ')
     rw [show ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction
-          = ((⟨_, hχirr⟩ : IrreducibleCharacter ↥hyp.base.T) : ClassFunction ↥hyp.base.T ℂ) from rfl,
+          = ((⟨_, hχirr⟩ : IrreducibleCharacter ↥hyp.base.T) : ClassFunction ↥hyp.base.T ℂ)
+            from rfl,
       show ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ'.toClassFunction
-          = ((⟨_, hψirr⟩ : IrreducibleCharacter ↥hyp.base.T) : ClassFunction ↥hyp.base.T ℂ) from rfl,
+          = ((⟨_, hψirr⟩ : IrreducibleCharacter ↥hyp.base.T) : ClassFunction ↥hyp.base.T ℂ)
+            from rfl,
       irreducibleCharacter_inner_eq_ite, if_neg]
     intro h
     exact hne' (congrArg
@@ -293,7 +298,8 @@ theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
       IrreducibleCharacter.inertia (G := ↥hyp.base.T)
           (H := (derivedInG hyp.base.T).subgroupOf hyp.base.T) θ
         = (derivedInG hyp.base.T).subgroupOf hyp.base.T)
-    (hlinear : ∀ θ ∈ 𝒯, (θ.toClassFunction : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1)
+    (hlinear : ∀ θ ∈ 𝒯,
+      (θ.toClassFunction : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1)
     (A : Set ↥hyp.base.T)
     (calT1_set : Set (ClassFunction ↥hyp.base.T ℂ))
     (hcalT1 : calT1_set = ↑(𝒯.image (fun θ => ClassFunction.induce
@@ -301,7 +307,8 @@ theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
     (hyp07 : OddOrder.Peterfalvi.S07.Hypothesis (L := ↥hyp.base.T) (G := G) calT1_set A)
     (hZIrr : ∀ a ∈ calT1_set, ∀ b ∈ calT1_set, hyp07.tau (a - b) ∈ ZIrr G)
     (h1A : (1 : ↥hyp.base.T) ∉ A)
-    (hsuppdiff : ∀ a ∈ calT1_set, ∀ b ∈ calT1_set, ((a - b : ClassFunction ↥hyp.base.T ℂ)).support ⊆ A)
+    (hsuppdiff : ∀ a ∈ calT1_set, ∀ b ∈ calT1_set,
+      ((a - b : ClassFunction ↥hyp.base.T ℂ)).support ⊆ A)
     (hcard2 : 2 ≤ calT1_set.ncard) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp07.tau calT1_set A) := by
   haveI := hyp.base.finiteG
@@ -314,7 +321,8 @@ theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
     Nat.cast_ne_zero.mpr hyp.base.p_prime.pos.ne'
   -- Each member `ζ = Ind_{QV}^T θ` is irreducible; extract its source `θ ∈ 𝒯` and its degree `= p`.
   have hmem_form : ∀ a ∈ calT1_set, ∃ θ ∈ 𝒯,
-      a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction := by
+      a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        θ.toClassFunction := by
     intro a ha
     rw [hcalT1, Finset.mem_coe, Finset.mem_image] at ha
     obtain ⟨θ, hθ, rfl⟩ := ha
@@ -329,7 +337,8 @@ theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
     obtain ⟨θ, hθ, rfl⟩ := hmem_form ζ hζ
     rw [ClassFunction.induce_apply_one, hindex, hlinear θ hθ, mul_one]
   -- assemble and invoke the equal-degree coherence producer.
-  refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree hyp07 hSfin hcard2 ?_ hZIrr ?_ ?_ h1A hsuppdiff
+  refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree hyp07 hSfin hcard2 ?_ hZIrr ?_ ?_
+    h1A hsuppdiff
   · exact fun ζ hζ => (hirr ζ hζ).inner_self_eq_one
   · exact fun a ha b hb => by rw [hdeg a ha, hdeg b hb]
   · exact fun a ha => by rw [hdeg a ha]; exact hp_ne
@@ -395,7 +404,8 @@ theorem T_typeIII_calT1_isCoherent [Finite G] (hyp : Hypothesis (G := G))
   haveI hKnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
     T_derivedSubgroupOf_normal hyp
   have hmem_form : ∀ a ∈ calT1_set, ∃ θ ∈ 𝒯,
-      a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction := by
+      a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
+        θ.toClassFunction := by
     intro a ha
     rw [hcalT1, Finset.mem_coe, Finset.mem_image] at ha
     obtain ⟨θ, hθ, rfl⟩ := ha

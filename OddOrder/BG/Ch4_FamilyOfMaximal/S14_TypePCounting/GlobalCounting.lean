@@ -136,7 +136,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
     have hridx : ¬ r ∣ (R.subgroupOf U).index := fun hd =>
       hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hd, Subgroup.index_ne_zero_of_finite⟩) rfl
     have hrSub : r ∣ Nat.card ↥(R.subgroupOf U) :=
-      ((Nat.Prime.dvd_mul hrprime).mp (by rw [hlag]; exact Nat.dvd_of_mem_primeFactors hr)).resolve_right
+      ((Nat.Prime.dvd_mul hrprime).mp
+        (by rw [hlag]; exact Nat.dvd_of_mem_primeFactors hr)).resolve_right
         hridx
     have hrR : r ∣ Nat.card ↥R := by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv] at hrSub
@@ -278,7 +279,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
       Kstar_isPiSubgroup_sigma hKstardef
     have hrnK : ¬ r ∣ Nat.card ↥K := fun hd => (fun h => hrκσ (Or.inl h))
       (hK.1 r (Nat.mem_primeFactors.mpr ⟨hrprime, by
-        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]; exact hd, Nat.card_pos.ne'⟩))
+        rw [Nat.card_congr
+          (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]; exact hd, Nat.card_pos.ne'⟩))
     have hrnKstar : ¬ r ∣ Nat.card ↥Kstar := fun hd =>
       hrσM (hKstarπ r (Nat.mem_primeFactors.mpr ⟨hrprime, hd, Nat.card_pos.ne'⟩))
     have hKKstar_bot : K ⊓ Kstar = ⊥ := by
@@ -308,7 +310,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
         (show Nat.card ↥R ≠ 1 from fun h => hRne (Subgroup.card_eq_one.mp h))
       have hpmem : p ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
         Nat.mem_primeFactors.mpr ⟨hp, by
-          rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv]; exact hpd, Nat.card_pos.ne'⟩
+          rw [Nat.card_congr
+            (Subgroup.subgroupOfEquivOfLe hRU).toEquiv]; exact hpd, Nat.card_pos.ne'⟩
       exact (Set.mem_singleton_iff.mp (hR.1 p hpmem)) ▸ hpd
     -- If `H` were conjugate to `M*`, then `K ≤ H` and `sK_uniqMst` force `H = M*`, so
     -- `R ≤ M ⊓ M* = Z`, whence `r ∣ |Z|`, contradicting `r ∤ |Z|`.
@@ -411,7 +414,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
     have hOqE : Oq ≤ E := (opiCoreInG_le _ _).trans
       (OddOrder.BG.Ch2.S08.fittingInG_le E)
     have hKOq : K ≤ Oq := OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
-      (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent E) hsK_FE (IsPGroup.of_card (by rw [hKcard, pow_one]))
+      (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent E) hsK_FE
+        (IsPGroup.of_card (by rw [hKcard, pow_one]))
     have hOqpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) Oq :=
       isPiSubgroup_opiCoreInG _ _
     have hEnOq : E ≤ Subgroup.normalizer (Oq : Set G) := by
@@ -446,7 +450,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
     have hcardHsDq : Nat.card ↥HsDq = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma H) * Nat.card ↥Oq := by
       have hOqnMs : Oq ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma H : Set G) :=
         (hOqE.trans hEsetup.E_le).trans hHnMsH
-      have h := card_sup_eq_mul_of_le_normalizer_of_disjoint hOqnMs (by rw [inf_comm]; exact hMsOqbot)
+      have h := card_sup_eq_mul_of_le_normalizer_of_disjoint hOqnMs
+        (by rw [inf_comm]; exact hMsOqbot)
       rw [hHsDqdef, sup_comm, h, Nat.mul_comm]
     -- `M_σ(H)` is the normal `{q}'`-Hall of `HsDq`.
     haveI hMsHsDqnorm : ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf HsDq).Normal :=
@@ -501,7 +506,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
     haveI h2 : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma H) :=
       (msigma_structure_of_notMem_sigma_kappa hG hHmax hqπH hqσ'H hqκH hAmem hAH).2.2
     haveI h3 : Group.IsNilpotent ↥((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H) :=
-      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le H)).symm
+      Group.nilpotent_of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le H)).symm
     have h4 : (OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H ≤ OddOrder.Isaacs.Ch01.fitting ↥H :=
       OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
     calc OddOrder.BG.Ch3.S10.Msigma H
@@ -621,7 +627,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
       have hfUM : (Nat.card ↥U).factorization r = (Nat.card ↥M).factorization r := by
         have hidxM : (U.subgroupOf M).index.factorization r = 0 :=
           Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
-            hU.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) hrκσ)
+            hU.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩)
+              hrκσ)
         have hUcard : Nat.card ↥(U.subgroupOf M) = Nat.card ↥U :=
           Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv
         have hlag := Subgroup.card_mul_index (U.subgroupOf M)

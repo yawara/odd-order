@@ -725,31 +725,40 @@ theorem SOf_HC_inner_sOf_H0C_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothes
     rw [hyp.setup_typeP_eq]
   -- `x`-source `θ` kills `hInHu` (`H ≤ HC`)
   obtain ⟨θ, hθne, hθker, hxeq⟩ := hxIKF
-  have hHθ : (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
-      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) := by
+  have hHθ : (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup :
+      Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ) := by
     rw [hhin]
     refine subset_trans (SetLike.coe_subset_coe.mpr (Subgroup.subgroupOf_mono _
       (Subgroup.subgroupOf_mono M (le_sup_left : hyp.H ≤ hyp.HC)))) hθker
   -- `y`-source `χ'` lies in `𝒳`: `¬ hInHu ⊆ Ker χ'`
   obtain ⟨χ', hχ'xiOf, hyeq⟩ := hy
-  have hχ'xi : ¬ ((OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
-      OddOrder.Peterfalvi.S03.characterKernel (χ' : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)) := hχ'xiOf.1
+  have hχ'xi : ¬ ((OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup :
+      Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (χ' : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)) := hχ'xiOf.1
   -- `Ind θ = Ind χ'`, so the sources are `M`-conjugate
   rw [OddOrder.Peterfalvi.S11.induceHU_eq_induce] at hyeq
   have heqInd := hxeq.symm.trans (hxy.trans hyeq)
   obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ χ').mp heqInd
   -- `hInHu` is `M`-conjugation-invariant (`H ⊴ M`)
-  have hAinv : ∀ a ∈ (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)),
-      ClassFunction.conjByMulEquiv g a ∈ (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) := by
+  have hAinv : ∀ a ∈ (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup :
+      Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)),
+      ClassFunction.conjByMulEquiv g a ∈
+        (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup :
+          Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) := by
     intro a ha
     simp only [SetLike.mem_coe] at ha ⊢
     rw [OddOrder.Peterfalvi.S11.hInHu, Subgroup.mem_subgroupOf] at ha ⊢
     rw [ClassFunction.conjByMulEquiv_apply]
     exact (OddOrder.Peterfalvi.S11.hSubgroupOfM_normal hyp.s11Setup).conj_mem _ ha g
   -- transport `hInHu ⊆ Ker θ` to `hInHu ⊆ Ker (conjBy g θ) = Ker χ'`
-  have hHχ' : (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup : Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
+  have hHχ' : (OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup :
+      Set ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel
-        (ClassFunction.conjBy g (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)) :=
+        (ClassFunction.conjBy g
+          (θ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) ℂ)) :=
     OddOrder.Peterfalvi.S11.subsetCharacterKernel_conjBy_of_invariant g _ _ hAinv hHθ
   rw [← IrreducibleCharacter.coe_conjBy, hg] at hHχ'
   exact hχ'xi hHχ'

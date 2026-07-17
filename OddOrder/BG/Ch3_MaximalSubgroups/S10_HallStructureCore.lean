@@ -634,7 +634,8 @@ theorem sigma_conj [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
   have hP'bar : (((Sylow.ofCard ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)) hcard :
         Sylow p ↥(MulAut.conj g • M)) : Subgroup ↥(MulAut.conj g • M)).map
           (MulAut.conj g • M).subtype : Subgroup G) = MulAut.conj g • Pbar := by
-    change ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)).map (MulAut.conj g • M).subtype = _
+    change ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)).map (MulAut.conj g • M).subtype
+      = _
     rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hle]
   rw [hP'bar, ← normalizer_conj_smul]
   exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hP
@@ -761,7 +762,8 @@ private theorem fusion_b [Finite G] (hG : IsMinimalSimpleOdd G)
     have hMsc : IsCoatom Ms := isCoatom_conj_smul hMc
     -- `t ∈ L` with `X₂ ≤ P̄^t`.
     obtain ⟨t, htL, hX₂t⟩ : ∃ t : G, t ∈ L ∧ X₂ ≤ MulAut.conj t • Pbar := by
-      obtain ⟨S'', hX₂S''⟩ := (hX₂p.of_equiv (Subgroup.subgroupOfEquivOfLe hX₂L).symm).exists_le_sylow
+      obtain ⟨S'', hX₂S''⟩ :=
+        (hX₂p.of_equiv (Subgroup.subgroupOfEquivOfLe hX₂L).symm).exists_le_sylow
       obtain ⟨t', ht'⟩ := MulAction.exists_smul_eq (↥L) P S''
       refine ⟨(t' : G), t'.2, ?_⟩
       calc X₂ = (X₂.subgroupOf L).map L.subtype := (Subgroup.map_subgroupOf_eq_of_le hX₂L).symm

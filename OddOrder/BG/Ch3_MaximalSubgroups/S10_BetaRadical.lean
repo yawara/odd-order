@@ -636,7 +636,8 @@ theorem beta_complement_normalizer_derived_contains_sylow [Finite G]
       hX_G_card, hKq_card]
   set P : Sylow q ↥(K.subgroupOf M) :=
     Sylow.ofCard ((X_G.subgroupOf M).subgroupOf (K.subgroupOf M)) hXGK_card with hP
-  have hPmap : (P : Subgroup ↥(K.subgroupOf M)).map (K.subgroupOf M).subtype = X_G.subgroupOf M := by
+  have hPmap : (P : Subgroup ↥(K.subgroupOf M)).map (K.subgroupOf M).subtype
+      = X_G.subgroupOf M := by
     rw [hP, Sylow.coe_ofCard, Subgroup.subgroupOf_map_subtype,
       inf_eq_left.mpr (Subgroup.subgroupOf_mono M hX_G_le_K)]
   have hFrattini := Sylow.normalizer_sup_eq_top P
@@ -751,7 +752,8 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
     have hSlt : (S : Subgroup G) < ⊤ := hS_le_M.trans_lt hM_lt
     have hSU : IsUniquelyMaximal (S : Subgroup G) :=
       OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_three_le_rank_of_lt_top hG hSlt hrank3
-    exact OddOrder.BG.Ch2.S09.not_isUniquelyMaximal_of_le_inf_distinct_maximals hM hH hS_le_HM hHM hSU
+    exact OddOrder.BG.Ch2.S09.not_isUniquelyMaximal_of_le_inf_distinct_maximals
+      hM hH hS_le_HM hHM hSU
   have hqβ : q ∉ beta M := fun h => hqα (beta_subset_alpha M h)
   -- `S ⊆ M_σ ⊆ M' = D`.
   have hS_pi : Ch03.Subgroup.IsPiGroup (sigma M) (S : Subgroup G) := by
@@ -780,7 +782,8 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
     set U : Subgroup G := Subgroup.normalizer ((S : Subgroup G) : Set G) ⊓ M with hU
     have hMβD : Mbeta M ≤ D :=
       le_trans (Subgroup.map_mono (Ch03.oPiCore_mono
-        (fun r hr => alpha_subset_sigma hG hM (beta_subset_alpha M hr)) ↥M)) (Msigma_le_derived hG hM)
+        (fun r hr => alpha_subset_sigma hG hM (beta_subset_alpha M hr)) ↥M))
+        (Msigma_le_derived hG hM)
     haveI hMβnorm : ((Mbeta M).subgroupOf D).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hMβD).mpr
         (hDM.trans (le_normalizer_opiCoreInG (beta M) M))
@@ -810,7 +813,8 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
             (Subgroup.normal_mul ((Mbeta M).subgroupOf D) (XD : Subgroup ↥D)).symm] at hform
         exact ⟨_, hform.symm⟩
       have hr_prime := Nat.prime_of_mem_primeFactors hr
-      rcases (Nat.Prime.dvd_mul hr_prime).mp ((Nat.mem_primeFactors.mp hr).2.1.trans hdvd) with h | h
+      rcases (Nat.Prime.dvd_mul hr_prime).mp ((Nat.mem_primeFactors.mp hr).2.1.trans hdvd)
+        with h | h
       · exact Or.inl (isPiSubgroup_opiCoreInG (beta M) M r
           (Nat.mem_primeFactors.mpr ⟨hr_prime,
             (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMβD).toEquiv) ▸ h, Nat.card_pos.ne'⟩))
@@ -836,7 +840,8 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
     -- **Frattini**: `M = K · N_M(S)`.
     have hSK_card : Nat.card ↥(((S : Subgroup G).subgroupOf M).subgroupOf (K.subgroupOf M)) =
         q ^ (Nat.card ↥(K.subgroupOf M)).factorization q := by
-      have hle : (S : Subgroup G).subgroupOf M ≤ K.subgroupOf M := Subgroup.subgroupOf_mono M hS_le_K
+      have hle : (S : Subgroup G).subgroupOf M ≤ K.subgroupOf M :=
+        Subgroup.subgroupOf_mono M hS_le_K
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS_le_M).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hKD.trans hDM)).toEquiv, hS_card, hKq_card]
@@ -863,8 +868,10 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
     have hMβ_pf : ∀ r ∈ (Nat.card ↥(Mbeta M)).primeFactors, r ∈ beta M := hMβ_hall.1
     have hcop_ab : Nat.Coprime (Nat.card ↥(Mbeta M)) (Nat.card ↥(XD : Subgroup ↥D)) := by
       rw [hb_eq]
-      exact Nat.Coprime.pow_right _ (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr
-        (fun hqdvd => hqβ (hMβ_pf q (Nat.mem_primeFactors.mpr ⟨Fact.out, hqdvd, Nat.card_pos.ne'⟩)))))
+      exact Nat.Coprime.pow_right _
+        (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr
+        (fun hqdvd =>
+          hqβ (hMβ_pf q (Nat.mem_primeFactors.mpr ⟨Fact.out, hqdvd, Nat.card_pos.ne'⟩)))))
     have hMβ'_card : Nat.card ↥((Mbeta M).subgroupOf D) = Nat.card ↥(Mbeta M) :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMβD).toEquiv
     have hMβX_card : Nat.card ↥MβX =
@@ -885,11 +892,13 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
         (Nat.card ↥D).factorization p = (Nat.card ↥(Mbeta M)).factorization p := by
       intro p hpβ' hp_prime
       have hidx : ¬ p ∣ (Mbeta M).index := fun hdvd =>
-        hMβ_hall.2 p (Nat.mem_primeFactors.mpr ⟨hp_prime, hdvd, Subgroup.index_ne_zero_of_finite⟩) hpβ'
+        hMβ_hall.2 p (Nat.mem_primeFactors.mpr ⟨hp_prime, hdvd,
+          Subgroup.index_ne_zero_of_finite⟩) hpβ'
       have haG : (Nat.card ↥(Mbeta M)).factorization p = (Nat.card G).factorization p := by
         have h2 : (Nat.card ↥(Mbeta M) * (Mbeta M).index).factorization p =
             (Nat.card G).factorization p := by rw [Subgroup.card_mul_index]
-        rwa [Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite, Finsupp.add_apply,
+        rwa [Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+          Finsupp.add_apply,
           Nat.factorization_eq_zero_of_not_dvd hidx, add_zero] at h2
       refine le_antisymm ?_ ?_
       · rw [haG]
@@ -1241,7 +1250,8 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
         haveI : IsCyclic ↥Q := hcyc
         exact hEnc (isCyclic_of_injective E.subtype E.subtype_injective)
       · by_cases h3 : 3 ≤ pRank ↥Q q
-        · exact (Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hq_odd hQpg h3).mpr
+        · exact (Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
+            hq_odd hQpg h3).mpr
             ⟨B, hBcard, hBmax⟩
         · exact isNarrow_of_pRank_le_two (by omega)
     -- `N := N_G(Q)` is a proper (hence solvable) subgroup, since `Q ≠ 1, ⊤` in the simple `G`.

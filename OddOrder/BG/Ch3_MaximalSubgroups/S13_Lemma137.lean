@@ -562,7 +562,8 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
     S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hMstarMax) hRMstar hRpiσ
   -- (f) `E₁` centralizes `R`.
   have hE1cR : E₁ ≤ Subgroup.centralizer (R : Set G) :=
-    E1_centralizes_R_of_hall_tau1 hG hMstarMax hE1ne (h.E₁_le.trans hEMstar) hπ hp hP hPE1 hRMsig hRcP
+    E1_centralizes_R_of_hall_tau1 hG hMstarMax hE1ne (h.E₁_le.trans hEMstar) hπ hp hP hPE1
+      hRMsig hRcP
   -- (g) `E₃` centralizes `R`, hence `E` does, contradiction with `C_G(E) ⊓ E₃ = ⊥`.
   have hE3cR : E₃ ≤ Subgroup.centralizer (R : Set G) := by
     haveI : IsCyclic ↥E₃ := h.E3_isCyclic hG
@@ -574,7 +575,9 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
   have hEcR : E ≤ Subgroup.centralizer (R : Set G) := hEsup ▸ sup_le hE1cR hE3cR
   have hRcE : R ≤ Subgroup.centralizer (E : Set G) :=
     Subgroup.commutator_eq_bot_iff_le_centralizer.mp
-      (by rw [Subgroup.commutator_comm]; exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hEcR)
+      (by
+        rw [Subgroup.commutator_comm]
+        exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hEcR)
   have hRbot : R ≤ Subgroup.centralizer (E : Set G) ⊓ E₃ := le_inf hRcE hRE3
   rw [(subgroupE_basic hG h).2.2.2.2.2.1] at hRbot
   exact hRne (le_bot_iff.mp hRbot)

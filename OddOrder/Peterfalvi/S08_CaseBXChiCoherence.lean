@@ -201,7 +201,8 @@ theorem xchi_inner_eq_of_anchored
         (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁))
       = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
           (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') + (a₀ : ℂ) ^ 2 := by
-    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+        hyp.dade hyp.hconj
         (S := ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁,
           OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁} : Set (ClassFunction ↥L ℂ)))
         (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -347,7 +348,8 @@ theorem exists_glue_nu_columnSum_Yset_via_map
     (νX : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G) :
     ∃ ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G,
       (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
-        ν (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = νX (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
+        ν (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+          = νX (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
       ∧ (∀ y ∈ hyp.Yset, ν y = cY.extension y) := by
   classical
   haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
@@ -435,10 +437,12 @@ noncomputable def coherentCertainTypeSet_union_Yset_via_anchoredImages
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
   -- the textbook column coherence `cX` (extension `= Ximg`, T=0-free).
-  set cX := certainTypeSet_isCoherent_via_anchoredImages hyp h46 cY hk Ximg hXanchored hXinner hXzirr
+  set cX :=
+    certainTypeSet_isCoherent_via_anchoredImages hyp h46 cY hk Ximg hXanchored hXinner hXzirr
     with hcX
   -- the glue map `ν` agreeing with `xChiExtension` (`= cX.extension`) on columns and `cY` on `Y`.
-  have hspec := (exists_glue_nu_columnSum_Yset_via_map hyp h46 hW1 cY (xChiExtension h46 Ximg)).choose_spec
+  have hspec :=
+    (exists_glue_nu_columnSum_Yset_via_map hyp h46 hW1 cY (xChiExtension h46 Ximg)).choose_spec
   set ν := (exists_glue_nu_columnSum_Yset_via_map hyp h46 hW1 cY (xChiExtension h46 Ximg)).choose
     with hνdef
   have hνcol : ∀ χ₂, ν (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = Ximg χ₂ := by

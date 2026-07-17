@@ -466,7 +466,8 @@ of the `Afam` grid has a common element `z χ₂ ∈ A_{χ₁, χ₂}` for every
 which needs `≥ 4` rows `= w₁ ≥ 5`).  A witness column `χ₂' ≠ χ₂` exists because `w₂ ≥ 3`. -/
 theorem exists_colCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) (hw1 : 5 ≤ Nat.card hyp.W1) :
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw1 : 5 ≤ Nat.card hyp.W1) :
     ∃ z : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} → ClassFunction G ℂ,
       ∀ q p, z q ∈ hyp.Afam hVeq app p q := by
   classical
@@ -493,7 +494,8 @@ applying `existsUnique_common` to the `transpose` grid (whose `≥ 4` rows are t
 a witness row `χ₁' ≠ χ₁` exists because `w₁ ≥ 3`. -/
 theorem exists_rowCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) (hw2 : 5 ≤ Nat.card hyp.W2) :
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw2 : 5 ≤ Nat.card hyp.W2) :
     ∃ w : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} → ClassFunction G ℂ,
       ∀ p q, w p ∈ hyp.Afam hVeq app p q := by
   classical
@@ -625,7 +627,8 @@ theorem exists_chiFamily_of_decomposition (hyp : TICyclicHypothesis G) [Fintype 
       · rw [hχpq p q hp hq]; exact (hsigφ _ _).inner_self
     have hoff : ∀ a b, a ≠ b → ClassFunction.inner (χ a) (χ b) = 0 := by
       rintro ⟨p, q⟩ ⟨p', q'⟩ hab
-      by_cases hp : p = 1 <;> by_cases hq : q = 1 <;> by_cases hp' : p' = 1 <;> by_cases hq' : q' = 1
+      by_cases hp : p = 1 <;> by_cases hq : q = 1 <;> by_cases hp' : p' = 1 <;>
+        by_cases hq' : q' = 1
       · subst hp; subst hq; subst hp'; subst hq'; exact absurd rfl hab
       · subst hp; subst hq; subst hp'
         rw [hχ11, hχ1q q' hq', ClassFunction.inner_neg_right, h1Gx (hsigz _), neg_zero]

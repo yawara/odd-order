@@ -51,7 +51,8 @@ theorem induce_smul_eq_mul_sum_of_invariant [Finite K] [Fintype K] [Fintype ↥H
     [Fintype (IrreducibleCharacter ↥H)] [Fintype ((K ⧸ H) →* ℂˣ)]
     (hab : ∀ x y : K, ⁅x, y⁆ ∈ H)
     (θ : IrreducibleCharacter ↥H) (ψ : IrreducibleCharacter K)
-    (hover : IrreducibleCharacter.LiesOver H ψ θ) (hinv : ∀ g : K, IrreducibleCharacter.conjBy g θ = θ) :
+    (hover : IrreducibleCharacter.LiesOver H ψ θ)
+    (hinv : ∀ g : K, IrreducibleCharacter.conjBy g θ = θ) :
     ClassFunction.restrictionMultiplicity H (ψ : ClassFunction K ℂ) (θ : ClassFunction ↥H ℂ) •
         ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
       = (ψ : ClassFunction K ℂ) *
@@ -176,7 +177,8 @@ theorem induce_smul_eq_sum_induce_mul_of_invariant_inertia
       rw [hinertia']; exact Subgroup.mem_top y
     exact (ClassFunction.mem_inertia).mp hmem
   -- Inertia-level general (1.7.b): `e · Ind_N^T θ' = ψ · ∑_β Inf(β)`.
-  have h5a := induce_smul_eq_mul_sum_of_invariant (K := ↥T) (H := N.subgroupOf T) hab θ' ψ hover hinv'
+  have h5a := induce_smul_eq_mul_sum_of_invariant (K := ↥T) (H := N.subgroupOf T)
+    hab θ' ψ hover hinv'
   -- Induction in stages: `Ind_T^L(Ind_N^T θ') = Ind_N^L θ`.
   have hstages := induce_induce_subgroupOf (M := L) hNT (θ : ClassFunction ↥N ℂ)
   have hcoe' : (θ' : ClassFunction ↥(N.subgroupOf T) ℂ)
@@ -254,7 +256,8 @@ theorem induce_inertia_constituent_apply_one_eq
   -- Each twist `ψ·Inf(β)` lies over `θ'` (its restriction to `N.subgroupOf T` is `Res ψ`).
   have hoverβ : ∀ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ,
       ClassFunction.restrictionMultiplicity (N.subgroupOf T)
-        ((ψ : ClassFunction ↥T ℂ) * linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T))))
+        ((ψ : ClassFunction ↥T ℂ)
+          * linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T))))
         θ'cf ≠ 0 := by
     intro β
     rw [ClassFunction.restrictionMultiplicity_def,
@@ -407,7 +410,8 @@ theorem constant_off_normal_of_inner_block_const {G : Type*} [Group G] [Finite G
           rw [hcoeff θ θ₀ ρ hθt hθ₀nt hlo hlo₀, hmult θ θ₀ ρ hlo hlo₀]; ring
       rw [hswap]
       have hI0 : ∑ θ ∈ A, ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
-            (θ : ClassFunction G ℂ) * ((θ : ClassFunction G ℂ) x - (θ : ClassFunction G ℂ) y) = 0 := by
+            (θ : ClassFunction G ℂ) * ((θ : ClassFunction G ℂ) x - (θ : ClassFunction G ℂ) y)
+              = 0 := by
         simp_rw [mul_sub]
         rw [Finset.sum_sub_distrib, hIndeval x, hIndeval y,
           ClassFunction.induce_apply_eq_zero_of_not_mem_normal H _ hx,

@@ -1492,7 +1492,8 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (ClassFunction.induce_mem_ZIrr _ (θ 0).property.mem_ZIrr))
       (coh.extension_mem_ZIrr _ (Submodule.subset_span (hSmem 0 (Ne.symm hind1H))))
     have hsmall : H78.smallIndex := by
-      have hfrobB := OddOrder.Peterfalvi.S14.frobenius_two_mul_card_complement_add_one_le_card_kernel
+      have hfrobB :=
+        OddOrder.Peterfalvi.S14.frobenius_two_mul_card_complement_add_one_le_card_kernel
         hFrobG hKodd hCodd hFrobG.ne_bot_kernel
       change 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
       have hke : H78.kernelOrder = Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M) := by

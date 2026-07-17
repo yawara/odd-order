@@ -128,14 +128,16 @@ theorem restrictionConstituentsSingleOrbit_of_isIrreducible
   obtain ⟨V, _, _, _, ρ, hρirr, hρchar⟩ := χ.isIrreducible
   haveI := hρirr
   -- Every constituent `ψ` of `Res χ` is the character of a simple `k[H]`-submodule of `Res ρ`.
-  have wrapper : ∀ ψ : IrreducibleCharacter ↥H, IrreducibleCharacter.LiesOver (G := G) (H := H) χ ψ →
+  have wrapper : ∀ ψ : IrreducibleCharacter ↥H,
+      IrreducibleCharacter.LiesOver (G := G) (H := H) χ ψ →
       ∃ N : Submodule ℂ[↥H] (resRep ρ H).asModule, IsSimpleModule ℂ[↥H] ↥N ∧
         ((Subrepresentation.ofSubmodule' N).toRepresentation).character
           = (ψ : ClassFunction ↥H ℂ) := by
     intro ψ hψ
     obtain ⟨W, _, _, _, σ, hσirr, hσchar⟩ := ψ.isIrreducible
     haveI := hσirr
-    have hfr := ClassFunction.restrictionMultiplicity_eq_finrank_intertwiningMap (H := H) ρ σ hρchar hσchar
+    have hfr := ClassFunction.restrictionMultiplicity_eq_finrank_intertwiningMap (H := H) ρ σ
+      hρchar hσchar
     have hfr_ne : Module.finrank ℂ (Representation.IntertwiningMap σ (ρ.comp H.subtype)) ≠ 0 :=
       fun h0 => hψ (by rw [hfr, h0, Nat.cast_zero])
     haveI : Nontrivial (Representation.IntertwiningMap σ (ρ.comp H.subtype)) :=
@@ -301,8 +303,10 @@ theorem exists_induce_constituent_partition [Finite G]
     intro θ hθ hθ'
     apply hBB'
     obtain ⟨g, hg⟩ := exists_conj_of_common_induce_constituent
-      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)).mpr ((hmem_cap φ θ).mp hθ))
-      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ')).mpr ((hmem_cap φ' θ).mp hθ'))
+      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)).mpr
+        ((hmem_cap φ θ).mp hθ))
+      ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ')).mpr
+        ((hmem_cap φ' θ).mp hθ'))
     ext θ''
     rw [hmem_cap, hmem_cap, ← hg, IrreducibleCharacter.liesOver_conjBy_iff]
   · intro A hA
@@ -423,7 +427,8 @@ theorem restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq
     (h₂ : IrreducibleCharacter.LiesOver (G := G) (H := H) φ₂ ρ)
     (hdeg : (φ₁ : ClassFunction G ℂ) 1 = (φ₂ : ClassFunction G ℂ) 1) :
     ClassFunction.restrictionMultiplicity H (φ₁ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ)
-      = ClassFunction.restrictionMultiplicity H (φ₂ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ) := by
+      = ClassFunction.restrictionMultiplicity H (φ₂ : ClassFunction G ℂ)
+          (ρ : ClassFunction ↥H ℂ) := by
   have e1 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₁ ρ h₁
   have e2 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₂ ρ h₂
   rw [hdeg] at e1

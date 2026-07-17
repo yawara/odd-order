@@ -694,7 +694,8 @@ theorem exists_constituent_not_subset_characterKernel
   have hfourier :=
     sum_inner_irreducibleCharacter_smul (ClassFunction.restrict B (χ : ClassFunction G ℂ))
   have key : (χ : ClassFunction G ℂ) x = (χ : ClassFunction G ℂ) 1 := by
-    have e1 : (χ : ClassFunction G ℂ) x = (ClassFunction.restrict B (χ : ClassFunction G ℂ)) xB := by
+    have e1 : (χ : ClassFunction G ℂ) x
+        = (ClassFunction.restrict B (χ : ClassFunction G ℂ)) xB := by
       rw [ClassFunction.restrict_apply]
     have e2 : (χ : ClassFunction G ℂ) 1 = (ClassFunction.restrict B (χ : ClassFunction G ℂ)) 1 := by
       rw [ClassFunction.restrict_apply]; rfl

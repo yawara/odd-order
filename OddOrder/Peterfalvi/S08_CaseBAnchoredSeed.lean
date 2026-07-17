@@ -781,7 +781,8 @@ noncomputable def coherentCertainTypeSet_union_Yset_caseB
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
     {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
       φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
@@ -1260,7 +1261,8 @@ noncomputable def caseBXimg
     (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
       φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
@@ -1293,7 +1295,8 @@ theorem caseBXimg_spec
     (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
       φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
@@ -1345,7 +1348,8 @@ noncomputable def caseBXset_isCoherent
     (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
       φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
@@ -1361,7 +1365,8 @@ noncomputable def caseBXset_isCoherent
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) where
   nonzero := hnonzero
   extension := caseBXsetExtension hyp h46
-    (caseBXimg hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL hc2 hFPF hη₁ cY hcYgood)
+    (caseBXimg hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL hc2 hFPF
+      hη₁ cY hcYgood)
   extension_inner_eq := by
     intro φ ψ hφ hψ
     rw [OddOrder.Peterfalvi.S07.zSpan] at hφ hψ

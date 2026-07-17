@@ -1015,7 +1015,8 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       · exfalso
         obtain ⟨q, hqy⟩ : (orderOf y').primeFactors.Nonempty :=
           Nat.nonempty_primeFactors.mpr (by
-            have := orderOf_pos y'; have hne : orderOf y' ≠ 1 := fun h => hy'1 (orderOf_eq_one_iff.mp h)
+            have := orderOf_pos y'
+            have hne : orderOf y' ≠ 1 := fun h => hy'1 (orderOf_eq_one_iff.mp h)
             omega)
         have hqκ := hy'κ q (hpiSet y' hqy)
         have hqτ2 := hτ2 q (hpiSet y' hqy)
@@ -1027,7 +1028,9 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hM, hxy ▸ hCyM⟩
       rw [hsingx, Set.mem_singleton_iff] at hmem; exact hmem
     obtain ⟨p, hpx⟩ : (orderOf x).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr (by
-      have := orderOf_pos x; have hne : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h); omega)
+      have := orderOf_pos x
+      have hne : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h)
+      omega)
     have hpτ2M : p ∈ tau2 M := hMN ▸ hπτ2N p (hpiSet x hpx)
     have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hxy ▸ hyMσ
     have hpσM : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
@@ -1047,7 +1050,9 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         ⟨Nat.prime_of_mem_primeFactors hq, (Nat.dvd_of_mem_primeFactors hq).trans
           ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard hx'N), Nat.card_pos.ne'⟩)
     obtain ⟨p, hpy⟩ : (orderOf y).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr (by
-      have := orderOf_pos y; have hne : orderOf y ≠ 1 := fun h => hy1 (orderOf_eq_one_iff.mp h); omega)
+      have := orderOf_pos y
+      have hne : orderOf y ≠ 1 := fun h => hy1 (orderOf_eq_one_iff.mp h)
+      omega)
     have hcox : Nat.Coprime (orderOf x) (orderOf x') :=
       OddOrder.GroupTheory.coprime_orderOf_of_isPiElement hxPi hx'Pi
     have hpg : (orderOf (x * x')).primeFactors =
@@ -1063,7 +1068,8 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hpmem : p ∈ (orderOf x).primeFactors ∪ (orderOf x').primeFactors := hpg ▸ hyg hpy
     have hσMN : OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.sigma N := by
       rcases Finset.mem_union.mp hpmem with hpx | hpx'
-      · exact absurd (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hM (hxPi p hpx) (hyPi p hpy)) hσeq
+      · exact absurd (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hM (hxPi p hpx) (hyPi p hpy))
+          hσeq
       · exact sigma_eq_of_mem_sigma_of_mem_sigma hG hM hNmax (hyPi p hpy) (hx'PiN p hpx')
     have hx'PiM : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x' := by
       rw [hσMN]; exact hx'PiN
@@ -1076,7 +1082,9 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (hyPi p hpy) (hσMN ▸ hyPi p hpy)
     -- `x = y'` is a `κ(M)`-element and a `τ₂(N)`-element; `p`-rank is conjugation invariant.
     obtain ⟨p2, hp2x⟩ : (orderOf x).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr (by
-      have := orderOf_pos x; have hne : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h); omega)
+      have := orderOf_pos x
+      have hne : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h)
+      omega)
     have hp2κ : p2 ∈ kappa M := hy'κ p2 (hxy' ▸ hpiSet x hp2x)
     have hp2τ2 : p2 ∈ tau2 N := hπτ2N p2 (hpiSet x hp2x)
     have hrM : pRank ↥M p2 = 1 := by

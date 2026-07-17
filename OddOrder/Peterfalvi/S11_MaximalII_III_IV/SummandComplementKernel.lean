@@ -728,7 +728,8 @@ theorem caseA_hcrit_of_member [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSe
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
     (caseA : CliffordCaseAData chars) [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
     {ζ₁ ζ₂ : IrreducibleCharacter ↥(huSub data)}
-    (hS0notker : ¬ (((caseA_realizedComplement chief caseA.S0).subgroupOf M).subgroupOf (huSub data) :
+    (hS0notker : ¬
+      (((caseA_realizedComplement chief caseA.S0).subgroupOf M).subgroupOf (huSub data) :
         Set ↥(huSub data)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (ζ₁ : ClassFunction ↥(huSub data) ℂ))
     (hkerW₂ : (((caseA_realizedComplement chief (caseA_wComplement caseA)).subgroupOf M).subgroupOf
@@ -909,7 +910,8 @@ theorem eq_of_liesOver_of_restrict_eq_irr {Γ : Type*} [Group Γ] [Fintype Γ]
   rw [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
     ClassFunction.restrictionMultiplicity_def, hres] at hover
   by_contra h
-  exact hover (by rw [OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite η θ, if_neg h])
+  exact hover (by rw [OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite η θ,
+    if_neg h])
 
 /-- **The seed is determined by the `hInHu`-restriction of `hcPsi`**: if `hcPsi θ₁` restricted to
 `hInHu.subgroupOf HC` equals the transported inflation of `θ₂`, then `θ₁ = θ₂`.  By
@@ -1088,7 +1090,8 @@ theorem caseA_reducible_source_eq_hcZeta [Finite G] {M : Subgroup G}
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
+  haveI : (hInHu data ⊔
+      ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
     hcInHu_realized_normal chief
   obtain ⟨χ, hχ, rfl⟩ := hφ
   have hind_red : ¬ IsIrreducibleCharacter
@@ -1224,7 +1227,8 @@ theorem caseA_regular_inflation_inertia_eq [Finite G] {M : Subgroup G}
   inertia_eq_hcInHu_caseA data chief caseA (fun i => by
     obtain ⟨x, hx, hne⟩ := (comp_subtype_ne_one_iff_exists caseA θ i).mp (hreg i)
     exact ⟨x, hx, by
-      rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+      rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
+        Units.val_one]
       simpa using hne⟩)
 
 /-- **A regular seed's `Ind_{HC}(hcPsi θ)` is irreducible** (caseA `Xθ`-member irreducibility).  The

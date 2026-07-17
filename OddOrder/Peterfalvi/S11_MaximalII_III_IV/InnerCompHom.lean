@@ -264,10 +264,12 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
     rw [Subgroup.coe_inclusion]
     exact (Subgroup.subgroupOf_mono (huSub data) (Subgroup.subgroupOf_mono M le_sup_right)) hc
   -- (6) `φ = ψhom · (hcLambdaHom λ)⁻¹` factors through `hcHom` (`φ` kills `H₀C`).
-  set φ : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) →* ℂˣ :=
+  set φ : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) →*
+      ℂˣ :=
     ψhom * (hcLambdaHom chief lam)⁻¹ with hφdef
   have hφkerH0 : ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf
-      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ≤ φ.ker := by
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ≤
+        φ.ker := by
     intro x hx
     rw [Subgroup.mem_subgroupOf] at hx
     have hxH : x ∈ (hInHu data).subgroupOf
@@ -279,7 +281,8 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
     exact hψhom_one x (hψkerC' x
       ((Subgroup.subgroupOf_mono (huSub data) (Subgroup.subgroupOf_mono M le_sup_left)) hx))
   have hφkerC : (cInHu data chief).subgroupOf
-      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ≤ φ.ker := by
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ≤
+        φ.ker := by
     intro x hx
     rw [Subgroup.mem_subgroupOf] at hx
     have hxc : x = Subgroup.inclusion (cInHu_le_hcRealized chief)
@@ -309,10 +312,12 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
       M).subgroupOf (huSub data))) ⊆
       OddOrder.Peterfalvi.S03.characterKernel
         (linearIrreducibleCharacter φ : ClassFunction
-          ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
+          ↥(hInHu data ⊔
+            ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
     intro x hx
     have hx1 : hcHom chief x = 1 := hx
-    have hxH0C : x ∈ (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+    have hxH0C : x ∈ (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).subgroupOf
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) := by
       rw [hcHom, MonoidHom.comp_apply] at hx1
       have h2 : (QuotientGroup.mk' ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
@@ -865,7 +870,8 @@ theorem hcZeta_mem_xiSet [Finite G] {M : Subgroup G}
     rw [Subgroup.coe_inclusion]; exact SetLike.coe_mem h
   have hψker := liesOver_mem_characterKernel hlo (hsub hgmem)
   have hψ1 : (hcPsi chief θ : ClassFunction
-      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) 1 = 1 := by
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      1 = 1 := by
     simp [hcPsi]
   rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
     hcPsi_apply_inclusion chief θ h, hψ1,
@@ -1314,7 +1320,7 @@ theorem hcZeta_exists_conj_of_fixed {M : Subgroup G} {data : TypesIIIIIIVSetup M
     with hφdef
   have hη := hcZeta_liesOver_compHom_of_fixed m ζ θ₀ φθ₀ hlo hfix rfl
   obtain ⟨g, hg⟩ :=
-    OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit.exists_conj
+   OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit.exists_conj
       (OddOrder.RepresentationTheory.restrictionConstituentsSingleOrbit_of_isIrreducible ζ) hlo hη
   refine ⟨g, ?_⟩
   have hc := congrArg (fun x : IrreducibleCharacter ↥(hInHu data) =>

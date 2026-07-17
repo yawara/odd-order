@@ -114,7 +114,8 @@ theorem fixedBy_eq_of_le_of_ne_bot {N E₁ : Subgroup G} (hprime : ActsPrimeOn N
     by_contra hcon
     push Not at hcon
     exact hPne (by rw [eq_bot_iff]; intro x hx; rw [Subgroup.mem_bot]; exact hcon x hx)
-  refine le_antisymm ?_ (inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPE1)))
+  refine le_antisymm ?_
+    (inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPE1)))
   calc fixedBy N P ≤ fixedByElement N g := fixedBy_le_fixedByElement hgP
     _ = fixedBy N E₁ := hprime g (hPE1 hgP) hg1
 
@@ -374,7 +375,8 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [Set.mem_compl_iff, mem_tau1_iff]
       rintro ⟨_, hqM', _⟩
       exact hqM' (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hq).1,
-        (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hE3M'star), Nat.card_pos.ne'⟩)
+        (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hE3M'star),
+        Nat.card_pos.ne'⟩)
     -- Corollary 13.2(b): `E₃` centralizes `M_σ ⊓ M*`.
     have hxp : IsPGroup p ↥(Subgroup.zpowers x) :=
       IsPGroup.of_card (by rw [Nat.card_zpowers, hx_ord, pow_one])
@@ -850,7 +852,8 @@ theorem aInvariant_sylow_conj_subgroup [Finite G] {A N : Subgroup G}
     ∃ c : G, c ∈ N ∧ c ∈ Subgroup.centralizer (A : Set G) ∧ MulAut.conj c • S = T := by
   classical
   letI act : MulDistribMulAction ↥A ↥N :=
-    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N (Subgroup.inclusion hAN)
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
+      (Subgroup.inclusion hAN)
   set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
   have hφ_coe : ∀ (a : ↥A) (x : ↥N), ((φ a) x : G) = (a : G) * (x : G) * (a : G)⁻¹ :=
     fun _ _ => rfl
@@ -891,7 +894,8 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow_subgroup [Finite G] {A N : Subg
       Nat.card ↥S = q ^ (Nat.card ↥N).factorization q := by
   classical
   letI act : MulDistribMulAction ↥A ↥N :=
-    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N (Subgroup.inclusion hAN)
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
+      (Subgroup.inclusion hAN)
   set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
   have hφ_coe : ∀ (a : ↥A) (x : ↥N), (N.subtype ((φ a) x)) = (↑a) * (N.subtype x) * (↑a)⁻¹ :=
     fun _ _ => rfl
@@ -983,7 +987,8 @@ theorem exists_E1inv_sylow_centralizing_derivedE [Finite G] (hG : IsMinimalSimpl
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWMσ).toEquiv]
     rw [hcardeq, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
       Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd
-        (fun hd => hqidx (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩)),
+        (fun hd =>
+          hqidx (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩)),
       add_zero]
   have hcardN : (Nat.card ↥N).factorization q = (Nat.card ↥(S10.Msigma M)).factorization q := by
     have h1 : (Nat.card ↥W).factorization q ≤ (Nat.card ↥N).factorization q :=
@@ -1083,7 +1088,8 @@ theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd
   have hXMσ : X ≤ S10.Msigma M := hXC.trans inf_le_left
   have hXM : X ≤ M := hXMσ.trans (S10.Msigma_le M)
   by_cases hcase : q ∈ S10.beta M ∨ X ≤ derivedInG (S10.Msigma M)
-  · -- **Reduction half** (BG L3608): Corollary 12.14 (faithful form) supplies both `ℳ(C_G(X)) = {M}`
+  · -- **Reduction half** (BG L3608): Corollary 12.14 (faithful form) supplies both
+    -- `ℳ(C_G(X)) = {M}`
     -- and `ℳ(S₀) = {M}` for its internal Sylow `S₀ ⊇ X`; the arbitrary `S` follows by conjugacy.
     obtain ⟨hCG, S₀, _hXS₀, hS₀Mσ, hS₀q, hS₀max, hMS₀⟩ :=
       Cor1214.maximalContaining_centralizer_and_someSylow_eq_singleton

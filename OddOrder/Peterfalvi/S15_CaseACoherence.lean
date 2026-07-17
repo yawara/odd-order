@@ -697,7 +697,8 @@ theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
   -- `indS`/`A(S)`;
   -- the (9.11.7)–(9.11.8) refutation, still a residual even on the M-side, issue 9083).
   intro S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
-  exact hyp.sSet_caseA_nineElevenRefutation hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
+  exact hyp.sSet_caseA_nineElevenRefutation hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne
+    hnopair
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **(9.11) coherence of the full honest §9 family `𝒮 = sSet` on `Ind_S^G`, unconditional** (issue
@@ -716,8 +717,10 @@ theorem Hypothesis.sSet_coherent_indS_A [Finite G]
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
   rcases clifford_dichotomy hG (hyp.mkSection11CharacterDataS_honest hG chief) with hA | hB
-  · exact hyp.sSet_coherent_indS_caseA hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief) hA.some
-  · exact hyp.sSet_coherent_indS_caseB hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief) hB.some
+  · exact hyp.sSet_coherent_indS_caseA hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief)
+      hA.some
+  · exact hyp.sSet_coherent_indS_caseB hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief)
+      hB.some
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
