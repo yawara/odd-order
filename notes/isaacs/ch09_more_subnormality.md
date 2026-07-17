@@ -10,8 +10,27 @@
 > → `GeneralizedFitting.lean` (`genFitting G` = F\*(G) 定義 + **Thm 9.8 Bender
 > `centralizer_genFitting_le_genFitting` + Cor 9.9 両方向
 > `genFitting_eq_fitting_iff`)。**§9A (9.1–9.9) は 2026-07-17 に完結** (全 sorry-free,
-> axiom-clean 監査済)。次 frontier = §9B (Wielandt automorphism tower, 9.10–9.22;
-> 上流優先+文書順)。
+> axiom-clean 監査済)。
+>
+> **§9B 進行中 (2026-07-18〜, 全 sorry-free/axiom-clean)**: `InnerAutomorphisms.lean`
+> (Inn(G) + Lem 9.11) → `AutTowerBounds.lean` (Lem 9.12 chain centralizer + Lem 9.14
+> order bound) → `NilpotentResidual.lean` (`nilpotentResidual S = S^∞` の定義・API +
+> Lem 9.15 `G=SF ⇒ G^∞=S^∞` + Cor 9.16 `F(G) ≤ N_G(S^∞)`) → `SubnormalSocle.lean`
+> (Lem 9.17 `S^G` minimal normal + **Cor 9.18** `E(G) ≤ N_G(S^∞)`: `layerCenter = E⊓C_G(E)`
+> を ambient Z(E) とし各 component 像に 9.17 を当てる、型 `↥E⧸Z(↥E)` を経由しない) →
+> `Schenkman.lean` (**Lem 9.19** Frattini nilpotent 判定 + **Lem 9.20** nilpotent
+> complement 存在 + **Thm 9.22** `Z(G)=1 ⇒ C_G(G^∞)≤G^∞` + **Thm 9.21** Schenkman
+> `S◁G, C_G(S)=1 ⇒ C_G(S^∞)≤S^∞`)。
+> **次 frontier = Thm 9.13** (order bound: 9.14+9.16+9.18+9.21+9.8 を束ねる) →
+> **Thm 9.10** (Wielandt aut tower, 9.12+9.13 経由)。上流優先+文書順。
+>
+> Schenkman 実装メモ: 9.22 は `inf_center_ne_bot_of_normal_of_isNilpotent`
+> (nilpotent 群の nontrivial normal は中心と交わる; upper central series 帰納) が核。
+> 9.21 は `Nat.card` 帰納 + subtype transport 補助 3 本
+> (`centralizer_subgroupOf_eq_bot` / `mem_centralizer_residual_subgroupOf` /
+> `coe_mem_residual_of_mem_subgroupOf`)。SC=G 枝は中間部分群不在 → G/S cyclic →
+> `isMulCommutative_of_isCyclic_of_ker_le_center` で C 可換 → 9.15 で G^∞=S^∞ → 9.22。
+> ⚠ `coatom map 方向` は mathlib 不在ゆえ `isCoatom_map_of_ker_le` で補完。
 >
 > Thm 9.8 実装メモ (書籍 p.275 忠実, landed): `C := C_G(F*)`, `Z := C ⊓ F*`, 反証で
 > `C.map π ≠ ⊥` (`π : G → G/Z`) → minimal normal `M̄ ≤ C.map π` を取り Lem 9.6 で分岐。

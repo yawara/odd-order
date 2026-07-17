@@ -38,7 +38,9 @@ namespace OddOrder.Isaacs.Ch09
 
 open Subgroup QuotientGroup
 
-open scoped commutatorElement
+open scoped commutatorElement IsMulCommutative
+
+universe u
 
 variable {G : Type*} [Group G]
 
@@ -308,6 +310,192 @@ theorem centralizer_nilpotentResidual_le_of_center_eq_bot [Finite G]
   rw [hCH_bot, sup_bot_eq] at hCdedek
   rw [hCdedek]
   exact inf_le_right
+
+end
+
+section /- 9B: Theorem 9.21 (Schenkman 一般形) の subtype transport 補助 -/
+
+/-- `C_G(S) = ⊥`, `S ≤ K` ⇒ `C_{↥K}(S.subgroupOf K) = ⊥`. -/
+private theorem centralizer_subgroupOf_eq_bot {K S : Subgroup G} (hSK : S ≤ K)
+    (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
+    Subgroup.centralizer ((S.subgroupOf K : Subgroup ↥K) : Set ↥K) = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff] at hx
+  have hxG : (x : G) ∈ Subgroup.centralizer (S : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hs
+    have := hx ⟨s, hSK hs⟩ (Subgroup.mem_subgroupOf.mpr hs)
+    simpa using congrArg Subtype.val this
+  rw [hCS, Subgroup.mem_bot] at hxG
+  rw [Subgroup.mem_bot]
+  exact Subtype.ext hxG
+
+/-- `x ∈ K`, `(x:G) ∈ C_G(S^∞)`, `S ≤ K` ⇒ `⟨x⟩ ∈ C_{↥K}((S.subgroupOf K)^∞)`. -/
+private theorem mem_centralizer_residual_subgroupOf [Finite G] {K S : Subgroup G} (hSK : S ≤ K)
+    {x : G} (hxK : x ∈ K)
+    (hxC : x ∈ Subgroup.centralizer (↑(nilpotentResidual S) : Set G)) :
+    (⟨x, hxK⟩ : ↥K)
+      ∈ Subgroup.centralizer (↑(nilpotentResidual (S.subgroupOf K)) : Set ↥K) := by
+  rw [Subgroup.mem_centralizer_iff] at hxC ⊢
+  intro r hr
+  have hrG : (r : G) ∈ nilpotentResidual S := by
+    rw [← map_subtype_nilpotentResidual_subgroupOf hSK]
+    exact Subgroup.mem_map_of_mem _ hr
+  refine Subtype.ext ?_
+  simpa using hxC (r : G) hrG
+
+/-- `x̄ ∈ (S.subgroupOf K)^∞` ⇒ `(x̄:G) ∈ S^∞` (`S ≤ K`). -/
+private theorem coe_mem_residual_of_mem_subgroupOf [Finite G] {K S : Subgroup G} (hSK : S ≤ K)
+    {x : ↥K} (hx : x ∈ nilpotentResidual (S.subgroupOf K)) :
+    (x : G) ∈ nilpotentResidual S := by
+  rw [← map_subtype_nilpotentResidual_subgroupOf hSK]
+  exact Subgroup.mem_map_of_mem _ hx
+
+end
+
+section /- 9B: Theorem 9.21 (Schenkman, 一般形, p. 282) -/
+
+/-- Schenkman 9.21 の帰納核 (`Nat.card G ≤ n` で帰納, `∀ G` を内側量化).
+`S ◁ G`, `C_G(S) = ⊥` ⇒ `C_G(S^∞) ≤ S^∞`. -/
+private theorem schenkman_aux (n : ℕ) :
+    ∀ (G : Type u) [Group G] [Finite G], Nat.card G ≤ n →
+      ∀ (S : Subgroup G), S.Normal → Subgroup.centralizer (S : Set G) = ⊥ →
+        Subgroup.centralizer (↑(nilpotentResidual S) : Set G) ≤ nilpotentResidual S := by
+  induction n with
+  | zero => intro G _ _ hcard; exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
+  | succ n IH =>
+    intro G _ _ hcard S hSnormal hCS
+    haveI := hSnormal
+    set R := nilpotentResidual S with hR
+    set C := Subgroup.centralizer (R : Set G) with hC
+    haveI hRnormal : R.Normal := by rw [hR]; infer_instance
+    haveI hCnormal : C.Normal := by rw [hC]; infer_instance
+    have hRS : R ≤ S := nilpotentResidual_le S
+    -- Step A: `C ⊓ S ≤ R` (`↥S` で 9.22)
+    have hStepA : C ⊓ S ≤ R := by
+      intro x hx
+      obtain ⟨hxC, hxS⟩ := Subgroup.mem_inf.mp hx
+      have hZS : Subgroup.center (↥S) = ⊥ := by
+        rw [eq_bot_iff]
+        intro z hz
+        rw [Subgroup.mem_center_iff] at hz
+        have hzG : (z : G) ∈ Subgroup.centralizer (S : Set G) := by
+          rw [Subgroup.mem_centralizer_iff]
+          intro s hs
+          simpa using congrArg Subtype.val (hz ⟨s, hs⟩)
+        rw [hCS, Subgroup.mem_bot] at hzG
+        rw [Subgroup.mem_bot]; exact Subtype.ext hzG
+      have h922 := centralizer_nilpotentResidual_le_of_center_eq_bot (G := ↥S) hZS
+      have hxbar : (⟨x, hxS⟩ : ↥S)
+          ∈ Subgroup.centralizer (↑(nilpotentResidual (⊤ : Subgroup ↥S)) : Set ↥S) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro r hr
+        have hrG : (r : G) ∈ R := by
+          rw [hR, ← map_subtype_nilpotentResidual_top S]
+          exact Subgroup.mem_map_of_mem _ hr
+        refine Subtype.ext ?_
+        simpa using (Subgroup.mem_centralizer_iff.mp hxC) (r : G) hrG
+      have hxRS := h922 hxbar
+      rw [hR, ← map_subtype_nilpotentResidual_top S]
+      exact Subgroup.mem_map_of_mem _ hxRS
+    by_cases hSC : S ⊔ C = ⊤
+    · -- SC = G の場合
+      -- 中間部分群がない: `S ≤ H → H = S ∨ H = ⊤`
+      have hinterval : ∀ H : Subgroup G, S ≤ H → H = S ∨ H = ⊤ := by
+        intro H hSH
+        rcases eq_or_ne H ⊤ with rfl | hHtop
+        · exact Or.inr rfl
+        · refine Or.inl ?_
+          haveI hSHn : (S.subgroupOf H).Normal := hSnormal.subgroupOf H
+          have hcardH : Nat.card ↥H ≤ n := by
+            have hlt : Nat.card ↥H < Nat.card G :=
+              lt_of_not_ge fun hge => hHtop (Subgroup.eq_top_of_le_card _ hge)
+            omega
+          have hIHH := IH ↥H hcardH (S.subgroupOf H) hSHn
+            (centralizer_subgroupOf_eq_bot hSH hCS)
+          have hHC : H ⊓ C ≤ R := by
+            intro x hx
+            obtain ⟨hxH, hxC⟩ := Subgroup.mem_inf.mp hx
+            exact coe_mem_residual_of_mem_subgroupOf hSH
+              (hIHH (mem_centralizer_residual_subgroupOf hSH hxH hxC))
+          have hHeq : H = S ⊔ (H ⊓ C) := by
+            have hmod := Subgroup.inf_sup_eq_sup_inf_of_normal_of_le (E := S) (A := C) (M := H) hSH
+            rwa [hSC, inf_top_eq] at hmod
+          rw [hHeq]
+          exact sup_eq_left.mpr (hHC.trans hRS)
+      -- `G/S` cyclic
+      haveI hcyc : IsCyclic (G ⧸ S) := by
+        have hsub : ∀ B : Subgroup (G ⧸ S), B = ⊥ ∨ B = ⊤ := by
+          intro B
+          rcases hinterval _ (QuotientGroup.le_comap_mk' S B) with h | h
+          · left
+            have h2 := congrArg (Subgroup.map (QuotientGroup.mk' S)) h
+            rw [Subgroup.map_comap_eq, MonoidHom.range_eq_top_of_surjective _
+              (QuotientGroup.mk'_surjective S), top_inf_eq] at h2
+            rw [h2, (Subgroup.map_eq_bot_iff S).mpr (QuotientGroup.ker_mk' S).ge]
+          · right
+            have h2 := congrArg (Subgroup.map (QuotientGroup.mk' S)) h
+            rwa [Subgroup.map_comap_eq, MonoidHom.range_eq_top_of_surjective _
+              (QuotientGroup.mk'_surjective S), top_inf_eq,
+              Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective S)] at h2
+        rcases subsingleton_or_nontrivial (G ⧸ S) with _ | _
+        · exact isCyclic_of_subsingleton
+        · obtain ⟨g, hg⟩ := exists_ne (1 : G ⧸ S)
+          refine ⟨⟨g, fun x => ?_⟩⟩
+          rcases hsub (Subgroup.zpowers g) with h0 | htop
+          · exact absurd (Subgroup.zpowers_eq_bot.mp h0) hg
+          · exact htop.ge (Subgroup.mem_top x)
+      -- `C` は可換
+      haveI hCcomm : IsMulCommutative ↥C := by
+        have hker : ((QuotientGroup.mk' S).comp C.subtype).ker ≤ Subgroup.center ↥C := by
+          intro z hz
+          simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+            QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hz
+          rw [Subgroup.mem_center_iff]
+          intro w
+          have hzR : (z : G) ∈ R := hStepA (Subgroup.mem_inf.mpr ⟨z.2, hz⟩)
+          exact Subtype.ext (by
+            simpa using ((Subgroup.mem_centralizer_iff.mp w.2) (z : G) hzR).symm)
+        exact ((QuotientGroup.mk' S).comp C.subtype).isMulCommutative_of_isCyclic_of_ker_le_center
+          hker
+      -- `G^∞ = S^∞` (9.15) と `Z(G) = ⊥` から 9.22
+      have h915 : nilpotentResidual (⊤ : Subgroup G) = R := by
+        rw [hR]
+        exact nilpotentResidual_top_eq_of_isSubnormal_sup_nilpotent (S := S) (F := C)
+          hSnormal.isSubnormal hSC
+      have hZG : Subgroup.center G = ⊥ := by
+        rw [eq_bot_iff]
+        intro z hz
+        have hzc : z ∈ Subgroup.centralizer (S : Set G) := by
+          rw [Subgroup.mem_centralizer_iff]
+          intro s _
+          exact Subgroup.mem_center_iff.mp hz s
+        rw [hCS, Subgroup.mem_bot] at hzc
+        rw [Subgroup.mem_bot]; exact hzc
+      have h922G := centralizer_nilpotentResidual_le_of_center_eq_bot (G := G) hZG
+      rw [h915] at h922G
+      exact h922G
+    · -- SC < G の場合: `↥(S ⊔ C)` に IH
+      set G₀ := S ⊔ C with hG₀
+      intro c hc
+      have hcG₀ : c ∈ G₀ := Subgroup.mem_sup_right hc
+      haveI hS₀normal : (S.subgroupOf G₀).Normal := hSnormal.subgroupOf G₀
+      have hcardG₀ : Nat.card ↥G₀ ≤ n := by
+        have hlt : Nat.card ↥G₀ < Nat.card G :=
+          lt_of_not_ge fun hge => hSC (Subgroup.eq_top_of_le_card _ hge)
+        omega
+      have hIH := IH ↥G₀ hcardG₀ (S.subgroupOf G₀) hS₀normal
+        (centralizer_subgroupOf_eq_bot le_sup_left hCS)
+      exact coe_mem_residual_of_mem_subgroupOf le_sup_left
+        (hIH (mem_centralizer_residual_subgroupOf le_sup_left hcG₀ hc))
+
+/-- **Isaacs Theorem 9.21** (Schenkman, p. 282): `S ◁ G` (有限群), `C_G(S) = 1` ならば
+`C_G(S^∞) ≤ S^∞`. -/
+theorem centralizer_nilpotentResidual_le_of_centralizer_eq_bot [Finite G] {S : Subgroup G}
+    [hS : S.Normal] (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
+    Subgroup.centralizer (↑(nilpotentResidual S) : Set G) ≤ nilpotentResidual S :=
+  schenkman_aux (Nat.card G) G le_rfl S hS hCS
 
 end
 
