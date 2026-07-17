@@ -67,7 +67,7 @@ variable [Finite Ω]
 
 omit [Finite Ω] in
 /-- The suborbit of `α` at `α` itself is `{α}`. -/
-private lemma orbit_stabilizer_self (α : Ω) :
+lemma orbit_stabilizer_self (α : Ω) :
     orbit (stabilizer G α) α = {α} := by
   ext γ
   constructor
@@ -382,7 +382,7 @@ lemma ncard_suborbit_eq_relIndex (α β : Ω) :
 
 omit [Finite Ω] in
 /-- Suborbit sizes are invariant under translation. -/
-private lemma ncard_suborbit_smul_eq (g : G) (α β : Ω) :
+lemma ncard_suborbit_smul_eq (g : G) (α β : Ω) :
     Set.ncard (orbit (stabilizer G (g • α)) (g • β)) =
       Set.ncard (orbit (stabilizer G α) β) := by
   have horb : orbit (stabilizer G (g • α)) (g • β) =
