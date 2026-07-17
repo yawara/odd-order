@@ -39,7 +39,7 @@ theorem algEquiv_permutes_single (ψ : (ι → k) ≃ₐ[k] (ι → k)) :
   set ε : ι → (ι → k) := fun i => ψ (Pi.single i 1) with hε
   -- each `Pi.single i 1` is idempotent, hence so is its image `ε i`
   have hsingle_idem : ∀ i, (Pi.single i (1 : k) : ι → k) * Pi.single i 1 = Pi.single i 1 := by
-    intro i; funext j; by_cases h : j = i <;> simp [Pi.single_apply, h]
+    intro i; funext j; by_cases h : j = i <;> simp [h]
   have hidem : ∀ i, IsIdempotentElem (ε i) := by
     intro i
     change ψ (Pi.single i 1) * ψ (Pi.single i 1) = ψ (Pi.single i 1)
@@ -75,7 +75,7 @@ theorem algEquiv_permutes_single (ψ : (ι → k) ≃ₐ[k] (ι → k)) :
     change ψ (Pi.single i 1) * ψ (Pi.single i' 1) = 0
     rw [← map_mul]
     have hz : (Pi.single i (1 : k) : ι → k) * Pi.single i' 1 = 0 := by
-      funext j; by_cases hj : j = i <;> by_cases hj' : j = i' <;> simp_all [Pi.single_apply]
+      funext j; by_cases hj : j = i <;> by_cases hj' : j = i' <;> simp_all
     rw [hz, map_zero]
   have hdisj : (↑(Finset.univ : Finset ι) : Set ι).PairwiseDisjoint S := by
     intro i _ i' _ h
@@ -193,7 +193,7 @@ theorem algHom_pi_eq_eval (f : (ι → k) →ₐ[k] k) : ∃ i₀, ∀ v : ι �
     refine IsIdempotentElem.iff_eq_zero_or_one.mp ?_
     rw [IsIdempotentElem, ← map_mul]
     congr 1
-    funext j; by_cases h : j = i <;> simp [Pi.single_apply, h]
+    funext j; by_cases h : j = i <;> simp [h]
   -- distinct ones are orthogonal.
   have hortho : ∀ i j, i ≠ j → f (Pi.single i (1 : k)) * f (Pi.single j 1) = 0 := by
     intro i j hij

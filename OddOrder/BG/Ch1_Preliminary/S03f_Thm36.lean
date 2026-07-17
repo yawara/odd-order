@@ -1731,7 +1731,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
               group
             rw [hval]
             exact Subgroup.commutator_mem_commutator ⟨(g : ↥H), g.2, rfl⟩ a.2
-          | one => simpa using Subgroup.one_mem _
+          | one => simp
           | mul y z hy hz ihy ihz =>
             rw [Subgroup.coe_mul, Subgroup.coe_mul]
             exact Subgroup.mul_mem _ ihy ihz
@@ -2220,7 +2220,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
               ((P.map H.subtype : Subgroup G) : Set G))
             (fun ℓ : (Nat.card ↥KG).primeFactors => OddOrder.Isaacs.Ch01.opCore (ℓ : ℕ) ↥KG)
             hy (fun ℓ z hz => hOl_cent ℓ ⟨z, hz, rfl⟩)
-            (by simpa using Subgroup.one_mem _)
+            (by simp)
             (fun z w hz hw => by
               show (z : G) * (w : G) ∈ _
               exact Subgroup.mul_mem _ hz hw)

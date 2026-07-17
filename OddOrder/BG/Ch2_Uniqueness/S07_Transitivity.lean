@@ -456,7 +456,7 @@ private theorem le_opiCoreInG_centralizer_of_mem_centralizer_sylow
     have hqP : (q : G) ∈ Subgroup.normalizer A := hAnormP hq
     rw [Subgroup.mem_normalizer_iff]
     intro z
-    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    simp only [Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
     exact Subgroup.mem_normalizer_iff.mp hqP (z : G)
   have hCQA : Subgroup.centralizer ((A.subgroupOf K : Subgroup ↥K) : Set ↥K) ⊓ (Q : Subgroup ↥K)
       ≤ A.subgroupOf K := by
@@ -480,7 +480,7 @@ private theorem le_opiCoreInG_centralizer_of_mem_centralizer_sylow
     have haW : (a : G) ∈ Subgroup.normalizer W := hAW ha
     rw [Subgroup.mem_normalizer_iff]
     intro z
-    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    simp only [Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
     exact Subgroup.mem_normalizer_iff.mp haW (z : G)
   have hWpi' : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (W.subgroupOf K) := by
     intro r hr
@@ -521,7 +521,7 @@ private theorem scn_ambient {p : ℕ} {G : Type*} [Group G] {P : Sylow p G} {A :
         ⟨g, hg⟩⁻¹
       rw [Subgroup.mem_subgroupOf] at this
       have heq : ((⟨g, hg⟩⁻¹ * ⟨g * a * g⁻¹, hAP hga⟩ * (⟨g, hg⟩⁻¹)⁻¹ : ↥(P : Subgroup G)) : G)
-          = a := by simp [Subgroup.coe_mul, Subgroup.coe_inv]; group
+          = a := by simp [Subgroup.coe_mul]; group
       rwa [heq] at this
   · intro x hx
     have hmem : (⟨x, (Subgroup.mem_inf.mp hx).2⟩ : ↥(P : Subgroup G))
@@ -1099,8 +1099,7 @@ private theorem coreClaim_scn2 [Finite G] (hG : IsMinimalSimpleOdd G)
       intro g hg
       have hgN : g ∈ Subgroup.normalizer A := hAnormP hg
       have hconjp : ∀ y : G, (g * y * g⁻¹) ^ p = g * y ^ p * g⁻¹ := fun y => by
-        have := map_pow (MulAut.conj g) y p
-        simpa [MulAut.conj_apply] using this.symm
+        simp
       rw [Subgroup.mem_normalizer_iff]
       intro x
       simp only [hOmdef, OddOrder.GroupTheory.mem_omega1OfAbelian]
@@ -1158,7 +1157,7 @@ private theorem coreClaim_scn2 [Finite G] (hG : IsMinimalSimpleOdd G)
       obtain ⟨xhat, hxhatL, rfl⟩ := hx
       rw [hBdef, Subgroup.mem_map]
       exact ⟨⟨g, hg⟩ * xhat * ⟨g, hg⟩⁻¹, hLpp_normal.conj_mem xhat hxhatL ⟨g, hg⟩, by
-        simp [Subgroup.coe_mul, Subgroup.coe_inv]⟩
+        simp [Subgroup.coe_mul]⟩
     -- `B` is elementary abelian of order `p²`, hence noncyclic.
     have hB_elem : B.IsElementaryAbelian p := by
       refine ⟨fun x y => Subtype.ext (hAcomm_set _ (hBA x.2) _ (hBA y.2)), fun x => Subtype.ext ?_⟩

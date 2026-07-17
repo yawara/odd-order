@@ -137,7 +137,6 @@ private lemma cyclicExtK_centralized {N : Type*} [Group N]
     simp [SemidirectProduct.mul_right, SemidirectProduct.right_inl, SemidirectProduct.right_inr]
   ext
   · -- Left component.
-    change ((y * cyclicExtK m a σ) * y⁻¹).left = (cyclicExtK m a σ).left
     simp only [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
                SemidirectProduct.inv_left,
                h_K_left, h_K_right, cyclicExtPhi_apply]

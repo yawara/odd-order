@@ -342,7 +342,7 @@ theorem not_conj_of_mem_tau1_union_tau3_of_normalizer_le [Finite G]
       rw [hX'def, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
     rw [← h1, hbot]
     ext x
-    simp [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    simp
   have hX'p : IsPGroup p ↥X' := by
     rw [hX'def, mulAut_smul_eq_map]
     exact hXp.map _

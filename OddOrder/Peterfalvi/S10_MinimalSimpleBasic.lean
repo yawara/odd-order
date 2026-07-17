@@ -802,7 +802,7 @@ theorem normalizer_support_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       intro n hn g
       induction hn using Subgroup.closure_induction with
       | mem x hx => exact Subgroup.subset_closure (hGinv g x hx)
-      | one => simpa using Subgroup.one_mem (Subgroup.closure X)
+      | one => simp
       | mul x y _ _ hx hy =>
           have hxy : g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹) := by group
           rw [hxy]; exact mul_mem hx hy
@@ -885,7 +885,7 @@ theorem dadeSupportHypothesisData_of_subset [Fintype G]
                   · rw [ftSupportKernel_eq_of_escaping hesc]
                     exact (hstruct hesc).2.2.2 b.1 (hXA b.2)
                   · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
-                    simpa using Nat.coprime_one_left _ }
+                    simp }
             H_eq_ftSupportKernel := fun _ => rfl
             hconj := fun a l => ftSupportKernel_conj_smul hG hM data hXA @hXiff l.2 }⟩
 
@@ -1620,7 +1620,7 @@ theorem dadeSupportHypothesisData_of_subset_sigmaSharp [Fintype G]
                   · rw [ftSupportKernel_eq_of_escaping hesc]
                     exact (hstruct hesc).2.2.2 b.1 (hXσ b.2)
                   · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
-                    simpa using Nat.coprime_one_left _ }
+                    simp }
             H_eq_ftSupportKernel := fun _ => rfl
             hconj := fun a l => ftSupportKernel_conj_smul_sigmaSharp hG hM hXσ @hXiff l.2 }⟩
 
@@ -1716,7 +1716,7 @@ theorem dadeSupportHypothesisData_of_subset_escaping_sigmaSharp [Fintype G]
                   · rw [ftSupportKernel_eq_of_escaping hesc]
                     exact (hstruct hesc).2.2.2 b.1 b.2
                   · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
-                    simpa using Nat.coprime_one_left _ }
+                    simp }
             H_eq_ftSupportKernel := fun _ => rfl
             hconj := fun a l =>
               ftSupportKernel_conj_smul_escaping_sigmaSharp hG hM hXesc @hXiff l.2 }⟩

@@ -244,7 +244,7 @@ theorem finrank_A1_le_finrank_invariants (ρ : Representation k G V)
     congr 1
     rw [Finset.sum_eq_single (1 : G)]
     · show e.symm (ρ (1 : G) (w : V)) 1 = w
-      have h1 : ρ (1 : G) (w : V) ∈ A 1 := by simpa using hmem 1 1 (w : V) w.2
+      have h1 : ρ (1 : G) (w : V) ∈ A 1 := by simp
       rw [hcs1 _ h1]; ext; simp
     · intro g _ hg1
       have hg : ρ g (w : V) ∈ A g := by simpa using hmem g 1 (w : V) w.2

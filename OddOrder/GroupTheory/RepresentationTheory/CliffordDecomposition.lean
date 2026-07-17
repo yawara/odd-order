@@ -438,7 +438,7 @@ theorem forall_mem_ne_trivial_of_induce_eq_sum
   have hrestrict : ClassFunction.restrict H (trivialIrreducibleCharacter L : ClassFunction L ℂ)
       = (trivialIrreducibleCharacter ↥H : ClassFunction ↥H ℂ) := by
     ext x
-    simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+    simp [IrreducibleCharacter.coe_trivialIrreducibleCharacter,
       trivialClassFunction_apply]
   have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
       (trivialIrreducibleCharacter L : ClassFunction L ℂ) = 0 := by

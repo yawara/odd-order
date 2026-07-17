@@ -466,9 +466,9 @@ theorem hInHu_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIII
   intro x hx
   obtain ⟨hxH, hxU⟩ := hx
   have hgH : (((x : ↥(huSub data)) : ↥M) : G) ∈ data.H := by
-    simp only [hInHu, Subgroup.mem_subgroupOf] at hxH; exact hxH
+    simp only [hInHu] at hxH; exact hxH
   have hgU : (((x : ↥(huSub data)) : ↥M) : G) ∈ data.typeP.U := by
-    simp only [uInHu, Subgroup.mem_subgroupOf] at hxU; exact hxU
+    simp only [uInHu] at hxU; exact hxU
   have hgUW1 : (((x : ↥(huSub data)) : ↥M) : G) ∈ data.typeP.U ⊔ data.typeP.W1 :=
     Subgroup.mem_sup_left hgU
   -- the `U`-action element with the same `G`-coordinate

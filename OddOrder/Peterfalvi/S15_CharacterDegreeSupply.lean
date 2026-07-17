@@ -183,7 +183,7 @@ theorem caseA_exists_irreducible_witnessed [Finite G] {M : Subgroup G}
   refine ⟨θ, hnt, hreg, ?_⟩
   by_contra h
   refine hζn ?_
-  simp only [Finset.mem_coe, hXmu, Finset.mem_filter, hXθ, Finset.mem_image]
+  simp only [Finset.mem_coe, Finset.mem_filter, hXθ, Finset.mem_image]
   exact ⟨⟨θ, hθ, rfl⟩, h⟩
 
 open OddOrder.Peterfalvi.S11 in

@@ -692,7 +692,7 @@ theorem add_two_lt_two_pow {q : ℕ} (hq : 3 ≤ q) : q + 2 < 2 ^ q := by
   | zero => omega
   | succ n ih =>
     rcases Nat.lt_or_ge n 3 with hn | hn
-    · interval_cases n <;> simp_all <;> omega
+    · interval_cases n <;> simp_all
     · have := ih hn
       rw [pow_succ]
       omega

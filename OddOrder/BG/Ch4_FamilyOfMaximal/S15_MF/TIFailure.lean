@@ -476,7 +476,7 @@ theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
     obtain ⟨n, hn⟩ := hQpg.exists_card_eq
     rw [hn]
     rcases Nat.eq_zero_or_pos n with h0 | h0
-    · subst h0; simpa using Nat.coprime_one_right _
+    · subst h0; simp
     · rw [Nat.coprime_pow_right_iff h0]
       exact ((Fact.out : q.Prime).coprime_iff_not_dvd.mpr (fun hd =>
         hDq' (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩))).symm

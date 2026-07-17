@@ -79,7 +79,7 @@ theorem unitVal_inv {hyp : Hypothesis (G := G)} (a : fieldNormalizerNormOneUnits
 /-- The field value of a norm-one unit is nonzero. -/
 theorem unitVal_ne_zero {hyp : Hypothesis (G := G)} (a : fieldNormalizerNormOneUnits hyp) :
     unitVal a ≠ 0 := by
-  simpa [unitVal] using (a : (GaloisField hyp.base.p hyp.base.q)ˣ).ne_zero
+  simp [unitVal]
 
 /-- Conjugating the prime-line scalar `s^x` by `σ(inr a)` scales the exponent by
 `↑a⁻¹`: `σ(inr a)⁻¹ · s^x · σ(inr a) = s^{(↑a⁻¹)·x}`.  This is BG's `s^a` notation. -/

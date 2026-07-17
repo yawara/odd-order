@@ -326,8 +326,8 @@ noncomputable def retarget_isCoherent_of_extensionImage
       (τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)) = 1 := by
     rw [hdade _ _ hmemu hmemd, ← Nat.cast_smul_eq_nsmul ℂ a chi1]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
-      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-      hχχ, hχχbar, hchi1χ, hchi1χbar, star_natCast]
+      ClassFunction.inner_smul_left,
+      hχχ, hχχbar, hchi1χ, hchi1χbar]
     ring
   have hdd : ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj))
       (τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)) = 2 := by
@@ -339,7 +339,7 @@ noncomputable def retarget_isCoherent_of_extensionImage
       (τ ((χ : ClassFunction ↥L ℂ) - a • chi1)) = 1 := by
     rw [hdade _ _ hmemd hmemu, ← Nat.cast_smul_eq_nsmul ℂ a chi1]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
-      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right,
       hχχ, hχchi1, hχbarχ, hχbarchi1, star_natCast]
     ring
   -- `hS₁.extension χ₁` norm and the conjugates of the two crux inner products.
@@ -384,10 +384,10 @@ noncomputable def retarget_isCoherent_of_extensionImage
   -- `⟨X, X̄⟩ = 0`.
   have hXXbar : ClassFunction.inner X Xbar = 0 := by
     rw [hXbar, hX, ← Nat.cast_smul_eq_nsmul ℂ a (hS₁.extension chi1)]
-    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    simp only [ClassFunction.inner_sub_right,
       ClassFunction.inner_add_left, ClassFunction.inner_add_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-      huu, hud, hdu, hcrux1, hcrux2, hvu, hvd, hvv, star_natCast]
+      huu, hud, hcrux1, hvu, hvd, hvv, star_natCast]
     ring
   -- `⟨X̄, X⟩ = 0`.
   have hXbarX : ClassFunction.inner Xbar X = 0 := by

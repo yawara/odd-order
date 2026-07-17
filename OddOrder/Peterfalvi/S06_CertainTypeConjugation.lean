@@ -221,7 +221,7 @@ theorem certainType_mu_conj_eq (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
   have hI := congrArg (fun φ => ClassFunction.inner φ
     ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ)) hb
   simp only [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_neg hne,
-    if_pos rfl, mul_zero, mul_one] at hI
+    mul_zero] at hI
   exact absurd hI.symm (by
     rcases (h.columnFamily χ₂⁻¹).sign_eq with he | he <;> rw [he] <;> norm_num)
 

@@ -50,7 +50,10 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -399,6 +402,24 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+
+-- Ch.6 (Frobenius Actions): Thm 6.24 (Thompson) — Frobenius kernels are nilpotent
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.isNilpotent_of_isFrobeniusAction
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.IsFrobeniusGroup.isNilpotent_kernel
+
+-- Ch.9 (More on Subnormality): Lem 9.1 — G/Z(G) simple ⇒ G' quasisimple with
+-- G'/Z(G') ≅ G/Z(G); Lem 9.2 — proper normals of a quasisimple group are central,
+-- nonidentity quotients are quasisimple.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isQuasisimple_commutator
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.commutatorQuotientCenterEquiv
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.IsQuasisimple.normal_le_center
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.IsQuasisimple.quotient
+
+-- Ch.9 (More on Subnormality): Lem 9.3 — a component not inside a minimal normal
+-- subgroup centralizes it; Thm 9.4 — distinct components commute.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.commutator_eq_bot_of_isMinimalNormal_of_isComponent
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.IsComponent.commutator_eq_bot_of_ne
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.

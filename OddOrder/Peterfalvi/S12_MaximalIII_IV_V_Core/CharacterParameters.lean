@@ -1258,7 +1258,7 @@ theorem Hypothesis.muGridAlpha_inner_self [Finite G]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
     hA, hB, hZ, hP, hP', hQ, hQ', hR, hR', star_intCast, star_natCast,
-    mul_zero, zero_mul, sub_zero, zero_sub, mul_one, mul_neg, neg_neg, neg_zero]
+    mul_zero, sub_zero, zero_sub, mul_one]
   rcases hδpm with h | h <;> subst h <;> push_cast <;> ring
 
 open scoped FiniteInduce in

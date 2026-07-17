@@ -332,7 +332,7 @@ private theorem conj_mem_omega1Map {M : Subgroup P} {g n : P}
   | mem w hw =>
     refine Subgroup.subset_closure ⟨hM w hw.1, ?_⟩
     rw [conj_pow, hw.2, mul_one, mul_inv_cancel]
-  | one => simpa using one_mem _
+  | one => simp
   | mul a b _ _ ha hb =>
     rw [show g * (a * b) * g⁻¹ = (g * a * g⁻¹) * (g * b * g⁻¹) by group]
     exact Subgroup.mul_mem _ ha hb
@@ -457,7 +457,6 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
           obtain ⟨m₀, hm₀, rfl⟩ := hm
           refine ⟨(⟨g', hg'⟩ : ↥G') * m₀ * (⟨g', hg'⟩ : ↥G')⁻¹,
             hM'_normal.conj_mem m₀ hm₀ ⟨g', hg'⟩, ?_⟩
-          push_cast
           rfl
         -- `M < G'`, so `|M| < |G'|`.
         have hM_lt_G' : M < G' := by
@@ -555,7 +554,7 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
               have hmul := mul_pow_prime_eq_one_of_class_le_two hp_odd hcl_M hnp' hxkp'
               -- `(n' * xk'⁻¹ : P) = n * (x^k)⁻¹ = a`.
               have hcoe : (((⟨n, hnM⟩ : ↥M) * (⟨x ^ k, hxkM⟩ : ↥M)⁻¹ : ↥M) : P) = a := by
-                simp only [Subgroup.coe_mul, InvMemClass.coe_inv, Subgroup.coe_mk]
+                simp only [Subgroup.coe_mul, InvMemClass.coe_inv]
                 rw [hk]; group
               have hfin : ((((⟨n, hnM⟩ : ↥M) * (⟨x ^ k, hxkM⟩ : ↥M)⁻¹) ^ p : ↥M) : P)
                   = ((1 : ↥M) : P) := by rw [hmul]
@@ -740,7 +739,7 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
         have hK_le_C : K ≤ C := by
           rw [hK_def, Subgroup.closure_le]
           intro z hz
-          simp only [Set.mem_insert_iff, Set.mem_singleton_iff, SetLike.mem_coe] at hz
+          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hz
           rcases hz with rfl | rfl
           · exact huC
           · exact hvC
@@ -811,7 +810,7 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
             have hcomm_eq : (⁅(⟨u, huK⟩ : ↥K), ⟨v, hvK⟩⁆ : ↥K) = (⟨⁅v, u⁆, hvuK⟩ : ↥K)⁻¹ := by
               rw [commutatorElement_def]
               apply Subtype.ext
-              simp only [Subgroup.coe_mul, InvMemClass.coe_inv, Subgroup.coe_mk,
+              simp only [Subgroup.coe_mul, InvMemClass.coe_inv,
                 commutatorElement_def]
               group
             rw [hcomm_eq, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]

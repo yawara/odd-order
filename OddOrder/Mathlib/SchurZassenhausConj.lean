@@ -1242,7 +1242,7 @@ private theorem step_caseB
         · intro hyK
           refine ⟨k_K⁻¹ * y * k_K, ?_, ?_⟩
           · exact K.mul_mem (K.mul_mem (K.inv_mem hk_K_K) hyK) hk_K_K
-          · change k_K * (k_K⁻¹ * y * k_K) * k_K⁻¹ = y; group
+          · group
       calc K.map (MulAut.conj n_N).toMonoidHom
           = (K.map (MulAut.conj k_K).toMonoidHom).map (MulAut.conj n_N).toMonoidHom := by
               rw [h_K_conj_kK]

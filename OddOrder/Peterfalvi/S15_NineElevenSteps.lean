@@ -240,7 +240,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
     (fun η hη => hyp.sSet_memberRFamily hG hnoV hη.1)
     (fun a ha b hb hab => by
       have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) ha.1 hb.1 hab
-      convert h using 2 <;> exact Subsingleton.elim _ _)
+      convert h using 2)
     hconj
     hnr
     hN
@@ -261,7 +261,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
         (OddOrder.Peterfalvi.S11.u_odd hG chars).pos.ne'))
     (by
       rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-      simpa using honestTypeP2ASet_one_not_mem (M := hyp.S))
+      simp)
     (hconj χ₀ hχ₀)
     (fun h => hnr χ₀ hχ₀ h.symm)
 

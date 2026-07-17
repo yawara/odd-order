@@ -538,7 +538,7 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_conj [Finite G]
     rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_smul_left, hμijζ, hμi0ζ, hμijζc, hμi0ζc, hζζ, hζζc,
-    star_intCast, star_natCast, mul_zero, zero_mul, sub_zero, zero_sub, mul_one]
+    mul_zero, sub_zero, zero_sub, mul_one]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.2), `(α_{ij}, ζ − η) = −n`** for any degree-`w₁` irreducible `η ∈ S(HC)`
@@ -576,7 +576,7 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_irr [Finite G]
     rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hηirr, if_neg (Ne.symm hηne)]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_smul_left, hμijζ, hμi0ζ, hμijη, hμi0η, hζζ, hζη,
-    star_intCast, star_natCast, mul_zero, zero_mul, sub_zero, zero_sub, mul_one]
+    mul_zero, sub_zero, zero_sub, mul_one]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `(α_{ij}, μ_k − dζ̄) = 0`** (M-side, `0 < k < w₂`, `k ≠ j`): the inner
@@ -1144,7 +1144,7 @@ theorem classFunction_inner_re_sq_le {H : Type*} [Group H] [Fintype H]
         = (ClassFunction.inner ψ ψ).re * (t * t)
           + (-2 * (ClassFunction.inner φ ψ).re) * t + (ClassFunction.inner φ φ).re := by
       rw [key, OddOrder.RepresentationTheory.inner_conj_symm φ ψ]
-      simp only [pow_two, Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.mul_im,
+      simp only [Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.mul_im,
         Complex.ofReal_re, Complex.ofReal_im, Complex.star_def, Complex.conj_re, Complex.conj_im,
         zero_mul, mul_zero, sub_zero, add_zero]
       ring

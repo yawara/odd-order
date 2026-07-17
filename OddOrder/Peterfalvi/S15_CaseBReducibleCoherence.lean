@@ -85,7 +85,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
     (fun η hη => hyp.sSet_memberRFamily hG hnoV hη)
     (fun a ha b hb hab => by
       have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) ha hb hab
-      convert h using 2 <;> exact Subsingleton.elim _ _)
+      convert h using 2)
     (fun a ha => sSet_closedUnderConjugate _ ha)
     (fun a ha heq => sSet_hasNoRealCharacters _ (hyp.oddCardS hG) ha heq.symm)
     ⟨hyp.q, hN⟩
@@ -109,7 +109,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
         (OddOrder.Peterfalvi.S11.u_odd hG chars).pos.ne'))
     (by
       rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-      simpa using honestTypeP2ASet_one_not_mem (M := hyp.S))
+      simp)
     (sSet_closedUnderConjugate _ hη₁)
     (sSet_hasNoRealCharacters _ (hyp.oddCardS hG) hη₁)
 
@@ -663,7 +663,7 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
   have h1A : (1 : ↥hyp.S)
       ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-    simpa using honestTypeP2ASet_one_not_mem (M := hyp.S)
+    simp
   have hgen :=
     OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
       (χ := OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupS hG)
@@ -790,7 +790,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
   have hone_notin : (1 : ↥hyp.S) ∉
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-    simpa using honestTypeP2ASet_one_not_mem (M := hyp.S)
+    simp
   -- the family, its finiteness, and the per-member column datum (all members reducible)
   set F : Set (ClassFunction ↥hyp.S ℂ) := sSet (hyp.toTypesIIIIIIVSetupS hG) with hFdef
   have hFfin : F.Finite := sSet_finite (hyp.toTypesIIIIIIVSetupS hG)

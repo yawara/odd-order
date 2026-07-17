@@ -380,11 +380,11 @@ theorem Hypothesis.eta10_Qsharp_norm_lower_core [Finite G]
       (Pm1 := hyp.q ^ hyp.p - 1) (u := hyp.v)
       (firstTerm := (Nat.card ↥(derivedInG hyp.T) : ℝ) - (hyp.v : ℝ) ^ 2)
       (α1 := α1) (δ := δ)
-      hvanish (by convert hinner using 2 <;> congr!)
-      (fun x hx => hχ x (by convert hx using 2 <;> congr!))
+      hvanish (by convert hinner using 2)
+      (fun x hx => hχ x (by convert hx using 2))
       hfirstTerm hcross hδ
-      (by convert hinfl using 2 <;> congr!) hu
-    convert h using 2 <;> congr!
+      (by convert hinfl using 2; congr!) hu
+    convert h using 2; congr!
   rwa [sum_apply_erase_one_filter_subgroupOf hQT
     (fun y => ‖hyp.eta10 y‖ ^ 2)] at hengine
 

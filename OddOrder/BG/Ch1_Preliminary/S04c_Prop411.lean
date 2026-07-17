@@ -742,7 +742,7 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
       apply le_antisymm
       · rw [Subgroup.closure_le]
         intro x hx
-        simp only [Set.mem_insert_iff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
         rcases hx with rfl | rfl
         · exact hmk1
         · exact hzZ
@@ -779,7 +779,7 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
         obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (hpow g)
         rw [← hk]; exact zpow_mem hapW k
       · rw [Subgroup.mem_center_iff.mp hz g, mul_assoc, mul_inv_cancel, mul_one]; exact hzW
-    | one => simpa using W.one_mem
+    | one => simp
     | mul x y _ _ hx hy =>
         rw [show g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹) by group]; exact W.mul_mem hx hy
     | inv x _ hx => rw [show g * x⁻¹ * g⁻¹ = (g * x * g⁻¹)⁻¹ by group]; exact W.inv_mem hx
@@ -840,7 +840,7 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
     apply le_antisymm
     · rw [Subgroup.closure_le]
       intro y hy
-      simp only [Set.mem_insert_iff, Set.mem_singleton_iff, SetLike.mem_coe] at hy
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hy
       rcases hy with rfl | rfl
       · exact Subgroup.mem_zpowers _
       · exact one_mem _
@@ -1009,7 +1009,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
         have hgen_le : Subgroup.closure ({a, b, z} : Set R') ≤ Subgroup.centralizer {c} := by
           rw [Subgroup.closure_le]
           intro y hy
-          simp only [Set.mem_insert_iff, Set.mem_singleton_iff, SetLike.mem_coe] at hy
+          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hy
           rw [SetLike.mem_coe, Subgroup.mem_centralizer_singleton_iff]
           rcases hy with rfl | rfl | rfl
           · exact hca.eq
@@ -1139,7 +1139,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
       apply le_antisymm
       · rw [Subgroup.closure_le]
         intro x hx
-        simp only [Set.mem_insert_iff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
         rcases hx with rfl | rfl
         · exact Subgroup.mem_zpowers _
         · exact hz_in_a

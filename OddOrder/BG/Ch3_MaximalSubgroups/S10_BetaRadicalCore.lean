@@ -383,7 +383,7 @@ private theorem sylow_structure_b [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
     refine ⟨(⟨g₁, hg₁⟩ : ↥(P : Subgroup G)) * (φ ⟨g₂, hg₂⟩) (⟨g₁, hg₁⟩)⁻¹,
       Subgroup.subset_closure ⟨_, _, rfl⟩, ?_⟩
     rw [map_mul, hφcoe ⟨g₂, hg₂⟩ (⟨g₁, hg₁⟩)⁻¹, commutatorElement_def]
-    simp only [Subgroup.coe_subtype, Subgroup.coe_inv, Subgroup.coe_mk]
+    simp only [Subgroup.coe_subtype, Subgroup.coe_inv]
     group
   have hmapeq : (Ch04.actionCommutator φ).map (P : Subgroup G).subtype = (P : Subgroup G) :=
     le_antisymm (Subgroup.map_subtype_le _) ((le_of_eq hPVeq).trans hge)
@@ -518,7 +518,7 @@ private theorem sylow_structure_c [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
     rw [inv_inv, hPM_eq, Subgroup.mem_subgroupOf]
     have hzQ : (z : G) ∈ Q := Subgroup.mem_subgroupOf.mp hz
     have hcoe : ((mM * z * mM⁻¹ : ↥M) : G) = m * (z : G) * m⁻¹ := by
-      simp only [hmMdef, Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_mk]
+      simp only [hmMdef, Subgroup.coe_mul, Subgroup.coe_inv]
     rw [hcoe]
     have hmem : m * (z : G) * m⁻¹ ∈ MulAut.conj m • Q := by
       rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def, MulAut.conj_inv_apply]

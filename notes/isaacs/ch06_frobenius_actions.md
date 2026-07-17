@@ -664,3 +664,39 @@ ROADMAP は Ch.6 完了後の第 5 波として Ch.7 (Thompson, ZJ) と Ch.10 (M
 - **Ch.10 (More Transfer)**: Ch.5 (Transfer) + Ch.6 (Frobenius) の融合. BG App.A 周辺で使う Hall-Higman 1.2.3 強化版 (Isaacs 10.X) が中心. 直接被引用は Ch.7 経由が多い.
 
 ⇒ Phase 1 完成への道筋: **Ch.5 → Ch.6 → Ch.7 → Ch.10** がクリティカルパス. Ch.6 は前 2 章のラッパー仕事と後 2 章の重い新規実装を結ぶ要.
+
+## 2026-07-17 Ch.6 完備化 (レーン a) — 章として全番号付き結果クローズ
+
+survey (`notes/meta/three_books_full_survey_2026_07_16.md`) の Ch.6 残 5 ギャップを全てクローズし、
+**Isaacs Ch.6 の 24 番号付き結果は全て形式化済み** (6.22 は BG Thm 3.7 として BG tree に既存) となった。
+
+| 結果 | 実装 | 所在 |
+|---|---|---|
+| Thm 6.4 (2)⇒(1) | `IsFrobeniusGroup.of_trivialIntersection` (これで 4 条件同値の全 6 方向が揃う) | `FrobeniusGroup.lean` |
+| Thm 6.7 | `exists_isComplement'_of_centralizer_le` | 新 leaf `KernelComplement.lean` |
+| Cor 6.17 完全形 | `sylow_isCyclic_or_two_quaternion_of_frobeniusAction` (6.10 × 6.11 合成) | `Main.lean` |
+| Thm 6.19 | `existsUnique_card_prime_of_isFrobeniusAction_of_odd` (+ pair 形) | `OddComplement.lean` |
+| **Thm 6.24** | `isNilpotent_of_isFrobeniusAction` (action 形) + `IsFrobeniusGroup.isNilpotent_kernel` (pair 形) | 新 leaf `KernelNilpotent.lean` |
+
+### Thm 6.24 (Thompson) の構成
+
+書籍証明 (p. 196) を忠実に |N| 強帰納法で形式化 (`KernelNilpotent.lean`, 391 行 sorry-free):
+
+- actor を素数位数部分群に置換 (`actorSubgroup`) してから帰納。
+- **invariant normal M がある場合**: `IsFrobeniusAction.subgroup`/`quotient` (Cor 6.2) で M と N/M に
+  帰納 → N solvable (mathlib `solvable_of_ker_le_range`) → solvable case
+  `isNilpotent_of_isFrobeniusAction_of_isSolvable` = 半直積 `N ⋊[φ] A` 内で BG Thm 3.7
+  (`OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree`) を適用し
+  `Group.nilpotent_of_mulEquiv` で引き戻す。
+- **無い場合**: N は r-群 (でなければ矛盾): 奇素数 r ∣ |N| を取り、A-invariant Sylow R
+  (`Ch04.exists_aInvariant_sylow`; coprime は `coprime_card`)。Z(R)-image (invariance は新 helper
+  `aInvariant_center_map`) と J(R) (`thompsonJ_map_of_injective` 経由) は nontrivial・invariant で
+  N に normal になれない → `C_N(Z(R))`, `N_N(J(R))` が proper invariant → 帰納で nilpotent →
+  `Ch05.hasNormalPComplement_of_isNilpotent` (新 leaf `NilpotentPComplement.lean`) → Thompson 7.1
+  (`Ch07.thompson_normal_p_complement_of_local_hypotheses`) で N が normal r-complement K を持つ →
+  K は `Ch05.map_mulAut_of_normal_pcomplement` で A-invariant、nontrivial (さもなくば N が r-群)・
+  proper で場合仮定と矛盾。
+
+import cycle 回避のため `KernelNilpotent.lean` は Ch06 `Main.lean` に入れず `OddOrder.lean` 直配線
+(BG S03c を import するため; `OddComplement`/`FrobeniusGroupQuotient` と同じパターン)。
+AxiomsCheck 登録済 (action + pair 両形)。

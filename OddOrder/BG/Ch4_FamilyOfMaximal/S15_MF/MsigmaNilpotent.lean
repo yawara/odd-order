@@ -1150,7 +1150,7 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
     obtain ⟨n, hn⟩ := hQpg.exists_card_eq
     rw [hn]
     rcases Nat.eq_zero_or_pos n with h0 | h0
-    · subst h0; simpa using Nat.coprime_one_right _
+    · subst h0; simp
     · rw [Nat.coprime_pow_right_iff h0]
       exact ((Fact.out : q.Prime).coprime_iff_not_dvd.mpr hqD).symm
   -- coprimality of cyclic `⟨k⟩ ≤ K` with `|M_σ|`, restricted along `D ⊔ Q ≤ M_σ`.

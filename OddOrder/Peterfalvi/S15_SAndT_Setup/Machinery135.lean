@@ -933,7 +933,7 @@ theorem caseB_eta01_norm_bound {S : Type*} [Group S] [Fintype S]
   have hδR : (δ : ℝ) ^ 2 = 1 := by exact_mod_cast hδ
   rw [sum_normSq_sharp_chi_decomp H ζ α χ (δ : ℝ) hvanish hinner
     (by intro x hx; rw [hχ x hx]; push_cast; ring), hcross, hfirstTerm, hδR]
-  push_cast; ring
+  ring
 
 /- `TISubsetOrthogonalityData` + its five `∃`-True-Prop scaffold theorems
 (`tiSubset_character_orthogonality`, `lambda_norm_lower`, `eta10_norm_lower`,
@@ -1083,7 +1083,7 @@ noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
     · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
   · intro l h hh
     by_cases h1 : h = 1
-    · subst h1; simpa using hyp.H.one_mem
+    · subst h1; simp
     · have hsh : h ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=
         OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hh, h1⟩
       exact (OddOrder.Peterfalvi.S04.mem_sharp.mp (S_normalizes_H_sharp hG hyp l hsh)).1

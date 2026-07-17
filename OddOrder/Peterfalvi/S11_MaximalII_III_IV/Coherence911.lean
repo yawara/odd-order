@@ -195,9 +195,8 @@ theorem hcHom_inclusion [Finite G] {M : Subgroup G}
       = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left h) := by
     simp only [QuotientGroup.quotientInfEquivProdNormalQuotient,
       QuotientGroup.quotientInfEquivProdNormalizerQuotient, MulEquiv.trans_apply,
-      QuotientGroup.quotientMulEquivOfEq_mk, QuotientGroup.quotientKerEquivOfSurjective,
-      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk, MulEquiv.symm_mk,
-      MonoidHom.toMulEquiv_apply, QuotientGroup.kerLift_mk]
+      QuotientGroup.quotientKerEquivOfSurjective,
+      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk]
     rfl
   show (hcQuotientEquivHbar chief)
       (QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left h)) = _
@@ -398,9 +397,8 @@ theorem hcLambdaHom_inclusion {M : Subgroup G}
       = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left c) := by
     simp only [QuotientGroup.quotientInfEquivProdNormalQuotient,
       QuotientGroup.quotientInfEquivProdNormalizerQuotient, MulEquiv.trans_apply,
-      QuotientGroup.quotientMulEquivOfEq_mk, QuotientGroup.quotientKerEquivOfSurjective,
-      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk, MulEquiv.symm_mk,
-      MonoidHom.toMulEquiv_apply, QuotientGroup.kerLift_mk]
+      QuotientGroup.quotientKerEquivOfSurjective,
+      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk]
     rfl
   simp only [hcLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
   have hcongr : (MulEquiv.subgroupCongr (hcRealized_eq_cInHu_sup_hInHu chief))
@@ -450,8 +448,8 @@ theorem hcPsiPair_apply_inclusion [Finite G] {M : Subgroup G}
   have hlam1 : hcLambdaHom chief lam (Subgroup.inclusion le_sup_left h) = 1 :=
     hcLambdaHom_eq_one_of_mem_hInHu chief lam (Subgroup.mem_subgroupOf.mpr h.2)
   simp only [hcPsiPair, hcPairHom, linearIrreducibleCharacter_apply, MonoidHom.mul_apply,
-    Units.val_mul, MonoidHom.comp_apply, ClassFunction.compHom_apply,
-    MulEquiv.coe_toMonoidHom, hcHom_inclusion, hlam1, Units.val_one, mul_one]
+    MonoidHom.comp_apply, ClassFunction.compHom_apply,
+    MulEquiv.coe_toMonoidHom, hcHom_inclusion, hlam1, mul_one]
 
 /-- **Restriction-inertia `inertia(ψ_{θ,λ}) ≤ inertia(θ₀)`**: an element fixing the pair
 character also fixes its `hInHu`-restriction `θ₀` (`hcPsiPair_apply_inclusion`).  Mirror of
