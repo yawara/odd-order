@@ -154,6 +154,8 @@ import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -6997,6 +6999,28 @@ is irreducible, and `D̄ = K̄ ⋊ V̄`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.KbarSemidirectEquiv
+
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 3, field-coordinate stage**:
+`F(D̄)` is identified with the full multiplicative group of the finite field of order
+`|Q₀|`; evaluation at the distinguished involution gives the additive coordinate.  The
+generic reassociation equivalence retains all three component actions. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_fitting_field_model
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sQ0_addEquiv_of_finrank_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingScalar_companion_compat
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_semilinear_field_model
+
+#assert_only_allowed_axioms SemidirectProduct.reassoc
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectProduct.reassocOfEquivToSemilinear
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
