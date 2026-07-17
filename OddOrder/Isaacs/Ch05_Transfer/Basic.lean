@@ -212,6 +212,48 @@ theorem not_isMulCommutative_sylow_of_le_commutator_inf_center
   not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center P
     (h_p_dvd.trans (Subgroup.card_dvd_of_le hZ))
 
+/-- **Isaacs Cor 5.4** (商版, 書籍の結論そのもの): `Z ≤ Γ' ∩ Z(Γ)`, `p ∣ |Z|` ⇒
+`Γ/Z` の Sylow `p`-部分群は**非巡回**.
+
+Schur multiplier 文脈で `G = Γ/Z`, `Z ≤ M(G)` のとき「`p ∣ |M(G)|` ⇒ Sylow_p(G)
+noncyclic」を与える形. 証明: `Syl_p(Γ/Z)` が巡回なら, `Γ` の Sylow `P` の像
+(共役で一致, `Sylow.mapSurjective`) も巡回. 制限準同型 `↥P →* ↥(P の像)` の核は
+`Z ∩ P ≤ Z(P)` (Z 中心的) なので
+`MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` で `P` 可換となり,
+前段 (`not_isMulCommutative_sylow_of_le_commutator_inf_center`) と矛盾. -/
+theorem not_isCyclic_sylow_quotient_of_le_commutator_inf_center
+    [Finite G] {p : ℕ} [Fact p.Prime] {Z : Subgroup G} [Z.Normal]
+    (hZ : Z ≤ commutator G ⊓ Subgroup.center G)
+    (h_p_dvd : p ∣ Nat.card Z) (Q : Sylow p (G ⧸ Z)) :
+    ¬ IsCyclic ↥(Q : Subgroup (G ⧸ Z)) := by
+  intro hcyc
+  obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+  set P' : Sylow p (G ⧸ Z) := P.mapSurjective (QuotientGroup.mk'_surjective Z) with hP'
+  -- 巡回性を Q から P' (共役) へ移送.
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (G ⧸ Z) P' Q
+  haveI hcyc' : IsCyclic ↥(P' : Subgroup (G ⧸ Z)) := by
+    have e1 : ↥(P' : Subgroup (G ⧸ Z)) ≃* ↥((g • P' : Sylow p (G ⧸ Z)) : Subgroup (G ⧸ Z)) :=
+      Sylow.equivSMul P' g
+    have e2 : ↥((g • P' : Sylow p (G ⧸ Z)) : Subgroup (G ⧸ Z)) ≃*
+        ↥(Q : Subgroup (G ⧸ Z)) :=
+      MulEquiv.subgroupCongr (congrArg _ hg)
+    exact isCyclic_of_surjective _ (e1.trans e2).symm.surjective
+  -- 制限準同型 ↥P →* ↥(P.map mk') の核 ≤ Z(P) → P 可換.
+  haveI hcyc'' : IsCyclic ↥(P.1.map (QuotientGroup.mk' Z)) := hcyc'
+  have hcomm : IsMulCommutative ↥(P : Subgroup G) := by
+    refine MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+      ((QuotientGroup.mk' Z).subgroupMap (P : Subgroup G)) ?_
+    intro x hx
+    have hxZ : (x : G) ∈ Z := by
+      have h1 : (QuotientGroup.mk' Z).subgroupMap (P : Subgroup G) x = 1 := hx
+      have h2 : QuotientGroup.mk' Z (x : G) = 1 := congrArg Subtype.val h1
+      rwa [← MonoidHom.mem_ker, QuotientGroup.ker_mk'] at h2
+    have hxC : (x : G) ∈ Subgroup.center G := (hZ.trans inf_le_right) hxZ
+    rw [Subgroup.mem_center_iff]
+    intro y
+    exact Subtype.ext (Subgroup.mem_center_iff.mp hxC y)
+  exact not_isMulCommutative_sylow_of_le_commutator_inf_center hZ h_p_dvd P hcomm
+
 end -- 5A
 
 section /- 5B: Central transfer, Schur, Dietzmann (pp. 153-159) -/
