@@ -705,6 +705,38 @@ theorem augmentationCoquotientMulLeft_eq_of_sub_mem
     augmentationCoquotientAlgHomG_apply] at hzero
   exact sub_eq_zero.mp hzero
 
+/-- Left multiplication by an element of the right ideal `ℤ[G]·Δ(K)`
+annihilates `Δ(G)‾`: `w·(k-1)·ᾱ = w·((k-1)ᾱ) = 0`. -/
+theorem augmentationCoquotientAlgHomG_eq_zero_of_mem_mul_right
+    {z : MonoidAlgebra ℤ G}
+    (hz : z ∈ (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))
+      * augmentationIdealOf G K) :
+    augmentationCoquotientAlgHomG G K z = 0 := by
+  refine Submodule.mul_induction_on' (fun a _ b hb => ?_)
+    (fun x y _ _ hx hy => ?_) hz
+  · rw [map_mul]
+    have h0 : augmentationCoquotientAlgHomG G K b = 0 := by
+      rw [augmentationCoquotientAlgHomG_apply]
+      exact augmentationCoquotientMulLeft_eq_zero_of_mem G K hb
+    rw [h0, mul_zero]
+  · rw [map_add, hx, hy, add_zero]
+
+/-- Right-ideal counterpart of `augmentationCoquotientMulLeft_eq_of_sub_mem`:
+elements of `ℤ[G]` differing by an element of the right ideal `ℤ[G]·Δ(K)`
+induce the same map on `Δ(G)‾`.  Used to prove `Ξ` is independent of the
+transversal (two transversal sums differ by such an element). -/
+theorem augmentationCoquotientMulLeft_eq_of_sub_mem_right
+    {x y : MonoidAlgebra ℤ G}
+    (h : x - y ∈ (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))
+      * augmentationIdealOf G K) :
+    augmentationCoquotientMulLeft G K hK x
+      = augmentationCoquotientMulLeft G K hK y := by
+  have hzero : augmentationCoquotientAlgHomG G K (x - y) = 0 :=
+    augmentationCoquotientAlgHomG_eq_zero_of_mem_mul_right G K h
+  rw [map_sub, augmentationCoquotientAlgHomG_apply,
+    augmentationCoquotientAlgHomG_apply] at hzero
+  exact sub_eq_zero.mp hzero
+
 /-- Compatibility of the `ℤ[G/K]`-action with the projection
 `π : ℤ[G] → ℤ[G/K]`: the coset `Kg` acts as `g` does (Isaacs p. 316). -/
 theorem augmentationCoquotientAlgHom_mapDomain (x : MonoidAlgebra ℤ G) :
