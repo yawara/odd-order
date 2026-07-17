@@ -354,6 +354,13 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.5 (Transfer): Cor 5.30 (odd p, order-p elements central)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normal_p_complement_of_order_p_central_odd
 
+-- Ch.6 (Frobenius Actions): Thm 6.4 (2)⇒(1) constructor (TI ⇒ Frobenius action)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.IsFrobeniusGroup.of_trivialIntersection
+
+-- Ch.6 (Frobenius Actions): Thm 6.7 (self-centralizing normal subgroup is complemented,
+-- and is a Frobenius kernel when proper nontrivial)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch06.exists_isComplement'_of_centralizer_le
+
 -- Ch.6 (Frobenius Actions): Thm 6.9 solvable Frobenius subgroup obstruction
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup
@@ -390,6 +397,18 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+
+-- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
+-- are cyclic or generalized quaternion.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.sylow_isCyclic_or_two_quaternion_of_frobeniusAction
+
+-- Ch.6 (Frobenius Actions): Thm 6.19 — odd Frobenius complement has a unique subgroup of
+-- order `r` for each prime `r ∣ |A|` (action + subgroup-pair forms).
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.existsUnique_card_prime_of_isFrobeniusAction_of_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.existsUnique_card_prime_of_isFrobeniusGroup_of_odd
 
 -- Ch.6 (Frobenius Actions): Huppert V.8.18 b) — odd Frobenius complement is a Z-group,
 -- its order-`r` subgroups centralize the commutator, and every prime-order subgroup is normal.

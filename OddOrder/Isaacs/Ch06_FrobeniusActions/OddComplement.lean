@@ -379,6 +379,64 @@ theorem normal_of_card_prime_of_isFrobeniusAction_of_odd
     have : k = r₀ := by rw [hk_eq, hν1, one_mul]
     rw [this]; exact hr₀
 
+/-- **Isaacs Thm 6.19** (p. 190), uniqueness core (action form): in a Frobenius complement
+`A` of odd order, two subgroups of the same prime order `r` coincide.
+
+Uniqueness upgrade of `normal_of_card_prime_of_isFrobeniusAction_of_odd` (= Huppert
+V.8.18 b)): two distinct order-`r` subgroups are both normal, hence disjoint and
+elementwise commuting, and their join is elementary abelian of order `r²` — impossible in
+a Frobenius actor (Thm 6.9 branch
+`false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target`). -/
+theorem eq_of_card_prime_of_isFrobeniusAction_of_odd
+    (hFrob : IsFrobeniusAction A U) (hodd : Odd (Nat.card A))
+    {r : ℕ} (hr : r.Prime) {R R' : Subgroup A}
+    (hRcard : Nat.card ↥R = r) (hR'card : Nat.card ↥R' = r) :
+    R = R' := by
+  by_contra hne
+  haveI : Fact r.Prime := ⟨hr⟩
+  have hRn : R.Normal := normal_of_card_prime_of_isFrobeniusAction_of_odd hFrob hodd hr hRcard
+  have hR'n : R'.Normal :=
+    normal_of_card_prime_of_isFrobeniusAction_of_odd hFrob hodd hr hR'card
+  -- distinct subgroups of the same prime order are disjoint
+  have hdisj : Disjoint R R' := by
+    rw [disjoint_iff]
+    have hdvd : Nat.card ↥(R ⊓ R') ∣ r := hRcard ▸ Subgroup.card_dvd_of_le inf_le_left
+    rcases hr.eq_one_or_self_of_dvd _ hdvd with h1 | hrr
+    · exact Subgroup.card_eq_one.mp h1
+    · exfalso
+      have hRR' : R ⊓ R' = R :=
+        Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hrr, hRcard])
+      have hle : R ≤ R' := hRR' ▸ inf_le_right
+      exact hne (Subgroup.eq_of_le_of_card_ge hle (by rw [hRcard, hR'card]))
+  -- the join `R ⊔ R'` is elementary abelian of order `r²`
+  have hR_elem := Subgroup.IsElementaryAbelian.of_card_prime (p := r) hRcard
+  have hR'_elem := Subgroup.IsElementaryAbelian.of_card_prime (p := r) hR'card
+  have hcent : R ≤ Subgroup.centralizer (R' : Set A) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact (Subgroup.commute_of_normal_of_disjoint R' R hR'n hRn hdisj.symm y x hy hx).eq
+  have hsup_elem := hR_elem.sup_of_le_centralizer hR'_elem hcent
+  have hsup_card : Nat.card ↥(R ⊔ R') = r ^ 2 := by
+    rw [card_sup_eq_card_mul_card_of_disjoint_normal' (disjoint_iff.mp hdisj),
+      hRcard, hR'card, sq]
+  exact
+    false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target
+      hFrob (R ⊔ R') hr hsup_elem hsup_card
+
+/-- **Isaacs Thm 6.19** (p. 190, action form): a Frobenius complement `A` of odd order has
+a *unique* subgroup of order `r` for each prime `r ∣ |A|` (existence = Cauchy). -/
+theorem existsUnique_card_prime_of_isFrobeniusAction_of_odd
+    (hFrob : IsFrobeniusAction A U) (hodd : Odd (Nat.card A))
+    {r : ℕ} (hr : r.Prime) (hdvd : r ∣ Nat.card A) :
+    ∃! R : Subgroup A, Nat.card ↥R = r := by
+  haveI : Fact r.Prime := ⟨hr⟩
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := A) r hdvd
+  exact ⟨Subgroup.zpowers x,
+    by change Nat.card ↥(Subgroup.zpowers x) = r; rw [Nat.card_zpowers, hx],
+    fun R hR => eq_of_card_prime_of_isFrobeniusAction_of_odd hFrob hodd hr hR
+      (by rw [Nat.card_zpowers, hx])⟩
+
 /-- **Z-group property, subgroup-pair form** (Step 1 for a bundled Frobenius group): in a finite
 Frobenius group `G = N ⋊ A` whose complement `A` has **odd order**, `A` is a Z-group — every
 Sylow subgroup of `A` is cyclic ([BG] Proposition 3.9 for the complement; the conjugation action
@@ -407,6 +465,20 @@ theorem normal_of_card_prime_of_isFrobeniusGroup_of_odd
     MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
   haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
   exact normal_of_card_prime_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd hr hRcard
+
+/-- **Isaacs Thm 6.19, subgroup-pair form**: in a finite Frobenius group `G = N ⋊ A` whose
+complement `A` has **odd order**, `A` has a unique subgroup of order `r` for each prime
+`r ∣ |A|`. -/
+theorem existsUnique_card_prime_of_isFrobeniusGroup_of_odd
+    {G : Type*} [Group G] [Finite G] {N A : Subgroup G}
+    (hFrob : IsFrobeniusGroup G N A) (hodd : Odd (Nat.card ↥A))
+    {r : ℕ} (hr : r.Prime) (hdvd : r ∣ Nat.card ↥A) :
+    ∃! R : Subgroup ↥A, Nat.card ↥R = r := by
+  letI : N.Normal := hFrob.isNormal
+  letI : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  exact existsUnique_card_prime_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd hr hdvd
 
 /-- A conjugate `A^g` of the complement of a Frobenius group `G = N ⋊ A` is again a Frobenius
 complement (the normal kernel `N` is fixed by conjugation).  Used to choose a complement
