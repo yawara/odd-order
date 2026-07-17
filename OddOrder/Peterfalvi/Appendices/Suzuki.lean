@@ -8,6 +8,7 @@ import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.Sylow
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki — hypotheses (A1)–(A3)
@@ -38,6 +39,50 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 open MulAction
 
 open scoped Pointwise
+
+/-! ## A dihedral conjugation lemma
+
+Two involutions whose product has odd order are conjugate by an involution
+of the dihedral group they generate — the classical argument used
+throughout Ch. I (cf. Isaacs, Lemma 2.14, whose inversion core
+`inv_by_two_involutions` we reuse). -/
+
+/-- If `s, v` are involutions with `|sv| = n` odd, then `u = s·(sv)^((n+1)/2)`
+satisfies `u² = 1` and `u⁻¹ s u = v`. -/
+theorem exists_involution_conj_of_odd_orderOf {G : Type*} [Group G]
+    {s v : G} (hs : s * s = 1) (hv : v * v = 1)
+    (hodd : Odd (orderOf (s * v))) :
+    ∃ u : G, u * u = 1 ∧ u⁻¹ * s * u = v := by
+  obtain ⟨j, hj⟩ := hodd
+  have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hs
+  have hvinv : v⁻¹ = v := inv_eq_of_mul_eq_one_right hv
+  -- `s` inverts `⟨sv⟩`
+  have hinv_s : ∀ z ∈ Subgroup.zpowers (s * v), s * z * s = z⁻¹ := by
+    intro z hz
+    refine Isaacs.Ch02.inv_by_two_involutions hv hs ?_
+    rwa [show v * s = (s * v)⁻¹ by rw [mul_inv_rev, hvinv, hsinv],
+      Subgroup.zpowers_inv]
+  have hkey := hinv_s _
+    (Subgroup.pow_mem _ (Subgroup.mem_zpowers (s * v)) (j + 1))
+  have hu2 : (s * (s * v) ^ (j + 1)) * (s * (s * v) ^ (j + 1)) = 1 := by
+    calc (s * (s * v) ^ (j + 1)) * (s * (s * v) ^ (j + 1))
+        = (s * (s * v) ^ (j + 1) * s) * (s * v) ^ (j + 1) := by group
+      _ = ((s * v) ^ (j + 1))⁻¹ * (s * v) ^ (j + 1) := by rw [hkey]
+      _ = 1 := inv_mul_cancel _
+  refine ⟨s * (s * v) ^ (j + 1), hu2, ?_⟩
+  rw [inv_eq_of_mul_eq_one_right hu2]
+  have hexp : (s * v) ^ (j + 1) * (s * v) ^ (j + 1) =
+      (s * v) ^ (orderOf (s * v)) * (s * v) := by
+    rw [← pow_add, ← pow_succ]
+    congr 1
+    omega
+  calc (s * (s * v) ^ (j + 1)) * s * (s * (s * v) ^ (j + 1))
+      = s * ((s * v) ^ (j + 1) * (s * s) * (s * v) ^ (j + 1)) := by group
+    _ = s * ((s * v) ^ (j + 1) * (s * v) ^ (j + 1)) := by
+        rw [hs, mul_one]
+    _ = s * ((s * v) ^ (orderOf (s * v)) * (s * v)) := by rw [hexp]
+    _ = s * (s * v) := by rw [pow_orderOf_eq_one, one_mul]
+    _ = v := by rw [← mul_assoc, hs, one_mul]
 
 /-! ## Hypotheses (A1)–(A3) -/
 
@@ -673,6 +718,118 @@ lemma odd_orderOf_mul_involution {s u : G} (hsH : s ∈ hyp.H) (hs2 : s ^ 2 = 1)
   exact huH (hyp.centralizer_le_H_of_mem_Q hwQ hw1
     (Subgroup.mem_centralizer_singleton_iff.mpr
       (by rw [hcomm_wu])))
+
+/-- `Q` contains an involution (`|Q|` is even; Cauchy). -/
+lemma exists_involution_mem_Q :
+    ∃ x : G, x ∈ hyp.Q ∧ x ^ 2 = 1 ∧ x ≠ 1 := by
+  haveI : Fintype hyp.Q := Fintype.ofFinite _
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := hyp.Q) 2
+    (by rw [← Nat.card_eq_fintype_card]; exact hyp.Q_even.two_dvd)
+  have hord : orderOf (x : G) = 2 :=
+    (orderOf_injective hyp.Q.subtype hyp.Q.subtype_injective x).trans hx
+  refine ⟨x, x.2, by rw [← hord]; exact pow_orderOf_eq_one _, ?_⟩
+  intro h1
+  rw [h1, orderOf_one] at hord
+  norm_num at hord
+
+/-- An involution of `H` is conjugate to any involution outside `H`
+(Prop 2(a) + the dihedral conjugation lemma). -/
+lemma isConj_involution_of_mem_of_not_mem {s w : G} (hsH : s ∈ hyp.H)
+    (hs2 : s ^ 2 = 1) (hs1 : s ≠ 1) (hw2 : w ^ 2 = 1) (hwH : w ∉ hyp.H) :
+    IsConj s w := by
+  obtain ⟨u, hu2, hconj⟩ := exists_involution_conj_of_odd_orderOf
+    (by rw [← sq]; exact hs2) (by rw [← sq]; exact hw2)
+    (hyp.odd_orderOf_mul_involution hsH hs2 hs1 hw2 hwH)
+  rw [isConj_iff]
+  exact ⟨u⁻¹, by rwa [inv_inv]⟩
+
+include hyp in
+/-- **Peterfalvi Part II, Ch. I Prop 2 (b)** (p. 100) — the involutions of
+`G` form a single conjugacy class. -/
+lemma isConj_of_involutions {u v : G} (hu2 : u ^ 2 = 1) (hu1 : u ≠ 1)
+    (hv2 : v ^ 2 = 1) (hv1 : v ≠ 1) : IsConj u v := by
+  by_cases huH : u ∈ hyp.H <;> by_cases hvH : v ∈ hyp.H
+  · -- both in `H`: both are conjugate to `t ∉ H`
+    have h1 := hyp.isConj_involution_of_mem_of_not_mem huH hu2 hu1
+      hyp.t_sq hyp.t_not_mem_H
+    have h2 := hyp.isConj_involution_of_mem_of_not_mem hvH hv2 hv1
+      hyp.t_sq hyp.t_not_mem_H
+    exact h1.trans h2.symm
+  · exact hyp.isConj_involution_of_mem_of_not_mem huH hu2 hu1 hv2 hvH
+  · exact (hyp.isConj_involution_of_mem_of_not_mem hvH hv2 hv1 hu2 huH).symm
+  · -- both outside `H`: both are conjugate to an involution of `Q ≤ H`
+    obtain ⟨s₀, hs₀Q, hs₀2, hs₀1⟩ := hyp.exists_involution_mem_Q
+    have h1 := hyp.isConj_involution_of_mem_of_not_mem
+      (hyp.Q_le_H hs₀Q) hs₀2 hs₀1 hu2 huH
+    have h2 := hyp.isConj_involution_of_mem_of_not_mem
+      (hyp.Q_le_H hs₀Q) hs₀2 hs₀1 hv2 hvH
+    exact h1.symm.trans h2
+
+/-- **Peterfalvi Part II, Ch. I Prop 2 (c)** (p. 100) — for an involution
+`s ∈ Q`, the map `u ↦ s^u = u⁻¹ s u` is a permutation of `I - (H ∩ I)`. -/
+lemma bijOn_conj_of_involution_mem_Q {s : G} (hsQ : s ∈ hyp.Q)
+    (hs2 : s ^ 2 = 1) (hs1 : s ≠ 1) :
+    Set.BijOn (fun u => u⁻¹ * s * u)
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H}
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H} := by
+  classical
+  have hsH := hyp.Q_le_H hsQ
+  have hmaps : Set.MapsTo (fun u => u⁻¹ * s * u)
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H}
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H} := by
+    rintro u ⟨hu2, hu1, huH⟩
+    have hcsq : (u⁻¹ * s * u) ^ 2 = 1 := by
+      rw [sq]
+      calc u⁻¹ * s * u * (u⁻¹ * s * u) = u⁻¹ * (s * s) * u := by group
+        _ = 1 := by rw [← sq, hs2, mul_one, inv_mul_cancel]
+    have hcne : u⁻¹ * s * u ≠ 1 := by
+      intro h
+      apply hs1
+      have h2 := congrArg (fun z : G => u * z * u⁻¹) h
+      simpa [mul_assoc] using h2
+    refine ⟨hcsq, hcne, ?_⟩
+    -- `s^u ∈ H` would put an involution inside the odd-order `H^{u⁻¹} ∩ H`
+    intro hmem
+    have huinvH : u⁻¹ ∉ hyp.H := fun h => huH (by simpa using inv_mem h)
+    have hoddK := hyp.odd_card_conj_inf huinvH
+    have hKmem : u⁻¹ * s * u ∈
+        hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H := by
+      refine Subgroup.mem_inf.mpr ⟨?_, hmem⟩
+      rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
+      have hred : (u⁻¹)⁻¹ * (u⁻¹ * s * u) * u⁻¹ = s := by group
+      rw [hred]
+      exact hsH
+    have hord2 : orderOf (⟨u⁻¹ * s * u, hKmem⟩ :
+        ↥(hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H)) = 2 := by
+      have h1 := orderOf_injective
+        (hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H).subtype
+        (Subgroup.subtype_injective _) ⟨u⁻¹ * s * u, hKmem⟩
+      rw [← h1]
+      exact orderOf_eq_prime hcsq hcne
+    have hdvd : 2 ∣ Nat.card
+        ↥(hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H) := by
+      rw [← hord2]
+      exact orderOf_dvd_natCard _
+    exact (Nat.two_dvd_ne_zero.mpr (Nat.odd_iff.mp hoddK)) hdvd
+  have hsurj : Set.SurjOn (fun u => u⁻¹ * s * u)
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H}
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H} := by
+    rintro v ⟨hv2, hv1, hvH⟩
+    obtain ⟨u, hu2, hconj⟩ := exists_involution_conj_of_odd_orderOf
+      (by rw [← sq]; exact hs2) (by rw [← sq]; exact hv2)
+      (hyp.odd_orderOf_mul_involution hsH hs2 hs1 hv2 hvH)
+    have huH : u ∉ hyp.H := by
+      intro huH
+      apply hvH
+      rw [← hconj]
+      exact mul_mem (mul_mem (inv_mem huH) hsH) huH
+    have hu1 : u ≠ 1 := by
+      intro h1
+      rw [h1] at hconj
+      simp only [inv_one, one_mul, mul_one] at hconj
+      exact hvH (hconj ▸ hsH)
+    exact ⟨u, ⟨by rw [sq]; exact hu2, hu1, huH⟩, hconj⟩
+  exact ((Set.toFinite _).surjOn_iff_bijOn_of_mapsTo hmaps).mp hsurj
 
 end Hypothesis
 
