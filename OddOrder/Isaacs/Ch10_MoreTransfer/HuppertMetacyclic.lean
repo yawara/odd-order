@@ -49,6 +49,7 @@ namespace OddOrder.Isaacs.Ch10
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
 open OddOrder.BG.Ch1
+open OddOrder.BG.Ch1_Preliminary
 open scoped commutatorElement
 
 variable {p : ℕ} [hp : Fact p.Prime]
@@ -214,6 +215,108 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     exact hnonab fun x y => mul_comm x y
   obtain ⟨hVea, hVcard⟩ := OddOrder.BG.Ch1.S04.isElementaryAbelian_omega1_of_isMetacyclic
     hPp (hp_prime.odd_of_ne_two (by omega)) hmeta hnc
+  -- ### Step 5: `V = Ω₁(P)` is not contained in `Z(P)`
+  -- (`commutator ↥P` is `p`-torsion, so it lies inside `V`)
+  have hK'V : _root_.commutator ↥P ≤ Omega ↥P p 1 := by
+    intro x hx
+    refine Omega.mem_of_pow_eq_one ?_
+    rw [pow_one]
+    have h1 : (⟨x, hx⟩ : ↥(_root_.commutator ↥P)) ^ p = 1 := by
+      rw [← hcomm_card]; exact pow_card_eq_one'
+    simpa using congrArg Subtype.val h1
+  -- conjugation action of `N` on `↥P`; `V` and `commutator ↥P` are characteristic
+  set φ₀ : N →* MulAut ↥P := MulAut.conjNormal with hφ₀_def
+  have hVinv : IsAInvariant φ₀ (Omega ↥P p 1) := IsAInvariant.of_characteristic φ₀
+  have hVnotZ : ¬ (Omega ↥P p 1 ≤ Subgroup.center ↥P) := by
+    intro hVZ
+    -- `P` acts trivially on the central `V`, so the action descends to `N ⧸ P`
+    have hker : P ≤ hVinv.restrict.ker := by
+      intro x hx
+      rw [MonoidHom.mem_ker]
+      apply MulEquiv.ext
+      rintro ⟨v, hv⟩
+      show (hVinv.restrict x) ⟨v, hv⟩ = ⟨v, hv⟩
+      apply Subtype.ext
+      show (φ₀ x) v = v
+      apply Subtype.ext
+      have hcomm := (Subgroup.mem_center_iff.mp (hVZ hv)) ⟨x, hx⟩
+      have hconj : (⟨x, hx⟩ : ↥P) * v * (⟨x, hx⟩ : ↥P)⁻¹ = v := by
+        rw [hcomm]; group
+      calc ((φ₀ x) v : N) = x * (v : N) * x⁻¹ := by simp [hφ₀_def]
+        _ = ((((⟨x, hx⟩ : ↥P) * v * (⟨x, hx⟩ : ↥P)⁻¹ : ↥P)) : N) := by
+            push_cast
+            rfl
+        _ = (v : N) := by rw [hconj]
+    -- the descended coprime action of `N ⧸ P` on `↥V`, and Maschke
+    set φQ : N ⧸ P →* MulAut ↥(Omega ↥P p 1) :=
+      QuotientGroup.lift P hVinv.restrict hker with hφQ_def
+    have hpE : p ∣ Nat.card ↥(Omega ↥P p 1) := by
+      rw [hVcard]; exact dvd_pow_self p two_ne_zero
+    have hcop : Nat.Coprime (Nat.card (N ⧸ P)) (Nat.card ↥(Omega ↥P p 1)) := by
+      rw [hVcard]
+      have h1 : Nat.card (N ⧸ P) = P.index := (Subgroup.index_eq_card P).symm
+      rw [h1]
+      exact Nat.Coprime.pow_right 2 ((hp_prime.coprime_iff_not_dvd.mpr hPidx).symm)
+    have hUinvN : IsAInvariant hVinv.restrict
+        ((_root_.commutator ↥P).subgroupOf (Omega ↥P p 1)) :=
+      isAInvariant_subgroupOf_restrict hVinv (IsAInvariant.of_characteristic φ₀)
+    have hUinv : IsAInvariant φQ ((_root_.commutator ↥P).subgroupOf (Omega ↥P p 1)) := by
+      intro a
+      obtain ⟨n, rfl⟩ := QuotientGroup.mk'_surjective P a
+      exact hUinvN n
+    obtain ⟨W, hWinv, hWinf, hWsup⟩ :=
+      exists_aInvariant_complement_of_isElementaryAbelian hpE hcop hVea hUinv
+    -- cardinality bookkeeping: `|U| = p` hence `|W| = p`
+    have hUcard : Nat.card ↥((_root_.commutator ↥P).subgroupOf (Omega ↥P p 1)) = p := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK'V).toEquiv, hcomm_card]
+    letI : CommGroup ↥(Omega ↥P p 1) :=
+      { (inferInstance : Group ↥(Omega ↥P p 1)) with mul_comm := hVea.comm }
+    have hcompl : ((_root_.commutator ↥P).subgroupOf (Omega ↥P p 1)).IsComplement' W := by
+      refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+        (disjoint_iff.mpr hWinf) ?_
+      rw [← Subgroup.mul_normal, hWsup, Subgroup.coe_top]
+    have hWcard : Nat.card ↥W = p := by
+      have hmul := hcompl.card_mul
+      rw [hUcard, hVcard, pow_two] at hmul
+      exact Nat.eq_of_mul_eq_mul_left hp_prime.pos hmul
+    -- transport `W` to a normal order-`p` subgroup of `N`
+    have hWres : IsAInvariant hVinv.restrict W := fun n => hWinv (QuotientGroup.mk n)
+    have hWPinv : IsAInvariant φ₀ (W.map (Omega ↥P p 1).subtype) :=
+      isAInvariant_map_subtype_of_restrict hVinv hWres
+    set W2 : Subgroup N := (W.map (Omega ↥P p 1).subtype).map P.subtype with hW2_def
+    have hW2card : Nat.card ↥W2 = p := by
+      rw [hW2_def,
+        ← Nat.card_congr (Subgroup.equivMapOfInjective _ P.subtype
+          P.subtype_injective).toEquiv,
+        ← Nat.card_congr (Subgroup.equivMapOfInjective _ (Omega ↥P p 1).subtype
+          (Omega ↥P p 1).subtype_injective).toEquiv]
+      exact hWcard
+    have hW2n : W2.Normal := by
+      constructor
+      intro x hx n
+      rw [hW2_def] at hx ⊢
+      obtain ⟨u, hu, rfl⟩ := hx
+      refine ⟨(φ₀ n) u, hWPinv.smul_mem n hu, ?_⟩
+      simp [hφ₀_def]
+    -- `W2 = P'` by uniqueness, yet `W2` meets `U = commutator` trivially: contradiction
+    have hW2eq : W2 = P' := huniq W2 hW2n hW2card
+    have hbot : P' ≤ ⊥ := by
+      intro x hxP'
+      have hxW2 : x ∈ W2 := by rw [hW2eq]; exact hxP'
+      rw [hW2_def] at hxW2
+      obtain ⟨u, hu, rfl⟩ := hxW2
+      obtain ⟨w, hw, rfl⟩ := hu
+      have hwU : w ∈ (_root_.commutator ↥P).subgroupOf (Omega ↥P p 1) := by
+        rw [Subgroup.mem_subgroupOf]
+        rw [← hP'_map] at hxP'
+        obtain ⟨k, hk, hkeq⟩ := hxP'
+        have hkw : k = ((w : ↥(Omega ↥P p 1)) : ↥P) := P.subtype_injective hkeq
+        rwa [hkw] at hk
+      have hmem : w ∈ (_root_.commutator ↥P).subgroupOf (Omega ↥P p 1) ⊓ W := ⟨hwU, hw⟩
+      rw [hWinf, Subgroup.mem_bot] at hmem
+      rw [hmem]
+      simp
+    exact hP'ne (le_bot_iff.mp hbot)
   sorry
 
 /-- **Isaacs Theorem 10.15**, inductive core: if `P ⊴ N` is a nonabelian
