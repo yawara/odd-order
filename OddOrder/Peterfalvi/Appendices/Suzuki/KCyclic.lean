@@ -273,6 +273,77 @@ def tau : MulAut hyp.Dbar where
 lemma tau_involutive (x : hyp.Dbar) : hyp.tau (hyp.tau x) = x :=
   hyp.tauHom_involutive x
 
+/-! ## `C_D̄(τ) = V̄`: the `τ`-fixed cosets are exactly the `V`-cosets (p. 103)
+
+A coset `d̄ = dW` is fixed by `τ` iff `w = (tdt)⁻¹d ∈ W`; but `w` commutes with `t`
+(as `W ≤ V = C_D(t)`), which forces `w² = 1`, and `D` has odd order, so `w = 1` and
+`t d t = d`, i.e. `d ∈ V`.  No coprime-action machinery is needed. -/
+
+/-- The coset element `w = ((tdt)⁻¹d : ↥D)` has `G`-value `t d⁻¹ t d`. -/
+private lemma tauD_inv_mul_coe (d : ↥hyp.D) :
+    (((hyp.tauD d)⁻¹ * d : ↥hyp.D) : G) = hyp.t * (d : G)⁻¹ * hyp.t * (d : G) := by
+  rw [Subgroup.coe_mul, Subgroup.coe_inv, hyp.tauD_apply_coe]
+  simp only [mul_inv_rev, hyp.t_inv_eq]
+  group
+
+/-- If `a² = 1` then `(a b⁻¹ a b)(b⁻¹ a b a) = 1` — the algebraic core of `w² = 1`
+for the `τ`-fixed-coset argument. -/
+private lemma sq_inverted_eq_one {H : Type*} [Group H] {a b : H} (ha : a * a = 1) :
+    (a * b⁻¹ * a * b) * (b⁻¹ * a * b * a) = 1 := by
+  have h1 : (a * b⁻¹ * a * b) * (b⁻¹ * a * b * a) = a * b⁻¹ * (a * a) * b * a := by group
+  rw [h1, ha, mul_one]
+  have h2 : a * b⁻¹ * b * a = a * a := by group
+  rw [h2, ha]
+
+/-- **Peterfalvi Part II, Ch. I §2** (p. 103): `C_D̄(τ) = V̄`.  A coset `d̄` is fixed
+by `τ` iff its representative lies in `V = C_D(t)`. -/
+lemma tau_mk_eq_iff_mem_V (d : ↥hyp.D) :
+    hyp.tau (QuotientGroup.mk d) = QuotientGroup.mk d ↔ (d : G) ∈ hyp.V := by
+  rw [hyp.tau_apply, hyp.tauHom_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf]
+  constructor
+  · -- `w = (tdt)⁻¹d ∈ W ⟹ d ∈ V`.
+    intro hwW
+    set w : G := (((hyp.tauD d)⁻¹ * d : ↥hyp.D) : G) with hwdef
+    have hwcoe : w = hyp.t * (d : G)⁻¹ * hyp.t * (d : G) := hyp.tauD_inv_mul_coe d
+    have hcomm : Commute w hyp.t := hyp.commute_t_of_mem_V (hyp.W_le_V hwW)
+    -- `t w t = w`, giving the second form `w = d⁻¹ t d t`.
+    have htwt : hyp.t * w * hyp.t = w := by
+      rw [hcomm.symm.eq, mul_assoc, hyp.t_mul_t, mul_one]
+    have hw2 : w = (d : G)⁻¹ * hyp.t * (d : G) * hyp.t := by
+      have hcalc : hyp.t * w * hyp.t = (d : G)⁻¹ * hyp.t * (d : G) * hyp.t := by
+        rw [hwcoe]
+        rw [show hyp.t * (hyp.t * (d : G)⁻¹ * hyp.t * (d : G)) * hyp.t
+              = hyp.t * hyp.t * ((d : G)⁻¹ * hyp.t * (d : G) * hyp.t) by
+            simp only [mul_assoc], hyp.t_mul_t, one_mul]
+      rw [← hcalc, htwt]
+    -- `w² = 1` from the two forms; `D` odd ⟹ `w = 1`.
+    have hsq : w ^ 2 = 1 := by
+      rw [pow_two]
+      nth_rewrite 1 [hwcoe]
+      nth_rewrite 1 [hw2]
+      exact sq_inverted_eq_one hyp.t_mul_t
+    have hw1 : w = 1 :=
+      eq_one_of_sq_eq_one_of_odd_card hyp.D_odd (hyp.V_le_D (hyp.W_le_V hwW)) hsq
+    -- `w = 1 ⟹ t d t = d ⟹ d ∈ V`.
+    have hwe : hyp.t * (d : G)⁻¹ * hyp.t * (d : G) = 1 := hwcoe ▸ hw1
+    have htdt : hyp.t * (d : G) * hyp.t = (d : G) := by
+      have hh : hyp.t * (d : G)⁻¹ * hyp.t = (d : G)⁻¹ := eq_inv_of_mul_eq_one_left hwe
+      have hinv := congrArg (·⁻¹) hh
+      simpa [mul_inv_rev, hyp.t_inv_eq, mul_assoc] using hinv
+    have hc : hyp.t * (d : G) = (d : G) * hyp.t := by
+      have hcong := congrArg (· * hyp.t) htdt
+      rwa [mul_assoc, hyp.t_mul_t, mul_one] at hcong
+    exact Subgroup.mem_inf.mpr
+      ⟨d.2, Subgroup.mem_centralizer_singleton_iff.mpr hc.symm⟩
+  · -- `d ∈ V ⟹ tauD d = d`, so the coset element is `1 ∈ W`.
+    intro hdV
+    have hcomm : Commute (d : G) hyp.t := hyp.commute_t_of_mem_V hdV
+    have htdt : hyp.t * (d : G) * hyp.t = (d : G) := by
+      rw [← hcomm.eq, mul_assoc, hyp.t_mul_t, mul_one]
+    have htauD : hyp.tauD d = d := Subtype.ext (by rw [hyp.tauD_apply_coe, htdt])
+    rw [htauD, inv_mul_cancel]
+    simpa using hyp.W.one_mem
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
