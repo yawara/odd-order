@@ -128,6 +128,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Bochert
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransvectionGeneration
 import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
 import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
+import OddOrder.Isaacs.Ch08_PermutationGroups.OrbitalGraph
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
