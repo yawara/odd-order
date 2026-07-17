@@ -161,8 +161,11 @@ import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310FixedPointSplit
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310GroupForm
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Nilpotent
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
