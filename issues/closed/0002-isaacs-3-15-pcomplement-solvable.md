@@ -41,3 +41,7 @@ owner chapter 規則で Ch.7 (Burnside) ディレクトリの placeholder ファ
 - 関連 issue: 0003 (Thm 3.17, 同じく Burnside 依存)
 
 > 🧾 (2026-07-02 hub 全体レビュー): trigger (Burnside p^aq^b = `burnside_p_pow_q_pow`, axiom-clean) は **fired 済** — ただし本 issue は off-FT-path につき coverage phase まで park 継続。
+
+## 2026-07-17 close
+
+`isSolvable_of_pcomplement_exists` (Ch07_ThompsonSubgroup/ForwardFromCh03.lean, Burnside + 3.17 経由) として sorry-free 実装済み (2026-07-17 Ch.3 survey-gap 一掃, AxiomsCheck 登録済). 完了条件充足につき close.

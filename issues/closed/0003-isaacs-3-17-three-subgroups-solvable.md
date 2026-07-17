@@ -43,3 +43,7 @@ G simple 場合 (M = G) に Burnside `pᵃqᵇ` 必須.
 - 関連 issue: 0002 (Thm 3.15, 同じく Burnside 依存)
 
 > 🧾 (2026-07-02 hub 全体レビュー): trigger (Burnside p^aq^b = `burnside_p_pow_q_pow`, axiom-clean) は **fired 済** — ただし本 issue は off-FT-path につき coverage phase まで park 継続。
+
+## 2026-07-17 close
+
+`isSolvable_of_pairwise_coprime_index` (Ch03_SplitExtensions/Theorem315.lean) として sorry-free 実装済み (2026-07-17 Ch.3 survey-gap 一掃; Burnside 不要と判明). 完了条件充足につき close.
