@@ -125,6 +125,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
 import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
 import OddOrder.Isaacs.Ch09_MoreSubnormality.InnerAutomorphisms
+import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
