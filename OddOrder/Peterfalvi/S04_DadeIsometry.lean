@@ -884,7 +884,8 @@ packaged induced character:
 
 `s` ranging over `{p : {B // B.Nonempty} // transversalRep (mk'' p.1) = p.1}` (as a `Finset`).
 This converts the (2.10) identity into the `∑ c_p • induceAlphaBTerm p` shape demanded by the bridge
-`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`.  The bijection sends a class `C` with
+`preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`. The bijection sends a class `C`
+with
 nonempty representative to `⟨rep C, _⟩` and back via `p ↦ mk'' p.1` (`Quotient.out_eq'`); the empty
 classes contribute `0` on the left and are excluded on the right. -/
 theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.HConjInvariant)

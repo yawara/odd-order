@@ -1189,8 +1189,10 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
     · -- low rank `(9.12)` (BG L2615-2619): `r(F(M')) ≤ 2` ⟹ by Thm 4.20 `M'' ≤ F(M')`, so
       -- `M' = O_{p'}(F(M'))·N_{M'}(P)`; `(9.11)` puts `O_{p'}(F(M'))` in `C_G(P₀)` and
       -- `N_{M'}(P) ≤ N_G(P) ≤ N_G(P₀)`, whence `P₀ ⊴ M'`, i.e. `M' ≤ N_G(P₀)`.
-      -- TODO(§9 Phase B sub-assembly 2): the Frattini decomposition. `derived_le_fitting_of_rank_fitting_le_two`
-      -- (Thm 4.20a) applies since `r_p(F)≤2` (here) + `r(O_{p'}(F))≤2` (¬h3D) ⟹ `rank F(M')≤2` (full).
+      -- TODO(§9 Phase B sub-assembly 2): the Frattini decomposition.
+      -- `derived_le_fitting_of_rank_fitting_le_two`
+      -- (Thm 4.20a) applies since `r_p(F)≤2` (here) + `r(O_{p'}(F))≤2` (¬h3D) ⟹ `rank F(M')≤2`
+      -- (full).
       have hMN0 : M' ≤ Subgroup.normalizer (P0 : Set G) := by
         -- `(9.6)`: `r_p(F(M')) ≤ 2`, and `¬ h3D` gives `rank O_{p'}(F(M')) ≤ 2`.
         have hpr : pRank ↥(S08.fittingInG M') p ≤ 2 :=

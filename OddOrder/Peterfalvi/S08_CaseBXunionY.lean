@@ -51,7 +51,8 @@ anchor member `μ_{j₀} = columnSum h46 k0 ∈ certainTypeSet h46 k`.  The sing
 and so does the anchor member `μ_{j₀}`, so `μ_{χ₂}(1) = μ_{j₀}(1)`.  Span induction lifts to
 integer combinations.
 
-This is the column analogue of the Frobenius `hsX` step of `hgen_withDiagonal_of_frobenius`, with the
+This is the column analogue of the Frobenius `hsX` step of `hgen_withDiagonal_of_frobenius`, with
+the
 degree-ratio integrality coming from the equal-degree condition built into `certainTypeSet` rather
 than from `exists_charValue_one_eq_mul_xBaseBlock_anchor`. -/
 theorem certainTypeSet_span_apply_one_eq_intMul
@@ -202,7 +203,8 @@ Every member is a column character `columnSum h46 χ₂` for some `W₂`-dual
 of `W₂`-duals — linear characters of a *finite* group — is finite
 (`SibleyDadeHypothesis.finite_linearCharacters_of_finite`), hence the range, hence `𝒯`.
 
-This is the `hXfin` input of the `(6.8.2)` `ν`-glue `exists_integralCharacterMap_glue_of_orthonormal`
+This is the `hXfin` input of the `(6.8.2)` `ν`-glue
+`exists_integralCharacterMap_glue_of_orthonormal`
 (via the column-sum-to-grid source reduction) and of any finite-enumeration of the column base. -/
 theorem certainTypeSet_finite
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)

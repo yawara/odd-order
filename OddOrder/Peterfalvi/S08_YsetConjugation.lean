@@ -183,7 +183,8 @@ theorem centralizer_inf_centralCommutator_eq_bot_of_c2_caseA (hyp : SibleyDadeHy
 
 /-- **(6.7)-wiring step (c): the centralizer in `↥L` of a nontrivial `z ∈ Z = Z(H) ∩ H′` is `H`.**
 `z ∈ Z(H)` gives `H ≤ C_L(z)`; `z ∈ H^#` with `L` Frobenius (kernel `H`) gives `C_L(z) ≤ H`
-(`centralizer_kernel_le`).  Hence `|C_L(z)| = |H|` is **constant on `Z^#`** — the `|C_L(·)|`-constancy
+(`centralizer_kernel_le`). Hence `|C_L(z)| = |H|` is **constant on `Z^#`** — the
+`|C_L(·)|`-constancy
 input of Peterfalvi (6.7). -/
 theorem centralizer_centralCommutator_eq (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
@@ -205,7 +206,8 @@ of `centralizer_centralCommutator_eq` (which used `hF.centralizer_kernel_le`).  
 `z ∈ Z(H)`; for `C_L(z) ≤ H`, decompose `g ∈ C_L(z)` via the complement `L = H ⋊ W₁`
 (`cert.isComplement`, `cert.K = H`) as `g = k·w` (`k ∈ H`, `w ∈ W₁`): `k` centralizes `z` (central),
 so `w = k⁻¹g` centralizes `z`; if `w ≠ 1` then `z ∈ C_L(w) ⊓ Zc = ⊥`
-(`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`, the math-(A) FPF), contradicting `z ≠ 1`, so
+(`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`, the math-(A) FPF), contradicting `z ≠ 1`,
+so
 `w = 1` and `g = k ∈ H`.  Gives the `|C_L(·)|`-constancy on `Zc^#` of Peterfalvi (6.7) without
 Frobenius. -/
 theorem centralizer_centralCommutator_eq_c2_caseA (hyp : SibleyDadeHypothesis G L H)

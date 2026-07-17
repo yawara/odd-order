@@ -501,7 +501,8 @@ Given a maximal proper coherent conjugation-closed `𝒮₂` with the degree-`q�
 coherently adjoinable, derive `False`.
 
 **Reuse map (verified STEP-1 for the assembly, issue 1017 hub note).**  Via
-`sSet_eq_sOf_H0Cprime` the full family `𝒮` *is* the `H₀C′` stratum `sOf data (chief.H₀ ⊔ chars.Cprime)`,
+`sSet_eq_sOf_H0Cprime` the full family `𝒮` *is* the `H₀C′` stratum
+`sOf data (chief.H₀ ⊔ chars.Cprime)`,
 so the entire generic (9.11) apparatus — all phrased over `sOf data (chief.H₀ ⊔ …)`,
 `{data}{chief}{chars}(caseA)`-parametrized, hence directly instantiable at `data :=
 toTypesIIIIIIVSetupS hG` — applies:
@@ -509,9 +510,11 @@ toTypesIIIIIIVSetupS hG` — applies:
 * the (9.11.1) squeeze `S11.nineElevenOne_configuration` + `S11.sumnS_irreducible_constant_degree`;
 * the world-facts *from the degree dichotomy*: `S11.nineElevenTwoTIWitness_of_degree_dichotomy`
   (TI-witness), `S11.nineElevenTwo_two_summand_inertia` (inertia `C = K₁ ⊓ K₂`),
-  `S11.nineElevenGamma_inner_self_mul_u` (Mackey norm), `S11.nineElevenThree_orbit_split` (class eq);
+  `S11.nineElevenGamma_inner_self_mul_u` (Mackey norm), `S11.nineElevenThree_orbit_split` (class
+  eq);
 * the abstract projection budget `S13.exists_bridge_target_of_budget` and the (5.6.3) union-pair
-  extension `S13.isCoherent_union_pair_of_bridge` for the (9.11.7)–(9.11.8) coherent-pair adjunction.
+  extension `S13.isCoherent_union_pair_of_bridge` for the (9.11.7)–(9.11.8) coherent-pair
+  adjunction.
 The genuinely `S`-specific pieces still to build are the caseA per-member Dade `R`-family (the
 analogue of the M-side `sOf_H0Cprime_memberRFamily`, feeding `𝒮₃`-coherence and the coherent-image
 cross-orthogonality) and the (5.6) pair-bound producer for the `indS`/`A(S)` world; the (9.11.7)–
@@ -543,7 +546,8 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation [Finite G]
     (hyp.toTypesIIIIIIVSetupS hG).nontrivial.2.1.pos
   have hu : 0 < chars.u := (OddOrder.Peterfalvi.S11.u_odd hG chars).pos
   have hp1 : 0 < chief.p - 1 := Nat.sub_pos_of_lt chief.p_prime.one_lt
-  -- strata collapse (issue 1017 step (a)): the generic (9.11) `U′`-anchor stratum is the full family
+  -- strata collapse (issue 1017 step (a)): the generic (9.11) `U′`-anchor stratum is the full
+  -- family
   have hcollapse : OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
         (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG))
       = sSet (hyp.toTypesIIIIIIVSetupS hG) := hyp.sOf_H0_uprime_eq_sSet hG chief
@@ -619,13 +623,15 @@ open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **(9.11) non-Galois-branch coherence of the full family `𝒮 = sSet` on `Ind_S^G`** (issue 1017,
 caseA of Peterfalvi (9.11) `Ptype_core_coherence`, Coq `PFsection9.v:1484`).  In the non-Galois case
-(`CliffordCaseAData`) the honest §9 family `𝒮 = sSet` is **genuinely mixed-degree**: the degree-`q·a`
+(`CliffordCaseAData`) the honest §9 family `𝒮 = sSet` is **genuinely mixed-degree**: the
+degree-`q·a`
 irreducibles fill `𝒮(H₀U′)` (at least `((p−1)/a)·(|U|/(a|U′|))` of them, `caseA_character_counts` /
 `caseA_exists_irreducible_qa`) alongside the degree-`q·u` members of `𝒮(H₀C)` (the `p−1` reducible
 μ_j residues plus an irreducible).  Because the degrees genuinely differ (`q·a ≠ q·u`), this is
 **not** the uniform-degree Galois route (caseB `sSet_coherent_indS_caseB`,
 `uniform_degree_coherence_of_families`): it is Peterfalvi's (9.11) **maximal-coherent-subfamily
-refutation**, mirroring the M-instance non-Galois assembly (`S11_NineElevenAlphaBound.lean`), not the
+refutation**, mirroring the M-instance non-Galois assembly (`S11_NineElevenAlphaBound.lean`), not
+the
 uniform fold `caseB_coherent_sOf_H0Cprime_of_mixed`.
 
 Honest route via `coherent_of_maximal_coherent_pair_refuted` (`S07_Subcoherent.lean:702`):
@@ -643,12 +649,16 @@ The reduction is landed sorry-free; the **sole residual** is the refuter, i.e. P
   `sSet_caseB_memberRFamily` (`S15_CaseBReducibleCoherence.lean`), feeding the `Dmem`/`Da` of the
   (5.6) adjoining engine `xAdjoinStepW_k`;
 * the **(9.11.1)–(9.11.6) squeeze assembly** for `indS`/`A(S)` — the analogue of the M-instance
-  `nineElevenEqualityRefutation_of_sevenEightRefutation` (`S11_NineElevenAlphaBound.lean:1124`), whose
-  bricks `lb0_le_lb1_of_degreeRatio_le` / `two_mul_le_of_dvd_of_odd` / `relIndex_le_relIndex_of_le` /
-  `sumnS_of_norm_one_constant_degree` / `sumnS_le_of_subset` are already landed in `S07_Subcoherent`;
+  `nineElevenEqualityRefutation_of_sevenEightRefutation` (`S11_NineElevenAlphaBound.lean:1124`),
+  whose
+  bricks `lb0_le_lb1_of_degreeRatio_le` / `two_mul_le_of_dvd_of_odd` / `relIndex_le_relIndex_of_le`
+  /
+  `sumnS_of_norm_one_constant_degree` / `sumnS_le_of_subset` are already landed in
+  `S07_Subcoherent`;
 * the **(9.11.7)–(9.11.8) orthogonal-branch refutation** — the `S`-instance analogue of the M-instance
   `NineElevenSevenEightRefutation` (`S11_NineElevenAlphaBound.lean:786`), which is *itself* still a
-  named residual on the M-side (issue 9083 Phase E), i.e. the deepest genuinely-unlanded piece of the
+  named residual on the M-side (issue 9083 Phase E), i.e. the deepest genuinely-unlanded piece of
+  the
   whole non-Galois (9.11) — not an `S`-instance-only gap. -/
 theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -674,13 +684,17 @@ theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
       (star_natCast _))
     (hyp.sSetIrrDeg_qa_coherent_indS_caseA hG hnoV chars caseA)
     ?_
-  -- The (9.11.1)–(9.11.8) refuter (sole residual): given a maximal proper coherent conjugation-closed
+  -- The (9.11.1)–(9.11.8) refuter (sole residual): given a maximal proper coherent
+  -- conjugation-closed
   -- `𝒮₂ ⊇ S₁(q·a)` with `𝒮₃ = 𝒮 \ 𝒮₂ ≠ ∅` and *no* conjugate pair `{χ, χ̄}` (`χ ∈ 𝒮₃`) coherently
-  -- adjoinable, derive `False`.  Book argument: the (9.11.1) degree squeeze `lb0 = 2·q·a·χ(1) < sumnS 𝒮₂`
-  -- would fire the (5.6) adjoining engine `xAdjoinStepW_k` on some `χ ∈ 𝒮₃` (contradicting `hnopair`),
+  -- adjoinable, derive `False`. Book argument: the (9.11.1) degree squeeze
+  -- `lb0 = 2·q·a·χ(1) < sumnS 𝒮₂`
+  -- would fire the (5.6) adjoining engine `xAdjoinStepW_k` on some `χ ∈ 𝒮₃` (contradicting
+  -- `hnopair`),
   -- so every squeeze inequality `lb0 ≤ lb1 ≤ lb2 ≤ lb3 ≤ sumnS S₁′ ≤ sumnS 𝒮₂` is an equality — a
   -- configuration refuted by (9.11.7)–(9.11.8).  See the theorem docstring for the three remaining
-  -- `b`-territory prerequisites (caseA `R`-family; (9.11.1)–(9.11.6) squeeze assembly for `indS`/`A(S)`;
+  -- `b`-territory prerequisites (caseA `R`-family; (9.11.1)–(9.11.6) squeeze assembly for
+  -- `indS`/`A(S)`;
   -- the (9.11.7)–(9.11.8) refutation, still a residual even on the M-side, issue 9083).
   intro S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair
   exact hyp.sSet_caseA_nineElevenRefutation hG hnoV chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh hS₃ne hnopair

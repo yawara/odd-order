@@ -808,7 +808,8 @@ cyclic, with order `e = |E|` dividing `p - 1` or `p + 1`.
 `exists_center_omega1_elemAbelian_fpf_of_witness` we obtain `T = Ω₁Z(O_p(H))` — elementary abelian
 of order `p` or `p²`, normalized by `E` (realized in `G` as `E' = frob.complement.map L.subtype`),
 with `E'` acting fixed-point-freely on `T` by conjugation.  The proven rep-theory core
-`isCyclic_and_card_dvd_of_fpf_conj_elemAbelian` then gives `IsCyclic E' ∧ (|E'| ∣ p-1 ∨ |E'| ∣ p²-1)`
+`isCyclic_and_card_dvd_of_fpf_conj_elemAbelian` then gives
+`IsCyclic E' ∧ (|E'| ∣ p-1 ∨ |E'| ∣ p²-1)`
 (the `§8`-free Singer/Case-A+B mechanism).  Transporting cyclicity back along `L.subtype` (`E ≅ E'`)
 and applying the packaged `p+1` refinement to the `p²-1` branch yields the (12.12) conclusion. -/
 theorem complement_cyclic_order_dvd [Finite G]

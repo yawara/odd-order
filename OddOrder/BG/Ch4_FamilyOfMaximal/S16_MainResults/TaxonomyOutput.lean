@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges
 /-!
 # BG Proposition 16.1 taxonomy + Theorems I/II (Peterfalvi が消費する出力)
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split,
+issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
@@ -196,10 +197,12 @@ theorem typeP_exists_hall_derived_eq [Finite G]
 
 /-- **Type-`F` Frobenius FPF against a `U₀`-element** (mmd L4486, the engine of `isTypeF_of_isTypeI`,
 following the Coq `BGsection16` argument): a nontrivial `X ≤ U₀` of the Frobenius complement has
-trivial `M_F`-centralizer, `M_F ⊓ C_G(X) = ⊥`.  Any `M_F`-element `y` centralizing some `x ∈ X# ⊆ U₀#`
+trivial `M_F`-centralizer, `M_F ⊓ C_G(X) = ⊥`. Any `M_F`-element `y` centralizing some
+`x ∈ X# ⊆ U₀#`
 lifts to `↥(M_F ⊔ U₀)`, where `frobenius_HU0` (kernel `M_F = H`, complement `U₀`) and
 `centralizer_complement_le` place it in `U₀`; then `y ∈ M_F ⊓ U₀ = ⊥` (the `complement` field with
-`U₀ ≤ U`).  This is the `C_H(K) = 1` half of the BG argument, applied to a `U₀`-element `X ⊆ K` rather
+`U₀ ≤ U`). This is the `C_H(K) = 1` half of the BG argument, applied to a `U₀`-element `X ⊆ K`
+rather
 than to the `κ`-Hall `K` itself (which need not lie in `H ⊔ U₀`). -/
 theorem typeFData_fitting_inf_centralizer_eq_bot [Finite G]
     {M : Subgroup G} (td : OddOrder.GroupTheory.TypeFData M) {X : Subgroup G}
@@ -252,7 +255,8 @@ last residual of `isTypeF_of_isTypeI`): from `p ∈ κ(M)` and the type-`F` datu
 `typeFData_fitting_inf_centralizer_eq_bot` applies) together with a `κ(M)`-Hall `K ⊇ X`.
 
 The construction (Coq `BGsection16.v:1031`): `p ∈ κ(M) ⟹ p ∉ σ(M)` (`kappa_subset_sigmaCompl`) and
-`p ∈ π(M)`, so `p ∤ |M_F|` (`M_F ⊆ M_σ`) and `p ∣ |U| = [M : M_F]`; since `exponent U₀ = exponent U`,
+`p ∈ π(M)`, so `p ∤ |M_F|` (`M_F ⊆ M_σ`) and `p ∣ |U| = [M : M_F]`; since
+`exponent U₀ = exponent U`,
 `p ∈ π(U₀)`, giving a Sylow `p`-subgroup `X ≤ U₀`, `X ≠ ⊥`.  Then `X` is a `κ`-group, so Hall's
 theorem in the solvable `M` (`hall_E_exists` + Hall conjugacy) places it in a `κ(M)`-Hall `K`.  This
 is the only residual; the rest of `isTypeF_of_isTypeI` is `sorry`-free modulo this. -/
@@ -335,7 +339,8 @@ consumes (it lets a non-Type-I `M` be placed in `ℳ_𝓟`, which a Type I `M` c
 `typeFData_exists_kappaElement_le_kappaHall` produces a nontrivial `p`-subgroup `X ≤ U₀` and a
 `κ(M)`-Hall `K ⊇ X`.  Theorem C(2) (`theoremC_paired_structure`) gives `K* = M_σ ⊓ C_G(K) ≠ ⊥` with
 `K* ≤ M_F`.  But `typeFData_fitting_inf_centralizer_eq_bot` forces `M_F ⊓ C_G(X) = ⊥`, and since
-`X ≤ K`, `K* ≤ C_G(K) ≤ C_G(X)` together with `K* ≤ M_F` place `K* ≤ M_F ⊓ C_G(X) = ⊥`, contradicting
+`X ≤ K`, `K* ≤ C_G(K) ≤ C_G(X)` together with `K* ≤ M_F` place `K* ≤ M_F ⊓ C_G(X) = ⊥`,
+contradicting
 `K* ≠ ⊥`. -/
 theorem isTypeF_of_isTypeI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
@@ -410,8 +415,10 @@ theorem proposition_type_classification [Finite G]
   -- `alternative` TI case is proved; only the `¬FittingIsTI` trichotomy (BG 15.7(e)) is residual.
   case hFI => exact isTypeI_of_isTypeF hG hM
   -- `hP1neIIIIV` (Type P₁, `M_F ≠ M_σ` ⟹ Type III/IV): the `TypePData` is fully constructed
-  -- (`typePData_of_isTypeP1_mf_ne_msigma`, BG Cor 15.5, `U ≠ ⊥` nilpotent); the sole residual is the
-  -- Peterfalvi (8.7) normalizer `N_G(U) ⊆ M` (isolated in `isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma`).
+  -- (`typePData_of_isTypeP1_mf_ne_msigma`, BG Cor 15.5, `U ≠ ⊥` nilpotent); the sole residual is
+  -- the
+  -- Peterfalvi (8.7) normalizer `N_G(U) ⊆ M` (isolated in
+  -- `isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma`).
   case hP1neIIIIV => exact isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma hG hM
   -- `hP1eqV` (Type P₁, `M_F = M_σ` ⟹ Type V): the type-V `TypePData` is fully constructed
   -- (`typePData_of_isTypeP1_mf_eq_msigma`, `U = ⊥`); the sole residual is the Peterfalvi (8.8)
@@ -436,7 +443,8 @@ theorem proposition_type_classification [Finite G]
     · exact hP2
   -- `hIIIIVP1` (Type III/IV ⟹ Type P₁ ∧ `M_F ≠ M_σ`): Type III/IV is non-Type-I, so `IsTypeP`.
   -- The `P₂` branch is excluded (`P₂ ⟹ II`, contradicting III/IV via
-  -- `not_isTypeII_of_isTypeIII_or_IV`), giving `P₁`; and `M_F = M_σ` would make it Type V (`hP1eqV`,
+  -- `not_isTypeII_of_isTypeIII_or_IV`), giving `P₁`; and `M_F = M_σ` would make it Type V
+  -- (`hP1eqV`,
   -- contradicting III/IV via `not_isTypeV_of_isTypeIII_or_IV`), so `M_F ≠ M_σ`.
   case hIIIIVP1 =>
     intro h34
@@ -462,7 +470,8 @@ theorem proposition_type_classification [Finite G]
 /-- **Peterfalvi (8.10)/(8.11), the full `M_s = M_σ` identity** (mmd 04.10:123: "M_s is the group
 denoted by M_σ in [BG]"): for a maximal subgroup `M` of its classified Peterfalvi type `τ`, the
 "main subgroup" `M_s` (`mainSubgroup`, `= M_F` for I/II/V, `= M'` for III/IV) coincides with BG's
-σ-Hall subgroup `M_σ`.  Assembled from `proposition_type_classification` (BG Prop 16.1): for I/II/V it
+σ-Hall subgroup `M_σ`. Assembled from `proposition_type_classification` (BG Prop 16.1): for I/II/V
+it
 is clause (f) (`M_F = M_σ ⟺ τ ∈ {I,II,V}`); for III/IV it is clause (c) (`τ ∈ {III,IV} ⟹ M` is type
 `P₁`) followed by `isTypeP1_derivedInG_eq_Msigma` (`M' = M_σ`).  The linchpin bridge turning BG's
 `M_σ`-stated Theorem E (`sigmaConjugacySaturation_Mtilde_ncard`, `sigma_reps_prime_cover`) into the
@@ -482,7 +491,8 @@ theorem mainSubgroup_eq_Msigma [Finite G]
 /-- **Support-set bridge (all types)**: Peterfalvi's `A_1(M) = M_s#` coincides with BG's
 `\widetilde M = M_σ#` (`sigmaSharp`) for a maximal subgroup of its classified type.  Immediate from
 `A_1(M) = M_s#`, `M_s = M_σ` (`mainSubgroup_eq_Msigma`, Peterfalvi (8.10)), and `M̃ = M_σ#`.
-Generalises the type-I/II support bridge to all five types; supplies the BG↔Pf support identification
+Generalises the type-I/II support bridge to all five types; supplies the BG↔Pf support
+identification
 behind `BGTheoremECoverData`'s `thickenedA1`/covering fields (issue 8020). -/
 theorem A1_eq_sigmaSharp [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
@@ -493,8 +503,10 @@ theorem A1_eq_sigmaSharp [Finite G]
 
 /-- **Every maximal subgroup has a Peterfalvi type** (exhaustiveness of the I–V classification): a
 maximal subgroup `M` of a minimal simple group of odd order has `HasPeterfalviType τ M` for some
-`τ ∈ {I,II,III,IV,V}`.  Reads off `proposition_type_classification` (BG Prop 16.1) over the exhaustive
-BG trichotomy `F`/`P₁`/`P₂` (`isTypeF_iff_not_isTypeP`, `isTypeP_iff_isTypeP1_or_isTypeP2`): type `F`
+`τ ∈ {I,II,III,IV,V}`. Reads off `proposition_type_classification` (BG Prop 16.1) over the
+exhaustive
+BG trichotomy `F`/`P₁`/`P₂` (`isTypeF_iff_not_isTypeP`, `isTypeP_iff_isTypeP1_or_isTypeP2`): type
+`F`
 is I (clause a), `P₂` is II (clause b), `P₁` splits as V if `M_F = M_σ` (clause d) else III/IV
 (clause c).  Supplies the `tau`/`typed` fields of `BGTheoremECoverData` (issue 8020). -/
 theorem exists_peterfalviType [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -518,8 +530,10 @@ theorem exists_peterfalviType [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 maximals): a maximal subgroup that is BG type `F` or `P₂` has `maxNilpotentNormalHall N = M_σ(N)`.
 Type `F` is Peterfalvi I and type `P₂` is Peterfalvi II (`proposition_type_classification` clauses
 (a)/(b)), both of which satisfy `M_F = M_σ` (clause (f)).  This is exactly the identity making
-Peterfalvi's (8.14) signalizer `R(x) = C_{(N[x])_F}(x)` (Coq `FTsignalizer`, Fitting of the signalizer
-maximal `N[x]`, which is type `F`/`P₂` by `signalizer_structure_of_mem_sigmaSharp`) coincide with BG's
+Peterfalvi's (8.14) signalizer `R(x) = C_{(N[x])_F}(x)` (Coq `FTsignalizer`, Fitting of the
+signalizer
+maximal `N[x]`, which is type `F`/`P₂` by `signalizer_structure_of_mem_sigmaSharp`) coincide with
+BG's
 `R(x) = (N[x])_σ ⊓ C_G(x)` (`Rsub`): `(N[x])_F = (N[x])_σ` (issue 8020). -/
 theorem maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {N : Subgroup G} (hN : N ∈ maximalSubgroups G)
@@ -847,7 +861,8 @@ theorem centralizer_escape_final_local [Finite G]
 normal-complement data `R(x)` exists and is attached to a *unique* maximal `N ⊇ C_G(x)` of type `F`
 or `P₂`.  Assembled from the signalizer structure (`signalizer_structure_of_mem_sigmaSharp`), the
 `τ₂`-element centralizer uniqueness (`maximalContaining_centralizer_eq_singleton_of_tau2_element`,
-giving `ℳ(C_G(x)) = {N}`), `RData_of_inputs`, `maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`,
+giving `ℳ(C_G(x)) = {N}`), `RData_of_inputs`,
+`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`,
 and the `P₂`-escape package (`centralizer_escape_final_local`). -/
 theorem exists_RData_escape_structure [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
@@ -1388,12 +1403,14 @@ theorem maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
   exact ⟨N, maximalContaining_centralizer_eq_singleton_of_tau2_element hG hNmax hxN hx1 hxtau2 hRne⟩
 
 /-- **The signalizer maximal is the unique type-`I`/`II` overgroup of `C_G(x)`** (full per-element
-half of Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ#`, `C_G(x) ⊄ M`) there is
+half of Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ#`, `C_G(x) ⊄ M`) there
+is
 a *unique* maximal subgroup `L` over `C_G(x)` of Peterfalvi type `I`/`II`.  Existence is the previous
 `exists_maximal_centralizer_le_typeI_or_typeII` (the type-`F`/`P₂` neighbour of
 `signalizer_structure_of_mem_sigmaSharp`, converted to type `I`/`II`); uniqueness is the Theorem-D
 singleton `ℳ(C_G(x)) = {N[x]}`
-(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`), which collapses *every*
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`), which collapses
+*every*
 maximal over `C_G(x)` — not merely the type-`I`/`II` ones — to `N[x]`.  This is exactly the `∃!`
 clause of (8.13)'s conclusion; the escape hypothesis `C_G(x) ⊄ M` supplies the `1 < |𝓜_σ(x)|` the
 existence half needs (`centralizer_le_of_maximalSigma_le_one`). -/
@@ -1448,7 +1465,8 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
             (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) :=
   theoremII_tame_embedding_of_inputs hG hM hKM hUM hK hU hX
     -- `hPieceInv`: BG Theorem E cross-piece exclusion.  `M_σ` (normal `σ`-Hall) and `U⊔M_σ` (normal
-    -- `κ′`-Hall, Theorem A(3)) make `M_σ`- and `A(M)`-membership of an element of `M` order-determined
+    -- `κ′`-Hall, Theorem A(3)) make `M_σ`- and `A(M)`-membership of an element of `M`
+    -- order-determined
     -- (`mem_Msigma_iff_isPiElement_sigma` / `mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), hence
     -- conjugation-invariant (`isPiElement_conj`).
     (by
@@ -1487,7 +1505,8 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
         · rw [show x = g⁻¹ * y * (g⁻¹)⁻¹ from by rw [hg]; group]
           exact S14.isPiElement_conj g⁻¹ h)
     -- `hMaxUnique`: BG §9--§10 maximal-overgroup uniqueness `|ℳ(C_G(x))| = 1`, discharged from the
-    -- signalizer uniqueness (`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`)
+    -- signalizer uniqueness
+    -- (`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`)
     -- via the `D ⊆ M_σ#` reduction (`mem_sigmaSharp_of_mem_aSet_of_escape`).
     (fun x hxX hx1 hesc N₁ N₂ hN₁ hN₂ => by
       obtain ⟨N, hMC⟩ := maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape

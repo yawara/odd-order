@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ChiefFactorCore
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData` (2000-line limit, issue
+0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -584,8 +585,10 @@ commuting spanning family realises `K` as the internal direct product `∏ ↥(S
 `Subgroup.noncommPiCoprod`, injective from independence and surjective from spanning), so
 `|K| = ∏ |S i| = ∏ n = n ^ k`.
 
-Applied to the chief factor `H̄` under the restricted `U`-action, with the pieces the `U W₁`-orbit of
-a minimal `U`-invariant `S₀` (each `U`-irreducible of order `|S₀| = p^d`), this gives `|H̄| = (p^d)^k`,
+Applied to the chief factor `H̄` under the restricted `U`-action, with the pieces the `U W₁`-orbit
+of
+a minimal `U`-invariant `S₀` (each `U`-irreducible of order `|S₀| = p^d`), this gives
+`|H̄| = (p^d)^k`,
 i.e. `q = d·k` — the divisibility `d ∣ q` underlying the Clifford dichotomy (`q` prime ⟹ `d ∈ {1, q}`). -/
 theorem exists_supIndep_aInvariant_family_of_iSup {K : Type*} [Group K] [Finite K]
     {A : Type*} [Group A] {φ : A →* MulAut K} {ι : Type*} [Finite ι]
@@ -891,7 +894,8 @@ If `α` is a fixed-point-free automorphism of a finite abelian group `K`, then a
 The displacement `x ↦ x / α x` is surjective (`MonoidHom.FixedPointFree.commutatorMap_surjective`),
 and `θ (x / α x) = θ x / θ (α x) = 1` by invariance, so `θ` vanishes on all of `K`.  This is the
 **character-side fixed-point-freeness** of the Frobenius action `H̄ ⋊ Ū` — for a nontrivial linear
-character `θ ∈ Irr(H̄)` and `g ∉ C = C_U(H̄)` (so `φ_U(g)` is FPF by `chiefFactor_caseB_action_fpf`),
+character `θ ∈ Irr(H̄)` and `g ∉ C = C_U(H̄)` (so `φ_U(g)` is FPF by
+`chiefFactor_caseB_action_fpf`),
 `θ` is *not* `φ_U(g)`-invariant, giving the inertia `I_U(θ) = C` underlying Peterfalvi (9.9). -/
 theorem eq_one_of_invariant_of_fixedPointFree {K M' : Type*} [Group K] [Finite K] [CommGroup M']
     {α : MulAut K} (hα : MonoidHom.FixedPointFree α) {θ : K →* M'}
@@ -1060,7 +1064,8 @@ theorem singerAdapter_coprime_fpf
 /-- **(9.7) case (a) bound.**  A group `A` acting on a group `K` of prime order `p` has its
 action-image `φ.range` of order dividing `p - 1`: `K` is cyclic, so `MulAut K ≅ (ZMod p)ˣ` has order
 `p - 1` (`IsCyclic.card_mulAut`), and `φ.range ≤ MulAut K`.  This is the `a ∣ p - 1` bound of
-Peterfalvi (9.7) case (a) for `a = |A : C_A(K)| = |φ.range|` (the `U`-action on an order-`p` Clifford
+Peterfalvi (9.7) case (a) for `a = |A : C_A(K)| = |φ.range|` (the `U`-action on an order-`p`
+Clifford
 factor `H₁` embeds `U/C_U(H₁)` into the cyclic `Aut(H₁)`). -/
 theorem card_range_dvd_card_sub_one_of_prime_card {A K : Type*} [Group A] [Group K] [Finite K]
     (φ : A →* MulAut K) (hp : (Nat.card K).Prime) :

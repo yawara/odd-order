@@ -473,11 +473,14 @@ theorem caseB_constituentDecomposition_tau1_mem_ZIrr
   · exact (hirr (fun χ₂ hne heq2 => hcase ⟨χ₂, hne, heq2⟩)).2.2.2.2.1
 
 /-- **(6.8.2.3) seam-1 orthogonality of the dispatch.**  `⟨(caseB_constituentDecomposition …).X,
-cY.extension η₁⟩ = 0`, dispatched per branch through the index cast (`charPsiDecomp_eqRec_X`): on the
-column branch the certain-type seam-1 `columnDecompositionTau_X_orthogonal` (using the partner anchor
+cY.extension η₁⟩ =
+0`, dispatched per branch through the index cast (`charPsiDecomp_eqRec_X`): on the
+column branch the certain-type seam-1 `columnDecompositionTau_X_orthogonal` (using the partner
+anchor
 `η' ≠ η₁ ∈ Yset`), on the irreducible branch the Dade family seam-1
 `irreducibleDecompositionTau_X_orthogonal` (using the per-`θ` anchor-vs-constituent orthogonality
-`hirrAnc`).  The partner data and the `η₁`-anchor data are explicit hypotheses (the genuine §5 content
+`hirrAnc`). The partner data and the `η₁`-anchor data are explicit hypotheses (the genuine §5
+content
 discharged at the capstone); this lemma is the pure branch plumbing. -/
 theorem caseB_constituentDecomposition_X_orthogonal
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -644,8 +647,10 @@ theorem caseB_per_phi_anchored_family
 /-- **Peterfalvi (6.8.2.3), the per-`φ` anchored image — `Y`-anchor data internalized.**  Strengthens
 `caseB_per_phi_anchored_family` by discharging the entire `η₁`-anchor / partner block from
 `η₁ ∈ Yset` alone, via the textbook choice of partner `η' = η̄₁` (the complex conjugate): `η̄₁ ∈ Y`
-(`Yset_closedUnderConjugate`), `η₁ ≠ η̄₁` (`Yset_hasNoRealCharacters`, Peterfalvi (5.2.a): odd order ⇒
-no nontrivial real irreducible), `⟨η₁, η̄₁⟩ = 0` (distinct irreducibles), and `η₁ − η̄₁` `H^#`-supported
+(`Yset_closedUnderConjugate`), `η₁ ≠ η̄₁` (`Yset_hasNoRealCharacters`, Peterfalvi (5.2.a): odd order
+⇒
+no nontrivial real irreducible), `⟨η₁, η̄₁⟩ = 0` (distinct irreducibles), and `η₁ − η̄₁`
+`H^#`-supported
 (equal degree `Yset_apply_one`, `sMember_diffSupport_of_charValue_eq`).  The remaining inputs are the
 genuinely hard §5/§6 content: the per-`θ` column/irreducible bundles `hcol`/`hirr`, the per-`θ`
 anchor-vs-constituent orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp`. -/
@@ -776,7 +781,8 @@ induced character `Ind^L_H θ` either equals a non-trivial certain-type column `
 
 This is the cover dichotomy underlying the case-(B) `X = 𝒳(W₂)` coherence: every `X`-member splits
 into the certain-type column part (coherent as a set, `certainTypeSet_isCoherent_tau_canonical`) or
-the irreducible part (adjoined as a `{χ, χ̄}` pair via `adjoin_irr_nonreal_of_supportedDecomposition`).
+the irreducible part (adjoined as a `{χ, χ̄}` pair via
+`adjoin_irr_nonreal_of_supportedDecomposition`).
 The irreducible branch is `caseB_irr_induce_isIrreducible` (the value↔index seam, settled session 43
 cont.⁹); the column branch is the witnessing `χ₂`. -/
 theorem caseB_induce_column_or_irreducible
@@ -800,8 +806,10 @@ theorem caseB_induce_column_or_irreducible
 
 `⟨Ind^L_H θ, columnSum h46 χ₂⟩ = 0`: by additivity `columnSum = ∑_i μ_{ij}`, it suffices each grid
 character `μ_{ij}` is `⊥ Ind^L_H θ`.  Both are irreducible, and distinct **by degree mod `|W₁|`**:
-`Ind^L_H θ` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)` (`induce_apply_one` + `index_H_eq_card_W1`), whereas
-a grid degree is `≡ ±1 (mod |W₁|)` (`certainType_degree_modEq`, sign `= ±1`), with `|W₁| ≠ 1`.  So the
+`Ind^L_H θ` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)` (`induce_apply_one` + `index_H_eq_card_W1`),
+whereas
+a grid degree is `≡ ±1 (mod |W₁|)` (`certainType_degree_modEq`, sign `= ±1`), with `|W₁| ≠ 1`. So
+the
 irreducible Kronecker inner product vanishes.  (This is the same degree argument as the `X ⊥ Y`
 `inner_columnFamily_mu_Yset_eq_zero`, with the `Y`-degree `|W₁|` replaced by `|W₁|·θ(1)`.) -/
 theorem caseB_inner_irr_columnSum_eq_zero
@@ -920,7 +928,8 @@ theorem caseB_inner_irr_conj_columnSum_eq_zero
   simpa using hkron
 
 /-- **(6.8.2) irreducible `X`-member ⊥ a certain-type column base** — the `χ`/`χ̄ ⊥ S₁` inputs
-(`hχ_S1`/`hχbar_S1`) of the case-(B) `X`-fold per-step, for the part of the prefix `S₁` consisting of
+(`hχ_S1`/`hχbar_S1`) of the case-(B) `X`-fold per-step, for the part of the prefix `S₁` consisting
+of
 certain-type columns.  Given that every member of `S₀` is a non-trivial column `columnSum h46 χ₂`,
 the irreducible `Ind^L_H θ` and its conjugate are orthogonal to all of `S₀`, by
 `caseB_inner_irr_columnSum_eq_zero` / `caseB_inner_irr_conj_columnSum_eq_zero`.  (The prefix's
@@ -969,7 +978,8 @@ theorem caseB_S_member_column_or_irreducible
 
 /-- **(6.8.2) `X(W₂) ⊥ Y`** — the `hpair` orthogonality input of the case-(B) `X ∪ Y` glue
 (`coherentXunionYset_caseB_of_glued`).  Every `X`-member is orthogonal to every `Y`-member: by the
-`S`-level cover (`caseB_S_member_column_or_irreducible`) an `X`-member is either a certain-type column
+`S`-level cover (`caseB_S_member_column_or_irreducible`) an `X`-member is either a certain-type
+column
 (`⊥ Y` by `inner_columnSum_Yset_eq_zero`) or an irreducible distinct from the `Y`-member (`⊥ Y` by
 `inner_irr_Yset_eq_zero`); the distinctness is the disjointness `X(W₂) ∩ Y = ∅` (`Y = S(⁅H,H⁆) ⊆
 S(W₂)` since `W₂ ⊆ ⁅H,H⁆`, antitone, and `X(W₂)` is disjoint from `S(W₂)`). -/

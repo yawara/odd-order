@@ -103,7 +103,8 @@ theorem prime_card_and_finrank_of_minimalNormal_kernel [Finite G] [IsAlgClosed F
 
 /-- **Case B transfer brick — invariants are preserved under the lift to `G ⧸ K₀`** (issue 8013
 piece 3).  When `K₀` acts trivially (`ρ x = 1` for `x ∈ K₀`), `ρ` factors as
-`ρ̄ = QuotientGroup.lift K₀ ρ` through `G ⧸ K₀`, and the `ρ̄`-invariants of the image `S·K₀/K₀` of any
+`ρ̄ = QuotientGroup.lift K₀ ρ` through `G ⧸ K₀`, and the `ρ̄`-invariants of the image `S·K₀/K₀` of
+any
 `S ≤ G` coincide (as a submodule of `V`) with the `ρ`-invariants of `S`: the actions agree on
 representatives (`ρ̄ ⟦g⟧ = ρ g`), so the same vectors are fixed.
 
@@ -153,7 +154,8 @@ theorem card_map_mk'_eq_of_disjoint {K₀ R : Subgroup G} [K₀.Normal] (hdisj :
 the conclusion of the theorem for the lifted representation `ρ̄` on `G ⧸ K₀` (with kernel `K/K₀`,
 complement `R·K₀/K₀`) transfers back to `ρ` on `G` (kernel `K`, complement `R`).  The complement's
 order is unchanged (`card_map_mk'_eq_of_disjoint`) and so is the `finrank` of its invariants
-(`invariants_lift_map_eq_of_trivial`), so `(a)` `|R| = p` and `(b)` `finrank V = |R| · finrank C_V(R)`
+(`invariants_lift_map_eq_of_trivial`), so `(a)` `|R| = p` and `(b)`
+`finrank V = |R| · finrank C_V(R)`
 carry over verbatim.  The induction (Case B) supplies the quotient conclusion `hquot` by applying the
 induction hypothesis to `ρ̄` (whose kernel `K/K₀` is strictly smaller). -/
 theorem caseB_transfer (ρ : Representation F G V) {K₀ K R : Subgroup G} [K₀.Normal]
@@ -174,7 +176,8 @@ theorem caseB_transfer (ρ : Representation F G V) {K₀ K R : Subgroup G} [K₀
   exact ⟨p, hp, by rw [← hcard]; exact hcardR', by rw [hfinrank', hcard, hinv]⟩
 
 /-- **Case B brick — irreducibility lifts to the quotient** (issue 8013 piece 3).  When `K₀` acts
-trivially, the lifted representation `ρ̄ = QuotientGroup.lift K₀ ρ` on `G ⧸ K₀` is again irreducible:
+trivially, the lifted representation `ρ̄ = QuotientGroup.lift K₀ ρ` on `G ⧸ K₀` is again
+irreducible:
 its subrepresentations are the same submodules as those of `ρ` (a submodule is `ρ̄`-invariant iff
 `ρ`-invariant, since `ρ̄ ⟦g⟧ = ρ g` and `mk'` is surjective), so the simple-order structure carries
 over.  Supplies the `[IsIrreducible ρ̄]` instance needed to apply the induction hypothesis to `ρ̄`. -/

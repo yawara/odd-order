@@ -18,7 +18,8 @@ For a type-`P₂` maximal `S`, the Dade support that the §13 machinery actually
 (Coq `prDade_sub_TIirr_on`), and `V_S = W ∖ (W₁ ∪ W₂)` has elements with nontrivial `W₂`-component,
 hence lies **outside** `S' = derivedInG S ⊇ A(S)`.  So a Dade map built on `'A(S)` alone cannot see
 the `V_S`-part of a `μ`-difference (it falls in the arbitrary linear-extension region), which is why
-the row-`0` cross-relation `τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}` (S15 `tauS_mu_row0_cross`) is not
+the row-`0` cross-relation `τ_S(μ_{0j} − μ_{01}) = η_{0j} − η_{01}` (S15 `tauS_mu_row0_cross`) is
+not
 provable with the `'A(S)`-Dade map (issue 9076).
 
 This file defines the honest type-`P₂` `A₀`-support
@@ -26,9 +27,11 @@ This file defines the honest type-`P₂` `A₀`-support
 `honestTypeP2A0Set M data = honestTypeP2ASet M ∪ conjClassSetIn M (typePV M data)`
 
 using the **correct** `M_σ^#`-indexed `A(S)` (`honestTypeP2ASet`, avoiding the issue-9008 `typePA`
-over-claim over `M^#` which includes the escaping non-`σ`-sharp `U^#`), together with the exceptional
+over-claim over `M^#` which includes the escaping non-`σ`-sharp `U^#`), together with the
+exceptional
 `V^M = conjClassSetIn M (typePV M data)`.  The set-level facts (`⊆ M`, non-identity, `M`-conjugation
-invariance, `A(S) ⊆ A₀(S)`) are assembled here from the corresponding `honestTypeP2ASet` and `typePV`
+invariance, `A(S) ⊆ A₀(S)`) are assembled here from the corresponding `honestTypeP2ASet` and
+`typePV`
 facts.  The Dade hypothesis (8.15) for this support — assembled through the `σ`-decomposition engine
 `dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`, whose `V`-part obligations are vacuous or
 generic (`centralizer_typePV_le_M`, `coprime_FT_signalizer_centralizerIn_typePV`,
@@ -63,7 +66,8 @@ theorem typePV_subset_M {M : Subgroup G} (data : TypePData M) :
 /-- **`V^M`-points lie in BG's `σ`-saturation `hatMsigma M`** (issue 9076 piece 4c-2b″, step 2a of
 the `honestTypeP2A0Set ⊆ A0Set` bridge).  A `V = typePV`-point `v = a·b` (`a ∈ W₁`, `b ∈ W₂`, the
 `W = W₁ ⊔ W₂` factorization) has a **nontrivial** `W₂`-component `b ≠ 1` (else `v = a ∈ W₁`), and
-`W₂ ≤ H = M_F ≤ M_σ` (`maxNilpotentNormalHall_le_Msigma`); since `W` is cyclic (abelian) `v` commutes
+`W₂ ≤ H = M_F ≤ M_σ` (`maxNilpotentNormalHall_le_Msigma`); since `W` is cyclic (abelian) `v`
+commutes
 with `b`, so `b ∈ M_σ ⊓ C_G(v)` witnesses `M_σ ⊓ C_G(v) ≠ ⊥`.  This is the `V`-side half of showing
 `A₀(S) ⊆ hatMsigma M`, feeding the BG §16 Theorem-II tame conjugation. -/
 theorem typePV_subset_hatMsigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -195,7 +199,8 @@ theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data :
   · exact absurd (conjClassSetIn_typePV_centralizer_le_M data hva) haesc
 
 /-- **(13.2.e) `normedTI` core for the `A₀`-support: no `A₀(S)`-point escapes.**  Every escaping
-`A₀(S)`-point reduces to an escaping `A(S)`-point (`escaping_honestTypeP2A0Set_mem_honestTypeP2ASet`,
+`A₀(S)`-point reduces to an escaping `A(S)`-point
+(`escaping_honestTypeP2A0Set_mem_honestTypeP2ASet`,
 since `V^S` does not escape), and the honest `A(S)` has no escaping point on a type-`P₂` maximal
 (`escaping_honestTypeP2ASet_eq_empty`, the proven (13.2.e) core via BG Theorem D(4)).  So the full
 `'A0(S)` support is `normedTI`: this is the trivial-stabilizer input `∀ a, dadeHypS0.H a = ⊥` the
@@ -444,10 +449,12 @@ elements of `A₀(M) = A(M) ∪ V^M` are already `M`-conjugate.  This is the fir
 II (`OddOrder.BG.Ch4.S16.theoremII_tame_embedding` with `X = A0Set M K`): for the tame embedding, a
 `G`-fusion of support points is controlled by `N_G(M) = M`.
 
-Discharge route (issue 9076 piece 4c): bridge the honest support `honestTypeP2A0Set M data` into BG's
+Discharge route (issue 9076 piece 4c): bridge the honest support `honestTypeP2A0Set M data` into
+BG's
 `A0Set M K = hatMsigma M ∖ 𝒞_G(K#)` — the `A(M)`-part via `honestTypeP2ASet_subset_hatMsigma`, the
 `V^M`-part via `typePV ⊆ hatMsigma` plus the order argument `V^M ∩ 𝒞_G(K#) = ∅` (a `V`-point has
-order divisible by `pq`, a `K#`-point only by `q`) — and produce the `κ`-Hall `K` / `(κ∪σ)′`-Hall `U`
+order divisible by `pq`, a `K#`-point only by `q`) — and produce the `κ`-Hall `K` / `(κ∪σ)′`-Hall
+`U`
 of the type-`P` maximal `M`.  With `a, b ∈ A0Set M K`, `theoremII_tame_embedding`'s first conjunct
 supplies the `M`-conjugator.  (Reduces the earlier "genuine deep FT-support geometry" pin to this
 concrete BG-support bridge.) -/
@@ -611,7 +618,8 @@ theorem Hypothesis.dadeHypT0_hconj [Fintype G] [Finite G]
   (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hTP Tdata).some.hconj
 
 /-- **`dadeHypS0.H a = ftSupportKernel S (A₀(S)) a`** (A₀ analogue of `dadeHypS_H_eq_ftSupportKernel`).
-The `'A0(S)`-instance Dade stabilizer at a support point `a` is the faithful (8.14) signalizer kernel
+The `'A0(S)`-instance Dade stabilizer at a support point `a` is the faithful (8.14) signalizer
+kernel
 `R(a) = ftSupportKernel S (A₀(S)) a`, read off the `H_eq_ftSupportKernel` field of the underlying
 `DadeSupportHypothesisData` that `dadeHypS0` is projected from. -/
 theorem Hypothesis.dadeHypS0_H_eq_ftSupportKernel [Fintype G] [Finite G]
@@ -674,7 +682,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 Assembles the §6 certain-type `Hypothesis46 (honestTypeP2ASet S) ↥S` from the type-uniform
 constructor `hypothesis46OfTypePData` (`S13_PrimeTIResidueBridge`): the type-`P` datum `hyp.Sdata`
 (with `IsTypeP S` from `S_nonI`), the honest `A(S)`-support with its `'A0(S)`-Dade `dadeHypS0`, and
-the kernel-family subgroup `subH = M_σ` — for which the covering `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` holds
+the kernel-family subgroup `subH = M_σ` — for which the covering `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#`
+holds
 (`mem_honestTypeP2ASet`).  This supplies the `certainTypeDiffSupported` /
 `certainType_diff_dade_apply_eq_of_mem_V` residue facts behind the `(13.18)` support/`V`-value pins
 (`tauS_mu_row0_diff_support` / `tauS_mu_row0_vanish_on_V`), which then discharge once `hyp.mu` is
@@ -690,7 +699,8 @@ noncomputable def Hypothesis.hyp46S [Finite G] (hyp : Hypothesis (G := G))
     ((OddOrder.BG.Ch3.S10.Msigma hyp.S).subgroupOf hyp.S)
     (by rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance)
     (by
-      -- `W₂ ≤ H = maxNilpotentNormalHall S ≤ M_σ` (`W2_le`/`H_eq` + `maxNilpotentNormalHall_le_Msigma`).
+      -- `W₂ ≤ H = maxNilpotentNormalHall S ≤ M_σ` (`W2_le`/`H_eq` +
+      -- `maxNilpotentNormalHall_le_Msigma`).
       refine Subgroup.subgroupOf_mono hyp.S ?_
       have hW2H : hyp.Sdata.W2 ≤ hyp.Sdata.H := le_trans hyp.Sdata.W2_le inf_le_left
       rw [hyp.Sdata.H_eq] at hW2H
@@ -702,7 +712,8 @@ noncomputable def Hypothesis.hyp46S [Finite G] (hyp : Hypothesis (G := G))
         (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.S_maximal))
     (by
       -- **`A_covers`**: for `hh ∈ M_σ#` and `x ∈ C_S(hh) ⊓ S'` with `x ≠ 1`, the point `↑x` lies in
-      -- `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` — witnessed by `z = ↑hh` (the covering `mem_honestTypeP2ASet`).
+      -- `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` — witnessed by `z = ↑hh` (the covering
+      -- `mem_honestTypeP2ASet`).
       intro hh hhσ hh1 x hx hx1
       rw [Subgroup.mem_inf] at hx
       obtain ⟨hxC, hxD⟩ := hx

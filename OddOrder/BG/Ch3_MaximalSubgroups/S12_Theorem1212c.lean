@@ -230,7 +230,8 @@ theorem frobFact_partA_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨⟨hE₂ab, hE₂norm⟩, _⟩ := E2_abelian_of_abelianSylow hG h hp hA hAE S hAS hSab
   refine ⟨E₂, h.E₂_le, hE₂ab, hE₂norm, ?_⟩
   intro x hxMσ hxne
-  -- `C_E(x) = E ⊓ C_G(x)` is a `τ₂`-subgroup of `E`; the normal Hall `τ₂`-subgroup `E₂` contains it.
+  -- `C_E(x) = E ⊓ C_G(x)` is a `τ₂`-subgroup of `E`; the normal Hall `τ₂`-subgroup `E₂` contains
+  -- it.
   haveI : ((E₂).subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₂_le).mpr hE₂norm
   have hpi : Ch03.Subgroup.IsPiGroup (tau2 M)

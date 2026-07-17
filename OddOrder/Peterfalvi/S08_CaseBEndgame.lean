@@ -168,8 +168,10 @@ instance of `W1_dvd_index_of_fixedPoints_le` for the `W₁`-conjugation action o
 *characteristic* subgroup of `H` containing every `x ∈ H` that commutes with some nonidentity
 `a ∈ W₁` (the certain-type fixed-point condition `C_H(W₁) = W₂ ⊆ M`), then `|W₁| ∣ |H : M| − 1`.
 
-The conjugation action `a • x = (a:L)·(x:L)·(a:L)⁻¹` is set up internally (so neither the statement nor
-the caller mentions it); a fixed point `a • x = x` unfolds — via `toMulAut`/`MulAut.conjNormal_apply`
+The conjugation action `a • x = (a:L)·(x:L)·(a:L)⁻¹` is set up internally (so neither the statement
+nor
+the caller mentions it); a fixed point `a • x = x` unfolds — via
+`toMulAut`/`MulAut.conjNormal_apply`
 — to `(a:L)·(x:L) = (x:L)·(a:L)`, discharging the `hfix` hypothesis of
 `W1_dvd_index_of_fixedPoints_le` from `hcomm`.  `M`-invariance comes from `M` characteristic
 (the `toMulAut` map-membership trick).  Applied with `M = [H,H]` and `hcomm` supplied by
@@ -365,7 +367,8 @@ theorem caseB_fpf_bound {G : Type*} [Group G] [Fintype G]
 /-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
 contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
 `d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
-(oddness + `card_modEq_one` divisibility + the chain index identity `hZ = |H:H′|·|H′:Z|`), one derives
+(oddness + `card_modEq_one` divisibility + the chain index identity `hZ = |H:H′|·|H′:Z|`), one
+derives
 `False`.  This composes the FPF index bound `two_mul_add_one_sq_le_of_two_fpf_factors` (giving the
 `(2·w1+1)² ≤ hZ` input) with the break arithmetic core `false_of_w2_break_arith`.
 

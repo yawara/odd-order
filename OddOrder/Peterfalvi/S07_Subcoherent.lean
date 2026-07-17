@@ -185,8 +185,10 @@ Coq `PFsection5.v:845`:
 Lemma subset_subcoherent S1 : cfConjC_subset S1 S -> subcoherent S1 tau R.
 ```
 Given a subcoherent `subcoherent S tau R` and a `cfConjC_subset S1 S` (`S1 ⊆ S`, conjugate-closed),
-every field of `subcoherent` restricts: `sub_in1`/`sub_in2` restrict the per-member `R`-datum and the
-cross-orthogonality; `sub_iso_to`/`zchar_subset` restrict the isometry; the family predicates restrict
+every field of `subcoherent` restricts: `sub_in1`/`sub_in2` restrict the per-member `R`-datum and
+the
+cross-orthogonality; `sub_iso_to`/`zchar_subset` restrict the isometry; the family predicates
+restrict
 along the inclusion.  This is the first glue step of the (9.11) `Ptype_core_coherence` derived-series
 induction (`PFsection9.v:1484`), where the full type-P subcoherent family is cut down to
 `S_ H0C'` (and again to the uniform-degree sub-family `S1`) before `uniform_degree_coherence` fires.
@@ -356,7 +358,8 @@ full induction — worth checking lane-a-side.**  Tracking = issue 1017. -/
 **Peterfalvi (9.11) norm chain (Coq `Ptype_core_coherence`, `PFsection9.v:1484-1560`).**  The
 non-Galois case of (9.11) runs the pair-adjoining induction (`coherentPairChain`,
 `S07_Coherence.lean:4907`); each step's (5.6.2) integer-forcing `hY : Da.Y = a • Da.tau1 χ₁`
-(the hypothesis of `retarget_isCoherent_of_decompositions_and_memberFamily`, `S07_Coherence.lean:4083`)
+(the hypothesis of `retarget_isCoherent_of_decompositions_and_memberFamily`,
+`S07_Coherence.lean:4083`)
 is discharged in Coq by the **squeeze**
 
 `lb0 ≤ lb1 ≤ lb2 ≤ lb3 ≤ sumnS S1' ≤ sumnS S2 ≤ lb0`  (Coq `lb01`/`lb12`/`lb23`/`lb3S1'`/`lbS1'2`),
@@ -387,7 +390,8 @@ the end of the section. -/
 
 Coq `PFsection9.v:1534` `pose Snorm (psi : 'CF(M)) := psi 1%g ^+ 2 / '[psi]`.  The real-part form
 `(ψ 1).re² / (⟨ψ,ψ⟩).re` used throughout §8 (`S08_CaseBEnumeration.lean:829`,
-`S08_Theorem63.lean:46`): for an actual character `ψ`, `ψ(1)` is a real degree and `⟨ψ,ψ⟩` a positive
+`S08_Theorem63.lean:46`): for an actual character `ψ`, `ψ(1)` is a real degree and `⟨ψ,ψ⟩` a
+positive
 real, so this real form agrees with the complex `ψ(1)²/⟨ψ,ψ⟩`. -/
 noncomputable def Snorm (ψ : ClassFunction L ℂ) : ℝ :=
   (ψ (1 : L)).re ^ 2 / (ClassFunction.inner ψ ψ).re
@@ -424,7 +428,8 @@ the raw `sumnS` factors through the anchor degree:
 
 `sumnS (image χmem s) = η² · ∑ᵢ deg(i)²/mc(i)`.
 
-This is the `calc` block that §8 duplicates inline (`S08_CaseBEnumeration.lean:1118-1125`); factoring
+This is the `calc` block that §8 duplicates inline (`S08_CaseBEnumeration.lean:1118-1125`);
+factoring
 it out is what lets the (9.11) squeeze `lb0 ≤ sumnS S2` (raw form) feed `xAdjoinStepW`'s
 `hDeg : 2·a < ∑ᵢ deg(i)²/mc(i)` (anchor-normalized form). `hinj` makes the sum over the image agree
 with the sum over the index set. -/
@@ -470,9 +475,11 @@ theorem two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS {ι : Type*} (s : Finset �
 Coq `PFsection9.v:1560` `have lb01: lb0 <= lb1 ?= iff (chi 1%g == (q * u)%:R)`, with
 `lb0 = 2·q·a·χ(1)` and `lb1 = 2·a·q²·u`.  In normalized form (dividing the Coq inequality by the
 anchor degree `η = χ₁(1)` and writing `χ(1) = c·η`, i.e. `c = q·χ(1)/η` the degree ratio): the map
-`c ↦ 2·a·c·η` is monotone in `c ≥ 0`, so the base bound `lb0` is at most `lb1 = 2·a·b·η` whenever the
+`c ↦ 2·a·c·η` is monotone in `c ≥ 0`, so the base bound `lb0` is at most `lb1 = 2·a·b·η` whenever
+the
 degree ratio `c ≤ b` (Coq's `chi 1%g ≤ q*u`, the ordering that (9.11.1) forces to equality).  We
-isolate the pure-arithmetic monotonicity (over `ℝ`, `η ≥ 0`, `a ≥ 0`); the identification of `c`, `b`
+isolate the pure-arithmetic monotonicity (over `ℝ`, `η ≥ 0`, `a ≥ 0`); the identification of `c`,
+`b`
 with the group-theoretic `q·χ(1)`, `q²·u` is supplied by the family. -/
 theorem lb0_le_lb1_of_degreeRatio_le {a c b η : ℝ} (ha : 0 ≤ a) (hη : 0 ≤ η) (hcb : c ≤ b) :
     2 * a * c * η ≤ 2 * a * b * η := by
@@ -498,7 +505,8 @@ theorem sumnS_constant {Si : Finset (ClassFunction L ℂ)} {v : ℝ}
 If every member of `Si` is norm-one (`⟨ψ,ψ⟩.re = 1`, e.g. irreducible) of common real degree `d`,
 then `sumnS Si = |Si|·d²`.  This is the value Coq computes for `sumnS S1'` (`PFsection9.v:1607`,
 `rewrite (eq_bigr (fun _ => ((q * a) ^ 2)%:R))`): on `S1'` every member is irreducible of degree
-`q·a`, so `Snorm ≡ (q·a)²` and `sumnS S1' = |S1'|·(q·a)²` — the left endpoint of the `lb3 ≤ sumnS S1'`
+`q·a`, so `Snorm ≡ (q·a)²` and `sumnS S1' = |S1'|·(q·a)²` — the left endpoint of the
+`lb3 ≤ sumnS S1'`
 squeeze step, combined with the `lb_Sqa` lower bound `|S1'| ≥ (p−1)·|U:U'| / a²`. -/
 theorem sumnS_of_norm_one_constant_degree {Si : Finset (ClassFunction L ℂ)} {d : ℝ}
     (hnorm : ∀ ψ ∈ Si, (ClassFunction.inner ψ ψ).re = 1)
@@ -587,7 +595,8 @@ firing precondition (`two_mul_lt_normalizedDegreeSq_of_lb0_lt_sumnS`), and the b
   clause; Lagrange `[U:U'] = [C:U']·[U:C]` for `U' ≤ C ≤ U`).  The caller multiplies `lb12` by
   `q²·u` and `lb23` by `(p−1)·q²` and identifies `u = [U:C]`.  No new analytic content.
 * **(9.11.5)** — `lb3 ≤ sumnS S1'` (Coq `lb3S1'`, `PFsection9.v:1596`): the uniform sub-family `S1'`
-  has every member of degree `q·a`, so `Snorm ≡ (q·a)²` on it and `sumnS S1' = |S1'|·(q·a)²`; combine
+  has every member of degree `q·a`, so `Snorm ≡ (q·a)²` on it and `sumnS S1' = |S1'|·(q·a)²`;
+  combine
   with the base-case lower bound `|S1| ≥ (p−1)·u/a²` (Coq `lb_Sqa`, the type-P `lb_Sqa` datum).  The
   uniform-`Snorm` computation is `sumnS_image_eq_anchorSq_mul` specialized to constant `deg`.
 * **(9.11.6)** — `sumnS S1' ≤ sumnS S2` (Coq `lbS1'2`, `PFsection9.v:1601`): `sumnS_le_of_subset`

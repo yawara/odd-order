@@ -83,7 +83,8 @@ non-coherence arithmetic `typeII_noncoherence_arithmetic`).
 Peterfalvi's "By (8.4.d), `(M'/M'')⋊W₁` is a Frobenius group of odd order; it follows that
 `|M':M''| ≥ 2w₁+1`": the cyclic Hall complement `W₁` acts on the abelian section `M'/M''`
 fixed-point-freely (its fixed points on `M'` are `C_{M'}(x) = W₂` by `TypePData.centralizer_W1`, and
-`W₂ ⊆ M''` by `TypePData.W2_le`), so `w₁ ∣ |M':M''| − 1` (`S08.caseB_W1_dvd_index_of_centralizer_le`,
+`W₂ ⊆ M''` by `TypePData.W2_le`), so `w₁ ∣ |M':M''| − 1`
+(`S08.caseB_W1_dvd_index_of_centralizer_le`,
 the `W₁`-conjugation action on `H = M'.subgroupOf M` with `M'' = ⁅H,H⁆`); with all orders odd and
 `M'' < M'` (`M'` solvable nontrivial, `IsSolvable.commutator_lt_top_of_nontrivial`) this forces
 `|M':M''| ≥ 2w₁+1` (`S08.two_mul_add_one_le_of_odd_dvd`).  Then `|M'| = |M''|·|M':M''| ≥ w₂·(2w₁+1)`
@@ -187,7 +188,8 @@ theorem Hypothesis.card_derived_ge [Finite G]
 
 Since `A(M) = typePA M = (M')#` (`typePA_eq_sharpSubgroup_derivedInG`), `|A(M)| = |M'| − 1`; and
 `|M| = w₁·|M'|` because `[M : M'] = w₁` (`TypePData.card_W1_eq_derived_index`,
-`Subgroup.index_mul_card`).  Hence `|A(M)|/|M| = (|M'|−1)/(w₁·|M'|) < 1/w₁` (as `|M'| ≥ 1`, `w₁ ≥ 1`).
+`Subgroup.index_mul_card`). Hence `|A(M)|/|M| = (|M'|−1)/(w₁·|M'|) < 1/w₁` (as `|M'| ≥ 1`,
+`w₁ ≥ 1`).
 This is the strict inequality Peterfalvi (10.8) uses at line 87 to turn `w₁/|M'| ≥ 1 − |G₁|/|G| −
 |A(M)|/|M|` into `> 1 − |G₁|/|G| − 1/w₁` (the `hA` consumed by `typeII_coherence_estimate_chain`). -/
 theorem Hypothesis.card_typePA_div_card_lt_inv_w1 [Finite G]
@@ -241,7 +243,8 @@ theorem Hypothesis.inner_tau1_zeta_self_eq_one [Finite G] [Fintype G] {M : Subgr
     (⟨params.zeta, params.zeta_irreducible⟩ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥M)
 
 /-- **The `(10.6.b)`-summed bound** (the analytic core of Peterfalvi (10.8) line 83): if a function
-`χ : G → ℂ` takes **odd integer** values on a finite set `S` (in particular `|χ(g)| ≥ 1` there), then
+`χ : G → ℂ` takes **odd integer** values on a finite set `S` (in particular `|χ(g)| ≥ 1` there),
+then
 `|S| ≤ Σ_{g ∈ S} ‖χ(g)‖²`.  General and reusable (no §10 hypotheses): per element, an odd integer
 `m ≠ 0` has `‖(m : ℂ)‖² = |m|² ≥ 1`, and `Σ_S 1 = |S|`.  In the (10.8) proof this is applied to
 `χ = ζ^{τ₁}` on `G₀ = {g | g ∉ Ã(M), (ord g).Coprime w₁}` via (10.6.b) `zeta_tau1_norm_ge_one`,
@@ -311,7 +314,8 @@ This is Peterfalvi (10.8) 04.12 line 81 → 83: apply the family inequality (7.5
 `inner_tau1_zeta_self_eq_one`) and drop the `G₀`-part of the sum via the `(10.6.b)` bound
 (`sum_zeta_tau1_normSq_ge_card`, using `G₀ ⊆ famG₀` from `dadeSupport_restrict_subset` and
 `‖·‖² ≥ 0` on the rest).  Pure real-arithmetic bookkeeping over the family inequality; the genuine
-`‖ζ^{τ₁,ρ}‖²` lower bound (7.8.b) and the `|G₁|`-count (TI-counting, §9) are the remaining gates that
+`‖ζ^{τ₁,ρ}‖²` lower bound (7.8.b) and the `|G₁|`-count (TI-counting, §9) are the remaining gates
+that
 turn this into line 87 and the contradiction.  Here `famG₀ = (toFamilyHypothesis71).G0` is the
 `A(M)`-support complement and `G₀ = {g ∉ Ã(M), (ord g).Coprime w₁}` the `A_0(M)`-support coprime
 subset (`G₀ ⊆ famG₀`). -/
@@ -365,7 +369,8 @@ theorem Hypothesis.chiRhoNormSq_zeta_le_line83 [Finite G]
 that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
 coherence bound `1 − 1/w₁ − 1/u < w₁w₂/|M'|`.
 
-Faithful inputs (with `Mp = |M'|`, `cardH = |H| = |S_F|`, `cardS = |S|`, `u = |U|`, `g1g = |G₁|/|G|`):
+Faithful inputs (with `Mp = |M'|`, `cardH = |H| = |S_F|`, `cardS = |S|`, `u = |U|`,
+`g1g = |G₁|/|G|`):
 * `hA` — the §7 output `w₁/|M'| > 1 − |G₁|/|G| − 1/w₁` (Peterfalvi line 87, from (7.5), (7.8.b),
   (10.6.b), and `|M'| ≥ 2w₁+1`);
 * `hB` — the TI-counting bound `|G₁|/|G| ≤ (|H|−1)/|S| + (w₁w₂−w₁−w₂+1)/(w₁w₂)` (from the inclusion

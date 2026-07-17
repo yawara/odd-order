@@ -113,7 +113,8 @@ theorem sum_inner_restrict_sq_eq_index {M : Type*} [Group M] [Fintype M]
   exact inner_induce_self_eq_index_of_le_center hN hφ
 
 /-- **(6.8.2.3) `αᵢ` aggregate** (Peterfalvi (6.8.2.3): `∑ aᵢαᵢ = Ind^L_{W₂} φ − |H:Z|·η₁`).  Summing
-the differences `αθ = χθ − aθ·η₁` (`χθ = Ind^M_H θ`, `aθ = ⟨φ∘e, Res_{K.subgroupOf H} θ⟩`) weighted by
+the differences `αθ = χθ − aθ·η₁` (`χθ = Ind^M_H θ`, `aθ = ⟨φ∘e, Res_{K.subgroupOf H} θ⟩`) weighted
+by
 `aθ` recovers `Ind^M_K φ − |H:K|·η₁`.  Mechanical combination of the two aggregate halves:
 `∑ aθ·χθ = Ind^M_K φ` (`sum_inner_restrict_smul_induce_eq_induce`) and `∑ aθ² = |H:K|`
 (`sum_inner_restrict_sq_eq_index`, the index `|↥H : K.subgroupOf H| = |H:K|`). -/
@@ -166,7 +167,8 @@ theorem eq_of_sum_mul_eq_sum_sq {ι : Type*} (s : Finset ι) (a b : ι → ℤ)
 
 /-- **Cauchy–Schwarz against a norm-`1` vector** (integer-coefficient form).  If `⟨u, w⟩ = b ∈ ℤ`
 and `‖w‖² = 1`, then `b² ≤ ‖u‖²`.  Pythagoras against the orthogonal split `u = b·w + (u − b·w)`
-(the complement `W` is orthogonal to `w`, since `b` is real: `⟨w, W⟩ = \overline{⟨u, w⟩} − \overline{b}
+(the complement `W` is orthogonal to `w`, since `b` is real:
+`⟨w, W⟩ = \overline{⟨u, w⟩} − \overline{b}
 = 0`), with `‖W‖² ≥ 0` (`inner_self_re_nonneg`).
 
 Specializes (with `u = D.Y`, `w = Y`) to the (6.8.2.3) per-step bound `bᵢ² ≤ ‖D.Y‖²`
@@ -263,7 +265,8 @@ vector `w`, an integer `a`, and a vector `v` with `⟨v, w⟩ = a` and `‖v‖�
 Cauchy–Schwarz forces `v = a·w`: indeed `‖v − a·w‖² = ‖v‖² − a⟨v,w⟩ − a⟨w,v⟩ + a²‖w‖² = 0`, so the
 positive-definiteness `eq_zero_of_inner_self_re_eq_zero` gives `v − a·w = 0`.
 
-This is the bridge from the (6.8.2.3) pinning `bᵢ = ⟨Yᵢ,Y⟩ = aᵢ` together with `‖Yᵢ‖² = ‖aᵢ·η₁‖² = aᵢ²`
+This is the bridge from the (6.8.2.3) pinning `bᵢ = ⟨Yᵢ,Y⟩ = aᵢ` together with
+`‖Yᵢ‖² = ‖aᵢ·η₁‖² = aᵢ²`
 ((5.4.b)) to the per-step image `Yᵢ = aᵢ·Y`, which then assembles the per-`χ` identity
 `(χ − a·η₁)^τ = X₁ − a·Y`. -/
 theorem eq_smul_of_inner_self_eq {v w : ClassFunction G ℂ} {a : ℤ}
@@ -284,10 +287,12 @@ omit [Fintype G] in
 /-- **Aggregate τ-image of integer-weighted constituents** (the (6.8.2.2)→(6.8.2.3) bridge).  For a
 `ℤ`-linear character map `τ` and per-constituent images `τ(αᵢ) = Xᵢ − Yᵢ`, the integer-weighted
 aggregate maps termwise: `τ(∑ᵢ aᵢ·αᵢ) = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)`.  Pure `ℤ`-linearity (`map_sum` +
-`map_zsmul`, with the `(aᵢ : ℂ)`-scalar smul reduced to the `ℤ`-action via `Int.cast_smul_eq_zsmul`).
+`map_zsmul`, with the `(aᵢ : ℂ)`-scalar smul reduced to the `ℤ`-action via
+`Int.cast_smul_eq_zsmul`).
 
 Combined with `sum_smul_constituent_diff_eq` (`∑ aᵢ·αᵢ = Ind^L_{W₂}φ − |H:Z|·η₁`) and the (6.8.2.2)
-decomposition `exists_decomposition_caseB` (`τ(Ind φ − |H:Z|·η₁) = Xagg − |H:Z|·Y`), this supplies the
+decomposition `exists_decomposition_caseB` (`τ(Ind φ − |H:Z|·η₁) = Xagg − |H:Z|·Y`), this supplies
+the
 `hagg` input `Xagg − n·Y = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)` of the pinning lemma `sum_coeff_eq_of_aggregate`. -/
 theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
     {ι : Type*} (s : Finset ι) (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G)
@@ -339,7 +344,8 @@ theorem sum_eq_sum_pos_weight_subtype {ι M : Type*} [Fintype ι] [AddCommMonoid
 `N ≤ M` and an irreducible character `θ` of `M`, the multiplicity `⟨φ, Res^M_N θ⟩` is a natural
 number (Clifford [Is] Thm 6.5, `restrictionMultiplicity_natCast`): a nonnegative integer, repackaged
 for the `φ`-first inner-product slot used by the (6.8.2.3) constituent aggregate
-`sum_smul_constituent_diff_eq` (which weights `αθ = Ind^M_H θ − aθ·η₁` by `aθ = ⟨φ, Res θ⟩`).  This is
+`sum_smul_constituent_diff_eq` (which weights `αθ = Ind^M_H θ − aθ·η₁` by `aθ = ⟨φ, Res θ⟩`). This
+is
 the source of the natural-number weight `a : ι → ℕ` consumed by the pinning `per_constituent_Y_eq_smul`. -/
 theorem exists_inner_restrict_natCast {M : Type*} [Group M] [Finite M] {N : Subgroup M}
     [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
@@ -378,7 +384,8 @@ theorem constituentWeight_pos_iff {M : Type*} [Group M] [Finite M] {N : Subgroup
 
 /-- **(6.8.2.3) constituent aggregate over the positive-weight subtype.**  The `αθ`-aggregate
 `sum_smul_constituent_diff_eq` (indexed by all of `Irr H`, with weight `aθ = ⟨φ, Res θ⟩` written as
-the `ℂ`-valued multiplicity) reindexed to the positive-weight subtype `{θ // 0 < aθ}` with the weight
+the `ℂ`-valued multiplicity) reindexed to the positive-weight subtype `{θ // 0 < aθ}` with the
+weight
 in natural-number form `constituentWeight`:
 `Ind^M_K φ − |H:K|·η₁ = ∑_{θ : 0 < aθ} aθ·(Ind^M_H θ − aθ·η₁)`.
 
@@ -409,7 +416,8 @@ theorem sum_smul_constituent_diff_pos_weight_subtype {M : Type*} [Group M] [Fint
         simp only [hθ, Nat.cast_zero, zero_smul])
 
 /-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
-bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
+bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so
+the
 case-(B) instantiation need only discharge the named structural hypotheses.
 
 For per-constituent (5.4) decompositions `Dᵢ : CharacterPsiDecomposition τ χᵢ (aᵢ·η)` (the `χᵢ` the
@@ -530,7 +538,8 @@ theorem inner_eq_zero_of_smul_sub_smul_orthogonal {ξ ξ' θ : ClassFunction G �
 /-- **`σ`-coefficient vanishing from a small support** (the (3.2.d)/(3.8) "all coefficients zero"
 case, via `grid_eq_zero_of_ncard_support_lt`).  For `ψ` vanishing on `V` with `NC(ψ) < min(w₁, w₂)`,
 every `σ`-image coefficient `sigmaCoeff ψ = ⟨ψ, ω^σ⟩` vanishes: the (3.7) additive identity
-`sigmaCoeff_add_eq` (from `ψ` vanishing on `V`) makes the coefficient grid additively separable, so a
+`sigmaCoeff_add_eq` (from `ψ` vanishing on `V`) makes the coefficient grid additively separable, so
+a
 support smaller than `min(w₁, w₂)` forces it identically zero.
 
 This is the (6.8.2.3) disjointness driver: applied to `ψ = (η₁ − η̄₁)^τ` (vanishing on `V` since
@@ -597,12 +606,15 @@ A point `v` of the `(ticVdiff h)`-exceptional set `V = W − (W₁ ∪ W₂)` is
 element of the kernel `K = h.K` (viewed in `G` via `L ↪ G`).
 
 Indeed, write `v = ↑w` with `w = x·y ∈ W₁ × W₂` (`exists_mul_of_mem_sup`); since `v ∉ W₂` the
-`W₁`-component `x ≠ 1`, and `x = w ^ n` (`exists_zpow_proj`) gives `orderOf x ∣ orderOf w = orderOf v`.
-If `v` were `G`-conjugate to `↑k` (`k ∈ K`) then `orderOf v = orderOf k ∣ |K|` (conjugation preserves
+`W₁`-component `x ≠ 1`, and `x = w ^ n` (`exists_zpow_proj`) gives
+`orderOf x ∣ orderOf w = orderOf v`.
+If `v` were `G`-conjugate to `↑k` (`k ∈ K`) then `orderOf v = orderOf k ∣ |K|` (conjugation
+preserves
 order), so `orderOf x ∣ gcd(|K|, |W₁|) = 1` (`card_coprime`), forcing `x = 1` — a contradiction.
 
 This is the structural disjointness `V ∩ (K^#)^G = ∅` powering the anchor: since
-`Supp(η₁ − η̄₁) ⊆ H^# ⊆ K^#` and `(η₁ − η̄₁)^τ` is a Dade image (vanishing off `conjugatesOfSet H^#`),
+`Supp(η₁ − η̄₁) ⊆ H^# ⊆ K^#` and `(η₁ − η̄₁)^τ` is a Dade image (vanishing off
+`conjugatesOfSet H^#`),
 it vanishes on `V`. -/
 theorem ticVdiffV_not_mem_conjugatesOfSet_K {A : Set G}
     (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) {v : G}
@@ -655,7 +667,8 @@ theorem ticVdiffV_not_mem_conjugatesOfSet_K {A : Set G}
 /-- **(6.8.2.3) anchor: the Dade image of an `H^#`-supported function vanishes on `V`.**
 For `α` supported on `H^# = sharpImage H`, the Sibley Dade image `α^τ = hyp.tau α` vanishes on the
 `(ticVdiff h46)`-exceptional set `V`.  Since `α^τ = dadeIntegralCharacterMap hyp.dade …` is a genuine
-Dade image, it vanishes off `conjugatesOfSet H^#` (`map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot`
+Dade image, it vanishes off `conjugatesOfSet H^#`
+(`map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot`
 via `dade_H_eq_bot`); and `V` is disjoint from `conjugatesOfSet H^# ⊆ conjugatesOfSet (K^G)` by
 `ticVdiffV_not_mem_conjugatesOfSet_K` (using `h46.K = H`, so `H^# ⊆ K^G`).  This is the **anchor**
 `hvanish` input of `inner_smul_chiFam_eq_zero_of_diff_vanishOnV`: with `α = η₁ − η̄₁`
@@ -677,9 +690,11 @@ theorem tau_apply_eq_zero_of_mem_ticVdiffV
   exact ticVdiffV_not_mem_conjugatesOfSet_K h46 hv (Group.conjugatesOfSet_mono hbridge hvconj)
 
 /-- **(6.8.2.3) anchor, generic coherent-extension form: a difference of coherent images of two
-`H^#`-supported-difference members vanishes on `V`.**  For *any* coherence `cS : IsCoherent hyp.tau S₁ H^#`
+`H^#`-supported-difference members vanishes on `V`.** For *any* coherence
+`cS : IsCoherent hyp.tau S₁ H^#`
 and members `η, η' ∈ S₁` whose difference `η − η'` is `H^#`-supported, the image difference
-`cS.extension η − cS.extension η'` vanishes on the `(ticVdiff h46)`-exceptional set `V`: the coherent
+`cS.extension η − cS.extension η'` vanishes on the `(ticVdiff h46)`-exceptional set `V`: the
+coherent
 extension agrees with the Dade map on the supported lattice (`extends_on_supported`,
 `cS.extension η − cS.extension η' = (η − η')^τ`), and `(η − η')^τ` vanishes on `V` by the anchor
 `tau_apply_eq_zero_of_mem_ticVdiffV`.
@@ -786,16 +801,20 @@ theorem coherent_extension_eq_zsmul_irreducible
   exact exists_zsmul_irreducibleCharacter_of_inner_self_one (cS.extension_mem_ZIrr η hηspan) hextnorm
 
 /-- **(6.8.2.3) seam-1 orthogonality, generic coherent form `⟨η^{τ₁}, ω_{ij}^σ⟩ = 0`.**  For *any*
-coherence `cS : IsCoherent hyp.tau S₁ H^#` and two irreducible members `η, η' ∈ S₁` with `⟨η, η'⟩ = 0`
-and `η − η'` `H^#`-supported, the image `cS.extension η` is orthogonal to every certain-type `σ`-image
+coherence `cS : IsCoherent hyp.tau S₁ H^#` and two irreducible members `η, η' ∈ S₁` with
+`⟨η, η'⟩ = 0`
+and `η − η'` `H^#`-supported, the image `cS.extension η` is orthogonal to every certain-type
+`σ`-image
 `ω_{ij}^σ = certainTypeOmegaSigma h46 χ₂ i`.
 
-Writing `η^{τ₁} = ε·ξ`, `η'^{τ₁} = ε'·ξ'` (`coherent_extension_eq_zsmul_irreducible`), the images are
+Writing `η^{τ₁} = ε·ξ`, `η'^{τ₁} = ε'·ξ'` (`coherent_extension_eq_zsmul_irreducible`), the images
+are
 orthonormal (`⟨ξ, ξ'⟩ = 0` from `extension_inner_eq` + `⟨η, η'⟩ = 0`), and the difference
 `ε·ξ − ε'·ξ' = η^{τ₁} − η'^{τ₁}` vanishes on `V`
 (`coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV`, the anchor); the disjointness machine
 `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` then gives `⟨ε·ξ, ω_{ij}^σ⟩ = 0`
-(`ω_{ij}^σ = chiFam P_{ij}`).  Instantiating `η' = η̄` (`⟨η, η̄⟩ = 0`, `η − η̄` `H^#`-supported by equal
+(`ω_{ij}^σ = chiFam P_{ij}`). Instantiating `η' = η̄` (`⟨η, η̄⟩ = 0`, `η − η̄` `H^#`-supported by
+equal
 degree) covers both the `Y`-anchor (seam-1) and an irreducible `X`-member (the column–irreducible
 cross-orthogonality of the case-(B) `X`-coherence glue). -/
 theorem inner_coherent_extension_certainTypeOmegaSigma_eq_zero
@@ -876,7 +895,8 @@ theorem inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero
 
 /-- **(6.8.2.3) seam-1, `R(μ_j)`-family form: `Y^{τ₁} ⊥ R(μ_j)`.**  For distinct `Y`-anchors
 `η ≠ η' ∈ Y`, the image `η^{τ₁}` is orthogonal to every member of the reducible image family
-`R(μ_j) = {±δ_j ω_{ij}^σ}` (`certainTypeRImage`, Peterfalvi (5.2.d)/(5.3.b)).  Each `R(μ_j)`-member is
+`R(μ_j) = {±δ_j ω_{ij}^σ}` (`certainTypeRImage`, Peterfalvi (5.2.d)/(5.3.b)). Each `R(μ_j)`-member
+is
 a signed `σ`-image `±δ_j · certainTypeOmegaSigma h46 χ₂⁽ʼ⁾ i`, so this is the seam-1 orthogonality
 `inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero` scaled by the sign.
 
@@ -905,7 +925,8 @@ theorem inner_coherentYset_extension_certainTypeRImage_eq_zero
       mul_zero]
 
 /-- **(6.8.2.3) seam-1, decomposition form: `⟨D.X, Y^{τ₁}⟩ = 0` (the `hXorth` for `per_constituent`).**
-For any `(5.4)` decomposition `D` whose image-family members are covered by the reducible `R(μ_j)` set
+For any `(5.4)` decomposition `D` whose image-family members are covered by the reducible `R(μ_j)`
+set
 (`himg`: every `α ∈ D.imageFamily.imageSet` is some `certainTypeRImage h46 χ₂ χ₂' p`), the
 `R(χᵢ)`-part `D.X ∈ ℤ[R(μ_j)]` is orthogonal to the `Y`-coherence image `η^{τ₁}` (for distinct
 anchors `η ≠ η' ∈ Y`).  This is `inner_X_Y_eq_zero_of_orthogonal` fed by the `R(μ_j)`-member
@@ -913,7 +934,8 @@ orthogonality `inner_coherentYset_extension_certainTypeRImage_eq_zero`.
 
 This is the capstone-ready `hXorth` input of `per_constituent_Y_eq_smul`: the certain-type
 decomposition `certainTypeDecompositionDa` (via `ofProjection (certainTypeR …)`) has
-`imageFamily.imageSet = Finset.univ.image (certainTypeRImage h46 χ₂ χ₂⁻¹)`, so `himg` is discharged at
+`imageFamily.imageSet = Finset.univ.image (certainTypeRImage h46 χ₂ χ₂⁻¹)`, so `himg` is discharged
+at
 the capstone by `Finset.mem_image` (the coverage form avoids a `DecidableEq (ClassFunction G ℂ)`
 obligation here). -/
 theorem inner_decomposition_X_coherentYset_extension_eq_zero
@@ -965,9 +987,11 @@ theorem inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset
 The `(4.9)` certain-type coherent extension of a column sum is `ν(μ_j) = δ_j ∑_i ω_{ij}^σ`
 (`certainTypeExtension_columnSum`), a `ℤ`-combination of `σ`-images; so for *any* coherence
 `cS : IsCoherent hyp.tau S₁ H^#` and irreducible member `χ ∈ S₁` (with `χ̄ ∈ S₁`, `⟨χ, χ̄⟩ = 0`,
-`χ − χ̄` `H^#`-supported), the generic seam-1 `inner_coherent_extension_certainTypeOmegaSigma_eq_zero`
+`χ − χ̄` `H^#`-supported), the generic seam-1
+`inner_coherent_extension_certainTypeOmegaSigma_eq_zero`
 gives `⟨ν(μ_j), cS.extension χ⟩ = 0` directly.  This is the **mixed-inner input** of the case-(B)
-`X`-coherence glue, uniformly for `χ ∈ Y` (column–`Y`) *and* an irreducible `χ ∈ X` (column–irreducible).
+`X`-coherence glue, uniformly for `χ ∈ Y` (column–`Y`) *and* an irreducible `χ ∈ X`
+(column–irreducible).
 **No per-constituent pinning needed.** -/
 theorem inner_certainTypeExtension_columnSum_coherent_extension_eq_zero
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -1029,8 +1053,10 @@ theorem inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero
 
 /-- **(6.8.2.3) per-constituent pinning, certain-type form: `Dᵢ.Y = aᵢ·η₁^{τ₁}`.**  The certain-type
 specialization of `per_constituent_Y_eq_smul`: for a family of `(5.4)` decompositions
-`D : ι → CharacterPsiDecomposition τ (χ i) (aᵢ·η₁)` whose image families are covered by the reducible
-`R(μ_j)` sets (`himg`), the (6.8.2.2) aggregate (`hagg`/`hsq`/`hXaggorth`) plus the per-step coefficient
+`D : ι → CharacterPsiDecomposition τ (χ i) (aᵢ·η₁)` whose image families are covered by the
+reducible
+`R(μ_j)` sets (`himg`), the (6.8.2.2) aggregate (`hagg`/`hsq`/`hXaggorth`) plus the per-step
+coefficient
 data (`hbi`) pin each `Dᵢ.Y = aᵢ·η₁^{τ₁}` (`η₁^{τ₁} = coherentYset.extension η₁`).
 
 The three structural inputs of `per_constituent_Y_eq_smul` are discharged internally: `hηnorm`

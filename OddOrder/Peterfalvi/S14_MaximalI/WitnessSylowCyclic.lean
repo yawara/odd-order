@@ -5,7 +5,8 @@ import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 /-!
 # WitnessSylowCyclic
 
-Prefix-split from `OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S14_MaximalI.MinimalCounterexample` (2000-line limit, issue
+0103 第 2 パス).
 -/
 
 /-!
@@ -898,8 +899,10 @@ theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
     haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
     -- **(11.9.c)/(9.7.b): `U` is cyclic** (Peterfalvi §11.9, proven sorry-free in
     -- `S13_NonGaloisExclusion`).  Available here now that the §12–16 import inversion is resolved
-    -- (HUB RULING, issue 9093: the §16 pair-data structures were extracted to `S13_Section16PairData`
-    -- and the (12.17) producer to `FeitThompsonPairProducer`, so `S13_NonGaloisExclusion` sits upstream
+    -- (HUB RULING, issue 9093: the §16 pair-data structures were extracted to
+    -- `S13_Section16PairData`
+    -- and the (12.17) producer to `FeitThompsonPairProducer`, so `S13_NonGaloisExclusion` sits
+    -- upstream
     -- of §12.10 as the mathematics requires).
     have hUcyc : IsCyclic ↥s13.base.typeP.U :=
       OddOrder.Peterfalvi.S13.U_isCyclic_of_hypothesis hG s13

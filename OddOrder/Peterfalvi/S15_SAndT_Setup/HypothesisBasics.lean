@@ -7,7 +7,8 @@ import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue
+0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
@@ -288,7 +289,8 @@ theorem Hypothesis.sSetIrrDeg_finite [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The `S07.Hypothesis` (5.2)-subcoherence structure for the uniform-degree irreducible
-sub-family `S₁(d)`** (issue 1017, update #17 — the first honest stage of the (9.11) coherence route).
+sub-family `S₁(d)`** (issue 1017, update #17 — the first honest stage of the (9.11) coherence
+route).
 Assembled from the honest (13.2.e) Dade isometry `τ = Ind_S^G` (`dadeHypS`) and the landed
 Dade-independent family inputs:
 * `Rdatum` = `sSet_member_differenceImage` per irreducible member;
@@ -323,7 +325,8 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
     (fun φ hφ => ?_) ?_ ?_ ?_ ?_ ?_
   · -- `Rdatum`: `φ ∈ S₁(d) ⇒ ∃ ξ ∈ 𝒳, φ = Ind ξ` (irreducible).  The `∃` witness is extracted via
-    -- `choose` (not `obtain`) so it may be eliminated into the data goal `CharacterDifferenceImage`.
+    -- `choose` (not `obtain`) so it may be eliminated into the data goal
+    -- `CharacterDifferenceImage`.
     have hφsSet : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) := hφ.1
     have hirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ := hφ.2.1
     obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
@@ -392,7 +395,8 @@ noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
   set A := OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S with hA
   -- The landed (5.3.a) subcoherence structure on `S₁(d)`; its `.tau` is the honest Dade map.
   set hyp' := hyp.sSetIrrDeg_subcoherent hG d hd with hhyp'
-  -- `hSfin`: `S₁(d)` injects into `IrreducibleCharacter ↥S` (a `Finite` type) — `sSetIrrDeg_finite`.
+  -- `hSfin`: `S₁(d)` injects into `IrreducibleCharacter ↥S` (a `Finite` type) —
+  -- `sSetIrrDeg_finite`.
   have hSfin : (hyp.sSetIrrDeg hG d).Finite := hyp.sSetIrrDeg_finite hG d
   -- `hirr`: each member is an irreducible character, so has self-inner `1`.
   have hirr : ∀ ζ ∈ hyp.sSetIrrDeg hG d, ClassFunction.inner ζ ζ = 1 :=
@@ -414,7 +418,8 @@ noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
       ((x - y : ClassFunction ↥hyp.S ℂ)).support ⊆ A := by
     intro x hx y hy
     exact hyp.sSetIrrDeg_member_diff_supported hG d hx hy
-  -- `hZIrr`: the honest Dade map sends `A(S)`-supported virtual-character differences into `ℤ[Irr G]`.
+  -- `hZIrr`: the honest Dade map sends `A(S)`-supported virtual-character differences into
+  -- `ℤ[Irr G]`.
   have hZIrr : ∀ a ∈ hyp.sSetIrrDeg hG d, ∀ b ∈ hyp.sSetIrrDeg hG d,
       hyp'.tau (a - b) ∈ OddOrder.RepresentationTheory.ZIrr G := by
     intro a ha b hb
@@ -789,7 +794,8 @@ open OddOrder.Peterfalvi.S11 in
 bridge): the generic (9.11) anchor stratum equals the full family.  Both `chief.H₀ = ⊥`
 (`toTypesIIIIIIVSetupS_chief_H0_eq_bot`) and `U′ = ⊥` (`uprimeSub_eq_bot`), so `H₀ ⊔ U′ = ⊥` and
 `𝒮(⊥) = 𝒮` (`sOf_bot_eq_sSet`).  This makes the generic (9.11.1) squeeze cut — phrased over
-`sOf data (chief.H₀ ⊔ uprimeSub data)` in `nineElevenOne_configuration`/`NineElevenEqualityRefutation`
+`sOf data (chief.H₀ ⊔ uprimeSub data)` in
+`nineElevenOne_configuration`/`NineElevenEqualityRefutation`
 — equal `sSet`, hence the degree-`qa` anchor cut equal `hyp.sSetIrrDeg hG (q·a)`. -/
 theorem Hypothesis.sOf_H0_uprime_eq_sSet [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))

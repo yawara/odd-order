@@ -3,13 +3,15 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Helpers
 /-!
 # MsigmaNilpotent
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103
+第 2 パス).
 -/
 
 /-!
 # BG Corollary 15.5 helpers (§14-independent) + Theorem 15.2 assembly
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue
+0103).
 -/
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -27,7 +29,8 @@ variable {G : Type*} [Group G]
 
 The `F(M) = F(M_σ) × O_{σ'}(F(M))` decomposition splits into two case-independent pieces:
 the nilpotent Hall splitting of `F(M)` (`opiCoreInG_sup_compl_eq_of_isNilpotent` applied to the
-nilpotent `F(M)`), and the identification `O_σ(F(M)) = F(M_σ)` (`opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma`, BG Corollary 15.5's "Lemma 1").
+nilpotent `F(M)`), and the identification `O_σ(F(M)) = F(M_σ)`
+(`opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma`, BG Corollary 15.5's "Lemma 1").
 The `τ₂`/cyclic content of the `σ'`-part is then supplied case by case in `fitting_decomposition`. -/
 
 /-- **Ambient nilpotent Hall splitting**: for a finite nilpotent subgroup `H`, the ambient

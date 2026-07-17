@@ -505,7 +505,8 @@ Given a maximal proper coherent conjugation-closed `𝒮₂` with the degree-`q�
 coherently adjoinable, derive `False`.
 
 **Reuse map (verified STEP-1 for the assembly, issue 1017 hub note).**  Via
-`sSet_eq_sOf_H0Cprime` the full family `𝒮` *is* the `H₀C′` stratum `sOf data (chief.H₀ ⊔ chars.Cprime)`,
+`sSet_eq_sOf_H0Cprime` the full family `𝒮` *is* the `H₀C′` stratum
+`sOf data (chief.H₀ ⊔ chars.Cprime)`,
 so the entire generic (9.11) apparatus — all phrased over `sOf data (chief.H₀ ⊔ …)`,
 `{data}{chief}{chars}(caseA)`-parametrized, hence directly instantiable at `data :=
 toTypesIIIIIIVSetupT hG hvd` — applies:
@@ -513,9 +514,11 @@ toTypesIIIIIIVSetupT hG hvd` — applies:
 * the (9.11.1) squeeze `S11.nineElevenOne_configuration` + `S11.sumnS_irreducible_constant_degree`;
 * the world-facts *from the degree dichotomy*: `S11.nineElevenTwoTIWitness_of_degree_dichotomy`
   (TI-witness), `S11.nineElevenTwo_two_summand_inertia` (inertia `C = K₁ ⊓ K₂`),
-  `S11.nineElevenGamma_inner_self_mul_u` (Mackey norm), `S11.nineElevenThree_orbit_split` (class eq);
+  `S11.nineElevenGamma_inner_self_mul_u` (Mackey norm), `S11.nineElevenThree_orbit_split` (class
+  eq);
 * the abstract projection budget `S13.exists_bridge_target_of_budget` and the (5.6.3) union-pair
-  extension `S13.isCoherent_union_pair_of_bridge` for the (9.11.7)–(9.11.8) coherent-pair adjunction.
+  extension `S13.isCoherent_union_pair_of_bridge` for the (9.11.7)–(9.11.8) coherent-pair
+  adjunction.
 The genuinely `S`-specific pieces still to build are the caseA per-member Dade `R`-family (the
 analogue of the M-side `sOf_H0Cprime_memberRFamily`, feeding `𝒮₃`-coherence and the coherent-image
 cross-orthogonality) and the (5.6) pair-bound producer for the `indS`/`A(S)` world; the (9.11.7)–
@@ -551,7 +554,8 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation_T [Finite G]
     (hyp.toTypesIIIIIIVSetupT hG hvd).nontrivial.2.1.pos
   have hu : 0 < chars.u := (OddOrder.Peterfalvi.S11.u_odd hG chars).pos
   have hp1 : 0 < chief.p - 1 := Nat.sub_pos_of_lt chief.p_prime.one_lt
-  -- strata collapse (mirror; issue 2035 step (a)): the generic (9.11) `U′`-anchor stratum is the full family
+  -- strata collapse (mirror; issue 2035 step (a)): the generic (9.11) `U′`-anchor stratum is the
+  -- full family
   have hcollapse : OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupT hG hvd)
         (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd))
       = sSet (hyp.toTypesIIIIIIVSetupT hG hvd) := hyp.sOf_H0_uprime_eq_sSet_T hG hvd chief

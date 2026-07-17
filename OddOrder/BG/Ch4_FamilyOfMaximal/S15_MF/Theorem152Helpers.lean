@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.SetupLemma151
 /-!
 # BG Theorem 15.2 — §14-gated conditional helpers
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue
+0103).
 -/
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -1519,7 +1520,8 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
     have := sylow_le_Msigma_of_normalizer_le hG hM Sp (hSpcoe ▸ hSbar_ne) hNM
     rwa [hSpcoe] at this
   -- Step 4: every Sylow subgroup of `↥H` maps into `M_σ`.  Then `H ≤ M_σ`.
-  -- Suffices: `(Msigma M).subgroupOf H = ⊤`, i.e. each Sylow of `↥H` lies in `(Msigma M).subgroupOf H`.
+  -- Suffices: `(Msigma M).subgroupOf H = ⊤`, i.e. each Sylow of `↥H` lies in
+  -- `(Msigma M).subgroupOf H`.
   have hH_Mσ : H ≤ OddOrder.BG.Ch3.S10.Msigma M := by
     have htop : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf H = ⊤ := by
       refine eq_top_of_forall_sylow_le (fun q _ P => ?_)

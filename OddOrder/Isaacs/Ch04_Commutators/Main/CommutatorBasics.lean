@@ -13,7 +13,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.CommutatorIdentities
 /-!
 # Isaacs §4A — Thm 4.7/4.8: maximal class p-群, Ω_r (pp. 113-122)
 
-Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue
+0103).
 §4A 前半 (identities + Lem 4.5/4.6) は `CommutatorIdentities.lean` へ prefix-split 済 (issue 0122)。
 -/
 

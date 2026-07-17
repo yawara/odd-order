@@ -361,7 +361,8 @@ theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {L : Subgroup G
     (induce_apply_one_ne_zero K (θ 0)) ν hnu hj
 
 /-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`, generic family form** (Peterfalvi (7.8.a)).
-For an arbitrary pairwise-orthogonal family `ζ` (`horth`), with `a = ⟨β, ζ_0^ν⟩ + 1` and `‖ζ_0‖² = 1`
+For an arbitrary pairwise-orthogonal family `ζ` (`horth`), with `a = ⟨β, ζ_0^ν⟩ + 1` and
+`‖ζ_0‖² = 1`
 (`hζ0norm`), `inner_beta_nuDiff_gen` rearranges to `⟨β, ζ_j^ν⟩ = star(d_j)(⟨β, ζ_0^ν⟩ + 1)`
 (`j ≠ 0, ind1H`).  Instantiated by `inner_beta_nu_eq` and the `Hypothesis78`-level constructor. -/
 theorem inner_beta_nu_eq_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
@@ -386,7 +387,8 @@ theorem inner_beta_nu_eq_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : 
 
 /-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`** (Peterfalvi (7.8.a)).  With `a = ⟨β, ζ_0^ν⟩ + 1`
 and `‖ζ_0‖² = 1` (the distinguished `ζ_0 ∈ Irr L`), `inner_beta_nuDiff` (`⟨β, ζ_j^ν − d_j ζ_0^ν⟩ =
-star(d_j) ‖ζ_0‖²`) rearranges to `⟨β, ζ_j^ν⟩ = star(d_j)(⟨β, ζ_0^ν⟩ + 1)` for `j ≠ 0, ind1H`.  This is
+star(d_j) ‖ζ_0‖²`) rearranges to `⟨β, ζ_j^ν⟩ = star(d_j)(⟨β, ζ_0^ν⟩ + 1)` for `j ≠ 0,
+ind1H`.  This is
 the `⟨β, ζ_j^ν⟩` value that cancels `a ⟨weightedNuSum, ζ_j^ν⟩` in `Gamma_orth_nu`. -/
 theorem inner_beta_nu_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -474,7 +476,8 @@ theorem betaDecomp_gamma_orth_nu_gen {G : Type*} [Group G] [Fintype G] {A : Set 
     rw [hstar]; ring
 
 /-- **Peterfalvi (7.8.a), `Γ ⊥ S^ν`** (the `Gamma_orth_nu` field of `BetaDecomp`).  For the residual
-`Γ = β − (1_G − ζ_0^ν + a · W)` with `a = ⟨β, ζ_0^ν⟩ + 1` and `W = Σ_{i≠ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²))
+`Γ = β − (1_G − ζ_0^ν + a · W)` with `a = ⟨β, ζ_0^ν⟩ + 1` and
+`W = Σ_{i≠ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²))
 ζ_i^ν`, every `ζ_j^ν` (`j ≠ ind1H`) is orthogonal to `Γ`:
 
 * `⟨1_G, ζ_j^ν⟩ = 0` (`orth_one`), `⟨ζ_0^ν, ζ_j^ν⟩ = ⟨ζ_0, ζ_j⟩` (`ν`-isometry), `⟨W, ζ_j^ν⟩ =

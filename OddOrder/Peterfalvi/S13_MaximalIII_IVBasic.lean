@@ -232,7 +232,8 @@ whole §13 (11.1)–(11.7) theory (and hence (11.5) `secondDerived_eq_HC`, (11.7
 the FT spine.  Every field is derived from the §12 hypothesis `hyp`: the (10.2)–(10.3) character
 parameters (`exists_charParameters_full`; proof-irrelevance of the `Prop`s `IsMinimalSimpleOdd` and
 `Odd` discharges the `∀ hG hodd` fields), the §11 chief-factor setup
-(`toTypesIIIIIIVSetup`/`exists_chiefFactorData`), and `C = C_U(H) = U ⊓ C_G(H)` with its `M`-normality
+(`toTypesIIIIIIVSetup`/`exists_chiefFactorData`), and `C = C_U(H) = U ⊓ C_G(H)` with its
+`M`-normality
 (`S12.typePData_C_normalized_by_M`) and centralizer form.  The formula `Prop`s are unconstrained
 placeholder fields. -/
 theorem exists_hypothesis_of_isTypeIIIorIV [Finite G]

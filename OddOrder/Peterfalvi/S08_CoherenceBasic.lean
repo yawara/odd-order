@@ -818,7 +818,8 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 
 /-- **(T8.11w1c) base-anchor X-chain coherence, completeness-exposing variant.**  Like
-`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X` but the per-step
+`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X` but the
+per-step
 producer `hstepData` additionally receives the Xset-cover completeness witness `hcover` (finding #6)
 — required to build the per-step `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…`
 engine.  Additive (no existing signature changes). -/
@@ -855,8 +856,10 @@ noncomputable def
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 
 /-- **(6.6)/(6.8.1), central-`Zc`, completeness-exposing form (redesign L2 outer shell, withCover).**
-Same as `Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
-but the `hstepData` producer receives the Xset-cover completeness witness `hcover` (finding #6), which
+Same as
+`Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+but the `hstepData` producer receives the Xset-cover completeness witness `hcover` (finding #6),
+which
 the monolith needs to build `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…` consumer. -/
 noncomputable def
     Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius
@@ -1000,7 +1003,8 @@ For any `Z`, a class function `φ` lies in the explicit `Finset`
 `(filter bot-kernel).image (Ind ·) \ (filter Z-kernel).image (Ind ·)` (the degree-square-sum domain
 of `sum_re_sq_Xset_eq_of_irreducible_X` / `Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X`) iff
 `φ ∈ Xset Z = S − S(Z)`.  Extracted from the L2 monolith's inline `hmemXF` so that a `Set`-form
-irreducibility hypothesis (the `c2`/case-A `isIrreducibleCharacter_of_mem_Xset_c2_caseA`) can feed the
+irreducibility hypothesis (the `c2`/case-A `isIrreducibleCharacter_of_mem_Xset_c2_caseA`) can feed
+the
 `Finset`-form nonemptiness lemma. -/
 theorem mem_xSetFinset_iff_mem_Xset (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} [Z.Normal] (φ : ClassFunction ↥L ℂ) :
@@ -1043,7 +1047,8 @@ open scoped Classical in
 /-- **(6.6)/(6.8) X = S − S(Zc) coherence — the L2 producer, generalized over the irreducibility
 input.**  `X(Zc)` is coherent (`Zc = Z(H) ∩ H′` central) given **only** that every `X`-member is
 irreducible (`hX`), that `X` is nonempty (`hXne`), and that `|L:H|` is coprime to `p` (`hidxp`).
-Builds the per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` for every chain step and feeds
+Builds the per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` for every chain step and
+feeds
 it to the `…withCover…` generic shell.  The Frobenius case (`…_of_frobenius`) and the
 certain-type/case-A case (`…_of_c2_caseA`) are thin specializations differing only in how
 `hX`/`hXne`/`hidxp` are produced (`isIrreducibleCharacter_of_mem_Xset_of_frobenius` +
@@ -1223,7 +1228,8 @@ The redesign's L2 deliverable: `X(Zc)` is coherent, with `Zc = Z(H) ∩ H′` ce
 per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (the first-ever such term) for every
 chain step and feeds it to the `…withCover…` Zc shell.  Per step: the current head `χs i` and every
 `X`-member `Ind θ` have degree `|L:H|·p^k` (`exists_index_primePow_degree_of_mem_S`), the central
-degree bound `θχ² ≤ |H:Zc|` holds ([Is] Cor 2.30 via `exists_source_primePow_centralBound_of_mem_Xset`),
+degree bound `θχ² ≤ |H:Zc|` holds ([Is] Cor 2.30 via
+`exists_source_primePow_centralBound_of_mem_Xset`),
 the `htail_le` field is `characterDegree_re_le_of_not_mem_pairUnion` (uses `hcover`), and the `hsum`
 partition is `natSum_partition_of_realSum` pinned by `sum_re_sq_Xset_eq`.  `H` is supplied as a
 `p`-group (the capstone's ¬-coherent branch gives this via `isPGroup_of_not_coherent`). -/
@@ -1257,10 +1263,14 @@ open scoped Classical in
 /-- **(6.6)/(6.8) X(Zc) coherence, certain-type case (B), math-(A) sub-case `Z(H) ∩ W₂ = ⊥` (CB3).**
 The CertainType/(c2) analogue of `Xset_centralCommutator_isCoherent_of_frobenius` under the math-(A)
 hypothesis `Z(H) ⊓ W₂ = 1` (`hA`): `W₁` still acts fixed-point-freely on `Zc = Z(H) ∩ H′`
-(`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`), so the same central-`Zc` coherence machinery
-of `Xset_centralCommutator_isCoherent_of_irreducible_X` applies.  The three irreducibility/coprimality
-inputs are produced from the certain-type data: `hX` from `isIrreducibleCharacter_of_mem_Xset_c2_caseA`,
-`hXne` from `Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (the `Set`→`Finset` form converted by
+(`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`), so the same central-`Zc` coherence
+machinery
+of `Xset_centralCommutator_isCoherent_of_irreducible_X` applies. The three
+irreducibility/coprimality
+inputs are produced from the certain-type data: `hX` from
+`isIrreducibleCharacter_of_mem_Xset_c2_caseA`,
+`hXne` from `Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (the `Set`→`Finset` form converted
+by
 `mem_xSetFinset_iff_mem_Xset`), and `hidxp` from `cert.card_coprime` + `index_H_eq_card_W1`. -/
 noncomputable def Xset_centralCommutator_isCoherent_of_c2_caseA
     (hyp : SibleyDadeHypothesis G L H)
@@ -1446,7 +1456,8 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_
 
 /-- **`X(Zc)` nonemptiness, case (A) / c2 form.**  As `Xset_centralCommutator_nonempty`, but the
 strictly-positive degree-square sum is supplied via
-`Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (which needs only `X`-irreducibility), with the
+`Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (which needs only `X`-irreducibility), with
+the
 `X = S − S(Zc) ⊆ Irr L` fact coming from the certain-type input
 `isIrreducibleCharacter_of_mem_Xset_c2_caseA` (cert data `hK`/`hW1`/`hA`) instead of the Frobenius
 hypothesis.  The `Zc.subgroupOf H ≠ ⊥` step is the same non-abelian-`H` argument. -/

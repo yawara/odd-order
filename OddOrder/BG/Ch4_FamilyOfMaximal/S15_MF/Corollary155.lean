@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Theorem152Assembly
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103
+第 2 パス).
 -/
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -1310,7 +1311,8 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hM_norm_F : M ≤ Subgroup.normalizer (F : Set G) :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch2.S08.fittingInG_le M)).mp
           (OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal M)
-      -- `M_F ≤ O_π(F)`: `M_F ≤ F`, `(M_F).subgroupOf F ⊴ F` (as `F ≤ M ≤ N_G(M_F)`), `M_F` a `π`-group.
+      -- `M_F ≤ O_π(F)`: `M_F ≤ F`, `(M_F).subgroupOf F ⊴ F` (as `F ≤ M ≤ N_G(M_F)`), `M_F` a
+      -- `π`-group.
       have hMF_norm_F : (((MF M).subgroupOf F)).Normal :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer hMF_le_F).mpr
           (hF_le_M.trans (maxNilpotentNormalHall_le_normalizer M))

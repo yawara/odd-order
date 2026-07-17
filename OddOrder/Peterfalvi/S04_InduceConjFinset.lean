@@ -264,7 +264,8 @@ Each summand `induceTerm M(B) α_B x g` over `x ∈ 𝒜(g, M(B))`, if nonzero, 
 `x⁻¹ g x = h·b` with `h ∈ H(B)`, `b ∈ N_L(B)` and `α(b) ≠ 0`, so `b ∈ A`
 (`exists_nLStabilizerIn_alphaB_induceTerm` + support of `α`).  By (2.1)
 (`exists_mem_centralizer_conj`, with `b` normalizing the coprime `H(B)`), `h·b` is
-`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)` (`centralizer_inf_hIntersection`);
+`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)`
+(`centralizer_inf_hIntersection`);
 since `c` commutes with `b`, `c·b = b·c ∈ b·H(b) ⊆ hCoset b`, so `g ∈ (bH(b))^G ⊆ dadeSupport` —
 contradicting `g ∉ dadeSupport`.  Hence every summand vanishes. -/
 theorem induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport (hyp : Hypothesis G A L)
@@ -669,7 +670,8 @@ theorem card_conjFiber_coset_eq_card_centralizer {K : Subgroup G} {a : G}
 This is the contrapositive content of the vanishing case
 `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport` isolated to one fiber: by (2.1)
 (`exists_mem_centralizer_conj`, with `b` normalizing the coprime `H(B)`), `y⁻¹gy = h·b` is
-`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)` (`centralizer_inf_hIntersection`);
+`H(B)`-conjugate to `c·b` with `c ∈ C_{H(B)}(b) = H(B∪{b}) ⊆ H(b)`
+(`centralizer_inf_hIntersection`);
 since `c` commutes with `b`, `c·b = b·c ∈ b·H(b) ⊆ hCoset b`, so `g ∈ (bH(b))^G`. -/
 theorem exists_mem_H_isConj_of_mem_conjFiber_coset (hyp : Hypothesis G A L)
     (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
@@ -1089,7 +1091,8 @@ For `a ∈ A` normalizing `H(B)` (i.e. `a ∈ N_L(B)`) and nonempty `B ⊆ A`,
 
     `|𝒜(g, H(B)·a)| · |H(B ∪ {a})| = |𝒜(g, H(B ∪ {a})·a)| · |H(B)|`.
 
-This is the (2.10) STEP 2 factorization `card_conjFiber_coset_mul_card_centralizerInf` specialized to
+This is the (2.10) STEP 2 factorization `card_conjFiber_coset_mul_card_centralizerInf` specialized
+to
 `K = H(B)`, with `C = H(B) ⊓ C_G(a) = C_{H(B)}(a) = H(B ∪ {a})` by (2.10.2)
 (`centralizer_inf_hIntersection`).  In the (2.10) alternating sum it shows the summands
 `(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·a)|` for `B` and `B ∪ {a}` are equal (so cancel by the opposite

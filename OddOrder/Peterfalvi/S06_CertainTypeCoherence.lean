@@ -477,7 +477,8 @@ theorem columnSum_inv_apply_one (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
 
 /-- **Peterfalvi (4.9)(a)/(b), nonzero (`IsCoherent.nonzero`)**: `μ̄_k − μ_k` is a nonzero element of
 `Z[𝒯, A]`.  Both `μ̄_k = μ_{k⁻¹}` and `μ_k` lie in `𝒯` (`k⁻¹ ≠ 1`, same degree by
-`columnSum_inv_apply_one`); the difference is `A`-supported (`columnDiff_support_subset`) and nonzero
+`columnSum_inv_apply_one`); the difference is `A`-supported (`columnDiff_support_subset`) and
+nonzero
 (`certainType_columnSum_conj_ne`, `μ̄_k ≠ μ_k`). -/
 theorem certainType_nonzero (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Invertible (Nat.card ↥h.K : ℂ)]

@@ -161,7 +161,8 @@ structure PrimeTIResidueData (S : Type*) [Group S] [Fintype S]
   `inertia_Ind_irr`, whose repo analogue `isIrreducibleCharacter_induce_of_inertia_eq` is
   available) via a **`p`-group fixed-point count**: on the `W1`-conjugation action on
   `Irr(PU)`, the `z`-fixed irreducibles (`z ∈ W1` a `p`-element) equal the `z`-fixed classes
-  (`card_afix_irr_classes`, repo `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`),
+  (`card_afix_irr_classes`, repo
+  `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`),
   and `sylow.pgroup_fix_mod` (mathlib `IsPGroup.card_modEq_card_fixedPoints`) with the
   coprimality `p ∤ |PU|` pins the fixed set to the residue image `{chi_ j}` of size `p`.  This
   computation consumes the **cyclic-TI structure** — the group `W1`, the decomposition
@@ -533,7 +534,8 @@ theorem induce_H_mem_zSpan_calS
       = (k : ℂ) := by
     rw [inner_conj_symm, hk, Complex.star_def, Complex.conj_natCast]
   rw [hc, Nat.cast_smul_eq_nsmul ℂ k (ClassFunction.induce PU (s : ClassFunction ↥PU ℂ))]
-  -- `k • Ind_{PU}^S s ∈ zSpan`: either `k = 0` (the term is `0`), or `P ⊄ ker s` and the engine fires.
+  -- `k • Ind_{PU}^S s ∈ zSpan`: either `k = 0` (the term is `0`), or `P ⊄ ker s` and the engine
+  -- fires.
   rcases Nat.eq_zero_or_pos k with hk0 | hk0
   · simp [hk0]
   · refine nsmul_mem ?_ k
@@ -546,11 +548,13 @@ end OddOrder.RepresentationTheory
 
 /-! ## The `prTIres_irr_cases` dichotomy, assembled over the S06 certain-type `Hypothesis`
 
-The genuinely-deep constituent classification `prTIres_irr_cases` (Peterfalvi (4.5.b)) — the crux the
+The genuinely-deep constituent classification `prTIres_irr_cases` (Peterfalvi (4.5.b)) — the crux
+the
 `PrimeTIResidueData` structure posits — is **already proven** as the inertia computation in
 `S06_CertainTypeClifford`: a `χ ∈ Irr(K)` not among the residues `χ_j` has full inertia `I_L(χ) = K`
 (`inertia_eq_K_of_forall_chiRestrict_ne`, the `p`-group fixed-point count via
-`card_fixedPoints_conjByPermIrr…` + `IsPGroup.card_modEq_card_fixedPoints`), whence `Ind χ` is a fresh
+`card_fixedPoints_conjByPermIrr…` + `IsPGroup.card_modEq_card_fixedPoints`), whence `Ind χ` is a
+fresh
 irreducible (`induce_isIrreducible_of_forall_chiRestrict_ne`) distinct from every `μ_{ij}`
 (`induce_ne_certainType_of_forall_chiRestrict_ne`).  Assembling the residue case (by definition) with
 that induced-irreducible case gives exactly the dichotomy `PrimeTIResidueData.prTIres_irr_cases`
@@ -571,8 +575,10 @@ omit [NeZero (Nat.card ↥h.W2)] in
 /-- **Peterfalvi (4.5.b) `prTIres_irr_cases`, assembled.**  Every `χ ∈ Irr(K)` is either a residue
 `χ_j` (`= chiRestrict χ₂` for some `W₂`-column `χ₂`) or induces to a *fresh* irreducible of `L`
 distinct from every certain-type character `μ_{ij}`.  The residue case is by definition; the
-induced-irreducible case is the S06 inertia computation (`induce_isIrreducible_of_forall_chiRestrict_ne`
-+ `induce_ne_certainType_of_forall_chiRestrict_ne`).  This is the deep field of a `PrimeTIResidueData`
+induced-irreducible case is the S06 inertia computation
+(`induce_isIrreducible_of_forall_chiRestrict_ne`
++ `induce_ne_certainType_of_forall_chiRestrict_ne`). This is the deep field of a
+`PrimeTIResidueData`
 constructor built from an `S06.Hypothesis` (issue 9014). -/
 theorem prTIres_irr_dichotomy (χ : IrreducibleCharacter ↥h.K) :
     (∃ χ₂, h.chiRestrict χ₂ = χ) ∨

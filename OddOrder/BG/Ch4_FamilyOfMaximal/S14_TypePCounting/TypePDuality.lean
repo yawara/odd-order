@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.CentralizerSup
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -1105,7 +1106,8 @@ theorem isHall_kappa_subgroupOf_conj [Finite G] (g : G) {M N KN : Subgroup G}
   have hkap : kappa M = kappa N := by rw [← hg, kappa_conj_smul]
   have hle : MulAut.conj g • KN ≤ M := by
     rw [← hg]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKNN
-  -- `Nat.card` is conjugation-invariant; the two `subgroupOf`s have equal card (both `= Nat.card KN`).
+  -- `Nat.card` is conjugation-invariant; the two `subgroupOf`s have equal card (both
+  -- `= Nat.card KN`).
   have hcardKN : Nat.card ↥(MulAut.conj g • KN) = Nat.card ↥KN := by
     rw [Subgroup.pointwise_smul_def]
     exact (Nat.card_congr (Subgroup.equivMapOfInjective _ _ (MulAut.conj g).injective).toEquiv).symm
@@ -1277,7 +1279,8 @@ A mis-encoded sorried surface (`nonidentity_covered_by_sigma_pieces`, covering b
 /-- **`Ẑ` elements have `σ`-length at most two** (the type-P exceptional half of BG Cor 14.10).  A
 `z ∈ Ẑ = zTilde Kref Kstarref = (Kref ⊔ Kstarref) ∖ (Kref ∪ Kstarref)` factors as `z = k·k*` with
 `k* ∈ Kstarref ⊆ M_σ(Mref)#` (a `σ(Mref)`-element, so `ℓ_σ(k*) = 1`) and `k ∈ Kref` a nonidentity
-`κ(Mref)`-element; since `Kref` consists of `σ(Mref*)`-elements for the non-conjugate partner `Mref*`
+`κ(Mref)`-element; since `Kref` consists of `σ(Mref*)`-elements for the non-conjugate partner
+`Mref*`
 (type-P duality), `sigma_cover_decomposition` gives the two-element `σ`-decomposition `{k, k*}`.
 
 **Implementation (completed 2026-07-01):**

@@ -625,7 +625,8 @@ theorem centralizerSupport_sharpSubgroup_eq_of_frobenius [Finite G] {M N : Subgr
     rw [Subgroup.mem_centralizer_singleton_iff]
 
 /-- **Peterfalvi (14.11.4): `|A(M)| = k − 1`** — the §8 cardinality input of the upper bound.  The
-type-I Dade support `A(M) = typeIA M` equals `K#` (`centralizerSupport_sharpSubgroup_eq_of_frobenius`
+type-I Dade support `A(M) = typeIA M` equals `K#`
+(`centralizerSupport_sharpSubgroup_eq_of_frobenius`
 applied to the Frobenius structure of `M` from `typeI_frobenius` (12.7), kernel `K = M_F`), so its
 cardinality is `|K| − 1 = k − 1`. -/
 theorem MHypothesis.card_typeIA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

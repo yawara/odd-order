@@ -774,8 +774,10 @@ theorem caseA_fixes_of_action_chain [Finite G] {M : Subgroup G}
   rw [← hφv v]; exact hefix v hf1 s hs
 
 /-- **Case (a), the commutator-form chain relation** (Peterfalvi (11.7), non-Galois case).  For the
-order-`p` `U`-invariant `S₀ ≤ H̄` there is an automorphism `σ` of the acting `U`-group, of odd order,
-whose conjugate action inverts every `v`-action on `S₀` — the chain relation `(φ v) ∘ (φ (σ v)) = id`.
+order-`p` `U`-invariant `S₀ ≤ H̄` there is an automorphism `σ` of the acting `U`-group, of odd
+order,
+whose conjugate action inverts every `v`-action on `S₀` — the chain relation
+`(φ v) ∘ (φ (σ v)) = id`.
 Fed to `caseA_fixes_of_action_chain`, this forces `U` to fix `S₀` pointwise (whence the (11.7)
 contradiction in `chief_H0_eq_bot`).
 
@@ -833,9 +835,11 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     exact hNne (Subgroup.map_injective (data.H).subtype_injective (by rw [h, Subgroup.map_bot]))
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   -- **`data` is of type III or IV** (`htype`, hypothesis).  Peterfalvi (11.7) (Hypothesis (11.2))
-  -- is stated only for types III/IV; the `|W₂| = chief.p` identity below (`chief.typeIII_IV_p_eq_W2`),
+  -- is stated only for types III/IV; the `|W₂| = chief.p` identity below
+  -- (`chief.typeIII_IV_p_eq_W2`),
   -- needed for the (9.6) fixed-point-free step `C_{H₀}(W₁) = 1` yielding `U ≤ C(H₀)` (Coq
-  -- `FTtype34_facts.cH0U`), requires it.  The commutator-form antisymmetry argument is type-agnostic.
+  -- `FTtype34_facts.cH0U`), requires it. The commutator-form antisymmetry argument is
+  -- type-agnostic.
   -- `|W₂| = chief.p` (types III/IV).
   have hW2p : Nat.card ↥data.typeP.W2 = chief.p := chief.typeIII_IV_p_eq_W2 htype
   -- The `W₂ ⊓ H₀ = ⊥` core (Peterfalvi (9.6), `chief_W2_inf_H0_eq_bot` replicated at chief level):
@@ -1077,7 +1081,8 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     rw [MulAut.smul_def, ← hks, map_zpow, ← hxCmk a]
     exact (Subgroup.closure _).zpow_mem (Subgroup.subset_closure (Set.mem_range_self a)) k
   -- `Dx`: if `⁅hat (xC a), hat y⁆ = 1` for all `a`, then `⁅hat z, hat y⁆ = 1` for all `z`.
-  -- The map `z ↦ ⁅hat z, hat y⁆` is a morphism (class-`2` linearity) killing `N`, and the `mk'N (xC a)`
+  -- The map `z ↦ ⁅hat z, hat y⁆` is a morphism (class-`2` linearity) killing `N`, and the
+  -- `mk'N (xC a)`
   -- generate `H̄`, so it vanishes on all of `H`.
   have hDx : ∀ (y : ↥data.typeP.H), (∀ a : ↥L, ⁅hat (xC a), hat y⁆ = 1) →
       ∀ z : ↥data.typeP.H, ⁅hat z, hat y⁆ = 1 := by

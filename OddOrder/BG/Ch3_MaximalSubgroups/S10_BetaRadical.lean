@@ -54,7 +54,8 @@ theorem exists_hall_pq_containing [Finite G] (hG : IsMinimalSimpleOdd G)
     exact hW₀hall
 
 /-- `M` は自身の導来部分群 `M' = derivedInG M` を正規化する。`derivedInG M = (commutator ↥M).map
-M.subtype` で `commutator ↥M ◁ ↥M` ゆえ `normalizer(commutator ↥M) = ⊤`、これを `Subgroup.le_normalizer_map`
+M.subtype` で `commutator ↥M ◁ ↥M` ゆえ `normalizer(commutator ↥M) =
+⊤`、これを `Subgroup.le_normalizer_map`
 で押し出すと `range M.subtype = M ≤ normalizer(M')`。Cor 10.9 で `W ⊓ M' ◁ W` (`W ≤ M`) を出すのに使う。 -/
 theorem le_normalizer_derivedInG (M : Subgroup G) :
     M ≤ Subgroup.normalizer (derivedInG M) := by
@@ -249,7 +250,8 @@ theorem beta_complement_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     (p ∈ alpha M → IsUniquelyMaximal (Subgroup.centralizer (X : Set G) ⊓ M)) := by
   obtain ⟨W, hXW, hWY, hWnil, hWhall⟩ :=
     exists_nilpotent_hall_pq hG hM hpq hpβ hqβ hXM hXq hcase
-  -- **L2**: `W ∩ M_σ` is a Hall `{p,q}`-subgroup of `M_σ` (Hall ∩ normal, transported from `↥(XM')`).
+  -- **L2**: `W ∩ M_σ` is a Hall `{p,q}`-subgroup of `M_σ` (Hall ∩ normal, transported from
+  -- `↥(XM')`).
   have hMσY : Msigma M ≤ X ⊔ derivedInG M := (Msigma_le_derived hG hM).trans le_sup_right
   haveI hMσYnorm : ((Msigma M).subgroupOf (X ⊔ derivedInG M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMσY).mpr
@@ -639,7 +641,8 @@ theorem beta_complement_normalizer_derived_contains_sylow [Finite G]
       inf_eq_left.mpr (Subgroup.subgroupOf_mono M hX_G_le_K)]
   have hFrattini := Sylow.normalizer_sup_eq_top P
   rw [hPmap, ← Subgroup.subgroupOf_normalizer_eq hX_G_le_M] at hFrattini
-  -- `hFrattini : (N_G(X_G)).subgroupOf M ⊔ K.subgroupOf M = ⊤`; rewrite `N_G(X_G).subgroupOf M = U.subgroupOf M`.
+  -- `hFrattini : (N_G(X_G)).subgroupOf M ⊔ K.subgroupOf M = ⊤`; rewrite
+  -- `N_G(X_G).subgroupOf M = U.subgroupOf M`.
   have hUeq : (Subgroup.normalizer (X_G : Set G)).subgroupOf M = U.subgroupOf M := by
     rw [hU, Subgroup.inf_subgroupOf_right]
   rw [hUeq] at hFrattini

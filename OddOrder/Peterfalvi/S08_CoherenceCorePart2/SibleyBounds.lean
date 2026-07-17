@@ -25,7 +25,8 @@ variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 open scoped Classical in
 /-- **(6.8.1) regular-character difference value over `X(Z)`** (mmd 04.8 L168, combined form).  For
 the central `(6.6)` set `X(Z)` and `z ∈ Z^#`, `∑_{χ ∈ X(Z)} χ(1)·(χ(z) − χ(1)) = -|L|`.  This is
-`(ρ_L − ρ_{L/Z})(z) − (ρ_L − ρ_{L/Z})(1) = -|L:Z| − (|L| − |L:Z|) = -|L|` (the off-identity minus the
+`(ρ_L − ρ_{L/Z})(z) − (ρ_L − ρ_{L/Z})(1) = -|L:Z| − (|L| − |L:Z|) = -|L|` (the off-identity minus
+the
 degree value), which divided by `a|W₁| = χ₁(1)` gives `∑dᵢχᵢ(z) − ∑dᵢχᵢ(1) = -|H|/a` — the key
 constant in showing `η₁^{τ₁}` is constant on `Z^#`. -/
 theorem sum_degree_mul_charValue_sub_Xset_eq_of_frobenius (hyp : SibleyDadeHypothesis G L H)
@@ -93,7 +94,8 @@ theorem exists_index_primePow_degree_of_mem_S (hyp : SibleyDadeHypothesis G L H)
 
 /-- **(6.6) per-member degree data for an X-member family.**  Vectorizes
 `exists_index_primePow_degree_of_mem_S` over a finite family `χmem : Fin k → Irr L` of `S`-members:
-there are exponents `mmem j` with `χmem j (1) = |L:H| · p^(mmem j)`.  Supplies the `dmem`/`θmem`/`mmem`
+there are exponents `mmem j` with `χmem j (1) = |L:H| · p^(mmem j)`. Supplies the
+`dmem`/`θmem`/`mmem`
 fields of the X-chain step data (`dmem j = |L:H|·θmem j`, `θmem j = p^(mmem j)`). -/
 theorem exists_memberDegreeData (hyp : SibleyDadeHypothesis G L H)
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
@@ -134,7 +136,8 @@ open scoped Classical in
 /-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
 
 Combines the member-family degree-square bound `sMember_degreeSqReBound_of_not_coherent`
-(`∑_{χ∈S₁} χ(1).re² ≤ 2ψ(1).re·χ₁(1).re`) with the real B2 identity `sum_re_sq_induce_kernelFilter_eq`
+(`∑_{χ∈S₁} χ(1).re² ≤ 2ψ(1).re·χ₁(1).re`) with the real B2 identity
+`sum_re_sq_induce_kernelFilter_eq`
 (`∑_{χ∈S(A)} χ(1).re² = |L:H|·(|H:A| − 1)`).  Since `S(A) ⊆ S₁`, the `S(A)`-sum is bounded by the
 `S₁`-sum, and with `χ₁(1) = |W₁| = |L:H|` (cancelling the positive index `|L:H|`) this gives
 `|H:A| − 1 ≤ 2ψ(1)`.  This is the (6.2) bound `2ψ(1) ≥ |K:A| − 1` (with `K = H`); composing with the
@@ -317,7 +320,8 @@ open scoped Classical in
 /-- **(6.6)/(6.8) X-set nonemptiness, CertainType (case B) form.**  As
 `Xset_nonempty_of_subgroupOf_ne_bot` but the strictly-positive degree-square sum is supplied by the
 case-B identity `sum_re_sq_Xset_eq_of_irreducible_X` (which needs only `X`-irreducibility, valid in
-case B) instead of the Frobenius `sum_re_sq_Xset_eq`.  The `hX` hypothesis is the `X = S − S(Z) ⊆ Irr L`
+case B) instead of the Frobenius `sum_re_sq_Xset_eq`. The `hX` hypothesis is the
+`X = S − S(Z) ⊆ Irr L`
 fact (Peterfalvi (6.8.1) for (c2), discharged by `isIrreducibleCharacter_of_mem_Xset_c2_caseA`). -/
 theorem Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} [Z.Normal] (hZbot : Z.subgroupOf H ≠ ⊥)
@@ -540,7 +544,8 @@ open scoped Classical in
 /-- **(6.2) first-obstruction + core wiring** `|K:A| − 1 ≤ 2ψ(1)`.
 
 From `S(A)` coherent and `S(B)` not coherent (with `S(A) ⊆ S(B)`), the first-obstruction
-`exists_coherentBreakPair` produces a breaking pair `{ψ, ψ̄}` with `ψ ∈ S(B)` (`ψ, ψ̄ ∉ S₁`), and the
+`exists_coherentBreakPair` produces a breaking pair `{ψ, ψ̄}` with `ψ ∈ S(B)` (`ψ, ψ̄ ∉ S₁`), and
+the
 (6.2) core `sMember_index_le_two_psi` — with the degree-`|W₁|` anchor `χ₁ ∈ S(A) ⊆ S₁`
 (`exists_mem_SsubFiltration_degree_W1`, valid since `H/(A.subgroupOf H)` has a proper commutator
 subgroup) — gives `|H:A| − 1 ≤ 2ψ(1)`.  The structural inputs (`S(B)` finite / conjugation-closed /

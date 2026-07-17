@@ -282,8 +282,10 @@ theorem xSum_le_two_psi_caseB
 /-- **Norm-weighted (5.6) `X`-sum bound, reducible-column break form.**  The column analogue of
 `xSum_le_two_psi_caseB`: when the (6.8.3) break is a reducible certain-type column
 `ψ = columnSum h46 χ₂b` (not excludable when `W₂ ⊄ Z`, e.g. case (A) at `Z = Z(H) ∩ H′`), the
-norm-weighted member-family bound `sMember_degreeSqNormReBound_of_not_coherent_columnBreak` (brick 3,
-column form) gives `∑_{χ∈X(W₂)} χ(1).re²/‖χ‖² = |L:H|·(|H| − |H:W₂|) ≤ 2·(columnSum χ₂b)(1).re·η(1).re`.
+norm-weighted member-family bound `sMember_degreeSqNormReBound_of_not_coherent_columnBreak` (brick
+3,
+column form) gives
+`∑_{χ∈X(W₂)} χ(1).re²/‖χ‖² = |L:H|·(|H| − |H:W₂|) ≤ 2·(columnSum χ₂b)(1).re·η(1).re`.
 The `X`-sum identity (`sum_re_div_normSq_Xset_eq`) and the weighted domination are identical to the
 irreducible form. -/
 theorem xSum_le_two_psi_caseB_columnBreak

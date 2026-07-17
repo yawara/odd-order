@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.WielandtSetup
 /-!
 # ChiefFactorCore
 
-Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData` (2000-line limit, issue
+0103 第 2 パス).
 -/
 
 /-!
 # Peterfalvi (9.5)-(9.7) — Clifford-theory data over the chief factor
 
-Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -56,7 +58,8 @@ theorem huSub_eq_derivedInG_subgroupOf (data : TypesIIIIIIVSetup M) :
 
 /-- **`HU ◁ M`**: `HU = H ⊔ U = M' = [M,M]` is the derived subgroup realised inside `↥M`, hence
 normal.  This is the `H ⊴ G` hypothesis letting the §9 induction `induceHU = Ind_{HU}^M` use the
-Clifford fibre/orbit machinery (`induce_eq_induce_iff_conj`: distinct `M`-conjugacy orbits ↔ distinct
+Clifford fibre/orbit machinery (`induce_eq_induce_iff_conj`: distinct `M`-conjugacy orbits ↔
+distinct
 inductions) for the `𝒳 ↔ 𝒮` count of Peterfalvi (9.5)/(9.9). -/
 instance huSub_normal (data : TypesIIIIIIVSetup M) : (huSub data).Normal := by
   rw [huSub_eq_derivedInG_subgroupOf, show (derivedInG M).subgroupOf M = commutator ↥M by
@@ -350,7 +353,8 @@ theorem uprimeSub_le_cSub [Finite G] {M : Subgroup G}
 
 /-! ### (9.9.a) realization: `HC ◁ HU` (the inertia subgroup is normal)
 
-For the (9.9.a) Clifford degree `χ(1) = u` we induce from the inertia subgroup `HC` of a chief-factor
+For the (9.9.a) Clifford degree `χ(1) = u` we induce from the inertia subgroup `HC` of a
+chief-factor
 character; `isIrreducibleCharacter_induce_of_inertia_eq` requires `HC ◁ HU`.  We realize `U` and
 `C = C_U(H̄)` inside `HU = huSub` and apply the abstract
 `sup_normal_of_normal_left_of_normal_subgroupOf` (`H ◁ HU` from `hInHu_normal`, `C ◁ U` from
@@ -522,7 +526,8 @@ theorem uInHu_inf_hcInHu_eq_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIII
   · exact le_inf (cInHu_le_uInHu data chief) le_sup_right
 
 /-- **(9.9.a) index step (A): `[HU:HC] = [U:C]` realized form `HC.index = (cInHu.subgroupOf uInHu).index`.**
-The second isomorphism theorem for `HC ◁ HU` with `uInHu ⊔ HC = ⊤`: `HU ⧸ HC ≃ uInHu ⧸ (uInHu ⊓ HC)`,
+The second isomorphism theorem for `HC ◁ HU` with `uInHu ⊔ HC = ⊤`:
+`HU ⧸ HC ≃ uInHu ⧸ (uInHu ⊓ HC)`,
 and `uInHu ⊓ HC = cInHu` (`uInHu_inf_hcInHu_eq_cInHu`). -/
 theorem index_hcInHu_eq_relindex_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) :
@@ -1213,7 +1218,8 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   Hpart_iSupIndep : iSupIndep Hpart
   /-- **Orbit generator** `S₀` (non-opaque (9.7) case-(a) structure): the `q` summands are the
   `U W₁`-translates `Hpart j = φ(orbitRep j) • S₀` of a single order-`p` subgroup `S₀`, where
-  `φ = quotientMulAutHom` is the (`Finite`-free) chief-factor action.  Exposing the orbit (rather than
+  `φ = quotientMulAutHom` is the (`Finite`-free) chief-factor action. Exposing the orbit (rather
+  than
   the opaque `W₁`-transitivity `Prop`) is what lets the (9.8.c) constant-factor-data set `Xmu` be
   constructed and `W₁`-transitivity of the summands proven. -/
   S0 : Subgroup (↥data.H ⧸ chief.N)
@@ -1283,7 +1289,8 @@ structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   u_dvd_norm_quotient : chars.u ∣ (chief.p ^ data.q - 1) / (chief.p - 1)
   /-- The defining property of case (b): `U` acts **irreducibly** on the chief factor `H̄ = H/H_0`,
   i.e. the only `U`-invariant subgroups of `H̄` are `⊥` and `⊤`.  Stated `Finite`-freely via the
-  `U`-action hom `uActionHom` (definitionally `(typeP_quotientCoprimeAction …).φ.comp (…).U.subtype`,
+  `U`-action hom `uActionHom` (definitionally
+  `(typeP_quotientCoprimeAction …).φ.comp (…).U.subtype`,
   which needs `[Finite G]`).  This is the hypothesis the Clifford degree analysis (9.8.c)/(9.9.a)
   consumes through `inertia_eq_hcInHu` (it computes the inertia group `I_{HU}(θ₀) = HC` of a
   nontrivial chief-factor character). -/
@@ -1291,14 +1298,17 @@ structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
       IsAInvariant (uActionHom data chief) J → J = ⊥ ∨ J = ⊤
 
 /-- **Peterfalvi (9.6)**: after choosing `H_0`, the induced `U`-action is non-trivial (`U` does not
-centralize `H`), `H̄ = H/H_0` is a chief factor of `M`, `|H̄| = p^q`, and (types III/IV) `|W_2| = p`.
+centralize `H`), `H̄ = H/H_0` is a chief factor of `M`, `|H̄| = p^q`, and (types III/IV)
+`|W_2| = p`.
 
 *Faithfulness note.* The printed (9.6) asserts `|W̄_2| = p` for the **image** `W̄_2 = C_{H̄}(W_1)`,
-which for type II is strictly smaller than the full `W_2 = C_H(W_1)` (the carrier never pins `|W_2|`,
+which for type II is strictly smaller than the full `W_2 = C_H(W_1)` (the carrier never pins
+`|W_2|`,
 only `|W_1|` is prime).  The earlier formalization stated the **unconditional** `|W_2| = p`, which is
 *false* for type II: `|W_2|^q = |H| = p^q·|H_0|` (by (9.3) + `quotient_order`) gives `|W_2| = p`
 only when `H_0 = 1`.  We therefore state the faithful, carrier-provable form: `|W_2| = p` only in
-the types III/IV branch (where `|W_2| = p` directly, `typeIII_IV_p_eq_W2`), together with the genuine
+the types III/IV branch (where `|W_2| = p` directly, `typeIII_IV_p_eq_W2`), together with the
+genuine
 order conclusion `|H̄| = p^q` (`quotient_order`).  The image fact `|W̄_2| = p` needs the (non-opaque)
 chief-factor structure and is delivered by `typeP_chiefFactor_card`. -/
 theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

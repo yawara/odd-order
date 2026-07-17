@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.CountingLayer
 /-!
 # Canonicalization
 
-Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.NormEstimates` (2000-line limit, issue 0103 第
+2 パス).
 -/
 
 /-!
 # Peterfalvi (13.5)-(13.10) — norm estimate tail
 
-Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory

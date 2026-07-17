@@ -281,7 +281,8 @@ theorem HC_lt_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
 `S' ⊆ S` carries a nonzero `A`-supported witness, then `S'` is coherent with the *same* coherent
 extension: the isometry (`extension_inner_eq`), `τ`-agreement (`extends_on_supported`) and
 `ZIrr`-codomain (`extension_mem_ZIrr`) laws all transport along the `zSpan` / `zSupportedSpan`
-monotonicity (`Submodule.span_mono` / `zSupportedSpan_mono_left`); only the `nonzero` witness must be
+monotonicity (`Submodule.span_mono` / `zSupportedSpan_mono_left`); only the `nonzero` witness must
+be
 re-supplied for `S'`.  This extracts the restriction pattern shared by `coherent_SOf_HC` (`S(HC) ⊆
 S(M'')`) and the world-bridge `𝒮(H₀C)`-coherence subset step (`sOf(H₀C) ⊆ sOf(H₀C')`, the (9.11)
 `hY` route). -/
@@ -453,11 +454,13 @@ noncomputable def coherent_sOf_H0Cprime_of_allReducible [Finite G]
 /-- **Peterfalvi (11.8): `S(HC)` is coherent** (sorry-free).  `S(HC) = SOf HC` is the subfamily of
 the degree-`w₁` family `S(M'')` cut out by the *larger* kernel condition (`M'' ≤ HC`,
 `secondDerived_le_HC`, so `S(HC) ⊆ S(M'')` by kernel-antitonicity), so it inherits the coherent
-extension of `S(M'')` (`secondDerived_coherent`) verbatim — the isometry/`τ`-agreement/`ZIrr`-codomain
+extension of `S(M'')` (`secondDerived_coherent`) verbatim — the
+isometry/`τ`-agreement/`ZIrr`-codomain
 laws transport along `zSpan`/`zSupportedSpan` monotonicity.  The one genuinely new input is the
 `nonzero` supported witness `ζ̄ − ζ` for a member `ζ ∈ S(HC)`: existence of `ζ` from
 `inducedKernelFamily_nonempty_of_commutator_ne_top` at the proper trace `HC ⊊ M'` (`HC_lt_derived`),
-its conjugate difference being `A₀`-supported (`mderivSharp_subset_A0`) and nonzero (odd order has no
+its conjugate difference being `A₀`-supported (`mderivSharp_subset_A0`) and nonzero (odd order has
+no
 real characters, `inducedKernelFamily_hasNoRealCharacters`).  This is the `S(HC)`-coherence input of
 the (11.8.6) world-bridge capstone (glued with the `𝒮(H₀C)`-coherence along
 `SOf_H0C_eq_SOf_HC_union_sOf`). -/
@@ -490,7 +493,8 @@ theorem coherent_SOf_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.base.commutator_quotient_ne_top hG hne)
   rw [hyp.SOf_eq] at hζ
   have hζc := OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hζ
-  -- assemble the restricted coherence, reusing `S(M'')`'s coherent extension (`isCoherent_of_subset`)
+  -- assemble the restricted coherence, reusing `S(M'')`'s coherent extension
+  -- (`isCoherent_of_subset`)
   refine ⟨isCoherent_of_subset hM''coh hsub ⟨ζ.conj - ζ, ⟨?_, ?_⟩, ?_⟩⟩
   · -- `ζ̄ − ζ ∈ ℤ[S(HC)]`
     rw [hyp.SOf_eq]

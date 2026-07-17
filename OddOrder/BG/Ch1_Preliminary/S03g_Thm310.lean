@@ -73,7 +73,8 @@ nonidentity nilpotent subgroup `M` that `E` normalizes, with `(|E|, |M|) = 1`.  
 This is the conclusion `(a)` of BG Theorem 3.10 in the form used by Proposition 14.2(g) (where
 `U = E₂E₃` is the abelian Frobenius kernel and `R = E₁` the cyclic complement).  The proof reduces
 `M` to a minimal `E`-invariant normal (hence elementary abelian) subgroup `M₀`, views `M₀` as a
-module via `prime_card_of_elemAbelian_mulDistrib`, and applies the abelian Frobenius weight argument.
+module via `prime_card_of_elemAbelian_mulDistrib`, and applies the abelian Frobenius weight
+argument.
 
 Note: `U` abelian lets us bypass BG's `K₀`-minimal-normal reduction (BG Case 2, first half), which
 is unnecessary for the Proposition 14.2(g) application. -/

@@ -8,7 +8,8 @@ import OddOrder.BG.Ch2_Uniqueness.S08_SCNFitting
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2
+パス).
 -/
 namespace OddOrder.BG.Ch2.S08
 open OddOrder.GroupTheory

@@ -608,7 +608,8 @@ theorem not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd
         rw [← hg]; exact Sylow.coe_subgroup_smul
       rw [hQ, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hSG]
     rw [hQconj]; exact hPMσ
-  -- Step 2: apply the core to `(Y' = g•Y ⊆ M_σ, H' = g•H)`, transport via `|deriv(g•K)| = |deriv K|`.
+  -- Step 2: apply the core to `(Y' = g•Y ⊆ M_σ, H' = g•H)`, transport via
+  -- `|deriv(g•K)| = |deriv K|`.
   have hY'ne : MulAut.conj g • Y ≠ ⊥ := by
     intro hb
     have hc : Nat.card ↥(MulAut.conj g • Y) = Nat.card ↥Y :=

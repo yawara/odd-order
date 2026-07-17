@@ -14,7 +14,8 @@ members `i ≠ j` of a `FrobeniusFamily`, the pair of (7.8) coherence setups for
 `sibley_dadeSupport_eq_kernelSpread` — to the family's already-proven `kernelSpread_disjoint`.
 
 This unlocks the sorry-free (7.9) `conclusion` dichotomy (`(β_i, ζ_j^ν) ≠ 0 ∨ (β_j, ζ_i^ν) ≠ 0`)
-for each pair, the `hbeta_ne` input of the good-index estimate `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero`
+for each pair, the `hbeta_ne` input of the good-index estimate
+`chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero`
 in the (7.10) `card_G0_lower_bound` assembly (issue 0044).
 -/
 
@@ -28,7 +29,8 @@ variable {G : Type*} [Group G] {k : ℕ}
 
 /-- **The Sibley (7.1) datum's Dade support is the kernel spread** `(H_i^#)^G`.  Same computation as
 `dadeSupport_hypothesis71_eq_kernelSpread` (the local subgroups `H(a) = ⊥` of the `of_isTISubset`
-construction collapse each coset `aH(a)` to `{a}`), but for `sibleyToHypothesis71` (support written as
+construction collapse each coset `aH(a)` to `{a}`), but for `sibleyToHypothesis71` (support written
+as
 `sharpImage ((H_i).subgroupOf L_i) = H_i^#` via `sharpImage_subgroupOf_eq`).  This identifies the
 `Hypothesis79.dadeSupport_disjoint` field with `kernelSpread_disjoint`. -/
 lemma sibley_dadeSupport_eq_kernelSpread [Fintype G] [Invertible (Nat.card G : ℂ)]

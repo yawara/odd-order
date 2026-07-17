@@ -14,9 +14,11 @@ Assembles the proven pieces into the **abelian-kernel** case of BG Theorem 3.10(
 * the weight-space spanning decomposition (`S03e.iSup_weightSpace_eq_top` + `iSupIndep_weightSpace`),
 * Frobenius freeness on weight characters (`weightChar_eq_one_of_conjChar_fixed`).
 
-The blocks are the `K`-weight spaces (over an algebraically closed field, abelian `K`, `char ∤ |K|`);
+The blocks are the `K`-weight spaces (over an algebraically closed field, abelian `K`,
+`char ∤ |K|`);
 the complement `R` permutes them, freely because a nonidentity complement element acts
-fixed-point-freely on `K` (Frobenius) and hence fixes only the trivial character — whose weight space
+fixed-point-freely on `K` (Frobenius) and hence fixes only the trivial character — whose weight
+space
 is `C_V(K) = 0`.  The prime-action condition then forces `|R|` prime via the keystone.
 
 ## Main statement
@@ -176,7 +178,8 @@ vanishing `C_V(K) = 0`) lands the hypotheses of the terminal. -/
 section ElemAbelian
 
 /-- **BG Theorem 3.10(a)+(b), elementary-abelian module case** (rank form).  With the `ZMod p`-module
-structure on `Additive M` supplied as a genuine instance binder (so tensor-product instance synthesis
+structure on `Additive M` supplied as a genuine instance binder (so tensor-product instance
+synthesis
 over `ZMod p` is not blocked by a `letI`-local module): `|R|` is prime **(a)** and
 `finrank (Additive M) = |R| · finrank C_M(R)` **(b)** — conclusion (b) `|M| = |C_M(R)|^p` of BG
 Theorem 3.10 at the rank level, the invariants being `C_M(R)` as the `R`-fixed submodule of
@@ -184,7 +187,8 @@ Theorem 3.10 at the rank level, the invariants being `C_M(R)` as the `R`-fixed s
 `prime_card_and_finrank_of_abelian_frobenius_weight` applies; `Module.finrank_baseChange` and
 `finrank_invariants_baseChangeRepresentation` transport (b) back to `ZMod p`.
 
-The `(a)`-only projection `prime_card_of_elemAbelian_aux` feeds `prime_card_of_elemAbelian_mulDistrib`
+The `(a)`-only projection `prime_card_of_elemAbelian_aux` feeds
+`prime_card_of_elemAbelian_mulDistrib`
 (conjugation ladder / Prop 14.2(g)); this `(a)+(b)` form feeds the conclusion-(b) ladder of the full
 BG Theorem 3.10 (issue 8013). -/
 theorem prime_card_and_finrank_of_elemAbelian {p : ℕ} [Fact p.Prime]

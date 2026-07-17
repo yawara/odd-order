@@ -515,7 +515,8 @@ open scoped Classical in
 
 Assembles the (6.2) member-family for a coherent `S₁` and the breaking pair `{ψ, ψ̄}`, feeding it to
 B1 (`coherentDegreeSumBound_of_not_coherent`).  When `S₁` (conjugation-closed, coherent, `⊆ S`)
-contains the degree-`|W₁|` anchor `χ₁`, `ψ ∈ S` with `{ψ, ψ̄}` disjoint from `S₁`, and `S₁ ∪ {ψ, ψ̄}`
+contains the degree-`|W₁|` anchor `χ₁`, `ψ ∈ S` with `{ψ, ψ̄}` disjoint from `S₁`, and
+`S₁ ∪ {ψ, ψ̄}`
 is not coherent, the degree-ratio sum is bounded by `∑ⱼ (degⱼ)² ≤ 2·a`, where `degⱼ = χⱼ(1)/χ₁(1)`
 and `a = ψ(1)/χ₁(1)`.
 
@@ -765,7 +766,8 @@ open scoped Classical in
 using that **every** member of `S` is irreducible (Frobenius).  In case B `S` carries `w₂−1`
 reducible members, so that conversion fails on `S`.  But `X` itself is irreducible
 (Peterfalvi (6.8.1) for (c2): the reducibles all lie in `S(Z)`, and `X = S ∖ S(Z)`), so the
-conversion holds **on `X`** alone.  The orbit-counting identity `sum_div_normSq_induce_kernelFilter_eq`
+conversion holds **on `X`** alone. The orbit-counting identity
+`sum_div_normSq_induce_kernelFilter_eq`
 (in the `χ(1)²/‖χ‖²` form — valid for reducibles) supplies the two filter sums, and
 `Finset.sum_sdiff` extracts `∑_X = ∑_{S} − ∑_{S(Z)}`; the `X`-irreducibility hypothesis converts
 only the `X`-side terms.  This unblocks the case-B (CB3 math-A / CB4 math-B) `hstepData` `total`. -/

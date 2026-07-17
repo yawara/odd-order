@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.TwoFamilies
 /-!
 # CharacterEstimate
 
-Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 
 /-!
 # Frobenius family — §7 の主定理へ向けた family 構成と assembly
 
-Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
+issue 0103).
 -/
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
@@ -427,7 +429,8 @@ lemma kernelSpread_pairwiseDisjoint [Finite G] (F : FrobeniusFamily G k) :
   exact F.kernelSpread_disjoint hij
 
 /-- **The (7.4) `FamilyHypothesis71` of a Frobenius family** (Peterfalvi (7.10)(a)-(c) ⟹ (7.4)).
-Each member `i` supplies the (7.1) datum `Hypothesis71 G (H_i^#) L_i` (`hypothesis71`), whose Dade map
+Each member `i` supplies the (7.1) datum `Hypothesis71 G (H_i^#) L_i` (`hypothesis71`), whose Dade
+map
 is a genuine isometry (`isDadeIsometry_of_isDadeMap`, from `isDadeMap` + `HConjInvariant`); the
 supports `A_i^{τ_i} = dadeSupport_i = (H_i^#)^G` are pairwise disjoint by the coprime-kernel
 `kernelSpread_disjoint` (via `dadeSupport_hypothesis71_eq_kernelSpread`).  This assembles the (7.4)

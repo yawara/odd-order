@@ -9,13 +9,15 @@ import OddOrder.GroupTheory.AInvariantComplement
 /-!
 # Notation
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 
 /-!
 # BG Theorem E notation + Theorems A--E
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split,
+issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S16
 
@@ -83,11 +85,14 @@ def maximalConjugatesContaining (M : Subgroup G) (x : G) : Set (Subgroup G) :=
 maximal conjugates that contain `x`.
 
 **Encoding fix (2026-06-29, lane δ; HUB-cleared `RData` is δ-internal, not a cross-lane contract):**
-conjunct 1 was `IsHallSubgroup (σ M) (C_M(x))`, which is **false** for type-`P` `M`: at `x ∈ Kstar^#`
+conjunct 1 was `IsHallSubgroup (σ M) (C_M(x))`, which is **false** for type-`P` `M`: at
+`x ∈ Kstar^#`
 the `κ`-Hall `K` (with `κ(M) ⊆ σ(M)ᶜ`) centralizes `x`, so `K ≤ C_M(x)`, making `C_M(x)` carry
 `σ(M)′`-primes — not a `σ(M)`-group.  Coq Theorem 14.4(b)/(e) has `C_M(x)` a `σ(N)′`-Hall of `C_G(x)`
-(`N` = the signalizer maximal), i.e. *intrinsically* a Hall subgroup of `C_G(x)` (its order coprime to
-its index).  We encode "`C_M(x)` is a Hall subgroup of `C_G(x)`" `σ`-agnostically as this coprimality,
+(`N` = the signalizer maximal), i.e. *intrinsically* a Hall subgroup of `C_G(x)` (its order coprime
+to
+its index). We encode "`C_M(x)` is a Hall subgroup of `C_G(x)`" `σ`-agnostically as this
+coprimality,
 matching the docstring and avoiding the spurious `σ(M)` reference. -/
 def RData (M : Subgroup G) (x : G) (R : Subgroup G) : Prop :=
   let Cx : Subgroup G := Subgroup.centralizer ({x} : Set G)
@@ -117,7 +122,8 @@ def piStar (G : Type*) [Group G] : Set ℕ :=
 
 /-! ### BG `FT_signalizer` (`R(x)`, Theorem D(3)/(4)) — concrete construction
 
-The concrete FT signalizer `R(x) = FT_signalizer x` (Coq `FT_signalizer`, BGsection14:90), built from
+The concrete FT signalizer `R(x) = FT_signalizer x` (Coq `FT_signalizer`, BGsection14:90), built
+from
 `FT_signalizer_base x = N[x]`: when `x` has more than one `σ`-maximal, `N[x]` is a maximal subgroup
 over `C_G(x)` (the unique one — Theorem D, via Corollary 12.14); `R(x) = (N[x])_σ ⊓ C_G(x)`.  This is
 the genuine object the Theorem D(3)/(4) data `RData M x R` is built on; the deep
@@ -232,7 +238,8 @@ theorem FT_signalizer_isHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) 
 
 /-- **Signalizer structure for a `σ`-sharp element** (the genuine bridge to Theorem D): for
 `x ∈ M_σ^#` with more than one `σ`-maximal, the proven `sigmaLength_one_centralizer_structure`
-(fed the genuine `genuineSigmaDecomposition`, with `ℓ_σ(x) = 1` from `Msigma_ell1`) yields the unique
+(fed the genuine `genuineSigmaDecomposition`, with `ℓ_σ(x) = 1` from `Msigma_ell1`) yields the
+unique
 maximal `N = N[x]` over `C_G(x)` together with the Hall property of `R = N_σ ⊓ C_G(x)`, the sharp
 transitivity on `𝓜_σ(x)`, the type-F/P2 dichotomy and the complement structure.  This is what the
 Theorem D(3)/(4) data is assembled from. -/
@@ -262,7 +269,8 @@ theorem signalizer_structure_of_mem_sigmaSharp [Finite G]
 
 /-- **The conjugates of `M` containing `x` are exactly the `σ`-maximals of `x`** (for `x ∈ M_σ^#`):
 `maximalConjugatesContaining M x = 𝓜_σ(x)`.  This identifies the set on which Theorem D(3)/(4)'s
-`RData` asks for sharp transitivity (`maximalConjugatesContaining`) with the set the proven structure
+`RData` asks for sharp transitivity (`maximalConjugatesContaining`) with the set the proven
+structure
 controls (`maximalSigmaSubgroupsOfElement`).
 * `⊆`: a conjugate `N = M^g ∋ x` has `x` a `σ(N)`-element (`σ(N) = σ(M)`, `sigma_conj`), and the
   normal `σ(N)`-Hall `N_σ` absorbs the `σ(N)`-subgroup `⟨x⟩` (`sigma_subgroup_le_Msigma_of_isHall`),
@@ -418,8 +426,10 @@ theorem RData_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
 /-- **Theorem D(3) conjunct 3, the centralizer complement** (Coq Theorem 14.4(b),
 `R ⋊ C_(M∩N)(x) = C(x)`): from the proven structure's `N`-complement `(N)_σ ⋊ (M ∩ N) = N`
 (`hMcompl`), inside `C_G(x)` the subgroups `C_M(x) = M ⊓ C_G(x)` and `R = (N)_σ ⊓ C_G(x)` complement
-each other.  This is the engine `IsComplement'.inf_centralizer_of_normalizer` (mathcomp `subcent_sdprod`)
-applied with `K = (N)_σ` (normal in `N`), `H = M ∩ N`, and `a = x`: `x` normalizes `(N)_σ` (it lies in
+each other. This is the engine `IsComplement'.inf_centralizer_of_normalizer` (mathcomp
+`subcent_sdprod`)
+applied with `K = (N)_σ` (normal in `N`), `H = M ∩ N`, and `a = x`: `x` normalizes `(N)_σ` (it lies
+in
 `N` since `C_G(x) ≤ N`, and `(N)_σ ◁ N`) and `M ∩ N` (it lies in `M ∩ N`).  Discharges the one
 genuinely-deep `RData` input of `RData_of_inputs`. -/
 theorem signalizer_centralizer_isComplement {M N : Subgroup G} {x : G}
@@ -445,7 +455,8 @@ theorem signalizer_centralizer_isComplement {M N : Subgroup G} {x : G}
   exact hgen.symm
 
 /-- **BG Theorem D(3) for the `|𝓜_σ(x)| > 1` branch** (`∃ R, RData M x R`): when `x ∈ M_σ^#` has more
-than one `σ`-maximal, the proven `signalizer_structure_of_mem_sigmaSharp` supplies the unique maximal
+than one `σ`-maximal, the proven `signalizer_structure_of_mem_sigmaSharp` supplies the unique
+maximal
 `N ≥ C_G(x)`, the Hall property of `R = (N)_σ ⊓ C_G(x)` and the sharp transitivity from `M`; the
 centralizer complement (conjunct 3) is `signalizer_centralizer_isComplement`, and `RData_of_inputs`
 assembles all four `RData` conjuncts.  This is the genuinely-deep half of `hD3`; the remaining
@@ -508,7 +519,8 @@ theorem card_signalizer_eq_card_maximalSigma [Finite G] (hG : OddOrder.BG.IsMini
 /-- **BG Lemma 14.5(a), `σ`-cover disjointness** (Coq `sigma_cover_disjoint`, `_of_inputs` form): for
 two distinct `σ`-length-one elements `x, y` with signalizer data, the cosets `x·R(x)` and `y·R(y)`
 (`R(·) = (N_·)_σ ⊓ C_G(·)`) are disjoint.  If `g = x·r = y·s` were common, the `σ`-decomposition
-`{x} ∪ {r}^# = σ(g) = {y} ∪ {s}^#` (`sigma_cover_decomposition_signalizer`) forces `y = r` (as `y ≠ x`)
+`{x} ∪ {r}^# = σ(g) = {y} ∪ {s}^#` (`sigma_cover_decomposition_signalizer`) forces `y = r` (as
+`y ≠ x`)
 and `s = x`; so `y ∈ (N_x)_σ` puts `N_x ∈ 𝓜_σ(y)`, and `x ∈ R(y) ∩ (N_x ⊓ C_G(y))` lands in the
 trivial intersection of the `y`-complement (`signalizer_centralizer_isComplement` at `M' = N_x`),
 forcing `x = 1` — contradiction.  The deep core of the `R(x)`-cover trivIset behind Lemma 14.5(c). -/

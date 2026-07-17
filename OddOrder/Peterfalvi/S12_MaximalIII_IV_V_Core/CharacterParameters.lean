@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Hypothesis
 /-!
 # Peterfalvi (10.2)-(10.4) — character parameters and coherent extension
 
-Split from the former monolithic `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core` (directory split,
+issue 0103).
 -/
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
@@ -250,7 +251,8 @@ theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
       = (if i = i' ∧ j = j' then 1 else 0) := by
   haveI := hyp.finiteG
   classical
-  -- reconstruct the context of `alignedOmegaSigmaGrid` / `exists_alignedOmegaSigmaGrid_chiFam_family`
+  -- reconstruct the context of `alignedOmegaSigmaGrid` /
+  -- `exists_alignedOmegaSigmaGrid_chiFam_family`
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
   haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
   haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
@@ -303,10 +305,12 @@ open scoped FiniteInduce in
 σ-images factor through a *product* index, `ω_{ij}^σ = χ_{(ρ i, κ j)}`, for an injective `W₁`-row
 family `ρ` and an injective `W₂`-column family `κ`.  Crucially the `W₂`-index `κ j` depends only on
 the column `j` (not on the row `i`), and the `W₁`-indices `ρ i` exhaust `Ŵ₁` as `i` ranges — this is
-what makes `μ_j^{τ₁}`'s σ-coefficient grid *two-column* supported (columns `κ j`, `κ j'`) and lets the
+what makes `μ_j^{τ₁}`'s σ-coefficient grid *two-column* supported (columns `κ j`, `κ j'`) and lets
+the
 (5.8) full-column endgame translate `∑_p χ_{(p, κ j)} = ∑_i ω_{ij}^σ`.
 
-`ω_{ij}^σ = σ(ω(ξ_{ij})) = χ_{omegaProdEquiv.symm ξ_{ij}}` (`sigma_omega`) for the transported product
+`ω_{ij}^σ = σ(ω(ξ_{ij})) = χ_{omegaProdEquiv.symm ξ_{ij}}` (`sigma_omega`) for the transported
+product
 character `ξ_{ij} = ω^{sdiff}_{χ₁ i, χ₂ j} ∘ e`.  By `omegaProdEquiv_symm_eq` the index pair is
 `(ξ_{ij}|_{W₁}, ξ_{ij}|_{W₂})`, and because `e` respects the `W₁/W₂` decomposition
 (`typePData_WEquiv_mem_W1/W2`: on the `W₁`-block the `ω_{0j}` factor `χ₂ ∘ wSnd ∘ e` is trivial, and
@@ -424,11 +428,14 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_product [Finite G]
 
 open scoped FiniteInduce in
 /-- **§10 σ-grid full-column collapse** (the output translation of the (5.8) σ-endgame): there is an
-injective `W₂`-column family `κ` with `∑_p χ_{(p, κ j)} = ∑_i ω_{ij}^σ` for every column `j`.  This is
-what turns the σ-endgame conclusion `μ_j^{τ₁} = δ·∑_p χ_{(p, κ j)}` into the (10.6)(a) summed isometry
+injective `W₂`-column family `κ` with `∑_p χ_{(p, κ j)} = ∑_i ω_{ij}^σ` for every column `j`. This
+is
+what turns the σ-endgame conclusion `μ_j^{τ₁} = δ·∑_p χ_{(p, κ j)}` into the (10.6)(a) summed
+isometry
 `μ_j^{τ₁} = δ·∑_i ω_{ij}^σ`.
 
-From the product structure (`exists_alignedOmegaSigmaGrid_chiFam_product`, `ω_{ij}^σ = χ_{(ρ i, κ j)}`),
+From the product structure (`exists_alignedOmegaSigmaGrid_chiFam_product`,
+`ω_{ij}^σ = χ_{(ρ i, κ j)}`),
 the row family `ρ : Fin w₁ → Ŵ₁` is injective and `|Fin w₁| = |Ŵ₁|` (`card_charGroup_subgroupOf`,
 `tic.W₁` is `W₁`), hence bijective; reindexing the `p`-sum along `ρ` collapses
 `∑_p χ_{(p, κ j)} = ∑_i χ_{(ρ i, κ j)} = ∑_i ω_{ij}^σ`. -/
@@ -499,7 +506,8 @@ theorem Hypothesis.muGrid_apply_one_within_column [Finite G]
 
 open OddOrder.Peterfalvi.S06 in
 /-- The `k`-th power of the row-`0` product source `ω(1, χ₂)` is the row-`0` source of the
-`k`-th power dual: `(omegaProdChar 1 χ₂)^k = omegaProdChar 1 (χ₂^k)` (on the §6 `toTICyclicHypothesis`).
+`k`-th power dual: `(omegaProdChar 1 χ₂)^k = omegaProdChar 1 (χ₂^k)` (on the §6
+`toTICyclicHypothesis`).
 Row `0` is the trivial `W₁`-dual, fixed by powering, so only the `W₂`-factor `χ₂` is raised. -/
 theorem omegaProdChar_one_pow {L : Type*} [Group L] [Fintype L]
     (h : OddOrder.Peterfalvi.S06.Hypothesis L)
@@ -771,9 +779,11 @@ theorem Hypothesis.muGrid_apply_one_cross_column [Finite G]
 /-- **§10 degree independence** (Peterfalvi (10.3), full statement at the materialized `μ`-grid
 level): for nontrivial columns (`0 < j, j' < w₂`) the common degree `μ_{ij}(1) = d` is independent
 of *both* the row `i` and the (nontrivial) column `j`.  This is the genuine (10.3) degree constancy,
-combining the within-column constancy `muGrid_apply_one_within_column` (the `i`-independence (4.5.a))
+combining the within-column constancy `muGrid_apply_one_within_column` (the `i`-independence
+(4.5.a))
 with the cross-column constancy `muGrid_apply_one_cross_column` (the `j`-independence via Theorem
-(8.8) `w₂` prime + Pontryagin).  It is exactly what populates `CharacterParameters.degree_independent`
+(8.8) `w₂` prime + Pontryagin). It is exactly what populates
+`CharacterParameters.degree_independent`
 once the common value `d` is named (at producer-construction time, where `hw2` is available). -/
 theorem Hypothesis.muGrid_apply_one_eq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -1049,7 +1059,8 @@ theorem Hypothesis.muGrid_isIrreducible [Finite G] (hG : OddOrder.BG.IsMinimalSi
 
 open scoped FiniteInduce in
 /-- **§10 column sum is induced from `M'`, hence vanishes off `M'`** (Peterfalvi (10.5)/(4.5.a)):
-the `W₂`-column sum `μ_k = ∑_{0≤i<w₁} μ_{ik}` equals the induced character `Ind_{M'}^M (Res_{M'} μ_{0k})`
+the `W₂`-column sum `μ_k = ∑_{0≤i<w₁} μ_{ik}` equals the induced character
+`Ind_{M'}^M (Res_{M'} μ_{0k})`
 (`induce_restrict_certainType_eq`), so it vanishes on every `x ∉ M' = [M,M]`.
 
 This is the structural fact making `μ_k − dζ̄` `A_0`-supported in the (10.5) `a = 0` argument (both
@@ -1695,7 +1706,8 @@ We pick a nontrivial column `j₀` (which exists because `w₂` is prime, hence 
 `d = μ_{0 j₀}(1)` as a natural number (the degree of an irreducible character,
 `exists_natDegree_characterDegree_dvd_card`).  `d > 1` is Peterfalvi (4.4): if `μ_{0 j₀}` had degree
 `1` it would be linear, hence `K`-trivial, hence a column-`0` character — contradicting `χ₂ ≠ 1`
-(`columnFamily_mu_ne`); this mirrors the crux of `exists_zeta_in_inducedFamily_degree_w1`.  `δ` is the
+(`columnFamily_mu_ne`); this mirrors the crux of `exists_zeta_in_inducedFamily_degree_w1`. `δ` is
+the
 column sign; and the congruence `μ_{0 j₀}(1) ≡ δ (mod w₁)` (Peterfalvi (4.3.d),
 `certainType_degree_modEq`) gives `n` with `n·w₁ = d − δ`.  The degree independence
 `μ_{ij}(1) = d` for all `i` and all nontrivial `j` is the materialized (10.3) constancy
@@ -1827,7 +1839,8 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (10.2)+(10.3), the character parameters of (10.4)**: assemble a genuine
 `CharacterParameters` for the §10 Hypothesis from the materialized §6 data.
 
-`ζ` is the degree-`w₁` irreducible of (10.2) (`exists_zeta_in_inducedFamily_degree_w1`), the `μ`- and
+`ζ` is the degree-`w₁` irreducible of (10.2) (`exists_zeta_in_inducedFamily_degree_w1`), the `μ`-
+and
 `ω^σ`-grids are `muGrid`/`omegaSigmaGrid`, `w₂` is prime by the non-circular (10.3) first clause
 (`Hypothesis.w2_prime`), and the degree data `d > 1`, `n·w₁ = d − δ`, `μ_{ij}(1) = d` come from
 `exists_charParamArith`.  The `δ_j`-independence `δ_j = δ_{j'}` (10.3) is the genuine
@@ -1927,7 +1940,8 @@ theorem Hypothesis.zeta_conj_ne [Finite G]
 
 /-- **Parameter package with all (10.6.b) hypotheses** (the `tau1_values_and_norm_bound` /
 `zeta_tau1_norm_ge_one` inputs).  Strengthens `exists_charParameters` to also expose the seven
-conditions those Dade-value lemmas require, now that each is establishable: `mu`/`omegaSigma` are the
+conditions those Dade-value lemmas require, now that each is establishable: `mu`/`omegaSigma` are
+the
 materialized grids (`rfl`), `ζ ∈ S` and `ζ(1) = w₁` come from `(10.2)`, `δ_j = δ` from
 `exists_charParamArith`, `δ = ±1` from `muColumnSign_eq_one_or_neg_one`, and `ζ̄ ≠ ζ` from
 `zeta_conj_ne` (Peterfalvi (1.1)).  This is the single producer the `(10.8)` line-83 step consumes

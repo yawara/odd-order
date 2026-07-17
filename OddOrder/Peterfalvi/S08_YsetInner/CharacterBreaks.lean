@@ -318,7 +318,8 @@ theorem eq_zero_or_edge_of_dvd_of_normBound {a b m : ℤ}
   -- `b² = (a·x)² ≤ 1 + a²` (drop `(b−a)² ≥ 0` and the `(m−2)·b² ≥ 0` slack).
   have hb2 : (a * x) ^ 2 ≤ 1 + a ^ 2 := by
     nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a * x))]
-  -- Hence `x² ≤ 1`: otherwise `x² ≥ 2` gives `2a² ≤ a²x² ≤ 1 + a²`, i.e. `a² ≤ 1`, contradicting `a ≥ 2`.
+  -- Hence `x² ≤ 1`: otherwise `x² ≥ 2` gives `2a² ≤ a²x² ≤ 1 + a²`, i.e. `a² ≤ 1`, contradicting
+  -- `a ≥ 2`.
   have hx2 : x ^ 2 ≤ 1 := by
     by_contra h
     push Not at h
@@ -772,8 +773,10 @@ theorem exists_conjugatePairCover {Γ : Type*} [Group Γ]
 /-- **Conjugate-pair cover without the irreducibility hypothesis** — the (6.8.3)/case-(c2)
 generalization of `exists_conjugatePairCover`.  Identical construction, but `X` is an arbitrary
 conjugation-closed real-free set (NOT required irreducible).  The cost is dropping the
-`IrreducibleCharacter`-typed `hpairχ` output: the pairs are returned as plain `ClassFunction`s with the
-direct conjugate relation `(pair i).2 = ((pair i).1).conj`.  Needed for (6.8.3) in case (c2), where the
+`IrreducibleCharacter`-typed `hpairχ` output: the pairs are returned as plain `ClassFunction`s with
+the
+direct conjugate relation `(pair i).2 = ((pair i).1).conj`. Needed for (6.8.3) in case (c2), where
+the
 set `S` contains the `w₂ − 1` reducible induced characters (so the break-pair `ψ` may be reducible).
 The irreducibility hypothesis `hXirr` was used in the original *only* to package the pairs as
 `IrreducibleCharacter`s; the conjugate-pair involution itself uses only `hXreal` + `hXconj`. -/
@@ -992,9 +995,12 @@ theorem exists_coherentBreakPair
     rw [← hsplit]; exact hnPi
 
 /-- **First obstruction to coherence without the irreducibility hypothesis** — the (6.8.3)/case-(c2)
-generalization of `exists_coherentBreakPair`.  `Sb` need only be conjugation-closed and real-free (NOT
-required irreducible), at the cost that the breaking character `ψ ∈ Sb` may itself be reducible.  Used
-in (6.8.3) for case (c2), where `S` contains the `w₂ − 1` reducible induced characters; the downstream
+generalization of `exists_coherentBreakPair`. `Sb` need only be conjugation-closed and real-free
+(NOT
+required irreducible), at the cost that the breaking character `ψ ∈ Sb` may itself be reducible.
+Used
+in (6.8.3) for case (c2), where `S` contains the `w₂ − 1` reducible induced characters; the
+downstream
 degree bound then uses the norm-weighted sum `χ(1)²/‖χ‖²` (valid for reducibles). -/
 theorem exists_coherentBreakPair_general
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]

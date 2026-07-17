@@ -11,7 +11,8 @@ import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 
 `prime_card_and_finrank_of_frobenius_general` (piece 3) proves BG Theorem 3.10 (a)+(b) in the
 **irreducible**-module case for a general Frobenius kernel.  The §15.2 application (issue 8012 step 4)
-acts on `M = Q̄`, an elementary abelian group that may be **reducible** as a module for the Frobenius
+acts on `M = Q̄`, an elementary abelian group that may be **reducible** as a module for the
+Frobenius
 group `KD`.  BG handles this by Case 1 of the Theorem 3.10 proof (mmd L1287-1317): an induction on
 the module, splitting a reducible `M` along a proper `G`-invariant submodule and combining the two
 pieces.
@@ -260,7 +261,8 @@ theorem prime_card_and_finrank_of_frobenius_elemAbelian
 piece 5, mmd L1313-1321/1321).  When `C_V(R)` is cyclic (here: `finrank C_V(R) ≤ 1`), the kernel's
 derived subgroup centralizes `V`: `K' ⊆ C_K(V)`, i.e. `ρ g = 1` for every `g ∈ ⁅K, K⁆`.
 
-Carries the genuine Frobenius-group structure `IsFrobeniusGroup G K R` (needed for Theorem 3.5 at the
+Carries the genuine Frobenius-group structure `IsFrobeniusGroup G K R` (needed for Theorem 3.5 at
+the
 irreducible leaf).  The irreducible leaf is `thm35` (BG Theorem 3.5); `|R|` prime and the
 one-dimensionality of `C_V(R)` come from the `(a)+(b)` result `…_frobenius_elemAbelian`.  The
 reducible case splits `⊤ = U ⊕ U'`, the cyclicity restricts (`C_U(R) ≤ C_V(R)`), and the conclusions
@@ -417,7 +419,8 @@ theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
   haveI : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
     (Module.FaithfullyFlat.nontrivial_tensorProduct_iff_right (R := ZMod p)
       (M := AlgebraicClosure (ZMod p)) (N := Additive M)).mpr hntM
-  -- `p ∤ |H|` gives `(|H| : F̄) ≠ 0`, hence the `NeZero` instance Maschke needs, and `(|K| : F̄) ≠ 0`.
+  -- `p ∤ |H|` gives `(|H| : F̄) ≠ 0`, hence the `NeZero` instance Maschke needs, and
+  -- `(|K| : F̄) ≠ 0`.
   haveI hNeZeroH : NeZero (Nat.card H : AlgebraicClosure (ZMod p)) :=
     ⟨by rw [Ne, CharP.cast_eq_zero_iff (AlgebraicClosure (ZMod p)) p]; exact hpH⟩
   have hpK : ¬ p ∣ Nat.card ↥K := fun hdvd => hpH (hdvd.trans (Subgroup.card_subgroup_dvd_card K))

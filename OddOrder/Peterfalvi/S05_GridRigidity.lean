@@ -13,13 +13,16 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 **Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000), §3, pp. 15-20.
 
 This file isolates the **module-generic** heart of Peterfalvi's rigidity lemma
-`eq_signed_sub_cTIiso` (Coq `PFsection3.v`, "(3.8) consequence used in (4.8)/(10.5)/(10.10)/(11.8)"):
+`eq_signed_sub_cTIiso` (Coq `PFsection3.v`, "(3.8) consequence used in
+(4.8)/(10.5)/(10.10)/(11.8)"):
 
-> a norm-`2` virtual character `X ∈ ℤ[Irr G]` that agrees with a signed difference `s·(χ_{P₁} − χ_{P₂})`
+> a norm-`2` virtual character `X ∈ ℤ[Irr G]` that agrees with a signed difference
+`s·(χ_{P₁} − χ_{P₂})`
 > of two members of an orthonormal grid family — the agreement encoded as *additive separability of
 > the difference's coefficient grid* — must in fact **equal** it.
 
-The statement (`orthonormalGrid_diff_rigidity`) is phrased for an **arbitrary** orthonormal family of
+The statement (`orthonormalGrid_diff_rigidity`) is phrased for an **arbitrary** orthonormal family
+of
 virtual characters `χ : ι × κ → CF(G)` indexed by a rectangular grid, taking the difference grid's
 additive separability (the (3.7) identity) as a hypothesis.  It does **not** mention the
 `σ`-isometry, the `TICyclicHypothesis`, or any side-specific data, so both
@@ -29,7 +32,8 @@ additive separability (the (3.7) identity) as a hypothesis.  It does **not** men
 * `S15` (the `η`-grid `η_{ij} = ω_{ij}^{τ₃}` of the (13.18) `S`-side cross-relation)
 
 instantiate the same engine.  The abstract combinatorial core (`grid_trichotomy`,
-`grid_no_constant_column`, `grid_no_constant_row`) is reused verbatim from `S05_GridTrichotomy`; this
+`grid_no_constant_column`, `grid_no_constant_row`) is reused verbatim from `S05_GridTrichotomy`;
+this
 file only lifts the three *character-theoretic* coefficient facts — the norm-`2` support bound, the
 `{0, ±1}` coefficient bound, and the all-zero Fourier endgame — from `chiFam` to an abstract `χ`.
 
@@ -141,7 +145,8 @@ theorem ncard_inner_grid_ne_zero_le_two {Idx : Type*} [Finite Idx]
 
 /-- **`{0, ±1}` coefficient bound** (abstract).  The inner products of a norm-`2` virtual character
 `X ∈ ZIrr(G)` against an orthonormal grid family `(χ pq)` lie in `{0, ±1}`.  Writing
-`X = ε_α·α + ε_β·β` and `χ pq = ε·ν` (norm-`1` classifier), the coefficient `⟨X, χ pq⟩` is `ε_α·ε` if
+`X = ε_α·α + ε_β·β` and `χ pq = ε·ν` (norm-`1` classifier), the coefficient `⟨X, χ pq⟩` is `ε_α·ε`
+if
 `ν = α`, `ε_β·ε` if `ν = β`, and `0` otherwise.  Abstract form of
 `sigmaCoeff_eq_zero_or_one_of_inner_self_two`. -/
 theorem inner_grid_eq_zero_or_pm_one_of_inner_self_two {Idx : Type*}

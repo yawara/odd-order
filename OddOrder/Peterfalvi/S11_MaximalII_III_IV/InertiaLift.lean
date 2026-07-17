@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CliffordData
 /-!
 # InertiaLift
 
-Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 /-!
 # Peterfalvi §9 — C_U(S₀) layer and character grid preparation
 
-Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -413,7 +415,8 @@ theorem index_cuInHu_subgroupOf_uInHu_eq_a [Finite G] (caseA : CliffordCaseAData
 degree-`qa` source character `θ₁·λ` has index `a` in `HU`, giving the source degree `a` and (after
 `Ind_{HU}^M`) the character degree `qa`.  Combines the second-iso step `[HU:H·C_U(S₀)] = [U:C_U(S₀)]`
 (`index_hcuInHu_eq_relindex_cuInHu`) with the first-iso value `[U:C_U(S₀)] = |Ū₁|`
-(`index_cuInHu_subgroupOf_uInHu_eq_a`).  Here `|Ū₁| = Nat.card (aInvariantRestrictAut …).range` is the
+(`index_cuInHu_subgroupOf_uInHu_eq_a`). Here `|Ū₁| = Nat.card (aInvariantRestrictAut …).range` is
+the
 genuine geometric `a = |U:C_U(H₁)|`, the value `clifford_caseA_data` assigns to `caseA.a`. -/
 theorem index_hcuInHu_eq_a [Finite G] (caseA : CliffordCaseAData chars) :
     (hInHu data ⊔ cuInHu caseA).index
@@ -453,7 +456,8 @@ theorem realizedH0supUprime_eq_realizedH0_sup_uprimeInHu {M : Subgroup G}
 order `p^d` with `0 < d` and `d ∣ q`.  Since `q` is prime, `d ∈ {1, q}`: the dichotomy of (9.7),
 case (a) (`d = 1`, `U` semisimple into order-`p` pieces) vs case (b) (`d = q`, `U` irreducible).
 
-Assembled from the spanning step (`iSup_smul_eq_top_of_irreducible`, on the `U W₁`-irreducible `H̄`),
+Assembled from the spanning step (`iSup_smul_eq_top_of_irreducible`, on the `U W₁`-irreducible
+`H̄`),
 the orbit lemmas (each `U W₁`-translate of `S₀` is `U`-irreducible of order `|S₀|`), and the order
 step (`card_eq_pow_of_iSup_aInvariant_irreducible`): `|H̄| = |S₀|^k`, while `|H̄| = p^q`, so
 `p^q = (p^d)^k`, i.e. `q = d·k`. -/
@@ -658,7 +662,8 @@ order coprime to `p - 1`.
 This discharges the hard `coprime` hypothesis of `chiefFactor_caseB_image_dvd_norm` from the
 Frobenius structure of `U W₁`: a nonidentity `w₀ ∈ W₁` acts on `Ū` fixed-point-freely.  Indeed if
 `act.φ(w₀)` commutes with `φ_U(u)` then `⁅w₀, u⁆` acts trivially on `H̄`, so `u` lies in a
-`w₀`-fixed coset of `C_U(H̄)`; Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) extracts a `w₀`-fixed
+`w₀`-fixed coset of `C_U(H̄)`; Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) extracts a
+`w₀`-fixed
 representative `c ∈ u·C_U(H̄)`, and `c ∈ C_U(w₀) = 1` by the Frobenius condition
 (`centralizer_complement_le`, `U ⊓ W₁ = ⊥`), forcing `u ∈ C_U(H̄)`, i.e. `φ_U(u) = 1`.  The
 canonical module-level `coprime_card_sub_one_of_faithful_irreducible_comm_fpf` (shared
@@ -691,7 +696,8 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
   letI : CommGroup (↥data.H ⧸ chief.N) := inferInstance
   letI : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
     chief.quotient_elementaryAbelian.zmodModule
-  -- Abelianness, irreducibility, faithfulness of `Ū = φU.range` (as in `chiefFactor_caseB_image_cyclic`).
+  -- Abelianness, irreducibility, faithfulness of `Ū = φU.range` (as in
+  -- `chiefFactor_caseB_image_cyclic`).
   have hcentral_triv : ∀ g : ↥(data.typeP.U ⊔ data.typeP.W1),
       (g : G) ∈ Subgroup.centralizer (data.typeP.H : Set G) → act.φ g = 1 := by
     intro g hg
@@ -935,8 +941,10 @@ theorem chiefFactor_caseB_action_fpf [Finite G] {M : Subgroup G}
 case (b), if a nontrivial irreducible character `θ` of the chief factor `H̄ = ↥H ⧸ N` is invariant
 under the `U`-action `φ_U(g)`, then `g` acts trivially (`φ_U(g) = 1`, i.e. `g ∈ C = C_U(H̄)`).
 
-This is the **character-side inertia** `I_U(θ) ⊆ C` of Peterfalvi (9.9.a), proven *realization-free*:
-the abelian `Irr ↔ Hom` bridge (`exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`)
+This is the **character-side inertia** `I_U(θ) ⊆ C` of Peterfalvi (9.9.a), proven
+*realization-free*:
+the abelian `Irr ↔ Hom` bridge
+(`exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`)
 turns `θ` into a linear character `θ̂`, and a `φ_U(g)`-invariant `θ̂` with `φ_U(g)` fixed-point-free
 (`chiefFactor_caseB_action_fpf`, valid for `g ∉ C`) is trivial
 (`eq_one_of_invariant_of_fixedPointFree`), contradicting `θ` nontrivial.  No realization of `H̄` as
@@ -1008,7 +1016,8 @@ theorem chiefFactor_caseA_char_inertia_gen [Finite G] {M : Subgroup G}
 
 /-- **Peterfalvi (9.8), case (a) non-Galois core**: the case-(a) analog of
 `chiefFactor_caseB_char_inertia`.  When `U` acts on `H̄ = H/N` with a `U`-invariant order-`p` factor
-(case (a) of (9.7), packaged as `CliffordCaseAData`), a character `θ` that is **regular** (nontrivial
+(case (a) of (9.7), packaged as `CliffordCaseAData`), a character `θ` that is **regular**
+(nontrivial
 on each of the `q` order-`p` Clifford summands `Hpart i`) and fixed by `φ_U(g)` forces `φ_U(g) = 1`.
 
 This is the `def_Itheta` computation `I_{HU}(θ̄) = HC` for the *reducible* (= regular) characters in
@@ -1039,7 +1048,8 @@ theorem chiefFactor_caseA_char_inertia [Finite G] {M : Subgroup G}
 `aInvariantRestrictAut caseA.S0_aInvariant g = 1`.  This — not `uActionHom g = 1` — is the correct
 conclusion for (9.8.d): `θ₁` need only be faithful on the *single* summand `S₀`, so the fixing
 element centralizes `S₀` (lands in `C_U(S₀)`), not necessarily all of `H̄`.  The pure-algebra heart
-is `mulAut_eq_id_on_of_fixes_ne_one_on_prime` (`θ₁` faithful on the prime-order `S₀`), lifted through
+is `mulAut_eq_id_on_of_fixes_ne_one_on_prime` (`θ₁` faithful on the prime-order `S₀`), lifted
+through
 `aInvariantRestrictAut_coe` (which identifies the restricted action with `uActionHom` on `S₀`).  This
 gives `I(θ₁) ∩ U ⊆ C_U(S₀)` in the degree-`qa` inertia lift. -/
 theorem chiefFactor_caseA_char_inertia_single [Finite G] {M : Subgroup G}
@@ -1063,7 +1073,8 @@ theorem chiefFactor_caseA_char_inertia_single [Finite G] {M : Subgroup G}
     mulAut_eq_id_on_of_fixes_ne_one_on_prime ((uActionHom data chief) g) caseA.S0
       (by rw [hS0card]; exact chief.p_prime)
       (fun x hx => caseA.S0_aInvariant.smul_mem g hx) θ hreg hinv
-  -- Lift to `aInvariantRestrictAut … g = 1` via the coercion `(restrict g x : H̄) = uActionHom g x`.
+  -- Lift to `aInvariantRestrictAut … g = 1` via the coercion
+  -- `(restrict g x : H̄) = uActionHom g x`.
   ext x
   rw [MulAut.one_apply, aInvariantRestrictAut_coe, hid x x.2]
 
@@ -1088,7 +1099,8 @@ theorem compHom_typeP_conjAction_inflation [Finite G] {M : Subgroup G}
   rfl
 
 /-- **Char-inertia inflation, parametrized over the core stabilizer-triviality `hcore`.**
-Strips the inflation (`compHom_typeP_conjAction_inflation`, `mk'` injective) from the `compHom`-fixing
+Strips the inflation (`compHom_typeP_conjAction_inflation`, `mk'` injective) from the
+`compHom`-fixing
 hypothesis to feed the per-element action-invariance to `hcore`.  Case (b) supplies `hcore` as
 `chiefFactor_caseB_char_inertia` (`U`-irreducible); case (a) via the non-Galois `Hpart` analysis. -/
 theorem caseB_char_inertia_inflation_of_core [Finite G] {M : Subgroup G}
@@ -1193,7 +1205,8 @@ theorem conjBy_compHom_hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup M)
 
 /-- **Realized stabilizer-triviality, parametrized over the char-inertia core `hcharInertia`.**
 The case-agnostic transport: a `U`-element `a` realized by `g ∈ HU` fixing `θ₀` (`conjBy` form) is
-turned into the `compHom (typeP_conjAction)` form (`conjBy_compHom_hInHuEquivH`, injective inflation)
+turned into the `compHom (typeP_conjAction)` form (`conjBy_compHom_hInHuEquivH`, injective
+inflation)
 and fed to `hcharInertia` to conclude `φ a = 1`.  Case (b) supplies `hcharInertia` as
 `caseB_char_inertia_inflation`; case (a) via the non-Galois analog. -/
 theorem caseB_inertia_realized_of_charInertia [Finite G] {M : Subgroup G}

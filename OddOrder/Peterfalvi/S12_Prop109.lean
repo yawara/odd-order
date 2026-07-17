@@ -64,7 +64,8 @@ theorem Hypothesis.muGrid_zero_zero_eq_trivial [Finite G]
 open scoped FiniteInduce in
 /-- **§10 `⟨μ_0, 1_M⟩ = 1`** (Peterfalvi (10.9), the `a_{00}` constant term, M-side): the column-`0`
 sum `μ_0 = ∑_i μ_{i0}` has principal multiplicity `1`, since `μ_{00} = 1_M` (anchor,
-`muGrid_zero_zero_eq_trivial`) contributes `1` and the remaining `μ_{i0}` (`i ≠ 0`) are orthogonal to
+`muGrid_zero_zero_eq_trivial`) contributes `1` and the remaining `μ_{i0}` (`i ≠ 0`) are orthogonal
+to
 `μ_{00}` (column-`0` orthonormality, `muGrid_inner_within_column`). -/
 theorem Hypothesis.muColumnZero_inner_trivial [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
@@ -147,7 +148,8 @@ open scoped FiniteInduce in
 `(Irr W)^σ`, and `‖χ‖² = 1`.
 
 This is the keystone of the Type-V elimination (10.10): the column-`0` decomposition
-`τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` (STEP 1, `tau_muColumnZero_sub_zeta_eq`) determines the residual
+`τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` (STEP 1, `tau_muColumnZero_sub_zeta_eq`) determines the
+residual
 `ζ^{τ₁}`; the (3.8) trichotomy (`sigmaCoeff_trichotomy`) on `ψ = τ(μ_0 − ζ)` (which vanishes on `V`,
 has `NC(ψ) ≤ w₁ + 1 < 2w₁`, and the odd-order gap `w₁ + 2 ≤ w₂`) forces the `σ`-coefficient grid of
 `ψ` to be the *single constant column* `j = 0` with value `1` (the principal column, anchored by
@@ -247,7 +249,8 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     intro v hv
     have hvM : v ∈ M := typePData_W_le_self hyp.typeP (SetLike.mem_coe.mp hv.1)
     rw [hψ, hyp.tau_apply_of_mem_typePV hsupp hv hvM]
-    -- `μ_0 − ζ` vanishes at `v ∈ V` (both `μ_0` and `ζ` are induced from the normal `M'`, `v ∉ M'`).
+    -- `μ_0 − ζ` vanishes at `v ∈ V` (both `μ_0` and `ζ` are induced from the normal `M'`,
+    -- `v ∉ M'`).
     have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
       rw [derivedInG, Subgroup.subgroupOf,
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
@@ -676,7 +679,8 @@ subfamily of `S = inducedFamily M`.
 This materializes the coq `cohS1 : coherent S1 M^# tau := uniform_degree_coherence scohS1`
 (`PFsection11.v`): the degree-`w₁` irreducible members of `S` all share the degree `w₁`, so the
 equal-degree coherence producer applies.  The family is enumerated as a `Finset` of *bundled*
-irreducible characters (`IrreducibleCharacter ↥M = {φ // IsIrreducibleCharacter φ}`); `Finset.equivFin`
+irreducible characters (`IrreducibleCharacter ↥M = {φ // IsIrreducibleCharacter φ}`);
+`Finset.equivFin`
 gives an injective `Fin n` indexing for free, and `inducedFamily_isCoherent_of_equalDegreeFamily`
 discharges the rest.  Nonemptiness with `n ≥ 2` is the conjugate pair `{ζ, ζ̄}` of the degree-`w₁`
 witness `exists_zeta_in_inducedFamily_degree_w1` (distinct since `S` has no real characters,
@@ -751,7 +755,8 @@ noncomputable def Hypothesis.SHC_isCoherent [Finite G]
 open scoped FiniteInduce in
 /-- **General constant-degree coherence** — the degree-`d` irreducible subfamily of `S =
 inducedFamily M` is coherent.  Generalizes `SHC_isCoherent` (which fixes `d = w₁`) to an arbitrary
-degree `d`: the irreducible degree-`d` members of `S` form an equal-degree family, so the R-datum-free
+degree `d`: the irreducible degree-`d` members of `S` form an equal-degree family, so the
+R-datum-free
 (5.7)/Dade constant-degree engine `inducedFamily_isCoherent_of_equalDegreeFamily` applies.  `≥ 2`
 members follow from one witness `ζ` (`hex`) plus its distinct conjugate `ζ̄` (odd order ⇒ no real
 characters, `inducedFamily_hasNoRealCharacters`).  This is the constant-degree base case of the
@@ -820,7 +825,8 @@ open scoped FiniteInduce in
 /-- **Per-member `R`-datum for an irreducible `S = inducedFamily M`-member** (the (5.2.d)
 `CharacterDifferenceImage` for `τ`).  For an irreducible `χ ∈ S`, the conjugate-pair keystone
 `{χ, χ̄}` has `A₀`-supported difference (`inducedFamily_sub_support`, `χ̄` a member of equal degree)
-and `χ` is non-real (odd order, `inducedFamily_hasNoRealCharacters`), so `dadeCharacterDifferenceImageOfDiff`
+and `χ` is non-real (odd order, `inducedFamily_hasNoRealCharacters`), so
+`dadeCharacterDifferenceImageOfDiff`
 produces the (5.2.d) image datum for the genuine Dade map `τ = dadeIntegralCharacterMap …`.  This is
 the irreducible half of the `subcoherent(S_ H0C')` `R`-datum feeding the Peterfalvi (9.11)
 core-coherence induction (the reducible `μ`-column half is separate, `tau_muGrid_row_diff`). -/
@@ -849,7 +855,8 @@ noncomputable def Hypothesis.inducedFamily_irreducible_Rdatum [Finite G]
 `ℤ[S, M^#] = ℤ[S, A_0]` condition for the uniform degree-`w₁` family `S(HC)`).  Since every member
 `χ ∈ S(HC)` has the same degree `χ(1) = w₁`, any `φ = ∑ c_χ χ ∈ ℤ[S(HC)]` with `φ(1) = 0` has
 `w₁·∑ c_χ = 0`, hence `∑ c_χ = 0`, so `φ = ∑ c_χ (χ − χ₀)` collapses to a combination of the
-`A_0`-supported differences `χ − χ₀` (`inducedFamily_sub_support`).  Proved by `span_induction` on the
+`A_0`-supported differences `χ − χ₀` (`inducedFamily_sub_support`). Proved by `span_induction` on
+the
 strengthened invariant `(ψ − (ψ(1)·w₁⁻¹)·χ₀).support ⊆ A_0` (closed under `+`/`•`, `= χ − χ₀` on
 generators), specialized at `φ(1) = 0`.  This is the `hspan` hypothesis of the Galois-equivariance
 `IsCoherent.extension_mapRingEquiv_comm` for the `S(HC)`-coherent `τ₁`. -/
@@ -1016,8 +1023,10 @@ theorem Hypothesis.SHC_extension_inner_of_ne [Finite G] {M : Subgroup G}
 open scoped FiniteInduce in
 /-- **SHC-coherence analog of `tau_zeta_sub_conj_eq_tau1`** (α-grid `S₁`-`τ₁` bridge for (11.8.5)).
 For a degree-`w₁` irreducible `ζ ∈ S(HC)`, the Dade image of the supported difference `ζ − ζ̄`
-equals the `S(HC)`-coherent split `ζ^{τ₁} − ζ̄^{τ₁}`.  Since `ζ, ζ̄ ∈ S(HC)` and `ζ − ζ̄` is supported
-on `A₀`, it lies in the supported lattice `ℤ[S(HC), A₀]` where `SHC_isCoherent.extension` agrees with
+equals the `S(HC)`-coherent split `ζ^{τ₁} − ζ̄^{τ₁}`. Since `ζ, ζ̄ ∈ S(HC)` and `ζ − ζ̄` is
+supported
+on `A₀`, it lies in the supported lattice `ℤ[S(HC), A₀]` where `SHC_isCoherent.extension` agrees
+with
 `hyp.tau` (`extends_on_supported`); `extension`-linearity (`map_sub`) then splits it.
 
 This is the essential SHC ingredient of the (5.3.b) `⟨ω^σ, ζ^{τ₁}⟩ = 0` argument (via

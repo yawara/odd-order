@@ -8,7 +8,8 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumCongruence
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 namespace OddOrder.RepresentationTheory
 open scoped MonoidAlgebra

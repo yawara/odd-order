@@ -147,7 +147,8 @@ theorem Hypothesis.sSet_coherent_extension_cross_orthogonal_T [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Peterfalvi (9.11.7)–(9.11.8), the orthogonal-branch refutation — `T`-instance residual**
-(mirror; issue 2035; the `T`-mirror of the M-side `S13.NineElevenSevenEightRefutation`, **discharged**
+(mirror; issue 2035; the `T`-mirror of the M-side `S13.NineElevenSevenEightRefutation`,
+**discharged**
 M-side by `nineElevenSevenEightRefutation`, Coq `PFsection9.v:2048-2227`).  In the orthogonal
 branch `α^τ ⊥ 𝒮₃^{τ₃}` of the (9.11.6) dichotomy: `𝒮₄ ≠ ∅` (else the (9.11.2)–(9.11.5)
 arithmetic spine already refutes), pick `λ₁ ∈ 𝒮₄`, put `e = u/a` and `β = λ₁ − e·ψ₁`; the

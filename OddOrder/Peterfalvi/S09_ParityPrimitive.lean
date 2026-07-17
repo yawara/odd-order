@@ -13,7 +13,8 @@ The Peterfalvi (7.9) dichotomy consumes the parity fact `cfdot_real_vchar_even`:
 virtual characters `φ, ψ ∈ ℤ[Irr G]`,
 `2 ∣ ⟨φ, ψ⟩ ↔ (2 ∣ ⟨φ, 1_G⟩) ∨ (2 ∣ ⟨ψ, 1_G⟩)`.
 
-The proof pairs each irreducible `χ` with its complex conjugate `χ̄` (`IrreducibleCharacter.conjPerm`):
+The proof pairs each irreducible `χ` with its complex conjugate `χ̄`
+(`IrreducibleCharacter.conjPerm`):
 for real `φ`, the Fourier coefficient `⟨φ, χ̄⟩` equals `⟨φ, χ⟩`, so a non-self-conjugate pair
 `{χ, χ̄}` contributes an even amount `2⟨φ,χ⟩⟨ψ,χ⟩` to `⟨φ,ψ⟩ = ∑_χ ⟨φ,χ⟩⟨χ,ψ⟩`; the only
 self-conjugate irreducible is the trivial one (`G` odd, Peterfalvi (1.1)), whose contribution is

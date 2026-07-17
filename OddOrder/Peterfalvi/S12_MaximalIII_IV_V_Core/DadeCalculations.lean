@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry106
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
@@ -286,7 +287,8 @@ two nontrivial columns `j, k ≠ 0`, the coherent images satisfy
 `μ_j^{τ₁} − δ·∑_i ω_{ij}^σ` does **not depend on the column `j`**.
 
 This is the honest §10-native column reduction of (10.6)(a): the difference
-`μ_j − μ_k = ∑_i(α_{ij} − α_{ik})` is `A_0(M)`-supported (each `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` is,
+`μ_j − μ_k = ∑_i(α_{ij} − α_{ik})` is `A_0(M)`-supported (each `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`
+is,
 `CharacterParameters.alpha_support`), so the coherent extension agrees there with the Dade isometry
 `τ` (`CoherentHypothesis.coherent.extends_on_supported`), and
 `τ(μ_j − μ_k) = δ·(∑ω_{ij}^σ − ∑ω_{ik}^σ)` is the landed (10.5) column-sum identity
@@ -391,7 +393,8 @@ count.  By (5.5) (`exists_muColumn_tau1_eq_sum_R`), `μ_j^{τ₁} = ∑_{x ∈ T
 orthonormal family and `|T| = ‖μ_j^{τ₁}‖² = w₁`.  The reduction
 `(ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁}) = δ` (`omegaSigmaDiff_inner_muColumn_tau1`) computes, against the
 `T`-sum, to `δ·[(false, i) ∈ T]` (the cross-column `j'` and the trivial column `0` are orthogonal);
-since `δ ≠ 0`, every `(false, i) ∈ T`.  So `{false} × univ ⊆ T` with both of cardinality `w₁`, forcing
+since `δ ≠ 0`, every `(false, i) ∈ T`. So `{false} × univ ⊆ T` with both of cardinality `w₁`,
+forcing
 `T = {false} × univ` and `μ_j^{τ₁} = ∑_i δ·ω_{ij}^σ = δ·∑_i ω_{ij}^σ`. -/
 theorem Hypothesis.muColumn_tau1_pin [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
@@ -496,7 +499,8 @@ is mapped through the `ℤ`-linear Dade map `τ`.  Then `τ(μ_k − dζ) = δ�
 `τ(α_{ik}) = δ(ω_{ik}^σ − ω_{i0}^σ) − nζ^{τ₁}` (`alpha_tau_image`); the `δ∑ω_{ik}^σ` cancel and
 `(w₁n − d)ζ^{τ₁} = −δζ^{τ₁}`, giving `δ·τ(μ_0 − ζ) = δ∑ω_{i0}^σ − δζ^{τ₁}`; cancel `δ` (`δ² = 1`).
 
-This is `STEP 1` of (10.6)(b) (issue 1009); the remaining `STEP 2` (`τ(μ_0 − ζ)` vanishes off `Ã(M)`,
+This is `STEP 1` of (10.6)(b) (issue 1009); the remaining `STEP 2` (`τ(μ_0 − ζ)` vanishes off
+`Ã(M)`,
 the tame support) + `STEP 3` parity then give `|ζ^{τ₁}(g)| ≥ 1`. -/
 theorem Hypothesis.tau_muColumnZero_sub_zeta_eq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
@@ -603,7 +607,8 @@ the Dade image `φ^τ = hyp.tau φ` has the same trivial-character multiplicity 
 `⟨φ^τ, 1_G⟩ = ⟨φ, 1_M⟩`.
 
 The genuine §10 Dade isometry `hyp.tau` agrees on the supported subspace with the §4 Dade map
-`hyp.dadeData.dade.dadeMap` (`dadeIntegralCharacterMap_apply_of_support`); the Peterfalvi (2.7) adjoint
+`hyp.dadeData.dade.dadeMap` (`dadeIntegralCharacterMap_apply_of_support`); the Peterfalvi (2.7)
+adjoint
 formula `adjoint_formula` with `χ = 1_G` gives `⟨dadeMap ⟨φ,_⟩, 1_G⟩ = ⟨φ, ψ⟩`, where the coset
 average `ψ = adjointAverageFun 1_G` is the constant `1` (`|H(a)|⁻¹·∑_{x ∈ H(a)} 1 = 1`), i.e. the
 trivial character `1_M`.  This is the `a_{00} = ((μ_0 − ζ)^τ, 1_G) = (μ_0 − ζ, 1_M)` computation
@@ -644,10 +649,12 @@ open scoped FiniteInduce in
 `φ` on `M` supported on `A_0(M)`, the Dade image `φ^τ = hyp.tau φ` *vanishes* at any
 `g ∉ Ã(M) = hyp.dadeData.dade.dadeSupport`.
 
-The genuine §10 Dade isometry `hyp.tau` is `S07.dadeIntegralCharacterMap hyp.dadeData.dade …`; on the
+The genuine §10 Dade isometry `hyp.tau` is `S07.dadeIntegralCharacterMap hyp.dadeData.dade …`; on
+the
 supported subspace it agrees with the §4 Dade map `hyp.dadeData.dade.dadeMap`
 (`dadeIntegralCharacterMap_apply_of_support`), which vanishes off `dadeSupport`
-(`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`).  This is the general "vanishes off `Ã(M)`" companion
+(`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`). This is the general "vanishes off `Ã(M)`"
+companion
 of `dadeIntegralCharacterMap_apply_one_eq_zero` (the `g = 1` special case), and the `Ã(M)`-vanishing
 step of (10.6)(b) (issue 1009, STEP 2). -/
 theorem Hypothesis.tau_apply_eq_zero_of_not_mem_dadeSupport [Finite G] {M : Subgroup G}
@@ -767,7 +774,8 @@ aligned grid): for `g : G` of order prime to `w₁`, each `ω_{i0}^σ(g)` is a r
 
 The aligned grid is `ω_{i0}^σ = σ(ω(ξ_i))` for the transported linear character
 `ξ_i = (omegaProdChar (w1CharEquiv i) χ₂).comp e` of `tic.W` (column-`0` dual `χ₂ = 1`).  As column
-`0` is trivial, `ξ_i` factors through `W₁` (`omegaProdChar_one_right`), so `orderOf ξ_i ∣ |W₁| = w₁`;
+`0` is trivial, `ξ_i` factors through `W₁` (`omegaProdChar_one_right`), so
+`orderOf ξ_i ∣ |W₁| = w₁`;
 since `(orderOf g)` is coprime to `w₁` it is coprime to `orderOf ξ_i`, and (3.9)(c)
 (`exists_intCast_sigma_omega_apply`) gives the integer. -/
 theorem Hypothesis.exists_intCast_alignedOmegaSigmaGrid_zero_column [Finite G]
@@ -845,7 +853,8 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (10.6)(b), STEP 3 — the principal grid value** ((4.4)/(3.2)(b)): the `(0,0)` entry
 of the aligned σ-grid is the trivial character `1_G`, `ω_{00}^σ = 1_G`.
 
-For `i = 0`, column `0`: the source `ξ_{00} = (omegaProdChar (w1CharEquiv 0) χ₂).comp e` is trivial —
+For `i = 0`, column `0`: the source `ξ_{00} = (omegaProdChar (w1CharEquiv 0) χ₂).comp e` is trivial
+—
 `w1CharEquiv 0 = 1` (`w1CharEquiv_zero`), `χ₂ = 1` (column `0`), so `omegaProdChar 1 1 = 1`
 (`omegaProdChar_one_one`) and `(1).comp e = 1`.  Then `tic.omega 1 = 1_{tic.W}` and
 `1_{tic.W}^σ = 1_G` (`sigma_trivial`). -/
@@ -1081,9 +1090,11 @@ open scoped FiniteInduce in
 By STEP 2 (`zeta_tau1_apply_eq_omegaSigma_sum_of_not_mem_dadeSupport`),
 `ζ^{τ₁}(g) = ∑_i ω_{i0}^σ(g)`.  Each `ω_{i0}^σ(g)` is a rational integer `n_i`
 (`exists_intCast_alignedOmegaSigmaGrid_zero_column`, (3.9)(c)), so `ζ^{τ₁}(g) = (∑_i n_i : ℤ)`.
-The terms pair under the row-conjugation involution `i ↦ i'` (`exists_rowInv_alignedOmegaSigma_conj`,
+The terms pair under the row-conjugation involution `i ↦ i'`
+(`exists_rowInv_alignedOmegaSigma_conj`,
 (3.9)(a)): `n_{i'} = n_i` (conjugation fixes the real integer), and the unique fixed point `i = 0`
-carries the principal value `n_0 = 1` (`alignedOmegaSigmaGrid_zero_zero`, `ω_{00}^σ = 1_G`).  Hence the
+carries the principal value `n_0 = 1` (`alignedOmegaSigmaGrid_zero_zero`, `ω_{00}^σ = 1_G`). Hence
+the
 off-principal terms sum to an even integer and `∑_i n_i = 1 + even` is odd; in particular
 `|ζ^{τ₁}(g)| ≥ 1`.  This closes (10.6)(b) (issue 1009). -/
 theorem Hypothesis.zeta_tau1_norm_ge_one [Finite G]
@@ -1184,7 +1195,8 @@ images, and outside the tame support the value of `zeta^tau1` has norm at least
 one.
 
 Conjunct (a) (the summed isometry) is the genuine `muColumn_tau1_pin` (the §10 specialisation of
-(5.8)).  Conjunct (b) (the (10.6)(b) parity bound) is now genuine and proven: off `Ã(M) = dadeSupport`,
+(5.8)). Conjunct (b) (the (10.6)(b) parity bound) is now genuine and proven: off
+`Ã(M) = dadeSupport`,
 at `g` of order prime to `w₁`, `ζ^{τ₁}(g)` is an **odd integer** (`zeta_tau1_norm_ge_one`), hence
 `|ζ^{τ₁}(g)| ≥ 1` — replacing the former opaque `zeta_tau1_norm_bound` placeholder field.  The
 (10.3)/(10.5) carrier pins (`hmu`/`hos`/`hzS`/`hz1`/`hzconj`/`hδpm`/`hδj`) are discharged by the

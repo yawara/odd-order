@@ -3,13 +3,15 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality
 /-!
 # KappaHallCommutator
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 
 /-!
 # BG Lemma 14.11 - Lemma 14.13 — global counting + subnormal closure
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
+split, issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -785,10 +787,12 @@ theorem kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde [Finite G]
     hNmax hNP hKM hK hKstar] at hmem
 
 /-- **`G^#` cover dichotomy** (the `⊆` of BG Corollary 14.9's `G^#` partition, both cases): every
-`g ≠ 1` lies in `𝒞_G(M̃)` for some maximal `M`, *or* in `𝒞_G(Ẑ)` for some exceptional pair `(K, K*)`.
+`g ≠ 1` lies in `𝒞_G(M̃)` for some maximal `M`, *or* in `𝒞_G(Ẑ)` for some exceptional pair
+`(K, K*)`.
 Immediate from `sigma_decomposition_dichotomy`: the signalizer branch gives `g ∈ M̃`
 (`mem_Mtilde_of_mem_coset`), the κ branch gives `g ∈ 𝒞_G(Ẑ)`
-(`kappa_branch_dichotomy_mem_conjClassSet_zTilde`).  Unlike `exists_mem_conjClassSet_Mtilde_of_ne_one`
+(`kappa_branch_dichotomy_mem_conjClassSet_zTilde`). Unlike
+`exists_mem_conjClassSet_Mtilde_of_ne_one`
 this needs no all-type-`F` hypothesis — it covers the κ branch with the `Ẑ` piece. -/
 theorem exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {g : G} (hg : g ≠ 1) :

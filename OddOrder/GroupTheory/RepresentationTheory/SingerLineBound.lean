@@ -58,10 +58,12 @@ irreducible action of a finite commutative group `C` on an `𝔽_p`-module `M` o
 
 Assembles the two `SingerField` outputs — `|C| ∣ p^q − 1`
 (`isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible`, the Singer embedding `C ↪ 𝔽_{p^q}^×`)
-and `gcd(|C|, p − 1) = 1` (`coprime_card_sub_one_of_faithful_irreducible_comm_fpf`, the fixed-point-free
+and `gcd(|C|, p − 1) = 1` (`coprime_card_sub_one_of_faithful_irreducible_comm_fpf`, the
+fixed-point-free
 trivial intersection `C ∩ 𝔽_p^× = 1`) — through the arithmetic core
 `dvd_div_of_coprime_of_dvd_sub_one`.  This is the divisibility Peterfalvi (13.2.c) reads for `u` in
-the Galois branch of `typeP_Galois` (issue 9000; consumed by `basic_structure.u_bound` and the Galois
+the Galois branch of `typeP_Galois` (issue 9000; consumed by `basic_structure.u_bound` and the
+Galois
 branch of (13.12) `c_eq_one`). -/
 theorem card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf
     {p q : ℕ} [Fact p.Prime] {C M : Type u}
