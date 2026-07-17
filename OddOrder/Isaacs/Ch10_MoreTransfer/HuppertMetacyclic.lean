@@ -53,6 +53,7 @@ open OddOrder.Isaacs.Ch04
 open OddOrder.BG.Ch1
 open OddOrder.BG.Ch1_Preliminary
 open scoped commutatorElement
+open scoped Pointwise
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
@@ -411,7 +412,180 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     exact hU2invN n
   obtain ⟨X, hXinv, hXinf, hXsup⟩ :=
     exists_aInvariant_complement_of_isElementaryAbelian hpE2 hcop2 hEea hU2inv
-  sorry
+  -- ### Step 8: `H := X.comap mk'` has a unique order-`p` subgroup, hence is cyclic
+  set H_P : Subgroup ↥P := X.comap (QuotientGroup.mk' (Subgroup.center ↥P))
+    with hH_P_def
+  -- `V ⊓ H ≤ Z`: an element of both maps into `U₂ ⊓ X = ⊥`
+  have hVH_le_Z : Omega ↥P p 1 ⊓ H_P ≤ Subgroup.center ↥P := by
+    rintro v ⟨hvV, hvH⟩
+    have h1 : (QuotientGroup.mk' (Subgroup.center ↥P)) v ∈ U2 ⊓ X := by
+      refine ⟨?_, hvH⟩
+      rw [hU2_def]
+      exact Subgroup.mem_map_of_mem _ hvV
+    rw [hXinf, Subgroup.mem_bot] at h1
+    rwa [← QuotientGroup.eq_one_iff v]
+  -- `|V ⊓ H| ≤ p` (otherwise `V ≤ H` and then `V ≤ Z`, contradiction)
+  have hD_card : Nat.card ↥(Omega ↥P p 1 ⊓ H_P : Subgroup ↥P) ≤ p := by
+    by_contra hgt
+    push Not at hgt
+    -- card divides p² and exceeds p, so it is p²; then V ⊓ H = V forces V ≤ Z
+    have hdvd : Nat.card ↥(Omega ↥P p 1 ⊓ H_P : Subgroup ↥P) ∣ p ^ 2 := by
+      rw [← hVcard]
+      exact Subgroup.card_dvd_of_le inf_le_left
+    obtain ⟨k, hk_le, hk⟩ := (Nat.dvd_prime_pow hp_prime).mp hdvd
+    interval_cases k
+    · rw [pow_zero] at hk; omega
+    · rw [pow_one] at hk; omega
+    · have heq : (Omega ↥P p 1 ⊓ H_P : Subgroup ↥P) = Omega ↥P p 1 := by
+        refine Subgroup.eq_of_le_of_card_ge inf_le_left ?_
+        rw [hk, hVcard]
+      exact hVnotZ (heq ▸ hVH_le_Z)
+  -- unique order-`p` subgroups in `↥H_P`
+  have hHuniq : ∀ K L : Subgroup ↥H_P, Nat.card ↥K = p → Nat.card ↥L = p → K = L := by
+    have hkey : ∀ K : Subgroup ↥H_P, Nat.card ↥K = p →
+        K = (Omega ↥P p 1 ⊓ H_P).subgroupOf H_P := by
+      intro K hK
+      have hle : K ≤ (Omega ↥P p 1 ⊓ H_P).subgroupOf H_P := by
+        intro k hk
+        rw [Subgroup.mem_subgroupOf]
+        refine ⟨?_, (k : ↥H_P).2⟩
+        refine Omega.mem_of_pow_eq_one ?_
+        rw [pow_one]
+        have h1 : (⟨k, hk⟩ : ↥K) ^ p = 1 := by rw [← hK]; exact pow_card_eq_one'
+        have h2 := congrArg (fun z : ↥K => ((z : ↥H_P) : ↥P)) h1
+        simpa using h2
+      refine Subgroup.eq_of_le_of_card_ge hle ?_
+      rw [hK]
+      calc Nat.card ↥((Omega ↥P p 1 ⊓ H_P).subgroupOf H_P)
+          = Nat.card ↥(Omega ↥P p 1 ⊓ H_P : Subgroup ↥P) :=
+            Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_right).toEquiv
+        _ ≤ p := hD_card
+    intro K L hK hL
+    rw [hkey K hK, hkey L hL]
+  have hHcyc : IsCyclic ↥H_P :=
+    OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd
+      (hPp.to_subgroup H_P) (hp_prime.odd_of_ne_two (by omega)) hHuniq
+  -- ### Step 9: `H ⊄ Z(P)`, hence some `u ∈ P` fails to centralize some `h₀ ∈ H`
+  have hU2ne_top : U2 ≠ ⊤ := by
+    intro htop
+    refine hnonab fun x y => ?_
+    -- `P = V ⊔ Z` would make `P` abelian
+    have hPVZ : ∀ w : ↥P, w ∈ Omega ↥P p 1 ⊔ Subgroup.center ↥P := by
+      intro w
+      have h1 : (QuotientGroup.mk' (Subgroup.center ↥P)) w ∈ U2 := by
+        rw [htop]; exact Subgroup.mem_top _
+      rw [hU2_def] at h1
+      obtain ⟨v, hv, hveq⟩ := h1
+      have hz : v⁻¹ * w ∈ Subgroup.center ↥P := QuotientGroup.eq.mp hveq
+      have : w = v * (v⁻¹ * w) := by group
+      rw [this]
+      exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hv) (Subgroup.mem_sup_right hz)
+    -- elements of `V ⊔ Z` commute
+    have hcommVZ : ∀ a b : ↥P, a ∈ Omega ↥P p 1 ⊔ Subgroup.center ↥P →
+        b ∈ Omega ↥P p 1 ⊔ Subgroup.center ↥P → a * b = b * a := by
+      have hmul : ∀ c : ↥P, c ∈ Omega ↥P p 1 ⊔ Subgroup.center ↥P →
+          ∃ v ∈ Omega ↥P p 1, ∃ z ∈ Subgroup.center ↥P, c = v * z := by
+        intro c hc
+        have : c ∈ (Omega ↥P p 1 : Set ↥P) * (Subgroup.center ↥P : Set ↥P) := by
+          rw [← Subgroup.mul_normal]
+          exact hc
+        obtain ⟨v, hv, z, hz, hvz⟩ := this
+        exact ⟨v, hv, z, hz, hvz.symm⟩
+      intro a b ha hb
+      obtain ⟨v₁, hv₁, z₁, hz₁, rfl⟩ := hmul a ha
+      obtain ⟨v₂, hv₂, z₂, hz₂, rfl⟩ := hmul b hb
+      have cz₁ : ∀ g : ↥P, Commute g z₁ := fun g => Subgroup.mem_center_iff.mp hz₁ g
+      have cz₂ : ∀ g : ↥P, Commute g z₂ := fun g => Subgroup.mem_center_iff.mp hz₂ g
+      have cv : Commute v₁ v₂ := by
+        have := hVea.comm ⟨v₁, hv₁⟩ ⟨v₂, hv₂⟩
+        simpa [Commute, SemiconjBy] using congrArg Subtype.val this
+      exact ((cv.mul_right (cz₂ v₁)).mul_left
+        (((cz₁ v₂).symm).mul_right (cz₂ z₁)))
+    exact hcommVZ x y (hPVZ x) (hPVZ y)
+  have hXne_bot : X ≠ ⊥ := by
+    intro hbot
+    rw [hbot, sup_bot_eq] at hXsup
+    exact hU2ne_top hXsup
+  obtain ⟨h₀, hh₀H, hh₀Z⟩ : ∃ h₀ : ↥P, h₀ ∈ H_P ∧ h₀ ∉ Subgroup.center ↥P := by
+    obtain ⟨⟨ξ, hξX⟩, hξne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hXne_bot
+    obtain ⟨h₀, rfl⟩ := QuotientGroup.mk'_surjective (Subgroup.center ↥P) ξ
+    refine ⟨h₀, hξX, fun hz => hξne (Subtype.ext ?_)⟩
+    show (QuotientGroup.mk' (Subgroup.center ↥P)) h₀ = 1
+    rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+  obtain ⟨u, hu⟩ : ∃ u : ↥P, u * h₀ ≠ h₀ * u := by
+    by_contra hall
+    push Not at hall
+    exact hh₀Z (Subgroup.mem_center_iff.mpr fun g => hall g)
+  -- ### Step 10: `N/C_N(H)` embeds in the abelian `Aut(H)`
+  have hH_Pinv : IsAInvariant φ₀ H_P := by
+    rw [hH_P_def]
+    refine isAInvariant_comap_mk' hZinv ?_
+    intro n
+    exact hXinv (QuotientGroup.mk n)
+  set H2 : Subgroup N := H_P.map P.subtype with hH2_def
+  haveI hH2n : H2.Normal := by
+    constructor
+    intro x hx n
+    rw [hH2_def] at hx ⊢
+    obtain ⟨w, hw, rfl⟩ := hx
+    refine ⟨(φ₀ n) w, hH_Pinv.smul_mem n hw, ?_⟩
+    simp [hφ₀_def]
+  haveI hH2cyc : IsCyclic ↥H2 := by
+    haveI := hHcyc
+    exact isCyclic_of_surjective
+      (Subgroup.equivMapOfInjective H_P P.subtype P.subtype_injective).toMonoidHom
+      (Subgroup.equivMapOfInjective H_P P.subtype P.subtype_injective).surjective
+  set ψ2 : N →* MulAut ↥H2 := MulAut.conjNormal with hψ2_def
+  -- `Aut(H)` is abelian since `H` is cyclic
+  let e := IsCyclic.mulAutMulEquiv ↥H2
+  letI : CommGroup (MulAut ↥H2) := e.toMonoidHom.commGroupOfInjective e.injective
+  have hN'ker : commutator N ≤ ψ2.ker := by
+    rw [commutator_def, Subgroup.commutator_le]
+    intro g₁ _ g₂ _
+    rw [MonoidHom.mem_ker, map_commutatorElement]
+    exact commutatorElement_eq_one_iff_mul_comm.mpr (mul_comm _ _)
+  -- `p` divides the index of the kernel: `u` acts nontrivially
+  have hp_ker : p ∣ ψ2.ker.index := by
+    have hxker : (u : N) ∉ ψ2.ker := by
+      intro hker
+      rw [MonoidHom.mem_ker] at hker
+      have h1 := congrArg (fun ψ : MulAut ↥H2 =>
+        ((ψ ⟨(h₀ : N), Subgroup.mem_map_of_mem _ hh₀H⟩ : ↥H2) : N)) hker
+      simp only [hψ2_def, MulAut.one_apply] at h1
+      have h2 : (u : N) * (h₀ : N) * (u : N)⁻¹ = (h₀ : N) := by
+        rw [show (((MulAut.conjNormal (u : N))
+              ⟨(h₀ : N), _⟩ : ↥H2) : N)
+            = (u : N) * (h₀ : N) * (u : N)⁻¹ from rfl] at h1
+        exact h1
+      refine hu ?_
+      apply Subtype.ext
+      have : (u : N) * (h₀ : N) = (h₀ : N) * (u : N) := by
+        calc (u : N) * (h₀ : N) = ((u : N) * (h₀ : N) * (u : N)⁻¹) * (u : N) := by group
+          _ = (h₀ : N) * (u : N) := by rw [h2]
+      exact_mod_cast this
+    obtain ⟨k, hk⟩ := hPp u
+    have hxpow : ((u : N)) ^ p ^ k = 1 := by
+      have := congrArg (Subtype.val) hk
+      simpa using this
+    set y : N ⧸ ψ2.ker := QuotientGroup.mk (u : N) with hy_def
+    have hyne : y ≠ 1 := by
+      rw [hy_def, Ne, QuotientGroup.eq_one_iff]
+      exact hxker
+    have hypow : y ^ p ^ k = 1 := by
+      rw [hy_def, ← QuotientGroup.mk_pow, hxpow, QuotientGroup.mk_one]
+    have hdvd : orderOf y ∣ p ^ k := orderOf_dvd_of_pow_eq_one hypow
+    obtain ⟨j, hj_le, hj⟩ := (Nat.dvd_prime_pow hp_prime).mp hdvd
+    have hj1 : 1 ≤ j := by
+      rcases Nat.eq_zero_or_pos j with h0 | h1
+      · exfalso
+        rw [h0, pow_zero, orderOf_eq_one_iff] at hj
+        exact hyne hj
+      · exact h1
+    calc p ∣ p ^ j := dvd_pow_self p (by omega)
+      _ = orderOf y := hj.symm
+      _ ∣ Nat.card (N ⧸ ψ2.ker) := orderOf_dvd_natCard y
+      _ = ψ2.ker.index := (Subgroup.index_eq_card ψ2.ker).symm
+  exact dvd_trans hp_ker (Subgroup.index_dvd_of_le hN'ker)
 
 /-- **Isaacs Theorem 10.15**, inductive core: if `P ⊴ N` is a nonabelian
 metacyclic Sylow `p`-subgroup (`p`-group of full `p`-part: `p ∤ |N : P|`) with
