@@ -300,4 +300,101 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
 
 end Prop2Bridge
 
+universe u v w
+
+section Prop2Companion
+
+variable {F : Type u} {E : Type v} {U : Type w}
+variable [Field F] [CommGroup E] [Module F (Additive E)] [Group U]
+
+private lemma additive_ofMul_ne_zero {s : E} (hs : s ≠ 1) :
+    Additive.ofMul s ≠ 0 := by
+  intro h
+  apply hs
+  apply Additive.ofMul.injective
+  simpa using h
+
+private lemma ringAut_eq_of_semilinear
+    {g : Additive E ≃+ Additive E} {s : Additive E} (hs : s ≠ 0)
+    {c d : F ≃+* F}
+    (hc : ∀ a : F, g (a • s) = c a • g s)
+    (hd : ∀ a : F, g (a • s) = d a • g s) : c = d := by
+  ext a
+  have hgs : g s ≠ 0 := by simpa using g.injective.ne hs
+  apply smul_left_injective F hgs
+  exact (hc a).symm.trans (hd a)
+
+/-- **Peterfalvi, Appendix I, Proposition 2(b)** (coherent semilinear companion).
+If every element of U is semilinear for some field automorphism, then those uniquely determined
+automorphisms assemble into a group homomorphism from U to the field automorphism group.
+The nonidentity point supplies the nonzero vector needed for uniqueness. -/
+theorem exists_semilinear_companion
+    (rho : U →* MulAut E) (s : E) (hs : s ≠ 1)
+    (hsemi : ∀ u : U, ∃ c : F ≃+* F, ∀ (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        c a • (MulEquiv.toAdditive (rho u)) x) :
+    ∃ companion : U →* (F ≃+* F), ∀ (u : U) (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        companion u a • (MulEquiv.toAdditive (rho u)) x := by
+  let c : U → (F ≃+* F) := fun u ↦ Classical.choose (hsemi u)
+  have hc (u : U) : ∀ (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        c u a • (MulEquiv.toAdditive (rho u)) x :=
+    Classical.choose_spec (hsemi u)
+  have hs0 : Additive.ofMul s ≠ 0 := additive_ofMul_ne_zero hs
+  have cone : c 1 = 1 := by
+    apply ringAut_eq_of_semilinear (g := MulEquiv.toAdditive (rho 1)) hs0
+    · exact fun a ↦ hc 1 a (Additive.ofMul s)
+    · intro a
+      simp
+  have cmul (u v : U) : c (u * v) = c u * c v := by
+    apply ringAut_eq_of_semilinear (g := MulEquiv.toAdditive (rho (u * v))) hs0
+    · exact fun a ↦ hc (u * v) a (Additive.ofMul s)
+    · intro a
+      rw [map_mul]
+      change (MulEquiv.toAdditive (rho u))
+          ((MulEquiv.toAdditive (rho v)) (a • Additive.ofMul s)) = _
+      rw [hc v a (Additive.ofMul s)]
+      rw [hc u (c v a) ((MulEquiv.toAdditive (rho v)) (Additive.ofMul s))]
+      rfl
+  let companion : U →* (F ≃+* F) :=
+    { toFun := c
+      map_one' := cone
+      map_mul' := cmul }
+  exact ⟨companion, hc⟩
+
+/-- **Peterfalvi, Appendix I, Proposition 2(b)** (point-stabilizer embedding).
+On a one-dimensional F-space, a faithful group of semilinear maps fixing a nonzero point embeds
+into the field automorphism group: a trivial companion fixes every scalar multiple of the point,
+hence fixes the whole space.  Together with MonoidHom.ofInjective this identifies the point
+stabilizer with a subgroup of RingAut F, exactly as in the textbook. -/
+theorem exists_injective_semilinear_companion
+    (rho : U →* MulAut E) (s : E) (hs : s ≠ 1)
+    (hdim : Module.finrank F (Additive E) = 1)
+    (hfix : ∀ u : U, rho u s = s) (hrho : Function.Injective rho)
+    (hsemi : ∀ u : U, ∃ c : F ≃+* F, ∀ (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        c a • (MulEquiv.toAdditive (rho u)) x) :
+    ∃ companion : U →* (F ≃+* F), Function.Injective companion ∧
+      ∀ (u : U) (a : F) (x : Additive E),
+        (MulEquiv.toAdditive (rho u)) (a • x) =
+          companion u a • (MulEquiv.toAdditive (rho u)) x := by
+  obtain ⟨companion, hcompanion⟩ := exists_semilinear_companion rho s hs hsemi
+  refine ⟨companion, ?_, hcompanion⟩
+  apply (injective_iff_map_eq_one companion).2
+  intro u hu
+  apply hrho
+  have hs0 : Additive.ofMul s ≠ 0 := additive_ofMul_ne_zero hs
+  have hfixA : (MulEquiv.toAdditive (rho u)) (Additive.ofMul s) = Additive.ofMul s := hfix u
+  have hrho_one : rho u = 1 := by
+    ext x
+    apply Additive.ofMul.injective
+    change (MulEquiv.toAdditive (rho u)) (Additive.ofMul x) = Additive.ofMul x
+    obtain ⟨a, ha⟩ := exists_smul_eq_of_finrank_eq_one hdim hs0 (Additive.ofMul x)
+    rw [← ha, hcompanion u a (Additive.ofMul s), hu, hfixA]
+    rfl
+  simpa using hrho_one
+
+end Prop2Companion
+
 end OddOrder.Peterfalvi.Appendices.Huppert

@@ -6992,6 +6992,16 @@ field automorphisms `σ_y`.  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear
 
+/-! **Peterfalvi, Appendix I, Proposition 2(b)**: the elementwise field automorphisms
+attached to semilinear maps form a coherent group homomorphism; on a faithful
+one-dimensional point stabilizer this homomorphism is injective. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_semilinear_companion
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_injective_semilinear_companion
+
 /-! **Peterfalvi, Appendix II (Near-Fields), Proposition 2 — irreducibility/counting + field
 structure** (`NearFields`).  The orbit-counting engine (`add_one_le_card_of_aInvariant_ne_bot`: an
 `A`-invariant `U ≠ ⊥` has `|A| + 1 ≤ |U|`), the elementary-abelian Maschke split
