@@ -338,6 +338,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.5 (Transfer): Thm 5.21 (Focal Subgroup Theorem)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.focalSubgroupTheorem
 
+-- Ch.5 (Transfer): Thm 5.24 (nilpotent maximal subgroup of a finite simple group is a p-group)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.exists_isPGroup_of_isCoatom_of_isNilpotent
+
 -- Ch.5 (Transfer): Thm 5.25 (normal p-complement iff Sylow controls own fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_controlsOwnFusion
 
