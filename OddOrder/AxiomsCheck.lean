@@ -153,6 +153,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -6980,6 +6981,22 @@ The automorphism group of a finite field, and hence every subgroup `A`, is cycli
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.ringAut_isCyclic_of_finite
+
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 3 preparation**: the image `K̄` is
+`F(D̄)`, the image `V̄` is the distinguished-point stabilizer, the Fitting action on `Q₀`
+is irreducible, and `D̄ = K̄ ⋊ V̄`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Kbar_eq_fitting
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Vbar_eq_pointStabilizer
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingAction_irreducible
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.KbarSemidirectEquiv
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
