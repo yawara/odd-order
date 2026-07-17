@@ -31,13 +31,13 @@ Proposition 2 runs:
   (§1 Prop 5) fixes the point `s ∈ Q₀^#`, so fixed-point-freeness kills it.
 * `Ā ⊆ J̄`: the Lemma (a) in endomorphism form
   (`map_eq_inv_of_forall_fixed_eq_one`) applied to `τ` on `Ā`.
-* `J̄ = K̄` (image of `K`): a coset inverted by `τ` contains an element of
-  `K` (an explicit `W`-correction using that representatives commute with
-  the error term `w = d(tdt) ∈ W`).
 * `J̄ ⊆ Ā`: with `B̄` the preimage in `D̄` of the `τ`-inverted subgroup of the
   abelian quotient `D̄/Ā`, one has `C_B̄(τ) = 1`, so `τ` inverts `B̄`, making
   `B̄` an abelian normal subgroup of `D̄`; hence `J̄ ⊆ B̄ ≤ F(D̄) = Ā`
   (Fitting's theorem, `nilpotent_normal_le_fitting`).
+* `J̄ = K̄` (image of `K`): a coset inverted by `τ` contains an element of
+  `K` (an explicit `W`-correction using that representatives commute with
+  the error term `w = d(tdt) ∈ W`).
 * Hence `Ā = K̄` is cyclic of order `|K|` (the projection `K → K̄` is
   injective), and a generator lifts to `k ∈ K` with `K = ⟨k⟩`; normality of
   `⟨K⟩` in `D` is §1 Lemma (b).
@@ -47,6 +47,7 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.Isaacs.Ch01 (fitting)
 open OddOrder.Isaacs.Ch06 (actionFixedBy)
+open scoped IsMulCommutative
 
 namespace Hypothesis
 
@@ -408,6 +409,112 @@ lemma fitting_subset_inverted {y : hyp.Dbar} (hy : y ∈ fitting hyp.Dbar) :
     · exact ho
   -- §1 Lemma (a), endomorphism form.
   exact congrArg Subtype.val (map_eq_inv_of_forall_fixed_eq_one hodd σ hσ2 hfix ⟨y, hy⟩)
+
+/-! ## `J ⊆ Ā`: every `τ`-inverted element lies in `F(D̄)` (p. 103) -/
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103): if `τ` inverts
+`x ∈ D̄`, then `x ∈ Ā = F(D̄)`.
+
+In the abelian quotient `D̄/Ā`, the inverted elements form a subgroup; its full
+preimage `B` is normal in `D̄`.  A `τ`-fixed element of `B` maps to an involution
+in the odd-order quotient, hence lies in `Ā`, where `tau_fixed_fitting_eq_one`
+kills it.  Thus §1 Lemma (a) makes `τ` inversion on `B`, so `B` is abelian and
+Fitting maximality gives `B ≤ Ā`. -/
+lemma inverted_mem_fitting {x : hyp.Dbar} (hx : hyp.tau x = x⁻¹) :
+    x ∈ fitting hyp.Dbar := by
+  let F : Subgroup hyp.Dbar := fitting hyp.Dbar
+  have hFmap : F.map (hyp.tau : hyp.Dbar ≃* hyp.Dbar).toMonoidHom = F :=
+    (Subgroup.characteristic_iff_map_eq.mp inferInstance) hyp.tau
+  have htauF : ∀ z ∈ F, hyp.tau z ∈ F := fun z hz => by
+    rw [← hFmap]
+    exact Subgroup.mem_map_of_mem _ hz
+  let Q := hyp.Dbar ⧸ F
+  letI : IsMulCommutative Q :=
+    Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
+      hyp.fitting_Dbar_cyclic_fpf_abelian.2.2
+  letI : CommGroup Q := inferInstance
+  let tauQ : Q →* Q :=
+    QuotientGroup.map F F hyp.tau.toMonoidHom (fun z hz => htauF z hz)
+  have tauQ_mk (z : hyp.Dbar) :
+      tauQ (QuotientGroup.mk' F z) = QuotientGroup.mk' F (hyp.tau z) := rfl
+  have htauQ2 (q : Q) : tauQ (tauQ q) = q := by
+    obtain ⟨z, rfl⟩ := QuotientGroup.mk'_surjective F q
+    rw [tauQ_mk, tauQ_mk, hyp.tau_involutive]
+  let Jq : Subgroup Q := MonoidHom.eqLocus tauQ invMonoidHom
+  let B : Subgroup hyp.Dbar := Jq.comap (QuotientGroup.mk' F)
+  haveI hJqN : Jq.Normal := Subgroup.normal_of_isMulCommutative Jq
+  haveI hBN : B.Normal := hJqN.comap (QuotientGroup.mk' F)
+  have hmemB_iff (z : hyp.Dbar) :
+      z ∈ B ↔ tauQ (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ := Iff.rfl
+  have hxB : x ∈ B := by
+    rw [hmemB_iff, tauQ_mk]
+    simpa using congrArg (QuotientGroup.mk' F) hx
+  have htauB : ∀ z ∈ B, hyp.tau z ∈ B := by
+    intro z hz
+    rw [hmemB_iff, tauQ_mk]
+    have hzq : tauQ (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ :=
+      (hmemB_iff z).mp hz
+    rw [hyp.tau_involutive, ← tauQ_mk]
+    have hi := congrArg Inv.inv hzq
+    simpa using hi.symm
+  have hoddQ : Odd (Nat.card Q) := by
+    have hdvd : Nat.card Q ∣ Nat.card hyp.Dbar := by
+      rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (s := F)]
+      exact Dvd.intro _ rfl
+    rcases Nat.even_or_odd (Nat.card Q) with he | ho
+    · exact absurd hyp.odd_card_Dbar
+        (Nat.not_odd_iff_even.mpr (even_iff_two_dvd.mpr (dvd_trans he.two_dvd hdvd)))
+    · exact ho
+  have hoddB : Odd (Nat.card ↥B) := by
+    rcases Nat.even_or_odd (Nat.card ↥B) with he | ho
+    · exact absurd hyp.odd_card_Dbar
+        (Nat.not_odd_iff_even.mpr (even_iff_two_dvd.mpr
+          (dvd_trans he.two_dvd (Subgroup.card_subgroup_dvd_card B))))
+    · exact ho
+  let sigma : ↥B →* ↥B :=
+    { toFun := fun z => ⟨hyp.tau z, htauB z z.2⟩
+      map_one' := Subtype.ext (by simp)
+      map_mul' := fun a b => Subtype.ext (by push_cast; rw [map_mul]) }
+  have hsigma2 : ∀ z, sigma (sigma z) = z := fun z =>
+    Subtype.ext (hyp.tau_involutive z)
+  have hfix : ∀ z, sigma z = z → z = 1 := by
+    intro z hz
+    have hzfix : hyp.tau (z : hyp.Dbar) = z := congrArg Subtype.val hz
+    have hzJ : tauQ (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ :=
+      (hmemB_iff z).mp z.2
+    have hqfix : tauQ (QuotientGroup.mk' F z) = QuotientGroup.mk' F z := by
+      rw [tauQ_mk, hzfix]
+    have hqinv : (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ :=
+      hqfix.symm.trans hzJ
+    have hq2 : (QuotientGroup.mk' F z) ^ 2 = 1 := by
+      rw [pow_two]
+      nth_rewrite 1 [hqinv]
+      rw [inv_mul_cancel]
+    have hoddTop : Odd (Nat.card ↥(⊤ : Subgroup Q)) := by simpa using hoddQ
+    have hq1 : QuotientGroup.mk' F z = 1 :=
+      eq_one_of_sq_eq_one_of_odd_card hoddTop (Subgroup.mem_top _) hq2
+    have hzF : (z : hyp.Dbar) ∈ F :=
+      (QuotientGroup.eq_one_iff (N := F) (z : hyp.Dbar)).mp hq1
+    exact Subtype.ext (hyp.tau_fixed_fitting_eq_one hzF hzfix)
+  have hinvB : ∀ z ∈ B, hyp.tau z = z⁻¹ := by
+    intro z hz
+    exact congrArg Subtype.val
+      (map_eq_inv_of_forall_fixed_eq_one hoddB sigma hsigma2 hfix ⟨z, hz⟩)
+  haveI hBcomm : IsMulCommutative ↥B := isMulCommutative_iff.mpr fun a b => by
+    apply Subtype.ext
+    have hab := hinvB ((a : hyp.Dbar) * b) (B.mul_mem a.2 b.2)
+    rw [map_mul, hinvB a a.2, hinvB b b.2, mul_inv_rev] at hab
+    have hab' := congrArg Inv.inv hab
+    simpa [mul_inv_rev] using hab'.symm
+  letI : CommGroup ↥B := inferInstance
+  haveI : Group.IsNilpotent ↥B := inferInstance
+  exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting hxB
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
+`Ā = J̄`; membership in `F(D̄)` is equivalent to being inverted by `τ`. -/
+lemma mem_fitting_iff_tau_eq_inv {x : hyp.Dbar} :
+    x ∈ fitting hyp.Dbar ↔ hyp.tau x = x⁻¹ :=
+  ⟨hyp.fitting_subset_inverted, hyp.inverted_mem_fitting⟩
 
 end Hypothesis
 

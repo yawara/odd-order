@@ -85,11 +85,14 @@
      App I gate closure により axiom-clean。
    - ✅ **Ā⊆J** (`fitting_subset_inverted`): τ が Ā 全元を反転。Ā characteristic ⟹ τ|_Ā は
      involutive endo で 1 のみ固定 (C_Ā(τ)=1) ⟹ Lemma(a) endo 形で全反転。
-   - **次 (残り 3 step)**: **J⊆Ā** (D̄/Ā abelian ⟹ B̄=τ-反転部分群、C_B̄(τ)⊆C_Ā(τ)⊆1... 実際は
-     C_B(τ)⊆C_A(τ)⊆W ⟹ τ が B̄ 反転 ⟹ B̄ abelian normal ⟹ Fitting で B̄≤Ā;
-     `nilpotent_normal_le_fitting`) → **Ā=J** → **A=KW, |Ā|=|K|** (§1 Lemma(a) を A に:
-     A=(A∩K)(A∩V), Ā=J ⟹ K⊆A, A∩V=W) → **K=⟨k⟩ cyclic** (Ā cyclic は App I gate、K→K̄
-     単射) → K◁D (§1 Lemma(b))。
+   - ✅ **J⊆Ā / Ā=J** (`inverted_mem_fitting` / `mem_fitting_iff_tau_eq_inv`):
+     D̄/Ā の τ-反転元部分群を引き戻した正規部分群 B̄ を構成。τ-固定元は奇位数商で
+     自明となって Ā に入り、C_Ā(τ)=1 で消える。Lemma (a) により τ は B̄ を全反転、
+     よって B̄ は abelian・nilpotent、`nilpotent_normal_le_fitting` で B̄≤Ā。逆包含と
+     合わせて Ā=J。axiom-clean。
+   - **次**: Ā=J から **K⊆A** と **A∩V=W** を示し、§1 Lemma (a) を A に適用して
+     **A=KW, |Ā|=|K|**。次いで Ā の cyclicity と K→K̄ の単射から **K=⟨k⟩ cyclic**、
+     §1 Lemma (b) から K◁D。
    - ✅ **App I gate closure (2026-07-18)**: BG Lemma 4.5(a) の正規 type-`(p,p)`
      prerequisite と Huppert の order-`p` fixed-space decomposition の双方が
      sorry-free で着地 (issue 2004 / 2040 完了)。

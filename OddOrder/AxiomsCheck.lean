@@ -6903,6 +6903,16 @@ axiom-clean (issue 2040). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Huppert.fitting_cyclic_fixedPointFree
 
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 2**: the elements of `D̄` inverted by
+the involution `τ` are exactly `F(D̄)`.  The reverse inclusion constructs the inverted
+subgroup in `D̄/F(D̄)` and uses Fitting maximality.  Fully unconditional and axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inverted_mem_fitting
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_fitting_iff_tau_eq_inv
+
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
 `F = 𝔽_p[T] = End_{𝔽_p[T]}(E)` over which `E` is `1`-dimensional, with `|F| = |E|`.  The abstract
