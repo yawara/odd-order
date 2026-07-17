@@ -568,12 +568,14 @@ theorem pGroup_cyclic_fixedPointFree
         -- order-`p` subgroups `Tᵢ ≤ R`; `E = ⊕ C_E(Tᵢ)` (coprime `Z_p×Z_p` action) is
         -- a `P`-permuted decomposition with `≥ 2` parts, so part (1)
         -- (`fpf_of_constant_stabilizer_of_permuted_decomp`) forces `P` cyclic — contra.
-        -- BLOCKER: the normal type-`(p,p)` step is [H] III.7.5 = Gorenstein 5.4.10.  Schur
-        -- forces `Z(P)` cyclic, so `Ω₁(Z(P))` has order `p` and the repo's available
-        -- `exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_omega1Center`
-        -- (abelian-center case) does NOT apply — this is exactly the cyclic-center case
-        -- deferred in `BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` (≈ line 911).  See
-        -- issue 2004.  Off-FT-critical-path (Appendix B = Peterfalvi Part II).
+        --
+        -- STATUS (issue 2004): the normal type-`(p,p)` step ([H] III.7.5 = Gorenstein
+        -- 5.4.10, odd `p`) is now PROVED unconditionally as
+        -- `OddOrder.BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic`.
+        -- Remaining to close this sorry: (i) Schur's lemma making `End_{𝔽_q[P]}(E)` a
+        -- finite field ⟹ `Z(P)` cyclic; (ii) `|R ∩ Z(P)| = p` from `Z(P)` cyclic + `R`
+        -- normal type-`(p,p)`; (iii) the coprime `Z_p×Z_p` decomposition
+        -- `E = ⊕ C_E(Tᵢ)` feeding `fpf_of_constant_stabilizer_of_permuted_decomp`.
         sorry
     · push Not at hirr
       obtain ⟨U, hUinv, hUbot, hUtop⟩ := hirr

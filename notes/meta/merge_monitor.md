@@ -19,6 +19,20 @@
 > Pf Appendices の旧「凍結 scaffold (どのレーンも編集しない)」は失効 — 新フェーズでは b (Suzuki 系) /
 > c (NearFields/Huppert/SemilinearField/FeitSibley) が実 statement 置換で所有 (reallocation note §0-1)。
 >
+> **▶ carve-out (hub 裁定 2026-07-18 監視 tick — merge 5ecd19df): b の Suzuki 前提補題群を BG §4 +
+> Huppert に許可**。b の Suzuki チェーン (App B → Ch.I-III) は **Gorenstein 5.4.10 (= BG Lemma 4.5(a),
+> odd p)** と Huppert の補題を prerequisite として要求する。b はこれらを以下で証明:
+> `OddOrder/BG/Ch1_Preliminary/S04_SmallRankBasic.lean` (BG Lemma 4.5(a) 無条件版、issue 2004) /
+> `OddOrder/Peterfalvi/Appendices/Huppert.lean` (issue 2005) / 新 shared leaf
+> `OddOrder/GroupTheory/NormalElementaryAbelianPrimeSq.lean` (正規 elementary abelian 内の type-(p,p),
+> S04_SmallRankBasic が import → closure 内)。**c_re の regex に nominal に掛かる (BG/ + Huppert) が
+> 逸脱でない**: (i) 全て genuine な Suzuki prerequisite、(ii) **c は BG §4・Huppert を触っていない**
+> (c の active = BG §2 + RepTheory + Fong-Swan、file 衝突ゼロ)、(iii) 新 axiom なし・sorry 18 不変。
+> ⟹ step 1.5 で b が S04_SmallRankBasic / Appendices/Huppert / NormalElementaryAbelianPrimeSq を
+> 編集しても逸脱でない (c が同 file を触ったら要再調整)。⚠ b は新 shared leaf を 9000 でなく 2004
+> (自 range) で track した — dup 無し (他レーン未着手) ゆえ非問題だが、今後の新 shared leaf は
+> 9000 claim 推奨。
+>
 > **✅ 2026-07-15 CLOSED: `feitThompson` axiom-clean 達成 (tick #22) → 全レーン a/b/c 退役、監視終了。**
 > `#print axioms OddOrder.feitThompson` = [propext, Classical.choice, Quot.sound] (sorryAx なし)。
 > 経緯: b/c 退役 (tick #17、issue 0121) → A 単独 codex 5.6 ultra で残 root 除去 (#4/#7-half/#5) →

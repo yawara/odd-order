@@ -197,6 +197,82 @@ theorem fitting_Dbar_cyclic_fpf_abelian :
     hyp.isElementaryAbelian_Q0 hyp.conjQ0bar hyp.injective_conjQ0bar
     hyp.conjQ0bar_transitive
 
+/-! ## The involutive automorphism `τ` of `D̄` induced by `t`
+
+`t` normalizes `D` and centralizes `W ≤ V = C_D(t)` pointwise, so conjugation
+by `t` induces an involutive automorphism `τ` of `D̄ = D/W`.  The book writes
+this action exponentially (`ā ↦ āᵗ`). -/
+
+lemma t_mul_t : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+
+/-- `t` normalizes `D` (p. 100), in the form using `t⁻¹ = t`. -/
+lemma t_conj_mem_D' {x : G} (hx : x ∈ hyp.D) : hyp.t * x * hyp.t ∈ hyp.D := by
+  have := hyp.t_conj_mem_D hx
+  rwa [hyp.t_inv_eq] at this
+
+/-- Conjugation by `t` as an endomorphism of `D`. -/
+def tauD : ↥hyp.D →* ↥hyp.D where
+  toFun d := ⟨hyp.t * (d : G) * hyp.t, hyp.t_conj_mem_D' d.2⟩
+  map_one' := Subtype.ext (by
+    change hyp.t * ((1 : ↥hyp.D) : G) * hyp.t = ((1 : ↥hyp.D) : G)
+    rw [Subgroup.coe_one, mul_one]
+    exact hyp.t_mul_t)
+  map_mul' d e := Subtype.ext (by
+    change hyp.t * ((d : G) * (e : G)) * hyp.t =
+      (hyp.t * (d : G) * hyp.t) * (hyp.t * (e : G) * hyp.t)
+    calc hyp.t * ((d : G) * (e : G)) * hyp.t
+        = hyp.t * (d : G) * (hyp.t * hyp.t) * (e : G) * hyp.t := by
+          rw [hyp.t_mul_t]; group
+      _ = (hyp.t * (d : G) * hyp.t) * (hyp.t * (e : G) * hyp.t) := by group)
+
+@[simp] lemma tauD_apply_coe (d : ↥hyp.D) :
+    ((hyp.tauD d : ↥hyp.D) : G) = hyp.t * (d : G) * hyp.t := rfl
+
+lemma tauD_involutive (d : ↥hyp.D) : hyp.tauD (hyp.tauD d) = d := by
+  refine Subtype.ext ?_
+  change hyp.t * (hyp.t * (d : G) * hyp.t) * hyp.t = (d : G)
+  calc hyp.t * (hyp.t * (d : G) * hyp.t) * hyp.t
+      = (hyp.t * hyp.t) * (d : G) * (hyp.t * hyp.t) := by group
+    _ = (d : G) := by rw [hyp.t_mul_t, one_mul, mul_one]
+
+/-- `τ` fixes `W` pointwise: `W ≤ V = C_D(t)`. -/
+lemma tauD_apply_of_mem_W {d : ↥hyp.D} (hd : (d : G) ∈ hyp.W) : hyp.tauD d = d := by
+  refine Subtype.ext ?_
+  change hyp.t * (d : G) * hyp.t = (d : G)
+  have hc : Commute (d : G) hyp.t := hyp.commute_t_of_mem_V (hyp.W_le_V hd)
+  rw [← hc.eq, mul_assoc, hyp.t_mul_t, mul_one]
+
+lemma tauD_mem_W_subgroupOf {d : ↥hyp.D} (hd : d ∈ hyp.W.subgroupOf hyp.D) :
+    hyp.tauD d ∈ hyp.W.subgroupOf hyp.D := by
+  rw [Subgroup.mem_subgroupOf] at hd ⊢
+  rw [hyp.tauD_apply_of_mem_W hd]
+  exact hd
+
+/-- The endomorphism of `D̄ = D/W` induced by `tauD`. -/
+def tauHom : hyp.Dbar →* hyp.Dbar :=
+  QuotientGroup.map _ _ hyp.tauD fun _ hd => hyp.tauD_mem_W_subgroupOf hd
+
+@[simp] lemma tauHom_mk (d : ↥hyp.D) :
+    hyp.tauHom (QuotientGroup.mk d) = QuotientGroup.mk (hyp.tauD d) := rfl
+
+lemma tauHom_involutive (x : hyp.Dbar) : hyp.tauHom (hyp.tauHom x) = x := by
+  obtain ⟨d, rfl⟩ := QuotientGroup.mk_surjective x
+  rw [hyp.tauHom_mk, hyp.tauHom_mk, hyp.tauD_involutive]
+
+/-- **`τ`** — the involutive automorphism of `D̄` induced by conjugation by
+`t` (p. 103, written `ā ↦ āᵗ`). -/
+def tau : MulAut hyp.Dbar where
+  toFun := hyp.tauHom
+  invFun := hyp.tauHom
+  left_inv := hyp.tauHom_involutive
+  right_inv := hyp.tauHom_involutive
+  map_mul' := map_mul hyp.tauHom
+
+@[simp] lemma tau_apply (x : hyp.Dbar) : hyp.tau x = hyp.tauHom x := rfl
+
+lemma tau_involutive (x : hyp.Dbar) : hyp.tau (hyp.tau x) = x :=
+  hyp.tauHom_involutive x
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

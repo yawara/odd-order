@@ -20,6 +20,7 @@ import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.SCN
+import OddOrder.GroupTheory.NormalElementaryAbelianPrimeSq
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
@@ -917,11 +918,15 @@ We supply the pieces that the repo infrastructure proves cleanly and rigorously:
   if moreover `Ω₁(Z(R))` is noncyclic, the `E_{p²}` can be taken central, hence
   **normal**. This is the (clean) abelian-center case of 4.5(a).
 
-The remaining (nonabelian, cyclic-center) case of the *normal* refinement is exactly
-Gorenstein 5.4.10's substance and is deferred. Parts (b), (c) of Lemma 4.5 are also
-deferred (4.5(b) needs the cyclic-maximal-subgroup classification **G** 5.4.3/5.4.4;
-4.5(c) needs 4.5(a) + Prop 4.3(a) applied to `Z₂(R)` together with the *normal*
-refinement). -/
+The **unconditional** normal refinement (including the previously deferred
+nonabelian cyclic-center case) is now proved as
+`exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic` in §4E below (via a
+maximal abelian normal subgroup: noncyclic ⟹ invariant-subspace lemma on `Ω₁(A)`,
+cyclic ⟹ `R` metacyclic ⟹ `Ω₁(R)` is type `(p,p)`).
+
+Parts (b), (c) of Lemma 4.5 remain deferred (4.5(b) needs the cyclic-maximal-subgroup
+classification **G** 5.4.3/5.4.4; 4.5(c) needs 4.5(a) + Prop 4.3(a) applied to
+`Z₂(R)`). -/
 
 section ElementaryAbelianExistence
 
@@ -1693,5 +1698,80 @@ theorem isCyclic_of_card_omega1_le_prime (hR : IsPGroup p R) (hp_odd : Odd p)
       Subgroup.eq_of_le_of_card_ge (memle L hL) (by rw [hL]; exact hΩ)]
 
 end ConverseLemma45
+
+/-! ## §4E: BG Lemma 4.5(a) unconditional — Gorenstein 5.4.10 (odd `p`)
+
+The full normal type-`(p,p)` existence for odd noncyclic `p`-groups, closing the case
+that the abelian-center theorem
+`exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_omega1Center`
+left open (`Z(R)` cyclic).
+
+Proof (via a maximal abelian normal subgroup `A`, which is self-centralizing by
+Gorenstein 5.3.12, `centralizer_eq_self_of_maximal_abelian_normal`):
+
+* If `A` is **noncyclic**, then `A` has `p`-rank `≥ 2`, so `Ω₁(A)` is a normal
+  elementary abelian subgroup of order `≥ p²`; the invariant-subspace lemma
+  `exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal` extracts a normal
+  type-`(p,p)`.
+* If `A` is **cyclic**, then (`p` odd) `R` is metacyclic
+  (`isMetacyclic_of_isCyclic_selfCentralizing_normal`), so `Ω₁(R)` is itself
+  elementary abelian of order `p²` (BG Lemma 4.10,
+  `isElementaryAbelian_omega1_of_isMetacyclic`) and characteristic, hence normal.
+-/
+
+section NormalPrimeSqExistence
+
+open OddOrder.GroupTheory
+
+variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
+
+/-- **BG Lemma 4.5(a)** (= Gorenstein "Finite Groups" Theorem 5.4.10, odd-`p` case).
+A finite noncyclic `p`-group `R` with `p` odd has a **normal** elementary abelian
+subgroup of order `p²` (a normal subgroup of type `(p,p)`).
+
+This is the unconditional form; the abelian-center special case is
+`exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_omega1Center`. -/
+theorem exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+    (hR : IsPGroup p R) (hp_odd : Odd p) (hnc : ¬ IsCyclic R) :
+    ∃ B : Subgroup R, B.Normal ∧ B.IsElementaryAbelian p ∧ Nat.card B = p ^ 2 := by
+  have hp : p.Prime := Fact.out
+  have hp2 : p ≠ 2 := by rintro rfl; exact (by decide : ¬ Odd 2) hp_odd
+  -- a maximal abelian normal subgroup `A` (self-centralizing).
+  haveI hbotcomm : IsMulCommutative (⊥ : Subgroup R) :=
+    IsMulCommutative.of_comm (fun a b => Subsingleton.elim _ _)
+  obtain ⟨A, -, hAmax⟩ :=
+    exists_maximalAbelianNormal_ge (B := (⊥ : Subgroup R)) inferInstance hbotcomm
+  haveI hAn : A.Normal := hAmax.isNormal
+  haveI hAcomm_inst : IsMulCommutative A := hAmax.isMulCommutative
+  have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := fun x hx y hy =>
+    congrArg Subtype.val (mul_comm' (⟨x, hx⟩ : A) ⟨y, hy⟩)
+  have hself : Subgroup.centralizer (A : Set R) = A := (hAmax.isSCN hR).selfCentralizing
+  by_cases hAcyc : IsCyclic A
+  · -- `A` cyclic ⟹ `R` metacyclic ⟹ `Ω₁(R)` is type `(p,p)`.
+    have hmeta := isMetacyclic_of_isCyclic_selfCentralizing_normal hR hp2 hAcyc hself
+    obtain ⟨hOea, hOcard⟩ := isElementaryAbelian_omega1_of_isMetacyclic hR hp_odd hmeta hnc
+    haveI : (Omega R p 1).Characteristic := Omega.characteristic
+    exact ⟨Omega R p 1, inferInstance, hOea, hOcard⟩
+  · -- `A` noncyclic ⟹ `Ω₁(A)` is a noncyclic normal elementary abelian subgroup.
+    haveI hApg : IsPGroup p A := hR.to_subgroup A
+    obtain ⟨E, hE_ea, hE_card⟩ :=
+      exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic hApg hp_odd hAcyc
+    have h2 : (2 : ℕ) ≤ pRank A p := by
+      have hle := le_pRank (G := A) E hE_ea
+      rwa [hE_card, Nat.log_pow hp.one_lt] at hle
+    have hVea : (omega1OfAbelian R A p hA_comm).IsElementaryAbelian p :=
+      omega1OfAbelian_isElementaryAbelian
+    have hVcard : p ^ 2 ≤ Nat.card (omega1OfAbelian R A p hA_comm) :=
+      Nat.le_of_dvd Nat.card_pos
+        (pow_dvd_card_omega1OfAbelian_of_pos_le_pRank (by norm_num) h2)
+    haveI hV_normal : (omega1OfAbelian R A p hA_comm).Normal := by
+      refine ⟨fun v hv g => ?_⟩
+      rw [mem_omega1OfAbelian] at hv ⊢
+      exact ⟨hAn.conj_mem v hv.1 g, by rw [conj_pow, hv.2, mul_one, mul_inv_cancel]⟩
+    obtain ⟨B, hBn, -, hBea, hBcard⟩ :=
+      exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal hR hVea hVcard
+    exact ⟨B, hBn, hBea, hBcard⟩
+
+end NormalPrimeSqExistence
 
 end OddOrder.BG.Ch1.S04
