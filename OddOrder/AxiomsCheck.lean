@@ -152,6 +152,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -6969,6 +6970,16 @@ therefore `S` is commutative or an honest Suzuki `2`-group. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sylowTwo_isMulCommutative_or_isSuzuki2Group
+
+/-! **Peterfalvi Part II, Ch. I §2, definition before Proposition 3**:
+`𝓛(F,A) = (F_add ⋊ Fˣ) ⋊ A`, with the natural field-automorphism action.
+The automorphism group of a finite field, and hence every subgroup `A`, is cyclic. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.fieldRingAutOnAffine
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.ringAut_isCyclic_of_finite
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
