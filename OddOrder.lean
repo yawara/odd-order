@@ -129,6 +129,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
 import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
+import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
