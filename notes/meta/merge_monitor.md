@@ -716,6 +716,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #24、Fable hub) — ✅ b + c 合流 (a 変化なし)、census 23 不変**:
+  **b** = `e362436d` (**Thm 8.43 + K_m 共役等変性**、CommonDivisorGraph 890 行) を merge `b623e60f`:
+  build **4342 jobs green**。**c** = `2c932068` (**Cor 10.23** Δ(K)‾ ≅ K/K' via (k−1)‾ ↦ K'k、
+  AugmentationIdeal +359 = **1164 行**) を merge `b98554c2`: build **4342 jobs green**。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK・逸脱なし。push `f5b65977..b98554c2`。
+  size watch: AugmentationIdeal 1164 行 (1500 接近) — c 自身が「10.24/10.25 は新 leaf」と宣言済 ✓。
 - **2026-07-17 (tick #23、Fable hub) — ✅ a/b/c 全 3 レーン合流、census 23 不変。⭐ a が Isaacs Ch.5 完走 (全 30 結果)**:
   **a** = `7fe79bc1` (**Thm 5.24** nilpotent maximal ⟹ p-群、NilpotentMaximal.lean 新設 313 行・自力
   wiring / **Ch.5 完走記録 = 全 30 番号付き結果形式化完了** / **Thm 6.4 (2)⇒(1)** TI ⟹ Frobenius action =
