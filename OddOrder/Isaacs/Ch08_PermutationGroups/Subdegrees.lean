@@ -13,10 +13,12 @@ import Mathlib.GroupTheory.Index
 
 Formalizes **Isaacs Thm 8.37** (p. 246): if `G` acts primitively on `Ω`
 with subdegrees `1 = m₁ ≤ m₂ ≤ ⋯ ≤ m_r`, then `m_{i+1} ≤ m₂ · m_i`;
-**Isaacs Lem 8.39** (p. 248), clauses (a) and (b) — the "arrow" index
-arithmetic (`relIndex_le_and_dvd_of_coprime`); and **Isaacs Thm 8.38**
-(p. 247, Weiss) — a subdegree coprime to the largest subdegree is `1`
-(`subdegree_eq_one_of_coprime_of_max`).
+**Isaacs Lem 8.39** (p. 248) — the "arrow" index arithmetic, clauses
+(a), (b) (`relIndex_le_and_dvd_of_coprime`) and (c)
+(`mul_subset_mul_of_coprime`); **Isaacs Thm 8.38** (p. 247, Weiss) — a
+subdegree coprime to the largest subdegree is `1`
+(`subdegree_eq_one_of_coprime_of_max`); and **Isaacs Thm 8.40**
+(p. 248, Manning).
 
 We state the gap form (`subdegree_gap_le`): if `s ≥ 1`, some suborbit at
 `α` has size `> s`, and no suborbit size lies strictly between `s` and `t`,
@@ -186,8 +188,8 @@ section Lemma839
 /-- **Isaacs Lem 8.39 (a), (b)** — in a finite group, write `m = |A : A∩B|`,
 `n = |A : A∩C|` and `u = |B : B∩C|` (the `m`-, `n`- and `u`-arrows of the
 book, with `A, B, C` the three point stabilizers).  If `|A| = |B|` and
-`m, n` are coprime, then `n ≤ u` and `u ∣ m n`.  (Clause (c),
-`C A ⊆ C B`, is deferred to its use in Thm 8.42.) -/
+`m, n` are coprime, then `n ≤ u` and `u ∣ m n`.  (Clause (c) is
+`mul_subset_mul_of_coprime` below.) -/
 theorem relIndex_le_and_dvd_of_coprime {M : Type*} [Group M] [Finite M]
     {A B C : Subgroup M} (hAB : Nat.card A = Nat.card B)
     (hcop : Nat.Coprime (B.relIndex A) (C.relIndex A)) :
@@ -247,6 +249,114 @@ theorem relIndex_le_and_dvd_of_coprime {M : Type*} [Group M] [Finite M]
     rw [Nat.mul_comm]
     rw [← hWrel, ← hWeq]
     exact hu_dvd
+
+/-- In a finite group, two subgroups with coprime indices cover the group:
+`X Y = H`.  (Proof: the `X`-orbit of the trivial coset of `Y` has size
+`|X : X ∩ Y| = |H : Y|`, so `X` is transitive on `H ⧸ Y`.) -/
+private lemma coe_mul_coe_eq_univ_of_coprime_index {H : Type*} [Group H]
+    [Finite H] {X Y : Subgroup H}
+    (hcop : Nat.Coprime X.index Y.index) :
+    (X : Set H) * (Y : Set H) = Set.univ := by
+  classical
+  -- `|X : X ∩ Y| = |H : Y|`
+  have hrel : Y.relIndex X = Y.index := by
+    have hle : Y.relIndex X ≤ Y.index := by
+      have h2 := Subgroup.relIndex_le_of_le_right (H := Y) (le_top : X ≤ ⊤)
+        (by rw [Subgroup.relIndex_top_right]
+            exact Subgroup.index_ne_zero_of_finite)
+      rwa [Subgroup.relIndex_top_right] at h2
+    have hdvd : Y.index ∣ Y.relIndex X := by
+      have h2 : Y.relIndex X * X.index = (Y ⊓ X).index := by
+        rw [← Subgroup.inf_relIndex_right Y X]
+        exact Subgroup.relIndex_mul_index inf_le_right
+      have h3 : Y.index ∣ (Y ⊓ X).index :=
+        Subgroup.index_dvd_of_le inf_le_left
+      rw [← h2] at h3
+      exact Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.symm hcop) h3
+    have hpos : 0 < Y.relIndex X :=
+      Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+    exact Nat.le_antisymm hle (Nat.le_of_dvd hpos hdvd)
+  -- the `X`-orbit of the trivial coset in `H ⧸ Y` is everything
+  have hstab : stabilizer (↥X) ((1 : H) : H ⧸ Y) = Y.subgroupOf X := by
+    ext x
+    rw [mem_stabilizer_iff, Subgroup.mem_subgroupOf]
+    have hkey : (x • ((1 : H) : H ⧸ Y) = ((1 : H) : H ⧸ Y)) ↔
+        ((↑x * 1 : H) : H ⧸ Y) = ((1 : H) : H ⧸ Y) := Iff.rfl
+    rw [hkey, mul_one, QuotientGroup.eq, mul_one, inv_mem_iff]
+  have horb : orbit (↥X) ((1 : H) : H ⧸ Y) = Set.univ := by
+    apply Set.eq_of_subset_of_ncard_le (Set.subset_univ _)
+    have hcard : Set.ncard (orbit (↥X) ((1 : H) : H ⧸ Y)) = Y.index := by
+      rw [← Nat.card_coe_set_eq,
+        Nat.card_congr (orbitEquivQuotientStabilizer (↥X)
+          ((1 : H) : H ⧸ Y)), hstab]
+      exact hrel
+    rw [Set.ncard_univ, hcard]
+    exact le_rfl
+  -- extract the product decomposition
+  ext h
+  simp only [Set.mem_univ, iff_true]
+  have h2 : ((h : H) : H ⧸ Y) ∈ orbit (↥X) ((1 : H) : H ⧸ Y) := by
+    rw [horb]
+    exact Set.mem_univ _
+  obtain ⟨x, hx⟩ := h2
+  have hx' : (↑x : H) • ((1 : H) : H ⧸ Y) = ((h : H) : H ⧸ Y) := hx
+  rw [MulAction.Quotient.smul_mk, smul_eq_mul, mul_one] at hx'
+  have h3 := QuotientGroup.eq.mp hx'
+  rw [Set.mem_mul]
+  exact ⟨↑x, x.2, (↑x)⁻¹ * h, h3,
+    by rw [← mul_assoc, mul_inv_cancel, one_mul]⟩
+
+/-- Under the coprimality of Lem 8.39, `A = (A ∩ C)(A ∩ B)`. -/
+private lemma inf_mul_inf_eq_of_coprime {M : Type*} [Group M] [Finite M]
+    {A B C : Subgroup M}
+    (hcop : Nat.Coprime (B.relIndex A) (C.relIndex A)) :
+    ((A ⊓ C : Subgroup M) : Set M) * ((A ⊓ B : Subgroup M) : Set M) =
+      (A : Set M) := by
+  apply Set.Subset.antisymm
+  · intro z hz
+    rw [Set.mem_mul] at hz
+    obtain ⟨u, hu, v, hv, huv⟩ := hz
+    rw [← huv]
+    exact A.mul_mem (Subgroup.mem_inf.mp hu).1 (Subgroup.mem_inf.mp hv).1
+  · intro a ha
+    have hcop' : Nat.Coprime (C.subgroupOf A).index (B.subgroupOf A).index :=
+      Nat.Coprime.symm hcop
+    have h2 := coe_mul_coe_eq_univ_of_coprime_index hcop'
+    have h3 : (⟨a, ha⟩ : ↥A) ∈
+        (C.subgroupOf A : Set ↥A) * (B.subgroupOf A : Set ↥A) := by
+      rw [h2]
+      exact Set.mem_univ _
+    rw [Set.mem_mul] at h3
+    obtain ⟨u, hu, v, hv, huv⟩ := h3
+    rw [Set.mem_mul]
+    refine ⟨↑u, Subgroup.mem_inf.mpr ⟨u.2, Subgroup.mem_subgroupOf.mp hu⟩,
+      ↑v, Subgroup.mem_inf.mpr ⟨v.2, Subgroup.mem_subgroupOf.mp hv⟩, ?_⟩
+    have h4 := congrArg Subtype.val huv
+    rw [Subgroup.coe_mul] at h4
+    exact h4
+
+/-- **Isaacs Lem 8.39 (c)** — with `A, B, C` three subgroups of a finite
+group, if `|A : A ∩ B|` and `|A : A ∩ C|` are coprime then
+`C A ⊆ C B` (as subsets; only coprimality is needed). -/
+theorem mul_subset_mul_of_coprime {M : Type*} [Group M] [Finite M]
+    {A B C : Subgroup M}
+    (hcop : Nat.Coprime (B.relIndex A) (C.relIndex A)) :
+    (C : Set M) * (A : Set M) ⊆ (C : Set M) * (B : Set M) := by
+  have h1 : (C : Set M) * (A : Set M) =
+      (C : Set M) * ((A ⊓ B : Subgroup M) : Set M) := by
+    rw [← inf_mul_inf_eq_of_coprime hcop, ← mul_assoc]
+    congr 1
+    apply Set.Subset.antisymm
+    · intro z hz
+      rw [Set.mem_mul] at hz
+      obtain ⟨u, hu, v, hv, huv⟩ := hz
+      rw [← huv]
+      exact C.mul_mem hu (Subgroup.mem_inf.mp hv).2
+    · intro z hz
+      rw [Set.mem_mul]
+      exact ⟨z, hz, 1, Subgroup.one_mem _, mul_one z⟩
+  rw [h1]
+  exact Set.mul_subset_mul_left fun z hz => (Subgroup.mem_inf.mp hz).2
 
 end Lemma839
 
