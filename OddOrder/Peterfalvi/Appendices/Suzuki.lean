@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)
