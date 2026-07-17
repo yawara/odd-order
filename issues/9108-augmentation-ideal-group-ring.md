@@ -64,6 +64,19 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   **新 sibling leaf** (`OddOrder/Algebra/PrincipalIdealTheorem.lean` 等;
   AugmentationIdeal.lean は 1164 行で 1500 trigger 目前)。その後
   10.26 (可換環補題) → 10.27/10.28 (Alperin-Kuo)。
+  **10.24 設計メモ (2026-07-17 調査)**: transfer は mathlib
+  `MonoidHom.transfer` (repo Ch05_Transfer が既用; v : G →* K/K' は
+  ϕ = Abelianization.of : K →* Abelianization K で transfer)。
+  K ⊴ G で Δ(K)Δ(G) は left ideal (g·Δ(K) = Δ(K)·g) → Δ(G)bar =
+  Δ(G)/Δ(K)Δ(G) に G-作用 (K は自明に作用) → Ξ = (∑_{t∈T} t)·-。
+  **10.24**: v(G) ≅ Ξ(Δ(G)bar)、鍵は Ξ(g−1 bar) = V(g)−1 bar
+  (∑t(g−1) = ∑(k_t−1)(t·g) ≡ ∑(k_t−1) mod Δ(K)Δ(G))。
+  **10.26**: 可換環 R、ideal U、A f.g. R-module、[A : UA] = m →
+  ∃r ≡ m·1 mod U, rA = 0 — `Matrix.adjugate_mul` (det trick) で自前証明
+  (mathlib Nakayama 変種 `exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul`
+  は m=1 特殊形のみ)。
+  **10.25**: G' ≤ K ≤ G ⇒ v(g)^{|K:G'|} = 1 — R = ℤ[G/K] (可換!)、
+  A = Δ(G)bar、U = Δ(G/K) の像で 10.26 を適用。
 - Lean 注意 (10.19): `rw [MonoidAlgebra.smul_single']` は smul instance
   不一致で失敗 → exact defeq 経由; MonoidAlgebra ≠ Finsupp 型分離
   (Finsupp.* API 不可、`MonoidAlgebra.induction_linear` /
