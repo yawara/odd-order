@@ -716,6 +716,11 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #18-19、Fable hub) — ✅ b (Thm 8.37) 合流、census 23 不変**:
+  tick #18 = 変化なし (全レーン 0)。tick #19: **b** = `aa6c09cd` (**Thm 8.37 subdegree growth
+  bound**、Subdegrees.lean 175 行新設 + Orbitals 追記、OddOrder.lean import は b 自身が追記済) を
+  merge `0ae6d620`: build **4316 jobs green**。a/c = 変化なし。sorry 23 不変・新 axiom なし・
+  AxiomsCheck OK・逸脱なし。
 - **2026-07-17 (tick #17、Fable hub) — ✅ a (Cor 4.12) + b (Thm 8.35/Lem 8.36) + c (10.15 step 5) 全 3 レーン合流、census 24→23 (c が scaffold 解消)**:
   **a** = 2 commits (**Cor 4.12** general bracketing form via commutator words / AxiomsCheck 3.35 登録)
   を merge `df50e982`: build **4314 jobs green** (14m16s)。**b** = `1aa5c91a`→`3e46b862` 系
