@@ -100,7 +100,7 @@ private lemma normal_of_center_le_of_center_index_pow_two
     rw [h_eq]; exact hn
   -- C = preimage of C' under mk' Z(T) (because Z(T) ≤ C).
   have h_comap_eq : C'.comap (QuotientGroup.mk' (Subgroup.center T)) = C := by
-    show ((C.map (QuotientGroup.mk' (Subgroup.center T))).comap _) = C
+    change ((C.map (QuotientGroup.mk' (Subgroup.center T))).comap _) = C
     rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk']
     exact sup_eq_left.mpr hZ_le_C
   rw [← h_comap_eq]
@@ -245,7 +245,7 @@ private lemma setOfPowEqOne_characteristic_of_class_le_two_odd
   refine ⟨fun φ => ?_⟩
   ext x
   rw [Subgroup.mem_comap]
-  show (φ x) ^ p = 1 ↔ x ^ p = 1
+  change (φ x) ^ p = 1 ↔ x ^ p = 1
   refine ⟨fun hpx => ?_, fun hpx => ?_⟩
   · -- φ x ^ p = 1 ⇒ φ (x^p) = 1 ⇒ x^p = 1 by injectivity
     rw [← map_pow] at hpx
@@ -366,7 +366,7 @@ private lemma card_setOfPowEqOne_inf_le_prime
     rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
     intro x
     apply Subtype.ext
-    show ((x : T) ^ p : T) = (1 : T)
+    change ((x : T) ^ p : T) = (1 : T)
     push_cast
     have h_mem : (x : T) ∈ K := (Subgroup.mem_inf.mp x.2).1
     exact h_mem
@@ -492,7 +492,7 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
     · -- ∀ x : K, x^p = 1
       intro x
       apply Subtype.ext
-      show ((x : T) ^ p : T) = (1 : T)
+      change ((x : T) ^ p : T) = (1 : T)
       push_cast
       have h_mem : (x : T) ∈ K := x.2
       change (x : T) ^ p = 1 at h_mem
@@ -541,14 +541,14 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
   -- Define K = {x : A | x^2 = 1} as a subgroup (uses abelianness).
   let K : Subgroup A := {
     carrier := {x : A | x ^ 2 = 1}
-    one_mem' := by show (1 : A) ^ 2 = 1; exact one_pow 2
+    one_mem' := by change (1 : A) ^ 2 = 1; exact one_pow 2
     inv_mem' := by
       intro x (hx : x ^ 2 = 1)
-      show (x⁻¹) ^ 2 = 1
+      change (x⁻¹) ^ 2 = 1
       rw [inv_pow, hx, inv_one]
     mul_mem' := by
       intro x y (hx : x ^ 2 = 1) (hy : y ^ 2 = 1)
-      show (x * y) ^ 2 = 1
+      change (x * y) ^ 2 = 1
       have h : (x * y) ^ 2 = x ^ 2 * y ^ 2 := by
         rw [pow_two, pow_two, pow_two]
         rw [mul_assoc, ← mul_assoc y x y, hAb y x, mul_assoc, ← mul_assoc]
@@ -559,7 +559,7 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
     refine ⟨fun φ => ?_⟩
     ext x
     rw [Subgroup.mem_comap]
-    show (φ x) ^ 2 = 1 ↔ x ^ 2 = 1
+    change (φ x) ^ 2 = 1 ↔ x ^ 2 = 1
     refine ⟨fun hpx => ?_, fun hpx => ?_⟩
     · rw [← map_pow] at hpx
       have : φ (x ^ 2) = φ 1 := by rw [hpx, map_one]
@@ -570,12 +570,12 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
     · -- commute
       intro x y
       apply Subtype.ext
-      show (x : A) * (y : A) = (y : A) * (x : A)
+      change (x : A) * (y : A) = (y : A) * (x : A)
       exact hAb _ _
     · -- ∀ x : K, x^2 = 1
       intro x
       apply Subtype.ext
-      show ((x : A) ^ 2 : A) = (1 : A)
+      change ((x : A) ^ 2 : A) = (1 : A)
       have h_mem : (x : A) ∈ K := x.2
       change (x : A) ^ 2 = 1 at h_mem
       exact h_mem
@@ -646,7 +646,7 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
       intro h
       have hd_pow_half : (d : (D : Subgroup A)) ^ (n / 2) = 1 := by
         apply Subtype.ext
-        show (((d : (D : Subgroup A)) ^ (n / 2) : (D : Subgroup A)) : A) = (1 : A)
+        change (((d : (D : Subgroup A)) ^ (n / 2) : (D : Subgroup A)) : A) = (1 : A)
         rw [SubmonoidClass.coe_pow]; exact h
       have hdvd : orderOf d ∣ (n / 2) := orderOf_dvd_of_pow_eq_one hd_pow_half
       rw [hd_order] at hdvd
@@ -681,7 +681,7 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
         rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
         intro x
         apply Subtype.ext
-        show ((x : (K ⊓ D : Subgroup A)) : A) ^ 2 = (1 : A)
+        change ((x : (K ⊓ D : Subgroup A)) : A) ^ 2 = (1 : A)
         have h_mem : (x : A) ∈ K := (Subgroup.mem_inf.mp x.2).1
         change (x : A) ^ 2 = 1 at h_mem
         exact h_mem
@@ -774,9 +774,9 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
     -- (a2D)^(n/2) = 1 in ↥D.
     have ha2D_pow_half : a2D ^ (n / 2) = 1 := by
       apply Subtype.ext
-      show ((a2D ^ (n / 2) : (D : Subgroup A)) : A) = (1 : A)
+      change ((a2D ^ (n / 2) : (D : Subgroup A)) : A) = (1 : A)
       rw [SubmonoidClass.coe_pow]
-      show (a ^ 2) ^ (n / 2) = 1
+      change (a ^ 2) ^ (n / 2) = 1
       exact ha_sq_pow_half
     -- d^(m * (n/2)) = (d^m)^(n/2) = (a2D)^(n/2) = 1, so orderOf d ∣ m * (n/2), i.e. n ∣ m*(n/2).
     have hm_two_dvd : (2 : ℤ) ∣ m := by

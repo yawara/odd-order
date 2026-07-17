@@ -319,10 +319,10 @@ theorem cyclic_pgroup_inf_eq_bot_iff
   let h_P : ↥P := ⟨h, hh_inP⟩
   let k_P : ↥P := ⟨k, hk_inP⟩
   have hh_P_ord : orderOf h_P = p := by
-    show orderOf (⟨h, hh_inP⟩ : ↥P) = p
+    change orderOf (⟨h, hh_inP⟩ : ↥P) = p
     rw [Subgroup.orderOf_mk]; exact hh_ord_g
   have hk_P_ord : orderOf k_P = p := by
-    show orderOf (⟨k, hk_inP⟩ : ↥P) = p
+    change orderOf (⟨k, hk_inP⟩ : ↥P) = p
     rw [Subgroup.orderOf_mk]; exact hk_ord_g
   -- Z := (powMonoidHom p).ker, unique order-p subgroup of ↥P
   obtain ⟨a, hP_card⟩ := IsPGroup.iff_card.mp hP_pgroup
@@ -556,7 +556,7 @@ theorem eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer
     rw [← hn_eq, h_eq]
   -- v(x).val = x^|G:P|
   have hv_x_val : (v x).val = x ^ (P : Subgroup G).index := by
-    show ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
+    change ((@MonoidHom.transfer G _ (P : Subgroup G) (P : Subgroup G)
         ((haveI := hPab; (inferInstance : CommGroup ↥(P : Subgroup G))))
           (MonoidHom.id (P : Subgroup G)) _) x).val = _
     rw [@MonoidHom.transfer_eq_pow G _ (P : Subgroup G) (P : Subgroup G)
@@ -807,7 +807,7 @@ theorem not_isSimpleGroup_of_isCyclic_sylow_two
       (Subgroup.mem_normalizer_iff.mp hn t).mp ht_inP
     have hntn_ord : orderOf (n * t * n⁻¹) = 2 := by
       have h_sb : SemiconjBy n t (n * t * n⁻¹) := by
-        show n * t = (n * t * n⁻¹) * n; group
+        change n * t = (n * t * n⁻¹) * n; group
       exact (SemiconjBy.orderOf_eq n h_sb).symm.trans ht_ord_g
     -- Lift to ↥P, use cyclic_finite_unique_order_two
     have ht_P_ord : orderOf (⟨t, ht_inP⟩ : ↥(P : Subgroup G)) = 2 := by

@@ -281,7 +281,7 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
     intro n
     induction n with
     | zero =>
-      show R ≤ Subgroup.map (P : Subgroup G).subtype ⊤
+      change R ≤ Subgroup.map (P : Subgroup G).subtype ⊤
       rw [h_top_map]
       exact inf_le_left
     | succ n ih =>
@@ -846,7 +846,7 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
         have hs_in_R : ((MulAut.conj yC)⁻¹ q_N : ↥N).val ∈ (R : Subgroup G) := by
           apply hS_in_G_le_R
           exact ⟨(MulAut.conj yC)⁻¹ q_N, hq_in_yCS, rfl⟩
-        show q ∈ (((yC : G) • R : Sylow p G) : Subgroup G)
+        change q ∈ (((yC : G) • R : Sylow p G) : Subgroup G)
         rw [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
         -- Goal: (MulAut.conj (yC : G))⁻¹ q ∈ (R : Subgroup G)
         -- Both sides equal (yC : G)⁻¹ * q * (yC : G); ((MulAut.conj yC)⁻¹ q_N).val computes same
@@ -922,14 +922,14 @@ theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]
             intro a ha
             refine Subgroup.mem_inf.mpr ⟨?_, hD_le_Q ha⟩
             -- a ∈ yR = yC.val • R; yC centralizes D so yC⁻¹ a yC = a ∈ R
-            show a ∈ (((yC : G) • R : Sylow p G) : Subgroup G)
+            change a ∈ (((yC : G) • R : Sylow p G) : Subgroup G)
             rw [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
             have h_a_in_R : a ∈ (R : Subgroup G) :=
               hPN_le_R (le_inf hD_le_P hD_le_N ha)
             have h_comm : a * (yC : G) = (yC : G) * a :=
               Subgroup.mem_centralizer_iff.mp hyC_cent_D a ha
             have h_smul_eq : (MulAut.conj (yC : G))⁻¹ • a = a := by
-              show (yC : G)⁻¹ * a * (yC : G) = a
+              change (yC : G)⁻¹ * a * (yC : G) = a
               rw [mul_assoc, h_comm, ← mul_assoc, inv_mul_cancel, one_mul]
             rw [h_smul_eq]; exact h_a_in_R
           exact Subgroup.centralizer_le h_D_le hz_C
@@ -977,10 +977,10 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
     set gP : Sylow p G := g • P with hgP_def
     -- y ∈ P ⊓ gP
     have hy_in_gP : y ∈ (gP : Subgroup G) := by
-      show y ∈ ((g • P : Sylow p G) : Subgroup G)
+      change y ∈ ((g • P : Sylow p G) : Subgroup G)
       rw [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
       have h_smul_eq : (MulAut.conj g)⁻¹ • y = x := by
-        show g⁻¹ * y * g = x
+        change g⁻¹ * y * g = x
         rw [← hgxy]; group
       rw [h_smul_eq]; exact hx_P
     have hy_in_PgP : y ∈ (P : Subgroup G) ⊓ (gP : Subgroup G) :=

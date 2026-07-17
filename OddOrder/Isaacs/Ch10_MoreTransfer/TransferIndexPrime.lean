@@ -110,7 +110,7 @@ theorem transfer_eq_prod_conj_of_mem {M : Subgroup G} [M.Normal] [Fintype (G ⧸
     intro k q
     induction q using QuotientGroup.induction_on with
     | H y =>
-      show ((x ^ k * y : G) : G ⧸ M) = (y : G ⧸ M)
+      change ((x ^ k * y : G) : G ⧸ M) = (y : G ⧸ M)
       rw [QuotientGroup.eq]
       have h1 : (x ^ k * y)⁻¹ * y = y⁻¹ * (x ^ k)⁻¹ * y := by group
       rw [h1]
@@ -154,7 +154,7 @@ theorem transfer_eq_prod_conj_of_mem {M : Subgroup G} [M.Normal] [Fintype (G ⧸
         phi_conj_rep_eq ϕ hx hrep.symm
     _ = _ := by
         refine congrArg ϕ (Subtype.ext ?_)
-        show _ = _ * x ^ Function.minimalPeriod (x • ·)
+        change _ = _ * x ^ Function.minimalPeriod (x • ·)
             (Quotient.mk (orbitRel (zpowers x) (G ⧸ M)) c).out * _
         rw [hper, pow_one]
 
@@ -190,14 +190,14 @@ theorem transfer_eq_pow_of_notMem {M : Subgroup G} [M.Normal] [M.FiniteIndex]
     intro k c
     induction c using QuotientGroup.induction_on with
     | H y =>
-      show ((x ^ k * y : G) : G ⧸ M) = _
+      change ((x ^ k * y : G) : G ⧸ M) = _
       rw [QuotientGroup.mk_mul, QuotientGroup.mk_zpow]
   -- every point has minimal period p under x • ·
   have hper : ∀ c : G ⧸ M, Function.minimalPeriod (x • ·) c = p := by
     intro c
     have hdvd : Function.minimalPeriod (x • ·) c ∣ p := by
       apply Function.IsPeriodicPt.minimalPeriod_dvd
-      show (x • ·)^[p] c = c
+      change (x • ·)^[p] c = c
       rw [smul_iterate_apply]
       have := hsmul (p : ℤ) c
       rw [zpow_natCast, zpow_natCast] at this
@@ -227,7 +227,7 @@ theorem transfer_eq_pow_of_notMem {M : Subgroup G} [M.Normal] [M.FiniteIndex]
       htop ▸ Subgroup.mem_top _
     obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hmem
     refine orbitRel_apply.mpr ⟨⟨x ^ k, Subgroup.zpow_mem _ (Subgroup.mem_zpowers x) k⟩, ?_⟩
-    show (x ^ k : G) • d = c
+    change (x ^ k : G) • d = c
     rw [hsmul k d, hk]
     group
   -- collapse the product to the single factor and normalize it
@@ -243,7 +243,7 @@ theorem transfer_eq_pow_of_notMem {M : Subgroup G} [M.Normal] [M.FiniteIndex]
             (Quotient.mk (orbitRel (zpowers x) (G ⧸ M)) 1).out
           rwa [hper] at h1⟩ := by
     refine congrArg ϕ (Subtype.ext ?_)
-    show r⁻¹ * x ^ Function.minimalPeriod (x • ·)
+    change r⁻¹ * x ^ Function.minimalPeriod (x • ·)
         (Quotient.mk (orbitRel (zpowers x) (G ⧸ M)) 1).out * r
       = r⁻¹ * x ^ p * r
     rw [hper]
@@ -439,7 +439,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
       exact map_list_prod M.subtype _
     have h1 : (⟨L, hLM⟩ : ↥M) = ((List.range p).map Lhat).prod := by
       apply Subtype.ext
-      show L = ((((List.range p).map Lhat).prod : ↥M) : P)
+      change L = ((((List.range p).map Lhat).prod : ↥M) : P)
       rw [hL_def, h2]
       rfl
     rw [h1, map_list_prod, List.map_map, Finset.prod_eq_multiset_prod]
@@ -465,9 +465,9 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
       obtain ⟨m1, hm1, rfl⟩ := Subgroup.mem_map.mp hy1
       obtain ⟨m2, hm2, rfl⟩ := Subgroup.mem_map.mp hy2
       refine Subtype.ext ?_
-      show π m1 * π m2 = π m2 * π m1
+      change π m1 * π m2 = π m2 * π m1
       rw [← map_mul, ← map_mul]
-      show ((m1 * m2 : P) : P ⧸ N) = ((m2 * m1 : P) : P ⧸ N)
+      change ((m1 * m2 : P) : P ⧸ N) = ((m2 * m1 : P) : P ⧸ N)
       rw [QuotientGroup.eq]
       -- (m1 m2)⁻¹ (m2 m1) = ⁅m̂2⁻¹, m̂1⁻¹⁆ ∈ M' ≤ Φ(M)
       have hcmem : (m1 * m2)⁻¹ * (m2 * m1) ∈ M :=
@@ -475,7 +475,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
       have hc : (⟨(m1 * m2)⁻¹ * (m2 * m1), hcmem⟩ : ↥M)
           = ⁅(⟨m2, hm2⟩ : ↥M)⁻¹, (⟨m1, hm1⟩ : ↥M)⁻¹⁆ := by
         ext
-        show (m1 * m2)⁻¹ * (m2 * m1) = m2⁻¹ * m1⁻¹ * (m2⁻¹)⁻¹ * (m1⁻¹)⁻¹
+        change (m1 * m2)⁻¹ * (m2 * m1) = m2⁻¹ * m1⁻¹ * (m2⁻¹)⁻¹ * (m1⁻¹)⁻¹
         group
       have hmem : (⟨(m1 * m2)⁻¹ * (m2 * m1), hcmem⟩ : ↥M) ∈ frattini ↥M := by
         rw [hc]
@@ -488,9 +488,9 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
     · rintro ⟨y, hy⟩
       obtain ⟨m, hm, rfl⟩ := Subgroup.mem_map.mp hy
       refine Subtype.ext ?_
-      show (π m) ^ p = 1
+      change (π m) ^ p = 1
       rw [← map_pow]
-      show ((m ^ p : P) : P ⧸ N) = 1
+      change ((m ^ p : P) : P ⧸ N) = 1
       rw [QuotientGroup.eq_one_iff]
       have hmem : (⟨m, hm⟩ : ↥M) ^ p ∈ frattini ↥M :=
         OddOrder.Isaacs.Ch04.pow_p_mem_frattini_of_pgroup hM_pgroup _
@@ -525,7 +525,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
       group
     rw [hconst, List.prod_replicate]
     rw [← map_pow]
-    show ((x ^ p : P) : P ⧸ N) = 1
+    change ((x ^ p : P) : P ⧸ N) = 1
     rw [QuotientGroup.eq_one_iff]
     have hmem : (⟨x, hx⟩ : ↥M) ^ p ∈ frattini ↥M :=
       OddOrder.Isaacs.Ch04.pow_p_mem_frattini_of_pgroup hM_pgroup _
@@ -679,7 +679,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini
           (MulAut.conj ((r : P))⁻¹).injective ((x ^ p) ^ n)
         have h3 : (MulAut.conj ((r : P))⁻¹).toMonoidHom ((x ^ p) ^ n)
             = ((r : P))⁻¹ * (x ^ p) ^ n * (r : P) := by
-          show ((r : P))⁻¹ * (x ^ p) ^ n * (((r : P))⁻¹)⁻¹ = _
+          change ((r : P))⁻¹ * (x ^ p) ^ n * (((r : P))⁻¹)⁻¹ = _
           rw [inv_inv]
         rw [h3] at h2
         rw [h2]

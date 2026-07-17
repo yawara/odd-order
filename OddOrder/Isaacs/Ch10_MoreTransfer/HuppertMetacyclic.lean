@@ -240,9 +240,9 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
       rw [MonoidHom.mem_ker]
       apply MulEquiv.ext
       rintro ⟨v, hv⟩
-      show (hVinv.restrict x) ⟨v, hv⟩ = ⟨v, hv⟩
+      change (hVinv.restrict x) ⟨v, hv⟩ = ⟨v, hv⟩
       apply Subtype.ext
-      show (φ₀ x) v = v
+      change (φ₀ x) v = v
       apply Subtype.ext
       have hcomm := (Subgroup.mem_center_iff.mp (hVZ hv)) ⟨x, hx⟩
       have hconj : (⟨x, hx⟩ : ↥P) * v * (⟨x, hx⟩ : ↥P)⁻¹ = v := by
@@ -512,7 +512,7 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     obtain ⟨⟨ξ, hξX⟩, hξne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hXne_bot
     obtain ⟨h₀, rfl⟩ := QuotientGroup.mk'_surjective (Subgroup.center ↥P) ξ
     refine ⟨h₀, hξX, fun hz => hξne (Subtype.ext ?_)⟩
-    show (QuotientGroup.mk' (Subgroup.center ↥P)) h₀ = 1
+    change (QuotientGroup.mk' (Subgroup.center ↥P)) h₀ = 1
     rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   obtain ⟨u, hu⟩ : ∃ u : ↥P, u * h₀ ≠ h₀ * u := by
     by_contra hall
