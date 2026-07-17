@@ -211,7 +211,8 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family [Finite G]
   -- the transported `chiColumn` is the linear (irreducible) character `η j` of `tic.W`.
   let η : Fin hyp.w2 → IrreducibleCharacter ↥tic.W := fun j =>
     linearIrreducibleCharacter
-      ((h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv (finCongr hcardW1.symm i)) (χ₂ j)).comp
+      ((h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv (finCongr hcardW1.symm i))
+        (χ₂ j)).comp
         e.toMonoidHom)
   refine ⟨fun j => tic.omegaIrrEquiv.symm (η j), ?_, ?_⟩
   · -- injectivity: peel off the injective maps `omegaIrrEquiv.symm`, `linearIrreducibleCharacter`,
@@ -972,7 +973,8 @@ theorem Hypothesis.muGrid_inner_cross_column [Finite G] (hG : OddOrder.BG.IsMini
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
   haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   -- The two `W₂`-duals differ (different columns).
-  have hχne : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2)) (finCongr hcardW2sub.symm j)
+  have hχne : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+      (finCongr hcardW2sub.symm j)
       ≠ finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2)) (finCongr hcardW2sub.symm j') :=
     fun heq => hjj' ((finCongr hcardW2sub.symm).injective
       ((finCardEquivCharacterGroup _).injective heq))
@@ -1036,7 +1038,8 @@ character of `M`, being the §6 certain-type character `(columnFamily χ₂).mu 
 `IrreducibleCharacter`).  This is the `μ_{ij} ∈ ℤ[Irr M]` input that makes `α_{ij}^τ` a virtual
 character of `G`, hence the inner products of the (10.5) `a = 0` argument integers. -/
 theorem Hypothesis.muGrid_isIrreducible [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1)
+    (j : Fin hyp.w2) :
     IsIrreducibleCharacter (hyp.muGrid hG hodd i j) := by
   haveI := hyp.finiteG
   classical
@@ -1098,7 +1101,8 @@ theorem Hypothesis.muGrid_column_sum_vanishes_off_derived [Finite G]
   rw [hsum]
   -- `K = M' = [M,M]` is normal, so the induced character vanishes off it.
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
-    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   haveI : h.K.Normal := hKnormal
   exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hx
@@ -1133,7 +1137,8 @@ theorem Hypothesis.muGrid_column_sum_mem_inducedFamily [Finite G]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
   haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   obtain ⟨θ, hθeq, hind⟩ :=
-    h.exists_irreducible_restrict_certainType (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))
+    h.exists_irreducible_restrict_certainType
+      (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))
   -- row-0 entry equals the certain-type character `μ_{0k}` (`finCongr` fixes `0`).
   have hrow0 : hyp.muGrid hG hodd 0 k
       = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu 0
@@ -1141,7 +1146,8 @@ theorem Hypothesis.muGrid_column_sum_mem_inducedFamily [Finite G]
     have hfc : (finCongr hcardW1.symm (0 : Fin hyp.w1)) = (0 : Fin (Nat.card h.W1)) := by simp
     rw [show hyp.muGrid hG hodd 0 k
       = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu
-          (finCongr hcardW1.symm 0) : ClassFunction ↥M ℂ) from by unfold Hypothesis.muGrid; rfl, hfc]
+          (finCongr hcardW1.symm 0) : ClassFunction ↥M ℂ) from by unfold Hypothesis.muGrid; rfl,
+      hfc]
   -- `θ ≠ 1`: else `μ_{0k}(1) = θ(1) = 1`, contradicting `hdk1`.
   have hθne : θ ≠ trivialIrreducibleCharacter ↥h.K := by
     intro htriv
@@ -1353,7 +1359,8 @@ theorem Hypothesis.muGrid_apply_eq_columnSign_mul_zeroColumn_of_mem_W1 [Finite G
           (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
     unfold Hypothesis.muGrid; rfl
   have em0 : hyp.muGrid hG hodd i 0
-      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu
+      = ((h.columnFamily (finCardEquivCharacterGroup _
+          (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu
           (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
     unfold Hypothesis.muGrid; rfl
   have esign : hyp.muColumnSign hG hodd j
@@ -1469,7 +1476,8 @@ theorem Hypothesis.muGrid_zero_column_apply_one [Finite G]
       finCardEquivCharacterGroup_zero]
   have hrow0 : (finCongr hcardW1.symm (0 : Fin hyp.w1)) = 0 := by apply Fin.ext; simp
   have e00 : hyp.muGrid hG hodd 0 0
-      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu
+      = ((h.columnFamily (finCardEquivCharacterGroup _
+          (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu
           (finCongr hcardW1.symm 0) : ClassFunction ↥M ℂ) := by
     unfold Hypothesis.muGrid; rfl
   rw [e00, hdual0, hrow0, h.certainType_zero_column_anchor.2,
@@ -1505,7 +1513,8 @@ theorem Hypothesis.muGrid_alpha_support [Finite G] (hG : OddOrder.BG.IsMinimalSi
   -- `ζ` is induced from the normal `M'`, hence vanishes off `M'`.
   obtain ⟨θ, _hθne, hζeq⟩ := hζS
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
-    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw

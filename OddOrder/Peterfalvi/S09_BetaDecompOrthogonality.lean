@@ -521,7 +521,8 @@ theorem betaDecomp_gamma_orth_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {
     (β : ClassFunction G ℂ)
     (hβ : β = H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
       - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
-    (a : ℂ) (ha : a = ClassFunction.inner β (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))) + 1)
+    (a : ℂ)
+    (ha : a = ClassFunction.inner β (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))) + 1)
     (W : ClassFunction G ℂ)
     (hW : W = ∑ i ∈ Finset.univ.erase ind1H,
       (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L) /

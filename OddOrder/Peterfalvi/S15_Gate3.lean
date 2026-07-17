@@ -310,11 +310,13 @@ theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       rw [← bdata.UW1_frobenius.isComplement.card_mul,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
-    have hcopUW1 : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥(hyp.U ⊔ hyp.W1)) := by
+    have hcopUW1 : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L))
+        (Nat.card ↥(hyp.U ⊔ hyp.W1)) := by
       rw [hcardUW1]; exact Nat.Coprime.mul_right hcopU.symm hcopW1.symm
     have hLFbot : maxNilpotentNormalHall L = ⊥ :=
       OddOrder.GroupTheory.isFrobenius_kernel_eq_bot_of_frobenius_subgroup hLFleL
-        (sup_le hUleL hW1leL) ⟨frob.complement, hfrobLF⟩ bdata.UW1_frobenius hbot hW1LF hsolv hcopUW1
+        (sup_le hUleL hW1leL) ⟨frob.complement, hfrobLF⟩ bdata.UW1_frobenius hbot hW1LF hsolv
+          hcopUW1
     exact frob.frobenius.ne_bot_kernel (by rw [hHeq, hLFbot, Subgroup.bot_subgroupOf])
   -- piece 6: `U ⊆ C_L(U ∩ L_F) ⊆ L_F` since `U` is abelian and `L_F` is the Frobenius kernel.
   have hUab : IsMulCommutative ↥(hyp.U.subgroupOf L) :=

@@ -302,7 +302,8 @@ theorem exists_conj_smul_eq_of_lines_of_expPExtraspecial [Finite G] {p : ℕ} [F
     exact ⟨rbar, rbar.2, OddOrder.BG.Ch1.S03d.zpowers_eq_of_prime_card (by rw [hR]; exact hpp)
       rbar.2 (fun h => hrbar (Subtype.ext h))⟩
   have hA₀card : Nat.card ↥A₀ = p := by rw [(mem_elemAbelianOfRank.mp hA₀mem).2, pow_one]
-  have hA₀starcard : Nat.card ↥A₀star = p := by rw [(mem_elemAbelianOfRank.mp hA₀star_mem).2, pow_one]
+  have hA₀starcard : Nat.card ↥A₀star = p := by
+    rw [(mem_elemAbelianOfRank.mp hA₀star_mem).2, pow_one]
   obtain ⟨a₀, ha₀A₀, hzpa₀⟩ := getgen hA₀card
   obtain ⟨a₀s, ha₀sA, hzpa₀s⟩ := getgen hA₀starcard
   have ha₀Q : a₀ ∈ Q := hA_le_Q (hA₀_le ha₀A₀)
@@ -421,11 +422,13 @@ theorem exists_expPExtraspecial_le_of_two_maximals [Finite G] (hG : IsMinimalSim
   -- `r(S) ≤ 2` (else Uniqueness forces `M = M⋆`).
   have hrank2 : rank ↥(S : Subgroup G) ≤ 2 := by
     by_contra hr
-    have huniq := Ch2.S09.uniquenessTheorem hG hSlt (by omega) (Or.inl (by omega : 3 ≤ rank ↥(S : Subgroup G)))
+    have huniq := Ch2.S09.uniquenessTheorem hG hSlt (by omega)
+      (Or.inl (by omega : 3 ≤ rank ↥(S : Subgroup G)))
     exact hMne (huniq.2.unique ⟨hM, by rw [hS]; exact hPbar_le_M⟩
       ⟨hMstar, by rw [hS]; exact hPbar_le_Mstar⟩)
   -- `S` nonabelian, so Cor 10.7(b) gives the extraspecial `Q`.
-  rcases (S10.sylow_structure hG S).2.1 hrank2 with habel | ⟨Q, _, hQ_le, _, hQ_es, hQ_card, _, _, _⟩
+  rcases (S10.sylow_structure hG S).2.1 hrank2 with
+    habel | ⟨Q, _, hQ_le, _, hQ_es, hQ_card, _, _, _⟩
   · exact absurd habel (by rw [hS]; exact hPbar_nab)
   · exact ⟨S, Q, by rw [hS]; exact hN, hrank2,
       hQ_le.trans (by rw [hS]; exact hPbar_le_K), hQ_es, hQ_card⟩
@@ -895,7 +898,8 @@ theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd 
   have hMα : S10.Malpha M ≠ ⊥ :=
     Malpha_ne_bot_of_sylow_normalizer_le hG hMmem hMstar hMne S hN_S
   have hMstarα : S10.Malpha Mstar ≠ ⊥ :=
-    Malpha_ne_bot_of_sylow_normalizer_le hG hMstar hMmem (Ne.symm hMne) S (by rw [inf_comm]; exact hN_S)
+    Malpha_ne_bot_of_sylow_normalizer_le hG hMstar hMmem (Ne.symm hMne) S
+      (by rw [inf_comm]; exact hN_S)
   -- distinguished lines `A₀` (realizing `M`) and `A₀⋆` (realizing `M⋆`) via Prop 12.4(b).
   obtain ⟨A₀, hA₀_mem, hA₀_le_A, hA₀_M⟩ :=
     exists_line_maximalContaining_eq_of_Malpha_ne_bot hG hMmem hA_mem hA_le_M hMα
@@ -905,7 +909,8 @@ theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd 
   have hZneM := maximalContaining_normalizer_center_ne_of_two_maximals hG hMmem hMstar hMne S hN_S
     hrankS hQ_es hQ_card hQ_le
   have hZneMstar := maximalContaining_normalizer_center_ne_of_two_maximals hG hMstar hMmem
-    (Ne.symm hMne) S (by rw [inf_comm]; exact hN_S) hrankS hQ_es hQ_card (by rw [inf_comm]; exact hQ_le)
+    (Ne.symm hMne) S (by rw [inf_comm]; exact hN_S)
+      hrankS hQ_es hQ_card (by rw [inf_comm]; exact hQ_le)
   have hA₀_ne_Z : A₀ ≠ (Subgroup.center ↥Q).map Q.subtype := fun heq => hZneM (heq ▸ hA₀_M)
   have hA₀star_ne_Z : A₀star ≠ (Subgroup.center ↥Q).map Q.subtype :=
     fun heq => hZneMstar (heq ▸ hA₀star_Mstar)

@@ -392,9 +392,12 @@ theorem fieldNormalizerComplementTransport_exists (hyp : Hypothesis (G := G))
          obtain ⟨v, hv⟩ := MonoidHom.mem_range.mp (by rw [hμ_range]; exact u.2)
          exact ⟨v, Subtype.ext hv⟩⟩ with heUdef
   refine ⟨eU.symm u, ?_, rfl⟩
-  have hval : (eU (eU.symm u) : ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q)) = u :=
+  have hval :
+      (eU (eU.symm u) : ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q)) = u :=
     eU.apply_symm_apply u
-  have : (μ (eU.symm u) : (GaloisField hyp.base.p hyp.base.q)ˣ) = (u : (GaloisField hyp.base.p hyp.base.q)ˣ) := by
+  have :
+      (μ (eU.symm u) : (GaloisField hyp.base.p hyp.base.q)ˣ) =
+        (u : (GaloisField hyp.base.p hyp.base.q)ˣ) := by
     have h1 : (μ' (eU.symm u) : (GaloisField hyp.base.p hyp.base.q)ˣ) =
         (u : (GaloisField hyp.base.p hyp.base.q)ˣ) := congrArg Subtype.val hval
     simpa [hμ'def] using h1
@@ -414,7 +417,8 @@ theorem fieldNormalizerComplementTransport_injective (hyp : Hypothesis (G := G))
   obtain ⟨vb, hvb_mu, hvb⟩ := fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range b
   rw [hva, hvb] at hab
   have hvab : va = vb := Subtype.ext hab
-  have : (a : (GaloisField hyp.base.p hyp.base.q)ˣ) = (b : (GaloisField hyp.base.p hyp.base.q)ˣ) := by
+  have :
+      (a : (GaloisField hyp.base.p hyp.base.q)ˣ) = (b : (GaloisField hyp.base.p hyp.base.q)ˣ) := by
     rw [← hva_mu, ← hvb_mu, hvab]
   exact Subtype.ext this
 
@@ -489,7 +493,8 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
   have hcompatLift : ∀ u : OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q,
       (fieldNormalizerKernelTransport hyp e).comp
           ((OddOrder.BG.AppC.NormSet.normOneMulAction hyp.base.p hyp.base.q u).toMonoidHom)
-        = (MulAut.conj (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u)).toMonoidHom.comp
+        = (MulAut.conj
+            (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u)).toMonoidHom.comp
           (fieldNormalizerKernelTransport hyp e) := by
     intro u
     ext s
@@ -776,7 +781,8 @@ theorem mu_range_eq_normOneUnits {hyp : Hypothesis (G := G)}
       (Nat.modEq_iff_dvd' (by have := hyp.base.p_prime.two_le; omega)).mpr dvd_rfl
     have hq1 : (1 : ℕ) ≡ hyp.base.p ^ hyp.base.q [MOD (hyp.base.p - 1)] := by
       simpa using h1.pow hyp.base.q
-    exact (Nat.modEq_iff_dvd' (Nat.one_le_pow _ _ (by have := hyp.base.p_prime.two_le; omega))).mp hq1
+    exact (Nat.modEq_iff_dvd' (Nat.one_le_pow _ _ (by have := hyp.base.p_prime.two_le; omega))).mp
+      hq1
   have hd_dvd : d ∣ (hyp.base.p ^ hyp.base.q - 1) :=
     ⟨hyp.base.p - 1, (Nat.div_mul_cancel hpm1_dvd).symm⟩
   have hkercard : Nat.card

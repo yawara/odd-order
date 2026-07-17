@@ -51,7 +51,8 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).toEquiv]]
     exact (Nat.Coprime.mul_right (typeP_coprime_H_W1 data.typeP).symm
       (typeP_coprime_U_W1 data.typeP hU).symm).symm
-  set h := chiefFactorQuotientHypothesisGen chief (K.subgroupOf M) hN'le hW1inf hW2notle hodd hHall with hh_def
+  set h := chiefFactorQuotientHypothesisGen chief (K.subgroupOf M) hN'le hW1inf hW2notle hodd hHall
+    with hh_def
   have hKeq : h.K = (huSub data).map (QuotientGroup.mk' (K.subgroupOf M)) :=
     chiefFactorQuotientHypothesisGen_K_eq chief (K.subgroupOf M) hN'le hW1inf hW2notle hodd hHall
   -- the inflation hom `g : ↥(huSub) →* ↥(h.K)`, surjective with kernel `H₀`
@@ -126,7 +127,8 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [hco]; exact hwy
   -- image equality: `{φ ∈ 𝒮(H₀) | ¬ irr φ} = Φ '' B'`, `Φ χ̄ = induceHU (compHom g χ̄)`
   have himage : {φ ∈ sOf data K | ¬ IsIrreducibleCharacter φ}
-      = (fun χbar : IrreducibleCharacter ↥h.K => induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) '' B' := by
+      = (fun χbar : IrreducibleCharacter ↥h.K =>
+          induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) '' B' := by
     ext φ
     simp only [Set.mem_image, hB'_def, Set.mem_setOf_eq]
     constructor
@@ -139,11 +141,13 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) := by
         rw [hg_ker]; exact hχH0
       obtain ⟨χbar, hχbar⟩ :=
-        OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hg_surj χ hgker_sub
+        OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hg_surj χ
+          hgker_sub
       refine ⟨χbar, ⟨?_, ?_⟩, ?_⟩
       · rw [← isIrreducibleCharacter_compHom_mk'_iff (K.subgroupOf M), ← hPhi χbar, hχbar]
         exact hred
-      · rw [← subset_characterKernel_compHom_iff g (χbar : ClassFunction ↥h.K ℂ) (hInHu data), hχbar]
+      · rw [← subset_characterKernel_compHom_iff g (χbar : ClassFunction ↥h.K ℂ) (hInHu data),
+          hχbar]
         exact hχX
       · rw [hχbar]
     · rintro ⟨χbar, ⟨hred, hker⟩, rfl⟩
@@ -166,7 +170,8 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         exact hred
   -- injectivity of `Φ` on `B'`
   have hInj : Set.InjOn
-      (fun χbar : IrreducibleCharacter ↥h.K => induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) B' := by
+      (fun χbar : IrreducibleCharacter ↥h.K =>
+          induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) B' := by
     intro χbar hχbar χbar' _ heq
     simp only at heq
     rw [hPhi χbar, hPhi χbar'] at heq
@@ -358,7 +363,8 @@ theorem chiefFactor_H0supC_subgroupOf_normal [Finite G] {M : Subgroup G}
       (cSub_normalized_by_uW1 data chief))
       (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (cSub data chief))
   -- `H ≤ N(H₀ ⊔ C)`: `H ≤ N(H₀)` and `h C h⁻¹ ⊆ H₀ C` via `⁅H, C⁆ ≤ H₀`.
-  have hH : data.typeP.H ≤ Subgroup.normalizer ((chief.H0 ⊔ cSub data chief : Subgroup G) : Set G) := by
+  have hH :
+      data.typeP.H ≤ Subgroup.normalizer ((chief.H0 ⊔ cSub data chief : Subgroup G) : Set G) := by
     refine key _ _ (fun h hh => ?_)
     rw [Subgroup.smul_sup]
     refine sup_le ?_ ?_
@@ -538,7 +544,8 @@ theorem commutator_hcInHu_le_realized [Finite G] {M : Subgroup G} (data : TypesI
     · have hh : hInHu data = data.H.comap (M.subtype.comp (huSub data).subtype) := by
         rw [hInHu, Subgroup.subgroupOf, Subgroup.subgroupOf, Subgroup.comap_comap]
       rw [hh]; exact Subgroup.map_comap_le _ _
-    · have hc : cInHu data chief = (cSub data chief).comap (M.subtype.comp (huSub data).subtype) := by
+    · have hc : cInHu data chief = (cSub data chief).comap (M.subtype.comp
+        (huSub data).subtype) := by
         rw [cInHu, Subgroup.subgroupOf, Subgroup.subgroupOf, Subgroup.comap_comap]
       rw [hc]; exact Subgroup.map_comap_le _ _
   rw [hreal, ← Subgroup.map_le_iff_le_comap, Subgroup.map_commutator]

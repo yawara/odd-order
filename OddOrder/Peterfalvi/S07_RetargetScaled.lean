@@ -164,7 +164,8 @@ theorem retargetS_inner_eq_on {τ₁ : IntegralCharacterMap L G}
       ClassFunction.inner (τ₁ φperp) (τ₁ ψperp)
         + s * (ClassFunction.inner χ χ)⁻¹ * star (s' * (ClassFunction.inner χ χ)⁻¹)
             * ClassFunction.inner χ χ
-        + t * (ClassFunction.inner chibar chibar)⁻¹ * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
+        + t * (ClassFunction.inner chibar chibar)⁻¹
+            * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
             * ClassFunction.inner chibar chibar := by
     rw [retargetS_apply, retargetS_apply, ← hφperp, ← hψperp, ← hs, ← ht, ← hs', ← ht']
     simp only [smul_smul]
@@ -177,7 +178,8 @@ theorem retargetS_inner_eq_on {τ₁ : IntegralCharacterMap L G}
       ClassFunction.inner φperp ψperp
         + s * (ClassFunction.inner χ χ)⁻¹ * star (s' * (ClassFunction.inner χ χ)⁻¹)
             * ClassFunction.inner χ χ
-        + t * (ClassFunction.inner chibar chibar)⁻¹ * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
+        + t * (ClassFunction.inner chibar chibar)⁻¹
+            * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
             * ClassFunction.inner chibar chibar := by
     have hφ' : φ = φperp + (s * (ClassFunction.inner χ χ)⁻¹) • χ
         + (t * (ClassFunction.inner chibar chibar)⁻¹) • chibar := by
@@ -270,7 +272,8 @@ theorem retargetS_inner_eq_on_zSpan_union {τ₁ : IntegralCharacterMap L G}
       ClassFunction.inner (τ₁ φperp) (τ₁ ψperp)
         + s * (ClassFunction.inner χ χ)⁻¹ * star (s' * (ClassFunction.inner χ χ)⁻¹)
             * ClassFunction.inner χ χ
-        + t * (ClassFunction.inner chibar chibar)⁻¹ * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
+        + t * (ClassFunction.inner chibar chibar)⁻¹
+            * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
             * ClassFunction.inner chibar chibar := by
     rw [retargetS_apply, retargetS_apply, ← hφperp, ← hψperp, ← hs, ← ht, ← hs', ← ht']
     simp only [smul_smul]
@@ -281,7 +284,8 @@ theorem retargetS_inner_eq_on_zSpan_union {τ₁ : IntegralCharacterMap L G}
       ClassFunction.inner φperp ψperp
         + s * (ClassFunction.inner χ χ)⁻¹ * star (s' * (ClassFunction.inner χ χ)⁻¹)
             * ClassFunction.inner χ χ
-        + t * (ClassFunction.inner chibar chibar)⁻¹ * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
+        + t * (ClassFunction.inner chibar chibar)⁻¹
+            * star (t' * (ClassFunction.inner chibar chibar)⁻¹)
             * ClassFunction.inner chibar chibar := by
     have hφ' : φ = φperp + (s * (ClassFunction.inner χ χ)⁻¹) • χ
         + (t * (ClassFunction.inner chibar chibar)⁻¹) • chibar := by
@@ -320,7 +324,8 @@ theorem retargetS_apply_right (hχbarχ : ClassFunction.inner chibar χ = 0)
     (hχbarχbarne : ClassFunction.inner chibar chibar ≠ 0) :
     retargetS τ₁ χ chibar X Xbar chibar = Xbar := by
   have hres : orthoResidualMapS (L := L) χ chibar chibar = 0 := by
-    rw [orthoResidualMapS_apply, hχbarχ, zero_smul, sub_zero, smul_smul, mul_inv_cancel₀ hχbarχbarne,
+    rw [orthoResidualMapS_apply, hχbarχ, zero_smul, sub_zero, smul_smul,
+      mul_inv_cancel₀ hχbarχbarne,
       one_smul, sub_self]
   rw [retargetS_apply, hres, map_zero, hχbarχ, zero_smul, add_zero, zero_add, smul_smul,
     mul_inv_cancel₀ hχbarχbarne, one_smul]

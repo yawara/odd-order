@@ -100,7 +100,8 @@ theorem sum_transversalRep_eq_sum_div_orbit
     · intro hB
       rw [MulAction.mem_orbit_iff]
       have : (Quotient.mk'' B : hyp.conjClassQuotient)
-          = Quotient.mk'' (Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C) := by
+          = Quotient.mk''
+            (Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C) := by
         rw [hB, Quotient.out_eq']
       exact Quotient.exact' this
     · intro hB
@@ -111,7 +112,8 @@ theorem sum_transversalRep_eq_sum_div_orbit
   rw [hfiber_eq]
   -- on the orbit, the summand is constant `= h B₀ / |orbit B₀|`; there are `|orbit B₀|` terms.
   have hconst : ∀ B ∈ (MulAction.orbit L B₀).toFinset,
-      h B / (Nat.card (MulAction.orbit L B) : ℂ) = h B₀ / (Nat.card (MulAction.orbit L B₀) : ℂ) := by
+      h B / (Nat.card (MulAction.orbit L B) : ℂ)
+          = h B₀ / (Nat.card (MulAction.orbit L B₀) : ℂ) := by
     intro B hB
     rw [Set.mem_toFinset] at hB
     rw [horbit_const B₀ B hB, hcard_const B₀ B hB]

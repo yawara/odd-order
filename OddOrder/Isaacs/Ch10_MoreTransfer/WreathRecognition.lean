@@ -34,7 +34,8 @@ Theory", §10A 前半: `C_p ≀ C_p` 認識に向けた p-群構造補題群。
 「`A` が共役類で生成される」は Lean では `A = Subgroup.normalClosure {a}`
 (単元集合の正規閉包 = `a` の共役類が生成する部分群) で表す。
 
-後続 (Cor 10.5) も本 leaf に追加予定。
+後続 (Cor 10.5 = `exists_surjective_wreath_of_noncommProd_conjClass_ne_one`,
+Lem 10.14 = `not_isMetacyclic_wreath`) も本 leaf に実装済み。
 
 ## 主要依存
 

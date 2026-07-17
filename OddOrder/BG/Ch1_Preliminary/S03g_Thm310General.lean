@@ -446,6 +446,7 @@ theorem prime_card_and_finrank_of_frobenius_general [Finite G] [IsAlgClosed F] [
         = finrank F (Representation.invariants (ρ.comp R.subtype))) :
     ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
       finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) :=
-  frobenius_general_aux (Nat.card ↥K) (K := K) (R := R) ρ hRne hKne hKcard hcop hCVK hFrob hcond3 rfl
+  frobenius_general_aux (Nat.card ↥K) (K := K) (R := R) ρ hRne hKne hKcard hcop hCVK hFrob hcond3
+    rfl
 
 end OddOrder.BG.Ch1.S03

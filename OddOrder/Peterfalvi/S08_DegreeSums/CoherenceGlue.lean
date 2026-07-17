@@ -322,7 +322,8 @@ theorem sMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
   rw [ClassFunction.mem_support] at hg
   have hg1 : g ≠ 1 := by
     rintro rfl
-    exact hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hn1, star_natCast, sub_self])
+    exact hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hn1, star_natCast,
+      sub_self])
   have hχg : χ g ≠ 0 := fun h0 =>
     hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_zero])
   have hgH : g ∈ H := by
@@ -473,7 +474,8 @@ theorem isIrreducibleCharacter_of_mem_Xset_c2_caseA (hyp : SibleyDadeHypothesis 
   exact hyp.isIrreducibleCharacter_of_mem_Xset_caseA hyp.centralCommutator_le
     hyp.centralCommutator_subgroupOf_le_center
     (fun w _ => by
-      rw [Subgroup.normalizer_eq_top_iff.mpr hyp.centralCommutator_normal]; exact Subgroup.mem_top w)
+      rw [Subgroup.normalizer_eq_top_iff.mpr
+        hyp.centralCommutator_normal]; exact Subgroup.mem_top w)
     (fun w hw hw1 => hyp.centralizer_inf_centralCommutator_eq_bot_of_c2_caseA hK hW1 hA hw hw1)
     hχX
 
@@ -613,10 +615,13 @@ theorem xMember_characterFacts_of_irreducible_X (hyp : SibleyDadeHypothesis G L 
   refine ⟨hreal, ?_, ?_, ?_, ?_⟩
   · simpa using irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hirr⟩
   · simpa using
-      irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ⟨χ.conj, hconjirr⟩
-  · have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hirr⟩
+      irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ.conj, hconjirr⟩
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+      ⟨χ, hirr⟩
     rwa [if_neg hbi_ne] at h
-  · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ.conj, hconjirr⟩
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
+      ⟨χ.conj, hconjirr⟩
     rwa [if_neg (fun h => hbi_ne h.symm)] at h
 
 /-- **(T8 leaf 1) `X`-member character facts** (Frobenius case). -/
@@ -654,7 +659,8 @@ theorem xMember_diffSupport_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
   rw [ClassFunction.mem_support] at hg
   have hg1 : g ≠ 1 := by
     rintro rfl
-    exact hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hn1, star_natCast, sub_self])
+    exact hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hn1, star_natCast,
+      sub_self])
   have hχg : χ g ≠ 0 := fun h0 =>
     hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_zero])
   have hgH : g ∈ H := by

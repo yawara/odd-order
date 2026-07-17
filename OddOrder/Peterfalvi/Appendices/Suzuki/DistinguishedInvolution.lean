@@ -367,6 +367,57 @@ theorem normalCore_eq_centralizer_Q :
 theorem normalCore_le_V : hyp.H.normalCore ≤ hyp.V := by
   rw [hyp.normalCore_H_eq_bot]; exact bot_le
 
+/-! ## The distinguished involution `s` and structure conjugator `r` (p. 101)
+
+Named witnesses of Proposition 4(b): the *distinguished involution* `s` of
+`Q` and the element `r ∈ Q` of the *structure equation* `tst = r⁻¹tr`. -/
+
+/-- The distinguished pair `(s, r)` of Prop 4(b). -/
+noncomputable def distinguishedPair : G × G :=
+  hyp.existsUnique_distinguishedInvolution.exists.choose
+
+/-- The **distinguished involution** `s` of `Q` (Prop 4(b)). -/
+noncomputable def distinguishedInvolution : G := hyp.distinguishedPair.1
+
+/-- The element `r ∈ Q` of the structure equation `tst = r⁻¹tr` (Prop 4(b)). -/
+noncomputable def structureConjugator : G := hyp.distinguishedPair.2
+
+lemma distinguishedPair_spec :
+    (hyp.distinguishedInvolution ∈ hyp.H ∧ hyp.distinguishedInvolution ^ 2 = 1 ∧
+      hyp.distinguishedInvolution ≠ 1) ∧ hyp.structureConjugator ∈ hyp.Q ∧
+      hyp.t * hyp.distinguishedInvolution * hyp.t =
+        hyp.structureConjugator⁻¹ * hyp.t * hyp.structureConjugator :=
+  hyp.existsUnique_distinguishedInvolution.exists.choose_spec
+
+lemma distinguishedInvolution_mem_H : hyp.distinguishedInvolution ∈ hyp.H :=
+  hyp.distinguishedPair_spec.1.1
+
+lemma distinguishedInvolution_sq : hyp.distinguishedInvolution ^ 2 = 1 :=
+  hyp.distinguishedPair_spec.1.2.1
+
+lemma distinguishedInvolution_ne_one : hyp.distinguishedInvolution ≠ 1 :=
+  hyp.distinguishedPair_spec.1.2.2
+
+lemma structureConjugator_mem_Q : hyp.structureConjugator ∈ hyp.Q :=
+  hyp.distinguishedPair_spec.2.1
+
+/-- **Structure equation** `tst = r⁻¹tr` (Prop 4(b)). -/
+lemma structure_equation :
+    hyp.t * hyp.distinguishedInvolution * hyp.t =
+      hyp.structureConjugator⁻¹ * hyp.t * hyp.structureConjugator :=
+  hyp.distinguishedPair_spec.2.2
+
+/-- Uniqueness of the distinguished pair: any `(s', r')` satisfying the
+defining conditions equals `(s, r)`. -/
+lemma eq_distinguishedPair_of_structure {s' r' : G} (hsH : s' ∈ hyp.H)
+    (hs2 : s' ^ 2 = 1) (hs1 : s' ≠ 1) (hrQ : r' ∈ hyp.Q)
+    (heq : hyp.t * s' * hyp.t = r'⁻¹ * hyp.t * r') :
+    s' = hyp.distinguishedInvolution ∧ r' = hyp.structureConjugator := by
+  have h : (s', r') = hyp.distinguishedPair :=
+    hyp.existsUnique_distinguishedInvolution.unique
+      ⟨⟨hsH, hs2, hs1⟩, hrQ, heq⟩ hyp.distinguishedPair_spec
+  exact ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

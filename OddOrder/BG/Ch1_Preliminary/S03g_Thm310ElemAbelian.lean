@@ -49,7 +49,8 @@ theorem invariants_toRepresentation_map_eq (ρ : Representation F G V) (W : Subr
   ext v
   constructor
   · rintro ⟨⟨w, hw⟩, hinv, rfl⟩
-    have hinv' := (Representation.mem_invariants (W.toRepresentation.comp H.subtype) ⟨w, hw⟩).mp hinv
+    have hinv' :=
+      (Representation.mem_invariants (W.toRepresentation.comp H.subtype) ⟨w, hw⟩).mp hinv
     refine Submodule.mem_inf.mpr
       ⟨(Representation.mem_invariants (ρ.comp H.subtype) w).mpr fun g => ?_, hw⟩
     have hg := congrArg Subtype.val (hinv' g)
@@ -85,7 +86,8 @@ theorem invariants_toRepresentation_eq_bot (ρ : Representation F G V) (W : Subr
 /-- **Hypothesis restriction: the prime-manner equality passes to a subrepresentation** (issue 8013
 piece 5).  If `C_V(H₁) ⊓ W = C_V(H₂) ⊓ W` then the `H₁`- and `H₂`-invariants of `W.toRepresentation`
 agree.  Used to transfer the subspace-form prime-manner hypothesis `C_V(x) = C_V(R)` to `U, U'`. -/
-theorem invariants_toRepresentation_eq_of_inf_eq (ρ : Representation F G V) (W : Subrepresentation ρ)
+theorem invariants_toRepresentation_eq_of_inf_eq (ρ : Representation F G V)
+    (W : Subrepresentation ρ)
     (H₁ H₂ : Subgroup G)
     (h : Representation.invariants (ρ.comp H₁.subtype) ⊓ W.toSubmodule
       = Representation.invariants (ρ.comp H₂.subtype) ⊓ W.toSubmodule) :
@@ -309,10 +311,12 @@ private theorem frobenius_elemAbelian_c_aux
       have hU'pos : 0 < finrank F ↥U'.toSubmodule := finrank_pos
       have hUlt : finrank F ↥U.toSubmodule < n := by rw [hn] at hsum; omega
       have hU'lt : finrank F ↥U'.toSubmodule < n := by rw [hn] at hsum; omega
-      have hcycU : finrank F (Representation.invariants (U.toRepresentation.comp R.subtype)) ≤ 1 := by
+      have hcycU : finrank F (Representation.invariants (U.toRepresentation.comp R.subtype))
+          ≤ 1 := by
         rw [finrank_invariants_toRepresentation_inf]
         exact le_trans (Submodule.finrank_mono inf_le_left) hcyc
-      have hcycU' : finrank F (Representation.invariants (U'.toRepresentation.comp R.subtype)) ≤ 1 := by
+      have hcycU' : finrank F (Representation.invariants (U'.toRepresentation.comp R.subtype))
+          ≤ 1 := by
         rw [finrank_invariants_toRepresentation_inf]
         exact le_trans (Submodule.finrank_mono inf_le_left) hcyc
       have hIHU := IH (finrank F ↥U.toSubmodule) hUlt U.toRepresentation
@@ -450,7 +454,8 @@ theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
   have hKcard : (Nat.card ↥K : AlgebraicClosure (ZMod p)) ≠ 0 := by
     rw [Ne, CharP.cast_eq_zero_iff (AlgebraicClosure (ZMod p)) p]; exact hpK
   -- Apply the general-kernel, alg-closed terminal to `ρ'`.
-  obtain ⟨p', hp', hcard', hfr'⟩ := prime_card_and_finrank_of_frobenius_elemAbelian ρ' hRne hKne hcop
+  obtain ⟨p', hp', hcard', hfr'⟩ := prime_card_and_finrank_of_frobenius_elemAbelian ρ' hRne
+    hKne hcop
     (by rw [hρ', ← baseChangeRepresentation_comp]
         exact invariants_baseChangeRepresentation_eq_bot _ _ hCK0)
     hFrob
@@ -502,14 +507,17 @@ theorem card_eq_pow_card_invariants_of_elemAbelian_general {p : ℕ} [Fact p.Pri
     (hcond3 : ∀ x : H, x ∈ R → x ≠ 1 →
       ∀ m : M, ((x : H) • m = m) ↔ (∀ s : ↥R, (s : H) • m = m)) :
     Nat.card M = (Nat.card ↥(Representation.invariants
-      ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))) ^ Nat.card ↥R := by
+      ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)))
+        ^ Nat.card ↥R := by
   classical
-  obtain ⟨_, _, _, hfr⟩ := prime_card_and_finrank_of_elemAbelian_general hRne hKne hpH hcop hCK hFrob
+  obtain ⟨_, _, _, hfr⟩ := prime_card_and_finrank_of_elemAbelian_general hRne hKne hpH hcop hCK
+    hFrob
     hcond3
   haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
   haveI : Fintype (Additive M) := Fintype.ofFinite _
   haveI : Fintype ↥(Representation.invariants
-    ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) := Fintype.ofFinite _
+    ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) :=
+      Fintype.ofFinite _
   change Nat.card (Additive M) = (Nat.card ↥(Representation.invariants
     ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))) ^ Nat.card ↥R
   have hM : Nat.card (Additive M) = p ^ finrank (ZMod p) (Additive M) := by
@@ -622,7 +630,8 @@ theorem commutator_acts_trivially_of_elemAbelian_general {p : ℕ} [Fact p.Prime
     apply Module.FaithfullyFlat.tensorProduct_mk_injective (A := ZMod p)
       (B := AlgebraicClosure (ZMod p)) (Additive M)
     have hmap := congrArg
-      (fun f : TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M) →ₗ[AlgebraicClosure (ZMod p)]
+      (fun f : TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)
+        →ₗ[AlgebraicClosure (ZMod p)]
         TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M) => f (1 ⊗ₜ[ZMod p] v)) hcomm
     simpa [hρ'] using hmap
   have hfix : ρ g (Additive.ofMul m) = Additive.ofMul m := by rw [hρg]; rfl

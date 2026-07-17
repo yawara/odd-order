@@ -332,16 +332,19 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
     rw [hφeq] at hirr ⊢
     exact hyp.sSet_member_differenceImage hG hξ hirr
-  · -- `hconj`: conjugate of a degree-`d` irreducible member of `𝒮` is again one (uses `star d = d`).
+  · -- `hconj`: conjugate of a degree-`d` irreducible member of `𝒮` is again one
+    -- (uses `star d = d`).
     exact hconjmem
   · -- `hreal`: no real members, restricted to `S₁(d) ⊆ 𝒮` (`sSetIrrDeg_hasNoRealCharacters`).
     exact hyp.sSetIrrDeg_hasNoRealCharacters hG d
-  · -- `hortho`: pairwise orthogonal, restricted to `S₁(d) ⊆ 𝒮`.  The `FiniteInduce`-scoped instances
+  · -- `hortho`: pairwise orthogonal, restricted to `S₁(d) ⊆ 𝒮`.
+    -- The `FiniteInduce`-scoped instances
     -- baked into `sSet_pairwiseOrthogonal`'s `inner` are (subsingleton-)equal to the section ones.
     intro φ ψ hφ hψ hne
     convert sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) hφ.1 hψ.1 hne using 2;
       exact Subsingleton.elim _ _
-  · -- `hconjsupp`: the conjugate difference `χ − χ̄` is `A(S)`-supported (`χ̄ ∈ S₁(d)` + equal degree),
+  · -- `hconjsupp`: the conjugate difference `χ − χ̄` is `A(S)`-supported
+    -- (`χ̄ ∈ S₁(d)` + equal degree),
     -- extracted as `sSetIrrDeg_member_diff_supported` (with `y = χ̄`).
     intro χ hχ
     exact hyp.sSetIrrDeg_member_diff_supported hG d hχ (hconjmem hχ)
@@ -403,7 +406,8 @@ noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
     fun ζ hζ => hζ.2.1.inner_self_eq_one
   -- `hconst`: uniform degree `φ(1) = d` (definitional membership).
   have hconst : ∀ a ∈ hyp.sSetIrrDeg hG d, ∀ b ∈ hyp.sSetIrrDeg hG d,
-      ((a : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 = ((b : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 :=
+      ((a : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 =
+        ((b : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 :=
     fun a ha b hb => by rw [ha.2.2, hb.2.2]
   -- `hdeg0`: nonzero degree (exposed `d ≠ 0`).
   have hdeg0 : ∀ a ∈ hyp.sSetIrrDeg hG d, ((a : ClassFunction ↥hyp.S ℂ) : ↥hyp.S → ℂ) 1 ≠ 0 :=

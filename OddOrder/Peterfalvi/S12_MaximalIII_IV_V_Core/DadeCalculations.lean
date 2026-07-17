@@ -266,7 +266,8 @@ theorem Hypothesis.exists_muColumn_tau1_eq_sum_R [Finite G]
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     exact Finset.sum_eq_zero fun i' _ => hyp.muGrid_inner_cross_column hG hG.odd i i' hj'j.symm
   -- assemble the (5.4) decomposition via `ofProjection` and apply (5.5).
-  let R := hyp.columnImageFamily hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0 (Ne.symm hj'j) hconj
+  let R := hyp.columnImageFamily hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0
+    (Ne.symm hj'j) hconj
   let D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau χ 0 :=
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection R coh.tau1
       (fun φ ζ hφ hζ => coh.coherent.extension_inner_eq φ ζ (hspan hφ) (hspan hζ))
@@ -694,7 +695,8 @@ theorem Hypothesis.muColumnZero_sub_zeta_support [Finite G]
   classical
   obtain ⟨θ, _hθne, hζeq⟩ := hζS
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
-    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
@@ -812,7 +814,8 @@ theorem Hypothesis.exists_intCast_alignedOmegaSigmaGrid_zero_column [Finite G]
       e.toMonoidHom
   -- `alignedOmegaSigmaGrid i 0 = σ(ω ξ)` (mirror the `step1` of the χ-family lemma; `ω = lin`).
   have step1 : hyp.alignedOmegaSigmaGrid hG hodd i 0
-      = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (tic.omega ξ : ClassFunction ↥tic.W ℂ) := by
+      = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd)
+        (tic.omega ξ : ClassFunction ↥tic.W ℂ) := by
     change tic.sigmaIntegral rfl (hyp.canonicalFullDadeApp hG hodd)
         (tic.omega ξ : ClassFunction ↥tic.W ℂ)
       = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (tic.omega ξ : ClassFunction ↥tic.W ℂ)
@@ -832,7 +835,8 @@ theorem Hypothesis.exists_intCast_alignedOmegaSigmaGrid_zero_column [Finite G]
   -- column `0` trivial ⟹ `ξ` factors through `W₁` as `(w1CharEquiv …).comp wFst ∘ e`.
   have hξeq : ξ = ((h.w1CharEquiv (finCongr hcardW1.symm i)).comp
       h.sdiffTICyclicHypothesis.wFst).comp e.toMonoidHom := by
-    have hpc : (h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv (finCongr hcardW1.symm i)) χ₂)
+    have hpc : (h.sdiffTICyclicHypothesis.omegaProdChar
+        (h.w1CharEquiv (finCongr hcardW1.symm i)) χ₂)
         = (h.w1CharEquiv (finCongr hcardW1.symm i)).comp h.sdiffTICyclicHypothesis.wFst := by
       rw [hχ₂]
       exact h.sdiffTICyclicHypothesis.omegaProdChar_one_right _
@@ -886,11 +890,13 @@ theorem Hypothesis.alignedOmegaSigmaGrid_zero_zero [Finite G]
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
   let ξ : ↥tic.W →* ℂˣ :=
-    (h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1)))
+    (h.sdiffTICyclicHypothesis.omegaProdChar
+      (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1)))
       χ₂).comp e.toMonoidHom
   -- `alignedOmegaSigmaGrid 0 0 = σ(ω ξ)` (mirror the `step1` of the χ-family lemma).
   have step1 : hyp.alignedOmegaSigmaGrid hG hodd 0 0
-      = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (tic.omega ξ : ClassFunction ↥tic.W ℂ) := by
+      = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd)
+        (tic.omega ξ : ClassFunction ↥tic.W ℂ) := by
     change tic.sigmaIntegral rfl (hyp.canonicalFullDadeApp hG hodd)
         (tic.omega ξ : ClassFunction ↥tic.W ℂ)
       = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (tic.omega ξ : ClassFunction ↥tic.W ℂ)
@@ -967,7 +973,8 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
       e.toMonoidHom
   -- `alignedOmegaSigmaGrid a 0 = σ(ω ξ_a)` for any row `a`.
   have step1 : ∀ a, hyp.alignedOmegaSigmaGrid hG hodd a 0
-      = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (tic.omega (ξ a) : ClassFunction ↥tic.W ℂ) := by
+      = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd)
+        (tic.omega (ξ a) : ClassFunction ↥tic.W ℂ) := by
     intro a
     change tic.sigmaIntegral rfl (hyp.canonicalFullDadeApp hG hodd)
         (tic.omega (ξ a) : ClassFunction ↥tic.W ℂ)
@@ -1023,7 +1030,8 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
       refine MonoidHom.ext fun w => Units.val_injective ?_
       rw [MonoidHom.comp_apply, MonoidHom.inv_apply, MonoidHom.comp_apply, ← hprod,
         MonoidHom.inv_apply]
-    rw [step1 a, step1 (finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm a))),
+    rw [step1 a,
+      step1 (finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm a))),
       tic.sigma_mapRingEquiv_comm rfl (hyp.canonicalFullDadeApp hG hodd) _ _,
       OddOrder.Peterfalvi.S06.galoisMap_conj_omega, hξinv]
   -- oddness of the dual `Ŵ₁` (from `Odd |G|` via `W₁ ≤ M ≤ G` and Pontryagin).
@@ -1073,7 +1081,8 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
     intro j' hj'
     have hkey := hconj i'
     rw [hj'] at hkey
-    have hii : finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i')) = i := by
+    have hii : finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i'))
+        = i := by
       rw [hround, OddOrder.Peterfalvi.S06.rowInv_rowInv]; simp
     rw [hii] at hkey
     -- `hkey : ω_{j'0}^σ = ω_{i0}^σ`.  Conclude `j' = i` via grid orthonormality.
@@ -1127,7 +1136,8 @@ theorem Hypothesis.zeta_tau1_norm_ge_one [Finite G]
       ∃ n : ℤ, (hyp.alignedOmegaSigmaGrid hG hG.odd i 0) g = (n : ℂ) := fun i =>
     hyp.exists_intCast_alignedOmegaSigmaGrid_zero_column hG hG.odd i hgord
   let n : Fin hyp.w1 → ℤ := fun i => (hint i).choose
-  have hn : ∀ i, (hyp.alignedOmegaSigmaGrid hG hG.odd i 0) g = (n i : ℂ) := fun i => (hint i).choose_spec
+  have hn : ∀ i, (hyp.alignedOmegaSigmaGrid hG hG.odd i 0) g = (n i : ℂ) :=
+    fun i => (hint i).choose_spec
   -- `m := ∑ n i`, and `ζ^{τ₁}(g) = (m : ℂ)`.
   have hval : coh.tau1 params.zeta g = ((∑ i : Fin hyp.w1, n i : ℤ) : ℂ) := by
     rw [hstep2, hsumapply]
@@ -1136,7 +1146,8 @@ theorem Hypothesis.zeta_tau1_norm_ge_one [Finite G]
   refine ⟨∑ i : Fin hyp.w1, n i, hval, ?_⟩
   -- the row-conjugation involution `ρ` ((3.9)(a)).
   have hB : ∀ a : Fin hyp.w1, ∃ i' : Fin hyp.w1,
-      ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (hyp.alignedOmegaSigmaGrid hG hG.odd a 0)
+      ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+        (hyp.alignedOmegaSigmaGrid hG hG.odd a 0)
         = hyp.alignedOmegaSigmaGrid hG hG.odd i' 0
       ∧ (i' = a ↔ a = 0)
       ∧ (∀ j' : Fin hyp.w1,

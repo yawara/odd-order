@@ -98,6 +98,31 @@ theorem eq_one_of_sq_eq_one_of_odd_card {G : Type*} [Group G] [Finite G]
   rw [hc, Nat.dvd_one, orderOf_eq_one_iff] at hg
   exact congrArg Subtype.val hg
 
+/-- A subgroup containing an involution has even order. -/
+theorem even_card_of_sq_eq_one_mem {G : Type*} [Group G] [Finite G]
+    {K : Subgroup G} {v : G} (hv : v ∈ K) (hv2 : v ^ 2 = 1) (hv1 : v ≠ 1) :
+    Even (Nat.card K) := by
+  have h2 : (⟨v, hv⟩ : K) ^ 2 = 1 := Subtype.ext (by push_cast; exact hv2)
+  have h1 : (⟨v, hv⟩ : K) ≠ 1 := fun h => hv1 (congrArg Subtype.val h)
+  have hdvd := orderOf_dvd_natCard (⟨v, hv⟩ : K)
+  rw [orderOf_eq_prime h2 h1] at hdvd
+  obtain ⟨r, hr⟩ := hdvd
+  exact ⟨r, by omega⟩
+
+/-- A subgroup of even order contains an involution (Cauchy). -/
+theorem exists_sq_eq_one_of_even_card {G : Type*} [Group G] [Finite G]
+    {K : Subgroup G} (heven : Even (Nat.card K)) :
+    ∃ v : G, v ∈ K ∧ v ^ 2 = 1 ∧ v ≠ 1 := by
+  haveI : Fintype K := Fintype.ofFinite _
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := K) 2
+    (by rw [← Nat.card_eq_fintype_card]; exact heven.two_dvd)
+  have hord : orderOf (x : G) = 2 :=
+    (orderOf_injective K.subtype K.subtype_injective x).trans hx
+  refine ⟨x, x.2, by rw [← hord]; exact pow_orderOf_eq_one _, ?_⟩
+  intro h1
+  rw [h1, orderOf_one] at hord
+  norm_num at hord
+
 /-- Conjugating a subgroup twice composes: `(K^a)^b = K^{ba}`. -/
 theorem map_conj_map_conj {G : Type*} [Group G] (K : Subgroup G) (a b : G) :
     (K.map (MulAut.conj a).toMonoidHom).map (MulAut.conj b).toMonoidHom =
@@ -355,6 +380,109 @@ lemma card_G_eq :
     rw [hyp.H_def]
     exact index_stabilizer_of_transitive G hyp.basept
   rw [← h1, hidx, hyp.card_Omega, hyp.card_H_eq]
+
+/-! ## The conjugate hypothesis (swapping `basept` and `t • basept`)
+
+The book's "similarly" steps (e.g. Prop 6(a), p. 102: `C_{Q^t}(X)` is
+transitive on `Ω_X - {H^t}`) transfer statements about `Ω - {basept}` to
+`Ω - {t • basept}`.  Formally this is conjugation of the whole hypothesis
+by `t`: the same group and involution, with point stabilizer `H^t`,
+regular normal complement `Q^t` and the same two-point stabilizer `D`. -/
+
+/-- `t` normalizes `D`: `D^t = D`. -/
+lemma D_map_conj_t_eq :
+    hyp.D.map (MulAut.conj hyp.t).toMonoidHom = hyp.D := by
+  ext x
+  rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
+  constructor
+  · intro h
+    have h2 := hyp.t_conj_mem_D h
+    have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+    have h3 : hyp.t⁻¹ * (hyp.t⁻¹ * x * hyp.t) * hyp.t = x := by
+      rw [hyp.t_inv_eq]
+      calc hyp.t * (hyp.t * x * hyp.t) * hyp.t
+          = (hyp.t * hyp.t) * x * (hyp.t * hyp.t) := by group
+        _ = x := by rw [htt, one_mul, mul_one]
+    rwa [h3] at h2
+  · exact hyp.t_conj_mem_D
+
+/-- The **conjugate hypothesis**: swap the roles of `basept` and
+`t • basept`.  Same group, same involution `t`; the point stabilizer
+becomes `H^t`, the regular normal complement `Q^t`, and `D` is unchanged. -/
+def symm : Hypothesis G Ω where
+  basept := hyp.t • hyp.basept
+  doubly_transitive := hyp.doubly_transitive
+  faithful := hyp.faithful
+  H := hyp.H.map (MulAut.conj hyp.t).toMonoidHom
+  Q := hyp.Q.map (MulAut.conj hyp.t).toMonoidHom
+  D := hyp.D
+  H_def := hyp.stabilizer_t_basept.symm
+  t := hyp.t
+  t_sq := hyp.t_sq
+  t_ne_one := hyp.t_ne_one
+  t_not_mem_H := by
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply, inv_mul_cancel, one_mul]
+    exact hyp.t_not_mem_H
+  D_def := by
+    rw [map_conj_map_conj, show hyp.t * hyp.t = 1 by rw [← sq]; exact hyp.t_sq,
+      map_conj_one, inf_comm, ← hyp.D_def]
+  Q_le_H := Subgroup.map_mono hyp.Q_le_H
+  Q_normal_in_H := by
+    intro h hh x hx
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply] at hh hx ⊢
+    have h2 := hyp.Q_normal_in_H _ hh _ hx
+    have h3 : (hyp.t⁻¹ * h * hyp.t) * (hyp.t⁻¹ * x * hyp.t) *
+        (hyp.t⁻¹ * h * hyp.t)⁻¹ = hyp.t⁻¹ * (h * x * h⁻¹) * hyp.t := by
+      group
+    rwa [h3] at h2
+  Q_inf_D_eq_bot := by
+    rw [eq_bot_iff]
+    intro x hx
+    obtain ⟨hxQ, hxD⟩ := Subgroup.mem_inf.mp hx
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply] at hxQ
+    have h2 : hyp.t⁻¹ * x * hyp.t ∈ hyp.Q ⊓ hyp.D :=
+      ⟨hxQ, hyp.t_conj_mem_D hxD⟩
+    rw [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot] at h2
+    rw [Subgroup.mem_bot]
+    calc x = hyp.t * (hyp.t⁻¹ * x * hyp.t) * hyp.t⁻¹ := by group
+      _ = 1 := by rw [h2]; group
+  Q_mul_D_eq_H := by
+    have himg : ∀ K : Subgroup G,
+        ((K.map (MulAut.conj hyp.t).toMonoidHom : Subgroup G) : Set G) =
+          (MulAut.conj hyp.t).toMonoidHom '' (K : Set G) := fun K =>
+      Subgroup.coe_map _ _
+    rw [himg, show (hyp.D : Set G) =
+        ((hyp.D.map (MulAut.conj hyp.t).toMonoidHom : Subgroup G) : Set G) by
+        rw [hyp.D_map_conj_t_eq],
+      himg, himg, ← Set.image_mul, hyp.Q_mul_D_eq_H]
+  Q_even := by
+    have hcard : Nat.card ↥(hyp.Q.map (MulAut.conj hyp.t).toMonoidHom) =
+        Nat.card ↥hyp.Q :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        (MulEquiv.injective (MulAut.conj hyp.t))).toEquiv.symm
+    rw [hcard]
+    exact hyp.Q_even
+  D_odd := hyp.D_odd
+  two_rank_ge_two := hyp.two_rank_ge_two
+
+@[simp] lemma symm_basept : hyp.symm.basept = hyp.t • hyp.basept := rfl
+
+@[simp] lemma symm_t : hyp.symm.t = hyp.t := rfl
+
+@[simp] lemma symm_D : hyp.symm.D = hyp.D := rfl
+
+@[simp] lemma symm_Q :
+    hyp.symm.Q = hyp.Q.map (MulAut.conj hyp.t).toMonoidHom := rfl
+
+@[simp] lemma symm_H :
+    hyp.symm.H = hyp.H.map (MulAut.conj hyp.t).toMonoidHom := rfl
+
+/-- Under the conjugate hypothesis, the "other" point `t' • basept'` is the
+original base point. -/
+@[simp] lemma symm_t_smul_basept :
+    hyp.symm.t • hyp.symm.basept = hyp.basept := by
+  rw [symm_t, symm_basept, smul_smul,
+    show hyp.t * hyp.t = 1 by rw [← sq]; exact hyp.t_sq, one_smul]
 
 /-! ## Chapter I §1, Proposition 1 (p. 100) -/
 

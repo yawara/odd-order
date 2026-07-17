@@ -869,9 +869,11 @@ theorem pencilCell (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : �
   have hχLb : χ ∈ A rb j₀ := by rw [hLb]; exact Finset.mem_insert_self _ _
   have hχLc : χ ∈ A rc j₀ := by rw [hLc]; exact Finset.mem_insert_self _ _
   have hfbLb : fb ∈ A rb j₀ := by
-    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hfcLc : fc ∈ A rc j₀ := by
-    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have dχnfb : χ ≠ -fb := ne_neg_of_Llinked hG (Or.inr ⟨hab, rfl⟩) hχLa hfbLb
   have dχnfc : χ ≠ -fc := ne_neg_of_Llinked hG (Or.inr ⟨hac, rfl⟩) hχLa hfcLc
   have dnfbnfc : (-fb) ≠ -fc := by
@@ -920,17 +922,20 @@ theorem transversalCell (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j�
   have hmaLa : ma ∈ A ra j₀ := by
     rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfaLa : fa ∈ A ra j₀ := by
-    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hχLb : χ ∈ A rb j₀ := by rw [hLb]; exact Finset.mem_insert_self _ _
   have hmbLb : mb ∈ A rb j₀ := by
     rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfbLb : fb ∈ A rb j₀ := by
-    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hχLc : χ ∈ A rc j₀ := by rw [hLc]; exact Finset.mem_insert_self _ _
   have hmcLc : mc ∈ A rc j₀ := by
     rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfcLc : fc ∈ A rc j₀ := by
-    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hmaT : ma ∈ A rt j₀ := by rw [hT]; exact Finset.mem_insert_self _ _
   have hmbT : mb ∈ A rt j₀ := by
     rw [hT]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
@@ -946,8 +951,10 @@ theorem transversalCell (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j�
   -- Step 3: exclude `-χ ∈ B`, hence `-fa ∈ B`.
   have hnegχ_nB : -χ ∉ A rt j₁ := by
     intro hnegχ
-    have hfbB : fb ∈ A rt j₁ := oStep_force hG hbt.symm hj.symm hLb dχmb dχfb dmbfb hχ_nB hmb_nB hnegχ
-    have hfcB : fc ∈ A rt j₁ := oStep_force hG hct.symm hj.symm hLc dχmc dχfc dmcfc hχ_nB hmc_nB hnegχ
+    have hfbB : fb ∈ A rt j₁ :=
+      oStep_force hG hbt.symm hj.symm hLb dχmb dχfb dmbfb hχ_nB hmb_nB hnegχ
+    have hfcB : fc ∈ A rt j₁ :=
+      oStep_force hG hct.symm hj.symm hLc dχmc dχfc dmcfc hχ_nB hmc_nB hnegχ
     have hmanegχ : ma ≠ -χ := ne_neg_of_mem_same hG hmaLa hχLa
     obtain ⟨t, _, _, _, hBset⟩ :=
       exists_third_of_card_three (hG.card_eq_three rt j₁) hmaB hnegχ hmanegχ
@@ -1018,19 +1025,23 @@ theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : �
   have hmaLa : ma ∈ A ra j₀ := by
     rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfaLa : fa ∈ A ra j₀ := by
-    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hχLb : χ ∈ A rb j₀ := by rw [hLb]; exact Finset.mem_insert_self _ _
   have hmbLb : mb ∈ A rb j₀ := by
     rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfbLb : fb ∈ A rb j₀ := by
-    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hχLc : χ ∈ A rc j₀ := by rw [hLc]; exact Finset.mem_insert_self _ _
   have hfcLc : fc ∈ A rc j₀ := by
-    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   -- `B₁`, `B₃` memberships
   have hmaB1 : ma ∈ A ra j₁ := by rw [hB1]; exact Finset.mem_insert_self _ _
   have hfbB1 : fb ∈ A ra j₁ := by
-    rw [hB1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hB1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hnegmbB1 : -mb ∈ A ra j₁ := by
     rw [hB1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hmaB3 : ma ∈ A rt j₁ := by rw [hB3]; exact Finset.mem_insert_self _ _
@@ -1059,7 +1070,8 @@ theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : �
     · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
       exact ⟨(hnn hmaLa hfaLa).symm, neg_injective.ne hfa_mb, (hnn hfbLb hfaLa).symm⟩
     · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
-      exact ⟨(hnn hmaLa hfcLc).symm, neg_injective.ne (hcross hbc.symm hχLc hχLb hfcLc hmbLb dχfc.symm),
+      exact ⟨(hnn hmaLa hfcLc).symm,
+        neg_injective.ne (hcross hbc.symm hχLc hχLb hfcLc hmbLb dχfc.symm),
         (hnn hfbLb hfcLc).symm⟩
   have hmb_nB2 : mb ∉ A rb j₁ := by
     have h := hG.noNeg_L ra rb j₁ j₁ (Or.inr ⟨hab, rfl⟩) (-mb) hnegmbB1
@@ -1167,17 +1179,20 @@ theorem caseI_special (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ 
   have hmaLa : ma ∈ A ra j₀ := by
     rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfaLa : fa ∈ A ra j₀ := by
-    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hχLb : χ ∈ A rb j₀ := by rw [hLb]; exact Finset.mem_insert_self _ _
   have hmbLb : mb ∈ A rb j₀ := by
     rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfbLb : fb ∈ A rb j₀ := by
-    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hχLc : χ ∈ A rc j₀ := by rw [hLc]; exact Finset.mem_insert_self _ _
   have hmcLc : mc ∈ A rc j₀ := by
     rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have hfcLc : fc ∈ A rc j₀ := by
-    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have hnn : ∀ {r s : ι} {x y : ClassFunction G ℂ}, x ∈ A r j₀ → y ∈ A s j₀ → x ≠ -y := by
     intro r s x y hx hy
     by_cases hrs : r = s
@@ -1288,11 +1303,14 @@ theorem exists_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fint
   have he23_3 : e23 ∈ A i₃ j₀ := by
     rw [hS3]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
   have ht1_1 : t1 ∈ A i₁ j₀ := by
-    rw [hS1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hS1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have ht2_2 : t2 ∈ A i₂ j₀ := by
-    rw [hS2]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hS2]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   have ht3_3 : t3 ∈ A i₃ j₀ := by
-    rw [hS3]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+    rw [hS3]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+      (Finset.mem_singleton_self _))
   by_cases he12 : e12 ∈ A i₄ j₀
   · -- Case I, apex `e12`, pencil `i₁, i₂, i₄`, transversal `i₃`
     obtain ⟨hne13_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h41, rfl⟩) hS1 d1213 de12t1 de13t1 he12
@@ -1301,12 +1319,14 @@ theorem exists_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fint
       lStep_third hG (Or.inr ⟨h43, rfl⟩) hS3 d1323 de13t3 de23t3 hne13_4 hne23_4
     have he12t3 : e12 ≠ t3 := fun h =>
       d1213 (eq_of_mem_Llinked hG (Or.inr ⟨h13, rfl⟩) he13_1 he13_3 he12_1 (by rw [h]; exact ht3_3))
-    obtain ⟨fc, _, _, _, hA4⟩ := exists_third_of_card_three (hG.card_eq_three i₄ j₀) he12 ht3_4 he12t3
+    obtain ⟨fc, _, _, _, hA4⟩ :=
+      exists_third_of_card_three (hG.card_eq_three i₄ j₀) he12 ht3_4 he12t3
     exact caseI_false hG h12 (Ne.symm h41) (Ne.symm h42) h13 h23 h43 hjne hS1 hS2 hA4 hS3
   · by_cases he13 : e13 ∈ A i₄ j₀
     · -- Case I, apex `e13`, pencil `i₁, i₃, i₄`, transversal `i₂`
       have hS1' : A i₁ j₀ = {e13, e12, t1} := by rw [hS1, Finset.insert_comm]
-      obtain ⟨hne12_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h41, rfl⟩) hS1' d1213.symm de13t1 de12t1 he13
+      obtain ⟨hne12_4, _, _, _, _⟩ :=
+        lStep hG (Or.inr ⟨h41, rfl⟩) hS1' d1213.symm de13t1 de12t1 he13
       obtain ⟨hne23_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h43, rfl⟩) hS3 d1323 de13t3 de23t3 he13
       have ht2_4 : t2 ∈ A i₄ j₀ :=
         lStep_third hG (Or.inr ⟨h42, rfl⟩) hS2 d1223 de12t2 de23t2 hne12_4 hne23_4
@@ -1320,8 +1340,10 @@ theorem exists_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fint
       · -- Case I, apex `e23`, pencil `i₂, i₃, i₄`, transversal `i₁`
         have hS2' : A i₂ j₀ = {e23, e12, t2} := by rw [hS2, Finset.insert_comm]
         have hS3' : A i₃ j₀ = {e23, e13, t3} := by rw [hS3, Finset.insert_comm]
-        obtain ⟨hne12_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h42, rfl⟩) hS2' d1223.symm de23t2 de12t2 he23
-        obtain ⟨hne13_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h43, rfl⟩) hS3' d1323.symm de23t3 de13t3 he23
+        obtain ⟨hne12_4, _, _, _, _⟩ :=
+          lStep hG (Or.inr ⟨h42, rfl⟩) hS2' d1223.symm de23t2 de12t2 he23
+        obtain ⟨hne13_4, _, _, _, _⟩ :=
+          lStep hG (Or.inr ⟨h43, rfl⟩) hS3' d1323.symm de23t3 de13t3 he23
         have ht1_4 : t1 ∈ A i₄ j₀ :=
           lStep_third hG (Or.inr ⟨h41, rfl⟩) hS1 d1213 de12t1 de13t1 hne12_4 hne13_4
         have he23t1 : e23 ≠ t1 := fun h =>
@@ -1329,7 +1351,8 @@ theorem exists_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fint
             (by rw [h]; exact ht1_1) he23_2).symm
         obtain ⟨fc, _, _, _, hA4⟩ :=
           exists_third_of_card_three (hG.card_eq_three i₄ j₀) he23 ht1_4 he23t1
-        exact caseI_false hG h23 (Ne.symm h42) (Ne.symm h43) h12.symm h13.symm h41 hjne hS2' hS3' hA4 hS1
+        exact caseI_false hG h23 (Ne.symm h42) (Ne.symm h43) h12.symm h13.symm h41 hjne hS2' hS3'
+          hA4 hS1
       · -- Case II: the fourth cell is the three "third" elements
         have ht1_4 : t1 ∈ A i₄ j₀ :=
           lStep_third hG (Or.inr ⟨h41, rfl⟩) hS1 d1213 de12t1 de13t1 he12 he13
@@ -1634,12 +1657,16 @@ theorem symm_orthonormal_family [Fintype ι] [Fintype κ] (hG : IsSignedTripleGr
     rcases eq_or_ne i k with rfl | hik
     · have hjl : j ≠ l := fun h => hne (by rw [h])
       have hnm : φ i j ∉ A i l := fun hmem =>
-        Ne.symm (hd3 i j) (eq_of_mem_Llinked hG (Or.inl ⟨rfl, hjl⟩) (hw i j) (hw i l) (hφc i j) hmem)
-      exact ⟨fun h => hnm (h ▸ hφc i l), hG.ne_neg_of_Llinked (Or.inl ⟨rfl, hjl⟩) (hφc i j) (hφc i l)⟩
+        Ne.symm (hd3 i j) (eq_of_mem_Llinked hG (Or.inl ⟨rfl, hjl⟩) (hw i j) (hw i l)
+          (hφc i j) hmem)
+      exact ⟨fun h => hnm (h ▸ hφc i l),
+        hG.ne_neg_of_Llinked (Or.inl ⟨rfl, hjl⟩) (hφc i j) (hφc i l)⟩
     · rcases eq_or_ne j l with rfl | hjl
       · have hnm : φ i j ∉ A k j := fun hmem =>
-          Ne.symm (hd2 i j) (eq_of_mem_Llinked hG (Or.inr ⟨hik, rfl⟩) (hz j i) (hz j k) (hφc i j) hmem)
-        exact ⟨fun h => hnm (h ▸ hφc k j), hG.ne_neg_of_Llinked (Or.inr ⟨hik, rfl⟩) (hφc i j) (hφc k j)⟩
+          Ne.symm (hd2 i j) (eq_of_mem_Llinked hG (Or.inr ⟨hik, rfl⟩) (hz j i) (hz j k)
+            (hφc i j) hmem)
+        exact ⟨fun h => hnm (h ▸ hφc k j),
+          hG.ne_neg_of_Llinked (Or.inr ⟨hik, rfl⟩) (hφc i j) (hφc k j)⟩
       · obtain ⟨h1, h2⟩ := hG.third_not_mem_far_cell hι hκ hik hjl (hz j) (hw i)
           (hφcell i j) (hd1 i j) (hd2 i j) (hd3 i j)
         exact ⟨fun h => h1 (h ▸ hφc k l), fun h => h2 (by rw [h, neg_neg]; exact hφc k l)⟩

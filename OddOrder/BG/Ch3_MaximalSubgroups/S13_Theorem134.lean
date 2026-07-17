@@ -127,7 +127,8 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
       have htb : t = b := by
         have htd := (Nat.mem_primeFactors.mp ht).2.1
         rw [hB₀card, pow_one] at htd
-        exact (Nat.prime_dvd_prime_iff_eq (Nat.mem_primeFactors.mp ht).1 (Fact.out : b.Prime)).mp htd
+        exact (Nat.prime_dvd_prime_iff_eq (Nat.mem_primeFactors.mp ht).1 (Fact.out : b.Prime)).mp
+          htd
       rw [htb]; exact hbnot
     have hB₀cent := hcor132.2.1 B₀ (le_inf hB₀E hB₀Mdag) hB₀pi
     have hcomm0 : ⁅S10.Msigma M ⊓ Mdag, B₀⁆ = ⊥ := by
@@ -139,7 +140,8 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
     hYne (le_bot_iff.mp (hYsub.trans (Subgroup.commutator_mono le_rfl hB₀MMdag |>.trans hbot.le)))
   have haβ : a ∈ S10.beta Mdag := (hcor132.2.2 hint).2 ha
   have hnc : ¬ ∃ g : G, MulAut.conj g • M = Mdag :=
-    not_conj_of_mem_tau1_union_tau3_of_normalizer_le hG h.mem_maximal (Or.inl ha) hA₀M hA₀ne hA₀p hNA₀
+    not_conj_of_mem_tau1_union_tau3_of_normalizer_le hG h.mem_maximal (Or.inl ha) hA₀M hA₀ne hA₀p
+      hNA₀
   have hMdagNe : Mdag ≠ M := fun heq => hnc ⟨1, by rw [map_one, one_smul]; exact heq.symm⟩
   -- `T` abelian (Theorem 12.13).
   have hTab : IsMulCommutative ↥T := by
@@ -160,7 +162,8 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
           (Nat.mem_primeFactors.mp ht).2.1.trans (Subgroup.card_dvd_of_le hB₀E), Nat.card_pos.ne'⟩))
       (fun t ht htc => htc (S10.Msigma_isPiGroup M t (Nat.mem_primeFactors.mpr
         ⟨(Nat.mem_primeFactors.mp ht).1,
-          (Nat.mem_primeFactors.mp ht).2.1.trans (Subgroup.card_dvd_of_le hTMsig), Nat.card_pos.ne'⟩)))
+          (Nat.mem_primeFactors.mp ht).2.1.trans (Subgroup.card_dvd_of_le hTMsig),
+            Nat.card_pos.ne'⟩)))
   have hB₀T_norm : B₀ ≤ Subgroup.normalizer (T : Set G) := le_sup_right.trans hTinv
   have hCYB : ⁅T, B₀⁆ ⊓ Subgroup.centralizer (B₀ : Set G) = ⊥ :=
     commutator_inf_centralizer_eq_bot_of_isCommutative
@@ -192,7 +195,8 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
   have hMdagα_ne : S10.Malpha Mdag ≠ ⊥ := fun hbot => hA₀ne (le_bot_iff.mp (hbot ▸ hA₀Mα))
   -- `ℳ(N_G(Y)) = {M†}`.
   have hMNYdag :
-      maximalSubgroupsContaining (Subgroup.normalizer ((⁅T, B₀⁆ : Subgroup G) : Set G)) = {Mdag} := by
+      maximalSubgroupsContaining (Subgroup.normalizer ((⁅T, B₀⁆ : Subgroup G) : Set G))
+        = {Mdag} := by
     by_contra hne
     obtain ⟨_, hCBY⟩ :=
       (tau1_Malpha_interaction hG hMdagMax hbs.symm hbτ1 hB₀ hB₀Mdag hYMdag hYne hYq hB₀NY hCYB
@@ -351,7 +355,8 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
       have hsr : s = r := by
         have hsd := (Nat.mem_primeFactors.mp hs).2.1
         rw [hRcard, pow_one] at hsd
-        exact (Nat.prime_dvd_prime_iff_eq (Nat.mem_primeFactors.mp hs).1 (Fact.out : r.Prime)).mp hsd
+        exact (Nat.prime_dvd_prime_iff_eq (Nat.mem_primeFactors.mp hs).1 (Fact.out : r.Prime)).mp
+          hsd
       rw [hsr]; exact hrnot
     have hRcent := hcor132.2.1 R (le_inf hRE hRMstar) hRpi
     have hcomm0 : ⁅S10.Msigma M ⊓ Mstar, R⁆ = ⊥ := by
@@ -387,7 +392,8 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
           (Nat.mem_primeFactors.mp hs).2.1.trans (Subgroup.card_dvd_of_le hRE), Nat.card_pos.ne'⟩))
       (fun s hs hsc => hsc (S10.Msigma_isPiGroup M s (Nat.mem_primeFactors.mpr
         ⟨(Nat.mem_primeFactors.mp hs).1,
-          (Nat.mem_primeFactors.mp hs).2.1.trans (Subgroup.card_dvd_of_le hSMsig), Nat.card_pos.ne'⟩)))
+          (Nat.mem_primeFactors.mp hs).2.1.trans (Subgroup.card_dvd_of_le hSMsig),
+            Nat.card_pos.ne'⟩)))
   have hRS_norm : R ≤ Subgroup.normalizer (S : Set G) := le_sup_right.trans hSinv
   have hCQR : ⁅S, R⁆ ⊓ Subgroup.centralizer (R : Set G) = ⊥ :=
     commutator_inf_centralizer_eq_bot_of_isCommutative
@@ -426,7 +432,8 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   -- ===== step 5: `ℳ(N_G(Q)) = {M*}` (Lemma 12.18(a) with `(r, R, M*)` for `(p, P, M)`) =====
   -- If `ℳ(N_G(Q)) ≠ {M*}`, Lemma 12.18(a) forces `M*_α ⊓ C(R ⊔ Q) = ⊥`; but `1 ⊂ P` lies there.
   have hMNQstar :
-      maximalSubgroupsContaining (Subgroup.normalizer ((⁅S, R⁆ : Subgroup G) : Set G)) = {Mstar} := by
+      maximalSubgroupsContaining (Subgroup.normalizer ((⁅S, R⁆ : Subgroup G) : Set G))
+        = {Mstar} := by
     by_contra hne
     obtain ⟨_, hCRQ⟩ :=
       (tau1_Malpha_interaction hG hMstarMax hrq.symm hrτ1 hR hRMstar hQMstar hQne hQq hRNQ hCQR

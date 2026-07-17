@@ -38,7 +38,8 @@ theorem extension_eq_or_eq_neg_of_frobenius
     hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
         = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁
       ∨ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
-        = -(hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₂ :=
+        = -(hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3
+              hHp).extension χ₂ :=
   hyp.extension_eq_or_eq_neg_general hF
     (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
     hyp.coherentYset hη₁ hχ₁ hχ₂ hne ha hdeg2 hgood
@@ -60,9 +61,11 @@ theorem extension_eq_or_eq_neg_c2_caseA
     (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
       = -(a : ℂ)) :
     hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
-        = (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension χ₁
+        = (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3
+              hHp).extension χ₁
       ∨ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
-        = -(hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension χ₂ :=
+        = -(hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3
+              hHp).extension χ₂ :=
   hyp.extension_eq_or_eq_neg_general_c2_caseA hK hW1 hA
     (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp)
     hyp.coherentYset hη₁ hχ₁ hχ₂ hne ha hdeg2 hgood
@@ -152,7 +155,8 @@ theorem crux_of_third_anchor_general_c2_caseA
     rw [hXc.extension_inner_eq ψ ψ' (Submodule.subset_span hψ) (Submodule.subset_span hψ')]
     have h := irreducibleCharacter_inner_eq_ite
       (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ⟩ : IrreducibleCharacter ↥L)
-      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ'⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ',
+          hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ'⟩ : IrreducibleCharacter ↥L)
     simpa using h
   rcases hyp.extension_eq_or_eq_neg_general_c2_caseA hK hW1 hA cX cY hη₁ hχ₁ hχ₂ hne₂ ha hdeg2
     hgood with h | h
@@ -209,7 +213,8 @@ theorem crux_of_third_anchor_c2_caseA
     (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
       = -(a : ℂ)) :
     hyp.tau (χ₁ - a • η₁)
-      = (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension χ₁
+      = (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3
+            hHp).extension χ₁
         - (a : ℂ) • hyp.coherentYset.extension η₁ :=
   hyp.crux_of_third_anchor_general_c2_caseA hK hW1 hA
     (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp)
@@ -300,7 +305,8 @@ theorem crux_c2_caseA
     (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1)
     (hm3 : 3 ≤ hyp.Yset.ncard) :
     hyp.tau (χ₁ - a • η₁)
-      = (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension χ₁
+      = (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3
+            hHp).extension χ₁
         - (a : ℂ) • hyp.coherentYset.extension η₁ :=
   hyp.crux_of_third_anchor_c2_caseA hK hW1 hA hHnonab hp hp3 hHp hη₁ hχ₁ hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂
     ha hdeg2 hdeg3
@@ -535,7 +541,8 @@ theorem inner_tau_scaledDiff_tau_Xset_scaledDiff_of_frobenius
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη₁)
       hdegX
-  have hsuppX3 : (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+  have hsuppX3 :
+      (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
     hyp.dade hyp.hconj (S := ({χ₁ - a • η₁, χ₃ - d • χ₁} : Set (ClassFunction ↥L ℂ)))
@@ -599,7 +606,8 @@ theorem inner_tau_scaledDiff_tau_Xset_scaledDiff_c2_caseA
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη₁)
       hdegX
-  have hsuppX3 : (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+  have hsuppX3 :
+      (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
     hyp.dade hyp.hconj (S := ({χ₁ - a • η₁, χ₃ - d • χ₁} : Set (ClassFunction ↥L ℂ)))
@@ -664,7 +672,8 @@ theorem inner_extension_Xset_scaledSub_eq_neg_general
     rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_conj_symm (cX.extension χ)
         (cY.extension η₁), h, star_zero, mul_zero, add_zero]
-  have hsuppX3 : (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+  have hsuppX3 :
+      (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
   have hXcoh : hyp.tau (χ₃ - d • χ₁) = cX.extension χ₃ - (d : ℂ) • cX.extension χ₁ := by
     have h := cX.extends_on_supported (χ₃ - d • χ₁)
@@ -710,7 +719,8 @@ theorem inner_extension_Xset_scaledSub_eq_neg_general_c2_caseA
     rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_conj_symm (cX.extension χ)
         (cY.extension η₁), h, star_zero, mul_zero, add_zero]
-  have hsuppX3 : (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+  have hsuppX3 :
+      (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
   have hXcoh : hyp.tau (χ₃ - d • χ₁) = cX.extension χ₃ - (d : ℂ) • cX.extension χ₁ := by
     have h := cX.extends_on_supported (χ₃ - d • χ₁)
@@ -765,7 +775,8 @@ theorem crux_general_of_higher_anchor
   rcases hyp.extension_eq_or_eq_neg_general hF cX cY hη₁ hχ₁X hχ₂ hne₂ ha hdeg2 hgood with h | h
   · exact eq_sub_of_add_eq h
   · exfalso
-    have hrel3 := hyp.inner_extension_Xset_scaledSub_eq_neg_general hF cX cY hη₁ hχ₁X hχ₃ hne₃₁ ha hd
+    have hrel3 := hyp.inner_extension_Xset_scaledSub_eq_neg_general hF cX cY hη₁ hχ₁X hχ₃ hne₃₁
+      ha hd
     rw [h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
       hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁X, if_neg hne₂] at hrel3
     have hd0 : (d : ℂ) = 0 := by linear_combination hrel3
@@ -807,7 +818,8 @@ theorem crux_general_of_higher_anchor_c2_caseA
     rw [cX.extension_inner_eq ψ ψ' (Submodule.subset_span hψ) (Submodule.subset_span hψ')]
     have h := irreducibleCharacter_inner_eq_ite
       (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ⟩ : IrreducibleCharacter ↥L)
-      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ'⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ',
+          hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ'⟩ : IrreducibleCharacter ↥L)
     simpa using h
   rcases hyp.extension_eq_or_eq_neg_general_c2_caseA hK hW1 hA cX cY hη₁ hχ₁X hχ₂ hne₂ ha hdeg2
     hgood with h | h
@@ -1233,7 +1245,8 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_general_c2_caseA
     (hyp.hgen_withDiagonal_c2_caseA hK hW1 hA hp hHp hη₁ hχ₁base ha)
   · -- `hmixed`: `⟨ν x, ν y⟩ = ⟨x, y⟩` (both `0`).
     rw [hglue.choose_spec.1 x hx, hglue.choose_spec.2 y hy,
-      hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA hK hW1 hA cX cY hx hy,
+      hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA hK hW1 hA cX cY hx
+        hy,
       hXY x hx y hy]
   · -- `hDτ`: `ν(χ₁−aη₁) = (χ₁−aη₁)^τ` = the crux.
     rw [Set.mem_singleton_iff] at hd

@@ -466,7 +466,8 @@ theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup H q (Nat.mem_primeFactors.mpr
       ⟨(Nat.mem_primeFactors.mp hq).1, (Nat.dvd_of_mem_primeFactors hq).trans
         (Subgroup.card_dvd_of_le (hLstar_eq ▸ inf_le_left)), Nat.card_pos.ne'⟩)
-  have hcLcent : MulAut.conj c • Lstar ≤ Subgroup.centralizer ((MulAut.conj c • L : Subgroup G)) := by
+  have hcLcent :
+      MulAut.conj c • Lstar ≤ Subgroup.centralizer ((MulAut.conj c • L : Subgroup G)) := by
     rw [← centralizer_conj_smul]
     exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (hLstar_eq ▸ inf_le_right)
   have htnL : t ∉ MulAut.conj c • L := fun ht =>
@@ -496,8 +497,10 @@ theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have h1 := Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj c) |>.mpr hCle
       rwa [centralizer_conj_smul, hcancel2 Y] at h1
     have hcHN : MulAut.conj c • H = N := by
-      have hmem : MulAut.conj c • H ∈ maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) :=
-        mem_maximalSubgroupsContaining.mpr ⟨isCoatom_conj_smul (mem_maximalSubgroups.mp hHmax), hCYle⟩
+      have hmem :
+          MulAut.conj c • H ∈ maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) :=
+        mem_maximalSubgroupsContaining.mpr ⟨isCoatom_conj_smul (mem_maximalSubgroups.mp hHmax),
+          hCYle⟩
       rw [hN_sing] at hmem; exact Set.eq_of_mem_singleton hmem
     exact ⟨c, hcHN⟩
   -- Extract a line `Y` from the nontrivial intersection and finish.
@@ -528,7 +531,8 @@ theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hYS : Subgroup.zpowers (y : G) ≤ MulAut.conj c • Lstar ⊓ Kstar :=
       Subgroup.zpowers_le.mpr y.2
     exact Or.inl (hfinish hp hYea (hYS.trans inf_le_left)
-      ((typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.2.1 p hp _ hYea (hYS.trans inf_le_right)))
+      ((typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.2.1 p hp _ hYea
+        (hYS.trans inf_le_right)))
 
 /-- A Hall `κ(N)`-subgroup `K'` of a maximal `N`, lying inside a nilpotent subgroup `W`, is cyclic.
 Since `κ(N) ⊆ τ₁(N) ∪ τ₃(N)`, every prime `p ∣ |K'|` has `pRank N p = 1`, so `pRank K' p ≤ 1`
@@ -703,7 +707,8 @@ theorem typeP_partner_existsUnique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   -- `ℳ(C_G(X)) = {M*}` (Theorem 14.7(1)).
   have h0 : maximalSubgroupsContaining (Subgroup.centralizer ((Subgroup.zpowers (x : G)) : Set G))
       = {Mstar} :=
-    typeP_partner_centralizer_singleton hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart hXelem hXK
+    typeP_partner_centralizer_singleton hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+      hXelem hXK
   refine ⟨Mstar, ⟨hMstarmax, hMstarP,
     typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU (Or.inl rfl) hMstarmem
       (Ne.symm hMstarne),

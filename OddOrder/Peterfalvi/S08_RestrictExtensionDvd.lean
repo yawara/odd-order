@@ -130,7 +130,8 @@ theorem dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius
   -- `χ₁ − a•η₁` is supported on `H^#`.
   have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
   have hsupp : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
-    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
+      hdeg
   -- reciprocity: `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = ⟨χ₁−aη₁, R⟩`.
   have hrec := hyp.inner_tau_eq_inner_restrict hsupp (hyp.coherentYset.extension η)
   refine ⟨cc - a * e, ?_, ?_⟩
@@ -173,7 +174,8 @@ theorem dvd_inner_tau_scaledDiff_extension_Yset_c2_caseA
   -- `χ₁ − a•η₁` is supported on `H^#`.
   have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
   have hsupp : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
-    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
+      hdeg
   -- reciprocity: `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = ⟨χ₁−aη₁, R⟩`.
   have hrec := hyp.inner_tau_eq_inner_restrict hsupp (hyp.coherentYset.extension η)
   refine ⟨cc - a * e, ?_, ?_⟩
@@ -218,7 +220,8 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_of_frobenius
   -- supported difference inputs.
   have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
   have hsuppX : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
-    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
+      hdeg
   have hsuppY : (η' - η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη') (hyp.Yset_subset_S hη)
       ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη).symm)
@@ -276,7 +279,8 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_c2_caseA
   -- supported difference inputs.
   have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
   have hsuppX : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
-    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
+      hdeg
   have hsuppY : (η' - η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη') (hyp.Yset_subset_S hη)
       ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη).symm)
@@ -352,7 +356,8 @@ theorem inner_self_tau_scaledDiff_of_frobenius
   -- supported singleton ⟹ Dade isometry.
   have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
   have hsupp : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
-    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
+      hdeg
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
     hyp.dade hyp.hconj (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
@@ -403,7 +408,8 @@ theorem inner_self_tau_scaledDiff_c2_caseA
   -- supported singleton ⟹ Dade isometry.
   have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
   have hsupp : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
-    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
+      hdeg
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
     hyp.dade hyp.hconj (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)

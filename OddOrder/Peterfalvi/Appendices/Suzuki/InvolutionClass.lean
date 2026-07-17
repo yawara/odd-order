@@ -501,16 +501,34 @@ lemma mul_t_mem_of_mem_KSet {k : G} (hk : k ∈ hyp.KSet) :
     rw [h2]
     exact mul_mem (inv_mem hkH) hktH
 
+/-- **Peterfalvi Part II, Ch. I Prop 3** (p. 101), injectivity clause — for
+`s ∈ H ∩ I` the map `k ↦ s^k = k⁻¹ s k` is injective on `K`.  (From Prop 2(c)
+applied to the involutions `kt`, whose conjugation permutes `I - (H∩I)`.) -/
+lemma injOn_conj_KSet {s : G} (hsH : s ∈ hyp.H) (hs2 : s ^ 2 = 1) (hs1 : s ≠ 1) :
+    Set.InjOn (fun k : G => k⁻¹ * s * k) hyp.KSet := by
+  classical
+  have hsQ := hyp.mem_Q_of_sq_eq_one_of_mem_H hsH hs2
+  have hbij := hyp.bijOn_conj_of_involution_mem_Q hsQ hs2 hs1
+  rintro k₁ hk₁ k₂ hk₂ heq
+  have heq' : k₁⁻¹ * s * k₁ = k₂⁻¹ * s * k₂ := heq
+  have hσeq : (k₁ * hyp.t)⁻¹ * s * (k₁ * hyp.t) =
+      (k₂ * hyp.t)⁻¹ * s * (k₂ * hyp.t) := by
+    have e1 : ∀ k : G, (k * hyp.t)⁻¹ * s * (k * hyp.t) =
+        hyp.t⁻¹ * (k⁻¹ * s * k) * hyp.t := by
+      intro k
+      group
+    rw [e1, e1, heq']
+  have h2 := hbij.injOn (hyp.mul_t_mem_of_mem_KSet hk₁)
+    (hyp.mul_t_mem_of_mem_KSet hk₂) hσeq
+  exact mul_right_cancel h2
+
 /-- **Peterfalvi Part II, Ch. I Prop 3** (p. 101), second clause — for
-`s ∈ H ∩ I` the conjugates `s^K` exhaust `H ∩ I`.  (Injectivity of
-`k ↦ s^k` on `K` comes from Prop 2(c) applied to the involutions `kt`.) -/
+`s ∈ H ∩ I` the conjugates `s^K` exhaust `H ∩ I`. -/
 lemma image_conj_KSet_eq_involutions_H {s : G} (hsH : s ∈ hyp.H)
     (hs2 : s ^ 2 = 1) (hs1 : s ≠ 1) :
     (fun k : G => k⁻¹ * s * k) '' hyp.KSet =
       {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
   classical
-  have hsQ := hyp.mem_Q_of_sq_eq_one_of_mem_H hsH hs2
-  have hbij := hyp.bijOn_conj_of_involution_mem_Q hsQ hs2 hs1
   have hsub : (fun k : G => k⁻¹ * s * k) '' hyp.KSet ⊆
       {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
     rintro - ⟨k, ⟨hkD, -⟩, rfl⟩
@@ -524,21 +542,9 @@ lemma image_conj_KSet_eq_involutions_H {s : G} (hsH : s ∈ hyp.H)
       have h2 := congrArg (fun z : G => k * z * k⁻¹) h
       simpa [mul_assoc] using h2
     · exact mul_mem (mul_mem (inv_mem hkH) hsH) hkH
-  have hinjK : Set.InjOn (fun k : G => k⁻¹ * s * k) hyp.KSet := by
-    rintro k₁ hk₁ k₂ hk₂ heq
-    have heq' : k₁⁻¹ * s * k₁ = k₂⁻¹ * s * k₂ := heq
-    have hσeq : (k₁ * hyp.t)⁻¹ * s * (k₁ * hyp.t) =
-        (k₂ * hyp.t)⁻¹ * s * (k₂ * hyp.t) := by
-      have e1 : ∀ k : G, (k * hyp.t)⁻¹ * s * (k * hyp.t) =
-          hyp.t⁻¹ * (k⁻¹ * s * k) * hyp.t := by
-        intro k
-        group
-      rw [e1, e1, heq']
-    have h2 := hbij.injOn (hyp.mul_t_mem_of_mem_KSet hk₁)
-      (hyp.mul_t_mem_of_mem_KSet hk₂) hσeq
-    exact mul_right_cancel h2
   refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
-  rw [Set.ncard_image_of_injOn hinjK, ← hyp.ncard_KSet_eq]
+  rw [Set.ncard_image_of_injOn (hyp.injOn_conj_KSet hsH hs2 hs1),
+    ← hyp.ncard_KSet_eq]
 
 
 end Hypothesis
