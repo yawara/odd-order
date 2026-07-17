@@ -71,9 +71,30 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   [K.FiniteIndex] に一般化。Ξ(range) = {Ξ((g-1)‾)} は
   `exists_of_mem_transferXi_range` (span_induction; add/smul case は
   ψ∘v の hom 性で閉じる)。
-- ⏭ 次: **10.26** (可換環補題, adjugate det trick — 10.25 の前提) →
-  **10.25** (Furtwängler; R = ℤ[G/K] 可換に 10.26 適用) →
-  10.27/10.28 (Alperin-Kuo)。同 leaf 継続 (現 ~530 行)。
+- ✅ **Thm 10.26 完成** (`FiniteIndexAnnihilator.lean`, mathlib のみ import,
+  sorry-free): 可換環 R・ideal U・加法 f.g. の A, U・[A:UA]=m 有限 →
+  ∃r, rA=0 ∧ r≡m·1 mod U (adjugate det trick;
+  `exists_smul_eq_zero_and_sub_card_mem`)。A/UA の巡回分解は
+  `equiv_directSum_zmod_of_finite'`。
+- ✅ **10.25 基盤: Δ(G)‾ の ℤ[G/K]-module 構造 + index 計算** (2026-07-17,
+  `PrincipalIdealTheorem.lean`, sorry-free):
+  - `augmentationCoquotientAlgHom : ℤ[G/K] →ₐ End_ℤ(Δ(G)‾)` (作用)
+  - `augmentationCoquotientAlgHomG` (ℤ[G] 版) + `_apply` (= mulLeft) +
+    `augmentationCoquotientAlgHom_mapDomain` (π:ℤ[G]→ℤ[G/K] 経由で Kg が g
+    と同一作用) + `augmentation_mapDomain` (π は augmentation 保存)
+  - `augmentationCoquotientModule` (compHom, letI 用; diamond 回避)
+  - `augmentationCoquotientSqImage` = Δ(G)²‾ + `augmentationCorel_le_sq`
+    (Δ(K)Δ(G) ⊆ Δ(G)²) + 第三同型 `augmentationCoquotientSqQuotientEquiv`
+    (Δ(G)‾/Δ(G)²‾ ≃ Δ(G)/Δ(G)²) →
+    `nat_card_quotient_augmentationCoquotientSqImage`: |Δ(G)‾:Δ(G)²‾| =
+    |G:G'| (10.20 接続)。
+- ⏭ 次 (10.25 詰め): (a) UA = Δ(G)²‾ の同定 (U=Δ(G/K) の像作用 = Δ(G)
+  左乗法 → Δ(G)A = Δ(G)²‾)。これで [A:UA]=|G:G'| が確定し 10.26 適用可。
+  (b) Lemma 10.27 (ε∈ℤ[G], εΔ(G)‾=0, δ(ε)=m ⇒ |G:K| | m ∧
+  (m/|G:K|)Ξ=0; transversal 係数の e_t 一致論法)。(c) 10.25 本体
+  (γ∈ℤ[G/K] を 10.26 で得 → ε=mapDomain 逆像で δ(ε)=|G:G'| → 10.27 →
+  |K:G'|Ξ=0 → 10.24 で v(g)^{|K:G'|}=1)。その後 10.27/10.28 Alperin-Kuo。
+  PrincipalIdealTheorem.lean は現 ~740 行 (2000 上限まで余裕)。
   **10.24 設計メモ (2026-07-17 調査)**: transfer は mathlib
   `MonoidHom.transfer` (repo Ch05_Transfer が既用; v : G →* K/K' は
   ϕ = Abelianization.of : K →* Abelianization K で transfer)。
