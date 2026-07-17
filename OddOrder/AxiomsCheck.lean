@@ -72,6 +72,7 @@ import OddOrder.BG.Ch1_Preliminary.S04g_Cor419
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
+import OddOrder.BG.Ch1_Preliminary.S06_Lem63b
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
@@ -4392,6 +4393,10 @@ set_option linter.style.longLine false in
 -- base change to `AlgebraicClosure F`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
+
+-- BG Lemma 6.3(b): for a finite solvable `G` with `G'` nilpotent and `|G/G'|` prime, `G'` is a Hall
+-- subgroup of `G` and `G' = [G, K]` for every complement `K` of `G'`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.lemma63b
 
 -- BG Corollary 4.19 (general form): for a finite solvable odd-order `G` and a normal subgroup `G*`
 -- with `r_p(G*) ≤ 2`, the derived subgroup `G'` centralizes every `p`-group chief factor `U/V` of
