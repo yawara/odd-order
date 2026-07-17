@@ -159,7 +159,7 @@ containment `A ≤ E₂`, which the `U = E₂E₃ = E₂` reduction needs. -/
 private theorem exists_elemAb_rank_two_le_E2_mem_of_tau2 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
     (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} [Fact q.Prime] (hq : q ∈ tau2 M)
-    {y' : G} (hy'E2 : y' ∈ E₂) (hy'q : y' ^ q = 1) (hy'1 : y' ≠ 1) :
+    {y' : G} (hy'E2 : y' ∈ E₂) (hy'q : y' ^ q = 1) (_hy'1 : y' ≠ 1) :
     ∃ A ∈ elemAbelianOfRank G q 2, A ≤ E₂ ∧ y' ∈ A := by
   classical
   have hE2comm : IsMulCommutative ↥E₂ := (nilpotent_sigmaComplement_abelian hG h).2.1.1

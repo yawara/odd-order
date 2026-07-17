@@ -273,7 +273,7 @@ Hypothesis (v) is the landed
 private theorem step3_Abar_centralizes_inter_LBar.{u}
     {G : Type u} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
-    (hp2 : p ≠ 2)
+    (_hp2 : p ≠ 2)
     (h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G)
     (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
     (h_oPiPrime_trivial : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
@@ -667,6 +667,7 @@ private theorem step5_Abar_centralizes_invariant_proper.{u}
 /-- The conjugation `MulDistribMulAction` of `↥Q` on the normal subgroup `↥N`
 of `K`, via `MulAut.conjNormal ∘ Q.subtype`.  Under this action,
 `a • n = ⟨↑a * ↑n * (↑a)⁻¹⟩`.  Used in Step 5 with `Q = Ā`, `N = L̄`. -/
+@[reducible]
 private noncomputable def subgroupConjActionOnNormal
     {K : Type*} [Group K] (Q N : Subgroup K) [N.Normal] :
     MulDistribMulAction ↥Q ↥N :=

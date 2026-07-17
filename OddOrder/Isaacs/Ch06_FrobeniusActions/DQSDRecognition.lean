@@ -789,7 +789,7 @@ private noncomputable def dihedralIsoOfInverting
     have step1 : a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := by
       have : Function.Bijective ((MulAut.conj a : P ≃* P) : P → P) :=
         (MulAut.conj a : P ≃* P).bijective
-      simpa using (map_zpow (MulAut.conj a : P →* P) c k).symm
+      simp
     rw [step1, h_conj, inv_zpow, ← zpow_neg]
   -- Cardinality computation: |P| = 2 * N.
   have hcard_P : Nat.card P = 2 * N := by
@@ -936,7 +936,7 @@ private noncomputable def quaternionIsoOfInverting
     have step1 : a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := by
       have : Function.Bijective ((MulAut.conj a : P ≃* P) : P → P) :=
         (MulAut.conj a : P ≃* P).bijective
-      simpa using (map_zpow (MulAut.conj a : P →* P) c k).symm
+      simp
     rw [step1, h_conj, inv_zpow, ← zpow_neg]
   -- Cardinality computation: |P| = 2 * N = 4 * M.
   have hcard_P : Nat.card P = 4 * M := by
@@ -1101,7 +1101,7 @@ theorem dihedralOrQuaternion_of_invertingConjugation
       have step1 : a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := by
         have : Function.Bijective ((MulAut.conj a : P ≃* P) : P → P) :=
           (MulAut.conj a : P ≃* P).bijective
-        simpa using (map_zpow (MulAut.conj a : P →* P) c k).symm
+        simp
       rw [step1, h_conj, inv_zpow, ← zpow_neg]
     have h_a_sq_sq : (a ^ 2) ^ 2 = 1 := by
       obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp h_a_sq_mem
@@ -1151,7 +1151,7 @@ private noncomputable def semiDihedralIsoOfTwistNormalized
       ∀ i : ZMod (2 ^ k), a * c ^ i.val * a⁻¹ = c ^ (r * i).val := by
     intro i
     have h_map : a * c ^ i.val * a⁻¹ = (a * c * a⁻¹) ^ i.val := by
-      simpa using (map_pow (MulAut.conj a : P →* P) c i.val).symm
+      simp
     rw [h_map, h_conj, ← pow_mul]
     rw [pow_eq_pow_iff_modEq, Nat.ModEq, h_order]
     rw [ZMod.val_mul, Nat.mod_mod]
@@ -1249,7 +1249,7 @@ private lemma twist_conj_zmod_pow
   have h_conj_twist : a * c * a⁻¹ = c ^ (SemiDihedralGroup.twist k).val := by
     rw [h_conj, h_z_pow, ← pow_twist_eq_pow_half_mul_inv c hk h_order]
   have h_map : a * c ^ i.val * a⁻¹ = (a * c * a⁻¹) ^ i.val := by
-    simpa using (map_pow (MulAut.conj a : P →* P) c i.val).symm
+    simp
   rw [h_map, h_conj_twist, ← pow_mul]
   rw [pow_eq_pow_iff_modEq, Nat.ModEq, h_order]
   rw [ZMod.val_mul, Nat.mod_mod]

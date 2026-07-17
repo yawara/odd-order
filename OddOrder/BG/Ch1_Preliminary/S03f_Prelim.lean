@@ -757,6 +757,7 @@ theorem disjoint_biSup_biSup_of_proj {M : Type*} [Group M] [IsMulCommutative M] 
 
 /-- **Conjugation action of a subgroup `A` on a conjugation-closed family of subgroups of `G`**
 (as a subtype of `Subgroup G`).  BG (3.38): the `PR`-action on `{K₁, …, Kₙ}`. -/
+@[reducible]
 def conjSubtypeMulAction (A : Subgroup G) (P : Subgroup G → Prop)
     (hP : ∀ (a : ↥A) (X : Subgroup G), P X → P (X.map (MulAut.conj (a : G)).toMonoidHom)) :
     MulAction ↥A {X : Subgroup G // P X} where

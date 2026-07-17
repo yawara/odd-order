@@ -116,6 +116,7 @@ as `MulDistribMulAction G (↥X ⧸ Y.subgroupOf X)`: `G` conjugates the normal 
 invariant subgroup `Y.subgroupOf X` is preserved (`Y` normal), and the action descends to the
 quotient, then is pulled back from `ConjAct G` to `G`. This is the chief-factor action fed (after
 descending through `G/L` via `mulDistribMulActionQuotientOfTrivial`) to the coprime case. -/
+@[reducible]
 noncomputable def chiefFactorConjAction {G : Type*} [Group G] (X Y : Subgroup G)
     [X.Normal] [Y.Normal] :
     MulDistribMulAction G (↥X ⧸ Y.subgroupOf X) :=

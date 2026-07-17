@@ -733,6 +733,7 @@ trivial, which Isaacs uses for the cyclic-arithmetic final branch. -/
 obtained by composing mathlib's conjugation `MulDistribMulAction` of `N_G(N)`
 on `N` with the inclusion `A ↪ N_G(N)`.  Under this action
 `a • n = ⟨↑a * ↑n * (↑a)⁻¹⟩`. -/
+@[reducible]
 noncomputable def conjActionOfNormalizes {G : Type*} [Group G] (A N : Subgroup G)
     (hAN : A ≤ Subgroup.normalizer N) : MulDistribMulAction ↥A ↥N :=
   MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer N)) ↥N

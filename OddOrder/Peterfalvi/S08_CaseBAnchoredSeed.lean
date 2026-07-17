@@ -1190,7 +1190,7 @@ Proof mirrors the equal-degree case: the scaled differences vanish at `1` (`f(1)
 a
 supported `φ = y + n·χ₁` has `0 = φ(1) = n·χ₁(1)`, forcing `n = 0`, so `φ = y ∈ D`. -/
 theorem mem_span_scaledDiff_of_mem_zSupportedSpan
-    (hyp : SibleyDadeHypothesis G L H)
+    (_hyp : SibleyDadeHypothesis G L H)
     {S₁ : Set (ClassFunction ↥L ℂ)} {χ₁ : ClassFunction ↥L ℂ}
     (hχ₁1 : (χ₁ : ClassFunction ↥L ℂ) 1 ≠ 0)
     (hdeg : ∀ f ∈ S₁, ∃ d : ℕ, (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1)

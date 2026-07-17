@@ -26,7 +26,12 @@
 > **§9B の解析補題は 9.11–9.22 + 9.13 まで全 landed (2026-07-18)**。
 > **残 = Thm 9.10** (Wielandt aut tower 本体; recursive type family + tower の `G_1`
 > subnormal と 9.13/9.21 normal のミスマッチ解決が要る = **issue 1037** に詳細)。
-> 次に §9C (Thompson-Wielandt 9.23–9.27) / §9D (Bartels 9.28–9.31)。
+>
+> **§9C 着手 (2026-07-18)**: `LayerRestriction.lean` (**Lem 9.25**
+> `map_layer_eq_layer_of_fitting_eq_bot`: F(G)=1, E(G)≤H ⇒ E(G)=E(H))。
+> 残 §9C = 9.26/9.27 (O^p 版 9.15; **O^p = p-residual の定義 API が未整備** — 要新設,
+> `nilpotentResidual` と同型の induction) → 9.24/9.23 (Thompson-Wielandt 本体, 重い)。
+> §9D (Bartels 9.28–9.31) も未着手。
 >
 > Schenkman 実装メモ: 9.22 は `inf_center_ne_bot_of_normal_of_isNilpotent`
 > (nilpotent 群の nontrivial normal は中心と交わる; upper central series 帰納) が核。

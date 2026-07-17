@@ -230,7 +230,7 @@ contains `Φ(S₀)`; membership in the kernel means the conjugate `x⁻¹ s x` l
 `M`. The `R` bound is the minimality of `n`. -/
 private lemma yoshida_of_mackey_factor_notMem (P : Sylow p G)
     {N : Subgroup G} (hN_def : N = Subgroup.normalizer ((P : Subgroup G) : Set G))
-    (hPN : (P : Subgroup G) ≤ N)
+    (_hPN : (P : Subgroup G) ≤ N)
     {M : Subgroup ↥N} [M.Normal] (hM_idx : M.index = p)
     {n : ↥N} (hn_min : ∀ m : ↥N, m ∉ M → orderOf n ≤ orderOf m)
     (hnPg : ((n : ↥N) : G) ∈ (P : Subgroup G))

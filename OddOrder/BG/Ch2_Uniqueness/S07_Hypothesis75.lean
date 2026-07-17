@@ -680,9 +680,9 @@ with `Q₂ = Q₁^k`. Inside `V := (K⊔P)⊓N(Q₂) = (K∩N(Q₂))·P`, the Ha
 `c := κk ∈ K∩N(P)`, which centralizes `P` (`mem_centralizer_of_mem_kSubgroup_normalizer`),
 so `c ∈ C_G(P)⊓K = O_{π'}(C_G(P))` by (a), and `Q₁^c = Q₂`. -/
 private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
-    (hA : Hypothesis71 A) {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
+    (hA : Hypothesis71 A) {q : ℕ} [Fact q.Prime] (_hq : q ∈ (primesOf A)ᶜ)
     {P : Subgroup G} (hAP : A ≤ P) [hAnormal : (A.subgroupOf P).Normal]
-    (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P) (hPlt : P < ⊤)
+    (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P) (_hPlt : P < ⊤)
     (htrans : ConjTransitiveOn (kSubgroup A) (hInvariantStar ⊤ A {q}))
     (hc_sub : hInvariantStar ⊤ P {q} ⊆ hInvariantStar ⊤ A {q}) :
     ConjTransitiveOn (opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)))
@@ -881,8 +881,8 @@ and `P ∩ N(P)′ ⊆ N(Q)′`. The factorization comes from (b) (transitivity)
 (`inf_commutator_eq_of_coprime`) in `↥N(P)` with `K := O_{π'}(C_G(P))`, `U := N(P)∩N(Q)`,
 `H := P`, using `derivedInG H = ⁅H,H⁆`. -/
 private theorem tp_d [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
-    {q : ℕ} [Fact q.Prime] (hq : q ∈ (primesOf A)ᶜ)
-    {P : Subgroup G} (hAP : A ≤ P) (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P)
+    {q : ℕ} [Fact q.Prime] (_hq : q ∈ (primesOf A)ᶜ)
+    {P : Subgroup G} (_hAP : A ≤ P) (hP_pi : Subgroup.IsPiSubgroup (primesOf A) P)
     (hPlt : P < ⊤) (hPne : P ≠ ⊥)
     (hb : ConjTransitiveOn (opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (P : Set G)))
         (hInvariantStar ⊤ P {q}))

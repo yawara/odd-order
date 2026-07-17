@@ -29,6 +29,7 @@ variable {V : Type*} [AddCommGroup V] [Module F V]
 
 /-- The restriction of a `↥R`-action on `ι` to a subgroup `↥S` (`S ≤ R`), via the inclusion
 `↥S →* ↥R`.  Used to apply the free block keystone to `R` and to `⟨x⟩ ≤ R` with the same blocks. -/
+@[reducible]
 noncomputable def mulActionSubgroupOfLe {R S : Subgroup G} (hSR : S ≤ R)
     {ι : Type*} [MulAction ↥R ι] : MulAction ↥S ι :=
   MulAction.compHom ι (Subgroup.inclusion hSR)

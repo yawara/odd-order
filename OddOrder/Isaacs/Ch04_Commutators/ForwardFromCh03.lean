@@ -91,6 +91,7 @@ noncomputable def IsCompatibleMulAction.toPermHom
 
 /-- Compatible action から `MulAction (G ⋊[φ] A) Ω` を構成 (非 instance).
 `Equiv.Perm Ω` の自明作用と `compHom` の合成. -/
+@[reducible]
 noncomputable def IsCompatibleMulAction.toMulAction
     [MulAction G Ω] [MulAction A Ω] (h : IsCompatibleMulAction φ Ω) :
     MulAction (SemidirectProduct G A φ) Ω :=
