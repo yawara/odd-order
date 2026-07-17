@@ -227,6 +227,7 @@ variable (hFrob_j : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
   ↥(F.L j) ((F.H j).subgroupOf (F.L j)) C_j)
 
 omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
+omit [Fintype ↥((F.H j).subgroupOf (F.L j))] in
 /-- The weighted coherent sum of one family is orthogonal to every
 non-principal coherent source image of a distinct family. -/
 theorem hypothesis79_weightedNuSum_cross_zeta_eq_zero_at
@@ -247,6 +248,7 @@ theorem hypothesis79_weightedNuSum_cross_zeta_eq_zero_at
       (Finset.ne_of_mem_erase hs) hr,
     mul_zero]
 
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- Expanding the selected beta decomposition against a coherent source image
 of a distinct family leaves only the Gamma term. -/
 theorem hypothesis79_beta_inner_nu_zeta_eq_gamma
@@ -327,6 +329,7 @@ theorem hypothesis79_gamma_inner_nu_zeta_eq_d_mul
   linear_combination hzero
 
 omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
+omit [Fintype ↥((F.H j).subgroupOf (F.L j))] in
 /-- The distinguished beta coefficient against another family is an integer,
 because both class functions are virtual characters. -/
 theorem hypothesis79_exists_integral_beta_zeta_coefficient :

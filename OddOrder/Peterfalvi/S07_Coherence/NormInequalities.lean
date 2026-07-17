@@ -234,6 +234,7 @@ theorem decompositionPair_tau1_agree {a : ℕ} {chi1 : ClassFunction L ℂ}
   rfl
 
 omit [Fintype L] in
+omit [Invertible (Nat.card L : ℂ)] in
 /-- `χ - χ̄ ∈ ℤ[χ−χ̄, χ−ψ]`: the difference sublattice contains the conjugate difference (it is a
 generator). -/
 theorem chi_sub_conj_mem_zSpan_support :
@@ -241,6 +242,7 @@ theorem chi_sub_conj_mem_zSpan_support :
   Submodule.subset_span (by simp)
 
 omit [Fintype L] in
+omit [Invertible (Nat.card L : ℂ)] in
 /-- `χ - ψ ∈ ℤ[χ−χ̄, χ−ψ]`: the difference sublattice contains the `ψ`-difference (it is a
 generator). -/
 theorem chi_sub_psi_mem_zSpan_support :

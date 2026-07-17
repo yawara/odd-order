@@ -119,6 +119,7 @@ private noncomputable def deltaHom [S.Normal]
       _ = (MulAut.conjNormal g s * s⁻¹) * (MulAut.conjNormal g t * t⁻¹) := by
             simp only [mul_assoc])
 
+omit [Finite R] in
 @[simp]
 private theorem deltaHom_apply [S.Normal]
     (hSR : ⁅S, (⊤ : Subgroup R)⁆ ≤ (Subgroup.center (↥S)).map S.subtype) (g : R) (s : ↥S) :
@@ -157,6 +158,7 @@ private theorem deltaHom_eq_one_iff_mem_centralizer [S.Normal]
     rw [deltaHom_apply hSR g s, hfix, mul_inv_cancel]
 
 omit [Fact (Nat.Prime p)] in
+omit [Finite R] in
 /-- `δ_g` kills `Z(S)`: as a homomorphism into the abelian group `Z(S)` it kills `[S, S]`,
 and `[S, S] = Z(S)` for extraspecial `S`. -/
 private theorem center_le_ker_deltaHom [S.Normal] (hS : IsExtraspecial p (↥S))

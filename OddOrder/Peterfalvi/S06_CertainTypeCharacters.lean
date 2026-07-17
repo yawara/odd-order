@@ -164,6 +164,7 @@ omit [Finite D] in
 theorem forall_mem_zpowers_cyclicGenerator : ∀ x : D, x ∈ zpowers (cyclicGenerator D) :=
   (IsCyclic.exists_generator (α := D)).choose_spec
 
+omit [Finite D] in
 theorem orderOf_cyclicGenerator : orderOf (cyclicGenerator D) = Nat.card D :=
   orderOf_eq_card_of_forall_mem_zpowers (forall_mem_zpowers_cyclicGenerator D)
 
@@ -354,6 +355,7 @@ theorem isCyclic_quotient_K : IsCyclic (L ⧸ h.K) := by
     (h.isComplement.symm.QuotientMulEquiv.symm : (↥h.W1) →* (L ⧸ h.K))
     (h.isComplement.symm.QuotientMulEquiv.symm).surjective
 
+omit [Fintype L] in
 /-- `L/K` is abelian (it is cyclic, `isCyclic_quotient_K`).  This is what makes an irreducible
 character of `L` whose kernel contains `K` linear (degree one) — the engine of the forward
 direction of (4.4). -/
@@ -426,6 +428,7 @@ noncomputable def induceZ :
   (h.sdiffTICyclicHypothesis.induceLinear).restrictScalars ℤ
 
 omit [Invertible (Nat.card L : ℂ)] in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- The (1.4) image `τ(χ_i − χ_0)` of the column family is the induced difference
 `Ind_W^L(ω_{ij} − ω_{0j})` — definitionally, since `induceZ` is `Ind_W^L` and
 `isometryDifferenceImage` is the image of the source difference. -/
@@ -536,6 +539,7 @@ theorem ind_cross_inner_eq_zero [NeZero (Nat.card h.W1)]
     h.sdiffFullDadeIsometryData.inner_eq, omegaColumnDiff_coe, omegaColumnDiff_coe]
   exact omega_diff_cross_inner_eq_zero h.sdiffTICyclicHypothesis hne _ _ _ _
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- The (1.4) image of the column family vanishes at `1` (the source difference
 `ω_{ij} − ω_{0j}` has degree `0`, and `Ind` preserves that). -/
 theorem image_apply_one_eq_zero [NeZero (Nat.card h.W1)]
@@ -682,6 +686,7 @@ theorem columnFamily_mu_injective [NeZero (Nat.card h.W1)] :
   · exact absurd heq (h.columnFamily_mu_ne hχ i i')
 
 omit [Invertible (Nat.card L : ℂ)] in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] in
 /-- The count `|W − W₂| = (w₁ − 1)·w₂`: the support set of the sdiff hypothesis is the
 complement of `W₂` in `W`, so `|W| − |W₂| = w₁w₂ − w₂`. -/
 theorem card_supportInSubgroup_sdiff :
@@ -710,6 +715,7 @@ theorem card_supportInSubgroup_sdiff :
       Fintype.card_subtype_compl]
   rw [hcompl, hsub, hW, hW2, Nat.sub_one_mul]
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- `dim_ℂ CF(W, W − W₂) = (w₁ − 1)·w₂`, the dimension behind the `ω_{ij} − ω_{0j}` basis. -/
 theorem finrank_sdiffSupported :
     Module.finrank ℂ (TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis)
@@ -774,6 +780,7 @@ theorem omegaColumnDiffBasis_apply
   exact congrFun hcoe pq
 
 omit [Invertible (Nat.card L : ℂ)] in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] in
 /-- `ω_{kl} = chiColumn l (e⁻¹ k)`: the basis index `k` (a `W₁`-dual) is `e (e⁻¹ k)` of
 the column family. -/
 theorem chiColumn_w1CharEquiv_symm [NeZero (Nat.card h.W1)]
@@ -1078,6 +1085,7 @@ theorem certainType_degree_modEq [NeZero (Nat.card h.W1)]
   exact ⟨m, by linear_combination hm⟩
 
 omit [Invertible (Nat.card L : ℂ)] in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] in
 /-- `ω_{00} = 1_W`: the index-`(0,0)` member of the column family (trivial `W₂`-dual, base
 `W₁`-index) is the trivial character of `W` (`omegaProdChar 1 1 = 1`, `ω(1) = 1_W`). -/
 theorem chiColumn_one_zero_eq_trivial [NeZero (Nat.card h.W1)] :

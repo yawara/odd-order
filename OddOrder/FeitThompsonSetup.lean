@@ -423,6 +423,7 @@ theorem muS_apply_of_not_mem_W2 (i : Fin tp.q) (j : Fin tp.p) (w : G) (hwW : w �
       = (deltaS hG mp tp j : ℂ) * _
   congr 1
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Value of `certainTypeS`'s product character on a transported `mp.K`-element**: only the
 `W₁`-factor `a` survives (`wFst` is the identity, `wSnd` is trivial, on a `W₁`-element).  This is the
 `tp.W1`-restriction value used (with its `tp.W2` mirror) to discharge the S/T-shared-`ω` symmetry on
@@ -445,6 +446,7 @@ theorem omegaProdCharS_apply_mem_K
     MonoidHom.comp_apply]
   rw [hfst, hsnd, map_one, mul_one]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Value of `certainTypeS`'s product character on a transported `mp.Kstar`-element**: only the
 `W₂`-factor `b` survives.  The `tp.W2`-restriction mirror of `omegaProdCharS_apply_mem_K`. -/
 theorem omegaProdCharS_apply_mem_Kstar

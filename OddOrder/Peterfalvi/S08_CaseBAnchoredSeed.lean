@@ -45,6 +45,7 @@ variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
 omit [Invertible (Nat.card G : ℂ)] in
+omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2.3) per-column central-character data** (the Q1 "central gap").
 
 For any irreducible character `θ` of `H` and a central subgroup `W₂ ≤ Z(H)`, the central **linear**
@@ -99,6 +100,7 @@ theorem exists_central_phi_data
   · rw [htrans]; exact hres
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
 /-- **Central character nontriviality** from the master restriction equation.  If
 `Res^H_N θ = θ(1)·χ` (the [Is] 2.27 form, `χ = compHom e φ_θ`) and `θ` is **not** constant on `N`
 (some `w ∈ N` with `θ(w) ≠ θ(1)`, i.e. `N ⊄ ker θ`), then the central character `χ` is nontrivial.

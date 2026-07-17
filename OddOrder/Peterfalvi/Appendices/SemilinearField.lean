@@ -99,6 +99,7 @@ theorem finrank_end_eq_one :
   haveI := finite_end (k := k) (T := T) (M := M)
   exact isSimpleModule_iff_finrank_eq_one.mp isSimpleModule_end
 
+omit [Finite T] in
 /-- `|End_{k[T]}(M)| = |M|`: as `M` is a `1`-dimensional `D`-space, `|M| = |D|¹`. -/
 theorem natCard_end_eq :
     Nat.card (Module.End (MonoidAlgebra k T) M) = Nat.card M := by

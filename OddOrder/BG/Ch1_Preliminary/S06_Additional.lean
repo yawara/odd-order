@@ -1293,6 +1293,7 @@ private theorem zpowers_isElementaryAbelian_of_pow_eq_one {x : G} (hxp : x ^ p =
 
 omit [IsSolvable G] in
 omit [Finite G] in
+omit [Fact (Nat.Prime p)] in
 /-- **E*(S) characterization (membership form)**: if `E` is a maximal elementary abelian
 `p`-subgroup, then every order-`p` element of `C_G(E)` already lies in `E`. (Apply
 `IsMaximalElementaryAbelian.le_of_le_centralizer` to `F = ⟨x⟩`.) -/

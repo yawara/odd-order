@@ -60,6 +60,7 @@ noncomputable def omegaSigmaGrid :
   rfl
 
 omit [Fintype ↥hyp.W] in
+omit [Invertible (Nat.card ↥hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] in
 /-- The (3.3) ω-grid entries are virtual characters of `W` (each is irreducible). -/
 theorem omegaGrid_mem_ZIrr (i : Fin (Nat.card hyp.W1)) (j : Fin (Nat.card hyp.W2)) :
     hyp.omegaGrid i j ∈ ZIrr hyp.W := by

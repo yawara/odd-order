@@ -1223,6 +1223,7 @@ gives `v(g)^c = 1` with `c = |K:G'|`. -/
 
 variable [hK : K.Normal]
 
+omit hK in
 /-- The augmentation of a coset-supported element is the sum of its
 coefficients: `δ(∑_q e_q·f(q)) = ∑_q e_q`. -/
 theorem augmentation_sectionWeightedSum [K.FiniteIndex] (e : G ⧸ K → ℤ)

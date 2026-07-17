@@ -326,6 +326,7 @@ private theorem omega1Map_eq_closure (M : Subgroup P) :
     exact hnp
 
 omit [Finite P] in
+omit [Fact (Nat.Prime p)] in
 /-- If conjugation by `g` preserves `M` (`g M g⁻¹ = M`, as the membership equivalence
 `hM`), then it preserves `omega1Map M p`. -/
 private theorem conj_mem_omega1Map {M : Subgroup P} {g n : P}

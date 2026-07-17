@@ -562,6 +562,7 @@ theorem omegaSChar_injective :
   rw [if_neg hcond, if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
   exact zero_ne_one h2
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Exhaustion by counting**: every linear character of `↥tp.W` underlies some `omegaS i j` —
 the `(i,j) ↦ omegaSChar i j` map is injective (the `omegaS` are orthonormal, hence distinct)
 between types of the same cardinality `pq`. -/
@@ -648,6 +649,7 @@ theorem omegaS_principal_eq_trivial :
   change ((1 : ↥tp.W →* ℂˣ) w : ℂ) = _
   rw [MonoidHom.one_apply, Units.val_one, trivialClassFunction_apply]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.9) principal value on generic elements** (issue-3002 supply): the principal
 grid value `(τ₃ω)_{00}(g) = 1` for every `g` (the coprimality hypothesis is unused:
 `omegaS₀₀` is the trivial character and `τ₃(1_W) = 1_G`). -/
@@ -702,6 +704,7 @@ theorem eqQ_finNeg_eq_rowInv (i : Fin tp.q) :
   rw [eqQ_finNeg hG mp tp i, (mp.certainTypeS hG).w1CharEquiv_finNeg,
     OddOrder.Peterfalvi.S06.w1CharEquiv_rowInv]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **CF-level conjugation pairs the `ω`-grid at the negated index** (Peterfalvi (3.9.a),
 character half): `ω̄_{ij} = ω_{−i,−j}` — complex conjugation inverts the linear grid character
 (`galoisMap_conj_omega`), and index negation is character inversion (`omegaSChar_finNeg`). -/
@@ -719,6 +722,7 @@ theorem omegaS_conj (i : Fin tp.q) (j : Fin tp.p) :
     ClassFunction.conj_eq_mapRingEquiv_conjAe]
   exact hg2
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **CF-level conjugation pairs the `μ`-grid at the negated index** (Peterfalvi (4.9)(a)):
 `μ̄_{ij} = μ_{−i,−j}` — the §6 conjugation bridge `certainType_mu_conj_eq` with the two
 power-enumeration index bridges (`chi2enum_finNeg`, `eqQ_finNeg_eq_rowInv`). -/
@@ -736,6 +740,7 @@ theorem muS_conj (i : Fin tp.q) (j : Fin tp.p) :
     ClassFunction.conj_eq_mapRingEquiv_conjAe]
   exact hg2
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **CF-level conjugation pairs the `η = τ₃∘ω` grid at the negated index** (Peterfalvi (3.9.a),
 full CF form — strengthening the generic-element `tau3W_omegaS_pair_of_coprime` below):
 `(τ₃ω_{ij})̄ = τ₃ω_{−i,−j}`.  `σ` intertwines the coefficientwise Galois action
@@ -758,6 +763,7 @@ theorem tau3W_omegaS_conj (i : Fin tp.q) (j : Fin tp.p) :
     ClassFunction.conj_eq_mapRingEquiv_conjAe]
   exact hcomm
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.9.a) conjugate-pair symmetry on generic elements** (issue-3002 supply):
 for `g` of order prime to `pq`, the `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)`
 (`S15.finNeg`), `(τ₃ω)_{−i,−j}(g) = (τ₃ω)_{ij}(g)`.
@@ -1043,6 +1049,7 @@ theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
           trivialClassFunction_apply]
   exact hev'.symm
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- The first nonprincipal row-axis character has the full prime order `q`. -/
 theorem orderOf_omegaSChar_row_base :
     orderOf
@@ -1078,6 +1085,7 @@ theorem orderOf_omegaSChar_row_base :
   · exact absurd (orderOf_eq_one_iff.mp h) hne
   · exact h
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- The first nonprincipal column-axis character has the full prime order `p`. -/
 theorem orderOf_omegaSChar_column_base :
     orderOf
