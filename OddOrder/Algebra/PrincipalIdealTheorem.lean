@@ -774,6 +774,68 @@ theorem augmentation_mapDomain (x : MonoidAlgebra ℤ G) :
 
 end CoquotientModule
 
+section TransversalIndependence
+
+/-! ### `Ξ` is independent of the transversal (Isaacs p. 313)
+
+Isaacs' `Ξ` is left multiplication by the sum of *any* transversal for `K`
+in `G`; here we show this map depends only on the transversal up to the coset
+of each representative, and identify Theorem 10.24's `Ξ = transferXi`
+(built from a left transversal via inverses) with the sum over an arbitrary
+system of coset representatives `f : G/K → G`. -/
+
+variable [hK : K.Normal] [K.FiniteIndex]
+
+/-- The transversal sum `∑_q of(f q)` over a system of coset representatives
+`f : G/K → G` (Isaacs' `σ = ∑_{t ∈ T} t`). -/
+noncomputable def sectionSum (f : G ⧸ K → G) : MonoidAlgebra ℤ G :=
+  letI := K.fintypeQuotientOfFiniteIndex
+  ∑ q : G ⧸ K, MonoidAlgebra.of ℤ G (f q)
+
+/-- `Ξ` is independent of the transversal: if `f₁ q` and `f₂ q` lie in the
+same coset for every `q`, the two transversal sums induce the same
+left-multiplication map on `Δ(G)‾` (Isaacs p. 313). -/
+theorem augmentationCoquotientMulLeft_sectionSum_congr
+    {f₁ f₂ : G ⧸ K → G} (h : ∀ q, (↑(f₁ q) : G ⧸ K) = ↑(f₂ q)) :
+    augmentationCoquotientMulLeft G K hK (sectionSum G K f₁)
+      = augmentationCoquotientMulLeft G K hK (sectionSum G K f₂) := by
+  apply augmentationCoquotientMulLeft_eq_of_sub_mem_right
+  letI := K.fintypeQuotientOfFiniteIndex
+  rw [sectionSum, sectionSum, ← Finset.sum_sub_distrib]
+  apply Submodule.sum_mem
+  intro q _
+  have hk : (f₁ q)⁻¹ * f₂ q ∈ K := QuotientGroup.eq.mp (h q)
+  have hval : MonoidAlgebra.of ℤ G (f₁ q) - MonoidAlgebra.of ℤ G (f₂ q)
+      = -(MonoidAlgebra.of ℤ G (f₁ q)
+          * (MonoidAlgebra.of ℤ G ((f₁ q)⁻¹ * f₂ q) - 1)) := by
+    rw [mul_sub, mul_one, ← map_mul, mul_inv_cancel_left, neg_sub]
+  rw [hval]
+  exact Submodule.neg_mem _ (Submodule.mul_mem_mul Submodule.mem_top
+    (sub_one_mem_augmentationIdealOf G K hk))
+
+/-- **Theorem 10.24's `Ξ` equals the sum over an arbitrary system of coset
+representatives** (Isaacs p. 313, transversal independence): for any
+`f : G/K → G` with `f q` representing `q`, `transferXi = Ξ_f`.  This bridges
+the left-transversal-inverse sum of Theorem 10.24 with the plain transversal
+sum used in Lemma 10.27. -/
+theorem transferXi_eq_mulLeft_sectionSum (S : K.LeftTransversal)
+    {f : G ⧸ K → G} (hf : ∀ q, (↑(f q) : G ⧸ K) = q) :
+    transferXi G K hK S
+      = augmentationCoquotientMulLeft G K hK (sectionSum G K f) := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  have hsec : transversalInvSum G K S
+      = sectionSum G K (fun q => (S.2.leftQuotientEquiv q⁻¹ : G)⁻¹) := by
+    rw [transversalInvSum, sectionSum]
+    exact (Equiv.sum_comp (Equiv.inv (G ⧸ K))
+      (fun q => MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv q : G)⁻¹)).symm
+  rw [transferXi, hsec]
+  apply augmentationCoquotientMulLeft_sectionSum_congr
+  intro q
+  rw [hf q, QuotientGroup.mk_inv, inv_eq_iff_eq_inv]
+  exact S.2.quotientGroupMk_leftQuotientEquiv q⁻¹
+
+end TransversalIndependence
+
 section CoquotientSq
 
 /-! ### The index `|Δ(G)‾ : Δ(G)²‾| = |G : G'|` (Isaacs p. 316)
