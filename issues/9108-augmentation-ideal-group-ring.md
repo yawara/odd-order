@@ -53,13 +53,17 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   `augmentationIdealOf_sq_eq_inf_groupRingOf` / `_sq_eq_inf` (両形式)。
   f = id on ℤ[K] は ker(f − id) への span_le で無帰納。transversal は
   `Subgroup.exists_isComplement_right K 1`。
-- ⏭ 次: **10.23** (`Δ(G)bar = Δ(G)/Δ(K)Δ(G)` 内で `Δ(K)bar ≅ K/K'`,
-  写像 `k−1 bar ↦ K'k`)。設計: 商 = module quotient
-  (`Δ(K)Δ(G) ≤ Δ(G)` comap Δ(G).subtype)、`Δ(K)bar` = Δ(K) の image。
-  iso は 10.20-for-K を transport: `MonoidAlgebra.mapDomain` 橋
-  (ℤ[↥K] ≃ₗ groupRingOf K, of k ↦ of ↑k) で `augmentationIdeal ↥K ≃
-  augmentationIdealOf K`、10.22 で kernel 同定。その後 10.24/10.25
-  (principal ideal thm) → 10.26-10.28 (Alperin-Kuo)。
+- ✅ **10.23 完成** (`abelianizationEquivAugmentationQuotientOf :
+  Abelianization K ≃* Multiplicative (AugmentationQuotientOf G K)`)。
+  mapDomain 橋は不採用 — Δ(K)bar = Δ(K)/(Δ(K)Δ(G) ∩ Δ(K)) (第二同型定理
+  読み) とし、10.20 の議論を span 版 basis (`augmentationIdealOfBasis`)
+  で replay。kernel 同定に 10.22 (`_sq_eq_inf`)。独立性は
+  `LinearIndependent.comp` が coe-of-mk 爆発 (traps §7) するため
+  coord functional 証明を複製。
+- ⏭ 次: **10.24/10.25** (principal ideal theorem, Furtwängler) —
+  **新 sibling leaf** (`OddOrder/Algebra/PrincipalIdealTheorem.lean` 等;
+  AugmentationIdeal.lean は 1164 行で 1500 trigger 目前)。その後
+  10.26 (可換環補題) → 10.27/10.28 (Alperin-Kuo)。
 - Lean 注意 (10.19): `rw [MonoidAlgebra.smul_single']` は smul instance
   不一致で失敗 → exact defeq 経由; MonoidAlgebra ≠ Finsupp 型分離
   (Finsupp.* API 不可、`MonoidAlgebra.induction_linear` /
