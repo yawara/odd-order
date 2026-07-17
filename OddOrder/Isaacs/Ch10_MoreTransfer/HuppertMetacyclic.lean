@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.GroupTheory.PrimeOrderSubgroups
 import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
@@ -54,6 +55,7 @@ open OddOrder.BG.Ch1
 open OddOrder.BG.Ch1_Preliminary
 open scoped commutatorElement
 open scoped Pointwise
+open scoped IsMulCommutative
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
@@ -681,6 +683,179 @@ theorem dvd_index_commutator_of_normal_metacyclic_sylow
     p ∣ (commutator N).index :=
   thm1015_aux (Nat.card ↥(P : Subgroup N)) hPn P.isPGroup'
     (P.not_dvd_index) hmeta hnonab hp2 le_rfl
+
+end
+
+section /- 10B: Theorem 10.12 (Huppert, p. 304) -/
+
+open OddOrder.Isaacs.Ch05
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Isaacs Thm 5.20 (abelianization-coefficient half)**: the kernel of the
+transfer `G →* P^{ab}` lies in `A^p(G)`. The focal transfer factors through the
+abelianization transfer by naturality in the coefficient (`transfer_comp_left`),
+and its kernel is exactly `A^p(G)` (`APrime_eq_transferFocal_ker`). -/
+theorem ker_transfer_abelianization_le_APrime (P : Sylow p G) :
+    (MonoidHom.transfer (Abelianization.of (G := ↥(P : Subgroup G)))).ker
+      ≤ APrime p G := by
+  rw [APrime_eq_transferFocal_ker P]
+  set π : Abelianization ↥(P : Subgroup G)
+      →* ↥(P : Subgroup G) ⧸ Subgroup.focalSubgroupOf (P : Subgroup G) :=
+    QuotientGroup.map _ _ (MonoidHom.id _)
+      (by simpa using Subgroup.commutator_le_focalSubgroupOf (P : Subgroup G))
+    with hπ_def
+  have hfactor : QuotientGroup.mk' (Subgroup.focalSubgroupOf (P : Subgroup G))
+      = π.comp (Abelianization.of (G := ↥(P : Subgroup G))) := by
+    ext x
+    rfl
+  have hcomp : Subgroup.transferFocal (P : Subgroup G)
+      = π.comp (MonoidHom.transfer
+        (Abelianization.of (G := ↥(P : Subgroup G)))) := by
+    unfold Subgroup.transferFocal
+    rw [hfactor, transfer_comp_left]
+  intro x hx
+  rw [MonoidHom.mem_ker] at hx ⊢
+  rw [hcomp, MonoidHom.comp_apply, hx, map_one]
+
+/-- If `p ∣ |G : G'|` then `p ∣ |G : A^p(G)|`: otherwise `A^p(G) = ⊤`, and the
+focal subgroup theorem puts the full Sylow `p`-subgroup inside `G'`,
+contradicting `p ∤ |G : P|`. -/
+theorem dvd_index_APrime_of_dvd_index_commutator (P : Sylow p G)
+    (h : p ∣ (commutator G).index) : p ∣ (APrime p G).index := by
+  have hp_prime : p.Prime := hp.out
+  obtain ⟨k, hk⟩ := APrime_index_isPGroup p G
+  rcases Nat.eq_zero_or_pos k with h0 | h1
+  · exfalso
+    have htop : APrime p G = ⊤ := by
+      rw [← Subgroup.index_eq_one, hk, h0, pow_zero]
+    obtain ⟨hGP, hAP, -⟩ := focalSubgroupTheorem P
+    have hFocP : (P : Subgroup G).focalSubgroup = (P : Subgroup G) := by
+      rw [← hAP, htop, top_inf_eq]
+    have hPle : (P : Subgroup G) ≤ commutator G :=
+      inf_eq_right.mp (by rw [hGP, hFocP])
+    exact P.not_dvd_index (h.trans (Subgroup.index_dvd_of_le hPle))
+  · rw [hk]
+    exact dvd_pow_self p h1.ne'
+
+/-- **Isaacs Theorem 10.12 (Huppert)**: let `G` be a finite group with a
+nonabelian metacyclic Sylow `p`-subgroup `P`, where `p > 2`. Then
+`p ∣ |G : G'|`.
+
+**証明**: `C_p ≀ C_p` は metacyclic な `P` の準同型像でない (Lemma 10.14) ので
+Yoshida (Thm 10.1 対偶) により `N := N_G(P)` の transfer 像と一致
+(= `N` が `p`-transfer を制御)。`P ⊴ N` は nonabelian metacyclic な正規 Sylow
+なので Thm 10.15 で `p ∣ |N:N'|` ⇒ `p ∣ |N : A^p(N)|` ⇒ `N`-transfer 像の位数を
+`p` が割る ⇒ `G`-transfer 像も同位数 ⇒ `p ∣ |G : ker v| ∣ |G:G'|`。 -/
+theorem dvd_index_commutator_of_metacyclic_sylow (hp2 : 2 < p) (P : Sylow p G)
+    (hmeta : IsMetacyclic ↥(P : Subgroup G))
+    (hnonab : ¬ ∀ x y : ↥(P : Subgroup G), x * y = y * x) :
+    p ∣ (commutator G).index := by
+  classical
+  -- Step 1: transfer-range equality (Yoshida 10.1 contrapositive + Lemma 10.14)
+  have hrange : (MonoidHom.transfer
+        (Abelianization.of (G := ↥(P : Subgroup G)))).range
+      = (MonoidHom.transfer (transferRes Subgroup.le_normalizer
+          (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
+    by_contra hne
+    have hle : (MonoidHom.transfer
+          (Abelianization.of (G := ↥(P : Subgroup G)))).range
+        ≤ (MonoidHom.transfer (transferRes Subgroup.le_normalizer
+            (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
+      rw [← transfer_transfer Subgroup.le_normalizer
+        (Abelianization.of (G := ↥(P : Subgroup G)))]
+      exact transfer_range_le _
+    obtain ⟨φ, hφ⟩ := exists_surjective_wreath_of_transfer_range_lt P
+      (lt_of_le_of_ne hle hne)
+    exact not_surjective_wreath_of_isMetacyclic p hmeta hp2 φ hφ
+  -- Step 2: Theorem 10.15 inside `N := N_G(P)` (as a raw normal-Sylow instance)
+  have hQn : ((P : Subgroup G).subgroupOf
+      (Subgroup.normalizer ((P : Subgroup G) : Set G))).Normal :=
+    Subgroup.normal_in_normalizer
+  set e : ↥((P : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G)))
+      ≃* ↥(P : Subgroup G) :=
+    Subgroup.subgroupOfEquivOfLe Subgroup.le_normalizer with he_def
+  have hPNp : IsPGroup p
+      ↥((P : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G))) :=
+    P.isPGroup'.of_equiv e.symm
+  have hPNidx : ¬ p ∣ ((P : Subgroup G).subgroupOf
+      (Subgroup.normalizer ((P : Subgroup G) : Set G))).index := fun hdvd =>
+    P.not_dvd_index (hdvd.trans
+      (Subgroup.relIndex_dvd_index_of_le Subgroup.le_normalizer))
+  have hmetaQ : IsMetacyclic
+      ↥((P : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G))) :=
+    hmeta.of_surjective (f := e.symm.toMonoidHom) e.symm.surjective
+  have hnonabQ : ¬ ∀ x y : ↥((P : Subgroup G).subgroupOf
+      (Subgroup.normalizer ((P : Subgroup G) : Set G))), x * y = y * x := by
+    intro hall
+    refine hnonab fun x y => ?_
+    have h1 : e.symm x * e.symm y = e.symm y * e.symm x := hall (e.symm x) (e.symm y)
+    have h2 := congrArg e h1
+    simpa using h2
+  have h1015 : p ∣ (commutator ↥(Subgroup.normalizer ((P : Subgroup G) : Set G))).index :=
+    thm1015_aux (Nat.card ↥((P : Subgroup G).subgroupOf
+        (Subgroup.normalizer ((P : Subgroup G) : Set G))))
+      hQn hPNp hPNidx hmetaQ hnonabQ hp2 le_rfl
+  -- Step 3: `p` divides the order of the `N`-level transfer image
+  set Q : Sylow p ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) :=
+    hPNp.toSylow hPNidx with hQ_def
+  have hQcoe : (Q : Subgroup ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)))
+      = (P : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G)) := rfl
+  set ê : Abelianization ↥((P : Subgroup G).subgroupOf
+        (Subgroup.normalizer ((P : Subgroup G) : Set G)))
+      ≃* Abelianization ↥(P : Subgroup G) := MulEquiv.abelianizationCongr e
+    with hê_def
+  have hWfact : MonoidHom.transfer (transferRes Subgroup.le_normalizer
+        (Abelianization.of (G := ↥(P : Subgroup G))))
+      = (ê.toMonoidHom).comp (MonoidHom.transfer
+          (Abelianization.of (G := ↥((P : Subgroup G).subgroupOf
+            (Subgroup.normalizer ((P : Subgroup G) : Set G)))))) := by
+    rw [← transfer_comp_left]
+    congr 1
+  have hB3 : p ∣ (APrime p ↥(Subgroup.normalizer ((P : Subgroup G) : Set G))).index :=
+    dvd_index_APrime_of_dvd_index_commutator Q h1015
+  have hkerle : (MonoidHom.transfer (Abelianization.of
+        (G := ↥((P : Subgroup G).subgroupOf
+          (Subgroup.normalizer ((P : Subgroup G) : Set G)))))).ker
+      ≤ APrime p ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) :=
+    ker_transfer_abelianization_le_APrime Q
+  have hcard1 : p ∣ Nat.card (MonoidHom.transfer (Abelianization.of
+      (G := ↥((P : Subgroup G).subgroupOf
+        (Subgroup.normalizer ((P : Subgroup G) : Set G)))))).range := by
+    have hcard_eq : Nat.card (MonoidHom.transfer (Abelianization.of
+        (G := ↥((P : Subgroup G).subgroupOf
+          (Subgroup.normalizer ((P : Subgroup G) : Set G)))))).range
+        = (MonoidHom.transfer (Abelianization.of
+            (G := ↥((P : Subgroup G).subgroupOf
+              (Subgroup.normalizer ((P : Subgroup G) : Set G)))))).ker.index := by
+      rw [Subgroup.index_eq_card]
+      exact (Nat.card_congr
+        (QuotientGroup.quotientKerEquivRange _).toEquiv).symm
+    rw [hcard_eq]
+    exact hB3.trans (Subgroup.index_dvd_of_le hkerle)
+  have hcard2 : p ∣ Nat.card (MonoidHom.transfer (transferRes
+      Subgroup.le_normalizer
+      (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
+    rw [hWfact, MonoidHom.range_comp]
+    rw [← Nat.card_congr (Subgroup.equivMapOfInjective _ ê.toMonoidHom
+      ê.injective).toEquiv]
+    exact hcard1
+  -- Step 4: conclude via `|v(G)| = |G : ker v|` and `G' ≤ ker v`
+  have hcardv : p ∣ Nat.card (MonoidHom.transfer
+      (Abelianization.of (G := ↥(P : Subgroup G)))).range := by
+    rw [hrange]
+    exact hcard2
+  have hval : Nat.card (MonoidHom.transfer
+        (Abelianization.of (G := ↥(P : Subgroup G)))).range
+      = (MonoidHom.transfer
+          (Abelianization.of (G := ↥(P : Subgroup G)))).ker.index := by
+    rw [Subgroup.index_eq_card]
+    exact (Nat.card_congr (QuotientGroup.quotientKerEquivRange _).toEquiv).symm
+  have hker_ge : commutator G ≤ (MonoidHom.transfer
+      (Abelianization.of (G := ↥(P : Subgroup G)))).ker :=
+    Abelianization.commutator_subset_ker _
+  rw [hval] at hcardv
+  exact hcardv.trans (Subgroup.index_dvd_of_le hker_ge)
 
 end
 
