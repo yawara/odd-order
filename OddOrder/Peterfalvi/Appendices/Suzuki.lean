@@ -1038,6 +1038,136 @@ lemma ncard_involutions_map_conj_eq_card_involutions_H :
           simpa [mul_assoc] using
             congrArg (fun z : G => hyp.t⁻¹ * z * hyp.t) h)
 
+/-! ## Chapter I §1, Proposition 3 (p. 101) -/
+
+/-- `k ↦ kt` maps `K` onto `{u ∈ I | H^u = H^t}` (the book's `Dt ∩ I`). -/
+lemma image_mul_t_KSet :
+    (fun k : G => k * hyp.t) '' hyp.KSet =
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+        hyp.H.map (MulAut.conj u).toMonoidHom =
+          hyp.H.map (MulAut.conj hyp.t).toMonoidHom} := by
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  ext u
+  constructor
+  · rintro ⟨k, ⟨hkD, hkinv⟩, rfl⟩
+    have hkH : k ∈ hyp.H := hyp.D_le_H hkD
+    refine ⟨?_, ?_, ?_⟩
+    · rw [sq]
+      calc k * hyp.t * (k * hyp.t) = k * (hyp.t * k * hyp.t) := by group
+        _ = k * k⁻¹ := by rw [hkinv]
+        _ = 1 := mul_inv_cancel k
+    · intro h1
+      apply hyp.t_not_mem_H
+      have h2 : hyp.t = k⁻¹ := by
+        have h3 := congrArg (fun z : G => k⁻¹ * z) h1
+        simpa [mul_assoc] using h3
+      rw [h2]
+      exact inv_mem hkH
+    · rw [hyp.map_conj_eq_map_conj_iff, hyp.t_inv_eq]
+      have h2 : hyp.t * (k * hyp.t) = k⁻¹ := by
+        rw [← mul_assoc]
+        exact hkinv
+      rw [h2]
+      exact inv_mem hkH
+  · rintro ⟨hu2, hu1, hueq⟩
+    have huu : u * u = 1 := by rw [← sq]; exact hu2
+    have huinv : u⁻¹ = u := inv_eq_of_mul_eq_one_right huu
+    have htuH : hyp.t⁻¹ * u ∈ hyp.H := (hyp.map_conj_eq_map_conj_iff).mp hueq
+    refine ⟨u * hyp.t, ⟨?_, ?_⟩, ?_⟩
+    · rw [hyp.mem_D_iff]
+      constructor
+      · have h2 : u * hyp.t = (hyp.t⁻¹ * u)⁻¹ := by
+          rw [mul_inv_rev, inv_inv, huinv]
+        rw [h2]
+        exact inv_mem htuH
+      · have h2 : hyp.t⁻¹ * (u * hyp.t) * hyp.t = hyp.t⁻¹ * u := by
+          calc hyp.t⁻¹ * (u * hyp.t) * hyp.t
+              = hyp.t⁻¹ * (u * (hyp.t * hyp.t)) := by group
+            _ = hyp.t⁻¹ * u := by rw [htt, mul_one]
+        rw [h2]
+        exact htuH
+    · calc hyp.t * (u * hyp.t) * hyp.t
+          = hyp.t * (u * (hyp.t * hyp.t)) := by group
+        _ = hyp.t * u := by rw [htt, mul_one]
+        _ = (u * hyp.t)⁻¹ := by rw [mul_inv_rev, hyp.t_inv_eq, huinv]
+    · calc u * hyp.t * hyp.t = u * (hyp.t * hyp.t) := by rw [mul_assoc]
+        _ = u := by rw [htt, mul_one]
+
+/-- **Peterfalvi Part II, Ch. I Prop 3** (p. 101), first clause —
+`|K| = |H ∩ I|`. -/
+lemma ncard_KSet_eq :
+    hyp.KSet.ncard = {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard := by
+  have hinj : Function.Injective (fun k : G => k * hyp.t) :=
+    fun a b h => mul_right_cancel h
+  calc hyp.KSet.ncard
+      = ((fun k : G => k * hyp.t) '' hyp.KSet).ncard :=
+        (Set.ncard_image_of_injective _ hinj).symm
+    _ = {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard := by
+        rw [hyp.image_mul_t_KSet,
+          hyp.ncard_involutions_map_conj_eq_card_involutions_H]
+
+/-- `k ↦ kt` sends `K` into `I - (H ∩ I)`. -/
+lemma mul_t_mem_of_mem_KSet {k : G} (hk : k ∈ hyp.KSet) :
+    (k * hyp.t) ^ 2 = 1 ∧ k * hyp.t ≠ 1 ∧ k * hyp.t ∉ hyp.H := by
+  obtain ⟨hkD, hkinv⟩ := hk
+  have hkH : k ∈ hyp.H := hyp.D_le_H hkD
+  refine ⟨?_, ?_, ?_⟩
+  · rw [sq]
+    calc k * hyp.t * (k * hyp.t) = k * (hyp.t * k * hyp.t) := by group
+      _ = k * k⁻¹ := by rw [hkinv]
+      _ = 1 := mul_inv_cancel k
+  · intro h1
+    apply hyp.t_not_mem_H
+    have h2 : hyp.t = k⁻¹ := by
+      have h3 := congrArg (fun z : G => k⁻¹ * z) h1
+      simpa [mul_assoc] using h3
+    rw [h2]
+    exact inv_mem hkH
+  · intro hktH
+    apply hyp.t_not_mem_H
+    have h2 : hyp.t = k⁻¹ * (k * hyp.t) := by group
+    rw [h2]
+    exact mul_mem (inv_mem hkH) hktH
+
+/-- **Peterfalvi Part II, Ch. I Prop 3** (p. 101), second clause — for
+`s ∈ H ∩ I` the conjugates `s^K` exhaust `H ∩ I`.  (Injectivity of
+`k ↦ s^k` on `K` comes from Prop 2(c) applied to the involutions `kt`.) -/
+lemma image_conj_KSet_eq_involutions_H {s : G} (hsH : s ∈ hyp.H)
+    (hs2 : s ^ 2 = 1) (hs1 : s ≠ 1) :
+    (fun k : G => k⁻¹ * s * k) '' hyp.KSet =
+      {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
+  classical
+  have hsQ := hyp.mem_Q_of_sq_eq_one_of_mem_H hsH hs2
+  have hbij := hyp.bijOn_conj_of_involution_mem_Q hsQ hs2 hs1
+  have hsub : (fun k : G => k⁻¹ * s * k) '' hyp.KSet ⊆
+      {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
+    rintro - ⟨k, ⟨hkD, -⟩, rfl⟩
+    have hkH : k ∈ hyp.H := hyp.D_le_H hkD
+    refine ⟨?_, ?_, ?_⟩
+    · rw [sq]
+      calc k⁻¹ * s * k * (k⁻¹ * s * k) = k⁻¹ * (s * s) * k := by group
+        _ = 1 := by rw [← sq, hs2, mul_one, inv_mul_cancel]
+    · intro h
+      apply hs1
+      have h2 := congrArg (fun z : G => k * z * k⁻¹) h
+      simpa [mul_assoc] using h2
+    · exact mul_mem (mul_mem (inv_mem hkH) hsH) hkH
+  have hinjK : Set.InjOn (fun k : G => k⁻¹ * s * k) hyp.KSet := by
+    rintro k₁ hk₁ k₂ hk₂ heq
+    have heq' : k₁⁻¹ * s * k₁ = k₂⁻¹ * s * k₂ := heq
+    have hσeq : (k₁ * hyp.t)⁻¹ * s * (k₁ * hyp.t) =
+        (k₂ * hyp.t)⁻¹ * s * (k₂ * hyp.t) := by
+      have e1 : ∀ k : G, (k * hyp.t)⁻¹ * s * (k * hyp.t) =
+          hyp.t⁻¹ * (k⁻¹ * s * k) * hyp.t := by
+        intro k
+        group
+      rw [e1, e1, heq']
+    have h2 := hbij.injOn (hyp.mul_t_mem_of_mem_KSet hk₁)
+      (hyp.mul_t_mem_of_mem_KSet hk₂) hσeq
+    exact mul_right_cancel h2
+  refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
+  rw [Set.ncard_image_of_injOn hinjK, ← hyp.ncard_KSet_eq]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
