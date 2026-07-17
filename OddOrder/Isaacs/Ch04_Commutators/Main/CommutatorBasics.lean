@@ -662,7 +662,7 @@ theorem commutator_top_subgroup_le_commutator (A : Subgroup G) :
   - `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`
     ⇒ Q commutative ⇒ commutator G ≤ ⁅A, ⊤⁆. -/
 theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
-    {A : Subgroup G} [A.Normal] [Finite G]
+    {A : Subgroup G} [A.Normal]
     (_hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (hCyclic : IsCyclic (G ⧸ A)) :
     _root_.commutator G = ⁅A, (⊤ : Subgroup G)⁆ := by
@@ -933,7 +933,7 @@ theorem commutatorRightHom_range_normal {A : Subgroup G} [A.Normal]
 * `y = 1`: `⁅a, 1⁆ = 1`.
 * `y = y₁·y₂`: identity `⁅a, y₁y₂⁆ = ⁅a, y₁⁆·(y₁·⁅a, y₂⁆·y₁⁻¹)` + range Normal.
 * `y = y₀⁻¹`: identity `⁅a, y₀⁻¹⁆ = y₀⁻¹·⁅a, y₀⁆⁻¹·y₀` + range Normal + inv_mem. -/
-theorem commutatorRightHom_range_eq_commutator {A : Subgroup G} [A.Normal] [Finite G]
+theorem commutatorRightHom_range_eq_commutator {A : Subgroup G} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     {g : G} (hgen : ∀ x : G ⧸ A, x ∈ Subgroup.zpowers ((g : G ⧸ A))) :
     (commutatorRightHom hAb g).range = _root_.commutator G := by
