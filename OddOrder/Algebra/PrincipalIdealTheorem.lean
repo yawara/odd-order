@@ -139,6 +139,52 @@ theorem augmentationCoquotientMulLeft_mk (hK : K.Normal)
     augmentationCoquotientMulLeft G K hK x (Submodule.Quotient.mk α)
       = Submodule.Quotient.mk (augmentationIdealMulLeft' G x α) := rfl
 
+/-- `K` acts trivially on `Δ(G)‾`: left multiplication by `k ∈ K` descends to
+the identity (Isaacs p. 313: `(k-1)ᾱ = 0`, so `kᾱ = ᾱ`). -/
+theorem augmentationCoquotientMulLeft_of_mem (hK : K.Normal) {k : G}
+    (hk : k ∈ K) :
+    augmentationCoquotientMulLeft G K hK (MonoidAlgebra.of ℤ G k)
+      = LinearMap.id := by
+  refine LinearMap.ext fun q => ?_
+  obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ q
+  rw [augmentationCoquotientMulLeft_mk, LinearMap.id_apply,
+    Submodule.Quotient.eq]
+  have hval : ((augmentationIdealMulLeft' G (MonoidAlgebra.of ℤ G k) α - α :
+        ↥(augmentationIdeal G)) : MonoidAlgebra ℤ G)
+      = (MonoidAlgebra.of ℤ G k - 1) * (α : MonoidAlgebra ℤ G) := by
+    push_cast
+    change MonoidAlgebra.of ℤ G k * (α : MonoidAlgebra ℤ G) - _ = _
+    rw [sub_mul, one_mul]
+  rw [mem_augmentationCorel, hval]
+  exact Submodule.mul_mem_mul (sub_one_mem_augmentationIdealOf G K hk) α.2
+
+/-- The natural map `Δ(K)‾ →ₗ[ℤ] Δ(G)‾` induced by `Δ(K) ⊆ Δ(G)` (both
+quotients are by `Δ(K)Δ(G)`). -/
+noncomputable def augmentationCoquotientInclusion :
+    AugmentationQuotientOf G K →ₗ[ℤ] AugmentationCoquotient G K :=
+  Submodule.mapQ (augmentationIdealOfRel G K) (augmentationCorel G K)
+    (Submodule.inclusion (augmentationIdealOf_le G K))
+    (fun _ hα => hα)
+
+@[simp]
+theorem augmentationCoquotientInclusion_mk (α : ↥(augmentationIdealOf G K)) :
+    augmentationCoquotientInclusion G K (Submodule.Quotient.mk α)
+      = Submodule.Quotient.mk
+          (Submodule.inclusion (augmentationIdealOf_le G K) α) := rfl
+
+/-- The map `Δ(K)‾ → Δ(G)‾` is injective (second isomorphism theorem: the
+kernel of `Δ(K) → Δ(G)‾` is `Δ(K)Δ(G) ∩ Δ(K)`, which is exactly the relation
+defining `Δ(K)‾`). -/
+theorem augmentationCoquotientInclusion_injective :
+    Function.Injective (augmentationCoquotientInclusion G K) := by
+  intro q₁ q₂ h
+  obtain ⟨α₁, rfl⟩ := Submodule.Quotient.mk_surjective _ q₁
+  obtain ⟨α₂, rfl⟩ := Submodule.Quotient.mk_surjective _ q₂
+  rw [augmentationCoquotientInclusion_mk, augmentationCoquotientInclusion_mk,
+    Submodule.Quotient.eq] at h
+  rw [Submodule.Quotient.eq]
+  exact h
+
 end Coquotient
 
 end OddOrder.Algebra
