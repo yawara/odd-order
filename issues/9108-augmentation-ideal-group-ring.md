@@ -117,7 +117,22 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   R-quotient と ℤ-quotient (restrictScalars) の card は defeq/rfl。
   補助: `mapDomainAlgHom_surjective` / `augmentationCoquotientModule_mapDomain_smul`
   ((π x)•a = mulLeft x a, compHom smul rfl)。
-- ⏭ **次 = 10.25 最終組み立て** (残り; PrincipalIdealTheorem.lean 現 ~1170 行):
+- ✅✅ **Thm 10.25 完成** (2026-07-17, sorry-free, `transfer_pow_relindex_eq_one`):
+  G'⊆K⊆G, G 有限 ⇒ v(g)^{|K:G'|}=1 (Furtwängler)。
+  - finiteness: `moduleFinite_augmentationCoquotient` /
+    `fg_top_augmentationCoquotient` / `fg_augmentationRingIdeal` /
+    `finite_quotient_augmentationRingIdeal_smul_top`
+  - core `exists_annihilator_transferXi`: 10.26 で γ → section 台形 ε →
+    10.27 で全 γ_q=c → c•transferXi=0, |G:K|·c=|G:G'|
+  - `pow_eq_one_of_smul_transferXi_eq_zero` + 10.24 iso + index tower
+    (relIndex_mul_index) で (|K:G'|:ℤ)=c → v(g)^{|K:G'|}=1
+  **⭐ principal ideal theorem chain 完成: 10.24/10.25/10.26/10.27 全て sorry-free。**
+- ⏭ **残り = 10.28 Alperin-Kuo** (§10C 最終定理) + §10A/10B の未着手分。
+  10.25/10.24 を consumer とする。PrincipalIdealTheorem.lean 現 ~1340 行
+  (2000 上限まで余裕、ただし 10.28 で分割検討)。
+  ---
+  (旧メモ、参考):
+  **次 = 10.25 最終組み立て** (残り; PrincipalIdealTheorem.lean 現 ~1170 行):
   (i) **finiteness**: A=Δ(G)‾ と U=Δ(G/K) は加法 f.g. (Finite G →
   ℤ[G]/ℤ[G/K] が f.g. ℤ-module (Noetherian) → 部分/商 f.g.)、
   `Finite (A⧸U•⊤)` は index=|G:G'| で Abelianization G (finite) と同型。
