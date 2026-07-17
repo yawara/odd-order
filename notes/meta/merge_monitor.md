@@ -716,6 +716,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #20、Fable hub) — ✅ a (Mann cluster) + c (Thm 10.12 + 10.16 = **Isaacs 10B 完全形式化**) 合流、census 23 不変**:
+  **a** = `3e8e319a` (SS4B **Mann cluster** M(G) + small-class nilpotency、Mann.lean 新設) を merge
+  `576d8284`: build **4317 jobs green**。⚠ hub 機械的修正 = Mann.lean root closure 欠落 →
+  OddOrder.lean import 追記 (step 3b、a も新 leaf 時は OddOrder.lean 追記込みで commit のこと)。
+  **c** = 4 commits (**Thm 10.12 Huppert** nonabelian metacyclic Sylow ⟹ p | |G:G'| / **Thm 10.16**
+  generalized Maschke group-action 形 = OperatorMaschke 拡張 / issue 3007 close = **Isaacs 10B
+  (10.12-10.17) 完全形式化**) を merge `11c09dcf`: build **4317 jobs green** (12m45s)。**b** = 変化なし。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK・逸脱なし。HuppertMetacyclic 687→862 行。
 - **2026-07-17 (tick #18-19、Fable hub) — ✅ b (Thm 8.37) 合流、census 23 不変**:
   tick #18 = 変化なし (全レーン 0)。tick #19: **b** = `aa6c09cd` (**Thm 8.37 subdegree growth
   bound**、Subdegrees.lean 175 行新設 + Orbitals 追記、OddOrder.lean import は b 自身が追記済) を
