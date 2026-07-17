@@ -34,11 +34,19 @@ Prop 2.2 と Clifford 半単純性を 2026-07-18 に char-free 化したので�
       de-privatize / 共有 leaf へ抽出 (mathlib に無い)。
 - [ ] **case (i)**: `restriction_isSimpleModule` (CliffordMultiplicityOne, char-free) で
       M_H ≅ L。hgen は [G:H]=p prime + x∉H から、hconj は L≅L^x を G=⟨H,x⟩ で全 g へ伝播。
-- [ ] **case (ii)** [= 主要ギャップ、issue 9110 の shared infra]: L ≇ L^x ⟹ dim M = p·dim L。
-      module-level induced-rep irreducibility over general alg-closed field が必要
-      (repo は ℂ character-level のみ; mathlib は Rep.ind に既約性なし)。
-      e=1 (multiplicity) の証明ルート案: (A) M ≅ Ind_H^G L (trivial inertia)、または
-      (B) End_{kG}(M)=k (Burnside) = End_{kH}(M_H) の ρ(x)-fixed points の次元計算 = e²。
+- [ ] **case (ii)** L ≇ L^x ⟹ dim M = p·dim L。**induced module は不要** (2026-07-18 に
+      より軽いルート確定; issue 9110 の induced-rep framing は撤回)。直接ルート:
+      - `W_i := L.map (conjSemilinearEnd ρ (x^i))` (i : Fin p)。各 simple
+        (`isSimpleModule_map_conjSemilinearEnd`)、dim_k W_i = dim_k L (conjSemilinearEnd は
+        k 上線型: conjMonoidAlgRingHom は係数体 k を固定)。
+      - `⨆_{i:Fin p} W_i = ⊤`: `iSup_map_conjSemilinearEnd_eq_top` (⨆_{g:G}=⊤) から、
+        g ∈ x^i H なら L.map(conj g) = W_i (`map_map_conjSemilinearEnd` + h∈H で
+        L.map(conj h)=L) ゆえ ⨆_g = ⨆_i。
+      - **directness** (唯一の要 brick): W_i は pairwise 非同型 (L≇L^x ⟹ Z/p 上の [L] の
+        stabilizer が trivial ⟹ 全 p 個非同型) ⟹ `iSupIndep W`。pairwise 非同型 simple の
+        独立性 (semisimple M_H の isotypic component 独立性 = mathlib `IsSemisimpleModule`/
+        isotypic から) を ~15-20 行で。
+      - ゆえに `DirectSum.IsInternal W` + dim ⊤ = Σ dim W_i = p·dim L。
 - [ ] **strong induction on |G|** で組み立て、full book strength (general solvable G, general F)。
 
 ## 完了条件
@@ -48,7 +56,8 @@ sorry-free・axiom-clean で。survey 正本の Lem 2.3 行を「済」に更新
 
 ## 参照
 
-- shared infra: [[9110]] module-level induced-rep Clifford (case ii の brick)
+- ~~shared infra: [[9110]] module-level induced-rep Clifford~~ — **撤回** (induced module 不要、
+  上記 direct-sum-of-conjugates ルートで CliffordAlgClosed 既存 infra + 小 directness lemma のみ)
 - 依存: `CliffordMultiplicityOne.restriction_isSimpleModule`,
   `CliffordAlgClosed.{isSemisimpleModule_resRep_of_isIrreducible,isIsotypicOfType_of_conjugates,
   iSup_map_conjSemilinearEnd_eq_top}`, `AbsolutelyIrreducible.IsAbsolutelyIrreducible`

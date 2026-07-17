@@ -7,7 +7,20 @@ created: 2026-07-18
 
 # Shared infra claim: module-level induced-rep irreducibility over general alg-closed field
 
-## claim (lane c, 2026-07-18)
+## ⚠ 撤回 (2026-07-18, 起票と同日)
+
+**この claim は不要と判明。close する。** BG Lem 2.3 case (ii) は induced-representation を
+経由せずに済む: M を p 個の conjugate simple 部分加群 `ρ(x^i)L` の**内部直和**として
+直接与えられる (G-不変性 ⟹ M 既約から全体を張る; pairwise 非同型 simple ⟹ 直和)。
+よって `dim M = p·dim L` が multiplicity/induced module 抜きで出る。必要 infra は
+CliffordAlgClosed の既存 `conjSemilinearEnd` 機構 + 小さい directness lemma のみ
+(module-level induced Clifford の shared infra は不要)。詳細は [[3008]] case (ii)。
+
+module-level induced Clifford が将来別文脈で必要になったら改めて claim すること。
+
+---
+
+## claim (lane c, 2026-07-18) [撤回済]
 
 lane c が **module-level** の induced-representation 既約性 / Clifford correspondence を
 **general algebraically closed field 上** (任意標数) で構築することを claim する。
