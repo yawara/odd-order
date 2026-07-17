@@ -20,9 +20,13 @@
 > を ambient Z(E) とし各 component 像に 9.17 を当てる、型 `↥E⧸Z(↥E)` を経由しない) →
 > `Schenkman.lean` (**Lem 9.19** Frattini nilpotent 判定 + **Lem 9.20** nilpotent
 > complement 存在 + **Thm 9.22** `Z(G)=1 ⇒ C_G(G^∞)≤G^∞` + **Thm 9.21** Schenkman
-> `S◁G, C_G(S)=1 ⇒ C_G(S^∞)≤S^∞`)。
-> **次 frontier = Thm 9.13** (order bound: 9.14+9.16+9.18+9.21+9.8 を束ねる) →
-> **Thm 9.10** (Wielandt aut tower, 9.12+9.13 経由)。上流優先+文書順。
+> `S◁G, C_G(S)=1 ⇒ C_G(S^∞)≤S^∞`) → `OrderBound.lean` (**Thm 9.13**
+> `S◁G, C_G(S)=1 ⇒ |G| ≤ |Z(S^∞)|·|Aut(S^∞)|`; normal 版は S^∞◁G ゆえ 9.14+9.21 直接、
+> 書籍の F* 経由 factorial 上界より強い)。
+> **§9B の解析補題は 9.11–9.22 + 9.13 まで全 landed (2026-07-18)**。
+> **残 = Thm 9.10** (Wielandt aut tower 本体; recursive type family + tower の `G_1`
+> subnormal と 9.13/9.21 normal のミスマッチ解決が要る = **issue 1037** に詳細)。
+> 次に §9C (Thompson-Wielandt 9.23–9.27) / §9D (Bartels 9.28–9.31)。
 >
 > Schenkman 実装メモ: 9.22 は `inf_center_ne_bot_of_normal_of_isNilpotent`
 > (nilpotent 群の nontrivial normal は中心と交わる; upper central series 帰納) が核。
