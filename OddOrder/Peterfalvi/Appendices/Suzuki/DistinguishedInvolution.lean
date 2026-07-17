@@ -304,6 +304,69 @@ theorem existsUnique_distinguishedInvolution :
     simp only [Prod.mk.injEq]
     exact ⟨hs_eq, hr_eq⟩
 
+/-! ## Chapter I §1, Proposition 4 (c) (p. 101)
+
+`N = ⋂_{x ∈ G} H^x` is the *normal core* `𝒩(G)` of `H`.  Because `G` acts
+faithfully on `Ω` (hypothesis (A2)), `N = 1`, so the book's `N = C_D(Q) ⊆
+C_D(t)` holds with all three subgroups equal to `1`, and the quotient
+`Ḡ = G/N` coincides with `G` (hence trivially satisfies (A1), `Q̄ ≅ Q`, and
+`|s̄t̄| = |st|`).  The mathematically substantial part in this setting is the
+identity `C_D(Q) = 1`.  (The general quotient construction of Prop 4(c), used
+in the Chapters II–IV induction where the ambient action need not be
+faithful, is recovered there by instantiating the hypotheses on `G/N`.) -/
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), the kernel — `𝒩(G) =
+⋂_x H^x = 1` (the action is faithful, (A2)). -/
+theorem normalCore_H_eq_bot : hyp.H.normalCore = ⊥ := by
+  haveI := hyp.faithful
+  haveI := hyp.doubly_transitive
+  haveI : MulAction.IsPretransitive G Ω :=
+    MulAction.isPretransitive_of_is_two_pretransitive
+  rw [eq_bot_iff]
+  intro n hn
+  rw [Subgroup.mem_bot]
+  apply FaithfulSMul.eq_of_smul_eq_smul (α := Ω)
+  intro ω
+  rw [one_smul]
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G hyp.basept ω
+  have hmem : g⁻¹ * n * g ∈ hyp.H := by
+    have := hn g⁻¹
+    rwa [inv_inv] at this
+  have hfix : (g⁻¹ * n * g) • hyp.basept = hyp.basept :=
+    hyp.smul_basept_eq_of_mem_H hmem
+  rw [← hg, ← mul_smul, show n * g = g * (g⁻¹ * n * g) from by group, mul_smul, hfix]
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), the substantial clause
+— `C_D(Q) = 1` (elements of `D` centralizing `Q` fix every point of `Ω`, hence
+are trivial by faithfulness). -/
+theorem centralizer_Q_inf_D_eq_bot :
+    hyp.D ⊓ Subgroup.centralizer (hyp.Q : Set G) = ⊥ := by
+  haveI := hyp.faithful
+  rw [eq_bot_iff]
+  intro d hd
+  obtain ⟨hdD, hdC⟩ := Subgroup.mem_inf.mp hd
+  rw [Subgroup.mem_bot]
+  apply FaithfulSMul.eq_of_smul_eq_smul (α := Ω)
+  intro ω
+  rw [one_smul]
+  by_cases hω : ω = hyp.basept
+  · rw [hω]; exact hyp.smul_basept_eq_of_mem_H (hyp.D_le_H hdD)
+  · obtain ⟨q, hq⟩ := hyp.qRegularEquiv.surjective ⟨ω, hω⟩
+    have hq' : (↑q : G) • (hyp.t • hyp.basept) = ω := congrArg Subtype.val hq
+    have hcomm : Commute d (↑q : G) :=
+      (Subgroup.mem_centralizer_iff.mp hdC (↑q) q.2).symm
+    rw [← hq', ← mul_smul, hcomm.eq, mul_smul, hyp.smul_t_basept_eq_of_mem_D hdD]
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), packaged — the book's
+`𝒩(G) = C_D(Q)` (both `= 1` under (A2)). -/
+theorem normalCore_eq_centralizer_Q :
+    hyp.H.normalCore = hyp.D ⊓ Subgroup.centralizer (hyp.Q : Set G) := by
+  rw [hyp.normalCore_H_eq_bot, hyp.centralizer_Q_inf_D_eq_bot]
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101) — `𝒩(G) ⊆ C_D(t) = V`. -/
+theorem normalCore_le_V : hyp.H.normalCore ≤ hyp.V := by
+  rw [hyp.normalCore_H_eq_bot]; exact bot_le
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
