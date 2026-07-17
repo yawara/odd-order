@@ -64,6 +64,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
 import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
@@ -4389,6 +4390,12 @@ set_option linter.style.longLine false in
 -- base change to `AlgebraicClosure F`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
+
+-- BG Lemma 4.5(c) / Proposition 4.6: for `p` odd and a noncyclic `p`-group `R`, `Ω₁(Z₂(R))` is
+-- noncyclic of exponent `p` (4.5(c)); and a noncyclic normal subgroup `S ⊴ R` contains an
+-- `R`-normal elementary abelian subgroup of order `p²` (Prop 4.6).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.omega1UpperCentralTwo_not_isCyclic_and_card_prime_sq_le_of_not_isCyclic
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal_not_isCyclic
 
 -- BG Proposition 4.4(b) (Gorenstein 7.6.5): for `A ∈ SCN(R)` with `R` a Sylow `p`-subgroup of a
 -- finite `G`, the centralizer `C_G(A)` is the internal direct product `A × H` of `A` with a
