@@ -716,6 +716,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #17、Fable hub) — ✅ a (Cor 4.12) + b (Thm 8.35/Lem 8.36) + c (10.15 step 5) 全 3 レーン合流、census 24→23 (c が scaffold 解消)**:
+  **a** = 2 commits (**Cor 4.12** general bracketing form via commutator words / AxiomsCheck 3.35 登録)
+  を merge `df50e982`: build **4314 jobs green** (14m16s)。**b** = `1aa5c91a`→`3e46b862` 系
+  (**Thm 8.35 + Lem 8.36 orbital graph connectivity**、OrbitalGraph.lean 新設) を merge `9d913e0a`:
+  build **4315 jobs green**。OddOrder.lean 独立追記衝突 (hub の HuppertMetacyclic import vs b の
+  OrbitalGraph import) は両保持で解決 (良性クラス)。**c** = `af71a955` (**Thm 10.15 step 5**
+  Omega1(P) not central、初の Maschke 適用、scaffold sorry 解消) を merge `3d62dbc5`: build
+  **4315 jobs green**。HuppertMetacyclic 316→687 行。新 axiom なし・AxiomsCheck OK・逸脱なし。
 - **2026-07-17 (tick #16、Fable hub) — ✅ a (Thm 3.34/3.35 + wreath) + b (Lem 8.34) + c (Thm 10.15 前半) 全 3 レーン合流、census 23→24 (scaffold +1)**:
   **a** = 4 commits (Thm 3.34 coprime orbit sizes / Thm 3.35 existence half / SS3A general wreath
   product = WreathProduct.lean 新設 / AxiomsCheck 3.26+3.31-3.34 登録) を merge `3c3284e6`: build
