@@ -5,7 +5,10 @@
 > 進捗 (全 sorry-free): §9A `Quasisimple.lean` (`IsQuasisimple` + Lem 9.1/9.2) →
 > `Components.lean` (`IsComponent` + Lem 9.3 + Thm 9.4 distinct components commute) →
 > `Semisimple.lean` (`IsSemisimpleGroup` + Lem 9.5 直積性/centerless + Lem 9.6
-> minimal normal は abelian/semisimple)。次 = layer `E(G)` + Thm 9.7 + `F*(G)` (Cor 9.9)。
+> minimal normal は abelian/semisimple) → `Layer.lean` (`layer G` = E(G) 定義・共役不変で
+> `G`-normal + Thm 9.7 (a) E'=E, (b) E/Z(E) semisimple, (c) [E,M]=1 for solvable normal M)。
+> 次 = generalized Fitting `F*(G) = F(G)E(G)` + Thm 9.8 (Bender, 一般形) + Cor 9.9
+> (`GeneralizedFitting.lean`)。§9A 完了間近。
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.9 (pp. 271-294).
 形式化先: `OddOrder/Isaacs/Ch09_MoreSubnormality/` (topic leaves; 2026-07-17 開始).
