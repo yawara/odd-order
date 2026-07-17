@@ -328,6 +328,7 @@ theorem derivedInG_pointwise_smul (M : Subgroup G) :
     _ = (commutator ↥(φ • M)).map (φ • M).subtype := by rw [hcomm]
     _ = derivedInG (φ • M) := rfl
 
+omit [Finite G] in
 /-- **`secondDerivedInAmbient` is `MulAut`-equivariant**: `φ • M'' = (φ • M)''`.  Immediate from
 applying `derivedInG_pointwise_smul` twice (`M'' = (M')'`). -/
 theorem secondDerivedInAmbient_pointwise_smul (M : Subgroup G) :

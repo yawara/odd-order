@@ -125,24 +125,28 @@ these discharge the `tau3_*` fields of `Section16CharacterData` (and hence of
 `Section16Inputs` / `S15.Hypothesis`). -/
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.2), isometry part**: `tau3W` preserves the class-function inner product. -/
 theorem tau3W_isometry :
     OddOrder.Peterfalvi.S07.IsIntegralIsometry (tau3W hG mp tp) :=
   (tiCyclicW hG mp tp).sigmaIntegral_isIntegralIsometry rfl (tiCyclicWDadeApp hG mp tp)
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.2)**: `tau3W` sends the trivial character to the trivial character. -/
 theorem tau3W_trivial :
     tau3W hG mp tp (trivialClassFunction ↥tp.W) = trivialClassFunction G :=
   (tiCyclicW hG mp tp).sigmaIntegral_trivial rfl (tiCyclicWDadeApp hG mp tp)
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.2)**: `tau3W` sends virtual characters to virtual characters. -/
 theorem tau3W_mem_ZIrr {z : ClassFunction ↥tp.W ℂ} (hz : z ∈ ZIrr ↥tp.W) :
     tau3W hG mp tp z ∈ ZIrr G :=
   (tiCyclicW hG mp tp).sigmaIntegral_mem_ZIrr rfl (tiCyclicWDadeApp hG mp tp) hz
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.2.c)**: on the regular set `W ∖ (W₁ ∪ W₂)` the map `tau3W` is the
 identity. -/
 theorem tau3W_apply_of_regular (α : ClassFunction ↥tp.W ℂ) (w : G) (hwW : w ∈ tp.W)
@@ -539,6 +543,7 @@ theorem cardTPW : Nat.card ↥tp.W = tp.q * tp.p := by
       tp.W1_inf_W2_eq_bot,
     ← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- The underlying-character grid is injective: orthonormal grid characters cannot have
 the same underlying linear character. -/
 theorem omegaSChar_injective :
@@ -664,6 +669,7 @@ theorem eqQ_finNeg (i : Fin tp.q) :
   simp only [eqQ, finCongr_apply, Fin.val_cast, OddOrder.Peterfalvi.S15.finNeg]
   rw [cardCertainTypeS_W1 hG mp tp]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Index negation is character inversion for the S-side grid characters** (Peterfalvi (3.5):
 the grid is indexed by character powers, so `ω_{−i,−j} = ω_{ij}⁻¹`).  Assembled from the two
 power-enumeration halves (`w1CharEquiv_finNeg` via the `eqQ` cast, `chi2enum_finNeg`) and the
@@ -686,6 +692,7 @@ theorem omegaSChar_finNeg (i : Fin tp.q) (j : Fin tp.p) :
   congr 1
   exact Units.val_inv_eq_inv_val _
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- The `eqQ` reindex intertwines row negation (`S15.finNeg`) with the character-inversion
 row permutation `rowInv`: both send `i` to the index of the inverse `W₁`-character. -/
 theorem eqQ_finNeg_eq_rowInv (i : Fin tp.q) :
@@ -954,6 +961,7 @@ theorem omegaSChar_col_align (i : Fin tp.q) (j : Fin tp.p) :
           ((tiCyclicW hG mp tp).wFst w) * _
     rw [hfst, map_one, map_one]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.4)/(3.5), the four-corner vanishing** (issue-2036 supply): off the
 conjugacy saturation of the regular set `V = W ∖ (W₁ ∪ W₂)`,
 `1 − η_{i0}(x) − η_{0j}(x) + η_{ij}(x) = 0` for nonzero row and column indices — the `(3.5)`

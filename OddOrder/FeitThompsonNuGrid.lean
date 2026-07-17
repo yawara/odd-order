@@ -132,12 +132,14 @@ variable [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)]
 noncomputable def rowT (j : Fin tp.p) : Fin (Nat.card ↥(mp.certainTypeT hG).W1) :=
   (mp.certainTypeT hG).w1CharEquiv.symm (rowDualT hG mp tp j)
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- The distinguished T-side row index is zero. -/
 theorem rowT_zero : rowT hG mp tp ⟨0, tp.p_prime.pos⟩ = 0 := by
   rw [rowT, rowDualT_zero]
   exact (mp.certainTypeT hG).w1CharEquiv.symm_apply_eq.mpr
     ((mp.certainTypeT hG).w1CharEquiv_zero).symm
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- The transported row enumeration intertwines `finNeg` with the certain-type `rowInv`. -/
 theorem rowT_finNeg_eq_rowInv (j : Fin tp.p) :
     rowT hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
@@ -207,6 +209,7 @@ theorem omegaS_inner (i k : Fin tp.q) (j l : Fin tp.p) :
         (chi2enum hG mp tp).injective h2⟩
     rw [if_neg hne, if_neg h]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- Distinct index pairs give distinct members of the shared `ω`-grid. -/
 theorem omegaS_pair_injective :
     Function.Injective

@@ -489,6 +489,7 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
   · have h := congrArg Φ hinf; rwa [Φ.map_inf, Φ.map_bot, hΦpU, ← hW_def] at h
   · have h := congrArg Φ hsup; rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
 
+omit [Finite E] in
 /-- **Peterfalvi Appendix B, Lemma — reducible case**: if the faithful coprime odd-order
 action of `P` on the elementary abelian `q`-group `E` admits a proper nonzero `P`-invariant
 subgroup `U`, then a constant point-stabilizer order forces the action to be

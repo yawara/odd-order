@@ -150,6 +150,7 @@ theorem IsIrreducibleCharacter.map_mul_of_apply_one_eq_one {φ : ClassFunction G
   rw [congrFun hχ (g * h), congrFun hχ g, congrFun hχ h]
   exact hval.symm
 
+omit [Finite G] in
 /-- A degree-one irreducible character has unit-modulus values, in particular `θ(g) ≠ 0`.
 
 From multiplicativity, `θ(g)·θ(g⁻¹) = θ(1) = 1`. -/

@@ -374,6 +374,7 @@ theorem gridEquivE_coe (w : ↥tp.W) :
     (((gridEquivE hG mp tp w : ↥(mp.certainTypeS hG).sdiffTICyclicHypothesis.W) :
         ↥mp.S) : G) = (w : G) := rfl
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- A `tp.W`-element lying in `mp.K` transports under `gridEquivE` into `certainTypeS.W1`
 (`= mp.K.subgroupOf mp.S`). -/
 theorem gridEquivE_mem_W1 (w : ↥tp.W) (hw : (w : G) ∈ mp.K) :
@@ -382,6 +383,7 @@ theorem gridEquivE_mem_W1 (w : ↥tp.W) (hw : (w : G) ∈ mp.K) :
   rw [Subgroup.mem_subgroupOf, certainTypeS_W1_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_coe]
   exact hw
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- A `tp.W`-element lying in `mp.Kstar` transports under `gridEquivE` into `certainTypeS.W2`
 (`= mp.Kstar.subgroupOf mp.S`). -/
 theorem gridEquivE_mem_W2 (w : ↥tp.W) (hw : (w : G) ∈ mp.Kstar) :

@@ -612,6 +612,7 @@ noncomputable def charGroupW2Equiv :
   (Equiv.swap 0 (e0.symm 1)).trans e0
 
 omit [NeZero (Nat.card ↥h.W1)] in
+omit [Invertible (Nat.card L : ℂ)] in
 @[simp] theorem charGroupW2Equiv_zero :
     h.charGroupW2Equiv 0 = 1 := by
   classical
