@@ -76,7 +76,8 @@ Theorem 2.6).
 | Prop 2.1(a) | `Representation.IsIrreducible` ✓ | `AbsolutelyIrreducible.lean` |
 | Prop 2.1(b) | Jacobson Density (mathlib) ✓ | `EnvelopingAlgebra.lean` |
 | Prop 2.1(c) | `LittleWedderburn` ✓ + Schur ✓ | (上記流用) |
-| Prop 2.2(a)(b) | Clifford **不在** (`Induced` のみ) | `Clifford.lean` (upstream) |
+| Prop 2.2(a) | ✅ `CliffordMultiplicityOne.restriction_isIrreducible` (char-free) | `CliffordAlgClosed.lean` |
+| Prop 2.2(b) | ✅ `CyclicExtension.exists_extension_of_nonempty_equiv_conjRep` (任意標数) | `CyclicExtension.lean` |
 | Lem 2.3 | (上記 abs.irred. 経由) | — |
 | Prop 2.4 (a-k) | `Module.End.eigenspace` 基本 | `EigenspaceUnderCyclicAction.lean` |
 | Thm 2.5 | `IsExtraspecial` ✓ (本 repo) | `AutElementaryAbelian.lean` + Prop 2.4 |
@@ -91,9 +92,9 @@ mathlib `Module.Finite.toModuleEnd_moduleEnd_surjective`
 
 ## 先行章依存 (BG §1, Isaacs Phase 1)
 
-| BG §2 | 依存 | 状態 (2026-05-24) |
+| BG §2 | 依存 | 状態 (2026-07-18 更新) |
 |---|---|---|
-| Prop 2.2 | **Isaacs Ch.6 §6F Clifford** | ❌ Ch.6 §6A 部分のみ |
+| Prop 2.2 | 表現論的 Clifford (BG 仮説 `M ≅ M^x` から直接) | ✅ 済 (Isaacs Ch.6 §6F 非依存) |
 | Thm 2.5 | Isaacs Thm 5.5.4-5 (extraspecial repr) | 対応 Ch.6 §6E? 未 |
 | Thm 2.6 | G Lem 2.6.3 (Isaacs FGT 不在) | `PGroupFixedVector.lean` 新規 + `Maschke` |
 | Prop 2.1 (a)(b) | Jacobson Density | ✅ mathlib 既存 |
@@ -113,7 +114,7 @@ mathlib `Module.Finite.toModuleEnd_moduleEnd_surjective`
      → Prop 2.1 (a)(b)(c)
   4. `RepresentationTheory/AutElementaryAbelian.lean` 新規 → Thm 2.5
   5. Lem 2.3 Fong–Swan は forward use 0 ⇒ defer
-  6. Prop 2.2 Clifford は **Isaacs Ch.6 §6F 完成待ち**
+  6. Prop 2.2(a)(b) ✅ 済 (`CliffordMultiplicityOne` + `CyclicExtension`; 2026-07-18)
 
 ## Gorenstein (G) ↔ Isaacs FGT / mathlib / shared module 読み替え
 
@@ -249,21 +250,24 @@ statement 確定.)
 - (b): `L` を `M^G` (induced module) の既約 `FG`-submodule
   とすれば (a) より `L_H ≅ M`.
 
-**形式化方針**:
-- Clifford theorem (mathlib 不在) は **Isaacs Ch.6 §6F で実装予定**.
-- 本節は Isaacs Ch.6 完成 **必須前提** (audit 確認).
-- shared module `OddOrder/GroupTheory/RepresentationTheory/Clifford.lean`
-  で Clifford decomposition + 引用 wrapper.
-- ⊕ 直和分解は mathlib `DirectSum.isInternal_*` API で.
-- 共役加群 `M^x`: `Representation` 引数を `g ↦ ρ (x⁻¹ g x)` で twist.
+**形式化状態 (2026-07-18 更新, 旧 docstring は stale だった)**: 両パートとも形式化済み・sorry-free.
+- **(a)** = `OddOrder.RepresentationTheory.restriction_isIrreducible`
+  (`RepresentationTheory/CliffordMultiplicityOne.lean`). 制限が `M` 上 isotypic ⇒
+  Skolem–Noether で `n = 1` を出す. `CliffordAlgClosed.lean` の共役単純部分加群
+  permutation + isotypic 構造が土台. **char 条件なし** (2026-07-17 に Maschke 仮定
+  `[Finite ↥H] [NeZero (Nat.card ↥H : k)]` を除去; 半単純性は `CliffordAlgClosed` の
+  `isSemisimpleModule_resRep_of_isIrreducible` = 標数フリーな Clifford 論法で供給).
+  Isaacs Ch.6 §6F Clifford 章に依存しない (Clifford decomposition を BG の
+  `M ≅ M^x` 仮説から表現論的に直接構成).
+- **(b)** = `OddOrder.RepresentationTheory.exists_extension_of_nonempty_equiv_conjRep`
+  (`RepresentationTheory/CyclicExtension.lean`). 任意の代数閉体 `F` 上・任意標数で
+  `H ⊴ K`, `K/H` cyclic (生成元 `g`), `ρ ≅ ρ^g` から拡張 `σ` (`Res_H σ = ρ`, `σ` 既約)
+  を構成. Schur + `m` 乗根で正規化した共役単位 `P` による `g^i h ↦ P^i ρ(h)` 構成.
+  ℂ 版 (Isaacs CTFG 11.22, 指標直交性から `ρ ≅ ρ^g` を導く層) は
+  `CyclicCharacterExtension.lean`.
 
-**下流引用**: §3 Thm 3.4 ×2 (BG §3 Frobenius), §2C Lem 2.3 内部
-(`Prop 2.2` 直接適用).
-
-**Phase 1 gate**: ❌ **Isaacs Ch.6 §6F Clifford 未完成
-(現状 §6A 部分のみ)**. 本節は §2 全体の最後に着手予定.
-
-(stub 未配置: Clifford shared module + Isaacs Ch.6 待ち.)
+**下流引用**: §3 Thm 3.4 ×2 (BG §3 Frobenius; extraspecial Clifford は
+`CliffordConjugateChar.lean` 経由), §2C Lem 2.3 内部 (`Prop 2.2` 直接適用).
 -/
 
 /-! ## §2C: Fong–Swan (Lem 2.3, mmd L655-668)
