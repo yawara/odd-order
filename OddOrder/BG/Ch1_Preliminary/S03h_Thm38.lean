@@ -1,6 +1,7 @@
 /-
 Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34

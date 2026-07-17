@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import OddOrder.BG.AppB_Thm62
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 

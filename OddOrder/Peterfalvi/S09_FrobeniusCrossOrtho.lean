@@ -1,6 +1,7 @@
 /-
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S09_CrossOrthogonality
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
