@@ -8,6 +8,7 @@ import Mathlib.Algebra.Algebra.Operations
 import Mathlib.LinearAlgebra.Basis.Basic
 import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.GroupTheory.Abelianization.Defs
+import Mathlib.GroupTheory.Complement
 
 /-!
 # The augmentation ideal of an integral group ring
@@ -489,5 +490,135 @@ theorem abelianizationEquivAugmentationQuotient_of (g : G) :
   rfl
 
 end AugmentationQuotient
+
+/-! ### Isaacs Lemma 10.21: transversal components of `Δ(K)Δ(G)` (pp. 311-312)
+
+`K ≤ G` に対し `Δ(K) ⊆ ℤ[G]` を `{k - 1 | k ∈ K}` の `ℤ`-span として実現し、
+右 transversal `T` (mathlib の `Subgroup.IsComplement (K : Set G) T`) に沿った
+成分和写像 `f = ∑ₜ fₜ : ℤ[G] → ℤ[K] ⊆ ℤ[G]` (`g = kt ↦ k`) を定義する。
+**Lemma 10.21** の成分和半分: `α ∈ Δ(K)Δ(G)` ならば `f(α) ∈ Δ(K)²`。 -/
+
+section TransversalComponents
+
+/-- The identity `(x - 1)(y - 1) = xy - x - y + 1` in `ℤ[G]`. -/
+theorem sub_one_mul_sub_one (x y : G) :
+    (MonoidAlgebra.of ℤ G x - 1) * (MonoidAlgebra.of ℤ G y - 1)
+      = MonoidAlgebra.of ℤ G (x * y) - MonoidAlgebra.of ℤ G x
+        - MonoidAlgebra.of ℤ G y + 1 := by
+  rw [map_mul, mul_sub, sub_mul, mul_one, one_mul]
+  abel
+
+variable (K : Subgroup G)
+
+/-- The copy of the augmentation ideal `Δ(K)` of a subgroup `K ≤ G` inside
+`ℤ[G]`: the `ℤ`-span of `{k - 1 | k ∈ K}` (Isaacs p. 311). -/
+noncomputable def augmentationIdealOf : Submodule ℤ (MonoidAlgebra ℤ G) :=
+  Submodule.span ℤ (Set.range fun k : K => MonoidAlgebra.of ℤ G ↑k - 1)
+
+theorem sub_one_mem_augmentationIdealOf (k : K) :
+    MonoidAlgebra.of ℤ G ↑k - 1 ∈ augmentationIdealOf G K :=
+  Submodule.subset_span ⟨k, rfl⟩
+
+theorem augmentationIdealOf_le :
+    augmentationIdealOf G K ≤ augmentationIdeal G :=
+  Submodule.span_le.mpr <| by
+    rintro _ ⟨k, rfl⟩
+    exact sub_one_mem_augmentationIdeal G ↑k
+
+/-- Reduction of `span S₁ * span S₂ ≤ P` to generators. Stated for `ℤ[G]`;
+this sidesteps `Submodule.span_mul_span`, whose Algebra-section `*`-instance
+(`Algebra.toModule`) does not match the Module-section `Submodule.mul`
+instance under keyed rewriting. -/
+theorem span_mul_span_le {S₁ S₂ : Set (MonoidAlgebra ℤ G)}
+    {P : Submodule ℤ (MonoidAlgebra ℤ G)}
+    (h : ∀ s₁ ∈ S₁, ∀ s₂ ∈ S₂, s₁ * s₂ ∈ P) :
+    Submodule.span ℤ S₁ * Submodule.span ℤ S₂ ≤ P := by
+  rw [Submodule.mul_le]
+  intro m hm n hn
+  induction hm using Submodule.span_induction with
+  | mem s₁ hs₁ =>
+    have hspan : Submodule.span ℤ S₂ ≤ P.comap (LinearMap.mulLeft ℤ s₁) :=
+      Submodule.span_le.mpr fun s₂ hs₂ => h s₁ hs₁ s₂ hs₂
+    exact hspan hn
+  | zero =>
+    rw [zero_mul]
+    exact P.zero_mem
+  | add x y hx hy ihx ihy =>
+    rw [add_mul]
+    exact P.add_mem ihx ihy
+  | smul c x hx ihx =>
+    rw [smul_mul_assoc]
+    exact P.smul_mem c ihx
+
+variable {T : Set G}
+
+/-- Isaacs p. 311, the map `f = ∑ₜ fₜ : ℤ[G] → ℤ[K] ⊆ ℤ[G]`: on a basis
+element `g` with unique factorization `g = kt` (`k ∈ K`, `t ∈ T`, along the
+right transversal `T`), returns `k` — i.e. the sum of all `t`-components. -/
+noncomputable def transversalComponentSum
+    (hT : Subgroup.IsComplement (K : Set G) T) :
+    MonoidAlgebra ℤ G →ₗ[ℤ] MonoidAlgebra ℤ G :=
+  (MonoidAlgebra.basis G ℤ).constr ℤ fun g =>
+    MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G)
+
+theorem transversalComponentSum_of (hT : Subgroup.IsComplement (K : Set G) T)
+    (u : G) :
+    transversalComponentSum G K hT (MonoidAlgebra.of ℤ G u)
+      = MonoidAlgebra.of ℤ G ((hT.equiv u).1 : G) := by
+  rw [show MonoidAlgebra.of ℤ G u = MonoidAlgebra.basis G ℤ u from
+    (MonoidAlgebra.basis_apply ℤ u).symm]
+  exact (MonoidAlgebra.basis G ℤ).constr_basis ℤ _ u
+
+theorem transversalComponentSum_one (hT : Subgroup.IsComplement (K : Set G) T)
+    (h1 : (1 : G) ∈ T) :
+    transversalComponentSum G K hT 1 = 1 := by
+  rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.of ℤ G 1 from
+      (map_one (MonoidAlgebra.of ℤ G)).symm,
+    transversalComponentSum_of, hT.equiv_one (K.one_mem) h1]
+
+/-- The key computation of Isaacs Lemma 10.21: for generators,
+`f((k-1)(g-1)) = (k-1)(h-1)` where `g = ht` is the transversal
+factorization. -/
+theorem transversalComponentSum_sub_one_mul_sub_one
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    (k : K) (g : G) :
+    transversalComponentSum G K hT
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+      = (MonoidAlgebra.of ℤ G ↑k - 1)
+        * (MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) - 1) := by
+  have hfst_mul : ((hT.equiv (↑k * g)).1 : G) = ↑k * ((hT.equiv g).1 : G) := by
+    rw [hT.equiv_mul_left_of_mem k.2]
+    rfl
+  have hfst_self : ((hT.equiv ↑k).1 : G) = ↑k := by
+    rw [hT.equiv_fst_eq_self_of_mem_of_one_mem h1 k.2]
+  rw [sub_one_mul_sub_one, map_add, map_sub, map_sub,
+    transversalComponentSum_of, transversalComponentSum_of,
+    transversalComponentSum_of, transversalComponentSum_one G K hT h1,
+    hfst_mul, hfst_self, sub_one_mul_sub_one, map_mul]
+
+/-- **Isaacs Lemma 10.21** (component-sum half): if `α ∈ Δ(K)Δ(G)` then
+`f(α) = ∑ₜ αₜ ∈ Δ(K)²`. -/
+theorem transversalComponentSum_mem_sq
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    {α : MonoidAlgebra ℤ G}
+    (hα : α ∈ augmentationIdealOf G K * augmentationIdeal G) :
+    transversalComponentSum G K hT α
+      ∈ augmentationIdealOf G K * augmentationIdealOf G K := by
+  have hle : augmentationIdealOf G K * augmentationIdeal G
+      ≤ (augmentationIdealOf G K * augmentationIdealOf G K).comap
+          (transversalComponentSum G K hT) := by
+    rw [augmentationIdeal_eq_span]
+    refine span_mul_span_le G ?_
+    rintro _ ⟨k, rfl⟩ _ ⟨g, rfl⟩
+    have : transversalComponentSum G K hT
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+        ∈ augmentationIdealOf G K * augmentationIdealOf G K := by
+      rw [transversalComponentSum_sub_one_mul_sub_one G K hT h1]
+      exact Submodule.mul_mem_mul (sub_one_mem_augmentationIdealOf G K k)
+        (sub_one_mem_augmentationIdealOf G K ⟨_, (hT.equiv g).1.2⟩)
+    exact this
+  exact hle hα
+
+end TransversalComponents
 
 end OddOrder.Algebra
