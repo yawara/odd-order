@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
+import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
@@ -4385,6 +4386,14 @@ set_option linter.style.longLine false in
 -- base change to `AlgebraicClosure F`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
+
+-- BG Lemma 2.7: for distinct primes `p ≠ q`, an elementary abelian `Q` of order `q²` acting
+-- faithfully (`𝔽_p`-linearly) on a `2`-dimensional `𝔽_p`-space `P` (= `Q ⊆ Aut(P)`) has
+-- `q ∣ p − 1` and a non-identity element acting as a scalar of order `q`.  The crux
+-- `isCyclic_of_faithful_isIrreducible` = Gorenstein Thm 3.2.3 (finite abelian + faithful
+-- irreducible ⟹ cyclic).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_of_faithful_isIrreducible
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.elemAbelian_aut_action
 
 -- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
 -- representation over an algebraically closed field has cyclic centre `Z(G)`.
