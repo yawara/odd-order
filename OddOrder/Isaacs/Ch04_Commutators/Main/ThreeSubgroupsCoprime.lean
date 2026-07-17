@@ -377,9 +377,13 @@ theorem fixedPoints_sup_actionCommutator_eq_top
 
 /-! ### Isaacs §4D Lem 4.29 ⭐ (BG Prop 1.6(b)): [G, A, A] = [G, A] for coprime + solvable -/
 
-/-- **Isaacs Lemma 4.29** (Γ form) ⭐: coprime + (A or G solvable) ⇒
+/-- **Isaacs Lemma 4.29** (Γ form, solvable case = 書籍証明の第 1 段落): coprime +
+(A or G solvable) ⇒
 `iterCommutator inl(G).range inr(A).range 2 = iterCommutator inl(G).range inr(A).range 1`
 in Γ = G ⋊[φ] A. Equivalent (Isaacs notation): `[G, A, A] = [G, A]`.
+
+書籍の印刷形は solvability 仮定の無い無条件版
+`iterCommutator_inl_inr_two_eq_one_of_coprime` (下記) — 本定理はその engine.
 
 **証明** (Isaacs p.139): Each generator `⁅inl g, inr a⁆` of [G, A]_Γ is in [G, A, A]_Γ.
 By Lem 4.28: g = c * x with c ∈ C_G(A), x ∈ actionCommutator.
@@ -491,6 +495,82 @@ theorem iterCommutator_inl_inr_two_eq_one
       rw [← this]
       exact ⟨c * x * c⁻¹, h_cxc_ac, rfl⟩
     exact Subgroup.commutator_mem_commutator h_in_I1 ⟨a, rfl⟩
+
+/-- **Isaacs Lemma 4.29** (Γ form, 書籍印刷形 = 無条件) ⭐: coprime action alone gives
+`iterCommutator inl(G).range inr(A).range 2 = iterCommutator inl(G).range inr(A).range 1`
+in `Γ = G ⋊[φ] A`; equivalently (Isaacs notation) `[G, A, A] = [G, A]`.
+
+書籍 p.139 の第 2 段落: solvability 仮定は各生成元 `⁅g, a⁆` を巡回部分群 `⟨a⟩ ≤ A`
+(巡回ゆえ可解) の制限作用に落として除去する —
+`[g,a] ∈ [G,⟨a⟩] = [G,⟨a⟩,⟨a⟩] ⊆ [G,A,A]`. solvable case の engine は
+`iterCommutator_inl_inr_two_eq_one` (上記), 制限の transport は
+`iterCommutator_inl_inr_restrict_eq_bot` と同じ `SemidirectProduct.map` 構図. -/
+theorem iterCommutator_inl_inr_two_eq_one_of_coprime
+    {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
+    {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
+    iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+                   (SemidirectProduct.inr : A →* G ⋊[φ] A).range 2 =
+    iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+                   (SemidirectProduct.inr : A →* G ⋊[φ] A).range 1 := by
+  set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
+  set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
+  haveI hI1_normal : (⁅XG, YA⁆).Normal :=
+    commutator_normal_of_sup_eq_top SemidirectProduct.inl_range_sup_inr_range_eq_top
+  refine le_antisymm ?_ ?_
+  · -- I2 ≤ I1 (trivial: I1 normal in Γ)
+    change ⁅iterCommutator XG YA 1, YA⁆ ≤ iterCommutator XG YA 1
+    rw [show iterCommutator XG YA 1 = ⁅XG, YA⁆ from rfl]
+    exact Subgroup.commutator_le_left _ _
+  · -- I1 ≤ I2: reduce each generator ⁅inl g, inr a⁆ to the cyclic subgroup ⟨a⟩.
+    change ⁅XG, YA⁆ ≤ ⁅iterCommutator XG YA 1, YA⁆
+    rw [Subgroup.commutator_le]
+    rintro _ ⟨g, rfl⟩ _ ⟨a, rfl⟩
+    -- Restricted action of B := ⟨a⟩ on G, and the embedding F : G ⋊[ψ] B →* G ⋊[φ] A.
+    let ψ : ↥(Subgroup.zpowers a) →* MulAut G := φ.comp (Subgroup.zpowers a).subtype
+    let F : G ⋊[ψ] ↥(Subgroup.zpowers a) →* G ⋊[φ] A :=
+      SemidirectProduct.map (MonoidHom.id G) (Subgroup.zpowers a).subtype (fun b => by
+        ext x
+        rfl)
+    let XGB : Subgroup (G ⋊[ψ] ↥(Subgroup.zpowers a)) :=
+      (SemidirectProduct.inl : G →* G ⋊[ψ] ↥(Subgroup.zpowers a)).range
+    let YBB : Subgroup (G ⋊[ψ] ↥(Subgroup.zpowers a)) :=
+      (SemidirectProduct.inr : ↥(Subgroup.zpowers a) →* G ⋊[ψ] ↥(Subgroup.zpowers a)).range
+    -- ⟨a⟩ acts coprimely and is cyclic, hence solvable: the solvable case applies.
+    have hCopB : Nat.Coprime (Nat.card ↥(Subgroup.zpowers a)) (Nat.card G) :=
+      Nat.Coprime.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _) hCop
+    haveI hBsolv : IsSolvable ↥(Subgroup.zpowers a) := by
+      -- ⟨a⟩ は可換 (`Subgroup.zpowers_isMulCommutative`); scoped instance で CommGroup 化.
+      open scoped IsMulCommutative in exact inferInstance
+    have h29B : iterCommutator XGB YBB 2 = iterCommutator XGB YBB 1 :=
+      iterCommutator_inl_inr_two_eq_one (φ := ψ) hCopB (Or.inl hBsolv)
+    -- The generator lives in [G,B]_Γ' = [G,B,B]_Γ'.
+    have h_gen : ⁅(SemidirectProduct.inl g : G ⋊[ψ] ↥(Subgroup.zpowers a)),
+        SemidirectProduct.inr (⟨a, Subgroup.mem_zpowers a⟩ : ↥(Subgroup.zpowers a))⁆ ∈
+          iterCommutator XGB YBB 2 := by
+      rw [h29B]
+      exact Subgroup.commutator_mem_commutator ⟨g, rfl⟩ ⟨_, rfl⟩
+    -- Transport through F (same shape as iterCommutator_inl_inr_restrict_eq_bot).
+    have h_map_X : XGB.map F ≤ XG := by
+      rintro _ ⟨_, ⟨x, rfl⟩, rfl⟩
+      exact ⟨x, by simp [F]⟩
+    have h_map_Y : YBB.map F ≤ YA := by
+      rintro _ ⟨_, ⟨b, rfl⟩, rfl⟩
+      exact ⟨b.1, by simp [F]⟩
+    have h_map_iter :
+        ∀ n : ℕ, (iterCommutator XGB YBB n).map F ≤ iterCommutator XG YA n := by
+      intro n
+      induction n with
+      | zero => simpa [iterCommutator_zero] using h_map_X
+      | succ n ih =>
+          rw [iterCommutator_succ, iterCommutator_succ, Subgroup.map_commutator]
+          exact Subgroup.commutator_mono ih h_map_Y
+    have h_img : F ⁅(SemidirectProduct.inl g : G ⋊[ψ] ↥(Subgroup.zpowers a)),
+        SemidirectProduct.inr (⟨a, Subgroup.mem_zpowers a⟩ : ↥(Subgroup.zpowers a))⁆ =
+        ⁅(SemidirectProduct.inl g : G ⋊[φ] A), SemidirectProduct.inr a⁆ := by
+      rw [map_commutatorElement]
+      simp [F]
+    exact h_map_iter 2 ⟨_, h_gen, h_img⟩
 
 private lemma iterCommutator_eq_one_of_two_eq_one
     {E F : Subgroup G}
