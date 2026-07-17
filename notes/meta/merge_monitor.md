@@ -716,6 +716,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #16、Fable hub) — ✅ a (Thm 3.34/3.35 + wreath) + b (Lem 8.34) + c (Thm 10.15 前半) 全 3 レーン合流、census 23→24 (scaffold +1)**:
+  **a** = 4 commits (Thm 3.34 coprime orbit sizes / Thm 3.35 existence half / SS3A general wreath
+  product = WreathProduct.lean 新設 / AxiomsCheck 3.26+3.31-3.34 登録) を merge `3c3284e6`: build
+  **4311 jobs green** (14m37s)。**b** = `1aa5c91a` (**Lem 8.34 orbitals and suborbits**、Orbitals.lean
+  新設) を merge `bc1b64d3`: build **4312 jobs green**。**c** = 5 commits (**Thm 10.15 Huppert 前半** =
+  HuppertMetacyclic.lean 新設 316 行、skeleton + inductive wrapper + base steps 2-4、残 1 sorry =
+  scaffold / **PrimeOrderSubgroups.lean shared leaf 新設** 115 行、9000 claim = 9107 起票→closed で
+  claim-before-build 準拠) を merge `3c481993`: build **4314 jobs green**。⚠ hub 機械的修正 =
+  HuppertMetacyclic の root closure 欠落 (どこからも import されず) → OddOrder.lean に import 追記
+  (step 3b、c は次回から新 leaf 時に OddOrder.lean 追記まで込みで commit のこと)。新 axiom なし・
+  AxiomsCheck OK・逸脱なし。
 - **2026-07-17 (tick #15、Fable hub) — ✅ a (notes) + b (Thm 8.33) + c (Cor 10.2 + Lem 10.13a/10.14) 全 3 レーン合流、census 23 不変**:
   **a** = `dbd08939` (ch03_split.md survey-gap sweep 記録、notes のみ) を merge `4266165a` (build 省略)。
   **b** = `5a862641` (**Thm 8.33 PSL(n,q) is simple**、PSLSimple.lean 364 行新設 + OddOrder.lean import)
