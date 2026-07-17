@@ -112,6 +112,7 @@ import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.TISubsetCounting
 import OddOrder.GroupTheory.ZGroup

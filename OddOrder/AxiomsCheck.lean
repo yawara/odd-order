@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -327,6 +328,98 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivOptionProd_affine
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.natCard
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivFin
+
+-- Standard root, torus, and Weyl permutations of the Suzuki ovoid.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPerm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPerm_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPerm_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom_apply_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom_apply_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.existsUnique_rootPerm_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_ne_zero
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_fst
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_snd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_symm_fst
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_symm_snd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScaleHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScaleHom_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_affineMk
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_mul_rootPerm_mul_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.origin
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.origin_eq_affineMk_zero_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_fst
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_snd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.suzukiNorm_ne_zero_of_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_weylAffine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_origin
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_affine_of_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_affineMk_of_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.suzukiNorm_ne_zero_of_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_involutive
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_origin
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_affine_of_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_affineMk_of_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_apply_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_symm
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A

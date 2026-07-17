@@ -17,13 +17,13 @@ searches found no existing construction.
 
 ## やること
 
-- [ ] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/StandardGenerators.lean`.
-- [ ] Construct the root-group permutation homomorphism fixing infinity and acting regularly on the affine chart.
-- [ ] Construct the torus permutation homomorphism with its explicit coordinate scaling.
-- [ ] Prove the root/torus conjugation formula in ovoid coordinates.
-- [ ] Construct the Weyl permutation, prove it swaps infinity and the affine origin, and prove involutivity from the reciprocal norm identity.
-- [ ] Expose warning-clean evaluation and injectivity APIs for later group generation.
-- [ ] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
+- [x] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/StandardGenerators.lean`.
+- [x] Construct the root-group permutation homomorphism fixing infinity and acting regularly on the affine chart.
+- [x] Construct the torus permutation homomorphism with its explicit coordinate scaling.
+- [x] Prove the root/torus conjugation formula in ovoid coordinates.
+- [x] Construct the Weyl permutation, prove it swaps infinity and the affine origin, and prove involutivity from the reciprocal norm identity.
+- [x] Expose warning-clean evaluation and injectivity APIs for later group generation.
+- [x] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
 
 ## 完了条件
 
