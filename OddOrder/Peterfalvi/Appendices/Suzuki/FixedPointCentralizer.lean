@@ -347,6 +347,171 @@ lemma card_cH_eq (hXD : X ≤ hyp.D) :
     obtain ⟨q, hq, d, hd, rfl⟩ := hmem
     exact ⟨⟨⟨q, hq⟩, ⟨d, hd⟩⟩, rfl⟩
 
+/-! ## Prop 6 (b): `|C_Q(X)|` is even (p. 102) -/
+
+/-- **Peterfalvi Part II, Ch. I Prop 6 (b)** (p. 102) — `|C_Q(X)|` is even.
+
+The pair-swap `(basept, t • basept) ↦ (t • basept, basept)` from (a) is an
+element of `C_G(X)` of even order, giving an involution `u ∈ C_G(X)`; `u`
+is conjugate to an involution of `Q` (Prop 2), so it fixes a point
+`ω' ∈ Ω_X` (via `C_G(u₀) ≤ H`, Prop 1(b)); moving `ω'` to `basept` by
+transitivity conjugates `u` into `C_H(X)`, so `|C_H(X)| = |C_Q(X)||C_D(X)|`
+is even, and `|C_D(X)|` is odd. -/
+theorem even_card_cQ (hXD : X ≤ hyp.D)
+    (h3 : 3 ≤ (fixedPoints X Ω).ncard) :
+    Even (Nat.card ↥(hyp.Q ⊓ Subgroup.centralizer (X : Set G))) := by
+  classical
+  have htb : hyp.t • hyp.basept ≠ hyp.basept :=
+    hyp.smul_basept_ne_of_not_mem_H hyp.t_not_mem_H
+  -- a pair-swap element of `C_G(X)`
+  obtain ⟨c, hc, hc1, hc2⟩ := hyp.exists_mem_centralizer_smul_pair hXD h3
+    (hyp.basept_mem_fixedPoints hXD) (hyp.t_smul_basept_mem_fixedPoints hXD)
+    (hyp.t_smul_basept_mem_fixedPoints hXD) (hyp.basept_mem_fixedPoints hXD)
+    (Ne.symm htb) htb
+  -- `c` has even order (an odd-order element with `c² ∈ Stab(basept)` would
+  -- itself stabilize `basept`, but `c • basept = t • basept ≠ basept`)
+  have hc2mem : c ^ 2 ∈ stabilizer G hyp.basept := by
+    rw [mem_stabilizer_iff, pow_two, mul_smul, hc1, hc2]
+  have hordc : Even (orderOf c) := by
+    by_contra hodd
+    rw [Nat.not_even_iff_odd] at hodd
+    obtain ⟨j, hj⟩ := hodd
+    have hcmem : c ∈ stabilizer G hyp.basept := by
+      have hcpow : c = (c ^ 2) ^ (j + 1) := by
+        rw [← pow_mul, show 2 * (j + 1) = orderOf c + 1 by omega,
+          pow_succ, pow_orderOf_eq_one, one_mul]
+      rw [hcpow]
+      exact pow_mem hc2mem (j + 1)
+    rw [mem_stabilizer_iff] at hcmem
+    rw [hcmem] at hc1
+    exact htb hc1.symm
+  -- the involution `u = c ^ k`, `orderOf c = 2k`
+  obtain ⟨k, hk⟩ := hordc
+  have hk0 : k ≠ 0 := by
+    intro h
+    have := orderOf_pos c
+    omega
+  have hu2 : (c ^ k) ^ 2 = 1 := by
+    rw [← pow_mul, show k * 2 = orderOf c by omega, pow_orderOf_eq_one]
+  have hu1 : c ^ k ≠ 1 := by
+    intro h
+    have hle := Nat.le_of_dvd (Nat.pos_of_ne_zero hk0)
+      (orderOf_dvd_of_pow_eq_one h)
+    omega
+  have huc : c ^ k ∈ Subgroup.centralizer (X : Set G) := pow_mem hc k
+  -- `u` fixes a point of `Ω_X`: it is conjugate to an involution `u₀ ∈ Q`
+  obtain ⟨u₀, hu₀Q, hu₀2, hu₀1⟩ := hyp.exists_involution_mem_Q
+  obtain ⟨g, hg⟩ := isConj_iff.mp
+    (hyp.isConj_of_involutions hu₀2 hu₀1 hu2 hu1)
+  -- hg : g * u₀ * g⁻¹ = c ^ k
+  have hω'fix : g • hyp.basept ∈ fixedPoints X Ω := by
+    rw [mem_fixedPoints_iff_forall]
+    intro x hx
+    have hxu : x * c ^ k = c ^ k * x :=
+      Subgroup.mem_centralizer_iff.mp huc x hx
+    have hcomm : (g⁻¹ * x * g) * u₀ = u₀ * (g⁻¹ * x * g) := by
+      have hu₀eq : u₀ = g⁻¹ * c ^ k * g := by rw [← hg]; group
+      rw [hu₀eq]
+      calc (g⁻¹ * x * g) * (g⁻¹ * c ^ k * g)
+          = g⁻¹ * (x * c ^ k) * g := by group
+        _ = g⁻¹ * (c ^ k * x) * g := by rw [hxu]
+        _ = (g⁻¹ * c ^ k * g) * (g⁻¹ * x * g) := by group
+    have hmemH : g⁻¹ * x * g ∈ hyp.H :=
+      hyp.centralizer_le_H_of_mem_Q hu₀Q hu₀1
+        (Subgroup.mem_centralizer_singleton_iff.mpr hcomm)
+    have hfixb : (g⁻¹ * x * g) • hyp.basept = hyp.basept :=
+      hyp.smul_basept_eq_of_mem_H hmemH
+    calc x • g • hyp.basept
+        = g • ((g⁻¹ * x * g) • hyp.basept) := by
+          rw [← mul_smul, ← mul_smul]
+          congr 1
+          group
+      _ = g • hyp.basept := by rw [hfixb]
+  have huω' : (c ^ k) • (g • hyp.basept) = g • hyp.basept := by
+    rw [← hg]
+    calc (g * u₀ * g⁻¹) • g • hyp.basept
+        = (g * u₀) • hyp.basept := by
+          rw [← mul_smul]
+          congr 1
+          group
+      _ = g • (u₀ • hyp.basept) := mul_smul _ _ _
+      _ = g • hyp.basept := by
+          rw [hyp.smul_basept_eq_of_mem_H (hyp.Q_le_H hu₀Q)]
+  -- conjugate `u` into `C_H(X)` by transitivity, so `|C_H(X)|` is even
+  obtain ⟨c', hc', hc's⟩ :=
+    hyp.exists_mem_centralizer_smul_eq_basept hXD h3 hω'fix
+  have hvc : c' * c ^ k * c'⁻¹ ∈ Subgroup.centralizer (X : Set G) :=
+    mul_mem (mul_mem hc' huc) (inv_mem hc')
+  have hc'inv : c'⁻¹ • hyp.basept = g • hyp.basept := by
+    have h := congrArg (fun ω : Ω => c'⁻¹ • ω) hc's.symm
+    simpa using h
+  have hvH : c' * c ^ k * c'⁻¹ ∈ hyp.H := by
+    rw [hyp.H_def, mem_stabilizer_iff]
+    calc (c' * c ^ k * c'⁻¹) • hyp.basept
+        = c' • (c ^ k) • c'⁻¹ • hyp.basept := by
+          rw [mul_smul, mul_smul]
+      _ = c' • (c ^ k) • (g • hyp.basept) := by rw [hc'inv]
+      _ = c' • (g • hyp.basept) := by rw [huω']
+      _ = hyp.basept := hc's
+  have hv2 : (c' * c ^ k * c'⁻¹) ^ 2 = 1 := by
+    have hexp : (c' * c ^ k * c'⁻¹) ^ 2 = c' * (c ^ k) ^ 2 * c'⁻¹ := by
+      rw [pow_two, pow_two]
+      group
+    rw [hexp, hu2, mul_one, mul_inv_cancel]
+  have hv1 : c' * c ^ k * c'⁻¹ ≠ 1 := by
+    intro h
+    apply hu1
+    calc c ^ k = c'⁻¹ * (c' * c ^ k * c'⁻¹) * c' := by group
+      _ = c'⁻¹ * 1 * c' := by rw [h]
+      _ = 1 := by group
+  have heven : Even (Nat.card ↥(hyp.H ⊓ Subgroup.centralizer (X : Set G))) :=
+    even_card_of_sq_eq_one_mem (Subgroup.mem_inf.mpr ⟨hvH, hvc⟩) hv2 hv1
+  -- `|C_H(X)| = |C_Q(X)||C_D(X)|` with `|C_D(X)|` odd
+  rw [hyp.card_cH_eq hXD] at heven
+  have hoddD : Odd (Nat.card ↥(hyp.D ⊓ Subgroup.centralizer (X : Set G))) :=
+    Nat.coprime_two_left.mp
+      ((Nat.coprime_two_left.mpr hyp.D_odd).coprime_dvd_right
+        (Subgroup.card_dvd_of_le inf_le_left))
+  rcases Nat.even_mul.mp heven with h | h
+  · exact h
+  · exact absurd h (Nat.not_even_iff_odd.mpr hoddD)
+
+/-! ## Prop 6 (c): `X` is conjugate in `D` to a subgroup of `V` (p. 102) -/
+
+/-- **Peterfalvi Part II, Ch. I Prop 6 (c)** (p. 102) — `X` is conjugate in
+`D` to a subgroup of `V`.  By (b) and Cauchy, `C_Q(X)` contains an
+involution `u`; by Prop 3, `u = s^k` for some `k ∈ K`; then
+`X ≤ C_D(s^k)`, i.e. `X^k ≤ C_D(s) = V` (Prop 5). -/
+theorem exists_conj_mem_D_map_le_V (hXD : X ≤ hyp.D)
+    (h3 : 3 ≤ (fixedPoints X Ω).ncard) :
+    ∃ k ∈ hyp.D, X.map (MulAut.conj k).toMonoidHom ≤ hyp.V := by
+  classical
+  obtain ⟨u, hu, hu2, hu1⟩ :=
+    exists_sq_eq_one_of_even_card (hyp.even_card_cQ hXD h3)
+  obtain ⟨huQ, huc⟩ := Subgroup.mem_inf.mp hu
+  -- `u = s^k` for some `k ∈ K` (Prop 3)
+  have humem : u ∈ {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} :=
+    ⟨hu2, hu1, hyp.Q_le_H huQ⟩
+  rw [← hyp.image_conj_KSet_eq_involutions_H hyp.distinguishedInvolution_mem_H
+    hyp.distinguishedInvolution_sq hyp.distinguishedInvolution_ne_one] at humem
+  obtain ⟨k, hkK, hks⟩ := humem
+  refine ⟨k, hkK.1, ?_⟩
+  rw [hyp.V_eq_centralizer_distinguishedInvolution]
+  intro y hy
+  obtain ⟨x, hx, rfl⟩ := Subgroup.mem_map.mp hy
+  have heq : (MulAut.conj k).toMonoidHom x = k * x * k⁻¹ := rfl
+  rw [heq]
+  refine Subgroup.mem_inf.mpr
+    ⟨hyp.D.mul_mem (hyp.D.mul_mem hkK.1 (hXD hx)) (hyp.D.inv_mem hkK.1), ?_⟩
+  rw [Subgroup.mem_centralizer_singleton_iff]
+  have hxu : x * u = u * x := Subgroup.mem_centralizer_iff.mp huc x hx
+  have hs_eq : hyp.distinguishedInvolution = k * u * k⁻¹ := by
+    rw [← hks]; group
+  rw [hs_eq]
+  exact calc (k * x * k⁻¹) * (k * u * k⁻¹) = k * (x * u) * k⁻¹ := by group
+    _ = k * (u * x) * k⁻¹ := by rw [hxu]
+    _ = (k * u * k⁻¹) * (k * x * k⁻¹) := by group
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

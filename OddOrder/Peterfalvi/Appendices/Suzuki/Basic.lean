@@ -98,6 +98,31 @@ theorem eq_one_of_sq_eq_one_of_odd_card {G : Type*} [Group G] [Finite G]
   rw [hc, Nat.dvd_one, orderOf_eq_one_iff] at hg
   exact congrArg Subtype.val hg
 
+/-- A subgroup containing an involution has even order. -/
+theorem even_card_of_sq_eq_one_mem {G : Type*} [Group G] [Finite G]
+    {K : Subgroup G} {v : G} (hv : v ∈ K) (hv2 : v ^ 2 = 1) (hv1 : v ≠ 1) :
+    Even (Nat.card K) := by
+  have h2 : (⟨v, hv⟩ : K) ^ 2 = 1 := Subtype.ext (by push_cast; exact hv2)
+  have h1 : (⟨v, hv⟩ : K) ≠ 1 := fun h => hv1 (congrArg Subtype.val h)
+  have hdvd := orderOf_dvd_natCard (⟨v, hv⟩ : K)
+  rw [orderOf_eq_prime h2 h1] at hdvd
+  obtain ⟨r, hr⟩ := hdvd
+  exact ⟨r, by omega⟩
+
+/-- A subgroup of even order contains an involution (Cauchy). -/
+theorem exists_sq_eq_one_of_even_card {G : Type*} [Group G] [Finite G]
+    {K : Subgroup G} (heven : Even (Nat.card K)) :
+    ∃ v : G, v ∈ K ∧ v ^ 2 = 1 ∧ v ≠ 1 := by
+  haveI : Fintype K := Fintype.ofFinite _
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := K) 2
+    (by rw [← Nat.card_eq_fintype_card]; exact heven.two_dvd)
+  have hord : orderOf (x : G) = 2 :=
+    (orderOf_injective K.subtype K.subtype_injective x).trans hx
+  refine ⟨x, x.2, by rw [← hord]; exact pow_orderOf_eq_one _, ?_⟩
+  intro h1
+  rw [h1, orderOf_one] at hord
+  norm_num at hord
+
 /-- Conjugating a subgroup twice composes: `(K^a)^b = K^{ba}`. -/
 theorem map_conj_map_conj {G : Type*} [Group G] (K : Subgroup G) (a b : G) :
     (K.map (MulAut.conj a).toMonoidHom).map (MulAut.conj b).toMonoidHom =
