@@ -65,10 +65,25 @@
        `exists_mem_center_of_normal_ne_bot_of_isNilpotent` + Cauchy) →
        `involutions_H_subset_centralizer_Q` (H∩I ⊆ Z(Q)) → **`Q0 : Subgroup G`**
        ({x∈H | x²=1}) + elementary abelian API (`commute_of_mem_Q0` 等)。
-5. **§2 Prop 2 未 (次)** — K は D の cyclic normal 部分群 (p.103)。
-   **gate: Peterfalvi Appendix I Prop 1/2** (D̄=D/W faithful+transitive on Q₀^# →
-   F(D̄) f.p.f. + D̄/F(D̄) abelian; App I Prop 2 で cyclic)。Fitting thm も要
-   (repo 済のはず、要 grep)。App I 未形式化なら先に App I (上流優先)。
+5. **§2 Prop 2 進行中** — K は D の cyclic normal 部分群 (p.103)。新 leaf `KCyclic.lean`。
+   - ✅ **基盤完了**: `conjQ0`/`ker_conjQ0` (核=W=C_D(H∩I))/`Dbar`=D/W/`conjQ0bar`
+     faithful/`conjQ0bar_transitive` (Q₀^# 可移, §1 Prop 3)/`odd_card_Dbar`→
+     `IsSolvable Dbar` (FT 本体)/`fitting_Dbar_cyclic_fpf_abelian` (**App I Prop 1 適用**)。
+   - ✅ **誘導自己同型 τ**: `tauD`/`tauHom`/`tau : MulAut Dbar` (t が D̄ 上に誘導、
+     W 上恒等ゆえ商へ降りる、involutive)。
+   - ✅ **§1 Lemma (a) endo 形** (`InvertedProduct.map_eq_inv_of_forall_fixed_eq_one`):
+     奇位数 X 上の involutive endo σ が 1 のみ固定 ⟹ σ 全反転 (τ は outer なので要)。
+   - **⚠ App I Prop 1 gate = `Huppert.fitting_cyclic_fixedPointFree` は当初 axiom-clean と
+     誤報告したが実は sorried** (`pGroup_cyclic_fixedPointFree` の non-cyclic case、
+     `#print axioms` で `sorryAx` 確認)。→ 上流優先で gate を進めた (下記)。
+   - **次**: C_D̄(τ)=V̄ → C_Ā(τ)=1 (V≤C_D(s) f.p.f.) → Ā⊆J (Lemma(a) endo) →
+     Fitting で Ā=J → A=KW → |Ā|=|K| → K cyclic (§1 Lemma(b) で K◁D)。
+   - **上流成果 (2026-07-18、gate 掘り下げ)**: App I Prop 1 の sorry = **Gorenstein 5.4.10
+     (odd p) = BG Lemma 4.5(a)** を証明 (issue 2004 完了):
+     `BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic` +
+     新 leaf `GroupTheory/NormalElementaryAbelianPrimeSq.lean` (不変部分空間補題 +
+     cyclic-selfcent⟹metacyclic)。**Huppert sorry の残り** = Schur⟹Z(P) cyclic + coprime
+     Z_p×Z_p 分解 = **issue 2005** (これが埋まれば App I Prop 1 gate が axiom-clean 化)。
 6. §2 Cor (S abelian or Suzuki 2-group; gate: App III Def 1) → §2 Prop 3 (𝓛(F_q,A)
    同型; gate: App I Prop 2) → §3 (induction hypothesis 適用開始)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
