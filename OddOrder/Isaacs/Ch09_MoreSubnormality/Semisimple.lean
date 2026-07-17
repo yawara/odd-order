@@ -8,7 +8,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import Mathlib.GroupTheory.NoncommPiCoprod
 
 /-!
-# Isaacs Ch. 9 — §9A: semisimple groups と Lemma 9.5 (pp. 274-275)
+# Isaacs Ch. 9 — §9A: semisimple groups と Lemma 9.5 / Lemma 9.6 (pp. 274-275)
 
 - `IsSemisimpleGroup`: **semisimple** = nonabelian simple normal subgroups の積 (書籍 p. 274).
 - **Lemma 9.5** (分割して形式化):
@@ -17,11 +17,26 @@ import Mathlib.GroupTheory.NoncommPiCoprod
     (mathlib `MonoidHom.noncommPiCoprod` による `(Π S, ↥S) ≃* G`).
   - `center_eq_bot_of_semisimpleFamily`: semisimple 群は centerless.
   - `mem_semisimpleFamily_of_isMinimalNormal`: 族は `G` の全 minimal normal subgroup と一致.
+- **Lemma 9.6** (`isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal`):
+  有限群の minimal normal subgroup は abelian か semisimple.
 - 下流 (Thm 9.7/9.8) 向け payload:
   - `IsSemisimpleGroup.isSimpleGroup_of_isMinimalNormal`: semisimple 群の minimal normal は
     nonabelian simple.
   - `IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable`: semisimple 群の solvable normal
     subgroup は自明 (Thm 9.7(c) の核心ステップ).
+
+`normal_map_subtype_of_char` は「characteristic in normal ⇒ ambient で normal」の局所
+private copy (同じ補題が `BG.Ch3.S10` と Ch10 `TransferIndexPrime` にもあり、shared 化は
+issue 9109; BG 版と `GroupTheory` 版の同名 public 化は Huppert.lean の無修飾参照と衝突する
+ため一本化は所有レーン込みの調整タスクとして繰延)。
+
+Lemma 9.6 の実装ノート: 書籍は `N` の minimal normal `S` を `↥N` の中で取るが、
+subgroup-of-subgroup の輸送を避けるため `S₀ := S.map N.subtype : Subgroup G` に押し出して
+**すべて `G` レベルで**議論する。abelian 枝は `F(N)`, `Z(N)` の押し出し
+(`normal_map_subtype_of_char`, issue 9109) が `G`-normal で `N` の
+minimality に食われることから `N` 可換を得る。nonabelian 枝は `S₀` の simple 性を
+`Subgroup.isSimpleGroup_iff` + Thm 2.6 (subnormal 鎖 `K₀ ⊴ S₀ ⊴ N ⊴ G`) で示し、
+`G`-共役族 `{S₀ᵍ}` の join が `G`-normal になって `N` と一致 → `↥N` の semisimple 族を成す.
 
 `center_eq_bot` 系は直積構造 (`noncommPiCoprod` の単射性・全射性) を経由するため
 `[Finite G]` を仮定する (Isaacs は有限群の本; 族の有限性が本質).
@@ -221,6 +236,201 @@ theorem IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable [Finite G]
   rcases hnorm.eq_bot_or_eq_top with hb | ht
   · exact hncomm (isMulCommutative_of_commutator_eq_bot hb)
   · exact hlt.ne ht
+
+end
+
+section /- 9A: Lemma 9.6 (p. 275) -/
+
+open scoped IsMulCommutative
+
+variable {G : Type*} [Group G]
+
+/-- `N ⊴ W` の characteristic subgroup `L ≤ ↥N` の ambient 押し出しは `W` で正規.
+「characteristic in normal ⇒ normal」の局所版 (shared 化は issue 9109). -/
+private theorem normal_map_subtype_of_char {W : Type*} [Group W] {N : Subgroup W}
+    [N.Normal] {L : Subgroup ↥N} (hL : L.Characteristic) :
+    (L.map N.subtype).Normal := by
+  refine ⟨fun a ha w => ?_⟩
+  obtain ⟨⟨a', ha'N⟩, ha'L, rfl⟩ := ha
+  have hmap : L.map (MulAut.conjNormal w).toMonoidHom = L :=
+    (Subgroup.characteristic_iff_map_eq.mp hL) (MulAut.conjNormal w)
+  have hmem : (MulAut.conjNormal w) ⟨a', ha'N⟩ ∈ L := by
+    rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
+  exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
+
+/-- **Isaacs Lemma 9.6**: 有限群の minimal normal subgroup は abelian か semisimple.
+
+`↥N` の minimal normal `S` を `G` へ押し出した `S₀` で場合分け:
+abelian なら `F(N)`, `Z(N)` の押し出しが `G`-normal (issue 9109 の
+`normal_map_subtype_of_char`) となり `N` の minimality から
+`N` は可換. nonabelian なら Thm 2.6 の subnormal 鎖で `S₀` が simple になり,
+`G`-共役族の join が `N` に一致して semisimple 族を成す. -/
+theorem isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal [Finite G]
+    {N : Subgroup G} (hN : Ch02.IsMinimalNormal N) :
+    IsMulCommutative ↥N ∨ IsSemisimpleGroup ↥N := by
+  haveI := hN.1
+  haveI hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN.2.1
+  have htop_ne : (⊤ : Subgroup ↥N) ≠ ⊥ := by
+    intro h
+    obtain ⟨x, hx⟩ := exists_ne (1 : ↥N)
+    exact hx (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_top x))
+  obtain ⟨S, hSmin, -⟩ :=
+    Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup ↥N) htop_ne
+  set S₀ : Subgroup G := S.map N.subtype with hS₀def
+  have hS₀le : S₀ ≤ N := Subgroup.map_subtype_le S
+  have hS₀recover : S₀.subgroupOf N = S :=
+    Subgroup.comap_map_eq_self_of_injective N.subtype_injective S
+  have hS₀ne : S₀ ≠ ⊥ := by
+    intro h
+    apply hSmin.2.1
+    rw [← hS₀recover, h, Subgroup.bot_subgroupOf]
+  have hS₀normalN : (S₀.subgroupOf N).Normal := hS₀recover ▸ hSmin.1
+  by_cases habel : IsMulCommutative ↥S₀
+  · -- abelian 枝: `N` は可換
+    left
+    haveI : IsMulCommutative ↥(S₀.subgroupOf N) := by
+      haveI := habel
+      exact isMulCommutative_of_surjective
+        (Subgroup.subgroupOfEquivOfLe hS₀le).symm.toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hS₀le).symm.surjective
+    haveI := hS₀normalN
+    have hfit : S₀.subgroupOf N ≤ Ch01.fitting ↥N := Ch01.nilpotent_normal_le_fitting
+    have hFnormal : ((Ch01.fitting ↥N).map N.subtype).Normal :=
+      normal_map_subtype_of_char (Ch01.fitting.characteristic ↥N)
+    have hFne : (Ch01.fitting ↥N).map N.subtype ≠ ⊥ := by
+      intro h
+      rw [Subgroup.map_eq_bot_iff_of_injective _ N.subtype_injective] at h
+      exact hSmin.2.1 (by rw [← hS₀recover]; exact le_bot_iff.mp (h ▸ hfit))
+    rcases hN.2.2 _ hFnormal (Subgroup.map_subtype_le _) with h | h
+    · exact absurd h hFne
+    have hfit_top : Ch01.fitting ↥N = ⊤ := by
+      apply Subgroup.map_injective N.subtype_injective
+      rw [h, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    haveI : Group.IsNilpotent ↥N := by
+      haveI h1 : Group.IsNilpotent ↥(⊤ : Subgroup ↥N) :=
+        hfit_top ▸ Ch01.fitting.isNilpotent (G := ↥N)
+      exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
+    have hZnormal : ((center ↥N).map N.subtype).Normal :=
+      normal_map_subtype_of_char Subgroup.centerCharacteristic
+    have hZne : (center ↥N).map N.subtype ≠ ⊥ := by
+      intro h
+      rw [Subgroup.map_eq_bot_iff_of_injective _ N.subtype_injective] at h
+      exact Group.IsNilpotent.center_ne_bot (G := ↥N) h
+    rcases hN.2.2 _ hZnormal (Subgroup.map_subtype_le _) with h | h
+    · exact absurd h hZne
+    have hcenter_top : center ↥N = ⊤ := by
+      apply Subgroup.map_injective N.subtype_injective
+      rw [h, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    exact IsMulCommutative.of_comm fun a b =>
+      Subgroup.mem_center_iff.mp (hcenter_top ▸ Subgroup.mem_top b) a
+  · -- nonabelian 枝: `N` は semisimple
+    right
+    -- Step 1: `S₀` は simple (Thm 2.6 の subnormal 鎖で `K₀ ⊴ N` に格上げ)
+    have hS₀simple : IsSimpleGroup ↥S₀ := by
+      rw [Subgroup.isSimpleGroup_iff]
+      refine ⟨hS₀ne, fun K₀ hK₀le hK₀norm => ?_⟩
+      by_cases hbot : K₀ = ⊥
+      · exact Or.inl hbot
+      refine Or.inr ?_
+      have hK₀N : K₀ ≤ N := hK₀le.trans hS₀le
+      have hK₀sub : K₀.IsSubnormal := by
+        have hS₀sub : S₀.IsSubnormal :=
+          Subgroup.IsSubnormal.trans hS₀le hS₀normalN.isSubnormal hN.1.isSubnormal
+        exact Subgroup.IsSubnormal.trans hK₀le hK₀norm.isSubnormal hS₀sub
+      have hK₀normalN : (K₀.subgroupOf N).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hK₀N).mpr
+          (Ch02.isMinimalNormal_le_normalizer_of_isSubnormal hK₀sub hN)
+      have hle' : K₀.subgroupOf N ≤ S := by
+        rw [← hS₀recover]
+        exact fun x hx => hK₀le hx
+      rcases hSmin.2.2 _ hK₀normalN hle' with h | h
+      · exfalso
+        apply hbot
+        have hmap := congrArg (Subgroup.map N.subtype) h
+        rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hK₀N, Subgroup.map_bot] at hmap
+      · have hmap := congrArg (Subgroup.map N.subtype) h
+        rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hK₀N, ← hS₀def] at hmap
+    -- Step 2: `G`-共役族とその join `T`
+    have hconj_le : ∀ g : G, S₀.map (MulAut.conj g).toMonoidHom ≤ N := by
+      rintro g x ⟨s, hs, rfl⟩
+      simpa [MulAut.conj_apply] using hN.1.conj_mem s (hS₀le hs) g
+    have hcomp : ∀ h g : G,
+        (S₀.map (MulAut.conj g).toMonoidHom).map (MulAut.conj h).toMonoidHom
+          = S₀.map (MulAut.conj (h * g)).toMonoidHom := by
+      intro h g
+      rw [Subgroup.map_map]
+      congr 1
+      ext x
+      simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      group
+    set T : Subgroup G := ⨆ g : G, S₀.map (MulAut.conj g).toMonoidHom with hTdef
+    have hS₀T : S₀ ≤ T := by
+      refine le_trans (le_of_eq ?_) (le_iSup (fun g : G => S₀.map (MulAut.conj g).toMonoidHom) 1)
+      ext x
+      simp [Subgroup.mem_map]
+    have hperm : ∀ h : G, T.map (MulAut.conj h).toMonoidHom = T := by
+      intro h
+      rw [hTdef, Subgroup.map_iSup]
+      refine le_antisymm (iSup_le fun g => ?_) (iSup_le fun g => ?_)
+      · rw [hcomp h g]
+        exact le_iSup (fun g' : G => S₀.map (MulAut.conj g').toMonoidHom) (h * g)
+      · refine le_trans (le_of_eq ?_) (le_iSup (fun g' : G =>
+          (S₀.map (MulAut.conj g').toMonoidHom).map (MulAut.conj h).toMonoidHom) (h⁻¹ * g))
+        rw [hcomp h (h⁻¹ * g), mul_inv_cancel_left]
+    have hTnormal : T.Normal := by
+      refine ⟨fun x hx g => ?_⟩
+      have hmem : (MulAut.conj g).toMonoidHom x ∈ T.map (MulAut.conj g).toMonoidHom :=
+        Subgroup.mem_map_of_mem _ hx
+      rw [hperm g] at hmem
+      simpa [MulAut.conj_apply] using hmem
+    have hTN : T = N := by
+      rcases hN.2.2 T hTnormal (iSup_le hconj_le : T ≤ N) with h | h
+      · exact absurd h fun hb => hS₀ne (le_bot_iff.mp (hb ▸ hS₀T))
+      · exact h
+    -- Step 3: 共役は `↥N` の normal subgroup
+    have haux : ∀ g : G, ∀ n ∈ N, ∀ x ∈ S₀.map (MulAut.conj g).toMonoidHom,
+        n * x * n⁻¹ ∈ S₀.map (MulAut.conj g).toMonoidHom := by
+      have hNnorm : N ≤ Subgroup.normalizer (S₀ : Set G) :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hS₀le).mp hS₀normalN
+      rintro g n hn x ⟨s, hs, rfl⟩
+      have hm : g⁻¹ * n * g ∈ N := by simpa using hN.1.conj_mem n hn g⁻¹
+      have hs' : (g⁻¹ * n * g) * s * (g⁻¹ * n * g)⁻¹ ∈ S₀ :=
+        (Subgroup.mem_normalizer_iff.mp (hNnorm hm) s).mp hs
+      refine ⟨(g⁻¹ * n * g) * s * (g⁻¹ * n * g)⁻¹, hs', ?_⟩
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      group
+    have hnorm_conj : ∀ g : G,
+        ((S₀.map (MulAut.conj g).toMonoidHom).subgroupOf N).Normal := by
+      intro g
+      rw [Subgroup.normal_subgroupOf_iff_le_normalizer (hconj_le g)]
+      intro n hn
+      rw [Subgroup.mem_normalizer_iff]
+      intro x
+      refine ⟨fun hx => haux g n hn x hx, fun hx => ?_⟩
+      have hback := haux g n⁻¹ (inv_mem hn) _ hx
+      have heq : n⁻¹ * (n * x * n⁻¹) * n⁻¹⁻¹ = x := by group
+      rwa [heq] at hback
+    -- Step 4: semisimple 族の組み立て
+    refine ⟨Set.range (fun g : G =>
+      (S₀.map (MulAut.conj g).toMonoidHom).subgroupOf N), ?_, ?_⟩
+    · rintro P ⟨g, rfl⟩
+      haveI := hS₀simple
+      have e : ↥((S₀.map (MulAut.conj g).toMonoidHom).subgroupOf N) ≃* ↥S₀ :=
+        (Subgroup.subgroupOfEquivOfLe (hconj_le g)).trans
+          (Subgroup.equivMapOfInjective S₀ (MulAut.conj g).toMonoidHom
+            (MulAut.conj g).injective).symm
+      refine ⟨hnorm_conj g, e.isSimpleGroup, fun hcomm => habel ?_⟩
+      haveI := hcomm
+      exact isMulCommutative_of_surjective e.toMonoidHom e.surjective
+    · apply Subgroup.map_injective N.subtype_injective
+      rw [sSup_range, Subgroup.map_iSup, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+      have hmapg : ∀ g : G,
+          ((S₀.map (MulAut.conj g).toMonoidHom).subgroupOf N).map N.subtype
+            = S₀.map (MulAut.conj g).toMonoidHom := by
+        intro g
+        rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr (hconj_le g)]
+      simp_rw [hmapg]
+      exact hTN
 
 end
 
