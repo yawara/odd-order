@@ -36,16 +36,24 @@ Prop 2.2 = char-free 化)。**§2 = 7 結果、残りは Lem 2.7 のみ**。
 
 ## やること
 
-- [ ] PDF で Lem 2.7 の正確な statement (hypotheses・(a)(b) の正確な形) を復元。
-- [ ] 形式化: `P`/`Q` を elementary abelian (= `(ZMod p) × ZMod p` 型 or `IsElementaryAbelian`)
-      とし、`Q → Aut P` faithful から (a) `q ∣ p−1`、(b) scalar 作用の元の存在。
-      おそらく `Q` abelian ⟹ `P` 上 simultaneously diagonalizable (F_p alg 拡大)、各 eigenvalue が
-      `q` 乗根 ⟹ `F_p^×` に位数 q 元 ⟹ `q | p−1`。
-- [ ] survey 正本 Lem 2.7 行を「済」に更新、§2 完成を記録。
+- [x] PDF で Lem 2.7 の正確な statement を復元 (commit dac61eea; mmd MISSING page も回復)。
+- [x] 形式化 (commit acc6f111): `ElemAbelianAutAction.elemAbelian_aut_action`。
+- [x] survey 正本 Lem 2.7 行「済」+ §2 完成を記録。
+
+## ✅ 完了 (2026-07-18)
+
+`ElemAbelianAutAction.lean`:
+- `isCyclic_of_faithful_isIrreducible` (Gorenstein Thm 3.2.3, 再利用 crux)
+- `elemAbelian_aut_action` (= BG Lem 2.7, book strength)
+
+両者 axiom-clean、AxiomsCheck 登録、OddOrder.lean 根 import、full build green (4303 jobs)。
+**BG §2 = 全 7 結果 (2.1–2.7) 完成。** 予定より軽く済んだ (既存 LineScalarCharacter infra +
+mathlib IsSimpleModule.annihilator_isMaximal 再利用; 当初想定の gcd/torsion 数え上げや
+diagonalization は不要だった)。
 
 ## 完了条件
 
-BG Lem 2.7 (a)(b) を book strength・sorry-free・axiom-clean で。§2 全 7 結果完成。
+BG Lem 2.7 (a)(b) を book strength・sorry-free・axiom-clean で。§2 全 7 結果完成。 ✅
 
 ## 参照
 
