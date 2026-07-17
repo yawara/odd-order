@@ -52,7 +52,20 @@ Prop 2.2 と Clifford 半単純性を 2026-07-18 に char-free 化したので�
         `iSupIndep`。mathlib `Submodule.linearEquiv_of_le_sSup` が肝。残: L≇L^x ⟹ Z/p 上の
         [L] stabilizer trivial ⟹ 全 p 個 pairwise 非同型 の orbit-stabilizer 部分。
       - ゆえに `DirectSum.IsInternal W` + dim ⊤ = Σ dim W_i = p·dim L。
-- [ ] **strong induction on |G|** で組み立て、full book strength (general solvable G, general F)。
+- [x] **strong induction on |G|** で組み立て、full book strength (general solvable G, general F)。
+
+## ✅ 完了 (2026-07-18)
+
+`FongSwan.lean` に:
+- `finrank_dvd_card_of_isAlgClosed_of_irreducible` (定理 A, alg-closed core, 強帰納)
+- `finrank_dvd_card_of_isAbsolutelyIrreducible` (定理 B = BG Lem 2.3, 一般体 via base change)
+
+両者 sorry-free・axiom-clean、AxiomsCheck 登録済 (commit 15842710)、full build green (4302 jobs)。
+survey 正本 Lem 2.3 行「済」更新済。commit chain: ae068904 (directness) → 7f3d8adc (case ii)
+→ 44562f2d (capstone) → 15842710 (AxiomsCheck + survey)。
+
+⚠ 残フォローアップ: `exists_normal_index_prime_of_solvable` の S07 private 版 / FongSwan public 版
+の重複統合 → 別 issue。
 
 ## 完了条件
 
