@@ -581,7 +581,7 @@ end Twisted
 
 end TwistedNearField
 
-variable {G Ω F : Type*} [Group G]
+variable {G Ω F : Type*} [Group G] [MulAction G Ω] [Finite G]
 
 /-- A lightweight carrier for finite near-field structure.  The algebraic laws
 are proposition fields until a reusable near-field API is introduced. -/
@@ -612,7 +612,7 @@ structure RankOneNearFieldData
   unique_involution_in_H_holds : unique_involution_in_H
 
 /-- **Peterfalvi Appendix C, Proposition 1**. -/
-theorem rankOne_affine_nearField [Finite G]
+theorem rankOne_affine_nearField
     (hyp : Suzuki.Hypothesis (G := G) (Ω := Ω))
     (two_rank_one : Prop) :
     two_rank_one → ∃ data : RankOneNearFieldData (F := F) hyp,
