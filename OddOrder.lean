@@ -83,6 +83,7 @@ import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SimpleSubmoduleIndependence
 import OddOrder.GroupTheory.PrimitivePrimeDivisor
 import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
 import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
