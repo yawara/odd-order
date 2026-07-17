@@ -9,6 +9,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)
