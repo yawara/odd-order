@@ -44,3 +44,9 @@ BG Lem 6.3(b) を book strength・sorry-free・axiom-clean。AxiomsCheck 登録�
 ## 参照
 
 - BG mmd L1996-2015、既存 S06_Additional (6.3(a))、survey L346
+
+## ✅ 完了 (2026-07-18)
+
+`S06_Lem63b.{commutator_isHall_of_nilpotent_prime_index, commutator_eq_commutator_top_of_isComplement', lemma63b}`、
+sorry-free・axiom-clean・AxiomsCheck 登録・full build green (4312 jobs)。⟹ BG Lem 6.3 全 (a)(b) 済。
+Hall part は [IsSolvable G] 不要 (mild 強化)。BG §6 残 = Thm 6.2 特殊化 + Thm 6.4 (missing, 低優先)。

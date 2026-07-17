@@ -343,7 +343,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
 |---|---|---|---|---|
-| Lem 6.3 | 部分 | S | (a) normal Hall H ≤ G' with complement K ⟹ H = [H,K] and C_H(K) ≤ H'; (b) G' nilpotent, /G… | Verified partial. Part (a) fully formalized in S06_Additional.lean, in two declarations (L307, L394): first conclusion ⁅H,K⁆ = H proved WITHOUT coprimality (stronger than the book, whose Hall hypothesis supplies it); sec… |
+| Lem 6.3 | 済 | S | (a) normal Hall H ≤ G' with complement K ⟹ H = [H,K] and C_H(K) ≤ H'; (b) G' nilpotent, /G… | [2026-07-18: (b) CLOSED ⟹ Lem 6.3 全済] (b) = `S06_Lem63b.lemma63b` (G' nilpotent + |G/G'| prime ⟹ G' Hall + G'=[G,K]), axiom-clean; Q=G/O_{p'}(G') が p-群 derived-index-p ⟹ Burnside cyclic ⟹ G'=O_{p'}(G')。Part (a) fully formalized in S06_Additional.lean, in two declarations (L307, L394): first conclusion ⁅H,K⁆ = H proved WITHOUT coprimality (stronger than the book, whose Hall hypothesis supplies it); sec… |
 | Thm 6.4 | 未 | M | Conjugation of H-invariant π-subgroups: H π'-subgroup normalizing π-subgroups J₁, J₂ (G₀ n… | Verified missing — refutation attempted and failed: every 'Thm 6.4'/'Theorem 6.4' hit in OddOrder/ is Isaacs Thm 6.4 (the Frobenius-group four-condition equivalence in Isaacs/Ch06_FrobeniusActions/FrobeniusGroup.lean), a… |
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
