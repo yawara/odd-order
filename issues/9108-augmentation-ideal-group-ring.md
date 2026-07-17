@@ -88,13 +88,28 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
     (Δ(G)‾/Δ(G)²‾ ≃ Δ(G)/Δ(G)²) →
     `nat_card_quotient_augmentationCoquotientSqImage`: |Δ(G)‾:Δ(G)²‾| =
     |G:G'| (10.20 接続)。
-- ⏭ 次 (10.25 詰め): (a) UA = Δ(G)²‾ の同定 (U=Δ(G/K) の像作用 = Δ(G)
-  左乗法 → Δ(G)A = Δ(G)²‾)。これで [A:UA]=|G:G'| が確定し 10.26 適用可。
-  (b) Lemma 10.27 (ε∈ℤ[G], εΔ(G)‾=0, δ(ε)=m ⇒ |G:K| | m ∧
-  (m/|G:K|)Ξ=0; transversal 係数の e_t 一致論法)。(c) 10.25 本体
-  (γ∈ℤ[G/K] を 10.26 で得 → ε=mapDomain 逆像で δ(ε)=|G:G'| → 10.27 →
-  |K:G'|Ξ=0 → 10.24 で v(g)^{|K:G'|}=1)。その後 10.27/10.28 Alperin-Kuo。
-  PrincipalIdealTheorem.lean は現 ~740 行 (2000 上限まで余裕)。
+- ✅ **10.25 基盤 (Ξ 独立性 + ℤ[G/K] 可換)** (2026-07-17, sorry-free):
+  - Ξ 独立性: `augmentationCoquotientMulLeft_eq_zero_of_mem` (mulLeft が
+    Δ(K) を消す) / `_eq_zero_of_mem_mul` (Δ(K)·ℤ[G] を algHomG が消す) /
+    `augmentationCoquotientMulLeft_eq_of_sub_mem` (x−y ∈ Δ(K)ℤ[G] ⇒ 同一 Ξ)
+  - `quotientCommGroup (commutator G ≤ K) : CommGroup (G⧸K)` (letI 用) +
+    `augmentationRingIdeal` (Δ(G/K) を Ideal 化) + carrier 同一補題
+- ⏭ **アーキテクチャ確定 (重要)**: 10.25 の statement は純群論
+  (`v(g)^{|K:G'|}=1`) にし、ℤ[G/K]-module (`augmentationCoquotientModule`)
+  や `U•⊤` を **statement に出さない** (letI module を statement に置くと
+  自由変数 unify 不能 = traps §7)。module 構造・`U•⊤ = Δ(G)²‾` の index 等は
+  **10.25 proof 内の have** で letI スコープに閉じ込める。module は instance
+  化しない (A=Submodule.Quotient の ℤ-module と diamond)。
+- ⏭ 次の作業単位:
+  (a) **Lemma 10.27** (別 lemma、純 ℤ[G] で letI 不要、statement は
+  `transferXi` 使用可): ε∈ℤ[G], εΔ(G)‾=0, m=δ(ε) ⇒ |G:K| | m ∧
+  (m/|G:K|)Ξ=0。論法: ε を coset-collapse して ∑ e_t t、(∑e_t t)(g−1) の
+  (t·g)-成分 = e_t k_t − e_{t·g} が 10.21 (`transversalComponent_mem`) で
+  Δ(K) → δ_K 適用で e_t=e_{t·g}、dot action 推移性で全 e_t 一致。
+  (b) 10.25 proof 内: letI 2 枚 → `have hidx : Nat.card(A⧸U•⊤)=|G:G'|`
+  (restrictScalars で U•⊤=Δ(G)²‾ を示し既証 nat_card... に接続) → 10.26 で
+  γ → ε=mapDomain 原像 (δ(ε)=|G:G'|, εA=0) → 10.27 → |K:G'|Ξ=0 → 10.24。
+  (c) その後 10.27(Lemma)/10.28 Alperin-Kuo。現 ~790 行 (2000 上限余裕)。
   **10.24 設計メモ (2026-07-17 調査)**: transfer は mathlib
   `MonoidHom.transfer` (repo Ch05_Transfer が既用; v : G →* K/K' は
   ϕ = Abelianization.of : K →* Abelianization K で transfer)。
