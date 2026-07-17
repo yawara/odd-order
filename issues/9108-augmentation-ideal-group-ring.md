@@ -111,7 +111,30 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   (η·s=η ∀s) ⇒ 群環の右不変元は係数一定 (`apply_eq_of_forall_mul_of_eq`)。
   補助: `mapDomain_eq_zero_of_mem_mul` (π が Δ(K)Δ(G) を消す) /
   `mul_mem_of_augmentationCoquotientMulLeft_eq_zero` (Ξ_ε=0⇒ε·α∈Δ(K)Δ(G))。
-- ⏭ **次 = 10.25 本体の組み立て** (capstone, PrincipalIdealTheorem.lean 現 1066 行):
+- ✅ **10.25 index 計算 |A:UA|=|G:G'|** (2026-07-17, sorry-free):
+  `restrictScalars_augmentationRingIdeal_smul_top` (UA=Δ(G)²‾) +
+  `nat_card_quotient_augmentationRingIdeal_smul_top` (=|Abelianization G|)。
+  R-quotient と ℤ-quotient (restrictScalars) の card は defeq/rfl。
+  補助: `mapDomainAlgHom_surjective` / `augmentationCoquotientModule_mapDomain_smul`
+  ((π x)•a = mulLeft x a, compHom smul rfl)。
+- ⏭ **次 = 10.25 最終組み立て** (残り; PrincipalIdealTheorem.lean 現 ~1170 行):
+  (i) **finiteness**: A=Δ(G)‾ と U=Δ(G/K) は加法 f.g. (Finite G →
+  ℤ[G]/ℤ[G/K] が f.g. ℤ-module (Noetherian) → 部分/商 f.g.)、
+  `Finite (A⧸U•⊤)` は index=|G:G'| で Abelianization G (finite) と同型。
+  (ii) **10.26 適用** `exists_smul_eq_zero_and_sub_card_mem` → γ∈ℤ[G/K]
+  (γ•A=0, γ≡|G:G'| mod U ⇒ δ(γ)=|G:G'|)。
+  (iii) **ε 構成**: ε := `sectionWeightedSum (fun q => γ q) f` (section f)。
+  π(ε)=γ (係数一致)、δ(ε)=δ(γ)=|G:G'| (augmentation_mapDomain)、
+  mulLeft ε = augmentationCoquotientAlgHom(γ) = 0 (γ•A=0)。
+  (iv) **10.27** `sectionWeightedSum_coeff_const` → 全 γ_q=c、
+  δ(ε)=c|G:K|=|G:G'| ⇒ c=|K:G'|、Ξ_ε=c·Ξ=0 (Ξ=transferXi via
+  `transferXi_eq_mulLeft_sectionSum`) ⇒ |K:G'|·transferXi=0。
+  (v) **10.24** `transferRangeEquivXiRange`: v(G)≅Ξ(Δ(G)‾)、|K:G'| が
+  加法的に Ξ(range) を消す ⇒ v(g)^{|K:G'|}=1 (乗法)。
+  statement は純群論 `MonoidHom.transfer(Abelianization.of)^{|K:G'|}` 系。
+  ---
+  (旧メモ、詳細版):
+  **次 = 10.25 本体の組み立て** (capstone, PrincipalIdealTheorem.lean 現 1066 行):
   純群論 statement `v(g)^{|K:G'|}=1` (G'≤K)。proof 内で letI 2 枚:
   (1) `hidx : Nat.card(A⧸U•⊤)=|G:G'|` — U=augmentationRingIdeal、
   restrictScalars で U•⊤=Δ(G)²‾ を示し既証 `nat_card_quotient_...` に接続。
