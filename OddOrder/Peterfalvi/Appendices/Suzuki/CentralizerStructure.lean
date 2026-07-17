@@ -204,6 +204,100 @@ theorem V_eq_centralizer_distinguishedInvolution :
   rw [← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq]
   exact le_of_eq hVcard.symm
 
+/-! ## `W = C_D(H ∩ I)` (p. 101) -/
+
+/-- `V` normalizes `K`: for `v ∈ V = C_D(t)` and `k ∈ K`, `vkv⁻¹ ∈ K`
+(since `t` centralizes `v`, so `t(vkv⁻¹)t = v k⁻¹ v⁻¹ = (vkv⁻¹)⁻¹`). -/
+lemma conj_mem_KSet_of_mem_V {v k : G} (hv : v ∈ hyp.V) (hk : k ∈ hyp.KSet) :
+    v * k * v⁻¹ ∈ hyp.KSet := by
+  have hvD : v ∈ hyp.D := hyp.V_le_D hv
+  have hvt : Commute v hyp.t := hyp.commute_t_of_mem_V hv
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  refine ⟨hyp.D.mul_mem (hyp.D.mul_mem hvD hk.1) (hyp.D.inv_mem hvD), ?_⟩
+  have htvt : hyp.t * v * hyp.t = v := by
+    calc hyp.t * v * hyp.t = hyp.t * (v * hyp.t) := by rw [mul_assoc]
+      _ = hyp.t * (hyp.t * v) := by rw [hvt.eq]
+      _ = (hyp.t * hyp.t) * v := by rw [mul_assoc]
+      _ = v := by rw [htt, one_mul]
+  have htv't : hyp.t * v⁻¹ * hyp.t = v⁻¹ := by
+    calc hyp.t * v⁻¹ * hyp.t = hyp.t * (v⁻¹ * hyp.t) := by rw [mul_assoc]
+      _ = hyp.t * (hyp.t * v⁻¹) := by rw [hvt.inv_left.eq]
+      _ = (hyp.t * hyp.t) * v⁻¹ := by rw [mul_assoc]
+      _ = v⁻¹ := by rw [htt, one_mul]
+  have hdecomp : hyp.t * (v * k * v⁻¹) * hyp.t
+      = (hyp.t * v * hyp.t) * (hyp.t * k * hyp.t) * (hyp.t * v⁻¹ * hyp.t) := by
+    have h : (hyp.t * v * hyp.t) * (hyp.t * k * hyp.t) * (hyp.t * v⁻¹ * hyp.t)
+        = hyp.t * v * (hyp.t * hyp.t) * k * (hyp.t * hyp.t) * v⁻¹ * hyp.t := by group
+    rw [h, htt]; group
+  rw [hdecomp, htvt, hk.2, htv't, mul_inv_rev, mul_inv_rev, inv_inv]
+  group
+
+/-- **Peterfalvi Part II, Ch. I Prop 5** (p. 101), second clause —
+`W = C_D(H ∩ I)`.  `W = C_V(K) = C_D(s) ∩ C_D(K)` (as `V = C_D(s)`), which is
+exactly the elements of `D` centralizing `H ∩ I = sᴷ`: the `⊆` direction is a
+product computation, and `⊇` uses that an element centralizing `H∩I` lies in
+`V = C_D(s)`, hence normalizes `K` and — by injectivity of `k ↦ s^k` (Prop 3)
+— centralizes `K`. -/
+theorem W_eq_centralizer_involutions_H :
+    hyp.W = hyp.D ⊓ Subgroup.centralizer {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
+  classical
+  set s := hyp.distinguishedInvolution with hs
+  have hsH : s ∈ hyp.H := hyp.distinguishedInvolution_mem_H
+  have hs2 : s ^ 2 = 1 := hyp.distinguishedInvolution_sq
+  have hs1 : s ≠ 1 := hyp.distinguishedInvolution_ne_one
+  have hsHI : s ∈ {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := ⟨hs2, hs1, hsH⟩
+  have hVeq : hyp.V = hyp.D ⊓ Subgroup.centralizer {s} :=
+    hyp.V_eq_centralizer_distinguishedInvolution
+  have hsurj := hyp.image_conj_KSet_eq_involutions_H hsH hs2 hs1
+  have hinj := hyp.injOn_conj_KSet hsH hs2 hs1
+  -- `w ∈ V` unfolds to `w ∈ D` and `Commute w s`
+  have hV_commute : ∀ {w : G}, w ∈ hyp.V → Commute w s := fun {w} hw =>
+    Subgroup.mem_centralizer_singleton_iff.mp (Subgroup.mem_inf.mp (hVeq ▸ hw)).2
+  ext w
+  rw [Subgroup.mem_inf, Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hw
+    obtain ⟨hwV, hwKc⟩ := Subgroup.mem_inf.mp hw
+    have hwK := Subgroup.mem_centralizer_iff.mp hwKc
+    have hcws : Commute w s := hV_commute hwV
+    refine ⟨hyp.V_le_D hwV, ?_⟩
+    intro x hx
+    rw [← hsurj] at hx
+    obtain ⟨k, hkK, hkx⟩ := hx
+    rw [← hkx]
+    have hck : Commute w k := (hwK k hkK).symm
+    have hc : Commute w (k⁻¹ * s * k) :=
+      ((hck.inv_right).mul_right hcws).mul_right hck
+    exact hc.symm.eq
+  · intro hw
+    obtain ⟨hwD, hwHI⟩ := hw
+    have hcws : Commute w s := (hwHI s hsHI).symm
+    have hwV : w ∈ hyp.V := by
+      rw [hVeq]
+      exact Subgroup.mem_inf.mpr ⟨hwD, Subgroup.mem_centralizer_singleton_iff.mpr hcws⟩
+    refine Subgroup.mem_inf.mpr ⟨hwV, Subgroup.mem_centralizer_iff.mpr ?_⟩
+    intro k hkK
+    -- `k' = wkw⁻¹ ∈ K` and `s^{k'} = s^k`, so injectivity gives `wkw⁻¹ = k`
+    have hk'K : w * k * w⁻¹ ∈ hyp.KSet := hyp.conj_mem_KSet_of_mem_V hwV hkK
+    have hwsw : w⁻¹ * s * w = s := by
+      rw [hcws.inv_left.eq, mul_assoc, inv_mul_cancel, mul_one]
+    have hskmem : k⁻¹ * s * k ∈ {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
+      rw [← hsurj]; exact ⟨k, hkK, rfl⟩
+    have hcomm_sk : (k⁻¹ * s * k) * w = w * (k⁻¹ * s * k) := hwHI _ hskmem
+    have hs_eq : (w * k * w⁻¹)⁻¹ * s * (w * k * w⁻¹) = k⁻¹ * s * k := by
+      calc (w * k * w⁻¹)⁻¹ * s * (w * k * w⁻¹)
+          = w * k⁻¹ * (w⁻¹ * s * w) * k * w⁻¹ := by
+            rw [mul_inv_rev, mul_inv_rev, inv_inv]; group
+        _ = w * k⁻¹ * s * k * w⁻¹ := by rw [hwsw]
+        _ = w * (k⁻¹ * s * k) * w⁻¹ := by group
+        _ = k⁻¹ * s * k := by rw [← hcomm_sk]; group
+    have hk'k : w * k * w⁻¹ = k := hinj hk'K hkK hs_eq
+    have hwk : w * k = k * w := by
+      calc w * k = w * k * (w⁻¹ * w) := by rw [inv_mul_cancel, mul_one]
+        _ = (w * k * w⁻¹) * w := by group
+        _ = k * w := by rw [hk'k]
+    exact hwk.symm
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
