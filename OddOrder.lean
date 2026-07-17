@@ -83,6 +83,7 @@ import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SimpleSubmoduleIndependence
 import OddOrder.GroupTheory.PrimitivePrimeDivisor
 import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
 import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
@@ -128,6 +129,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.InnerAutomorphisms
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
 import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
