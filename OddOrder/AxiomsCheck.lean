@@ -15,6 +15,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -420,6 +421,37 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_apply_apply
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_symm
+
+-- The generated Suzuki permutation group and its doubly transitive action.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardGeneratorSet
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootPerm_mem_standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusPerm_mem_standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylPerm_mem_standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_le
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_rootHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_torusHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_smul_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_smul_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_smul_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_smul_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_smul_affineMk
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_origin
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_affine_of_ne_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_affineMk_of_ne_zero
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_sq_eq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_mul_rootHom_mul_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_exists_smul_eq_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isPretransitive
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_infinityStabilizer_isPretransitive
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isMultiplyPretransitive
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A
