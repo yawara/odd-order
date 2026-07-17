@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+import OddOrder.Isaacs.Ch04_Commutators.Mann
 
 /-!
 # Peterfalvi Part II, Ch. I §2: Proposition 1 (the structure of `Q`)
@@ -207,6 +208,135 @@ theorem isNilpotent_Q : Group.IsNilpotent ↥hyp.Q := by
       Subgroup.mem_bot] at hnmem
     exact hn (Subtype.ext hnmem)
   exact isNilpotent_of_isFrobeniusAction hFrob
+
+/-! ## Prop 1 (c): `H ∩ I ⊆ Z(Q)` and `Q₀` is elementary abelian (p. 103) -/
+
+open OddOrder.Isaacs.Ch04 in
+/-- `Z(Q)` contains an involution: the Sylow `2`-subgroup of the nilpotent
+group `Q` is normal (mathlib) and nontrivial (`|Q|` even), so it meets the
+center (Isaacs Lemma 4.16 auxiliary,
+`exists_mem_center_of_normal_ne_bot_of_isNilpotent`); a central element of
+`2`-power order powers up to a central involution (Cauchy on `⟨x⟩`). -/
+lemma exists_involution_mem_center_Q :
+    ∃ u : G, u ∈ hyp.Q ∧ u ^ 2 = 1 ∧ u ≠ 1 ∧
+      ∀ v ∈ hyp.Q, u * v = v * u := by
+  classical
+  haveI := hyp.isNilpotent_Q
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨S⟩ : Nonempty (Sylow 2 ↥hyp.Q) := Sylow.nonempty
+  have hSne : (S : Subgroup ↥hyp.Q) ≠ ⊥ := by
+    intro hbot
+    have hcard := S.card_eq_multiplicity
+    rw [hbot, Subgroup.card_bot] at hcard
+    have hpos := Nat.Prime.factorization_pos_of_dvd Nat.prime_two
+      Nat.card_pos.ne' hyp.Q_even.two_dvd
+    have h1lt : 1 < 2 ^ (Nat.card ↥hyp.Q).factorization 2 :=
+      Nat.one_lt_two_pow_iff.mpr hpos.ne'
+    omega
+  obtain ⟨x, hxS, hxc, hx1⟩ :=
+    exists_mem_center_of_normal_ne_bot_of_isNilpotent hSne
+  -- `x` has `2`-power order, so `⟨x⟩` has even order and contains an
+  -- involution, still central
+  obtain ⟨k, hk⟩ := S.isPGroup' ⟨x, hxS⟩
+  have hxpow : x ^ 2 ^ k = 1 := by
+    have := congrArg Subtype.val hk
+    push_cast at this
+    exact this
+  obtain ⟨j, -, horder⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp
+    (orderOf_dvd_of_pow_eq_one hxpow)
+  have hj0 : j ≠ 0 := by
+    rintro rfl
+    rw [pow_zero, orderOf_eq_one_iff] at horder
+    exact hx1 horder
+  have heven : Even (Nat.card ↥(Subgroup.zpowers x)) := by
+    rw [Nat.card_zpowers, horder, Nat.even_pow]
+    exact ⟨even_two, hj0⟩
+  obtain ⟨v, hvzp, hv2, hv1⟩ := exists_sq_eq_one_of_even_card heven
+  have hvc : v ∈ Subgroup.center ↥hyp.Q :=
+    Subgroup.zpowers_le.mpr hxc hvzp
+  refine ⟨(v : ↥hyp.Q), v.2, ?_, fun h => hv1 (Subtype.ext h), ?_⟩
+  · have := congrArg Subtype.val hv2
+    push_cast at this
+    exact this
+  · intro w hw
+    have h := Subgroup.mem_center_iff.mp hvc ⟨w, hw⟩
+    have h2 := congrArg Subtype.val h
+    push_cast at h2
+    exact h2.symm
+
+/-- **Peterfalvi Part II, Ch. I §2 Prop 1 (c)** (p. 103), first clause —
+every involution of `H` centralizes `Q` (i.e. `H ∩ I ⊆ Z(Q)`, as the
+involutions of `H` lie in `Q`).  `Z(Q)` contains one involution `u₀`, and
+`u₀^K` exhausts `H ∩ I` (§1 Prop 3) while `K ⊆ D` normalizes `Q`. -/
+theorem involutions_H_subset_centralizer_Q {u : G} (huH : u ∈ hyp.H)
+    (hu2 : u ^ 2 = 1) (hu1 : u ≠ 1) :
+    u ∈ Subgroup.centralizer (hyp.Q : Set G) := by
+  obtain ⟨u₀, hu₀Q, hu₀2, hu₀1, hu₀c⟩ := hyp.exists_involution_mem_center_Q
+  have humem : u ∈ {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := ⟨hu2, hu1, huH⟩
+  rw [← hyp.image_conj_KSet_eq_involutions_H (hyp.Q_le_H hu₀Q) hu₀2 hu₀1]
+    at humem
+  obtain ⟨k, hkK, hku⟩ := humem
+  rw [Subgroup.mem_centralizer_iff]
+  intro v hv
+  have hkH : k ∈ hyp.H := hyp.D_le_H hkK.1
+  have hkv : k * v * k⁻¹ ∈ hyp.Q := hyp.Q_normal_in_H k hkH v hv
+  have hcomm := hu₀c _ hkv
+  rw [← hku]
+  calc v * (k⁻¹ * u₀ * k) = k⁻¹ * ((k * v * k⁻¹) * u₀) * k := by group
+    _ = k⁻¹ * (u₀ * (k * v * k⁻¹)) * k := by rw [← hcomm]
+    _ = (k⁻¹ * u₀ * k) * v := by group
+
+/-- `Q₀ = (H ∩ I) ∪ {1}` (p. 103, the book's standing notation): the
+involutions of `H` together with the identity form a subgroup —
+multiplicative closure holds because involutions of `H` centralize each
+other (Prop 1(c)). -/
+def Q0 : Subgroup G where
+  carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
+  one_mem' := ⟨one_pow 2, hyp.H.one_mem⟩
+  inv_mem' := by
+    rintro x ⟨hx2, hxH⟩
+    refine ⟨?_, hyp.H.inv_mem hxH⟩
+    rw [inv_pow, hx2, inv_one]
+  mul_mem' := by
+    rintro a b ⟨ha2, haH⟩ ⟨hb2, hbH⟩
+    refine ⟨?_, hyp.H.mul_mem haH hbH⟩
+    rcases eq_or_ne a 1 with rfl | ha1
+    · rwa [one_mul]
+    have hbQ : b ∈ hyp.Q := hyp.mem_Q_of_sq_eq_one_of_mem_H hbH hb2
+    have hcomm : b * a = a * b :=
+      Subgroup.mem_centralizer_iff.mp
+        (hyp.involutions_H_subset_centralizer_Q haH ha2 ha1) b hbQ
+    calc (a * b) ^ 2 = a * (b * a) * b := by rw [sq]; group
+      _ = a * (a * b) * b := by rw [hcomm]
+      _ = a ^ 2 * b ^ 2 := by rw [sq, sq]; group
+      _ = 1 := by rw [ha2, hb2, mul_one]
+
+lemma mem_Q0_iff {x : G} : x ∈ hyp.Q0 ↔ x ^ 2 = 1 ∧ x ∈ hyp.H := Iff.rfl
+
+/-- `Q₀` has exponent `2` ("elementary": every element squares to `1`). -/
+lemma sq_eq_one_of_mem_Q0 {x : G} (hx : x ∈ hyp.Q0) : x ^ 2 = 1 := hx.1
+
+lemma Q0_le_Q : hyp.Q0 ≤ hyp.Q := fun _ hx =>
+  hyp.mem_Q_of_sq_eq_one_of_mem_H hx.2 hx.1
+
+/-- **Peterfalvi Part II, Ch. I §2 Prop 1 (c)** (p. 103), second clause,
+centralizer form — `Q₀ ≤ Z(Q)` (with `Q₀ ≤ Q` this is `H ∩ I ⊆ Z(Q)`). -/
+lemma Q0_le_centralizer_Q :
+    hyp.Q0 ≤ Subgroup.centralizer (hyp.Q : Set G) := by
+  intro x hx
+  rcases eq_or_ne x 1 with rfl | hx1
+  · exact one_mem _
+  · exact hyp.involutions_H_subset_centralizer_Q hx.2 hx.1 hx1
+
+/-- **Peterfalvi Part II, Ch. I §2 Prop 1 (c)** (p. 103), second clause —
+`Q₀` is abelian (with `sq_eq_one_of_mem_Q0`: elementary abelian). -/
+lemma commute_of_mem_Q0 {a b : G} (ha : a ∈ hyp.Q0) (hb : b ∈ hyp.Q0) :
+    Commute a b := by
+  rcases eq_or_ne a 1 with rfl | ha1
+  · exact Commute.one_left b
+  exact (Subgroup.mem_centralizer_iff.mp
+    (hyp.involutions_H_subset_centralizer_Q ha.2 ha.1 ha1) b
+    (hyp.Q0_le_Q hb)).symm
 
 end Hypothesis
 
