@@ -76,8 +76,19 @@
    - **⚠ App I Prop 1 gate = `Huppert.fitting_cyclic_fixedPointFree` は当初 axiom-clean と
      誤報告したが実は sorried** (`pGroup_cyclic_fixedPointFree` の non-cyclic case、
      `#print axioms` で `sorryAx` 確認)。→ 上流優先で gate を進めた (下記)。
-   - **次**: C_D̄(τ)=V̄ → C_Ā(τ)=1 (V≤C_D(s) f.p.f.) → Ā⊆J (Lemma(a) endo) →
-     Fitting で Ā=J → A=KW → |Ā|=|K| → K cyclic (§1 Lemma(b) で K◁D)。
+   - ✅ **C_D̄(τ)=V̄** (`tau_mk_eq_iff_mem_V`): τ-固定コセット = V-コセット。w=(tdt)⁻¹d∈W
+     は t と可換 (W≤V) ⟹ w²=1、D 奇位数 ⟹ w=1 ⟹ tdt=d ⟺ d∈V。helper
+     `sq_inverted_eq_one` (a²=1⟹(ab⁻¹ab)(b⁻¹aba)=1)。axiom-clean。
+   - ✅ **C_Ā(τ)=1** (`tau_fixed_fitting_eq_one`): τ-固定 Fitting 元は 1。V̄ に属す⟹s∈Q₀^#
+     固定 (V≤C_D(s), Prop 5)、Ā は Q₀ 上 f.p.f. (App I gate) ⟹ 矛盾。**gate cite ゆえ
+     transitively sorryAx** (sorried-cite 方針)。
+   - ✅ **Ā⊆J** (`fitting_subset_inverted`): τ が Ā 全元を反転。Ā characteristic ⟹ τ|_Ā は
+     involutive endo で 1 のみ固定 (C_Ā(τ)=1) ⟹ Lemma(a) endo 形で全反転。
+   - **次 (残り 3 step)**: **J⊆Ā** (D̄/Ā abelian ⟹ B̄=τ-反転部分群、C_B̄(τ)⊆C_Ā(τ)⊆1... 実際は
+     C_B(τ)⊆C_A(τ)⊆W ⟹ τ が B̄ 反転 ⟹ B̄ abelian normal ⟹ Fitting で B̄≤Ā;
+     `nilpotent_normal_le_fitting`) → **Ā=J** → **A=KW, |Ā|=|K|** (§1 Lemma(a) を A に:
+     A=(A∩K)(A∩V), Ā=J ⟹ K⊆A, A∩V=W) → **K=⟨k⟩ cyclic** (Ā cyclic は App I gate、K→K̄
+     単射) → K◁D (§1 Lemma(b))。
    - **上流成果 (2026-07-18、gate 掘り下げ)**: App I Prop 1 の sorry = **Gorenstein 5.4.10
      (odd p) = BG Lemma 4.5(a)** を証明 (issue 2004 完了):
      `BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic` +

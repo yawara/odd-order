@@ -273,6 +273,142 @@ def tau : MulAut hyp.Dbar where
 lemma tau_involutive (x : hyp.Dbar) : hyp.tau (hyp.tau x) = x :=
   hyp.tauHom_involutive x
 
+/-! ## `C_D̄(τ) = V̄`: the `τ`-fixed cosets are exactly the `V`-cosets (p. 103)
+
+A coset `d̄ = dW` is fixed by `τ` iff `w = (tdt)⁻¹d ∈ W`; but `w` commutes with `t`
+(as `W ≤ V = C_D(t)`), which forces `w² = 1`, and `D` has odd order, so `w = 1` and
+`t d t = d`, i.e. `d ∈ V`.  No coprime-action machinery is needed. -/
+
+/-- The coset element `w = ((tdt)⁻¹d : ↥D)` has `G`-value `t d⁻¹ t d`. -/
+private lemma tauD_inv_mul_coe (d : ↥hyp.D) :
+    (((hyp.tauD d)⁻¹ * d : ↥hyp.D) : G) = hyp.t * (d : G)⁻¹ * hyp.t * (d : G) := by
+  rw [Subgroup.coe_mul, Subgroup.coe_inv, hyp.tauD_apply_coe]
+  simp only [mul_inv_rev, hyp.t_inv_eq]
+  group
+
+/-- If `a² = 1` then `(a b⁻¹ a b)(b⁻¹ a b a) = 1` — the algebraic core of `w² = 1`
+for the `τ`-fixed-coset argument. -/
+private lemma sq_inverted_eq_one {H : Type*} [Group H] {a b : H} (ha : a * a = 1) :
+    (a * b⁻¹ * a * b) * (b⁻¹ * a * b * a) = 1 := by
+  have h1 : (a * b⁻¹ * a * b) * (b⁻¹ * a * b * a) = a * b⁻¹ * (a * a) * b * a := by group
+  rw [h1, ha, mul_one]
+  have h2 : a * b⁻¹ * b * a = a * a := by group
+  rw [h2, ha]
+
+/-- **Peterfalvi Part II, Ch. I §2** (p. 103): `C_D̄(τ) = V̄`.  A coset `d̄` is fixed
+by `τ` iff its representative lies in `V = C_D(t)`. -/
+lemma tau_mk_eq_iff_mem_V (d : ↥hyp.D) :
+    hyp.tau (QuotientGroup.mk d) = QuotientGroup.mk d ↔ (d : G) ∈ hyp.V := by
+  rw [hyp.tau_apply, hyp.tauHom_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf]
+  constructor
+  · -- `w = (tdt)⁻¹d ∈ W ⟹ d ∈ V`.
+    intro hwW
+    set w : G := (((hyp.tauD d)⁻¹ * d : ↥hyp.D) : G) with hwdef
+    have hwcoe : w = hyp.t * (d : G)⁻¹ * hyp.t * (d : G) := hyp.tauD_inv_mul_coe d
+    have hcomm : Commute w hyp.t := hyp.commute_t_of_mem_V (hyp.W_le_V hwW)
+    -- `t w t = w`, giving the second form `w = d⁻¹ t d t`.
+    have htwt : hyp.t * w * hyp.t = w := by
+      rw [hcomm.symm.eq, mul_assoc, hyp.t_mul_t, mul_one]
+    have hw2 : w = (d : G)⁻¹ * hyp.t * (d : G) * hyp.t := by
+      have hcalc : hyp.t * w * hyp.t = (d : G)⁻¹ * hyp.t * (d : G) * hyp.t := by
+        rw [hwcoe]
+        rw [show hyp.t * (hyp.t * (d : G)⁻¹ * hyp.t * (d : G)) * hyp.t
+              = hyp.t * hyp.t * ((d : G)⁻¹ * hyp.t * (d : G) * hyp.t) by
+            simp only [mul_assoc], hyp.t_mul_t, one_mul]
+      rw [← hcalc, htwt]
+    -- `w² = 1` from the two forms; `D` odd ⟹ `w = 1`.
+    have hsq : w ^ 2 = 1 := by
+      rw [pow_two]
+      nth_rewrite 1 [hwcoe]
+      nth_rewrite 1 [hw2]
+      exact sq_inverted_eq_one hyp.t_mul_t
+    have hw1 : w = 1 :=
+      eq_one_of_sq_eq_one_of_odd_card hyp.D_odd (hyp.V_le_D (hyp.W_le_V hwW)) hsq
+    -- `w = 1 ⟹ t d t = d ⟹ d ∈ V`.
+    have hwe : hyp.t * (d : G)⁻¹ * hyp.t * (d : G) = 1 := hwcoe ▸ hw1
+    have htdt : hyp.t * (d : G) * hyp.t = (d : G) := by
+      have hh : hyp.t * (d : G)⁻¹ * hyp.t = (d : G)⁻¹ := eq_inv_of_mul_eq_one_left hwe
+      have hinv := congrArg (·⁻¹) hh
+      simpa [mul_inv_rev, hyp.t_inv_eq, mul_assoc] using hinv
+    have hc : hyp.t * (d : G) = (d : G) * hyp.t := by
+      have hcong := congrArg (· * hyp.t) htdt
+      rwa [mul_assoc, hyp.t_mul_t, mul_one] at hcong
+    exact Subgroup.mem_inf.mpr
+      ⟨d.2, Subgroup.mem_centralizer_singleton_iff.mpr hc.symm⟩
+  · -- `d ∈ V ⟹ tauD d = d`, so the coset element is `1 ∈ W`.
+    intro hdV
+    have hcomm : Commute (d : G) hyp.t := hyp.commute_t_of_mem_V hdV
+    have htdt : hyp.t * (d : G) * hyp.t = (d : G) := by
+      rw [← hcomm.eq, mul_assoc, hyp.t_mul_t, mul_one]
+    have htauD : hyp.tauD d = d := Subtype.ext (by rw [hyp.tauD_apply_coe, htdt])
+    rw [htauD, inv_mul_cancel]
+    simpa using hyp.W.one_mem
+
+/-! ## `C_Ā(τ) = 1` (p. 103) -/
+
+/-- **Peterfalvi Part II, Ch. I §2** (p. 103): a `τ`-fixed element of `Ā = F(D̄)` is
+trivial.  Such an element lies in `V̄` (`tau_mk_eq_iff_mem_V`), whose elements fix the
+distinguished point `s ∈ Q₀^#` (`V ⊆ C_D(s)`, §1 Prop 5); but `Ā` acts fixed-point-
+freely on `Q₀` (Appendix I, Proposition 1), so it must be `1`. -/
+lemma tau_fixed_fitting_eq_one {x : hyp.Dbar} (hxF : x ∈ fitting hyp.Dbar)
+    (hxτ : hyp.tau x = x) : x = 1 := by
+  by_contra hx1
+  obtain ⟨v, rfl⟩ := QuotientGroup.mk_surjective x
+  -- `v ∈ V`, hence `v` centralizes the distinguished involution `s`.
+  have hvV : (v : G) ∈ hyp.V := (hyp.tau_mk_eq_iff_mem_V v).mp hxτ
+  have hvs : (v : G) ∈ Subgroup.centralizer {hyp.distinguishedInvolution} := by
+    rw [hyp.V_eq_centralizer_distinguishedInvolution] at hvV
+    exact (Subgroup.mem_inf.mp hvV).2
+  have hcomm : Commute (v : G) hyp.distinguishedInvolution :=
+    Subgroup.mem_centralizer_singleton_iff.mp hvs
+  have hsQ : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  -- `x = mk v` fixes the nonidentity point `s ∈ Q₀`.
+  have hfix : hyp.conjQ0bar (QuotientGroup.mk v) ⟨hyp.distinguishedInvolution, hsQ⟩ =
+      ⟨hyp.distinguishedInvolution, hsQ⟩ := by
+    rw [hyp.conjQ0bar_mk]
+    refine Subtype.ext ?_
+    rw [hyp.conjQ0_apply_coe, hcomm.eq]
+    group
+  -- fixed-point-freeness of `Ā` (Appendix I Prop 1) gives a contradiction.
+  have hfpf := hyp.fitting_Dbar_cyclic_fpf_abelian.2.1 (QuotientGroup.mk v) hxF hx1
+  have hmem : (⟨hyp.distinguishedInvolution, hsQ⟩ : ↥hyp.Q0) ∈
+      actionFixedBy hyp.conjQ0bar (QuotientGroup.mk v) := hfix
+  rw [hfpf, Subgroup.mem_bot] at hmem
+  exact hyp.distinguishedInvolution_ne_one (by simpa using congrArg Subtype.val hmem)
+
+/-! ## `Ā ⊆ J`: `τ` inverts every element of `Ā` (p. 103) -/
+
+/-- **Peterfalvi Part II, Ch. I §2** (p. 103): `Ā = F(D̄) ⊆ J`, i.e. `τ` inverts every
+element of the Fitting subgroup.  `Ā` is characteristic, so `τ` restricts to an
+involutive endomorphism of `Ā` fixing only `1` (`tau_fixed_fitting_eq_one`); `Ā` has
+odd order, so the §1 Lemma (a) in endomorphism form
+(`map_eq_inv_of_forall_fixed_eq_one`) shows `τ` inverts every element. -/
+lemma fitting_subset_inverted {y : hyp.Dbar} (hy : y ∈ fitting hyp.Dbar) :
+    hyp.tau y = y⁻¹ := by
+  -- `τ` maps `Ā` into `Ā` (characteristic).
+  have hmapeq : (fitting hyp.Dbar).map (hyp.tau : hyp.Dbar ≃* hyp.Dbar).toMonoidHom =
+      fitting hyp.Dbar :=
+    (Subgroup.characteristic_iff_map_eq.mp inferInstance) hyp.tau
+  have hmem : ∀ z ∈ fitting hyp.Dbar, hyp.tau z ∈ fitting hyp.Dbar := fun z hz => by
+    rw [← hmapeq]; exact Subgroup.mem_map_of_mem _ hz
+  -- the restricted endomorphism `σ = τ|_Ā`.
+  let σ : ↥(fitting hyp.Dbar) →* ↥(fitting hyp.Dbar) :=
+    { toFun := fun a => ⟨hyp.tau a, hmem a a.2⟩
+      map_one' := Subtype.ext (by simp)
+      map_mul' := fun a b => Subtype.ext (by push_cast; rw [map_mul]) }
+  have hσ2 : ∀ a, σ (σ a) = a := fun a => Subtype.ext (hyp.tau_involutive a)
+  have hfix : ∀ a, σ a = a → a = 1 := fun a ha =>
+    Subtype.ext (hyp.tau_fixed_fitting_eq_one a.2 (congrArg Subtype.val ha))
+  -- odd order of `Ā`.
+  have hodd : Odd (Nat.card ↥(fitting hyp.Dbar)) := by
+    rcases Nat.even_or_odd (Nat.card ↥(fitting hyp.Dbar)) with he | ho
+    · exact absurd hyp.odd_card_Dbar (Nat.not_odd_iff_even.mpr
+        (even_iff_two_dvd.mpr (dvd_trans he.two_dvd (Subgroup.card_subgroup_dvd_card _))))
+    · exact ho
+  -- §1 Lemma (a), endomorphism form.
+  exact congrArg Subtype.val (map_eq_inv_of_forall_fixed_eq_one hodd σ hσ2 hfix ⟨y, hy⟩)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
