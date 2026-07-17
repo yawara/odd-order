@@ -1,11 +1,11 @@
 ---
-id: 1036
-slug: ch05-basic-split
-title: "Ch05_Transfer/Basic.lean (1657 行) の prefix-split (1500 行閾値超過)"
+id: 122
+slug: ch04-commutatorbasics-split
+title: "Ch04 Main/CommutatorBasics.lean (1552 行) の prefix-split (1500 行閾値超過)"
 created: 2026-07-17
 ---
 
-# Ch05_Transfer/Basic.lean (1657 行) の prefix-split (1500 行閾値超過)
+# Ch04 Main/CommutatorBasics.lean (1552 行) の prefix-split (1500 行閾値超過)
 
 ## 背景
 
