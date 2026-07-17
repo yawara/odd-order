@@ -121,8 +121,20 @@
      `V̄ ≃* A ≤ RingAut F` と三作用の同変性、`Q₀ ⋊ D̄ ≃* 𝓛(F,A)` を返す。
    - finite-field automorphism group の cyclicity から `V̄` cyclic。全 endpoint axiom-clean。
      `Kbar_eq_fitting` により本文の `K̄ ↔ Fˣ` と一致。**→ §2 全結果 formalized。**
-8. **次 frontier = §3 Lemma 1** (Theorem A の結論下で `Q` は 2-group、
-   `L = O^{2′}(G) = ⟨Q^x | x ∈ G⟩`)。§3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の
-   具体構造を使うが、条件付き結論の上流 API から文書順に構成する。
+8. **Section 3 Lemma 1 conditional core complete** -- new leaf `InductionHypothesis.lean`.
+   - `Q_isPGroup_of_card_Omega_sub_one_eq_two_pow` converts the genuine target-degree
+     formula into the book conclusion that `Q` is a 2-group.
+   - `exists_sylow_two_eq_Q` combines this with section 1 Proposition 1(c).
+   - `simple_normal_oddIndex_Q_core` proves the exact equalities
+     `L = primeComplementResidual 2 G = (supremum of the conjugates of Q)` from a
+     simple normal `L` of odd index.
+   - Shared support is `GroupTheory/PrimeComplementResidual.lean`; it also replaces the
+     former Ch09-local normal-closure implementation. Issue 9112 is closed.
+   - This is an honest target-independent prerequisite, not yet the full numbered result:
+     the three concrete target actions must supply simplicity and their degree formulas.
+9. **Next frontier = Section 3 Lemma 1 target-family discharge, PSL(2,q) first**.
+   Reuse Isaacs Ch08 `isSimpleGroup_projectiveSpecialLinearGroup` and mathlib
+   `Projectivization.card_of_finrank_two`; then build the Sz(q) and PSU(3,q) target
+   libraries rather than postulating their properties.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

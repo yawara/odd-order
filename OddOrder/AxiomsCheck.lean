@@ -157,6 +157,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7034,6 +7035,20 @@ three compatible component actions assemble to `Q₀ ⋊ D̄ ≅ 𝓛(F_q, A)` w
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectProduct.reassocOfEquivToSemilinear
+
+/-! **Peterfalvi Part II, Ch. I section 3, Lemma 1 (group-theoretic core)**:
+the target permutation degree makes `Q` a 2-group; Proposition 1(c) makes it Sylow,
+and simplicity identifies `L` with both the prime-complement residual and the join
+of the conjugates of `Q`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_isPGroup_of_card_Omega_sub_one_eq_two_pow
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sylow_two_eq_Q
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.simple_normal_oddIndex_Q_core
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field

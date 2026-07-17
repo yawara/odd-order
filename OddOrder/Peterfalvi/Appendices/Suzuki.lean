@@ -17,6 +17,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)

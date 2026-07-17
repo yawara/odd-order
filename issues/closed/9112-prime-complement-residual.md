@@ -21,10 +21,10 @@ Peterfalvi Part II Ch. I §3 Lemma 1 の `O^{p′}(G)` は、有限群の Sylow 
 
 ## やること
 
-- [ ] `OddOrder/GroupTheory/PrimeComplementResidual.lean` に共役 join/normal closure の汎用 API を移設する。
-- [ ] `primeComplementResidual p G := ⨆ P : Sylow p G, (P : Subgroup G)` を定義し Normal instance を構成する。
-- [ ] 任意の `P : Sylow p G` について residual = `normalClosure P`、および正規 p′-index subgroup への最小性を証明する。
-- [ ] Peterfalvi §3 Lemma 1 の conditional core から residual と `⟨Q^x⟩` を同定する。
+- [x] `OddOrder/GroupTheory/PrimeComplementResidual.lean` に共役 join/normal closure の汎用 API を移設する。
+- [x] `primeComplementResidual p G := ⨆ P : Sylow p G, (P : Subgroup G)` を定義し Normal instance を構成する。
+- [x] 任意の `P : Sylow p G` について residual = `normalClosure P`、および正規 p′-index subgroup への最小性を証明する。
+- [x] Peterfalvi §3 Lemma 1 の conditional core から residual と `⟨Q^x⟩` を同定する。
 
 ## 完了条件
 
@@ -37,3 +37,9 @@ Suzuki §3 Lemma 1 conditional core と `OddOrder.AxiomsCheck` が build-green�
 - `notes/peterfalvi/suzuki_ch1.md` item 8
 - `OddOrder/Isaacs/Ch09_MoreSubnormality/SubnormalSocle.lean`
 - `OddOrder/Isaacs/Ch05_Transfer/Basic.lean` (`OPrime`, semantically distinct)
+
+## Completion
+
+Completed 2026-07-18. The shared residual API, Ch09 relocation, Suzuki section 3
+conditional core, and explicit AxiomsCheck guards are build-green and axiom-clean.
+Target-family discharges of Theorem A are tracked at the Suzuki chapter frontier.
