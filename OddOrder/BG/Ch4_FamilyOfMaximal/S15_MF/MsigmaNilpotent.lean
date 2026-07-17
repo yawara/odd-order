@@ -1082,7 +1082,7 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hQ : Q = opiCoreInG ({q} : Set ℕ) M)
     (hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
-    (hKstarQ : Kstar ≤ Q) (hQneMσ : Q ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hKstarQ : Kstar ≤ Q) (_hQneMσ : Q ≠ OddOrder.BG.Ch3.S10.Msigma M)
     (hKne : K ≠ ⊥) (hKMσdisj : Disjoint K (OddOrder.BG.Ch3.S10.Msigma M))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)))
     (hMσnotnil : ¬ Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M))
@@ -1091,7 +1091,7 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
     (hQDdisj : Disjoint Q D)
     (hcomplD : Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
       (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
-    (hDnil : Group.IsNilpotent ↥D) (hDne : D ≠ ⊥) :
+    (hDnil : Group.IsNilpotent ↥D) (_hDne : D ≠ ⊥) :
     M ≤ Subgroup.normalizer ((Q ⊓ Subgroup.centralizer (D : Set G) : Subgroup G) : Set G) ∧
       ¬ Kstar ≤ (Q ⊓ Subgroup.centralizer (D : Set G)) ∧
       (Q ⊓ Subgroup.centralizer (D : Set G)) < Q ∧

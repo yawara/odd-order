@@ -900,7 +900,7 @@ meets/frees `±mb, ±mc, fb, fc` of the other two pencil rows.  The shared half 
 `fb, fc ∈ B` (one O-step each), but `B` has room for only one element besides `ma, -χ`.  Newness of
 `χ8` falls out of `oStep_both_out` against the two pencil cells. -/
 theorem transversalCell (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : κ}
-    (hab : ra ≠ rb) (hac : ra ≠ rc) (hbc : rb ≠ rc)
+    (_hab : ra ≠ rb) (_hac : ra ≠ rc) (hbc : rb ≠ rc)
     (hat : ra ≠ rt) (hbt : rb ≠ rt) (hct : rc ≠ rt) (hj : j₀ ≠ j₁)
     {χ ma mb mc fa fb fc : ClassFunction G ℂ}
     (hLa : A ra j₀ = {χ, ma, fa}) (hLb : A rb j₀ = {χ, mb, fb})
@@ -1000,12 +1000,12 @@ by an O-step; finally `χ8 ∈ B₂`).  (3.5.4.5): in the passive cell `B₄ = A
 forcing `-mb ∈ B₄` (share with `B₁`); but then `O(B₄, A rb j₀)` forces `mb ∈ B₄` too — impossible. -/
 theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : κ}
     (hab : ra ≠ rb) (hac : ra ≠ rc) (hbc : rb ≠ rc)
-    (hat : ra ≠ rt) (hbt : rb ≠ rt) (hct : rc ≠ rt) (hj : j₀ ≠ j₁)
+    (_hat : ra ≠ rt) (hbt : rb ≠ rt) (hct : rc ≠ rt) (hj : j₀ ≠ j₁)
     {χ ma mb mc fa fb fc χ8 : ClassFunction G ℂ}
     (hLa : A ra j₀ = {χ, ma, fa}) (hLb : A rb j₀ = {χ, mb, fb})
     (hLc : A rc j₀ = {χ, mc, fc}) (hT : A rt j₀ = {ma, mb, mc})
     (hB3 : A rt j₁ = {ma, -fa, χ8}) (hB1 : A ra j₁ = {ma, -mb, fb})
-    (hχ8fb : χ8 ≠ fb) (hχ8negmb : χ8 ≠ -mb) : False := by
+    (hχ8fb : χ8 ≠ fb) (_hχ8negmb : χ8 ≠ -mb) : False := by
   classical
   obtain ⟨dχma, dχfa, dmafa⟩ := triple_distinct (hLa ▸ hG.card_eq_three ra j₀)
   obtain ⟨dχmb, dχfb, dmbfb⟩ := triple_distinct (hLb ▸ hG.card_eq_three rb j₀)

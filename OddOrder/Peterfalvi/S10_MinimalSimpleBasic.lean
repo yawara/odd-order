@@ -1454,7 +1454,7 @@ supporting maximals are pinned by singleton uniqueness, `MulAut.conj m • N[a]`
 `m·C_G(a)·m⁻¹`, and `R = N_σ ⊓ C_G(·)` transports by `M_σ`-equivariance. -/
 theorem FT_signalizer_conj_smul_of_escaping_sigmaSharp [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) {a m : G} (hm : m ∈ M)
+    (hM : M ∈ maximalSubgroups G) {a m : G} (_hm : m ∈ M)
     (hσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
     (hesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
     (hσ' : m * a * m⁻¹ ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)

@@ -858,7 +858,7 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.HC) hyp.base.A0)
-    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M) {d : ℕ}
+    {ζ : ClassFunction ↥M ℂ} (_hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M) {d : ℕ}
     (hζHC : ζ ∈ hyp.SOf hyp.HC)
     (hζdeg : ∀ j : Fin hyp.base.w2, j ≠ 0 →
       (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i j) 1 = (d : ℂ) * ζ 1)

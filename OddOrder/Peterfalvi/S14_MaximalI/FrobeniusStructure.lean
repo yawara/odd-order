@@ -627,7 +627,7 @@ the per-member scaled-difference support of the (5.6) degree data (h56).  Off `H
 (`Sset_vanishes_off_H`); at `1` the degree relation makes it vanish; so it is supported on
 `H^# = A(L)`. -/
 theorem Sset_scaledDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (_hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
     (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
     {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) (hχ' : χ' ∈ hyp.Sset) {m : ℕ}
     (hdeg : (χ : ↥L → ℂ) 1 = (m : ℂ) * (χ' : ↥L → ℂ) 1) :

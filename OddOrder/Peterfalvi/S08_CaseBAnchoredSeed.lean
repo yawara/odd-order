@@ -43,6 +43,7 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **(6.8.2.3) per-column central-character data** (the Q1 "central gap").
 
 For any irreducible character `θ` of `H` and a central subgroup `W₂ ≤ Z(H)`, the central **linear**
@@ -96,6 +97,7 @@ theorem exists_central_phi_data
     exact_mod_cast hdpos.ne'
   · rw [htrans]; exact hres
 
+omit [Fintype G] in
 /-- **Central character nontriviality** from the master restriction equation.  If
 `Res^H_N θ = θ(1)·χ` (the [Is] 2.27 form, `χ = compHom e φ_θ`) and `θ` is **not** constant on `N`
 (some `w ∈ N` with `θ(w) ≠ θ(1)`, i.e. `N ⊄ ker θ`), then the central character `χ` is nontrivial.
@@ -209,6 +211,7 @@ theorem exists_decomposition_caseB_anchorCY
       + ((W2.subgroupOf H).index : ℂ) • cY.extension η₁, horth, hXZ, ?_⟩
   abel
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2.3) certain-type column is nonconstant on `W₂`** (`hWne` provider, the `(R1)` §6 fact).
 For a nontrivial column `χ₂ ≠ 1`, the underlying irreducible `θ = Res^H μ_{0,χ₂}` is **not constant
 on `W₂.subgroupOf H`** (`∃ w, θ(w) ≠ θ(1)`, i.e. `W₂ ⊄ ker θ`).  This is Peterfalvi (4.7)
@@ -352,12 +355,12 @@ theorem caseB_member_anchored_image
     (hW2H : h46.W2 ≤ H)
     (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
-    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
-    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
-    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
-    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
-    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
-    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    (_hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (_hp : p.Prime) (_hHp : IsPGroup p ↥H)
+    (_hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (_hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (_hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (_hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
     (θ : IrreducibleCharacter ↥H)
     (hθne : ∃ w : ↥(h46.W2.subgroupOf H),

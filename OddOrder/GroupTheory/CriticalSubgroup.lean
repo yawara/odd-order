@@ -792,6 +792,7 @@ open scoped commutatorElement
 variable {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime]
 variable {A : Type*} [Group A] [Finite A]
 
+omit [Finite P] in
 /-- If `A` acts trivially on a characteristic self-centralizing subgroup `C`
 (`C ≤ C_P(C)`-image suffices via `IsCritical`), then `[P, A] = actionCommutator φ`
 centralizes `C`, i.e. `actionCommutator φ ≤ C_P(C)`.
@@ -858,7 +859,7 @@ Proof: by `actionCommutator_le_centralizer_of_acts_trivially_of_characteristic`,
 `p'`, `P` is a `p`-group) and solvability of `P` (`p`-group ⇒ nilpotent ⇒ solvable)
 give `actionCommutator φ = ⊥` by the coprime collapse Lem 4.28 corollary. -/
 theorem IsCritical.actionCommutator_eq_bot_of_acts_trivially
-    {φ : A →* MulAut P} (hp_odd : p ≠ 2) (hP : IsPGroup p P)
+    {φ : A →* MulAut P} (_hp_odd : p ≠ 2) (hP : IsPGroup p P)
     (hA_p' : ¬ p ∣ Nat.card A) {C : Subgroup P} (hC : IsCritical C)
     (h_triv : (C : Set P) ⊆ Subgroup.fixedPointsOfMulAut φ) :
     actionCommutator φ = ⊥ := by

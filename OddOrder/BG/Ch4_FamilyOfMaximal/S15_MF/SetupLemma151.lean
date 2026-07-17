@@ -586,7 +586,7 @@ theorem derivedDerived_le_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
 /-- **`K = ⊥` forces `κ(M) = ∅`** (`§14`-independent): if the Hall `κ(M)`-subgroup `K ≤ M` of `M`
 is trivial, then `M` has no `κ(M)`-prime, so `κ(M) = ∅`, i.e. `M` is type `F`.  (A `κ(M)`-prime
 would divide `|M|` — `κ(M) ⊆ π(M)` — and the Hall `κ(M)`-subgroup would be nontrivial.) -/
-theorem isTypeF_of_isHall_kappa_eq_bot [Finite G] {M K : Subgroup G} (hKM : K ≤ M)
+theorem isTypeF_of_isHall_kappa_eq_bot [Finite G] {M K : Subgroup G} (_hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKbot : K = ⊥) :
     S14.IsTypeF M := by
   by_contra hF

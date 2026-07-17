@@ -1165,7 +1165,7 @@ theorem Hypothesis.forall_dadeHypS_H_eq_bot_of_isTISubset [Fintype G] [Finite G]
     (hTI : OddOrder.GroupTheory.IsTISubset (honestTypeP2ASet hyp.S) hyp.S) :
     ∀ a : {a : G // a ∈ honestTypeP2ASet hyp.S}, (hyp.dadeHypS hG).H a = ⊥ :=
   hyp.forall_dadeHypS_H_eq_bot_of_not_escaping hG
-    (fun a ha hesc => hesc.2 (hTI.centralizer_le ha))
+    (fun _a ha hesc => hesc.2 (hTI.centralizer_le ha))
 
 /-- **(Rung B, the equivalence, Peterfalvi (2.3) for the honest `S`-instance)**: the three forms of
 the (13.2.e) `normedTI` gate coincide —

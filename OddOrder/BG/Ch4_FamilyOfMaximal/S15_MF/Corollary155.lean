@@ -278,6 +278,7 @@ theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
 -- The iterated quotient `(↥N ⧸ ψ.ker) ⧸ O_q(…)` makes the `Group`-instance synthesis for the
 -- `mk' _ ⁅x, y⁆ = 1` step exceed the default `synthInstance` budget; raise it locally.
 set_option synthInstance.maxHeartbeats 80000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Theorem 15.2 step 5 — `D` centralizes `Q` for narrow `Q`** (mmd L4202, BG Theorem 5.5(a)):
 if `Q` is a narrow `q`-group (`q` odd), `D ⊔ K` is a Frobenius group with kernel `D` and complement
 `K` acting in a prime manner, `D ⊔ K ≤ N_G(Q)`, `D` is a `q'`-group (`q ∤ |D|`), and the orders of

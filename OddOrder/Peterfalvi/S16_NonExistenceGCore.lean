@@ -329,7 +329,7 @@ theorem step4_relation_5076 [Finite G] {hyp : Hypothesis (G := G)}
 /-- BG Appendix C, Lemma C.3 Step 3 bad-branch inclusion for a general conjugator
 `g`: if `(PU) ∩ (PU)^g = PU`, then conjugation by `g` preserves `PU`. -/
 theorem conj_mem_P_sup_U_of_inf_conj_eq {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {g : G}
+    (_data : FieldNormalizerData hyp) {g : G}
     (hbad : (hyp.base.P ⊔ hyp.base.U) ⊓
         (MulAut.conj g⁻¹ • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.P ⊔ hyp.base.U) :
     ∀ ⦃x : G⦄, x ∈ hyp.base.P ⊔ hyp.base.U → g * x * g⁻¹ ∈ hyp.base.P ⊔ hyp.base.U := by
@@ -347,7 +347,7 @@ theorem conj_mem_P_sup_U_of_inf_conj_eq {hyp : Hypothesis (G := G)}
 conjugator `g` of `p`-power order: a one-sided conjugation inclusion of `PU`
 upgrades to `g ∈ N_G(PU)`. -/
 theorem mem_normalizer_P_sup_U_of_conj_of_pow {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {g : G}
+    (_data : FieldNormalizerData hyp) {g : G}
     (hconj : ∀ ⦃x : G⦄, x ∈ hyp.base.P ⊔ hyp.base.U → g * x * g⁻¹ ∈ hyp.base.P ⊔ hyp.base.U)
     (hgp : g ^ hyp.base.p = 1) :
     g ∈ Subgroup.normalizer ((hyp.base.P ⊔ hyp.base.U : Subgroup G) : Set G) := by
@@ -412,7 +412,7 @@ relation `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃` (`tᵢ = yc⁻¹ sᵢ y
 then `u^{s₁} ∈ U^{t t₁} = U`, so Step 2 gives `s₁ = 1`, contradicting `(C.6)`. -/
 theorem step4_sigma_primeLine_eq_s_inv [Finite G] {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) {c1 c3 : ZMod hyp.base.p}
-    (hc1 : c1 ≠ 0) (hc3 : c3 ≠ 0) (yc : G) (hty : data.t = yc⁻¹ * data.s * yc)
+    (hc1 : c1 ≠ 0) (_hc3 : c3 ≠ 0) (yc : G) (hty : data.t = yc⁻¹ * data.s * yc)
     (hrel : data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
         (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c1))⁻¹ * yc) * data.t⁻¹ =
       data.t⁻¹ * (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c3))⁻¹ * yc) *

@@ -356,6 +356,7 @@ theorem dadeIntegralCharacterMap_conj_of_support (hyp : S04.Hypothesis G A L)
     dadeIntegralCharacterMap_apply_of_support hyp dade hφc,
     hyp.dadeMap_conj]
 
+omit [Fintype G] in
 /-- Every element of the integral span `ℤ[S]` of a set `S` of **supported** class functions is
 itself supported.
 

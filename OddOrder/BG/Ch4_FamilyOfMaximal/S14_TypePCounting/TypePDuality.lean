@@ -160,6 +160,7 @@ noncomputable def dummySigmaDecomposition (G : Type*) [Group G] : SigmaDecomposi
     intro y
     by_cases h : y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty <;> simp [h]
 
+omit [Group G] in
 /-- Two subsets of a finite group, each covering more than half of it, must intersect. -/
 theorem ncard_inter_nonempty_of_two_mul_gt [Finite G] {A B : Set G}
     (hA : Nat.card G < 2 * A.ncard) (hB : Nat.card G < 2 * B.ncard) :
@@ -1137,7 +1138,7 @@ theorem conjClassSet_zTilde_eq_of_isConjugate [Finite G]
     (hMmax : M ∈ maximalSubgroups G) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
-    (hNmax : N ∈ maximalSubgroups G) (hKNN : KN ≤ N)
+    (_hNmax : N ∈ maximalSubgroups G) (hKNN : KN ≤ N)
     (hKN : Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N))
     (hKstarN : KstarN = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G))
     (hconj : IsConjugateSubgroup N M) :
@@ -1297,7 +1298,7 @@ theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
     (hMref : Mref ∈ maximalSubgroups G) (hMPref : IsTypeP Mref) (hKMref : Kref ≤ Mref)
     (hKref : Ch03.IsHallSubgroup (kappa Mref) (Kref.subgroupOf Mref))
     (hKstarref : Kstarref = OddOrder.BG.Ch3.S10.Msigma Mref ⊓ Subgroup.centralizer (Kref : Set G))
-    (hUref : Ch03.IsHallSubgroup ((kappa Mref ∪ OddOrder.BG.Ch3.S10.sigma Mref)ᶜ)
+    (_hUref : Ch03.IsHallSubgroup ((kappa Mref ∪ OddOrder.BG.Ch3.S10.sigma Mref)ᶜ)
       (Uref.subgroupOf Mref))
     {z : G} (hz : z ∈ zTilde Kref Kstarref) :
     sigmaLength z ≤ 2 := by

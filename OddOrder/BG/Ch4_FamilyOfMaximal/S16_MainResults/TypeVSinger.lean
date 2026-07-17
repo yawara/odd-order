@@ -80,7 +80,7 @@ non-TI witness `X₁ ≤ M_F` whose `M_F`-centralizer has rank `< 3` (the `E1X_f
 `pRank ≤ rank(M_F ⊓ C_G(X₁)) < 3` (it embeds into `M_F ⊓ C_G(X₁)` as `P ≤ M_F`).  No Sylow/`β`
 plumbing is needed: the `pRank ≥ 3` hypothesis is exactly the contradiction branch of `r(P) ≤ 2`. -/
 theorem isNarrow_opiCore_of_three_le_pRank [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (_hM : M ∈ maximalSubgroups G)
     {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime) (hpodd : Odd p)
     (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ S15.MF M)
     (hrank3 : rank ↥(S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
@@ -317,9 +317,9 @@ de-privatize/expose `sylow_structure_b`, build the `p′`-Hall complement `V` of
 central product using `hZPcard`. -/
 theorem card_opiCore_eq_prime_cube_singer [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
+    (_hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
     {p : ℕ} (hp : p.Prime) (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
-    (hpπ : p ∈ (Nat.card ↥(S15.MF M)).primeFactors)
+    (_hpπ : p ∈ (Nat.card ↥(S15.MF M)).primeFactors)
     (hrPle2 : pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ 2)
     (hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)))
     (hZPcard : Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p) :

@@ -66,7 +66,7 @@ theorem derivedInG_le_derivedInG {H K : Subgroup G} (hHK : H ≤ K) :
 contradicting Sylow conjugacy with the abelian `S`. -/
 theorem sylow_isMulCommutative_of_tau2_of_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
-    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    (hp : p ∈ tau2 M) {A : Subgroup G} (_hA : A ∈ elemAbelianOfRank G p 2) (_hAE : A ≤ E)
     {S : Sylow p G} (hSab : IsMulCommutative ↥(S : Subgroup G))
     {q : ℕ} [Fact q.Prime] (hq : q ∈ tau2 M) (Sq : Sylow q G) :
     IsMulCommutative ↥(Sq : Subgroup G) := by

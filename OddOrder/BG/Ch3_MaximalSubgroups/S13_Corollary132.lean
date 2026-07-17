@@ -191,7 +191,7 @@ theorem mem_primeFactors_of_isPGroup_le [Finite G] {r : ℕ} (hr : r.Prime)
   exact Nat.mem_primeFactors.mpr ⟨hr, hrdvdH, Nat.card_pos.ne'⟩
 
 /-- If `p ∈ π(M)` but `p ∉ σ(M)`, then `p ∈ π(E)` (`|M| = |M_σ| · |E|` and `π(M_σ) ⊆ σ(M)`). -/
-theorem mem_primeFactors_E_of_mem_M_of_not_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+theorem mem_primeFactors_E_of_mem_M_of_not_sigma [Finite G] (_hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} (hp : p.Prime)
     (hpM : p ∈ (Nat.card ↥M).primeFactors) (hpσ : p ∉ S10.sigma M) :
     p ∈ (Nat.card ↥E).primeFactors := by

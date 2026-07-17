@@ -397,6 +397,7 @@ private theorem prime_le_card_omega1 {H : Type*} [Group H] [Finite H] {p : ℕ} 
     _ ≤ Nat.card (Omega H p 1) := Subgroup.card_le_of_le hsub
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **BG Theorem 4.12(c)** (Huppert), faithful form. `references/bg/local-analysis.mmd` L1616-1622.
 
 With `T := [R, A] = actionCommutator φ` and `C := C_R(A) = fixedPointsOfMulAut φ`, under the

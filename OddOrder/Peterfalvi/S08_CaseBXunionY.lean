@@ -41,6 +41,7 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **Degree ratio of a `certainTypeSet`-span element against any reference column member.**
 
 Every `ψ ∈ ℤ[certainTypeSet h46 k]` has degree an integer multiple of `μ_{j₀}(1)` for any
@@ -193,6 +194,7 @@ theorem hgen_withDiagonal_certainTypeSet
   · exact Submodule.smul_mem _ s
       (Submodule.subset_span (Set.mem_union_right _ (Set.mem_singleton _)))
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **The certain-type set `𝒯 = certainTypeSet h46 k` is finite.**
 
 Every member is a column character `columnSum h46 χ₂` for some `W₂`-dual

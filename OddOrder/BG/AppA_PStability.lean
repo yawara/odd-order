@@ -822,6 +822,7 @@ theorem thmA4a [Finite G] (hp_odd : p ≠ 2) (hodd : Odd (Nat.card G))
 
 open scoped commutatorElement in
 open OddOrder.GroupTheory OddOrder.Isaacs.Ch03 OddOrder.BG.Ch1.S01 in
+omit [Fact (Nat.Prime p)] in
 /-- **Chain-stabilizer ⊆ centralizer (coprime)**: `M` 有限, `K ◁ M` を `p`-群, `D ≤ M` が
 `K` と coprime (`(|D|,|K|)=1`) で `K` の chief series を stabilize
 (`⁅Pᵢ, D⁆ ≤ Pᵢ₊₁`) するなら, `D ≤ C_M(K)`.
@@ -831,7 +832,7 @@ open OddOrder.GroupTheory OddOrder.Isaacs.Ch03 OddOrder.BG.Ch1.S01 in
 `K` の chief series (`subgroupOf K` 化) に適用. -/
 private theorem coprime_chainStabilizer_le_centralizer
     {M : Type*} [Group M] [Finite M]
-    {K : Subgroup M} [K.Normal] (hK : IsPGroup p K)
+    {K : Subgroup M} [K.Normal] (_hK : IsPGroup p K)
     {D : Subgroup M} (hcop : (Nat.card ↥D).Coprime (Nat.card ↥K))
     (hsolv : IsSolvable ↥D ∨ IsSolvable ↥K)
     (hstab : ∀ i, ⁅chiefSeriesInside K i, D⁆ ≤ chiefSeriesInside K (i + 1)) :

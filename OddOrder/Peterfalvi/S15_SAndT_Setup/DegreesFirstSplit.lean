@@ -170,7 +170,7 @@ theorem hypothesis76AlphaFun_inflation [Fintype G] [Invertible (Nat.card G : ℂ
     (H76 : OddOrder.Peterfalvi.S09.Hypothesis76 G A L) (P' : Subgroup ↥L)
     (χ : ClassFunction G ℂ)
     (F : Finset ↥L) (hF : ∀ x : ↥L, x ∈ F ↔ ((x : G) ∈ H76.H ∧ x ≠ 1))
-    (hP'H : ∀ x : ↥L, x ∈ P' → (x : G) ∈ H76.H) :
+    (_hP'H : ∀ x : ↥L, x ∈ P' → (x : G) ∈ H76.H) :
     ((Nat.card ↥P' : ℝ) - 1) * ‖hypothesis76AlphaFun H76 P' χ 1‖ ^ 2
       ≤ ∑ x ∈ F, ‖hypothesis76AlphaFun H76 P' χ x‖ ^ 2 := by
   classical
@@ -889,6 +889,7 @@ theorem normSqSumQ_spec {H : Type*} [Group H] {A : Finset H} {χ : ClassFunction
   exact_mod_cast Classical.choose_spec h
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (13.3.a)**: each nonzero `μ`-column sum `μ_j = ∑_i μ_{ij}` is induced from a
 *linear* (degree-one) irreducible character of `H = PC`.

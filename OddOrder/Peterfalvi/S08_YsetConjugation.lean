@@ -65,7 +65,7 @@ coherence step: it is **central in `H`** (so [Is] Cor 2.30 `exists_degree_sq_le_
 The earlier capstone route mis-instantiated the `(6.6)` producer at `Z = ⁅H,H⁆`, which is **not**
 central for class `≥ 3` `p`-groups (e.g. `UT(4,p)`), so its degree field `θχ² ≤ qtot ≤ |H:⁅H,H⁆|`
 was unsatisfiable.  See `notes/peterfalvi/s08_6_8_blocker_central_Z.md`. -/
-def centralCommutator (hyp : SibleyDadeHypothesis G L H) : Subgroup ↥L :=
+def centralCommutator (_hyp : SibleyDadeHypothesis G L H) : Subgroup ↥L :=
   (Subgroup.center ↥H).map H.subtype ⊓ ⁅H, H⁆
 
 theorem centralCommutator_le_commutator (hyp : SibleyDadeHypothesis G L H) :
@@ -133,7 +133,7 @@ either `Z(H) ⊓ W₂ = 1` (case A, handled at the central `Z = Z(H) ∩ H'`) or
 This lemma extracts the case-(B) hypothesis `hB : Z(H) ⊓ W₂ ≠ 1` into the centrality
 `W₂.subgroupOf H ≤ Z(↥H)` — the (6.6) / [Is] Cor 2.30 bound enabler at `Z = W₂`, the analogue of
 `centralCommutator_subgroupOf_le_center`. -/
-theorem W2_subgroupOf_le_center_of_caseB (hyp : SibleyDadeHypothesis G L H)
+theorem W2_subgroupOf_le_center_of_caseB (_hyp : SibleyDadeHypothesis G L H)
     {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
     (hK : cert.K = H) (hprime : (Nat.card cert.W2).Prime)
     (hB : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H ≠ ⊥) :

@@ -153,7 +153,7 @@ open scoped FiniteInduce in
 /-- **§10 `‖ζ^{τ₁}‖² = 1`** (Peterfalvi (10.5)): the coherent extension `τ₁` is an isometry on
 `ℤ[S]` and `ζ ∈ S` is irreducible, so `‖ζ^{τ₁}‖² = ‖ζ‖² = 1`. -/
 theorem Hypothesis.zeta_tau1_inner_self [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (_hodd : Odd (Nat.card G))
     {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) :
     ClassFunction.inner (coh.tau1 ζ) (coh.tau1 ζ) = 1 := by
@@ -172,7 +172,7 @@ One of the three orthogonalities dropping out of the (10.6)(a) reduction `(α_{i
 dζ̄^{τ₁}) = (δ(ω_{ij}^σ − ω_{i0}^σ), μ_j^{τ₁})`; the remaining `ζ̄^{τ₁} ⊥ Im σ`
 is the §5 (5.3.b)/(5.5) input still to be formalised. -/
 theorem Hypothesis.zeta_tau1_inner_conj [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (_hodd : Odd (Nat.card G))
     {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζne : ζ.conj ≠ ζ) :

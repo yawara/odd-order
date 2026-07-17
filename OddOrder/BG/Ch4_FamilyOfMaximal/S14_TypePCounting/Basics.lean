@@ -170,7 +170,7 @@ carries every `σ(M)'`-prime of `M`; combined with `κ(M) ⊆ π(M) ∖ σ(M)` t
 Used to exclude the degenerate cases (`κ(M) ∩ τ₃(M) ≠ ∅`, or `E₂E₃ = 1`) when building the
 matched `κ`-complement of a type-`P₂` maximal subgroup. -/
 theorem kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
     (h : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃)
     (hEκ : ∀ p ∈ (Nat.card ↥E).primeFactors, p ∈ kappa M) :
     kappa M = sigmaComplementPrimes M := by
@@ -431,7 +431,7 @@ in `κ(M)`.  `p ∈ τ₁(M)` (as `E₁` is Hall `τ₁(M)` of `E`), and a rank-
 (`hCE1`, from `E1_not_regular`).  So `E₁` is a `κ(M)`-subgroup; with `[M:E₁]` coprime to `κ(M)`
 this makes `E₁` a Hall `κ(M)`-subgroup, conjugate to `K` (the entry to WLOG `K = E₁`). -/
 theorem mem_kappa_of_mem_primeFactors_card_E1 [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
     (h : SubgroupESetup M E E₁ E₂ E₃)
     (hE1prime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁)
     (hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥)
@@ -1359,7 +1359,7 @@ group theory: `x^[M:N] ∈ N` (`Subgroup.pow_index_mem`), and `x ∈ ⟨x^[M:N]�
 coprime to `orderOf x` (`exists_pow_eq_self_of_coprime`).  The engine for "a normal `π′`-Hall of `M`
 absorbs every `π′`-element of `M`" (apply with `[M:N]` a `π`-number and `x` a `π′`-element) — used
 for the `A(M)` / `κ(M)′`-Hall piece of BG Theorem E's "distinct orders". -/
-theorem mem_of_coprime_index [Finite G] {M N : Subgroup G} (hNM : N ≤ M)
+theorem mem_of_coprime_index [Finite G] {M N : Subgroup G} (_hNM : N ≤ M)
     [(N.subgroupOf M).Normal] {x : G} (hxM : x ∈ M)
     (hcop : Nat.Coprime ((N.subgroupOf M).index) (orderOf x)) : x ∈ N := by
   have hpow : x ^ (N.subgroupOf M).index ∈ N := by

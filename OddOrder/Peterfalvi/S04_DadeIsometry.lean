@@ -304,8 +304,8 @@ noncomputable def Hypothesis.dadeLinearMap (hyp : Hypothesis G A L) :
 i.e. it `IsDadeMap`.  This discharges the `IsDadeMap` interface by construction. -/
 theorem Hypothesis.isDadeMap_dadeMap (hyp : Hypothesis G A L) :
     IsDadeMap hyp (hyp.dadeMap (k := k)) where
-  map_eq_of_isConj_hCoset α g a h hh hconj := hyp.dadeValue_eq α hh hconj
-  map_eq_zero_of_not_mem_dadeSupport α g hg :=
+  map_eq_of_isConj_hCoset α _g _a _h hh hconj := hyp.dadeValue_eq α hh hconj
+  map_eq_zero_of_not_mem_dadeSupport α _g hg :=
     hyp.dadeValue_of_not_mem_dadeSupport α hg
 
 /-- **Peterfalvi (2.11), restriction compatibility of the constructed Dade map.**  The
@@ -814,6 +814,7 @@ the support-side total `sum_mobiusTermCF_transversalRep_eq_neg` and the non-supp
 `FullDadeIsometryData`. -/
 
 open scoped Classical in
+omit [Fintype ↥L] in
 /-- **Peterfalvi (2.10), the pointwise identity.**  For a supported class function `α ∈ CF(L, A)`,
 the Dade map equals the negated transversal sum of orbit-averaging summands:
 
@@ -874,6 +875,7 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
     · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC]
 
 open scoped Classical in
+omit [Fintype ↥L] in
 /-- The transversal sum of `mobiusTermCF` reindexes over the `Finset` of nonempty subsets that are
 their own conjugacy-class representative (`transversalRep (mk'' B) = B`), with the summand the
 packaged induced character:
@@ -938,6 +940,7 @@ theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.H
     by_contra hne
     exact hC (hyp.mobiusTermCF_of_not_nonempty hconj _ g hne)
 
+omit [Fintype G] in
 /-- Evaluation of a `Finset` sum of class functions is the sum of the evaluations. -/
 private theorem classFunction_finset_sum_apply {ι : Type*} (s : Finset ι)
     (f : ι → ClassFunction G ℂ) (g : G) :

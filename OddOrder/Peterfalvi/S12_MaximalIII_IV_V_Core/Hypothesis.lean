@@ -230,6 +230,7 @@ theorem conjPerm_not_mem_conjByOrbit {K : Type*} [Group K] [Finite K] {H : Subgr
   exact conjPerm_ne_self_of_mem_conjByOrbit hoddH hθ x.1.2 hfix
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped FiniteInduce in
 /-- **The induced family `S = inducedFamily M` has no real characters** (Peterfalvi §10, the
 `no_real_characters` clause of the §7 coherence hypothesis for `S`).  Every `Ind_{M'}^M θ`

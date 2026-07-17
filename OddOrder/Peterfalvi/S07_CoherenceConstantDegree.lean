@@ -47,6 +47,7 @@ noncomputable def pairExtension {τ : IntegralCharacterMap L G} {χ : ClassFunct
   (IntegralCharacterMap.innerLeftℤ χ).smulRight (hχ.sign • (hχ.mu : ClassFunction G ℂ))
     + (IntegralCharacterMap.innerLeftℤ χ.conj).smulRight (hχ.sign • (hχ.nu : ClassFunction G ℂ))
 
+omit [Fintype G] in
 @[simp] theorem pairExtension_apply {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) (φ : ClassFunction L ℂ) :
     pairExtension hχ φ =
@@ -322,9 +323,11 @@ theorem inner_X_perp {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L �
 relation is symmetric.) -/
 def DiffPair (χ ζ : ClassFunction L ℂ) : Prop := χ ≠ ζ ∧ χ ≠ ζ.conj
 
+omit [Fintype L] in
 theorem DiffPair.conj_ne {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) : χ.conj ≠ ζ :=
   fun he => h.2 (by rw [← ClassFunction.conj_conj χ, he])
 
+omit [Fintype L] in
 theorem DiffPair.symm {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) : DiffPair ζ χ :=
   ⟨h.1.symm, fun he => h.2 (by rw [he, ClassFunction.conj_conj])⟩
 

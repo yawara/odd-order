@@ -169,7 +169,7 @@ theorem kstar_le_fittingInAmbient_of_inputs [Finite G]
 `⊆ O_q(M)` (`le_opiCoreInG_of_normal_of_isPiSubgroup`).  The §14 input is `q = |K*|` prime (used
 only to know `K*` is a `q`-group, via `hKstar_q`). -/
 theorem kstar_le_opiCore_of_le_fittingInAmbient [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (_hM : M ∈ maximalSubgroups G)
     {q : ℕ}
     (hKstar_q : ∀ r ∈ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
         ⊓ Subgroup.centralizer (K : Set G))).primeFactors, r ∈ ({q} : Set ℕ))

@@ -190,10 +190,12 @@ noncomputable def supportedProj (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ �
     · simp only [if_pos hg, if_pos ((hA g h).mpr hg), η.conj_eq g h]
     · simp only [if_neg hg, if_neg (fun hc => hg ((hA g h).mp hc))]⟩
 
+omit [Fintype L] in
 @[simp] theorem supportedProj_apply (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A)
     (η : ClassFunction L ℂ) (x : L) :
     supportedProj A hA η x = if x ∈ A then η x else 0 := rfl
 
+omit [Fintype L] in
 /-- The supported projection is supported on `A` (lies in `CF(L,A)`). -/
 theorem supportedProj_mem_supported (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A)
     (η : ClassFunction L ℂ) :
@@ -530,6 +532,7 @@ theorem induce_diff_support {K : Subgroup L} [hK : K.Normal] [Fintype ↥K]
     rw [Set.mem_singleton_iff] at hx1
     exact hx (by rw [hx1, hd, sub_self])
 
+omit [Fintype L] in
 /-- **Peterfalvi (7.7.a), the degree-zero reduction.**  A class function in the span of the full
 family `{ζ_i}` that vanishes at `1` lies in the span of the difference vectors `{ψ_i = ζ_i − d_i ζ_0}`
 (`i ≠ 0`).  Writing `ψ = Σ a_i ζ_i`, the condition `ψ(1) = 0` gives `Σ a_i d_i = 0` (`ζ_i(1) = d_i ζ_0(1)`,
@@ -1029,7 +1032,7 @@ noncomputable def hypothesis76OfDadeTrivialBase
     (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
     (hAH : A = (H : Set G) \ {1}) :
     Hypothesis76 G A L :=
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  haveI _hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
   haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
@@ -1087,7 +1090,7 @@ noncomputable def hypothesis76OfDadeBase
       haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
       IrreducibleCharacter ↥(H.subgroupOf L)) :
     Hypothesis76 G A L :=
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  haveI _hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
   haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')

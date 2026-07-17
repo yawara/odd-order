@@ -159,8 +159,8 @@ noncomputable def hypothesis71 [Fintype G] (F : FrobeniusFamily G k) (i : Fin k)
   Hypothesis71.of_isTISubset
     (fun x hx => OddOrder.Peterfalvi.S04.mem_sharp.mpr
       ⟨Set.mem_univ x, (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).2⟩)
-    (fun x hx => F.kernel_le i (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1)
-    (fun l a ha => (F.mem_kernel_sharp_conj_iff_of_mem_L i l.2).mpr ha)
+    (fun _x hx => F.kernel_le i (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1)
+    (fun l _a ha => (F.mem_kernel_sharp_conj_iff_of_mem_L i l.2).mpr ha)
     (F.isTI i)
 
 /-- **The Dade support of the `i`-th (7.1) datum is the kernel spread** `(H_i^#)^G`.  For the

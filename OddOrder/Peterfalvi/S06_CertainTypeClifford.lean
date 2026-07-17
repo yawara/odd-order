@@ -364,6 +364,7 @@ namespace Hypothesis
 
 variable (h : Hypothesis L)
 
+omit [Fintype L] in
 /-- **`W ⊓ K = W₂` (membership form)** (mmd 04.6, (4.5) proof "`K ∩ W = W₂`"): an element of
 `W = W₁ ⊔ W₂` that lies in `K` already lies in `W₂`.  Writing it as `x·y` with `x ∈ W₁`,
 `y ∈ W₂ ≤ K`, the `W₁`-part `x = (x·y)·y⁻¹` lies in `K`, hence in `K ⊓ W₁ = ⊥`
@@ -551,6 +552,7 @@ variable [Invertible (Nat.card L : ℂ)]
   [Fintype ↥(h.W1 ⊔ h.W2)]
   [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **The induced column difference `Ind_W^L(ω_{ij} − ω_{0j})` vanishes on `K`** (mmd 04.6,
 (4.5.a) proof).  The source difference `ω_{ij} − ω_{0j}` is supported on `W − W₂` (the two
 linear characters of a column agree on `W₂`, `omega_omegaProdChar_sub_eq_zero_of_mem_W2`), so
@@ -616,6 +618,7 @@ theorem restrict_certainType_eq [NeZero (Nat.card h.W1)]
     SignedIrreducibleDifferenceFamily.classFunction_apply,
     SignedIrreducibleDifferenceFamily.classFunction_apply] at hdiff
 
+omit [Fintype L] in
 /-- **`[L : K] = w₁`** (mmd 04.6, (4.5) proof): the index of the normal subgroup `K` equals
 `|W₁|`, since `K` is a complement to `W₁` in `L` (`L/K ≅ W₁` via `isComplement.QuotientMulEquiv`). -/
 theorem index_K_eq : h.K.index = Nat.card h.W1 := by
@@ -757,6 +760,7 @@ and every irreducible character of `L` is some `μ_{ij}` or such an `Ind^L_K χ`
 (`card_fixed_irr_le_W2` says `g` fixes at most `w₂` irreducibles, and the `w₂` distinct `χ_j` already
 exhaust them), and the complement `L = K ⋊ W₁` then forces the inertia group down to `K`. -/
 
+omit [Fintype L] in
 /-- **Bridge: inertia ↔ conjugation-permutation fixed point.**  For `g : L` and `θ ∈ Irr(K)`, `g`
 lies in the inertia group of `θ` iff `θ` is fixed by the conjugation permutation
 `IrreducibleCharacter.conjByPerm g` (whose fixed-point count is bounded by `card_fixed_irr_le_W2`). -/
@@ -828,6 +832,7 @@ theorem chiRestrict_injective [NeZero (Nat.card h.W1)] :
   rw [hLHS, hRHS] at key
   exact one_ne_zero key
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **The number of columns is `w₂`** (`|Ŵ₂| = |W₂|`, Pontryagin self-duality
 `card_charGroup_subgroupOf`).  Together with `chiRestrict_injective` this gives `w₂` distinct
 `χ_j ∈ Irr(K)`, matching the `card_fixed_irr_le_W2` bound. -/

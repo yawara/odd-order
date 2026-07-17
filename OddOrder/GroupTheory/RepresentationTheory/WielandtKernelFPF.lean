@@ -115,6 +115,7 @@ open OddOrder.GroupTheory.CenterModuleDecomp (centerProj)
 
 variable {k : Type*} [Field k] [Fintype G] [Invertible (Fintype.card G : k)]
 
+omit [Finite G] in
 /-- **The averaging idempotent absorbs right multiplication.**  `average · z = (aug z) • average`
 for every `z ∈ k[G]`: right-multiplying by a group element fixes `average`
 (`GroupAlgebra.mul_average_right`), and a general `z` contributes its augmentation coefficient. -/
@@ -129,6 +130,7 @@ theorem average_mul (z : MonoidAlgebra k G) :
         rw [MonoidAlgebra.smul_single, smul_eq_mul, mul_one],
       mul_smul_comm, GroupAlgebra.mul_average_right]
 
+omit [Finite G] in
 /-- The averaging idempotent absorbs left multiplication too: `z · average = (aug z) • average`. -/
 theorem mul_average (z : MonoidAlgebra k G) :
     z * average k G = MonoidAlgebra.lift k k G 1 z • average k G := by
@@ -210,6 +212,7 @@ theorem range_centerProj_aug_eq_invariants {W : Type*} [AddCommGroup W] [Module 
   rw [centerProj_aug_eq_averageMap φ ρ haug]
   exact (isProj_averageMap ρ).range
 
+omit [Finite G] in
 /-- The augmentation coordinate `i₀` is fixed by every `simplesAction φ α` (it is *the* trivial
 simple).  Proof: applying `aug` to `centerRep_apply_symm_single` and using `aug`-invariance of
 `centerRep` (`aug_centerRep`) shows the idempotent at `simplesAction φ α i₀` has augmentation `1`,
@@ -284,7 +287,7 @@ Frobenius complement `E` permutes the `A i` by `simplesAction φ ∘ ψ` (item 0
 theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
     (ρ : Representation k L W) {U E : Subgroup L} [U.Normal]
     [Fintype ↥E] [Invertible (Fintype.card ↥E : k)] [NeZero (Nat.card ↥U : k)]
-    (hsup : U ⊔ E = ⊤)
+    (_hsup : U ⊔ E = ⊤)
     (hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥U))
     (hEnt : 1 < Nat.card ↥E)
     (hfpf : ∀ e ∈ E, e ≠ 1 → ∀ u ∈ U, e * u * e⁻¹ = u → u = 1)

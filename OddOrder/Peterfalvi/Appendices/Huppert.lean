@@ -416,6 +416,7 @@ section Maschke
 
 variable {E : Type*} [Group E] [Finite E] {P : Type*} [Group P] [Finite P]
 
+omit [Finite E] in
 /-- **Operator Maschke for an elementary abelian group**: a coprime `MulAut`-action of `P`
 on an elementary abelian `q`-group `E` splits any `P`-invariant subgroup off via a
 `P`-invariant complement.  This is the module-Maschke input for the Lemma's reducible

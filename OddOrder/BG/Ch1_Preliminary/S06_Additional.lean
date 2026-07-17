@@ -480,6 +480,7 @@ private theorem inf_eq_bot_of_coprime_card {H K : Subgroup G}
   exact Subgroup.card_eq_one.mp hone
 
 
+omit [Finite G] in
 /-- **BG Lemma 6.5(a)** (mmd L2054): `G` 可解, `K ⊴ G`, `G = KU`, `H ≤ U`,
 `(|H|, |K|) = 1` のとき `H ∩ G' = H ∩ U'`。 -/
 theorem inf_commutator_eq_of_coprime [IsSolvable G] {K U H : Subgroup G} [K.Normal]
@@ -1026,6 +1027,7 @@ theorem oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow (S : Sylow p G)
     rw [hM, hN]
     exact Ch03.oPiCore_compl_le_oPiPrimePiCore {p} G
 
+omit [IsSolvable G] in
 /-- **BG Lemma 6.6(1b)** (mmd L2092): `p`-length 1 で `G = O_{p'}(G) · N_G(S)`.
 
 Frattini を `N = O_{p',p}(G)` の中の Sylow `S` に適用すると `N_G(S) · N = G`。foundation で
@@ -1080,7 +1082,7 @@ Lem 6.5(c) を `K = O_{p'}(G)`, `U = N_G(S)`, `H = ⟨Y⟩`, `g = x` に適用�
 `⟨Y⟩^x = ⟨x⁻¹Yx⟩ ≤ S ≤ N_G(S)` (`hYx`)。出力 `c ∈ C_G(⟨Y⟩) ⊓ M ≤ C_G(Y)`。 -/
 theorem exists_mem_centralizer_mul_normalizer_of_conj_subset_sylow (S : Sylow p G)
     (hpl1 : OddOrder.BG.Ch1.hasPLengthOne p G)
-    {Y : Set G} (hYne : Y.Nonempty) (hYS : Y ⊆ (S : Subgroup G))
+    {Y : Set G} (_hYne : Y.Nonempty) (hYS : Y ⊆ (S : Subgroup G))
     {x : G} (hYx : ∀ y ∈ Y, x⁻¹ * y * x ∈ (S : Subgroup G)) :
     ∃ c ∈ Subgroup.centralizer Y, ∃ g ∈ Subgroup.normalizer (S : Subgroup G), c * g = x := by
   set M : Subgroup G := Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G with hM
@@ -1160,6 +1162,7 @@ private theorem exists_mem_oPiPrimePiCore_conj_le_sylow (S : Sylow p G)
   rw [inf_of_le_left hconjQN, inf_of_le_left hSN] at hmapped
   exact hmapped
 
+omit [IsSolvable G] in
 /-- **BG Lemma 6.6(4)** (mmd L2103): `p`-length 1 で, `p`-部分群 `Q` に対し
 `∃ x ∈ C_G(Q ⊓ S)`, `Q^x ⊆ S` (`Q.comap (conj x) ≤ S`, = `x⁻¹Qx ⊆ S`)。
 
@@ -1271,7 +1274,7 @@ private theorem oPiCore_singleton_le_oPiPrimePiCore :
   rw [Ch04.oPiCore_singleton_eq_opCore]
   exact opCore_le_oPiPrimePiCore p
 
-omit [IsSolvable G] in
+omit [IsSolvable G] [Finite G] in
 /-- `⟨x⟩` is `p`-elementary abelian when `x ^ p = 1`. -/
 private theorem zpowers_isElementaryAbelian_of_pow_eq_one {x : G} (hxp : x ^ p = 1) :
     (Subgroup.zpowers x).IsElementaryAbelian p := by
@@ -1307,7 +1310,7 @@ private theorem mem_of_mem_centralizer_pow_eq_one
     exact this.eq
   exact (hE.le_of_le_centralizer hX hEcent) (Subgroup.mem_zpowers x)
 
-omit [IsSolvable G] in
+omit [IsSolvable G] [Fact (Nat.Prime p)] in
 /-- **O_{p'}(G) = ⊥ ⟹ O_{p',p}(G) = O_p(G)**: if the lower `p'`-layer is trivial, the
 `O_{p',p}` layer collapses to the `p`-radical. (`oPiPrimePiCore π G = comap (mk' M) (oPiCore π
 (G/M))` with `M = ⊥`; `mk' ⊥` is the inverse of `quotientBot`, and `oPiCore` transports.) -/

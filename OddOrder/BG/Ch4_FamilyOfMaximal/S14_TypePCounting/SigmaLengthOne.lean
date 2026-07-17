@@ -595,7 +595,7 @@ theorem ne_one_of_mem_sigmaConjugacySaturation {M : Subgroup G} {x : G}
 `σ`-maximals (`x = t^a` with `t ∈ M_σ^#` puts `x ∈ (M^a)_σ`).  This routes `Rsub_ncard_eq`
 (needs `ℓ_σ(x) = 1`) and the fibre identification of Lemma 14.5(c). -/
 theorem length_one_of_mem_sigmaConjugacySaturation [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
     (hx : x ∈ sigmaConjugacySaturation M) :
     D.length x = 1 ∧ ∃ a : G, MulAut.conj a • M ∈ maximalSigmaSubgroupsOfElement x := by

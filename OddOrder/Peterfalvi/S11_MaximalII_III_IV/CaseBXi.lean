@@ -431,6 +431,7 @@ theorem caseA_hInHu_le_realizedS0_sup_realizedComplement [Finite G] {M : Subgrou
   exact Subgroup.mul_mem_sup (Subgroup.mem_subgroupOf.mp ha) (Subgroup.mem_subgroupOf.mp hb)
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`H ⊄ Ker ζ_{θ₁,λ}`** (`ζ_{θ₁,λ} ∈ 𝒳`): the irreducible `ζ_{θ₁,λ}` is nontrivial on
 `H = hInHu`.  Single-factor mirror of `hcZetaPair_mem_xiSet` — the pair restricts on `hInHu` to the
 inflation `θ₀` (`hcuPsiPair_apply_inclusion`), so `H ⊆ Ker` would force `θ = 1`. -/
@@ -495,6 +496,7 @@ theorem hcuZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
   exact hψker
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`ζ_{θ₁,λ} ∈ 𝒳(H₀U')`**: combining `H ⊄ Ker` (`hcuZetaPair_mem_xiSet`) and `H₀U' ⊆ Ker`
 (`hcuZetaPair_H0supUprime_subset_ker`).  The source character of the (9.8.d) `𝒮(H₀U')`-member
 `Ind_{HU}^M ζ_{θ₁,λ}`.  Single-factor mirror of `hcZetaPair_mem_xiOf`. -/
@@ -738,6 +740,7 @@ theorem hcPairHom_inclusion_cInHu [Finite G] {M : Subgroup G}
     hcLambdaHom_inclusion chief lam c]
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`C ⊆ Ker ζ_{θ,λ}` forces `λ = 1`** (the (9.9.c) rigidity): if the realized `C` lies in
 the kernel of `ζ_{θ,λ} = Ind_{HC}^{HU}(ψ_{θ,λ})`, then kernel descent
 (`mem_characterKernel_of_mem_characterKernel_induce`, `HC ◁ HU`) puts `C` in the kernel of the
@@ -778,6 +781,7 @@ theorem lam_eq_one_of_cInHu_subset_ker_zetaPair [Finite G] {M : Subgroup G}
   simp only [hcPsiPair, linearIrreducibleCharacter_apply, hcPairHom_inclusion_cInHu chief θ lam c]
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Peterfalvi (9.9.c), the `C = 1` half**: in Clifford case (b), if `𝒮(H₀C')` contains no
 irreducible character then `C = ⊥`.  Otherwise take `θ ≠ 1` on `H̄`
 (`exists_chiefFactorHom_ne_one`) and `λ ≠ 1` on `C` trivial on `C'`

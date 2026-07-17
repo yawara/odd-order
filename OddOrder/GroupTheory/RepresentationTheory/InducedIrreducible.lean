@@ -255,6 +255,7 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
     Nat.card_eq_fintype_card]
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **The conjugate-orbit sum is a virtual character**: each summand of the orbit
 `{θ^{x⁻¹} : x ∈ G}` is (the coercion of) an irreducible character of `H`
 (`IrreducibleCharacter.conjBy`), so the sum lies in `ℤ[Irr H]`.  Together with
@@ -270,6 +271,7 @@ theorem orbitSum_mem_ZIrr [Finite H] (θ : IrreducibleCharacter H) :
   exact (IrreducibleCharacter.conjBy x⁻¹ θ).2.mem_ZIrr
 
 open scoped Classical in
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **Distinct-fibre orbit sums are orthogonal**: if `Ind_H^G θ ≠ Ind_H^G θ'`, the conjugate
 orbits of `θ` and `θ'` are disjoint sets of irreducibles (`induce_conjBy_eq` — a common
 conjugate would force equal inductions), so the orbit sums are orthogonal
@@ -352,6 +354,7 @@ theorem induce_injective_of_inertia_stable {θ ψ : IrreducibleCharacter H}
   obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ ψ).mp h
   rw [← hg]; exact hθ g
 
+omit [Fintype G] in
 /-- **Orbit size = inertia index.**  The `G`-conjugation orbit of `θ ∈ Irr H` (`H ⊴ G`) has
 cardinality `[G : I_G(θ)]`, via the coset parametrization `conjByOrbitEquivLeftCosets`.  Together
 with `induce_eq_induce_iff_conj` (orbit = fibre of `θ ↦ Ind θ`) this gives the multiplicity with
@@ -361,6 +364,7 @@ theorem card_conjByOrbit_eq_index_inertia (θ : IrreducibleCharacter H) :
       (IrreducibleCharacter.inertia (G := G) (H := H) θ).index :=
   (Nat.card_congr (IrreducibleCharacter.conjByOrbitEquivLeftCosets (G := G) (H := H) θ)).symm
 
+omit [Fintype G] in
 /-- **Conjugation preserves degree.**  `(θ^g)(1) = θ(1)`: conjugation evaluates `θ` at
 `g · 1 · g⁻¹ = 1`. -/
 @[simp] theorem conjBy_apply_one (g : G) (θ : IrreducibleCharacter H) :
@@ -907,7 +911,7 @@ and `(α,β) = 0` forces `(β,γ) = 0`.  Expanding `(α−β, u•γ−v•δ) =
 `(α−β)(1) = 0`, i.e. `α(1) = β(1)`) gives `0 = 2uεα(1)`, contradicting `u ≠ 0`, `ε ≠ 0`,
 `α(1) ≠ 0`. -/
 theorem inner_eq_zero_of_orthogonal_signedDifference
-    {α β γ δ : ClassFunction Γ ℂ} {u v : ℝ} (hu : u ≠ 0) (hv : v ≠ 0)
+    {α β γ δ : ClassFunction Γ ℂ} {u v : ℝ} (hu : u ≠ 0) (_hv : v ≠ 0)
     (hα : α ∈ ZIrr Γ) (hαn : ClassFunction.inner α α = 1)
     (hβ : β ∈ ZIrr Γ) (hβn : ClassFunction.inner β β = 1)
     (hγ : γ ∈ ZIrr Γ) (hγn : ClassFunction.inner γ γ = 1)

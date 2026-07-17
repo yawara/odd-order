@@ -48,6 +48,7 @@ section InnerConj
 
 variable [Fintype G] [Invertible (Nat.card G : ℂ)]
 
+omit [Finite G] in
 /-- **Conjugation identity for the inner product**: `⟨φ, ψ̄⟩ = star ⟨φ̄, ψ⟩`.  Both sides equal
 `⅟|G| ∑_g φ(g) ψ(g)` (unfolding `star` on the conjugates).  For **real** `φ` (`φ̄ = φ`) this gives
 `⟨φ, ψ̄⟩ = star ⟨φ, ψ⟩`, the Fourier-coefficient symmetry used in the (7.9) parity argument. -/

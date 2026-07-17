@@ -49,7 +49,7 @@ theorem mem_agemo_iff_of_comm {H : Type*} [CommGroup H] {p n : ℕ} {x : H} :
 /-- The maximality predicate making `S` a Sylow `p`-subgroup *of `M`* as well: any `p`-subgroup
 `R` of `M` containing `S` equals `S`. Holds because `S` is already a Sylow `p`-subgroup of `G`. -/
 theorem sylow_maximal_in_M_of_le {p : ℕ} [Fact p.Prime] {M : Subgroup G} [Finite G]
-    {S : Sylow p G} (hSM : (S : Subgroup G) ≤ M) :
+    {S : Sylow p G} (_hSM : (S : Subgroup G) ≤ M) :
     ∀ R : Subgroup G, (S : Subgroup G) ≤ R → R ≤ M → IsPGroup p ↥R → R = (S : Subgroup G) := by
   intro R hSR _ hRpg
   refine (Subgroup.eq_of_le_of_card_ge hSR ?_).symm
@@ -1035,6 +1035,7 @@ theorem exists_generator_of_card_prime [Finite G] {p : ℕ} [Fact p.Prime] {L : 
     (by rw [Nat.card_zpowers, hord]; exact hLp.le)⟩
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Theorem 12.12, Case 3, the `C_E(S) = E` branch** (BG L3349-3358): in the abelian-Sylow
 regime with the regularity hypothesis, if `C_E(S) = E` then `S` has a cyclic subgroup `Z` of
 exponent `exp(S)`, normalized by `E`, acting regularly on `M_σ`. (Construction avoiding the
@@ -1046,7 +1047,7 @@ theorem exists_cyclic_Enormal_regular_of_CES_eq [Finite G] (hG : IsMinimalSimple
     (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
     {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
     (hSab : IsMulCommutative ↥(S : Subgroup G))
-    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+    (_hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
       S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥)
     (hCES : Subgroup.centralizer ((S : Subgroup G) : Set G) ⊓ E = E) :
     ∃ Z : Subgroup G, Z ≤ (S : Subgroup G) ∧ IsCyclic ↥Z ∧ Z ≠ ⊥ ∧

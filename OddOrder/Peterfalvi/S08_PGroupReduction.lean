@@ -412,6 +412,7 @@ theorem nonempty_coherent_S_of_c2_of_branches (hyp : SibleyDadeHypothesis G L H)
   · exact hcaseB hp hHp hB
   · exact hcaseA hp hHp hA
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8) case A/B split** (discharges `hsplit` of `nonempty_coherent_S_of_c2_of_branches`).
 Since `W₂ ≤ H` is of prime order, `W₂.subgroupOf H` has prime order too, so the subgroup
 `(W₂.subgroupOf H) ⊓ Z(H)` is either trivial (case A: `Z(H) ∩ W₂ = 1`) or all of `W₂.subgroupOf H`

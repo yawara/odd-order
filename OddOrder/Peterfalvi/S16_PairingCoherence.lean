@@ -190,7 +190,7 @@ theorem zeta_deg_match :
   rw [induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)]
 
 /-- `ψ_i = ζ_i − d_i ζ_0` is supported on `A(L)`. -/
-theorem psi_support (hG : OddOrder.BG.IsMinimalSimpleOdd G) (i : Fin (data.n + 1)) :
+theorem psi_support (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (i : Fin (data.n + 1)) :
     (data.zeta i - data.d i • data.zeta 0).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L := by
   haveI := data.kernelIn_normal
@@ -499,7 +499,7 @@ noncomputable def betaDecomp (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
 `extension_mapRingEquiv_comm`): each `Ind θ ∈ S` vanishes off the normal kernel
 (`Sset_vanishes_off_H`), so `ℤ[S] ⊆ {ψ | supp ψ ⊆ H}` by span induction; vanishing at `1`
 then lands the support in `H^# = A(L)`. -/
-theorem zSpan_Sset_support_subset (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem zSpan_Sset_support_subset (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {φ : ClassFunction ↥L ℂ}
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan data.typeIHyp.Sset) (h1 : φ 1 = 0) :
     φ.support ⊆ data.typeIHyp.A := by
@@ -694,7 +694,7 @@ theorem dadeSupport_eq (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
 
 /-- **The type-I support is the `A₁`-support**: `A(L) = A₁(L) = (L_F)^#` (both are the
 sharp Fitting kernel). -/
-theorem typeIA_eq_A1 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+theorem typeIA_eq_A1 (_hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     typeIA L data.typeIHyp.typeI = A1 L PeterfalviType.I := by
   rw [data.typeIA_eq_sharp]
   change (data.kernel : Set G) \ {1} = sharpSubgroup (maxNilpotentNormalHall L)

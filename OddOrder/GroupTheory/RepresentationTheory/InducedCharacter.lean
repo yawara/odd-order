@@ -815,6 +815,7 @@ section InducedTrivialNorm
 
 variable [Invertible (Nat.card G : ℂ)]
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **Restriction of the induced trivial character to a normal `H`**: `Res_H Ind_H^G 1_H = [G:H]•1_H`.
 Every `G`-conjugate of `h ∈ H` stays in `H` (normality), so `Ind_H^G 1_H` is the constant `[G:H]` on
 `H` (`induce_apply_of_mem_normal_of_const`). -/

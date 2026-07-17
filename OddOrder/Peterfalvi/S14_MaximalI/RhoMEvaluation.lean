@@ -457,7 +457,7 @@ theorem counterexample_psi_int_on_K_sub_Kprime [Finite G]
     {g : G} (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime) :
     ∃ z : ℤ, ψ g = (z : ℂ) :=
   rhoM_integer_values hψZ
-    (fun g₁ g₂ h1 h2 h3 h4 =>
+    (fun _g₁ _g₂ h1 h2 h3 h4 =>
       counterexample_psi_constant_on_K_sub_Kprime hG hnoV data hyp coh data0 hchi0 hchi0_mem
         hpsi hypM h1 h2 h3 h4)
     g hgK hgK'

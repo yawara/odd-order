@@ -317,6 +317,7 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp_T [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Peterfalvi (9.11.1), the `T`-instance (5.6) pair-bound residual** (mirror of
 `nineElevenPairBoundS`, issue 2035 refuter-`T` campaign; the M-side provider
 `S11.nineElevenPairBound` requires `htype : IsTypeIII M ∨ IsTypeIV M` — false for the type-II

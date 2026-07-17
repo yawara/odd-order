@@ -161,7 +161,7 @@ lemma smulSection_spec (g : G) (f : G ⧸ K → G)
 
 /-- Translating the outer-section transversal: `g • range f = range (smulSection g f)`. -/
 lemma smul_range_section (g : G) (f : G ⧸ K → G)
-    (hf : Function.RightInverse f QuotientGroup.mk) :
+    (_hf : Function.RightInverse f QuotientGroup.mk) :
     g • Set.range f = Set.range (smulSection g f) := by
   ext y
   constructor
@@ -306,7 +306,7 @@ section with the same fiber section. -/
 lemma smul_range_compSection (g : G) (f : G ⧸ K → G)
     (hf : Function.RightInverse f QuotientGroup.mk)
     (s : ↥K ⧸ H.subgroupOf K → ↥K)
-    (hs : Function.RightInverse s QuotientGroup.mk) :
+    (_hs : Function.RightInverse s QuotientGroup.mk) :
     g • Set.range (compSection hHK f hf s)
       = Set.range (compSection hHK (smulSection g f) (smulSection_spec g f hf) s) := by
   -- both sides are sections of G ⧸ H differing by the reparametrization q ↦ g • q;

@@ -77,7 +77,7 @@ theorem card_odd_of_isMinimalSimpleOdd [Finite G] (hG : OddOrder.BG.IsMinimalSim
 (`coprime_card_kernel_complement`).  This is the coprimality input of the `W₁`-fixed-point
 lifting on `M'/M''` behind the h56 anchor (Peterfalvi (8.4.d)). -/
 theorem coprime_card_W1_derived [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(derivedInG M)) := by
   haveI : Fintype G := Fintype.ofFinite _
@@ -872,7 +872,7 @@ theorem exists_source_of_coherence_dichotomy
     (hzS : params.zeta ∈ inducedFamily M)
     (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
-    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    (_chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     {A' B : Subgroup ↥M} [A'.Normal]
     [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
     [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]

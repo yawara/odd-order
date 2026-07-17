@@ -111,7 +111,7 @@ theorem zpowers_mem_ker_restrict [IsMulCommutative A] (φ : A →* MulAut G) (a 
 noncomputable def quotAction [IsMulCommutative A] (φ : A →* MulAut G) (a : A) :
     (A ⧸ Subgroup.zpowers a) →* MulAut ↥(actionFixedBy φ a) :=
   QuotientGroup.lift (Subgroup.zpowers a) (isAInvariant_actionFixedBy φ a).restrict
-    (fun x hx => zpowers_mem_ker_restrict φ a hx)
+    (fun _x hx => zpowers_mem_ker_restrict φ a hx)
 
 /-- Compatibility: the `A ⧸ ⟨a⟩`-action on `C_G(a)`, evaluated at `mk z`, agrees with `φ z`. -/
 theorem quotAction_mk_apply_val [IsMulCommutative A] (φ : A →* MulAut G) (a : A) (z : A)

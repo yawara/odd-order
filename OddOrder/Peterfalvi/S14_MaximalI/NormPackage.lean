@@ -475,7 +475,7 @@ theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
     (data : RankTwoWitnessData ctr) (hLeq : L = data.L)
-    {g : G} (hg_comm : Commute data.x g) (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime)
+    {g : G} (_hg_comm : Commute data.x g) (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime)
     (hyp : Hypothesis L) (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
     (dade : DadeNotation hyp)
     (hψeq : dade.psi = coh.extension dade.chi)

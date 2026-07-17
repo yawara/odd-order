@@ -52,6 +52,7 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **The certain-type column set is closed under conjugation** (`hS₀conj` for the case-(B) cover).
 A member of `certainTypeSet h46 k` is a column `columnSum h46 χ₂` (`χ₂ ≠ 1`, degree-matched); its
 conjugate is the *inverse* column `columnSum h46 χ₂⁻¹` (`columnSum_conj_eq`), which is again a member
@@ -140,7 +141,7 @@ theorem caseB_Xset_conjugatePairCover
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
-    (hbase : OddOrder.Peterfalvi.S06.certainTypeSet h46 k ⊆ hyp.Xset h46.W2)
+    (_hbase : OddOrder.Peterfalvi.S06.certainTypeSet h46 k ⊆ hyp.Xset h46.W2)
     (hnonS₀_irr : ∀ χ ∈ hyp.Xset h46.W2,
       χ ∉ OddOrder.Peterfalvi.S06.certainTypeSet h46 k → IsIrreducibleCharacter χ) :
     ∃ (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)

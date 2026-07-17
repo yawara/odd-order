@@ -951,7 +951,7 @@ itself cyclic — it is (noncanonically) isomorphic to the underlying group
 *power enumeration* by a generator — the structure-preserving grid indexing of Peterfalvi (3.5)
 under which index negation is character inversion ((3.9.a)). -/
 theorem isCyclic_charGroup_subgroupOf (hyp : TICyclicHypothesis G) {H : Subgroup G}
-    (hHW : H ≤ hyp.W) :
+    (_hHW : H ≤ hyp.W) :
     IsCyclic ((H.subgroupOf hyp.W) →* ℂˣ) := by
   haveI := hyp.W_cyclic
   haveI : Finite G := Finite.of_fintype G

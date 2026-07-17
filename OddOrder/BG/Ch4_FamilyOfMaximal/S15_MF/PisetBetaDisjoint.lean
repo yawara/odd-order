@@ -538,7 +538,7 @@ dichotomy): if a prime `r` divides `M_F` and lies in `β(M)`, then `r_r(M_F) ≥
 `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` as the contradiction target against the `< 3`
 bound coming from `C_{M_F}(X₁)`. -/
 theorem three_le_pRank_mf_of_mem_beta [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (_hM : M ∈ maximalSubgroups G)
     {r : ℕ} (hrπ : r ∈ S14.piSet (MF M)) (hrβ : r ∈ OddOrder.BG.Ch3.S10.beta M) :
     3 ≤ pRank ↥(MF M) r := by
   have hrmem : r ∈ (Nat.card ↥(MF M)).primeFactors := hrπ
