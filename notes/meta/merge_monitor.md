@@ -716,6 +716,23 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #24、Fable hub) — ✅ b + c 合流 (a 変化なし)、census 23 不変**:
+  **b** = `e362436d` (**Thm 8.43 + K_m 共役等変性**、CommonDivisorGraph 890 行) を merge `b623e60f`:
+  build **4342 jobs green**。**c** = `2c932068` (**Cor 10.23** Δ(K)‾ ≅ K/K' via (k−1)‾ ↦ K'k、
+  AugmentationIdeal +359 = **1164 行**) を merge `b98554c2`: build **4342 jobs green**。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK・逸脱なし。push `f5b65977..b98554c2`。
+  size watch: AugmentationIdeal 1164 行 (1500 接近) — c 自身が「10.24/10.25 は新 leaf」と宣言済 ✓。
+- **2026-07-17 (tick #23、Fable hub) — ✅ a/b/c 全 3 レーン合流、census 23 不変。⭐ a が Isaacs Ch.5 完走 (全 30 結果)**:
+  **a** = `7fe79bc1` (**Thm 5.24** nilpotent maximal ⟹ p-群、NilpotentMaximal.lean 新設 313 行・自力
+  wiring / **Ch.5 完走記録 = 全 30 番号付き結果形式化完了** / **Thm 6.4 (2)⇒(1)** TI ⟹ Frobenius action =
+  Ch.6 着手 / AxiomsCheck 5.24+4.29 登録) を merge `2be48021`: build **4324 jobs green**。
+  **b** = `ac064e4f` (**Thm 8.41** common-divisor graph ≤ 3 成分 + **Thm 8.42(b)** k_m ∣ n、
+  CommonDivisorGraph 688 行) を merge `fee3fa6f`: build **4342 jobs green**。
+  **c** = `e8435e09` (**Lem 10.21** fₜ(Δ(K)Δ(G)) ⊆ Δ(K) + **Cor 10.22** Δ(K)² = Δ(K)Δ(G) ∩ ℤ[K]、
+  AugmentationIdeal 805 行) を merge `22178b21`: build **4342 jobs green**。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK・逸脱なし。push `aef6abcd..22178b21`。
+  ⚠ size watch: **Ch06 FrobeniusGroup.lean 1462 行 (1500 接近)** — a は Ch.6 の次の主結果から新 leaf
+  必須 (規約どおり)。超過したら hub が分割 (0122/1036 と同手順)。
 - **2026-07-17 (tick #22、Fable hub) — ✅ a/b/c 全 3 レーン合流、census 23 不変**:
   **a** = `87e5b628` (**Lem 4.6 一般化** [Finite G] 除去 + **Lem 4.29 unconditional** coprimality のみで
   [G,A,A]=[G,A] = specialized 債務解消 2 件 / AxiomsCheck Ch05 mains 登録 / issue 0002/0003 close) を
