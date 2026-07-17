@@ -21,11 +21,18 @@ Prop 2.2 = char-free 化)。**§2 = 7 結果、残りは Lem 2.7 のみ**。
 **まず PDF から statement を復元**すること (Nougat 再実行でなく `Read pages=N` で BG PDF の
 §2/§3 境界ページ = Thm 2.6 の後、§3 の前。[[nougat-missing-page-recovery]])。
 
-## 推定 statement (survey L309 より、PDF で確認要)
+## ✅ statement 復元済 (2026-07-18, PDF pdftotext, book p.16-17; mmd MISSING_PAGE_FAIL:29 も復元)
 
-`p ≠ q` primes, `P ≅ (Z/p)²` elementary abelian, `Q ≅ (Z/q)²`, `Q ⊆ Aut(P)` faithful ⟹
-(a) `q ∣ p − 1`; (b) ある `α ∈ Q^#` が `P` 上 scalar として作用 (survived tail の `λ^q=1` と整合:
-`Q` の作用は各 eigen-line 上 `q` 乗根 scalar、`F_p^×` の `q`-torsion ゆえ `q | p−1`)。
+> **Lemma 2.7.** Suppose that `p` and `q` are distinct primes, `P` and `Q` are elementary abelian
+> groups of order `p²` and `q²` respectively, and `Q ⊆ Aut(P)`. Then
+> (a) `q` divides `(p − 1)`, and
+> (b) there exists an element `α ∈ Q^#` and an integer `r` such that `xα = xʳ` for every `x ∈ P`,
+> `rq ≡ 1 (mod p)`, and `r ≢ 1 (mod p)`.
+
+**証明** (BG): `P` を `F_p` 上 2 次元空間、`Q` を線型変換群とみる。`Q` abelian かつ非 cyclic ゆえ
+`Q` は `P` 上既約でない (G Thm 3.2.3 = 有限 abelian が忠実既約表現を持てば cyclic)。よって
+`P = P₁ ⊕ P₂` (1 次元 `Q`-部分加群)。各 `Pᵢ` 上 `Q` は scalar character `χᵢ` で作用。
+忠実性 + `Q ≅ (Z/q)²` で (a) `q|p−1`、(b) 非自明 scalar 元 (`χ₁=χ₂` の核、位数 ≥ q > 1)。
 
 ## やること
 
