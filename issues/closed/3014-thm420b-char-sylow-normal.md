@@ -43,3 +43,10 @@ Thm 4.20 行「済」(⟹ 全 (a)(b)(c) 完成)。
 ## 参照
 
 - BG mmd L1779-1793、既存 S05_NarrowPGroups (4.20(a)(c))
+
+## ✅ 完了 (2026-07-18)
+
+`S05_Thm420b.characteristic_le_derived_normal_of_rank_fitting_le_two`、sorry-free・axiom-clean・
+AxiomsCheck 登録・full build green (4310 jobs)。Fitting は ⨆_q O_q(G) iSup 分解で扱い、Frattini は
+normalizer_sup_eq_top'、char-transport は mathlib-only helper。⟹ BG Thm 4.20 全 (a)(b)(c) 済。
+BG §4 の numbered 結果は全完成、残は特殊化債務 (Thm 4.12(b)(c)/Cor 4.19) のみ。
