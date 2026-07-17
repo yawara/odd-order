@@ -153,6 +153,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 /-!
@@ -6949,6 +6950,14 @@ cyclic subgroup normal in `D` asserted by Proposition 2. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_isCyclic
+
+/-! **Peterfalvi Appendix III, Definition 1**: Suzuki `2`-groups are encoded
+honestly as nonabelian `2`-groups with at least two involutions and a cyclic
+subgroup of automorphisms acting regularly on the involutions.  Faithfulness is
+built into the subgroup inclusion in `MulAut`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
