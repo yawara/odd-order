@@ -929,4 +929,138 @@ theorem mem_augmentationRingIdeal_iff_mem_augmentationIdeal
 
 end CommQuotient
 
+section Lemma1027
+
+/-! ### Lemma 10.27 (Isaacs pp. 316-317)
+
+If `ε ∈ ℤ[G]` annihilates `Δ(G)‾` and `ε = ∑_q e_q·f(q)` is supported on a
+system of coset representatives, then all coefficients `e_q` are equal.  The
+argument pushes `ε(g-1) ∈ Δ(K)Δ(G)` through the projection `π : ℤ[G] → ℤ[G/K]`
+(which kills `Δ(K)Δ(G)`), reducing to the fact that a right-invariant element
+of a finite group ring has constant coefficients. -/
+
+/-- A right-invariant element of a group ring has constant coefficients:
+`η·s = η` for all `s` forces `η a = η b`. -/
+theorem apply_eq_of_forall_mul_of_eq {H : Type*} [Group H]
+    {η : MonoidAlgebra ℤ H}
+    (hinv : ∀ s : H, η * MonoidAlgebra.of ℤ H s = η) (a b : H) :
+    η a = η b := by
+  have key : ∀ s : H, η (a * s⁻¹) = η a := by
+    intro s
+    have h1 : (η * MonoidAlgebra.of ℤ H s) a = η (a * s⁻¹) := by
+      rw [MonoidAlgebra.of_apply, MonoidAlgebra.mul_single_apply, mul_one]
+    rw [hinv s] at h1
+    exact h1.symm
+  have h2 := key (b⁻¹ * a)
+  rw [mul_inv_rev, inv_inv, ← mul_assoc, mul_inv_cancel, one_mul] at h2
+  exact h2.symm
+
+variable [hK : K.Normal] [K.FiniteIndex]
+
+omit [K.FiniteIndex] in
+/-- `π = mapDomain (G → G/K)` kills `Δ(K)`. -/
+theorem mapDomain_eq_zero_of_mem_augmentationIdealOf
+    {a : MonoidAlgebra ℤ G} (ha : a ∈ augmentationIdealOf G K) :
+    MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) a = 0 := by
+  induction ha using Submodule.span_induction with
+  | mem z hz =>
+    obtain ⟨k, rfl⟩ := hz
+    have hk1 : (QuotientGroup.mk' K (k : G) : G ⧸ K) = 1 := by
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact k.2
+    rw [map_sub, map_one, MonoidAlgebra.of_apply,
+      MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
+      hk1, ← MonoidAlgebra.one_def, sub_self]
+  | zero => rw [map_zero]
+  | add x y _ _ ihx ihy => rw [map_add, ihx, ihy, add_zero]
+  | smul c x _ ihx => rw [map_smul, ihx]; exact smul_zero c
+
+omit [K.FiniteIndex] in
+/-- `π = mapDomain (G → G/K)` kills the ideal `Δ(K)Δ(G)`. -/
+theorem mapDomain_eq_zero_of_mem_mul
+    {x : MonoidAlgebra ℤ G}
+    (hx : x ∈ augmentationIdealOf G K * augmentationIdeal G) :
+    MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x = 0 := by
+  refine Submodule.mul_induction_on' (fun a ha b _ => ?_)
+    (fun u v _ _ hu hv => ?_) hx
+  · rw [map_mul, mapDomain_eq_zero_of_mem_augmentationIdealOf G K ha, zero_mul]
+  · rw [map_add, hu, hv, add_zero]
+
+omit [K.FiniteIndex] in
+/-- If `ε` annihilates `Δ(G)‾` (i.e. `Ξ_ε = 0`), then `ε·α ∈ Δ(K)Δ(G)` for
+every `α ∈ Δ(G)`. -/
+theorem mul_mem_of_augmentationCoquotientMulLeft_eq_zero
+    {ε : MonoidAlgebra ℤ G}
+    (hε : augmentationCoquotientMulLeft G K hK ε = 0)
+    {α : MonoidAlgebra ℤ G} (hα : α ∈ augmentationIdeal G) :
+    ε * α ∈ augmentationIdealOf G K * augmentationIdeal G := by
+  have h := DFunLike.congr_fun hε (Submodule.Quotient.mk ⟨α, hα⟩)
+  rw [augmentationCoquotientMulLeft_mk, LinearMap.zero_apply,
+    Submodule.Quotient.mk_eq_zero] at h
+  exact mem_augmentationCorel.mp h
+
+/-- The transversal sum weighted by `e : G/K → ℤ` (Isaacs' `ε = ∑_t e_t t`). -/
+noncomputable def sectionWeightedSum (e : G ⧸ K → ℤ) (f : G ⧸ K → G) :
+    MonoidAlgebra ℤ G :=
+  letI := K.fintypeQuotientOfFiniteIndex
+  ∑ q : G ⧸ K, MonoidAlgebra.single (f q) (e q)
+
+/-- `π(∑_q e_q·f(q)) = ∑_q e_q·q`, the finsupp with coefficient `e_q` at `q`. -/
+theorem mapDomain_sectionWeightedSum (e : G ⧸ K → ℤ) {f : G ⧸ K → G}
+    (hf : ∀ q, (↑(f q) : G ⧸ K) = q) (q : G ⧸ K) :
+    (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+        (sectionWeightedSum G K e f)) q = e q := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  rw [sectionWeightedSum, map_sum]
+  have hterm : ∀ p : G ⧸ K,
+      (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+        (MonoidAlgebra.single (f p) (e p)))
+        = MonoidAlgebra.single p (e p) := by
+    intro p
+    rw [MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
+      QuotientGroup.mk'_apply, hf p]
+  simp_rw [hterm]
+  change (∑ p : G ⧸ K, (Finsupp.single p (e p) : (G ⧸ K) →₀ ℤ)) q = e q
+  rw [Finsupp.finsetSum_apply]
+  refine Eq.trans (Finset.sum_eq_single q ?_ ?_) Finsupp.single_eq_same
+  · intro p _ hp
+    exact Finsupp.single_eq_of_ne hp.symm
+  · intro h
+    exact absurd (Finset.mem_univ q) h
+
+/-- **Isaacs Lemma 10.27**, key step (pp. 316-317): if `ε = ∑_q e_q·f(q)` (for
+a system `f` of coset representatives) annihilates `Δ(G)‾`, then all the
+coefficients `e_q` are equal. -/
+theorem sectionWeightedSum_coeff_const
+    {f : G ⧸ K → G} (hf : ∀ q, (↑(f q) : G ⧸ K) = q) {e : G ⧸ K → ℤ}
+    (hε : augmentationCoquotientMulLeft G K hK (sectionWeightedSum G K e f) = 0)
+    (q₁ q₂ : G ⧸ K) : e q₁ = e q₂ := by
+  -- `π(ε)` is right-invariant: `π(ε) * of s = π(ε)` for all `s ∈ G/K`
+  have hinv : ∀ s : G ⧸ K,
+      MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+          (sectionWeightedSum G K e f) * MonoidAlgebra.of ℤ (G ⧸ K) s
+        = MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+          (sectionWeightedSum G K e f) := by
+    intro s
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective s
+    have hmul : sectionWeightedSum G K e f * (MonoidAlgebra.of ℤ G g - 1)
+        ∈ augmentationIdealOf G K * augmentationIdeal G :=
+      mul_mem_of_augmentationCoquotientMulLeft_eq_zero G K hε
+        (sub_one_mem_augmentationIdeal G g)
+    have hpi : MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+        (sectionWeightedSum G K e f * (MonoidAlgebra.of ℤ G g - 1)) = 0 :=
+      mapDomain_eq_zero_of_mem_mul G K hmul
+    rw [map_mul, map_sub, map_one] at hpi
+    rw [show MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+          (MonoidAlgebra.of ℤ G g) = MonoidAlgebra.of ℤ (G ⧸ K) ↑g from ?_] at hpi
+    · rw [mul_sub, mul_one, sub_eq_zero] at hpi
+      exact hpi
+    · rw [MonoidAlgebra.of_apply, MonoidAlgebra.mapDomainAlgHom_apply,
+        MonoidAlgebra.mapDomain_single, QuotientGroup.mk'_apply,
+        ← MonoidAlgebra.of_apply]
+  have hcoeff := apply_eq_of_forall_mul_of_eq hinv q₁ q₂
+  rwa [mapDomain_sectionWeightedSum G K e hf q₁,
+    mapDomain_sectionWeightedSum G K e hf q₂] at hcoeff
+
+end Lemma1027
+
 end OddOrder.Algebra
