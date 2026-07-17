@@ -105,7 +105,24 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   (同一 coset の 2 代表系 ⇒ 同一 Ξ、右イデアル消滅で) /
   `transferXi_eq_mulLeft_sectionSum` (10.24 の Ξ = 任意 section の Ξ)。
   右イデアル版消滅補題 `_eq_zero_of_mem_mul_right` / `_eq_of_sub_mem_right` も。
-- ⏭ 次の作業単位:
+- ✅ **Lemma 10.27 核心** (2026-07-17, sorry-free, `sectionWeightedSum_coeff_const`):
+  ε=∑_q e_q·f(q) が Δ(G)‾ を消せば全 e_q 一致。**transversalComponent 機構を
+  回避**: ε(g−1)∈Δ(K)Δ(G) を π=mapDomain(G→G/K) で送ると η=π(ε) が右不変
+  (η·s=η ∀s) ⇒ 群環の右不変元は係数一定 (`apply_eq_of_forall_mul_of_eq`)。
+  補助: `mapDomain_eq_zero_of_mem_mul` (π が Δ(K)Δ(G) を消す) /
+  `mul_mem_of_augmentationCoquotientMulLeft_eq_zero` (Ξ_ε=0⇒ε·α∈Δ(K)Δ(G))。
+- ⏭ **次 = 10.25 本体の組み立て** (capstone, PrincipalIdealTheorem.lean 現 1066 行):
+  純群論 statement `v(g)^{|K:G'|}=1` (G'≤K)。proof 内で letI 2 枚:
+  (1) `hidx : Nat.card(A⧸U•⊤)=|G:G'|` — U=augmentationRingIdeal、
+  restrictScalars で U•⊤=Δ(G)²‾ を示し既証 `nat_card_quotient_...` に接続。
+  U,A の加法 f.g. (Finite G)。(2) 10.26 `exists_smul_eq_zero_and_sub_card_mem`
+  適用で γ∈ℤ[G/K] (γA=0, γ≡|G:G'| mod U)。(3) ε := section 台形の γ 原像
+  (δ(ε)=|G:G'|, Ξ_ε=0) → 10.27 `sectionWeightedSum_coeff_const` で e 一定=c、
+  δ(ε)=c|G:K| ⇒ c=|K:G'|、Ξ_ε=c·Ξ=0 ⇒ |K:G'|·Ξ=0。(4)
+  `transferXi_eq_mulLeft_sectionSum` で Ξ=transferXi、10.24
+  `transferRangeEquivXiRange` で v(G)≅Ξ(Δ(G)‾) ⇒ v(g)^{|K:G'|}=1。
+  ---
+  (旧メモ、参考): 
   (a) **Lemma 10.27 (section 台形版で十分)**: 10.25 が渡す ε は γ∈ℤ[G/K] の
   mapDomain 原像 = **既に `∑_q e_q of(f q)` 形** (e_q = γ_q) なので ε→ε' 簡約
   不要。statement: f = section, e : G/K→ℤ, ε = ∑_q e_q of(f q),
