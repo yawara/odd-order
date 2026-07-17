@@ -43,6 +43,12 @@ lemma mem_orbitalAt_iff {Δ : Set (Ω × Ω)} {α β : Ω} :
     β ∈ orbitalAt Δ α ↔ (α, β) ∈ Δ :=
   Iff.rfl
 
+/-- Orbitals are `G`-invariant, pairwise. -/
+lemma smul_pair_mem_orbit {p : Ω × Ω} (g : G) {a b : Ω}
+    (h : (a, b) ∈ orbit G p) : (g • a, g • b) ∈ orbit G p := by
+  have h2 := MulAction.smul_orbit g p ▸ Set.smul_mem_smul_set h
+  rwa [Prod.smul_mk] at h2
+
 /-- **Isaacs Lem 8.34**, disjointness — the orbital functions of distinct
 orbitals at a common point are disjoint. -/
 theorem orbital_eq_of_orbitalAt_inter {p q : Ω × Ω} {α β : Ω}
