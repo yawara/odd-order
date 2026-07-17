@@ -64,6 +64,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
@@ -4388,6 +4389,11 @@ set_option linter.style.longLine false in
 -- base change to `AlgebraicClosure F`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
+
+-- BG Proposition 4.4(b) (Gorenstein 7.6.5): for `A ∈ SCN(R)` with `R` a Sylow `p`-subgroup of a
+-- finite `G`, the centralizer `C_G(A)` is the internal direct product `A × H` of `A` with a
+-- `p'`-subgroup `H`.
+#assert_only_allowed_axioms OddOrder.GroupTheory.centralizer_eq_dprod_of_isSCN_of_sylow
 
 -- BG Theorem 3.10 (general nilpotent M packaging): a solvable Frobenius group `H = KR` acting on a
 -- nontrivial nilpotent (in fact solvable) `M` with `(|H|,|M|)=1`, `C_M(K)=1`, prime-manner
