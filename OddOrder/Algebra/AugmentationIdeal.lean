@@ -106,4 +106,98 @@ theorem augmentationIdeal_eq_span :
     rintro _ ⟨g, rfl⟩
     exact sub_one_mem_augmentationIdeal G g
 
+/-- **Isaacs Lemma 10.19 (independence half)**: the family `g - 1` for
+`1 ≠ g ∈ G` is `ℤ`-linearly independent in `ℤ[G]` (extract the coefficient at
+`j ≠ 1` with the standard-basis coordinate functional). -/
+theorem linearIndependent_of_sub_one :
+    LinearIndependent ℤ (fun g : {g : G // g ≠ 1} =>
+      MonoidAlgebra.of ℤ G g.val - 1) := by
+  classical
+  rw [linearIndependent_iff']
+  intro s f hsum j hj
+  have hc := congrArg ((MonoidAlgebra.basis G ℤ).coord j.val) hsum
+  rw [map_sum, map_zero] at hc
+  have hterm : ∀ i ∈ s,
+      (MonoidAlgebra.basis G ℤ).coord j.val
+        (f i • (MonoidAlgebra.of ℤ G i.val - 1))
+      = if i = j then f i else 0 := by
+    intro i _
+    rw [map_smul, map_sub]
+    have h1 : (MonoidAlgebra.basis G ℤ).coord j.val (MonoidAlgebra.of ℤ G i.val)
+        = if i.val = j.val then 1 else 0 := by
+      rw [show MonoidAlgebra.of ℤ G i.val = MonoidAlgebra.basis G ℤ i.val from
+        (MonoidAlgebra.basis_apply ℤ i.val).symm]
+      rw [Module.Basis.coord_apply, Module.Basis.repr_self,
+        Finsupp.single_apply]
+    have h2 : (MonoidAlgebra.basis G ℤ).coord j.val (1 : MonoidAlgebra ℤ G)
+        = 0 := by
+      rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.basis G ℤ 1 from
+        by rw [MonoidAlgebra.basis_apply]; rfl]
+      rw [Module.Basis.coord_apply, Module.Basis.repr_self,
+        Finsupp.single_apply, if_neg (fun h => j.2 h.symm)]
+    rw [h1, h2, sub_zero]
+    rcases eq_or_ne i j with rfl | hij
+    · rw [if_pos rfl, if_pos rfl, smul_eq_mul, mul_one]
+    · rw [if_neg (fun h => hij (Subtype.ext h)), if_neg hij, smul_zero]
+  rw [Finset.sum_congr rfl hterm, Finset.sum_ite_eq' s j (fun i => f i),
+    if_pos hj] at hc
+  exact hc
+
+/-- **Isaacs Lemma 10.19**: the `g - 1` for `1 ≠ g ∈ G` form a `ℤ`-basis of the
+augmentation ideal `Δ(G)`. -/
+noncomputable def augmentationIdealBasis :
+    Module.Basis {g : G // g ≠ 1} ℤ ↥(augmentationIdeal G) := by
+  refine Module.Basis.mk (v := fun g : {g : G // g ≠ 1} =>
+    (⟨MonoidAlgebra.of ℤ G g.val - 1, sub_one_mem_augmentationIdeal G g.val⟩ :
+      ↥(augmentationIdeal G))) ?_ ?_
+  · -- independence: push forward along the (injective) inclusion
+    have hamb := linearIndependent_of_sub_one G
+    exact hamb.of_comp (augmentationIdeal G).subtype
+  · -- spanning: transport `augmentationIdeal_eq_span` into the subtype
+    rintro ⟨α, hα⟩ -
+    have hspan : α ∈ Submodule.span ℤ
+        (Set.range fun g : G => MonoidAlgebra.of ℤ G g - 1) := by
+      rw [← augmentationIdeal_eq_span]
+      exact hα
+    induction hspan using Submodule.span_induction with
+    | mem x hx =>
+      obtain ⟨g, rfl⟩ := hx
+      rcases eq_or_ne g 1 with rfl | hg
+      · have h0 : (⟨MonoidAlgebra.of ℤ G 1 - 1, hα⟩ :
+            ↥(augmentationIdeal G)) = 0 := by
+          apply Subtype.ext
+          show MonoidAlgebra.of ℤ G 1 - 1 = 0
+          rw [map_one, sub_self]
+        rw [h0]
+        exact Submodule.zero_mem _
+      · exact Submodule.subset_span ⟨⟨g, hg⟩, rfl⟩
+    | zero =>
+      have h0 : (⟨(0 : MonoidAlgebra ℤ G), hα⟩ : ↥(augmentationIdeal G)) = 0 :=
+        rfl
+      rw [h0]
+      exact Submodule.zero_mem _
+    | add x y hx hy ihx ihy =>
+      have hxm : x ∈ augmentationIdeal G := by
+        rw [augmentationIdeal_eq_span]; exact hx
+      have hym : y ∈ augmentationIdeal G := by
+        rw [augmentationIdeal_eq_span]; exact hy
+      have hsplit : (⟨x + y, hα⟩ : ↥(augmentationIdeal G))
+          = ⟨x, hxm⟩ + ⟨y, hym⟩ := rfl
+      rw [hsplit]
+      exact Submodule.add_mem _ (ihx hxm) (ihy hym)
+    | smul c x hx ihx =>
+      have hxm : x ∈ augmentationIdeal G := by
+        rw [augmentationIdeal_eq_span]; exact hx
+      have hsplit : (⟨c • x, hα⟩ : ↥(augmentationIdeal G)) = c • ⟨x, hxm⟩ :=
+        rfl
+      rw [hsplit]
+      exact Submodule.smul_mem _ _ (ihx hxm)
+
+@[simp]
+theorem augmentationIdealBasis_apply (g : {g : G // g ≠ 1}) :
+    ((augmentationIdealBasis G g : ↥(augmentationIdeal G)) :
+        MonoidAlgebra ℤ G)
+      = MonoidAlgebra.of ℤ G g.val - 1 := by
+  rw [augmentationIdealBasis, Module.Basis.mk_apply]
+
 end OddOrder.Algebra
