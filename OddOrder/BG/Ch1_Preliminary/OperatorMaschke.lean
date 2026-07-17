@@ -410,4 +410,144 @@ theorem exists_aInvariant_irreducible_summand_disjoint
     exists_aInvariant_complement_of_isElementaryAbelian hpV hcop hV hS_inv
   exact ⟨S, W, hS_inv, hWinv, hSW_inf, hSW_sup, hS_ne, hirr, hCS⟩
 
+section GeneralizedMaschke /- Isaacs Thm 10.16 (p. 305) -/
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant)
+
+/-- **Isaacs Theorem 10.16 (generalized Maschke, group-action form)**: let a
+finite group `A` act on a group `V` via `φ : A →* MulAut V`, and suppose
+`V = U × W` is an internal direct product with `U` abelian and `A`-invariant.
+If `u ↦ u^{|A|}` is bijective on `U`, then `U` admits an `A`-invariant normal
+complement `N ⊴ V`.
+
+**証明** (Isaacs p. 305): 射影 `θ : V → U` (`W` 成分を潰す準同型) から平均化
+`Φ(x) = ∏_{k} (φ k)⁻¹ (θ ((φ k) x))` を作る。`U` が可換なので `Φ` は準同型、
+添字の平行移動で `A`-equivariant。`Φ|_U = (·)^{|A|}` は単射なので `U ⊓ ker Φ = ⊥`、
+全射なので `U ⊔ ker Φ = ⊤`。`N := ker Φ`。 -/
+theorem exists_aInvariant_complement_of_pow_card_bijective
+    {V : Type*} [Group V] {A : Type*} [Group A] [Finite A]
+    {φ : A →* MulAut V} {U W : Subgroup V} [W.Normal]
+    (hcompl : U.IsComplement' W)
+    (hU_comm : ∀ x y : ↥U, x * y = y * x)
+    (hU_inv : IsAInvariant φ U)
+    (hbij : Function.Bijective fun u : ↥U => u ^ Nat.card A) :
+    ∃ N : Subgroup V, N.Normal ∧ IsAInvariant φ N ∧ U ⊓ N = ⊥ ∧ U ⊔ N = ⊤ := by
+  classical
+  letI : CommGroup ↥U := { (inferInstance : Group ↥U) with mul_comm := hU_comm }
+  haveI : Fintype A := Fintype.ofFinite A
+  -- the projection `θ : V →* U` killing the `W`-component
+  set e : V ⧸ W ≃* ↥U := hcompl.QuotientMulEquiv with he_def
+  set θ : V →* ↥U := e.toMonoidHom.comp (QuotientGroup.mk' W) with hθ_def
+  have hθU : ∀ u : ↥U, θ (u : V) = u := by
+    intro u
+    have h1 : e.symm u = QuotientGroup.mk (u : V) := rfl
+    have h2 : e (QuotientGroup.mk (u : V)) = u := by
+      rw [← h1, MulEquiv.apply_symm_apply]
+    rw [hθ_def]
+    exact h2
+  -- the averaged homomorphism `Φ : V →* U`
+  have hf_mem : ∀ (k : A) (x : V), (φ k⁻¹) ((θ ((φ k) x) : V)) ∈ U := fun k x =>
+    hU_inv.smul_mem k⁻¹ (θ ((φ k) x)).2
+  set Φ : V →* ↥U :=
+    { toFun := fun x => ∏ k : A,
+        (⟨(φ k⁻¹) ((θ ((φ k) x) : V)), hf_mem k x⟩ : ↥U)
+      map_one' := by
+        refine Finset.prod_eq_one fun k _ => ?_
+        apply Subtype.ext
+        simp
+      map_mul' := fun x y => by
+        rw [← Finset.prod_mul_distrib]
+        refine Finset.prod_congr rfl fun k _ => ?_
+        apply Subtype.ext
+        push_cast
+        rw [map_mul (φ k), map_mul θ, Subgroup.coe_mul, map_mul (φ k⁻¹)] }
+    with hΦ_def
+  have hΦ_apply : ∀ x : V, Φ x = ∏ k : A,
+      (⟨(φ k⁻¹) ((θ ((φ k) x) : V)), hf_mem k x⟩ : ↥U) := fun _ => rfl
+  -- `Φ` restricted to `U` is the `|A|`-power map
+  have hΦU : ∀ u : ↥U, Φ (u : V) = u ^ Nat.card A := by
+    intro u
+    rw [hΦ_apply]
+    have hfac : ∀ k : A,
+        (⟨(φ k⁻¹) ((θ ((φ k) (u : V)) : V)), hf_mem k (u : V)⟩ : ↥U) = u := by
+      intro k
+      apply Subtype.ext
+      have hmem : (φ k) (u : V) ∈ U := hU_inv.smul_mem k u.2
+      have hθk : θ ((φ k) (u : V)) = ⟨(φ k) (u : V), hmem⟩ := hθU ⟨(φ k) (u : V), hmem⟩
+      change ((φ k⁻¹) ((θ ((φ k) (u : V)) : V)) : V) = (u : V)
+      rw [hθk]
+      change (φ k⁻¹) ((φ k) (u : V)) = (u : V)
+      rw [← MulAut.mul_apply, ← map_mul, inv_mul_cancel, map_one, MulAut.one_apply]
+    rw [Finset.prod_congr rfl fun k _ => hfac k, Finset.prod_const,
+      Finset.card_univ, ← Nat.card_eq_fintype_card]
+  -- `Φ` is `A`-equivariant: `Φ ((φ a) x) = (φ a) (Φ x)` inside `U`
+  have hgmem : ∀ (a k : A) (x : V), (φ (a * k⁻¹)) ((θ ((φ k) x) : V)) ∈ U := by
+    intro a k x
+    have h1 := hU_inv.smul_mem (a * k⁻¹) (θ ((φ k) x)).2
+    exact h1
+  have hequiv : ∀ (a : A) (x : V),
+      Φ ((φ a) x) = (hU_inv.restrict a) (Φ x) := by
+    intro a x
+    rw [hΦ_apply, hΦ_apply, map_prod]
+    -- step 1: rewrite each factor with `(φ k) ((φ a) x) = (φ (k * a)) x`
+    have h1 : (∏ k : A, (⟨(φ k⁻¹) ((θ ((φ k) ((φ a) x)) : V)),
+          hf_mem k ((φ a) x)⟩ : ↥U))
+        = ∏ k : A, (⟨(φ (a * (k * a)⁻¹)) ((θ ((φ (k * a)) x) : V)),
+            hgmem a (k * a) x⟩ : ↥U) := by
+      refine Finset.prod_congr rfl fun k _ => Subtype.ext ?_
+      change (φ k⁻¹) ((θ ((φ k) ((φ a) x)) : V))
+          = (φ (a * (k * a)⁻¹)) ((θ ((φ (k * a)) x) : V))
+      rw [← MulAut.mul_apply, ← map_mul]
+      congr 2
+      group
+    rw [h1]
+    -- step 2: reindex `j := k * a`
+    rw [Fintype.prod_equiv (Equiv.mulRight a)
+      (fun k : A => (⟨(φ (a * (k * a)⁻¹)) ((θ ((φ (k * a)) x) : V)),
+        hgmem a (k * a) x⟩ : ↥U))
+      (fun j : A => (⟨(φ (a * j⁻¹)) ((θ ((φ j) x) : V)), hgmem a j x⟩ : ↥U))
+      (fun k => rfl)]
+    -- step 3: each factor is `(restrict a)` of the original factor
+    refine Finset.prod_congr rfl fun j _ => Subtype.ext ?_
+    change (φ (a * j⁻¹)) ((θ ((φ j) x) : V))
+        = ((hU_inv.restrict a) ⟨(φ j⁻¹) ((θ ((φ j) x) : V)), hf_mem j x⟩ : V)
+    rw [map_mul φ a j⁻¹, MulAut.mul_apply]
+    rfl
+  -- assemble `N := ker Φ`
+  refine ⟨Φ.ker, MonoidHom.normal_ker Φ, ?_, ?_, ?_⟩
+  · -- `A`-invariance of the kernel
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [MonoidHom.mem_ker] at hx ⊢
+    rw [hequiv, hx, map_one]
+  · -- `U ⊓ ker Φ = ⊥`: on `U`, `Φ` is the injective `|A|`-power map
+    rw [eq_bot_iff]
+    intro x hx
+    rw [Subgroup.mem_inf] at hx
+    obtain ⟨hxU, hxker⟩ := hx
+    rw [Subgroup.mem_bot]
+    rw [MonoidHom.mem_ker] at hxker
+    have h1 : (⟨x, hxU⟩ : ↥U) ^ Nat.card A = 1 := by
+      rw [← hΦU ⟨x, hxU⟩]
+      exact hxker
+    have h2 : (⟨x, hxU⟩ : ↥U) = 1 := by
+      have := hbij.injective (a₁ := ⟨x, hxU⟩) (a₂ := 1) (by
+        show (⟨x, hxU⟩ : ↥U) ^ Nat.card A = 1 ^ Nat.card A
+        rw [h1, one_pow])
+      exact this
+    simpa using congrArg Subtype.val h2
+  · -- `U ⊔ ker Φ = ⊤`: `Φ(V) ⊆ U = Φ(U)`
+    rw [eq_top_iff]
+    intro x _
+    obtain ⟨u, hu⟩ := hbij.surjective (Φ x)
+    have hu' : u ^ Nat.card A = Φ x := hu
+    have hker : (u : V)⁻¹ * x ∈ Φ.ker := by
+      rw [MonoidHom.mem_ker, map_mul, map_inv, hΦU, hu', inv_mul_cancel]
+    have hx_eq : x = (u : V) * ((u : V)⁻¹ * x) := by group
+    rw [hx_eq]
+    exact Subgroup.mul_mem _
+      (Subgroup.mem_sup_left u.2) (Subgroup.mem_sup_right hker)
+
+end GeneralizedMaschke
+
 end OddOrder.BG.Ch1_Preliminary
