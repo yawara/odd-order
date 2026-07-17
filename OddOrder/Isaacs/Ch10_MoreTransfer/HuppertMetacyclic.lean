@@ -78,9 +78,25 @@ theorem index_commutator_dvd_of_surjective {G H : Type*} [Group G] [Group H]
   obtain ⟨g, rfl⟩ := hf h
   exact ⟨QuotientGroup.mk g, rfl⟩
 
+/-- **Isaacs Theorem 10.15, base case** (Isaacs pp. 305-306, second and later
+paragraphs): under the 10.15 hypotheses, if moreover the quotient `P/Y` is
+abelian — equivalently `⁅P, P⁆ ≤ Y` — for **every** normal subgroup `Y ⊴ N` of
+order `p` inside `P`, then `p ∣ |N : N'|`. This is the heart of the proof
+(steps 2-10 of the module docstring); the inductive wrapper `thm1015_aux`
+reduces to it. -/
+private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
+    (hPn : P.Normal) (hPp : IsPGroup p ↥P) (hPidx : ¬(p ∣ P.index))
+    (hmeta : IsMetacyclic ↥P) (hnonab : ¬ ∀ x y : ↥P, x * y = y * x)
+    (hp2 : 2 < p)
+    (habel : ∀ Y : Subgroup N, Y.Normal → Y ≤ P → Nat.card ↥Y = p → ⁅P, P⁆ ≤ Y) :
+    p ∣ (commutator N).index := by
+  sorry
+
 /-- **Isaacs Theorem 10.15**, inductive core: if `P ⊴ N` is a nonabelian
 metacyclic Sylow `p`-subgroup (`p`-group of full `p`-part: `p ∤ |N : P|`) with
-`p > 2`, then `p` divides `|N : N'|`. Induction on `|P| ≤ n`. -/
+`p > 2`, then `p` divides `|N : N'|`. Induction on `|P| ≤ n`; the inductive
+step passes to `N ⧸ Y` for a normal `Y` of order `p` with `P/Y` nonabelian,
+and the terminal case is `thm1015_base`. -/
 private theorem thm1015_aux (n : ℕ) :
     ∀ {N : Type*} [Group N] [Finite N] {P : Subgroup N},
       P.Normal → IsPGroup p ↥P → ¬(p ∣ P.index) →
@@ -88,7 +104,76 @@ private theorem thm1015_aux (n : ℕ) :
       2 < p →
       Nat.card ↥P ≤ n →
       p ∣ (commutator N).index := by
-  sorry
+  induction n with
+  | zero =>
+    intro N _ _ P _ _ _ _ _ _ hle
+    have : 0 < Nat.card ↥P := Nat.card_pos
+    omega
+  | succ n ih =>
+    intro N _ _ P hPn hPp hPidx hmeta hnonab hp2 hle
+    classical
+    have hp_prime : p.Prime := hp.out
+    by_cases hquot : ∃ Y : Subgroup N, Y.Normal ∧ Y ≤ P ∧ Nat.card ↥Y = p ∧
+        ¬ ⁅P, P⁆ ≤ Y
+    · -- some order-`p` normal `Y` has nonabelian `P/Y`: induct in `N ⧸ Y`
+      obtain ⟨Y, hYn, hYP, hYcard, hYcomm⟩ := hquot
+      haveI := hYn
+      have hfsurj : Function.Surjective (QuotientGroup.mk' Y) :=
+        QuotientGroup.mk'_surjective Y
+      set Pq : Subgroup (N ⧸ Y) := P.map (QuotientGroup.mk' Y) with hPq_def
+      haveI hPqn : Pq.Normal := Subgroup.Normal.map hPn _ hfsurj
+      -- the image is again a `p`-group …
+      have hPqp : IsPGroup p ↥Pq :=
+        IsPGroup.of_surjective (hPp.of_equiv (MulEquiv.refl _)) ((QuotientGroup.mk' Y).subgroupMap P)
+          ((QuotientGroup.mk' Y).subgroupMap_surjective P)
+      -- … of the same (unchanged) index …
+      have hPqidx : Pq.index = P.index := by
+        rw [hPq_def, Subgroup.index_map, QuotientGroup.ker_mk', sup_of_le_left hYP,
+          MonoidHom.range_eq_top_of_surjective _ hfsurj, Subgroup.index_top, mul_one]
+      -- … metacyclic …
+      have hmetaq : IsMetacyclic ↥Pq :=
+        hmeta.of_surjective ((QuotientGroup.mk' Y).subgroupMap_surjective P)
+      -- … and of cardinality `|P| / p`
+      have hcard_mul : Nat.card ↥Pq * p = Nat.card ↥P := by
+        have h1 := Subgroup.card_mul_index Pq
+        have h2 := Subgroup.card_mul_index Y
+        have h3 := Subgroup.card_mul_index P
+        have h4 : Nat.card (N ⧸ Y) = Y.index := (Subgroup.index_eq_card Y).symm
+        have hidx_pos : 0 < P.index := Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite)
+        refine Nat.eq_of_mul_eq_mul_right hidx_pos ?_
+        have : Nat.card ↥Pq * Pq.index = Nat.card (N ⧸ Y) := h1
+        rw [hPqidx, h4] at this
+        -- `card Pq * P.index * p = Y.index * p = card Y * Y.index = card N = card P * P.index`
+        calc Nat.card ↥Pq * p * P.index
+            = Nat.card ↥Pq * P.index * p := by ring
+          _ = Y.index * p := by rw [this]
+          _ = p * Y.index := by ring
+          _ = Nat.card ↥Y * Y.index := by rw [hYcard]
+          _ = Nat.card N := h2
+          _ = Nat.card ↥P * P.index := h3.symm
+      have hcard_le : Nat.card ↥Pq ≤ n := by
+        have hpos : 0 < Nat.card ↥Pq := Nat.card_pos
+        nlinarith [hcard_mul, hle, hp2, hpos]
+      -- `P/Y` is nonabelian: were it abelian, `⁅P, P⁆` would map to `⊥`, i.e. land in `Y`
+      have hQnonab : ¬ ∀ x y : ↥Pq, x * y = y * x := by
+        intro hcomm
+        refine hYcomm ?_
+        have hbot : ⁅Pq, Pq⁆ = ⊥ := by
+          rw [eq_bot_iff, Subgroup.commutator_le]
+          intro g₁ hg₁ g₂ hg₂
+          have := hcomm ⟨g₁, hg₁⟩ ⟨g₂, hg₂⟩
+          have hcoe : g₁ * g₂ = g₂ * g₁ := congrArg Subtype.val this
+          simp [commutatorElement_def, hcoe, Subgroup.mem_bot]
+        have hmap : (⁅P, P⁆ : Subgroup N).map (QuotientGroup.mk' Y) = ⊥ := by
+          rw [Subgroup.map_commutator]
+          exact hbot
+        rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hmap
+        exact hmap
+      have hres := ih hPqn hPqp (by rw [hPqidx]; exact hPidx) hmetaq hQnonab hp2 hcard_le
+      exact dvd_trans hres (index_commutator_dvd_of_surjective hfsurj)
+    · -- every order-`p` normal subgroup has abelian `P/Y`: the base case applies
+      push Not at hquot
+      exact thm1015_base hPn hPp hPidx hmeta hnonab hp2 hquot
 
 /-- **Isaacs Theorem 10.15**: let `P ⊴ N` with `P` a nonabelian metacyclic
 Sylow `p`-subgroup of the finite group `N`, and `p > 2`. Then `p` divides
