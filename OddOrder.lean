@@ -174,6 +174,7 @@ import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
 import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
 import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke

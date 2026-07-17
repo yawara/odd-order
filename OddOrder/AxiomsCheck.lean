@@ -70,6 +70,7 @@ import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
+import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
@@ -4390,6 +4391,10 @@ set_option linter.style.longLine false in
 -- base change to `AlgebraicClosure F`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
+
+-- BG Theorem 4.20(b): for a finite solvable odd-order `G` with `r(F(G)) ≤ 2`, a Sylow subgroup `S`,
+-- and a characteristic `T ≤ S` with `T ⊆ S'`, the subgroup `T` is normal in `G`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.characteristic_le_derived_normal_of_rank_fitting_le_two
 
 -- BG Lemma 4.5(c) / Proposition 4.6: for `p` odd and a noncyclic `p`-group `R`, `Ω₁(Z₂(R))` is
 -- noncyclic of exponent `p` (4.5(c)); and a noncyclic normal subgroup `S ⊴ R` contains an
