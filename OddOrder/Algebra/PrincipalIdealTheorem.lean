@@ -8,7 +8,9 @@ import Mathlib.GroupTheory.Abelianization.Finite
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.RingTheory.Ideal.Maps
+import Mathlib.RingTheory.Finiteness.Finsupp
 import OddOrder.Algebra.AugmentationIdeal
+import OddOrder.Algebra.FiniteIndexAnnihilator
 
 /-!
 # Towards the principal ideal theorem: `Δ(K)Δ(G)` for a normal subgroup
@@ -942,7 +944,7 @@ theorem augmentationCoquotientModule_mapDomain_smul (h : _root_.commutator G ≤
       = augmentationCoquotientMulLeft G K hK x a := by
   letI := quotientCommGroup G K h
   letI := augmentationCoquotientModule G K
-  show augmentationCoquotientAlgHom G K
+  change augmentationCoquotientAlgHom G K
     (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) a = _
   rw [augmentationCoquotientAlgHom_mapDomain]
 
@@ -1026,6 +1028,51 @@ theorem nat_card_quotient_augmentationRingIdeal_smul_top
   rw [← nat_card_quotient_augmentationCoquotientSqImage G K,
     ← restrictScalars_augmentationRingIdeal_smul_top G K h]
   rfl
+
+/-! ### Finiteness facts for the application of Theorem 10.26 (Isaacs p. 316) -/
+
+omit [hK : K.Normal] in
+/-- `Δ(G)‾` is finitely generated as an additive group (`G` finite). -/
+theorem moduleFinite_augmentationCoquotient [Finite G] :
+    Module.Finite ℤ (AugmentationCoquotient G K) := by
+  letI : Module.Finite ℤ (MonoidAlgebra ℤ G) :=
+    inferInstanceAs (Module.Finite ℤ (G →₀ ℤ))
+  letI : Module.Finite ℤ (augmentationIdeal G) := inferInstance
+  exact Module.Finite.of_surjective (augmentationCorel G K).mkQ
+    (Submodule.mkQ_surjective _)
+
+omit [hK : K.Normal] in
+/-- The additive group `⊤` of `Δ(G)‾` is finitely generated (`G` finite). -/
+theorem fg_top_augmentationCoquotient [Finite G] :
+    (⊤ : AddSubgroup (AugmentationCoquotient G K)).FG := by
+  letI := moduleFinite_augmentationCoquotient G K
+  have h := Module.Finite.fg_top (R := ℤ) (M := AugmentationCoquotient G K)
+  rw [Submodule.fg_iff_addSubgroup_fg] at h
+  simpa using h
+
+/-- The augmentation ideal `Δ(G/K)` is finitely generated as an additive group
+(`G` finite, so `ℤ[G/K]` is a Noetherian `ℤ`-module). -/
+theorem fg_augmentationRingIdeal [Finite G] :
+    (augmentationRingIdeal G K).toAddSubgroup.FG := by
+  letI : Module.Finite ℤ (MonoidAlgebra ℤ (G ⧸ K)) :=
+    inferInstanceAs (Module.Finite ℤ ((G ⧸ K) →₀ ℤ))
+  have h : ((augmentationRingIdeal G K).restrictScalars ℤ).FG :=
+    IsNoetherian.noetherian _
+  rw [Submodule.fg_iff_addSubgroup_fg] at h
+  exact h
+
+/-- `Δ(G)‾ / Δ(G/K)·Δ(G)‾` is finite of order `|G : G'|` (`G` finite). -/
+theorem finite_quotient_augmentationRingIdeal_smul_top [Finite G]
+    (h : _root_.commutator G ≤ K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    Finite (AugmentationCoquotient G K ⧸ (augmentationRingIdeal G K •
+      (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K)))) := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  have hpos : Nat.card (Abelianization G) ≠ 0 := Nat.card_pos.ne'
+  rw [← nat_card_quotient_augmentationRingIdeal_smul_top G K h] at hpos
+  exact Nat.finite_of_card_ne_zero hpos
 
 end CommQuotient
 
