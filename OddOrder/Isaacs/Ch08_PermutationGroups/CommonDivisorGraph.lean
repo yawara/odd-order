@@ -204,6 +204,218 @@ theorem relIndex_arrowKernel_dvd_relIndex_arrowKernel {m n : ℕ} {α γ : Ω}
     Nat.eq_of_mul_eq_mul_right hpos h6
   exact Dvd.intro_left _ h7.symm
 
+/-- Counting the image of a subgroup in a coset space:
+`|mk '' A| = |A : C ∩ A|` in `M ⧸ C`. -/
+private lemma ncard_image_mk_eq_relIndex {M : Type*} [Group M] [Finite M]
+    (C A : Subgroup M) :
+    Set.ncard ((QuotientGroup.mk : M → M ⧸ C) '' (A : Set M)) =
+      C.relIndex A := by
+  have hstab : stabilizer (↥A) ((1 : M) : M ⧸ C) = C.subgroupOf A := by
+    ext x
+    rw [mem_stabilizer_iff, Subgroup.mem_subgroupOf]
+    have hkey : (x • ((1 : M) : M ⧸ C) = ((1 : M) : M ⧸ C)) ↔
+        ((↑x * 1 : M) : M ⧸ C) = ((1 : M) : M ⧸ C) := Iff.rfl
+    rw [hkey, mul_one, QuotientGroup.eq, mul_one, inv_mem_iff]
+  have horb : (QuotientGroup.mk : M → M ⧸ C) '' (A : Set M) =
+      orbit (↥A) ((1 : M) : M ⧸ C) := by
+    ext x
+    constructor
+    · rintro ⟨a, ha, rfl⟩
+      rw [MulAction.mem_orbit_iff]
+      refine ⟨⟨a, ha⟩, ?_⟩
+      have h2 : (⟨a, ha⟩ : ↥A) • ((1 : M) : M ⧸ C) =
+          ((a * 1 : M) : M ⧸ C) := rfl
+      rw [h2, mul_one]
+    · rintro ⟨a, ha⟩
+      have ha' : a • ((1 : M) : M ⧸ C) = x := ha
+      rw [← ha']
+      have h2 : a • ((1 : M) : M ⧸ C) = ((↑a * 1 : M) : M ⧸ C) := rfl
+      rw [h2, mul_one]
+      exact ⟨↑a, a.2, rfl⟩
+  rw [horb, ← Nat.card_coe_set_eq,
+    Nat.card_congr (orbitEquivQuotientStabilizer (↥A) ((1 : M) : M ⧸ C)),
+    hstab]
+  rfl
+
+/-- If `C A = C B` (as subsets) then `|A : C ∩ A| = |B : C ∩ B|`. -/
+private lemma relIndex_eq_of_coe_mul_eq {M : Type*} [Group M] [Finite M]
+    {C A B : Subgroup M}
+    (h : (C : Set M) * (A : Set M) = (C : Set M) * (B : Set M)) :
+    C.relIndex A = C.relIndex B := by
+  -- pass to `A C = B C` by taking inverses
+  have h2 : (A : Set M) * (C : Set M) = (B : Set M) * (C : Set M) := by
+    have h3 := congrArg (·⁻¹) h
+    simpa only [mul_inv_rev, inv_coe_set] using h3
+  have himg : ∀ {A' B' : Subgroup M},
+      (A' : Set M) * (C : Set M) = (B' : Set M) * (C : Set M) →
+      (QuotientGroup.mk : M → M ⧸ C) '' (A' : Set M) ⊆
+        QuotientGroup.mk '' (B' : Set M) := by
+    intro A' B' hAB
+    rintro x ⟨a, ha, rfl⟩
+    have h4 : (a : M) ∈ (B' : Set M) * (C : Set M) := by
+      rw [← hAB, Set.mem_mul]
+      exact ⟨a, ha, 1, C.one_mem, mul_one a⟩
+    rw [Set.mem_mul] at h4
+    obtain ⟨b, hb, c, hc, hbc⟩ := h4
+    refine ⟨b, hb, ?_⟩
+    rw [QuotientGroup.eq, ← hbc, ← mul_assoc, inv_mul_cancel, one_mul]
+    exact hc
+  rw [← ncard_image_mk_eq_relIndex C A, ← ncard_image_mk_eq_relIndex C B]
+  congr 1
+  exact Set.Subset.antisymm (himg h2) (himg h2.symm)
+
+/-- **Isaacs Thm 8.42 (b)** (p. 250) — with hypotheses as in (a),
+`k_m = |K_m(α) : G_α|` divides `n`. -/
+theorem relIndex_arrowKernel_dvd_of_isArrow {m n : ℕ} {α γ : Ω}
+    (hmn : m < n) (hαγ : IsArrow G n α γ)
+    (hcop : ∀ δ ε : Ω,
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) m ∨
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) n) :
+    (stabilizer G α).relIndex (arrowKernel G m α) ∣ n := by
+  set T : Set G := (stabilizer G γ : Set G) * (stabilizer G α : Set G)
+    with hTdef
+  -- (b1): `C G_δ = C G_α` for every `δ ∈ [α]_m`, via Lem 8.39(c) both ways
+  have hb1 : ∀ δ ∈ arrowComponent G m α,
+      δ ∈ arrowComponent G m α ∧
+        (stabilizer G γ : Set G) * (stabilizer G δ : Set G) = T := by
+    intro δ hδ
+    refine arrowComponent_induction
+      (p := fun δ => δ ∈ arrowComponent G m α ∧
+        (stabilizer G γ : Set G) * (stabilizer G δ : Set G) = T)
+      ⟨mem_arrowComponent_self m α, hTdef.symm⟩ ?_ hδ
+    rintro β β' ⟨hβmem, hIH⟩ harrow
+    refine ⟨mem_arrowComponent_of_isArrow hβmem harrow, ?_⟩
+    have hSβ : IsArrow G n β γ :=
+      isArrow_of_mem_arrowComponent hmn hαγ hcop hβmem
+    have hSβ' : IsArrow G n β' γ :=
+      isArrow_of_mem_arrowComponent hmn hαγ hcop
+        (mem_arrowComponent_of_isArrow hβmem harrow)
+    have harrow' : Set.ncard (orbit (stabilizer G β') β) = m :=
+      harrow.symm
+    rw [isArrow_iff] at harrow hSβ hSβ'
+    -- coprimality of `m` and `n`
+    have hcopmn : Nat.Coprime m n := by
+      rcases hcop β β' with h2 | h2 <;> rw [harrow] at h2
+      · have h3 : Nat.gcd m m = 1 := h2
+        rw [Nat.gcd_self] at h3
+        rw [h3]
+        exact Nat.coprime_one_left n
+      · exact h2
+    -- Lem 8.39(c) forwards: `C G_β ⊆ C G_{β'}`
+    have hfwd : (stabilizer G γ : Set G) * (stabilizer G β : Set G) ⊆
+        (stabilizer G γ : Set G) * (stabilizer G β' : Set G) := by
+      apply mul_subset_mul_of_coprime
+      rw [← ncard_suborbit_eq_relIndex, ← ncard_suborbit_eq_relIndex,
+        harrow, hSβ]
+      exact hcopmn
+    -- Lem 8.39(c) backwards: `C G_{β'} ⊆ C G_β`
+    have hbwd : (stabilizer G γ : Set G) * (stabilizer G β' : Set G) ⊆
+        (stabilizer G γ : Set G) * (stabilizer G β : Set G) := by
+      apply mul_subset_mul_of_coprime
+      rw [← ncard_suborbit_eq_relIndex, ← ncard_suborbit_eq_relIndex,
+        harrow', hSβ']
+      exact hcopmn
+    rw [← hIH]
+    exact Set.Subset.antisymm hbwd hfwd
+  -- (b2): `T` is invariant under right multiplication by each `G_δ`
+  have hTg : ∀ δ ∈ arrowComponent G m α, ∀ g ∈ stabilizer G δ,
+      T * {g} ⊆ T := by
+    intro δ hδ g hg z hz
+    have hTδ := (hb1 δ hδ).2
+    rw [Set.mem_mul] at hz
+    obtain ⟨t, ht, g', hg', htg⟩ := hz
+    rw [Set.mem_singleton_iff] at hg'
+    rw [hg'] at htg
+    rw [← hTδ, Set.mem_mul] at ht
+    obtain ⟨c, hc, d, hd, hcd⟩ := ht
+    rw [← htg, ← hcd, ← hTδ, Set.mem_mul]
+    exact ⟨c, hc, d * g, (stabilizer G δ).mul_mem hd hg,
+      (mul_assoc c d g).symm⟩
+  have hTg' : ∀ δ ∈ arrowComponent G m α, ∀ g ∈ stabilizer G δ,
+      T * {g} = T := by
+    intro δ hδ g hg
+    apply Set.Subset.antisymm (hTg δ hδ g hg)
+    intro t ht
+    have h2 : t * g⁻¹ ∈ T := by
+      apply hTg δ hδ g⁻¹ (inv_mem hg)
+      rw [Set.mem_mul]
+      exact ⟨t, ht, g⁻¹, rfl, rfl⟩
+    rw [Set.mem_mul]
+    exact ⟨t * g⁻¹, h2, g, rfl,
+      by rw [mul_assoc, inv_mul_cancel, mul_one]⟩
+  -- (b3): hence invariant under right multiplication by `K_m(α)`
+  have hTK : ∀ g ∈ arrowKernel G m α, T * {g} = T := by
+    intro g hgK
+    have hgK' : g ∈ Subgroup.closure
+        (⋃ β ∈ arrowComponent G m α, (stabilizer G β : Set G)) := hgK
+    clear hgK
+    induction hgK' using Subgroup.closure_induction with
+    | mem x hx =>
+      obtain ⟨δ, hδ, hxδ⟩ := Set.mem_iUnion₂.mp hx
+      exact hTg' δ hδ x hxδ
+    | one =>
+      rw [show ({1} : Set G) = (1 : Set G) from rfl, mul_one]
+    | mul x y hx hy hTx hTy =>
+      rw [← Set.singleton_mul_singleton, ← mul_assoc, hTx, hTy]
+    | inv x hx hTx =>
+      calc T * {x⁻¹} = (T * {x}) * {x⁻¹} := by rw [hTx]
+        _ = T * ({x} * {x⁻¹}) := by rw [mul_assoc]
+        _ = T * {1} := by
+            rw [Set.singleton_mul_singleton, mul_inv_cancel]
+        _ = T := by
+            rw [show ({1} : Set G) = (1 : Set G) from rfl, mul_one]
+  -- (b4): `C K_m(α) = C G_α`
+  have hTK2 : T * (arrowKernel G m α : Set G) = T := by
+    apply Set.Subset.antisymm
+    · rintro z hz
+      rw [Set.mem_mul] at hz
+      obtain ⟨t, ht, k, hk, htk⟩ := hz
+      rw [← hTK k hk, Set.mem_mul]
+      exact ⟨t, ht, k, rfl, htk⟩
+    · intro t ht
+      rw [Set.mem_mul]
+      exact ⟨t, ht, 1, (arrowKernel G m α).one_mem, mul_one t⟩
+  have hCK : (stabilizer G γ : Set G) * (arrowKernel G m α : Set G) =
+      T := by
+    apply Set.Subset.antisymm
+    · rintro z hz
+      rw [Set.mem_mul] at hz
+      obtain ⟨c, hc, k, hk, hck⟩ := hz
+      have hcT : c ∈ T := by
+        rw [Set.mem_mul]
+        exact ⟨c, hc, 1, (stabilizer G α).one_mem, mul_one c⟩
+      rw [← hTK2, Set.mem_mul]
+      exact ⟨c, hcT, k, hk, hck⟩
+    · rintro z hz
+      rw [Set.mem_mul] at hz ⊢
+      obtain ⟨c, hc, a, ha, hca⟩ := hz
+      exact ⟨c, hc, a, stabilizer_le_arrowKernel_self m α ha, hca⟩
+  -- (b5): index bookkeeping — `n = k_m · |G_γ : G_γ ∩ K|`
+  have hrel : (stabilizer G γ).relIndex (arrowKernel G m α) =
+      (stabilizer G γ).relIndex (stabilizer G α) :=
+    relIndex_eq_of_coe_mul_eq (by rw [hCK, hTdef])
+  have hn : (stabilizer G γ).relIndex (stabilizer G α) = n := by
+    rw [← ncard_suborbit_eq_relIndex]
+    exact hαγ
+  set K := arrowKernel G m α
+  set C := stabilizer G γ
+  set A := stabilizer G α
+  have h1 : C.relIndex K * Nat.card ↥(C ⊓ K) = Nat.card K :=
+    relIndex_mul_card_inf C K
+  have h2 : A.relIndex K * Nat.card A = Nat.card K := by
+    have h4 := relIndex_mul_card_inf A K
+    rwa [inf_eq_left.mpr (stabilizer_le_arrowKernel_self m α)] at h4
+  have h3 : K.relIndex C * Nat.card ↥(K ⊓ C) = Nat.card C :=
+    relIndex_mul_card_inf K C
+  have hAC : Nat.card A = Nat.card C := card_stabilizer_eq α γ
+  have h5 : n * Nat.card ↥(C ⊓ K) =
+      A.relIndex K * K.relIndex C * Nat.card ↥(C ⊓ K) := by
+    rw [← hn, ← hrel, h1, ← h2, hAC, ← h3, inf_comm K C, ← mul_assoc]
+  have hpos : 0 < Nat.card ↥(C ⊓ K) := Nat.card_pos
+  have h6 : n = A.relIndex K * K.relIndex C :=
+    Nat.eq_of_mul_eq_mul_right hpos h5
+  exact ⟨K.relIndex C, h6⟩
+
 end Theorem842
 
 end OddOrder.Isaacs.Ch08
