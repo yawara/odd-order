@@ -103,8 +103,15 @@
    - ✅ **App I gate closure (2026-07-18)**: BG Lemma 4.5(a) の正規 type-`(p,p)`
      prerequisite と Huppert の order-`p` fixed-space decomposition の双方が
      sorry-free で着地 (issue 2004 / 2040 完了)。
-6. §2 Cor (S abelian or Suzuki 2-group; gate: App III Def 1) → §2 Prop 3 (𝓛(F_q,A)
-   同型; gate: App I Prop 2) → §3 (induction hypothesis 適用開始)。
-   §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
+6. ✅ **§2 Cor 完了** — 新 leaf `SylowTwo.lean`。任意の `S : Sylow 2 Q` は
+   commutative または honest な Suzuki 2-group (`sylowTwo_isMulCommutative_or_isSuzuki2Group`)。
+   - App III Definition 1 を `IsPGroup 2` + 非可換 + 異なる involution 2 個 +
+     cyclic `A ≤ MulAut S` の regular action として de-scaffold。faithful 性は subgroup inclusion に内蔵。
+   - `Q` nilpotent ⟹ `S` normal/characteristic、`conjQByK` を `S` へ制限し `A := range φ`。
+   - `s^K = H∩I` (`image_conj_KSet_eq_involutions_H`) で transporter の存在、
+     `injOn_conj_KSet` で一意性。全 endpoint axiom-clean。
+7. **次 frontier = §2 Prop 3** (`𝓛(F_q,A)` 同型; App I Prop 2) → §3
+   (induction hypothesis 適用開始)。§3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造
+   (mathlib 未整備) に gate される項が増える。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

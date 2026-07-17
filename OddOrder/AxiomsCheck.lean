@@ -6959,6 +6959,17 @@ built into the subgroup inclusion in `MulAut`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
 
+/-! **Peterfalvi Part II, Ch. I §2, Corollary**: nilpotence makes a Sylow
+`2`-subgroup `S ≤ Q` characteristic.  The cyclic subgroup `K` acts on `S`,
+and §1 Proposition 3 gives a regular action on its nonidentity involutions;
+therefore `S` is commutative or an honest Suzuki `2`-group. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByK
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sylowTwo_isMulCommutative_or_isSuzuki2Group
+
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
 `F = 𝔽_p[T] = End_{𝔽_p[T]}(E)` over which `E` is `1`-dimensional, with `|F| = |E|`.  The abstract
