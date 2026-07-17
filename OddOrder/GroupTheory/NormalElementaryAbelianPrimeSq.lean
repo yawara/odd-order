@@ -5,6 +5,9 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.IsMetacyclic
+import Mathlib.RingTheory.ZMod.UnitsCyclic
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Normal type-`(p,p)` subgroups inside a normal elementary abelian subgroup
@@ -199,5 +202,63 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_of_normal_not_isCyclic
       haveI : Subsingleton V := (Nat.card_eq_one_iff_unique.mp (by rw [hk, pow_zero])).1
       exact isCyclic_of_subsingleton)
   · exact hVnc (isCyclic_of_prime_card (p := p) (by rw [hk, pow_one]))
+
+/-! ## Cyclic self-centralizing normal subgroups force metacyclic (odd `p`) -/
+
+/-- A finite `p`-group (`p` odd) with a **cyclic self-centralizing normal** subgroup
+`A` is metacyclic.
+
+Conjugation gives `R →* MulAut A` with kernel `C_R(A) = A`, so `R/A ↪ MulAut A`.
+For `A` a cyclic `p`-group with `p` odd, `MulAut A ≅ (ℤ/p^m)ˣ` is cyclic
+(`IsCyclic.mulAutMulEquiv` + `ZMod.isCyclic_units_of_prime_pow`); a subgroup of a
+cyclic group is cyclic, so `R/A` is cyclic and `⟨A, R/A⟩` witnesses metacyclicity.
+
+This is the reduction used in Gorenstein "Finite Groups" 5.4.10 / BG Lemma 4.5(a):
+if the maximal abelian normal subgroup is cyclic, `R` is metacyclic. -/
+theorem isMetacyclic_of_isCyclic_selfCentralizing_normal
+    (hR : IsPGroup p R) (hp2 : p ≠ 2)
+    {A : Subgroup R} [hAn : A.Normal] (hAcyc : IsCyclic A)
+    (hself : Subgroup.centralizer (A : Set R) = A) :
+    IsMetacyclic R := by
+  haveI : IsCyclic A := hAcyc
+  -- `MulAut A` is cyclic.
+  obtain ⟨m, hm⟩ := (IsPGroup.iff_card).mp (hR.to_subgroup A)
+  haveI hMulAutCyc : IsCyclic (MulAut A) := by
+    have e : MulAut A ≃* (ZMod (Nat.card A))ˣ := IsCyclic.mulAutMulEquiv A
+    rw [hm] at e
+    haveI : IsCyclic (ZMod (p ^ m))ˣ :=
+      ZMod.isCyclic_units_of_prime_pow p Fact.out hp2 m
+    exact isCyclic_of_surjective e.symm e.symm.surjective
+  -- `ker (conjNormal) = C_R(A) = A`.
+  have hker : (MulAut.conjNormal (H := A)).ker = A := by
+    ext g
+    rw [MonoidHom.mem_ker]
+    constructor
+    · intro hg
+      rw [← hself, Subgroup.mem_centralizer_iff]
+      intro h hh
+      have key : g * h * g⁻¹ = h := by
+        have h1 : (MulAut.conjNormal (H := A) g) ⟨h, hh⟩ = ⟨h, hh⟩ := by rw [hg]; rfl
+        calc g * h * g⁻¹ = ((MulAut.conjNormal (H := A) g ⟨h, hh⟩ : A) : R) :=
+              (MulAut.conjNormal_apply g ⟨h, hh⟩).symm
+          _ = ((⟨h, hh⟩ : A) : R) := by rw [h1]
+          _ = h := rfl
+      exact (mul_inv_eq_iff_eq_mul.mp key).symm
+    · intro hg
+      rw [← hself, Subgroup.mem_centralizer_iff] at hg
+      refine MulEquiv.ext fun h => Subtype.ext ?_
+      rw [MulAut.conjNormal_apply]
+      have hc := hg (h : R) h.2
+      rw [← hc, mul_assoc, mul_inv_cancel, mul_one]
+      rfl
+  -- `R/A ≅ range (conjNormal) ≤ MulAut A` is cyclic.
+  haveI hker_cyc : IsCyclic (R ⧸ (MulAut.conjNormal (H := A)).ker) := by
+    have e := QuotientGroup.quotientKerEquivRange (MulAut.conjNormal (H := A))
+    haveI : IsCyclic (MulAut.conjNormal (H := A)).range := inferInstance
+    exact isCyclic_of_surjective e.symm e.symm.surjective
+  haveI hQcyc : IsCyclic (R ⧸ A) :=
+    isCyclic_of_surjective (QuotientGroup.quotientMulEquivOfEq hker)
+      (QuotientGroup.quotientMulEquivOfEq hker).surjective
+  exact ⟨A, hAn, hAcyc, hQcyc⟩
 
 end OddOrder.GroupTheory
