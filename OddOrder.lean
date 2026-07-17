@@ -120,6 +120,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
