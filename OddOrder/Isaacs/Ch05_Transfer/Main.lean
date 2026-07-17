@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch05_Transfer.Basic
+import OddOrder.Isaacs.Ch05_Transfer.Dietzmann
+import OddOrder.Isaacs.Ch05_Transfer.SylowTwoDirectFactor
 
 /-!
 # TAIL
