@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Transfer
+import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.LinearAlgebra.Isomorphisms
 import OddOrder.Algebra.AugmentationIdeal
 
 /-!
@@ -597,6 +599,135 @@ noncomputable def augmentationCoquotientModule :
     Module (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K) :=
   Module.compHom _ (augmentationCoquotientAlgHom G K).toRingHom
 
+/-- Left multiplication `ℤ[G] →ₐ[ℤ] End_ℤ(Δ(G)‾)` (the `ℤ[G]`-module
+structure of Isaacs p. 313, in algebra-homomorphism form). -/
+noncomputable def augmentationCoquotientAlgHomG :
+    MonoidAlgebra ℤ G →ₐ[ℤ] Module.End ℤ (AugmentationCoquotient G K) :=
+  MonoidAlgebra.lift ℤ (Module.End ℤ (AugmentationCoquotient G K)) G
+    (augmentationCoquotientGAction G K)
+
+/-- Left multiplication `x ↦ (ᾱ ↦ x·ᾱ)` as a `ℤ`-linear map in `x`. -/
+noncomputable def augmentationCoquotientMulLeftLinear :
+    MonoidAlgebra ℤ G →ₗ[ℤ] Module.End ℤ (AugmentationCoquotient G K) where
+  toFun x := augmentationCoquotientMulLeft G K hK x
+  map_add' x y := by
+    refine LinearMap.ext fun w => ?_
+    obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ w
+    rw [LinearMap.add_apply, augmentationCoquotientMulLeft_mk,
+      augmentationCoquotientMulLeft_mk, augmentationCoquotientMulLeft_mk,
+      ← Submodule.Quotient.mk_add]
+    exact congrArg _ (Subtype.ext (by
+      simp only [augmentationIdealMulLeft'_coe, Submodule.coe_add, add_mul]))
+  map_smul' c x := by
+    refine LinearMap.ext fun w => ?_
+    obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ w
+    rw [RingHom.id_apply]
+    change augmentationCoquotientMulLeft G K hK (c • x) (Submodule.Quotient.mk α)
+      = c • augmentationCoquotientMulLeft G K hK x (Submodule.Quotient.mk α)
+    rw [augmentationCoquotientMulLeft_mk, augmentationCoquotientMulLeft_mk]
+    have hstep : augmentationIdealMulLeft' G (c • x) α
+        = c • augmentationIdealMulLeft' G x α :=
+      Subtype.ext (by
+        simp only [augmentationIdealMulLeft'_coe, SetLike.val_smul,
+          smul_mul_assoc])
+    rw [hstep]
+    exact map_smul (augmentationCorel G K).mkQ c
+      (augmentationIdealMulLeft' G x α)
+
+theorem augmentationCoquotientAlgHomG_apply (x : MonoidAlgebra ℤ G) :
+    augmentationCoquotientAlgHomG G K x
+      = augmentationCoquotientMulLeft G K hK x := by
+  have hext : (augmentationCoquotientAlgHomG G K).toLinearMap
+      = augmentationCoquotientMulLeftLinear G K := by
+    refine MonoidAlgebra.lhom_ext' fun g => LinearMap.ext_ring ?_
+    have h1 : augmentationCoquotientAlgHomG G K (MonoidAlgebra.of ℤ G g)
+        = augmentationCoquotientMulLeft G K hK (MonoidAlgebra.of ℤ G g) :=
+      MonoidAlgebra.lift_of _ _
+    exact h1
+  exact DFunLike.congr_fun hext x
+
+/-- Compatibility of the `ℤ[G/K]`-action with the projection
+`π : ℤ[G] → ℤ[G/K]`: the coset `Kg` acts as `g` does (Isaacs p. 316). -/
+theorem augmentationCoquotientAlgHom_mapDomain (x : MonoidAlgebra ℤ G) :
+    augmentationCoquotientAlgHom G K
+        (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x)
+      = augmentationCoquotientMulLeft G K hK x := by
+  rw [← augmentationCoquotientAlgHomG_apply]
+  have hcomp : (augmentationCoquotientAlgHom G K).comp
+      (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K))
+      = augmentationCoquotientAlgHomG G K := by
+    refine MonoidAlgebra.algHom_ext fun g => ?_
+    simp only [AlgHom.coe_comp, Function.comp_apply,
+      MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
+      QuotientGroup.mk'_apply]
+    rw [← MonoidAlgebra.of_apply, ← MonoidAlgebra.of_apply,
+      augmentationCoquotientAlgHom_of]
+    exact (augmentationCoquotientAlgHomG_apply G K _).symm
+  exact DFunLike.congr_fun hcomp x
+
+/-- The projection `π : ℤ[G] → ℤ[G/K]` preserves the augmentation. -/
+theorem augmentation_mapDomain (x : MonoidAlgebra ℤ G) :
+    augmentation (G ⧸ K)
+        (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x)
+      = augmentation G x := by
+  have hcomp : (augmentation (G ⧸ K)).comp
+      (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K))
+      = augmentation G := by
+    refine MonoidAlgebra.algHom_ext fun g => ?_
+    simp only [AlgHom.coe_comp, Function.comp_apply,
+      MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
+      QuotientGroup.mk'_apply]
+    rw [← MonoidAlgebra.of_apply, ← MonoidAlgebra.of_apply, augmentation_of,
+      augmentation_of]
+  exact DFunLike.congr_fun hcomp x
+
 end CoquotientModule
+
+section CoquotientSq
+
+/-! ### The index `|Δ(G)‾ : Δ(G)²‾| = |G : G'|` (Isaacs p. 316)
+
+Theorem 10.25 の証明で Theorem 10.26 に渡す index 計算:
+`UA = Δ(G)²‾` (別補題) と `Δ(G)‾/Δ(G)²‾ ≅ Δ(G)/Δ(G)² ≅ G/G'`
+(第三同型 + Theorem 10.20)。 -/
+
+/-- The image `Δ(G)²‾` of `Δ(G)²` in `Δ(G)‾` (Isaacs p. 316:
+`UA = Δ(G)A = Δ(G)²‾`). -/
+noncomputable def augmentationCoquotientSqImage :
+    Submodule ℤ (AugmentationCoquotient G K) :=
+  (augmentationIdealSq G).map (augmentationCorel G K).mkQ
+
+theorem augmentationCorel_le_sq :
+    augmentationCorel G K ≤ augmentationIdealSq G :=
+  Submodule.comap_mono (Submodule.mul_le.mpr fun _ hm _ hn =>
+    Submodule.mul_mem_mul (augmentationIdealOf_le G K hm) hn)
+
+/-- Third isomorphism theorem: `Δ(G)‾/Δ(G)²‾ ≃ Δ(G)/Δ(G)²`
+(Isaacs p. 316: `|A : UA| = |Δ(G) : Δ(G)²|`, valid since
+`Δ(K)Δ(G) ⊆ Δ(G)²`). -/
+noncomputable def augmentationCoquotientSqQuotientEquiv :
+    (AugmentationCoquotient G K ⧸ augmentationCoquotientSqImage G K)
+      ≃ₗ[ℤ] AugmentationQuotient G :=
+  Submodule.quotientQuotientEquivQuotient (augmentationCorel G K)
+    (augmentationIdealSq G) (augmentationCorel_le_sq G K)
+
+/-- `|Δ(G)‾ : Δ(G)²‾| = |G : G'|` (Isaacs p. 316, combining the third
+isomorphism theorem with Theorem 10.20). -/
+theorem nat_card_quotient_augmentationCoquotientSqImage :
+    Nat.card (AugmentationCoquotient G K ⧸ augmentationCoquotientSqImage G K)
+      = Nat.card (Abelianization G) :=
+  Nat.card_congr ((augmentationCoquotientSqQuotientEquiv G K).toEquiv.trans
+    (Multiplicative.ofAdd.trans
+      (abelianizationEquivAugmentationQuotient G).toEquiv.symm))
+
+theorem finite_quotient_augmentationCoquotientSqImage [Finite G] :
+    Finite
+      (AugmentationCoquotient G K ⧸ augmentationCoquotientSqImage G K) :=
+  Finite.of_equiv (Abelianization G)
+    ((augmentationCoquotientSqQuotientEquiv G K).toEquiv.trans
+      (Multiplicative.ofAdd.trans
+        (abelianizationEquivAugmentationQuotient G).toEquiv.symm)).symm
+
+end CoquotientSq
 
 end OddOrder.Algebra
