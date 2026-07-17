@@ -646,6 +646,61 @@ theorem augmentationCoquotientAlgHomG_apply (x : MonoidAlgebra ℤ G) :
     exact h1
   exact DFunLike.congr_fun hext x
 
+/-- Left multiplication by an element of `Δ(K)` annihilates `Δ(G)‾`
+(Isaacs p. 313: `(k-1)ᾱ = 0`, extended `ℤ`-linearly to all of `Δ(K)`). -/
+theorem augmentationCoquotientMulLeft_eq_zero_of_mem
+    {x : MonoidAlgebra ℤ G} (hx : x ∈ augmentationIdealOf G K) :
+    augmentationCoquotientMulLeft G K hK x = 0 := by
+  have key : augmentationCoquotientMulLeftLinear G K x = 0 := by
+    induction hx using Submodule.span_induction with
+    | mem z hz =>
+      obtain ⟨k, rfl⟩ := hz
+      have hof : augmentationCoquotientMulLeftLinear G K
+          (MonoidAlgebra.of ℤ G ↑k) = LinearMap.id :=
+        augmentationCoquotientMulLeft_of_mem G K hK k.2
+      have h1 : augmentationCoquotientMulLeftLinear G K
+          (1 : MonoidAlgebra ℤ G) = LinearMap.id := by
+        have h := augmentationCoquotientMulLeft_of_mem G K hK K.one_mem
+        rwa [map_one] at h
+      rw [map_sub, hof, h1, sub_self]
+    | zero => exact map_zero _
+    | add x y _ _ ihx ihy => rw [map_add, ihx, ihy, add_zero]
+    | smul c x _ ihx => rw [map_smul, ihx]; exact smul_zero c
+  exact key
+
+/-- Left multiplication by an element of the left ideal `Δ(K)·ℤ[G]`
+annihilates `Δ(G)‾` (Isaacs p. 313). -/
+theorem augmentationCoquotientAlgHomG_eq_zero_of_mem_mul
+    {z : MonoidAlgebra ℤ G}
+    (hz : z ∈ augmentationIdealOf G K
+      * (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))) :
+    augmentationCoquotientAlgHomG G K z = 0 := by
+  refine Submodule.mul_induction_on' (fun a ha b _ => ?_)
+    (fun x y _ _ hx hy => ?_) hz
+  · rw [map_mul]
+    have h0 : augmentationCoquotientAlgHomG G K a = 0 := by
+      rw [augmentationCoquotientAlgHomG_apply]
+      exact augmentationCoquotientMulLeft_eq_zero_of_mem G K ha
+    rw [h0, zero_mul]
+  · rw [map_add, hx, hy, add_zero]
+
+/-- **Transversal independence of `Ξ`** (Isaacs p. 313): if two elements of
+`ℤ[G]` differ by an element of the left ideal `Δ(K)·ℤ[G]`, then they induce
+the same left-multiplication map on `Δ(G)‾`.  In particular the sum of a
+transversal for `K` in `G` induces a well-defined `Ξ`, independent of the
+choice of transversal. -/
+theorem augmentationCoquotientMulLeft_eq_of_sub_mem
+    {x y : MonoidAlgebra ℤ G}
+    (h : x - y ∈ augmentationIdealOf G K
+      * (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))) :
+    augmentationCoquotientMulLeft G K hK x
+      = augmentationCoquotientMulLeft G K hK y := by
+  have hzero : augmentationCoquotientAlgHomG G K (x - y) = 0 :=
+    augmentationCoquotientAlgHomG_eq_zero_of_mem_mul G K h
+  rw [map_sub, augmentationCoquotientAlgHomG_apply,
+    augmentationCoquotientAlgHomG_apply] at hzero
+  exact sub_eq_zero.mp hzero
+
 /-- Compatibility of the `ℤ[G/K]`-action with the projection
 `π : ℤ[G] → ℤ[G/K]`: the coset `Kg` acts as `g` does (Isaacs p. 316). -/
 theorem augmentationCoquotientAlgHom_mapDomain (x : MonoidAlgebra ℤ G) :
