@@ -84,6 +84,34 @@ theorem exists_involution_conj_of_odd_orderOf {G : Type*} [Group G]
     _ = s * (s * v) := by rw [pow_orderOf_eq_one, one_mul]
     _ = v := by rw [← mul_assoc, hs, one_mul]
 
+/-- A subgroup of odd order contains no involution. -/
+theorem eq_one_of_sq_eq_one_of_odd_card {G : Type*} [Group G] [Finite G]
+    {K : Subgroup G} (hodd : Odd (Nat.card K)) {x : G} (hx : x ∈ K)
+    (hx2 : x ^ 2 = 1) : x = 1 := by
+  have hd2 : orderOf (⟨x, hx⟩ : K) ∣ 2 :=
+    orderOf_dvd_of_pow_eq_one (Subtype.ext (by push_cast; exact hx2))
+  have hdK : orderOf (⟨x, hx⟩ : K) ∣ Nat.card K := orderOf_dvd_natCard _
+  have hg := Nat.dvd_gcd hd2 hdK
+  have hc : Nat.gcd 2 (Nat.card K) = 1 := Nat.coprime_two_left.mpr hodd
+  rw [hc, Nat.dvd_one, orderOf_eq_one_iff] at hg
+  exact congrArg Subtype.val hg
+
+/-- Conjugating a subgroup twice composes: `(K^a)^b = K^{ba}`. -/
+theorem map_conj_map_conj {G : Type*} [Group G] (K : Subgroup G) (a b : G) :
+    (K.map (MulAut.conj a).toMonoidHom).map (MulAut.conj b).toMonoidHom =
+      K.map (MulAut.conj (b * a)).toMonoidHom := by
+  rw [Subgroup.map_map]
+  congr 1
+  ext x
+  simp [MulAut.conj_apply, mul_assoc]
+
+/-- Conjugation by `1` fixes every subgroup. -/
+theorem map_conj_one {G : Type*} [Group G] (K : Subgroup G) :
+    K.map (MulAut.conj (1 : G)).toMonoidHom = K := by
+  ext x
+  rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
+  simp
+
 /-! ## Hypotheses (A1)–(A3) -/
 
 /-- **Peterfalvi Part II, hypotheses (A1)–(A3)** (p. 97).  The internal
@@ -791,7 +819,6 @@ lemma bijOn_conj_of_involution_mem_Q {s : G} (hsQ : s ∈ hyp.Q)
     -- `s^u ∈ H` would put an involution inside the odd-order `H^{u⁻¹} ∩ H`
     intro hmem
     have huinvH : u⁻¹ ∉ hyp.H := fun h => huH (by simpa using inv_mem h)
-    have hoddK := hyp.odd_card_conj_inf huinvH
     have hKmem : u⁻¹ * s * u ∈
         hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H := by
       refine Subgroup.mem_inf.mpr ⟨?_, hmem⟩
@@ -799,18 +826,8 @@ lemma bijOn_conj_of_involution_mem_Q {s : G} (hsQ : s ∈ hyp.Q)
       have hred : (u⁻¹)⁻¹ * (u⁻¹ * s * u) * u⁻¹ = s := by group
       rw [hred]
       exact hsH
-    have hord2 : orderOf (⟨u⁻¹ * s * u, hKmem⟩ :
-        ↥(hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H)) = 2 := by
-      have h1 := orderOf_injective
-        (hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H).subtype
-        (Subgroup.subtype_injective _) ⟨u⁻¹ * s * u, hKmem⟩
-      rw [← h1]
-      exact orderOf_eq_prime hcsq hcne
-    have hdvd : 2 ∣ Nat.card
-        ↥(hyp.H.map (MulAut.conj u⁻¹).toMonoidHom ⊓ hyp.H) := by
-      rw [← hord2]
-      exact orderOf_dvd_natCard _
-    exact (Nat.two_dvd_ne_zero.mpr (Nat.odd_iff.mp hoddK)) hdvd
+    exact hcne (eq_one_of_sq_eq_one_of_odd_card
+      (hyp.odd_card_conj_inf huinvH) hKmem hcsq)
   have hsurj : Set.SurjOn (fun u => u⁻¹ * s * u)
       {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H}
       {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H} := by
@@ -830,6 +847,196 @@ lemma bijOn_conj_of_involution_mem_Q {s : G} (hsQ : s ∈ hyp.Q)
       exact hvH (hconj ▸ hsH)
     exact ⟨u, ⟨by rw [sq]; exact hu2, hu1, huH⟩, hconj⟩
   exact ((Set.toFinite _).surjOn_iff_bijOn_of_mapsTo hmaps).mp hsurj
+
+/-- `H^g = H` exactly for `g ∈ H` (restatement of `N_G(H) = H`, Prop 1(d)). -/
+lemma map_conj_eq_self_iff_mem_H {g : G} :
+    hyp.H.map (MulAut.conj g).toMonoidHom = hyp.H ↔ g ∈ hyp.H := by
+  constructor
+  · intro heq
+    rw [← hyp.normalizer_H_eq_H, Subgroup.mem_set_normalizer_iff]
+    intro n
+    simp only [SetLike.mem_coe]
+    constructor
+    · intro hn
+      rw [← heq]
+      exact ⟨n, hn, rfl⟩
+    · intro hn
+      rw [← heq] at hn
+      obtain ⟨m, hm, hme⟩ := hn
+      have h2 : g * m * g⁻¹ = g * n * g⁻¹ := hme
+      have hmn : m = n := mul_left_cancel (mul_right_cancel h2)
+      rwa [← hmn]
+  · intro hg
+    ext x
+    constructor
+    · rintro ⟨m, hm, rfl⟩
+      exact mul_mem (mul_mem hg hm) (inv_mem hg)
+    · intro hx
+      exact ⟨g⁻¹ * x * g, mul_mem (mul_mem (inv_mem hg) hx) hg, by
+        change g * (g⁻¹ * x * g) * g⁻¹ = x
+        group⟩
+
+/-- `H^a = H^b ↔ b⁻¹a ∈ H` (from Prop 1(d)). -/
+lemma map_conj_eq_map_conj_iff {a b : G} :
+    hyp.H.map (MulAut.conj a).toMonoidHom =
+      hyp.H.map (MulAut.conj b).toMonoidHom ↔ b⁻¹ * a ∈ hyp.H := by
+  constructor
+  · intro h
+    have h2 := congrArg
+      (fun K : Subgroup G => K.map (MulAut.conj b⁻¹).toMonoidHom) h
+    simp only [map_conj_map_conj] at h2
+    rw [inv_mul_cancel, map_conj_one] at h2
+    exact (hyp.map_conj_eq_self_iff_mem_H).mp h2
+  · intro h
+    have h2 := congrArg
+      (fun K : Subgroup G => K.map (MulAut.conj b).toMonoidHom)
+      ((hyp.map_conj_eq_self_iff_mem_H).mpr h)
+    simp only [map_conj_map_conj] at h2
+    rwa [mul_inv_cancel_left] at h2
+
+/-- For an involution `u`, `s^u = u⁻¹su` lands in `H^u`. -/
+lemma conj_mem_map_conj_of_sq_eq_one {s u : G} (hsH : s ∈ hyp.H)
+    (hu2 : u ^ 2 = 1) :
+    u⁻¹ * s * u ∈ hyp.H.map (MulAut.conj u).toMonoidHom := by
+  have huu : u * u = 1 := by rw [← sq]; exact hu2
+  have huinv : u⁻¹ = u := inv_eq_of_mul_eq_one_right huu
+  rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
+  have heq : u⁻¹ * (u⁻¹ * s * u) * u = s := by
+    rw [huinv]
+    calc u * (u * s * u) * u = (u * u) * s * (u * u) := by group
+      _ = s := by rw [huu, one_mul, mul_one]
+  rw [heq]
+  exact hsH
+
+/-- **Peterfalvi Part II, Ch. I Prop 2 (d)** (p. 100) — the number of
+involutions `u` with `H^u = H^t` equals `|H ∩ I|`.
+
+Proof: for the involution `s ∈ Q` of Cauchy, the permutation `u ↦ s^u` of
+`I - (H ∩ I)` (Prop 2(c)) maps `{u ∈ I | H^u = H^t}` bijectively onto
+`H^t ∩ I` (as `s^u ∈ H^u`, and `s^u ∈ H^u ∩ H^t` forces `H^u = H^t` by the
+oddness of Prop 1(a)), and `|H^t ∩ I| = |H ∩ I|`. -/
+lemma ncard_involutions_map_conj_eq_card_involutions_H :
+    {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+        hyp.H.map (MulAut.conj u).toMonoidHom =
+          hyp.H.map (MulAut.conj hyp.t).toMonoidHom}.ncard =
+      {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard := by
+  classical
+  obtain ⟨s, hsQ, hs2, hs1⟩ := hyp.exists_involution_mem_Q
+  have hsH := hyp.Q_le_H hsQ
+  have hbij := hyp.bijOn_conj_of_involution_mem_Q hsQ hs2 hs1
+  -- `T ⊆ A` (an involution with `H^u = H^t` is outside `H`)
+  have hTA : {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+      hyp.H.map (MulAut.conj u).toMonoidHom =
+        hyp.H.map (MulAut.conj hyp.t).toMonoidHom} ⊆
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H} := by
+    rintro u ⟨hu2, hu1, hueq⟩
+    refine ⟨hu2, hu1, fun huH => ?_⟩
+    exact hyp.t_not_mem_H ((hyp.map_conj_eq_self_iff_mem_H).mp
+      (((hyp.map_conj_eq_self_iff_mem_H).mpr huH).symm.trans hueq).symm)
+  -- `B ⊆ A` (an involution of `H^t` is outside `H`, by Prop 1(a))
+  have hBA : {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+      u ∈ hyp.H.map (MulAut.conj hyp.t).toMonoidHom} ⊆
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H} := by
+    rintro u ⟨hu2, hu1, huHt⟩
+    refine ⟨hu2, hu1, fun huH => ?_⟩
+    exact hu1 (eq_one_of_sq_eq_one_of_odd_card
+      (hyp.odd_card_conj_inf hyp.t_not_mem_H)
+      (Subgroup.mem_inf.mpr ⟨huHt, huH⟩) hu2)
+  -- on `A`: `u ∈ T ↔ s^u ∈ B`
+  have hkey : ∀ u ∈ {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H},
+      (u ∈ {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+          hyp.H.map (MulAut.conj u).toMonoidHom =
+            hyp.H.map (MulAut.conj hyp.t).toMonoidHom} ↔
+        u⁻¹ * s * u ∈ {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+          u ∈ hyp.H.map (MulAut.conj hyp.t).toMonoidHom}) := by
+    rintro u huA
+    obtain ⟨hu2, hu1, huH⟩ := huA
+    constructor
+    · rintro ⟨-, -, hueq⟩
+      obtain ⟨hσ2, hσ1, -⟩ := hbij.mapsTo ⟨hu2, hu1, huH⟩
+      refine ⟨hσ2, hσ1, ?_⟩
+      rw [← hueq]
+      exact hyp.conj_mem_map_conj_of_sq_eq_one hsH hu2
+    · rintro ⟨hσ2, hσ1, hσHt⟩
+      refine ⟨hu2, hu1, ?_⟩
+      by_contra hne
+      -- `H^u ≠ H^t`, so `|H^u ∩ H^t|` is odd, yet contains the involution `s^u`
+      have htuH : hyp.t⁻¹ * u ∉ hyp.H :=
+        fun h => hne ((hyp.map_conj_eq_map_conj_iff).mpr h)
+      have hodd := hyp.odd_card_conj_inf htuH
+      have hconj_eq : (hyp.H.map (MulAut.conj (hyp.t⁻¹ * u)).toMonoidHom ⊓
+          hyp.H).map (MulAut.conj hyp.t).toMonoidHom =
+          hyp.H.map (MulAut.conj u).toMonoidHom ⊓
+            hyp.H.map (MulAut.conj hyp.t).toMonoidHom := by
+        rw [Subgroup.map_inf _ _ _ (MulEquiv.injective (MulAut.conj hyp.t)),
+          map_conj_map_conj, mul_inv_cancel_left]
+      have hoddconj : Odd (Nat.card
+          ↥(hyp.H.map (MulAut.conj u).toMonoidHom ⊓
+            hyp.H.map (MulAut.conj hyp.t).toMonoidHom)) := by
+        rw [← hconj_eq,
+          ← Nat.card_congr (Subgroup.equivMapOfInjective _ _
+            (MulEquiv.injective (MulAut.conj hyp.t))).toEquiv]
+        exact hodd
+      exact hσ1 (eq_one_of_sq_eq_one_of_odd_card hoddconj
+        (Subgroup.mem_inf.mpr
+          ⟨hyp.conj_mem_map_conj_of_sq_eq_one hsH hu2, hσHt⟩) hσ2)
+  -- the permutation restricts to a bijection `T ≃ B`
+  have himg : (fun u => u⁻¹ * s * u) ''
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+        hyp.H.map (MulAut.conj u).toMonoidHom =
+          hyp.H.map (MulAut.conj hyp.t).toMonoidHom} =
+      {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+        u ∈ hyp.H.map (MulAut.conj hyp.t).toMonoidHom} := by
+    apply Set.Subset.antisymm
+    · rintro - ⟨u, huT, rfl⟩
+      exact (hkey u (hTA huT)).mp huT
+    · intro b hb
+      obtain ⟨u, huA, hub⟩ := hbij.surjOn (hBA hb)
+      have hub' : u⁻¹ * s * u = b := hub
+      refine ⟨u, (hkey u huA).mpr ?_, hub⟩
+      rw [hub']
+      exact hb
+  -- `|H^t ∩ I| = |H ∩ I|` via conjugation by `t`
+  have hBS : {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+      u ∈ hyp.H.map (MulAut.conj hyp.t).toMonoidHom} =
+      (fun x : G => hyp.t * x * hyp.t⁻¹) ''
+        {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
+    ext b
+    constructor
+    · rintro ⟨hb2, hb1, hbHt⟩
+      obtain ⟨m, hm, hme⟩ := hbHt
+      have hme' : hyp.t * m * hyp.t⁻¹ = b := hme
+      refine ⟨m, ⟨?_, ?_, hm⟩, hme'⟩
+      · have h2 : (hyp.t * m * hyp.t⁻¹) ^ 2 = 1 := by rw [hme']; exact hb2
+        rw [conj_pow] at h2
+        have h3 := congrArg (fun z : G => hyp.t⁻¹ * z * hyp.t) h2
+        simpa [mul_assoc] using h3
+      · intro h1
+        apply hb1
+        rw [← hme', h1, mul_one, mul_inv_cancel]
+    · rintro ⟨m, ⟨hm2, hm1, hmH⟩, rfl⟩
+      refine ⟨?_, ?_, ⟨m, hmH, rfl⟩⟩
+      · rw [conj_pow, hm2, mul_one, mul_inv_cancel]
+      · intro h
+        apply hm1
+        have h2 := congrArg (fun z : G => hyp.t⁻¹ * z * hyp.t) h
+        simpa [mul_assoc] using h2
+  calc {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+        hyp.H.map (MulAut.conj u).toMonoidHom =
+          hyp.H.map (MulAut.conj hyp.t).toMonoidHom}.ncard
+      = ((fun u => u⁻¹ * s * u) ''
+          {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+            hyp.H.map (MulAut.conj u).toMonoidHom =
+              hyp.H.map (MulAut.conj hyp.t).toMonoidHom}).ncard :=
+        (Set.ncard_image_of_injOn (hbij.injOn.mono hTA)).symm
+    _ = {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
+          u ∈ hyp.H.map (MulAut.conj hyp.t).toMonoidHom}.ncard := by
+        rw [himg]
+    _ = {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H}.ncard := by
+        rw [hBS]
+        exact Set.ncard_image_of_injective _ (fun a b h => by
+          simpa [mul_assoc] using
+            congrArg (fun z : G => hyp.t⁻¹ * z * hyp.t) h)
 
 end Hypothesis
 
