@@ -16,12 +16,12 @@ Repository and open-claim searches found no existing construction.
 
 ## やること
 
-- [ ] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/RootGroup.lean`.
-- [ ] Construct the group law `(a,b)*(c,d) = (a+c,b+d+a*theta(c))`.
-- [ ] Prove explicit one, multiplication, inverse, square, and fourth-power formulas.
-- [ ] Construct the central involution line and prove its structural API.
-- [ ] Prove the exact cardinality and the `2`-group instance/theorem.
-- [ ] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
+- [x] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/RootGroup.lean`.
+- [x] Construct the ovoid-coordinate group law `(x,y)*(u,v) = (x+u,y+v+u*theta(x))`.
+- [x] Prove explicit one, multiplication, inverse, square, and fourth-power formulas.
+- [x] Construct the central involution line and prove its structural API.
+- [x] Prove the exact cardinality and the `2`-group instance/theorem.
+- [x] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
 
 ## 完了条件
 

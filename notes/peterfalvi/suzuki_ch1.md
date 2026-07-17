@@ -136,8 +136,11 @@
    - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
      `theta(theta(x)) = x^2`; these are the concrete identities used by the standard
      root-group and torus formulas.
-   - Next upstream layer: construct the nonabelian root group `S(q,theta)` on `F x F`,
-     then its standard action on the `q^2 + 1` point ovoid and its simple permutation
-     image. After Sz(q), construct the PSU(3,q) target of degree `q^3 + 1`.
+   - `GroupTheory/SpecificGroups/Suzuki/RootGroup.lean` now constructs the nonabelian
+     root group `S(q,theta)` in ovoid coordinates, proves its explicit inverse, square,
+     exponent-four law, central involution line, exact order `q^2`, and `2`-group property.
+   - Next upstream layer: construct the standard action on the `q^2 + 1` point ovoid
+     and its simple permutation image. After Sz(q), construct the PSU(3,q) target of
+     degree `q^3 + 1`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
