@@ -49,6 +49,7 @@ namespace OddOrder.Isaacs.Ch10
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
 open OddOrder.BG.Ch1
+open scoped commutatorElement
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
@@ -90,6 +91,129 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     (hp2 : 2 < p)
     (habel : ∀ Y : Subgroup N, Y.Normal → Y ≤ P → Nat.card ↥Y = p → ⁅P, P⁆ ≤ Y) :
     p ∣ (commutator N).index := by
+  classical
+  have hp_prime : p.Prime := hp.out
+  haveI := hPn
+  -- ### Step 2 setup: `P' := ⁅P, P⁆ ⊴ N` is a nontrivial cyclic `p`-group
+  set P' : Subgroup N := ⁅P, P⁆ with hP'_def
+  haveI hP'n : P'.Normal := by rw [hP'_def]; infer_instance
+  have hP'le : P' ≤ P := Subgroup.commutator_le_left P P
+  have hP'_map : (_root_.commutator ↥P).map P.subtype = P' := by
+    rw [_root_.commutator_def, Subgroup.map_commutator, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype]
+  have hP'cyc : IsCyclic ↥P' := by
+    haveI := hmeta.isCyclic_commutator
+    have e := Subgroup.equivMapOfInjective (_root_.commutator ↥P) P.subtype
+      P.subtype_injective
+    rw [hP'_map] at e
+    exact isCyclic_of_surjective e.toMonoidHom e.surjective
+  have hP'p : IsPGroup p ↥P' := hPp.to_le hP'le
+  have hP'ne : P' ≠ ⊥ := by
+    intro hbot
+    refine hnonab fun x y => ?_
+    have hmem : ⁅(x : N), (y : N)⁆ ∈ P' :=
+      Subgroup.commutator_mem_commutator x.2 y.2
+    rw [hbot, Subgroup.mem_bot] at hmem
+    exact Subtype.ext (commutatorElement_eq_one_iff_mul_comm.mp hmem)
+  -- `P'` contains an order-`p` element (Cauchy), giving `Y₀ ≤ P'` of order `p`
+  have hpdvd : p ∣ Nat.card ↥P' := by
+    rcases hP'p.card_eq_or_dvd with h1 | h2
+    · exact absurd (Subgroup.card_eq_one.mp h1) hP'ne
+    · exact h2
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hpdvd
+  set Y₀ : Subgroup N := (Subgroup.zpowers g).map P'.subtype with hY₀_def
+  have hY₀le : Y₀ ≤ P' := Subgroup.map_subtype_le _
+  have hY₀card : Nat.card ↥Y₀ = p := by
+    rw [hY₀_def,
+      ← Nat.card_congr (Subgroup.equivMapOfInjective (Subgroup.zpowers g) P'.subtype
+        P'.subtype_injective).toEquiv,
+      Nat.card_zpowers, hg]
+  -- conjugation permutes the order-`p` subgroups of the cyclic `P'`, so `Y₀ ⊴ N`
+  have hY₀conj : ∀ n : N, Y₀.map (MulAut.conj n).toMonoidHom = Y₀ := by
+    intro n
+    set Y₁ : Subgroup N := Y₀.map (MulAut.conj n).toMonoidHom with hY₁_def
+    have hY₁le : Y₁ ≤ P' := by
+      rw [hY₁_def]
+      rintro _ ⟨y, hy, rfl⟩
+      exact hP'n.conj_mem y (hY₀le hy) n
+    have hY₁card : Nat.card ↥Y₁ = p := by
+      rw [hY₁_def,
+        ← Nat.card_congr (Subgroup.equivMapOfInjective Y₀ (MulAut.conj n).toMonoidHom
+          (MulAut.conj n).injective).toEquiv]
+      exact hY₀card
+    haveI := hP'cyc
+    have hsub : Y₁.subgroupOf P' = Y₀.subgroupOf P' := by
+      refine subgroup_eq_of_card_eq_prime_of_isCyclic (p := p) ?_ ?_
+      · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY₁le).toEquiv]
+        exact hY₁card
+      · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY₀le).toEquiv]
+        exact hY₀card
+    ext x
+    constructor
+    · intro hx
+      have hxP' : x ∈ P' := hY₁le hx
+      have : (⟨x, hxP'⟩ : ↥P') ∈ Y₁.subgroupOf P' := hx
+      rw [hsub] at this
+      exact this
+    · intro hx
+      have hxP' : x ∈ P' := hY₀le hx
+      have : (⟨x, hxP'⟩ : ↥P') ∈ Y₀.subgroupOf P' := hx
+      rw [← hsub] at this
+      exact this
+  haveI hY₀n : Y₀.Normal := by
+    constructor
+    intro y hy n
+    rw [← hY₀conj n]
+    exact ⟨y, hy, rfl⟩
+  -- ### Step 2 conclusion: `|P'| = p`, and `P'` is the unique order-`p` normal subgroup
+  have hP'card : Nat.card ↥P' = p := by
+    have hP'Y₀ : P' ≤ Y₀ := habel Y₀ hY₀n (hY₀le.trans hP'le) hY₀card
+    rw [le_antisymm hP'Y₀ hY₀le]
+    exact hY₀card
+  -- any normal `p`-subgroup of `N` sits inside the normal Sylow subgroup `P`
+  have hle_P : ∀ Y : Subgroup N, Y.Normal → IsPGroup p ↥Y → Y ≤ P := by
+    intro Y hYn hYp
+    haveI := hYn
+    by_contra hnot
+    have hsupp : IsPGroup p ↥(Y ⊔ P) := hYp.to_sup_of_normal_right hPp
+    have hlt : P < Y ⊔ P := lt_of_le_of_ne le_sup_right fun h => hnot (h ▸ le_sup_left)
+    have hrel_ne : P.relIndex (Y ⊔ P) ≠ 1 := by
+      intro h1
+      exact hlt.not_ge (Subgroup.relIndex_eq_one.mp h1)
+    have hdvd_card : P.relIndex (Y ⊔ P) ∣ Nat.card ↥(Y ⊔ P) :=
+      Subgroup.index_dvd_card _
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hsupp
+    rw [hm] at hdvd_card
+    obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow hp_prime).mp hdvd_card
+    have hk1 : 1 ≤ k := by
+      rcases Nat.eq_zero_or_pos k with h0 | h1
+      · exact absurd (by rw [hk, h0, pow_zero]) hrel_ne
+      · exact h1
+    refine hPidx ?_
+    have hmul := Subgroup.relIndex_mul_index (le_sup_right : P ≤ Y ⊔ P)
+    calc p ∣ p ^ k := dvd_pow_self p (by omega)
+      _ = P.relIndex (Y ⊔ P) := hk.symm
+      _ ∣ P.index := ⟨(Y ⊔ P).index, hmul.symm⟩
+  have huniq : ∀ Y : Subgroup N, Y.Normal → Nat.card ↥Y = p → Y = P' := by
+    intro Y hYn hYcard
+    have hYP : Y ≤ P := hle_P Y hYn (IsPGroup.of_card (by rw [hYcard, pow_one]))
+    have hP'Y : P' ≤ Y := habel Y hYn hYP hYcard
+    exact (Subgroup.eq_of_le_of_card_ge hP'Y (by rw [hP'card, hYcard])).symm
+  -- ### Step 3: `P' ≤ Z(P)` — `P` has class 2
+  have hcomm_card : Nat.card ↥(_root_.commutator ↥P) = p := by
+    have h := Nat.card_congr (Subgroup.equivMapOfInjective (_root_.commutator ↥P)
+      P.subtype P.subtype_injective).toEquiv
+    rw [hP'_map] at h
+    rw [h, hP'card]
+  have hcomm_le_center : _root_.commutator ↥P ≤ Subgroup.center ↥P :=
+    normal_le_center_of_card_eq_prime hPp hcomm_card
+  -- ### Step 4: `V := Ω₁(P)` is elementary abelian of order `p²`
+  have hnc : ¬ IsCyclic ↥P := by
+    intro hcyc
+    letI : CommGroup ↥P := IsCyclic.commGroup
+    exact hnonab fun x y => mul_comm x y
+  obtain ⟨hVea, hVcard⟩ := OddOrder.BG.Ch1.S04.isElementaryAbelian_omega1_of_isMetacyclic
+    hPp (hp_prime.odd_of_ne_two (by omega)) hmeta hnc
   sorry
 
 /-- **Isaacs Theorem 10.15**, inductive core: if `P ⊴ N` is a nonabelian
@@ -163,7 +287,7 @@ private theorem thm1015_aux (n : ℕ) :
           intro g₁ hg₁ g₂ hg₂
           have := hcomm ⟨g₁, hg₁⟩ ⟨g₂, hg₂⟩
           have hcoe : g₁ * g₂ = g₂ * g₁ := congrArg Subtype.val this
-          simp [commutatorElement_def, hcoe, Subgroup.mem_bot]
+          simp [commutatorElement_def, hcoe]
         have hmap : (⁅P, P⁆ : Subgroup N).map (QuotientGroup.mk' Y) = ⊥ := by
           rw [Subgroup.map_commutator]
           exact hbot
