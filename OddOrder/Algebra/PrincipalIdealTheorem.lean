@@ -145,6 +145,11 @@ noncomputable def augmentationCoquotientMulLeft (hK : K.Normal)
       (mul_mem_augmentationIdealOf_mul G K hK x (mem_augmentationCorel.mp hα)))
 
 @[simp]
+theorem augmentationIdealMulLeft'_coe (x : MonoidAlgebra ℤ G)
+    (α : ↥(augmentationIdeal G)) :
+    (augmentationIdealMulLeft' G x α : MonoidAlgebra ℤ G) = x * α := rfl
+
+@[simp]
 theorem augmentationCoquotientMulLeft_mk (hK : K.Normal)
     (x : MonoidAlgebra ℤ G) (α : ↥(augmentationIdeal G)) :
     augmentationCoquotientMulLeft G K hK x (Submodule.Quotient.mk α)
@@ -513,5 +518,85 @@ noncomputable def transferRangeEquivXiRange (hK : K.Normal)
   MulEquiv.ofBijective _ (transferRangeToXiRange_bijective G K hK S)
 
 end TransferBridge
+
+section CoquotientModule
+
+/-! ### `Δ(G)‾` as a `ℤ[G/K]`-module (Isaacs p. 316)
+
+`K` は `Δ(G)‾` に自明に作用するので、`G/K` の作用が降下し、`Δ(G)‾` は
+`ℤ[G/K]` 上の加群になる。Theorem 10.25 はこの構造の上で Theorem 10.26
+(`FiniteIndexAnnihilator.lean`) を `R = ℤ[G/K]` (可換、`G' ≤ K` のとき) に
+適用する。instance にはせず (`ℤ`-module 構造との diamond を避ける)、
+`Module.compHom` の値として提供し、使用側で `letI` する。 -/
+
+variable [hK : K.Normal]
+
+/-- Left multiplication as a monoid homomorphism
+`G →* End_ℤ(Δ(G)‾)` (Isaacs p. 313: `Δ(G)‾` is a left `ℤ[G]`-module). -/
+noncomputable def augmentationCoquotientGAction :
+    G →* Module.End ℤ (AugmentationCoquotient G K) where
+  toFun g := augmentationCoquotientMulLeft G K hK (MonoidAlgebra.of ℤ G g)
+  map_one' := by
+    refine LinearMap.ext fun x => ?_
+    obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ x
+    rw [augmentationCoquotientMulLeft_mk, Module.End.one_apply]
+    exact congrArg _ (Subtype.ext (by
+      rw [augmentationIdealMulLeft'_coe, map_one, one_mul]))
+  map_mul' g h := by
+    refine LinearMap.ext fun x => ?_
+    obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ x
+    rw [Module.End.mul_apply, augmentationCoquotientMulLeft_mk,
+      augmentationCoquotientMulLeft_mk, augmentationCoquotientMulLeft_mk]
+    exact congrArg _ (Subtype.ext (by
+      simp only [augmentationIdealMulLeft'_coe, map_mul, mul_assoc]))
+
+@[simp]
+theorem augmentationCoquotientGAction_apply (g : G)
+    (x : AugmentationCoquotient G K) :
+    augmentationCoquotientGAction G K g x
+      = augmentationCoquotientMulLeft G K hK (MonoidAlgebra.of ℤ G g) x := rfl
+
+/-- The `G`-action on `Δ(G)‾` descends to `G/K` (Isaacs p. 313: `K` acts
+trivially). -/
+noncomputable def augmentationCoquotientQuotientAction :
+    G ⧸ K →* Module.End ℤ (AugmentationCoquotient G K) :=
+  QuotientGroup.lift K (augmentationCoquotientGAction G K)
+    (fun k hk => by
+      refine LinearMap.ext fun x => ?_
+      rw [augmentationCoquotientGAction_apply,
+        augmentationCoquotientMulLeft_of_mem G K hK hk, Module.End.one_apply,
+        LinearMap.id_apply])
+
+@[simp]
+theorem augmentationCoquotientQuotientAction_mk (g : G)
+    (x : AugmentationCoquotient G K) :
+    augmentationCoquotientQuotientAction G K (↑g : G ⧸ K) x
+      = augmentationCoquotientMulLeft G K hK (MonoidAlgebra.of ℤ G g) x := rfl
+
+/-- The action of the group ring `ℤ[G/K]` on `Δ(G)‾`, as an algebra
+homomorphism into `End_ℤ(Δ(G)‾)` (Isaacs p. 316: `A = Δ(G)‾` is a left
+module for `R = ℤ[G/K]`). -/
+noncomputable def augmentationCoquotientAlgHom :
+    MonoidAlgebra ℤ (G ⧸ K) →ₐ[ℤ] Module.End ℤ (AugmentationCoquotient G K) :=
+  MonoidAlgebra.lift ℤ (Module.End ℤ (AugmentationCoquotient G K)) (G ⧸ K)
+    (augmentationCoquotientQuotientAction G K)
+
+@[simp]
+theorem augmentationCoquotientAlgHom_of (g : G) :
+    augmentationCoquotientAlgHom G K
+        (MonoidAlgebra.of ℤ (G ⧸ K) (↑g : G ⧸ K))
+      = augmentationCoquotientMulLeft G K hK (MonoidAlgebra.of ℤ G g) := by
+  refine LinearMap.ext fun x => ?_
+  rw [augmentationCoquotientAlgHom, MonoidAlgebra.lift_of,
+    augmentationCoquotientQuotientAction_mk]
+
+/-- `Δ(G)‾` as a `ℤ[G/K]`-module.  Not an instance: use
+`letI := augmentationCoquotientModule G K` locally. -/
+@[reducible]
+noncomputable def augmentationCoquotientModule :
+    Module (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K) :=
+  Module.compHom _ (augmentationCoquotientAlgHom G K).toRingHom
+
+end CoquotientModule
 
 end OddOrder.Algebra
