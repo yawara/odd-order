@@ -118,6 +118,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.Isaacs.Ch04_Commutators.Mann
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch08_PermutationGroups.AffineGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransitiveAutomorphisms
@@ -126,6 +127,11 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 import OddOrder.Isaacs.Ch08_PermutationGroups.PCycleJordan
 import OddOrder.Isaacs.Ch08_PermutationGroups.Bochert
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransvectionGeneration
+import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
+import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
+import OddOrder.Isaacs.Ch08_PermutationGroups.OrbitalGraph
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity

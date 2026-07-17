@@ -716,6 +716,46 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #20、Fable hub) — ✅ a (Mann cluster) + c (Thm 10.12 + 10.16 = **Isaacs 10B 完全形式化**) 合流、census 23 不変**:
+  **a** = `3e8e319a` (SS4B **Mann cluster** M(G) + small-class nilpotency、Mann.lean 新設) を merge
+  `576d8284`: build **4317 jobs green**。⚠ hub 機械的修正 = Mann.lean root closure 欠落 →
+  OddOrder.lean import 追記 (step 3b、a も新 leaf 時は OddOrder.lean 追記込みで commit のこと)。
+  **c** = 4 commits (**Thm 10.12 Huppert** nonabelian metacyclic Sylow ⟹ p | |G:G'| / **Thm 10.16**
+  generalized Maschke group-action 形 = OperatorMaschke 拡張 / issue 3007 close = **Isaacs 10B
+  (10.12-10.17) 完全形式化**) を merge `11c09dcf`: build **4317 jobs green** (12m45s)。**b** = 変化なし。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK・逸脱なし。HuppertMetacyclic 687→862 行。
+- **2026-07-17 (tick #18-19、Fable hub) — ✅ b (Thm 8.37) 合流、census 23 不変**:
+  tick #18 = 変化なし (全レーン 0)。tick #19: **b** = `aa6c09cd` (**Thm 8.37 subdegree growth
+  bound**、Subdegrees.lean 175 行新設 + Orbitals 追記、OddOrder.lean import は b 自身が追記済) を
+  merge `0ae6d620`: build **4316 jobs green**。a/c = 変化なし。sorry 23 不変・新 axiom なし・
+  AxiomsCheck OK・逸脱なし。
+- **2026-07-17 (tick #17、Fable hub) — ✅ a (Cor 4.12) + b (Thm 8.35/Lem 8.36) + c (10.15 step 5) 全 3 レーン合流、census 24→23 (c が scaffold 解消)**:
+  **a** = 2 commits (**Cor 4.12** general bracketing form via commutator words / AxiomsCheck 3.35 登録)
+  を merge `df50e982`: build **4314 jobs green** (14m16s)。**b** = `1aa5c91a`→`3e46b862` 系
+  (**Thm 8.35 + Lem 8.36 orbital graph connectivity**、OrbitalGraph.lean 新設) を merge `9d913e0a`:
+  build **4315 jobs green**。OddOrder.lean 独立追記衝突 (hub の HuppertMetacyclic import vs b の
+  OrbitalGraph import) は両保持で解決 (良性クラス)。**c** = `af71a955` (**Thm 10.15 step 5**
+  Omega1(P) not central、初の Maschke 適用、scaffold sorry 解消) を merge `3d62dbc5`: build
+  **4315 jobs green**。HuppertMetacyclic 316→687 行。新 axiom なし・AxiomsCheck OK・逸脱なし。
+- **2026-07-17 (tick #16、Fable hub) — ✅ a (Thm 3.34/3.35 + wreath) + b (Lem 8.34) + c (Thm 10.15 前半) 全 3 レーン合流、census 23→24 (scaffold +1)**:
+  **a** = 4 commits (Thm 3.34 coprime orbit sizes / Thm 3.35 existence half / SS3A general wreath
+  product = WreathProduct.lean 新設 / AxiomsCheck 3.26+3.31-3.34 登録) を merge `3c3284e6`: build
+  **4311 jobs green** (14m37s)。**b** = `1aa5c91a` (**Lem 8.34 orbitals and suborbits**、Orbitals.lean
+  新設) を merge `bc1b64d3`: build **4312 jobs green**。**c** = 5 commits (**Thm 10.15 Huppert 前半** =
+  HuppertMetacyclic.lean 新設 316 行、skeleton + inductive wrapper + base steps 2-4、残 1 sorry =
+  scaffold / **PrimeOrderSubgroups.lean shared leaf 新設** 115 行、9000 claim = 9107 起票→closed で
+  claim-before-build 準拠) を merge `3c481993`: build **4314 jobs green**。⚠ hub 機械的修正 =
+  HuppertMetacyclic の root closure 欠落 (どこからも import されず) → OddOrder.lean に import 追記
+  (step 3b、c は次回から新 leaf 時に OddOrder.lean 追記まで込みで commit のこと)。新 axiom なし・
+  AxiomsCheck OK・逸脱なし。
+- **2026-07-17 (tick #15、Fable hub) — ✅ a (notes) + b (Thm 8.33) + c (Cor 10.2 + Lem 10.13a/10.14) 全 3 レーン合流、census 23 不変**:
+  **a** = `dbd08939` (ch03_split.md survey-gap sweep 記録、notes のみ) を merge `4266165a` (build 省略)。
+  **b** = `5a862641` (**Thm 8.33 PSL(n,q) is simple**、PSLSimple.lean 364 行新設 + OddOrder.lean import)
+  を merge `d156907f`: build **4310 jobs green**。**c** = 4 commits (**Cor 10.2** class(P)<p ⟹ N_G(P)
+  controls p-transfer / **Lem 10.13(a)+10.14** wreath-no-metacyclic-image、IsMetacyclic shared leaf 追記
+  / issue 3006 close + 3007 起票) を merge `1e759f67`: build **4310 jobs green** (13m10s —
+  IsMetacyclic が BG 上流ゆえ再ビルド大)。sorry 23 不変・新 axiom なし・AxiomsCheck OK・新規 shared
+  leaf なし (IsMetacyclic は既存)。size watch: WreathRecognition 1298 行 (⚠ 1500 接近、未超過)。
 - **2026-07-17 (tick #14、Fable hub) — ✅ a (Thm 3.31 + Main 分割) + c 合流、census 23 不変**:
   (cron queue に tick prompt 5 件が蓄積着火 → 1 tick として処理。) **a** = 3 commits (Thm 3.31
   Hartley-Turull abelian replacement / Thm 3.36 |G/N|=m clause / **Ch03 Main 1405→1075 行 =

@@ -3,7 +3,7 @@
 > 🚧 **形式化進行中 (lane c, 2026-07-17〜)** — 旧「FT 経路外 deferred」は 2026-07-16 の
 > 全 3 冊フェーズ移行で失効。着手順は上流優先+文書順 (§10A → §10B → §10C)。
 >
-> **§10A 完全形式化済 (2026-07-17, 全て sorry-free)** — Cor 10.2 のみ残:
+> **§10A 完全形式化済 (2026-07-17, 全て sorry-free)** — 10.1–10.11 全部 landed:
 >
 > - ✅ **Lem 10.3** (a)(b)(c) — `WreathRecognition.lean`
 > - ✅ **Thm 10.4** `C_p ≀ C_p` 認識 — 同 leaf
@@ -20,7 +20,18 @@
 > - ✅ **Lem 10.11** — `TransferIndexPrime.lean`
 > - ✅ **Thm 10.1 (Yoshida)** — `Yoshida.lean`
 >   (`exists_surjective_wreath_of_transfer_range_lt`)
-> - ⏭ 次: **Cor 10.2** (class < p ⇒ 制御) → §10B (Huppert metacyclic)
+> - ✅ **Cor 10.2** (class < p ⇒ N_G(P) が p-transfer を制御) — `Yoshida.lean`
+>   (`transfer_range_eq_of_nilpotencyClass_lt`; `nilpotencyClass_wreath`
+>   (`class(C_p ≀ C_p) = p`, 10.3(c) を base = normal closure of 単一座標に適用) は
+>   `WreathRecognition.lean` §10A 末尾)
+> - ✅ **§10B 完全形式化済 (2026-07-17, sorry-free)**: Lem 10.13 (`IsMetacyclic.of_surjective`/`subgroup`)、
+>   Lem 10.14 (`not_isMetacyclic_wreath`, WreathRecognition 10B section)、
+>   Thm 10.15 (`dvd_index_commutator_of_normal_metacyclic_sylow`, `HuppertMetacyclic.lean`)、
+>   **Thm 10.12 Huppert** (`dvd_index_commutator_of_metacyclic_sylow`, 同 leaf; bridge =
+>   Isaacs 5.20 P^ab 版 `ker_transfer_abelianization_le_APrime` + `dvd_index_APrime_of_dvd_index_commutator`)、
+>   Thm 10.16 一般化 Maschke (`exists_aInvariant_complement_of_pow_card_bijective`,
+>   OperatorMaschke.lean)、Cor 10.17 (既存 `exists_aInvariant_complement_of_isElementaryAbelian`)。
+> - ⏭ 次: **§10C** (10.18–10.28: principal ideal theorem, augmentation ideal, Alperin-Kuo)
 >
 > 「N が p-transfer を制御しない」の Lean 形 = transfer 像の真包含
 > (`v.range < w'.range`)。副産物 shared infra: `PRank.exists_isComplement'`,
