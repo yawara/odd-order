@@ -63,6 +63,7 @@ noncomputable def endField : Field (Module.End (MonoidAlgebra k T) M) :=
   haveI := finite_end (k := k) (T := T) (M := M); inferInstance
 
 omit [Finite T] in
+omit [Finite M] in
 /-- `M` is simple as a module over `D = End_{k[T]}(M)`.
 
 Because `k[T]` is commutative, each scalar map `m ↦ r • m` (`r ∈ k[T]`) is `k[T]`-linear, i.e.
@@ -90,6 +91,7 @@ theorem isSimpleModule_end :
     rw [Submodule.eq_top_iff'] at h ⊢
     exact fun x => (hmem x).mpr (h x)
 
+omit [Finite T] in
 /-- `M` is `1`-dimensional over the field `D = End_{k[T]}(M)` (`isSimpleModule_end` + the
 classification of simple modules over a division ring). -/
 theorem finrank_end_eq_one :

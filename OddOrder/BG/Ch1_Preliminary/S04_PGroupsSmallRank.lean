@@ -76,6 +76,7 @@ private theorem commutatorElement_mem_center
     exact (⁅S, (⊤ : Subgroup R)⁆).inv_mem hmem
   exact hSR hinv
 
+omit [Finite R] in
 /-- The element `(g · s · g⁻¹) · s⁻¹ ∈ ↥S` lies in `Z(S)`. (`= ⁅g, s⁆ ∈ [S, R] ⊆ Z(S)`,
 reflected back into `↥S` via injectivity of `S.subtype`.) Requires `S` normal so that
 conjugation by `g` is an automorphism of `↥S`. -/
@@ -176,6 +177,7 @@ private noncomputable def deltaQuot [S.Normal] (hS : IsExtraspecial p (↥S))
     (↥S ⧸ Subgroup.center (↥S)) →* Subgroup.center (↥S) :=
   QuotientGroup.lift (Subgroup.center (↥S)) (deltaHom hSR g) (center_le_ker_deltaHom hS hSR g)
 
+omit [Fact (Nat.Prime p)] in
 @[simp]
 private theorem deltaQuot_mk [S.Normal] (hS : IsExtraspecial p (↥S))
     (hSR : ⁅S, (⊤ : Subgroup R)⁆ ≤ (Subgroup.center (↥S)).map S.subtype) (g : R) (s : ↥S) :
@@ -192,6 +194,7 @@ private theorem quotientCenter_isElementaryAbelian (hS : IsExtraspecial p (↥S)
   exact IsElementaryAbelian.of_mulEquiv (QuotientGroup.quotientMulEquivOfEq hfrat) hEA
 
 omit [Finite R] in
+omit [Fact (Nat.Prime p)] in
 /-- `Z(S)` is elementary abelian: it is cyclic of prime order `p`. -/
 private theorem centerS_isElementaryAbelian (hS : IsExtraspecial p (↥S)) :
     IsElementaryAbelian p (Subgroup.center (↥S)) := by

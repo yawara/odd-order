@@ -299,4 +299,55 @@ theorem closure_invertedBy_subgroupOf_normal {M : Type*} [Group M] [Finite M]
   rw [Subgroup.mem_subgroupOf] at hn ⊢
   exact conj_mem_closure_invertedBy ht hodd hnorm g.2 hn
 
+/-! ## The Lemma (a), endomorphism form with trivial fixed points
+
+The `Y × Z ≃ X` decomposition specialises, for an involutive endomorphism `σ`
+of a finite group `X` of odd order whose fixed points are trivial
+(`Y = C_X(σ) = 1`), to: `σ` inverts every element of `X`.  This form (with
+`σ` an abstract endomorphism rather than conjugation by an element) is what
+Ch. I §2 Prop 2 applies to subgroups of the quotient `D/W`, on which `t` acts
+only as an (outer) automorphism. -/
+
+/-- **Peterfalvi Part II, Ch. I §1, the Lemma (a)** (p. 101), endomorphism
+form with trivial fixed points: if `σ` is an involutive endomorphism of a
+finite group `X` of odd order fixing only `1`, then `σ` inverts every element
+of `X`.  (For `x ∈ X` set `w = σ(x)⁻¹x`, `z = w^{(|X|+1)/2}` its odd square
+root; then `xz⁻¹` is `σ`-fixed, hence trivial, so `σ x = x⁻¹`.) -/
+theorem map_eq_inv_of_forall_fixed_eq_one {X : Type*} [Group X] [Finite X]
+    (hodd : Odd (Nat.card X)) (σ : X →* X) (hσ2 : ∀ x, σ (σ x) = x)
+    (hfix : ∀ x, σ x = x → x = 1) (x : X) : σ x = x⁻¹ := by
+  -- `w = σ(x)⁻¹ x` is inverted by `σ`
+  set w : X := (σ x)⁻¹ * x with hw
+  have hσw : σ w = w⁻¹ := by
+    rw [hw, map_mul, map_inv, hσ2, mul_inv_rev, inv_inv]
+  -- hence so is every power of `w`
+  have hσwn : ∀ n : ℕ, σ (w ^ n) = (w ^ n)⁻¹ := fun n => by
+    rw [map_pow, hσw, inv_pow]
+  -- `z = w^{(|X|+1)/2}` satisfies `z² = w` (odd square root)
+  set z : X := w ^ ((Nat.card X + 1) / 2) with hz
+  have hcard : w ^ Nat.card X = 1 := by
+    have := orderOf_dvd_natCard w
+    exact orderOf_dvd_iff_pow_eq_one.mp this
+  have hz2 : z * z = w := by
+    rw [hz, ← pow_add]
+    obtain ⟨m, hm⟩ := hodd
+    have hhalf : (Nat.card X + 1) / 2 + (Nat.card X + 1) / 2 = Nat.card X + 1 := by
+      omega
+    rw [hhalf, pow_succ, hcard, one_mul]
+  -- `y = x z⁻¹` is `σ`-fixed: `σ(x) z = x z⁻¹ ⟺ σ(x) z² = x ⟺ σ(x) w = x`
+  have hyfix : σ (x * z⁻¹) = x * z⁻¹ := by
+    have h1 : σ (x * z⁻¹) = σ x * z := by
+      rw [map_mul, map_inv, hz, hσwn, inv_inv]
+    rw [h1]
+    have h2 : σ x * (z * z) = x := by
+      rw [hz2, hw]
+      group
+    calc σ x * z = σ x * (z * z) * z⁻¹ := by group
+      _ = x * z⁻¹ := by rw [h2]
+  have hy1 : x * z⁻¹ = 1 := hfix _ hyfix
+  have hxz : x = z := by
+    have := congrArg (· * z) hy1
+    simpa using this
+  rw [hxz, hz, hσwn, ← hz]
+
 end OddOrder.Peterfalvi.Appendices.Suzuki

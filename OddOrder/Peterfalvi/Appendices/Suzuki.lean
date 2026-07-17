@@ -11,6 +11,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)

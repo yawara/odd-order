@@ -59,15 +59,18 @@ omit [Fintype ι] in
 private theorem proj_apply (hW : DirectSum.IsInternal W) (i : ι) (v : V) :
     proj hW i v = ((LinearEquiv.ofBijective (DirectSum.coeLinearMap W) hW).symm v i : V) := rfl
 
+omit [Fintype ι] in
 private theorem proj_mem (hW : DirectSum.IsInternal W) (i : ι) (v : V) : proj hW i v ∈ W i := by
   rw [proj_apply]; exact ((LinearEquiv.ofBijective (DirectSum.coeLinearMap W) hW).symm v i).2
 
+omit [Fintype ι] in
 /-- The component of a vector that already lies in block `W i` is itself in that slot, and
 vanishes in the other slots. -/
 private theorem proj_of_mem (hW : DirectSum.IsInternal W) {i : ι} {x : V} (hx : x ∈ W i) :
     proj hW i x = x := by
   rw [proj_apply, hW.ofBijective_coeLinearMap_of_mem hx]
 
+omit [Fintype ι] in
 private theorem proj_of_mem_ne (hW : DirectSum.IsInternal W) {i j : ι} (hij : i ≠ j) {x : V}
     (hx : x ∈ W i) : proj hW j x = 0 := by
   rw [proj_apply, hW.ofBijective_coeLinearMap_of_mem_ne hij hx, ZeroMemClass.coe_zero]
@@ -91,6 +94,7 @@ private theorem mem_invariants_iff (v : V) :
 
 variable {ρ H}
 
+omit [Finite ↥H] in
 /-- **Component-transport law.** If `v` is `H`-invariant, its `(h • i)`-component is the image
 under `ρ h` of its `i`-component. -/
 private theorem proj_smul_of_mem_invariants (hW : DirectSum.IsInternal W)
@@ -121,6 +125,7 @@ private theorem proj_smul_of_mem_invariants (hW : DirectSum.IsInternal W)
   · intro hi; exact absurd (Finset.mem_univ i) hi
 
 omit [Finite ↥H] in
+omit [Fintype ι] [DecidableEq ι] in
 /-- Blocks in the same `H`-orbit have the same dimension: `ρ h` is invertible and maps `W i`
 onto `W (h • i)`. -/
 private theorem finrank_block_smul [FiniteDimensional F V]
@@ -131,6 +136,7 @@ private theorem finrank_block_smul [FiniteDimensional F V]
 
 variable (ρ H)
 
+omit [Finite ↥H] in
 /-- The **orbit sum** `∑_{h ∈ H} ρ h x` is always `H`-invariant: left-multiplication permutes
 the summands. -/
 private theorem orbitSum_mem_invariants [Fintype ↥H] (x : V) :
@@ -145,6 +151,7 @@ private theorem orbitSum_mem_invariants [Fintype ↥H] (x : V) :
 variable {ρ H}
 
 omit [Finite ↥H] in
+omit [Fintype ι] [DecidableEq ι] in
 /-- For an orbit class `o`, its chosen representative's orbit equals `o.orbit`, so any `i` with the
 same class lies in `orbit ↥H o.out`. -/
 private theorem mem_orbit_out_of_mk (i : ι) :
@@ -154,6 +161,7 @@ private theorem mem_orbit_out_of_mk (i : ι) :
     MulAction.orbitRel.Quotient.mem_orbit.2 rfl
   rwa [MulAction.orbitRel.Quotient.orbit_eq_orbit_out _ Quotient.out_eq'] at h1
 
+omit [Finite ↥H] in
 /-- **Free + finite orbit partition.**  The map `(o, h) ↦ h • o.out` is a bijection from
 `Ω × H` (with `Ω` the set of `H`-orbits) onto `ι`. -/
 private theorem orbitProdEquiv_bijective [Fintype ↥H]
@@ -193,6 +201,7 @@ private theorem sum_eq_sum_orbit [Fintype ↥H] [Fintype (MulAction.orbitRel.Quo
     ← Finset.univ_sigma_univ, Finset.sum_sigma]
 
 omit [Finite ↥H] in
+omit [Fintype ι] [DecidableEq ι] in
 /-- Two representatives of *distinct* orbit classes can never be carried into one another. -/
 private theorem smul_out_ne_out_of_ne {o o' : MulAction.orbitRel.Quotient ↥H ι} (hne : o' ≠ o)
     (h : ↥H) : h • (o.out : ι) ≠ (o'.out : ι) := by

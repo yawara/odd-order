@@ -384,6 +384,7 @@ theorem conj_induce {H : Subgroup L} [Invertible (Nat.card ↥H : ℂ)] (θ : Cl
   rw [hSA, mul_comm]
 
 omit [Fintype L] in
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **Conjugation by a group element commutes with complex conjugation** of class functions:
 `(θ^g)̄ = (θ̄)^g`.  Both sides evaluate to `star (θ ⟨g h g⁻¹⟩)`. -/
 theorem conjBy_conj {H : Subgroup L} [H.Normal] (g : L) (θ : ClassFunction ↥H ℂ) :

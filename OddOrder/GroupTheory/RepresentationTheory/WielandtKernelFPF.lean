@@ -144,6 +144,7 @@ theorem mul_average (z : MonoidAlgebra k G) :
         rw [MonoidAlgebra.smul_single, smul_eq_mul, mul_one],
       smul_mul_assoc, GroupAlgebra.mul_average_left]
 
+omit [Finite G] in
 /-- The averaging idempotent is central in `k[G]`. -/
 theorem average_mem_center : average k G ∈ Subalgebra.center k (MonoidAlgebra k G) :=
   Subalgebra.mem_center_iff.mpr fun z => by rw [average_mul, mul_average]
@@ -216,6 +217,7 @@ theorem range_centerProj_aug_eq_invariants {W : Type*} [AddCommGroup W] [Module 
   exact (isProj_averageMap ρ).range
 
 omit [Finite G] in
+omit [Invertible (Fintype.card G : k)] in
 /-- The augmentation coordinate `i₀` is fixed by every `simplesAction φ α` (it is *the* trivial
 simple).  Proof: applying `aug` to `centerRep_apply_symm_single` and using `aug`-invariance of
 `centerRep` (`aug_centerRep`) shows the idempotent at `simplesAction φ α i₀` has augmentation `1`,
@@ -230,6 +232,7 @@ theorem simplesAction_fixed_of_aug {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug
   rw [if_neg (Ne.symm h)] at key
   exact zero_ne_one key
 
+omit [Finite G] in
 /-- **The augmentation coordinate exists** (the trivial simple).  There is `i₀ : Fin N` with
 `φ z i₀ = aug z` for every `z` — the augmentation read through the splitting — and it is fixed by
 every `simplesAction φ α`.  This is the simple whose isotypic component is the `G`-invariants

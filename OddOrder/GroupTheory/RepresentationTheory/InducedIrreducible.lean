@@ -256,6 +256,7 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
 
 open scoped Classical in
 omit [Fintype ↥H] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)] in
 /-- **The conjugate-orbit sum is a virtual character**: each summand of the orbit
 `{θ^{x⁻¹} : x ∈ G}` is (the coercion of) an irreducible character of `H`
 (`IrreducibleCharacter.conjBy`), so the sum lies in `ℤ[Irr H]`.  Together with
@@ -355,6 +356,7 @@ theorem induce_injective_of_inertia_stable {θ ψ : IrreducibleCharacter H}
   rw [← hg]; exact hθ g
 
 omit [Fintype G] in
+omit [Fintype H] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)] in
 /-- **Orbit size = inertia index.**  The `G`-conjugation orbit of `θ ∈ Irr H` (`H ⊴ G`) has
 cardinality `[G : I_G(θ)]`, via the coset parametrization `conjByOrbitEquivLeftCosets`.  Together
 with `induce_eq_induce_iff_conj` (orbit = fibre of `θ ↦ Ind θ`) this gives the multiplicity with
@@ -365,6 +367,7 @@ theorem card_conjByOrbit_eq_index_inertia (θ : IrreducibleCharacter H) :
   (Nat.card_congr (IrreducibleCharacter.conjByOrbitEquivLeftCosets (G := G) (H := H) θ)).symm
 
 omit [Fintype G] in
+omit [Fintype H] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)] in
 /-- **Conjugation preserves degree.**  `(θ^g)(1) = θ(1)`: conjugation evaluates `θ` at
 `g · 1 · g⁻¹ = 1`. -/
 @[simp] theorem conjBy_apply_one (g : G) (θ : IrreducibleCharacter H) :

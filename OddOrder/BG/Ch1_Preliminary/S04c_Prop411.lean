@@ -288,6 +288,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq_of_comm (hR : IsPGroup p R)
     rwa [← hmkb_top] at hx
 
 omit [Finite R] in
+omit [Fact (Nat.Prime p)] in
 /-- **BG Prop 4.11, equation (4.7)**: lift a metacyclic quotient `R/⟨z⟩` back to `R`.
 
 Let `R` be a finite `p`-group, `z ∈ Z(R)` of order `p` (so `T := ⟨z⟩` is normal), and suppose
@@ -663,6 +664,7 @@ private theorem exists_zpow_mul_zpow_of_mem_closure_pair_central {a z : R}
     rw [mul_inv_rev, hc2.symm.inv_left.inv_right.eq, zpow_neg, zpow_neg]
 
 omit [Finite R] in
+omit [Fact (Nat.Prime p)] in
 /-- **Prop 4.11 micro-helper**: with `z` central of order `p`, `(a ^ k * z ^ m) ^ p = a ^ (k*p)`
 (the `z` part dies since `z ^ p = 1`). -/
 private theorem zpow_mul_zpow_pow_of_central {a z : R} (hz_center : z ∈ Subgroup.center R)
