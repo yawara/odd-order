@@ -23,7 +23,7 @@
 > Huppert に許可**。b の Suzuki チェーン (App B → Ch.I-III) は **Gorenstein 5.4.10 (= BG Lemma 4.5(a),
 > odd p)** と Huppert の補題を prerequisite として要求する。b はこれらを以下で証明:
 > `OddOrder/BG/Ch1_Preliminary/S04_SmallRankBasic.lean` (BG Lemma 4.5(a) 無条件版、issue 2004) /
-> `OddOrder/Peterfalvi/Appendices/Huppert.lean` (issue 2005) / 新 shared leaf
+> `OddOrder/Peterfalvi/Appendices/Huppert.lean` (issue 2040) / 新 shared leaf
 > `OddOrder/GroupTheory/NormalElementaryAbelianPrimeSq.lean` (正規 elementary abelian 内の type-(p,p),
 > S04_SmallRankBasic が import → closure 内)。**c_re の regex に nominal に掛かる (BG/ + Huppert) が
 > 逸脱でない**: (i) 全て genuine な Suzuki prerequisite、(ii) **c は BG §4・Huppert を触っていない**

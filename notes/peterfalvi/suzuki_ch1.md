@@ -73,15 +73,16 @@
      W 上恒等ゆえ商へ降りる、involutive)。
    - ✅ **§1 Lemma (a) endo 形** (`InvertedProduct.map_eq_inv_of_forall_fixed_eq_one`):
      奇位数 X 上の involutive endo σ が 1 のみ固定 ⟹ σ 全反転 (τ は outer なので要)。
-   - **⚠ App I Prop 1 gate = `Huppert.fitting_cyclic_fixedPointFree` は当初 axiom-clean と
-     誤報告したが実は sorried** (`pGroup_cyclic_fixedPointFree` の non-cyclic case、
-     `#print axioms` で `sorryAx` 確認)。→ 上流優先で gate を進めた (下記)。
+   - ✅ **App I Prop 1 gate axiom-clean**:
+     `Huppert.pGroup_cyclic_fixedPointFree` の irreducible non-cyclic case を、正規
+     type-`(p,p)` 部分群の order-`p` fixed spaces による `P`-permuted direct
+     decomposition で閉じた。従って `fitting_Dbar_cyclic_fpf_abelian` も axiom-clean。
    - ✅ **C_D̄(τ)=V̄** (`tau_mk_eq_iff_mem_V`): τ-固定コセット = V-コセット。w=(tdt)⁻¹d∈W
      は t と可換 (W≤V) ⟹ w²=1、D 奇位数 ⟹ w=1 ⟹ tdt=d ⟺ d∈V。helper
      `sq_inverted_eq_one` (a²=1⟹(ab⁻¹ab)(b⁻¹aba)=1)。axiom-clean。
    - ✅ **C_Ā(τ)=1** (`tau_fixed_fitting_eq_one`): τ-固定 Fitting 元は 1。V̄ に属す⟹s∈Q₀^#
-     固定 (V≤C_D(s), Prop 5)、Ā は Q₀ 上 f.p.f. (App I gate) ⟹ 矛盾。**gate cite ゆえ
-     transitively sorryAx** (sorried-cite 方針)。
+     固定 (V≤C_D(s), Prop 5)、Ā は Q₀ 上 f.p.f. (App I gate) ⟹ 矛盾。
+     App I gate closure により axiom-clean。
    - ✅ **Ā⊆J** (`fitting_subset_inverted`): τ が Ā 全元を反転。Ā characteristic ⟹ τ|_Ā は
      involutive endo で 1 のみ固定 (C_Ā(τ)=1) ⟹ Lemma(a) endo 形で全反転。
    - **次 (残り 3 step)**: **J⊆Ā** (D̄/Ā abelian ⟹ B̄=τ-反転部分群、C_B̄(τ)⊆C_Ā(τ)⊆1... 実際は
@@ -89,12 +90,9 @@
      `nilpotent_normal_le_fitting`) → **Ā=J** → **A=KW, |Ā|=|K|** (§1 Lemma(a) を A に:
      A=(A∩K)(A∩V), Ā=J ⟹ K⊆A, A∩V=W) → **K=⟨k⟩ cyclic** (Ā cyclic は App I gate、K→K̄
      単射) → K◁D (§1 Lemma(b))。
-   - **上流成果 (2026-07-18、gate 掘り下げ)**: App I Prop 1 の sorry = **Gorenstein 5.4.10
-     (odd p) = BG Lemma 4.5(a)** を証明 (issue 2004 完了):
-     `BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic` +
-     新 leaf `GroupTheory/NormalElementaryAbelianPrimeSq.lean` (不変部分空間補題 +
-     cyclic-selfcent⟹metacyclic)。**Huppert sorry の残り** = Schur⟹Z(P) cyclic + coprime
-     Z_p×Z_p 分解 = **issue 2005** (これが埋まれば App I Prop 1 gate が axiom-clean 化)。
+   - ✅ **App I gate closure (2026-07-18)**: BG Lemma 4.5(a) の正規 type-`(p,p)`
+     prerequisite と Huppert の order-`p` fixed-space decomposition の双方が
+     sorry-free で着地 (issue 2004 / 2040 完了)。
 6. §2 Cor (S abelian or Suzuki 2-group; gate: App III Def 1) → §2 Prop 3 (𝓛(F_q,A)
    同型; gate: App I Prop 2) → §3 (induction hypothesis 適用開始)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。

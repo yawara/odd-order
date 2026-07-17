@@ -6887,8 +6887,21 @@ through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_com
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
 (`OddOrder/Peterfalvi/Appendices/`).  Only fully unconditional, axiom-clean declarations are
-registered here; results still conditional on an open `sorry` (e.g. Appendix I's Lemma
-non-cyclic case, deferred to Gorenstein 5.4.10 / issue 2004) are intentionally absent. -/
+registered here. -/
+
+/-! **Peterfalvi, Appendix I (Huppert), Lemma and Proposition 1**: an odd `p`-group acting
+faithfully on an elementary abelian `q`-group with constant nonzero point-stabilizer order is
+cyclic and fixed-point-free.  The irreducible non-cyclic case uses a normal elementary abelian
+subgroup `R` of order `p²`; the fixed spaces of its order-`p` subgroups form a permuted
+independent family spanning the module.  Applying the per-prime result to `O_p(F(D))` gives the
+cyclic, fixed-point-free Fitting subgroup in Proposition 1.  Fully unconditional and
+axiom-clean (issue 2040). -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.pGroup_cyclic_fixedPointFree
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.fitting_cyclic_fixedPointFree
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
