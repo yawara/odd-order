@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import Mathlib.NumberTheory.Multiplicity
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.Finite.Basic

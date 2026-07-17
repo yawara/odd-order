@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.Data.Complex.Basic
 import Mathlib.LinearAlgebra.Matrix.ToLin
