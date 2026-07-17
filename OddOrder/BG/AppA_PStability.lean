@@ -653,7 +653,8 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           rw [h_act ((a (i + 1)).toRepresentation z_subt w - w), h_act w]
           change ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val)
               = (0 : V)
-          -- (ρ_H z_subt - 1)² w.val = ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val)
+          -- (ρ_H z_subt - 1)² w.val = ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val -
+          -- w.val)
           have h_at_val :
               ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val) = 0 := by
             have h := congr_arg (· w.val) hzsq

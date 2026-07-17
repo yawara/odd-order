@@ -361,7 +361,8 @@ The four `IsCoherent` fields:
   preserved), so `φ̄, ψ̄ ∈ ℤ[S(HC)]`; `⟨SHC(φ̄), SHC(ψ̄)⟩ = ⟨φ̄, ψ̄⟩ = star⟨φ,ψ⟩ = ⟨φ,ψ⟩`
   (`inner_conj_conj` and the reality of a `ZIrr` pairing);
 * **agrees with `τ` on `ℤ[S(HC), A₀]`**: this is where `S(HC) = {ζ, ζ̄}` is used — every
-  `A₀`-supported element of `span{ζ, ζ̄}` is a multiple `a(ζ − ζ̄)` (value at `1` is `(a+b)w₁ = 0`), on which
+  `A₀`-supported element of `span{ζ, ζ̄}` is a multiple `a(ζ − ζ̄)` (value at `1` is `(a+b)w₁ = 0`),
+  on which
   `SHC_swap` and `SHC` both send `ζ − ζ̄ ↦ ζ^{τ₁} − ζ̄^{τ₁} = τ(ζ − ζ̄)`;
 * **maps into `ZIrr`** and **nonzero-supported witness `ζ − ζ̄`**: inherited from `SHC`.
 
@@ -610,7 +611,8 @@ theorem mem_ZIrr_inner_eq_sum_over_irr [Finite G] [Fintype G] [Fintype (Irreduci
 /-- **Parity of a sum over a fixed-point-free involution** with an involution-invariant integer
 weight.  If `g` is a fixed-point-free involution on `s` and `f (g a) = f a` for all `a ∈ s`, then
 `∑_{a ∈ s} f a` is even — each orbit `{a, g a}` contributes `2·f a`.  (Proof via `ZMod 2`:
-`(f a : ZMod 2) + (f (g a) : ZMod 2) = 2·(f a) = 0`, so `Finset.sum_involution` kills the sum mod 2.)
+`(f a : ZMod 2) + (f (g a) : ZMod 2) = 2·(f a) = 0`, so `Finset.sum_involution` kills the sum mod
+2.)
 This is the combinatorial core of the Peterfalvi (11.8.5) "`a` even from `β` real" parity — the
 conjugation involution `χ ↦ χ̄` on `Irr G ∖ {1}` is fixed-point-free by Peterfalvi (1.1). -/
 theorem even_sum_of_involution {α : Type*} [DecidableEq α] {s : Finset α} {f : α → ℤ}
@@ -783,7 +785,8 @@ theorem Hypothesis.a_even_of_eq_inner_sumOmegaSigma [Finite G]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5), `β ⊥ 1_G`** (`i ≠ 0`): `⟨α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁},
-1_G⟩ = 0`.  Via the Dade adjoint `tau_inner_trivial` (`⟨α_{ij}^τ, 1_G⟩ = ⟨α_{ij}, 1_M⟩ = 0`, `hα1M`);
+1_G⟩ = 0`.  Via the Dade adjoint `tau_inner_trivial` (`⟨α_{ij}^τ, 1_G⟩ = ⟨α_{ij}, 1_M⟩ =
+0`, `hα1M`);
 `1_G = ω_{00}^σ` (`alignedOmegaSigmaGrid_zero_zero`), so `⟨ω_{ij}^σ − ω_{i0}^σ, 1_G⟩ = 0`
 (`alignedOmegaSigmaGrid_inner`, using `i ≠ 0`); and `⟨ζ^{τ₁}, 1_G⟩ = 0`
 (Peterfalvi (5.3.b), `SHC_extension_inner_alignedOmegaSigma_eq_zero`).  This is the `β ⊥ 1` input to
@@ -890,11 +893,13 @@ theorem Hypothesis.muGridAlpha_inner_trivial_M [Finite G] {M : Subgroup G}
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5), the parity anchor `a = (∑_r ω_{r0}^σ, β)`**: the residual coefficient `a`
-(defined by `(α_{ij}^τ, ζ^{τ₁}) = a − n`, `hinner`) equals the `σ`-grid inner product of the (11.8.3)
+(defined by `(α_{ij}^τ, ζ^{τ₁}) = a − n`, `hinner`) equals the `σ`-grid inner product of the
+(11.8.3)
 residual `β = α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁}`.  This is the identity feeding the parity
 assembly `a_even_of_eq_inner_sumOmegaSigma` (β real virtual character ⊥ 1 ⇒ `a` even), the input
 that excludes `a = 1` unconditionally.  Computation: `(α_{ij}^τ, ∑_r ω_{r0}^σ) = a − δ` (from
-`muGridAlpha_tau_inner_zeroColumnSum_sub_zeta` `= n − δ`, the (11.8.4) rewrite `h114`, and `hinner`);
+`muGridAlpha_tau_inner_zeroColumnSum_sub_zeta` `= n − δ`, the (11.8.4) rewrite `h114`, and
+`hinner`);
 `(ω^σ diff, ∑ω) = −1` (`alignedOmegaSigma_diff_inner_zeroColumnSum`); `(ζ^{τ₁}, ∑ω) = 0`
 (`SHC_extension_inner_zeroColumnOmegaSigma_sum`, (5.3.b)) — so `(β, ∑ω) = (a − δ) − δ·(−1) + 0 = a`,
 and conjugate-symmetry gives `(∑ω, β) = a`.  The `δ` in `β`'s coefficient cancels the `δ` from the
@@ -939,7 +944,8 @@ theorem Hypothesis.muGridAlpha_a_eq_inner_sumOmegaSigma_beta [Finite G] {M : Sub
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
-Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
+Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}`
+(`μ₀ = ∑ μ_{i'0}`),
 the two-way computation of `(α_{ij}^τ, (μ₀ − ζ)^τ)` forces `a = 0` when `a ∈ {0, 2}`:
 * `M`-side (via the Dade isometry, `muGridAlpha_tau_inner_zeroColumnSum_sub_zeta`): `= n − δ`;
 * `G`-side (via (11.8.4) + the residual decomposition `α_{ij}^τ = δ(ω^σ diff) − nζ^{τ₁} + a∑β`
@@ -1009,7 +1015,8 @@ open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), unconditional `a = 0`**.  Combines the conditional (11.8.5)
 `charParam_a_eq_zero_of_residualEq` (which gives `a ∈ {0,1,2}` and the implication
 `Even a → a = 0`) with the parity assembly: the (11.8.3) residual
-`β = α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁}` is a virtual character (`beta_mem_ZIrr`) orthogonal
+`β = α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁}` is a virtual character (`beta_mem_ZIrr`)
+orthogonal
 to `1_G` (`beta_inner_trivial`, its `hα1M` discharged by `muGridAlpha_inner_trivial_M` for `i ≠ 0`),
 **real** (`beta_isReal`, the (11.8.3) reality), and `a = (∑_r ω_{r0}^σ, β)`
 (`muGridAlpha_a_eq_inner_sumOmegaSigma_beta`); so `a` is even
@@ -1085,9 +1092,12 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.6) opening identity** `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, `δ = 1`).
 Given the `a = 0` Dade images `α_{ij}^τ = ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}` for all `i` (`halpha`,
 Peterfalvi (11.8.2)+(11.8.5), `SHC_tau_muGridAlpha_eq` at `δ = 1`) and the (11.8.4) value
-`(μ₀ − ζ)^τ = ∑_i ω_{i0}^σ − ζ^{τ₁}` (`h114`), the `M`-level identity `μ_j − dζ = (μ₀ − ζ) + ∑_i α_{ij}`
-(needs `d = w₁·n + 1`, i.e. `δ = 1`) maps through the linear Dade isometry `τ` (`map_add`, `map_sum`)
-to `∑_i ω_{i0}^σ − ζ^{τ₁} + ∑_i (ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}) = ∑_i ω_{ij}^σ − dζ^{τ₁}`.  This is the
+`(μ₀ − ζ)^τ = ∑_i ω_{i0}^σ − ζ^{τ₁}` (`h114`), the `M`-level identity
+`μ_j − dζ = (μ₀ − ζ) + ∑_i α_{ij}`
+(needs `d = w₁·n + 1`, i.e. `δ = 1`) maps through the linear Dade isometry `τ` (`map_add`,
+`map_sum`)
+to `∑_i ω_{i0}^σ − ζ^{τ₁} + ∑_i (ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}) = ∑_i ω_{ij}^σ − dζ^{τ₁}`. This is
+the
 key step of (11.8.6): with `μ_j^{τ₂} = ∑_i ω_{ij}^σ` (via (4.9)/(5.8)) it makes `S(C) = S₁ ∪ S₂`
 coherent, contradicting (11.3). -/
 theorem Hypothesis.tau_muColumnSum_sub_zeta_eq_of_alphaImage [Finite G] {M : Subgroup G}
@@ -1338,7 +1348,8 @@ prime-TI port.  Since `M' = HU = h.K` (`toCertainTypeHypothesis`), `θ` is an ir
 the (4.5.b) reducibility criterion `induce_not_isIrreducible_iff` forces `θ = chiRestrict χ₂` (a
 column `χ_j`, via the inertia computation `I_L(χ) = K`).  Then `induce_restrict_certainType_eq`
 identifies `Ind_K^M (chiRestrict χ₂) = ∑ᵢ μ_{ik}` (the μ-grid column), where `k` is the column of
-`χ₂`; `θ ≠ 1` excludes the trivial column (`chiRestrict_one_eq_trivial`, `finCardEquivCharacterGroup`
+`χ₂`; `θ ≠ 1` excludes the trivial column (`chiRestrict_one_eq_trivial`,
+`finCardEquivCharacterGroup`
 sends `0` to `1`), giving `k ≠ 0`. -/
 theorem Hypothesis.exists_muGrid_column_eq_of_inducedFamily_reducible [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -1393,7 +1404,8 @@ theorem Hypothesis.exists_muGrid_column_eq_of_inducedFamily_reducible [Finite G]
         = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu
             (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) from by unfold Hypothesis.muGrid; rfl,
         hχ₂k]
-    -- `y = Ind_{M'} θ = Ind_{h.K} (chiRestrict χ₂) = ∑ᵢ μ_{ik}` (last `induce` step defeq via `M' = h.K`).
+    -- `y = Ind_{M'} θ = Ind_{h.K} (chiRestrict χ₂) = ∑ᵢ μ_{ik}` (last `induce` step defeq via
+    -- `M' = h.K`).
     rw [h2, hχ₂]
     exact hyeq
 
@@ -1401,7 +1413,8 @@ open scoped FiniteInduce in
 /-- **Reducible members of `S = inducedFamily M` have degree `q·u = qu`** — the reducible-side of the
 (11.8.1) uniform-degree structure of `𝒮₂ = Sset \ SHCSet`.  A reducible `inducedFamily`-member is a
 nonzero μ-column (`exists_muGrid_column_eq_of_inducedFamily_reducible`, the (9.5)/(4.5.b) family
-identification), which lies in `𝒮(H₀) = sOf ... chief.H0` (`muGrid_column_sum_mem_sOf_H0_and_reducible`);
+identification), which lies in `𝒮(H₀) = sOf ... chief.H0`
+(`muGrid_column_sum_mem_sOf_H0_and_reducible`);
 then `reducible_mem_sOf_H0_apply_one_eq_qu` gives degree `q·u`. -/
 theorem Hypothesis.inducedFamily_reducible_apply_one_eq_qu [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -1467,7 +1480,8 @@ open scoped FiniteInduce in
 /-- **`S(HC) ⊥ (S − S(HC))`** (the source-orthogonality `hsrc_ortho` input for the (11.8.6) union):
 `S(HC)` and `S₂ = S(C) − S(HC)` are disjoint subsets of `S = inducedFamily M`, so a member of each
 is a distinct pair of `inducedFamily` characters, orthogonal by `inducedFamily_pairwiseOrthogonal`.
-This is the set-level `X ⊥ Y` the (6.8.1) union glue `exists_integralCharacterMap_glue_of_orthonormal`
+This is the set-level `X ⊥ Y` the (6.8.1) union glue
+`exists_integralCharacterMap_glue_of_orthonormal`
 takes (with `X = S(HC)`, `Y = S₂`). -/
 theorem Hypothesis.SHCSet_inner_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     {x y : ClassFunction ↥M ℂ} (hx : x ∈ hyp.SHCSet) (hy : y ∈ hyp.Sset \ hyp.SHCSet) :
@@ -1515,7 +1529,8 @@ theorem Hypothesis.SHCSet_subset_Sset [Finite G] {M : Subgroup G} (hyp : Hypothe
 
 open scoped FiniteInduce in
 /-- **`S(C) = S(HC) ∪ (S(C) − S(HC))`** (the set-level decomposition `S = S₁ ∪ S₂` of the (11.8.6)
-union): `S(HC) ⊆ S` (`SHCSet_subset_Sset`), so `S = S(HC) ∪ (S ∖ S(HC))` by `Set.union_sdiff_cancel`.
+union): `S(HC) ⊆ S` (`SHCSet_subset_Sset`), so `S = S(HC) ∪ (S ∖ S(HC))` by
+`Set.union_sdiff_cancel`.
 This is the exact `rw` that turns the (11.8.6) goal `IsCoherent τ S A₀` into the union form
 `IsCoherent τ (S(HC) ∪ S₂) A₀` the S07 gluing engine
 (`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`) concludes — with `X = S(HC)`
@@ -1527,13 +1542,15 @@ theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : 
 
 open scoped Classical FiniteInduce in
 /-- **(11.8.6) gluing wrapper: `S(C) = S(HC) ∪ S₂` coherence from the glued `τ₃` data** (sorry-free).
-The pure-algebra half of Peterfalvi (11.8.6): given the two coherences `coh` (`S(HC) = S₁`, `τ₁`) and
+The pure-algebra half of Peterfalvi (11.8.6): given the two coherences `coh` (`S(HC) = S₁`, `τ₁`)
+and
 `hY` (`S₂ = S(C) − S(HC)`, `τ₂`), a glued integral map `ν` agreeing with `coh.extension` on `S₁` and
 with `hY.extension` on `S₂` (`hagreeX`/`hagreeY` — Peterfalvi's `τ₃`), the mixed isometry `hmixed`,
 and the supported cross-diagonal set `D` on which `ν = τ` (`hDτ`, the `hcol` column identities feed
 this) with the enlarged generation hypothesis `hgen`, the full family `S = S(C)` is coherent.
 
-This packages the S07 gluing engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`
+This packages the S07 gluing engine
+`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`
 for the (11.8.6) union: the source-orthogonality `hsrc_ortho` is discharged internally from the
 landed `span_inner_SHCSet_diff_eq_zero` (`S₁ ⊥ S₂` at span level), and the conclusion is rewritten
 from the union form to `hyp.Sset` via `Sset_eq_SHCSet_union_diff`.  What remains for the caller is

@@ -261,7 +261,8 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
       hirr β⟩
   have hsum : ClassFunction.induce H θ = ∑ β, (η β : ClassFunction L ℂ) := by
     rw [hdecomp]
-  -- distinctness: package the norm-saturating decomposition into a finset of `[T:H]` distinct irreducibles
+  -- distinctness: package the norm-saturating decomposition into a finset of `[T:H]` distinct
+  -- irreducibles
   obtain ⟨S, hScard, hSsum, hSwit⟩ := exists_finset_eq_sum_of_sum_inner_self_eq_card η hsum hnorm
   rw [hcardHom] at hScard
   refine ⟨S, ?_, hScard, hSsum, ?_, ?_⟩
@@ -283,7 +284,8 @@ concrete Peterfalvi (8.2.c) data: a complement `Γ = H U` (`H ⊔ U = ⊤`), the
 (`inertia_inf_isMulCommutative_of_le`) and hence `⁅I(θ), I(θ)⁆ ≤ H`
 (`commutator_inertia_le_of_sup_eq_top`), which is exactly the abelian-quotient hypothesis.
 
-Stated so it can be discharged by the type-`F` consumer (which has (8.2.c) = `typeF_inertia_inf_le_U1`
+Stated so it can be discharged by the type-`F` consumer (which has (8.2.c) =
+`typeF_inertia_inf_le_U1`
 and the complement in scope) **without importing the Feit–Thompson `Hypothesis` structure** — the
 leaf stays upstream of Peterfalvi §14, so the general `typeI_induced_char_constituents` can cite it
 without an import cycle. -/
@@ -307,7 +309,8 @@ theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
       (∀ φ ∈ S, ∃ β : (↥T ⧸ H.subgroupOf T) →* ℂˣ,
         (φ : ClassFunction L ℂ) = ClassFunction.induce T
           (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T))))) := by
-  -- (8.2.c) + abelian `U₁` ⟹ `I(θ) ∩ U` abelian ⟹ `⁅I(θ), I(θ)⁆ ≤ H` = the abelian-quotient hypothesis
+  -- (8.2.c) + abelian `U₁` ⟹ `I(θ) ∩ U` abelian ⟹ `⁅I(θ), I(θ)⁆ ≤ H` = the abelian-quotient
+  -- hypothesis
   have hcomm : IsMulCommutative ↥(ClassFunction.inertia (G := L) θ ⊓ U) :=
     ClassFunction.inertia_inf_isMulCommutative_of_le θ hbound hU1comm
   have hcommle : ⁅ClassFunction.inertia (G := L) θ, ClassFunction.inertia (G := L) θ⁆ ≤ H :=

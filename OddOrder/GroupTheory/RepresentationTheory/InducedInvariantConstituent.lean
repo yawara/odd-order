@@ -11,11 +11,14 @@ import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 # The general Peterfalvi (1.7.b): equal-degree induced constituents (abelian inertia quotient)
 
 For a normal subgroup `H ⊴ K` with `K/H` **abelian** and a `K`-invariant `θ ∈ Irr H`, the
-irreducible constituents of `Ind_H^K θ` all share the common degree `ψ(1) = e·θ(1)` (where `ψ` is any
+irreducible constituents of `Ind_H^K θ` all share the common degree `ψ(1) = e·θ(1)` (where `ψ` is
+any
 one constituent and `e = ⟨Res ψ, θ⟩`).  This is Peterfalvi (1.7.b) at the inertia group
 `T = I_K(θ)` (where `θ` is invariant); **no coprimality** is assumed, so it applies where the
-coprime Gallagher decomposition (`induce_eq_sum_mul_linearClassFunction`) does not — in particular at
-the `H'/H` level of Peterfalvi (12.5), where `K/H = H/H'` is abelian automatically (`H' = [H,H]`) but
+coprime Gallagher decomposition (`induce_eq_sum_mul_linearClassFunction`) does not — in particular
+at
+the `H'/H` level of Peterfalvi (12.5), where `K/H = H/H'` is abelian automatically (`H' = [H,H]`)
+but
 `|H'|` and `[H:H']` share prime divisors.
 
 The proof assembles the bottom-up chain:
@@ -117,12 +120,14 @@ with `θ ∈ Irr N`, inertia `T = I_L(θ)`, and `T/N` abelian, the induced chara
 decomposes (scaled by `e = ⟨Res_T ψ, θ'⟩` for a `T`-constituent `ψ`) as
 `e · Ind_N^L θ = ∑_β Ind_T^L(ψ·Inf(β))`, each summand irreducible of degree `[L:T]·ψ(1)`.
 
-Combines induction in stages (`induce_induce_subgroupOf`, `Ind_N^L θ = Ind_T^L(Ind_N^T θ')`) with the
+Combines induction in stages (`induce_induce_subgroupOf`, `Ind_N^L θ = Ind_T^L(Ind_N^T θ')`) with
+the
 inertia-level general (1.7.b) decomposition `induce_smul_eq_mul_sum_of_invariant`
 (`e·Ind_N^T θ' = ψ·∑_β Inf(β)`, valid since `θ'` is `T`-invariant as `T = I_L(θ)` and `T/N` is
 abelian), pushing `Ind_T^L` through the scalar (`induce_smul`), the product-sum
 (`ClassFunction.mul_sum`), and the sum (`induce_sum`).  The general (no-coprimality) analog of
-`exists_extension_induce_eq_sum_induce_mul`, using a constituent `ψ` (with factor `e`) in place of an
+`exists_extension_induce_eq_sum_induce_mul`, using a constituent `ψ` (with factor `e`) in place of
+an
 extension `χ`.  Feeds the `H'/H`-level equal-degree that Peterfalvi (12.5) needs. -/
 theorem induce_smul_eq_sum_induce_mul_of_invariant_inertia
     {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
@@ -288,7 +293,8 @@ theorem induce_inertia_constituent_apply_one_eq
 /-- **Equal-degree constituents of `Ind_N^H λ` have equal multiplicity in it.**  Lifts
 `restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq` through
 `inner_induce_coe_eq_restrictionMultiplicity` (`⟨Ind_N λ, φ⟩ = restrictionMultiplicity N φ λ`).  For
-`N ⊴ H`, `λ ∈ Irr N` and constituents `φ₁, φ₂` of `Ind_N^H λ` (both lying over `λ`) with equal degree
+`N ⊴ H`, `λ ∈ Irr N` and constituents `φ₁, φ₂` of `Ind_N^H λ` (both lying over `λ`) with equal
+degree
 `φ₁(1) = φ₂(1)`, `⟨Ind_N λ, φ₁⟩ = ⟨Ind_N λ, φ₂⟩`.  Combined with the general (1.7.b) equal degree of
 *all* constituents, this is the **common multiplicity `e`** of the Peterfalvi (12.5) `DpsiH` block
 `Ind_N λ = e·∑_{φ constituent} φ`. -/
@@ -415,7 +421,8 @@ theorem constant_off_normal_of_inner_block_const {G : Type*} [Group G] [Finite G
 /-- **Equal degree of the constituents of `Ind_N^L θ`** (Peterfalvi (1.7.b), the exact form the
 (12.5) `DpsiH` decomposition consumes).  Immediate from `induce_inertia_constituent_apply_one_eq`
 applied to `φ₁, φ₂` with the *same* Clifford correspondent `ψ`: both degrees equal `[L:T]·ψ(1)`.
-With `T/N` abelian (the `H'/H = [H,H]/H` case), this is the coprimality-free equal degree feeding the
+With `T/N` abelian (the `H'/H = [H,H]/H` case), this is the coprimality-free equal degree feeding
+the
 `DpsiH` block coefficient/multiplicity constancy. -/
 theorem induce_inertia_constituents_apply_one_eq
     {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]

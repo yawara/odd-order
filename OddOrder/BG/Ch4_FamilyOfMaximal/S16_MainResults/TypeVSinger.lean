@@ -105,7 +105,8 @@ theorem isNarrow_opiCore_of_three_le_pRank [Finite G]
       = (Subgroup.centralizer (X₁ : Set G)).subgroupOf P := by
     rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, himg_set]
   rw [hcent]
-  -- `↥((C_G(X₁)).subgroupOf P)` embeds into `M_F ⊓ C_G(X₁)` (image is `P ⊓ C_G(X₁) ≤ M_F ⊓ C_G(X₁)`).
+  -- `↥((C_G(X₁)).subgroupOf P)` embeds into `M_F ⊓ C_G(X₁)` (image is
+  -- `P ⊓ C_G(X₁) ≤ M_F ⊓ C_G(X₁)`).
   have hsub : ((Subgroup.centralizer (X₁ : Set G)).subgroupOf P).map P.subtype
       ≤ S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G) := by
     simp only [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype]
@@ -181,7 +182,8 @@ theorem pRank_opiCore_le_two_of_kappaHall [Finite G]
 /-- **`|Z(O_p(M_F))| = p` in the type-V Singer case** (BG Theorem 15.7(e), Coq `defZP`/`oZ0`): the
 centre of `P = O_p(M_F)` has order `p`.  The cyclic `κ`-Hall `K` (a `p′`-group acting on `P`)
 centralizes `Ω₁(Z(P))` — it equals `K* = M_σ ⊓ C(K)` and `Ω₁(Z(P)) ≤ K*` (the `(e3)` Singer
-hypothesis) — so by **BG Theorem 1.11** (`actsTrivially_on_of_fixes_omega1`, the coprime `Ω₁`-rigidity)
+hypothesis) — so by **BG Theorem 1.11** (`actsTrivially_on_of_fixes_omega1`, the coprime
+`Ω₁`-rigidity)
 `K` centralizes all of `Z(P)`.  Hence `Z(P) ≤ M_σ ⊓ C(K) = K* = Ω₁(Z(P)) ≤ Z(P)`, i.e.
 `Z(P) = Ω₁(Z(P))`, whose order is `p`.  This is the `|Z(P)| = p` input to the central-product
 collapse `mFT_rank2_Sylow_cprod` (`card_opiCore_eq_prime_cube_singer`).
@@ -258,8 +260,10 @@ theorem card_center_opiCore_eq_prime_of_omega1Center_le_kstar [Finite G]
 `M_F = M_σ` and `p ∈ σ(M)`, the `p`-core `P = O_p(M_F)` is a Sylow `p`-subgroup of `G`.
 
 `P` is a `{p}`-Hall (hence Sylow) subgroup of the nilpotent `M_F = M_σ`
-(`oPiCore_isHall_of_isNilpotent`: `p ∤ [M_F : P]`), so `|P| = p^{v_p(|M_F|)}` is the full `p`-part of
-`|M_σ|`; and since `M_σ` is the `σ`-Hall of `G` with `p ∈ σ` (`Msigma_isHall`: `p ∤ [G : M_σ]`), that
+(`oPiCore_isHall_of_isNilpotent`: `p ∤ [M_F : P]`), so `|P| = p^{v_p(|M_F|)}` is the full `p`-part
+of
+`|M_σ|`; and since `M_σ` is the `σ`-Hall of `G` with `p ∈ σ` (`Msigma_isHall`: `p ∤ [G : M_σ]`),
+that
 `p`-part equals `v_p(|G|)`.  Thus `|P| = p^{v_p(|G|)}`, so `Sylow.ofCard` exhibits `P` as a Sylow
 `p`-subgroup of `G`.  This is the `mFT_rank2_Sylow_cprod` Sylow input for the type-V Singer case
 (`card_opiCore_eq_prime_cube_singer`). -/
@@ -308,12 +312,15 @@ and `P` non-abelian (`hPnab`) are in hand.
 All four inputs are now discharged: `r(P) ≤ 2` (`hrPle2`), `P` non-abelian (`hPnab`), `P` Sylow of
 `G` (`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq `sylP_G`), and `|Z(P)| = p` (`hZPcard`,
 `card_center_opiCore_eq_prime_of_omega1Center_le_kstar`, Coq `defZP` via BG Theorem 1.11).  The sole
-remaining content is the **Blackburn rank-2 Sylow central-product structure** (`mFT_rank2_Sylow_cprod`,
+remaining content is the **Blackburn rank-2 Sylow central-product structure**
+(`mFT_rank2_Sylow_cprod`,
 Coq §10.7b; Lean `S10.sylow_structure_b`, currently `private`): a Sylow `P` with `r(P) ≤ 2` and `P`
 non-abelian is a central product `S ∘ C` of a nonabelian `p³` `S = Ω₁` with cyclic `C`; with
-`|Z(P)| = p` the cyclic factor `C = Z(P)` collapses into `Z(S)`, leaving `|P| = |S| = p³`.  To finish:
+`|Z(P)| = p` the cyclic factor `C = Z(P)` collapses into `Z(S)`, leaving `|P| = |S| = p³`. To
+finish:
 de-privatize/expose `sylow_structure_b`, build the `p′`-Hall complement `V` of `P` in `N_G(P)`
-(Schur–Zassenhaus), convert `pRank ≤ 2` to `rank ≤ 2` (`rank_le_pRank_of_isPGroup`), and collapse the
+(Schur–Zassenhaus), convert `pRank ≤ 2` to `rank ≤ 2` (`rank_le_pRank_of_isPGroup`), and collapse
+the
 central product using `hZPcard`. -/
 theorem card_opiCore_eq_prime_cube_singer [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
@@ -388,11 +395,13 @@ theorem card_opiCore_eq_prime_cube_singer [Finite G]
 
 /-- **`|K| ∣ n` from a Singer embedding into a cyclic group all of whose `K`-images are `n`-th roots
 of unity** (the final arithmetic step of the type-V Singer divisibility, route B step L5).  If a
-finite group `K` embeds (`hμ`) into a finite cyclic group `C` and every image `μ k` is killed by `n`,
+finite group `K` embeds (`hμ`) into a finite cyclic group `C` and every image `μ k` is killed by
+`n`,
 then `K` is cyclic and `|K| ∣ n`.
 
 In the type-V disjunct-3 application `C = 𝔽_{p²}ˣ` (Singer field units of `V = P/Z(P)`), `μ` is the
-Singer realization `K ↪ 𝔽_{p²}ˣ`, and `μ k ^ (p+1) = 1` is the determinant-one / symplectic condition
+Singer realization `K ↪ 𝔽_{p²}ˣ`, and `μ k ^ (p+1) = 1` is the determinant-one / symplectic
+condition
 `det(k) = N(μ k) = μ(k)^{p+1} = 1` (`algebraMap_norm_eq_pow`): `K` preserves the alternating
 commutator form on `V`, so `K ⊆ Sp(V) = SL₂` and `det = 1`.  Then `|K| ∣ p+1`. -/
 theorem card_dvd_of_injective_to_cyclic_forall_pow {K C : Type*} [Group K] [Finite K]
@@ -412,13 +421,15 @@ theorem card_dvd_of_injective_to_cyclic_forall_pow {K C : Type*} [Group K] [Fini
 type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
 
 The type-`P` datum is the fully-constructed `typePData_of_isTypeP1_mf_eq_msigma` (`U = ⊥`,
-`sorry`-free — the type-V carrier-constructibility milestone); `isTypeV_of_typePData` then reduces to
+`sorry`-free — the type-V carrier-constructibility milestone); `isTypeV_of_typePData` then reduces
+to
 the `alternative` disjunction on `H = M_F`.  As for the type-`F` bridge `isTypeI_of_isTypeF`, the
 `FittingIsTI M` case is discharged directly (disjunct (a): `M_F#` is a `TI`-subset, via
 `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`).
 
 The sole remaining residual is thus the genuinely-deep **`¬FittingIsTI` case of Peterfalvi (8.8) /
-BG Theorem 15.7(d)(e)** (Coq `BGsection15` `nonTI_Fitting_structure`): either `M_F` abelian of rank 2
+BG Theorem 15.7(d)(e)** (Coq `BGsection15` `nonTI_Fitting_structure`): either `M_F` abelian of rank
+2
 with `|W₁| ∣ p - 1`, or `O_p(M_F)` of order `p³` with `|W₁| ∣ p + 1` (the Suzuki/`SL₂`-type
 structures).  Unlike the type-`F` trichotomy (`isTypeI_of_isTypeF`, whose non-TI cases are `rank = 2`
 / `exp U ∣ p - 1`), the type-V alternatives carry the `W₁`-Frobenius divisibilities `|W₁| ∣ p ∓ 1`,
@@ -488,12 +499,14 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
       exact Or.inr (Or.inl ⟨p, hp, hHMF ▸ hpπ, hdvd, hHMF ▸ hcyc⟩)
     · -- (e3): `¬(|W₁| ∣ p − 1)`, the genuine Singer case.  Then `Z ⊓ K* ≠ ⊥` (else the Frobenius
       -- engine `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot` would give `|K| = |W₁| ∣ p − 1`),
-      -- hence `Z ≤ K* = Z₀ = Z(P)` (Coq `defKs`/`defZP`/`rPle2`/`oZ0`, the genuinely-deep residual).
+      -- hence `Z ≤ K* = Z₀ = Z(P)` (Coq `defKs`/`defZP`/`rPle2`/`oZ0`, the genuinely-deep
+      -- residual).
       have hZK : Z ⊓ Kstar ≠ ⊥ := fun h => hdvd
         (hW1K ▸ kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot hG hM hP1.1 hKM hK hKstardef hU
           hZMσ hZcard hKNZ h)
       -- `r(O_p(M_F)) ≤ 2` (Coq `rPle2`): faithfulness `K ⊓ C_G(P) = ⊥`
-      -- (`kappaHall_inf_centralizer_opiCore_eq_bot`, brick 4) + `pRank_opiCore_le_two_of_kappaHall`.
+      -- (`kappaHall_inf_centralizer_opiCore_eq_bot`, brick 4) +
+      -- `pRank_opiCore_le_two_of_kappaHall`.
       have hpodd : Odd p :=
         hG.odd.of_dvd_nat ((Nat.dvd_of_mem_primeFactors hpπ).trans
           (Subgroup.card_subgroup_dvd_card _))

@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InnerCompHom
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -471,7 +472,8 @@ Pointwise: `(conjBy g χ) y = χ (g·y·g⁻¹)` and `characterDegree (conjBy g 
 This is the linchpin of the *intrinsic* characterization of the (9.8.d) pair-family
 `T = {ψ_{θ₁,λ}}` as `{χ ∈ Irr(H·C_U(S₀)) | linear ∧ H₀-realized ⊆ Ker χ ∧ W-lifted ⊆ Ker χ ∧
 χ|_H ≠ 1 ∧ U'-realized ⊆ Ker χ}`: each realized kernel condition `N-realized ⊆ Ker χ` for an
-`HU`-normal `N` (H₀-realized, W-lifted, U'-realized — all `◁ HU`) is `HU`-conjugation-stable, because
+`HU`-normal `N` (H₀-realized, W-lifted, U'-realized — all `◁ HU`) is `HU`-conjugation-stable,
+because
 the ambient normality makes `N-realized ∩ (H·C_U(S₀))` a `conjByMulEquiv g`-invariant set for every
 `g ∈ HU`.  Hence `T` is conjugation-closed, the input `hT` of `card_image_induce_eq_div` for the
 `|image| = |T|/a` orbit step — without a `hcuPsiPair`-conjBy-descent lemma. -/
@@ -528,7 +530,8 @@ of `↥K`, `conjByMulEquiv w n`) lies in the kernel of `χ`:
 
 Elementary: `(χ^w) n = χ (w·n·w⁻¹)` (`conjBy_apply`) and `characterDegree (χ^w) = characterDegree χ`
 (conjugation fixes the value at `1`).  This is the *non-invariant* counterpart of
-`subsetCharacterKernel_conjBy_of_invariant` — instead of assuming a `conjByMulEquiv w`-invariant set,
+`subsetCharacterKernel_conjBy_of_invariant` — instead of assuming a `conjByMulEquiv w`-invariant
+set,
 it tracks exactly where conjugation moves the kernel.  It is the genuinely-absent `cfker_conjg`
 brick underlying the (9.8.d) `W₁`-injectivity (Coq `injXtheta`, `cfker_conjg`): a `W₁`-conjugate of
 a family member's kernel is the kernel of the conjugate, so a summand `S₀ = H₁` moved into
@@ -568,7 +571,8 @@ theorem subsetCharacterKernel_conjBy_iff {K : Subgroup G} [K.Normal]
   · intro h n hn; exact (mem_characterKernel_conjBy w χ n).mpr (h n hn)
 
 /-- **`induceHU χ = Ind_{HU}^M χ`** (unfold the wrapper).  `induceHU` is definitionally
-`ClassFunction.induce (huSub data)` with an internally-chosen `Invertible` instance; that instance is
+`ClassFunction.induce (huSub data)` with an internally-chosen `Invertible` instance; that instance
+is
 propositional (`Subsingleton`), so the wrapper equals the raw induction for any ambient instance.
 Lets the `induceHU`-injectivity frame reuse the `induce_eq_induce_iff_conj` orbit machinery. -/
 theorem induceHU_eq_induce [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
@@ -608,9 +612,11 @@ This reduces (9.8.d) (γ) — `Ind_{HU}^M` injective on the `ζ_{θ₁,λ}`-fami
 group/kernel statement `hcrit`: two family members are non-`W₁`-conjugate.  In the Coq proof
 (`injXtheta`, `PFsection9.v` L1233-1253) `hcrit` is exactly the Frobenius `Ū ⋊ W₁` +
 `cfker`-under-`W₁`-conjugation argument: decompose `w = y·w₁` (`M = HU ⋊ W₁`), `conjBy y` inner, so
-`conjBy w₁ ψ = χ`; then `W = H₂…H_q ⊆ Ker ψ,Ker χ` (family members trivial on the summand complement)
+`conjBy w₁ ψ = χ`; then `W = H₂…H_q ⊆ Ker ψ,Ker χ` (family members trivial on the summand
+complement)
 while a nontrivial `w₁` moves `S₀ = H₁` into `W` (Clifford permutation `H̄ = ⊕ S₀^{w}`), forcing
-`H̄ ⊆ Ker χ` (via `mem_characterKernel_conjBy`) — contradicting `H ⊄ Ker χ`; hence `w₁ = 1`, `w ∈ HU`.
+`H̄ ⊆ Ker χ` (via `mem_characterKernel_conjBy`) — contradicting `H ⊄ Ker χ`; hence `w₁ = 1`,
+`w ∈ HU`.
 The `cfker`-conjugation half (`mem_characterKernel_conjBy` / `subsetCharacterKernel_conjBy_iff`),
 the `W = H₂…H_q ⊆ Ker` propagation (core (1), `hcuZetaPair_summandComplement_subset_ker`), and the
 full `hcrit` reduction (`hcrit_of_summand_orbit`) are now all landed; the sole residual is the
@@ -656,7 +662,8 @@ free-`W₁`-orbit structure `H̄ = ⊕_{w ∈ W₁} S₀^w`; it is **reconstruct
 `caseA_wOrbit_horbit` (with `W = caseA_wComplement caseA`), so the unconditional `hcrit`
 (`horbit` discharged) is `caseA_hcrit_of_member`.  (`CliffordCaseAData` carries the summands only as
 an *arbitrary* `U`-supindep family (`clifford_caseA_data`, `orbitRep : Fin q → U ⊔ W₁` from a choice
-function), *not* the `W₁`-conjugate orbit; the orbit is re-derived rather than read off the carrier —
+function), *not* the `W₁`-conjugate orbit; the orbit is re-derived rather than read off the carrier
+—
 no structure enrichment is needed, see issue 1018.) -/
 theorem hcrit_of_summand_orbit [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     {chief : ChiefFactorData data} [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
@@ -714,7 +721,8 @@ datum supplied by the reconstructed `caseA_wOrbit_horbit` (a nontrivial `w₁ �
 character-kernel facts that hold for a family member `ζ₁, ζ₂` (`realized S₀ ⊄ Ker ζ₁`,
 `realized W ⊆ Ker ζ₂`); the `(9.7.a)` prerequisite is fully discharged (no `horbit` hypothesis
 remains).  Combined with `induceHU_inj_of_conj_mem_huSub` this closes (γ) of Peterfalvi (9.8.d) once
-`hkerW₂` is instantiated at `W = caseA_wComplement caseA` (via `hcuZetaPair_summandComplement_subset_ker`
+`hkerW₂` is instantiated at `W = caseA_wComplement caseA` (via
+`hcuZetaPair_summandComplement_subset_ker`
 with `θ|_W = 1`, which holds since a member's seed `θ₁ ∈ Irr(H̄/W)`). -/
 theorem caseA_hcrit_of_member [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
@@ -823,7 +831,8 @@ theorem card_theta_triv_W_nontriv_S0 [Finite G] {M : Subgroup G}
 An irreducible `HC`-character `ψ` trivial on `Ker hcHom` (`= H₀C`) inflates from `H̄ = HC/H₀C`
 (`exists_compHom_eq_of_subset_characterKernel`, `hcHom` surjective); since `H̄` is abelian the
 inflation is *linear*, so `ψ = hcPsi θbar` for a hom-form seed `θbar : H̄ →* ℂˣ`.  This collapses the
-step-5 (e)(linear)/(f)(trivial)/(g)(identification) chain: the reducible `ξ`'s `HC`-constituent `ψ'`,
+step-5 (e)(linear)/(f)(trivial)/(g)(identification) chain: the reducible `ξ`'s `HC`-constituent
+`ψ'`,
 being trivial on `H₀C` (from `ξ ∈ 𝒳(H₀C)`), is automatically linear and of `hcPsi` form. -/
 theorem exists_hcPsi_eq_of_hcHom_ker_subset [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
@@ -887,7 +896,8 @@ theorem hcPsi_restrict_hInHu_subgroupOf [Finite G] {M : Subgroup G}
 /-- **A lies-over character whose restriction is irreducible identifies the constituent** (general
 Clifford orthonormality): if the irreducible `χ` of `Γ` lies over `θ ∈ Irr K` and `Res_K χ` equals a
 *single* irreducible character `η ∈ Irr K`, then `η = θ`.  `⟨Res_K χ, θ⟩ ≠ 0` becomes `⟨η, θ⟩ ≠ 0`,
-which forces `η = θ` (distinct irreducibles orthogonal, `irreducibleCharacter_inner_eq_ite`).  Used to
+which forces `η = θ` (distinct irreducibles orthogonal, `irreducibleCharacter_inner_eq_ite`). Used
+to
 identify the intermediate constituent's seed in the (9.8.c) step-5 assembly (a linear `ψ'` restricts
 to a single character, pinning its inflation seed). -/
 theorem eq_of_liesOver_of_restrict_eq_irr {Γ : Type*} [Group Γ] [Fintype Γ]
@@ -905,7 +915,8 @@ theorem eq_of_liesOver_of_restrict_eq_irr {Γ : Type*} [Group Γ] [Fintype Γ]
 `hInHu.subgroupOf HC` equals the transported inflation of `θ₂`, then `θ₁ = θ₂`.  By
 `hcPsi_restrict_hInHu_subgroupOf` the left side is the transported inflation of `θ₁`, so the two
 inflations agree; the descent hom `mk'_N ∘ hInHuEquivH ∘ subgroupOfEquivOfLe` is surjective, so
-`θ₁ = θ₂` pointwise.  This is the (g′) identification of the (9.8.c) step-5 assembly: the intermediate
+`θ₁ = θ₂` pointwise. This is the (g′) identification of the (9.8.c) step-5 assembly: the
+intermediate
 constituent `ψ' = hcPsi θbar''` lying over `θ₀ = infl θbar` forces `θbar'' = θbar`. -/
 theorem hcPsi_seed_eq_of_restrict_eq [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
@@ -949,7 +960,8 @@ set_option maxHeartbeats 1000000 in
 -- raised heartbeat budget for the heavy elaboration below
 /-- **step 5 (assembly): the reducible `M`-fixed `ζ` is `Ind_{HC}^{HU}(hcPsi θbar)`** (Peterfalvi
 (9.8.c), `Xmu` surjectivity).  A reducible (`M`-fixed) `ζ ∈ 𝒳(H₀C)` lying over the seed inflation
-`θ₀` (`hlo`; the seed `θbar` is regular by `caseA_reducible_theta_regular`, `≠ 1` by `hnt`) equals the
+`θ₀` (`hlo`; the seed `θbar` is regular by `caseA_reducible_theta_regular`, `≠ 1` by `hnt`) equals
+the
 (9.8.c) construction `Ind_{HC}^{HU}(hcPsi θbar)`.
 
 Chain: lies-over transitivity (`exists_liesOver_intermediate`) yields an `HC`-constituent `ψ'` with
@@ -960,7 +972,8 @@ Chain: lies-over transitivity (`exists_liesOver_intermediate`) yields an `HC`-co
 `θ₀'` forces `θ₀'' = θ₀'` (`eq_of_liesOver_of_restrict_eq_irr`), i.e. `θbar'' = θbar`
 (`hcPsi_seed_eq_of_restrict_eq`).  Then `ζ` over `hcPsi θbar` and `Ind_{HC}(hcPsi θbar)` irreducible
 (`hcZeta_irreducible`, foundation `caseA_reducible_inflation_inertia_eq`) give
-`ζ = Ind_{HC}(hcPsi θbar)` (`coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce`).  This is the
+`ζ = Ind_{HC}(hcPsi θbar)` (`coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce`). This is
+the
 surjectivity input to `|Xmu| = p-1`. -/
 theorem caseA_reducible_eq_hcZeta [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -1176,7 +1189,8 @@ theorem reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     exact caseB_reducible_sOf_H0_isIndHC hG chars caseB hφ hred
 
 /-- **step 5 consequence (9.8.b degree, caseA): a reducible `𝒮(H₀)`-member has degree `qu`.**  By
-`caseA_reducible_source_eq_hcZeta` the reducible `φ = Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`, whose degree
+`caseA_reducible_source_eq_hcZeta` the reducible `φ = Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`, whose
+degree
 is `q·u` (`hcZeta_induceHU_apply_one`).  The degree half of `caseA_character_counts` conjunct (b). -/
 theorem caseA_reducible_induceHU_apply_one_eq_qu [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -1237,7 +1251,8 @@ open scoped Classical in
 set_option maxHeartbeats 1000000 in
 -- raised heartbeat budget for the heavy elaboration below
 /-- **|Xmu| = p-1** (Peterfalvi (9.8.c), the reducible-inducing regular seeds).  `Xmu` = the
-`Xθ`-members `ζ = Ind_{HC}(hcPsi θ)` (regular `θ`) whose `M`-induction `Ind_{HU}^M ζ` is *reducible*.
+`Xθ`-members `ζ = Ind_{HC}(hcPsi θ)` (regular `θ`) whose `M`-induction `Ind_{HU}^M ζ` is
+*reducible*.
 The map `ζ ↦ Ind_{HU}^M ζ` is a bijection `Xmu ≃ {reducible 𝒮(H₀)-members}`: injective on reducibles
 (`caseA_induceHU_inj_of_reducible`) and surjective (every reducible `𝒮(H₀)`-member is
 `Ind_{HU}^M(Ind_{HC}(hcPsi θbar))` for a regular seed, `caseA_reducible_source_eq_hcZeta`), so

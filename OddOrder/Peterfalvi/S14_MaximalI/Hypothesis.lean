@@ -140,7 +140,8 @@ noncomputable def tau {L : Subgroup G} (hyp : Hypothesis L) :
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The Peterfalvi (7.1) `ρ`-machinery data for `(L, A(L))`** — the §7 foundation for the (12.16)
 Dade calculation.  Built genuinely from the §10 Dade isometry carried by `hyp.dadeData`/`hyp.hconj`:
-unlike the type-`P` `S12.Hypothesis.toHypothesis71`, the type-I support `A(L) = typeIA` is already the
+unlike the type-`P` `S12.Hypothesis.toHypothesis71`, the type-I support `A(L) = typeIA` is already
+the
 set on which `dadeData` lives, so no restriction is needed — the Dade map, its `IsDadeMap`
 certificate, and the `L`-equivariance transfer directly.  This `S09.Hypothesis71` is what lets the
 §9 norm machinery — `chiRho_norm_sq_le` (7.2.b), `chiRho_integral_inequality` (7.3),
@@ -545,7 +546,8 @@ open scoped Classical in
 on the (normal) kernel.**  In a Frobenius group `Γ` of odd order with kernel `H`, for `θ ∈ Irr H`,
 `θ ≠ 1`, the induced `Ind_H^Γ θ` is irreducible (`isIrreducibleCharacter_induce_of_frobeniusGroup`),
 **non-real** (odd order, `not_isReal_of_ne_trivial_of_odd_card'`, `χ ≠ 1` via `⟨Ind θ, 1⟩ = 0`),
-and supported on `H` (it vanishes off the **normal** `H`, `induceSum_eq_zero_of_not_conjugatesInto`).
+and supported on `H` (it vanishes off the **normal** `H`,
+`induceSum_eq_zero_of_not_conjugatesInto`).
 Packaged as an **opaque** `ξ : Irr Γ` (with `↑ξ = Ind θ`) — stated with explicit `Fintype`/
 `Invertible` binders (not the `FiniteInduce` scope) so the coset-sum coercion stays `whnf`-cheap.
 Discharges the type-I (12.2.a) constituent structure trivially for a Frobenius `L`
@@ -603,7 +605,8 @@ constituent set is the singleton `{χ}`: decomposition, equal-degree, nonemptine
 non-realness from the odd order of `L`; support `H#` because `Ind θ` vanishes off the normal `H`.
 This discharges `typeI_induced_char_constituents` **without (8.2.c)** for the Frobenius case — the
 one the (12.16) witness-side `R(χ)`/(12.3)/(12.4) machinery actually consumes.  The heavy content is
-in `frobenius_induce_char_singleton` (clean instances); here only the `H# ⊆ supportInSubgroup` bridge
+in `frobenius_induce_char_singleton` (clean instances); here only the `H# ⊆ supportInSubgroup`
+bridge
 and the singleton packaging remain. -/
 theorem frobenius_typeI_induced_char_constituents [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
@@ -653,7 +656,8 @@ theorem frobenius_typeI_induced_char_constituents [Finite G]
 /-- **Peterfalvi (12.2.a)**: each `χ ∈ S` decomposes (multiplicity one) into irreducible
 constituents of equal degree, each non-real and supported in `A(L) ∪ {1}`.  The §12 assembly:
 unpack the type-`F` constituent structure (`typeI_induced_char_constituents`) into the genuine
-`CharacterDecompositionData` carrier — whose R(χ) blocks of (12.2.b) then come from `R1`/`Rset`.  The deep type-`F` Clifford content ((8.2.c) inertia +
+`CharacterDecompositionData` carrier — whose R(χ) blocks of (12.2.b) then come from `R1`/`Rset`. The
+deep type-`F` Clifford content ((8.2.c) inertia +
 (1.7.c)/(1.5.a)/(1.2)) is isolated in the obligation, keeping this assembly `sorry`-free. -/
 theorem character_decomposition_and_dade_domain [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
@@ -664,7 +668,8 @@ theorem character_decomposition_and_dade_domain [Finite G]
   exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hconjnm, hsupp⟩, rfl⟩
 
 /-- **Peterfalvi (12.2.a) `CharacterDecompositionData` for a Frobenius type-I `L`** —
-`character_decomposition_and_dade_domain` without the (8.2.c)-gated `typeI_induced_char_constituents`
+`character_decomposition_and_dade_domain` without the (8.2.c)-gated
+`typeI_induced_char_constituents`
 obligation.  For a Frobenius `L` (kernel `H = L_F`) the constituent structure is the trivial
 singleton `{χ}` (`frobenius_typeI_induced_char_constituents`), so the carrier is **sorry-free**.
 This is the `data` the witness-`L` side of (12.16) needs (`ψ ∈ ℤ[R(χ_L)]` via (5.5), and the

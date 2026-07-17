@@ -18,7 +18,8 @@ this section assembles it into the actual `IsCoherent (S₁ ∪ {χ, χ̄}) A` w
 in are the honest outputs of (5.4)/(5.5)/(5.6.2): the coherent `τ₁` (= `hS₁.extension`), the
 orthonormal pairs `{χ, χ̄}`, `{X, X̄}` (with `‖χ‖² = ‖χ̄‖² = 1` for irreducibles, hence
 `‖X‖² = ‖X̄‖² = 1`), the conjugate-image definition `X̄ = X − (χ − χ̄)^τ`, the (5.5)+(5.2.e)
-orthogonality `X, X̄ ⊥ τ₁ ξ` for `ξ ⊥ {χ, χ̄}`, the (5.6.2) image equation `(χ − aχ₁)^τ = X − aχ₁^{τ₁}`,
+orthogonality `X, X̄ ⊥ τ₁ ξ` for `ξ ⊥ {χ, χ̄}`, the (5.6.2) image equation
+`(χ − aχ₁)^τ = X − aχ₁^{τ₁}`,
 and the (5.1)-type generation `Z[S₁∪S₂, L^#] ⊆ ℤ[Z[S₁,L^#] ∪ {χ−χ̄, χ−aχ₁}]`.  No hypothesis
 assumes the extension itself: `τ₂` is *constructed* as `retarget τ₁ χ χ̄ X X̄`. -/
 
@@ -119,7 +120,8 @@ noncomputable def retarget_isCoherent
     intro φ hφ
     exact IntegralCharacterMap.eq_on_zSpan_of_eq_on hagree_T (hgen hφ)
   · -- extension_mem_ZIrr: `τ₂ = retarget τ₁ χ χ̄ X X̄` sends each generator of `ℤ[S₁ ∪ {χ, χ̄}]` to
-    -- a virtual character (`S₁`-members via `τ₁` and its inductive ZIrr-codomain; `χ ↦ X`, `χ̄ ↦ X̄`).
+    -- a virtual character (`S₁`-members via `τ₁` and its inductive ZIrr-codomain; `χ ↦ X`,
+    -- `χ̄ ↦ X̄`).
     intro φ hφ
     rw [hτ₂def]
     induction hφ using Submodule.span_induction with
@@ -295,7 +297,8 @@ open IntegralCharacterMap in
 /-- **Peterfalvi (1.1)+(1.4): an equal-degree set is coherent.**
 
 If `χ : Fin n → CF(L)` (`n ≥ 2`) is an orthonormal family with all members of equal degree `d ≠ 0`,
-whose differences `χⱼ − χ₀` are supported in `A` (`1 ∉ A`), and `X : Fin n → CF(G)` is an orthonormal
+whose differences `χⱼ − χ₀` are supported in `A` (`1 ∉ A`), and `X : Fin n → CF(G)` is an
+orthonormal
 family in the target with `τ (χⱼ − χ₀) = Xⱼ − X₀` (the (1.4) signed-difference image equation), then
 `{χ₀, …, χₙ₋₁} = range χ` is coherent, with extension `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ` (`coherentImageMap`).
 
@@ -550,7 +553,8 @@ running-`τ₁`-coupled hypothesis, the (5.6.2) **image equation**
 
 This is *not* a free wiring fact — it is exactly Peterfalvi (5.6.1)+(5.6.2): writing the (5.4)
 decomposition `(χ − a·χ₁)^{τ₁'} = X − Y` against `R(χ)` (where `τ₁'` is the (5.4) auxiliary isometry
-agreeing with `τ` on the supported difference), the integer-forcing capstone `lambda_eq_zero_and_Z_eq_zero`
+agreeing with `τ` on the supported difference), the integer-forcing capstone
+`lambda_eq_zero_and_Z_eq_zero`
 collapses `Y` to `a·χ₁^{τ₁}`.  The producer below assembles `himg` from the three honest textbook
 facts, *constructing* it rather than positing it:
 
@@ -677,12 +681,15 @@ The two decompositions and their common projection are exactly Peterfalvi's (5.6
 * `htau1_chi : Da.tau1 χ = D₀.tau1 χ` — both decompositions evaluate the *same* running `τ₁` at `χ`.
   This is the honest τ₁-agreement input; the (5.6.2) identification `Da.X = D₀.X` (the two `R(χ)`
   projections coincide, both `∑_{α∈E}α`) is then **derived** here via `X_eq_of_tau1_eq_on_chi`
-  (`Da.X = Da.tau1 χ` from the (5.6.2) collapse `hY`, `= D₀.tau1 χ = D₀.X` from (5.5)), *not* posited;
+  (`Da.X = Da.tau1 χ` from the (5.6.2) collapse `hY`, `= D₀.tau1 χ = D₀.X` from (5.5)), *not*
+  posited;
 * `hperElem : ∀ ξ ∈ ℤ[S₁], ∀ α ∈ R(χ), ⟨τ₁ ξ, α⟩ = 0` — the (5.5)+(5.2.e) **per-element**
   `R(χ)`-orthogonality of the running images.  The sum-level lattice orthogonalities
-  `hX_ortho`/`hXbar_ortho` (`⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0`) consumed by `retarget_isCoherent_of_decomposition`
+  `hX_ortho`/`hXbar_ortho` (`⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0`) consumed by
+  `retarget_isCoherent_of_decomposition`
   are **derived** here via `inner_X_eq_zero_of_orthogonal_imageSet` /
-  `inner_conjImage_eq_zero_of_orthogonal_imageSet` (using `X = ∑ coeff•α` and `(χ−χ̄)^τ = ∑_{α∈R(χ)}α`
+  `inner_conjImage_eq_zero_of_orthogonal_imageSet` (using `X = ∑ coeff•α` and
+  `(χ−χ̄)^τ = ∑_{α∈R(χ)}α`
   both in `ℤ[R(χ)]`), *not* posited.
 
 The `himg` facts (`htau1_diff`, `hY`, `htau1_chi1`) are the (5.4)/(5.6.2)/(coherence-compat) inputs
@@ -782,7 +789,8 @@ noncomputable def retarget_isCoherent_of_decompositions_and_memberFamily
       Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - chibar, χ - a • chi1})) :
     IsCoherent τ (S₁ ∪ {χ, chibar}) A := by
   classical
-  -- The per-element `R(χ)`-orthogonality `hperElem`, *constructed* from the per-member (5.5)/(5.2.e)
+  -- The per-element `R(χ)`-orthogonality `hperElem`, *constructed* from the per-member
+  -- (5.5)/(5.2.e)
   -- data: each member's running image `x^{τ₁} = (Dmem x hx).X ⊥ R(χ)`, lifted to `ℤ[S₁]`.
   have hperElem : ∀ ξ ∈ Submodule.span ℤ S₁,
       ∀ α ∈ D₀.imageFamily.imageSet, ClassFunction.inner (hS₁.extension ξ) α = 0 := by
@@ -798,7 +806,8 @@ open scoped Classical in
 open OddOrder.RepresentationTheory in
 /-- **Peterfalvi (5.6.3) per-step coherence from the SUPPORTED decomposition alone (X-family).**
 
-The `ψ = 0` decomposition `D₀` of `retarget_isCoherent_of_decomposition[s]` requires `τ₁χ ∈ ℤ[Irr G]`,
+The `ψ = 0` decomposition `D₀` of `retarget_isCoherent_of_decomposition[s]` requires
+`τ₁χ ∈ ℤ[Irr G]`,
 which fails for an *unsupported* induced `χ = Ind θ` (there `τ` is an off-support arbitrary
 extension, so `τχ ∉ ℤ[Irr G]`).  This variant routes coherence entirely through the **supported**
 decomposition `Da` of `χ − a·χ₁` (built from `(χ − a·χ₁)^{τ₁} ∈ ℤ[Irr G]`, which holds because the
@@ -881,7 +890,8 @@ noncomputable def retarget_isCoherent_of_supportedDecomposition
   have hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁,
       ClassFunction.inner (hS₁.extension ξ) (Da.X - τ (χ - χ.conj)) = 0 := fun ξ hξ =>
     Da.inner_conjImage_eq_zero_of_orthogonal_imageSet (hperElem ξ hξ)
-  -- `X = Da.X ∈ ℤ[R(χ)] ⊂ ℤ[Irr G]` and `X̄ = Da.X − (χ − χ̄)^τ ∈ ℤ[Irr G]` (both `R(χ)`-combinations).
+  -- `X = Da.X ∈ ℤ[R(χ)] ⊂ ℤ[Irr G]` and `X̄ = Da.X − (χ − χ̄)^τ ∈ ℤ[Irr G]` (both
+  -- `R(χ)`-combinations).
   have hXZ : Da.X ∈ ZIrr G := by
     rw [Da.X_eq]
     exact Submodule.sum_mem _ (fun α hα => by
@@ -898,7 +908,8 @@ open scoped Classical in
 open OddOrder.RepresentationTheory in
 /-- **(5.6.3) supported per-step coherence, `hperElem` discharged from the member family (X-family).**
 
-The X-family analogue of `retarget_isCoherent_of_decompositions_and_memberFamily`: routes through the
+The X-family analogue of `retarget_isCoherent_of_decompositions_and_memberFamily`: routes through
+the
 supported decomposition `Da` only (no `ψ=0` `D₀`, no `τχ ∈ ZIrr`), discharging the per-element
 `R(χ)`-orthogonality `hperElem` from the per-member `ψ = 0` decompositions `Dmem` of `S₁` (mmd L77,
 "`χᵢ^{τ₁}` is orthogonal to `R(χ)` by (5.5) and (5.2.e)"). -/
@@ -943,9 +954,11 @@ open OddOrder.RepresentationTheory in
 /-- **Peterfalvi (5.6.3) per-step coherence from a shared-isometry decomposition pair.**
 
 The full (5.6) adjoining step `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {χ, χ̄}) A` with the two
-distinguished decompositions `D₀`, `Da` *produced together* by `CharacterPsiDecomposition.decompositionPair`
+distinguished decompositions `D₀`, `Da` *produced together* by
+`CharacterPsiDecomposition.decompositionPair`
 from a single shared auxiliary isometry `τ₁` — so the τ₁-agreement input `htau1_chi : Da.tau1 χ =
-D₀.tau1 χ` of `retarget_isCoherent_of_decompositions_and_memberFamily` is discharged **structurally**
+D₀.tau1
+χ` of `retarget_isCoherent_of_decompositions_and_memberFamily` is discharged **structurally**
 (`decompositionPair_tau1_agree`, by `rfl`), never posited.
 
 This is the precise PASS 2 (ii) entry point for a (6.6) `hstep`: instead of supplying two ad-hoc
@@ -1513,7 +1526,8 @@ theorem pairUnion_mono (S₀ : Set (ClassFunction L ℂ))
 /-- The `(i+1)`-st accumulator `pairUnion S₀ pair (i+1)` is the `i`-th accumulator with the explicit
 two-element set `{c₁, c₂}` adjoined, *provided* the `i`-th pair is `(pair i) = (c₁, c₂)`.
 
-This is the set-level bridge from a per-step adjoining engine — whose conclusion is naturally phrased
+This is the set-level bridge from a per-step adjoining engine — whose conclusion is naturally
+phrased
 as coherence of `S₁ ∪ {c₁, c₂}` for the adjoined pair — to the `coherentPairChain` accumulator shape
 `pairUnion S₀ pair (i+1)`.  With `c₁ = χ`, `c₂ = χ̄` and `(pair i) = (χ, χ̄)`, the two match
 definitionally up to the `(pair i).1`/`(pair i).2` rewrites supplied by `hpair0`/`hpair1`. -/
@@ -1571,7 +1585,8 @@ theorem pairUnion_eq_of_cover {S₀ X : Set (ClassFunction L ℂ)}
 Given a coherent base set `S₀` (the equal-minimal-degree prefix coherence supplied by (1.1)+(1.4))
 and, for each `i < N`, an adjoining step turning coherence of the set accumulated so far
 (`pairUnion S₀ pair i`) into coherence of the set with the `i`-th pair `{χᵢ, χ̄ᵢ}` adjoined
-(`pairUnion S₀ pair (i+1)`), the full union after `N` adjoinings, `pairUnion S₀ pair N`, is coherent.
+(`pairUnion S₀ pair (i+1)`), the full union after `N` adjoinings, `pairUnion S₀ pair N`, is
+coherent.
 
 Each step `hstep i _` is one application of (5.6) (`retarget_isCoherent`); the caller supplies the
 per-step (5.6) data (orthonormal `{χᵢ, χ̄ᵢ}`/`{Xᵢ, X̄ᵢ}`, the image equation, the lattice

@@ -22,7 +22,8 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 /-!
 # S07_Theorem74
 
-Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 /-!

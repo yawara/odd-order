@@ -34,7 +34,8 @@ issue 2013 / `notes/peterfalvi/s13_17_structural_program.md`. -/
 This is the `S ↔ T` symmetric companion of `BasicStructureData.P_order` (`|P| = |S_F| = p^q`), now
 **proven** for the (14.9) type-II member `T`: from `IsTypeII T`, the (9.3) Wielandt order relation
 `typeII_III_IV_order_relations` on the reconciled type-`P` data of `T` (`reconciled_typePData_T`)
-gives `|T_F| = |tpd.W2|^|tpd.W1| = |W₁|^|W₂| = q^p` (the intrinsic factors reconcile to `tpd.W2 = W₁`,
+gives `|T_F| = |tpd.W2|^|tpd.W1| = |W₁|^|W₂| = q^p` (the intrinsic factors reconcile to
+`tpd.W2 = W₁`,
 `tpd.W1 = W₂`).  Combined with the automorphism-equivariance of `M_F`
 (`maxNilpotentNormalHall_pointwise_smul`), it gives `|L_F| = q^p` for every `L` conjugate to `T`,
 which is what the `L ~ T` exclusion of (13.17.a) uses.  The `IsTypeII T` hypothesis is threaded from
@@ -127,7 +128,8 @@ theorem tConjugate_fitting_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       have h1 : orderOf (⟨w, hw⟩ : ↥hyp.W1) ∣ Nat.card ↥hyp.W1 := orderOf_dvd_natCard _
       rw [heq, ← hyp.q_eq_card_W1] at h1
       exact h1
-  -- part 3: `L_F ⊓ U = ⊥` — `L_F` a `q`-group (`|L_F| = q^p`), `U` coprime to `q` (`U ⋊ W₁` Frobenius).
+  -- part 3: `L_F ⊓ U = ⊥` — `L_F` a `q`-group (`|L_F| = q^p`), `U` coprime to `q` (`U ⋊ W₁`
+  -- Frobenius).
   have hLFU : maxNilpotentNormalHall L ⊓ hyp.U = ⊥ := by
     obtain ⟨data, _⟩ := basic_structure hG hyp
     have hcopUq : Nat.Coprime (Nat.card ↥hyp.U) hyp.q := by
@@ -277,7 +279,8 @@ theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
     (hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
     hyp.U ≤ maxNilpotentNormalHall L := by
-  -- The (12.7) Frobenius structure of the type-`I` `L`, with kernel `L_F = maxNilpotentNormalHall L`.
+  -- The (12.7) Frobenius structure of the type-`I` `L`, with kernel
+  -- `L_F = maxNilpotentNormalHall L`.
   obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hnoV hLmax hLI
   have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
   have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
@@ -622,7 +625,8 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
 maximal `L` conjugate to `S`, the Fitting kernel `L_F` is a `p`-group of order `p^q` containing `W₂`
 and meeting `V` trivially.  **Now proven** (the V-side mirror of `tConjugate_fitting_data`): part (1)
 `|L_F| = p^q` from the proven `card_P_eq` via the `S`-conjugation equivariance of `M_F`; part (2)
-`W₂ ≤ L_F` places the `p`-group `W₂ ⊆ N_G(V) ⊆ L` in the normal `p`-Hall `L_F`; part (3) `L_F ⊓ V = ⊥`
+`W₂ ≤ L_F` places the `p`-group `W₂ ⊆ N_G(V) ⊆ L` in the normal `p`-Hall `L_F`; part (3)
+`L_F ⊓ V = ⊥`
 from `|L_F| = p^q` coprime to `|V|` (`V ⋊ W₂` Frobenius, `(|V|, p) = 1`).  `IsTypeII T` (for the
 `V ⋊ W₂` Frobenius) is threaded from `exists_typeI_maximal_overNormalizer_V`. -/
 theorem sConjugate_fitting_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -660,7 +664,8 @@ theorem sConjugate_fitting_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       have h1 : orderOf (⟨w, hw⟩ : ↥hyp.W2) ∣ Nat.card ↥hyp.W2 := orderOf_dvd_natCard _
       rw [heq, ← hyp.p_eq_card_W2] at h1
       exact h1
-  -- part 3: `L_F ⊓ V = ⊥` — `|L_F| = p^q` coprime to `|V|` (`V ⋊ W₂` Frobenius gives `(|V|, p) = 1`).
+  -- part 3: `L_F ⊓ V = ⊥` — `|L_F| = p^q` coprime to `|V|` (`V ⋊ W₂` Frobenius gives
+  -- `(|V|, p) = 1`).
   have hLFV : maxNilpotentNormalHall L ⊓ hyp.V = ⊥ := by
     obtain ⟨tpd, htpdV, htpdW1, _⟩ := reconciled_typePData_T hG hyp
     obtain ⟨tdata⟩ := hTTypeII

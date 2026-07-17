@@ -4,7 +4,8 @@ import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.OrderRelayer
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM` (2000-line limit, issue 0103 第
+2 パス).
 -/
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
@@ -774,8 +775,10 @@ S- and T-sides, giving the same signed `eta_ij` expansion as in (14.11.2) for
 `beta_L^tau`; this contradicts the nonzero pairing in case-(b) of (14.14).
 
 De-opacified (W4 §16, lane-h): the genuine character theory (the `β_L^τ` expansion, the `η`-grid /
-`χ_L` orthogonalities to `ψ^{τ₁}`, and the case-(b) pairing) is the faithful `CaseBContradictionData`;
-the contradiction itself is the pure inner-product computation `(β_L^τ, ψ^{τ₁}) = (Σ ±η_ij − χ_L, ψ^{τ₁})
+`χ_L` orthogonalities to `ψ^{τ₁}`, and the case-(b) pairing) is the faithful
+`CaseBContradictionData`;
+the contradiction itself is the pure inner-product computation
+`(β_L^τ, ψ^{τ₁}) = (Σ ±η_ij − χ_L, ψ^{τ₁})
 = Σ ±·0 − 0 = 0`, contradicting `(β_L^τ, ψ^{τ₁}) ≠ 0`. -/
 theorem caseB_character_contradiction_of_gap_inequalities
     [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -827,7 +830,8 @@ theorem caseB_contradiction_of_full_u_card_congruences
 end OrthogonalitySwitchData
 
 /-- For `p ≥ 7`, `p² ≤ 3^(p-3)`: the monotonicity input for the `p = 5` step of Peterfalvi (14.14.b).
-The paper's `f(x) = 3^(x-3)/x²` is increasing for `x ≥ 2` (`f(x+1)/f(x) = 3(1 − 1/(x+1))² > 1`); this
+The paper's `f(x) = 3^(x-3)/x²` is increasing for `x ≥ 2` (`f(x+1)/f(x) = 3(1 − 1/(x+1))² > 1`);
+this
 is the integer form `p² ≤ 3^(p-3)` proved by induction from `p = 7` (`7² = 49 ≤ 81 = 3⁴`). -/
 private theorem sq_le_three_pow_sub_three {p : ℕ} (hp : 7 ≤ p) : p ^ 2 ≤ 3 ^ (p - 3) := by
   induction p, hp using Nat.le_induction with
@@ -1437,7 +1441,8 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [htriv, ← typeIHyp.typeI.typeF.H_eq]
     exact induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)
   · -- **Peterfalvi (7.8)**: the distinguished `ζ = ζ_0 = Ind_K θ_0` (`θ_0 ≠ 1_K`) is irreducible
-    -- (Frobenius, [Is] 6.34), hence `‖ζ‖² = 1` — the `ζ_0` unit-norm input to the (7.5)/(7.8) machinery.
+    -- (Frobenius, [Is] 6.34), hence `‖ζ‖² = 1` — the `ζ_0` unit-norm input to the (7.5)/(7.8)
+    -- machinery.
     obtain ⟨C, hFrobG⟩ := hfrob
     have hθ0_ne : θ 0 ≠ trivialIrreducibleCharacter
         ↥(typeIHyp.typeI.typeF.H.subgroupOf M) := by

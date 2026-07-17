@@ -13,18 +13,23 @@ import OddOrder.Peterfalvi.S07_Coherence
 > **(5.7)** Assume Hypothesis (5.2) and that `χ(1)` is independent of `χ` for `χ ∈ S`.  Then `S` is
 > coherent.  (`references/peterfalvi/04.7_pp_25_29_Coherence.mmd:107`)
 
-The §11/§13 maximal-subgroup analysis (Peterfalvi (11.5), repo `S13_MaximalIII_IV.HC_le_secondDerived`)
+The §11/§13 maximal-subgroup analysis (Peterfalvi (11.5), repo
+`S13_MaximalIII_IV.HC_le_secondDerived`)
 needs this: since `M'/M''` is abelian, the constituents of `S(M'')` all have equal degree, so (5.7)
 makes `S(M'')` coherent — the coherence content of `M'' = HC`.
 
 **Status (lane-c relane #8, issue 4012): COMPLETE — `coherent_of_constant_degree` sorry-free +
 axiom-clean.**  The proof follows Peterfalvi (5.7) directly rather than the inductive `retarget`
-chain: the auxiliary isometry `τ₁` is built in *one shot* (`χ₀ ↦ β`, `χⱼ ↦ β − (χ₀ − χⱼ)^τ`).  Because
-all members share a degree, every difference `χ₀ − χⱼ` is supported, so `τ₁`'s decompositions use the
+chain: the auxiliary isometry `τ₁` is built in *one shot* (`χ₀ ↦ β`, `χⱼ ↦ β − (χ₀ − χⱼ)^τ`).
+Because
+all members share a degree, every difference `χ₀ − χⱼ` is supported, so `τ₁`'s decompositions use
+the
 fixed Dade map `τ` itself (no running-extension/Gram–Schmidt residual), and the orthonormal target
-family feeds the equal-degree coherence builder `coherentEqualDegree`.  The common image `β` (a single
+family feeds the equal-degree coherence builder `coherentEqualDegree`. The common image `β` (a
+single
 element of `R(χ₀)`) is independent of the auxiliary member by the (5.4.b) two-sided norm argument
-(`pairDecomp_two_sided`) and the 4-case independence (`commonImage_inner`); a single conjugate pair `S`
+(`pairDecomp_two_sided`) and the 4-case independence (`commonImage_inner`); a single conjugate pair
+`S`
 routes to the (5.2.d) base case.  Design + framework mapping are in
 `notes/peterfalvi/s05_57_constant_degree_coherence_producer.md`.
 -/
@@ -250,7 +255,8 @@ satisfy `‖D.X‖² = 1` and `D.Y = D'.X`.
 
 This is Peterfalvi's "`‖X‖² = ‖χ‖²`" and "`Y = 0`" combined: the (5.4.b) hypothesis `‖Y‖² ≥ ‖ζ‖²`
 is supplied by the symmetric `D'` through `‖D.Y − D'.X‖² ≥ 0` together with the identity
-`⟨D.Y, D'.X⟩ = ‖D'.X‖² ≥ ‖ζ‖²` (which holds because `D.Y = D.X − (χ − ζ)^τ`, `(χ − ζ)^τ = D'.Y − D'.X`,
+`⟨D.Y, D'.X⟩ = ‖D'.X‖² ≥ ‖ζ‖²` (which holds because `D.Y = D.X − (χ − ζ)^τ`,
+`(χ − ζ)^τ = D'.Y − D'.X`,
 `⟨D.X, D'.X⟩ = 0` and `⟨D'.X, D'.Y⟩ = 0`).  Once `‖D.Y‖² = ‖ζ‖²` is forced, `‖D.Y − D'.X‖² = 0`. -/
 theorem pairDecomp_two_sided
     {τ : IntegralCharacterMap L G} {χ ζ : ClassFunction L ℂ}
@@ -461,7 +467,8 @@ theorem commonImage_inner_refconj (hyp : Hypothesis (L := L) (G := G) S A)
       (imageFam hyp hζ₀) (hdp.imageFam_orthogonal hyp hχ₀ hζ₀), add_zero]
 
 /-- **(5.7) fact (B) at a member `ζ` in a *third* pair: `⟨β, (χ₀ − ζ)^τ⟩ = 1`.**  The independence
-of `β` from the auxiliary member: `⟨β, (χ₀−ζ)^τ⟩ = ⟨D₀.X, Dζ.X⟩ = ⟨χ₀−ζ₀, χ₀−ζ⟩ = 1`, the cross terms
+of `β` from the auxiliary member: `⟨β, (χ₀−ζ)^τ⟩ = ⟨D₀.X, Dζ.X⟩ = ⟨χ₀−ζ₀, χ₀−ζ⟩ = 1`, the cross
+terms
 vanishing because `R(χ₀) ⊥ R(ζ)`, `R(χ₀) ⊥ R(ζ₀)` and `D₀.Y, Dζ.Y` lie in `R(ζ₀)`, `R(ζ)` (different
 pairs, `pairDecomp_two_sided`). -/
 theorem commonImage_inner_other (hyp : Hypothesis (L := L) (G := G) S A)
@@ -528,9 +535,12 @@ theorem commonImage_inner (hyp : Hypothesis (L := L) (G := G) S A)
 `τ₁` of (5.7) given by `χⱼ^{τ₁} = X j := β − (χ₀ − χⱼ)^τ` (`χ₀ := χ 0`, `β = χ₀^{τ₁}`), one has
 `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩`, from `‖β‖² = 1` (A), the uniform fact `⟨β, (χ₀ − χⱼ)^τ⟩ = 1 − ⟨χ₀, χⱼ⟩`
 (B), and the **lattice-relative** difference-isometry `hdiff`
-(`⟨(χ₀−χᵢ)^τ, (χ₀−χⱼ)^τ⟩ = ⟨χ₀−χᵢ, χ₀−χⱼ⟩`).  This is the *only* place (5.7) used the isometry, and it
-uses it solely on supported differences (issue 9001), so **no global `IsIntegralIsometry` is needed**
-— the theorem applies directly to the Feit–Thompson Dade map (`dim CF(L) > dim CF(G)`, isometric only
+(`⟨(χ₀−χᵢ)^τ, (χ₀−χⱼ)^τ⟩ = ⟨χ₀−χᵢ, χ₀−χⱼ⟩`). This is the *only* place (5.7) used the isometry, and
+it
+uses it solely on supported differences (issue 9001), so **no global `IsIntegralIsometry` is
+needed**
+— the theorem applies directly to the Feit–Thompson Dade map (`dim CF(L) > dim CF(G)`, isometric
+only
 on `A(L)`-supported functions).  (Hence `τ₁` is an isometry — Peterfalvi's closing remark.) -/
 theorem xFamily_inner {τ : IntegralCharacterMap L G} {n : ℕ} [NeZero n]
     (χ : Fin n → ClassFunction L ℂ)
@@ -573,7 +583,8 @@ it is the (5.2.d) base case; otherwise the auxiliary isometry `χⱼ ↦ β − 
 `β = χ₀^{τ₁}` the common `R(χ₀)`-projection, independent of the auxiliary member) is an orthonormal
 retargeting, fed to the equal-degree coherence builder `coherentEqualDegree`.
 
-This is the producer that `S13_MaximalIII_IV.HC_le_secondDerived` (Peterfalvi (11.5)) will cite, once
+This is the producer that `S13_MaximalIII_IV.HC_le_secondDerived` (Peterfalvi (11.5)) will cite,
+once
 a `Hypothesis (5.2)` instance for `S(M'')` is constructed on the §13 Dade side. -/
 theorem coherent_of_constant_degree
     (hyp : Hypothesis (L := L) (G := G) S A) (hSfin : S.Finite) (hcard : 2 ≤ S.ncard)

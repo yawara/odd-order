@@ -14,13 +14,15 @@ import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 /-!
 # SubcoherenceInputs
 
-Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics` (2000-line limit, issue
+0103 第 2 パス).
 -/
 
 /-!
 # Peterfalvi (13.1)-(13.2) — S,T hypothesis and basic structure
 
-Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S15
 
@@ -123,10 +125,13 @@ structure Hypothesis where
   /-- **Peterfalvi (13.1.b)/(13.2), T-side complement disjointness**: `Q ⊓ V = ⊥`.  The κ-Hall
   invariant complement `V` to `Q = T_F` in `T'` genuinely *complements* `Q` — a fact available
   ungated at the §16 construction (`exists_kappaHall_invariant_complement_to_MF` returns
-  `M_F ⊓ U = ⊥` from `T`'s type-`P` structure, i.e. from `T_nonI`, **not** requiring (14.9)/`IsTypeP2 T`),
-  but dropped by the abstract `T_deriv_eq_QV` (`T' = Q ⊔ V`, which alone does not force disjointness).
+  `M_F ⊓ U = ⊥` from `T`'s type-`P` structure, i.e. from `T_nonI`, **not** requiring
+  (14.9)/`IsTypeP2 T`),
+  but dropped by the abstract `T_deriv_eq_QV` (`T' = Q ⊔ V`, which alone does not force
+  disjointness).
   Threading it exposes the T-side linchpin used by every V-side coprimality/complement argument
-  (`isMulCommutative_V`, `coprime_card_V_card_Q_of_disjoint`, …), previously routed circularly through
+  (`isMulCommutative_V`, `coprime_card_V_card_Q_of_disjoint`, …), previously routed circularly
+  through
   the sorried `reconciled_typePData_T` (`Q_inf_V_eq_bot_of_reconciled`). -/
   Q_inf_V_eq_bot : Q ⊓ V = ⊥
   /-- **Peterfalvi (13.1.b), T-side semidirect complement `T = T' ⋊ W₂`**: the cyclic factor `W₂`
@@ -489,7 +494,8 @@ and `A_0(S)` is a TI-subset (13.2.e).
 
 Unlike the *type determination* and the `U W₁` *Frobenius structure* of (13.2.a) — both now read off
 sorry-free from the carrier (`isTypeII_of_isTypeP2`, `typeP_uW1_frobenius` on `Sdata`) — these are
-the σ-structure facts of the type-`P₂` member `S`: `M_σ = M_F` is the elementary-abelian `p`-group of
+the σ-structure facts of the type-`P₂` member `S`: `M_σ = M_F` is the elementary-abelian `p`-group
+of
 rank `q` on which the prime-order `κ`-Hall factor `W₁` acts (BG §10/§14 σ-theory), giving the
 `u`-bound from the count of `W₁`-orbits.  No repo theorem yet states "`M_σ` elementary abelian of
 order `p^q`"; declared here as the localized faithful gate (the
@@ -616,7 +622,8 @@ the **core** `M_σ^#`.  For the type-`P₂` maximal `S` this is `A(S) = centrali
 This is the honest (13.2.e) Dade-support set; the earlier `typePA = (S')^#` over-claim (issue 9008)
 included the Frobenius-complement points `U^#` (`C_{S_σ} = 1`), which is false-as-stated for `P₂`.
 
-Following 9008 Option A, `A(S)` reduces to the type-I `ASet` bridge: `A(S) ⊆ ASet S U₀` for a matched
+Following 9008 Option A, `A(S)` reduces to the type-I `ASet` bridge: `A(S) ⊆ ASet S U₀` for a
+matched
 `(κ∪σ)'`-Hall `U₀` (`typeP2_exists_matched_kappa_hall_pair`), since `S' = U₀ ⊔ S_σ`
 (`typeP_hall_derived_eq_and_abelian`) and every `A(S)`-point centralizes a nonidentity `S_σ`-element
 (so lies in `\widehat{S_σ}`).  The three (8.13) obligations then flow through the type-agnostic BG
@@ -765,7 +772,8 @@ theorem coprime_FT_signalizer_centralizerIn_honestTypeP2ASet [Finite G]
     exact Subgroup.card_dvd_of_le inf_le_left
   obtain ⟨-, -, Ufr, -, hfrobU⟩ :=
     OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius hG hM haσ hgt ⟨p, hpσ, hpS⟩
-  -- Frobenius kernel absorption: a `w`-point centralizing a nonidentity `M_σ`-element lands in `M_σ`.
+  -- Frobenius kernel absorption: a `w`-point centralizing a nonidentity `M_σ`-element lands in
+  -- `M_σ`.
   have hker : ∀ {u v : G}, u ∈ M → v ∈ OddOrder.BG.Ch3.S10.Msigma M → v ≠ 1 →
       Commute u v → u ∈ OddOrder.BG.Ch3.S10.Msigma M := by
     intro u v huM hvMσ hv1 hcomm
@@ -1021,7 +1029,8 @@ theorem escaping_honestTypeP2ASet_eq_empty [Finite G]
 
 /-- **Peterfalvi (8.15) for the type-`P₂` support `A(S)`: the Dade (2.2) support hypotheses hold.**
 The honest (13.2.e) foundation.  Assembles the `σ`-decomposition-generic engine
-(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₂` pins obtained from the
+(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₂` pins obtained from
+the
 matched κ-Hall / `(κ∪σ)'`-Hall pair (`typeP2_exists_matched_kappa_hall_pair`): escaping points are
 `σ`-sharp (`escaping_honestTypeP2ASet_mem_sigmaSharp`, (8.13.b)), `G`-conjugacy is `M`-conjugacy
 (`honestTypeP2ASet_isConj_conj_in_M`, (8.13.a)), and the coprimality
@@ -1029,7 +1038,8 @@ matched κ-Hall / `(κ∪σ)'`-Hall pair (`typeP2_exists_matched_kappa_hall_pair
 non-identity, nonempty, `M`-conjugation-invariant).
 
 This is the honest type-`P₂` Dade support (issue 9008 Option A / issue 1017 update #9): its `.dade`
-field is the `S04.Hypothesis G (A(S)) M` (the `τ = Ind_M^G` Dade isometry lives on `A(S)`), replacing
+field is the `S04.Hypothesis G (A(S)) M` (the `τ = Ind_M^G` Dade isometry lives on `A(S)`),
+replacing
 the likely-unsound `sibleyTarget_H0C` route for the (13.3) `S`-instance coherence. -/
 theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
@@ -1064,8 +1074,10 @@ theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
 /-- **(13.2.e) `S`-instance Dade hypothesis** (issue 1017 update #10, step 1): the `Hypothesis`-level
 instantiation of `dadeSupportHypothesisData_honestTypeP2ASet` at the type-`P` maximal `S`
 (via `hyp.S_maximal`/`hyp.S_isTypeP`), packaging the honest §16 support
-`A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` (`honestTypeP2ASet hyp.S`) as an `S04.Hypothesis`.  This is the concrete
-`S04` Dade datum for `S` (previously only available as the standalone theorem taking `hM`/`hP2`); its
+`A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` (`honestTypeP2ASet hyp.S`) as an `S04.Hypothesis`. This is the
+concrete
+`S04` Dade datum for `S` (previously only available as the standalone theorem taking `hM`/`hP2`);
+its
 `.fullDadeIsometryData` (given the support's `HConjInvariant`) materialises the Dade isometry
 `τ = Ind_S^G` on the `ℤ`-lattice of virtual characters — the (13.2.e) foundation the §9 subcoherence
 assembly (`S07.irrSubcoherent`) consumes to re-ground `coherent_H0Cprime_S` off the unsound
@@ -1317,7 +1329,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `ξ ∈ 𝒳` (Peterfalvi (9.5)'s family, `H ⊄ Ker ξ`), where `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` is the honest
 type-`P₂` Dade support (`honestTypeP2ASet hyp.S`).
 
-This is the honest §9 instance of the (4.7) support fact underlying the (5.3.a) R-datum's `hdiffsupp`
+This is the honest §9 instance of the (4.7) support fact underlying the (5.3.a) R-datum's
+`hdiffsupp`
 input (the family differences of `𝒮` must vanish off `A(S)`).  The proof **mirrors** the S06 (4.7)
 induced-support lemma `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`
 (the S06 statement is bound to the `Hypothesis46` structure and cannot be instantiated for the §9
@@ -1431,10 +1444,12 @@ theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(5.3.a) per-member difference support** (issue 1017): the Dade-image support hypothesis
-`((Ind ξ)̄ − Ind ξ).support ⊆ A(S)` (as an `S`-support) that `S07.dadeCharacterDifferenceImageOfDiff`
+`((Ind ξ)̄ − Ind ξ).support ⊆ A(S)` (as an `S`-support) that
+`S07.dadeCharacterDifferenceImageOfDiff`
 consumes to build the `CharacterDifferenceImage` of an irreducible §9 member.  From
 `sSet_member_support_subset_A` (support `⊆ A(S) ∪ {1}`), removing the identity: the difference
-`(Ind ξ)̄ − Ind ξ` vanishes at `1` (the degree `Ind ξ(1) = q·ξ(1)` is a positive real, self-conjugate).
+`(Ind ξ)̄ − Ind ξ` vanishes at `1` (the degree `Ind ξ(1) = q·ξ(1)` is a positive real,
+self-conjugate).
 This is the `hdiffsupp` half of the R-datum — the S-instance `R1_diffsupp` (Peterfalvi §12/§5). -/
 theorem Hypothesis.sSet_member_diffsupp [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))

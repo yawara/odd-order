@@ -28,7 +28,8 @@ open scoped Pointwise
 
 The maximal pair `S, T`, their (non-)types, the "at least one Type II" disjunction,
 and the case-(b) trichotomy of (8.8).  These are the fields of `Section16Inputs`
-that mention only `S, T`.  Producer: `section16MaximalPair_of_isMinimalSimpleOdd` (in `S13_TypeDetermination`, below the unconditional (10.10))
+that mention only `S, T`. Producer: `section16MaximalPair_of_isMinimalSimpleOdd` (in
+`S13_TypeDetermination`, below the unconditional (10.10))
 (BG §16 main results). -/
 structure Section16MaximalPairCore (G : Type*) [Group G] [Finite G] where
   S : Subgroup G
@@ -62,7 +63,8 @@ structure Section16MaximalPairCore (G : Type*) [Group G] [Finite G] where
   K_eq : K = BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer (Kstar : Set G)
   Z_cyclic : IsCyclic ↥(K ⊔ Kstar)
   /-- **Peterfalvi (13.2.a)**: the `S`-member of the pair is of type `P₂` (Type II).  In the
-  canonical producer this is pinned via `isTypeP2_of_typeP_kappaHall_lt` (`S13_TypeDetermination`) on the smaller-κ
+  canonical producer this is pinned via `isTypeP2_of_typeP_kappaHall_lt` (`S13_TypeDetermination`)
+  on the smaller-κ
   labelling; in the `M`-seeded producer it is the clean resolution of the `typeP_duality`
   disjunction against `¬ IsTypeP2 M` (no (13.2.a) content; issue 1020 Phase 1a). -/
   S_typeP2 : BG.Ch4.S14.IsTypeP2 S

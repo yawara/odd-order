@@ -23,7 +23,8 @@ irreducible-`X` chain and the `Y`-coherence.  The remaining input to the column 
 
 This leaf assembles `hXanchored` from the per-`φ` anchored-image producer
 `caseB_per_phi_anchored_fromYset` (`S08_CaseBAssembly`).  The key structural point (Peterfalvi
-(6.8.2.3), verified gap analysis): the columns do **not** all lie over a single source character `φ`;
+(6.8.2.3), verified gap analysis): the columns do **not** all lie over a single source character
+`φ`;
 each column's underlying irreducible `θ_{χ₂} = Res^H μ_{0,χ₂}` lies over its **own** central linear
 character `φ_θ` ([Is] Lemma 2.27, `Res^H_{W₂} θ = θ(1)·φ_θ` with `W₂ ≤ Z(H)`).  The first piece is
 therefore the per-`θ` central-character data:
@@ -169,7 +170,8 @@ theorem exists_decomposition_caseB_coherentYset
 
 /-- **(6.8.2.2) aggregate against an arbitrary `Y`-coherence `cY`** — the `hYcard`-free,
 uniform-`cY` form of `exists_decomposition_caseB_coherentYset`.  Given the good anchor multiplicity
-`hgood : ⟨(Ind^L_{W₂}φ − |H:W₂|·η₁)^τ, cY.extension η₁⟩ = −|H:W₂|` (supplied uniformly across all `φ`
+`hgood : ⟨(Ind^L_{W₂}φ − |H:W₂|·η₁)^τ, cY.extension η₁⟩ = −|H:W₂|` (supplied uniformly across all
+`φ`
 by `SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB`, folding in the `m = 2` relabel),
 produces the anchored decomposition against `cY` with `X ⊥ cY.extension(𝒴)` and `X ∈ ZIrr`.  Replaces
 the `coeff_eq_neg_or_edge_caseB` + `hYcard` derivation by the `hgood` hypothesis; the rest of the
@@ -246,14 +248,17 @@ theorem caseB_column_W2_nonconstant
 For a **nontrivial** certain-type column `χ₂ ≠ 1` (`hχ₂`; its underlying irreducible
 `θ = Res^H μ_{0,χ₂}` is then nonconstant on `W₂` by `caseB_column_W2_nonconstant`), and with
 `|𝒴| ≠ 2` (`hYcard`, excluding the relabel edge), the Sibley–Dade map sends the anchored difference
-`columnSum χ₂ − a·η₁` to `X − a·η₁^{τ₁}` for some virtual `X` against the **canonical** `Y`-coherence
+`columnSum χ₂ − a·η₁` to `X − a·η₁^{τ₁}` for some virtual `X` against the **canonical**
+`Y`-coherence
 `hyp.coherentYset`, with `a = θ(1)` (the constituent weight).
 
 Assembles the per-`θ` central character (`exists_central_phi_data`), the `(6.8.2.2)` aggregate
-against `hyp.coherentYset` (`exists_decomposition_caseB_coherentYset`), the column/irreducible bundles
+against `hyp.coherentYset` (`exists_decomposition_caseB_coherentYset`), the column/irreducible
+bundles
 (`caseB_hcol`/`caseB_hirr`/`caseB_hirrAnc`, with non-linearity `caseB_hnonlin`), and the per-`φ`
 anchored producer (`caseB_per_phi_anchored_fromYset`), then rewrites `Ind^L_H θ = columnSum χ₂`
-(`columnSum_eq_induce_H`).  This is the `(6.8.2.3)` per-column anchored image `hXanchored` (modulo the
+(`columnSum_eq_induce_H`). This is the `(6.8.2.3)` per-column anchored image `hXanchored` (modulo
+the
 uniform `a₀` and the `Ximg` packaging, handled at the `∀`-column assembly). -/
 theorem caseB_column_anchored_image
     (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
@@ -440,7 +445,8 @@ anchored image `τ(μ − a₀·η₁) = X − a₀·ν₁`, `hanc`, where `μ =
 orthogonal to `cY.extension y` for **every** `y ∈ Y`, not only the anchor `η₁`.
 
 Writing `⟨X, ν_y⟩ = ⟨X, ν_y − ν₁⟩ + ⟨X, ν₁⟩`, the anchor term is `hmix = 0` and the difference term
-`⟨X, cY.ext(y − η₁)⟩ = ⟨X, τ(y − η₁)⟩` (`cY` extends `τ` on the `H^#`-supported `y − η₁`) vanishes by
+`⟨X, cY.ext(y − η₁)⟩ = ⟨X, τ(y − η₁)⟩` (`cY` extends `τ` on the `H^#`-supported `y − η₁`) vanishes
+by
 the Dade isometry of `τ` and the `Y`-isometry of `cY`: with `X = τ(μ − a₀η₁) + a₀·ν₁`,
 `⟨X, τ(y − η₁)⟩ = ⟨μ − a₀η₁, y − η₁⟩ + a₀·⟨η₁, y − η₁⟩ = a₀(1 − c) + a₀(c − 1) = 0`
 (`c = ⟨η₁, y⟩`, the columns being orthogonal to `Y`).  This is the uniform `hXmixed` content for the
@@ -622,7 +628,8 @@ theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
   rw [inner_conj_symm (cY.extension η) (cX.extension χ), hconcl.1, star_zero]
 
 /-- **(6.8.2) case-(B) `X ∪ Y` glue `hmixed`** — the seam orthogonality
-`⟨ν x, ν y⟩ = ⟨x, y⟩` of `coherentXunionYset_caseB_of_glued`, reduced to the single `cX`-construction
+`⟨ν x, ν y⟩ = ⟨x, y⟩` of `coherentXunionYset_caseB_of_glued`, reduced to the single
+`cX`-construction
 obligation `hcolAgree` (`cX.extension μ_j = certainTypeExtension μ_j` on the certain-type columns, a
 property of the canonical `xChainCoherentW` base).
 
@@ -859,7 +866,8 @@ noncomputable def coherentCertainTypeSet_union_Yset_caseB
     · rw [hXimg]; simp only [if_neg hmem]; rw [ClassFunction.inner_zero_left]
 
 /-- **(6.8.2.3) per-member anchored image for an arbitrary `X`-member.**  Generalizes
-`caseB_column_anchored_full` from a certain-type column to **any** `χ ∈ Xset W₂` (reducible column or
+`caseB_column_anchored_full` from a certain-type column to **any** `χ ∈ Xset W₂` (reducible column
+or
 irreducible).  Every such `χ = Ind^L_H θ` with `W₂ ⊄ Ker θ` (from `S_eq` and `χ ∉ S(W₂)`: had
 `W₂ ⊆ Ker θ` then `χ ∈ S(W₂)`), so `caseB_member_anchored_image` supplies the (6.8.2.3) anchored
 image with `a = χ(1)/|W₁| = θ(1)`.
@@ -1024,7 +1032,8 @@ theorem anchoredImage_scaledDiff_eq
 
 /-- **(6.8.2) grid constituents are not `X`-members** — `μ_{iχ₂} ∉ Xset W₂`.  A certain-type grid
 character has degree `≡ ±1 (mod |W₁|)` (`certainType_degree_modEq`, the sign `= ±1`), whereas every
-`X`-member `Ind^L_H θ` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)`; with `|W₁| ≠ 1` these are incompatible.
+`X`-member `Ind^L_H θ` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)`; with `|W₁| ≠ 1` these are
+incompatible.
 
 This is the disjointness underlying the **dichotomy extension** for the full `Xset W₂` coherence: on
 the basis `Irr L`, the irreducible `X`-members `χ ↦ Ximg χ` and the column grid members
@@ -1167,12 +1176,15 @@ theorem caseBXsetExtension_eq
 
 /-- **(6.8.2) supported generation by scaled differences** (the varying-degree analogue of
 `mem_span_columnDiff_of_mem_zSupportedSpan`).  Given an anchor `χ₁ ∈ S₁` (with `χ₁(1) ≠ 0`) such that
-every `f ∈ S₁` has degree `f(1) = d·χ₁(1)` for some `d : ℕ` (the integral degree ratio, available for
-`X`-members since `H` is a `p`-group), every supported (degree-`0`) `φ ∈ Z[S₁, H^#]` lies in the span
+every `f ∈ S₁` has degree `f(1) = d·χ₁(1)` for some `d : ℕ` (the integral degree ratio, available
+for
+`X`-members since `H` is a `p`-group), every supported (degree-`0`) `φ ∈ Z[S₁, H^#]` lies in the
+span
 of the scaled differences `f − d·χ₁`.
 
 Proof mirrors the equal-degree case: the scaled differences vanish at `1` (`f(1) − d·χ₁(1) = 0`), so
-`D = span{f − d·χ₁}` sits inside `ker(ev₁)`; `Z[S₁] ≤ D ⊔ ℤ·χ₁` (write `f = (f − d·χ₁) + d·χ₁`); and a
+`D = span{f − d·χ₁}` sits inside `ker(ev₁)`; `Z[S₁] ≤ D ⊔ ℤ·χ₁` (write `f = (f − d·χ₁) + d·χ₁`); and
+a
 supported `φ = y + n·χ₁` has `0 = φ(1) = n·χ₁(1)`, forcing `n = 0`, so `φ = y ∈ D`. -/
 theorem mem_span_scaledDiff_of_mem_zSupportedSpan
     (hyp : SibleyDadeHypothesis G L H)

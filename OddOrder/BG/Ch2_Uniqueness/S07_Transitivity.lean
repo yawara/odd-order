@@ -8,7 +8,8 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Hypothesis75
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2
+パス).
 -/
 namespace OddOrder.BG.Ch2.S07
 open OddOrder.GroupTheory
@@ -109,7 +110,8 @@ theorem opiCoreInG_centralizer_inf_le_opiCoreInG [Finite G] {p : ℕ} [Fact p.Pr
     _ = opiCoreInG ({p} : Set ℕ)ᶜ X := rfl
 
 /-- **Bar-quotient bridge** for Proposition 7.5's special case: the image of `O_{π',π}(G')` under
-the quotient `mk' : G' → G'/O_{π'}(G')` is exactly `O_π(G'/O_{π'}(G'))` — i.e. `O_p(X̄) = mk(O_{p',p}(X))`.
+the quotient `mk' : G' → G'/O_{π'}(G')` is exactly `O_π(G'/O_{π'}(G'))` — i.e.
+`O_p(X̄) = mk(O_{p',p}(X))`.
 Immediate from `oPiPrimePiCore` being defined as `comap (mk' O_{π'}) (O_π of the quotient)` plus
 `map_comap_eq_self_of_surjective`. With Theorem 6.1 (`thmA4b`: `A ≤ O_{p',p}(X)`) this gives
 `Ā ≤ O_p(X̄)`. -/
@@ -693,7 +695,8 @@ private theorem card_le_prime_mul_card_centralizer_inf {p : ℕ} [Fact p.Prime] 
       exact absurd hlt (not_lt.mpr (Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le h))
     calc p ^ j ≤ p ^ 1 := Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le hj1
       _ = p := pow_one p
-  -- Orbit-stabilizer: `|P| = |orbit| · |stab|`, with `stab = C_R(bhat)` injecting into `C_G(b) ⊓ P`.
+  -- Orbit-stabilizer: `|P| = |orbit| · |stab|`, with `stab = C_R(bhat)` injecting into
+  -- `C_G(b) ⊓ P`.
   set stab : Subgroup (ConjAct R) := MulAction.stabilizer (ConjAct R) bhat with hstabdef
   have hPeq : Nat.card R = Nat.card (MulAction.orbit (ConjAct R) bhat) * Nat.card ↥stab := by
     have hidx : stab.index = Nat.card (MulAction.orbit (ConjAct R) bhat) := by
@@ -1013,7 +1016,8 @@ private theorem coreClaim_scn2 [Finite G] (hG : IsMinimalSimpleOdd G)
     · rw [hn]; exact dvd_pow_self p hn0.ne'
   have hp_odd : Odd p := hG.odd.of_dvd_nat (hpA.trans (Subgroup.card_subgroup_dvd_card A))
   have hp2 : p ≠ 2 := by rintro rfl; rw [Nat.odd_iff] at hp_odd; omega
-  -- `Z(P)` inside `G`: elements of `P` that centralize `P`. `Z(P) ≤ A` (SCN), each is central in `P`.
+  -- `Z(P)` inside `G`: elements of `P` that centralize `P`. `Z(P) ≤ A` (SCN), each is central in
+  -- `P`.
   set ZP : Subgroup G :=
     Subgroup.centralizer ((P : Subgroup G) : Set G) ⊓ (P : Subgroup G) with hZPdef
   have hZP_le_A : ZP ≤ A := by

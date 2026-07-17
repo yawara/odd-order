@@ -41,7 +41,8 @@ statements** about `β_j`/`Γ`, tied to `hyp`, the grid `hyp.eta`, and `S`:
 The remaining half of **(13.18.c)** — `Γ`'s `j`-independence (`defGamma`) — is the standalone proven
 `gammaGrid_defGamma` (not a field here, to keep the `FiniteInduce` `τ_S` instances out of this
 structure's explicit inner-product binders).  ⚠ The **removed** fields `Gamma_independent`
-(`⟨Γ,η_ik⟩ = 0`) and the old `Y_norm_bound` (`‖Γ‖² ≤ (u−1)/q + 1`) were **overstatements** — (13.18.c)
+(`⟨Γ,η_ik⟩ = 0`) and the old `Y_norm_bound` (`‖Γ‖² ≤ (u−1)/q + 1`) were **overstatements** —
+(13.18.c)
 says `Γ` is independent of `j`, not grid-orthogonal, and (13.18.d) bounds the grid-orthogonal part
 `Y`, not `‖Γ‖²` (issue 3003).
 
@@ -685,7 +686,8 @@ Contrapositive of Peterfalvi's argument (mirroring `PrimeTIResidue.constituent_P
 if `P ⊆ ker μ_{0j}` then `W₂ ⊆ P ⊆ ker μ_{0j}`, so `Res_{S'} μ_{0j}` is trivial on the `W₂`-part
 (`characterKernel_restrict_subgroupOf`); its constituent `ψ` — the (4.5.a) source of
 `μ_j = ∑_i μ_{ij} = Ind_{S'} ψ`, with `⟨Res_{S'} μ_{0j}, ψ⟩ = 1` by Frobenius reciprocity — inherits
-that kernel containment (`characterKernel_subset_of_isCharacter_of_inner_ne_zero`), contradicting the
+that kernel containment (`characterKernel_subset_of_isCharacter_of_inner_ne_zero`), contradicting
+the
 `mu_colSum_eq_induce` clause `W₂ ⊄ ker ψ`. -/
 theorem P_not_subset_characterKernel_mu [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
@@ -982,7 +984,8 @@ This is exactly Peterfalvi (13.18.c)'s "`Γ` is independent of `j`" (Coq `defGam
 Proof (sorry-free glue, one isolated obligation): `τ_S(β_j) − τ_S(β_{#1}) = τ_S(β_j − β_{#1})` by
 `ℤ`-linearity of the Dade map (`map_sub`), and `β_j − β_{#1} = μ_{01} − μ_{0j} = −(μ_{0j} − μ_{01})`
 (both share the `Ind_{PW₁}^S 1` positive part), so `τ_S(β_j − β_{#1}) = −(η_{0j} − η_{01}) =
-η_{01} − η_{0j}` by the (4.8)/(5.3) cross-relation `tauS_mu_row0_cross`.  Cancelling the `−1_G`'s and
+η_{01} −
+η_{0j}` by the (4.8)/(5.3) cross-relation `tauS_mu_row0_cross`.  Cancelling the `−1_G`'s and
 `abel` closes the goal. -/
 theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

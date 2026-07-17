@@ -4,13 +4,15 @@ import OddOrder.Peterfalvi.S16_NonExistenceG.CoherentEtaOrthogonality
 /-!
 # BetaVanishing
 
-Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.ComparingLM` (2000-line limit, issue 0103 第
+2 パス).
 -/
 
 /-!
 # Peterfalvi (14.12)-(14.16) — comparing L and M
 
-Split from the former monolithic `OddOrder.Peterfalvi.S16_NonExistenceG` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S16_NonExistenceG` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
@@ -237,7 +239,8 @@ outright (`W2_le_P`); `Q` elementary abelian is the §15 obligation `Q_elemAbeli
 The field model needs **no** cyclicity of `U`: the Singer representation `exists_pu_field_repr` is
 built from `U` **abelian** (Peterfalvi (13.2.a): `UW₁` is Frobenius with abelian kernel `U`; coq
 `PFsection14.v` `cUU : abelian U`) via the abelian Singer irreducibility
-`isSimpleModule_of_abelian_faithful_card`, and the injection `μ : U ↪ 𝔽_{p^q}^×` into the cyclic unit
+`isSimpleModule_of_abelian_faithful_card`, and the injection `μ : U ↪ 𝔽_{p^q}^×` into the cyclic
+unit
 group is a *consequence* — never a hypothesis. -/
 theorem S_field_model_structural_inputs [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)

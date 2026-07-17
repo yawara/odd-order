@@ -23,7 +23,8 @@ union glue `S07.coherentUnion_of_glued_of_bridge` (Coq `bridge_coherent`, no gen
 generation engine (both false for non-Galois type III/IV, issue 1019).
 
 The sole sorried-cite is the caseA **refuter** (the (9.11.2) pair-adjoining non-coherence, lane-b's
-active `S11_NineElevenCoherence` work); everything else — the caseB coherence, the (11.7) `H₀C′ ≤ H₀C`
+active `S11_NineElevenCoherence` work); everything else — the caseB coherence, the (11.7)
+`H₀C′ ≤ H₀C`
 transfer, the Clifford dispatch, and the reducible-μ-column witness — is landed.
 -/
 
@@ -97,8 +98,10 @@ induction — is the sole sorried-cite.  The `𝒮(H₀C)`-restriction witness (
 the conjugate difference `μ̄ − μ` of a reducible μ-column (`columnSum_muColumnChar_mem_sOf_H0C`,
 `w₂ ≥ 2`), `A₀`-supported and nonzero (odd-order no-real-characters).
 
-This is the unconditional `X`-side (𝒮(H₀C)-coherence) input of the honest (11.8.6) world-bridge union
-glue `S07.coherentUnion_of_glued_of_bridge`; contradicting the (11.3) non-coherence closes (11.8) without the
+This is the unconditional `X`-side (𝒮(H₀C)-coherence) input of the honest (11.8.6) world-bridge
+union
+glue `S07.coherentUnion_of_glued_of_bridge`; contradicting the (11.3) non-coherence closes (11.8)
+without the
 false wide uniform-degree route (issue 1019). -/
 theorem coherent_sOf_H0C [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -284,7 +287,8 @@ along `τθ = ∑_i ω^σ_{i1} − d·ζ^{τ₁}` (`hθτ`, the column identity)
 `ξ(1)·⟨c(μ₁), ∑ω^σ⟩` vanishes: the `ζ^{τ₁}`-crosses by the two-stratum `coherent_ortho`
 (`SOf_coherent_extension_cross_orthogonal`), the `⟨c(ξ), ∑ω^σ⟩`-cross by the (5.5) dispatch of
 `ξ` (a `dadeOfDiff` pair) against the grid members (the σ-grid world-bridge
-`certainTypeOmegaSigma_muColumnChar_eq_aligned` + `certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP`).
+`certainTypeOmegaSigma_muColumnChar_eq_aligned` +
+`certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP`).
 So `⟨c(μ₁), ∑ω^σ⟩ = w₁`; with `‖c(μ₁)‖² = ‖μ₁‖² = w₁` (isometry) and `‖∑ω^σ‖² = w₁`
 (orthonormal grid), positive-definiteness pins `c(μ₁) = ∑_i ω^σ_{i1}`. -/
 theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
@@ -843,14 +847,16 @@ orthogonality, integer degrees, the `A = L^#` degree/support dictionary) are all
 Remaining genuine §14/§9 character content (NONE of it the removed false `hgen`):
 - `hmixed` — the (6.7) image-side orthogonality `⟨χ^{τ₂}, φ^{τ₁}⟩ = ⟨χ, φ⟩` (the `b ≡ 0` congruence,
   §14/Sibley-gated) — the SAME genuine content as the old `hmixed`;
-- `hbridge_τ` — the (5.8) bridge `τ`-agreement `ν(∑ᵢ μ_{i1} − dζ) = τ(∑ᵢ μ_{i1} − dζ)`, which via the
+- `hbridge_τ` — the (5.8) bridge `τ`-agreement `ν(∑ᵢ μ_{i1} − dζ) = τ(∑ᵢ μ_{i1} − dζ)`, which via
+the
   `ν`-agreements + `hcol` is `hsofC.extension (∑ᵢ μ_{i1}) = ∑ᵢ ω^σ_{i1}` (the `𝒮(H₀C)` coherent
   extension sends the reducible μ-column to the aligned ω^σ-column).  `coherent_sOf_H0C` carries no
   such μ-column image pin — this is the honest heir of the old `hDτ` sorry, §14/§9-gated.
 
 Two further bridge inputs (`hφY : dζ ∈ ℤ[S(HC)]`, `hbridge_supp : ∑ᵢ μ_{i1} − dζ` `A₀`-supported)
 are TRUE but currently `sorry`ed because they need `ζ ∈ S(HC)` and the degree match
-`(∑ᵢ μ_{i1})(1) = d·ζ(1)`, which the *signature* does not carry (only `ζ ∈ inducedFamily M ⊋ S(HC)`);
+`(∑ᵢ μ_{i1})(1) = d·ζ(1)`, which the *signature* does not carry (only
+`ζ ∈ inducedFamily M ⊋ S(HC)`);
 both are caller-supplied facts (`ζ` irreducible of degree `w₁`; `secondDerived_eq_HC` +
 `SOf_secondDerived_eq`; `degree_independent`).  Threading `ζ ∈ hyp.SOf hyp.HC` (+ degree) into the
 signature closes them, leaving only `hmixed`/`hbridge_τ`.  See issue 1019 update¹³. -/
@@ -1012,11 +1018,15 @@ assumption, then closes via the **narrow** capstone `coherent_SOf_H0C_of_column_
 `S12.coherent_Sset_of_column_identities`/(10.8) route.
 
 World-bridge threading: the residual machinery and the conclusion live in the §12 `hyp`-world, while
-the narrow capstone/refuter (`coherent_sOf_H0C`, the (11.3) non-coherence) live in the §13 `s13hyp`-world
-(`s13hyp.base = hyp` propositionally, via `exists_hypothesis_of_isTypeIIIorIV`).  Since `s13hyp.base =
-hyp` holds only up to `hbase` (not definitionally), the whole goal is first `rw [← hbase]`-transported
+the narrow capstone/refuter (`coherent_sOf_H0C`, the (11.3) non-coherence) live in the §13
+`s13hyp`-world
+(`s13hyp.base = hyp` propositionally, via `exists_hypothesis_of_isTypeIIIorIV`). Since
+`s13hyp.base =
+hyp` holds only up to `hbase` (not definitionally), the whole goal is first `rw [←
+hbase]`-transported
 into the `s13hyp.base`-world, so the S12 machinery and the narrow endpoint share one world and the
-`isCoherent_of_subset ν` restriction keeps `coh.extension = ν.extension` definitionally (feeding `hcol`
+`isCoherent_of_subset ν` restriction keeps `coh.extension = ν.extension` definitionally (feeding
+`hcol`
 into the capstone with no cast). -/
 theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}

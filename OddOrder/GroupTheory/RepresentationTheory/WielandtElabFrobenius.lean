@@ -124,7 +124,8 @@ theorem htag_of_frobenius {U E : Subgroup L} [U.Normal] [Fintype ↥E]
   rw [hkey, ← Submodule.finrank_map_subtype_eq W₀ (invariants (ρW.comp E.subtype)), hbridge]
 
 /-- **Peterfalvi (9.1), the per-chief-factor dimension identity (⋆)** from the Frobenius data.  For
-the elementary-abelian representation `elabRepresentation p φ` of `L = U ⋊ E` (Frobenius) on a finite
+the elementary-abelian representation `elabRepresentation p φ` of `L = U ⋊ E` (Frobenius) on a
+finite
 `𝔽_p`-module `V` (`p ∤ |U|, |E|`), the dimension identity `WielandtDimIdentity p φ U E` holds.
 
 This is `WielandtCounting.finrank_elab_identity` discharged by the kernel-FPF fact (†)

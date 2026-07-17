@@ -1040,7 +1040,8 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
             rw [MonoidHom.map_closure] at h1
             rw [← h1]; congr 1
             rw [Set.image_insert_eq, Set.image_insert_eq, Set.image_singleton]
-          -- `[a,b] = c ∈ ⟨c⟩` (so `mk a, mk b` commute); `z` is central; hence all generators commute.
+          -- `[a,b] = c ∈ ⟨c⟩` (so `mk a, mk b` commute); `z` is central; hence all generators
+          -- commute.
           have hmkc : QuotientGroup.mk' (Subgroup.zpowers c) c = 1 := by
             rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact Subgroup.mem_zpowers c
           have hab_q : Commute (QuotientGroup.mk' (Subgroup.zpowers c) a)

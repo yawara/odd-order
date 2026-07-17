@@ -99,7 +99,8 @@ theorem U_centralizes_H0_of_W2_inf_H0_bot [Finite G] {M : Subgroup G} (hyp : Hyp
 chief subgroup `H₀` trivially.
 
 Since `|W₂| = p` is prime (`ChiefFactorData.typeIII_IV_p_eq_W2`), `W₂ ⊓ H₀` is `⊥` or `W₂`.  The
-chief-factor computation `|C_{H̄}(W₁)| = p` (`coprimeFrobeniusChiefFactor_card`, the second component)
+chief-factor computation `|C_{H̄}(W₁)| = p` (`coprimeFrobeniusChiefFactor_card`, the second
+component)
 shows the image `W̄₂` of `W₂` in `H̄ = H/H₀` is nontrivial, so `W₂ ⊄ H₀`, ruling out `W₂ ⊓ H₀ = W₂`.
 This is the genuine §8/chief input behind the fixed-point-free hypothesis `C_{H₀}(W₁) = 1` of
 `U_centralizes_H0_of_W2_inf_H0_bot`; it is unconditional (no character input). -/
@@ -107,7 +108,8 @@ theorem chief_W2_inf_H0_eq_bot [Finite G] {M : Subgroup G} (hyp : Hypothesis M) 
     hyp.s11Setup.typeP.W2 ⊓ hyp.chief.H0 = ⊥ := by
   set data := hyp.s11Setup.typeP with hdata
   have hU : data.U ≠ ⊥ := hyp.s11Setup.nontrivial.1
-  -- `F` = the `W₁`-fixed points of the conjugation action on `H`; `F` maps onto `W₂`, and `H₀` is the
+  -- `F` = the `W₁`-fixed points of the conjugation action on `H`; `F` maps onto `W₂`, and `H₀` is
+  -- the
   -- image of the chief-factor kernel `N`.
   set F : Subgroup ↥data.H :=
     fixedSubgroup (OddOrder.Peterfalvi.S11.typeP_conjAction data)
@@ -167,7 +169,8 @@ theorem chief_W2_inf_H0_eq_bot [Finite G] {M : Subgroup G} (hyp : Hypothesis M) 
 centralizes the chief subgroup `H₀`.
 
 This discharges the second conjunct of (11.6) with *no character input*.  Peterfalvi's chain is:
-`C_{H₀}(W₁) = 1` (here `chief_W2_inf_H0_eq_bot`, the `W₂ ⊓ H₀ = ⊥` form of (9.6)), so `U` centralizes
+`C_{H₀}(W₁) = 1` (here `chief_W2_inf_H0_eq_bot`, the `W₂ ⊓ H₀ = ⊥` form of (9.6)), so `U`
+centralizes
 `H₀` by Wielandt (9.1) (`U_centralizes_H0_of_W2_inf_H0_bot`).  The remaining (11.6) conjuncts
 (`H` a `p`-group, `H₀ = H'`, `C = U'`) stay gated on (11.5)/(9.3); see `core_structure`. -/
 theorem U_centralizes_H0 [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
@@ -493,9 +496,12 @@ theorem chief_N_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   simpa using h
 
 /-- **Identification `C = cSub`** (Coq `Ptype_Fcompl_kernel_cent`): the §11 Fitting-complement
-`C = C_U(H)` (`hyp.C`, `C_eq_centralizer`) equals the §9 chief-factor action kernel `cSub = C_U(H̄)`.
-Forward (`C_U(H) ≤ cSub`) is `mem_cSub_of_mem_U_of_centralizes` (centralizing `H` ⟹ trivial on `H̄`).
-Reverse (`cSub ≤ C_U(H)`) uses `H₀ = 1` (`chief_N_eq_bot`: `N = ⊥`, so `H̄ = H/⊥`, and a `cSub`-element
+`C = C_U(H)` (`hyp.C`, `C_eq_centralizer`) equals the §9 chief-factor action kernel
+`cSub = C_U(H̄)`.
+Forward (`C_U(H) ≤ cSub`) is `mem_cSub_of_mem_U_of_centralizes` (centralizing `H` ⟹ trivial on
+`H̄`).
+Reverse (`cSub ≤ C_U(H)`) uses `H₀ = 1` (`chief_N_eq_bot`: `N = ⊥`, so `H̄ = H/⊥`, and a
+`cSub`-element
 — acting trivially on `H̄` — centralizes `H` since the quotient by `⊥` is injective).  This makes the
 capstone family `𝒮(H₀ ⊔ C)` coincide with the (9.11) family `𝒮(H₀ ⊔ cSub)`, the connector for the
 `hY` route (issue 1019 update⁴⁸). -/
@@ -544,7 +550,8 @@ theorem C_eq_cSub_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and `H_0 = 1`.
 
-`H₀ = 1` is the crux `chief_H0_eq_bot_of_noncoherent`.  Given it, both remaining conjuncts are immediate from the
+`H₀ = 1` is the crux `chief_H0_eq_bot_of_noncoherent`. Given it, both remaining conjuncts are
+immediate from the
 chief-factor data: the kernel `N` (with `H₀ = N.map H.subtype`) is trivial, so `H̄ = H/N ≅ H`
 carries the chief factor's `IsElementaryAbelian p` (`ChiefFactorData.quotient_elementaryAbelian`
 transported
@@ -643,7 +650,8 @@ The chain: `μ_k ∈ 𝒮(H₀^prod)` and is reducible by the (11.8.1) count
 (`muGrid_column_sum_mem_sOf_H0_and_reducible`, at a producer chief over `toTypesIIIIIIVSetup`);
 the family relaxes to `𝒮(⊥)` (kernel antitone) where it is setup-independent, and the §13 setup
 agrees with the producer (`TypesIIIIIIVSetup.eq_of_typeP_eq`, `setup_typeP_eq`); `H₀ = ⊥` in
-types III/IV (`chief_H0_eq_bot_of_noncoherent`), so this is `𝒮(H₀)`-membership over `hyp.s11Setup`; a reducible
+types III/IV (`chief_H0_eq_bot_of_noncoherent`), so this is `𝒮(H₀)`-membership over `hyp.s11Setup`;
+a reducible
 `𝒮(H₀)`-member lies in `𝒮(H₀ ⊔ cSub)` by the (9.9.b) count (`reducible_mem_sOf_H0C`); `cSub = C`
 (`C_eq_cSub_of_noncoherent`) identifies that family with `𝒮(H₀C)`. -/
 theorem columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent [Finite G]
@@ -685,7 +693,8 @@ theorem columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent [Finite G]
 
 /-- **Peterfalvi (9.5)/(9.9.b): the nontrivial column sums `μ_k` are `𝒮(H₀C′)`-members** — the
 `hμmem` input of the (9.11) caseB chain fold (`caseB_coherent_sOf_H0Cprime_of_mixed`).  Follows
-from the `𝒮(H₀C)` form (`columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent`) by the kernel-antitone subset
+from the `𝒮(H₀C)` form (`columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent`) by the kernel-antitone
+subset
 `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (`C′ ≤ C`, `sOf_H0C_subset_sOf_H0Cprime`). -/
 theorem columnSum_muColumnChar_mem_sOf_H0Cprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)

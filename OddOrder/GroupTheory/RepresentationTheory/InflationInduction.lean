@@ -24,7 +24,8 @@ induced character on a quotient `G ⧸ N`, used for Peterfalvi (13.18.b)'s ident
 * `OddOrder.RepresentationTheory.induce_one_eq_compHom_induce_one_of_le` — **P2, trivial-character
   induction–inflation commute.**  For `N ⊴ G`, `N ≤ A`, `Ind_A^G 1_A = (Ind_{A/N}^{G/N} 1) ∘ mk'`.
   Both sides are permutation characters; equality is pointwise via `induce_one_apply`
-  (the filter-count `{x : x⁻¹gx ∈ A}` is the `mk'`-preimage of `{xq : xq⁻¹ḡxq ∈ A/N}`, `|N|`-to-`1`).
+  (the filter-count `{x : x⁻¹gx ∈ A}` is the `mk'`-preimage of `{xq : xq⁻¹ḡxq ∈ A/N}`,
+  `|N|`-to-`1`).
 
 These package the "(1.6.b)" identification Peterfalvi uses in (13.18.a,b): together with
 `norm_induce_one_frobenius` on the Frobenius quotient `S̄`, they give

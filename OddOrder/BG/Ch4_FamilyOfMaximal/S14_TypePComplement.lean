@@ -11,7 +11,8 @@ import OddOrder.GroupTheory.AInvariantComplement
 For a type-`P` maximal subgroup `M` with cyclic κ-Hall `K`, the derived subgroup `M' = [M,M]`
 factors as `M' = M_F U` with a complement `U` *that `K` normalizes* — Peterfalvi's "`W₁`
 normalizes `U`, which is possible by the remark following Definition (8.4)".  This is exactly the
-invariant Schur–Zassenhaus complement (`OddOrder.GroupTheory.exists_aInvariant_complement_within_normal`):
+invariant Schur–Zassenhaus complement
+(`OddOrder.GroupTheory.exists_aInvariant_complement_within_normal`):
 `K` acts coprimely on the solvable `M'` (it complements `M'` in `M`, so `|K|` is coprime to
 `|M'| = [M : K]`), and `M_F` is a `K`-invariant normal Hall subgroup of `M'`.
 
@@ -61,7 +62,8 @@ theorem exists_kappaHall_invariant_complement_to_MF (hG : OddOrder.BG.IsMinimalS
     hKM.trans hM_norm_M'
   have hK_norm_MF : K ≤ Subgroup.normalizer (maxNilpotentNormalHall M : Set G) :=
     hKM.trans hM_norm_MF
-  -- `M_F` is a Hall subgroup of `M'` (restrict from Hall in `M`: the relative index divides `[M:M_F]`).
+  -- `M_F` is a Hall subgroup of `M'` (restrict from Hall in `M`: the relative index divides
+  -- `[M:M_F]`).
   have hMF_hallM := maxNilpotentNormalHall_isHall M
   have hMF_hall' : Ch03.IsHallSubgroup (Nat.card ↥(maxNilpotentNormalHall M)).primeFactors
       ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)) := by

@@ -184,7 +184,8 @@ noncomputable def eqQ : Fin tp.q ≃ Fin (Nat.card ↥(mp.certainTypeS hG).W1) :
 
 /-- The base `W₂`-column enumeration `Fin tp.p ≃ Ŵ₂` (Pontryagin: `|Ŵ₂| = |W₂| = tp.p`).  Stated in
 the `sdiffTICyclicHypothesis.W₂/W` forms (defeq to `certainTypeS.W₂` / `W₁ ⊔ W₂`) so that both
-`chiColumn` and `card_charGroup_subgroupOf` consume it directly.  An arbitrary bijection; the column-`0`
+`chiColumn` and `card_charGroup_subgroupOf` consume it directly. An arbitrary bijection; the
+column-`0`
 normalization is applied in `chi2enum`. -/
 theorem cardChi2CharGroup :
     Nat.card (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
@@ -345,7 +346,8 @@ theorem muS_reducible_dichotomy {X : Subgroup ↥mp.S} {ψ : ClassFunction ↥mp
 
 /-- **A linear character of `↥tp.W` is determined by its restrictions to `tp.W1` and `tp.W2`.**
 Since `tp.W = tp.W1 ⊔ tp.W2` is an internal product of two commuting subgroups, every `w : ↥tp.W`
-factors as `w = a * b` with `a ∈ tp.W1`, `b ∈ tp.W2`; two monoid homs agreeing on `tp.W1` and `tp.W2`
+factors as `w = a * b` with `a ∈ tp.W1`, `b ∈ tp.W2`; two monoid homs agreeing on `tp.W1` and
+`tp.W2`
 therefore agree everywhere.  This is the generating-set half of the S/T-shared-`ω` symmetry. -/
 theorem monoidHom_eq_of_eqOn_W1_W2 {χ χ' : ↥tp.W →* ℂˣ}
     (h1 : ∀ w : ↥tp.W, (w : G) ∈ tp.W1 → χ w = χ' w)

@@ -12,13 +12,15 @@ import OddOrder.Peterfalvi.S16_PairingBessel
 /-!
 # TSideTypeP
 
-Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 /-!
 # Peterfalvi (14.3)-(14.7) — the subgroup L over N_G(U)
 
-Split from the former monolithic `OddOrder.Peterfalvi.S16_NonExistenceG` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S16_NonExistenceG` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory
@@ -67,7 +69,8 @@ character/coherence/Γ-bridge machinery:
 * `QV ◁ T` with `[T : QV] = p` (Coq `index_sdprod defT`, `p = |W2|` via `W2_isComplement_T_deriv`) —
   this is `calT1_1p`'s degree factor.
 * `Q ⋊ V = QV` (Coq `defQV`, from `T_deriv_eq_QV` + `Q_inf_V_eq_bot`), giving `QV/Q ≅ V` and hence
-  `|QV/Q| = |V|` (Coq `card_isog (sdprod_isog defQV)`) — the source of the abelian-quotient irr count.
+  `|QV/Q| = |V|` (Coq `card_isog (sdprod_isog defQV)`) — the source of the abelian-quotient irr
+  count.
 * `QV/Q` abelian (Coq `isog_abelian (sdprod_isog defQV)`, `V` abelian) — makes every `QV/Q`-irr
   linear, so `calT1_1p`'s inflated sources have degree one and `Ind_{QV}^T` has degree `[T:QV] = p`.
 
@@ -166,7 +169,8 @@ whose every member induces irreducibly to `T` (equivalently has inertia `I_T(θ)
 
 This is the direct §16 specialization of the shared-infra orbit count
 `RepresentationTheory.card_image_induce_eq_div` with `G := ↥T`, `H := QV.subgroupOf T`, and the
-index `[T:QV] = p` plugged in via `T_derived_index_eq_p`.  It is **ungated** (no `IsTypeII`/`IsTypeP2`
+index `[T:QV] = p` plugged in via `T_derived_index_eq_p`. It is **ungated** (no
+`IsTypeII`/`IsTypeP2`
 input, no `sorry`): the two facts entering are supplied by the caller as `𝒯`'s
 conjugation-invariance and irreducible-induction (inertia `= QV`) hypotheses.  For the `calT1`
 assembly `𝒯` is the non-principal inflated `Irr(QV/Q)`-family, `|𝒯| = |V| − 1`
@@ -288,7 +292,8 @@ The semidirect tower `T = T' ⋊ W₁` (`M_complement`) and `T' = M_F ⋊ U` (`d
 `Q = M_F`) compose to a complement of the *normal* `Q` by `U ⊔ W₁`.
 
 * **Disjoint** `Q ⊓ (U ⊔ W₁) = ⊥`: an element lies in `Q ≤ T'`, so in `(U ⊔ W₁) ⊓ T'`, which is `U`
-  (decompose in the Frobenius complement `U ⋊ W₁`: the `W₁`-part lands in `W₁ ⊓ T' = ⊥`), and then in
+  (decompose in the Frobenius complement `U ⋊ W₁`: the `W₁`-part lands in `W₁ ⊓ T' = ⊥`), and then
+  in
   `Q ⊓ U = M_F ⊓ U = ⊥` (`derived_complement`).
 * **Order** `|Q|·|U ⊔ W₁| = |T|`: `|U ⊔ W₁| = |U|·|W₁|` (Frobenius complement), `|M_F|·|U| = |T'|`
   (`derived_complement`), `|T'|·|W₁| = |T|` (`M_complement`).
@@ -937,14 +942,16 @@ theorem inducedFamily_mapRingEquiv_mem
 
 /-- **The intrinsic type-III kernel size bound `2p + 1 ≤ |V|`** (ungated, the crude `hcard2` input).
 The intrinsic `U ⋊ W₁` Frobenius (`T_typeIII_UW1_frobenius`) has odd kernel `U` (`|U| = |V|`,
-`T_typeIII_card_U`) and odd complement `W₁` (`|W₁| = p`, `T_typeIII_card_W1`); the odd-order Frobenius
+`T_typeIII_card_U`) and odd complement `W₁` (`|W₁| = p`, `T_typeIII_card_W1`); the odd-order
+Frobenius
 size condition `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` (`|A| ∣ |N|−1`, and
 `|N|−1` even with `|A|` odd forces `|N|−1 ≥ 2|A|`) then gives `2p + 1 ≤ |V|`.
 
 This is the **ungated** source of the `calT1` crude size bound `2 ≤ (|V|−1)/p` (`hcard2` in
 `T_typeIII_ratio_le`): it needs only oddness (subgroups of the odd `G`) plus the intrinsic Frobenius
 index `[T:T'] = p` — **not** the lane-b-gated `|V|`-lower-bound `v = (q^p−1)/(q−1)` (13.15).  (The
-`v`-value is still needed for the *exact* count `(v−1)/p`, but the coherence input `hcard2` only needs
+`v`-value is still needed for the *exact* count `(v−1)/p`, but the coherence input `hcard2` only
+needs
 `≥ 2`.) -/
 theorem T_typeIII_two_p_add_one_le_card_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (td : OddOrder.GroupTheory.TypeIIIData hyp.base.T) :
@@ -1050,7 +1057,8 @@ theorem tSideDadeMap_isometry_diff (hyp : Hypothesis (G := G)) [Fintype G] [Fint
       = ClassFunction.inner (a - b) (c - d) := by
   haveI := hyp.base.finiteG
   -- Both differences live in the supported subspace `CF(T, A₁(T))`; unfold `τ_T` and apply the
-  -- Dade supported-span inner-preservation lemma (the same brick `S14.Sset_tau_isometry_diff` uses).
+  -- Dade supported-span inner-preservation lemma (the same brick `S14.Sset_tau_isometry_diff`
+  -- uses).
   have hS : ∀ s ∈ ({a - b, c - d} : Set (ClassFunction ↥hyp.base.T ℂ)),
       s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
@@ -1073,7 +1081,8 @@ here `T' = M_σ(T)` for the type-`P₁` regime that type-III inhabits) gives
 
 This is the linchpin making the (14.9) coherence support facts derivable *without* any cross-lane
 type-`P` char structure: the induced members `Ind_{QV}^T θ` vanish off the normal `QV = T' =
-derivedInG T`, so their differences are automatically supported in `sigmaSharp T = (T')^#` — matching
+derivedInG T`, so their differences are automatically supported in `sigmaSharp T =
+(T')^#` — matching
 the Dade domain of `tSideDadeMap`.  (Coq `FTcore_eq_der1`: for `FTtype T > 2`, `T_s = T^{(1)}`; the
 member differences `nu_0 − zeta ∈ 'CF(T, QV^#) = 'CF(T, 'A1(T))`, PFsection14.v:785--790.) -/
 theorem T_typeIII_sigmaSharp_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.Hypothesis71
 /-!
 # Peterfalvi (7.6)-(7.7) — normal-subgroup case A = H#
 
-Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
+issue 0103).
 -/
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)

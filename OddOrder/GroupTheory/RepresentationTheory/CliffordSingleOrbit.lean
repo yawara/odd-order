@@ -11,7 +11,8 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 # Clifford's theorem: the constituents of a restriction form a single conjugation orbit
 
 `OddOrder.GroupTheory.RepresentationTheory` shared module: the **single-orbit** half of Clifford's
-theorem ([Isaacs] Thm 6.5), the input that lets `clifford_decomposition` become a genuine theorem and
+theorem ([Isaacs] Thm 6.5), the input that lets `clifford_decomposition` become a genuine theorem
+and
 that the (9.9.a) Clifford-degree assembly (`apply_one_eq_sum_restrictionMultiplicity_mul`) needs.
 
 For a `G`-irreducible representation `ρ` and a normal subgroup `H ⊴ G`, any two simple `k[H]`-
@@ -313,7 +314,8 @@ theorem exists_induce_constituent_partition [Finite G]
 normal `H ⊴ G` and `χ ∈ Irr G` lying over `θ ∈ Irr H` with `θ` **`G`-invariant** (`θ^g = θ` for all
 `g`), the restriction is a single multiple of `θ`: `Res^G_H χ = e · θ` with `e = ⟨Res χ, θ⟩`.
 
-All constituents of `Res^G_H χ` form one `G`-orbit (`restrictionConstituentsSingleOrbit_of_isIrreducible`);
+All constituents of `Res^G_H χ` form one `G`-orbit
+(`restrictionConstituentsSingleOrbit_of_isIrreducible`);
 `G`-invariance collapses that orbit to `{θ}`, so the Fourier expansion
 (`sum_inner_irreducibleCharacter_smul`) of `Res χ` over `Irr H` has only the `θ`-term.
 
@@ -354,7 +356,8 @@ a normal subgroup `H ⊴ G`, and a constituent `θ₀` of `Res^G_H χ`, the degr
 (`apply_one_eq_sum_restrictionMultiplicity_mul`), single-orbit
 (`restrictionConstituentsSingleOrbit_of_isIrreducible`), common multiplicity
 (`hasCommonRestrictionMultiplicity_of_singleOrbit`), and orbit size
-(`card_conjByOrbit_eq_index_inertia`): in `∑_θ ⟨Res χ,θ⟩·θ(1)` only the `[G:I]`-element orbit of `θ₀`
+(`card_conjByOrbit_eq_index_inertia`): in `∑_θ ⟨Res χ,θ⟩·θ(1)` only the `[G:I]`-element orbit of
+`θ₀`
 contributes, each term equal to `⟨Res χ,θ₀⟩·θ₀(1)` (common multiplicity, conjugation-invariant
 degree). -/
 theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia

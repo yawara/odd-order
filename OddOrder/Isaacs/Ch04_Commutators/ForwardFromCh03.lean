@@ -459,7 +459,8 @@ theorem exists_aInvariant_sylow
     ext x
     constructor
     · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
-      -- y = (MulAut.conj g) z = g * z * g⁻¹, x = (φ a) y = (φ a)(g z g⁻¹) = (φ a g) (φ a z) (φ a g)⁻¹
+      -- y = (MulAut.conj g) z = g * z * g⁻¹, x = (φ a) y = (φ a)(g z g⁻¹) = (φ a g) (φ a z) (φ a
+      -- g)⁻¹
       refine ⟨(φ a) z, ⟨z, hz, rfl⟩, ?_⟩
       change MulAut.conj (φ a g) ((φ a) z) = (φ a) ((MulAut.conj g) z)
       simp [MulAut.conj_apply, map_mul, map_inv]

@@ -13,7 +13,8 @@ For a finite abelian subgroup `K` (commuting images) acting via `ρ` on a finite
 
   `⨆ χ, weightSpace ρ K χ = ⊤`.
 
-This is the spanning half of the abelian Clifford decomposition `V = ⨁_χ weightSpace χ` (independence
+This is the spanning half of the abelian Clifford decomposition `V = ⨁_χ weightSpace χ`
+(independence
 is `iSupIndep_weightSpace`).  It feeds the free block permutation dimension count of BG Theorem
 3.10(a).
 
@@ -21,7 +22,8 @@ The proof: each `ρ k` is semisimple (annihilated by the squarefree `X^{|K|} - 1
 `char ∤ |K|`), so over an algebraically closed field its (maximal generalized) eigenspaces span
 (`Module.End.iSup_maxGenEigenspace_eq_top`); the family `{ρ k}` commutes, so they are simultaneously
 diagonalizable (`iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute`); and
-for semisimple operators `maxGenEigenspace = eigenspace`, turning the simultaneous decomposition into
+for semisimple operators `maxGenEigenspace = eigenspace`, turning the simultaneous decomposition
+into
 the weight-space decomposition.
 -/
 

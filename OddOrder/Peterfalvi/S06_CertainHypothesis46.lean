@@ -73,7 +73,8 @@ structure Hypothesis46Core (A : Set G) (L : Subgroup G) [Fintype ↥L]
       x ≠ 1 → (L.subtype x) ∈ A
 
 /-- **Peterfalvi Hypothesis (4.6).**  See the module docstring.  Extends the certain-type Dade
-hypothesis `CertainTypeHypothesis A L` (= (4.2) for `↥L` + §4 Dade on `A`) with the ambient TI-cyclic
+hypothesis `CertainTypeHypothesis A L` (= (4.2) for `↥L` + §4 Dade on `A`) with the ambient
+TI-cyclic
 data (3.1), the normal subgroup `H` with `W₂ ⊆ H ⊆ K`, the covering condition on `A`, and the Dade
 isometry `τ` relative to `A₀ = A ∪ V^L`.  The Dade-free structural part is `Hypothesis46Core`
 (`Hypothesis46.toCore`). -/

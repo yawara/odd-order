@@ -357,7 +357,8 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
   haveI := hyp.finiteG
   obtain ⟨hχS, hχnotS₂⟩ := hχ
   obtain ⟨cohS₂_indT⟩ := hS₂coh
-  -- (1) Dade-side coherence via `congrMap`: `indT = Ind_T^G = τ` on `A(T)`-supported class functions.
+  -- (1) Dade-side coherence via `congrMap`: `indT = Ind_T^G = τ` on `A(T)`-supported class
+  -- functions.
   have hindT_dade : ∀ f : ClassFunction ↥hyp.T ℂ,
       f ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) S₂
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) →

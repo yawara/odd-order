@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S16_NonExistenceG.SubgroupL
 /-!
 # Peterfalvi (14.8)-(14.9) — key inequality, T is type II
 
-Split from the former monolithic `OddOrder.Peterfalvi.S16_NonExistenceG` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S16_NonExistenceG` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S16
 open OddOrder.GroupTheory

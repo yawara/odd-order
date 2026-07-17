@@ -45,7 +45,8 @@ Every member of the filtration set `S(A)` is irreducible once `W₂ ≤ A`.  Ind
 `caseB_S_member_column_or_irreducible`, either an irreducible character or one of the `w₂ − 1`
 certain-type columns `columnSum h46 χ₂` (`χ₂ ≠ 1`); but the latter is excluded from `S(A)` by
 `columnSum_notMem_SsubFiltration_of_le` (since `W₂ ≤ A`).  This supplies the `hψirr` hypothesis that
-the norm-weighted (5.6) bound `sSubFiltration_sum_le_two_psi_caseB` demands of the break character in
+the norm-weighted (5.6) bound `sSubFiltration_sum_le_two_psi_caseB` demands of the break character
+in
 the (6.2)/(6.3) certain-type chain. -/
 theorem SibleyDadeHypothesis.member_isIrreducible_of_W2_le
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -130,7 +131,8 @@ theorem six_two_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
 /-- **Peterfalvi (6.2), central case `C = H`, case (c2)** (`six_two_central` analogue).
 With `B ⊆ D ≤ H` (`B` as `N = B.subgroupOf H`), `D/B` central in `H/B`, `S(A)` coherent, `S(B)` not:
 `|H:A| − 1 ≤ 2|L:H|·√|H:D|`.  Mirror of `six_two_central` (`S08_CoherenceCorePart2:3669`), already
-Frobenius-free apart from the (6.2) per-step call, which becomes `six_two_index_bound_c2`; the θ-bound
+Frobenius-free apart from the (6.2) per-step call, which becomes `six_two_index_bound_c2`; the
+θ-bound
 `psi_degree_le_of_source_central` is unchanged (it consumes only `H_normal`). -/
 theorem six_two_central_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
@@ -192,10 +194,12 @@ theorem six_three_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
 
 /-- **Peterfalvi (6.3), case (c2)** (`six_three` analogue, `hW2B`-free).  The minimal-`A` induction:
 for `M ≤ H₁ ≤ ⁅H,H⁆` with `S(H₁)` coherent and `4|L:K|²+1 < |H:H₁|`, `S(M)` is coherent.  Mirror of
-`six_three` (`S08_CoherenceCorePart2:3750`); `hF` becomes the certain-type `(h46, hHK, hW1)`, and the
+`six_three` (`S08_CoherenceCorePart2:3750`); `hF` becomes the certain-type `(h46, hHK, hW1)`, and
+the
 per-step `(6.3)` index bound is `six_three_index_bound_c2`.  The break admitted by that bound need no
 longer be irreducible — the `column/irreducible` dispatch in `six_two_index_bound_c2` removed the
-`W₂ ≤ B` requirement, so the induction may descend below `W₂` (where column-transition breaks occur).
+`W₂ ≤ B` requirement, so the induction may descend below `W₂` (where column-transition breaks
+occur).
 The `A ≤ ⁅H,H⁆` input of `six_three_index_bound_c2` holds since `A ≤ H₁ ≤ ⁅H,H⁆`. -/
 theorem six_three_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
@@ -249,7 +253,8 @@ theorem six_three_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
 /-- **Peterfalvi (6.3) consequence, case (c2): the abelianization bound from non-coherence.**  The
 `hbound : |Abelianization H| ≤ 4|W₁|²+1` of the (6.5)/(6.8) reduction, certain-type case.  Mirror of
 the index-bound part of `isPGroup_of_not_coherent` (`S08_CoherenceCorePart2:3818-3830`): apply
-`six_three_c2` with `M = ⊥`, `H₁ = ⁅H,H⁆` (so `S(⊥) = S` would be coherent if `|H:⁅H,H⁆| > 4|L:H|²+1`,
+`six_three_c2` with `M = ⊥`, `H₁ = ⁅H,H⁆` (so `S(⊥) = S` would be coherent if
+`|H:⁅H,H⁆| > 4|L:H|²+1`,
 contradicting `hSncoh`); `S(⁅H,H⁆) = Y` is coherent (`coherentYset`).  Feeds the c2 `p`-group
 reduction `exists_isPGroup_H_of_c2_of_card_le`. -/
 theorem abelianization_card_le_of_not_coherent_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]

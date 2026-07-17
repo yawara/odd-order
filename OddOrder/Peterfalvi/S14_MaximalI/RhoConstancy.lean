@@ -107,7 +107,8 @@ private theorem classFunction_sum_apply {H : Type*} [Group H] {ι : Type*} (s : 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4)/(12.5) input**: each member `χ = Ind_H^L θ` of `S` vanishes on `L − H`.
 `H = L_F` is normal in `L` (`maxNilpotentNormalHall_subgroupOf_normal`, the Fitting subgroup `L_F`),
-so the induced character is supported on `H` (`ClassFunction.induce_eq_zero_of_not_mem_normal`).  This
+so the induced character is supported on `H` (`ClassFunction.induce_eq_zero_of_not_mem_normal`).
+This
 is the "the elements of `S` vanish on `L − H`" step of the constant-on-coset conclusions of
 (12.4)/(12.5) (`ψ(xh) = β(xh) + γ(xh) = γ(x)`, the `β ∈ ℂ[S]` part vanishing off `H`). -/
 theorem Sset_vanishes_off_H {L : Subgroup G} (hyp : Hypothesis L) {χ : ClassFunction ↥L ℂ}
@@ -372,13 +373,16 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne {L : Subgroup G} [Finite G]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Two-family variant of the constituent-difference block orthogonality.**  Same `L`, but the two
-constituents may come from *different* members `χ₁, χ₂ ∈ S`: given `φ ∈ S(χ₁)`, `φ' ∈ S(χ₂)` with the
-distinctness conditions `φ ≠ φ'`, `φ ≠ φ̄'`, `φ̄ ≠ φ'` (a caller supplies these from `χ₁ ∉ {χ₂, χ̄₂}`
+constituents may come from *different* members `χ₁, χ₂ ∈ S`: given `φ ∈ S(χ₁)`, `φ' ∈ S(χ₂)` with
+the
+distinctness conditions `φ ≠ φ'`, `φ ≠ φ̄'`, `φ̄ ≠ φ'` (a caller supplies these from
+`χ₁ ∉ {χ₂, χ̄₂}`
 + disjoint constituents), the Dade images of the signed differences are orthogonal.
 
 Generalizes `constituentDiff_tau_inner_eq_zero_of_ne` (same `χ`, where the conditions come from
 `data.conj_not_mem`) — the cross-family input for the same-`L` `R(χ₁) ⊥ R(χ₂)` orthogonality.  The
-proof is identical: the supports of both differences lie in `A(L)` (`constituentDiff_support_subset`,
+proof is identical: the supports of both differences lie in `A(L)`
+(`constituentDiff_support_subset`,
 one per data), the Dade map is an isometry there, and the `L`-side pairing expands into four
 off-diagonal `Irr L` deltas. -/
 theorem constituentDiff_tau_inner_eq_zero_of_ne_across {L : Subgroup G} [Finite G]
@@ -625,7 +629,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 Proof: a member `α ∈ R(χ₁)` lies in `R₁(φ₁) = (R1cdi data1 hφ₁).toOrthonormalImage` for some
 constituent `φ₁`, and likewise `β ∈ R₁(φ₂)`.  The cross-`L` (4.1) orthogonality
 `toOrthonormalImage_inner_eq_zero_across` reduces `⟨α, β⟩ = 0` to the orthogonality of the signed
-differences `⟨(φ₁−φ̄₁)^{τ₁}, (φ₂−φ̄₂)^{τ₂}⟩ = 0` (`image_eq_signedDifference`), which is the geometric
+differences `⟨(φ₁−φ̄₁)^{τ₁}, (φ₂−φ̄₂)^{τ₂}⟩ = 0` (`image_eq_signedDifference`), which is the
+geometric
 obligation `nonconjugate_diffImage_inner_zero` ((8.18.c): the supports lie in disjoint `Ã(L₁)`,
 `Ã₁(L₂)`). -/
 theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
@@ -654,7 +659,8 @@ families and their conjugates (`hcond`: `φ₁ ≠ φ₂`, `φ₁ ≠ φ̄₂`, 
 
 The same-`L` companion of `nonconjugate_typeI_R_orthogonal`: the cross-`L` (4.1) reduction
 `toOrthonormalImage_inner_eq_zero_across` sends `⟨α, β⟩ = 0` to the signed-difference orthogonality,
-here `constituentDiff_tau_inner_eq_zero_of_ne_across` (the two-family block orthogonality) rather than
+here `constituentDiff_tau_inner_eq_zero_of_ne_across` (the two-family block orthogonality) rather
+than
 the geometric `nonconjugate_diffImage_inner_zero`.  This is the `ζ ∈ ℤ[R(χ)] ⟹ ζ ⊥ R(χ')` input
 (`χ' ≠ χ, χ̄`) behind the (12.14) coset-constancy of the coherent extension. -/
 theorem samegroup_typeI_R_orthogonal {L : Subgroup G} [Finite G]
@@ -1264,7 +1270,8 @@ open scoped Classical in
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
 `A` relative to `L` (`L ⊆ N_G(A)`, `A ⊆ L`, `IsTISubset A L`) and a class function `α` of `L`
 supported in `A`, the induced class function `Ind_L^G α` agrees with `α` on `A`: only the `|L|`
-conjugators `x ∈ L` contribute to the induction sum (the others land outside `A`, where `α` vanishes,
+conjugators `x ∈ L` contribute to the induction sum (the others land outside `A`, where `α`
+vanishes,
 by the TI property), each with value `α(a)`.  This is **pin (b), step 1** — the value-half of the
 "Dade map = Ind on the trivial-`H` part" bridge. -/
 theorem induce_apply_eq_self_of_mem_tiSubset {A : Set G} {L : Subgroup G}
@@ -1310,7 +1317,8 @@ open scoped Classical in
 /-- **Peterfalvi (12.4) pin (b), step 2**: for a Dade hypothesis with all trivial stabilizers
 `∀ a, H(a) = ⊥`, induction `Ind_L^G` (restricted to `CF(L, A)`) **is** the Dade map.  Generalizes
 `TICyclicHypothesis.isDadeMap_inducedDadeMap`: the value half is the step-1 self-value
-`induce_apply_eq_self_of_mem_tiSubset` (the coset condition collapses to `IsConj a g` since `h ∈ ⊥`),
+`induce_apply_eq_self_of_mem_tiSubset` (the coset condition collapses to `IsConj a g` since
+`h ∈ ⊥`),
 the support half is `induce_eq_zero_of_not_conjugatesIntoSet` (induced functions vanish off the
 `A`-conjugates, which are the Dade support when `H = ⊥`).  Via `IsDadeMap.unique` this pins the
 abstract Dade map to `Ind_L^G` on `CF(L, A)`. -/
@@ -1600,7 +1608,8 @@ def InHKernel {L : Subgroup G} (hyp : Hypothesis L) (φ : IrreducibleCharacter �
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Toward (12.4) pin (c'), the off-kernel direction** (genuine): every constituent `φ ∈ S(χ)` of a
 member `χ = Ind_H^L θ ∈ S` (`θ ≠ 1_H`) is off-kernel, `H ⊄ ker φ`.  If `H ⊆ ker φ` then `Res_H φ` is
-constant `= φ(1)` on `H` (`= φ(1)·1_H`), so by Frobenius `⟨χ, φ⟩ = ⟨θ, Res_H φ⟩ = star(φ(1))·⟨θ, 1_H⟩
+constant `= φ(1)` on `H` (`= φ(1)·1_H`), so by Frobenius
+`⟨χ, φ⟩ = ⟨θ, Res_H φ⟩ = star(φ(1))·⟨θ, 1_H⟩
 = 0` (`θ ≠ 1_H`); but `φ` a constituent of `χ` gives `⟨χ, φ⟩ = 1`.  This is the `⊇` inclusion
 `S(χ) ⊆ {φ : H ⊄ ker φ}` of the partition `exists_offKernel_constituent_partition`. -/
 theorem constituents_not_inHKernel {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
@@ -1639,8 +1648,10 @@ theorem constituents_not_inHKernel {L : Subgroup G} [Finite G] (hyp : Hypothesis
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Toward (12.4) pin (c'), the capturing direction** (genuine): every off-kernel irreducible `φ`
 (`H ⊄ ker φ`) is a constituent of some `χ ∈ S`.  By `exists_constituent_not_subset_characterKernel`
-([Is] 6.5 / constituent transitivity), `Res_H φ` has a constituent `θ ≠ 1_H`; then `χ := Ind_H^L θ ∈ S`
-and `⟨φ, χ⟩ = ⟨Res_H φ, θ⟩ ≠ 0` (Frobenius `inner_induce_eq_inner_restrict` + conjugate symmetry), so
+([Is] 6.5 / constituent transitivity), `Res_H φ` has a constituent `θ ≠ 1_H`; then
+`χ := Ind_H^L θ ∈ S`
+and `⟨φ, χ⟩ = ⟨Res_H φ, θ⟩ ≠ 0` (Frobenius `inner_induce_eq_inner_restrict` + conjugate symmetry),
+so
 `φ ∈ S(χ)`.  This is the `⊆` inclusion `{φ : H ⊄ ker φ} ⊆ ⋃ S(χ)` of the partition
 `exists_offKernel_constituent_partition`. -/
 theorem not_inHKernel_imp_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
@@ -1685,8 +1696,10 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Pin (c') partition characterization** (genuine, both directions): the off-kernel irreducibles
 `{φ : H ⊄ ker φ}` are *exactly* the constituents of the `S`-members, `⋃_{χ ∈ S} S(χ)`.  `⊆` is the
 capturing direction `not_inHKernel_imp_mem_constituents`; `⊇` is `constituents_not_inHKernel`.  This
-is the set-equality underlying the `biUnion` of `exists_offKernel_constituent_partition`; the residual
-of that pin is now only the **disjointness** (φ in `S(χ) ∩ S(χ')` ⟹ χ = χ', via Clifford single-orbit
+is the set-equality underlying the `biUnion` of `exists_offKernel_constituent_partition`; the
+residual
+of that pin is now only the **disjointness** (φ in `S(χ) ∩ S(χ')` ⟹ χ = χ', via Clifford
+single-orbit
 `RestrictionConstituentsSingleOrbit.exists_conj` + `induce_conjBy_eq`) and the `parts`-`Finset`
 construction. -/
 theorem not_inHKernel_iff {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
@@ -1801,7 +1814,8 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), the off-kernel regroup** (genuine, from the [Is] 6.2 partition pin): the
 off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
 Regroup the off-kernel irreducibles by the partition into `S(χ)`
-(`exists_offKernel_constituent_partition`); on each `S(χ)` the coefficient `⟨Res_L ψ, φ⟩` is constant
+(`exists_offKernel_constituent_partition`); on each `S(χ)` the coefficient `⟨Res_L ψ, φ⟩` is
+constant
 (`Sset_coeff_equal`, from `ψ ⊥ R(χ)`), so the `S(χ)`-block is `c_χ·∑_{φ ∈ S(χ)} φ = c_χ·χ`
 (`decomp`), which vanishes at `g ∈ L − H` (`Sset_vanishes_off_H`). -/
 theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G]

@@ -39,7 +39,8 @@ variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 /-- **Peterfalvi (6.8.3) case-(A): non-coherence of `S` is impossible.**
 
 If `X(Z) ∪ Y` (`Z = Zc = Z(H) ∩ H′`) is coherent but `S` is not, a contradiction follows.  The
-break pair `{ψ, ψ̄}` is dispatched irreducible / column (case (A) cannot absorb columns into `X(Z)`);
+break pair `{ψ, ψ̄}` is dispatched irreducible / column (case (A) cannot absorb columns into
+`X(Z)`);
 either way the norm-weighted (5.6) `X`-sum bound forces
 `|W₁|·|H:Z|·(|Z|−1) ≤ 2|W₁|²·d` with `d = θ(1) ≤ √|H:Z|` (`ψ = Ind θ`), refuted by the case-(A) FPF
 bound `2|W₁| ≤ |Z|−1` via `false_of_centralCommutator_break_arith`.  The FPF data (`hfpf`) and
@@ -81,7 +82,8 @@ theorem false_of_coherentXunionYset_caseA_of_not_coherentS
   obtain ⟨η, hηY⟩ := hyp.Yset_nonempty
   have hηS₁ : η ∈ S₁ := hSaS₁ (Or.inr hηY)
   have hηdeg : η 1 = (Nat.card hyp.W1 : ℂ) := hyp.Yset_apply_one hηY
-  -- `ψ = Ind θ` (every `S`-member is induced), `d = θ(1)`, `d² ≤ |H:Zc|` ([Is] Cor 2.30, `Zc ≤ Z(H)`).
+  -- `ψ = Ind θ` (every `S`-member is induced), `d = θ(1)`, `d² ≤ |H:Zc|` ([Is] Cor 2.30,
+  -- `Zc ≤ Z(H)`).
   have hψS : ψ ∈ hyp.S := hψSb
   have hψSeq := hψS
   rw [hyp.S_eq, Set.mem_setOf_eq] at hψSeq

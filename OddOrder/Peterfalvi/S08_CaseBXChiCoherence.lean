@@ -11,7 +11,8 @@ import OddOrder.Peterfalvi.S08_CaseBXunionY
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 §8, (6.8.2) (mmd `references/peterfalvi/04.8` L178-224).
 
-This leaf builds the **textbook** `X`-coherence on the certain-type column set, whose extension sends
+This leaf builds the **textbook** `X`-coherence on the certain-type column set, whose extension
+sends
 each column `μ_j = columnSum χ₂` to its **own `(6.8.2.3)` projection image** `X_χ` (the value
 `τ(μ_j − a₀·η₁) + a₀·η₁^{τ₁}` produced by the per-constituent decomposition), **not** to the
 canonical certain-type coherence image `cTE(μ_j) = δ_j ∑_i ω_{ij}^σ`.
@@ -49,8 +50,10 @@ irreducible `μ_{0,χ₂}` of each column to that column's target image `Ximg χ
 irreducible to `0`.  The witness column `χ₂` is selected uniquely by `columnFamily_mu_injective`
 (the grid `(χ₂, i) ↦ μ_{ij}` is injective, so `μ_{0,χ₂}` determines `χ₂`).
 
-The "all on the `0`-th row" choice is one of many splittings of the column image `Ximg χ₂` across the
-`w₁` constituents `{μ_{ij}}`; any splitting yields the same value on the column sum `μ_j = ∑_i μ_{ij}`,
+The "all on the `0`-th row" choice is one of many splittings of the column image `Ximg χ₂` across
+the
+`w₁` constituents `{μ_{ij}}`; any splitting yields the same value on the column sum
+`μ_j = ∑_i μ_{ij}`,
 and the coherence fields only see column-level values. -/
 noncomputable def xChiExtensionFun
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) [NeZero (Nat.card h46.W1)]
@@ -126,7 +129,8 @@ theorem xChiExtension_columnSum
   · intro h0; exact absurd (Finset.mem_univ _) h0
 
 /-- **A `(5.4)` decomposition's `X`-part is a virtual character** (`D.X ∈ ℤ[Irr G]`).  Generic
-brick discharging the `hXzirr` obligation of the textbook `X_χ`-coherence: `X = ∑_{α ∈ R(χ)} coeff α • α`
+brick discharging the `hXzirr` obligation of the textbook `X_χ`-coherence:
+`X = ∑_{α ∈ R(χ)} coeff α • α`
 (`X_eq`) is a `ℤ`-combination of the orthonormal image-family members `α ∈ ZIrr G`
 (`imageFamily.mem_ZIrr`).  For the column decomposition `columnDecompositionTau`, `imageFamily =
 columnRFamilyTau` (`imageSet = certainTypeR.imageSet`, the signed `σ`-images), so its `X` lands in
@@ -394,7 +398,8 @@ identity** `Ximg = cTE` required.  This is the precise sense in which the textbo
 the `hanchored` over-constraint.
 
 `hXmixed` is the `(6.8.2.3)` seam orthogonality `X_χ ⊥ Y^{τ₁}` (`⟨Ximg χ₂, η^{τ₁}⟩ = 0`), another
-genuine `(6.8.2.3)` output.  All four `X_χ`-hypotheses are to be discharged from `columnDecompositionTau`
+genuine `(6.8.2.3)` output. All four `X_χ`-hypotheses are to be discharged from
+`columnDecompositionTau`
 + the `(6.8.2.2)` aggregate `Y`-pinning. -/
 noncomputable def coherentCertainTypeSet_union_Yset_via_anchoredImages
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]

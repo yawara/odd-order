@@ -3,7 +3,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 /-!
 # Isaacs §4D 後半 — Baer trick (Lem 4.37) と応用 (pp. 141-146)
 
-Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue
+0103).
 -/
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement

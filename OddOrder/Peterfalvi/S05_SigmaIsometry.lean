@@ -636,7 +636,8 @@ theorem ncard_inner_chiFam_ne_zero_le_one (hyp : TICyclicHypothesis G) [Fintype 
 /-- **(3.9)(a)-norm-`2` support bound**: a norm-`2` virtual character `χ ∈ ZIrr(G)` has at most two
 nonzero `σ`-image coefficients.  By `mem_ZIrr_inner_self_eq_sum_sq` +
 `exists_pair_of_sum_sq_eq_two`, `χ = ε_α·α + ε_β·β` for two distinct irreducibles `α, β`; each has
-`≤ 1` nonzero inner product against the orthonormal `χ`-family (`ncard_inner_chiFam_ne_zero_le_one`),
+`≤ 1` nonzero inner product against the orthonormal `χ`-family
+(`ncard_inner_chiFam_ne_zero_le_one`),
 and the coefficient support is contained in `S_α ∪ S_β`.  This is the norm-`2` analogue of
 `ncard_inner_chiFam_ne_zero_le_one`, used by the (4.8)/(10.5) Dade-image trichotomy endgames. -/
 theorem ncard_sigmaCoeff_ne_zero_le_two (hyp : TICyclicHypothesis G) [Fintype hyp.W]

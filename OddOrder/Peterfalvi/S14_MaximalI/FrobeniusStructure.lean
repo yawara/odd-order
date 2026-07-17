@@ -111,9 +111,11 @@ separate hypothesis).  Under TI, the §4 Dade datum's local subgroups vanish
 `SibleyTarget` is available.
 
 **Note (2026-07-01, issue 2032):** the earlier `_hfrob`-only signature was *unsound* — the (12.16)
-witness `L` is Frobenius but its `H^#` is **not** TI in `G` (Peterfalvi (12.10): "By (12.9), `H^#` is
+witness `L` is Frobenius but its `H^#` is **not** TI in `G` (Peterfalvi (12.10): "By (12.9), `H^#`
+is
 not a TI-subset of `G`"), so `dade_H_eq_bot` fails there.  The `_hTI` hypothesis restores soundness;
-the witness (non-TI) is handled by the case-(b)/(c) routes of `frobenius_typeI_coherent`, not by this
+the witness (non-TI) is handled by the case-(b)/(c) routes of `frobenius_typeI_coherent`, not by
+this
 TI-only carrier.
 
 **Construction (2026-07-14, carve-out issue 9077)**: kernel `H = (L_F).subgroupOf L`; the Frobenius
@@ -217,7 +219,8 @@ isometry only on the supported differences `χ₀ − χⱼ` (S07:487); this var
 lattice-relative fact `hdiff`, so it applies to the Feit–Thompson **Dade** map (which is *not* a
 global `IsIntegralIsometry` — `dim CF(L) > dim CF(G)` — but *is* isometric on the `A(L)`-supported
 differences).  Identical proof, sourcing the difference inner product from `hdiff`.  This is the one
-place the (5.7) equal-degree coherence used the global isometry (issue 9001), so it is the load-bearing
+place the (5.7) equal-degree coherence used the global isometry (issue 9001), so it is the
+load-bearing
 step for a Dade-compatible `frobenius_typeI_coherent_of_abelianKernel`. -/
 theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -242,7 +245,8 @@ theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
   ring
 
 /-- **Peterfalvi (12.1) support `A(L) = H^#` from a Frobenius witness** — the Frobenius-parameterized
-core of `typeIA_eq_sharp` (below), factored out so the (12.6) case-(b) coherence assembly can cite it
+core of `typeIA_eq_sharp` (below), factored out so the (12.6) case-(b) coherence assembly can cite
+it
 with the `hfrob` it already has (the full `typeIA_eq_sharp` derives `hfrob` from `typeI_frobenius`,
 which is defined later).  Since `L` is Frobenius with kernel `H`, the centralizer of any `x ∈ H^#`
 lies in `H` (`IsFrobeniusGroup.centralizer_kernel_le`), so the `A(L)`-support (`centralizerSupport`
@@ -533,7 +537,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **A member's conjugate-difference `χ̄ − χ` is `A(L)`-supported** (any `χ ∈ S`, no constant-degree
 needed) — the per-member support field of the (5.6) family enumeration (h56).  Off `H` both `χ` and
-`χ̄` vanish (`Sset_vanishes_off_H`); at `1`, `χ̄(1) = χ(1)` because `χ(1)` is a (real) natural degree
+`χ̄` vanish (`Sset_vanishes_off_H`); at `1`, `χ̄(1) = χ(1)` because `χ(1)` is a (real) natural
+degree
 (`χ` irreducible), so `χ̄ − χ` is supported on `H^# = A(L)`. -/
 theorem Sset_conjDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
@@ -924,7 +929,8 @@ open scoped Classical in
 /-- **Peterfalvi (6.2) per-step index bound** (witness form) — if `S(A) ⊆ S₁` (coherent, with a
 degree-`|L:K|` anchor `χ₁`) breaks against `{ψ, ψ̄}`, then `|K:A| − 1 ≤ 2·ψ(1).re`.  The `S(A)`
 degree-square sum `|L:K|·(|K:A|−1)` (B2, `Sset_sum_re_sq_induce_kernelFilter_eq`) is bounded by the
-full enumerated `S₁`-family sum, which the (5.6) bound `Sset_degreeSqReBound_of_not_coherent` caps by
+full enumerated `S₁`-family sum, which the (5.6) bound `Sset_degreeSqReBound_of_not_coherent` caps
+by
 `2·ψ(1).re·χ₁(1).re`; dividing by `χ₁(1).re = |L:K|`.  Mirror of `sMember_index_le_two_psi`. -/
 theorem Sset_index_le_two_psi [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
@@ -1081,7 +1087,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 (6.5) engine `nonempty_coherent_SOf_bot_of_index_dvd` consumes.  If `S(A) ⊆ S(B)` (`A`-filtration
 inside `B`-filtration), `K/(A.subgroupOf K)` not perfect (`hAcomm`), `S(A)` coherent and `S(B)` not,
 then a break member `ψ = Ind_K^L θ ∈ S(B)` (`B ⊆ Ker θ`) satisfies `|K:A| − 1 ≤ 2·ψ(1).re`.  Combines
-`exists_coherentBreakPair`, the degree-`|L:K|` anchor (`exists_mem_SsubFiltration_degree_index`), and
+`exists_coherentBreakPair`, the degree-`|L:K|` anchor (`exists_mem_SsubFiltration_degree_index`),
+and
 `Sset_index_le_two_psi`.  Mirror of the Sibley `six_two_index_bound`. -/
 theorem Sset_six_two_index_bound [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
@@ -1153,7 +1160,8 @@ theorem SsubFiltration_commutator_diff_supported [Finite G] {L : Subgroup G} (hy
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The witness Dade map is a difference-isometry on `S(H′)`** (`hab`-free), mirroring
-`Sset_tau_isometry_diff` via `SsubFiltration_commutator_diff_supported`.  Standalone member-difference
+`Sset_tau_isometry_diff` via `SsubFiltration_commutator_diff_supported`. Standalone
+member-difference
 fact; the `S07.Hypothesis` field is discharged in its (0099) `zSupportedSpan` form via
 `dadeIntegralCharacterMap_inner_eq_of_supported`. -/
 theorem SsubFiltration_commutator_tau_isometry_diff [Finite G] {L : Subgroup G}
@@ -1243,7 +1251,8 @@ noncomputable def Sset_differenceImage [Finite G] {L : Subgroup G} (hyp : Hypoth
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (5.2.e) orthogonality of witness difference images** — the
 `difference_images_orthogonal` field.  For members `φ, χ ∈ S` with `⟨φ,χ⟩ = ⟨φ,χ̄⟩ = 0`, the signed
-Dade images `(φ−φ̄)^τ`, `(χ−χ̄)^τ` are orthogonal: the conjugate-differences are `A(L)`-supported, so
+Dade images `(φ−φ̄)^τ`, `(χ−χ̄)^τ` are orthogonal: the conjugate-differences are `A(L)`-supported,
+so
 the Dade isometry (`Sset_tau_isometry_diff`) reduces the pairing to the source
 `⟨φ−φ̄, χ−χ̄⟩`, which expands to the four cross terms — all zero by orthogonality and irreducibility
 (`Sset_pairwiseOrthogonal`, `Sset_inner_self_eq_one`). -/
@@ -1407,7 +1416,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7).  The witness
-`S07.Hypothesis hyp.Sset hyp.A` is assembled from the ten witness lemmas above (all seven §5.2 fields
+`S07.Hypothesis hyp.Sset hyp.A` is assembled from the ten witness lemmas above (all seven §5.2
+fields
 plus the `coherent_of_constant_degree` inputs), and the coherence is produced by the now
 lattice-relative `coherent_of_constant_degree` (issue 9001, no global isometry needed).  Nonemptiness
 of `S` (`hcard`) comes from the nontrivial abelian kernel `H` having a nontrivial irreducible `θ`,
@@ -1610,7 +1620,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 Def (8.3) case (c): `exp(U) ∣ p − 1` for every `p ∣ |H|`; `S` is coherent by (6.5.c).
 
 The proof feeds the abstract (6.5.c) engine `S08.nonempty_coherent_SOf_bot_of_index_dvd` on the
-witness filtration `S(A) = SsubFiltration A` (`SOf`), `τ = tau`, `A0 = A`, kernel `K = (L_F).subgroupOf L`:
+witness filtration `S(A) = SsubFiltration A` (`SOf`), `τ = tau`, `A0 = A`, kernel
+`K = (L_F).subgroupOf L`:
 * **abelian branch** (`K` commutative): `⁅K,K⁆ = ⊥`, so `S(⁅K,K⁆) = S(⊥) = S` is coherent directly
   by `hcoh` (the `S(H′)` coherence `SsubFiltration_commutator_coherent`);
 * **non-abelian branch**: the engine derives "`K` is a `p`-group" internally (6.5.b) from the

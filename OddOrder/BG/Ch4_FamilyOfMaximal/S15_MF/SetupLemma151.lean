@@ -7,7 +7,8 @@ import OddOrder.Mathlib.Subgroup
 /-!
 # BG §15 notation + Lemma 15.1 (U M_sigma auxiliary structure)
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue
+0103).
 -/
 namespace OddOrder.BG.Ch4.S15
 
@@ -1377,7 +1378,8 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
         have hcardSUG : Nat.card ↥SUG = p ^ (k + 1) := by
           rw [hSUGdecomp, card_sup_eq_mul_of_le_normalizer_of_disjoint hA₀NZ hA₀Z, hA₀card, hk,
             ← pow_succ']
-        -- `SUG` is not cyclic (it contains the rank-2 elementary abelian `A`), so `exp SUG < |SUG|`.
+        -- `SUG` is not cyclic (it contains the rank-2 elementary abelian `A`), so
+        -- `exp SUG < |SUG|`.
         have hSUGnotcyc : ¬ IsCyclic ↥SUG := by
           intro hcyc
           haveI := hcyc
@@ -1653,7 +1655,8 @@ qualifiers in the historical status below are stale.  Original (Lane G 2026-06-1
   (`subgroupESetup_of_isHall_kappa_eq_bot` ⟹ `U M_σ = M`); the `K ≠ ⊥` branch reduces to
   `M' = U M_σ` (forward lemma).
 * **Conjunct 2** (`K` cyclic): `K = ⊥` sorry-free; `K ≠ ⊥` cites the (sorried) §14 `typeP_duality`
-  (Thm 14.7(d)), with `IsTypeP M` derived from `K ≠ ⊥` (`isTypeP_of_isHall_kappa_subgroupOf_ne_bot`).
+  (Thm 14.7(d)), with `IsTypeP M` derived from `K ≠ ⊥`
+  (`isTypeP_of_isHall_kappa_subgroupOf_ne_bot`).
 * **Conjunct 5** (`K ≠ ⊥` package): `IsComplement'` + coprimality cite the (sorried) §14
   `typeP_duality` (Thm 14.7(h)); `M' = U M_σ` and `U` abelian come from the forward lemma.
 * **Conjuncts 6** (Cor 14.3 funnel — the `X` cyclic-`τ₂` step needs `X` abelian, which routes

@@ -16,7 +16,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily
 /-!
 # S09_Building78C
 
-Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 namespace OddOrder.Peterfalvi.S09.Cert
@@ -247,7 +248,8 @@ theorem eq_zero_on_A_of_inner_zero [Invertible (Nat.card L : ℂ)] (A : Set L)
 
 /-- **Peterfalvi (7.7.a), the Gram entry.**  For a pairwise-orthogonal family `ζ : Fin (n+1) → CF(L)`
 and the difference vectors `ψ_j = ζ_j − d_j ζ_0` (`j ≥ 1`), the inner product `⟨ψ_j, ζ_i⟩` (`i ≥ 1`)
-is the diagonal entry `‖ζ_j‖²` when `i = j` and `0` otherwise: the `ζ_0` term drops out (`0 ≠ i`) and
+is the diagonal entry `‖ζ_j‖²` when `i = j` and `0` otherwise: the `ζ_0` term drops out (`0 ≠ i`)
+and
 the `ζ_j`-term is the orthonormality indicator.  This is the Gram matrix that pins the coefficients
 of the (7.7.a) decomposition. -/
 theorem inner_psi_zeta [Invertible (Nat.card L : ℂ)] {n : ℕ}
@@ -265,7 +267,8 @@ theorem inner_psi_zeta [Invertible (Nat.card L : ℂ)] {n : ℕ}
 /-- **Peterfalvi (7.7.a), the Gram sum.**  For a pairwise-orthogonal family `ζ` and `j ≥ 1`, pairing
 `ψ_j = ζ_j − d_j ζ_0` against any linear combination `Σ_{i ≥ 1} b_i ζ_i` picks out the diagonal:
 `⟨ψ_j, Σ_{i≥1} b_i ζ_i⟩ = star(b_j) ‖ζ_j‖²`.  Immediate from the Gram entry `inner_psi_zeta` and
-`Finset.sum_eq_single`.  In (7.7.a) the candidate is `Σ_{i≥1} (c̄_i/‖ζ_i‖²) ζ_i`, so this equals `c_j`
+`Finset.sum_eq_single`. In (7.7.a) the candidate is `Σ_{i≥1} (c̄_i/‖ζ_i‖²) ζ_i`, so this equals
+`c_j`
 (after `star (c̄_j/‖ζ_j‖²)·‖ζ_j‖² = c_j`, using `‖ζ_j‖²` real). -/
 theorem inner_psi_candidate [Invertible (Nat.card L : ℂ)] {n : ℕ}
     (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
@@ -306,7 +309,8 @@ pairwise-orthogonal family `ζ` of class functions with nonzero norms whose diff
 
 This **discharges the `Hypothesis76.chiRho_decomp` certificate** of Peterfalvi (7.7.a) (issue 1013):
 the candidate `Σ c̄_i/‖ζ_i‖² ζ_i` and `χ^ρ` have the same inner products `c_j` against the spanning
-`{ψ_j}` (`chiRho_adjoint` on one side, `inner_psi_candidate_eq` on the other), so their difference is
+`{ψ_j}` (`chiRho_adjoint` on one side, `inner_psi_candidate_eq` on the other), so their difference
+is
 orthogonal to a spanning set of `CF(L,A)` and hence vanishes on `A` (`eq_zero_on_A_of_inner_zero`). -/
 theorem chiRho_decomp_proof {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -534,10 +538,13 @@ theorem induce_diff_support {K : Subgroup L} [hK : K.Normal] [Fintype ↥K]
 
 omit [Fintype L] in
 /-- **Peterfalvi (7.7.a), the degree-zero reduction.**  A class function in the span of the full
-family `{ζ_i}` that vanishes at `1` lies in the span of the difference vectors `{ψ_i = ζ_i − d_i ζ_0}`
-(`i ≠ 0`).  Writing `ψ = Σ a_i ζ_i`, the condition `ψ(1) = 0` gives `Σ a_i d_i = 0` (`ζ_i(1) = d_i ζ_0(1)`,
+family `{ζ_i}` that vanishes at `1` lies in the span of the difference vectors
+`{ψ_i = ζ_i − d_i ζ_0}`
+(`i ≠ 0`). Writing `ψ = Σ a_i ζ_i`, the condition `ψ(1) = 0` gives `Σ a_i d_i = 0`
+(`ζ_i(1) = d_i ζ_0(1)`,
 `ζ_0(1) ≠ 0`), and then `ψ = Σ_{i≠0} a_i ψ_i` since the `ζ_0`-coefficient `a_0 + Σ_{i≠0} a_i d_i =
-Σ_i a_i d_i = 0`.  Combined with `CF(L,A) ⊆ span {ζ_i}` (`eq_induce_restrict_of_supported` + the family
+Σ_i a_i d_i = 0`.  Combined with `CF(L,A) ⊆ span
+{ζ_i}` (`eq_induce_restrict_of_supported` + the family
 covering all induced characters), this gives the `hspan` hypothesis of `chiRho_decomp_proof`. -/
 theorem mem_span_psi_of_apply_one_zero {n : ℕ} (ζ : Fin (n + 1) → ClassFunction L ℂ)
     (d : Fin (n + 1) → ℂ) (hd : ∀ i : Fin (n + 1), ζ i (1 : L) = d i * ζ 0 (1 : L))
@@ -746,7 +753,8 @@ and `supported_mem_span_psi`.  The only remaining inputs are the geometric facts
 the conjugation-invariance `hAconj`.
 
 When `K = H.subgroupOf L` for the normal subgroup `H ⊴ L` of Peterfalvi's `Hypothesis76` and
-`A = H \ {1}`, all of `hinj`/`hcover` come from `exists_distinct_induced_family`, `hdeg`/`psi_support`
+`A = H \ {1}`, all of `hinj`/`hcover` come from `exists_distinct_induced_family`,
+`hdeg`/`psi_support`
 from `induce_apply_one_ne_zero`/`induce_diff_support`, and `hAK_off`/`hA_one`/`hAconj` from
 `Subgroup.mem_subgroupOf` + the normality of `H`.  Thus the `Hypothesis76.chiRho_decomp` certificate
 is constructible from `(7.1)` data alone, with no certificate assumed. -/

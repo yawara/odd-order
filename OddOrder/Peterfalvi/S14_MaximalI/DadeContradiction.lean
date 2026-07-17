@@ -32,7 +32,8 @@ structure DadeNotation {L : Subgroup G} (hyp : Hypothesis L) where
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13), the Dade calculation realized from coherence**: given the (12.6) coherent
-extension of `L`'s family `S` (`S07.IsCoherent`, supplied by `witness_L_coherent`) and a distinguished
+extension of `L`'s family `S` (`S07.IsCoherent`, supplied by `witness_L_coherent`) and a
+distinguished
 character `χ ∈ S` of degree `e`, the (12.13) `DadeNotation` is realized with `τ₁ =` the coherent
 extension and `ψ = χ^{τ₁} = extension χ`.
 
@@ -60,9 +61,11 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13), the distinguished character**: the family `S` of `L` contains a member of
 minimal degree `[L : H]` (`H = L_F`), namely `Ind_H^L θ` for `θ` a nontrivial **linear** character
 of `H`.  Such `θ` exists because `H = L_F` is a nontrivial nilpotent group, so its commutator is
-proper (`H` is not perfect); `exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`
+proper (`H` is not perfect);
+`exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`
 then supplies a nontrivial degree-one `θ`, and `induce_apply_one` gives the induced degree
-`[L:H]·θ(1) = [L:H]`.  This is the distinguished `χ ∈ S` with `χ(1) = e = [L:H]` of the (12.13)/(12.16)
+`[L:H]·θ(1) = [L:H]`. This is the distinguished `χ ∈ S` with `χ(1) = e = [L:H]` of the
+(12.13)/(12.16)
 Dade calculation — the input to `dadeNotation_of_coherence`. -/
 theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
     ∃ χ ∈ hyp.Sset, χ (1 : ↥L) = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
@@ -207,7 +210,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 (`orthogonal_character_constant_on_coset`) to this `Hypothesis M` with `x = witness.x ∈ P₀ ≤ M`
 gives `dade.psi(x·g) = dade.psi(x)` for `g ∈ H_M = K`, provided the two inputs:
 * `horth`: `dade.psi ⊥ R_M(χ)` for `χ ∈ S_M` — the cross-group orthogonality `L ≠ M`
-  (`coherent_extension_constituent_orthogonal_Rset_of_nonconjugate`, since `dade.psi = coh.extension χ_L`
+  (`coherent_extension_constituent_orthogonal_Rset_of_nonconjugate`, since
+  `dade.psi = coh.extension χ_L`
   lies in `ℤ[R(χ_L)]` and `R(χ_L) ⊥ R(χ_M)`); needs the coherence `coh` and `L ≠ M` in scope;
 * `hxK`: `x ∉ K` — `x` is a nontrivial `p`-element and `p ∤ |K| = |M_F|` (`K` is the `p'`-Hall `M_F`). -/
 theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -507,7 +511,8 @@ open OddOrder.Peterfalvi.S09.Cert in
 the (7.8.b) bound `hB`).  The abstract `IsCoherent` does not carry orthogonality to `1_G`, but it
 is recovered from the **complex conjugate** `ζ̄_0 = Ind θ̄_0 ∈ S` (`Sset_closedUnderConjugate`) — a
 second member of the *same degree*, distinct from `ζ_0` because `L` has odd order (no nontrivial
-real irreducible, `not_isReal_of_ne_trivial_of_odd_card'`).  `coherence_extension_orthogonal_constOne`
+real irreducible, `not_isReal_of_ne_trivial_of_odd_card'`).
+`coherence_extension_orthogonal_constOne`
 then forces `⟨ν ζ_0, 1_G⟩ = 0`.  Holds for **any** nontrivial `θ_0` (degree-`e`/linearity unused). -/
 theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
@@ -1063,12 +1068,16 @@ theorem norm_conclusion_glue {e mval : ℤ} {kK kKp kM kH normRhoM normRho : ℝ
 
 /-- **Peterfalvi (12.16), the full assembly** (the entire argument, parameterized on its gated
 upstream): the minimal counterexample is impossible.  Combines the `(1.10)` congruence/magnitude
-start (`abs_psi_g_ge_e_sub_one`: `|ψ(g)| ≥ e-1`), the §7/§8 norm-bound middle (`norm_conclusion_glue`
+start (`abs_psi_g_ge_e_sub_one`: `|ψ(g)| ≥ e-1`), the §7/§8 norm-bound middle
+(`norm_conclusion_glue`
 from the three bounds `hA`/`hB`/`hC`), and the index/degree endgame (`counterexample_closing`).
 
-Every hypothesis is a fact supplied by §7/§8/§12: `h_const` = (12.14), `h_psix` = Dade value relation
-with (1.10.a) on `χ`, `h_psig_int` = (12.15), `h2e` = (12.12); `hA` = (12.15)+`|ψ(g)|`, `hB` = (7.8.b),
-`hC` = (7.3)+(8.17); `hM` = (12.11), `hidx` = fpf `[K:K'] ≥ 4` of (8.1.c).  The remaining work to close
+Every hypothesis is a fact supplied by §7/§8/§12: `h_const` = (12.14), `h_psix` = Dade value
+relation
+with (1.10.a) on `χ`, `h_psig_int` = (12.15), `h2e` = (12.12); `hA` = (12.15)+`|ψ(g)|`, `hB` =
+(7.8.b),
+`hC` = (7.3)+(8.17); `hM` = (12.11), `hidx` = fpf `[K:K'] ≥ 4` of (8.1.c). The remaining work to
+close
 `counterexample_contradiction` is exactly the construction of these — the §7 `ρ`/`ρM` machinery. -/
 theorem counterexample_contradiction_of_facts [Finite G]
     {p : ℕ} (hp : p.Prime) {ε : ℂ} (hε : IsPrimitiveRoot ε p)

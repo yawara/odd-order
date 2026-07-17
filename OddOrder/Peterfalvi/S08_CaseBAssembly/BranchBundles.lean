@@ -41,7 +41,8 @@ coprime to a normal subgroup's index is contained in it (so the running images i
 trivial), whence the normal complement of a fixed subgroup is unique. -/
 
 /-- **A subgroup of order coprime to a normal subgroup's index is contained in it.**  The image of
-`K` in `C ⧸ N` has order dividing both `|K|` and `[C : N]` (Lagrange), which are coprime, so the image
+`K` in `C ⧸ N` has order dividing both `|K|` and `[C : N]` (Lagrange), which are coprime, so the
+image
 is trivial and `K ≤ ker (mk' N) = N`. -/
 theorem le_of_card_coprime_index {C : Type*} [Group C]
     {K N : Subgroup C} [N.Normal] (hcop : Nat.Coprime (Nat.card K) N.index) : K ≤ N := by
@@ -753,7 +754,8 @@ theorem caseB_hnonlin [Finite ↥H]
   exact (constituentWeight_pos_iff hφ' θ).mp hweight hzero
 
 /-- **(6.8.2.3) per-`θ` anchor-vs-constituent orthogonality** (`hirrAnc` of the dispatch).  For a
-positive-weight `θ` whose `Ind^L_H θ` is not a column (irreducible branch), the four inner products of
+positive-weight `θ` whose `Ind^L_H θ` is not a column (irreducible branch), the four inner products
+of
 `η₁, η̄₁` against the induced character and its conjugate vanish: each is a `Y`-member against a
 distinct irreducible (`inner_Yset_irr_eq_zero`), distinctness from non-linearity `hnonlin`. -/
 theorem caseB_hirrAnc
@@ -836,7 +838,8 @@ decomposition `D` with image side `D.X ⊥ Y₀` (`hX`), `τ₁`-image a virtual
 `D.tau1 (χ − ψ) ∈ ZIrr G` (`hτmem`) and a virtual-character anchor `Y₀ ∈ ZIrr G` (`hY₀`), the
 orthogonal residual pairs integrally with the anchor:
 `⟨D.Y, Y₀⟩ = ⟨D.X, Y₀⟩ − ⟨D.tau1 (χ−ψ), Y₀⟩ = −⟨D.tau1 (χ−ψ), Y₀⟩ ∈ ℤ`.
-This is the route-independent `hbi` of `per_phi_anchored_image` (`Y = X − τ₁(χ−ψ)` from `tau1_image`;
+This is the route-independent `hbi` of `per_phi_anchored_image` (`Y = X − τ₁(χ−ψ)` from
+`tau1_image`;
 `⟨τ₁(χ−ψ), Y₀⟩ ∈ ℤ` by `inner_mem_ZIrr_int`). -/
 theorem psiDecomp_Y_inner_int {L' G' : Type*} [Group L'] [Group G'] [Fintype L'] [Fintype G']
     [Invertible (Nat.card L' : ℂ)] [Invertible (Nat.card G' : ℂ)]
@@ -856,7 +859,8 @@ theorem psiDecomp_Y_inner_int {L' G' : Type*} [Group L'] [Group G'] [Fintype L']
 /-- The per-`θ` **column-branch bundle** (mixed dispatch).  For each nontrivial column character
 `χ₂` whose certain-type column `μ_j = columnSum h46 χ₂` equals `Ind^L_H θ`, the structural inputs of
 `columnDecompositionTau`: equal column degrees, the `τ`-image agreement on `μ_j − μ̄_j`, the two
-`H^#`-supports, the `ZIrr`-membership of `(μ_j − a·η₁)^{hyp.tau}`, and the three (5.2.c) orthogonality
+`H^#`-supports, the `ZIrr`-membership of `(μ_j − a·η₁)^{hyp.tau}`, and the three (5.2.c)
+orthogonality
 scalars.  Extracted as an abbreviation so the dispatch lemmas share one bundle type with
 `caseB_constituentDecomposition` (definitionally the same `hcol` Prop). -/
 abbrev CaseBColBundle (hyp : SibleyDadeHypothesis G L H)
@@ -886,7 +890,8 @@ abbrev CaseBColBundle (hyp : SibleyDadeHypothesis G L H)
         (a • η₁ : ClassFunction ↥L ℂ) = 0)
 
 /-- The per-`θ` **irreducible-branch bundle** (mixed dispatch).  When no nontrivial column equals
-`Ind^L_H θ`, the structural inputs of `irreducibleDecompositionTau` (= `decompositionDaFromDadeOfDiff
+`Ind^L_H θ`, the structural inputs of `irreducibleDecompositionTau` (=
+`decompositionDaFromDadeOfDiff
 hyp.dade hyp.hconj`): irreducibility, non-realness, the two `H^#`-supports, the `ZIrr`-membership of
 `(Ind^L_H θ − a·η₁)^{hyp.tau}`, and the (5.2.c) orthogonality scalars.  Shared with
 `caseB_constituentDecomposition` (definitionally the same `hirr` Prop). -/
@@ -916,7 +921,8 @@ abbrev CaseBIrrBundle (hyp : SibleyDadeHypothesis G L H)
         (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0)
 
 /-- **(6.8.2.3) full column-branch bundle.**  Assembles the entire `CaseBColBundle` for the dispatch
-weight `aθ = constituentWeight hφ' θ`: all six conjuncts hold.  The two degree-coupled ones (`hSdiff`,
+weight `aθ = constituentWeight hφ' θ`: all six conjuncts hold. The two degree-coupled ones
+(`hSdiff`,
 `htau1_mema`) are supplied with the degree match `caseB_column_degree_match` (needs the source to
 occur in `θ`, `0 < constituentWeight`); the rest are unconditional.  This is the column-branch input
 `hcol` of the mixed per-`φ` dispatch (`caseB_per_phi_anchored_fromYset`). -/

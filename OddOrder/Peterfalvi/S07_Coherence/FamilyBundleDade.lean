@@ -527,7 +527,8 @@ resulting two-element `CharacterDifferenceImage` to the orthonormal family via
 from the Dade isometry on the two-element family `{χ, χ̄}`:
 
 * **virtual-character images** — `dadeIntegralCharacterMap_mem_ZIrr_of_supported` ((2.6.b)
-  `PreservesVirtualCharacters`): `(χ̄ - χ)^τ ∈ ℤ[Irr G]` since `χ̄ - χ` is supported and in `ℤ[Irr L]`;
+  `PreservesVirtualCharacters`): `(χ̄ - χ)^τ ∈ ℤ[Irr G]` since `χ̄ - χ` is supported and in
+  `ℤ[Irr L]`;
 * **vanish at `1`** — `dadeIntegralCharacterMap_apply_one_eq_zero` (`1 ∉ dadeSupport`): the Dade
   image vanishes off the support, hence at `1`;
 * **inner-product preservation** — `dadeIntegralCharacterMap_inner_eq_on_supported_span`
@@ -619,7 +620,8 @@ supported (`1 ∉ A = H^#`), yet the conjugate difference `χ̄ − χ` vanishes
 
 The Dade `CF(L,A)`-isometry is applied on the **difference set** `D = {0, χ̄ − χ}` (both supported:
 `0` trivially, `χ̄ − χ` by hypothesis), into which both keystone differences
-`irreducibleCharacterDifference fam i` (`= 0` for `i = 0`, `= χ̄ − χ` for `i = 1`) land — exactly the
+`irreducibleCharacterDifference fam i` (`= 0` for `i = 0`, `= χ̄ − χ` for `i = 1`) land — exactly
+the
 generators the (1.4)/(2.6.a) keystone uses.  No `χ`/`χ̄` individual support is touched.
 `dadeOrthonormalCharacterImageFamily` (individual supports) is recovered as the special case where
 `hdiffsupp` is derived from `hχsupp`, `hχbarsupp`. -/
@@ -703,10 +705,13 @@ noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
 
 Builds `Da : CharacterPsiDecomposition τ χ (a·χ₁)` directly via `ofProjection` — **not**
 `decompositionPair`, which also builds the `ψ=0` `D₀` requiring the unprovable `τχ ∈ ZIrr`.  This is
-now constructible for an unsupported induced X-member `χ = Ind θ` thanks to the difference-sublattice
-weakening of `tau1_inner_eq_on_support`: the auxiliary isometry `τ₁ = τ` only needs inner-preservation
+now constructible for an unsupported induced X-member `χ = Ind θ` thanks to the
+difference-sublattice
+weakening of `tau1_inner_eq_on_support`: the auxiliary isometry `τ₁ = τ` only needs
+inner-preservation
 on `ℤ[χ−χ̄, χ−a·χ₁]` (both supported differences — supplied by
-`dadeIntegralCharacterMap_inner_eq_on_supported_span` on the difference set `{χ−χ̄, χ−a·χ₁}`), and the
+`dadeIntegralCharacterMap_inner_eq_on_supported_span` on the difference set `{χ−χ̄, χ−a·χ₁}`), and
+the
 `ZIrr`-membership only on `χ − a·χ₁` (`htau1_mema`, the degree-matched difference vanishing at `1`).
 `R(χ)` is the difference-support family `dadeOrthonormalCharacterImageFamilyOfDiff`. -/
 noncomputable def decompositionDaFromDadeOfDiff
@@ -748,7 +753,8 @@ noncomputable def decompositionDaFromDadeOfDiff
 
 /-- **Peterfalvi (5.2.e) inner-product core for the Dade families.**
 
-`⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0` whenever the four characters `x, x̄, χ, χ̄` are supported in `CF(L,A)`
+`⟨(x − x̄)^τ, (χ − χ̄)^τ⟩ = 0` whenever the four characters `x, x̄, χ, χ̄` are supported in
+`CF(L,A)`
 and `x, x̄` are each orthogonal to both `χ` and `χ̄`.  The Dade isometry's `CF(L,A)`
 inner-preservation (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) reduces it to
 `⟨x − x̄, χ − χ̄⟩`, which expands to the four cross pairings — all zero.  This is the source-side
@@ -933,7 +939,8 @@ the prior coherence:
 * the norm data `mc i = ‖χᵢ‖²` (real and positive, the latter from `χᵢ ≠ 0`), with `‖χ₁‖² ∈ ℤ`
   from `inner_mem_ZIrr_int`.
 
-Only the genuine (6.6) source-side content remains as input: the family bundle `B` (degrees, pairwise
+Only the genuine (6.6) source-side content remains as input: the family bundle `B` (degrees,
+pairwise
 orthogonality of `S₁`), the family memberships/supports/non-vanishing, the per-member family data
 (`Dmem`/`hmemTau1`/`hmemOrtho`, exactly the `DadeChainStep` fields), and the degree inequality (c). -/
 theorem dade_Y_collapse_of_family
@@ -964,8 +971,10 @@ theorem dade_Y_collapse_of_family
         (ClassFunction.inner (B.chiFam i) (B.chiFam i)).re) :
     Da.Y = a • Da.tau1 chi1 := by
   classical
-  -- Generator set uses the supported difference `χ − a·χ₁` (NOT bare `χ`): the isometry is only ever
-  -- applied to family members and to differences, so no individual `χ`-support is needed (X-family).
+  -- Generator set uses the supported difference `χ − a·χ₁` (NOT bare `χ`): the isometry is only
+  -- ever
+  -- applied to family members and to differences, so no individual `χ`-support is needed
+  -- (X-family).
   set S₀ : Set (ClassFunction (↥L) ℂ) := insert ((χ : ClassFunction (↥L) ℂ) - a • chi1)
     (insert chi1 (B.chiFam '' ↑s)) with hS₀def
   have hS₀supp : ∀ x ∈ S₀, x.support ⊆ supportInSubgroup A L := by
@@ -1052,7 +1061,8 @@ generation hypothesis is discharged by `zSupportedSpan_pair_subset_span` from `�
 (`irreducibleCharacter_conj_apply_one`), and `1 ∉ A`.
 
 The orthonormality `{χ, χ̄}` (`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar`) is taken as input — exactly the
-(5.2)-level character data the (6.6)/(6.8) enumeration provides (the same fields as `DadeChainStep`).
+(5.2)-level character data the (6.6)/(6.8) enumeration provides (the same fields as
+`DadeChainStep`).
 This is the missing base case: every prior coherence producer *consumed* a coherent set but none
 *constructed* the seed. -/
 noncomputable def coherentPair_fromDade
@@ -1402,7 +1412,8 @@ None of these mention the Dade isometry's *image-side* structure: they are the s
 and orthogonality data the (6.6) enumeration is responsible for.  `advance` adjoins the Round-B
 `R(χ)` (`dadeOrthonormalCharacterImageFamily`) and the (2.6.b) `ZIrr`-membership and discharges the
 step.  The (5.1) generation hypothesis is **not** a field: it is pure ℤ-module theory routed
-through the difference generators (`zSupportedSpan_adjoinPair_subset_span`), discharged internally by
+through the difference generators (`zSupportedSpan_adjoinPair_subset_span`), discharged internally
+by
 `advance` from `hmemSupp` and `hchi1supp` (no (4.7) `ℤ[S, L^#] = ℤ[S, A]` needed). -/
 structure DadeChainStep
     (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)

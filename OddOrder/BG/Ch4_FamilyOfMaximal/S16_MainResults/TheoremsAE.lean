@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
@@ -419,7 +420,8 @@ five conjuncts is cited from its standalone `sorry`-free lemma:
 * (5) `A(M) − M_σ` is a `TI`-subset of `G` — `theoremB_A_minus_Msigma_isTISubset`.
 
 Faithfulness fixes over the original scaffold: the explicit `hKM : K ≤ M`, `hUM : U ≤ M` and the
-Hall `κ`-subgroup `hK` (part of the BG setup `M = K U M_σ`, genuinely needed by conjuncts (2)(3)(5));
+Hall `κ`-subgroup `hK` (part of the BG setup `M = K U M_σ`, genuinely needed by conjuncts
+(2)(3)(5));
 and the *prime* restriction on conjunct (1) — the unrestricted `∀ p : ℕ` form is false (a composite
 `p` is met by non-abelian `{q, r}`-groups; see `theoremB_U_sylow_abelian_rank_le_two`). -/
 theorem theoremB_U_and_A_tame [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -568,7 +570,8 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   -- `M' = U ⊔ M_σ` (Theorem C(3) / Lemma 15.1(b)).
   have hM'eq : derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
     (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
-  -- **Helper A**: every `κ(M)'`-element of `M` lies in the normal Hall `κ'`-subgroup `M' = U ⊔ M_σ`.
+  -- **Helper A**: every `κ(M)'`-element of `M` lies in the normal Hall `κ'`-subgroup
+  -- `M' = U ⊔ M_σ`.
   -- (`M'` complements the Hall `κ`-subgroup `K` in `M`, so `[M : M'] = |K|` is a `κ`-number;
   -- a `κ'`-element has image of order dividing both `[M : M']` and its own order, hence trivial.)
   have hkappaComplMem : ∀ x : G, x ∈ M → IsPiElement (S14.kappa M)ᶜ x →
@@ -606,7 +609,8 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       have h := orderOf_eq_one_iff.mp hord1
       rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h
     exact Subgroup.mem_subgroupOf.mp hx'N
-  -- **Helper B**: `M' ⊓ (K ⊔ K*) = K*` (direct: `x = k·k* ∈ M'`, `k* ∈ K* ≤ M'`, so `k ∈ K ⊓ M' = 1`).
+  -- **Helper B**: `M' ⊓ (K ⊔ K*) = K*` (direct: `x = k·k* ∈ M'`, `k* ∈ K* ≤ M'`, so
+  -- `k ∈ K ⊓ M' = 1`).
   have hMeetKKstar : (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) ⊓ (K ⊔ Kstar) = Kstar := by
     refine le_antisymm ?_ (le_inf (hKstarMσ.trans le_sup_right) le_sup_right)
     -- `K` is normal in `K ⊔ K*` (`K*` centralizes it), so an element `x` of `K ⊔ K*` is `a·b`
@@ -886,7 +890,8 @@ theorem typeP2_matched_kappa_hall_pair_of_esetup [Finite G]
 /-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P₂` maximal subgroup** (BG `kappa_complement`;
 existential form).  Obtains an arbitrary `E`-setup (`exists_subgroupESetup`) and reads off the pair
 via `typeP2_matched_kappa_hall_pair_of_esetup`.  Consumers needing the pair inside a *prescribed*
-`σ(M)'`-complement `E` (e.g. `E = M ⊓ N` in Corollary 15.9, so a Sylow of `U₀` lands in `M`) call the
+`σ(M)'`-complement `E` (e.g. `E = M ⊓ N` in Corollary 15.9, so a Sylow of `U₀` lands in `M`) call
+the
 `_of_esetup` core with their own setup. -/
 theorem typeP2_exists_matched_kappa_hall_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
@@ -965,7 +970,8 @@ theorem theoremC_paired_structure [Finite G]
   have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
   -- Conjuncts 1, 7 (Lemma 15.1(b)): `U` abelian and `M' = U ⊔ M_σ`.
   obtain ⟨hM'eq, hUab⟩ := typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU
-  -- Conjuncts 3,4,5,8,6 (Corollary 15.6): `K*` nontrivial cyclic `≤ M_F`, `K* ≤ M''`, `M_F` not cyclic.
+  -- Conjuncts 3,4,5,8,6 (Corollary 15.6): `K*` nontrivial cyclic `≤ M_F`, `K* ≤ M''`, `M_F` not
+  -- cyclic.
   obtain ⟨hKsne, hKscyc, hKsMF, hKsdd, hMFnc⟩ := typeP_kstar_in_mf hG hM hP hKM hK hKstar
   -- Conjunct 9 (Theorem 14.7): the unique non-conjugate type-`P` partner `M*`.
   have hdual := (typeP_duality hG hM hP hKM hK hKstar).2.2
@@ -1047,7 +1053,8 @@ theorem theoremC_paired_structure [Finite G]
     -- `FittingIsTI M` for type-`P₂`: BG Theorem 15.7(a) (`fittingIsTI_of_isTypeP2`).
     exact ⟨q, hq, hKq, S15.fittingIsTI_of_isTypeP2 hG hM hP2⟩
   · -- Conjunct 12 (BG Theorem C(8) = `kstar_card_prime_of_inputs`): `U = ⊥ → |K*|` prime.
-    -- `U = ⊥` makes `M` type-`P₁` (`κ(M) = σ(M)'` via the trivial Hall complement), then `|K*|` prime.
+    -- `U = ⊥` makes `M` type-`P₁` (`κ(M) = σ(M)'` via the trivial Hall complement), then `|K*|`
+    -- prime.
     intro hUbot
     have hUbot' : U.subgroupOf M = ⊥ := by simp [hUbot]
     have hP1 : S14.IsTypeP1 M :=
@@ -1154,7 +1161,8 @@ theorem msigma_fusion_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 `S12.Msigma_inf_conj_inf_derived_eq_bot`), of odd order, and of rank `≤ 1`: any noncyclic elementary
 abelian `A ≤ M_σ ∩ M^g` would, by `norm_noncyclic_sigma` (Corollary 12.4), satisfy `C_G(A) ≤ N_G(A)
 ≤ M`, contradicting the σ-uniqueness core `S12.centralizer_not_le_of_isPGroup_le_Msigma_inf_conj`.
-A finite commutative odd group of rank `≤ 1` is cyclic (`isCyclic_of_isMulCommutative_of_rank_le_one`,
+A finite commutative odd group of rank `≤ 1` is cyclic
+(`isCyclic_of_isMulCommutative_of_rank_le_one`,
 the §15 rank-1 ⇒ cyclic step).  Supplies the `hD2` input of Theorem D. -/
 theorem Msigma_inf_conj_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G} (hg : g ∉ M) :
@@ -1369,7 +1377,8 @@ theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 
 /-- **`π(M_σ) = σ(M)`** (the prime-factor content of `M_σ` being the `σ(M)`-Hall subgroup, BG (8.11) /
 `Msigma_isHall`): a prime divides `|M_σ|` iff it is a `σ`-prime of `M`.  Forward is the `π`-part of
-the Hall property (`Msigma_isHall.1`); backward, a `σ`-prime `p` divides `|M|` (`mem_sigma_iff`) hence
+the Hall property (`Msigma_isHall.1`); backward, a `σ`-prime `p` divides `|M|` (`mem_sigma_iff`)
+hence
 `|G|`, but not the `σ′`-index `[G : M_σ]` (`Msigma_isHall.2`), so by `|G| = |M_σ|·[G : M_σ]` it
 divides `|M_σ|`.  Bridges the `σ`-stated partition (`sigma_reps_prime_cover`) to the
 `π(mainSubgroup ·)` form of `BGTheoremECoverData` via Peterfalvi (8.10) (`M_s = M_σ`, issue 8020). -/
@@ -1564,9 +1573,11 @@ full local counting/partition statement is `theoremE_sigma_partition_and_countin
 **Faithfully restated (2026-07-07, issue 0098 b-task, post Cor 15.9).**  The prior form omitted `U ≤ M`
 and the `(κ∪σ)′`-Hall hypothesis on `U`, so conjuncts 2–3 were not forced (a free `U` lets `A(M)`
 contain `κ`-elements) and it stood as a `sorry` placeholder.  This type-`P` (`K ≠ ⊥`) version adds
-`hKM`/`hUM`/`hU`, and all three are proved: conjuncts 1 (`zTilde` TI) and 2 (`A_0(M)−A(M)` TI) are the
+`hKM`/`hUM`/`hU`, and all three are proved: conjuncts 1 (`zTilde` TI) and 2 (`A_0(M)−A(M)` TI) are
+the
 matching conjuncts of `theoremC_paired_structure` (via the paired partner `M*`); conjunct 3
-(`Supports = A(M) ⊆ 𝒞_G(zTilde ∪ A_0(M))`) reduces to `A(M) ⊆ A_0(M)` — an `A(M)`-element `y ∈ U ⊔ M_σ`
+(`Supports = A(M) ⊆ 𝒞_G(zTilde ∪ A_0(M))`) reduces to `A(M) ⊆ A_0(M)` — an `A(M)`-element
+`y ∈ U ⊔ M_σ`
 is a `κ(M)′`-element (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), while `𝒞_G(K#)`-elements are
 `κ(M)`-elements (`K` a `κ`-Hall, `isPiElement_conj`); a nonidentity element cannot be both. -/
 theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

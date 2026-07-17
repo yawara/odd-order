@@ -256,7 +256,8 @@ open scoped Classical in
 from the (14.9) expansion, with both `Δ_a` and `Γ` orthogonal to `1_G` and
 `⟨Γ,a⟩ = 1 + ⟨Δ_a,Γ⟩`, then `⟨Γ,a⟩` is an odd integer and hence nonzero.
 
-The parity statement is exactly `RepresentationTheory.cfdot_real_vchar_even`: `⟨Δ_a,Γ⟩` is even because
+The parity statement is exactly `RepresentationTheory.cfdot_real_vchar_even`: `⟨Δ_a,Γ⟩` is even
+because
 trivial coefficients vanish.  This theorem performs all integrality/parity bookkeeping after the
 genuine `Δ_a` construction; no prime-TI or Dade hypothesis is hidden in its conclusion. -/
 theorem gap_coefficients_nonzero_of_delta_parity [Fintype G]
@@ -333,7 +334,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) ≤
       ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) := by
   -- Coq `FTtypeP_min_typeII` body (PFsection14.v:737--853): `calT1`/coherence + Γ-Bessel.
-  -- Reduced to the proven Γ-Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`; every char-cascade
+  -- Reduced to the proven Γ-Bessel skeleton `T_typeIII_ratio_le_of_gamma_bridge`; every
+  -- char-cascade
   -- carrier is now supplied, so this theorem carries **no local `sorry`**.  The last residual —
   -- the Coq (11.8) `FTtype34_not_ortho_cycTIiso` non-orthogonality `hnotZeroRowProjection` — is now
   -- discharged by transporting the canonical narrow-`𝒮(H₀C)` refuter through the global σ/η grid
@@ -355,7 +357,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- **Carrier 1 (the coherent `τ₁`-image family, now DISCHARGED from the (14.9) coherence).**
   -- The intrinsic type-III datum builds the degree-`p` `Ind_{QV}^T`-family `calT1_set` with all
   -- coherence inputs (`T_typeIII_calT1_family`); the T-side Dade package + coherence engine
-  -- (`T_typeIII_calT1_isCoherent`, i.e. `T_typeIII_hyp07` ∘ `T_typeIII_calT1_coherent`) then produce
+  -- (`T_typeIII_calT1_isCoherent`, i.e. `T_typeIII_hyp07` ∘ `T_typeIII_calT1_coherent`) then
+  -- produce
   -- the coherent map `τ₁ = hτ.extension`.  Its image `calT1 := τ₁(calT1_set)` is an **orthonormal**
   -- set of `G`-class functions (`horth`), because `τ₁` is an isometry on `ℤ[calT1_set]`
   -- (`IsCoherent.extension_inner_eq`) and the source members are orthonormal irreducibles.
@@ -878,10 +881,12 @@ subgroup that is *not* type II is type III.  In σ-theoretic terms, `IsTypeP1 T`
 `¬ IsTypeP2 T` given `IsTypeP T`) forces `T` to be structurally Type III.
 
 **Fully reduced to the single (11.9) residual `T_not_isTypeIV_of_isTypeP1`.**  The type dictionary
-`proposition_type_classification` (BG Prop 16.1, proven) gives, from `IsTypeP1 T`, either Type III/IV
+`proposition_type_classification` (BG Prop 16.1, proven) gives, from `IsTypeP1 T`, either Type
+III/IV
 (if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`).  **Type V is excluded outright** by the (10.10)
 hypothesis `hnoV` (instantiate with the axiom-clean `no_typeV_maximal_unconditional`,
-`S12_Noncoherence`; issue 9087), so `M_F ≠ M_σ` and `T` is Type III or IV.  Excluding Type IV — the genuine (11.9) Galois/character
+`S12_Noncoherence`; issue 9087), so `M_F ≠ M_σ` and `T` is Type III or IV. Excluding Type IV — the
+genuine (11.9) Galois/character
 content — is the isolated residual `T_not_isTypeIV_of_isTypeP1`.  The Type-V exclusion and the III/IV
 structural wiring (incl. the `TypeIIIData.normalizer_le` field, bundled into the clause-(c)
 disjunction) are proven here. -/
@@ -911,7 +916,8 @@ contradicting (14.8) `key_inequality`'s `(v − 1)/p > (u − 1)/q`.
 
 The two deep pieces are isolated as `T_typeIII_ratio_le` (character body) and
 `T_isTypeIII_of_isTypeP1` (type determination), both consumed below.  The `>` half is (14.8): its
-pure cyclotomic comparison lives upstream in `KeyInequalityArithmetic`, while the two group-theoretic
+pure cyclotomic comparison lives upstream in `KeyInequalityArithmetic`, while the two
+group-theoretic
 order inputs are the direct (13.4) producer `T_side_caseB_facts` and the (13.15) producer
 `Hypothesis.u_le_cyclotomicQuotient`.  Thus no forward reference through the later
 `key_inequality` theorem is needed. -/
@@ -960,7 +966,8 @@ theorem T_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 (`T_isTypeP2`), and *every* type-`P₂` maximal subgroup is type II by the proven BG bridge
 `isTypeII_of_isTypeP2`.  That bridge discharges
 the deep `M'`-type-`F` structure — `IsTypeF (derivedInG T)` and `(T')_F = T_F` — internally
-(`isTypeF_derivedInG_of_isTypeP2`), so the sole residual of (14.9) is the type-`P₂` fact `T_isTypeP2`.
+(`isTypeF_derivedInG_of_isTypeP2`), so the sole residual of (14.9) is the type-`P₂` fact
+`T_isTypeP2`.
 (Placed ahead of `exists_LHypothesis` so the §14 `T`-side chain — `typeII_overNormalizer_frobenius`
 etc. — can cite `IsTypeII T` locally.) -/
 theorem T_typeII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

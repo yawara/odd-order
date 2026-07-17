@@ -22,7 +22,8 @@ Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleBasic` (2000-line limit,
 /-!
 # S10_MinimalSimpleBasic
 
-Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleStructure` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleStructure` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 /-!
@@ -503,7 +504,8 @@ theorem typeII_normalizer_not_le_of_typePData [Finite G]
       (Nat.card ↥((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)))
       ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).index :=
     (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall (derivedInG M)).coprime_index
-  -- Both `td.typeP.U` and `data.U` complement `M_F` in `M'` (Definition (8.4) `derived_complement`).
+  -- Both `td.typeP.U` and `data.U` complement `M_F` in `M'` (Definition (8.4)
+  -- `derived_complement`).
   have hTd_compl : Subgroup.IsComplement'
       ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M))
       (td.typeP.U.subgroupOf (derivedInG M)) := by
@@ -550,7 +552,8 @@ theorem typeII_normalizer_not_le_of_typePData [Finite G]
 /loop 2026-07-07).  The former `typeII_A_sets_TI` / `typeII_A_sets_normalizer` claimed the *full*
 type-II sets `A(M) = (M')#`, `A_1(M) = M_σ#` are TI-subsets of `G` with normalizer `M`.  This is
 **false**: `M_σ` is only *tamely* imbedded (BG Theorem II), `M_σ ∩ M_σ^g` cyclic (Theorem D(2))
-rather than trivial, with escaping `σ`-elements (`C_G(x) ⊄ M`).  The *faithful* content — `A(M) − M_σ`
+rather than trivial, with escaping `σ`-elements (`C_G(x) ⊄ M`). The *faithful* content —
+`A(M) − M_σ`
 is a TI-subset — is Pf (8.10)/(8.12.c) = BG Theorem B(5), **proved** as
 `OddOrder.BG.Ch4.S16.theoremB_A_minus_Msigma_isTISubset`; cite that directly.  The false sorries are
 removed to prevent a bogus-witness false pin (cf. the `sibleyTarget`/`frobI` precedents). -/

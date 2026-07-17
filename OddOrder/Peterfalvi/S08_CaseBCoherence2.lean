@@ -49,7 +49,8 @@ every `η ∈ Y`, then every element of `ℤ[X]` is orthogonal to every element 
 `ℤ`-bilinearity fact (`Submodule.span_induction`).
 
 This generalizes `inner_eq_zero_of_mem_span_of_disjoint_irreducible` (which derives the pairwise
-orthogonality from distinct-irreducible) so it applies in case (B), where `X = S − S(W₂)` contains the
+orthogonality from distinct-irreducible) so it applies in case (B), where `X = S − S(W₂)` contains
+the
 **reducible** column characters `μ_j = ∑ᵢ μ_{ij}`: `⟨μ_j, η⟩ = ∑ᵢ ⟨μ_{ij}, η⟩ = 0` (each grid
 character `μ_{ij} ∈ X` is a distinct irreducible from `η ∈ Y = S(H')`), supplied as the `hpair`
 hypothesis at the case-(B) `X ∪ Y` glue. -/
@@ -81,7 +82,8 @@ restricted Dade datum `(hyp.restrict, dade.restrict)` agrees with that of `(hyp,
 This is the (6.8) case-(B) `map-agreement` core: Peterfalvi (4.9)'s certain-type coherence
 `certainType_isCoherent` uses the *enlarged* datum `dade0` on `A₀ = A ∪ V^L`, while `hyp.tau` is the
 base datum on `A = H^#`; the `μ_j`-differences are `A`-supported, so once the wiring identifies
-`dade0.restrict A` with the base datum, this lemma + `IsCoherent.congrMap` transport the certain-type
+`dade0.restrict A` with the base datum, this lemma + `IsCoherent.congrMap` transport the
+certain-type
 coherence onto `hyp.tau`. -/
 theorem dadeIntegralCharacterMap_restrict_eq_of_support
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -105,14 +107,18 @@ theorem dadeIntegralCharacterMap_restrict_eq_of_support
 
 /-- **(6.8.2) case-(B) `X ∪ Y` coherence, glued form.**  The case-(B) counterpart of
 `coherentXunionYset_centralCommutator_of_glued_of_frobenius`: glue the case-(B) `X`-coherence `cX`
-(on `X = S − S(W₂)`, which now contains the reducible column characters `μ_j`) with the `Y`-coherence
-`coherentYset` via the §7 diagonal-aware engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`.
+(on `X = S − S(W₂)`, which now contains the reducible column characters `μ_j`) with the
+`Y`-coherence
+`coherentYset` via the §7 diagonal-aware engine
+`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`.
 
 The only case-(B) difference from the Frobenius assembly is the **source orthogonality** `X ⊥ Y`:
-since `X` is no longer all-irreducible, it is supplied by `inner_eq_zero_of_mem_span_of_pairwise_orthogonal`
+since `X` is no longer all-irreducible, it is supplied by
+`inner_eq_zero_of_mem_span_of_pairwise_orthogonal`
 from the pairwise `⟨x, y⟩ = 0` (`x ∈ X`, `y ∈ Y`) — for `x = μ_j = ∑ᵢ μ_{ij}` this is
 `∑ᵢ ⟨μ_{ij}, η⟩ = 0`.  The combined extension `ν` (the (6.8.2) `τ₂`), its agreements, the mixed inner
-products `hmixed` (the (6.8.2.3) content), and the cross-diagonal set `D`/`hDτ` (with the satisfiable
+products `hmixed` (the (6.8.2.3) content), and the cross-diagonal set `D`/`hDτ` (with the
+satisfiable
 generation `hgen`) are supplied at capstone wiring. -/
 noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -145,7 +151,8 @@ noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
 `certainType_isCoherent`, but with respect to the *enlarged* Dade map
 `dadeIntegralCharacterMap h46.dade0 h46.tau` on `A₀ = A ∪ V^L`.  Since the `μ_j`-differences are
 `A`-supported (`A = H^#`), `IsCoherent.congrMap` re-targets that coherence to the Sibley–Dade
-`hyp.tau`, given the map-agreement `hmapagree` on the supported lattice (established at capstone wiring
+`hyp.tau`, given the map-agreement `hmapagree` on the supported lattice (established at capstone
+wiring
 from `dadeIntegralCharacterMap_restrict_eq_of_support` + the construction fact `dade0.restrict A`
 agrees with the base Dade datum `hyp.dade`, since `h46.dade = hyp.dade`).
 
@@ -287,7 +294,8 @@ image family `certainTypeR` is built against the *enlarged* certain-type map
 
 This rebuilds the family against the Sibley–Dade map `hyp.tau`, reusing the three map-independent
 fields and transferring the image equation along the `H^#`-agreement `hmapagree`
-(`(μ_j − μ̄_j)^{hyp.tau} = (μ_j − μ̄_j)^{τ_enl}`, valid since `μ_j − μ̄_j` is `H^#`-supported in case c2
+(`(μ_j − μ̄_j)^{hyp.tau} = (μ_j − μ̄_j)^{τ_enl}`, valid since `μ_j − μ̄_j` is `H^#`-supported in
+case c2
 `K = H` and both maps coincide there).  This puts the column `R(μ_j)` and the irreducible Dade
 families `dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj` in the *same* map `hyp.tau`,
 the single `τ` of the per-`φ` family.  `hmapagree` is supplied at capstone wiring (as for
@@ -318,10 +326,12 @@ noncomputable def columnRFamilyTau
 /-- **(6.8.2.3) column constituent decomposition for `hyp.tau`.**  The (5.4) decomposition data for a
 reducible column `μ_j = columnSum χ₂` against the Sibley–Dade map `hyp.tau`, built by `ofProjection`
 from the retargeted family `columnRFamilyTau` and `hyp.tau`'s `H^#`-inner-preservation
-(`dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`).  This is the column branch
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`). This is the column
+branch
 of the per-`φ` family living in the *same* `τ = hyp.tau` as the irreducible constituents
 (`decompositionDaFromDadeOfDiff hyp.dade hyp.hconj`).  The column differences `μ_j − μ̄_j`,
-`μ_j − a·η₁` are `H^#`-supported (`hSdiff`, case c2 `K = H`); `hmapagree` transfers the family's image
+`μ_j − a·η₁` are `H^#`-supported (`hSdiff`, case c2 `K = H`); `hmapagree` transfers the family's
+image
 equation; both are discharged at capstone wiring. -/
 noncomputable def columnDecompositionTau
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -363,7 +373,8 @@ noncomputable def columnDecompositionTau
     rfl htau1_mema hχψ hχbarψ hχχbar
 
 /-- **(6.8.2.3) irreducible constituent decomposition for `hyp.tau`.**  The (5.4) decomposition data
-for an irreducible induced constituent `Ind^L_H θ` (non-column `θ`), via `decompositionDaFromDadeOfDiff`
+for an irreducible induced constituent `Ind^L_H θ` (non-column `θ`), via
+`decompositionDaFromDadeOfDiff`
 for the Sibley–Dade datum `hyp.dade` (which carries `hyp.hconj : HConjInvariant`).  Since
 `hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`, this lands
 directly in `hyp.tau` — the *same* map as the column decompositions (`columnDecompositionTau`), so
@@ -395,7 +406,8 @@ noncomputable def irreducibleDecompositionTau
 
 /-- **(6.8.2.3) per-constituent anchored image, mixed family (assembly skeleton).**  Given the per-`φ`
 decomposition family `D` (one (5.4) decomposition `CharacterPsiDecomposition hyp.tau (χ i) (aᵢ·η₁)`
-per constituent — built by dispatching `columnDecompositionTau` / `irreducibleDecompositionTau`), with
+per constituent — built by dispatching `columnDecompositionTau` / `irreducibleDecompositionTau`),
+with
 `(D i).tau1 = hyp.tau` (`htau1`, immediate for both branches), the (6.8.2.2) aggregate
 (`hagg`/`hsq`/`hXaggorth`), and the per-step `R(χᵢ) ⊥ Y₀` / coefficient data (`hXorth`/`hbi`), the
 pinning `per_constituent_Y_eq_smul` forces `(D i).Y = aᵢ·Y₀`, and the decomposition image equation
@@ -446,7 +458,8 @@ theorem per_phi_anchored_image
   rw [h1, hY]
 
 /-- **(6.8.2.3) column constituent decomposition for `hyp.tau`, `Ind^L_H`-form.**  The
-family-ready column branch: `columnDecompositionTau` (whose `χ`-component is `columnSum χ₂`) recast to
+family-ready column branch: `columnDecompositionTau` (whose `χ`-component is `columnSum χ₂`) recast
+to
 the `Ind^L_H θ`-form `induce H (Res_H μ_{0j})` via the (4.5.a) transport `columnSum_eq_induce_H`
 (`h46.K = H`).  This matches the per-`φ` family's `χ`-component `induce H i.val` (the column index
 `θ = ⟨Res_H μ_{0j}, _⟩`), so it slots directly into the dispatch alongside
@@ -568,7 +581,8 @@ theorem SibleyDadeHypothesis.columnSum_notMem_SsubFiltration
 
 /-- **(6.8.2) case-(B), `μ_j ∉ S(A)` for `W₂ ≤ A`** (filtration generalization of
 `columnSum_notMem_SsubFiltration`).  Since `S(A) ⊆ S(W₂)` whenever `W₂ ≤ A`
-(`SsubFiltration_antitone`: a larger kernel constraint gives a smaller filtration set) and the column
+(`SsubFiltration_antitone`: a larger kernel constraint gives a smaller filtration set) and the
+column
 `μ_j = columnSum h46 χ₂` (`χ₂ ≠ 1`) already lies outside `S(W₂)`
 (`columnSum_notMem_SsubFiltration`), it lies outside `S(A)` too.
 
@@ -636,7 +650,8 @@ theorem SibleyDadeHypothesis.mem_Xset_exists_inducing
 
 omit [Fintype G] in
 /-- **(6.8.2.3) step 2 ([Is] 2.27 central restriction):** for an irreducible `θ` of `H` whose kernel
-does not contain the central subgroup `Z = W₂.subgroupOf H`, the restriction `Res^H_Z θ` is `θ(1)` times
+does not contain the central subgroup `Z = W₂.subgroupOf H`, the restriction `Res^H_Z θ` is `θ(1)`
+times
 a **nontrivial linear** character `φ` of `Z`.
 
 Direct application of `IsIrreducibleCharacter.exists_central_linear_restriction` (Schur central
@@ -664,13 +679,16 @@ theorem certainType_central_restriction
 
 omit [Invertible (Nat.card G : ℂ)] in
 /-- **(6.8.2.3) constituent weight = degree (central multiplicity).**  For an irreducible `θ` of `H`
-whose central restriction is `Res^H_Z θ = θ(1)·φ` (`certainType_central_restriction`, `Z = W₂.subgroupOf H`
+whose central restriction is `Res^H_Z θ = θ(1)·φ` (`certainType_central_restriction`,
+`Z = W₂.subgroupOf H`
 central), the multiplicity of `φ` in `Res^H_Z θ` is `θ(1)`:
-`⟨φ, Res^H_Z θ⟩ = ⟨φ, θ(1)·φ⟩ = θ(1)·⟨φ, φ⟩ = θ(1)` (with `θ(1)` real, `= (d : ℂ)` a positive integer
+`⟨φ, Res^H_Z θ⟩ = ⟨φ, θ(1)·φ⟩ = θ(1)·⟨φ, φ⟩ = θ(1)` (with `θ(1)` real, `= (d : ℂ)` a positive
+integer
 by `irreducibleCharacter_apply_one_eq_pos_natCast`, so `star (θ(1)) = θ(1)`).
 
 This is the weight reconciliation `aθ = θ(1)` for the (6.8.2.3) `αθ`-aggregate: the multiplicity
-`aθ = ⟨φ, Res θ⟩` (`sum_smul_constituent_diff_eq`) equals the degree ratio `θ(1) = χθ(1)/|W₁|` used in
+`aθ = ⟨φ, Res θ⟩` (`sum_smul_constituent_diff_eq`) equals the degree ratio `θ(1) = χθ(1)/|W₁|` used
+in
 the per-constituent decomposition, so the two index conventions coincide on the constituents. -/
 theorem inner_central_restrict_eq_apply_one [Fintype ↥H]
     (θ : IrreducibleCharacter ↥H) {W2 : Subgroup ↥L}

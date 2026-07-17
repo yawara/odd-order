@@ -95,7 +95,8 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
   - **Lem 1.7(d⇐)** `frattini_le_commutator_sup_pow_closure` ⭐ sorry-free (Ch.4 Lem 4.5)
   - **Lem 1.7(d)** `commutator_sup_pow_closure_eq_frattini` ⭐ sorry-free
   - **Thm 1.8** `burnside_operator` ⭐ sorry-free (Isaacs Cor 3.29 `aFixed_quotient_frattini` 経由)
-  - **Lem 1.9 (2-step)** `coprime_actsTrivially_of_normal_and_quotient` ⭐ sorry-free (Isaacs Cor 3.28 経由)
+  - **Lem 1.9 (2-step)** `coprime_actsTrivially_of_normal_and_quotient` ⭐ sorry-free (Isaacs Cor
+  3.28 経由)
   - **Lem 1.22** `normal_subgroup_card_pow_le_of_pGroup` ⭐ sorry-free 完成
   - **Lem 1.14 main** `normalizer_sup_eq_normalizer_sup_of_pGroup_coprime` ⭐ **sorry-free 完成**
   - **Lem 1.14 易方向** `le_normalizer_sup_of_normal` ⭐ sorry-free
@@ -110,7 +111,8 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
   (Sylow II in ↥(T ⊔ M)) + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` + `inf_of_le_left`
   で `MulAut.conj y.val • T = T_x` を G で取得 + `mem_sup_of_normal_left` で `y.val = m·t'` 分解
   + `t' ∈ T` で `t' · T · t'⁻¹ = T` + `m⁻¹·x ∈ N_G(T)` で集約.
-- Phase 1 完成度: Ch.1 ✅ / Ch.3 ✅ (Hall + Hall-Higman 3.21) / Ch.4 §4D 進行中 / Ch.7 §7A/§7C 着手 / Ch.5/6 進行中.
+- Phase 1 完成度: Ch.1 ✅ / Ch.3 ✅ (Hall + Hall-Higman 3.21) / Ch.4 §4D 進行中 / Ch.7 §7A/§7C 着手 / Ch.5/6
+進行中.
 -/
 
 namespace OddOrder.BG.Ch1.S01

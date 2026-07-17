@@ -30,7 +30,8 @@ to the family, with real coefficients `c`:
 Then `∑ i ∈ s, (c i)² · m i + ‖Z‖² ≤ ‖ψ‖²`.
 
 This is the geometric half of (5.6.2): the Pythagoras expansion of `‖Y‖²` against the
-orthogonal family, combined with the opening bound `‖Y‖² ≤ ‖ψ‖²` (`inner_self_Y_re_le_inner_self_psi`).
+orthogonal family, combined with the opening bound `‖Y‖² ≤ ‖ψ‖²`
+(`inner_self_Y_re_le_inner_self_psi`).
 The arithmetic half — substituting the (5.6.1) coefficients and forcing the integer `λ = 0` —
 is `int_eq_zero_of_sq_mul_le_of_two_mul_lt`. -/
 theorem sum_sq_mul_add_normSq_Z_le
@@ -320,13 +321,15 @@ theorem inner_X_conjImage_eq_zero
 
 `retarget_isCoherent_of_decomposition` consumes the lattice orthogonalities `hX_ortho`/`hXbar_ortho`
 — `⟨τ₁ ξ, X⟩ = ⟨τ₁ ξ, X̄⟩ = 0` for `ξ ∈ ℤ[S₁]` (`τ₁ := hS₁.extension`).  In the text these are the
-(5.5)+(5.2.e) facts: `X ∈ ℤ[R(χ)]` (the (5.5) output `X = ∑ coeff•α`, `X_eq`), `X̄ = X − (χ − χ̄)^τ ∈
+(5.5)+(5.2.e) facts: `X ∈ ℤ[R(χ)]` (the (5.5) output `X = ∑ coeff•α`, `X_eq`),
+`X̄ = X − (χ − χ̄)^τ ∈
 ℤ[R(χ)]` too (`(χ − χ̄)^τ = ∑_{α∈R(χ)}α`, `imageFamily.image_eq`), and for every `χᵢ ∈ S₁` the image
 `χᵢ^{τ₁}` is orthogonal to `R(χ)` (by (5.5) for `χᵢ` and (5.2.e) `R(χᵢ) ⊥ R(χ)`), so `τ₁ ξ ⊥ R(χ)`
 for every `ξ ∈ ℤ[S₁]`.
 
 The two reductions *derive* `hX_ortho`/`hXbar_ortho` from the **per-element** `R(χ)`-orthogonality
-`∀ α ∈ R(χ), ⟨η, α⟩ = 0` (the genuine (5.5)+(5.2.e) input, leaving only that as the residual coupling
+`∀ α ∈ R(χ), ⟨η, α⟩ = 0` (the genuine (5.5)+(5.2.e) input, leaving only that as the residual
+coupling
 to the family `{R(χᵢ)}`).  Stated for an arbitrary `η : CF(G)`, so the caller plugs
 `η := hS₁.extension ξ`. -/
 
@@ -389,7 +392,8 @@ arithmetic is the one Peterfalvi performs verbatim in (5.6.3):
 * `⟨X, X̄⟩ = 0` (`inner_X_conjImage_eq_zero`), and `X̄ = X − (χ − χ̄)^τ ∈ ℤ[Irr G]`.
 
 This is the constructible foundational brick of the G2.7 hstep gate: it discharges the `{X, X̄}`
-block of `retarget_isCoherent` (`hXX`/`hXbarXbar`/`hXXbar`/`hXbarX`/`hXbar_def`) plus virtual-character
+block of `retarget_isCoherent` (`hXX`/`hXbarXbar`/`hXXbar`/`hXbarX`/`hXbar_def`) plus
+virtual-character
 membership, *from* a decomposition `D`.  Producing `D` itself (the auxiliary isometry `τ₁` agreeing
 with the running coherence extension on `χ − χ̄`) is the separate, genuinely hard step. -/
 

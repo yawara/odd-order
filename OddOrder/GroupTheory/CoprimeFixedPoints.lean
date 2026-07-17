@@ -179,7 +179,8 @@ Wielandt identity holds for `H`:
 `|C_H(UE)|^{|E|} · |H| = |C_H(E)|^{|E|} · |C_H(U)|` (with `C_H(UE) = fixedSubgroup φ ⊤`).
 
 This is the inductive step of `wielandt_fixedPoint_frobenius`: the chief-step multiplicativity
-`card_fixedSubgroup_eq_mul` rewrites each ambient fixed-point count as `|C_H(X) ⊓ N| · |C_{H/N}(X)|`,
+`card_fixedSubgroup_eq_mul` rewrites each ambient fixed-point count as
+`|C_H(X) ⊓ N| · |C_{H/N}(X)|`,
 `|H| = |N| · |H/N|`, and `wielandt_card_combine` multiplies `hfac` and `hIH`. -/
 theorem wielandt_step [Finite L] [Finite H] {φ : L →* MulAut H} {U E : Subgroup L}
     {N : Subgroup H} [N.Normal] [IsSolvable H] (hN : IsAInvariant φ N)

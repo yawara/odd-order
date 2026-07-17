@@ -400,7 +400,8 @@ theorem hypothesis78_beta_conj_sub [Fintype G] [Invertible (Nat.card G : ℂ)]
   have hagree := coherence_hagree_dadeMap hyp hconj
     (F.coherence i hodd hnilp C hFrob) hzd_mem hj₁_mem
     (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
-  -- `dade.toDadeMap` on supported functions is `dadeIntegralCharacterMap hyp dade` (a `ℤ`-linear map).
+  -- `dade.toDadeMap` on supported functions is `dadeIntegralCharacterMap hyp dade` (a `ℤ`-linear
+  -- map).
   have hbridge : ∀ (φ : ClassFunction ↥(F.L i) ℂ)
       (hφ : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
           (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i)),

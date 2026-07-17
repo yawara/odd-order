@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.Machinery135
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit` (2000-line limit, issue
+0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
@@ -383,7 +384,8 @@ end GenericAlpha
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (13.5.a), base decomposition**: on `H^#`, `χ` equals the (7.7.a) `ρ`-decomposition
 `∑_{i≥1} (c̄_i / ‖ζ_i‖²) ζ_i` of the coherent datum `H_sharp_hypothesis76`.  Combines the `χ = χ^ρ`
-bridge `chiRho_eq_self_of_H_eq_bot` (TI case, `H(a) = ⊥`) with `chiRho_explicit_formula` (7.7.a).  The
+bridge `chiRho_eq_self_of_H_eq_bot` (TI case, `H(a) = ⊥`) with `chiRho_explicit_formula` (7.7.a).
+The
 full (13.5.a) point formula `χ = (a/‖ζ₁‖²)ζ₁ + α` (with `P` off the kernels of `α`) then follows by
 extracting the distinguished `ζ₁` term and grouping the `P`-kernel tail of this sum. -/
 theorem H_sharp_chiRho_eq_explicit [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -399,7 +401,8 @@ theorem H_sharp_chiRho_eq_explicit [Fintype G] [Invertible (Nat.card G : ℂ)]
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **Peterfalvi (13.5.a), point formula**: on `H^#`, the test character `χ` decomposes as the
-distinguished term `(c̄_{i₁}/‖ζ_{i₁}‖²) ζ_{i₁}` plus the **`P`-kernel tail** `α = ∑_{P⊆ker ζ_i, i≥1}`.
+distinguished term `(c̄_{i₁}/‖ζ_{i₁}‖²) ζ_{i₁}` plus the **`P`-kernel tail**
+`α = ∑_{P⊆ker ζ_i, i≥1}`.
 From the base decomposition `H_sharp_chiRho_eq_explicit` (χ = ∑_{i≥1} of the `ρ`-coefficients) one
 extracts the distinguished index `i₁` (which is `P`-non-kernel, `hi1_ker`) and drops the `S₁`-middle
 indices (`P`-non-kernel, `≠ i₁`) whose coefficients vanish by the (13.5) orthogonality hypothesis

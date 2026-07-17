@@ -289,7 +289,8 @@ theorem inertia_eq_of_freeAction [Finite H]
 
 Let `M ≤ H ⊴ G` with `M ⊴ G`, and let `q : ↥H →* ↥H̄` be a homomorphism onto a normal subgroup
 `H̄ ⊴ G/M` that realizes the quotient corestriction (`(q x : G/M) = mk' M x`).  Inflating a class
-function `θ̄` of `H̄` to `θ = θ̄ ∘ q` is **equivariant** for the conjugation actions: conjugating `θ`
+function `θ̄` of `H̄` to `θ = θ̄ ∘ q` is **equivariant** for the conjugation actions: conjugating
+`θ`
 by `g : G` equals inflating the conjugate of `θ̄` by `mk' M g`.  Consequently the inertia group of
 `θ` is the preimage of the inertia group of `θ̄`.  This is the bridge that, in Peterfalvi (6.8)(c2),
 reduces `I_L(θ) = H` for a linear `θ` to the fixed-point-free action of `W₁` on the abelian

@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
 /-!
 # InnerCompHom
 
-Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -751,7 +752,8 @@ theorem hcZeta_apply_one [Finite G] {M : Subgroup G}
 /-- **`H₀C ⊆ Ker ψ`** (`HC`-level, pointwise): every `x` in the realized `H₀C` lies in the character
 kernel of the `HC`-linear character `ψ`, since `ψ = θ ∘ hcHom` and `hcHom` kills `H₀C`
 (`hcHom_eq_one_of_mem_realizedH0supC`).  Stated *without* the induce/Fintype/Invertible instances so
-the giant `HC` term never enters a `whnf`-exploding unification; the induce-kernel step below cites it
+the giant `HC` term never enters a `whnf`-exploding unification; the induce-kernel step below cites
+it
 pointwise. -/
 theorem hcPsi_mem_characterKernel_of_mem_realizedH0supC [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
@@ -1146,7 +1148,8 @@ theorem hcZeta_induceHU_irreducible [Finite G] {M : Subgroup G}
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
       (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ)) := by
   -- `letI` (not `haveI`) keeps the instances transparent so `induceHU = ClassFunction.induce`
-  -- holds by `rfl` (matching `induceHU`'s own `letI`s); cf. the `hunfold` idiom at `reducible_count`.
+  -- holds by `rfl` (matching `induceHU`'s own `letI`s); cf. the `hunfold` idiom at
+  -- `reducible_count`.
   letI : Fintype ↥M := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
@@ -1164,7 +1167,8 @@ theorem hcZeta_induceHU_irreducible [Finite G] {M : Subgroup G}
 
 /-- **Conjunct (c) of (9.8.c), `hIM`-gated assembly**: given the not-`W₁`-fixed datum (`hIM`), the
 (9.8.c) construction `Ind_{HU}^M ζ` witnesses an irreducible `𝒮(H₀C)`-member of degree `qu`.  Bundles
-the membership (`hcZeta_induceHU_mem_sOf`), irreducibility (`hcZeta_induceHU_irreducible`), and degree
+the membership (`hcZeta_induceHU_mem_sOf`), irreducibility (`hcZeta_induceHU_irreducible`), and
+degree
 (`hcZeta_induceHU_apply_one`).  Discharging `hIM` (the free-`W₁`-orbit propagation `θ̄^{w₀}≠θ̄ ⟹
 ζ^{w₀}≠ζ`) closes conjunct (c) of `caseA_character_counts`. -/
 theorem hcZeta_exists_irreducible_sOf [Finite G] {M : Subgroup G}
@@ -1265,7 +1269,8 @@ theorem hInHuConj_bijective {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : �
 /-- **L2 result: `LiesOver`-equivariance under an `M`-fixing `m`.**  If `ζ` is fixed by `conjBy m`
 and lies over `θ₀`, then `ζ` also lies over the `φ_m`-conjugate `φθ₀ = compHom φ_m θ₀`.  Proof: the
 restriction multiplicity `⟨Res ζ, φθ₀⟩ = ⟨Res ζ, compHom φ_m θ₀⟩ = ⟨compHom φ_m (Res ζ), compHom φ_m
-θ₀⟩` (by `Res ζ = compHom φ_m (Res ζ)`, from `conjBy m ζ = ζ` and the L1 identity) `= ⟨Res ζ, θ₀⟩ ≠ 0`
+θ₀⟩` (by `Res ζ = compHom φ_m (Res ζ)`, from `conjBy m ζ = ζ` and the L1 identity) `= ⟨Res ζ, θ₀⟩ ≠
+0`
 (`inner_compHom_of_bijective`). -/
 theorem hcZeta_liesOver_compHom_of_fixed {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (m : ↥M)
@@ -1336,7 +1341,8 @@ theorem hcZeta_inertia_ne_top_of_free {M : Subgroup G} {data : TypesIIIIIIVSetup
 
 /-- **`φ_m`-analog of the inflation-conjugation commute.**  For `m ∈ M` realized by `b ∈ U W₁`
 (`↑m = ↑b`), `compHom φ_m` of an inflation equals the inflation of `typeP_conjAction b`.  Mirrors
-`conjBy_compHom_hInHuEquivH` (both reduce to `m·h·m⁻¹ = b·h·b⁻¹` in `G`), turning the `M`-conjugation
+`conjBy_compHom_hInHuEquivH` (both reduce to `m·h·m⁻¹ = b·h·b⁻¹` in `G`), turning the
+`M`-conjugation
 `compHom φ_m θ₀` of the chief-factor `θ₀` into the abstract `b`-action on `H`. -/
 theorem compHom_hInHuConj_hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (b : ↥(data.typeP.U ⊔ data.typeP.W1)) (m : ↥M) (hmb : ((m : G)) = (b : G))
@@ -1418,7 +1424,8 @@ theorem exists_uInHu_conjBy_eq_of_fixed [Finite G] {M : Subgroup G}
 If `χ` is fixed by `conjBy m` (`↑m = ↑b`, `b ∈ U ⊔ W₁`) and lies over the inflation `θ₀` of the seed
 `θbar : H̄ →* ℂˣ`, then there is a `U`-element `a` with `θbar ∘ q(a) = θbar ∘ q(b)`
 (`q = quotientMulAutHom`).  Chains the `U`-conjugation `exists_uInHu_conjBy_eq_of_fixed`, the L4
-bridge `conjBy_eq_compHom_iff_quotient` (turning it into `q(a)θbar = q(b)θbar` at the `H̄`-level), and
+bridge `conjBy_eq_compHom_iff_quotient` (turning it into `q(a)θbar = q(b)θbar` at the `H̄`-level),
+and
 `linearIrreducibleCharacter_injective` (stripping the linear wrapper).  Thus the `W₁`-twist
 `θbar ∘ q(b)` lies in the `U`-orbit `{θbar ∘ q(a) : a ∈ U}` of `θbar` — the input to the
 factor-permutation invariance of the nontrivial-`Hpart` set. -/
@@ -1461,10 +1468,12 @@ theorem exists_uPart_theta_comp_quotient_eq_of_fixed [Finite G] {M : Subgroup G}
   exact linearIrreducibleCharacter_injective (IrreducibleCharacter.ext hbridge)
 
 /-- **step 2 D₁: `Ū` preserves per-`Hpart` nontriviality** (Peterfalvi (9.8.c) surjectivity).  For a
-`U`-part element `a` (`a ∈ U ⊔ W₁` with `↑a ∈ U`), the twist `θbar ∘ q(a)` is trivial on the Clifford
+`U`-part element `a` (`a ∈ U ⊔ W₁` with `↑a ∈ U`), the twist `θbar ∘ q(a)` is trivial on the
+Clifford
 summand `Hpart i` iff `θbar` is (`q = quotientMulAutHom`).  A form-alignment wrapper over
 `caseA_uActionHom_comp_subtype_eq_one_iff`: `uActionHom data chief ⟨a, ·⟩ = quotientMulAutHom a`
-(`uActionHom` is `quotientMulAutHom ∘ U.subgroupOf.subtype`), so the `Ū`-action on the factors matches
+(`uActionHom` is `quotientMulAutHom ∘ U.subgroupOf.subtype`), so the `Ū`-action on the factors
+matches
 `q(a)`.  Combined with the orbit equality `θbar∘q(a) = θbar∘q(w)` (`exists_uPart_..._of_fixed`), this
 makes the nontrivial-`Hpart` set invariant under the `W₁`-twist `q(w)`. -/
 theorem caseA_theta_comp_quotient_uPart_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
@@ -1586,7 +1595,8 @@ theorem caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed [Finite G] {M : Subg
 
 /-- **step 2 (regularity): a reducible constituent seed is regular** (Peterfalvi (9.8.c)
 surjectivity).  If `ζ` is `M`-fixed (`I_M(ζ) = ⊤`, from reducibility of `Ind_M ζ`) and lies over the
-inflation of a nonzero seed `θbar : H̄ →* ℂˣ`, then `θbar` is *regular*: nontrivial on every Clifford
+inflation of a nonzero seed `θbar : H̄ →* ℂˣ`, then `θbar` is *regular*: nontrivial on every
+Clifford
 summand `Hpart i`.  Two steps, both via the `S₀`-aggregation
 `caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed` (`θbar ∘ q(v)` and `θbar` agree on `S₀`):
 `θbar` is nontrivial on `S₀` (else it is trivial on every `Hpart i = q(orbitRep i) • S₀`, hence on
@@ -1636,7 +1646,8 @@ theorem caseA_reducible_theta_regular [Finite G] {M : Subgroup G}
 (9.8.c)).  Chains the regularity `caseA_reducible_theta_regular` (a reducible `M`-fixed `ζ`'s
 constituent seed `θbar` is regular) into `inertia_eq_hcInHu_caseA` (a regular seed's inflation `θ₀`
 has `HU`-inertia `HC`), converting the hom-form regularity to the `IrreducibleCharacter` pointwise
-form via `comp_subtype_ne_one_iff_exists`.  This `I_{HU}(θ₀) = HC` is what makes `Ind_{HC}(hcPsi θbar)`
+form via `comp_subtype_ne_one_iff_exists`. This `I_{HU}(θ₀) = HC` is what makes
+`Ind_{HC}(hcPsi θbar)`
 irreducible (`hcZeta_irreducible`) and drives the Clifford-correspondence identification
 `ζ = Ind_{HC}(hcPsi θbar) ∈ Xθ` closing the `Xmu`-surjectivity. -/
 theorem caseA_reducible_inflation_inertia_eq [Finite G] {M : Subgroup G}
@@ -1662,9 +1673,11 @@ theorem caseA_reducible_inflation_inertia_eq [Finite G] {M : Subgroup G}
   simpa using hne
 
 /-- **Restriction transitivity** (general): for `H ≤ K ≤ G`, restricting a class function to `K`
-and then to `H` (realised in `K` as `H.subgroupOf K`) equals restricting directly to `H`, transported
+and then to `H` (realised in `K` as `H.subgroupOf K`) equals restricting directly to `H`,
+transported
 along the iso `H.subgroupOf K ≃* H`.  Foundational for the lies-over transitivity in the (9.8.c)
-Clifford-correspondence step 5 (`ξ` over `θ₀` at `H = hInHu ⊆ HC` factors through an `HC`-constituent).
+Clifford-correspondence step 5 (`ξ` over `θ₀` at `H = hInHu ⊆ HC` factors through an
+`HC`-constituent).
 Pointwise both sides are `φ` at the common `G`-image. -/
 theorem restrict_restrict_subgroupOf {Γ k : Type*} [Group Γ] [CommRing k]
     {H K : Subgroup Γ} (hHK : H ≤ K) (φ : ClassFunction Γ k) :

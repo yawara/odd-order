@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.HypothesisBasics
 /-!
 # Machinery135
 
-Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S15_SAndT_Setup.DegreesFirstSplit` (2000-line limit, issue
+0103 第 2 パス).
 -/
 
 /-!
 # Peterfalvi (13.3)-(13.5) — character degrees, first case split, generic alpha
 
-Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
@@ -458,7 +460,8 @@ theorem exists_nat_inner_self_of_mem_ZIrr {H : Type*} [Group H] [Fintype H]
 (13.5.b)).  For complex functions `f, g` on a finite index set and a real scalar `κ`,
 `∑‖κ·f + g‖² = κ²∑‖f‖² + 2κ·Re(∑ f·ḡ) + ∑‖g‖²`.  In (13.5.b) this is applied with `κ = a/‖ζ₁‖²`,
 `f = ζ₁`, `g = α` on `H#`; together with the (13.5) sum facts `∑_{H#}|ζ₁|² = |S|‖ζ₁‖² − ζ₁(1)²` and
-`∑_{H#} ζ₁ᾱ = −ζ₁(1)α(1)` it yields the (13.5.b) norm decomposition consumed by `caseB_lambda_norm_core`
+`∑_{H#} ζ₁ᾱ = −ζ₁(1)α(1)` it yields the (13.5.b) norm decomposition consumed by
+`caseB_lambda_norm_core`
 (13.6) and `caseB_eta01_norm_core` (13.8). -/
 theorem sum_normSq_real_smul_add {ι : Type*} (s : Finset ι) (κ : ℝ) (f g : ι → ℂ) :
     (∑ x ∈ s, ‖(κ : ℂ) * f x + g x‖ ^ 2)
@@ -480,7 +483,8 @@ open scoped Classical in
 /-- **Peterfalvi (13.5), `ζ₁`-norm sum** (the (13.5.b) `firstTerm`): for a function `ζ` on `S`
 vanishing outside the subgroup `H ≤ S`, the squared-norm sum over `H# = H ∖ {1}` equals the full sum
 over `S` minus the value at `1`.  In (13.5) `ζ = ζ₁` vanishes on `S − H` (induced from `H`, with `P`
-off the kernels), so combined with Parseval `∑_{x∈S}‖ζ₁‖² = |S|·‖ζ₁‖²` (`sum_normSq_eq_card_mul_inner`)
+off the kernels), so combined with Parseval `∑_{x∈S}‖ζ₁‖² = |S|·‖ζ₁‖²`
+(`sum_normSq_eq_card_mul_inner`)
 this gives `∑_{H#}|ζ₁|² = |S|‖ζ₁‖² − ζ₁(1)²`, the `firstTerm` consumed by `caseB_lambda_norm_core`
 (13.6) and `caseB_eta01_norm_core` (13.8). -/
 theorem sum_normSq_sharp_eq_total_sub_one {S : Type*} [Group S] [Fintype S]
@@ -738,7 +742,8 @@ theorem caseB_u_bound_arith {p q : ℕ} (hp : 2 ≤ p) (hq : 1 ≤ q) :
 
 In (13.6) the inflation degree satisfies `α(1) = q·b` for an integer `b`, and the bound reduces to
 `(|P|−1)·α(1)² − 2·λ(1)·α(1) = q²·((|P|−1)·b² − 2u·b) ≥ 0`, using `u ≤ (|P|−1)/2` from (13.2.c).
-This is exactly that nonnegativity `0 ≤ (|P|−1)·b² − 2u·b` (here `Pm1 = |P| − 1`), pure ℤ-arithmetic:
+This is exactly that nonnegativity `0 ≤ (|P|−1)·b² − 2u·b` (here `Pm1 = |P| − 1`), pure
+ℤ-arithmetic:
 `(|P|−1)b² − 2ub = (|P|−1−2u)·b² + 2u·b(b−1)`, both summands `≥ 0` (the first by `2u ≤ |P|−1`, the
 second since consecutive integers `b(b−1) ≥ 0`).  Carrier-free core of the (13.6) estimate. -/
 theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
@@ -757,9 +762,11 @@ theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
 
 For the irreducible `λ ∈ S` of degree `λ(1) = u q` induced from a linear character of `H = PC`
 (`‖λ‖² = 1`, `a = 1`), the (13.5) decomposition gives `s = (|S| − λ(1)²) − 2λ(1)α(1) + sₐ` where
-`s = ∑_{H#}|λ^{τ₁}|²`, `sₐ = ∑_{H#}|α|²`.  By (13.5.a)+(1.10) the correction `α(1) = q b` is divisible
+`s = ∑_{H#}|λ^{τ₁}|²`, `sₐ = ∑_{H#}|α|²`. By (13.5.a)+(1.10) the correction `α(1) = q b` is
+divisible
 by `q`, by (13.5.c) `(|P|−1)α(1)² ≤ sₐ`, and by (13.2.c) `2u ≤ |P|−1`.  The cross terms are then
-nonnegative — `−2λ(1)α(1) + (|P|−1)α(1)² = q²((|P|−1)b² − 2ub) ≥ 0` (`caseB_quadratic_nonneg`) — whence
+nonnegative — `−2λ(1)α(1) + (|P|−1)α(1)² = q²((|P|−1)b² − 2ub) ≥ 0` (`caseB_quadratic_nonneg`) —
+whence
 `|S| − λ(1)² ≤ s`.  Carrier-free arithmetic core (`Scard, Pm1, u, q` abstract naturals; the
 character-theoretic decomposition is supplied by the cascade once the (13.5) engine lands). -/
 theorem caseB_lambda_norm_core {Scard Pm1 u q : ℕ} {s sₐ lam1 : ℝ} {b : ℤ}
@@ -881,12 +888,17 @@ theorem caseB_eta_norm_bound {S : Type*} [Group S] [Fintype S]
 
 /-- **Arithmetic assembly of Peterfalvi (13.8)**: the norm lower bound `∑_{x∈H#}|η₀₁(x)|² ≥ |S'| − u²`.
 
-By (13.3.c) there are `j` and `δ = ±1` with `μ_j^{τ₁} = δ ∑_{0≤i<q} η_{i1}`, so the (13.5) hypothesis
-holds with `ζ₁ = μ_j` (degree `qu`, `‖μ_j‖² = q`), `χ = η₀₁`, `a = δ`.  The (13.5.b) decomposition then
-gives `s = firstTerm − 2δu·α(1) + sₐ` where `firstTerm = (1/q)(|S| − (qu)²/q) = |S|/q − u² = |S'| − u²`
-(as `[S:S'] = q`) and `sₐ = ∑_{H#}|α|²`.  With `(|P|−1)α(1)² ≤ sₐ` (13.5.c), `α(1) ∈ ℤ`, `δ² = 1`, and
+By (13.3.c) there are `j` and `δ = ±1` with `μ_j^{τ₁} = δ ∑_{0≤i<q} η_{i1}`, so the (13.5)
+hypothesis
+holds with `ζ₁ = μ_j` (degree `qu`, `‖μ_j‖² = q`), `χ = η₀₁`, `a = δ`. The (13.5.b) decomposition
+then
+gives `s = firstTerm − 2δu·α(1) + sₐ` where
+`firstTerm = (1/q)(|S| − (qu)²/q) = |S|/q − u² = |S'| − u²`
+(as `[S:S'] = q`) and `sₐ = ∑_{H#}|α|²`. With `(|P|−1)α(1)² ≤ sₐ` (13.5.c), `α(1) ∈ ℤ`, `δ² = 1`,
+and
 `2u ≤ |P|−1` (13.2.c), the cross terms are nonnegative — setting `b = δ·α(1)`,
-`−2δu·α(1) + (|P|−1)α(1)² = (|P|−1)b² − 2ub ≥ 0` (`caseB_quadratic_nonneg`) — whence `firstTerm ≤ s`.
+`−2δu·α(1) + (|P|−1)α(1)² = (|P|−1)b² − 2ub ≥ 0` (`caseB_quadratic_nonneg`) — whence
+`firstTerm ≤ s`.
 Carrier-free arithmetic core; the character-theoretic decomposition is supplied by the (13.5) engine. -/
 theorem caseB_eta01_norm_core {Pm1 u : ℕ} {firstTerm s sₐ : ℝ} {α1 δ : ℤ}
     (hδ : δ ^ 2 = 1)
@@ -1011,9 +1023,11 @@ theorem S_normalizes_H_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-- **Peterfalvi (13.5)/(7.1)**: the §4 Dade hypothesis for the TI-subset `(S, H^#)`.  Since `H^#` is a
 TI-subset of `G` with normalizer `S` ((8.5.a)/(8.6.a)), `S04.of_isTISubset` builds the Dade datum
-(whose local subgroups `H(a) = ⊥`) whose isometry is the `τ = Ind_S^G` powering the (13.5) ρ-machinery
+(whose local subgroups `H(a) = ⊥`) whose isometry is the `τ = Ind_S^G` powering the (13.5)
+ρ-machinery
 ((7.7.a) `chiRho_explicit_formula` applied to `(S, H^#)`).  The structural inputs `H^# ⊆ G^#` and
-`H = PC ≤ S` (`P = S_F ≤ S`, `C ≤ U ≤ M' = [S,S] ≤ S`) are discharged here; the TI/normalizer content
+`H = PC ≤ S` (`P = S_F ≤ S`, `C ≤ U ≤ M' = [S,S] ≤ S`) are discharged here; the TI/normalizer
+content
 is the §8 obligation `H_sharp_isTISubset`/`S_normalizes_H_sharp`.  The Dade foundation of the (13.5)
 engine. -/
 noncomputable def H_sharp_dadeHypothesis [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1044,9 +1058,11 @@ theorem H_sharp_hconj [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (13.5)/(7.1)**: the (7.1) ρ-hypothesis for `(S, H^#)`.  Mirrors `S14.toHypothesis71`:
-the Dade isometry `τ` is the `fullDadeIsometryData` of the (13.5) Dade datum `H_sharp_dadeHypothesis`,
+the Dade isometry `τ` is the `fullDadeIsometryData` of the (13.5) Dade datum
+`H_sharp_dadeHypothesis`,
 and conjugation invariance is `H_sharp_hconj`.  This is the (7.1) datum on which `chiRho` (the `ρ`
-map) and — once the coherence datum is supplied — the (7.7.a) `chiRho_explicit_formula` of the (13.5)
+map) and — once the coherence datum is supplied — the (7.7.a) `chiRho_explicit_formula` of the
+(13.5)
 point formula are evaluated. -/
 noncomputable def H_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1064,7 +1080,8 @@ open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 certificate.  Built from the (7.1) ρ-hypothesis `H_sharp_hypothesis71` and the Dade-isometry property
 via `S09.hypothesis76OfDade` (issue-1013: the whole `Hypothesis76`, *including* the (7.7.a)
 `chiRho_decomp`, is constructible from `(7.1)` data alone — the induced family `{Ind_H^S θ}` is the
-`exists_distinct_induced_family` enumeration, the certificate is `chiRho_decomp_induced`).  The normal
+`exists_distinct_induced_family` enumeration, the certificate is `chiRho_decomp_induced`). The
+normal
 subgroup is `H = PC ⊴ S` (`S` normalizes `H^#` ⟹ normalizes `H`).  This is the datum on which the
 (13.5.a) point formula `chiRho_explicit_formula` (7.7.a) is read off. -/
 noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ)]

@@ -100,7 +100,8 @@ theorem Hypothesis.sSet_reducible_conj_not_irr [Finite G] (hyp : Hypothesis (G :
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The two μ-columns of a reducible `𝒮`-member are distinct**: col`(η) ≠ ` col`(η̄)`, else
-`η̄ = ∑ᵢ μ_{i,col(η̄)} = ∑ᵢ μ_{i,col(η)} = η` makes `η` real, contradicting `sSet_hasNoRealCharacters`
+`η̄ = ∑ᵢ μ_{i,col(η̄)} = ∑ᵢ μ_{i,col(η)} = η` makes `η` real, contradicting
+`sSet_hasNoRealCharacters`
 (the family is no-real by `oddCardS`). -/
 theorem Hypothesis.sSet_reducible_columns_ne [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
@@ -125,9 +126,11 @@ open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Member−conjugate difference support** (Clifford-case-agnostic; issue 1017): for any member
 `η ∈ 𝒮 = sSet`, `(η̄ − η).support ⊆ A(S)`.  Since `η = Ind_{HU}^S ξ` (`ξ ∈ 𝒳`) this is the landed
-`sSet_member_diffsupp`, which holds for *both* Clifford cases: a member and its conjugate always share
+`sSet_member_diffsupp`, which holds for *both* Clifford cases: a member and its conjugate always
+share
 the real, positive degree `η̄(1) = η(1)`, so `1 ∉ Supp(η̄ − η)`.  This frees the `R`-family
-diff-support input from the caseB-uniformity route `sSet_caseB_member_diff_supported` (which derives the
+diff-support input from the caseB-uniformity route `sSet_caseB_member_diff_supported` (which derives
+the
 equal degree from `caseB`), so the *same* per-member `R`-family serves caseA and caseB. -/
 theorem Hypothesis.sSet_member_conjDiff_supported [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
@@ -145,7 +148,8 @@ open scoped FiniteInduce in
 reducible caseB `R`-family): for a reducible `η = ∑ᵢ μ_{ij} ∈ 𝒮` with conjugate `η̄ = ∑ᵢ μ_{ik}`
 (`j ≠ k`, both `≠ 0`), the honest `'A(S)`-Dade image is `τ_S(η − η̄) = ∑ᵢ(η_{ij} − η_{ik})`.
 
-The column difference `η − η̄` is `A(S)`-supported (`sSet_caseB_member_diff_supported`), so the honest
+The column difference `η − η̄` is `A(S)`-supported (`sSet_caseB_member_diff_supported`), so the
+honest
 `τ_S` (`dadeHypS`) agrees there with `Ind_S^G` (`sInstance_dade_eq_induce`) and hence with the
 `'A0`-Dade `τ_S⁰` (`dadeHypS0`, `sInstance_dade0_eq_induce`, since `A(S) ⊆ A₀(S)`); the per-row
 prime-`TI` cross-relation `tauS_mu_cross` then evaluates `τ_S⁰(μ_{ij} − μ_{ik}) = η_{ij} − η_{ik}`,
@@ -413,7 +417,8 @@ open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Per-member orthonormal Dade `R`-family for a REDUCIBLE `𝒮`-member** (route B; the honest
 `S`-instance analogue of the M-side column branch of `caseB_sOf_memberRFamily`).  The thin wrapper
-over `…_ofColumns` that dispatches `η, η̄` to their μ-columns `j = ` col`(η)`, `k = ` col`(η̄)` via the
+over `…_ofColumns` that dispatches `η, η̄` to their μ-columns `j = ` col`(η)`, `k = ` col`(η̄)` via
+the
 (9.11) reverse dichotomy `sSet_reducible_eq_muColumnSum` (`.choose`), with `j ≠ k` from
 non-realness.  See `…_ofColumns` for the family content. -/
 noncomputable def Hypothesis.sSet_reducible_memberRFamily [Finite G]
@@ -442,10 +447,13 @@ open scoped FiniteInduce in
 /-- **Per-member orthonormal Dade `R`-family over `𝒮 = sSet`** (issue 1017, the `R` input of the (5.7)
 coherence engine `uniform_degree_coherence_of_families`, the honest `S`-instance analogue of the
 M-instance `caseB_sOf_memberRFamily`, `S13_MaximalIII_IV.lean:546`).  **Clifford-case-agnostic**: the
-construction depends on nothing beyond `η ∈ 𝒮` and its conjugate (the two Clifford cases were only ever
-threaded to obtain the member+conjugate equal-degree fact, which is automatic — `η̄(1) = η(1)`), so the
+construction depends on nothing beyond `η ∈ 𝒮` and its conjugate (the two Clifford cases were only
+ever
+threaded to obtain the member+conjugate equal-degree fact, which is automatic — `η̄(1) = η(1)`), so
+the
 *same* `R`-family feeds both the caseB Galois engine (`sSet_coherent_dade_caseB`) and the caseA
-non-Galois (9.11.7)–(9.11.8) coherent-pair budget.  Every member is dispatched to its (5.2.d) `R`-datum:
+non-Galois (9.11.7)–(9.11.8) coherent-pair budget. Every member is dispatched to its (5.2.d)
+`R`-datum:
 
 * **irreducible member `η`** — the 2-element signed Dade image family
   `dadeOrthonormalCharacterImageFamilyOfDiff` (`η^τ − η̄^τ = ε·(μ − ν)`), assembled sorry-free from
@@ -483,7 +491,8 @@ noncomputable def Hypothesis.sSet_memberRFamily [Finite G]
   · -- reducible member (`η = μ_j`): the `2q`-element signed-η `R`-family, built above by route B
     -- (`sSet_reducible_memberRFamily`), verified sorry-free (`tauS_mu_cross` +
     -- `mu_reducible_dichotomy`).  Route A (`certainTypeR`) is genuinely inapplicable on the S-side
-    -- (`hyp.mu` from `certainTypeS`, ungrounded), but route B is buildable from the abstract fields —
+    -- (`hyp.mu` from `certainTypeS`, ungrounded), but route B is buildable from the abstract fields
+    -- —
     -- refuting the prior (748e6a27) "9014-blocked" record.
     exact hyp.sSet_reducible_memberRFamily hG hnoV hη hirr
 

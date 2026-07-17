@@ -3,13 +3,15 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Basics
 /-!
 # ElemAbelianNeighbor
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 
 /-!
 # BG Lemma 14.1 / Proposition 14.2 — local structure of type-P members
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
+split, issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -1065,7 +1067,8 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI.  `IsTypeP2 M` forces
       -- `U = E₂E₃ ≠ 1` (`E23_ne_bot_of_isTypeP2_caseTau1`); the Frobenius core
       -- (`sigma_eq_beta_and_prime_card_E1_of_caseTau1`) gives `σ = β` and `|K|` prime via
-      -- Theorem 3.10(a); the TI clause follows from `σ = β` (`isTISubset_sigmaSharp_of_sigma_eq_beta`).
+      -- Theorem 3.10(a); the TI clause follows from `σ = β`
+      -- (`isTISubset_sigmaSharp_of_sigma_eq_beta`).
       intro hP2
       have hKstar_ne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≠ ⊥ :=
         Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg

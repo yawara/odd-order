@@ -553,7 +553,8 @@ private theorem exists_sylow_le_of_mem_sigma [Finite G]
     have hYM : Y ≤ M := le_trans inf_le_left hP
     have hYpg : IsPGroup p ↥Y :=
       S.2.of_injective (Subgroup.inclusion (inf_le_right)) (Subgroup.inclusion_injective _)
-    -- `Y.subgroupOf M` is a `p`-group `⊇ P`, hence `= P` by Sylow maximality; mapping back, `Y = P̄`.
+    -- `Y.subgroupOf M` is a `p`-group `⊇ P`, hence `= P` by Sylow maximality; mapping back,
+    -- `Y = P̄`.
     have hPle : (P : Subgroup ↥M) ≤ Y.subgroupOf M :=
       hPbar_subOf ▸ Subgroup.comap_mono (f := M.subtype) hgrow.le
     have hYsubM_pg : IsPGroup p ↥(Y.subgroupOf M) :=

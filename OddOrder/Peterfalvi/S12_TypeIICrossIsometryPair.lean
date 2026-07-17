@@ -16,7 +16,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 
 The pair-witness production of the (10.7) cross-isometry package
 (`TypeIICrossIsometryData`): at the `M`-seeded canonical pair (`T = M`,
-`Kstar = hyp.typeP.W1`, `exists_section16MaximalPairCore_around` — the order-free `Core` form, issue 1020 Phase 1a), with the §9 setup of the
+`Kstar = hyp.typeP.W1`, `exists_section16MaximalPairCore_around` — the order-free `Core` form, issue
+1020 Phase 1a), with the §9 setup of the
 type-II member `mp.S` wired to the pair (`exists_typesIIIIIIVSetup_Sdata`), the
 character-theoretic fields are **produced**, not posited:
 

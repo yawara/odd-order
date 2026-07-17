@@ -12,13 +12,15 @@ import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 # Peterfalvi (9.7)(a): the non-Galois imprimitive `u`-bound `u ≤ (p^q − 1)/(p − 1)`
 
 The non-Galois branch of the `typeP_Galois` `u`-bound dichotomy (issue 9000, W2 instance tail).  When
-the `U`-action on the chief factor `H̄ = H/N` is imprimitive (Clifford case (a), `CliffordCaseAData`),
+the `U`-action on the chief factor `H̄ = H/N` is imprimitive (Clifford case (a),
+`CliffordCaseAData`),
 `H̄` decomposes into `q` order-`p` blocks `Hpart i` permuted by `W₁`, and the image `Ū` embeds into
 `ℤ_{p-1}^{q-1}` via the block-scalar ratios, giving `|Ū| ≤ (p-1)^{q-1} ≤ (p^q-1)/(p-1)`.
 
 This routes the S11 case-(a) block data through the generic σ-theory engine
 `card_le_cyclotomicQuotient_of_blocks` (`TypePGaloisUBound`), via the subgroup→subrepresentation
-bridge `aInvariantSubrep`.  The only genuinely §9-specific input is the "no global scalar" injectivity
+bridge `aInvariantSubrep`. The only genuinely §9-specific input is the "no global scalar"
+injectivity
 (Coq `psi`, `PFsection9.v:442`) — the Frobenius fixed-point-freeness of the `W̄₁`-action on `Ū` —
 proved below by turning a common block scalar into a central automorphism and applying the descended
 Frobenius action (see `notes/peterfalvi/s11_9_7a_imprimitive_ubound.md`).

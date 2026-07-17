@@ -12,7 +12,8 @@ The `retarget` machinery of `S07_Coherence` (`orthoResidualMap`/`retarget`/`reta
 builds the (5.6.3) coherence extension for an **orthonormal** break pair `{χ, χ̄}` (`‖χ‖² = 1`): the
 Gram–Schmidt projection uses `⟨φ, χ⟩` directly, which is correct only when `‖χ‖² = 1`.
 
-For a **reducible** break character (the certain-type column `μ_j`, `‖μ_j‖² = w₁ > 1`) the projection
+For a **reducible** break character (the certain-type column `μ_j`, `‖μ_j‖² = w₁ > 1`) the
+projection
 coefficient is `⟨φ, χ⟩ / ‖χ‖²`.  Over the integral lattice this is still well-defined: on
 `ℤ[S₁ ∪ {χ, χ̄}]` (with `χ ⊥ S₁`, `χ ⊥ χ̄`) any `φ` has `⟨φ, χ⟩ = m·‖χ‖²` for the integer
 coordinate `m`, so `⟨φ, χ⟩ / ‖χ‖² = m ∈ ℤ`.  The functional `innerLeftℤ χ` is `ℂ`-valued, so the
@@ -330,7 +331,8 @@ end Apply
 
 The `‖χ‖² ≠ 1` analogue of `retarget_isCoherent`.  Given a coherent `τ` on `S₁`
 (`τ₁ := hS₁.extension`), a conjugate pair `{χ, χ̄}` disjoint from and orthogonal to `S₁` with
-`‖χ‖² ≠ 0`, `‖χ̄‖² ≠ 0`, and the (5.4)/(5.5)/(5.6.2) target data `{X, X̄} ⊂ ℤ[Irr G]` with **matching
+`‖χ‖² ≠ 0`, `‖χ̄‖² ≠ 0`, and the (5.4)/(5.5)/(5.6.2) target data `{X, X̄} ⊂ ℤ[Irr G]` with
+**matching
 Gram** `⟨X,X⟩ = ⟨χ,χ⟩`, `⟨X̄,X̄⟩ = ⟨χ̄,χ̄⟩` (and `X̄ = X − (χ−χ̄)^τ`, both `⊥ τ₁(ℤ[S₁])`, plus the
 (5.6.2) image equation), the union `S₁ ∪ {χ, χ̄}` is coherent.
 
@@ -449,8 +451,10 @@ structure RetargetTargetPairGen (D : CharacterPsiDecomposition (L := L) (G := G)
 
 open scoped Classical in
 /-- **Peterfalvi (5.6.3): the Gram-matched target pair `{X, X̄}` for a reducible `χ`.**
-The `‖χ‖² ≠ 1` analogue of `retargetTargetPair`: from the (5.5) decomposition `D` and the source-pair
-orthogonality `⟨χ,χ̄⟩ = ⟨χ̄,χ⟩ = 0`, `(5.5)` gives `X = ∑_{α∈E} α` with `|E| = ‖χ‖²`, so `‖X‖² = ‖χ‖²`;
+The `‖χ‖² ≠ 1` analogue of `retargetTargetPair`: from the (5.5) decomposition `D` and the
+source-pair
+orthogonality `⟨χ,χ̄⟩ = ⟨χ̄,χ⟩ = 0`, `(5.5)` gives `X = ∑_{α∈E} α` with `|E| = ‖χ‖²`, so
+`‖X‖² = ‖χ‖²`;
 the source-pair norm `|R(χ)| = ‖χ − χ̄‖² = ‖χ‖² + ‖χ̄‖²` then gives
 `‖X̄‖² = |R(χ)| − |E| = ‖χ̄‖²`.  No `‖χ‖² = 1` assumption. -/
 noncomputable def retargetTargetPair_gen

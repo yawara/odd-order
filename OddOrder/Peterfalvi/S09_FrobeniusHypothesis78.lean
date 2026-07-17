@@ -9,7 +9,8 @@ import OddOrder.Peterfalvi.S09_FrobeniusSibley
 # Peterfalvi (7.8) for a Frobenius family — assembling the `Hypothesis78`
 
 Downstream of `S09_FrobeniusSibley` (the (6.8) coherent extension `ν = coherence.extension` for the
-induced family `S = {Ind_{H_i}^{L_i} θ | θ ≠ 1}`): each `FrobeniusFamily` member `i` carries the full
+induced family `S = {Ind_{H_i}^{L_i} θ | θ ≠ 1}`): each `FrobeniusFamily` member `i` carries the
+full
 Peterfalvi (7.8) structure `Hypothesis78 G (H_i^#) L_i`.  This is the (7.8) hypothesis whose (7.8.b)
 norm bound `zetaNuRhoNormSq_ge_of_facts` feeds the `card_G0_lower_bound` (7.10) character estimate
 (issue 0044).
@@ -17,13 +18,15 @@ norm bound `zetaNuRhoNormSq_ge_of_facts` feeds the `card_G0_lower_bound` (7.10) 
 Mirrors the §12→§7 witness assembly `S14.witness_L_hypothesis78`:
 * the (6.8) coherence `F.coherence` supplies `ν = coh.extension`, whose
   `IsCoherent.extension_inner_eq`/`extends_on_supported` give the `nu_isometry` (via
-  `coherence_extension_inner_eq_on_family`) and the (7.8.a) agreement (via `coherence_hagree_dadeMap`);
+  `coherence_extension_inner_eq_on_family`) and the (7.8.a) agreement (via
+  `coherence_hagree_dadeMap`);
 * a nontrivial **linear** character of the nilpotent kernel `K_i = (H_i).subgroupOf L_i` gives the
   distinguished induced `χ = Ind θ_lin` of degree `[L_i:K_i]`, placed at index `0` by
   `exists_placed_induced_family` with the trivial char `1_{K_i}` at `ind1H ≠ 0`;
 * the support `A = H_i^#` (`sharpImage_subgroupOf_eq`) and degree coefficients `d_i = θ_i(1)`.
 
-The `Hypothesis71` fed to `hypothesis78OfDade` is `sibleyToHypothesis71`, whose `τ` is the coherence's
+The `Hypothesis71` fed to `hypothesis78OfDade` is `sibleyToHypothesis71`, whose `τ` is the
+coherence's
 Dade map `(dade.fullDadeIsometryData hconj).toDadeIsometryData.toDadeMap` (matching
 `coherence_hagree_dadeMap` definitionally) — mirroring `S14.Hypothesis.toHypothesis71`.
 -/
@@ -73,7 +76,8 @@ namespace FrobeniusFamily
 variable {G : Type*} [Group G] {k : ℕ}
 
 /-- **The (7.1) datum with the coherence's Dade map** (mirrors `S14.Hypothesis.toHypothesis71`).
-Its `τ = (dade.fullDadeIsometryData hconj).toDadeIsometryData.toDadeMap` is *definitionally* the Dade
+Its `τ = (dade.fullDadeIsometryData hconj).toDadeIsometryData.toDadeMap` is *definitionally* the
+Dade
 map for which `F.coherence` is coherent (`coherence_hagree_dadeMap` produces exactly this), so it is
 the `Hypothesis71` to feed `hypothesis78OfDade` alongside `ν = F.coherence.extension`. -/
 noncomputable def sibleyToHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -93,7 +97,8 @@ noncomputable def sibleyToHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
 
 /-- **The distinguished character for the `i`-th Frobenius member** (Peterfalvi (7.8)/(12.13) analog).
 The Sibley family `S = {Ind θ | θ ∈ Irr K_i, θ ≠ 1}` contains a member of degree `[L_i:K_i]`, namely
-`Ind_{K_i}^{L_i} θ` for a nontrivial **linear** `θ`.  Exists because `K_i = (H_i).subgroupOf L_i` is a
+`Ind_{K_i}^{L_i} θ` for a nontrivial **linear** `θ`. Exists because `K_i = (H_i).subgroupOf L_i` is
+a
 nontrivial nilpotent group (`hnilp` + `hFrob.ne_bot_kernel`), hence not perfect
 (`exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`); `induce_apply_one` gives
 the induced degree `[L_i:K_i]·1`. -/
@@ -173,7 +178,8 @@ noncomputable def hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
   -- The type-I support `A(L_i) = H_i^#`.
   have hAH : OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))
       = (F.H i : Set G) \ {1} := F.sharpImage_subgroupOf_eq i
-  -- The placed induced family (as data), exposed via `sibleyPlacedFamily` (defeq to the inline `pf`).
+  -- The placed induced family (as data), exposed via `sibleyPlacedFamily` (defeq to the inline
+  -- `pf`).
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
   have hχdeg : (Classical.choose (F.exists_sibley_distinguished_char i hodd hnilp C hFrob))
       (1 : ↥(F.L i)) = (((F.H i).subgroupOf (F.L i)).index : ℂ) :=

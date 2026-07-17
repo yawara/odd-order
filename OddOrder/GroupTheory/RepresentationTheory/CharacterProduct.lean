@@ -342,7 +342,8 @@ theorem eq_sum_of_inner_eq_one_of_inner_self_eq_card {G : Type*} [Group G] [Fini
   exact Finset.sum_congr rfl fun χ hχ => by rw [h1 χ hχ, one_smul]
 
 /-- **An abelian group has exactly `|G|` irreducible characters.**  For a finite commutative group
-every conjugacy class is a singleton (`isConj_iff_eq`), so `|ConjClasses G| = |G|`, and the number of
+every conjugacy class is a singleton (`isConj_iff_eq`), so `|ConjClasses G| = |G|`, and the number
+of
 irreducible characters equals the number of conjugacy classes (`card_irreducibleCharacter_eq`).  In
 Gallagher's theorem this counts `|Irr(I/H)| = [I:H]` — the number of linear characters `β` twisting
 `χ` — so the `[I:H]` distinct constituents `χ·Inf(β)` exhaust `Ind_H^I θ`. -/

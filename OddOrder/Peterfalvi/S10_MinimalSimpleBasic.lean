@@ -388,7 +388,8 @@ theorem escaping_sigma_disjoint_centralizer [Finite G]
 /-- **Peterfalvi (8.13.c1) at a `σ`-sharp escaping point** — the `σ`-decomposition-generic core of
 `escaping_typeIA_signalizer_structure`, shared by every Peterfalvi type.  For `a ∈ M_σ^#` with
 `C_G(a) ⊄ M`, the signalizer `R(a) = FT_signalizer a` gives `C_G(a) = R(a) ⋊ C_M(a)`:
-- join `C_G(a) = R(a) ⊔ C_M(a)`, disjointness `R(a) ⊓ C_M(a) = ⊥`, and normality of `R(a)` in `C_G(a)`.
+- join `C_G(a) = R(a) ⊔ C_M(a)`, disjointness `R(a) ⊓ C_M(a) = ⊥`, and normality of `R(a)` in
+`C_G(a)`.
 
 The escaping hypothesis forces `1 < |𝓜_σ(a)|` (`centralizer_le_of_maximalSigma_le_one`), so the
 supporting maximal is pinned (`N[a] = FT_signalizerBase a`, singleton uniqueness) and Theorem D(3)'s
@@ -1122,7 +1123,8 @@ theorem centralizer_typePV_le_M {M : Subgroup G} (data : TypePData M) {v : G}
 
 /-- **Peterfalvi (8.13.b) for the type-`P₁` `A_0`-support**: an escaping point of
 `A_0(M) = A(M) ∪ V^M` is `σ`-sharp.  The exceptional `V^M`-points are non-escaping
-(`centralizer_typePV_le_M`: `C_G(m·v·m⁻¹) = m·C_G(v)·m⁻¹ ≤ M`), so an escaping point of `A_0` lies in
+(`centralizer_typePV_le_M`: `C_G(m·v·m⁻¹) = m·C_G(v)·m⁻¹ ≤ M`), so an escaping point of `A_0` lies
+in
 `A(M) = M_σ^#` (`typePA_eq_sigmaSharp_of_isTypeP1`).  This is the `(8.13.b)` reduction the `σ`-sharp
 Dade engine needs to cover the full `A_0(M)` support (not just `A_1 = M_σ^#`) for type `P₁`. -/
 theorem escaping_typePA0_mem_sigmaSharp_of_isTypeP1 [Finite G]
@@ -1336,7 +1338,8 @@ theorem typePA0_isConj_conj_in_M_of_isTypeP1 [Finite G]
 
 /-- **(8.13.c2) coprimality for the exceptional `V^M`-support** (type `P₁`): for escaping
 `a ∈ M_σ^#` and a `V^M`-point `b`, `|R(a)|` is coprime to `|C_M(b)|`.  `C_M(b)` is `M`-conjugate to
-`C_M(v) = W` (`v ∈ V`: `C_G(v) = N_G(⟨v⟩) = W` by `normalizer_V`, using `W` abelian for `⊇`); picking
+`C_M(v) = W` (`v ∈ V`: `C_G(v) = N_G(⟨v⟩) = W` by `normalizer_V`, using `W` abelian for `⊇`);
+picking
 a nonidentity `w ∈ W₂ ⊆ M_σ^#`, `W ≤ C_M(w)` (abelian), so the `σ`-sharp coprimality
 (`escaping_sigmaSharp_disjoint_centralizer`) at `w` kills every common prime.  This reduces the
 exceptional-support coprimality to the σ-sharp one — the `V^M` half of the engine's
@@ -1644,7 +1647,8 @@ theorem ftSupportKernel_conj_smul_escaping_sigmaSharp [Finite G]
 
 /-- **Faithful (8.15) datum for an `M`-invariant `X ⊆ M` whose escaping points are `σ`-sharp**
 (the general `σ`-decomposition engine).  Generalises `dadeSupportHypothesisData_of_subset_sigmaSharp`
-from `X ⊆ M_σ^#` to `X ⊆ M` with escaping points in `M_σ^#`, taking the `(8.13.a)` `conj_in_L` and the
+from `X ⊆ M_σ^#` to `X ⊆ M` with escaping points in `M_σ^#`, taking the `(8.13.a)` `conj_in_L` and
+the
 `(8.13.c2)` coprimality as inputs (the escaping structure `(8.13.c1)` is still the `σ`-generic
 `escaping_sigmaSharp_signalizer_structure`).  Instantiated at `X = A_0(M)` for type `P₁`. -/
 theorem dadeSupportHypothesisData_of_subset_escaping_sigmaSharp [Fintype G]
@@ -1824,7 +1828,8 @@ for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`.
 `A(M) = ⋃_{x∈M_s^#} C_{M'}(x)^#` indexed over the **core** `M_s^# = M_σ^#`.  For `P₁` (`M_σ = M'`)
 this equals `(M')^#`, which is exactly `typePA` (`typePA_eq_sigmaSharp_of_isTypeP1`).  For `P₂`
 (type II, `M_σ = M_F ⊊ M'`) the correct `A(M)` is *strictly smaller* than `(M')^#`: it excludes the
-Frobenius-complement points `U^#` (which have `C_{M_σ} = 1`).  Since `typePA` models the full `(M')^#`
+Frobenius-complement points `U^#` (which have `C_{M_σ} = 1`). Since `typePA` models the full
+`(M')^#`
 (the `.mmd` extraction of (8.10) dropped the `M_s → M` subscript — see 9008), the `P₂` Dade support
 over `typePA` is **false-as-stated**: those `U^#` points can escape `M` yet are not `σ`-sharp,
 violating (8.13.b).  It also has **no on-path consumer** — the sole intended consumer

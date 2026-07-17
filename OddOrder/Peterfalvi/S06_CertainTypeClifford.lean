@@ -757,7 +757,8 @@ theorem induce_restrict_certainType_eq [NeZero (Nat.card h.W1)]
 For `χ ∈ Irr(K)` not one of the `χ_j`, `Ind^L_K χ` is irreducible, distinct from every `μ_{ij}`,
 and every irreducible character of `L` is some `μ_{ij}` or such an `Ind^L_K χ`.  The heart is the
 *inertia* computation `I_L(χ) = K`: a character not among the `χ_j` is fixed by no `g ∈ W₁^#`
-(`card_fixed_irr_le_W2` says `g` fixes at most `w₂` irreducibles, and the `w₂` distinct `χ_j` already
+(`card_fixed_irr_le_W2` says `g` fixes at most `w₂` irreducibles, and the `w₂` distinct `χ_j`
+already
 exhaust them), and the complement `L = K ⋊ W₁` then forces the inertia group down to `K`. -/
 
 omit [Fintype L] in
@@ -798,7 +799,8 @@ theorem chiRestrict_isFixedPt [NeZero (Nat.card h.W1)]
   exact ClassFunction.conjBy_restrict g ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
 
 /-- **The `χ_j` are distinct** (injective in the column `χ₂`): if `χ_j = χ_{j'}` then their
-inductions `μ_j = ∑_i μ_{ij}` and `μ_{j'} = ∑_i μ_{ij'}` coincide (`induce_restrict_certainType_eq`),
+inductions `μ_j = ∑_i μ_{ij}` and `μ_{j'} = ∑_i μ_{ij'}` coincide
+(`induce_restrict_certainType_eq`),
 but `⟨μ_j, μ_{0j}⟩ = 1` while `⟨μ_{j'}, μ_{0j}⟩ = 0` for `j ≠ j'` (cross-column orthogonality
 `columnFamily_mu_ne`), a contradiction. -/
 theorem chiRestrict_injective [NeZero (Nat.card h.W1)] :
@@ -876,9 +878,12 @@ theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
   exact ⟨χ₂, Subtype.ext_iff.mp hχ₂⟩
 
 /-- **The reducible-inducing column `chiRestrict χ₂` is `L`-invariant** (issue 1012, W₁-stability for
-(9.9.b)): `chiRestrict χ₂ = Res_K μ` is the restriction of the `L`-character `μ = (columnFamily χ₂).mu 0`
-(`coe_chiRestrict`), so conjugation by any `g ∈ L` fixes it (`μ` is a class function of `L`, invariant
-under `L`-conjugation).  This `L`-inertia-stability is the source↔image bijection input of the (9.9.b)
+(9.9.b)): `chiRestrict χ₂ = Res_K μ` is the restriction of the `L`-character
+`μ = (columnFamily χ₂).mu 0`
+(`coe_chiRestrict`), so conjugation by any `g ∈ L` fixes it (`μ` is a class function of `L`,
+invariant
+under `L`-conjugation). This `L`-inertia-stability is the source↔image bijection input of the
+(9.9.b)
 reducible count: `induce` is injective on the reducible-inducing columns
 (`induce_injective_of_inertia_stable`), since each is fixed by all of `L`. -/
 theorem chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
@@ -967,7 +972,8 @@ certain-type character `μ_{ij}` or `Ind^L_K χ` for some `χ ∈ Irr(K)` not am
 
 Pick an irreducible constituent `θ` of `Res^L_K μ` (`exists_liesOver`); then `μ` is a constituent of
 `Ind^L_K θ` (`inner_induce_ne_zero_iff_liesOver`).  If `θ = χ_j` then `Ind^L_K θ = μ_j = ∑_i μ_{ij}`
-(`induce_restrict_certainType_eq`), so `μ = μ_{ij}` for some `i`.  Otherwise `Ind^L_K θ` is irreducible
+(`induce_restrict_certainType_eq`), so `μ = μ_{ij}` for some `i`. Otherwise `Ind^L_K θ` is
+irreducible
 (`induce_isIrreducible_of_forall_chiRestrict_ne`), hence equals `μ`. -/
 theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : IrreducibleCharacter L) :
     (∃ χ₂ i, (h.columnFamily χ₂).mu i = μ) ∨

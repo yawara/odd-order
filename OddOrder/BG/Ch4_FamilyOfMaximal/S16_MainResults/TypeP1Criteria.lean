@@ -3,13 +3,15 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE
 /-!
 # TypeP1Criteria
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TypeBridges` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 
 /-!
 # BG Proposition 16.1 forward bridges — shared type data の構成
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split,
+issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
@@ -137,9 +139,11 @@ theorem normalizer_fittingInAmbient_eq_self [Finite G]
 /-- **Prop 16.1(a) `alternative` disjunct (i), TI case** (Peterfalvi (8.3)(a)): if the Fitting
 subgroup `F(M)` of a maximal `M` is `TI` (`FittingIsTI M`), then its nilpotent normal Hall core
 `M_F#` is a `TI`-subset with normalizer `N_G(M_F)`.  Since `M_F ≤ F(M)`, an overlap `a, gag⁻¹ ∈ M_F#`
-is an overlap in `F(M)#`, so `FittingIsTI` forces `g ∈ N_G(F(M)) = M` (`normalizer_fittingInAmbient_eq_self`);
+is an overlap in `F(M)#`, so `FittingIsTI` forces `g ∈ N_G(F(M)) = M`
+(`normalizer_fittingInAmbient_eq_self`);
 and `M_F ⊴ M` gives `M ≤ N_G(M_F)`, whence `g ∈ N_G(M_F)`.  This supplies the first disjunct of the
-`TypeIData.alternative` field in the `F(M)`-TI case of the `hFI` bridge of `proposition_type_classification`
+`TypeIData.alternative` field in the `F(M)`-TI case of the `hFI` bridge of
+`proposition_type_classification`
 (the non-TI case is the deeper BG Theorem 15.7(e) trichotomy, `fitting_not_ti_cases`). -/
 theorem maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
@@ -790,7 +794,8 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · -- `F(M)` not TI ⟹ BG Theorem 15.7(e) trichotomy.  For type `F` the type-`P₁` case (e3) is
     -- excluded, leaving disjunct (b) (`M_F` abelian of rank 2) or (c) (exponent / cyclic-`O_{p'}`).
     rw [td.H_eq]
-    -- The non-TI witness: `g ∉ M`, prime `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`, `rank (M_F ⊓ C_G(X₁)) < 3`.
+    -- The non-TI witness: `g ∉ M`, prime `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
+    -- `rank (M_F ⊓ C_G(X₁)) < 3`.
     obtain ⟨g, p, X₁, hgM, hp, _hpσ, hX₁card, hX₁Mσ, hX₁cMσ, _hCGnotM, hrank3⟩ :=
       exists_inf_conj_fitting_orderP_witness hG hM hTI
     haveI : Fact p.Prime := ⟨hp⟩
@@ -961,7 +966,8 @@ def typePData_of_inputs {M H U W1 W2 : Subgroup G}
         normalizer_eq_sup_of_isTISubset_of_isCyclic hWcyc hTI hXne hXV }
 
 /-- **The `W₂ = C_{M'}(W₁#)` centralizer law** (BG Theorem C / Peterfalvi (8.4), the `TypePData`
-`centralizer_W1` field): for a type-`P` maximal subgroup with cyclic `κ`-Hall `K`, the `M'`-centralizer
+`centralizer_W1` field): for a type-`P` maximal subgroup with cyclic `κ`-Hall `K`, the
+`M'`-centralizer
 of every `k ∈ K#` is exactly `K* = C_{M_σ}(K)`.  Sharpens Theorem A(5) (`C_M(k) = K ⊔ K*`,
 `typeP_centralizer_kappaElement_eq`) by intersecting with `M'`: since `K* ≤ M'` and `K ⊓ M' = ⊥`
 (the `M = M' ⋊ K` complement has coprime orders, Theorem 14.7(h)), the modular law gives
@@ -1035,10 +1041,12 @@ the proven §14/§15 structure and gating only on the genuinely-deep **`M_F`-int
   (`typeP_derivedInG_inf_centralizer_kappaElement_eq` = Theorem A(5) + Dedekind); plus
   `hHeq`/`hHle`/`hW1le`/`hW1ne`), with `W₁ = K`, `W₂ = K*`, `W = K ⊔ K*`, `H = M_F`;
 * gated (named residuals): the `M_F`-internal complement `U` (`M' = M_F ⊔ U`, `U` nilpotent and
-  normalized by `W₁` — `hUle`/`hKnorm`/`hUnilp`/`hDcompl`; issue 7008: `U ⊴ M'` is unfaithful) and the
+  normalized by `W₁` — `hUle`/`hKnorm`/`hUnilp`/`hDcompl`; issue 7008: `U ⊴ M'` is unfaithful) and
+  the
   real Fitting decomposition `F(M) = M_F ⊔ (U ⊓ C_M(M_F))` (`hSDfit`/`hFiteq`).
 
-This single construction feeds all three of `hP2II`/`hP1neIIIIV`/`hP1eqV` (types II/III/IV/V bundle a
+This single construction feeds all three of `hP2II`/`hP1neIIIIV`/`hP1eqV` (types II/III/IV/V bundle
+a
 `TypePData`); the gated residuals are exactly the `M_F`-internal structure not present in
 `typeP_auxiliary_structure`'s `M' = U M_σ` decomposition. -/
 noncomputable def typePData_of_isTypeP_of_inputs [Finite G]
@@ -1193,7 +1201,8 @@ carrier-constructibility milestone: every such maximal subgroup carries a Peterf
 
 The `M_F`-internal complement `U` (`M' = M_σ = M_F ⊔ U`, `M_F ⊓ U = ⊥`, `K ≤ N_G(U)`) is supplied by
 `exists_typeP1_mf_complement` (`K`-invariant Schur–Zassenhaus); the four deep `U`/Fitting fields are
-the new BG Corollary 15.5 lemmas: `U` is nilpotent (`isNilpotent_complement_of_isTypeP1_mf_ne_msigma`,
+the new BG Corollary 15.5 lemmas: `U` is nilpotent
+(`isNilpotent_complement_of_isTypeP1_mf_ne_msigma`,
 `U ≅ M_σ/M_F`), `U` is a genuine `M'`-complement (`isComplement'_mf_complement_of_sup_inf`), and the
 Fitting decomposition `F(M) = M_F ⊔ (U ⊓ C_M(M_F))` (`fittingInAmbient_eq_mf_sup_inf_of_…`, whence
 `M'' ≤ F(M)` gives `hSDfit`).  Fed to the gated-endpoint `typePData_of_isTypeP_of_inputs`.  Mirrors
@@ -1334,9 +1343,11 @@ theorem isTypeII_of_isTypeP2_of_derived_typeF [Finite G]
 derived subgroup `M' = M^{(1)}` of a type-`P₂` maximal `M` is itself of type `F`.
 
 Structurally `M' = M_σ ⋊ U` is the type-`F`-shaped `M_σ ⋊ (complement)` inside `M` — exactly as the
-type-`F` *maximal* of `typeFData_of_kappa_eq_bot` is `M = M_σ ⋊ U` — so the *same* data assemble: the
+type-`F` *maximal* of `typeFData_of_kappa_eq_bot` is `M = M_σ ⋊ U` — so the *same* data assemble:
+the
 `M_σ ⋊ U` complement (`typeP2_mf_internal_fitting_decomposition`), the abelian inertia `U₁` and the
-Frobenius factor `M_σ ⋊ U₀` (Lemma 15.1(d)(e), `typeP_auxiliary_structure`), and the crucial `F`-core
+Frobenius factor `M_σ ⋊ U₀` (Lemma 15.1(d)(e), `typeP_auxiliary_structure`), and the crucial
+`F`-core
 identity `(M')_F = M_σ = M_F` (`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`).  This last
 identity is the Coq `defM'F` step (`Fcore_max` + Hall transitivity): it needs **no** `τ₂(M) = ∅`
 hypothesis (which is in fact false for some type-`P₂` `M`, cf. Corollary 15.9). -/
@@ -1486,7 +1497,8 @@ theorem centralizer_msigma_kappaElement_eq_kstar [Finite G]
 divisibility engine for type-V disjunct (e2), Coq `regZq_dv_q1`): if the Hall `κ`-subgroup `K`
 normalizes an order-`p` subgroup `Z ≤ M_σ` with `Z ⊓ K* = ⊥`, then `K` acts on `Z` as a Frobenius
 group — every `k ∈ K#` centralizes only `1` in `Z`, since `C_{M_σ}(k) = K*`
-(`centralizer_msigma_kappaElement_eq_kstar`) and `Z ⊓ K* = ⊥` — so `card_dvd_sub_one_of_isFrobeniusAction`
+(`centralizer_msigma_kappaElement_eq_kstar`) and `Z ⊓ K* = ⊥` — so
+`card_dvd_sub_one_of_isFrobeniusAction`
 gives `|K| ∣ |Z| - 1 = p - 1`. -/
 theorem kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U Z : Subgroup G} {p : ℕ}
@@ -1522,7 +1534,8 @@ theorem kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot [Finite G]
 
 /-- **`K` acts faithfully on `P = O_p(M_F)` in the type-V Singer case** (Coq `defKs`/`defZP`:
 `K* = Z` forces `C_K(P) = 1`).  For a type-`P₁` maximal `M` with Hall `κ`-subgroup `K`,
-`K* = M_σ ⊓ C(K)`, and an order-`p` subgroup `Z ≤ K*` with `X₁ ⊄ Z` (the non-TI witness `X₁` of order
+`K* = M_σ ⊓ C(K)`, and an order-`p` subgroup `Z ≤ K*` with `X₁ ⊄ Z` (the non-TI witness `X₁` of
+order
 `p`, `X₁ ≤ M_F`), the centralizer of `P` in `K` is trivial.
 
 A nonidentity `x ∈ K ⊓ C_G(P)` centralizes `P ⊇ X₁`, so `X₁ ≤ M_σ ⊓ C_G(x) = K*`

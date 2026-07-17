@@ -111,7 +111,8 @@ noncomputable def ticWEquivSdiffW (h : Hypothesis46 A L) :
 its `sdiff.W` partner under `L ↪ G`. -/
 theorem coe_ticWEquivSdiffW (h : Hypothesis46 A L) (g : h.tic.W) :
     ((ticWEquivSdiffW h g : ↥L) : G) = (g : G) := by
-  -- `equivMapOfInjective` undoes the `.symm` in the bridge, landing back on the `subgroupCongr` cast
+  -- `equivMapOfInjective` undoes the `.symm` in the bridge, landing back on the `subgroupCongr`
+  -- cast
   have key : (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective)
       (ticWEquivSdiffW h g) = MulEquiv.subgroupCongr (tic_W_eq_map h) g :=
     (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective).apply_symm_apply _
@@ -458,7 +459,8 @@ theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
   ring
 
 /-- **Peterfalvi (4.8), step (6) input** (`NC(φ) ≤ 2`).  The Dade image `φ = (μ_{ij} − μ_{ik})^τ`,
-of squared norm `2`, has at most two nonzero `σ`-image coefficients.  By `mem_ZIrr_inner_self_eq_sum_sq`
+of squared norm `2`, has at most two nonzero `σ`-image coefficients. By
+`mem_ZIrr_inner_self_eq_sum_sq`
 + `exists_pair_of_sum_sq_eq_two` it is `ε_α·α + ε_β·β` for two distinct irreducibles `α, β`; each of
 `α, β` has `≤ 1` nonzero inner product against the orthonormal `χ`-family
 (`ncard_inner_chiFam_ne_zero_le_one`), and `Supp(φ-coeffs) ⊆ S_α ∪ S_β`. -/
@@ -636,7 +638,8 @@ theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
 distinct columns `χ₂ ≠ χ₂'` and equal degree `μ_{ij}(1) = μ_{ik}(1)`, the Dade image is
 `(μ_{ij} − μ_{ik})^τ = δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.
 
-`ψ := (μ_{ij} − μ_{ik})^τ − δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes on `V` (step (4)), so its `σ`-coefficient
+`ψ := (μ_{ij} − μ_{ik})^τ − δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes on `V` (step (4)), so its
+`σ`-coefficient
 grid is additively separable (3.7) with `NC(ψ) ≤ 4 < 2·min(w₁, w₂)`.  As `w₁, w₂` are coprime odd
 (`≥ 3`), one of `w₁ + 2 ≤ w₂`, `w₂ + 2 ≤ w₁` holds; the (3.8) trichotomy `grid_trichotomy` (in that
 orientation) leaves all-zero, a constant column, or a constant row.  The latter two are impossible

@@ -222,7 +222,8 @@ The (5.6) adjoining step for the *induced (unsupported)* X-family.  Instead of m
 `{χ, χ̄}` to a supported `ψ = 0` decomposition image (which needs `τχ ∈ ZIrr`, false for the
 unsupported `χ = Ind θ`), `χ` is mapped to the **corrected extension image**
 `X := τ(χ − a·χ₁) + a·νχ₁` (both terms integral).  This makes the (5.6.2) image equation `himg`
-definitional, **bypassing** the `htau1_chi1` requirement `τχ₁ = νχ₁` that fails for unsupported `χ₁`.
+definitional, **bypassing** the `htau1_chi1` requirement `τχ₁ = νχ₁` that fails for unsupported
+`χ₁`.
 
 Every remaining obligation of `retarget_isCoherent` is discharged from the source/Dade/ν isometries
 plus the two crux inner products `hcrux1 : ⟨τ(χ−a·χ₁), νχ₁⟩ = −a` and `hcrux2 : ⟨τ(χ−χ̄), νχ₁⟩ = 0`
@@ -356,7 +357,8 @@ noncomputable def retarget_isCoherent_of_extensionImage
     τ ((χ : ClassFunction ↥L ℂ) - a • chi1) + a • hS₁.extension chi1 with hX
   set Xbar : ClassFunction G ℂ := X - τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)
     with hXbar
-  -- `X, X̄ ∈ ℤ[Irr G]`: the supported Dade images `(χ−a·χ₁)^τ`, `(χ−χ̄)^τ` are virtual (hypotheses),
+  -- `X, X̄ ∈ ℤ[Irr G]`: the supported Dade images `(χ−a·χ₁)^τ`, `(χ−χ̄)^τ` are virtual
+  -- (hypotheses),
   -- and `ν χ₁ ∈ ZIrr` is now recorded by the coherence's `extension_mem_ZIrr` field (`χ₁ ∈ S₁`).
   have hνchi1Z : hS₁.extension chi1 ∈ ZIrr G :=
     hS₁.extension_mem_ZIrr chi1 (Submodule.subset_span hchi1)
@@ -485,7 +487,8 @@ open scoped Classical in
 /-- **(T-A1) Per-step X-family coherence adjoin from a member family.** (`noncomputable def`: the
 conclusion `IsCoherent` lives in `Type`, carrying the new extension `ν`.)
 
-The (5.6)/(6.6) per-step adjoining of a new induced X-pair `{χ, χ̄}` to a coherent set `S₁`, packaged
+The (5.6)/(6.6) per-step adjoining of a new induced X-pair `{χ, χ̄}` to a coherent set `S₁`,
+packaged
 as a function of the member-family enumeration data.  This wires the landed crux1 chain (the genuine
 (5.6.1)/(5.6.2) `Y`-collapse, `crux1_of_memberFamily`) into the adjoining bridge
 (`retarget_isCoherent_of_extensionImage`).
@@ -679,7 +682,8 @@ noncomputable def xAdjoinStep
       Finset.sum_eq_zero (fun α hα =>
         OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily
           (Dmem i₁ hi₁) (hortho_mem i₁ hi₁) rfl hα), star_zero]
-  -- `(χ − χ̄)^τ ∈ ZIrr` from the `R(χ)` family (`image_eq`); `(χ − a·χ₁)^τ ∈ ZIrr` is `htau1_memaχ`.
+  -- `(χ − χ̄)^τ ∈ ZIrr` from the `R(χ)` family (`image_eq`); `(χ − a·χ₁)^τ ∈ ZIrr` is
+  -- `htau1_memaχ`.
   have hτdiffZ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
       (hyp.fullDadeIsometryData hconj)
       ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) ∈ ZIrr G := by

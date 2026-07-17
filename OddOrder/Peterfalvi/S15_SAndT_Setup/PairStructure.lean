@@ -279,10 +279,12 @@ theorem Hypothesis.isNilpotent_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
 
 /-- **A type-`P` datum on `T` whose complement is the abstract `V` (and whose kernel is `Q`).**
 The §13-level producer `typePData_of_isTypeNonI T_nonI` gives *some* `tpd0 : TypePData T`; its
-complement `tpd0.U` and the §16-chosen `V` both complement `Q = T_F` in `T' = QV`, so Schur–Zassenhaus
+complement `tpd0.U` and the §16-chosen `V` both complement `Q = T_F` in `T' = QV`, so
+Schur–Zassenhaus
 inside `↥T'` (`IsComplement'.exists_conj_of_coprime`) conjugates `tpd0.U` onto `V` by an element
 `g ∈ T'` (hence `g ∈ T`).  Because `g ∈ T`, conjugation by `g` fixes both `T` and its normal
-`Q = T_F`, so whole-datum conjugation `tpd0.conj (MulAut.conj g)` — which transports *every* field of
+`Q = T_F`, so whole-datum conjugation `tpd0.conj (MulAut.conj g)` — which transports *every* field
+of
 `TypePData` (including `fitting_eq` and `secondDerived_le_fitting`) — again lands on `T`, with its
 `U`-field equal to `V` and its `H`-field equal to `Q`.  This is the honest engine behind the
 `fitting_eq`/`secondDerived_le_fitting`/`U_nilpotent` fields of `reconciled_typePData_T`. -/
@@ -433,7 +435,8 @@ theorem coprime_card_derivedInG_index_of_isTypeP [Finite G]
 (`W2_isComplement_T_deriv`); a produced `κ(T)`-Hall `K` (`exists_isHallSubgroup_kappa_ge`, cyclic,
 also complementing `T'`) is `T`-conjugate to `W₂` by Schur–Zassenhaus
 (`IsComplement'.exists_conj_of_coprime`, coprimality `coprime_card_derivedInG_index_of_isTypeP`);
-Hall-ness transfers along the conjugation (`IsHallSubgroup.mulAut_smul`).  This discharges the `hFactA`
+Hall-ness transfers along the conjugation (`IsHallSubgroup.mulAut_smul`). This discharges the
+`hFactA`
 residual of `reconciled_typePData_T` with no `FieldNormalizerData`/(14.9) input. -/
 theorem Hypothesis.W2_isKappaHall_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
@@ -596,7 +599,8 @@ theorem Msigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
 /-- **Fact B (`T`-side): `W₁ = M_σ(T) ⊓ C_G(W₂)`** (the (8.4.d)-dual centralizer law for `T`, ungated
 via the type-`P` pairing — Coq `PFsection8` `typeP_cent_compl`/`FTtypeP_pair_witness`).
 
-This is the last residual of `reconciled_typePData_T` (issue 9073); it is genuine §13 pairing content
+This is the last residual of `reconciled_typePData_T` (issue 9073); it is genuine §13 pairing
+content
 proved *without* assuming `(14.9)`/`IsTypeII T`, by descending to `S`'s type-`P` structure:
 
 * Apply `typeP_duality`/`exists_partner`/`typeP_partner_structure` to `S` (`hKS` = Fact A for `S`,
@@ -750,15 +754,18 @@ theorem Hypothesis.reconciled_residuals_of_pairing_facts [Finite G]
       hG hyp.T_maximal hP hW2T hFactA hFactB
 
 /-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
-withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30).  `T` is type non-I (`T_nonI`), hence type-`P`,
+withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30). `T` is type non-I (`T_nonI`), hence
+type-`P`,
 and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
 decomposition of `T`: there is a `TypePData T` with `.U = V`, `.W1 = W₂`, and `.W2 = W₁` (the dual
 cyclic factor `C_{T'}(W₂#)` of `T`'s type-`P` structure is exactly the shared `W₁`).
 
-This is the genuine §13 reconciliation — **TRUE**, and the right §13-level statement: it asserts only
+This is the genuine §13 reconciliation — **TRUE**, and the right §13-level statement: it asserts
+only
 the *general* type-`P` structure of `T` (available from `T_nonI` at §13), reconciled to the abstract
 `V`/`W₂`.  (The sharper `IsTypeP2 T` is *equivalent* to the (14.9) conclusion `IsTypeII T` by the BG
-type dictionary `proposition_type_classification` — `IsTypeII M ↔ IsTypeP2 M` — but is not needed for
+type dictionary `proposition_type_classification` — `IsTypeII M ↔ IsTypeP2 M` — but is not needed
+for
 the reconciliation itself, so this stays a clean §13 obligation.)  It lives **off the FT spine**: the
 `V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
 sorry-free.  Gated on §13; declared sorried.  (Relocated from `S15_SAndT` for the (13.9)/(13.10)
@@ -776,12 +783,16 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW2W).surjective
   have hW1cyc : IsCyclic ↥hyp.W1 :=
     isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW1W).surjective
-  -- **(8.4.d)-dual pairing residuals** for the `W2_le`/`centralizer_W1` fields.  These are exactly the
-  -- two facts `typeP_partner_structure` (applied to `S`) supplies for its partner `T`: `W₂` a `κ`-Hall
+  -- **(8.4.d)-dual pairing residuals** for the `W2_le`/`centralizer_W1` fields. These are exactly
+  -- the
+  -- two facts `typeP_partner_structure` (applied to `S`) supplies for its partner `T`: `W₂` a
+  -- `κ`-Hall
   -- of `T` (**Fact A**) and `W₁ = M_σ(T) ⊓ C(W₂)` (**Fact B**).  Their *sufficiency* is verified by
   -- `reconciled_residuals_of_pairing_facts` (via `typeP_kstar_in_mf` /
-  -- `typeP_derivedInG_inf_centralizer_kappaElement_eq`); the two residuals are honestly gated on the
-  -- §13 `typeP_partner` port (issue 9073) whose remaining step wires `typeP_partner_structure`'s inputs
+  -- `typeP_derivedInG_inf_centralizer_kappaElement_eq`); the two residuals are honestly gated on
+  -- the
+  -- §13 `typeP_partner` port (issue 9073) whose remaining step wires `typeP_partner_structure`'s
+  -- inputs
   -- (S-side κ-Hall + Z-family covering) from the abstract `Hypothesis`.
   -- **Fact A** (`W₂` κ-Hall of `T`) is now proven ungated (`W2_isKappaHall_T`, via the produced
   -- κ-Hall + Schur–Zassenhaus).  **Fact B** (`W₁ = M_σ(T) ⊓ C(W₂)`) remains the sole residual — the
@@ -806,13 +817,15 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     -- halves are `IsTypeP2 hyp.T` (≡ `IsTypeII hyp.T`, BG (14.9))-gated, which is unavailable at
     -- §13 (`IsTypeII hyp.T` lives in `S16` = import-downstream; see `T_typeII`):
     --   • `hyp.W1 ≤ hyp.Q`: needs `hyp.q ∣ Nat.card ↥hyp.Q`; every route (`card_Q_eq`,
-    --     `exists_sylow_coe_eq_Q`, `pgroup_le_of_normal_coprime_index` dualizing `W2_le_P`) requires
+    --     `exists_sylow_coe_eq_Q`, `pgroup_le_of_normal_coprime_index` dualizing `W2_le_P`)
+    -- requires
     --     `IsTypeII hyp.T` — `q ∣ |Q|` is provably NOT derivable from `hG`+`hyp` alone.  The S-side
     --     `W2_le_P` instead consumes the type-uniform `|P| = p^q` theorem `card_P_eq`.
     --   • `hyp.W1 ≤ secondDerivedInAmbient hyp.T`: needs the intrinsic identification
     --     `hyp.W1 = tpd.W2 = C_{T'}(W₂#)` for a type-`P` datum `tpd` whose `.W1 = W₂`.  The datum
     --     `d` from `exists_typePData_U_eq_V` only pins `d.U = V`, `d.H = Q` (the Schur–Zassenhaus
-    --     conjugator controls the *complement*, not the cyclic factors), so `d.W1`/`d.W2` need not be
+    --     conjugator controls the *complement*, not the cyclic factors), so `d.W1`/`d.W2` need not
+    -- be
     --     the abstract `W₂`/`W₁`.  The alignment is the `typeP_pair` content (Coq PFsection8
     --     `FTtypeP_pair_witness`/`of_typeP_pair`: the shared `W = S ⊓ T` forces T's swapped
     --     decomposition `xdefW : W₂ \x W₁ = W`, whose (8.4.d) component gives `W₁ ⊆ H ⊓ T''`) —
@@ -871,16 +884,20 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       have hHeq : tpd0.H = hyp.Q := by rw [tpd0.H_eq, hyp.Q_eq_TF]
       exact hHeq ▸ tpd0.H_noncyclic
     -- `T`-side (8.5.a) Fitting containment/identity, transported from *any* type-`P` datum on `T`
-    -- whose complement is `V` and whose kernel is `Q` (`exists_typePData_U_eq_V`, honest whole-datum
-    -- conjugation via `TypePData.conj`).  No longer gated: these are genuine consequences of `T_nonI`.
+    -- whose complement is `V` and whose kernel is `Q` (`exists_typePData_U_eq_V`, honest
+    -- whole-datum
+    -- conjugation via `TypePData.conj`). No longer gated: these are genuine consequences of
+    -- `T_nonI`.
     secondDerived_le_fitting := by
       obtain ⟨d, hU, hH⟩ := hyp.exists_typePData_U_eq_V hG
       have := d.secondDerived_le_fitting; rwa [hH, hU] at this
     fitting_eq := by
       obtain ⟨d, hU, hH⟩ := hyp.exists_typePData_U_eq_V hG
       have := d.fitting_eq; rwa [hH, hU] at this
-    -- **Precise residual (`centralizer_W1`, goal after instantiation `W1 := hyp.W2`, `W2 := hyp.W1`,
-    -- `M := hyp.T`): `∀ x ∈ hyp.W2, x ≠ 1 → derivedInG hyp.T ⊓ Subgroup.centralizer ({x}) = hyp.W1`.**
+    -- **Precise residual (`centralizer_W1`, goal after instantiation `W1 := hyp.W2`,
+    -- `W2 := hyp.W1`,
+    -- `M := hyp.T`):
+    -- `∀ x ∈ hyp.W2, x ≠ 1 → derivedInG hyp.T ⊓ Subgroup.centralizer ({x}) = hyp.W1`.**
     -- This is the dual cyclic-factor law `C_{T'}(W₂#) = W₁` (Coq (8.4.d) `{in W1^#, C_M'[·] = W2}`
     -- with the swapped `xdefW`).  It is the T-side reflection of the *carried* S-side field
     -- `Sdata.centralizer_W1` (`∀ x ∈ W₁#, S' ⊓ C(x) = W₂`; see its use in
@@ -888,13 +905,16 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     -- The ungated general-type-`P` centralizer law `typeP_centralizer_kappaElement_eq`
     -- (`M ⊓ C_G(k) = K ⊔ K*` for `k ∈ K#`, only `IsTypeP M`) would apply to `T` with `K := W₂`,
     -- but ONLY once `W₂` is known to be a κ-Hall of `T` and `K* = M_σ(T) ⊓ C(W₂) = W₁` — precisely
-    -- the `typeP_pair` reconciliation (≡ `IsTypeP2 hyp.T`), which the abstract `Hypothesis` does not
+    -- the `typeP_pair` reconciliation (≡ `IsTypeP2 hyp.T`), which the abstract `Hypothesis` does
+    -- not
     -- carry (no `Tdata`).  Discharged from `hFactA`/`hFactB` via the verified reduction
     -- `reconciled_residuals_of_pairing_facts` (`typeP_derivedInG_inf_centralizer_kappaElement_eq`).
     centralizer_W1 := hCentW1_pf
     normalizer_V := by
-      -- The `W`-exceptional-set normalizer `N_G(X) = W` is symmetric in `W₁`/`W₂`, so it is read off
-      -- the S-side carrier `Sdata.normalizer_V` (same fact as `base_W_normalizer_V`, inlined since S15
+      -- The `W`-exceptional-set normalizer `N_G(X) = W` is symmetric in `W₁`/`W₂`, so it is read
+      -- off
+      -- the S-side carrier `Sdata.normalizer_V` (same fact as `base_W_normalizer_V`, inlined since
+      -- S15
       -- is upstream of S16).  The exceptional set `W − (W₂ ∪ W₁) = W − (W₁ ∪ W₂)` is `union_comm`.
       have hWeq : hyp.Sdata.W = hyp.W := by
         rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hyp.W_eq_join.symm

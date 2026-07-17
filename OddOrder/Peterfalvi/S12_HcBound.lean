@@ -76,7 +76,8 @@ open OddOrder.Peterfalvi.S11 in
 end-to-end).  Via the constructed `Section11CharacterData`, the (9.7) Clifford dichotomy
 (`clifford_dichotomy`, proven) splits into case (a)/(b); in case (b), `caseB_degree_qu` gives that
 every member of the §9 family `𝒮(H₀C')` has degree `q·u = q·|Ū|`.  This is the §9 half of the
-(11.8.1) degree `d = |Ū|` (the μ-grid column `μ_j = ∑_i μ_{ij}` has degree `qu`, so `μ_{ij}(1) = u`);
+(11.8.1) degree `d = |Ū|` (the μ-grid column `μ_j = ∑_i μ_{ij}` has degree `qu`, so
+`μ_{ij}(1) = u`);
 combined with the μ-grid ↔ §9-family correspondence (`huSub = M'`, `chars.S ⊆ inducedFamily`) it
 gives `d = |Ū|`.  The case (a) branch (reducible-induction degree, `caseA_reducible_*`) is the
 remaining case. -/

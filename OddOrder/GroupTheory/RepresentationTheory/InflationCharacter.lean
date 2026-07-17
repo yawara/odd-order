@@ -577,11 +577,13 @@ irreducible character of `G ⧸ N`.
 
 Forward is `IsIrreducibleCharacter.compHom_of_surjective` (`mk' N` is surjective).  Backward: an
 irreducible `compHom (mk' N) ψ` has `N ⊆ ker` (it is constant `= ψ 1` on `N`), so by
-`exists_inflate_eq_of_subset_characterKernel` it equals `inflate χ̄` for some irreducible `χ̄`; since
+`exists_inflate_eq_of_subset_characterKernel` it equals `inflate χ̄` for some irreducible `χ̄`;
+since
 `compHom (mk' N)` is injective (`compHom_injective_of_surjective`), `ψ = χ̄` is irreducible.
 
 This is the reducibility correspondence of the §9↔§6 bridge: via the induction-inflation commute
-`induceHU (inflate χ̄) = compHom (mk' N) (induce K̄ χ̄)`, the §9 member `φ = induceHU (inflate χ̄)` is
+`induceHU (inflate χ̄) = compHom (mk' N) (induce K̄ χ̄)`, the §9 member `φ = induceHU (inflate χ̄)`
+is
 reducible iff the §6 induction `induce K̄ χ̄` is (issue 1012, B2 bijection). -/
 theorem isIrreducibleCharacter_compHom_mk'_iff (ψ : ClassFunction (G ⧸ N) ℂ) :
     IsIrreducibleCharacter (ClassFunction.compHom (QuotientGroup.mk' N) ψ) ↔

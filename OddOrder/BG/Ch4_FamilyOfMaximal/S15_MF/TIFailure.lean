@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第
+2 パス).
 -/
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -641,9 +642,11 @@ theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
 (Coq `tau2_P2type_signalizer`, BGsection15.v:1315--1333): for a type-`P` maximal `L` with
 `κ(L)`-Hall `Ks`, `K = L_σ ⊓ C(Ks)` (`|K| = q` prime, `q ∈ σ(L)`), and a rank-2 elementary abelian
 `A ≤ L_σ` that is a `q₁`-group (`q₁` prime), one has: (a) `A ≤ F(L)` (Coq `sAFL`, line 1319);
-(b) `Q = O_q(L)` is a Sylow-`q` of `L` (Coq `sylQ`, line 1319); (c) `Q ∈ 𝒰` (Coq `uniqQ`, line 1330).
+(b) `Q = O_q(L)` is a Sylow-`q` of `L` (Coq `sylQ`, line 1319); (c) `Q ∈ 𝒰` (Coq `uniqQ`, line
+1330).
 
-⚠ **This is a genuinely unformalized §12/§15 keystone of BG Theorem 15.8** (`tau2_transfer_constraint`).
+⚠ **This is a genuinely unformalized §12/§15 keystone of BG Theorem 15.8**
+(`tau2_transfer_constraint`).
 It bundles the three "pre-`def_q1`" facts Coq extracts from `Ptype_structure`/`Fcore_structure`
 before proving `q₁ = q`:
 * `sAFL`/`sylQ` (line 1319) — in the nilpotent `L_F = L_σ` case, `A ⊆ L_σ = L_F ⊆ F(L)` and
@@ -788,14 +791,16 @@ nonabelian) = `partner_opiCore_nonabelian` (focal Lemma 6.5(a) inside `↥M*_σ`
 
 ⚠ **Assembly landed: `tau2_transfer_constraint` is sorry-free** (2026-07-07, issue 9017 更新 #12),
 citing **three** precisely-isolated genuinely-gated keystones (the brief's premise that only `uniqQ`
-gates was too optimistic; three clauses of Coq `Ptype_structure`/`Fcore_structure`/`P2type_signalizer`
+gates was too optimistic; three clauses of Coq
+`Ptype_structure`/`Fcore_structure`/`P2type_signalizer`
 are missing from the repo's §14 API).  The full Coq spine is built inline; dependency graph
 (verified non-circular): **Keystone A** `typeP_partner_sylow_uniquelyMaximal_bundle`
 (Coq `sAFL`+`sylQ`+`uniqQ`) → `def_q1` (`F(L)` nilpotent via
 `le_centralizer_opiCore_of_fittingInAmbient_nilpotent` — *not* `L_σ`-nilpotent, so no circularity —
 + `eq_of_uniquelyMaximal_centralized_by_rank2_le`) → `b'q` (`q ∉ β(M*)`, from
 `isMaximalElementaryAbelian_of_mem_tau2`'s `¬ idealPrime` + `mem_beta_iff`) → **Keystone B**
-`typeP_isTypeP1_of_not_mem_beta` (Coq `P1maxL`) → `nilLs` (`M*_σ` nilpotent, via the *contrapositive*
+`typeP_isTypeP1_of_not_mem_beta` (Coq `P1maxL`) → `nilLs` (`M*_σ` nilpotent, via the
+*contrapositive*
 of `mf_ne_msigma_typeP1_structure`'s `q ∈ β(M*)` conjunct) → `sKLs'` (`K ⊆ (M*_σ)′`,
 `typeP1_msigma_eq_derivedInG` + `Msigma_inf_centralizer_le_derivedDerived`) → Step 4 `not_cQQ`
 (`partner_opiCore_nonabelian`) → `oX`/singleton (`tau2_singleton_of_nonabelianSylow`) → escape
@@ -866,7 +871,8 @@ theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     rw [hQdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσL
   have hMnormQ : Mstar ≤ Subgroup.normalizer (Q : Set G) := by
     rw [hQdef]; exact OddOrder.GroupTheory.le_normalizer_opiCoreInG _ Mstar
-  -- **`sAFL` + `sylQ` + `uniqQ`** (Keystone A): `A ≤ F(M*)`, `Q = O_q(M*)` a Sylow of `M*`, `Q ∈ 𝒰`.
+  -- **`sAFL` + `sylQ` + `uniqQ`** (Keystone A): `A ≤ F(M*)`, `Q = O_q(M*)` a Sylow of `M*`,
+  -- `Q ∈ 𝒰`.
   obtain ⟨hAFL, ⟨P, hPQ⟩, hQU⟩ :=
     typeP_partner_sylow_uniquelyMaximal_bundle hG hMstarmax hMstP hKsMstar hKsHall hKeq hqπK hqσL
       hq1prime hA_elem hAMσstar hACK
@@ -1115,7 +1121,8 @@ supplies this from `x ∈ M_σ^#` once `M_σ ⊆ F(M)`, i.e. after `M ∈ 𝓜_�
 
 Proof: pick `y ∈ C_G(x) ∖ M`.  As `y` centralizes `x`, `y·x·y⁻¹ = x`; so the *same* nonidentity
 `x ∈ F(M)^#` witnesses an overlap `∃ a ∈ F(M)^#, y·a·y⁻¹ ∈ F(M)^#`.  Were `F(M)` a TI-subset with
-normalizer-bound `N_G(F(M))`, this would force `y ∈ N_G(F(M)) ≤ M` (`normalizer_fittingInG_le_self`),
+normalizer-bound `N_G(F(M))`, this would force `y ∈ N_G(F(M)) ≤ M`
+(`normalizer_fittingInG_le_self`),
 contradicting `y ∉ M`. -/
 theorem not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)

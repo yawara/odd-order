@@ -363,12 +363,14 @@ degree-`w₁` irreducible `ζ ∈ S(HC)`, the coherent image `ζ^{τ₁} = SHC_i
 orthogonal to every aligned `σ`-grid vector `ω_{ij}^σ`.
 
 Port of the intermediate of `tau1_zeta_vanishes_on_typePV` to the `S(HC)`-coherence (the by-contra
-lacks the full-`S` `coh`).  Writing `ω_{ij}^σ = χ_{P j}` (`exists_alignedOmegaSigmaGrid_chiFam_family`,
+lacks the full-`S` `coh`). Writing `ω_{ij}^σ = χ_{P j}`
+(`exists_alignedOmegaSigmaGrid_chiFam_family`,
 the *same* `tic`/`canonicalFullDadeApp`), the difference `ζ^{τ₁} − ζ̄^{τ₁} = (ζ − ζ̄)^τ`
 (`tau_zeta_sub_conj_eq_SHC_extension`) has `≤ 2 < min(w₁, w₂)` nonzero `σ`-coefficients (each of
 `ζ^{τ₁}, ζ̄^{τ₁}` has `≤ 1`, being norm-`1` — `ncard_inner_chiFam_ne_zero_le_one`), so
 `sigmaCoeff_eq_zero_of_sigmaNC_lt` gives `⟨ζ^{τ₁} − ζ̄^{τ₁}, χ_{P j}⟩ = 0`; the norm-`1` projection
-`inner_left_eq_zero_of_inner_sub_eq_zero` (orthonormal `{ζ^{τ₁}, ζ̄^{τ₁}}` via `SHC_extension_inner_*`)
+`inner_left_eq_zero_of_inner_sub_eq_zero` (orthonormal `{ζ^{τ₁}, ζ̄^{τ₁}}` via
+`SHC_extension_inner_*`)
 then upgrades this to `⟨ζ^{τ₁}, χ_{P j}⟩ = 0`. -/
 theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
@@ -455,10 +457,12 @@ input).  For a degree-`w₁` irreducible `ζ ∈ S(HC)` with `ζ̄ ≠ ζ`, the 
 
 Port of `tau1_zeta_vanishes_on_typePV` to the `S(HC)`-coherence (the (11.8) by-contradiction lacks
 the full-`S` `coh`).  Same argument as `SHC_extension_inner_alignedOmegaSigma_eq_zero`, but concluded
-against every `χ_{pq}` (`eq_zero_of_mem_V_of_inner_chiFam_eq_zero`, Peterfalvi (3.2.d)) rather than a
+against every `χ_{pq}` (`eq_zero_of_mem_V_of_inner_chiFam_eq_zero`, Peterfalvi (3.2.d)) rather than
+a
 single aligned grid vector: `(ζ − ζ̄)^τ = ζ^{τ₁} − ζ̄^{τ₁}` (`tau_zeta_sub_conj_eq_SHC_extension`)
 vanishes on `V` with `NC ≤ 2 < min(w₁, w₂)`, so `sigmaCoeff_eq_zero_of_sigmaNC_lt` gives
-`⟨ζ^{τ₁} − ζ̄^{τ₁}, χ_{pq}⟩ = 0`, and the norm-`1` projection `inner_left_eq_zero_of_inner_sub_eq_zero`
+`⟨ζ^{τ₁} − ζ̄^{τ₁}, χ_{pq}⟩ = 0`, and the norm-`1` projection
+`inner_left_eq_zero_of_inner_sub_eq_zero`
 (orthonormal `{ζ^{τ₁}, ζ̄^{τ₁}}`) upgrades it to `⟨ζ^{τ₁}, χ_{pq}⟩ = 0` for every `pq`. -/
 theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
@@ -581,7 +585,8 @@ theorem Hypothesis.SHC_muGridPsi_vanishes_on_typePV [Finite G] {M : Subgroup G}
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `‖X‖² = 2` and `X ⊥ ζ^{τ₁}`, S(HC)-coherent version** (`a = 0`), where
 `X = α_{ij}^τ + n·ζ^{τ₁}` (`ζ^{τ₁} = SHC_isCoherent.extension ζ`).  Given the `a = 0` inner product
-`⟨α_{ij}^τ, ζ^{τ₁}⟩ = −n` (`muGridAlpha_tau_residual_norm` with `a = 0`), with `‖α_{ij}^τ‖² = 2 + n²`
+`⟨α_{ij}^τ, ζ^{τ₁}⟩ = −n` (`muGridAlpha_tau_residual_norm` with `a = 0`), with
+`‖α_{ij}^τ‖² = 2 + n²`
 (`muGridAlpha_tau_inner_self`) and `‖ζ^{τ₁}‖² = 1` (`SHC_extension_inner_self`):
 `⟨X, ζ^{τ₁}⟩ = ⟨α^τ, ζ^{τ₁}⟩ + n‖ζ^{τ₁}‖² = −n + n = 0` and
 `‖X‖² = ‖α^τ‖² + 2n⟨α^τ, ζ^{τ₁}⟩ + n²‖ζ^{τ₁}‖² = (2+n²) − 2n² + n² = 2`.  SHC port of
@@ -625,7 +630,8 @@ theorem Hypothesis.SHC_muGridAlpha_tau_X_inner [Finite G] {M : Subgroup G}
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5) Dade-image identity, S(HC)-coherent version** (`a = 0`):
-`α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}` with `ζ^{τ₁} = SHC_isCoherent.extension ζ`, given the
+`α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}` with `ζ^{τ₁} = SHC_isCoherent.extension ζ`, given
+the
 `a = 0` inner product `⟨α_{ij}^τ, ζ^{τ₁}⟩ = −n` (`muGridAlpha_tau_residual_norm` with `a = 0`).
 
 SHC port of `tau_muGridAlpha_eq` (the full-`coh` (10.5) endgame, which the (11.8) by-contradiction
@@ -682,7 +688,8 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
 
 open scoped FiniteInduce in
 /-- **General `S(HC)`-coherence split** `(ζ − η)^τ = ζ^{τ₁} − η^{τ₁}` for degree-`w₁` irreducibles
-`ζ, η ∈ S(HC)` (α-grid `S₁`-`τ₁` input to (11.8.2)).  Generalizes `tau_zeta_sub_conj_eq_SHC_extension`
+`ζ, η ∈ S(HC)` (α-grid `S₁`-`τ₁` input to (11.8.2)). Generalizes
+`tau_zeta_sub_conj_eq_SHC_extension`
 (the `η = ζ̄` case) to an arbitrary `S(HC)` member: since `ζ, η ∈ S(HC)` have equal degree `w₁`, the
 difference `ζ − η` is `A₀`-supported (`inducedFamily_sub_support`) and lies in `ℤ[S(HC)]`, where
 `SHC_isCoherent.extension` agrees with `hyp.tau` (`extends_on_supported`). -/
@@ -711,10 +718,12 @@ theorem Hypothesis.tau_sub_eq_SHC_extension [Finite G] {M : Subgroup G}
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.2), the `S₁^{τ₁}`-projection coefficient relation**:
 `(α_{ij}^τ, ζ^{τ₁}) − (α_{ij}^τ, η^{τ₁}) = −n` for any degree-`w₁` irreducible `η ∈ S(HC)`, `η ≠ ζ`.
-Combining the general split `(ζ − η)^τ = ζ^{τ₁} − η^{τ₁}` (`tau_sub_eq_SHC_extension`), the `τ`-isometry
+Combining the general split `(ζ − η)^τ = ζ^{τ₁} − η^{τ₁}` (`tau_sub_eq_SHC_extension`), the
+`τ`-isometry
 on the supported `α_{ij}` and `ζ − η` (`tau_inner_eq_of_supported`), and the source value `−n`
 (`muGridAlpha_inner_zeta_sub_irr`).  Since the orthonormal `{λ^{τ₁} : λ ∈ S₁}` gives
-`(α_{ij}^τ, λ^{τ₁})` as the projection coefficient, this forces `(α_{ij}^τ, η^{τ₁}) = a` (constant in
+`(α_{ij}^τ, λ^{τ₁})` as the projection coefficient, this forces `(α_{ij}^τ, η^{τ₁}) = a` (constant
+in
 `η ≠ ζ`) and `(α_{ij}^τ, ζ^{τ₁}) = a − n` — the coefficient structure of the (11.8.2) decomposition
 `α_{ij}^τ = X − nζ^{τ₁} + a∑_{λ∈S₁}λ^{τ₁}`. -/
 theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_sub [Finite G] {M : Subgroup G}
@@ -884,7 +893,8 @@ theorem inner_self_eq_sum_sq_add_of_intProjection [Finite G] {φ : ClassFunction
 open scoped Classical in
 /-- **Sum of squares with one distinguished coefficient.**  If `e ∈ R`, `f e = x`, and `f β = y` for
 every `β ∈ R` with `β ≠ e`, then `∑_{β∈R} (f β)² = x² + (|R| − 1)·y²`.  Used in (11.8.2) to evaluate
-`∑_{λ∈S(HC)} c(λ^{τ₁})² = (a − n)² + (|S₁| − 1)·a²` (the `ζ^{τ₁}` coefficient is `a − n`, every other
+`∑_{λ∈S(HC)} c(λ^{τ₁})² = (a − n)² + (|S₁| − 1)·a²` (the `ζ^{τ₁}` coefficient is `a − n`, every
+other
 coefficient is `a`). -/
 theorem sum_sq_eq_of_split {R : Finset (ClassFunction G ℂ)} {e : ClassFunction G ℂ} (he : e ∈ R)
     {f : ClassFunction G ℂ → ℤ} {x y : ℤ} (hx : f e = x)
@@ -921,7 +931,8 @@ and remainder `Y ⊥ R` (this `Y` is Peterfalvi's residual `X`, with `α_{ij}^τ
 a·∑_{λ∈S₁} λ^{τ₁}`).  The coefficient relation (`muGridAlpha_tau_inner_SHC_extension_sub`, cont.³²)
 forces `c(η^{τ₁}) = a` (constant, `η ≠ ζ`) with `a := c(ζ^{τ₁}) + n`, so `⟨α_{ij}^τ, ζ^{τ₁}⟩ =
 c(ζ^{τ₁}) = a − n`.  Parseval (`inner_self_eq_sum_sq_add_of_intProjection`) + the sum split
-(`sum_sq_eq_of_split`) + `‖α_{ij}^τ‖² = 2 + n²` (`muGridAlpha_tau_inner_self`) give the residual norm
+(`sum_sq_eq_of_split`) + `‖α_{ij}^τ‖² = 2 + n²` (`muGridAlpha_tau_inner_self`) give the residual
+norm
 `‖X‖² = 2 + n² − ((a−n)² + (n−1)a²)`.  With `‖X‖² ≥ 0` (`int_le_of_add_inner_self_eq`) this is
 `n(a²−2a) ≤ 2`, whence `a ∈ {0,1,2}` (`charParam_a_mem_of_norm_ineq`); and for `a = 0` or `a = 2`
 the norm collapses to `‖X‖² = 2` — the input to Peterfalvi's `X = ω_{ij}^σ − ω_{i0}^σ`.
@@ -1062,9 +1073,11 @@ remainder) equals `δ·(ω_{ij}^σ − ω_{i0}^σ)` when `a ∈ {0, 2}` (`‖X�
 
 Feeds the (11.8.5) `a = 0` argument (`β = a·∑λ^{τ₁}` then (5.3.b)).  From
 `muGridAlpha_tau_residual_norm` the residual `Y` satisfies `‖Y‖² = 2` (for `a ∈ {0, 2}`),
-`Y ∈ ℤ[Irr G]`, and — crucially — `Y = α_{ij}^τ` on `V` (the `∑λ^{τ₁}` correction vanishes there, each
+`Y ∈ ℤ[Irr G]`, and — crucially — `Y = α_{ij}^τ` on `V` (the `∑λ^{τ₁}` correction vanishes there,
+each
 `λ ∈ S(HC)` being a non-real degree-`w₁` irreducible, `SHC_extension_vanishes_on_typePV`).  Then
-`ψ = Y − δ(ω^σ diff)` vanishes on `V` (with the value-on-`V` leg `tau_muGridAlpha_apply_eq_on_typePV`,
+`ψ = Y − δ(ω^σ diff)` vanishes on `V` (with the value-on-`V` leg
+`tau_muGridAlpha_apply_eq_on_typePV`,
 `α^τ = δ(ω^σ diff)` there), so the norm-`2` Dade-image trichotomy `eq_smul_chiFam_diff_of_vanishOnV`
 forces `Y = δ(ω_{ij}^σ − ω_{i0}^σ)`. -/
 theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
@@ -1158,7 +1171,8 @@ theorem Hypothesis.SHC_extension_inner_zeroColumnOmegaSigma_sum [Finite G] {M : 
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5) `G`-side (5.3.b) sum over `S₁`** `(∑_{β∈R} β, ∑_r ω_{r0}^σ) = 0`: each
-`β = λ^{τ₁}` (`hRrev`) is a degree-`w₁` `S(HC)` coherent image, non-real (`inducedFamily_degree_w1_conj_ne`),
+`β = λ^{τ₁}` (`hRrev`) is a degree-`w₁` `S(HC)` coherent image, non-real
+(`inducedFamily_degree_w1_conj_ne`),
 so `(λ^{τ₁}, ∑_r ω_{r0}^σ) = 0` (`SHC_extension_inner_zeroColumnOmegaSigma_sum`), summed over `R`. -/
 theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
