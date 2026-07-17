@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -238,6 +239,16 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_eq_normalClosure
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_le_of_coprime_index
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
+
+-- Shared defining field and Tits twist for the Suzuki target in Peterfalvi Part II.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_field
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.iterateFrobeniusEquiv_period
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_symm
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_symm_apply
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_twice
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_sq
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A

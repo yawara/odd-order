@@ -130,10 +130,14 @@
      bijection from `Omega` to the standard projective line. It derives
      `|Omega| - 1 = |F| = 2^n` and transports the existing Isaacs Ch08 PSL simplicity.
    - Shared support is `GroupTheory/PrimeComplementResidual.lean`; issue 9112 is closed.
-9. **Next frontier = Section 3 Lemma 1, Sz(q) target**.
-   Build the concrete Suzuki field/Tits twist, ovoid action, and simple permutation
-   group. The correct standard-action degree is `q^2 + 1`, so the core needs
-   `|Omega| - 1 = 2^(2e)` when `q = 2^e`. After Sz(q), construct the PSU(3,q)
-   target, whose standard-action degree is `q^3 + 1`.
+9. **Section 3 Lemma 1, Sz(q) target in progress**.
+   - Shared leaf `GroupTheory/SpecificGroups/Suzuki/Field.lean` constructs the field
+     of order `q = 2^(2m+1)` and the Tits twist `theta(x) = x^(2^(m+1))`.
+   - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
+     `theta(theta(x)) = x^2`; these are the concrete identities used by the standard
+     root-group and torus formulas.
+   - Next upstream layer: construct the nonabelian root group `S(q,theta)` on `F x F`,
+     then its standard action on the `q^2 + 1` point ovoid and its simple permutation
+     image. After Sz(q), construct the PSU(3,q) target of degree `q^3 + 1`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

@@ -16,11 +16,11 @@ first shared leaf before construction begins.
 
 ## やること
 
-- [ ] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Field.lean`.
-- [ ] Define the characteristic-two field of order `2^(2*m+1)`.
-- [ ] Construct the `(m+1)`-fold Frobenius Tits twist.
-- [ ] Prove its power formula and that its square is Frobenius `x |-> x^2`.
-- [ ] Wire the shared leaf into `OddOrder.lean` and the explicit axiom audit.
+- [x] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Field.lean`.
+- [x] Define the characteristic-two field of order `2^(2*m+1)`.
+- [x] Construct the `(m+1)`-fold Frobenius Tits twist.
+- [x] Prove its power formula and that its square is Frobenius `x |-> x^2`.
+- [x] Wire the shared leaf into `OddOrder.lean` and the explicit axiom audit.
 
 ## 完了条件
 
