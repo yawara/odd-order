@@ -48,6 +48,8 @@ namespace OddOrder.Isaacs.Ch10
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03 (IsAInvariant)
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply_mk')
+open OddOrder.Isaacs.Ch04
 open OddOrder.BG.Ch1
 open OddOrder.BG.Ch1_Preliminary
 open scoped commutatorElement
@@ -317,6 +319,98 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
       rw [hmem]
       simp
     exact hP'ne (le_bot_iff.mp hbot)
+  -- ### Step 6: `P ⧸ Z(P)` is elementary abelian
+  -- `⁅·, x⁆` is a homomorphism in the left argument (class ≤ 2) …
+  have hcomm_hom : ∀ x a b : ↥P, ⁅a * b, x⁆ = ⁅a, x⁆ * ⁅b, x⁆ := by
+    intro x a b
+    have hcb := Subgroup.mem_center_iff.mp
+      (hcomm_le_center (commutatorElement_mem_commutator_top b x))
+    have hca := Subgroup.mem_center_iff.mp
+      (hcomm_le_center (commutatorElement_mem_commutator_top a x))
+    have h1 : ⁅a * b, x⁆ = a * ⁅b, x⁆ * a⁻¹ * ⁅a, x⁆ := by group
+    have h2 : a * ⁅b, x⁆ * a⁻¹ = ⁅b, x⁆ := by rw [hcb a]; group
+    rw [h1, h2, ← hca ⁅b, x⁆]
+  -- … so `⁅y^m, x⁆ = ⁅y, x⁆^m`
+  have hcomm_pow : ∀ (x y : ↥P) (m : ℕ), ⁅y ^ m, x⁆ = ⁅y, x⁆ ^ m := by
+    intro x y m
+    induction m with
+    | zero => simp
+    | succ m ih => rw [pow_succ, pow_succ, hcomm_hom x (y ^ m) y, ih]
+  -- `p`-th powers are central since `|P'| = p`
+  have hpow_central : ∀ y : ↥P, y ^ p ∈ Subgroup.center ↥P := by
+    intro y
+    rw [Subgroup.mem_center_iff]
+    intro x
+    have hc : ⁅y, x⁆ ^ p = 1 := by
+      have hmem := commutatorElement_mem_commutator_top y x
+      have h1 : (⟨⁅y, x⁆, hmem⟩ : ↥(_root_.commutator ↥P)) ^ p = 1 := by
+        rw [← hcomm_card]; exact pow_card_eq_one'
+      simpa using congrArg Subtype.val h1
+    have : ⁅y ^ p, x⁆ = 1 := by rw [hcomm_pow x y p, hc]
+    have := commutatorElement_eq_one_iff_mul_comm.mp this
+    rw [this]
+  -- the conjugation action of `N` descends to `E := P ⧸ Z(P)` modulo `P`
+  have hZinv : IsAInvariant φ₀ (Subgroup.center ↥P) := IsAInvariant.of_characteristic φ₀
+  set φ₁ : N →* MulAut (↥P ⧸ Subgroup.center ↥P) := quotientMulAutHom hZinv with hφ₁_def
+  have hker2 : P ≤ φ₁.ker := by
+    intro x hx
+    rw [MonoidHom.mem_ker]
+    apply MulEquiv.ext
+    intro v
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective (Subgroup.center ↥P) v
+    rw [hφ₁_def, quotientMulAutHom_apply_mk']
+    show _ = (1 : MulAut _) ((QuotientGroup.mk' _) y)
+    rw [MulAut.one_apply]
+    rw [QuotientGroup.mk'_eq_mk']
+    refine ⟨⁅(⟨x, hx⟩ : ↥P), y⁻¹⁆, hcomm_le_center
+      (commutatorElement_mem_commutator_top (⟨x, hx⟩ : ↥P) y⁻¹), ?_⟩
+    have hval : (φ₀ x) y = (⟨x, hx⟩ : ↥P) * y * (⟨x, hx⟩ : ↥P)⁻¹ := by
+      apply Subtype.ext
+      simp [hφ₀_def]
+    rw [hval, commutatorElement_def]
+    group
+  set φQ2 : N ⧸ P →* MulAut (↥P ⧸ Subgroup.center ↥P) :=
+    QuotientGroup.lift P φ₁ hker2 with hφQ2_def
+  -- elementary abelian: abelian (class 2) + exponent `p` (p-th powers central)
+  have hEea : IsElementaryAbelian p (↥P ⧸ Subgroup.center ↥P) := by
+    constructor
+    · exact fun a b => isMulCommutative_iff.mp
+        ((Subgroup.Normal.quotient_commutative_iff_commutator_le
+          (N := Subgroup.center ↥P)).mpr hcomm_le_center) a b
+    · intro v
+      obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective (Subgroup.center ↥P) v
+      rw [← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      exact hpow_central y
+  -- `p` divides `|E|`: the centre is proper since `P` is nonabelian
+  have hZne : Subgroup.center ↥P ≠ ⊤ := by
+    intro htop
+    refine hnonab fun x y => ?_
+    exact Subgroup.mem_center_iff.mp (htop ▸ Subgroup.mem_top y) x
+  have hEp : IsPGroup p (↥P ⧸ Subgroup.center ↥P) := hPp.to_quotient _
+  have hpE2 : p ∣ Nat.card (↥P ⧸ Subgroup.center ↥P) := by
+    rcases hEp.card_eq_or_dvd with h1 | h2
+    · exfalso
+      have : (Subgroup.center ↥P).index = 1 := by
+        rw [Subgroup.index_eq_card]; exact h1
+      exact hZne (Subgroup.index_eq_one.mp this)
+    · exact h2
+  have hcop2 : Nat.Coprime (Nat.card (N ⧸ P))
+      (Nat.card (↥P ⧸ Subgroup.center ↥P)) := by
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hEp
+    rw [hm, ← Subgroup.index_eq_card]
+    exact Nat.Coprime.pow_right m ((hp_prime.coprime_iff_not_dvd.mpr hPidx).symm)
+  -- `U₂ := VZ/Z`, invariant; Maschke gives an invariant complement `X = H/Z`
+  set U2 : Subgroup (↥P ⧸ Subgroup.center ↥P) :=
+    (Omega ↥P p 1).map (QuotientGroup.mk' (Subgroup.center ↥P)) with hU2_def
+  have hU2invN : IsAInvariant φ₁ U2 := by
+    rw [hU2_def, hφ₁_def]
+    exact isAInvariant_map_mk' hZinv hVinv
+  have hU2inv : IsAInvariant φQ2 U2 := by
+    intro a
+    obtain ⟨n, rfl⟩ := QuotientGroup.mk'_surjective P a
+    exact hU2invN n
+  obtain ⟨X, hXinv, hXinf, hXsup⟩ :=
+    exists_aInvariant_complement_of_isElementaryAbelian hpE2 hcop2 hEea hU2inv
   sorry
 
 /-- **Isaacs Theorem 10.15**, inductive core: if `P ⊴ N` is a nonabelian
