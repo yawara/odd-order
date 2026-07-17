@@ -1,10 +1,12 @@
 # Isaacs Ch.9: More on Subnormality — mini-roadmap
 
-> ⏸ **NOT formalized (2026-07-02)** — FT 経路外につき deferred
-> (CLAUDE.md スコープ: 作業は FT 経路限定; post-FT coverage phase で再訪)。
+> 🚧 **形式化進行中 (レーン a, 2026-07-17〜)** — 全 3 冊フェーズ (2026-07-16〜) で deferred 解除。
+> 旧 banner「FT 経路外につき deferred (2026-07-02)」は失効。
+> 進捗: §9A quasisimple 基礎 (`Quasisimple.lean`: `IsQuasisimple` + Lem 9.1 + Lem 9.2,
+> sorry-free) 完了。次 = component / Thm 9.4 (`Components.lean`) → semisimple / layer / F\*。
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.9 (pp. 271-294).
-形式化先 (予定): `OddOrder/Isaacs/Ch09_MoreSubnormality.lean` (未作成).
+形式化先: `OddOrder/Isaacs/Ch09_MoreSubnormality/` (topic leaves; 2026-07-17 開始).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 4880-5310.
 ROADMAP 上の位置: **第 3 波 (Ch.2 完了後、並列可)** — 直接前提は Ch.2 (Thm 2.6 minimal normal が subnormal を正規化, socle 概念), 軽く Ch.1 (Fitting, 冪零).
 
