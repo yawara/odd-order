@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Transfer
 import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.RingTheory.Ideal.Maps
 import OddOrder.Algebra.AugmentationIdeal
 
 /-!
@@ -38,6 +40,8 @@ Theorem 10.24 (range の同型) の仕上げと 10.25/10.26 は後続。
 namespace OddOrder.Algebra
 
 open MonoidAlgebra
+
+open scoped commutatorElement
 
 variable (G : Type*) [Group G] (K : Subgroup G)
 
@@ -646,6 +650,93 @@ theorem augmentationCoquotientAlgHomG_apply (x : MonoidAlgebra ℤ G) :
     exact h1
   exact DFunLike.congr_fun hext x
 
+/-- Left multiplication by an element of `Δ(K)` annihilates `Δ(G)‾`
+(Isaacs p. 313: `(k-1)ᾱ = 0`, extended `ℤ`-linearly to all of `Δ(K)`). -/
+theorem augmentationCoquotientMulLeft_eq_zero_of_mem
+    {x : MonoidAlgebra ℤ G} (hx : x ∈ augmentationIdealOf G K) :
+    augmentationCoquotientMulLeft G K hK x = 0 := by
+  have key : augmentationCoquotientMulLeftLinear G K x = 0 := by
+    induction hx using Submodule.span_induction with
+    | mem z hz =>
+      obtain ⟨k, rfl⟩ := hz
+      have hof : augmentationCoquotientMulLeftLinear G K
+          (MonoidAlgebra.of ℤ G ↑k) = LinearMap.id :=
+        augmentationCoquotientMulLeft_of_mem G K hK k.2
+      have h1 : augmentationCoquotientMulLeftLinear G K
+          (1 : MonoidAlgebra ℤ G) = LinearMap.id := by
+        have h := augmentationCoquotientMulLeft_of_mem G K hK K.one_mem
+        rwa [map_one] at h
+      rw [map_sub, hof, h1, sub_self]
+    | zero => exact map_zero _
+    | add x y _ _ ihx ihy => rw [map_add, ihx, ihy, add_zero]
+    | smul c x _ ihx => rw [map_smul, ihx]; exact smul_zero c
+  exact key
+
+/-- Left multiplication by an element of the left ideal `Δ(K)·ℤ[G]`
+annihilates `Δ(G)‾` (Isaacs p. 313). -/
+theorem augmentationCoquotientAlgHomG_eq_zero_of_mem_mul
+    {z : MonoidAlgebra ℤ G}
+    (hz : z ∈ augmentationIdealOf G K
+      * (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))) :
+    augmentationCoquotientAlgHomG G K z = 0 := by
+  refine Submodule.mul_induction_on' (fun a ha b _ => ?_)
+    (fun x y _ _ hx hy => ?_) hz
+  · rw [map_mul]
+    have h0 : augmentationCoquotientAlgHomG G K a = 0 := by
+      rw [augmentationCoquotientAlgHomG_apply]
+      exact augmentationCoquotientMulLeft_eq_zero_of_mem G K ha
+    rw [h0, zero_mul]
+  · rw [map_add, hx, hy, add_zero]
+
+/-- **Transversal independence of `Ξ`** (Isaacs p. 313): if two elements of
+`ℤ[G]` differ by an element of the left ideal `Δ(K)·ℤ[G]`, then they induce
+the same left-multiplication map on `Δ(G)‾`.  In particular the sum of a
+transversal for `K` in `G` induces a well-defined `Ξ`, independent of the
+choice of transversal. -/
+theorem augmentationCoquotientMulLeft_eq_of_sub_mem
+    {x y : MonoidAlgebra ℤ G}
+    (h : x - y ∈ augmentationIdealOf G K
+      * (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))) :
+    augmentationCoquotientMulLeft G K hK x
+      = augmentationCoquotientMulLeft G K hK y := by
+  have hzero : augmentationCoquotientAlgHomG G K (x - y) = 0 :=
+    augmentationCoquotientAlgHomG_eq_zero_of_mem_mul G K h
+  rw [map_sub, augmentationCoquotientAlgHomG_apply,
+    augmentationCoquotientAlgHomG_apply] at hzero
+  exact sub_eq_zero.mp hzero
+
+/-- Left multiplication by an element of the right ideal `ℤ[G]·Δ(K)`
+annihilates `Δ(G)‾`: `w·(k-1)·ᾱ = w·((k-1)ᾱ) = 0`. -/
+theorem augmentationCoquotientAlgHomG_eq_zero_of_mem_mul_right
+    {z : MonoidAlgebra ℤ G}
+    (hz : z ∈ (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))
+      * augmentationIdealOf G K) :
+    augmentationCoquotientAlgHomG G K z = 0 := by
+  refine Submodule.mul_induction_on' (fun a _ b hb => ?_)
+    (fun x y _ _ hx hy => ?_) hz
+  · rw [map_mul]
+    have h0 : augmentationCoquotientAlgHomG G K b = 0 := by
+      rw [augmentationCoquotientAlgHomG_apply]
+      exact augmentationCoquotientMulLeft_eq_zero_of_mem G K hb
+    rw [h0, mul_zero]
+  · rw [map_add, hx, hy, add_zero]
+
+/-- Right-ideal counterpart of `augmentationCoquotientMulLeft_eq_of_sub_mem`:
+elements of `ℤ[G]` differing by an element of the right ideal `ℤ[G]·Δ(K)`
+induce the same map on `Δ(G)‾`.  Used to prove `Ξ` is independent of the
+transversal (two transversal sums differ by such an element). -/
+theorem augmentationCoquotientMulLeft_eq_of_sub_mem_right
+    {x y : MonoidAlgebra ℤ G}
+    (h : x - y ∈ (⊤ : Submodule ℤ (MonoidAlgebra ℤ G))
+      * augmentationIdealOf G K) :
+    augmentationCoquotientMulLeft G K hK x
+      = augmentationCoquotientMulLeft G K hK y := by
+  have hzero : augmentationCoquotientAlgHomG G K (x - y) = 0 :=
+    augmentationCoquotientAlgHomG_eq_zero_of_mem_mul_right G K h
+  rw [map_sub, augmentationCoquotientAlgHomG_apply,
+    augmentationCoquotientAlgHomG_apply] at hzero
+  exact sub_eq_zero.mp hzero
+
 /-- Compatibility of the `ℤ[G/K]`-action with the projection
 `π : ℤ[G] → ℤ[G/K]`: the coset `Kg` acts as `g` does (Isaacs p. 316). -/
 theorem augmentationCoquotientAlgHom_mapDomain (x : MonoidAlgebra ℤ G) :
@@ -682,6 +773,68 @@ theorem augmentation_mapDomain (x : MonoidAlgebra ℤ G) :
   exact DFunLike.congr_fun hcomp x
 
 end CoquotientModule
+
+section TransversalIndependence
+
+/-! ### `Ξ` is independent of the transversal (Isaacs p. 313)
+
+Isaacs' `Ξ` is left multiplication by the sum of *any* transversal for `K`
+in `G`; here we show this map depends only on the transversal up to the coset
+of each representative, and identify Theorem 10.24's `Ξ = transferXi`
+(built from a left transversal via inverses) with the sum over an arbitrary
+system of coset representatives `f : G/K → G`. -/
+
+variable [hK : K.Normal] [K.FiniteIndex]
+
+/-- The transversal sum `∑_q of(f q)` over a system of coset representatives
+`f : G/K → G` (Isaacs' `σ = ∑_{t ∈ T} t`). -/
+noncomputable def sectionSum (f : G ⧸ K → G) : MonoidAlgebra ℤ G :=
+  letI := K.fintypeQuotientOfFiniteIndex
+  ∑ q : G ⧸ K, MonoidAlgebra.of ℤ G (f q)
+
+/-- `Ξ` is independent of the transversal: if `f₁ q` and `f₂ q` lie in the
+same coset for every `q`, the two transversal sums induce the same
+left-multiplication map on `Δ(G)‾` (Isaacs p. 313). -/
+theorem augmentationCoquotientMulLeft_sectionSum_congr
+    {f₁ f₂ : G ⧸ K → G} (h : ∀ q, (↑(f₁ q) : G ⧸ K) = ↑(f₂ q)) :
+    augmentationCoquotientMulLeft G K hK (sectionSum G K f₁)
+      = augmentationCoquotientMulLeft G K hK (sectionSum G K f₂) := by
+  apply augmentationCoquotientMulLeft_eq_of_sub_mem_right
+  letI := K.fintypeQuotientOfFiniteIndex
+  rw [sectionSum, sectionSum, ← Finset.sum_sub_distrib]
+  apply Submodule.sum_mem
+  intro q _
+  have hk : (f₁ q)⁻¹ * f₂ q ∈ K := QuotientGroup.eq.mp (h q)
+  have hval : MonoidAlgebra.of ℤ G (f₁ q) - MonoidAlgebra.of ℤ G (f₂ q)
+      = -(MonoidAlgebra.of ℤ G (f₁ q)
+          * (MonoidAlgebra.of ℤ G ((f₁ q)⁻¹ * f₂ q) - 1)) := by
+    rw [mul_sub, mul_one, ← map_mul, mul_inv_cancel_left, neg_sub]
+  rw [hval]
+  exact Submodule.neg_mem _ (Submodule.mul_mem_mul Submodule.mem_top
+    (sub_one_mem_augmentationIdealOf G K hk))
+
+/-- **Theorem 10.24's `Ξ` equals the sum over an arbitrary system of coset
+representatives** (Isaacs p. 313, transversal independence): for any
+`f : G/K → G` with `f q` representing `q`, `transferXi = Ξ_f`.  This bridges
+the left-transversal-inverse sum of Theorem 10.24 with the plain transversal
+sum used in Lemma 10.27. -/
+theorem transferXi_eq_mulLeft_sectionSum (S : K.LeftTransversal)
+    {f : G ⧸ K → G} (hf : ∀ q, (↑(f q) : G ⧸ K) = q) :
+    transferXi G K hK S
+      = augmentationCoquotientMulLeft G K hK (sectionSum G K f) := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  have hsec : transversalInvSum G K S
+      = sectionSum G K (fun q => (S.2.leftQuotientEquiv q⁻¹ : G)⁻¹) := by
+    rw [transversalInvSum, sectionSum]
+    exact (Equiv.sum_comp (Equiv.inv (G ⧸ K))
+      (fun q => MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv q : G)⁻¹)).symm
+  rw [transferXi, hsec]
+  apply augmentationCoquotientMulLeft_sectionSum_congr
+  intro q
+  rw [hf q, QuotientGroup.mk_inv, inv_eq_iff_eq_inv]
+  exact S.2.quotientGroupMk_leftQuotientEquiv q⁻¹
+
+end TransversalIndependence
 
 section CoquotientSq
 
@@ -729,5 +882,285 @@ theorem finite_quotient_augmentationCoquotientSqImage [Finite G] :
         (abelianizationEquivAugmentationQuotient G).toEquiv.symm)).symm
 
 end CoquotientSq
+
+section CommQuotient
+
+/-! ### `G/K` abelian and `ℤ[G/K]` commutative when `G' ⊆ K` (Isaacs p. 316)
+
+Theorem 10.25 applies Theorem 10.26 over `R = ℤ[G/K]`, which is commutative
+precisely because `G' ⊆ K` makes `G/K` abelian. -/
+
+variable [hK : K.Normal]
+
+/-- `G/K` is abelian when `K` contains the commutator subgroup `G'`
+(Isaacs p. 316).  Provided as a `def` for local `letI` use — a global
+instance would fire speculatively on every normal-subgroup quotient. -/
+@[reducible]
+def quotientCommGroup (h : _root_.commutator G ≤ K) : CommGroup (G ⧸ K) :=
+  { (inferInstance : Group (G ⧸ K)) with
+    mul_comm := by
+      intro a b
+      obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
+      obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective b
+      rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, QuotientGroup.eq]
+      have hmem : ⁅y⁻¹, x⁻¹⁆ ∈ K :=
+        h (Subgroup.commutator_mem_commutator (Subgroup.mem_top _)
+          (Subgroup.mem_top _))
+      have heq : (x * y)⁻¹ * (y * x) = ⁅y⁻¹, x⁻¹⁆ := by
+        rw [commutatorElement_def, inv_inv, inv_inv]; group
+      rwa [heq] }
+
+/-- The augmentation ideal `Δ(G/K)` of `ℤ[G/K]` as a genuine ring ideal
+(Isaacs' `U` in the proof of Theorem 10.25). -/
+noncomputable def augmentationRingIdeal :
+    Ideal (MonoidAlgebra ℤ (G ⧸ K)) :=
+  RingHom.ker (augmentation (G ⧸ K)).toRingHom
+
+theorem mem_augmentationRingIdeal {γ : MonoidAlgebra ℤ (G ⧸ K)} :
+    γ ∈ augmentationRingIdeal G K ↔ augmentation (G ⧸ K) γ = 0 :=
+  RingHom.mem_ker
+
+/-- The augmentation ring ideal `Δ(G/K)` and the `ℤ`-submodule
+`augmentationIdeal (G ⧸ K)` have the same underlying set. -/
+theorem mem_augmentationRingIdeal_iff_mem_augmentationIdeal
+    {γ : MonoidAlgebra ℤ (G ⧸ K)} :
+    γ ∈ augmentationRingIdeal G K ↔ γ ∈ augmentationIdeal (G ⧸ K) := by
+  rw [mem_augmentationRingIdeal, mem_augmentationIdeal_iff]
+
+/-- `π = mapDomain (G → G/K)` is surjective on group rings. -/
+theorem mapDomainAlgHom_surjective :
+    Function.Surjective (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) :
+      MonoidAlgebra ℤ G → MonoidAlgebra ℤ (G ⧸ K)) :=
+  Finsupp.mapDomain_surjective (QuotientGroup.mk'_surjective K)
+
+/-- The `ℤ[G/K]`-action of `π(x)` on `Δ(G)‾` is the `ℤ[G]`-action of `x`. -/
+theorem augmentationCoquotientModule_mapDomain_smul (h : _root_.commutator G ≤ K)
+    (x : MonoidAlgebra ℤ G) (a : AugmentationCoquotient G K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) • a
+      = augmentationCoquotientMulLeft G K hK x a := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  show augmentationCoquotientAlgHom G K
+    (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) a = _
+  rw [augmentationCoquotientAlgHom_mapDomain]
+
+/-- **Isaacs p. 316** (the index computation `|A : UA| = |Δ(G) : Δ(G)²|`):
+`UA = Δ(G)²‾`, i.e. the `ℤ[G/K]`-submodule `Δ(G/K)·Δ(G)‾`, restricted to `ℤ`,
+equals the image of `Δ(G)²` in `Δ(G)‾`. -/
+theorem restrictScalars_augmentationRingIdeal_smul_top
+    (h : _root_.commutator G ≤ K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    Submodule.restrictScalars ℤ (augmentationRingIdeal G K •
+        (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K)))
+      = augmentationCoquotientSqImage G K := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  apply le_antisymm
+  · intro w hw
+    rw [Submodule.restrictScalars_mem] at hw
+    refine Submodule.smul_induction_on hw (fun γ hγ a _ => ?_)
+      (fun x y hx hy => Submodule.add_mem _ hx hy)
+    -- lift `γ ∈ Δ(G/K)` to `x₀ ∈ Δ(G)` with `π x₀ = γ`
+    obtain ⟨x₀, hx₀'⟩ := mapDomainAlgHom_surjective G K γ
+    have hx₀Δ : x₀ ∈ augmentationIdeal G := by
+      rw [mem_augmentationIdeal_iff, ← augmentation_mapDomain G K x₀, hx₀']
+      exact Iff.mp (mem_augmentationRingIdeal G K) hγ
+    obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ a
+    rw [← hx₀', augmentationCoquotientModule_mapDomain_smul G K h x₀,
+      augmentationCoquotientMulLeft_mk G K hK]
+    refine Submodule.mem_map.mpr ⟨⟨(x₀ : MonoidAlgebra ℤ G) * α,
+      mul_mem_augmentationIdeal_left G x₀ α.2⟩, ?_, rfl⟩
+    exact mem_augmentationIdealSq.mpr (Submodule.mul_mem_mul hx₀Δ α.2)
+  · -- `Δ(G)²‾ ≤ UA`: reduce `mk β` on generators `p*q`, `p, q ∈ Δ(G)`
+    intro w hw
+    obtain ⟨⟨β, hβΔ⟩, ha, rfl⟩ := Submodule.mem_map.mp hw
+    rw [mem_augmentationIdealSq] at ha
+    have key : ∀ γ ∈ augmentationIdeal G * augmentationIdeal G,
+        γ ∈ augmentationIdeal G ∧ ∀ hγ : γ ∈ augmentationIdeal G,
+          (Submodule.Quotient.mk ⟨γ, hγ⟩ : AugmentationCoquotient G K)
+            ∈ Submodule.restrictScalars ℤ (augmentationRingIdeal G K •
+              (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K))
+                (AugmentationCoquotient G K))) := by
+      intro γ hγsq
+      refine Submodule.mul_induction_on hγsq (fun p hp q hq => ?_)
+        (fun u v ihu ihv => ?_)
+      · refine ⟨mul_mem_augmentationIdeal_left G p hq, fun hγ => ?_⟩
+        have hpq : (Submodule.Quotient.mk ⟨p * q, hγ⟩ :
+              AugmentationCoquotient G K)
+            = (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) p)
+                • (Submodule.Quotient.mk ⟨q, hq⟩ :
+                  AugmentationCoquotient G K) := by
+          rw [augmentationCoquotientModule_mapDomain_smul G K h p,
+            augmentationCoquotientMulLeft_mk G K hK]
+          rfl
+        rw [hpq, Submodule.restrictScalars_mem]
+        refine Submodule.smul_mem_smul ?_ Submodule.mem_top
+        rw [mem_augmentationRingIdeal, augmentation_mapDomain G K p]
+        exact mem_augmentationIdeal_iff.mp hp
+      · obtain ⟨hu, ihu'⟩ := ihu
+        obtain ⟨hv, ihv'⟩ := ihv
+        refine ⟨Submodule.add_mem _ hu hv, fun hγ => ?_⟩
+        have hadd : (Submodule.Quotient.mk ⟨u + v, hγ⟩ :
+              AugmentationCoquotient G K)
+            = Submodule.Quotient.mk ⟨u, hu⟩ + Submodule.Quotient.mk ⟨v, hv⟩ := by
+          rw [← Submodule.Quotient.mk_add]; rfl
+        rw [hadd]
+        exact Submodule.add_mem _ (ihu' hu) (ihv' hv)
+    exact (key β ha).2 hβΔ
+
+/-- **Isaacs p. 316**: the index `|A : UA| = |G : G'|` for `A = Δ(G)‾`,
+`U = Δ(G/K)`.  This is the `m` fed to Theorem 10.26 in the proof of
+Theorem 10.25. -/
+theorem nat_card_quotient_augmentationRingIdeal_smul_top
+    (h : _root_.commutator G ≤ K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    Nat.card (AugmentationCoquotient G K ⧸ (augmentationRingIdeal G K •
+        (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K))))
+      = Nat.card (Abelianization G) := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  rw [← nat_card_quotient_augmentationCoquotientSqImage G K,
+    ← restrictScalars_augmentationRingIdeal_smul_top G K h]
+  rfl
+
+end CommQuotient
+
+section Lemma1027
+
+/-! ### Lemma 10.27 (Isaacs pp. 316-317)
+
+If `ε ∈ ℤ[G]` annihilates `Δ(G)‾` and `ε = ∑_q e_q·f(q)` is supported on a
+system of coset representatives, then all coefficients `e_q` are equal.  The
+argument pushes `ε(g-1) ∈ Δ(K)Δ(G)` through the projection `π : ℤ[G] → ℤ[G/K]`
+(which kills `Δ(K)Δ(G)`), reducing to the fact that a right-invariant element
+of a finite group ring has constant coefficients. -/
+
+/-- A right-invariant element of a group ring has constant coefficients:
+`η·s = η` for all `s` forces `η a = η b`. -/
+theorem apply_eq_of_forall_mul_of_eq {H : Type*} [Group H]
+    {η : MonoidAlgebra ℤ H}
+    (hinv : ∀ s : H, η * MonoidAlgebra.of ℤ H s = η) (a b : H) :
+    η a = η b := by
+  have key : ∀ s : H, η (a * s⁻¹) = η a := by
+    intro s
+    have h1 : (η * MonoidAlgebra.of ℤ H s) a = η (a * s⁻¹) := by
+      rw [MonoidAlgebra.of_apply, MonoidAlgebra.mul_single_apply, mul_one]
+    rw [hinv s] at h1
+    exact h1.symm
+  have h2 := key (b⁻¹ * a)
+  rw [mul_inv_rev, inv_inv, ← mul_assoc, mul_inv_cancel, one_mul] at h2
+  exact h2.symm
+
+variable [hK : K.Normal] [K.FiniteIndex]
+
+omit [K.FiniteIndex] in
+/-- `π = mapDomain (G → G/K)` kills `Δ(K)`. -/
+theorem mapDomain_eq_zero_of_mem_augmentationIdealOf
+    {a : MonoidAlgebra ℤ G} (ha : a ∈ augmentationIdealOf G K) :
+    MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) a = 0 := by
+  induction ha using Submodule.span_induction with
+  | mem z hz =>
+    obtain ⟨k, rfl⟩ := hz
+    have hk1 : (QuotientGroup.mk' K (k : G) : G ⧸ K) = 1 := by
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact k.2
+    rw [map_sub, map_one, MonoidAlgebra.of_apply,
+      MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
+      hk1, ← MonoidAlgebra.one_def, sub_self]
+  | zero => rw [map_zero]
+  | add x y _ _ ihx ihy => rw [map_add, ihx, ihy, add_zero]
+  | smul c x _ ihx => rw [map_smul, ihx]; exact smul_zero c
+
+omit [K.FiniteIndex] in
+/-- `π = mapDomain (G → G/K)` kills the ideal `Δ(K)Δ(G)`. -/
+theorem mapDomain_eq_zero_of_mem_mul
+    {x : MonoidAlgebra ℤ G}
+    (hx : x ∈ augmentationIdealOf G K * augmentationIdeal G) :
+    MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x = 0 := by
+  refine Submodule.mul_induction_on' (fun a ha b _ => ?_)
+    (fun u v _ _ hu hv => ?_) hx
+  · rw [map_mul, mapDomain_eq_zero_of_mem_augmentationIdealOf G K ha, zero_mul]
+  · rw [map_add, hu, hv, add_zero]
+
+omit [K.FiniteIndex] in
+/-- If `ε` annihilates `Δ(G)‾` (i.e. `Ξ_ε = 0`), then `ε·α ∈ Δ(K)Δ(G)` for
+every `α ∈ Δ(G)`. -/
+theorem mul_mem_of_augmentationCoquotientMulLeft_eq_zero
+    {ε : MonoidAlgebra ℤ G}
+    (hε : augmentationCoquotientMulLeft G K hK ε = 0)
+    {α : MonoidAlgebra ℤ G} (hα : α ∈ augmentationIdeal G) :
+    ε * α ∈ augmentationIdealOf G K * augmentationIdeal G := by
+  have h := DFunLike.congr_fun hε (Submodule.Quotient.mk ⟨α, hα⟩)
+  rw [augmentationCoquotientMulLeft_mk, LinearMap.zero_apply,
+    Submodule.Quotient.mk_eq_zero] at h
+  exact mem_augmentationCorel.mp h
+
+/-- The transversal sum weighted by `e : G/K → ℤ` (Isaacs' `ε = ∑_t e_t t`). -/
+noncomputable def sectionWeightedSum (e : G ⧸ K → ℤ) (f : G ⧸ K → G) :
+    MonoidAlgebra ℤ G :=
+  letI := K.fintypeQuotientOfFiniteIndex
+  ∑ q : G ⧸ K, MonoidAlgebra.single (f q) (e q)
+
+/-- `π(∑_q e_q·f(q)) = ∑_q e_q·q`, the finsupp with coefficient `e_q` at `q`. -/
+theorem mapDomain_sectionWeightedSum (e : G ⧸ K → ℤ) {f : G ⧸ K → G}
+    (hf : ∀ q, (↑(f q) : G ⧸ K) = q) (q : G ⧸ K) :
+    (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+        (sectionWeightedSum G K e f)) q = e q := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  rw [sectionWeightedSum, map_sum]
+  have hterm : ∀ p : G ⧸ K,
+      (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+        (MonoidAlgebra.single (f p) (e p)))
+        = MonoidAlgebra.single p (e p) := by
+    intro p
+    rw [MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
+      QuotientGroup.mk'_apply, hf p]
+  simp_rw [hterm]
+  change (∑ p : G ⧸ K, (Finsupp.single p (e p) : (G ⧸ K) →₀ ℤ)) q = e q
+  rw [Finsupp.finsetSum_apply]
+  refine Eq.trans (Finset.sum_eq_single q ?_ ?_) Finsupp.single_eq_same
+  · intro p _ hp
+    exact Finsupp.single_eq_of_ne hp.symm
+  · intro h
+    exact absurd (Finset.mem_univ q) h
+
+/-- **Isaacs Lemma 10.27**, key step (pp. 316-317): if `ε = ∑_q e_q·f(q)` (for
+a system `f` of coset representatives) annihilates `Δ(G)‾`, then all the
+coefficients `e_q` are equal. -/
+theorem sectionWeightedSum_coeff_const
+    {f : G ⧸ K → G} (hf : ∀ q, (↑(f q) : G ⧸ K) = q) {e : G ⧸ K → ℤ}
+    (hε : augmentationCoquotientMulLeft G K hK (sectionWeightedSum G K e f) = 0)
+    (q₁ q₂ : G ⧸ K) : e q₁ = e q₂ := by
+  -- `π(ε)` is right-invariant: `π(ε) * of s = π(ε)` for all `s ∈ G/K`
+  have hinv : ∀ s : G ⧸ K,
+      MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+          (sectionWeightedSum G K e f) * MonoidAlgebra.of ℤ (G ⧸ K) s
+        = MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+          (sectionWeightedSum G K e f) := by
+    intro s
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective s
+    have hmul : sectionWeightedSum G K e f * (MonoidAlgebra.of ℤ G g - 1)
+        ∈ augmentationIdealOf G K * augmentationIdeal G :=
+      mul_mem_of_augmentationCoquotientMulLeft_eq_zero G K hε
+        (sub_one_mem_augmentationIdeal G g)
+    have hpi : MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+        (sectionWeightedSum G K e f * (MonoidAlgebra.of ℤ G g - 1)) = 0 :=
+      mapDomain_eq_zero_of_mem_mul G K hmul
+    rw [map_mul, map_sub, map_one] at hpi
+    rw [show MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+          (MonoidAlgebra.of ℤ G g) = MonoidAlgebra.of ℤ (G ⧸ K) ↑g from ?_] at hpi
+    · rw [mul_sub, mul_one, sub_eq_zero] at hpi
+      exact hpi
+    · rw [MonoidAlgebra.of_apply, MonoidAlgebra.mapDomainAlgHom_apply,
+        MonoidAlgebra.mapDomain_single, QuotientGroup.mk'_apply,
+        ← MonoidAlgebra.of_apply]
+  have hcoeff := apply_eq_of_forall_mul_of_eq hinv q₁ q₂
+  rwa [mapDomain_sectionWeightedSum G K e hf q₁,
+    mapDomain_sectionWeightedSum G K e hf q₂] at hcoeff
+
+end Lemma1027
 
 end OddOrder.Algebra
