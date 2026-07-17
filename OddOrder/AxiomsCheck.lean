@@ -3,7 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Lean
+import Lean.Elab.Command
+import Lean.Util.CollectAxioms
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.ChermakDelgado
@@ -145,9 +146,6 @@ import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
--- 機械列挙ファイル (flagship axioms check) のため分割対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 8500
-
 /-!
 # Axioms check for chapter flagship theorems
 
@@ -182,6 +180,10 @@ elaboration が失敗し, `lake build` も失敗する.
 
 Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
+
+-- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
+set_option linter.style.longFile 8500
+set_option linter.style.longLine false
 
 open Lean Elab Command
 
