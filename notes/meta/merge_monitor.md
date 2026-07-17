@@ -716,6 +716,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #26 部分実行→ユーザー区切り指示で監視停止、Fable hub) — ✅ a のみ合流、census 23 不変。b/c は未マージ持ち越し**:
+  **a** = `6bd419ec` (nilpotent normal p-complements + 一意性/自己同型不変性、
+  NilpotentPComplement.lean 新設 185 行) を merge `9089d2e8`: build **4344 jobs green**。
+  **ユーザー「いったん区切れますか」→ 監視 cron (`895cb8e3`) を CronDelete、b/c は次回再開時に合流**:
+  - **b 持ち越し** = `f0b2cca1` (⭐ **Pf Part II Suzuki 着手**: 旧 opaque-Prop scaffold 削除 →
+    **honest (A1)-(A3) Hypothesis** 実定義 + 基本補題、Suzuki.lean sorry 5→0。NearFields 2 行は
+    自所有 signature 変更への 🔩 機械的追従で非逸脱と hub 判定済み。census 23→18 見込み)。
+  - **c 持ち越し** = `aa973764` (PrincipalIdealTheorem.lean 新設 = Δ(K)Δ(G) left ideal +
+    Δ(G)‾ module、Isaacs 10.24 基盤。自力 wiring 済・claim 9108 内)。
+  - 両者とも hub の事前検査 (範囲・sorry・axiom) は**合格済み**、build gate のみ未実施。
+  再開手順: cron 再作成 (15 分 `7,22,37,52`) → 通常 tick で b/c から合流。
 - **2026-07-17 (tick #25、Fable hub) — ✅ a/b/c 合流、census 23 不変。⭐ b が Isaacs Ch.8 完了**:
   **a** = `bbe016d2` (**Thm 6.7** kernel complement + **Cor 6.17 完全形** = KernelComplement.lean
   新設 108 行 / **Thm 6.19** 奇数位数 Frobenius complement の素数位数部分群一意性 / AxiomsCheck
