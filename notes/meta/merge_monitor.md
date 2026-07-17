@@ -716,6 +716,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #27 = 監視再開、Fable hub) — ✅ b + c 持ち越し分を合流、census 23→18 (b の scaffold 5 sorry 削除)。cron 再作成 (15 分 `7,22,37,52`)**:
+  **b** = `03e52686` tip (⭐ Pf Part II Suzuki: honest (A1)-(A3) Hypothesis 置換 + **Ch.I Prop 1(a)(b)**
+  `exists_mem_H_conj_inf_eq_D` / `normalizer_le_H_of_le_Q`) を merge `f0314f12`: build **4344 jobs green**。
+  NearFields 2 行 = 🔩 機械的追従 (self-flag 済) で非逸脱確定。
+  **c** = `45925853` tip (PrincipalIdealTheorem.lean = Δ(K)Δ(G) left ideal + Δ(G)‾ module +
+  K-自明作用 + ι 単射、Isaacs 10.24 基盤、claim 9108 内・wiring 済) を merge `455dcf4a`:
+  build **4345 jobs green**。AxiomsCheck OK・新 axiom なし・逸脱なし。push `6299b980..455dcf4a`。
+  **a** = 変化なし (0 ahead)。
+  **並行タスク開始 (ユーザー指示 2026-07-17)**: (1) 既存 linter warnings 解消 — full-log census
+  4,778 件 (line-length 2741 / `show` linter 869 / unused simp args 125 / simpa→simp 38 / 他)、
+  hub が凍結ファイルから段階的に解消 (active frontier は回避、issue 起票)。(2) ファイル粒度
+  enforcement — 2000 行超 = S03f_Thm36.lean 3822 行 (分割必須、BG 凍結ゆえ hub 実施) +
+  1900 行台 3 件 (CharacterParameters 1976 / RhoConstancy 1971 / S04g_Thm418 1963) を watch。
 - **2026-07-17 (tick #26 部分実行→ユーザー区切り指示で監視停止、Fable hub) — ✅ a のみ合流、census 23 不変。b/c は未マージ持ち越し**:
   **a** = `6bd419ec` (nilpotent normal p-complements + 一意性/自己同型不変性、
   NilpotentPComplement.lean 新設 185 行) を merge `9089d2e8`: build **4344 jobs green**。
