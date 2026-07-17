@@ -368,7 +368,7 @@ variable [Finite Ω]
 
 omit [Finite Ω] in
 /-- The size of a suborbit is a relative index of stabilizers. -/
-private lemma ncard_suborbit_eq_relIndex (α β : Ω) :
+lemma ncard_suborbit_eq_relIndex (α β : Ω) :
     Set.ncard (orbit (stabilizer G α) β) =
       (stabilizer G β).relIndex (stabilizer G α) := by
   have hstab : stabilizer (↥(stabilizer G α)) β =
@@ -405,28 +405,31 @@ private lemma ncard_suborbit_smul_eq (g : G) (α β : Ω) :
 
 omit [Finite Ω] in
 /-- Conjugate stabilizers have equal cardinality. -/
-private lemma card_stabilizer_eq [IsPretransitive G Ω] (α β : Ω) :
+lemma card_stabilizer_eq [IsPretransitive G Ω] (α β : Ω) :
     Nat.card (stabilizer G α) = Nat.card (stabilizer G β) := by
   obtain ⟨g, rfl⟩ := exists_smul_eq G α β
   rw [stabilizer_smul_eq_stabilizer_map_conj]
   exact Nat.card_congr
     (Subgroup.equivMapOfInjective _ _ (MulEquiv.injective (MulAut.conj g))).toEquiv
 
+/-- `|B : A ∩ B| · |A ∩ B| = |B|` — the relative index against the
+intersection. -/
+lemma relIndex_mul_card_inf {M : Type*} [Group M] [Finite M]
+    (A B : Subgroup M) :
+    A.relIndex B * Nat.card ↥(A ⊓ B) = Nat.card B := by
+  have h2 := Subgroup.index_mul_card ((A ⊓ B).subgroupOf B)
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+    (inf_le_right : A ⊓ B ≤ B)).toEquiv] at h2
+  rw [← Subgroup.inf_relIndex_right A B]
+  exact h2
+
 /-- Relative indices of equal-order subgroups are symmetric:
 `|K : H ∩ K| = |H : K ∩ H|` when `|H| = |K|`. -/
-private lemma relIndex_comm_of_card_eq {M : Type*} [Group M] [Finite M]
+lemma relIndex_comm_of_card_eq {M : Type*} [Group M] [Finite M]
     {H K : Subgroup M} (hcard : Nat.card H = Nat.card K) :
     H.relIndex K = K.relIndex H := by
-  have key : ∀ A B : Subgroup M,
-      A.relIndex B * Nat.card ↥(A ⊓ B) = Nat.card B := by
-    intro A B
-    have h2 := Subgroup.index_mul_card ((A ⊓ B).subgroupOf B)
-    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
-      (inf_le_right : A ⊓ B ≤ B)).toEquiv] at h2
-    rw [← Subgroup.inf_relIndex_right A B]
-    exact h2
-  have h1 := key H K
-  have h2 := key K H
+  have h1 := relIndex_mul_card_inf H K
+  have h2 := relIndex_mul_card_inf K H
   rw [inf_comm K H, hcard] at h2
   have hpos : 0 < Nat.card ↥(H ⊓ K) := Nat.card_pos
   exact Nat.eq_of_mul_eq_mul_right hpos (h1.trans h2.symm)
