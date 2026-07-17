@@ -596,6 +596,98 @@ theorem transversalComponentSum_sub_one_mul_sub_one
     transversalComponentSum_of, transversalComponentSum_one G K hT h1,
     hfst_mul, hfst_self, sub_one_mul_sub_one, map_mul]
 
+open scoped Classical in
+/-- The `t`-component `fₜ : ℤ[G] → ℤ[K] ⊆ ℤ[G]` with respect to the right
+transversal `T` (Isaacs p. 311): a basis element `g` with unique factorization
+`g = ks` (`k ∈ K`, `s ∈ T`) maps to `k` if `s = t`, and to `0` otherwise. -/
+noncomputable def transversalComponent
+    (hT : Subgroup.IsComplement (K : Set G) T) (t : G) :
+    MonoidAlgebra ℤ G →ₗ[ℤ] MonoidAlgebra ℤ G :=
+  (MonoidAlgebra.basis G ℤ).constr ℤ fun g =>
+    if ((hT.equiv g).2 : G) = t
+      then MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) else 0
+
+open scoped Classical in
+theorem transversalComponent_of (hT : Subgroup.IsComplement (K : Set G) T)
+    (t : G) (u : G) :
+    transversalComponent G K hT t (MonoidAlgebra.of ℤ G u)
+      = if ((hT.equiv u).2 : G) = t
+          then MonoidAlgebra.of ℤ G ((hT.equiv u).1 : G) else 0 := by
+  rw [show MonoidAlgebra.of ℤ G u = MonoidAlgebra.basis G ℤ u from
+    (MonoidAlgebra.basis_apply ℤ u).symm]
+  exact (MonoidAlgebra.basis G ℤ).constr_basis ℤ _ u
+
+open scoped Classical in
+/-- Component computation on generators: for `g = hs` along the transversal,
+`fₜ((k-1)(g-1)) = [s = t]·(kh - h) + [1 = t]·(1 - k)` (Isaacs p. 312; both
+brackets lie in `Δ(K)` for every `t`). -/
+theorem transversalComponent_sub_one_mul_sub_one
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    (k : K) (g : G) (t : G) :
+    transversalComponent G K hT t
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+      = (if ((hT.equiv g).2 : G) = t
+          then MonoidAlgebra.of ℤ G (↑k * ((hT.equiv g).1 : G))
+            - MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) else 0)
+        + (if (1 : G) = t then 1 - MonoidAlgebra.of ℤ G ↑k else 0) := by
+  have hfst_mul : ((hT.equiv (↑k * g)).1 : G) = ↑k * ((hT.equiv g).1 : G) := by
+    rw [hT.equiv_mul_left_of_mem k.2]; rfl
+  have hsnd_mul : ((hT.equiv (↑k * g)).2 : G) = ((hT.equiv g).2 : G) := by
+    rw [hT.equiv_mul_left_of_mem k.2]
+  have hfst_self : ((hT.equiv ↑k).1 : G) = ↑k := by
+    rw [hT.equiv_fst_eq_self_of_mem_of_one_mem h1 k.2]
+  have hsnd_self : ((hT.equiv ↑k).2 : G) = 1 := by
+    rw [hT.equiv_snd_eq_one_of_mem_of_one_mem h1 k.2]
+  have hone : transversalComponent G K hT t 1
+      = if (1 : G) = t then 1 else 0 := by
+    rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.of ℤ G 1 from
+        (map_one (MonoidAlgebra.of ℤ G)).symm,
+      transversalComponent_of, hT.equiv_one (K.one_mem) h1]
+  rw [sub_one_mul_sub_one, map_add, map_sub, map_sub,
+    transversalComponent_of, transversalComponent_of, transversalComponent_of,
+    hone]
+  simp only [hfst_mul, hsnd_mul, hfst_self, hsnd_self]
+  split_ifs <;> abel
+
+/-- **Isaacs Lemma 10.21** (per-component half): if `α ∈ Δ(K)Δ(G)` then every
+`t`-component satisfies `αₜ ∈ Δ(K)`. -/
+theorem transversalComponent_mem
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T) (t : G)
+    {α : MonoidAlgebra ℤ G}
+    (hα : α ∈ augmentationIdealOf G K * augmentationIdeal G) :
+    transversalComponent G K hT t α ∈ augmentationIdealOf G K := by
+  have hle : augmentationIdealOf G K * augmentationIdeal G
+      ≤ (augmentationIdealOf G K).comap (transversalComponent G K hT t) := by
+    rw [augmentationIdeal_eq_span]
+    refine span_mul_span_le G ?_
+    rintro _ ⟨k, rfl⟩ _ ⟨g, rfl⟩
+    have : transversalComponent G K hT t
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+        ∈ augmentationIdealOf G K := by
+      rw [transversalComponent_sub_one_mul_sub_one G K hT h1]
+      refine Submodule.add_mem _ ?_ ?_
+      · split_ifs
+        · have hsplit : MonoidAlgebra.of ℤ G (↑k * ((hT.equiv g).1 : G))
+              - MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G)
+              = (MonoidAlgebra.of ℤ G (↑k * ((hT.equiv g).1 : G)) - 1)
+                - (MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) - 1) := by
+            abel
+          rw [hsplit]
+          exact Submodule.sub_mem _
+            (sub_one_mem_augmentationIdealOf G K
+              ⟨↑k * ((hT.equiv g).1 : G), K.mul_mem k.2 (hT.equiv g).1.2⟩)
+            (sub_one_mem_augmentationIdealOf G K ⟨_, (hT.equiv g).1.2⟩)
+        · exact Submodule.zero_mem _
+      · split_ifs
+        · have hsplit : (1 : MonoidAlgebra ℤ G) - MonoidAlgebra.of ℤ G ↑k
+              = -(MonoidAlgebra.of ℤ G ↑k - 1) := by
+            abel
+          rw [hsplit]
+          exact Submodule.neg_mem _ (sub_one_mem_augmentationIdealOf G K k)
+        · exact Submodule.zero_mem _
+    exact this
+  exact hle hα
+
 /-- **Isaacs Lemma 10.21** (component-sum half): if `α ∈ Δ(K)Δ(G)` then
 `f(α) = ∑ₜ αₜ ∈ Δ(K)²`. -/
 theorem transversalComponentSum_mem_sq
