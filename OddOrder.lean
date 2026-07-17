@@ -165,6 +165,7 @@ import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch1_Preliminary.PLength
+import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
