@@ -716,6 +716,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #22、Fable hub) — ✅ a/b/c 全 3 レーン合流、census 23 不変**:
+  **a** = `87e5b628` (**Lem 4.6 一般化** [Finite G] 除去 + **Lem 4.29 unconditional** coprimality のみで
+  [G,A,A]=[G,A] = specialized 債務解消 2 件 / AxiomsCheck Ch05 mains 登録 / issue 0002/0003 close) を
+  merge `51b19a32`: build **4321 jobs green**。**b** = `aef8861a` (**m-arrow 装置 + Thm 8.42(a)**、
+  CommonDivisorGraph.lean 新設 209 行、b 自身が OddOrder.lean wiring 済 ✓) を merge `07125b6d`:
+  build **4322 jobs green**。**c** = `bf1efc39` (**Thm 10.20** G/G' ≃* Δ(G)/Δ(G)² abelianization、
+  AugmentationIdeal +296 = 493 行) を merge `0d96b284`: build **4322 jobs green**。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK (2540 asserts)・逸脱なし。push `72ea268e..0d96b284`。
+  ⚠ size watch: **Ch04 Main/CommutatorBasics.lean 1552 行 (> 1500)** — issue 0122 起票、hub が分割実施
+  (a の Ch04 worktree クリーン確認済 = 安全窓)。
 - **2026-07-17 (tick #21、Fable hub 監視再開) — ✅ 中断 merge 回収 + a×2 / b×2 / c×1 の計 5 merge、census 23 不変**:
   セッション開始時に前 hub セッションの**中断 trial merge** (a@d389e81c staged + MERGE_HEAD 残存) を検出 →
   「前セッションがマージ途中で死んだ場合」手順で検証完結 `24494f85` (AxiomsCheck **Mann cluster 登録** +

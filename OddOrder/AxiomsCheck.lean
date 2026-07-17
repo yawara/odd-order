@@ -311,12 +311,23 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- P p-subgroup, Q normal p'-subgroup, Q fixes all P-fixed elements ⇒ Q acts trivially.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.isaacs_thm_4_38
 
+-- Ch.5 (Transfer): Cor 5.4 quotient form (Z ≤ Γ' ∩ Z(Γ), p ∣ |Z| ⇒ Sylow_p(Γ/Z) noncyclic)
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch05.not_isCyclic_sylow_quotient_of_le_commutator_inf_center
+
+-- Ch.5 (Transfer): Thm 5.10 (Dietzmann: finite conjugation-closed bounded-exponent X ⇒ ⟨X⟩ finite)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch05.dietzmann
+
 -- Ch.5 (Transfer): Lem 5.12 (N_G(P) controls C_G(P) fusion)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.normalizer_controls_centralizer_fusion
 
 -- Ch.5 (Transfer): Thm 5.13 (Burnside normal p-complement)
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer
+
+-- Ch.5 (Transfer): Cor 5.19 general form (Sylow 2 with strict-max cyclic direct factor ⇒ not simple)
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch05.not_isSimpleGroup_of_sylow_two_cyclic_strict_max_factor
 
 -- Ch.5 (Transfer): Thm 5.20 (focal transfer kernel is A^p(G))
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch05.APrime_eq_transferFocal_ker
