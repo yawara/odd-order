@@ -377,6 +377,38 @@ lemma tau_fixed_fitting_eq_one {x : hyp.Dbar} (hxF : x ∈ fitting hyp.Dbar)
   rw [hfpf, Subgroup.mem_bot] at hmem
   exact hyp.distinguishedInvolution_ne_one (by simpa using congrArg Subtype.val hmem)
 
+/-! ## `Ā ⊆ J`: `τ` inverts every element of `Ā` (p. 103) -/
+
+/-- **Peterfalvi Part II, Ch. I §2** (p. 103): `Ā = F(D̄) ⊆ J`, i.e. `τ` inverts every
+element of the Fitting subgroup.  `Ā` is characteristic, so `τ` restricts to an
+involutive endomorphism of `Ā` fixing only `1` (`tau_fixed_fitting_eq_one`); `Ā` has
+odd order, so the §1 Lemma (a) in endomorphism form
+(`map_eq_inv_of_forall_fixed_eq_one`) shows `τ` inverts every element. -/
+lemma fitting_subset_inverted {y : hyp.Dbar} (hy : y ∈ fitting hyp.Dbar) :
+    hyp.tau y = y⁻¹ := by
+  -- `τ` maps `Ā` into `Ā` (characteristic).
+  have hmapeq : (fitting hyp.Dbar).map (hyp.tau : hyp.Dbar ≃* hyp.Dbar).toMonoidHom =
+      fitting hyp.Dbar :=
+    (Subgroup.characteristic_iff_map_eq.mp inferInstance) hyp.tau
+  have hmem : ∀ z ∈ fitting hyp.Dbar, hyp.tau z ∈ fitting hyp.Dbar := fun z hz => by
+    rw [← hmapeq]; exact Subgroup.mem_map_of_mem _ hz
+  -- the restricted endomorphism `σ = τ|_Ā`.
+  let σ : ↥(fitting hyp.Dbar) →* ↥(fitting hyp.Dbar) :=
+    { toFun := fun a => ⟨hyp.tau a, hmem a a.2⟩
+      map_one' := Subtype.ext (by simp)
+      map_mul' := fun a b => Subtype.ext (by push_cast; rw [map_mul]) }
+  have hσ2 : ∀ a, σ (σ a) = a := fun a => Subtype.ext (hyp.tau_involutive a)
+  have hfix : ∀ a, σ a = a → a = 1 := fun a ha =>
+    Subtype.ext (hyp.tau_fixed_fitting_eq_one a.2 (congrArg Subtype.val ha))
+  -- odd order of `Ā`.
+  have hodd : Odd (Nat.card ↥(fitting hyp.Dbar)) := by
+    rcases Nat.even_or_odd (Nat.card ↥(fitting hyp.Dbar)) with he | ho
+    · exact absurd hyp.odd_card_Dbar (Nat.not_odd_iff_even.mpr
+        (even_iff_two_dvd.mpr (dvd_trans he.two_dvd (Subgroup.card_subgroup_dvd_card _))))
+    · exact ho
+  -- §1 Lemma (a), endomorphism form.
+  exact congrArg Subtype.val (map_eq_inv_of_forall_fixed_eq_one hodd σ hσ2 hfix ⟨y, hy⟩)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
