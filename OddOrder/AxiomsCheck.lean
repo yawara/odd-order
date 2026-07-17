@@ -768,6 +768,10 @@ set_option linter.style.longLine false in
 --   ⇒ ∃ G ⊇ N (N ⊴ G), G/N cyclic of order m, generator g, g^m = a, x^g = σ x.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.cyclic_extension_exists
 
+-- Ch.3 (Split Extensions): Thm 3.35 existence 半分 — matching data から拡大同型を構成
+-- (uniqueness 半分 cyclic_quotient_extension_unique と合わせて 3.35 完結).
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.cyclic_quotient_extension_iso_exists
+
 -- Ch.4 ForwardFromCh03 (Isaacs Ch.3 §3E Lemma 3.24(a) Glauberman fixed-point) ⭐
 -- A acts on G via auto, A,G finite, (|A|,|G|)=1, A or G solvable.
 -- A and G act on Ω with compatibility, G transitive ⇒ ∃ A-invariant α ∈ Ω.
