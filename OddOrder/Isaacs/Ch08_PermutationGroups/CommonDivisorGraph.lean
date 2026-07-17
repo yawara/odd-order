@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: `m`-arrows and the subgroups `K_m` (§8D)
@@ -416,6 +417,272 @@ theorem relIndex_arrowKernel_dvd_of_isArrow {m n : ℕ} {α γ : Ω}
     Nat.eq_of_mul_eq_mul_right hpos h5
   exact ⟨K.relIndex C, h6⟩
 
+/-! ### Isaacs Thm 8.41 — the common-divisor graph -/
+
+/-- The remark before Thm 8.42 (Isaacs p. 249): an `m`-arrow with `m > 1`
+forces `k_m > 1`. -/
+lemma one_lt_relIndex_arrowKernel_of_isArrow {m : ℕ} {α β : Ω}
+    (hm : 1 < m) (h : IsArrow G m α β) :
+    1 < (stabilizer G α).relIndex (arrowKernel G m α) := by
+  have hne : (stabilizer G α).relIndex (arrowKernel G m α) ≠ 0 :=
+    Subgroup.index_ne_zero_of_finite
+  rcases Nat.lt_or_ge 1 ((stabilizer G α).relIndex (arrowKernel G m α))
+    with h2 | h2
+  · exact h2
+  · exfalso
+    have h3 : (stabilizer G α).relIndex (arrowKernel G m α) = 1 := by omega
+    have h4 : arrowKernel G m α ≤ stabilizer G α := by
+      have h5 : (stabilizer G α).subgroupOf (arrowKernel G m α) = ⊤ := by
+        rw [← Subgroup.index_eq_one]
+        exact h3
+      exact Subgroup.subgroupOf_eq_top.mp h5
+    have h7 : stabilizer G β ≤ stabilizer G α :=
+      le_trans (stabilizer_le_arrowKernel
+        (mem_arrowComponent_of_isArrow (mem_arrowComponent_self m α) h)) h4
+    have h8 : stabilizer G β = stabilizer G α :=
+      Subgroup.eq_of_le_of_card_ge h7 (le_of_eq (card_stabilizer_eq α β))
+    have h9 : orbit (stabilizer G α) β = {β} := by
+      rw [← h8]
+      exact orbit_stabilizer_self β
+    have h10 : Set.ncard (orbit (stabilizer G α) β) = m := h
+    rw [h9, Set.ncard_singleton] at h10
+    omega
+
+/-- Core of **Isaacs Thm 8.41** — three subdegrees `u < v, w` with `v, w`
+coprime, such that every subdegree is coprime to `u` or `v`, and to `u`
+or `w`, force `u = 1`. -/
+theorem subdegree_eq_one_of_separations {u v w : ℕ} {α βu βv βw : Ω}
+    (hu : IsArrow G u α βu) (hv : IsArrow G v α βv)
+    (hw : IsArrow G w α βw)
+    (huv : u < v) (huw : u < w) (hvw : Nat.Coprime v w)
+    (hsepv : ∀ δ ε : Ω,
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) u ∨
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) v)
+    (hsepw : ∀ δ ε : Ω,
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) u ∨
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) w) :
+    u = 1 := by
+  by_contra hu1
+  have hu0 : 0 < u := by
+    have h5 : (orbit (stabilizer G α) βu).Finite := Set.finite_range _
+    have h6 := (Set.ncard_pos h5).mpr ⟨βu, mem_orbit_self _⟩
+    have hu' : Set.ncard (orbit (stabilizer G α) βu) = u := hu
+    omega
+  have hu2 : 1 < u := by omega
+  have h1 := relIndex_arrowKernel_dvd_of_isArrow huv hv hsepv
+  have h2 := relIndex_arrowKernel_dvd_of_isArrow huw hw hsepw
+  have h3 : (stabilizer G α).relIndex (arrowKernel G u α) ∣ Nat.gcd v w :=
+    Nat.dvd_gcd h1 h2
+  have hvw' : Nat.gcd v w = 1 := hvw
+  rw [hvw'] at h3
+  have h4 := Nat.dvd_one.mp h3
+  have h5 := one_lt_relIndex_arrowKernel_of_isArrow hu2 hu
+  omega
+
+omit [Finite G] in
+/-- Transport of a subdegree witness to any base point. -/
+lemma IsArrow.exists_of_point {d : ℕ} {δ ε : Ω}
+    (h : IsArrow G d δ ε) (α : Ω) : ∃ β, IsArrow G d α β := by
+  obtain ⟨g, rfl⟩ := exists_smul_eq G δ α
+  refine ⟨g • ε, ?_⟩
+  rw [isArrow_iff, ncard_suborbit_smul_eq]
+  exact h
+
 end Theorem842
+
+section CommonDivisorGraphDef
+
+variable (G Ω) in
+/-- The set of subdegrees of the action. -/
+def subdegrees : Set ℕ := {d | ∃ α β : Ω, IsArrow G d α β}
+
+/-- The common-divisor graph on a set of naturals (Isaacs p. 249):
+distinct `a, b` are joined when they are *not* coprime. -/
+def commonDivisorGraph (D : Set ℕ) : SimpleGraph D where
+  Adj a b := a ≠ b ∧ ¬ Nat.Coprime (a : ℕ) (b : ℕ)
+  symm := by
+    constructor
+    rintro a b ⟨hab, hcop⟩
+    exact ⟨hab.symm, fun h => hcop (Nat.Coprime.symm h)⟩
+  loopless := by
+    constructor
+    rintro a ⟨hab, -⟩
+    exact hab rfl
+
+end CommonDivisorGraphDef
+
+section Theorem841
+
+variable [Finite G] [IsPretransitive G Ω] [Nonempty Ω]
+
+/-- **Isaacs Thm 8.41** (p. 249) — the common-divisor graph on the set of
+subdegrees of a transitive action of a finite group has at most three
+connected components (including the component `{1}`). -/
+theorem card_connectedComponent_commonDivisorGraph_le_three :
+    Nat.card
+      (commonDivisorGraph (subdegrees G Ω)).ConnectedComponent ≤ 3 := by
+  classical
+  by_contra hlt
+  rw [not_le] at hlt
+  set D := subdegrees G Ω with hD
+  set Γ := commonDivisorGraph D with hΓ
+  obtain ⟨α₀⟩ := ‹Nonempty Ω›
+  have h1D : (1 : ℕ) ∈ D := by
+    refine ⟨α₀, α₀, ?_⟩
+    rw [isArrow_iff, orbit_stabilizer_self, Set.ncard_singleton]
+  set one : ↥D := ⟨1, h1D⟩ with hone
+  set comp1 := Γ.connectedComponentMk one with hcomp1
+  -- vertices in different components separate the subdegree set
+  have hbridge : ∀ a b : ↥D,
+      Γ.connectedComponentMk a ≠ Γ.connectedComponentMk b →
+      ∀ δ ε : Ω,
+        Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) (a : ℕ) ∨
+        Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) (b : ℕ) := by
+    intro a b hab δ ε
+    by_contra hcon
+    push Not at hcon
+    obtain ⟨h1, h2⟩ := hcon
+    have hdD : Set.ncard (orbit (stabilizer G δ) ε) ∈ D := ⟨δ, ε, rfl⟩
+    set d : ↥D := ⟨Set.ncard (orbit (stabilizer G δ) ε), hdD⟩ with hd
+    have hne_ab : a ≠ b := fun h => hab (by rw [h])
+    by_cases hda : d = a
+    · have hadj : Γ.Adj a b := by
+        refine ⟨hne_ab, ?_⟩
+        rw [← hda]
+        exact h2
+      exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
+    · by_cases hdb : d = b
+      · have hadj : Γ.Adj a b := by
+          refine ⟨hne_ab, ?_⟩
+          have h3 : ¬ Nat.Coprime (b : ℕ) (a : ℕ) := by
+            rw [← hdb]
+            exact h1
+          exact fun h => h3 (Nat.Coprime.symm h)
+        exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
+      · have hadj1 : Γ.Adj d a := ⟨hda, h1⟩
+        have hadj2 : Γ.Adj d b := ⟨hdb, h2⟩
+        have hreach : Γ.Reachable a b :=
+          (hadj1.reachable.symm).trans hadj2.reachable
+        exact hab (SimpleGraph.ConnectedComponent.eq.mpr hreach)
+  -- vertices in different components are coprime
+  have hcoprime : ∀ a b : ↥D,
+      Γ.connectedComponentMk a ≠ Γ.connectedComponentMk b →
+      Nat.Coprime (a : ℕ) (b : ℕ) := by
+    intro a b hab
+    by_contra h2
+    have hadj : Γ.Adj a b := ⟨fun h => hab (by rw [h]), h2⟩
+    exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
+  -- three vertices in distinct components, none the component of `1`
+  have hkey : ∀ x y z : ↥D,
+      Γ.connectedComponentMk x ≠ Γ.connectedComponentMk y →
+      Γ.connectedComponentMk x ≠ Γ.connectedComponentMk z →
+      Γ.connectedComponentMk y ≠ Γ.connectedComponentMk z →
+      Γ.connectedComponentMk x ≠ comp1 →
+      Γ.connectedComponentMk y ≠ comp1 →
+      Γ.connectedComponentMk z ≠ comp1 → False := by
+    intro x y z hxy hxz hyz hx1 hy1 hz1
+    have hval1 : ∀ t : ↥D, (t : ℕ) = 1 →
+        Γ.connectedComponentMk t = comp1 := by
+      intro t ht
+      have h2 : t = one := Subtype.ext (by rw [ht])
+      rw [h2, hcomp1]
+    obtain ⟨δx, εx, hx⟩ := x.2
+    obtain ⟨βx, hx'⟩ := hx.exists_of_point α₀
+    obtain ⟨δy, εy, hy⟩ := y.2
+    obtain ⟨βy, hy'⟩ := hy.exists_of_point α₀
+    obtain ⟨δz, εz, hz⟩ := z.2
+    obtain ⟨βz, hz'⟩ := hz.exists_of_point α₀
+    have hvxy : (x : ℕ) ≠ (y : ℕ) := fun h2 => hxy (by rw [Subtype.ext h2])
+    have hvxz : (x : ℕ) ≠ (z : ℕ) := fun h2 => hxz (by rw [Subtype.ext h2])
+    have hvyz : (y : ℕ) ≠ (z : ℕ) := fun h2 => hyz (by rw [Subtype.ext h2])
+    have hsxy := hbridge x y hxy
+    have hsxz := hbridge x z hxz
+    have hsyz := hbridge y z hyz
+    have hcxy := hcoprime x y hxy
+    have hcxz := hcoprime x z hxz
+    have hcyz := hcoprime y z hyz
+    rcases Nat.lt_trichotomy (x : ℕ) (y : ℕ) with h12 | h12 | h12
+    · rcases Nat.lt_trichotomy (x : ℕ) (z : ℕ) with h13 | h13 | h13
+      · -- `x` smallest
+        exact hx1 (hval1 x
+          (subdegree_eq_one_of_separations hx' hy' hz' h12 h13 hcyz
+            hsxy hsxz))
+      · exact hvxz h13
+      · -- `z < x < y`: `z` smallest
+        exact hz1 (hval1 z
+          (subdegree_eq_one_of_separations hz' hx' hy' h13
+            (lt_trans h13 h12) hcxy
+            (fun δ ε => (hsxz δ ε).symm) (fun δ ε => (hsyz δ ε).symm)))
+    · exact hvxy h12
+    · rcases Nat.lt_trichotomy (y : ℕ) (z : ℕ) with h23 | h23 | h23
+      · -- `y` smallest
+        exact hy1 (hval1 y
+          (subdegree_eq_one_of_separations hy' hx' hz' h12 h23 hcxz
+            (fun δ ε => (hsxy δ ε).symm) hsyz))
+      · exact hvyz h23
+      · -- `z < y < x`: `z` smallest
+        exact hz1 (hval1 z
+          (subdegree_eq_one_of_separations hz' hx' hy'
+            (lt_trans h23 h12) h23 hcxy
+            (fun δ ε => (hsxz δ ε).symm) (fun δ ε => (hsyz δ ε).symm)))
+  -- extract four distinct components
+  have hfin : Finite Γ.ConnectedComponent := by
+    rcases finite_or_infinite Γ.ConnectedComponent with h | h
+    · exact h
+    · haveI := h
+      rw [Nat.card_eq_zero_of_infinite] at hlt
+      omega
+  haveI := hfin
+  haveI := Fintype.ofFinite Γ.ConnectedComponent
+  have hcard : 3 < (Finset.univ : Finset Γ.ConnectedComponent).card := by
+    rwa [Finset.card_univ, ← Nat.card_eq_fintype_card]
+  obtain ⟨c₁, -⟩ := Finset.card_pos.mp (by omega : 0 < (Finset.univ :
+    Finset Γ.ConnectedComponent).card)
+  have h2 : 0 < (Finset.univ.erase c₁).card := by
+    rw [Finset.card_erase_of_mem (Finset.mem_univ c₁)]
+    omega
+  obtain ⟨c₂, hc₂⟩ := Finset.card_pos.mp h2
+  have hc₂1 : c₂ ≠ c₁ := (Finset.mem_erase.mp hc₂).1
+  have h3 : 0 < ((Finset.univ.erase c₁).erase c₂).card := by
+    rw [Finset.card_erase_of_mem hc₂,
+      Finset.card_erase_of_mem (Finset.mem_univ c₁)]
+    omega
+  obtain ⟨c₃, hc₃⟩ := Finset.card_pos.mp h3
+  have hc₃2 : c₃ ≠ c₂ := (Finset.mem_erase.mp hc₃).1
+  have hc₃1 : c₃ ≠ c₁ :=
+    (Finset.mem_erase.mp (Finset.mem_erase.mp hc₃).2).1
+  have h4 : 0 < (((Finset.univ.erase c₁).erase c₂).erase c₃).card := by
+    rw [Finset.card_erase_of_mem hc₃, Finset.card_erase_of_mem hc₂,
+      Finset.card_erase_of_mem (Finset.mem_univ c₁)]
+    omega
+  obtain ⟨c₄, hc₄⟩ := Finset.card_pos.mp h4
+  have hc₄3 : c₄ ≠ c₃ := (Finset.mem_erase.mp hc₄).1
+  have hc₄2 : c₄ ≠ c₂ :=
+    (Finset.mem_erase.mp (Finset.mem_erase.mp hc₄).2).1
+  have hc₄1 : c₄ ≠ c₁ :=
+    (Finset.mem_erase.mp
+      (Finset.mem_erase.mp (Finset.mem_erase.mp hc₄).2).2).1
+  -- three of them avoid `comp1`
+  have hpick : ∃ d₁ d₂ d₃ : Γ.ConnectedComponent,
+      d₁ ≠ d₂ ∧ d₁ ≠ d₃ ∧ d₂ ≠ d₃ ∧
+        d₁ ≠ comp1 ∧ d₂ ≠ comp1 ∧ d₃ ≠ comp1 := by
+    by_cases h1 : c₁ = comp1
+    · exact ⟨c₂, c₃, c₄, fun h => hc₃2 h.symm, fun h => hc₄2 h.symm,
+        fun h => hc₄3 h.symm, h1 ▸ hc₂1, h1 ▸ hc₃1, h1 ▸ hc₄1⟩
+    · by_cases h2' : c₂ = comp1
+      · exact ⟨c₁, c₃, c₄, fun h => hc₃1 h.symm, fun h => hc₄1 h.symm,
+          fun h => hc₄3 h.symm, h1, h2' ▸ hc₃2, h2' ▸ hc₄2⟩
+      · by_cases h3' : c₃ = comp1
+        · exact ⟨c₁, c₂, c₄, fun h => hc₂1 h.symm, fun h => hc₄1 h.symm,
+            fun h => hc₄2 h.symm, h1, h2', h3' ▸ hc₄3⟩
+        · exact ⟨c₁, c₂, c₃, fun h => hc₂1 h.symm, fun h => hc₃1 h.symm,
+            fun h => hc₃2 h.symm, h1, h2', h3'⟩
+  obtain ⟨d₁, d₂, d₃, h12, h13, h23, hd1, hd2, hd3⟩ := hpick
+  obtain ⟨x, rfl⟩ := Quot.exists_rep d₁
+  obtain ⟨y, rfl⟩ := Quot.exists_rep d₂
+  obtain ⟨z, rfl⟩ := Quot.exists_rep d₃
+  exact hkey x y z h12 h13 h23 hd1 hd2 hd3
+
+end Theorem841
 
 end OddOrder.Isaacs.Ch08
