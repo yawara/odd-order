@@ -262,6 +262,9 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- coprime action + solvability ⇒ `[G,A,A] = [G,A]` in semidirect-product form.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one
 
+-- Ch.4 (Commutators): Lem 4.29 書籍印刷形 (無条件): coprimality alone ⇒ `[G,A,A] = [G,A]`.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one_of_coprime
+
 -- Ch.4 (Commutators): Cor 4.30
 -- faithful action + `[G, A, ..., A] = 1` ⇒ every prime divisor of |A| divides |G|.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.prime_dvd_card_of_faithful_iterCommutator_eq_bot
