@@ -44,6 +44,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.HartleyTurull
+import OddOrder.Isaacs.Ch04_Commutators.Mann
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
@@ -735,6 +736,18 @@ set_option linter.style.longLine false in
 
 -- Ch.3 §3E (Ch.4 owner): Thm 3.26 — A-不変共役類 ↔ C_G(A) の類の全単射 (Glauberman 経由).
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.aInvariantConjClassesEquiv
+
+-- Ch.4 §4B Mann クラスタ: Lem 4.17 計数 / Cor 4.18 / Thm 4.15 / Lem 4.16 (nilpotent 一般化) /
+-- Thm 4.14 Mann / Thm 4.19 (F(M(G)) class ≤ 4).
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.card_centralizer_lt_card_centralizer_commutator
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.commutator_mannSubgroup_le_center
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.nilpotencyClass_mannSubgroup_le_of_centralizer_eq_self
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.centralizer_eq_self_of_maximal_abelian_normal_of_isNilpotent
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.nilpotencyClass_mannSubgroup_le_of_isNilpotent
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.nilpotencyClass_map_fitting_mannSubgroup_le
 
 -- Ch.3 §3E Hartley-Turull クラスタ: Lem 3.32 / Lem 3.33 / Thm 3.31 / Thm 3.34.
 #assert_only_allowed_axioms

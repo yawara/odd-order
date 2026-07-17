@@ -716,6 +716,21 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #21、Fable hub 監視再開) — ✅ 中断 merge 回収 + a×2 / b×2 / c×1 の計 5 merge、census 23 不変**:
+  セッション開始時に前 hub セッションの**中断 trial merge** (a@d389e81c staged + MERGE_HEAD 残存) を検出 →
+  「前セッションがマージ途中で死んだ場合」手順で検証完結 `24494f85` (AxiomsCheck **Mann cluster 登録** +
+  **Cor 5.4 商版** Syl_p(G/Z) 非巡回 + issue 1036 起票分): build **4317 jobs green**。続けて
+  **b** = `8937cf1e` (**Thm 8.38 Weiss + Lem 8.39(a,b) + Thm 8.40 Manning**、Subdegrees +594) を merge
+  `29ed1ca7`: build 4317 green。**c** = `2a4fa8bf` (**Isaacs Lem 10.19** Δ(G) の Z-basis 完全証明、
+  AugmentationIdeal.lean 新設 203 行 = shared leaf、claim 9108 準拠) を merge `4a7708e5`: build **4318
+  jobs green**。⚠ hub 機械的修正 = AugmentationIdeal root closure 孤立 → OddOrder.lean import 追記
+  (step 3b、c は 3 回目 — 新 leaf 時は wiring 込みで commit のこと)。tick 中に積まれた分も処理:
+  **a** = `14713149` (**Thm 5.10 Dietzmann** 262 行 + **Cor 5.19 一般形** SylowTwoDirectFactor 178 行、
+  a 自身が wiring 済 ✓) を merge `8f2d79ea`: build **4320 jobs green**。**b** = `bab22b1f`
+  (**Lem 8.39(c)** CA ⊆ CB、Subdegrees 877 行) を merge `10defb2d`: build 4320 green。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK・逸脱なし。push `33b559cf..10defb2d`。
+  **監視 cron 再作成 = id `895cb8e3`、15 分 `7,22,37,52`** (現行ユーザー指定継承)。
+  ⚠ size watch: **Ch05_Transfer/Basic.lean 1657 行 (> 1500)** — issue 1036 起票済、hub が prefix-split 実施予定。
 - **2026-07-17 (tick #20、Fable hub) — ✅ a (Mann cluster) + c (Thm 10.12 + 10.16 = **Isaacs 10B 完全形式化**) 合流、census 23 不変**:
   **a** = `3e8e319a` (SS4B **Mann cluster** M(G) + small-class nilpotency、Mann.lean 新設) を merge
   `576d8284`: build **4317 jobs green**。⚠ hub 機械的修正 = Mann.lean root closure 欠落 →
