@@ -307,7 +307,8 @@ Assembled from the general `S07.IsCoherent.extension_constant_on_sharp_of_prime`
 `hZp`; `hSu` (`Yset_mapRingEquiv_mem`), `hZA` (`coe_mem_sharpImage_of_mem_commutator` via
 `W₂ ⊆ ⁅H,H⁆`), `hηx` (`Yset_apply_eq_apply_one_of_mem_commutator`) are the case-(B) discharges;
 `hSirr`/`hlat`/`hpair` come from the `Y`-coherence structure (`isIrreducibleCharacter_of_mem_Yset`,
-`extension_mem_ZIrr`, `two_le_Yset_ncard`); `hspan` from `zSpan_S_support_subset_of_apply_one_eq_zero`
+`extension_mem_ZIrr`, `two_le_Yset_ncard`); `hspan` from
+`zSpan_S_support_subset_of_apply_one_eq_zero`
 (via `Y ⊆ S`). -/
 theorem SibleyDadeHypothesis.coherentYset_extension_const_on_W2
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -648,7 +649,8 @@ theorem SibleyDadeHypothesis.card_H_dvd_card_W2_mul_regCharCoeff
 /-- **(6.8.2.2) `|H:W₂| ∣ a`** (Peterfalvi (6.8.2.2): "`a ≡ 0 (mod |H:Z|)`").  Cancelling `|W₂|`
 from the integration core `card_H_dvd_card_W2_mul_regCharCoeff` (`|H| ∣ |W₂|·m`) via the index
 factorization `|H| = |H:W₂|·|W₂|` (`index_mul_card` on `W₂.subgroupOf H`, `subgroupOfEquivOfLe`):
-the regular-character coefficient `m = ⟨Res_{W₂} Res_L η^{τ₁}, φ⟩` is divisible by the relative index
+the regular-character coefficient `m = ⟨Res_{W₂} Res_L η^{τ₁}, φ⟩` is divisible by the relative
+index
 `[H:W₂] = (W₂.subgroupOf H).index`.  This is the textbook's `a ≡ 0 (mod |H:Z|)`. -/
 theorem SibleyDadeHypothesis.index_W2_dvd_regCharCoeff
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -686,11 +688,14 @@ theorem SibleyDadeHypothesis.index_W2_dvd_regCharCoeff
 
 open scoped OddOrder.AlgInt in
 /-- **(6.8.2.2): `⟨α^τ, ψ⟩` is an integer `≡ 0 (mod |H:W₂|)`** for `ψ = η'^{τ₁} ∈ 𝒴^{τ₁}`.
-With `α = Ind^L_{W₂}φ − |H:W₂|·η₁` (`φ` nontrivial linear, `η₁ ∈ Y` the anchor), the Dade reciprocity
+With `α = Ind^L_{W₂}φ − |H:W₂|·η₁` (`φ` nontrivial linear, `η₁ ∈ Y` the anchor), the Dade
+reciprocity
 `inner_tau_indW2_sub_smul_eq` gives `⟨α^τ, ψ⟩ = ⟨φ, Res^L_{W₂} Res^G_L ψ⟩ − |H:W₂|·⟨η₁, Res^G_L ψ⟩`.
 
-The degree relation `c = |H:W₂|` is computed: `Ind_{W₂}φ(1) = [L:W₂]·φ(1) = [H:W₂]·|W₁| = |H:W₂|·η₁(1)`
-(`induce_apply_one` + `relIndex_mul_index` + `index_H_eq_card_W1` + `Yset_apply_one`).  The first inner
+The degree relation `c = |H:W₂|` is computed:
+`Ind_{W₂}φ(1) = [L:W₂]·φ(1) = [H:W₂]·|W₁| = |H:W₂|·η₁(1)`
+(`induce_apply_one` + `relIndex_mul_index` + `index_H_eq_card_W1` + `Yset_apply_one`). The first
+inner
 product equals the integer `a = m` (`⟨φ, Res⟩ = star⟨Res, φ⟩ = m`, `inner_conj_symm`, `m` from
 `mem_ZIrr_inner_int`), divisible by `[H:W₂]` (`index_W2_dvd_regCharCoeff`); the second is an integer
 `b'` (`mem_ZIrr_inner_int` + flip).  Hence `⟨α^τ, ψ⟩ = m − [H:W₂]·b'`, an integer divisible by

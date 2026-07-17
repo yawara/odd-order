@@ -461,7 +461,8 @@ theorem Afam_existsUnique_common (hyp : TICyclicHypothesis G) [Fintype hyp.W]
 
 open scoped Classical in
 /-- **Column-common family** (the `-χ_{0j}` of (3.5)): when `w₁ ≥ 5`, each column `χ₂` (nontrivial)
-of the `Afam` grid has a common element `z χ₂ ∈ A_{χ₁, χ₂}` for every row `χ₁` (`existsUnique_common`,
+of the `Afam` grid has a common element `z χ₂ ∈ A_{χ₁, χ₂}` for every row `χ₁`
+(`existsUnique_common`,
 which needs `≥ 4` rows `= w₁ ≥ 5`).  A witness column `χ₂' ≠ χ₂` exists because `w₂ ≥ 3`. -/
 theorem exists_colCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -730,8 +731,10 @@ open scoped Classical in
 `(χ_{ij})` over `Ĉ₁ × Ĉ₂ = Irr(W)` of virtual characters with `χ_{00} = 1_G` and
 `Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Here `W₂` has only two nontrivial
 characters, so the column-anchors `z` (from `exists_colCommon`, which needs `w₁ ≥ 5`) live over a
-two-element index; `two_col_orthonormal_family_reindexed` produces the per-row meets `w` and interior
-thirds `φ` with `A_{ij} = {z j, w i, φ i j}` and an orthonormal `gridFamily`, after which the χ-family
+two-element index; `two_col_orthonormal_family_reindexed` produces the per-row meets `w` and
+interior
+thirds `φ` with `A_{ij} = {z j, w i, φ i j}` and an orthonormal `gridFamily`, after which the
+χ-family
 is assembled by the shared `exists_chiFamily_of_decomposition`.  (This is the case Peterfalvi calls
 "complete" after (3.5.5).) -/
 theorem exists_chiFamily_two_col (hyp : TICyclicHypothesis G) [Fintype hyp.W]
@@ -842,8 +845,10 @@ theorem exists_chiFamily_transpose (hyp : TICyclicHypothesis G) [Fintype hyp.W]
 open scoped Classical in
 /-- **Peterfalvi (3.5)** (full): for any admissible `W = W₁ × W₂` there is an orthonormal family
 `(χ_{ij})` indexed by `Ĉ₁ × Ĉ₂ = Irr(W)` of virtual characters with `χ_{00} = 1_G`, all `χ_{ij} ∈
-ZIrr G`, and `Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Since `|W₁|, |W₂|` are
-odd `> 1` (so `∈ {3, 5, 7, …}`) and `max(|W₁|, |W₂|) ≥ 5` (`sup_card_ge_five`), the three orientations
+ZIrr G`, and `Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Since `|W₁|,
+|W₂|` are
+odd `> 1` (so `∈ {3, 5, 7, …}`) and `max(|W₁|, |W₂|) ≥ 5` (`sup_card_ge_five`), the three
+orientations
 cover every case: `w₁, w₂ ≥ 5` (`exists_chiFamily_symm`), `w₁ ≥ 5 ∧ w₂ = 3`
 (`exists_chiFamily_two_col`), and `w₁ = 3 ∧ w₂ ≥ 5` (`exists_chiFamily_transpose`). -/
 theorem exists_chiFamily (hyp : TICyclicHypothesis G) [Fintype hyp.W]

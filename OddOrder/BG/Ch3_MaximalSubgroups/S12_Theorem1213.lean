@@ -276,7 +276,8 @@ theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial_le [Finite G] {p : ℕ} 
 /-- **Two non-central lines of a common `A ∈ ℰ²(Q)` are `Q`-conjugate** (subgroup form of the
 Heisenberg line-conjugacy, BG 12.13 final step): for `A ∈ ℰ²(Q)` with `Z(Q) ≤ A` and `A₀, A₀⋆`
 distinct-from-`Z(Q)` lines of `A`, there is `g ∈ Q` with `g A₀ g⁻¹ = A₀⋆`. Pick generators
-`a₀, a₀⋆`; they avoid `Z(Q)` (a line `≠ Z(Q)` meets it trivially), and `A = ⟨a₀⟩ ⊔ Z(Q)` (a `p`-group
+`a₀, a₀⋆`; they avoid `Z(Q)` (a line `≠ Z(Q)` meets it trivially), and `A = ⟨a₀⟩ ⊔ Z(Q)` (a
+`p`-group
 strictly above `Z(Q)` inside the order-`p²` `A`), so `a₀⋆ ∈ ⟨a₀⟩ ⊔ Z(Q)`; apply
 `exists_conj_smul_zpowers_eq_of_expPExtraspecial_le`. -/
 theorem exists_conj_smul_eq_of_lines_of_expPExtraspecial [Finite G] {p : ℕ} [Fact p.Prime]
@@ -645,7 +646,8 @@ theorem center_map_le_of_mem_elemAbelianOfRank_two_le_expPExtraspecial [Finite G
   exact hle (Subgroup.mem_zpowers z)
 
 /-- **`ℳ(N_G(Z)) ≠ {M}`** (BG 12.13, mmd L3387-3395; `Z = Z(Q)` for the extraspecial `Q ⊆ M ∩ M⋆`).
-`Q/Z` acts on `K = C_{M_α}(Z)`; Proposition 1.16 writes `K = ⟨C_K(Ā) | Ā ∈ ℰ¹(Q/Z)⟩`, and Proposition
+`Q/Z` acts on `K = C_{M_α}(Z)`; Proposition 1.16 writes `K = ⟨C_K(Ā) | Ā ∈ ℰ¹(Q/Z)⟩`, and
+Proposition
 12.4(a) gives `C_K(A) = C_K(Ā) ⊆ M⋆` for the rank-2 `A ⊇ Z`, so `K ⊆ M⋆`. Then `M = (M ∩ M⋆)M_α`
 (Corollary 10.9(b), using `α(M) = β(M)`) and Lemma 6.5(b) give `N_M(Z) ⊆ M⋆`; since `M⋆ ≠ M`, the
 unique maximal over `N_G(Z)` (if any) is not `M`.
@@ -673,7 +675,8 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
     have hZcard : Nat.card ↥Z = p := by
       rw [hZdef, Subgroup.card_map_of_injective Q.subtype_injective,
         hQ_es.isExtraspecial.center_card]
-    -- **`C_{M_α}(Z) ⊆ M⋆`** — the `cocyclicFixedByClosure`/`Q/Z`-on-`K` analytic core (Prop 1.16 + 12.4a).
+    -- **`C_{M_α}(Z) ⊆ M⋆`** — the `cocyclicFixedByClosure`/`Q/Z`-on-`K` analytic core (Prop 1.16 +
+    -- 12.4a).
     have hK : Subgroup.centralizer (Z : Set G) ⊓ S10.Malpha M ≤ Mstar := by
       classical
       set K : Subgroup G := Subgroup.centralizer (Z : Set G) ⊓ S10.Malpha M with hKdef

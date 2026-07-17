@@ -3,13 +3,15 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155
 /-!
 # PisetBetaDisjoint
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第
+2 パス).
 -/
 
 /-!
 # BG Theorems 15.7-15.9 — TI failure and final local constraints
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF` (directory split, issue
+0103).
 -/
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -142,8 +144,10 @@ in `σ(M) ∪ τ₂(M)`.  A `τ₃(M)`-prime is `∉ σ(M)` (hence `∈ τ₂(M)
 with `r_p = 1` — contradiction.
 
 This is the `defE`/`E3_1` prime-set half of Corollary 15.9's cyclic Frobenius complement (Coq
-`nonTI_Fitting_structure` part (d)): once `τ₃(M) = ∅` the `τ₃`-Hall `E₃` of any `σ(M)'`-complement is
-trivial (`E3_eq_bot_of_tau3_eq_empty`), so `E = E₁E₂` and — with `τ₂(M) = ∅` (Theorem 15.8) — `E = E₁`
+`nonTI_Fitting_structure` part (d)): once `τ₃(M) = ∅` the `τ₃`-Hall `E₃` of any `σ(M)'`-complement
+is
+trivial (`E3_eq_bot_of_tau3_eq_empty`), so `E = E₁E₂` and — with `τ₂(M) = ∅` (Theorem 15.8) —
+`E = E₁`
 is cyclic.  The remaining upstream gate is the `¬FittingIsTI`-specific `M' ≤ F(M)` (`M'` nilpotency;
 issue 2037). -/
 theorem tau3_eq_empty_of_derivedInG_le_fittingInAmbient [Finite G]
@@ -445,7 +449,8 @@ If not, `O_{σ(M)'}(F(M))` is cyclic (`opiCoreInG_sigmaCompl_fittingInAmbient_is
 order-`p` subgroup `X₁ ≤ F(M) ⊓ F(M)^g` (it is a `p`-subgroup of `F(M)`, hence
 `≤ O_p(F(M)) ≤ O_{σ'}(F(M))`) is the unique one, hence normalized by both `M` and `M^g` (each
 normalizes the relevant cyclic `O_{σ'}` and `X₁ = (X₁)` is order-preserved).  Then
-`normalizer_eq_of_normal_of_mem_maximal` gives `N_G(X₁) = M`, but also `M = N_G(g⁻¹·X₁·g) = g⁻¹·M·g`,
+`normalizer_eq_of_normal_of_mem_maximal` gives `N_G(X₁) = M`, but also
+`M = N_G(g⁻¹·X₁·g) = g⁻¹·M·g`,
 forcing `g ∈ M` — contradiction. -/
 theorem mem_sigma_of_prime_dvd_card_inf_conj_fitting [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
@@ -611,7 +616,8 @@ theorem exists_inf_conj_fitting_orderP_witness [Finite G]
   have hX₁M : X₁ ≤ M := hX₁F.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
   have hpσ_sub : ({p} : Set ℕ) ⊆ OddOrder.BG.Ch3.S10.sigma M := by
     intro q hq; rw [Set.mem_singleton_iff] at hq; rw [hq]; exact hpσ
-  -- Generic helper: a `p`-subgroup of `F(M)` lies in `M_σ` (`O_p(F(M)) ≤ O_σ(F(M)) = F(M_σ) ≤ M_σ`).
+  -- Generic helper: a `p`-subgroup of `F(M)` lies in `M_σ`
+  -- (`O_p(F(M)) ≤ O_σ(F(M)) = F(M_σ) ≤ M_σ`).
   have hMσ_of : ∀ Z : Subgroup G, Z ≤ fittingInAmbient M → IsPGroup p ↥Z →
       Z ≤ OddOrder.BG.Ch3.S10.Msigma M := by
     intro Z hZF hZp
@@ -662,9 +668,11 @@ theorem exists_inf_conj_fitting_orderP_witness [Finite G]
   exact ⟨g, p, X₁, hgM, hp, hpσ, hX₁card, hX₁Mσ, hX₁cMσ, hCGnotM, hrank3⟩
 
 /-- **`O_p(M_F)` is noncyclic at a non-TI witness prime** (Coq `nonTI_Fitting_structure`, `not_cycMp`):
-if `M_F` contains an order-`p` subgroup `X₁` that is also contained in the conjugate `M_F^g` for some
+if `M_F` contains an order-`p` subgroup `X₁` that is also contained in the conjugate `M_F^g` for
+some
 `g ∉ M`, then `O_p(M_F)` is not cyclic.  Were it cyclic, `X₁` would be its unique order-`p` subgroup,
-hence characteristic in `O_p(M_F) ⊴ M`, giving `N_G(X₁) = M`; applied to `g⁻¹·X₁·g ≤ O_p(M_F)` it gives
+hence characteristic in `O_p(M_F) ⊴ M`, giving `N_G(X₁) = M`; applied to `g⁻¹·X₁·g ≤ O_p(M_F)` it
+gives
 `N_G(g⁻¹·X₁·g) = g⁻¹·M·g`, so `M = g⁻¹·M·g`, forcing `g ∈ M` — contradiction.  Both `X₁` and its
 `g⁻¹`-conjugate land in the *same* cyclic `O_p(M_F)`, so no cyclic-conjugate transfer is needed.
 
@@ -833,7 +841,8 @@ if `C_G(X₁) ⊄ M` (with `X₁ ≠ 1`), the nilpotent subgroup `C_{M_F}(X₁) 
 Every Sylow `P` of the nilpotent `C_{M_F}(X₁)` is abelian: a non-abelian one would be uniquely
 maximal (`nonabelian_pgroup_isUniquelyMaximal`), and as `P ≤ C_{M_F}(X₁) < ⊤` this would force
 `C_{M_F}(X₁)` itself to be uniquely maximal (`IsUniquelyMaximal.of_le_of_lt_top`), contradicting
-`not_isUniquelyMaximal_mf_inf_centralizer_of_not_le`.  Then `isMulCommutative_of_isNilpotent_of_sylow_comm`
+`not_isUniquelyMaximal_mf_inf_centralizer_of_not_le`. Then
+`isMulCommutative_of_isNilpotent_of_sylow_comm`
 gives abelianness.  This is the second `E1X_facts` input (with noncyclicity) to the non-abelian
 branch of BG Theorem 15.7(e). -/
 theorem isMulCommutative_mf_inf_centralizer_of_not_le [Finite G]

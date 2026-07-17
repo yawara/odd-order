@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.KappaHallCommutator
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.GlobalCounting` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -269,7 +270,8 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
     -- `ziMMst : M ⊓ M* = K ⊔ K*` and `sK_uniqMst : K ≤ M*^a ⟹ a ∈ M*`.
     obtain ⟨hziMMst, hsKuniq⟩ := partner_inf_and_uniq hG hMstmax hMstP hMstpair.1 hMstpair.2.1
       hMstpair.2.2 hKMsigmaMst hKM hKstarM hZcyc hKstarNe hKNe hMsMst
-    -- `r ∤ |Z|`: `Z = K ⊔ K* = K · K*` (disjoint, commuting), `r ∉ π(K) ⊆ κ(M)`, `r ∉ π(K*) ⊆ σ(M)`.
+    -- `r ∤ |Z|`: `Z = K ⊔ K* = K · K*` (disjoint, commuting), `r ∉ π(K) ⊆ κ(M)`,
+    -- `r ∉ π(K*) ⊆ σ(M)`.
     have hKπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M)ᶜ K :=
       kappaHall_isPiSubgroup_sigmaCompl hKM hK
     have hKstarπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M) Kstar :=
@@ -789,8 +791,10 @@ non-conjugate premise is vacuous — by Theorem 13.9 non-conjugate maximals have
 /-- **BG Corollary 14.10** (mmd L4008): global `σ`-length bound `ℓ_σ(g) ≤ 2`.
 
 Assembled from the faithful `G#` cover.  The genuine `SigmaDecompositionData` is
-`genuineSigmaDecomposition hG` (`length = sigmaLength`); `ℓ_σ(1) = 0` (`sigmaLength_eq_zero_iff`), and
-for `g ≠ 1` the cover (`exists_mem_conjClassSet_Mtilde_or_fixed_zTilde` when a type-P maximal exists,
+`genuineSigmaDecomposition hG` (`length = sigmaLength`); `ℓ_σ(1) = 0` (`sigmaLength_eq_zero_iff`),
+and
+for `g ≠ 1` the cover (`exists_mem_conjClassSet_Mtilde_or_fixed_zTilde` when a type-P maximal
+exists,
 else `sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`) places `g` in `𝒞_G(M̃)` or
 `𝒞_G(Ẑ)`; conjugation-invariance (`sigmaLength_conj`) reduces to the per-piece bounds
 `sigmaLength_le_two_of_mem_Mtilde` and
@@ -922,7 +926,8 @@ decomposition below (Coq `nilpotent_subnormal (Fitting_nil D) sK_FD`).  Not `S14
 
 /-- **Every subgroup of a finite nilpotent group is subnormal** (mathcomp `nilpotent_subnormal`).
 Strong induction on the index: for `H ≠ ⊤` the normalizer condition
-(`Group.normalizerCondition_of_isNilpotent`) gives `H < N(H)`, `H ⊴ N(H)` (`normal_in_normalizer`), and
+(`Group.normalizerCondition_of_isNilpotent`) gives `H < N(H)`, `H ⊴ N(H)` (`normal_in_normalizer`),
+and
 `[Γ : N(H)] < [Γ : H]` (`index_strictAnti`), so the IH makes `N(H)` subnormal;
 then `IsSubnormal.step`. -/
 theorem isSubnormal_of_isNilpotent {Γ : Type*} [Group Γ] [Finite Γ] [Group.IsNilpotent Γ]

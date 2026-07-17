@@ -16,7 +16,8 @@ import OddOrder.Isaacs.Ch01_Sylow.Main
 /-!
 # S08_CenterFittingOpcore
 
-Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 /-!

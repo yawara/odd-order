@@ -394,7 +394,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
         exact Subgroup.map_mono hSP
       have hTq : IsPGroup q ↥T :=
         P.isPGroup'.of_equiv (Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective)
-      -- `N_T(S) := T ⊓ N_G(S) ⊆ M ⊓ M*`, `S ≤ N_T(S)`, `IsPGroup q (N_T(S))` ⟹ `hSmax`: `S = N_T(S)`.
+      -- `N_T(S) := T ⊓ N_G(S) ⊆ M ⊓ M*`, `S ≤ N_T(S)`, `IsPGroup q (N_T(S))` ⟹ `hSmax`:
+      -- `S = N_T(S)`.
       have hS_eq_NTS : S = T ⊓ Subgroup.normalizer (S : Set G) :=
         hSmax _ (le_inf (inf_le_left.trans hTM) (inf_le_right.trans hNS_Mstar))
           (hTq.to_le inf_le_left) (le_inf hST Subgroup.le_normalizer)
@@ -415,8 +416,10 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
     exact hSmax _ (le_inf (inf_le_right.trans hb) (inf_le_left.trans hT'Mstar))
       (hT'q.to_le inf_le_left) (le_inf hST' Subgroup.le_normalizer)
   -- (d) `q ∈ σ(M*)` branch (BG L3443-3451): `N_G(S) ⊆ M*` (from (b)+(c), as `q ∈ σ(M*)`) ⟹ `S` is
-  --   a Sylow `q` of `G`. Cor 10.9(b) (`S10.beta_factorization_of_sylow_normalizer_in_intersection`):
-  --   `M=(M∩M*)·M_α`, `α(M)=β(M)`, symmetrically for `M*` ⟹ `M*=(M∩M*)M*_β` [d.1], `M_β=M_α≠1` [d.3].
+  --   a Sylow `q` of `G`. Cor 10.9(b)
+  -- (`S10.beta_factorization_of_sylow_normalizer_in_intersection`):
+  --   `M=(M∩M*)·M_α`, `α(M)=β(M)`, symmetrically for `M*` ⟹ `M*=(M∩M*)M*_β` [d.1], `M_β=M_α≠1`
+  -- [d.3].
   --   `τ₁(M*)⊆τ₁(M)∪α(M)` [d.2]: `r∈τ₁(M*)`, `R=Syl_r(M∩M*)` Sylow `r` of `M*=(M∩M*)M*_α` w/ normal
   --   complement ⟹ if `r∉α(M)` same for `M=(M∩M*)M_α`.
   have hd : q ∈ S10.sigma Mstar →
@@ -658,17 +661,20 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
       --   `r∈π(M)−σ(M)` (σ(M)∩σ(M*)=∅)。`C_G(A)⊆E*` (12.6b)、`E*` は `r'`-group (r∈σM*) ⟹ C_G(A) `r'`.
       -- **Fact 1 (clear, ⟹ r>q)**: A は Syl_r(M*_σ) を中心化しない (中心化 S ⟹ S≤C_G(A)⊆E* `r'`、
       --   だが S は Syl_r かつ r∣|M*_σ| ⟹ S≠1 矛盾)。`beta_complement_centralizes` (10.9(a)(1),
-      --   `S10_BetaRadical:241`) の対偶: X=A,(r,q),hcase=`r<q` ⟹ A centralizes Syl_r(M*_σ) 矛盾 ⟹ ¬(r<q)⟹r>q.
+      --   `S10_BetaRadical:241`) の対偶: X=A,(r,q),hcase=`r<q` ⟹ A centralizes Syl_r(M*_σ) 矛盾 ⟹
+      -- ¬(r<q)⟹r>q.
       -- **Fact 2 (✅ cracked, ⟹ q>r)**: `beta_complement_centralizes` を M 側に p₀=q, q₀=r, X=Syl_r(M)
       --   で対偶適用: Syl_r(M) が Syl_q(M_σ) を中心化しない ⟹ ¬(Syl_r(M)⊆M' ∨ q<r) ⟹ q>r。
       --   「Syl_r(M) は Syl_q(M_σ) を中心化しない」: q∈σ(M) ⟹ Syl_q(M_σ)=Syl_q(M)=Syl_q(G) (full), 全 M-共役。
       --   もし P:=Syl_r(M) が Q:=Syl_q(M_σ) を中心化 ⟹ A (q-群≤M) を m∈M で Q に共役で入れ (A≤m•Q),
-      --   m⁻¹•P ⊆ C_G(A) (P centralizes Q ⟹ m⁻¹•P centralizes m⁻¹•Q⊇A), C_G(A) `r'` ⟹ m⁻¹•P=1 ⟹ P=1 矛盾。
+      --   m⁻¹•P ⊆ C_G(A) (P centralizes Q ⟹ m⁻¹•P centralizes m⁻¹•Q⊇A), C_G(A) `r'` ⟹ m⁻¹•P=1 ⟹ P=1
+      -- 矛盾。
       intro r hr_piM hr_sigmaMstar
       by_contra hr_notbeta
       haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr_piM⟩
       have hr_ne_q : r ≠ q := fun h => hqns (h ▸ hr_sigmaMstar)
-      -- `r ∉ σ(M)` (σ(M) disjoint σ(M*) by 12.6(f), via `elemAb_normal_in_E_of_tau2` last conjunct).
+      -- `r ∉ σ(M)` (σ(M) disjoint σ(M*) by 12.6(f), via `elemAb_normal_in_E_of_tau2` last
+      -- conjunct).
       have hr_notSigmaM : r ∉ S10.sigma M := by
         have hdisj := ((elemAb_normal_in_E_of_tau2 hG hsetupS he1 hA_mem hAEs).2.2.2.2.2 M
           (mem_maximalSubgroups.mp hM) (not_conj_symm ha)).2
@@ -714,7 +720,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
       have hA_Msigma : A ≤ S10.Msigma M :=
         S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM) hA_le_M hA_sigma
       -- **Fact 1**: `r > q`. Else `r < q`, and Cor 10.9(a)(1) (M*, X=A) gives `A` centralizes a
-      -- Sylow `r` of `M*_σ` — but it is an `r`-group `≤ C_G(A)` (`r'`), so `= 1`, contradicting `r ∣ |M*_σ|`.
+      -- Sylow `r` of `M*_σ` — but it is an `r`-group `≤ C_G(A)` (`r'`), so `= 1`, contradicting
+      -- `r ∣ |M*_σ|`.
       have hrq : q < r := by
         by_contra hle
         rw [not_lt] at hle
@@ -730,7 +737,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
         exact hCAr (Nat.mem_primeFactors.mpr
           ⟨Fact.out, hrSm.trans (Subgroup.card_dvd_of_le hSmC), Nat.card_pos.ne'⟩)
       -- **Fact 2**: `r < q`. Else `q < r`, and Cor 10.9(a)(1) (M, X=Syl_r(M)) makes `Syl_r(M)`
-      -- centralize a Syl_q `Q` of `M_σ`; conjugating `A` (≤ M_σ) into that Sylow puts a conjugate of
+      -- centralize a Syl_q `Q` of `M_σ`; conjugating `A` (≤ M_σ) into that Sylow puts a conjugate
+      -- of
       -- `Syl_r(M)` inside `C_G(A)` (`r'`), forcing `Syl_r(M) = 1` — impossible (`r ∈ π(M)`).
       have hqr : r < q := by
         by_contra hle
@@ -767,7 +775,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
                   ((Q : Subgroup ↥(S10.Msigma M)).map (S10.Msigma M).subtype) : Subgroup G) : Set G) :=
                 centralizer_conj_smul _ _
             _ ≤ Subgroup.centralizer (A : Set G) := Subgroup.centralizer_le hA_le_conj
-        -- `r ∣ |Prm|` (Sylow `r` of `M`, `r ∈ π(M)`); conjugation preserves card; so `r ∣ |C_G(A)|`, contra.
+        -- `r ∣ |Prm|` (Sylow `r` of `M`, `r ∈ π(M)`); conjugation preserves card; so
+        -- `r ∣ |C_G(A)|`, contra.
         have hr_dvd_Prm : r ∣ Nat.card ↥Prm := by
           rw [hPrmdef, Subgroup.card_map_of_injective M.subtype_injective]
           exact Pr.dvd_card_of_dvd_card (Nat.mem_primeFactors.mp hr_piM).2.1

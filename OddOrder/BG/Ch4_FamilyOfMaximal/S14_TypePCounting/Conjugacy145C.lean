@@ -3,13 +3,15 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.LocalStructure
 /-!
 # Conjugacy145C
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 
 /-!
 # BG Theorem 14.4 / Lemma 14.5 — sigma-length one centralizers
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
+split, issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -293,7 +295,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
             ((OddOrder.BG.Ch3.S10.Msigma M).orderOf_dvd_natCard hxMσ), Nat.card_pos.ne'⟩)
       exact Set.disjoint_left.mp
         (OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hMmax hNmax h1215.1) hpσM
-    -- Corollary 14.3: branch κ is impossible (`q ∈ τ₂(N)` has `r_q = 2 ≠ 1`), so the τ₂ branch holds.
+    -- Corollary 14.3: branch κ is impossible (`q ∈ τ₂(N)` has `r_q = 2 ≠ 1`), so the τ₂ branch
+    -- holds.
     rcases sigma_diagnostic hG D hNmax hwsharp hxN hx hxCw hxσN with ⟨hκ, _⟩ | ⟨hτ2, _, _⟩
     · exfalso
       have hqπ : q ∈ piSet (Subgroup.closure ({x} : Set G)) := by
@@ -354,7 +357,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
       rw [heq] at hq_notin
       exact hq_notin hq_in
   · -- per-`M` part `(c)`, `(d)`, `(e)`.  Fix `M₂ ∈ 𝓜_σ(x)` and re-run Proposition 12.15 for
-    -- `(M₂, q, X, N)`: `N ≠ M₂` (as `x ∈ M₂_σ` but `x ∉ N_σ`), and `q ∉ σ(N)` (`q ∈ π(⟨x⟩) ⊆ τ₂(N)`).
+    -- `(M₂, q, X, N)`: `N ≠ M₂` (as `x ∈ M₂_σ` but `x ∉ N_σ`), and `q ∉ σ(N)`
+    -- (`q ∈ π(⟨x⟩) ⊆ τ₂(N)`).
     intro M₂ hM₂mem
     obtain ⟨hM₂max, hxM₂σ⟩ := hM₂mem
     haveI hMσNnormal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
@@ -479,7 +483,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
       have hx_in : x ∈ Subgroup.normalizer ((MulAut.conj w • A₁ : Subgroup G) : Set G) ⊓
           OddOrder.BG.Ch3.S10.Msigma M₂ :=
         Subgroup.mem_inf.mpr ⟨hAnormalEN hxEN, hxM₂σ⟩
-      -- If `p ∉ σ(M₂)` then `p ∈ τ₂(M₂)` (rank 2), so Cor 12.6(b) kills `N_{M₂σ}(A)` — contradiction.
+      -- If `p ∉ σ(M₂)` then `p ∈ τ₂(M₂)` (rank 2), so Cor 12.6(b) kills `N_{M₂σ}(A)` —
+      -- contradiction.
       by_contra hpσM₂
       have hAM₂_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M₂)ᶜ)
           (MulAut.conj w • A₁) := by
@@ -725,7 +730,8 @@ theorem exists_mem_sigma_of_prime_dvd_card [Finite G] (hG : OddOrder.BG.IsMinima
 
 /-- **BG `ell_sigma0P`** (Coq BGsection14:222): the genuine σ-length of `x` is `0` iff `x = 1`.
 If `x ≠ 1`, any prime `p ∣ orderOf x` divides `|G|`, hence is a `σ`-prime of some maximal `M`
-(`exists_mem_sigma_of_prime_dvd_card`); then `sigmaPart M x ≠ 1` (else `x` would be a `σ(M)′`-element
+(`exists_mem_sigma_of_prime_dvd_card`); then `sigmaPart M x ≠ 1` (else `x` would be a
+`σ(M)′`-element
 avoiding `p`), so `sigma_decomposition x` is nonempty.  (Placed after
 `exists_mem_sigma_of_prime_dvd_card`, which it cites; the genuine `sigmaLength` is defined earlier.) -/
 theorem sigmaLength_eq_zero_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (x : G) :

@@ -463,7 +463,8 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   have hqαM : q ∉ S10.alpha M := fun ha =>
     Set.eq_empty_iff_forall_notMem.mp
       ((S10.disjoint_of_not_conj hG h.mem_maximal hMstarMax hnc).1.2) q ⟨ha, hqσstar⟩
-  -- ===== steps 7-9: `C_{M_α}(P) = C_{M_α}(R)` → three-subgroups → Lemma 12.18(a) contradiction =====
+  -- ===== steps 7-9: `C_{M_α}(P) = C_{M_α}(R)` → three-subgroups → Lemma 12.18(a) contradiction
+  -- =====
   -- `r ∈ τ₁(M)`: `τ₁(M*) ⊆ τ₁(M) ∪ α(M)`, `r ∈ π(E) ⟹ r ∉ σ(M) ⊇ α(M)`.
   have hrτ1M : r ∈ tau1 M := by
     rcases hτ1sub r Fact.out hrτ1 with h1 | h1
@@ -492,7 +493,8 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     le_antisymm
       (alpha_fixed_le_fixed hG h hp hP hPE hr hR hRC)
       (alpha_fixed_le_fixed hG h hrτ1M hR hRE hpE hP (le_inf hPE hPCR))
-  -- step 8: `A := C_{M_α}(P)` is `S`-invariant (`S ⊆ C(P)`, `M_α ⊴ M`) and `⊆ C(R)` (`= C_{M_α}(R)`),
+  -- step 8: `A := C_{M_α}(P)` is `S`-invariant (`S ⊆ C(P)`, `M_α ⊴ M`) and `⊆ C(R)`
+  -- (`= C_{M_α}(R)`),
   -- so by three-subgroups it is centralized by `Q = ⁅S, R⁆`.
   have hMNMα : M ≤ Subgroup.normalizer ((S10.Malpha M : Subgroup G) : Set G) :=
     le_normalizer_opiCoreInG (S10.alpha M) M

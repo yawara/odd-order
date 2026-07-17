@@ -66,7 +66,8 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
 
 /- `Q ⊓ V = ⊥` is now the honest `Hypothesis.Q_inf_V_eq_bot` field (threaded from the §16 constructor
 via `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)); the former
-`Q_inf_V_eq_bot_of_reconciled` — which derived it circularly from the sorried `reconciled_typePData_T`
+`Q_inf_V_eq_bot_of_reconciled` — which derived it circularly from the sorried
+`reconciled_typePData_T`
 — is retired.  V-side helpers use `hyp.Q_inf_V_eq_bot` directly. -/
 
 /-- **Peterfalvi (13.2.b)/(14.2.a), `T`-side dual of `W2_le_P`: `W₁ ≤ Q`.**  The cyclic factor `W₁`
@@ -153,8 +154,10 @@ theorem normalizer_W1_le_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 nonidentity element of the complement `V` centralizes `W₂`.
 
 The `T`-side dual of `centralizer_W1_inf_U_eq_bot`.  On the `S`-side the `U ⋊ W₁` Frobenius structure
-comes from `basic_structure`; here the `V ⋊ W₂` Frobenius structure is read off the reconciled type-`P`
-decomposition of `T` (`reconciled_typePData_T` + `typeP_uW1_frobenius`), with `V ≠ ⊥` supplied by the
+comes from `basic_structure`; here the `V ⋊ W₂` Frobenius structure is read off the reconciled
+type-`P`
+decomposition of `T` (`reconciled_typePData_T` + `typeP_uW1_frobenius`), with `V ≠ ⊥` supplied by
+the
 (14.9) `T_typeII` core (`tdata.common`).  A nonidentity `x ∈ V` centralizing a nonidentity `w ∈ W₂`
 would give `w x w⁻¹ = x`, contradicting the Frobenius condition (`IsFrobeniusGroup.conj_frobenius`).
 This is the `C_D(W₂) ≤ C_V(W₂) = ⊥` input to the (13.16) `W₁`-side core. -/
@@ -311,11 +314,14 @@ theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (Subgroup.subgroupOfEquivOfLe hV_le) h4
 
 /-- **Peterfalvi (13.16), the crux `N_V(W₁) ≤ C_G(W₁)`** (`W₁`-side dual of
-`normalizer_U_inf_W2_le_centralizer_W2`): every element of `N_V(W₁) := V ⊓ N_G(W₁)` centralizes `W₁`.
+`normalizer_U_inf_W2_le_centralizer_W2`): every element of `N_V(W₁) := V ⊓ N_G(W₁)` centralizes
+`W₁`.
 
 The conjugation action of `W₂` on the abelian `V` is coprime (`(|W₂|, |V|) = 1` from the `V ⋊ W₂`
-Frobenius structure) with fixed points `C_V(W₂) = ⊥` (`centralizer_W2_inf_V_eq_bot`).  For `g ∈ N_V(W₁)`,
-`W₂` fixes the coset `g · C_V(W₁)` (`conj_W2_mem_centralizer_W1`), so the coprime fixed-point lifting
+Frobenius structure) with fixed points `C_V(W₂) = ⊥` (`centralizer_W2_inf_V_eq_bot`). For
+`g ∈ N_V(W₁)`,
+`W₂` fixes the coset `g · C_V(W₁)` (`conj_W2_mem_centralizer_W1`), so the coprime fixed-point
+lifting
 (`Isaacs.Ch04.coprime_fixedPoints_quotient`) produces a `W₂`-fixed representative `c ∈ C_V(W₂) = ⊥`;
 hence `g ≡ 1 (mod C_V(W₁))`, i.e. `g ∈ C_G(W₁)`.  Gated on the (14.9) `T_typeII` structure (via the
 `V ⋊ W₂` Frobenius and the abelianness of `V`, both from the reconciled type-`P` data of `T`). -/
@@ -583,7 +589,8 @@ complement `V ⋊ W₂` acts coprimely on the Fitting kernel `Q = T_F`.  The `T`
 `Coprime |Q| [T:Q]`), and `V ⋊ W₂` complements `Q` in `T`: from the honest `Hypothesis` fields
 `W2_isComplement_T_deriv` (`M' ⋊ W₂ = T`) and `Q_inf_V_eq_bot`/`T_deriv_eq_QV` (`Q ⋊ V = M'`) one
 reads off `Q ⊓ (V ⊔ W₂) = ⊥` and `Q ⊔ (V ⊔ W₂) = T`, so `[T:Q] = |V ⊔ W₂|`.  **Fully honest /
-ungated** — both complements come from the §16 constructor (`typeP_derivedInG_isComplement_kappaHall`
+ungated** — both complements come from the §16 constructor
+(`typeP_derivedInG_isComplement_kappaHall`
 / `exists_kappaHall_invariant_complement_to_MF`, via `T_nonI`, not (14.9)); no dependence on the
 sorried `reconciled_typePData_T`. -/
 theorem coprime_card_Q_card_VW2 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -674,9 +681,12 @@ theorem coprime_card_Q_card_VW2 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
 /-- **Peterfalvi (14.2.a), `T`-side dual of `BasicStructureGated.P_elementaryAbelian`**: the Fitting
 kernel `Q = T_F` is elementary abelian of exponent `q`.
 
-On the `S`-side this is the `§16`-carrier fact `P_elementaryAbelian` (from the type-`P₂` structure of
-`S`); `T` is likewise type-`P₂` (`IsTypeII T ↔ IsTypeP2 T`, `proposition_type_classification`), so the
-same σ-structure fact holds — `T_σ = T_F` is the elementary-abelian `q`-group of rank `p` on which the
+On the `S`-side this is the `§16`-carrier fact `P_elementaryAbelian` (from the type-`P₂` structure
+of
+`S`); `T` is likewise type-`P₂` (`IsTypeII T ↔ IsTypeP2 T`, `proposition_type_classification`), so
+the
+same σ-structure fact holds — `T_σ = T_F` is the elementary-abelian `q`-group of rank `p` on which
+the
 prime-order `κ`-factor `W₂` acts.  Proven as the exact dual of the `S`-side `P_elementaryAbelian`
 (`S15_SAndT_Setup`, now sorry-free): the (14.9) type-II `T` gives a `TypesIIIIIIVSetup T` from the
 reconciled `TypePData T` (`reconciled_typePData_T`) whose chief kernel `N = ⊥` (since `|Q| = q^p`,
@@ -862,7 +872,8 @@ three atomic facts carrying the content of (13.16), **assembled** for the (14.9)
 * `N_G(W₁) ≤ Q ⊔ W₂` (`normalizer_W1_le_QW2_of_D_eq_bot`, proven) — the TI reduction
   `normalizer_W1_le_T` + the Maschke/Wielandt core `normalizer_W1_within_T_of_D_eq_bot`.
 
-`IsTypeII T` is threaded from `exists_LHypothesis` (§16, via (14.9) `T_typeII`); conjuncts 1 and 3 are
+`IsTypeII T` is threaded from `exists_LHypothesis` (§16, via (14.9) `T_typeII`); conjuncts 1 and 3
+are
 sorry-free, so the residual is exactly conjunct 2. -/
 theorem normalizer_W1_structure_of_D_eq_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))

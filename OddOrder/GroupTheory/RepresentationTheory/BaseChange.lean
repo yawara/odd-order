@@ -192,7 +192,8 @@ theorem finrank_invariants_baseChangeRepresentation
   have hker : LinearMap.ker (invariantsObstruction (baseChangeRepresentation K ρ))
       = LinearMap.ker (TensorProduct.AlgebraTensorModule.lTensor K K f) := by
     rw [hfactor, LinearMap.ker_comp, hkere, Submodule.comap_bot]
-  -- `K ⊗ (subtype of ker f)` is injective (flatness), so its range has dimension `finrank F (ker f)`.
+  -- `K ⊗ (subtype of ker f)` is injective (flatness), so its range has dimension
+  -- `finrank F (ker f)`.
   have hinj : Function.Injective (TensorProduct.AlgebraTensorModule.lTensor K K
       (LinearMap.ker f).subtype) :=
     Module.Flat.lTensor_preserves_injective_linearMap (M := K)

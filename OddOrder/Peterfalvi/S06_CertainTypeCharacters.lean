@@ -647,7 +647,8 @@ theorem columnFamily_mu_ne [NeZero (Nat.card h.W1)]
 
 omit [Invertible (Nat.card L : ℂ)] in
 /-- **Linear independence of the `CF(W, W − W₂)` family** `ω_{ij} − ω_{0j}` (`i ≠ 0`, all `j`):
-the biorthogonal system `⟨ω_{i'j'} − ω_{0j'}, ω_{ij}⟩ = δ` (`omegaColumnDiff_inner_omega_self`/`_ne`)
+the biorthogonal system `⟨ω_{i'j'} − ω_{0j'}, ω_{ij}⟩ = δ`
+(`omegaColumnDiff_inner_omega_self`/`_ne`)
 witnesses linear independence.  With the matching count `(w₁−1)·w₂ = |W − W₂| = dim CF(W, W − W₂)`
 this gives the basis of (4.3.b) (the `ω_{ij} − ω_{0j}` comprise a basis of `CF(W, W − W₂)`). -/
 theorem omegaColumnDiff_linearIndependent :

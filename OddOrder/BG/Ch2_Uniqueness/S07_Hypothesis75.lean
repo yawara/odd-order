@@ -8,7 +8,8 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 /-!
 # S07_Hypothesis75
 
-Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S07_Transitivity` (2000-line limit, issue 0103 第 2
+パス).
 -/
 namespace OddOrder.BG.Ch2.S07
 open OddOrder.GroupTheory

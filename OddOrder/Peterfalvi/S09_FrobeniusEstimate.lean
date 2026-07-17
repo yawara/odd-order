@@ -233,7 +233,8 @@ theorem sibleyToHypothesis71_chiRhoCF_eq [Fintype G] [Invertible (Nat.card G : �
 open scoped Classical in
 /-- **Peterfalvi (7.8.b) for the `i`-th Frobenius member**: `1 − e_i/h_i ≤ ‖ζ_0^{νρ}‖²`, the norm
 lower bound (`H78.zetaNuRhoNormSq`) feeding the `card_G0_lower_bound` (7.10) estimate (issue 0044).
-Assembles the (7.8) `Hypothesis78` and feeds the bundled §7 producer `zetaNuRhoNormSqGeOfDade` its four
+Assembles the (7.8) `Hypothesis78` and feeds the bundled §7 producer `zetaNuRhoNormSqGeOfDade` its
+four
 genuine inputs: `hzeta0nu` (`ζ_0^ν ⊥ 1_G`, `F.hzeta0nu`), `hζ0norm` (`‖ζ_0‖² = 1`, Frobenius),
 `a`/`ha` (`(β, ζ_0^ν) + 1 ∈ ℤ`, `exists_betaDecomp_a`), and `hsmall` (`2e + 1 ≤ h`,
 `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel`).  Mirrors `S14.witness_L_zeta_bound`. -/
@@ -383,7 +384,8 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     a ha hsmall
   -- Expose the distinguished coherent image `χ = ν(Ind θ_0)` and transport the bound to the
   -- family `hypothesis71` `chiRhoCF` form (the `H78.zetaNuRho` unfolds to `sibley.chiRhoCF χ` since
-  -- `H78` is `set`-transparent, then `sibleyToHypothesis71_chiRhoCF_eq` rewrites to `hypothesis71`).
+  -- `H78` is `set`-transparent, then `sibleyToHypothesis71_chiRhoCF_eq` rewrites to
+  -- `hypothesis71`).
   refine ⟨coh.extension (ClassFunction.induce ((F.H i).subgroupOf (F.L i))
     (θ 0 : ClassFunction _ ℂ)), ?_, ?_⟩
   · rw [coherence_extension_inner_eq_on_family coh (hSmem 0 (Ne.symm hind1H))
@@ -411,7 +413,8 @@ assembly).  The distinguished coherent image `χ = ζ_0^ν = ν(Ind θ_0)` is no
 (7.8.b) bound `1 − e_i/h_i ≤ (F.familyHypothesis71).chiRhoNormSq χ i`.  Immediate from
 `zetaNuRhoNormSq_ge` once the ambient `Fintype`/`Invertible` on `↥L_i` are pinned to
 `familyHypothesis71`'s fields (`Fintype.ofFinite`/`invertibleOfNonzero`), so the inner product of
-`zetaNuRhoNormSq_ge` (already in `hypothesis71`'s `chiRhoCF` form via `sibleyToHypothesis71_chiRhoCF_eq`)
+`zetaNuRhoNormSq_ge` (already in `hypothesis71`'s `chiRhoCF` form via
+`sibleyToHypothesis71_chiRhoCF_eq`)
 is *definitionally* `chiRhoNormSq`. -/
 theorem exists_chiRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))

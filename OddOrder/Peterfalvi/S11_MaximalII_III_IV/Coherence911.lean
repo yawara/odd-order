@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CharacterCounts
 /-!
 # Peterfalvi (9.8.c)/(9.9.c) — irreducible-character constructions
 
-Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
+0103).
 
 The former (9.11) declarations in this leaf routed through an inapplicable (6.8)
 `SibleyTarget`.  They were withdrawn after the honest `Ind_S^G` / `A(S)` coherence construction
@@ -39,7 +40,8 @@ theorem realizedH0supC_normal_huSub [Finite G] {M : Subgroup G}
 
 /-- **`H₀C ∩ H = H₀` inside `hInHu`** (the `H ∩ N` of the second iso, realized in `hInHu`):
 `(realized H₀C).subgroupOf hInHu = (realized H₀).subgroupOf hInHu`.  From
-`hInHu_inf_realizedH0supC_eq_realizedH0` via `inf_subgroupOf_left`.  This rewrites the `N.subgroupOf H`
+`hInHu_inf_realizedH0supC_eq_realizedH0` via `inf_subgroupOf_left`. This rewrites the
+`N.subgroupOf H`
 of `quotientInfEquivProdNormalQuotient` to `realized H₀`, the kernel of `hInHu ↠ H̄`. -/
 theorem realizedH0supC_subgroupOf_hInHu_eq {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
@@ -230,7 +232,8 @@ theorem hcPsi_apply_inclusion [Finite G] {M : Subgroup G}
 
 /-- **Restriction-inertia `inertia(ψ) ≤ inertia(θ₀)`**: an element `g` fixing the `HC`-character `ψ`
 also fixes its restriction `θ₀ = ψ|_hInHu` (via `hcPsi_apply_inclusion`).  Pointwise `conjBy`
-argument: `conjBy g θ₀ (h) = θ₀⟨g h g⁻¹⟩ = ψ(incl⟨g h g⁻¹⟩) = ψ⟨g (incl h) g⁻¹⟩ = (conjBy g ψ)(incl h)
+argument:
+`conjBy g θ₀ (h) = θ₀⟨g h g⁻¹⟩ = ψ(incl⟨g h g⁻¹⟩) = ψ⟨g (incl h) g⁻¹⟩ = (conjBy g ψ)(incl h)
 = ψ(incl h) = θ₀(h)`.  Combined with `subgroup_le_inertia` and the seed `inertia(θ₀) = HC`, gives
 `inertia(ψ) = HC`. -/
 theorem hcPsi_inertia_le [Finite G] {M : Subgroup G}
@@ -297,7 +300,8 @@ theorem hcZeta_irreducible [Finite G] {M : Subgroup G}
     (hcPsi_inertia_eq_hc chief θ hθ₀)
 
 /-- **`[HU:HC] = u`**: the index of `HC = hInHu ⊔ H₀C` in `HU` is `u = |Ū|`.  Via the identification
-`HC = hInHu ⊔ cInHu` and the existing `index_hcInHu_eq_relindex_cInHu` + `index_cInHu_subgroupOf_uInHu_eq_u`
+`HC = hInHu ⊔ cInHu` and the existing `index_hcInHu_eq_relindex_cInHu` +
+`index_cInHu_subgroupOf_uInHu_eq_u`
 (`[HU:HC] = [U:C] = u`).  The degree `ζ(1) = [HU:HC]·ψ(1) = u·1` of the (9.8.c) construction. -/
 theorem hc_index_eq_u [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -798,7 +802,8 @@ theorem realizedH0supUprime_le_hcuInHu [Finite G] {M : Subgroup G}
 
 /-- **`hcuPairHom` kills `H₀U'`** (`HC`-level, pointwise): every `x` in the realized `H₀U'` lies in
 the kernel of the pair hom `θ₁·λ`.  Decompose `x = h₀·u'` (`realizedH₀ ◁ H·C_U(S₀)`): the `θ`-part
-`hcuThetaHom` restricts to `hcuSeedHom θ` on `h₀ ∈ H₀` (`= 1`, `hcuSeedHom_eq_one_of_mem_realizedH0`)
+`hcuThetaHom` restricts to `hcuSeedHom θ` on `h₀ ∈ H₀` (`= 1`,
+`hcuSeedHom_eq_one_of_mem_realizedH0`)
 and dies on `u' ∈ C_U(S₀)` (`hcuThetaHom_inclusion_cuInHu`); the `λ`-part `hcuLambdaHom` dies on
 `h₀ ∈ H` (`hcuLambdaHom_eq_one_of_mem_hInHu`) and restricts to `λ u' = 1` on `u' ∈ U'` (`hlam`).
 Single-factor mirror of `hcPairHom_eq_one_of_mem_realizedH0supCprime`. -/

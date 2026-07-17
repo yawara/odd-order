@@ -563,7 +563,8 @@ def Orthogonal (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
 open scoped Classical in
 /-- **Peterfalvi (4.1), cross-domain member form (the `u = v = 1` case).**
 
-The two `CharacterDifferenceImage`s may live over **different domains** `L, L'` (maps `τ, τ'`) but the
+The two `CharacterDifferenceImage`s may live over **different domains** `L, L'` (maps `τ, τ'`) but
+the
 same `G`.  If the signed differences `(χ − χ̄)^τ = ε·(μ − ν)` and `(ψ − ψ̄)^{τ'} = ε'·(μ' − ν')` are
 orthogonal in `CF(G)`, then every cross pairing of members vanishes — `μ, ν, μ', ν'` share no
 irreducible, so any `a ∈ R(χ)`, `b ∈ R(ψ)` satisfy `(a, b) = 0`.

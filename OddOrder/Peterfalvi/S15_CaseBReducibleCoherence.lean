@@ -130,7 +130,8 @@ Honest route (mirroring the *landed* M-instance `caseB_coherent_sOf_H0Cprime`,
 `S13_CoreStructure.lean:1544`, which likewise routes through the norm-general (5.7) engine rather
 than the mixed *fold*): since the whole family is **uniform** degree `q·u`
 (`sSet_caseB_apply_one_eq_qu`), coherence on the honest Dade map `τ` follows directly from
-`uniform_degree_coherence_of_families` (`sSet_coherent_dade_caseB`, this file) with a reducible μ-column
+`uniform_degree_coherence_of_families` (`sSet_coherent_dade_caseB`, this file) with a reducible
+μ-column
 pivot; then `congrMap` re-grounds `τ` onto `Ind_S^G` on the `A(S)`-supported span
 (`sInstance_dade_eq_induce`).  All the (5.7)-engine wiring, the uniform-degree fact, the pivot norm,
 the Dade isometry/ZIrr/support inputs, and the *irreducible* per-member `R`-datum are landed
@@ -159,7 +160,8 @@ theorem Hypothesis.sSet_coherent_indS_caseB [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Honest §9 character data on `S`** (issue 2035 step 3; support corrected to `A(S)`, issue 1017):
-the `mkSection11CharacterDataS` mirror with the *genuine* coherence inputs — `tau := Ind_S^G` (`indS`,
+the `mkSection11CharacterDataS` mirror with the *genuine* coherence inputs — `tau := Ind_S^G`
+(`indS`,
 Peterfalvi (13.2.e)) and `H0CprimeSupport := A(S)` (`supportInSubgroup (honestTypeP2ASet S) S`, the
 honest Dade support `⋃_{x∈S_σ#} C_{S′}(x)#`).
 
@@ -232,12 +234,15 @@ open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Per-member (5.4) decomposition `D(φ)` for a member `φ ∈ 𝒮₂`, case-agnostic** (issue 1017
 step (c)).  The `ψ = 0` `CharacterPsiDecomposition` over the honest Dade map `τ` whose orthonormal
-image family is the case-agnostic `R`-family `sSet_memberRFamily` (irreducible *or* reducible μ-column)
+image family is the case-agnostic `R`-family `sSet_memberRFamily` (irreducible *or* reducible
+μ-column)
 and whose auxiliary isometry is the coherent extension `ν = hS₂coh.extension` — every `ofProjection`
-input (non-realness cross-orthogonality `⟨φ, φ̄⟩ = 0`, conjugate-difference support `(φ̄ − φ) ⊆ A(S)`,
+input (non-realness cross-orthogonality `⟨φ, φ̄⟩ = 0`, conjugate-difference support
+`(φ̄ − φ) ⊆ A(S)`,
 `ν`-integrality `νφ ∈ ℤ[Irr G]`, the sponsoring-lattice `ℤ[φ, φ̄]` inner-preservation and
 `ν(φ − φ̄) = τ(φ − φ̄)`) discharged from the family layer via `sSet_subset_inducedKernelFamily`.  The
-`S`-instance analogue of `memberExtensionDecomposition`, with the case-agnostic family in place of the
+`S`-instance analogue of `memberExtensionDecomposition`, with the case-agnostic family in place of
+the
 irreducible-only `dadeOrthonormalCharacterImageFamilyOfDiff`. -/
 noncomputable def Hypothesis.sSet_memberPsiDecomp [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -297,10 +302,12 @@ noncomputable def Hypothesis.sSet_memberPsiDecomp [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The break decomposition `Da` for a pair-refuted member `χ`, case-agnostic** (issue 1017
-step (c)).  The `ψ = a·χ₁` `CharacterPsiDecomposition` over the honest Dade map `τ` (with `τ` itself as
+step (c)). The `ψ = a·χ₁` `CharacterPsiDecomposition` over the honest Dade map `τ` (with `τ` itself
+as
 the auxiliary isometry, so `Da.tau1 = τ`) whose image family is the case-agnostic `R`-family
 `sSet_memberRFamily hG hnoV hχ`; the difference set `{χ − χ̄, χ − a·χ₁}` is `A(S)`-supported
-(`sSet_member_conjDiff_supported` + `hdiffasupp`), so the Dade isometry preserves the sponsoring-lattice
+(`sSet_member_conjDiff_supported` + `hdiffasupp`), so the Dade isometry preserves the
+sponsoring-lattice
 inner products (`dadeIntegralCharacterMap_inner_eq_on_supported_span`).  The `S`-instance analogue of
 `decompositionDaFromDadeOfDiff`, case-agnostic in `χ`. -/
 noncomputable def Hypothesis.sSet_breakPsiDecomp [Finite G]
@@ -353,7 +360,8 @@ open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Scaled-difference support for `𝒮`-members** (issue 1017 step (c), the honest-`A(S)` analogue of
 the general `inducedKernelFamily_scaledDiff_support`).  For members `φ, ψ ∈ 𝒮` with a matching scaled
-degree `φ(1) = c·ψ(1)` (`c : ℕ`), the difference `φ − c·ψ` vanishes at `1`, so — since every `𝒮`-member
+degree `φ(1) = c·ψ(1)` (`c : ℕ`), the difference `φ − c·ψ` vanishes at `1`, so — since every
+`𝒮`-member
 is supported in `A(S) ∪ {1}` (`sSet_member_support_subset`, the honest (4.7) support) — its support
 lands in `A(S)`.  Used in place of the general induced-family support lemma, whose `hKsupp` premise
 `(S′)^# ⊆ A(S)` is *false* for the honest, strictly-smaller type-`P₂` support `A(S)`. -/
@@ -436,12 +444,14 @@ set_option maxHeartbeats 1600000 in
 `indS`/`A(S)` world rather than cited).  For a pair-refuted `χ ∈ 𝒮 ∖ 𝒮₂` (its conjugate pair
 `{χ, χ̄}` not coherently adjoinable to the coherent maximal `𝒮₂`), the member `χ = Ind_{HU}^S ζ` has
 degree `χ(1) = q·d` with source degree `d ≤ u`, and every finite `F ⊆ 𝒮₂` obeys the (5.6)
-norm-weighted degree-square bound `sumnS F ≤ 2·(q·a)·(q·d) = 2q²a·d` (Theorem (5.6) at the degree-`qa`
+norm-weighted degree-square bound `sumnS F ≤ 2·(q·a)·(q·d) = 2q²a·d` (Theorem (5.6) at the
+degree-`qa`
 anchor read contrapositively through `S08.coherentDegreeSqNormBound_of_not_coherentW_k`).
 
 **Precisely-named residual (issue 1017 step (c), `TRUE` signature, no hoisted content).**  The
 genuinely-`S`-specific inputs still to build: the caseA per-member Dade `R`-family — now
-Clifford-case-agnostic, `sSet_memberRFamily` (issue 1017 update #45), citable here after the step (b)
+Clifford-case-agnostic, `sSet_memberRFamily` (issue 1017 update #45), citable here after the step
+(b)
 relocation — feeding the (5.6) engine, and the (9.8.a) source-degree divisibility `a ∣ ζ(1)`
 (`S11.caseA_sOf_source_degree_ratio` via `sSet_eq_sOf_H0Cprime`). -/
 theorem Hypothesis.nineElevenPairBoundS [Finite G]
@@ -470,7 +480,8 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
   haveI := hyp.finiteG
   obtain ⟨hχS, hχnotS₂⟩ := hχ
   obtain ⟨cohS₂_indS⟩ := hS₂coh
-  -- (1) Dade-side coherence via `congrMap`: `indS = Ind_S^G = τ` on `A(S)`-supported class functions.
+  -- (1) Dade-side coherence via `congrMap`: `indS = Ind_S^G = τ` on `A(S)`-supported class
+  -- functions.
   have hindS_dade : ∀ f : ClassFunction ↥hyp.S ℂ,
       f ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.S) S₂
         (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) →

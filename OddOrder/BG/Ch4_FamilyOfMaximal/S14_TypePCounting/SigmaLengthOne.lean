@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.Conjugacy145C
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -326,7 +327,8 @@ the nonempty σ-decomposition; conjugate `M₀` so that `x ∈ M_σ` (preserving
 `x = (g)_{σ(M)}`).  Then `g ∉ M` (else `s'g` kills `x`), so `|𝓜_σ(x)| > 1`
 (`centralizer_le_of_maximalSigma_ncard_eq_one`).  The neighbour `N = N(x)` of Theorem 14.4 has
 `C_G(x) ≤ N` and `M ∩ N` a Hall `σ(N)′`-subgroup of `N` (complement of `N_σ`); since `g` is a
-`σ(N)′`-element (`s'g` for `N`), `⟨g⟩` conjugates into `M ∩ N ⊆ M` (`exists_conj_smul_le_of_isHall`),
+`σ(N)′`-element (`s'g` for `N`), `⟨g⟩` conjugates into `M ∩ N ⊆ M`
+(`exists_conj_smul_le_of_isHall`),
 so `(g^w)_{σ(M)} = (x)^w = 1` by `s'g`, forcing `x = 1` — a contradiction. -/
 theorem sigma_decomposition_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (D : SigmaDecompositionData G) {g : G} (hg : g ≠ 1) :
@@ -1034,7 +1036,8 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           ((OddOrder.BG.Ch3.S10.Msigma M).orderOf_dvd_natCard hxMσ), Nat.card_pos.ne'⟩)
     exact tau2_subset_sigma_compl M hpτ2M hpσM
   · -- **Disjoint classes**: factor matching gives `y = x'`, `y' = x`; then `M, N` conjugate, and
-    -- `x = y'` is a `κ(M)`-element (rank 1) and a `τ₂(N)`-element (rank 2), absurd by conj-invariance.
+    -- `x = y'` is a `κ(M)`-element (rank 1) and a `τ₂(N)`-element (rank 2), absurd by
+    -- conj-invariance.
     have hxPiMc : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ x :=
       fun p hp hpM => hσeq (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hM (hxPi p hp) hpM)
     have hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N := by

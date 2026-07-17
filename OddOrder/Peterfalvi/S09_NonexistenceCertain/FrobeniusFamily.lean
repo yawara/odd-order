@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.CharacterEstimate
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.FrobeniusFamily` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)

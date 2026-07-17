@@ -91,7 +91,8 @@ theorem dvd_inner_restrict_extension_Yset_c2_caseA
   exact_mod_cast this
 
 /-- **(6.8.1) `a ∣ b`** (mmd 04.8 L176, the `b ≡ 0 (mod a)` half of "`b ≡ c ≡ 0 (mod a)`").  For
-`η = η₁ ∈ Y` and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|` (`a > 0`), the `η₁^{τ₁}`-coefficient
+`η = η₁ ∈ Y` and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|` (`a > 0`), the
+`η₁^{τ₁}`-coefficient
 of the cross-diagonal image `(χ₁−aη₁)^τ` — namely `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩`, which is `b − a` in the
 Peterfalvi decomposition (168) `(χ₁−aη₁)^τ = X − aη₁^{τ₁} + b∑η_j^{τ₁}` — is an **integer divisible
 by `a`**.  Since `a ∣ (b − a) ⟺ a ∣ b`, this is exactly Peterfalvi's `b ≡ 0 (mod a)`.
@@ -190,7 +191,8 @@ with `χ₁(1) = a·|W₁|` (`a > 0`):
 
 By the Dade isometry on the supported pair `{χ₁−aη₁, η_j−η₁}`
 (`dadeIntegralCharacterMap_inner_eq_on_supported_span`; `χ₁−aη₁` supported by
-`sMember_scaledDiffSupport_of_charValue_eq`, `η_j−η₁` by `sMember_diffSupport_of_charValue_eq` at the
+`sMember_scaledDiffSupport_of_charValue_eq`, `η_j−η₁` by `sMember_diffSupport_of_charValue_eq` at
+the
 common degree `|W₁|`), the inner product equals the source `⟨χ₁−aη₁, η_j−η₁⟩`, which expands by
 `X ⊥ Y` (`⟨χ₁,η_j⟩ = ⟨χ₁,η₁⟩ = 0`) and `Y`-orthonormality (`⟨η₁,η_j⟩ = 0`, `⟨η₁,η₁⟩ = 1`) to
 `a·⟨η₁,η₁⟩ = a`.  This gives the constancy `β_j − β₁ = a` (j>1) of the `η_j^{τ₁}`-coefficients

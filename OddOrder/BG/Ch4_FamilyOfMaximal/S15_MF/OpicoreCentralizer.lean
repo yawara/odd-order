@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
 /-!
 # OpicoreCentralizer
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第
+2 パス).
 -/
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -26,18 +27,22 @@ The `≥ 3` side is fully proved (`three_le_pRank_mf_of_mem_beta`: any `r ∈ π
 `pRank (M_F) r < 3`, the genuinely deep §15 content isolated as the single remaining `sorry`.
 
 **Proved building blocks (this file):** the setup
-`exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` (step 1: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`)
+`exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` (step 1: `g ∉ M`,
+`X = F(M) ⊓ F(M)^g ≠ ⊥`)
 and `rank_lt_three_of_le_two_maximals` (step 7 core: a subgroup in two distinct maximals has rank
 `< 3`).  The remaining assembly, with the located upstream lemmas:
 
 * **(step 3, `p ∈ σ(M)`)** pick `p ∈ π(X)`, `X₁ ≤ X` of order `p`
   (`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent`: `X₁ ≤ O_p(F(M))`).  If `p ∉ σ(M)` then
   `O_p(F(M)) ≤ O_{σ'}(F(M))` is cyclic (`fitting_decomposition`), so `X₁` is the unique order-`p`
-  subgroup, hence characteristic and normal in both `M` and `M^g`; `normalizer_eq_of_normal_of_mem_maximal`
-  (S08, currently `private`) forces `M^g = M`, contradicting `g ∉ M`.  ⟹ `p ∈ σ(M)`.  *(fiddly sub-step:
+  subgroup, hence characteristic and normal in both `M` and `M^g`;
+  `normalizer_eq_of_normal_of_mem_maximal`
+  (S08, currently `private`) forces `M^g = M`, contradicting `g ∉ M`. ⟹ `p ∈ σ(M)`. *(fiddly
+  sub-step:
   cyclic group ⟹ unique/characteristic order-`p` subgroup.)*
 * **(step 5, `p ∉ β(M)`)** `X₁ ≤ O_p(M) ≤ M_σ` (`opiCoreInG_singleton_le_Msigma_of_mem_sigma`) and
-  `X₁ ≤ F(M)^g ≤ M^g`, so `X₁ ≤ M_σ ⊓ M^g`; Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`) ⟹ `p ∉ β(M)`,
+  `X₁ ≤ F(M)^g ≤ M^g`, so `X₁ ≤ M_σ ⊓ M^g`; Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`) ⟹
+  `p ∉ β(M)`,
   hence `r ≠ p` for the `β`-prime `r` (so the `r = p` case is vacuous).
 * **(step 6, `C_G(X₁) ⊄ M`)** `fusion_control_of_mem_sigma` part (e) with `p ∈ σ(M)`, `X₁ ≤ M`,
   `conj g⁻¹ • X₁ ≤ M`.
@@ -132,7 +137,8 @@ theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
     rank_lt_three_of_le_two_maximals hG hM hNmax hNneM
       (inf_le_left.trans (maxNilpotentNormalHall_le M)) (inf_le_right.trans hCGN)
   -- Step 8: `r`-elements of `M_F` centralize `X₁` (coprime, `F(M)` nilpotent), so the `r`-Sylow of
-  -- `M_F` lies in `C_{M_F}(X₁)`; hence `r ∤ [M_F : C_{M_F}(X₁)]` and `r_r(M_F) = r_r(C_{M_F}(X₁)) < 3`.
+  -- `M_F` lies in `C_{M_F}(X₁)`; hence `r ∤ [M_F : C_{M_F}(X₁)]` and
+  -- `r_r(M_F) = r_r(C_{M_F}(X₁)) < 3`.
   haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
   have hcentr : ∀ A : Subgroup G, A ≤ MF M → IsPGroup r ↥A →
       A ≤ Subgroup.centralizer (X₁ : Set G) := by
@@ -199,7 +205,8 @@ the derived subgroup of a maximal subgroup whose Fitting subgroup is *not* `TI` 
 
 `M_F = M_σ` (`mf_eq_msigma_of_not_fittingIsTI`), and `M_β ≤ M_σ = M_F` is a `β(M)`-group
 (`Mbeta_isPiGroup`; `β ⊆ α ⊆ σ` via `alpha_subset_sigma`), so `π(M_β) ⊆ π(M_F) ∩ β(M) = ∅`
-(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), forcing `M_β = 1`.  Then `M'/M_β ≅ M'` is nilpotent
+(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), forcing `M_β = 1`. Then `M'/M_β ≅ M'` is
+nilpotent
 (`derivedQuotientMbeta_isNilpotent`), and the nilpotent normal `M'` lies in the Fitting subgroup
 (`le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent`).  Sole upstream gate of the `E₃ = 1`
 chain feeding Corollary 15.9's cyclic Frobenius complement (with
@@ -337,7 +344,8 @@ authoritative MathComp odd-order formalization (`theories/BGsection15.v`, `nonTI
 states conjunct (c) as `M^'(1) ⊆ 'F(M)` (inclusion) `∧ M_σ × O_σ('F(M)) = 'F(M)`, **not** equality —
 its source comment explicitly records the change: *"We had to change the statement … the first
 equality of part (c) does not appear to be valid: if M is of type F … E2 might have a Sylow subgroup
-that meets F(M) but is also centralised by E1 and hence intersects M' trivially; … only the inclusion
+that meets F(M) but is also centralised by E1 and hence intersects M' trivially; … only the
+inclusion
 M' ⊆ F(M) seems to be needed in the sequel."*  (independently curl-verified, not via the consult).
 Only `M' ≤ F(M)` is BG-faithful and provable; the equality holds iff `C_Y(E₁) = 1`, a non-derivable
 condition (BG only gets `M` Frobenius later, in Corollary 15.9, after `τ₂(M) = ∅`, i.e. `E₂ = 1`).
@@ -357,8 +365,10 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         -- `M' = F(M)`, but that equality is an **overstatement** in the type-`F` case (it is
         -- equivalent to the non-derivable condition `C_Y(E₁) = 1`).  We therefore weakened it to the
         -- faithful inclusion `M' ⊆ F(M)`, matching the authoritative MathComp formalization
-        -- (`nonTI_Fitting_structure`, which uses `M^'(1) ⊆ 'F(M)` and whose source comment states the
-        -- printed equality "does not appear to be valid").  Full justification in the docstring above.
+        -- (`nonTI_Fitting_structure`, which uses `M^'(1) ⊆ 'F(M)` and whose source comment states
+        -- the
+        -- printed equality "does not appear to be valid"). Full justification in the docstring
+        -- above.
         derivedInG M ≤ fittingInAmbient M ∧
         (∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
           p ∉ OddOrder.BG.Ch3.S10.beta M ∧
@@ -403,13 +413,19 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · -- `IsCyclic X`
     infer_instance
   · -- **`M' ≤ F(M)`** (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)` is an
-    -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`).  The argument is *type-independent*
+    -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`). The argument is
+    -- *type-independent*
     -- (covers both type `F` and type `P₁`): take a §12 `E`-setup `M = M_σ ⋊ E`, so
-    -- `M' = M_σ ⊔ E'` (`derivedInG_eq_Msigma_sup_derivedInG_complement`).  Lemma 12.19 supplies a Hall
-    -- `β(M)'`-subgroup `W ≤ M_σ` of `M_σ` that `E'` centralizes; since `π(M_σ) = π(M_F)` is disjoint
-    -- from `β(M)` (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, as `M_F = M_σ`), `M_σ` is itself a
-    -- `β'`-group, so `W = M_σ` and `E' ≤ C_G(M_σ)`.  Then `M_σ ≤ F(M)` (`M_F = M_σ` nilpotent normal)
-    -- and `E' ≤ C_G(M_σ) ⊓ M ≤ F(M)` (`fitting_decomposition`: `F(M) = (C_M(M_F) ⊓ M) ⊔ M_F`), whence
+    -- `M' = M_σ ⊔ E'` (`derivedInG_eq_Msigma_sup_derivedInG_complement`). Lemma 12.19 supplies a
+    -- Hall
+    -- `β(M)'`-subgroup `W ≤ M_σ` of `M_σ` that `E'` centralizes; since `π(M_σ) = π(M_F)` is
+    -- disjoint
+    -- from `β(M)` (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, as `M_F = M_σ`), `M_σ` is
+    -- itself a
+    -- `β'`-group, so `W = M_σ` and `E' ≤ C_G(M_σ)`. Then `M_σ ≤ F(M)` (`M_F = M_σ` nilpotent
+    -- normal)
+    -- and `E' ≤ C_G(M_σ) ⊓ M ≤ F(M)` (`fitting_decomposition`: `F(M) = (C_M(M_F) ⊓ M) ⊔ M_F`),
+    -- whence
     -- `M' = M_σ ⊔ E' ≤ F(M)`.
     haveI : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
     obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
@@ -417,8 +433,10 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [derivedInG_eq_Msigma_sup_derivedInG_complement hG hsetup]
     -- Lemma 12.19: a Hall `β(M)'`-subgroup `W ≤ M_σ` of `M_σ` centralized by `E'`.
     obtain ⟨W, hWle, hWHall, hWcent⟩ := derivedE_centralizes_betaComplement hG hsetup
-    -- `W = M_σ`: every prime of the index `[M_σ : W]` divides `|M_σ| = |M_F|`, hence lies in `π(M_F)`,
-    -- which is disjoint from `β(M)`; but the Hall condition makes that index a `β`-number, so it is `1`.
+    -- `W = M_σ`: every prime of the index `[M_σ : W]` divides `|M_σ| = |M_F|`, hence lies in
+    -- `π(M_F)`,
+    -- which is disjoint from `β(M)`; but the Hall condition makes that index a `β`-number, so it is
+    -- `1`.
     have hWeq : W = OddOrder.BG.Ch3.S10.Msigma M := by
       have hidx : (W.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).index = 1 := by
         by_contra hne

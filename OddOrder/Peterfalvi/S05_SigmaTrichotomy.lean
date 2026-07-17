@@ -442,9 +442,11 @@ of `X = μ_k^{τ₁}`, this turns the norm-`w₁` data into the class-function i
 open scoped Classical in
 /-- **Peterfalvi (5.8), `σ`-coefficient full-column endgame.**  Let `X` be a class function of `G`
 that vanishes on `V` (so its `σ`-coefficient grid is additively separable, `sigmaCoeff_add_eq`),
-whose `σ`-coefficients are supported on two `W₂`-columns `jcol ≠ kcol`, with column-`kcol` entries in
+whose `σ`-coefficients are supported on two `W₂`-columns `jcol ≠ kcol`, with column-`kcol` entries
+in
 `{0, δ}` and column-`jcol` entries in `{0, −δ}` (`δ = ±1`), and which accounts for its full self
-inner product through its `σ`-coefficients (`hParseval`, the Parseval equality / no `Im σ`-orthogonal
+inner product through its `σ`-coefficients (`hParseval`, the Parseval equality / no
+`Im σ`-orthogonal
 component) with `‖X‖² = w₁` (`hXnorm`, the coherence isometry).  Then `X` is a single constant full
 column: either `X = δ·∑_i χ_{(i,kcol)}` or `X = −δ·∑_i χ_{(i,jcol)}`.
 
@@ -518,7 +520,8 @@ theorem eq_smul_chiFam_column_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype
   -- reconstruct `X` from its coefficients, then collapse to the surviving column.
   have hXrec : X = ∑ pq, hyp.sigmaCoeff hVeq app X pq • hyp.chiFam hVeq app pq :=
     hyp.eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq hVeq app hParseval
-  -- collapse the double sum onto the single nonzero column `col`, where `sigmaCoeff (·, col) = val`.
+  -- collapse the double sum onto the single nonzero column `col`, where
+  -- `sigmaCoeff (·, col) = val`.
   have hcollapse : ∀ (col : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) (val : ℂ),
       (∀ p, hyp.sigmaCoeff hVeq app X (p, col) = val) →
       (∀ p q, q ≠ col → hyp.sigmaCoeff hVeq app X (p, q) = 0) →

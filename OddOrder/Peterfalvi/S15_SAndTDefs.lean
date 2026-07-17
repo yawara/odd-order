@@ -908,7 +908,8 @@ theorem exists_conj_typeP_U_of_coprime [Finite G]
     hM'_le_S.trans hS_le_NP
   haveI hPn_normal : (hyp.P.subgroupOf (derivedInG hyp.S)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le).mpr hM'_le_NP
-  -- `typeP.U` complements `P` in `M'` (the `derived_complement` field, rewritten via `P = typeP.H`).
+  -- `typeP.U` complements `P` in `M'` (the `derived_complement` field, rewritten via
+  -- `P = typeP.H`).
   have hKcompl : (hyp.P.subgroupOf (derivedInG hyp.S)).IsComplement'
       (tdata.typeP.U.subgroupOf (derivedInG hyp.S)) := by
     rw [hPH]; exact tdata.typeP.derived_complement
@@ -942,7 +943,8 @@ theorem exists_conj_typeP_U_of_coprime [Finite G]
     have key := Nat.eq_of_mul_eq_mul_left hPpos
       (hUcompl.card_mul.trans hKcompl.card_mul.symm)
     rw [← hUcong, ← hKcong]; exact key
-  -- Schur–Zassenhaus inside `↥M'`: `U.subgroupOf M' ≤ (typeP.U.subgroupOf M')ᶜᵒⁿʲ` by some `x ∈ M'`.
+  -- Schur–Zassenhaus inside `↥M'`: `U.subgroupOf M' ≤ (typeP.U.subgroupOf M')ᶜᵒⁿʲ` by some
+  -- `x ∈ M'`.
   obtain ⟨x, hx⟩ := Ch03.exists_conj_le_of_isComplement'_of_coprime
     (M := hyp.P.subgroupOf (derivedInG hyp.S))
     (K := tdata.typeP.U.subgroupOf (derivedInG hyp.S))
@@ -981,7 +983,8 @@ theorem card_W1_add_W2 (hyp : Hypothesis (G := G)) :
 /-- **Peterfalvi (14.11)**, base-derived: `|W| = p q`.  `W = W₁ ⊔ W₂` (`W_eq_join`) is the internal
 direct product of the elementwise-commuting (`W1_commutes_W2`), trivially-intersecting
 (`W1_inf_W2_eq_bot`) cyclic factors `W₁` (order `q`) and `W₂` (order `p`), so
-`|W| = |W₁| · |W₂| = q p = p q` via the disjoint-normalizer product formula.  Supplies the `card_W_eq`
+`|W| = |W₁| · |W₂| = q p = p q` via the disjoint-normalizer product formula. Supplies the
+`card_W_eq`
 field of `MHypothesis`, de-gating it from a §13-14 σ-prerequisite to a base consequence. -/
 theorem card_W_eq_pq [Finite G] (hyp : Hypothesis (G := G)) :
     Nat.card ↥hyp.W = hyp.p * hyp.q := by
@@ -1004,7 +1007,8 @@ theorem card_W_eq_pq [Finite G] (hyp : Hypothesis (G := G)) :
   exact mul_comm hyp.q hyp.p
 
 /-- **Peterfalvi (14.11.3)**, base-derived: the exceptional set `W − (W₁ ∪ W₂)` is nonempty.
-`|W| = p q` (`card_W_eq_pq`) strictly exceeds `|W₁ ∪ W₂| ≤ |W₁| + |W₂| = q + p` since `(p−1)(q−1) > 0`
+`|W| = p q` (`card_W_eq_pq`) strictly exceeds `|W₁ ∪ W₂| ≤ |W₁| + |W₂| = q + p` since
+`(p−1)(q−1) > 0`
 for the odd primes `p, q ≥ 3`, so `W` cannot be covered by `W₁ ∪ W₂`.  Supplies the `W_set_nonempty`
 field of `MHypothesis`. -/
 theorem W_sdiff_nonempty [Finite G] (hyp : Hypothesis (G := G)) :
@@ -1036,8 +1040,10 @@ Phase 0): for `S` of type II, if the complement `U` meets the Fitting kernel `P 
 
 This is the *derivable* half of the (13.2) faithfulness datum.  `P = S_F = maxNilpotentNormalHall M'`
 (`TypeIIData.derived_fitting_eq`) is a **relative Hall** subgroup of `M' = derivedInG S`
-(`maxNilpotentNormalHall_isHall`: `(M_F).subgroupOf M'` is Hall in `↥M'`), so `|P|` is coprime to its
-index `[M' : P]`.  Disjointness plus `M' = P ⊔ U` (`S_deriv_eq_PU`) makes `U` a genuine `P`-complement
+(`maxNilpotentNormalHall_isHall`: `(M_F).subgroupOf M'` is Hall in `↥M'`), so `|P|` is coprime to
+its
+index `[M' : P]`. Disjointness plus `M' = P ⊔ U` (`S_deriv_eq_PU`) makes `U` a genuine
+`P`-complement
 with `|U| = [M' : P]`, whence `Coprime |U| |P|`.  The remaining input `P ⊓ U = ⊥` is the carrier
 faithfulness datum (`hyp.U` is currently under-constrained; supplied by the enriched §16 Hypothesis,
 Phase 0(b)).  Composes with `exists_conj_typeP_U_of_coprime` to discharge the L~S rule-out. -/

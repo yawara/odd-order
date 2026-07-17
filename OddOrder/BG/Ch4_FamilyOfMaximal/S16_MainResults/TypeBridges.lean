@@ -32,7 +32,8 @@ variable {G : Type*} [Group G]
 mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:
 `M' = M_F ⊔ U = M_F` (`TypePData.derivedInG_eq_fitting_sup_U` with `U = ⊥`), while always
 `M_F ≤ M_σ ≤ M'` (`maxNilpotentNormalHall_le_Msigma`, `Msigma_le_derived`); so `M_F = M_σ = M'`.
-Axiom-clean (does *not* cite Theorem A(8), unlike the `M_F = M_σ` step of `typeFData_of_kappa_eq_bot`).
+Axiom-clean (does *not* cite Theorem A(8), unlike the `M_F = M_σ` step of
+`typeFData_of_kappa_eq_bot`).
 This is the structural half of clause (d): the `IsTypeP1` half is the (deeper) `κ` refinement. -/
 theorem mf_eq_msigma_of_typePData_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypePData M) (hU : data.U = ⊥) :
@@ -187,7 +188,8 @@ theorem typePData_normalizer_U_le_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimp
 
 /-- **Type II and Type III/IV are mutually exclusive** (mmd L4478 reverse): the type-II condition
 `¬ N_G(U) ≤ M` (`TypeIIData.normalizer_not_le`) and the type-III/IV condition `N_G(U) ≤ M`
-(`TypeIIIData.normalizer_le`/`TypeIVData.normalizer_le`) cannot both hold on a maximal `M`, since the
+(`TypeIIIData.normalizer_le`/`TypeIVData.normalizer_le`) cannot both hold on a maximal `M`, since
+the
 complements `U` are `M`-conjugate (`typePData_normalizer_U_le_iff`).  This is the exclusivity that
 refines `IsTypeP` (`= IsTypeP1 ∨ IsTypeP2`) into the precise type for the reverse bridges
 `hIIP2`/`hIIIIVP1`. -/
@@ -655,7 +657,8 @@ nontrivial complement `U` satisfies `U ≠ ⊥`, `|W₁|` prime, and `M_F#` is a
 
 The `|W₁|` primality is Theorem A(8) (`theoremA8_structure`: `M_F ≠ M_σ ⟹ |K| = p` prime, with
 `|W₁| = |K| = [M:M']`); the `M_F#`-`TI` is the `FittingIsTI M` clause of A(8)
-(`fitting_isTI_of_mf_ne_msigma`) read through `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`.
+(`fitting_isTI_of_mf_ne_msigma`) read through
+`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`.
 Discharges the `hcommon` input of the type III/IV last mile `isTypeIII_or_IV_of_typePData`, so once
 the type-`P₁` `TypePData` is constructed (`exists_typeP1_mf_complement` plus the deep
 nilpotency/Fitting fields) and `N_G(U) ⊆ M` is supplied, the `hP1neIIIIV` bridge closes. -/

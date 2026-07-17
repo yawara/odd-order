@@ -603,7 +603,8 @@ private theorem two_mul_add_one_le_of_modEq_one_odd {p x : ℕ} (hp : Odd p) (hp
 consequence of `k > 2 p v`, `e ≤ p q`, and `q < p`: cross multiplication reduces it to
 `e(v−1) ≤ pq(v−1) < p(k−1)`.  The `k > 2 p v` bound is in turn
 the arithmetic consequence (`two_mul_add_one_le_of_modEq_one_odd`) of the §13/§15 structural datum
-`hstruct` of (14.11.1): by (13.17) the kernel order factors as `k = v·x` with `x` an integer, `x ≠ 1`
+`hstruct` of (14.11.1): by (13.17) the kernel order factors as `k = v·x` with `x` an integer,
+`x ≠ 1`
 (as `K ≠ V`), and `x ≡ 1 (mod p)` (since `W₂` acts fixed-point-freely on `K` and `V`); as `k = |K|`
 is odd, `x` is odd, so `x ≥ 2p+1` and `k = vx > 2pv`.  The third inequality of (14.11.1),
 `(v − 1) / p > (u − 1) / q`, is `key_ratio_inequality_of_caseB_data` (14.8), discharged in

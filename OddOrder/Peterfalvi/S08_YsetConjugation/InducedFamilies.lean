@@ -454,7 +454,8 @@ theorem isIrreducibleCharacter_induce_of_degree_one (hyp : SibleyDadeHypothesis 
   rcases hyp.cases with hF | ⟨h46, _hdade, hK, hW1, _hprime, hW2, hcop⟩
   · exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
   · -- (c2) inertia bridge: `I_L(θ) = H` via the abelian quotient `H/⁅H,H⁆` (Brauer + Isaacs 3.28).
-    -- `cases` now carries the full `Hypothesis46`; project to the underlying `CertainTypeHypothesis`.
+    -- `cases` now carries the full `Hypothesis46`; project to the underlying
+    -- `CertainTypeHypothesis`.
     exact isIrreducibleCharacter_induce_of_inertia_eq θ
       (hyp.inertia_eq_H_of_c2 h46.toCertainTypeHypothesis hK hW1 hW2 hcop hθ_one hθ_ne)
 

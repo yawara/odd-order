@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel
 /-!
 # Peterfalvi (9.8.d) count — def_Itheta reconstruction and assembly
 
-Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -335,7 +336,8 @@ theorem card_hom_triv_N_eq_card_quotient_general {K : Type*} [Group K] [Finite K
 
 open scoped commutatorElement in
 /-- **Peterfalvi (9.8.d)** (count substrate).  `⁅cuInHu, cuInHu⁆ ≤ U'` realized: the derived subgroup
-of the realized `C_U(S₀)` lands in the realized `U' = [U,U]`, since `C_U(S₀) ≤ U`.  Makes the quotient
+of the realized `C_U(S₀)` lands in the realized `U' = [U,U]`, since `C_U(S₀) ≤ U`. Makes the
+quotient
 `C_U(S₀)/U'` abelian, so its linear characters number `[C_U(S₀):U']` (Pontryagin). -/
 theorem commutator_cuInHu_le_uprimeRealized [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -366,7 +368,8 @@ theorem commutator_cuInHu_le_uprimeRealized [Finite G] {M : Subgroup G}
 
 /-- **Peterfalvi (9.8.d)** (count substrate).  The `λ`-numerator: linear characters
 `λ : C_U(S₀) →* ℂˣ` trivial on `U'` number `[C_U(S₀):U']`.  The realized `U'` (as a subgroup of
-`cuInHu`) contains the derived subgroup (`commutator_cuInHu_le_uprimeRealized`), so it is normal with
+`cuInHu`) contains the derived subgroup (`commutator_cuInHu_le_uprimeRealized`), so it is normal
+with
 abelian quotient `cuInHu/U'`; hence `#{λ | U'-realized ⊆ Ker λ} = |cuInHu/U' →* ℂˣ| = |cuInHu/U'|`
 (Pontryagin) `= (U'-realized).relIndex(cuInHu) = (uprimeSub).relIndex(cuSub)` (`relIndex_subgroupOf`
 twice).  The `λ`-factor count of the (9.8.d) domain `(p-1)·[C_U(S₀):U']`. -/
@@ -642,7 +645,8 @@ proven for a source character `θ₁` supported on `S₀`.  Both directions:
 The `S₀`-summand decomposition `H̄ = S₀ ⊕ W` is `chiefFactor_caseA_S0_complement` (operator Maschke,
 `|U| ⟂ |H̄|`); the source character `θ₁ ∈ Irr(H̄/W)` (nontrivial on `S₀`, trivial on `W`) is
 `exists_source_char_caseA`.  These assemble into `inertia_eq_hcuInHu` and the one-shot existence
-`exists_source_char_inertia_eq_hcuInHu_caseA`: there is a `θ₁` (nontrivial on `S₀`) whose inflation's
+`exists_source_char_inertia_eq_hcuInHu_caseA`: there is a `θ₁` (nontrivial on `S₀`) whose
+inflation's
 `HU`-inertia is exactly `H·C_U(S₀)`, of index `[HU:H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`),
 giving source degree `a` and `M`-induction degree `qa`.
 
@@ -659,7 +663,8 @@ analog of `hInHu_inf_cInHu_eq_bot`.  These directly mirror the (9.9.c) `hcLambda
 `H·C_U(S₀) ≃* H ⋊ C_U(S₀)` from `hInHu_inf_cuInHu_eq_bot` + `sup = ⊤`, with the `C`-invariance
 `cuInHu_le_inertia_of_complement_triv` discharging `lift`'s compatibility) times `hcuLambdaHom λ`,
 packaged as `hcuPairHom`/`hcuPsiPair`.  Its `HU`-induction `ζ_{θ₁,λ}` is irreducible of degree `a`
-(`hcuZetaPair_irreducible` via `inertia_eq_hcuInHu` + `isIrreducibleCharacter_induce_of_inertia_eq`),
+(`hcuZetaPair_irreducible` via `inertia_eq_hcuInHu` +
+`isIrreducibleCharacter_induce_of_inertia_eq`),
 and `Ind_{HU}^M ζ` has degree `qa` (`hcuZetaPair_induceHU_apply_one`); the one-shot existence is
 `caseA_exists_irreducible_source_degree_qa`.
 
@@ -673,7 +678,8 @@ via `typeP_H_le_normalizer_uprimeSub`), realized as `realizedH0supUprime_normal_
 `λ` trivial on `U'`, as `hcuZetaPair_induceHU_mem_sOf` (via `hcuZetaPair_mem_xiOf` =
 `hcuZetaPair_mem_xiSet` [`H ⊄ Ker`, `hcuPsiPair_apply_inclusion` + `liesOver_mem_characterKernel`] +
 `hcuZetaPair_H0supUprime_subset_ker` [`H₀U' ⊆ Ker`]).  The kernel step is
-`subsetCharacterKernel_induce_of_subgroupOf` (`[A.Normal]` = `realizedH0supUprime_normal_huSub`) with
+`subsetCharacterKernel_induce_of_subgroupOf` (`[A.Normal]` = `realizedH0supUprime_normal_huSub`)
+with
 `hcuPairHom_eq_one_of_mem_realizedH0supUprime`: decompose a realized-`H₀U'` element as `h₀·u'`
 (`realizedH0supUprime_eq_realizedH0_sup_uprimeInHu`) — the `θ`-extension `hcuThetaHom` kills `h₀`
 (`hcuSeedHom_eq_one_of_mem_realizedH0`, since `H₀ = N.comap hInHuEquivH`) and the complement `u'`
@@ -683,16 +689,20 @@ and restricts to `λ u' = 1` on `u' ∈ U'`.
 **(iv) `Ind_{HU}^M ζ`-irreducibility — LANDED** (unconditional).  The `hIM`
 (`I_M(ζ) ≠ M`) is now discharged: the (9.8.d) source `θ₁` is built *non-regular*
 (`exists_source_char_hom_caseA_nonRegular` — trivial on a Clifford summand `Hpart j₁ ≤ W` where
-`W = ⨆_{j≠j₀} Hpart j` is the summand-join complement `caseA_exists_summand_join_complement_S0`, itself
-from the support witness `caseA_exists_index_S0_not_le_biSup_compl` `∃ j₀, ¬ S₀ ≤ ⨆_{j≠j₀} Hpart j`).
+`W = ⨆_{j≠j₀} Hpart j` is the summand-join complement `caseA_exists_summand_join_complement_S0`,
+itself
+from the support witness `caseA_exists_index_S0_not_le_biSup_compl`
+`∃ j₀, ¬ S₀ ≤ ⨆_{j≠j₀} Hpart j`).
 Since `ζ` lies over `θ₀` at `hInHu` (`hcuZetaPair_liesOver_hInHu`, lies-over descent
 `liesOver_of_liesOver_liesOver_subgroupOf`), an `M`-fixed `ζ` would force `θ₁` *regular*
 (`caseA_reducible_theta_regular`) — nontrivial on *every* summand — contradicting non-regularity at
 `j₁`; hence `I_M(ζ)≠M` (`hcuZetaPair_inertia_ne_top`) and `Ind_{HU}^M ζ` is irreducible with no
 hypothesis (`hcuZetaPair_induceHU_irreducible_of_nonRegular`,
-`caseA_exists_irreducible_source_degree_qa_induceHU_irreducible`).  This is cleaner than the full-regular
+`caseA_exists_irreducible_source_degree_qa_induceHU_irreducible`). This is cleaner than the
+full-regular
 `clifford_caseA_exists_char_inertia_hc_not_fixed` (no per-summand nontriviality needed): the single
-summand `S₀ = H₁` supporting `θ₁ ∈ Irr(H̄/(H₂…H_q))` is moved off itself by the `W₁`-transitive summand
+summand `S₀ = H₁` supporting `θ₁ ∈ Irr(H̄/(H₂…H_q))` is moved off itself by the `W₁`-transitive
+summand
 permutation.
 
 **(v) count — LANDED** (no `sorry`).  `𝒮(H₀U')` contains `≥ ((p-1)/a)·(|U|/(a|U'|))` irreducibles
@@ -711,7 +721,8 @@ of degree `qa`.  The assembly (in `caseA_character_counts`'s (d) branch):
   substrate but unused by the final count).
 * **second induction (γ, injective)** — `induceHU` is injective on `image₁` via
   `induceHU_inj_of_conj_mem_huSub` + `caseA_hcrit_of_member` (its `hS0notker` =
-  `caseA_hcuZetaPair_realizedS0_not_subset_ker`; its `hkerW₂` = `hcuZetaPair_summandComplement_subset_ker`
+  `caseA_hcuZetaPair_realizedS0_not_subset_ker`; its `hkerW₂` =
+  `hcuZetaPair_summandComplement_subset_ker`
   at `W = caseA_wComplement`; the (9.7.a) `horbit` is the reconstructed `caseA_wOrbit_horbit`).
 * **target membership** — each `induceHU ζ` is in `𝒮(H₀U')` (`hcuZetaPair_induceHU_mem_sOf`),
   irreducible (`caseA_member_induceHU_irreducible`, the `W₁`-orbit non-regularity), of degree `qa`
@@ -732,7 +743,8 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       ((chief.p - 1) / caseA.a) * (Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime)) ≤
         {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
           IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
-  -- (b) count = §9↔§6 bijection `reducible_count_sOf_H0`; degree = caseA step-5 assembly; membership
+  -- (b) count = §9↔§6 bijection `reducible_count_sOf_H0`; degree = caseA step-5 assembly;
+  -- membership
   -- = case-agnostic cardinality argument `reducible_mem_sOf_H0C`.
   refine ⟨reducible_count_sOf_H0 hG chief, fun φ hφ hred =>
     ⟨caseA_reducible_induceHU_apply_one_eq_qu caseA hG φ hφ hred,

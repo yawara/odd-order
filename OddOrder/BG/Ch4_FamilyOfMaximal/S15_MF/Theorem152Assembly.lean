@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.MsigmaNilpotent
 /-!
 # Theorem152Assembly
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.Corollary155` (2000-line limit, issue 0103
+第 2 パス).
 -/
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
@@ -20,7 +21,8 @@ variable {G : Type*} [Group G]
 
 /-- **Theorem 15.2 step (c)(d) — `M_σ/Q` is nilpotent** (mmd L4192, "`K` acts regularly on `M_σ/Q`,
 therefore by Theorem 3.7 (applied to `K₁M_σ/Q`), `M_σ/Q` is nilpotent").  In the type-`P` setting
-with `K` a Hall `κ`-subgroup, `K* = C_{M_σ}(K) ⊆ Q = O_q(M)` (step 2), so `K` acts fixed-point-freely
+with `K` a Hall `κ`-subgroup, `K* = C_{M_σ}(K) ⊆ Q = O_q(M)` (step 2), so `K` acts
+fixed-point-freely
 on `M_σ/Q` (Proposition 1.5(d): the fixed classes lift to `C_{M_σ}(k) = K* ⊆ Q`).  Theorem 3.7
 applied to a prime-order `K₁ ≤ K` makes `M_σ/Q` nilpotent.
 
@@ -118,7 +120,8 @@ the index `[M_σ : Q]` is coprime to `q`, i.e. `Q` is a Hall `{q}`-subgroup (= n
 
 Argument: were `q ∣ [M_σ : Q]`, the (characteristic, since `M_σ/Q` is nilpotent) `q`-core
 `R̄ = O_q(M_σ/Q)` would be nontrivial; its preimage `R` in `M_σ` is a `q`-group properly above `Q`,
-and `R.map M_σ.subtype ⊴ M` (the `q`-core `R̄` is characteristic, so preserved by the `M`-conjugation
+and `R.map M_σ.subtype ⊴ M` (the `q`-core `R̄` is characteristic, so preserved by the
+`M`-conjugation
 automorphisms of `M_σ/Q`; `M` normalizes `M_σ` and `Q`).  A normal `q`-subgroup of `M` lies in
 `O_q(M) = Q`, forcing `R = Q`, i.e. `R̄ = ⊥` — contradiction.  Hence `O_q(M_σ/Q) = ⊥`, and
 `not_dvd_card_of_opCore_eq_bot` gives `q ∤ [M_σ : Q]`. -/
@@ -263,7 +266,8 @@ theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
     rw [Subgroup.mem_subgroupOf]
     exact hRG_le_Q ⟨x, hx, rfl⟩
   have hReq : R = Q.subgroupOf Mσ := le_antisymm hR_le_Qsub hQsub_le_R
-  -- `comap (mk') Cq = R = Q.subgroupOf Mσ = ker (mk') = comap (mk') ⊥`; `mk'` surjective ⟹ `Cq = ⊥`.
+  -- `comap (mk') Cq = R = Q.subgroupOf Mσ = ker (mk') = comap (mk') ⊥`; `mk'` surjective ⟹
+  -- `Cq = ⊥`.
   have hcomapbot : Cq.comap (QuotientGroup.mk' (Q.subgroupOf Mσ))
       = (⊥ : Subgroup (↥Mσ ⧸ Q.subgroupOf Mσ)).comap (QuotientGroup.mk' (Q.subgroupOf Mσ)) := by
     rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
@@ -355,7 +359,8 @@ theorem exists_kInvariant_qComplement [Finite G]
     rw [hD, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective Mσ.subtype_injective]
   -- `{q}ᶜ`-Hall `DM` = `{p ∉ {q}}`-Hall (defeq, for `hall_compl_isComplement`).
   have hDM_hall' : Ch03.IsHallSubgroup {p | p ∉ ({q} : Set ℕ)} DM := hDM_hall
-  -- `IsComplement' DM (Q.subgroupOf Mσ)`, hence `IsComplement' (Q.subgroupOf Mσ) (D.subgroupOf Mσ)`.
+  -- `IsComplement' DM (Q.subgroupOf Mσ)`, hence
+  -- `IsComplement' (Q.subgroupOf Mσ) (D.subgroupOf Mσ)`.
   have hcompl : Subgroup.IsComplement' (Q.subgroupOf Mσ) (D.subgroupOf Mσ) := by
     rw [hDsub_eq]
     exact (OddOrder.BG.Ch1.S01.hall_compl_isComplement hDM_hall' hQHall).symm
@@ -445,7 +450,8 @@ This is the BG step "`C_D(Q̄) = C_D(Q)`".  Proof via the coprime decomposition 
 `subgroup_coprime_decomposition`): for the coprime action of `A = ⟨d⟩` on `Q`,
 `Q = C_Q(⟨d⟩) ⊔ ⁅Q, ⟨d⟩⁆`.  The set of `x ∈ N(Q₀)` whose conjugation centralizes `Q̄` is a subgroup
 containing `d` (closure uses `⁅x x', y⁆ = x ⁅x', y⁆ x⁻¹ · ⁅x, y⁆`), hence `⟨d⟩`, so `⁅Q, ⟨d⟩⁆ ≤ Q₀`.
-With `Q₀ ⊆ C_G(d)` and `C_Q(⟨d⟩) ⊆ C_G(d)` (as `d ∈ ⟨d⟩`), both summands centralize `d`, so does `Q`.
+With `Q₀ ⊆ C_G(d)` and `C_Q(⟨d⟩) ⊆ C_G(d)` (as `d ∈ ⟨d⟩`), both summands centralize `d`, so does
+`Q`.
 
 Used in `centralizer_msigma_quotient_le_fittingInAmbient` to decompose `C_{M_σ}(Q̄) = Q·C_D(Q)`. -/
 theorem centralizes_Q_of_centralizes_quotient [Finite G]
@@ -518,7 +524,8 @@ open scoped commutatorElement in
 /-- **Theorem 15.2(g) — the section-Fitting containment `C_{M_σ}(Q̄) ⊆ F(M)`** (mmd L4196-4198,
 "`F(M) = Q·C_M(Q) = C_{M_σ}(Q̄)`"), which discharges `hsecFit` of
 `derivedDerived_le_fittingInAmbient_of_inputs`.  Unlike the *full* centralizer `C_M(Q)` (which needs
-the genuine `σ`-uniqueness gate `C_M(Q) ⊆ M_σ`), the `M_σ`-section centralizer `C_{M_σ}(Q̄)` lands in
+the genuine `σ`-uniqueness gate `C_M(Q) ⊆ M_σ`), the `M_σ`-section centralizer `C_{M_σ}(Q̄)` lands
+in
 `F(M)` from the local `M_σ = Q ⋊ D` structure alone:
 
 * `S := C_{M_σ}(Q̄) = {x ∈ M_σ : ⁅x, y⁆ ∈ Q₀ ∀ y ∈ Q}` decomposes as `S = Q ⊔ (D ⊓ S)`: writing
@@ -678,7 +685,8 @@ theorem finrank_le_one_of_card_eq {q : ℕ} [Fact q.Prime] {Mod : Type*}
 /-- **Counting the invariants of a quotient module by its fixed-point subgroup** (`§14`-independent,
 reusable).  For a finite commutative `H`-module `Mod` over `ZMod q` (with `H` acting through a
 `MulDistribMulAction`) and a subgroup `R ≤ H`, if `Cbar ≤ Mod` is exactly the set of `R`-fixed
-points (`hchar`), then the `R`-invariants of the associated representation have cardinality `|Cbar|`.
+points (`hchar`), then the `R`-invariants of the associated representation have cardinality
+`|Cbar|`.
 
 This isolates the `Module.End`/`Additive` instance bookkeeping (the module is an *instance argument*
 here, mirroring `card_eq_pow_card_invariants_of_elemAbelian_general`), so the caller can apply it
@@ -875,7 +883,8 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
         Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
       change ((x : G))⁻¹ * (x : G) ∈ Q0
       rw [inv_mul_cancel]; exact Q0.one_mem
-  -- the `K`-fixed classes of `Q̄` are exactly `g.range` (the image of `C`), via `hsmul_iff`+`hCfix`.
+  -- the `K`-fixed classes of `Q̄` are exactly `g.range` (the image of `C`), via
+  -- `hsmul_iff`+`hCfix`.
   have hchar : ∀ w : ↥Q ⧸ Q0.subgroupOf Q,
       (∀ r : ↥(K.subgroupOf H), (r : ↥H) • w = w) ↔ w ∈ g.range := by
     intro w

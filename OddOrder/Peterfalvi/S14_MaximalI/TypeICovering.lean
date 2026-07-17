@@ -504,7 +504,8 @@ TypeF`, and `TypeF ⟺ κ(S) = ∅`).  BG Theorem 14.7 duality (`typeP_duality`)
 `κ(S)`-Hall subgroup `K` produces the complement `S = S' ⋊ K` (first conjunct), the dual maximal
 `T = M*`, the cyclic factor `W = K ⊔ K*`, the type-II witness, and the `κ(M*)`-Hall `K*`.  Applying
 the duality again at `M*` gives the second complement `T = T' ⋊ K*`.  The `κ`-Hall complement `K`
-plays the role of the case-(b) factor `W₁` (both `K` and the type-`P` `W₁` complement `S'`, Peterfalvi
+plays the role of the case-(b) factor `W₁` (both `K` and the type-`P` `W₁` complement `S'`,
+Peterfalvi
 (8.8.b1)).  Cites the merged BG §16 `typeP_duality` and `proposition_type_classification`; the
 remaining hard content lives in their (issue-8015) residuals. -/
 theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :

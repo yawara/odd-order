@@ -13,7 +13,8 @@ import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 
 **Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000), §6, (6.5).
 
-The group-theoretic core of Peterfalvi (6.5)(b) — *a finite nilpotent group on whose abelianization a
+The group-theoretic core of Peterfalvi (6.5)(b) — *a finite nilpotent group on whose abelianization
+a
 finite group acts fixed-point-freely, with the `≤ 4|·|² + 1` index bound, is a `p`-group* — is
 already formalized abstractly:
 * `isPGroup_of_isFrobeniusGroup_of_card_le` (`S08_CoherenceCorePart1`) for the (6.8)(c1) Frobenius
@@ -85,7 +86,8 @@ via the explicit `L`-conjugation `w x w⁻¹ = x`).  Together with the Hall copr
 (6.2)/(6.3) index bound `hbound`, the nilpotent `H` is a `p`-group.
 
 This wires `isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` into the capstone via the
-`W₁`-conjugation action, isolating `hfix` (the (4.6)/(6.4.c) fixed-point condition) and `hbound` (the
+`W₁`-conjugation action, isolating `hfix` (the (4.6)/(6.4.c) fixed-point condition) and `hbound`
+(the
 contrapositive of Theorem (6.3)) as the residual obligations of the (6.8)(c2) `p`-group reduction. -/
 theorem exists_isPGroup_H_of_c2_of_card_le (hyp : SibleyDadeHypothesis G L H)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥hyp.W1))
@@ -232,7 +234,8 @@ theorem sq_le_card_abelianization_of_isPGroup_of_noncomm
 
 /-- **Peterfalvi (6.5)(c) coherence producer** (abstract (6.1)/(5.2) form, over the `S07` setup).
 
-The (6.5)(c) conclusion "`S = SOf ⊥` is coherent" for a nilpotent **Frobenius kernel** `H` (kernel of
+The (6.5)(c) conclusion "`S = SOf ⊥` is coherent" for a nilpotent **Frobenius kernel** `H` (kernel
+of
 `hF : IsFrobeniusGroup ↥L H C`) with the divisibility `|L:H| ∣ p − 1` for every `p ∣ |H|` (`hdvd`),
 assembled over the abstract `S07` coherence setup (`τ`, `A0`, filtration `SOf`).  By contradiction:
 if `SOf ⊥` is not coherent, then `six_three_of_six_two_oracle` (with `M = ⊥`, `H₁ = ⁅H,H⁆`, `K = H`)
@@ -468,7 +471,8 @@ theorem caseB_W2_le_center_L (hyp : SibleyDadeHypothesis G L H) [H.Normal]
 /-- **Peterfalvi (6.8) case-B coherence from c2 data** (discharges `hcaseB` of the dispatch skeleton).
 Given the case-B math condition `W₂ ⊆ Z(H)` (`hcen`) and the `p`-group structure, derive the
 structural inputs `hderiv` (W₂ ⊆ commutator via `commutator_subgroupOf_self`), `hcZ` (`|W₂|` prime),
-and `hW2cenL` (`caseB_W2_le_center_L`), then feed `nonempty_coherent_S_caseB_of_structure` (cont.¹³).
+and `hW2cenL` (`caseB_W2_le_center_L`), then feed `nonempty_coherent_S_caseB_of_structure`
+(cont.¹³).
 The FPF index data (`hc2`/`hfpf`/`hFPF`) and the X/Y-cardinality conditions (`hYcard`/`hXne`) remain
 as named hypotheses, to be discharged separately (`hfpf` via `caseB_fpf_bound`, the rest from the
 final `S08:59` wiring). -/

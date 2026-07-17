@@ -242,7 +242,8 @@ noncomputable def IsElementaryAbelian.mulAutEquivGeneralLinearGroup
   letI := hE.zmodModule
   haveI : Finite (Additive E) := inferInstanceAs (Finite E)
   -- `AddAutAdditive : AddAut (Additive E) ≃+ Additive (MulAut E)`;
-  -- `AddEquiv.toMultiplicativeLeft` turns it into `Multiplicative (AddAut (Additive E)) ≃* MulAut E`.
+  -- `AddEquiv.toMultiplicativeLeft` turns it into
+  -- `Multiplicative (AddAut (Additive E)) ≃* MulAut E`.
   exact (AddEquiv.toMultiplicativeLeft (AddAutAdditive (G := E))).symm.trans
     IsElementaryAbelian.addAutEquivGL
 

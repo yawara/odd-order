@@ -8,7 +8,8 @@ import Mathlib.GroupTheory.IsPerfect
 /-!
 # Peterfalvi (10.1) — type III/IV/V hypothesis + §5/§6 bridge prerequisites
 
-Split from the former monolithic `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core` (directory split,
+issue 0103).
 -/
 namespace OddOrder.Peterfalvi.S12
 
@@ -1090,7 +1091,8 @@ theorem typePData_sup_subgroupOf_eq {M : Subgroup G} (data : TypePData M) :
 
 /-- The `W ≤ M ≤ G` isomorphism `↥W ≃* ↥(W₁.subgroupOf M ⊔ W₂.subgroupOf M)` used to transport the
 §6 `↥M`-level `ω`-grid (built on `W₁.subgroupOf M ⊔ W₂.subgroupOf M`) to the §5 `G`-level TI-cyclic
-hypothesis (built on `W ≤ G`).  This is the `e` reconstructed inline in `alignedOmegaSigmaGrid`; named
+hypothesis (built on `W ≤ G`). This is the `e` reconstructed inline in `alignedOmegaSigmaGrid`;
+named
 here so the (10.6) column-structure argument can reason about how it respects the `W₁/W₂`
 decomposition.  Both `subgroupOfEquivOfLe.symm` and `subgroupCongr` preserve the underlying
 `G`-element, so does `e` (`typePData_WEquiv_coe`). -/
@@ -1417,7 +1419,8 @@ theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
     rw [hKeq, derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   -- `M'` is not perfect (issue 7008, replacing the deleted `fitting_lt_derived`): `M' = M_F ⋊ U`
-  -- is solvable — `M_F` nilpotent (`maxNilpotentNormalHall_isNilpotent`) is the normal kernel and the
+  -- is solvable — `M_F` nilpotent (`maxNilpotentNormalHall_isNilpotent`) is the normal kernel and
+  -- the
   -- quotient `M'/M_F ≃ U` is nilpotent (`U_nilpotent`) via `derived_complement` — and nontrivial
   -- (`W₂ ≠ ⊥`, `W₂ ≤ M_F ≤ M'`); a nontrivial solvable group is not perfect.
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _

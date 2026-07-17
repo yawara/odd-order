@@ -15,7 +15,8 @@ import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limit, issue 0103 第 2
+パス).
 -/
 namespace OddOrder.Peterfalvi.S09.Cert
 open OddOrder.RepresentationTheory
@@ -96,7 +97,8 @@ extension `ν` and the agreement `τ(ψ_i) = ν ζ_i − d_i ν ζ_0` on `S` —
 structure is built, *including* the `(7.8.c.i)` certificate `chiRho_eq_inner_beta`, which is
 discharged by `chiRho_eq_inner_beta_induced`.
 
-The distinguished `ζ = ζ_0` has `ζ(1) = (Ind 1_H)(1)` (`hdeg_match`), forcing `d_{ind1H} = 1`, so the
+The distinguished `ζ = ζ_0` has `ζ(1) = (Ind 1_H)(1)` (`hdeg_match`), forcing `d_{ind1H} = 1`, so
+the
 certificate's `β = τ(Ind 1_H − ζ)` matches the family-difference `τ(ζ_{ind1H} − ζ_0)`.  Together with
 `hypothesis76OfFamily` this realizes the issue-1013 goal: `Hypothesis78` (the §7 floor cited by
 `(12.16)` / `(14.11)`) is constructible from `(7.1)` + coherence alone, with no certificate assumed. -/
@@ -176,7 +178,8 @@ noncomputable def hypothesis78OfDade
             (supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm)
             (fun y => supportInSubgroup_sharp_subset_subgroupOf H hAH)
             (one_not_mem_supportInSubgroup_sharp H hAH) ind1H hind1H hzeta_ind1H ν χ hagree hortho hx]
-        -- Bridge the `(7.7.a)` coefficient `d_{ind1H}` (`= 1`) to the bare difference `ζ_{ind1H} − ζ_0`.
+        -- Bridge the `(7.7.a)` coefficient `d_{ind1H}` (`= 1`) to the bare difference
+        -- `ζ_{ind1H} − ζ_0`.
         refine congrArg star (congrArg (ClassFunction.inner · χ) (congrArg H71.τ ?_))
         apply Subtype.ext
         change ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
@@ -227,7 +230,8 @@ theorem cCoeff_nu_zeta_zero_eq_neg_d {G : Type*} [Group G] [Fintype G] {A : Set 
 
 /-- **Peterfalvi (7.8.b) coefficient identification, the `Ind 1_H` index.**  At `i = ind1H`, the
 `(7.7.a)` coefficient `c_{ind1H} = (ψ_{ind1H}^τ, ζ_0^ν)` equals `(β, ζ_0^ν)`: with `d_{ind1H} = 1`
-and `zetaDistinct = 0`, the supported difference `ψ_{ind1H} = ζ_{ind1H} − ζ_0` coincides (as a member
+and `zetaDistinct = 0`, the supported difference `ψ_{ind1H} = ζ_{ind1H} − ζ_0` coincides (as a
+member
 of `CF(L,A)`) with `Ind 1_H − ζ`, whose Dade image is `β`.  This is the distinguished coefficient
 feeding the (7.8.b) double sum; combined with `exists_betaDecomp_a` it gives `c_{ind1H} = a − 1`. -/
 theorem cCoeff_nu_zeta_zero_ind1H_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
@@ -245,7 +249,8 @@ theorem cCoeff_nu_zeta_zero_ind1H_eq {G : Type*} [Group G] [Fintype G] {A : Set 
 /-- **Orthogonality collapse of the `(7.7.b)` double sum.**  When the induced family `ζ_i` is
 pairwise orthogonal (`(ζ_i, ζ_j) = 0` for `i ≠ j`, true for the distinct induced characters by
 Frobenius reciprocity), the `(7.7.b)` double sum splits into a diagonal part and a rank-one
-correction: `‖χ^ρ‖² = Σ_i c̄_i c_i/‖ζ_i‖² − (Σ_i c̄_i ζ_i(1)/‖ζ_i‖²)(Σ_j c_j \overline{ζ_j(1)}/‖ζ_j‖²)/|L|`.
+correction:
+`‖χ^ρ‖² = Σ_i c̄_i c_i/‖ζ_i‖² − (Σ_i c̄_i ζ_i(1)/‖ζ_i‖²)(Σ_j c_j \overline{ζ_j(1)}/‖ζ_j‖²)/|L|`.
 This is the shape used by (7.8.b) (`χ = ζ_0^ν`) before substituting the coefficients. -/
 theorem chiRho_norm_sq_collapse {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -406,7 +411,8 @@ theorem zetaNuRho_inner_eq_cexpr {G : Type*} [Group G] [Fintype G] {A : Set G} {
 
 /-- **(7.8.b) real-part + matching.**  Taking the real part of the ℂ-level norm identity (all of
 `a, e, G, |L| = e·h` being real casts) and applying `normEstimate_matching`, the `ζ_0^ν`-norm
-equals Peterfalvi's quadratic `(1/e)(1−1/h)a² − (2/h)a + (1−e/h) = normQuadraticCorrection + (1−e/h)`.
+equals Peterfalvi's quadratic
+`(1/e)(1−1/h)a² − (2/h)a + (1−e/h) = normQuadraticCorrection + (1−e/h)`.
 This bridges the ℂ-level `zetaNuRho_inner_eq_cexpr` to the ℝ-valued `NormEstimates` field. -/
 theorem cexpr_re_eq_normQuad (a e h G : ℝ) (he : e ≠ 0) (hh : h ≠ 0)
     (hG : G = e * (h - 1) - e ^ 2) :
@@ -630,13 +636,15 @@ theorem zetaNuRhoNormSq_eq_normQuad_of_facts {G : Type*} [Group G] [Fintype G] {
       hN_ind1H hP_ind1H hGsum)
 
 /-- **Peterfalvi (7.8.b), the `ζ`-norm lower bound** (`Hypothesis78` level).  The direct `≤` form of
-the (7.8.b) target `NormEstimates.zetaNuRho_norm_sq_ge`: from the `zetaNuRhoNormSq_eq_normQuad_of_facts`
+the (7.8.b) target `NormEstimates.zetaNuRho_norm_sq_ge`: from the
+`zetaNuRhoNormSq_eq_normQuad_of_facts`
 identity and the `smallIndex` (`2e + 1 ≤ h`) nonnegativity reduction
 `zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq`, the coherent `ζ`-image satisfies
 `1 − e/h ≤ ‖ζ_0^{νρ}‖²`.
 
 To obtain the *full* (7.8.b) `NormEstimates` (both the `ζ` bound and the `Γ` bound `‖Γ‖² ≤ e − 1`),
-feed `zetaNuRhoNormSq_eq_normQuad_of_facts` as the `hzeta` argument of the already-assembled source-side
+feed `zetaNuRhoNormSq_eq_normQuad_of_facts` as the `hzeta` argument of the already-assembled
+source-side
 `OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_source_orthogonal`. -/
 theorem zetaNuRhoNormSq_ge_of_facts {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -664,7 +672,8 @@ theorem zetaNuRhoNormSq_ge_of_facts {G : Type*} [Group G] [Fintype G] {A : Set G
 /-- **Peterfalvi (7.8.a), the `BetaDecomp` constructor** (`Hypothesis78` level).  Assembles the full
 `(7.8.a)` decomposition `β = 1_G − ζ_0^ν + a · W + Γ` (with `Γ` the explicit residual) for an
 abstract `H78` from the `(7.8.a)` coherence / family facts, discharging all four `BetaDecomp` proof
-fields via the family-agnostic gen lemmas (`betaDecomp_orth_one_gen`, `betaDecomp_gamma_orth_nu_gen`,
+fields via the family-agnostic gen lemmas (`betaDecomp_orth_one_gen`,
+`betaDecomp_gamma_orth_nu_gen`,
 `betaDecomp_gamma_orth_one_gen`).  Because `H78` is abstract here (not a `hypothesis78OfDade`
 application), the field projections `H78.hyp76.zeta` / `H78.beta` / `H78.weightedNuSum` do not trip
 the whnf-wall.  The hypotheses (family orthogonality, coherence agreement `hagree`, source
@@ -840,7 +849,8 @@ noncomputable def betaDecompOfDade
 /-- **`e = [L : H◁L]`**, the complement index as the `subgroupOf` index.  By Lagrange both equal
 `|L| / |H|`: `(H.subgroupOf L).index · |H.subgroupOf L| = |L|` and `|H.subgroupOf L| = |H|`, while
 `e · |H| = |L|` (`kernelOrder_mul_complementIndex_eq_card_L`); cancelling `|H| > 0` identifies them.
-This bridges the induced-principal degree/norm `‖Ind 1_K‖² = Ind 1_K(1) = [L:K]` (`K = H.subgroupOf L`)
+This bridges the induced-principal degree/norm `‖Ind 1_K‖² = Ind 1_K(1) = [L:K]`
+(`K = H.subgroupOf L`)
 to the `(7.8.b)` complement index `e`, the `hN_ind1H`/`hP_ind1H` source facts. -/
 theorem complementIndex_eq_subgroupOf_index {G : Type*} [Group G] [Fintype G] {A : Set G}
     {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -857,15 +867,18 @@ theorem complementIndex_eq_subgroupOf_index {G : Type*} [Group G] [Fintype G] {A
   rw [h2, mul_comm, h1]
 
 /-- **Peterfalvi (7.8.b), the concrete ζ-norm bound over a Dade family** (the `hB` producer).
-Bundles `hypothesis78OfDade` + `betaDecompOfDade` with the (7.8.b) ζ-bound `zetaNuRhoNormSq_ge_of_facts`:
+Bundles `hypothesis78OfDade` + `betaDecompOfDade` with the (7.8.b) ζ-bound
+`zetaNuRhoNormSq_ge_of_facts`:
 for the concrete `H78` from a Dade family `θ`, the `(7.8.b)` facts are discharged — coefficient
 identifications `c_{ind1H} = a−1` / `c_i = −d_i` (`cCoeff_nu_zeta_zero_ind1H_eq` /
 `cCoeff_nu_zeta_zero_eq_neg_d`, with the `hagree` transported to computed-`d`/`psiSupp` form),
 reality (`induce_apply_one_star`), degree ratio `d_i = ζ_i(1)/e` (via `zeta_one_eq_ind1H_one`
 giving `ζ_0(1) = ζ_{ind1H}(1) = e`), the index facts `‖Ind 1_K‖² = Ind 1_K(1) = e`
 (`induce_trivialChar_*_eq_index` + `complementIndex_eq_subgroupOf_index`), and the `(1.5.d)`
-degree-sum (`family_degree_sum_Ioi`).  Yields `1 − e/h ≤ ‖ζ_0^{νρ}‖²`, the `CounterexampleDadeData.hB`
-contract of (12.16).  Genuine `(7.8.b)` inputs: `hzeta0nu`/`hζ0norm`/`a`/`ha` (as in `betaDecompOfDade`)
+degree-sum (`family_degree_sum_Ioi`). Yields `1 − e/h ≤ ‖ζ_0^{νρ}‖²`, the
+`CounterexampleDadeData.hB`
+contract of (12.16). Genuine `(7.8.b)` inputs: `hzeta0nu`/`hζ0norm`/`a`/`ha` (as in
+`betaDecompOfDade`)
 and the smallness `hsmall`. -/
 theorem zetaNuRhoNormSqGeOfDade
     {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
@@ -1430,7 +1443,8 @@ theorem coherence_hagree {L G : Type*} [Group L] [Group G] [Fintype L] [Fintype 
 /-- **The (7.8.a) coherence agreement in `DadeMap` form** (the §12→§7 bridge, parts 1+2 combined).
 For the §12 coherent base map `τ = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)`
 (ℂ-linear by `dadeIntegralCharacterMap_smul_complex`), `coherence_hagree` gives the agreement at the
-`IntegralCharacterMap` level; `dadeIntegralCharacterMap_apply_of_support` rewrites it to the `DadeMap`
+`IntegralCharacterMap` level; `dadeIntegralCharacterMap_apply_of_support` rewrites it to the
+`DadeMap`
 `(hyp.fullDadeIsometryData hconj).toDadeMap` on the supported difference (these agree by
 `dadeIsometryData_toDadeMap`).  The result is exactly the `hagree` shape that `hypothesis78OfDade`
 consumes (`H71.τ ⟨ζ_i − d_i ζ_0, _⟩ = ν ζ_i − d_i ν ζ_0` with `H71 = toHypothesis71`,

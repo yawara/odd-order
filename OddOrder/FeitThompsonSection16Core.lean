@@ -682,7 +682,8 @@ All structural fields are discharged through BG §14/15/16 machinery (sorry-free
 `typePData_of_isTypeP_of_inputs`.  The two structural hypotheses, `K ≤ N_G(U)` and that `U` is the
 `(κ∪σ)′`-Hall, are the residual obligations discharged for the canonical pair by
 `exists_kappaHall_invariant_complement_to_MF` (`K ≤ N_G(U)`) and
-`Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement` (the `(κ∪σ)′`-Hall property),
+`Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement` (the `(κ∪σ)′`-Hall
+property),
 bundled in `exists_typePData_W1_eq_of_isTypeP2`. -/
 noncomputable def typePData_of_kappaHall_hallComplement {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
@@ -755,7 +756,8 @@ theorem typePData_of_kappaHall_hallComplement_W2 {G : Type*} [Group G] [Finite G
 /-- **Matched `TypePData` for a type-`P₂` maximal subgroup** (`sorry`-free; POLE-1 carrier, issue
 4008).  Given a type-`P₂` maximal subgroup `M` and a cyclic κ-Hall `K`, the κ-Hall-invariant
 complement `U` to `M_F` in `M'` (`exists_kappaHall_invariant_complement_to_MF`, supplying
-`K ≤ N_G(U)`) is the `(κ∪σ)'`-Hall (`S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement`), so
+`K ≤ N_G(U)`) is the `(κ∪σ)'`-Hall (`S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement`),
+so
 `typePData_of_kappaHall_hallComplement` produces a `TypePData M` with the **chosen** factor
 `data.W₁ = K`.  This is the bridge the §16 producer needs to carry a `TypePData mp.S` whose `W₁` is
 the maximal-pair κ-Hall `mp.K` — the last carrier step before Peterfalvi `basic_structure` (13.2),
@@ -907,7 +909,8 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
   -- canonical pair (`mp.K`, `mp.Kstar`).
   -- **U-side** from Peterfalvi (13.1.b): the κ-Hall-invariant complement `U` to `M_F` in `M'`
-  -- (`exists_kappaHall_invariant_complement_to_MF` = invariant Schur–Zassenhaus, BG §1 Prop 1.5(b)).
+  -- (`exists_kappaHall_invariant_complement_to_MF` = invariant Schur–Zassenhaus, BG §1 Prop
+  -- 1.5(b)).
   -- The ordering `|K| < |K*|` is carried by the relabelled pair (`mp.K_lt_Kstar`), so the residual
   -- is now fully discharged.
   -- `Section16TypePStructure mp` is `Type`-valued, so we cannot `obtain` the `∃`-witness into the
@@ -916,8 +919,10 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
     mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
   have hTcompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
     mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
-  -- **S-side `TypePData` carrier** (relane #4, issue 4010): the chosen complement `U = hScompl.choose`
-  -- to `M_F` in `S'` is the `(κ∪σ)'`-Hall (`S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement`, using
+  -- **S-side `TypePData` carrier** (relane #4, issue 4010): the chosen complement
+  -- `U = hScompl.choose`
+  -- to `M_F` in `S'` is the `(κ∪σ)'`-Hall
+  -- (`S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement`, using
   -- `mp.S_typeP2`), so `typePData_of_kappaHall_hallComplement` produces a `TypePData mp.S` with
   -- `.W₁ = mp.K = W1` and `.U = U`, reconciling the carrier to the structure's factors.
   have hUM : hScompl.choose ≤ mp.S :=

@@ -32,7 +32,8 @@ import Mathlib.RingTheory.Polynomial.RationalRoot
 /-!
 # ClassSumCongruence
 
-Prefix-split from `OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 
 /-!
@@ -835,7 +836,8 @@ theorem centralizer_le_of_mem_isTISubset {A : Set G} {L : Subgroup G}
 omit [Fintype (ConjClasses G)] in
 /-- **The central-character value `ω_ρ(⟦z⟧)` depends only on `χ_ρ(z)` and the class size `|⟦z⟧|`.**
 
-`ω_ρ(⟦z⟧) = |⟦z⟧| · χ_ρ(z) / χ_ρ(1)` (`centralCharacterOfRep_classSum` + `sum_character_eq_card_mul`),
+`ω_ρ(⟦z⟧) = |⟦z⟧| · χ_ρ(z) / χ_ρ(1)` (`centralCharacterOfRep_classSum` +
+`sum_character_eq_card_mul`),
 so if `z, z'` have equal class size (`|⟦z⟧| = |⟦z'⟧|`) and equal character value
 (`χ_ρ(z) = χ_ρ(z')`) then `ω_ρ(⟦z⟧) = ω_ρ(⟦z'⟧)`.
 

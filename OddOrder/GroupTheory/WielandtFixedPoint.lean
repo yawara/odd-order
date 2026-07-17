@@ -23,7 +23,8 @@ without a cycle.
 `wielandt_fixedPoint_frobenius` is **fully unconditional** (sorry-free, axiom-clean): the
 group-theoretic chief-series assembly (pieces A/B/C) reduces it to the per-chief-factor **dimension
 identity** (⋆) `PerFactorDimIdentity` on each elementary-abelian chief factor, and that identity is
-discharged by the kernel-FPF fact (†) over `𝔽̄_p` (`WielandtKernelFPF.wielandtDimIdentity_of_frobenius`,
+discharged by the kernel-FPF fact (†) over `𝔽̄_p`
+(`WielandtKernelFPF.wielandtDimIdentity_of_frobenius`,
 the modular Brauer / free-orbit count plus base change `𝔽_p → 𝔽̄_p`).
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece E), issue 2014.
@@ -45,7 +46,8 @@ Proved by the **chief-series assembly** (`wielandt_formula_of_perfactor`): the g
 follows by strong induction on `|H|` from the per-chief-factor identity `WielandtPerFactor`, which
 in turn (`wielandtPerFactor_of_dim`) follows from the per-factor **dimension identity** (⋆)
 `PerFactorDimIdentity` on each elementary-abelian chief factor.  That dimension identity is supplied
-by `WielandtKernelFPF.wielandtDimIdentity_of_frobenius` (the kernel-FPF fact (†) over `𝔽̄_p` plus base
+by `WielandtKernelFPF.wielandtDimIdentity_of_frobenius` (the kernel-FPF fact (†) over `𝔽̄_p` plus
+base
 change), so the whole proof is unconditional (axiom-clean). -/
 theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
     [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H) :

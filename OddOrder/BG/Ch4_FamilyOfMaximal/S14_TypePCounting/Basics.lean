@@ -13,7 +13,8 @@ import OddOrder.GroupTheory.PiElementDecomposition
 /-!
 # BG §14 — split-extension derived subgroup + kappa(M), type-P families, sigma-length
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
+split, issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S14
 
@@ -1248,7 +1249,8 @@ theorem prime_dvd_orderOf_piPart [Finite G] {π : Set ℕ} {p : ℕ} (hp : p.Pri
 
 /-- **The `π`-part is multiplicative on commuting elements** (Coq `consttM`): for commuting `x, y`,
 `piPart π (x * y) = piPart π x * piPart π y`.  Both `π`-parts are powers of `x`, `y`, so they commute
-(as do the two `π′`-parts and the cross pairs), letting `x * y = (xπ yπ)(xπ′ yπ′)` be rearranged into
+(as do the two `π′`-parts and the cross pairs), letting `x * y = (xπ yπ)(xπ′ yπ′)` be rearranged
+into
 a commuting `π`-element times `π′`-element; uniqueness of the `π`-decomposition
 (`isPiElement_mul_unique`) identifies its `π`-part with `xπ yπ`.  The computational tool behind the
 `σ`-decomposition of a `σ`-cover element `x · R(x)` (BG Lemma 14.5). -/
@@ -1415,7 +1417,8 @@ theorem card_sup_dvd_mul_of_normal {H N : Subgroup G} [N.Normal] :
 /-- **`U ⊔ M_σ`-membership is exactly being a `κ(M)′`-element** (for `x ∈ M`, given `U⊔M_σ ◁ M` as
 `hnorm`).  `U⊔M_σ` is the normal `κ(M)′`-Hall of `M`: forward, `|U⊔M_σ| ∣ |U||M_σ|`
 (`card_sup_dvd_mul_of_normal`, `M_σ ◁ M`) and `π(U), π(M_σ) ⊆ κ′`, so any `x ∈ U⊔M_σ` is a
-`κ′`-element; backward, `[M:U⊔M_σ]` is a `κ`-number (`index_U_sup_Msigma_primeFactors_subset_kappa`),
+`κ′`-element; backward, `[M:U⊔M_σ]` is a `κ`-number
+(`index_U_sup_Msigma_primeFactors_subset_kappa`),
 coprime to a `κ′`-element's order, so `mem_of_coprime_index` puts it in `U⊔M_σ`.  The `A(M)`-piece of
 BG Theorem E's "distinct orders": `U⊔M_σ`-membership of an element of `M` is order-determined. -/
 theorem mem_U_sup_Msigma_iff_isPiElement_kappa_compl [Finite G]
@@ -1510,7 +1513,8 @@ theorem sigmaPart_eq_one_of_not_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
 
 /-- **σ-decomposition of a `σ`-cover element** (Coq `sigma_cover_decomposition`, BG remark above
 Lemma 14.5): for a nonidentity `σ(M)`-element `x`, a `σ(N)`-element `x'` with `M`, `N`
-non-conjugate, and `x`, `x'` commuting, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`.  Each `σ(L)`-part
+non-conjugate, and `x`, `x'` commuting, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`. Each
+`σ(L)`-part
 of `x * x'` is `sigmaPart L x · sigmaPart L x'` (`piPart_mul_of_commute`); as `M`, `N` are
 non-conjugate, no `L` is conjugate to both, so that part is `x` (`L ∼ M`), `x'` (`L ∼ N`) or `1`. -/
 theorem sigma_cover_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1585,7 +1589,8 @@ theorem not_conj_of_mem_Msigma_of_tau2 [Finite G] {M N : Subgroup G}
 
 /-- **σ-decomposition of a cover element in the signalizer context** (`sigma_cover_decomposition`
 specialized to `N` = the signalizer maximal): for `x ∈ M_σ^#` a `τ₂(N)`-element and `x' ∈ N_σ`
-commuting with `x`, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`.  The `M, N` non-conjugacy needed by
+commuting with `x`, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`. The `M, N` non-conjugacy needed
+by
 `sigma_cover_decomposition` is supplied by `not_conj_of_mem_Msigma_of_tau2`.  Discharges the cover
 decomposition that BG Lemma 14.5(a) (`sigma_cover_disjoint`) reads off. -/
 theorem sigma_cover_decomposition_signalizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

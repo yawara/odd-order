@@ -8,7 +8,8 @@ import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit, issue 0103 第 2
+パス).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.RepresentationTheory
@@ -977,13 +978,15 @@ landed steps into one refutation, isolating the three remaining deep group/chara
 hypotheses:
 
 * **(9.11.2)** the inertia identity `C = K₁ ⊓ K₂` with `[U:K₁] = [U:K₂] = a` (`K₁ = C_U(S₀)`,
-  `K₂ = C_U(S₀ʷ)`), giving `u ≤ a²` (`nineElevenTwo_u_le_a_sq`).  Gated on the two-summand `θ`-character
+  `K₂ = C_U(S₀ʷ)`), giving `u ≤ a²` (`nineElevenTwo_u_le_a_sq`). Gated on the two-summand
+  `θ`-character
   inertia computation (generalising `hcPsi_inertia_index_eq_u` from all summands to two).
 * **(9.11.3)** the `HŪ/(H₀C)` class equation `hclass` (`|Ū| + Σχ(1)² = p^q·u`, its character side
   `sum_xiOf_H0C_degreeSq` landed) and the `W₁`-orbit split `hn` (`n = q·|𝒮₄| + (p−1)`), giving the
   cleared count (`nineElevenThree_count`).
 * **(9.11.4)** the Mackey norm `hnorm` (`‖α‖²·u = (a+1)u + (q−1)a²`), whose `‖α‖² = ‖γ‖²+1` reduction
-  is `cfnorm_sub_irreducible_orthogonal` and whose `‖γ‖²` is the non-normal-`HU₁` double-coset count.
+  is `cfnorm_sub_irreducible_orthogonal` and whose `‖γ‖²` is the non-normal-`HU₁` double-coset
+  count.
 
 The (9.11.5) exponential-beats-polynomial contradiction (`nineElevenFive_refutation`) closes it. -/
 

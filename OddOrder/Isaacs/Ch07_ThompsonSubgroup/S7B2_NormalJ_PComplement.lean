@@ -431,7 +431,8 @@ private theorem step3_Abar_centralizes_inter_LBar.{u}
           (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
         rw [hL_def, hmk_def]; exact opPpPrimeCore_map_eq_LBar
       rw [← hLmap]; exact Subgroup.mem_map_of_mem mk hxL
-    -- `mk x` has order a power of `p` (in the image) and divides `|L̄|` (a `p'`-number) ⇒ `mk x = 1`.
+    -- `mk x` has order a power of `p` (in the image) and divides `|L̄|` (a `p'`-number) ⇒
+    -- `mk x = 1`.
     have hxbar_one : mk x = 1 := by
       -- order of `mk x` divides a `p`-power (from the `p`-group `K.map mk`).
       obtain ⟨k, hk⟩ := hKmap_pg ⟨mk x, hxbar_mem⟩

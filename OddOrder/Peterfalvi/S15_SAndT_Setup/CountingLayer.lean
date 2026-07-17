@@ -8,7 +8,8 @@ import OddOrder.Peterfalvi.S15_SAndT_Setup.PairStructure
 /-!
 # Peterfalvi (13.5)-(13.10) — counting layer
 
-Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue
+0103).
 Structural `(S, T)`-pair facts live upstream in `PairStructure.lean` (prefix-split).
 -/
 namespace OddOrder.Peterfalvi.S15

@@ -3,13 +3,15 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaLengthOne
 /-!
 # SigmaCovers
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 
 /-!
 # BG Theorem 14.7 — Z = K ⊔ K* internal direct product (duality bedrock)
 
-Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
+split, issue 0103).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -91,7 +93,8 @@ theorem card_kappaHall_ne_one [Finite G] {M K : Subgroup G} (hP : IsTypeP M) (hK
   exact fun h => hpprime.ne_one (Nat.dvd_one.mp (h ▸ hpK))
 
 /-- **BG 14.7, `|K| ≠ |K*|`**: the two κ-Hall factors of a type-`P` dual pair have distinct orders.
-They are coprime (`coprime_card_kappaHall_Kstar`) and `|K| > 1` (`card_kappaHall_ne_one`), so equality
+They are coprime (`coprime_card_kappaHall_Kstar`) and `|K| > 1` (`card_kappaHall_ne_one`), so
+equality
 would force `|K| = 1`. -/
 theorem card_kappaHall_ne_card_Kstar [Finite G] {M K Kstar : Subgroup G} (hP : IsTypeP M)
     (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
@@ -345,7 +348,8 @@ theorem typeP_swap_Z_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     K ⊔ Kstar ≤ Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) := by
   classical
   set Kistar := OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G) with hKistar
-  -- `N_G(X) ⊓ Mi = Ki ⊔ Ki*` (Proposition 14.2(b1) for `Mi`, the reference choice of Hall subgroup).
+  -- `N_G(X) ⊓ Mi = Ki ⊔ Ki*` (Proposition 14.2(b1) for `Mi`, the reference choice of Hall
+  -- subgroup).
   have hNeq : Subgroup.normalizer (X : Set G) ⊓ Mi = Ki ⊔ Kistar :=
     typeP_normalizer_inf_eq hG hMi hPi hKiMi hKi hp hX hXKi
   -- `K` centralizes `K*` (since `K* ≤ C_G(K)`), hence `K ≤ C_G(X) ≤ N_G(X)`.

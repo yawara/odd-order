@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.CharacterParameters
 /-!
 # Isometry105
 
-Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 
 /-!
 # Peterfalvi (10.5)-(10.6) — Dade-isometry calculations
 
-Split from the former monolithic `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core` (directory split,
+issue 0103).
 -/
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
@@ -543,7 +545,8 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_conj [Finite G]
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.2), `(α_{ij}, ζ − η) = −n`** for any degree-`w₁` irreducible `η ∈ S(HC)`
 distinct from `ζ`.  General-`η` companion of `muGridAlpha_inner_zeta_sub_conj` (the `η = ζ̄` case):
-since `η` has the same degree as `ζ` (`hη1 : η(1) = ζ(1)`), both `μ_{ij}, μ_{i0}` are degree-distinct
+since `η` has the same degree as `ζ` (`hη1 : η(1) = ζ(1)`), both `μ_{ij}, μ_{i0}` are
+degree-distinct
 from — hence orthogonal to — `η` (`muGrid_inner_eq_zero_of_apply_one_ne`), and `(ζ, η) = 0`
 (`η ≠ ζ`, both irreducible), so only the `−nζ` term survives:
 `(α_{ij}, ζ − η) = −n(ζ, ζ) = −n` (independent of `δ`).
@@ -613,7 +616,8 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_sub_conj [Finite G]
       rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
       mul_zero, sub_zero]
-  -- `(α_{ij}, μ_{i'k}) = 0` for each `i'`: cross-column (`k ≠ j`, `k ≠ 0`) + degree (`k`-column ≠ ζ).
+  -- `(α_{ij}, μ_{i'k}) = 0` for each `i'`: cross-column (`k ≠ j`, `k ≠ 0`) + degree (`k`-column ≠
+  -- ζ).
   have hrow : ∀ i' : Fin hyp.w1,
       ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         (hyp.muGrid hG hodd i' k) = 0 := by
@@ -691,7 +695,8 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5) M-side inner product** `(α_{ij}, μ₀ − ζ) = n − δ`, where `μ₀ = ∑_{i'} μ_{i'0}`
 is the column-`0` sum (`0 < j`).  Within column `0` the `μ_{i'0}` are orthonormal, so only `i' = i`
 survives in `(δ·μ_{i0}, μ₀)`, giving `−δ`; `μ_{ij}` (column `j ≠ 0`) is cross-column to column `0`;
-`ζ` (degree `w₁ > 1`) is degree-distinct from every `μ_{i'0}` (degree `1`) and from `μ_{ij}`/`μ_{i0}`,
+`ζ` (degree `w₁ > 1`) is degree-distinct from every `μ_{i'0}` (degree `1`) and from
+`μ_{ij}`/`μ_{i0}`,
 and `(ζ, ζ) = 1` gives `(α_{ij}, ζ) = −n`.  Hence `(α_{ij}, μ₀ − ζ) = −δ − (−n) = n − δ`.  This is the
 `M`-side of the (11.8.5) two-way computation of `((μ₀ − ζ)^τ, α_{ij}^τ) = (μ₀ − ζ, α_{ij})` (Dade
 isometry), which together with the `G`-side (via (11.8.4)) forces `a = 0`. -/
@@ -744,7 +749,8 @@ open scoped FiniteInduce in
 `ζ₁, ζ₂ ∈ S = inducedFamily M` of *equal degree* (`ζ₁(1) = ζ₂(1)`), the difference `ζ₁ − ζ₂` is
 supported in `A_0(M)`.  Both are induced from the normal `M' = [M,M]`, hence vanish off `M'`; and
 `(ζ₁ − ζ₂)(1) = 0`, so the support lies in `M'^# = M' − {1}`.  Every element of `M'^#` centralizes
-itself, hence lies in `A(M) ⊆ A_0(M)` (the left disjunct of `typePA0`, as in `muGrid_alpha_support`).
+itself, hence lies in `A(M) ⊆ A_0(M)` (the left disjunct of `typePA0`, as in
+`muGrid_alpha_support`).
 
 This is the `hsuppdiff` precondition feeding the (5.7)/(1.4) equal-degree coherence producer
 `coherentEqualDegree_fromDade` on the degree-`w₁` subfamily `S(HC)` (Peterfalvi (11.8)); the
@@ -789,7 +795,8 @@ theorem Hypothesis.inducedFamily_sub_support [Finite G] {M : Subgroup G} (hyp : 
 open scoped FiniteInduce in
 /-- **§10 support of `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the difference `ζ − ζ̄` of a
 degree-`w₁` irreducible `ζ ∈ S` and its conjugate is supported in `A_0(M)`.  The conjugate-pair
-special case of `inducedFamily_sub_support`: `ζ̄ = ζ.conj ∈ S` (`inducedFamily_closedUnderConjugate`)
+special case of `inducedFamily_sub_support`: `ζ̄ = ζ.conj ∈ S`
+(`inducedFamily_closedUnderConjugate`)
 has the same degree `ζ̄(1) = ζ(1)` (the degree is a real natural number).
 
 This makes `ζ − ζ̄` `A_0`-supported, so the Dade isometry `τ` transfers it
@@ -946,7 +953,8 @@ theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.I
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5), `M`-side transferred to the Dade image** `(α_{ij}^τ, (μ₀ − ζ)^τ) = n − δ`,
 where `μ₀ = ∑_{i'} μ_{i'0}`.  Both `α_{ij}` (`muGrid_alpha_support`) and `μ₀ − ζ`
-(`zeroColumnSum_sub_zeta_support`) are `A_0`-supported, so the Dade isometry `τ` preserves their inner
+(`zeroColumnSum_sub_zeta_support`) are `A_0`-supported, so the Dade isometry `τ` preserves their
+inner
 product (`tau_inner_eq_of_supported`), and the `M`-side value is `n − δ`
 (`muGridAlpha_inner_zeroColumnSum_sub_zeta`).  Under the (11.8.4) by-contradiction hypothesis
 `(μ₀ − ζ)^τ = ∑ ω_{r0}^σ − ζ^{τ₁}`, this becomes `(α_{ij}^τ, ∑ ω_{r0}^σ − ζ^{τ₁}) = n − δ`, whose
@@ -977,7 +985,8 @@ inner product, transferred to the `M`-side.  Both `α_{ij}` (`muGrid_alpha_suppo
 product (`tau_inner_eq_of_supported`), and the `M`-side value is `0`
 (`muGridAlpha_inner_muColumn_sub_conj`).
 
-Since `μ_k`, `ζ̄ ∈ ℤ[S]`, on the coherent side `(μ_k − dζ̄)^τ = (μ_k − dζ̄)^{τ₁} = μ_k^{τ₁} − dζ̄^{τ₁}`
+Since `μ_k`, `ζ̄ ∈ ℤ[S]`, on the coherent side
+`(μ_k − dζ̄)^τ = (μ_k − dζ̄)^{τ₁} = μ_k^{τ₁} − dζ̄^{τ₁}`
 (the coherent extension agrees with `τ` on this `A_0`-supported lattice element), so this is the
 `(α_{ij}^τ, μ_k^{τ₁} − dζ̄^{τ₁}) = 0` step of the (10.5) `a = 0` argument, whence
 `(α_{ij}^τ, μ_k^{τ₁}) = da`.  No Dade–coherence adjunction is needed: the combination `μ_k − dζ̄`,

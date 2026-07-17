@@ -55,7 +55,8 @@ variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **The certain-type column set is closed under conjugation** (`hS₀conj` for the case-(B) cover).
 A member of `certainTypeSet h46 k` is a column `columnSum h46 χ₂` (`χ₂ ≠ 1`, degree-matched); its
-conjugate is the *inverse* column `columnSum h46 χ₂⁻¹` (`columnSum_conj_eq`), which is again a member
+conjugate is the *inverse* column `columnSum h46 χ₂⁻¹` (`columnSum_conj_eq`), which is again a
+member
 of the set: `χ₂⁻¹ ≠ 1` (since `χ₂ ≠ 1`), and the degree condition is preserved because the inverse
 column has the same degree as the original (`columnSum_inv_apply_one`). -/
 theorem certainTypeSet_closedUnderConjugate
@@ -927,7 +928,8 @@ theorem sMember_degreeSqNormBound_of_not_coherent
 The column-break analogue of `sMember_degreeSqNormBound_of_not_coherent`: the adjoined break is a
 reducible certain-type column `μ_b = columnSum χ₂b` (not an irreducible pair).  Same conclusion
 `∑ⱼ degⱼ²/mcⱼ ≤ 2a`, via the reducible-break engine: break fields from
-`caseB_breakChar_fields_columnBreak` (4b), per-member datum from `caseB_member_orthoDatum_columnBreak`
+`caseB_breakChar_fields_columnBreak` (4b), per-member datum from
+`caseB_member_orthoDatum_columnBreak`
 (4c), break decomposition `columnDecompositionTau` (over `hyp.tau`, `tau1 = hyp.tau`, image family
 `columnRFamilyTau` with `imageSet = certainTypeR χ₂b` so the 4c raw orthogonality is definitionally
 `.Orthogonal`), and the bound from the reducible contrapositive

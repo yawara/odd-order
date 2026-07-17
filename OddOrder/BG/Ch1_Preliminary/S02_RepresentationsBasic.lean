@@ -27,7 +27,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 /-!
 # S02_RepresentationsBasic
 
-Prefix-split from `OddOrder.BG.Ch1_Preliminary.S02_Representations` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch1_Preliminary.S02_Representations` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 /-!

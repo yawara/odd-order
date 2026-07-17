@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula
 /-!
 # Peterfalvi (7.9) — two-family non-orthogonality + orthogonal integer decomposition
 
-Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
+issue 0103).
 -/
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)

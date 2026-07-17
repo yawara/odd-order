@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.Isometry105
 /-!
 # Isometry106
 
-Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core.DadeCalculations` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 namespace OddOrder.Peterfalvi.S12
 open OddOrder.GroupTheory
@@ -68,7 +69,8 @@ theorem Hypothesis.muColumn_tau1_inner_self [Finite G] {M : Subgroup G}
 
 open scoped FiniteInduce in
 /-- **§10 `α_{ij}^τ` is a virtual character of `G`** (Peterfalvi (10.5)): `α_{ij} = μ_{ij} − δ·μ_{i0}
-− n·ζ` is a virtual character of `M` (`muGrid_isIrreducible`, `ζ` irreducible) and is `A_0`-supported
+−
+n·ζ` is a virtual character of `M` (`muGrid_isIrreducible`, `ζ` irreducible) and is `A_0`-supported
 (`muGrid_alpha_support`), so its Dade image lies in `ℤ[Irr G]`
 (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`).  Together with `ζ^{τ₁}, μ_k^{τ₁} ∈ ℤ[Irr G]` this
 makes the inner products of the `a = 0` argument integers. -/
@@ -267,7 +269,8 @@ Combines the value-on-`V` leg `tau_muGridAlpha_apply_eq_on_typePV` (`α^τ = δ(
 (3.2.c)/(4.3.c) and the definition of `τ`) with the vanishing of `ζ^{τ₁}` on `V` (`hζvanish`, the
 §5/§7 input of (10.5): "By (5.3.b), (5.5) and (3.2.d), `ζ^{τ₁}` vanishes on `V`").  The remaining
 step to `alpha_tau_image` is `NC(ψ) ≤ 4 < 2·inf(w₁,w₂)` + Theorem (3.8)
-(`S05.sigmaCoeff_trichotomy`, requiring a `FullDadeApplication` for the type-`P` `TICyclicHypothesis`)
+(`S05.sigmaCoeff_trichotomy`, requiring a `FullDadeApplication` for the type-`P`
+`TICyclicHypothesis`)
 forcing `ψ ⊥ ω^σ`, hence `ψ = 0`. -/
 theorem Hypothesis.muGridPsi_vanishes_on_typePV [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
@@ -391,7 +394,8 @@ theorem Hypothesis.tau_chidiff_inner_alignedOmega_eq_zero [Finite G]
 Since `⟨a,s⟩ = ⟨b,s⟩ =: x ∈ ℤ` (`a, s ∈ ℤ[Irr G]`, `inner_mem_ZIrr_int`), the projection norm
 `‖s − x·a − x·b‖² = 1 − 2x² ≥ 0` forces `2x² ≤ 1`, hence `x = 0`.  This is the integral-geometry
 core that lets the §10 `ζ^{τ₁}`-vanishing argument bypass the (5.4)/(5.5) `R(ζ)` machinery:
-applied with `a = ζ^{τ₁}`, `b = ζ̄^{τ₁}`, `s = ω^σ`, the orthogonality of `(ζ − ζ̄)^τ = a − b` to the
+applied with `a = ζ^{τ₁}`, `b = ζ̄^{τ₁}`, `s = ω^σ`, the orthogonality of `(ζ − ζ̄)^τ = a − b` to
+the
 `σ`-image (Peterfalvi (5.3.b), via (3.8)) gives `ζ^{τ₁} ⊥ ω^σ` directly. -/
 theorem inner_left_eq_zero_of_inner_sub_eq_zero {G : Type*} [Group G] [Fintype G]
     [Invertible (Nat.card G : ℂ)]
@@ -797,7 +801,8 @@ of (10.2) (`hzS`/`hz1`) and the column sign `δ = ±1` (`hδpm`/`hδj`) — the 
 Thin corollary of the grid identity `tau_muGridAlpha_eq`.  All arithmetic inputs are discharged from
 the (10.3) data carried by `CharacterParameters` (`degree_independent`, `n_formula`, `d_gt_one`,
 `two_le_n`) and the structural bounds `w₁, w₂ ≥ 3` (`three_le_card_W1/W2`): the auxiliary nontrivial
-column `k ≠ j`, the degree distinctness `d ≠ w₁`/`1 ≠ w₁`, and the parity `n ≥ 2` (Peterfalvi (10.3),
+column `k ≠ j`, the degree distinctness `d ≠ w₁`/`1 ≠ w₁`, and the parity `n ≥ 2` (Peterfalvi
+(10.3),
 now `params.two_le_n`).  The only hypotheses beyond the (10.2)/(10.3) construction pins are `hzconj`
 — the non-realness `ζ̄ ≠ ζ` (Peterfalvi (1.1): a nontrivial irreducible of an odd-order group is not
 real; carried per the §10 (10.5) chain convention, derivable via
@@ -868,7 +873,8 @@ From the diagonal reduction `(α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁}) = 1`
 (`muGridAlpha_tau1_inner_muColumn_self_sub_conj`), the vanishing `(α_{ij}^τ, ζ̄^{τ₁}) = 0`
 (from `(α_{ij}^τ, ζ^{τ₁}) = −n` (`muGridAlpha_tau1_zeta_eq_neg_n`, the (10.5) `a = 0`) and
 `(α_{ij}^τ, ζ̄^{τ₁}) = (α_{ij}^τ, ζ^{τ₁}) + n` (`muGridAlpha_tau_inner_zeta_sub_conj`)), the (10.5)
-Dade image `α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − nζ^{τ₁}` (`alpha_tau_image`) and `(ζ^{τ₁}, μ_j^{τ₁}) = 0`
+Dade image `α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − nζ^{τ₁}` (`alpha_tau_image`) and
+`(ζ^{τ₁}, μ_j^{τ₁}) = 0`
 (`zeta_tau1_inner_muColumn`): `1 = (α_{ij}^τ, μ_j^{τ₁}) = δ(ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁})`, hence
 `(ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁}) = δ` (`δ² = 1`).  This pins the `j`-column coefficient of
 `μ_j^{τ₁}` along `ω_{ij}^σ` to `δ` for every `i`, which together with `‖μ_j^{τ₁}‖² = w₁` forces the
@@ -1088,7 +1094,8 @@ now stated on the structural `Hypothesis ↥M`, hence applies to the §10 muGrid
 `(hyp.toCertainTypeHypothesis hG hodd).toHypothesis`.  The `muGrid ↔ columnFamily` row reindexing
 gives `∑_i μ_{ij} = ∑_{i'} (h.columnFamily (χ₂ j)).mu i'`; complex conjugation (`ClassFunction.conj`
 = `mapRingEquiv conj` pointwise) sends it to the `χ₂⁻¹`-column.  `j' ≠ 0` from
-`finCardEquivCharacterGroup_zero` (the column-`0` dual is trivial) and `j' ≠ j` from the odd order of
+`finCardEquivCharacterGroup_zero` (the column-`0` dual is trivial) and `j' ≠ j` from the odd order
+of
 the column character group (`W_odd`/`card_charGroup_W2`, no involutions; the `column_inv_ne_self`
 argument inlined).  This is the conjugate-column input `(μ_j)‾ = μ_{j'}` for the (5.5)-for-columns
 route to (10.6)(a): `tau_muGrid_columnSum_diff` (with `k = j'`) then supplies the column
@@ -1146,7 +1153,8 @@ theorem Hypothesis.exists_conj_column [Finite G]
     (finCongr hcardW2sub.symm).symm ((finCardEquivCharacterGroup _).symm (χ₂ j)⁻¹)
   have hj'χ : χ₂ j' = (χ₂ j)⁻¹ := by simp only [χ₂, j', Equiv.apply_symm_apply]
   have hχ₂jne : χ₂ j ≠ 1 := fun he => hj0 ((hχ₂one j).mp he)
-  -- `(χ₂ j)⁻¹ ≠ χ₂ j` (column char group has odd order — no involutions; `column_inv_ne_self` inline)
+  -- `(χ₂ j)⁻¹ ≠ χ₂ j` (column char group has odd order — no involutions; `column_inv_ne_self`
+  -- inline)
   have hinvne : (χ₂ j)⁻¹ ≠ χ₂ j := by
     have hodd' : Odd (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) := by
       rw [h.card_charGroup_W2]

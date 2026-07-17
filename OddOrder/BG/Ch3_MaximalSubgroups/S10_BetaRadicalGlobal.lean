@@ -90,7 +90,8 @@ Proof: (a) `A ∈ ℰ²(G) ∩ ℰ*(G)` ⇒ `A ≤ Q` for some Sylow `Q` (`exist
 maximal-elem-ab of order `p²` in `↥Q`, contradicting `idealPrime`. (b) `2 ≤ rank ↥R` ⇒ `R`
 noncyclic ⇒ `A ∈ ℰ²(R)` (S04), not maximal by (a), so `A ∈ 𝒰` by §9's
 `isUniquelyMaximal_of_mem_e2_not_maximal` (Uniqueness Theorem — cited), lifted to `R` by
-`isUniquelyMaximal_of_le_of_lt_top`. (c) `Q = N_P(X)`: if `r(Q) ≥ 2` use (b); else `Q` cyclic, `X char Q`
+`isUniquelyMaximal_of_le_of_lt_top`. (c) `Q = N_P(X)`: if `r(Q) ≥ 2` use (b); else `Q` cyclic,
+`X char Q`
 (cyclic uniqueness), `N_P(Q) ⊆ N_P(X) = Q`, so `Q = P` by the nilpotent normalizer condition,
 contradicting `3 ≤ pRank G p ≤ rank ↥P`. -/
 theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]

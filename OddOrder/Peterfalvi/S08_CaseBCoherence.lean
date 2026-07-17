@@ -87,7 +87,8 @@ theorem SibleyDadeHypothesis.inner_induce_W2_Yset_diff_eq_zero
 /-- **(6.8.2.2) cross-term `⟨α^τ, (η' − η₁)^τ⟩ = c`** for `α = Ind^L_{W₂}φ − c·η₁` and `η', η₁ ∈ Y`,
 `η' ≠ η₁`.  By the Dade isometry on the supported pair `{α, η' − η₁}`
 (`dadeIntegralCharacterMap_inner_eq_on_supported_span`; both supported on `H^#` via
-`support_indW2_sub_smul_subset_sharpImage` / `sMember_diffSupport_of_charValue_eq`) it reduces to the
+`support_indW2_sub_smul_subset_sharpImage` / `sMember_diffSupport_of_charValue_eq`) it reduces to
+the
 source inner product `⟨α, η' − η₁⟩`, which expands to
 `⟨Ind_{W₂}φ, η' − η₁⟩ − c·⟨η₁, η' − η₁⟩ = 0 − c·(0 − 1) = c` using the source orthogonality
 `inner_induce_W2_Yset_diff_eq_zero` and the `Y`-orthonormality (the inner product is linear in its
@@ -203,7 +204,8 @@ theorem inner_self_induce_eq_index_of_le_center
   exact mul_left_cancel₀ hW2ne hcard
 
 /-- **(6.8.2.2) single cross-term `⟨Ind_{W₂}φ, η⟩ = 0`** for a *nontrivial* `φ ∈ Irr W₂` and `η ∈ Y`.
-By Frobenius reciprocity `⟨Ind_{W₂}φ, η⟩ = ⟨φ, Res^L_{W₂}η⟩`, and `Res^L_{W₂}η` is the constant `|W₁|`
+By Frobenius reciprocity `⟨Ind_{W₂}φ, η⟩ = ⟨φ, Res^L_{W₂}η⟩`, and `Res^L_{W₂}η` is the constant
+`|W₁|`
 on `W₂` (each `η ∈ Y` is constant `η(1) = |W₁|` on `⁅H,H⁆ ⊇ W₂`,
 `Yset_apply_eq_apply_one_of_mem_commutator` + `Yset_apply_one`); the inner product then factors as
 `|W₂|⁻¹·(∑_{w} φ(w))·\overline{|W₁|} = 0` since `∑_w φ(w) = 0` for the nontrivial `φ`
@@ -234,7 +236,8 @@ linear, `η₁ ∈ Y`, `W₂ ≤ Z(↥L)`).  Expanding the inner product and usi
 `‖α‖² = |L:W₂| + c·c̄`.
 
 For the assembly coefficient `c = (|H:W₂| : ℂ)` (real), `c·c̄ = |H:W₂|²`, giving Peterfalvi's
-`‖α‖² = |L:Z| + |H:Z|²`.  Combined with `inner_self_tau_indW2_sub_smul` (`‖α^τ‖² = ‖α‖²`), this is the
+`‖α‖² = |L:Z| + |H:Z|²`. Combined with `inner_self_tau_indW2_sub_smul` (`‖α^τ‖² = ‖α‖²`), this is
+the
 norm input to the (6.8.2.2) trichotomy. -/
 theorem SibleyDadeHypothesis.inner_self_indW2_sub_smul_eq
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -508,7 +511,8 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_caseB
 
 open scoped Classical in
 /-- **(6.8.2.2) good case for `|Y| ≥ 3`.**  When `m = |Y| ≥ 3`, the edge case (`m = 2`) of
-`coeff_eq_neg_or_edge_caseB` is impossible, so the good value `⟨α^τ, η₁^{τ₁}⟩ = −|H:Z|` holds with no
+`coeff_eq_neg_or_edge_caseB` is impossible, so the good value `⟨α^τ, η₁^{τ₁}⟩ = −|H:Z|` holds with
+no
 relabel.  Combined with `orthogonal_tau_indW2_add_extension_caseB`, this gives the (6.8.2.2)
 decomposition `α^τ = X − |H:Z|·η₁^{τ₁}` (`X ⊥ 𝒴^{τ₁}`, `X ∈ ℤ[Irr G]`) unconditionally for `|Y| ≥ 3`
 (the `m = 2` edge requires the `η₁^{τ₁} ↦ −η₂^{τ₁}` relabel, handled separately). -/
@@ -540,7 +544,8 @@ witness `cY` with `⟨α^τ, cY.extension η₁⟩ = −|H:Z|` — the uniform `
 assembly.  Generic `|Y| ≥ 3`: `cY = coherentYset` (good branch of `coeff_eq_neg_or_edge_caseB`).
 Edge `|Y| = 2`: `coherentYset` may give the bad value `0`; then `Y = {η₁, η₂}` and the sign-swapped
 witness `cY'` (`coherentEqualDegree_swap_neg`, `η₁ ↦ −η₂^{τ₁}`) gives
-`⟨α^τ, cY' η₁⟩ = −⟨α^τ, η₂^{τ₁}⟩ = −|H:Z|`, since `⟨α^τ, η₂^{τ₁}⟩ = ⟨α^τ, η₁^{τ₁}⟩ + |H:Z| = 0 + |H:Z|`
+`⟨α^τ, cY' η₁⟩ = −⟨α^τ, η₂^{τ₁}⟩ = −|H:Z|`, since
+`⟨α^τ, η₂^{τ₁}⟩ = ⟨α^τ, η₁^{τ₁}⟩ + |H:Z| = 0 + |H:Z|`
 (`inner_tau_indW2_sub_smul_tau_Yset_diff` + `extends_on_supported`). -/
 theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_caseB
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]

@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain.NormalCase
 /-!
 # QuadraticTerm
 
-Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S09_NonexistenceCertain.CoherenceFormula` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 
 /-!
 # Peterfalvi (7.8) — coherence-based formula for χ^ρ
 
-Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
+issue 0103).
 -/
 namespace OddOrder.Peterfalvi.S09
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)

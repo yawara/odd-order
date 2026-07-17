@@ -45,7 +45,8 @@ identity `finrank_elab_identity`, discharged from that identity in `wielandtPerF
 
 The exponent `p` is required to be *prime* (not merely an exponent): this is what makes `↥N` an
 `𝔽_p`-vector space, the form in which the dimension identity (⋆) lives.  Primality is not recoverable
-from `IsElementaryAbelian p ↥N` alone (e.g. `IsElementaryAbelian 6 (ZMod 2)` holds), so it is carried
+from `IsElementaryAbelian p ↥N` alone (e.g. `IsElementaryAbelian 6 (ZMod 2)` holds), so it is
+carried
 explicitly. -/
 def WielandtPerFactor (L : Type*) [Group L] (U E : Subgroup L) : Prop :=
   ∀ (H : Type*) [Group H] [Finite H] (φ : L →* MulAut H) (N : Subgroup H) [N.Normal],
@@ -60,7 +61,8 @@ coprime solvable action `φ : L →* MulAut H`:
 `|C_H(UE)|^{|E|} · |H| = |C_H(E)|^{|E|} · |C_H(U)|` (with `C_H(UE) = fixedSubgroup φ ⊤`).
 
 Proved by strong induction on `|H|`: the trivial group is the base case; otherwise an
-elementary-abelian `L`-invariant normal subgroup `N` (`exists_aInvariant_normal_isElementaryAbelian`)
+elementary-abelian `L`-invariant normal subgroup `N`
+(`exists_aInvariant_normal_isElementaryAbelian`)
 splits the problem via `wielandt_step`, with the per-factor identity on `N` from `hpf` and the
 induction hypothesis on the smaller quotient `H/N`. -/
 theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E : Subgroup L}

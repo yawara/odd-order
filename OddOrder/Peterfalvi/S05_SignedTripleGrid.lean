@@ -254,7 +254,8 @@ theorem orthonormal_option_trivial [Invertible (Nat.card G : ℂ)] {τ : Type*}
 /-- A family `X : τ → ±Irr(G)` of signed nontrivial irreducibles is **orthonormal** as soon as it is
 *injective* and *no member is another's negative*: the diagonal inner products are `1` and the
 off-diagonal ones are `0`.  This is the bridge from the combinatorial facts of (3.5.5) (distinctness
-and "no negated coincidence") to the analytic orthonormality of the family `(χ_{ij})` that powers the
+and "no negated coincidence") to the analytic orthonormality of the family `(χ_{ij})` that powers
+the
 isometry `σ` of (3.2).  (Stated diagonal/off-diagonal rather than via `if a = b` to stay free of any
 `DecidableEq τ` instance.) -/
 theorem orthonormal_of_injective_of_no_neg [Invertible (Nat.card G : ℂ)] {τ : Type*}
@@ -1589,7 +1590,8 @@ open scoped Classical in
 (`≥ 4` rows and columns) with column-commons `z j` (in every `A · j`) and row-commons `w i` (in
 every `A i ·`) admits interior thirds `φ i j` with `A i j = {z j, w i, φ i j}`, and the combined
 family `(w i, z j, φ i j)` is **orthonormal** (`⟨·, ·⟩ = δ`).  Establishes the six pairwise relations
-(column-commons via `common_ne_other_column_mem`, row-commons via `common_ne_other_row_mem`, interior
+(column-commons via `common_ne_other_column_mem`, row-commons via `common_ne_other_row_mem`,
+interior
 thirds via `third_not_mem_far_cell` for the far case and `L`-relations for the same row/column, plus
 the cross relations) and feeds them to `gridFamily_orthonormal`. -/
 theorem symm_orthonormal_family [Fintype ι] [Fintype κ] (hG : IsSignedTripleGrid A)
@@ -1755,8 +1757,10 @@ open scoped Classical in
 /-- **(3.5.5) two-column family, reindexed to `κ`** (the `w₂ = 3` shape, in the
 `symm_orthonormal_family` interface): when there are exactly two columns (`Fintype.card κ = 2`) with
 column-commons `z j` (`z j ∈ A i j` for every row `i`), the `Bool`-indexed
-`two_col_orthonormal_family` is reindexed back to `κ` via a bijection `Bool ≃ κ`, yielding row-anchors
-`w i` (the per-row meet of the two cells), interior thirds `φ i j`, cells `A i j = {z j, w i, φ i j}`,
+`two_col_orthonormal_family` is reindexed back to `κ` via a bijection `Bool ≃ κ`, yielding
+row-anchors
+`w i` (the per-row meet of the two cells), interior thirds `φ i j`, cells
+`A i j = {z j, w i, φ i j}`,
 and an orthonormal `gridFamily z w φ` over `ι ⊕ κ ⊕ ι × κ`.  This lets the `w₂ = 3` and transpose
 `w₁ = 3` orientations of (3.5) share the `κ`-indexed χ-assembly. -/
 theorem two_col_orthonormal_family_reindexed [Fintype ι] [Fintype κ] (hG : IsSignedTripleGrid A)

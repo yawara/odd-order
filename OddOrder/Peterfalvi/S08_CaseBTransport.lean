@@ -41,12 +41,14 @@ variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
 /-- **(6.8.2.2) good-case `X`-structure, general `Y`-coherence witness.**  The `cY`-parametrized
-version of `orthogonal_tau_indW2_add_extension_caseB`: for *any* `Y`-coherence witness `cY` (e.g. the
+version of `orthogonal_tau_indW2_add_extension_caseB`: for *any* `Y`-coherence witness `cY` (e.g.
+the
 swapped witness from `exists_Ycoherence_hgood_caseB` in the `|Y| = 2` edge), the good value
 `⟨α^τ, cY.extension η₁⟩ = −|H:Z|` makes `X := α^τ + |H:Z|·cY.extension η₁` orthogonal to the whole
 family `{cY.extension η}` and lie in `ℤ[Irr G]`, giving `α^τ = X − |H:Z|·cY.extension η₁`.
 
-The agreement `cY.extension η − cY.extension η₁ = (η − η₁)^τ` is `cY.extends_on_supported` + `map_sub`
+The agreement `cY.extension η − cY.extension η₁ = (η − η₁)^τ` is `cY.extends_on_supported` +
+`map_sub`
 (inlined, since `cY` need not be `coherentYset`). -/
 theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_general_caseB
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -122,7 +124,8 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_general_caseB
     exact add_mem hvZ he₁Z
 
 /-- **Peterfalvi (6.8.2.2): the `X − |H:Z|·Y` decomposition.**  For `α = Ind^L_{W₂}φ − |H:Z|·η₁`
-(`φ` nontrivial linear), there is a `Y`-coherence witness `cY` and an `X ∈ ℤ[Irr G]` orthogonal to the
+(`φ` nontrivial linear), there is a `Y`-coherence witness `cY` and an `X ∈ ℤ[Irr G]` orthogonal to
+the
 whole family `{cY.extension η : η ∈ Y}` with `α^τ = X − |H:Z|·cY.extension η₁`.
 
 Combines the uniform good-value witness `exists_Ycoherence_hgood_caseB` (handling the `|Y| = 2`

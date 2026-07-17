@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0
 /-!
 # Peterfalvi (9.8)-(9.10) — character counts in the two Clifford cases
 
-Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -253,7 +254,8 @@ theorem exists_regular_not_reducible_of_odd {α : Type*} {X Xmu : Set α}
   exact (lt_irrefl _) hlt
 
 /-- **`u = |Ū|` is odd**: `u` is the order of the range of the `U`-action `uActionHom` on the chief
-factor, so by the first isomorphism theorem `u ∣ |U.subgroupOf (U ⊔ W₁)| ∣ |U ⊔ W₁| ∣ |G|`, and `|G|`
+factor, so by the first isomorphism theorem `u ∣ |U.subgroupOf (U ⊔ W₁)| ∣ |U ⊔ W₁| ∣ |G|`, and
+`|G|`
 is odd (odd-order hypothesis).  The parity input `hu` to `exists_regular_not_reducible_of_odd` in the
 (9.8.c) counting argument (`u` odd + `p-1` even forces `|𝒳(H₀C)| > p-1`). -/
 theorem u_odd [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -274,7 +276,8 @@ theorem u_odd [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact (Nat.odd_mul.mp (hk ▸ hG.odd)).1
 
 -- `caseA_character_counts` (Peterfalvi (9.8)) is defined at the end of the file, after the (9.8.c)
--- `H₀C` character machinery (`caseA_reducible_eq_hcZeta`, `caseA_reducible_induceHU_apply_one_eq_qu`,
+-- `H₀C` character machinery (`caseA_reducible_eq_hcZeta`,
+-- `caseA_reducible_induceHU_apply_one_eq_qu`,
 -- etc.) that its (b)/(c) conjuncts cite.
 
 section
@@ -399,7 +402,8 @@ section
 open scoped commutatorElement
 
 /-- **Peterfalvi (9.9.a): `H ⊔ C ≤ normalizer(H₀ ⊔ C')`.**  For a generator `x ∈ H ∪ C` and any
-`k ∈ K = H₀C'`, `⁅x,k⁆ ∈ K`: by `closure_induction` on `k`, the base cases (`k ∈ H₀` or `k ∈ C'`) use
+`k ∈ K = H₀C'`, `⁅x,k⁆ ∈ K`: by `closure_induction` on `k`, the base cases (`k ∈ H₀` or `k ∈ C'`)
+use
 `⁅H,H₀⁆,⁅C,H₀⁆ ≤ H₀` and `⁅H,C'⁆ ≤ H₀`, `⁅C,C'⁆ ≤ C'`, and the inductive conjugations stay in `K`
 since `K` is closed under conjugation by its own elements.  Then `x k x⁻¹ = ⁅x,k⁆·k ∈ K`. -/
 theorem HsupC_le_normalizer_K [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
@@ -664,7 +668,8 @@ theorem uprimeSub_subgroupOf_M_normal [Finite G] {M : Subgroup G}
 
 /-- **realized `U' ◁ HU`** (Peterfalvi (9.8.d)): restriction of `U' ◁ M`
 (`uprimeSub_subgroupOf_M_normal`) along `huSub ≤ ↥M`.  This is the normality that makes the
-`U' ⊆ Ker χ` condition `HU`-conjugation-invariant: `Ker(χ^g) = g⁻¹·(Ker χ)·g ⊇ g⁻¹·U'·g = U'`, so the
+`U' ⊆ Ker χ` condition `HU`-conjugation-invariant: `Ker(χ^g) = g⁻¹·(Ker χ)·g ⊇ g⁻¹·U'·g = U'`, so
+the
 `𝒮(H₀U')`-family's `U'`-triviality survives conjugation — the `λ`-half of the (9.8.d) count (α). -/
 theorem uprimeInHu_normal_huSub [Finite G] {M : Subgroup G}
     (data : TypesIIIIIIVSetup M) :

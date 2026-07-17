@@ -13,7 +13,8 @@ Peterfalvi (13.15) (04.15 p. 86) states that if case (9.7.b) holds for a type-II
 Peterfalvi states it for `M = S` but *applies it to both `S` and `T`* (04.16 p. 87, deriving
 `v = (q^p − 1)/(q − 1)` "by (13.15)"), so the arithmetic is genuinely side-symmetric.
 
-Its proof introduces the cofactor `x` with `u·x = (p^q − 1)/(p − 1)` and shows `x = 1` (resp. `x = q`)
+Its proof introduces the cofactor `x` with `u·x = (p^q − 1)/(p − 1)` and shows `x = 1` (resp.
+`x = q`)
 by ruling out `x ≥ 2q + 1` via the analytic inequality (13.10)+(13.12) and the (13.11) lower bounds
 on `m`, exactly as in the `(13.12)` `c`-elimination — **except** that the endgame is purely numeric
 (`x ∣ (p² + p + 1) ∈ {31, 57}` with `x ≥ 7` and `u ≠ 1` prime-to-`3`), with *no* structural residual
@@ -23,8 +24,10 @@ on `m`, exactly as in the `(13.12)` `c`-elimination — **except** that the endg
 The genuinely deep character/`σ`-theory content — the value of `m` (Peterfalvi (13.9)) and the
 analytic inequality (13.10) with `c = 1`/`d = 1` (which itself needs (13.12), `typeP_Galois`-gated,
 issue 9000) — enters this engine **only as explicit hypotheses** (`hmval`-free here; `hanalytic`,
-the `m`-lower bounds, `h11c`).  Thus this engine is *ungated*: the caller (the `S`-side `caseB_order_u`
-or the `T`-side `v`-value) supplies those char inputs, which bottom out in `typeP_Galois` (issue 9000).
+the `m`-lower bounds, `h11c`). Thus this engine is *ungated*: the caller (the `S`-side
+`caseB_order_u`
+or the `T`-side `v`-value) supplies those char inputs, which bottom out in `typeP_Galois` (issue
+9000).
 -/
 
 namespace OddOrder.Peterfalvi.S15
@@ -85,7 +88,8 @@ theorem caseB_order_x_absurd_of_ge {p q x u : ℕ} {m : ℚ}
   have hq35 : q = 3 ∨ 5 ≤ q := prime_split q hq hq3le
   have hpexp : (p : ℚ) ^ q = (p : ℚ) ^ (q - 1) * (p : ℚ) := by
     rw [← pow_succ]; congr 1; omega
-  -- Step 1: `m < qp/((2q+1)(p-1))`, hence `q = 3` (identical to `c_eq_one_forces_params`, `x` for `c`).
+  -- Step 1: `m < qp/((2q+1)(p-1))`, hence `q = 3` (identical to `c_eq_one_forces_params`, `x` for
+  -- `c`).
   have hbound2q1 : m < (q : ℚ) * (p : ℚ) / ((2 * (q : ℚ) + 1) * ((p : ℚ) - 1)) := by
     have hden1 : (0 : ℚ) < (p : ℚ) ^ (q - 1) * (x : ℚ) * ((p : ℚ) - 1) := by positivity
     have hden2 : (0 : ℚ) < (2 * (q : ℚ) + 1) * ((p : ℚ) - 1) := by positivity
@@ -150,10 +154,13 @@ theorem caseB_order_x_absurd_of_ge {p q x u : ℕ} {m : ℚ}
 
 The cofactor `x` (with `u·x = (p^q − 1)/(p − 1)`) satisfies `x ≡ 1 (mod q)` by the (13.14)
 divisor-congruence `cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one` and is odd (it divides the
-odd cyclotomic quotient, `cyclotomic_quotient_odd`); with `q` odd these force `x = 1` or `x ≥ 2q + 1`,
-and the latter is ruled out by `caseB_order_x_absurd_of_ge`.  Hence `x = 1` and `u = (p^q − 1)/(p − 1)`.
+odd cyclotomic quotient, `cyclotomic_quotient_odd`); with `q` odd these force `x = 1` or
+`x ≥ 2q + 1`,
+and the latter is ruled out by `caseB_order_x_absurd_of_ge`. Hence `x = 1` and
+`u = (p^q − 1)/(p − 1)`.
 
-The `T`-side `v`-value `v = (q^p − 1)/(q − 1)` of Peterfalvi (14.4) is the instance with the roles of
+The `T`-side `v`-value `v = (q^p − 1)/(q − 1)` of Peterfalvi (14.4) is the instance with the roles
+of
 `p, q` swapped and `q ≢ 1 (mod p)` (04.16 p. 87).  The char/`σ`-theory inputs `hanalytic`, `hm5`,
 `hm7`, `h11c` are supplied by the caller (they bottom out in the analytic inequality (13.10) with
 `c = 1`/`d = 1`, i.e. `typeP_Galois`, issue 9000). -/

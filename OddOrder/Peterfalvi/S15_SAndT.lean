@@ -35,7 +35,8 @@ variable {G : Type*} [Group G]
 
 /-! #### (13.19.c) dichotomy — the isolated deep obligation
 
-We prove `typeI_caseC_dichotomy` for the **distinguished coherent-family member** `ζ_0 = dataL.zeta 0`
+We prove `typeI_caseC_dichotomy` for the **distinguished coherent-family member**
+`ζ_0 = dataL.zeta 0`
 (so the §7.8 `betaDecomp`/`normEstimates` of the bundle apply directly), and pass `ζ_0` as the
 producer's `φ`.  The pieces: the bridge `β_L^τ = (dataL.h78 hG).beta`, the parity core
 `⟨β_S^τ, ζ_0^{τ₁}⟩ + ⟨β_L^τ, η_{01}⟩ ≡ 1 (mod 2)`, and the two case bounds. -/
@@ -511,7 +512,8 @@ theorem inner_tauSbetaGrid_coh_ext_zeta_eq_of_c_eq_one [Finite G]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`(Γ_S, ζ_i^{τ₁}) = bSphi·d_i`** (`i ≠ ind1H`): the `η`-orthogonal residual `Γ_S = GammaGrid`
-pairs with the `L`-family exactly as `β_S^τ` does — `Γ_S = β_S^τ − 1 + η_{01}` (`gammaGrid_defGamma`),
+pairs with the `L`-family exactly as `β_S^τ` does — `Γ_S = β_S^τ − 1 + η_{01}`
+(`gammaGrid_defGamma`),
 and the `1_G`/`η_{01}` parts are orthogonal to the coherent image (`(betaDecomp).orth_one`,
 (13.19.b)). -/
 theorem inner_gammaGrid_coh_ext_zeta_eq_of_c_eq_one [Finite G]

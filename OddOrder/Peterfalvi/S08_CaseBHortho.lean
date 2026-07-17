@@ -24,8 +24,10 @@ stated at the `imageSet` level.  It is the certain-type counterpart of
 
 The proof mirrors the V-vanishing technique of
 `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (`S08_CaseBCoherence2`): each member
-`α = (±δ_j)·ω_{ij}^σ` of `R(μ_j)` is a scalar multiple of a `chiFam` (`certainTypeOmegaSigma_eq_chiFam`),
-each member `β = c·ξ` of `R(χ)` (`ξ ∈ {μ, ν} ⊆ Irr G`) is one half of the two-element break pair, and
+`α = (±δ_j)·ω_{ij}^σ` of `R(μ_j)` is a scalar multiple of a `chiFam`
+(`certainTypeOmegaSigma_eq_chiFam`),
+each member `β = c·ξ` of `R(χ)` (`ξ ∈ {μ, ν} ⊆ Irr G`) is one half of the two-element break pair,
+and
 the break difference `c·ξ − c'·ξ' = (χ − χ̄)^τ` vanishes on the `(ticVdiff h46)`-exceptional set `V`
 (`tau_apply_eq_zero_of_mem_ticVdiffV`, since `χ − χ̄` is `H^#`-supported).  The disjointness machine
 `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` then gives `⟨c·ξ, ω_{ij}^σ⟩ = 0`, and conjugate
@@ -142,7 +144,8 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff
     (Int.cast_smul_eq_zsmul ℂ cd.sign cd.muClassFunction).symm
   have hνcast : (-cd.sign) • cd.nuClassFunction = (-(cd.sign : ℂ)) • cd.nuClassFunction := by
     rw [← Int.cast_smul_eq_zsmul ℂ (-cd.sign) cd.nuClassFunction, Int.cast_neg]
-  -- For each `β = ε·μ` or `−ε·ν`, and each `α = (±δ_j)·ω^σ`, reduce via conjugate symmetry and `key`.
+  -- For each `β = ε·μ` or `−ε·ν`, and each `α = (±δ_j)·ω^σ`, reduce via conjugate symmetry and
+  -- `key`.
   rcases hβ with rfl | rfl <;> cases b <;>
     simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
   -- Case β = ε·μ, α = δ_j·ω_{χ₂,i}^σ.

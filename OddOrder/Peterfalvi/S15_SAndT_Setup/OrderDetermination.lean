@@ -5,7 +5,8 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 /-!
 # Peterfalvi (13.11)-(13.15) — order and divisor determination
 
-Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S15_SAndT_Setup` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory

@@ -3,7 +3,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.SigmaCovers
 /-!
 # CentralizerSup
 
-Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting.TypePDuality` (2000-line limit,
+issue 0103 第 2 パス).
 -/
 namespace OddOrder.BG.Ch4.S14
 open OddOrder.GroupTheory
@@ -84,7 +85,8 @@ theorem typeP_family_prime_pow_dvd_Kstar [Finite G] (hG : OddOrder.BG.IsMinimalS
 /-- **BG 14.7, the σ-decomposition `⊔ Kᵢ* = Z`** (mmd L4009): the canonical factors of the family
 join to all of `Z`.  `⊔ Kᵢ* ≤ Z` is clear; for `Z ≤ ⊔ Kᵢ*` it suffices that `|Z| ∣ |⊔ Kᵢ*|`, which
 holds prime-power-wise: for `pᵏ ∣ |Z|` the prime `p` lies in some `σ(N)`
-(`typeP_family_sigma_covers`), and then `pᵏ ∣ |Kᵢ*|` (`typeP_family_prime_pow_dvd_Kstar`) `∣ |⊔ Kᵢ*|`.
+(`typeP_family_sigma_covers`), and then `pᵏ ∣ |Kᵢ*|` (`typeP_family_prime_pow_dvd_Kstar`)
+`∣ |⊔ Kᵢ*|`.
 With `⊔ Kᵢ* ≤ Z` this gives equality.  The structural heart of the TI-of-`T` step. -/
 theorem typeP_family_iSup_Kstar_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)

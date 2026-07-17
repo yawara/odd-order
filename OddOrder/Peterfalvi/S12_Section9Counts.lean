@@ -711,15 +711,19 @@ theorem Hypothesis.card_abelianization_derived_eq_charParam_d [Finite G]
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.1), `|S(HC)| = n`** (§9 count, named obligation).  The number of degree-`w₁`
 irreducible members of `S = inducedFamily M` equals `n = (d − δ)/w₁ = (d − 1)/w₁`.  `S(HC) = S₁`
-consists of the `(u − 1)/q` degree-`q = w₁` irreducible constituents of the constant-degree Frobenius
+consists of the `(u − 1)/q` degree-`q = w₁` irreducible constituents of the constant-degree
+Frobenius
 family `(U/C) ⋊ W₁`, so `|S(HC)| = (u − 1)/q = (d − 1)/w₁ = n` by (11.8.1).  This is the cardinality
 matching the isometric coherent image (`exists_coherentImage_SHC`, `|R| = |S(HC)|`) to `n`.
 
 The orbit count `|M'{}^{ab}| = w₁·|S(HC)| + 1` and the `n·w₁ = d − 1` arithmetic are discharged by
 `card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq` (sorry-free); the remaining
-`|M'/M''| = d` input is assembled by `card_abelianization_derived_eq_charParam_d` from the two (11.5)/
-(11.7) structural facts threaded here: `hM2` (`M'' = HC`, Peterfalvi (11.5) `S13.secondDerived_eq_HC`)
-and `hHcard` (`|H| = |W₂|^{|W₁|} = p^q`, Peterfalvi (11.7)/(13.2.b) `S13.H_elementaryAbelian`), which
+`|M'/M''| = d` input is assembled by `card_abelianization_derived_eq_charParam_d` from the two
+(11.5)/
+(11.7) structural facts threaded here: `hM2` (`M'' = HC`, Peterfalvi (11.5)
+`S13.secondDerived_eq_HC`)
+and `hHcard` (`|H| = |W₂|^{|W₁|} = p^q`, Peterfalvi (11.7)/(13.2.b) `S13.H_elementaryAbelian`),
+which
 force any chief kernel `N ◁ H` to be trivial (`H/N` has order `p^q = |H|`, so `|N| = 1`).  Both are
 `params`-free and expressed in the §12 `Hypothesis`; they are discharged at the `FeitThompson` layer
 (where `S13` is available).  See `notes/peterfalvi/s13_11_8_orthogonality.md`. -/
@@ -740,7 +744,8 @@ theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
     (hyp.charParam_delta_eq_one hG htype params hmu hδpm) ?_
   -- **The remaining (11.5)/(11.7) gate**: `|M'/M''| = u = d`.  Obtain the §11 chief factor on
   -- `M`, prove its kernel `N = ⊥` from `|H| = |W₂|^{|W₁|}` (any proper chief kernel would make
-  -- `|H/N| < |H|`), then assemble `|M'{}^{ab}| = d` via `card_abelianization_derived_eq_charParam_d`.
+  -- `|H/N| < |H|`), then assemble `|M'{}^{ab}| = d` via
+  -- `card_abelianization_derived_eq_charParam_d`.
   have hnt : TypePNontrivialCore M hyp.typeP :=
     typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG

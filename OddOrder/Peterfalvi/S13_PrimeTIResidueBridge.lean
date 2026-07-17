@@ -82,7 +82,8 @@ noncomputable def Hypothesis.residueS [Finite G] (hyp : Hypothesis (G := G))
 
 /-! ## Support-set relation: honest `A(S)` `⊆` the deprecated `typePA` over-claim (issue 9008)
 
-The `(13.18)` support pin `S15.Hypothesis.tauS_mu_row0_diff_support` places the `μ`-column difference
+The `(13.18)` support pin `S15.Hypothesis.tauS_mu_row0_diff_support` places the `μ`-column
+difference
 support inside `honestTypeP2A0Set = honestTypeP2ASet ∪ V^S`, whose `A`-part
 `honestTypeP2ASet = centralizerSupport (M_σ^#) S'` is the **honest** Peterfalvi (8.10)/(13.2.e)
 type-`P₂` support (indexed over the *core* `M_σ^#`; issue 9008 Option A).  The old
@@ -114,14 +115,17 @@ theorem honestTypeP2ASet_subset_typePA {M : Subgroup G}
 
 /-! ## A type-`P₂`-usable `Hypothesis46` constructor (issue 9076, char-endgame shared infra)
 
-`§12.Hypothesis.toHypothesis46` (S12_Core:1088) builds a §6 `Hypothesis46 (typePA M) M` **only from a
+`§12.Hypothesis.toHypothesis46` (S12_Core:1088) builds a §6 `Hypothesis46 (typePA M) M` **only from
+a
 `S12.Hypothesis M`**, which requires the type-III/IV/V (`IsTypeP1`) Dade datum — unavailable for a
 type-`P₂` maximal.  `hypothesis46OfTypePData` below is the type-uniform version: it takes the Dade
 datum (the `A₀`-Dade `dade0` and its `HConjInvariant`) and the (4.6.c) kernel-family subgroup `subH`
 **as parameters**, and assembles the `Hypothesis46` from any `TypePData M` (structural `tic`/`W₁`/`W₂`
 reconciliation done here, type-uniformly).  A type-`P₂` caller (e.g. lane-c's `S15_HonestTypeP2A0`)
-instantiates it with `A = honestTypeP2ASet M`, `dade0 = dadeHypS0`, `subH = M_σ` (for which `A_covers`
-holds, `honestTypeP2ASet = ⋃_{z∈M_σ#} C_{S'}(z)#`), unblocking the (13.18) `certainTypeDiffSupported`
+instantiates it with `A = honestTypeP2ASet M`, `dade0 = dadeHypS0`, `subH = M_σ` (for which
+`A_covers`
+holds, `honestTypeP2ASet = ⋃_{z∈M_σ#} C_{S'}(z)#`), unblocking the (13.18)
+`certainTypeDiffSupported`
 / `certainType_diff_dade_eq` residue facts.  Mirrors `toHypothesis46` field-for-field, with the Dade
 and `subH` hoisted to parameters. -/
 open scoped FiniteInduce in

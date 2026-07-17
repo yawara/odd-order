@@ -12,7 +12,8 @@ import OddOrder.Peterfalvi.S07_RetargetScaled
 This file provides `retarget_isCoherent_of_extensionImage_k`, the `‖χ‖² ≠ 1` analogue of
 `retarget_isCoherent_of_extensionImage` (`S08_CoherenceCorePart1`).  The construction is identical —
 the new pair `{χ, χ̄}` is mapped to the **corrected extension image** `X := τ(χ − a·χ₁) + a·νχ₁`
-(both terms integral), making the (5.6.2) image equation `himg` definitional — but every inner-product
+(both terms integral), making the (5.6.2) image equation `himg` definitional — but every
+inner-product
 identity is kept **symbolic** in `⟨χ,χ⟩` / `⟨χ̄,χ̄⟩` instead of hard-coding `= 1`:
 
 * `‖τ(χ − a·χ₁)‖² = ⟨χ,χ⟩ + a²` (was `1 + a²`);

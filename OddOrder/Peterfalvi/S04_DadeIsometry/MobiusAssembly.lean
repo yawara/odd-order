@@ -54,7 +54,8 @@ size:
     `∑_{C ∈ ℬ} h(rep C) = ∑_{B ⊆ A} h(B) / |orbit B|`.
 
 Each orbit `O` contributes `∑_{B ∈ O} h(B)/|orbit B| = |O| · h(rep)/|O| = h(rep)` (the numerator is
-orbit-constant and `|orbit B| = |O|` throughout `O`); partitioning the powerset sum into orbit fibers
+orbit-constant and `|orbit B| = |O|` throughout `O`); partitioning the powerset sum into orbit
+fibers
 (`Finset.sum_fiberwise_of_maps_to` along `Quotient.mk''`) collapses it to the transversal sum.  This
 realizes the `1/|L:N_L(B)|` weight of (2.10) (`card_orbit_mul_card_setLStabilizer`). -/
 theorem sum_transversalRep_eq_sum_div_orbit

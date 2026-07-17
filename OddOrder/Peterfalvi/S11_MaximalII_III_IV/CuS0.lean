@@ -3,7 +3,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.InertiaLift
 /-!
 # TAIL
 
-Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.CuS0` (2000-line limit, issue 0103 第 2
+パス).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -110,7 +111,8 @@ theorem inertia_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIII
   inertia_inf_uInHu_le_cInHu_of_realized data chief (caseB_inertia_realized hcaseB hθbar)
 
 /-- **Peterfalvi (9.8.d) hard inertia direction: `I(θ₁₀) ⊓ U ≤ C_U(S₀)`.**  For a chief-factor
-character `θ₁` nontrivial on the orbit generator `S₀ = H₁` (`hreg` on `caseA.S0`), any `U`-element in
+character `θ₁` nontrivial on the orbit generator `S₀ = H₁` (`hreg` on `caseA.S0`), any `U`-element
+in
 the inertia of the inflation `θ₁₀` centralizes `S₀`, hence lies in `C_U(S₀) = cuInHu`.  The
 single-factor analog of `inertia_inf_uInHu_le_cInHu`: same `conjBy → compHom → mk'`-injective
 unwrapping (`conjBy_compHom_hInHuEquivH`, `compHom_typeP_conjAction_inflation`,
@@ -165,7 +167,8 @@ theorem inertia_inf_uInHu_le_cuInHu [Finite G] {M : Subgroup G} {data : TypesIII
   exact ⟨_, ⟨a, hker, rfl⟩, rfl⟩
 
 /-- **Peterfalvi (9.8.d): the `S₀`-summand decomposition `H̄ = S₀ ⊕ W`.**  The abelian chief factor
-`H̄ = H/H₀` is an elementary abelian `p`-group on which `U` acts coprimely (`|U| ⟂ |H̄|`), so operator
+`H̄ = H/H₀` is an elementary abelian `p`-group on which `U` acts coprimely (`|U| ⟂ |H̄|`), so
+operator
 Maschke (`exists_aInvariant_complement_of_isElementaryAbelian`) splits the `U`-invariant order-`p`
 factor `S₀ = caseA.S0` off: there is a `U`-invariant complement `W` (`= H₂…H_q` in Peterfalvi's
 notation) with `S₀ ⊓ W = ⊥`, `S₀ ⊔ W = ⊤`.  This is the *fresh* decomposition (distinct from the
@@ -348,7 +351,8 @@ theorem caseA_exists_summand_join_complement_S0 [Finite G] {M : Subgroup G}
 
 /-- **Peterfalvi (9.8.d) easy inertia direction `C_U(S₀) ⊆ I_{HU}(θ₁₀)`, given an `S₀`-summand
 decomposition.**  For a `U`-invariant complement `W` of `S₀` (`S₀ ⊔ W = ⊤`) and a chief-factor
-character `θ₁ = θbar` **trivial on `W`**, every `C_U(S₀) = cuInHu`-element fixes the inflation `θ₁₀`.
+character `θ₁ = θbar` **trivial on `W`**, every `C_U(S₀) = cuInHu`-element fixes the inflation
+`θ₁₀`.
 The realized easy half of the (9.8.d) inertia lift (mirror of `cInHu_le_inertia`, but where the
 `C`-element acts trivially on *all* of `H̄`, here the `C_U(S₀)`-element acts trivially on `S₀` and
 merely preserves `W`).  The algebraic heart is `mulAut_fixes_char_of_id_on_summand_triv_complement`:
@@ -391,7 +395,8 @@ theorem cuInHu_le_inertia_of_complement_triv [Finite G] {M : Subgroup G}
       = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x :=
     mulAut_fixes_char_of_id_on_summand_triv_complement (uActionHom data chief a') caseA.S0 W
       hsup hid hWpres θbar htriv
-  -- `uActionHom a' = quotientMulAutHom w` (`uActionHom = quotientMulAutHom ∘ subtype`; `subtype a' = w`)
+  -- `uActionHom a' = quotientMulAutHom w` (`uActionHom = quotientMulAutHom ∘ subtype`;
+  -- `subtype a' = w`)
   have huaw : uActionHom data chief a' = quotientMulAutHom chief.N_aInvariant w := by
     rw [show uActionHom data chief a'
         = quotientMulAutHom chief.N_aInvariant
@@ -454,7 +459,8 @@ theorem inertia_eq_hcuInHu_of_easy_le [Finite G] {M : Subgroup G} {data : TypesI
 decomposition and `θ₁ = θbar` supported on `S₀` (nontrivial on `S₀`, trivial on the complement `W`).
 Combines the proven hard direction (`inertia_inf_uInHu_le_cuInHu`) with the easy direction
 (`cuInHu_le_inertia_of_complement_triv`) through the assembly `inertia_eq_hcuInHu_of_easy_le`.  The
-index of `H·C_U(S₀)` in `HU` is `a` (`index_hcuInHu_eq_caseA_a`), so the source `θ₁·λ` has degree `a`
+index of `H·C_U(S₀)` in `HU` is `a` (`index_hcuInHu_eq_caseA_a`), so the source `θ₁·λ` has degree
+`a`
 and its `M`-induction degree `qa`. -/
 theorem inertia_eq_hcuInHu [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
@@ -481,7 +487,8 @@ theorem inertia_eq_hcuInHu [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup
 **nontrivial on `S₀`** (`hreg`) and **trivial on `W`** (`htriv`) — precisely the input feeding
 `inertia_eq_hcuInHu`.  This realizes Peterfalvi's `θ₁ ∈ Irr(H̄/(H₂…H_q))`, `θ₁ ≠ 1`.  Construction:
 `H̄/W` has order `p` (`W` complements the order-`p` `S₀`), hence is cyclic with a nontrivial
-character `χ̄` (`exists_ne_one_hom_of_prime_card`); pulling `χ̄` back along `mk' W` gives `θ₁`, which
+character `χ̄` (`exists_ne_one_hom_of_prime_card`); pulling `χ̄` back along `mk' W` gives `θ₁`,
+which
 kills `W` and is nontrivial on `S₀` because `S₀` surjects onto `H̄/W` (`S₀ ⊔ W = ⊤`). -/
 theorem exists_source_char_caseA [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -548,7 +555,8 @@ theorem exists_source_char_caseA [Finite G] {M : Subgroup G}
 `S₀`-summand decomposition (`chiefFactor_caseA_S0_complement`), the source character
 (`exists_source_char_caseA`), and the full inertia lift (`inertia_eq_hcuInHu`): there is a
 chief-factor character `θ₁ = θbar`, nontrivial on `S₀`, whose inflation `θ₁₀`'s inertia in `HU` is
-exactly `H·C_U(S₀)`.  Since `[HU : H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`), the `HU`-induction of
+exactly `H·C_U(S₀)`. Since `[HU : H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`), the `HU`-induction
+of
 `θ₁·λ` (for any `λ ∈ Irr(C_U(S₀)/U')`) from `H·C_U(S₀)` is an irreducible source character of degree
 `a`, and its `M`-induction has degree `qa` — the (9.8.d) degree-`qa` members of `𝒮(H₀U')`.  This
 packages the honest inertia content of (9.8.d); the `θ₁·λ` construction and count consume it. -/
@@ -575,14 +583,16 @@ from `H` to `H·C_U(S₀) = H ⋊ C_U(S₀)` (`C_U(S₀)` is *not* normal — on
 extension as a homomorphism `hcuThetaHom : H·C_U(S₀) →* ℂˣ` via `SemidirectProduct.lift`: on the
 normal factor `H` it is the seed hom `θ ∘ mk'(N) ∘ hInHuEquivH`, on the complement `C_U(S₀)` it is
 trivial (the `λ`-factor is added separately as `hcuLambdaHom`).  The `lift` compatibility
-`fn(c·h·c⁻¹) = fn(h)` is exactly the `C_U(S₀)`-invariance of `θ₀` (`cuInHu_le_inertia_of_complement_triv`),
+`fn(c·h·c⁻¹) = fn(h)` is exactly the `C_U(S₀)`-invariance of `θ₀`
+(`cuInHu_le_inertia_of_complement_triv`),
 made available at hom level because the codomain `ℂˣ` is abelian.  The pair
 `θ₁·λ = hcuThetaHom · (hcuLambdaHom λ)` restricts to `θ₀` on `H` (the `λ`-factor dies there), so the
 inertia lift `inertia_eq_hcuInHu` transfers verbatim and `Ind_{H·C_U(S₀)}^{HU}(θ₁·λ)` is irreducible
 of degree `[HU : H·C_U(S₀)] = a` (`index_hcuInHu_eq_caseA_a`), whence `Ind_{HU}^M` has degree `qa`. -/
 
 /-- **`H` and `C_U(S₀)` are complementary inside `H·C_U(S₀)`** (`IsComplement'` of the two
-`subgroupOf`-realizations in the join): `H ⊓ C_U(S₀) = ⊥` (`hInHu_inf_cuInHu_eq_bot`) gives disjointness,
+`subgroupOf`-realizations in the join): `H ⊓ C_U(S₀) = ⊥` (`hInHu_inf_cuInHu_eq_bot`) gives
+disjointness,
 `H ⊔ C_U(S₀)` is the whole ambient by construction.  This is the complement input to
 `SemidirectProduct.mulEquivSubgroup`, exhibiting `H·C_U(S₀) ≃* H ⋊[φ] C_U(S₀)`. -/
 theorem hInHu_isComplement'_cuInHu_in_hcuInHu [Finite G] {M : Subgroup G}
@@ -615,7 +625,8 @@ noncomputable def hcuSeedHom [Finite G] {M : Subgroup G}
 the seed hom `θ ∘ mk'(N) ∘ hInHuEquivH` from the normal factor `H` to `H·C_U(S₀)`, trivial on the
 complement `C_U(S₀)`.  Built by `SemidirectProduct.lift` (through the complement iso
 `hInHu_isComplement'_cuInHu_in_hcuInHu`); the `lift` `φ`-compatibility `fn(φ(c) h) = fn(h)` is the
-`C_U(S₀)`-invariance of `θ₀` (`hinv`, supplied by `cuInHu_le_inertia_of_complement_triv`), using that
+`C_U(S₀)`-invariance of `θ₀` (`hinv`, supplied by `cuInHu_le_inertia_of_complement_triv`), using
+that
 the codomain `ℂˣ` is abelian (`MulAut.conj = 1`).  Restricts to `θ₀` on `H`
 (`hcuThetaHom_inclusion_hInHu`). -/
 noncomputable def hcuThetaHom [Finite G] {M : Subgroup G}
@@ -666,7 +677,8 @@ noncomputable def hcuThetaHom [Finite G] {M : Subgroup G}
 
 /-- **`hcuThetaHom` restricts to `θ₀` on `H`**: on the inclusion of `h ∈ H` into `H·C_U(S₀)`, the
 extension returns the seed value `hcuSeedHom θ h`.  Via `SemidirectProduct.lift_inl` after
-`(mulEquivSubgroup).symm (inclusion h) = inl h` (the complement iso sends the normal factor to `inl`).
+`(mulEquivSubgroup).symm (inclusion h) = inl h` (the complement iso sends the normal factor to
+`inl`).
 This is the single-factor analog of `hcHom_inclusion`, feeding the restriction-inertia argument. -/
 theorem hcuThetaHom_inclusion_hInHu [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -702,7 +714,8 @@ theorem hcuThetaHom_inclusion_hInHu [Finite G] {M : Subgroup G}
 
 /-- **The (9.8.d) pair hom `θ₁·λ : H·C_U(S₀) →* ℂˣ`**: the product of the `θ₀`-extension `hcuThetaHom`
 (the single-factor analog of the `θ`-inflation, restricting to `θ₀` on `H`) and the `λ`-lift
-`hcuLambdaHom λ` (trivial on `H`).  On `H` it agrees with `hcuThetaHom` (= `θ₀`) alone; on `C_U(S₀)` it
+`hcuLambdaHom λ` (trivial on `H`). On `H` it agrees with `hcuThetaHom` (= `θ₀`) alone; on `C_U(S₀)`
+it
 is `λ` (the extension is trivial there by construction).  Mirror of `hcPairHom`, single-factor. -/
 noncomputable def hcuPairHom [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -733,7 +746,8 @@ noncomputable def hcuPsiPair [Finite G] {M : Subgroup G}
   linearIrreducibleCharacter (hcuPairHom caseA θ hinv lam)
 
 /-- **`ψ_{θ₁,λ}|_hInHu = θ₀`** (pointwise): on the inclusion of `h ∈ H` the pair character equals the
-seed's inflation `θ₀`.  The `λ`-factor dies (`hcuLambdaHom_eq_one_of_mem_hInHu`) and the `θ`-factor is
+seed's inflation `θ₀`. The `λ`-factor dies (`hcuLambdaHom_eq_one_of_mem_hInHu`) and the `θ`-factor
+is
 the extension's restriction (`hcuThetaHom_inclusion_hInHu`), which by
 `compHom_linearIrreducibleCharacter` is exactly the ClassFunction seed `θ₀`.  Same right-hand side as
 the seed of `inertia_eq_hcuInHu`, so the restriction-inertia argument applies to the pair verbatim. -/
@@ -796,7 +810,8 @@ theorem hcuPsiPair_inertia_le [Finite G] {M : Subgroup G}
   congr 1
 
 /-- **`inertia(ψ_{θ₁,λ}) = H·C_U(S₀)`** (Peterfalvi (9.8.d)): with the seed inertia
-`inertia(θ₀) = H·C_U(S₀)` (`inertia_eq_hcuInHu` for `θ` nontrivial on `S₀`, trivial on the complement),
+`inertia(θ₀) = H·C_U(S₀)` (`inertia_eq_hcuInHu` for `θ` nontrivial on `S₀`, trivial on the
+complement),
 the pair character's `HU`-inertia is exactly `H·C_U(S₀)`.  Single-factor mirror of
 `hcPsiPair_inertia_eq_hc`.  Feeds `isIrreducibleCharacter_induce_of_inertia_eq` for the degree-`a`
 irreducible. -/
@@ -852,7 +867,8 @@ theorem hcuZetaPair_irreducible [Finite G] {M : Subgroup G}
     (hcuPsiPair_inertia_eq_hcu caseA θ hinv lam hθ₀)
 
 /-- **`ζ_{θ₁,λ}(1) = a`** (Peterfalvi (9.8.d), source degree): the induced source character has degree
-`[HU : H·C_U(S₀)] · ψ(1) = a · 1 = a`, since `ψ_{θ₁,λ}` is linear (`ClassFunction.induce_apply_one` +
+`[HU : H·C_U(S₀)] · ψ(1) = a · 1 = a`, since `ψ_{θ₁,λ}` is linear (`ClassFunction.induce_apply_one`
++
 `index_hcuInHu_eq_caseA_a`).  The `M`-induction then has degree `q·a` (`hcuZetaPair_induceHU_apply_one`). -/
 theorem hcuZetaPair_apply_one [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -896,7 +912,8 @@ theorem hcuZetaPair_induceHU_apply_one [Finite G] {M : Subgroup G}
   rw [induceHU_apply_one_eq_q_mul, hcuZetaPair_apply_one, Nat.cast_mul]
 
 /-- **`hcuSeedHom`-invariance from the `C_U(S₀)`-inertia of `θ₀`** (Peterfalvi (9.8.d)): the
-`ClassFunction`-level invariance `conjBy c θ₀ = θ₀` (available as `cuInHu_le_inertia_of_complement_triv`)
+`ClassFunction`-level invariance `conjBy c θ₀ = θ₀` (available as
+`cuInHu_le_inertia_of_complement_triv`)
 descends to the hom-level invariance `hinv` required by `hcuThetaHom`, because `θ₀` is the
 `linearClassFunction` of `hcuSeedHom θ` (via `compHom_linearIrreducibleCharacter`) and the coercion
 `ℂˣ → ℂ` is injective.  This bridges the substrate to the extension construction. -/
@@ -934,9 +951,11 @@ theorem hcuSeedHom_invariance_of_cuInHu_le_inertia [Finite G] {M : Subgroup G}
   simpa only [hcuSeedHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom] using hval
 
 /-- **Peterfalvi (9.8.d) source character in hom form**: the hom-level version of
-`exists_source_char_caseA`.  There is a homomorphism `θ : H̄ →* ℂˣ` and an `S₀`-summand complement `W`
+`exists_source_char_caseA`. There is a homomorphism `θ : H̄ →* ℂˣ` and an `S₀`-summand complement
+`W`
 such that `linearIrreducibleCharacter θ` is nontrivial on `S₀`, trivial on `W`, and `W` is
-`U`-invariant with `S₀ ⊔ W = ⊤`.  Same construction as `exists_source_char_caseA` (nontrivial character
+`U`-invariant with `S₀ ⊔ W = ⊤`. Same construction as `exists_source_char_caseA` (nontrivial
+character
 of the order-`p` quotient `H̄/W` pulled back along `mk' W`), but returning the underlying hom so the
 extension `hcuThetaHom` and the `hcuSeedHom`-invariance can be built. -/
 theorem exists_source_char_hom_caseA [Finite G] {M : Subgroup G}
@@ -1064,13 +1083,15 @@ theorem exists_source_char_hom_caseA_nonRegular [Finite G] {M : Subgroup G}
 
 /-- **Peterfalvi (9.8.d): the degree-`qa` irreducible character of `HU`/`M`.**  Fully assembling the
 (9.8.d) construction: there is a homomorphism `θ` (nontrivial on `S₀`), an `S₀`-summand complement
-`W`, and — for any `λ ∈ Irr(C_U(S₀))` — the pair character `θ₁·λ` on `H·C_U(S₀)` whose `HU`-induction
+`W`, and — for any `λ ∈ Irr(C_U(S₀))` — the pair character `θ₁·λ` on `H·C_U(S₀)` whose
+`HU`-induction
 `ζ_{θ₁,λ}` is **irreducible** of degree `[HU : H·C_U(S₀)] = a` (`hcuZetaPair_irreducible` +
 `hcuZetaPair_apply_one`), and whose `M`-induction `Ind_{HU}^M ζ_{θ₁,λ}` has degree `q·a = qa`
 (`hcuZetaPair_induceHU_apply_one`).  The inertia hypotheses are discharged from the substrate:
 `exists_source_char_hom_caseA` supplies `θ`/`W`, `inertia_eq_hcuInHu` gives
 `inertia(θ₀) = H·C_U(S₀)`, and `hcuSeedHom_invariance_of_cuInHu_le_inertia` (via
-`cuInHu_le_inertia_of_complement_triv`) gives the extension's compatibility `hinv`.  This packages the
+`cuInHu_le_inertia_of_complement_triv`) gives the extension's compatibility `hinv`. This packages
+the
 honest source-character content of (9.8.d); the `Ind_{HU}^M`-irreducibility (`W₁`-free-orbit
 propagation) and the `𝒮(H₀U')`-membership/count consume it. -/
 theorem caseA_exists_irreducible_source_degree_qa [Finite G] {M : Subgroup G}
@@ -1236,7 +1257,8 @@ noncomputable def clifford_caseB_data [Finite G] {M : Subgroup G}
 /-- **Peterfalvi (9.7) case (a) carrier.**  When `H̄` contains a `U`-invariant order-`p` factor `S₀`
 (Clifford case (a), the right branch of `chiefFactor_clifford_U_dichotomy`), the chief factor splits
 as the internal direct product of `q = |W₁|` order-`p` factors — the `U W₁`-orbit of `S₀`, packaged
-as a `Fin q`-family via the `SupIndep` partition of `exists_supIndep_aInvariant_family_of_iSup` — and
+as a `Fin q`-family via the `SupIndep` partition of `exists_supIndep_aInvariant_family_of_iSup` —
+and
 the `U`-action on `S₀` has image of order `a ∣ p - 1` (`aInvariantRestrictAut_range_card_dvd`). -/
 noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -1299,7 +1321,8 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
   rwa [hS₀card] at hdvd
 
 /-- **`|S₀| = p`**: the orbit generator `S₀` (`CliffordCaseAData.S0`) has order `p`.  Each summand
-`Hpart j = φ(orbitRep j) • S₀` (`Hpart_orbit`) is an automorphic image of `S₀` under the chief-factor
+`Hpart j = φ(orbitRep j) • S₀` (`Hpart_orbit`) is an automorphic image of `S₀` under the
+chief-factor
 action `φ = quotientMulAutHom`, hence has the same order (`card_pointwise_smul`), which is `p`
 (`Hpart_order`).  A foundational input for the (9.8.c) constant-factor-data construction (`S₀ ≅ ℤ/p`
 has exactly `p` characters, `p-1` of them nontrivial). -/
@@ -1534,9 +1557,11 @@ theorem caseA_induceHU_inj_of_reducible [Finite G] {M : Subgroup G}
   exact ClassFunction.mem_inertia.mp (by rw [hinertia]; exact Subgroup.mem_top g)
 
 /-- **A nonempty left-translation-closed subset of a group is everything.**  If `T` is nonempty and
-closed under left multiplication by *every* group element (`∀ a b, b ∈ T → a·b ∈ T`), then `T = univ`
+closed under left multiplication by *every* group element (`∀ a b, b ∈ T → a·b ∈ T`), then
+`T = univ`
 (any `w = (w·t⁻¹)·t ∈ T`).  The `W₁`-transitivity core of the (9.8.c) surjectivity route: the set of
-`W₁`-conjugates `S₀^w` on which a constituent `θ̄₀` is nontrivial is `W₁`-translation-invariant (from
+`W₁`-conjugates `S₀^w` on which a constituent `θ̄₀` is nontrivial is `W₁`-translation-invariant
+(from
 `M`-invariance of the reducible constituent) — so if nonempty (`H ⊄ ker`) it is *all* conjugates,
 making `θ̄₀` regular.  Since the `W₁`-conjugates are indexed by `W₁` itself with `W₁` acting by
 translation, transitivity is free (no producer `W₁`-permutation is needed). -/
@@ -1549,7 +1574,8 @@ theorem eq_univ_of_nonempty_of_mul_mem_left {W : Type*} [Group W] {T : Set W}
 
 /-- **`Ū`-invariance of nontriviality on any `U`-invariant subgroup**: for a `U`-invariant subgroup
 `K ≤ H̄` (`IsAInvariant (uActionHom data chief) K`), a character `θ` is nontrivial on `K` iff its
-`U`-translate `θ ∘ φ_U(a)` is.  Since `φ_U(a)` restricts to a bijection of `K` (`hK`, invertible), the
+`U`-translate `θ ∘ φ_U(a)` is. Since `φ_U(a)` restricts to a bijection of `K` (`hK`, invertible),
+the
 two restrictions have the same triviality.  Generalises `caseA_uActionHom_comp_subtype_eq_one_iff`
 (the `Hpart i` case) to any `U`-invariant `K` — used on the `W₁`-conjugates `q(w) • S₀` (also
 `U`-invariant, `U ◁ U W₁`) in the (9.8.c) surjectivity regularity argument. -/
@@ -1589,7 +1615,8 @@ theorem caseA_uActionHom_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
   comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant (caseA.Hpart_aInvariant i) a θ
 
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
-Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
+Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w`
+(`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
 internal-direct-product bijection to `exists_regular_char_of_bijective`. -/
 theorem clifford_caseA_exists_regular_char_on_conjugates [Finite G] {M : Subgroup G}
@@ -1689,7 +1716,8 @@ theorem clifford_caseA_exists_regular_char_not_fixed [Finite G] {M : Subgroup G}
 Applies the generic inertia lift `inertia_eq_hcInHu_gen` to the `W1`-conjugate family
 `{act.φ↑w • S₀}_{w∈W1}`: each is `U`-invariant (since `S₀` is and `U ◁ UW1`, so `U` fixes each
 conjugate as a subgroup), they span `H̄` by (9.7), and have order `p`.  For a character nontrivial on
-each (a regular character), its inflation `θ₀` has inertia `HC` in `HU` — the `I_HU = HC` step toward
+each (a regular character), its inflation `θ₀` has inertia `HC` in `HU` — the `I_HU = HC` step
+toward
 the degree-`qu` irreducible of (9.8.c). -/
 theorem clifford_caseA_regular_inertia_hc [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)

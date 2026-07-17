@@ -11,7 +11,8 @@ import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 **Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000),
 §4, p. 24, statement (4.9)(a).
 
-The (4.9)(a) argument relates the **complex conjugate** of a certain-type column character to another
+The (4.9)(a) argument relates the **complex conjugate** of a certain-type column character to
+another
 column: `μ̄_j = μ_{j'}` with `j' ≠ j` (because `j ≠ 0` and `|W|` is odd).  The bridge is the σ-side
 Galois equivariance (3.9): conjugation is the cyclotomic automorphism `z ↦ z̄`, so `(ω_{ij}^σ)̄ =
 (ω̄_{ij})^σ`, and `ω̄_{ij}` is again a grid character `ω_{i'j'}` (the conjugate of a linear character
@@ -275,7 +276,8 @@ theorem column_inv_ne_self (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   exact orderOf_eq_one_iff.mp h1
 
 /-- **Peterfalvi (4.9)(a), `μ̄_k ≠ μ_k`.**  For a nontrivial column `χ₂`, the conjugate column
-`μ̄_k = μ_{k'}` (`certainType_columnSum_conj`, `k' = χ₂⁻¹`) is a **different** certain-type character:
+`μ̄_k = μ_{k'}` (`certainType_columnSum_conj`, `k' = χ₂⁻¹`) is a **different** certain-type
+character:
 `χ₂⁻¹ ≠ χ₂` (`column_inv_ne_self`, `|W|` odd) makes the two column sums orthogonal
 (`columnFamily_mu_sum_inner`), so `⟨μ̄_k, μ_k⟩ = 0 ≠ w₁ = ‖μ_k‖²`.  This is the nonvanishing
 `0 ≠ μ̄_k − μ_k ∈ Z[T, A]` input to the (4.9)(a) coherence (`IsCoherent.nonzero`). -/

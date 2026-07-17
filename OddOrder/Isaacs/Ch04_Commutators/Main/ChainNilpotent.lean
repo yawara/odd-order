@@ -3,7 +3,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 /-!
 # Isaacs §4C Thm 4.24 — faithful chain action ⇒ A nilpotent
 
-Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue
+0103).
 -/
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement
@@ -203,7 +204,8 @@ private lemma actionCommutatorInfty_isAInvariant
   -- Strategy: actionCommutatorInfty φ = ⁅⊤, lowerCentralSeriesInfty⁆ "viewed in G" via the action.
   -- Use the fact that the generating set
   -- {g * (φ a) g⁻¹ : g ∈ G, a ∈ A^∞}
-  -- is invariant under φ b for b ∈ A: (φ b) (g * (φ a) g⁻¹) = (φ b) g * (φ (b * a * b⁻¹)) ((φ b) g)⁻¹,
+  -- is invariant under φ b for b ∈ A: (φ b) (g * (φ a) g⁻¹) = (φ b) g * (φ (b * a * b⁻¹)) ((φ b)
+  -- g)⁻¹,
   -- and b * a * b⁻¹ ∈ A^∞ because A^∞ is characteristic (hence normal) in A.
   apply OddOrder.Isaacs.Ch03.IsAInvariant.closure_of_invariant_set
   intro b
@@ -387,7 +389,8 @@ private theorem commutator_actionCommutatorInfty_actionCommutator_eq_bot
     -- this : (actionCommutator (φ.comp ((lowerCentralSeriesInfty A).subtype))).map inl =
     --        ⁅XG, ((SemidirectProduct.inr).comp (lowerCentralSeriesInfty A).subtype).range⁆
     -- We want LHS = (actionCommutatorInfty φ).map inl, which is the same since
-    -- actionCommutatorInfty φ := actionCommutator (phiInfty φ) := actionCommutator (φ.comp subtype).
+    -- actionCommutatorInfty φ := actionCommutator (phiInfty φ) := actionCommutator (φ.comp
+    -- subtype).
     exact this.symm
   rw [h_YinfA_XG_eq, hGA_inl, ← Subgroup.map_commutator] at h_three
   exact (Subgroup.map_eq_bot_iff_of_injective _ SemidirectProduct.inl_injective).mp h_three

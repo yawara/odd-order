@@ -34,11 +34,15 @@ variable [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)]
 /-! ### `tau3`: the real Dade σ-integral on `W = tp.W` (cd piece 5)
 
 The integral character map `τ₃ : ClassFunction ↥tp.W →ₗ[ℤ] ClassFunction G` is the Peterfalvi (3.2)
-σ-isometry of the **G-internal TI-cyclic structure** on `W = S ∩ T = mp.K ⊔ mp.Kstar`, supported on the
-regular set `Ẑ = W \ (W₁ ∪ W₂)` (`= S14.zTilde mp.K mp.Kstar`).  It must be the genuine Dade map (not a
-formal one): `η := τ₃ ∘ ω` is consumed downstream as a real virtual character (notes 更新¹⁷).  The TI-set
+σ-isometry of the **G-internal TI-cyclic structure** on `W = S ∩ T = mp.K ⊔ mp.Kstar`, supported on
+the
+regular set `Ẑ = W \ (W₁ ∪ W₂)` (`= S14.zTilde mp.K mp.Kstar`). It must be the genuine Dade map (not
+a
+formal one): `η := τ₃ ∘ ω` is consumed downstream as a real virtual character (notes 更新¹⁷). The
+TI-set
 fact is read off the proven `BG §14 typeP_duality` (Theorem 14.7), and the Dade isometry from the
-general §4 producer `S04.Hypothesis.fullDadeIsometryData` (all local `H(a) = ⊥`, so `HConjInvariant` is
+general §4 producer `S04.Hypothesis.fullDadeIsometryData` (all local `H(a) = ⊥`, so `HConjInvariant`
+is
 automatic).  Named `tau3W` to avoid the `Section16CharacterData.tau3` field projection. -/
 
 /-- The **G-internal TI-cyclic structure (3.1)** on `W = S ∩ T = mp.K ⊔ mp.Kstar`, supported on

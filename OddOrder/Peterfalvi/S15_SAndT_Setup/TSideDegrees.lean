@@ -258,7 +258,8 @@ theorem Hypothesis.card_Q_eq_qp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       rw [base12.typeP.card_W1_eq_derived_index,
         hyp.W2_isComplement_T_deriv.symm.index_eq_card,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2T).toEquiv, ← hyp.p_eq_card_W2]
-    -- `w₂ = q`: the dual-factor bridge `|M_σ(T) ⊓ C(W₂)| = |typeP.W2|` against `W₁ = M_σ(T) ⊓ C(W₂)`
+    -- `w₂ = q`: the dual-factor bridge `|M_σ(T) ⊓ C(W₂)| = |typeP.W2|` against
+    -- `W₁ = M_σ(T) ⊓ C(W₂)`
     have hw2 : base12.w2 = hyp.q := by
       change Nat.card ↥base12.typeP.W2 = hyp.q
       haveI : IsCyclic ↥hyp.W2 := by

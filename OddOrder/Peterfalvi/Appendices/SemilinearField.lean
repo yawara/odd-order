@@ -21,7 +21,8 @@ and let `T ⊴ U` be a *cyclic normal* subgroup acting *irreducibly* on `E`.
 
 This file establishes the *core* of part (a), stated over an abstract finite simple module `M`
 over the group algebra `k[T]` of a commutative group `T` over a finite field `k` (so as to keep
-the `k[T]`-module instances honest — see `notes/peterfalvi/appendices.md (削除済, git履歴)` session 5 for the
+the `k[T]`-module instances honest — see `notes/peterfalvi/appendices.md (削除済, git履歴)` session 5 for
+the
 instance gotchas that force this abstraction).  The endomorphism ring `D = End_{k[T]}(M)` is:
 
 * a **field** (Schur's Lemma `⟹` division ring, finite `⟹` Wedderburn), `endField`;
@@ -45,7 +46,8 @@ variable {k : Type*} [CommRing k] {T : Type*} [CommGroup T] [Finite T]
 omit [Finite T] in
 /-- `End_{k[T]}(M)` is finite (it injects into the finite function space `M → M`).
 
-⚠ Deliberately **not** a global instance: an unconstrained `Finite (Module.End (MonoidAlgebra k T) M)`
+⚠ Deliberately **not** a global instance: an unconstrained
+`Finite (Module.End (MonoidAlgebra k T) M)`
 instance interferes with `Representation.asModule` `Module`-synthesis when `[IsIrreducible ρ]` is in
 scope (the Schur→Wedderburn chain pulls it into unrelated searches).  Provided locally via `haveI`
 in the theorems that need the field structure. -/

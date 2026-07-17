@@ -233,7 +233,8 @@ theorem actsPrimeOn_Msigma_of_mem_tau13 [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-- A nontrivial cyclic Sylow `p`-subgroup `P` of `E` has `p ∈ τ₁(M) ∪ τ₃(M)`: as `P` is a Sylow
 `p` of `E` and `p ∤ |M_σ|` (since `p ∈ π(E) ⊆ σ(M)'`), `P` is a Sylow `p` of `M`, so
-`r_p(M) = r_p(P) ≤ 1`; with `p ∉ σ(M)` this places `p` in `τ₁ ∪ τ₃` (which is `{p ∉ σ(M), r_p(M)=1}`).
+`r_p(M) = r_p(P) ≤ 1`; with `p ∉ σ(M)` this places `p` in `τ₁ ∪ τ₃` (which is
+`{p ∉ σ(M), r_p(M)=1}`).
 Excludes `τ₂` (which needs `r_p(M)=2`) and supplies the `τ₁ ∪ τ₃` hypothesis of the core lemma. -/
 theorem mem_tau1_union_tau3_of_isCyclic_sylow_E [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
@@ -417,7 +418,8 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
 `le_centralizer_of_forall_prime_isPGroup` reduces `E₁ ≤ C(C_{M_σ}(x))` to: every prime-power
 subgroup `R ≤ E₁` is centralized by `C_{M_σ}(x)`. Picking an order-`r` element `y ∈ R`,
 Theorem 13.4 (with `⟨x⟩ ∈ ℰ_p¹(E)` and `⟨y⟩ ∈ ℰ_r¹(C_E(⟨x⟩))`, valid since `E₁` is abelian) gives
-`C_{M_σ}(x) ⊆ C_{M_σ}(y) = C_{M_σ}(R)` (last equality is `R`'s prime action, Corollary 13.3(a) core),
+`C_{M_σ}(x) ⊆ C_{M_σ}(y) = C_{M_σ}(R)` (last equality is `R`'s prime action, Corollary 13.3(a)
+core),
 so `C_{M_σ}(x) ≤ C(R)`. A general `g ∈ E₁#` reduces to its prime-power `x = g^{ord g / p}` via
 `C(g) ⊆ C(x)`. No explicit Sylow decomposition of `E₁` is needed: the prime-power induction in
 `le_centralizer_of_forall_prime_isPGroup` carries it. -/
@@ -587,7 +589,8 @@ private theorem map_subtype_conj_subgroupOf {U : Subgroup G} (n' : ↥U) (K : Su
 /-- **ℳ-transfer between maximal `q`-subgroups of `N ≤ M`.** If `S` and `S₀` are both maximal
 `q`-subgroups of `N` (`N ≤ M`, `M` maximal in `G`) and `ℳ(S₀) = {M}`, then `ℳ(S) = {M}`. The two
 are conjugate by some `m ∈ N` (Sylow conjugacy inside `↥N`); since `m ∈ M`, conjugation by `m` fixes
-`M`, so the unique maximal over `S₀` transports to the unique maximal over `S`. Used in Lemma 13.6 to
+`M`, so the unique maximal over `S₀` transports to the unique maximal over `S`. Used in Lemma 13.6
+to
 pass from the internal Sylow `S₀ ⊇ X` of the faithful Corollary 12.14 to the arbitrary Sylow `S`. -/
 theorem maximalContaining_eq_singleton_of_maximal_qsubgroup [Finite G]
     {M N S S₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hNM : N ≤ M)
@@ -626,7 +629,8 @@ theorem maximalContaining_eq_singleton_of_maximal_qsubgroup [Finite G]
     rwa [Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def] at h
   set m : G := (g : G) with hm
   have hmN : m ∈ N := g.2
-  -- Push the conjugation down to `G`: `m S₀ m⁻¹ = S` (`•`-form; `map (conj m).toMonoidHom` is defeq).
+  -- Push the conjugation down to `G`: `m S₀ m⁻¹ = S` (`•`-form; `map (conj m).toMonoidHom` is
+  -- defeq).
   have hconj : MulAut.conj m • S₀ = S := by
     have hlhs := map_subtype_conj_subgroupOf g S₀ hS₀N
     rw [← hPS₀, hgsub, hPS, Subgroup.map_subgroupOf_eq_of_le hSN] at hlhs

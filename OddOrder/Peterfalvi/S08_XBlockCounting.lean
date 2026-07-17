@@ -76,8 +76,10 @@ Pick distinct references `χ' ≠ χ` in `X(Zc)` (`2 ≤ |X(Zc)|`, from `two_le_
 (χ'(1)•χ − χ(1)•χ')^{τ₂}` is the τ₂-image of a *supported* (degree-`0`,
 `sMember_smulDiffSupport_of_charValue_eq` — no divisibility needed) integer `X`-combination, and
 `α − β = (η − η')^{τ₁}` the τ₁-image of a supported (equal-degree, `Yset_apply_one`) `Y`-difference;
-the difference-orthogonality `inner_extension_eq_inner_of_supported` (`= 0` by `X ⊥ Y`) and degree-`0`
-`extension_apply_one_eq_zero_of_supported` discharge `hdiff`/`hα1`/`hγδ1`.  The conclusion `⟨α,γ⟩ = 0`
+the difference-orthogonality `inner_extension_eq_inner_of_supported` (`= 0` by `X ⊥ Y`) and
+degree-`0`
+`extension_apply_one_eq_zero_of_supported` discharge `hdiff`/`hα1`/`hγδ1`. The conclusion
+`⟨α,γ⟩ = 0`
 gives the claim by conjugate symmetry. -/
 theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -516,7 +518,8 @@ theorem inner_restrict_extension_Yset_mul_degree_eq_of_frobenius
   exact sub_eq_zero.mp hortho
 
 /-- **Case-(A)/c2 mirror of `inner_restrict_extension_Yset_mul_degree_eq_of_frobenius`.**  Same as
-the Frobenius original, with `hF` replaced by the certain-type case-(A) bundle `cert`/`hK`/`hW1`/`hA`,
+the Frobenius original, with `hF` replaced by the certain-type case-(A) bundle
+`cert`/`hK`/`hW1`/`hA`,
 and the Frobenius adapters replaced by their `_c2_caseA` counterparts. -/
 theorem inner_restrict_extension_Yset_mul_degree_eq_c2_caseA
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -635,7 +638,8 @@ theorem restrict_extension_Yset_degree_value_eq_of_frobenius
   ring
 
 /-- **Case-(A)/c2 mirror of `restrict_extension_Yset_degree_value_eq_of_frobenius`.**  Same as the
-Frobenius original, with `hF` replaced by the certain-type case-(A) bundle `cert`/`hK`/`hW1`/`hA`, and
+Frobenius original, with `hF` replaced by the certain-type case-(A) bundle `cert`/`hK`/`hW1`/`hA`,
+and
 the Frobenius adapters replaced by their `_c2_caseA` counterparts. -/
 theorem restrict_extension_Yset_degree_value_eq_c2_caseA
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -707,7 +711,8 @@ theorem restrict_extension_Yset_degree_value_eq_c2_caseA
 
 /-- **(6.8.1) `η^{τ₁}` is constant on `Zc^#`** (mmd 04.8 L168 conclusion).  For `η ∈ Y`, the
 restriction `Res^G_L(η^{τ₁})` takes the same value at any two points of `Zc^#`.  Immediate from the
-value identity `restrict_extension_Yset_degree_value_eq_of_frobenius` (whose right side `-⟨R,χ₁⟩·|L|`
+value identity `restrict_extension_Yset_degree_value_eq_of_frobenius` (whose right side
+`-⟨R,χ₁⟩·|L|`
 is independent of the point) and `χ₁(1) ≠ 0` (any anchor `χ₁ ∈ X(Zc)`, nonempty).  This is the exact
 "character constant on `Z^#`" hypothesis of the (6.7) adapter `peterfalvi_67_centralCommutator`. -/
 theorem restrict_extension_Yset_const_on_centralCommutator_of_frobenius
@@ -903,10 +908,12 @@ noncomputable def
 
 /-- **(6.6)/(6.8.1), central-`Zc` form (redesign L2 outer shell):** chain-level coherence for
 `X = S − S(Zc)` with the **central** `Zc = Z(H) ∩ H′`, from base-anchor common-index p-power step
-packages.  This replaces `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+packages. This replaces
+`Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
 (which instantiated the general (6.6) consumer at `Z = ⁅H,H⁆`, where the per-step degree field
 `hθsq_le_qtot : θχ² ≤ qtot ≤ |H:⁅H,H⁆|` is *unsatisfiable* for class ≥ 3 `p`-groups — see
-`notes/peterfalvi/s08_6_8_blocker_central_Z.md`).  At the central `Zc` that field is honestly fillable
+`notes/peterfalvi/s08_6_8_blocker_central_Z.md`). At the central `Zc` that field is honestly
+fillable
 by [Is] Cor 2.30 (`exists_source_primePow_centralBound_of_mem_Xset`), so the `hstepData` hypothesis
 is satisfiable here — the remaining work is to *construct* it (the producer monolith).  `hX` is
 discharged Z-generically (`isIrreducibleCharacter_of_mem_Xset_of_frobenius`) and `hXne` from `H`
@@ -1330,7 +1337,8 @@ theorem restrict_extension_Yset_charValue_cong_of_frobenius
 
 open scoped OddOrder.AlgInt in
 /-- **Case-(A)/c2 mirror of `restrict_extension_Yset_charValue_cong_of_frobenius`.**  Same as the
-Frobenius original, with `hF` replaced by the certain-type case-(A) bundle `cert`/`hK`/`hW1`/`hA`, and
+Frobenius original, with `hF` replaced by the certain-type case-(A) bundle `cert`/`hK`/`hW1`/`hA`,
+and
 the Frobenius adapters replaced by their `_c2_caseA` counterparts. -/
 theorem restrict_extension_Yset_charValue_cong_c2_caseA
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -1398,7 +1406,8 @@ This is the (6.7) divisibility step.  The value identity
 `z ∈ Zc^#` (`R = Res^G_L(η^{τ₁})`); with `χ₁(1) = a|W₁|` and `|L| = |H|·|W₁|`
 (`index_H_eq_card_W1` + `index_mul_card`) it becomes `a·(R(z)−R(1)) = −c·|H|`, i.e.
 `(R(z)−R(1))/|H| = −c/a`.  The (6.7)-congruence
-`restrict_extension_Yset_charValue_cong_of_frobenius` says `(R(z)−R(1))/|H|` is an algebraic integer;
+`restrict_extension_Yset_charValue_cong_of_frobenius` says `(R(z)−R(1))/|H|` is an algebraic
+integer;
 so the rational `−c/a` is an algebraic integer, hence an integer (`isIntegral_rat_imp_int`), i.e.
 `a ∣ c`.  (`c ∈ ℤ` because `R ∈ ZIrr L` and `χ₁` is irreducible, `mem_ZIrr_inner_int`.) -/
 theorem dvd_inner_restrict_extension_Yset_of_frobenius

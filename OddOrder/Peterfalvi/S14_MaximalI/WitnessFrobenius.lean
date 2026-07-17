@@ -110,7 +110,8 @@ theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
 `q`-subgroup `P` of `U` is cyclic, distinguish `q ∣ |U|` from `q ∤ |U|`.  If `q ∤ |U|` then `P` is
 trivial (its order is a `q`-power dividing `|U|`, forcing order `1`), hence cyclic.  If `q ∣ |U|`,
 embed `U ↪ L` (via `U_le`): `P` becomes a `q`-subgroup of `L`, contained in a Sylow `q`-subgroup `Q`
-of `L`, which is cyclic by the minimality core `witness_L_sylow_cyclic_of_dvd_complement`; a subgroup
+of `L`, which is cyclic by the minimality core `witness_L_sylow_cyclic_of_dvd_complement`; a
+subgroup
 of a cyclic group is cyclic, so `P` is cyclic. -/
 theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
@@ -468,7 +469,8 @@ theorem intersection_complement_structure [Finite G]
 
 /-- **Peterfalvi (12.10), non-TI clause**: for the (12.9) witness `L`, its Frobenius kernel
 `H = L_F` has `H^#` **not** a TI-subset of `G`.  This is the "By (12.9), `H^#` is not a TI-subset"
-step of (12.10): the rank-two witness `x ∈ Ω₁(P₀)^#` has `C_G(x) ⊄ L` (`data.centralizer_x_not_le_L`)
+step of (12.10): the rank-two witness `x ∈ Ω₁(P₀)^#` has `C_G(x) ⊄ L`
+(`data.centralizer_x_not_le_L`)
 while `N_G(H) = L` (maximality of `L` + `H = L_F` normal); pick `g ∈ C_G(x) ∖ L`, then `g ∉ N_G(H)`
 yet `g x g⁻¹ = x ∈ H^#`, witnessing the TI failure (`x ∈ H^# ∩ (H^#)^g`).
 
@@ -526,7 +528,8 @@ Combines the Hypothesis + Frobenius witness of `witness_L_hypothesis_frobenius` 
 Frobenius-case coherence.  Crucially the witness dispatches only through the **(b)/(c)** cases
 (both `sorry`-free): its `H^#` is *not* TI (Peterfalvi (12.10), `witness_H_sharp_not_isTISubset`),
 so the TI-only case (a) `sibleyTarget_frobI` is excluded — hence this coherence never depends on the
-(8.18.c) geometry that case (a) transitively needs, only on the genuine (12.9)/(12.10) witness facts.
+(8.18.c) geometry that case (a) transitively needs, only on the genuine (12.9)/(12.10) witness
+facts.
 This is the coherence input "`S` coherent" of the (12.16) Dade calculation — it feeds the `(7.8.b)`
 norm bound `hB` of `CounterexampleDadeData` via the §7 `Hypothesis78`/`NormEstimates`. -/
 theorem witness_L_coherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

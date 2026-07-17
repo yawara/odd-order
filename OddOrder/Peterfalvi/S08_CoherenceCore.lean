@@ -980,7 +980,8 @@ When `X(Zc) = {χ₁, χ₂}` (a conjugate pair, equal degree), the step-5 dicho
 `X = cX₀ χ₁ ∨ X = −cX₀ χ₂` (`extension_eq_or_eq_neg_general` at the fixed `cX₀`) has no third anchor
 to exclude the right disjunct; instead, the right disjunct is *absorbed* by the sign-swapped witness
 `cX'` (`coherentEqualDegree_swap_neg`, `χ₁ ↦ −χ₂^{τ₂}`, valid because `|X| = 2` is the whole set):
-`cX' χ₁ = −cX₀ χ₂ = X`, giving the crux `(χ₁−aη₁)^τ = cX' χ₁ − a·cY η₁`.  Left disjunct uses `cX = cX₀`
+`cX' χ₁ = −cX₀ χ₂ = X`, giving the crux `(χ₁−aη₁)^τ = cX' χ₁ − a·cY η₁`. Left disjunct uses
+`cX = cX₀`
 directly.  Produces a witness + crux for *some* `cX`. -/
 theorem exists_Xcoherence_crux_of_card_two_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -1040,7 +1041,8 @@ theorem exists_Xcoherence_crux_of_card_two_of_frobenius
 
 open scoped Classical in
 /-- **(6.8.1) E3: `X`-coherence witness + crux in the `|X(Zc)| = 2` edge**, case (A) / c2 mirror of
-`exists_Xcoherence_crux_of_card_two_of_frobenius`.  The fixed `X`-coherence/dichotomy/`X`-irreducibility
+`exists_Xcoherence_crux_of_card_two_of_frobenius`. The fixed
+`X`-coherence/dichotomy/`X`-irreducibility
 inputs use their case-(A) counterparts (`Xset_centralCommutator_isCoherent_of_c2_caseA`,
 `extension_eq_or_eq_neg_general_c2_caseA`, `isIrreducibleCharacter_of_mem_Xset_c2_caseA`) instead of
 `hF` (cert data `hK`/`hW1`/`hA`); the non-`hF` `coherentEqualDegree_swap_neg` relabel is copied
@@ -1175,7 +1177,8 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_general
 `coherentXunionYset_centralCommutator_diagonal_general`.  The glue/`X ⊥ Y`/`hgen`/`X`-irreducibility
 inputs use their case-(A) counterparts
 (`coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_c2_caseA`,
-`inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA`, `hgen_withDiagonal_c2_caseA`,
+`inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA`,
+`hgen_withDiagonal_c2_caseA`,
 `isIrreducibleCharacter_of_mem_Xset_c2_caseA`) instead of `hF` (cert data `hK`/`hW1`/`hA`). -/
 noncomputable def coherentXunionYset_centralCommutator_diagonal_general_c2_caseA
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -1389,7 +1392,8 @@ both unconditionally available, are used.  E2 (`exists_Ycoherence_hgood_of_frobe
 `Y`-witness + good case (the `m = 2` relabel).  The `X`-side splits on `|X(Zc)|`: `≥ 3` uses the
 degree-ratio crux E1 (`crux_general_of_higher_anchor`) at the fixed `X`-witness; `= 2` uses the
 relabel crux E3 (`exists_Xcoherence_crux_of_card_two_of_frobenius`).  Either way the crux feeds the
-shared assembly `coherentXunionYset_centralCommutator_diagonal_general`, giving `X(Zc) ∪ Y` coherent,
+shared assembly `coherentXunionYset_centralCommutator_diagonal_general`, giving `X(Zc) ∪ Y`
+coherent,
 and the (6.8.3) extension `false_of_coherentXunionYset_of_not_coherentS` lifts it to `S`. -/
 theorem nonempty_coherent_S_caseA_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]

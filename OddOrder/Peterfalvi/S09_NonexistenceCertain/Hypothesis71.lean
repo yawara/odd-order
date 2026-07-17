@@ -5,7 +5,8 @@ import OddOrder.GroupTheory.TISubset
 /-!
 # Peterfalvi (7.1)-(7.5) — TI-subset hypothesis, cardinality identity, family form
 
-Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S09_NonexistenceCertain` (directory split,
+issue 0103).
 -/
 
 /-!

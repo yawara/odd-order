@@ -34,7 +34,8 @@ in-repo assembler `S07.irrSubcoherent`, threading:
 * `τ = tSideDadeMap hyp hG` (the genuine §10 Dade integral character map);
 * the family predicates `S03.ClosedUnderConjugate`/`HasNoRealCharacters`/`PairwiseOrthogonal`, all
   derived from the induced-irreducible structure alone (Frobenius-analogous to the type-I
-  `S14.Sset_*` witnesses): closure via `induce_conj`, no-real via `not_isReal_of_ne_trivial_of_odd_card'`
+  `S14.Sset_*` witnesses): closure via `induce_conj`, no-real via
+  `not_isReal_of_ne_trivial_of_odd_card'`
   (odd `|T|`, `Ind θ ≠ 1`), orthogonality via `irreducibleCharacter_inner_eq_ite`;
 * the per-member `CharacterDifferenceImage` via `S07.dadeCharacterDifferenceImageOfDiff` (fed the
   conjugate-difference support `(χ̄ − χ).support ⊆ supportInSubgroup (sigmaSharp T) T`, from the
@@ -121,7 +122,8 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
         hcontra
     rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
     exact one_ne_zero hzero
-  -- (a) `S03.HasNoRealCharacters calT1_set`: each member is a nontrivial irreducible of the odd `T`.
+  -- (a) `S03.HasNoRealCharacters calT1_set`: each member is a nontrivial irreducible of the odd
+  -- `T`.
   have hreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters calT1_set := by
     intro χ hχ
     obtain ⟨θ, hθ, rfl⟩ := hmem_form χ hχ
@@ -255,13 +257,16 @@ carrying `tauT` and the seven §5.2 fields), this produces coherence via the pro
   (`IsIrreducibleCharacter.inner_self_eq_one`);
 * `hconst`/`hdeg0` — each `ζ` has degree `ζ(1) = [T:QV]·θ(1) = p·1 = p ≠ 0`
   (`ClassFunction.induce_apply_one` + `T_derived_index_eq_p` `[T:QV] = p` + linearity
-  `hlinear : θ(1) = 1`, since `θ` inflates from the abelian `QV/Q ≅ V`), i.e. Coq's `all_pred1_constant p`;
+  `hlinear : θ(1) = 1`, since `θ` inflates from the abelian `QV/Q ≅ V`), i.e. Coq's
+  `all_pred1_constant p`;
 * `hSfin` — `calT1_set` is the image of a `Finset`, hence finite.
 
-The residual — **the T-side type-`P` Dade isometry construction** (Coq `FTtypeP_coh_base`, a from-scratch
+The residual — **the T-side type-`P` Dade isometry construction** (Coq `FTtypeP_coh_base`, a
+from-scratch
 §4/§5 build with **no** existing type-`P` Dade base in the repo) — is precisely the input `hyp07`
 together with the three genuinely Dade/support-dependent facts, kept as explicit hypotheses (each
-cited from `hyp07`'s concrete Dade map at the call site, exactly as the §14 type-I assembly discharges
+cited from `hyp07`'s concrete Dade map at the call site, exactly as the §14 type-I assembly
+discharges
 them via `dadeIntegralCharacterMap_mem_ZIrr_of_supported` etc.):
 
 * `hZIrr : ∀ a b ∈ calT1_set, hyp07.tau (a − b) ∈ ZIrr G` — the Dade-map integrality on member
@@ -274,7 +279,8 @@ them via `dadeIntegralCharacterMap_mem_ZIrr_of_supported` etc.):
 
 This is the honest §16 coherence assembly point for (14.9): it consumes only the verified bricks
 (`isIrreducibleCharacter_induce_of_inertia_eq`, `induce_apply_one`, `T_derived_index_eq_p`,
-`coherent_of_constant_degree`) and the parameterized Dade setup, leaving the type-`P` Dade base as the
+`coherent_of_constant_degree`) and the parameterized Dade setup, leaving the type-`P` Dade base as
+the
 single precisely-scoped deep obligation.  Its output feeds the (14.9) Γ-Bessel bound
 `T_typeIII_ratio_le` (Coq `cohT1` consumed at PFsection14.v:769 `have [[Itau1T Ztau1T] Dtau1T] := cohT1`). -/
 theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
@@ -341,7 +347,8 @@ support/integrality carriers are discharged here from the induced-character supp
 * `hsuppdiff` — member differences vanish off `A₁(T)` (the same `hdiff_supp`, from the members
   vanishing off `QV = T'` and `sigmaSharp T = (T')^#`).
 
-The only *external* input is `hcard2 : 2 ≤ calT1_set.ncard` (`= (|V|−1)/p ≥ 2`, the size bound needing
+The only *external* input is `hcard2 : 2 ≤ calT1_set.ncard` (`= (|V|−1)/p ≥ 2`, the size bound
+needing
 a `|V|`-lower bound — kept explicit, as in `T_typeIII_calT1_coherent`).  Output: the coherent
 `τ₁ = hyp07.tau = tSideDadeMap hyp hG`-extension whose orthonormal image family feeds the (14.9)
 Γ-Bessel bound. -/

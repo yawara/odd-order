@@ -11,7 +11,8 @@ import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
 /-!
 # S11_SingleFactorCentralizer
 
-Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit, issue 0103 第 2
+パス).
 -/
 
 /-!
@@ -839,11 +840,13 @@ theorem exists_two_summand_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
 Book (9.11.2), first assertion (the deep input `U₁ ∩ U₁ʷ = C`): the `θ`-character regular on the two
 summands `S₀`, `S₀ʷ` has inertia `I_{HU}(θ) ⊓ U = C_U(S₀) ⊓ C_U(S₀ʷ) = U₁ ∩ U₁ʷ`, whose index
 `[U : U₁ ∩ U₁ʷ]` is then forced into `{u, a}`.  The `⊆`-half of that inertia computation — *a fixing
-element centralizes each regular summand* — is the per-summand lemma below, applied once per summand.
+element centralizes each regular summand* — is the per-summand lemma below, applied once per
+summand.
 
 The a-owned `chiefFactor_caseA_char_inertia_single` (`S11_MaximalII_III_IV`) proves this for the
 distinguished generator `S₀ = caseA.S0`; the two-summand argument needs it for the `W₁`-conjugate
-`S₀ʷ` as well, i.e. for an *arbitrary* order-`p` `U`-invariant summand.  We lift the same pure-algebra
+`S₀ʷ` as well, i.e. for an *arbitrary* order-`p` `U`-invariant summand. We lift the same
+pure-algebra
 core (`mulAut_eq_id_on_of_fixes_ne_one_on_prime`) to a generic summand `S`. -/
 
 section NineElevenTwoInertia
@@ -855,9 +858,11 @@ variable [Finite G] {M : Subgroup G}
 /-- **Per-summand char-inertia (generic summand).**  For *any* order-`p` `U`-invariant summand `S` of
 the chief factor `H̄` and an irreducible `θ` nontrivial on `S`, a `U`-element `g` fixing `θ` acts
 trivially on `S` (`aInvariantRestrictAut hSinv g = 1`, i.e. `g ∈ C_U(S)`).  This generalises the
-a-owned `chiefFactor_caseA_char_inertia_single` from the distinguished generator `S₀ = caseA.S0` to an
+a-owned `chiefFactor_caseA_char_inertia_single` from the distinguished generator `S₀ = caseA.S0` to
+an
 arbitrary summand — needed for the (9.11.2) two-summand inertia `I(θ) ⊓ U ⊆ C_U(S₀) ⊓ C_U(S₀ʷ)`,
-obtained by applying this once to `S = S₀` and once to `S = S₀ʷ` (both order-`p`, `U`-invariant, with
+obtained by applying this once to `S = S₀` and once to `S = S₀ʷ` (both order-`p`, `U`-invariant,
+with
 `θ` regular on each).  Same pure-algebra heart (`mulAut_eq_id_on_of_fixes_ne_one_on_prime`: `θ`
 faithful on the prime-order `S`), lifted through `aInvariantRestrictAut_coe`. -/
 theorem caseA_char_inertia_of_summand {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -903,7 +908,8 @@ theorem caseA_char_inertia_two_summands {data : TypesIIIIIIVSetup M} {chief : Ch
     caseA_char_inertia_of_summand (caseA.Hpart_aInvariant j) (caseA.Hpart_order j) hregj g hinv⟩
 
 /-- **(9.11.2) two-summand inertia containment `C_U(H_i) ⊓ C_U(H_j) ⊆ I(θ) ⊓ U`** (the reverse `⊇`).
-For a linear character `χ` of `H̄` supported on the two summands `H_i`, `H_j` (trivial on every other
+For a linear character `χ` of `H̄` supported on the two summands `H_i`, `H_j` (trivial on every
+other
 summand `H_k`, `hsupp`), a `U`-element `g` centralizing both (`aInvariantRestrictAut … g = 1` on `i`
 and `j`) fixes `χ`: `χ(g·x) = χ(x)` for all `x`.  Proof by the generators argument — `χ∘g` and `χ`
 agree on each summand `H_k` (on `H_i`/`H_j` because `g` acts as the identity; on the others because
@@ -952,8 +958,10 @@ theorem caseA_centralizes_two_summands_fixes_char {data : TypesIIIIIIVSetup M}
 open scoped IsMulCommutative in
 /-- **The (9.11.2) two-summand character exists on the case-(a) chief factor.**  Instantiates
 `exists_two_summand_char` at the internal direct product `caseA.Hpart` of the `q` order-`p` Clifford
-summands (`Hpart_iSupIndep` + `Hpart_iSup` + `Hpart_order`): for two distinct summand indices `i ≠ j`
-there is a linear character `θ` of `H̄` nontrivial on `H_i`, `H_j` and trivial on every other summand.
+summands (`Hpart_iSupIndep` + `Hpart_iSup` + `Hpart_order`): for two distinct summand indices
+`i ≠ j`
+there is a linear character `θ` of `H̄` nontrivial on `H_i`, `H_j` and trivial on every other
+summand.
 Feeding this `θ` to `caseA_char_inertia_two_summands` (`⊆`) and
 `caseA_centralizes_two_summands_fixes_char` (`⊇`) identifies its inertia as `C_U(H_i) ⊓ C_U(H_j)`. -/
 theorem exists_caseA_two_summand_char {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -969,7 +977,8 @@ theorem exists_caseA_two_summand_char {data : TypesIIIIIIVSetup M} {chief : Chie
 /-- **(9.11.2) inertia identity at the chief-factor level.**  Combining the three landed pieces —
 the two-summand character `exists_caseA_two_summand_char`, the `⊆` containment
 `caseA_char_inertia_two_summands`, and the `⊇` containment
-`caseA_centralizes_two_summands_fixes_char` — there is a linear character `θ` of `H̄` whose `U`-inertia
+`caseA_centralizes_two_summands_fixes_char` — there is a linear character `θ` of `H̄` whose
+`U`-inertia
 is *exactly* the two-summand centralizer: for `g ∈ U`, `g` fixes `θ` **iff** `g` centralizes both
 Clifford summands `H_i`, `H_j` (`aInvariantRestrictAut … g = 1`).  This is the `Ū`-side of Peterfalvi
 (9.11.2): the inertia of the two-summand `θ` is `C_U(H_i) ⊓ C_U(H_j) = U₁ ∩ U₁ʷ`.  The `⊆` direction
@@ -1002,11 +1011,13 @@ theorem caseA_inertia_iff_centralizes_two_summands {data : TypesIIIIIIVSetup M}
     exact fun h => hxne (Units.val_eq_one.mp h)
 
 /-- **`C ⊆ C_U(H_k)` (action level): centralizing all of `H̄` centralizes each summand.**  A
-`U`-element `g` acting trivially on the whole chief factor (`uActionHom g = 1`, i.e. `g` realizing an
+`U`-element `g` acting trivially on the whole chief factor (`uActionHom g = 1`, i.e. `g` realizing
+an
 element of `C = C_U(H̄)`) acts trivially on every Clifford summand `H_k`
 (`aInvariantRestrictAut (Hpart_aInvariant k) g = 1`), because the restricted action is a restriction
 of `uActionHom g = 1`.  This is the easy `⊆`-direction of the (9.11.2) final identity `C = U₁ ∩ U₁ʷ`:
-`C ⊆ C_U(H_i) ⊓ C_U(H_j)` (the reverse `⊇` is the deep degree argument).  Realized to `G`-subgroups it
+`C ⊆ C_U(H_i) ⊓ C_U(H_j)` (the reverse `⊇` is the deep degree argument). Realized to `G`-subgroups
+it
 gives `cSub ≤ C_U(H_i) ⊓ C_U(H_j)` (cf. the landed `cSub_le_cuSub` for the generator `S₀`). -/
 theorem centralizes_all_imp_centralizes_summand {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
@@ -1018,10 +1029,12 @@ theorem centralizes_all_imp_centralizes_summand {data : TypesIIIIIIVSetup M}
   rw [MulAut.one_apply, aInvariantRestrictAut_coe, hg, MulAut.one_apply]
 
 /-- **Inflation-fixing ⟹ action-fixing (conclusion-agnostic).**  If a realized `U`-element `g` fixes
-the *inflated* chief-factor character `θ₀ = θbar` inflated to `H` (the `compHom (mk' N)`-fixing under
+the *inflated* chief-factor character `θ₀ = θbar` inflated to `H` (the `compHom (mk' N)`-fixing
+under
 `typeP_conjAction`), then `g`'s `U`-action fixes `θbar` on `H̄`: `θbar(φ_U(g)·x) = θbar(x)` for all
 `x`.  Strips the inflation (`compHom_typeP_conjAction_inflation`, then `mk' N` injective) exactly as
-`caseB_char_inertia_inflation_of_core` does, but *without* committing to a downstream conclusion — so
+`caseB_char_inertia_inflation_of_core` does, but *without* committing to a downstream conclusion —
+so
 it composes with **any** char-inertia core (all-summand `uActionHom g = 1`, or the two-summand
 centralizer).  This is the HU→Ū half of the (9.11.2) inertia bridge. -/
 theorem inflation_fixing_imp_action_fixing {data : TypesIIIIIIVSetup M}
@@ -1054,9 +1067,11 @@ theorem inflation_fixing_imp_action_fixing {data : TypesIIIIIIVSetup M}
 
 /-- **(9.11.2) HU-inertia bridge (`⊆` half): fixing the inflated two-summand `θ₀` in `HU` centralizes
 both summands.**  For a chief-factor character `θbar` regular on the two Clifford summands `H_i`,
-`H_j`, a realized `U`-element `g` in the `HU`-inertia of the inflation `θ₀` (`hfix`) centralizes both
+`H_j`, a realized `U`-element `g` in the `HU`-inertia of the inflation `θ₀` (`hfix`) centralizes
+both
 summands: `aInvariantRestrictAut … g = 1` on `i` and `j`.  Composes the inflation-stripping
-`inflation_fixing_imp_action_fixing` (HU-fixing → Ū-fixing) with the Ū-level two-summand char-inertia
+`inflation_fixing_imp_action_fixing` (HU-fixing → Ū-fixing) with the Ū-level two-summand
+char-inertia
 `caseA_char_inertia_two_summands`.  This is the `HU`-side of `I(θ₀) ⊓ U ⊆ C_U(H_i) ⊓ C_U(H_j)`; with
 the realized subgroups it feeds the index computation `[HU : I(θ₀)] = [U : U₁ ∩ U₁ʷ]`. -/
 theorem caseA_hu_char_inertia_two_summands {data : TypesIIIIIIVSetup M}

@@ -3,13 +3,15 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.Coherence911
 /-!
 # CaseBXi
 
-Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line limit, issue 0103 第 2 パス).
+Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
+limit, issue 0103 第 2 パス).
 -/
 
 /-!
 # Peterfalvi (9.8.d) (γ) core — summand-complement kernel W ⊆ Ker ζ
 
-Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue 0103).
+Split from the former monolithic `OddOrder.Peterfalvi.S11_MaximalII_III_IV` (directory split, issue
+0103).
 -/
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
@@ -27,8 +29,10 @@ variable {M : Subgroup G}
 
 /-! ### Peterfalvi (9.8.d) (γ) core (1): the summand-complement kernel `W = H₂…H_q ⊆ Ker ζ`
 
-The (9.8.d) `W₁`-injectivity (Coq `injXtheta`) needs, for each family member `ζ = Ind_{H·C_U(S₀)}^{HU}
-ψ_{θ₁,λ}` (`θ₁ ∈ Irr(H̄/W)`, trivial on the summand-join complement `W = H₂…H_q`), that the *realized*
+The (9.8.d) `W₁`-injectivity (Coq `injXtheta`) needs, for each family member
+`ζ = Ind_{H·C_U(S₀)}^{HU}
+ψ_{θ₁,λ}` (`θ₁ ∈ Irr(H̄/W)`, trivial on the summand-join complement `W =
+H₂…H_q`), that the *realized*
 `W` lies in `Ker ζ`.  This is the direct mirror of `hcuZetaPair_H0supUprime_subset_ker`: `W`
 realizes into `HU` as a normal subgroup on which `ψ_{θ₁,λ}` is trivial (the `θ`-factor is `θ|_W = 1`
 via the seed, the `λ`-factor is trivial on `H ⊇ W`), so the induce-kernel step
@@ -267,9 +271,11 @@ by `w₁` inside `HU` moves the realized generator summand `S₀` into the reali
 `W = ⨆_{w∈W₁#} S₀^w` (`caseA_realizedComplement chief (caseA_wComplement caseA)`).
 
 The `H̄`-descent of the concrete conjugation: for `s` in the realized `S₀`, take `x_s : ↥H` with
-`mk'(N) x_s ∈ S₀` and `↑x_s = ↑s`; then `w₁·s·w₁⁻¹` realizes `x = (w₁·(·)·w₁⁻¹) x_s = typeP_conjAction
+`mk'(N) x_s ∈ S₀` and `↑x_s = ↑s`; then `w₁·s·w₁⁻¹` realizes
+`x = (w₁·(·)·w₁⁻¹) x_s = typeP_conjAction
 ⟨w₁⟩ x_s`, whose `mk'(N)`-image is `φ(⟨w₁⟩)•(mk'(N) x_s) ∈ φ(⟨w₁⟩)•S₀ = S₀^{w₁}`
-(`quotientMulAutHom_apply_mk'`).  Since `w₁ ≠ 1`, `S₀^{w₁} = caseA_wOrbit caseA ⟨w₁⟩ ≤ caseA_wComplement
+(`quotientMulAutHom_apply_mk'`). Since `w₁ ≠ 1`,
+`S₀^{w₁} = caseA_wOrbit caseA ⟨w₁⟩ ≤ caseA_wComplement
 caseA = W` (`caseA_wComplement` is the join over the nontrivial conjugates).  This is precisely the
 `H₁^w ⊆ H₂…H_q` step (`w ∈ W₁#`) of the Coq `injXtheta` (`PFsection9.v` L1233-1253), discharging the
 `horbit` hypothesis of `hcrit_of_summand_orbit`. -/
@@ -361,7 +367,8 @@ theorem hcuZetaPair_summandComplement_subset_ker [Finite G] {M : Subgroup G}
     (H := hInHu data ⊔ cuInHu caseA)
     (le_trans (caseA_realizedComplement_subgroupOf_le_hInHu chief W) le_sup_left)
     (hcuPsiPair caseA θ hinv lam) ?_
-  -- Bridge: `A.subgroupOf (hInHu⊔cuInHu) = (A.subgroupOf hInHu).map (inclusion)`, then reuse vanishing.
+  -- Bridge: `A.subgroupOf (hInHu⊔cuInHu) = (A.subgroupOf hInHu).map (inclusion)`, then reuse
+  -- vanishing.
   have hAle : ((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data)
       ≤ hInHu data := caseA_realizedComplement_subgroupOf_le_hInHu chief W
   have hbridge : (((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data)).subgroupOf
@@ -564,9 +571,11 @@ theorem hcuZetaPair_induceHU_mem_sOf [Finite G] {M : Subgroup G}
 
 /-- **`Ind_{HU}^M ζ_{θ₁,λ}` is irreducible** (Peterfalvi (9.8.d) (iv), `hIM`-gated).  Given the source
 character `ζ_{θ₁,λ}` is not `W₁`-fixed (`hIM : I_{HU-ambient}(ζ) ≠ ⊤`, i.e. `I_M(ζ) ≠ M`), the
-`M`-induction `Ind_{HU}^M ζ` is irreducible.  Since `HU ◁ M` with `[M:HU] = q` prime, `HU ≤ I_M(ζ) ≤ M`
+`M`-induction `Ind_{HU}^M ζ` is irreducible. Since `HU ◁ M` with `[M:HU] = q` prime,
+`HU ≤ I_M(ζ) ≤ M`
 and `I_M(ζ) ≠ M` force `I_M(ζ) = HU` (`eq_of_le_of_prime_index`), whence `Ind` is irreducible
-(`isIrreducibleCharacter_induce_of_inertia_eq`).  Single-factor mirror of `hcZeta_induceHU_irreducible`;
+(`isIrreducibleCharacter_induce_of_inertia_eq`). Single-factor mirror of
+`hcZeta_induceHU_irreducible`;
 its `hIM` is the genuinely-hard `W₁`-free-orbit datum for the `S₀`-supported `θ₁` (see the (9.8.d)
 `Still open` note on `caseA_character_counts`), left as an explicit hypothesis. -/
 theorem hcuZetaPair_induceHU_irreducible [Finite G] {M : Subgroup G}
@@ -873,8 +882,10 @@ theorem caseB_no_irreducible_forces_C_bot [Finite G]
   exact hc₀ (by rw [hlam1 c₀, MonoidHom.one_apply])
 
 /-- **Inertia index of `hcPsi θ` is `u`** (regular `θ`): for a regular seed `θ` (nontrivial on each
-Clifford factor `Hpart i`), the `HU`-inertia of `ζ_θ = hcPsi θ` is `HC` (`hcPsi_inertia_eq_hc` with the
-`inertia_eq_hcInHu_caseA` seed), so `[HU : I_{HU}(hcPsi θ)] = [HU:HC] = u` (`hc_index_eq_u`).  This is
+Clifford factor `Hpart i`), the `HU`-inertia of `ζ_θ = hcPsi θ` is `HC` (`hcPsi_inertia_eq_hc` with
+the
+`inertia_eq_hcInHu_caseA` seed), so `[HU : I_{HU}(hcPsi θ)] = [HU:HC] = u` (`hc_index_eq_u`). This
+is
 the uniform fibre size `[HU : I]` of the induction map `θ ↦ Ind_{HC}^{HU}(hcPsi θ)` in the `oXtheta`
 `u`-to-1 count (each `HU`-conjugation orbit of a regular `hcPsi θ` has `u` elements). -/
 theorem hcPsi_inertia_index_eq_u [Finite G] {M : Subgroup G}
@@ -1025,10 +1036,12 @@ factor-preservation).  For `u ∈ uInHu` (a realized `U`-element inside `HU`), t
 conjugation `A_u = hcConjDescend u` agrees on `H̄ = H/N` with the abstract `U`-action
 `uActionHom data chief a`, where `a` is the realization of `u` in `↥(U.subgroupOf (U ⊔ W₁))`.
 Both descend the conjugation `x ↦ u·x·u⁻¹` to `H̄`, matched pointwise by the shared `G`-value
-`u_G·h_G·u_G⁻¹`: on the left via `hcHom_inclusion` (`hcHom` on the `H`-part is `mk'_N ∘ hInHuEquivH`)
+`u_G·h_G·u_G⁻¹`: on the left via `hcHom_inclusion` (`hcHom` on the `H`-part is
+`mk'_N ∘ hInHuEquivH`)
 and the factoring `hcConjDescend_hcHom`, on the right via `quotientMulAutHom_apply_mk'` and
 `typeP_conjAction_apply`.  Combined with `hcConjDescend_mul`/`hcConjDescend_eq_id_of_mem_hc` (the
-`H`-part `A_h` is the identity), this reduces the case-A factor-preservation `A_g(Hpart i) ⊆ Hpart i`
+`H`-part `A_h` is the identity), this reduces the case-A factor-preservation
+`A_g(Hpart i) ⊆ Hpart i`
 to the `U`-invariance `Hpart_aInvariant`. -/
 theorem hcConjDescend_eq_uActionHom [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) {u : ↥(huSub data)}
@@ -1147,7 +1160,8 @@ theorem hcConjDescend_comp_regular_iff [Finite G] {M : Subgroup G}
   forall_congr' fun _ => not_congr (hcConjDescend_comp_subtype_eq_one_iff caseA g θ)
 
 /-- **Conjugation-commute at the `IrreducibleCharacter` level**: `(hcPsi θ)^g = hcPsi (θ ∘ A_g)`.
-The `IrreducibleCharacter`-level form of `hcPsi_conjBy_eq` (`coe_conjBy` + `IrreducibleCharacter.ext`),
+The `IrreducibleCharacter`-level form of `hcPsi_conjBy_eq` (`coe_conjBy` +
+`IrreducibleCharacter.ext`),
 the shape consumed by the conjugation-closure hypothesis of `card_filter_induce_eq_index_inertia`. -/
 theorem hcPsi_irreducibleConjBy_eq [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
@@ -1160,7 +1174,8 @@ theorem hcPsi_irreducibleConjBy_eq [Finite G] {M : Subgroup G}
 
 /-- **The regular-inflated set is `HU`-conjugation-closed** (`oXtheta` `T`-invariance).  For a regular
 seed `θ` (nontrivial on every Clifford factor `Hpart i`) and `g ∈ HU`, the conjugate `(hcPsi θ)^g`
-equals `hcPsi θ'` for the regular seed `θ' = θ ∘ A_g`: the commute `hcPsi_irreducibleConjBy_eq` gives
+equals `hcPsi θ'` for the regular seed `θ' = θ ∘ A_g`: the commute `hcPsi_irreducibleConjBy_eq`
+gives
 the identity, and `hcConjDescend_comp_regular_iff` gives the regularity of `θ'`.  This is exactly the
 conjugation-closure hypothesis `hT` of `card_filter_induce_eq_index_inertia` for the induction
 `θ ↦ Ind_{HC}^{HU}(hcPsi θ)` over `T = {hcPsi θ | θ regular}`, whose fibres have size `u`

@@ -23,7 +23,8 @@ In case (B) the coherent set `S₁` contains **reducible** certain-type columns 
 `‖μⱼ‖² > 1`), so the genuine Peterfalvi (5.6) — with the `‖χᵢ‖²`-weighted projection coefficients
 `1/‖χᵢ‖²` and the weighted bound `2a < ∑ deg²/‖χᵢ‖²` — is required (ChatGPT/Pro-verified that there
 is *no* sidestep; see `notes/peterfalvi/s08_6_8_3_reducibleS_chatgpt_answer.md` Q1–Q4).  The
-weighting is localized to the **member family** `χmem`; the break pair `χ, χ̄` and the anchor `χmem i₁`
+weighting is localized to the **member family** `χmem`; the break pair `χ, χ̄` and the anchor
+`χmem i₁`
 remain irreducible (norm one) in the (6.8.3) application, so their fields are unchanged.
 
 This file develops that weighted engine additively (the unweighted version is preserved for case A):
@@ -428,7 +429,8 @@ noncomputable def xAdjoinStepW
       Finset.sum_eq_zero (fun α hα =>
         OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily
           (Dmem i₁ hi₁) (hortho_mem i₁ hi₁) (htau1Dmem i₁ hi₁) hα), star_zero]
-  -- `(χ − χ̄)^τ ∈ ZIrr` from the `R(χ)` family (`image_eq`); `(χ − a·χ₁)^τ ∈ ZIrr` is `htau1_memaχ`.
+  -- `(χ − χ̄)^τ ∈ ZIrr` from the `R(χ)` family (`image_eq`); `(χ − a·χ₁)^τ ∈ ZIrr` is
+  -- `htau1_memaχ`.
   have hτdiffZ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
       (hyp.fullDadeIsometryData hconj)
       ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) ∈ ZIrr G := by
@@ -621,7 +623,8 @@ noncomputable def XAdjoinStepInputW.adjoin
 
 /-- **Norm-weighted (5.6) degree-square bound (contrapositive of `xAdjoinStepW`).**
 
-The norm-weighted Peterfalvi (5.6) inequality: if `S₁` is coherent but `S₁ ∪ {χ, χ̄}` is **not**, then
+The norm-weighted Peterfalvi (5.6) inequality: if `S₁` is coherent but `S₁ ∪ {χ, χ̄}` is **not**,
+then
 the weighted degree-square sum is bounded by twice the degree ratio,
 `∑_{i∈s} deg(i)² / ‖χmem i‖² ≤ 2a`.  This is the reducible-member generalization of
 `coherentDegreeSumBound_of_not_coherent` (the case-A `‖χmem i‖² = 1` specialization, with conclusion
@@ -701,7 +704,8 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
 
 The `‖χ‖² ≠ 1` analogue of `coherentDegreeSqNormBound_of_not_coherentW`: if `S₁` is coherent but
 `S₁ ∪ {χ, χ̄}` is **not** — for a possibly **reducible** break `χ` whose decomposition `Da` is
-supplied as a parameter — then the weighted degree-square sum is bounded, `∑ deg(i)²/‖χmem i‖² ≤ 2a`.
+supplied as a parameter — then the weighted degree-square sum is bounded,
+`∑ deg(i)²/‖χmem i‖² ≤ 2a`.
 Pure contrapositive of the reducible-break forward engine `xAdjoinStepW_k`. -/
 theorem coherentDegreeSqNormBound_of_not_coherentW_k
     {A : Set G}
@@ -775,11 +779,13 @@ The weighted analogue of `xChainCoherent`: folds the per-step weighted adjoin `x
 `certainTypeSet_isCoherent_tau_canonical`.  Each step adjoins the irreducible pair `(χs i, χ̄s i)` to
 the accumulator `pairUnion S₀ pair i` through the bundled weighted input `hstep i`, whose member
 family ranges over the **(possibly reducible)** accumulator members — exactly the case-(B) X-chain
-the unweighted `xChainCoherent` cannot express (its `XAdjoinStepInput` bakes in member orthonormality
+the unweighted `xChainCoherent` cannot express (its `XAdjoinStepInput` bakes in member
+orthonormality
 `‖χmem i‖² = 1`, which fails on the reducible columns).
 
 The construction of `hstep` (the per-step `XAdjoinStepInputW`) from the certain-type column data —
-`certainTypeMemberDecomposition` for the reducible-column members, `certainTypeR_imageSet_orthogonal_
+`certainTypeMemberDecomposition` for the reducible-column members,
+`certainTypeR_imageSet_orthogonal_
 dadeOfDiff` for their cross-family orthogonality, `memberExtensionDecomposition` for the
 already-adjoined irreducibles — is the remaining per-step obligation; this fold packages it into the
 full `X`-coherence `cX`. -/

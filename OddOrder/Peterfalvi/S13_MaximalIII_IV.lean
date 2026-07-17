@@ -532,7 +532,8 @@ theorem caseB_sOf_member_dichotomy [Finite G]
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Per-member orthonormal `R`-family over `𝒮(H₀C′)`** (the raw (5.2.d) datum for the
 norm-general (5.7) engine `uniform_degree_coherence_of_families`).  The caseB member dichotomy
-(`caseB_sOf_member_dichotomy`) splits every member into an irreducible (degree `d`) or a certain-type
+(`caseB_sOf_member_dichotomy`) splits every member into an irreducible (degree `d`) or a
+certain-type
 column sum `μ_k`; the `R`-family is dispatched accordingly:
 
 * **irreducible `η`** — the 2-element signed Dade family `dadeOrthonormalCharacterImageFamilyOfDiff`

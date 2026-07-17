@@ -801,7 +801,8 @@ theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {W : Subgroup G}
 omit hH [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Degree from restriction multiplicities** (the degree side of Clifford's theorem).  For
 `H ⊴ G` and any class function `χ` of `G`, the degree `χ(1)` equals `∑_θ ⟨Res χ, θ⟩ · θ(1)` over
-the irreducible characters `θ` of `H` — the Fourier expansion (`sum_inner_irreducibleCharacter_smul`)
+the irreducible characters `θ` of `H` — the Fourier expansion
+(`sum_inner_irreducibleCharacter_smul`)
 of `Res^G_H χ` evaluated at `1`.
 
 Combined with single-orbit + common multiplicity
@@ -838,7 +839,8 @@ section SignedIrreducible
 Peterfalvi **(4.1)** is the elementary character-theoretic lemma that lets one glue two coherent
 families into a single isometry: it promotes orthogonality of *signed differences* to orthogonality
 of the underlying signed irreducibles.  A "signed irreducible" (Peterfalvi's `±Irr X`) is a norm-`1`
-element of `ZIrr Γ`, i.e. `±` an irreducible character (`exists_zsmul_irreducibleCharacter_of_inner_self_one`).
+element of `ZIrr Γ`, i.e. `±` an irreducible character
+(`exists_zsmul_irreducibleCharacter_of_inner_self_one`).
 The lemma is used in §4.3, §6.8.1, §9.5, §10.3 and §14.1. -/
 
 variable {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]
