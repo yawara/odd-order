@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
@@ -201,7 +202,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 8700
+set_option linter.style.longFile 8900
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -281,6 +282,51 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.natCard_centerLine
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.natCard
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.isPGroup
+
+-- Anisotropic norm and q^2 + 1 point carrier for the Suzuki ovoid.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_zero_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_eq_zero_iff
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_reciprocal
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm_mk
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm_eq_zero_iff_eq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_inj
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_ext
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_ne_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.infinity_ne_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk_ne_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.infinity_ne_affineMk
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk_inj
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.eq_infinity_or_eq_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.cases
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivOptionProd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivOptionProd_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivOptionProd_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.natCard
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivFin
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A

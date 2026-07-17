@@ -139,8 +139,11 @@
    - `GroupTheory/SpecificGroups/Suzuki/RootGroup.lean` now constructs the nonabelian
      root group `S(q,theta)` in ovoid coordinates, proves its explicit inverse, square,
      exponent-four law, central involution line, exact order `q^2`, and `2`-group property.
-   - Next upstream layer: construct the standard action on the `q^2 + 1` point ovoid
-     and its simple permutation image. After Sz(q), construct the PSU(3,q) target of
-     degree `q^3 + 1`.
+   - `GroupTheory/SpecificGroups/Suzuki/Ovoid.lean` proves the anisotropic norm
+     `N(x,y) = x^2*theta(x) + x*y + theta(y)`, its reciprocal identity for the Weyl
+     map, and constructs the infinity-plus-affine ovoid carrier of exact size `q^2 + 1`.
+   - Next upstream layer: construct the root, torus, and Weyl permutations, prove the
+     standard action is doubly transitive, and construct its simple permutation image.
+     After Sz(q), construct the PSU(3,q) target of degree `q^3 + 1`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

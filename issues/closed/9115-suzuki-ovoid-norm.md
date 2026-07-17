@@ -18,13 +18,13 @@ found no existing norm or ovoid construction.
 
 ## やること
 
-- [ ] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Ovoid.lean`.
-- [ ] Define the Suzuki norm and prove its characteristic-two twist identities.
-- [ ] Prove `N(x,y) = 0` exactly at `(0,0)`.
-- [ ] Prove the reciprocal norm identity needed by the Weyl involution.
-- [ ] Construct the ovoid point type as infinity plus the affine root-group chart.
-- [ ] Prove its exact cardinality `q^2 + 1` and finite structural API.
-- [ ] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
+- [x] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Ovoid.lean`.
+- [x] Define the Suzuki norm and prove its characteristic-two twist identities.
+- [x] Prove `N(x,y) = 0` exactly at `(0,0)`.
+- [x] Prove the reciprocal norm identity needed by the Weyl involution.
+- [x] Construct the ovoid point type as infinity plus the affine root-group chart.
+- [x] Prove its exact cardinality `q^2 + 1` and finite structural API.
+- [x] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
 
 ## 完了条件
 
