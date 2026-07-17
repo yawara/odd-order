@@ -104,6 +104,54 @@ lemma arrowKernel_le_arrowKernel {m n : ℕ} {α γ : Ω}
     arrowKernel G m α ≤ arrowKernel G n γ :=
   arrowKernel_le fun _β hβ => stabilizer_le_arrowKernel (h hβ)
 
+/-- `m`-arrows transport along the action. -/
+lemma IsArrow.smul {m : ℕ} {α β : Ω} (h : IsArrow G m α β) (g : G) :
+    IsArrow G m (g • α) (g • β) := by
+  rw [isArrow_iff, ncard_suborbit_smul_eq]
+  exact h
+
+private lemma reflTransGen_isArrow_smul {m : ℕ} (g : G) {a b : Ω}
+    (h : Relation.ReflTransGen (IsArrow G m) a b) :
+    Relation.ReflTransGen (IsArrow G m) (g • a) (g • b) := by
+  induction h with
+  | refl => exact .refl
+  | tail _ hbc ih => exact ih.tail (hbc.smul g)
+
+/-- Components of the `m`-graph transport along the action
+(Isaacs p. 249: `G` acts as automorphisms of the `m`-graph). -/
+lemma arrowComponent_smul (m : ℕ) (g : G) (α : Ω) :
+    arrowComponent G m (g • α) = (g • ·) '' arrowComponent G m α := by
+  ext β
+  constructor
+  · intro hβ
+    have h2 := reflTransGen_isArrow_smul g⁻¹ hβ
+    rw [inv_smul_smul] at h2
+    exact ⟨g⁻¹ • β, h2, smul_inv_smul g β⟩
+  · rintro ⟨β', hβ', rfl⟩
+    exact reflTransGen_isArrow_smul g hβ'
+
+/-- The subgroups `K_m` are conjugation-equivariant (Isaacs p. 249:
+`K_m(α · g) = K_m(α)^g`). -/
+lemma arrowKernel_smul (m : ℕ) (g : G) (α : Ω) :
+    arrowKernel G m (g • α) =
+      (arrowKernel G m α).map (MulAut.conj g).toMonoidHom := by
+  unfold arrowKernel
+  rw [MonoidHom.map_closure]
+  congr 1
+  rw [arrowComponent_smul, Set.biUnion_image, Set.image_iUnion₂]
+  refine Set.iUnion₂_congr fun β' _hβ' => ?_
+  rw [stabilizer_smul_eq_stabilizer_map_conj, Subgroup.coe_map]
+
+/-- The index `k_m = |K_m(α) : G_α|` does not depend on the base point
+(Isaacs p. 249). -/
+lemma relIndex_arrowKernel_eq [IsPretransitive G Ω] (m : ℕ) (α β : Ω) :
+    (stabilizer G α).relIndex (arrowKernel G m α) =
+      (stabilizer G β).relIndex (arrowKernel G m β) := by
+  obtain ⟨g, rfl⟩ := exists_smul_eq G α β
+  rw [stabilizer_smul_eq_stabilizer_map_conj, arrowKernel_smul,
+    Subgroup.relIndex_map_map_of_injective _ _
+      (MulEquiv.injective (MulAut.conj g))]
+
 end ArrowMachinery
 
 /-! ### Isaacs Thm 8.42 (a) -/
@@ -509,6 +557,62 @@ def commonDivisorGraph (D : Set ℕ) : SimpleGraph D where
     rintro a ⟨hab, -⟩
     exact hab rfl
 
+/-- Every subdegree is positive. -/
+lemma subdegrees_pos [Finite G] (d : ↥(subdegrees G Ω)) : 0 < (d : ℕ) := by
+  obtain ⟨α, β, h⟩ := d.2
+  have h5 : (orbit (stabilizer G α) β).Finite := Set.finite_range _
+  have h6 := (Set.ncard_pos h5).mpr ⟨β, mem_orbit_self _⟩
+  have h' : Set.ncard (orbit (stabilizer G α) β) = (d : ℕ) := h
+  omega
+
+/-- Vertices of the common-divisor graph in different components separate
+the subdegree set: every subdegree is coprime to one of the two. -/
+lemma separation_of_connectedComponentMk_ne {a b : ↥(subdegrees G Ω)}
+    (hab : (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a ≠
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk b) :
+    ∀ δ ε : Ω,
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) (a : ℕ) ∨
+      Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) (b : ℕ) := by
+  intro δ ε
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨h1, h2⟩ := hcon
+  have hdD : Set.ncard (orbit (stabilizer G δ) ε) ∈ subdegrees G Ω :=
+    ⟨δ, ε, rfl⟩
+  set d : ↥(subdegrees G Ω) := ⟨Set.ncard (orbit (stabilizer G δ) ε), hdD⟩
+    with hd
+  have hne_ab : a ≠ b := fun h => hab (by rw [h])
+  by_cases hda : d = a
+  · have hadj : (commonDivisorGraph (subdegrees G Ω)).Adj a b := by
+      refine ⟨hne_ab, ?_⟩
+      rw [← hda]
+      exact h2
+    exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
+  · by_cases hdb : d = b
+    · have hadj : (commonDivisorGraph (subdegrees G Ω)).Adj a b := by
+        refine ⟨hne_ab, ?_⟩
+        have h3 : ¬ Nat.Coprime (b : ℕ) (a : ℕ) := by
+          rw [← hdb]
+          exact h1
+        exact fun h => h3 (Nat.Coprime.symm h)
+      exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
+    · have hadj1 : (commonDivisorGraph (subdegrees G Ω)).Adj d a := ⟨hda, h1⟩
+      have hadj2 : (commonDivisorGraph (subdegrees G Ω)).Adj d b := ⟨hdb, h2⟩
+      have hreach : (commonDivisorGraph (subdegrees G Ω)).Reachable a b :=
+        (hadj1.reachable.symm).trans hadj2.reachable
+      exact hab (SimpleGraph.ConnectedComponent.eq.mpr hreach)
+
+/-- Vertices of the common-divisor graph in different components are
+coprime. -/
+lemma coprime_of_connectedComponentMk_ne {a b : ↥(subdegrees G Ω)}
+    (hab : (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a ≠
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk b) :
+    Nat.Coprime (a : ℕ) (b : ℕ) := by
+  by_contra h2
+  have hadj : (commonDivisorGraph (subdegrees G Ω)).Adj a b :=
+    ⟨fun h => hab (by rw [h]), h2⟩
+  exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
+
 end CommonDivisorGraphDef
 
 section Theorem841
@@ -532,46 +636,6 @@ theorem card_connectedComponent_commonDivisorGraph_le_three :
     rw [isArrow_iff, orbit_stabilizer_self, Set.ncard_singleton]
   set one : ↥D := ⟨1, h1D⟩ with hone
   set comp1 := Γ.connectedComponentMk one with hcomp1
-  -- vertices in different components separate the subdegree set
-  have hbridge : ∀ a b : ↥D,
-      Γ.connectedComponentMk a ≠ Γ.connectedComponentMk b →
-      ∀ δ ε : Ω,
-        Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) (a : ℕ) ∨
-        Nat.Coprime (Set.ncard (orbit (stabilizer G δ) ε)) (b : ℕ) := by
-    intro a b hab δ ε
-    by_contra hcon
-    push Not at hcon
-    obtain ⟨h1, h2⟩ := hcon
-    have hdD : Set.ncard (orbit (stabilizer G δ) ε) ∈ D := ⟨δ, ε, rfl⟩
-    set d : ↥D := ⟨Set.ncard (orbit (stabilizer G δ) ε), hdD⟩ with hd
-    have hne_ab : a ≠ b := fun h => hab (by rw [h])
-    by_cases hda : d = a
-    · have hadj : Γ.Adj a b := by
-        refine ⟨hne_ab, ?_⟩
-        rw [← hda]
-        exact h2
-      exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
-    · by_cases hdb : d = b
-      · have hadj : Γ.Adj a b := by
-          refine ⟨hne_ab, ?_⟩
-          have h3 : ¬ Nat.Coprime (b : ℕ) (a : ℕ) := by
-            rw [← hdb]
-            exact h1
-          exact fun h => h3 (Nat.Coprime.symm h)
-        exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
-      · have hadj1 : Γ.Adj d a := ⟨hda, h1⟩
-        have hadj2 : Γ.Adj d b := ⟨hdb, h2⟩
-        have hreach : Γ.Reachable a b :=
-          (hadj1.reachable.symm).trans hadj2.reachable
-        exact hab (SimpleGraph.ConnectedComponent.eq.mpr hreach)
-  -- vertices in different components are coprime
-  have hcoprime : ∀ a b : ↥D,
-      Γ.connectedComponentMk a ≠ Γ.connectedComponentMk b →
-      Nat.Coprime (a : ℕ) (b : ℕ) := by
-    intro a b hab
-    by_contra h2
-    have hadj : Γ.Adj a b := ⟨fun h => hab (by rw [h]), h2⟩
-    exact hab (SimpleGraph.ConnectedComponent.eq.mpr hadj.reachable)
   -- three vertices in distinct components, none the component of `1`
   have hkey : ∀ x y z : ↥D,
       Γ.connectedComponentMk x ≠ Γ.connectedComponentMk y →
@@ -595,12 +659,12 @@ theorem card_connectedComponent_commonDivisorGraph_le_three :
     have hvxy : (x : ℕ) ≠ (y : ℕ) := fun h2 => hxy (by rw [Subtype.ext h2])
     have hvxz : (x : ℕ) ≠ (z : ℕ) := fun h2 => hxz (by rw [Subtype.ext h2])
     have hvyz : (y : ℕ) ≠ (z : ℕ) := fun h2 => hyz (by rw [Subtype.ext h2])
-    have hsxy := hbridge x y hxy
-    have hsxz := hbridge x z hxz
-    have hsyz := hbridge y z hyz
-    have hcxy := hcoprime x y hxy
-    have hcxz := hcoprime x z hxz
-    have hcyz := hcoprime y z hyz
+    have hsxy := separation_of_connectedComponentMk_ne hxy
+    have hsxz := separation_of_connectedComponentMk_ne hxz
+    have hsyz := separation_of_connectedComponentMk_ne hyz
+    have hcxy := coprime_of_connectedComponentMk_ne hxy
+    have hcxz := coprime_of_connectedComponentMk_ne hxz
+    have hcyz := coprime_of_connectedComponentMk_ne hyz
     rcases Nat.lt_trichotomy (x : ℕ) (y : ℕ) with h12 | h12 | h12
     · rcases Nat.lt_trichotomy (x : ℕ) (z : ℕ) with h13 | h13 | h13
       · -- `x` smallest
@@ -684,5 +748,143 @@ theorem card_connectedComponent_commonDivisorGraph_le_three :
   exact hkey x y z h12 h13 h23 hd1 hd2 hd3
 
 end Theorem841
+
+/-! ### Isaacs Thm 8.43 -/
+
+section Theorem843
+
+variable [Finite G] [IsPretransitive G Ω]
+
+/-- **Isaacs Thm 8.43** (p. 251) — let `cA ≠ cB` be two components of the
+common-divisor graph of the subdegrees, neither containing `1`, and
+suppose `cB` contains the largest subdegree `ν`.  Then every subdegree in
+`cA` is smaller than every subdegree in `cB`, and every two distinct
+subdegrees in `cB` fail to be coprime (are joined by an edge).
+
+(The book states this for a graph with exactly three components
+`{1}, A, B`; the hypothesis that these are all the components is not
+needed for the proof.) -/
+theorem lt_forall_and_not_coprime_of_max_mem
+    {cA cB : (commonDivisorGraph (subdegrees G Ω)).ConnectedComponent}
+    (hAB : cA ≠ cB)
+    (hA1 : ∀ t : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk t = cA →
+      (t : ℕ) ≠ 1)
+    (hB1 : ∀ t : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk t = cB →
+      (t : ℕ) ≠ 1)
+    {ν : ↥(subdegrees G Ω)}
+    (hν : (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk ν = cB)
+    (hmax : ∀ d : ↥(subdegrees G Ω), (d : ℕ) ≤ (ν : ℕ)) :
+    (∀ a b : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a = cA →
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk b = cB →
+      (a : ℕ) < (b : ℕ)) ∧
+    (∀ u v : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk u = cB →
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk v = cB →
+      u ≠ v → ¬ Nat.Coprime (u : ℕ) (v : ℕ)) := by
+  classical
+  -- a fixed base point for all the indices `k_m`
+  obtain ⟨α₀, -, -⟩ := ν.2
+  -- value inequality from distinct components
+  have hvalne : ∀ s t : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk s ≠
+        (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk t →
+      (s : ℕ) ≠ (t : ℕ) :=
+    fun _s _t hst h2 => hst (by rw [Subtype.ext h2])
+  -- `k_s ∣ t` for `s < t` in different components (Thm 8.42 (b))
+  have hkdvd : ∀ s t : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk s ≠
+        (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk t →
+      (s : ℕ) < (t : ℕ) →
+      (stabilizer G α₀).relIndex (arrowKernel G (s : ℕ) α₀) ∣ (t : ℕ) := by
+    intro s t hst hlt
+    obtain ⟨δ, ε, hw⟩ := t.2
+    obtain ⟨γ, hw'⟩ := hw.exists_of_point α₀
+    exact relIndex_arrowKernel_dvd_of_isArrow hlt hw'
+      (separation_of_connectedComponentMk_ne hst)
+  -- `k_s ∣ k_t` for `s < t` in different components (Thm 8.42 (a))
+  have hkk : ∀ s t : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk s ≠
+        (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk t →
+      (s : ℕ) < (t : ℕ) →
+      (stabilizer G α₀).relIndex (arrowKernel G (s : ℕ) α₀) ∣
+        (stabilizer G α₀).relIndex (arrowKernel G (t : ℕ) α₀) := by
+    intro s t hst hlt
+    obtain ⟨δ, ε, hw⟩ := t.2
+    obtain ⟨γ, hw'⟩ := hw.exists_of_point α₀
+    have h2 := relIndex_arrowKernel_dvd_relIndex_arrowKernel hlt hw'
+      (separation_of_connectedComponentMk_ne hst)
+    rwa [relIndex_arrowKernel_eq (t : ℕ) γ α₀] at h2
+  -- `k_s > 1` for subdegrees `s ≠ 1`
+  have hk1 : ∀ s : ↥(subdegrees G Ω), (s : ℕ) ≠ 1 →
+      1 < (stabilizer G α₀).relIndex (arrowKernel G (s : ℕ) α₀) := by
+    intro s hs1
+    have hpos := subdegrees_pos s
+    obtain ⟨δ, ε, hw⟩ := s.2
+    obtain ⟨β, hw'⟩ := hw.exists_of_point α₀
+    exact one_lt_relIndex_arrowKernel_of_isArrow (by omega) hw'
+  -- clause (i)
+  have hi : ∀ a b : ↥(subdegrees G Ω),
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a = cA →
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk b = cB →
+      (a : ℕ) < (b : ℕ) := by
+    intro a b ha hb
+    have hab' : (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a ≠
+        (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk b := by
+      rw [ha, hb]
+      exact hAB
+    have hvab := hvalne a b hab'
+    rcases Nat.lt_or_ge (a : ℕ) (b : ℕ) with h | h
+    · exact h
+    · exfalso
+      have hba : (b : ℕ) < (a : ℕ) := by omega
+      have h1 := hkdvd b a hab'.symm hba
+      have h3 := hkk b a hab'.symm hba
+      have haν : (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a ≠
+          (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk ν := by
+        rw [ha, hν]
+        exact hAB
+      have haltν : (a : ℕ) < (ν : ℕ) :=
+        lt_of_le_of_ne (hmax a) (hvalne a ν haν)
+      have h4 := hkdvd a ν haν haltν
+      have h5 : (stabilizer G α₀).relIndex (arrowKernel G (b : ℕ) α₀) ∣
+          Nat.gcd (a : ℕ) (ν : ℕ) :=
+        Nat.dvd_gcd h1 (dvd_trans h3 h4)
+      have h6 := hk1 b (hB1 b hb)
+      have h7 : Nat.gcd (a : ℕ) (ν : ℕ) = 1 :=
+        coprime_of_connectedComponentMk_ne haν
+      rw [h7] at h5
+      have := Nat.dvd_one.mp h5
+      omega
+  refine ⟨hi, ?_⟩
+  -- clause (ii)
+  intro u v hu hv huv
+  obtain ⟨a, ha⟩ : ∃ a, (commonDivisorGraph
+      (subdegrees G Ω)).connectedComponentMk a = cA := Quot.exists_rep cA
+  have hau : (a : ℕ) < (u : ℕ) := hi a u ha hu
+  have hav : (a : ℕ) < (v : ℕ) := hi a v ha hv
+  have hua : (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a ≠
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk u := by
+    rw [ha, hu]
+    exact hAB
+  have hva : (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk a ≠
+      (commonDivisorGraph (subdegrees G Ω)).connectedComponentMk v := by
+    rw [ha, hv]
+    exact hAB
+  have h1 := hkdvd a u hua hau
+  have h2 := hkdvd a v hva hav
+  have h3 := hk1 a (hA1 a ha)
+  intro hcop
+  have h4 : (stabilizer G α₀).relIndex (arrowKernel G (a : ℕ) α₀) ∣
+      Nat.gcd (u : ℕ) (v : ℕ) :=
+    Nat.dvd_gcd h1 h2
+  have hcop' : Nat.gcd (u : ℕ) (v : ℕ) = 1 := hcop
+  rw [hcop'] at h4
+  have := Nat.dvd_one.mp h4
+  omega
+
+end Theorem843
 
 end OddOrder.Isaacs.Ch08
