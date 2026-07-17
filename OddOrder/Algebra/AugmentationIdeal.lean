@@ -8,6 +8,7 @@ import Mathlib.Algebra.Algebra.Operations
 import Mathlib.LinearAlgebra.Basis.Basic
 import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.GroupTheory.Abelianization.Defs
+import Mathlib.GroupTheory.Complement
 
 /-!
 # The augmentation ideal of an integral group ring
@@ -489,5 +490,675 @@ theorem abelianizationEquivAugmentationQuotient_of (g : G) :
   rfl
 
 end AugmentationQuotient
+
+/-! ### Isaacs Lemma 10.21: transversal components of `Δ(K)Δ(G)` (pp. 311-312)
+
+`K ≤ G` に対し `Δ(K) ⊆ ℤ[G]` を `{k - 1 | k ∈ K}` の `ℤ`-span として実現し、
+右 transversal `T` (mathlib の `Subgroup.IsComplement (K : Set G) T`) に沿った
+成分和写像 `f = ∑ₜ fₜ : ℤ[G] → ℤ[K] ⊆ ℤ[G]` (`g = kt ↦ k`) を定義する。
+**Lemma 10.21** の成分和半分: `α ∈ Δ(K)Δ(G)` ならば `f(α) ∈ Δ(K)²`。 -/
+
+section TransversalComponents
+
+/-- The identity `(x - 1)(y - 1) = xy - x - y + 1` in `ℤ[G]`. -/
+theorem sub_one_mul_sub_one (x y : G) :
+    (MonoidAlgebra.of ℤ G x - 1) * (MonoidAlgebra.of ℤ G y - 1)
+      = MonoidAlgebra.of ℤ G (x * y) - MonoidAlgebra.of ℤ G x
+        - MonoidAlgebra.of ℤ G y + 1 := by
+  rw [map_mul, mul_sub, sub_mul, mul_one, one_mul]
+  abel
+
+variable (K : Subgroup G)
+
+/-- The copy of the augmentation ideal `Δ(K)` of a subgroup `K ≤ G` inside
+`ℤ[G]`: the `ℤ`-span of `{k - 1 | k ∈ K}` (Isaacs p. 311). -/
+noncomputable def augmentationIdealOf : Submodule ℤ (MonoidAlgebra ℤ G) :=
+  Submodule.span ℤ (Set.range fun k : K => MonoidAlgebra.of ℤ G ↑k - 1)
+
+theorem sub_one_mem_augmentationIdealOf {x : G} (hx : x ∈ K) :
+    MonoidAlgebra.of ℤ G x - 1 ∈ augmentationIdealOf G K :=
+  Submodule.subset_span ⟨⟨x, hx⟩, rfl⟩
+
+theorem augmentationIdealOf_le :
+    augmentationIdealOf G K ≤ augmentationIdeal G :=
+  Submodule.span_le.mpr <| by
+    rintro _ ⟨k, rfl⟩
+    exact sub_one_mem_augmentationIdeal G ↑k
+
+/-- Reduction of `span S₁ * span S₂ ≤ P` to generators. Stated for `ℤ[G]`;
+this sidesteps `Submodule.span_mul_span`, whose Algebra-section `*`-instance
+(`Algebra.toModule`) does not match the Module-section `Submodule.mul`
+instance under keyed rewriting. -/
+theorem span_mul_span_le {S₁ S₂ : Set (MonoidAlgebra ℤ G)}
+    {P : Submodule ℤ (MonoidAlgebra ℤ G)}
+    (h : ∀ s₁ ∈ S₁, ∀ s₂ ∈ S₂, s₁ * s₂ ∈ P) :
+    Submodule.span ℤ S₁ * Submodule.span ℤ S₂ ≤ P := by
+  rw [Submodule.mul_le]
+  intro m hm n hn
+  induction hm using Submodule.span_induction with
+  | mem s₁ hs₁ =>
+    have hspan : Submodule.span ℤ S₂ ≤ P.comap (LinearMap.mulLeft ℤ s₁) :=
+      Submodule.span_le.mpr fun s₂ hs₂ => h s₁ hs₁ s₂ hs₂
+    exact hspan hn
+  | zero =>
+    rw [zero_mul]
+    exact P.zero_mem
+  | add x y hx hy ihx ihy =>
+    rw [add_mul]
+    exact P.add_mem ihx ihy
+  | smul c x hx ihx =>
+    rw [smul_mul_assoc]
+    exact P.smul_mem c ihx
+
+variable {T : Set G}
+
+/-- Isaacs p. 311, the map `f = ∑ₜ fₜ : ℤ[G] → ℤ[K] ⊆ ℤ[G]`: on a basis
+element `g` with unique factorization `g = kt` (`k ∈ K`, `t ∈ T`, along the
+right transversal `T`), returns `k` — i.e. the sum of all `t`-components. -/
+noncomputable def transversalComponentSum
+    (hT : Subgroup.IsComplement (K : Set G) T) :
+    MonoidAlgebra ℤ G →ₗ[ℤ] MonoidAlgebra ℤ G :=
+  (MonoidAlgebra.basis G ℤ).constr ℤ fun g =>
+    MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G)
+
+theorem transversalComponentSum_of (hT : Subgroup.IsComplement (K : Set G) T)
+    (u : G) :
+    transversalComponentSum G K hT (MonoidAlgebra.of ℤ G u)
+      = MonoidAlgebra.of ℤ G ((hT.equiv u).1 : G) := by
+  rw [show MonoidAlgebra.of ℤ G u = MonoidAlgebra.basis G ℤ u from
+    (MonoidAlgebra.basis_apply ℤ u).symm]
+  exact (MonoidAlgebra.basis G ℤ).constr_basis ℤ _ u
+
+theorem transversalComponentSum_one (hT : Subgroup.IsComplement (K : Set G) T)
+    (h1 : (1 : G) ∈ T) :
+    transversalComponentSum G K hT 1 = 1 := by
+  rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.of ℤ G 1 from
+      (map_one (MonoidAlgebra.of ℤ G)).symm,
+    transversalComponentSum_of, hT.equiv_one (K.one_mem) h1]
+
+/-- The key computation of Isaacs Lemma 10.21: for generators,
+`f((k-1)(g-1)) = (k-1)(h-1)` where `g = ht` is the transversal
+factorization. -/
+theorem transversalComponentSum_sub_one_mul_sub_one
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    (k : K) (g : G) :
+    transversalComponentSum G K hT
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+      = (MonoidAlgebra.of ℤ G ↑k - 1)
+        * (MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) - 1) := by
+  have hfst_mul : ((hT.equiv (↑k * g)).1 : G) = ↑k * ((hT.equiv g).1 : G) := by
+    rw [hT.equiv_mul_left_of_mem k.2]
+    rfl
+  have hfst_self : ((hT.equiv ↑k).1 : G) = ↑k := by
+    rw [hT.equiv_fst_eq_self_of_mem_of_one_mem h1 k.2]
+  rw [sub_one_mul_sub_one, map_add, map_sub, map_sub,
+    transversalComponentSum_of, transversalComponentSum_of,
+    transversalComponentSum_of, transversalComponentSum_one G K hT h1,
+    hfst_mul, hfst_self, sub_one_mul_sub_one, map_mul]
+
+open scoped Classical in
+/-- The `t`-component `fₜ : ℤ[G] → ℤ[K] ⊆ ℤ[G]` with respect to the right
+transversal `T` (Isaacs p. 311): a basis element `g` with unique factorization
+`g = ks` (`k ∈ K`, `s ∈ T`) maps to `k` if `s = t`, and to `0` otherwise. -/
+noncomputable def transversalComponent
+    (hT : Subgroup.IsComplement (K : Set G) T) (t : G) :
+    MonoidAlgebra ℤ G →ₗ[ℤ] MonoidAlgebra ℤ G :=
+  (MonoidAlgebra.basis G ℤ).constr ℤ fun g =>
+    if ((hT.equiv g).2 : G) = t
+      then MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) else 0
+
+open scoped Classical in
+theorem transversalComponent_of (hT : Subgroup.IsComplement (K : Set G) T)
+    (t : G) (u : G) :
+    transversalComponent G K hT t (MonoidAlgebra.of ℤ G u)
+      = if ((hT.equiv u).2 : G) = t
+          then MonoidAlgebra.of ℤ G ((hT.equiv u).1 : G) else 0 := by
+  rw [show MonoidAlgebra.of ℤ G u = MonoidAlgebra.basis G ℤ u from
+    (MonoidAlgebra.basis_apply ℤ u).symm]
+  exact (MonoidAlgebra.basis G ℤ).constr_basis ℤ _ u
+
+open scoped Classical in
+/-- Component computation on generators: for `g = hs` along the transversal,
+`fₜ((k-1)(g-1)) = [s = t]·(kh - h) + [1 = t]·(1 - k)` (Isaacs p. 312; both
+brackets lie in `Δ(K)` for every `t`). -/
+theorem transversalComponent_sub_one_mul_sub_one
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    (k : K) (g : G) (t : G) :
+    transversalComponent G K hT t
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+      = (if ((hT.equiv g).2 : G) = t
+          then MonoidAlgebra.of ℤ G (↑k * ((hT.equiv g).1 : G))
+            - MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) else 0)
+        + (if (1 : G) = t then 1 - MonoidAlgebra.of ℤ G ↑k else 0) := by
+  have hfst_mul : ((hT.equiv (↑k * g)).1 : G) = ↑k * ((hT.equiv g).1 : G) := by
+    rw [hT.equiv_mul_left_of_mem k.2]; rfl
+  have hsnd_mul : ((hT.equiv (↑k * g)).2 : G) = ((hT.equiv g).2 : G) := by
+    rw [hT.equiv_mul_left_of_mem k.2]
+  have hfst_self : ((hT.equiv ↑k).1 : G) = ↑k := by
+    rw [hT.equiv_fst_eq_self_of_mem_of_one_mem h1 k.2]
+  have hsnd_self : ((hT.equiv ↑k).2 : G) = 1 := by
+    rw [hT.equiv_snd_eq_one_of_mem_of_one_mem h1 k.2]
+  have hone : transversalComponent G K hT t 1
+      = if (1 : G) = t then 1 else 0 := by
+    rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.of ℤ G 1 from
+        (map_one (MonoidAlgebra.of ℤ G)).symm,
+      transversalComponent_of, hT.equiv_one (K.one_mem) h1]
+  rw [sub_one_mul_sub_one, map_add, map_sub, map_sub,
+    transversalComponent_of, transversalComponent_of, transversalComponent_of,
+    hone]
+  simp only [hfst_mul, hsnd_mul, hfst_self, hsnd_self]
+  split_ifs <;> abel
+
+/-- **Isaacs Lemma 10.21** (per-component half): if `α ∈ Δ(K)Δ(G)` then every
+`t`-component satisfies `αₜ ∈ Δ(K)`. -/
+theorem transversalComponent_mem
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T) (t : G)
+    {α : MonoidAlgebra ℤ G}
+    (hα : α ∈ augmentationIdealOf G K * augmentationIdeal G) :
+    transversalComponent G K hT t α ∈ augmentationIdealOf G K := by
+  have hle : augmentationIdealOf G K * augmentationIdeal G
+      ≤ (augmentationIdealOf G K).comap (transversalComponent G K hT t) := by
+    rw [augmentationIdeal_eq_span]
+    refine span_mul_span_le G ?_
+    rintro _ ⟨k, rfl⟩ _ ⟨g, rfl⟩
+    have : transversalComponent G K hT t
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+        ∈ augmentationIdealOf G K := by
+      rw [transversalComponent_sub_one_mul_sub_one G K hT h1]
+      refine Submodule.add_mem _ ?_ ?_
+      · split_ifs
+        · have hsplit : MonoidAlgebra.of ℤ G (↑k * ((hT.equiv g).1 : G))
+              - MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G)
+              = (MonoidAlgebra.of ℤ G (↑k * ((hT.equiv g).1 : G)) - 1)
+                - (MonoidAlgebra.of ℤ G ((hT.equiv g).1 : G) - 1) := by
+            abel
+          rw [hsplit]
+          exact Submodule.sub_mem _
+            (sub_one_mem_augmentationIdealOf G K
+              (K.mul_mem k.2 (hT.equiv g).1.2))
+            (sub_one_mem_augmentationIdealOf G K (hT.equiv g).1.2)
+        · exact Submodule.zero_mem _
+      · split_ifs
+        · have hsplit : (1 : MonoidAlgebra ℤ G) - MonoidAlgebra.of ℤ G ↑k
+              = -(MonoidAlgebra.of ℤ G ↑k - 1) := by
+            abel
+          rw [hsplit]
+          exact Submodule.neg_mem _ (sub_one_mem_augmentationIdealOf G K k.2)
+        · exact Submodule.zero_mem _
+    exact this
+  exact hle hα
+
+/-- **Isaacs Lemma 10.21** (component-sum half): if `α ∈ Δ(K)Δ(G)` then
+`f(α) = ∑ₜ αₜ ∈ Δ(K)²`. -/
+theorem transversalComponentSum_mem_sq
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    {α : MonoidAlgebra ℤ G}
+    (hα : α ∈ augmentationIdealOf G K * augmentationIdeal G) :
+    transversalComponentSum G K hT α
+      ∈ augmentationIdealOf G K * augmentationIdealOf G K := by
+  have hle : augmentationIdealOf G K * augmentationIdeal G
+      ≤ (augmentationIdealOf G K * augmentationIdealOf G K).comap
+          (transversalComponentSum G K hT) := by
+    rw [augmentationIdeal_eq_span]
+    refine span_mul_span_le G ?_
+    rintro _ ⟨k, rfl⟩ _ ⟨g, rfl⟩
+    have : transversalComponentSum G K hT
+        ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
+        ∈ augmentationIdealOf G K * augmentationIdealOf G K := by
+      rw [transversalComponentSum_sub_one_mul_sub_one G K hT h1]
+      exact Submodule.mul_mem_mul (sub_one_mem_augmentationIdealOf G K k.2)
+        (sub_one_mem_augmentationIdealOf G K (hT.equiv g).1.2)
+    exact this
+  exact hle hα
+
+/-! ### Isaacs Corollary 10.22: `Δ(K)² = Δ(K)Δ(G) ∩ ℤ[K]` (p. 312) -/
+
+/-- The copy of the group ring `ℤ[K]` of a subgroup `K ≤ G` inside `ℤ[G]`:
+the `ℤ`-span of the basis elements `k ∈ K`. -/
+noncomputable def groupRingOf : Submodule ℤ (MonoidAlgebra ℤ G) :=
+  Submodule.span ℤ (Set.range fun k : K => MonoidAlgebra.of ℤ G ↑k)
+
+theorem of_mem_groupRingOf {x : G} (hx : x ∈ K) :
+    MonoidAlgebra.of ℤ G x ∈ groupRingOf G K :=
+  Submodule.subset_span ⟨⟨x, hx⟩, rfl⟩
+
+theorem one_mem_groupRingOf : (1 : MonoidAlgebra ℤ G) ∈ groupRingOf G K := by
+  rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.of ℤ G 1 from
+    (map_one (MonoidAlgebra.of ℤ G)).symm]
+  exact of_mem_groupRingOf G K K.one_mem
+
+theorem augmentationIdealOf_le_groupRingOf :
+    augmentationIdealOf G K ≤ groupRingOf G K :=
+  Submodule.span_le.mpr <| by
+    rintro _ ⟨k, rfl⟩
+    exact Submodule.sub_mem _ (of_mem_groupRingOf G K k.2)
+      (one_mem_groupRingOf G K)
+
+/-- `Δ(K)² ⊆ Δ(K)`: same computation as `augmentationIdeal_sq_le`, inside the
+subgroup copy. -/
+theorem augmentationIdealOf_sq_le :
+    augmentationIdealOf G K * augmentationIdealOf G K
+      ≤ augmentationIdealOf G K := by
+  refine span_mul_span_le G ?_
+  rintro _ ⟨k, rfl⟩ _ ⟨k', rfl⟩
+  rw [sub_one_mul_sub_one]
+  have h : MonoidAlgebra.of ℤ G (↑k * ↑k') - MonoidAlgebra.of ℤ G ↑k
+      - MonoidAlgebra.of ℤ G ↑k' + 1
+      = (MonoidAlgebra.of ℤ G (↑k * ↑k') - 1)
+        - (MonoidAlgebra.of ℤ G ↑k - 1)
+        - (MonoidAlgebra.of ℤ G ↑k' - 1) := by
+    abel
+  rw [h]
+  exact Submodule.sub_mem _
+    (Submodule.sub_mem _
+      (sub_one_mem_augmentationIdealOf G K (K.mul_mem k.2 k'.2))
+      (sub_one_mem_augmentationIdealOf G K k.2))
+    (sub_one_mem_augmentationIdealOf G K k'.2)
+
+/-- `f` is the identity on `ℤ[K]` (each basis element `k ∈ K` factors as
+`k·1` along the transversal). -/
+theorem transversalComponentSum_eq_self {T : Set G}
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    {α : MonoidAlgebra ℤ G} (hα : α ∈ groupRingOf G K) :
+    transversalComponentSum G K hT α = α := by
+  have hle : groupRingOf G K
+      ≤ LinearMap.ker (transversalComponentSum G K hT - LinearMap.id) :=
+    Submodule.span_le.mpr <| by
+      rintro _ ⟨k, rfl⟩
+      rw [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.sub_apply,
+        LinearMap.id_apply, transversalComponentSum_of, sub_eq_zero,
+        hT.equiv_fst_eq_self_of_mem_of_one_mem h1 k.2]
+  have hker := hle hα
+  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
+    sub_eq_zero] at hker
+  exact hker
+
+/-- **Isaacs Corollary 10.22** (ℤ[K]-form):
+`Δ(K)² = Δ(K)Δ(G) ⊓ ℤ[K]` in `ℤ[G]`. -/
+theorem augmentationIdealOf_sq_eq_inf_groupRingOf :
+    augmentationIdealOf G K * augmentationIdealOf G K
+      = (augmentationIdealOf G K * augmentationIdeal G) ⊓ groupRingOf G K := by
+  obtain ⟨T, hT, h1⟩ := Subgroup.exists_isComplement_right K 1
+  apply le_antisymm
+  · exact le_inf (mul_le_mul_right (augmentationIdealOf_le G K) _)
+      ((augmentationIdealOf_sq_le G K).trans
+        (augmentationIdealOf_le_groupRingOf G K))
+  · rintro α ⟨hα₁, hα₂⟩
+    have hmem := transversalComponentSum_mem_sq G K hT h1 hα₁
+    rwa [transversalComponentSum_eq_self G K hT h1 hα₂] at hmem
+
+/-- **Isaacs Corollary 10.22** (Δ(K)-form):
+`Δ(K)² = Δ(K)Δ(G) ⊓ Δ(K)` in `ℤ[G]`. -/
+theorem augmentationIdealOf_sq_eq_inf :
+    augmentationIdealOf G K * augmentationIdealOf G K
+      = (augmentationIdealOf G K * augmentationIdeal G)
+          ⊓ augmentationIdealOf G K := by
+  apply le_antisymm
+  · exact le_inf (mul_le_mul_right (augmentationIdealOf_le G K) _)
+      (augmentationIdealOf_sq_le G K)
+  · exact le_trans
+      (inf_le_inf_left _ (augmentationIdealOf_le_groupRingOf G K))
+      (le_of_eq (augmentationIdealOf_sq_eq_inf_groupRingOf G K).symm)
+
+/-! ### Isaacs Corollary 10.23: `Δ(K)‾ ≅ K/K'` in `Δ(G)/Δ(K)Δ(G)` (p. 312)
+
+Isaacs の `Δ(K)‾` (= `Δ(K)` の `Δ(G)‾ = Δ(G)/Δ(K)Δ(G)` 内の像) は第二同型定理で
+`Δ(K)/(Δ(K)Δ(G) ∩ Δ(K))` と同一視できるので、ここでは商
+`Δ(K)/(Δ(K)Δ(G) ∩ Δ(K))` として形式化する (kernel の同定が Corollary 10.22)。
+証明は Theorem 10.20 の議論の `Δ(K) ⊆ ℤ[G]` (span 版) での replay。 -/
+
+section SubgroupAugmentationQuotient
+
+theorem linearIndependent_of_sub_one_subgroup :
+    LinearIndependent ℤ (fun k : {k : K // k ≠ 1} =>
+      MonoidAlgebra.of ℤ G ↑k.val - 1) := by
+  classical
+  rw [linearIndependent_iff']
+  intro s f hsum j hj
+  have hc := congrArg ((MonoidAlgebra.basis G ℤ).coord ↑j.val) hsum
+  rw [map_sum, map_zero] at hc
+  have hterm : ∀ i ∈ s,
+      (MonoidAlgebra.basis G ℤ).coord ↑j.val
+        (f i • (MonoidAlgebra.of ℤ G ↑i.val - 1))
+      = if i = j then f i else 0 := by
+    intro i _
+    rw [map_smul, map_sub]
+    have h1 : (MonoidAlgebra.basis G ℤ).coord ↑j.val
+        (MonoidAlgebra.of ℤ G ↑i.val)
+        = if (↑i.val : G) = ↑j.val then 1 else 0 := by
+      rw [show MonoidAlgebra.of ℤ G (↑i.val : G) = MonoidAlgebra.basis G ℤ ↑i.val
+        from (MonoidAlgebra.basis_apply ℤ (↑i.val : G)).symm]
+      rw [Module.Basis.coord_apply, Module.Basis.repr_self,
+        Finsupp.single_apply]
+    have h2 : (MonoidAlgebra.basis G ℤ).coord ↑j.val (1 : MonoidAlgebra ℤ G)
+        = 0 := by
+      rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.basis G ℤ 1 from
+        by rw [MonoidAlgebra.basis_apply]; rfl]
+      rw [Module.Basis.coord_apply, Module.Basis.repr_self,
+        Finsupp.single_apply,
+        if_neg (fun h => j.2 (OneMemClass.coe_eq_one.mp h.symm))]
+    rw [h1, h2, sub_zero]
+    rcases eq_or_ne i j with rfl | hij
+    · rw [if_pos rfl, if_pos rfl, smul_eq_mul, mul_one]
+    · have hne : (↑i.val : G) ≠ ↑j.val := fun h =>
+        hij (Subtype.ext (Subtype.ext h))
+      rw [if_neg hne, if_neg hij, smul_zero]
+  rw [Finset.sum_congr rfl hterm, Finset.sum_ite_eq' s j (fun i => f i),
+    if_pos hj] at hc
+  exact hc
+
+/-- The elements `k - 1`, `1 ≠ k ∈ K`, form a `ℤ`-basis of the copy of
+`Δ(K)` inside `ℤ[G]` (Lemma 10.19 for the subgroup copy). -/
+noncomputable def augmentationIdealOfBasis :
+    Module.Basis {k : K // k ≠ 1} ℤ ↥(augmentationIdealOf G K) := by
+  refine Module.Basis.mk (v := fun k : {k : K // k ≠ 1} =>
+    (⟨MonoidAlgebra.of ℤ G ↑k.val - 1,
+      sub_one_mem_augmentationIdealOf G K k.val.2⟩ :
+      ↥(augmentationIdealOf G K))) ?_ ?_
+  · have hamb := linearIndependent_of_sub_one_subgroup G K
+    exact hamb.of_comp (augmentationIdealOf G K).subtype
+  · rintro ⟨α, hα⟩ -
+    have hspan : α ∈ Submodule.span ℤ
+        (Set.range fun k : K => MonoidAlgebra.of ℤ G ↑k - 1) := hα
+    induction hspan using Submodule.span_induction with
+    | mem x hx =>
+      obtain ⟨k, rfl⟩ := hx
+      rcases eq_or_ne k 1 with rfl | hk
+      · have h0 : (⟨MonoidAlgebra.of ℤ G ↑(1 : K) - 1, hα⟩ :
+            ↥(augmentationIdealOf G K)) = 0 := by
+          apply Subtype.ext
+          change MonoidAlgebra.of ℤ G ↑(1 : K) - 1 = 0
+          rw [OneMemClass.coe_one, map_one, sub_self]
+        rw [h0]
+        exact Submodule.zero_mem _
+      · exact Submodule.subset_span ⟨⟨k, hk⟩, rfl⟩
+    | zero =>
+      have h0 : (⟨(0 : MonoidAlgebra ℤ G), hα⟩ :
+          ↥(augmentationIdealOf G K)) = 0 := rfl
+      rw [h0]
+      exact Submodule.zero_mem _
+    | add x y hx hy ihx ihy =>
+      have hsplit : (⟨x + y, hα⟩ : ↥(augmentationIdealOf G K))
+          = ⟨x, hx⟩ + ⟨y, hy⟩ := rfl
+      rw [hsplit]
+      exact Submodule.add_mem _ (ihx hx) (ihy hy)
+    | smul c x hx ihx =>
+      have hsplit : (⟨c • x, hα⟩ : ↥(augmentationIdealOf G K))
+          = c • ⟨x, hx⟩ := rfl
+      rw [hsplit]
+      exact Submodule.smul_mem _ _ (ihx hx)
+
+@[simp]
+theorem augmentationIdealOfBasis_apply (k : {k : K // k ≠ 1}) :
+    ((augmentationIdealOfBasis G K k : ↥(augmentationIdealOf G K)) :
+        MonoidAlgebra ℤ G)
+      = MonoidAlgebra.of ℤ G ↑k.val - 1 := by
+  rw [augmentationIdealOfBasis, Module.Basis.mk_apply]
+
+/-- `Δ(K)Δ(G) ∩ Δ(K)` pulled back to a submodule of `Δ(K)` — the kernel of
+`Δ(K) → Δ(K)‾` (Isaacs p. 312). -/
+noncomputable def augmentationIdealOfRel : Submodule ℤ ↥(augmentationIdealOf G K) :=
+  (augmentationIdealOf G K * augmentationIdeal G).comap
+    (augmentationIdealOf G K).subtype
+
+theorem mem_augmentationIdealOfRel {G : Type*} [Group G] {K : Subgroup G}
+    {α : ↥(augmentationIdealOf G K)} :
+    α ∈ augmentationIdealOfRel G K
+      ↔ (α : MonoidAlgebra ℤ G)
+          ∈ augmentationIdealOf G K * augmentationIdeal G :=
+  Iff.rfl
+
+/-- The quotient `Δ(K)‾ = Δ(K)/(Δ(K)Δ(G) ∩ Δ(K))`. -/
+abbrev AugmentationQuotientOf :=
+  ↥(augmentationIdealOf G K) ⧸ augmentationIdealOfRel G K
+
+/-- The forward map of Corollary 10.23: `K →* Δ(K)‾`, `k ↦ (k-1)‾`. -/
+noncomputable def toAugmentationQuotientOf :
+    K →* Multiplicative (AugmentationQuotientOf G K) where
+  toFun k := Multiplicative.ofAdd (Submodule.Quotient.mk
+    ⟨MonoidAlgebra.of ℤ G ↑k - 1, sub_one_mem_augmentationIdealOf G K k.2⟩)
+  map_one' := by
+    have h0 : (⟨MonoidAlgebra.of ℤ G ↑(1 : K) - 1,
+        sub_one_mem_augmentationIdealOf G K (1 : K).2⟩ :
+        ↥(augmentationIdealOf G K)) = 0 := by
+      apply Subtype.ext
+      change MonoidAlgebra.of ℤ G ↑(1 : K) - 1 = 0
+      rw [OneMemClass.coe_one, map_one, sub_self]
+    rw [h0, Submodule.Quotient.mk_zero, ofAdd_zero]
+  map_mul' x y := by
+    have key : (Submodule.Quotient.mk
+          ⟨MonoidAlgebra.of ℤ G ↑(x * y) - 1,
+            sub_one_mem_augmentationIdealOf G K (x * y).2⟩ :
+          AugmentationQuotientOf G K)
+        = Submodule.Quotient.mk
+            ⟨MonoidAlgebra.of ℤ G ↑x - 1,
+              sub_one_mem_augmentationIdealOf G K x.2⟩
+          + Submodule.Quotient.mk
+            ⟨MonoidAlgebra.of ℤ G ↑y - 1,
+              sub_one_mem_augmentationIdealOf G K y.2⟩ := by
+      rw [← Submodule.Quotient.mk_add, Submodule.Quotient.eq]
+      have hval : ((⟨MonoidAlgebra.of ℤ G ↑(x * y) - 1,
+              sub_one_mem_augmentationIdealOf G K (x * y).2⟩
+            - (⟨MonoidAlgebra.of ℤ G ↑x - 1,
+                sub_one_mem_augmentationIdealOf G K x.2⟩
+              + ⟨MonoidAlgebra.of ℤ G ↑y - 1,
+                  sub_one_mem_augmentationIdealOf G K y.2⟩) :
+            ↥(augmentationIdealOf G K)) : MonoidAlgebra ℤ G)
+          = (MonoidAlgebra.of ℤ G ↑x - 1) * (MonoidAlgebra.of ℤ G ↑y - 1) := by
+        push_cast
+        rw [of_mul_sub_one]
+        abel
+      rw [mem_augmentationIdealOfRel, hval]
+      exact Submodule.mul_mem_mul (sub_one_mem_augmentationIdealOf G K x.2)
+        (sub_one_mem_augmentationIdeal G ↑y)
+    rw [key, ofAdd_add]
+
+/-- The retraction `θ : Δ(K) →ₗ[ℤ] K/K'` on the basis of the subgroup copy,
+`θ(k - 1) = K'k`. -/
+noncomputable def augmentationIdealOfRetraction :
+    ↥(augmentationIdealOf G K) →ₗ[ℤ] Additive (Abelianization K) :=
+  (augmentationIdealOfBasis G K).constr ℤ fun k =>
+    Additive.ofMul (Abelianization.of k.val)
+
+theorem augmentationIdealOfRetraction_sub_one (k : K)
+    (h : MonoidAlgebra.of ℤ G ↑k - 1 ∈ augmentationIdealOf G K) :
+    augmentationIdealOfRetraction G K ⟨MonoidAlgebra.of ℤ G ↑k - 1, h⟩
+      = Additive.ofMul (Abelianization.of k) := by
+  rcases eq_or_ne k 1 with rfl | hk
+  · have h0 : (⟨MonoidAlgebra.of ℤ G ↑(1 : K) - 1, h⟩ :
+        ↥(augmentationIdealOf G K)) = 0 := by
+      apply Subtype.ext
+      change MonoidAlgebra.of ℤ G ↑(1 : K) - 1 = 0
+      rw [OneMemClass.coe_one, map_one, sub_self]
+    rw [h0, map_zero, map_one, ofMul_one]
+  · have hb : (⟨MonoidAlgebra.of ℤ G ↑k - 1, h⟩ :
+        ↥(augmentationIdealOf G K))
+        = augmentationIdealOfBasis G K ⟨k, hk⟩ := by
+      apply Subtype.ext
+      rw [augmentationIdealOfBasis_apply]
+    rw [hb]
+    exact (augmentationIdealOfBasis G K).constr_basis ℤ _ ⟨k, hk⟩
+
+theorem augmentationIdealOfRetraction_sub_one_mul_sub_one (x y : K)
+    (h : (MonoidAlgebra.of ℤ G ↑x - 1) * (MonoidAlgebra.of ℤ G ↑y - 1)
+      ∈ augmentationIdealOf G K) :
+    augmentationIdealOfRetraction G K
+      ⟨(MonoidAlgebra.of ℤ G ↑x - 1) * (MonoidAlgebra.of ℤ G ↑y - 1), h⟩
+      = 0 := by
+  have hsplit : (⟨(MonoidAlgebra.of ℤ G ↑x - 1) * (MonoidAlgebra.of ℤ G ↑y - 1),
+        h⟩ : ↥(augmentationIdealOf G K))
+      = ⟨MonoidAlgebra.of ℤ G ↑(x * y) - 1,
+          sub_one_mem_augmentationIdealOf G K (x * y).2⟩
+        - ⟨MonoidAlgebra.of ℤ G ↑x - 1, sub_one_mem_augmentationIdealOf G K x.2⟩
+        - ⟨MonoidAlgebra.of ℤ G ↑y - 1,
+            sub_one_mem_augmentationIdealOf G K y.2⟩ := by
+    apply Subtype.ext
+    push_cast
+    rw [of_mul_sub_one]
+    abel
+  rw [hsplit, map_sub, map_sub, augmentationIdealOfRetraction_sub_one,
+    augmentationIdealOfRetraction_sub_one, augmentationIdealOfRetraction_sub_one,
+    map_mul, ofMul_mul]
+  abel
+
+/-- Left multiplication by `α`, as an endomorphism of `Δ(K)` (well-defined
+when `α ∈ Δ(K)` since `Δ(K)² ⊆ Δ(K)`). -/
+noncomputable def augmentationIdealOfMulLeft (α : MonoidAlgebra ℤ G)
+    (hα : α ∈ augmentationIdealOf G K) :
+    ↥(augmentationIdealOf G K) →ₗ[ℤ] ↥(augmentationIdealOf G K) :=
+  (LinearMap.mulLeft ℤ α).restrict fun _ hβ =>
+    augmentationIdealOf_sq_le G K (Submodule.mul_mem_mul hα hβ)
+
+/-- Right multiplication by `β`, as an endomorphism of `Δ(K)`. -/
+noncomputable def augmentationIdealOfMulRight (β : MonoidAlgebra ℤ G)
+    (hβ : β ∈ augmentationIdealOf G K) :
+    ↥(augmentationIdealOf G K) →ₗ[ℤ] ↥(augmentationIdealOf G K) :=
+  (LinearMap.mulRight ℤ β).restrict fun _ hα =>
+    augmentationIdealOf_sq_le G K (Submodule.mul_mem_mul hα hβ)
+
+theorem augmentationIdealOfRetraction_comp_mulLeft (x : K) :
+    (augmentationIdealOfRetraction G K).comp
+        (augmentationIdealOfMulLeft G K (MonoidAlgebra.of ℤ G ↑x - 1)
+          (sub_one_mem_augmentationIdealOf G K x.2)) = 0 :=
+  (augmentationIdealOfBasis G K).ext fun y => by
+    rw [LinearMap.comp_apply, LinearMap.zero_apply]
+    have hb : augmentationIdealOfMulLeft G K (MonoidAlgebra.of ℤ G ↑x - 1)
+          (sub_one_mem_augmentationIdealOf G K x.2)
+          (augmentationIdealOfBasis G K y)
+        = ⟨(MonoidAlgebra.of ℤ G ↑x - 1) * (MonoidAlgebra.of ℤ G ↑y.val - 1),
+            augmentationIdealOf_sq_le G K (Submodule.mul_mem_mul
+              (sub_one_mem_augmentationIdealOf G K x.2)
+              (sub_one_mem_augmentationIdealOf G K y.val.2))⟩ := by
+      apply Subtype.ext
+      change (MonoidAlgebra.of ℤ G ↑x - 1)
+          * ((augmentationIdealOfBasis G K y : ↥(augmentationIdealOf G K)) :
+              MonoidAlgebra ℤ G) = _
+      rw [augmentationIdealOfBasis_apply]
+    rw [hb, augmentationIdealOfRetraction_sub_one_mul_sub_one]
+
+theorem augmentationIdealOfRetraction_comp_mulRight
+    (β : ↥(augmentationIdealOf G K)) :
+    (augmentationIdealOfRetraction G K).comp
+        (augmentationIdealOfMulRight G K (β : MonoidAlgebra ℤ G) β.2) = 0 :=
+  (augmentationIdealOfBasis G K).ext fun x => by
+    rw [LinearMap.comp_apply, LinearMap.zero_apply]
+    have hb : augmentationIdealOfMulRight G K (β : MonoidAlgebra ℤ G) β.2
+          (augmentationIdealOfBasis G K x)
+        = augmentationIdealOfMulLeft G K (MonoidAlgebra.of ℤ G ↑x.val - 1)
+            (sub_one_mem_augmentationIdealOf G K x.val.2) β := by
+      apply Subtype.ext
+      change ((augmentationIdealOfBasis G K x : ↥(augmentationIdealOf G K)) :
+            MonoidAlgebra ℤ G) * (β : MonoidAlgebra ℤ G)
+          = (MonoidAlgebra.of ℤ G ↑x.val - 1) * (β : MonoidAlgebra ℤ G)
+      rw [augmentationIdealOfBasis_apply]
+    rw [hb]
+    exact LinearMap.congr_fun
+      (augmentationIdealOfRetraction_comp_mulLeft G K x.val) β
+
+/-- `θ` vanishes on the kernel `Δ(K)Δ(G) ∩ Δ(K)`: by Corollary 10.22 this is
+`Δ(K)²`, on which `θ` vanishes as in Theorem 10.20. -/
+theorem augmentationIdealOfRetraction_eq_zero_of_mem_rel
+    {α : ↥(augmentationIdealOf G K)} (hα : α ∈ augmentationIdealOfRel G K) :
+    augmentationIdealOfRetraction G K α = 0 := by
+  obtain ⟨a, ha⟩ := α
+  replace hα : a ∈ augmentationIdealOf G K * augmentationIdeal G := hα
+  have hsq : a ∈ augmentationIdealOf G K * augmentationIdealOf G K := by
+    rw [augmentationIdealOf_sq_eq_inf]
+    exact Submodule.mem_inf.mpr ⟨hα, ha⟩
+  refine Submodule.mul_induction_on'
+    (C := fun r _ => ∀ hr : r ∈ augmentationIdealOf G K,
+      augmentationIdealOfRetraction G K ⟨r, hr⟩ = 0) ?_ ?_ hsq ha
+  · intro m hm n hn h
+    exact LinearMap.congr_fun
+      (augmentationIdealOfRetraction_comp_mulRight G K ⟨n, hn⟩) ⟨m, hm⟩
+  · intro x hx y hy ihx ihy h
+    have hxm : x ∈ augmentationIdealOf G K := augmentationIdealOf_sq_le G K hx
+    have hym : y ∈ augmentationIdealOf G K := augmentationIdealOf_sq_le G K hy
+    have hsplit : (⟨x + y, h⟩ : ↥(augmentationIdealOf G K))
+        = ⟨x, hxm⟩ + ⟨y, hym⟩ := rfl
+    rw [hsplit, map_add, ihx hxm, ihy hym, add_zero]
+
+/-- `θ` descends to `Δ(K)‾ →ₗ[ℤ] K/K'`. -/
+noncomputable def augmentationQuotientOfRetraction :
+    AugmentationQuotientOf G K →ₗ[ℤ] Additive (Abelianization K) :=
+  (augmentationIdealOfRel G K).liftQ (augmentationIdealOfRetraction G K)
+    fun _ hα => LinearMap.mem_ker.mpr
+      (augmentationIdealOfRetraction_eq_zero_of_mem_rel G K hα)
+
+@[simp]
+theorem augmentationQuotientOfRetraction_mk (α : ↥(augmentationIdealOf G K)) :
+    augmentationQuotientOfRetraction G K (Submodule.Quotient.mk α)
+      = augmentationIdealOfRetraction G K α := rfl
+
+theorem augmentationQuotientOfRetraction_lift (a : Abelianization K) :
+    augmentationQuotientOfRetraction G K
+        ((Abelianization.lift (toAugmentationQuotientOf G K) a).toAdd)
+      = Additive.ofMul a := by
+  refine QuotientGroup.induction_on a fun k => ?_
+  change augmentationIdealOfRetraction G K
+      ⟨MonoidAlgebra.of ℤ G ↑k - 1, sub_one_mem_augmentationIdealOf G K k.2⟩
+    = Additive.ofMul (Abelianization.of k)
+  exact augmentationIdealOfRetraction_sub_one G K k _
+
+theorem lift_augmentationQuotientOfRetraction (q : AugmentationQuotientOf G K) :
+    (Abelianization.lift (toAugmentationQuotientOf G K)
+        ((augmentationQuotientOfRetraction G K q).toMul)).toAdd = q := by
+  obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ q
+  obtain ⟨a, ha⟩ := α
+  have hspan : a ∈ Submodule.span ℤ
+      (Set.range fun k : K => MonoidAlgebra.of ℤ G ↑k - 1) := ha
+  induction hspan using Submodule.span_induction with
+  | mem z hz =>
+    obtain ⟨k, rfl⟩ := hz
+    rw [augmentationQuotientOfRetraction_mk,
+      augmentationIdealOfRetraction_sub_one, toMul_ofMul,
+      Abelianization.lift_apply_of]
+    rfl
+  | zero =>
+    have h0 : (⟨(0 : MonoidAlgebra ℤ G), ha⟩ :
+        ↥(augmentationIdealOf G K)) = 0 := rfl
+    rw [h0, Submodule.Quotient.mk_zero, map_zero, toMul_zero, map_one,
+      toAdd_one]
+  | add x y hx hy ihx ihy =>
+    have hsplit : (⟨x + y, ha⟩ : ↥(augmentationIdealOf G K))
+        = ⟨x, hx⟩ + ⟨y, hy⟩ := rfl
+    rw [hsplit, Submodule.Quotient.mk_add, map_add, toMul_add, map_mul,
+      toAdd_mul, ihx hx, ihy hy]
+  | smul c x hx ihx =>
+    have hsplit : (⟨c • x, ha⟩ : ↥(augmentationIdealOf G K))
+        = c • ⟨x, hx⟩ := rfl
+    rw [hsplit, Submodule.Quotient.mk_smul, map_smul, toMul_zsmul, map_zpow,
+      toAdd_zpow, ihx hx]
+    with_unfolding_all rfl
+
+/-- **Isaacs Corollary 10.23**: `Δ(K)‾ ≅ K/K'` via `(k-1)‾ ↦ K'k`, where
+`Δ(K)‾ = Δ(K)/(Δ(K)Δ(G) ∩ Δ(K))` is (the second-isomorphism-theorem model
+of) the image of `Δ(K)` in `Δ(G)/Δ(K)Δ(G)`. -/
+noncomputable def abelianizationEquivAugmentationQuotientOf :
+    Abelianization K ≃* Multiplicative (AugmentationQuotientOf G K) :=
+  MulEquiv.mk'
+    { toFun := Abelianization.lift (toAugmentationQuotientOf G K)
+      invFun := fun q => (augmentationQuotientOfRetraction G K q.toAdd).toMul
+      left_inv := fun a => by
+        change (augmentationQuotientOfRetraction G K
+            ((Abelianization.lift (toAugmentationQuotientOf G K) a).toAdd)).toMul
+          = a
+        rw [augmentationQuotientOfRetraction_lift, toMul_ofMul]
+      right_inv := fun q => by
+        apply Multiplicative.toAdd.injective
+        exact lift_augmentationQuotientOfRetraction G K q.toAdd }
+    fun x y => map_mul (Abelianization.lift (toAugmentationQuotientOf G K)) x y
+
+@[simp]
+theorem abelianizationEquivAugmentationQuotientOf_of (k : K) :
+    abelianizationEquivAugmentationQuotientOf G K (Abelianization.of k)
+      = Multiplicative.ofAdd (Submodule.Quotient.mk
+          ⟨MonoidAlgebra.of ℤ G ↑k - 1,
+            sub_one_mem_augmentationIdealOf G K k.2⟩) :=
+  rfl
+
+end SubgroupAugmentationQuotient
+
+end TransversalComponents
 
 end OddOrder.Algebra
