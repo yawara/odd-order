@@ -1091,4 +1091,56 @@ theorem actionCommutator_commutator_eq_bot_of_acts_trivially
         SemidirectProduct.inl_injective).mp h_map_bot
 
 end
+
+/-! ### Isaacs Cor 4.12, 一般括弧形 (weight-n commutator words, p. 124)
+
+既存の left-associated 元交換子形 (`iterLeftCommutator_mem_lowerCentralSeries_add`) に
+対し, 書籍の Cor 4.12 本来の形 = **任意括弧付けの部分群交換子** `[[G,G],[G,[G,G]]]` 等が
+`γₙ(G)` に含まれることを, 交換子語の二分木で定式化する. -/
+
+/-- **重み付き交換子語** (Isaacs p.124): `G` のコピーの任意括弧付け交換子を表す二分木.
+`leaf` = `G` 自身 (weight 1), `node l r` = `⁅l, r⁆`. -/
+inductive CommutatorWord : Type
+  | leaf : CommutatorWord
+  | node : CommutatorWord → CommutatorWord → CommutatorWord
+
+namespace CommutatorWord
+
+/-- 語の重み = 葉 (`G` のコピー) の数. -/
+def weight : CommutatorWord → ℕ
+  | leaf => 1
+  | node l r => l.weight + r.weight
+
+/-- 語の群 `G` での評価: 葉は `⊤`, 節は部分群交換子. -/
+def eval (G : Type*) [Group G] : CommutatorWord → Subgroup G
+  | leaf => ⊤
+  | node l r => ⁅l.eval G, r.eval G⁆
+
+theorem one_le_weight : ∀ w : CommutatorWord, 1 ≤ w.weight
+  | leaf => le_refl 1
+  | node l _ => le_trans (one_le_weight l) (Nat.le_add_right _ _)
+
+/-- **Isaacs Cor 4.12 (一般括弧形)**: 任意の weight-`n` 交換子語の `G` での評価は
+`γₙ(G)` (mathlib 添字では `(⊤ : Subgroup G).lowerCentralSeries (n-1)`) に含まれる.
+帰納法 + Thm 4.11 (`commutator_lowerCentralSeries_le`) そのまま (書籍 p.124). -/
+theorem eval_le_lowerCentralSeries (G : Type*) [Group G] :
+    ∀ w : CommutatorWord, w.eval G ≤ (⊤ : Subgroup G).lowerCentralSeries (w.weight - 1)
+  | leaf => le_of_eq rfl
+  | node l r => by
+    calc (node l r).eval G = ⁅l.eval G, r.eval G⁆ := rfl
+      _ ≤ ⁅(⊤ : Subgroup G).lowerCentralSeries (l.weight - 1),
+            (⊤ : Subgroup G).lowerCentralSeries (r.weight - 1)⁆ :=
+          Subgroup.commutator_mono (eval_le_lowerCentralSeries G l)
+            (eval_le_lowerCentralSeries G r)
+      _ ≤ (⊤ : Subgroup G).lowerCentralSeries ((l.weight - 1) + (r.weight - 1) + 1) :=
+          commutator_lowerCentralSeries_le _ _
+      _ = (⊤ : Subgroup G).lowerCentralSeries ((node l r).weight - 1) := by
+          have h1 := one_le_weight l
+          have h2 := one_le_weight r
+          congr 1
+          show l.weight - 1 + (r.weight - 1) + 1 = l.weight + r.weight - 1
+          omega
+
+end CommutatorWord
+
 end OddOrder.Isaacs.Ch04
