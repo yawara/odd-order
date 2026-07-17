@@ -73,6 +73,15 @@ general nilpotent M は book の正確な statement (in-scope、specialization d
 - **nilpotent ⟹ solvable ⟹ chief factor elementary abelian**: mathlib `IsNilpotent.isSolvable` +
   `solvable_minimal_normal_isElementaryAbelian` (S03g_Thm310General で既使用)。
 
+## 進捗 (2026-07-18)
+
+- [x] **piece 1 (b)-glue 順序公式** ✅ commit 69516988: `S03g_Thm310FixedPointSplit.card_fixedSubgroup_eq_mul_of_mulDistribMulAction` — `|C_M(R)|=|C_{M₀}(R)|·|C_{M/M₀}(R)|` (MulDistribMulAction 形)。core は既存 `Ch04.card_fixedSubgroup_eq_mul_of_normal` (HartleyTurull)。framework bridge (`toMulAut` + `IsAInvariant.restrict/.quotientMulAutHom`) friction 無を確認。axiom-clean。
+- [ ] **piece 2 base (elem-abelian group form)** 🔄 in flight: `S03g_Thm310GroupForm.bgThm310_elemAbelian_group` — module leaf を group 形 (fixedSubgroup) で wrap。crux bridge = invariants ↔ fixedSubgroup の card 一致。
+- [ ] **piece 3 induction**: general nilpotent M、`Nat.card M` 強帰納、base=piece 2、step=piece 1 + M_0 maximal H-invariant normal (MinimalInvariantNormal/chief-factor)。
+- [ ] **piece 4 (c)**: Lemma 1.9 glue (piece 2 に (c) 統合済なら induction で運ぶ)。
+
+**top-level statement shape (確定)**: `C_M(R) := fixedSubgroup (MulDistribMulAction.toMulAut H M) R` (Subgroup)。piece 1/2/3 全て同 `fixedSubgroup`+`IsAInvariant` framework で統一 (module 摩擦は piece 2 内に閉じ込め)。
+
 ## 完了条件
 
 group-level `bgTheorem310_nilpotent` (general nilpotent M, general kernel, (a)+(b)+(c)) を book
