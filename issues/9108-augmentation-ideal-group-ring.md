@@ -30,6 +30,22 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
 - 消費者: Ch10 §10C leaf (`PrincipalIdeal.lean` 予定; 10.18/10.24/10.25 +
   10.26 可換環補題 + 10.27/10.28 Alperin-Kuo)。
 
+## 進捗 (2026-07-17 lane c)
+
+- ✅ δ (`augmentation`) + Δ (`augmentationIdeal`, ℤ-Submodule) + simp 補題
+- ✅ **Lemma 10.19 完成**: `augmentationIdeal_eq_span` (spanning) +
+  `linearIndependent_of_sub_one` + `augmentationIdealBasis` (ℤ-basis) +
+  `augmentationIdealBasis_apply`
+- ⏭ 次: **Thm 10.20** `G/G' ≃ Δ/Δ²`。設計: Δ² = Submodule.mul、
+  商は `↥Δ ⧸ (Δ².comap Δ.subtype)`。順方向 φ : G →* Multiplicative (商)
+  (xy−1 = (x−1)+(y−1)+(x−1)(y−1) で hom 性)、逆方向 θ =
+  `augmentationIdealBasis.constr` で θ(g−1) = Abelianization.of g、
+  θ(Δ²) = 0 は (x−1)(y−1) = (xy−1)−(x−1)−(y−1) + span_induction。
+  ker φ = G' で `Abelianization G ≃ Δ/Δ²`。
+- Lean 注意: `rw [MonoidAlgebra.smul_single']` は smul instance 不一致で失敗
+  → exact defeq 経由; MonoidAlgebra ≠ Finsupp 型分離 (Finsupp.* API 不可、
+  `MonoidAlgebra.induction_linear` / `MonoidAlgebra.basis` を使う)。
+
 ## 完了条件
 
 - AugmentationIdeal.lean: δ/Δ def + 10.19 + 10.20 sorry-free (10.21-10.23 も同 leaf か
