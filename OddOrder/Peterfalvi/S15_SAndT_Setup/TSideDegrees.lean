@@ -581,7 +581,7 @@ theorem Hypothesis.nu_rowSum_mem_sOf_H0_T [Finite G]
         = ClassFunction.induce
             (OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) χ := by
       unfold OddOrder.Peterfalvi.S11.induceHU
-      congr! <;> exact Subsingleton.elim _ _
+      congr!
     have h2 : ClassFunction.induce ((derivedInG hyp.T).subgroupOf hyp.T) ψ
         = OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd) χ := by
       rw [h1, hχdef]

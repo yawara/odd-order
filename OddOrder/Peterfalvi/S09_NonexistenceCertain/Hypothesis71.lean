@@ -649,7 +649,6 @@ theorem card_dadeSupport_div_card_G_eq_card_A_div_card_L [Fintype L]
   have hreal : (Nat.card G : ℝ)⁻¹ * (Nat.card H71.hyp.dadeSupport : ℝ) =
       (Nat.card L : ℝ)⁻¹ * (Nat.card A : ℝ) := by
     have := congrArg Complex.re hiso_eq
-    push_cast at this
     simpa using this
   field_simp at hreal ⊢
   linarith [hreal]

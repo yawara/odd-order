@@ -634,7 +634,7 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
       rwa [inv_inv] at this
     have hc := hzc (m⁻¹ * y * m) hyQ'
     have heq : ⁅m * z * m⁻¹, y⁆ = m * ⁅z, m⁻¹ * y * m⁆ * m⁻¹ := by
-      rw [conjugate_commutatorElement]; congr 1 <;> group
+      rw [conjugate_commutatorElement]; congr 1; group
     rw [heq]
     exact (Subgroup.mem_normalizer_iff.mp (hMnormQ0 hm) ⁅z, m⁻¹ * y * m⁆).mp hc
   have hMnormS : M ≤ Subgroup.normalizer (S : Set G) := by

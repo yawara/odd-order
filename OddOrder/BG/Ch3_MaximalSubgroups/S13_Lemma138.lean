@@ -358,7 +358,7 @@ theorem exists_prime_betastar_dvd_of_hall_le [Finite G] (hG : IsMinimalSimpleOdd
     have hmem : r ∈ S10.alpha Mstar ∩ S10.sigma M :=
       ⟨S10.beta_subset_alpha Mstar hrβstar, hrσM⟩
     rw [hdisj] at hmem
-    simpa using hmem
+    simp at hmem
   exact ⟨r, hrp, hrβstar, hrMC, hrσ⟩
 
 /-- **Lemma 13.8 GAP 2 (M-oriented 全体)**: `H ⊇ Y₀ = C_{M_β}(P)` を `C_G(P)` の Hall

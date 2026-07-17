@@ -784,7 +784,7 @@ theorem dadeIntegralCharacterMap_inner_conjDifference_eq_zero
     Submodule.sub_mem _ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
   rw [dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS hx_span hχ_span]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
-    hxχ, hxχbar, hxbarχ, hxbarχbar, sub_zero, sub_self]
+    hxχ, hxχbar, hxbarχ, hxbarχbar, sub_self]
 
 /-- **Peterfalvi (5.2.e) for the Dade `R(·)` families.**
 

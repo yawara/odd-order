@@ -94,7 +94,7 @@ theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
         ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
     rw [← hψbar, ← hθbar]
     ext x
-    simp [hcPsi, linearIrreducibleCharacter_apply, ClassFunction.compHom_apply,
+    simp [hcPsi, ClassFunction.compHom_apply,
       MonoidHom.comp_apply]
   have hψeq' : ψ = hcPsi chief θbar := IrreducibleCharacter.ext hψeq
   rcases eq_or_ne θbar 1 with rfl | hθne
@@ -105,7 +105,7 @@ theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
         = trivialClassFunction _ := by
       rw [hψeq]
       ext x
-      simp [hcPsi, linearIrreducibleCharacter_apply, trivialClassFunction]
+      simp [hcPsi, trivialClassFunction]
     have hinv : ∀ g : ↥(huSub data), IrreducibleCharacter.conjBy g ψ = ψ := by
       intro g
       apply IrreducibleCharacter.ext
@@ -433,7 +433,7 @@ theorem isIndHC_of_source_eq_induce_hcPsi [Finite G] {M : Subgroup G}
   · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
       f.surjective (hcPsi chief θbar).isIrreducible
   · rw [ClassFunction.compHom_apply, map_one]
-    simp [hcPsi, linearIrreducibleCharacter_apply_one]
+    simp [hcPsi]
   · have hstages := OddOrder.RepresentationTheory.induce_induce_subgroupOf
       (M := ↥M) (K := (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
         (huSub data)).map (huSub data).subtype) (H := huSub data) hKle
@@ -473,7 +473,7 @@ theorem isIndHC_of_source_eq_induce_hcPsi [Finite G] {M : Subgroup G}
     calc induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ)
         = ClassFunction.induce (huSub data) (ζ' : ClassFunction ↥(huSub data) ℂ) := by
           unfold induceHU
-          congr! <;> exact Subsingleton.elim _ _
+          congr!
       _ = ClassFunction.induce (huSub data)
             (ClassFunction.induce (((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
               M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data))
@@ -546,7 +546,7 @@ theorem isIndHC_of_source_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
   · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
       f.surjective (hcPsiPair chief θbar lam).isIrreducible
   · rw [ClassFunction.compHom_apply, map_one]
-    simp [hcPsiPair, linearIrreducibleCharacter_apply_one]
+    simp [hcPsiPair]
   · have hstages := OddOrder.RepresentationTheory.induce_induce_subgroupOf
       (M := ↥M) (K := (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
         (huSub data)).map (huSub data).subtype) (H := huSub data) hKle
@@ -586,7 +586,7 @@ theorem isIndHC_of_source_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
     calc induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ)
         = ClassFunction.induce (huSub data) (ζ' : ClassFunction ↥(huSub data) ℂ) := by
           unfold induceHU
-          congr! <;> exact Subsingleton.elim _ _
+          congr!
       _ = ClassFunction.induce (huSub data)
             (ClassFunction.induce (((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
               M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data))
@@ -666,7 +666,7 @@ theorem caseB_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSim
   · exact OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
       f.surjective (hcPsi chief θbar).isIrreducible
   · rw [ClassFunction.compHom_apply, map_one]
-    simp [hcPsi, linearIrreducibleCharacter_apply_one]
+    simp [hcPsi]
   · -- `Ind_{HU}^M (Ind_{HC}^{HU} ψ₀) = Ind_K^M (ψ₀ ∘ f)` by stages + `subgroupCongr` transport
     have hstages := OddOrder.RepresentationTheory.induce_induce_subgroupOf
       (M := ↥M) (K := (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
@@ -709,7 +709,7 @@ theorem caseB_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSim
     calc induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ)
         = ClassFunction.induce (huSub data) (ζ' : ClassFunction ↥(huSub data) ℂ) := by
           unfold induceHU
-          congr! <;> exact Subsingleton.elim _ _
+          congr!
       _ = ClassFunction.induce (huSub data)
             (ClassFunction.induce (((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
               M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data))
@@ -741,7 +741,7 @@ theorem hcZeta_apply_one [Finite G] {M : Subgroup G}
     show (hcPsi chief θ : ClassFunction
         ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
         (1 : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
-        = 1 from by simp [hcPsi, linearIrreducibleCharacter_apply_one], mul_one]
+        = 1 from by simp [hcPsi], mul_one]
 
 /-- **`H₀C ⊆ Ker ψ`** (`HC`-level, pointwise): every `x` in the realized `H₀C` lies in the character
 kernel of the `HC`-linear character `ψ`, since `ψ = θ ∘ hcHom` and `hcHom` kills `H₀C`

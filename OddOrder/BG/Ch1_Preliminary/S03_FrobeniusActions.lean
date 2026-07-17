@@ -263,7 +263,6 @@ theorem zpowers_quotient_fixed_of_generator_quotient_fixed
   rw [← ha_eq]
   have hgenQ :
       (x : G ⧸ N) * (y : G ⧸ N) * (x : G ⧸ N)⁻¹ = (y : G ⧸ N) := by
-    change (x : G ⧸ N) * (y : G ⧸ N) * (x : G ⧸ N)⁻¹ = (y : G ⧸ N)
     exact hgen
   have hxy_comm : Commute (x : G ⧸ N) (y : G ⧸ N) := by
     have hmul := congrArg (fun z => z * (x : G ⧸ N)) hgenQ

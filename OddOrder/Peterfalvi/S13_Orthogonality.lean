@@ -514,8 +514,7 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
     rw [hθτ, hextsplit, hγθ] at h1
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-      hcross_μζ, hcross_ξζ, hcross_ξΩ, star_natCast, mul_zero, sub_zero, zero_sub,
-      neg_zero] at h1
+      hcross_μζ, hcross_ξζ, hcross_ξΩ, star_natCast, mul_zero, sub_zero] at h1
     exact mul_left_cancel₀ hnξne h1
   -- norms and positive-definiteness: `‖c(μ) − Ω‖² = 0`
   have hextnorm : ClassFunction.inner (c.extension μ) (c.extension μ) = (hyp.base.w1 : ℂ) := by

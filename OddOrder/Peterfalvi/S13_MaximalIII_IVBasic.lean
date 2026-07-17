@@ -1331,7 +1331,7 @@ theorem secondDerived_le_H_sup_derivedU [Finite G] {M : Subgroup G} (hyp : Hypot
   rw [commutator_eq_closure] at hc
   induction hc using Subgroup.closure_induction with
   | one =>
-      simpa using Subgroup.one_mem (hyp.base.typeP.H ⊔ derivedInG hyp.base.typeP.U)
+      simp
   | mul y z _ _ hy hz =>
       rw [map_mul]
       exact Subgroup.mul_mem _ hy hz

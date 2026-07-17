@@ -822,7 +822,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
   have hone_notin : (1 : ↥hyp.T) ∉
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-    simpa using honestTypeP2ASet_one_not_mem (M := hyp.T)
+    simp
   -- the family, its finiteness, and the per-member row datum (all members reducible)
   set F : Set (ClassFunction ↥hyp.T ℂ) := sSet (hyp.toTypesIIIIIIVSetupT hG hvd) with hFdef
   have hFfin : F.Finite := sSet_finite (hyp.toTypesIIIIIIVSetupT hG hvd)

@@ -1173,7 +1173,7 @@ theorem gammaGrid_orthogonal_one_of_c_eq_one [Finite G]
       ClassFunction.inner (GammaGrid hG hyp)
         (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
   intro _ _
-  convert gammaGrid_orthogonal_one_aux hG hnoV hyp hc1 using 2 <;> exact Subsingleton.elim _ _
+  convert gammaGrid_orthogonal_one_aux hG hnoV hyp hc1 using 2; exact Subsingleton.elim _ _
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ` — fully proven (Coq `GammaReal`,

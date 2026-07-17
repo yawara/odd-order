@@ -933,8 +933,7 @@ theorem Hypothesis.muGridAlpha_a_eq_inner_sumOmegaSigma_beta [Finite G] {M : Sub
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
       ClassFunction.inner_smul_left, hαω,
       hyp.alignedOmegaSigma_diff_inner_zeroColumnSum hG hodd i hj0,
-      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG coh hodd hζS hζirr hζ1 hζne,
-      star_natCast, star_intCast]
+      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG coh hodd hζS hζirr hζ1 hζne]
     ring
   rw [OddOrder.RepresentationTheory.inner_conj_symm, hβω, star_intCast]
 
@@ -1000,8 +999,7 @@ theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
       ClassFunction.inner_smul_left,
       hyp.alignedOmegaSigma_diff_inner_zeroColumnSum hG hodd i hj0,
       hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG coh hodd hζS hζirr hζ1 hζne,
-      hyp.R_sum_inner_zeroColumnOmegaSigma_sum hG coh hodd hRrev,
-      star_natCast, star_intCast]
+      hyp.R_sum_inner_zeroColumnOmegaSigma_sum hG coh hodd hRrev]
     ring
   rw [ClassFunction.inner_sub_right, hαω, hinner] at htrans
   have ha0 : (a : ℂ) = 0 := by linear_combination -htrans

@@ -603,7 +603,7 @@ theorem inner_dadeDiff_conjDifference_eq_zero
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS
     (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
-    hxχ, hxχbar, hxbarχ, hxbarχbar, sub_zero, sub_self]
+    hxχ, hxχbar, hxbarχ, hxbarχbar, sub_self]
 
 /-- **(5.2.e) Dade `R(·)`-family orthogonality via *difference* supports (induced case).**
 

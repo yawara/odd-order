@@ -629,7 +629,7 @@ noncomputable def H_sharp_hypothesis76_base [Fintype G] [Invertible (Nat.card G 
     · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
   · intro l h hh
     by_cases h1 : h = 1
-    · subst h1; simpa using hyp.H.one_mem
+    · subst h1; simp
     · have hsh : h ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=
         OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hh, h1⟩
       exact (OddOrder.Peterfalvi.S04.mem_sharp.mp (S_normalizes_H_sharp hG hyp l hsh)).1
@@ -746,7 +746,7 @@ theorem lambda_tau1_cCoeff_base [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [hKJ]
     intro θ θ' hθP hθ'P
     have h := core.tau1S_apply_induce_sub _ _ θ.2 θ'.2 hθP hθ'P
-    exact h.trans (by congr! <;> exact Subsingleton.elim _ _)
+    exact h.trans (by congr!)
   have hfield2 : ∀ θ θ' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
       ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf K : Set ↥K) ⊆
         OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ)) →
@@ -759,7 +759,7 @@ theorem lambda_tau1_cCoeff_base [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [hKJ]
     intro θ θ' hθP hθ'P
     have h := core.tau1S_inner_induce _ _ θ.2 θ'.2 hθP hθ'P
-    convert h using 1 <;> congr! <;> exact Subsingleton.elim _ _
+    convert h using 1; congr!; exact Subsingleton.elim _ _
   -- λ and the base φ₀, transported into the `K`-spelling
   have hθlK : ∃ θK : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
       lam.lambda = ClassFunction.induce K (θK : ClassFunction ↥K ℂ) ∧
@@ -915,7 +915,7 @@ theorem eta10_cCoeff_base_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [hKJ]
     intro θ θ' hθP hθ'P
     have h := core.tau1S_apply_induce_sub _ _ θ.2 θ'.2 hθP hθ'P
-    exact h.trans (by congr! <;> exact Subsingleton.elim _ _)
+    exact h.trans (by congr!)
   -- the (4.1)/(5.3.b)+(13.3.c) column-`0` field, at the `η₁₀`-index
   have hfieldEta : ∀ θ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
       ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf K : Set ↥K) ⊆
@@ -925,7 +925,7 @@ theorem eta10_cCoeff_base_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [hKJ]
     intro θ hθP
     have h := core.tau1S_induce_inner_eta_col_zero ⟨1, hyp.q_prime.one_lt⟩ _ θ.2 hθP
-    convert h using 1 <;> congr! <;> exact Subsingleton.elim _ _
+    convert h using 1; congr!; exact Subsingleton.elim _ _
   -- the base `ζ₀ = Ind φK` in the `K`-spelling
   have hφ₀K : ∃ φK : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
       ClassFunction.induce (hyp.H.subgroupOf hyp.S)
@@ -1016,7 +1016,7 @@ theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G] [Fintype G]
             - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) := by
     rw [← map_sub, hμInd, hlamEq]
     have h := core.tau1S_apply_induce_sub θμ θl hθμirr hθlirr hθμP hθlP
-    exact h.trans (by congr! <;> exact Subsingleton.elim _ _)
+    exact h.trans (by congr!)
   have hsupp : ∀ w : ↥hyp.S, (w : G) ∉ sharpSubgroup hyp.H →
       (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ
         - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θl) w = 0 := by
@@ -1043,7 +1043,7 @@ theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G] [Fintype G]
   simp only [ClassFunction.sub_apply] at hdv
   rw [hvan] at hdv
   have hμv := congrArg (fun f : ClassFunction G ℂ => f x) hμτ
-  simp only [ClassFunction.smul_apply, smul_eq_mul,
+  simp only [ClassFunction.smul_apply,
     OddOrder.RepresentationTheory.ClassFunction.finset_sum_apply] at hμv
   have hlamv : core.tau1S lam.lambda x = core.tau1S (∑ i : Fin hyp.q, hyp.mu i j) x :=
     (sub_eq_zero.mp hdv).symm

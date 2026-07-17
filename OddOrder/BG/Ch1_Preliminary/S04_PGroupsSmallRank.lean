@@ -360,7 +360,6 @@ private theorem mem_centralizer_iff_mem_center (s : ↥S) :
   constructor
   · intro h t
     apply S.subtype_injective
-    push_cast
     exact h (t : R) t.2
   · intro h r hr
     have hv := congrArg (fun x : ↥S => (x : R)) (h ⟨r, hr⟩)

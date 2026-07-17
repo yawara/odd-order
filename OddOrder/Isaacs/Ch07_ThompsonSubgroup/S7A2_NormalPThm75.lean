@@ -1299,8 +1299,8 @@ theorem sylow_normal_of_elementary_normal_P_theorem
         _ < Nat.card H * H.index := (Nat.mul_lt_mul_left hcard_pos).mpr hHidx_gt
         _ = Nat.card G := hmul
     -- P and Q sit inside H.
-    have hP_le_H : (P : Subgroup G) ≤ H := by simpa [H, hH_def] using le_sup_left
-    have hQ_le_H : (Q : Subgroup G) ≤ H := by simpa [H, hH_def] using le_sup_right
+    have hP_le_H : (P : Subgroup G) ≤ H := by simp [H]
+    have hQ_le_H : (Q : Subgroup G) ≤ H := by simp [H]
     -- View P as a Sylow of H.
     let P' : Sylow p H := P.subtype hP_le_H
     -- Descend hypothesis (i): IsPiSeparable on H.

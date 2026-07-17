@@ -643,7 +643,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB_T [Finite G]
     (fun η hη => hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hη)
     (fun a ha b hb hab => by
       have h := sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) ha hb hab
-      convert h using 2 <;> exact Subsingleton.elim _ _)
+      convert h using 2)
     (fun a ha => sSet_closedUnderConjugate _ ha)
     (fun a ha heq => sSet_hasNoRealCharacters _ (hyp.oddCardT hG) ha heq.symm)
     ⟨hyp.p, hN⟩
@@ -668,7 +668,7 @@ noncomputable def Hypothesis.sSet_coherent_dade_caseB_T [Finite G]
         (OddOrder.Peterfalvi.S11.u_odd hG (hyp.mkSection11CharacterDataT hG hvd chief)).pos.ne'))
     (by
       rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-      simpa using honestTypeP2ASet_one_not_mem (M := hyp.T))
+      simp)
     (sSet_closedUnderConjugate _ hη₁)
     (sSet_hasNoRealCharacters _ (hyp.oddCardT hG) hη₁)
 
@@ -817,7 +817,7 @@ noncomputable def Hypothesis.sSetIrrDegT_subcoherent [Fintype G] [Finite G]
   · exact hconjmem
   · exact hyp.sSetIrrDegT_hasNoRealCharacters hG hvd d
   · intro φ ψ hφ hψ hne
-    convert sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) hφ.1 hψ.1 hne using 2 <;>
+    convert sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) hφ.1 hψ.1 hne using 2;
       exact Subsingleton.elim _ _
   · intro χ hχ
     exact hyp.sSetIrrDegT_member_diff_supported hG hvd d hχ (hconjmem hχ)
@@ -857,7 +857,7 @@ noncomputable def Hypothesis.sSetIrrDegT_coherent [Fintype G] [Finite G]
     fun a ha => by rw [ha.2.2]; exact hd0
   have h1A : (1 : ↥hyp.T) ∉ A := by
     rw [hA, OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-    simpa using honestTypeP2ASet_one_not_mem (M := hyp.T)
+    simp
   have hsuppdiff : ∀ x ∈ hyp.sSetIrrDegT hG hvd d, ∀ y ∈ hyp.sSetIrrDegT hG hvd d,
       ((x - y : ClassFunction ↥hyp.T ℂ)).support ⊆ A := by
     intro x hx y hy

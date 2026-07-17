@@ -542,7 +542,7 @@ theorem ticyclic_apply_eq_zero_of_forall_inner_chiFam [Finite G]
       OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega,
       OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega]
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left, hχ0,
-      sub_zero, add_zero, zero_sub, neg_zero, zero_add]
+      sub_zero, add_zero]
   have hres := OddOrder.Peterfalvi.S05.TICyclicHypothesis.vanishOnV_of_inner_alphaCF hyp hVeq
     hf hv
   rwa [ClassFunction.restrict_apply] at hres

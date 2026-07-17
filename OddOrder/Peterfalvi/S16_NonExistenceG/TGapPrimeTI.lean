@@ -72,9 +72,7 @@ theorem exists_typeIII_primeTIredZero_with_inner [Finite G]
           (Subgroup.subgroupOfEquivOfLe td.typeP.W1_le).toEquiv
       _ = (hyp.base.p : ℂ) := by
         rw [T_typeIII_card_W1 hyp td]
-  · change ClassFunction.inner (residue.primeTIred 0)
-        (trivialClassFunction ↥hyp.base.T) = 1
-    rw [← residue.cfInd_prTIres 0, residue.prTIres0]
+  · rw [← residue.cfInd_prTIres 0, residue.prTIres0]
     have hconst :
         OddOrder.Peterfalvi.S09.Hypothesis71.constOne ↥hyp.base.T =
           trivialClassFunction ↥hyp.base.T := by
@@ -148,9 +146,7 @@ theorem exists_typeIII_primeTIredZero_with_projectionData_galois_and_eq_induce [
         exact Nat.card_congr
           (Subgroup.subgroupOfEquivOfLe td.typeP.W1_le).toEquiv
       _ = (hyp.base.p : ℂ) := by rw [T_typeIII_card_W1 hyp td]
-  · change ClassFunction.inner (residue.primeTIred 0)
-        (trivialClassFunction ↥hyp.base.T) = 1
-    rw [← residue.cfInd_prTIres 0, residue.prTIres0]
+  · rw [← residue.cfInd_prTIres 0, residue.prTIres0]
     have hconst :
         OddOrder.Peterfalvi.S09.Hypothesis71.constOne ↥hyp.base.T =
           trivialClassFunction ↥hyp.base.T := by

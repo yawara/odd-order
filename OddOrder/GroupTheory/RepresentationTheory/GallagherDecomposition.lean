@@ -237,7 +237,7 @@ theorem induce_trivial_eq_sum_linearClassFunction [Finite K] [Fintype K]
       ClassFunction.conjBy y (trivialClassFunction ↥H) = trivialClassFunction ↥H := by
     intro y; ext h; simp [ClassFunction.conjBy_apply, trivialClassFunction_apply]
   have hres : ClassFunction.restrict H (trivialClassFunction K) = trivialClassFunction ↥H := by
-    ext h; simp [ClassFunction.restrict_apply, trivialClassFunction_apply]
+    ext h; simp [trivialClassFunction_apply]
   have hgal := induce_eq_sum_mul_linearClassFunction (K := K) (H := H)
     trivialClassFunction_isIrreducible hinv hab trivialClassFunction_isIrreducible hres
     (d := 1) (by rw [trivialClassFunction_apply]; norm_num) (Nat.coprime_one_right _)

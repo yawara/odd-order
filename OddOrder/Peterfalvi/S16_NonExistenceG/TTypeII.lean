@@ -642,12 +642,12 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         -- `S12.FiniteInduce.finiteSubFintype`/`natCardInvC` but appear as opaque fvars, so the
         -- scoped-instance `inducedFamily` / `s12Tau…` consumers need a `Subsingleton.elim` bridge.
         have hzetaS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily hyp.base.T :=
-          ⟨θ, hne θ hθ, by convert hζeq.symm using 2 <;> exact Subsingleton.elim _ _⟩
+          ⟨θ, hne θ hθ, by convert hζeq.symm using 2; exact Subsingleton.elim _ _⟩
         -- `hν0eq` carries the local `haveI` `Fintype`/`Invertible` diamond (opaque fvars,
         -- definitionally the scoped `S12.FiniteInduce.*`), bridged by `Subsingleton.elim`.
         have himage := s12Tau_zeroColumn_sub_eq_tSideDadeMap hG hyp dataT' hP1'
           hIII ζ ν0
-          (by convert hν0eq using 2 <;> exact Subsingleton.elim _ _) hβsupp
+          (by convert hν0eq using 2; exact Subsingleton.elim _ _) hβsupp
         have hzeta1 : ζ 1 =
             ((s12HypothesisOfTypePData hG hyp.base.T_maximal dataT'
               (Or.inl hIII) hP1').w1 : ℂ) := by

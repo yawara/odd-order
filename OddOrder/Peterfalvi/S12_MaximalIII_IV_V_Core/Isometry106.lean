@@ -137,7 +137,7 @@ theorem Hypothesis.muGridAlpha_tau1_zeta_eq_neg_n [Finite G] {M : Subgroup G}
   have hre1 : ((d : ℂ) * ((m : ℂ) + (n : ℂ))).re = (d : ℝ) * ((m : ℝ) + (n : ℝ)) := by
     simp [Complex.mul_re, Complex.add_re, Complex.add_im]
   have hre2 : ((2 : ℂ) + (n : ℂ) ^ 2).re = 2 + (n : ℝ) ^ 2 := by
-    simp [Complex.add_re, pow_two, Complex.mul_re, Complex.mul_im]
+    simp [Complex.add_re, pow_two, Complex.mul_re]
   rw [hre1, hre2, Complex.natCast_re] at hcs
   -- Apply the numeric core with `a = m + n`.
   have ha0 : m + (n : ℤ) = 0 := by

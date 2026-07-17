@@ -1232,7 +1232,6 @@ theorem isPLocal_of_quotient [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [F
     -- a ∈ normalizer (P_M.map ...), b ∈ U.subgroupOf M. a * b = ⟨m, hm⟩.
     -- M.subtype b ∈ U.
     have hMb_U : (b : G) ∈ U := by
-      change (b : ↥M).1 ∈ U
       change b ∈ U.subgroupOf M at hb
       exact hb
     -- M.subtype a ∈ L = normalizer P_G in G.

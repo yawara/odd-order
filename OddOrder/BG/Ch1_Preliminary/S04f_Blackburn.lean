@@ -192,7 +192,6 @@ private theorem blackburn_noncentral_commutator_map_centralizer_card_and_omega
     refine Omega.mem_of_pow_eq_one ?_
     rw [pow_one]
     rw [← map_pow]
-    change QuotientGroup.mk' C (t ^ p) = 1
     have ht_pow : t ^ p = 1 := congrArg Subtype.val (hT_elem.pow_eq_one ⟨t, htT⟩)
     rw [ht_pow, map_one]
   exact ⟨hTmap_card, hTmap_omega⟩
@@ -909,7 +908,6 @@ private theorem commute_quotient_of_commutator_mem
     (hxy : ⁅x, y⁆ ∈ N) :
     Commute (QuotientGroup.mk' N x) (QuotientGroup.mk' N y) := by
   rw [← commutatorElement_eq_one_iff_commute, ← map_commutatorElement]
-  change QuotientGroup.mk' N ⁅x, y⁆ = 1
   exact (QuotientGroup.eq_one_iff ⁅x, y⁆).mpr hxy
 
 /-- A right-hand error factor commuting with the left entry and the retained right

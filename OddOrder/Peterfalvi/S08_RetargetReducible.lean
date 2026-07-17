@@ -127,8 +127,8 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
       (τ (χ - chibar)) = ClassFunction.inner χ χ := by
     rw [hdade _ _ hmemu hmemd, ← Nat.cast_smul_eq_nsmul ℂ a chi1]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
-      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-      hχχbar, hchi1χ, hchi1χbar, star_natCast]
+      ClassFunction.inner_smul_left,
+      hχχbar, hchi1χ, hchi1χbar]
     ring
   have hdd : ClassFunction.inner (τ (χ - chibar))
       (τ (χ - chibar)) = ClassFunction.inner χ χ + ClassFunction.inner chibar chibar := by

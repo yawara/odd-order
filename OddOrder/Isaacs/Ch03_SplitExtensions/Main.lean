@@ -995,7 +995,6 @@ theorem IsAInvariant.subgroupOf {A : Type*} [Group A] {φ : A →* MulAut G}
     -- hmem : ((hH.restrict a)⁻¹ • ⟨g, hg⟩).val ∈ K
     -- We have ((hH.restrict a)⁻¹ ⟨g, hg⟩).val = (φ a)⁻¹ g
     -- So (φ a)⁻¹ g ∈ K (via hmem). Apply (φ a) to get g ∈ K.
-    change g ∈ K
     have h1 : ((hH.restrict a)⁻¹ • (⟨g, hg⟩ : ↥H)).val = (φ a)⁻¹ g := rfl
     have h2 : (φ a)⁻¹ g ∈ K := h1 ▸ hmem
     have : (φ a) ((φ a)⁻¹ g) ∈ K := hK.smul_mem a h2
