@@ -716,6 +716,30 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #29、Fable hub — /model 切替で監視再開) — ✅ wave 4b 中断分回収 + b/c 合流、census 18 不変。cron 再作成 (`590a4277`, 15 分 `7,22,37,52`)**:
+  セッション開始時に前 Opus セッションの **wave 4b Workflow 中断** (55 .lean dirty、build gate 前) を検出 →
+  build gate が**折返しスクリプトの構文バグ 3 箇所**を検出、手動修正 (⚠ 教訓: 改行して行頭に `.method` を
+  置くと projection でなく**引数** (anonymous dot notation) にパースされる — GlobalCounting:139
+  `.resolve_right` / XBlockCounting:411,466 `.extension`。正解 = 引数リスト内で折返し `).method` は閉じ
+  括弧密着。全 diff 再スキャンで他 artifact なし) → commit `da8b0a1c` (build 4356 green)。残 ~116 files は
+  wave 4b 継続 (issue 0123)。
+  **b** = `56d5b12b` (⭐ Suzuki Ch.I §1 **the Lemma (a) + Prop 5 完了 + Prop 6(a) 完了** — InvertedProduct 232
+  + CentralizerStructure 303 + FixedPointCentralizer 352 新設、hub import 済) を merge `8fc8b77a`:
+  build **4359 jobs green**。
+  **c** = `df20b457` (⭐ **Isaacs Ch.10 章完成 = 全 28 結果 (10.1–10.28) sorry-free** — Thm 10.25 Furtwängler
+  principal ideal theorem + Thm 10.18 + Cor 10.28 Alperin-Kuo、issue 9108 close) を merge `2575bfa5`:
+  build **4360 jobs green**。**a** = 変化なし (0 ahead)。
+  AxiomsCheck OK・新 axiom なし・sorry 18 不変・逸脱なし。push 済。
+  size watch: PrincipalIdealTheorem.lean **1350 行** (1500 接近 watch; Ch.10 完成で増加は収束見込み)。
+  **🔧 build ボトルネック運用改善 (ユーザー指摘 2026-07-17 → hub 決定、次 tick から適用)**:
+  (1) **レーン合流 > hub lint 作業の優先順** — hub 側 dirty (lint 途中) がある tick では `git stash` して
+  レーンの軽い incremental gate を先に通し、hub 分は後で復元して別 gate (今回 wave 4b 先行で b/c landing が
+  ~40 分遅延した反省; stash なら gate 切り分けも汚れない)。
+  (2) **wrap-only lint wave の中間 gate は touched-module targeted build に格下げ** (折返し破壊は touched
+  file 自身のコンパイルで顕在化 — 実例 = 上記 3 箇所とも touched file 内) 、full build + AxiomsCheck は
+  **push 直前の 1 回に集約** (origin/main の full-green 保証は不変)。
+  (3) gotcha: build は `> log 2>&1; echo BUILD_EXIT=$?` の file 直書きで — `| tail` pipe は exit code を
+  隠蔽し (PIPESTATUS 必須) ログ全体も失う (今回 1 回踏んで失敗 2 件目の error 詳細を紛失)。
 - **2026-07-17 (tick #28、Opus hub — /model 切替) — ✅ a/b/c 全合流 + linter wave 5a。census 18 不変。cron 再作成 (`3701c985`, 15 分)**:
   ⚠ ユーザーが Fable→Opus に /model 切替 → session cron `8ef28e3e` は listed-but-dead リスクゆえ
   CronDelete → Opus セッションで再作成 `3701c985` (同 15 分 `7,22,37,52`)。
