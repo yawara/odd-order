@@ -168,6 +168,14 @@ theorem nilpotentResidual_eq_bot_iff [Finite G] {S : Subgroup G} :
   · rintro ⟨n, hn⟩
     exact le_bot_iff.mp ((iInf_le _ n).trans_eq hn)
 
+/-- `N_G(S) ≤ N_G(S^∞)` (`S` を固定する共役は `S^∞` も固定する). -/
+theorem normalizer_le_normalizer_nilpotentResidual [Finite G] (S : Subgroup G) :
+    Subgroup.normalizer (S : Set G)
+      ≤ Subgroup.normalizer (nilpotentResidual S : Set G) := by
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff_map_conj_eq] at hg ⊢
+  rw [map_nilpotentResidual, hg]
+
 /-- nilpotent 部分群の像は nilpotent (lower central series の像で直接; 有限性不要). -/
 theorem isNilpotent_map {K : Type*} [Group K] (f : G →* K) {S : Subgroup G}
     (h : Group.IsNilpotent S) : Group.IsNilpotent (S.map f) := by
