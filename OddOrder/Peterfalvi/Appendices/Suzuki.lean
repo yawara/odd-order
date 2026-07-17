@@ -359,6 +359,34 @@ lemma normalizer_le_H_of_le_Q {X : Subgroup G} (hX : X ≤ hyp.Q)
   rw [h4, le_bot_iff] at h3
   exact hX1 h3
 
+/-- For `1 ≠ x ∈ Q`, the centralizer `C_G(x)` lies in `H` (consequence of
+Prop 1(b), via `C_G(x) ≤ N_G(⟨x⟩)`). -/
+lemma centralizer_le_H_of_mem_Q {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) :
+    Subgroup.centralizer ({x} : Set G) ≤ hyp.H := by
+  have hcnorm : Subgroup.centralizer ({x} : Set G) ≤
+      Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+    intro c hc
+    have hcomm : Commute c x := Subgroup.mem_centralizer_singleton_iff.mp hc
+    have hfix : ∀ k : ℤ, c * x ^ k * c⁻¹ = x ^ k := fun k => by
+      rw [(hcomm.zpow_right k).eq, mul_assoc, mul_inv_cancel, mul_one]
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro n
+    simp only [SetLike.mem_coe]
+    constructor
+    · intro hn
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hn
+      exact Subgroup.mem_zpowers_iff.mpr ⟨k, by rw [← hk, hfix]⟩
+    · intro hn
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hn
+      refine Subgroup.mem_zpowers_iff.mpr ⟨k, ?_⟩
+      have h3 : n = c⁻¹ * x ^ k * c := by rw [hk]; group
+      rw [h3]
+      calc x ^ k = c⁻¹ * (c * x ^ k * c⁻¹) * c := by group
+        _ = c⁻¹ * x ^ k * c := by rw [hfix]
+  exact hcnorm.trans (hyp.normalizer_le_H_of_le_Q
+    (Subgroup.zpowers_le.mpr hx)
+    (fun hbot => hx1 (Subgroup.zpowers_eq_bot.mp hbot)))
+
 /-- **Peterfalvi Part II, Ch. I Prop 1 (c)** (p. 100) — `Q` contains a Sylow
 `2`-subgroup of `G`.  (From `|G| = |Q| · |D|(|Q| + 1)` with odd cofactor
 `|D|(|Q| + 1)`.) -/
@@ -547,40 +575,104 @@ theorem oPiCore_two_compl_eq_normalCore :
     have hzmem := Subgroup.mem_inf.mp hz
     refine Subgroup.mem_inf.mpr ⟨?_, hzmem.1⟩
     have hbG : (b : G) ≠ 1 := fun h => hb (Subtype.ext h)
-    -- `C_G(b) ≤ N_G(⟨b⟩) ≤ H` (Prop 1(b))
-    have hcnorm : Subgroup.centralizer ({(b : G)} : Set G) ≤
-        Subgroup.normalizer
-          ((Subgroup.zpowers (b : G) : Subgroup G) : Set G) := by
-      intro c hc
-      have hcomm : Commute c (b : G) :=
-        Subgroup.mem_centralizer_singleton_iff.mp hc
-      have hfix : ∀ k : ℤ, c * (b : G) ^ k * c⁻¹ = (b : G) ^ k := fun k => by
-        rw [(hcomm.zpow_right k).eq, mul_assoc, mul_inv_cancel, mul_one]
-      rw [Subgroup.mem_set_normalizer_iff]
-      intro n
-      simp only [SetLike.mem_coe]
-      constructor
-      · intro hn
-        obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hn
-        exact Subgroup.mem_zpowers_iff.mpr ⟨k, by rw [← hk, hfix]⟩
-      · intro hn
-        obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hn
-        refine Subgroup.mem_zpowers_iff.mpr ⟨k, ?_⟩
-        have h3 : n = c⁻¹ * (b : G) ^ k * c := by rw [hk]; group
-        rw [h3]
-        calc (b : G) ^ k = c⁻¹ * (c * (b : G) ^ k * c⁻¹) * c := by group
-          _ = c⁻¹ * (b : G) ^ k * c := by rw [hfix]
-    have hcent_le : Subgroup.centralizer ({(b : G)} : Set G) ≤ hyp.H :=
-      hcnorm.trans (hyp.normalizer_le_H_of_le_Q
-        (Subgroup.zpowers_le.mpr (hXQ b.2))
-        (fun hbot => hbG (Subgroup.zpowers_eq_bot.mp hbot)))
-    exact hcent_le hzmem.2
+    exact hyp.centralizer_le_H_of_mem_Q (hXQ b.2) hbG hzmem.2
   rw [htop, top_le_iff, Subgroup.subgroupOf_eq_top] at hle2
   exact le_antisymm
     (Subgroup.normal_le_normalCore.mpr (hle2.trans inf_le_left))
     hcore_le
 
 end Prop1e
+
+/-! ## Chapter I §1, Proposition 2 (pp. 100–101) -/
+
+/-- Every element of `H` of order dividing `2` lies in `Q` (as `H/Q ≅ D`
+has odd order).  In particular `H ∩ I = Q ∩ I`. -/
+lemma mem_Q_of_sq_eq_one_of_mem_H {s : G} (hsH : s ∈ hyp.H) (hs2 : s ^ 2 = 1) :
+    s ∈ hyp.Q := by
+  haveI hnorm : (hyp.Q.subgroupOf hyp.H).Normal := by
+    refine ⟨fun n hn h => ?_⟩
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    push_cast
+    exact hyp.Q_normal_in_H h h.2 n hn
+  -- `|H ⧸ Q| = |D|` is odd
+  have hcard_sub : Nat.card (hyp.Q.subgroupOf hyp.H) = Nat.card hyp.Q :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).toEquiv
+  have hidx : (hyp.Q.subgroupOf hyp.H).index = Nat.card hyp.D := by
+    have h1 := (hyp.Q.subgroupOf hyp.H).card_mul_index
+    rw [hcard_sub, hyp.card_H_eq] at h1
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h1
+  -- the image of `s` in `H ⧸ Q` has order dividing both `2` and the odd `|D|`
+  set s' : hyp.H := ⟨s, hsH⟩ with hs'
+  have hs'2 : s' ^ 2 = 1 := Subtype.ext (by push_cast; exact hs2)
+  have hdvd2 : orderOf ((QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H)) s') ∣ 2 :=
+    (orderOf_map_dvd _ s').trans (orderOf_dvd_of_pow_eq_one hs'2)
+  have hdvdD : orderOf ((QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H)) s') ∣
+      Nat.card hyp.D := by
+    rw [← hidx, Subgroup.index_eq_card]
+    exact orderOf_dvd_natCard _
+  have h1 : orderOf ((QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H)) s') = 1 :=
+    Nat.eq_one_of_dvd_coprimes (Nat.coprime_two_left.mpr hyp.D_odd) hdvd2 hdvdD
+  have hker : s' ∈ (QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H)).ker := by
+    rw [MonoidHom.mem_ker, ← orderOf_eq_one_iff]
+    exact h1
+  rw [QuotientGroup.ker_mk', Subgroup.mem_subgroupOf] at hker
+  exact hker
+
+/-- **Peterfalvi Part II, Ch. I Prop 2 (a)** (p. 100) — if `s ∈ H ∩ I` and
+`u ∈ I - (H ∩ I)`, then `su` has odd order.  (If the order were even, the
+involution `w ∈ ⟨su⟩` would be centralized by both `s` and `u`; by Prop 1(b)
+first `w ∈ H` — hence `w ∈ Q` — and then `u ∈ H`, a contradiction.) -/
+lemma odd_orderOf_mul_involution {s u : G} (hsH : s ∈ hyp.H) (hs2 : s ^ 2 = 1)
+    (hs1 : s ≠ 1) (hu2 : u ^ 2 = 1) (huH : u ∉ hyp.H) :
+    Odd (orderOf (s * u)) := by
+  by_contra hodd
+  rw [Nat.not_odd_iff_even] at hodd
+  have hss : s * s = 1 := by rw [← sq]; exact hs2
+  have huu : u * u = 1 := by rw [← sq]; exact hu2
+  have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hss
+  have huinv : u⁻¹ = u := inv_eq_of_mul_eq_one_right huu
+  have hn_pos : 0 < orderOf (s * u) := orderOf_pos _
+  obtain ⟨m, hm⟩ := hodd
+  -- the involution `w = (su)^m` of `⟨su⟩`
+  set w : G := (s * u) ^ m with hw
+  have hw2 : w ^ 2 = 1 := by
+    rw [hw, ← pow_mul, mul_two, ← hm, pow_orderOf_eq_one]
+  have hw1 : w ≠ 1 := by
+    intro h
+    have hdvd := orderOf_dvd_of_pow_eq_one h
+    have := Nat.le_of_dvd (by omega) hdvd
+    omega
+  have hwinv : w⁻¹ = w :=
+    inv_eq_of_mul_eq_one_right (by rw [← sq]; exact hw2)
+  -- `s` and `u` invert `su`, hence centralize `w`
+  have hconj_s : s * (s * u) * s⁻¹ = (s * u)⁻¹ := by
+    rw [hsinv, mul_inv_rev, huinv, hsinv]
+    calc s * (s * u) * s = s * s * (u * s) := by group
+      _ = u * s := by rw [hss, one_mul]
+  have hconj_u : u * (s * u) * u⁻¹ = (s * u)⁻¹ := by
+    rw [huinv, mul_inv_rev, huinv, hsinv]
+    calc u * (s * u) * u = (u * s) * (u * u) := by group
+      _ = u * s := by rw [huu, mul_one]
+  have hs_w : s * w * s⁻¹ = w := by
+    rw [hw, ← conj_pow, hconj_s, inv_pow, ← hw, hwinv]
+  have hu_w : u * w * u⁻¹ = w := by
+    rw [hw, ← conj_pow, hconj_u, inv_pow, ← hw, hwinv]
+  have hcomm_ws : w * s = s * w := by
+    have h2 := congrArg (fun z : G => z * s) hs_w
+    simpa [mul_assoc, hsinv, hss] using h2.symm
+  have hcomm_wu : w * u = u * w := by
+    have h2 := congrArg (fun z : G => z * u) hu_w
+    simpa [mul_assoc, huinv, huu] using h2.symm
+  -- `w ∈ C_G(s) ≤ H` (Prop 1(b)), hence `w ∈ Q`
+  have hsQ : s ∈ hyp.Q := hyp.mem_Q_of_sq_eq_one_of_mem_H hsH hs2
+  have hwH : w ∈ hyp.H :=
+    hyp.centralizer_le_H_of_mem_Q hsQ hs1
+      (Subgroup.mem_centralizer_singleton_iff.mpr hcomm_ws)
+  have hwQ : w ∈ hyp.Q := hyp.mem_Q_of_sq_eq_one_of_mem_H hwH hw2
+  -- then `u ∈ C_G(w) ≤ H`, contradiction
+  exact huH (hyp.centralizer_le_H_of_mem_Q hwQ hw1
+    (Subgroup.mem_centralizer_singleton_iff.mpr
+      (by rw [hcomm_wu])))
 
 end Hypothesis
 
