@@ -415,7 +415,8 @@ private theorem sylow_structure_b [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
       rw [Subgroup.mem_bot]; exact Subtype.ext hxinf
     have hmulu : (↑((P : Subgroup G).subgroupOf N) : Set ↥N) * (↑(V.subgroupOf N) : Set ↥N)
         = Set.univ := by
-      rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup hPN hVN, hPVsup, Subgroup.subgroupOf_self,
+      rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup hPN hVN, hPVsup,
+          Subgroup.subgroupOf_self,
         Subgroup.coe_top]
     have hCompl : ((P : Subgroup G).subgroupOf N).IsComplement' (V.subgroupOf N) :=
       Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf) hmulu
@@ -1131,7 +1132,8 @@ theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
     exact (h4 p hp_prime hpM hpβ).1
   · -- (b) for `M_σ = Msigma M`.
     haveI : IsSolvable ↥(Msigma M) := by
-      let e := Subgroup.equivMapOfInjective (Ch03.oPiCore (sigma M) ↥M) M.subtype M.subtype_injective
+      let e := Subgroup.equivMapOfInjective (Ch03.oPiCore (sigma M) ↥M) M.subtype
+          M.subtype_injective
       exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
     refine produce (Msigma M) inferInstance (fun p hp_prime hpπA hpβ => ?_)
     have hpM : p ∈ (Nat.card ↥M).primeFactors :=

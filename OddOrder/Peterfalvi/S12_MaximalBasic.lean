@@ -557,7 +557,8 @@ theorem Hypothesis.mem_restricted_dadeSupport_of_coprime [Finite G] {M : Subgrou
         have haC : a.1 ∈ OddOrder.Peterfalvi.S04.centralizerIn M a.1 :=
           ⟨hyp.dadeData.dade.subset_L a.2, Subgroup.mem_centralizer_iff.mpr
             (fun z hz => by rw [Set.mem_singleton_iff.mp hz])⟩
-        have he : orderOf a.1 = orderOf (⟨a.1, haC⟩ : ↥(OddOrder.Peterfalvi.S04.centralizerIn M a.1)) :=
+        have he : orderOf a.1 = orderOf (⟨a.1, haC⟩ : ↥(OddOrder.Peterfalvi.S04.centralizerIn M
+            a.1)) :=
           orderOf_injective (OddOrder.Peterfalvi.S04.centralizerIn M a.1).subtype
             (OddOrder.Peterfalvi.S04.centralizerIn M a.1).subtype_injective ⟨a.1, haC⟩
         rw [he]; exact orderOf_dvd_natCard _

@@ -462,7 +462,8 @@ set_option linter.style.longLine false in
 This consumes the same concrete S07 coherence witness as
 `indChainDecomposition_of_isCoherent`, then applies the S08 weighted source-difference
 image identity to the resulting Ind-chain package. -/
-theorem indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero_of_isCoherent
+theorem
+    indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero_of_isCoherent
     (H78 : Hypothesis78 G A L)
     {A_prime : Set L}
     {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
@@ -488,7 +489,8 @@ theorem indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul
 
 set_option linter.style.longLine false in
 /-- H78-facing normalized weighted Ind equation, with the Parseval norm coefficient. -/
-theorem indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero_of_isCoherent
+theorem
+    indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero_of_isCoherent
     (H78 : Hypothesis78 G A L)
     {A_prime : Set L}
     {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}

@@ -240,7 +240,8 @@ theorem certainTypeOmegaSigma_muColumnChar_eq_aligned [Finite G]
       = (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).sigma rfl
           (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (hyp.toHypothesis46 hG hG.odd))
           (ClassFunction.compHom
-            (((Subgroup.subgroupOfEquivOfLe (OddOrder.Peterfalvi.S12.typePData_W_le_self hyp.typeP)).symm.trans
+            (((Subgroup.subgroupOfEquivOfLe (OddOrder.Peterfalvi.S12.typePData_W_le_self
+                hyp.typeP)).symm.trans
               (MulEquiv.subgroupCongr
                 (OddOrder.Peterfalvi.S12.typePData_sup_subgroupOf_eq hyp.typeP).symm)).toMonoidHom)
             ((hyp.toHypothesis46 hG hG.odd).chiColumn (hyp.muColumnChar hG hG.odd j)
@@ -677,7 +678,8 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap χ
       (fun i => (ClassFunction.inner (χ i) (χ i))⁻¹ • Ωof (kf i)) with hν₀def
   have hν₀apply : ∀ i : Fin n, ν₀ (χ i) = Ωof (kf i) := fun i =>
-    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_apply_eq_of_orthogonal hχorth hχnorm i
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_apply_eq_of_orthogonal hχorth
+        hχnorm i
   -- the column-independent residual `r = Ω_j − τ(μcol_j)`
   set r : ClassFunction G ℂ :=
     Ωof ⟨1, hw2⟩ - hyp.base.tau (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)

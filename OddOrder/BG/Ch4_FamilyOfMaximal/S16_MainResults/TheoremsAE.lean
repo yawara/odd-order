@@ -777,7 +777,8 @@ theorem typeP2_matched_kappa_hall_pair_of_esetup [Finite G]
     rintro ⟨p, hpκ, hpτ3⟩
     have hp : p.Prime := S14.prime_of_mem_kappa hpκ
     obtain ⟨hE3ne, hreg⟩ := S14.E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
-    obtain ⟨_, _, hEprime, _⟩ := OddOrder.BG.Ch3.S13.E3_not_regular_consequences hG hsetup hE3ne hreg
+    obtain ⟨_, _, hEprime, _⟩ := OddOrder.BG.Ch3.S13.E3_not_regular_consequences hG hsetup hE3ne
+        hreg
     obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
       by_contra hcon; push Not at hcon; exact hreg fun y hy hy1 => hcon y hy hy1
@@ -1012,7 +1013,8 @@ theorem theoremC_paired_structure [Finite G]
       have hU₀ab' : ∀ a ∈ U₀, ∀ b ∈ U₀, a * b = b * a := fun a ha b hb =>
         congrArg Subtype.val (isMulCommutative_iff.mp hU₀ab (⟨a, ha⟩ : ↥U₀) ⟨b, hb⟩)
       obtain ⟨H, _, _, _, _, hHNU₀⟩ :=
-        S14.typeP2_neighbor_is_typeF hG hM hP2 hK₀M hU₀M hK₀ hU₀ hU₀ab' hr (Subgroup.map_subtype_le _)
+        S14.typeP2_neighbor_is_typeF hG hM hP2 hK₀M hU₀M hK₀ hU₀ hU₀ab' hr (Subgroup.map_subtype_le
+            _)
           hR₀ hK₀NU₀
       -- Transport `N_G(U) ⊄ M` (assumed `≤`, for contradiction) to `N_G(U₀) ≤ M`.
       intro hle
@@ -1358,7 +1360,8 @@ theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
       ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi)
     (p : ℕ) :
-    p ∈ (Nat.card G).primeFactors ↔ ∃ Mi : Subgroup G, Mi ∈ reps ∧ p ∈ OddOrder.BG.Ch3.S10.sigma Mi := by
+    p ∈ (Nat.card G).primeFactors ↔ ∃ Mi : Subgroup G, Mi ∈ reps ∧ p ∈ OddOrder.BG.Ch3.S10.sigma
+        Mi := by
   constructor
   · -- `p ∣ |G|` ⟹ `p ∈ σ(M)` for some maximal `M` ⟹ `p ∈ σ(Mᵢ)` for its representative.
     intro hp

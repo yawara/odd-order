@@ -658,7 +658,8 @@ theorem isaacs_thm_5_17
   have h_coprime_PK : Nat.Coprime (Nat.card ↥(P : Subgroup G)) (Nat.card ↥K) := by
     -- |K| = |K'|
     have h_K_card : Nat.card ↥K = Nat.card ↥K' :=
-      (Nat.card_congr (Subgroup.equivMapOfInjective K' N.subtype Subtype.coe_injective).toEquiv).symm
+      (Nat.card_congr (Subgroup.equivMapOfInjective K' N.subtype
+          Subtype.coe_injective).toEquiv).symm
     -- |K'| = P_N.index (complement)
     have h_K'_card : Nat.card ↥K' = P_N.index := by
       have := hK'_compl.card_right

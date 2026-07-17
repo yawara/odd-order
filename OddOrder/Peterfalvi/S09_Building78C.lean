@@ -481,7 +481,8 @@ theorem induce_apply_one_star (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.c
 family `θ : Fin (n+1) → Irr K` of pairwise non-conjugate irreducibles, the induced characters
 `ζ_i = Ind_K^L θ_i` are pairwise orthogonal — the `horth` hypothesis of `chiRho_decomp_proof`.
 Direct from `inner_induce_eq_zero_of_not_conj`. -/
-theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card L : ℂ)]
+theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card L :
+    ℂ)]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
     (hnc : ∀ a b : Fin (n + 1), a ≠ b →

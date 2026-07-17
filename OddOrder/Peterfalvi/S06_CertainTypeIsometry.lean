@@ -529,7 +529,8 @@ theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
           (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq
       = (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq
         - ((h.columnFamily χ₂).sign : ℂ)
-          * ((if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) = pq then (1 : ℂ) else 0)
+          * ((if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) = pq then (1 : ℂ) else
+              0)
             - (if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) = pq
                 then (1 : ℂ) else 0)) := by
   simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff]

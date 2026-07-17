@@ -436,7 +436,8 @@ private theorem pRank_normalizer_le_one_core [Finite G] (hG : IsMinimalSimpleOdd
     obtain ⟨B, hBea, hBMM⟩ :=
       exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank (Fact.out : p.Prime) hpRankMM
     exact hcontra B hBea (hBMM.trans inf_le_left) Mstar
-      (mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar_max, hBMM.trans inf_le_right⟩)
+      (mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar_max, hBMM.trans
+          inf_le_right⟩)
       hMstarne (Subgroup.le_normalizer.trans hMstar_ge)
 
 /-- **BG Corollary 12.16(a)** (mmd L3453-3456), **`q`-group specialization**: for a nonidentity

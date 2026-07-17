@@ -999,6 +999,7 @@ theorem caseB_Xset_orthogonal_Yset
   rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hx) with
     ⟨χ₂, -, rfl⟩ | hirr
   · exact inner_columnSum_Yset_eq_zero hyp h46 hW1 hy χ₂
-  · exact inner_irr_Yset_eq_zero hyp hirr hy (fun heq => Set.disjoint_left.mp hdisj hx (heq.symm ▸ hy))
+  · exact inner_irr_Yset_eq_zero hyp hirr hy (fun heq => Set.disjoint_left.mp hdisj hx (heq.symm ▸
+      hy))
 
 end OddOrder.Peterfalvi.S08

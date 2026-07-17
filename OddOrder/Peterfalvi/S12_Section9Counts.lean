@@ -261,7 +261,8 @@ theorem typePData_C_normalized_by_M [Finite G] {M : Subgroup G} (data : TypePDat
       ≤ Subgroup.normalizer (data.H : Set G) :=
     inf_le_right.trans (Subgroup.centralizer_le_normalizer (data.H : Set G))
   have hHC : ((data.H ⊔ (data.U ⊓ Subgroup.centralizer (data.H : Set G)) : Subgroup G) : Set G)
-      = (data.H : Set G) * ((data.U ⊓ Subgroup.centralizer (data.H : Set G) : Subgroup G) : Set G) :=
+      = (data.H : Set G) * ((data.U ⊓ Subgroup.centralizer (data.H : Set G) : Subgroup G) : Set
+          G) :=
     Subgroup.coe_mul_of_right_le_normalizer_left _ _ hCleNH
   -- coprimality of `|H|` and `|U|`
   have hcoHU : Nat.Coprime (Nat.card ↥data.H) (Nat.card ↥data.U) :=

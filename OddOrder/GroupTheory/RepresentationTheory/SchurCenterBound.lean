@@ -70,7 +70,8 @@ theorem exists_central_scalar (ρ : Representation ℂ G V) [IsIrreducible ρ]
 
 `ρ z = c • id` and `ρ z⁻¹ = c' • id` with `c·c' = 1` (since `ρ z · ρ z⁻¹ = id`), so
 `χ(z)·χ(z⁻¹) = (n·c)(n·c') = n²`. -/
-theorem char_mul_char_inv_of_mem_center_complex [Finite G] (ρ : Representation ℂ G V) [IsIrreducible ρ]
+theorem char_mul_char_inv_of_mem_center_complex [Finite G] (ρ : Representation ℂ G V) [IsIrreducible
+    ρ]
     {z : G} (hz : z ∈ Subgroup.center G) :
     ρ.character z * ρ.character z⁻¹ = (finrank ℂ V : ℂ) ^ 2 := by
   obtain ⟨c, hc⟩ := exists_central_scalar ρ hz

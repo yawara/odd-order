@@ -122,7 +122,8 @@ theorem false_of_coherentXunionYset_caseA_of_not_coherentS
     nlinarith [hxb]
   rw [hyp.index_mul_card_sub_factor (Z := hyp.centralCommutator), hyp.index_H_eq_card_W1] at hxbN
   -- discharge the arithmetic core (case-(A) single-FPF form).
-  refine SibleyDadeHypothesis.false_of_centralCommutator_break_arith (w1 := Nat.card hyp.W1) (d := d)
+  refine SibleyDadeHypothesis.false_of_centralCommutator_break_arith (w1 := Nat.card hyp.W1) (d :=
+      d)
     (hZ := Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H))
     (cZ := Nat.card ↥(hyp.centralCommutator.subgroupOf H))
     Nat.card_pos hdpos hdsq hZ2 hfpf ?_

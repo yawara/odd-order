@@ -60,7 +60,8 @@ the (11.8.1) §9 counts).  Given the §9 setup `data` (`toTypesIIIIIIVSetup`) an
 degree fact `caseB_degree_qu`).  So the §9 *degree* analysis — `clifford_dichotomy` (9.7) and the
 `μ_j(1) = qu` of (9.8)/(9.9) — becomes available on the §10 `Hypothesis`.  (`tau := hyp.tau` records
 the genuine Dade map for the coherence use; the support/`Prop` are placeholders for the count use.) -/
-noncomputable def Hypothesis.mkSection11CharacterData [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+noncomputable def Hypothesis.mkSection11CharacterData [Finite G] {M : Subgroup G} (hyp : Hypothesis
+    M)
     (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData data) :
     OddOrder.Peterfalvi.S11.Section11CharacterData data chief where
@@ -138,7 +139,8 @@ theorem Hypothesis.mkSection11CharacterData_u_modEq_one [Finite G] {M : Subgroup
     (hyp : Hypothesis M) (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData data) (hU : data.typeP.U ≠ ⊥) :
     (hyp.mkSection11CharacterData data chief).u ≡ 1 [MOD Nat.card ↥data.typeP.W1] := by
-  have hgen := (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data.typeP hU).card_range_comp_subtype_modEq_one
+  have hgen := (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data.typeP
+      hU).card_range_comp_subtype_modEq_one
     (quotientMulAutHom (N := chief.N) chief.N_aInvariant)
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at hgen
 
@@ -292,7 +294,8 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
           ((h.chiRestrict (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)))
             : ClassFunction ↥h.K ℂ) := by
     intro j
-    rw [h.coe_chiRestrict, h.induce_restrict_certainType_eq, ← Equiv.sum_comp (finCongr hcardW1.symm)
+    rw [h.coe_chiRestrict, h.induce_restrict_certainType_eq, ← Equiv.sum_comp (finCongr
+        hcardW1.symm)
       (fun i' => ((h.columnFamily
         (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu i' : ClassFunction ↥M ℂ))]
     exact Finset.sum_congr rfl (fun i _ => by unfold Hypothesis.muGrid; rfl)
@@ -692,7 +695,8 @@ theorem Hypothesis.charParam_d_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   have hq : (hyp.toTypesIIIIIIVSetup htype hnt).q = hyp.w1 := rfl
   have hqu' : (hyp.w1 : ℂ) * (params.d : ℂ)
       = (((hyp.toTypesIIIIIIVSetup htype hnt).q
-          * (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
+          * (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) :=
+              by
     rw [← hdeg]; exact hqu
   rw [hq] at hqu'
   push_cast at hqu'
@@ -859,7 +863,8 @@ theorem Hypothesis.charParam_delta_eq_one [Finite G] (hG : OddOrder.BG.IsMinimal
   have hd1 : (hyp.w1 : ℤ) ∣ (1 : ℤ) - (params.d : ℤ) :=
     Nat.modEq_iff_dvd.mp (hyp.charParam_d_modEq_one hG htype params hmu)
   have hkey : (hyp.w1 : ℤ) ∣ (1 : ℤ) - params.delta := by
-    have hcomb : (1 : ℤ) - params.delta = ((params.d : ℤ) - params.delta) + (1 - (params.d : ℤ)) := by
+    have hcomb : (1 : ℤ) - params.delta = ((params.d : ℤ) - params.delta) + (1 - (params.d : ℤ)) :=
+        by
       ring
     rw [hcomb]; exact dvd_add hddelta hd1
   rcases hδpm with h1 | hm1

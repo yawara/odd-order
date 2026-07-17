@@ -155,7 +155,8 @@ private noncomputable def commBihomP : P →* P →* Multiplicative (ZMod p) whe
       map_mul' := fun y y' => by
         rw [← map_mul]
         exact congrArg (commMulEquiv hP)
-          (Subtype.ext (commutatorElement_mul_right_of_le_center hP.commutator_eq_center.le x y y')) }
+          (Subtype.ext (commutatorElement_mul_right_of_le_center hP.commutator_eq_center.le x y y'))
+              }
   map_one' := by
     ext y
     simp [commutatorElement_one_left]
@@ -236,7 +237,8 @@ private theorem commBihom2_mk (x y : P) :
 /-- Value of the commutator form on representatives: `b(x̄, ȳ) = toAdd (ζ ⁅x, y⁆)`. -/
 theorem commPairing_ofMul (x y : P) :
     commPairing hP (Additive.ofMul (QuotientGroup.mk x)) (Additive.ofMul (QuotientGroup.mk y)) =
-      Multiplicative.toAdd (commMulEquiv hP ⟨⁅x, y⁆, commutatorElement_mem_commutator_top x y⟩) := by
+      Multiplicative.toAdd (commMulEquiv hP ⟨⁅x, y⁆, commutatorElement_mem_commutator_top x y⟩) :=
+          by
   rw [commPairing_mk, commBihom2_mk]
 
 /-- The commutator form is **alternating**: `b(v, v) = 0`. -/

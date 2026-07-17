@@ -347,7 +347,8 @@ theorem maximalContaining_centralizer_and_someSylow_eq_singleton [Finite G]
         have hcent : derivedInG (S : Subgroup G) ≤ Subgroup.centralizer (P₁ : Set G) := by
           rw [derivedInG_eq_commutator]
           -- `⁅P₁,P₁⁆ = Z(P₁) ≤ C_G(P₁)` (extraspecial: derived = centre).
-          have hP₁cc : ⁅(P₁ : Subgroup G), (P₁ : Subgroup G)⁆ ≤ Subgroup.centralizer (P₁ : Set G) := by
+          have hP₁cc : ⁅(P₁ : Subgroup G), (P₁ : Subgroup G)⁆ ≤ Subgroup.centralizer (P₁ : Set G) :=
+              by
             rw [← derivedInG_eq_commutator, derivedInG, hP₁es.isExtraspecial.commutator_eq_center]
             intro y hy
             obtain ⟨z, hz, rfl⟩ := Subgroup.mem_map.mp hy

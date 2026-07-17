@@ -327,7 +327,8 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
           ⟨ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ a : ClassFunction _ ℂ)
           - d a • ClassFunction.induce ((F.H i).subgroupOf (F.L i))
             (θ 0 : ClassFunction _ ℂ), psi_support a⟩
-        = coh.extension (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ a : ClassFunction _ ℂ))
+        = coh.extension (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ a : ClassFunction _
+            ℂ))
           - d a • coh.extension
             (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ)) := by
     intro a _ha0 ha_ind
@@ -397,7 +398,8 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
         = (ClassFunction.inner ((F.hypothesis71 i).chiRhoCF (coh.extension
             (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))))
           ((F.hypothesis71 i).chiRhoCF (coh.extension
-            (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))))).re := by
+            (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))))).re :=
+                by
       change (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re = _
       have hzr : H78.zetaNuRho = (F.hypothesis71 i).chiRhoCF (coh.extension
           (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))) := by

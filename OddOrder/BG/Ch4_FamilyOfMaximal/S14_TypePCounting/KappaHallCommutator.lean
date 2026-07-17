@@ -300,7 +300,8 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
       · exact tau3_subset_sigma_compl M h
     have hpκ : p ∉ kappa M := by rw [hF]; exact Set.notMem_empty p
     have hAM : A ≤ M := hAK'.trans (hK'E.trans hsetup.E_le)
-    obtain ⟨_, hCA, _⟩ := msigma_structure_of_notMem_sigma_kappa hG hsetup.mem_maximal hpπ hpσ hpκ hA hAM
+    obtain ⟨_, hCA, _⟩ := msigma_structure_of_notMem_sigma_kappa hG hsetup.mem_maximal hpπ hpσ hpκ
+        hA hAM
     have hAcent : A ≤ Subgroup.centralizer (Msigma M : Set G) := hAK'.trans hK'cent
     have hMσcentA : Msigma M ≤ Subgroup.centralizer (A : Set G) := by
       rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
@@ -501,7 +502,8 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
     rw [hA.2, Nat.mem_primeFactors] at hr
     exact ((Nat.prime_dvd_prime_iff_eq hr.1 Fact.out).mp (hr.1.dvd_of_dvd_pow hr.2.1)) ▸ hpσβ.1
   have hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma Mstar :=
-    OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall (OddOrder.BG.Ch3.S10.Msigma_isHall hG hMstarmax) hAMstar hApiσ
+    OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall (OddOrder.BG.Ch3.S10.Msigma_isHall hG
+        hMstarmax) hAMstar hApiσ
   have hCMσQ : OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer (Q : Set G) ≠ ⊥ := fun h =>
     hA₁ne (le_bot_iff.mp (h ▸ inf_le_inf hAMσ le_rfl))
   refine ⟨Mstar, hMstarmax, ?_⟩
@@ -686,7 +688,8 @@ theorem kappa_branch_mem_conjClassSet_zTilde [Finite G]
     hale (Subgroup.smul_mem_pointwise_smul y' (MulAut.conj a) _
       (Subgroup.subset_closure (Set.mem_singleton y')))
   -- `aᵃ • y ∈ M_σ`.
-  have hMsigmaFix : MulAut.conj a • OddOrder.BG.Ch3.S10.Msigma M = OddOrder.BG.Ch3.S10.Msigma M := by
+  have hMsigmaFix : MulAut.conj a • OddOrder.BG.Ch3.S10.Msigma M = OddOrder.BG.Ch3.S10.Msigma M :=
+      by
     rw [← Msigma_conj_smul, Subgroup.conj_smul_eq_self_of_mem haM]
   have hayMsigma : MulAut.conj a • y ∈ OddOrder.BG.Ch3.S10.Msigma M :=
     hMsigmaFix ▸ Subgroup.smul_mem_pointwise_smul y (MulAut.conj a) _ hyMsigma

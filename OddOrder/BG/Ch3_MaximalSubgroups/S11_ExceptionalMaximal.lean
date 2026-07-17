@@ -512,7 +512,8 @@ theorem exists_isAInvSylowIn [Finite G] {A : Subgroup G} {p : ℕ} [Fact p.Prime
     OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow (G := ↥H) (A := ↥A) (φ := φ)
       hCop (Or.inl inferInstance) hP₀sub_q hP₀sub_inv
   -- Map the Sylow back to `G`.
-  refine ⟨(S : Subgroup ↥H).map H.subtype, ⟨Subgroup.map_subtype_le _, S.2.map H.subtype, ?_, ?_⟩, ?_⟩
+  refine ⟨(S : Subgroup ↥H).map H.subtype, ⟨Subgroup.map_subtype_le _, S.2.map H.subtype, ?_, ?_⟩,
+      ?_⟩
   · -- `A ≤ N_G(Q)` from conjugation-invariance of `S`.
     intro a ha
     rw [Subgroup.mem_normalizer_iff]
@@ -600,7 +601,8 @@ theorem Msigma_meet_conjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   have hAnormMsM : A ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) :=
     le_trans h.A_le hMnormMsM
   -- `A` normalizes `M_σ^g` (`A^{g⁻¹} ≤ M ≤ N_G(M_σ)`, conjugated back).
-  have hAnormConj : A ≤ Subgroup.normalizer ((MulAut.conj g • S10.Msigma M : Subgroup G) : Set G) := by
+  have hAnormConj : A ≤ Subgroup.normalizer ((MulAut.conj g • S10.Msigma M : Subgroup G) : Set G) :=
+      by
     rw [← normalizer_conj_smul g (S10.Msigma M)]
     have hconjA : (MulAut.conj g)⁻¹ • A ≤ M := by
       have := (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := (MulAut.conj g)⁻¹)).mpr hAg

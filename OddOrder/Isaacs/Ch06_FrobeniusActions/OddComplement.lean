@@ -515,7 +515,8 @@ theorem IsFrobeniusGroup.conjComplement {G : Type*} [Group G] [Finite G] {N A : 
     rw [this, hgxg]; group
   · -- `A^g ≠ ⊥`.
     intro hbot
-    exact h.ne_bot_complement (Subgroup.card_eq_one.mp (by rw [← hAg_card, hbot, Subgroup.card_bot]))
+    exact h.ne_bot_complement (Subgroup.card_eq_one.mp (by rw [← hAg_card, hbot,
+        Subgroup.card_bot]))
   · -- conjugation Frobenius for `A^g`, transferred along `g`.
     intro a haAg ha1 n hnN hn1 hfix
     rw [hmem] at haAg

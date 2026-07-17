@@ -785,7 +785,8 @@ private theorem exists_elementaryAbelian_le_center_of_le_rank [Finite G]
       omega
     · exact hge
   set B : Subgroup G := B₀.map ZA.subtype with hB
-  have hB_ea : B.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.map ZA.subtype_injective hB₀_ea
+  have hB_ea : B.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.map ZA.subtype_injective
+      hB₀_ea
   have hlogB : n ≤ Nat.log p (Nat.card ↥B) := by
     rw [hB, Subgroup.card_map_of_injective ZA.subtype_injective]; exact hB₀_log
   refine ⟨p, B, hB_ea, ?_, hlogB, le_trans (Subgroup.map_subtype_le _) (Subgroup.map_subtype_le _),
@@ -821,7 +822,8 @@ private theorem not_isCyclic_of_cocyclic [Finite G] {p : ℕ} (hp2 : 2 ≤ p) {B
   have hsup' : Y' ⊔ K = ⊤ := by
     apply Subgroup.map_injective B.subtype_injective
     rw [Subgroup.map_sup, hY', hK, Subgroup.map_subgroupOf_eq_of_le hYB,
-      Subgroup.map_subgroupOf_eq_of_le hzple, hsup, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+      Subgroup.map_subgroupOf_eq_of_le hzple, hsup, ← MonoidHom.range_eq_map,
+          Subgroup.range_subtype]
   have hKle : Nat.card ↥K ≤ p := by
     rw [hK, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hzple).toEquiv, Nat.card_zpowers]
     refine Nat.le_of_dvd (by omega : 0 < p) (orderOf_dvd_of_pow_eq_one ?_)

@@ -127,7 +127,8 @@ theorem chief_W2_inf_H0_eq_bot [Finite G] {M : Subgroup G} (hyp : Hypothesis M) 
       (Subgroup.card_subgroup_dvd_card _)
   haveI : IsSolvable ↥data.H := (OddOrder.Peterfalvi.S11.typeP_coprimeAction data hU).H_solvable
   have hmap : F.map (QuotientGroup.mk' hyp.chief.N) = act.fixedByE :=
-    map_fixedSubgroup_eq_fixedSubgroup_quotient hyp.chief.N_aInvariant hcopHW1 (Or.inr inferInstance)
+    map_fixedSubgroup_eq_fixedSubgroup_quotient hyp.chief.N_aInvariant hcopHW1 (Or.inr
+        inferInstance)
   have hUnorm : act.U.Normal :=
     (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data hU).isNormal
   have hEcyc : IsCyclic ↥act.fixedByE :=

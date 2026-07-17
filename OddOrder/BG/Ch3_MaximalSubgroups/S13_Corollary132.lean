@@ -248,7 +248,8 @@ theorem msigma_centralizer_le_of_invariant_sylow_centralized [Finite G]
           (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hPRE), Nat.card_pos.ne'⟩)
     · exact fun q hq hqc => hqc (S10.Msigma_isPiGroup M q
         (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hq).1,
-          (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hNMsig), Nat.card_pos.ne'⟩))
+          (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hNMsig),
+              Nat.card_pos.ne'⟩))
   have hNM : N ≤ M := hNMsig.trans (S10.Msigma_le M)
   haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
   haveI hNsolv : IsSolvable ↥N :=

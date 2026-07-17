@@ -176,7 +176,8 @@ theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
     le_inf hP'MF (hcentr P' hP'MF hP'r)
   have hidx : ¬ r ∣ ((MF M ⊓ Subgroup.centralizer (X₁ : Set G)).subgroupOf (MF M)).index := by
     intro hdvd
-    have hP'sub : P'.subgroupOf (MF M) ≤ (MF M ⊓ Subgroup.centralizer (X₁ : Set G)).subgroupOf (MF M) :=
+    have hP'sub : P'.subgroupOf (MF M) ≤ (MF M ⊓ Subgroup.centralizer (X₁ : Set G)).subgroupOf (MF
+        M) :=
       Subgroup.subgroupOf_mono (MF M) hP'C
     have hdvd2 : r ∣ (P'.subgroupOf (MF M)).index :=
       hdvd.trans (Subgroup.index_dvd_of_le hP'sub)
@@ -245,7 +246,8 @@ theorem derivedInG_le_fittingInAmbient_of_not_fittingIsTI [Finite G]
     rw [heq]; infer_instance
   haveI := OddOrder.BG.Ch3.S10.derivedQuotientMbeta_isNilpotent hG hM
   haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) :=
-    Group.nilpotent_of_mulEquiv ((QuotientGroup.quotientMulEquivOfEq heq).trans QuotientGroup.quotientBot)
+    Group.nilpotent_of_mulEquiv ((QuotientGroup.quotientMulEquivOfEq heq).trans
+        QuotientGroup.quotientBot)
   -- `M'` normal in `M` + nilpotent ⟹ `M' ≤ F(M)`.
   have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)

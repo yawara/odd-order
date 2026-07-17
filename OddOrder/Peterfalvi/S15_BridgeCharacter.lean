@@ -1101,7 +1101,8 @@ private theorem gammaGrid_orthogonal_one_aux [Finite G]
   -- `⟨Ind_{PW₁}^S 1, 1_S⟩ = 1`.
   have hind : ClassFunction.inner (indPW1 hyp)
       (OddOrder.Peterfalvi.S09.Hypothesis71.constOne (↥hyp.S)) = 1 := by
-    rw [indPW1, ← OddOrder.RepresentationTheory.IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+    rw [indPW1, ←
+        OddOrder.RepresentationTheory.IrreducibleCharacter.coe_trivialIrreducibleCharacter]
     exact OddOrder.Peterfalvi.S09.Cert.inner_induce_trivialChar_constOne_eq_one
       ((hyp.P ⊔ hyp.W1).subgroupOf hyp.S)
   -- `⟨μ_{01}, 1_S⟩ = 0`: `μ_{01}` is irreducible and `≠ 1_S` (else `⟨Ind 1, μ_{01}⟩ = 1 ≠ 0`).

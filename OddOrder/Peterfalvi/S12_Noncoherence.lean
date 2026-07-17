@@ -535,7 +535,8 @@ theorem typeV_sixFiveB_pGroup [Finite G]
       ≤ 4 * Nat.card ↥(hyp.W1.subgroupOf M) ^ 2 + 1 := by
     rw [hW1card]
     exact typeV_sixFiveA_bound hG hyp ⟨dV⟩ hnc
-  obtain ⟨p, hp, hHp⟩ := OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator
+  obtain ⟨p, hp, hHp⟩ :=
+      OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator
     hcop hfix hHodd hWodd hbound'
   haveI : Fact p.Prime := ⟨hp⟩
   have hHp' : IsPGroup p ↥(derivedInG M) := hHp.of_equiv (Subgroup.subgroupOfEquivOfLe hM'le)

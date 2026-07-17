@@ -68,7 +68,8 @@ theorem le_centralizer_opiCore_of_msigma_nilpotent [Finite G]
   -- `⁅Q̄, Ā⁆ = ⊥` (nilpotent, normal `q`-part vs `q'`-part), so `Ā ≤ C(Q̄)`.
   have hcommbot : ⁅Q.subgroupOf Ls, A.subgroupOf Ls⁆ = ⊥ :=
     commutator_eq_bot_of_isNilpotent_of_normal_isPGroup hQbarpg hqnotA
-  have hAbarC : A.subgroupOf Ls ≤ Subgroup.centralizer ((Q.subgroupOf Ls : Subgroup ↥Ls) : Set ↥Ls) :=
+  have hAbarC : A.subgroupOf Ls ≤ Subgroup.centralizer ((Q.subgroupOf Ls : Subgroup ↥Ls) : Set
+      ↥Ls) :=
     Subgroup.commutator_eq_bot_iff_le_centralizer.mp
       (by rw [Subgroup.commutator_comm]; exact hcommbot)
   -- Push out to the ambient: `A ≤ C_G(Q)`.
@@ -277,7 +278,8 @@ theorem opiCore_index_coprime_of_typeP [Finite G] (hG : OddOrder.BG.IsMinimalSim
   have hqidxMσ : ¬ q ∣ (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma L)).index := by
     by_cases hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L)
     · -- nilpotent: `Q = O_q(L_σ)` is a Hall `{q}`-subgroup of `L_σ`.
-      have hMnormMσ : L ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma L : Subgroup G) : Set G) :=
+      have hMnormMσ : L ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma L : Subgroup G) : Set
+          G) :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer hMσL).mp
           (by rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance)
       have hQeqMσ : Q = opiCoreInG ({q} : Set ℕ) (OddOrder.BG.Ch3.S10.Msigma L) := by
@@ -538,7 +540,8 @@ theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
       have hxN0 : x ∈ Subgroup.normalizer (Q0 : Set G) := hMσnormQ0 (hHle hx)
       rw [commutatorElement_def]
       exact Q0.mul_mem ((Subgroup.mem_normalizer_iff.mp hxN0 z).mp hz) (Q0.inv_mem hz)⟩
-    have hQ0ltW : Q0 < W := lt_of_le_of_ne hQ0W (fun heq => hKstarNotQ0 (le_of_le_of_eq hKW heq.symm))
+    have hQ0ltW : Q0 < W := lt_of_le_of_ne hQ0W (fun heq => hKstarNotQ0 (le_of_le_of_eq hKW
+        heq.symm))
     -- `W` is `M`-normal (from the `M`-invariance of `H`); the deep chief-factor step.
     have hWnorm : (W.subgroupOf L).Normal := by
       -- `L` normalizes `M_σ = O_{σ(L)}(L)`.
@@ -556,7 +559,8 @@ theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
         rw [Subgroup.commutator_le]
         intro a ha b hb
         rw [commutatorElement_def]
-        exact mul_mem (mul_mem (mul_mem (hDMσ ha) (hDMσ hb)) (inv_mem (hDMσ ha))) (inv_mem (hDMσ hb))
+        exact mul_mem (mul_mem (mul_mem (hDMσ ha) (hDMσ hb)) (inv_mem (hDMσ ha))) (inv_mem (hDMσ
+            hb))
       have hDDH : ⁅D, D⁆ ≤ H := fun g hg => ⟨hDDMσ hg, fun k hk => hDcomm g hg k (hKstarQ hk)⟩
       have hsup : Q ⊔ D = OddOrder.BG.Ch3.S10.Msigma L := by
         have h := congrArg (Subgroup.map (OddOrder.BG.Ch3.S10.Msigma L).subtype) hcomplD.sup_eq_top

@@ -226,7 +226,8 @@ theorem cocyclicFixedByClosure_eq_top_of_not_isCyclic
               exact hcm.symm
             · -- `(m : G)` is fixed by all of `Y`.
               intro y hy
-              have hfix := hZfix (QuotientGroup.mk' (Subgroup.zpowers a) y) (Subgroup.mem_comap.mp hy)
+              have hfix := hZfix (QuotientGroup.mk' (Subgroup.zpowers a) y) (Subgroup.mem_comap.mp
+                  hy)
               rw [QuotientGroup.mk'_apply] at hfix
               have hcompat := quotAction_mk_apply_val φ a y m
               rw [hfix] at hcompat

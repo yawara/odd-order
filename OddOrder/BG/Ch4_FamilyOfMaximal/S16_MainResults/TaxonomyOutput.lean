@@ -1131,7 +1131,8 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
         Subgroup.comap_map_eq_self_of_injective S.subtype_injective U'
       have hU : Ch03.IsHallSubgroup ((S14.kappa S ∪ OddOrder.BG.Ch3.S10.sigma S)ᶜ)
           ((U'.map S.subtype).subgroupOf S) := by rw [hUeq]; exact hU'
-      refine Or.inr ⟨S, Mstar, K, Kstar, K ⊔ Kstar, hS, hMstarMem, ?_, rfl, hcyc, ?_, ?_, ?_, ?_, ?_⟩
+      refine Or.inr ⟨S, Mstar, K, Kstar, K ⊔ Kstar, hS, hMstarMem, ?_, rfl, hcyc, ?_, ?_, ?_, ?_,
+          ?_⟩
       · -- `S ≠ Mstar`: else `S` would be conjugate to itself `= Mstar`, against `¬conj S Mstar`.
         rintro rfl
         exact hSnconjMstar (S14.IsConjugateSubgroup.refl S)

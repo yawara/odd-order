@@ -686,7 +686,8 @@ theorem Hypothesis.W1_eq_Msigma_T_inf_centralizer_W2 [Finite G]
   have hW1MsigmaT : hyp.W1 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T :=
     OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
       (OddOrder.BG.Ch3.S10.Msigma_isHall hG hyp.T_maximal) hW1T hW1piT
-  have hSupset : hyp.W1 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set G) :=
+  have hSupset : hyp.W1 ≤ OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (hyp.W2 : Set
+      G) :=
     le_inf hW1MsigmaT (by
       intro x hx
       rw [Subgroup.mem_centralizer_iff]
@@ -870,7 +871,8 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         rwa [hyp.Q_inf_V_eq_bot, Subgroup.mem_bot] at hxQV
       · have hsup : (hyp.Q.subgroupOf (derivedInG hyp.T)) ⊔
             (hyp.V.subgroupOf (derivedInG hyp.T)) = ⊤ := by
-          rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.T_deriv_eq_QV.symm, Subgroup.subgroupOf_self]
+          rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.T_deriv_eq_QV.symm,
+              Subgroup.subgroupOf_self]
         have hmul := Subgroup.normal_mul (hyp.Q.subgroupOf (derivedInG hyp.T))
           (hyp.V.subgroupOf (derivedInG hyp.T))
         rw [hsup, Subgroup.coe_top] at hmul

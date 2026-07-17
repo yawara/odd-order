@@ -371,7 +371,8 @@ theorem hcuZetaPair_summandComplement_subset_ker [Finite G] {M : Subgroup G}
   -- vanishing.
   have hAle : ((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data)
       ≤ hInHu data := caseA_realizedComplement_subgroupOf_le_hInHu chief W
-  have hbridge : (((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+  have hbridge : (((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub
+      data)).subgroupOf
         (hInHu data ⊔ cuInHu caseA)
       = ((((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data)).subgroupOf
           (hInHu data)).map
@@ -1090,7 +1091,8 @@ theorem hcConjDescend_maps_Hpart [Finite G] {M : Subgroup G}
     (hz : z ∈ caseA.Hpart i) :
     hcConjDescend chief g z ∈ caseA.Hpart i := by
   -- decompose `g = h·u` with `h ∈ hInHu`, `u ∈ uInHu`
-  have hgtop : g ∈ hInHu data ⊔ uInHu data := by rw [hInHu_sup_uInHu_eq_top]; exact Subgroup.mem_top g
+  have hgtop : g ∈ hInHu data ⊔ uInHu data := by
+    rw [hInHu_sup_uInHu_eq_top]; exact Subgroup.mem_top g
   rw [← SetLike.mem_coe, Subgroup.normal_mul] at hgtop
   obtain ⟨h, hh, u, hu, rfl⟩ := hgtop
   -- `A_{h·u} = A_h ∘ A_u`, and `A_h = id` (`h ∈ hInHu ⊆ HC`)
@@ -1251,7 +1253,8 @@ theorem oXtheta_count [Finite G] {M : Subgroup G}
   have key : T.card
       = chars.u * (T.image fun χ => ClassFunction.induce _ χ.toClassFunction).card := by
     rw [Finset.card_eq_sum_card_fiberwise
-        (fun χ hχ => Finset.mem_image_of_mem (fun χ => ClassFunction.induce _ χ.toClassFunction) hχ),
+        (fun χ hχ => Finset.mem_image_of_mem (fun χ => ClassFunction.induce _ χ.toClassFunction)
+            hχ),
       Finset.sum_congr rfl hfib, Finset.sum_const, smul_eq_mul, mul_comm]
   -- `|T| = |RegF| = (p-1)^q`
   have hTeq : T.card = (chief.p - 1) ^ data.q := by
@@ -1360,7 +1363,8 @@ theorem caseB_oXtheta_count [Finite G] {M : Subgroup G}
   have key : T.card
       = chars.u * (T.image fun χ => ClassFunction.induce _ χ.toClassFunction).card := by
     rw [Finset.card_eq_sum_card_fiberwise
-        (fun χ hχ => Finset.mem_image_of_mem (fun χ => ClassFunction.induce _ χ.toClassFunction) hχ),
+        (fun χ hχ => Finset.mem_image_of_mem (fun χ => ClassFunction.induce _ χ.toClassFunction)
+            hχ),
       Finset.sum_congr rfl hfib, Finset.sum_const, smul_eq_mul, mul_comm]
   have hTeq : T.card = chief.p ^ data.q - 1 := by
     rw [hTdef, Finset.card_image_of_injective _ (hcPsi_injective chief), hNF]

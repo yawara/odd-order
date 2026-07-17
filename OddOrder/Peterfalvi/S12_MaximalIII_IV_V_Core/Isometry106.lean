@@ -75,7 +75,8 @@ n·ζ` is a virtual character of `M` (`muGrid_isIrreducible`, `ζ` irreducible) 
 (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`).  Together with `ζ^{τ₁}, μ_k^{τ₁} ∈ ℤ[Irr G]` this
 makes the inner products of the `a = 0` argument integers. -/
 theorem Hypothesis.muGridAlpha_tau_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2}
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin
+        hyp.w2}
     (hj0 : j ≠ 0) {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
     (hζirr : IsIrreducibleCharacter ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
     (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
@@ -83,8 +84,10 @@ theorem Hypothesis.muGridAlpha_tau_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinim
     (hδj : hyp.muColumnSign hG hodd j = δ) :
     hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ∈ ZIrr G := by
   haveI := hyp.finiteG
-  have hαZ : (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ∈ ZIrr ↥M := by
-    refine Submodule.sub_mem _ (Submodule.sub_mem _ (hyp.muGrid_isIrreducible hG hodd i j).mem_ZIrr ?_) ?_
+  have hαZ : (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ∈ ZIrr ↥M :=
+      by
+    refine Submodule.sub_mem _ (Submodule.sub_mem _ (hyp.muGrid_isIrreducible hG hodd i j).mem_ZIrr
+        ?_) ?_
     · rw [Int.cast_smul_eq_zsmul]
       exact zsmul_mem (hyp.muGrid_isIrreducible hG hodd i 0).mem_ZIrr δ
     · rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hζirr.mem_ZIrr n
@@ -250,7 +253,8 @@ theorem Hypothesis.muGridAlpha_tau_X_inner [Finite G] {M : Subgroup G}
     hdζ h0ζ hδpm
   have hzz := hyp.zeta_tau1_inner_self hG hodd coh hζS hζirr
   have ha0' : ClassFunction.inner (coh.tau1 ζ)
-      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)) = -(n : ℂ) := by
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)) = -(n :
+          ℂ) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, ha0, star_neg, star_natCast]
   constructor
   · simp only [ClassFunction.inner_add_left, ClassFunction.inner_smul_left, ha0, hzz, mul_one]
