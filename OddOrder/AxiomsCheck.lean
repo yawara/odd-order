@@ -158,6 +158,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7049,6 +7050,19 @@ of the conjugates of `Q`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.simple_normal_oddIndex_Q_core
+
+/-! **Peterfalvi Part II, Ch. I section 3, Lemma 1 (PSL(2,q) target)**:
+the standard projective-line action supplies the power-of-two degree, PSL simplicity,
+and hence the exact residual and conjugate-join conclusions. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.psl2_degree_twoPower
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.psl2_target_simple
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_and_residual_of_psl2_target
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
