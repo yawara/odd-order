@@ -356,6 +356,109 @@ lemma card_G_eq :
     exact index_stabilizer_of_transitive G hyp.basept
   rw [← h1, hidx, hyp.card_Omega, hyp.card_H_eq]
 
+/-! ## The conjugate hypothesis (swapping `basept` and `t • basept`)
+
+The book's "similarly" steps (e.g. Prop 6(a), p. 102: `C_{Q^t}(X)` is
+transitive on `Ω_X - {H^t}`) transfer statements about `Ω - {basept}` to
+`Ω - {t • basept}`.  Formally this is conjugation of the whole hypothesis
+by `t`: the same group and involution, with point stabilizer `H^t`,
+regular normal complement `Q^t` and the same two-point stabilizer `D`. -/
+
+/-- `t` normalizes `D`: `D^t = D`. -/
+lemma D_map_conj_t_eq :
+    hyp.D.map (MulAut.conj hyp.t).toMonoidHom = hyp.D := by
+  ext x
+  rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
+  constructor
+  · intro h
+    have h2 := hyp.t_conj_mem_D h
+    have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+    have h3 : hyp.t⁻¹ * (hyp.t⁻¹ * x * hyp.t) * hyp.t = x := by
+      rw [hyp.t_inv_eq]
+      calc hyp.t * (hyp.t * x * hyp.t) * hyp.t
+          = (hyp.t * hyp.t) * x * (hyp.t * hyp.t) := by group
+        _ = x := by rw [htt, one_mul, mul_one]
+    rwa [h3] at h2
+  · exact hyp.t_conj_mem_D
+
+/-- The **conjugate hypothesis**: swap the roles of `basept` and
+`t • basept`.  Same group, same involution `t`; the point stabilizer
+becomes `H^t`, the regular normal complement `Q^t`, and `D` is unchanged. -/
+def symm : Hypothesis G Ω where
+  basept := hyp.t • hyp.basept
+  doubly_transitive := hyp.doubly_transitive
+  faithful := hyp.faithful
+  H := hyp.H.map (MulAut.conj hyp.t).toMonoidHom
+  Q := hyp.Q.map (MulAut.conj hyp.t).toMonoidHom
+  D := hyp.D
+  H_def := hyp.stabilizer_t_basept.symm
+  t := hyp.t
+  t_sq := hyp.t_sq
+  t_ne_one := hyp.t_ne_one
+  t_not_mem_H := by
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply, inv_mul_cancel, one_mul]
+    exact hyp.t_not_mem_H
+  D_def := by
+    rw [map_conj_map_conj, show hyp.t * hyp.t = 1 by rw [← sq]; exact hyp.t_sq,
+      map_conj_one, inf_comm, ← hyp.D_def]
+  Q_le_H := Subgroup.map_mono hyp.Q_le_H
+  Q_normal_in_H := by
+    intro h hh x hx
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply] at hh hx ⊢
+    have h2 := hyp.Q_normal_in_H _ hh _ hx
+    have h3 : (hyp.t⁻¹ * h * hyp.t) * (hyp.t⁻¹ * x * hyp.t) *
+        (hyp.t⁻¹ * h * hyp.t)⁻¹ = hyp.t⁻¹ * (h * x * h⁻¹) * hyp.t := by
+      group
+    rwa [h3] at h2
+  Q_inf_D_eq_bot := by
+    rw [eq_bot_iff]
+    intro x hx
+    obtain ⟨hxQ, hxD⟩ := Subgroup.mem_inf.mp hx
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply] at hxQ
+    have h2 : hyp.t⁻¹ * x * hyp.t ∈ hyp.Q ⊓ hyp.D :=
+      ⟨hxQ, hyp.t_conj_mem_D hxD⟩
+    rw [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot] at h2
+    rw [Subgroup.mem_bot]
+    calc x = hyp.t * (hyp.t⁻¹ * x * hyp.t) * hyp.t⁻¹ := by group
+      _ = 1 := by rw [h2]; group
+  Q_mul_D_eq_H := by
+    have himg : ∀ K : Subgroup G,
+        ((K.map (MulAut.conj hyp.t).toMonoidHom : Subgroup G) : Set G) =
+          (MulAut.conj hyp.t).toMonoidHom '' (K : Set G) := fun K =>
+      Subgroup.coe_map _ _
+    rw [himg, show (hyp.D : Set G) =
+        ((hyp.D.map (MulAut.conj hyp.t).toMonoidHom : Subgroup G) : Set G) by
+        rw [hyp.D_map_conj_t_eq],
+      himg, himg, ← Set.image_mul, hyp.Q_mul_D_eq_H]
+  Q_even := by
+    have hcard : Nat.card ↥(hyp.Q.map (MulAut.conj hyp.t).toMonoidHom) =
+        Nat.card ↥hyp.Q :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        (MulEquiv.injective (MulAut.conj hyp.t))).toEquiv.symm
+    rw [hcard]
+    exact hyp.Q_even
+  D_odd := hyp.D_odd
+  two_rank_ge_two := hyp.two_rank_ge_two
+
+@[simp] lemma symm_basept : hyp.symm.basept = hyp.t • hyp.basept := rfl
+
+@[simp] lemma symm_t : hyp.symm.t = hyp.t := rfl
+
+@[simp] lemma symm_D : hyp.symm.D = hyp.D := rfl
+
+@[simp] lemma symm_Q :
+    hyp.symm.Q = hyp.Q.map (MulAut.conj hyp.t).toMonoidHom := rfl
+
+@[simp] lemma symm_H :
+    hyp.symm.H = hyp.H.map (MulAut.conj hyp.t).toMonoidHom := rfl
+
+/-- Under the conjugate hypothesis, the "other" point `t' • basept'` is the
+original base point. -/
+@[simp] lemma symm_t_smul_basept :
+    hyp.symm.t • hyp.symm.basept = hyp.basept := by
+  rw [symm_t, symm_basept, smul_smul,
+    show hyp.t * hyp.t = 1 by rw [← sq]; exact hyp.t_sq, one_smul]
+
 /-! ## Chapter I §1, Proposition 1 (p. 100) -/
 
 omit [Finite G] in

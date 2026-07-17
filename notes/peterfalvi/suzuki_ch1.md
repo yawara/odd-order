@@ -25,23 +25,33 @@
 
 ## 次の frontier (文書順)
 
-1. **Lemma (p.101)** — 一般群補題: `M` 有限群、`t` 位数2、`X≤M` 奇数位数で `t` 正規化、
-   `Y=C_X(t)`、`Z={x∈X | x^t=x⁻¹}`。(a) `(y,z)↦yz`, `(y,z)↦zy` は `Y×Z→X` 全単射
-   (∴ `|X|=|Y||Z|`); (b) `⟨Z⟩ ⊴ X`。
-   - **証明戦略 (explicit-inverse 版; book の counting より Lean 向き)**: `x∈X` に対し
-     `w:=(x^t)⁻¹x = t x⁻¹ t x ∈ X` は `twt=w⁻¹` を満たす (∈Z 型)。奇数位数ゆえ一意平方根
-     `z:=w^{(|X|+1)/2}` (`z²=w`, `z∈Z`)、`y:=xz⁻¹∈Y` (`tyt=y` を `txt=xw⁻¹` から検算)。
-     これが `Y×Z≃X` の逆写像 → 直接全単射。一意性は `z²=(x^t)⁻¹x` (x=yz なら) + 奇数位数
-     squaring 単射。奇数位数 squaring の素材は既に `DistinguishedInvolution.lean` に汎用で
-     ある: `sq_pow_half_orderOf` (存在), `eq_of_sq_eq_of_odd_orderOf` (一意) — import 再利用可
-     (現在 `Hypothesis` namespace 内だが hyp 非依存の汎用 lemma)。
-   - 配置: 一般群補題ゆえ `Suzuki/` 内の新 leaf (例 `InvertedProduct.lean`) に M,t,X 抽象で。
-     mixed-type (Y=subgroup, Z=set) の bijection に注意。
-2. **Prop 5 (p.101)** — `V=C_D(s)` かつ `W=C_D(H∩I)`。V⊆C_D(s) は Prop 4(b) 一意性から
-   (`ts^v t=(r⁻¹)^v t r^v` ⇒ `s^v=s`)。等号は Lemma(a) `|D|=|V||K|` + Prop 3
-   `|K|=|s^D|=|D:C_D(s)|` で index 一致。
-3. **Prop 6 (p.101–102)** — `X⊆D` で `|Ω_X|≥3` の下での構造 (Prop 1(a) 型二重推移)。
-4. 以降 Ch.I §2 (`Cor`: S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
+0. ✅ **Lemma (a) 完了** — `InvertedProduct.lean` (一般群補題、M,t,X 抽象、hyp 非依存)。
+   `invertedProdEquiv : Y × Z ≃ X` (explicit-inverse: `x↦(xz⁻¹,z)`, `z=w^{(|X|+1)/2}`,
+   `w=(t x⁻¹ t)x`) + `card_eq_card_centralizer_mul_ncard_invertedBy : |X|=|Y||Z|`。
+   奇数位数 squaring 素材 (`sq_pow_half`/`pow_half_sq`/`pow_card_eq_one_of_mem`) も汎用で内包。
+   - **⚠ Lemma (b) `⟨Z⟩ ⊴ X` は未** (Prop 5 に不要ゆえ後回し)。証明: `Y` は `Z` を正規化
+     (`y∈Y,z∈Z ⇒ yzy⁻¹∈Z`: `t(yzy⁻¹)t=(tyt)(tzt)(ty⁻¹t)=y z⁻¹ y⁻¹=(yzy⁻¹)⁻¹`)、
+     `Z⊆⟨Z⟩`、`X=YZ` (Lemma a) より `X` が `⟨Z⟩=closure(invertedBy X t)` を正規化。
+1. ✅ **Prop 5 (p.101) 完了** — `V=C_D(s)` + `W=C_D(H∩I)`。
+   - `DistinguishedInvolution.lean`: `distinguishedInvolution`, `structureConjugator`,
+     `structure_equation`, `eq_distinguishedPair_of_structure` (一意性)。
+   - `CentralizerStructure.lean`: `V_eq_centralizer_distinguishedInvolution` (counting は
+     `orbit_distinguishedInvolution_eq` + Lemma(a) `|D|=|V||K|` + Prop 3 + orbit-stab) /
+     `W_eq_centralizer_involutions_H` (`W = D ⊓ centralizer (H∩I involutions set)`;
+     ⊇ は `conj_mem_KSet_of_mem_V` (V normalizes K) + `injOn_conj_KSet` で `wkw⁻¹=k`)。
+   - `InvolutionClass.lean`: Prop 3 injectivity を `injOn_conj_KSet` として公開 lemma 化。
+2. **Prop 6 (p.101–102) 未 (次)** — `X⊆D`, `|Ω_X|≥3`:
+   (a) `C_G(X)` は `Ω_X` 上二重可移 + `C_H(X)=C_Q(X)⋊C_D(X)`。証明: Q regular on Ω−{H},
+       `H₁∈Ω_X−{H}` に `y∈Q, H^{ty}=H₁` → `x∈X` で `H^{ty}=H₁ˣ=H^{tyx}=H^{tx⁻¹yx}`
+       (x∈D⊆H^t で `H^{tx⁻¹}=H^t`) → regularity で `y=x⁻¹yx` → `C_Q(X)` regular on
+       `Ω_X−{H}`。対称に `C_{Q^t}(X)` transitive on `Ω_X−{H^t}` → 2-transitive。
+   (b) `|C_Q(X)|` 偶数。証明: (a)→`|C_G(X)|` 偶 (2-trans, |Ω_X|(|Ω_X|−1) | order) →
+       involution `u∈C_G(X)` → `u∈H'`, Prop 1(b) `X⊆C_G(u)⊆H'` → `H'∈Ω_X` →
+       transitivity で `|C_H(X)|=|C_{H'}(X)|` 偶 → `C_D(X)` 奇 (D 奇) → `C_Q(X)` 偶。
+   (c) `X` は D-conjugate to subgroup of `V`。証明: (b)+Prop 3 → `s^k∈C_Q(X)` →
+       `X⊆C_D(s^k)=Vᵏ` (Prop 5)。
+3. 以降 Ch.I §2 (`Cor`: S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
+4. **Lemma (b) `⟨Z⟩◁X` 未** (InvertedProduct.lean, Prop 5 に不要で後回し; §0 参照)。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
