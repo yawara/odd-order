@@ -32,21 +32,27 @@
    - **⚠ Lemma (b) `⟨Z⟩ ⊴ X` は未** (Prop 5 に不要ゆえ後回し)。証明: `Y` は `Z` を正規化
      (`y∈Y,z∈Z ⇒ yzy⁻¹∈Z`: `t(yzy⁻¹)t=(tyt)(tzt)(ty⁻¹t)=y z⁻¹ y⁻¹=(yzy⁻¹)⁻¹`)、
      `Z⊆⟨Z⟩`、`X=YZ` (Lemma a) より `X` が `⟨Z⟩=closure(invertedBy X t)` を正規化。
-1. **Prop 5 (p.101)** — `V=C_D(s)` かつ `W=C_D(H∩I)`。
-   - **specialization identity (重要)**: `hyp.KSet = invertedBy hyp.D hyp.t` は**定義的に一致**
-     (両者 `{x | x∈D ∧ t*x*t=x⁻¹}`)、`hyp.V = hyp.D ⊓ centralizer {t}` も一致。ゆえに Lemma(a) を
-     `X:=hyp.D, t:=hyp.t` で適用 → `Nat.card D = Nat.card V * KSet.ncard` (= `|D|=|V||K|`)。
-     hyp 引数: `ht=t_sq(→t*t=1)`, `hodd=D_odd`, `hnorm` = `t_conj_mem_D`+`t_inv_eq` (`t*x*t∈D`)。
-   - **distinguished involution `s` の naming が必要**: Prop 4(b) は `existsUnique_...` で提供。
-     Prop 5 では `s` を `Classical.choose` 等で固定 (or `s`,`r` を `Hypothesis` の派生 def として
-     用意) → `V⊆C_D(s)`: `v∈V` に structure eq `tst=r⁻¹tr` を conjugate し 4(b) 一意性で `s^v=s`。
-   - 等号: `|K|=|s^D|` (Prop 3 `image_conj_KSet_eq_involutions_H` の `s^K=H∩I` + `|K|=|H∩I|`)
-     と `|s^D|=|D:C_D(s)|` (orbit-stabilizer, mathlib `MulAction`/`Subgroup.card_eq_card_quotient…`)
-     から `|D:V|=|K|=|D:C_D(s)|` → `V=C_D(s)` (V⊆C_D(s) と index 一致)。
-   - `W=C_D(H∩I)`: `W=C_V(K)` (定義) = `C_D(s)∩C_D(K)` = `H∩I` を中心化する `D` の元
-     (Prop 3 `k↦s^k` が `K→H∩I` 全単射、`V` normalizes `K`)。
+1. **Prop 5 (p.101)** — `V=C_D(s)` ✅ / `W=C_D(H∩I)` 未。
+   - ✅ **`s`/`r` naming 完了** (`DistinguishedInvolution.lean`): `distinguishedInvolution`,
+     `structureConjugator` (`existsUnique_...`.exists.choose)、`structure_equation`、
+     `eq_distinguishedPair_of_structure` (一意性)。
+   - ✅ **`V=C_D(s)` 完了** (`CentralizerStructure.lean`): `V_le_centralizer_distinguishedInvolution`
+     (⊆) + `V_eq_centralizer_distinguishedInvolution` (=)。counting は `orbit_distinguishedInvolution_eq`
+     (`sᴰ=H∩I`) + Lemma(a) `|D|=|V||K|` + Prop 3 `|K|=|H∩I|` + orbit-stab (ConjAct, stabilizer=C_D(s))。
+     specialization identity `hyp.KSet = invertedBy hyp.D hyp.t` は定義的一致で Lemma(a) 直接適用。
+   - **⚠ `W=C_D(H∩I)` 未 (次)**: `W:=V⊓centralizer KSet = C_V(K)` (定義)。`V=C_D(s)` より
+     `W = D ⊓ centralizer {s} ⊓ centralizer KSet`。目標 `W = D ⊓ centralizer (H∩I set)`。
+     - ⊆: s,K を中心化 ⇒ 各 `s^k=k⁻¹sk` を中心化 (積)。容易。
+     - ⊇ (要点): `d∈D` が `H∩I` を中心化 ⇒ `d` は `s∈H∩I` を中心化 ⇒ `d∈C_D(s)=V` (V=C_D(s) 使用)
+       ⇒ `V` は `K` を正規化 (`v∈V,k∈K ⇒ vkv⁻¹∈K`: `t(vkv⁻¹)t=(tvt)(tkt)(tv⁻¹t)=v k⁻¹ v⁻¹`,
+       v は t と可換 tvt=v) ⇒ `dkd⁻¹∈K` かつ `s^{dkd⁻¹}=s^k` (d が s^k と s を中心化) ⇒
+       **Prop 3 の `k↦s^k` 単射性**で `dkd⁻¹=k` ⇒ `d∈C_D(K)`。
+     - **要 exposure**: Prop 3 injectivity は `image_conj_KSet_eq_involutions_H` 内部の `hinjK`
+       (未公開)。`InvolutionClass.lean` に `injOn_conj_KSet` 等で公開 lemma 化 or 再導出が必要。
+       V normalizes K も新 lemma (`vkv⁻¹∈K`) で用意。
 2. **Prop 6 (p.101–102)** — `X⊆D` で `|Ω_X|≥3` の下での構造 (Prop 1(a) 型二重推移)。
 3. 以降 Ch.I §2 (`Cor`: S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
+4. **Lemma (b) `⟨Z⟩◁X` 未** (InvertedProduct.lean, Prop 5 に不要で後回し; §0 参照)。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
