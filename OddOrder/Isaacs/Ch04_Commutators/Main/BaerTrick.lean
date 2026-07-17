@@ -322,7 +322,7 @@ noncomputable instance BaerMul.instCommGroup {G : Type*} [Group G]
     [hOdd : Fact (Odd (Nat.card G))]
     [hC : Fact (_root_.commutator G ≤ Subgroup.center G)] : CommGroup (BaerMul G) where
   mul_assoc x y z := by
-    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))
+    change BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))
         (BaerMul.toG z)) =
       BaerMul.ofG (baerAdd (BaerMul.toG x)
         (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG z)))))
@@ -330,19 +330,19 @@ noncomputable instance BaerMul.instCommGroup {G : Type*} [Group G]
     exact congr_arg BaerMul.ofG
       (baerAdd_assoc hC.out (BaerMul.toG x) (BaerMul.toG y) (BaerMul.toG z)).symm
   one_mul x := by
-    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG 1)) (BaerMul.toG x)) = x
+    change BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG 1)) (BaerMul.toG x)) = x
     simp only [BaerMul.toG_ofG, baerAdd_one_left]
     rfl
   mul_one x := by
-    show BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG (BaerMul.ofG 1))) = x
+    change BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG (BaerMul.ofG 1))) = x
     simp only [BaerMul.toG_ofG, baerAdd_one_right]
     rfl
   mul_comm x y := by
-    show BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y)) =
+    change BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y)) =
       BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG x))
     exact congr_arg BaerMul.ofG (baerAdd_comm hC.out hOdd.out _ _)
   inv_mul_cancel x := by
-    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (BaerMul.toG x)⁻¹)) (BaerMul.toG x)) =
+    change BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (BaerMul.toG x)⁻¹)) (BaerMul.toG x)) =
       BaerMul.ofG 1
     simp only [BaerMul.toG_ofG]
     rw [baerAdd_inv_left]
@@ -359,15 +359,15 @@ noncomputable def MulAut.toBaerMul {G : Type*} [Group G] (f : G ≃* G) :
   toFun x := BaerMul.ofG (f (BaerMul.toG x))
   invFun x := BaerMul.ofG (f.symm (BaerMul.toG x))
   left_inv x := by
-    show BaerMul.ofG (f.symm (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG x))))) = x
+    change BaerMul.ofG (f.symm (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG x))))) = x
     simp only [BaerMul.toG_ofG, f.symm_apply_apply]
     rfl
   right_inv x := by
-    show BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (f.symm (BaerMul.toG x))))) = x
+    change BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (f.symm (BaerMul.toG x))))) = x
     simp only [BaerMul.toG_ofG, f.apply_symm_apply]
     rfl
   map_mul' x y := by
-    show BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))) =
+    change BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))) =
         BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG x))))
           (BaerMul.toG (BaerMul.ofG (f (BaerMul.toG y)))))
     simp only [BaerMul.toG_ofG]
@@ -380,12 +380,12 @@ noncomputable def MulAut.toBaerMulHom {G : Type*} [Group G] :
   toFun f := MulAut.toBaerMul f
   map_one' := by
     ext x
-    show BaerMul.ofG ((1 : MulAut G) (BaerMul.toG x)) = x
-    show BaerMul.ofG (BaerMul.toG x) = x
+    change BaerMul.ofG ((1 : MulAut G) (BaerMul.toG x)) = x
+    change BaerMul.ofG (BaerMul.toG x) = x
     exact BaerMul.ofG_toG x
   map_mul' f g := by
     ext x
-    show BaerMul.ofG ((f * g) (BaerMul.toG x)) =
+    change BaerMul.ofG ((f * g) (BaerMul.toG x)) =
         BaerMul.ofG (f (BaerMul.toG (BaerMul.ofG (g (BaerMul.toG x)))))
     simp only [BaerMul.toG_ofG]
     rfl
@@ -412,7 +412,7 @@ lemma BaerMul.npow_eq_pow {G : Type*} [Group G]
     rfl
   | succ k ih =>
     rw [pow_succ, ih]
-    show BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG ((BaerMul.toG x) ^ k))) (BaerMul.toG x)) =
+    change BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG ((BaerMul.toG x) ^ k))) (BaerMul.toG x)) =
         BaerMul.ofG ((BaerMul.toG x) ^ (k + 1))
     simp only [BaerMul.toG_ofG]
     rw [baerAdd_pow_self_eq_pow_succ]
@@ -423,7 +423,7 @@ lemma BaerMul.pow_eq_one_iff {G : Type*} [Group G]
     (x : BaerMul G) (n : ℕ) :
     @HPow.hPow (BaerMul G) ℕ _ _ x n = 1 ↔ (BaerMul.toG x) ^ n = 1 := by
   rw [BaerMul.npow_eq_pow]
-  show BaerMul.ofG ((BaerMul.toG x) ^ n) = BaerMul.ofG 1 ↔ (BaerMul.toG x) ^ n = 1
+  change BaerMul.ofG ((BaerMul.toG x) ^ n) = BaerMul.ofG 1 ↔ (BaerMul.toG x) ^ n = 1
   exact BaerMul.ofG.apply_eq_iff_eq
 
 /-- `IsPGroup p (BaerMul G) ↔ IsPGroup p G`. BaerMul の構造を経由しても p-群性は不変. -/
@@ -493,7 +493,7 @@ theorem actionCommutator_eq_bot_of_pgroup_class_le_two_fixes_order_p
     intro g hg a
     have hg_G : (BaerMul.toG g) ^ p = 1 := (BaerMul.pow_eq_one_iff g p).mp hg
     have h_fixed : (φ a) (BaerMul.toG g) = BaerMul.toG g := h_fix _ hg_G a
-    show BaerMul.ofG ((φ a) (BaerMul.toG g)) = g
+    change BaerMul.ofG ((φ a) (BaerMul.toG g)) = g
     rw [h_fixed]
     exact BaerMul.ofG_toG g
   -- Apply Cor 4.35 to BaerMul G
@@ -509,7 +509,7 @@ theorem actionCommutator_eq_bot_of_pgroup_class_le_two_fixes_order_p
   -- So: ofG ((φ a) g) = ofG g, hence (φ a) g = g by injectivity
   have h_eq : BaerMul.ofG ((φ a) g) = BaerMul.ofG g := by
     have hkey : (φ' a) (BaerMul.ofG g) = BaerMul.ofG ((φ a) g) := by
-      show BaerMul.ofG ((φ a) (BaerMul.toG (BaerMul.ofG g))) = BaerMul.ofG ((φ a) g)
+      change BaerMul.ofG ((φ a) (BaerMul.toG (BaerMul.ofG g))) = BaerMul.ofG ((φ a) g)
       rw [BaerMul.toG_ofG]
     rw [← hkey]
     exact h_act
@@ -574,7 +574,7 @@ private theorem isaacs_thm_4_36_aux {A : Type*} [Group A] [Finite A]
       have h_fix_H : ∀ h : ↥H, h ^ p = 1 → ∀ a : A, (φ_H a) h = h := by
         intro h hh_pow a
         apply Subtype.ext
-        show (φ a) h.val = h.val
+        change (φ a) h.val = h.val
         apply h_fix
         have := congr_arg (Subtype.val : ↥H → G) hh_pow
         simpa using this
@@ -599,7 +599,7 @@ private theorem isaacs_thm_4_36_aux {A : Type*} [Group A] [Finite A]
     have h_fix_G' : ∀ g' : ↥G', g' ^ p = 1 → ∀ a : A, (φ_G' a) g' = g' := by
       intro g' hg'_pow a
       apply Subtype.ext
-      show (φ a) g'.val = g'.val
+      change (φ a) g'.val = g'.val
       apply h_fix
       have := congr_arg (Subtype.val : ↥G' → G) hg'_pow
       simpa using this
@@ -710,7 +710,7 @@ theorem fixedPoints_ne_bot_of_pgroup_action_pgroup
   letI : MulAction P G := MulAction.compHom G φ
   -- 1 ∈ fixedPoints (φ p is a group hom, so (φ p) 1 = 1)
   have h1_fix : (1 : G) ∈ MulAction.fixedPoints P G := fun p => by
-    show (φ p) 1 = 1
+    change (φ p) 1 = 1
     exact map_one (φ p)
   -- p ∣ |G| since G is a nontrivial p-group
   obtain ⟨n, hn_pos, hn_card⟩ := hG.nontrivial_iff_card.mp inferInstance

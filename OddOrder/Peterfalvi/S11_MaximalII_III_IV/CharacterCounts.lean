@@ -116,7 +116,7 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [huSub, Subgroup.mem_subgroupOf]
       exact Subgroup.mem_sup_left hwH
     refine ⟨⟨w, hwHU⟩, ?_, ?_⟩
-    · show (⟨w, hwHU⟩ : ↥(huSub data)) ∈ (data.H.subgroupOf M).subgroupOf (huSub data)
+    · change (⟨w, hwHU⟩ : ↥(huSub data)) ∈ (data.H.subgroupOf M).subgroupOf (huSub data)
       rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
       exact hwH
     · apply Subtype.ext
@@ -152,7 +152,7 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           IsIrreducibleCharacter.compHom_of_surjective hg_surj χbar.isIrreducible⟩, ?_, rfl⟩
         rw [mem_xiOf]
         refine ⟨?_, ?_⟩
-        · show ¬ ((hInHu data : Set ↥(huSub data)) ⊆ _)
+        · change ¬ ((hInHu data : Set ↥(huSub data)) ⊆ _)
           rw [subset_characterKernel_compHom_iff g (χbar : ClassFunction ↥h.K ℂ) (hInHu data)]
           exact hker
         · rw [← hg_ker]
@@ -860,7 +860,7 @@ theorem caseB_exists_chiefFactorConstituent [Finite G]
   haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
     ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   refine ⟨θ, hθlo, ?_, ?_⟩
-  · show ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+  · change ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
       (θ : ClassFunction ↥(hInHu data) ℂ) = hInHu data ⊔ cInHu data chief
     rw [hθeq]
     exact inertia_eq_hcInHu data chief caseB.actsIrreducibly hθbarnt

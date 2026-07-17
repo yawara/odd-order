@@ -829,7 +829,7 @@ theorem isMulCommutative_typePData_U_of_V [Finite G]
       have htower : hyp.base.Q.relIndex (derivedInG hyp.base.T) *
           (derivedInG hyp.base.T).relIndex hyp.base.T = hyp.base.Q.relIndex hyp.base.T :=
         Subgroup.relIndex_mul_relIndex hyp.base.Q (derivedInG hyp.base.T) hyp.base.T hQ_le hM'_le_T
-      show hyp.base.Q.relIndex (derivedInG hyp.base.T) ∣ hyp.base.Q.relIndex hyp.base.T
+      change hyp.base.Q.relIndex (derivedInG hyp.base.T) ∣ hyp.base.Q.relIndex hyp.base.T
       exact ⟨(derivedInG hyp.base.T).relIndex hyp.base.T, htower.symm⟩
     rw [hcard]
     exact Nat.Coprime.coprime_dvd_right hdvd h0

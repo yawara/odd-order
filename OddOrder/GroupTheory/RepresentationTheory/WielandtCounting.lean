@@ -151,7 +151,7 @@ theorem ρ_comp_averageMap_comm (ρ : Representation k G V) (U : Subgroup G) [U.
   congr 1
   rw [map_sum]
   refine Fintype.sum_equiv (MulAut.conjNormal g : MulAut U).toEquiv _ _ (fun u => ?_)
-  show ρ g (ρ (u : G) v) = ρ (↑(MulAut.conjNormal g u) : G) (ρ g v)
+  change ρ g (ρ (u : G) v) = ρ (↑(MulAut.conjNormal g u) : G) (ρ g v)
   rw [MulAut.conjNormal_apply]
   simp only [← Module.End.mul_apply, ← map_mul]
   congr 2
@@ -239,11 +239,11 @@ theorem finrank_A1_le_finrank_invariants (ρ : Representation k G V)
       e.symm (averageMap ρ (w : V)) 1 = ⅟(Fintype.card G : k) • w := by
     intro w
     simp only [averageMap_apply, map_smul, map_sum]
-    show ⅟(Fintype.card G : k) • ((∑ x : G, e.symm (ρ x (w : V))) 1) = ⅟(Fintype.card G : k) • w
+    change ⅟(Fintype.card G : k) • ((∑ x : G, e.symm (ρ x (w : V))) 1) = ⅟(Fintype.card G : k) • w
     rw [DirectSum.sum_apply]
     congr 1
     rw [Finset.sum_eq_single (1 : G)]
-    · show e.symm (ρ (1 : G) (w : V)) 1 = w
+    · change e.symm (ρ (1 : G) (w : V)) 1 = w
       have h1 : ρ (1 : G) (w : V) ∈ A 1 := by simp
       rw [hcs1 _ h1]; ext; simp
     · intro g _ hg1

@@ -195,7 +195,7 @@ theorem derivedSeries_subtype_commutator_eq_bot_of_iter_eq_bot
         exact commutator_le_iff_le_normalizer.mpr h_norm
       -- iter E' X k = iter E X (k+1) = ⊥
       have h_iter_E' : iterCommutator E' X k = ⊥ := by
-        show iterCommutator (iterCommutator E X 1) X k = ⊥
+        change iterCommutator (iterCommutator E X 1) X k = ⊥
         rw [iterCommutator_add]
         convert h_iter using 2
         omega
@@ -231,7 +231,7 @@ theorem derivedSeries_subtype_commutator_eq_bot_of_iter_eq_bot
         rw [show k = (k - 1) + 1 from (Nat.sub_add_cancel hk_le).symm,
             derivedSeries_succ]
         congr 2
-      show ⁅(derivedSeries ↥X (k + 1 - 1)).map X.subtype, E⁆ = ⊥
+      change ⁅(derivedSeries ↥X (k + 1 - 1)).map X.subtype, E⁆ = ⊥
       rw [show k + 1 - 1 = k from by omega]
       rw [← h_DD]
       exact h_DDE
@@ -413,12 +413,12 @@ theorem iterCommutator_inl_inr_two_eq_one
   refine le_antisymm ?_ ?_
   · -- I2 ≤ I1 (trivial: I1 normal in Γ, so ⁅I1, F⁆ ≤ I1)
     show iterCommutator XG YA 2 ≤ iterCommutator XG YA 1
-    show ⁅iterCommutator XG YA 1, YA⁆ ≤ iterCommutator XG YA 1
+    change ⁅iterCommutator XG YA 1, YA⁆ ≤ iterCommutator XG YA 1
     rw [show iterCommutator XG YA 1 = ⁅XG, YA⁆ from rfl]
     exact Subgroup.commutator_le_left _ _
   · -- I1 ≤ I2 (the substantive direction)
     show iterCommutator XG YA 1 ≤ iterCommutator XG YA 2
-    show ⁅XG, YA⁆ ≤ ⁅iterCommutator XG YA 1, YA⁆
+    change ⁅XG, YA⁆ ≤ ⁅iterCommutator XG YA 1, YA⁆
     rw [Subgroup.commutator_le]
     rintro _ ⟨g_0, rfl⟩ _ ⟨a, rfl⟩
     -- Goal: ⁅inl g_0, inr a⁆ ∈ ⁅iterCommutator XG YA 1, YA⁆
@@ -434,7 +434,7 @@ theorem iterCommutator_inl_inr_two_eq_one
     have h_commute_ca : Commute (SemidirectProduct.inl c : G ⋊[φ] A)
         (SemidirectProduct.inr a) := by
       -- inl c · inr a = inr a · inl c iff (φ a) c = c (which holds by h_fix)
-      show (SemidirectProduct.inl c : G ⋊[φ] A) * SemidirectProduct.inr a =
+      change (SemidirectProduct.inl c : G ⋊[φ] A) * SemidirectProduct.inr a =
           SemidirectProduct.inr a * SemidirectProduct.inl c
       -- inr a * inl c * inr a⁻¹ = inl((φ a) c) = inl c (by inl_aut + h_fix)
       have h_aut := SemidirectProduct.inl_aut (φ := φ) a c
@@ -1037,7 +1037,7 @@ noncomputable def fittingProductHom {A G : Type*} [CommGroup G] [Group A] [Finty
 lemma fittingProductHom_apply_of_fixed {A G : Type*} [CommGroup G] [Group A] [Fintype A]
     {φ : A →* MulAut G} {c : G} (hc : ∀ a : A, (φ a) c = c) :
     fittingProductHom φ c = c ^ Nat.card A := by
-  show ∏ a : A, (φ a) c = c ^ Nat.card A
+  change ∏ a : A, (φ a) c = c ^ Nat.card A
   have h_eq : ∏ a : A, (φ a) c = ∏ _a : A, c :=
     Finset.prod_congr rfl (fun a _ => hc a)
   rw [h_eq, Finset.prod_const, Finset.card_univ, Nat.card_eq_fintype_card]
@@ -1047,7 +1047,7 @@ lemma fittingProductHom_apply_of_fixed {A G : Type*} [CommGroup G] [Group A] [Fi
 lemma fittingProductHom_apply_of_smul {A G : Type*} [CommGroup G] [Group A] [Fintype A]
     {φ : A →* MulAut G} (g : G) (a : A) :
     fittingProductHom φ ((φ a) g) = fittingProductHom φ g := by
-  show ∏ b : A, (φ b) ((φ a) g) = ∏ b : A, (φ b) g
+  change ∏ b : A, (φ b) ((φ a) g) = ∏ b : A, (φ b) g
   -- Rewrite (φ b) ∘ (φ a) = φ (b * a) using map_mul
   have h_compose : ∀ b : A, (φ b) ((φ a) g) = (φ (b * a)) g := fun b => by
     rw [← MulAut.mul_apply, ← map_mul]

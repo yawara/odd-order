@@ -385,7 +385,7 @@ private theorem map_subtype_conj_smul {M : Subgroup G} (c : ↥M) (K : Subgroup 
     ext x
     simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
       Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
-  show (K.map (MulAut.conj c).toMonoidHom).map M.subtype
+  change (K.map (MulAut.conj c).toMonoidHom).map M.subtype
       = (K.map M.subtype).map (MulAut.conj (c : G)).toMonoidHom
   rw [Subgroup.map_map, Subgroup.map_map, hcomp]
 
@@ -444,7 +444,7 @@ private theorem fusion_d_of_mem_sigma [Finite G]
   -- Sylow conjugacy in `↥M`: `c • P = PY` for some `c ∈ M`.
   obtain ⟨c, hc⟩ := MulAction.exists_smul_eq (↥M) P PY
   have hPY : ((PY : Subgroup ↥M).map M.subtype : Subgroup G) = MulAut.conj g • X := by
-    show (((MulAut.conj g • X).subgroupOf M : Subgroup ↥M).map M.subtype) = MulAut.conj g • X
+    change (((MulAut.conj g • X).subgroupOf M : Subgroup ↥M).map M.subtype) = MulAut.conj g • X
     rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hg]
   -- transport to `G`: `conj ↑c • X = conj g • X`.
   have hconj : MulAut.conj (c : G) • X = MulAut.conj g • X := by
@@ -579,10 +579,10 @@ private def conjOrderIso (g : G) : Subgroup G ≃o Subgroup G where
   toFun H := MulAut.conj g • H
   invFun H := MulAut.conj g⁻¹ • H
   left_inv H := by
-    show MulAut.conj g⁻¹ • (MulAut.conj g • H) = H
+    change MulAut.conj g⁻¹ • (MulAut.conj g • H) = H
     rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
   right_inv H := by
-    show MulAut.conj g • (MulAut.conj g⁻¹ • H) = H
+    change MulAut.conj g • (MulAut.conj g⁻¹ • H) = H
     rw [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
   map_rel_iff' := Subgroup.pointwise_smul_le_pointwise_smul_iff
 
@@ -633,7 +633,7 @@ theorem sigma_conj [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
   have hP'bar : (((Sylow.ofCard ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)) hcard :
         Sylow p ↥(MulAut.conj g • M)) : Subgroup ↥(MulAut.conj g • M)).map
           (MulAut.conj g • M).subtype : Subgroup G) = MulAut.conj g • Pbar := by
-    show ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)).map (MulAut.conj g • M).subtype = _
+    change ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)).map (MulAut.conj g • M).subtype = _
     rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hle]
   rw [hP'bar, ← normalizer_conj_smul]
   exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hP

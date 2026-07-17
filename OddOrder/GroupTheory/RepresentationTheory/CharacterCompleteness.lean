@@ -144,7 +144,7 @@ theorem transportRep_character {W X : Type*} [AddCommGroup W] [Module ℂ W]
     (σ : Representation ℂ G W) (e : W ≃ₗ[ℂ] X) :
     (transportRep σ e).character = σ.character := by
   funext g
-  show LinearMap.trace ℂ X (e.conj (σ g)) = LinearMap.trace ℂ W (σ g)
+  change LinearMap.trace ℂ X (e.conj (σ g)) = LinearMap.trace ℂ W (σ g)
   exact LinearMap.trace_conj' (σ g) e
 
 set_option backward.isDefEq.respectTransparency false in
@@ -445,7 +445,7 @@ variable {G : Type*} [Group G]
 conjugacy class. -/
 def classFunctionInv (f : ClassFunction G ℂ) : ClassFunction G ℂ :=
   ⟨fun g => f g⁻¹, fun g h => by
-    show f (h * g * h⁻¹)⁻¹ = f g⁻¹
+    change f (h * g * h⁻¹)⁻¹ = f g⁻¹
     rw [show (h * g * h⁻¹)⁻¹ = h * g⁻¹ * h⁻¹ from by group, f.conj_eq]⟩
 
 @[simp] theorem classFunctionInv_apply (f : ClassFunction G ℂ) (g : G) :

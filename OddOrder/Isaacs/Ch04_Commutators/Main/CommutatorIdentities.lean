@@ -333,7 +333,7 @@ private lemma index_eq_prime_of_isCoatom_of_pgroup
   -- M ≤ H'
   have h_M_le_H' : M ≤ H' := by
     intro x hx
-    show (QuotientGroup.mk' M) x ∈ H
+    change (QuotientGroup.mk' M) x ∈ H
     rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).mpr hx]
     exact Subgroup.one_mem H
   -- H' < ⊤ (else H = ⊤ via mk' surjective)
@@ -530,8 +530,8 @@ theorem frattini_le_of_isElementaryAbelian_quotient_of_pgroup
   -- N ≤ M: y ∈ N ⇒ mk' N y = 1 ⇒ φ 1 = 1
   have hN_le_M : N ≤ M := by
     intro y hy
-    show QuotientGroup.mk' N y ∈ M_quot
-    show φ (QuotientGroup.mk' N y) = 1
+    change QuotientGroup.mk' N y ∈ M_quot
+    change φ (QuotientGroup.mk' N y) = 1
     have h_eq_one : QuotientGroup.mk' N y = 1 := (QuotientGroup.eq_one_iff y).mpr hy
     rw [h_eq_one, map_one]
   -- x ∉ M: φ (xN) = ofAdd (f xa), and f xa ≠ 0 ⇒ ofAdd ... ≠ 1
@@ -642,7 +642,7 @@ theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
   set H : Subgroup G := ⁅A, (⊤ : Subgroup G)⁆ with hHeq
   -- Step 1: H ≤ A.
   have hHleA : H ≤ A := by
-    show ⁅A, (⊤ : Subgroup G)⁆ ≤ A
+    change ⁅A, (⊤ : Subgroup G)⁆ ≤ A
     rw [Subgroup.commutator_comm]
     exact (Subgroup.commutator_top_left_le_iff (H := A)).mpr ‹A.Normal›
   -- Step 2: lift f : G/H →* G/A.
@@ -681,7 +681,7 @@ theorem commutator_eq_commutator_of_normal_abelian_cyclic_quotient
   -- Step 5: commutator G ⊆ H.
   rw [_root_.commutator_def, Subgroup.commutator_def, Subgroup.closure_le]
   rintro _ ⟨a, _, b, _, rfl⟩
-  show ⁅a, b⁆ ∈ H
+  change ⁅a, b⁆ ∈ H
   rw [← QuotientGroup.eq_one_iff (N := H)]
   show ((⁅a, b⁆ : G) : G ⧸ H) = 1
   rw [show ((⁅a, b⁆ : G) : G ⧸ H) = ⁅(a : G ⧸ H), (b : G ⧸ H)⁆ by
@@ -711,11 +711,11 @@ def commutatorRightHom {A : Subgroup G} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (g : G) : A →* G where
   toFun a := ⁅(a : G), g⁆
   map_one' := by
-    show ⁅((1 : A) : G), g⁆ = 1
+    change ⁅((1 : A) : G), g⁆ = 1
     rw [Subgroup.coe_one]
     exact commutatorElement_one_left g
   map_mul' a b := by
-    show ⁅((a * b : A) : G), g⁆ = ⁅((a : A) : G), g⁆ * ⁅((b : A) : G), g⁆
+    change ⁅((a * b : A) : G), g⁆ = ⁅((a : A) : G), g⁆ * ⁅((b : A) : G), g⁆
     rw [Subgroup.coe_mul, commutatorElement_mul_left_eq]
     have hbg : ⁅(b : G), g⁆ ∈ A := commutatorElement_mem_of_normal b.2 g
     have hag : ⁅(a : G), g⁆ ∈ A := commutatorElement_mem_of_normal a.2 g
@@ -729,7 +729,7 @@ theorem commutatorRightHom_range_le_commutator {A : Subgroup G} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (g : G) :
     (commutatorRightHom hAb g).range ≤ _root_.commutator G := by
   rintro x ⟨a, rfl⟩
-  show ⁅((a : A) : G), g⁆ ∈ _root_.commutator G
+  change ⁅((a : A) : G), g⁆ ∈ _root_.commutator G
   exact commutatorElement_mem_commutator_top _ _
 
 /-- For `g : G` such that `g · A` generates `G ⧸ A`, `A ⊔ ⟨g⟩ = ⊤`. -/
@@ -800,7 +800,7 @@ theorem commutatorRightHom_mem_ker_iff {A : Subgroup G} [A.Normal]
     exact (hxS _ rfl).symm
   · intro ha
     rw [MonoidHom.mem_ker]
-    show ⁅(a : G), g⁆ = 1
+    change ⁅(a : G), g⁆ = 1
     rw [commutatorElement_eq_one_iff_mul_comm]
     exact (Subgroup.mem_center_iff.mp ha g).symm
 

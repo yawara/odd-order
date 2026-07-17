@@ -96,7 +96,7 @@ theorem coset_conj_into_centralizer_coset [Finite G] {H : Subgroup G} {g : G}
     rintro _ ⟨⟨q, w⟩, rfl⟩
     have haH : ((q.out : H) : G) ∈ H := (q.out : H).2
     have hwH : (w : G) ∈ H := hCH w.2
-    show (((q.out : H) : G) * ((w : G) * g) * ((q.out : H) : G)⁻¹) * g⁻¹ ∈ H
+    change (((q.out : H) : G) * ((w : G) * g) * ((q.out : H) : G)⁻¹) * g⁻¹ ∈ H
     have hgag : g * ((q.out : H) : G)⁻¹ * g⁻¹ ∈ H := hg _ (H.inv_mem haH)
     have hrw : (((q.out : H) : G) * ((w : G) * g) * ((q.out : H) : G)⁻¹) * g⁻¹
         = (((q.out : H) : G) * (w : G)) * (g * ((q.out : H) : G)⁻¹ * g⁻¹) := by group
@@ -157,7 +157,7 @@ theorem coset_conj_into_centralizer_coset [Finite G] {H : Subgroup G} {g : G}
     ext x
     constructor
     · intro hx; exact ⟨x * g⁻¹, hx, by group⟩
-    · rintro ⟨h, hh, rfl⟩; show h * g * g⁻¹ ∈ H; simpa [mul_assoc] using hh
+    · rintro ⟨h, hh, rfl⟩; change h * g * g⁻¹ ∈ H; simpa [mul_assoc] using hh
   have hRcard : R.ncard = Nat.card H := by
     rw [hRimg, Set.ncard_image_of_injective _ (mul_left_injective g)]
     exact (Nat.card_coe_set_eq _).symm

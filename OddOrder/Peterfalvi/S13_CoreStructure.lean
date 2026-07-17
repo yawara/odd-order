@@ -314,7 +314,7 @@ theorem Hypothesis.H0_eq_Hprime_of_noncoherent [Finite G]
           have hgelt : (⟨g, hgH⟩ : ↥hyp.base.typeP.H)
               = (x₁ * x' * x₁⁻¹ * x'⁻¹) * (x' * w * x'⁻¹) := by
             refine Subtype.ext ?_
-            show g = g₁ * h' * g₁⁻¹ * h'⁻¹ * (h' * (g₁ * (u * g₁⁻¹ * u⁻¹)) * h'⁻¹)
+            change g = g₁ * h' * g₁⁻¹ * h'⁻¹ * (h' * (g₁ * (u * g₁⁻¹ * u⁻¹)) * h'⁻¹)
             rw [hab', hg₂eq]
             group
           rw [hgelt, map_mul]
@@ -443,7 +443,7 @@ theorem chief_H0_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSim
     rw [hyp.H0_eq_Hprime_of_noncoherent hG hnc htype, hyp.Hprime_eq, ← hHH]
   -- **case-B hypotheses of `chiefKernel_caseB_false`**
   have hpK : IsPGroup hyp.chief.p ↥hyp.s11Setup.H := by
-    show IsPGroup hyp.chief.p ↥hyp.s11Setup.typeP.H
+    change IsPGroup hyp.chief.p ↥hyp.s11Setup.typeP.H
     rw [hp_eq, hHH]; exact hyp.H_isPGroup hG hnc htype
   have hNcomm : hyp.chief.N = commutator ↥hyp.s11Setup.H := by
     apply Subgroup.map_injective (hyp.s11Setup.typeP.H).subtype_injective
@@ -581,7 +581,7 @@ theorem H_elementaryAbelian [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       congrArg (fun (X : Subgroup G) => Nat.card ↥X) hHH
     have h := hyp.chief.quotient_order
     rw [hcardHH, hp_eq, hyp.s11Setup_q_eq, hH0] at h
-    show Nat.card ↥hyp.base.typeP.H = hyp.p ^ hyp.q
+    change Nat.card ↥hyp.base.typeP.H = hyp.p ^ hyp.q
     simpa using h
 
 /-- **The (11.3) noncoherence refuter, packaged** (issue 9087 legacy-rewire threading): `𝒮(H₀C)`

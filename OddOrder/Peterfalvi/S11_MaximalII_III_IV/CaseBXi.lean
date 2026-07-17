@@ -232,7 +232,7 @@ theorem caseA_realizedComplement_uW_le_normalizer [Finite G] {M : Subgroup G}
     have key := hconj (⟨g, hg⟩ : ↥data.U)⁻¹ hm
     have hE : ((⟨g, hg⟩ : ↥data.U)⁻¹ : G) * data.H.subtype m
         * (((⟨g, hg⟩ : ↥data.U)⁻¹ : G))⁻¹ = h := by
-      rw [hval]; show g⁻¹ * (g * h * g⁻¹) * (g⁻¹ : G)⁻¹ = h; group
+      rw [hval]; change g⁻¹ * (g * h * g⁻¹) * (g⁻¹ : G)⁻¹ = h; group
     exact hE ▸ key
   exact sup_le hH_norm hU_norm
 
@@ -315,14 +315,14 @@ theorem caseA_wOrbit_horbit [Finite G] {M : Subgroup G}
     have hmem_orbit : (quotientMulAutHom chief.N_aInvariant a) ((QuotientGroup.mk' chief.N) x_s)
         ∈ caseA_wOrbit caseA awsub := by
       rw [caseA_wOrbit]
-      show (quotientMulAutHom chief.N_aInvariant a) ((QuotientGroup.mk' chief.N) x_s)
+      change (quotientMulAutHom chief.N_aInvariant a) ((QuotientGroup.mk' chief.N) x_s)
         ∈ quotientMulAutHom chief.N_aInvariant ↑awsub • caseA.S0
       rw [hawsub]
       exact Subgroup.smul_mem_pointwise_smul _ _ caseA.S0 hx_sS0
     exact (le_iSup₂ (f := fun w (_ : w ≠ 1) => caseA_wOrbit caseA w) awsub hawne) hmem_orbit
   · -- `↑x = ↑↑(conjByMulEquiv w₁ s)` in `G`.
     rw [Subgroup.coe_subtype, hx, typeP_conjAction_apply, ClassFunction.conjByMulEquiv_apply]
-    show (a : G) * (x_s : G) * (a : G)⁻¹
+    change (a : G) * (x_s : G) * (a : G)⁻¹
       = ((w₁ : ↥M) : G) * ((s : ↥M) : G) * ((w₁ : ↥M) : G)⁻¹
     have hxs : (x_s : G) = ((s : ↥M) : G) := by rw [← hx_sval]; rfl
     rw [hxs]
@@ -489,7 +489,7 @@ theorem hcuZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
     linearIrreducibleCharacter_apply] at hψker
   have hqeq : (QuotientGroup.mk' chief.N) ((hInHuEquivH data) h) = q := hhq
   rw [hqeq] at hψker
-  show θ q = (1 : ℂˣ)
+  change θ q = (1 : ℂˣ)
   refine Units.ext ?_
   rw [Units.val_one]
   exact hψker
@@ -1041,7 +1041,7 @@ theorem hcConjDescend_eq_uActionHom [Finite G] {M : Subgroup G}
   have hRHS : uActionHom data chief ⟨x₀, Subgroup.mem_subgroupOf.mpr huU⟩
         (QuotientGroup.mk' chief.N (hInHuEquivH data h))
       = QuotientGroup.mk' chief.N (typeP_conjAction data.typeP x₀ (hInHuEquivH data h)) := by
-    show (quotientMulAutHom chief.N_aInvariant) x₀
+    change (quotientMulAutHom chief.N_aInvariant) x₀
         (QuotientGroup.mk' chief.N (hInHuEquivH data h)) = _
     rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
   -- left side: `A_u ∘ hcHom` = `hcHom ∘ conjBy u`, and the conjugate lands in `hInHu`

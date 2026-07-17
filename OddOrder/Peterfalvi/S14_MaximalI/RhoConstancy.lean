@@ -143,7 +143,7 @@ theorem Sset_diff_support_subset_A1 {L : Subgroup G} [Finite G] (hyp : Hypothesi
     have hx1 : x = 1 := by
       by_contra hx1
       refine hxA1 ((Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr ?_, fun h => ?_⟩)
-      · show (x : G) ∈ maxNilpotentNormalHall L
+      · change (x : G) ∈ maxNilpotentNormalHall L
         rw [← hyp.typeI.typeF.H_eq]
         exact hxH
       · rw [Set.mem_singleton_iff] at h
@@ -847,7 +847,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
     have hne1 : y ≠ 1 := by
       rintro rfl
       refine (ClassFunction.mem_support.mp hy) ?_
-      show (fam i : ClassFunction ↥L ℂ) 1 - (fam 0 : ClassFunction ↥L ℂ) 1 = 0
+      change (fam i : ClassFunction ↥L ℂ) 1 - (fam 0 : ClassFunction ↥L ℂ) 1 = 0
       rw [hTdeg (fam i) (hfam_mem i), hTdeg (fam 0) (hfam_mem 0), sub_self]
     rcases ClassFunction.support_sub_subset _ _ hy with h | h
     · rcases hTsupp _ (hfam_mem i) h with h2 | h2
@@ -865,13 +865,13 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
     (hTdeg (fam i) (hfam_mem i)).trans (hTdeg (fam 0) (hfam_mem 0)).symm
   have hvirtual : IsometryDifferenceImagesAreVirtual hyp.tau fam := by
     intro i
-    show hyp.tau (irreducibleCharacterDifference fam i) ∈ ZIrr G
+    change hyp.tau (irreducibleCharacterDifference fam i) ∈ ZIrr G
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
       hyp.dadeData.dade hyp.hconj (hdiff_supp i)
       (Submodule.sub_mem _ (fam i).mem_ZIrr (fam 0).mem_ZIrr)
   have hzero : IsometryDifferenceImagesVanishAtOne hyp.tau fam := by
     intro i
-    show hyp.tau (irreducibleCharacterDifference fam i) (1 : G) = 0
+    change hyp.tau (irreducibleCharacterDifference fam i) (1 : G) = 0
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
       hyp.dadeData.dade hyp.hconj (hdiff_supp i)
   have hisom : ∀ i j, ClassFunction.inner (isometryDifferenceImage hyp.tau fam i)
@@ -879,7 +879,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
       = ClassFunction.inner (irreducibleCharacterDifference fam i)
           (irreducibleCharacterDifference fam j) := by
     intro i j
-    show ClassFunction.inner (hyp.tau (irreducibleCharacterDifference fam i))
+    change ClassFunction.inner (hyp.tau (irreducibleCharacterDifference fam i))
       (hyp.tau (irreducibleCharacterDifference fam j)) = _
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
       hyp.dadeData.dade hyp.hconj hSsupp (Submodule.subset_span ⟨i, rfl⟩)
@@ -909,7 +909,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
         simp only [hfamdef, Equiv.symm_apply_apply]
       have hLHS : (x : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)
           = irreducibleCharacterDifference fam (T.equivFin ⟨x, hx⟩) := by
-        show (x : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)
+        change (x : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)
           = (fam (T.equivFin ⟨x, hx⟩) : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)
         rw [hfx]
       rw [hLHS]
@@ -1035,7 +1035,7 @@ theorem coherent_extension_mem_span_imageFamily {L : Subgroup G} [Finite G] (hyp
         {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
           (χ : ClassFunction ↥L ℂ) - 0} ≤
       OddOrder.Peterfalvi.S07.zSpan hyp.Sset := by
-    show Submodule.span ℤ _ ≤ Submodule.span ℤ _
+    change Submodule.span ℤ _ ≤ Submodule.span ℤ _
     rw [Submodule.span_le]
     intro x hx
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
@@ -1325,7 +1325,7 @@ theorem isDadeMap_induce_of_forall_H_eq_bot {A : Set G} {L : Subgroup G}
     have hh1 : h = 1 := Subgroup.mem_bot.mp (by rw [← hH a]; exact hh)
     subst hh1
     have hga : IsConj a.1 g := by simpa using hconj
-    show ClassFunction.induce L (α : ClassFunction ↥L ℂ) g = _
+    change ClassFunction.induce L (α : ClassFunction ↥L ℂ) g = _
     rw [← (ClassFunction.induce L (α : ClassFunction ↥L ℂ)).of_isConj hga]
     exact induce_apply_eq_self_of_mem_tiSubset hyp.subset_L
       (fun x hx a' ha' => by simpa using hyp.L_normalizes_A ⟨x⁻¹, L.inv_mem hx⟩ ha')
@@ -1333,7 +1333,7 @@ theorem isDadeMap_induce_of_forall_H_eq_bot {A : Set G} {L : Subgroup G}
       (ClassFunction.mem_supportedSubmodule.mp α.2) a.2
   map_eq_zero_of_not_mem_dadeSupport := by
     intro α g hg
-    show ClassFunction.induce L (α : ClassFunction ↥L ℂ) g = 0
+    change ClassFunction.induce L (α : ClassFunction ↥L ℂ) g = 0
     refine ClassFunction.induce_eq_zero_of_not_conjugatesIntoSet
       (ClassFunction.mem_supportedSubmodule.mp α.2) (fun hgin => hg ?_)
     rw [hyp.dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot hH]

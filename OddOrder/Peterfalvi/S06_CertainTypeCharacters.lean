@@ -194,7 +194,7 @@ theorem cyclicPowEnum_eq_inv_of_add_mod_eq_zero (hn : Nat.card D = n) {i j : Fin
     cyclicPowEnum hn i = (cyclicPowEnum hn j)⁻¹ := by
   have hord : orderOf (cyclicGenerator D) = n := (orderOf_cyclicGenerator D).trans hn
   have key : cyclicPowEnum hn i * cyclicPowEnum hn j = 1 := by
-    show cyclicGenerator D ^ (i : ℕ) * cyclicGenerator D ^ (j : ℕ) = 1
+    change cyclicGenerator D ^ (i : ℕ) * cyclicGenerator D ^ (j : ℕ) = 1
     rw [← pow_add, ← pow_mod_orderOf, hord, hij, pow_zero]
   exact mul_eq_one_iff_eq_inv.mp key
 
@@ -272,7 +272,7 @@ theorem w1CharEquiv_finNeg [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
   haveI := h.isCyclic_w1CharGroup
   rw [w1CharEquiv]
   refine cyclicPowEnum_eq_inv_of_add_mod_eq_zero _ ?_
-  show ((Nat.card h.W1 - (i : ℕ)) % Nat.card h.W1 + (i : ℕ)) % Nat.card h.W1 = 0
+  change ((Nat.card h.W1 - (i : ℕ)) % Nat.card h.W1 + (i : ℕ)) % Nat.card h.W1 = 0
   rcases Nat.eq_zero_or_pos (i : ℕ) with h0 | hpos
   · simp [h0]
   · have hi : (i : ℕ) < Nat.card h.W1 := i.2
@@ -711,7 +711,7 @@ theorem finrank_sdiffSupported :
   haveI : Fintype ↥h.sdiffTICyclicHypothesis.W := Fintype.ofFinite _
   haveI : IsMulCommutative ↥h.sdiffTICyclicHypothesis.W :=
     h.sdiffTICyclicHypothesis.isMulCommutative_W
-  show Module.finrank ℂ ↥(ClassFunction.supportedSubmodule
+  change Module.finrank ℂ ↥(ClassFunction.supportedSubmodule
       (OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
         h.sdiffTICyclicHypothesis.W)) = _
   rw [finrank_supportedSubmodule_eq_card, h.card_supportInSubgroup_sdiff]
@@ -1080,7 +1080,7 @@ theorem chiColumn_one_zero_eq_trivial [NeZero (Nat.card h.W1)] :
   -- the value `ω_{00}(w) = (w1CharEquiv 0)(wFst w) · 1(wSnd w) = 1`
   have hv : (h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv 0)
       (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) w = 1 := by
-    show (h.w1CharEquiv 0) (h.sdiffTICyclicHypothesis.wFst w)
+    change (h.w1CharEquiv 0) (h.sdiffTICyclicHypothesis.wFst w)
         * (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (h.sdiffTICyclicHypothesis.wSnd w) = 1
     rw [h.w1CharEquiv_zero, MonoidHom.one_apply, MonoidHom.one_apply, one_mul]
   rw [hv, Units.val_one]

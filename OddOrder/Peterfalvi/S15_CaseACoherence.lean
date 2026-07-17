@@ -1052,7 +1052,7 @@ theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- `PC = H.subgroupOf S ≤ S' = HU`.
   have hHderiv : hyp.H ≤ derivedInG hyp.S := by
-    show hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
+    change hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
     rw [hyp.S_deriv_eq_PU]
     exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
   have hKle : hyp.H.subgroupOf hyp.S ≤ HU := by
@@ -1109,14 +1109,14 @@ theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
     rw [OddOrder.Peterfalvi.S11.mem_sSet]
     refine ⟨s, ?_, rfl⟩
     -- `s ∈ xiSet data`: `hInHu data ⊄ ker s`, with `hInHu = (P.subgroupOf S).subgroupOf HU`.
-    show ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
+    change ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥HU ℂ))
     have hHInHu : (OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU)
         = ((hyp.P.subgroupOf hyp.S).subgroupOf HU : Set ↥HU) := by
       congr 1
-      show (data.H.subgroupOf hyp.S).subgroupOf HU = (hyp.P.subgroupOf hyp.S).subgroupOf HU
+      change (data.H.subgroupOf hyp.S).subgroupOf HU = (hyp.P.subgroupOf hyp.S).subgroupOf HU
       have hPeq : data.H = hyp.P := by
-        show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+        change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
       rw [hPeq]
     rw [hHInHu]
     -- The generic kernel step: `θ'` is a constituent of `Res s` (coefficient `k > 0`), and

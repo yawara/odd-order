@@ -179,7 +179,7 @@ noncomputable def hypothesis78OfDade
         -- Bridge the `(7.7.a)` coefficient `d_{ind1H}` (`= 1`) to the bare difference `ζ_{ind1H} − ζ_0`.
         refine congrArg star (congrArg (ClassFunction.inner · χ) (congrArg H71.τ ?_))
         apply Subtype.ext
-        show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
+        change ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
             - d ind1H • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) = _
         rw [hd1, one_smul]
         rfl }
@@ -512,7 +512,7 @@ theorem family_degree_sum {L : Type*} [Group L] [Fintype L] [Invertible (Nat.car
     have hone : ClassFunction.inner (ClassFunction.induce K (φ' : ClassFunction ↥K ℂ))
         (Hypothesis71.constOne L) = 1 := by
       rw [← hj, hjeq]
-      show ClassFunction.inner (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ))
+      change ClassFunction.inner (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ))
         (Hypothesis71.constOne L) = 1
       rw [hzeta_ind1H]; exact inner_induce_trivialChar_constOne_eq_one K
     rw [inner_induce_constOne_eq_zero K φ' hφ'] at hone
@@ -699,7 +699,7 @@ noncomputable def betaDecompOfFacts {G : Type*} [Group G] [Fintype G] {A : Set G
   have hβ : H78.beta
       = H78.hyp76.hyp71.τ ⟨H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta 0, diffβ⟩ := by
     rw [H78.beta_def]; congr 1; apply Subtype.ext
-    show H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct
+    change H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct
       = H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta 0
     rw [hzd]
   have hW : H78.weightedNuSum = ∑ i ∈ Finset.univ.erase H78.ind1H,
@@ -790,12 +790,12 @@ noncomputable def betaDecompOfDade
   -- `θ_i ≠ 1_K` for `i ≠ ind1H` (injectivity + `θ_{ind1H} = 1_K`).
   have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥(H.subgroupOf L) :=
     fun j hj hc => hj (hinj (by
-      show ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)
+      change ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)
         = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
       rw [hc, hzeta_ind1H]))
   -- The constructor's computed `d` agrees with the supplied `d` (both `= ζ_i(1)/ζ_0(1)`).
   have hdeq : ∀ i, H78.hyp76.d i = d i := fun i => by
-    show ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
+    change ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
         ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) = d i
     rw [div_eq_iff hz0]; exact hdeg i
   -- Coherence agreement transported from the supplied `d` to the constructor's computed `d`
@@ -811,7 +811,7 @@ noncomputable def betaDecompOfDade
             - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ),
           psi_support i⟩ := by
       apply Subtype.ext
-      show ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+      change ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
           - H78.hyp76.d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)
         = ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
           - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)
@@ -821,7 +821,7 @@ noncomputable def betaDecompOfDade
   -- `⟨β, 1_G⟩ = ⟨Ind 1_K − ζ_0, 1_L⟩ = 1 − 0 = 1`.
   have hz_ind : H78.hyp76.zeta H78.ind1H = ClassFunction.induce (H.subgroupOf L)
       (trivialIrreducibleCharacter ↥(H.subgroupOf L) : ClassFunction _ ℂ) := by
-    show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) = _
+    change ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) = _
     rw [hzeta_ind1H]
   have hz_zd : H78.hyp76.zeta H78.zetaDistinct
       = ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) := rfl
@@ -929,11 +929,11 @@ theorem zetaNuRhoNormSqGeOfDade
     induce_apply_one_ne_zero _ (θ 0)
   have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥(H.subgroupOf L) :=
     fun j hj hc => hj (hinj (by
-      show ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)
+      change ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)
         = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
       rw [hc, hzeta_ind1H]))
   have hdeq : ∀ i, H78.hyp76.d i = d i := fun i => by
-    show ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
+    change ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
         ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) = d i
     rw [div_eq_iff hz0]; exact hdeg i
   have hagree' : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ H78.ind1H →
@@ -945,7 +945,7 @@ theorem zetaNuRhoNormSqGeOfDade
             - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ),
           psi_support i⟩ : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L) := by
       apply Subtype.ext
-      show ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+      change ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
           - H78.hyp76.d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)
         = ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
           - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)
@@ -954,10 +954,10 @@ theorem zetaNuRhoNormSqGeOfDade
     exact hagree i hi0 hii
   have hz_ind : H78.hyp76.zeta H78.ind1H = ClassFunction.induce (H.subgroupOf L)
       (trivialIrreducibleCharacter ↥(H.subgroupOf L) : ClassFunction _ ℂ) := by
-    show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) = _
+    change ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) = _
     rw [hzeta_ind1H]
   have hd1 : H78.hyp76.d H78.ind1H = 1 := by
-    show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) (1 : ↥L) /
+    change ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) (1 : ↥L) /
         ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) = 1
     rw [← hdeg_match, div_self hz0]
   have hP_ind1H : H78.hyp76.zeta H78.ind1H (1 : ↥L) = (H78.complementIndex : ℂ) := by
@@ -965,13 +965,13 @@ theorem zetaNuRhoNormSqGeOfDade
     exact induce_trivialChar_apply_eq_index (H.subgroupOf L) (Subgroup.one_mem _)
   have hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ) := by
     rw [complementIndex_eq_subgroupOf_index H78]
-    show ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H)
+    change ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H)
       = ((H78.hyp76.H.subgroupOf L).index : ℂ)
     rw [hz_ind]
     exact induce_trivialChar_normSq_eq_index (H.subgroupOf L)
   have hz0_compl : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
       = (H78.complementIndex : ℂ) := by
-    show H78.hyp76.zeta H78.zetaDistinct (1 : ↥L) = (H78.complementIndex : ℂ)
+    change H78.hyp76.zeta H78.zetaDistinct (1 : ↥L) = (H78.complementIndex : ℂ)
     rw [H78.zeta_one_eq_ind1H_one, hP_ind1H]
   have hz0_deg : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
       = ((H.subgroupOf L).index : ℂ) := by
@@ -988,7 +988,7 @@ theorem zetaNuRhoNormSqGeOfDade
     (induce_family_orthogonal_of_injective (H.subgroupOf L) θ hinj)
     (by
       rw [cCoeff_nu_zeta_zero_ind1H_eq H78 H78.nu rfl hd1, hBDa]
-      show ClassFunction.inner H78.beta
+      change ClassFunction.inner H78.beta
         (ν (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ))) = (a : ℂ) - 1
       rw [ha]; ring)
     (fun i hi0 hii => cCoeff_nu_zeta_zero_eq_neg_d H78.hyp76 H78.nu hagree' H78.nu_isometry
@@ -996,14 +996,14 @@ theorem zetaNuRhoNormSqGeOfDade
       (fun i hi => induce_family_orthogonal_of_injective (H.subgroupOf L) θ hinj i 0 hi)
       hζ0norm i hi0 hii)
     (fun i => by
-      show star (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
+      change star (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
           ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L))
         = ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
           ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
       rw [star_div₀, induce_apply_one_star, induce_apply_one_star])
     (fun i => induce_apply_one_star (H.subgroupOf L) (θ i))
     (fun i => by
-      show ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
+      change ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L) /
           ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
         = ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
           / (H78.complementIndex : ℂ)
@@ -1129,20 +1129,20 @@ theorem betaDecompOfDade_a_eq_zero
     induce_apply_one_ne_zero _ (θ 0)
   have hz_ind : H78.hyp76.zeta H78.ind1H = ClassFunction.induce (H.subgroupOf L)
       (trivialIrreducibleCharacter ↥(H.subgroupOf L) : ClassFunction _ ℂ) := by
-    show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) = _
+    change ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) = _
     rw [hzeta_ind1H]
   have hP_ind1H : H78.hyp76.zeta H78.ind1H (1 : ↥L) = (H78.complementIndex : ℂ) := by
     rw [complementIndex_eq_subgroupOf_index H78, hz_ind]
     exact induce_trivialChar_apply_eq_index (H.subgroupOf L) (Subgroup.one_mem _)
   have hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ) := by
     rw [complementIndex_eq_subgroupOf_index H78]
-    show ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H)
+    change ClassFunction.inner (H78.hyp76.zeta H78.ind1H) (H78.hyp76.zeta H78.ind1H)
       = ((H78.hyp76.H.subgroupOf L).index : ℂ)
     rw [hz_ind]
     exact induce_trivialChar_normSq_eq_index (H.subgroupOf L)
   have hz0_compl : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
       = (H78.complementIndex : ℂ) := by
-    show H78.hyp76.zeta H78.zetaDistinct (1 : ↥L) = (H78.complementIndex : ℂ)
+    change H78.hyp76.zeta H78.zetaDistinct (1 : ↥L) = (H78.complementIndex : ℂ)
     rw [H78.zeta_one_eq_ind1H_one, hP_ind1H]
   -- Family orthogonality in the `if`-diagonal form.
   have horth_if : ∀ i ∈ (Finset.univ.erase H78.ind1H),
@@ -1336,10 +1336,10 @@ theorem chiRho_nu_zeta0_apply_eq_zeta0_ofDade
       have hβ : H71.τ ⟨ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
             - d ind1H • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ),
           psi_support ind1H⟩ = H78.beta := by
-        show H71.τ _ = H78.hyp76.hyp71.τ H78.indMinusZetaSupp
+        change H71.τ _ = H78.hyp76.hyp71.τ H78.indMinusZetaSupp
         congr 1
         apply Subtype.ext
-        show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
+        change ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
             - d ind1H • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)
           = H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct
         rw [hdind, one_smul]

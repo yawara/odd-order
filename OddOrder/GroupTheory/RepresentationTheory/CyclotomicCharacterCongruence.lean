@@ -209,7 +209,7 @@ theorem exists_integral_zirr_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ} (hε : 
           (isIntegral_algebraMap (R := ℤ) (x := c)).mul hz
         refine ⟨(c : ℂ) * z, hcz, ?_⟩
         have happ : ∀ g, (c • ψ) g = (c : ℂ) * ψ g := fun g => by
-          show c • ψ g = (c : ℂ) * ψ g
+          change c • ψ g = (c : ℂ) * ψ g
           rw [zsmul_eq_mul]
         rw [happ, happ]; linear_combination (c : ℂ) * e }
   -- every irreducible character of `A` lies in `M`.

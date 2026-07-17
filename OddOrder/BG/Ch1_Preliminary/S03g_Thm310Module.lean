@@ -90,11 +90,11 @@ theorem prime_card_and_finrank_of_abelian_frobenius_weight [Finite G] [IsAlgClos
     { smul := fun r i => ⟨conjChar K (r : G) i.1, hpres r i.1 i.2⟩
       one_smul := fun i => by
         apply Subtype.ext
-        show conjChar K ((1 : ↥R) : G) i.1 = i.1
+        change conjChar K ((1 : ↥R) : G) i.1 = i.1
         rw [Subgroup.coe_one, conjChar_one]
       mul_smul := fun r s i => by
         apply Subtype.ext
-        show conjChar K ((r * s : ↥R) : G) i.1 = conjChar K (r : G) (conjChar K (s : G) i.1)
+        change conjChar K ((r * s : ↥R) : G) i.1 = conjChar K (r : G) (conjChar K (s : G) i.1)
         rw [Subgroup.coe_mul, conjChar_mul] }
   have hsmul : ∀ (r : ↥R) (i : ι), (r • i).val = conjChar K (r : G) i.val := fun _ _ => rfl
   -- (3) The blocks.
@@ -110,13 +110,13 @@ theorem prime_card_and_finrank_of_abelian_frobenius_weight [Finite G] [IsAlgClos
           by_cases hχ : weightSpace ρ K χ = ⊥
           · rw [hχ]; exact bot_le
           · exact le_iSup (fun i : ι => weightSpace ρ K i.val) (⟨χ, hχ⟩ : ι)
-      show (⨆ i : ι, weightSpace ρ K i.val) = ⊤
+      change (⨆ i : ι, weightSpace ρ K i.val) = ⊤
       rw [heq]
       exact iSup_weightSpace_eq_top ρ K hKab hKcard
   -- (5) `R` permutes the blocks.
   have hperm : ∀ (h : ↥R) (i : ι), (W i).map (ρ (h : G)) = W (h • i) := by
     intro h i
-    show (weightSpace ρ K i.val).map (ρ (h : G)) = weightSpace ρ K (h • i).val
+    change (weightSpace ρ K i.val).map (ρ (h : G)) = weightSpace ρ K (h • i).val
     rw [hsmul h i]
     exact map_weightSpace ρ (h : G) i.val
   -- (6) The permutation is free (Frobenius ⟹ a nonidentity element fixes only the trivial char).

@@ -196,7 +196,7 @@ theorem SibleyDadeHypothesis.columnSum_mem_S
     intro hθtriv
     refine OddOrder.Peterfalvi.S06.chiRestrict_ne_trivialIrreducibleCharacter h46 hχ₂
       (Subtype.ext ?_)
-    show ClassFunction.restrict h46.K ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)
+    change ClassFunction.restrict h46.K ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)
         = trivialClassFunction ↥h46.K
     have h1 : ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)
         = trivialClassFunction ↥H := Subtype.ext_iff.mp hθtriv

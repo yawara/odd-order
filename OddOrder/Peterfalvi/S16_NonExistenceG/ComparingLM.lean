@@ -363,7 +363,7 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     have hφmem : dataL.zeta 0 ∈ dataL.typeIHyp.Sset :=
       dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)
     have hker : dataL.kernelIn = (maxNilpotentNormalHall L).subgroupOf L := by
-      show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = _
+      change (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = _
       rw [dataL.typeIHyp.typeI.typeF.H_eq]
     have hφdeg : dataL.zeta 0 (1 : ↥L)
         = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
@@ -394,7 +394,7 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     have hφmem : dataL.zeta 0 ∈ dataL.typeIHyp.Sset :=
       dataL.zeta_mem_Sset (Ne.symm dataL.ind1H_ne_zero)
     have hker : dataL.kernelIn = (maxNilpotentNormalHall L).subgroupOf L := by
-      show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = _
+      change (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = _
       rw [dataL.typeIHyp.typeI.typeF.H_eq]
     have hφdeg : dataL.zeta 0 (1 : ↥L)
         = ((((maxNilpotentNormalHall L).subgroupOf L).index : ℕ) : ℂ) := by
@@ -555,7 +555,7 @@ theorem typeICoherent78_complementIndex_eq_pq [Finite G]
   have hcomplD : Nat.card ↥dataL.kernelIn * Nat.card ↥dataL.C = Nat.card ↥Ldata.L :=
     dataL.hFrob.isComplement.card_mul_card
   have hce : (dataL.h78 hG).complementIndex = Nat.card ↥dataL.C := by
-    show Nat.card ↥Ldata.L / Nat.card dataL.kernel = Nat.card ↥dataL.C
+    change Nat.card ↥Ldata.L / Nat.card dataL.kernel = Nat.card ↥dataL.C
     rw [show Nat.card dataL.kernel = Nat.card ↥dataL.kernelIn from
         (dataL.kernelOrder_eq hG) ▸ rfl,
       ← hcomplD, Nat.mul_div_cancel_left _ Nat.card_pos]
@@ -593,14 +593,14 @@ theorem typeICoherent78_index_eq_pq [Finite G]
     ((maxNilpotentNormalHall Ldata.L).subgroupOf Ldata.L).index
       = hyp.base.p * hyp.base.q := by
   have hker : dataL.kernelIn = (maxNilpotentNormalHall Ldata.L).subgroupOf Ldata.L := by
-    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf Ldata.L = _
+    change (dataL.typeIHyp.typeI.typeF.H).subgroupOf Ldata.L = _
     rw [dataL.typeIHyp.typeI.typeF.H_eq]
   rw [← hker]
   -- `kernelIn.index = complementIndex` (both are `|L| / |H_L|`), then the complement order.
   have hmul : dataL.kernelIn.index * Nat.card ↥dataL.kernelIn = Nat.card ↥Ldata.L :=
     Subgroup.index_mul_card dataL.kernelIn
   have hce : (dataL.h78 hG).complementIndex = dataL.kernelIn.index := by
-    show Nat.card ↥Ldata.L / Nat.card dataL.kernel = dataL.kernelIn.index
+    change Nat.card ↥Ldata.L / Nat.card dataL.kernel = dataL.kernelIn.index
     rw [show Nat.card dataL.kernel = Nat.card ↥dataL.kernelIn from
         (dataL.kernelOrder_eq hG) ▸ rfl,
       ← hmul, Nat.mul_div_cancel _ Nat.card_pos]
@@ -614,7 +614,7 @@ theorem typeICoherent78_card_kernel_eq_h [Finite G]
     (dataL : TypeICoherent78Data nc.Ldata.L) :
     Nat.card ↥dataL.typeIHyp.H = nc.h := by
   have hHeq : dataL.typeIHyp.H = nc.Ldata.H := by
-    show dataL.typeIHyp.typeI.typeF.H = nc.Ldata.H
+    change dataL.typeIHyp.typeI.typeF.H = nc.Ldata.H
     rw [dataL.typeIHyp.typeI.typeF.H_eq, nc.Ldata.H_eq_LF]
   rw [nc.h_eq_card_H, hHeq]
 
@@ -1431,7 +1431,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · exact typeIHyp.typeI.typeF.H_eq
   · -- **Peterfalvi (7.6)/(14.10)**: the induced principal `ζ_{ind1H} = Ind_K 1_K` has
     -- degree `[M:K]` at `1` (`θ ind1H = 1_K` + `induce_trivialChar_apply_eq_index`).
-    show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
+    change ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
         (θ ind1H : ClassFunction _ ℂ) (1 : M)
         = (((maxNilpotentNormalHall M).subgroupOf M).index : ℂ)
     rw [htriv, ← typeIHyp.typeI.typeF.H_eq]
@@ -1447,7 +1447,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             (θ 0 : ClassFunction _ ℂ)
           = ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ ind1H : ClassFunction _ ℂ) from by rw [h0triv, htriv])).symm
-    show ClassFunction.inner
+    change ClassFunction.inner
         (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
           (θ 0 : ClassFunction _ ℂ))
         (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
@@ -1489,13 +1489,13 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hsmall : H78.smallIndex := by
       have hfrobB := OddOrder.Peterfalvi.S14.frobenius_two_mul_card_complement_add_one_le_card_kernel
         hFrobG hKodd hCodd hFrobG.ne_bot_kernel
-      show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+      change 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
       have hke : H78.kernelOrder = Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M) := by
         rw [hKcard]; rfl
       have hcompl : Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M) * Nat.card ↥C
           = Nat.card ↥M := hFrobG.isComplement.card_mul_card
       have hce : H78.complementIndex = Nat.card ↥C := by
-        show Nat.card ↥M / Nat.card typeIHyp.typeI.typeF.H = Nat.card ↥C
+        change Nat.card ↥M / Nat.card typeIHyp.typeI.typeF.H = Nat.card ↥C
         rw [← hKcard, ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
       rw [hke, hce]; exact hfrobB
     exact zetaNuRhoNormSqGeOfDade typeIHyp.toHypothesis71

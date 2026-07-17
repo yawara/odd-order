@@ -270,7 +270,7 @@ theorem caseA_source_degree_dvd_a_of_S0_witness
   -- Inertia containment `I(θ₀) ≤ H·C_U(S₀)`, hence `a ∣ [HU : I(θ₀)]`.
   have hcont : IrreducibleCharacter.inertia (G := ↥(huSub data)) (H := hInHu data) θ₀
       ≤ hInHu data ⊔ cuInHu caseA := by
-    show ClassFunction.inertia (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+    change ClassFunction.inertia (θ₀ : ClassFunction ↥(hInHu data) ℂ)
       ≤ hInHu data ⊔ cuInHu caseA
     rw [hform]
     exact inertia_le_hcuInHu caseA hreg
@@ -353,7 +353,7 @@ theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
     · rw [caseA.Hpart_orbit w, ← hφw] at hyHw
       exact Subgroup.mem_pointwise_smul_iff_inv_smul_mem.mp hyHw
     · rw [hθbarw, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
-      show θbar (φw (φw⁻¹ • y)) ≠ 1
+      change θbar (φw (φw⁻¹ • y)) ≠ 1
       simpa [MulAut.smul_def] using hyne
   -- The `M`-realization `m` of `rep_w` and the conjugated character `χ' = χ^m`.
   have hUW1M : data.typeP.U ⊔ data.typeP.W1 ≤ M := sup_le (U_le_M data) data.typeP.W1_le
@@ -388,10 +388,10 @@ theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
         ClassFunction.compHom_linearIrreducibleCharacter,
         ClassFunction.compHom_linearIrreducibleCharacter, ← hφw, ← hθbarw]
       rfl
-    show OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity _
+    change OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity _
       (χ' : ClassFunction ↥(huSub data) ℂ) _ ≠ 0
     rw [OddOrder.RepresentationTheory.ClassFunction.restrictionMultiplicity_def, htarget, hχ']
-    show ClassFunction.inner (ClassFunction.restrict (hInHu data)
+    change ClassFunction.inner (ClassFunction.restrict (hInHu data)
         (ClassFunction.conjBy (G := ↥M) (H := huSub data) m
           (χ : ClassFunction ↥(huSub data) ℂ)))
       (ClassFunction.compHom (hInHuConj data m) _) ≠ 0
@@ -401,7 +401,7 @@ theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
   -- `χ'(1) = χ(1) = d` (conjugation fixes the identity).
   have hd' : (χ' : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ) := by
     rw [hχ']
-    show (ClassFunction.conjBy (G := ↥M) (H := huSub data) m
+    change (ClassFunction.conjBy (G := ↥M) (H := huSub data) m
       (χ : ClassFunction ↥(huSub data) ℂ)) 1 = (d : ℂ)
     rw [ClassFunction.conjBy_apply, ← hd]
     exact congrArg _ (by simp)
@@ -784,7 +784,7 @@ theorem nineElevenOne_configuration (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [relIndex_cSub_U_eq_u chars]; exact _hE3
   by_contra hne
   have hne' : cSub data chief ≠ uprimeSub data := fun h => hne (by
-    show chars.C = chars.Uprime
+    change chars.C = chars.Uprime
     simp only [Section11CharacterData.C, Section11CharacterData.Uprime]; exact h)
   exact absurd hCU' (ne_of_lt (OddOrder.Peterfalvi.S07.relIndex_lt_relIndex_of_le_of_ne
     (uprimeSub_le_cSub data chief) (cSub_le_U data chief) hne'))
@@ -932,7 +932,7 @@ theorem caseA_centralizes_two_summands_fixes_char {data : TypesIIIIIIVSetup M}
       MonoidHom.eqLocus (χ.comp ((uActionHom data chief) g).toMonoidHom) χ := by
     rw [iSup_le_iff]
     intro k x hx
-    show (χ.comp ((uActionHom data chief) g).toMonoidHom) x = χ x
+    change (χ.comp ((uActionHom data chief) g).toMonoidHom) x = χ x
     rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
     by_cases hk : k = i ∨ k = j
     · rw [hcent k hk x hx]

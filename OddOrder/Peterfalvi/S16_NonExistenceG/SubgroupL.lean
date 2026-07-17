@@ -444,7 +444,7 @@ theorem fieldNormalizerComplementTransport_range (hyp : Hypothesis (G := G))
            obtain ⟨v, hv⟩ := MonoidHom.mem_range.mp (by rw [hμ_range]; exact u.2)
            exact ⟨v, Subtype.ext hv⟩⟩ with heUdef
     refine ⟨eU (⟨g, hg⟩ : ↥hyp.base.U), ?_⟩
-    show (hyp.base.U.subtype.comp eU.symm.toMonoidHom) (eU ⟨g, hg⟩) = g
+    change (hyp.base.U.subtype.comp eU.symm.toMonoidHom) (eU ⟨g, hg⟩) = g
     simp
 
 /-- **(14.7) σ-bridge assembly.**  Given the full Peterfalvi (14.2)(a) field model
@@ -495,7 +495,7 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
     ext s
     obtain ⟨v, hμv, hfUv⟩ :=
       fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range u
-    show fieldNormalizerKernelTransport hyp e
+    change fieldNormalizerKernelTransport hyp e
         ((OddOrder.BG.AppC.NormSet.normOneMulAction hyp.base.p hyp.base.q u) s) =
       fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u *
         fieldNormalizerKernelTransport hyp e s *
@@ -698,7 +698,7 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         Additive.ofMul ((conjHom c) (Additive.toMul a)) := by
     intro c a
     have h : MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c • a = ρ c a := by
-      show (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c)) a = ρ c a
+      change (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c)) a = ρ c a
       rw [Representation.asAlgebraHom_of]
     rw [h, hρ_apply]
   haveI hNeZero : NeZero (Nat.card ↥hyp.base.U : ZMod hyp.base.p) := by

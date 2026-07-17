@@ -61,12 +61,12 @@ lemma mem_conjSubgroup {x g : G} :
   constructor
   · rintro ⟨h, hh, rfl⟩
     have h1 : x⁻¹ * ((MulAut.conj x).toMonoidHom h) * x = h := by
-      show x⁻¹ * (x * h * x⁻¹) * x = h
+      change x⁻¹ * (x * h * x⁻¹) * x = h
       group
     rwa [h1]
   · intro hg
     refine ⟨x⁻¹ * g * x, hg, ?_⟩
-    show x * (x⁻¹ * g * x) * x⁻¹ = g
+    change x * (x⁻¹ * g * x) * x⁻¹ = g
     group
 
 /-- The Mackey coefficient datum at a representative `x`: the restriction of
@@ -79,13 +79,13 @@ def mackeyRes (ϕ : ↥H →* A) (x : G) :
         mem_conjSubgroup.mp (1 : ↥((conjSubgroup x H ⊓ K).subgroupOf K)).2.1⟩ : ↥H)
         = 1 := by
       ext
-      show x⁻¹ * _ * x = 1
+      change x⁻¹ * _ * x = 1
       norm_num
     rw [h1, map_one]
   map_mul' w₁ w₂ := by
     rw [← map_mul]
     refine congrArg ϕ (Subtype.ext ?_)
-    show x⁻¹ * _ * x = (x⁻¹ * _ * x) * (x⁻¹ * _ * x)
+    change x⁻¹ * _ * x = (x⁻¹ * _ * x) * (x⁻¹ * _ * x)
     push_cast
     group
 
@@ -156,7 +156,7 @@ lemma dosetFiberMap_bijective :
       obtain ⟨k₀, h₀, hk₀, hh₀, hout⟩ := DoubleCoset.mk_out_eq_mul K H g
       refine ⟨⟨DoubleCoset.mk K H g,
         ((⟨k₀⁻¹, K.inv_mem hk₀⟩ : ↥K) : ↥K ⧸ _)⟩, ?_⟩
-      show ((k₀⁻¹ * (DoubleCoset.mk K H g).out : G) : G ⧸ H) = ((g : G) : G ⧸ H)
+      change ((k₀⁻¹ * (DoubleCoset.mk K H g).out : G) : G ⧸ H) = ((g : G) : G ⧸ H)
       rw [hout, QuotientGroup.eq]
       have h7 : (k₀⁻¹ * (k₀ * g * h₀))⁻¹ * g = h₀⁻¹ := by group
       rw [h7]
@@ -181,9 +181,9 @@ lemma dosetFiberEquiv_smul (q : DoubleCoset.Quotient (K : Set G) H)
     dosetFiberEquiv ⟨q, u • r⟩ = (u : G) • dosetFiberEquiv ⟨q, r⟩ := by
   induction r using QuotientGroup.induction_on with
   | H w =>
-    show dosetFiberEquiv ⟨q, ((u * w : ↥K) : ↥K ⧸ _)⟩ = _
+    change dosetFiberEquiv ⟨q, ((u * w : ↥K) : ↥K ⧸ _)⟩ = _
     rw [dosetFiberEquiv_mk]
-    show _ = ((u : G) * ((w : G) * q.out) : G ⧸ H)
+    change _ = ((u : G) * ((w : G) * q.out) : G ⧸ H)
     apply congrArg
     push_cast
     group
@@ -249,7 +249,7 @@ private lemma diff_mackeySection (ϕ : ↥H →* A)
     unfold Subgroup.leftTransversals.diff
     refine Finset.prod_congr rfl fun c _ => ?_
     refine congrArg ϕ (Subtype.ext ?_)
-    show _ * _ = _
+    change _ * _ = _
     rw [IsComplement.leftQuotientEquiv_apply (mackeySection_spec s hs),
       IsComplement.leftQuotientEquiv_apply (mackeySection_spec s' hs')]
   have hdiff2 : ∀ q : DoubleCoset.Quotient (K : Set G) H,
@@ -263,7 +263,7 @@ private lemma diff_mackeySection (ϕ : ↥H →* A)
     unfold Subgroup.leftTransversals.diff
     refine Finset.prod_congr rfl fun r _ => ?_
     refine congrArg (mackeyRes ϕ q.out) (Subtype.ext ?_)
-    show _ * _ = _
+    change _ * _ = _
     rw [IsComplement.leftQuotientEquiv_apply (hs q),
       IsComplement.leftQuotientEquiv_apply (hs' q)]
   rw [hdiff1]
@@ -285,7 +285,7 @@ private lemma diff_mackeySection (ϕ : ↥H →* A)
     unfold mackeySection
     rw [hcoord]
   refine congrArg ϕ (Subtype.ext ?_)
-  show (γ (dosetFiberEquiv ⟨q, r⟩))⁻¹ * γ' (dosetFiberEquiv ⟨q, r⟩)
+  change (γ (dosetFiberEquiv ⟨q, r⟩))⁻¹ * γ' (dosetFiberEquiv ⟨q, r⟩)
     = q.out⁻¹ * (((s q r)⁻¹ * s' q r : ↥K) : G) * q.out
   rw [hγq, hγ'q]
   push_cast
@@ -343,7 +343,7 @@ theorem transfer_eq_prod_doubleCoset (ϕ : ↥H →* A)
         = khat * s ((dosetFiberEquiv (K := K) (H := H)).symm c).1
             ((dosetFiberEquiv (K := K) (H := H)).symm c).2 := by
       rw [hs'_def]
-      show smulSection khat (s ((dosetFiberEquiv (K := K) (H := H)).symm c).1)
+      change smulSection khat (s ((dosetFiberEquiv (K := K) (H := H)).symm c).1)
         (khat • ((dosetFiberEquiv (K := K) (H := H)).symm c).2) = _
       rw [smulSection, inv_smul_smul]
     rw [h8]

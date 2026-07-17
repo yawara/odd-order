@@ -1242,7 +1242,7 @@ theorem Hypothesis.C_eq_bot_of_c_eq_one [Finite G] (hyp : Hypothesis (G := G))
 /-- **`H = P` from (13.12)** — with `C = ⊥` the (13.5) subgroup `H = P C` collapses to `P`. -/
 theorem Hypothesis.H_eq_P_of_c_eq_one [Finite G] (hyp : Hypothesis (G := G))
     (hc1 : hyp.c = 1) : hyp.H = hyp.P := by
-  show hyp.P ⊔ hyp.C = hyp.P
+  change hyp.P ⊔ hyp.C = hyp.P
   rw [hyp.C_eq_bot_of_c_eq_one hc1, sup_bot_eq]
 
 /-- **`q ∤ |S′|` from (13.12)**: `|S′| = p^q·(u·c) = p^q·u`, with `q ∤ p^q`

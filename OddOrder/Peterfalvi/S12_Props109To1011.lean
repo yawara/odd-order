@@ -66,7 +66,7 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
     finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm ((χ₂ j)⁻¹))
   -- the column dual at `k` is the inverse dual at `j`
   have hχ₂k : χ₂ k = (χ₂ j)⁻¹ := by
-    show finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (finCongr hcardW2sub
+    change finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (finCongr hcardW2sub
         ((finCardEquivCharacterGroup _).symm ((χ₂ j)⁻¹)))) = (χ₂ j)⁻¹
     rw [show finCongr hcardW2sub.symm (finCongr hcardW2sub
           ((finCardEquivCharacterGroup _).symm ((χ₂ j)⁻¹)))
@@ -81,7 +81,7 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
       have hb0 : finCongr hcardW2sub.symm b = 0 := (finCardEquivCharacterGroup _).injective hb
       exact Fin.ext (by simpa using congrArg Fin.val hb0)
     · intro hb
-      show finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm b) = 1
+      change finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm b) = 1
       rw [hb, show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by apply Fin.ext; simp,
         finCardEquivCharacterGroup_zero]
   -- `k = 0 ↔ j = 0` (the Coq `aut_Iirr_eq0`)
@@ -125,7 +125,7 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
       rw [OddOrder.Peterfalvi.S06.omegaProdChar_inv, hχ₂k]
       exact congrArg
         (fun c => h.sdiffTICyclicHypothesis.omegaProdChar c ((χ₂ j)⁻¹)) hχ1inv
-    show ((h.sdiffTICyclicHypothesis.omegaProdChar
+    change ((h.sdiffTICyclicHypothesis.omegaProdChar
         (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1))) (χ₂ j)).comp e.toMonoidHom)⁻¹
       = (h.sdiffTICyclicHypothesis.omegaProdChar
         (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1))) (χ₂ k)).comp e.toMonoidHom

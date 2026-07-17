@@ -391,7 +391,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
     haveI : (R.subgroupOf M).FiniteIndex := ⟨fun h => hRsubM_idx (h ▸ dvd_zero q)⟩
     let RM : Sylow q ↥M := (hRp.comap_subtype (K := M)).toSylow hRsubM_idx
     have hRM_coe : (RM : Subgroup ↥M).map M.subtype = R := by
-      show ((hRp.comap_subtype (K := M)).toSylow hRsubM_idx : Subgroup ↥M).map M.subtype = R
+      change ((hRp.comap_subtype (K := M)).toSylow hRsubM_idx : Subgroup ↥M).map M.subtype = R
       rw [(hRp.comap_subtype (K := M)).toSylow_coe hRsubM_idx, Subgroup.comap_subtype,
         Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hRM]
     -- `R ≠ ⊥`: else `R.index = |G|`, which `q` divides (`q ∈ σ(M) ⊆ π(G)`), contradicting `hRidxG`.
@@ -628,7 +628,7 @@ theorem Msigma_meet_conjugate [Finite G] (hG : IsMinimalSimpleOdd G)
         _ = g⁻¹ * (y * (g * a * g⁻¹)) * g := by rw [hya]
         _ = (g⁻¹ * y * g) * a := by group
     · -- `(conj g)(g⁻¹ y g) = y`.
-      show g * (g⁻¹ * y * g) * g⁻¹ = y
+      change g * (g⁻¹ * y * g) * g⁻¹ = y
       group
   -- Main claim (a): `M_σ ⊓ M^g = ⊥`.
   have hpartA : S10.Msigma M ⊓ MulAut.conj g • M = ⊥ := by
@@ -834,7 +834,7 @@ private theorem centralizer_conj_smul (g : G) (H : Subgroup G) :
     obtain ⟨x, hx, rfl⟩ := hy
     have h1 := hc x hx
     rw [hinv c] at h1
-    show (MulAut.conj g) x * c = c * (MulAut.conj g) x
+    change (MulAut.conj g) x * c = c * (MulAut.conj g) x
     rw [MulAut.conj_apply]
     calc g * x * g⁻¹ * c = g * (x * (g⁻¹ * c * g)) * g⁻¹ := by group
       _ = g * ((g⁻¹ * c * g) * x) * g⁻¹ := by rw [h1]

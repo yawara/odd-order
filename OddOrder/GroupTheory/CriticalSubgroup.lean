@@ -744,7 +744,7 @@ theorem Omega.pow_eq_one_of_class_le_two (hp_odd : Odd p)
   have hle : Omega K p 1 ≤ omega1OfClassLeTwo K p hp_odd hcl := by
     rw [Omega, Subgroup.closure_le]
     intro x hx
-    show x ^ p = 1
+    change x ^ p = 1
     exact pow_one p ▸ hx
   simpa [omega1OfClassLeTwo] using hle hg
 

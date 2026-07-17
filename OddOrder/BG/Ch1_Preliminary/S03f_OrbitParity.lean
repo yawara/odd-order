@@ -291,7 +291,7 @@ theorem orbit_parity_contradiction
     φV hcopKV hKG_not_cyclic
   have hspan : (⨆ i : {Ki : Subgroup G // Pfam Ki}, (Vfam i).subgroupOf VG) = ⊤ := by
     rw [eq_top_iff, ← hspanRaw]
-    show Subgroup.closure _ ≤ _
+    change Subgroup.closure _ ≤ _
     rw [Subgroup.closure_le]
     rintro v ⟨Y, ⟨a, hYa⟩, hYfix⟩
     haveI hYnorm : Y.Normal := ⟨fun y hy g => by
@@ -347,7 +347,7 @@ theorem orbit_parity_contradiction
       set YG : Subgroup G := Y.map KG.subtype with hYGdef
       have hYG_le : YG ≤ KG := Subgroup.map_subtype_le Y
       have hYG_rel : YG.relIndex KG = q := by
-        show ((Y.map KG.subtype).comap KG.subtype).index = q
+        change ((Y.map KG.subtype).comap KG.subtype).index = q
         rw [Subgroup.comap_map_eq_self_of_injective KG.subtype_injective]
         exact hYq
       have hvfix : (v : G) ∈ Subgroup.centralizer (YG : Set G) := by
@@ -438,7 +438,7 @@ theorem orbit_parity_contradiction
       exact hVfam_stable j k hk x hx
     · intro x hx
       refine ⟨k⁻¹ * x * k, ?_, by
-        show k * (k⁻¹ * x * k) * k⁻¹ = x
+        change k * (k⁻¹ * x * k) * k⁻¹ = x
         group⟩
       have h7 := hVfam_stable j k⁻¹ (KG.inv_mem hk) x hx
       rwa [inv_inv] at h7
@@ -471,7 +471,7 @@ theorem orbit_parity_contradiction
         have hb' : b • i₀ = j := hb
         refine le_iSup₂ (f := fun j' (_ : j' ∈ MulAction.orbit (↥A) i₀) => Vfam j')
           ((⟨g, hgA⟩ : ↥A) • j) ⟨⟨g, hgA⟩ * b, ?_⟩
-        show (⟨g, hgA⟩ * b : ↥A) • i₀ = (⟨g, hgA⟩ : ↥A) • j
+        change (⟨g, hgA⟩ * b : ↥A) • i₀ = (⟨g, hgA⟩ : ↥A) • j
         rw [mul_smul, hb']
       · rw [hSdef]
         refine iSup₂_le fun j hj => ?_
@@ -485,7 +485,7 @@ theorem orbit_parity_contradiction
           (f := fun j' (_ : j' ∈ MulAction.orbit (↥A) i₀) =>
             (Vfam j').map (MulAut.conj (g : G)).toMonoidHom)
           ((⟨g, hgA⟩ : ↥A)⁻¹ • j) ⟨(⟨g, hgA⟩ : ↥A)⁻¹ * b, ?_⟩
-        show ((⟨g, hgA⟩ : ↥A)⁻¹ * b) • i₀ = (⟨g, hgA⟩ : ↥A)⁻¹ • j
+        change ((⟨g, hgA⟩ : ↥A)⁻¹ * b) • i₀ = (⟨g, hgA⟩ : ↥A)⁻¹ • j
         rw [mul_smul, hb']
     refine sup_le (sup_le (sup_le ?_ ?_) ?_) ?_
     · -- `V_G` centralizes `S ≤ V_G`
@@ -545,7 +545,7 @@ theorem orbit_parity_contradiction
       have hg2 : g • i₀ = j := hg
       have hg'2 : g' • j₀ = j := hg'
       refine ⟨g'⁻¹ * g, ?_⟩
-      show (g'⁻¹ * g) • i₀ = j₀
+      change (g'⁻¹ * g) • i₀ = j₀
       rw [mul_smul, hg2, ← hg'2, inv_smul_smul]
     -- disjointness of the sups via the averaging projections
     have hS₁S₂_bot : S₁ ⊓ S₂ = ⊥ := by
@@ -824,7 +824,7 @@ theorem orbit_parity_contradiction
     apply hj
     have hxAm : xA = b ^ m := by
       refine Subtype.ext ?_
-      show xG = ((b ^ m : ↥A) : G)
+      change xG = ((b ^ m : ↥A) : G)
       rw [← hm]
       rfl
     rw [hxAm]
@@ -952,7 +952,7 @@ theorem orbit_parity_contradiction
         obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hgz
         have h7 : (⟨g, hgA⟩ : ↥A) = xA ^ k := by
           refine Subtype.ext ?_
-          show g = ((xA ^ k : ↥A) : G)
+          change g = ((xA ^ k : ↥A) : G)
           rw [← hk]
           rfl
         rw [h7]

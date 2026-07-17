@@ -204,7 +204,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     have hP₀E3bot : P₀ ⊓ E₃ = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcopP₀E3).eq_bot
     have hcomm : ∀ (m : ↥P₀) (n : ↥E₃), Commute (P₀.subtype m) (E₃.subtype n) := by
       intro m n
-      show (m : G) * (n : G) = (n : G) * (m : G)
+      change (m : G) * (n : G) = (n : G) * (m : G)
       exact (Subgroup.mem_centralizer_iff.mp (hP₀cent m.2) (n : G) n.2).symm
     haveI : IsCyclic ↥D := by
       have hinj : Function.Injective (MonoidHom.noncommCoprod P₀.subtype E₃.subtype hcomm) :=
@@ -236,12 +236,12 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [SetLike.mem_coe] at ha hb
         refine ⟨⟨a, ha⟩, ?_⟩
         rw [MonoidHom.comp_apply]
-        show mk (Subgroup.inclusion h.E₁_le ⟨a, ha⟩) = mk e
+        change mk (Subgroup.inclusion h.E₁_le ⟨a, ha⟩) = mk e
         rw [hmkdef, QuotientGroup.mk'_eq_mk']
         refine ⟨⟨b, h.E₃_le hb⟩, ?_, ?_⟩
         · rw [Subgroup.mem_subgroupOf]; exact hb
         · apply Subtype.ext
-          show a * b = (e : G)
+          change a * b = (e : G)
           exact hab
     -- both `X` and `P₀` are disjoint from `E₃` (orders coprime), so inject into the quotient.
     have hcopXE3 : Nat.Coprime (Nat.card ↥X) (Nat.card ↥E₃) :=

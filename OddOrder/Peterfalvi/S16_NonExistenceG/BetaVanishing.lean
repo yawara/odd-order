@@ -365,7 +365,7 @@ theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         Additive.ofMul ((conjHom c) (Additive.toMul a)) := by
     intro c a
     have h : MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c • a = ρ c a := by
-      show (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c)) a = ρ c a
+      change (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c)) a = ρ c a
       rw [Representation.asAlgebraHom_of]
     rw [h, hρ_apply]
   haveI hNeZero : NeZero (Nat.card ↥hyp.base.V : ZMod hyp.base.q) := by

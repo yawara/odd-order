@@ -291,14 +291,14 @@ theorem isElementaryAbelian_map_of_isElementaryAbelian
   refine ⟨?_, ?_⟩
   · rintro ⟨_, a₁, ha₁, rfl⟩ ⟨_, a₂, ha₂, rfl⟩
     apply Subtype.ext
-    show f a₁ * f a₂ = f a₂ * f a₁
+    change f a₁ * f a₂ = f a₂ * f a₁
     rw [← f.map_mul, ← f.map_mul]
     have hcomm : (⟨a₁, ha₁⟩ : A) * ⟨a₂, ha₂⟩ = ⟨a₂, ha₂⟩ * ⟨a₁, ha₁⟩ :=
       hA.1 ⟨a₁, ha₁⟩ ⟨a₂, ha₂⟩
     exact congr_arg f (congr_arg Subtype.val hcomm)
   · rintro ⟨_, a, ha, rfl⟩
     apply Subtype.ext
-    show (f a) ^ p = 1
+    change (f a) ^ p = 1
     rw [← f.map_pow, ← f.map_one]
     have hpow : (⟨a, ha⟩ : A) ^ p = 1 := hA.2 ⟨a, ha⟩
     exact congr_arg f (congr_arg Subtype.val hpow)
@@ -850,7 +850,7 @@ theorem omega1ZCenterOpCore_isElementaryAbelian
   refine ⟨omega1ZCenterOpCore_comm, ?_⟩
   intro x
   apply Subtype.ext
-  show ((x : G) ^ p) = 1
+  change ((x : G) ^ p) = 1
   exact pow_p_eq_one_of_mem_omega1ZCenterOpCore x.2
 
 /-- **Isaacs Thm 7.6 Step 6 prep** (mmd L3881): `Z(P) ⊆ Z(U)` (in the image
@@ -871,12 +871,12 @@ theorem center_sylow_le_zCenterOpCoreSubgroup_of_oPiCorePrime_eq_bot
       ⟨⟨z', hz'_P⟩, hz'_center, rfl⟩
   -- ⟨z', hz_in_U⟩ ∈ Z(U) because z' commutes with each u ∈ U ⊆ P.
   refine ⟨⟨(z' : G), hz_in_U⟩, ?_, rfl⟩
-  show (⟨(z' : G), hz_in_U⟩ : ↥(OddOrder.Isaacs.Ch01.opCore p G)) ∈
+  change (⟨(z' : G), hz_in_U⟩ : ↥(OddOrder.Isaacs.Ch01.opCore p G)) ∈
       Subgroup.center (OddOrder.Isaacs.Ch01.opCore p G)
   rw [Subgroup.mem_center_iff]
   intro u
   apply Subtype.ext
-  show ((u : G) * (z' : G)) = ((z' : G) * (u : G))
+  change ((u : G) * (z' : G)) = ((z' : G) * (u : G))
   have hu_P : (u : G) ∈ (P : Subgroup G) := OddOrder.Isaacs.Ch01.opCore_le P u.2
   have hcomm : (⟨(u : G), hu_P⟩ : (P : Subgroup G)) * ⟨z', hz'_P⟩
       = ⟨z', hz'_P⟩ * ⟨(u : G), hu_P⟩ :=

@@ -424,7 +424,7 @@ theorem H_le_S [Finite G] (hyp : Hypothesis (G := G)) : hyp.H ≤ hyp.S := by
   have hUS : hyp.U ≤ hyp.S := by
     have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
     exact le_trans h1 (Subgroup.map_subtype_le _)
-  show hyp.P ⊔ hyp.C ≤ hyp.S
+  change hyp.P ⊔ hyp.C ≤ hyp.S
   refine sup_le ?_ ?_
   · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
   · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
@@ -1277,7 +1277,7 @@ theorem Hypothesis.Cprime_eq_bot (hyp : Hypothesis (G := G)) : hyp.Cprime = ⊥ 
     refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
     rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
     exact hCab.is_comm.comm a b
-  show derivedInG hyp.C = ⊥
+  change derivedInG hyp.C = ⊥
   rw [derivedInG, hcomm, Subgroup.map_bot]
 
 /-- **`(C')^#` is empty for the type-`P₂` maximal `S`** (immediate from `Cprime_eq_bot`).  Since
@@ -1344,7 +1344,7 @@ theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
   classical
   -- `H = P = S_F ≤ S_σ`.
   have hHP : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
-    show hyp.Sdata.H = hyp.P
+    change hyp.Sdata.H = hyp.P
     rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   have hPle : hyp.P ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
     rw [hyp.P_eq_SF]

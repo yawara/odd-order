@@ -330,7 +330,7 @@ private theorem frobenius_elemAbelian_c_aux
       refine LinearMap.ext fun v => ?_
       obtain ⟨u, hu, u', hu', rfl⟩ := Submodule.mem_sup.mp
         (show v ∈ U.toSubmodule ⊔ U'.toSubmodule by rw [hsup]; exact Submodule.mem_top)
-      show ρ g (u + u') = u + u'
+      change ρ g (u + u') = u + u'
       rw [map_add, hgU u hu, hgU' u' hu']
 
 /-- **BG Theorem 3.10 (c), elementary abelian module case** (issue 8013 piece 5).  For a Frobenius
@@ -502,7 +502,7 @@ theorem card_eq_pow_card_invariants_of_elemAbelian_general {p : ℕ} [Fact p.Pri
   haveI : Fintype (Additive M) := Fintype.ofFinite _
   haveI : Fintype ↥(Representation.invariants
     ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) := Fintype.ofFinite _
-  show Nat.card (Additive M) = (Nat.card ↥(Representation.invariants
+  change Nat.card (Additive M) = (Nat.card ↥(Representation.invariants
     ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))) ^ Nat.card ↥R
   have hM : Nat.card (Additive M) = p ^ finrank (ZMod p) (Additive M) := by
     rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]

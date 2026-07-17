@@ -387,11 +387,11 @@ theorem mem_span_columnDiff_of_mem_zSupportedSpan (h : Hypothesis46 A L) [NeZero
     AddMonoidHom.mk' (fun ψ => ψ (1 : ↥L)) (fun _ _ => rfl) with hev1
   have mem_apply_one : ∀ f ∈ certainTypeSet h k, ev1 f = ev1 (columnSum h k) := by
     rintro f ⟨χ₂, _, hdeg, rfl⟩
-    show (columnSum h χ₂ : ClassFunction ↥L ℂ) 1 = (columnSum h k : ClassFunction ↥L ℂ) 1
+    change (columnSum h χ₂ : ClassFunction ↥L ℂ) 1 = (columnSum h k : ClassFunction ↥L ℂ) 1
     rw [columnSum_apply_one, columnSum_apply_one]; exact hdeg
   -- the common degree `μ_k(1) ≠ 0`
   have d_ne : ev1 (columnSum h k) ≠ 0 := by
-    show (columnSum h k : ClassFunction ↥L ℂ) 1 ≠ 0
+    change (columnSum h k : ClassFunction ↥L ℂ) 1 ≠ 0
     rw [columnSum_apply_one]
     obtain ⟨d₀, hd₀pos, hd₀⟩ :=
       irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily k).mu 0)
@@ -424,7 +424,7 @@ theorem mem_span_columnDiff_of_mem_zSupportedSpan (h : Hypothesis46 A L) [NeZero
   obtain ⟨n, rfl⟩ := Submodule.mem_span_singleton.mp hz
   -- `φ(1) = 0` (supported off `1`)
   have hφ1 : ev1 φ = 0 := by
-    show φ (1 : ↥L) = 0
+    change φ (1 : ↥L) = 0
     by_contra hne
     have h1mem : (1 : ↥L) ∈ S04.supportInSubgroup A L :=
       hφsupp (ClassFunction.mem_support.mpr hne)
@@ -911,14 +911,14 @@ theorem certainTypeRImage_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   obtain ⟨b, i⟩ := p
   cases b
   · -- `(false, i) ↦ δ•ω_{χ₂,i}`; conjugate = `δ•ω_{χ₂⁻¹, rowInv i} = −((true, rowInv i))`
-    show ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+    change ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
         (((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂ i)
       = -((-((h.columnFamily χ₂).sign : ℂ)) • certainTypeOmegaSigma h χ₂⁻¹
           (rowInv h.toHypothesis i))
     rw [Int.cast_smul_eq_zsmul, ClassFunction.mapRingEquiv_zsmul,
       certainTypeOmegaSigma_conj_eq, neg_smul, neg_neg, Int.cast_smul_eq_zsmul]
   · -- `(true, i) ↦ −δ•ω_{χ₂⁻¹,i}`; conjugate = `−δ•ω_{χ₂, rowInv i} = −((false, rowInv i))`
-    show ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+    change ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
         ((-((h.columnFamily χ₂).sign : ℂ)) • certainTypeOmegaSigma h χ₂⁻¹ i)
       = -(((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂ (rowInv h.toHypothesis i))
     rw [show (-((h.columnFamily χ₂).sign : ℂ)) = ((-(h.columnFamily χ₂).sign : ℤ) : ℂ) from by

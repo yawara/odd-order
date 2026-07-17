@@ -658,9 +658,9 @@ private theorem card_le_prime_mul_card_centralizer_inf {p : ℕ} [Fact p.Prime] 
     rw [hBsub, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBP).toEquiv, hBcard]
   have horb_sub : MulAction.orbit (ConjAct R) bhat ⊆ (Bsub : Set R) := by
     rintro _ ⟨c, rfl⟩
-    show (c • bhat) ∈ (Bsub : Set R)
+    change (c • bhat) ∈ (Bsub : Set R)
     rw [SetLike.mem_coe, hBsub, Subgroup.mem_subgroupOf, ConjAct.smul_def]
-    show (ConjAct.ofConjAct c : R).val * b * ((ConjAct.ofConjAct c : R).val)⁻¹ ∈ B
+    change (ConjAct.ofConjAct c : R).val * b * ((ConjAct.ofConjAct c : R).val)⁻¹ ∈ B
     exact hBnorm _ (ConjAct.ofConjAct c).2 b hbB
   have hone_not : (1 : R) ∉ MulAction.orbit (ConjAct R) bhat := by
     rintro ⟨c, hc⟩

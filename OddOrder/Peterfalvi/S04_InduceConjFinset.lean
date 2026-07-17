@@ -624,7 +624,7 @@ theorem card_conjFiber_coset_eq_card_centralizer {K : Subgroup G} {a : G}
       left_inv := ?_
       right_inv := ?_ }
   · -- `a⁻¹·(y⁻¹gy) ∈ K`: from `y⁻¹gy ∈ K·a = a·K`.
-    show a⁻¹ * (y.1⁻¹ * g * y.1) ∈ K
+    change a⁻¹ * (y.1⁻¹ * g * y.1) ∈ K
     obtain ⟨h, hh, a', ha', hyeq⟩ := y.2
     rw [Set.mem_singleton_iff] at ha'
     simp only at hyeq
@@ -636,11 +636,11 @@ theorem card_conjFiber_coset_eq_card_centralizer {K : Subgroup G} {a : G}
     rw [hreduce]
     exact hh
   · -- `y·(a·(a⁻¹·(y⁻¹gy)))·y⁻¹ = g`
-    show y.1 * (a * (a⁻¹ * (y.1⁻¹ * g * y.1))) * y.1⁻¹ = g
+    change y.1 * (a * (a⁻¹ * (y.1⁻¹ * g * y.1))) * y.1⁻¹ = g
     group
   · -- `p.1.2⁻¹·g·p.1.2 ∈ K·a`: from `p.2(a·p.1)p.2⁻¹ = g`, `p.1∈K`.
     obtain ⟨⟨q1, q2⟩, hq1, hq2⟩ := p
-    show q2⁻¹ * g * q2 ∈ (↑K : Set G) * ({a} : Set G)
+    change q2⁻¹ * g * q2 ∈ (↑K : Set G) * ({a} : Set G)
     rw [Set.mem_mul]
     refine ⟨a * q1 * a⁻¹, ?_, a, Set.mem_singleton _, ?_⟩
     · -- `a·q1·a⁻¹ ∈ K` (`K` is normalized by `a`, which lies in `C_G(a)`)
@@ -657,7 +657,7 @@ theorem card_conjFiber_coset_eq_card_centralizer {K : Subgroup G} {a : G}
     apply Subtype.ext
     apply Prod.ext
     · -- `a⁻¹·(t⁻¹·g·t) = x` from `t(a·x)t⁻¹ = g`
-      show a⁻¹ * (t⁻¹ * g * t) = x
+      change a⁻¹ * (t⁻¹ * g * t) = x
       conv_lhs => rw [← ht]
       group
     · rfl
@@ -774,7 +774,7 @@ theorem induce_alphaB_apply_eq_alpha_mul_sum_conjL (hyp : Hypothesis G A L)
     have hbnotQ : ¬ ∃ l : L, (l : G) * a.1 * (l : G)⁻¹ = (b : G) := by
       intro hQ; exact hbQ (by rw [hsQ, Finset.mem_filter]; exact ⟨Finset.mem_univ _, hQ⟩)
     have hfiber0 : N b = 0 := by
-      show ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
+      change ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
         * ({(b : G)} : Set G))).card : ℂ) = 0
       norm_cast
       rw [Finset.card_eq_zero]
@@ -798,7 +798,7 @@ theorem induce_alphaB_apply_eq_alpha_mul_sum_conjL (hyp : Hypothesis G A L)
       = (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ := by
     refine ClassFunction.of_isConj (α : ClassFunction L ℂ) (isConj_iff.mpr ⟨l⁻¹, ?_⟩)
     apply Subtype.ext
-    show (l⁻¹ : L) * (b : G) * ((l⁻¹ : L) : G)⁻¹ = a.1
+    change (l⁻¹ : L) * (b : G) * ((l⁻¹ : L) : G)⁻¹ = a.1
     rw [← hl]; push_cast; group
   simp only [hN]
   rw [hαeq]
@@ -893,7 +893,7 @@ theorem card_cosetConjFiber_eq_card_centralizerInf {K : Subgroup G} {a : G}
     obtain ⟨-, hecomm⟩ := Subgroup.mem_inf.mp e.2
     have hge : Commute (e : G) a := Subgroup.mem_centralizer_singleton_iff.mp hecomm
     have hge' : (e : G)⁻¹ * a = a * (e : G)⁻¹ := hge.inv_left.eq
-    show ((e : G) * x₀)⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * a) * ((e : G) * x₀) = w
+    change ((e : G) * x₀)⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * a) * ((e : G) * x₀) = w
     rw [← hcx₀]
     calc ((e : G) * x₀)⁻¹ * (((e : G) * (c₀ : G) * (e : G)⁻¹) * a) * ((e : G) * x₀)
         = x₀⁻¹ * ((c₀ : G) * ((e : G)⁻¹ * a * (e : G))) * x₀ := by group
@@ -903,7 +903,7 @@ theorem card_cosetConjFiber_eq_card_centralizerInf {K : Subgroup G} {a : G}
   · -- left inverse: `j (i e) = e`
     intro e _
     apply Subtype.ext
-    show (e : G) * x₀ * (x₀ : G)⁻¹ = (e : G)
+    change (e : G) * x₀ * (x₀ : G)⁻¹ = (e : G)
     group
   · -- right inverse: `i (j p) = p`
     rintro ⟨⟨c, hcC⟩, ⟨x, hxK⟩⟩ hp
@@ -912,7 +912,7 @@ theorem card_cosetConjFiber_eq_card_centralizerInf {K : Subgroup G} {a : G}
     apply Prod.ext
     · -- first coordinate: `(x x₀⁻¹) c₀ (x x₀⁻¹)⁻¹ = c`
       apply Subtype.ext
-      show (x * (x₀ : G)⁻¹) * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ = c
+      change (x * (x₀ : G)⁻¹) * (c₀ : G) * (x * (x₀ : G)⁻¹)⁻¹ = c
       have hxx₀ := OddOrder.GroupTheory.mem_centralizer_of_coset_conj_eq (g := a) (H := K)
         hcop hxK hx₀K hcC hc₀C (by rw [hpeq, ← hcx₀])
       obtain ⟨-, hcomm⟩ := Subgroup.mem_inf.mp hxx₀
@@ -933,7 +933,7 @@ theorem card_cosetConjFiber_eq_card_centralizerInf {K : Subgroup G} {a : G}
       exact mul_right_cancel e3.symm
     · -- second coordinate: `(x x₀⁻¹) x₀ = x`
       apply Subtype.ext
-      show x * (x₀ : G)⁻¹ * (x₀ : G) = x
+      change x * (x₀ : G)⁻¹ * (x₀ : G) = x
       group
 
 /-- **Peterfalvi (2.1), the fiber factorization** (the long pole of (2.10) STEP 2).  Let `a`
@@ -1057,7 +1057,7 @@ theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
         have := (mem_conjFiber (g := g)).mp (Finset.mem_coe.mpr hq.1); simpa using this
       simp only [hS, Finset.mem_filter, Finset.mem_univ, true_and]
       -- S-condition: `(q.1 q.2)⁻¹ g (q.1 q.2) = q.2⁻¹ ((q.1⁻¹gq.1·a⁻¹)·a) q.2`
-      show (q.1 * (q.2 : G))⁻¹ * g * (q.1 * (q.2 : G))
+      change (q.1 * (q.2 : G))⁻¹ * g * (q.1 * (q.2 : G))
         = (q.2 : G)⁻¹ * ((q.1⁻¹ * g * q.1 * a⁻¹) * a) * (q.2 : G)
       rw [show (q.1⁻¹ * g * q.1 * a⁻¹) * a = q.1⁻¹ * g * q.1 by group]
       group
@@ -1067,11 +1067,11 @@ theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
         (Finset.mem_filter.mp hpS).2
       -- `(p.1 p.2.2⁻¹)·p.2.2 = p.1`, and the recovered `c = p.2.1`.
       apply Prod.ext
-      · show p.1 * (p.2.2 : G)⁻¹ * (p.2.2 : G) = p.1; group
+      · change p.1 * (p.2.2 : G)⁻¹ * (p.2.2 : G) = p.1; group
       apply Prod.ext
       · -- recovered centralizer component equals `p.2.1`
         apply Subtype.ext
-        show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹) * a⁻¹ = (p.2.1 : G)
+        change (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹) * a⁻¹ = (p.2.1 : G)
         rw [show (p.1 * (p.2.2 : G)⁻¹)⁻¹ * g * (p.1 * (p.2.2 : G)⁻¹)
             = (p.2.2 : G) * (p.1⁻¹ * g * p.1) * (p.2.2 : G)⁻¹ by group, hp]
         group
@@ -1079,7 +1079,7 @@ theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
     · -- right inverse `i (j q) = q`
       intro q hq
       apply Prod.ext
-      · show q.1 * (q.2 : G) * (q.2 : G)⁻¹ = q.1; group
+      · change q.1 * (q.2 : G) * (q.2 : G)⁻¹ = q.1; group
       · rfl
   rw [hSleft] at hSright
   exact hSright
@@ -1170,12 +1170,12 @@ theorem mem_nLStabilizerIn_insert_iff (a : {a : G // a ∈ A})
   have hfix : ∀ hx : (a : G) ∈ L, hyp.conjA ⟨(a : G), hx⟩ a = a := by
     intro hx
     apply Subtype.ext
-    show (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
+    change (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
     group
   have hfixinv : ∀ hx : (a : G) ∈ L, hyp.conjA ⟨(a : G), hx⟩⁻¹ a = a := by
     intro hx
     apply Subtype.ext
-    show (a : G)⁻¹ * (a : G) * ((a : G)⁻¹)⁻¹ = (a : G)
+    change (a : G)⁻¹ * (a : G) * ((a : G)⁻¹)⁻¹ = (a : G)
     group
   rw [mem_nLStabilizerIn, mem_nLStabilizerIn]
   constructor
@@ -1236,7 +1236,7 @@ theorem mobiusSummand_add_insert_eq_zero (hconj : hyp.HConjInvariant) (g : G)
   -- cast the multiplicative identity to ℂ: `fb * hib = fib * hb` (`hiB` and `insert_nonempty`
   -- give defeq `H(insert a B)`)
   have hmulC : fb * hib = fib * hb := by
-    show ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ)
+    change ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ)
         * (Nat.card (hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : ℂ)
       = ((conjFiber g ((↑(hIntersection hyp (insert a B) (Finset.insert_nonempty a B)) : Set G)
             * ({(a : G)} : Set G))).card : ℂ)
@@ -1261,7 +1261,7 @@ theorem singleton_mem_mobiusIndex (a : {a : G // a ∈ A}) :
   rw [Finset.mem_singleton] at hc
   rw [hc, Finset.mem_singleton]
   apply Subtype.ext
-  show (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
+  change (a : G) * (a : G) * (a : G)⁻¹ = (a : G)
   group
 
 /-- The toggle-`a` map `B ↦ B △ {a}`: removes `a` from `B` if present, else inserts it. -/
@@ -1317,7 +1317,7 @@ theorem sum_mobiusSummand_eq_singleton (hconj : hyp.HConjInvariant) (g : G)
         rw [add_comm]; exact this
       · rw [toggleA_of_mem haB, Finset.mem_erase, hyp.mem_mobiusIndex]
         refine ⟨fun hcontra => haB' ?_, hB'ne, hB'norm⟩
-        show a ∈ B.erase a
+        change a ∈ B.erase a
         rw [hcontra]; exact Finset.mem_singleton_self a
       · rw [toggleA_of_mem haB]
         rw [toggleA_of_not_mem haB', Finset.insert_erase haB]

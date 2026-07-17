@@ -74,7 +74,7 @@ theorem inducedFamily_closedUnderConjugate [Finite G] (M : Subgroup G) :
         (fun c : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
           (c : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)) h
     apply Subtype.ext
-    show (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+    change (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
       = trivialClassFunction ↥((derivedInG M).subgroupOf M)
     rw [← ClassFunction.conj_conj (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ), hcoe]
     exact trivialClassFunction_isReal
@@ -102,13 +102,13 @@ theorem inducedFamily_closedUnderMapRingEquiv [Finite G] (M : Subgroup G) (σ : 
     rw [IrreducibleCharacter.galoisMap_symm_galoisMap] at h'
     rw [h']
     apply Subtype.ext
-    show (IrreducibleCharacter.galoisMap σ.symm
+    change (IrreducibleCharacter.galoisMap σ.symm
         (trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M))
         : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
       = trivialClassFunction ↥((derivedInG M).subgroupOf M)
     ext x
     rw [IrreducibleCharacter.galoisMap_apply_apply]
-    show σ.symm ((trivialClassFunction ↥((derivedInG M).subgroupOf M) : _ → ℂ) x) = _
+    change σ.symm ((trivialClassFunction ↥((derivedInG M).subgroupOf M) : _ → ℂ) x) = _
     rw [trivialClassFunction_apply, map_one]
   · rw [hφeq, ClassFunction.mapRingEquiv_induce, IrreducibleCharacter.galoisMap_apply_coe]
 
@@ -214,7 +214,7 @@ theorem conjPerm_not_mem_conjByOrbit {K : Type*} [Group K] [Finite K] {H : Subgr
     fun η => ⟨IrreducibleCharacter.conjPerm ↥H η.1, conjPerm_mem_conjByOrbit hmem η.2⟩ with hf
   have hf2 : f ^ 2 = 1 := by
     funext η
-    show f (f η) = η
+    change f (f η) = η
     exact Subtype.ext (conjPerm_conjPerm η.1)
   have hmod := Equiv.Perm.card_fixedPoints_modEq (f := f) (p := 2) (n := 1) (by simpa using hf2)
   have hodd_orbit : Odd (Fintype.card ↥(IrreducibleCharacter.conjByOrbit (G := K) θ)) := by

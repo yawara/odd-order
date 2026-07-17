@@ -543,13 +543,13 @@ theorem IsElementaryAbelian.map_hom {p : ℕ} {N : Type*} [Group N] {H : Subgrou
     have hcomm : x' * y' = y' * x' :=
       Subtype.ext_iff.mp (hH.1 ⟨x', hx'⟩ ⟨y', hy'⟩)
     refine Subtype.ext ?_
-    show f x' * f y' = f y' * f x'
+    change f x' * f y' = f y' * f x'
     rw [← map_mul, ← map_mul, hcomm]
   · rintro ⟨x, hx⟩
     obtain ⟨x', hx', rfl⟩ := Subgroup.mem_map.mp hx
     have hpow : x' ^ p = 1 := Subtype.ext_iff.mp (hH.2 ⟨x', hx'⟩)
     refine Subtype.ext ?_
-    show (f x') ^ p = 1
+    change (f x') ^ p = 1
     rw [← map_pow, hpow, map_one]
 
 /-- Pulling back along an injective hom: if `H.map f` is elementary abelian, so

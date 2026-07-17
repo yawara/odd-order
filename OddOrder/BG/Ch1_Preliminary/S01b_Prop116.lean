@@ -101,7 +101,7 @@ theorem zpowers_mem_ker_restrict [IsMulCommutative A] (φ : A →* MulAut G) (a 
     {x : A} (hx : x ∈ Subgroup.zpowers a) :
     (isAInvariant_actionFixedBy φ a).restrict x = 1 := by
   ext g
-  show ((isAInvariant_actionFixedBy φ a).restrict x g : G) = (g : G)
+  change ((isAInvariant_actionFixedBy φ a).restrict x g : G) = (g : G)
   rw [OddOrder.Isaacs.Ch03.IsAInvariant.restrict_apply_val]
   have hg : (g : G) ∈ actionFixedPoints φ (Subgroup.zpowers a) := by
     rw [← actionFixedBy_eq_actionFixedPoints_zpowers]; exact g.2

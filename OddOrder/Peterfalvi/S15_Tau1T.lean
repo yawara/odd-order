@@ -299,7 +299,7 @@ theorem Hypothesis.induce_K_mem_zSpan_T [Finite G]
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- `K = QD ≤ T' = HU`.
   have hKderiv : hyp.K ≤ derivedInG hyp.T := by
-    show hyp.Q ⊔ hyp.D ≤ derivedInG hyp.T
+    change hyp.Q ⊔ hyp.D ≤ derivedInG hyp.T
     rw [hyp.T_deriv_eq_QV]
     exact sup_le le_sup_left (le_trans (hyp.D_eq ▸ inf_le_left) le_sup_right)
   have hKle : hyp.K.subgroupOf hyp.T ≤ HU := by
@@ -354,12 +354,12 @@ theorem Hypothesis.induce_K_mem_zSpan_T [Finite G]
     rw [OddOrder.Peterfalvi.S11.mem_sSet]
     refine ⟨s, ?_, rfl⟩
     -- `s ∈ xiSet data`: `hInHu data ⊄ ker s`, with `hInHu = (Q.subgroupOf T).subgroupOf HU`.
-    show ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
+    change ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥HU ℂ))
     have hHInHu : (OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU)
         = ((hyp.Q.subgroupOf hyp.T).subgroupOf HU : Set ↥HU) := by
       congr 1
-      show (data.H.subgroupOf hyp.T).subgroupOf HU = (hyp.Q.subgroupOf hyp.T).subgroupOf HU
+      change (data.H.subgroupOf hyp.T).subgroupOf HU = (hyp.Q.subgroupOf hyp.T).subgroupOf HU
       rw [hyp.toTypesIIIIIIVSetupT_H_eq hG hvd]
     rw [hHInHu]
     -- The generic kernel step: `θ'` is a constituent of `Res s` (coefficient `k > 0`), and
@@ -418,7 +418,7 @@ theorem Hypothesis.induce_K_mem_zSpan_sSet_irr_T [Finite G]
   letI : Invertible (Nat.card ↥HU : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hKderiv : hyp.K ≤ derivedInG hyp.T := by
-    show hyp.Q ⊔ hyp.D ≤ derivedInG hyp.T
+    change hyp.Q ⊔ hyp.D ≤ derivedInG hyp.T
     rw [hyp.T_deriv_eq_QV]
     exact sup_le le_sup_left (le_trans (hyp.D_eq ▸ inf_le_left) le_sup_right)
   have hKle : hyp.K.subgroupOf hyp.T ≤ HU := by
@@ -476,12 +476,12 @@ theorem Hypothesis.induce_K_mem_zSpan_sSet_irr_T [Finite G]
     intro s hks
     rw [OddOrder.Peterfalvi.S11.mem_sSet]
     refine ⟨s, ?_, rfl⟩
-    show ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
+    change ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥HU ℂ))
     have hHInHu : (OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU)
         = ((hyp.Q.subgroupOf hyp.T).subgroupOf HU : Set ↥HU) := by
       congr 1
-      show (data.H.subgroupOf hyp.T).subgroupOf HU = (hyp.Q.subgroupOf hyp.T).subgroupOf HU
+      change (data.H.subgroupOf hyp.T).subgroupOf HU = (hyp.Q.subgroupOf hyp.T).subgroupOf HU
       rw [hyp.toTypesIIIIIIVSetupT_H_eq hG hvd]
     rw [hHInHu]
     have hs : ClassFunction.inner

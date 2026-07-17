@@ -1182,7 +1182,7 @@ theorem CharacterDifferenceImage.nu_eq_mu_conj
   · -- `ν̄ = μ`, hence `ν = μ̄`.
     have hcoe : (hχ.nu : ClassFunction G ℂ).conj = (hχ.mu : ClassFunction G ℂ) :=
       congrArg (fun c : IrreducibleCharacter G => (c : ClassFunction G ℂ)) hcase
-    show (hχ.nu : ClassFunction G ℂ) = (hχ.mu : ClassFunction G ℂ).conj
+    change (hχ.nu : ClassFunction G ℂ) = (hχ.mu : ClassFunction G ℂ).conj
     rw [← hcoe, ClassFunction.conj_conj]
   · -- Otherwise the pairing equation reads `[μ̄ = μ] − 0 = 0 − 1`, impossible.
     exfalso

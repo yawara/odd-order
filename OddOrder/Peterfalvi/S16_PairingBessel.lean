@@ -150,11 +150,11 @@ theorem smallIndex : (data.h78 hG).smallIndex := by
       (Subgroup.card_subgroup_dvd_card data.C)
   have hfrobB := OddOrder.Peterfalvi.S14.frobenius_two_mul_card_complement_add_one_le_card_kernel
     data.hFrob hKodd hCodd data.hFrob.ne_bot_kernel
-  show 2 * (data.h78 hG).complementIndex + 1 ≤ (data.h78 hG).kernelOrder
+  change 2 * (data.h78 hG).complementIndex + 1 ≤ (data.h78 hG).kernelOrder
   have hcompl : Nat.card ↥data.kernelIn * Nat.card ↥data.C = Nat.card ↥L :=
     data.hFrob.isComplement.card_mul_card
   have hce : (data.h78 hG).complementIndex = Nat.card ↥data.C := by
-    show Nat.card ↥L / Nat.card data.kernel = Nat.card ↥data.C
+    change Nat.card ↥L / Nat.card data.kernel = Nat.card ↥data.C
     rw [show Nat.card data.kernel = Nat.card ↥data.kernelIn from
         (data.kernelOrder_eq hG) ▸ rfl,
       ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
@@ -164,7 +164,7 @@ theorem smallIndex : (data.h78 hG).smallIndex := by
 /-- `d_{ind1H} = 1` for the constructor-computed `hyp76.d`. -/
 theorem hyp76_d_ind1H_eq_one : (data.h78 hG).hyp76.d ((data.h78 hG).ind1H) = 1 := by
   haveI := data.kernelIn_normal
-  show ClassFunction.induce data.kernelIn (data.θ data.ind1H : ClassFunction _ ℂ) (1 : ↥L) /
+  change ClassFunction.induce data.kernelIn (data.θ data.ind1H : ClassFunction _ ℂ) (1 : ↥L) /
       ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L) = 1
   rw [← data.zeta_deg_match, div_self (induce_apply_one_ne_zero _ (data.θ 0))]
 
@@ -180,7 +180,7 @@ theorem hagree_hyp76 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   have hz0 : ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
     induce_apply_one_ne_zero _ (data.θ 0)
   have hdeq : (data.h78 hG).hyp76.d i = data.d i := by
-    show ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) /
+    change ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) /
         ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L) = data.d i
     rw [div_eq_iff hz0]; exact data.zeta_deg i
   have hsub : (data.h78 hG).hyp76.psiSupp i
@@ -188,7 +188,7 @@ theorem hagree_hyp76 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
         OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ
           (typeIA L data.typeIHyp.typeI) L) := by
     apply Subtype.ext
-    show data.zeta i - (data.h78 hG).hyp76.d i • data.zeta 0
+    change data.zeta i - (data.h78 hG).hyp76.d i • data.zeta 0
       = data.zeta i - data.d i • data.zeta 0
     rw [hdeq]
   rw [hsub, hdeq]
@@ -232,7 +232,7 @@ theorem zetaNuRhoNormSq_eq_normQuad (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
       data.zeta_zero_norm_one i hi0 hii
   · -- `d_i` is real.
     intro i
-    show star (ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) /
+    change star (ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) /
         ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L))
       = ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) /
         ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L)
@@ -241,7 +241,7 @@ theorem zetaNuRhoNormSq_eq_normQuad (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     exact fun i => induce_apply_one_star data.kernelIn (data.θ i)
   · -- `d_i = ζ_i(1)/e`.
     intro i
-    show ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) /
+    change ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) /
         ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L)
       = ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L)
         / ((data.h78 hG).complementIndex : ℂ)

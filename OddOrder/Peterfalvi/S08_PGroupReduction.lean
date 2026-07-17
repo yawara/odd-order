@@ -103,7 +103,7 @@ theorem exists_isPGroup_H_of_c2_of_card_le (hyp : SibleyDadeHypothesis G L H)
     have h1 : (a • x : ↥H) = (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a) x := by
       simp [MulDistribMulAction.toMulAut_apply]
     rw [h1]
-    show ((MulAut.conjNormal (H := H) (hyp.W1.subtype a)) x : ↥L) = _
+    change ((MulAut.conjNormal (H := H) (hyp.W1.subtype a)) x : ↥L) = _
     rw [MulAut.conjNormal_apply]; rfl
   -- convert the explicit-conjugation `hfix` to the smul form the reduction lemma consumes.
   have hfix' : ∀ w : ↥hyp.W1, w ≠ 1 → ∀ x : ↥H, w • x = x → x ∈ commutator ↥H := by
@@ -318,7 +318,7 @@ theorem commutator_ne_bot_of_Xset_commutator_nonempty (hyp : SibleyDadeHypothesi
   have hcommbot : (⁅H, H⁆ : Subgroup ↥L) = ⊥ :=
     (Subgroup.subgroupOf_eq_bot.mp hbot).eq_bot_of_le (Subgroup.commutator_le_left H H)
   have hXempty : hyp.Xset ⁅H, H⁆ = ∅ := by
-    show hyp.S \ hyp.SsubFiltration ⁅H, H⁆ = ∅
+    change hyp.S \ hyp.SsubFiltration ⁅H, H⁆ = ∅
     rw [hcommbot, hyp.SsubFiltration_bot, Set.sdiff_self]
   rw [hXempty] at hXne
   exact Set.not_nonempty_empty hXne

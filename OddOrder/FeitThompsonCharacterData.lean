@@ -182,11 +182,11 @@ noncomputable def hyp46Smp :
         (fun l _ ha => OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha)
     tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis tp.Sdata hG.odd
     tic_W1 := by
-      show tp.Sdata.W1 = _
+      change tp.Sdata.W1 = _
       rw [certainTypeS_W1_eq, Subgroup.map_subgroupOf_eq_of_le mp.K_le_S,
         tp.Sdata_W1_eq, tp.W1_eq_K hG]
     tic_W2 := by
-      show tp.Sdata.W2 = _
+      change tp.Sdata.W2 = _
       rw [certainTypeS_W2_eq, Subgroup.map_subgroupOf_eq_of_le (kstar_le_S hG mp),
         tp.Sdata_W2_eq, tp.W2_eq_Kstar hG]
     tic_V := rfl
@@ -244,11 +244,11 @@ noncomputable def hyp46SmpCore :
     -- The structural proofs are verbatim copies of the `hyp46Smp` fields so this core remains
     -- definitionally independent of the full `A₀(S)`-Dade package.
     tic_W1 := by
-      show tp.Sdata.W1 = _
+      change tp.Sdata.W1 = _
       rw [certainTypeS_W1_eq, Subgroup.map_subgroupOf_eq_of_le mp.K_le_S,
         tp.Sdata_W1_eq, tp.W1_eq_K hG]
     tic_W2 := by
-      show tp.Sdata.W2 = _
+      change tp.Sdata.W2 = _
       rw [certainTypeS_W2_eq, Subgroup.map_subgroupOf_eq_of_le (kstar_le_S hG mp),
         tp.Sdata_W2_eq, tp.W2_eq_Kstar hG]
     tic_V := rfl
@@ -438,7 +438,7 @@ theorem omegaS_eq_omega_omegaSChar (i : Fin tp.q) (j : Fin tp.p) :
   ext w
   simp only [omegaS, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
     Peterfalvi.S06.Hypothesis.chiColumn, Peterfalvi.S05.TICyclicHypothesis.omega_apply,
-    omegaSChar, MonoidHom.comp_apply]
+    omegaSChar]
   rfl
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
@@ -604,7 +604,7 @@ theorem tau3W_omegaS_intCast_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
     (tiCyclicWDadeApp hG mp tp) (omegaSChar hG mp tp i j) hcop
   refine ⟨n, ?_⟩
   rw [omegaS_eq_omega_omegaSChar]
-  show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g = _
+  change (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g = _
   rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   exact hn
 
@@ -620,7 +620,7 @@ theorem omegaS_principal_eq_trivial :
     rw [omegaSChar, h0, (mp.certainTypeS hG).w1CharEquiv_zero, chi2enum_zero]
     apply MonoidHom.ext
     intro w
-    show ((mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar 1 1
+    change ((mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar 1 1
       ((gridEquivE hG mp tp).toMonoidHom w) : ℂˣ) = 1
     rw [(mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_one, MonoidHom.one_apply]
   rw [omegaS_eq_omega_omegaSChar, hchar]
@@ -775,7 +775,7 @@ theorem tau3W_omegaS_pair_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
     rw [OddOrder.Peterfalvi.S06.galoisMap_conj_omega]
     exact congrArg _ (omegaSChar_finNeg hG mp tp i j)
   rw [omegaS_eq_omega_omegaSChar, omegaS_eq_omega_omegaSChar]
-  show (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g
+  change (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g
     = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _ g
   rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply,
     OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply, homega,
@@ -808,7 +808,7 @@ theorem tau3W_omegaS_complete_vanish (χ : ClassFunction G ℂ)
       ((tiCyclicW hG mp tp).omegaProdChar a b)
     rw [(tiCyclicW hG mp tp).omegaProdEquiv_symm_omegaProdChar a b] at h1
     rw [← h1, ← hij]
-    show _ = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _
+    change _ = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   rw [OddOrder.RepresentationTheory.inner_conj_symm _ χ, hchi, horth i j, star_zero]
 
@@ -875,7 +875,7 @@ theorem omegaSChar_row_align (i : Fin tp.q) (j : Fin tp.p) :
           omegaS_apply_of_mem_W1_col_eq hG mp tp i ⟨0, tp.p_prime.pos⟩ j w hw,
           ← omegaSChar_val hG mp tp i j w])
     refine h1.trans ((DFunLike.congr_fun hpair w).symm.trans ?_)
-    show _ * ((tiCyclicW hG mp tp).omegaProdEquiv.symm
+    change _ * ((tiCyclicW hG mp tp).omegaProdEquiv.symm
         (omegaSChar hG mp tp i j)).2 ((tiCyclicW hG mp tp).wSnd w)
       = _ * (1 : (tiCyclicW hG mp tp).W2.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
           ((tiCyclicW hG mp tp).wSnd w)
@@ -890,7 +890,7 @@ theorem omegaSChar_row_align (i : Fin tp.q) (j : Fin tp.p) :
         rw [omegaSChar_val hG mp tp _ _ w,
           omegaS_col_zero_apply_of_mem_W2 hG mp tp i w hw, Units.val_one])
     rw [h1]
-    show (1 : ℂˣ) = ((tiCyclicW hG mp tp).omegaProdEquiv.symm
+    change (1 : ℂˣ) = ((tiCyclicW hG mp tp).omegaProdEquiv.symm
         (omegaSChar hG mp tp i j)).1 ((tiCyclicW hG mp tp).wFst w)
       * (1 : (tiCyclicW hG mp tp).W2.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
           ((tiCyclicW hG mp tp).wSnd w)
@@ -917,7 +917,7 @@ theorem omegaSChar_col_align (i : Fin tp.q) (j : Fin tp.p) :
         rw [omegaSChar_val hG mp tp _ _ w,
           omegaS_row_zero_apply_of_mem_W1 hG mp tp j w hw, Units.val_one])
     rw [h1]
-    show (1 : ℂˣ) = (1 : (tiCyclicW hG mp tp).W1.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
+    change (1 : ℂˣ) = (1 : (tiCyclicW hG mp tp).W1.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
         ((tiCyclicW hG mp tp).wFst w)
       * ((tiCyclicW hG mp tp).omegaProdEquiv.symm
           (omegaSChar hG mp tp i j)).2 ((tiCyclicW hG mp tp).wSnd w)
@@ -932,7 +932,7 @@ theorem omegaSChar_col_align (i : Fin tp.q) (j : Fin tp.p) :
           omegaS_apply_of_mem_W2_row_eq hG mp tp ⟨0, tp.q_prime.pos⟩ i j w hw,
           ← omegaSChar_val hG mp tp i j w])
     refine h1.trans ((DFunLike.congr_fun hpair w).symm.trans ?_)
-    show ((tiCyclicW hG mp tp).omegaProdEquiv.symm
+    change ((tiCyclicW hG mp tp).omegaProdEquiv.symm
         (omegaSChar hG mp tp i j)).1 ((tiCyclicW hG mp tp).wFst w) * _
       = (1 : (tiCyclicW hG mp tp).W1.subgroupOf (tiCyclicW hG mp tp).W →* ℂˣ)
           ((tiCyclicW hG mp tp).wFst w) * _
@@ -997,7 +997,7 @@ theorem tau3W_omegaS_fourcorner_vanish (i : Fin tp.q) (j : Fin tp.p)
       ((tiCyclicW hG mp tp).omegaProdChar pr.1 pr.2)
     rw [(tiCyclicW hG mp tp).omegaProdEquiv_symm_omegaProdChar pr.1 pr.2] at h1
     rw [← h1, ← hchar, omegaS_eq_omega_omegaSChar]
-    show _ = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _
+    change _ = (tiCyclicW hG mp tp).sigmaIntegral rfl (tiCyclicWDadeApp hG mp tp) _
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   have hc11 := hcorner i j (A, B) hpair.symm
   have hcA1 := hcorner i ⟨0, tp.p_prime.pos⟩ (A, 1) (omegaSChar_row_align hG mp tp i j)

@@ -532,7 +532,7 @@ theorem zSpan_Sset_support_subset (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hgH : g ∈ data.kernelIn := hsuppH φ hφ hg
   have hg1 : g ≠ 1 := by
     rintro rfl; exact (ClassFunction.mem_support.mp hg) h1
-  show g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L
+  change g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L
   exact (mem_supportInSubgroup_sharp_subgroupOf_iff data.kernel
     (data.typeIA_eq_sharp) g).mpr ⟨hgH, hg1⟩
 
@@ -697,7 +697,7 @@ sharp Fitting kernel). -/
 theorem typeIA_eq_A1 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     typeIA L data.typeIHyp.typeI = A1 L PeterfalviType.I := by
   rw [data.typeIA_eq_sharp]
-  show (data.kernel : Set G) \ {1} = sharpSubgroup (maxNilpotentNormalHall L)
+  change (data.kernel : Set G) \ {1} = sharpSubgroup (maxNilpotentNormalHall L)
   rw [show data.kernel = maxNilpotentNormalHall L from data.typeIHyp.typeI.typeF.H_eq]
   rfl
 
@@ -763,7 +763,7 @@ theorem zeta_ne_conj_at {i : Fin (data.n + 1)} (hi : i ≠ data.ind1H)
   have hdeg : (data.h78 hG).hyp76.zeta i (1 : ↥L)
       = ((data.kernelIn).index : ℂ) * (di : ℂ) := by
     rw [data.h78_zeta_eq]
-    show ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) = _
+    change ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) = _
     rw [ClassFunction.induce_apply_one, hdi]
   have hne_triv : (⟨(data.h78 hG).hyp76.zeta i, hirr⟩ :
       IrreducibleCharacter ↥L) ≠ trivialIrreducibleCharacter _ := by

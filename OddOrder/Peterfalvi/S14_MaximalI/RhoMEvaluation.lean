@@ -154,7 +154,7 @@ theorem counterexample_psi_constant_on_signalizer_coset [Finite G]
     have hyNF : y ∈ hypN.H := by
       have hyMσ : y ∈ OddOrder.BG.Ch3.S10.Msigma N := (Subgroup.mem_inf.mp hyKer).1
       have hyNF' : y ∈ maxNilpotentNormalHall N := hNFeq ▸ hyMσ
-      show y ∈ hypN.typeI.typeF.H
+      change y ∈ hypN.typeI.typeF.H
       rw [hypN.typeI.typeF.H_eq]
       exact hyNF'
     exact hconstN y hyNF
@@ -508,7 +508,7 @@ theorem dadeSupport_restrict_subset_ftThickenedSupport [Finite G] {M : Subgroup 
 maximal is the sharp kernel `H^#` (`H = M_F = mainSubgroup`), via the `H_eq` identification. -/
 theorem A1_eq_sharpSubgroup_H {M : Subgroup G} (hyp : Hypothesis M) :
     A1 M PeterfalviType.I = sharpSubgroup hyp.typeI.typeF.H := by
-  show sharpSubgroup (mainSubgroup M PeterfalviType.I) = _
+  change sharpSubgroup (mainSubgroup M PeterfalviType.I) = _
   rw [show mainSubgroup M PeterfalviType.I = maxNilpotentNormalHall M from rfl,
     hyp.typeI.typeF.H_eq]
 

@@ -197,10 +197,10 @@ theorem normalizer_W2_le_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [h] at key; simp only [mul_one, inv_mul_cancel] at key
     exact hane key
   have ha_sharp : a ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.S := by
-    show a ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
+    change a ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
     exact ⟨hW2F haW2, hane⟩
   have hga_sharp : g * a * g⁻¹ ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.S := by
-    show g * a * g⁻¹ ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
+    change g * a * g⁻¹ ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
     exact ⟨hW2F hgaW2, hgane⟩
   have hgN : g ∈ Subgroup.normalizer
       (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) :=

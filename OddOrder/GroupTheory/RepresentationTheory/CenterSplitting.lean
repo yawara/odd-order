@@ -70,7 +70,7 @@ theorem mem_center_pi {f : ∀ i, C i} :
   · intro h g
     simp only [Subalgebra.mem_center_iff] at h
     funext i
-    show g i * f i = f i * g i
+    change g i * f i = f i * g i
     exact h i (g i)
 
 /-- **The centre of a product algebra is the product of the centres**, as an `R`-algebra

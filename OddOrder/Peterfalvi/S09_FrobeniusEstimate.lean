@@ -129,7 +129,7 @@ theorem hzeta0nu [Fintype G] [Invertible (Nat.card G : ℂ)]
           (c : ClassFunction ↥((F.H i).subgroupOf (F.L i)) ℂ)) h
       simpa using h2
     apply Subtype.ext
-    show (θ0 : ClassFunction ↥((F.H i).subgroupOf (F.L i)) ℂ)
+    change (θ0 : ClassFunction ↥((F.H i).subgroupOf (F.L i)) ℂ)
       = trivialClassFunction ↥((F.H i).subgroupOf (F.L i))
     rw [← ClassFunction.conj_conj (θ0 : ClassFunction ↥((F.H i).subgroupOf (F.L i)) ℂ), hcoe]
     exact trivialClassFunction_isReal
@@ -360,12 +360,12 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
   have hsmall : H78.smallIndex := by
     have hfrob := hFrob.two_mul_card_complement_add_one_le_card_kernel hKodd hCodd
       hFrob.ne_bot_kernel
-    show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+    change 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
     have hke : H78.kernelOrder = Nat.card ↥((F.H i).subgroupOf (F.L i)) := by
-      show Nat.card ↥(F.H i) = Nat.card ↥((F.H i).subgroupOf (F.L i))
+      change Nat.card ↥(F.H i) = Nat.card ↥((F.H i).subgroupOf (F.L i))
       exact hKcard.symm
     have hce : H78.complementIndex = Nat.card ↥C := by
-      show Nat.card ↥(F.L i) / Nat.card ↥(F.H i) = Nat.card ↥C
+      change Nat.card ↥(F.L i) / Nat.card ↥(F.H i) = Nat.card ↥C
       rw [← hKcard, ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
     rw [hke, hce]; exact hfrob
   -- Feed the bundled (7.8.b) producer.  `hzeta0nu` is stated for the literal `F.coherence`; fold it
@@ -395,10 +395,10 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
             (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))))
           ((F.hypothesis71 i).chiRhoCF (coh.extension
             (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))))).re := by
-      show (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re = _
+      change (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re = _
       have hzr : H78.zetaNuRho = (F.hypothesis71 i).chiRhoCF (coh.extension
           (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))) := by
-        show (F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRhoCF (coh.extension
+        change (F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRhoCF (coh.extension
           (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))) = _
         rw [F.sibleyToHypothesis71_chiRhoCF_eq]
       rw [hzr]

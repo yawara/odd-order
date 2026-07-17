@@ -233,7 +233,7 @@ theorem Hypothesis.inner_tau1_zeta_self_eq_one [Finite G] [Fintype G] {M : Subgr
     ClassFunction.inner (coh.tau1 params.zeta) (coh.tau1 params.zeta) = 1 := by
   have hspan : params.zeta ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) hyp.Sset :=
     Submodule.subset_span params.zeta_mem_S
-  show ClassFunction.inner (coh.coherent.extension params.zeta)
+  change ClassFunction.inner (coh.coherent.extension params.zeta)
     (coh.coherent.extension params.zeta) = 1
   rw [coh.coherent.extension_inner_eq params.zeta params.zeta hspan hspan]
   simpa using OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
@@ -942,7 +942,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
       θ i ≠ trivialIrreducibleCharacter ↥K := by
     intro i hi hcontra
     apply hi; apply hinj
-    show ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+    change ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
       = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
     rw [hcontra, htriv]
   have hSmem : ∀ i : Fin (n + 1), i ≠ ind1H →
@@ -1017,7 +1017,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
           ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
             - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ),
             (ClassFunction.mem_supportedSubmodule).mpr (hsupp_full i)⟩ := by
-      show ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict Set.subset_union_left
+      change ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict Set.subset_union_left
           hnorm).toDadeMap ⟨_, psi_support i⟩ = _
       rw [OddOrder.Peterfalvi.S04.FullDadeIsometryData.restrict_apply]
       exact congrArg _ (Subtype.ext rfl)
@@ -1032,7 +1032,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     rw [hcieq, hcardM, Nat.mul_div_cancel _ Nat.card_pos]
   have hko : H78.kernelOrder = Nat.card ↥(derivedInG M) := rfl
   have hsmall : H78.smallIndex := by
-    show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+    change 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
     rw [hci, hko]
     have hMp := hyp.card_derived_ge hG
     have hw2 : 0 < hyp.w2 := Nat.card_pos
@@ -1057,7 +1057,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
       rw [← hθ0'coe]
       simpa using congrArg (fun c : IrreducibleCharacter ↥K => (c : ClassFunction ↥K ℂ)) h
     apply Subtype.ext
-    show (θ 0 : ClassFunction ↥K ℂ) = trivialClassFunction ↥K
+    change (θ 0 : ClassFunction ↥K ℂ) = trivialClassFunction ↥K
     rw [← ClassFunction.conj_conj (θ 0 : ClassFunction ↥K ℂ), hcoe]
     exact trivialClassFunction_isReal
   have hnorm0 : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
@@ -1098,7 +1098,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
     have hmem := (mem_supportInSubgroup_sharp_subgroupOf_iff (derivedInG M) hAH x).mpr
       ⟨hxd.1, hxd.2⟩
-    show x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M
+    change x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem ⊢
     exact Set.mem_union_left _ hmem
   have hζ0_1 : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
@@ -1137,14 +1137,14 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
       hnorm0 a ha hsmall
   -- **Norm bridge** `chiRhoNormSq = zetaNuRhoNormSq` (mirrors S16's norm-bridge lemma).
   have hpsi : coh.tau1 params.zeta = H78.nu (H78.hyp76.zeta H78.zetaDistinct) := by
-    show coh.tau1 params.zeta = coh.tau1 (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+    change coh.tau1 params.zeta = coh.tau1 (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
     rw [hθ0eq]
   have hnorm_eq : (hyp.toFamilyHypothesis71).chiRhoNormSq (coh.tau1 params.zeta) 0
       = H78.zetaNuRhoNormSq := by
     have hH71 : H78.hyp76.hyp71 = hyp.toHypothesis71 := rfl
     have hcf : ((hyp.toFamilyHypothesis71).hyp71 0).chiRhoCF (coh.tau1 params.zeta)
         = H78.zetaNuRho := by
-      show hyp.toHypothesis71.chiRhoCF (coh.tau1 params.zeta) = H78.zetaNuRho
+      change hyp.toHypothesis71.chiRhoCF (coh.tau1 params.zeta) = H78.zetaNuRho
       rw [Hypothesis78.zetaNuRho, hH71, ← hpsi]
     simp only [FamilyHypothesis71.chiRhoNormSq, Hypothesis78.zetaNuRhoNormSq, hcf]
     congr 1

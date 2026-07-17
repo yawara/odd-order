@@ -1192,7 +1192,7 @@ theorem mem_span_scaledDiff_of_mem_zSupportedSpan
     induction hδ using Submodule.span_induction with
     | mem x hx =>
         obtain ⟨f, _, d, hfd, rfl⟩ := hx
-        show (f - d • χ₁) (1 : ↥L) = 0
+        change (f - d • χ₁) (1 : ↥L) = 0
         rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ d χ₁, ClassFunction.smul_apply,
           hfd, sub_self]
     | zero => exact map_zero ev1
@@ -1210,7 +1210,7 @@ theorem mem_span_scaledDiff_of_mem_zSupportedSpan
   obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.mp (hspan_le hφspan)
   obtain ⟨n, rfl⟩ := Submodule.mem_span_singleton.mp hz
   have hφ1 : ev1 φ = 0 := by
-    show φ (1 : ↥L) = 0
+    change φ (1 : ↥L) = 0
     by_contra hne
     have h1mem := hφsupp (ClassFunction.mem_support.mpr hne)
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h1mem

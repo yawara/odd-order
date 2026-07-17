@@ -107,7 +107,7 @@ theorem CharacterDegreeCore.exists_caseB_data_eta10_H_core [Finite G]
         rw [hyp.S_deriv_eq_PU]
         exact le_sup_right
       exact le_trans h1 (Subgroup.map_subtype_le _)
-    show hyp.P ⊔ hyp.C ≤ hyp.S
+    change hyp.P ⊔ hyp.C ≤ hyp.S
     refine sup_le ?_ ?_
     · rw [hyp.P_eq_SF]
       exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
@@ -183,7 +183,7 @@ theorem CharacterDegreeCore.exists_caseB_data_eta10_H_core [Finite G]
   · intro x hx
     obtain ⟨hxH, hx1⟩ := (Set.Finite.mem_toFinset _).mp hx
     have hxS : x ∈ hyp.S := hHS hxH
-    show hyp.eta10 x = if h : x ∈ hyp.S then αS ⟨x, h⟩ else 0
+    change hyp.eta10 x = if h : x ∈ hyp.S then αS ⟨x, h⟩ else 0
     rw [dif_pos hxS]
     have hxsharp : ((⟨x, hxS⟩ : ↥hyp.S) : G) ∈
         OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=

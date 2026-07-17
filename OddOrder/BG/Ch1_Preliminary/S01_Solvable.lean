@@ -278,7 +278,7 @@ theorem coprime_stabilizes_chain_trivial
       exact stepdown i (ih (i + 1) (by omega)) a x hx
   intro a
   refine MulEquiv.ext (fun x => ?_)
-  show (ψ a) x = x
+  change (ψ a) x = x
   exact key n 0 (by omega) a x (by rw [hs0]; exact Subgroup.mem_top x)
 
 open OddOrder.Isaacs.Ch03 (IsAInvariant) in
@@ -1222,7 +1222,7 @@ theorem oPiPrimeCore_centralizer_le_oPiPrimeCore
     have hxCbar : x ∈ Cbar := hKC hx
     have hmem : (⟨x, hxCbar⟩ : ↥Cbar) ∈ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar :=
       hK_le_oPiCore (by rw [Subgroup.mem_subgroupOf]; exact hx)
-    show x ∈ (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar).map Cbar.subtype
+    change x ∈ (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥Cbar).map Cbar.subtype
     exact Subgroup.mem_map.mpr ⟨⟨x, hxCbar⟩, hmem, rfl⟩
   -- (F) special case at `Ḡ`: `O_{p'}(Cbar) = ⊥` (because `O_{p'}(Ḡ) = ⊥`).
   have hbarbot : OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ (G ⧸ M₀) = ⊥ :=

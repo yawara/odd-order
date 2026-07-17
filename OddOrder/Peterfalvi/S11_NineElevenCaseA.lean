@@ -108,14 +108,14 @@ theorem caseA_coherent_sOf_H0Cprime_of_refuter [Finite G]
     exact absurd hNpos (lt_irrefl 0)
   -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′` by derived-subgroup monotonicity)
   have hCU : hyp.C ≤ hyp.s11Setup.U := by
-    show hyp.C ≤ hyp.s11Setup.typeP.U
+    change hyp.C ≤ hyp.s11Setup.typeP.U
     rw [hyp.setup_typeP_eq]; exact hyp.C_le_U
   have hle : hyp.H0Cprime
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
-    show hyp.chief.H0 ⊔ derivedInG hyp.C
+    change hyp.chief.H0 ⊔ derivedInG hyp.C
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
     refine sup_le_sup_left ?_ hyp.chief.H0
-    show derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
+    change derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
     rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.C,
       OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.s11Setup.U]
     exact Subgroup.commutator_mono hCU hCU
@@ -280,14 +280,14 @@ theorem caseA_refuter_of_equality_refutation [Finite G]
   have hp1 : 0 < hyp.chief.p - 1 := Nat.sub_pos_of_lt hyp.chief.p_prime.one_lt
   -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′`), as in `caseA_coherent_sOf_H0Cprime_of_refuter`
   have hCU : hyp.C ≤ hyp.s11Setup.U := by
-    show hyp.C ≤ hyp.s11Setup.typeP.U
+    change hyp.C ≤ hyp.s11Setup.typeP.U
     rw [hyp.setup_typeP_eq]; exact hyp.C_le_U
   have hle : hyp.H0Cprime
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
-    show hyp.chief.H0 ⊔ derivedInG hyp.C
+    change hyp.chief.H0 ⊔ derivedInG hyp.C
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
     refine sup_le_sup_left ?_ hyp.chief.H0
-    show derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
+    change derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
     rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.C,
       OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.s11Setup.U]
     exact Subgroup.commutator_mono hCU hCU
@@ -471,7 +471,7 @@ theorem nineElevenPairBound [Finite G]
     rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]
   have hζ' : ζ ∈ OddOrder.Peterfalvi.S11.xiOf hyp.s11Setup
       (hyp.chief.H0 ⊔ (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Cprime) := by
-    show ζ ∈ OddOrder.Peterfalvi.S11.xiOf hyp.s11Setup
+    change ζ ∈ OddOrder.Peterfalvi.S11.xiOf hyp.s11Setup
       (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cprimeSub hyp.s11Setup hyp.chief)
     rw [hCp]
     exact hζ
@@ -501,14 +501,14 @@ theorem nineElevenPairBound [Finite G]
     rw [h0, Nat.zero_mul] at hNpos
     exact absurd hNpos (lt_irrefl 0)
   have hCU : hyp.C ≤ hyp.s11Setup.U := by
-    show hyp.C ≤ hyp.s11Setup.typeP.U
+    change hyp.C ≤ hyp.s11Setup.typeP.U
     rw [hyp.setup_typeP_eq]; exact hyp.C_le_U
   have hle : hyp.H0Cprime
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
-    show hyp.chief.H0 ⊔ derivedInG hyp.C
+    change hyp.chief.H0 ⊔ derivedInG hyp.C
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
     refine sup_le_sup_left ?_ hyp.chief.H0
-    show derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
+    change derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
     rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.C,
       OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.s11Setup.U]
     exact Subgroup.commutator_mono hCU hCU
@@ -758,7 +758,7 @@ theorem caseA_two_summand_inertia_inputs [Finite G]
   -- `𝒮(H₀C) ⊆ 𝒮(H₀C′)` along `H₀C′ ≤ H₀C` (`C′ = [C,C] ≤ C`, `C = cSub` by `C_eq_cSub`)
   have hle : hyp.H0Cprime
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
-    show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
+    change hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
     refine sup_le_sup_left ?_ hyp.chief.H0
     rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]
     exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief
@@ -842,21 +842,21 @@ theorem caseA_nineElevenThree_count_inputs [Finite G]
   classical
   -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′`), as in `caseA_refuter_of_equality_refutation`
   have hCUle : hyp.C ≤ hyp.s11Setup.U := by
-    show hyp.C ≤ hyp.s11Setup.typeP.U
+    change hyp.C ≤ hyp.s11Setup.typeP.U
     rw [hyp.setup_typeP_eq]; exact hyp.C_le_U
   have hleU' : hyp.H0Cprime
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup := by
-    show hyp.chief.H0 ⊔ derivedInG hyp.C
+    change hyp.chief.H0 ⊔ derivedInG hyp.C
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup
     refine sup_le_sup_left ?_ hyp.chief.H0
-    show derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
+    change derivedInG hyp.C ≤ derivedInG hyp.s11Setup.U
     rw [OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.C,
       OddOrder.Peterfalvi.S11.derivedInG_eq_commutator hyp.s11Setup.U]
     exact Subgroup.commutator_mono hCUle hCUle
   -- `H₀C′ ≤ H₀C` (`C′ ≤ C`, `C = cSub` by `C_eq_cSub`), as in the Phase-B corollary
   have hleC : hyp.H0Cprime
       ≤ hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief := by
-    show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
+    change hyp.chief.H0 ⊔ derivedInG hyp.C ≤ _
     refine sup_le_sup_left ?_ hyp.chief.H0
     rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]
     exact OddOrder.Peterfalvi.S11.cprimeSub_le_C hyp.s11Setup hyp.chief

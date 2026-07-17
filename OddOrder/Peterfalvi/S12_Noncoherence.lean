@@ -490,7 +490,7 @@ theorem typeV_sixFiveB_pGroup [Finite G]
             ↥((derivedInG M).subgroupOf M) a) x := by
       simp [MulDistribMulAction.toMulAut_apply]
     rw [h1]
-    show ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)
+    change ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)
       ((hyp.W1.subgroupOf M).subtype a)) x : ↥M) = _
     rw [MulAut.conjNormal_apply]; rfl
   have hW1card : Nat.card ↥(hyp.W1.subgroupOf M) = hyp.w1 :=

@@ -1005,7 +1005,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
             extension_inner_eq := hinner
             extends_on_supported := hextends
             extension_mem_ZIrr := hZIrr }, ?_⟩
-  show ν₀ (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
+  change ν₀ (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
     = ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩
   rw [← hχi₁, hν₀apply i₁, hkfi₁]
 

@@ -161,7 +161,7 @@ theorem symm_single_eq_average {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) 
   -- `aug a = 1` (the augmentation of the averaging idempotent).
   have hauga : aug a = 1 := by
     rw [aug_apply]
-    show MonoidAlgebra.lift k k G 1 (average k G) = 1
+    change MonoidAlgebra.lift k k G 1 (average k G) = 1
     rw [show average k G = ⅟(Fintype.card G : k) • ∑ g : G, MonoidAlgebra.of k G g from rfl,
       map_smul, map_sum]
     rw [show (∑ g : G, MonoidAlgebra.lift k k G 1 (MonoidAlgebra.of k G g)) = (Fintype.card G : k) by
@@ -171,7 +171,7 @@ theorem symm_single_eq_average {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) 
   -- `a * φ.symm (Pi.single i₀ 1) = a` (from `average · z = aug z • average` and `aug ε_{i₀} = 1`).
   have hstep : a * φ.symm (Pi.single i₀ 1) = a := by
     apply Subtype.ext
-    show average k G * ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = average k G
+    change average k G * ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = average k G
     rw [average_mul, ← aug_apply, haug1, one_smul]
   -- Apply `φ`: `φ a * Pi.single i₀ 1 = φ a`, hence `φ a = Pi.single i₀ (φ a i₀)`.
   have hφstep : φ a * Pi.single i₀ 1 = φ a := by
@@ -198,7 +198,7 @@ coordinate `i₀`, `centerProj φ ρ i₀ = averageMap ρ`. -/
 theorem centerProj_aug_eq_averageMap {W : Type*} [AddCommGroup W] [Module k W]
     (ρ : Representation k G W) {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) :
     centerProj φ ρ i₀ = averageMap ρ := by
-  show asAlgebraHom ρ ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = asAlgebraHom ρ (average k G)
+  change asAlgebraHom ρ ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = asAlgebraHom ρ (average k G)
   rw [symm_single_eq_average φ haug]
 
 /-- **The trivial isotypic component equals the `G`-invariants** (item 2, ingredient g).  For the
@@ -354,7 +354,7 @@ theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
     have hintertwine : ∀ u : ↥U,
         (τ : Module.End k W) * ρU u = ρU (ψ e u) * (τ : Module.End k W) := by
       intro u
-      show ρ (e : L) * ρ ((u : L)) = ρ ((ψ e u : ↥U) : L) * ρ (e : L)
+      change ρ (e : L) * ρ ((u : L)) = ρ ((ψ e u : ↥U) : L) * ρ (e : L)
       rw [← map_mul, ← map_mul]
       congr 1
       rw [show ((ψ e u : ↥U) : L) = (e : L) * (u : L) * (e : L)⁻¹ from

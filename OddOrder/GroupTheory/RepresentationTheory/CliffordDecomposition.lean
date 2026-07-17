@@ -413,7 +413,7 @@ theorem conjBy_ne_conj_of_odd {H : Subgroup L} [H.Normal] [Invertible (Nat.card 
     exact (ClassFunction.inertia θ).pow_mem hg2I (m + 1)
   -- `g ∈ I_L(θ)` ⟹ `θ = θ̄` real ⟹ `θ = 1_H`, contradicting `θ ≠ 1_H`
   have hreal : ClassFunction.IsReal θ := by
-    show θ.conj = θ
+    change θ.conj = θ
     rw [← hconj]; exact ClassFunction.mem_inertia.mp hgI
   have hoddH : Odd (Nat.card ↥H) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
   have hbne : (⟨θ, hθirr⟩ : IrreducibleCharacter ↥H) ≠ trivialIrreducibleCharacter ↥H :=

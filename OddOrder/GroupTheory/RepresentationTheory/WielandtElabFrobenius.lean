@@ -119,7 +119,7 @@ theorem htag_of_frobenius {U E : Subgroup L} [U.Normal] [Fintype ↥E]
     · rintro ⟨hvW, hvE⟩
       refine ⟨⟨v, hvW⟩, fun e => ?_, rfl⟩
       apply Subtype.ext
-      show ((ρW (E.subtype e) ⟨v, hvW⟩ : ↥W₀) : V) = v
+      change ((ρW (E.subtype e) ⟨v, hvW⟩ : ↥W₀) : V) = v
       rw [hρWval]; exact hvE e
   rw [hkey, ← Submodule.finrank_map_subtype_eq W₀ (invariants (ρW.comp E.subtype)), hbridge]
 

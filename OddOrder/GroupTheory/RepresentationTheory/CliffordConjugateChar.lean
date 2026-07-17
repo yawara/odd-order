@@ -167,7 +167,7 @@ noncomputable def equivOfAsModuleEquiv {N : Type*} [AddCommGroup N] [Module k N]
     intro g
     ext v
     rw [LinearMap.comp_apply, LinearMap.comp_apply]
-    show e (ρ₁ g v) = ρ₂ g (e v)
+    change e (ρ₁ g v) = ρ₂ g (e v)
     rw [← hIM (ρ₁ g v), ← hIM v]
     exact LinearMap.congr_fun
       (((equivLinearMapAsModule ρ₁ ρ₂).symm e.toLinearMap).isIntertwining' g) v)

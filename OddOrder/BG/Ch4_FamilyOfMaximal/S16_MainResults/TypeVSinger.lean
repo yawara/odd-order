@@ -229,7 +229,7 @@ theorem card_center_opiCore_eq_prime_of_omega1Center_le_kstar [Finite G]
       have hgKstar : (g : G) ∈ Kstar := by rw [hKstarEqZ]; exact hgZ
       rw [hKstar] at hgKstar; exact (Subgroup.mem_inf.mp hgKstar).2
     apply Subtype.ext
-    show (a : G) * (g : G) * (a : G)⁻¹ = (g : G)
+    change (a : G) * (g : G) * (a : G)⁻¹ = (g : G)
     have hcomm : (a : G) * (g : G) = (g : G) * (a : G) :=
       Subgroup.mem_centralizer_iff.mp hgC (a : G) a.2
     rw [hcomm, mul_inv_cancel_right]

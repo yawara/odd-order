@@ -307,7 +307,7 @@ private theorem map_subtype_conj_smul {N : Subgroup G} (c : ↥N) (K : Subgroup 
     ext x
     simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
       Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
-  show (K.map (MulAut.conj c).toMonoidHom).map N.subtype
+  change (K.map (MulAut.conj c).toMonoidHom).map N.subtype
       = (K.map N.subtype).map (MulAut.conj (c : G)).toMonoidHom
   rw [Subgroup.map_map, Subgroup.map_map, hcomp]
 

@@ -754,7 +754,7 @@ noncomputable def adjoin_irr_nonreal_of_supportedDecomposition
     intro heq
     apply hχnonreal
     have h2 := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq
-    show χ.conj = χ
+    change χ.conj = χ
     simpa using h2.symm
   have hχχbar : ClassFunction.inner χ χ.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)

@@ -627,9 +627,9 @@ theorem exists_compHom_eq_of_subset_characterKernel {H G : Type*} [Group H] [Gro
     rw [he_def, QuotientGroup.mk'_apply]; exact QuotientGroup.kerLift_mk _ x
   have he_comp : e.symm.toMonoidHom.comp f = QuotientGroup.mk' f.ker := by
     apply MonoidHom.ext; intro x
-    show e.symm (f x) = QuotientGroup.mk' f.ker x
+    change e.symm (f x) = QuotientGroup.mk' f.ker x
     rw [← he_fe x, MulEquiv.symm_apply_apply]
-  show ClassFunction.compHom f
+  change ClassFunction.compHom f
     (ClassFunction.compHom e.symm.toMonoidHom (θ0 : ClassFunction (H ⧸ f.ker) ℂ)) =
       (χ : ClassFunction H ℂ)
   rw [ClassFunction.compHom_comp, he_comp, ← inflate_coe f.ker θ0, hθ0]

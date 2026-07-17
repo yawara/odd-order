@@ -75,14 +75,14 @@ noncomputable def centerEnd (α : MulAut G) :
     (MonoidAlgebra.domCongrAut (R := k) (A := k) α).map_mem_center z.2⟩
   map_add' x y := by
     apply Subtype.ext
-    show MonoidAlgebra.domCongrAut (R := k) (A := k) α
+    change MonoidAlgebra.domCongrAut (R := k) (A := k) α
           ((x : MonoidAlgebra k G) + (y : MonoidAlgebra k G))
         = MonoidAlgebra.domCongrAut (R := k) (A := k) α (x : MonoidAlgebra k G)
           + MonoidAlgebra.domCongrAut (R := k) (A := k) α (y : MonoidAlgebra k G)
     rw [map_add]
   map_smul' c x := by
     apply Subtype.ext
-    show MonoidAlgebra.domCongrAut (R := k) (A := k) α (c • (x : MonoidAlgebra k G))
+    change MonoidAlgebra.domCongrAut (R := k) (A := k) α (c • (x : MonoidAlgebra k G))
         = c • MonoidAlgebra.domCongrAut (R := k) (A := k) α (x : MonoidAlgebra k G)
     rw [map_smul]
 
@@ -93,12 +93,12 @@ noncomputable def centerRep :
   toFun := centerEnd
   map_one' := by
     apply LinearMap.ext; intro z; apply Subtype.ext
-    show MonoidAlgebra.domCongrAut (R := k) (A := k) (1 : MulAut G) (z : MonoidAlgebra k G)
+    change MonoidAlgebra.domCongrAut (R := k) (A := k) (1 : MulAut G) (z : MonoidAlgebra k G)
         = (z : MonoidAlgebra k G)
     rw [map_one, AlgEquiv.one_apply]
   map_mul' α β := by
     apply LinearMap.ext; intro z; apply Subtype.ext
-    show MonoidAlgebra.domCongrAut (R := k) (A := k) (α * β) (z : MonoidAlgebra k G)
+    change MonoidAlgebra.domCongrAut (R := k) (A := k) (α * β) (z : MonoidAlgebra k G)
         = MonoidAlgebra.domCongrAut (R := k) (A := k) α
             (MonoidAlgebra.domCongrAut (R := k) (A := k) β (z : MonoidAlgebra k G))
     rw [map_mul, AlgEquiv.mul_apply]
@@ -114,7 +114,7 @@ theorem centerRep_apply_centerBasis (α : MulAut G) (C : ConjClasses G) :
     centerRep (k := k) α (centerBasis (k := k) C) = centerBasis (k := k) (α • C) := by
   rw [centerBasis_apply, centerBasis_apply]
   apply Subtype.ext
-  show MonoidAlgebra.domCongrAut (R := k) (A := k) α (classSum (k := k) C)
+  change MonoidAlgebra.domCongrAut (R := k) (A := k) α (classSum (k := k) C)
       = classSum (k := k) (ConjClasses.map (α : G →* G) C)
   exact domCongr_classSum α C
 

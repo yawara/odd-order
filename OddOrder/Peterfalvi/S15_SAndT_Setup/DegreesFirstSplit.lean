@@ -767,7 +767,7 @@ theorem Hypothesis.H_mulCommutative [Finite G] (hG : OddOrder.BG.IsMinimalSimple
         (⟨(a : G), hCU a.2⟩ : ↥hyp.U) ⟨(b : G), hCU b.2⟩
       simpa using congrArg Subtype.val h)⟩⟩
   have hCP : hyp.C ≤ Subgroup.centralizer (hyp.P : Set G) := hyp.C_eq ▸ inf_le_right
-  show IsMulCommutative ↥(hyp.P ⊔ hyp.C)
+  change IsMulCommutative ↥(hyp.P ⊔ hyp.C)
   rw [sup_comm]
   exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer hCab hPab hCP
 
@@ -936,7 +936,7 @@ theorem Hypothesis.mu_j_isIndPC [Finite G]
     OddOrder.Peterfalvi.S11.reducible_sOf_H0_isIndHC hG (hyp.mkSection11CharacterDataS hG chief)
       hmem hred
   -- `HC.map subtype = (H ⊔ C).subgroupOf S = (PC).subgroupOf S = hyp.H.subgroupOf S`
-  have hHeq : data.H = hyp.P := by show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hHeq : data.H = hyp.P := by change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   have hsupeq : data.H ⊔ OddOrder.Peterfalvi.S11.cSub data chief = hyp.H := by
     rw [hHeq, hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]; rfl
   have hHC : (OddOrder.Peterfalvi.S11.hInHu data ⊔

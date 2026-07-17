@@ -185,11 +185,11 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
       = Nat.card ↥data.L := hC.isComplement.card_mul_card
   have hsmall : H78.smallIndex := by
     have hfrob := frobenius_two_mul_card_complement_add_one_le_card_kernel hC hKodd hCodd hKnt
-    show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+    change 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
     have hke : H78.kernelOrder = Nat.card ↥((hyp.typeI.typeF.H).subgroupOf data.L) := by
       rw [hKcard]; rfl
     have hce : H78.complementIndex = Nat.card ↥frob.complement := by
-      show Nat.card ↥data.L / Nat.card hyp.typeI.typeF.H = Nat.card ↥frob.complement
+      change Nat.card ↥data.L / Nat.card hyp.typeI.typeF.H = Nat.card ↥frob.complement
       rw [← hKcard, ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
     rw [hke, hce]; exact hfrob
   -- The (7.8.b) bound for `H78`.
@@ -207,7 +207,7 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   have hznorm : H78.zetaNuRhoNormSq
       = (ClassFunction.inner (hyp.toHypothesis71.chiRhoCF dade.psi)
           (hyp.toHypothesis71.chiRhoCF dade.psi)).re := by
-    show (ClassFunction.inner
+    change (ClassFunction.inner
         (hyp.toHypothesis71.chiRhoCF (coh.extension (ClassFunction.induce
           ((hyp.typeI.typeF.H).subgroupOf data.L) (θ 0 : ClassFunction _ ℂ))))
         (hyp.toHypothesis71.chiRhoCF (coh.extension (ClassFunction.induce

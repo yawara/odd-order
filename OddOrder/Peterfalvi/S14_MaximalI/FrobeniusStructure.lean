@@ -252,7 +252,7 @@ theorem Hypothesis.typeIA_eq_sharp_of_frobenius [Finite G] {L : Subgroup G} (hyp
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
     OddOrder.GroupTheory.typeIA L hyp.typeI
       = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H := by
-  show OddOrder.GroupTheory.centralizerSupport
+  change OddOrder.GroupTheory.centralizerSupport
       (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H) L
     = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H
   ext y
@@ -1030,7 +1030,7 @@ theorem SsubFiltration_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : H
         (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
           (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
     apply Subtype.ext
-    show (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+    change (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
       = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
     rw [← ClassFunction.conj_conj
       (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
@@ -1262,7 +1262,7 @@ theorem Sset_differenceImages_orthogonal [Finite G] {L : Subgroup G} (hyp : Hypo
     _ _ ?_
   rw [← (Sset_differenceImage hyp hodd hfrob hab hAH hφ).image_conjugateDifference,
       ← (Sset_differenceImage hyp hodd hfrob hab hAH hχ).image_conjugateDifference]
-  show ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  change ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
   rw [Sset_tau_isometry_diff hyp hab hAH hφ hφc hχ hχc]
   have hne1 : φ.conj ≠ χ := by
     intro heq
@@ -1304,7 +1304,7 @@ theorem SsubFiltration_commutator_closedUnderConjugate [Finite G] {L : Subgroup 
         (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
           (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
     apply Subtype.ext
-    show (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+    change (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
       = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
     rw [← ClassFunction.conj_conj
       (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
@@ -1384,7 +1384,7 @@ theorem SsubFiltration_commutator_differenceImages_orthogonal [Finite G] {L : Su
     _ _ ?_
   rw [← (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hφ).image_conjugateDifference,
       ← (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hχ).image_conjugateDifference]
-  show ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  change ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
   rw [SsubFiltration_commutator_tau_isometry_diff hyp hAH hφ hφc hχ hχc]
   have hne1 : φ.conj ≠ χ := by
     intro heq

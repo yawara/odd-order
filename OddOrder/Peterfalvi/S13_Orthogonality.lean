@@ -226,7 +226,7 @@ theorem certainTypeOmegaSigma_muColumnChar_eq_aligned [Finite G]
   haveI := hyp.finiteG
   classical
   -- the two setups agree definitionally (`toHypothesis46.tic` is the grid `tic` by field literal)
-  show (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).sigma rfl
+  change (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).sigma rfl
       (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication (hyp.toHypothesis46 hG hG.odd))
       ((OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).omega
         (OddOrder.Peterfalvi.S06.omegaProdCharTic (hyp.toHypothesis46 hG hG.odd)
@@ -817,7 +817,7 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
             extension_inner_eq := hinner
             extends_on_supported := hextends
             extension_mem_ZIrr := hZIrr }, ?_⟩
-  show ν₀ (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
+  change ν₀ (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
     = Ωof ⟨1, hw2⟩
   rw [← hχi₁, hν₀apply i₁, hkfi₁]
 

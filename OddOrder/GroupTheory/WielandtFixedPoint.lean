@@ -78,7 +78,7 @@ theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
     -- The canonical `𝔽_{p'}`-module structure on the chief factor `↥N'`.
     letI : CommGroup ↥N' := hpe'.subgroupCommGroup
     letI : Module (ZMod p') (Additive ↥N') := hpe'.subgroupZmodModule
-    show WielandtDimIdentity (V := ↥N') p' hN'.restrict act.U act.E
+    change WielandtDimIdentity (V := ↥N') p' hN'.restrict act.U act.E
     by_cases hN1 : Nat.card ↥N' = 1
     · -- Trivial chief factor: the module is `0`-dimensional, both sides vanish.
       haveI : Subsingleton ↥N' := (Nat.card_eq_one_iff_unique.mp hN1).1

@@ -644,7 +644,7 @@ theorem isPGroup_map_mk'_subtype_of_isPGroup_quotient {G : Type*} [Group G] {K :
   have hgL : (g : G) ^ q ^ n ∈ N.map K.subtype := by
     simpa using Subgroup.mem_map_of_mem K.subtype hgN
   apply Subtype.ext
-  show ((x : G ⧸ N.map K.subtype)) ^ q ^ n = 1
+  change ((x : G ⧸ N.map K.subtype)) ^ q ^ n = 1
   rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   exact hgL
 

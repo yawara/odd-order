@@ -414,7 +414,7 @@ theorem T_typeIII_quotFrobenius_kernel_eq [Finite G] (hyp : Hypothesis (G := G))
           (⟨(x : G), hUW1leM x.2⟩ : ↥hyp.base.T) := fun x => rfl
   apply le_antisymm
   · rintro _ ⟨x, hxU, rfl⟩
-    show e x ∈ _
+    change e x ∈ _
     rw [he]
     exact Subgroup.mem_map.mpr ⟨⟨(x : G), hUW1leM x.2⟩,
       Subgroup.mem_subgroupOf.mpr (td.typeP.U_le (Subgroup.mem_subgroupOf.mp hxU)), rfl⟩
@@ -438,7 +438,7 @@ theorem T_typeIII_quotFrobenius_kernel_eq [Finite G] (hyp : Hypothesis (G := G))
       apply Subtype.ext; simpa [hqEltdef, huEltdef] using hdecG
     refine Subgroup.mem_map.mpr ⟨uUW1, Subgroup.mem_subgroupOf.mpr
       (Subgroup.mem_subgroupOf.mpr huuU), ?_⟩
-    show e uUW1 = _
+    change e uUW1 = _
     rw [he]
     have hgoaleq : (⟨((uUW1 : ↥(td.typeP.U ⊔ td.typeP.W1)) : G), hUW1leM uUW1.2⟩ : ↥hyp.base.T)
         = uElt := rfl
@@ -619,7 +619,7 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
         simp [ClassFunction.conjBy_apply, trivialIrreducibleCharacter, trivialClassFunction_apply]
     · -- infl (conjBy (mk g) θbar) = conjBy g (infl θbar)
       apply IrreducibleCharacter.ext
-      show ClassFunction.compHom q _ = ClassFunction.conjBy g (ClassFunction.compHom q _)
+      change ClassFunction.compHom q _ = ClassFunction.conjBy g (ClassFunction.compHom q _)
       rw [conjBy_compHom_eq_compHom_conjBy q hq]
       rfl
   -- hcard : 𝒯.card = |V| - 1
@@ -773,7 +773,7 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
         (MulEquiv.subgroupCongr himg)
     haveI hHbarComm : IsMulCommutative ↥Hbar :=
       OddOrder.GroupTheory.isMulCommutative_of_mulEquiv hemap hUcomm
-    show (ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ) :
+    change (ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ) :
       ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1
     rw [ClassFunction.compHom_apply, map_one]
     exact θbar.isIrreducible.apply_one_eq_one_of_isMulCommutative
@@ -792,12 +792,12 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
         simpa using congrArg (fun c : IrreducibleCharacter ↥Hbar => (c : ClassFunction ↥Hbar ℂ))
           hcontra
       apply IrreducibleCharacter.ext
-      show (θbar : ClassFunction ↥Hbar ℂ) = trivialClassFunction ↥Hbar
+      change (θbar : ClassFunction ↥Hbar ℂ) = trivialClassFunction ↥Hbar
       rw [← ClassFunction.conj_conj (θbar : ClassFunction ↥Hbar ℂ), hcoe]
       exact trivialClassFunction_isReal
     · -- `infl (θbar̄) = (infl θbar)^`: pointwise `compHom q θbar̄ x = star (θbar (q x))`.
       apply IrreducibleCharacter.ext
-      show ClassFunction.compHom q ((θbar : ClassFunction ↥Hbar ℂ).conj)
+      change ClassFunction.compHom q ((θbar : ClassFunction ↥Hbar ℂ).conj)
         = (ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ)).conj
       ext x
       simp [ClassFunction.compHom_apply, ClassFunction.conj_apply]
@@ -820,7 +820,7 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
         IrreducibleCharacter.coe_trivialIrreducibleCharacter,
         trivialClassFunction_apply] using hx'
     · apply IrreducibleCharacter.ext
-      show ClassFunction.compHom q
+      change ClassFunction.compHom q
           (IrreducibleCharacter.galoisMap σc θbar : ClassFunction ↥Hbar ℂ) =
         ClassFunction.mapRingEquiv σc
           (ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ))
@@ -859,7 +859,7 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
           rw [IrreducibleCharacter.coe_conjBy]; ext x
           simp [ClassFunction.conjBy_apply, trivialIrreducibleCharacter, trivialClassFunction_apply]
       · apply IrreducibleCharacter.ext
-        show ClassFunction.compHom q _ = ClassFunction.conjBy g (ClassFunction.compHom q _)
+        change ClassFunction.compHom q _ = ClassFunction.conjBy g (ClassFunction.compHom q _)
         rw [conjBy_compHom_eq_compHom_conjBy q hq]
         rfl
     have hcard : 𝒯.card = Nat.card ↥hyp.base.V - 1 := by

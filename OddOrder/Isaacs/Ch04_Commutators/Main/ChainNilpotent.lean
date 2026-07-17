@@ -216,7 +216,7 @@ private lemma actionCommutatorInfty_isAInvariant
         (φ b) g * (phiInfty φ) ⟨b * a.val * b⁻¹, h_norm.conj_mem _ a.property _⟩
           ((φ b) g)⁻¹ := by
     intro g a
-    show (φ b) (g * (φ a.val) g⁻¹) = (φ b) g * (φ (b * a.val * b⁻¹)) ((φ b) g)⁻¹
+    change (φ b) (g * (φ a.val) g⁻¹) = (φ b) g * (φ (b * a.val * b⁻¹)) ((φ b) g)⁻¹
     rw [map_mul (φ b)]
     congr 1
     rw [show ((φ b) g)⁻¹ = (φ b) g⁻¹ from (map_inv (φ b) g).symm,
@@ -235,7 +235,7 @@ private lemma actionCommutatorInfty_isAInvariant
           simpa [mul_assoc] using this⟩
         ((φ b)⁻¹ g)⁻¹,
       ⟨(φ b)⁻¹ g, _, rfl⟩, ?_⟩
-    show (φ b) ((φ b)⁻¹ g * (φ (b⁻¹ * a.val * b)) ((φ b)⁻¹ g)⁻¹) =
+    change (φ b) ((φ b)⁻¹ g * (φ (b⁻¹ * a.val * b)) ((φ b)⁻¹ g)⁻¹) =
         g * (φ a.val) g⁻¹
     rw [map_mul (φ b)]
     congr 1
@@ -441,7 +441,7 @@ private theorem commutator_inl_C_XG_inr_A_eq_bot_of_centralized
     -- = inl c * (inl c)⁻¹ = 1
     have hi := SemidirectProduct.inl_aut (φ := φ) a c
     -- hi : inl ((φ a) c) = inr a * inl c * inr a⁻¹
-    show (SemidirectProduct.inr a : G ⋊[φ] A) * SemidirectProduct.inl c *
+    change (SemidirectProduct.inr a : G ⋊[φ] A) * SemidirectProduct.inl c *
         (SemidirectProduct.inr a)⁻¹ * (SemidirectProduct.inl c)⁻¹ = 1
     rw [show ((SemidirectProduct.inr a : G ⋊[φ] A))⁻¹ = SemidirectProduct.inr a⁻¹ from
         (map_inv _ _).symm, ← hi, h_fix]

@@ -71,7 +71,7 @@ theorem FT_signalizer_eq_Rsub_of_escape [Finite G] (hG : OddOrder.BG.IsMinimalSi
     exact Set.mem_singleton_iff.mp hmem2
   rw [OddOrder.BG.Ch4.S14.Rsub_eq_inf hG (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG)
     hx1 hlen hgt]
-  show OddOrder.BG.Ch3.S10.Msigma (OddOrder.BG.Ch4.S16.FT_signalizerBase x)
+  change OddOrder.BG.Ch3.S10.Msigma (OddOrder.BG.Ch4.S16.FT_signalizerBase x)
       ⊓ Subgroup.centralizer ({x} : Set G) = _
   rw [hbase_eq, hN'_eq]
 
@@ -761,7 +761,7 @@ noncomputable def nonTypeICovering_of_isTypeP [Finite G] (hG : OddOrder.BG.IsMin
       · exact hsub _ (OddOrder.BG.Ch4.S14.one_not_mem_zTilde Kref Kstarref) hy
   · -- pairwise_disjoint_thickened
     intro j _ k _ hjk
-    show Disjoint (data.cover j) (data.cover k)
+    change Disjoint (data.cover j) (data.cover k)
     rw [hcover j, hcover k]
     exact OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D (data.maximal j) (data.maximal k)
       (fun hconj => hjk (data.nonconjugate j k hconj))
@@ -961,7 +961,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           = OddOrder.BG.Ch3.S10.Msigma (e.symm j.down).1 :=
         OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG (hrepsMax _ (e.symm j.down).2)
           (htyped (e.symm j.down))
-      show Nat.card ↥(conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D (e.symm j.down).1)) = _
+      change Nat.card ↥(conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D (e.symm j.down).1)) = _
       rw [Nat.card_coe_set_eq,
         OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard hG D
           (hrepsMax _ (e.symm j.down).2), hms]
@@ -1045,7 +1045,7 @@ theorem support_mutual_exclusion [Finite G]
     (Subgroup.nontrivial_iff_ne_bot _).mpr hHne
   obtain ⟨y, hyne⟩ := exists_ne (1 : ↥(maxNilpotentNormalHall S))
   have hxA1 : (y : G) ∈ A1 S PeterfalviType.I := by
-    show (y : G) ∈ (maxNilpotentNormalHall S : Set G) \ {1}
+    change (y : G) ∈ (maxNilpotentNormalHall S : Set G) \ {1}
     exact ⟨y.2, fun h => hyne (Subtype.ext h)⟩
   have h1 : (y : G) ∈ conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D S) :=
     subset_conjClassSet (OddOrder.BG.Ch4.S14.sigmaSharp_subset_Mtilde hG D (hA1S ▸ hxA1))

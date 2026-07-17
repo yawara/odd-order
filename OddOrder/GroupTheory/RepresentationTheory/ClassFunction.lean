@@ -160,7 +160,7 @@ behind Peterfalvi (2.9)'s `α_B = α ∘ f_B`, where `f_B : M(B) →* L` is the 
 the semidirect decomposition `M(B) = H(B) ⋊ N_L(B)`. -/
 def compHom (f : H →* G) (φ : ClassFunction G k) : ClassFunction H k :=
   ⟨fun h => φ (f h), fun h₁ h₂ => by
-    show φ (f (h₂ * h₁ * h₂⁻¹)) = φ (f h₁)
+    change φ (f (h₂ * h₁ * h₂⁻¹)) = φ (f h₁)
     rw [map_mul, map_mul, map_inv]
     exact φ.conj_eq (f h₁) (f h₂)⟩
 

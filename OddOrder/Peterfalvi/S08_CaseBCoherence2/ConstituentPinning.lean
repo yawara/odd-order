@@ -614,7 +614,7 @@ theorem ticVdiffV_not_mem_conjugatesOfSet_K {A : Set G}
   -- `orderOf a = orderOf v` (conjugation preserves order)
   obtain ⟨c, hc⟩ := isConj_iff.mp hav
   have hsemi : SemiconjBy c a v := by
-    show c * a = v * c
+    change c * a = v * c
     rw [← hc]; group
   have hav_ord : orderOf a = orderOf v := SemiconjBy.orderOf_eq c hsemi
   -- `orderOf a = orderOf k ∣ |K|`

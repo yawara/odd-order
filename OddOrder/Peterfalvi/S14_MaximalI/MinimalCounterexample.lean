@@ -94,7 +94,7 @@ theorem isCyclic_and_card_dvd_of_odd_two_dim_irreducible
   -- not choke on the `ρ.asModule` notation — which it does once `IsIrreducible ρ` is around).
   letI : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
   have hsmul : ∀ (e : E) (x : V), MonoidAlgebra.of (ZMod p) E e • x = ρ e x := fun e x => by
-    show (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
+    change (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
     rw [Representation.asAlgebraHom_of]
   haveI : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
     (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
@@ -140,7 +140,7 @@ theorem isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar
     (OddOrder.BG.Ch1.S02.odd_two_dim_abelian hodd hdim ρ hfaith hchar).comm
   letI : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
   have hsmul : ∀ (e : E) (x : V), MonoidAlgebra.of (ZMod p) E e • x = ρ e x := fun e x => by
-    show (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
+    change (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
     rw [Representation.asAlgebraHom_of]
   haveI : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
     (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
@@ -160,7 +160,7 @@ theorem isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar
   -- `|E| ∣ (p - 1)(p + 1) = p² - 1` and `Coprime |E| (p - 1)` force `|E| ∣ p + 1`.
   have hpq : (p - 1) * (p + 1) = p ^ 2 - 1 := by
     obtain ⟨n, rfl⟩ : ∃ n, p = n + 2 := ⟨p - 2, by have := (Fact.out (p := p.Prime)).two_le; omega⟩
-    show (n + 1) * (n + 3) = (n + 2) ^ 2 - 1
+    change (n + 1) * (n + 3) = (n + 2) ^ 2 - 1
     have hexp : (n + 2) ^ 2 = (n + 1) * (n + 3) + 1 := by ring
     omega
   rw [← hpq] at hdvd_sq

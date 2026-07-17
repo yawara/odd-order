@@ -124,7 +124,7 @@ noncomputable def chiefFactorConjAction {G : Type*} [Group G] (X Y : Subgroup G)
       (Y.subgroupOf X) (by
         intro a m hm
         rw [Subgroup.mem_subgroupOf] at hm ⊢
-        show ConjAct.ofConjAct a * (↑m : G) * (ConjAct.ofConjAct a)⁻¹ ∈ Y
+        change ConjAct.ofConjAct a * (↑m : G) * (ConjAct.ofConjAct a)⁻¹ ∈ Y
         exact (‹Y.Normal›).conj_mem _ hm _)
   MulDistribMulAction.compHom _ (ConjAct.toConjAct (G := G)).toMonoidHom
 
@@ -482,7 +482,7 @@ theorem chiefFactor_invariant_eq_bot_or_top {G : Type*} [Group G] {X Y : Subgrou
       rw [hq, QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, chiefFactorConjAction_smul_mk]
       congr 1
       apply Subtype.ext
-      show g * w * g⁻¹ = (↑(ConjAct.toConjAct g • x') : G)
+      change g * w * g⁻¹ = (↑(ConjAct.toConjAct g • x') : G)
       rw [← hx'eq]; rfl
     rw [hmkeq]; exact hNinv g (q x') hx'
   have hYW : Y ≤ W := by
@@ -586,7 +586,7 @@ theorem isPGroup_map_mk'_of_isElementaryAbelian {G : Type*} [Group G] {K L : Sub
     simpa using h2
   rw [pow_one]
   apply Subtype.ext
-  show ((x : G ⧸ L)) ^ q = (1 : G ⧸ L)
+  change ((x : G ⧸ L)) ^ q = (1 : G ⧸ L)
   rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   exact hgLpow
 

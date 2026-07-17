@@ -675,7 +675,7 @@ theorem Hypothesis.supportInSubgroup_sharp_derived_subset_A0 [Finite G] {M : Sub
   intro z hz
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hz
   obtain ⟨hzM', hz1⟩ := hz
-  show (z : G) ∈ typePA0 M hyp.typeP
+  change (z : G) ∈ typePA0 M hyp.typeP
   unfold typePA0
   rw [Set.mem_union]
   left
@@ -774,7 +774,7 @@ theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
   have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
     OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hyp.maximal hP1
   have haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
-    show a ∈ sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
+    change a ∈ sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
     rw [← hM'σ]
     exact haM'
   -- BG Theorem D(4): the unique supporting maximal with the type-`F`/`P₂` package
@@ -1544,7 +1544,7 @@ theorem typeII_HU_frobenius_of_coherent' [Finite G]
     simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf]
     constructor
     · rintro ⟨w, hw, rfl⟩
-      show ((e.symm w : ↥(derivedInG S)) : G) ∈ X
+      change ((e.symm w : ↥(derivedInG S)) : G) ∈ X
       have hz : ((e.symm w : ↥(derivedInG S)) : G)
           = u⁻¹ * ((w : ↥(derivedInG mp.S)) : G) * u := by
         have := hcoe (e.symm w)

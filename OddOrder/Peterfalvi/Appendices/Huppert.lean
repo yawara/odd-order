@@ -688,8 +688,8 @@ theorem card_pointStabilizer_comp_eq_of_normal_of_transitive
     fun t => ⟨⟨d⁻¹ * (t.1 : D) * d, hN.conj_mem' _ t.1.2 d⟩,
       mem_pointStabilizer.mpr (hfix' _ (mem_pointStabilizer.mp t.2))⟩,
     fun s => ?_, fun t => ?_⟩
-  · apply Subtype.ext; apply Subtype.ext; show d⁻¹ * (d * (s.1 : D) * d⁻¹) * d = (s.1 : D); group
-  · apply Subtype.ext; apply Subtype.ext; show d * (d⁻¹ * (t.1 : D) * d) * d⁻¹ = (t.1 : D); group
+  · apply Subtype.ext; apply Subtype.ext; change d⁻¹ * (d * (s.1 : D) * d⁻¹) * d = (s.1 : D); group
+  · apply Subtype.ext; apply Subtype.ext; change d * (d⁻¹ * (t.1 : D) * d) * d⁻¹ = (t.1 : D); group
 
 /-- **Peterfalvi Appendix B, Proposition 1 — the abelian-quotient step**: for a
 finite solvable group `D` whose Fitting subgroup `F(D)` is cyclic, `D/F(D)` is
@@ -840,7 +840,7 @@ theorem fitting_fpf_of_transitive [Finite D] [Finite E] {q : ℕ}
     rw [map_pow]
     induction n with
     | zero => simp
-    | succ k ih => rw [pow_succ']; show (φ a) ((φ a ^ k) e) = e; rw [ih, he]
+    | succ k ih => rw [pow_succ']; change (φ a) ((φ a ^ k) e) = e; rw [ih, he]
   intro f hfF hf1
   haveI : Fact q.Prime := ⟨hq⟩
   set f' : ↥(fitting D) := ⟨f, hfF⟩ with hf'def

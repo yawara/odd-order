@@ -855,7 +855,7 @@ theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
         refine Subgroup.card_eq_one.mp ?_
         rwa [Subgroup.card_map_of_injective P.subtype_injective] at h1
       · exact hpp
-    show X = omega1CenterInG P p
+    change X = omega1CenterInG P p
     have hOmEq : omega1CenterInG P p = Z'.map P.subtype := rfl
     rw [hOmEq]
     exact (Subgroup.eq_of_le_of_card_ge hmap (le_of_eq (by rw [hXcard, hZ₀card]))).symm

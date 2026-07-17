@@ -66,7 +66,7 @@ theorem commute_mulAut_of_elabRepresentation_apply_eq_smul {p : ℕ} {L V : Type
     Commute σ (φ l) := by
   have : σ * (φ l) = (φ l) * σ := by
     refine MulEquiv.ext fun x => ?_
-    show σ ((φ l) x) = (φ l) (σ x)
+    change σ ((φ l) x) = (φ l) (σ x)
     calc σ ((φ l) x)
         = Additive.toMul ((MulEquiv.toAdditive σ) (Additive.ofMul ((φ l) x))) := rfl
       _ = Additive.toMul ((MulEquiv.toAdditive σ) (μ • Additive.ofMul x)) := by rw [happly]
@@ -230,7 +230,7 @@ theorem uActionHom_range_comm [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSe
     ext y
     refine QuotientGroup.induction_on y ?_
     intro x
-    show (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
+    change (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
     have hstep : (act.φ g) (QuotientGroup.mk' chief.N x)
         = QuotientGroup.mk' chief.N ((typeP_conjAction data.typeP g) x) := rfl
     rw [hstep, hfix x]
@@ -238,7 +238,7 @@ theorem uActionHom_range_comm [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSe
     intro a b
     refine commutatorElement_eq_one_iff_commute.mp ?_
     rw [← map_commutatorElement φU a b]
-    show act.φ (act.U.subtype ⁅a, b⁆) = 1
+    change act.φ (act.U.subtype ⁅a, b⁆) = 1
     apply hcentral_triv
     change ((data.typeP.U ⊔ data.typeP.W1).subtype.comp act.U.subtype) ⁅a, b⁆
         ∈ Subgroup.centralizer (data.typeP.H : Set G)

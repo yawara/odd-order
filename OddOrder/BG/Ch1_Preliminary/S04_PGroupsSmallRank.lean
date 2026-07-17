@@ -97,7 +97,7 @@ private noncomputable def deltaHom [S.Normal]
   MonoidHom.mk' (fun s => ⟨MulAut.conjNormal g s * s⁻¹, deltaElement_mem hSR g s⟩) (by
     intro s t
     apply Subtype.ext
-    show MulAut.conjNormal g (s * t) * (s * t)⁻¹ =
+    change MulAut.conjNormal g (s * t) * (s * t)⁻¹ =
       (MulAut.conjNormal g s * s⁻¹) * (MulAut.conjNormal g t * t⁻¹)
     have hcentral : MulAut.conjNormal g t * t⁻¹ ∈ Subgroup.center (↥S) :=
       deltaElement_mem hSR g t
@@ -148,7 +148,7 @@ private theorem deltaHom_eq_one_iff_mem_centralizer [S.Normal]
       apply S.subtype_injective
       rw [Subgroup.coe_subtype, MulAut.conjNormal_apply, ← hcomm]; group
     apply Subtype.ext
-    show (deltaHom hSR g s : ↥S) = (1 : ↥S)
+    change (deltaHom hSR g s : ↥S) = (1 : ↥S)
     rw [deltaHom_apply hSR g s, hfix, mul_inv_cancel]
 
 /-- `δ_g` kills `Z(S)`: as a homomorphism into the abelian group `Z(S)` it kills `[S, S]`,
@@ -329,7 +329,7 @@ private theorem card_quotient_centralizer_le [S.Normal] (hS : IsExtraspecial p (
       have hfi := congrFun hxy i
       simp only [F, Quotient.lift_mk] at hfi
       -- `Λ g (b i) = ofMul (deltaQuot g (toMul (b i)))`.
-      show (Additive.ofMul (deltaQuot hS hSR g (Additive.toMul (b i)))) =
+      change (Additive.ofMul (deltaQuot hS hSR g (Additive.toMul (b i)))) =
         (Additive.ofMul (deltaQuot hS hSR g' (Additive.toMul (b i))))
       rw [hfi]
     have hΛ : Λ g = Λ g' := Module.Basis.ext b hbasis
@@ -816,7 +816,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
     have hle : Omega R p 1 ≤ omega1 := by
       rw [Omega, Subgroup.closure_le]
       intro x hx
-      show x ^ p = 1
+      change x ^ p = 1
       exact pow_one p ▸ hx
     simpa [omega1] using hle hg
   clear hg g
@@ -867,7 +867,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
         have hΩle : Omega ↥S p 1 ≤ omega1S := by
           rw [Omega, Subgroup.closure_le]
           intro a ha
-          show a ^ p = 1
+          change a ^ p = 1
           exact pow_one p ▸ ha
         intro a ha
         simpa [omega1S] using hΩle ha

@@ -131,7 +131,7 @@ theorem conj_smul_eq_self_of_mem_normalizer {Q : Subgroup G} {a : G}
       have h3 : a * (a⁻¹ * x * a) * a⁻¹ = x := by group
       rw [h3] at h2
       exact h2.mpr hx
-    · show MulAut.conj a (a⁻¹ * x * a) = x
+    · change MulAut.conj a (a⁻¹ * x * a) = x
       simp only [MulAut.conj_apply]
       group
 

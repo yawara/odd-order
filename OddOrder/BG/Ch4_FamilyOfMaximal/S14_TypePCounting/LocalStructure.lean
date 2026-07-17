@@ -431,7 +431,7 @@ theorem maximalContaining_centralizer_eq_singleton_of_tau2_element [Finite G]
     rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
   exact (nilpotent_sigmaComplement_abelian hG hsetup).2.2.2.2 x' hx'M hx'1
     (fun r hr => hx'τ2 r (by
-      show r ∈ (Nat.card ↥(Subgroup.closure {x'})).primeFactors
+      change r ∈ (Nat.card ↥(Subgroup.closure {x'})).primeFactors
       rw [hcard]; exact hr)) hC
 
 /-- **`pi_of_cent_sigma` τ₂-case uniqueness** (Coq `BGsection14`:806, the `'M('C[y]) = [set M]`

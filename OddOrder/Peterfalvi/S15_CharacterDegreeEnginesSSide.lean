@@ -90,7 +90,7 @@ theorem Hypothesis.induce_H_mem_zSpan_sSet_irr [Finite G]
   letI : Invertible (Nat.card ↥HU : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hHderiv : hyp.H ≤ derivedInG hyp.S := by
-    show hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
+    change hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
     rw [hyp.S_deriv_eq_PU]
     exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
   have hKle : hyp.H.subgroupOf hyp.S ≤ HU := by
@@ -149,14 +149,14 @@ theorem Hypothesis.induce_H_mem_zSpan_sSet_irr [Finite G]
     intro s hks
     rw [OddOrder.Peterfalvi.S11.mem_sSet]
     refine ⟨s, ?_, rfl⟩
-    show ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
+    change ¬ ((OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥HU ℂ))
     have hHInHu : (OddOrder.Peterfalvi.S11.hInHu data : Set ↥HU)
         = ((hyp.P.subgroupOf hyp.S).subgroupOf HU : Set ↥HU) := by
       congr 1
-      show (data.H.subgroupOf hyp.S).subgroupOf HU = (hyp.P.subgroupOf hyp.S).subgroupOf HU
+      change (data.H.subgroupOf hyp.S).subgroupOf HU = (hyp.P.subgroupOf hyp.S).subgroupOf HU
       have hPeq : data.H = hyp.P := by
-        show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+        change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
       rw [hPeq]
     rw [hHInHu]
     have hs : ClassFunction.inner
@@ -499,7 +499,7 @@ theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
     have hx' : x ∈ (data.H.subgroupOf hyp.S).subgroupOf
         (OddOrder.Peterfalvi.S11.huSub data) := hx
     have hPeq : data.H = hyp.P := by
-      show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+      change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
     rw [hPeq] at hx'
     exact Subgroup.mem_subgroupOf.mp hx'
   have hxkerInd : (x : ↥hyp.S) ∈ OddOrder.Peterfalvi.S03.characterKernel
@@ -623,7 +623,7 @@ noncomputable def H_sharp_hypothesis76_base [Fintype G] [Invertible (Nat.card G 
   · have hUS : hyp.U ≤ hyp.S := by
       have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
       exact le_trans h1 (Subgroup.map_subtype_le _)
-    show hyp.P ⊔ hyp.C ≤ hyp.S
+    change hyp.P ⊔ hyp.C ≤ hyp.S
     refine sup_le ?_ ?_
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     · rw [hyp.C_eq]; exact le_trans inf_le_left hUS

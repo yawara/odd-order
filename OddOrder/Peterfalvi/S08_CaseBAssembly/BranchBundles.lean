@@ -527,7 +527,7 @@ theorem caseB_irr_induce_isIrreducible
       (θK : ClassFunction ↥h46.K ℂ) ⟨x, hx₁⟩
         = (θ : ClassFunction ↥H ℂ) ⟨x, hx₂⟩ := by
     intro x hx₁ hx₂
-    show ClassFunction.compHom e.toMonoidHom (θ : ClassFunction ↥H ℂ) ⟨x, hx₁⟩ = _
+    change ClassFunction.compHom e.toMonoidHom (θ : ClassFunction ↥H ℂ) ⟨x, hx₁⟩ = _
     rw [ClassFunction.compHom_apply]
     rfl
   have hindeq : ClassFunction.induce h46.K (θK : ClassFunction ↥h46.K ℂ)
@@ -598,7 +598,7 @@ theorem caseB_irr_conj_inner
     intro heq
     apply hnonreal
     have h2 := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq
-    show Φ.conj = Φ
+    change Φ.conj = Φ
     simpa using h2.symm
   have hkron := irreducibleCharacter_inner_eq_ite (⟨Φ, hirr1⟩ : IrreducibleCharacter ↥L)
     (⟨Φ.conj, hirr1.conj⟩ : IrreducibleCharacter ↥L)

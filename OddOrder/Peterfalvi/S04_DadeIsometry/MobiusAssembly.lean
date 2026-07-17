@@ -149,8 +149,8 @@ theorem card_hIntersection_conjFinset (hconj : hyp.HConjInvariant) (l : L)
     rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hsmul]
     rw [show (l : G)⁻¹ * ((l : G) * (y : G) * (l : G)⁻¹) * (l : G) = (y : G) from by group]
     exact y.2
-  · apply Subtype.ext; show (l : G) * ((l : G)⁻¹ * (x : G) * (l : G)) * (l : G)⁻¹ = (x : G); group
-  · apply Subtype.ext; show (l : G)⁻¹ * ((l : G) * (y : G) * (l : G)⁻¹) * (l : G) = (y : G); group
+  · apply Subtype.ext; change (l : G) * ((l : G)⁻¹ * (x : G) * (l : G)) * (l : G)⁻¹ = (x : G); group
+  · apply Subtype.ext; change (l : G)⁻¹ * ((l : G) * (y : G) * (l : G)⁻¹) * (l : G) = (y : G); group
 
 /-- The conjugation orbit element `a^l` lies in `N_L(B^l)` iff `a` lies in `N_L(B)`. -/
 theorem mem_nLStabilizerIn_conjA_conjFinset (l : L)

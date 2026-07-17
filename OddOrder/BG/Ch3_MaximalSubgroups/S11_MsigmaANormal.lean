@@ -734,7 +734,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
           congr 1
           refine Subtype.ext ?_
           rw [hφ_coe a y]
-          show (↑a : G) * (y₀ : G) * (↑a : G)⁻¹ = (y₀ : G)
+          change (↑a : G) * (y₀ : G) * (↑a : G)⁻¹ = (y₀ : G)
           have hcomm : (↑a : G) * (y₀ : G) = (y₀ : G) * (↑a : G) :=
             Subgroup.mem_centralizer_iff.mp
               ((inf_le_right : Q ⊓ Subgroup.centralizer (A : Set G) ≤

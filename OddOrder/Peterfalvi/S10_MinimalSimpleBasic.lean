@@ -1263,7 +1263,7 @@ theorem escapingCentralizers_control [Finite G]
     · subst hA0
       exact escaping_typePA0_mem_sigmaSharp_of_isTypeP1 hG hM data hP1 ⟨hxX, hesc⟩
   refine ⟨fun x hx => ?_, fun x hx => ?_⟩
-  · show x ∈ OddOrder.GroupTheory.A1 M tau
+  · change x ∈ OddOrder.GroupTheory.A1 M tau
     rw [OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType]
     exact key x hx
   · exact OddOrder.BG.Ch4.S16.existsUnique_maximal_centralizer_le_typeI_or_typeII hG hM
@@ -1441,7 +1441,7 @@ theorem dadeSupportHypotheses_typeI [Fintype G] [Finite G]
     obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp data.typeF.H_nontrivial
     have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
     have haH : a.1 ∈ mainSubgroup M PeterfalviType.I := by
-      show a.1 ∈ maxNilpotentNormalHall M
+      change a.1 ∈ maxNilpotentNormalHall M
       rw [← data.typeF.H_eq]
       exact a.2
     exact ⟨a.1, (Set.mem_sdiff _).mpr

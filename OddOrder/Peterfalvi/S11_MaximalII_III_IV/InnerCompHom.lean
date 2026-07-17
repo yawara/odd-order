@@ -705,7 +705,7 @@ theorem caseB_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSim
             (hcPsi chief θbar).toClassFunction := by
       rw [hcomp]
       exact OddOrder.RepresentationTheory.induce_compHom_subgroupCongr hKeq _
-    show induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ) = _
+    change induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ) = _
     calc induceHU data (ζ' : ClassFunction ↥(huSub data) ℂ)
         = ClassFunction.induce (huSub data) (ζ' : ClassFunction ↥(huSub data) ℂ) := by
           unfold induceHU
@@ -865,7 +865,7 @@ theorem hcZeta_mem_xiSet [Finite G] {M : Subgroup G}
   -- `hψker : (θ ((mk' N) (hInHuEquivH h)) : ℂ) = 1`, and `(mk' N)(hInHuEquivH h) = q`.
   have hqeq : (QuotientGroup.mk' chief.N) ((hInHuEquivH data) h) = q := hhq
   rw [hqeq] at hψker
-  show θ q = (1 : ℂˣ)
+  change θ q = (1 : ℂˣ)
   refine Units.ext ?_
   rw [Units.val_one]
   exact hψker
@@ -991,7 +991,7 @@ theorem caseB_no_irreducible_u_formula [Finite G]
     intro φ hφ hirr
     apply hno
     refine ⟨φ, ?_, hirr⟩
-    show φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief)
+    change φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief)
     rw [hCpbot, sup_bot_eq]
     exact hφ
   -- the case-(b) `oXtheta` count

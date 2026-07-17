@@ -85,7 +85,7 @@ theorem p_prime_and_card_H_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 /-- `H` is nilpotent (`H = M_F`, the maximal normal nilpotent Hall subgroup). -/
 theorem H_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     Group.IsNilpotent ↥hyp.H := by
-  show Group.IsNilpotent ↥hyp.base.typeP.H
+  change Group.IsNilpotent ↥hyp.base.typeP.H
   rw [hyp.base.typeP.H_eq]
   exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
 
@@ -244,7 +244,7 @@ theorem p_mem_primeFactors [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.p ∈ (Nat.card ↥hyp.H).primeFactors := by
   obtain ⟨hp_prime, hcard⟩ := hyp.p_prime_and_card_H_eq hG
   have hq : hyp.q ≠ 0 := by
-    show Nat.card ↥hyp.base.typeP.W1 ≠ 0
+    change Nat.card ↥hyp.base.typeP.W1 ≠ 0
     exact Nat.card_pos.ne'
   refine Nat.mem_primeFactors.mpr ⟨hp_prime, ?_, Nat.card_pos.ne'⟩
   rw [hcard]

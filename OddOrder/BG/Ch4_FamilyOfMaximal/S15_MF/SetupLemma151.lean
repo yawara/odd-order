@@ -325,7 +325,7 @@ theorem fittingInAmbient_eq_self_of_isNilpotent [Finite G] {H : Subgroup G}
     Group.nilpotent_of_mulEquiv Subgroup.topEquiv.symm
   have htop : OddOrder.Isaacs.Ch01.fitting ↥H = ⊤ :=
     top_le_iff.mp OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
-  show (OddOrder.Isaacs.Ch01.fitting ↥H).map H.subtype = H
+  change (OddOrder.Isaacs.Ch01.fitting ↥H).map H.subtype = H
   rw [htop, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
 
 /-- **Converse of `fittingInAmbient_eq_self_of_isNilpotent`** (`§14`-independent, reusable): if the

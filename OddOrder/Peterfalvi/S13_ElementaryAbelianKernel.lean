@@ -125,7 +125,7 @@ theorem exists_normal_subgroup_index_prime [Finite K] {p : ℕ}
     intro r hr
     have hrN : r ∈ N := hRlt.le hr
     refine ⟨⟨r, hrN⟩, ?_, rfl⟩
-    show (⟨r, hrN⟩ : ↥N) ∈ Q₀
+    change (⟨r, hrN⟩ : ↥N) ∈ Q₀
     rw [hQ₀def, Subgroup.mem_comap]
     have : (⟨r, hrN⟩ : ↥N) ∈ R' := by
       rw [hR'def, Subgroup.mem_subgroupOf]
@@ -1043,7 +1043,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       quotientMulAutHom chief.N_aInvariant a (g : ↥data.typeP.H ⧸ chief.N) := by
     intro a
     rw [hxCdef]
-    show QuotientGroup.mk' chief.N (φ a x) = _
+    change QuotientGroup.mk' chief.N (φ a x) = _
     rw [← hx]
     rfl
   have hS₀ne : S₀ ≠ ⊥ := by
@@ -1153,7 +1153,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     intro a v
     -- `φ (v:↥L) (xC a) = φ ((v:↥L) * a) x = xC ((v:↥L) * a)`.
     have hcomp : φ (v : ↥L) (xC a) = xC ((v : ↥L) * a) := by
-      show φ (v : ↥L) (φ a x) = φ ((v : ↥L) * a) x
+      change φ (v : ↥L) (φ a x) = φ ((v : ↥L) * a) x
       rw [map_mul, MulAut.mul_apply]
     rw [hcomp, hxCmk ((v : ↥L) * a)]
     -- `Φ ((v:↥L)*a) g = Φ a (Φ (a⁻¹ (v:↥L) a) g) = Φ a (g ^ e va) = (Φ a g)^{e va}`.

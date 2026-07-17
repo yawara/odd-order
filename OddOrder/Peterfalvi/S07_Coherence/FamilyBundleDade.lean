@@ -1173,7 +1173,7 @@ noncomputable def coherentEqualDegree_fromDade
       - (fun k => (χ k : ClassFunction (↥L) ℂ)) 0) = X j - X 0 := by
     intro j
     have hXd : X j - X 0 = data.signedDifference j := by
-      show data.sign • data.classFunction j - data.sign • data.classFunction 0
+      change data.sign • data.classFunction j - data.sign • data.classFunction 0
         = data.sign • (data.classFunction j - data.classFunction 0)
       rw [smul_sub]
     rw [hXd]; exact hdata j

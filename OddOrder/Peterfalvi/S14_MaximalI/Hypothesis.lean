@@ -248,7 +248,7 @@ theorem Sset_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis 
         (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
           (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
     apply Subtype.ext
-    show (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+    change (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
       = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
     rw [← ClassFunction.conj_conj
       (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]

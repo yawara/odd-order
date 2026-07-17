@@ -145,7 +145,7 @@ theorem sigma_omega (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       = hyp.chiFam hVeq app (hyp.omegaProdEquiv.symm ξ) := by
   rw [sigma_irreducibleCharacter]
   congr 1
-  show hyp.omegaProdEquiv.symm (hyp.omegaEquiv.symm (hyp.omega ξ)) = hyp.omegaProdEquiv.symm ξ
+  change hyp.omegaProdEquiv.symm (hyp.omegaEquiv.symm (hyp.omega ξ)) = hyp.omegaProdEquiv.symm ξ
   congr 1
   exact hyp.omegaEquiv.symm_apply_apply ξ
 
@@ -342,7 +342,7 @@ theorem sigma_apply_of_mem_V (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         simp only [map_smul, ClassFunction.smul_apply, RingHom.id_apply, smul_eq_mul]; ring }
   have hD0 : D = 0 := by
     refine Module.Basis.ext (irreducibleCharacterBasis (G := hyp.W)) (fun ω => ?_)
-    show hyp.sigma hVeq app (irreducibleCharacterBasis (G := hyp.W) ω) v
+    change hyp.sigma hVeq app (irreducibleCharacterBasis (G := hyp.W) ω) v
         - (irreducibleCharacterBasis (G := hyp.W) ω) ⟨v, hyp.V_subset_W hv⟩ = 0
     rw [irreducibleCharacterBasis_apply,
       hyp.sigma_apply_irreducibleCharacter_of_mem_V hVeq app ω hv, sub_self]
@@ -1219,7 +1219,7 @@ theorem exists_ratCast_of_forall_complexRingEquiv_eq {x : ℂ} (hint : IsIntegra
     have hconj : IsConjRoot ℚ
         (⟨y, hyK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ))
         (⟨x, hxK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) := by
-      show minpoly ℚ _ = minpoly ℚ _
+      change minpoly ℚ _ = minpoly ℚ _
       calc minpoly ℚ (⟨y, hyK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ))
           = minpoly ℚ y := IntermediateField.minpoly_eq _
         _ = minpoly ℚ x := hminy

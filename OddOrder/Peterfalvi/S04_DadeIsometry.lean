@@ -852,7 +852,7 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
   letI := hyp.conjFinsetAction
   letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
   refine ClassFunction.ext fun g => ?_
-  show hyp.dadeValue (α : SupportedClassFunctions (G := G) ℂ A L) g
+  change hyp.dadeValue (α : SupportedClassFunctions (G := G) ℂ A L) g
     = -∑ C : hyp.conjClassQuotient,
         hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
   by_cases hg : g ∈ hyp.dadeSupport
@@ -913,7 +913,7 @@ theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.H
       intro C hC
       rw [Finset.mem_filter]
       refine ⟨Finset.mem_univ _, ?_⟩
-      show hyp.transversalRep (Quotient.mk'' (hyp.transversalRep C)) = hyp.transversalRep C
+      change hyp.transversalRep (Quotient.mk'' (hyp.transversalRep C)) = hyp.transversalRep C
       simp only [transversalRep, Quotient.out_eq']
     · -- `j p ∈ filter (rep nonempty)`
       intro p hp
@@ -922,7 +922,7 @@ theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.H
       rw [hp.2]; exact p.2
     · -- left inverse: `mk'' (rep C) = C`
       intro C hC
-      show Quotient.mk'' (hyp.transversalRep C) = C
+      change Quotient.mk'' (hyp.transversalRep C) = C
       simp only [transversalRep, Quotient.out_eq']
     · -- right inverse: `⟨rep (mk'' p.1), _⟩ = p`
       intro p hp
@@ -969,7 +969,7 @@ theorem Hypothesis.preservesVirtualCharacters_dadeMap (hconj : hyp.HConjInvarian
     fun p => -((-1 : ℤ) ^ p.1.card), ?_⟩
   refine ClassFunction.ext fun g => ?_
   rw [hyp.dadeMap_eq_neg_sum_mobiusTermCF hconj α]
-  show -∑ C : hyp.conjClassQuotient,
+  change -∑ C : hyp.conjClassQuotient,
       hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
     = (∑ p ∈ (Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
         (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),

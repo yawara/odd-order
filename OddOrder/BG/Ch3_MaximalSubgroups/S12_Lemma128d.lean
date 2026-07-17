@@ -274,7 +274,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     refine Nat.le_of_dvd Nat.card_pos ?_
     refine card_opiCoreInG_dvd_of_nilpotent Nat.card_pos.ne' ?_
     intro r hr hr2
-    show (Nat.card ↥K).factorization r ≤ (Nat.card ↥E₂).factorization r
+    change (Nat.card ↥K).factorization r ≤ (Nat.card ↥E₂).factorization r
     have hfacK : (Nat.card ↥K).factorization r
         = (Nat.card ↥E₂).factorization r + (Nat.card ↥E₃).factorization r := by
       rw [hcard_K, Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne',

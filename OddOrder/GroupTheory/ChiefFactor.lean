@@ -521,7 +521,7 @@ theorem isNilpotent_of_chief_factor_centralization
       exact h_cent n
     have h_elem : ⁅(x : G), (g : G)⁆ ∈ chiefSeriesInside K (n + 1) :=
       h_subset (Subgroup.commutator_mem_commutator hx_val hg_val)
-    show ((x * g * x⁻¹ * g⁻¹ : ↥K) : G) ∈ chiefSeriesInside K (n + 1)
+    change ((x * g * x⁻¹ * g⁻¹ : ↥K) : G) ∈ chiefSeriesInside K (n + 1)
     have h_eq : ((x * g * x⁻¹ * g⁻¹ : ↥K) : G) = ⁅(x : G), (g : G)⁆ := by
       simp [commutatorElement_def]
     rw [h_eq]

@@ -706,11 +706,11 @@ theorem avgConj_coe_mem (B W : Subgroup G) [W.Normal] [IsMulCommutative ↥W] [F
   rw [avgConj_apply]
   refine Finset.prod_induction _ (fun w : ↥W => (w : G) ∈ X)
     (fun a b ha hb => by
-      show ((a * b : ↥W) : G) ∈ X
+      change ((a * b : ↥W) : G) ∈ X
       rw [Subgroup.coe_mul]
       exact X.mul_mem ha hb)
     (by
-      show ((1 : ↥W) : G) ∈ X
+      change ((1 : ↥W) : G) ∈ X
       rw [Subgroup.coe_one]
       exact X.one_mem)
     (fun b _ => ?_)
@@ -737,7 +737,7 @@ theorem disjoint_biSup_biSup_of_proj {M : Type*} [Group M] [IsMulCommutative M] 
   have hEt : E z = z ^ m := by
     have hle : (⨆ i ∈ t, V i : Subgroup M) ≤ MonoidHom.eqLocus E (powMonoidHom m) := by
       refine iSup₂_le fun j hj => fun v hv => ?_
-      show E v = powMonoidHom m v
+      change E v = powMonoidHom m v
       rw [powMonoidHom_apply, hE, MonoidHom.finsetProd_apply]
       rw [Finset.prod_eq_single j (fun b _ hbj => hkill b j hbj v hv)
         (fun hj' => absurd hj hj')]
@@ -763,14 +763,14 @@ def conjSubtypeMulAction (A : Subgroup G) (P : Subgroup G → Prop)
   smul a X := ⟨(X : Subgroup G).map (MulAut.conj (a : G)).toMonoidHom, hP a X X.2⟩
   one_smul X := by
     refine Subtype.ext ?_
-    show Subgroup.map _ _ = _
+    change Subgroup.map _ _ = _
     have h1 : (MulAut.conj ((1 : ↥A) : G)).toMonoidHom = MonoidHom.id G := by
       ext g
       simp
     rw [h1, Subgroup.map_id]
   mul_smul a b X := by
     refine Subtype.ext ?_
-    show Subgroup.map _ _ = Subgroup.map _ (Subgroup.map _ _)
+    change Subgroup.map _ _ = Subgroup.map _ (Subgroup.map _ _)
     rw [Subgroup.map_map]
     congr 1
     ext g

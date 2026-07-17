@@ -696,7 +696,7 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     exact hanc ⟨w * aκ * w⁻¹, ⟨hbκK, hbκne⟩, w⁻¹, by rw [haaκ]; group⟩
   -- `b_κ' ∈ K*`: it lies in `M' ⊓ C_M(b_κ) = M' ⊓ (K ⊔ K*) = K*`.
   have hbκ'comm : Commute (w * aκ * w⁻¹) (w * aκ' * w⁻¹) := by
-    show w * aκ * w⁻¹ * (w * aκ' * w⁻¹) = w * aκ' * w⁻¹ * (w * aκ * w⁻¹)
+    change w * aκ * w⁻¹ * (w * aκ' * w⁻¹) = w * aκ' * w⁻¹ * (w * aκ * w⁻¹)
     calc w * aκ * w⁻¹ * (w * aκ' * w⁻¹) = w * (aκ * aκ') * w⁻¹ := by group
       _ = w * (aκ' * aκ) * w⁻¹ := by rw [hcomm.eq]
       _ = w * aκ' * w⁻¹ * (w * aκ * w⁻¹) := by group

@@ -322,7 +322,7 @@ theorem typeFData_exists_kappaElement_le_kappaHall [Finite G]
     rw [← Subgroup.map_subgroupOf_eq_of_le hXMle]
     exact Subgroup.map_mono hXK'
   · -- `IsHallSubgroup κ ((K'.map subtype).subgroupOf M)` reduces to `hK'_hall` on `K'`.
-    show Ch03.IsHallSubgroup (S14.kappa M) ((K'.map M.subtype).comap M.subtype)
+    change Ch03.IsHallSubgroup (S14.kappa M) ((K'.map M.subtype).comap M.subtype)
     rw [Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     exact hK'_hall
 
@@ -710,7 +710,7 @@ theorem centralizer_escape_final_local [Finite G]
   have hinf : OddOrder.BG.Ch3.S10.Msigma N ⊓ (M ⊓ N) = ⊥ := by
     have hd : Disjoint (OddOrder.BG.Ch3.S10.Msigma N ⊓ (M ⊓ N)) N := by
       rw [← Subgroup.subgroupOf_eq_bot]
-      show (OddOrder.BG.Ch3.S10.Msigma N ⊓ (M ⊓ N)).comap N.subtype = ⊥
+      change (OddOrder.BG.Ch3.S10.Msigma N ⊓ (M ⊓ N)).comap N.subtype = ⊥
       rw [Subgroup.comap_inf]; exact disjoint_iff.mp hcompl.disjoint
     have hle : OddOrder.BG.Ch3.S10.Msigma N ⊓ (M ⊓ N) ≤ N := inf_le_right.trans inf_le_right
     rw [← inf_of_le_left hle]; exact disjoint_iff.mp hd

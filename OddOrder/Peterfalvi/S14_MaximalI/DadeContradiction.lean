@@ -543,7 +543,7 @@ theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
       simpa using h2
     apply Subtype.ext
-    show (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+    change (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
       = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
     rw [← ClassFunction.conj_conj (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
     exact trivialClassFunction_isReal
@@ -1399,11 +1399,11 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       = Nat.card ↥data.L := hC.isComplement.card_mul_card
   have hsmall : H78.smallIndex := by
     have hfrob := frobenius_two_mul_card_complement_add_one_le_card_kernel hC hKodd hCodd hKnt
-    show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+    change 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
     have hke : H78.kernelOrder = Nat.card ↥((hyp.typeI.typeF.H).subgroupOf data.L) := by
       rw [hKcard]; rfl
     have hce : H78.complementIndex = Nat.card ↥C := by
-      show Nat.card ↥data.L / Nat.card hyp.typeI.typeF.H = Nat.card ↥C
+      change Nat.card ↥data.L / Nat.card hyp.typeI.typeF.H = Nat.card ↥C
       rw [← hKcard, ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
     rw [hke, hce]; exact hfrob
   refine ⟨hyp, H78, ?_⟩

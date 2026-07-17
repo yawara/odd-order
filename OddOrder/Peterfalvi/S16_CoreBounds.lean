@@ -1091,7 +1091,7 @@ theorem exists_yD_mem_actionCommutator_conj_s_eq_t [Finite G]
   have hy_coe : (data.y : G) = (yD : G) * (yC : G) := by
     have h := congrArg (Subtype.val) hyDyC
     simpa using h.symm
-  show MulAut.conj (yD : G) data.s = MulAut.conj data.y data.s
+  change MulAut.conj (yD : G) data.s = MulAut.conj data.y data.s
   rw [MulAut.conj_apply, MulAut.conj_apply, hy_coe, mul_inv_rev,
     show (yD : G) * (yC : G) * data.s * ((yC : G)⁻¹ * (yD : G)⁻¹)
         = (yD : G) * ((yC : G) * data.s * (yC : G)⁻¹) * (yD : G)⁻¹ by group,

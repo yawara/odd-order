@@ -77,7 +77,7 @@ theorem Hypothesis.toTypesIIIIIIVSetupT_H_eq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1) :
     ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q := by
-  show (reconciled_typePData_T hG hyp).choose.H = hyp.Q
+  change (reconciled_typePData_T hG hyp).choose.H = hyp.Q
   rw [(reconciled_typePData_T hG hyp).choose.H_eq, hyp.Q_eq_TF]
 
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
@@ -144,7 +144,7 @@ theorem Hypothesis.q_not_dvd_card_H [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   intro hdvd
   -- `|H| ∣ |S'| = |P|·|U|`.
   have hHle : hyp.H ≤ derivedInG hyp.S := by
-    show hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
+    change hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
     rw [hyp.S_deriv_eq_PU]
     exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
   have hcard_deriv : Nat.card ↥hyp.P * Nat.card ↥hyp.U = Nat.card ↥(derivedInG hyp.S) := by
@@ -216,7 +216,7 @@ theorem disjoint_conjClassSet_sharp_H_Q [Finite G] (hG : OddOrder.BG.IsMinimalSi
 theorem Hypothesis.mem_G0_iff (hyp : Hypothesis (G := G)) (x : G) :
     x ∈ hyp.G0 ↔ x ≠ 1 ∧ x ∉ conjClassSet (sharpSubgroup hyp.H)
       ∧ x ∉ conjClassSet (sharpSubgroup hyp.Q) := by
-  show x ∈ sharpSubgroup (⊤ : Subgroup G) \ _ ↔ _
+  change x ∈ sharpSubgroup (⊤ : Subgroup G) \ _ ↔ _
   simp only [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe,
     Subgroup.mem_top, true_and, Set.mem_union, not_or]
 
@@ -263,7 +263,7 @@ theorem Hypothesis.sum_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleO
     rintro K x hx rfl
     obtain ⟨a, ⟨-, ha1⟩, g, hg⟩ := mem_conjClassSet.mp hx
     refine ha1 ?_
-    show a = 1
+    change a = 1
     have ha : a = g⁻¹ * (g * a * g⁻¹) * g := by group
     rw [ha, hg]
     group
@@ -839,7 +839,7 @@ theorem card_sharp_toFinset [Fintype G] (K : Subgroup G) :
       = (Finset.univ.filter (· ∈ K)).erase 1 := by
     ext x
     rw [Set.Finite.mem_toFinset, Finset.mem_erase, Finset.mem_filter]
-    show x ∈ (K : Set G) \ {1} ↔ _
+    change x ∈ (K : Set G) \ {1} ↔ _
     rw [Set.mem_sdiff, Set.mem_singleton_iff]
     exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
   rw [h, Finset.card_erase_of_mem (Finset.mem_filter.mpr ⟨Finset.mem_univ _, K.one_mem⟩)]
