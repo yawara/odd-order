@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Lemma615
 
 /-!
@@ -1309,6 +1310,24 @@ theorem isCyclic_or_two_quaternion_of_subgroups_card_prime_unique
     exact False.elim
       (false_of_unique_subgroups_card_two_of_semiDihedral_of_not_isCyclic
         hP_two hUnique_two hP_cyclic hSD)
+
+/-- **Isaacs Cor 6.17** (p. 190, full form): every Sylow subgroup of a Frobenius complement
+is cyclic or (for `p = 2`) generalized quaternion.
+
+Composition of **Cor 6.10** (`subgroups_card_prime_unique_of_frobeniusAction_sylow`: a Sylow
+`p`-subgroup of a Frobenius complement has at most one subgroup of order `p`) with
+**Thm 6.11** (`isCyclic_or_two_quaternion_of_subgroups_card_prime_unique`).  The abelian
+branches are `sylow_isCyclic_of_frobeniusAction_of_isMulCommutative` and
+`isCyclic_of_frobeniusAction_of_isMulCommutative` (an abelian Frobenius complement is
+cyclic). -/
+theorem sylow_isCyclic_or_two_quaternion_of_frobeniusAction
+    {A U : Type*} [Group A] [Finite A] [Group U] [Finite U] [Nontrivial U]
+    [MulDistribMulAction A U]
+    (hFrob : IsFrobeniusAction A U) {p : ℕ} [Fact p.Prime] (P : Sylow p A) :
+    IsCyclic ↥(P : Subgroup A) ∨
+      p = 2 ∧ ∃ n : ℕ, Nonempty (↥(P : Subgroup A) ≃* QuaternionGroup n) :=
+  isCyclic_or_two_quaternion_of_subgroups_card_prime_unique P.isPGroup'
+    (subgroups_card_prime_unique_of_frobeniusAction_sylow hFrob P)
 
 /-! ### Lem 6.15 — contradiction forms for the 6.11 route -/
 
