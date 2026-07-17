@@ -385,7 +385,7 @@ theorem card_filter_induce_eq_index_inertia (T : Finset (IrreducibleCharacter H)
     Nat.card_coe_set_eq, ← Set.ncard_coe_finset]
   congr 1
   ext θ
-  simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_coe,
+  simp only [Finset.coe_filter, Set.mem_setOf_eq,
     IrreducibleCharacter.mem_conjByOrbit, induce_eq_induce_iff_conj]
   constructor
   · rintro ⟨_, g, hg⟩

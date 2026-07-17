@@ -127,7 +127,7 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have himage : {φ ∈ sOf data K | ¬ IsIrreducibleCharacter φ}
       = (fun χbar : IrreducibleCharacter ↥h.K => induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) '' B' := by
     ext φ
-    simp only [Set.mem_sep_iff, Set.mem_image, hB'_def, Set.mem_setOf_eq]
+    simp only [Set.mem_image, hB'_def, Set.mem_setOf_eq]
     constructor
     · rintro ⟨hφS, hred⟩
       rw [mem_sOf] at hφS
@@ -431,7 +431,7 @@ theorem HsupC_le_normalizer_K [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSe
       · rcases hx with hxH | hxC
         · exact hHC' (Subgroup.commutator_mem_commutator hxH (cprimeSub_le_C data chief hyc'))
         · exact hCC (Subgroup.commutator_mem_commutator hxC (cprimeSub_le_C data chief hyc'))
-    | one => simpa using K.one_mem
+    | one => simp
     | mul a b ha hb iha ihb =>
       have haK : a ∈ K := by rw [hKclosure]; exact ha
       rw [show ⁅x, a * b⁆ = ⁅x, a⁆ * (a * ⁅x, b⁆ * a⁻¹) by

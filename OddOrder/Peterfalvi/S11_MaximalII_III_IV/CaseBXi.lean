@@ -974,7 +974,7 @@ theorem hcConjDescend_bijective [Finite G] {M : Subgroup G}
     rw [hcConjDescend_hcHom, hcConjDescend_hcHom]
     congr 1
     apply Subtype.ext
-    simp only [ClassFunction.conjByMulEquiv_apply, Subgroup.coe_mul, Subgroup.coe_inv]
+    simp only [ClassFunction.conjByMulEquiv_apply]
     group
 
 /-- **`A_g = id` for `g ∈ HC`**: conjugation by an `HC`-element descends to the identity on `H̄`,
@@ -1013,7 +1013,7 @@ theorem hcConjDescend_mul [Finite G] {M : Subgroup G}
   rw [← hx, MonoidHom.comp_apply, hcConjDescend_hcHom, hcConjDescend_hcHom, hcConjDescend_hcHom]
   congr 1
   apply Subtype.ext
-  simp only [ClassFunction.conjByMulEquiv_apply, Subgroup.coe_mul, Subgroup.coe_inv]
+  simp only [ClassFunction.conjByMulEquiv_apply]
   group
 
 /-- **`A_u = uActionHom(a)` for a `U`-part element `u ∈ uInHu`** (P3 of the case-A

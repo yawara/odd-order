@@ -497,7 +497,6 @@ theorem CharacterDegreeCore.exists_caseB_data_lambda_core [Finite G]
     have hval : ‖(hyp.q : ℂ) * (b : ℂ)‖ ^ 2
         = ((hyp.q : ℝ) * (b : ℝ)) ^ 2 := by
       rw [norm_mul, mul_pow, Complex.norm_natCast, Complex.norm_intCast, sq_abs]
-      push_cast
       ring
     rw [hval] at hinfl
     exact hinfl
@@ -559,11 +558,11 @@ theorem CharacterDegreeCore.lambda_tau1_sharp_norm_lower_core [Finite G]
       (fun x => lam.lambda x) α (fun x => core.tau1S lam.lambda ↑x)
       (Scard := Nat.card ↥hyp.S) (Pm1 := hyp.p ^ hyp.q - 1)
       (u := hyp.u) (q := hyp.q) (lam1 := ((hyp.u * hyp.q : ℕ) : ℝ)) (b := b)
-      hvanish (by convert hinner using 2 <;> congr!)
-      (fun x hx => hχ x (by convert hx using 2 <;> congr!))
+      hvanish (by convert hinner using 2)
+      (fun x hx => hχ x (by convert hx using 2))
       hT hzetaOne hcross hlam1
-      (by convert hinfl using 2 <;> congr!) hu
-    convert h using 2 <;> congr!
+      (by convert hinfl using 2; congr!) hu
+    convert h using 2; congr!
   rwa [sum_apply_erase_one_filter_subgroupOf hHS
     (fun y => ‖core.tau1S lam.lambda y‖ ^ 2)] at hengine
 

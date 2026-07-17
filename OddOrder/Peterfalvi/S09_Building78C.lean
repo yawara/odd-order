@@ -964,10 +964,10 @@ noncomputable def hypothesis76OfFamily
       simp only [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
       refine ⟨hx.1, fun h1 => hx.2 (Subtype.ext h1)⟩
     zeta_injective := hinj
-    zeta_induced := fun i => ⟨θ i, by congr! <;> exact Subsingleton.elim _ _⟩
+    zeta_induced := fun i => ⟨θ i, by congr!; exact Subsingleton.elim _ _⟩
     zeta_family_cover := fun φ => by
       obtain ⟨i, hi⟩ := hcover φ
-      exact ⟨i, hi.trans (by congr! <;> exact Subsingleton.elim _ _)⟩
+      exact ⟨i, hi.trans (by congr!; exact Subsingleton.elim _ _)⟩
     chiRho_decomp := by
       intro χ x hx
       have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=

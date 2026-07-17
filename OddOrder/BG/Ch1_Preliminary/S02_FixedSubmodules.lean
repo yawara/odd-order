@@ -1513,7 +1513,6 @@ theorem exists_prime_opCore_ne_bot_of_commutative
   have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hr_dvd
   have hPnormal : (P : Subgroup G).Normal := by
     refine ⟨fun x hx g => ?_⟩
-    change g * x * g⁻¹ ∈ (P : Subgroup G)
     rw [hGcomm.comm g x]
     simpa [mul_assoc] using hx
   haveI : (P : Subgroup G).Normal := hPnormal

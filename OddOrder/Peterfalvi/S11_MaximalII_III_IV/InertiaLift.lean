@@ -308,9 +308,8 @@ theorem hcuLambdaHom_inclusion [Finite G] (caseA : CliffordCaseAData chars)
       = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left c) := by
     simp only [QuotientGroup.quotientInfEquivProdNormalQuotient,
       QuotientGroup.quotientInfEquivProdNormalizerQuotient, MulEquiv.trans_apply,
-      QuotientGroup.quotientMulEquivOfEq_mk, QuotientGroup.quotientKerEquivOfSurjective,
-      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk, MulEquiv.symm_mk,
-      MonoidHom.toMulEquiv_apply, QuotientGroup.kerLift_mk]
+      QuotientGroup.quotientKerEquivOfSurjective,
+      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk]
     rfl
   simp only [hcuLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
   have hcongr : (MulEquiv.subgroupCongr (hcuInHu_eq_cuInHu_sup_hInHu caseA))

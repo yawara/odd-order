@@ -653,7 +653,7 @@ theorem exists_chiFamily_of_decomposition (hyp : TICyclicHypothesis G) [Fintype 
       · subst hq; subst hq'
         rw [hχp1 p hp, hχp1 p' hp', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
           neg_neg, hgw, hgw, hortho, if_neg (by
-            simp only [ne_eq, Sum.inr.injEq, Sum.inl.injEq, Subtype.mk.injEq]
+            simp only [ne_eq, Sum.inl.injEq, Subtype.mk.injEq]
             exact fun h => hab (by rw [h]))]
       · subst hq
         rw [hχp1 p hp, hχpq p' q' hp' hq', ClassFunction.inner_neg_left, hgw, hgφ, hortho,

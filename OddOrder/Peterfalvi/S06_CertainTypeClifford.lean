@@ -57,7 +57,7 @@ theorem card_group_dvd_card_of_freeAction {G α : Type*} [Group G] [Finite G] [F
     exact ⟨fun a => hs (hfree s (a : α) (MulAction.mem_fixedBy.mp a.2))⟩
   have h1 : Fintype.card (MulAction.fixedBy α (1 : G)) = Fintype.card α := by
     have huniv : MulAction.fixedBy α (1 : G) = Set.univ := by
-      ext a; simp [MulAction.mem_fixedBy]
+      ext a; simp
     exact Fintype.card_congr ((Equiv.setCongr huniv).trans (Equiv.Set.univ α))
   have hsum : (∑ s : G, Fintype.card (MulAction.fixedBy α s)) = Fintype.card α :=
     (Finset.sum_eq_single (1 : G) h0 (fun h => absurd (Finset.mem_univ _) h)).trans h1

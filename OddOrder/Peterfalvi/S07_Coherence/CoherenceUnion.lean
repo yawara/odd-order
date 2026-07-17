@@ -480,7 +480,7 @@ theorem coherentEqualDegree_swap_neg
   have hr : Set.range (![φ₀, φ₁] : Fin 2 → ClassFunction L ℂ) = ({φ₀, φ₁} : Set _) := by
     ext x
     simp only [Set.mem_range, Fin.exists_fin_two, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Matrix.head_cons, Set.mem_insert_iff, Set.mem_singleton_iff]
+      Set.mem_insert_iff, Set.mem_singleton_iff]
     tauto
   refine ⟨hr ▸ coherentEqualDegree (by norm_num : (2 : ℕ) ≤ 2) horthχ horthX himg hXZ hdeg'
       hdeg0' h1A hsuppdiff, ?_, ?_⟩

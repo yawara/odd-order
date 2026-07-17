@@ -921,7 +921,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     representatives := fun M hM => by
       obtain ⟨Mi, ⟨hMirep, hconj⟩, _⟩ := hreps M hM
       refine ⟨⟨e ⟨Mi, hMirep⟩⟩, ?_⟩
-      simp only [ULift.down_up, Equiv.symm_apply_apply]
+      simp only [Equiv.symm_apply_apply]
       exact hconj
     nonconjugate := fun j k hconj => by
       have hsub : e.symm j.down = e.symm k.down := by
@@ -935,7 +935,7 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       constructor
       · rintro ⟨Mi, hMirep, hpMi⟩
         refine ⟨⟨e ⟨Mi, hMirep⟩⟩, ?_⟩
-        simp only [ULift.down_up, Equiv.symm_apply_apply]
+        simp only [Equiv.symm_apply_apply]
         exact (hbridge ⟨Mi, hMirep⟩ _ (htyped ⟨Mi, hMirep⟩) p).mpr hpMi
       · rintro ⟨j, hpj⟩
         exact ⟨(e.symm j.down).1, (e.symm j.down).2,
@@ -990,14 +990,14 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       refine (OddOrder.BG.Ch4.S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG
         htypeF).trans ?_
       ext g
-      simp only [Set.mem_iUnion₂, Set.mem_iUnion, exists_prop]
+      simp only [Set.mem_iUnion, exists_prop]
       constructor
       · intro hex
         obtain ⟨Mi, hMirep, hg⟩ :=
           (OddOrder.BG.Ch4.S16.mem_conjClassSet_Mtilde_maximals_iff_reps hG hrepsMax
             (fun H hH => (hreps H hH).exists) g).mp hex
         refine ⟨⟨e ⟨Mi, hMirep⟩⟩, ?_⟩
-        simp only [ULift.down_up, Equiv.symm_apply_apply]
+        simp only [Equiv.symm_apply_apply]
         exact hg
       · rintro ⟨j, hg⟩
         exact ⟨(e.symm j.down).1, hrepsMax _ (e.symm j.down).2, hg⟩

@@ -975,7 +975,7 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
       hηS hηirr hη1 hηζ hdeg hμ0 hnf hδj hdζ h0ζ
     rw [hcoeff _ hζR, hcoeff _ (hRmem η hηS hηirr hη1)] at hsub
     have hcast : ((c (coh.extension η) : ℤ) : ℂ) = ((a : ℤ) : ℂ) := by
-      rw [hadef]; push_cast; push_cast at hsub; linear_combination -hsub
+      rw [hadef]; push_cast; linear_combination -hsub
     exact_mod_cast hcast
   have hsplit := sum_sq_eq_of_split hζR hcζ hcη
   rw [hRn] at hsplit

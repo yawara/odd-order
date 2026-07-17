@@ -49,6 +49,10 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
       `Lean.Util.CollectAxioms` narrow / docstring を最初のコマンドに / file-scoped
       `linter.style.longLine false` (機械列挙の明示例外)。leaf build green 検証済。
 - [ ] wave 1: no-op/dead tactic + unused simp args + simpa/`<;>` (~230 件、意味非依存)
+      — 3 subagent 委譲 (2026-07-17)。残置 1 件: `S07_Coherence/PsiDecomposition.lean:191`
+      (sole-arg `simp only [if_pos rfl]`、除去すると `simp only []` 化するため個別攻略要 —
+      `reduceIte` simproc 置換は Decidable instance の whnf 可否に依存し unsafe、build 試行で決める)。
+      Isaacs Ch06 の 11 件は a の active 領域ゆえ除外 (frontier 移動後に追补)。
 - [ ] wave 2: binder 衛生 (unused section vars / Variable name) (~220 件)
 - [ ] wave 3: header/docstring/maxHeartbeats (~120 件)
 - [ ] wave 4: longLine 2741 件 — dir 単位 (BG → Pf S* → Isaacs 完了章 → shared)

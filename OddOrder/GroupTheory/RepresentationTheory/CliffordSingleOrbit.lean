@@ -532,7 +532,7 @@ theorem apply_one_le_induce_apply_one_of_liesOver
   have hexp := sum_inner_irreducibleCharacter_smul (G := G)
     (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
   have key := congrArg (fun f : ClassFunction G ℂ => f (1 : G)) hexp
-  simp only [hsumapp, ClassFunction.smul_apply, smul_eq_mul] at key
+  simp only [hsumapp, ClassFunction.smul_apply] at key
   -- Every summand `⟨Ind ψ, η⟩ · η(1)` is `≥ 0`.
   have hnn : ∀ η ∈ (Finset.univ : Finset (IrreducibleCharacter G)),
       (0 : ℂ) ≤ ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))

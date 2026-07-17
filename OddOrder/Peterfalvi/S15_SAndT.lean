@@ -728,7 +728,7 @@ theorem typeI_caseC_dichotomy_of_c_eq_one [Finite G]
       typeI_caseC_bound_c1_of_c_eq_one _hG hnoV hyp hc1 dataL nS hnS
         (by rintro rfl; obtain ⟨m, hm⟩ := hSodd; omega)⟩
     intro _ _
-    convert hbridge using 2 <;> first | rfl | exact Subsingleton.elim _ _
+    convert hbridge using 2; first | rfl | exact Subsingleton.elim _ _
   · -- case (c2): `nS` even, so `nL` is odd and `p ≤ e`.
     have hLodd : Odd nL := by
       rw [Int.not_odd_iff_even] at hSodd
@@ -750,7 +750,7 @@ theorem typeI_caseC_dichotomy_of_c_eq_one [Finite G]
     refine Or.inr ⟨fun j hj => ⟨nL, hLodd, ?_⟩,
       typeI_caseC_bound_c2_of_c_eq_one _hG hnoV hyp hc1 dataL nL hnL hnL0⟩
     intro _ _
-    convert hbridge j hj using 2 <;> first | rfl | exact Subsingleton.elim _ _
+    convert hbridge j hj using 2; first | rfl | exact Subsingleton.elim _ _
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.19.c) T-side dichotomy** (S↔T swapped): the `typeI_caseC_dichotomy` instance at

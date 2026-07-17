@@ -38,7 +38,7 @@ private theorem conj_smul_centralizer_singleton (u x : G) :
   ext g
   rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
   have hsmul : ((MulAut.conj u)⁻¹ • g : G) = u⁻¹ * g * u := by
-    rw [← map_inv]; simp [MulAut.smul_def, MulAut.conj_apply]
+    rw [← map_inv]; simp [MulAut.smul_def]
   rw [hsmul]
   simp only [Subgroup.mem_centralizer_iff, Set.mem_singleton_iff, forall_eq]
   constructor

@@ -789,7 +789,7 @@ theorem mem_closure_conjCentralizers_of_not_isCyclic
       have hau : (a • u : ↥N) = u := hu_fix
       have : ((a • u : ↥N) : G) = (↑u : G) := congrArg _ hau
       rwa [hsmul_coe] at this
-  · simpa using Subgroup.one_mem _
+  · simp
   · intro x y _ _ hx hy
     rw [Subgroup.coe_mul]; exact Subgroup.mul_mem _ hx hy
   · intro x _ hx
