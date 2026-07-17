@@ -7020,6 +7020,11 @@ field automorphisms `σ_y`.  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear
 
+/-! The scalar-enhanced form retains the concrete homomorphism `T → Fˣ` and its action law. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear_with_scalar
+
 /-! **Peterfalvi, Appendix I, Proposition 2(b)**: the elementwise field automorphisms
 attached to semilinear maps form a coherent group homomorphism; on a faithful
 one-dimensional point stabilizer this homomorphism is injective. -/

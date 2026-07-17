@@ -298,6 +298,155 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
   change uLin (a x) = uLin (a (uLin.symm (uLin x)))
   rw [LinearEquiv.symm_apply_apply]
 
+/-- **Peterfalvi, Appendix I, Proposition 2(a)+(b)**, with the scalar
+realization of `T` retained.  The old `exists_field_semilinear` theorem remains
+unchanged; this stronger result is the interface required by Part II, Ch. I
+§2, Proposition 3. -/
+theorem exists_field_semilinear_with_scalar.{u} {p : ℕ} [Fact p.Prime]
+    {E : Type u} [CommGroup E] [Finite E] [Nontrivial E]
+    (hE : IsElementaryAbelian p E) {T : Type*} [CommGroup T] [Finite T]
+    (ψ : T →* MulAut E)
+    (hirr : ∀ U : Subgroup E, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤) :
+    ∃ (F : Type u) (_ : Field F) (_ : Module F (Additive E)) (_ : Finite F),
+      Module.finrank F (Additive E) = 1 ∧ Nat.card F = Nat.card E ∧
+      (∃ μ : T →* Fˣ, ∀ (t : T) (x : Additive E),
+        (μ t : F) • x = Additive.ofMul ((ψ t) (Additive.toMul x))) ∧
+      ∀ (g : MulAut E) (c : T ≃* T), (∀ t, ψ (c t) = g * ψ t * g⁻¹) →
+        ∃ σ : F ≃+* F, ∀ (a : F) (x : Additive E),
+          (MulEquiv.toAdditive g) (a • x) =
+            σ a • (MulEquiv.toAdditive g) x := by
+  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hE.pow_eq_one x.toMul
+  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
+  letI instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+    Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom
+  have key : ∀ (t : T) (x : Additive E),
+      (MonoidAlgebra.of (ZMod p) T t) • x =
+        Additive.ofMul ((ψ t) (Additive.toMul x)) := by
+    intro t x
+    rw [show (MonoidAlgebra.of (ZMod p) T t) • x =
+          ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x from rfl,
+        Representation.asAlgebraHom_of]
+    rfl
+  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
+    haveI : Nontrivial (Additive E) :=
+      inferInstanceAs (Nontrivial (Additive E))
+    refine { eq_bot_or_eq_top := fun N ↦ ?_ }
+    let H : Subgroup E :=
+      { carrier := {e : E | Additive.ofMul e ∈ N}
+        one_mem' := by
+          change Additive.ofMul (1 : E) ∈ N
+          rw [ofMul_one]
+          exact N.zero_mem
+        mul_mem' := fun {a b} ha hb => by
+          change Additive.ofMul (a * b) ∈ N
+          rw [ofMul_mul]
+          exact N.add_mem ha hb
+        inv_mem' := fun {a} ha => by
+          change Additive.ofMul a⁻¹ ∈ N
+          rw [ofMul_inv]
+          exact N.neg_mem ha }
+    have hHinv : IsAInvariant ψ H := by
+      rw [isAInvariant_iff_smul_mem]
+      intro t a ha
+      change Additive.ofMul ((ψ t) a) ∈ N
+      have hmem :
+          (MonoidAlgebra.of (ZMod p) T t) • (Additive.ofMul a) ∈ N :=
+        N.smul_mem _ (show Additive.ofMul a ∈ N from ha)
+      rw [key t (Additive.ofMul a)] at hmem
+      exact hmem
+    rcases hirr H hHinv with h | h
+    · left
+      rw [Submodule.eq_bot_iff]
+      intro x hx
+      have hxH : Additive.toMul x ∈ H := hx
+      rw [h, Subgroup.mem_bot] at hxH
+      change Additive.ofMul (Additive.toMul x) = 0
+      rw [hxH, ofMul_one]
+    · right
+      rw [Submodule.eq_top_iff']
+      intro x
+      exact (by rw [h]; exact Subgroup.mem_top _ : Additive.toMul x ∈ H)
+  let μ : T →* (Module.End (MonoidAlgebra (ZMod p) T) (Additive E))ˣ :=
+    (Units.map (Algebra.lsmul (MonoidAlgebra (ZMod p) T)
+      (MonoidAlgebra (ZMod p) T) (Additive E)).toMonoidHom).comp
+      (MonoidAlgebra.of (ZMod p) T).toHomUnits
+  refine ⟨Module.End (MonoidAlgebra (ZMod p) T) (Additive E), endField,
+    Module.End.applyModule, finite_end, finrank_end_eq_one,
+    natCard_end_eq.trans (Nat.card_congr Additive.toMul),
+    ⟨μ, ?_⟩, fun g c hc => ?_⟩
+  · intro t x
+    change (MonoidAlgebra.of (ZMod p) T t) • x = _
+    exact key t x
+  · let uLin : Additive E ≃ₗ[ZMod p] Additive E :=
+      (MulEquiv.toAdditive g).toLinearEquiv
+        (fun a x =>
+          ZMod.map_smul (MulEquiv.toAdditive g).toAddMonoidHom a x)
+    let τ : MonoidAlgebra (ZMod p) T ≃ₐ[ZMod p]
+        MonoidAlgebra (ZMod p) T :=
+      MonoidAlgebra.domCongr (ZMod p) (ZMod p) c
+    have hu_eq : ∀ t, g * ψ t = ψ (c t) * g := by
+      intro t
+      rw [hc t]
+      group
+    have hsemi : ∀ (r : MonoidAlgebra (ZMod p) T) (x : Additive E),
+        uLin (r • x) = (τ r) • (uLin x) := by
+      intro r
+      refine MonoidAlgebra.induction_on
+        (p := fun r => ∀ x : Additive E, uLin (r • x) = (τ r) • (uLin x))
+        r (fun t x => ?_) (fun a b ha hb x => ?_)
+        (fun s a ha x => ?_)
+      · have e1 : (MonoidAlgebra.of (ZMod p) T t) • x =
+            (mulAutToEnd E p (ψ t)) x := by
+          change ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x = _
+          rw [Representation.asAlgebraHom_of]
+          rfl
+        have e2 : τ (MonoidAlgebra.of (ZMod p) T t) =
+            MonoidAlgebra.of (ZMod p) T (c t) := by
+          change MonoidAlgebra.domCongr (ZMod p) (ZMod p) c
+            (MonoidAlgebra.of (ZMod p) T t) = _
+          rw [show MonoidAlgebra.of (ZMod p) T t =
+              MonoidAlgebra.single t 1 from rfl,
+            MonoidAlgebra.domCongr_single]
+          rfl
+        have e3 : (MonoidAlgebra.of (ZMod p) T (c t)) • (uLin x) =
+            (mulAutToEnd E p (ψ (c t))) (uLin x) := by
+          change ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T (c t))
+            (uLin x) = _
+          rw [Representation.asAlgebraHom_of]
+          rfl
+        rw [e1, e2, e3]
+        change mulAutToEnd E p g ((mulAutToEnd E p (ψ t)) x) =
+          (mulAutToEnd E p (ψ (c t))) (mulAutToEnd E p g x)
+        rw [← Module.End.mul_apply, ← Module.End.mul_apply,
+          ← map_mul, ← map_mul, hu_eq t]
+      · rw [add_smul, map_add, ha, hb, map_add, add_smul]
+      · rw [smul_assoc, map_smul, ha, map_smul, smul_assoc]
+    let τRing : MonoidAlgebra (ZMod p) T ≃+*
+        MonoidAlgebra (ZMod p) T := τ.toRingEquiv
+    haveI := RingHomInvPair.of_ringEquiv τRing
+    haveI := RingHomInvPair.of_ringEquiv τRing.symm
+    let eSL : Additive E
+        ≃ₛₗ[(τRing : MonoidAlgebra (ZMod p) T →+*
+          MonoidAlgebra (ZMod p) T)] Additive E :=
+      { toFun := uLin
+        map_add' := uLin.map_add
+        map_smul' := fun r x => hsemi r x
+        invFun := uLin.symm
+        left_inv := uLin.left_inv
+        right_inv := uLin.right_inv }
+    refine ⟨eSL.conjRingEquiv, fun a x => ?_⟩
+    change uLin (a • x) = eSL.conjRingEquiv a • uLin x
+    rw [Module.End.smul_def, Module.End.smul_def,
+      LinearEquiv.conjRingEquiv_apply_apply]
+    change uLin (a x) = uLin (a (uLin.symm (uLin x)))
+    rw [LinearEquiv.symm_apply_apply]
+
 end Prop2Bridge
 
 universe u v w
