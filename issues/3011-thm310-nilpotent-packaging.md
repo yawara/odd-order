@@ -51,6 +51,18 @@ general nilpotent M は book の正確な statement (in-scope、specialization d
   - **glue (c)**: cyclic C_M(R) ⟹ `K'⊆C_K(M_0)∩C_K(M/M_0)⊆C_K(M)` (Lemma 1.9 / chain stabilizer,
     S01 §1 に済)。
 
+## ⚠ 2 つの action framework (要 bridge、実行時の主 friction)
+
+- **base leaf** (`S03g_Thm310ElemAbelian`) = `[MulDistribMulAction H M]` (M CommGroup)。
+- **coprime fixed-point / minimal-invariant-normal / chief-factor infra** = `φ : L →* MulAut H`
+  形 (`CoprimeFixedPoints.lean`, `MinimalInvariantNormal.lean`, `S03h` の
+  `fixedPointsOfMulAut_quotientMulAutHom_eq_map` = Prop 1.5(d) group 形,
+  `coprime_fixedPoints_quotient`)。
+- **bridge**: `MulDistribMulAction H M` から `φ : H →* MulAut M` を構成 (各 h の作用は M の自己同型;
+  `MulDistribMulAction.toMulEquiv`/`toMulAut` 系)。逆に φ から subgroup/quotient への誘導作用。
+  top-level statement は `MulDistribMulAction H M` で述べ (base leaf に合わせる)、coprime infra を
+  使う箇所で φ に変換する。**この bridge が最初に解決すべき設計点。**
+
 ## 既存 infra (reuse)
 
 - **chief factor**: `S03c_Thm37` / `S03h_Thm38` の chief-factor machinery (Thm 3.7/3.8 と構造同一)、
