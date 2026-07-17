@@ -156,6 +156,123 @@ lemma ncard_fixedPoints (hXD : X ≤ hyp.D) :
         (Set.mem_sdiff_singleton (a := ω))).trans
       (hyp.cQRegularEquiv hXD).symm)
 
+/-- Surjectivity of the orbit map, extracted: every fixed point other than
+`basept` is `y • (t • basept)` for some `y ∈ C_Q(X)`. -/
+lemma exists_mem_cQ_smul_t_basept_eq (hXD : X ≤ hyp.D) {ω : Ω}
+    (hω : ω ∈ fixedPoints X Ω) (hne : ω ≠ hyp.basept) :
+    ∃ y ∈ hyp.Q ⊓ Subgroup.centralizer (X : Set G),
+      y • (hyp.t • hyp.basept) = ω := by
+  obtain ⟨y, hy⟩ := (hyp.cQRegularEquiv hXD).surjective ⟨ω, hω, hne⟩
+  exact ⟨(y : G), y.2, congrArg Subtype.val hy⟩
+
+/-- The symmetric statement (the book's "similarly", p. 102), via the
+conjugate hypothesis `hyp.symm`: every fixed point other than `t • basept`
+is `c • basept` for some `c ∈ C_{Q^t}(X)`; we record the two consequences
+used downstream (`c` centralizes `X` and fixes `t • basept`). -/
+lemma exists_mem_centralizer_smul_basept_eq (hXD : X ≤ hyp.D) {ω : Ω}
+    (hω : ω ∈ fixedPoints X Ω) (hne : ω ≠ hyp.t • hyp.basept) :
+    ∃ c ∈ Subgroup.centralizer (X : Set G),
+      c • hyp.basept = ω ∧ c • (hyp.t • hyp.basept) = hyp.t • hyp.basept := by
+  have hXD' : X ≤ hyp.symm.D := hXD
+  obtain ⟨y, hy⟩ := (hyp.symm.cQRegularEquiv hXD').surjective ⟨ω, hω, hne⟩
+  have hval : (y : G) • (hyp.symm.t • hyp.symm.basept) = ω :=
+    congrArg Subtype.val hy
+  rw [hyp.symm_t_smul_basept] at hval
+  refine ⟨(y : G), y.2.2, hval, ?_⟩
+  exact hyp.symm.smul_basept_eq_of_mem_H (hyp.symm.Q_le_H y.2.1)
+
+/-! ## Prop 6 (a): `C_G(X)` is doubly transitive on `Ω_X` (p. 102) -/
+
+/-- If `|Ω_X| ≥ 3` there is a fixed point besides `basept` and
+`t • basept`. -/
+lemma exists_third_fixedPoint (h3 : 3 ≤ (fixedPoints X Ω).ncard) :
+    ∃ ω₀ ∈ fixedPoints X Ω,
+      ω₀ ≠ hyp.basept ∧ ω₀ ≠ hyp.t • hyp.basept := by
+  by_contra hcon
+  push Not at hcon
+  have hsub : fixedPoints X Ω ⊆ {hyp.basept, hyp.t • hyp.basept} := by
+    intro ω hω
+    rcases eq_or_ne ω hyp.basept with h | h
+    · exact Set.mem_insert_iff.mpr (Or.inl h)
+    · exact Set.mem_insert_iff.mpr (Or.inr (hcon ω hω h))
+  have hle := Set.ncard_le_ncard hsub (Set.toFinite _)
+  have h2 : ({hyp.basept, hyp.t • hyp.basept} : Set Ω).ncard ≤ 2 :=
+    (Set.ncard_insert_le _ _).trans (by rw [Set.ncard_singleton])
+  omega
+
+/-- Transitivity normal form: every fixed point can be moved to `basept`
+by `C_G(X)` (uses `|Ω_X| ≥ 3` to bridge `t • basept → basept` through a
+third fixed point). -/
+lemma exists_mem_centralizer_smul_eq_basept (hXD : X ≤ hyp.D)
+    (h3 : 3 ≤ (fixedPoints X Ω).ncard) {ω : Ω}
+    (hω : ω ∈ fixedPoints X Ω) :
+    ∃ c ∈ Subgroup.centralizer (X : Set G), c • ω = hyp.basept := by
+  -- a `swap` element moving `t • basept` to `basept`
+  have hswap : ∃ c ∈ Subgroup.centralizer (X : Set G),
+      c • (hyp.t • hyp.basept) = hyp.basept := by
+    obtain ⟨ω₀, hω₀, hω₀b, hω₀t⟩ := hyp.exists_third_fixedPoint h3
+    obtain ⟨y, hy, hysmul⟩ := hyp.exists_mem_cQ_smul_t_basept_eq hXD hω₀ hω₀b
+    obtain ⟨c, hc, hcsmul, -⟩ :=
+      hyp.exists_mem_centralizer_smul_basept_eq hXD hω₀ hω₀t
+    refine ⟨c⁻¹ * y, mul_mem (inv_mem hc) hy.2, ?_⟩
+    rw [mul_smul, hysmul, ← hcsmul, inv_smul_smul]
+  rcases eq_or_ne ω hyp.basept with rfl | hne
+  · exact ⟨1, one_mem _, one_smul _ _⟩
+  · obtain ⟨y, hy, hysmul⟩ := hyp.exists_mem_cQ_smul_t_basept_eq hXD hω hne
+    obtain ⟨c, hc, hcsmul⟩ := hswap
+    refine ⟨c * y⁻¹, mul_mem hc (inv_mem hy.2), ?_⟩
+    rw [mul_smul, ← hysmul, inv_smul_smul, hcsmul]
+
+/-- **Peterfalvi Part II, Ch. I Prop 6 (a)** (p. 102) — `C_G(X)` is
+transitive on `Ω_X`. -/
+theorem exists_mem_centralizer_smul_eq (hXD : X ≤ hyp.D)
+    (h3 : 3 ≤ (fixedPoints X Ω).ncard) {ω₁ ω₂ : Ω}
+    (h1 : ω₁ ∈ fixedPoints X Ω) (h2 : ω₂ ∈ fixedPoints X Ω) :
+    ∃ c ∈ Subgroup.centralizer (X : Set G), c • ω₁ = ω₂ := by
+  obtain ⟨c₁, hc₁, hc₁s⟩ := hyp.exists_mem_centralizer_smul_eq_basept hXD h3 h1
+  obtain ⟨c₂, hc₂, hc₂s⟩ := hyp.exists_mem_centralizer_smul_eq_basept hXD h3 h2
+  refine ⟨c₂⁻¹ * c₁, mul_mem (inv_mem hc₂) hc₁, ?_⟩
+  rw [mul_smul, hc₁s, ← hc₂s, inv_smul_smul]
+
+/-- Doubly transitive normal form: any pair of distinct fixed points can
+be moved to `(basept, t • basept)` by `C_G(X)`. -/
+lemma exists_mem_centralizer_smul_pair_basept (hXD : X ≤ hyp.D)
+    (h3 : 3 ≤ (fixedPoints X Ω).ncard) {α₁ α₂ : Ω}
+    (hα₁ : α₁ ∈ fixedPoints X Ω) (hα₂ : α₂ ∈ fixedPoints X Ω)
+    (hne : α₁ ≠ α₂) :
+    ∃ c ∈ Subgroup.centralizer (X : Set G),
+      c • α₁ = hyp.basept ∧ c • α₂ = hyp.t • hyp.basept := by
+  obtain ⟨c₀, hc₀, hc₀s⟩ := hyp.exists_mem_centralizer_smul_eq_basept hXD h3 hα₁
+  have hα₂' : c₀ • α₂ ∈ fixedPoints X Ω :=
+    smul_mem_fixedPoints_of_mem_centralizer hc₀ hα₂
+  have hα₂ne : c₀ • α₂ ≠ hyp.basept := by
+    rw [← hc₀s]
+    exact fun h => hne (smul_left_cancel c₀ h).symm
+  obtain ⟨y, hy, hysmul⟩ := hyp.exists_mem_cQ_smul_t_basept_eq hXD hα₂' hα₂ne
+  refine ⟨y⁻¹ * c₀, mul_mem (inv_mem hy.2) hc₀, ?_, ?_⟩
+  · rw [mul_smul, hc₀s,
+      hyp.smul_basept_eq_of_mem_H (inv_mem (hyp.Q_le_H hy.1))]
+  · rw [mul_smul, ← hysmul, inv_smul_smul]
+
+/-- **Peterfalvi Part II, Ch. I Prop 6 (a)** (p. 102), first clause —
+`C_G(X)` is doubly transitive on `Ω_X` (elementwise form; the bundled
+`IsMultiplyPretransitive` for the induced action is deferred to the point
+of use, Ch. I §3). -/
+theorem exists_mem_centralizer_smul_pair (hXD : X ≤ hyp.D)
+    (h3 : 3 ≤ (fixedPoints X Ω).ncard) {α₁ α₂ β₁ β₂ : Ω}
+    (hα₁ : α₁ ∈ fixedPoints X Ω) (hα₂ : α₂ ∈ fixedPoints X Ω)
+    (hβ₁ : β₁ ∈ fixedPoints X Ω) (hβ₂ : β₂ ∈ fixedPoints X Ω)
+    (hαne : α₁ ≠ α₂) (hβne : β₁ ≠ β₂) :
+    ∃ c ∈ Subgroup.centralizer (X : Set G),
+      c • α₁ = β₁ ∧ c • α₂ = β₂ := by
+  obtain ⟨cα, hcα, hcα1, hcα2⟩ :=
+    hyp.exists_mem_centralizer_smul_pair_basept hXD h3 hα₁ hα₂ hαne
+  obtain ⟨cβ, hcβ, hcβ1, hcβ2⟩ :=
+    hyp.exists_mem_centralizer_smul_pair_basept hXD h3 hβ₁ hβ₂ hβne
+  refine ⟨cβ⁻¹ * cα, mul_mem (inv_mem hcβ) hcα, ?_, ?_⟩
+  · rw [mul_smul, hcα1, ← hcβ1, inv_smul_smul]
+  · rw [mul_smul, hcα2, ← hcβ2, inv_smul_smul]
+
 /-! ## Prop 6 (a): `C_H(X) = C_Q(X) ⋊ C_D(X)` (p. 102) -/
 
 /-- **Peterfalvi Part II, Ch. I Prop 6 (a)** (p. 102), second clause —
