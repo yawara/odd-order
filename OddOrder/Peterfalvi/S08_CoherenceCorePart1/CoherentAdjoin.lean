@@ -143,7 +143,7 @@ theorem crux1_of_memberFamily
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
     (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
-    (hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (_hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
     {S₁ : Set (ClassFunction ↥L ℂ)}
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent τ S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))

@@ -59,6 +59,7 @@ variable [IsSimpleModule (MonoidAlgebra k T) M]
 /-- **Schur + Wedderburn**: the endomorphism ring of a finite simple `k[T]`-module is a field.
 (Schur makes it a division ring, `Module.End` instance; finite division rings are fields,
 `littleWedderburn`.) -/
+@[reducible]
 noncomputable def endField : Field (Module.End (MonoidAlgebra k T) M) :=
   haveI := finite_end (k := k) (T := T) (M := M); inferInstance
 
