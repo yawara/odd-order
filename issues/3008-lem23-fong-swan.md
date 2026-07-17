@@ -42,10 +42,11 @@ Prop 2.2 と Clifford 半単純性を 2026-07-18 に char-free 化したので�
       - `⨆_{i:Fin p} W_i = ⊤`: `iSup_map_conjSemilinearEnd_eq_top` (⨆_{g:G}=⊤) から、
         g ∈ x^i H なら L.map(conj g) = W_i (`map_map_conjSemilinearEnd` + h∈H で
         L.map(conj h)=L) ゆえ ⨆_g = ⨆_i。
-      - **directness** (唯一の要 brick): W_i は pairwise 非同型 (L≇L^x ⟹ Z/p 上の [L] の
-        stabilizer が trivial ⟹ 全 p 個非同型) ⟹ `iSupIndep W`。pairwise 非同型 simple の
-        独立性 (semisimple M_H の isotypic component 独立性 = mathlib `IsSemisimpleModule`/
-        isotypic から) を ~15-20 行で。
+      - **directness** ✅ **済** (commit ae068904): 汎用 module 補題
+        `iSupIndep_of_pairwise_not_linearEquiv_of_isSimpleModule`
+        (`SimpleSubmoduleIndependence.lean`, axiom-clean)。pairwise 非同型 simple 族 ⟹
+        `iSupIndep`。mathlib `Submodule.linearEquiv_of_le_sSup` が肝。残: L≇L^x ⟹ Z/p 上の
+        [L] stabilizer trivial ⟹ 全 p 個 pairwise 非同型 の orbit-stabilizer 部分。
       - ゆえに `DirectSum.IsInternal W` + dim ⊤ = Σ dim W_i = p·dim L。
 - [ ] **strong induction on |G|** で組み立て、full book strength (general solvable G, general F)。
 
