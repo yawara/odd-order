@@ -36,6 +36,7 @@ noncomputable def eTS :
       ↥(mp.certainTypeS hG).sdiffTICyclicHypothesis.W :=
   (gridEquivE_T hG mp tp).symm.trans (gridEquivE hG mp tp)
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- The round-trip through `tp.W`. -/
 theorem eTS_gridEquivE_T (w : ↥tp.W) :
     eTS hG mp tp (gridEquivE_T hG mp tp w) = gridEquivE hG mp tp w := by
@@ -110,12 +111,14 @@ theorem rowDualT_apply_mem_Kstar (j : Fin tp.p) (w : ↥tp.W)
   rw [eTS_gridEquivE_T]
   exact omegaProdCharS_apply_mem_Kstar hG mp tp 1 _ w hw
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- The base row dual is trivial. -/
 theorem rowDualT_zero : rowDualT hG mp tp ⟨0, tp.p_prime.pos⟩ = 1 := by
   rw [rowDualT, chi2enum_zero,
     (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar_one_one,
     MonoidHom.one_comp, MonoidHom.one_comp]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- Row-index negation is inversion of the transported T-side row dual. -/
 theorem rowDualT_finNeg (j : Fin tp.p) :
     rowDualT hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
@@ -181,6 +184,7 @@ theorem omegaS_eq_omegaT (i : Fin tp.q) (j : Fin tp.p) :
   rw [hrow, ClassFunction.compHom_linearIrreducibleCharacter,
     ClassFunction.compHom_linearIrreducibleCharacter, key]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.3)/(3.4)**: the shared `ω`-grid is orthonormal. -/
 theorem omegaS_inner (i k : Fin tp.q) (j l : Fin tp.p) :
     ClassFunction.inner (omegaS hG mp tp i j) (omegaS hG mp tp k l)

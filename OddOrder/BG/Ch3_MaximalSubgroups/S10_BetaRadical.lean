@@ -1077,7 +1077,7 @@ private theorem conj_smul_mem_hInvariantStar_top_conj {P Q : Subgroup G} {π : S
 Sylow `p`-subgroup containing `A^k = A` with `Q ∈ ℋ_G^*(P;q)` (conjugation equivariance). -/
 private theorem exists_sylow_mem_hInvariantStar [Finite G] (hG : IsMinimalSimpleOdd G)
     {p q : ℕ} [Fact p.Prime] [Fact q.Prime] {A : Subgroup G}
-    (hAp : IsPGroup p ↥A) (hAne : A ≠ ⊥) (hHyp71 : Ch2.S07.Hypothesis71 A)
+    (hAp : IsPGroup p ↥A) (_hAne : A ≠ ⊥) (hHyp71 : Ch2.S07.Hypothesis71 A)
     (hπ : Ch2.S07.primesOf A = {p}) (hq : q ∈ (Ch2.S07.primesOf A)ᶜ)
     (htrans : Ch2.S07.ConjTransitiveOn (Ch2.S07.kSubgroup A) (hInvariantStar ⊤ A {q}))
     {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ A {q}) :

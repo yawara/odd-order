@@ -870,7 +870,7 @@ BG の理由: `Q ⊆ M*'`、`M*'/M*_α` は nilpotent (Thm 10.2)、`M_α ∩ M*`
 
 これは BG が "because …" で省略する genuine elision (ChatGPT 再構成プロンプト 3c)。 -/
 theorem gap3_commutator_inf_le_Malpha_star [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    {M Mstar : Subgroup G} (_hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
     {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQM : Q ≤ M) (hQMstar : Q ≤ Mstar)
     (hQq : IsPGroup q ↥Q) (hqα : q ∉ S10.alpha M) (hQderivStar : Q ≤ derivedInG Mstar) :
     ⁅S10.Malpha M ⊓ Mstar, Q⁆ ≤ S10.Malpha Mstar := by
@@ -952,7 +952,7 @@ theorem exists_order_r_le_normalizer_centralizer [Finite G]
     (hFrat : M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M)
     (hp_nMβ : ¬ p ∣ Nat.card ↥(S10.Mbeta M)) {r : ℕ} [Fact r.Prime]
     (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)))
-    (hr_nMβ : ¬ r ∣ Nat.card ↥(S10.Mbeta M)) (hsolvM : IsSolvable ↥M) :
+    (hr_nMβ : ¬ r ∣ Nat.card ↥(S10.Mbeta M)) (_hsolvM : IsSolvable ↥M) :
     ∃ R : Subgroup G, Nat.card ↥R = r ∧ R ≤ M ⊓ Subgroup.normalizer (Q : Set G)
       ∧ R ≤ Subgroup.centralizer (P : Set G) := by
   classical
@@ -1236,9 +1236,9 @@ genuine elision (ChatGPT 再構成プロンプト 3a/3b)。 -/
 theorem gap3_centralizer_Malpha_P_le_Mstar [Finite G] (hG : IsMinimalSimpleOdd G)
     {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
     {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M) {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
-    (hPM : P ≤ M) {Q : Subgroup G} (hQM : Q ≤ M)
+    (hPM : P ≤ M) {Q : Subgroup G} (_hQM : Q ≤ M)
     (hQinv : P ≤ Subgroup.normalizer (Q : Set G)) (hNQ : Subgroup.normalizer (Q : Set G) ≤ Mstar)
-    (hαβ : S10.alpha M = S10.beta M)
+    (_hαβ : S10.alpha M = S10.beta M)
     (hFrat : M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M)
     {r : ℕ} [Fact r.Prime] (hrβ : r ∈ S10.beta Mstar)
     (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G))) (hrσ : r ∉ S10.sigma M) :

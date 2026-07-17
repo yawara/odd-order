@@ -126,6 +126,7 @@ theorem finrank_one_rep_apply_eq_character_smul_id {V : Type*} [AddCommGroup V]
 
 variable [Finite G]
 
+omit [Finite G] in
 /-- A degree-one irreducible character is **multiplicative**: `θ(g·h) = θ(g)·θ(h)`.
 
 The witnessing representation is 1-dimensional (its degree is `θ(1) = 1`), so every operator is a

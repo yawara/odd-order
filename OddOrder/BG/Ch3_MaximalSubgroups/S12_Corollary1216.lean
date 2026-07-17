@@ -516,8 +516,8 @@ private theorem not_mem_primeFactors_derived_of_tau1_core [Finite G] (hG : IsMin
     (hqσ : q ∈ S10.sigma M) (hYMσ : Y ≤ S10.Msigma M)
     {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
     (hpτ1 : p ∈ tau1 M)
-    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
-    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
+    {H : Subgroup G} (_hHY : H ∈ maximalSubgroupsContaining Y)
+    (_hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
     p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors := by
   have hpM' : p ∉ (Nat.card ↥(derivedInG M)).primeFactors := ((mem_tau1_iff M p).mp hpτ1).2.1
   intro hpmem

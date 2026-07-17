@@ -1246,6 +1246,7 @@ theorem chiRho_apply_eq_zeta0_sharp
     (one_not_mem_supportInSubgroup_sharp H hAH) hζ0norm χ hc hx
 
 set_option maxHeartbeats 800000 in
+-- raised heartbeat budget for the heavy elaboration below
 open OddOrder.Peterfalvi.S09 in
 /-- **Peterfalvi (12.14), `ψ^ρ(x) = χ(x)` for the Dade-realized family.**  In the setting of
 `betaDecompOfDade_a_eq_zero` (whose numerics force the (7.8.a) coefficient `a = 0`), the coherent

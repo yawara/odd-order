@@ -537,6 +537,6 @@ theorem centralizer_le_centralizer_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G
     S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≤
       S10.Msigma M ⊓ Subgroup.centralizer (R : Set G) :=
   msigma_centralizer_le_of_invariant_sylow_centralized hG h hPE hRC
-    (fun q hq S hSN hSpg hSinv => per_q_centralizes hG h hp hr hP hPE hR hRC hq hSN hSpg hSinv)
+    (fun _q hq _S hSN hSpg hSinv => per_q_centralizes hG h hp hr hP hPE hR hRC hq hSN hSpg hSinv)
 
 end OddOrder.BG.Ch3.S13

@@ -57,7 +57,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) S₂
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
-    (hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
+    (_hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
     (hnopairD : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
@@ -87,10 +87,10 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
       (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
     (γ ψ₁ : ClassFunction ↥hyp.S ℂ)
     (hψ₁S₂ : ψ₁ ∈ S₂)
-    (hψ₁irr : IsIrreducibleCharacter ψ₁)
+    (_hψ₁irr : IsIrreducibleCharacter ψ₁)
     (hψ₁deg : (ψ₁ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
     (hγZIrr : γ ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S)
-    (hγ1 : (γ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
+    (_hγ1 : (γ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
     (hγorth : ∀ φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG), ClassFunction.inner γ φ = 0)
     (hαsupp : ((γ - ψ₁ : ClassFunction ↥hyp.S ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)

@@ -1191,7 +1191,7 @@ with the `H` and `p q` already fixed in Section 16. -/
 theorem exists_typeI_eta_axes_odd_of_caseB_gap
     [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (_hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
     (hH_of_orth :
       ∀ orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L,

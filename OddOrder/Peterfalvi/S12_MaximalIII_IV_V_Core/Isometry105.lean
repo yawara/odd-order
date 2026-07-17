@@ -794,8 +794,8 @@ has the same degree `ζ̄(1) = ζ(1)` (the degree is a real natural number).
 
 This makes `ζ − ζ̄` `A_0`-supported, so the Dade isometry `τ` transfers it
 (`tau_inner_eq_of_supported`) in the `(α_{ij}^τ, (ζ−ζ̄)^τ) = (α_{ij}, ζ−ζ̄)` step. -/
-theorem Hypothesis.zeta_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+theorem Hypothesis.zeta_sub_conj_support [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (_hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) :
     (ζ - ζ.conj).support ⊆ hyp.A0 := by
   haveI := hyp.finiteG
@@ -901,7 +901,7 @@ and `(μ₀ − ζ)(1) = w₁·1 − w₁ = 0`, so the support lies in `M'^# ⊆
 (11.8.5) `M`-side inner product `(α_{ij}, μ₀ − ζ)` to the Dade image via `tau_inner_eq_of_supported`. -/
 theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
-    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (_hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
     ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ).support ⊆ hyp.A0 := by
   haveI := hyp.finiteG

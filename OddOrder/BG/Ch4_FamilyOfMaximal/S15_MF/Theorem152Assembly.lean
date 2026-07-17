@@ -124,7 +124,7 @@ automorphisms of `M_σ/Q`; `M` normalizes `M_σ` and `Q`).  A normal `q`-subgrou
 `not_dvd_card_of_opCore_eq_bot` gives `q ∤ [M_σ : Q]`. -/
 theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
     {M Mσ Q : Subgroup G} {q : ℕ} [Fact q.Prime]
-    (hQMσ : Q ≤ Mσ) (hMσM : Mσ ≤ M) (hQpg : IsPGroup q ↥Q)
+    (_hQMσ : Q ≤ Mσ) (hMσM : Mσ ≤ M) (hQpg : IsPGroup q ↥Q)
     (hMnormMσ : M ≤ Subgroup.normalizer (Mσ : Set G))
     (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
     (hQmax : ∀ R : Subgroup G, R ≤ M → (R.subgroupOf M).Normal → IsPGroup q ↥R → R ≤ Q)
@@ -451,9 +451,9 @@ Used in `centralizer_msigma_quotient_le_fittingInAmbient` to decompose `C_{M_σ}
 theorem centralizes_Q_of_centralizes_quotient [Finite G]
     {Q Q0 : Subgroup G} {d : G}
     (hdN : d ∈ Subgroup.normalizer (Q : Set G))
-    (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
+    (_hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
     (hdQ0 : d ∈ Subgroup.normalizer (Q0 : Set G))
-    (hQ0Q : Q0 ≤ Q) (hQ0d : Q0 ≤ Subgroup.centralizer ({d} : Set G))
+    (_hQ0Q : Q0 ≤ Q) (hQ0d : Q0 ≤ Subgroup.centralizer ({d} : Set G))
     (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers d)) (Nat.card ↥Q))
     (hSolv : IsSolvable ↥Q)
     (hfix : ∀ y ∈ Q, ⁅d, y⁆ ∈ Q0) :
@@ -498,7 +498,7 @@ theorem centralizes_Q_of_centralizes_quotient [Finite G]
 /-- From an `IsComplement'` of `H.subgroupOf N` and `K.subgroupOf N` (with `H, K ≤ N`), every
 `x ∈ N` factors as `x = a·b` with `a ∈ H`, `b ∈ K` (`§14`-independent, generic helper; keeps the
 `↥N`-complement reasoning away from later `M_σ`-unfolding). -/
-theorem exists_mul_mem_of_isComplement_subgroupOf {N H K : Subgroup G} (hHN : H ≤ N) (hKN : K ≤ N)
+theorem exists_mul_mem_of_isComplement_subgroupOf {N H K : Subgroup G} (_hHN : H ≤ N) (_hKN : K ≤ N)
     (hcompl : Subgroup.IsComplement' (H.subgroupOf N) (K.subgroupOf N))
     {x : G} (hxN : x ∈ N) : ∃ a ∈ H, ∃ b ∈ K, x = a * b := by
   -- `(H.subgroupOf N) * (K.subgroupOf N) = univ` (complement), so `⟨x, _⟩` factors there.
@@ -513,6 +513,7 @@ theorem exists_mul_mem_of_isComplement_subgroupOf {N H K : Subgroup G} (hHN : H 
   exact hcoe
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped commutatorElement in
 /-- **Theorem 15.2(g) — the section-Fitting containment `C_{M_σ}(Q̄) ⊆ F(M)`** (mmd L4196-4198,
 "`F(M) = Q·C_M(Q) = C_{M_σ}(Q̄)`"), which discharges `hsecFit` of
@@ -724,7 +725,7 @@ The §14-gated inputs are `hcond3` (prime-manner action of `K`, Proposition 14.2
 `MulDistribMulAction` setup built here. -/
 theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     {Q Q0 D K C : Subgroup G} {q : ℕ} [Fact q.Prime] [(Q0.subgroupOf Q).Normal]
-    (hQ0Q : Q0 ≤ Q) (hQ0C : Q0 ≤ C) (hCQ : C ≤ Q) (hDne : D ≠ ⊥)
+    (_hQ0Q : Q0 ≤ Q) (hQ0C : Q0 ≤ C) (hCQ : C ≤ Q) (hDne : D ≠ ⊥)
     (hEA : OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q))
     (hNT : Nontrivial (↥Q ⧸ Q0.subgroupOf Q))
     (hDQ : D ≤ Subgroup.normalizer (Q : Set G)) (hKQ : K ≤ Subgroup.normalizer (Q : Set G))

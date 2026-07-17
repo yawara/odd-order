@@ -1346,7 +1346,7 @@ representative `Mᵢ` conjugate to `M` also has `p ∈ σ(Mᵢ)`.  Reverse: `σ(
 (`theoremE_sigma_partition_and_counting`, issue 8019). -/
 theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {reps : Set (Subgroup G)}
-    (hrepsMax : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
+    (_hrepsMax : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
     (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
       ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi)
     (p : ℕ) :

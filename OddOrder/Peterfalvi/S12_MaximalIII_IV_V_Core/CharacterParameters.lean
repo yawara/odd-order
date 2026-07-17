@@ -88,7 +88,7 @@ application is built directly: the TI-cyclic Dade hypothesis has trivial local s
 (`HConjInvariant.of_forall_H_eq_bot`), so `Hypothesis.fullDadeIsometryData` applies.  Its index set
 `Fin |W₁| × Fin |W₂|` is definitionally `Fin w₁ × Fin w₂`.  This is the genuine source for
 `CharacterParameters.omegaSigma`. -/
-noncomputable def Hypothesis.omegaSigmaGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+noncomputable def Hypothesis.omegaSigmaGrid [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
     Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ := by
   haveI := hyp.finiteG

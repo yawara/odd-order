@@ -1125,6 +1125,7 @@ theorem IsCharacter.zero : IsCharacter (0 : ClassFunction G ℂ) := by
   change (0 : ℂ) = LinearMap.trace ℂ PUnit ((1 : Representation ℂ G PUnit) g)
   rw [Subsingleton.elim ((1 : Representation ℂ G PUnit) g) 0, map_zero]
 
+omit [Finite G] in
 /-- Genuine characters are closed under addition: the direct sum (`Representation.prod`) of the
 witnessing representations has character `χ + ψ`. -/
 theorem IsCharacter.add {χ ψ : ClassFunction G ℂ} (hχ : IsCharacter χ) (hψ : IsCharacter ψ) :

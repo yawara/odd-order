@@ -601,6 +601,7 @@ theorem hcPsiPair_realizedH0supCprime_subgroupOf_subset_characterKernel [Finite 
     (SetLike.mem_coe.mp hx)
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`H₀C' ⊆ Ker ζ_{θ,λ}`**: the realized `H₀C'` lies in the character kernel of
 `ζ_{θ,λ} = Ind_{HC}^{HU}(ψ_{θ,λ})`.  Since the pair is `1` on `H₀C'` and `H₀C' ◁ HU`
 (`realizedH0supCprime_normal_huSub`), the normal subgroup lands in the induced kernel
@@ -630,6 +631,7 @@ theorem hcZetaPair_H0supCprime_subset_ker [Finite G] {M : Subgroup G}
     (hcPsiPair_realizedH0supCprime_subgroupOf_subset_characterKernel chief θ lam hlam)
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`H ⊄ Ker ζ_{θ,λ}`** (`ζ_{θ,λ} ∈ 𝒳`): the irreducible `ζ_{θ,λ}` is nontrivial on
 `H = hInHu`.  Mirror of `hcZeta_mem_xiSet` — the pair restricts on `hInHu` to the same
 inflation `θ₀` (`hcPsiPair_apply_inclusion`), so `H ⊆ Ker` would force `θ = 1`. -/
@@ -695,6 +697,7 @@ theorem hcZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
   exact hψker
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`ζ_{θ,λ} ∈ 𝒳(H₀C')`**: combining `H ⊄ Ker` (`hcZetaPair_mem_xiSet`) and
 `H₀C' ⊆ Ker` (`hcZetaPair_H0supCprime_subset_ker`).  This is the source character of the
 (9.9.c) `𝒮(H₀C')`-member `Ind_{HU}^M ζ_{θ,λ}`.  Mirror of `hcZeta_mem_xiOf`. -/
@@ -886,6 +889,7 @@ theorem hcuPsiPair_realizedH0supUprime_subgroupOf_subset_characterKernel [Finite
     Units.val_one]
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`H₀U' ⊆ Ker ζ_{θ₁,λ}`**: the realized `H₀U'` lies in the character kernel of
 `ζ_{θ₁,λ} = Ind_{H·C_U(S₀)}^{HU}(ψ_{θ₁,λ})`.  Since the pair is `1` on `H₀U'` and `H₀U' ◁ HU`
 (`realizedH0supUprime_normal_huSub`), the normal subgroup lands in the induced kernel

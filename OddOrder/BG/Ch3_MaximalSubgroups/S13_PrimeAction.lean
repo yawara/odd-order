@@ -422,7 +422,7 @@ so `C_{M_σ}(x) ≤ C(R)`. A general `g ∈ E₁#` reduces to its prime-power `x
 `C(g) ⊆ C(x)`. No explicit Sylow decomposition of `E₁` is needed: the prime-power induction in
 `le_centralizer_of_forall_prime_isPGroup` carries it. -/
 theorem E1_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (hE1 : E₁ ≠ ⊥) :
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (_hE1 : E₁ ≠ ⊥) :
     ActsPrimeOn (S10.Msigma M) E₁ := by
   classical
   haveI hcyc : IsCyclic ↥E₁ := h.E1_isCyclic hG

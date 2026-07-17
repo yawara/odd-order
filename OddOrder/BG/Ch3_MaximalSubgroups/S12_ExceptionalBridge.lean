@@ -323,7 +323,7 @@ If `M* = M^g`, then `X' = X^{g⁻¹}` is a nonidentity `p`-subgroup of `M` with
 contradicting `r_p(M) = 1` and `p ∉ σ(M)`. -/
 theorem not_conj_of_mem_tau1_union_tau3_of_normalizer_le [Finite G]
     (hG : IsMinimalSimpleOdd G) {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M ∪ tau3 M) {X : Subgroup G} (hXM : X ≤ M)
+    {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M ∪ tau3 M) {X : Subgroup G} (_hXM : X ≤ M)
     (hXne : X ≠ ⊥) (hXp : IsPGroup p ↥X)
     (hN : Subgroup.normalizer (X : Set G) ≤ Mstar) :
     ¬ ∃ g : G, MulAut.conj g • M = Mstar := by

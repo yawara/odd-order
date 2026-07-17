@@ -157,7 +157,7 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
     {j k : Fin hyp.p} (hj0 : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk0 : k ≠ ⟨0, hyp.p_prime.pos⟩)
     (hjk : j ≠ k)
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
-    (hηconj : (η : ClassFunction ↥hyp.S ℂ).conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    (_hηconj : (η : ClassFunction ↥hyp.S ℂ).conj ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hjeq : η = ∑ i : Fin hyp.q, hyp.mu i j)
     (hkeq : (η : ClassFunction ↥hyp.S ℂ).conj = ∑ i : Fin hyp.q, hyp.mu i k) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
@@ -639,7 +639,7 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))
-    {φ : ClassFunction ↥hyp.S ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
+    {φ : ClassFunction ↥hyp.S ℂ} (_hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ)
     (hr : ¬ ClassFunction.IsReal (φ : ClassFunction ↥hyp.S ℂ))
     (hs : ((φ : ClassFunction ↥hyp.S ℂ).conj - (φ : ClassFunction ↥hyp.S ℂ)).support ⊆

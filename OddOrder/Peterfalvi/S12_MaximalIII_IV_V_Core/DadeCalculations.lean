@@ -139,7 +139,7 @@ noncomputable def Hypothesis.columnImageFamilyCohFree [Finite G]
     {params : CharacterParameters hyp}
     (hmu : params.mu = hyp.muGrid hG hG.odd)
     (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
-    (hzconj : params.zeta.conj ≠ params.zeta)
+    (_hzconj : params.zeta.conj ≠ params.zeta)
     (hδpm : params.delta = 1 ∨ params.delta = -1)
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
     {j j' : Fin hyp.w2} (hj0 : j ≠ 0) (hj'0 : j' ≠ 0) (hjj' : j ≠ j')

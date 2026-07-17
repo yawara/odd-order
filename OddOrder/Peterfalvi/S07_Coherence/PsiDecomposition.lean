@@ -1227,7 +1227,7 @@ theorem coherentImageMap_inner_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
     (horthχ : ∀ i j, ClassFunction.inner (χ i) (χ j) = if i = j then (1 : ℂ) else 0)
     (horthX : ∀ i j, ClassFunction.inner (X i) (X j) = if i = j then (1 : ℂ) else 0)
     {φ ψ : ClassFunction L ℂ}
-    (hφ : φ ∈ Submodule.span ℤ (Set.range χ)) (hψ : ψ ∈ Submodule.span ℤ (Set.range χ)) :
+    (hφ : φ ∈ Submodule.span ℤ (Set.range χ)) (_hψ : ψ ∈ Submodule.span ℤ (Set.range χ)) :
     ClassFunction.inner (coherentImageMap (L := L) (G := G) χ X φ)
         (coherentImageMap (L := L) (G := G) χ X ψ) =
       ClassFunction.inner φ ψ := by

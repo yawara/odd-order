@@ -63,6 +63,7 @@ theorem classFunction_eq_sum_inner_smul (φ : ClassFunction Γ ℂ) :
   rw [hstep, sub_self]
 
 open scoped Classical in
+omit [Invertible (Nat.card Γ : ℂ)] in
 /-- **Regular-character difference value over the non-inflated irreducibles** (mmd 04.8 L168,
 combined `(ρ_Γ − ρ_{Γ/N})(z) − (…)(1)` value).  For `N ⊴ Γ` and `z ∈ N^#`,
 `∑_{χ ∈ Irr Γ, N ⊄ ker χ} χ(1)·(χ(z) − χ(1)) = -|Γ|`.  This is
@@ -340,6 +341,7 @@ section DadeReciprocity
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
   {A : Set G} {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- In the **TI Dade situation** (`hyp.H a = ⊥`, e.g. `H^#` a TI-subset with normalizer `L`), the
 (2.7) adjoint averaging map collapses to plain evaluation: `adjointAverageFun hyp χ a = χ(a)`.  The
 average `|H(a)|⁻¹ ∑_{x ∈ H(a)} χ(ax)` over the trivial group `H(a) = ⊥` is the single term

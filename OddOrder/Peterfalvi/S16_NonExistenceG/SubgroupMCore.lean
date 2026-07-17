@@ -852,7 +852,7 @@ projects the chosen member's membership; no false uniqueness of the two class fu
 theorem exists_betaMGridData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
-    (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
+    (_hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
     ∃ grid : OddOrder.Peterfalvi.S15.TypeIOrthogonalityGridData hyp.base Mdata.coherent78,
       grid.phi ∈ Mdata.typeIHyp.Sset := by

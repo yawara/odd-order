@@ -86,7 +86,7 @@ form (`equivLinearMapAsModule`); it is nonzero, so injective by Schur
 `k[H]`-isomorphic to `σ.asModule` (`LinearEquiv.ofInjective`), and transporting that isomorphism
 through `equivOfAsModuleEquiv` + `char_iso` equates the characters. -/
 theorem exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner [FiniteDimensional k V]
-    {H : Subgroup G} [hH : H.Normal]
+    {H : Subgroup G} [_hH : H.Normal]
     {W : Type*} [AddCommGroup W] [Module k W]
     (σ : Representation k ↥H W) [σ.IsIrreducible]
     {f : Representation.IntertwiningMap σ (resRep ρ H)} (hf : f ≠ 0) :
@@ -218,7 +218,7 @@ constituent `ρ`) and Frobenius (`inner_induce_ne_zero_iff_liesOver`).  With
 `{φ : ⟨Ind_H ρ, φ⟩ ≠ 0}` cover and pairwise-partition `Irr G` — the `trivIset`+`cover` of the
 Peterfalvi (12.5) `DpsiH` regrouping. -/
 theorem exists_induce_inner_ne_zero [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
-    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    {H : Subgroup G} [_hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
     (φ : IrreducibleCharacter G) :
     ∃ ρ : IrreducibleCharacter ↥H,
       ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))

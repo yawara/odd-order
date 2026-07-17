@@ -298,6 +298,7 @@ variable [Finite G] {L M : Subgroup G}
 variable (dataL : TypeICoherent78Data L) (dataM : TypeICoherent78Data M)
 variable (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
+omit [Finite G] in
 /-- Left additivity of the inner product over a finite sum. -/
 private theorem inner_sum_left' {ι : Type*} [Fintype G] [Invertible (Nat.card G : ℂ)]
     (s : Finset ι) (f : ι → ClassFunction G ℂ) (ψ : ClassFunction G ℂ) :

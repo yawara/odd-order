@@ -120,21 +120,25 @@ Read off the `S05` σ-isometry lemmas through the extracted `tiCyclicW`/`tiCycli
 these discharge the `tau3_*` fields of `Section16CharacterData` (and hence of
 `Section16Inputs` / `S15.Hypothesis`). -/
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Peterfalvi (3.2), isometry part**: `tau3W` preserves the class-function inner product. -/
 theorem tau3W_isometry :
     OddOrder.Peterfalvi.S07.IsIntegralIsometry (tau3W hG mp tp) :=
   (tiCyclicW hG mp tp).sigmaIntegral_isIntegralIsometry rfl (tiCyclicWDadeApp hG mp tp)
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Peterfalvi (3.2)**: `tau3W` sends the trivial character to the trivial character. -/
 theorem tau3W_trivial :
     tau3W hG mp tp (trivialClassFunction ↥tp.W) = trivialClassFunction G :=
   (tiCyclicW hG mp tp).sigmaIntegral_trivial rfl (tiCyclicWDadeApp hG mp tp)
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Peterfalvi (3.2)**: `tau3W` sends virtual characters to virtual characters. -/
 theorem tau3W_mem_ZIrr {z : ClassFunction ↥tp.W ℂ} (hz : z ∈ ZIrr ↥tp.W) :
     tau3W hG mp tp z ∈ ZIrr G :=
   (tiCyclicW hG mp tp).sigmaIntegral_mem_ZIrr rfl (tiCyclicWDadeApp hG mp tp) hz
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Peterfalvi (3.2.c)**: on the regular set `W ∖ (W₁ ∪ W₂)` the map `tau3W` is the
 identity. -/
 theorem tau3W_apply_of_regular (α : ClassFunction ↥tp.W ℂ) (w : G) (hwW : w ∈ tp.W)
@@ -143,6 +147,7 @@ theorem tau3W_apply_of_regular (α : ClassFunction ↥tp.W ℂ) (w : G) (hwW : w
   (tiCyclicW hG mp tp).sigmaIntegral_apply_of_mem_V rfl (tiCyclicWDadeApp hG mp tp) α
     (show w ∈ (tiCyclicW hG mp tp).V from ⟨hwW, hnot⟩)
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (4.3.b), full-grid orthonormality of the S-side `μ`-grid** (issues 9076/9014):
 `⟨μ_{ij}, μ_{kl}⟩ = [(i,j) = (k,l)]`.  Within a column by the (1.4) family injectivity; across
 columns by the certain-type cross-column distinctness `columnFamily_mu_ne`. -/
@@ -284,6 +289,7 @@ noncomputable def hyp46SmpCore :
         simpa using this }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (4.8) conclusion (1) on the `muS` grid** (Coq `prDade_sub_TIirr_on`; the
 `(13.18)` support engine in producer vocabulary): for nontrivial equal-degree columns
 `j, k ≠ 0`, the `μ`-column difference `μ_{ij} − μ_{ik}` is supported in
@@ -311,12 +317,14 @@ theorem muS_diff_support (i : Fin tp.q) {j k : Fin tp.p}
   exact OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0 (hyp46SmpCore hG mp tp)
     hχj hχk (eqQ hG mp tp i) hdeg hz
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- The `omegaS` are linear characters: `ω_{ij}(1) = 1`. -/
 theorem omegaS_apply_one (i : Fin tp.q) (j : Fin tp.p) :
     omegaS hG mp tp i j 1 = 1 := by
   rw [omegaS, ClassFunction.compHom_apply, map_one]
   exact (mp.certainTypeS hG).chiColumn_apply_one _ _
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- Each `omegaS i j` is a virtual character of `↥tp.W` (the pullback along `gridEquivE` of an
 irreducible character). -/
 theorem omegaS_mem_ZIrr (i : Fin tp.q) (j : Fin tp.p) :
@@ -608,6 +616,7 @@ theorem tau3W_omegaS_intCast_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
   rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   exact hn
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- The principal grid character `omegaS ⟨0⟩ ⟨0⟩` is the trivial character of `↥tp.W`:
 its underlying hom is `omegaProdChar (w1CharEquiv 0) (chi2enum 0) = omegaProdChar 1 1 = 1`
 (`w1CharEquiv_zero`, `chi2enum_zero`), and `omega 1 = trivialClassFunction`. -/
@@ -638,6 +647,7 @@ theorem tau3W_omegaS_principal_of_coprime {g : G}
     tau3W hG mp tp (omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ ⟨0, tp.p_prime.pos⟩) g = 1 := by
   rw [omegaS_principal_eq_trivial, tau3W_trivial, trivialClassFunction_apply]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **The `eqQ` reindex commutes with index negation**: `eqQ` is a `finCongr` (value-preserving
 cast along `|W₁| = q`), so the `S15.finNeg` negation on `Fin tp.q` transports to the explicit
 `(w₁ − ·) % w₁` negation on `Fin |W₁|` — the index form of `w1CharEquiv_finNeg`. -/
@@ -852,6 +862,7 @@ theorem omegaSChar_val (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W) :
   rw [omegaS_eq_omega_omegaSChar]
   rfl
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Row alignment**: `omegaSChar i 0` is the product character of the first component of
 `omegaSChar i j`'s pair with the trivial second component. -/
 theorem omegaSChar_row_align (i : Fin tp.q) (j : Fin tp.p) :
@@ -896,6 +907,7 @@ theorem omegaSChar_row_align (i : Fin tp.q) (j : Fin tp.p) :
           ((tiCyclicW hG mp tp).wSnd w)
     rw [hfst, map_one, MonoidHom.one_apply, one_mul]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Column alignment**: `omegaSChar 0 j` is the product character of the trivial first
 component with the second component of `omegaSChar i j`'s pair. -/
 theorem omegaSChar_col_align (i : Fin tp.q) (j : Fin tp.p) :

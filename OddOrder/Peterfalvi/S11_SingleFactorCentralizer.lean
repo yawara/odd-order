@@ -294,6 +294,7 @@ theorem caseA_source_degree_dvd_a_of_S0_witness
   rw [hdeq]
   exact Dvd.dvd.mul_left hdvd_idx e
 
+omit [Finite G] in
 /-- **A nontrivial `H̄`-hom is nontrivial on some Clifford summand.**  The summands span
 (`Hpart_iSup : ⨆ i, Hpart i = ⊤`), so a hom `θ̄` trivial on every `Hpart i` is trivial on all of
 `H̄` (`Subgroup.iSup_induction`).  Selects the summand `w` of Coq `a_dv_XH0`'s
@@ -427,6 +428,7 @@ theorem caseA_a_odd (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     omega
   · exact hodd
 
+omit [Finite G] in
 /-- **`a·|U′| ∣ |U|`** (the (9.11) `szS1′` exactness, half 1).  `a = [U : C_U(S₀)]` (realized:
 `(cuInHu.subgroupOf uInHu).index`), so `|U| = |C_U(S₀)|·a` (Lagrange), and `|U′| ∣ |C_U(S₀)|`
 (`U′ ≤ C_U(S₀)`, `uprimeSub_le_cuSub`).  Makes the ℕ-division in the landed (9.8.d) count
@@ -470,6 +472,7 @@ theorem caseA_a_mul_card_uprime_dvd_card_U [Finite G] {M : Subgroup G}
   obtain ⟨k, hk⟩ := hdvdC
   exact ⟨k, by rw [hk]; ring⟩
 
+omit [Finite G] in
 /-- **`a²·|U′| ∣ (p−1)·|U|`** (Coq `dv_lb`/`lb_d ∣ lb_n`, the (9.8.d)/(9.11.5) count-denominator
 exactness): from `a ∣ p−1` (`a_dvd_p_sub_one`) and `a·|U′| ∣ |U|`
 (`caseA_a_mul_card_uprime_dvd_card_U`).  This is what turns the landed count's iterated

@@ -687,7 +687,7 @@ open scoped FiniteInduce in
 difference `ζ − η` is `A₀`-supported (`inducedFamily_sub_support`) and lies in `ℤ[S(HC)]`, where
 `SHC_isCoherent.extension` agrees with `hyp.tau` (`extends_on_supported`). -/
 theorem Hypothesis.tau_sub_eq_SHC_extension [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {ζ η : ClassFunction ↥M ℂ}
     (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
@@ -749,7 +749,7 @@ coincided, `1 = ⟨φ^{τ₁}, φ^{τ₁}⟩ = ⟨φ^{τ₁}, ψ^{τ₁}⟩ = 0`
 `{λ^{τ₁} : λ ∈ S(HC)}` as an orthonormal `Finset` for the (11.8.2) integer projection
 (`exists_intProjection_of_orthonormal_ZIrr`). -/
 theorem Hypothesis.SHC_extension_inj [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {φ ψ : ClassFunction ↥M ℂ}
     (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))

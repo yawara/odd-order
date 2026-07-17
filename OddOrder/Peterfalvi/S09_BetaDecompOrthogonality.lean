@@ -22,6 +22,7 @@ Peterfalvi's (7.8.c) collapse hinges on the fact that `ζ_1 = Ind_K^L 1_K` satis
 `ζ_1(x) = ‖ζ_1‖² = [L:K]` for `x ∈ K`, so the single surviving `(7.7.a)` term
 `(c̄_1/‖ζ_1‖²) ζ_1(x)` simplifies to `c̄_1 = star(β,χ)`. -/
 
+omit [Fintype L] in
 /-- **Conjugation fixes the trivial class function.**  `(1_K)^g = 1_K` for any `g`, since the
 trivial class function is constant `1`. -/
 theorem conjBy_trivialClassFunction {K : Subgroup L} [K.Normal] (g : L) :

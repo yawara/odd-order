@@ -1690,7 +1690,7 @@ Dade-isometry `ν` basis extension, G2.7); the degree-inequality side of each st
 noncomputable def peterfalvi_66_coherence_of_X
     {τ : IntegralCharacterMap L G} {A : Set L} {X S₀ : Set (ClassFunction L ℂ)}
     [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (hXfin : X.Finite)
+    (_hXfin : X.Finite)
     {e : Fin X.ncard → ClassFunction L ℂ} (hsurj : ∀ χ ∈ X, ∃ i, e i = χ)
     (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ) (N : ℕ)
     (hS₀ : S₀ ⊆ X) (hpairs : ∀ j, j < N → pairSet (L := L) pair j ⊆ X)

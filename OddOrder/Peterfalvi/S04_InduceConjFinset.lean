@@ -1270,10 +1270,12 @@ noncomputable def toggleA (a : {a : G // a ∈ A}) (B : Finset {a : G // a ∈ A
   classical
   exact if a ∈ B then B.erase a else insert a B
 
+omit [Group G] in
 theorem toggleA_of_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
     (haB : a ∈ B) : toggleA a B = B.erase a := by
   classical rw [toggleA]; simp only [if_pos haB]
 
+omit [Group G] in
 theorem toggleA_of_not_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
     (haB : a ∉ B) : toggleA a B = insert a B := by
   classical rw [toggleA]; simp only [if_neg haB]

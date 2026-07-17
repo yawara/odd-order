@@ -895,12 +895,12 @@ S16 `chiRhoNormSq_eq_zetaNuRhoNormSq`). -/
 theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
-    (hmu : params.mu = hyp.muGrid hG hG.odd)
-    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (_hmu : params.mu = hyp.muGrid hG hG.odd)
+    (_hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
     (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     (hzconj : params.zeta.conj ≠ params.zeta)
-    (hδpm : params.delta = 1 ∨ params.delta = -1)
-    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
+    (_hδpm : params.delta = 1 ∨ params.delta = -1)
+    (_hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
     (1 : ℝ) - (hyp.w1 : ℝ) / (Nat.card ↥(derivedInG M) : ℝ)
       ≤ (hyp.toFamilyHypothesis71).chiRhoNormSq (coh.tau1 params.zeta) 0 := by
   haveI := hyp.finiteG

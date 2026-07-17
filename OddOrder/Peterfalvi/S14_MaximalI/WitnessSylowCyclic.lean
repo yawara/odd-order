@@ -771,7 +771,7 @@ in a maximal subgroup over `C_G(x)`, which must be `M`; and any maximal `L ≠ M
 theorem centralizer_control_of_CKx [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
     (hLM : L ≠ ctr.M)
-    {Lt : PeterfalviType} (hLt : HasPeterfalviType Lt L) (hPL : ctr.P0 ≤ mainSubgroup L Lt)
+    {Lt : PeterfalviType} (_hLt : HasPeterfalviType Lt L) (_hPL : ctr.P0 ≤ mainSubgroup L Lt)
     {x : G} (hx : x ∈ ctr.P0) (hxne : x ≠ 1)
     (hCKx : ¬ (Subgroup.centralizer ({x} : Set G) ⊓ ctr.K ≤ ctr.Kprime)) :
     Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≤ ctr.M ∧

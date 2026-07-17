@@ -1222,7 +1222,7 @@ already saturates the bound `2q²au` exactly (`sumnS_irreducible_constant_degree
 (9.8.d) count equality at `C = U′`, `2a = p−1`), so a member outside `𝒮₁′` would add its
 positive `Snorm` (`sOf_mem_Snorm_pos`) beyond `hFbound`. -/
 theorem caseA_sTwo_subset_degreeQaCut [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief))
     {S₂ : Set (ClassFunction ↥M ℂ)}

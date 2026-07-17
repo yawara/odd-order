@@ -122,12 +122,14 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 
 /-! ### Glauberman の補助補題群 -/
 
+omit [Finite A] in
 /-- `IsSolvable G ⇒ IsSolvable inl.range` (inl の rangeRestrict 経由). -/
 private lemma isSolvable_inlRange_of_isSolvable {φ : A →* MulAut G} [IsSolvable G] :
     IsSolvable (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range :=
   solvable_of_surjective (MonoidHom.rangeRestrict_surjective
     (SemidirectProduct.inl : G →* SemidirectProduct G A φ))
 
+omit [Finite A] in
 /-- `IsSolvable A ⇒ IsSolvable (Γ ⧸ inl.range)`.
 `rightHom` の核が `inl.range` で `rightHom` は全射, 第一同型定理 + 同型による IsSolvable
 の移送. -/
@@ -153,6 +155,7 @@ private lemma isSolvable_quotient_inlRange_of_isSolvable
     (h_iso1.trans h_iso2).symm
   exact solvable_of_surjective (f := h_iso.toMonoidHom) h_iso.surjective
 
+omit [Finite A] in
 /-- `inl.range` の `Γ = G ⋊ A` における index は `Nat.card A`. -/
 private lemma inlRange_index_eq_card_A {φ : A →* MulAut G} :
     (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range.index = Nat.card A := by
@@ -981,6 +984,7 @@ theorem exists_fixed_conj_of_isConj_of_fixed
   exact ⟨c, hc_fixed, Subtype.ext_iff.mp hc_smul⟩
 
 open OddOrder.GroupTheory in
+omit [Finite A] in
 /-- `C_G(A) = fixedSubgroup φ ⊤` の類を `G` へ送った像は A-不変
 (well-definedness / range 側). 代表が A-固定なので類は各 `φ a` で固定される. -/
 theorem conjClasses_map_fixedSubgroup_aInvariant {φ : A →* MulAut G}
@@ -1046,6 +1050,7 @@ noncomputable def aInvariantConjClassesEquiv {φ : A →* MulAut G}
        exact ⟨d, Subtype.ext hd⟩⟩
 
 open OddOrder.GroupTheory in
+omit [Finite A] in
 /-- `C_G(A)` に含まれる部分群は自動的に A-不変 (元ごとに固定されるため). -/
 theorem isAInvariant_of_le_fixedSubgroup {φ : A →* MulAut G} {D : Subgroup G}
     (hDC : D ≤ fixedSubgroup φ (⊤ : Subgroup A)) : IsAInvariant φ D := by

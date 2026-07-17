@@ -859,10 +859,10 @@ is a *normal* `(κ∪σ)'`-subgroup and `U.subgroupOf E` is a `(κ∪σ)'`-Hall 
 `C_G(U) ≤ C_G(B) ≤ M`. -/
 theorem centralizer_kappaCompl_le_of_mem_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
     {M U K : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hKM : K ≤ M) (hUM : U ≤ M)
+    (_hKM : K ≤ M) (hUM : U ≤ M)
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
-    (hKNU : K ≤ Subgroup.normalizer (U : Set G))
-    {r : ℕ} (hrprime : r.Prime) (hr : r ∈ tau2 M) (hrU : r ∈ piSet U) :
+    (_hKNU : K ≤ Subgroup.normalizer (U : Set G))
+    {r : ℕ} (hrprime : r.Prime) (hr : r ∈ tau2 M) (_hrU : r ∈ piSet U) :
     Subgroup.centralizer (U : Set G) ≤ M := by
   classical
   haveI : Fact r.Prime := ⟨hrprime⟩
@@ -1177,8 +1177,8 @@ Proof (Coq `not_cQQ`, working inside `↥(L_σ)`): the nilpotent `L_σ` factors 
 gives `K ⊓ (L_σ)' = K ⊓ ⁅Q, Q⁆`.  If `Q` were abelian, `⁅Q, Q⁆ = ⊥`, so `K ⊓ (L_σ)' = ⊥`; but
 `K ≤ (L_σ)'` gives `K ⊓ (L_σ)' = K`, forcing `K = ⊥`, contradicting `|K| = q > 1`. -/
 theorem partner_opiCore_nonabelian [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L K : Subgroup G} {q : ℕ} [Fact q.Prime]
-    (hL : L ∈ maximalSubgroups G) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L K : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (_hL : L ∈ maximalSubgroups G) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
     (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma L))
     (hKcard : Nat.card ↥K = q)
     (hKQ : K ≤ opiCoreInG ({q} : Set ℕ) L)

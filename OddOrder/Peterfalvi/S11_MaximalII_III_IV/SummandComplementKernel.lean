@@ -946,6 +946,7 @@ theorem hcPsi_seed_eq_of_restrict_eq [Finite G] {M : Subgroup G}
   exact Units.val_injective hval
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **step 5 (assembly): the reducible `M`-fixed `ζ` is `Ind_{HC}^{HU}(hcPsi θbar)`** (Peterfalvi
 (9.8.c), `Xmu` surjectivity).  A reducible (`M`-fixed) `ζ ∈ 𝒳(H₀C)` lying over the seed inflation
 `θ₀` (`hlo`; the seed `θbar` is regular by `caseA_reducible_theta_regular`, `≠ 1` by `hnt`) equals the
@@ -1043,6 +1044,7 @@ theorem caseA_reducible_eq_hcZeta [Finite G] {M : Subgroup G}
   rwa [hψ'eq, hθbar] at hζψ'
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **step 5 consequence (caseA): a reducible `𝒮(H₀)`-member is `Ind_{HU}^M(Ind_{HC}(hcPsi θbar))` for
 a regular seed `θbar`.**  A reducible `φ = Ind_{HU}^M χ ∈ 𝒮(H₀)` has `M`-fixed source `χ`
 (`inertia_eq_top_of_induceHU_not_irreducible`); the case-agnostic cardinality argument
@@ -1089,6 +1091,7 @@ theorem caseA_reducible_source_eq_hcZeta [Finite G] {M : Subgroup G}
   exact congrArg (induceHU data) (caseA_reducible_eq_hcZeta caseA θbar χ hlo hMfix hnt hH0C)
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical in
 /-- **Peterfalvi (13.3.a) core, case (a)** (the (9.8.b)-side `isIndHC`): in Clifford case (a),
 every *reducible* member of `𝒮(H₀)` is induced from a linear character of `HC` at the
@@ -1140,6 +1143,7 @@ theorem caseA_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSim
   exact ⟨ψ, hψirr, hψone, hφeq.trans hψeq⟩
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical in
 /-- **Peterfalvi (13.3.a) core, case-agnostic (Coq `isIndHC`)**: every *reducible* member of
 `𝒮(H₀)` is induced from a linear character of `HC` at the `M`-level — in either Clifford case
@@ -1231,6 +1235,7 @@ theorem caseA_hcZeta_irreducible_of_regular [Finite G] {M : Subgroup G}
 set_option linter.style.openClassical false in
 open scoped Classical in
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **|Xmu| = p-1** (Peterfalvi (9.8.c), the reducible-inducing regular seeds).  `Xmu` = the
 `Xθ`-members `ζ = Ind_{HC}(hcPsi θ)` (regular `θ`) whose `M`-induction `Ind_{HU}^M ζ` is *reducible*.
 The map `ζ ↦ Ind_{HU}^M ζ` is a bijection `Xmu ≃ {reducible 𝒮(H₀)-members}`: injective on reducibles
@@ -1297,6 +1302,7 @@ theorem caseA_Xmu_card_eq [Finite G] {M : Subgroup G}
 set_option linter.style.openClassical false in
 open scoped Classical in
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Peterfalvi (9.8.c): `𝒮(H₀C)` contains an irreducible character of degree `qu`.**  The parity
 dichotomy `exists_regular_not_reducible_of_odd` applied to `X = Xθ` (`u·|Xθ| = (p-1)^q` by
 `oXtheta_count`, `p-1` even as `p ∤ |G|` is odd, `u` odd by `u_odd`) and its `p-1`-element subfamily

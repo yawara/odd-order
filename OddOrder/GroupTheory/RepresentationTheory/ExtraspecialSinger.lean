@@ -165,6 +165,7 @@ private noncomputable def commBihomP : P →* P →* Multiplicative (ZMod p) whe
     exact congrArg (commMulEquiv hP)
       (Subtype.ext (commutatorElement_mul_left_of_le_center hP.commutator_eq_center.le x x' y))
 
+omit [Finite P] in
 /-- `ζ ⁅x, z⁆ = 1` when `z ∈ commutator P` (central, right slot). -/
 private theorem commBihomP_central_right (x : P) {z : P} (hz : z ∈ commutator P) :
     commBihomP hP x z = 1 := by
@@ -173,6 +174,7 @@ private theorem commBihomP_central_right (x : P) {z : P} (hz : z ∈ commutator 
       (Subgroup.mem_center_iff.mp (hP.commutator_eq_center.le hz) x))
   simp only [commBihomP, MonoidHom.coe_mk, OneHom.coe_mk, hz1, map_one]
 
+omit [Finite P] in
 /-- `ζ ⁅z, y⁆ = 1` when `z ∈ commutator P` (central, left slot). -/
 private theorem commBihomP_central_left {z : P} (hz : z ∈ commutator P) (y : P) :
     commBihomP hP z y = 1 := by
@@ -270,6 +272,7 @@ universe u
 
 variable {p : ℕ} [Fact p.Prime] {K P : Type u} [Group K] [Finite K] [Group P] [Finite P]
 
+omit [Finite K] in
 /-- **`|K| ∣ n` from a Singer embedding `μ : K ↪ C` into a finite cyclic group whose images are
 `n`-th roots of unity.**  The final arithmetic step of route B (here `C = 𝔽_{p²}ˣ`, `n = p+1`). -/
 private theorem card_dvd_of_injective_to_cyclic_forall_pow {C : Type*}
@@ -290,6 +293,7 @@ open OddOrder.BG.Ch1_Preliminary
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply)
 open scoped IsMulCommutative in
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Route B (BG Theorem 15.7(e), disjunct 3): `|K| ∣ p + 1`.**
 
 A cyclic `p'`-group `K` (`p` odd) acting on an extraspecial group `P` of order `p³` with the
@@ -301,7 +305,7 @@ lifts it to fixed-point-freeness on `V = P/Z(P)` internally.)
 irreducible (else the split-torus / line case gives `|K| ∣ p - 1`).  Singer realizes
 `V ≅ 𝔽_{p²}` with `μ : K ↪ 𝔽_{p²}ˣ`.  `K` preserves the commutator symplectic form, so
 `det ρ(k) = 1`; but `det ρ(k) = N(μ k) = μ(k)^{p+1}`, whence `|K| ∣ p + 1`. -/
-theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
+theorem card_dvd_succ_of_primeAction_extraspecial (_hodd : Odd p)
     (hP : IsExtraspecial p P) (hPcard : Nat.card P = p ^ 3) (φ : K →* MulAut P)
     (hfpf : ∀ k : K, k ≠ 1 → ∀ x : P, (φ k) x = x → x ∈ commutator P)
     (hcentZ : ∀ k : K, ∀ z : P, z ∈ commutator P → (φ k) z = z)

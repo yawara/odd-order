@@ -42,6 +42,7 @@ section Prop2Core
 variable {k : Type*} [CommRing k] {T : Type*} [CommGroup T] [Finite T]
   {M : Type*} [AddCommGroup M] [Module (MonoidAlgebra k T) M] [Finite M]
 
+omit [Finite T] in
 /-- `End_{k[T]}(M)` is finite (it injects into the finite function space `M → M`).
 
 ⚠ Deliberately **not** a global instance: an unconstrained `Finite (Module.End (MonoidAlgebra k T) M)`
@@ -59,6 +60,7 @@ variable [IsSimpleModule (MonoidAlgebra k T) M]
 noncomputable def endField : Field (Module.End (MonoidAlgebra k T) M) :=
   haveI := finite_end (k := k) (T := T) (M := M); inferInstance
 
+omit [Finite T] in
 /-- `M` is simple as a module over `D = End_{k[T]}(M)`.
 
 Because `k[T]` is commutative, each scalar map `m ↦ r • m` (`r ∈ k[T]`) is `k[T]`-linear, i.e.

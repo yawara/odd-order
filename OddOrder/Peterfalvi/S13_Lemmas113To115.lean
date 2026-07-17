@@ -973,7 +973,7 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     {χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
       ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
     (hχ₂ : χ₂ ≠ 1)
-    (hdegmem : ∀ x ∈ s, x 1 = χ₁ 1)
+    (_hdegmem : ∀ x ∈ s, x 1 = χ₁ 1)
     (hdegS₁diff : ∀ x ∈ S₁, ((x - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0)
     (hμ_S1 : ∀ x ∈ S₁, ClassFunction.inner
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) x = 0)

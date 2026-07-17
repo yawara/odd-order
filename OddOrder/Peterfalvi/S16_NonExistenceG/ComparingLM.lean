@@ -331,7 +331,7 @@ noncomputable def lSideGridCoeffData [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
-    (dataL : TypeICoherent78Data L) (hq3 : hyp.base.q = 3) (hp5 : hyp.base.p = 5)
+    (dataL : TypeICoherent78Data L) (_hq3 : hyp.base.q = 3) (_hp5 : hyp.base.p = 5)
     (hepq : (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q)
     (hub_u : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) <
       ((Nat.card ↥dataL.typeIHyp.H - 1 : ℕ) : ℚ)

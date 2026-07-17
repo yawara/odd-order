@@ -601,6 +601,7 @@ theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hnorm0 hnorm0' horth hsupp h1_0 h1_0'
 
 set_option maxHeartbeats 800000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09 in
 open OddOrder.Peterfalvi.S09.Cert in

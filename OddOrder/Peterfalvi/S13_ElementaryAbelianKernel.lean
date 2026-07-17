@@ -171,8 +171,8 @@ variable {K : Type*} [Group K]
 * is *central* (directly from `[K, N] ≤ Q` — no `p`-group argument needed);
 
 so `Ĥ` has nilpotency class `≤ 2` with `Ĥ' = N̂ ≤ Z(Ĥ)` of order `p`. -/
-theorem quotient_classTwo_structure [Finite K] {p : ℕ} (hp : p.Prime)
-    {N Q : Subgroup K} [hNnorm : N.Normal] (hQnorm : Q.Normal) (hQle : Q ≤ N)
+theorem quotient_classTwo_structure [Finite K] {p : ℕ} (_hp : p.Prime)
+    {N Q : Subgroup K} [_hNnorm : N.Normal] (hQnorm : Q.Normal) (hQle : Q ≤ N)
     (hRQ : ⁅(⊤ : Subgroup K), N⁆ ≤ Q) (hcard : Nat.card ↥N = p * Nat.card ↥Q)
     (hNcomm : N = commutator K) :
     haveI := hQnorm

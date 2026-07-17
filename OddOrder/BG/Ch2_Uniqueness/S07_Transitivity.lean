@@ -1400,7 +1400,7 @@ theorem hypothesis71_of_scn2_or_pLengthOne [Finite G] (hG : IsMinimalSimpleOdd G
 `A ∈ SCN₃(p)`, `q ∈ p'` ⇒ `O_{p'}(C_G(A))` は `ℋ_G*(A;q)` 上推移的に作用する。
 §8–§16 で最頻出。証明は Prop 7.5(2) + Thm 7.2。 -/
 theorem thompsonTransitivity [Finite G] (hG : IsMinimalSimpleOdd G)
-    {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
+    {p : ℕ} [Fact p.Prime] (_hp_mem : p ∣ Nat.card G)
     {A : Subgroup G} (hA : A ∈ scn3Global p G) {q : ℕ} [Fact q.Prime] (hq : q ≠ p) :
     ConjTransitiveOn (opiCoreInG {p}ᶜ (Subgroup.centralizer (A : Set G)))
       (hInvariantStar ⊤ A {q}) := by

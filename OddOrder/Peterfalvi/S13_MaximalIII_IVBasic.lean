@@ -856,7 +856,7 @@ theorem card_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
 
 /-- **`|HC : H₀C| = p^q`** — the `C`-factor cancels and `|H : H₀| = p^q` is the chief-factor
 order ((9.6), `quotient_order` + `typeIII_IV_p_eq_W2`). -/
-theorem H0C_relIndex_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem H0C_relIndex_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M) :
     hyp.H0C.relIndex hyp.HC = hyp.p ^ hyp.q := by
   have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by

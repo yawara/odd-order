@@ -47,6 +47,7 @@ open scoped IsMulCommutative
 
 variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] {S : Subgroup R}
 
+omit [Finite R] in
 /-- `S` is normal in `R` from `⁅S, ⊤⁆ ≤ S`: the conjugation action lands in `S`. -/
 private theorem extraspecial_normal_of_commutator_le
     (hSinR : ⁅S, (⊤ : Subgroup R)⁆ ≤ S) : S.Normal := by
@@ -54,12 +55,14 @@ private theorem extraspecial_normal_of_commutator_le
     OddOrder.Isaacs.Ch04.le_normalizer_of_commutator_le hSinR
   exact Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp hnorm)
 
+omit [Finite R] in
 /-- From `[S, R] ⊆ S' = Z(S)` the ambient inclusion `[S, R] ⊆ S` (image of a subgroup of `S`). -/
 private theorem commutator_le_self_of_hSR
     (hSR : ⁅S, (⊤ : Subgroup R)⁆ ≤ (Subgroup.center (↥S)).map S.subtype) :
     ⁅S, (⊤ : Subgroup R)⁆ ≤ S :=
   le_trans hSR (Subgroup.map_subtype_le _)
 
+omit [Finite R] in
 /-- For `g ∈ R` and `s ∈ S`, the commutator `⁅g, ↑s⁆ = (g s g⁻¹) s⁻¹` lies in `S`
 and, as an element of `↥S`, in the centre `Z(S)`. This is the heart of `[S, R] ⊆ Z(S)`. -/
 private theorem commutatorElement_mem_center
@@ -151,6 +154,7 @@ private theorem deltaHom_eq_one_iff_mem_centralizer [S.Normal]
     change (deltaHom hSR g s : ↥S) = (1 : ↥S)
     rw [deltaHom_apply hSR g s, hfix, mul_inv_cancel]
 
+omit [Fact (Nat.Prime p)] in
 /-- `δ_g` kills `Z(S)`: as a homomorphism into the abelian group `Z(S)` it kills `[S, S]`,
 and `[S, S] = Z(S)` for extraspecial `S`. -/
 private theorem center_le_ker_deltaHom [S.Normal] (hS : IsExtraspecial p (↥S))
@@ -186,6 +190,7 @@ private theorem quotientCenter_isElementaryAbelian (hS : IsExtraspecial p (↥S)
   haveI : (frattini (↥S)).Normal := inferInstance
   exact IsElementaryAbelian.of_mulEquiv (QuotientGroup.quotientMulEquivOfEq hfrat) hEA
 
+omit [Finite R] in
 /-- `Z(S)` is elementary abelian: it is cyclic of prime order `p`. -/
 private theorem centerS_isElementaryAbelian (hS : IsExtraspecial p (↥S)) :
     IsElementaryAbelian p (Subgroup.center (↥S)) := by
@@ -194,6 +199,7 @@ private theorem centerS_isElementaryAbelian (hS : IsExtraspecial p (↥S)) :
   have hx : x ^ (Nat.card (Subgroup.center (↥S))) = 1 := pow_card_eq_one'
   rwa [hS.center_card] at hx
 
+omit [Finite R] in
 /-- The kernel of `R →* MulAut ↥S` (conjugation) is `C_R(S)`. -/
 private theorem conjNormal_ker_eq_centralizer_local [S.Normal] :
     (MulAut.conjNormal (H := S) : R →* MulAut (↥S)).ker
@@ -219,6 +225,7 @@ private theorem conjNormal_ker_eq_centralizer_local [S.Normal] :
       rw [Subgroup.coe_subtype, MulAut.conjNormal_apply, ← hcomm]; group
     rw [hfix]; rfl
 
+omit [Fact (Nat.Prime p)] in
 /-- The `ZMod p`-scalar-torsion condition `p • x = 0` for an elementary-abelian
 multiplicative group viewed additively. -/
 private theorem additive_nsmul_eq_zero {V : Type*} [Group V]
@@ -353,6 +360,7 @@ private theorem card_quotient_centralizer_le [S.Normal] (hS : IsExtraspecial p (
     _ = p ^ Module.finrank (ZMod p) (Additive Q) := by rw [hcardZ, hι_card]
     _ = Nat.card Q := hQ_pow.symm
 
+omit [Finite R] in
 /-- An element `s ∈ S` centralizes `S` (in `R`) iff, as an element of `↥S`, it lies in `Z(S)`. -/
 private theorem mem_centralizer_iff_mem_center (s : ↥S) :
     (s : R) ∈ Subgroup.centralizer (S : Set R) ↔ s ∈ Subgroup.center (↥S) := by

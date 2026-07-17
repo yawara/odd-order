@@ -31,7 +31,7 @@ variable {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
 finite solvable group has a `φ`-invariant complement `U`, provided the action is coprime to `|G|`. -/
 theorem exists_aInvariant_complement_of_normal_isHall [IsSolvable G] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    {N : Subgroup G} [N.Normal] (hN_inv : IsAInvariant φ N)
+    {N : Subgroup G} [N.Normal] (_hN_inv : IsAInvariant φ N)
     (hN_hall : IsHallSubgroup (Nat.card ↥N).primeFactors N) :
     ∃ U : Subgroup G, Subgroup.IsComplement' N U ∧ IsAInvariant φ U := by
   classical

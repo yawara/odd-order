@@ -71,6 +71,7 @@ noncomputable def xChiExtension
   ((OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr ℂ
     (xChiExtensionFun h46 Ximg)).restrictScalars ℤ
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- The `X_χ`-extension on the `0`-th-row certain-type irreducible: `ν(μ_{0,χ₂}) = Ximg χ₂`. -/
 theorem xChiExtension_mu_zero
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) [NeZero (Nat.card h46.W1)]
@@ -90,6 +91,7 @@ theorem xChiExtension_mu_zero
   have hchoose : hex.choose = (χ₂, 0) := h46.columnFamily_mu_injective hex.choose_spec.1
   rw [hchoose]
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- The `X_χ`-extension on a higher-row certain-type irreducible: `ν(μ_{iχ₂}) = 0` for `i ≠ 0`. -/
 theorem xChiExtension_mu_ne_zero
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) [NeZero (Nat.card h46.W1)]

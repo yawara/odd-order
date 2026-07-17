@@ -226,6 +226,7 @@ theorem columnSum_eq_induce_H
   exact OddOrder.Peterfalvi.S04.Hypothesis.induce_congr_of_subgroup_eq hHK
     (fun x hx₁ hx₂ => by simp [ClassFunction.restrict_apply])
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2) case-(B), `Res_H μ_{ij} = Res_H μ_{0j}`.**  The H-presentation of (4.8) step 1
 `restrict_certainType_eq` (`Res_K μ_{ij} = Res_K μ_{0j} = χ_j`), transported pointwise along
 `h46.K = H`. -/
@@ -601,6 +602,7 @@ theorem SibleyDadeHypothesis.certainTypeSet_subset_Xset
   exact hyp.mem_Xset.mpr ⟨hyp.columnSum_mem_S h46 hHK hχ₂,
     hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂⟩
 
+omit [Fintype G] in
 /-- **(6.8.2) case-(B): `W₂` is central in `H`.**  In case (B), `W₂ ⊆ Z(↥L)`
 (`certainType_W2_le_center`), so its trace `W₂.subgroupOf H` lies in `Z(↥H)`: a `W₂`-element
 commutes with all of `↥L`, hence with `↥H`.  This is the [Is] 2.27 hypothesis `Z ≤ Z(G)` (with
@@ -632,6 +634,7 @@ theorem SibleyDadeHypothesis.mem_Xset_exists_inducing
   obtain ⟨θ, hθne, hθind⟩ := hχS
   exact ⟨θ, hθne, fun hker => hχnotZ (hyp.mem_SsubFiltration.mpr ⟨θ, hθne, hker, hθind⟩), hθind⟩
 
+omit [Fintype G] in
 /-- **(6.8.2.3) step 2 ([Is] 2.27 central restriction):** for an irreducible `θ` of `H` whose kernel
 does not contain the central subgroup `Z = W₂.subgroupOf H`, the restriction `Res^H_Z θ` is `θ(1)` times
 a **nontrivial linear** character `φ` of `Z`.
@@ -659,6 +662,7 @@ theorem certainType_central_restriction
   rw [htriv, trivialClassFunction_apply, one_mul] at hzval
   exact hzval
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **(6.8.2.3) constituent weight = degree (central multiplicity).**  For an irreducible `θ` of `H`
 whose central restriction is `Res^H_Z θ = θ(1)·φ` (`certainType_central_restriction`, `Z = W₂.subgroupOf H`
 central), the multiplicity of `φ` in `Res^H_Z θ` is `θ(1)`:

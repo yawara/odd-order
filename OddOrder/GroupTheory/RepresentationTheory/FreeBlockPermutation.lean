@@ -55,6 +55,7 @@ private noncomputable def proj (hW : DirectSum.IsInternal W) (i : ι) : V →ₗ
   (W i).subtype ∘ₗ DirectSum.component F ι (fun i => W i) i ∘ₗ
     (LinearEquiv.ofBijective (DirectSum.coeLinearMap W) hW).symm.toLinearMap
 
+omit [Fintype ι] in
 private theorem proj_apply (hW : DirectSum.IsInternal W) (i : ι) (v : V) :
     proj hW i v = ((LinearEquiv.ofBijective (DirectSum.coeLinearMap W) hW).symm v i : V) := rfl
 
@@ -82,6 +83,7 @@ private theorem sum_proj (hW : DirectSum.IsInternal W) (v : V) : ∑ i, proj hW 
   simp only [proj_apply]
   exact h
 
+omit [Finite ↥H] in
 /-- Membership in the `H`-invariants, restated through the coercion `↥H → G`. -/
 private theorem mem_invariants_iff (v : V) :
     v ∈ Representation.invariants (ρ.comp H.subtype) ↔ ∀ h : ↥H, ρ (h : G) v = v := by
@@ -118,6 +120,7 @@ private theorem proj_smul_of_mem_invariants (hW : DirectSum.IsInternal W)
     exact fun he => hji ((MulAction.injective h) he)
   · intro hi; exact absurd (Finset.mem_univ i) hi
 
+omit [Finite ↥H] in
 /-- Blocks in the same `H`-orbit have the same dimension: `ρ h` is invertible and maps `W i`
 onto `W (h • i)`. -/
 private theorem finrank_block_smul [FiniteDimensional F V]
@@ -141,6 +144,7 @@ private theorem orbitSum_mem_invariants [Fintype ↥H] (x : V) :
 
 variable {ρ H}
 
+omit [Finite ↥H] in
 /-- For an orbit class `o`, its chosen representative's orbit equals `o.orbit`, so any `i` with the
 same class lies in `orbit ↥H o.out`. -/
 private theorem mem_orbit_out_of_mk (i : ι) :
@@ -188,6 +192,7 @@ private theorem sum_eq_sum_orbit [Fintype ↥H] [Fintype (MulAction.orbitRel.Quo
   rw [← Function.Bijective.sum_comp (orbitProdEquiv_bijective (H := H) hfree) f,
     ← Finset.univ_sigma_univ, Finset.sum_sigma]
 
+omit [Finite ↥H] in
 /-- Two representatives of *distinct* orbit classes can never be carried into one another. -/
 private theorem smul_out_ne_out_of_ne {o o' : MulAction.orbitRel.Quotient ↥H ι} (hne : o' ≠ o)
     (h : ↥H) : h • (o.out : ι) ≠ (o'.out : ι) := by

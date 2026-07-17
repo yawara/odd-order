@@ -21,6 +21,7 @@ variable {M : Subgroup G}
 
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Case-(b) exhaustion of `𝒳(H₀C)` by `hcPsi`-inductions** (Clifford correspondence, the
 surjectivity half of the case-(b) `oXtheta`): every `χ ∈ 𝒳(H₀C)` equals
 `Ind_{HC}^{HU}(hcPsi θbar)` for some nontrivial seed `θbar : H̄ →* ℂˣ`.
@@ -156,6 +157,7 @@ theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
       (hcZeta_irreducible chief θbar hθ₀) (hψeq' ▸ hψover)
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **Case-(b) pair exhaustion of `𝒳(H₀C')`** (the `C'`-kernel analogue of
 `caseB_xiOf_H0C_eq_induce_hcPsi`): every `ζ ∈ 𝒳(H₀C')` equals `Ind_{HC}^{HU}(hcPsiPair θ λ)` for a
 nontrivial seed `θ : H̄ →* ℂˣ` and a linear `λ : C →* ℂˣ` trivial on `C'`.
@@ -372,6 +374,7 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
     (hcZetaPair_irreducible chief θbar lam hθ₀) (hψeq' ▸ hψover)
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical in
 /-- **Stages-flattening**: a `𝒮`-member whose (irreducible) source equals
 `Ind_{HC}^{HU}(hcPsi θbar)` is induced from a linear character of the `M`-level `HC`
@@ -485,6 +488,7 @@ theorem isIndHC_of_source_eq_induce_hcPsi [Finite G] {M : Subgroup G}
       _ = _ := hstages
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical in
 /-- **Stages-flattening, pair version**: the `hcPsiPair` analogue of
 `isIndHC_of_source_eq_induce_hcPsi`.  A `𝒮`-member whose (irreducible) source equals
@@ -598,6 +602,7 @@ theorem isIndHC_of_source_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
       _ = _ := hstages
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical in
 /-- **Peterfalvi (13.3.a) core (Coq `PFsection9.isIndHC`)**: in Clifford case (b), every
 *reducible* member of `𝒮(H₀)` is induced from a linear character of `HC` at the `M`-level.
@@ -777,6 +782,7 @@ theorem hcPsi_realizedH0supC_subgroupOf_subset_characterKernel [Finite G] {M : S
   exact hcPsi_mem_characterKernel_of_mem_realizedH0supC chief θ (SetLike.mem_coe.mp hx)
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`H₀C ⊆ Ker ζ`**: the realized `H₀C` lies in the character kernel of `ζ = Ind_{HC}^{HU}(ψ)`.
 Since `ψ` is `1` on `H₀C` (`hcPsi_mem_characterKernel_of_mem_realizedH0supC`) and `H₀C ◁ HC ≤ HU`,
 the normal subgroup `H₀C` lies in `Ker(Ind ψ)` (`subsetCharacterKernel_induce_of_subgroupOf`).  This
@@ -801,6 +807,7 @@ theorem hcZeta_H0supC_subset_ker [Finite G] {M : Subgroup G}
     (hcPsi_realizedH0supC_subgroupOf_subset_characterKernel chief θ)
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`H ⊄ Ker ζ`** (`ζ ∈ 𝒳`): the irreducible `ζ = Ind_{HC}^{HU}(ψ)` is nontrivial on `H = hInHu`.
 `ζ` lies over `ψ` (Frobenius: `⟨Ind ψ, ζ⟩ = ⟨ζ,ζ⟩ = 1`), so `H ⊆ Ker ζ` would descend
 (`liesOver_mem_characterKernel`) to `H ⊆ Ker ψ` (`ψ|_H = 1`).  But `ψ|_H` is the inflation of `θ`
@@ -871,6 +878,7 @@ theorem hcZeta_mem_xiSet [Finite G] {M : Subgroup G}
   exact hψker
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 /-- **`ζ ∈ 𝒳(H₀C)`**: combining the two halves `H ⊄ Ker ζ` (`hcZeta_mem_xiSet`) and `H₀C ⊆ Ker ζ`
 (`hcZeta_H0supC_subset_ker`).  This is the source character of the (9.8.c) `𝒮(H₀C)`-member
 `Ind_{HU}^M ζ` of degree `qu`. -/
@@ -950,6 +958,7 @@ theorem conjBy_eq_self_of_not_isIrreducibleCharacter_induceHU [Finite G] {M : Su
   exact IrreducibleCharacter.ext (by rw [IrreducibleCharacter.coe_conjBy]; exact hw)
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical in
 /-- **Peterfalvi (9.9.c), the `u`-formula half**: in Clifford case (b), if `𝒮(H₀C')` contains
 no irreducible character then `u = (p^q−1)/(p−1)`.
@@ -1089,7 +1098,7 @@ theorem hcZeta_induceHU_apply_one [Finite G] {M : Subgroup G}
 by its source `ζ ∈ 𝒳(H₀C)` (`hcZeta_mem_xiOf`). -/
 theorem hcZeta_induceHU_mem_sOf [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
-    (chars : Section11CharacterData data chief)
+    (_chars : Section11CharacterData data chief)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hθnt : θ ≠ 1)
     [Fintype ↥(huSub data)]
     [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
@@ -1119,7 +1128,7 @@ supplied by propagating `θ̄`'s free-`W₁`-orbit (`clifford_caseA_exists_char_
 `w₀` datum) through the construction. -/
 theorem hcZeta_induceHU_irreducible [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
-    (chars : Section11CharacterData data chief)
+    (_chars : Section11CharacterData data chief)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
     [Fintype ↥(huSub data)]
     [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]

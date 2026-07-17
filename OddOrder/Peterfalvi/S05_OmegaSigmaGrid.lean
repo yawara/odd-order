@@ -59,6 +59,7 @@ noncomputable def omegaSigmaGrid :
     hyp.omegaSigmaGrid hVeq app i j = hyp.sigmaIntegral hVeq app (hyp.omegaGrid i j) :=
   rfl
 
+omit [Fintype ↥hyp.W] in
 /-- The (3.3) ω-grid entries are virtual characters of `W` (each is irreducible). -/
 theorem omegaGrid_mem_ZIrr (i : Fin (Nat.card hyp.W1)) (j : Fin (Nat.card hyp.W2)) :
     hyp.omegaGrid i j ∈ ZIrr hyp.W := by

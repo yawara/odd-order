@@ -334,7 +334,7 @@ abelian `E₂ = A₀ × C` has `exp E₂ ∣ lcm(exp A₀, exp C)` (surjective `
 theorem exists_factorization_le_at_prime [Finite G] {E E₀ A₀ E₂ : Subgroup G} {p : ℕ}
     [Fact p.Prime] (hA₀E₂ : A₀ ≤ E₂) (hE₂E : E₂ ≤ E)
     (hE₀NA₀ : E₀ ≤ Subgroup.normalizer (A₀ : Set G)) (hE₂ab : IsMulCommutative ↥E₂)
-    (hA₀card : Nat.card ↥A₀ = p) (hE₂sup : E₂ ≤ A₀ ⊔ E₀) (hA₀E₀ : A₀ ⊓ E₀ = ⊥)
+    (hA₀card : Nat.card ↥A₀ = p) (hE₂sup : E₂ ≤ A₀ ⊔ E₀) (_hA₀E₀ : A₀ ⊓ E₀ = ⊥)
     (hcard : Nat.card ↥(E₂.subgroupOf E) = p ^ (Nat.card ↥E).factorization p)
     (hCne : E₂ ⊓ E₀ ≠ ⊥) :
     ∃ g₀ : ↥E₀, (Monoid.exponent ↥E).factorization p ≤ (orderOf g₀).factorization p := by

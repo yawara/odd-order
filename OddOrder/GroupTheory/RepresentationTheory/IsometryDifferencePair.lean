@@ -1041,6 +1041,7 @@ theorem mu_ne_of_forall_inner_difference_eq_zero
 
 end SignedIrreducibleDifferenceFamily
 
+omit [Fintype G] in
 /-- **Anchored-difference rigidity** (the (13.1.e) grid-uniqueness core, issue 2038): two
 families of irreducible characters with the same anchored differences
 `ν_i − ν_0 = ν'_i − ν'_0` coincide, provided `ν'` is injective and `n ≥ 2`.

@@ -926,7 +926,7 @@ theorem characterDegree_re_le_of_not_mem_pairUnion (hyp : SibleyDadeHypothesis G
         (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re)
     (hcover : ∀ φ ∈ hyp.Xset Z, φ ∈ hyp.xBaseBlock Z ∨
       ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
-    {i : ℕ} (hi : i < N)
+    {i : ℕ} (_hi : i < N)
     {φ : ClassFunction ↥L ℂ} (hφX : φ ∈ hyp.Xset Z)
     (hφnot : φ ∉ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i) :
     (OddOrder.Peterfalvi.S03.characterDegree (pair i).1).re ≤

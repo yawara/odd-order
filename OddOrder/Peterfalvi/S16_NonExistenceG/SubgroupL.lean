@@ -647,6 +647,7 @@ theorem conj_mem_Q (hyp : Hypothesis (G := G)) (v : ↥hyp.base.V) (x : ↥hyp.b
   exact (Subgroup.mem_normalizer_iff.mp hv (x : G)).mp x.2
 
 set_option maxHeartbeats 1000000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped IsMulCommutative in
 /-- **(14.7)/(14.2)(a) field model from the §13 numeric data.**  When
 `|U| = (p^q-1)/(p-1)` (the (14.7) cyclotomic value), the conjugation action of `U` on the

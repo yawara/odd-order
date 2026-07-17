@@ -55,6 +55,8 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
+import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -432,6 +434,21 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch09.IsSemisimpleGroup.isSimpleGroup_of_isMinimalNormal
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable
+
+-- Ch.9 (More on Subnormality): Lem 9.6 — a minimal normal subgroup of a finite group is
+-- abelian or semisimple.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal
+
+-- Ch.9 (More on Subnormality): the layer E(G) and Theorem 9.7 — (a) E' = E,
+-- (b) E/Z(E) semisimple, (c) [E,M] = 1 for every solvable normal subgroup M.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.commutator_layer_eq_layer
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isSemisimpleGroup_layer_quotient_center
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.commutator_layer_eq_bot_of_normal_isSolvable
+
+-- Ch.9 (More on Subnormality): generalized Fitting F*(G) = F(G)E(G); Cor 9.9 (←) —
+-- F(G) ⊇ C_G(F(G)) implies F*(G) = F(G) (via Thm 9.7(c)).
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.genFitting_eq_fitting_of_centralizer_fitting_le
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.

@@ -364,6 +364,7 @@ theorem monoidHom_eq_of_eqOn_W1_W2 {χ χ' : ↥tp.W →* ℂˣ}
   rw [← hab, map_mul, map_mul, h1 a (Subgroup.mem_subgroupOf.mp ha),
     h2 b (Subgroup.mem_subgroupOf.mp hb)]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **`gridEquivE` preserves the underlying `G`-element.**  It is the composite of the
 element-preserving subgroup equivs `subgroupOfEquivOfLe` and `subgroupCongr`, so transporting
 `w : ↥tp.W` into `certainTypeS`'s `W` does not move the ambient group element. -/
@@ -460,6 +461,7 @@ theorem omegaProdCharS_apply_mem_Kstar
     MonoidHom.comp_apply]
   rw [hfst, hsnd, map_one, one_mul]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Value of `certainTypeT`'s product character on a transported `mp.K`-element**: since `mp.K` is
 the `W₂`-factor of `T`, only the `W₂`-factor `b` survives.  The T-side mirror of
 `omegaProdCharS_apply_mem_Kstar`. -/
@@ -481,6 +483,7 @@ theorem omegaProdCharT_apply_mem_K
     MonoidHom.comp_apply]
   rw [hfst, hsnd, map_one, one_mul]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Value of `certainTypeT`'s product character on a transported `mp.Kstar`-element**: since
 `mp.Kstar` is the `W₁`-factor of `T`, only the `W₁`-factor `a` survives.  The T-side mirror of
 `omegaProdCharS_apply_mem_K`. -/

@@ -176,7 +176,7 @@ theorem pComplement_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
 
 /-- The `p`-core and the `p`-complement intersect trivially (independence of the cores). -/
 theorem disjoint_opCore_pComplementCore [Finite G]
-    {M : Subgroup G} (hyp : Hypothesis M) (hp_prime : hyp.p.Prime)
+    {M : Subgroup G} (hyp : Hypothesis M) (_hp_prime : hyp.p.Prime)
     (hp_mem : hyp.p ∈ (Nat.card ↥hyp.H).primeFactors) :
     Disjoint (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H) hyp.pComplementCore := by
   classical
@@ -251,7 +251,7 @@ theorem p_mem_primeFactors [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact dvd_mul_of_dvd_left (dvd_pow_self _ hq) _
 
 /-- The `p`-core and the `p`-complement jointly generate `H` (nilpotent: Sylows generate). -/
-theorem opCore_sup_pComplementCore_eq_top [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem opCore_sup_pComplementCore_eq_top [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H ⊔ hyp.pComplementCore = ⊤ := by
   classical

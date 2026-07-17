@@ -37,6 +37,7 @@ variable {G : Type*} [Group G] [Fintype G]
 variable {A : Set G} {L : Subgroup G} [Fintype ↥L]
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **Complex conjugation inverts a linear character.**  For a linear character `χ : W →* ℂˣ` of the
 finite group `W`, the Galois action of complex conjugation `Complex.conjAe` on `ω(χ)` is `ω(χ⁻¹)`.
 Pointwise: `(ω(χ))(w) = χ(w)` is a root of unity (`χ(w)^{|W|} = 1`), so `‖χ(w)‖ = 1` and
@@ -80,6 +81,7 @@ row `i'` with `w1CharEquiv i' = (w1CharEquiv i)⁻¹`.  Combined with `certainTy
 this yields `(ω_{ij}^σ)̄ = ω_{i'j'}^σ`: the conjugate of a σ-image is the σ-image at the conjugate
 grid index (`j' = χ₂⁻¹` independent of `i`). -/
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **`omegaProdChar` inverts coordinatewise** (`ℂˣ` abelian): `ω(χ₁, χ₂)⁻¹ = ω(χ₁⁻¹, χ₂⁻¹)`. -/
 theorem omegaProdChar_inv (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
     (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
@@ -97,6 +99,7 @@ noncomputable def rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (i : Fin (Nat.card h.W1)) : Fin (Nat.card h.W1) :=
   h.w1CharEquiv.symm ((h.w1CharEquiv i)⁻¹)
 
+omit [Fintype G] in
 @[simp] theorem w1CharEquiv_rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (i : Fin (Nat.card h.W1)) :
     h.w1CharEquiv (rowInv h i) = (h.w1CharEquiv i)⁻¹ :=
@@ -290,6 +293,7 @@ theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h
     if_pos rfl] at h0
   exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
 
+omit [Fintype G] in
 /-- **Row inversion fixes the anchor row**: `rowInv 0 = 0` (the row-`0` character is trivial,
 `w1CharEquiv_zero`, and `1⁻¹ = 1`). -/
 @[simp] theorem rowInv_zero (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] :

@@ -390,7 +390,7 @@ theorem A_le_fittingInAmbient_of_typeP1_nonnil [Finite G]
     (hKs : Ch03.IsHallSubgroup (S14.kappa L) (Ks.subgroupOf L))
     (hKdefL : K = OddOrder.BG.Ch3.S10.Msigma L ⊓ Subgroup.centralizer (Ks : Set G))
     (hne : MF L ≠ OddOrder.BG.Ch3.S10.Msigma L)
-    (hA : A ∈ elemAbelianOfRank G q1 2) (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L)
+    (_hA : A ∈ elemAbelianOfRank G q1 2) (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L)
     (hACK : A ≤ Subgroup.centralizer (K : Set G)) :
     A ≤ fittingInAmbient L := by
   classical
@@ -665,7 +665,7 @@ theorem typeP_partner_sylow_uniquelyMaximal_bundle [Finite G]
     (hKs : Ch03.IsHallSubgroup (S14.kappa L) (Ks.subgroupOf L))
     (hKdefL : K = OddOrder.BG.Ch3.S10.Msigma L ⊓ Subgroup.centralizer (Ks : Set G))
     (hqπ : q ∈ S14.piSet K) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma L)
-    (hq1prime : q1.Prime) (hA : A ∈ elemAbelianOfRank G q1 2)
+    (_hq1prime : q1.Prime) (hA : A ∈ elemAbelianOfRank G q1 2)
     (hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma L)
     (hACK : A ≤ Subgroup.centralizer (K : Set G)) :
     A ≤ fittingInAmbient L ∧
@@ -1155,7 +1155,7 @@ theorem hfratt_of_hall_not_normal [Finite G]
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hHMσ : H ≤ OddOrder.BG.Ch3.S10.Msigma M)
     (hHhall : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
-    (hHne : H ≠ ⊥) (hHnotnorm : ¬ (H.subgroupOf M).Normal) :
+    (_hHne : H ≠ ⊥) (hHnotnorm : ¬ (H.subgroupOf M).Normal) :
     ∃ Q : Subgroup G, Q ≤ M ∧ (Q.subgroupOf M).Normal ∧ Disjoint Q H ∧
       ∀ m ∈ M, ∃ n a : G, n ∈ Subgroup.normalizer (H : Set G) ∧ a ∈ Q ∧ m = n * a := by
   classical

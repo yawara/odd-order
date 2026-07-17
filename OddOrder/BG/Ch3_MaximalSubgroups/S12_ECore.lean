@@ -1221,8 +1221,8 @@ theorem subgroupE_basic [Finite G] (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E�
 /-- **BG Lemma 12.2(a)** (mmd L3062): `X` を `M` の非自明 `p`-部分群、`M* ∈ ℳ(N_G(X))` とすると
 `p ∈ σ(M*) ∪ τ₂(M*)`。(原典 (b) の τ₁∪τ₃ 非共役は後続。) -/
 theorem prime_mem_sigma_or_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
-    {X : Subgroup G} (hXM : X ≤ M) (hXne : X ≠ ⊥) (hXp : IsPGroup p ↥X)
+    {M : Subgroup G} (_hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    {X : Subgroup G} (_hXM : X ≤ M) (hXne : X ≠ ⊥) (hXp : IsPGroup p ↥X)
     {Mstar : Subgroup G}
     (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
     p ∈ S10.sigma Mstar ∨ p ∈ tau2 Mstar := by

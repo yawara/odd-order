@@ -83,7 +83,7 @@ open scoped FiniteInduce in
 /-- **Differences of degree-one `H`-inductions are supported in `H^#`** (the `S`-side mirror
 of `indK_sub_indK_support`; the (13.4) `α`-support for the conjugate pair `λ − λ̄`). -/
 theorem Hypothesis.indH_sub_indH_support [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (θ θ' : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)
     (hθ1 : θ 1 = 1) (hθ'1 : θ' 1 = 1) :
     (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ

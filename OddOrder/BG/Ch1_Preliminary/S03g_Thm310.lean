@@ -83,7 +83,7 @@ theorem prime_card_complement_of_frobenius_conj {G : Type*} [Group G] [Finite G]
     (hUK_frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥E (U.subgroupOf E) (K.subgroupOf E))
     (hUab : ∀ a b : ↥U, (a : G) * (b : G) = (b : G) * (a : G))
     (hEM : E ≤ Subgroup.normalizer M)
-    (hMnilp : Group.IsNilpotent ↥M) (hMne : M ≠ ⊥)
+    (_hMnilp : Group.IsNilpotent ↥M) (hMne : M ≠ ⊥)
     (hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥M))
     (hCU : M ⊓ Subgroup.centralizer (U : Set G) = ⊥)
     (hcond3 : ∀ x ∈ K, x ≠ 1 →

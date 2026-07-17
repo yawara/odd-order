@@ -657,7 +657,7 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
     (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G) (hMne : M ≠ Mstar)
     (S : Sylow p G) (hN_S : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M ⊓ Mstar)
     (hrank : rank ↥(S : Subgroup G) ≤ 2) (hQ_es : IsExpPExtraspecial p ↥Q)
-    (hQcard : Nat.card ↥Q = p ^ 3) (hQ_le : Q ≤ M ⊓ Mstar) :
+    (_hQcard : Nat.card ↥Q = p ^ 3) (hQ_le : Q ≤ M ⊓ Mstar) :
     maximalSubgroupsContaining
         (Subgroup.normalizer (((Subgroup.center ↥Q).map Q.subtype) : Set G)) ≠ {M} := by
   set Z : Subgroup G := (Subgroup.center ↥Q).map Q.subtype with hZdef

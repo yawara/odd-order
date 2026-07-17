@@ -340,7 +340,7 @@ theorem le_Msigma_of_mem_elemAbelianOfRank_of_mem_sigma [Finite G]
 `N_G(A^w) ⊄ M*` が `N_G(A) ≤ M*` と衝突して不発。 -/
 theorem mem_sigma_of_tau2_of_mem_maximalContaining [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
-    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    (_hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
     {Mstar : Subgroup G}
     (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (A : Set G))) :
     p ∈ S10.sigma Mstar := by
@@ -1264,9 +1264,9 @@ theorem tau2_transfer_to_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
       q ∈ tau2 Mstar ∧
       (∃ P : Sylow p G, Mstar ≤ Subgroup.normalizer ((P : Subgroup G) : Set G)) ∧
       (∃ Q : Sylow q G, (Q : Subgroup G) ≤ Mstar ∧ IsMulCommutative ↥(Q : Subgroup G))) :=
-  ⟨fun q hq_prime hq => tau2_prime_mem_sigma_diff_beta hG h hp hA hAE hMstar hq_prime hq,
-   fun r hr => index_primeFactors_subset_tau1_union_tau2 hG h hp hA hAE hMstar hr,
-   fun q hqi hqc =>
+  ⟨fun _q hq_prime hq => tau2_prime_mem_sigma_diff_beta hG h hp hA hAE hMstar hq_prime hq,
+   fun _r hr => index_primeFactors_subset_tau1_union_tau2 hG h hp hA hAE hMstar hr,
+   fun _q hqi hqc =>
      tau2_normalSylow_abelianSylow_of_mem_index_card hG h hp hA hAE hMstar hqi hqc⟩
 
 end OddOrder.BG.Ch3.S12

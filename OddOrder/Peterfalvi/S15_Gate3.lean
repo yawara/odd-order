@@ -256,7 +256,7 @@ reusable across the §16 conjugacy arguments. -/
 theorem not_conj_of_isTypeI_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {L M : Subgroup G} (hLI : IsTypeI L) (hMmax : M ∈ maximalSubgroups G)
     (hMnonI : IsTypeNonI M) : ¬ ∃ g : G, MulAut.conj g • L = M :=
-  fun ⟨g, hg⟩ =>
+  fun ⟨_g, hg⟩ =>
     OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG hMmax hMnonI
       (OddOrder.GroupTheory.isTypeI_of_conj hLI hg)
 

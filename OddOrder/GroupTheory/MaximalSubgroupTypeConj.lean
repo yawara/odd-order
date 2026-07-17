@@ -269,6 +269,7 @@ theorem isComplement'_subgroupOf_pointwise_smul {H U M : Subgroup G}
     ← map_subgroupMap_subgroupOf, ← map_subgroupMap_subgroupOf]
   exact isComplement'_map_of_mulEquiv (φ.subgroupMap M) h
 
+omit [Finite G] in
 /-- Normality of a `subgroupOf`-subgroup transfers along the pointwise `MulAut` action. -/
 theorem normal_subgroupOf_pointwise_smul {N U : Subgroup G} (h : (N.subgroupOf U).Normal) :
     ((φ • N).subgroupOf (φ • U)).Normal := by
@@ -289,6 +290,7 @@ theorem isFrobeniusGroup_subgroupOf_pointwise_smul {H U0 : Subgroup G}
     ← pointwise_mulAut_smul_eq_map φ (H ⊔ U0), Subgroup.smul_sup] at e
   exact e
 
+omit [Finite G] in
 /-- The centralizer-bound field of `TypeFData` transfers along the pointwise `MulAut` action. -/
 theorem inf_centralizer_le_pointwise_smul {H U U1 : Subgroup G}
     (h : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set G) ≤ U1) :
@@ -301,6 +303,7 @@ theorem inf_centralizer_le_pointwise_smul {H U U1 : Subgroup G}
   rw [hxset, ← centralizer_pointwise_smul, ← Subgroup.smul_inf]
   exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (h y hy hyne)
 
+omit [Finite G] in
 /-- **`derivedInG` is `MulAut`-equivariant**: `φ • M' = (φ • M)'`.  The derived subgroup
 `commutator ↥M` transports along the iso `↥M ≃* ↥(φ•M)` induced by `φ`, and the composition
 `(φ•M).subtype ∘ conjSubgroupEquiv = φ ∘ M.subtype` carries it to `derivedInG (φ • M)`.  Reproved
@@ -332,6 +335,7 @@ theorem secondDerivedInAmbient_pointwise_smul (M : Subgroup G) :
   unfold secondDerivedInAmbient
   rw [derivedInG_pointwise_smul, derivedInG_pointwise_smul]
 
+omit [Finite G] in
 /-- **Nilpotency transfers along the pointwise `MulAut` action**: if `↥K` is nilpotent then so is
 `↥(φ • K)`, via the iso `conjSubgroupEquiv φ K : ↥K ≃* ↥(φ • K)`. -/
 theorem isNilpotent_pointwise_smul {K : Subgroup G} (h : Group.IsNilpotent ↥K) :
@@ -448,6 +452,7 @@ theorem isTypeI_of_conj {L M : Subgroup G} (h : IsTypeI L) {g : G}
     (hconj : MulAut.conj g • L = M) : IsTypeI M :=
   hconj ▸ isTypeI_pointwise_smul (MulAut.conj g) h
 
+omit [Finite G] in
 /-- The centralizer of the `φ`-image of a subgroup is the `φ`-image of the centralizer:
 `centralizer ((φ • H : Subgroup G) : Set G) = φ • centralizer (H : Set G)`.  A convenience
 repackaging of `centralizer_pointwise_smul` with `coe_pointwise_smul` for the `TypePData` fields. -/

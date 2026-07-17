@@ -280,6 +280,7 @@ theorem eq_smul_of_inner_self_eq {v w : ClassFunction G ℂ} {a : ℤ}
     rw [hnorm]; simp
   exact sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero hre)
 
+omit [Fintype G] in
 /-- **Aggregate τ-image of integer-weighted constituents** (the (6.8.2.2)→(6.8.2.3) bridge).  For a
 `ℤ`-linear character map `τ` and per-constituent images `τ(αᵢ) = Xᵢ − Yᵢ`, the integer-weighted
 aggregate maps termwise: `τ(∑ᵢ aᵢ·αᵢ) = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)`.  Pure `ℤ`-linearity (`map_sum` +

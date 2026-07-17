@@ -305,6 +305,7 @@ theorem commutator_centralizes_of_stabilize {A H : Subgroup P} [A.Normal]
 
 /-! ## Helpers for `omega1Map` as a closure of order-`p` elements -/
 
+omit [Finite P] in
 /-- `omega1Map M p = ⟨{n ∈ M : n^p = 1}⟩` as a subgroup of the ambient group. -/
 private theorem omega1Map_eq_closure (M : Subgroup P) :
     omega1Map M p = Subgroup.closure {n : P | n ∈ M ∧ n ^ p = 1} := by

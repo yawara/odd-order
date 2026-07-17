@@ -321,6 +321,7 @@ theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
     exact hcommle (Subgroup.commutator_mem_commutator x.2 y.2)
   exact exists_extension_induce_eq_sum_distinct_irreducible hHT hθ hinertia hab hd hcop
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **Coprimality of the inertia index with the character order·degree, from a Hall subgroup.**
 For `H ⊴ L` with `gcd(|H|, [L:H]) = 1` (`H` Hall) and `θ ∈ Irr(H)` of degree `d`, the index `[T:H]`
 of `H` in any intermediate `H ≤ T ≤ L` is coprime to `o(det θ)·d`.  Indeed `[T:H] ∣ [L:H]`
@@ -356,6 +357,7 @@ theorem coprime_index_orderOf_determinant_mul_of_coprime_index
   exact ((hcop_Hi.coprime_dvd_right ho_dvd).mul_right
     (hcop_Hi.coprime_dvd_right hd_dvd)).coprime_dvd_left hidx_dvd
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **Induction commutes with complex conjugation**: `(Ind_H^L θ)̄ = Ind_H^L (θ̄)`.  Pointwise
 `star` distributes over the induction sum `⅟|H| · ∑_x induceTerm θ x g` (`star_sum`, `star_invOf`,
 `star_natCast`), and `star (induceTerm θ x g) = induceTerm θ̄ x g` since `θ̄ = star ∘ θ`.  Used to
@@ -378,6 +380,7 @@ theorem conj_induce {H : Subgroup L} [Invertible (Nat.card ↥H : ℂ)] (θ : Cl
   have hSA : star (⅟ (Nat.card ↥H : ℂ)) = ⅟ (Nat.card ↥H : ℂ) := hSAbase.invOf.star_eq
   rw [hSA, mul_comm]
 
+omit [Fintype L] in
 /-- **Conjugation by a group element commutes with complex conjugation** of class functions:
 `(θ^g)̄ = (θ̄)^g`.  Both sides evaluate to `star (θ ⟨g h g⁻¹⟩)`. -/
 theorem conjBy_conj {H : Subgroup L} [H.Normal] (g : L) (θ : ClassFunction ↥H ℂ) :

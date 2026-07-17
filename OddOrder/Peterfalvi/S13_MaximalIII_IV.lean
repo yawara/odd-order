@@ -819,7 +819,7 @@ difference of any member against the anchor `χ₁ ∈ 𝒮(H₀C′)` is `A₀`
 Since every chain accumulator `S₁ = pairUnion S₀ pair i` is a subfamily of `𝒮(H₀C′)`, this one
 lemma feeds `hdegS₁diff` at every step. -/
 theorem sOf_anchor_diff_support [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (d : ℕ)
     (hunif : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       (φ : ClassFunction ↥M ℂ) 1 = (d : ℂ))

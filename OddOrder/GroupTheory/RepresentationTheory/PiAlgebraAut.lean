@@ -136,6 +136,7 @@ theorem algEquiv_permutes_single (ψ : (ι → k) ≃ₐ[k] (ι → k)) :
     exact hd rfl
   exact ⟨Equiv.ofBijective π ⟨hinj, Finite.surjective_of_injective hinj⟩, fun i => hπeq i⟩
 
+omit [Fintype ι] in
 /-- Standard idempotents in `ι → k` are determined by their index. -/
 theorem single_one_inj {i j : ι} (h : (Pi.single i (1 : k) : ι → k) = Pi.single j 1) : i = j := by
   by_contra hij

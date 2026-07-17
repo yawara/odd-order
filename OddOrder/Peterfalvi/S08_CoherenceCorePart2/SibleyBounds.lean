@@ -44,7 +44,7 @@ theorem sum_degree_mul_charValue_sub_Xset_eq_of_frobenius (hyp : SibleyDadeHypot
 /-- **(6.6) `htotal` factorization.**  `|L:H|·(|H| − |H:Z|) = |H:Z| · (|L:H|·(|Z| − 1))` (Lagrange
 `|H| = |H:Z|·|Z|`).  With the X degree-sum `total = |L:H|·(|H| − |H:Z|)` (`sum_re_sq_Xset_eq`), this
 is the `total = qtot · c` of the X-chain step data with `qtot = |H:Z|`, `c = |L:H|·(|Z| − 1)`. -/
-theorem index_mul_card_sub_factor (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L} [Z.Normal] :
+theorem index_mul_card_sub_factor (_hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L} [Z.Normal] :
     H.index * (Nat.card ↥H - Nat.card (↥H ⧸ Z.subgroupOf H))
       = Nat.card (↥H ⧸ Z.subgroupOf H) * (H.index * (Nat.card ↥(Z.subgroupOf H) - 1)) := by
   have hlag : Nat.card ↥H

@@ -857,6 +857,7 @@ theorem centralCharacterOfRep_eq_of_card_eq_of_character_eq (ρ : Representation
     sum_character_eq_card_mul ρ (ConjClasses.mk z') (g := z') rfl, hcard, hchar]
 
 omit [Fintype (ConjClasses G)] in
+omit [DecidableEq (ConjClasses G)] in
 /-- **Class-size constancy from centralizer constancy inside a subgroup.**  If the ambient
 centralizers `C_G(z)` and `C_G(z')` both lie in `L`, then equality of the `L`-centralizer sizes
 `|L ∩ C_G(z)| = |L ∩ C_G(z')|` forces equality of the ambient conjugacy-class sizes
@@ -1289,7 +1290,7 @@ theorem coeff_mul_card_eq_classSumCoeff (Ci Cj Cs : ConjClasses G) :
   congr 2
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
 
-omit [DecidableEq G] in
+omit [DecidableEq G] [Fintype (ConjClasses G)] in
 /-- **Identity-class class-sum coefficient.**  The per-element coefficient of `1` in
 `classSum Ci * classSum Cj` is the identity-class pair count `classSumCoeff Ci Cj 1`, since the
 identity conjugacy class has one element. -/

@@ -386,7 +386,7 @@ the unifying conditions being exactly `N' ◁ M`, `N' ≤ HU`, and (through the 
 `N' ∩ H = H₀`.  `isComplement` from `IsComplement'.map_mk'`, `centralizer_W2` from
 `centralizer_W2bar_quotient`, `W2_nontrivial` from `W₂ ⊄ N'` directly. -/
 noncomputable def chiefFactorQuotientHypothesisGen [Finite G] {M : Subgroup G}
-    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {data : TypesIIIIIIVSetup M} (_chief : ChiefFactorData data)
     (N' : Subgroup ↥M) [N'.Normal]
     (hN'le : N' ≤ (derivedInG M).subgroupOf M)
     (hW1inf : data.W1.subgroupOf M ⊓ N' = ⊥)

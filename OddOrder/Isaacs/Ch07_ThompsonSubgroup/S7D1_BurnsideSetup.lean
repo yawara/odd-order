@@ -674,7 +674,7 @@ only among `{p, q}`, and `F(M) = ⨆_{r ∈ primeFactors |M|} O_r(M)`, at least 
 of `O_p(M)`, `O_q(M)` is nontrivial. -/
 theorem maximal_isPType_or_isQType
     {H : Type*} [Group H] [Finite H] {p q : ℕ}
-    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
     {M : Subgroup H} (hM_max : IsCoatom M) (hM_ne_bot : M ≠ ⊥)
     (hM_solvable : IsSolvable M) :
@@ -850,7 +850,7 @@ generate everything.
 since `|N| ∣ p^a q^b`. -/
 theorem opCore_sup_opCore_eq_top_of_nilpotent_paqb
     {N : Type*} [Group N] [Finite N] [Group.IsNilpotent N] {p q : ℕ}
-    [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     {a b : ℕ} (hN_dvd : Nat.card N ∣ p ^ a * q ^ b) :
     OddOrder.Isaacs.Ch01.opCore p N ⊔ OddOrder.Isaacs.Ch01.opCore q N = ⊤ := by
   classical

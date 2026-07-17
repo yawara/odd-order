@@ -294,6 +294,7 @@ theorem typeII_T2_extension_lam_eq_single [Finite G]
   rw [hτ1, hEsum, hα, Finset.sum_singleton]
 
 set_option maxHeartbeats 800000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical FiniteInduce in
 /-- **The `R(λ)`-members are orthogonal to the whole `σ`-grid** (Peterfalvi (5.3.b) for the
 type-II `S`-side; standalone form of the key brick inside
@@ -777,6 +778,7 @@ theorem omegaProdCharTic_symm_snd_ne [Fintype G] [Fintype ↥L]
 end IndexComponents
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (5.8) for the type-II `S`-side column — the `ν^{τ₂}` dichotomy** (Coq
 `coherent_prDade_TIred`): the coherent image of the reducible `T2`-column

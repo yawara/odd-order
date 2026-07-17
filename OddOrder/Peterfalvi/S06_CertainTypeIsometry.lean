@@ -169,6 +169,7 @@ theorem certainTypeOmegaSigma_eq_chiFam (h : Hypothesis46 A L) [NeZero (Nat.card
       ((ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)) :=
   (ticVdiff h).sigma_omega rfl (ticVdiffFullDadeApplication h) (omegaProdCharTic h χ₂ i)
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.8), step (1)** (the sign equality `δ_j = δ_k`).  Fix a row `i` and two
 columns `χ₂, χ₂'`.  If the certain-type characters `μ_{ij}` and `μ_{ik}` have equal degree at
 `1`, then the two column signs coincide.
@@ -209,6 +210,7 @@ theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46Core A L)
        have hle := Int.le_of_dvd (by norm_num) hdvd
        omega)
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- On `W₁`, the column character `ω_{ij} = chiColumn χ₂ i` is independent of the column `χ₂`:
 the `W₂`-projection `wSnd` is trivial on `W₁` (`wSnd_eq_one_of_mem_W1`), so
 `ω_{ij}(w) = (w1CharEquiv i)(wFst w)` for every column `χ₂`.  (Generalizes `chiColumn_one_apply`

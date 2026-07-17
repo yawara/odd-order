@@ -589,6 +589,7 @@ theorem Hypothesis.nu_rowSum_mem_sOf_H0_T [Finite G]
     exact h2
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (13.3.a) at `T`**: each nonzero `ν`-row sum `ν_i = ∑_j ν_{ij}` is induced
 from a *linear* (degree-one) irreducible character of `K = QD`.  Mirror of `mu_j_isIndPC`:

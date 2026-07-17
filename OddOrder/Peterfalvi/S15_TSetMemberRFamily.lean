@@ -456,6 +456,7 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
 
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **irr × irr `R`-family orthogonality, `T`-instance form** (mirror of
@@ -487,6 +488,7 @@ theorem Hypothesis.dadeOfDiff_orthogonal_typeP_T [Finite G]
     hxχ hxχbar hxbarχ hxbarχbar
 
 set_option maxHeartbeats 1600000 in
+-- raised heartbeat budget for the heavy elaboration below
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **(5.2.e) cross-orthogonality of the caseB-`T` per-member `R`-families** (mirror of

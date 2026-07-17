@@ -55,7 +55,7 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_general_caseB
     (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
-    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (φ : IrreducibleCharacter ↥W2) (_hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
     (h1 : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) 1
       = ((W2.subgroupOf H).index : ℂ) * η₁ 1)
     (hgood : ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)

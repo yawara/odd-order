@@ -151,6 +151,7 @@ section Dichotomy35
 variable {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
 variable {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
 
+omit [FiniteDimensional F V] in
 /-- **Lemma 3.3 plumbing for (3.5).**  If `N ⊔ R` preserves a submodule `A`, `N ≤ K` is a
 nontrivial `R`-invariant subgroup of the kernel of a Frobenius group `G = KR`, and `R` has no
 nonzero fixed vector inside `A` (i.e. `C_A(R) = 0`), then `N` acts trivially on `A`.
@@ -718,6 +719,7 @@ theorem mem_weightSpace {ρ : Representation F G W} {K' : Subgroup G} {χ : ↥K
 noncomputable def conjChar (K' : Subgroup G) [K'.Normal] (g : G) (χ : ↥K' → F) : ↥K' → F :=
   fun k' => χ (OddOrder.RepresentationTheory.conjNormalMulAut K' g⁻¹ k')
 
+omit [Field F] in
 theorem conjChar_one (K' : Subgroup G) [K'.Normal] (χ : ↥K' → F) : conjChar K' 1 χ = χ := by
   funext k'
   simp only [conjChar, inv_one]
@@ -725,6 +727,7 @@ theorem conjChar_one (K' : Subgroup G) [K'.Normal] (χ : ↥K' → F) : conjChar
   apply Subtype.ext
   rw [OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe]; group
 
+omit [Field F] in
 theorem conjChar_mul (K' : Subgroup G) [K'.Normal] (g₁ g₂ : G) (χ : ↥K' → F) :
     conjChar K' (g₁ * g₂) χ = conjChar K' g₁ (conjChar K' g₂ χ) := by
   funext k'

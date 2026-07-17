@@ -933,7 +933,7 @@ of the (9.11) family coherence. -/
 theorem Hypothesis.reducible_mem_inducedKernelFamily_mem_certainTypeSet [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP)
-    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
+    (_chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt))
     [NeZero (Nat.card (hyp.toHypothesis46 hG hG.odd).W1)]
     (hw2 : (hyp.w2).Prime) {kref : Fin hyp.w2} (hkref : kref ≠ 0)
     {B : Subgroup ↥M} {ψ : ClassFunction ↥M ℂ}

@@ -965,7 +965,7 @@ The `S(HC)`-coherence `τ₁ = SHC_isCoherent.extension` is an isometry on `ℤ[
 (`extension_inner_eq`) and the degree-`w₁` irreducible `ζ ∈ S(HC)`, so `‖ζ^{τ₁}‖² = ‖ζ‖² = 1`.
 Specializes the generic `IsCoherent.inner_extension_self_eq_one` to `coh = SHC_isCoherent`. -/
 theorem Hypothesis.SHC_extension_inner_self [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
@@ -1003,7 +1003,7 @@ Together with `SHC_extension_inner_self` (`‖φ^{τ₁}‖² = 1`) this says th
 isometry on `ℤ[S(HC)]` (`extension_inner_eq`), so `(φ^{τ₁}, ψ^{τ₁}) = (φ, ψ) = 0` for distinct
 irreducibles.  Available from `SHC_isCoherent` alone (no full-`S` `coh`). -/
 theorem Hypothesis.SHC_extension_inner_of_ne [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {φ ψ : ClassFunction ↥M ℂ}
     (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))

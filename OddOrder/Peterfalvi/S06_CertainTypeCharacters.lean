@@ -160,6 +160,7 @@ noncomputable def cyclicGenerator : D :=
   (IsCyclic.exists_generator (α := D)).choose
 
 open Subgroup in
+omit [Finite D] in
 theorem forall_mem_zpowers_cyclicGenerator : ∀ x : D, x ∈ zpowers (cyclicGenerator D) :=
   (IsCyclic.exists_generator (α := D)).choose_spec
 
@@ -344,6 +345,7 @@ theorem chiColumn_one_apply [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1))
 elaborate). -/
 instance instKNormal : h.K.Normal := h.K_normal
 
+omit [Fintype L] in
 /-- `L/K` is cyclic: it is isomorphic to the cyclic complement `W₁`
 (`Subgroup.IsComplement'.QuotientMulEquiv`). -/
 theorem isCyclic_quotient_K : IsCyclic (L ⧸ h.K) := by
@@ -423,6 +425,7 @@ noncomputable def induceZ :
     ClassFunction h.sdiffTICyclicHypothesis.W ℂ →ₗ[ℤ] ClassFunction L ℂ :=
   (h.sdiffTICyclicHypothesis.induceLinear).restrictScalars ℤ
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- The (1.4) image `τ(χ_i − χ_0)` of the column family is the induced difference
 `Ind_W^L(ω_{ij} − ω_{0j})` — definitionally, since `induceZ` is `Ind_W^L` and
 `isometryDifferenceImage` is the image of the source difference. -/
@@ -642,6 +645,7 @@ theorem columnFamily_mu_ne [NeZero (Nat.card h.W1)]
   rw [heq, irreducibleCharacter_inner, if_pos rfl] at hinner
   exact one_ne_zero hinner
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **Linear independence of the `CF(W, W − W₂)` family** `ω_{ij} − ω_{0j}` (`i ≠ 0`, all `j`):
 the biorthogonal system `⟨ω_{i'j'} − ω_{0j'}, ω_{ij}⟩ = δ` (`omegaColumnDiff_inner_omega_self`/`_ne`)
 witnesses linear independence.  With the matching count `(w₁−1)·w₂ = |W − W₂| = dim CF(W, W − W₂)`
@@ -675,6 +679,7 @@ theorem columnFamily_mu_injective [NeZero (Nat.card h.W1)] :
     rfl
   · exact absurd heq (h.columnFamily_mu_ne hχ i i')
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- The count `|W − W₂| = (w₁ − 1)·w₂`: the support set of the sdiff hypothesis is the
 complement of `W₂` in `W`, so `|W| − |W₂| = w₁w₂ − w₂`. -/
 theorem card_supportInSubgroup_sdiff :
@@ -766,6 +771,7 @@ theorem omegaColumnDiffBasis_apply
     exact coe_basisOfLinearIndependentOfCardEqFinrank _ _
   exact congrFun hcoe pq
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- `ω_{kl} = chiColumn l (e⁻¹ k)`: the basis index `k` (a `W₁`-dual) is `e (e⁻¹ k)` of
 the column family. -/
 theorem chiColumn_w1CharEquiv_symm [NeZero (Nat.card h.W1)]
@@ -1069,6 +1075,7 @@ theorem certainType_degree_modEq [NeZero (Nat.card h.W1)]
   rw [hψ1] at hm
   exact ⟨m, by linear_combination hm⟩
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- `ω_{00} = 1_W`: the index-`(0,0)` member of the column family (trivial `W₂`-dual, base
 `W₁`-index) is the trivial character of `W` (`omegaProdChar 1 1 = 1`, `ω(1) = 1_W`). -/
 theorem chiColumn_one_zero_eq_trivial [NeZero (Nat.card h.W1)] :

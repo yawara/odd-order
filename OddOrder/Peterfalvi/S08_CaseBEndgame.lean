@@ -254,7 +254,7 @@ theorem caseB_W1_dvd_relIndex_commutator {G : Type*} [Group G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
     {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)] (hyp : SibleyDadeHypothesis G L H)
     (cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L)
-    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (hW2 : cert.W2 ≤ ⁅H, H⁆)
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (_hW2 : cert.W2 ≤ ⁅H, H⁆)
     (hW2cen : cert.W2 ≤ Subgroup.center ↥L)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1)) :
     Nat.card ↥hyp.W1 ∣ (cert.W2.subgroupOf H).relIndex (commutator ↥H) - 1 := by
