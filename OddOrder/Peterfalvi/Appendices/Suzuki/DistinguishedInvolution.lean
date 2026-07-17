@@ -56,6 +56,18 @@ lemma pow_mem_KSet {a : G} (ha : a ∈ hyp.KSet) (n : ℕ) : a ^ n ∈ hyp.KSet 
     _ = (a⁻¹) ^ n := by rw [hstep]
     _ = (a ^ n)⁻¹ := inv_pow a n
 
+lemma one_mem_KSet : (1 : G) ∈ hyp.KSet :=
+  ⟨hyp.D.one_mem, by rw [mul_one, inv_one, ← sq]; exact hyp.t_sq⟩
+
+/-- `K` is closed under integer powers. -/
+lemma zpow_mem_KSet {a : G} (ha : a ∈ hyp.KSet) (k : ℤ) :
+    a ^ k ∈ hyp.KSet := by
+  rcases k with n | n
+  · rw [Int.ofNat_eq_natCast, zpow_natCast]
+    exact hyp.pow_mem_KSet ha n
+  · rw [zpow_negSucc]
+    exact hyp.inv_mem_KSet (hyp.pow_mem_KSet ha (n + 1))
+
 /-! ## Odd order of elements of `D` -/
 
 /-- Every element of `D` has odd order (`|D|` is odd). -/
