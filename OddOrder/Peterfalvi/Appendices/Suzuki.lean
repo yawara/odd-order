@@ -136,6 +136,95 @@ lemma t_conj_mem_D {x : G} (hx : x ∈ hyp.D) :
   rw [h3]
   exact h1
 
+/-- `g ∉ H` exactly means `g` moves the base point. -/
+lemma smul_basept_ne_of_not_mem_H {g : G} (hg : g ∉ hyp.H) :
+    g • hyp.basept ≠ hyp.basept := by
+  intro h2
+  exact hg (hyp.H_def ▸ mem_stabilizer_iff.mpr h2)
+
+/-- `D` is the pointwise stabilizer of the pair `(basept, t • basept)`. -/
+lemma D_eq_stabilizer_inf :
+    hyp.D = stabilizer G hyp.basept ⊓ stabilizer G (hyp.t • hyp.basept) := by
+  rw [hyp.D_def, hyp.H_def, stabilizer_smul_eq_stabilizer_map_conj]
+
+/-! ## Chapter I §1, Proposition 1 (p. 100) -/
+
+omit [Finite G] in
+/-- Conjugation moves two-point stabilizers to two-point stabilizers. -/
+private lemma stabilizer_inf_map_conj (k : G) (α β : Ω) :
+    (stabilizer G α ⊓ stabilizer G β).map (MulAut.conj k).toMonoidHom =
+      stabilizer G (k • α) ⊓ stabilizer G (k • β) := by
+  rw [stabilizer_smul_eq_stabilizer_map_conj,
+    stabilizer_smul_eq_stabilizer_map_conj]
+  exact Subgroup.map_inf _ _ _ (MulEquiv.injective (MulAut.conj k))
+
+/-- **Peterfalvi Part II, Ch. I Prop 1 (a)** (p. 100) — for `g ∉ H`, the
+intersection `H^g ∩ H` is conjugate to `D` by an element of `H`.  (Here
+`H^g` denotes `g H g⁻¹`; as `g` ranges over `G - H` this is the same
+family as the book's `g⁻¹ H g`.) -/
+lemma exists_mem_H_conj_inf_eq_D {g : G} (hg : g ∉ hyp.H) :
+    ∃ h ∈ hyp.H,
+      ((hyp.H.map (MulAut.conj g).toMonoidHom ⊓ hyp.H).map
+        (MulAut.conj h).toMonoidHom) = hyp.D := by
+  have hgω : g • hyp.basept ≠ hyp.basept := hyp.smul_basept_ne_of_not_mem_H hg
+  have htω : hyp.t • hyp.basept ≠ hyp.basept :=
+    hyp.smul_basept_ne_of_not_mem_H hyp.t_not_mem_H
+  obtain ⟨k, hk1, hk2⟩ :=
+    (is_two_pretransitive_iff.mp hyp.doubly_transitive)
+      (Ne.symm hgω) (Ne.symm htω)
+  refine ⟨k, hyp.H_def ▸ mem_stabilizer_iff.mpr hk1, ?_⟩
+  have h2 : hyp.H.map (MulAut.conj g).toMonoidHom ⊓ hyp.H =
+      stabilizer G hyp.basept ⊓ stabilizer G (g • hyp.basept) := by
+    rw [hyp.H_def, ← stabilizer_smul_eq_stabilizer_map_conj, inf_comm]
+  rw [h2, stabilizer_inf_map_conj, hk1, hk2, ← hyp.D_eq_stabilizer_inf]
+
+/-- **Peterfalvi Part II, Ch. I Prop 1 (a)**, second clause — `|H^g ∩ H|`
+is odd for `g ∉ H`. -/
+lemma odd_card_conj_inf {g : G} (hg : g ∉ hyp.H) :
+    Odd (Nat.card
+      ↥(hyp.H.map (MulAut.conj g).toMonoidHom ⊓ hyp.H)) := by
+  obtain ⟨h, _hh, heq⟩ := hyp.exists_mem_H_conj_inf_eq_D hg
+  have hcard : Nat.card
+      ↥(hyp.H.map (MulAut.conj g).toMonoidHom ⊓ hyp.H) =
+      Nat.card hyp.D := by
+    rw [← heq]
+    exact Nat.card_congr
+      (Subgroup.equivMapOfInjective _ _
+        (MulEquiv.injective (MulAut.conj h))).toEquiv
+  rw [hcard]
+  exact hyp.D_odd
+
+/-- **Peterfalvi Part II, Ch. I Prop 1 (b)** (p. 100) — a nontrivial
+subgroup of `Q` has its normalizer inside `H`. -/
+lemma normalizer_le_H_of_le_Q {X : Subgroup G} (hX : X ≤ hyp.Q)
+    (hX1 : X ≠ ⊥) : Subgroup.normalizer (X : Set G) ≤ hyp.H := by
+  intro g hg
+  by_contra hgH
+  -- `X ≤ H^g ∩ H`
+  have hXle : X ≤ hyp.H.map (MulAut.conj g).toMonoidHom ⊓ hyp.H := by
+    intro x hx
+    rw [Subgroup.mem_inf]
+    refine ⟨?_, hyp.Q_le_H (hX hx)⟩
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
+    have h2 := (Subgroup.mem_set_normalizer_iff''.mp hg x).mp hx
+    exact hyp.Q_le_H (hX h2)
+  obtain ⟨h, hh, heq⟩ := hyp.exists_mem_H_conj_inf_eq_D hgH
+  -- conjugating by `h` lands `X` inside `Q ⊓ D = ⊥`
+  have h3 : X.map (MulAut.conj h).toMonoidHom ≤ hyp.Q ⊓ hyp.D := by
+    intro y hy
+    obtain ⟨x, hx, hxy⟩ := hy
+    have hxy' : h * x * h⁻¹ = y := hxy
+    constructor
+    · rw [← hxy']
+      exact hyp.Q_normal_in_H h hh x (hX hx)
+    · rw [← heq]
+      exact ⟨x, hXle hx, hxy⟩
+  rw [hyp.Q_inf_D_eq_bot, le_bot_iff, Subgroup.map_eq_bot_iff] at h3
+  have h4 : (MulAut.conj h).toMonoidHom.ker = ⊥ :=
+    (MonoidHom.ker_eq_bot_iff _).mpr (MulEquiv.injective (MulAut.conj h))
+  rw [h4, le_bot_iff] at h3
+  exact hX1 h3
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
