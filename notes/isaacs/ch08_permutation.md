@@ -1,7 +1,23 @@
 # Isaacs Ch.8: Permutation Groups — mini-roadmap
 
-> ⏸ **NOT formalized (2026-07-02)** — FT 経路外につき deferred
-> (CLAUDE.md スコープ: 作業は FT 経路限定; post-FT coverage phase で再訪)。
+> ✅ **COMPLETE (2026-07-17, lane b)** — 実作業ギャップ 25 件 (survey note 判定)
+> を全て sorry-free で形式化。mathlib 既収載分 (8.1/8.2/8.11-8.22/8.27-8.30 等)
+> はラッパー方針によりそのまま利用 (本文 docstring で対応記録)。
+>
+> **ファイル対応** (`OddOrder/Isaacs/Ch08_PermutationGroups/`):
+> - `AffineGroup` (Cor 8.7)、`NonzeroVectors`/`RegularNormal` (支持)、
+>   `TransitiveAutomorphisms` (Lem 8.8)、`HalfTransitive` (Thm 8.9, Lem 8.10)
+> - `CycleCommutators` (Lem 8.24, 8.25)、`PCycleJordan` (Thm 8.23; mathlib の
+>   `proof_wanted` 解消)、`Bochert` (Thm 8.26)
+> - `TransvectionGeneration` (Thm 8.31, 8.32)、`PSLSimple` (Thm 8.33、
+>   仮定は honest 一般化 `3 ≤ card ∨ ∃ β ≠ 0, β² ≠ 1`)
+> - `Orbitals` (Lem 8.34)、`OrbitalGraph` (Thm 8.35, Lem 8.36)、
+>   `Subdegrees` (Thm 8.37 gap 形一般化, Thm 8.38 Weiss, Lem 8.39(a-c),
+>   Thm 8.40 Manning + relIndex 橋 API)、
+>   `CommonDivisorGraph` (m-arrow/`[α]_m`/K_m 装置, Thm 8.42(a)(b),
+>   Thm 8.41 ≤3 成分, Thm 8.43, Cor 8.44 semidirect 転写)
+>
+> 次クラスタ (lane b): Pf App Suzuki (32 件) → Suzuki2Groups (8 件)。
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.8 (pp. 223-270).
 形式化先 (予定): `OddOrder/Isaacs/Ch08_Permutation.lean` (未作成).

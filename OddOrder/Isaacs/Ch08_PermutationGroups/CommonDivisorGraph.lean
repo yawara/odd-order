@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
+import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Isaacs, Finite Group Theory — Ch. 8: `m`-arrows and the subgroups `K_m` (§8D)
@@ -886,5 +887,165 @@ theorem lt_forall_and_not_coprime_of_max_mem
   omega
 
 end Theorem843
+
+/-! ### Isaacs Cor 8.44 -/
+
+section Corollary844
+
+open SemidirectProduct
+
+variable (A M : Type*) [Group A] [Group M] [Finite A] [Finite M]
+  [MulDistribMulAction A M]
+
+/-- The set of orbit sizes of an action by automorphisms. -/
+def autOrbitSizes : Set ℕ := {d | ∃ x : M, Set.ncard (orbit A x) = d}
+
+/-- The semidirect product realizing an automorphism action (Isaacs
+p. 251: `Γ = G ⋊ A`). -/
+private abbrev sdGroup := M ⋊[MulDistribMulAction.toMulAut A M] A
+
+private abbrev sdPoint : Subgroup (sdGroup A M) :=
+  (inr : A →* sdGroup A M).range
+
+private abbrev sdSpace := sdGroup A M ⧸ sdPoint A M
+
+private def sdEmbed (x : M) : sdSpace A M :=
+  ((inl x : sdGroup A M) : sdSpace A M)
+
+omit [Finite A] [Finite M] in
+private lemma sdEmbed_surjective : Function.Surjective (sdEmbed A M) := by
+  intro ω
+  obtain ⟨γ, rfl⟩ := QuotientGroup.mk_surjective ω
+  refine ⟨γ.left, ?_⟩
+  have h2 : (inl γ.left * inr γ.right : sdGroup A M) = γ :=
+    inl_left_mul_inr_right γ
+  calc sdEmbed A M γ.left
+      = ((inl γ.left * inr γ.right : sdGroup A M) : sdSpace A M) :=
+        (QuotientGroup.mk_mul_of_mem _
+          (MonoidHom.mem_range.mpr ⟨γ.right, rfl⟩)).symm
+    _ = (γ : sdSpace A M) := by rw [h2]
+
+omit [Finite A] [Finite M] in
+private lemma sdEmbed_injective : Function.Injective (sdEmbed A M) := by
+  intro x y h
+  have h2 := QuotientGroup.eq.mp h
+  rw [← map_inv, ← map_mul] at h2
+  obtain ⟨b, hb⟩ := MonoidHom.mem_range.mp h2
+  have h3 := congrArg SemidirectProduct.left hb
+  rw [left_inr, left_inl] at h3
+  have h4 : x * 1 = x * (x⁻¹ * y) := congrArg (x * ·) h3
+  rwa [mul_one, ← mul_assoc, mul_inv_cancel, one_mul] at h4
+
+omit [Finite A] [Finite M] in
+/-- The `A`-orbits on `M` match the suborbits at the trivial coset. -/
+private lemma sdEmbed_image_orbit (x : M) :
+    sdEmbed A M '' orbit A x =
+      orbit (stabilizer (sdGroup A M) ((1 : sdGroup A M) : sdSpace A M))
+        (sdEmbed A M x) := by
+  have hstab : ∀ γ : sdGroup A M,
+      γ ∈ stabilizer (sdGroup A M) ((1 : sdGroup A M) : sdSpace A M) ↔
+        γ ∈ sdPoint A M := by
+    intro γ
+    rw [MulAction.stabilizer_quotient]
+  ext ω
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    rw [MulAction.mem_orbit_iff] at hy ⊢
+    obtain ⟨a, rfl⟩ := hy
+    refine ⟨⟨inr a, (hstab _).mpr (MonoidHom.mem_range.mpr ⟨a, rfl⟩)⟩, ?_⟩
+    have h2 : (⟨inr a, (hstab _).mpr (MonoidHom.mem_range.mpr ⟨a, rfl⟩)⟩ :
+          stabilizer (sdGroup A M) ((1 : sdGroup A M) : sdSpace A M)) •
+        sdEmbed A M x =
+        ((inr a * inl x : sdGroup A M) : sdSpace A M) := rfl
+    rw [h2]
+    have h3 : (inl (a • x) : sdGroup A M) = inr a * inl x * inr a⁻¹ :=
+      inl_aut a x
+    rw [sdEmbed, h3, QuotientGroup.mk_mul_of_mem _
+      (MonoidHom.mem_range.mpr ⟨a⁻¹, rfl⟩)]
+  · rintro ⟨k, hk⟩
+    have hk' : k • sdEmbed A M x = ω := hk
+    obtain ⟨a, ha⟩ := MonoidHom.mem_range.mp ((hstab _).mp k.2)
+    refine ⟨a • x, mem_orbit x a, ?_⟩
+    rw [← hk']
+    have h2 : k • sdEmbed A M x =
+        (((k : sdGroup A M) * inl x : sdGroup A M) : sdSpace A M) := rfl
+    rw [h2, ← ha]
+    have h4 : (inl (a • x) : sdGroup A M) = inr a * inl x * inr a⁻¹ :=
+      inl_aut a x
+    rw [sdEmbed, h4, QuotientGroup.mk_mul_of_mem _
+      (MonoidHom.mem_range.mpr ⟨a⁻¹, rfl⟩)]
+
+omit [Finite A] [Finite M] in
+private lemma autOrbitSizes_eq_subdegrees :
+    autOrbitSizes A M = subdegrees (sdGroup A M) (sdSpace A M) := by
+  ext d
+  constructor
+  · rintro ⟨x, hx⟩
+    refine ⟨((1 : sdGroup A M) : sdSpace A M), sdEmbed A M x, ?_⟩
+    rw [isArrow_iff]
+    change Set.ncard (orbit (stabilizer (sdGroup A M)
+      ((1 : sdGroup A M) : sdSpace A M)) (sdEmbed A M x)) = d
+    rw [← sdEmbed_image_orbit,
+      Set.ncard_image_of_injective _ (sdEmbed_injective A M)]
+    exact hx
+  · rintro ⟨δ, ε, h⟩
+    obtain ⟨ε', h'⟩ := h.exists_of_point ((1 : sdGroup A M) : sdSpace A M)
+    obtain ⟨x, rfl⟩ := sdEmbed_surjective A M ε'
+    refine ⟨x, ?_⟩
+    rw [isArrow_iff] at h'
+    change Set.ncard (orbit (stabilizer (sdGroup A M)
+      ((1 : sdGroup A M) : sdSpace A M)) (sdEmbed A M x)) = d at h'
+    rw [← sdEmbed_image_orbit,
+      Set.ncard_image_of_injective _ (sdEmbed_injective A M)] at h'
+    exact h'
+
+/-- **Isaacs Cor 8.44** (p. 251), first assertion — for finite groups `A`
+acting on `M` by automorphisms, the common-divisor graph on the set of
+`A`-orbit sizes has at most three connected components (including
+`{1}`).  (With `A = M` acting by conjugation this applies to the set of
+class sizes of an arbitrary finite group.) -/
+theorem card_connectedComponent_commonDivisorGraph_autOrbitSizes_le_three :
+    Nat.card
+      (commonDivisorGraph (autOrbitSizes A M)).ConnectedComponent ≤ 3 := by
+  haveI : Finite (sdGroup A M) :=
+    Finite.of_equiv (M × A)
+      ⟨fun p => ⟨p.1, p.2⟩, fun s => (s.left, s.right),
+        fun _p => rfl, fun _s => rfl⟩
+  rw [autOrbitSizes_eq_subdegrees]
+  exact card_connectedComponent_commonDivisorGraph_le_three
+
+/-- **Isaacs Cor 8.44** (p. 251), second assertion — the conclusion of
+Thm 8.43 for the orbit sizes of an automorphism action. -/
+theorem lt_forall_and_not_coprime_of_max_mem_autOrbitSizes
+    {cA cB : (commonDivisorGraph (autOrbitSizes A M)).ConnectedComponent}
+    (hAB : cA ≠ cB)
+    (hA1 : ∀ t : ↥(autOrbitSizes A M),
+      (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk t = cA →
+      (t : ℕ) ≠ 1)
+    (hB1 : ∀ t : ↥(autOrbitSizes A M),
+      (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk t = cB →
+      (t : ℕ) ≠ 1)
+    {ν : ↥(autOrbitSizes A M)}
+    (hν : (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk ν =
+      cB)
+    (hmax : ∀ d : ↥(autOrbitSizes A M), (d : ℕ) ≤ (ν : ℕ)) :
+    (∀ a b : ↥(autOrbitSizes A M),
+      (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk a = cA →
+      (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk b = cB →
+      (a : ℕ) < (b : ℕ)) ∧
+    (∀ u v : ↥(autOrbitSizes A M),
+      (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk u = cB →
+      (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk v = cB →
+      u ≠ v → ¬ Nat.Coprime (u : ℕ) (v : ℕ)) := by
+  haveI : Finite (sdGroup A M) :=
+    Finite.of_equiv (M × A)
+      ⟨fun p => ⟨p.1, p.2⟩, fun s => (s.left, s.right),
+        fun _p => rfl, fun _s => rfl⟩
+  revert cA cB hAB hA1 hB1 ν hν hmax
+  rw [autOrbitSizes_eq_subdegrees]
+  intro cA cB hAB hA1 hB1 ν hν hmax
+  exact lt_forall_and_not_coprime_of_max_mem hAB hA1 hB1 hν hmax
+
+end Corollary844
 
 end OddOrder.Isaacs.Ch08
