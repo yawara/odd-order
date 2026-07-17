@@ -76,9 +76,8 @@ general nilpotent M は book の正確な statement (in-scope、specialization d
 ## 進捗 (2026-07-18)
 
 - [x] **piece 1 (b)-glue 順序公式** ✅ commit 69516988: `S03g_Thm310FixedPointSplit.card_fixedSubgroup_eq_mul_of_mulDistribMulAction` — `|C_M(R)|=|C_{M₀}(R)|·|C_{M/M₀}(R)|` (MulDistribMulAction 形)。core は既存 `Ch04.card_fixedSubgroup_eq_mul_of_normal` (HartleyTurull)。framework bridge (`toMulAut` + `IsAInvariant.restrict/.quotientMulAutHom`) friction 無を確認。axiom-clean。
-- [ ] **piece 2 base (elem-abelian group form)** 🔄 in flight: `S03g_Thm310GroupForm.bgThm310_elemAbelian_group` — module leaf を group 形 (fixedSubgroup) で wrap。crux bridge = invariants ↔ fixedSubgroup の card 一致。
-- [ ] **piece 3 induction**: general nilpotent M、`Nat.card M` 強帰納、base=piece 2、step=piece 1 + M_0 maximal H-invariant normal (MinimalInvariantNormal/chief-factor)。
-- [ ] **piece 4 (c)**: Lemma 1.9 glue (piece 2 に (c) 統合済なら induction で運ぶ)。
+- [x] **piece 2 base (elem-abelian group form)** ✅ commit (S03g_Thm310GroupForm): `bgThm310_elemAbelian_group` — module leaf を group 形 (fixedSubgroup) で wrap。crux bridge `card_invariants_eq_card_fixedSubgroup` = invariants↔fixedSubgroup の card 一致 (`Equiv.subtypeEquiv Additive.toMul`)。(c) も統合済。axiom-clean。
+- [ ] **piece 3 induction** 🔄 in flight (S03g_Thm310Nilpotent): general nilpotent M、`Nat.card M` 型多相強帰納、base=piece 2 (M H-chief ⟹ elem abelian)、step=piece 1 order 公式 + M_0 proper H-invariant normal (MinimalInvariantNormal `exists_aInvariant_normal_isElementaryAbelian`)。likely sticking = MulDistribMulAction on ↥M_0/M⧸M_0 の instance 構成。(c) は Lemma 1.9 で induction 内 glue。
 
 **top-level statement shape (確定)**: `C_M(R) := fixedSubgroup (MulDistribMulAction.toMulAut H M) R` (Subgroup)。piece 1/2/3 全て同 `fixedSubgroup`+`IsAInvariant` framework で統一 (module 摩擦は piece 2 内に閉じ込め)。
 
