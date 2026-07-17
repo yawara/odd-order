@@ -67,6 +67,24 @@ created: 2026-07-17
 10. N/C ↪ Aut(H) abelian ⇒ N' ≤ C; p ∣ |N:C| (P ⊄ C, C ⊇ ker で p-element 生存)
     ⇒ p ∣ |N:N'| (`Subgroup.index_dvd_of_le`)。
 
+## 進捗 (2026-07-17 lane c)
+
+- ✅ **Thm 10.15 完成 (sorry-free)** — `HuppertMetacyclic.lean`
+  `dvd_index_commutator_of_normal_metacyclic_sylow` (帰納 wrapper `thm1015_aux`
+  + base `thm1015_base` steps 2-10 全部実証明)。
+- ✅ Lem 10.13(a) `IsMetacyclic.of_surjective` / Lem 10.14
+  `not_isMetacyclic_wreath` + `not_surjective_wreath_of_isMetacyclic`
+  (WreathRecognition 10B section)。
+- ✅ 部品 shared leaf `PrimeOrderSubgroups.lean` (9107)。
+- ⏭ **残り**: (a) **Thm 10.12 本体** — bridge 設計が必要:
+  「N = N_G(P) controls p-transfer (Yoshida 対偶 + 10.14) + p ∣ |N:N'|
+  ⇒ p ∣ |G:G'|」。Cor 10.2 (`transfer_range_eq_of_nilpotencyClass_lt`,
+  Yoshida.lean) と同型の by_contra + `exists_surjective_wreath_of_transfer_range_lt`
+  + `not_surjective_wreath_of_isMetacyclic` で range equality までは出る。
+  そこから「p ∣ |N:N'| ⇒ p ∣ |G:G'|」への変換は Ch05 transfer 部品
+  (focal subgroup / Thm 5.12 系) か 10.7 Frattini 判定 (TransferIndexPrime.lean)
+  を精査して選ぶ。(b) **Thm 10.16** 一般 Maschke (OperatorMaschke へ追加)。
+
 ## 完了条件
 
 - HuppertMetacyclic.lean: 10.15 + 10.12 sorry-free
