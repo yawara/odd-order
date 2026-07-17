@@ -32,8 +32,12 @@ Prop 2.2 と Clifford 半単純性を 2026-07-18 に char-free 化したので�
 - [ ] **prime-index normal subgroup**: solvable finite nontrivial G ⟹ ∃ H ◁ G, [G:H] prime。
       既存 `exists_normal_index_prime_of_solvable` (S07_Hypothesis75.lean:50) が **private** —
       de-privatize / 共有 leaf へ抽出 (mathlib に無い)。
+- [x] **case (ii) dimension brick** ✅ **済** (commit 7f3d8adc):
+      `finrank_eq_index_mul_finrank_of_not_linearEquiv_conj` (CliffordConjugateDirectSum.lean)。
+      W≇W^x ⟹ dim V = [G:H]·dim W。conjStab/pairwise 非同型/直和 全て内包。axiom-clean。
 - [ ] **case (i)**: `restriction_isSimpleModule` (CliffordMultiplicityOne, char-free) で
       M_H ≅ L。hgen は [G:H]=p prime + x∉H から、hconj は L≅L^x を G=⟨H,x⟩ で全 g へ伝播。
+      [capstone subagent 進行中 = FongSwan.lean]
 - [ ] **case (ii)** L ≇ L^x ⟹ dim M = p·dim L。**induced module は不要** (2026-07-18 に
       より軽いルート確定; issue 9110 の induced-rep framing は撤回)。直接ルート:
       - `W_i := L.map (conjSemilinearEnd ρ (x^i))` (i : Fin p)。各 simple
