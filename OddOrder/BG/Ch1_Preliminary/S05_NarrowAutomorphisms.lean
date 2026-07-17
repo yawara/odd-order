@@ -134,7 +134,7 @@ private theorem not_narrow_witness_le_critical
       obtain ⟨x', hx'_center, rfl⟩ := hx
       obtain ⟨y', hy'_center, rfl⟩ := hy
       apply Subtype.ext
-      show (x' : R) * (y' : R) = (y' : R) * (x' : R)
+      change (x' : R) * (y' : R) = (y' : R) * (x' : R)
       exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hy'_center x')
     · rintro ⟨x, hx⟩
       apply Subtype.ext
@@ -314,7 +314,7 @@ private theorem card_inf_critical_centralizer_eq_prime
       (ne_bot_of_exponent_eq_prime hHexp)
   have hz_mem : z ∈ H ⊓ Subgroup.centralizer (S : Set R) := by
     refine ⟨hzH, ?_⟩
-    show z ∈ Subgroup.centralizer (S : Set R)
+    change z ∈ Subgroup.centralizer (S : Set R)
     rw [Subgroup.mem_centralizer_iff]
     intro s _
     exact Subgroup.mem_center_iff.mp hzZR s
@@ -353,7 +353,7 @@ private theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
         exact h1 v (Set.mem_singleton v)
       · intro h
         refine ⟨?_, (x⁻¹ * y).2⟩
-        show ((x⁻¹ * y : ↥M) : R) ∈ Subgroup.centralizer ({v} : Set R)
+        change ((x⁻¹ * y : ↥M) : R) ∈ Subgroup.centralizer ({v} : Set R)
         rw [Subgroup.mem_centralizer_iff]
         intro h' hh'
         rw [Set.mem_singleton_iff] at hh'
@@ -491,7 +491,7 @@ private theorem isPGroup_commutator_and_orderOf_dvd_of_narrow_witness
         H ⊓ Subgroup.centralizer (S : Set R) := by
     intro M hMH x hx
     refine ⟨hMH hx.2, ?_⟩
-    show x ∈ Subgroup.centralizer (S : Set R)
+    change x ∈ Subgroup.centralizer (S : Set R)
     rw [Subgroup.mem_centralizer_iff]
     intro s hs
     rw [← hzpow_v] at hs
@@ -719,7 +719,7 @@ private theorem isPGroup_commutator_and_orderOf_dvd_of_narrow_witness
               (ψs i (a' : A)) ⟨(x : R), hx⟩ : ↥(s i)) : R) := by
           rw [hψB_def, hψs_def]
           rfl
-        show ((x⁻¹ * (ψB a') x : ↥H) : R) ∈ s (i + 1)
+        change ((x⁻¹ * (ψB a') x : ↥H) : R) ∈ s (i + 1)
         rw [hval]
         exact hmem
     have hbH : (ψs 0) b = 1 := by
@@ -890,7 +890,7 @@ private theorem thm55c_of_pRank_le_two
             refine ⟨⟨v, hv⟩, ?_, rfl⟩
             apply Omega.mem_of_pow_eq_one
             apply Subtype.ext
-            show v ^ p ^ 1 = 1
+            change v ^ p ^ 1 = 1
             rw [pow_one]
             exact hvp
           rw [hΩeq] at hv_mem
@@ -912,7 +912,7 @@ private theorem thm55c_of_pRank_le_two
         obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
         obtain ⟨u, hu, v, hv, huv⟩ := hdecomp x
         refine ⟨⟨v, hv⟩, ?_⟩
-        show ((v : R) : R ⧸ Omega R p 1) = ((x : R) : R ⧸ Omega R p 1)
+        change ((v : R) : R ⧸ Omega R p 1) = ((x : R) : R ⧸ Omega R p 1)
         rw [QuotientGroup.eq, hΩR]
         have hcomm_uv : Commute u v := hcp'.commute_of_mem hu hv
         have hval : v⁻¹ * x = u := by

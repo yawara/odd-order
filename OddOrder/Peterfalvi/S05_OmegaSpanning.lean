@@ -121,7 +121,7 @@ theorem supported_le_span_omega_sub_sndPart (hyp : TICyclicHypothesis G) [Fintyp
       have hval : (hyp.omega χ : ClassFunction hyp.W ℂ) w
           = (hyp.omega (hyp.sndPart χ) : ClassFunction hyp.W ℂ) w := by
         rw [omega_apply, omega_apply, sndPart_apply_of_mem_W2 hyp χ hw]
-      show c χ * ((hyp.omega χ : ClassFunction hyp.W ℂ) w
+      change c χ * ((hyp.omega χ : ClassFunction hyp.W ℂ) w
         - (hyp.omega (hyp.sndPart χ) : ClassFunction hyp.W ℂ) w) = 0
       rw [hval, sub_self, mul_zero]
     have hsum0 : (∑ χ : hyp.W →* ℂˣ,
@@ -140,7 +140,7 @@ theorem supported_le_span_omega_sub_sndPart (hyp : TICyclicHypothesis G) [Fintyp
     have hproj : g w = g ((hyp.W2.subgroupOf hyp.W).subtype (hyp.wSnd w)) := by
       rw [hg, ClassFunction.finset_sum_apply, ClassFunction.finset_sum_apply]
       refine Finset.sum_congr rfl fun χ _ => ?_
-      show c χ * (hyp.omega (hyp.sndPart χ) : ClassFunction hyp.W ℂ) w
+      change c χ * (hyp.omega (hyp.sndPart χ) : ClassFunction hyp.W ℂ) w
         = c χ * (hyp.omega (hyp.sndPart χ) : ClassFunction hyp.W ℂ) _
       rw [omega_apply, omega_apply, sndPart_apply_eq_apply_sndProj hyp χ w]
     rw [hproj,

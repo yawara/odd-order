@@ -716,7 +716,7 @@ theorem SOf_HC_inner_sOf_H0C_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothes
   -- `H` realized inside `HU`
   have hhin : OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup
       = (hyp.H.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) := by
-    show (hyp.s11Setup.typeP.H.subgroupOf M).subgroupOf _
+    change (hyp.s11Setup.typeP.H.subgroupOf M).subgroupOf _
         = (hyp.base.typeP.H.subgroupOf M).subgroupOf _
     rw [hyp.setup_typeP_eq]
   -- `x`-source `θ` kills `hInHu` (`H ≤ HC`)

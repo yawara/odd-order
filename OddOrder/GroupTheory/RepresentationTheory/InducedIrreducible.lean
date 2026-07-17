@@ -754,7 +754,7 @@ theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {W : Subgroup G}
       have h2 := congrArg (fun c : IrreducibleCharacter H => (c : ClassFunction H ℂ)) h
       simpa using h2
     apply Subtype.ext
-    show (θ : ClassFunction H ℂ) = trivialClassFunction H
+    change (θ : ClassFunction H ℂ) = trivialClassFunction H
     rw [← ClassFunction.conj_conj (θ : ClassFunction H ℂ), hcoe]
     exact trivialClassFunction_isReal
   have hirr := isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ

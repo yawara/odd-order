@@ -226,7 +226,7 @@ private theorem exists_hall_actsTrivially_of_forall_sylow
     have hH_D_invD : Ch03.IsAInvariant ψ H_D := by
       rw [Ch03.isAInvariant_iff_smul_mem]
       intro a h hh
-      show (φ (a : A)) h ∈ H_D
+      change (φ (a : A)) h ∈ H_D
       rw [hH_D_triv (a : A) a.2 h hh]; exact hh
     obtain ⟨c, hc_fix, hc_conj⟩ :=
       OddOrder.BG.Ch1.S01.aInvariant_hall_conj (φ := ψ) hcopD hH_D_hall hH₀_hall
@@ -236,7 +236,7 @@ private theorem exists_hall_actsTrivially_of_forall_sylow
     obtain ⟨h', hh', rfl⟩ := hh
     have hac : (φ a) c = c := hc_fix ⟨a, ha⟩
     have hah : (φ a) h' = h' := hH_D_triv a ha h' hh'
-    show (φ a) (c * h' * c⁻¹) = c * h' * c⁻¹
+    change (φ a) (c * h' * c⁻¹) = c * h' * c⁻¹
     rw [map_mul, map_mul, map_inv, hac, hah]
   -- `K ⊇` every Sylow ⇒ `K = ⊤`.
   rw [← Subgroup.index_eq_one]

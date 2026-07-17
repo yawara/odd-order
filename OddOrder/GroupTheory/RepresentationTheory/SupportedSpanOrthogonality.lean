@@ -78,7 +78,7 @@ theorem eq_zero_on_iff_forall_inner_eq_zero_of_span
       rw [ClassFunction.mem_support] at hxΦ hxDc
       have hxA : x ∈ A := ClassFunction.mem_supportedSubmodule.mp (hΦA i) hxΦ
       refine hxDc ?_
-      show D x - DA x = 0
+      change D x - DA x = 0
       rw [hDA_apply, if_pos hxA, sub_self]
     -- Hence `⟨Φ i, DA⟩ = ⟨Φ i, D⟩ = 0` for every `i`.
     have hΦDA : ∀ i, ClassFunction.inner (Φ i) DA = 0 := by
@@ -96,7 +96,7 @@ theorem eq_zero_on_iff_forall_inner_eq_zero_of_span
           obtain ⟨i, rfl⟩ := hx
           exact hΦDA i
       | zero =>
-          show ClassFunction.inner (0 : ClassFunction Γ ℂ) DA = 0
+          change ClassFunction.inner (0 : ClassFunction Γ ℂ) DA = 0
           rw [show (0 : ClassFunction Γ ℂ) = (0 : ℂ) • (0 : ClassFunction Γ ℂ) by simp,
             ClassFunction.inner_smul_left, zero_mul]
       | add x y _ _ ihx ihy => rw [ClassFunction.inner_add_left, ihx, ihy, add_zero]

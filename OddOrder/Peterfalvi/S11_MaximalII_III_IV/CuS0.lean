@@ -236,7 +236,7 @@ theorem caseA_exists_index_S0_not_le_biSup_compl [Finite G] {M : Subgroup G}
       e.symm.toMonoidHom)
   have hmemKj : ∀ (j₀ : Fin data.q) (x : ↥data.H ⧸ chief.N),
       x ∈ Kj j₀ ↔ (e.symm x) j₀ = 1 := fun j₀ x => by
-    show ((Pi.evalMonoidHom (fun k : Fin data.q => ↥(caseA.Hpart k)) j₀).comp
+    change ((Pi.evalMonoidHom (fun k : Fin data.q => ↥(caseA.Hpart k)) j₀).comp
         e.symm.toMonoidHom) x = 1 ↔ _
     rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, Pi.evalMonoidHom_apply]
   have hker : ∀ j₀ j : Fin data.q, j ≠ j₀ → caseA.Hpart j ≤ Kj j₀ := by
@@ -595,7 +595,7 @@ theorem hInHu_isComplement'_cuInHu_in_hcuInHu [Finite G] {M : Subgroup G}
     (hInHu_normal data).subgroupOf _
   refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
   · rw [disjoint_iff]
-    show (hInHu data).comap _ ⊓ (cuInHu caseA).comap _ = ⊥
+    change (hInHu data).comap _ ⊓ (cuInHu caseA).comap _ = ⊥
     rw [← Subgroup.comap_inf (hInHu data) (cuInHu caseA)
       (hInHu data ⊔ cuInHu caseA).subtype, hInHu_inf_cuInHu_eq_bot caseA]
     simp
@@ -1334,7 +1334,7 @@ theorem caseA_wOrbit_one [Finite G] {M : Subgroup G}
     caseA_wOrbit caseA 1 = caseA.S0 := by
   rw [caseA_wOrbit]
   haveI : chief.N.Normal := chief.N_normal
-  show quotientMulAutHom chief.N_aInvariant
+  change quotientMulAutHom chief.N_aInvariant
       ↑(1 : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) • caseA.S0 = caseA.S0
   rw [Subgroup.coe_one, map_one, one_smul]
 
@@ -1613,7 +1613,7 @@ theorem clifford_caseA_exists_regular_char_on_conjugates [Finite G] {M : Subgrou
   have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
     iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
   have htop : act.U ⊔ act.E = ⊤ := by
-    show data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+    change data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
         ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) = ⊤
     rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
   have hspan : ⨆ a : ↥(act.U ⊔ act.E), act.φ ↑a • S₀ = ⊤ := by
@@ -1660,7 +1660,7 @@ theorem clifford_caseA_exists_regular_char_not_fixed [Finite G] {M : Subgroup G}
   have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
     iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
   have htop : act.U ⊔ act.E = ⊤ := by
-    show data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+    change data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
         ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) = ⊤
     rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
   have hspan : ⨆ a : ↥(act.U ⊔ act.E), act.φ ↑a • S₀ = ⊤ := by
@@ -1713,7 +1713,7 @@ theorem clifford_caseA_regular_inertia_hc [Finite G] {M : Subgroup G}
   have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
     iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
   have htop : act.U ⊔ act.E = ⊤ := by
-    show data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+    change data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
         ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) = ⊤
     rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
   have hspan : ⨆ a : ↥(act.U ⊔ act.E), act.φ ↑a • S₀ = ⊤ := by

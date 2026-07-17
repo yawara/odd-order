@@ -139,10 +139,10 @@ theorem normalizer_W1_le_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [h] at key; simp only [mul_one, inv_mul_cancel] at key
     exact hane key
   have ha_sharp : a ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.T := by
-    show a ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) \ {1}
+    change a ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) \ {1}
     exact ⟨hW1F haW1, hane⟩
   have hga_sharp : g * a * g⁻¹ ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.T := by
-    show g * a * g⁻¹ ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) \ {1}
+    change g * a * g⁻¹ ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) \ {1}
     exact ⟨hW1F hgaW1, hgane⟩
   have hgN : g ∈ Subgroup.normalizer
       (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) :=
@@ -705,9 +705,9 @@ theorem Q_elementaryAbelian_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨chief, _⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG setupT
   haveI := chief.N_normal
   have hHeq : (setupT.H : Subgroup G) = hyp.Q := by
-    show tpd.H = hyp.Q; rw [tpd.H_eq, hyp.Q_eq_TF]
+    change tpd.H = hyp.Q; rw [tpd.H_eq, hyp.Q_eq_TF]
   have hqdim : setupT.q = hyp.p := by
-    show Nat.card ↥tpd.W1 = hyp.p; rw [htpdW1, ← hyp.p_eq_card_W2]
+    change Nat.card ↥tpd.W1 = hyp.p; rw [htpdW1, ← hyp.p_eq_card_W2]
   have hcardH : Nat.card ↥setupT.H = hyp.q ^ hyp.p := by
     -- Wielandt (9.3) order relation `|H| = |W₂|^|W₁|` for the type-II `T` (as in `card_Q_eq`,
     -- inlined since `card_Q_eq` is downstream of this lemma).

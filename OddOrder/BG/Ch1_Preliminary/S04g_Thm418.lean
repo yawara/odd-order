@@ -369,7 +369,7 @@ theorem pRank_quotient_le_of_coprime {p : ℕ} [Fact p.Prime]
   set H : Subgroup G := B.comap (QuotientGroup.mk' N) with hH_def
   have hNH : N ≤ H := by
     intro x hx
-    show QuotientGroup.mk' N x ∈ B
+    change QuotientGroup.mk' N x ∈ B
     have hx1 : QuotientGroup.mk' N x = 1 := (QuotientGroup.eq_one_iff x).mpr hx
     rw [hx1]
     exact B.one_mem
@@ -1908,7 +1908,7 @@ theorem isPGroup_quotient_oPiCore_of_comm {B : Type*} [Group B] [Finite B] {p : 
     have hpi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} (Subgroup.zpowers x) := by
       intro q' hq'
       rw [hcard, hq.primeFactors, Finset.mem_singleton] at hq'
-      show q' ≠ p
+      change q' ≠ p
       rw [hq']; exact hqp
     have hbot : Subgroup.zpowers x = ⊥ :=
       Ch03.eq_bot_of_isPiGroup_of_oPiCore_eq_bot {r : ℕ | r ≠ p} hpi hcoreC

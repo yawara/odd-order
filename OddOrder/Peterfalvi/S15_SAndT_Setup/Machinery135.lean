@@ -1023,7 +1023,7 @@ noncomputable def H_sharp_dadeHypothesis [Fintype G] (hG : OddOrder.BG.IsMinimal
     have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
     exact le_trans h1 (Subgroup.map_subtype_le _)
   have hHS : hyp.H ≤ hyp.S := by
-    show hyp.P ⊔ hyp.C ≤ hyp.S
+    change hyp.P ⊔ hyp.C ≤ hyp.S
     refine sup_le ?_ ?_
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
@@ -1077,7 +1077,7 @@ noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
   · have hUS : hyp.U ≤ hyp.S := by
       have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
       exact le_trans h1 (Subgroup.map_subtype_le _)
-    show hyp.P ⊔ hyp.C ≤ hyp.S
+    change hyp.P ⊔ hyp.C ≤ hyp.S
     refine sup_le ?_ ?_
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     · rw [hyp.C_eq]; exact le_trans inf_le_left hUS

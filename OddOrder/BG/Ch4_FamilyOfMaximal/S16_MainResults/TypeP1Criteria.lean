@@ -572,7 +572,7 @@ theorem fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma [Finite G]
     have hxFM : (⟨x, hxM⟩ : ↥M) ∈
         (Subgroup.centralizer (N : Set G) ⊓ M).subgroupOf M ⊔ N.subgroupOf M := by
       rw [← Subgroup.subgroupOf_sup inf_le_right hNM, Subgroup.mem_subgroupOf]
-      show x ∈ Subgroup.centralizer (N : Set G) ⊓ M ⊔ N
+      change x ∈ Subgroup.centralizer (N : Set G) ⊓ M ⊔ N
       rw [← hFcent]; exact hxF
     obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup_of_normal_right.mp hxFM
     have haC : (a : G) ∈ Subgroup.centralizer (N : Set G) :=
@@ -594,7 +594,7 @@ theorem fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma [Finite G]
       _ = (b : G) * y * (b : G)⁻¹ * (a : G) * (a : G)⁻¹ := by rw [← hcomm]
       _ = (b : G) * y * (b : G)⁻¹ := by group
   -- Assemble `F = N ⊔ (U ⊓ C(N))`.
-  show F = N ⊔ (U ⊓ Subgroup.centralizer (N : Set G))
+  change F = N ⊔ (U ⊓ Subgroup.centralizer (N : Set G))
   apply le_antisymm
   · rw [hmod]
     exact sup_le_sup_left (le_inf inf_le_left hFUcent) N
@@ -807,7 +807,7 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     by_cases habel : IsMulCommutative ↥(MF M)
     · -- abelian `M_F` ⟹ disjunct (b): `rank M_F = 2`.
       refine Or.inr (Or.inl ⟨habel, ?_⟩)
-      show rank ↥(MF M) = 2
+      change rank ↥(MF M) = 2
       have hcommMF : ∀ a b : ↥(MF M), a * b = b * a := isMulCommutative_iff.mp habel
       -- ≤ 2: `M_F` abelian ⟹ `M_F ≤ C_G(X₁)`, so `M_F ⊓ C_G(X₁) = M_F` and `rank M_F < 3`.
       have hMFcentr : MF M ≤ Subgroup.centralizer (X₁ : Set G) := by
@@ -1323,12 +1323,12 @@ theorem isTypeII_of_isTypeP2_of_derived_typeF [Finite G]
   refine isTypeII_of_typePData
     (typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK hUle hKnorm hUnilp hdec.1 hdec.2.1 hdec.2.2)
     ⟨?_, ?_, ?_⟩ ?_ ?_ hderF ?_
-  · show U ≠ ⊥; exact hUne
-  · show (Nat.card ↥K).Prime; rw [hKq]; exact hqp
+  · change U ≠ ⊥; exact hUne
+  · change (Nat.card ↥K).Prime; rw [hKq]; exact hqp
   · rw [hMFMσ]; exact hMσTI
-  · show IsMulCommutative ↥U; exact hUcomm
-  · show ¬ Subgroup.normalizer (U : Set G) ≤ M; exact hnorm
-  · show maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M; exact hderfit
+  · change IsMulCommutative ↥U; exact hUcomm
+  · change ¬ Subgroup.normalizer (U : Set G) ≤ M; exact hnorm
+  · change maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M; exact hderfit
 
 /-- **Prop 16.1 / Peterfalvi (8.6.b II), the `M'`-type-`F` residual (`hderF`), unconditional** — the
 derived subgroup `M' = M^{(1)}` of a type-`P₂` maximal `M` is itself of type `F`.

@@ -859,7 +859,7 @@ theorem tau2_element_sigmaLength_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- `piSet (closure {x'})` membership reduces to `(orderOf x').primeFactors`.
   have hpiSet : ∀ q : ℕ, q ∈ (orderOf x').primeFactors → q ∈ tau2 M := fun q hq =>
     hx'τ2 q (by
-      show q ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
+      change q ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
       rw [hcard]; exact hq)
   -- a `τ₂(M)`-prime `p ∣ |x'|`, and a rank-two `τ₂(M)` elementary abelian `A ≤ E`.
   have hord_ne : orderOf x' ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]

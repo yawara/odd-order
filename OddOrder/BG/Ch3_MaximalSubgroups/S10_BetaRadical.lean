@@ -1156,7 +1156,7 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
     have hpf : (Nat.card ↥A).primeFactors = {p} := by
       rw [hAcard]; exact Nat.primeFactors_prime_pow (by norm_num) Fact.out
     ext r
-    show r ∈ (Nat.card ↥A).primeFactors ↔ r ∈ ({p} : Set ℕ)
+    change r ∈ (Nat.card ↥A).primeFactors ↔ r ∈ ({p} : Set ℕ)
     rw [hpf, Finset.mem_singleton, Set.mem_singleton_iff]
   have hq : q ∈ (Ch2.S07.primesOf A)ᶜ := by
     rw [hπ]; exact fun h => hpq (Set.mem_singleton_iff.mp h).symm

@@ -266,7 +266,7 @@ theorem le_sup_inf_centralizer_of_commutator_le [Finite G]
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a x hx
     rw [Subgroup.mem_subgroupOf] at hx ⊢
-    show (a : G) * (x : G) * (a : G)⁻¹ ∈ M₀
+    change (a : G) * (x : G) * (a : G)⁻¹ ∈ M₀
     exact (Subgroup.mem_normalizer_iff.mp (hDM₀ a.2) (x : G)).mp hx
   -- `actionCommutator φ ≤ M₀.subgroupOf N` (from `⁅N,D⁆ ⊆ M₀`).
   have hac_map : (OddOrder.Isaacs.Ch04.actionCommutator φ).map N.subtype = ⁅N, D⁆ :=
@@ -733,7 +733,7 @@ theorem fpf_of_centralizer_inf_le [Finite G]
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a x hx
     rw [Subgroup.mem_subgroupOf] at hx ⊢
-    show (a : G) * (x : G) * (a : G)⁻¹ ∈ Q0
+    change (a : G) * (x : G) * (a : G)⁻¹ ∈ Q0
     exact (Subgroup.mem_normalizer_iff.mp (hkzQ0 a.2) (x : G)).mp hx
   -- Prop 1.5(d) + brick A-core: the quotient fixed points are trivial.
   have hbridge : (Subgroup.fixedPointsOfMulAut φ).map (D ⊔ Q1).subtype =
@@ -766,7 +766,7 @@ theorem fpf_of_centralizer_inf_le [Finite G]
       QuotientGroup.mk' (Q0.subgroupOf (D ⊔ Q1)) ⟨x, hx⟩ := by
     rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
       QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-    show (k * x * k⁻¹)⁻¹ * x ∈ Q0
+    change (k * x * k⁻¹)⁻¹ * x ∈ Q0
     have heq : (k * x * k⁻¹)⁻¹ * x = k * x⁻¹ * k⁻¹ * x := by group
     rw [heq]; exact hpre
   -- Hence `x̄` is fixed by all of `⟨k⟩`, so lies in the trivial fixed-point set.
@@ -813,7 +813,7 @@ theorem fpf_of_centralizer_inf_le_general [Finite G]
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a x hx
     rw [Subgroup.mem_subgroupOf] at hx ⊢
-    show (a : G) * (x : G) * (a : G)⁻¹ ∈ Q0
+    change (a : G) * (x : G) * (a : G)⁻¹ ∈ Q0
     exact (Subgroup.mem_normalizer_iff.mp (hkzQ0 a.2) (x : G)).mp hx
   have hbridge : (Subgroup.fixedPointsOfMulAut φ).map A.subtype =
       Subgroup.centralizer ((Subgroup.zpowers k : Subgroup G) : Set G) ⊓ A :=
@@ -842,7 +842,7 @@ theorem fpf_of_centralizer_inf_le_general [Finite G]
       QuotientGroup.mk' (Q0.subgroupOf A) ⟨x, hx⟩ := by
     rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
       QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-    show (k * x * k⁻¹)⁻¹ * x ∈ Q0
+    change (k * x * k⁻¹)⁻¹ * x ∈ Q0
     have heq : (k * x * k⁻¹)⁻¹ * x = k * x⁻¹ * k⁻¹ * x := by group
     rw [heq]; exact hpre
   have hxbar : QuotientGroup.mk' (Q0.subgroupOf A) ⟨x, hx⟩ ∈
@@ -1409,7 +1409,7 @@ theorem mem_centralizer_of_centralizes_quotient [Finite G]
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a y hy
     rw [Subgroup.mem_subgroupOf] at hy ⊢
-    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
+    change (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
     exact (Subgroup.mem_normalizer_iff.mp (hDQ0 a.2) (y : G)).mp hy
   -- Proposition 1.5(d): the quotient fixed points push forward from `C_{↥Q}(D) = Q₀`, hence `⊥`.
   have hbridge : (Subgroup.fixedPointsOfMulAut φ).map Q.subtype =
@@ -1435,7 +1435,7 @@ theorem mem_centralizer_of_centralizes_quotient [Finite G]
     intro a
     rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
       QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-    show ((a : G) * x * (a : G)⁻¹)⁻¹ * x ∈ Q0
+    change ((a : G) * x * (a : G)⁻¹)⁻¹ * x ∈ Q0
     have h1 : ⁅(a : G), x⁆ ∈ Q0 := hfix a a.2
     have h2 : ((a : G) * x * (a : G)⁻¹)⁻¹ * x = x⁻¹ * ⁅(a : G), x⁆⁻¹ * (x⁻¹)⁻¹ := by
       rw [commutatorElement_def]; group

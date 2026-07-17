@@ -315,12 +315,12 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           simpa using h_a0_bot
         · -- s (Fin.last n) = ⊤
           have hlast : ((Fin.last n : Fin (n + 1)) : ℕ) = n := by simp
-          show (a ((Fin.last n : Fin (n + 1)) : ℕ)).toSubmodule = ⊤
+          change (a ((Fin.last n : Fin (n + 1)) : ℕ)).toSubmodule = ⊤
           rw [hlast]; exact h_an_top
         · -- h_triv_quot
           intro g_q i v hv
           have h_eq : ρ_Q g_q v = ρ_H (g_q : ↥H) v := rfl
-          show ρ_Q g_q v - v ∈ (a ((i.castSucc : Fin (n + 1)) : ℕ)).toSubmodule
+          change ρ_Q g_q v - v ∈ (a ((i.castSucc : Fin (n + 1)) : ℕ)).toSubmodule
           rw [h_eq]
           have hcastSucc : ((i.castSucc : Fin (n + 1)) : ℕ) = i.val := by simp
           have hsucc : ((i.succ : Fin (n + 1)) : ℕ) = i.val + 1 := by simp
@@ -353,11 +353,11 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
                             ρ_H h v - v ∈ (a i).toSubmodule }
           one_mem' := by
             intro v _
-            show ρ_H 1 v - v ∈ (a i).toSubmodule
+            change ρ_H 1 v - v ∈ (a i).toSubmodule
             simp [map_one, Module.End.one_apply]
           mul_mem' := by
             intro h₁ h₂ hh₁ hh₂ v hv
-            show ρ_H (h₁ * h₂) v - v ∈ (a i).toSubmodule
+            change ρ_H (h₁ * h₂) v - v ∈ (a i).toSubmodule
             have h_decomp : ρ_H (h₁ * h₂) v - v
                 = ρ_H h₁ (ρ_H h₂ v - v) + (ρ_H h₁ v - v) := by
               rw [map_mul, Module.End.mul_apply, map_sub]
@@ -367,7 +367,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
               ((a i).apply_mem_toSubmodule h₁ (hh₂ v hv)) (hh₁ v hv)
           inv_mem' := by
             intro h hh v hv
-            show ρ_H h⁻¹ v - v ∈ (a i).toSubmodule
+            change ρ_H h⁻¹ v - v ∈ (a i).toSubmodule
             -- key: ρ_H h⁻¹ v - v = ρ_H h⁻¹ (-(ρ_H h v - v))
             have h_apply : ρ_H h⁻¹ (-(ρ_H h v - v)) = ρ_H h⁻¹ v - v := by
               rw [map_neg, map_sub]
@@ -386,7 +386,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       have hN_i_normal : N_i.Normal := by
         constructor
         intro n hn g v hv
-        show ρ_H (g * n * g⁻¹) v - v ∈ (a i).toSubmodule
+        change ρ_H (g * n * g⁻¹) v - v ∈ (a i).toSubmodule
         -- ρ_H (g n g⁻¹) v = ρ_H g (ρ_H n (ρ_H g⁻¹ v))
         -- v = ρ_H g (ρ_H g⁻¹ v)
         -- so diff = ρ_H g (ρ_H n (ρ_H g⁻¹ v) - ρ_H g⁻¹ v)
@@ -412,7 +412,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       -- a i ⋖ a (i+1) ⇒ a i < a (i+1) as Submodule
       have h_ai_lt_aip1 : (a i).toSubmodule < aip1_top := by
         have h_lt : a i < a (i + 1) := (h_cov i hi_lt_n).lt
-        show (a i).toSubmodule < (a (i + 1)).toSubmodule
+        change (a i).toSubmodule < (a (i + 1)).toSubmodule
         exact lt_of_le_of_ne h_lt.le
           (fun h_eq => h_lt.ne (Subrepresentation.toSubmodule_injective h_eq))
       have h_ai_in_aip1_ne_top : ai_in_aip1 ≠ ⊤ := by
@@ -496,7 +496,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
         -- W invariant under (a(i+1)).toRepresentation
         have hW_inv : ∀ h : ↥H, ∀ w ∈ W, (a (i + 1)).toRepresentation h w ∈ W := by
           intro h w hw_W
-          show ai_in_aip1.mkQ ((a (i + 1)).toRepresentation h w) ∈ U
+          change ai_in_aip1.mkQ ((a (i + 1)).toRepresentation h w) ∈ U
           have h_step : ai_in_aip1.mkQ ((a (i + 1)).toRepresentation h w) =
               ρ_quot h (ai_in_aip1.mkQ w) := rfl
           rw [h_step]
@@ -521,7 +521,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           intro v hv
           have h_in_aip1 : v ∈ aip1_top := (h_cov i hi_lt_n).le hv
           refine ⟨⟨v, h_in_aip1⟩, ?_, rfl⟩
-          show (⟨v, h_in_aip1⟩ : ↥aip1_top) ∈ W
+          change (⟨v, h_in_aip1⟩ : ↥aip1_top) ∈ W
           exact hW_ge hv
         -- σ ≤ a (i+1)
         have hσ_le_aip1 : σ ≤ a (i + 1) := by
@@ -542,7 +542,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
             congr_arg Subrepresentation.toSubmodule hσ_eq_ai
           rw [hσ_eq] at hwval_σ
           have hw_ai : w ∈ ai_in_aip1 := hwval_σ
-          show (ai_in_aip1.mkQ w : ↥aip1_top ⧸ ai_in_aip1) ∈
+          change (ai_in_aip1.mkQ w : ↥aip1_top ⧸ ai_in_aip1) ∈
             (⊥ : Submodule F (↥aip1_top ⧸ ai_in_aip1))
           rw [Submodule.mem_bot, Submodule.mkQ_apply,
             Submodule.Quotient.mk_eq_zero]
@@ -552,7 +552,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           rw [eq_top_iff]
           intro u _
           obtain ⟨w, rfl⟩ := ai_in_aip1.mkQ_surjective u
-          show w ∈ W
+          change w ∈ W
           have hwval_aip1 : w.val ∈ aip1_top := w.property
           have hσ_eq : σ.toSubmodule = (a (i + 1)).toSubmodule :=
             congr_arg Subrepresentation.toSubmodule hσ_eq_aip1
@@ -625,7 +625,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
             Submodule.Quotient.mk ((a (i + 1)).toRepresentation z_subt
               ((a (i + 1)).toRepresentation z_subt w - w) -
               ((a (i + 1)).toRepresentation z_subt w - w)) := by
-          show M (Submodule.Quotient.mk w) = _
+          change M (Submodule.Quotient.mk w) = _
           rw [hM_def, pow_two, Module.End.mul_apply, h_step, h_step]
         rw [h_sq_app]
         -- The inner argument equals 0 in ↥aip1_top.
@@ -637,7 +637,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           have h_act : ∀ (u' : ↥aip1_top),
               ((a (i + 1)).toRepresentation z_subt u' : ↥aip1_top).val =
               ρ_H z_subt u'.val := fun _ => rfl
-          show ((((a (i + 1)).toRepresentation z_subt
+          change ((((a (i + 1)).toRepresentation z_subt
               ((a (i + 1)).toRepresentation z_subt w - w) -
               ((a (i + 1)).toRepresentation z_subt w - w)) : ↥aip1_top).val) =
               (0 : ↥aip1_top).val
@@ -651,7 +651,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           rw [show ((((a (i + 1)).toRepresentation z_subt w - w) : ↥aip1_top).val) =
               ((a (i + 1)).toRepresentation z_subt w : ↥aip1_top).val - w.val from rfl]
           rw [h_act ((a (i + 1)).toRepresentation z_subt w - w), h_act w]
-          show ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val)
+          change ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val)
               = (0 : V)
           -- (ρ_H z_subt - 1)² w.val = ρ_H z_subt (ρ_H z_subt w.val - w.val) - (ρ_H z_subt w.val - w.val)
           have h_at_val :
@@ -702,7 +702,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
               rw [← hn, pow_orderOf_eq_one]
             have h_eq : (QuotientGroup.mk z_subt : ↥H ⧸ N_i) ^ (p ^ n)
                 = (QuotientGroup.mk (z_subt ^ (p ^ n)) : ↥H ⧸ N_i) := by
-              show ((QuotientGroup.mk' N_i) z_subt) ^ (p ^ n) =
+              change ((QuotientGroup.mk' N_i) z_subt) ^ (p ^ n) =
                 (QuotientGroup.mk' N_i) (z_subt ^ (p ^ n))
               rw [map_pow]
             rw [h_eq, h_pow]; rfl
@@ -1448,7 +1448,7 @@ theorem thmA4b [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd 
     le_trans (Subgroup.map_le_iff_le_comap.mp hStab) hcomap_le_R
   -- Step 7: `A ≤ O_{p',p}(G)`, which is defeq `comap (mk' N) (O_p(Ḡ))`
   -- (`{p_1 | p_1 ∉ {p}}` is defeq `{q | q ≠ p}` since `x ∈ {p} ≡ x = p`).
-  show A ≤ Subgroup.comap mk (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N))
+  change A ≤ Subgroup.comap mk (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N))
   rw [← Subgroup.map_le_iff_le_comap, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
   exact hAbar_le_R
 

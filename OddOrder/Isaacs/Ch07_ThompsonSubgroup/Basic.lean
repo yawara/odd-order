@@ -392,12 +392,12 @@ theorem step3_main
     rw [hMg_def, Subgroup.mem_map]
     constructor
     · rintro ⟨m, hm, rfl⟩
-      show g⁻¹ * (MulAut.conj g m) * g ∈ M
+      change g⁻¹ * (MulAut.conj g m) * g ∈ M
       rw [MulAut.conj_apply, show g⁻¹ * (g * m * g⁻¹) * g = m from by group]
       exact hm
     · intro hx
       refine ⟨g⁻¹ * x * g, hx, ?_⟩
-      show MulAut.conj g (g⁻¹ * x * g) = x
+      change MulAut.conj g (g⁻¹ * x * g) = x
       rw [MulAut.conj_apply]; group
   have hg_in_M_of_Mg_eq : Mg = M → g ∈ M := fun hMgM => by
     rw [← hNM_eq_M, Subgroup.mem_normalizer_iff'']

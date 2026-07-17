@@ -101,7 +101,7 @@ noncomputable def IsCompatibleMulAction.toMulAction
     letI := h.toMulAction
     (SemidirectProduct.inl g : SemidirectProduct G A φ) • ω = g • ω := by
   letI := h.toMulAction
-  show h.toPermHom (SemidirectProduct.inl g) ω = g • ω
+  change h.toPermHom (SemidirectProduct.inl g) ω = g • ω
   simp [IsCompatibleMulAction.toPermHom, SemidirectProduct.lift_inl]
 
 @[simp] lemma IsCompatibleMulAction.toMulAction_inr_smul
@@ -109,7 +109,7 @@ noncomputable def IsCompatibleMulAction.toMulAction
     letI := h.toMulAction
     (SemidirectProduct.inr a : SemidirectProduct G A φ) • ω = a • ω := by
   letI := h.toMulAction
-  show h.toPermHom (SemidirectProduct.inr a) ω = a • ω
+  change h.toPermHom (SemidirectProduct.inr a) ω = a • ω
   simp [IsCompatibleMulAction.toPermHom, SemidirectProduct.lift_inr]
 
 end CompatibleAction
@@ -243,7 +243,7 @@ theorem glauberman_fixed_point_exists
     rw [h_card_eq, ← h_card_inlG]
     exact Subgroup.card_dvd_of_le inf_le_right
   have h_subof_index : (inlG.subgroupOf U).index = Nat.card A := by
-    show inlG.relIndex U = Nat.card A
+    change inlG.relIndex U = Nat.card A
     exact h_relIndex
   have h_coprime_subof : Nat.Coprime (Nat.card (inlG.subgroupOf U)) (inlG.subgroupOf U).index := by
     rw [h_subof_index]
@@ -458,11 +458,11 @@ theorem exists_aInvariant_sylow
     · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
       -- y = (MulAut.conj g) z = g * z * g⁻¹, x = (φ a) y = (φ a)(g z g⁻¹) = (φ a g) (φ a z) (φ a g)⁻¹
       refine ⟨(φ a) z, ⟨z, hz, rfl⟩, ?_⟩
-      show MulAut.conj (φ a g) ((φ a) z) = (φ a) ((MulAut.conj g) z)
+      change MulAut.conj (φ a g) ((φ a) z) = (φ a) ((MulAut.conj g) z)
       simp [MulAut.conj_apply, map_mul, map_inv]
     · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
       refine ⟨(MulAut.conj g) z, ⟨z, hz, rfl⟩, ?_⟩
-      show (φ a) ((MulAut.conj g) z) = MulAut.conj (φ a g) ((φ a) z)
+      change (φ a) ((MulAut.conj g) z) = MulAut.conj (φ a g) ((φ a) z)
       simp [MulAut.conj_apply, map_mul, map_inv]
   -- G transitive on Sylow p G.
   haveI hSyl_nonempty : Nonempty (Sylow p G) := inferInstance
@@ -483,7 +483,7 @@ theorem exists_aInvariant_sylow
   rw [Sylow.pointwise_smul_def] at h_coe
   -- h_coe : (φ a) • (P : Subgroup G) = (P : Subgroup G).
   -- IsAInvariant says (φ a) • P = P (as Subgroup), which by smul_def is the same.
-  show (φ a : MulAut G) • (P : Subgroup G) = (P : Subgroup G)
+  change (φ a : MulAut G) • (P : Subgroup G) = (P : Subgroup G)
   exact h_coe
 
 /-- **Isaacs Thm 3.23(b)**: 2 つの A-invariant Sylow p-subgroup は C_G(A) で共役.
@@ -506,11 +506,11 @@ theorem aInvariant_sylow_conj
     constructor
     · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
       refine ⟨(φ a) z, ⟨z, hz, rfl⟩, ?_⟩
-      show MulAut.conj (φ a g) ((φ a) z) = (φ a) ((MulAut.conj g) z)
+      change MulAut.conj (φ a g) ((φ a) z) = (φ a) ((MulAut.conj g) z)
       simp [MulAut.conj_apply, map_mul, map_inv]
     · rintro ⟨y, ⟨z, hz, rfl⟩, rfl⟩
       refine ⟨(MulAut.conj g) z, ⟨z, hz, rfl⟩, ?_⟩
-      show (φ a) ((MulAut.conj g) z) = MulAut.conj (φ a g) ((φ a) z)
+      change (φ a) ((MulAut.conj g) z) = MulAut.conj (φ a g) ((φ a) z)
       simp [MulAut.conj_apply, map_mul, map_inv]
   have hG_trans : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
   -- A-invariance of S, T as Sylow: a • S = S (in Sylow type).
@@ -591,7 +591,7 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow
     have hRzn : (hN_inv.restrict a) z ∈ R_in_N := hR_in_N_inv.smul_mem a hz_in
     -- (φ a) x = ((hN_inv.restrict a) z).val (since x = z.val and restrict_apply_val).
     refine ⟨(hN_inv.restrict a) z, hRzn, ?_⟩
-    show ((hN_inv.restrict a) z).val = (φ a) x
+    change ((hN_inv.restrict a) z).val = (φ a) x
     rw [← hz_eq]
     rfl
   -- Step 4: R ≤ N(Q), so Q ⊔ R is a p-group; A-inv; ⊇ P. Maximality ⇒ R ≤ Q.
@@ -610,7 +610,7 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow
   have hQN_pgrp : IsPGroup p (Q.subgroupOf N) := hQ_pgrp.comap_subtype
   have hR_in_N_le_QN : (R_in_N : Subgroup ↥N) ≤ Q.subgroupOf N := by
     intro x hx
-    show x.val ∈ Q
+    change x.val ∈ Q
     have : x.val ∈ R := ⟨x, hx, rfl⟩
     exact hR_le_Q this
   have hQN_eq_R_in_N : Q.subgroupOf N = R_in_N :=
@@ -918,7 +918,7 @@ theorem exists_fixed_isConj_of_aInvariant_class
     smul := fun g x => ⟨g * x.val * g⁻¹, x.property.trans (isConj_iff.mpr ⟨g, rfl⟩)⟩
     one_smul := fun x => Subtype.ext (show (1 : G) * x.val * (1 : G)⁻¹ = x.val by simp)
     mul_smul := fun g h x => Subtype.ext (by
-      show g * h * x.val * (g * h)⁻¹ = g * (h * x.val * h⁻¹) * g⁻¹
+      change g * h * x.val * (g * h)⁻¹ = g * (h * x.val * h⁻¹) * g⁻¹
       group) }
   letI : MulAction A {x : G // IsConj x₀ x} := {
     smul := fun a x => ⟨(φ a) x.val,
@@ -929,7 +929,7 @@ theorem exists_fixed_isConj_of_aInvariant_class
   have hcompat : IsCompatibleMulAction φ {x : G // IsConj x₀ x} := by
     intro a g x
     refine Subtype.ext ?_
-    show (φ a) (g * x.val * g⁻¹) = (φ a) g * (φ a) x.val * ((φ a) g)⁻¹
+    change (φ a) (g * x.val * g⁻¹) = (φ a) g * (φ a) x.val * ((φ a) g)⁻¹
     simp [map_mul]
   haveI : Nonempty {x : G // IsConj x₀ x} := ⟨⟨x₀, IsConj.refl x₀⟩⟩
   have htrans : MulAction.IsPretransitive G {x : G // IsConj x₀ x} := by
@@ -957,7 +957,7 @@ theorem exists_fixed_conj_of_isConj_of_fixed
     smul := fun g z => ⟨g * z.val * g⁻¹, z.property.trans (isConj_iff.mpr ⟨g, rfl⟩)⟩
     one_smul := fun z => Subtype.ext (show (1 : G) * z.val * (1 : G)⁻¹ = z.val by simp)
     mul_smul := fun g h z => Subtype.ext (by
-      show g * h * z.val * (g * h)⁻¹ = g * (h * z.val * h⁻¹) * g⁻¹
+      change g * h * z.val * (g * h)⁻¹ = g * (h * z.val * h⁻¹) * g⁻¹
       group) }
   letI : MulAction A {z : G // IsConj x z} := {
     smul := fun a z => ⟨(φ a) z.val,
@@ -968,7 +968,7 @@ theorem exists_fixed_conj_of_isConj_of_fixed
   have hcompat : IsCompatibleMulAction φ {z : G // IsConj x z} := by
     intro a g z
     refine Subtype.ext ?_
-    show (φ a) (g * z.val * g⁻¹) = (φ a) g * (φ a) z.val * ((φ a) g)⁻¹
+    change (φ a) (g * z.val * g⁻¹) = (φ a) g * (φ a) z.val * ((φ a) g)⁻¹
     simp [map_mul]
   have htrans : MulAction.IsPretransitive G {z : G // IsConj x z} := by
     constructor
@@ -988,7 +988,7 @@ theorem conjClasses_map_fixedSubgroup_aInvariant {φ : A →* MulAut G}
     (d.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype).map (φ a).toMonoidHom
       = d.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype := by
   obtain ⟨y, rfl⟩ := d.exists_rep
-  show ConjClasses.mk ((φ a) y.val) = ConjClasses.mk y.val
+  change ConjClasses.mk ((φ a) y.val) = ConjClasses.mk y.val
   rw [y.property a trivial]
 
 open OddOrder.GroupTheory in

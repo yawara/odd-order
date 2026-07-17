@@ -144,7 +144,7 @@ include hG in
 `(mp.Kstar ⊔ mp.K).subgroupOf mp.T` (`tp.W = mp.K ⊔ mp.Kstar` and `certainTypeT.sdiff.W = W₁ ⊔ W₂`). -/
 theorem tpW_subgroupOf_T_eq :
     tp.W.subgroupOf mp.T = (mp.certainTypeT hG).sdiffTICyclicHypothesis.W := by
-  show tp.W.subgroupOf mp.T = (mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2
+  change tp.W.subgroupOf mp.T = (mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2
   rw [certainTypeT_W1_eq hG mp, certainTypeT_W2_eq hG mp,
     ← Subgroup.subgroupOf_sup mp.Kstar_le_T (k_le_T hG mp), sup_comm, ← tp.W_eq_kappa_join hG]
 
@@ -224,7 +224,7 @@ theorem chi2enum_finNeg (j : Fin tp.p) :
     (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W
   rw [chi2enum]
   refine OddOrder.Peterfalvi.S06.cyclicPowEnum_eq_inv_of_add_mod_eq_zero _ ?_
-  show ((tp.p - (j : ℕ)) % tp.p + (j : ℕ)) % tp.p = 0
+  change ((tp.p - (j : ℕ)) % tp.p + (j : ℕ)) % tp.p = 0
   rcases Nat.eq_zero_or_pos (j : ℕ) with h0 | hpos
   · simp [h0]
   · have hj : (j : ℕ) < tp.p := j.2
@@ -236,7 +236,7 @@ include hG in
 `(mp.K ⊔ mp.Kstar).subgroupOf mp.S` (`tp.W = mp.K ⊔ mp.Kstar` and `certainTypeS.sdiff.W = W₁ ⊔ W₂`). -/
 theorem tpW_subgroupOf_eq :
     tp.W.subgroupOf mp.S = (mp.certainTypeS hG).sdiffTICyclicHypothesis.W := by
-  show tp.W.subgroupOf mp.S = (mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2
+  change tp.W.subgroupOf mp.S = (mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2
   rw [certainTypeS_W1_eq hG mp, certainTypeS_W2_eq hG mp,
     ← Subgroup.subgroupOf_sup mp.K_le_S (kstar_le_S hG mp), tp.W_eq_kappa_join hG]
 

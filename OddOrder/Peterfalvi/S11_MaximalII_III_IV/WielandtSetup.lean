@@ -268,7 +268,7 @@ theorem typeP_fixedSubgroup_map (data : TypePData M) {K : Subgroup G}
     have hlx : (l : G) * x = x * (l : G) :=
       Subgroup.mem_centralizer_iff.mp hxC (l : G) (Subgroup.mem_subgroupOf.mp hl)
     have hval : ((typeP_conjAction data l) ⟨x, hxH⟩ : G) = x := by
-      rw [typeP_conjAction_apply]; show (l : G) * x * (l : G)⁻¹ = x
+      rw [typeP_conjAction_apply]; change (l : G) * x * (l : G)⁻¹ = x
       rw [hlx, mul_inv_cancel_right]
     exact Subtype.ext hval
 
@@ -313,20 +313,20 @@ theorem typeP_wielandt_order_relation [Finite G] (data : TypePData M) (hU : data
           * Nat.card ↥(data.H ⊓ Subgroup.centralizer (data.U : Set G)) := by
   have key := wielandt_fixedPoint_frobenius (typeP_coprimeAction data hU)
   have hEcard : Nat.card ↥(typeP_coprimeAction data hU).E = Nat.card ↥data.W1 := by
-    show Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1)) = Nat.card ↥data.W1
+    change Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1)) = Nat.card ↥data.W1
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
   have hUfix : Nat.card ↥(typeP_coprimeAction data hU).fixedByU
       = Nat.card ↥(data.H ⊓ Subgroup.centralizer (data.U : Set G)) := by
-    show Nat.card ↥(fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)))
+    change Nat.card ↥(fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)))
       = _
     exact typeP_card_fixedSubgroup data le_sup_left
   have hEfix : Nat.card ↥(typeP_coprimeAction data hU).fixedByE = Nat.card ↥data.W2 := by
-    show Nat.card ↥(fixedSubgroup (typeP_conjAction data) (data.W1.subgroupOf (data.U ⊔ data.W1)))
+    change Nat.card ↥(fixedSubgroup (typeP_conjAction data) (data.W1.subgroupOf (data.U ⊔ data.W1)))
       = _
     rw [typeP_card_fixedSubgroup data le_sup_right, typeP_H_inf_centralizer_W1 data]
   have hUEfix : Nat.card ↥(typeP_coprimeAction data hU).fixedByUE
       = Nat.card ↥(data.H ⊓ Subgroup.centralizer ((data.U ⊔ data.W1 : Subgroup G) : Set G)) := by
-    show Nat.card ↥(fixedSubgroup (typeP_conjAction data) ⊤) = _
+    change Nat.card ↥(fixedSubgroup (typeP_conjAction data) ⊤) = _
     rw [← Subgroup.subgroupOf_self (data.U ⊔ data.W1)]
     exact typeP_card_fixedSubgroup data le_rfl
   rw [hUEfix, hEcard, hEfix, hUfix] at key
@@ -430,11 +430,11 @@ theorem typeP_commutator_U_centralizes_H (data : TypePData M) :
   set K := data.U ⊓ Subgroup.centralizer (data.H : Set G) with hK
   -- `derivedInG J = ⁅J, J⁆`, so `M'' = secondDerivedInAmbient M = ⁅M', M'⁆`.
   have hderiv : ∀ J : Subgroup G, derivedInG J = ⁅J, J⁆ := fun J => by
-    show (commutator ↥J).map J.subtype = ⁅J, J⁆
+    change (commutator ↥J).map J.subtype = ⁅J, J⁆
     rw [commutator_def, Subgroup.map_commutator]
     simp only [← MonoidHom.range_eq_map, Subgroup.range_subtype]
   have hUU_M'' : ⁅data.U, data.U⁆ ≤ secondDerivedInAmbient M := by
-    show ⁅data.U, data.U⁆ ≤ derivedInG (derivedInG M)
+    change ⁅data.U, data.U⁆ ≤ derivedInG (derivedInG M)
     rw [hderiv (derivedInG M)]
     exact Subgroup.commutator_mono data.U_le data.U_le
   have hUU_HK : ⁅data.U, data.U⁆ ≤ data.H ⊔ K := hUU_M''.trans data.secondDerived_le_fitting
@@ -699,7 +699,7 @@ theorem isAInvariant_fixedSubgroup_of_normal {L H : Type*} [Group L] [Group H]
     IsAInvariant φ (fixedSubgroup φ K) := by
   rw [isAInvariant_iff_smul_mem]
   intro a x hx k hk
-  show (φ k) ((φ a) x) = (φ a) x
+  change (φ k) ((φ a) x) = (φ a) x
   have hmem : a⁻¹ * k * a ∈ K := by
     have := hK.conj_mem k hk a⁻¹
     simpa using this
@@ -832,7 +832,7 @@ theorem coprimeFrobeniusChiefFactor_card_of_summand
     rw [Subgroup.subgroupOf_map_subtype] at e
     have hcyc : IsCyclic ↥((fixedSubgroup act.φ act.E).subgroupOf S) :=
       isCyclic_of_surjective e.symm e.symm.surjective
-    show IsCyclic ↥(fixedSubgroup hSinv.restrict act.E)
+    change IsCyclic ↥(fixedSubgroup hSinv.restrict act.E)
     rwa [fixedSubgroup_restrict_eq hSinv]
   have hK1 : Nat.card ↥S ≠ 1 := fun h => hSne (Subgroup.card_eq_one.mp h)
   obtain ⟨hScard, hEcard⟩ :=
@@ -967,7 +967,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
   obtain ⟨hScard, hCSEcard⟩ :=
     coprimeFrobeniusChiefFactor_card_of_summand act_V hUnorm hp hpe hSinv hSne hirr hCS hEcyc
   have hEcard : Nat.card ↥act_V.E = Nat.card ↥data.W1 := by
-    show Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1)) = Nat.card ↥data.W1
+    change Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1)) = Nat.card ↥data.W1
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
   have hScard' : Nat.card ↥S = p ^ Nat.card ↥data.W1 := by rw [hScard, hEcard]
   -- `V` is abelian, so all its subgroups are normal.
@@ -993,7 +993,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
     Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N₀) W
   -- `|H/N| = W.index = |S| = p^q`.
   have hcardN : Nat.card (↥data.H ⧸ N) = p ^ Nat.card ↥data.W1 := by
-    show N.index = p ^ Nat.card ↥data.W1
+    change N.index = p ^ Nat.card ↥data.W1
     rw [hNdef, Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective N₀),
       hcompl.index_eq_card, hScard']
   -- `p ∣ |W₂|`: `p = |C_V(W₁) ⊓ S| ∣ |C_V(W₁)| = |act_V.fixedByE| ∣ |W₂|`.
@@ -1038,7 +1038,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
     obtain ⟨a, ha, b, hb, rfl⟩ := Subgroup.mem_sup.mp (hSW_sup ▸ Subgroup.mem_top x)
     have hxfix : a * b ∈ fixedSubgroup act_V.φ act_V.U := hx
     have hafix : a ∈ act_V.fixedByU := by
-      show a ∈ fixedSubgroup act_V.φ act_V.U
+      change a ∈ fixedSubgroup act_V.φ act_V.U
       rw [mem_fixedSubgroup]
       intro l hl
       have hxl : act_V.φ l a * act_V.φ l b = a * b := by
@@ -1169,7 +1169,7 @@ theorem typeP_aInvariantNormal_le_normalizer [Finite G] {M : Subgroup G} (data :
     have key := hconj ⟨g, hg⟩⁻¹ hm
     have hE : ((⟨g, hg⟩ : ↥(data.U ⊔ data.W1))⁻¹ : G) * data.H.subtype m
         * (((⟨g, hg⟩ : ↥(data.U ⊔ data.W1))⁻¹ : G))⁻¹ = h := by
-      rw [hval]; show g⁻¹ * (g * h * g⁻¹) * (g⁻¹ : G)⁻¹ = h; group
+      rw [hval]; change g⁻¹ * (g * h * g⁻¹) * (g⁻¹ : G)⁻¹ = h; group
     exact hE ▸ key
   exact hM2.trans (sup_le (sup_le hH_norm (le_sup_left.trans hUW1_norm))
     (le_sup_right.trans hUW1_norm))
@@ -1460,7 +1460,7 @@ theorem exists_chiefFactorData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
             typeIII_IV_p_eq_W2 := ?_
             U_noncentral_on_quotient := hNonc }, hlt⟩
   · -- `|H| = |H/N| · |N| = p^q · |H₀|`.
-    show Nat.card ↥data.typeP.H
+    change Nat.card ↥data.typeP.H
         = p ^ Nat.card ↥data.typeP.W1 * Nat.card ↥(N.map data.typeP.H.subtype)
     rw [← Subgroup.index_mul_card N,
       show N.index = p ^ Nat.card ↥data.typeP.W1 from hcardN,

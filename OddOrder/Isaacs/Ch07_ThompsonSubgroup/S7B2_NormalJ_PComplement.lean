@@ -484,10 +484,10 @@ private theorem relIndex_sup_of_inf_eq_bot
   have h2 : Nat.card (N.subgroupOf (N ⊔ A)) * (N.subgroupOf (N ⊔ A)).index =
       Nat.card ↥(N ⊔ A) := Subgroup.card_mul_index _
   have hNrel : (N.subgroupOf (N ⊔ A)).index = Nat.card A := by
-    show N.relIndex (N ⊔ A) = Nat.card A
+    change N.relIndex (N ⊔ A) = Nat.card A
     rw [Subgroup.relIndex_sup_left]
     -- `N.relIndex A = |A : N ⊓ A| = |A : ⊥| = |A|`.
-    show (N.subgroupOf A).index = Nat.card A
+    change (N.subgroupOf A).index = Nat.card A
     have : N.subgroupOf A = ⊥ := by
       rw [Subgroup.subgroupOf_eq_bot]
       rw [disjoint_iff]; exact h_inf
@@ -1518,7 +1518,7 @@ theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal]
         rw [hN_eq] at hc_Nbar
         obtain ⟨n, hn_NgP, hn_eq⟩ := hc_Nbar
         refine ⟨n, ⟨hn_NgP, ?_⟩, hn_eq⟩
-        show f n ∈ Cbar
+        change f n ∈ Cbar
         rw [hn_eq]
         exact hc
     -- Claim: X ≤ centralizer P

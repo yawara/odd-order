@@ -132,7 +132,7 @@ theorem huSub_index_eq_q [Finite G] (data : TypesIIIIIIVSetup M) :
     simp only [TypesIIIIIIVSetup.q, TypesIIIIIIVSetup.W1]
     rw [data.typeP.M_complement.symm.index_eq_card,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv]
-  show ((data.H ⊔ data.U).subgroupOf M).index = data.q
+  change ((data.H ⊔ data.U).subgroupOf M).index = data.q
   rw [hsup]; exact hidx
 
 /-- The induced degree, with the index resolved: `(Ind_{HU}^M χ)(1) = q · χ(1)` (`q = |W₁|`).  This
@@ -328,7 +328,7 @@ theorem mem_cSub_of_mem_U_of_centralizes [Finite G] {M : Subgroup G}
         rw [typeP_conjAction_apply]
         have hcom : (h : G) * x = x * (h : G) :=
           (Subgroup.mem_centralizer_iff.mp hxC) (h : G) h.2
-        show x * (h : G) * x⁻¹ = (h : G)
+        change x * (h : G) * x⁻¹ = (h : G)
         rw [← hcom, mul_assoc, mul_inv_cancel, mul_one]
       rw [hfix]
   simp only [cSub, Subgroup.mem_map]
@@ -589,7 +589,7 @@ theorem card_cInHu_eq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data
 /-- `|C| = |ker(uActionHom)|`: `cSub` is the injective double-image of the kernel. -/
 theorem card_cSub_eq_card_ker (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
     Nat.card ↥(cSub data chief) = Nat.card ↥(uActionHom data chief).ker := by
-  show Nat.card ↥(((uActionHom data chief).ker.map
+  change Nat.card ↥(((uActionHom data chief).ker.map
       (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
         (data.typeP.U ⊔ data.typeP.W1).subtype) = Nat.card ↥(uActionHom data chief).ker
   rw [← Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective _)).toEquiv,
@@ -729,7 +729,7 @@ theorem mulAut_eq_one_of_eq_id_on_iSup {H : Type*} [Group H] (α : MulAut H)
         simp only [Set.mem_setOf_eq] at ha ⊢; rw [map_inv, ha] } with hS
   have htop : S = ⊤ := top_le_iff.mp (hspan ▸ iSup_le (fun i x hx => htriv i x hx))
   ext x
-  show α x = x
+  change α x = x
   exact htop.ge (Subgroup.mem_top x)
 
 open OddOrder.RepresentationTheory in
@@ -1352,7 +1352,7 @@ theorem centralizer_map_mk'_eq_of_coprime_zpowers {Γ : Type*} [Group Γ] [Finit
     have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ N := by
       rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
       intro c n hn
-      show (MulAut.conj (c : Γ)) n ∈ N
+      change (MulAut.conj (c : Γ)) n ∈ N
       rw [MulAut.conj_apply]
       exact (inferInstance : N.Normal).conj_mem n hn (c : Γ)
     haveI : IsCyclic ↥(Subgroup.zpowers x) := Subgroup.isCyclic_zpowers x
@@ -1529,7 +1529,7 @@ theorem hcRealized_map_subtype_eq [Finite G] {M : Subgroup G}
   have hCsub : (cSub data chief).subgroupOf M ≤ huSub data :=
     Subgroup.subgroupOf_mono M ((cSub_le_U data chief).trans le_sup_right)
   rw [hInHu_sup_realizedH0supC, Subgroup.map_sup]
-  show (hInHu data).map (huSub data).subtype ⊔ (cInHu data chief).map (huSub data).subtype
+  change (hInHu data).map (huSub data).subtype ⊔ (cInHu data chief).map (huSub data).subtype
       = (data.H ⊔ cSub data chief).subgroupOf M
   rw [hInHu, cInHu, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
     inf_of_le_left hHsub, inf_of_le_left hCsub, ← Subgroup.subgroupOf_sup (H_le_M data)

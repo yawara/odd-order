@@ -308,7 +308,7 @@ noncomputable def H0Cprime {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
 /-- `H₀C' ≤ H₀C` since `C' = [C, C] ≤ C`. -/
 theorem H0Cprime_le_H0C {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.H0Cprime ≤ hyp.H0C := by
-  show hyp.chief.H0 ⊔ derivedInG hyp.C ≤ hyp.chief.H0 ⊔ hyp.C
+  change hyp.chief.H0 ⊔ derivedInG hyp.C ≤ hyp.chief.H0 ⊔ hyp.C
   exact sup_le_sup_left (Subgroup.map_subtype_le _) hyp.chief.H0
 
 /-- **World-bridge subset `𝒮(H₀C) ⊆ 𝒮(H₀C')`** (kernel antitone, `C' = [C,C] ≤ C`, so
@@ -469,7 +469,7 @@ theorem SOf_H0C_eq_SOf_HC_union_sOf [Finite G] {M : Subgroup G} (hyp : Hypothesi
       · -- `H`-trace ≤ Ker θ : this is `hInHu` (using `s11Setup.H = H`), which is `hH`
         have hhin : OddOrder.Peterfalvi.S11.hInHu hyp.s11Setup
             = (hyp.H.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup) := by
-          show (hyp.s11Setup.typeP.H.subgroupOf M).subgroupOf
+          change (hyp.s11Setup.typeP.H.subgroupOf M).subgroupOf
                 (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
               = (hyp.base.typeP.H.subgroupOf M).subgroupOf
                 (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
@@ -799,25 +799,25 @@ theorem card_HC [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
 /-- Bridge: the §9 setup's `H` is the §13 `H` (via `setup_typeP_eq`). -/
 theorem s11Setup_H_eq {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.s11Setup.H = hyp.H := by
-  show hyp.s11Setup.typeP.H = hyp.base.typeP.H
+  change hyp.s11Setup.typeP.H = hyp.base.typeP.H
   rw [hyp.setup_typeP_eq]
 
 /-- Bridge: the §9 setup's `U` is the §13 `U`. -/
 theorem s11Setup_U_eq {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.s11Setup.U = hyp.U := by
-  show hyp.s11Setup.typeP.U = hyp.base.typeP.U
+  change hyp.s11Setup.typeP.U = hyp.base.typeP.U
   rw [hyp.setup_typeP_eq]
 
 /-- Bridge: the §9 setup's `q` is the §13 `q`. -/
 theorem s11Setup_q_eq {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.s11Setup.q = hyp.q := by
-  show Nat.card ↥hyp.s11Setup.typeP.W1 = Nat.card ↥hyp.base.typeP.W1
+  change Nat.card ↥hyp.s11Setup.typeP.W1 = Nat.card ↥hyp.base.typeP.W1
   rw [hyp.setup_typeP_eq]
 
 /-- Bridge: the §9 setup's `W₂` is the §13 `W₂`-carrier of `p`. -/
 theorem s11Setup_card_W2_eq {M : Subgroup G} (hyp : Hypothesis M) :
     Nat.card ↥hyp.s11Setup.W2 = hyp.p := by
-  show Nat.card ↥hyp.s11Setup.typeP.W2 = Nat.card ↥hyp.base.typeP.W2
+  change Nat.card ↥hyp.s11Setup.typeP.W2 = Nat.card ↥hyp.base.typeP.W2
   rw [hyp.setup_typeP_eq]
 
 /-- `|H₀C| = |H₀| · |C|` (mirror of `card_HC`: `H₀ ⊓ C ≤ H ⊓ U = ⊥`). -/

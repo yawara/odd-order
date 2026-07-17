@@ -1,6 +1,7 @@
 /-
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
 
@@ -80,7 +81,7 @@ theorem card_quotient_frattini_le_card_omega1_of_comm (hR : IsPGroup p R)
     · rw [Omega, Subgroup.closure_le]
       rintro x hx
       rw [SetLike.mem_coe, MonoidHom.mem_ker]
-      show x ^ p = 1
+      change x ^ p = 1
       simpa using hx
   -- `range φ ≤ Φ(R)`: each `xᵖ ∈ Φ(R)`.
   have hrange_le : φ.range ≤ frattini R := by
@@ -1129,7 +1130,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
       have hgK : (g : R') ∈ K := hRp_le_K hgRp
       obtain ⟨k, m, hkm⟩ :=
         exists_zpow_mul_zpow_of_mem_closure_pair_central hz_center (hKeq ▸ hgK)
-      show ((g : R') ^ (p ^ 1)) ∈ Subgroup.zpowers a
+      change ((g : R') ^ (p ^ 1)) ∈ Subgroup.zpowers a
       rw [pow_one, hkm, zpow_mul_zpow_pow_of_central hz_center hzp k m]
       exact zpow_mem (Subgroup.mem_zpowers a) (k * (p : ℤ))
     have hz_in_a : z ∈ Subgroup.zpowers a := hU₀_le_zpa hzU₀

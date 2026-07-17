@@ -282,7 +282,7 @@ theorem exists_induce_constituent_partition [Finite G]
   have hmem_cap : ∀ φ θ : IrreducibleCharacter G, θ ∈ cap φ ↔
       IrreducibleCharacter.LiesOver H θ (lam φ) := by
     intro φ θ
-    show θ ∈ Finset.univ.filter _ ↔ _
+    change θ ∈ Finset.univ.filter _ ↔ _
     rw [Finset.mem_filter]
     simp only [Finset.mem_univ, true_and]
     exact IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)
@@ -517,7 +517,7 @@ theorem apply_one_le_induce_apply_one_of_liesOver
         (η : ClassFunction G ℂ),
       inner_conj_symm (ClassFunction.restrict I (η : ClassFunction G ℂ))
         (ψ : ClassFunction ↥I ℂ)]
-    show star (ClassFunction.restrictionMultiplicity I (η : ClassFunction G ℂ)
+    change star (ClassFunction.restrictionMultiplicity I (η : ClassFunction G ℂ)
         (ψ : ClassFunction ↥I ℂ)) = _
     rw [hk, star_natCast]
   -- Fourier expansion of `Ind ψ` at `1`: degree = `∑_η ⟨Ind ψ, η⟩ · η(1)`.

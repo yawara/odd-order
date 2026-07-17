@@ -1145,7 +1145,7 @@ theorem Hypothesis.muGrid_column_sum_mem_inducedFamily [Finite G]
     simpa using h2
   -- The column sum is `Ind_{M'}^M θ`, so it lies in `S`.
   refine ⟨θ, hθne, ?_⟩
-  show (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
+  change (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
     = ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)
   rw [hind, ← Equiv.sum_comp (finCongr hcardW1.symm)
     (fun i' => ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu i'
@@ -1403,7 +1403,7 @@ theorem Hypothesis.muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_type
   -- the transport `e` carries `v` to itself (same underlying `G`-element).
   have he_coe : ((e ⟨v, tic.V_subset_W hvtic⟩ : ↥(h.W1 ⊔ h.W2)) : ↥M) = ⟨v, hvM⟩ := by
     apply Subtype.ext
-    show ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
+    change ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
         ((Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm
           ⟨v, tic.V_subset_W hvtic⟩) : ↥M) : G) = v
     rw [MulEquiv.subgroupCongr_apply]; rfl
@@ -1511,7 +1511,7 @@ theorem Hypothesis.muGrid_alpha_support [Finite G] (hG : OddOrder.BG.IsMinimalSi
     have hnfC : (n : ℂ) * (hyp.w1 : ℂ) = (d : ℂ) - (δ : ℂ) := by exact_mod_cast hnf
     rw [hnfC]; ring
   have hz1 : z ≠ 1 := fun h0 => hz (h0 ▸ hα1)
-  show (z : G) ∈ typePA0 M hyp.typeP
+  change (z : G) ∈ typePA0 M hyp.typeP
   unfold typePA0
   rw [Set.mem_union]
   by_cases hzM' : (z : G) ∈ derivedInG M

@@ -587,7 +587,7 @@ theorem MHypothesis.rhoNormSq_ge_lower [Finite G] {hyp : Hypothesis (G := G)}
   -- `h78.kernelOrder = |K| = k`.
   have hko : Mdata.h78.kernelOrder = Mdata.k := by
     rw [Mdata.k_eq_card_K]
-    show Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
+    change Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
     rw [Mdata.h78_H_eq]
   -- Rewrite the (7.8.b) carrier into `e`/`k` and conclude.
   have key := Mdata.h78_zetaNuRho_normSq_ge

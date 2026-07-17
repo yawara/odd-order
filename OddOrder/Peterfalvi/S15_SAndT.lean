@@ -233,7 +233,7 @@ theorem typeI_caseC_bound_c2_of_c_eq_one [Finite G]
   have he_eq : (dataL.h78 hG).complementIndex = ((maxNilpotentNormalHall L).subgroupOf L).index := by
     rw [dataL.complementIndex_eq hG]
     congr 1
-    show (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
+    change (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
     rw [dataL.typeIHyp.typeI.typeF.H_eq]
   -- degree hypothesis for the row-constancy citation.
   have hdeg0 : dataL.zeta 0 (1 : ↥L)
@@ -571,7 +571,7 @@ theorem typeI_caseC_bound_c1_of_c_eq_one [Finite G]
   haveI := dataL.kernelIn_normal
   -- index/card bridges to `kernelIn`.
   have he_eq : (dataL.kernelIn).index = ((maxNilpotentNormalHall L).subgroupOf L).index := by
-    show ((dataL.typeIHyp.typeI.typeF.H).subgroupOf L).index = _
+    change ((dataL.typeIHyp.typeI.typeF.H).subgroupOf L).index = _
     rw [dataL.typeIHyp.typeI.typeF.H_eq]
   have hcard_eq : Nat.card ↥dataL.kernelIn = Nat.card ↥dataL.typeIHyp.H :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe dataL.kernel_le).toEquiv

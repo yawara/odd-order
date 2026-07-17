@@ -227,7 +227,7 @@ theorem derivedInG_le_fittingInAmbient_of_not_fittingIsTI [Finite G]
       Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
     have hpβ : p ∈ OddOrder.BG.Ch3.S10.beta M := OddOrder.BG.Ch3.S10.Mbeta_isPiGroup M p hpMβ
     have hpMF : p ∈ S14.piSet (MF M) := by
-      show p ∈ (Nat.card ↥(MF M)).primeFactors
+      change p ∈ (Nat.card ↥(MF M)).primeFactors
       rw [hMFMσ]
       exact Nat.primeFactors_mono (Subgroup.card_dvd_of_le hMβMσ) Nat.card_pos.ne' hpMβ
     exact piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI p hpMF hpβ

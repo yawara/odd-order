@@ -241,7 +241,7 @@ theorem Hypothesis.exists_caseB_data_eta10_T_core [Finite G]
     hypothesis76AlphaFun H76 (hyp.Q.subgroupOf hyp.T) hyp.eta10, α1, δ,
     ?_, ?_, ?_, ?_, ?_, hδ2, ?_⟩
   · intro x hx
-    show ((hyp.p : ℂ))⁻¹ * H76.zeta i₁ x = 0
+    change ((hyp.p : ℂ))⁻¹ * H76.zeta i₁ x = 0
     rw [hvanishZ x hx, mul_zero]
   · have hfull := hypothesis76_zeta_inner_alphaFun_eq_zero H76
       (hyp.Q.subgroupOf hyp.T) hyp.eta10 i₁ hi₁ker
@@ -313,7 +313,7 @@ theorem Hypothesis.exists_caseB_data_eta10_T_core [Finite G]
       rw [hdeg, show ((hyp.p * hyp.v : ℕ) : ℂ) = (hyp.p : ℂ) * (hyp.v : ℂ) from by
         push_cast; ring]
       field_simp
-    show ((((hyp.p : ℂ))⁻¹ * H76.zeta i₁ 1) *
+    change ((((hyp.p : ℂ))⁻¹ * H76.zeta i₁ 1) *
         (starRingEnd ℂ) (hypothesis76AlphaFun H76
           (hyp.Q.subgroupOf hyp.T) hyp.eta10 1)).re = (hyp.v : ℝ) * (α1 : ℝ)
     rw [hζ1v, hα1]

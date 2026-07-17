@@ -410,9 +410,9 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
       obtain ⟨g', hg', hg'eq⟩ := hgX
       have hg'c : (↑g' : G) = a * g * a⁻¹ := hg'eq
       refine ⟨(φ ⟨a, ha⟩⁻¹) g', hX'inv.smul_mem ⟨a, ha⟩⁻¹ hg', ?_⟩
-      show (((φ ⟨a, ha⟩⁻¹) g' : ↥E₂) : G) = g
+      change (((φ ⟨a, ha⟩⁻¹) g' : ↥E₂) : G) = g
       rw [hφ_coe ⟨a, ha⟩⁻¹ g', hg'c]
-      show a⁻¹ * (a * g * a⁻¹) * a⁻¹⁻¹ = g
+      change a⁻¹ * (a * g * a⁻¹) * a⁻¹⁻¹ = g
       group
   -- order bookkeeping: `|E₀| = |E| / p` for `E₀ := E₁ ⊔ (X ⊔ E₃)`.
   have hX_E₃_bot : X ⊓ E₃ = ⊥ := by

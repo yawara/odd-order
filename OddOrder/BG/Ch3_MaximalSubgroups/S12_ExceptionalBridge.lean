@@ -813,7 +813,7 @@ theorem le_of_forall_line_inf_centralizer_le [Finite G] {p : ℕ} [Fact p.Prime]
       obtain ⟨y', hy', rfl⟩ := hy
       have h1 := congrArg W.subtype (hfix y' hy')
       rw [hφ_coe] at h1
-      show (y' : G) * W.subtype g = W.subtype g * (y' : G)
+      change (y' : G) * W.subtype g = W.subtype g * (y' : G)
       calc (y' : G) * W.subtype g
           = ((y' : G) * W.subtype g * (↑y')⁻¹) * ↑y' := by group
         _ = W.subtype g * (y' : G) := by rw [h1]

@@ -669,7 +669,7 @@ theorem exists_conjugatePairCover {Γ : Type*} [Group Γ]
   have hcidx_ne : ∀ i, cidx i ≠ i := by
     intro i hfix
     apply hXreal (he_mem i)
-    show (e i).conj = e i
+    change (e i).conj = e i
     rw [← hcidx i, hfix]
   have hcidx_notS₀ : ∀ {i}, e i ∉ S₀ → e (cidx i) ∉ S₀ := by
     intro i hi hc
@@ -806,7 +806,7 @@ theorem exists_conjugatePairCover_general {Γ : Type*} [Group Γ]
   have hcidx_ne : ∀ i, cidx i ≠ i := by
     intro i hfix
     apply hXreal (he_mem i)
-    show (e i).conj = e i
+    change (e i).conj = e i
     rw [← hcidx i, hfix]
   have hcidx_notS₀ : ∀ {i}, e i ∉ S₀ → e (cidx i) ∉ S₀ := by
     intro i hi hc

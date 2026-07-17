@@ -198,10 +198,10 @@ theorem hcHom_inclusion [Finite G] {M : Subgroup G}
       QuotientGroup.quotientKerEquivOfSurjective,
       QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk]
     rfl
-  show (hcQuotientEquivHbar chief)
+  change (hcQuotientEquivHbar chief)
       (QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left h)) = _
   rw [← hfwd]
-  show ((QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
+  change ((QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
         (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).symm.trans
       (QuotientGroup.congr ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
         (hInHu data)) chief.N (hInHuEquivH data) _))
@@ -689,7 +689,7 @@ theorem hcZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
     linearIrreducibleCharacter_apply] at hψker
   have hqeq : (QuotientGroup.mk' chief.N) ((hInHuEquivH data) h) = q := hhq
   rw [hqeq] at hψker
-  show θ q = (1 : ℂˣ)
+  change θ q = (1 : ℂˣ)
   refine Units.ext ?_
   rw [Units.val_one]
   exact hψker

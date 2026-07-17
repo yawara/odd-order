@@ -1295,7 +1295,7 @@ theorem alphaB_apply_mul (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
       = ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
     apply Subtype.ext
     exact hyp.dadeQuotientHom_coe_of_mem_nLStabilizerIn hconj hB ⟨b, hbM⟩ hb
-  show α (hyp.dadeQuotientHom hconj hB ⟨h * b, hmem⟩) = _
+  change α (hyp.dadeQuotientHom hconj hB ⟨h * b, hmem⟩) = _
   rw [hsplit, map_mul, hfh, one_mul, hval]
 
 /- 2.10.1: `L`-conjugacy invariance of `Ind_{M(B)}^G α_B` (Dade-specific form). -/

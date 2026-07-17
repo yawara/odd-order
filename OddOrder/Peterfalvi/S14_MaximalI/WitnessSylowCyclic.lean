@@ -915,7 +915,7 @@ theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
       have htower := Subgroup.relIndex_mul_relIndex (maxNilpotentNormalHall L) (derivedInG L) L
         hLFle hL'le
       rw [d.card_U_eq_index]
-      show (maxNilpotentNormalHall L).relIndex (derivedInG L)
+      change (maxNilpotentNormalHall L).relIndex (derivedInG L)
         ∣ (maxNilpotentNormalHall L).relIndex L
       exact ⟨(derivedInG L).relIndex L, htower.symm⟩
     have hcopHU : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥d.U) := by
@@ -1459,7 +1459,7 @@ theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       exact hg_mem
     · rintro rfl
       intro a
-      show ψ a 1 = 1
+      change ψ a 1 = 1
       exact map_one (ψ a)
   -- Orbit counting: `|K/K'| ≡ 1 (mod p)`.
   haveI : Fintype (↥ctr.K ⧸ commutator ↥ctr.K) := Fintype.ofFinite _

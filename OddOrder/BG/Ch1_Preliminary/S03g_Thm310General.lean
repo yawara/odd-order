@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.Isaacs.Ch02_Subnormality.Main
@@ -219,7 +224,7 @@ theorem fpf_lift_of_centralizer_bot [Finite G] {K₀ K : Subgroup G} [K₀.Norma
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a y hy
     rw [Subgroup.mem_subgroupOf] at hy ⊢
-    show (a : G) * (y : G) * (a : G)⁻¹ ∈ K₀
+    change (a : G) * (y : G) * (a : G)⁻¹ ∈ K₀
     exact (Subgroup.mem_normalizer_iff.mp (hzK₀ a.2) (y : G)).mp hy
   -- The conjugation-action fixed points are `⊥` (the Frobenius FPF condition `C_K(r) = 1`).
   have hfpbot : Subgroup.fixedPointsOfMulAut φ = ⊥ := by
@@ -245,7 +250,7 @@ theorem fpf_lift_of_centralizer_bot [Finite G] {K₀ K : Subgroup G} [K₀.Norma
       QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩ := by
     rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
       QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-    show (r * k * r⁻¹)⁻¹ * k ∈ K₀
+    change (r * k * r⁻¹)⁻¹ * k ∈ K₀
     have heqk : (r * k * r⁻¹)⁻¹ * k = k⁻¹ * (r * k * r⁻¹ * k⁻¹)⁻¹ * (k⁻¹)⁻¹ := by group
     have hkN : k ∈ Subgroup.normalizer (K₀ : Set G) := hKK₀ hkK
     rw [heqk]
@@ -403,7 +408,7 @@ private theorem frobenius_general_aux [IsAlgClosed F] [FiniteDimensional F V] [N
           intro hbot
           have hmem : (⟨k₀, hK₀leK hk₀K₀⟩ : ↥K) ∈ φ.ker := by
             rw [MonoidHom.mem_ker, hφ, MonoidHom.comp_apply]
-            show (QuotientGroup.mk' K₀) k₀ = 1
+            change (QuotientGroup.mk' K₀) k₀ = 1
             rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact hk₀K₀
           rw [hbot, Subgroup.mem_bot] at hmem
           exact hk₀1 (Subtype.ext_iff.mp hmem)

@@ -54,6 +54,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -420,6 +421,17 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.commutator_eq_bot_of_isMinimalNormal_of_isComponent
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.IsComponent.commutator_eq_bot_of_ne
+
+-- Ch.9 (More on Subnormality): Lem 9.5 — a product of nonabelian simple normal subgroups
+-- is direct (Pi-equiv) and the family is exactly the set of minimal normal subgroups;
+-- payload: semisimple groups are centerless with nonabelian simple minimal normals and
+-- no nontrivial solvable normal subgroups.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.piEquivOfSemisimpleFamily
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.mem_semisimpleFamily_of_isMinimalNormal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.IsSemisimpleGroup.isSimpleGroup_of_isMinimalNormal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.

@@ -1048,7 +1048,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
             extension_inner_eq := hinner
             extends_on_supported := hextends
             extension_mem_ZIrr := hZIrr }, ?_⟩
-  show ν₀ (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
+  change ν₀ (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
     = ∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j
   rw [← hχi₁, hν₀apply i₁, hrfi₁]
 

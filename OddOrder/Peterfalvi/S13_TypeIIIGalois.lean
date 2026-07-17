@@ -434,7 +434,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_ortho
         tic.sigmaCoeff hVeq app ψ (ρ i', κ j')
           = ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd i' j') := by
       intro i' j'
-      show ClassFunction.inner ψ (tic.chiFam hVeq app (ρ i', κ j')) = _
+      change ClassFunction.inner ψ (tic.chiFam hVeq app (ρ i', κ j')) = _
       rw [← hprod i' j']
     have h := tic.sigmaCoeff_add_eq hVeq app hpsiV (ρ i) (ρ 0) (κ j) (κ 0)
     rw [hcoeff i j, hcoeff 0 0, hcoeff i 0, hcoeff 0 j, hn i j, hn 0 0, hn i 0, hn 0 j] at h

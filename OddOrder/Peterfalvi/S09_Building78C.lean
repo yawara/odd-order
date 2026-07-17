@@ -202,7 +202,7 @@ theorem supportedProj_mem_supported (A : Set L) (hA : ∀ g h : L, h * g * h⁻�
   intro x hx
   by_contra hxA
   apply hx
-  show supportedProj A hA η x = 0
+  change supportedProj A hA η x = 0
   simp only [supportedProj_apply, if_neg hxA]
 
 /-- **The supported projection preserves inner products against `CF(L,A)`.**  For `ψ` supported on
@@ -644,7 +644,7 @@ noncomputable def distinctInducedFamily (K : Subgroup L) [K.Normal] [Fintype ↥
         have hmem : ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈ V :=
           Finset.mem_image_of_mem _ (Finset.mem_univ φ)
         refine ⟨e ⟨_, hmem⟩, ?_⟩
-        show ClassFunction.induce K (θ (e ⟨_, hmem⟩) : ClassFunction ↥K ℂ) = _
+        change ClassFunction.induce K (θ (e ⟨_, hmem⟩) : ClassFunction ↥K ℂ) = _
         rw [hθ (e ⟨_, hmem⟩)]
         exact congrArg Subtype.val (Equiv.symm_apply_apply e ⟨_, hmem⟩) }
 

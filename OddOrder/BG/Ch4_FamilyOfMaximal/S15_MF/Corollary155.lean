@@ -863,7 +863,7 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
     refine hfrob.conj_frobenius ⟨a, haDK⟩ (Subgroup.mem_subgroupOf.mpr haK)
       (fun h => ha1 (congrArg Subtype.val h)) ⟨n, hnDK⟩ (Subgroup.mem_subgroupOf.mpr hnD)
       (fun h => hn1 (congrArg Subtype.val h)) (Subtype.ext ?_)
-    show (a : G) * (n : G) * (a : G)⁻¹ = (n : G)
+    change (a : G) * (n : G) * (a : G)⁻¹ = (n : G)
     exact heq
   have cC6 : q ∈ OddOrder.BG.Ch3.S10.beta M :=
     mem_beta_of_inputs hQ0notC (D_centralizes_Q_of_not_mem_beta hG hM hq_odd hQpg hQne hqπ P hQP

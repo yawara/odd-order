@@ -207,7 +207,7 @@ theorem h78_complementIndex_eq_e [Finite G] {hyp : Hypothesis (G := G)}
     Mdata.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le Mdata.M
   have hko : Mdata.h78.kernelOrder = Mdata.k := by
     rw [Mdata.k_eq_card_K]
-    show Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
+    change Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
     rw [Mdata.h78_H_eq]
   have hmul := Mdata.h78.kernelOrder_mul_complementIndex_eq_card_L
   rw [hko, Mdata.k_eq_card_K] at hmul
@@ -565,7 +565,7 @@ theorem isFrobeniusGroup_conj_ne_of_mem_map_complement
   intro hcontra
   apply hconj
   apply Subtype.coe_injective
-  show ((a' * ⟨u, hmemL⟩ * a'⁻¹ : ↥L) : G) = ((⟨u, hmemL⟩ : ↥L) : G)
+  change ((a' * ⟨u, hmemL⟩ * a'⁻¹ : ↥L) : G) = ((⟨u, hmemL⟩ : ↥L) : G)
   rw [MulMemClass.coe_mul, MulMemClass.coe_mul, InvMemClass.coe_inv,
     show ((a' : G)) = a from ha'_eq]
   exact hcontra
@@ -1394,7 +1394,7 @@ theorem finNeg_involutive {n : ℕ} (hn : 0 < n) : Function.Involutive (finNeg h
 theorem finNeg_eq_self_iff {n : ℕ} (hn : 0 < n) (hodd : Odd n) (i : Fin n) :
     finNeg hn i = i ↔ i = ⟨0, hn⟩ := by
   rw [Fin.ext_iff, Fin.ext_iff, finNeg_val]
-  show (n - i.val) % n = i.val ↔ i.val = 0
+  change (n - i.val) % n = i.val ↔ i.val = 0
   constructor
   · intro h
     rcases Nat.eq_zero_or_pos i.val with h0 | hpos
@@ -1425,7 +1425,7 @@ theorem one_le_norm_eta_grid_signed_sum {q p : ℕ} (hq : 0 < q) (hp : 0 < p)
   have hinv : Function.Involutive
       (fun x : Fin q × Fin p => (finNeg hq x.1, finNeg hp x.2)) := by
     intro x
-    show (finNeg hq (finNeg hq x.1), finNeg hp (finNeg hp x.2)) = x
+    change (finNeg hq (finNeg hq x.1), finNeg hp (finNeg hp x.2)) = x
     rw [finNeg_involutive hq x.1, finNeg_involutive hp x.2]
   have key := one_le_norm_signed_paired_sum
     (fun x : Fin q × Fin p => n x.1 x.2) (fun x => ε x.1 x.2)

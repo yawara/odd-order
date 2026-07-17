@@ -241,7 +241,7 @@ theorem commutator_subgroupOf_self {G : Type*} [Group G] (H : Subgroup G) :
   have htop : (⊤ : Subgroup ↥H).map H.subtype = H := by
     rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
   have h1 : (_root_.commutator ↥H).map H.subtype = ⁅H, H⁆ := by
-    show (⁅(⊤ : Subgroup ↥H), (⊤ : Subgroup ↥H)⁆).map H.subtype = ⁅H, H⁆
+    change (⁅(⊤ : Subgroup ↥H), (⊤ : Subgroup ↥H)⁆).map H.subtype = ⁅H, H⁆
     rw [Subgroup.map_commutator, htop]
   rw [← h1]
   exact Subgroup.comap_map_eq_self_of_injective H.subtype_injective _

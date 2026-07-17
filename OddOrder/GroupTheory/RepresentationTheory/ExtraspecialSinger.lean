@@ -215,7 +215,7 @@ noncomputable def commPairing : V[P] →+ V[P] →+ ZMod p :=
           map_mul, toAdd_mul]))
     (fun v v' => by
       refine AddMonoidHom.ext fun w => ?_
-      show Multiplicative.toAdd (commBihom2 hP (Additive.toMul (v + v')) (Additive.toMul w)) =
+      change Multiplicative.toAdd (commBihom2 hP (Additive.toMul (v + v')) (Additive.toMul w)) =
         Multiplicative.toAdd (commBihom2 hP (Additive.toMul v) (Additive.toMul w)) +
         Multiplicative.toAdd (commBihom2 hP (Additive.toMul v') (Additive.toMul w))
       rw [show Additive.toMul (v + v') = Additive.toMul v * Additive.toMul v' from rfl,
@@ -381,7 +381,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
           exact h3
         rw [QuotientGroup.eq] at h2
         refine ⟨x⁻¹ * (φ (k ^ j)) x, by simpa [mul_inv_rev] using (commutator P).inv_mem h2, ?_⟩
-        show φ (k ^ j) x = x * (x⁻¹ * (φ (k ^ j)) x)
+        change φ (k ^ j) x = x * (x⁻¹ * (φ (k ^ j)) x)
         group
       obtain ⟨c, hc, n, hn, hcn⟩ :=
         OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient hcop
@@ -392,7 +392,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
       have hxc : x = c * n⁻¹ := by rw [hcn]; group
       rw [hxc]
       exact (commutator P).mul_mem hcZ ((commutator P).inv_mem hn)
-    show Additive.ofMul (QuotientGroup.mk x) = 0
+    change Additive.ofMul (QuotientGroup.mk x) = 0
     rw [show (QuotientGroup.mk x : P ⧸ commutator P) = 1 from
       (QuotientGroup.eq_one_iff x).mpr hxZ]
     rfl
@@ -494,7 +494,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
     Module.compHom (Additive (P ⧸ commutator P)) (ρ.asAlgebraHom).toRingHom
   have hsmul : ∀ (k : K) (x : Additive (P ⧸ commutator P)),
       MonoidAlgebra.of (ZMod p) K k • x = ρ k x := fun k x => by
-    show (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) K k)) x = ρ k x
+    change (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) K k)) x = ρ k x
     rw [Representation.asAlgebraHom_of]
   haveI : IsSimpleModule (MonoidAlgebra (ZMod p) K) (Additive (P ⧸ commutator P)) :=
     (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
@@ -529,7 +529,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
         (eL.symm : Kf →ₗ[ZMod p] Additive (P ⧸ commutator P))) =
         Algebra.lmul (ZMod p) Kf ↑(μ k) := by
       ext y
-      show eL (ρ k (eL.symm y)) = ↑(μ k) * y
+      change eL (ρ k (eL.symm y)) = ↑(μ k) * y
       rw [heL, ← hsmul k (eL.symm y), hcompat]
       congr 1
       rw [← heL, eL.apply_symm_apply]

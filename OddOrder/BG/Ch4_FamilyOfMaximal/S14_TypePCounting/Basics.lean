@@ -211,7 +211,7 @@ theorem Msigma_inf_centralizer_conj_ne_bot {M P : Subgroup G} {m : G} (hmM : m �
     rw [SetLike.mem_coe, Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hy
     have hyval : (MulAut.conj m)⁻¹ • y = m⁻¹ * y * m := by
       rw [inv_smul_eq_iff]
-      show y = MulAut.conj m (m⁻¹ * y * m)
+      change y = MulAut.conj m (m⁻¹ * y * m)
       rw [MulAut.conj_apply]; group
     rw [hyval] at hy
     have hcomm : (m⁻¹ * y * m) * x = x * (m⁻¹ * y * m) :=

@@ -61,7 +61,7 @@ theorem Hypothesis.muColumn_tau1_inner_self [Finite G] {M : Subgroup G}
   have hμkS := hyp.muGrid_column_sum_mem_inducedFamily hG hodd k hdk1
   have hspan : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
       ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hμkS
-  show ClassFunction.inner (coh.coherent.extension (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k))
+  change ClassFunction.inner (coh.coherent.extension (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k))
       (coh.coherent.extension (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)) = (hyp.w1 : ℂ)
   rw [coh.coherent.extension_inner_eq _ _ hspan hspan]
   exact hyp.muGrid_column_sum_inner_self hG hodd k
@@ -158,7 +158,7 @@ theorem Hypothesis.zeta_tau1_inner_self [Finite G] {M : Subgroup G}
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) :
     ClassFunction.inner (coh.tau1 ζ) (coh.tau1 ζ) = 1 := by
   have hspan : ζ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζS
-  show ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ) = 1
+  change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ) = 1
   rw [coh.coherent.extension_inner_eq _ _ hspan hspan,
     OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
 
@@ -180,7 +180,7 @@ theorem Hypothesis.zeta_tau1_inner_conj [Finite G] {M : Subgroup G}
   have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
   have hspan : ζ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζS
   have hspanc : ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζcS
-  show ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
+  change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
   rw [coh.coherent.extension_inner_eq _ _ hspan hspanc,
     OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj, if_neg (Ne.symm hζne)]
 
@@ -203,7 +203,7 @@ theorem Hypothesis.zeta_tau1_inner_muColumn [Finite G] {M : Subgroup G}
   have hspanζ : ζ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζS
   have hspanμ : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
       ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hμkS
-  show ClassFunction.inner (coh.coherent.extension ζ)
+  change ClassFunction.inner (coh.coherent.extension ζ)
     (coh.coherent.extension (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)) = 0
   rw [coh.coherent.extension_inner_eq _ _ hspanζ hspanμ,
     OddOrder.RepresentationTheory.inner_sum_right]

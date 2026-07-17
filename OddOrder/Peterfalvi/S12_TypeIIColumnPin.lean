@@ -851,12 +851,12 @@ theorem typeII_nu_tau2_dichotomy [Finite G]
   have hsstar : ∀ b : Bool, star (cond b (-δ) δ) = cond b (-δ) δ := by
     intro b; cases b
     · exact hδstar
-    · show star (-δ) = -δ
+    · change star (-δ) = -δ
       rw [star_neg, hδstar]
   have hssq : ∀ b : Bool, (cond b (-δ) δ) * (cond b (-δ) δ) = 1 := by
     intro b; cases b
     · exact hδsq
-    · show (-δ) * (-δ) = 1
+    · change (-δ) * (-δ) = 1
       rw [neg_mul_neg]; exact hδsq
   have hχinv : χ₂⁻¹ ≠ χ₂ := OddOrder.Peterfalvi.S06.column_inv_ne_self
     (typeIIHypothesis46 hG hSmax hSII data.typeP) hne1
@@ -905,11 +905,11 @@ theorem typeII_nu_tau2_dichotomy [Finite G]
             (typeIIHypothesis46 hG hSmax hSII data.typeP) (cond x.1 χ₂⁻¹ χ₂) x.2)) := by
     rintro ⟨b, i⟩
     cases b
-    · show OddOrder.Peterfalvi.S06.certainTypeRImage _ χ₂ χ₂⁻¹ (false, i) = δ • _
+    · change OddOrder.Peterfalvi.S06.certainTypeRImage _ χ₂ χ₂⁻¹ (false, i) = δ • _
       simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
       rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam, hδdef]
       rfl
-    · show OddOrder.Peterfalvi.S06.certainTypeRImage _ χ₂ χ₂⁻¹ (true, i) = (-δ) • _
+    · change OddOrder.Peterfalvi.S06.certainTypeRImage _ χ₂ χ₂⁻¹ (true, i) = (-δ) • _
       simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
       rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam, hδdef]
       rfl
@@ -1084,7 +1084,7 @@ theorem typeII_nu_tau2_dichotomy [Finite G]
         (fun h => absurd hx₁T h), if_pos hx₁P]
       rcases x₁ with ⟨b, i⟩
       cases b
-      · show δ * 1 = δ
+      · change δ * 1 = δ
         rw [mul_one]
       · exact absurd hx₁b (by simp)
     · left
@@ -1130,7 +1130,7 @@ theorem typeII_nu_tau2_dichotomy [Finite G]
       rcases x₁ with ⟨b, i⟩
       cases b
       · exact absurd hx₁b (by simp)
-      · show (-δ) * 1 = -δ
+      · change (-δ) * 1 = -δ
         rw [mul_one]
     · left
       refine Finset.sum_eq_zero fun y hyT => ?_

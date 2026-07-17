@@ -1094,7 +1094,7 @@ theorem normalizer_fittingInG_le_self [Finite G]
     have hFne : fittingInAmbient M ≠ ⊥ := by
       have hFMne : OddOrder.Isaacs.Ch01.fitting ↥M ≠ ⊥ :=
         OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial ↥M
-      show OddOrder.BG.Ch2.S08.fittingInG M ≠ ⊥
+      change OddOrder.BG.Ch2.S08.fittingInG M ≠ ⊥
       rw [OddOrder.BG.Ch2.S08.fittingInG]
       exact fun h => hFMne ((Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp h)
     -- `F(M) ⊴ G`, `F(M) ≠ ⊥`, `G` simple ⟹ `F(M) = ⊤` ⟹ `G` nilpotent ⟹ solvable, contradiction.
@@ -1102,7 +1102,7 @@ theorem normalizer_fittingInG_le_self [Finite G]
     · exact hFne hbot
     · -- `F(M) = ⊤`: `G ≃ ↥F(M)` is nilpotent, hence solvable.
       haveI : Group.IsNilpotent ↥(fittingInAmbient M) := by
-        show Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG M)
+        change Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG M)
         exact OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
       haveI : Group.IsNilpotent (↥(⊤ : Subgroup G)) := htop ▸ this
       haveI : Group.IsNilpotent G := Group.nilpotent_of_mulEquiv Subgroup.topEquiv

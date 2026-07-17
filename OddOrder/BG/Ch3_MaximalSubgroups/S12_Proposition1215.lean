@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
@@ -110,7 +115,7 @@ private theorem map_subtype_conj_smul {M : Subgroup G} (c : ↥M) (K : Subgroup 
     ext x
     simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
       Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
-  show (K.map (MulAut.conj c).toMonoidHom).map M.subtype
+  change (K.map (MulAut.conj c).toMonoidHom).map M.subtype
       = (K.map M.subtype).map (MulAut.conj (c : G)).toMonoidHom
   rw [Subgroup.map_map, Subgroup.map_map, hcomp]
 

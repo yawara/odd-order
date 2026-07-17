@@ -97,7 +97,7 @@ theorem exists_transfer_eq_conj_of_index_eq_one {H : Subgroup G} [H.FiniteIndex]
       (((1 : G) : G ⧸ H)))]
   refine ⟨(Quotient.mk (MulAction.orbitRel (Subgroup.zpowers g) (G ⧸ H))
       (((1 : G) : G ⧸ H))).out.out, congrArg ϕ (Subtype.ext ?_)⟩
-  show _ * g ^ Function.minimalPeriod _ _ * _ = _
+  change _ * g ^ Function.minimalPeriod _ _ * _ = _
   rw [Function.minimalPeriod_eq_one_of_subsingleton, pow_one]
 
 variable (hHK : H ≤ K)
@@ -167,12 +167,12 @@ lemma smul_range_section (g : G) (f : G ⧸ K → G)
   constructor
   · rintro ⟨-, ⟨Q, rfl⟩, rfl⟩
     refine ⟨g • Q, ?_⟩
-    show smulSection g f (g • Q) = g • f Q
+    change smulSection g f (g • Q) = g • f Q
     rw [smulSection, inv_smul_smul]
     rfl
   · rintro ⟨Q, rfl⟩
     refine ⟨f (g⁻¹ • Q), ⟨g⁻¹ • Q, rfl⟩, ?_⟩
-    show g • f (g⁻¹ • Q) = smulSection g f Q
+    change g • f (g⁻¹ • Q) = smulSection g f Q
     rfl
 
 variable [H.FiniteIndex] [K.FiniteIndex] [(H.subgroupOf K).FiniteIndex]
@@ -210,7 +210,7 @@ private lemma diff_compSection (ϕ : ↥H →* A)
     unfold Subgroup.leftTransversals.diff
     refine Finset.prod_congr rfl fun q _ => ?_
     refine congrArg ϕ (Subtype.ext ?_)
-    show _ * _ = _
+    change _ * _ = _
     rw [IsComplement.leftQuotientEquiv_apply (compSection_spec hHK f hf s hs),
       IsComplement.leftQuotientEquiv_apply (compSection_spec hHK f' hf' s hs)]
   have hdiff2 : diff (MonoidHom.transfer (transferRes hHK ϕ))
@@ -222,7 +222,7 @@ private lemma diff_compSection (ϕ : ↥H →* A)
     unfold Subgroup.leftTransversals.diff
     refine Finset.prod_congr rfl fun Q _ => ?_
     refine congrArg (MonoidHom.transfer (transferRes hHK ϕ)) (Subtype.ext ?_)
-    show _ * _ = _
+    change _ * _ = _
     rw [IsComplement.leftQuotientEquiv_apply hf, IsComplement.leftQuotientEquiv_apply hf']
   rw [hdiff1, hdiff2]
   -- reindex the H-product along the fibration e
@@ -245,7 +245,7 @@ private lemma diff_compSection (ϕ : ↥H →* A)
     unfold Subgroup.leftTransversals.diff
     refine Finset.prod_congr rfl fun r _ => ?_
     refine congrArg (transferRes hHK ϕ) (Subtype.ext ?_)
-    show _ * _ = _
+    change _ * _ = _
     rw [IsComplement.leftQuotientEquiv_apply hs]
     rw [smul_apply_eq_smul_apply_inv_smul, IsComplement.leftQuotientEquiv_apply hs]
     rfl
@@ -287,7 +287,7 @@ private lemma diff_compSection (ϕ : ↥H →* A)
       rw [he']
     -- both factors are ϕ of the same element of H
     refine congrArg ϕ (Subtype.ext ?_)
-    show (γ (e.symm (Q, ((b : ↥K) : ↥K ⧸ H.subgroupOf K))))⁻¹
+    change (γ (e.symm (Q, ((b : ↥K) : ↥K ⧸ H.subgroupOf K))))⁻¹
         * γ' (e.symm (Q, ((b : ↥K) : ↥K ⧸ H.subgroupOf K)))
       = (((s (((b : ↥K) : ↥K ⧸ H.subgroupOf K)))⁻¹
           * (k * s (k⁻¹ • (((b : ↥K) : ↥K ⧸ H.subgroupOf K)))) : ↥K) : G)
@@ -327,10 +327,10 @@ lemma smul_range_compSection (g : G) (f : G ⧸ K → G)
       have hsnd : (Subgroup.quotientEquivProdOfLE' hHK (smulSection g f)
           (smulSection_spec g f hf) ((g * x : G) : G ⧸ H)).2
           = (Subgroup.quotientEquivProdOfLE' hHK f hf ((x : G) : G ⧸ H)).2 := by
-        show Quotient.mk'' _ = Quotient.mk'' _
+        change Quotient.mk'' _ = Quotient.mk'' _
         apply congrArg
         refine Subtype.ext ?_
-        show (smulSection g f ((g * x : G) : G ⧸ K))⁻¹ * (g * x)
+        change (smulSection g f ((g * x : G) : G ⧸ K))⁻¹ * (g * x)
           = (f ((x : G) : G ⧸ K))⁻¹ * x
         rw [smulSection]
         have h2 : g⁻¹ • ((g * x : G) : G ⧸ K) = ((x : G) : G ⧸ K) := by

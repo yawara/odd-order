@@ -229,7 +229,7 @@ private theorem mem_setNormalizer_of_conj_smul_eq {Q : Subgroup G} {n : G}
     (h : MulAut.conj n • Q = Q) : n ∈ Subgroup.normalizer (Q : Set G) := by
   rw [Subgroup.mem_set_normalizer_iff]
   intro z
-  show z ∈ Q ↔ n * z * n⁻¹ ∈ Q
+  change z ∈ Q ↔ n * z * n⁻¹ ∈ Q
   constructor
   · intro hz
     have hmem : n * z * n⁻¹ ∈ MulAut.conj n • Q :=
@@ -675,7 +675,7 @@ theorem exists_sylow_complement_normalizer [Finite G] {p : ℕ} [Fact p.Prime]
   refine ⟨K.map N.subtype, Subgroup.map_subtype_le _, ?_, ?_⟩
   · have hPVN : (P : Subgroup G) ⊓ K.map N.subtype ≤ N := inf_le_left.trans hPN
     have hsubinf : ((P : Subgroup G) ⊓ K.map N.subtype).subgroupOf N = ⊥ := by
-      show ((P : Subgroup G) ⊓ K.map N.subtype).comap N.subtype = ⊥
+      change ((P : Subgroup G) ⊓ K.map N.subtype).comap N.subtype = ⊥
       rw [Subgroup.comap_inf, Subgroup.comap_map_eq_self_of_injective N.subtype_injective]
       exact disjoint_iff.mp hK.isCompl.disjoint
     rw [← Subgroup.map_subgroupOf_eq_of_le hPVN, hsubinf, Subgroup.map_bot]

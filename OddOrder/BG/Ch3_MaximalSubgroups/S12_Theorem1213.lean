@@ -142,7 +142,7 @@ theorem exists_conj_eq_center_mul_of_expPExtraspecial {Q : Type*} [Group Q] [Fin
   let φ : Q →* Subgroup.center Q := MonoidHom.mk'
     (fun q => ⟨⁅q, a₀⁆, hmemZ q⟩) (fun x y => by
       apply Subtype.ext
-      show ⁅x * y, a₀⁆ = ⁅x, a₀⁆ * ⁅y, a₀⁆
+      change ⁅x * y, a₀⁆ = ⁅x, a₀⁆ * ⁅y, a₀⁆
       have hc := hcentral ⁅y, a₀⁆ (hmemZ y)
       have e1 : ⁅x * y, a₀⁆ = x * ⁅y, a₀⁆ * x⁻¹ * ⁅x, a₀⁆ := by
         simp only [commutatorElement_def]; group

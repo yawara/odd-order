@@ -174,7 +174,7 @@ theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
         rw [hR, Subgroup.mem_comap]; rw [← hz] at hw; exact hw
       refine ⟨⟨z, hzmem⟩, Subtype.ext ?_⟩
       rw [hg]
-      show (QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype ⟨z, hzmem⟩) : ↥Mσ ⧸ Q.subgroupOf Mσ) = w
+      change (QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype ⟨z, hzmem⟩) : ↥Mσ ⧸ Q.subgroupOf Mσ) = w
       rw [QuotientGroup.mk'_apply]; exact hz
     have hgval : ∀ r : ↥R, (g r : ↥Mσ ⧸ Q.subgroupOf Mσ)
         = QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype r) := fun r => rfl
@@ -381,7 +381,7 @@ theorem exists_kInvariant_qComplement [Finite G]
         rw [Subgroup.pointwise_smul_def]; exact Subgroup.mem_map.mpr ⟨w, hwDM, rfl⟩
       rwa [hDM_inv ⟨k, hk⟩] at hmem
     refine ⟨φ ⟨k, hk⟩ w, hφwDM, ?_⟩
-    show ((φ ⟨k, hk⟩ w : ↥Mσ) : G) = k * (Mσ.subtype w) * k⁻¹
+    change ((φ ⟨k, hk⟩ w : ↥Mσ) : G) = k * (Mσ.subtype w) * k⁻¹
     rfl
   -- `D` nilpotent (`complement_isNilpotent_of_inputs`, prime-order `K₁ ≤ K`).
   -- (assembled below via a prime-order `K₁ ≤ K` and the prime-manner action).
@@ -693,7 +693,7 @@ theorem card_invariants_eq_card_of_fixedPoints {q : ℕ} {H : Type*} [Group H]
   refine Equiv.subtypeEquiv Additive.toMul (fun v => ?_)
   rw [Representation.mem_invariants, ← hchar (Additive.toMul v)]
   refine forall_congr' (fun r => ?_)
-  show ((r : H) • v = v) ↔ ((r : H) • Additive.toMul v = Additive.toMul v)
+  change ((r : H) • v = v) ↔ ((r : H) • Additive.toMul v = Additive.toMul v)
   constructor
   · intro h
     have := congrArg Additive.toMul h
@@ -756,7 +756,7 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a y hy
     rw [Subgroup.mem_subgroupOf] at hy ⊢
-    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
+    change (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
     exact (Subgroup.mem_normalizer_iff.mp (hHQ0 a.2) (y : G)).mp hy
   haveI : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
   letI act : MulDistribMulAction ↥H (↥Q ⧸ Q0.subgroupOf Q) :=
@@ -770,11 +770,11 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
       ((a • (QuotientGroup.mk x : ↥Q ⧸ Q0.subgroupOf Q)) = QuotientGroup.mk x)
         ↔ ⁅(a : G), (x : G)⁆ ∈ Q0 := by
     intro a x
-    show (quotientMulAutHom hMinv a (QuotientGroup.mk' (Q0.subgroupOf Q) x)
+    change (quotientMulAutHom hMinv a (QuotientGroup.mk' (Q0.subgroupOf Q) x)
         = QuotientGroup.mk' (Q0.subgroupOf Q) x) ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
     rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
       QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-    show ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
+    change ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
     have hxN : (x : G) ∈ Subgroup.normalizer (Q0 : Set G) := hQQ0 x.2
     have heq : ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G)
         = (x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ := by
@@ -872,7 +872,7 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
       refine ⟨⟨(x : G), hxC⟩, ?_⟩
       rw [hg, MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.eq,
         Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-      show ((x : G))⁻¹ * (x : G) ∈ Q0
+      change ((x : G))⁻¹ * (x : G) ∈ Q0
       rw [inv_mul_cancel]; exact Q0.one_mem
   -- the `K`-fixed classes of `Q̄` are exactly `g.range` (the image of `C`), via `hsmul_iff`+`hCfix`.
   have hchar : ∀ w : ↥Q ⧸ Q0.subgroupOf Q,
@@ -955,7 +955,7 @@ theorem centralizes_quotient_iff_mem_kstar_sup [Finite G]
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a y hy
     rw [Subgroup.mem_subgroupOf] at hy ⊢
-    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
+    change (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
     exact (Subgroup.mem_normalizer_iff.mp (hKQ0 a.2) (y : G)).mp hy
   have hsmul_iff : ∀ (a : ↥K) (x : ↥Q),
       ((quotientMulAutHom hMinv a (QuotientGroup.mk' (Q0.subgroupOf Q) x)
@@ -963,7 +963,7 @@ theorem centralizes_quotient_iff_mem_kstar_sup [Finite G]
     intro a x
     rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
       QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-    show ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
+    change ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
     have hxN : (x : G) ∈ Subgroup.normalizer (Q0 : Set G) := hQQ0 x.2
     have heq : ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G)
         = (x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ := by

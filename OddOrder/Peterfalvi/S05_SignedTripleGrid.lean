@@ -239,13 +239,13 @@ theorem orthonormal_option_trivial [Invertible (Nat.card G : ℂ)] {τ : Type*}
     | none => rw [if_pos rfl]; exact inner_trivialClassFunction_self G
     | some b =>
       rw [if_neg (by simp)]
-      show ClassFunction.inner (trivialClassFunction G) (X b) = 0
+      change ClassFunction.inner (trivialClassFunction G) (X b) = 0
       rw [OddOrder.RepresentationTheory.inner_conj_symm, (hsig b).inner_trivial, star_zero]
   | some a =>
     cases b with
     | none => rw [if_neg (by simp)]; exact (hsig a).inner_trivial
     | some b =>
-      show ClassFunction.inner (X a) (X b) = _
+      change ClassFunction.inner (X a) (X b) = _
       rw [hortho a b]
       by_cases h : a = b
       · rw [if_pos h, if_pos (congrArg some h)]
@@ -1783,7 +1783,7 @@ theorem two_col_orthonormal_family_reindexed [Fintype ι] [Fintype κ] (hG : IsS
         = gridFamily (fun b => z (e b)) m ψ (E a) := by
       rintro (i | j | ⟨i, j⟩)
       · rfl
-      · show z j = z (e (e.symm j)); rw [Equiv.apply_symm_apply]
+      · change z j = z (e (e.symm j)); rw [Equiv.apply_symm_apply]
       · rfl
     intro a b
     rw [hgfeq a, hgfeq b]

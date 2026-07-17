@@ -514,7 +514,7 @@ theorem actionCommutator_one_eq_bot {A G : Type*} [Group A] [Group G] :
     actionCommutator (1 : A →* MulAut G) = ⊥ := by
   rw [actionCommutator, Subgroup.closure_eq_bot_iff]
   rintro _ ⟨g, a, rfl⟩
-  show g * (1 : MulAut G) g⁻¹ = 1
+  change g * (1 : MulAut G) g⁻¹ = 1
   simp
 
 /-- **`actionCommutator φ` は φ 作用下で A-不変**.
@@ -758,20 +758,20 @@ def OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom {A G : Type*} [Group A] [Group
     toFun := fun h => ⟨(φ a) h.val, hH.smul_mem a h.property⟩
     invFun := fun h => ⟨(φ a)⁻¹ h.val, hH.inv_smul_mem a h.property⟩
     left_inv := fun h => Subtype.ext (by
-      show (φ a)⁻¹ ((φ a) h.val) = h.val
+      change (φ a)⁻¹ ((φ a) h.val) = h.val
       simp)
     right_inv := fun h => Subtype.ext (by
-      show (φ a) ((φ a)⁻¹ h.val) = h.val
+      change (φ a) ((φ a)⁻¹ h.val) = h.val
       simp)
     map_mul' := fun x y => Subtype.ext (map_mul (φ a) x.val y.val)
   }
   map_one' := by
     ext h
-    show ((φ 1 : MulAut G) h.val) = h.val
+    change ((φ 1 : MulAut G) h.val) = h.val
     simp
   map_mul' a b := by
     ext h
-    show ((φ (a * b) : MulAut G) h.val) = ((φ a) ((φ b) h.val))
+    change ((φ (a * b) : MulAut G) h.val) = ((φ a) ((φ b) h.val))
     rw [map_mul]; rfl
 
 @[simp] lemma OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val
@@ -1138,7 +1138,7 @@ theorem eval_le_lowerCentralSeries (G : Type*) [Group G] :
           have h1 := one_le_weight l
           have h2 := one_le_weight r
           congr 1
-          show l.weight - 1 + (r.weight - 1) + 1 = l.weight + r.weight - 1
+          change l.weight - 1 + (r.weight - 1) + 1 = l.weight + r.weight - 1
           omega
 
 end CommutatorWord

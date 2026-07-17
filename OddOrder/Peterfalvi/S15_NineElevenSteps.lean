@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import OddOrder.Peterfalvi.S15_CaseBReducibleCoherence
 
 /-!
@@ -454,13 +459,13 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf [Finite G]
   have hHMs : ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G)
       ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
     have h1 : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
-      show hyp.Sdata.H = hyp.P
+      change hyp.Sdata.H = hyp.P
       rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
     rw [h1, hyp.P_eq_SF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
   have hSderiv : derivedInG hyp.S
       = (hyp.toTypesIIIIIIVSetupS hG).H ⊔ (hyp.toTypesIIIIIIVSetupS hG).U := by
-    show _ = hyp.Sdata.H ⊔ hyp.Sdata.U
+    change _ = hyp.Sdata.H ⊔ hyp.Sdata.U
     rw [hyp.Sdata.derivedInG_eq_fitting_sup_U, hyp.Sdata.H_eq]
   have hKderiv : (hyp.toTypesIIIIIIVSetupS hG).H ⊔ cuSubOf caseA i ≤ derivedInG hyp.S := by
     rw [hSderiv]

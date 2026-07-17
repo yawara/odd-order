@@ -1,6 +1,7 @@
 /-
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
@@ -181,7 +182,7 @@ theorem cfdot_real_vchar_even (hodd : Odd (Nat.card G))
         rw [← hq (IrreducibleCharacter.conjPerm G χ), ← hq χ]
         exact inner_conjPerm_eq_of_real hψZ hψR χ
       exact_mod_cast this
-    show p (IrreducibleCharacter.conjPerm G χ) * q (IrreducibleCharacter.conjPerm G χ) = p χ * q χ
+    change p (IrreducibleCharacter.conjPerm G χ) * q (IrreducibleCharacter.conjPerm G χ) = p χ * q χ
     rw [hpinv, hqinv]
 
 end Main

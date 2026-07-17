@@ -486,11 +486,11 @@ theorem subsetCharacterKernel_conjBy_of_invariant {K : Subgroup G} [K.Normal]
   have hdeg : OddOrder.Peterfalvi.S03.characterDegree (ClassFunction.conjBy g χ)
       = OddOrder.Peterfalvi.S03.characterDegree χ := by
     rw [OddOrder.Peterfalvi.S03.characterDegree_def, OddOrder.Peterfalvi.S03.characterDegree_def]
-    show (ClassFunction.conjBy g χ) 1 = χ 1
+    change (ClassFunction.conjBy g χ) 1 = χ 1
     rw [ClassFunction.conjBy_apply]
     refine congrArg χ (Subtype.ext ?_)
     simp only [OneMemClass.coe_one, mul_one, mul_inv_cancel]
-  show (ClassFunction.conjBy g χ) y
+  change (ClassFunction.conjBy g χ) y
     = OddOrder.Peterfalvi.S03.characterDegree (ClassFunction.conjBy g χ)
   rw [ClassFunction.conjBy_apply, hdeg]
   have hmem := hker hy'
@@ -543,7 +543,7 @@ theorem mem_characterKernel_conjBy {K : Subgroup G} [K.Normal]
   have hdeg : OddOrder.Peterfalvi.S03.characterDegree (ClassFunction.conjBy w χ)
       = OddOrder.Peterfalvi.S03.characterDegree χ := by
     rw [OddOrder.Peterfalvi.S03.characterDegree_def, OddOrder.Peterfalvi.S03.characterDegree_def]
-    show (ClassFunction.conjBy w χ) 1 = χ 1
+    change (ClassFunction.conjBy w χ) 1 = χ 1
     rw [ClassFunction.conjBy_apply]
     refine congrArg χ (Subtype.ext ?_)
     simp only [OneMemClass.coe_one, mul_one, mul_inv_cancel]

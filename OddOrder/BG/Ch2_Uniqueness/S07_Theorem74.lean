@@ -219,14 +219,14 @@ theorem mem_kSubgroup_of_piPrime_mem_centralizer [Finite G] (hG : IsMinimalSimpl
       rw [Subgroup.pointwise_smul_def, Subgroup.mem_map]
       constructor
       · rintro ⟨z, hz, rfl⟩
-        show x * z * x⁻¹ ∈ A
+        change x * z * x⁻¹ ∈ A
         have hxz : x * z * x⁻¹ = z := by
           rw [← Subgroup.mem_centralizer_iff.mp hx z hz, mul_inv_cancel_right]
         rw [hxz]
         exact hz
       · intro hy
         refine ⟨y, hy, ?_⟩
-        show x * y * x⁻¹ = y
+        change x * y * x⁻¹ = y
         rw [← Subgroup.mem_centralizer_iff.mp hx y hy, mul_inv_cancel_right]
     rw [lt_top_iff_ne_top]
     intro hX_top
@@ -251,14 +251,14 @@ theorem mem_kSubgroup_of_piPrime_mem_centralizer [Finite G] (hG : IsMinimalSimpl
     · rintro ⟨z, hz, rfl⟩
       obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
       refine Subgroup.mem_zpowers_iff.mpr ⟨n, ?_⟩
-      show c ^ n = MulAut.conj a (c ^ n)
+      change c ^ n = MulAut.conj a (c ^ n)
       rw [map_zpow]
       simp only [MulAut.conj_apply]
       rw [hac]
     · intro hy
       obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hy
       refine ⟨c ^ n, Subgroup.mem_zpowers_iff.mpr ⟨n, rfl⟩, ?_⟩
-      show MulAut.conj a (c ^ n) = y
+      change MulAut.conj a (c ^ n) = y
       rw [map_zpow]
       simp only [MulAut.conj_apply]
       rw [hac, hn]
@@ -845,9 +845,9 @@ private theorem not_isCyclic_of_cocyclic [Finite G] {p : ℕ} (hp2 : 2 ≤ p) {B
   -- `Y` is elementary abelian and cyclic, so `|Y| ≤ p`.
   have hY_ea : Y.IsElementaryAbelian p := by
     refine ⟨fun x y => Subtype.ext ?_, fun x => Subtype.ext ?_⟩
-    · show (x : G) * (y : G) = (y : G) * (x : G)
+    · change (x : G) * (y : G) = (y : G) * (x : G)
       exact congrArg (Subtype.val : ↥B → G) (hB_ea.1 ⟨(x : G), hYB x.2⟩ ⟨(y : G), hYB y.2⟩)
-    · show (x : G) ^ p = 1
+    · change (x : G) ^ p = 1
       exact congrArg (Subtype.val : ↥B → G) (hB_ea.2 (⟨(x : G), hYB x.2⟩ : ↥B))
   have hYle : Nat.card ↥Y ≤ p := by
     have hdvd : Monoid.exponent ↥Y ∣ p := by
@@ -917,7 +917,7 @@ theorem transitive_of_three_le_rank_center [Finite G] (hG : IsMinimalSimpleOdd G
     have hY_nc : ¬ IsCyclic ↥Y := not_isCyclic_of_cocyclic hp2 hB_ea hB_log hYB hbB hsup
     haveI : IsMulCommutative ↥Y :=
       IsMulCommutative.of_comm fun x y => Subtype.ext (by
-        show (x : G) * (y : G) = (y : G) * (x : G)
+        change (x : G) * (y : G) = (y : G) * (x : G)
         exact congrArg (Subtype.val : ↥B → G) (hB_ea.1 ⟨(x : G), hYB x.2⟩ ⟨(y : G), hYB y.2⟩))
     have hYA : Y ≤ A := le_trans hYB hBA
     obtain ⟨z, hzY, hz_ne, hzQ₂⟩ :=
@@ -1023,12 +1023,12 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
       · rintro ⟨z, hz, rfl⟩
         obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
         refine Subgroup.mem_zpowers_iff.mpr ⟨n, ?_⟩
-        show (c : G) ^ n = MulAut.conj a ((c : G) ^ n)
+        change (c : G) ^ n = MulAut.conj a ((c : G) ^ n)
         rw [map_zpow]; simp only [MulAut.conj_apply]; rw [hac]
       · intro hy
         obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hy
         exact ⟨(c : G) ^ n, Subgroup.mem_zpowers_iff.mpr ⟨n, rfl⟩, by
-          show MulAut.conj a ((c : G) ^ n) = y
+          change MulAut.conj a ((c : G) ^ n) = y
           rw [map_zpow]; simp only [MulAut.conj_apply]; rw [hac, hn]⟩
     · intro r hr
       rw [hcc_card] at hr

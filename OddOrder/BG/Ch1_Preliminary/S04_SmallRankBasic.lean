@@ -756,7 +756,7 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
     have hle : Omega R p 1 ≤ omega1 := by
       rw [Omega, Subgroup.closure_le]
       intro x hx
-      show x ^ p = 1
+      change x ^ p = 1
       exact pow_one p ▸ hx
     simpa [omega1] using hle hg
   clear hg g
@@ -809,7 +809,7 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
       have hΩle : Omega ↥S p 1 ≤ omega1S := by
         rw [Omega, Subgroup.closure_le]
         intro a ha
-        show a ^ p = 1
+        change a ^ p = 1
         exact pow_one p ▸ ha
       intro z hz
       rw [hH_def, Subgroup.mem_map] at hz

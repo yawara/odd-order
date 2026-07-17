@@ -38,7 +38,7 @@ theorem conj_mem_xiSet {M : Subgroup G} [Finite G] {data : TypesIIIIIIVSetup M}
       OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
   -- Membership unfolds (rfl) to a `characterKernel`-containment on the conjugate coe, which is
   -- defeq `(↑χ).conj`; `characterKernel_conj` rewrites it back to `characterKernel ↑χ` = `hχ`.
-  show ¬ (↑(hInHu data) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+  change ¬ (↑(hInHu data) ⊆ OddOrder.Peterfalvi.S03.characterKernel
     ((χ : ClassFunction ↥(huSub data) ℂ).conj))
   rw [OddOrder.Peterfalvi.S03.characterKernel_conj]
   exact hχ
@@ -56,7 +56,7 @@ theorem sSet_closedUnderConjugate {M : Subgroup G} [Finite G] (data : TypesIIIII
     conj_mem_xiSet hχ, ?_⟩
   -- `(Ind_{HU}^M χ)̄ = Ind_{HU}^M χ̄` (`conj_induce`); `induceHU` bakes in its own `Invertible`
   -- instance, so `convert` absorbs the (subsingleton) instance mismatch.
-  show (induceHU data (χ : ClassFunction ↥(huSub data) ℂ)).conj
+  change (induceHU data (χ : ClassFunction ↥(huSub data) ℂ)).conj
     = induceHU data ((χ : ClassFunction ↥(huSub data) ℂ).conj)
   letI : Fintype ↥M := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
@@ -81,10 +81,10 @@ theorem sSet_pairwiseOrthogonal {M : Subgroup G} [Finite G] (data : TypesIIIIIIV
   rintro _ _ ⟨χ, hχ, rfl⟩ ⟨χ', hχ', rfl⟩ hne
   -- non-conjugate sources: else the inductions—hence the members—coincide, contradicting `hne`.
   have hnc : ∀ g : ↥M, IrreducibleCharacter.conjBy g χ ≠ χ' := fun g hg => hne (by
-    show ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+    change ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
       = ClassFunction.induce (huSub data) (χ' : ClassFunction ↥(huSub data) ℂ)
     exact (induce_eq_induce_iff_conj χ χ').mpr ⟨g, hg⟩)
-  show ClassFunction.inner (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ))
+  change ClassFunction.inner (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ))
       (ClassFunction.induce (huSub data) (χ' : ClassFunction ↥(huSub data) ℂ)) = 0
   exact inner_induce_eq_zero_of_not_conj χ χ' hnc
 
@@ -621,7 +621,7 @@ theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hHP : base12.typeP.H = hyp.P := by
       rw [base12.typeP.H_eq, ← hyp.P_eq_SF]
     have hw1 : base12.w1 = hyp.q := by
-      show Nat.card ↥base12.typeP.W1 = hyp.q
+      change Nat.card ↥base12.typeP.W1 = hyp.q
       rw [base12.typeP.card_W1_eq_derived_index,
         ← hyp.Sdata.card_W1_eq_derived_index, hyp.Sdata_W1_eq,
         ← hyp.q_eq_card_W1]
@@ -637,7 +637,7 @@ theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hdata := OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2 hG
       hyp.S_maximal hSP hyp.Sdata.W1_le hW1hall hyp.Sdata
     have hw2 : base12.w2 = hyp.p := by
-      show Nat.card ↥base12.typeP.W2 = hyp.p
+      change Nat.card ↥base12.typeP.W2 = hyp.p
       rw [← hbase, hdata, hSdataW2, ← hyp.p_eq_card_W2]
     rw [hHP, hw1, hw2] at hcard
     exact hcard
@@ -653,10 +653,10 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_chief_N_eq_bot [Finite G]
     chief.N = ⊥ := by
   haveI := chief.N_normal
   have hHeq : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
-    show hyp.Sdata.H = hyp.P
+    change hyp.Sdata.H = hyp.P
     rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   have hq : (hyp.toTypesIIIIIIVSetupS hG).q = hyp.q := by
-    show Nat.card ↥hyp.Sdata.W1 = hyp.q
+    change Nat.card ↥hyp.Sdata.W1 = hyp.q
     rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
   have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).H = hyp.p ^ hyp.q := by
     rw [show ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G) = hyp.P from hHeq]
@@ -707,7 +707,7 @@ theorem Hypothesis.sSet_eq_sOf_H0Cprime [Finite G]
   classical
   have hH0 : chief.H0 = ⊥ := hyp.toTypesIIIIIIVSetupS_chief_H0_eq_bot hG chief
   have hCp : chars.Cprime = ⊥ := by
-    show OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupS hG) chief = ⊥
+    change OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupS hG) chief = ⊥
     have hCU : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief ≤ hyp.U :=
       (OddOrder.Peterfalvi.S11.cSub_le_U _ _).trans (le_of_eq hyp.Sdata_U_eq)
     have hCab : IsMulCommutative
@@ -722,7 +722,7 @@ theorem Hypothesis.sSet_eq_sOf_H0Cprime [Finite G]
       refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
       rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
       exact hCab.is_comm.comm a b
-    show derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) = ⊥
+    change derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) = ⊥
     rw [derivedInG, hcomm, Subgroup.map_bot]
   rw [hH0, hCp, sup_bot_eq]
   apply Set.Subset.antisymm
@@ -770,7 +770,7 @@ derivedInG U = ⊥`.  The `uprimeSub`-analogue of `Cprime_eq_bot` (same argument
 theorem Hypothesis.uprimeSub_eq_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     uprimeSub (hyp.toTypesIIIIIIVSetupS hG) = ⊥ := by
-  show derivedInG (hyp.toTypesIIIIIIVSetupS hG).U = ⊥
+  change derivedInG (hyp.toTypesIIIIIIVSetupS hG).U = ⊥
   have hUU : (hyp.toTypesIIIIIIVSetupS hG).U ≤ hyp.U := le_of_eq hyp.Sdata_U_eq
   have hUab : IsMulCommutative ↥(hyp.toTypesIIIIIIVSetupS hG).U :=
     ⟨⟨fun a b => Subtype.ext (by
@@ -923,7 +923,7 @@ theorem Hypothesis.mu_colSum_mem_sOf_H0 [Finite G]
         exact congrArg Subtype.val (MulEquiv.subgroupCongr_symm_apply hKeq c)
       have hxhInHu : x ∈ OddOrder.Peterfalvi.S11.hInHu (hyp.toTypesIIIIIIVSetupS hG) := by
         refine Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr ?_)
-        show ((x : ↥hyp.S) : G) ∈ hyp.Sdata.H
+        change ((x : ↥hyp.S) : G) ∈ hyp.Sdata.H
         rw [hxval, hyp.Sdata.H_eq, ← hyp.P_eq_SF]
         exact W2_le_P hG hyp hcW2
       have hxker := hsub (SetLike.mem_coe.mpr hxhInHu)
@@ -980,7 +980,7 @@ theorem Hypothesis.sSet_caseB_apply_one_eq_qu [Finite G]
   have hH0 : chief.H0 = ⊥ := hyp.toTypesIIIIIIVSetupS_chief_H0_eq_bot hG chief
   have hCp : chars.Cprime = ⊥ := by
     -- `C′ = cprimeSub = derivedInG (cSub)`, and `cSub ≤ U` abelian, so its derived subgroup is `⊥`.
-    show OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupS hG) chief = ⊥
+    change OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupS hG) chief = ⊥
     have hCU : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief ≤ hyp.U :=
       (OddOrder.Peterfalvi.S11.cSub_le_U _ _).trans (le_of_eq hyp.Sdata_U_eq)
     have hCab : IsMulCommutative
@@ -995,7 +995,7 @@ theorem Hypothesis.sSet_caseB_apply_one_eq_qu [Finite G]
       refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
       rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
       exact hCab.is_comm.comm a b
-    show derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) = ⊥
+    change derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) = ⊥
     rw [derivedInG, hcomm, Subgroup.map_bot]
   -- membership in the smaller `𝒮(H₀C′)` (equal to `sSet` once the kernel demand degenerates)
   have hmem : φ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime) := by
@@ -1069,11 +1069,11 @@ theorem Hypothesis.P_elementaryAbelian [Finite G]
   obtain ⟨chief, _⟩ :=
     OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)
   have hHeq : ((hyp.toTypesIIIIIIVSetupS hG).H : Subgroup G) = hyp.P := by
-    show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+    change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   have hN : chief.N = ⊥ := hyp.toTypesIIIIIIVSetupS_chief_N_eq_bot hG chief
   -- `chief.p = p` from `|P| = p^q = chief.p^q · |N|` with `|N| = 1`.
   have hq : (hyp.toTypesIIIIIIVSetupS hG).q = hyp.q := by
-    show Nat.card ↥hyp.Sdata.W1 = hyp.q; rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
+    change Nat.card ↥hyp.Sdata.W1 = hyp.q; rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]
   have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupS hG).H = hyp.p ^ hyp.q := by
     rw [hHeq]; exact hyp.card_P_eq hG hyp.Sdata_W2_eq
   have hquot := OddOrder.Peterfalvi.S11.chiefFactor_quotient_card chief
@@ -1109,7 +1109,7 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_cSub_eq_C [Finite G]
   haveI := chief.N_normal
   have hUeq : (hyp.toTypesIIIIIIVSetupS hG).U = hyp.U := hyp.Sdata_U_eq
   have hHeq : (hyp.toTypesIIIIIIVSetupS hG).H = hyp.P := by
-    show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+    change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   apply le_antisymm
   · -- forward: `cSub ≤ U ⊓ C_G(P)`
     rw [hyp.C_eq]
@@ -1159,9 +1159,9 @@ theorem Hypothesis.toTypesIIIIIIVSetupS_cSub_eq_C [Finite G]
       have hxP : ((x : G)) ∈ hyp.P := hHeq ▸ x.2
       have hcx : g * (x : G) = (x : G) * g :=
         (Subgroup.mem_centralizer_iff.mp hgC (x : G) hxP).symm
-      show (bUW1 : G) * (x : G) * (bUW1 : G)⁻¹ = (x : G)
+      change (bUW1 : G) * (x : G) * (bUW1 : G)⁻¹ = (x : G)
       rw [hbUW1def]
-      show g * (x : G) * g⁻¹ = (x : G)
+      change g * (x : G) * g⁻¹ = (x : G)
       rw [hcx]; group
     have hbker : (⟨bUW1, hbUW1mem⟩ : ↥(((hyp.toTypesIIIIIIVSetupS hG).typeP.U).subgroupOf
         ((hyp.toTypesIIIIIIVSetupS hG).typeP.U ⊔ (hyp.toTypesIIIIIIVSetupS hG).typeP.W1)))

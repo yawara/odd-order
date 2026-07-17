@@ -286,7 +286,7 @@ theorem typeIBetaL_support_subset_dadeSupport [Finite G] {L : Subgroup G}
         trivialClassFunction_apply, mul_one, hdeg]
       have hHeq : H' = (maxNilpotentNormalHall L).subgroupOf L := by
         rw [hH'def]
-        show (typeISetup.typeI.typeF.H).subgroupOf L = _
+        change (typeISetup.typeI.typeF.H).subgroupOf L = _
         rw [typeISetup.typeI.typeF.H_eq]
       rw [hHeq, sub_self]
     have hzc : z ∈ OddOrder.RepresentationTheory.ClassFunction.conjugatesInto H' := by
@@ -314,7 +314,7 @@ theorem typeIBetaL_support_subset_dadeSupport [Finite G] {L : Subgroup G}
   intro x hx
   by_contra hnot
   apply hx
-  show typeIBetaL typeISetup φ x = 0
+  change typeIBetaL typeISetup φ x = 0
   rw [typeIBetaL,
     show typeISetup.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         typeISetup.dadeData.dade
@@ -336,7 +336,7 @@ theorem tau_support_subset_dadeSupport [Finite G] {L : Subgroup G}
   intro x hx
   by_contra hnot
   apply hx
-  show typeISetup.tau ψ x = 0
+  change typeISetup.tau ψ x = 0
   rw [show typeISetup.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         typeISetup.dadeData.dade
         (typeISetup.dadeData.dade.fullDadeIsometryData typeISetup.hconj) from rfl,
@@ -627,7 +627,7 @@ theorem exists_zeta_index_of_mem_Sset [Finite G]
   have hreal : ClassFunction.IsReal
       (ClassFunction.induce dataL.kernelIn (dataL.θ dataL.ind1H : ClassFunction _ ℂ)) := by
     rw [hind1]
-    show (ClassFunction.induce dataL.kernelIn (trivialClassFunction _)).conj = _
+    change (ClassFunction.induce dataL.kernelIn (trivialClassFunction _)).conj = _
     rw [conj_induce]
     exact congrArg _ trivialClassFunction_isReal
   rw [hk'] at hreal

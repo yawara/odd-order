@@ -1706,7 +1706,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         have heq : ⁅(ph : G), g₂⁆ = (ph : G) * (g₂ * (ph : G)⁻¹ * g₂⁻¹) := by
           rw [commutatorElement_def]
           group
-        show ⁅(ph : G), g₂⁆ ∈ (P.map H.subtype : Subgroup G)
+        change ⁅(ph : G), g₂⁆ ∈ (P.map H.subtype : Subgroup G)
         rw [heq]
         exact Subgroup.mul_mem _ ⟨ph, hph, rfl⟩ h2
       · rintro _ ⟨pp, hpp, rfl⟩
@@ -2222,7 +2222,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
             hy (fun ℓ z hz => hOl_cent ℓ ⟨z, hz, rfl⟩)
             (by simp)
             (fun z w hz hw => by
-              show (z : G) * (w : G) ∈ _
+              change (z : G) * (w : G) ∈ _
               exact Subgroup.mul_mem _ hz hw)
         intro x hx
         refine hC ⟨x, hx⟩ ?_
@@ -2334,7 +2334,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         have h2 := Subgroup.mem_centralizer_iff.mp (hcent ⟨g0, hg0Q, rfl⟩) ψ₀ hψ₀P
         apply Subtype.ext
         rw [hφA_val]
-        show ψ₀ * (KG.subtype g0) * ψ₀⁻¹ = KG.subtype g0
+        change ψ₀ * (KG.subtype g0) * ψ₀⁻¹ = KG.subtype g0
         rw [mul_inv_eq_iff_eq_mul]
         exact h2
       constructor
@@ -2817,7 +2817,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           apply Subtype.ext
           have h1 : ((φA ⟨g₂, hg₂A⟩ ((⟨g₁, hg₁⟩ : ↥KG)⁻¹) : ↥KG) : G)
               = g₂ * g₁⁻¹ * g₂⁻¹ := hφA_val _ _
-          show ⁅g₁, g₂⁆
+          change ⁅g₁, g₂⁆
             = ((⟨g₁, hg₁⟩ * φA ⟨g₂, hg₂A⟩ (⟨g₁, hg₁⟩ : ↥KG)⁻¹ : ↥KG) : G)
           rw [Subgroup.coe_mul, h1, commutatorElement_def,
             mul_assoc g₁ g₂ g₁⁻¹, mul_assoc g₁]
@@ -2875,7 +2875,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
               = ((rr : ↥A) : G) * x * ((rr : ↥A) : G)⁻¹ := hφA_val _ _
           rw [h1val]
           exact mul_inv_eq_iff_eq_mul.mpr h2
-        show ((φA (rr : ↥A) ⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG)
+        change ((φA (rr : ↥A) ⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG)
           = ((⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG)
         rw [h1]
       have h3 : ((⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG) = 1 := by
@@ -3017,7 +3017,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       · intro hc rr
         have h2 := Subgroup.mem_centralizer_iff.mp hc ((rr : ↥T) : G)
           (Subgroup.mem_subgroupOf.mp rr.2)
-        show ρT ((rr : ↥T)) v = v
+        change ρT ((rr : ↥T)) v = v
         rw [hρT_apply]
         apply Additive.toMul.injective
         rw [toMul_ofMul]
@@ -3151,7 +3151,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
             apply Subtype.ext
             have h1 : ((φA ⟨g₂, hg₂A⟩ ((⟨g₁, hg₁⟩ : ↥KG)⁻¹) : ↥KG) : G)
                 = g₂ * g₁⁻¹ * g₂⁻¹ := hφA_val _ _
-            show ⁅g₁, g₂⁆
+            change ⁅g₁, g₂⁆
               = ((⟨g₁, hg₁⟩ * φA ⟨g₂, hg₂A⟩ (⟨g₁, hg₁⟩ : ↥KG)⁻¹ : ↥KG) : G)
             rw [Subgroup.coe_mul, h1, commutatorElement_def,
               mul_assoc g₁ g₂ g₁⁻¹, mul_assoc g₁]
@@ -3228,7 +3228,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
                 = ((pp : ↥A) : G) * x * ((pp : ↥A) : G)⁻¹ := hφA_val _ _
             rw [h1val]
             exact mul_inv_eq_iff_eq_mul.mpr h2
-          show ((φA (pp : ↥A) ⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG)
+          change ((φA (pp : ↥A) ⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG)
             = ((⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG)
           rw [h1]
         have h3 : ((⟨x, hxK⟩ : ↥KG) : ↥KG ⧸ commutator ↥KG) ∈ (⊥ : Subgroup _) := by
@@ -3253,7 +3253,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
             exact Subgroup.commutator_mem_commutator ha k.2
           have hw_one : ((φA ⟨a, haA⟩ k * k⁻¹ : ↥KG) : ↥KG ⧸ commutator ↥KG) = 1 :=
             hKR_mk_one _ hwmem (φA ⟨a, haA⟩ k * k⁻¹ : ↥KG).2
-          show ((φA ⟨a, haA⟩ k : ↥KG) : ↥KG ⧸ commutator ↥KG)
+          change ((φA ⟨a, haA⟩ k : ↥KG) : ↥KG ⧸ commutator ↥KG)
             = ((k : ↥KG) : ↥KG ⧸ commutator ↥KG)
           calc ((φA ⟨a, haA⟩ k : ↥KG) : ↥KG ⧸ commutator ↥KG)
               = (((φA ⟨a, haA⟩ k * k⁻¹) * k : ↥KG) : ↥KG ⧸ commutator ↥KG) := by
@@ -3321,7 +3321,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         apply Subtype.ext
         have h1 : ((φA ⟨g₂, hg₂A⟩ ((⟨g₁, hg₁⟩ : ↥KG)⁻¹) : ↥KG) : G)
             = g₂ * g₁⁻¹ * g₂⁻¹ := hφA_val _ _
-        show ⁅g₁, g₂⁆
+        change ⁅g₁, g₂⁆
           = ((⟨g₁, hg₁⟩ * φA ⟨g₂, hg₂A⟩ (⟨g₁, hg₁⟩ : ↥KG)⁻¹ : ↥KG) : G)
         rw [Subgroup.coe_mul, h1, commutatorElement_def,
           mul_assoc g₁ g₂ g₁⁻¹, mul_assoc g₁]

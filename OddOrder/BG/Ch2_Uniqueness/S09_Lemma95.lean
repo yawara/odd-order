@@ -985,7 +985,7 @@ private theorem pRank_le_pRank_oPiCore_compl_of_nilpotent
     rw [hk, Nat.mem_primeFactors] at hr
     have hrq : r = q :=
       (Nat.prime_dvd_prime_iff_eq hr.1 (Fact.out : q.Prime)).mp (hr.1.dvd_of_dvd_pow hr.2.1)
-    show r ≠ p
+    change r ≠ p
     rw [hrq]; exact hqp
   have hScore : (S : Subgroup N) ≤ Ch03.oPiCore {r : ℕ | r ≠ p} N := hSpi.le_oPiCore
   calc pRank N q = pRank ↥(S : Subgroup N) q := (pRank_sylow_eq S).symm

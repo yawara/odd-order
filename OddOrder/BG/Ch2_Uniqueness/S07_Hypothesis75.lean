@@ -544,11 +544,11 @@ private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fa
     { smul := smulFn
       one_smul := fun Q => by
         apply Subtype.ext
-        show MulAut.conj ((1 : ↥P) : G) • (Q : Subgroup G) = (Q : Subgroup G)
+        change MulAut.conj ((1 : ↥P) : G) • (Q : Subgroup G) = (Q : Subgroup G)
         rw [Subgroup.coe_one, map_one, one_smul]
       mul_smul := fun x y Q => by
         apply Subtype.ext
-        show MulAut.conj (((x * y : ↥P)) : G) • (Q : Subgroup G)
+        change MulAut.conj (((x * y : ↥P)) : G) • (Q : Subgroup G)
           = MulAut.conj ((x : G)) • MulAut.conj ((y : G)) • (Q : Subgroup G)
         rw [Subgroup.coe_mul, map_mul, mul_smul] }
   have hsmul_coe : ∀ (x : ↥P) (Q : ↥S),
@@ -563,7 +563,7 @@ private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fa
     rw [MulAction.toPermHom_apply, MulAction.toPerm_apply, Equiv.Perm.one_apply]
     apply Subtype.ext
     rw [hsmul_coe, Subgroup.coe_pow]
-    show MulAut.conj (g ^ p) • (Q : Subgroup G) = (Q : Subgroup G)
+    change MulAut.conj (g ^ p) • (Q : Subgroup G) = (Q : Subgroup G)
     exact conj_smul_eq_self_of_mem_normalizer
       ((hInvariantStar_le_normalizer Q.2) hgpA)
   -- `zpowers σ` is a `p`-group: its order `= orderOf σ ∣ p`.
@@ -982,11 +982,11 @@ private theorem tp_card_hStar_dvd_kSubgroup [Finite G] {A : Subgroup G} {q : ℕ
     { smul := smulFn
       one_smul := fun Q => by
         apply Subtype.ext
-        show MulAut.conj ((1 : ↥K) : G) • (Q : Subgroup G) = (Q : Subgroup G)
+        change MulAut.conj ((1 : ↥K) : G) • (Q : Subgroup G) = (Q : Subgroup G)
         rw [Subgroup.coe_one, map_one, one_smul]
       mul_smul := fun x y Q => by
         apply Subtype.ext
-        show MulAut.conj (((x * y : ↥K)) : G) • (Q : Subgroup G)
+        change MulAut.conj (((x * y : ↥K)) : G) • (Q : Subgroup G)
           = MulAut.conj ((x : G)) • MulAut.conj ((y : G)) • (Q : Subgroup G)
         rw [Subgroup.coe_mul, map_mul, mul_smul] }
   have hsmul_coe : ∀ (k : ↥K) (Q : ↥S),

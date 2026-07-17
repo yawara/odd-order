@@ -195,7 +195,7 @@ theorem actsPrimeOn_sup_of_eq_centralizer [Finite G] {N E₁ E₃ : Subgroup G}
     have hordca : orderOf (c * a) = orderOf c * orderOf a :=
       hca.orderOf_mul_eq_mul_orderOf_of_coprime hcop_ca
     have hsc : SemiconjBy x' x (c * a) := by
-      show x' * x = (c * a) * x'
+      change x' * x = (c * a) * x'
       rw [← hconj]; group
     have hordeq : orderOf x = orderOf (c * a) := SemiconjBy.orderOf_eq x' hsc
     have hordane : orderOf a ≠ 1 := fun h => ha1 (orderOf_eq_one_iff.mp h)

@@ -123,7 +123,7 @@ theorem IsPCentral.conj {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime
       have := congrArg (Subgroup.subtype (P : Subgroup G)) hcomm
       simpa using this.symm
     apply Subtype.ext
-    show (MulAut.conj g w₀) * (g * xv * g⁻¹) = (g * xv * g⁻¹) * (MulAut.conj g w₀)
+    change (MulAut.conj g w₀) * (g * xv * g⁻¹) = (g * xv * g⁻¹) * (MulAut.conj g w₀)
     simp only [MulAut.conj_apply]
     calc g * w₀ * g⁻¹ * (g * xv * g⁻¹)
         = g * (w₀ * xv) * g⁻¹ := by group

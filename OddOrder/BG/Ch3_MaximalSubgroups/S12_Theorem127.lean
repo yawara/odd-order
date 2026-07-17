@@ -143,7 +143,7 @@ theorem exists_elemAb_rank_two_le_E_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd 
     have hsmul_eq : MulAut.conj (m : G) • ((TM : Subgroup ↥M).map M.subtype) = T := by
       have h1 : ((m • TM : Sylow q ↥M) : Subgroup ↥M).map M.subtype = T := by
         rw [hm, hTSdef]
-        show (T.subgroupOf M).map M.subtype = T
+        change (T.subgroupOf M).map M.subtype = T
         exact Subgroup.map_subgroupOf_eq_of_le hT_le_M
       rw [← h1, Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def,
         Subgroup.pointwise_smul_def, Subgroup.map_map, Subgroup.map_map]
@@ -677,7 +677,7 @@ theorem exists_canonical_line_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpl
       have hsmul_eq : MulAut.conj (m : G) • ((TW : Subgroup ↥M).map M.subtype) = P := by
         have h1 : ((m • TW : Sylow p ↥M) : Subgroup ↥M).map M.subtype = P := by
           rw [hm]
-          show (P.subgroupOf M).map M.subtype = P
+          change (P.subgroupOf M).map M.subtype = P
           exact Subgroup.map_subgroupOf_eq_of_le hP_le_M
         rw [← h1, Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def,
           Subgroup.pointwise_smul_def, Subgroup.map_map, Subgroup.map_map]

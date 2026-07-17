@@ -50,7 +50,7 @@ certain-type `W̄₂ = W₂ H₀ / H₀` of `S06.Hypothesis (M/H₀)` is nontriv
 theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     ¬ data.W2 ≤ chief.H0 := by
-  show ¬ data.typeP.W2 ≤ chief.H0
+  change ¬ data.typeP.W2 ≤ chief.H0
   haveI := chief.N_normal
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   have hHbar : Nat.card (↥data.H ⧸ chief.N) ≠ 1 := by
@@ -223,7 +223,7 @@ theorem chiefFactor_card_W2bar [Finite G] {M : Subgroup G}
         (QuotientGroup.mk' (chief.H0.subgroupOf M))) * Nat.card ↥J₁
       = chief.p * Nat.card ↥J₁ := by
     rw [← hW2split, hcardW2M, ← hcardF_W2, hFsplit, hfixp, hker]
-  show Nat.card ↥((data.typeP.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+  change Nat.card ↥((data.typeP.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
     = chief.p
   exact Nat.eq_of_mul_eq_mul_right hposJ hchain
 
@@ -306,8 +306,8 @@ theorem card_fiber_mk'_eq {Γ : Type*} [Group Γ] {N : Subgroup Γ} [N.Normal] (
   · refine QuotientGroup.eq.mpr ?_
     have he : (x₀ * (n : Γ))⁻¹ * x₀ = ((n : Γ))⁻¹ := by group
     rw [he]; exact inv_mem n.2
-  · intro p; ext; show x₀ * (x₀⁻¹ * (p : Γ)) = (p : Γ); group
-  · intro n; ext; show x₀⁻¹ * (x₀ * (n : Γ)) = (n : Γ); group
+  · intro p; ext; change x₀ * (x₀⁻¹ * (p : Γ)) = (p : Γ); group
+  · intro n; ext; change x₀⁻¹ * (x₀ * (n : Γ)) = (n : Γ); group
 
 /-- **`|N|`-fold fiberwise sum over a quotient** (general): `∑_{x:Γ} g(x N) = |N| • ∑_{q:Γ/N} g q`.
 Each fiber of `mk' N` has `|N|` elements (`card_fiber_mk'_eq`), and the summand is constant on
@@ -511,7 +511,7 @@ theorem chiefFactorQuotientHypothesis_K_eq [Finite G] {M : Subgroup G}
     (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
     (chiefFactorQuotientHypothesis chief hodd hHall).K
       = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) := by
-  show ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+  change ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
       = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
   rw [huSub_eq_derivedInG_subgroupOf]
 
@@ -528,7 +528,7 @@ theorem chiefFactorQuotientHypothesisGen_K_eq [Finite G] {M : Subgroup G}
     (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
     (chiefFactorQuotientHypothesisGen chief N' hN'le hW1inf hW2notle hodd hHall).K
       = (huSub data).map (QuotientGroup.mk' N') := by
-  show ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' N')
+  change ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' N')
       = (huSub data).map (QuotientGroup.mk' N')
   rw [huSub_eq_derivedInG_subgroupOf]
 
@@ -691,7 +691,7 @@ theorem isAInvariant_comp_subtype_pointwise_smul {A K : Type*} [Group A] [Group 
     {S₀ : Subgroup K} (hS₀ : IsAInvariant (φ.comp U.subtype) S₀) (a : A) :
     IsAInvariant (φ.comp U.subtype) (φ a • S₀) := by
   intro u
-  show φ ↑u • (φ a • S₀) = φ a • S₀
+  change φ ↑u • (φ a • S₀) = φ a • S₀
   have hmem : a⁻¹ * (↑u : A) * a ∈ U := by
     have h := hU.conj_mem (↑u) u.2 a⁻¹; rwa [inv_inv] at h
   rw [smul_smul, ← map_mul,
@@ -739,7 +739,7 @@ theorem iSup_phi_smul_eq_iSup_W_of_normal {A K : Type*} [Group A] [Group K]
     rintro ⟨a, ha⟩
     have ha' : a ∈ (↑U * ↑W : Set A) := by rw [← Subgroup.normal_mul]; exact ha
     obtain ⟨u, hu, w, hw, huw⟩ := Set.mem_mul.mp ha'
-    show φ a • S₀ ≤ ⨆ w' : ↥W, φ ↑w' • S₀
+    change φ a • S₀ ≤ ⨆ w' : ↥W, φ ↑w' • S₀
     rw [← huw, map_mul, mul_smul]
     have key : φ u • (φ w • S₀) = φ w • S₀ :=
       isAInvariant_comp_subtype_pointwise_smul hU hS₀ w ⟨u, hu⟩
@@ -864,15 +864,15 @@ theorem fixedPointFree_of_aInvariant_irreducible_comm
     { carrier := {y | φ a y = y}
       one_mem' := map_one (φ a)
       mul_mem' := fun {y z} hy hz => by
-        show φ a (y * z) = y * z
+        change φ a (y * z) = y * z
         rw [map_mul, show φ a y = y from hy, show φ a z = z from hz]
       inv_mem' := fun {y} hy => by
-        show φ a y⁻¹ = y⁻¹
+        change φ a y⁻¹ = y⁻¹
         rw [map_inv, show φ a y = y from hy] }
   have hxF : x ∈ F := hx
   -- `Fix(φ a)` is `A`-invariant: `φ a` commutes with every `φ b` (image of `φ` abelian).
   have hAinv : IsAInvariant φ F := isAInvariant_iff_smul_mem.mpr fun b y hy => by
-    show φ a (φ b y) = φ b y
+    change φ a (φ b y) = φ b y
     have he : (φ a * φ b) y = (φ b * φ a) y := by rw [(hcomm a b).eq]
     rw [MulAut.mul_apply, MulAut.mul_apply, show φ a y = y from hy] at he
     exact he
@@ -943,7 +943,7 @@ theorem exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
   have hcmul : ∀ g h, c (g * h) = c g * c h := fun g h => by
     have e1 : (ρ (g * h)) x = (c g * c h) • x := by
       rw [map_mul]
-      show (ρ g) ((ρ h) x) = (c g * c h) • x
+      change (ρ g) ((ρ h) x) = (c g * c h) • x
       rw [← hc h, map_smul, ← hc g, smul_smul, mul_comm]
     have key : c (g * h) • x = (c g * c h) • x := by rw [hc (g * h)]; exact e1
     exact smul_left_injective ℂ hx key
@@ -985,7 +985,7 @@ theorem exists_addEquiv_asModule_fpf
       left_inv := fun z => by simp
       right_inv := fun z => by simp
       map_add' := fun z w => by
-        show Additive.ofMul (σ (Additive.toMul (z + w)))
+        change Additive.ofMul (σ (Additive.toMul (z + w)))
           = Additive.ofMul (σ (Additive.toMul z)) + Additive.ofMul (σ (Additive.toMul w))
         rw [show Additive.toMul (z + w) = Additive.toMul z * Additive.toMul w from rfl, map_mul]
         rfl }

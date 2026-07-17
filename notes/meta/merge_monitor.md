@@ -716,6 +716,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #28、Opus hub — /model 切替) — ✅ a/b/c 全合流 + linter wave 5a。census 18 不変。cron 再作成 (`3701c985`, 15 分)**:
+  ⚠ ユーザーが Fable→Opus に /model 切替 → session cron `8ef28e3e` は listed-but-dead リスクゆえ
+  CronDelete → Opus セッションで再作成 `3701c985` (同 15 分 `7,22,37,52`)。
+  **a** = `c44941b5` (⭐ **Isaacs Thm 6.24 Thompson** = Frobenius kernel 冪零・KernelNilpotent.lean +
+  **Ch.9 SS9A** quasisimple Lemma 9.1/9.2) build 4348 green。
+  **b** = `11ebb787` (Suzuki **Ch.I Prop 1 完備 + Prop 2(a-d) + Prop 3 + Prop 4(a)** canonical form +
+  Suzuki.lean を pure re-export hub + 3 topic leaves に dir 分割) build 4351 green。
+  **c** = `958f2bb4` (⭐ **Isaacs Thm 10.24 完成** sorry-free = v(G)≅Ξ(Δ(G)‾) + FiniteIndexAnnihilator.lean
+  = Thm 10.26 基盤) build 4352 green。全 AxiomsCheck OK・新 axiom なし・逸脱なし。push 済。
+  **linter campaign (issue 0123)**: wave 0 (AxiomsCheck 359) + wave 1 (no-op/dead tactic 247) +
+  wave 5a (`show`→`change` 812) = 計 **1398 件解消** (4761→3363)。3 subagent 並列 + 列精密スクリプト。
+  ⚠ wave-1 で `git add 'OddOrder/**/*.lean'` glob が top-level `FeitThompsonCharacterData.lean` を
+  取りこぼし → wave 5a で回収。**以後 commit は `git add -A -- 'OddOrder/'`** (cron prompt 反映済)。
 - **2026-07-17 (tick #27 = 監視再開、Fable hub) — ✅ b + c 持ち越し分を合流、census 23→18 (b の scaffold 5 sorry 削除)。cron 再作成 (15 分 `7,22,37,52`)**:
   **b** = `03e52686` tip (⭐ Pf Part II Suzuki: honest (A1)-(A3) Hypothesis 置換 + **Ch.I Prop 1(a)(b)**
   `exists_mem_H_conj_inf_eq_D` / `normalizer_le_H_of_le_Q`) を merge `f0314f12`: build **4344 jobs green**。
@@ -727,8 +740,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   **並行タスク開始 (ユーザー指示 2026-07-17)**: (1) 既存 linter warnings 解消 — full-log census
   4,778 件 (line-length 2741 / `show` linter 869 / unused simp args 125 / simpa→simp 38 / 他)、
   hub が凍結ファイルから段階的に解消 (active frontier は回避、issue 起票)。(2) ファイル粒度
-  enforcement — 2000 行超 = S03f_Thm36.lean 3822 行 (分割必須、BG 凍結ゆえ hub 実施) +
-  1900 行台 3 件 (CharacterParameters 1976 / RhoConstancy 1971 / S04g_Thm418 1963) を watch。
+  enforcement — 2000 行超は AxiomsCheck (機械列挙例外) と S03f_Thm36.lean 3822 行のみ。
+  **S03f は per-file 明示例外 (`linter.style.longFile 4000`) 済み + 実質単一宣言 (thm36_aux
+  ~3700 行) で宣言境界が無く prefix-split 不能** — 凍結 sorry-free 証明の分解は regression
+  リスクのみで利得なし ⟹ hub 裁定 = 例外維持 (分割対象にしない)。1900 行台 3 件
+  (CharacterParameters 1976 / RhoConstancy 1971 / S04g_Thm418 1963) は 2000 未満 = watch のみ
+  (レーン追記を tick step 4 で flag)。
 - **2026-07-17 (tick #26 部分実行→ユーザー区切り指示で監視停止、Fable hub) — ✅ a のみ合流、census 23 不変。b/c は未マージ持ち越し**:
   **a** = `6bd419ec` (nilpotent normal p-complements + 一意性/自己同型不変性、
   NilpotentPComplement.lean 新設 185 行) を merge `9089d2e8`: build **4344 jobs green**。

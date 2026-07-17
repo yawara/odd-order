@@ -179,7 +179,7 @@ theorem isHallSubgroup_subgroupOf_inf_of_normal_isHall [Finite G] {π : Set ℕ}
     exact hAhall.1 p (Nat.primeFactors_mono (hcard1 ▸ hcard2) Nat.card_pos.ne' hp)
   · -- `π′`-index: `[H : A ⊓ H] = (A_N).relIndex (H_N) ∣ (A_N).index`.
     have he1 : ((A ⊓ H).subgroupOf H).index = (A.subgroupOf N).relIndex (H.subgroupOf N) := by
-      show (A ⊓ H).relIndex H = _
+      change (A ⊓ H).relIndex H = _
       rw [inf_comm, Subgroup.inf_relIndex_left, ← Subgroup.relIndex_subgroupOf hHN]
     have htower := Subgroup.relIndex_mul_relIndex (A.subgroupOf N)
       ((H.subgroupOf N) ⊔ (A.subgroupOf N)) ⊤ le_sup_right le_top

@@ -424,11 +424,11 @@ theorem conjClass_meets_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjCl
       { carrier := {ψ | IsConj (ψ a) a}
         one_mem' := by simpa only [Set.mem_setOf_eq, MulAut.one_apply] using IsConj.refl a
         mul_mem' := fun {ψ₁ ψ₂} h₁ h₂ => by
-          show IsConj ((ψ₁ * ψ₂) a) a
+          change IsConj ((ψ₁ * ψ₂) a) a
           rw [MulAut.mul_apply]
           exact (hmapconj ψ₁ h₂).trans h₁
         inv_mem' := fun {ψ} hψ => by
-          show IsConj (ψ⁻¹ a) a
+          change IsConj (ψ⁻¹ a) a
           have h3 : IsConj (ψ⁻¹ (ψ a)) (ψ⁻¹ a) := hmapconj ψ⁻¹ hψ
           rw [MulAut.inv_apply_self] at h3
           exact h3.symm }

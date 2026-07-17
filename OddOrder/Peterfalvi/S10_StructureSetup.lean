@@ -426,7 +426,7 @@ theorem hall_maxNilpotentNormalHall_and_mainSubgroup [Finite G]
       exact hMsHall.2 p
         (Nat.mem_primeFactors.mpr ⟨hp_prime, hpMσidx, Subgroup.index_ne_zero_of_finite⟩) hpσ
   · -- `M_s = M_σ` (BG Prop 16.1); the Hall property is `Msigma_isHall` re-indexed to `π(M_σ)`.
-    show Ch03.IsHallSubgroup
+    change Ch03.IsHallSubgroup
       (Nat.card ↥(OddOrder.GroupTheory.mainSubgroup M tau)).primeFactors
       (OddOrder.GroupTheory.mainSubgroup M tau)
     rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM hType]

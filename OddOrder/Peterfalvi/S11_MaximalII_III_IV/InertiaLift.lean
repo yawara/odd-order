@@ -47,7 +47,7 @@ theorem cuSub_le_U (caseA : CliffordCaseAData chars) : cuSub caseA ≤ data.U :=
 the kernel (mirrors `card_cSub_eq_card_ker`). -/
 theorem card_cuSub_eq_card_ker (caseA : CliffordCaseAData chars) :
     Nat.card ↥(cuSub caseA) = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).ker := by
-  show Nat.card ↥(((aInvariantRestrictAut caseA.S0_aInvariant).ker.map
+  change Nat.card ↥(((aInvariantRestrictAut caseA.S0_aInvariant).ker.map
       (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
         (data.typeP.U ⊔ data.typeP.W1).subtype)
       = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).ker
@@ -609,7 +609,7 @@ theorem chiefFactor_caseB_image_cyclic [Finite G] {M : Subgroup G}
     ext y
     refine QuotientGroup.induction_on y ?_
     intro x
-    show (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
+    change (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
     have hstep : (act.φ g) (QuotientGroup.mk' chief.N x)
         = QuotientGroup.mk' chief.N ((typeP_conjAction data.typeP g) x) := rfl
     rw [hstep, hfix x]
@@ -618,7 +618,7 @@ theorem chiefFactor_caseB_image_cyclic [Finite G] {M : Subgroup G}
     intro a b
     refine commutatorElement_eq_one_iff_commute.mp ?_
     rw [← map_commutatorElement φU a b]
-    show act.φ (act.U.subtype ⁅a, b⁆) = 1
+    change act.φ (act.U.subtype ⁅a, b⁆) = 1
     apply hcentral_triv
     change ((data.typeP.U ⊔ data.typeP.W1).subtype.comp act.U.subtype) ⁅a, b⁆
         ∈ Subgroup.centralizer (data.typeP.H : Set G)
@@ -705,7 +705,7 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
     ext y
     refine QuotientGroup.induction_on y ?_
     intro x
-    show (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
+    change (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
     have hstep : (act.φ g) (QuotientGroup.mk' chief.N x)
         = QuotientGroup.mk' chief.N ((typeP_conjAction data.typeP g) x) := rfl
     rw [hstep, hfix x]
@@ -713,7 +713,7 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
     intro a b
     refine commutatorElement_eq_one_iff_commute.mp ?_
     rw [← map_commutatorElement φU a b]
-    show act.φ (act.U.subtype ⁅a, b⁆) = 1
+    change act.φ (act.U.subtype ⁅a, b⁆) = 1
     apply hcentral_triv
     change ((data.typeP.U ⊔ data.typeP.W1).subtype.comp act.U.subtype) ⁅a, b⁆
         ∈ Subgroup.centralizer (data.typeP.H : Set G)
@@ -743,7 +743,7 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
   have hwUW1 : w ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_right hwW1
   set w₀ : ↥(data.typeP.U ⊔ data.typeP.W1) := ⟨w, hwUW1⟩ with hw₀def
   have hw₀E : w₀ ∈ act.E := by
-    show (⟨w, hwUW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈
+    change (⟨w, hwUW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈
       data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
     rw [Subgroup.mem_subgroupOf]; exact hwW1
   have hw₀ne : w₀ ≠ 1 := fun h => hwne (Subtype.ext_iff.mp h)
@@ -757,7 +757,7 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
       φU (ψ g y) = act.φ g * φU y * (act.φ g)⁻¹ := by
     intro g y
     have he : φU (ψ g y) = act.φ ((g : ↥(data.typeP.U ⊔ data.typeP.W1)) * act.U.subtype y * g⁻¹) := by
-      show act.φ (act.U.subtype (ψ g y)) = _
+      change act.φ (act.U.subtype (ψ g y)) = _
       rw [hψcoe]
     rw [he, map_mul, map_mul, map_inv]; rfl
   -- The kernel `N = C_U(H̄)` of `φU`, and its `ψ`-invariance.
@@ -766,7 +766,7 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
     rw [isAInvariant_iff_smul_mem]
     intro a y hy
     rw [hNdef, MonoidHom.mem_ker] at hy ⊢
-    show φU (ψ ((Subgroup.zpowers w₀).subtype a) y) = 1
+    change φU (ψ ((Subgroup.zpowers w₀).subtype a) y) = 1
     rw [hφUconj, hy, mul_one, mul_inv_cancel]
   -- Coprimality and solvability inputs for Isaacs Cor 3.28.
   have hCop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers w₀)) (Nat.card ↥act.U) := by
@@ -790,7 +790,7 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
     have ha1 : ((φU.range).subtype a : MulAut (↥data.H ⧸ chief.N)) = act.φ (act.U.subtype u₀) :=
       hu₀.symm
     have hCm : Commute (act.φ w₀) (act.φ (act.U.subtype u₀)) := by
-      show act.φ w₀ * act.φ (act.U.subtype u₀) = act.φ (act.U.subtype u₀) * act.φ w₀
+      change act.φ w₀ * act.φ (act.U.subtype u₀) = act.φ (act.U.subtype u₀) * act.φ w₀
       apply MulEquiv.ext
       intro x
       rw [MulAut.mul_apply, MulAut.mul_apply, ← ha1]
@@ -912,7 +912,7 @@ theorem chiefFactor_caseB_action_fpf [Finite G] {M : Subgroup G}
     ext y
     refine QuotientGroup.induction_on y ?_
     intro z
-    show (act.φ c) (QuotientGroup.mk' chief.N z) = QuotientGroup.mk' chief.N z
+    change (act.φ c) (QuotientGroup.mk' chief.N z) = QuotientGroup.mk' chief.N z
     have hstep : (act.φ c) (QuotientGroup.mk' chief.N z)
         = QuotientGroup.mk' chief.N ((typeP_conjAction data.typeP c) z) := rfl
     rw [hstep, hfix z]
@@ -921,7 +921,7 @@ theorem chiefFactor_caseB_action_fpf [Finite G] {M : Subgroup G}
     intro a b
     refine commutatorElement_eq_one_iff_commute.mp ?_
     rw [← map_commutatorElement φU a b]
-    show act.φ (act.U.subtype ⁅a, b⁆) = 1
+    change act.φ (act.U.subtype ⁅a, b⁆) = 1
     apply hcentral_triv
     change ((data.typeP.U ⊔ data.typeP.W1).subtype.comp act.U.subtype) ⁅a, b⁆
         ∈ Subgroup.centralizer (data.typeP.H : Set G)

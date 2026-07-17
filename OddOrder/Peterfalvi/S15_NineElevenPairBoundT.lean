@@ -56,7 +56,7 @@ theorem Hypothesis.sSet_eq_sOf_H0Cprime_T [Finite G]
   classical
   have hH0 : chief.H0 = ⊥ := hyp.toTypesIIIIIIVSetupT_chief_H0_eq_bot hG hvd chief
   have hCp : chars.Cprime = ⊥ := by
-    show OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief = ⊥
+    change OddOrder.Peterfalvi.S11.cprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief = ⊥
     have hCV : OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief
         ≤ hyp.V :=
       (OddOrder.Peterfalvi.S11.cSub_le_U _ _).trans
@@ -74,7 +74,7 @@ theorem Hypothesis.sSet_eq_sOf_H0Cprime_T [Finite G]
       refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
       rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
       exact hCab.is_comm.comm a b
-    show derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥
+    change derivedInG (OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥
     rw [derivedInG, hcomm, Subgroup.map_bot]
   rw [hH0, hCp, sup_bot_eq, sOf_bot_eq_sSet]
 
@@ -86,7 +86,7 @@ theorem Hypothesis.uprimeSub_eq_bot_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1) :
     uprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) = ⊥ := by
-  show derivedInG (hyp.toTypesIIIIIIVSetupT hG hvd).U = ⊥
+  change derivedInG (hyp.toTypesIIIIIIVSetupT hG hvd).U = ⊥
   have hUV : (hyp.toTypesIIIIIIVSetupT hG hvd).U ≤ hyp.V :=
     le_of_eq (hyp.toTypesIIIIIIVSetupT_U_eq hG hvd)
   have hVab : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG

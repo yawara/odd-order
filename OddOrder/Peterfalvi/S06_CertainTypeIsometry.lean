@@ -324,7 +324,7 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46Core A L)
       have hvV : L.subtype (x * y) ∈ h.tic.V := by
         rw [h.tic_V]
         refine ⟨?_, ?_⟩
-        · show L.subtype (x * y) ∈ h.tic.W
+        · change L.subtype (x * y) ∈ h.tic.W
           rw [htW]; exact Subgroup.mem_map.mpr ⟨x * y, hxyW, rfl⟩
         · rintro (hmem | hmem)
           · -- `x·y ∈ W₁` would force `y = 1`.
@@ -420,7 +420,7 @@ theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
   have hwpt : (⟨(w : ↥L), h.sdiffTICyclicHypothesis.V_subset_W hwsdiffV⟩ :
       h.sdiffTICyclicHypothesis.W) = w := Subtype.ext rfl
   rw [tau_toDadeMap_apply_of_mem h _ hvA0]
-  show (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+  change (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
       - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) ⟨v, h.dade0.mem_L hvA0⟩ = _
   rw [ClassFunction.sub_apply, ← hwL,
     h.certainType_apply_eq_of_mem_V χ₂ i hwsdiffV,
@@ -444,7 +444,7 @@ theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
     ClassFunction.inner (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg))
         (h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)) = 2 := by
   rw [h.tau.inner_eq]
-  show ClassFunction.inner
+  change ClassFunction.inner
       (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
         - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ))
       (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
@@ -591,12 +591,12 @@ theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
   have hcij : ClassFunction.inner φ ωij = (s : ℂ) := by
     have he := hall Pij
     rw [sigmaCoeff_psi_eq, if_pos rfl, if_neg (Ne.symm hPne)] at he
-    rw [hωijeq]; show (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pij = _
+    rw [hωijeq]; change (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pij = _
     linear_combination he
   have hcik : ClassFunction.inner φ ωik = -(s : ℂ) := by
     have he := hall Pik
     rw [sigmaCoeff_psi_eq, if_neg hPne, if_pos rfl] at he
-    rw [hωikeq]; show (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pik = _
+    rw [hωikeq]; change (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pik = _
     linear_combination he
   -- orthonormality of `ω_ij^σ, ω_ik^σ` and `‖φ‖² = 2`
   have hnorm : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg

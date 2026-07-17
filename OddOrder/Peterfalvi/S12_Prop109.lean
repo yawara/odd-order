@@ -276,7 +276,7 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       apply hpq
       -- `⟨ψ, χ_pq⟩ = ∑_{i'} ⟨ω_{i'0}^σ, χ_pq⟩ − ⟨ζ^{τ₁}, χ_pq⟩`; the second term is `0` (hcon.2),
       -- and `⟨ω_{i'0}^σ, χ_pq⟩ = ⟨χ_{(ρ i', κ 0)}, χ_pq⟩ = 0` since `pq ≠ (ρ i', κ 0)` (hcon.1).
-      show ClassFunction.inner ψ (tic.chiFam hVeq app pq) = 0
+      change ClassFunction.inner ψ (tic.chiFam hVeq app pq) = 0
       rw [hstep1, ClassFunction.inner_sub_left, hcon.2, sub_zero, inner_sum_left]
       refine Finset.sum_eq_zero (fun i' _ => ?_)
       rw [hprod i' 0,

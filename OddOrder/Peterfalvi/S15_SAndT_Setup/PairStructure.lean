@@ -251,7 +251,7 @@ theorem Hypothesis.isNilpotent_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       have htower : hyp.Q.relIndex (derivedInG hyp.T) *
           (derivedInG hyp.T).relIndex hyp.T = hyp.Q.relIndex hyp.T :=
         Subgroup.relIndex_mul_relIndex hyp.Q (derivedInG hyp.T) hyp.T hQ_le hM'_le_T
-      show hyp.Q.relIndex (derivedInG hyp.T) ∣ hyp.Q.relIndex hyp.T
+      change hyp.Q.relIndex (derivedInG hyp.T) ∣ hyp.Q.relIndex hyp.T
       exact ⟨(derivedInG hyp.T).relIndex hyp.T, htower.symm⟩
     rw [hcard]
     exact Nat.Coprime.coprime_dvd_right hdvd h0
@@ -335,7 +335,7 @@ theorem Hypothesis.exists_typePData_U_eq_V [Finite G] (hG : OddOrder.BG.IsMinima
       have htower : hyp.Q.relIndex (derivedInG hyp.T) *
           (derivedInG hyp.T).relIndex hyp.T = hyp.Q.relIndex hyp.T :=
         Subgroup.relIndex_mul_relIndex hyp.Q (derivedInG hyp.T) hyp.T hQ_le hM'_le_T
-      show hyp.Q.relIndex (derivedInG hyp.T) ∣ hyp.Q.relIndex hyp.T
+      change hyp.Q.relIndex (derivedInG hyp.T) ∣ hyp.Q.relIndex hyp.T
       exact ⟨(derivedInG hyp.T).relIndex hyp.T, htower.symm⟩
     rw [hcard]
     exact Nat.Coprime.coprime_dvd_right hdvd h0
@@ -380,7 +380,7 @@ theorem Hypothesis.exists_typePData_U_eq_V [Finite G] (hG : OddOrder.BG.IsMinima
     · intro hx
       refine ⟨g⁻¹ * x * g, (hgN (g⁻¹ * x * g)).mpr ?_, ?_⟩
       · rwa [show g * (g⁻¹ * x * g) * g⁻¹ = x from by group]
-      · show MulAut.conj g (g⁻¹ * x * g) = x
+      · change MulAut.conj g (g⁻¹ * x * g) = x
         simp only [MulAut.conj_apply]; group
   -- Whole-datum conjugation, cast back to `TypePData T`.  The `.U`/`.H` projections have constant
   -- codomain `Subgroup G`, so they commute with the `▸` cast on the index (proved by `subst` on a

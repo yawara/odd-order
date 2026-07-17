@@ -1221,7 +1221,7 @@ theorem subrepresentation_character_eq_one_of_character_eq_one
   have hid : ρ g = LinearMap.id := rep_eq_id_of_character_eq_one ρ h
   -- Restricting the identity to the invariant submodule is the identity.
   have hrestr : ρ'.toRepresentation g = LinearMap.id := by
-    show (ρ g).restrict (ρ'.apply_mem_toSubmodule g) = LinearMap.id
+    change (ρ g).restrict (ρ'.apply_mem_toSubmodule g) = LinearMap.id
     ext v
     simp [LinearMap.restrict_apply, hid]
   -- Both sides are the dimension of the submodule (`trace id = finrank`).

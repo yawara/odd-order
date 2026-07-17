@@ -1122,7 +1122,7 @@ representation on `PUnit`). -/
 theorem IsCharacter.zero : IsCharacter (0 : ClassFunction G ℂ) := by
   refine ⟨PUnit, inferInstance, inferInstance, inferInstance, 1, ?_⟩
   funext g
-  show (0 : ℂ) = LinearMap.trace ℂ PUnit ((1 : Representation ℂ G PUnit) g)
+  change (0 : ℂ) = LinearMap.trace ℂ PUnit ((1 : Representation ℂ G PUnit) g)
   rw [Subsingleton.elim ((1 : Representation ℂ G PUnit) g) 0, map_zero]
 
 /-- Genuine characters are closed under addition: the direct sum (`Representation.prod`) of the
@@ -1134,7 +1134,7 @@ theorem IsCharacter.add {χ ψ : ClassFunction G ℂ} (hχ : IsCharacter χ) (h�
   refine ⟨V × W, inferInstance, inferInstance, inferInstance, ρ.prod σ, ?_⟩
   funext g
   have hprod : (ρ.prod σ).character g = ρ.character g + σ.character g := by
-    show LinearMap.trace ℂ (V × W) ((ρ g).prodMap (σ g))
+    change LinearMap.trace ℂ (V × W) ((ρ g).prodMap (σ g))
         = LinearMap.trace ℂ V (ρ g) + LinearMap.trace ℂ W (σ g)
     exact LinearMap.trace_prodMap' (ρ g) (σ g)
   rw [hprod, ClassFunction.add_apply, congrFun hρ g, congrFun hσ g]

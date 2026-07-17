@@ -109,7 +109,7 @@ theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinima
     apply Subtype.ext
     apply Subtype.ext
     rw [OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW]
-    show (g : G) = ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
+    change (g : G) = ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
         ((Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm g) : ↥M) : G)
     rw [MulEquiv.subgroupCongr_apply]
     rfl
@@ -135,7 +135,7 @@ theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinima
         ClassFunction.compHom_apply,
         show e.toMonoidHom g = OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 g from (hpt g).symm]
       exact OddOrder.Peterfalvi.S06.omegaProdCharTic_apply h46 _ _ g
-    show (OddOrder.Peterfalvi.S06.ticVdiff h46).sigma rfl
+    change (OddOrder.Peterfalvi.S06.ticVdiff h46).sigma rfl
         (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication h46)
         ((OddOrder.Peterfalvi.S06.ticVdiff h46).omega
           (OddOrder.Peterfalvi.S06.omegaProdCharTic h46 _ (finCongr hcardW1.symm ii)))
@@ -248,7 +248,7 @@ theorem Hypothesis.tau_muGrid_fourCorner [Finite G] (hG : OddOrder.BG.IsMinimalS
     apply Subtype.ext
     apply Subtype.ext
     rw [OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW]
-    show (g : G) = ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
+    change (g : G) = ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
         ((Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm g) : ↥M) : G)
     rw [MulEquiv.subgroupCongr_apply]
     rfl
@@ -274,7 +274,7 @@ theorem Hypothesis.tau_muGrid_fourCorner [Finite G] (hG : OddOrder.BG.IsMinimalS
         ClassFunction.compHom_apply,
         show e.toMonoidHom g = OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 g from (hpt g).symm]
       exact OddOrder.Peterfalvi.S06.omegaProdCharTic_apply h46 _ _ g
-    show (OddOrder.Peterfalvi.S06.ticVdiff h46).sigma rfl
+    change (OddOrder.Peterfalvi.S06.ticVdiff h46).sigma rfl
         (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication h46)
         ((OddOrder.Peterfalvi.S06.ticVdiff h46).omega
           (OddOrder.Peterfalvi.S06.omegaProdCharTic h46 _ (finCongr hcardW1.symm ii)))
@@ -778,7 +778,7 @@ theorem Hypothesis.inducedFamily_sub_support [Finite G] {M : Subgroup G} (hyp : 
     apply hz
     rw [ClassFunction.sub_apply, hdeg, sub_self]
   have hzM' : (z : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp hzK
-  show (z : G) ∈ typePA0 M hyp.typeP
+  change (z : G) ∈ typePA0 M hyp.typeP
   unfold typePA0
   rw [Set.mem_union]
   left
@@ -885,7 +885,7 @@ theorem Hypothesis.muColumn_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMini
       Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, star_natCast]
     ring
   have hzM' : (z : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp hzK
-  show (z : G) ∈ typePA0 M hyp.typeP
+  change (z : G) ∈ typePA0 M hyp.typeP
   unfold typePA0
   rw [Set.mem_union]
   left
@@ -935,7 +935,7 @@ theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.I
       Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
     ring
   have hzM' : (z : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp hzK
-  show (z : G) ∈ typePA0 M hyp.typeP
+  change (z : G) ∈ typePA0 M hyp.typeP
   unfold typePA0
   rw [Set.mem_union]
   left

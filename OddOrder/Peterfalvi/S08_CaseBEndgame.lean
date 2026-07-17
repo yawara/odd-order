@@ -192,7 +192,7 @@ theorem caseB_W1_dvd_index_of_centralizer_le {G : Type*} [Group G] [Finite G]
     have h1 : (a • x : ↥H) = (MulDistribMulAction.toMulAut ↥W1 ↥H a) x := by
       simp [MulDistribMulAction.toMulAut_apply]
     rw [h1]
-    show ((MulAut.conjNormal (H := H) (W1.subtype a)) x : ↥L) = _
+    change ((MulAut.conjNormal (H := H) (W1.subtype a)) x : ↥L) = _
     rw [MulAut.conjNormal_apply]; rfl
   -- `M` characteristic ⟹ invariant under the action
   have hMinv : ∀ a : ↥W1, ∀ m ∈ M, a • m ∈ M := by
@@ -277,7 +277,7 @@ theorem caseB_W1_dvd_relIndex_commutator {G : Type*} [Group G] [Fintype G]
     have h1 : (a • x : ↥H) = (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a) x := by
       simp [MulDistribMulAction.toMulAut_apply]
     rw [h1]
-    show ((MulAut.conjNormal (H := H) (hyp.W1.subtype a)) x : ↥L) = _
+    change ((MulAut.conjNormal (H := H) (hyp.W1.subtype a)) x : ↥L) = _
     rw [MulAut.conjNormal_apply]; rfl
   -- `commutator ↥H` is `W₁`-invariant (characteristic)
   have hcommInv : ∀ a : ↥hyp.W1, ∀ m ∈ commutator ↥H, a • m ∈ commutator ↥H := by

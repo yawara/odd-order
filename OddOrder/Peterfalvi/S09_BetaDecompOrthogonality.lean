@@ -156,7 +156,7 @@ theorem betaDecomp_orth_one_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L
       rw [hagree i hi0 hi]; abel
     rw [hrearrange, ClassFunction.inner_add_left, ClassFunction.inner_smul_left, hzeta0nu,
       mul_zero, add_zero, inner_tau_supported_constOne]
-    show ClassFunction.inner (ζ i - d i • ζ 0) (Hypothesis71.constOne L) = 0
+    change ClassFunction.inner (ζ i - d i • ζ 0) (Hypothesis71.constOne L) = 0
     rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
       hzeta_orth_one i hi, hzeta_orth_one 0 (Ne.symm hind1H), mul_zero, sub_zero]
 
@@ -192,7 +192,7 @@ theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
     intro j hj hcontra
     apply hj
     apply hinj
-    show ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)
+    change ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)
       = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
     rw [hcontra, hzeta_ind1H]
   exact betaDecomp_orth_one_gen H71 (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
@@ -600,7 +600,7 @@ theorem betaDecomp_gamma_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} 
   have hθ0 : θ 0 ≠ trivialIrreducibleCharacter ↥K := by
     intro h
     exact hind0 (hinj (by
-      show ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+      change ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
         = ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)
       rw [hzeta_ind1H, h]))
   have hβ1 : ClassFunction.inner β (Hypothesis71.constOne G) = 1 := by

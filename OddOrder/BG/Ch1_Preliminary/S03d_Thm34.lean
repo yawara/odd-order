@@ -122,7 +122,7 @@ private theorem thm34_commutator_of_generated {F : Type*} [Field F]
   have hKCr : (⨆ i, Hs i) ≤ Cr := by
     refine iSup_le fun i => ?_
     intro k' hk'
-    show ⁅r, k'⁆ ∈ MonoidHom.ker ρ
+    change ⁅r, k'⁆ ∈ MonoidHom.ker ρ
     rw [MonoidHom.mem_ker]
     exact hproper (Hs i) (hHlt i) (hHinv i) _ (Subgroup.commutator_mem_commutator hr hk')
   rw [← hgen] at hk
@@ -269,7 +269,7 @@ private lemma thm34_isExtraspecial_of_special {G : Type*} [Group G] [Finite G]
   have hmem : ∀ z : ↥(Subgroup.center ↥K),
       (K.subtype.comp (Subgroup.center ↥K).subtype) z ∈ Subgroup.center G := by
     intro z
-    show ((z : ↥K) : G) ∈ Subgroup.center G
+    change ((z : ↥K) : G) ∈ Subgroup.center G
     have hcent : Subgroup.centralizer ({((z : ↥K) : G)} : Set G) = ⊤ := by
       rw [eq_top_iff, ← hcompl.sup_eq_top]
       refine sup_le (fun a ha => ?_) (fun b hb => ?_)
@@ -398,7 +398,7 @@ private lemma normal_le_of_complement_prime_of_inf_eq_bot
     obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q Rsyl
     have hxQ : (x : G) ∈ (Q : Subgroup G) := hQ (Subgroup.mem_zpowers _)
     have hcompute : (MulAut.conj g)⁻¹ • (g * (x : G) * g⁻¹) = (x : G) := by
-      rw [← map_inv]; show (MulAut.conj g⁻¹) (g * (x : G) * g⁻¹) = (x : G)
+      rw [← map_inv]; change (MulAut.conj g⁻¹) (g * (x : G) * g⁻¹) = (x : G)
       rw [MulAut.conj_apply]; group
     have hconjR : g * (x : G) * g⁻¹ ∈ R := by
       have hR : (Rsyl : Subgroup G) = R := Sylow.coe_ofCard _ _
@@ -713,7 +713,7 @@ private theorem thm34_aux : ∀ (n : ℕ)
       haveI hIsTriv : Representation.IsTrivial (W.toRepresentation.comp N.subtype) := by
         constructor
         intro n
-        show W.toRepresentation (n : G) = LinearMap.id
+        change W.toRepresentation (n : G) = LinearMap.id
         have hnk : W.toRepresentation.asGroupHom (n : G) = 1 := MonoidHom.mem_ker.mp n.2
         rw [← Representation.asGroupHom_apply, hnk, Units.val_one]; rfl
       haveI : (K.map (QuotientGroup.mk' N)).Normal :=
@@ -802,7 +802,7 @@ private theorem thm34_aux : ∀ (n : ℕ)
       apply LinearMap.ext
       intro x
       apply Subtype.ext
-      show ρ g (x : V) = (W.toRepresentation (1 : G) x : V)
+      change ρ g (x : V) = (W.toRepresentation (1 : G) x : V)
       rw [hg, map_one]; rfl
     -- `g₀ ∈ ⁅R, K⁆ ⊆ K`; `K` acts nontrivially (`ρ g₀ ≠ 1`).
     have hg₀K : g₀ ∈ K := (Subgroup.commutator_le_right R K) hg₀mem
@@ -1025,7 +1025,7 @@ private theorem thm34_aux : ∀ (n : ℕ)
       have hCVeig : cyclicEigenspaceFinDim ε
           (W.toRepresentation.asGroupHom (ψ : G) : Module.End F ↥W.toSubmodule)
           (0 : Fin p) = 0 := by
-        show Module.finrank F ↥(cyclicEigenspace ε
+        change Module.finrank F ↥(cyclicEigenspace ε
           (W.toRepresentation.asGroupHom (ψ : G) : Module.End F ↥W.toSubmodule)
           ((0 : Fin p) : ℕ)) = 0
         rw [show ((0 : Fin p) : ℕ) = 0 from rfl, heig_bot, finrank_bot]

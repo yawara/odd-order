@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import OddOrder.FeitThompsonCharacterData
 
 /-!
@@ -88,7 +93,7 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
       delta_zero_eq_one := by
         haveI : NeZero (Nat.card ↥(mp.certainTypeS hG).W1) :=
           ⟨by rw [Section16CharacterData.cardCertainTypeS_W1 hG mp tp]; exact tp.q_prime.pos.ne'⟩
-        show Section16CharacterData.deltaS hG mp tp ⟨0, tp.p_prime.pos⟩ = 1
+        change Section16CharacterData.deltaS hG mp tp ⟨0, tp.p_prime.pos⟩ = 1
         rw [Section16CharacterData.deltaS, Section16CharacterData.chi2enum_zero]
         exact ((mp.certainTypeS hG).certainType_zero_column_anchor).1
       tau3 := Section16CharacterData.tau3W hG mp tp

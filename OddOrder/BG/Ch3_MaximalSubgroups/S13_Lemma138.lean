@@ -696,7 +696,7 @@ theorem QMbeta_sup_normal_in_M [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgr
       ext x
       simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
         Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
-    show (K.map (MulAut.conj c).toMonoidHom).map (derivedInG M).subtype
+    change (K.map (MulAut.conj c).toMonoidHom).map (derivedInG M).subtype
         = (K.map (derivedInG M).subtype).map (MulAut.conj (c : G)).toMonoidHom
     rw [Subgroup.map_map, Subgroup.map_map, hcomp]
   have hcQ : MulAut.conj (c : G) • Q = MulAut.conj m • Q := by

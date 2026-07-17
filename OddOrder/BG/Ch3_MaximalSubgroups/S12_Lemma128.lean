@@ -681,7 +681,7 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
     haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
     set R : Subgroup G := ((default : Sylow (r : ℕ) ↥E₂) : Subgroup ↥E₂).map E₂.subtype
       with hRdef
-    show R ≤ Subgroup.centralizer ((E₂ : Subgroup G) : Set G)
+    change R ≤ Subgroup.centralizer ((E₂ : Subgroup G) : Set G)
     have hr2 : (r : ℕ) ∈ tau2 M := by
       have h1 : (r : ℕ) ∈ (Nat.card ↥(E₂.subgroupOf E)).primeFactors := by
         rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv]

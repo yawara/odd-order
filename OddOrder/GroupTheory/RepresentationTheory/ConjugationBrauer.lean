@@ -163,7 +163,7 @@ theorem card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_b
     have hh_one : h = 1 := by
       apply Subtype.ext
       simpa using (Subgroup.mem_bot.mp hh_bot)
-    show ConjClasses.mk h = 1
+    change ConjClasses.mk h = 1
     rw [hh_one]
     exact ConjClasses.one_eq_mk_one.symm
   rw [Nat.card_eq_one_iff_unique]
@@ -316,7 +316,7 @@ theorem conjBy_compHom_eq_compHom_conjBy (q : ↥H →* ↥H')
   apply congrArg θbar
   apply Subtype.ext
   -- Reduce to an equality of `G/M`-values: both are `mk'(g)·mk'(h)·mk'(g)⁻¹`.
-  show ((q ⟨g * (h : G) * g⁻¹, ‹H.Normal›.conj_mem (h : G) h.property g⟩ : ↥H') : G ⧸ M) =
+  change ((q ⟨g * (h : G) * g⁻¹, ‹H.Normal›.conj_mem (h : G) h.property g⟩ : ↥H') : G ⧸ M) =
     QuotientGroup.mk' M g * ((q h : ↥H') : G ⧸ M) * (QuotientGroup.mk' M g)⁻¹
   rw [hq, hq]
   simp only [QuotientGroup.mk'_apply, QuotientGroup.mk_mul, QuotientGroup.mk_inv]

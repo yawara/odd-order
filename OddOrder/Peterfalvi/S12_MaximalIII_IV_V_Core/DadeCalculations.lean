@@ -656,7 +656,7 @@ theorem Hypothesis.tau_apply_eq_zero_of_not_mem_dadeSupport [Finite G] {M : Subg
     hyp.tau φ g = 0 := by
   haveI := hyp.finiteG
   classical
-  show OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+  change OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
       (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) φ g = 0
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _ hφ]
   exact (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)).map_eq_zero_of_not_mem_dadeSupport
@@ -715,7 +715,7 @@ theorem Hypothesis.muColumnZero_sub_zeta_support [Finite G]
       Finset.sum_congr rfl (fun i _ => hyp.muGrid_zero_column_apply_one hG hodd i),
       Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one, sub_self]
   have hzM' : (z : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp hzK
-  show (z : G) ∈ typePA0 M hyp.typeP
+  change (z : G) ∈ typePA0 M hyp.typeP
   unfold typePA0
   rw [Set.mem_union]
   left
@@ -811,7 +811,7 @@ theorem Hypothesis.exists_intCast_alignedOmegaSigmaGrid_zero_column [Finite G]
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   -- column `0` dual is trivial, so `ξ = (w1CharEquiv …).comp wFst ∘ e` factors through `W₁`.
   have hχ₂ : χ₂ = 1 := by
-    show finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1
+    change finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1
     rw [show (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 0 from by simp,
       finCardEquivCharacterGroup_zero]
   -- `(w1CharEquiv …) ^ w₁ = 1` from `|Ŵ₁| = |W₁| = w₁` (Pontryagin self-duality).
@@ -888,7 +888,7 @@ theorem Hypothesis.alignedOmegaSigmaGrid_zero_zero [Finite G]
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   -- both indices trivial ⟹ `ξ = 1`.
   have hχ₂ : χ₂ = 1 := by
-    show finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1
+    change finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1
     rw [show (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 0 from by simp,
       finCardEquivCharacterGroup_zero]
   have hχ1 : h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1)) = 1 := by
@@ -897,7 +897,7 @@ theorem Hypothesis.alignedOmegaSigmaGrid_zero_zero [Finite G]
     have hpc : h.sdiffTICyclicHypothesis.omegaProdChar
         (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1))) χ₂ = 1 := by
       rw [hχ₂, hχ1]; exact h.sdiffTICyclicHypothesis.omegaProdChar_one_one
-    show (h.sdiffTICyclicHypothesis.omegaProdChar
+    change (h.sdiffTICyclicHypothesis.omegaProdChar
       (h.w1CharEquiv (finCongr hcardW1.symm (0 : Fin hyp.w1))) χ₂).comp e.toMonoidHom = 1
     rw [hpc, MonoidHom.one_comp]
   -- `tic.omega 1 = 1_{tic.W}`, and `1_{tic.W}^σ = 1_G`.
@@ -966,7 +966,7 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
     rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
   -- column `0` dual is trivial: `χ₂ = 1` (so `χ₂⁻¹ = χ₂`).
   have hχ₂ : χ₂ = 1 := by
-    show finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1
+    change finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1
     rw [show (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 0 from by simp,
       finCardEquivCharacterGroup_zero]
   -- the row-inversion translated index
@@ -975,7 +975,7 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
   -- `finCongr` round-trip: `finCongr hcardW1.symm i' = rowInv (finCongr hcardW1.symm i)`.
   have hround : finCongr hcardW1.symm i'
       = OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i) := by
-    show finCongr hcardW1.symm
+    change finCongr hcardW1.symm
         (finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i)))
       = OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i)
     simp
@@ -1005,7 +1005,7 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
         rw [hroundA, OddOrder.Peterfalvi.S06.w1CharEquiv_rowInv,
           OddOrder.Peterfalvi.S06.omegaProdChar_inv, hχ₂]
         congr 1
-      show ((h.sdiffTICyclicHypothesis.omegaProdChar
+      change ((h.sdiffTICyclicHypothesis.omegaProdChar
           (h.w1CharEquiv (finCongr hcardW1.symm a)) χ₂).comp e.toMonoidHom)⁻¹
         = (h.sdiffTICyclicHypothesis.omegaProdChar
           (h.w1CharEquiv (finCongr hcardW1.symm
@@ -1051,7 +1051,7 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
       rw [h0]; simp
     · intro hi0
       have hz : finCongr hcardW1.symm i = 0 := by rw [hi0]; simp
-      show finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i)) = i
+      change finCongr hcardW1 (OddOrder.Peterfalvi.S06.rowInv h (finCongr hcardW1.symm i)) = i
       rw [hz]
       have hrow0 : OddOrder.Peterfalvi.S06.rowInv h (0 : Fin (Nat.card h.W1)) = 0 := by
         have h_inv_one :

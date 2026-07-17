@@ -270,7 +270,7 @@ theorem typeII_sSet_member_support_subset [Finite G]
   classical
   -- `H = S_F = S_σ` (type II).
   have hHσ : data.H = Msigma S := by
-    show data.typeP.H = Msigma S
+    change data.typeP.H = Msigma S
     rw [data.typeP.H_eq]
     exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG
       hSmax (Or.inr hSII)
@@ -322,7 +322,7 @@ theorem typeII_sSet_member_support_subset [Finite G]
   set w : ↥(huSub data) := ⟨c⁻¹ * x * c, hc⟩ with hw_def
   have hw_val : (ξ : ClassFunction ↥(huSub data) ℂ) w ≠ 0 := ClassFunction.mem_support.mp hcsupp
   have hxeq : (x : G) = (c : G) * ((w : ↥S) : G) * (c : G)⁻¹ := by
-    show (x : G) = (c : G) * ((c : G)⁻¹ * (x : G) * (c : G)) * (c : G)⁻¹
+    change (x : G) = (c : G) * ((c : G)⁻¹ * (x : G) * (c : G)) * (c : G)⁻¹
     group
   have hwne : ((w : ↥S) : G) ≠ 1 := by
     intro he

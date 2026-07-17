@@ -379,7 +379,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
         obtain ⟨y, hxy⟩ := hx_notZP
         -- [x, y] ∈ ⁅lcs P (k-1), ⊤⁆ = lcs P k via lcs definition
         have h_xy_in_kp : ⁅x, y⁆ ∈ (⊤ : Subgroup P).lowerCentralSeries ((k - 1) + 1) := by
-          show ⁅x, y⁆ ∈ ⁅(⊤ : Subgroup P).lowerCentralSeries (k - 1), (⊤ : Subgroup P)⁆
+          change ⁅x, y⁆ ∈ ⁅(⊤ : Subgroup P).lowerCentralSeries (k - 1), (⊤ : Subgroup P)⁆
           exact Subgroup.commutator_mem_commutator hx_in (Subgroup.mem_top y)
         have hk_succ : (k - 1) + 1 = k := Nat.sub_add_cancel hk_pos
         rw [hk_succ] at h_xy_in_kp
@@ -518,14 +518,14 @@ theorem mul_pow_of_class_le_two
 def setOfPowEqOne (hC : _root_.commutator G ≤ Subgroup.center G) {p : ℕ}
     (hp : Odd p) : Subgroup G where
   carrier := {x | x^p = 1}
-  one_mem' := by show (1 : G)^p = 1; exact one_pow p
+  one_mem' := by change (1 : G)^p = 1; exact one_pow p
   inv_mem' := by
     intro x (hx : x^p = 1)
-    show x⁻¹^p = 1
+    change x⁻¹^p = 1
     rw [inv_pow, hx, inv_one]
   mul_mem' := by
     intro x y (hx : x^p = 1) (hy : y^p = 1)
-    show (x * y)^p = 1
+    change (x * y)^p = 1
     rw [mul_pow_of_class_le_two hC, hx, hy, one_mul, one_mul]
     -- Goal: ⁅y, x⁆^(p*(p-1)/2) = 1
     have hcom_p : ⁅y, x⁆^p = 1 := by

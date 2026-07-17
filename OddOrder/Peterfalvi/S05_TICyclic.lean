@@ -293,7 +293,7 @@ theorem finrank_supportedSubmodule_eq_card {H : Type*} [Group H] [Fintype H] [Is
         by_contra hwA
         exact hw (dif_neg hwA)
       · funext a
-        show (if hw : (a : H) ∈ A then g ⟨(a : H), hw⟩ else 0) = g a
+        change (if hw : (a : H) ∈ A then g ⟨(a : H), hw⟩ else 0) = g a
         rw [dif_pos a.2]
   rw [(LinearEquiv.ofBijective restr hbij).finrank_eq, Module.finrank_fintype_fun_eq_card,
     Nat.card_eq_fintype_card]
@@ -669,15 +669,15 @@ noncomputable def supportInVdiffEquiv (hyp : TICyclicHypothesis G) :
         rwa [hyp.wFst_wProdEquiv] at h⟩
   left_inv := fun x => by
     apply Subtype.ext
-    show hyp.wProdEquiv (hyp.wFst x.1, hyp.wSnd x.1) = x.1
+    change hyp.wProdEquiv (hyp.wFst x.1, hyp.wSnd x.1) = x.1
     rw [wFst_apply, wSnd_apply, Prod.mk.eta, MulEquiv.apply_symm_apply]
   right_inv := fun p => by
     apply Prod.ext
     · apply Subtype.ext
-      show hyp.wFst (hyp.wProdEquiv (p.1.1, p.2.1)) = p.1.1
+      change hyp.wFst (hyp.wProdEquiv (p.1.1, p.2.1)) = p.1.1
       rw [wFst_wProdEquiv]
     · apply Subtype.ext
-      show hyp.wSnd (hyp.wProdEquiv (p.1.1, p.2.1)) = p.2.1
+      change hyp.wSnd (hyp.wProdEquiv (p.1.1, p.2.1)) = p.2.1
       rw [wSnd_wProdEquiv]
 
 /-- The count `|V| = (w₁ − 1)(w₂ − 1)`, `V = W ∖ (W₁ ∪ W₂)`. -/
@@ -707,7 +707,7 @@ theorem finrank_supportedOnV (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vd
   haveI : Finite G := Finite.of_fintype G
   haveI : Fintype ↥hyp.W := Fintype.ofFinite _
   haveI : IsMulCommutative ↥hyp.W := hyp.isMulCommutative_W
-  show Module.finrank ℂ
+  change Module.finrank ℂ
       ↥(ClassFunction.supportedSubmodule (G := ↥hyp.W)
         (OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W))
       = (Nat.card hyp.W1 - 1) * (Nat.card hyp.W2 - 1)

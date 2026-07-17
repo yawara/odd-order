@@ -509,7 +509,7 @@ theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
     linearIrreducibleCharacter_apply] at hψker
   have hqeq : (QuotientGroup.mk' chief.N) ((hInHuEquivH data) h) = caseA.S0.subtype s := hhs
   rw [hqeq] at hψker
-  show θ (caseA.S0.subtype s) = (1 : ℂˣ)
+  change θ (caseA.S0.subtype s) = (1 : ℂˣ)
   refine Units.ext ?_
   rw [Units.val_one]
   exact hψker
@@ -1087,7 +1087,7 @@ theorem exceptional_case_frobenius_realization [Finite G]
   rw [hnnconj] at hfrob2
   -- Rewrite the ambient `M' = H ⊔ U`.
   have hM'eq : derivedInG M = data.H ⊔ data.U := by
-    show derivedInG M = data.typeP.H ⊔ data.typeP.U
+    change derivedInG M = data.typeP.H ⊔ data.typeP.U
     rw [data.typeP.H_eq]
     exact data.typeP.derivedInG_eq_fitting_sup_U
   rw [← hM'eq]
@@ -1110,7 +1110,7 @@ theorem caseA_exists_irreducible_qa [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   have hf1 : 1 ≤ (chief.p - 1) / caseA.a :=
     (Nat.one_le_div_iff caseA.a_pos).mpr (Nat.le_of_dvd hppos caseA.a_dvd_p_sub_one)
   have hf2 : 1 ≤ Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime) := by
-    show 1 ≤ Nat.card ↥data.U / (caseA.a * Nat.card ↥(uprimeSub data))
+    change 1 ≤ Nat.card ↥data.U / (caseA.a * Nat.card ↥(uprimeSub data))
     rw [card_U_div_a_mul_card_Uprime_eq_relIndex caseA]
     have hne : (uprimeSub data).relIndex (cuSub caseA) ≠ 0 := by
       rw [Subgroup.relIndex]

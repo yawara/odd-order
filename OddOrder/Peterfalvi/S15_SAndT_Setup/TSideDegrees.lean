@@ -254,13 +254,13 @@ theorem Hypothesis.card_Q_eq_qp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     have hHQ : base12.typeP.H = hyp.Q := by rw [base12.typeP.H_eq, hyp.Q_eq_TF]
     -- `w₁ = p`: both `typeP.W1` and `W₂` complement `T'` in `T`, so both have the derived index
     have hw1 : base12.w1 = hyp.p := by
-      show Nat.card ↥base12.typeP.W1 = hyp.p
+      change Nat.card ↥base12.typeP.W1 = hyp.p
       rw [base12.typeP.card_W1_eq_derived_index,
         hyp.W2_isComplement_T_deriv.symm.index_eq_card,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2T).toEquiv, ← hyp.p_eq_card_W2]
     -- `w₂ = q`: the dual-factor bridge `|M_σ(T) ⊓ C(W₂)| = |typeP.W2|` against `W₁ = M_σ(T) ⊓ C(W₂)`
     have hw2 : base12.w2 = hyp.q := by
-      show Nat.card ↥base12.typeP.W2 = hyp.q
+      change Nat.card ↥base12.typeP.W2 = hyp.q
       haveI : IsCyclic ↥hyp.W2 := by
         haveI := hyp.W_cyclic
         exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe
@@ -309,7 +309,7 @@ theorem Hypothesis.toTypesIIIIIIVSetupT_chief_N_eq_bot [Finite G]
     chief.N = ⊥ := by
   haveI := chief.N_normal
   have hq : (hyp.toTypesIIIIIIVSetupT hG hvd).q = hyp.p := by
-    show Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).W1 = hyp.p
+    change Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).W1 = hyp.p
     rw [hyp.toTypesIIIIIIVSetupT_W1_eq hG hvd, ← hyp.p_eq_card_W2]
   have hcardH : Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).H = hyp.q ^ hyp.p := by
     rw [show ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q from
@@ -406,9 +406,9 @@ theorem Hypothesis.toTypesIIIIIIVSetupT_cSub_eq_D [Finite G]
       have hyQ : ((y : G)) ∈ hyp.Q := hHeq ▸ y.2
       have hcy : g * (y : G) = (y : G) * g :=
         (Subgroup.mem_centralizer_iff.mp hgC (y : G) hyQ).symm
-      show (bUW1 : G) * (y : G) * (bUW1 : G)⁻¹ = (y : G)
+      change (bUW1 : G) * (y : G) * (bUW1 : G)⁻¹ = (y : G)
       rw [hbUW1def]
-      show g * (y : G) * g⁻¹ = (y : G)
+      change g * (y : G) * g⁻¹ = (y : G)
       rw [hcy]; group
     have hbker : (⟨bUW1, hbUW1mem⟩ :
         ↥(((hyp.toTypesIIIIIIVSetupT hG hvd).typeP.U).subgroupOf
@@ -737,7 +737,7 @@ theorem Hypothesis.toTypesIIIIIIVSetupT_q_eq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1) :
     (hyp.toTypesIIIIIIVSetupT hG hvd).q = hyp.p := by
-  show Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).W1 = hyp.p
+  change Nat.card ↥(hyp.toTypesIIIIIIVSetupT hG hvd).W1 = hyp.p
   rw [hyp.toTypesIIIIIIVSetupT_W1_eq hG hvd, ← hyp.p_eq_card_W2]
 
 /-- **`T`-instance chief-factor prime identity**: `chief.p = q`, forced by
@@ -974,7 +974,7 @@ theorem Hypothesis.sSet_caseB_apply_one_eq_vp [Finite G]
   haveI := hyp.finiteG
   have hH0 : chief.H0 = ⊥ := hyp.toTypesIIIIIIVSetupT_chief_H0_eq_bot hG hvd chief
   have hCp : (hyp.mkSection11CharacterDataT hG hvd chief).Cprime = ⊥ := by
-    show cprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief = ⊥
+    change cprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief = ⊥
     have hCV : cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief ≤ hyp.V :=
       (cSub_le_U _ _).trans (le_of_eq (hyp.toTypesIIIIIIVSetupT_U_eq hG hvd))
     have hVab : IsMulCommutative ↥hyp.V := hyp.isMulCommutative_V_unconditional hG
@@ -990,7 +990,7 @@ theorem Hypothesis.sSet_caseB_apply_one_eq_vp [Finite G]
       refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
       rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
       exact hCab.is_comm.comm a b
-    show derivedInG (cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥
+    change derivedInG (cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) = ⊥
     rw [derivedInG, hcomm, Subgroup.map_bot]
   have hmem : φ ∈ (hyp.mkSection11CharacterDataT hG hvd chief).SOf
       (chief.H0 ⊔ (hyp.mkSection11CharacterDataT hG hvd chief).Cprime) := by
@@ -1283,7 +1283,7 @@ theorem Hypothesis.sSet_reducible_rows_ne [Finite G]
   have hkeq := (hyp.sSet_reducible_eq_nuRowSum hG pins hvd
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hη)
     (hyp.sSet_reducible_conj_not_irr_T hirr)).choose_spec.2
-  show (η : ClassFunction ↥hyp.T ℂ).conj = η
+  change (η : ClassFunction ↥hyp.T ℂ).conj = η
   rw [hkeq, ← he, ← hjeq]
 
 end OddOrder.Peterfalvi.S15

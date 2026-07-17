@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import OddOrder.Peterfalvi.S15_BridgeCharacter
 
 /-!
@@ -113,7 +118,7 @@ theorem Hypothesis.sSet_reducible_columns_ne [Finite G]
   have hkeq := (hyp.sSet_reducible_eq_muColumnSum hG
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
     (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.2
-  show (η : ClassFunction ↥hyp.S ℂ).conj = η
+  change (η : ClassFunction ↥hyp.S ℂ).conj = η
   rw [hkeq, ← he, ← hjeq]
 
 open OddOrder.Peterfalvi.S11 in

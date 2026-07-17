@@ -348,7 +348,7 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
       induce_compHom_subgroupCongr hKeq.symm _
     -- the reducible transported source is a §6 column `χ_j`
     obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff ⟨_, hχKirr⟩).mp (by
-      show ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+      change ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
         (ClassFunction.compHom (MulEquiv.subgroupCongr hKeq.symm).toMonoidHom
           (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ)))
       rw [hind]
@@ -386,7 +386,7 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
             ((finCardEquivCharacterGroup _).symm χ₂') := (Equiv.apply_symm_apply _ _).symm
         _ = finCardEquivCharacterGroup _ 0 := by rw [hs0]
         _ = 1 := finCardEquivCharacterGroup_zero _
-    · show (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i
+    · change (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i
           (finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂')))
         = induceHU (hyp.toTypesIIIIIIVSetup htype hnt)
             (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ)
@@ -466,7 +466,7 @@ theorem Hypothesis.reducible_mem_sOf_H0_eq_muGrid_columnSum [Finite G]
           (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ) :=
     induce_compHom_subgroupCongr hKeq.symm _
   obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff ⟨_, hχKirr⟩).mp (by
-    show ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
+    change ¬ IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
       (ClassFunction.compHom (MulEquiv.subgroupCongr hKeq.symm).toMonoidHom
         (χ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetup htype hnt)) ℂ)))
     rw [hind]

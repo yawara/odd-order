@@ -249,7 +249,7 @@ theorem lambdaWitness_of_caseB_member [Finite G]
     isIndHC_of_source_eq_induce_hcPsiPair (M := hyp.S) (data := data) (chief := chief)
       (θbar := θbar) (lam := lam) (ζ' := ζ) hζeq
   -- (3) transport `HC.map subtype = (PC).subgroupOf S`.
-  have hHeq : data.H = hyp.P := by show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hHeq : data.H = hyp.P := by change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   have hsupeq : data.H ⊔ cSub data chief = hyp.H := by
     rw [hHeq, hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]; rfl
   have hHC : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
@@ -357,7 +357,7 @@ theorem lambdaWitness_of_caseA [Finite G]
       = ClassFunction.induce ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
         hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) ψ := hψeq
   -- (4) transport `HC.map subtype = (PC).subgroupOf S`.
-  have hHeq : data.H = hyp.P := by show hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  have hHeq : data.H = hyp.P := by change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   have hsupeq : data.H ⊔ cSub data chief = hyp.H := by
     rw [hHeq, hyp.toTypesIIIIIIVSetupS_cSub_eq_C hG chief]; rfl
   have hHC : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
@@ -1233,7 +1233,7 @@ theorem Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy [Finite G]
     omega
   · obtain ⟨caseB⟩ := hB
     have hnotmod : ¬ hyp'.p ≡ 1 [MOD hyp'.q] := by
-      show ¬ hyp.q ≡ 1 [MOD hyp.p]
+      change ¬ hyp.q ≡ 1 [MOD hyp.p]
       intro hmod
       have hq_mod : hyp.q % hyp.p = hyp.q := Nat.mod_eq_of_lt hqp
       have h1_mod : 1 % hyp.p = 1 :=

@@ -641,7 +641,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
       exact (sub_sub_cancel Γ0 ((OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
       ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) (lam₁ - lam₁.conj))).symm
     · -- the bridge `(λ₁ − e·ψ₁)^τ = X − e·τ₁ψ₁` (`ℤ`-scalar form)
-      show (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
+      change (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
       ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) (lam₁ - ((e : ℕ) : ℤ) • ψ₁) = Γ0 - ((e : ℕ) : ℤ) • c₁.extension ψ₁
       simp only [natCast_zsmul]
       rw [← Nat.cast_smul_eq_nsmul ℂ e (c₁.extension ψ₁)]

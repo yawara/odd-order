@@ -144,7 +144,7 @@ theorem line_le_of_le_E_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
     simpa using congrArg Subtype.val (hX.1.pow_eq_one ⟨x, hx⟩)
   refine ⟨⟨x, hxP⟩, ?_, rfl⟩
   apply Subgroup.subset_closure
-  show (⟨x, hxP⟩ : ↥P) ^ (p ^ 1) = 1
+  change (⟨x, hxP⟩ : ↥P) ^ (p ^ 1) = 1
   rw [pow_one]
   exact Subtype.ext (by simpa using hxp)
 

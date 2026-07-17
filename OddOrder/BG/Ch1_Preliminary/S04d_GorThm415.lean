@@ -1,6 +1,7 @@
 /-
 Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S04c_Prop411
 import OddOrder.GroupTheory.CriticalSubgroup
@@ -200,7 +201,7 @@ private theorem class_le_two_of_two_abelian_normal {M : Type*} [Group M]
         Commute (QuotientGroup.mk' N a) (QuotientGroup.mk' N b) := fun a ha b hb => by
       rw [Commute, SemiconjBy, ← map_mul, ← map_mul, hY a ha b hb]
     -- Assemble: `Commute (mk ux * mk vx) (mk uy * mk vy)`.
-    show Commute (QuotientGroup.mk' N (ux * vx)) (QuotientGroup.mk' N (uy * vy))
+    change Commute (QuotientGroup.mk' N (ux * vx)) (QuotientGroup.mk' N (uy * vy))
     rw [map_mul, map_mul]
     have cux : Commute (QuotientGroup.mk' N ux) (QuotientGroup.mk' N uy * QuotientGroup.mk' N vy) :=
       (keyX ux hux uy huy).mul_right (key ux hux vy hvy)
@@ -827,7 +828,7 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
           rw [← htop_gen]; exact Subgroup.mem_top _
         have hmem_b : b' ∈ Subgroup.closure ({⟨u, huK⟩, ⟨v, hvK⟩} : Set ↥K) := by
           rw [← htop_gen]; exact Subgroup.mem_top _
-        show Commute (QuotientGroup.mk' (Subgroup.center ↥K) a')
+        change Commute (QuotientGroup.mk' (Subgroup.center ↥K) a')
           (QuotientGroup.mk' (Subgroup.center ↥K) b')
         -- Reduce to generators commuting, via two nested `closure_induction`.
         refine Subgroup.closure_induction₂ (p := fun a b _ _ =>
@@ -873,7 +874,7 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
   have hp : p.Prime := Fact.out
   have hH_le_A : H ≤ A := omega1OfAbelian_le
   -- The goal's LHS is `omega1Map C p = D`.
-  show omega1Map C p = H
+  change omega1Map C p = H
   -- `D = ⟨{n ∈ C : n^p = 1}⟩`; the set is closed under product (PART 2), so `D` is exp `p`.
   have hmul := omega1_centralizer_mul_pow hp_odd hP hA_comm hA_maxAb
   -- `D = {n ∈ C : n^p = 1}` as a subgroup, with `∀ d ∈ D, d^p = 1`.

@@ -304,7 +304,7 @@ theorem trivial_of_invariants_comp_ne_bot
         have hn' : g⁻¹ * (n : G) * g ∈ N := by
           have := hNnorm.conj_mem (n : G) n.2 g⁻¹; simpa using this
         have hfix := hv ⟨g⁻¹ * (n : G) * g, hn'⟩
-        show ρ (n : G) (ρ g v) = ρ g v
+        change ρ (n : G) (ρ g v) = ρ g v
         have hfix' : ρ (g⁻¹ * (n : G) * g) v = v := hfix
         rw [← Module.End.mul_apply, ← map_mul,
           show (n : G) * g = g * (g⁻¹ * (n : G) * g) by group, map_mul, Module.End.mul_apply,
@@ -347,7 +347,7 @@ theorem map_conjSemilinearEnd_eq_self_of_mem (ρ : Representation F G W)
     refine ⟨conjSemilinearEnd (H := H) ρ g⁻¹ w, ?_, ?_⟩
     · rw [hact (H.inv_mem hg) w]; exact M.smul_mem _ hw
     · rw [conjSemilinearEnd_apply]
-      show ρ g (ρ g⁻¹ w) = w
+      change ρ g (ρ g⁻¹ w) = w
       rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
 
 open OddOrder.RepresentationTheory in
@@ -778,7 +778,7 @@ theorem iSupIndep_weightSpace (ρ : Representation F G W) {K' : Subgroup G}
     (hcomm : ∀ a b : ↥K', (a : G) * (b : G) = (b : G) * (a : G)) :
     iSupIndep (weightSpace ρ K') := by
   have hC : ∀ a b : ↥K', Commute (ρ (a : G)) (ρ (b : G)) := fun a b => by
-    show ρ (a : G) * ρ (b : G) = ρ (b : G) * ρ (a : G)
+    change ρ (a : G) * ρ (b : G) = ρ (b : G) * ρ (a : G)
     rw [← map_mul, ← map_mul, hcomm a b]
   refine (Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo
     (fun k' : ↥K' => ρ (k' : G))
@@ -885,16 +885,16 @@ theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W]
   letI actK : MulAction ↥K (↥K' → F) :=
     { smul := fun k χ => conjChar K' (k : G) χ
       one_smul := fun χ => by
-        show conjChar K' ((1 : ↥K) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
+        change conjChar K' ((1 : ↥K) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
       mul_smul := fun a b χ => by
-        show conjChar K' ((a * b : ↥K) : G) χ = conjChar K' (a : G) (conjChar K' (b : G) χ)
+        change conjChar K' ((a * b : ↥K) : G) χ = conjChar K' (a : G) (conjChar K' (b : G) χ)
         rw [Subgroup.coe_mul, conjChar_mul] }
   letI actR : MulAction ↥R (↥K' → F) :=
     { smul := fun r χ => conjChar K' (r : G) χ
       one_smul := fun χ => by
-        show conjChar K' ((1 : ↥R) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
+        change conjChar K' ((1 : ↥R) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
       mul_smul := fun a b χ => by
-        show conjChar K' ((a * b : ↥R) : G) χ = conjChar K' (a : G) (conjChar K' (b : G) χ)
+        change conjChar K' ((a * b : ↥R) : G) χ = conjChar K' (a : G) (conjChar K' (b : G) χ)
         rw [Subgroup.coe_mul, conjChar_mul] }
   have hsmulK : ∀ (k : ↥K) (χ : ↥K' → F), k • χ = conjChar K' (k : G) χ := fun _ _ => rfl
   have hsmulR : ∀ (r : ↥R) (χ : ↥K' → F), r • χ = conjChar K' (r : G) χ := fun _ _ => rfl
@@ -905,7 +905,7 @@ theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W]
     rw [MulAction.mem_orbit_iff]
     constructor
     · rintro ⟨k, rfl⟩
-      show weightSpace ρ K' (k • χ₁) ≠ ⊥
+      change weightSpace ρ K' (k • χ₁) ≠ ⊥
       rw [hsmulK]; exact hconj_wt (k : G) χ₁ h₁
     · intro hχ
       obtain ⟨k, hk⟩ := exists_conjChar_eq_of_irreducible ρ hKirr hindep h₁ hχ
@@ -915,7 +915,7 @@ theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W]
     rw [MulAction.mem_orbit_iff]
     constructor
     · rintro ⟨r, rfl⟩
-      show weightSpace ρ K' (r • χ₁) ≠ ⊥
+      change weightSpace ρ K' (r • χ₁) ≠ ⊥
       rw [hsmulR]; exact hconj_wt (r : G) χ₁ h₁
     · intro hχ
       obtain ⟨h, hh⟩ := exists_conjChar_eq_of_irreducible ρ hKRirr hindep h₁ hχ
@@ -988,7 +988,7 @@ theorem exists_weightSpace_ge_of_finrank_one [FiniteDimensional F W] (σ : Repre
   obtain ⟨c, rfl⟩ := hm
   rw [mem_weightSpace]
   intro k'
-  show σ (k' : G) (c • m₀) = χ k' • (c • m₀)
+  change σ (k' : G) (c • m₀) = χ k' • (c • m₀)
   rw [map_smul, ← hχ k', smul_smul, smul_smul, mul_comm]
 
 open OddOrder.RepresentationTheory in
@@ -1018,7 +1018,7 @@ theorem restrictScalars_le_invariants_of_finrank_one [FiniteDimensional F W]
   have hvmem : v ∈ (Subrepresentation.ofSubmodule' M).toSubmodule := hv
   have h2 : Mρ g ⟨v, hvmem⟩ = ⟨v, hvmem⟩ := by rw [hg1]; rfl
   have h3 := congrArg (Subtype.val) h2
-  show σ (k' : G) v = v
+  change σ (k' : G) v = v
   rw [← hgk]
   simpa [hMρ, Subrepresentation.toRepresentation] using h3
 
@@ -1210,11 +1210,11 @@ theorem finrank_eq_one_of_weight_fixed [Finite G] [FiniteDimensional F W] [Nontr
             rw [inv_smul_eq_iff₀ hc0]; exact hcav.symm } := by
       rw [← hgen, Subgroup.closure_le]
       rintro s (hsK' | hsx)
-      · show σ s v ∈ Submodule.span F {v}
+      · change σ s v ∈ Submodule.span F {v}
         rw [hK'scalar ⟨s, hsK'⟩]
         exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v)
       · rw [Set.mem_singleton_iff] at hsx; subst hsx
-        show σ s v ∈ Submodule.span F {v}
+        change σ s v ∈ Submodule.span F {v}
         rw [hxscalar]
         exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v)
     exact fun g hg => hle hg
@@ -1330,7 +1330,7 @@ theorem invariants_commutator_ne_bot_of_irreducible
         refine ⟨w, ?_, hw⟩
         rw [Representation.mem_invariants]
         intro k'
-        show σ (k' : G) w = w
+        change σ (k' : G) w = w
         rw [htriv (k' : G) k'.2]; rfl
       · -- **`K'`-analysis, NONISO**: two distinct weights contradict the orbit count.
         have hwt2 : weightSpace σ (⁅K, K⁆ : Subgroup G)
@@ -1578,7 +1578,7 @@ private theorem thm35_aux : ∀ (n : ℕ)
         -- `ρ` factors through `G/C` as `ρ̄ = ofQuotient ρ C`.
         haveI hIsTriv : Representation.IsTrivial (ρ.comp C.subtype) := by
           refine ⟨fun c => ?_⟩
-          show ρ (c : G) = LinearMap.id
+          change ρ (c : G) = LinearMap.id
           rw [MonoidHom.mem_ker.mp c.2]; rfl
         set ρbar := Representation.ofQuotient ρ C with hρbar
         haveI : (K.map (QuotientGroup.mk' C)).Normal :=
@@ -1631,7 +1631,7 @@ private theorem thm35_aux : ∀ (n : ℕ)
             rwa [hρbar, Representation.ofQuotient_coe_apply] at hkey
           · intro hv rbar
             obtain ⟨r', hr', hr'eq⟩ := rbar.2
-            show ρbar (rbar : G ⧸ C) v = v
+            change ρbar (rbar : G ⧸ C) v = v
             rw [← hr'eq, hρbar, QuotientGroup.mk'_apply, Representation.ofQuotient_coe_apply]
             exact hv ⟨r', hr'⟩
         have hCV1Q : Module.finrank F

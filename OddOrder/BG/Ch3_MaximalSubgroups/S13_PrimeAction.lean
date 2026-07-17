@@ -898,7 +898,7 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow_subgroup [Finite G] {A N : Subg
     rw [Ch03.isAInvariant_iff_smul_mem]
     intro a x hx
     rw [Subgroup.mem_subgroupOf] at hx ⊢
-    show N.subtype ((φ a) x) ∈ P
+    change N.subtype ((φ a) x) ∈ P
     rw [hφ_coe a x]
     exact (Subgroup.mem_normalizer_iff.mp (hPinv a.2) (N.subtype x)).mp hx
   have hPqN : IsPGroup q ↥(P.subgroupOf N) := hPq.of_equiv (Subgroup.subgroupOfEquivOfLe hPN).symm

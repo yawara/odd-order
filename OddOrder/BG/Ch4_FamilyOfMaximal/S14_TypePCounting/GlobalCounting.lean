@@ -321,7 +321,7 @@ theorem typeP2_neighbor_is_typeF_of_mem [Finite G] (hG : OddOrder.BG.IsMinimalSi
   -- Conjunct 1 (`IsTypeF H`), hoisted (also the `hF` input to Lemma 14.11 below): every type-`P`
   -- maximal is conjugate to `M` or `M*` (`hcover`), and `H` is conjugate to neither.
   have hFmaxH : IsTypeF H := by
-    show kappa H = ∅
+    change kappa H = ∅
     rw [← Set.not_nonempty_iff_eq_empty]
     intro hHP
     exact (hcover H hHmax hHP).elim notMGH notMstGH
@@ -799,7 +799,7 @@ theorem exists_sigmaDecomposition_length_le_two [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ∃ D : SigmaDecompositionData G, ∀ g : G, D.length g ≤ 2 := by
   refine ⟨genuineSigmaDecomposition hG, fun g => ?_⟩
-  show sigmaLength g ≤ 2
+  change sigmaLength g ≤ 2
   by_cases hg1 : g = 1
   · have h0 : sigmaLength g = 0 := (sigmaLength_eq_zero_iff hG g).mpr hg1
     omega

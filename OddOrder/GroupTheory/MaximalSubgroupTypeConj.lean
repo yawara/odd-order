@@ -423,12 +423,12 @@ def TypeIData.conj (φ : MulAut G) {M : Subgroup G} (data : TypeIData M) :
       rwa [image_sharpSubgroup, normalizer_pointwise_smul] at hti
     · right; left
       refine ⟨isMulCommutative_pointwise_smul φ h.1, ?_⟩
-      show rank ↥(φ • data.typeF.H) = 2
+      change rank ↥(φ • data.typeF.H) = 2
       rw [← rank_of_mulEquiv (conjSubgroupEquiv φ data.typeF.H)]; exact h.2
     · right; right
       obtain ⟨h1, p, hp, hpmem, hcyc⟩ := h
       have hcard : Nat.card ↥(φ • data.typeF.H) = Nat.card ↥data.typeF.H := card_pointwise_smul φ _
-      show (∀ q : ℕ, q.Prime → q ∈ (Nat.card ↥(φ • data.typeF.H)).primeFactors →
+      change (∀ q : ℕ, q.Prime → q ∈ (Nat.card ↥(φ • data.typeF.H)).primeFactors →
           Monoid.exponent ↥(φ • data.typeF.U) ∣ q - 1) ∧
         ∃ q : ℕ, q.Prime ∧ q ∈ (Nat.card ↥(φ • data.typeF.H)).primeFactors ∧
           IsCyclic ↥(opiCoreInG {q}ᶜ (φ • data.typeF.H))

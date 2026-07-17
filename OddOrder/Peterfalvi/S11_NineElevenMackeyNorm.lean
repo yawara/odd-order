@@ -106,10 +106,10 @@ theorem sum_apply_mul_eq_zero_of_not_subset_characterKernel (N : Subgroup Γ) [h
     rw [hT, Finset.mul_sum, Finset.sum_mul]
     refine Fintype.sum_equiv
       ⟨fun n => ⟨g * (n : Γ) * g⁻¹, hconj n⟩, fun n => ⟨g⁻¹ * (n : Γ) * g, hconj' n⟩,
-        fun n => Subtype.ext (by show g⁻¹ * (g * (n : Γ) * g⁻¹) * g = (n : Γ); group),
-        fun n => Subtype.ext (by show g * (g⁻¹ * (n : Γ) * g) * g⁻¹ = (n : Γ); group)⟩
+        fun n => Subtype.ext (by change g⁻¹ * (g * (n : Γ) * g⁻¹) * g = (n : Γ); group),
+        fun n => Subtype.ext (by change g * (g⁻¹ * (n : Γ) * g) * g⁻¹ = (n : Γ); group)⟩
       _ _ fun n => ?_
-    show ρ g * ρ (n : Γ) = ρ (g * (n : Γ) * g⁻¹) * ρ g
+    change ρ g * ρ (n : Γ) = ρ (g * (n : Γ) * g⁻¹) * ρ g
     rw [← map_mul, ← map_mul]
     congr 1
     group
@@ -146,10 +146,10 @@ theorem sum_apply_mul_eq_zero_of_not_subset_characterKernel (N : Subgroup Γ) [h
       obtain ⟨w, rfl⟩ := hv
       have h := congrArg (fun f : V →ₗ[ℂ] V => f w) (hmulT ⟨x, hxN⟩)
       simpa [Module.End.mul_apply] using h
-    show χ x = OddOrder.Peterfalvi.S03.characterDegree χ
-    show χ x = χ 1
+    change χ x = OddOrder.Peterfalvi.S03.characterDegree χ
+    change χ x = χ 1
     rw [congrFun hchar x, congrFun hchar 1]
-    show LinearMap.trace ℂ V (ρ x) = LinearMap.trace ℂ V (ρ 1)
+    change LinearMap.trace ℂ V (ρ x) = LinearMap.trace ℂ V (ρ 1)
     congr 1
     rw [map_one]
     exact LinearMap.ext hid
@@ -221,7 +221,7 @@ theorem inner_induce_trivial_induce_eq_zero [Invertible (Nat.card Γ : ℂ)]
         intro y
         rw [Subgroup.mem_subgroupOf, Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
           ← map_inv, inv_inv, MulAut.smul_def, MulAut.conj_apply]
-        show x * (x⁻¹ * (y : Γ) * x) * x⁻¹ ∈ K
+        change x * (x⁻¹ * (y : Γ) * x) * x⁻¹ ∈ K
         have hyy : x * (x⁻¹ * (y : Γ) * x) * x⁻¹ = (y : Γ) := by group
         rw [hyy]
         exact y.2
@@ -239,9 +239,9 @@ theorem inner_induce_trivial_induce_eq_zero [Invertible (Nat.card Γ : ℂ)]
           ⟨fun y => ⟨⟨x⁻¹ * (y : Γ) * x, hD.conj_mem' _ (hKD y.2) x⟩, hmemK' y⟩,
             fun z => ⟨x * ((z : ↥D) : Γ) * x⁻¹, hmemK'' z⟩,
             fun y => Subtype.ext (by
-              show x * (x⁻¹ * (y : Γ) * x) * x⁻¹ = (y : Γ); group),
+              change x * (x⁻¹ * (y : Γ) * x) * x⁻¹ = (y : Γ); group),
             fun z => Subtype.ext (Subtype.ext (by
-              show x⁻¹ * (x * ((z : ↥D) : Γ) * x⁻¹) * x = ((z : ↥D) : Γ); group))⟩
+              change x⁻¹ * (x * ((z : ↥D) : Γ) * x⁻¹) * x = ((z : ↥D) : Γ); group))⟩
           _ _ fun y => rfl
       rw [hreindex]
       refine sum_subgroup_apply_eq_zero_of_not_subset_characterKernel ?_ hζirr hker
@@ -512,7 +512,7 @@ theorem sum_card_inf_conjSMul_eq {Hn Uu U₁ Cc Ww : Subgroup Γ} [Hn.Normal]
         ((Ww : Subgroup Γ) : Set Γ)) : Γ) • U₁) = Nat.card ↥U₁ := by
       have h1 : MulAut.conj (1 : Γ) • U₁ = U₁ := by
         rw [map_one, one_smul]
-      show Nat.card ↥(U₁ ⊓ MulAut.conj (1 : Γ) • U₁) = Nat.card ↥U₁
+      change Nat.card ↥(U₁ ⊓ MulAut.conj (1 : Γ) • U₁) = Nat.card ↥U₁
       rw [h1, inf_idem]
     rw [h1term]
     congr 1
