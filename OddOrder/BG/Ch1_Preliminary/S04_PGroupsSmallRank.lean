@@ -720,7 +720,8 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
           exact isMulCommutative_iff.mp
             (IsPGroup.isMulCommutative_of_card_eq_prime_sq hm)
       -- `Z(R') = ⊤`, so `upperCentralSeries R' 1 = ⊤`, giving `cl(R') ≤ 1`.
-      rw [← Subgroup.upperCentralSeries_eq_top_iff_nilpotencyClass_le, Subgroup.upperCentralSeries_one, eq_top_iff]
+      rw [← Subgroup.upperCentralSeries_eq_top_iff_nilpotencyClass_le,
+          Subgroup.upperCentralSeries_one, eq_top_iff]
       intro z _
       rw [Subgroup.mem_center_iff]
       intro g

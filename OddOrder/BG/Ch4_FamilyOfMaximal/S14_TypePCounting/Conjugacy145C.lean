@@ -201,7 +201,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
       rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
       · exact heq.ge
       · rcases hG.simple.eq_bot_or_eq_top_of_normal M
-            (Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hMmax).2 _ hlt)) with hb | ht
+            (Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hMmax).2 _ hlt)) with hb |
+                ht
         · exact absurd hb hMne
         · exact absurd ht (mem_maximalSubgroups.mp hMmax).1
     -- Decompose `c = v * a` with `v ∈ N_σ`, `a ∈ M ⊓ N` (in `↥N`, since `N_σ ⊴ N`).
@@ -373,7 +374,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     have hqπ : q ∈ piSet (Subgroup.closure ({x} : Set G)) := by
       rw [piSet, Set.mem_setOf_eq, hcardx]
       exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩
-    have hqnσN : q ∉ OddOrder.BG.Ch3.S10.sigma N := fun h => tau2_subset_sigma_compl N (hπτ2 q hqπ) h
+    have hqnσN : q ∉ OddOrder.BG.Ch3.S10.sigma N := fun h => tau2_subset_sigma_compl N (hπτ2 q hqπ)
+        h
     have hNM₂ : N ≠ M₂ := fun heq => hqnσN (heq ▸ hqσM₂)
     -- Build `S₂ = Sylow_q(M₂ ∩ N) ⊇ X`.
     have hXM₂N : X ≤ M₂ ⊓ N := le_inf hXM₂le hXNle
@@ -472,7 +474,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
           rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA₁N).toEquiv, hA₁.2,
             Nat.primeFactors_pow p two_ne_zero, Nat.Prime.primeFactors hpp] at hr
           rw [Finset.mem_singleton.mp hr]; exact hpτ2N)
-      have hA : MulAut.conj w • A₁ ∈ elemAbelianOfRank G p 2 := conj_smul_mem_elemAbelianOfRank w hA₁
+      have hA : MulAut.conj w • A₁ ∈ elemAbelianOfRank G p 2 := conj_smul_mem_elemAbelianOfRank w
+          hA₁
       have hAEN : MulAut.conj w • A₁ ≤ EN := hwle.trans hN_E.E₂_le
       have hAM₂ : MulAut.conj w • A₁ ≤ M₂ := by rw [hEN_eq] at hAEN; exact hAEN.trans inf_le_left
       -- `A ⊴ E_N` (Cor 12.6(a)); `x ∈ M₂∩N = E_N` ⟹ `x` normalises `A`; `x ∈ M₂_σ`.

@@ -397,7 +397,8 @@ theorem H_sharp_chiRho_eq_explicit [Fintype G] [Invertible (Nat.card G : ℂ)]
           (H_sharp_hypothesis76 hG hyp).zetaNormSq i) *
         (H_sharp_hypothesis76 hG hyp).zeta i a :=
   (chiRho_eq_self_of_H_eq_bot (H_sharp_hypothesis71 hG hyp) (fun _ => rfl) χ a ha).symm.trans
-    (OddOrder.Peterfalvi.S09.Hypothesis76.chiRho_explicit_formula (H_sharp_hypothesis76 hG hyp) χ ha)
+    (OddOrder.Peterfalvi.S09.Hypothesis76.chiRho_explicit_formula (H_sharp_hypothesis76 hG hyp) χ
+        ha)
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **Peterfalvi (13.5.a), point formula**: on `H^#`, the test character `χ` decomposes as the
@@ -425,7 +426,8 @@ theorem H_sharp_point_formula [Fintype G] [Invertible (Nat.card G : ℂ)]
             (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
               OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)),
           (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
-            (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a := by
+            (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a :=
+                by
   classical
   rw [H_sharp_chiRho_eq_explicit hG hyp χ a ha,
     ← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr hi1)]
@@ -437,7 +439,8 @@ theorem H_sharp_point_formula [Fintype G] [Invertible (Nat.card G : ℂ)]
       ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
         OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i))),
       (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
-        (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a = 0 := by
+        (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a = 0 :=
+            by
     refine Finset.sum_eq_zero (fun i hi => ?_)
     simp only [Finset.mem_filter, Finset.mem_erase] at hi
     rw [hmiddle i (Finset.mem_Ioi.mp hi.1.2) hi.1.1 hi.2, star_zero, zero_div, zero_mul]
@@ -464,7 +467,8 @@ theorem H_sharp_point_formula_kernel_only [Fintype G] [Invertible (Nat.card G : 
             (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
               OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i)),
           (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
-            (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a := by
+            (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a :=
+                by
   classical
   rw [H_sharp_chiRho_eq_explicit hG hyp χ a ha,
     ← Finset.sum_filter_add_sum_filter_not (Finset.Ioi 0)
@@ -474,7 +478,8 @@ theorem H_sharp_point_formula_kernel_only [Fintype G] [Invertible (Nat.card G : 
       ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
         OddOrder.Peterfalvi.S03.characterKernel ((H_sharp_hypothesis76 hG hyp).zeta i))),
       (star ((H_sharp_hypothesis76 hG hyp).cCoeff χ i) /
-        (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a = 0 := by
+        (H_sharp_hypothesis76 hG hyp).zetaNormSq i) * (H_sharp_hypothesis76 hG hyp).zeta i a = 0 :=
+            by
     refine Finset.sum_eq_zero (fun i hi => ?_)
     simp only [Finset.mem_filter] at hi
     rw [hall i (Finset.mem_Ioi.mp hi.1) hi.2, star_zero, zero_div, zero_mul]

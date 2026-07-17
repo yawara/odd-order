@@ -816,7 +816,8 @@ theorem typePData_conjClassSet_typePV_ncard [Finite G] {M : Subgroup G} (data : 
     (conjClassSet (typePV M data)).ncard
       = (Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1 - Nat.card ↥data.W2 + 1)
         * data.W.index := by
-  rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset (OddOrder.Peterfalvi.S10.typePData_V_ti data)
+  rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset (OddOrder.Peterfalvi.S10.typePData_V_ti
+      data)
     (typePData_W_normalizes_typePV data), typePData_typePV_ncard]
 
 /-- **The (10.8) `V`-capture step** (Peterfalvi p. 60, the `x ∈ S − HU` branch of the `G₁`

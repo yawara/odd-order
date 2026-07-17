@@ -340,7 +340,8 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal [Finit
       rw [OddOrder.RepresentationTheory.inner_conj_symm, heOmegalam, star_zero]
     have heclam : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
         ((hyp.SHC_isCoherent hG).extension lam) = 0 :=
-      hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1 hlamS hlamirr hlam1 (Ne.symm hlamzetac)
+      hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1 hlamS hlamirr hlam1
+          (Ne.symm hlamzetac)
     have hece : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
         ((hyp.SHC_isCoherent hG).extension ζ) = 0 :=
       hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1 hζS hζirr hζ1 hζne

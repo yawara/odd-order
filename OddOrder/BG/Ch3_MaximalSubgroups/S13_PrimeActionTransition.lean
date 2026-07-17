@@ -259,7 +259,8 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [hKbot, Subgroup.mem_bot] at this
         rw [Subgroup.mem_bot]
         exact Subtype.ext this
-      have h1 : Nat.card ↥((K.subgroupOf E).map mk) = (E₃.subgroupOf E).relIndex (K.subgroupOf E) := by
+      have h1 : Nat.card ↥((K.subgroupOf E).map mk) = (E₃.subgroupOf E).relIndex (K.subgroupOf E) :=
+          by
         rw [← Subgroup.relIndex_ker, hmkdef, QuotientGroup.ker_mk']
       rw [h1, Subgroup.relIndex,
         Subgroup.subgroupOf_eq_bot.mpr (disjoint_iff.mpr hkerbot), Subgroup.index_bot]

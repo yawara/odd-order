@@ -288,7 +288,8 @@ noncomputable def certainTypeSet_isCoherent_via_anchoredImages
         rw [xChiExtension_columnSum, xChiExtension_columnSum]
         exact hXinner χ₂ χ₂' ⟨χ₂, hne₂, hdeg₂, rfl⟩ ⟨χ₂', hne₂', hdeg₂', rfl⟩
     | zero_left v _ => rw [map_zero, ClassFunction.inner_zero_left, ClassFunction.inner_zero_left]
-    | zero_right u _ => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+    | zero_right u _ => rw [map_zero, ClassFunction.inner_zero_right,
+        ClassFunction.inner_zero_right]
     | add_left u₁ u₂ v _ _ _ ih₁ ih₂ =>
         rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left, ih₁, ih₂]
     | add_right u v₁ v₂ _ _ _ ih₁ ih₂ =>

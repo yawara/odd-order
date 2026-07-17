@@ -296,7 +296,8 @@ theorem card_Msigma_inf_centralizer_eq_card_W2 [Finite G]
       Subgroup.map_subgroupOf_eq_of_le hKS] at h2
   set g0G : G := (n : G) with hg0G
   have hg0M : g0G ∈ S := n.2
-  have hMsigmaInv : MulAut.conj g0G • OddOrder.BG.Ch3.S10.Msigma S = OddOrder.BG.Ch3.S10.Msigma S := by
+  have hMsigmaInv : MulAut.conj g0G • OddOrder.BG.Ch3.S10.Msigma S = OddOrder.BG.Ch3.S10.Msigma S :=
+      by
     apply conj_smul_eq_self_of_mem_normalizer
     have hsub : S ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma S) := by
       rw [OddOrder.BG.Ch3.S10.Msigma]
@@ -468,7 +469,8 @@ theorem typeI_or_typeII_centralizer_unique_hall [Finite G]
   have hCY : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (Y : Set G) ≠ ⊥ := by
     rw [← hCeq, ← hMFσ]; exact hCX
   -- BG Theorem B(4): `ℳ(C_G(Y)) = {M}`.
-  have hM4 := (OddOrder.BG.Ch4.S14.typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hU hYU hYne hCY).1
+  have hM4 := (OddOrder.BG.Ch4.S14.typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hU hYU hYne
+      hCY).1
   rw [hCeq]
   have hCleM : Subgroup.centralizer (Y : Set G) ≤ M :=
     (mem_maximalSubgroupsContaining.mp (hM4 ▸ Set.mem_singleton M)).2

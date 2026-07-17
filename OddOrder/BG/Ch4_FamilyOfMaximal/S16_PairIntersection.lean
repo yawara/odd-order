@@ -219,7 +219,8 @@ theorem typeP_pair_W_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     M ⊓ Mstar = K ⊔ Kstar ∧ IsCyclic ↥(M ⊓ Mstar) ∧ K ⊓ Kstar = ⊥ ∧
       (∀ x ∈ K, ∀ y ∈ Kstar, Commute x y) := by
   have heq : M ⊓ Mstar = K ⊔ Kstar :=
-    typeP_pair_inf_eq hG hM hP hKM hK hKstar hU hMstar hPstar hnc hKstarMstar hKstar_hall hZcyc hK_eq
+    typeP_pair_inf_eq hG hM hP hKM hK hKstar hU hMstar hPstar hnc hKstarMstar hKstar_hall hZcyc
+        hK_eq
   refine ⟨heq, heq ▸ hZcyc, kappaHall_inf_Kstar_eq_bot hKM hK hKstar, fun x hx y hy => ?_⟩
   letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
   exact congrArg Subtype.val

@@ -492,7 +492,8 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
     exact hyp.W1_commutes_W2 z hz x hx
   have hW2_le_N : hyp.W2 ≤ Subgroup.normalizer (hyp.W1 : Set G) :=
     hW2_le_C.trans (Subgroup.centralizer_le_normalizer _)
-  have hK_norm_Q : K ≤ Subgroup.normalizer (hyp.Q : Set G) := (hK_le_V.trans hV_le_T).trans hT_norm_Q
+  have hK_norm_Q : K ≤ Subgroup.normalizer (hyp.Q : Set G) := (hK_le_V.trans hV_le_T).trans
+      hT_norm_Q
   -- `V ≤ N(K)` (`V` abelian, `K ≤ V`).
   haveI hKnormalV : (K.subgroupOf hyp.V).Normal := by
     refine ⟨fun n _ g => ?_⟩
@@ -520,7 +521,8 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
   -- Wielandt: `V ≤ C(⁅Q,K⁆)`.
   have hVEnorm : hyp.V ⊔ hyp.W2 ≤ Subgroup.normalizer ((⁅hyp.Q, K⁆ : Subgroup G) : Set G) := by
     rw [sup_le_iff]
-    refine ⟨fun v hv => OddOrder.BG.Ch1.S03f.mem_normalizer_commutator ((hV_le_T.trans hT_norm_Q) hv)
+    refine ⟨fun v hv => OddOrder.BG.Ch1.S03f.mem_normalizer_commutator ((hV_le_T.trans hT_norm_Q)
+        hv)
       (hV_norm_K hv), fun w hw => OddOrder.BG.Ch1.S03f.mem_normalizer_commutator
       ((hW2_le_T.trans hT_norm_Q) hw) (hW2_norm_K hw)⟩
   haveI hQKsolv : IsSolvable ↥(⁅hyp.Q, K⁆ : Subgroup G) :=

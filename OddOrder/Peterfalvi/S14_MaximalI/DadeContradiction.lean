@@ -717,7 +717,8 @@ theorem witness_dade_psi_apply_x_eq_chi [Finite G] (hG : OddOrder.BG.IsMinimalSi
           (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _ ℂ)))
         = ClassFunction.inner
           (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ))
-          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _ ℂ)) :=
+          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _
+              ℂ)) :=
     fun i j hi hj => coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
   have hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       hyp.toHypothesis71.τ ⟨ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
@@ -1364,7 +1365,8 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _ ℂ)))
         = ClassFunction.inner
           (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ))
-          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _ ℂ)) :=
+          (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ j : ClassFunction _
+              ℂ)) :=
     fun i j hi hj => coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
   have hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       hyp.toHypothesis71.τ ⟨ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)

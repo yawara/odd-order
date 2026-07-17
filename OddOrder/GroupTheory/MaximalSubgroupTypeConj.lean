@@ -362,7 +362,8 @@ theorem fitting_map_subtype_pointwise_smul (M : Subgroup G) :
     · haveI : ((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))).Normal :=
         Subgroup.Normal.map inferInstance (e : ↥M →* ↥(φ • M)) e.surjective
       haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))) :=
-        Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e : ↥M →* ↥(φ • M)) e.injective)
+        Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e : ↥M →* ↥(φ • M))
+            e.injective)
       exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
     · -- pull back along `e.symm`
       have h2 : (OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (e.symm : ↥(φ • M) →* ↥M) ≤

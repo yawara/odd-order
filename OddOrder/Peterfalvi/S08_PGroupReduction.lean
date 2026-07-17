@@ -409,7 +409,8 @@ theorem nonempty_coherent_S_of_c2_of_branches (hyp : SibleyDadeHypothesis G L H)
         (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
-  have hfix := fixedPoints_W1_subset_commutator_of_c2 hyp h46.toCertainTypeHypothesis hHK hW1 hW2comm
+  have hfix := fixedPoints_W1_subset_commutator_of_c2 hyp h46.toCertainTypeHypothesis hHK hW1
+      hW2comm
   obtain ⟨p, hp, hHp⟩ := exists_isPGroup_H_of_c2_of_card_le hyp hcop hfix hbound
   rcases hsplit with hB | hA
   · exact hcaseB hp hHp hB

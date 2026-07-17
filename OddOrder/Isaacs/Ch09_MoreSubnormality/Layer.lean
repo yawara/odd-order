@@ -261,7 +261,8 @@ theorem commutator_layer_eq_bot_of_normal_isSolvable [Finite G] {M : Subgroup G}
       have := (Subgroup.map_eq_bot_iff _).mp himg
       rwa [QuotientGroup.ker_mk'] at this
     intro w hw
-    have hwmem : (⟨w, hw.2⟩ : ↥E) ∈ center ↥E := hNle (by rw [hN, Subgroup.mem_subgroupOf]; exact hw)
+    have hwmem : (⟨w, hw.2⟩ : ↥E) ∈ center ↥E :=
+      hNle (by rw [hN, Subgroup.mem_subgroupOf]; exact hw)
     rw [Subgroup.mem_centralizer_iff]
     intro y hy
     have h2 := congrArg Subtype.val (Subgroup.mem_center_iff.mp hwmem ⟨y, hy⟩)

@@ -231,7 +231,8 @@ theorem typeI_caseC_bound_c2_of_c_eq_one [Finite G]
   haveI := dataL.kernelIn_normal
   have hp0 : (0 : ℕ) < hyp.p := hyp.p_prime.pos
   -- `e = [L:H]` in the two forms.
-  have he_eq : (dataL.h78 hG).complementIndex = ((maxNilpotentNormalHall L).subgroupOf L).index := by
+  have he_eq : (dataL.h78 hG).complementIndex = ((maxNilpotentNormalHall L).subgroupOf L).index :=
+      by
     rw [dataL.complementIndex_eq hG]
     congr 1
     change (dataL.typeIHyp.typeI.typeF.H).subgroupOf L = (maxNilpotentNormalHall L).subgroupOf L
@@ -592,7 +593,8 @@ theorem typeI_caseC_bound_c1_of_c_eq_one [Finite G]
       exact IsIrreducibleCharacter.inner_self_eq_one
         (dataL.zeta_irreducible_at hG (Finset.mem_erase.mp hi).1)
     · rw [if_neg hij]
-      exact OddOrder.Peterfalvi.S09.Cert.induce_family_orthogonal_of_injective dataL.kernelIn dataL.θ dataL.inj i j hij
+      exact OddOrder.Peterfalvi.S09.Cert.induce_family_orthogonal_of_injective dataL.kernelIn
+          dataL.θ dataL.inj i j hij
   -- `⟨v, v⟩ = Σ d_i²`.
   have hvv : ClassFunction.inner v v
       = ∑ i ∈ Finset.univ.erase dataL.ind1H, dataL.d i ^ 2 := by

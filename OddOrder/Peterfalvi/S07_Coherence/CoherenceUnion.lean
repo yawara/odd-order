@@ -660,7 +660,8 @@ theorem inner_extension_orthogonal_imageSet_of_members
   | zero => rw [map_zero, ClassFunction.inner_zero_left]
   | add x y _ _ ihx ihy => rw [map_add, ClassFunction.inner_add_left, ihx, ihy, add_zero]
   | smul c x _ ih =>
-      rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ c (e x), ClassFunction.inner_smul_left, ih, mul_zero]
+      rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ c (e x), ClassFunction.inner_smul_left, ih,
+          mul_zero]
 
 open scoped Classical in
 open OddOrder.RepresentationTheory in
@@ -1009,7 +1010,8 @@ noncomputable def retarget_isCoherent_of_sharedDecomposition
     (hY :
       ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
         htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).Y =
-        a • ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees
+        a • ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq
+            htau1_agrees
           htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).tau1 chi1)
     (htau1_chi1 :
       ((CharacterPsiDecomposition.decompositionPair imageFamily tau1 htau1_inner_eq htau1_agrees

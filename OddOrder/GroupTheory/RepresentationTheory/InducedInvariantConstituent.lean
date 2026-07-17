@@ -96,7 +96,8 @@ theorem induce_invariant_constituent_apply_one_eq [Finite K] [Fintype K] [Fintyp
   -- Pair with `φ`: `e · ⟨Ind θ, φ⟩ = ∑_β [Φ β = φ]`.
   have hkey : ClassFunction.restrictionMultiplicity H (ψ : ClassFunction K ℂ)
         (θ : ClassFunction ↥H ℂ)
-        * ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) (φ : ClassFunction K ℂ)
+        * ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) (φ : ClassFunction K
+            ℂ)
       = ∑ β : (K ⧸ H) →* ℂˣ, (if Φ β = φ then (1 : ℂ) else 0) := by
     rw [← ClassFunction.inner_smul_left, h5a, inner_sum_left]
     refine Finset.sum_congr rfl fun β _ => ?_
@@ -279,7 +280,8 @@ theorem induce_inertia_constituent_apply_one_eq
   have hlift := induce_smul_eq_sum_induce_mul_of_invariant_inertia hNT hab θ hinertia ψ hover
   -- Pair with `φ`.
   have hkey : ClassFunction.restrictionMultiplicity (N.subgroupOf T) (ψ : ClassFunction ↥T ℂ) θ'cf
-        * ClassFunction.inner (ClassFunction.induce N (θ : ClassFunction ↥N ℂ)) (φ : ClassFunction L ℂ)
+        * ClassFunction.inner (ClassFunction.induce N (θ : ClassFunction ↥N ℂ)) (φ : ClassFunction L
+            ℂ)
       = ∑ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ, (if Φ β = φ then (1 : ℂ) else 0) := by
     rw [← ClassFunction.inner_smul_left, hlift, inner_sum_left]
     refine Finset.sum_congr rfl fun β _ => ?_

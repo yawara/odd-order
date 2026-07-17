@@ -58,7 +58,8 @@ theorem classFunction_eq_sum_inner_smul (φ : ClassFunction Γ ℂ) :
     rw [Finset.sum_eq_single b]
     · rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite b b, if_pos rfl, mul_one]
     · intro a _ hab
-      rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite a b, if_neg hab, mul_zero]
+      rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite a b, if_neg hab,
+          mul_zero]
     · intro hb; exact absurd (Finset.mem_univ b) hb
   rw [hstep, sub_self]
 
@@ -317,7 +318,8 @@ theorem eq_zero_or_edge_of_dvd_of_normBound {a b m : ℤ}
   have ha0 : (0 : ℤ) < a := by linarith
   -- `b² = (a·x)² ≤ 1 + a²` (drop `(b−a)² ≥ 0` and the `(m−2)·b² ≥ 0` slack).
   have hb2 : (a * x) ^ 2 ≤ 1 + a ^ 2 := by
-    nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a * x))]
+    nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a *
+        x))]
   -- Hence `x² ≤ 1`: otherwise `x² ≥ 2` gives `2a² ≤ a²x² ≤ 1 + a²`, i.e. `a² ≤ 1`, contradicting
   -- `a ≥ 2`.
   have hx2 : x ^ 2 ≤ 1 := by

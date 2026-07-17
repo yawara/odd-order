@@ -84,7 +84,8 @@ theorem induce_induce_subgroupOf {M : Type*} [Group M] [Fintype M] [Invertible (
   have hres : ∀ χ : IrreducibleCharacter M,
       ClassFunction.restrict (K.subgroupOf H)
           (ClassFunction.restrict H (χ : ClassFunction M ℂ))
-        = ClassFunction.compHom e.toMonoidHom (ClassFunction.restrict K (χ : ClassFunction M ℂ)) := by
+        = ClassFunction.compHom e.toMonoidHom (ClassFunction.restrict K (χ : ClassFunction M ℂ)) :=
+            by
     intro χ; ext y
     rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply, ClassFunction.compHom_apply,
       ClassFunction.restrict_apply]

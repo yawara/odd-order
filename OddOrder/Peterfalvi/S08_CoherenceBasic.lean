@@ -1098,7 +1098,8 @@ noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
   have hmemX : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Xset hyp.centralCommutator := by
     intro j
     have : (χmem j : ClassFunction ↥L ℂ) ∈
-        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock hyp.centralCommutator) pair i := by
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock hyp.centralCommutator) pair i :=
+            by
       rw [← hrange]; exact Set.mem_range_self j
     rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp this with hbase | ⟨j', hj', hj'pair⟩
     · exact hyp.xBaseBlock_subset _ hbase
@@ -1116,7 +1117,8 @@ noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
               (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
           (fun θ => ClassFunction.induce H θ.toClassFunction) \
         (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
-            (↑(hyp.centralCommutator.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (↑(hyp.centralCommutator.subgroupOf H) : Set ↥H) ⊆
+                OddOrder.Peterfalvi.S03.characterKernel
                 (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
           (fun θ => ClassFunction.induce H θ.toClassFunction) with hXFdef
   have hmemXF : ∀ φ, φ ∈ XF ↔ φ ∈ hyp.Xset hyp.centralCommutator := by

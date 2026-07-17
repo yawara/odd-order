@@ -150,7 +150,8 @@ theorem coset_conj_into_centralizer_coset [Finite G] {H : Subgroup G} {g : G}
   have hcardC : Nat.card (C.subgroupOf H) = Nat.card C :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCH).toEquiv
   have hcardDom : Nat.card ((H ⧸ C.subgroupOf H) × C) = Nat.card H := by
-    rw [Nat.card_prod, ← hcardC, ← Subgroup.card_eq_card_quotient_mul_card_subgroup (C.subgroupOf H)]
+    rw [Nat.card_prod, ← hcardC, ← Subgroup.card_eq_card_quotient_mul_card_subgroup (C.subgroupOf
+        H)]
   -- `Hg` (here `R`) has `|H|` elements (the bijection `h ↦ h·g`).
   set R : Set G := {x : G | x * g⁻¹ ∈ H} with hR
   have hRimg : R = (fun h => h * g) '' (H : Set G) := by

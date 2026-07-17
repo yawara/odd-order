@@ -68,7 +68,8 @@ theorem typeIA_nonempty (M : Subgroup G) (data : TypeIData M) :
   obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp data.typeF.H_nontrivial
   have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
   exact ⟨a.1, data.typeF.H_le a.2, ha1',
-    a.1, (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
+    a.1, (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp
+        h)⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 /-- **The type-`F` complement `U` is a `(κ ∪ σ)′`-Hall subgroup of `M`.**  For type I,

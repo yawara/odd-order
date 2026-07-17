@@ -762,7 +762,8 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
   have hφUconj : ∀ (g : ↥(data.typeP.U ⊔ data.typeP.W1)) (y : ↥act.U),
       φU (ψ g y) = act.φ g * φU y * (act.φ g)⁻¹ := by
     intro g y
-    have he : φU (ψ g y) = act.φ ((g : ↥(data.typeP.U ⊔ data.typeP.W1)) * act.U.subtype y * g⁻¹) := by
+    have he : φU (ψ g y) = act.φ ((g : ↥(data.typeP.U ⊔ data.typeP.W1)) * act.U.subtype y * g⁻¹) :=
+        by
       change act.φ (act.U.subtype (ψ g y)) = _
       rw [hψcoe]
     rw [he, map_mul, map_mul, map_inv]; rfl

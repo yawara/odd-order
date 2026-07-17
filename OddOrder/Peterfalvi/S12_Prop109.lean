@@ -56,7 +56,8 @@ theorem Hypothesis.muGrid_zero_zero_eq_trivial [Finite G]
       finCardEquivCharacterGroup_zero]
   have hrow0 : (finCongr hcardW1.symm (0 : Fin hyp.w1)) = 0 := by apply Fin.ext; simp
   have e00 : hyp.muGrid hG hodd 0 0
-      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin
+          hyp.w2)))).mu
           (finCongr hcardW1.symm 0) : ClassFunction ↥M ℂ) := by
     unfold Hypothesis.muGrid; rfl
   rw [e00, hdual0, hrow0, h.certainType_zero_column_anchor.2]
@@ -256,7 +257,8 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
-      rw [Subgroup.mem_subgroupOf]; exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
+      rw [Subgroup.mem_subgroupOf]; exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived
+          hyp.typeP hv
     obtain ⟨θ, _hθne, hζeq⟩ := hzS
     have hζv : params.zeta ⟨v, hvM⟩ = 0 := by
       rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
@@ -489,7 +491,8 @@ theorem inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 [Finite G]
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
-      rw [Subgroup.mem_subgroupOf]; exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
+      rw [Subgroup.mem_subgroupOf]; exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived
+          hyp.typeP hv
     obtain ⟨θ, _hθne, hζeq⟩ := hzS
     have hζv : ζ ⟨v, hvM⟩ = 0 := by
       rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
@@ -842,7 +845,8 @@ noncomputable def Hypothesis.inducedFamily_irreducible_Rdatum [Finite G]
   have hreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥M ℂ) := fun h => hne h
   have hcS : (χ : ClassFunction ↥M ℂ).conj ∈ inducedFamily M :=
     inducedFamily_closedUnderConjugate M hχ
-  have hdeg : ((χ : ClassFunction ↥M ℂ).conj : ↥M → ℂ) 1 = ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 := by
+  have hdeg : ((χ : ClassFunction ↥M ℂ).conj : ↥M → ℂ) 1 = ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 :=
+      by
     obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
     simp only [ClassFunction.conj_apply, hd, star_natCast]
   have hdiffsupp : ((χ : ClassFunction ↥M ℂ).conj - (χ : ClassFunction ↥M ℂ)).support ⊆

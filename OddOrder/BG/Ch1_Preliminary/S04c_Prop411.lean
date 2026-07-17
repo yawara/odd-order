@@ -207,7 +207,8 @@ theorem exists_generators_le_two_of_card_quotient_frattini_le_prime_sq
     fun u => (QuotientGroup.mk'_surjective (frattini R) u).choose_spec
   refine ⟨U.image f, le_trans Finset.card_image_le hUcard, ?_⟩
   -- the image of `closure (U.image f)` in `R/Φ` is `closure U = ⊤`.
-  have hmap : (Subgroup.closure (↑(U.image f) : Set R)).map (QuotientGroup.mk' (frattini R)) = ⊤ := by
+  have hmap : (Subgroup.closure (↑(U.image f) : Set R)).map (QuotientGroup.mk' (frattini R)) = ⊤ :=
+      by
     rw [MonoidHom.map_closure]
     have himg : (QuotientGroup.mk' (frattini R)) '' (↑(U.image f) : Set R) = (↑U : Set _) := by
       rw [Finset.coe_image, Set.image_image]
@@ -1035,7 +1036,8 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
           have htop : Subgroup.closure
               ({QuotientGroup.mk' (Subgroup.zpowers c) a, QuotientGroup.mk' (Subgroup.zpowers c) b,
                 QuotientGroup.mk' (Subgroup.zpowers c) z} : Set (R' ⧸ Subgroup.zpowers c)) = ⊤ := by
-            have h1 : (Subgroup.closure ({a, b, z} : Set R')).map (QuotientGroup.mk' (Subgroup.zpowers c)) = ⊤ := by
+            have h1 : (Subgroup.closure ({a, b, z} : Set R')).map (QuotientGroup.mk'
+                (Subgroup.zpowers c)) = ⊤ := by
               rw [hgen, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective _)]
             rw [MonoidHom.map_closure] at h1
             rw [← h1]; congr 1
@@ -1050,8 +1052,10 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
               rw [← hc_def]; exact hmkc
             rw [map_mul, map_mul, map_mul, map_inv, map_inv] at this
             -- `ā⁻¹ b̄⁻¹ ā b̄ = 1 ⇒ Commute ā b̄`.
-            have heq : QuotientGroup.mk' (Subgroup.zpowers c) b * QuotientGroup.mk' (Subgroup.zpowers c) a
-                = QuotientGroup.mk' (Subgroup.zpowers c) a * QuotientGroup.mk' (Subgroup.zpowers c) b := by
+            have heq : QuotientGroup.mk' (Subgroup.zpowers c) b * QuotientGroup.mk'
+                (Subgroup.zpowers c) a
+                = QuotientGroup.mk' (Subgroup.zpowers c) a * QuotientGroup.mk' (Subgroup.zpowers c)
+                    b := by
               set A := QuotientGroup.mk' (Subgroup.zpowers c) a
               set B := QuotientGroup.mk' (Subgroup.zpowers c) b
               have h2 : A * (A⁻¹ * B⁻¹ * A * B) = A := by rw [this, mul_one]
@@ -1082,7 +1086,8 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
                 | exact hbz_q.eq | exact hbz_q.symm.eq
           rw [htop] at hcomm_top
           exact ⟨⟨fun x y => by
-            have := hcomm_top.is_comm.comm (⟨x, Subgroup.mem_top x⟩ : (⊤ : Subgroup (R' ⧸ Subgroup.zpowers c)))
+            have := hcomm_top.is_comm.comm (⟨x, Subgroup.mem_top x⟩ : (⊤ : Subgroup (R' ⧸
+                Subgroup.zpowers c)))
               ⟨y, Subgroup.mem_top y⟩
             exact Subtype.ext_iff.mp this⟩⟩
         · rw [Subgroup.zpowers_le, hc_def]

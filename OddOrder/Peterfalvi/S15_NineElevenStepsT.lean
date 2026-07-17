@@ -267,7 +267,8 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
         (hsuppdiff a ha b hb)
         (Submodule.sub_mem _ (sSet_subset_ZIrr _ ha.1) (sSet_subset_ZIrr _ hb.1)))
     hsuppdiff
-    (fun {φ ξ} hφ hξ h1 h2 => hyp.sSet_memberRFamily_orthogonal_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hφ.1 hξ.1 h1 h2)
+    (fun {φ ξ} hφ hξ h1 h2 => hyp.sSet_memberRFamily_orthogonal_T hG hnoV pins hvd hTP Tdata hU hW1
+        hW2 hφ.1 hξ.1 h1 h2)
     (fun a ha => (hS3deg a ha).trans (hS3deg χ₀ hχ₀).symm)
     (by
       rw [hS3deg χ₀ hχ₀]

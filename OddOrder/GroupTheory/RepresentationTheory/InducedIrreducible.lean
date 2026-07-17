@@ -424,7 +424,8 @@ theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
         induce H θ.toClassFunction = induce H θ₀.toClassFunction),
         (H.index : ℂ) * θ.toClassFunction 1 ^ 2
       = (H.index : ℂ)
-          * (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index * θ₀.toClassFunction 1 ^ 2 := by
+          * (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index * θ₀.toClassFunction 1 ^ 2 :=
+              by
     have hconst : ∀ θ ∈ T.filter (fun θ =>
         induce H θ.toClassFunction = induce H θ₀.toClassFunction),
         (H.index : ℂ) * θ.toClassFunction 1 ^ 2 = (H.index : ℂ) * θ₀.toClassFunction 1 ^ 2 := by
@@ -437,7 +438,8 @@ theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
     ring
   rw [hfib, induce_apply_one]
   have hinner : ClassFunction.inner (induce H θ₀.toClassFunction) (induce H θ₀.toClassFunction)
-      = (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) / (Nat.card ↥H : ℂ) := by
+      = (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) / (Nat.card ↥H : ℂ) :=
+          by
     rw [eq_div_iff hcH, mul_comm]
     exact card_mul_inner_self_induce_eq_card_inertia θ₀
   rw [hinner]
@@ -448,7 +450,8 @@ theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
     rw [← Nat.cast_mul, Subgroup.index_mul_card]
   have hAB : (H.index : ℂ) * (Nat.card ↥H : ℂ)
       = ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
-          * (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) := hHmul.trans hImul.symm
+          * (Nat.card ↥(IrreducibleCharacter.inertia (G := G) (H := H) θ₀) : ℂ) := hHmul.trans
+              hImul.symm
   rw [div_div_eq_mul_div, div_eq_iff hcI]
   linear_combination (θ₀.toClassFunction 1 ^ 2 * (H.index : ℂ)) * hAB
 

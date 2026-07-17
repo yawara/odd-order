@@ -122,7 +122,8 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
     rw [hyp.tInstance_dade_eq_induce hG hnoV hTP
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2, hyp.indT_apply]
   -- ── `τ₃` = the (9.11.6) `𝒮₃`-coherence on the honest Dade
-  obtain ⟨c₃⟩ := hyp.sSet_sThree_coherent_dade_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars hS₂conj hS₃ne hS3deg
+  obtain ⟨c₃⟩ := hyp.sSet_sThree_coherent_dade_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars hS₂conj
+      hS₃ne hS3deg
   -- ── the `𝒮(H₀C)`-stratum dictionary and degree dichotomy (as in the equality assembler)
   have hsubC : OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupT hG hvd)
       (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief)
@@ -311,7 +312,8 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
           ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) (γ - ψ₁))
         (c₃.extension lam) = 0
   · -- orthogonal branch — the (9.11.7)–(9.11.8) residual refutes
-    exact (hyp.nineElevenSevenEightRefutationT hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂cohD
+    exact (hyp.nineElevenSevenEightRefutationT hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars caseA S₂
+        hS₁S₂ hS₂S hS₂conj hS₂cohD
       hS₃ne hnopairD h2a hCUprime hS3deg hcount hFboundU hS2deg c₃ γ ψ₁ hψ₁S₂ hψ₁irr hψ₁deg
       hγZIrr hγ1 hγorth hαsupp hc).elim
   · -- non-orthogonal branch — the Bessel count `|𝒮₄| ≤ ‖α^τ‖² = N`
@@ -600,7 +602,8 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation_T [Finite G]
             ≤ 2 * ((hyp.toTypesIIIIIIVSetupT hG hvd).q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ)) := by
     intro χ hχ
     obtain ⟨d, hχdeg, hdu, hFbound⟩ :=
-      hyp.nineElevenPairBoundT hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh χ hχ (hnopair χ hχ)
+      hyp.nineElevenPairBoundT hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars caseA S₂ hS₁S₂ hS₂S
+          hS₂conj hS₂coh χ hχ (hnopair χ hχ)
     have hpair : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
         ≤ 2 * ((hyp.toTypesIIIIIIVSetupT hG hvd).q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ) :=
       hFbound hS1'fin.toFinset (by rw [Set.Finite.coe_toFinset]; exact hS1'sub)
@@ -624,7 +627,8 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation_T [Finite G]
     have h := hFbound₀ F hF
     rwa [hd₀u] at h
   -- hand the equality configuration to the (9.11.2)–(9.11.8) refutation residual
-  exact hyp.nineElevenEqualityRefutationT hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars caseA S₂ hS₁S₂ hS₂S hS₂conj hS₂coh
+  exact hyp.nineElevenEqualityRefutationT hG hnoV pins hvd hTP Tdata hU hW1 hW2 chars caseA S₂ hS₁S₂
+      hS₂S hS₂conj hS₂coh
     ⟨χ₀, hχ₀⟩ hnopair h2a hCUprime hS3deg hcount hFboundU
 
 open OddOrder.Peterfalvi.S11 in

@@ -837,7 +837,8 @@ theorem normalizer_eq_centralizerK_mul_normalizerU [IsSolvable G] {K U H : Subgr
       rw [Subgroup.mem_comap] at hx
       exact hHU (((Subgroup.mem_normalizer_iff.mp hn) x).mpr hx)
     obtain ⟨c, hc, u, hu, hnu⟩ := exists_mem_centralizerK_mul_of_conj_le hKU hHU hcop hcn
-    have hcN : c ∈ Subgroup.normalizer H := centralizer_set_le_normalizer H (Subgroup.mem_inf.mp hc).1
+    have hcN : c ∈ Subgroup.normalizer H := centralizer_set_le_normalizer H (Subgroup.mem_inf.mp
+        hc).1
     have huN : u ∈ Subgroup.normalizer H := by
       have hue : u = c⁻¹ * n := by rw [hnu]; group
       rw [hue]; exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hcN) hn

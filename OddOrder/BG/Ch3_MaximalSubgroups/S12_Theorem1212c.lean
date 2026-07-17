@@ -547,7 +547,8 @@ theorem frobenius_factorization_of_regular [Finite G] (hG : IsMinimalSimpleOdd G
       intro r hr
       obtain ⟨hrp, hrd, _⟩ := Nat.mem_primeFactors.mp hr
       have hrE : r ∈ (Nat.card ↥E).primeFactors := by
-        exact Nat.mem_primeFactors.mpr ⟨hrp, hrd.trans (E.orderOf_dvd_natCard heE), Nat.card_pos.ne'⟩
+        exact Nat.mem_primeFactors.mpr ⟨hrp, hrd.trans (E.orderOf_dvd_natCard heE),
+            Nat.card_pos.ne'⟩
       have hru : r ∈ tau1 M ∪ tau2 M ∪ tau3 M :=
         h.mem_tau_union_of_mem_primeFactors hG hrE
       have hrnτ2 : r ∉ tau2 M := fun hr2 => hτ2 ⟨r, hrE, hr2⟩

@@ -798,7 +798,8 @@ theorem coherent_extension_eq_zsmul_irreducible
   have hηspan : η ∈ OddOrder.Peterfalvi.S07.zSpan S₁ := Submodule.subset_span hη
   have hextnorm : ClassFunction.inner (cS.extension η) (cS.extension η) = 1 := by
     rw [cS.extension_inner_eq η η hηspan hηspan, hηnorm]
-  exact exists_zsmul_irreducibleCharacter_of_inner_self_one (cS.extension_mem_ZIrr η hηspan) hextnorm
+  exact exists_zsmul_irreducibleCharacter_of_inner_self_one (cS.extension_mem_ZIrr η hηspan)
+      hextnorm
 
 /-- **(6.8.2.3) seam-1 orthogonality, generic coherent form `⟨η^{τ₁}, ω_{ij}^σ⟩ = 0`.**  For *any*
 coherence `cS : IsCoherent hyp.tau S₁ H^#` and two irreducible members `η, η' ∈ S₁` with
@@ -884,7 +885,8 @@ theorem inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero
     ClassFunction.inner (hyp.coherentYset.extension η)
       (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i) = 0 := by
   refine inner_coherent_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hyp.coherentYset hη hη'
-    (hyp.isIrreducibleCharacter_of_mem_Yset hη) (hyp.isIrreducibleCharacter_of_mem_Yset hη') ?_ ?_ χ₂ i
+    (hyp.isIrreducibleCharacter_of_mem_Yset hη) (hyp.isIrreducibleCharacter_of_mem_Yset hη') ?_ ?_
+        χ₂ i
   · have h := irreducibleCharacter_inner_eq_ite
       (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
       (⟨η', hyp.isIrreducibleCharacter_of_mem_Yset hη'⟩ : IrreducibleCharacter ↥L)

@@ -192,7 +192,8 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   have hSmax : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup q ↥T → S ≤ T → S = T :=
     fun T hTM hTq hST => eq_of_le_of_isPGroup_card_eq_factorization hScard hTM hTq hST
   have hScardG : Nat.card ↥S = q ^ (Nat.card G).factorization q := by
-    rw [hScard, factorization_Msigma_eq_of_mem_sigma hG hM hqM, factorization_M_eq_G_of_mem_sigma hqM]
+    rw [hScard, factorization_Msigma_eq_of_mem_sigma hG hM hqM, factorization_M_eq_G_of_mem_sigma
+        hqM]
   have hvpos : 0 < (Nat.card ↥(S10.Msigma M)).factorization q := by
     rw [factorization_Msigma_eq_of_mem_sigma hG hM hqM]
     obtain ⟨_, hqdvdM, hMne⟩ := Nat.mem_primeFactors.mp ((S10.mem_sigma_iff M q).mp hqM).1
@@ -252,11 +253,13 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   have hSinf : S ≤ M ⊓ Mstar' := le_inf hSinf_M hSMstar'
   -- `p ∈ τ₁(Mstar')`.
   have hpE : p ∈ (Nat.card ↥E).primeFactors :=
-    Nat.mem_primeFactors.mpr ⟨hpprime, hpdvd.trans (Subgroup.card_dvd_of_le h.E₁_le), Nat.card_pos.ne'⟩
+    Nat.mem_primeFactors.mpr ⟨hpprime, hpdvd.trans (Subgroup.card_dvd_of_le h.E₁_le),
+        Nat.card_pos.ne'⟩
   have hpMstar : p ∈ (Nat.card ↥Mstar').primeFactors :=
     Nat.mem_primeFactors.mpr ⟨hpprime, hPcard ▸ Subgroup.card_dvd_of_le hPMstar', Nat.card_pos.ne'⟩
   have hpτ1star : p ∈ tau1 Mstar' :=
-    mem_tau1_Mstar_of_einvariant_sylow hG h hMstar'mem hnc' hpE hpMstar hPMM' hPp hSMσ hSMstar' hSne hCSP
+    mem_tau1_Mstar_of_einvariant_sylow hG h hMstar'mem hnc' hpE hpMstar hPMM' hPp hSMσ hSMstar' hSne
+        hCSP
   -- Lemma 13.8 with `Q = Q* = S` yields the contradiction.
   exact forbidden_config_impossible hG hM hMstar'mem hnc' hpτ1 hpτ1star hPmem hPMM'
     hSinf hSq hQmax hSinf hSq hQmax hPinv hPinv hCSP hCSP hNSMstar' hNSM
@@ -882,8 +885,10 @@ theorem centralizer_Qstar_P_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     exact (Subgroup.mem_centralizer_iff.mp (sup_le hPle hQle hg) a (Set.mem_singleton a)).symm
   · -- `q* ∉ β`: `Q*` is a full Sylow `q*`-subgroup of `M_σ`, so Lemma 13.6 applies.
     have hcardMσ : Nat.card ↥Qstar = qs ^ (Nat.card ↥(S10.Msigma M)).factorization qs := by
-      rw [hQstarcard, hMσMstar_eq, factorization_inf_centralizer_Q_eq_of_not_beta hG h hQderived hqsβ]
-    have hQstarmaxMσ : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup qs ↥T → Qstar ≤ T → Qstar = T :=
+      rw [hQstarcard, hMσMstar_eq, factorization_inf_centralizer_Q_eq_of_not_beta hG h hQderived
+          hqsβ]
+    have hQstarmaxMσ : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup qs ↥T → Qstar ≤ T → Qstar =
+        T :=
       fun T hT hTq hQT => eq_of_le_of_isPGroup_card_eq_factorization hcardMσ hT hTq hQT
     exact centralizer_sylow_inf_eq_bot hG h hqsσ hPE1 hPne hQstarMσ
       (IsPGroup.iff_card.mpr ⟨_, hcardMσ⟩) hQstarmaxMσ hMstarMax hMMstar.symm
@@ -913,7 +918,8 @@ theorem normalizer_Qstar_le_M [Finite G] (hG : IsMinimalSimpleOdd G)
     exact S10.normalizer_le_of_nontrivial_beta_subgroup hG h.mem_maximal
       (hQstarMσ.trans (S10.Msigma_le M)) hQstarne hQstarpiβ
   · have hcardMσ : Nat.card ↥Qstar = qs ^ (Nat.card ↥(S10.Msigma M)).factorization qs := by
-      rw [hQstarcard, hMσMstar_eq, factorization_inf_centralizer_Q_eq_of_not_beta hG h hQderived hqsβ]
+      rw [hQstarcard, hMσMstar_eq, factorization_inf_centralizer_Q_eq_of_not_beta hG h hQderived
+          hqsβ]
     exact normalizer_einvariant_sylow_le hG h.mem_maximal hqsσ hQstarMσ hcardMσ
 
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
@@ -970,7 +976,8 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
       intro hsingle; rw [hsingle, Set.mem_singleton_iff] at hMstar_mem
       exact hMMstar hMstar_mem.symm
     obtain ⟨_, _, _, hCMαP, hCMαPQ⟩ :=
-      (tau1_Malpha_interaction hG h.mem_maximal hpq hpτ1 hPmem hPM hQM hQne hQq hPNQ hCQ hMNQ).2 hQsyl
+      (tau1_Malpha_interaction hG h.mem_maximal hpq hpτ1 hPmem hPM hQM hQne hQq hPNQ hCQ hMNQ).2
+          hQsyl
     haveI hPsolv : IsSolvable ↥P := isSolvable_of_comm (mem_elemAbelianOfRank.mp hPmem).1.1
     obtain ⟨kq, hQk⟩ := IsPGroup.iff_card.mp hQq
     have hcopPQ : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q) := by
@@ -1015,7 +1022,8 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
         ⟨hpprime, hPcardp ▸ Subgroup.card_dvd_of_le (hPE1.trans h.E₁_le), Nat.card_pos.ne'⟩
     have hPMstar : P ≤ Mstar := hPE1.trans (h.E₁_le.trans hEMstar)
     have hpMstar : p ∈ (Nat.card ↥Mstar).primeFactors :=
-      Nat.mem_primeFactors.mpr ⟨hpprime, hPcardp ▸ Subgroup.card_dvd_of_le hPMstar, Nat.card_pos.ne'⟩
+      Nat.mem_primeFactors.mpr ⟨hpprime, hPcardp ▸ Subgroup.card_dvd_of_le hPMstar,
+          Nat.card_pos.ne'⟩
     have hPMM : P ≤ M ⊓ Mstar := le_inf hPM hPMstar
     have hpτ1star : p ∈ tau1 Mstar :=
       mem_tau1_Mstar_of_einvariant_sylow hG h hMstarMax hnc hpE hpMstar hPMM

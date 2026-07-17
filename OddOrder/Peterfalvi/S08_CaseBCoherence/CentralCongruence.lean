@@ -49,7 +49,8 @@ theorem eq_zero_or_edge_of_dvd_of_normLt {a b m : ℤ}
   obtain ⟨x, rfl⟩ := hdvd
   have ha0 : (0 : ℤ) < a := by linarith
   have hb2 : (a * x) ^ 2 < 2 * a ^ 2 := by
-    nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a * x))]
+    nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a *
+        x))]
   have hx2 : x ^ 2 ≤ 1 := by
     by_contra h
     push Not at h
@@ -351,7 +352,8 @@ theorem SibleyDadeHypothesis.support_indW2_sub_smul_subset_sharpImage
   -- both pieces are supported on `H`
   have hindW2 : (ClassFunction.induce W2 φ).support ⊆ (H : Set ↥L) :=
     ClassFunction.support_induce_subset_of_le_normal hW2H φ
-  have hη₁supp : (ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ)).support
+  have hη₁supp : (ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H
+      ℂ)).support
       ⊆ (H : Set ↥L) :=
     ClassFunction.support_induce_subset_of_normal H _
   intro x hx
@@ -360,7 +362,8 @@ theorem SibleyDadeHypothesis.support_indW2_sub_smul_subset_sharpImage
     by_contra hxnotH
     have h1' : ClassFunction.induce W2 φ x = 0 := by
       by_contra h; exact hxnotH (hindW2 (ClassFunction.mem_support.mpr h))
-    have h2' : (ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ)) x = 0 := by
+    have h2' : (ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ)) x = 0 :=
+        by
       by_contra h; exact hxnotH (hη₁supp (ClassFunction.mem_support.mpr h))
     exact hx (by simp only [ClassFunction.sub_apply, ClassFunction.smul_apply,
       h1', h2', mul_zero, sub_zero])
@@ -628,12 +631,14 @@ theorem SibleyDadeHypothesis.card_H_dvd_card_W2_mul_regCharCoeff
     ClassFunction.restrict_apply W2 (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1
   have hZ1 : (W2.subtype z₀) ≠ 1 := fun h => hz₀1 (W2.subtype_injective (by simpa using h))
   -- (6.7) congruence `f(z₀) ≡ f(1) (mod |H|)`.
-  have hcong := hyp.restrict_extension_Yset_charValue_cong_caseB hcop hp hHp hprime hW2comm hW2cen hη
+  have hcong := hyp.restrict_extension_Yset_charValue_cong_caseB hcop hp hHp hprime hW2comm hW2cen
+      hη
     (z := W2.subtype z₀) (SetLike.coe_mem z₀) hZ1
   rw [← hfz, ← hf1] at hcong
   -- `f(1) − f(z₀) ≡ 0 (mod |H|)`.
   have hsub : f 1 - f z₀ ≡ 0 [ALGMOD (Nat.card ↥H : ℤ)] := by
-    have h := OddOrder.AlgInt.Cong.sub hcong.symm (OddOrder.AlgInt.Cong.refl (Nat.card ↥H : ℤ) (f z₀))
+    have h := OddOrder.AlgInt.Cong.sub hcong.symm (OddOrder.AlgInt.Cong.refl (Nat.card ↥H : ℤ) (f
+        z₀))
     simpa using h
   rw [hreg] at hsub
   -- convert to the integer congruence and apply the reverse bridge.

@@ -323,7 +323,8 @@ noncomputable instance BaerMul.instCommGroup {G : Type*} [Group G]
     [hOdd : Fact (Odd (Nat.card G))]
     [hC : Fact (_root_.commutator G ≤ Subgroup.center G)] : CommGroup (BaerMul G) where
   mul_assoc x y z := by
-    change BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG y))))
+    change BaerMul.ofG (baerAdd (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG x) (BaerMul.toG
+        y))))
         (BaerMul.toG z)) =
       BaerMul.ofG (baerAdd (BaerMul.toG x)
         (BaerMul.toG (BaerMul.ofG (baerAdd (BaerMul.toG y) (BaerMul.toG z)))))

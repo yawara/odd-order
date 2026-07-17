@@ -558,7 +558,8 @@ theorem typeP_sylow_not_le_kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   have hNlt : Subgroup.normalizer ((Subgroup.zpowers (w : G)) : Set G) < ⊤ :=
     normalizer_lt_top_of_le_of_ne_bot hG h.mem_maximal hXM hXne
   obtain ⟨Mi, hMico, hNMi⟩ :=
-    (eq_top_or_exists_le_coatom (Subgroup.normalizer ((Subgroup.zpowers (w : G)) : Set G))).resolve_left
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer ((Subgroup.zpowers (w : G)) : Set
+        G))).resolve_left
       hNlt.ne
   have hMimem : Mi ∈ maximalSubgroupsContaining
       (Subgroup.normalizer ((Subgroup.zpowers (w : G)) : Set G)) := ⟨hMico, hNMi⟩
@@ -747,7 +748,8 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         have hgE : g ∈ E := (hXK.trans hKEeq.le) hgX
         have hy'E : (b : G) * g * (b : G)⁻¹ ∈ E := E.mul_mem (E.mul_mem he hgE) (E.inv_mem he)
         have hy'1 : (b : G) * g * (b : G)⁻¹ ≠ 1 := by
-          rw [show (b : G) * g * (b : G)⁻¹ = MulAut.conj (b : G) g from (MulAut.conj_apply _ _).symm]
+          rw [show (b : G) * g * (b : G)⁻¹ = MulAut.conj (b : G) g from (MulAut.conj_apply _
+              _).symm]
           exact fun hc => hg1' ((MulAut.conj (b : G)).map_eq_one_iff.mp hc)
         -- `s · y' · s⁻¹ = n g n⁻¹ ∈ X ≤ E`.
         have hsy' : (a : G) * ((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ = n * g * n⁻¹ := by
@@ -1086,7 +1088,8 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hKstar_ne : Kstar ≠ ⊥ := by
         rw [hKstar]
         exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg
-      refine kstar_ne_msigma_aux hG h' (le_refl K) h'.E₁_le hKne hKne (fun q hq => ?_) hKstar hKstar_ne
+      refine kstar_ne_msigma_aux hG h' (le_refl K) h'.E₁_le hKne hKne (fun q hq => ?_) hKstar
+          hKstar_ne
       exact kappa_subset_tau1_union_tau3 (hK.1 q (by
         rwa [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hq))
 

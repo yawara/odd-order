@@ -223,7 +223,8 @@ theorem uprimeSub_le_U (data : TypesIIIIIIVSetup M) : uprimeSub data ≤ data.U 
   Subgroup.map_subtype_le _
 
 /-- **Peterfalvi's `C' = [C, C]`** (9.5), realised in `G` as `derivedInG C`. -/
-noncomputable def cprimeSub (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) : Subgroup G :=
+noncomputable def cprimeSub (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) : Subgroup
+    G :=
   derivedInG (cSub data chief)
 
 theorem cprimeSub_le_C (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
@@ -630,7 +631,8 @@ variable {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData 
 factor (`cSub`), no longer a free field. -/
 noncomputable def C (_chars : Section11CharacterData data chief) : Subgroup G := cSub data chief
 
-theorem C_le_U (chars : Section11CharacterData data chief) : chars.C ≤ data.U := cSub_le_U data chief
+theorem C_le_U (chars : Section11CharacterData data chief) : chars.C ≤ data.U := cSub_le_U data
+    chief
 
 /-- **Peterfalvi's `U' = [U, U]`** (9.5), genuine (`uprimeSub`). -/
 def Uprime (_chars : Section11CharacterData data chief) : Subgroup G := uprimeSub data
@@ -709,7 +711,8 @@ theorem mulAut_eq_one_of_fixes_irr_ne_trivial_of_prime_card {K : Type*} [Group K
   have hχne : χ ≠ 1 := by
     intro h0
     apply hθnt
-    rw [← hχ, h0, show (linearIrreducibleCharacter (1 : K →* ℂˣ)) = trivialIrreducibleCharacter K from
+    rw [← hχ, h0, show (linearIrreducibleCharacter (1 : K →* ℂˣ)) = trivialIrreducibleCharacter K
+        from
       linearIrreducibleCharacter_eq_trivial_iff.mpr rfl]
     rfl
   refine mulAut_eq_one_of_fixes_ne_one_hom hp α χ hχne (fun x => ?_)
@@ -1402,7 +1405,8 @@ theorem centralizer_map_mk'_eq_of_coprime_zpowers {Γ : Type*} [Group Γ] [Finit
     rw [Subgroup.mem_comap, Subgroup.mem_centralizer_iff]
     intro ybar hybar
     rw [Set.mem_singleton_iff] at hybar; subst hybar
-    show QuotientGroup.mk' N x * QuotientGroup.mk' N c = QuotientGroup.mk' N c * QuotientGroup.mk' N x
+    show QuotientGroup.mk' N x * QuotientGroup.mk' N c = QuotientGroup.mk' N c * QuotientGroup.mk' N
+        x
     rw [← map_mul, ← map_mul, Subgroup.mem_centralizer_iff.mp hc x (Set.mem_singleton _)]
 
 /-- **`H₀ ◁ M`** (the chief-factor kernel is `M`-normal): `H₀.subgroupOf M` is normal in `↥M`, so

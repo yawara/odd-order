@@ -74,22 +74,30 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
       Workflow 12 並列が Opus セッション終了で**中断** → 55 .lean files 分 (+719/-356、
       >100 バイト行 323 解消) を build gate 後に commit。**残り ~116 files は wave 4b
       継続で** (再 census → 同スクリプト再実行)。
+- [x] wave 4b **完了** (2026-07-17 夜 Fable hub, commit 24872aae): 中断分の残り 118 files
+      (+606/-303、空白のみ変更を tr -d ハッシュ比較で全数検証) を build gate 後に回収。
+      Layer.lean は lane a active frontier と交差ゆえ reflow 破棄 (本方針どおり)。
+      **⚠ 折り返しスクリプトの構文破壊 2 件を修正** (CaseBXi.lean:1094 /
+      OrderDetermination.lean:386-389): **same-line `by` のタクティク列末尾 term を
+      ぶら下げ折り返しすると、継続行が by-block のコラム基準より浅くなり block が閉じて
+      壊れる** (行末が完結可能な term のときのみ発症; `exact`/`<;>` 等で行が終わる強制継続
+      形は無事)。修正形 = `by` / `fun h =>` 直後で改行。今後の折り返しスクリプトは
+      same-line `by` を含む行を skip 対象にする。
 - [ ] wave 5: `show`→`change` batch 2 (active 近傍) + open scoped Classical 14 件。
 
-## 残キュー (概算)
+## 残キュー (2026-07-17 夜再 census、green full build unique 1245 件)
 
 | 件数 | linter | 対応 |
 |---|---|---|
-| ~336 | longLine コード行 (残) | wave 4b 継続 (部分 landing 済 323/659) |
-| ~830 | longLine docstring 残 (単一長 span) | 折返し不可、留保 (低価値) |
-| 110 | 未使用 section var (partial) | wave 2b (複数未使用 var の残り) |
-| ~57 | `show`→`change` active 近傍 | wave 5b |
-| 24 | longLine markdown 表 | 対象外 (折返すと表破壊) |
+| 608 | longLine 残 (docstring 単一長 span 主体 + markdown 表 24) | 折返し不可分は留保 (低価値)。コード行の残余は wave 4c で個別 |
+| 334 | **unused hypothesis in type** (255 単数 + 65 複数 + 14 outside-proofs) | **要方針決定**: 修正 = 仮説削除 = signature 変更。教科書 faithful statement は保持が正 → per-decl 判定が必要。helper は削除可。v4.32 toolchain の新 linter |
+| 113 | 未使用 section var | **wave 2b (次)** — `omit … in` 挿入、42 files |
+| 59 | style.show | wave 5b (goal を変える show → change、要個別確認) |
 | 18 | declaration uses sorry | 対象外 (frontier) |
-- [ ] wave 2: binder 衛生 (unused section vars / Variable name) (~220 件)
-- [ ] wave 3: header/docstring/maxHeartbeats (~120 件)
-- [ ] wave 4: longLine 2741 件 — dir 単位 (BG → Pf S* → Isaacs 完了章 → shared)
-- [ ] wave 5: style.show 869 件 + open scoped Classical 14 件 (要方針調査)
+| 17 | Variable name 未参照 | wave 2c (`_`-prefix) |
+| 14 | open scoped Classical | wave 5 (個別判断) |
+| 12 | class 型 def の abbrev/instance マーク | 小物 wave (要挙動確認) |
+| 9+9+6+5 | maxHeartbeats unscoped / overlapping instances / def→theorem / simpa→simp | 小物 wave (overlapping は instance 引数削除 = signature 接触、要個別) |
 
 ## 完了条件
 

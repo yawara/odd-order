@@ -51,10 +51,26 @@
    (c) `exists_conj_mem_D_map_le_V`: C_Q(X) の involution u=s^k (Prop 3) → X^k ≤ V。
    - bundled `IsMultiplyPretransitive` (induced action) は使用点 Ch.I §3 で導出予定。
    - Basic に汎用 helper: `even_card_of_sq_eq_one_mem` / `exists_sq_eq_one_of_even_card`。
-3. **Lemma (b) `⟨Z⟩◁X` 未 (次、文書順は p.101 = Prop 5 の前)** (InvertedProduct.lean;
-   証明計画は §0 参照: Y normalizes Z → closure map → X=YZ で分解)。
-4. 以降 Ch.I §2 (p.102–: Prop 1 `C_Q(x)=1`/Q nilpotent/H∩I⊆Z(Q), Prop 2, Cor:
-   S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
+3. ✅ **Lemma (b) `⟨Z⟩◁X` 完了** (InvertedProduct.lean): `conj_mem_of_mem_centralizer`
+   (Y normalizes Z) + `closure_invertedBy_le` + `conj_mem_closure_invertedBy` /
+   `closure_invertedBy_subgroupOf_normal` (X=YZ 分解 + MonoidHom.map_closure)。
+   **→ Ch.I §1 (pp.100–102) 全結果 formalized。**
+4. ✅ **§2 Prop 1 完了** — 新 leaf `QStructure.lean`:
+   (a) `Q_inf_centralizer_eq_bot_of_mem_KSet` (C_Q(x)=1; Prop 6(b)+Prop 3 injectivity
+       → 固定点 pair → C_H(x)≤D)。
+   (b) `isNilpotent_Q`: ⟨x⟩ 共役作用 = IsFrobeniusAction → **Thompson = Isaacs Thm 6.24
+       (repo 済 `isNilpotent_of_isFrobeniusAction`)**。|K|>1 は (A3) 四元群経由
+       (`exists_ne_one_mem_KSet`)。
+   (c) `exists_involution_mem_center_Q` (nilpotent Sylow-2 normal + Isaacs Ch04
+       `exists_mem_center_of_normal_ne_bot_of_isNilpotent` + Cauchy) →
+       `involutions_H_subset_centralizer_Q` (H∩I ⊆ Z(Q)) → **`Q0 : Subgroup G`**
+       ({x∈H | x²=1}) + elementary abelian API (`commute_of_mem_Q0` 等)。
+5. **§2 Prop 2 未 (次)** — K は D の cyclic normal 部分群 (p.103)。
+   **gate: Peterfalvi Appendix I Prop 1/2** (D̄=D/W faithful+transitive on Q₀^# →
+   F(D̄) f.p.f. + D̄/F(D̄) abelian; App I Prop 2 で cyclic)。Fitting thm も要
+   (repo 済のはず、要 grep)。App I 未形式化なら先に App I (上流優先)。
+6. §2 Cor (S abelian or Suzuki 2-group; gate: App III Def 1) → §2 Prop 3 (𝓛(F_q,A)
+   同型; gate: App I Prop 2) → §3 (induction hypothesis 適用開始)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
