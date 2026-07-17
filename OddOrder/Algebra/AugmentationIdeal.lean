@@ -515,9 +515,9 @@ variable (K : Subgroup G)
 noncomputable def augmentationIdealOf : Submodule ℤ (MonoidAlgebra ℤ G) :=
   Submodule.span ℤ (Set.range fun k : K => MonoidAlgebra.of ℤ G ↑k - 1)
 
-theorem sub_one_mem_augmentationIdealOf (k : K) :
-    MonoidAlgebra.of ℤ G ↑k - 1 ∈ augmentationIdealOf G K :=
-  Submodule.subset_span ⟨k, rfl⟩
+theorem sub_one_mem_augmentationIdealOf {x : G} (hx : x ∈ K) :
+    MonoidAlgebra.of ℤ G x - 1 ∈ augmentationIdealOf G K :=
+  Submodule.subset_span ⟨⟨x, hx⟩, rfl⟩
 
 theorem augmentationIdealOf_le :
     augmentationIdealOf G K ≤ augmentationIdeal G :=
@@ -675,15 +675,15 @@ theorem transversalComponent_mem
           rw [hsplit]
           exact Submodule.sub_mem _
             (sub_one_mem_augmentationIdealOf G K
-              ⟨↑k * ((hT.equiv g).1 : G), K.mul_mem k.2 (hT.equiv g).1.2⟩)
-            (sub_one_mem_augmentationIdealOf G K ⟨_, (hT.equiv g).1.2⟩)
+              (K.mul_mem k.2 (hT.equiv g).1.2))
+            (sub_one_mem_augmentationIdealOf G K (hT.equiv g).1.2)
         · exact Submodule.zero_mem _
       · split_ifs
         · have hsplit : (1 : MonoidAlgebra ℤ G) - MonoidAlgebra.of ℤ G ↑k
               = -(MonoidAlgebra.of ℤ G ↑k - 1) := by
             abel
           rw [hsplit]
-          exact Submodule.neg_mem _ (sub_one_mem_augmentationIdealOf G K k)
+          exact Submodule.neg_mem _ (sub_one_mem_augmentationIdealOf G K k.2)
         · exact Submodule.zero_mem _
     exact this
   exact hle hα
@@ -706,10 +706,99 @@ theorem transversalComponentSum_mem_sq
         ((MonoidAlgebra.of ℤ G ↑k - 1) * (MonoidAlgebra.of ℤ G g - 1))
         ∈ augmentationIdealOf G K * augmentationIdealOf G K := by
       rw [transversalComponentSum_sub_one_mul_sub_one G K hT h1]
-      exact Submodule.mul_mem_mul (sub_one_mem_augmentationIdealOf G K k)
-        (sub_one_mem_augmentationIdealOf G K ⟨_, (hT.equiv g).1.2⟩)
+      exact Submodule.mul_mem_mul (sub_one_mem_augmentationIdealOf G K k.2)
+        (sub_one_mem_augmentationIdealOf G K (hT.equiv g).1.2)
     exact this
   exact hle hα
+
+/-! ### Isaacs Corollary 10.22: `Δ(K)² = Δ(K)Δ(G) ∩ ℤ[K]` (p. 312) -/
+
+/-- The copy of the group ring `ℤ[K]` of a subgroup `K ≤ G` inside `ℤ[G]`:
+the `ℤ`-span of the basis elements `k ∈ K`. -/
+noncomputable def groupRingOf : Submodule ℤ (MonoidAlgebra ℤ G) :=
+  Submodule.span ℤ (Set.range fun k : K => MonoidAlgebra.of ℤ G ↑k)
+
+theorem of_mem_groupRingOf {x : G} (hx : x ∈ K) :
+    MonoidAlgebra.of ℤ G x ∈ groupRingOf G K :=
+  Submodule.subset_span ⟨⟨x, hx⟩, rfl⟩
+
+theorem one_mem_groupRingOf : (1 : MonoidAlgebra ℤ G) ∈ groupRingOf G K := by
+  rw [show (1 : MonoidAlgebra ℤ G) = MonoidAlgebra.of ℤ G 1 from
+    (map_one (MonoidAlgebra.of ℤ G)).symm]
+  exact of_mem_groupRingOf G K K.one_mem
+
+theorem augmentationIdealOf_le_groupRingOf :
+    augmentationIdealOf G K ≤ groupRingOf G K :=
+  Submodule.span_le.mpr <| by
+    rintro _ ⟨k, rfl⟩
+    exact Submodule.sub_mem _ (of_mem_groupRingOf G K k.2)
+      (one_mem_groupRingOf G K)
+
+/-- `Δ(K)² ⊆ Δ(K)`: same computation as `augmentationIdeal_sq_le`, inside the
+subgroup copy. -/
+theorem augmentationIdealOf_sq_le :
+    augmentationIdealOf G K * augmentationIdealOf G K
+      ≤ augmentationIdealOf G K := by
+  refine span_mul_span_le G ?_
+  rintro _ ⟨k, rfl⟩ _ ⟨k', rfl⟩
+  rw [sub_one_mul_sub_one]
+  have h : MonoidAlgebra.of ℤ G (↑k * ↑k') - MonoidAlgebra.of ℤ G ↑k
+      - MonoidAlgebra.of ℤ G ↑k' + 1
+      = (MonoidAlgebra.of ℤ G (↑k * ↑k') - 1)
+        - (MonoidAlgebra.of ℤ G ↑k - 1)
+        - (MonoidAlgebra.of ℤ G ↑k' - 1) := by
+    abel
+  rw [h]
+  exact Submodule.sub_mem _
+    (Submodule.sub_mem _
+      (sub_one_mem_augmentationIdealOf G K (K.mul_mem k.2 k'.2))
+      (sub_one_mem_augmentationIdealOf G K k.2))
+    (sub_one_mem_augmentationIdealOf G K k'.2)
+
+/-- `f` is the identity on `ℤ[K]` (each basis element `k ∈ K` factors as
+`k·1` along the transversal). -/
+theorem transversalComponentSum_eq_self {T : Set G}
+    (hT : Subgroup.IsComplement (K : Set G) T) (h1 : (1 : G) ∈ T)
+    {α : MonoidAlgebra ℤ G} (hα : α ∈ groupRingOf G K) :
+    transversalComponentSum G K hT α = α := by
+  have hle : groupRingOf G K
+      ≤ LinearMap.ker (transversalComponentSum G K hT - LinearMap.id) :=
+    Submodule.span_le.mpr <| by
+      rintro _ ⟨k, rfl⟩
+      rw [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.sub_apply,
+        LinearMap.id_apply, transversalComponentSum_of, sub_eq_zero,
+        hT.equiv_fst_eq_self_of_mem_of_one_mem h1 k.2]
+  have hker := hle hα
+  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
+    sub_eq_zero] at hker
+  exact hker
+
+/-- **Isaacs Corollary 10.22** (ℤ[K]-form):
+`Δ(K)² = Δ(K)Δ(G) ⊓ ℤ[K]` in `ℤ[G]`. -/
+theorem augmentationIdealOf_sq_eq_inf_groupRingOf :
+    augmentationIdealOf G K * augmentationIdealOf G K
+      = (augmentationIdealOf G K * augmentationIdeal G) ⊓ groupRingOf G K := by
+  obtain ⟨T, hT, h1⟩ := Subgroup.exists_isComplement_right K 1
+  apply le_antisymm
+  · exact le_inf (mul_le_mul_right (augmentationIdealOf_le G K) _)
+      ((augmentationIdealOf_sq_le G K).trans
+        (augmentationIdealOf_le_groupRingOf G K))
+  · rintro α ⟨hα₁, hα₂⟩
+    have hmem := transversalComponentSum_mem_sq G K hT h1 hα₁
+    rwa [transversalComponentSum_eq_self G K hT h1 hα₂] at hmem
+
+/-- **Isaacs Corollary 10.22** (Δ(K)-form):
+`Δ(K)² = Δ(K)Δ(G) ⊓ Δ(K)` in `ℤ[G]`. -/
+theorem augmentationIdealOf_sq_eq_inf :
+    augmentationIdealOf G K * augmentationIdealOf G K
+      = (augmentationIdealOf G K * augmentationIdeal G)
+          ⊓ augmentationIdealOf G K := by
+  apply le_antisymm
+  · exact le_inf (mul_le_mul_right (augmentationIdealOf_le G K) _)
+      (augmentationIdealOf_sq_le G K)
+  · exact le_trans
+      (inf_le_inf_left _ (augmentationIdealOf_le_groupRingOf G K))
+      (le_of_eq (augmentationIdealOf_sq_eq_inf_groupRingOf G K).symm)
 
 end TransversalComponents
 
