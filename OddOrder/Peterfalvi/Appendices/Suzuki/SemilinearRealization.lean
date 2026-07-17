@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
-import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
@@ -256,6 +256,144 @@ theorem exists_semilinear_field_model :
   refine ⟨F, hF, hmodule, hfinite, hdim, hcard, μ, ν, νe,
     hν, hμ, hνsemi, fun _ ↦ rfl, ?_⟩
   exact hyp.fittingScalar_companion_compat μ hμ ν hνsemi
+
+/-- The complementary subgroups `F(D̄)` and `V̄` give the external decomposition of `D̄`. -/
+noncomputable def fittingSemidirectEquiv :
+    ↥(fitting hyp.Dbar) ⋊[hyp.fittingConjAction] ↥hyp.Vbar ≃* hyp.Dbar :=
+  SemidirectProduct.mulEquivSubgroup hyp.fitting_isComplement_Vbar
+
+/-- The scalar and field-automorphism coordinates intertwine all three actions in the
+reassociated semidirect product used by Proposition 3. -/
+theorem exists_equivariant_field_coordinates
+    {F : Type u} [Field F] [Module F (Additive ↥hyp.Q0)]
+    (hdim : Module.finrank F (Additive ↥hyp.Q0) = 1)
+    (μ : ↥(fitting hyp.Dbar) ≃* Fˣ)
+    (ν : ↥hyp.Vbar →* (F ≃+* F))
+    (νe : ↥hyp.Vbar ≃* ↥(MonoidHom.range ν))
+    (hμ : ∀ (t : ↥(fitting hyp.Dbar)) (x : Additive ↥hyp.Q0),
+      ((μ t : Fˣ) : F) • x =
+        Additive.ofMul (hyp.fittingAction t (Additive.toMul x)))
+    (hνsemi : ∀ (z : ↥hyp.Vbar) (a : F) (x : Additive ↥hyp.Q0),
+      (MulEquiv.toAdditive (hyp.VbarAction z)) (a • x) =
+        ν z a • (MulEquiv.toAdditive (hyp.VbarAction z)) x)
+    (hνe : ∀ z, (νe z : F ≃+* F) = ν z)
+    (hcompat : ∀ (z : ↥hyp.Vbar) (t : ↥(fitting hyp.Dbar)),
+      μ (hyp.fittingConjAction z t) =
+        fieldRingAutOnUnits F (ν z) (μ t)) :
+    ∃ e : ↥hyp.Q0 ≃* Multiplicative F,
+      (∀ t : ↥(fitting hyp.Dbar),
+        (SemidirectProduct.leftFactorAction hyp.fittingConjAction
+          (hyp.conjQ0bar.comp hyp.fittingSemidirectEquiv.toMonoidHom) t).trans e =
+            e.trans (fieldScalarAction F (μ t))) ∧
+      (∀ z : ↥hyp.Vbar,
+        (SemidirectProduct.rightFactorAction hyp.fittingConjAction
+          (hyp.conjQ0bar.comp hyp.fittingSemidirectEquiv.toMonoidHom) z).trans e =
+            e.trans (fieldRingAutOnAdditive F (νe z : RingAut F))) ∧
+      ∀ z : ↥hyp.Vbar,
+        (hyp.fittingConjAction z).trans μ =
+          μ.trans (fieldRingAutOnUnits F (νe z : RingAut F)) := by
+  obtain ⟨eA, heA⟩ := hyp.exists_sQ0_addEquiv_of_finrank_one hdim
+  let e : ↥hyp.Q0 ≃* Multiplicative F := AddEquiv.toMultiplicativeRight eA
+  refine ⟨e, ?_, ?_, ?_⟩
+  · intro t
+    ext x
+    apply Multiplicative.toAdd.injective
+    change eA (Additive.ofMul
+        ((hyp.conjQ0bar.comp hyp.fittingSemidirectEquiv.toMonoidHom)
+          (SemidirectProduct.inl t) x)) =
+      ((μ t : Fˣ) : F) * eA (Additive.ofMul x)
+    apply eA.symm.injective
+    rw [eA.symm_apply_apply, heA, mul_smul, ← heA, eA.symm_apply_apply]
+    simpa [fittingSemidirectEquiv, fittingAction] using
+      (hμ t (Additive.ofMul x)).symm
+  · intro z
+    ext x
+    apply Multiplicative.toAdd.injective
+    change eA (Additive.ofMul
+        ((hyp.conjQ0bar.comp hyp.fittingSemidirectEquiv.toMonoidHom)
+          (SemidirectProduct.inr z) x)) =
+      (νe z : RingAut F) (eA (Additive.ofMul x))
+    apply eA.symm.injective
+    rw [eA.symm_apply_apply, heA, hνe]
+    let a : F := eA (Additive.ofMul x)
+    have hx : eA.symm a = Additive.ofMul x := eA.symm_apply_apply _
+    have hz := hνsemi z a (Additive.ofMul hyp.sQ0)
+    have hzfix :
+        (MulEquiv.toAdditive (hyp.VbarAction z)) (Additive.ofMul hyp.sQ0) =
+          Additive.ofMul hyp.sQ0 := by
+      exact congrArg Additive.ofMul (hyp.VbarAction_fix_sQ0 z)
+    rw [← heA, hx] at hz
+    rw [hzfix] at hz
+    simpa [fittingSemidirectEquiv, VbarAction] using hz
+  · intro z
+    apply MulEquiv.ext
+    intro t
+    change μ (hyp.fittingConjAction z t) =
+      fieldRingAutOnUnits F (νe z : RingAut F) (μ t)
+    rw [hνe]
+    exact hcompat z t
+
+/-- **Peterfalvi Part II, Chapter I §2, Proposition 3.**
+The group on `Q0` and `Dbar` is a semilinear affine group over a finite field of
+order `|Q0|`; its point-stabilizer factor `Vbar` is cyclic. -/
+theorem exists_semilinear_equiv :
+    ∃ (F : Type u) (_ : Field F) (_ : Finite F)
+      (A : Subgroup (RingAut F)),
+      Nat.card F = Nat.card ↥hyp.Q0 ∧
+      IsCyclic ↥hyp.Vbar ∧
+      ∃ (eQ : ↥hyp.Q0 ≃* Multiplicative F)
+        (μ : ↥(fitting hyp.Dbar) ≃* Fˣ)
+        (νe : ↥hyp.Vbar ≃* A),
+        (∀ t : ↥(fitting hyp.Dbar),
+          (SemidirectProduct.leftFactorAction hyp.fittingConjAction
+            (hyp.conjQ0bar.comp hyp.fittingSemidirectEquiv.toMonoidHom) t).trans eQ =
+              eQ.trans (fieldScalarAction F (μ t))) ∧
+        (∀ z : ↥hyp.Vbar,
+          (SemidirectProduct.rightFactorAction hyp.fittingConjAction
+            (hyp.conjQ0bar.comp hyp.fittingSemidirectEquiv.toMonoidHom) z).trans eQ =
+              eQ.trans (fieldRingAutOnAdditive F (νe z : RingAut F))) ∧
+        (∀ z : ↥hyp.Vbar,
+          (hyp.fittingConjAction z).trans μ =
+            μ.trans (fieldRingAutOnUnits F (νe z : RingAut F))) ∧
+        ∃ eL : ↥hyp.Q0 ⋊[hyp.conjQ0bar] hyp.Dbar ≃* semilinearGroup F A,
+          (∀ q : ↥hyp.Q0,
+            eL (SemidirectProduct.inl q) =
+              SemidirectProduct.inl (SemidirectProduct.inl (eQ q))) ∧
+          (∀ t : ↥(fitting hyp.Dbar),
+            eL (SemidirectProduct.inr
+                (hyp.fittingSemidirectEquiv (SemidirectProduct.inl t))) =
+              SemidirectProduct.inl (SemidirectProduct.inr (μ t))) ∧
+          ∀ z : ↥hyp.Vbar,
+            eL (SemidirectProduct.inr
+                (hyp.fittingSemidirectEquiv (SemidirectProduct.inr z))) =
+              SemidirectProduct.inr (νe z) := by
+  obtain ⟨F, hF, hmodule, hfinite, hdim, hcard,
+      μ, ν, νe, _hνinj, hμ, hνsemi, hνe, hcompat⟩ :=
+    hyp.exists_semilinear_field_model
+  letI : Field F := hF
+  letI : Module F (Additive ↥hyp.Q0) := hmodule
+  letI : Finite F := hfinite
+  let A : Subgroup (RingAut F) := MonoidHom.range ν
+  have hVcyclic : IsCyclic ↥hyp.Vbar :=
+    (νe.symm.isCyclic).mp (ringAutSubgroup_isCyclic_of_finite F A)
+  obtain ⟨eQ, hT, hE, hκ⟩ :=
+    hyp.exists_equivariant_field_coordinates hdim μ ν νe
+      hμ hνsemi hνe hcompat
+  let semilinearEquiv :
+      ↥hyp.Q0 ⋊[hyp.conjQ0bar] hyp.Dbar ≃* semilinearGroup F A :=
+    SemidirectProduct.reassocOfEquivToSemilinear A hyp.fittingConjAction
+      hyp.conjQ0bar hyp.fittingSemidirectEquiv eQ μ νe hT hE hκ
+  refine ⟨F, hF, hfinite, A, hcard, hVcyclic, eQ, μ, νe,
+    hT, hE, hκ, semilinearEquiv, ?_, ?_, ?_⟩
+  · intro q
+    exact reassocOfEquivToSemilinear_inl A hyp.fittingConjAction
+      hyp.conjQ0bar hyp.fittingSemidirectEquiv eQ μ νe hT hE hκ q
+  · intro t
+    exact reassocOfEquivToSemilinear_leftFactor A hyp.fittingConjAction
+      hyp.conjQ0bar hyp.fittingSemidirectEquiv eQ μ νe hT hE hκ t
+  · intro z
+    exact reassocOfEquivToSemilinear_rightFactor A hyp.fittingConjAction
+      hyp.conjQ0bar hyp.fittingSemidirectEquiv eQ μ νe hT hE hκ z
 
 end Hypothesis
 

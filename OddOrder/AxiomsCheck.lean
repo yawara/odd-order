@@ -7000,10 +7000,10 @@ is irreducible, and `D̄ = K̄ ⋊ V̄`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.KbarSemidirectEquiv
 
-/-! **Peterfalvi Part II, Ch. I §2, Proposition 3, field-coordinate stage**:
-`F(D̄)` is identified with the full multiplicative group of the finite field of order
-`|Q₀|`; evaluation at the distinguished involution gives the additive coordinate.  The
-generic reassociation equivalence retains all three component actions. -/
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 3**: `F(D̄) ≅ F_qˣ`, while `V̄`
+embeds faithfully into `Aut(F_q)` and normalizes the scalar action semilinearly.  The
+three compatible component actions assemble to `Q₀ ⋊ D̄ ≅ 𝓛(F_q, A)` with
+`|F_q| = |Q₀|`; cyclicity of finite-field automorphisms gives cyclic `V̄`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_fitting_field_model
@@ -7016,6 +7016,12 @@ generic reassociation equivalence retains all three component actions. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_semilinear_field_model
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_equivariant_field_coordinates
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_semilinear_equiv
 
 #assert_only_allowed_axioms SemidirectProduct.reassoc
 

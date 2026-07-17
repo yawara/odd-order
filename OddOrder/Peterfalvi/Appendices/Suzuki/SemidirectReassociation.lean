@@ -132,4 +132,148 @@ def SemidirectProduct.reassocOfEquivToSemilinear
 
 end SemilinearTransport
 
+section ComponentImages
+
+variable {E : Type uE} {T : Type uT} {V : Type uV} {D : Type uD}
+  [Group E] [Group T] [Group V] [Group D]
+  {F : Type uF} [Field F] (A : Subgroup (RingAut F))
+  (κ : V →* MulAut T) (α : D →* MulAut E)
+  (δ : T ⋊[κ] V ≃* D)
+  (e : E ≃* Multiplicative F) (μ : T ≃* Fˣ) (ν : V ≃* A)
+  (hT : ∀ t : T,
+    (SemidirectProduct.leftFactorAction κ (α.comp δ.toMonoidHom) t).trans e =
+      e.trans (fieldScalarAction F (μ t)))
+  (hE : ∀ v : V,
+    (SemidirectProduct.rightFactorAction κ (α.comp δ.toMonoidHom) v).trans e =
+      e.trans (fieldRingAutOnAdditive F (ν v : RingAut F)))
+  (hκ : ∀ v : V,
+    (κ v).trans μ = μ.trans (fieldRingAutOnUnits F (ν v : RingAut F)))
+
+local notation "Φ" => SemidirectProduct.reassocOfEquivToSemilinear
+  A κ α δ e μ ν hT hE hκ
+
+/-- The semilinear reassociation sends the normal factor to the additive-field factor. -/
+theorem reassocOfEquivToSemilinear_inl (x : E) :
+    Φ (SemidirectProduct.inl x) =
+      SemidirectProduct.inl (SemidirectProduct.inl (e x)) := by
+  let c₀ := SemidirectProduct.congr
+    (φ₁ := α.comp δ.toMonoidHom) (φ₂ := α)
+    (MulEquiv.refl E) δ (fun _ => by ext; rfl)
+  let c₂ :
+      (E ⋊[SemidirectProduct.leftFactorAction κ (α.comp δ.toMonoidHom)] T) ⋊[
+        SemidirectProduct.rightFactorActionOnLeftSemidirect κ
+          (α.comp δ.toMonoidHom)] V ≃* semilinearGroup F A :=
+    SemidirectProduct.congr (SemidirectProduct.congr e μ hT) ν (fun v => by
+    ext y <;>
+      simp only [SemidirectProduct.rightFactorActionOnLeftSemidirect,
+        SemidirectProduct.congr_apply_left, SemidirectProduct.congr_apply_right,
+        MulEquiv.trans_apply]
+    · exact DFunLike.congr_fun (hE v) y.left
+    · exact congrArg (fun u : Fˣ => (u : F))
+        (DFunLike.congr_fun (hκ v) y.right))
+  have hc : c₀.symm (SemidirectProduct.inl x : E ⋊[α] D) =
+      (SemidirectProduct.inl x : E ⋊[α.comp δ.toMonoidHom] (T ⋊[κ] V)) := by
+    apply SemidirectProduct.ext
+    · rw [SemidirectProduct.congr_symm_apply_left]
+      rfl
+    · rw [SemidirectProduct.congr_symm_apply_right]
+      change δ.symm 1 = 1
+      exact map_one δ.symm
+  change c₂ (SemidirectProduct.reassoc κ (α.comp δ.toMonoidHom)
+      (c₀.symm (SemidirectProduct.inl x))) = _
+  rw [hc]
+  apply SemidirectProduct.ext
+  · apply SemidirectProduct.ext
+    · change e x = e x
+      rfl
+    · change μ 1 = 1
+      exact map_one μ
+  · change ν 1 = 1
+    exact map_one ν
+
+/-- The semilinear reassociation sends the left acting factor to the scalar factor. -/
+theorem reassocOfEquivToSemilinear_leftFactor (t : T) :
+    Φ (SemidirectProduct.inr (δ (SemidirectProduct.inl t))) =
+      SemidirectProduct.inl (SemidirectProduct.inr (μ t)) := by
+  let c₀ := SemidirectProduct.congr
+    (φ₁ := α.comp δ.toMonoidHom) (φ₂ := α)
+    (MulEquiv.refl E) δ (fun _ => by ext; rfl)
+  let c₂ :
+      (E ⋊[SemidirectProduct.leftFactorAction κ (α.comp δ.toMonoidHom)] T) ⋊[
+        SemidirectProduct.rightFactorActionOnLeftSemidirect κ
+          (α.comp δ.toMonoidHom)] V ≃* semilinearGroup F A :=
+    SemidirectProduct.congr (SemidirectProduct.congr e μ hT) ν (fun v => by
+      ext y <;>
+        simp only [SemidirectProduct.rightFactorActionOnLeftSemidirect,
+          SemidirectProduct.congr_apply_left, SemidirectProduct.congr_apply_right,
+          MulEquiv.trans_apply]
+      · exact DFunLike.congr_fun (hE v) y.left
+      · exact congrArg (fun u : Fˣ => (u : F))
+          (DFunLike.congr_fun (hκ v) y.right))
+  have hc : c₀.symm
+      (SemidirectProduct.inr (δ (SemidirectProduct.inl t)) : E ⋊[α] D) =
+      (SemidirectProduct.inr (SemidirectProduct.inl t) :
+        E ⋊[α.comp δ.toMonoidHom] (T ⋊[κ] V)) := by
+    apply SemidirectProduct.ext
+    · rw [SemidirectProduct.congr_symm_apply_left]
+      rfl
+    · rw [SemidirectProduct.congr_symm_apply_right]
+      change δ.symm (δ (SemidirectProduct.inl t)) = SemidirectProduct.inl t
+      exact δ.symm_apply_apply _
+  change c₂ (SemidirectProduct.reassoc κ (α.comp δ.toMonoidHom)
+      (c₀.symm (SemidirectProduct.inr (δ (SemidirectProduct.inl t))))) = _
+  rw [hc]
+  apply SemidirectProduct.ext
+  · apply SemidirectProduct.ext
+    · change e 1 = 1
+      exact map_one e
+    · change μ t = μ t
+      rfl
+  · change ν 1 = 1
+    exact map_one ν
+
+/-- The semilinear reassociation sends the right acting factor to the
+field-automorphism factor. -/
+theorem reassocOfEquivToSemilinear_rightFactor (v : V) :
+    Φ (SemidirectProduct.inr (δ (SemidirectProduct.inr v))) =
+      SemidirectProduct.inr (ν v) := by
+  let c₀ := SemidirectProduct.congr
+    (φ₁ := α.comp δ.toMonoidHom) (φ₂ := α)
+    (MulEquiv.refl E) δ (fun _ => by ext; rfl)
+  let c₂ :
+      (E ⋊[SemidirectProduct.leftFactorAction κ (α.comp δ.toMonoidHom)] T) ⋊[
+        SemidirectProduct.rightFactorActionOnLeftSemidirect κ
+          (α.comp δ.toMonoidHom)] V ≃* semilinearGroup F A :=
+    SemidirectProduct.congr (SemidirectProduct.congr e μ hT) ν (fun z => by
+      ext y <;>
+        simp only [SemidirectProduct.rightFactorActionOnLeftSemidirect,
+          SemidirectProduct.congr_apply_left, SemidirectProduct.congr_apply_right,
+          MulEquiv.trans_apply]
+      · exact DFunLike.congr_fun (hE z) y.left
+      · exact congrArg (fun u : Fˣ => (u : F))
+          (DFunLike.congr_fun (hκ z) y.right))
+  have hc : c₀.symm
+      (SemidirectProduct.inr (δ (SemidirectProduct.inr v)) : E ⋊[α] D) =
+      (SemidirectProduct.inr (SemidirectProduct.inr v) :
+        E ⋊[α.comp δ.toMonoidHom] (T ⋊[κ] V)) := by
+    apply SemidirectProduct.ext
+    · rw [SemidirectProduct.congr_symm_apply_left]
+      rfl
+    · rw [SemidirectProduct.congr_symm_apply_right]
+      change δ.symm (δ (SemidirectProduct.inr v)) = SemidirectProduct.inr v
+      exact δ.symm_apply_apply _
+  change c₂ (SemidirectProduct.reassoc κ (α.comp δ.toMonoidHom)
+      (c₀.symm (SemidirectProduct.inr (δ (SemidirectProduct.inr v))))) = _
+  rw [hc]
+  apply SemidirectProduct.ext
+  · apply SemidirectProduct.ext
+    · change e 1 = 1
+      exact map_one e
+    · change μ 1 = 1
+      exact map_one μ
+  · change ν v = ν v
+    rfl
+
+end ComponentImages
+
 end OddOrder.Peterfalvi.Appendices.Suzuki

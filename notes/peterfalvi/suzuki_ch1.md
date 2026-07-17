@@ -110,8 +110,19 @@
    - `Q` nilpotent ⟹ `S` normal/characteristic、`conjQByK` を `S` へ制限し `A := range φ`。
    - `s^K = H∩I` (`image_conj_KSet_eq_involutions_H`) で transporter の存在、
      `injOn_conj_KSet` で一意性。全 endpoint axiom-clean。
-7. **次 frontier = §2 Prop 3** (`𝓛(F_q,A)` 同型; App I Prop 2) → §3
-   (induction hypothesis 適用開始)。§3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造
-   (mathlib 未整備) に gate される項が増える。
+7. ✅ **§2 Prop 3 完了** — `SemilinearModel.lean`/`SemidirectReassociation.lean`/
+   `SemilinearRealization.lean`。
+   - App I Prop 2(a) から同じ有限体 `F` 上で `|F|=|Q₀|`、`F(D̄) ≃* Fˣ` を実構成。
+     推移性と `sQ0 ≠ 1` で scalar map の全射性まで証明。
+   - Prop 2(b) を `V̄` に適用して faithful `ν : V̄ →* RingAut F` を構成し、
+     `V̄ ≃* range ν`、semilinearity、`V̄` 共役と scalar action の整合性を証明。
+   - `D̄ = F(D̄) ⋊ V̄` を外部半直積へし、三重半直積を座標を保って再結合。
+     `exists_semilinear_equiv` は `Q₀ ≃* F_add`、`F(D̄) ≃* Fˣ`、
+     `V̄ ≃* A ≤ RingAut F` と三作用の同変性、`Q₀ ⋊ D̄ ≃* 𝓛(F,A)` を返す。
+   - finite-field automorphism group の cyclicity から `V̄` cyclic。全 endpoint axiom-clean。
+     `Kbar_eq_fitting` により本文の `K̄ ↔ Fˣ` と一致。**→ §2 全結果 formalized。**
+8. **次 frontier = §3 Lemma 1** (Theorem A の結論下で `Q` は 2-group、
+   `L = O^{2′}(G) = ⟨Q^x | x ∈ G⟩`)。§3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の
+   具体構造を使うが、条件付き結論の上流 API から文書順に構成する。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
