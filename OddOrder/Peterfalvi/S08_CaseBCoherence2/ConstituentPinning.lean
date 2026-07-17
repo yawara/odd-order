@@ -284,6 +284,7 @@ theorem eq_smul_of_inner_self_eq {v w : ClassFunction G ℂ} {a : ℤ}
   exact sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero hre)
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **Aggregate τ-image of integer-weighted constituents** (the (6.8.2.2)→(6.8.2.3) bridge).  For a
 `ℤ`-linear character map `τ` and per-constituent images `τ(αᵢ) = Xᵢ − Yᵢ`, the integer-weighted
 aggregate maps termwise: `τ(∑ᵢ aᵢ·αᵢ) = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)`.  Pure `ℤ`-linearity (`map_sum` +
@@ -304,6 +305,7 @@ theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card
   rw [Int.cast_smul_eq_zsmul ℂ (a i) (α i), map_zsmul, himg i hi,
     ← Int.cast_smul_eq_zsmul ℂ (a i) (Xv i - Yv i)]
 
+omit [Fintype G] in
 /-- **(6.8.2.2)→(6.8.2.3) aggregate `hagg` builder.**  Assembles the `hagg` input of
 `per_constituent_Y_eq_smul` from the three (6.8.2.2) pieces: the image decomposition
 `τ β = Xagg − n·Y` (`exists_decomposition_caseB`, `β = Ind^L_{W₂}φ − |H:Z|·η₁`, `n = |H:Z|`), the

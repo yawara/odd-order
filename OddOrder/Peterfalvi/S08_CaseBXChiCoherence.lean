@@ -113,6 +113,7 @@ theorem xChiExtension_mu_ne_zero
   rw [hpair] at hp2
   exact hi hp2
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
 /-- **The `X_χ`-extension on a column sum**: `ν(μ_j) = ν(∑_i μ_{ij}) = Ximg χ₂`.  Only the `0`-th-row
 term survives (`xChiExtension_mu_zero`/`xChiExtension_mu_ne_zero`). -/
 theorem xChiExtension_columnSum

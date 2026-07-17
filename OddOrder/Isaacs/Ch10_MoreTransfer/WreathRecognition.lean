@@ -56,6 +56,7 @@ variable {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
 
 section /- 10A: Lemma 10.3 (pp. 297-298) -/
 
+omit [Finite P] hp in
 /-- Pointwise commutativity of an elementary abelian subgroup, coerced to the
 ambient group. -/
 private lemma elemAb_comm {A : Subgroup P} (hEA : A.IsElementaryAbelian p) :
@@ -427,6 +428,7 @@ section /- 10A: Theorem 10.4 — recognition of `C_p ≀ C_p` (pp. 298-299) -/
 
 open scoped IsMulCommutative
 
+omit [Finite P] in
 /-- Conjugates of an element of a normal subgroup remain in the subgroup. -/
 private lemma mem_of_isConj_of_mem_normal {A : Subgroup P} [A.Normal] {a b : P}
     (haA : a ∈ A) (hab : IsConj a b) : b ∈ A := by
@@ -446,6 +448,7 @@ theorem conjClass_pairwise_commute {A : Subgroup P} [A.Normal]
   exact elemAb_comm hEA x (mem_of_isConj_of_mem_normal haA hx) y
     (mem_of_isConj_of_mem_normal haA hy)
 
+omit [Finite P] in
 /-- If `A` is an abelian subgroup of prime index and `a ∈ A` is noncentral, then
 `C_P(a) = A`: the centralizer contains the abelian `A`, is proper (else `a` would be
 central), and `A` is maximal (prime index). -/
@@ -476,6 +479,7 @@ private lemma centralizer_singleton_eq_of_not_mem_center {A : Subgroup P}
       exact Nat.eq_of_mul_eq_mul_right hp_prime.pos (hmul.trans (one_mul p).symm)
     exact le_antisymm (Subgroup.relIndex_eq_one.mp hrel) hA_le
 
+omit [Finite P] in
 /-- For `u ∉ A` with `A` normal of prime index `p`, the image of `u` in `P ⧸ A`
 has order exactly `p`. -/
 private lemma orderOf_mk_eq_of_notMem {A : Subgroup P} [A.Normal]
@@ -580,6 +584,7 @@ private lemma conj_pow_injOn {A : Subgroup P} [A.Normal]
   · exact key i j hle hj hij
   · exact (key j i hle hi hij.symm).symm
 
+omit [Finite P] in
 /-- A subgroup of prime index is proper: there is an element outside it. -/
 lemma exists_notMem_of_index_prime {A : Subgroup P} (hidx : A.index = p) :
     ∃ u : P, u ∉ A := by

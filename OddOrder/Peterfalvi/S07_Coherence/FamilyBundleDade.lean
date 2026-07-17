@@ -357,6 +357,7 @@ theorem dadeIntegralCharacterMap_conj_of_support (hyp : S04.Hypothesis G A L)
     hyp.dadeMap_conj]
 
 omit [Fintype G] in
+omit [Fintype ↥L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- Every element of the integral span `ℤ[S]` of a set `S` of **supported** class functions is
 itself supported.
 

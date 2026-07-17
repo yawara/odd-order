@@ -55,6 +55,7 @@ theorem le_of_card_coprime_index {C : Type*} [Group C]
   exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2)
 
 omit [Invertible (Nat.card G : ℂ)] in
+omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **The `H`-field of an `S04.Hypothesis` is determined by `(G, A, L)`.**  Two Dade hypotheses on the
 same data agree on every `H(a)`: each is the normal complement of `C_L(a)` in `C_G(a)`
 (`centralizer_eq_sup`/`centralizer_disjoint`/`H_normalized`), of order coprime to `|C_L(a)|`
@@ -106,6 +107,7 @@ theorem dade_H_eq {A : Set G} (hyp₁ hyp₂ : OddOrder.Peterfalvi.S04.Hypothesi
   exact Subgroup.mem_subgroupOf.mp (hle h1)
 
 omit [Invertible (Nat.card G : ℂ)] in
+omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Structure extensionality for `S04.Hypothesis` via the data field `H`.**  `H` is the only
 `Type`-valued field of `S04.Hypothesis`; the remaining eight fields are `Prop`s, equal by proof
 irrelevance.  So two hypotheses on the same `(G, A, L)` whose `H`-fields coincide are equal.  This
@@ -355,6 +357,7 @@ theorem caseB_column_htau1_mema
   exact Submodule.sum_mem _ (fun i _ => ((h46.columnFamily χ₂).mu i).mem_ZIrr)
 
 omit [Invertible (Nat.card G : ℂ)] in
+omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2.3) weight reconciliation `aθ = θ(1)`.**  When the source `φ` actually occurs in the
 central restriction of `θ` (`0 < constituentWeight`), the multiplicity `aθ = ⟨φ, Res^H_{W₂} θ⟩`
 equals the degree `θ(1)`.  Indeed `W₂` is central in `H`, so `Res^H_{W₂} θ = θ(1)·λ` for a unique

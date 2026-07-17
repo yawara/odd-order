@@ -345,6 +345,7 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
   {A : Set G} {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 
 omit [Invertible (Nat.card G : ℂ)] in
+omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] in
 /-- In the **TI Dade situation** (`hyp.H a = ⊥`, e.g. `H^#` a TI-subset with normalizer `L`), the
 (2.7) adjoint averaging map collapses to plain evaluation: `adjointAverageFun hyp χ a = χ(a)`.  The
 average `|H(a)|⁻¹ ∑_{x ∈ H(a)} χ(ax)` over the trivial group `H(a) = ⊥` is the single term

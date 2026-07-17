@@ -1276,6 +1276,7 @@ private theorem oPiCore_singleton_le_oPiPrimePiCore :
   exact opCore_le_oPiPrimePiCore p
 
 omit [IsSolvable G] [Finite G] in
+omit [Fact (Nat.Prime p)] in
 /-- `⟨x⟩` is `p`-elementary abelian when `x ^ p = 1`. -/
 private theorem zpowers_isElementaryAbelian_of_pow_eq_one {x : G} (hxp : x ^ p = 1) :
     (Subgroup.zpowers x).IsElementaryAbelian p := by
@@ -1291,6 +1292,8 @@ private theorem zpowers_isElementaryAbelian_of_pow_eq_one {x : G} (hxp : x ^ p =
       hxp, one_zpow]
 
 omit [IsSolvable G] in
+omit [Finite G] in
+omit [Fact (Nat.Prime p)] in
 /-- **E*(S) characterization (membership form)**: if `E` is a maximal elementary abelian
 `p`-subgroup, then every order-`p` element of `C_G(E)` already lies in `E`. (Apply
 `IsMaximalElementaryAbelian.le_of_le_centralizer` to `F = ⟨x⟩`.) -/

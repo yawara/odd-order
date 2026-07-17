@@ -815,6 +815,7 @@ the support-side total `sum_mobiusTermCF_transversalRep_eq_neg` and the non-supp
 
 open scoped Classical in
 omit [Fintype ↥L] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Peterfalvi (2.10), the pointwise identity.**  For a supported class function `α ∈ CF(L, A)`,
 the Dade map equals the negated transversal sum of orbit-averaging summands:
 
@@ -876,6 +877,7 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
 
 open scoped Classical in
 omit [Fintype ↥L] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- The transversal sum of `mobiusTermCF` reindexes over the `Finset` of nonempty subsets that are
 their own conjugacy-class representative (`transversalRep (mk'' B) = B`), with the summand the
 packaged induced character:
@@ -942,6 +944,7 @@ theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.H
     exact hC (hyp.mobiusTermCF_of_not_nonempty hconj _ g hne)
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] in
 /-- Evaluation of a `Finset` sum of class functions is the sum of the evaluations. -/
 private theorem classFunction_finset_sum_apply {ι : Type*} (s : Finset ι)
     (f : ι → ClassFunction G ℂ) (g : G) :
@@ -952,6 +955,7 @@ private theorem classFunction_finset_sum_apply {ι : Type*} (s : Finset ι)
   rw [Finset.sum_insert hps', Finset.sum_insert hps', ClassFunction.add_apply, ih]
 
 open scoped Classical in
+omit [Fintype ↥L] in
 /-- **Peterfalvi (2.6.b).**  The complex Dade map preserves virtual characters:
 `τ : ℤ[Irr L, A] → ℤ[Irr G]`.
 

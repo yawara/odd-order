@@ -106,6 +106,7 @@ lemma orderOf_eq_prime_pow_of_minimal_notMem {N₀ : Type*} [Group N₀] [Finite
     exact orderOf_dvd_natCard _
   exact (Nat.prime_dvd_prime_iff_eq hq hp_prime).mp hdvd_p
 
+omit hp in
 /-- A `p`-element of a group with a normal Sylow `p`-subgroup lies in it. -/
 lemma mem_sylow_of_orderOf_prime_pow {N₀ : Type*} [Group N₀] [Finite N₀]
     (P₀ : Sylow p N₀) [(P₀ : Subgroup N₀).Normal]
@@ -123,6 +124,7 @@ lemma mem_sylow_of_orderOf_prime_pow {N₀ : Type*} [Group N₀] [Finite N₀]
     Subgroup.mem_sup_left (Subgroup.mem_zpowers n)
   rwa [heq] at h1
 
+omit [Finite G] in
 /-- Conjugation by an element of the normalizer fixes the subgroup:
 `conjSubgroup y H = H` for `y ∈ N_G(H)`. In particular this applies to any
 subgroup and `y ∈ H` itself. -/
@@ -132,6 +134,7 @@ lemma conjSubgroup_eq_self_of_mem_normalizer {H : Subgroup G} {y : G}
   rw [mem_conjSubgroup]
   exact (Subgroup.mem_normalizer_iff''.mp hy g).symm
 
+omit hp in
 /-- If a Sylow subgroup satisfies `↑P ≤ x N x⁻¹` for `N := N_G(P)`, then
 `x ∈ N`: the conjugate `x⁻¹ P x` is a Sylow subgroup contained in `N`, where
 `P` is a *normal* Sylow subgroup, so `x⁻¹ P x = P` by maximality. -/

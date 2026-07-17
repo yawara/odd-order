@@ -224,10 +224,12 @@ noncomputable def commPairing : V[P] →+ V[P] →+ ZMod p :=
       rw [show Additive.toMul (v + v') = Additive.toMul v * Additive.toMul v' from rfl,
         map_mul, MonoidHom.mul_apply, toAdd_mul])
 
+omit [Finite P] in
 @[simp] theorem commPairing_mk (x y : P) :
     commPairing hP (Additive.ofMul (QuotientGroup.mk x)) (Additive.ofMul (QuotientGroup.mk y)) =
       Multiplicative.toAdd (commBihom2 hP (QuotientGroup.mk x) (QuotientGroup.mk y)) := rfl
 
+omit [Finite P] in
 private theorem commBihom2_mk (x y : P) :
     commBihom2 hP (QuotientGroup.mk x) (QuotientGroup.mk y) =
       commMulEquiv hP ⟨⁅x, y⁆, commutatorElement_mem_commutator_top x y⟩ := by

@@ -212,6 +212,7 @@ theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46Core A L)
        omega)
 
 omit [Invertible (Nat.card G : ℂ)] in
+omit [Invertible (Nat.card ↥L : ℂ)] in
 /-- On `W₁`, the column character `ω_{ij} = chiColumn χ₂ i` is independent of the column `χ₂`:
 the `W₂`-projection `wSnd` is trivial on `W₁` (`wSnd_eq_one_of_mem_W1`), so
 `ω_{ij}(w) = (w1CharEquiv i)(wFst w)` for every column `χ₂`.  (Generalizes `chiColumn_one_apply`
@@ -229,6 +230,7 @@ theorem chiColumn_apply_of_mem_W1 (h : Hypothesis46Core A L) [NeZero (Nat.card h
         * χ₂ (h.sdiffTICyclicHypothesis.wSnd w) := rfl
   rw [Hypothesis.chiColumn, h.sdiffTICyclicHypothesis.omega_apply, h1, hχ, mul_one]
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.8), step (2)** (agreement on `W₁`).  Two equal-degree certain-type characters
 `μ_{ij}, μ_{ik}` (same row `i`, columns `χ₂, χ₂'`) agree on all of `W₁`, so `μ_{ij} − μ_{ik}`
 vanishes there.

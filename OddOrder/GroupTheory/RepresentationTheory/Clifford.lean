@@ -1126,6 +1126,7 @@ theorem IsCharacter.zero : IsCharacter (0 : ClassFunction G ℂ) := by
   rw [Subsingleton.elim ((1 : Representation ℂ G PUnit) g) 0, map_zero]
 
 omit [Finite G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- Genuine characters are closed under addition: the direct sum (`Representation.prod`) of the
 witnessing representations has character `χ + ψ`. -/
 theorem IsCharacter.add {χ ψ : ClassFunction G ℂ} (hχ : IsCharacter χ) (hψ : IsCharacter ψ) :
@@ -1140,6 +1141,7 @@ theorem IsCharacter.add {χ ψ : ClassFunction G ℂ} (hχ : IsCharacter χ) (h�
     exact LinearMap.trace_prodMap' (ρ g) (σ g)
   rw [hprod, ClassFunction.add_apply, congrFun hρ g, congrFun hσ g]
 
+omit [Finite G] in
 /-- Genuine characters are closed under `ℕ`-scalar multiples. -/
 theorem IsCharacter.nsmul {χ : ClassFunction G ℂ} (hχ : IsCharacter χ) (n : ℕ) :
     IsCharacter (n • χ) := by
@@ -1147,6 +1149,7 @@ theorem IsCharacter.nsmul {χ : ClassFunction G ℂ} (hχ : IsCharacter χ) (n :
   | zero => simpa using IsCharacter.zero
   | succ k ih => rw [succ_nsmul]; exact ih.add hχ
 
+omit [Finite G] in
 /-- Genuine characters are closed under finite sums. -/
 theorem IsCharacter.sum {ι : Type*} {s : Finset ι} {f : ι → ClassFunction G ℂ}
     (h : ∀ i ∈ s, IsCharacter (f i)) : IsCharacter (∑ i ∈ s, f i) := by

@@ -618,6 +618,7 @@ theorem SibleyDadeHypothesis.certainTypeSet_subset_Xset
     hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂⟩
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2) case-(B): `W₂` is central in `H`.**  In case (B), `W₂ ⊆ Z(↥L)`
 (`certainType_W2_le_center`), so its trace `W₂.subgroupOf H` lies in `Z(↥H)`: a `W₂`-element
 commutes with all of `↥L`, hence with `↥H`.  This is the [Is] 2.27 hypothesis `Z ≤ Z(G)` (with
@@ -650,6 +651,7 @@ theorem SibleyDadeHypothesis.mem_Xset_exists_inducing
   exact ⟨θ, hθne, fun hker => hχnotZ (hyp.mem_SsubFiltration.mpr ⟨θ, hθne, hker, hθind⟩), hθind⟩
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2.3) step 2 ([Is] 2.27 central restriction):** for an irreducible `θ` of `H` whose kernel
 does not contain the central subgroup `Z = W₂.subgroupOf H`, the restriction `Res^H_Z θ` is `θ(1)`
 times
@@ -679,6 +681,7 @@ theorem certainType_central_restriction
   exact hzval
 
 omit [Invertible (Nat.card G : ℂ)] in
+omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2.3) constituent weight = degree (central multiplicity).**  For an irreducible `θ` of `H`
 whose central restriction is `Res^H_Z θ = θ(1)·φ` (`certainType_central_restriction`,
 `Z = W₂.subgroupOf H`

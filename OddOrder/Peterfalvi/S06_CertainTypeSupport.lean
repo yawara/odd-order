@@ -39,6 +39,7 @@ variable {A : Set G} {L : Subgroup G} [Fintype ↥L]
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
 omit [Fintype ↥L] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Peterfalvi (4.7)**, core support statement, *structural form*.  This is the (4.7) core depending
 only on the (4.6.c)/(4.6.d) data — a normal `subH ≤ K` and the covering condition `A_covers` — and
 **not** on the Dade isometry (`dade0`/`tau`) of `Hypothesis46`.  It therefore applies in any setting

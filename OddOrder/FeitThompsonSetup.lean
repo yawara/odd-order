@@ -374,6 +374,7 @@ theorem gridEquivE_coe (w : ↥tp.W) :
     (((gridEquivE hG mp tp w : ↥(mp.certainTypeS hG).sdiffTICyclicHypothesis.W) :
         ↥mp.S) : G) = (w : G) := rfl
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- A `tp.W`-element lying in `mp.K` transports under `gridEquivE` into `certainTypeS.W1`
 (`= mp.K.subgroupOf mp.S`). -/
 theorem gridEquivE_mem_W1 (w : ↥tp.W) (hw : (w : G) ∈ mp.K) :
@@ -382,6 +383,7 @@ theorem gridEquivE_mem_W1 (w : ↥tp.W) (hw : (w : G) ∈ mp.K) :
   rw [Subgroup.mem_subgroupOf, certainTypeS_W1_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_coe]
   exact hw
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- A `tp.W`-element lying in `mp.Kstar` transports under `gridEquivE` into `certainTypeS.W2`
 (`= mp.Kstar.subgroupOf mp.S`). -/
 theorem gridEquivE_mem_W2 (w : ↥tp.W) (hw : (w : G) ∈ mp.Kstar) :
@@ -421,6 +423,7 @@ theorem muS_apply_of_not_mem_W2 (i : Fin tp.q) (j : Fin tp.p) (w : G) (hwW : w �
       = (deltaS hG mp tp j : ℂ) * _
   congr 1
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Value of `certainTypeS`'s product character on a transported `mp.K`-element**: only the
 `W₁`-factor `a` survives (`wFst` is the identity, `wSnd` is trivial, on a `W₁`-element).  This is the
 `tp.W1`-restriction value used (with its `tp.W2` mirror) to discharge the S/T-shared-`ω` symmetry on
@@ -443,6 +446,7 @@ theorem omegaProdCharS_apply_mem_K
     MonoidHom.comp_apply]
   rw [hfst, hsnd, map_one, mul_one]
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Value of `certainTypeS`'s product character on a transported `mp.Kstar`-element**: only the
 `W₂`-factor `b` survives.  The `tp.W2`-restriction mirror of `omegaProdCharS_apply_mem_K`. -/
 theorem omegaProdCharS_apply_mem_Kstar

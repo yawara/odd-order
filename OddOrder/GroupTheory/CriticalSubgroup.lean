@@ -793,6 +793,7 @@ variable {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime]
 variable {A : Type*} [Group A] [Finite A]
 
 omit [Finite P] in
+omit [Finite A] in
 /-- If `A` acts trivially on a characteristic self-centralizing subgroup `C`
 (`C ≤ C_P(C)`-image suffices via `IsCritical`), then `[P, A] = actionCommutator φ`
 centralizes `C`, i.e. `actionCommutator φ ≤ C_P(C)`.

@@ -101,11 +101,13 @@ noncomputable def rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
   h.w1CharEquiv.symm ((h.w1CharEquiv i)⁻¹)
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 @[simp] theorem w1CharEquiv_rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (i : Fin (Nat.card h.W1)) :
     h.w1CharEquiv (rowInv h i) = (h.w1CharEquiv i)⁻¹ :=
   h.w1CharEquiv.apply_symm_apply _
 
+omit [Fintype G] in
 /-- `rowInv` is an **involution** (`(w1CharEquiv i)⁻¹` inverts), hence a permutation of the rows. -/
 theorem rowInv_rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
     rowInv h (rowInv h i) = i := by
@@ -296,6 +298,7 @@ theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h
   exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Row inversion fixes the anchor row**: `rowInv 0 = 0` (the row-`0` character is trivial,
 `w1CharEquiv_zero`, and `1⁻¹ = 1`). -/
 @[simp] theorem rowInv_zero (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] :
