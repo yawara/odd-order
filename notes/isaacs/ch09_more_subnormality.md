@@ -7,8 +7,19 @@
 > `Semisimple.lean` (`IsSemisimpleGroup` + Lem 9.5 直積性/centerless + Lem 9.6
 > minimal normal は abelian/semisimple) → `Layer.lean` (`layer G` = E(G) 定義・共役不変で
 > `G`-normal + Thm 9.7 (a) E'=E, (b) E/Z(E) semisimple, (c) [E,M]=1 for solvable normal M)。
-> 次 = generalized Fitting `F*(G) = F(G)E(G)` + Thm 9.8 (Bender, 一般形) + Cor 9.9
-> (`GeneralizedFitting.lean`)。§9A 完了間近。
+> → `GeneralizedFitting.lean` (`genFitting G` = F\*(G) 定義 + Cor 9.9 `←`:
+> `F ⊇ C(F) ⇒ F*=F`, 9.7(c) 依存)。**§9A 残 = Thm 9.8 (Bender 一般形
+> `C_G(F*) ⊆ F*`) + Cor 9.9 `→`** のみ (同 `GeneralizedFitting.lean` に追記予定)。
+>
+> Thm 9.8 の設計 (書籍 p.275 忠実): `C := C_G(F*)`, `Z := C ⊓ F*`, 反証で `Z < C` →
+> `G/Z` の minimal normal `N̄ ≤ C.map q` を取り Lem 9.6 で abelian/semisimple 分岐。
+> abelian: `M := comap q N̄` は `⁅M,M⁆ ≤ Z ≤ Z(M)` ゆえ nilpotent → `M ≤ F(G) ⊆ F*` かつ
+> `M ≤ C` → `M ≤ Z` で `N̄ = ⊥` 矛盾 (nilpotent 補題は `isNilpotent_of_ker_le_center` +
+> `isMulCommutative_of_commutator_eq_bot`)。semisimple: `↥N̄` の minimal normal `T̄`
+> (nonabelian simple, `IsSemisimpleGroup.isSimpleGroup_of_isMinimalNormal`) を `Ḡ` へ押し上げ
+> `S := comap q` → `S ◁ M ◁ G` subnormal, `Z = Z(S)`, Lem 9.1 で `⁅S,S⁆` quasisimple =
+> component `⊆ E ⊆ F*` かつ `⊆ C` → `⊆ Z` で `S̄` abelian, nonabelian simple と矛盾。
+> semisimple 枝は T̄ (↥N̄) → Ḡ → G の 3 段 subtype 輸送が重い。
 
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.9 (pp. 271-294).
 形式化先: `OddOrder/Isaacs/Ch09_MoreSubnormality/` (topic leaves; 2026-07-17 開始).
