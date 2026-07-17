@@ -81,11 +81,23 @@ general nilpotent M は book の正確な statement (in-scope、specialization d
 
 **top-level statement shape (確定)**: `C_M(R) := fixedSubgroup (MulDistribMulAction.toMulAut H M) R` (Subgroup)。piece 1/2/3 全て同 `fixedSubgroup`+`IsAInvariant` framework で統一 (module 摩擦は piece 2 内に閉じ込め)。
 
+## ✅ 完了 (2026-07-18) — BG §3 全 10 結果完成
+
+`S03g_Thm310Nilpotent.bgThm310_nilpotent` = general nilpotent M (実は general solvable M、book より強)、
+general kernel、(a)+(b)+(c)。sorry-free・axiom-clean・AxiomsCheck 登録・full build green (4307 jobs)。
+3 piece で assemble (全 axiom-clean):
+- piece 1 `S03g_Thm310FixedPointSplit` (b)-glue 順序公式 (commit 69516988)
+- piece 2 `S03g_Thm310GroupForm` elem-abelian base group 形 (invariants↔fixedSubgroup bridge)
+- piece 3 `S03g_Thm310Nilpotent` induction (φ:H→*MulAut 形 型多相強帰納、compHom で base 作用構成、
+  Lemma 1.9 で (c) glue)
+
+想定した sticking (M_0/M⧸M_0 の MulDistribMulAction instance) は φ:MulAut framework で induction を
+述べることで dissolve (per-step instance 不要、base で compHom を 1 回のみ)。
+
 ## 完了条件
 
 group-level `bgTheorem310_nilpotent` (general nilpotent M, general kernel, (a)+(b)+(c)) を book
-strength・sorry-free・axiom-clean。AxiomsCheck 登録、survey 正本 Thm 3.10「済」+ BG §3 完成を記録。
-⚠ 規模大 (1-3日、piece 分割推奨: (a) は M 非依存で即、(b) の Case-1 induction が本体、(c) は Lemma 1.9)。
+strength・sorry-free・axiom-clean。AxiomsCheck 登録、survey 正本 Thm 3.10「済」+ BG §3 完成を記録。 ✅
 
 ## 参照
 
