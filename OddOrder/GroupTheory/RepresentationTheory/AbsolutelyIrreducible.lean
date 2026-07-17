@@ -11,6 +11,8 @@ import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import Mathlib.RingTheory.Finiteness.Basic
 import Mathlib.RingTheory.IntegralDomain
 import Mathlib.RingTheory.TensorProduct.Finite
+import Mathlib.RingTheory.LittleWedderburn
+import Mathlib.RingTheory.Finiteness.Cardinality
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.LinearAlgebra.TensorProduct.Basis
@@ -294,6 +296,158 @@ theorem span_range_quotient_out_eq_top (ρ : Representation F G V)
 
 end CentralCharacter
 
+section SchurField
+
+open Representation
+
+variable {F : Type*} [Field F]
+variable {G : Type*} [Monoid G] {V : Type*} [AddCommGroup V] [Module F V]
+variable {ρ : Representation F G V}
+
+/-- An irreducible representation has a nontrivial underlying space. -/
+theorem nontrivial_of_isIrreducible (ρ : Representation F G V) [ρ.IsIrreducible] :
+    Nontrivial V := by
+  by_contra h
+  rw [not_nontrivial_iff_subsingleton] at h
+  exact bot_ne_top (α := Subrepresentation ρ)
+    (Subrepresentation.toSubmodule_injective (Subsingleton.elim _ _))
+
+instance [ρ.IsIrreducible] : Nontrivial (IntertwiningMap ρ ρ) := by
+  haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
+  obtain ⟨v, hv⟩ := exists_ne (0 : V)
+  exact ⟨1, 0, fun h10 => hv (by simpa using DFunLike.congr_fun h10 v)⟩
+
+instance : IntCast (IntertwiningMap ρ ρ) :=
+  ⟨fun n => n • (1 : IntertwiningMap ρ ρ)⟩
+
+/-- The self-intertwiners of a representation form a ring (mathlib only provides the
+`Semiring` instance). -/
+instance : Ring (IntertwiningMap ρ ρ) :=
+  fast_instance%
+  Function.Injective.ring (fun f : IntertwiningMap ρ ρ => f.toLinearMap)
+    (Representation.IntertwiningMap.toLinearMap_injective ρ ρ) rfl rfl (fun _ _ => rfl)
+    (fun _ _ => rfl) (fun _ => rfl) (fun _ _ => rfl) (fun _ _ => rfl) (fun _ _ => rfl)
+    (fun f n => by
+      induction n with
+      | zero => rfl
+      | succ n ih =>
+        simp only [pow_succ, Representation.IntertwiningMap.coe_mul,
+          show f ^ (n + 1) = f ^ n * f from rfl, ih])
+    (fun _ => rfl) (fun n => zsmul_one n)
+
+/-- **Schur's lemma, division-ring form**: the self-intertwiners `Hom_FG(V, V)` of an
+irreducible representation form a division ring (every nonzero intertwiner is bijective,
+and the inverse of a bijective intertwiner is an intertwiner). -/
+noncomputable instance [ρ.IsIrreducible] : DivisionRing (IntertwiningMap ρ ρ) :=
+  DivisionRing.ofIsUnitOrEqZero fun f => by
+    rcases Representation.IsIrreducible.bijective_or_eq_zero f with hf | hf
+    · refine Or.inl ⟨⟨f, (f.ofBijective hf).symm.toIntertwiningMap, ?_, ?_⟩, rfl⟩
+      · apply Representation.IntertwiningMap.ext
+        apply LinearMap.ext
+        intro v
+        exact (f.ofBijective hf).toLinearEquiv.apply_symm_apply v
+      · apply Representation.IntertwiningMap.ext
+        apply LinearMap.ext
+        intro v
+        exact (f.ofBijective hf).toLinearEquiv.symm_apply_apply v
+    · exact Or.inr hf
+
+/-- Over a finite field, the self-intertwiner algebra of a finite-dimensional representation
+is finite.  Combined with the division-ring instance above, **Wedderburn's little theorem**
+(the mathlib instance `littleWedderburn`) then makes `Hom_FG(V, V)` of an irreducible `ρ` a
+**finite field** — the first half of BG Prop 2.1(c). -/
+instance [Finite F] [FiniteDimensional F V] : Finite (IntertwiningMap ρ ρ) := by
+  haveI : Finite V := Module.finite_of_finite F
+  exact Finite.of_injective (fun f : IntertwiningMap ρ ρ => (f : V → V)) DFunLike.coe_injective
+
+noncomputable example [Finite F] [FiniteDimensional F V] [ρ.IsIrreducible] :
+    Field (IntertwiningMap ρ ρ) := inferInstance
+
+/-- The tautological action of the self-intertwiners on the underlying space
+(the analogue of `Module.End.applyModule`). -/
+instance : SMul (IntertwiningMap ρ ρ) V :=
+  ⟨fun f v => f v⟩
+
+@[simp] theorem intertwiningMap_smul_def (f : IntertwiningMap ρ ρ) (v : V) : f • v = f v := rfl
+
+instance : Module (IntertwiningMap ρ ρ) V where
+  one_smul _ := rfl
+  mul_smul _ _ _ := rfl
+  smul_zero f := map_zero f.toLinearMap
+  smul_add f v w := map_add f.toLinearMap v w
+  add_smul _ _ _ := rfl
+  zero_smul _ := rfl
+
+instance : IsScalarTower F (IntertwiningMap ρ ρ) V :=
+  ⟨fun _ _ _ => rfl⟩
+
+variable (ρ) in
+/-- `ρ`, regarded as a representation over the (bigger) coefficient ring
+`K = Hom_FG(V, V)` of its self-intertwiners: each `ρ g` is `K`-linear precisely because the
+elements of `K` intertwine `ρ`.  This is the "regard `M` as a `KG`-module" of
+**BG Prop 2.1(c)**; see `isAbsolutelyIrreducible_overEnd` for the full statement. -/
+def overEnd : Representation (IntertwiningMap ρ ρ) G V where
+  toFun g :=
+    { toFun := ρ g
+      map_add' := (ρ g).map_add
+      map_smul' := fun f v => (LinearMap.congr_fun (f.isIntertwining' g) v).symm }
+  map_one' := by ext v; simp
+  map_mul' g h := by ext v; simp [Module.End.mul_apply]
+
+@[simp] theorem overEnd_apply (g : G) (v : V) : overEnd ρ g v = ρ g v := rfl
+
+-- The statements below need the coefficients `K = Hom_FG(V, V)` of `overEnd ρ` to be a
+-- (commutative) field, so they are stated over a finite `F`, where the `Field K` structure
+-- is found by instance search (`littleWedderburn` on the `DivisionRing`/`Finite` instances
+-- above).  Over a general `F` the same statements make sense over the division ring `K`,
+-- but mathlib's `Representation.IsIrreducible` is field-specific.
+variable [Finite F] [FiniteDimensional F V]
+
+/-- A representation stays irreducible when regarded over its self-intertwiner field:
+a `K`-subrepresentation is in particular an `F`-subrepresentation. -/
+instance [ρ.IsIrreducible] : (overEnd ρ).IsIrreducible := by
+  haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
+  haveI : Nontrivial (Subrepresentation (overEnd ρ)) := by
+    obtain ⟨v, hv⟩ := exists_ne (0 : V)
+    refine ⟨⊥, ⊤, fun h => hv ?_⟩
+    have htop : v ∈ (⊤ : Subrepresentation (overEnd ρ)) :=
+      Submodule.mem_top (R := IntertwiningMap ρ ρ) (M := V)
+    rw [← h] at htop
+    exact (Submodule.mem_bot (IntertwiningMap ρ ρ)).mp htop
+  refine { eq_bot_or_eq_top := fun W => ?_ }
+  -- the same carrier as an `F`-subrepresentation of `ρ`
+  let W' : Subrepresentation ρ :=
+    { toSubmodule := W.toSubmodule.restrictScalars F
+      apply_mem_toSubmodule := fun g v hv => W.apply_mem_toSubmodule g hv }
+  rcases eq_bot_or_eq_top W' with hW' | hW'
+  · refine Or.inl (Subrepresentation.toSubmodule_injective ?_)
+    have : W'.toSubmodule = ⊥ := by rw [hW']; rfl
+    exact (Submodule.restrictScalars_eq_bot_iff F _ _).mp this
+  · refine Or.inr (Subrepresentation.toSubmodule_injective ?_)
+    have : W'.toSubmodule = ⊤ := by rw [hW']; rfl
+    exact (Submodule.restrictScalars_eq_top_iff F _ _).mp this
+
+/-- Every self-intertwiner of `overEnd ρ` is a `K`-scalar (`Hom_KG(V, V) = K` for
+`K = Hom_FG(V, V)`): a `K`-linear intertwiner is in particular `F`-linear, hence an element
+of `K`, and its `K`-scalar action is just its application. -/
+theorem algebraMap_overEnd_intertwiningMap_surjective [ρ.IsIrreducible] :
+    Function.Surjective
+      (algebraMap (IntertwiningMap ρ ρ) (IntertwiningMap (overEnd ρ) (overEnd ρ))) := by
+  intro φ
+  -- `φ` restricted to `F`-scalars, as an element of `K = Hom_FG(V, V)`
+  refine ⟨{ toFun := φ
+            map_add' := φ.toLinearMap.map_add
+            map_smul' := fun c v =>
+              φ.toLinearMap.map_smul (algebraMap F (IntertwiningMap ρ ρ) c) v
+            isIntertwining' := fun g => LinearMap.ext fun v =>
+              LinearMap.congr_fun (φ.isIntertwining' g) v }, ?_⟩
+  apply Representation.IntertwiningMap.ext
+  apply LinearMap.ext
+  intro v
+  rfl
+
+end SchurField
+
 section AbsoluteIrreducibility
 
 open scoped TensorProduct
@@ -303,14 +457,6 @@ universe u
 
 variable {F : Type u} [Field F]
 variable {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
-
-/-- An irreducible representation has a nontrivial underlying space. -/
-theorem nontrivial_of_isIrreducible (ρ : Representation F G V) [ρ.IsIrreducible] :
-    Nontrivial V := by
-  by_contra h
-  rw [not_nontrivial_iff_subsingleton] at h
-  exact bot_ne_top (α := Subrepresentation ρ)
-    (Subrepresentation.toSubmodule_injective (Subsingleton.elim _ _))
 
 /-- `baseChangeRepresentation K ρ g` is the base change of the linear map `ρ g`. -/
 theorem baseChangeRepresentation_eq_baseChange (K : Type*) [Field K] [Algebra F K]
@@ -546,6 +692,20 @@ theorem IsAbsolutelyIrreducible.baseChangeRepresentation_isIrreducible
     (baseChangeRepresentation K ρ).IsIrreducible :=
   isIrreducible_baseChangeRepresentation_of_algebraMap_surjective ρ
     (isAbsolutelyIrreducible_iff_bijective_algebraMap.mp h).2 K
+
+/-- **BG Proposition 2.1(c)** (p. 10): if `F` is a finite field and `M` is an irreducible
+`FG`-module, then `K = Hom_FG(M, M)` is a finite field (Schur's lemma + Wedderburn's little
+theorem — the `Field K` structure here is found by the mathlib instance `littleWedderburn`
+through the `DivisionRing`/`Finite` instances above), and `M`, regarded as a `KG`-module via
+`overEnd`, is *absolutely* irreducible. -/
+theorem isAbsolutelyIrreducible_overEnd [Finite F] [ρ.IsIrreducible] [FiniteDimensional F V] :
+    IsAbsolutelyIrreducible (overEnd ρ) := by
+  haveI : FiniteDimensional (IntertwiningMap ρ ρ) V :=
+    Module.Finite.of_restrictScalars_finite F (IntertwiningMap ρ ρ) V
+  rw [isAbsolutelyIrreducible_iff_bijective_algebraMap]
+  exact ⟨(algebraMap (IntertwiningMap ρ ρ)
+      (IntertwiningMap (overEnd ρ) (overEnd ρ))).injective,
+    algebraMap_overEnd_intertwiningMap_surjective⟩
 
 end AbsoluteIrreducibility
 
