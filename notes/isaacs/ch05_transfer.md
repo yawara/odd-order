@@ -255,3 +255,25 @@ Isaacs は **任意の subgroup H** に対して `Foc_G(H)` を定義 (L3132), m
 - **Thm 5.26 Frobenius normal p-complement の証明戦略**: Isaacs は (3) ⇒ (1) を 5.25 + 5.27 + 5.28 で示す. (3) ⇒ (1) で 5.28 が肝 (任意 p-subgroup X で N/C が p-group ⇒ P, Q ∈ Syl_p が C_G(P∩Q) 内で共役). mathlib に類似補題が無い可能性が高く Isaacs 流を follow.
 - **Thm 5.24 (G simple, H maximal nilpotent ⇒ H は p-group)** を実装すべきか: BG/Peterfalvi 直接被引用なし, Isaacs Ch.6+ 引用も Wielandt 文脈で 1 回程度. 後回し可.
 - **5.10 Dietzmann の置き場所**: mathlib に Schur 5.7 が `card_commutator_le_of_finite_commutatorSet` として既収載で, この証明では Dietzmann を経由しない別経路 (closureCommutatorRepresentatives) を取っている. Isaacs 5.7 を mathlib 経由で示すか, 5.10 を経由して Isaacs 流で示すかは美学の問題. Dietzmann 単独の下流被引用は Ch.5 内に閉じる.
+
+## 2026-07-17 Ch.5 完備化 (レーン a) — 章として全番号付き結果クローズ
+
+survey (`notes/meta/three_books_full_survey_2026_07_16.md`) の Ch.5 残 4 ギャップを全てクローズし、
+**Isaacs Ch.5 の 30 番号付き結果は全て形式化済み** (mathlib 被覆 9 + repo 実装 21) となった。
+
+| 結果 | 実装 | 所在 |
+|---|---|---|
+| Cor 5.4 商版 | `not_isCyclic_sylow_quotient_of_le_commutator_inf_center` | `Basic.lean` |
+| Thm 5.10 Dietzmann | `dietzmann` / `dietzmann_setFinite` (list 化した書籍証明; §5B 完備化) | 新 leaf `Dietzmann.lean` |
+| Cor 5.19 一般形 | `not_isSimpleGroup_of_sylow_two_cyclic_strict_max_factor` (`A ⊔ B = ⊤` + exponent 条件 encode; 旧 cyclic 版は `B = ⊥` 特殊化) | 新 leaf `SylowTwoDirectFactor.lean` |
+| Thm 5.24 | `exists_isPGroup_of_isCoatom_of_isNilpotent` | 新 leaf `NilpotentMaximal.lean` |
+
+5.24 の支持補題 (公開 API、他章から再利用可):
+
+- `APrime_lt_top_of_isNilpotent_of_prime_dvd_card`: 有限 nilpotent `H`, `p ∣ |H|` ⇒ `A^p(H) < H`。
+  `Sylow.directProductOfNormal` の p 成分射影 ∘ abelianization の kernel を `APrime_le` の witness にする。
+- `exists_sylow_coe_eq_of_normalizer_le` (Sylow promotion): `H` の maximal p-subgroup `P` で
+  `N_G(P) ≤ H` なら `P ∈ Syl_p(G)`。normalizer growth (Ch01 Thm 1.22) 経由。
+
+旧「未解決の疑問」のうち 5.24 (後回し可) と 5.10 (置き場所) は上記で決着。AxiomsCheck 登録済
+(5.4 商版 / 5.10 / 5.19 一般形 / 5.24)。全 leaf sorry-free、full build green。
