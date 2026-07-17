@@ -408,7 +408,8 @@ theorem inner_extension_span_Xset_centralCommutator_Yset_eq_zero_c2_caseA
   | smul c a _ ih =>
       rw [map_zsmul,
         ← Int.cast_smul_eq_zsmul ℂ c
-          ((hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension
+          ((hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp
+            hp3 hHp).extension
             a),
         ClassFunction.inner_smul_left, ih, mul_zero]
 
@@ -462,7 +463,8 @@ theorem inner_restrict_extension_Yset_mem_span_Xset_eq_zero_c2_caseA
   classical
   have hrec := hyp.inner_tau_eq_inner_restrict hx.2 (hyp.coherentYset.extension η)
   have hτ : hyp.tau x =
-      (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension x :=
+      (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp
+        hp3 hHp).extension x :=
     ((hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3
       hHp).extends_on_supported x hx).symm
   have h0 : ClassFunction.inner
@@ -489,7 +491,8 @@ theorem inner_restrict_extension_Yset_mul_degree_eq_of_frobenius
     {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset hyp.centralCommutator)
     (hχ' : χ' ∈ hyp.Xset hyp.centralCommutator) :
     (χ' 1) * ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ
-      = (χ 1) * ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ' := by
+      = (χ 1) * ClassFunction.inner
+        (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ' := by
   classical
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
     fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h
@@ -532,7 +535,8 @@ theorem inner_restrict_extension_Yset_mul_degree_eq_c2_caseA
     {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset hyp.centralCommutator)
     (hχ' : χ' ∈ hyp.Xset hyp.centralCommutator) :
     (χ' 1) * ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ
-      = (χ 1) * ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ' := by
+      = (χ 1) * ClassFunction.inner
+        (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ' := by
   classical
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
     fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA h
@@ -760,7 +764,8 @@ theorem restrict_extension_Yset_const_on_centralCommutator_c2_caseA
   obtain ⟨χ₁, hχ₁⟩ := hyp.Xset_centralCommutator_nonempty_c2_caseA hK hW1 hA hHnonab
   have hd : χ₁ 1 ≠ 0 := by
     obtain ⟨d, hd_pos, hd_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
-      (⟨χ₁, hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hχ₁⟩ : IrreducibleCharacter ↥L)
+      (⟨χ₁, hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hχ₁⟩
+        : IrreducibleCharacter ↥L)
     simp only [IrreducibleCharacter.coe_mk] at hd_eq
     rw [hd_eq]; exact_mod_cast hd_pos.ne'
   have hv := hyp.restrict_extension_Yset_degree_value_eq_c2_caseA
@@ -1021,7 +1026,7 @@ noncomputable def
     (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
     (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
       ν x =
-        (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+      (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
           hF hXne hstepData).extension x)
     (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
     (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
@@ -1308,7 +1313,8 @@ theorem restrict_extension_Yset_charValue_cong_of_frobenius
   have hεint : IsIntegral ℤ (ε : ℂ) := by
     simpa using (isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := ε))
   -- the eval identity `η^{τ₁}(g) = ε · ξ(g)`.
-  have hsmul : ∀ g : G, (hyp.coherentYset.extension η) g = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
+  have hsmul : ∀ g : G, (hyp.coherentYset.extension η) g
+      = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
     intro g
     rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
   obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
@@ -1368,7 +1374,8 @@ theorem restrict_extension_Yset_charValue_cong_c2_caseA
   have hεint : IsIntegral ℤ (ε : ℂ) := by
     simpa using (isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := ε))
   -- the eval identity `η^{τ₁}(g) = ε · ξ(g)`.
-  have hsmul : ∀ g : G, (hyp.coherentYset.extension η) g = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
+  have hsmul : ∀ g : G, (hyp.coherentYset.extension η) g
+      = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
     intro g
     rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
   obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible

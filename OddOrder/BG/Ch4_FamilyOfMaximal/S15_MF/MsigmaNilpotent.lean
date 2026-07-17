@@ -60,7 +60,8 @@ theorem normalizer_le_normalizer_centralizer (H : Subgroup G) :
   intro g hg
   rw [Subgroup.mem_normalizer_iff]
   have key : ∀ {z : G}, z ∈ Subgroup.normalizer (H : Set G) →
-      ∀ c, c ∈ Subgroup.centralizer (H : Set G) → z * c * z⁻¹ ∈ Subgroup.centralizer (H : Set G) := by
+      ∀ c, c ∈ Subgroup.centralizer (H : Set G) →
+        z * c * z⁻¹ ∈ Subgroup.centralizer (H : Set G) := by
     intro z hz c hc
     rw [Subgroup.mem_centralizer_iff]
     intro x hx
@@ -529,7 +530,8 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
       rwa [hbot, Subgroup.mem_bot] at hmem
     · -- `ρ.range ≠ ⊥`: `K₁` is nontrivial and meets `Q₀` trivially.
       obtain ⟨p, hp, hcard⟩ := hK1prime
-      haveI : Nontrivial ↥K1 := Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
+      haveI : Nontrivial ↥K1 :=
+        Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
       obtain ⟨k, hk1⟩ := exists_ne (1 : ↥K1)
       intro hbot
       refine hk1 (Subtype.ext ?_)
@@ -541,7 +543,8 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
       exact hmem
     · -- `card ρ.range = card K₁ = p` (`ρ` injective).
       obtain ⟨p, hp, hcard⟩ := hK1prime
-      exact ⟨p, hp, by rw [← hcard]; exact Nat.card_congr (MonoidHom.ofInjective hρinj).symm.toEquiv⟩
+      exact ⟨p, hp,
+        by rw [← hcard]; exact Nat.card_congr (MonoidHom.ofInjective hρinj).symm.toEquiv⟩
     · -- Fixed-point-free: a fixed nontrivial image contradicts `hFPF` (`k` fixes `x` mod `Q₀`).
       intro r hr hr1 n hn hn1 heq
       obtain ⟨a, rfl⟩ := MonoidHom.mem_range.mp hr
@@ -641,7 +644,8 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
       have hmem : ψ ⟨x, hxN⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
       rwa [hbot, Subgroup.mem_bot] at hmem
     · obtain ⟨p, hp, hcard⟩ := hK1prime
-      haveI : Nontrivial ↥K1 := Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
+      haveI : Nontrivial ↥K1 :=
+        Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
       obtain ⟨k, hk1⟩ := exists_ne (1 : ↥K1)
       intro hbot
       refine hk1 (Subtype.ext ?_)
@@ -652,7 +656,8 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
       rw [hK1Q0disj.eq_bot, Subgroup.mem_bot] at hmem
       exact hmem
     · obtain ⟨p, hp, hcard⟩ := hK1prime
-      exact ⟨p, hp, by rw [← hcard]; exact Nat.card_congr (MonoidHom.ofInjective hρinj).symm.toEquiv⟩
+      exact ⟨p, hp,
+        by rw [← hcard]; exact Nat.card_congr (MonoidHom.ofInjective hρinj).symm.toEquiv⟩
     · intro r hr hr1 n hn hn1 heq
       obtain ⟨a, rfl⟩ := MonoidHom.mem_range.mp hr
       obtain ⟨b, rfl⟩ := MonoidHom.mem_range.mp hn
@@ -1027,7 +1032,8 @@ theorem Q1_eq_Q_of_inputs [Finite G]
   by_contra hne
   have hQ1ltQ : Q1 < Q := lt_of_le_of_ne hQ1Q hne
   obtain ⟨Q2, hQ1Q2, hQ2Q, hDnormQ2, hK1normQ2, hQ2normQ1⟩ :=
-    exists_chiefFactor_over_normalized hQ1ltQ hQM hMnormQ (le_inf hDM hDnormQ1) (le_inf hK1M hK1normQ1)
+    exists_chiefFactor_over_normalized hQ1ltQ hQM hMnormQ (le_inf hDM hDnormQ1)
+      (le_inf hK1M hK1normQ1)
   -- (Q₁, Q₂)-level engine hypotheses, descended from the global data.
   have hDQ2Mσ : D ⊔ Q2 ≤ Mσ := (sup_le_sup_left hQ2Q D).trans hDQMσ
   have hQ1DQ2 : Q1 ≤ D ⊔ Q2 := hQ1Q2.le.trans le_sup_right

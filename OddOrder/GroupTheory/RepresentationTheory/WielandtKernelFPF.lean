@@ -110,7 +110,8 @@ section TrivialIsotypic
 
 open MonoidAlgebra Representation GroupAlgebra
 open OddOrder.GroupTheory.CenterClassSum (centerRep)
-open OddOrder.GroupTheory.CenterSimplesOrbit (aug aug_apply aug_centerRep centerRep_apply_symm_single)
+open OddOrder.GroupTheory.CenterSimplesOrbit (aug aug_apply aug_centerRep
+  centerRep_apply_symm_single)
 open OddOrder.GroupTheory.CenterModuleDecomp (centerProj)
 
 variable {k : Type*} [Field k] [Fintype G] [Invertible (Fintype.card G : k)]
@@ -166,7 +167,8 @@ theorem symm_single_eq_average {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) 
     change MonoidAlgebra.lift k k G 1 (average k G) = 1
     rw [show average k G = ⅟(Fintype.card G : k) • ∑ g : G, MonoidAlgebra.of k G g from rfl,
       map_smul, map_sum]
-    rw [show (∑ g : G, MonoidAlgebra.lift k k G 1 (MonoidAlgebra.of k G g)) = (Fintype.card G : k) by
+    rw [show (∑ g : G, MonoidAlgebra.lift k k G 1 (MonoidAlgebra.of k G g))
+          = (Fintype.card G : k) by
           simp only [MonoidAlgebra.lift_of, MonoidHom.one_apply, Finset.sum_const, Finset.card_univ,
             nsmul_eq_mul, mul_one],
       smul_eq_mul, invOf_mul_self]
@@ -200,7 +202,8 @@ coordinate `i₀`, `centerProj φ ρ i₀ = averageMap ρ`. -/
 theorem centerProj_aug_eq_averageMap {W : Type*} [AddCommGroup W] [Module k W]
     (ρ : Representation k G W) {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) :
     centerProj φ ρ i₀ = averageMap ρ := by
-  change asAlgebraHom ρ ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = asAlgebraHom ρ (average k G)
+  change asAlgebraHom ρ ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G)
+    = asAlgebraHom ρ (average k G)
   rw [symm_single_eq_average φ haug]
 
 /-- **The trivial isotypic component equals the `G`-invariants** (item 2, ingredient g).  For the

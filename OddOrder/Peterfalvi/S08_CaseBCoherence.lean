@@ -250,7 +250,8 @@ theorem SibleyDadeHypothesis.inner_self_indW2_sub_smul_eq
       = (W2.index : ℂ) + c * star c := by
   have hIndnorm := inner_self_induce_eq_index_of_le_center hW2cen φ
   have hcross := hyp.inner_induce_W2_Yset_eq_zero hW2comm φ hφ hη₁
-  have hcross' : ClassFunction.inner η₁ (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)) = 0 := by
+  have hcross' : ClassFunction.inner η₁ (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ))
+      = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hcross, star_zero]
   have hη₁n : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
@@ -363,7 +364,8 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
   have hβval : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
       ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
         - ((W2.subgroupOf H).index : ℂ) • η₁)) ψ
-        = ((if ψ = hyp.coherentYset.extension η₁ then bb else bb + (W2.subgroupOf H).index : ℤ) : ℂ) := by
+        = ((if ψ = hyp.coherentYset.extension η₁ then bb
+            else bb + (W2.subgroupOf H).index : ℤ) : ℂ) := by
     intro ψ hψ
     rw [Finset.mem_image] at hψ
     obtain ⟨η, hη, rfl⟩ := hψ
@@ -588,7 +590,8 @@ theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_caseB
     have hYeq : hyp.Yset = ({η₁, η₂} : Set (ClassFunction ↥L ℂ)) :=
       (Set.eq_of_subset_of_ncard_le hpairsub (hm2.le.trans_eq (Set.ncard_pair hη₂ne.symm).symm)
         hyp.Yset_finite).symm
-    have hinner : ∀ ψ ψ' : ClassFunction ↥L ℂ, IsIrreducibleCharacter ψ → IsIrreducibleCharacter ψ' →
+    have hinner : ∀ ψ ψ' : ClassFunction ↥L ℂ,
+        IsIrreducibleCharacter ψ → IsIrreducibleCharacter ψ' →
         ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
       intro ψ ψ' hψ hψ'
       have h := irreducibleCharacter_inner (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
@@ -725,7 +728,8 @@ theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB
     by_cases hex : ∃ φ₀ : IrreducibleCharacter ↥W2,
         (φ₀ : ClassFunction ↥W2 ℂ) 1 = 1 ∧ φ₀ ≠ trivialIrreducibleCharacter ↥W2
     · obtain ⟨φ₀, hφ₀1, hφ₀⟩ := hex
-      rcases hyp.coeff_eq_neg_or_edge_caseB hcop hp hHp hprime hW2comm hW2cen hη₁ φ₀ hφ₀1 hφ₀ hc2 hFPF
+      rcases hyp.coeff_eq_neg_or_edge_caseB hcop hp hHp hprime hW2comm hW2cen hη₁ φ₀ hφ₀1 hφ₀ hc2
+        hFPF
         with hgood₀ | ⟨_, hbad₀⟩
       · -- good branch: `cY = coherentYset`.
         refine ⟨hyp.coherentYset, fun φ hφ1 hφ => ?_⟩

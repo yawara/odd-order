@@ -115,27 +115,34 @@ noncomputable def isCoherent_pair_of_differenceImage
       extension_inner_eq := ?_
       extends_on_supported := ?_
       extension_mem_ZIrr := ?_ }
-  · -- isometry on `ℤ[{χ,χ̄}]`: orthonormal-basis Parseval.  For `φ = a•χ+b•χ̄`, `ψ = c•χ+d•χ̄`, both
+  · -- isometry on `ℤ[{χ,χ̄}]`: orthonormal-basis Parseval.
+    -- For `φ = a•χ+b•χ̄`, `ψ = c•χ+d•χ̄`, both
     -- `⟨ext φ, ext ψ⟩` and `⟨φ, ψ⟩` reduce to `a·c + b·d` via the orthonormalities
     -- `⟨εμ,εμ⟩=⟨χ,χ⟩=1`, `⟨εμ,εν⟩=⟨χ,χ̄⟩=0`.
     intro φ ψ hφ hψ
     obtain ⟨a, b, rfl⟩ := Submodule.mem_span_pair.mp hφ
     obtain ⟨c, d, rfl⟩ := Submodule.mem_span_pair.mp hψ
     have hextφ : pairExtension hχ (a • χ + b • χ.conj)
-        = a • (hχ.sign • (hχ.mu : ClassFunction G ℂ)) + b • (hχ.sign • (hχ.nu : ClassFunction G ℂ)) := by
+        = a • (hχ.sign • (hχ.mu : ClassFunction G ℂ))
+          + b • (hχ.sign • (hχ.nu : ClassFunction G ℂ)) := by
       rw [map_add, map_zsmul, map_zsmul, pairExtension_chi hχ hχχ hortho,
         pairExtension_chiConj hχ hχbar hortho']
     have hextψ : pairExtension hχ (c • χ + d • χ.conj)
-        = c • (hχ.sign • (hχ.mu : ClassFunction G ℂ)) + d • (hχ.sign • (hχ.nu : ClassFunction G ℂ)) := by
+        = c • (hχ.sign • (hχ.mu : ClassFunction G ℂ))
+          + d • (hχ.sign • (hχ.nu : ClassFunction G ℂ)) := by
       rw [map_add, map_zsmul, map_zsmul, pairExtension_chi hχ hχχ hortho,
         pairExtension_chiConj hχ hχbar hortho']
-    have hμμ0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ) = 1 := by
+    have hμμ0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ)
+        = 1 := by
       rw [irreducibleCharacter_inner, if_pos rfl]
-    have hμν0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ) = 0 := by
+    have hμν0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ)
+        = 0 := by
       rw [irreducibleCharacter_inner, if_neg hχ.distinct]
-    have hνμ0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ) = 0 := by
+    have hνμ0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ)
+        = 0 := by
       rw [irreducibleCharacter_inner, if_neg (Ne.symm hχ.distinct)]
-    have hνν0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ) = 1 := by
+    have hνν0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ)
+        = 1 := by
       rw [irreducibleCharacter_inner, if_pos rfl]
     rw [hextφ, hextψ]
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,

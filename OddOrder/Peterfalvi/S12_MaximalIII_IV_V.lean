@@ -204,7 +204,8 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
   -- the (5.3.b) orthogonalities `⟨∑_r ω_{r0}^σ, λ^{τ₁}⟩ = 0`
   have heΩ : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
       (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 :=
-    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd hζS hζirr hζ1 hζne
+    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd
+      hζS hζirr hζ1 hζne
   have hΩe : ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
       ((hyp.SHC_isCoherent hG).extension ζ) = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, heΩ, star_zero]
@@ -213,7 +214,8 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
     exact hζne.symm
   have heΩc : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
       (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 :=
-    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd hζcS hζcirr hζc1 hζcne
+    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd
+      hζcS hζcirr hζc1 hζcne
   have hΩec : ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
       ((hyp.SHC_isCoherent hG).extension ζ.conj) = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, heΩc, star_zero]
@@ -335,13 +337,15 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
       rw [← (hyp.SHC_isCoherent hG).extends_on_supported _ hmemsupp, map_sub]
     have heOmegalam : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension lam)
         (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 :=
-      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd hlamS hlamirr hlam1 hlamne
+      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd
+        hlamS hlamirr hlam1 hlamne
     have hOmegalam : ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
         ((hyp.SHC_isCoherent hG).extension lam) = 0 := by
       rw [OddOrder.RepresentationTheory.inner_conj_symm, heOmegalam, star_zero]
     have heclam : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
         ((hyp.SHC_isCoherent hG).extension lam) = 0 :=
-      hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1 hlamS hlamirr hlam1 (Ne.symm hlamzetac)
+      hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1
+        hlamS hlamirr hlam1 (Ne.symm hlamzetac)
     have hece : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
         ((hyp.SHC_isCoherent hG).extension ζ) = 0 :=
       hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1 hζS hζirr hζ1 hζne
@@ -921,7 +925,8 @@ theorem Hypothesis.muGridAlpha_a_eq_inner_sumOmegaSigma_beta [Finite G] {M : Sub
           - coh.extension ζ) :
     (a : ℂ) = ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-          - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+          - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+              - hyp.alignedOmegaSigmaGrid hG hodd i 0)
           + (n : ℂ) • coh.extension ζ) := by
   have hαω : ClassFunction.inner
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
@@ -981,7 +986,8 @@ theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
         (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
       (Even a → a = 0) := by
   obtain ⟨a, Y, hbound, hinner, hYeq, hdecompA⟩ :=
-    hyp.SHC_residual_eq_omegaSigma_diff hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm
+    hyp.SHC_residual_eq_omegaSigma_diff hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf
+      hδj hdζ h0ζ hδpm
       hn2 hRn hZ horth hRmem hRrev
   refine ⟨a, hbound, hinner, ?_⟩
   intro heven
@@ -1070,10 +1076,12 @@ theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
     rwa [hδj] at this
   have hβr := hyp.beta_isReal hG coh hconj hodd i hj0 hζS hζirr hζ1 hdeg0
     (hyp.muGrid_zero_column_apply_one hG hodd 0) hnf hδj h410 h48
-  obtain ⟨a, hbound, hinner, heven_imp⟩ := hyp.charParam_a_eq_zero_of_residualEq hG coh hodd i hj0 hζS
+  obtain ⟨a, hbound, hinner, heven_imp⟩ := hyp.charParam_a_eq_zero_of_residualEq hG coh hodd i
+    hj0 hζS
     hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev h114
   have hζne := hyp.inducedFamily_degree_w1_conj_ne hG hζirr hζ1
-  have ha := hyp.muGridAlpha_a_eq_inner_sumOmegaSigma_beta hG coh hodd i hj0 hζS hζirr hζ1 hζne hdeg hμ0
+  have ha := hyp.muGridAlpha_a_eq_inner_sumOmegaSigma_beta hG coh hodd i hj0 hζS hζirr hζ1
+    hζne hdeg hμ0
     hnf hδj hdζ h0ζ hinner h114
   have hβZ := hyp.beta_mem_ZIrr hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
   have hβ1 : ClassFunction.inner
@@ -1310,7 +1318,8 @@ theorem Hypothesis.induce_derived_apply_one_eq_w1_mul [Finite G] {M : Subgroup G
     (θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M)) :
     (ClassFunction.induce ((derivedInG M).subgroupOf M)
         (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)) (1 : ↥M)
-      = (hyp.w1 : ℂ) * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) (1 : ↥((derivedInG M).subgroupOf M)) := by
+      = (hyp.w1 : ℂ) * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+          (1 : ↥((derivedInG M).subgroupOf M)) := by
   haveI := hyp.finiteG
   have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
     hyp.typeP.card_W1_eq_derived_index.symm

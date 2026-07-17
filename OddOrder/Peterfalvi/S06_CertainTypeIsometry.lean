@@ -300,7 +300,8 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46Core A L)
           ξ ≠ 1 → ((h.columnFamily ξ).mu i : ClassFunction ↥L ℂ) z = 0 := by
         intro ξ hξ
         have key := chiRestrict_apply_eq_zero_of_not_mem_union h hξ (g := ⟨z, hzK⟩) hnm
-        rwa [h.coe_chiRestrict, ← h.restrict_certainType_eq ξ i, ClassFunction.restrict_apply] at key
+        rwa [h.coe_chiRestrict, ← h.restrict_certainType_eq ξ i,
+          ClassFunction.restrict_apply] at key
       exact hz ((hcoe χ₂ hχ₂).trans (hcoe χ₂' hχ₂').symm)
     · -- `z ∈ L − K`: `z ~_L x·y` with `x ∈ W₁^#`, `y ∈ W₂`; moreover `y ≠ 1` (else `z ~ x ∈ W₁`,
       -- where the difference vanishes by step (2)), so `x·y ∈ V = W − (W₁ ∪ W₂)` and `z ∈ V^L`.
@@ -519,7 +520,8 @@ open scoped Classical in
 theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
-    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) (φ : ClassFunction G ℂ)
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    (φ : ClassFunction G ℂ)
     (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
         ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
     (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
@@ -577,7 +579,8 @@ theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
           - (h.columnFamily χ₂).sign •
             (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq = 0) :
     h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)
-      = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+      = (h.columnFamily χ₂).sign
+        • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
   classical
   set φ := h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg) with hφ
   set ωij := certainTypeOmegaSigma h χ₂ i with hωij
@@ -654,7 +657,8 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg)
-      = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+      = (h.columnFamily χ₂).sign
+        • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
   classical
   haveI : Finite G := Finite.of_fintype G
   haveI : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
@@ -690,7 +694,8 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
     ring
   -- additive separability of `a` (3.7)
   have hadd : ∀ p p' q q', a (p, q) + a (p', q') = a (p, q') + a (p', q) :=
-    fun p p' q q' => (ticVdiff h).sigmaCoeff_add_eq rfl (ticVdiffFullDadeApplication h) hψV p p' q q'
+    fun p p' q q' =>
+      (ticVdiff h).sigmaCoeff_add_eq rfl (ticVdiffFullDadeApplication h) hψV p p' q q'
   -- `NC(ψ) ≤ 4`
   have hNC4 : {x | a x ≠ 0}.ncard ≤ 4 := by
     have hsub : {x | a x ≠ 0} ⊆ {x | G x ≠ 0} ∪ {Pij, Pik} := by
@@ -729,11 +734,14 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
     have hNClt : {x | a x ≠ 0}.ncard
         < 2 * Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := by
       rw [hcard1]; omega
-    rcases OddOrder.Peterfalvi.S05.grid_trichotomy a hadd hgap hNClt with hz | ⟨j₀, c, hc, h1, h2⟩ | ⟨i₀, c, hc, h1, h2⟩
+    rcases OddOrder.Peterfalvi.S05.grid_trichotomy a hadd hgap hNClt with
+      hz | ⟨j₀, c, hc, h1, h2⟩ | ⟨i₀, c, hc, h1, h2⟩
     · exact hz
-    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
+    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_column
+        (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
         hc h1 h2).elim
-    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_row (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
+    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_row
+        (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
         hc h1 h2).elim
   · -- `w₂ < w₁`: transpose the grid so `Ŵ₂` is the rows
     set aT : ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) ×
@@ -749,11 +757,14 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
         le_trans (Set.ncard_le_ncard_of_injOn Prod.swap (fun x hx => hx)
           (Prod.swap_injective.injOn) (Set.toFinite _)) hNC4
       rw [hcard2]; omega
-    rcases OddOrder.Peterfalvi.S05.grid_trichotomy aT haddT hgap hNCltT with hz | ⟨p₀, c, hc, h1, h2⟩ | ⟨q₀, c, hc, h1, h2⟩
+    rcases OddOrder.Peterfalvi.S05.grid_trichotomy aT haddT hgap hNCltT with
+      hz | ⟨p₀, c, hc, h1, h2⟩ | ⟨q₀, c, hc, h1, h2⟩
     · intro pq; exact hz (pq.2, pq.1)
-    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_row (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
+    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_row
+        (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
         hc (fun q => h1 q) (fun i j hi => h2 j i hi)).elim
-    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
+    · exact (OddOrder.Peterfalvi.S05.grid_no_constant_column
+        (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
         hc (fun p => h1 p) (fun i j hj => h2 j i hj)).elim
 
 /-! ### Peterfalvi (4.9)(b): the summed isometry identity

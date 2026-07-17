@@ -208,7 +208,8 @@ theorem centralizer_inf_le_fittingInAmbient_of_le_Msigma [Finite G]
   -- `C_M(Q) ◁ M` (`M` normalizes `Q`, hence `C_G(Q)`, hence `C_G(Q) ⊓ M`).
   have hMnormC : M ≤ Subgroup.normalizer
       ((Subgroup.centralizer (Q : Set G) ⊓ M : Subgroup G) : Set G) :=
-    le_normalizer_inf (hMnormQ.trans (normalizer_le_normalizer_centralizer Q)) Subgroup.le_normalizer
+    le_normalizer_inf (hMnormQ.trans (normalizer_le_normalizer_centralizer Q))
+      Subgroup.le_normalizer
   haveI : ((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr hMnormC
   haveI : Group.IsNilpotent ↥((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M) :=
@@ -576,7 +577,8 @@ theorem opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma [Finite G]
       (Subgroup.normal_subgroupOf_iff_le_normalizer hN_Mσ).mpr (hMσ_le_M.trans hM_norm_N)
     -- `N` is nilpotent (subgroup of the nilpotent `F(M)`).
     haveI : Group.IsNilpotent ↥N := by
-      haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+      haveI : Group.IsNilpotent ↥(fittingInAmbient M) :=
+        OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
       exact Group.nilpotent_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (OddOrder.GroupTheory.opiCoreInG_le σ (fittingInAmbient M)))
     -- Nilpotent normal subgroup of `M_σ` lands in `F(M_σ)`.
@@ -811,7 +813,8 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
     centralizer_msigma_quotient_le_fittingInAmbient hG hM hQMσ hDMσ hQ0def hQ0Q hcomplD hMnormQ
       hMNQ0 hQpg hDnil hcopDQ hQab
   have cC16 : derivedInG (derivedInG M) ≤ fittingInAmbient M :=
-    derivedDerived_le_fittingInAmbient_of_inputs hMσderived hsigmaprime hQMσ hDMσ hQab hDcomm hsecFit
+    derivedDerived_le_fittingInAmbient_of_inputs hMσderived hsigmaprime hQMσ hDMσ hQab hDcomm
+      hsecFit
   -- **`q ∈ β(M)` (conjunct 6).**
   have hQne : Q ≠ ⊥ := by
     intro h0
@@ -969,7 +972,8 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.GroupTheory.le_normalizer_opiCoreInG σ M
   have hMσ_le_M : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   have hM_norm_Y : M ≤ Subgroup.normalizer (Y : Set G) :=
-    (Subgroup.normal_subgroupOf_iff_le_normalizer (h3.trans (OddOrder.BG.Ch2.S08.fittingInG_le M))).mp
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+        (h3.trans (OddOrder.BG.Ch2.S08.fittingInG_le M))).mp
       (by rw [hY]; exact OddOrder.BG.Ch2.S08.opiCoreInG_fittingInG_subgroupOf_normal σᶜ M)
   -- ## Lemma 15.1 inputs (a `κ`-Hall `K` and a `(κ∪σ)ᶜ`-Hall `U`), via Hall's theorem in `↥M`.
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
@@ -1327,13 +1331,15 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       haveI hObar_norm : ((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M).Normal :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer hOπ_le_M).mpr
           (OddOrder.GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer π hM_norm_F)
-      have hObar_pi : Ch03.Subgroup.IsPiGroup π ((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M) := by
+      have hObar_pi :
+          Ch03.Subgroup.IsPiGroup π ((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M) := by
         intro p hp
         have hcardO : Nat.card ↥((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M) =
             Nat.card ↥(OddOrder.GroupTheory.opiCoreInG π F) :=
           Nat.card_congr (Subgroup.subgroupOfEquivOfLe hOπ_le_M).toEquiv
         exact OddOrder.GroupTheory.isPiSubgroup_opiCoreInG π F p (by rwa [hcardO] at hp)
-      have hObar_le_Hbar : (OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M ≤ (MF M).subgroupOf M :=
+      have hObar_le_Hbar :
+          (OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M ≤ (MF M).subgroupOf M :=
         Ch03.Subgroup.IsPiGroup.normal_le_hall hObar_pi (maxNilpotentNormalHall_isHall M)
       have hMF_le_M : MF M ≤ M := maxNilpotentNormalHall_le M
       have hOπ_le_MF : OddOrder.GroupTheory.opiCoreInG π F ≤ MF M := by

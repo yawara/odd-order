@@ -328,7 +328,8 @@ theorem T_typeIII_Q_isComplement_UW1 [Finite G] (hyp : Hypothesis (G := G))
     have hd := td.typeP.derived_complement.disjoint; rw [disjoint_iff] at hd
     rw [eq_bot_iff]; intro x hx; rw [Subgroup.mem_inf] at hx
     have hxM' : x ∈ derivedInG hyp.base.T := hHle hx.1
-    have : (⟨x, hxM'⟩ : ↥(derivedInG hyp.base.T)) ∈ (td.typeP.H.subgroupOf (derivedInG hyp.base.T)) ⊓
+    have : (⟨x, hxM'⟩ : ↥(derivedInG hyp.base.T)) ∈
+        (td.typeP.H.subgroupOf (derivedInG hyp.base.T)) ⊓
         (td.typeP.U.subgroupOf (derivedInG hyp.base.T)) := by
       rw [Subgroup.mem_inf]
       exact ⟨Subgroup.mem_subgroupOf.mpr hx.1, Subgroup.mem_subgroupOf.mpr hx.2⟩
@@ -338,7 +339,8 @@ theorem T_typeIII_Q_isComplement_UW1 [Finite G] (hyp : Hypothesis (G := G))
     intro x hx; obtain ⟨hxUW1, hxM'⟩ := hx
     have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP td.common.1
     obtain ⟨⟨u, w⟩, hgw⟩ := (hfrob.isComplement.existsUnique ⟨x, hxUW1⟩).exists
-    have huU : ((u : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) ∈ td.typeP.U := Subgroup.mem_subgroupOf.mp u.2
+    have huU : ((u : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) ∈ td.typeP.U :=
+      Subgroup.mem_subgroupOf.mp u.2
     have hwW1 : ((w : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) ∈ td.typeP.W1 :=
       Subgroup.mem_subgroupOf.mp w.2
     have hxeq : x = ((u : ↥(td.typeP.U ⊔ td.typeP.W1)) : G) *
@@ -370,11 +372,13 @@ theorem T_typeIII_Q_isComplement_UW1 [Finite G] (hyp : Hypothesis (G := G))
     rw [← (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP td.common.1).isComplement.card_mul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
-  have hcardM' : Nat.card ↥td.typeP.H * Nat.card ↥td.typeP.U = Nat.card ↥(derivedInG hyp.base.T) := by
+  have hcardM' : Nat.card ↥td.typeP.H * Nat.card ↥td.typeP.U =
+      Nat.card ↥(derivedInG hyp.base.T) := by
     rw [← td.typeP.derived_complement.card_mul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUleM').toEquiv]
-  have hcardM : Nat.card ↥(derivedInG hyp.base.T) * Nat.card ↥td.typeP.W1 = Nat.card ↥hyp.base.T := by
+  have hcardM : Nat.card ↥(derivedInG hyp.base.T) * Nat.card ↥td.typeP.W1 =
+      Nat.card ↥hyp.base.T := by
     rw [← td.typeP.M_complement.card_mul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'leM).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1leM).toEquiv]
@@ -557,13 +561,17 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
   set mkN := QuotientGroup.mk' (hyp.base.Q.subgroupOf hyp.base.T) with hmkN
   set Hbar := ((derivedInG hyp.base.T).subgroupOf hyp.base.T).map mkN with hHbar
   set q : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) →* ↥Hbar :=
-    (mkN.comp ((derivedInG hyp.base.T).subgroupOf hyp.base.T).subtype).codRestrict Hbar (fun x => Subgroup.mem_map.mpr ⟨x, x.2, rfl⟩) with hq_def
-  have hq : ∀ x : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T), ((q x : ↥Hbar) : ↥hyp.base.T ⧸ hyp.base.Q.subgroupOf hyp.base.T) = mkN (x : ↥hyp.base.T) := fun x => rfl
+    (mkN.comp ((derivedInG hyp.base.T).subgroupOf hyp.base.T).subtype).codRestrict Hbar
+      (fun x => Subgroup.mem_map.mpr ⟨x, x.2, rfl⟩) with hq_def
+  have hq : ∀ x : ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T),
+      ((q x : ↥Hbar) : ↥hyp.base.T ⧸ hyp.base.Q.subgroupOf hyp.base.T) = mkN (x : ↥hyp.base.T) :=
+    fun x => rfl
   have hq_surj : Function.Surjective q := by
     rintro ⟨z, hz⟩; rw [hHbar, Subgroup.mem_map] at hz
     obtain ⟨x, hxH, hxz⟩ := hz; exact ⟨⟨x, hxH⟩, Subtype.ext hxz⟩
   have hqinj : Function.Injective
-      (ClassFunction.compHom q : ClassFunction ↥Hbar ℂ → ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ) :=
+      (ClassFunction.compHom q : ClassFunction ↥Hbar ℂ →
+        ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ) :=
     ClassFunction.compHom_injective_of_surjective hq_surj
   -- quotient Frobenius, kernel = Hbar
   set e : ↥(td.typeP.U ⊔ td.typeP.W1) ≃* (↥hyp.base.T ⧸ hyp.base.Q.subgroupOf hyp.base.T) :=
@@ -576,7 +584,8 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
       (T_typeIII_Q_isComplement_UW1 hyp td).symm.QuotientMulEquiv.symm) = e from rfl] at himg
   rw [himg] at hqfrob0
   -- the inflation map on irreducibles
-  set infl : IrreducibleCharacter ↥Hbar → IrreducibleCharacter ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) :=
+  set infl : IrreducibleCharacter ↥Hbar →
+      IrreducibleCharacter ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) :=
     fun θbar => ⟨ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ),
       IsIrreducibleCharacter.compHom_of_surjective hq_surj θbar.isIrreducible⟩ with hinfl
   have hinfl_inj : Function.Injective infl := by
@@ -592,7 +601,9 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
       θbar ≠ trivialIrreducibleCharacter ↥Hbar)).image infl with h𝒯
   -- hinertia
   have hinertia : ∀ θ ∈ 𝒯,
-      IrreducibleCharacter.inertia (G := ↥hyp.base.T) (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) θ = ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := by
+      IrreducibleCharacter.inertia (G := ↥hyp.base.T)
+        (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) θ =
+        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := by
     intro θ hθ
     rw [h𝒯, Finset.mem_image] at hθ
     obtain ⟨θbar, hθbar, rfl⟩ := hθ
@@ -601,7 +612,8 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
       (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) hNH hqfrob0 q hq hqinj θbar hθbar.2
   -- hconj
   have hconj : ∀ θ ∈ 𝒯, ∀ g : ↥hyp.base.T,
-      IrreducibleCharacter.conjBy (G := ↥hyp.base.T) (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) g θ ∈ 𝒯 := by
+      IrreducibleCharacter.conjBy (G := ↥hyp.base.T)
+        (H := ((derivedInG hyp.base.T).subgroupOf hyp.base.T)) g θ ∈ 𝒯 := by
     intro θ hθ g
     rw [h𝒯, Finset.mem_image] at hθ ⊢
     obtain ⟨θbar, hθbar, rfl⟩ := hθ
@@ -642,10 +654,12 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
       OddOrder.GroupTheory.isMulCommutative_of_mulEquiv hemap hUcomm
     have hIrrHbar : Nat.card (IrreducibleCharacter ↥Hbar) = Nat.card ↥hyp.base.V := by
       rw [card_irreducibleCharacter_eq_card_of_commGroup, ← Nat.card_congr hemap.toEquiv,
-        Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv, T_typeIII_card_U hyp td]
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv,
+        T_typeIII_card_U hyp td]
     -- |filter (≠triv) univ| = |univ| - 1
     have hfilter : (Finset.univ.filter (fun θbar : IrreducibleCharacter ↥Hbar =>
-        θbar ≠ trivialIrreducibleCharacter ↥Hbar)).card = Fintype.card (IrreducibleCharacter ↥Hbar) - 1 := by
+        θbar ≠ trivialIrreducibleCharacter ↥Hbar)).card =
+        Fintype.card (IrreducibleCharacter ↥Hbar) - 1 := by
       rw [Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ]
     rw [hfilter]
     have : Fintype.card (IrreducibleCharacter ↥Hbar) = Nat.card ↥hyp.base.V := by
@@ -879,7 +893,8 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
         OddOrder.GroupTheory.isMulCommutative_of_mulEquiv hemap hUcomm
       have hIrrHbar : Nat.card (IrreducibleCharacter ↥Hbar) = Nat.card ↥hyp.base.V := by
         rw [card_irreducibleCharacter_eq_card_of_commGroup, ← Nat.card_congr hemap.toEquiv,
-          Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv, T_typeIII_card_U hyp td]
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv,
+          T_typeIII_card_U hyp td]
       have hfilter : (Finset.univ.filter (fun θbar : IrreducibleCharacter ↥Hbar =>
           θbar ≠ trivialIrreducibleCharacter ↥Hbar)).card
           = Fintype.card (IrreducibleCharacter ↥Hbar) - 1 := by
@@ -963,9 +978,11 @@ theorem T_typeIII_two_p_add_one_le_card_V [Finite G] (hG : OddOrder.BG.IsMinimal
   -- Kernel `|U.subgroupOf| = |U| = |V|`, complement `|W₁.subgroupOf| = |W₁| = p`.
   have hcardN : Nat.card ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1))
       = Nat.card ↥hyp.base.V := by
-    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv, T_typeIII_card_U hyp td]
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv,
+      T_typeIII_card_U hyp td]
   have hcardA : Nat.card ↥(td.typeP.W1.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) = hyp.base.p := by
-    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv, T_typeIII_card_W1 hyp td]
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv,
+      T_typeIII_card_W1 hyp td]
   have hNodd : Odd (Nat.card ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1))) := by
     rw [hcardN]; exact hVodd
   have hAodd : Odd (Nat.card ↥(td.typeP.W1.subgroupOf (td.typeP.U ⊔ td.typeP.W1))) := by

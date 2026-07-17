@@ -824,7 +824,8 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- ≥ 2: `O_p(M_F)` is abelian (`≤ M_F`) and noncyclic, so `2 ≤ pRank ≤ rank`.
       have hOpMF : opiCoreInG ({p} : Set ℕ) (MF M) ≤ MF M := opiCoreInG_le {p} (MF M)
       have hcommOp : ∀ x y : ↥(opiCoreInG ({p} : Set ℕ) (MF M)), x * y = y * x := fun x y =>
-        Subtype.ext (by simpa using congrArg Subtype.val (hcommMF ⟨(x : G), hOpMF x.2⟩ ⟨(y : G), hOpMF y.2⟩))
+        Subtype.ext
+          (by simpa using congrArg Subtype.val (hcommMF ⟨(x : G), hOpMF x.2⟩ ⟨(y : G), hOpMF y.2⟩))
       have hOpnc : ¬ IsCyclic ↥(opiCoreInG ({p} : Set ℕ) (MF M)) :=
         not_isCyclic_opiCore_mf_of_orderP_le_conj hG hM hp hgM hX₁card hX₁MF hX₁cMF
       have h2pRank : 2 ≤ pRank ↥(opiCoreInG ({p} : Set ℕ) (MF M)) p :=
@@ -982,7 +983,8 @@ theorem typeP_derivedInG_inf_centralizer_kappaElement_eq [Finite G]
   classical
   haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
   -- Theorem 14.7(h): `M = M' ⋊ K` complement (coprime orders), `K ⊔ K*` cyclic ⟹ `K` cyclic.
-  obtain ⟨_hMcompl, hcop, _, ⟨_, _, _, _, hWcyc, _, _, _⟩, _⟩ := typeP_duality hG hM hP hKM hK hKstar
+  obtain ⟨_hMcompl, hcop, _, ⟨_, _, _, _, hWcyc, _, _, _⟩, _⟩ :=
+    typeP_duality hG hM hP hKM hK hKstar
   haveI : IsCyclic ↥(K ⊔ Kstar) := hWcyc
   haveI : IsCyclic ↥K := Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
   -- A Hall `(κ ∪ σ)ᶜ`-subgroup `U` of `M` (for the Theorem A(5) citation).
@@ -1221,7 +1223,8 @@ noncomputable def typePData_of_isTypeP1_mf_ne_msigma [Finite G]
   have hKM : K ≤ M := Subgroup.map_subtype_le hKex.choose
   have hKeq : K.subgroupOf M = hKex.choose :=
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective hKex.choose
-  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by rw [hKeq]; exact hKex.choose_spec
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by
+    rw [hKeq]; exact hKex.choose_spec
   have hKne : K ≠ ⊥ := fun h =>
     card_kappaHall_ne_one hP1.1 hKM hK (by rw [h, Subgroup.card_bot])
   -- The `K`-invariant `M_F`-complement `U` in `M' = M_σ` (`Type`-valued goal: `Exists.choose`).
@@ -1241,7 +1244,8 @@ noncomputable def typePData_of_isTypeP1_mf_ne_msigma [Finite G]
       maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) := by
     obtain ⟨_, -, -, -, hM''F, -, -, -, -, -, -, -⟩ := S15.fitting_decomposition hG hM
     rw [← hFiteq]; exact hM''F
-  exact typePData_of_isTypeP_of_inputs hG hM hP1.1 hKM hKne hK hUle hKnorm hUnilp hDcompl hSDfit hFiteq
+  exact typePData_of_isTypeP_of_inputs hG hM hP1.1 hKM hKne hK hUle hKnorm hUnilp
+    hDcompl hSDfit hFiteq
 
 /-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose
 `U`-factor has its normalizer inside `M` is of type III or IV, according as `U` is abelian or not.
@@ -1330,7 +1334,8 @@ theorem isTypeII_of_isTypeP2_of_derived_typeF [Finite G]
         Subgroup.comap_map_eq_self_of_injective U.subtype_injective R']; exact hR') hKnorm
     exact hHnorm (le_trans inf_le_right hNU)
   refine isTypeII_of_typePData
-    (typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK hUle hKnorm hUnilp hdec.1 hdec.2.1 hdec.2.2)
+    (typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK hUle hKnorm hUnilp
+      hdec.1 hdec.2.1 hdec.2.2)
     ⟨?_, ?_, ?_⟩ ?_ ?_ hderF ?_
   · change U ≠ ⊥; exact hUne
   · change (Nat.card ↥K).Prime; rw [hKq]; exact hqp
@@ -1393,7 +1398,8 @@ theorem isTypeF_derivedInG_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSim
       exact ⟨maxNilpotentNormalHall_le_Msigma hG hM hx, hx1⟩
     exponent_eq := hexp
     frobenius_HU0 := by rw [hMFMσ, sup_comm]; exact hfrob }⟩
-  · -- `U1_normal`: `U`-conjugation permutes the generators `C_U(x)` of `centralizerGeneratedBySigma`.
+  · -- `U1_normal`: `U`-conjugation permutes the generators `C_U(x)` of
+    -- `centralizerGeneratedBySigma`.
     apply Subgroup.Normal.of_conjugate_fixed
     intro h
     rw [Subgroup.conj_smul_subgroupOf

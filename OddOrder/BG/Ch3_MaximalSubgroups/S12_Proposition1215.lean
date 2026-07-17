@@ -641,7 +641,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
         rw [← Subgroup.subgroupOf_sup (S10.Msigma_le Mstar) hsetupS.E_le, hsetupS.E_compl_sup]
         exact Subgroup.mem_subgroupOf.mpr hxMstar
       have hsub' : (⟨x, hxMstar⟩ : ↥Mstar) ∈
-          ((S10.Msigma Mstar).subgroupOf Mstar : Set ↥Mstar) * (Es.subgroupOf Mstar : Set ↥Mstar) := by
+          ((S10.Msigma Mstar).subgroupOf Mstar : Set ↥Mstar) *
+            (Es.subgroupOf Mstar : Set ↥Mstar) := by
         rw [← Subgroup.normal_mul]; exact hsub
       obtain ⟨s, hs, a, ha, hsa⟩ := hsub'
       have hseq : (s : ↥Mstar) = ⟨x, hxMstar⟩ * a⁻¹ := by rw [← hsa]; group
@@ -706,7 +707,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
           rcases (Nat.Prime.dvd_mul Fact.out).mp (hmul.symm ▸ hr_dvd_Mstar) with h | h
           · exact h
           · exact absurd h hr_not_idx
-        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le Mstar)).toEquiv] at hr_dvd_sub
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le Mstar)).toEquiv]
+          at hr_dvd_sub
       -- More shared facts for Fact 2: `q ∉ β(M)` (12.1(g): `q ∈ τ₂(M*) ⟹ ¬idealPrime q`),
       -- `A` is a `σ(M)`-subgroup, hence `A ≤ M_σ` (normal σ-Hall absorbs σ-subgroups).
       have hq_notBetaM : q ∉ S10.beta M := fun hq_beta =>
@@ -748,7 +750,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
         have hPrm_pg : IsPGroup r ↥Prm :=
           Pr.2.of_equiv (Subgroup.equivMapOfInjective _ _ M.subtype_injective)
         obtain ⟨Q, hPrQ⟩ := (S10.beta_complement_centralizes hG hM (Ne.symm hr_ne_q) hq_notBetaM
-          hr_notBetaM (Subgroup.map_subtype_le _) hPrm_pg (Or.inr (lt_of_le_of_ne hle (Ne.symm hr_ne_q)))).1
+          hr_notBetaM (Subgroup.map_subtype_le _) hPrm_pg
+            (Or.inr (lt_of_le_of_ne hle (Ne.symm hr_ne_q)))).1
         -- `A ≤ M_σ` lies in some Sylow `q` `T` of `↥M_σ`; `T` is `M_σ`-conjugate to `Q`.
         have hAsub_pg : IsPGroup q ↥(A.subgroupOf (S10.Msigma M)) :=
           hA_ea.isPGroup.of_equiv (Subgroup.subgroupOfEquivOfLe hA_Msigma).symm
@@ -772,7 +775,8 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
                     (S10.Msigma M).subtype : Subgroup G) : Set G) :=
                 Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hPrQ
             _ = Subgroup.centralizer ((MulAut.conj ((S10.Msigma M).subtype g) •
-                  ((Q : Subgroup ↥(S10.Msigma M)).map (S10.Msigma M).subtype) : Subgroup G) : Set G) :=
+                  ((Q : Subgroup ↥(S10.Msigma M)).map
+                    (S10.Msigma M).subtype) : Subgroup G) : Set G) :=
                 centralizer_conj_smul _ _
             _ ≤ Subgroup.centralizer (A : Set G) := Subgroup.centralizer_le hA_le_conj
         -- `r ∣ |Prm|` (Sylow `r` of `M`, `r ∈ π(M)`); conjugation preserves card; so

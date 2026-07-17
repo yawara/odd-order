@@ -561,7 +561,8 @@ theorem actsRegularlyOn_E3_E1_of_kappa_inf_tau3_empty [Finite G]
   have hzx : (z : G) ∈ Subgroup.zpowers x := z.2
   have hRcard : Nat.card ↥(Subgroup.zpowers (z : G)) = r := by
     rw [Nat.card_zpowers]
-    exact (orderOf_injective (Subgroup.zpowers x).subtype (Subgroup.zpowers x).subtype_injective z).trans hz
+    exact (orderOf_injective (Subgroup.zpowers x).subtype
+      (Subgroup.zpowers x).subtype_injective z).trans hz
   have hRelem : Subgroup.zpowers (z : G) ∈ elemAbelianOfRank G r 1 :=
     ⟨Subgroup.IsElementaryAbelian.of_card_prime hRcard, by rw [hRcard, pow_one]⟩
   have hRE3 : Subgroup.zpowers (z : G) ≤ E₃ := (Subgroup.zpowers_le.mpr (hxzpM hzx))
@@ -702,7 +703,8 @@ theorem actsRegularlyOn_E2_E1_of_actsPrime [Finite G]
   have hg₀E1 : (g₀ : G) ∈ E₁ := hgE1' hg₀g
   have hPcard : Nat.card ↥(Subgroup.zpowers (g₀ : G)) = p := by
     rw [Nat.card_zpowers]
-    exact (orderOf_injective (Subgroup.zpowers g).subtype (Subgroup.zpowers g).subtype_injective g₀).trans hg₀
+    exact (orderOf_injective (Subgroup.zpowers g).subtype
+      (Subgroup.zpowers g).subtype_injective g₀).trans hg₀
   have hPelem : Subgroup.zpowers (g₀ : G) ∈ elemAbelianOfRank G p 1 :=
     ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩
   have hPbot : Subgroup.zpowers (g₀ : G) ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hPelem
@@ -730,7 +732,8 @@ theorem actsRegularlyOn_E2_E1_of_actsPrime [Finite G]
   have hyE2' : Subgroup.zpowers y ≤ E₂ := Subgroup.zpowers_le.mpr hyE2
   have hy'E2 : (y' : G) ∈ E₂ := hyE2' hy'y
   have hy'ord : orderOf (y' : G) = q :=
-    (orderOf_injective (Subgroup.zpowers y).subtype (Subgroup.zpowers y).subtype_injective y').trans hy'
+    (orderOf_injective (Subgroup.zpowers y).subtype
+      (Subgroup.zpowers y).subtype_injective y').trans hy'
   have hy'q : (y' : G) ^ q = 1 := by rw [← hy'ord]; exact pow_orderOf_eq_one _
   have hy'1 : (y' : G) ≠ 1 := by
     intro hc; rw [hc, orderOf_one] at hy'ord; exact hq.ne_one hy'ord.symm
@@ -788,8 +791,10 @@ theorem actsRegularlyOn_E23_E1_of_caseTau1 [Finite G]
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv
     have hc3 : Nat.card ↥(E₃.subgroupOf E) = Nat.card ↥E₃ :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
-    have hsτ2 : s ∈ tau2 M := h.E₂_hall.1 s (hc2 ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩)
-    have hsτ3 : s ∈ tau3 M := h.E₃_hall.1 s (hc3 ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩)
+    have hsτ2 : s ∈ tau2 M :=
+      h.E₂_hall.1 s (hc2 ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩)
+    have hsτ3 : s ∈ tau3 M :=
+      h.E₃_hall.1 s (hc3 ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩)
     have h2 := tau2_pRank_eq_two hsτ2
     have h1 := tau3_pRank_eq_one hsτ3
     omega
@@ -898,8 +903,10 @@ theorem normalizer_inf_E_le_E1_of_caseTau1 [Finite G]
   have hcop2 : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₂) := by
     by_contra hnc
     obtain ⟨s, hs, hsm, hsn⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
-    have := tau1_pRank_eq_one (h.E₁_hall.1 s (hc1E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩))
-    have := tau2_pRank_eq_two (h.E₂_hall.1 s (hc2E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩))
+    have := tau1_pRank_eq_one
+      (h.E₁_hall.1 s (hc1E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩))
+    have := tau2_pRank_eq_two
+      (h.E₂_hall.1 s (hc2E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩))
     omega
   have hcop3 : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₃) := by
     by_contra hnc
@@ -913,15 +920,18 @@ theorem normalizer_inf_E_le_E1_of_caseTau1 [Finite G]
     have hcop23 : Nat.Coprime (Nat.card ↥E₂) (Nat.card ↥E₃) := by
       by_contra hnc
       obtain ⟨s, hs, hsm, hsn⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
-      have := tau2_pRank_eq_two (h.E₂_hall.1 s (hc2E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩))
-      have := tau3_pRank_eq_one (h.E₃_hall.1 s (hc3E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩))
+      have := tau2_pRank_eq_two
+        (h.E₂_hall.1 s (hc2E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩))
+      have := tau3_pRank_eq_one
+        (h.E₃_hall.1 s (hc3E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩))
       omega
     exact Subgroup.card_eq_one.mp (Nat.dvd_one.mp (hcop23 ▸ Nat.dvd_gcd hd1 hd2))
   have hcard23 : Nat.card ↥(E₂ ⊔ E₃) = Nat.card ↥E₂ * Nat.card ↥E₃ :=
     card_sup_eq_mul_of_le_normalizer_of_disjoint (h.E₂_le.trans hEnormE3) hE23disj
   have hE1_23_disj : E₁ ⊓ (E₂ ⊔ E₃) = ⊥ := by
     have hd1 : Nat.card ↥(E₁ ⊓ (E₂ ⊔ E₃)) ∣ Nat.card ↥E₁ := Subgroup.card_dvd_of_le inf_le_left
-    have hd2 : Nat.card ↥(E₁ ⊓ (E₂ ⊔ E₃)) ∣ Nat.card ↥(E₂ ⊔ E₃) := Subgroup.card_dvd_of_le inf_le_right
+    have hd2 : Nat.card ↥(E₁ ⊓ (E₂ ⊔ E₃)) ∣ Nat.card ↥(E₂ ⊔ E₃) :=
+      Subgroup.card_dvd_of_le inf_le_right
     have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥(E₂ ⊔ E₃)) :=
       hcard23 ▸ Nat.Coprime.mul_right hcop2 hcop3
     exact Subgroup.card_eq_one.mp (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2))
@@ -1530,7 +1540,8 @@ theorem sigma_cover_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   have hNM : ¬ ∃ g : G, MulAut.conj g • N = M := by
     rintro ⟨g, hg⟩
     exact hMN ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
-  have hpart : ∀ L : Subgroup G, sigmaPart L (x * x') = sigmaPart L x * sigmaPart L x' := fun L => by
+  have hpart : ∀ L : Subgroup G,
+      sigmaPart L (x * x') = sigmaPart L x * sigmaPart L x' := fun L => by
     simp only [sigmaPart]; exact piPart_mul_of_commute hcomm
   ext y
   simp only [sigmaDecomposition, Set.mem_sdiff, Set.mem_setOf_eq, Set.mem_singleton_iff,
@@ -1578,7 +1589,8 @@ theorem not_conj_of_mem_Msigma_of_tau2 [Finite G] {M N : Subgroup G}
     (orderOf x).exists_prime_and_dvd (fun h => hx1 (orderOf_eq_one_iff.mp h))
   haveI : Fact q.Prime := ⟨hqp⟩
   have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
-    isPiElement_sigma_of_mem_Msigma hxM q (Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩)
+    isPiElement_sigma_of_mem_Msigma hxM q
+      (Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩)
   have hqσN : q ∈ OddOrder.BG.Ch3.S10.sigma N := hg ▸ OddOrder.BG.Ch3.S10.sigma_conj g hqσM
   have hcardx : Nat.card ↥(Subgroup.closure ({x} : Set G)) = orderOf x := by
     rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
@@ -1599,7 +1611,8 @@ theorem sigma_cover_decomposition_signalizer [Finite G] (hG : OddOrder.BG.IsMini
     (hxτ2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N)
     (hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N) (hcomm : Commute x x') :
     sigmaDecomposition (x * x') = insert x ({x'} \ {1}) :=
-  sigma_cover_decomposition hG hM hN (not_conj_of_mem_Msigma_of_tau2 hxM hx1 hxτ2) hxM hx1 hx'N hcomm
+  sigma_cover_decomposition hG hM hN (not_conj_of_mem_Msigma_of_tau2 hxM hx1 hxτ2)
+    hxM hx1 hx'N hcomm
 
 /-- **`x` is a `σ`-part of the cover element `x · x'`** (Coq `mem_sigma_cover_decomposition`): immediate
 from `sigma_cover_decomposition_signalizer`, `x ∈ {x} ∪ {x'}^#`.  Used in BG Lemma 14.5(a). -/

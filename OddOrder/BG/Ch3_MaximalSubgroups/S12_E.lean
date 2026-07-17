@@ -89,7 +89,8 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
         ≤ (derivedInG M).subgroupOf M :=
           Subgroup.comap_mono (S10.Msigma_le_derived hG h.mem_maximal)
       _ = commutator ↥M := hid
-  have hcop : Nat.Coprime (Nat.card ↥((S10.Msigma M).subgroupOf M)) (Nat.card ↥(E.subgroupOf M)) := by
+  have hcop : Nat.Coprime (Nat.card ↥((S10.Msigma M).subgroupOf M))
+      (Nat.card ↥(E.subgroupOf M)) := by
     have h1 := (S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
     rwa [hcomplement.symm.index_eq_card] at h1
   -- Second conjunct `⁅M_σ, E⁆ = M_σ`: first conclusion of Lemma 6.3(a) inside `↥M`, mapped to `G`.
@@ -172,7 +173,8 @@ private theorem exists_hall_subgroupOf_of_full_factorization [Finite G] {Nsub C 
     have hpdvd : p ∣ (W.subgroupOf Nsub).index := (Nat.mem_primeFactors.mp hp).2.1
     -- `|Nsub| = |W.subgroupOf Nsub| · index`; compare `factorization p`.
     have hmul := Subgroup.card_mul_index (W.subgroupOf Nsub)
-    have hfac : (Nat.card ↥(W.subgroupOf Nsub)).factorization p + ((W.subgroupOf Nsub).index).factorization p
+    have hfac : (Nat.card ↥(W.subgroupOf Nsub)).factorization p
+        + ((W.subgroupOf Nsub).index).factorization p
         = (Nat.card ↥Nsub).factorization p := by
       rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
         Finsupp.add_apply]
@@ -787,7 +789,8 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [hk] at hs
     have hsp := Nat.prime_of_mem_primeFactors hs
     have hsq : s = q :=
-      (Nat.prime_dvd_prime_iff_eq hsp Fact.out).mp (hsp.dvd_of_dvd_pow (Nat.dvd_of_mem_primeFactors hs))
+      (Nat.prime_dvd_prime_iff_eq hsp Fact.out).mp
+        (hsp.dvd_of_dvd_pow (Nat.dvd_of_mem_primeFactors hs))
     exact hsq ▸ hqα
   -- `(12.6)` and `(12.5)`.
   have h126 : rank ↥(Subgroup.centralizer (P : Set G) ⊓ S10.Malpha M) ≤ 1 :=
@@ -915,7 +918,8 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
         (Nat.Coprime.mul_right (Nat.coprime_comm.mp h1) (Nat.coprime_comm.mp h2))
     refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
       (N := Q ⊔ R₁) (R := P) ?_ ?_ ?_ hPne ⟨p, Fact.out, hPcard⟩ ?_
-    · exact (le_inf hQinv hPnormR₁).trans (Subgroup.normalizer_inf_normalizer_le_normalizer_sup Q R₁)
+    · exact (le_inf hQinv hPnormR₁).trans
+        (Subgroup.normalizer_inf_normalizer_le_normalizer_sup Q R₁)
     · rw [disjoint_iff, inf_comm]
       exact OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hPp hQR₁cop
     · exact fun h => hQne (le_bot_iff.mp (le_sup_left.trans h.le))

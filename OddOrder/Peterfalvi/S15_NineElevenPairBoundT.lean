@@ -416,7 +416,8 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
   have hχ₁mem : χ₁ ∈ Set.range χmem := hrange ▸ hχ₁S₂
   obtain ⟨i₁, hi₁eq⟩ := hχ₁mem
   subst hi₁eq
-  have hmemsSet : ∀ j, χmem j ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) := fun j => hS₂S (hmemS1set j)
+  have hmemsSet : ∀ j, χmem j ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) :=
+    fun j => hS₂S (hmemS1set j)
   have hmemsOf : ∀ j, χmem j ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupT hG hvd)
       (chief.H0 ⊔ chars.Cprime) := fun j => by
     rw [← hyp.sSet_eq_sOf_H0Cprime_T hG hvd chars]; exact hmemsSet j
@@ -468,38 +469,49 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
     intro hc; apply hχnotS₂
     have h := hS₂conj hc; rwa [ClassFunction.conj_conj] at h
   have hdiffsuppχ : ((OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj
       - OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T :=
     hyp.sSet_member_conjDiff_supported_T hG hvd hχS
-  have hχψb : ClassFunction.inner (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+  have hχψb : ClassFunction.inner
+      (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ))
       (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj
       = 0 :=
     OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hχfam
       (OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hχfam)
-      (fun h => sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG) hχS h.symm)
-  have hχbψ : ClassFunction.inner (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+      (fun h =>
+        sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG) hχS h.symm)
+  have hχbψ : ClassFunction.inner
+      (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj
       (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ))
       = 0 :=
     OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
       (OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hχfam) hχfam
       (fun h => sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG) hχS h)
-  have hχχne : ClassFunction.inner (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+  have hχχne : ClassFunction.inner
+      (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ))
       (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ))
       ≠ 0 := by
     rw [(OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos hχfam).1]
     exact_mod_cast (OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos hχfam).2.ne'
-  have hχbχbne : ClassFunction.inner (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+  have hχbχbne : ClassFunction.inner
       (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj
+      (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj
       ≠ 0 := by
     have hcf := OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate
       (⊥ : Subgroup ↥hyp.T) hχfam
@@ -513,7 +525,8 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
       (fun h => hχnotS₂ (h ▸ hx))
   have hψbar_S1 : ∀ x ∈ S₂, ClassFunction.inner
       (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj x
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj x
       = 0 := fun x hx =>
     sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd)
       (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd) hχS) (hS₂S hx)
@@ -544,7 +557,8 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
       (s := (Finset.univ : Finset (Fin k))) (χmem := χmem) (deg := deg) (i₁ := i₁)
       hcover (Finset.mem_univ i₁) (fun j _ => hmemS1set j) hmemdegdiffsupp
   have hbar1 : ((OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj
         : ↥hyp.T → ℂ) 1
       = (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)
@@ -563,18 +577,21 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
       (χ := OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ))
       (chibar := (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj)
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj)
       (chi1 := χmem i₁) (a := e)
       hSgen hψdeg hbar1 hχ₁ne h1A
   -- (8) the decomposition supply from the case-agnostic `R`-family (break `Da`, per-member `D`).
-  have hχaeχ1 : ClassFunction.inner (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
+  have hχaeχ1 : ClassFunction.inner
+      (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ))
       (e • χmem i₁ : ClassFunction ↥hyp.T ℂ) = 0 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ e (χmem i₁),
       OddOrder.RepresentationTheory.inner_smul_right, hψ_S1 (χmem i₁) (hmemS1set i₁), mul_zero]
   have hχbaraeχ1 : ClassFunction.inner
       (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
-        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd))
+          ℂ)).conj
       (e • χmem i₁ : ClassFunction ↥hyp.T ℂ) = 0 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ e (χmem i₁),
       OddOrder.RepresentationTheory.inner_smul_right, hψbar_S1 (χmem i₁) (hmemS1set i₁), mul_zero]

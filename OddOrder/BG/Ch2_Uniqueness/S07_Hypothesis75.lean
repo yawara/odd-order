@@ -835,7 +835,8 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
       rw [hP'_def, Nat.card_congr (Subgroup.equivSMul (MulAut.conj k) P).toEquiv])
   -- Conjugate `P'` to `P` inside `V` (Hall conjugacy).
   obtain ⟨w, hwV, hwconj⟩ :=
-    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hV_solv hP'_le_V hP_le_V hP'_hall hP_hall
+    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hV_solv hP'_le_V hP_le_V hP'_hall
+      hP_hall
   -- Decompose `w = s · κ` with `s ∈ P`, `κ ∈ K'` (`V = P · K'`, `K' ⊴ V`).
   have hPnK' : P ≤ Subgroup.normalizer (K' : Set G) := hP_le_V.trans hVnK'
   have hw_mem : w ∈ (P : Set G) * (K' : Set G) := by
@@ -1045,7 +1046,8 @@ private theorem tp_c_full [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G
     intro hpd
     have hdvdK : p ∣ Nat.card ↥(kSubgroup A) :=
       hpd.trans (tp_card_hStar_dvd_kSubgroup htrans)
-    exact (isPiSubgroup_kSubgroup A p (Nat.mem_primeFactors.mpr ⟨hp, hdvdK, Nat.card_pos.ne'⟩)) hp_pi
+    exact (isPiSubgroup_kSubgroup A p (Nat.mem_primeFactors.mpr ⟨hp, hdvdK, Nat.card_pos.ne'⟩))
+      hp_pi
   intro Q hQ
   by_cases hQbot : Q = ⊥
   · -- `Q = ⊥`: use (7.3) and maximality.
@@ -1210,7 +1212,8 @@ theorem transitivity_propagates [Finite G] (hG : IsMinimalSimpleOdd G)
         have hqB : q ∈ (primesOf B)ᶜ := by rw [hprimesBA]; exact hq
         have hPpiB : Subgroup.IsPiSubgroup (primesOf B) P := by rw [hprimesBA]; exact hPpi
         have htransB : ConjTransitiveOn (kSubgroup B) (hInvariantStar ⊤ B {q}) := by
-          have heqK : kSubgroup B = opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (B : Set G)) := by
+          have heqK :
+              kSubgroup B = opiCoreInG (primesOf A)ᶜ (Subgroup.centralizer (B : Set G)) := by
             rw [kSubgroup, hprimesBA]
           rw [heqK]; exact hbAB
         -- IH on `(B, P)`.

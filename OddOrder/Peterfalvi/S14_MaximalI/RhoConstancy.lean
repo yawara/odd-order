@@ -93,7 +93,8 @@ theorem constituentDiff_support_subset {L : Subgroup G} {hyp : Hypothesis L}
     rw [Set.mem_singleton_iff] at h
     subst h
     obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
-    exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
+    exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast,
+      sub_self])
 
 /-- Evaluation of a finite sum of class functions at a point (the eval map is additive). -/
 private theorem classFunction_sum_apply {H : Type*} [Group H] {ι : Type*} (s : Finset ι)
@@ -777,7 +778,8 @@ theorem R1cdi_muNu_mem_span_Rset {L : Subgroup G} [Finite G] {hyp : Hypothesis L
     rw [hμ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span hμRset)
   · have hν : (R1cdi data hφ).nuClassFunction
-        = (-(R1cdi data hφ).sign) • ((-(R1cdi data hφ).sign) • (R1cdi data hφ).nuClassFunction) := by
+        = (-(R1cdi data hφ).sign) •
+          ((-(R1cdi data hφ).sign) • (R1cdi data hφ).nuClassFunction) := by
       rw [smul_smul, neg_mul_neg, hsq, one_smul]
     rw [hν]
     exact Submodule.smul_mem _ _ (Submodule.subset_span hνRset)
@@ -816,7 +818,8 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
     · rw [Finset.mem_image] at hx
       obtain ⟨φ, hφ, rfl⟩ := hx
       rw [IrreducibleCharacter.conjPerm_apply_coe]
-      have hconjsupp : (φ : ClassFunction ↥L ℂ).conj.support = (φ : ClassFunction ↥L ℂ).support := by
+      have hconjsupp : (φ : ClassFunction ↥L ℂ).conj.support
+          = (φ : ClassFunction ↥L ℂ).support := by
         ext y; simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
       rw [hconjsupp]; exact data.supported φ hφ
   -- (2) every member of `T` has the reference degree `φref(1)`.
@@ -841,7 +844,8 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
     data.not_real φref hφref ((IrreducibleCharacter.conjPerm_eq_self_iff φref).mp hcon.symm)
   have hn2 : 2 ≤ n := Finset.one_lt_card.mpr ⟨φref, hφrefT, _, hconjrefT, hrefne⟩
   haveI : NeZero n := ⟨by omega⟩
-  set fam : Fin n → IrreducibleCharacter ↥L := fun i => (T.equivFin.symm i : IrreducibleCharacter ↥L)
+  set fam : Fin n → IrreducibleCharacter ↥L :=
+    fun i => (T.equivFin.symm i : IrreducibleCharacter ↥L)
     with hfamdef
   have hfam_mem : ∀ i, fam i ∈ T := fun i => (T.equivFin.symm i).2
   have hfam_inj : Function.Injective fam :=
@@ -1552,7 +1556,8 @@ theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G]
     have h2 := hyp.dadeData.dade.L_normalizes_A l⁻¹ h
     have h3 : a ∈ typeIA L hyp.typeI := by simpa [Subgroup.coe_inv, mul_assoc] using h2
     exact h3
-  have hA₁A : hyp.ambientA \ escapingCentralizerSet L hyp.ambientA ⊆ hyp.ambientA := Set.sdiff_subset
+  have hA₁A : hyp.ambientA \ escapingCentralizerSet L hyp.ambientA ⊆ hyp.ambientA :=
+    Set.sdiff_subset
   have hA₁norm : ∀ (l : L) ⦃a : G⦄,
       a ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA →
       (l : G) * a * (l : G)⁻¹ ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA := by

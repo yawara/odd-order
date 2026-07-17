@@ -60,19 +60,32 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
       ⚠ **glob 教訓**: commit は `git add -A -- 'OddOrder/'` を使う (top-level ファイルを
       漏らさない) — cron prompt にも反映済。warnings 4761→3363。
 
-## 残キュー (2026-07-17 時点、unique 3363)
+## 進捗 (2026-07-17、Opus hub)
 
-| 件数 | linter | wave |
+- [x] wave 3: header "Copyright too short!" 60 件 (commit 3b36723e)。3 バケット
+      (PREPEND 23 / INSERT Authors 36 / LICENSE+Authors 1)。
+- [x] wave 2: 未使用 section var (omit) + 未参照 binder (_prefix) + maxHeartbeats
+      コメント (commit 2d40988d)。varname 189→17・hbcomment 44→0・sectionvar 152→110。
+      build-break 5 ラウンド修正 (omit 型 `↑(Nat.card G)`→`(…:ℂ)` 29件・doc-comment 後
+      誤配置 7件移動・VARNAME が dot-notation/named-arg で実使用の revert 数件)。
+- [x] wave 4a: docstring/コメント長行の折返し 1135 行 (commit 056901e1)。backtick span
+      atomic 保持で分断回避。
+- [~] wave 4b **部分 landing** (2026-07-17 Fable hub tick #29): 計画 659 件/172 files の
+      Workflow 12 並列が Opus セッション終了で**中断** → 55 .lean files 分 (+719/-356、
+      >100 バイト行 323 解消) を build gate 後に commit。**残り ~116 files は wave 4b
+      継続で** (再 census → 同スクリプト再実行)。
+- [ ] wave 5: `show`→`change` batch 2 (active 近傍) + open scoped Classical 14 件。
+
+## 残キュー (概算)
+
+| 件数 | linter | 対応 |
 |---|---|---|
-| ~2386 | longLine (>100 桁) | wave 4 (dir 単位、S15/S08/S11/S12+BG Ch4 集中) |
-| 152 | 未使用 section variable 自動 include | wave 2 (`omit` 追記) |
-| 60 | header "Copyright too short!" | wave 3 (prepend script 準備済) |
-| 57 | `show`→`change` active 近傍 | wave 5b (frontier 移動後) |
-| ~70 | Variable name not referenced | wave 2 (`_`-prefix) |
-| 53 | maxHeartbeats コメント/scope | wave 3 |
-| 14 | open scoped Classical | wave 5 (要個別判断) |
+| ~336 | longLine コード行 (残) | wave 4b 継続 (部分 landing 済 323/659) |
+| ~830 | longLine docstring 残 (単一長 span) | 折返し不可、留保 (低価値) |
+| 110 | 未使用 section var (partial) | wave 2b (複数未使用 var の残り) |
+| ~57 | `show`→`change` active 近傍 | wave 5b |
+| 24 | longLine markdown 表 | 対象外 (折返すと表破壊) |
 | 18 | declaration uses sorry | 対象外 (frontier) |
-| 1 | PsiDecomposition:191 sole-arg | 個別 |
 - [ ] wave 2: binder 衛生 (unused section vars / Variable name) (~220 件)
 - [ ] wave 3: header/docstring/maxHeartbeats (~120 件)
 - [ ] wave 4: longLine 2741 件 — dir 単位 (BG → Pf S* → Isaacs 完了章 → shared)

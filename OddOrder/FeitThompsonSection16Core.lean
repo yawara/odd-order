@@ -742,15 +742,18 @@ theorem typePData_of_kappaHall_hallComplement_W2 {G : Type*} [Group G] [Finite G
   haveI := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
   obtain ⟨⟨x, hxK⟩, hxne⟩ := exists_ne (1 : ↥K)
   have hxne' : x ≠ 1 := by rintro rfl; exact hxne rfl
-  have hW1 : (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 = K :=
+  have hW1 :
+      (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 = K :=
     typePData_of_kappaHall_hallComplement_W1 hG hM hP2 hKM hKne hK hUM hUhall hKnorm
-  have hxW1 : x ∈ (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 := by
+  have hxW1 : x ∈
+      (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 := by
     rw [hW1]; exact hxK
   have hcen :=
     (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).centralizer_W1
       x hxW1 hxne'
   have hkstar :=
-    BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP2.1 hKM hK hKstar x hxK hxne'
+    BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP2.1 hKM hK hKstar
+      x hxK hxne'
   exact hcen.symm.trans hkstar
 
 /-- **Matched `TypePData` for a type-`P₂` maximal subgroup** (`sorry`-free; POLE-1 carrier, issue
@@ -770,7 +773,8 @@ theorem exists_typePData_W1_eq_of_isTypeP2 {G : Type*} [Group G] [Finite G]
   obtain ⟨U, hUsup, hKnorm, hUinf⟩ :=
     BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG hM hP2.1 hKM hK
   have hUM : U ≤ M := (le_sup_right.trans_eq hUsup.symm).trans (Subgroup.map_subtype_le _)
-  have hUhall := Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement hG hM hP2 hUM hUsup hUinf
+  have hUhall :=
+    Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement hG hM hP2 hUM hUsup hUinf
   exact ⟨typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm,
     typePData_of_kappaHall_hallComplement_W1 hG hM hP2 hKM hKne hK hUM hUhall hKnorm⟩
 
@@ -927,7 +931,9 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   -- `.W₁ = mp.K = W1` and `.U = U`, reconciling the carrier to the structure's factors.
   have hUM : hScompl.choose ≤ mp.S :=
     (le_sup_right.trans_eq hScompl.choose_spec.1.symm).trans (Subgroup.map_subtype_le _)
-  have hUhall := Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement hG mp.S_maximal mp.S_typeP2 hUM
+  have hUhall :=
+    Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement hG mp.S_maximal
+      mp.S_typeP2 hUM
     hScompl.choose_spec.1 hScompl.choose_spec.2.2
   have hKne : mp.K ≠ ⊥ := fun h =>
     BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall (Subgroup.card_eq_one.mpr h)

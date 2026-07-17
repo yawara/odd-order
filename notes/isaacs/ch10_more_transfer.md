@@ -1,7 +1,28 @@
 # Isaacs Ch.10: More Transfer Theory — mini-roadmap
 
-> 🚧 **形式化進行中 (lane c, 2026-07-17〜)** — 旧「FT 経路外 deferred」は 2026-07-16 の
-> 全 3 冊フェーズ移行で失効。着手順は上流優先+文書順 (§10A → §10B → §10C)。
+> ✅ **章完成 (lane c, 2026-07-17) — 全 28 結果 (10.1–10.28) sorry-free 形式化済**。
+> 旧「FT 経路外 deferred」は 2026-07-16 の全 3 冊フェーズ移行で失効。
+> 着手順は上流優先+文書順 (§10A → §10B → §10C) で消化した。
+>
+> **§10C 完全形式化済 (2026-07-17, sorry-free)** — 10.18–10.28 全部 landed:
+>
+> - ✅ **Lem 10.19 / Thm 10.20 / 10.21–10.23** augmentation ideal API —
+>   shared `OddOrder/Algebra/AugmentationIdeal.lean` (mathlib 未収載、upstream 候補 HIGH)
+> - ✅ **Thm 10.24** `v(G) ≅ Ξ(Δ(G)‾)` / **Lem 10.27** 係数一定性 / **Thm 10.25**
+>   `v(g)^{|K:G'|}=1` — shared `OddOrder/Algebra/PrincipalIdealTheorem.lean`
+> - ✅ **Thm 10.26** 可換環 annihilator 補題 (det trick) —
+>   `OddOrder/Algebra/FiniteIndexAnnihilator.lean`
+> - ✅ **Thm 10.18** (Furtwängler principal ideal theorem: transfer `G → G'/G''`
+>   自明) — `Ch10_MoreTransfer/PrincipalIdeal.lean`
+>   (`transfer_commutator_eq_one`; 10.25 の `K = G'` 特殊化)
+> - ✅ **Cor 10.28** (Alperin–Kuo `g^{|G:G'∩Z(G)|} = 1`) — 同 leaf
+>   (`pow_index_commutator_inf_center_eq_one`; 一般形
+>   `pow_index_eq_one_of_le_commutator_le_center` は任意の `A ≤ G' ∩ Z(G)`)。
+>   mathlib `transfer_eq_pow` (Thm 5.6 一般中心形) + `transfer_transfer` (10.8)
+>   + 10.18 で組立。
+>
+> AxiomsCheck: 章 headline (10.1/10.11/10.12/10.15/10.20/10.25/10.18/10.28) を
+> `#assert_only_allowed_axioms` に追加済 (2026-07-17)。
 >
 > **§10A 完全形式化済 (2026-07-17, 全て sorry-free)** — 10.1–10.11 全部 landed:
 >
@@ -31,7 +52,6 @@
 >   Isaacs 5.20 P^ab 版 `ker_transfer_abelianization_le_APrime` + `dvd_index_APrime_of_dvd_index_commutator`)、
 >   Thm 10.16 一般化 Maschke (`exists_aInvariant_complement_of_pow_card_bijective`,
 >   OperatorMaschke.lean)、Cor 10.17 (既存 `exists_aInvariant_complement_of_isElementaryAbelian`)。
-> - ⏭ 次: **§10C** (10.18–10.28: principal ideal theorem, augmentation ideal, Alperin-Kuo)
 >
 > 「N が p-transfer を制御しない」の Lean 形 = transfer 像の真包含
 > (`v.range < w'.range`)。副産物 shared infra: `PRank.exists_isComplement'`,
