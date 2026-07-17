@@ -47,3 +47,10 @@ Lem 4.5 / Prop 4.6「済」。
 ## 参照
 
 - BG mmd L1496-1516、既存 S04_SmallRankBasic (4.5(a)(b), 4.3(a))
+
+## ✅ 完了 (2026-07-18)
+
+`S04_Lem45c_Prop46.lean`: Lem 4.5(c) + Prop 4.6、sorry-free・axiom-clean・AxiomsCheck 登録・
+full build green (4309 jobs)。既存 omega1UpperCentralTwo (NarrowPGroup) + commutator_lt_self +
+Lem 1.22 再利用。survey 訂正 (4.5(a) は既済だった)。⚠ normal_map_subtype_of_char 6 site 目複製 (9109)。
+BG §4 残 = Thm 4.20(b) + 特殊化債務 (4.12/4.19)。
