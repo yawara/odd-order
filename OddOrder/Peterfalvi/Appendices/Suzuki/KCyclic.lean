@@ -516,6 +516,61 @@ lemma mem_fitting_iff_tau_eq_inv {x : hyp.Dbar} :
     x ∈ fitting hyp.Dbar ↔ hyp.tau x = x⁻¹ :=
   ⟨hyp.fitting_subset_inverted, hyp.inverted_mem_fitting⟩
 
+/-! ## The preimage `A` and the identities `K ⊆ A`, `A ∩ V = W` (p. 103) -/
+
+/-- The subgroup of `D` called `A` in Proposition 2: the full preimage of
+`Ā = F(D̄)` under `D → D̄ = D/W`. -/
+def fittingPreimage : Subgroup ↥hyp.D :=
+  (fitting hyp.Dbar).comap (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D))
+
+/-- Membership in the Fitting preimage `A`. -/
+lemma mem_fittingPreimage_iff (d : ↥hyp.D) :
+    d ∈ hyp.fittingPreimage ↔ QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d ∈
+      fitting hyp.Dbar := Iff.rfl
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103): `K ⊆ A`.
+Every element of `K` maps to the inverted locus `J̄ = Ā`. -/
+lemma mem_fittingPreimage_of_mem_KSet {k : G} (hk : k ∈ hyp.KSet) :
+    (⟨k, hk.1⟩ : ↥hyp.D) ∈ hyp.fittingPreimage := by
+  let kD : ↥hyp.D := ⟨k, hyp.mem_D_of_mem_KSet hk⟩
+  change kD ∈ hyp.fittingPreimage
+  rw [hyp.mem_fittingPreimage_iff, hyp.mem_fitting_iff_tau_eq_inv]
+  have htauD : hyp.tauD kD = kD⁻¹ :=
+    Subtype.ext (hyp.t_conj_eq_inv_of_mem_KSet hk)
+  calc
+    hyp.tau (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) kD) =
+        QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) (hyp.tauD kD) :=
+      hyp.tauHom_mk kD
+    _ = QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) kD⁻¹ := congrArg _ htauD
+    _ = (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) kD)⁻¹ := map_inv _ _
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103): `A ∩ V = W`.
+The image of `A ∩ V` is both `τ`-fixed and in `F(D̄)`, hence trivial. -/
+lemma fittingPreimage_inf_V :
+    hyp.fittingPreimage ⊓ hyp.V.subgroupOf hyp.D = hyp.W.subgroupOf hyp.D := by
+  ext d
+  constructor
+  · rintro ⟨hdA, hdV⟩
+    change (d : G) ∈ hyp.V at hdV
+    change (d : G) ∈ hyp.W
+    have hfixed : hyp.tau (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d) =
+        QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d :=
+      (hyp.tau_mk_eq_iff_mem_V d).2 hdV
+    have hdF : QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d ∈ fitting hyp.Dbar :=
+      (hyp.mem_fittingPreimage_iff d).1 hdA
+    exact (QuotientGroup.eq_one_iff (N := hyp.W.subgroupOf hyp.D) d).mp
+      (hyp.tau_fixed_fitting_eq_one hdF hfixed)
+  · intro hdW
+    change (d : G) ∈ hyp.W at hdW
+    refine ⟨?_, ?_⟩
+    · change QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d ∈ fitting hyp.Dbar
+      have hq1 : QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d = 1 :=
+        (QuotientGroup.eq_one_iff (N := hyp.W.subgroupOf hyp.D) d).2 hdW
+      rw [hq1]
+      exact (fitting hyp.Dbar).one_mem
+    · change (d : G) ∈ hyp.V
+      exact hyp.W_le_V hdW
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

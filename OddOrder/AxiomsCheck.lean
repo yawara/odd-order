@@ -6913,6 +6913,15 @@ subgroup in `D̄/F(D̄)` and uses Fitting maximality.  Fully unconditional and a
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_fitting_iff_tau_eq_inv
 
+/-! The next step constructs the full preimage `A` of `F(D̄)`, proves `K ⊆ A`, and
+identifies `A ∩ V = W` from the trivial `τ`-fixed locus in `F(D̄)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_fittingPreimage_of_mem_KSet
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingPreimage_inf_V
+
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
 `F = 𝔽_p[T] = End_{𝔽_p[T]}(E)` over which `E` is `1`-dimensional, with `|F| = |E|`.  The abstract

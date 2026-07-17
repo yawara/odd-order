@@ -90,9 +90,12 @@
      自明となって Ā に入り、C_Ā(τ)=1 で消える。Lemma (a) により τ は B̄ を全反転、
      よって B̄ は abelian・nilpotent、`nilpotent_normal_le_fitting` で B̄≤Ā。逆包含と
      合わせて Ā=J。axiom-clean。
-   - **次**: Ā=J から **K⊆A** と **A∩V=W** を示し、§1 Lemma (a) を A に適用して
-     **A=KW, |Ā|=|K|**。次いで Ā の cyclicity と K→K̄ の単射から **K=⟨k⟩ cyclic**、
-     §1 Lemma (b) から K◁D。
+   - ✅ **K⊆A / A∩V=W** (`mem_fittingPreimage_of_mem_KSet` /
+     `fittingPreimage_inf_V`): A を D→D̄ の F(D̄) の full preimage として構成。K の
+     元は商で τ-反転されるため Ā=J に入り、A∩V の像は Ā 内で τ-固定なので 1、従って
+     A∩V=W。axiom-clean。
+   - **次**: §1 Lemma (a) を A に適用して **A=KW, |Ā|=|K|**。次いで Ā の cyclicity
+     と K→K̄ の単射から **K=⟨k⟩ cyclic**、§1 Lemma (b) から K◁D。
    - ✅ **App I gate closure (2026-07-18)**: BG Lemma 4.5(a) の正規 type-`(p,p)`
      prerequisite と Huppert の order-`p` fixed-space decomposition の双方が
      sorry-free で着地 (issue 2004 / 2040 完了)。
