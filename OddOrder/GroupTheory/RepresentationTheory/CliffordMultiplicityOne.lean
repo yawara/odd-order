@@ -258,7 +258,7 @@ automorphism `cliffordConj ρ x` of `E` whose fixed subalgebra is the scalars
 (`cliffordConj_fixed_imp_scalar`), so Skolem–Noether (`finrank_eq_one_of_aut_fixedScalar`) forces
 `finrank k E = 1`, i.e. `n = 1`, i.e. `V_H ≅ W` is simple. -/
 theorem restriction_isSimpleModule [ρ.IsIrreducible] [IsAlgClosed k] [Module.Finite k V]
-    [Nontrivial V] [Finite ↥H] [NeZero (Nat.card ↥H : k)]
+    [Nontrivial V]
     (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
     (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥) [IsSimpleModule k[↥H] W]
     (hconj : ∀ g : G, Nonempty (W ≃ₗ[k[↥H]] (W.map (conjSemilinearEnd (H := H) ρ g)))) :
@@ -270,8 +270,8 @@ theorem restriction_isSimpleModule [ρ.IsIrreducible] [IsAlgClosed k] [Module.Fi
     Module.Finite.of_restrictScalars_finite k k[↥H] (resRep ρ H).asModule
   haveI hWfin : Module.Finite k ↥W :=
     Module.Finite.of_injective ((W.subtype).restrictScalars k) Subtype.val_injective
-  haveI hss : IsSemisimpleModule k[↥H] (resRep ρ H).asModule := by
-    rw [← isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
+  haveI hss : IsSemisimpleModule k[↥H] (resRep ρ H).asModule :=
+    isSemisimpleModule_resRep_of_isIrreducible ρ
   -- The restriction is `W`-isotypic, hence `V_H ≅ Wⁿ`.
   have hiso : IsIsotypicOfType k[↥H] (resRep ρ H).asModule ↥W :=
     isIsotypicOfType_of_conjugates ρ W hW hconj
@@ -316,7 +316,7 @@ set_option backward.isDefEq.respectTransparency false in
 irreducible.  This repackages `restriction_isSimpleModule` through
 `Representation.irreducible_iff_isSimpleModule_asModule`. -/
 theorem restriction_isIrreducible [ρ.IsIrreducible] [IsAlgClosed k] [Module.Finite k V]
-    [Nontrivial V] [Finite ↥H] [NeZero (Nat.card ↥H : k)]
+    [Nontrivial V]
     (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
     (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥) [IsSimpleModule k[↥H] W]
     (hconj : ∀ g : G, Nonempty (W ≃ₗ[k[↥H]] (W.map (conjSemilinearEnd (H := H) ρ g)))) :
