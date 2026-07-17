@@ -716,6 +716,15 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-17 (tick #25、Fable hub) — ✅ a/b/c 合流、census 23 不変。⭐ b が Isaacs Ch.8 完了**:
+  **a** = `bbe016d2` (**Thm 6.7** kernel complement + **Cor 6.17 完全形** = KernelComplement.lean
+  新設 108 行 / **Thm 6.19** 奇数位数 Frobenius complement の素数位数部分群一意性 / AxiomsCheck
+  Ch06 mains 登録) を merge `69c0877a`: build **4343 jobs green**。
+  **b** = `c8a4b437` (**Cor 8.44** 自己同型軌道サイズ集合 = **Isaacs Ch.8 完了** (25 件完走)、
+  CommonDivisorGraph 1051 行 + notes banner) を merge `ba12a51b`: build **4343 jobs green**。
+  b の次 frontier = Pf App Suzuki チェーン (32+8 件、実 statement 置換から)。
+  **c** = `94df6dad` (9108 の 10.24-10.26 設計メモ、issues のみ build 省略) を merge `7f243e90`。
+  sorry 23 不変・新 axiom なし・AxiomsCheck OK・逸脱なし。push `26a3db35..7f243e90`。
 - **2026-07-17 (tick #24、Fable hub) — ✅ b + c 合流 (a 変化なし)、census 23 不変**:
   **b** = `e362436d` (**Thm 8.43 + K_m 共役等変性**、CommonDivisorGraph 890 行) を merge `b623e60f`:
   build **4342 jobs green**。**c** = `2c932068` (**Cor 10.23** Δ(K)‾ ≅ K/K' via (k−1)‾ ↦ K'k、
