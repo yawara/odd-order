@@ -43,12 +43,23 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   (`Basis.constr`)、`θ(Δ²)=0` は制限 mulLeft/mulRight + `Basis.ext` +
   `Submodule.mul_induction_on'`。simp 補題で e (of g) = (g−1)+Δ² を pin。
   root `OddOrder.lean` に wire 済 (leaf は consumer 0 で full build 外だった)。
-- ⏭ 次: **10.21** (t-成分: `α ∈ Δ(K)Δ(G)` → `α_t ∈ Δ(K)`,
-  `∑_t α_t ∈ Δ(K)²`) → **10.22** (`Δ(K)² = Δ(K)Δ(G) ∩ ℤ[K]`) →
-  **10.23** (`Δ(K)bar ≅ K/K'`)。t-成分 `f_t : ℤ[G] →+ ℤ[K]` は
-  Finsupp fiber 分解 or 右 transversal (`Subgroup.MemRightTransversals`?)
-  で構成、`ℤ[K] ⊆ ℤ[G]` の埋め込みは `MonoidAlgebra.mapDomain`
-  (`Finsupp.mapDomain` 単射) — 要 API 調査。
+- ✅ **10.21 完成**: `augmentationIdealOf K` (Δ(K) ⊆ ℤ[G], span 定義) +
+  `transversalComponent` (f_t, classical ite) / `transversalComponentSum`
+  (f = ∑f_t) を `Basis.constr` + mathlib `Subgroup.IsComplement.equiv`
+  (equiv_mul_left_of_mem / equiv_fst_eq_self / equiv_one) で構成。
+  `transversalComponent_mem` (α_t ∈ Δ(K)) + `transversalComponentSum_mem_sq`
+  (f(α) ∈ Δ(K)²)。生成元計算は Isaacs の 2 case が単一 ite 恒等式に統合。
+- ✅ **10.22 完成**: `groupRingOf K` (ℤ[K] ⊆ ℤ[G]) +
+  `augmentationIdealOf_sq_eq_inf_groupRingOf` / `_sq_eq_inf` (両形式)。
+  f = id on ℤ[K] は ker(f − id) への span_le で無帰納。transversal は
+  `Subgroup.exists_isComplement_right K 1`。
+- ⏭ 次: **10.23** (`Δ(G)bar = Δ(G)/Δ(K)Δ(G)` 内で `Δ(K)bar ≅ K/K'`,
+  写像 `k−1 bar ↦ K'k`)。設計: 商 = module quotient
+  (`Δ(K)Δ(G) ≤ Δ(G)` comap Δ(G).subtype)、`Δ(K)bar` = Δ(K) の image。
+  iso は 10.20-for-K を transport: `MonoidAlgebra.mapDomain` 橋
+  (ℤ[↥K] ≃ₗ groupRingOf K, of k ↦ of ↑k) で `augmentationIdeal ↥K ≃
+  augmentationIdealOf K`、10.22 で kernel 同定。その後 10.24/10.25
+  (principal ideal thm) → 10.26-10.28 (Alperin-Kuo)。
 - Lean 注意 (10.19): `rw [MonoidAlgebra.smul_single']` は smul instance
   不一致で失敗 → exact defeq 経由; MonoidAlgebra ≠ Finsupp 型分離
   (Finsupp.* API 不可、`MonoidAlgebra.induction_linear` /
@@ -60,6 +71,9 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   全部 binder) + 制限 mulLeft/mulRight + `Basis.ext` で任意元積を処理。
   ② `toAdd_zpow` の zsmul と商加群 smul (`Submodule.Quotient.instSMul'`) の
   不一致は `Int.cast_smul_eq_zsmul` でも埋まらず → `with_unfolding_all rfl`。
+- Lean 注意 (10.22): subtype-indexed span の membership 補題は
+  `{x : G} (hx : x ∈ K)` 形式必須 — `(k : ↥K)` 形式を匿名 mk に適用すると
+  1 use site ~950k heartbeats (memory lean-instance-defeq-traps §7)。
 
 ## 完了条件
 
