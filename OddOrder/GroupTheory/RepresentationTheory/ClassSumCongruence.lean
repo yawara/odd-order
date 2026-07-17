@@ -18,6 +18,7 @@ import OddOrder.GroupTheory.TISubset
 import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.GroupTheory.ConjClassSet
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.ConjClassCardinality
 import OddOrder.Mathlib.Sylow
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
@@ -617,15 +618,6 @@ theorem exists_central_scalar_asAlgebraHom (ρ : Representation ℂ G V) [IsIrre
   rw [IntertwiningMap.algebraMap_apply, IntertwiningMap.toLinearMap_smul,
     show (1 : IntertwiningMap ρ ρ).toLinearMap = LinearMap.id from rfl] at hlin
   exact hlin.symm
-
-omit [FiniteDimensional ℂ V] in
-/-- `V` is nontrivial when `ρ` is irreducible (used so that `finrank ℂ V > 0`). -/
-theorem nontrivial_of_isIrreducible (ρ : Representation ℂ G V) [IsIrreducible ρ] :
-    Nontrivial V := by
-  haveI h1 : Nontrivial (Subrepresentation ρ) := IsSimpleOrder.toNontrivial
-  have h2 : Nontrivial (Submodule ℂ V) :=
-    (Subrepresentation.toSubmodule_injective (ρ := ρ)).nontrivial
-  exact (Submodule.nontrivial_iff ℂ).mp h2
 
 /-- The unique scalar `c` with `ρ.asAlgebraHom x = c • id` is the normalized trace
 `trace(ρ.asAlgebraHom x) / finrank ℂ V`. -/
