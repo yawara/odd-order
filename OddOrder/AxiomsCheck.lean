@@ -10,6 +10,7 @@ import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -229,6 +230,12 @@ elab "#assert_only_allowed_axioms " name:ident : command => do
 disallowed axiom(s):{indentD m!"{bad.toList}"}"
 
 /-! ### Per-chapter flagship checks. -/
+
+-- Shared prime-complement residual API used by Peterfalvi Part II, Ch. I, section 3.
+#assert_only_allowed_axioms Subgroup.normalClosure_eq_iSup_map_conj
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_eq_normalClosure
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_le_of_coprime_index
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A
