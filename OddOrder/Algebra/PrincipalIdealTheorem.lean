@@ -1300,6 +1300,51 @@ theorem exists_annihilator_transferXi [Finite G] (h : _root_.commutator G ≤ K)
       (sectionSum G K f)).symm
   rw [hlin, hεann]
 
+/-- Elements of `Ξ(Δ(G)‾)` are annihilated by `c` (multiplicatively, `^c = 1`)
+when `c • Ξ = 0`. -/
+theorem pow_eq_one_of_smul_transferXi_eq_zero [K.FiniteIndex]
+    (S : K.LeftTransversal) {c : ℤ}
+    (hc : c • transferXi G K hK S = 0)
+    (w : Multiplicative ↥(LinearMap.range (transferXi G K hK S))) :
+    w ^ c = 1 := by
+  have hcw : c • (Multiplicative.toAdd w) = 0 := by
+    obtain ⟨x, hx⟩ := (Multiplicative.toAdd w).2
+    refine Subtype.ext ?_
+    rw [SetLike.val_smul, ← hx, ZeroMemClass.coe_zero]
+    exact (DFunLike.congr_fun hc x).trans (LinearMap.zero_apply x)
+  rw [← ofAdd_toAdd w, ← ofAdd_zsmul, hcw, ofAdd_zero]
+
+/-- **Isaacs Theorem 10.25** (pp. 316-317): for `G' ⊆ K ⊆ G` with `G` finite,
+the transfer `v : G → K/K'` satisfies `v(g)^{|K:G'|} = 1`. -/
+theorem transfer_pow_relindex_eq_one [Finite G] (h : _root_.commutator G ≤ K)
+    (g : G) :
+    (MonoidHom.transfer (Abelianization.of : K →* Abelianization K) g)
+        ^ ((_root_.commutator G).relIndex K) = 1 := by
+  set S : K.LeftTransversal := default with hS
+  obtain ⟨c, hc_eq, hc_ann⟩ := exists_annihilator_transferXi G K h S
+  -- `c = |K:G'|` as integers
+  have hcard_ne : Nat.card (G ⧸ K) ≠ 0 := by
+    rw [← Subgroup.index_eq_card]; exact Subgroup.index_ne_zero_of_finite
+  have hidx : ((_root_.commutator G).relIndex K : ℤ) = c := by
+    have htower := Subgroup.relIndex_mul_index h
+    rw [Subgroup.index_eq_card, Subgroup.index_eq_card] at htower
+    have hcast : ((_root_.commutator G).relIndex K : ℤ) * (Nat.card (G ⧸ K) : ℤ)
+        = (Nat.card (Abelianization G) : ℤ) := by exact_mod_cast htower
+    apply mul_right_cancel₀ (by exact_mod_cast hcard_ne : (Nat.card (G ⧸ K) : ℤ) ≠ 0)
+    rw [hcast, ← hc_eq]; ring
+  -- transport `w^c = 1` through the isomorphism `v(G) ≅ Ξ(Δ(G)‾)`
+  set y : ↥(MonoidHom.transfer (Abelianization.of : K →* Abelianization K)).range :=
+    ⟨_, g, rfl⟩ with hy
+  have hyc : y ^ c = 1 := by
+    apply (transferRangeEquivXiRange G K hK S).injective
+    rw [map_zpow, map_one]
+    exact pow_eq_one_of_smul_transferXi_eq_zero G K S hc_ann _
+  have hval : (MonoidHom.transfer (Abelianization.of : K →* Abelianization K) g) ^ c = 1 := by
+    have := congrArg (Subgroup.subtype _) hyc
+    rwa [map_zpow, map_one] at this
+  rw [← zpow_natCast, hidx]
+  exact hval
+
 end Lemma1025
 
 end OddOrder.Algebra
