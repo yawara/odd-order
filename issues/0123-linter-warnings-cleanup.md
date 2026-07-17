@@ -90,7 +90,7 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
 | 件数 | linter | 対応 |
 |---|---|---|
 | 608 | longLine 残 (docstring 単一長 span 主体 + markdown 表 24) | 折返し不可分は留保 (低価値)。コード行の残余は wave 4c で個別 |
-| 334 | **unused hypothesis in type** (255 単数 + 65 複数 + 14 outside-proofs) | **要方針決定**: 修正 = 仮説削除 = signature 変更。教科書 faithful statement は保持が正 → per-decl 判定が必要。helper は削除可。v4.32 toolchain の新 linter |
+| 334 | **unused instance in type** (255 単数 + 65 複数 + 14 outside-proofs) | **✅ 方針決定済 (hub 裁定 2026-07-17、下記 RULING)** — wave 6。「教科書 faithful な仮説削除」問題では**なかった** (誤読訂正)|
 | 113 | 未使用 section var | **wave 2b (次)** — `omit … in` 挿入、42 files |
 | 59 | style.show | wave 5b (goal を変える show → change、要個別確認) |
 | 18 | declaration uses sorry | 対象外 (frontier) |
@@ -98,6 +98,40 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
 | 14 | open scoped Classical | wave 5 (個別判断) |
 | 12 | class 型 def の abbrev/instance マーク | 小物 wave (要挙動確認) |
 | 9+9+6+5 | maxHeartbeats unscoped / overlapping instances / def→theorem / simpa→simp | 小物 wave (overlapping は instance 引数削除 = signature 接触、要個別) |
+
+## RULING: "unused hypothesis in type" 334 件 = **instance binder であって数学的仮説でない** (hub 裁定 2026-07-17)
+
+**誤読の訂正**: 上表の旧記載「修正 = 仮説削除 = signature 変更。教科書 faithful statement は
+保持が正 → per-decl 判定が必要」は**誤り**。linter 実体を読んで確定した事実:
+
+- 発生源 = `Mathlib/Tactic/Linter/UnusedInstancesInType.lean` の **2 linter のみ**:
+  **`linter.unusedDecidableInType`** と **`linter.unusedFintypeInType`**。message 文字列
+  (`Lean.Name.unusedInstancesMsg`) は両者専用ゆえ、334 件は**全てこの 2 つ**。
+- 両 linter は `Mathlib/Init.lean:108-109` で **`linter.mathlibStandardSet` に所属** (個別の
+  `defValue := false` は set 経由で on になる) ⟹ **mathlib 自身が課している標準**であり、
+  本リポジトリの `weak.linter.mathlibStandardSet = true` は意図どおり。
+- **発火条件が決定的**: `binderInfo.isInstImplicit` **かつ**型が `Decidable*` / `Fintype` の
+  binder に**限る** (`isDecidableVariant` / `isAppOrForallOfConst \`Fintype`)。
+  ⟹ 対象は **typeclass instance binder** であって、`(h : R ≠ ⊥)` のような**数学的仮説では
+  一切ない**。「教科書 faithful な仮説を削るか」という論点は**そもそも発生しない**。
+- 対象は `theorem`/`lemma`/Prop-class `instance` のみ (`logUnusedInstancesInTheoremsWhere`)
+  ⟹ 計算可能性の懸念なし (`Fintype.ofFinite` が noncomputable でも Prop なので無害)。
+
+**⟹ 方針 (wave 6)**: 両者とも **statement の一般化**であり、CLAUDE.md「特殊化債務はできる限り
+一般化する」に**積極的に合致**する。docstring 注記や per-decl 保留で逃げない。
+
+| linter | 修正 | 効果 |
+|---|---|---|
+| `unusedDecidableInType` | instance binder を**削除** + 証明に `classical` (term なら `open scoped Classical in` を**term レベル**に) | statement が真に一般化。`Decidable` 名前空間の decl は linter 自身が除外 |
+| `unusedFintypeInType` | `[Fintype X]` → **`[Finite X]`** + 証明で `Fintype.ofFinite` (or 完全削除) | `Fintype` → `Finite` は genuine な一般化 |
+
+**call-site 互換性**: どちらも**仮説を弱める**方向ゆえ既存 consumer は無変更で通る
+(`Fintype X` から `Finite X` は instance 導出可能; 削除した `DecidableEq` は単に不要になる)。
+⟹ 下流追従は原則不要。ただし **build で必ず検証** (wave 2 の omit 挿入と同じく、
+「型で未使用」= 「証明で未使用」ではないため証明側に `classical` 補充が要る)。
+
+⚠ **`Fintype` を statement が実際に使う場合は発火しない** (linter は型内の出現を見る) ゆえ、
+`Nat.card` vs `Fintype.card` のような**意味のある** `Fintype` 依存は誤爆しない。
 
 ## 完了条件
 

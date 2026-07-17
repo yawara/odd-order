@@ -606,7 +606,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
    している (例: hub の prefix-split で旧 module 名ファイルが新 Core を import する場合は追記不要)。
    どちらも無いと `lake build OddOrder` の対象外でゲートをすり抜ける (実例: S05b /
    S11_MsigmaANormal が closure 外で未検証だった)。孤立時 = hub が `OddOrder.lean` に import 行を
-   追記してから build (機械的修正、abort 不要)。
+   追記してから build (機械的修正、abort 不要)。**pure re-export hub file (`Suzuki.lean` 等) の
+   import 一覧漏れも同じ穴** — その場合は `OddOrder.lean` でなく該当 hub file に追記する。
+   > **⚠ 頻発パターン (2026-07-17 tick、全 3 冊フェーズで再確認)**: 新フェーズは新 leaf を
+   > 大量に切るため root closure 漏れが**常態的に起きる**。同 tick で a
+   > (`Ch09/{NilpotentResidual,SubnormalSocle}` — `OddOrder.lean` 漏れ) と b
+   > (`Suzuki/KCyclic` — `Suzuki.lean` hub 漏れ) の 2 レーンで独立発生。検出の確証 =
+   > **build jobs の +N が新 module 数と一致するか** (漏れていた module は「初回 elaborate」ゆえ
+   > jobs が増える; 4363→4365 で a の 2 module、4365→4366 で b の 1 module を確認)。
+   > lane 側は新 leaf 作成時に hub/`OddOrder.lean` へ import 追記するのがデフォルト (LAUNCH.md
+   > 記載) だが徹底されないことがある。hub は **step 3b を毎 tick 必ず実行** (`--diff-filter=A` +
+   > importer grep) し、漏れは機械的修正で塞ぐ。lane a は本 tick で自己修正コミット
+   > (97540ff6) も出した。
 4. **サイズ watch (粒度規約の enforcement, 2026-06-11)**: 合流後に
    `git diff HEAD^ --stat -- '*.lean'` で touched .lean の現在行数を `wc -l` 確認。
    **1,500 行超の既存ファイルへの追記**を検出したら: 合流は維持しつつ ⚠ flag をサマリに含め、
