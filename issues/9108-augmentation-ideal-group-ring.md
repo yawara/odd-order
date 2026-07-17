@@ -60,10 +60,20 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   で replay。kernel 同定に 10.22 (`_sq_eq_inf`)。独立性は
   `LinearIndependent.comp` が coe-of-mk 爆発 (traps §7) するため
   coord functional 証明を複製。
-- ⏭ 次: **10.24/10.25** (principal ideal theorem, Furtwängler) —
-  **新 sibling leaf** (`OddOrder/Algebra/PrincipalIdealTheorem.lean` 等;
-  AugmentationIdeal.lean は 1164 行で 1500 trigger 目前)。その後
-  10.26 (可換環補題) → 10.27/10.28 (Alperin-Kuo)。
+- ✅ **Thm 10.24 完成** (2026-07-17, `PrincipalIdealTheorem.lean` sorry-free):
+  核心恒等式 `transferXi_mk_sub_one` (Ξ((g-1)‾) = ι(θ(v g))) +
+  range 同型 `transferRangeEquivXiRange` (v(G) ≅ Ξ(Δ(G)‾))。
+  設計の鍵: σ = 左 transversal S の**逆元和** (`transversalInvSum`) に取る
+  と Isaacs の右 transversal 因子 k_q = (S q)⁻¹·g·S(g⁻¹•q) が mathlib
+  `Subgroup.leftTransversals.diff` の因子と一致し左右規約の橋渡し不要。
+  Fintype (G⧸K) は mathlib diff と同じ `fintypeQuotientOfFiniteIndex` を
+  letI で pin (statement には出さず def 内に封じる)。[Finite G] でなく
+  [K.FiniteIndex] に一般化。Ξ(range) = {Ξ((g-1)‾)} は
+  `exists_of_mem_transferXi_range` (span_induction; add/smul case は
+  ψ∘v の hom 性で閉じる)。
+- ⏭ 次: **10.26** (可換環補題, adjugate det trick — 10.25 の前提) →
+  **10.25** (Furtwängler; R = ℤ[G/K] 可換に 10.26 適用) →
+  10.27/10.28 (Alperin-Kuo)。同 leaf 継続 (現 ~530 行)。
   **10.24 設計メモ (2026-07-17 調査)**: transfer は mathlib
   `MonoidHom.transfer` (repo Ch05_Transfer が既用; v : G →* K/K' は
   ϕ = Abelianization.of : K →* Abelianization K で transfer)。

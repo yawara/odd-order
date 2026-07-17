@@ -215,6 +215,30 @@ theorem transferFactor_mem (S : K.LeftTransversal) (g : G) (q : G ⧸ K) :
     ((S.2.quotientGroupMk_leftQuotientEquiv q).trans
       ((g • S).2.quotientGroupMk_leftQuotientEquiv q).symm))
 
+/-- `ψ = ι ∘ θ : K/K' →* Δ(G)‾` — the composite of the isomorphism `θ` of
+Corollary 10.23 with the inclusion `ι : Δ(K)‾ → Δ(G)‾` (written
+multiplicatively). Injective by `abelianizationToCoquotient_injective`. -/
+noncomputable def abelianizationToCoquotient :
+    Abelianization K →* Multiplicative (AugmentationCoquotient G K) :=
+  (AddMonoidHom.toMultiplicative
+      (augmentationCoquotientInclusion G K).toAddMonoidHom).comp
+    (abelianizationEquivAugmentationQuotientOf G K).toMonoidHom
+
+@[simp]
+theorem abelianizationToCoquotient_apply (a : Abelianization K) :
+    abelianizationToCoquotient G K a
+      = Multiplicative.ofAdd (augmentationCoquotientInclusion G K
+          (abelianizationEquivAugmentationQuotientOf G K a).toAdd) := rfl
+
+theorem abelianizationToCoquotient_injective :
+    Function.Injective (abelianizationToCoquotient G K) := by
+  intro a b h
+  rw [abelianizationToCoquotient_apply, abelianizationToCoquotient_apply] at h
+  exact (abelianizationEquivAugmentationQuotientOf G K).injective
+    (Multiplicative.toAdd.injective
+      (augmentationCoquotientInclusion_injective G K
+        (Multiplicative.ofAdd.injective h)))
+
 variable [K.FiniteIndex]
 
 /-- The sum `σ ∈ ℤ[G]` of the inverses of a left transversal `S` for `K` in
@@ -361,6 +385,132 @@ theorem transferXi_mk_sub_one (hK : K.Normal) (S : K.LeftTransversal)
         - transferFactorSum G K S g := rfl
   rw [hcoe]
   exact transversalInvSum_mul_sub_one_sub_mem G K S g
+
+/-- Restatement of `transferXi_mk_sub_one` via `ψ`:
+`Ξ((g-1)‾) = (ψ(v(g))).toAdd`. -/
+theorem transferXi_mk_sub_one_eq_toAdd (hK : K.Normal) (S : K.LeftTransversal)
+    (g : G) :
+    transferXi G K hK S (Submodule.Quotient.mk
+        ⟨MonoidAlgebra.of ℤ G g - 1, sub_one_mem_augmentationIdeal G g⟩)
+      = (abelianizationToCoquotient G K
+          (MonoidHom.transfer
+            (Abelianization.of : K →* Abelianization K) g)).toAdd := by
+  rw [transferXi_mk_sub_one G K hK S g, abelianizationToCoquotient_apply,
+    toAdd_ofAdd]
+
+/-- The image `Ξ(Δ(G)‾)` consists exactly of the elements `Ξ((g-1)‾)`
+(Isaacs p. 314: `Ξ` carries the generators `(g-1)‾` of `Δ(G)‾` onto the
+subgroup `X ≅ v(G)`, so the image of `Ξ` is all of `X`). -/
+theorem exists_of_mem_transferXi_range (hK : K.Normal) (S : K.LeftTransversal)
+    {y : AugmentationCoquotient G K}
+    (hy : y ∈ LinearMap.range (transferXi G K hK S)) :
+    ∃ g : G, y = transferXi G K hK S (Submodule.Quotient.mk
+      ⟨MonoidAlgebra.of ℤ G g - 1, sub_one_mem_augmentationIdeal G g⟩) := by
+  obtain ⟨x, rfl⟩ := hy
+  obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ x
+  obtain ⟨β, hβ⟩ := α
+  have hspan : β ∈ Submodule.span ℤ
+      (Set.range fun g : G => MonoidAlgebra.of ℤ G g - 1) := by
+    rw [← augmentationIdeal_eq_span]; exact hβ
+  revert hβ
+  induction hspan using Submodule.span_induction with
+  | mem z hz =>
+    intro hβ
+    obtain ⟨g, rfl⟩ := hz
+    exact ⟨g, rfl⟩
+  | zero =>
+    intro hβ
+    refine ⟨1, ?_⟩
+    have h0 : (⟨(0 : MonoidAlgebra ℤ G), hβ⟩ : ↥(augmentationIdeal G))
+        = ⟨MonoidAlgebra.of ℤ G 1 - 1, sub_one_mem_augmentationIdeal G 1⟩ :=
+      Subtype.ext (show (0 : MonoidAlgebra ℤ G)
+        = MonoidAlgebra.of ℤ G 1 - 1 by rw [map_one, sub_self])
+    rw [h0]
+  | add x y hxs hys ihx ihy =>
+    intro hβ
+    have hx : x ∈ augmentationIdeal G := by
+      rw [augmentationIdeal_eq_span]; exact hxs
+    have hy' : y ∈ augmentationIdeal G := by
+      rw [augmentationIdeal_eq_span]; exact hys
+    obtain ⟨gx, ex⟩ := ihx hx
+    obtain ⟨gy, ey⟩ := ihy hy'
+    refine ⟨gx * gy, ?_⟩
+    have hsplit : (⟨x + y, hβ⟩ : ↥(augmentationIdeal G))
+        = ⟨x, hx⟩ + ⟨y, hy'⟩ := rfl
+    rw [hsplit, Submodule.Quotient.mk_add, map_add, ex, ey,
+      transferXi_mk_sub_one_eq_toAdd, transferXi_mk_sub_one_eq_toAdd,
+      transferXi_mk_sub_one_eq_toAdd, map_mul, map_mul, toAdd_mul]
+  | smul c x hxs ihx =>
+    intro hβ
+    have hx : x ∈ augmentationIdeal G := by
+      rw [augmentationIdeal_eq_span]; exact hxs
+    obtain ⟨gx, ex⟩ := ihx hx
+    refine ⟨gx ^ c, ?_⟩
+    have hsplit : (⟨c • x, hβ⟩ : ↥(augmentationIdeal G)) = c • ⟨x, hx⟩ := rfl
+    rw [hsplit, Submodule.Quotient.mk_smul, map_smul, ex,
+      transferXi_mk_sub_one_eq_toAdd, transferXi_mk_sub_one_eq_toAdd,
+      map_zpow, map_zpow, toAdd_zpow]
+
+/-- The forward homomorphism of Theorem 10.24: `v(G) →* Ξ(Δ(G)‾)`,
+`v(g) ↦ Ξ((g-1)‾) = (ψ(v(g))).toAdd`. -/
+noncomputable def transferRangeToXiRange (hK : K.Normal)
+    (S : K.LeftTransversal) :
+    ↥(MonoidHom.transfer (Abelianization.of : K →* Abelianization K)).range
+      →* Multiplicative ↥(LinearMap.range (transferXi G K hK S)) where
+  toFun y := Multiplicative.ofAdd
+    ⟨(abelianizationToCoquotient G K ↑y).toAdd, by
+      obtain ⟨g, hg⟩ := y.2
+      exact ⟨Submodule.Quotient.mk
+          ⟨MonoidAlgebra.of ℤ G g - 1, sub_one_mem_augmentationIdeal G g⟩,
+        (transferXi_mk_sub_one_eq_toAdd G K hK S g).trans (by rw [hg])⟩⟩
+  map_one' := by
+    rw [← ofAdd_zero]
+    refine congrArg _ (Subtype.ext ?_)
+    have hv : (abelianizationToCoquotient G K (1 : Abelianization K)).toAdd
+        = 0 := by rw [map_one, toAdd_one]
+    exact hv
+  map_mul' y₁ y₂ := by
+    rw [← ofAdd_add]
+    refine congrArg _ (Subtype.ext ?_)
+    have hv : (abelianizationToCoquotient G K
+          ((y₁ : Abelianization K) * (y₂ : Abelianization K))).toAdd
+        = (abelianizationToCoquotient G K y₁).toAdd
+          + (abelianizationToCoquotient G K y₂).toAdd := by
+      rw [map_mul, toAdd_mul]
+    exact hv
+
+theorem transferRangeToXiRange_bijective (hK : K.Normal)
+    (S : K.LeftTransversal) :
+    Function.Bijective (transferRangeToXiRange G K hK S) := by
+  constructor
+  · intro y₁ y₂ h
+    have hval : (abelianizationToCoquotient G K ↑y₁).toAdd
+        = (abelianizationToCoquotient G K ↑y₂).toAdd :=
+      congrArg Subtype.val (Multiplicative.ofAdd.injective h)
+    exact Subtype.ext (abelianizationToCoquotient_injective G K
+      (Multiplicative.toAdd.injective hval))
+  · intro x
+    obtain ⟨g, hg⟩ := exists_of_mem_transferXi_range G K hK S x.toAdd.2
+    refine ⟨⟨MonoidHom.transfer (Abelianization.of : K →* Abelianization K) g,
+      ⟨g, rfl⟩⟩, ?_⟩
+    apply Multiplicative.toAdd.injective
+    refine Subtype.ext ?_
+    have hv : (abelianizationToCoquotient G K
+          (MonoidHom.transfer
+            (Abelianization.of : K →* Abelianization K) g)).toAdd
+        = (x.toAdd : AugmentationCoquotient G K) := by
+      rw [← transferXi_mk_sub_one_eq_toAdd G K hK S g, ← hg]
+    exact hv
+
+/-- **Isaacs Theorem 10.24** (p. 314): `v(G) ≅ Ξ(Δ(G)‾)` — the image of the
+transfer homomorphism `v : G → K/K'` (for `K ⊴ G` of finite index) is
+isomorphic to the image of `Ξ : Δ(G)‾ → Δ(G)‾`, left multiplication by the
+sum of a transversal for `K` in `G`. -/
+noncomputable def transferRangeEquivXiRange (hK : K.Normal)
+    (S : K.LeftTransversal) :
+    ↥(MonoidHom.transfer (Abelianization.of : K →* Abelianization K)).range
+      ≃* Multiplicative ↥(LinearMap.range (transferXi G K hK S)) :=
+  MulEquiv.ofBijective _ (transferRangeToXiRange_bijective G K hK S)
 
 end TransferBridge
 
