@@ -226,18 +226,20 @@ Thm 6.4 in Isaacs asserts the equivalence of four conditions:
 3. (centralizer-in-A) `∀ 1 ≠ a ∈ A, C_G(a) ⊆ A`.
 4. (centralizer-in-N) `∀ 1 ≠ n ∈ N, C_G(n) ⊆ N`.
 
-We adopt (1) as the canonical condition (it is the most directly elementary). We then prove
-the cyclic equivalence of (1) ⇔ (2) ⇔ (3) directly, and supply constructors from (3) and (4).
-The direction (1) ⇒ (4) requires Cor 6.6 (Frobenius's theorem on Frobenius kernels) and is
-deferred. -/
+We adopt (1) as the canonical condition (it is the most directly elementary). All four
+conditions are equivalent to it: `trivialIntersection` ((1) ⇒ (2)),
+`centralizer_complement_le` ((1) ⇒ (3)), `centralizer_kernel_le` ((1) ⇒ (4), via Cor 6.6),
+and the constructors `of_trivialIntersection` ((2) ⇒ (1)), `of_centralizer_complement_le`
+((3) ⇒ (1)), `of_centralizer_kernel_le` ((4) ⇒ (1)). -/
 
 /-- A **Frobenius group**: `G` has a nontrivial normal subgroup `N` (the *Frobenius kernel*)
 complemented by a nontrivial subgroup `A` (the *Frobenius complement*), with the conjugation
 action of `A` on `N` being Frobenius.
 
 This is Isaacs's condition (1) of Thm 6.4; the other three equivalent conditions are proven
-separately as `trivialIntersection`, `centralizer_complement_le`, and the constructors
-`of_centralizer_complement_le` / `of_centralizer_kernel_le`. -/
+separately as `trivialIntersection` / `centralizer_complement_le` / `centralizer_kernel_le`,
+with converse constructors `of_trivialIntersection` / `of_centralizer_complement_le` /
+`of_centralizer_kernel_le`. -/
 structure IsFrobeniusGroup (G : Type*) [Group G] (N A : Subgroup G) : Prop where
   /-- The kernel `N` is normal in `G`. -/
   isNormal : N.Normal
@@ -412,6 +414,34 @@ theorem of_centralizer_kernel_le
     -- `a ∈ N ∩ A = ⊥` ⇒ `a = 1`, contradicting `ha`.
     have hdisj : Disjoint N A := hC.disjoint
     exact ha (Subgroup.disjoint_def.mp hdisj haN haA)
+
+/-- **Isaacs Thm 6.4 (2) ⇒ (1)** (constructor). If `A ⊓ A^g = ⊥` for every `g ∉ A`, then
+the conjugation action of `A` on `N` is Frobenius.
+
+Book proof (p. 180): (2) ⇒ (3) — for `1 ≠ a ∈ A` and `x ∈ C_G(a)`, the element `a` lies in
+`A ⊓ A^x`, so triviality of the intersection forces `x ∈ A` — followed by the existing
+(3) ⇒ (1) constructor `of_centralizer_complement_le`. -/
+theorem of_trivialIntersection
+    (hN : N.Normal) (hC : Subgroup.IsComplement' N A)
+    (hN_ne : N ≠ ⊥) (hA_ne : A ≠ ⊥)
+    (h2 : ∀ g : G, g ∉ A → A ⊓ Subgroup.map (MulAut.conj g).toMonoidHom A = ⊥) :
+    IsFrobeniusGroup G N A := by
+  refine of_centralizer_complement_le hN hC hN_ne hA_ne ?_
+  -- (2) ⇒ (3): `x ∈ C_G(a)` with `1 ≠ a ∈ A` forces `x ∈ A`.
+  intro a haA ha x hx
+  rw [Subgroup.mem_centralizer_singleton_iff] at hx
+  by_contra hxA
+  have h_ti := h2 x hxA
+  have h_a_in_conj : a ∈ Subgroup.map (MulAut.conj x).toMonoidHom A := by
+    rw [Subgroup.mem_map]
+    refine ⟨a, haA, ?_⟩
+    simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
+    calc x * a * x⁻¹ = (a * x) * x⁻¹ := by rw [hx]
+      _ = a := by rw [mul_inv_cancel_right]
+  have h_a_in : a ∈ A ⊓ Subgroup.map (MulAut.conj x).toMonoidHom A :=
+    Subgroup.mem_inf.mpr ⟨haA, h_a_in_conj⟩
+  rw [h_ti, Subgroup.mem_bot] at h_a_in
+  exact ha h_a_in
 
 /-- Given `IsComplement' N A`, every `g : G` factors uniquely as `n * a` with `n ∈ N`, `a ∈ A`. -/
 private theorem _root_.Subgroup.IsComplement'.factor
