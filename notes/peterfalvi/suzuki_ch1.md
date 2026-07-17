@@ -25,23 +25,28 @@
 
 ## 次の frontier (文書順)
 
-1. **Lemma (p.101)** — 一般群補題: `M` 有限群、`t` 位数2、`X≤M` 奇数位数で `t` 正規化、
-   `Y=C_X(t)`、`Z={x∈X | x^t=x⁻¹}`。(a) `(y,z)↦yz`, `(y,z)↦zy` は `Y×Z→X` 全単射
-   (∴ `|X|=|Y||Z|`); (b) `⟨Z⟩ ⊴ X`。
-   - **証明戦略 (explicit-inverse 版; book の counting より Lean 向き)**: `x∈X` に対し
-     `w:=(x^t)⁻¹x = t x⁻¹ t x ∈ X` は `twt=w⁻¹` を満たす (∈Z 型)。奇数位数ゆえ一意平方根
-     `z:=w^{(|X|+1)/2}` (`z²=w`, `z∈Z`)、`y:=xz⁻¹∈Y` (`tyt=y` を `txt=xw⁻¹` から検算)。
-     これが `Y×Z≃X` の逆写像 → 直接全単射。一意性は `z²=(x^t)⁻¹x` (x=yz なら) + 奇数位数
-     squaring 単射。奇数位数 squaring の素材は既に `DistinguishedInvolution.lean` に汎用で
-     ある: `sq_pow_half_orderOf` (存在), `eq_of_sq_eq_of_odd_orderOf` (一意) — import 再利用可
-     (現在 `Hypothesis` namespace 内だが hyp 非依存の汎用 lemma)。
-   - 配置: 一般群補題ゆえ `Suzuki/` 内の新 leaf (例 `InvertedProduct.lean`) に M,t,X 抽象で。
-     mixed-type (Y=subgroup, Z=set) の bijection に注意。
-2. **Prop 5 (p.101)** — `V=C_D(s)` かつ `W=C_D(H∩I)`。V⊆C_D(s) は Prop 4(b) 一意性から
-   (`ts^v t=(r⁻¹)^v t r^v` ⇒ `s^v=s`)。等号は Lemma(a) `|D|=|V||K|` + Prop 3
-   `|K|=|s^D|=|D:C_D(s)|` で index 一致。
-3. **Prop 6 (p.101–102)** — `X⊆D` で `|Ω_X|≥3` の下での構造 (Prop 1(a) 型二重推移)。
-4. 以降 Ch.I §2 (`Cor`: S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
+0. ✅ **Lemma (a) 完了** — `InvertedProduct.lean` (一般群補題、M,t,X 抽象、hyp 非依存)。
+   `invertedProdEquiv : Y × Z ≃ X` (explicit-inverse: `x↦(xz⁻¹,z)`, `z=w^{(|X|+1)/2}`,
+   `w=(t x⁻¹ t)x`) + `card_eq_card_centralizer_mul_ncard_invertedBy : |X|=|Y||Z|`。
+   奇数位数 squaring 素材 (`sq_pow_half`/`pow_half_sq`/`pow_card_eq_one_of_mem`) も汎用で内包。
+   - **⚠ Lemma (b) `⟨Z⟩ ⊴ X` は未** (Prop 5 に不要ゆえ後回し)。証明: `Y` は `Z` を正規化
+     (`y∈Y,z∈Z ⇒ yzy⁻¹∈Z`: `t(yzy⁻¹)t=(tyt)(tzt)(ty⁻¹t)=y z⁻¹ y⁻¹=(yzy⁻¹)⁻¹`)、
+     `Z⊆⟨Z⟩`、`X=YZ` (Lemma a) より `X` が `⟨Z⟩=closure(invertedBy X t)` を正規化。
+1. **Prop 5 (p.101)** — `V=C_D(s)` かつ `W=C_D(H∩I)`。
+   - **specialization identity (重要)**: `hyp.KSet = invertedBy hyp.D hyp.t` は**定義的に一致**
+     (両者 `{x | x∈D ∧ t*x*t=x⁻¹}`)、`hyp.V = hyp.D ⊓ centralizer {t}` も一致。ゆえに Lemma(a) を
+     `X:=hyp.D, t:=hyp.t` で適用 → `Nat.card D = Nat.card V * KSet.ncard` (= `|D|=|V||K|`)。
+     hyp 引数: `ht=t_sq(→t*t=1)`, `hodd=D_odd`, `hnorm` = `t_conj_mem_D`+`t_inv_eq` (`t*x*t∈D`)。
+   - **distinguished involution `s` の naming が必要**: Prop 4(b) は `existsUnique_...` で提供。
+     Prop 5 では `s` を `Classical.choose` 等で固定 (or `s`,`r` を `Hypothesis` の派生 def として
+     用意) → `V⊆C_D(s)`: `v∈V` に structure eq `tst=r⁻¹tr` を conjugate し 4(b) 一意性で `s^v=s`。
+   - 等号: `|K|=|s^D|` (Prop 3 `image_conj_KSet_eq_involutions_H` の `s^K=H∩I` + `|K|=|H∩I|`)
+     と `|s^D|=|D:C_D(s)|` (orbit-stabilizer, mathlib `MulAction`/`Subgroup.card_eq_card_quotient…`)
+     から `|D:V|=|K|=|D:C_D(s)|` → `V=C_D(s)` (V⊆C_D(s) と index 一致)。
+   - `W=C_D(H∩I)`: `W=C_V(K)` (定義) = `C_D(s)∩C_D(K)` = `H∩I` を中心化する `D` の元
+     (Prop 3 `k↦s^k` が `K→H∩I` 全単射、`V` normalizes `K`)。
+2. **Prop 6 (p.101–102)** — `X⊆D` で `|Ω_X|≥3` の下での構造 (Prop 1(a) 型二重推移)。
+3. 以降 Ch.I §2 (`Cor`: S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
