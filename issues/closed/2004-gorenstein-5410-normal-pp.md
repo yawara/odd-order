@@ -58,3 +58,28 @@ BG S04 に「p odd 非cyclic ⟹ normal type-(p,p)」の無条件版が landing 
 `pGroup_cyclic_fixedPointFree` の non-cyclic sorry で、これを cite する Lean consumer は
 現状 0 (2026-07-02 grep 確認)。**σ-theory near-field が App B/C を cite する時に再開**。
 それまで `issues/pending/` で保留。
+
+## ✅ 完了 (2026-07-18)
+
+**pending 判断は失効** (2026-07-16 に FT 経路限定フェーズ終了 → 全 3 冊フェーズ;
+「consumer 0 だから deprioritize」は CLAUDE.md「進捗の測り方」に反する自家製 gating。
+実際 Pf Suzuki §2 Prop 2 が App I Prop 1 gate 経由で live consumer になった)。
+
+本 issue の核心デリバラブル = **BG S04 に「p odd 非cyclic ⟹ normal type-(p,p)」の
+無条件版を landing** は完了:
+`OddOrder.BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic`
+(build green, axiom-clean, sorry 無し)。
+
+証明経路 (極大 abelian normal A 経由、Gorenstein 5.4.10 odd を再構成):
+- 新 shared leaf `GroupTheory/NormalElementaryAbelianPrimeSq.lean`:
+  - `exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal` (不変部分空間補題:
+    正規 elem abelian V, |V|≥p² ⟹ 正規 type-(p,p) ≤ V; 「非自明正規⟹中心と交わる」二段)
+  - `..._of_normal_not_isCyclic` (V 非 cyclic 版)
+  - `isMetacyclic_of_isCyclic_selfCentralizing_normal` (cyclic self-cent normal ⟹
+    metacyclic; MulAut A ≅ (ℤ/p^m)ˣ cyclic 経由)
+- S04 assembly: A noncyclic ⟹ Ω₁(A) 経由 L1 / A cyclic ⟹ metacyclic ⟹
+  `isElementaryAbelian_omega1_of_isMetacyclic` (BG Lemma 4.10、既存)。
+
+⟹ `issues/closed/` へ。**Huppert non-cyclic sorry の残り** (Schur⟹field⟹Z(P) cyclic +
+coprime Z_p×Z_p 分解) は本 issue の範囲外 (完了条件が明示的に「App.B 側で対応」と分離) ⟹
+新 issue 2005 で追跡。
