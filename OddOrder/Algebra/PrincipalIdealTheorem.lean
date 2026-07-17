@@ -8,7 +8,9 @@ import Mathlib.GroupTheory.Abelianization.Finite
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.RingTheory.Ideal.Maps
+import Mathlib.RingTheory.Finiteness.Finsupp
 import OddOrder.Algebra.AugmentationIdeal
+import OddOrder.Algebra.FiniteIndexAnnihilator
 
 /-!
 # Towards the principal ideal theorem: `Δ(K)Δ(G)` for a normal subgroup
@@ -942,7 +944,7 @@ theorem augmentationCoquotientModule_mapDomain_smul (h : _root_.commutator G ≤
       = augmentationCoquotientMulLeft G K hK x a := by
   letI := quotientCommGroup G K h
   letI := augmentationCoquotientModule G K
-  show augmentationCoquotientAlgHom G K
+  change augmentationCoquotientAlgHom G K
     (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) a = _
   rw [augmentationCoquotientAlgHom_mapDomain]
 
@@ -1026,6 +1028,51 @@ theorem nat_card_quotient_augmentationRingIdeal_smul_top
   rw [← nat_card_quotient_augmentationCoquotientSqImage G K,
     ← restrictScalars_augmentationRingIdeal_smul_top G K h]
   rfl
+
+/-! ### Finiteness facts for the application of Theorem 10.26 (Isaacs p. 316) -/
+
+omit [hK : K.Normal] in
+/-- `Δ(G)‾` is finitely generated as an additive group (`G` finite). -/
+theorem moduleFinite_augmentationCoquotient [Finite G] :
+    Module.Finite ℤ (AugmentationCoquotient G K) := by
+  letI : Module.Finite ℤ (MonoidAlgebra ℤ G) :=
+    inferInstanceAs (Module.Finite ℤ (G →₀ ℤ))
+  letI : Module.Finite ℤ (augmentationIdeal G) := inferInstance
+  exact Module.Finite.of_surjective (augmentationCorel G K).mkQ
+    (Submodule.mkQ_surjective _)
+
+omit [hK : K.Normal] in
+/-- The additive group `⊤` of `Δ(G)‾` is finitely generated (`G` finite). -/
+theorem fg_top_augmentationCoquotient [Finite G] :
+    (⊤ : AddSubgroup (AugmentationCoquotient G K)).FG := by
+  letI := moduleFinite_augmentationCoquotient G K
+  have h := Module.Finite.fg_top (R := ℤ) (M := AugmentationCoquotient G K)
+  rw [Submodule.fg_iff_addSubgroup_fg] at h
+  simpa using h
+
+/-- The augmentation ideal `Δ(G/K)` is finitely generated as an additive group
+(`G` finite, so `ℤ[G/K]` is a Noetherian `ℤ`-module). -/
+theorem fg_augmentationRingIdeal [Finite G] :
+    (augmentationRingIdeal G K).toAddSubgroup.FG := by
+  letI : Module.Finite ℤ (MonoidAlgebra ℤ (G ⧸ K)) :=
+    inferInstanceAs (Module.Finite ℤ ((G ⧸ K) →₀ ℤ))
+  have h : ((augmentationRingIdeal G K).restrictScalars ℤ).FG :=
+    IsNoetherian.noetherian _
+  rw [Submodule.fg_iff_addSubgroup_fg] at h
+  exact h
+
+/-- `Δ(G)‾ / Δ(G/K)·Δ(G)‾` is finite of order `|G : G'|` (`G` finite). -/
+theorem finite_quotient_augmentationRingIdeal_smul_top [Finite G]
+    (h : _root_.commutator G ≤ K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    Finite (AugmentationCoquotient G K ⧸ (augmentationRingIdeal G K •
+      (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K)))) := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  have hpos : Nat.card (Abelianization G) ≠ 0 := Nat.card_pos.ne'
+  rw [← nat_card_quotient_augmentationRingIdeal_smul_top G K h] at hpos
+  exact Nat.finite_of_card_ne_zero hpos
 
 end CommQuotient
 
@@ -1162,5 +1209,142 @@ theorem sectionWeightedSum_coeff_const
     mapDomain_sectionWeightedSum G K e hf q₂] at hcoeff
 
 end Lemma1027
+
+section Lemma1025
+
+/-! ### Isaacs Theorem 10.25 (pp. 316-317)
+
+The transfer `v : G → K/K'` (for `G' ⊆ K ⊆ G`, `G` finite) satisfies
+`v(g)^{|K:G'|} = 1`.  Assembling: Theorem 10.26 (over `R = ℤ[G/K]`, with
+`m = |A:UA| = |G:G'|`) yields `γ` with `γ·Δ(G)‾ = 0` and `δ(γ) = |G:G'|`;
+lift `γ` to a coset-supported `ε ∈ ℤ[G]`; Lemma 10.27 forces `ε = c·σ` with
+`c·|G:K| = |G:G'|`, so `c·Ξ = 0`; Theorem 10.24 (`v(G) ≅ Ξ(Δ(G)‾)`) then
+gives `v(g)^c = 1` with `c = |K:G'|`. -/
+
+variable [hK : K.Normal]
+
+/-- The augmentation of a coset-supported element is the sum of its
+coefficients: `δ(∑_q e_q·f(q)) = ∑_q e_q`. -/
+theorem augmentation_sectionWeightedSum [K.FiniteIndex] (e : G ⧸ K → ℤ)
+    (f : G ⧸ K → G) :
+    letI := K.fintypeQuotientOfFiniteIndex
+    augmentation G (sectionWeightedSum G K e f) = ∑ q : G ⧸ K, e q := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  rw [sectionWeightedSum, map_sum]
+  exact Finset.sum_congr rfl fun q _ => augmentation_single G (f q) (e q)
+
+/-- **Isaacs Theorem 10.25** (core, pp. 316-317): there is `c` with
+`|G:K|·c = |G:G'|` such that `c` annihilates `Ξ = transferXi`. -/
+theorem exists_annihilator_transferXi [Finite G] (h : _root_.commutator G ≤ K)
+    (S : K.LeftTransversal) :
+    ∃ c : ℤ, (Nat.card (G ⧸ K) : ℤ) * c = (Nat.card (Abelianization G) : ℤ) ∧
+      c • transferXi G K hK S = 0 := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  haveI := finite_quotient_augmentationRingIdeal_smul_top G K h
+  letI := K.fintypeQuotientOfFiniteIndex
+  -- Theorem 10.26 over `R = ℤ[G/K]`
+  obtain ⟨γ, hγann, hγcong⟩ := exists_smul_eq_zero_and_sub_card_mem
+    (augmentationRingIdeal G K) (fg_augmentationRingIdeal G K)
+    (fg_top_augmentationCoquotient G K)
+  rw [nat_card_quotient_augmentationRingIdeal_smul_top G K h] at hγcong
+  -- coset representatives and the lift `ε`
+  set f : G ⧸ K → G := Quotient.out with hf_def
+  have hf : ∀ q, (↑(f q) : G ⧸ K) = q := fun q => Quotient.out_eq' q
+  set e : G ⧸ K → ℤ := fun q => γ q with he_def
+  -- `π ε = γ`
+  have hπε : MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
+      (sectionWeightedSum G K e f) = γ := by
+    refine Finsupp.ext fun q => ?_
+    rw [mapDomain_sectionWeightedSum G K e hf q]
+  -- `Ξ_ε = 0`
+  have hεann : augmentationCoquotientMulLeft G K hK
+      (sectionWeightedSum G K e f) = 0 := by
+    have h1 : augmentationCoquotientMulLeft G K hK (sectionWeightedSum G K e f)
+        = augmentationCoquotientAlgHom G K γ := by
+      rw [← hπε, augmentationCoquotientAlgHom_mapDomain]
+    rw [h1]
+    exact LinearMap.ext fun a => hγann a
+  -- Lemma 10.27: all coefficients equal
+  set c : ℤ := e ((1 : G) : G ⧸ K) with hc_def
+  have hconst : ∀ q, e q = c :=
+    fun q => sectionWeightedSum_coeff_const G K hf hεann q _
+  -- `δ(ε) = c·|G:K|` and `δ(ε) = δ(γ) = |G:G'|`
+  have hδε : augmentation G (sectionWeightedSum G K e f)
+      = (Nat.card (G ⧸ K) : ℤ) * c := by
+    rw [augmentation_sectionWeightedSum G K e f]
+    rw [Finset.sum_congr rfl fun q _ => hconst q, Finset.sum_const,
+      Finset.card_univ, Nat.card_eq_fintype_card, nsmul_eq_mul]
+  have hδγ : augmentation G (sectionWeightedSum G K e f)
+      = (Nat.card (Abelianization G) : ℤ) := by
+    rw [← augmentation_mapDomain G K, hπε]
+    have hmem : augmentation (G ⧸ K) (γ
+        - (Nat.card (Abelianization G) : MonoidAlgebra ℤ (G ⧸ K))) = 0 :=
+      (mem_augmentationRingIdeal G K).mp hγcong
+    rw [map_sub, sub_eq_zero] at hmem
+    rw [hmem, map_natCast]
+  refine ⟨c, hδε.symm.trans hδγ, ?_⟩
+  -- `c • Ξ = mulLeft(c • σ) = mulLeft ε = 0`
+  have hεc : sectionWeightedSum G K e f = c • sectionSum G K f := by
+    have hec : e = fun _ => c := funext hconst
+    rw [hec, sectionWeightedSum, sectionSum]
+    show ∑ q : G ⧸ K, MonoidAlgebra.single (f q) c
+        = c • ∑ q : G ⧸ K, MonoidAlgebra.of ℤ G (f q)
+    refine Eq.trans (Finset.sum_congr rfl fun q _ => ?_) Finset.smul_sum.symm
+    rw [MonoidAlgebra.of_apply, MonoidAlgebra.smul_single', mul_one]
+  rw [transferXi_eq_mulLeft_sectionSum G K S hf]
+  have hlin : c • augmentationCoquotientMulLeft G K hK (sectionSum G K f)
+      = augmentationCoquotientMulLeft G K hK (sectionWeightedSum G K e f) := by
+    rw [hεc]
+    exact (map_smul (augmentationCoquotientMulLeftLinear G K) c
+      (sectionSum G K f)).symm
+  rw [hlin, hεann]
+
+/-- Elements of `Ξ(Δ(G)‾)` are annihilated by `c` (multiplicatively, `^c = 1`)
+when `c • Ξ = 0`. -/
+theorem pow_eq_one_of_smul_transferXi_eq_zero [K.FiniteIndex]
+    (S : K.LeftTransversal) {c : ℤ}
+    (hc : c • transferXi G K hK S = 0)
+    (w : Multiplicative ↥(LinearMap.range (transferXi G K hK S))) :
+    w ^ c = 1 := by
+  have hcw : c • (Multiplicative.toAdd w) = 0 := by
+    obtain ⟨x, hx⟩ := (Multiplicative.toAdd w).2
+    refine Subtype.ext ?_
+    rw [SetLike.val_smul, ← hx, ZeroMemClass.coe_zero]
+    exact (DFunLike.congr_fun hc x).trans (LinearMap.zero_apply x)
+  rw [← ofAdd_toAdd w, ← ofAdd_zsmul, hcw, ofAdd_zero]
+
+/-- **Isaacs Theorem 10.25** (pp. 316-317): for `G' ⊆ K ⊆ G` with `G` finite,
+the transfer `v : G → K/K'` satisfies `v(g)^{|K:G'|} = 1`. -/
+theorem transfer_pow_relindex_eq_one [Finite G] (h : _root_.commutator G ≤ K)
+    (g : G) :
+    (MonoidHom.transfer (Abelianization.of : K →* Abelianization K) g)
+        ^ ((_root_.commutator G).relIndex K) = 1 := by
+  set S : K.LeftTransversal := default with hS
+  obtain ⟨c, hc_eq, hc_ann⟩ := exists_annihilator_transferXi G K h S
+  -- `c = |K:G'|` as integers
+  have hcard_ne : Nat.card (G ⧸ K) ≠ 0 := by
+    rw [← Subgroup.index_eq_card]; exact Subgroup.index_ne_zero_of_finite
+  have hidx : ((_root_.commutator G).relIndex K : ℤ) = c := by
+    have htower := Subgroup.relIndex_mul_index h
+    rw [Subgroup.index_eq_card, Subgroup.index_eq_card] at htower
+    have hcast : ((_root_.commutator G).relIndex K : ℤ) * (Nat.card (G ⧸ K) : ℤ)
+        = (Nat.card (Abelianization G) : ℤ) := by exact_mod_cast htower
+    apply mul_right_cancel₀ (by exact_mod_cast hcard_ne : (Nat.card (G ⧸ K) : ℤ) ≠ 0)
+    rw [hcast, ← hc_eq]; ring
+  -- transport `w^c = 1` through the isomorphism `v(G) ≅ Ξ(Δ(G)‾)`
+  set y : ↥(MonoidHom.transfer (Abelianization.of : K →* Abelianization K)).range :=
+    ⟨_, g, rfl⟩ with hy
+  have hyc : y ^ c = 1 := by
+    apply (transferRangeEquivXiRange G K hK S).injective
+    rw [map_zpow, map_one]
+    exact pow_eq_one_of_smul_transferXi_eq_zero G K S hc_ann _
+  have hval : (MonoidHom.transfer (Abelianization.of : K →* Abelianization K) g) ^ c = 1 := by
+    have := congrArg (Subgroup.subtype _) hyc
+    rwa [map_zpow, map_one] at this
+  rw [← zpow_natCast, hidx]
+  exact hval
+
+end Lemma1025
 
 end OddOrder.Algebra

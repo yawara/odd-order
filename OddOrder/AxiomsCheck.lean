@@ -58,6 +58,8 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
 import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
+import OddOrder.Isaacs.Ch10_MoreTransfer.Main
+import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
@@ -8416,6 +8418,26 @@ the assembled T-side case-(b) facts to Lean/mathlib's standard three axioms. -/
   OddOrder.Peterfalvi.S15.Hypothesis.T_caseB_v_eq_full_of_swapped_lambda_dichotomy
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_of_q_lt_p_core
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional
+
+-- Ch.10 (More Transfer Theory) §10A: Thm 10.1 Yoshida — P Sylow, v(G) < P/P' ⇒
+-- G は C_p ≀ C_p 上へ全射 / Thm 10.11 (self-normalizing 系の帰結)
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.exists_surjective_wreath_of_transfer_range_lt
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch10.exists_normal_index_prime_transfer_mem
+
+-- Ch.10 §10B: Thm 10.12 Huppert — p > 2, nonabelian metacyclic Sylow p ⇒
+-- p ∣ |G : G'|, Thm 10.15 正規 Sylow 版
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch10.dvd_index_commutator_of_metacyclic_sylow
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.dvd_index_commutator_of_normal_metacyclic_sylow
+
+-- Ch.10 §10C: Thm 10.20 G/G' ≅ Δ(G)/Δ(G)² / Thm 10.25 v(g)^{|K:G'|} = 1 /
+-- Thm 10.18 Furtwängler principal ideal theorem (transfer G → G'/G'' 自明) /
+-- Cor 10.28 Alperin-Kuo g^{|G : G'∩Z(G)|} = 1
+#assert_only_allowed_axioms OddOrder.Algebra.abelianizationEquivAugmentationQuotient
+#assert_only_allowed_axioms OddOrder.Algebra.transfer_pow_relindex_eq_one
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch10.transfer_commutator_eq_one
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch10.pow_index_commutator_inf_center_eq_one
 
 /-! **Feit–Thompson end-to-end axiom audit** (2026-07-15, issues 9077/0118/0121).
 The honest T-side `(13.12)` producer supplies `D = ⊥` downstream of the character-degree layer;
