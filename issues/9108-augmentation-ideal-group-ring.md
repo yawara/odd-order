@@ -100,12 +100,22 @@ augmentation 無し; `RingTheory/Ideal/IsAugmentation.lean` は無関係な一�
   自由変数 unify 不能 = traps §7)。module 構造・`U•⊤ = Δ(G)²‾` の index 等は
   **10.25 proof 内の have** で letI スコープに閉じ込める。module は instance
   化しない (A=Submodule.Quotient の ℤ-module と diamond)。
+- ✅ **Ξ transversal 独立性 + section 橋渡し** (2026-07-17, sorry-free):
+  `sectionSum f` (∑_q of(f q)) / `augmentationCoquotientMulLeft_sectionSum_congr`
+  (同一 coset の 2 代表系 ⇒ 同一 Ξ、右イデアル消滅で) /
+  `transferXi_eq_mulLeft_sectionSum` (10.24 の Ξ = 任意 section の Ξ)。
+  右イデアル版消滅補題 `_eq_zero_of_mem_mul_right` / `_eq_of_sub_mem_right` も。
 - ⏭ 次の作業単位:
-  (a) **Lemma 10.27** (別 lemma、純 ℤ[G] で letI 不要、statement は
-  `transferXi` 使用可): ε∈ℤ[G], εΔ(G)‾=0, m=δ(ε) ⇒ |G:K| | m ∧
-  (m/|G:K|)Ξ=0。論法: ε を coset-collapse して ∑ e_t t、(∑e_t t)(g−1) の
-  (t·g)-成分 = e_t k_t − e_{t·g} が 10.21 (`transversalComponent_mem`) で
-  Δ(K) → δ_K 適用で e_t=e_{t·g}、dot action 推移性で全 e_t 一致。
+  (a) **Lemma 10.27 (section 台形版で十分)**: 10.25 が渡す ε は γ∈ℤ[G/K] の
+  mapDomain 原像 = **既に `∑_q e_q of(f q)` 形** (e_q = γ_q) なので ε→ε' 簡約
+  不要。statement: f = section, e : G/K→ℤ, ε = ∑_q e_q of(f q),
+  mulLeft ε = 0 ⇒ 全 e_q 一致 (=c) ∧ ε = c·sectionSum f。
+  論法: ε(of g−1) = ∑_{q'}[e_{q'(mkg)⁻¹}·of k_{q'} − e_{q'}]·of(f q')
+  (k_q ∈ K は f q·g = k_q·f(q·mkg))。range f は IsComplement(K,·) 右
+  transversal ゆえ `transversalComponent_mem` (10.21) で各成分 ∈ Δ(K) →
+  δ_K で e_{q'(mkg)⁻¹}=e_{q'} ∀q',g → G/K 推移性で全一致。
+  **crux = range f を IsComplement 化 + transversalComponent を e_q 成分に接続**。
+  m=δ(ε)=c|G:K| ⇒ |G:K||m ∧ (m/|G:K|)Ξ = cΞ = 0。
   (b) 10.25 proof 内: letI 2 枚 → `have hidx : Nat.card(A⧸U•⊤)=|G:G'|`
   (restrictScalars で U•⊤=Δ(G)²‾ を示し既証 nat_card... に接続) → 10.26 で
   γ → ε=mapDomain 原像 (δ(ε)=|G:G'|, εA=0) → 10.27 → |K:G'|Ξ=0 → 10.24。
