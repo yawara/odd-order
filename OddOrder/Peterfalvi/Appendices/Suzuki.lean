@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
+import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)
