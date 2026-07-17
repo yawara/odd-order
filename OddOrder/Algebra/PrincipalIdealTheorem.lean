@@ -927,6 +927,106 @@ theorem mem_augmentationRingIdeal_iff_mem_augmentationIdeal
     γ ∈ augmentationRingIdeal G K ↔ γ ∈ augmentationIdeal (G ⧸ K) := by
   rw [mem_augmentationRingIdeal, mem_augmentationIdeal_iff]
 
+/-- `π = mapDomain (G → G/K)` is surjective on group rings. -/
+theorem mapDomainAlgHom_surjective :
+    Function.Surjective (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) :
+      MonoidAlgebra ℤ G → MonoidAlgebra ℤ (G ⧸ K)) :=
+  Finsupp.mapDomain_surjective (QuotientGroup.mk'_surjective K)
+
+/-- The `ℤ[G/K]`-action of `π(x)` on `Δ(G)‾` is the `ℤ[G]`-action of `x`. -/
+theorem augmentationCoquotientModule_mapDomain_smul (h : _root_.commutator G ≤ K)
+    (x : MonoidAlgebra ℤ G) (a : AugmentationCoquotient G K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) • a
+      = augmentationCoquotientMulLeft G K hK x a := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  show augmentationCoquotientAlgHom G K
+    (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) a = _
+  rw [augmentationCoquotientAlgHom_mapDomain]
+
+/-- **Isaacs p. 316** (the index computation `|A : UA| = |Δ(G) : Δ(G)²|`):
+`UA = Δ(G)²‾`, i.e. the `ℤ[G/K]`-submodule `Δ(G/K)·Δ(G)‾`, restricted to `ℤ`,
+equals the image of `Δ(G)²` in `Δ(G)‾`. -/
+theorem restrictScalars_augmentationRingIdeal_smul_top
+    (h : _root_.commutator G ≤ K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    Submodule.restrictScalars ℤ (augmentationRingIdeal G K •
+        (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K)))
+      = augmentationCoquotientSqImage G K := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  apply le_antisymm
+  · intro w hw
+    rw [Submodule.restrictScalars_mem] at hw
+    refine Submodule.smul_induction_on hw (fun γ hγ a _ => ?_)
+      (fun x y hx hy => Submodule.add_mem _ hx hy)
+    -- lift `γ ∈ Δ(G/K)` to `x₀ ∈ Δ(G)` with `π x₀ = γ`
+    obtain ⟨x₀, hx₀'⟩ := mapDomainAlgHom_surjective G K γ
+    have hx₀Δ : x₀ ∈ augmentationIdeal G := by
+      rw [mem_augmentationIdeal_iff, ← augmentation_mapDomain G K x₀, hx₀']
+      exact Iff.mp (mem_augmentationRingIdeal G K) hγ
+    obtain ⟨α, rfl⟩ := Submodule.Quotient.mk_surjective _ a
+    rw [← hx₀', augmentationCoquotientModule_mapDomain_smul G K h x₀,
+      augmentationCoquotientMulLeft_mk G K hK]
+    refine Submodule.mem_map.mpr ⟨⟨(x₀ : MonoidAlgebra ℤ G) * α,
+      mul_mem_augmentationIdeal_left G x₀ α.2⟩, ?_, rfl⟩
+    exact mem_augmentationIdealSq.mpr (Submodule.mul_mem_mul hx₀Δ α.2)
+  · -- `Δ(G)²‾ ≤ UA`: reduce `mk β` on generators `p*q`, `p, q ∈ Δ(G)`
+    intro w hw
+    obtain ⟨⟨β, hβΔ⟩, ha, rfl⟩ := Submodule.mem_map.mp hw
+    rw [mem_augmentationIdealSq] at ha
+    have key : ∀ γ ∈ augmentationIdeal G * augmentationIdeal G,
+        γ ∈ augmentationIdeal G ∧ ∀ hγ : γ ∈ augmentationIdeal G,
+          (Submodule.Quotient.mk ⟨γ, hγ⟩ : AugmentationCoquotient G K)
+            ∈ Submodule.restrictScalars ℤ (augmentationRingIdeal G K •
+              (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K))
+                (AugmentationCoquotient G K))) := by
+      intro γ hγsq
+      refine Submodule.mul_induction_on hγsq (fun p hp q hq => ?_)
+        (fun u v ihu ihv => ?_)
+      · refine ⟨mul_mem_augmentationIdeal_left G p hq, fun hγ => ?_⟩
+        have hpq : (Submodule.Quotient.mk ⟨p * q, hγ⟩ :
+              AugmentationCoquotient G K)
+            = (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) p)
+                • (Submodule.Quotient.mk ⟨q, hq⟩ :
+                  AugmentationCoquotient G K) := by
+          rw [augmentationCoquotientModule_mapDomain_smul G K h p,
+            augmentationCoquotientMulLeft_mk G K hK]
+          rfl
+        rw [hpq, Submodule.restrictScalars_mem]
+        refine Submodule.smul_mem_smul ?_ Submodule.mem_top
+        rw [mem_augmentationRingIdeal, augmentation_mapDomain G K p]
+        exact mem_augmentationIdeal_iff.mp hp
+      · obtain ⟨hu, ihu'⟩ := ihu
+        obtain ⟨hv, ihv'⟩ := ihv
+        refine ⟨Submodule.add_mem _ hu hv, fun hγ => ?_⟩
+        have hadd : (Submodule.Quotient.mk ⟨u + v, hγ⟩ :
+              AugmentationCoquotient G K)
+            = Submodule.Quotient.mk ⟨u, hu⟩ + Submodule.Quotient.mk ⟨v, hv⟩ := by
+          rw [← Submodule.Quotient.mk_add]; rfl
+        rw [hadd]
+        exact Submodule.add_mem _ (ihu' hu) (ihv' hv)
+    exact (key β ha).2 hβΔ
+
+/-- **Isaacs p. 316**: the index `|A : UA| = |G : G'|` for `A = Δ(G)‾`,
+`U = Δ(G/K)`.  This is the `m` fed to Theorem 10.26 in the proof of
+Theorem 10.25. -/
+theorem nat_card_quotient_augmentationRingIdeal_smul_top
+    (h : _root_.commutator G ≤ K) :
+    letI := quotientCommGroup G K h
+    letI := augmentationCoquotientModule G K
+    Nat.card (AugmentationCoquotient G K ⧸ (augmentationRingIdeal G K •
+        (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K))))
+      = Nat.card (Abelianization G) := by
+  letI := quotientCommGroup G K h
+  letI := augmentationCoquotientModule G K
+  rw [← nat_card_quotient_augmentationCoquotientSqImage G K,
+    ← restrictScalars_augmentationRingIdeal_smul_top G K h]
+  rfl
+
 end CommQuotient
 
 section Lemma1027
