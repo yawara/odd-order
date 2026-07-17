@@ -53,6 +53,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -413,6 +414,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.commutatorQuotientCenterEquiv
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.IsQuasisimple.normal_le_center
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.IsQuasisimple.quotient
+
+-- Ch.9 (More on Subnormality): Lem 9.3 — a component not inside a minimal normal
+-- subgroup centralizes it; Thm 9.4 — distinct components commute.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.commutator_eq_bot_of_isMinimalNormal_of_isComponent
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.IsComponent.commutator_eq_bot_of_ne
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
