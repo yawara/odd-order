@@ -40,18 +40,21 @@
      `W_eq_centralizer_involutions_H` (`W = D ⊓ centralizer (H∩I involutions set)`;
      ⊇ は `conj_mem_KSet_of_mem_V` (V normalizes K) + `injOn_conj_KSet` で `wkw⁻¹=k`)。
    - `InvolutionClass.lean`: Prop 3 injectivity を `injOn_conj_KSet` として公開 lemma 化。
-2. **Prop 6 (p.101–102) 未 (次)** — `X⊆D`, `|Ω_X|≥3`:
-   (a) `C_G(X)` は `Ω_X` 上二重可移 + `C_H(X)=C_Q(X)⋊C_D(X)`。証明: Q regular on Ω−{H},
-       `H₁∈Ω_X−{H}` に `y∈Q, H^{ty}=H₁` → `x∈X` で `H^{ty}=H₁ˣ=H^{tyx}=H^{tx⁻¹yx}`
-       (x∈D⊆H^t で `H^{tx⁻¹}=H^t`) → regularity で `y=x⁻¹yx` → `C_Q(X)` regular on
-       `Ω_X−{H}`。対称に `C_{Q^t}(X)` transitive on `Ω_X−{H^t}` → 2-transitive。
-   (b) `|C_Q(X)|` 偶数。証明: (a)→`|C_G(X)|` 偶 (2-trans, |Ω_X|(|Ω_X|−1) | order) →
-       involution `u∈C_G(X)` → `u∈H'`, Prop 1(b) `X⊆C_G(u)⊆H'` → `H'∈Ω_X` →
-       transitivity で `|C_H(X)|=|C_{H'}(X)|` 偶 → `C_D(X)` 奇 (D 奇) → `C_Q(X)` 偶。
-   (c) `X` は D-conjugate to subgroup of `V`。証明: (b)+Prop 3 → `s^k∈C_Q(X)` →
-       `X⊆C_D(s^k)=Vᵏ` (Prop 5)。
-3. 以降 Ch.I §2 (`Cor`: S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
+2. ✅ **Prop 6 (p.101–102) 完了** — 新 leaf `FixedPointCentralizer.lean`
+   (`Ω_X = MulAction.fixedPoints X Ω`, X : Subgroup G, hXD : X ≤ D):
+   (a) `cQRegularEquiv` (C_Q(X) ≃ Ω_X−{basept}) + `ncard_fixedPoints`
+       (|Ω_X|=|C_Q(X)|+1) + `cQ_mul_cD_eq_cH`/`card_cH_eq` (C_H(X)=C_Q(X)⋊C_D(X)) +
+       `exists_mem_centralizer_smul_pair` (二重可移、elementwise 形)。対称側は
+       **`Hypothesis.symm`** (Basic.lean: basept↔t•basept 入替、H'=H^t/Q'=Q^t/D'=D) 経由。
+   (b) `even_card_cQ`: pair-swap 元 c (basept↔t•basept) は偶数位数 → involution
+       u=c^k ∈ C_G(X) → 単一共役類+C_G(u₀)≤H で固定点 ω'∈Ω_X → 可移性で C_H(X) へ共役。
+   (c) `exists_conj_mem_D_map_le_V`: C_Q(X) の involution u=s^k (Prop 3) → X^k ≤ V。
+   - bundled `IsMultiplyPretransitive` (induced action) は使用点 Ch.I §3 で導出予定。
+   - Basic に汎用 helper: `even_card_of_sq_eq_one_mem` / `exists_sq_eq_one_of_even_card`。
+3. **Lemma (b) `⟨Z⟩◁X` 未 (次、文書順は p.101 = Prop 5 の前)** (InvertedProduct.lean;
+   証明計画は §0 参照: Y normalizes Z → closure map → X=YZ で分解)。
+4. 以降 Ch.I §2 (p.102–: Prop 1 `C_Q(x)=1`/Q nilpotent/H∩I⊆Z(Q), Prop 2, Cor:
+   S abelian or Suzuki 2-group) → §3 (Prop 1 trichotomy, Lemmas)。
    §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
-4. **Lemma (b) `⟨Z⟩◁X` 未** (InvertedProduct.lean, Prop 5 に不要で後回し; §0 参照)。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
