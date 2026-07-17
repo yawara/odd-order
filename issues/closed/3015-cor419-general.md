@@ -52,3 +52,10 @@ sticking point を報告して §6 へ移ってもよい。
 
 - BG mmd L1758-1770、既存 S04g_Thm418 (reduced form, Thm 4.18, core418)
 - survey L338
+
+## ✅ 完了 (2026-07-18) — BG §4 完全完成
+
+`S04g_Cor419.commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal`、sorry-free・
+axiom-clean・AxiomsCheck 登録・full build green (4311 jobs)。O_{p'}(G*)=1 reduction を Ḡ=G/W への
+passing で public API のみで実装 (core418 de-private 不要)。⟹ **BG §4 全 20 numbered 結果 + 特殊化債務
+全完成**。⚠ normal_map_subtype_of_char 7 site 目複製 (9109)。
