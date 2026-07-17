@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Transfer
 import Mathlib.GroupTheory.Abelianization.Finite
+import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.RingTheory.Ideal.Maps
 import OddOrder.Algebra.AugmentationIdeal
 
 /-!
@@ -38,6 +40,8 @@ Theorem 10.24 (range の同型) の仕上げと 10.25/10.26 は後続。
 namespace OddOrder.Algebra
 
 open MonoidAlgebra
+
+open scoped commutatorElement
 
 variable (G : Type*) [Group G] (K : Subgroup G)
 
@@ -784,5 +788,51 @@ theorem finite_quotient_augmentationCoquotientSqImage [Finite G] :
         (abelianizationEquivAugmentationQuotient G).toEquiv.symm)).symm
 
 end CoquotientSq
+
+section CommQuotient
+
+/-! ### `G/K` abelian and `ℤ[G/K]` commutative when `G' ⊆ K` (Isaacs p. 316)
+
+Theorem 10.25 applies Theorem 10.26 over `R = ℤ[G/K]`, which is commutative
+precisely because `G' ⊆ K` makes `G/K` abelian. -/
+
+variable [hK : K.Normal]
+
+/-- `G/K` is abelian when `K` contains the commutator subgroup `G'`
+(Isaacs p. 316).  Provided as a `def` for local `letI` use — a global
+instance would fire speculatively on every normal-subgroup quotient. -/
+@[reducible]
+def quotientCommGroup (h : _root_.commutator G ≤ K) : CommGroup (G ⧸ K) :=
+  { (inferInstance : Group (G ⧸ K)) with
+    mul_comm := by
+      intro a b
+      obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
+      obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective b
+      rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, QuotientGroup.eq]
+      have hmem : ⁅y⁻¹, x⁻¹⁆ ∈ K :=
+        h (Subgroup.commutator_mem_commutator (Subgroup.mem_top _)
+          (Subgroup.mem_top _))
+      have heq : (x * y)⁻¹ * (y * x) = ⁅y⁻¹, x⁻¹⁆ := by
+        rw [commutatorElement_def, inv_inv, inv_inv]; group
+      rwa [heq] }
+
+/-- The augmentation ideal `Δ(G/K)` of `ℤ[G/K]` as a genuine ring ideal
+(Isaacs' `U` in the proof of Theorem 10.25). -/
+noncomputable def augmentationRingIdeal :
+    Ideal (MonoidAlgebra ℤ (G ⧸ K)) :=
+  RingHom.ker (augmentation (G ⧸ K)).toRingHom
+
+theorem mem_augmentationRingIdeal {γ : MonoidAlgebra ℤ (G ⧸ K)} :
+    γ ∈ augmentationRingIdeal G K ↔ augmentation (G ⧸ K) γ = 0 :=
+  RingHom.mem_ker
+
+/-- The augmentation ring ideal `Δ(G/K)` and the `ℤ`-submodule
+`augmentationIdeal (G ⧸ K)` have the same underlying set. -/
+theorem mem_augmentationRingIdeal_iff_mem_augmentationIdeal
+    {γ : MonoidAlgebra ℤ (G ⧸ K)} :
+    γ ∈ augmentationRingIdeal G K ↔ γ ∈ augmentationIdeal (G ⧸ K) := by
+  rw [mem_augmentationRingIdeal, mem_augmentationIdeal_iff]
+
+end CommQuotient
 
 end OddOrder.Algebra
