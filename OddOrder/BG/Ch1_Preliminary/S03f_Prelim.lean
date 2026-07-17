@@ -766,7 +766,7 @@ def conjSubtypeMulAction (A : Subgroup G) (P : Subgroup G → Prop)
     show Subgroup.map _ _ = _
     have h1 : (MulAut.conj ((1 : ↥A) : G)).toMonoidHom = MonoidHom.id G := by
       ext g
-      simp [MulAut.conj_apply]
+      simp
     rw [h1, Subgroup.map_id]
   mul_smul a b X := by
     refine Subtype.ext ?_

@@ -567,7 +567,7 @@ theorem frobenius_induce_char_singleton {Γ : Type*} [Group Γ] [Fintype Γ]
           (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ)
         = (trivialIrreducibleCharacter ↥H : ClassFunction ↥H ℂ) := by
       ext x
-      simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      simp [IrreducibleCharacter.coe_trivialIrreducibleCharacter,
         trivialClassFunction_apply]
     have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
         (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) = 0 := by

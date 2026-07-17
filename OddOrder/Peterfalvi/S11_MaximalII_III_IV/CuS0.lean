@@ -757,7 +757,7 @@ theorem hcuPsiPair_apply_inclusion [Finite G] {M : Subgroup G}
       (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h) = 1 :=
     hcuLambdaHom_eq_one_of_mem_hInHu caseA lam (Subgroup.mem_subgroupOf.mpr h.2)
   simp only [hcuPsiPair, hcuPairHom, linearIrreducibleCharacter_apply, MonoidHom.mul_apply,
-    Units.val_mul, hcuThetaHom_inclusion_hInHu, hlam1, Units.val_one, mul_one, hcuSeedHom,
+    hcuThetaHom_inclusion_hInHu, hlam1, mul_one, hcuSeedHom,
     MonoidHom.comp_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
     linearIrreducibleCharacter_apply]
 
@@ -873,7 +873,7 @@ theorem hcuZetaPair_apply_one [Finite G] {M : Subgroup G}
   rw [ClassFunction.induce_apply_one, index_hcuInHu_eq_caseA_a,
     show (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)
         (1 : ↥(hInHu data ⊔ cuInHu caseA)) = 1 from by
-      simp [hcuPsiPair, linearIrreducibleCharacter_apply_one], mul_one]
+      simp [hcuPsiPair], mul_one]
 
 /-- **`Ind_{HU}^M ζ_{θ₁,λ}(1) = q·a`** (Peterfalvi (9.8.d), full degree): `[M:HU]·ζ(1) = q·a`, from
 `induceHU_apply_one_eq_q_mul` and the source degree `a` (`hcuZetaPair_apply_one`).  This is the
@@ -927,7 +927,7 @@ theorem hcuSeedHom_invariance_of_cuInHu_le_inertia [Finite G] {M : Subgroup G}
   -- evaluate both sides at `h`; the seed-ClassFunction is `hcuSeedHom θ`.
   have hval := congrFun (congrArg (fun f : ClassFunction ↥(hInHu data) ℂ => (f : ↥(hInHu data) → ℂ))
     hconj) h
-  simp only [ClassFunction.conjBy_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+  simp only [ClassFunction.conjBy_apply,
     ClassFunction.compHom_linearIrreducibleCharacter, linearIrreducibleCharacter_apply] at hval
   -- `hval : (θ (mk' N (hInHuEquivH ⟨c·h·c⁻¹⟩)) : ℂ) = (θ (mk' N (hInHuEquivH h)) : ℂ)`.
   refine Units.val_injective ?_

@@ -77,11 +77,11 @@ def bilinToAlt {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
   toFun v := β (v 0) (v 1)
   map_update_add' m i x y := by
     fin_cases i <;>
-      simp only [Function.update, Fin.isValue, dite_eq_ite, map_add, LinearMap.add_apply] <;>
+      simp only [Function.update, Fin.isValue, dite_eq_ite] <;>
       norm_num
   map_update_smul' m i c x := by
     fin_cases i <;>
-      simp only [Function.update, Fin.isValue, dite_eq_ite, map_smul, LinearMap.smul_apply,
+      simp only [Function.update, Fin.isValue, dite_eq_ite,
         smul_eq_mul] <;>
       norm_num
   map_eq_zero_of_eq' v i j hvij hij := by
@@ -188,11 +188,11 @@ private noncomputable def commBihom1 : P →* (P ⧸ commutator P) →* Multipli
   map_one' := by
     ext q
     simp only [MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.lift_mk',
-      QuotientGroup.lift_mk, MonoidHom.one_apply, map_one]
+      MonoidHom.one_apply, map_one]
   map_mul' x x' := by
     ext q
     simp only [MonoidHom.comp_apply, MonoidHom.mul_apply, QuotientGroup.mk'_apply,
-      QuotientGroup.lift_mk', QuotientGroup.lift_mk, map_mul]
+      QuotientGroup.lift_mk', map_mul]
 
 /-- The fully descended commutator pairing `(P/Z) →* (P/Z) →* Multiplicative 𝔽_p`. -/
 private noncomputable def commBihom2 :
@@ -200,8 +200,7 @@ private noncomputable def commBihom2 :
   QuotientGroup.lift (commutator P) (commBihom1 hP)
     (fun x hx => MonoidHom.mem_ker.mpr (by
       ext q
-      simp only [commBihom1, QuotientGroup.lift_mk', MonoidHom.coe_mk, OneHom.coe_mk,
-        MonoidHom.one_apply]
+      simp only [commBihom1, MonoidHom.coe_mk, OneHom.coe_mk]
       exact commBihomP_central_left hP hx q))
 
 /-- The **symplectic commutator form** on `V = P / Z(P)`, valued in `𝔽_p`: the bi-additive

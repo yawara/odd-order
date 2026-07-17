@@ -698,7 +698,6 @@ theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] 
       rw [← h_frattini] at hm_M
       rcases Subgroup.mem_sup_of_normal_right.mp hm_M with ⟨a, ha, b, hb, hab⟩
       have hMb_U : (b : G) ∈ U := by
-        change (b : ↥M).1 ∈ U
         change b ∈ U.subgroupOf M at hb
         exact hb
       have hMa_L : (a : G) ∈ L := by

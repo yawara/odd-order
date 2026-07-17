@@ -510,7 +510,7 @@ theorem caseB_anchoredImage_seam_all_Yset
   -- assemble: the `c = ⟨η₁, y⟩` terms cancel.
   rw [hX, ClassFunction.inner_add_left, hiso, ClassFunction.inner_smul_left, hcYiso]
   simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ η₁, ClassFunction.inner_sub_left,
-    ClassFunction.inner_sub_right, ClassFunction.inner_smul_left, star_natCast, hμy, hμη, hηη]
+    ClassFunction.inner_sub_right, ClassFunction.inner_smul_left, hμy, hμη, hηη]
   ring
 
 /-- **(6.8.2.3) seam for an irreducible `X`-member** — `⟨χ^{τ₂}, η^{τ₁}⟩ = 0` for an irreducible
@@ -977,11 +977,11 @@ theorem inner_eq_of_anchored_varying
   -- the cross terms with `ν`.
   have hτiν : ClassFunction.inner (hyp.tau (χi - ai • η₁)) ν = -(ai : ℂ) := by
     rw [hanci]
-    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, star_natCast]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left]
     rw [hmixi, hνν]; ring
   have hτjν : ClassFunction.inner (hyp.tau (χj - aj • η₁)) ν = -(aj : ℂ) := by
     rw [hancj]
-    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, star_natCast]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left]
     rw [hmixj, hνν]; ring
   have hντj : ClassFunction.inner ν (hyp.tau (χj - aj • η₁)) = -(aj : ℂ) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hτjν, star_neg, star_natCast]

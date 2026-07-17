@@ -213,13 +213,13 @@ theorem xchi_inner_eq_of_anchored
       (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)) ν = -(a₀ : ℂ) := by
     rw [hanc]
     simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ ν, ClassFunction.inner_sub_left,
-      ClassFunction.inner_smul_left, star_natCast]
+      ClassFunction.inner_smul_left]
     rw [hmix, hνν]; ring
   have hτlν : ClassFunction.inner
       (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁)) ν = -(a₀ : ℂ) := by
     rw [hanc']
     simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ ν, ClassFunction.inner_sub_left,
-      ClassFunction.inner_smul_left, star_natCast]
+      ClassFunction.inner_smul_left]
     rw [hmix', hνν]; ring
   have hντl : ClassFunction.inner ν
       (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁)) = -(a₀ : ℂ) := by

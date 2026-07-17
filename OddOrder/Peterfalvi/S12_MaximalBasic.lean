@@ -74,7 +74,7 @@ theorem typeII_noncoherence_arithmetic
   -- The lower bound `(2w₁+1)w₂ = 2·w₁w₂ + w₂ ≤ Mp` contradicts it.
   have hMpcast : 2 * ((w₁ : ℚ) * (w₂ : ℚ)) + (w₂ : ℚ) ≤ (Mp : ℚ) := by
     have : ((2 * w₁ + 1) * w₂ : ℚ) ≤ (Mp : ℚ) := by exact_mod_cast hMp
-    push_cast at this; linarith
+    linarith
   linarith
 
 /-- **Peterfalvi (10.8), structural lower bound** `(2w₁+1)·w₂ ≤ |M'|` (the `hMp` input to the

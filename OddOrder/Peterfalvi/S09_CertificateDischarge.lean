@@ -342,7 +342,6 @@ theorem rank1_eval_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : ℂ)
       (a - 1) - (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i) / e := by
   rw [← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr (Fin.pos_iff_ne_zero.mpr hind)),
     hc_ind1H, ha1_real, hP_ind1H, hN_ind1H, mul_div_assoc, div_self he, mul_one, sub_eq_add_neg]
-  congr 1
   rw [show (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, star (c i) * P i / N i)
         = ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i * (-(1 / e)) from
       Finset.sum_congr rfl fun i hi => by
@@ -365,7 +364,6 @@ theorem rank1_eval_Y_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : �
   rw [← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr (Fin.pos_iff_ne_zero.mpr hind)),
     hc_ind1H, hP_real ind1H, hP_ind1H, hN_ind1H, mul_div_assoc, div_self he, mul_one,
     sub_eq_add_neg]
-  congr 1
   rw [show (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, c i * star (P i) / N i)
         = ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i * (-(1 / e)) from
       Finset.sum_congr rfl fun i hi => by
@@ -454,7 +452,7 @@ theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat
         (fun θ => ClassFunction.induce K θ.toClassFunction),
       χ 1 ^ 2 / ClassFunction.inner χ χ = (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
   have hbot : (⊥ : Subgroup L).subgroupOf K = ⊥ := by
-    ext x; simp [Subgroup.mem_subgroupOf]
+    ext x; simp
   have h := OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq (G := L) (H := K) (A := ⊥)
   have hfilter : (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
       (↑((⊥ : Subgroup L).subgroupOf K) : Set ↥K) ⊆

@@ -434,7 +434,7 @@ theorem sigmaSharp_conj_smul [Finite G] (g : G) (M : Subgroup G) :
   rw [sigmaSharp, sigmaSharp, sharpSubgroup, sharpSubgroup, Set.smul_set_sdiff,
     ← Subgroup.coe_pointwise_smul, ← Msigma_conj_smul]
   congr 1
-  simp [Set.smul_set_singleton, MulAut.smul_def]
+  simp [Set.smul_set_singleton]
 
 /-- **`M̃` is conjugation-equivariant** (mmd L3908): `conj g • M̃(M) = M̃(Mᵍ)`.  Each product
 `x·x'` (`x ∈ M_σ^#`, `x' ∈ R(x)`) conjugates to `(xᵍ)(x'ᵍ)` with `xᵍ ∈ (Mᵍ)_σ^#`

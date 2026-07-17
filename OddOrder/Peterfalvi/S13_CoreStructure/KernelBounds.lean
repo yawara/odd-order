@@ -360,7 +360,7 @@ theorem secondDerived_le_pKernel_sup_derivedU [Finite G]
   rw [commutator_eq_closure] at hc
   induction hc using Subgroup.closure_induction with
   | one =>
-      simpa using Subgroup.one_mem (hyp.pKernel ⊔ derivedInG hyp.base.typeP.U)
+      simp
   | mul y z _ _ hy hz =>
       rw [map_mul]
       exact Subgroup.mul_mem _ hy hz
@@ -672,7 +672,7 @@ theorem secondDerived_le_hKernel_sup_derivedU [Finite G]
   rw [commutator_eq_closure] at hc
   induction hc using Subgroup.closure_induction with
   | one =>
-      simpa using Subgroup.one_mem (hyp.hKernel ⊔ derivedInG hyp.base.typeP.U)
+      simp
   | mul y z _ _ hy hz =>
       rw [map_mul]
       exact Subgroup.mul_mem _ hy hz

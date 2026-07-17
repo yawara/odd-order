@@ -106,7 +106,7 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
         = (trivialIrreducibleCharacter ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) :
             ClassFunction ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) ℂ) := by
       ext x
-      simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      simp [IrreducibleCharacter.coe_trivialIrreducibleCharacter,
         trivialClassFunction_apply]
     have hzero : ClassFunction.inner
         (ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)

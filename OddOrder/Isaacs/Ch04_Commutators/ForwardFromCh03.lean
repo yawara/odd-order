@@ -366,7 +366,6 @@ theorem glauberman_fixed_points_conj
   -- H acts on X by left multiplication.
   letI mulH : MulAction ↥H X := {
     smul := fun h x => ⟨h.val * x.val, by
-      change (h.val * x.val) • α = β
       rw [mul_smul, x.property]
       exact h.property⟩
     one_smul := fun x => Subtype.ext (one_mul _)
@@ -377,7 +376,6 @@ theorem glauberman_fixed_points_conj
   -- A acts on X via φ.
   letI mulA : MulAction A X := {
     smul := fun a x => ⟨(φ a) x.val, by
-      change ((φ a) x.val) • α = β
       have hcompat := h a x.val α
       rw [x.property] at hcompat
       rw [hα a] at hcompat

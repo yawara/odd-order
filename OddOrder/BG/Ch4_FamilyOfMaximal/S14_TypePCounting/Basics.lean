@@ -1331,8 +1331,7 @@ theorem isPiElement_sigma_of_mem_Msigma [Finite G] {M : Subgroup G} {x : G}
     IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x := by
   intro p hp
   have horx : orderOf x = orderOf (⟨x, hx⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma M)) := by
-    simpa using orderOf_injective (OddOrder.BG.Ch3.S10.Msigma M).subtype
-      (OddOrder.BG.Ch3.S10.Msigma M).subtype_injective ⟨x, hx⟩
+    simp
   have hdvd : orderOf x ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
     rw [horx]; exact orderOf_dvd_natCard _
   exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p

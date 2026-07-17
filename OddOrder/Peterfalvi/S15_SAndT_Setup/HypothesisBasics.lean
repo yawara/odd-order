@@ -336,7 +336,7 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
   · -- `hortho`: pairwise orthogonal, restricted to `S₁(d) ⊆ 𝒮`.  The `FiniteInduce`-scoped instances
     -- baked into `sSet_pairwiseOrthogonal`'s `inner` are (subsingleton-)equal to the section ones.
     intro φ ψ hφ hψ hne
-    convert sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) hφ.1 hψ.1 hne using 2 <;>
+    convert sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) hφ.1 hψ.1 hne using 2;
       exact Subsingleton.elim _ _
   · -- `hconjsupp`: the conjugate difference `χ − χ̄` is `A(S)`-supported (`χ̄ ∈ S₁(d)` + equal degree),
     -- extracted as `sSetIrrDeg_member_diff_supported` (with `y = χ̄`).
@@ -407,7 +407,7 @@ noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
   -- `h1A`: `1 ∉ A(S)`.
   have h1A : (1 : ↥hyp.S) ∉ A := by
     rw [hA, OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
-    simpa using honestTypeP2ASet_one_not_mem (M := hyp.S)
+    simp
   -- `hsuppdiff`: for `x, y ∈ S₁(d)`, `(x − y).support ⊆ A(S)` (equal degree ⇒ vanish at `1`);
   -- extracted as `sSetIrrDeg_member_diff_supported` (also the (5.3.a) `hconjsupp` input).
   have hsuppdiff : ∀ x ∈ hyp.sSetIrrDeg hG d, ∀ y ∈ hyp.sSetIrrDeg hG d,
@@ -951,7 +951,7 @@ theorem Hypothesis.mu_colSum_mem_sOf_H0 [Finite G]
         = ClassFunction.induce
             (OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupS hG)) χ := by
       unfold OddOrder.Peterfalvi.S11.induceHU
-      congr! <;> exact Subsingleton.elim _ _
+      congr!
     have h2 : ClassFunction.induce ((derivedInG hyp.S).subgroupOf hyp.S) ψ
         = OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupS hG) χ := by
       rw [h1, hχdef]

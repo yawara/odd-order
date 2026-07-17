@@ -33,7 +33,7 @@ theorem Hypothesis.columnRImage_inner [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     simp only [Hypothesis.columnRImage, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_smul_right, hyp.alignedOmegaSigmaGrid_inner hG hodd,
       hδstar, star_neg, mul_neg, neg_mul, neg_neg, Prod.mk.injEq, reduceCtorEq, false_and,
-      true_and, and_true, eq_self_iff_true, ↓reduceIte]
+      true_and, and_true, ↓reduceIte]
   · -- (false,false): same column `j`, `δ²·[ip=iq] = [ip=iq]`
     rw [← mul_assoc, hδsq, one_mul]
   · -- (false,true): cross column `j ≠ j'`
@@ -445,7 +445,7 @@ theorem Hypothesis.muColumn_tau1_pin [Finite G]
       simp only [hRdef, Hypothesis.columnRImage, ClassFunction.inner_sub_left,
         OddOrder.RepresentationTheory.inner_smul_right, hyp.alignedOmegaSigmaGrid_inner hG hG.odd,
         hδstar, star_neg, Prod.mk.injEq, reduceCtorEq, false_and, true_and, and_true,
-        eq_self_iff_true, ↓reduceIte, mul_one, mul_zero, mul_neg, neg_mul, neg_neg]
+        ↓reduceIte, neg_mul]
     · -- (false, i'): `δ · [i = i'] − δ · [i = i' ∧ 0 = j] = if i' = i then δ else 0`
       rw [if_neg (show ¬(i = i' ∧ (0 : Fin hyp.w2) = j) from fun hh => hj0 hh.2.symm),
         mul_zero, sub_zero]

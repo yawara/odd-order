@@ -493,7 +493,7 @@ private theorem chiefSeriesSubgroupOf_zero (K : Subgroup G) [K.Normal] :
   unfold chiefSeriesSubgroupOf
   rw [chiefSeriesInside_zero]
   ext x
-  simp [Subgroup.mem_subgroupOf]
+  simp
 
 private theorem chiefSeriesSubgroupOf_eq_bot_of_chiefSeriesInside_eq_bot
     {K : Subgroup G} {N : ℕ} (h : chiefSeriesInside K N = ⊥) :
@@ -501,7 +501,7 @@ private theorem chiefSeriesSubgroupOf_eq_bot_of_chiefSeriesInside_eq_bot
   unfold chiefSeriesSubgroupOf
   rw [h]
   ext x
-  simp [Subgroup.mem_subgroupOf, Subgroup.mem_bot]
+  simp [Subgroup.mem_bot]
 
 /-- **Nilpotency engine** for BG §1 Prop. 1.2 reverse direction: if `⁅K, V_i⁆ ≤ V_{i+1}`
 for every step of `chiefSeriesInside K`, then `↥K` is nilpotent. -/

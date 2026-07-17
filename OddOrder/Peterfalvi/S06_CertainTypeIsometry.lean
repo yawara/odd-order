@@ -682,7 +682,7 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
     intro v hv
     rw [hψ, ClassFunction.sub_apply, ClassFunction.zsmul_apply, ClassFunction.sub_apply,
       certainType_diff_dade_apply_eq_of_mem_V h hχ₂ hχ₂' i hdeg hv, zsmul_eq_mul]
-    push_cast; ring
+    ring
   -- additive separability of `a` (3.7)
   have hadd : ∀ p p' q q', a (p, q) + a (p', q') = a (p, q') + a (p', q) :=
     fun p p' q q' => (ticVdiff h).sigmaCoeff_add_eq rfl (ticVdiffFullDadeApplication h) hψV p p' q q'

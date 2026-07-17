@@ -352,7 +352,7 @@ theorem caseB_order_u_of_analytic_inequality [Finite G]
         (hyp.p : ℚ) ^ hyp.q - 1 := by
     have h := congrArg (Nat.cast (R := ℚ)) hquotient_mul
     push_cast [Nat.cast_sub hp1, Nat.cast_sub hpq1] at h
-    convert h using 1 <;> ring
+    convert h using 1
   have huxQ : (hyp.u : ℚ) * (x : ℚ) =
       (((hyp.p ^ hyp.q - 1) / (hyp.p - 1) : ℕ) : ℚ) := by
     exact_mod_cast hux
