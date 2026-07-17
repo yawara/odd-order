@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
+import OddOrder.GroupTheory.RepresentationTheory.FongSwan
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
@@ -4376,6 +4377,14 @@ set_option linter.style.longLine false in
 -- the divisibility `dim V ≡ ±1 (mod h)` and the `C_V(H)` dichotomy.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_modEq_of_extraspecial
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_eq_sub_one_of_extraspecial
+
+-- BG Lemma 2.3 (Fong–Swan): for a finite solvable group `G` and an absolutely irreducible
+-- `FG`-module `V` over any field `F`, `dim_F V ∣ |G|`.  Proved by the elementary BG Clifford
+-- induction (not Brauer lifting): alg-closed core `finrank_dvd_card_of_isAlgClosed_of_irreducible`
+-- (strong induction on `|G|`, prime-index `H ◁ G`, char-free Clifford, case (i)/(ii) split) plus
+-- base change to `AlgebraicClosure F`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
 
 -- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
 -- representation over an algebraically closed field has cyclic centre `Z(G)`.
