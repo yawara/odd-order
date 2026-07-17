@@ -19,6 +19,9 @@ created: 2026-07-17
 Isaacs Ch.9 (§9A, Lemma 9.6 の Fitting/center 押し出し) でも同じ補題が必要になった
 (3 消費者目)。BG leaf は Isaacs より下流なので Isaacs 側から import できない。
 
+**2026-07-18 追記**: BG Lem 1.21(d) の `PLengthPComplement.lean` (private `normal_map_subtype_of_char`)
+で **5 site 目の複製**が発生 (Ch3 が下流ゆえ import 不可)。consolidation 時にこの site も切替対象。
+
 ## ⚠ 2026-07-17 判明: 同名 public 化は build を壊す (naive 追加不可)
 
 `OddOrder.GroupTheory.normal_map_subtype_of_characteristic` を
