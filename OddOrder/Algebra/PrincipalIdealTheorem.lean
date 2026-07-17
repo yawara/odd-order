@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Transfer
 import OddOrder.Algebra.AugmentationIdeal
 
 /-!
@@ -18,8 +19,18 @@ Theorem 10.24 に向けた基盤。`K ⊴ G` のとき `Δ(K)Δ(G)` は `ℤ[G]`
 * `AugmentationCoquotient G K` — `Δ(G)‾ = Δ(G)/Δ(K)Δ(G)`。
 * `augmentationCoquotientMulLeft` — 左乗法 `ξ_x : Δ(G)‾ → Δ(G)‾` の降下
   (Theorem 10.24 の `Ξ` は `x = ∑_{t ∈ T} t` の場合)。
+* `transversalInvSum` — `σ = ∑_{t ∈ T} t` (右 transversal `T = S⁻¹` の和)。
+* `transferXi` — Isaacs の `Ξ = σ·(-) : Δ(G)‾ → Δ(G)‾`。
+* `transferXi_mk_sub_one` — **Theorem 10.24 の核心恒等式**
+  `Ξ((g-1)‾) = ι(θ(v(g)))` (`θ` = Corollary 10.23 の同型 `K/K' ≅ Δ(K)‾`、
+  `v` = transfer)。
 
-Theorem 10.24 (transfer との同型) 本体と 10.25/10.26 は後続。
+右 transversal を左 transversal `S` の逆元集合 `S⁻¹` に取ると、
+`σ(g-1) ≡ ∑_q (k_q - 1) mod Δ(K)Δ(G)` の因子
+`k_q = (S q)⁻¹ · g · S(g⁻¹ • q)` が mathlib の transfer
+(`Subgroup.leftTransversals.diff`) の因子と一致し、規約の橋渡しが不要になる。
+
+Theorem 10.24 (range の同型) の仕上げと 10.25/10.26 は後続。
 -/
 
 namespace OddOrder.Algebra
@@ -186,5 +197,171 @@ theorem augmentationCoquotientInclusion_injective :
   exact h
 
 end Coquotient
+
+section TransferBridge
+
+/-! ### Isaacs Theorem 10.24 (pp. 313-314): 核心恒等式 `Ξ((g-1)‾) = ι(θ(v(g)))` -/
+
+/-- Each transfer factor `(S q)⁻¹ · g · S(g⁻¹ • q)` (the `diff` factor of
+mathlib's `MonoidHom.transfer`) lies in `K`. -/
+theorem transferFactor_mem (S : K.LeftTransversal) (g : G) (q : G ⧸ K) :
+    (S.2.leftQuotientEquiv q : G)⁻¹
+      * (g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G)) ∈ K := by
+  have h : g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G)
+      = ((g • S).2.leftQuotientEquiv q : G) := by
+    rw [Subgroup.smul_apply_eq_smul_apply_inv_smul, smul_eq_mul]
+  rw [h]
+  exact QuotientGroup.leftRel_apply.mp (Quotient.exact'
+    ((S.2.quotientGroupMk_leftQuotientEquiv q).trans
+      ((g • S).2.quotientGroupMk_leftQuotientEquiv q).symm))
+
+variable [K.FiniteIndex]
+
+/-- The sum `σ ∈ ℤ[G]` of the inverses of a left transversal `S` for `K` in
+`G` — equivalently, the sum of the elements of the right transversal `S⁻¹`
+(Isaacs p. 313, `σ = ∑_{t ∈ T} t`). -/
+noncomputable def transversalInvSum (S : K.LeftTransversal) :
+    MonoidAlgebra ℤ G :=
+  letI := K.fintypeQuotientOfFiniteIndex
+  ∑ q : G ⧸ K, MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv q : G)⁻¹
+
+/-- `∑_q (k_q - 1) ∈ ℤ[G]` where `k_q = (S q)⁻¹ · g · S(g⁻¹ • q) ∈ K` are the
+transfer factors of `g` — the additive avatar of the pretransfer
+`V(g) = ∏_q k_q` (Isaacs p. 314). -/
+noncomputable def transferFactorSum (S : K.LeftTransversal) (g : G) :
+    MonoidAlgebra ℤ G :=
+  letI := K.fintypeQuotientOfFiniteIndex
+  ∑ q : G ⧸ K,
+    (MonoidAlgebra.of ℤ G
+        ((S.2.leftQuotientEquiv q : G)⁻¹
+          * (g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G))) - 1)
+
+theorem transferFactorSum_mem (S : K.LeftTransversal) (g : G) :
+    transferFactorSum G K S g ∈ augmentationIdealOf G K := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  exact Submodule.sum_mem _ fun q _ =>
+    sub_one_mem_augmentationIdealOf G K (transferFactor_mem G K S g q)
+
+/-- **Isaacs p. 314** (core computation in the proof of Theorem 10.24):
+`σ(g - 1) ≡ ∑_q (k_q - 1) mod Δ(K)Δ(G)`. -/
+theorem transversalInvSum_mul_sub_one_sub_mem (S : K.LeftTransversal)
+    (g : G) :
+    transversalInvSum G K S * (MonoidAlgebra.of ℤ G g - 1)
+        - transferFactorSum G K S g
+      ∈ augmentationIdealOf G K * augmentationIdeal G := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  have key : transversalInvSum G K S * (MonoidAlgebra.of ℤ G g - 1)
+      - transferFactorSum G K S g
+      = ∑ q : G ⧸ K,
+          (MonoidAlgebra.of ℤ G
+              ((S.2.leftQuotientEquiv q : G)⁻¹
+                * (g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G))) - 1)
+            * (MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv (g⁻¹ • q) : G)⁻¹
+                - 1) := by
+    have hreindex : (∑ q : G ⧸ K,
+          MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv q : G)⁻¹)
+        = ∑ q : G ⧸ K,
+            MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv (g⁻¹ • q) : G)⁻¹ :=
+      (Equiv.sum_comp (MulAction.toPerm g).symm fun p =>
+        MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv p : G)⁻¹).symm
+    rw [transversalInvSum, transferFactorSum, Finset.sum_mul]
+    rw [show (∑ q : G ⧸ K,
+          MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv q : G)⁻¹
+            * (MonoidAlgebra.of ℤ G g - 1))
+        = ∑ q : G ⧸ K,
+            (MonoidAlgebra.of ℤ G ((S.2.leftQuotientEquiv q : G)⁻¹ * g)
+              - MonoidAlgebra.of ℤ G (S.2.leftQuotientEquiv q : G)⁻¹) from
+      Finset.sum_congr rfl fun q _ => by rw [mul_sub, mul_one, ← map_mul]]
+    rw [Finset.sum_sub_distrib, hreindex, ← Finset.sum_sub_distrib,
+      ← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl fun q _ => ?_
+    have hgrp : ((S.2.leftQuotientEquiv q : G)⁻¹
+          * (g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G)))
+          * (S.2.leftQuotientEquiv (g⁻¹ • q) : G)⁻¹
+        = (S.2.leftQuotientEquiv q : G)⁻¹ * g := by
+      rw [mul_assoc, mul_inv_cancel_right]
+    rw [mul_sub, sub_mul, one_mul, mul_one, ← map_mul, hgrp]
+  rw [key]
+  exact Submodule.sum_mem _ fun q _ =>
+    Submodule.mul_mem_mul
+      (sub_one_mem_augmentationIdealOf G K (transferFactor_mem G K S g q))
+      (sub_one_mem_augmentationIdeal G _)
+
+/-- **Isaacs p. 314** (proof of Theorem 10.24): under the isomorphism
+`K/K' ≅ Δ(K)‾` of Corollary 10.23, the transfer `v(g)` corresponds to the
+class of `∑_q (k_q - 1)` (multiplicativity of `k ↦ (k-1)‾` turns the
+pretransfer product `V(g) = ∏ k_q` into this sum). -/
+theorem abelianizationEquiv_transfer (S : K.LeftTransversal) (g : G) :
+    abelianizationEquivAugmentationQuotientOf G K
+        (MonoidHom.transfer (Abelianization.of : K →* Abelianization K) g)
+      = Multiplicative.ofAdd (Submodule.Quotient.mk
+          ⟨transferFactorSum G K S g, transferFactorSum_mem G K S g⟩) := by
+  letI := K.fintypeQuotientOfFiniteIndex
+  have hprod : MonoidHom.transfer
+        (Abelianization.of : K →* Abelianization K) g
+      = ∏ q : G ⧸ K, Abelianization.of
+          (⟨(S.2.leftQuotientEquiv q : G)⁻¹
+              * (g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G)),
+            transferFactor_mem G K S g q⟩ : K) := by
+    rw [MonoidHom.transfer_def _ S g]
+    simp only [Subgroup.leftTransversals.diff]
+    refine Finset.prod_congr rfl fun q _ => congrArg _ ?_
+    simp only [Subtype.mk.injEq]
+    rw [Subgroup.smul_apply_eq_smul_apply_inv_smul, smul_eq_mul]
+  rw [hprod, map_prod]
+  simp only [abelianizationEquivAugmentationQuotientOf_of]
+  rw [← ofAdd_sum]
+  congr 1
+  have hmk : (∑ q : G ⧸ K, (Submodule.Quotient.mk
+        ⟨MonoidAlgebra.of ℤ G
+            ((S.2.leftQuotientEquiv q : G)⁻¹
+              * (g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G))) - 1,
+          sub_one_mem_augmentationIdealOf G K (transferFactor_mem G K S g q)⟩
+        : AugmentationQuotientOf G K))
+      = Submodule.Quotient.mk (∑ q : G ⧸ K,
+          (⟨MonoidAlgebra.of ℤ G
+              ((S.2.leftQuotientEquiv q : G)⁻¹
+                * (g * (S.2.leftQuotientEquiv (g⁻¹ • q) : G))) - 1,
+            sub_one_mem_augmentationIdealOf G K (transferFactor_mem G K S g q)⟩
+            : ↥(augmentationIdealOf G K))) := by
+    simp only [← Submodule.mkQ_apply, map_sum]
+  rw [hmk]
+  congr 1
+  refine Subtype.ext ?_
+  rw [AddSubmonoidClass.coe_finsetSum]
+  exact Finset.sum_congr rfl fun q _ => rfl
+
+/-- Isaacs' `Ξ : Δ(G)‾ → Δ(G)‾` (p. 313) — the descent of left
+multiplication by the transversal sum `σ` (Theorem 10.24 の `Ξ`). -/
+noncomputable def transferXi (hK : K.Normal) (S : K.LeftTransversal) :
+    AugmentationCoquotient G K →ₗ[ℤ] AugmentationCoquotient G K :=
+  augmentationCoquotientMulLeft G K hK (transversalInvSum G K S)
+
+/-- **Isaacs Theorem 10.24** (p. 314), core identity: `Ξ((g-1)‾) = ι(θ(v(g)))`
+where `θ : K/K' ≅ Δ(K)‾` is the isomorphism of Corollary 10.23, `ι` the
+inclusion `Δ(K)‾ → Δ(G)‾`, and `v` the transfer `G → K/K'`. The isomorphism
+`v(G) ≅ Ξ(Δ(G)‾)` follows since `ι ∘ θ` is injective. -/
+theorem transferXi_mk_sub_one (hK : K.Normal) (S : K.LeftTransversal)
+    (g : G) :
+    transferXi G K hK S (Submodule.Quotient.mk
+        ⟨MonoidAlgebra.of ℤ G g - 1, sub_one_mem_augmentationIdeal G g⟩)
+      = augmentationCoquotientInclusion G K
+          (abelianizationEquivAugmentationQuotientOf G K
+              (MonoidHom.transfer
+                (Abelianization.of : K →* Abelianization K) g)).toAdd := by
+  rw [abelianizationEquiv_transfer G K S g, toAdd_ofAdd, transferXi,
+    augmentationCoquotientMulLeft_mk, augmentationCoquotientInclusion_mk,
+    Submodule.Quotient.eq, mem_augmentationCorel]
+  have hcoe : ((augmentationIdealMulLeft' G (transversalInvSum G K S)
+          ⟨MonoidAlgebra.of ℤ G g - 1, sub_one_mem_augmentationIdeal G g⟩
+        - Submodule.inclusion (augmentationIdealOf_le G K)
+            ⟨transferFactorSum G K S g, transferFactorSum_mem G K S g⟩ :
+        ↥(augmentationIdeal G)) : MonoidAlgebra ℤ G)
+      = transversalInvSum G K S * (MonoidAlgebra.of ℤ G g - 1)
+        - transferFactorSum G K S g := rfl
+  rw [hcoe]
+  exact transversalInvSum_mul_sub_one_sub_mem G K S g
+
+end TransferBridge
 
 end OddOrder.Algebra
