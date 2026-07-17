@@ -313,7 +313,8 @@ theorem typeP_family_T_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hgN : g ∈ N := by
     by_contra hgnot
     have hbot := hdfirst g hgnot
-    have hmem : g * y * g⁻¹ ∈ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ⊓ (MulAut.conj g • N) := by
+    have hmem : g * y * g⁻¹ ∈ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ⊓ (MulAut.conj g • N) :=
+        by
       refine Subgroup.mem_inf.mpr ⟨hygKstar, ?_⟩
       have hyN : y ∈ N := (inf_le_right.trans (OddOrder.BG.Ch3.S10.Msigma_le N)) hyKstar
       rw [show (MulAut.conj g • N : Subgroup G) = N.map (MulAut.conj g).toMonoidHom from rfl,
@@ -618,7 +619,8 @@ theorem conjClassSet_T_Mtilde_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSim
     rw [← Mtilde_conj_smul, heq]; exact Set.smul_mem_smul_set hsM
   obtain ⟨x, x'', htxx, hlenx, hx''R⟩ := mem_Mtilde_imp_form hG D
     (mem_maximalSubgroups_of_isConjugateSubgroup hMi ⟨g₁⁻¹ * g₂, rfl⟩) htM
-  exact not_type1_of_type2 hG D hNmax hy hgyy' hcomm hy'1 hy'N hy'C hy'κ ⟨x, x'', htxx, hlenx, hx''R⟩
+  exact not_type1_of_type2 hG D hNmax hy hgyy' hcomm hy'1 hy'N hy'C hy'κ ⟨x, x'', htxx, hlenx,
+      hx''R⟩
 
 /-- **BG 14.7, type-`P₁` Hall complement card** (mmd L4039, "`Kᵢ` complements `M_{iσ}` in `M_i`"):
 for a type-`P₁` maximal subgroup `N` with a Hall `κ(N)`-subgroup `K_N ≤ N`, the order factors as
@@ -932,7 +934,8 @@ theorem exists_typeP2_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   push Not at hcon
   have hallP1 : ∀ N ∈ ZFamilyFinset M K, IsTypeP1 N := fun N hN =>
     (isTypeP_iff_isTypeP1_or_isTypeP2.mp
-      (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN)).2.1).resolve_right
+      (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp
+          hN)).2.1).resolve_right
       (hcon N hN)
   -- lemma instances (explicit `T`), then fold `T`
   have hT_count := typeP_family_conjClass_T_count hG hM hP hKM hK hKstar hU

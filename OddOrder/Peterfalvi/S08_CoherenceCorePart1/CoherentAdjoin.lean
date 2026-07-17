@@ -633,8 +633,10 @@ noncomputable def xAdjoinStep
         (hmemdiffsupp i hi) hrealχ hdiffsuppχ (hmemχ i hi) (hmemχbar i hi) (hmembarχ i hi)
         (hmembarχbar i hi)
   -- (5.2.e) `⟨Da.X, ν χᵢ⟩ = 0` per member.
-  have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) = 0 :=
-    fun i hi => inner_decomposition_X_extension_member_eq_zero hS₁ Da (Dmem i hi) (hortho_mem i hi) rfl
+  have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
+      0 :=
+    fun i hi => inner_decomposition_X_extension_member_eq_zero hS₁ Da (Dmem i hi) (hortho_mem i hi)
+        rfl
   -- (5.6.1) cross-term `hfound` per member (`inner_dade_extension_of_supported`).
   have hfound : ∀ i ∈ s, ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)

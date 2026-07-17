@@ -64,7 +64,8 @@ theorem iSup_weightSpace_eq_top [Finite G] [FiniteDimensional F W] [IsAlgClosed 
   -- STEP 2: for semisimple operators, `maxGenEigenspace = eigenspace`.
   have hmax : ∀ (k : ↥K) (μ : F), (f k).maxGenEigenspace μ = (f k).eigenspace μ := by
     intro k μ
-    exact (Module.End.isFinitelySemisimple_iff_isSemisimple.mpr (hss k)).maxGenEigenspace_eq_eigenspace μ
+    exact (Module.End.isFinitelySemisimple_iff_isSemisimple.mpr (hss
+        k)).maxGenEigenspace_eq_eigenspace μ
   -- STEP 3: max generalized eigenspaces of each `f k` span (algebraically closed).
   have hspan : ∀ k : ↥K, (⨆ μ : F, (f k).maxGenEigenspace μ) = ⊤ :=
     fun k => Module.End.iSup_maxGenEigenspace_eq_top (f k)
@@ -75,7 +76,8 @@ theorem iSup_weightSpace_eq_top [Finite G] [FiniteDimensional F W] [IsAlgClosed 
     rw [hf]
     simp only
     rw [← map_mul, ← map_mul, hcomm i j]
-  have hkey := Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
+  have hkey :=
+      Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
     f hcommute hspan
   -- STEP 5: rewrite `maxGenEigenspace → eigenspace` to recover the weight spaces.
   rw [← hkey]

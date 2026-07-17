@@ -731,7 +731,8 @@ theorem ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast (hyp : TICyclicHypothe
     _ ≤ ∑ a ∈ c.support, 1 := by
         refine Finset.sum_le_sum (fun a ha => ?_)
         have haZ : a ∈ ZIrr G :=
-          IrreducibleCharacter.mem_ZIrr (⟨a, hsupp (Finset.mem_coe.mpr ha)⟩ : IrreducibleCharacter G)
+          IrreducibleCharacter.mem_ZIrr (⟨a, hsupp (Finset.mem_coe.mpr ha)⟩ : IrreducibleCharacter
+              G)
         have ha1 : ClassFunction.inner a a = 1 := by
           have := irreducibleCharacter_inner_eq_ite
             (⟨a, hsupp (Finset.mem_coe.mpr ha)⟩ : IrreducibleCharacter G)

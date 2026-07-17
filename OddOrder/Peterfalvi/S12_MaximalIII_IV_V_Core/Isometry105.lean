@@ -610,8 +610,10 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_sub_conj [Finite G]
   -- `(α_{ij}, ζ̄) = 0`: `μ_{ij}, μ_{i0}` degree-distinct from `ζ̄`, and `(ζ, ζ̄) = 0`.
   have hαζc : ClassFunction.inner
       (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ζ.conj = 0 := by
-    have a1 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hconjirr (by rw [hconj1]; exact hdζ)
-    have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr (by rw [hconj1]; exact h0ζ)
+    have a1 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hconjirr (by rw [hconj1]; exact
+        hdζ)
+    have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr (by rw [hconj1]; exact
+        h0ζ)
     have a3 : ClassFunction.inner ζ ζ.conj = 0 := by
       rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
@@ -765,7 +767,8 @@ theorem Hypothesis.inducedFamily_sub_support [Finite G] {M : Subgroup G} (hyp : 
   obtain ⟨θ₁, _hθ₁ne, hζ₁eq⟩ := hζ₁
   obtain ⟨θ₂, _hθ₂ne, hζ₂eq⟩ := hζ₂
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
-    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
+        M.subtype_injective]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζ₁vanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ₁ w = 0 := fun {w} hw => by
     rw [hζ₁eq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
@@ -858,7 +861,8 @@ theorem Hypothesis.muColumn_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMini
   classical
   obtain ⟨θ, _hθne, hζeq⟩ := hζS
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
-    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
+        M.subtype_injective]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
@@ -915,7 +919,8 @@ theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.I
   classical
   obtain ⟨θ, _hθne, hζeq⟩ := hζS
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
-    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
+        M.subtype_injective]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
@@ -1121,10 +1126,12 @@ theorem cauchySchwarz_numeric {d n w₁ : ℕ} {δ a : ℤ}
   have hdR : (d : ℝ) = (n : ℝ) * (w₁ : ℝ) + (δ : ℝ) := by exact_mod_cast hd
   have hw1R : (3 : ℝ) ≤ (w₁ : ℝ) := by exact_mod_cast hw1
   have hn2R : (2 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn2
-  have hδR : (δ : ℝ) = 1 ∨ (δ : ℝ) = -1 := by rcases hδ with h | h <;> [left; right] <;> exact_mod_cast h
+  have hδR : (δ : ℝ) = 1 ∨ (δ : ℝ) = -1 := by rcases hδ with h | h <;> [left; right] <;>
+      exact_mod_cast h
   rw [hdR] at hd2
   rcases hδR with hδ1 | hδ1 <;> rw [hδ1] at hd2 <;>
-    nlinarith [hd2, hw1R, hn2R, mul_nonneg (by linarith : (0:ℝ) ≤ (w₁:ℝ) - 3) (by linarith : (0:ℝ) ≤ (n:ℝ) - 2),
+    nlinarith [hd2, hw1R, hn2R, mul_nonneg (by linarith : (0:ℝ) ≤ (w₁:ℝ) - 3) (by linarith : (0:ℝ) ≤
+        (n:ℝ) - 2),
       mul_nonneg (by linarith : (0:ℝ) ≤ (n:ℝ) - 2) (by linarith : (0:ℝ) ≤ (n:ℝ) - 2),
       mul_nonneg (by linarith : (0:ℝ) ≤ (w₁:ℝ) - 3) (by linarith : (0:ℝ) ≤ (w₁:ℝ) - 3)]
 

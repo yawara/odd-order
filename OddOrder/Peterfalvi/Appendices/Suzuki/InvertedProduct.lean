@@ -167,6 +167,26 @@ lemma yRoot_mem [Finite M] (ht : t * t = 1) (hodd : Odd (Nat.card X))
   change (x * (sqrtRoot X t x)⁻¹) * t = t * (x * (sqrtRoot X t x)⁻¹)
   rw [e, e2, h]
 
+/-- `Y` normalizes `Z`: for `y ∈ Y = C_X(t)` and `z ∈ Z`, `yzy⁻¹ ∈ Z`
+(since `t` centralizes `y`, `t(yzy⁻¹)t = (tyt)(tzt)(ty⁻¹t) = yz⁻¹y⁻¹`). -/
+lemma conj_mem_of_mem_centralizer (ht : t * t = 1) {y z : M}
+    (hy : y ∈ X ⊓ Subgroup.centralizer ({t} : Set M))
+    (hz : z ∈ invertedBy X t) : y * z * y⁻¹ ∈ invertedBy X t := by
+  obtain ⟨hyX, hyc⟩ := Subgroup.mem_inf.mp hy
+  have hyt : Commute y t := Subgroup.mem_centralizer_singleton_iff.mp hyc
+  refine ⟨mul_mem (mul_mem hyX hz.1) (X.inv_mem hyX), ?_⟩
+  have htyt : t * y * t = y := by
+    rw [hyt.symm.eq, mul_assoc, ht, mul_one]
+  have htyit : t * y⁻¹ * t = y⁻¹ := by
+    rw [hyt.symm.inv_right.eq, mul_assoc, ht, mul_one]
+  have hdecomp : t * (y * z * y⁻¹) * t =
+      (t * y * t) * (t * z * t) * (t * y⁻¹ * t) := by
+    have h : (t * y * t) * (t * z * t) * (t * y⁻¹ * t) =
+        t * y * (t * t) * z * (t * t) * y⁻¹ * t := by group
+    rw [h, ht]; group
+  rw [hdecomp, htyt, hz.2, htyit]
+  group
+
 /-- For `y ∈ Y`, `z ∈ Z`, the element `w(yz) = t (yz)⁻¹ t (yz)` equals `z²`. -/
 lemma w_of_prod (ht : t * t = 1) {y z : M}
     (hy : y ∈ X ⊓ Subgroup.centralizer ({t} : Set M)) (hz : z ∈ invertedBy X t) :
@@ -228,5 +248,55 @@ theorem card_eq_card_centralizer_mul_ncard_invertedBy {M : Type*} [Group M]
       (invertedBy X t).ncard := by
   rw [← Nat.card_coe_set_eq, ← Nat.card_prod,
     Nat.card_congr (invertedProdEquiv ht hodd hnorm)]
+
+/-- `⟨Z⟩ ≤ X`. -/
+lemma closure_invertedBy_le {M : Type*} [Group M] {t : M} {X : Subgroup M} :
+    Subgroup.closure (invertedBy X t) ≤ X :=
+  (Subgroup.closure_le X).mpr fun _ hz => hz.1
+
+open invertedBy in
+/-- **Peterfalvi Part II, Ch. I §1, the Lemma (b)** (p. 101), elementwise —
+`X` normalizes `⟨Z⟩`.  `Y` normalizes `Z` (hence `⟨Z⟩`), elements of `Z`
+normalize `⟨Z⟩` as members, and `X = YZ` by the Lemma (a). -/
+theorem conj_mem_closure_invertedBy {M : Type*} [Group M] [Finite M] {t : M}
+    {X : Subgroup M} (ht : t * t = 1) (hodd : Odd (Nat.card X))
+    (hnorm : ∀ x ∈ X, t * x * t ∈ X) {x w : M} (hx : x ∈ X)
+    (hw : w ∈ Subgroup.closure (invertedBy X t)) :
+    x * w * x⁻¹ ∈ Subgroup.closure (invertedBy X t) := by
+  -- decompose `x = y * z` with `y ∈ Y`, `z ∈ Z` (Lemma (a))
+  obtain ⟨⟨⟨y, hy⟩, ⟨z, hz⟩⟩, hxyz⟩ :=
+    (invertedProdEquiv ht hodd hnorm).surjective ⟨x, hx⟩
+  have hxeq : y * z = x := congrArg Subtype.val hxyz
+  have hzc : z ∈ Subgroup.closure (invertedBy X t) := Subgroup.subset_closure hz
+  -- conjugation by `y` preserves `⟨Z⟩`
+  have hyconj : ∀ v ∈ Subgroup.closure (invertedBy X t),
+      y * v * y⁻¹ ∈ Subgroup.closure (invertedBy X t) := by
+    have himg : (MulAut.conj y).toMonoidHom '' invertedBy X t ⊆
+        invertedBy X t := by
+      rintro - ⟨z', hz', rfl⟩
+      exact conj_mem_of_mem_centralizer ht hy hz'
+    have hmap : (Subgroup.closure (invertedBy X t)).map
+        (MulAut.conj y).toMonoidHom ≤ Subgroup.closure (invertedBy X t) := by
+      rw [MonoidHom.map_closure]
+      exact Subgroup.closure_mono himg
+    intro v hv
+    exact hmap ⟨v, hv, rfl⟩
+  -- `x w x⁻¹ = y (z w z⁻¹) y⁻¹`
+  have hzw : z * w * z⁻¹ ∈ Subgroup.closure (invertedBy X t) :=
+    mul_mem (mul_mem hzc hw) (inv_mem hzc)
+  have hfinal := hyconj _ hzw
+  have heq : y * (z * w * z⁻¹) * y⁻¹ = x * w * x⁻¹ := by rw [← hxeq]; group
+  rwa [heq] at hfinal
+
+/-- **Peterfalvi Part II, Ch. I §1, the Lemma (b)** (p. 101) — `⟨Z⟩ ◁ X`,
+as normality of `⟨Z⟩` viewed inside `X`. -/
+theorem closure_invertedBy_subgroupOf_normal {M : Type*} [Group M] [Finite M]
+    {t : M} {X : Subgroup M} (ht : t * t = 1) (hodd : Odd (Nat.card X))
+    (hnorm : ∀ x ∈ X, t * x * t ∈ X) :
+    ((Subgroup.closure (invertedBy X t)).subgroupOf X).Normal := by
+  constructor
+  intro n hn g
+  rw [Subgroup.mem_subgroupOf] at hn ⊢
+  exact conj_mem_closure_invertedBy ht hodd hnorm g.2 hn
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

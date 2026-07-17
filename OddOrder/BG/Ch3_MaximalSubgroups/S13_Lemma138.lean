@@ -538,7 +538,8 @@ theorem exists_prime_betastar_dvd_or [Finite G] (hG : IsMinimalSimpleOdd G)
   have hYMstarθ : Subgroup.IsPiSubgroup (S10.beta M ∪ S10.beta Mstar)
       (S10.Malpha Mstar ⊓ Subgroup.centralizer (P : Set G)) :=
     fun p hp => Set.mem_union_right _ (hYMstarβ p hp)
-  have hCMαP_le : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤ Subgroup.centralizer (P:Set G) :=
+  have hCMαP_le : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤ Subgroup.centralizer (P:Set
+      G) :=
     inf_le_right
   have hCMstarαP_le :
       S10.Malpha Mstar ⊓ Subgroup.centralizer (P : Set G) ≤ Subgroup.centralizer (P:Set G) :=
@@ -1382,7 +1383,8 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
       hNQ
   have hPMstar : P ≤ Mstar ⊓ M := by rw [inf_comm]; exact hPM
   have hQstarle' : Qstar ≤ Mstar ⊓ M := by rw [inf_comm]; exact hQstarle
-  have hQstarmax' : ∀ T : Subgroup G, T ≤ Mstar ⊓ M → IsPGroup qstar ↥T → Qstar ≤ T → Qstar = T := by
+  have hQstarmax' : ∀ T : Subgroup G, T ≤ Mstar ⊓ M → IsPGroup qstar ↥T → Qstar ≤ T → Qstar = T :=
+      by
     intro T hT hTq hQT; rw [inf_comm] at hT; exact hQstarmax T hT hTq hQT
   obtain ⟨hqpstar, _, hαβstar, _, hqαstar, hCMstarαP, hCMstarαPQ⟩ :=
     forbidden_config_step1 hG hMstar hM (Ne.symm hMMstar) hpstar hP hPMstar hQstarle' hQstarq
@@ -1431,7 +1433,8 @@ theorem factorization_M_eq_G_of_mem_sigma [Finite G] {M : Subgroup G} {q : ℕ} 
   obtain ⟨SG, hSG⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ P
   have e1 : Nat.card ↥(SG : Subgroup G) = q ^ (Nat.card ↥M).factorization q := by
     rw [hSG, Subgroup.card_map_of_injective M.subtype_injective]; exact P.card_eq_multiplicity
-  have e2 : Nat.card ↥(SG : Subgroup G) = q ^ (Nat.card G).factorization q := SG.card_eq_multiplicity
+  have e2 : Nat.card ↥(SG : Subgroup G) = q ^ (Nat.card G).factorization q :=
+      SG.card_eq_multiplicity
   exact Nat.pow_right_injective (Fact.out : q.Prime).two_le (e1.symm.trans e2)
 
 /-- **σ-Sylow uniqueness for `M_σ`-Sylows** (Prop 10.14-flavoured): `q ∈ σ(M)`, `S ≤ M_σ` with

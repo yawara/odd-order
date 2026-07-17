@@ -461,7 +461,8 @@ theorem exists_invariant_cyclic_sameExponent_regular [Finite G] (hG : IsMinimalS
     (dvd_trans (hA.2 ▸ dvd_pow_self p (two_ne_zero)) (Subgroup.card_subgroup_dvd_card A))
   have hSp : IsPGroup p ↥(S : Subgroup G) := S.isPGroup'
   have hrank : pRank ↥(S : Subgroup G) p ≤ 2 :=
-    (pRank_le_of_injective (Subgroup.inclusion_injective hSM)).trans (le_of_eq (tau2_pRank_eq_two hp))
+    (pRank_le_of_injective (Subgroup.inclusion_injective hSM)).trans (le_of_eq (tau2_pRank_eq_two
+        hp))
   -- decomposition `S = S₀ × S₁`, `S₀ = C_S(X)`, `S₁ = [S, X]`.
   obtain ⟨hdisj, hsup⟩ :=
     OddOrder.Isaacs.Ch05.fitting_coprime_abelian_decomp (P := (S : Subgroup G)) (K := X) hXN hcop
@@ -481,7 +482,8 @@ theorem exists_invariant_cyclic_sameExponent_regular [Finite G] (hG : IsMinimalS
       (by rw [inf_comm]; exact hdisj) hS₀ne
   -- both factors `N_G(S)`-invariant (Lemma 12.8(f)).
   obtain ⟨h128f0, h128f1⟩ := relative_normality_of_abelianSylow hG h hp hA hAE hAS hSab X hXN
-  have hS₀inv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ Subgroup.normalizer (S₀ : Set G) := by
+  have hS₀inv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ Subgroup.normalizer (S₀ : Set G) :=
+      by
     rw [hS₀def, inf_comm]; exact h128f0
   have hS₁inv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ Subgroup.normalizer (S₁ : Set G) :=
     h128f1
@@ -800,7 +802,8 @@ theorem exists_sylow_tau1_cyclic_notCentralizing [Finite G] (hG : IsMinimalSimpl
     (omega1_eq_of_tau2 hG h.mem_maximal hp hA hAM S.isPGroup' hAS hSM
       (sylow_maximal_in_M_of_le hSM)).1
   -- `C_E(A) ⊴ E` (Corollary 12.10(c)).
-  have hCEAnorm : E ≤ Subgroup.normalizer ((E ⊓ Subgroup.centralizer (A : Set G) : Subgroup G) : Set G) :=
+  have hCEAnorm : E ≤ Subgroup.normalizer ((E ⊓ Subgroup.centralizer (A : Set G) : Subgroup G) : Set
+      G) :=
     ((nilpotent_sigmaComplement_abelian hG h).2.2.1 p (Fact.out : p.Prime) hp A hA hAE).2.1
   haveI hCEA_norm : ((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr hCEAnorm
@@ -1170,7 +1173,8 @@ theorem exists_cyclic_Enormal_regular_of_CES_eq [Finite G] (hG : IsMinimalSimple
   have hLZ : (Subgroup.zpowers wG : Subgroup G) ≤ Subgroup.zpowers s := by
     rw [← hsw]
     exact Subgroup.zpowers_le.mpr (Subgroup.pow_mem _ (Subgroup.mem_zpowers s) _)
-  refine ⟨Subgroup.zpowers s, hZS, inferInstance, (Subgroup.zpowers_eq_bot.not.mpr hsne), ?_, ?_, ?_⟩
+  refine ⟨Subgroup.zpowers s, hZS, inferInstance, (Subgroup.zpowers_eq_bot.not.mpr hsne), ?_, ?_,
+      ?_⟩
   · -- `E ≤ N_G(⟨s⟩)`: `E ≤ C(S) ≤ C({s}) = C(⟨s⟩) ≤ N(⟨s⟩)`.
     have hEC' : E ≤ Subgroup.centralizer ({s} : Set G) :=
       hEC.trans (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hsS))

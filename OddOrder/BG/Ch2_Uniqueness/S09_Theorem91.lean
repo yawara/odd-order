@@ -832,7 +832,8 @@ theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimal
     -- Eq (9.3): `N_G(Pamb) ≤ M`.
     have hNPamb_le_M : Subgroup.normalizer (Pamb : Set G) ≤ M :=
       normalizer_sylow_map_le_maximal hG hM P hp_dvd_G
-        (by rw [← hPamb]; intro hbot; exact hRamb_ne (le_bot_iff.mp (hRamb_Pamb.trans (le_of_eq hbot))))
+        (by rw [← hPamb]; intro hbot; exact hRamb_ne (le_bot_iff.mp (hRamb_Pamb.trans (le_of_eq
+            hbot))))
         (by rw [← hPamb]; exact hPle)
     -- Case `Ramb = Pamb`: `N_G(Ramb) = N_G(Pamb) ≤ M`.
     by_cases hRP : Ramb = Pamb

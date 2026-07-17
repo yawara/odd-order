@@ -283,7 +283,8 @@ noncomputable def columnConstituentDecomposition
         (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)))
       (a • η₁) := by
   rw [← columnSum_eq_induce_H h46 hHK χ₂]
-  exact OddOrder.Peterfalvi.S06.certainTypeDecompositionDa h46 hχ₂ hdeg hμη₁supp htau1_mema hχψ hχbarψ
+  exact OddOrder.Peterfalvi.S06.certainTypeDecompositionDa h46 hχ₂ hdeg hμη₁supp htau1_mema hχψ
+      hχbarψ
 
 /-- **(6.8.2.3) reducible `R(μ_j)` image family, retargeted to `hyp.tau`.**  The certain-type column
 image family `certainTypeR` is built against the *enlarged* certain-type map

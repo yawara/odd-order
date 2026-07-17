@@ -533,7 +533,8 @@ open scoped FiniteInduce in
 `x ∈ conjClassSet (W ∖ (W₁ ∪ W₂))` (a `typePV`-point of the `S`-data, hence in `A₀(S)`), the Dade
 map reads the source at the representative `w`, which is `0` because `A(S) ⊆ S' = derivedInG S`
 while a regular `W`-element lies outside `S'` (`typePData_typePV_not_mem_derived`). -/
-theorem Hypothesis.dadeS0_apply_eq_zero_of_regular [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem Hypothesis.dadeS0_apply_eq_zero_of_regular [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
+    G)
     (hyp : Hypothesis (G := G))
     {f : ClassFunction ↥hyp.S ℂ}
     (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)

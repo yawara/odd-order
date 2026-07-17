@@ -111,7 +111,8 @@ noncomputable def hcHom [Finite G] {M : Subgroup G}
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
     hN.subgroupOf _
   (hcQuotientEquivHbar chief).toMonoidHom.comp
-    (QuotientGroup.mk' ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+    (QuotientGroup.mk' ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub
+        data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))))
 
 /-- **The `HC`-linear character `ψ`** of the (9.8.c) construction: for a chief-factor character
@@ -205,7 +206,8 @@ theorem hcHom_inclusion [Finite G] {M : Subgroup G}
   rw [← hfwd]
   change ((QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
         (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).symm.trans
-      (QuotientGroup.congr ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (QuotientGroup.congr ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub
+          data)).subgroupOf
         (hInHu data)) chief.N (hInHuEquivH data) _))
       ((QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
         (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
@@ -249,9 +251,11 @@ theorem hcPsi_inertia_le [Finite G] {M : Subgroup G}
   intro g hg
   rw [ClassFunction.mem_inertia] at hg ⊢
   ext h
-  have key : (ClassFunction.conjBy g (hcPsi chief θ : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ))
+  have key : (ClassFunction.conjBy g (hcPsi chief θ : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub
+      data chief).subgroupOf M).subgroupOf (huSub data)) ℂ))
       (Subgroup.inclusion le_sup_left h)
-      = (hcPsi chief θ : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) (Subgroup.inclusion le_sup_left h) := by rw [hg]
+      = (hcPsi chief θ : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+          M).subgroupOf (huSub data)) ℂ) (Subgroup.inclusion le_sup_left h) := by rw [hg]
   rw [ClassFunction.conjBy_apply] at key ⊢
   rw [← hcPsi_apply_inclusion, ← hcPsi_apply_inclusion, ← key]
   congr 1
@@ -471,7 +475,8 @@ theorem hcPsiPair_inertia_le [Finite G] {M : Subgroup G}
   intro g hg
   rw [ClassFunction.mem_inertia] at hg ⊢
   ext h
-  have key : (ClassFunction.conjBy g (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ))
+  have key : (ClassFunction.conjBy g (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔
+      ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ))
       (Subgroup.inclusion le_sup_left h)
       = (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) (Subgroup.inclusion le_sup_left h) := by rw [hg]
   rw [ClassFunction.conjBy_apply] at key ⊢

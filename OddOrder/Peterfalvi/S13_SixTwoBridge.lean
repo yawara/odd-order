@@ -853,7 +853,8 @@ theorem sixTwoDecompositionData [Finite G]
     · exact S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
         hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
         hψB hψirr hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
-    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hmu hδpm hδj hzS hz1 hS₁conj hS₁sub hS₁coh hψB hψirr
+    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hmu hδpm hδj hzS hz1 hS₁conj
+        hS₁sub hS₁coh hψB hψirr
         hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
   · -- reducible (μ-column) break: the named grid obligation
     exact sixTwoDecompositionData_of_reducible_break hG hyp hmu hδpm hδj hzS hz1
@@ -936,7 +937,8 @@ theorem six_two_dichotomy_bound
   haveI := hyp.finiteG
   haveI : Fintype ↥C := Fintype.ofFinite _
   exact OddOrder.Peterfalvi.S08.six_two_general hBD hCK hcentral
-    (hyp.exists_source_of_coherence_dichotomy hG hmu hδpm hδj hzS hz1 htype hnt chief hA'ne hBne hAcoh hBncoh)
+    (hyp.exists_source_of_coherence_dichotomy hG hmu hδpm hδj hzS hz1 htype hnt chief hA'ne hBne
+        hAcoh hBncoh)
 
 end Hypothesis
 

@@ -997,7 +997,8 @@ theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
     intro l
     rw [(hyp.eta ⟨0, hyp.q_prime.pos⟩ l).of_isConj hconjwx.symm, hyp.eta_eq_tau_omega,
       hyp.tau3_apply_of_regular _ w hwW hw12]
-  rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply, OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+  rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
+      OddOrder.RepresentationTheory.ClassFunction.sub_apply,
     hmu j hj0, hmu ⟨1, by have := hyp.three_le_p; omega⟩ one_ne_zero,
     heta j, heta ⟨1, by have := hyp.three_le_p; omega⟩]
   ring

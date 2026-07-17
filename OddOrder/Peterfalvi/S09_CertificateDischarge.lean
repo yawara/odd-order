@@ -177,7 +177,8 @@ noncomputable def hypothesis78OfDade
           chiRho_eq_inner_beta_induced H71 (H.subgroupOf L) θ d psi_support hinj hcover hdeg
             (supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm)
             (fun y => supportInSubgroup_sharp_subset_subgroupOf H hAH)
-            (one_not_mem_supportInSubgroup_sharp H hAH) ind1H hind1H hzeta_ind1H ν χ hagree hortho hx]
+            (one_not_mem_supportInSubgroup_sharp H hAH) ind1H hind1H hzeta_ind1H ν χ hagree hortho
+                hx]
         -- Bridge the `(7.7.a)` coefficient `d_{ind1H}` (`= 1`) to the bare difference
         -- `ζ_{ind1H} − ζ_0`.
         refine congrArg star (congrArg (ClassFunction.inner · χ) (congrArg H71.τ ?_))
@@ -797,7 +798,8 @@ noncomputable def betaDecompOfDade
   have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
     induce_apply_one_ne_zero _ (θ 0)
   -- `θ_i ≠ 1_K` for `i ≠ ind1H` (injectivity + `θ_{ind1H} = 1_K`).
-  have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥(H.subgroupOf L) :=
+  have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥(H.subgroupOf
+      L) :=
     fun j hj hc => hj (hinj (by
       change ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)
         = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
@@ -940,7 +942,8 @@ theorem zetaNuRhoNormSqGeOfDade
   have hBDa : hBD.a = a := rfl
   have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
     induce_apply_one_ne_zero _ (θ 0)
-  have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥(H.subgroupOf L) :=
+  have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥(H.subgroupOf
+      L) :=
     fun j hj hc => hj (hinj (by
       change ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)
         = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
@@ -991,12 +994,14 @@ theorem zetaNuRhoNormSqGeOfDade
     rw [hz0_compl]; exact_mod_cast complementIndex_eq_subgroupOf_index H78
   have hGsum : ∑ i ∈ (Finset.Ioi (0 : Fin (H78.hyp76.n + 1))).erase H78.ind1H,
         H78.hyp76.zeta i 1 ^ 2 / H78.hyp76.zetaNormSq i
-      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2 := by
+      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2 :=
+          by
     rw [complementIndex_eq_subgroupOf_index H78,
       show (H78.kernelOrder : ℂ) = (Nat.card ↥(H.subgroupOf L) : ℂ) from by
         rw [show H78.kernelOrder = Nat.card ↥(H.subgroupOf L) from
           (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv).symm]]
-    exact family_degree_sum_Ioi (H.subgroupOf L) θ hinj hcover ind1H hind1H hzeta_ind1H hz0_deg hζ0norm
+    exact family_degree_sum_Ioi (H.subgroupOf L) θ hinj hcover ind1H hind1H hzeta_ind1H hz0_deg
+        hζ0norm
   exact zetaNuRhoNormSq_ge_of_facts H78 hBD rfl
     (induce_family_orthogonal_of_injective (H.subgroupOf L) θ hinj)
     (by

@@ -536,7 +536,8 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
       - coh.extension ζ.conj) (tic.chiFam hVeq app (a', b')) = 0 := by
     rw [← hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1]; exact hL3
   have hsZ : tic.chiFam hVeq app (a', b') ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (a', b')
-  have hs1 : ClassFunction.inner (tic.chiFam hVeq app (a', b')) (tic.chiFam hVeq app (a', b')) = 1 := by
+  have hs1 : ClassFunction.inner (tic.chiFam hVeq app (a', b')) (tic.chiFam hVeq app (a', b')) =
+      1 := by
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
@@ -682,7 +683,8 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
         - (δ : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P 0))) v = 0 := by
     intro v hv
     rw [hPj', hP0']
-    exact hyp.SHC_muGridPsi_vanishes_on_typePV hG coh hodd hj0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj hv
+    exact hyp.SHC_muGridPsi_vanishes_on_typePV hG coh hodd hj0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj
+        hv
   rw [eq_sub_iff_add_eq, ← hPj', ← hP0']
   exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hXfacts.2 hPne hδpm hψV
 
@@ -1062,7 +1064,8 @@ theorem Hypothesis.muGridAlpha_tau_proj_a_mem [Finite G] {M : Subgroup G}
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         (coh.extension ζ) = (a : ℂ) - (n : ℂ) := by
-  obtain ⟨a, _, ha, _, hinner, _, _, _, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0 hζS
+  obtain ⟨a, _, ha, _, hinner, _, _, _, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0
+      hζS
     hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev
   exact ⟨a, ha, hinner⟩
 
@@ -1107,7 +1110,8 @@ theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
       hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         = Y - (n : ℂ) • coh.extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
   obtain ⟨a, Y, hbound, hYorth, hinner, hnorm, hnorm2case, hYZ, hYV, hdecompA⟩ :=
-    hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2
+    hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm
+        hn2
       hRn hZ horth hRmem hRrev
   refine ⟨a, Y, hbound, hinner, ?_, hdecompA⟩
   intro ha02

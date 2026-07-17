@@ -97,7 +97,8 @@ structure XAdjoinStepInputW {A : Set G}
     (χmem i) 0
   /-- The (5.2.e) cross-family orthogonality `R(χmem i) ⊥ R(χ)`. -/
   hortho_mem : ∀ i (hi : i ∈ s), (Dmem i hi).imageFamily.Orthogonal
-    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hrealχ hdiffsuppχ)
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hrealχ
+        hdiffsuppχ)
   /-- The running-extension agreement `(Dmem i).tau1 = ν`. -/
   htau1Dmem : ∀ i (hi : i ∈ s), (Dmem i hi).tau1 (χmem i) = hS₁.extension (χmem i)
   a : ℕ
@@ -171,7 +172,8 @@ forces `λ = 0`, i.e. `μ = −a`.  Here `∑ rc² · mc = ∑ deg²/mc` is the 
 theorem crux1_of_memberFamilyW {A : Set G}
     (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
-    (_hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (_hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData
+        hconj))
     {S₁ : Set (ClassFunction ↥L ℂ)}
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent τ S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
@@ -377,7 +379,8 @@ noncomputable def xAdjoinStepW
       (χmem i₁ : ClassFunction ↥L ℂ) = 1 := by
     rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl]; exact_mod_cast hanchorNorm
   -- (5.2.e) `⟨Da.X, ν χᵢ⟩ = 0` per member.
-  have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) = 0 :=
+  have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
+      0 :=
     fun i hi =>
       inner_decomposition_X_extension_member_eq_zero hS₁ Da (Dmem i hi) (hortho_mem i hi)
         (htau1Dmem i hi)

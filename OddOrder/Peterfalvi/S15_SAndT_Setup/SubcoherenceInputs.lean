@@ -1062,7 +1062,8 @@ theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
     have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
     have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
     refine ⟨a.1, haM', ha1', a.1, ?_, ?_⟩
-    · exact (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩
+    · exact (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp
+        h)⟩
     · exact Subgroup.mem_centralizer_singleton_iff.mpr rfl
   · -- `M`-conjugation invariance.
     intro m x hm

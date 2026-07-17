@@ -461,7 +461,8 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
     have h_pow_in : (⟨c, hc⟩ : _root_.commutator T) ^ Nat.card (_root_.commutator T) = 1 :=
       pow_card_eq_one'
     rw [h_card_comm] at h_pow_in
-    have : ((⟨c, hc⟩ : _root_.commutator T) ^ p : _root_.commutator T) = (1 : _root_.commutator T) :=
+    have : ((⟨c, hc⟩ : _root_.commutator T) ^ p : _root_.commutator T) = (1 : _root_.commutator
+        T) :=
       h_pow_in
     have h_pow' : (c : T) ^ p = 1 := by
       have h1 := congrArg Subtype.val this

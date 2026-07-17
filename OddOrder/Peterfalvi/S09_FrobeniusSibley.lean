@@ -112,7 +112,8 @@ noncomputable def sibleyDadeHypothesis_of_frobenius [Fintype G] [Invertible (Nat
     card_L_odd := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
     H_sharp_ti := by rw [sharpImage_subgroupOf_eq]; exact F.isTI i
     dade := dade0
-    hconj := OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot dade0 (fun _ => rfl)
+    hconj := OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot dade0 (fun _ =>
+        rfl)
     dade_H_eq_bot := fun _ => rfl
     S := {φ : ClassFunction ↥(F.L i) ℂ | ∃ θ : IrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)),
       θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)) ∧

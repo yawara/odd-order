@@ -645,7 +645,8 @@ theorem coeff_eq_neg_or_edge_c2_caseA
   classical
   -- step 3: `bb = ⟨v, η₁^{τ₁}⟩ ∈ ℤ`, `a ∣ bb`.
   obtain ⟨bb, hbb, habb⟩ :=
-    hyp.dvd_inner_tau_scaledDiff_extension_Yset_c2_caseA hK hW1 hA hHnonab hp hp3 hHp hη₁ hχ₁ ha_pos ha
+    hyp.dvd_inner_tau_scaledDiff_extension_Yset_c2_caseA hK hW1 hA hHnonab hp hp3 hHp hη₁ hχ₁ ha_pos
+        ha
   -- `Y`-orthonormality and injectivity of the extension on `Y`.
   have hYon : ∀ ψ ψ' : ClassFunction ↥L ℂ, ψ ∈ hyp.Yset → ψ' ∈ hyp.Yset →
       ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
@@ -1266,9 +1267,11 @@ theorem inner_extension_Xset_sub_eq_neg_one_c2_caseA
     (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₂ ≠ χ₁)
     {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) (hdeg2 : χ₂ 1 = χ₁ 1) :
     ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
-        ((hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension χ₂)
+        ((hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension
+            χ₂)
       - ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
-        ((hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension χ₁)
+        ((hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp).extension
+            χ₁)
       = -1 :=
   hyp.inner_extension_Xset_sub_eq_neg_one_general_c2_caseA hK hW1 hA
     (hyp.Xset_centralCommutator_isCoherent_of_c2_caseA hK hW1 hA hHnonab hp hp3 hHp)
@@ -1430,7 +1433,8 @@ theorem extension_eq_or_eq_neg_general_c2_caseA
     rw [hXc.extension_inner_eq ψ ψ' (Submodule.subset_span hψ) (Submodule.subset_span hψ')]
     have h := irreducibleCharacter_inner_eq_ite
       (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ⟩ : IrreducibleCharacter ↥L)
-      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ'⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hψ'⟩ : IrreducibleCharacter
+          ↥L)
     simpa using h
   have hX1norm : ClassFunction.inner (hXc.extension χ₁) (hXc.extension χ₁) = 1 := by
     rw [hXon χ₁ χ₁ hχ₁ hχ₁, if_pos rfl]

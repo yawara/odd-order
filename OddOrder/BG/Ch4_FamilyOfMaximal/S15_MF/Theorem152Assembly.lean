@@ -177,7 +177,8 @@ theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
         rw [hR, Subgroup.mem_comap]; rw [← hz] at hw; exact hw
       refine ⟨⟨z, hzmem⟩, Subtype.ext ?_⟩
       rw [hg]
-      change (QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype ⟨z, hzmem⟩) : ↥Mσ ⧸ Q.subgroupOf Mσ) = w
+      change (QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype ⟨z, hzmem⟩) : ↥Mσ ⧸ Q.subgroupOf Mσ) =
+          w
       rw [QuotientGroup.mk'_apply]; exact hz
     have hgval : ∀ r : ↥R, (g r : ↥Mσ ⧸ Q.subgroupOf Mσ)
         = QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype r) := fun r => rfl
@@ -660,7 +661,8 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
   haveI : Group.IsNilpotent ↥(S.subgroupOf M) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (hSMσ.trans hMσM)).symm
   have hSF : S ≤ fittingInAmbient M := by
-    calc S = (S.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le (hSMσ.trans hMσM)).symm
+    calc S = (S.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le (hSMσ.trans
+        hMσM)).symm
       _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
           Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
       _ = fittingInAmbient M := rfl

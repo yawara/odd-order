@@ -1252,7 +1252,8 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     -- combine: `D₀ = D₀ ^ (…)`, so the exponent is `≡ 1 (mod p)`.
     have hDeq : D₀ = D₀ ^ (e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v)) := by
       rw [← hway1, hway2]
-    have hmod : e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v) ≡ 1 [MOD chief.p] := by
+    have hmod : e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v) ≡ 1 [MOD chief.p] :=
+        by
       have hpoweq : D₀ ^ (e (MulAut.conjNormal (a₀⁻¹) v) * e (MulAut.conjNormal (b₀⁻¹) v))
           = D₀ ^ 1 := by rw [pow_one]; exact hDeq.symm
       have hfinD : IsOfFinOrder D₀ := by

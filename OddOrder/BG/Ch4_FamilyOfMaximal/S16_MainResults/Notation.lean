@@ -202,7 +202,8 @@ with `C_G(x) ≤ N`, the centralizer normalizes `(N)_σ ⊓ C_G(x)` — it norma
 theorem centralizer_le_normalizer_Msigma_inf_centralizer {x : G} {N : Subgroup G}
     (hCN : Subgroup.centralizer ({x} : Set G) ≤ N) :
     Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer
-      ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G) : Set G) := by
+      ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G) : Set G) :=
+          by
   haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hbaseN : N ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma N : Set G) :=

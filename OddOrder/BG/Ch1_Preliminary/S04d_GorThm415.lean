@@ -771,7 +771,8 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
           have hwK : (w : P) ∈ Subgroup.closure ({u, v} : Set P) := by rw [← hK_def]; exact w.2
           -- Build membership of `w` by induction on `(w : P) ∈ closure {u, v}`.
           have key2 : ∀ z : P, z ∈ Subgroup.closure ({u, v} : Set P) →
-              ∀ (hz : z ∈ K), (⟨z, hz⟩ : ↥K) ∈ Subgroup.closure ({⟨u, huK⟩, ⟨v, hvK⟩} : Set ↥K) := by
+              ∀ (hz : z ∈ K), (⟨z, hz⟩ : ↥K) ∈ Subgroup.closure ({⟨u, huK⟩, ⟨v, hvK⟩} : Set ↥K) :=
+                  by
             intro z hzc
             induction hzc using Subgroup.closure_induction with
             | mem w hw =>

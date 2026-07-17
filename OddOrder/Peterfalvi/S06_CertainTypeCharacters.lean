@@ -597,7 +597,8 @@ theorem columnFamily_cross_products_zero [NeZero (Nat.card h.W1)]
         ((h.columnFamily χ₂').mu k' : ClassFunction L ℂ) = 0 ∧
       ClassFunction.inner ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
         ((h.columnFamily χ₂').mu 0 : ClassFunction L ℂ) = 0 := by
-  have hself : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1)) (m : Fin (Nat.card h.W1)),
+  have hself : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1)) (m : Fin (Nat.card
+      h.W1)),
       ClassFunction.inner (d.mu m : ClassFunction L ℂ) (d.mu m : ClassFunction L ℂ) = 1 := by
     intro d m; rw [irreducibleCharacter_inner, if_pos rfl]
   have horth : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1))

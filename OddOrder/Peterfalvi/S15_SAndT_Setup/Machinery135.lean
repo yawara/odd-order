@@ -473,7 +473,8 @@ theorem sum_normSq_real_smul_add {ι : Type*} (s : Finset ι) (κ : ℝ) (f g : 
     intro x _
     rw [← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq,
       Complex.normSq_add, Complex.normSq_mul, Complex.normSq_ofReal]
-    rw [show ((κ : ℂ) * f x) * (starRingEnd ℂ) (g x) = (κ : ℂ) * (f x * (starRingEnd ℂ) (g x)) by ring,
+    rw [show ((κ : ℂ) * f x) * (starRingEnd ℂ) (g x) = (κ : ℂ) * (f x * (starRingEnd ℂ) (g x)) by
+        ring,
       Complex.re_ofReal_mul]
     ring
   rw [Finset.sum_congr rfl hpt, Finset.sum_add_distrib, Finset.sum_add_distrib,
@@ -653,7 +654,8 @@ theorem norm_induce_one_frobenius {G : Type*} [Group G] [Fintype G]
           star ((ClassFunction.restrict A (ClassFunction.induce A (trivialClassFunction ↥A))) a)
         = (ClassFunction.induce A (trivialClassFunction ↥A)) (↑a : G) := by
     intro a
-    rw [ClassFunction.restrict_apply, hreal a, show (trivialClassFunction ↥A) a = 1 from rfl, one_mul]
+    rw [ClassFunction.restrict_apply, hreal a, show (trivialClassFunction ↥A) a = 1 from rfl,
+        one_mul]
   rw [Finset.sum_congr rfl (fun a _ => hterm a)]
   congr 1
   rw [← Finset.add_sum_erase Finset.univ _ (Finset.mem_univ (1 : ↥A))]
@@ -1087,8 +1089,10 @@ subgroup is `H = PC ⊴ S` (`S` normalizes `H^#` ⟹ normalizes `H`).  This is t
 noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    OddOrder.Peterfalvi.S09.Hypothesis76 G (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S := by
-  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeTrivialBase (H_sharp_hypothesis71 hG hyp) ?_ hyp.H ?_ ?_ rfl
+    OddOrder.Peterfalvi.S09.Hypothesis76 G (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S :=
+        by
+  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeTrivialBase (H_sharp_hypothesis71 hG hyp) ?_
+      hyp.H ?_ ?_ rfl
   · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
       (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeIsometry
   · have hUS : hyp.U ≤ hyp.S := by

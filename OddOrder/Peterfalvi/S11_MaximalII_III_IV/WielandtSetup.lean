@@ -386,7 +386,8 @@ theorem typeP_U_not_centralizes_H [Finite G] (data : TypePData M) (hU : data.U �
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
   haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
     rw [← hFit]
-    exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting ↥M)
+    exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting
+        ↥M)
       M.subtype M.subtype_injective)
   -- `M'.subgroupOf M` is the commutator subgroup of `↥M`: normal and nilpotent.
   have hM'sub : (derivedInG M).subgroupOf M = commutator ↥M :=

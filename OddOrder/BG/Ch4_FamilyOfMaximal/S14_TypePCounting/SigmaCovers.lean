@@ -967,7 +967,8 @@ theorem typeP_self_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hcanon : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
       = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M :=
     typeP_neighbor_Kstar_eq_Z_inf_Msigma hKM hK (by rw [hKstar])
-  have hKstarEq : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar := hcanon.symm.trans hKstar.symm
+  have hKstarEq : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar := hcanon.symm.trans
+      hKstar.symm
   refine ⟨hKstarEq, by rw [hKstarEq], ?_, ?_⟩
   · rw [hKstarEq, hKstar]
     exact (sup_le_normalizer_inf_of_commute inf_le_right).trans inf_le_right

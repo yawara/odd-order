@@ -246,7 +246,8 @@ theorem typePData_W1_prime_not_mem_sigma [Finite G]
   intro hpσ
   haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
   -- An order-`p` element `g ∈ W₁` and the cyclic subgroup `L = ⟨g⟩` of order `p`.
-  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p (Nat.dvd_of_mem_primeFactors hp)
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p (Nat.dvd_of_mem_primeFactors
+      hp)
   have hgord : orderOf ((g : G)) = p :=
     (orderOf_injective data.W1.subtype data.W1.subtype_injective g).trans hg
   set L : Subgroup G := Subgroup.zpowers (g : G) with hLdef
@@ -772,7 +773,8 @@ theorem typeP1_complement_mem_sigma_and_factorization [Finite G]
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
     exact Nat.mem_primeFactors.mpr
       ⟨hpp, hpU.trans (hM'σ ▸ Subgroup.card_dvd_of_le hUle'), Nat.card_pos.ne'⟩
-  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM).1 p hpMσ
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG
+      hM).1 p hpMσ
   refine ⟨hpσ, ?_⟩
   -- (2) `p`-parts agree.  `[M:U] = [M':U]·[M:M']`.
   have hidx_split : (U.subgroupOf M').index * (M'.subgroupOf M).index = (U.subgroupOf M).index :=

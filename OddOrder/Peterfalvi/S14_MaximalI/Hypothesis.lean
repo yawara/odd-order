@@ -531,7 +531,8 @@ theorem typeI_induced_char_constituents [Finite G]
     -- (b) `C_H(x) = ⊥` would give `φ(x) = 0` (Pf (1.2)); so `C_H(x) ≠ ⊥`, i.e. `(x:G) ∈ A(L)`
     by_contra hxA
     rw [ClassFunction.mem_support] at hx
-    refine hx (OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
+    refine hx
+        (OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
       φ hHker ?_)
     refine (Subgroup.eq_bot_iff_forall _).mpr (fun z hz => ?_)
     by_contra hz1
@@ -713,7 +714,8 @@ theorem R1_diffsupp {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction �
     rw [Set.mem_singleton_iff] at h
     subst h
     obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
-    exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
+    exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast,
+        sub_self])
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.2.b), the underlying difference image `{μ_φ, ν_φ, ε}` of `R₁(φ)`.**  The Dade

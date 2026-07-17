@@ -440,7 +440,8 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
         rw [hh]; exact hU'
       obtain ⟨-, hKstar_ne, -, -, -, -, -⟩ := S14.typeP_structure hG hM hP hKM hK hKstardef hU
       -- The partner `Mstar` (Theorem 14.7).
-      obtain ⟨Mstar, ⟨hMstarmax, hMstarP, hMstarnc, ⟨hKstarMstar, hKstarHall, hKeq⟩, -, -, -, -⟩, -⟩ :=
+      obtain ⟨Mstar, ⟨hMstarmax, hMstarP, hMstarnc, ⟨hKstarMstar, hKstarHall, hKeq⟩, -, -, -, -⟩,
+          -⟩ :=
         (S14.typeP_duality hG hM hP hKM hK hKstardef).2.2
       have hKMstarσ : K ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := by rw [hKeq]; exact inf_le_left
       -- `ℳ(C(Q)) = {Mstar}` (typeP_structure of `Mstar`, `Q ≤ K = C_{Mstar_σ}(Kstar)`).
@@ -582,7 +583,8 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
         (Subgroup.normal_subgroupOf_iff_le_normalizer hcE).mpr hEN
       have hQ'qg : IsPGroup q ↥(Q.subgroupOf E) := by
         rw [IsPGroup.iff_card]
-        exact ⟨1, by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQE).toEquiv, hQcard, pow_one]⟩
+        exact ⟨1, by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQE).toEquiv, hQcard,
+            pow_one]⟩
       obtain ⟨P, hQ'P⟩ := hQ'qg.exists_le_sylow
       have hQ'nc : ¬ (Q.subgroupOf E ≤ c.subgroupOf E) := by
         intro hle

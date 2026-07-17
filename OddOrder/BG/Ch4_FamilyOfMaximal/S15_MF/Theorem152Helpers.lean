@@ -988,7 +988,8 @@ theorem mf_centralizer_msigma_decomp [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
         (Subgroup.equivMapOfInjective H'' C.subtype C.subtype_injective).toEquiv,
       (hH''.symm).index_eq_card]
   -- `X` is a `(κ ∪ σ)'`-group:  `κ'` (from `X ≤ C`) and `σ'` (from `|X| = N.index`).
-  have hX_pi : ∀ p ∈ (Nat.card ↥X).primeFactors, p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+  have hX_pi : ∀ p ∈ (Nat.card ↥X).primeFactors, p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+      by
     intro p hp
     rw [Set.mem_compl_iff, Set.mem_union]
     push Not
@@ -1572,7 +1573,8 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
         have hPbarOf : Pbar.subgroupOf H = (P : Subgroup ↥H) :=
           Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
         have hq_ndvd : ¬ q ∣ Pbar.index := by
-          have hrel : Pbar.relIndex H * H.index = Pbar.index := Subgroup.relIndex_mul_index hPbar_le_H
+          have hrel : Pbar.relIndex H * H.index = Pbar.index := Subgroup.relIndex_mul_index
+              hPbar_le_H
           rw [← hrel]
           refine Nat.Prime.not_dvd_mul Fact.out ?_ ?_
           · rw [Subgroup.relIndex, hPbarOf]; exact P.not_dvd_index

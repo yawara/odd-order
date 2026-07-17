@@ -446,7 +446,8 @@ theorem card_cuInHuPair_eq {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (i j : Fin data.q) :
     Nat.card ↥(cuInHuPair caseA i j) = Nat.card ↥(cuSubOf caseA i ⊓ cuSubOf caseA j) := by
-  have hKleU : cuSubOf caseA i ⊓ cuSubOf caseA j ≤ data.U := inf_le_left.trans (cuSubOf_le_U caseA i)
+  have hKleU : cuSubOf caseA i ⊓ cuSubOf caseA j ≤ data.U := inf_le_left.trans (cuSubOf_le_U caseA
+      i)
   have hCsubM : (cuSubOf caseA i ⊓ cuSubOf caseA j).subgroupOf M ≤ huSub data :=
     Subgroup.subgroupOf_mono M (hKleU.trans (le_sup_right : data.U ≤ data.H ⊔ data.U))
   have hCleM : cuSubOf caseA i ⊓ cuSubOf caseA j ≤ M := hKleU.trans (U_le_M data)

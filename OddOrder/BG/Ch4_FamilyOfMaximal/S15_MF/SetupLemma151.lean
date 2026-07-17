@@ -794,7 +794,8 @@ theorem typeP_hall_derived_eq_and_abelian [Finite G] (hG : OddOrder.BG.IsMinimal
         exact hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
       · intro p hp hpcompl
         have hpMσ : p ∈ (Nat.card ↥(Mσ.subgroupOf M)).primeFactors := by
-          rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
+          rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le
+              M)).toEquiv]
         exact hpcompl (Or.inr (hMσHall.1 p hpMσ))
     exact (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   -- `U ≤ M'`: `|U|` (a κ'-number) is coprime to `[M:M'] = |K|` (a κ-number).

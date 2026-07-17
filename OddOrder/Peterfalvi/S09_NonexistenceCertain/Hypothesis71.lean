@@ -139,7 +139,8 @@ noncomputable def of_isTISubset
     Hypothesis71 G A L where
   hyp := OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm hTI
   τ := (OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm hTI).dadeMap
-  isDadeMap := (OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm hTI).isDadeMap_dadeMap
+  isDadeMap := (OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm
+      hTI).isDadeMap_dadeMap
   hConjInvariant :=
     OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
 

@@ -110,7 +110,8 @@ theorem oPiCorePrime_subgroup_eq_bot_of_opCore_le
   -- but `p ∤ Nat.card M`, so `Nat.card M' = 1`, hence `M' = ⊥`, hence `M = ⊥`.
   have hM'_card : Nat.card ↥M' = Nat.card M := by
     rw [hM'_def]
-    exact Nat.card_congr (Subgroup.equivMapOfInjective M H.subtype Subtype.coe_injective).symm.toEquiv
+    exact Nat.card_congr (Subgroup.equivMapOfInjective M H.subtype
+        Subtype.coe_injective).symm.toEquiv
   have hM'_pg : IsPGroup p ↥M' :=
     hU_pg.of_injective (Subgroup.inclusion hM'_le_U) (Subgroup.inclusion_injective hM'_le_U)
   obtain ⟨j, hj⟩ : ∃ j, Nat.card ↥M' = p ^ j := IsPGroup.iff_card.mp hM'_pg
@@ -421,7 +422,8 @@ private theorem step3_Abar_centralizes_inter_LBar.{u}
     intro x hx
     have hxL : x ∈ L := hx.1
     -- `mk x ∈ L̄` and `mk x` lies in the `p`-group image, but `L̄` is `p'`, so `mk x = 1`.
-    have hKmap_pg : IsPGroup p ((L ⊓ (Subgroup.thompsonJ (S : Subgroup ↥H) p).map H.subtype).map mk) :=
+    have hKmap_pg : IsPGroup p ((L ⊓ (Subgroup.thompsonJ (S : Subgroup ↥H) p).map H.subtype).map
+        mk) :=
       hK_pg.map mk
     have hxbar_mem : mk x ∈ (L ⊓ (Subgroup.thompsonJ (S : Subgroup ↥H) p).map H.subtype).map mk :=
       Subgroup.mem_map_of_mem mk hx
@@ -439,7 +441,8 @@ private theorem step3_Abar_centralizes_inter_LBar.{u}
       have hord_dvd_pk : orderOf (mk x) ∣ p ^ k := by
         rw [orderOf_dvd_iff_pow_eq_one]
         have hk' : (⟨mk x, hxbar_mem⟩ :
-            ↥((L ⊓ (Subgroup.thompsonJ (S : Subgroup ↥H) p).map H.subtype).map mk)) ^ p ^ k = 1 := hk
+            ↥((L ⊓ (Subgroup.thompsonJ (S : Subgroup ↥H) p).map H.subtype).map mk)) ^ p ^ k = 1 :=
+                hk
         have := congrArg (Subtype.val) hk'
         simpa using this
       -- order of `mk x` divides `|L̄|` (since `mk x ∈ L̄`).
@@ -603,7 +606,8 @@ private theorem step5_Abar_centralizes_invariant_proper.{u}
   have hU_le_P : U ≤ (P : Subgroup G) := OddOrder.Isaacs.Ch01.opCore_le P
   -- `L = comap mk L̄`, and `L.map mk = L̄`.
   have hL_comap : L = Lbar.comap mk := by rw [hL_def, hLbar_def, hmk_def, opPpPrimeCore]
-  have hLmap : L.map mk = Lbar := by rw [hL_def, hLbar_def, hmk_def]; exact opPpPrimeCore_map_eq_LBar
+  have hLmap : L.map mk = Lbar := by rw [hL_def, hLbar_def, hmk_def]; exact
+      opPpPrimeCore_map_eq_LBar
   have hU_le_L : U ≤ L := by rw [hU_eq_oPi, hL_def]; exact oPiCore_p_le_opPpPrimeCore
   -- `M = preimage of W`, `U ≤ M ≤ L`.
   set M : Subgroup G := W.comap mk with hM_def
@@ -947,7 +951,8 @@ private theorem step4_5_normal_J_hypotheses.{u}
       rw [← hrelindex_map, hAbar_relindex]
     -- `Nat.card Lbar` is a `p'`-number, so `p ∤ (UA.subgroupOf LA).index`.
     have hLbar_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} Lbar := by
-      rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) {q | q ≠ p}
+      rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := G ⧸
+          OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) {q | q ≠ p}
     have hp_not_dvd : ¬ p ∣ (UA.subgroupOf LA).index := by
       rw [hidx_eq, hUA_relindex_LA]
       intro hdvd
@@ -1011,7 +1016,8 @@ private theorem step4_5_normal_J_hypotheses.{u}
     have hAbar_relindex : (Abar).relIndex (Lbar ⊔ Abar) = Nat.card Lbar :=
       relIndex_sup_of_inf_eq_bot (by rw [inf_comm]; exact hAbar_inf_Lbar)
     have hLbar_pi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} Lbar := by
-      rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) {q | q ≠ p}
+      rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := G ⧸
+          OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) {q | q ≠ p}
     have hp_not_dvd : ¬ p ∣ (UA.subgroupOf LA).index := by
       rw [hidx_eq, hrelindex_map.symm.trans hAbar_relindex]
       intro hdvd

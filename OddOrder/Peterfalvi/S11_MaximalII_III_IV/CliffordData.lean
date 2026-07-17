@@ -66,7 +66,8 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
     hEcyc hHbar
   have hfixne : (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE ≠ ⊥ := by
     intro h
-    have h1 : Nat.card ↥(typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE = 1 :=
+    have h1 : Nat.card ↥(typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE =
+        1 :=
       by rw [h]; simp
     exact chief.p_prime.ne_one (hcard.2.symm.trans h1)
   have hcopHW1 : Nat.Coprime
@@ -155,7 +156,8 @@ theorem chiefFactor_card_W2bar [Finite G] {M : Subgroup G}
     chief.quotient_elementaryAbelian chief.quotient_chiefFactor chief.U_noncentral_on_quotient
     hEcyc hHbar
   have hcopHW1 : Nat.Coprime
-      (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card ↥data.typeP.H) :=
+      (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card
+          ↥data.typeP.H) :=
     (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
   haveI : IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
   -- `F = C_H(W₁)`, with `F.map(mk' N) = fixedByE` and `F.map H.subtype = W₂`.

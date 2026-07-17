@@ -319,7 +319,8 @@ noncomputable def coherentXunionYset_caseB
     (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+        hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
       φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
@@ -408,7 +409,8 @@ theorem nonempty_coherent_S_caseB_of_anchor
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
     (hcZ : 2 ≤ Nat.card ↥(h46.W2.subgroupOf H))
     (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+        hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
       φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
@@ -588,7 +590,8 @@ theorem nonempty_coherent_S_caseB_edge (hyp : SibleyDadeHypothesis G L H)
       have h := Subgroup.relIndex_mul_index hW2H
       rw [hyp.index_H_eq_card_W1] at h
       exact h.symm
-    have hw1ltZ : (Nat.card hyp.W1 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by exact_mod_cast hw1lt
+    have hw1ltZ : (Nat.card hyp.W1 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by exact_mod_cast
+        hw1lt
     have hiposZ : (0 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by
       exact_mod_cast lt_of_le_of_lt (Nat.zero_le _) hw1lt
     rw [hidx]; push_cast; nlinarith [hw1ltZ, hiposZ]

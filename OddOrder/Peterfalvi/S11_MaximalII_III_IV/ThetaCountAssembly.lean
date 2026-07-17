@@ -56,7 +56,8 @@ theorem hom_eq_of_eqOn_hInHu_cuInHu [Finite G] {M : Subgroup G}
   · rw [hS]; rintro x (hx | hx)
     · -- x ∈ A means (x : huSub) ∈ hInHu, so x = inclusion h.
       rw [SetLike.mem_coe, Subgroup.mem_subgroupOf] at hx
-      have : x = Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) ⟨x, hx⟩ :=
+      have : x = Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) ⟨x,
+          hx⟩ :=
         Subtype.ext rfl
       rw [this]; exact hH _
     · rw [SetLike.mem_coe, Subgroup.mem_subgroupOf] at hx
@@ -187,7 +188,8 @@ theorem hcuSeedHom_injective [Finite G] {M : Subgroup G}
     Function.Injective (hcuSeedHom (chief := chief) (data := data)) := by
   haveI := chief.N_normal
   intro θ₁ θ₂ h12
-  have hsurj : Function.Surjective ((QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom) :=
+  have hsurj : Function.Surjective ((QuotientGroup.mk' chief.N).comp (hInHuEquivH
+      data).toMonoidHom) :=
     (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
   apply MonoidHom.ext
   intro x
@@ -283,10 +285,12 @@ theorem exists_hcuPsiPair_eq_of_linear_realizedH0_ker [Finite G] {M : Subgroup G
     (hlin : ∃ f : ↥(hInHu data ⊔ cuInHu caseA) →* ℂˣ,
       (χ : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ) = linearIrreducibleCharacter f)
     (hker : ∀ h : ↥(hInHu data),
-      (h : ↥(hInHu data)) ∈ ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data) →
+      (h : ↥(hInHu data)) ∈ ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu
+          data) →
         (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h :
           ↥(hInHu data ⊔ cuInHu caseA))
-          ∈ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)) :
+          ∈ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(hInHu data ⊔ cuInHu caseA)
+              ℂ)) :
     ∃ (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
       (hinv : ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
         hcuSeedHom (chief := chief) θ
@@ -331,7 +335,8 @@ theorem card_hom_triv_N_eq_card_quotient_general {K : Type*} [Group K] [Finite K
     rw [MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.lift_mk']
   · apply MonoidHom.ext; intro x
     obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective N x
-    rw [QuotientGroup.mk'_apply, QuotientGroup.lift_mk, MonoidHom.comp_apply, QuotientGroup.mk'_apply]
+    rw [QuotientGroup.mk'_apply, QuotientGroup.lift_mk, MonoidHom.comp_apply,
+        QuotientGroup.mk'_apply]
 
 
 open scoped commutatorElement in
@@ -380,7 +385,8 @@ theorem card_lambda_triv_uprime [Finite G] {M : Subgroup G}
         (((uprimeSub data).subgroupOf M).subgroupOf (huSub data)).subgroupOf (cuInHu caseA)
           ≤ lam.ker}
       = (uprimeSub data).relIndex (cuSub caseA) := by
-  set N := (((uprimeSub data).subgroupOf M).subgroupOf (huSub data)).subgroupOf (cuInHu caseA) with hN
+  set N := (((uprimeSub data).subgroupOf M).subgroupOf (huSub data)).subgroupOf (cuInHu caseA) with
+      hN
   have hcomm : _root_.commutator ↥(cuInHu caseA) ≤ N := by
     rw [hN]
     rw [Subgroup.subgroupOf, ← Subgroup.map_le_iff_le_comap]

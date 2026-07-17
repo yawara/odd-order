@@ -225,7 +225,8 @@ theorem exists_Sset_apply_one_eq_index [Finite G]
   have hcomm : commutator ↥((typeISetup.typeI.typeF.H).subgroupOf L) ≠ ⊤ :=
     ne_of_lt (IsSolvable.commutator_lt_top_of_nontrivial
       (G := ↥((typeISetup.typeI.typeF.H).subgroupOf L)))
-  obtain ⟨θ, hθ_ne, hθ1⟩ := OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
+  obtain ⟨θ, hθ_ne, hθ1⟩ :=
+      OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
     hcomm
   refine ⟨ClassFunction.induce ((typeISetup.typeI.typeF.H).subgroupOf L)
       (θ : ClassFunction _ ℂ), ⟨θ, hθ_ne, rfl⟩, ?_⟩

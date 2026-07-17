@@ -284,7 +284,8 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
   set H : Subgroup G := maxNilpotentNormalHall data.L with hHdef
   have hAM : A ≤ ctr.M := hAML.trans inf_le_left
   have hAL : A ≤ data.L := hAML.trans inf_le_right
-  haveI hHnilp : Group.IsNilpotent ↥H := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent data.L
+  haveI hHnilp : Group.IsNilpotent ↥H := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent
+      data.L
   have hHL : H ≤ data.L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
   have hHnorm : data.L ≤ Subgroup.normalizer (H : Set G) :=
     OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer data.L
@@ -300,7 +301,8 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
   -- `P = O_p(H) ∩ M` contains `P₀`, sits inside `H` and `M`.
   set P : Subgroup G := opiCoreInG ({ctr.p} : Set ℕ) H ⊓ ctr.M with hPdef
   have hP0_le_P : ctr.P0 ≤ P :=
-    le_inf (pGroup_le_opiCoreInG_of_le_of_isNilpotent ctr.P0_pGroup (witness_P0_le_kernel hG hnoV data))
+    le_inf (pGroup_le_opiCoreInG_of_le_of_isNilpotent ctr.P0_pGroup (witness_P0_le_kernel hG hnoV
+        data))
       ctr.P0_le_M
   have hP_le_H : P ≤ H := inf_le_left.trans (opiCoreInG_le _ _)
   have hP_le_M : P ≤ ctr.M := inf_le_right

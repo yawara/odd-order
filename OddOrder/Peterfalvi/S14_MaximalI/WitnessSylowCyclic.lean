@@ -111,8 +111,10 @@ theorem typeI_frobenius_of_pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     intro hc
     haveI := hc
     exact hnc (isCyclic_of_surjective
-      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype U.subtype_injective).symm.toMonoidHom
-      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype U.subtype_injective).symm.surjective)
+      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype
+          U.subtype_injective).symm.toMonoidHom
+      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype
+          U.subtype_injective).symm.surjective)
   · -- `q ∣ (maxNilpotentNormalHall M).relIndex M = [M : H] = |U|`.
     rw [← data.typeF.H_eq, hrel]; exact hqU
 
@@ -801,7 +803,8 @@ theorem centralizer_control_of_CKx [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     rw [← Subgroup.centralizer_closure]; exact Subgroup.centralizer_le_normalizer _
   have hcl_le_M : Subgroup.closure ({x} : Set G) ≤ ctr.M := Subgroup.closure_le _ |>.mpr (by
     simpa using hxM)
-  have hNx_lt : Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≠ ⊤ := by
+  have hNx_lt : Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≠ ⊤ :=
+      by
     intro htop
     rcases (Subgroup.normalizer_eq_top_iff.mp htop).eq_bot_or_eq_top with hb | ht
     · exact hxne (by simpa [hb] using Subgroup.subset_closure (Set.mem_singleton x))

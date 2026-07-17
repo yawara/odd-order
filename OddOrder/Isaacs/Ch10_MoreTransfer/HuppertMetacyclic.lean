@@ -621,7 +621,8 @@ private theorem thm1015_aux (n : ℕ) :
       haveI hPqn : Pq.Normal := Subgroup.Normal.map hPn _ hfsurj
       -- the image is again a `p`-group …
       have hPqp : IsPGroup p ↥Pq :=
-        IsPGroup.of_surjective (hPp.of_equiv (MulEquiv.refl _)) ((QuotientGroup.mk' Y).subgroupMap P)
+        IsPGroup.of_surjective (hPp.of_equiv (MulEquiv.refl _)) ((QuotientGroup.mk' Y).subgroupMap
+            P)
           ((QuotientGroup.mk' Y).subgroupMap_surjective P)
       -- … of the same (unchanged) index …
       have hPqidx : Pq.index = P.index := by
