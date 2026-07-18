@@ -102,7 +102,7 @@ theorem oPiCore_le_opPPrimeCore (p : ℕ) (G : Type*) [Group G] :
   intro x hx
   have : (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G)) x = 1 := by
     rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact hx
-  simpa [opPPrimeCore, Subgroup.mem_comap, this] using (Subgroup.one_mem _)
+  simp [opPPrimeCore, Subgroup.mem_comap, this]
 
 /-- **`O_{p,p',p}(G)`**: the preimage in `G` of the `p`-core of `G/O_{p,p'}(G)`. -/
 def opPPrimePCore (p : ℕ) (G : Type*) [Group G] : Subgroup G :=
@@ -118,7 +118,7 @@ theorem opPPrimeCore_le_opPPrimePCore (p : ℕ) (G : Type*) [Group G] :
   intro x hx
   have : (QuotientGroup.mk' (opPPrimeCore p G)) x = 1 := by
     rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact hx
-  simpa [opPPrimePCore, Subgroup.mem_comap, this] using (Subgroup.one_mem _)
+  simp [opPPrimePCore, Subgroup.mem_comap, this]
 
 /-- `O_{p,p',p}(G) = ⊤` exactly when `O_p(G/O_{p,p'}(G))` is everything. -/
 theorem opPPrimePCore_eq_top_iff (p : ℕ) (G : Type*) [Group G] :
@@ -265,7 +265,7 @@ theorem oPiCore_pPrime_eq_bot [Finite G] (h : IsThreeStepGroup G p) :
   have hx' : (⟨x, hKle hx⟩ : ↥(opPPrimeCore p G)) ∈ M := hx
   rw [hMbot, Subgroup.mem_bot] at hx'
   have : x = 1 := congrArg Subtype.val hx'
-  simpa [this] using Subgroup.one_mem (⊥ : Subgroup G)
+  simp [this]
 
 /-! ### Consequence (b): `G/O_{p,p'}(G)` is a nontrivial `p`-group -/
 
