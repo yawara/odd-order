@@ -173,7 +173,11 @@
      canonical quadratic extension `GF(q^2)/GF(q)`, installs q-Frobenius as the
      nontrivial star involution, and proves exact fixed-field and Hermitian trace-fiber
      cardinalities `q`.  This is the common field layer for the unitary target.
-   - Next upstream layer: construct the Hermitian root group of order `q^3` and
-     its infinity-plus-affine unital carrier of degree `q^3 + 1`.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/RootGroup.lean` constructs the
+     Hermitian root group with its explicit coordinate multiplication, proves all group
+     laws, exact order `q^3`, and `2`-group property, then constructs the infinity-plus-
+     affine unital carrier of exact degree `q^3 + 1`.
+   - Next upstream layer: construct the faithful root and torus permutations and the
+     unitary Weyl involution on this unital carrier.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

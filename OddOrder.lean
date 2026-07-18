@@ -111,6 +111,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup

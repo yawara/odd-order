@@ -13,6 +13,7 @@ import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
@@ -281,6 +282,28 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_add_star_eq_mul_star
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_add_star_eq_mul_star
+
+-- Hermitian root group and q^3 + 1 unital for the PSU(3,q) target.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.fst_mul
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.snd_mul
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.fst_inv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.snd_inv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.equivSigma
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.natCard
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.isPGroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.affine_ne_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.infinity_ne_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.natCard
 
 -- Shared defining field and Tits twist for the Suzuki target in Peterfalvi Part II.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_field
