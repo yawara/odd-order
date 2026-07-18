@@ -314,8 +314,19 @@
      a Suzuki `2`-group of order `ℓ^3`; it does not assert the later type-B
      conclusion.  Target build, Suzuki hub, `OddOrder.AxiomsCheck`, and full
      `lake build OddOrder` all pass with only the three allowed axioms.
-   - **Next frontier:** §3 Proposition 2 (pp. 106–107): if `G` is not simple,
-     prove the conclusion of Theorem A, using the source construction
-     `L = ⟨I⟩`, the bijectivity of `x ↦ [x,k]` on `Q`, and induction on `L`.
+13. ✅ **§3 Proposition 2** (pp. 106–107) is formalized in
+    `InductionNonSimple.lean`.
+    - The proof constructs the source subgroup `L = ⟨I⟩` as a proper normal
+      subgroup and follows the literal factorization `k = t(tk)`.
+    - The map `x ↦ [x,k]` is injective from `C_Q(k) = 1`, hence bijective on
+      finite `Q`, proving `Q ≤ L` without a posited carrier.
+    - The action and (A1)--(A3) are restricted honestly to `L`; double
+      transitivity gives `G = LD` and `[G : L]` odd.
+    - The induction result in `L` is lifted to `G`; the implicit final source
+      step is made explicit by proving its normal odd-index subgroup contains
+      every involution and therefore equals `L`.
+    - The leaf build, Suzuki hub, `OddOrder.AxiomsCheck`, and full
+      `lake build OddOrder` pass with only the three allowed axioms.
+    - **Next frontier:** §3 Lemma 2 (p. 107), conjugacy of subsets of `V`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
