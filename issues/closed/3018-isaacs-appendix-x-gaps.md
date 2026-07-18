@@ -15,14 +15,26 @@ lane c は BG §1-§4 完成 + §6 substantial 済。次の高価値 in-scope pi
 - **Isaacs Appendix (X.1-X.23)** = elementary group theory compendium、17/23 済、残 6 は
   inessential clause の S-gap。**active work 無 (git 確認)** = 独立・非衝突の lane-c 適地。
 
-## 残ギャップ (survey L248-)
+## 残ギャップ (survey L248-) — ✅ 全済 (2026-07-18)
 
-- **X.1** ✅ **済** (commit, DirectDiamond.lean `coe_sup_eq_mul_iff_mul_comm`): HK subgroup ⟺ ↑H*↑K=↑K*↑H。public 化。
-- **X.4** ✅ **済** (commit, DirectDiamond.lean `directDiamond_bijOn`): direct-diamond correspondence。
-- **X.5** (部分): Frattini = nongenerators。forward = mathlib `frattini_nongenerating`、converse。
-- **X.11** (部分): |K:H∩K| ≤ |G:H|, 等号 ⟺ HK=G。inequality は mathlib、等号 iff clause。
-- **X.12** (部分): coprime index ⟹ HK=G (join 形は済)、set-product 形 (∀g=hk)。
-- **X.22** (部分): internal direct product criterion (prefix-intersection iff)。
+- **X.1** ✅ **済** (DirectDiamond.lean `coe_sup_eq_mul_iff_mul_comm`): HK subgroup ⟺ ↑H*↑K=↑K*↑H。public 化。
+- **X.4** ✅ **済** (DirectDiamond.lean `directDiamond_bijOn`): direct-diamond correspondence。
+- **X.5** ✅ **済** (SubgroupBasics.lean): converse = `mem_frattini_of_nongenerating` (finiteness 不要)、
+  full iff = `mem_frattini_iff_nongenerating [IsCoatomic]`。forward half は mathlib `frattini_nongenerating`。
+- **X.11** ✅ **済** (SubgroupBasics.lean `relIndex_eq_index_iff_mul_eq_univ [Finite G]`):
+  |K:H∩K| = |G:H| ⟺ ↑H*↑K=univ。⚠ **hint 訂正**: "HK=G" = set product `↑H*↑K = univ` は
+  `H⊔K=⊤` より真に強い (S₃ 反例; 元 issue の "HK=G" を join と読むと誤り)。inequality は mathlib
+  `relIndex_le_of_le_right`。証明は repo Lem X.2 (`Ch02.card_set_mul_card_inf`) 経由。
+- **X.12** ✅ **既済** (repo): set-product 形 = `Ch03.set_mul_eq_univ_of_coprime_index`
+  (Theorem315.lean)、join 形 = `Ch03.sup_eq_top_of_coprime_index`。SubgroupBasics で docstring 注記のみ。
+- **X.22** ✅ **済** (SubgroupBasics.lean `iSupIndep_iff_disjoint_biSup_lt [Finite ι]`):
+  正規族の iSupIndep ⟺ prefix-disjoint。hard 方向 = `supIndep_of_prefix` (strong induction)、
+  modular law の必要 instance = `disjoint_sup_of_normal` (subgroup lattice は非 modular ゆえ正規性経由)。
+
+**⟹ Isaacs Appendix 完成** (X.1-X.23 全済 or mathlib/repo 被覆)。全 SubgroupBasics 宣言 axiom-clean
+`[propext, Classical.choice, Quot.sound]` (直接 #print axioms 検証)、full build green 4387 jobs。
+AxiomsCheck 非登録 (appendix elementary、FT spine 非消費、DirectDiamond と同方針 — mathlib upstream candidate)。
+commit `7b8d175a1` (SubgroupBasics)。
 
 ## X.4 statement (Isaacs mmd L5953)
 

@@ -39,7 +39,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Isaacs Ch.8 | 44 | 0 | 0 | 0 | 25 | 19 |
 | Isaacs Ch.9 | 34 | 0 | 1 | 4 | 29 | 0 |
 | Isaacs Ch.10 | 28 | 1 | 0 | 1 | 26 | 0 |
-| Isaacs Appendix (The Basics) | 23 | 2 | 0 | 5 | 1 | 15 |
+| Isaacs Appendix (The Basics) | 23 | 8 | 0 | 0 | 0 | 15 |
 
 ### Isaacs Ch.1 — Isaacs Ch.1 Sylow Theory
 
@@ -251,12 +251,12 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
 |---|---|---|---|---|
-| X.1 | 部分 | S | HK is a subgroup iff HK = KH (permutable subgroups) | VERIFIED partial: forward direction (HK=KH => ↑(H⊔K) = HK as sets) is proved in the repo but private to Ch02 Basic.lean (used for Isaacs Thm 2.8); mathlib Algebra/Group/Subgroup/Pointwise.lean (read directly) covers only… |
-| X.4 | 未 | S | Direct-diamond correspondence: X ↦ X∩K injects {X : H≤X≤HK} into {W : D≤W≤K}, image = {W :… | VERIFIED missing: re-grepped repo for 'diamond', interval/coset correspondence patterns, and all OrderIso uses in OddOrder (all are isCoatom_iff transport along MulAut.conj or module-lattice isos — none is this statement… |
-| X.5 | 部分 | S | Frattini subgroup = set of nongenerators | VERIFIED partial by reading mathlib GroupTheory/Frattini.lean and Order/Radical.lean in full: forward direction is frattini_nongenerating (K ⊔ Φ(G) = ⊤ => K = ⊤, equivalent to the book's ⟨X∪Φ⟩<G form; repo has a finite s… |
-| X.11 | 部分 | S | /K : H∩K/ ≤ /G:H/, with equality iff HK = G | VERIFIED partial: the inequality is mathlib-derivable via relIndex_le_of_le_right (verified at Index.lean:391; note it carries a relIndex ≠ 0 side hypothesis, harmless in the finite case) — this exact derivation appears … |
-| X.12 | 部分 | S | Coprime indices /G:H/, /G:K/ => HK = G | VERIFIED partial by reading the statement: the join form (Nat.Coprime H.index K.index => H ⊔ K = ⊤) is formalized sorry-free and widely cited (Ch05 Transfer, BG S12). The book's stronger set-product form (every g = hk, i… |
-| X.22 | 部分 | S | Internal direct product criterion: G = M₁⋯M_r with M_i ⊴ G is direct iff (M₁⋯M_{k-1}) ∩ M_… | VERIFIED partial: mathlib packages internal direct products via iSupIndep + injectivity of noncommPiCoprod (and has the unnumbered pre-X.23 fact commute_of_normal_of_disjoint). The repo has two adjacent special cases (co… |
+| X.1 | 済 | S | HK is a subgroup iff HK = KH (permutable subgroups) | ✅ 2026-07-18 `Appendix/DirectDiamond.lean` `coe_sup_eq_mul_iff_mul_comm` (public 化)。 |
+| X.4 | 済 | S | Direct-diamond correspondence: X ↦ X∩K injects {X : H≤X≤HK} into {W : D≤W≤K}, image = {W : WH subgroup} | ✅ 2026-07-18 `Appendix/DirectDiamond.lean` `directDiamond_bijOn`/`injOn`/`image` (Dedekind + X.1)。 |
+| X.5 | 済 | S | Frattini subgroup = set of nongenerators | ✅ 2026-07-18 `Appendix/SubgroupBasics.lean`: converse `mem_frattini_of_nongenerating` (finiteness 不要)、full iff `mem_frattini_iff_nongenerating [IsCoatomic]`。forward half = mathlib `frattini_nongenerating`。 |
+| X.11 | 済 | S | /K : H∩K/ ≤ /G:H/, with equality iff HK = G | ✅ 2026-07-18 `Appendix/SubgroupBasics.lean` `relIndex_eq_index_iff_mul_eq_univ [Finite G]`。⚠ "HK=G" は set product `↑H*↑K=univ` (H⊔K=⊤ より真に強い、S₃ 反例)。inequality は mathlib `relIndex_le_of_le_right`。証明は repo Lem X.2 経由。 |
+| X.12 | 済 | S | Coprime indices /G:H/, /G:K/ => HK = G | ✅ 既済 (再確認 2026-07-18): set-product 形 = `Ch03.set_mul_eq_univ_of_coprime_index` (Theorem315.lean)、join 形 = `Ch03.sup_eq_top_of_coprime_index`。SubgroupBasics で docstring 注記。 |
+| X.22 | 済 | S | Internal direct product criterion: G = M₁⋯M_r with M_i ⊴ G is direct iff (M₁⋯M_{k-1}) ∩ M_k = 1 | ✅ 2026-07-18 `Appendix/SubgroupBasics.lean` `iSupIndep_iff_disjoint_biSup_lt [Finite ι]` (正規族の iSupIndep ⟺ prefix-disjoint)。hard 方向 `supIndep_of_prefix`、modular law instance `disjoint_sup_of_normal`。 |
 
 ## BG
 
