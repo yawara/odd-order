@@ -315,6 +315,35 @@ section /- 9C: Lemma 9.26 の ambient 版と Cor 9.27 の subnormal 版 -/
 
 open scoped Pointwise
 
+/-- 正規化条件を `↥H` へ落とす: `A ≤ N_G(B)` ⇒ `A.subgroupOf H ≤ N_{↥H}(B.subgroupOf H)`. -/
+theorem subgroupOf_le_normalizer_subgroupOf {A B H : Subgroup G}
+    (h : A ≤ Subgroup.normalizer (B : Set G)) :
+    A.subgroupOf H ≤ Subgroup.normalizer ((B.subgroupOf H : Subgroup ↥H) : Set ↥H) := by
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hxN := Subgroup.mem_normalizer_iff.mp (h (Subgroup.mem_subgroupOf.mp hx)) (y : G)
+  simpa [Subgroup.mem_subgroupOf] using hxN
+
+/-- 正規化条件を ambient へ持ち上げる: `A' ≤ N_{↥H}(B')` ⇒
+`A'.map H.subtype ≤ N_G(B'.map H.subtype)`. -/
+theorem map_subtype_le_normalizer_map_subtype {H : Subgroup G} {A' B' : Subgroup ↥H}
+    (h : A' ≤ Subgroup.normalizer (B' : Set ↥H)) :
+    A'.map H.subtype ≤ Subgroup.normalizer ((B'.map H.subtype : Subgroup G) : Set G) := by
+  rintro _ ⟨a, ha, rfl⟩
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hconj := Subgroup.mem_normalizer_iff.mp (h ha)
+  constructor
+  · rintro ⟨b, hb, rfl⟩
+    exact ⟨a * b * a⁻¹, (hconj b).mp hb, by simp⟩
+  · rintro ⟨c, hc, hceq⟩
+    refine ⟨a⁻¹ * c * a, (hconj (a⁻¹ * c * a)).mpr (by simpa [mul_assoc] using hc), ?_⟩
+    have hc' : (a : G) * y * (a : G)⁻¹ = (c : G) := hceq.symm
+    simp only [Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
+    rw [← hc']
+    group
+
 /-- **Isaacs Lemma 9.26 (ambient 版)**: `R = S ⊔ P` で `S`, `P` がともに `R` に normal,
 `P` が `p`-群ならば `O^p(R) = O^p(S)`.
 
@@ -404,5 +433,31 @@ theorem le_normalizer_pResidualOf_of_subnormal_two [Finite G] [Fact p.Prime]
     _ = Subgroup.normalizer (pResidualOf p S : Set G) := by rw [key]
 
 end
+
+/-- **Corollary 9.27 の subnormal 版 (相対形)**: ambient 群を部分群 `H` に取り替えた形.
+`S ≤ T ≤ H`, `P ≤ H` で `T`, `P` が `H` に normal, `S` が `T` に normal, `P` が `p`-群
+ならば `P ≤ N_G(O^p(S))`.
+
+Thm 9.24 の Case 2 はこの形で使う (`H` が ambient, `T = core_H(D)`, `S = core_K(E) = V`,
+`P = O_p(H)`; いずれも `G` には normal でない). 絶対版を `↥H` に適用し
+`map_subtype_le_normalizer_map_subtype` で ambient に戻す. -/
+theorem le_normalizer_pResidualOf_of_subnormal_two_rel [Finite G] [Fact p.Prime]
+    {H S T P : Subgroup G} (hST : S ≤ T) (hTH : T ≤ H) (hPH : P ≤ H)
+    (hTn : H ≤ Subgroup.normalizer (T : Set G))
+    (hPn : H ≤ Subgroup.normalizer (P : Set G))
+    (hSn : T ≤ Subgroup.normalizer (S : Set G)) (hP : IsPGroup p ↥P) :
+    P ≤ Subgroup.normalizer (pResidualOf p S : Set G) := by
+  haveI : (T.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hTH).mpr hTn
+  haveI : (P.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPH).mpr hPn
+  have hSH : S ≤ H := hST.trans hTH
+  have hPpg : IsPGroup p ↥(P.subgroupOf H) :=
+    hP.of_injective (Subgroup.subgroupOfEquivOfLe hPH).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hPH).injective
+  have key := le_normalizer_pResidualOf_of_subnormal_two (G := ↥H)
+    (S := S.subgroupOf H) (T := T.subgroupOf H) (P := P.subgroupOf H)
+    (Subgroup.comap_mono hST) (subgroupOf_le_normalizer_subgroupOf hSn) hPpg
+  have hlift := map_subtype_le_normalizer_map_subtype key
+  rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPH,
+    map_subtype_pResidualOf_subgroupOf hSH] at hlift
 
 end OddOrder.Isaacs.Ch09
