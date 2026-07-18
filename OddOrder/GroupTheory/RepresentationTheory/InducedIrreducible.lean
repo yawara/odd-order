@@ -674,7 +674,7 @@ theorem sum_image_induce_div_normSq_apply_eq_zero
 /-- Integer-vector combinatorics: if nonzero integer coefficients on a finite set have squares
 summing to `1`, the set is a singleton with coefficient `±1`. (The `∑ = 1` analogue of
 `exists_pair_of_sum_sq_eq_two`.) -/
-theorem exists_single_of_sum_sq_eq_one {ι : Type*} [DecidableEq ι] {s : Finset ι} {c : ι → ℤ}
+theorem exists_single_of_sum_sq_eq_one {ι : Type*} {s : Finset ι} {c : ι → ℤ}
     (hne : ∀ a ∈ s, c a ≠ 0) (hsum : ∑ a ∈ s, c a ^ 2 = 1) :
     ∃ α, s = {α} ∧ (c α = 1 ∨ c α = -1) := by
   classical
