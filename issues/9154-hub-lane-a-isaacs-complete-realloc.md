@@ -116,3 +116,29 @@ subnormal 監査と同じ方式: 番号ごとの悉皆 grep + 実 sorry 実測 +
 - [`lane_reallocation_2026_07_16.md`](../notes/meta/lane_reallocation_2026_07_16.md) §1-2
 - [`three_books_full_survey_2026_07_16.md`](../notes/meta/three_books_full_survey_2026_07_16.md)
   (Isaacs 節に警告バナー追加済)
+
+## ✅ §2 実施結果 (hub, 2026-07-19) — BG/Peterfalvi も 42% が stale
+
+7 バッチ並列 read-only 監査 (`wf_27b12223-fd5`) で **未/部分/特殊化 の 111 件**を実測再検証:
+
+| 判定 | 件数 |
+|---|---|
+| `STALE_ALREADY_DONE` (note は未/部分だが実際は完了) | **37** |
+| `STALE_PARTIAL` (程度が食い違う) | **10** |
+| `CONFIRMED` (ラベルどおり = 本物の残作業) | 64 |
+
+⟹ **stale 47 件 (42%)**。Isaacs 節と同率で、**§3 の「scope 正本から降格」裁定は BG/Pf にも妥当**。
+
+**最大の塊**: Pf App Suzuki の I.1/I.2/I.3 Props **13 件が「未」だが実際は完了** (lane b が構築済)。
+BG §1-§4 の特殊化債務 bullet 5 件は本文では解消済と書きつつ見出しが `特殊化債務` のまま。
+
+**⚠ 危険側のズレ 2 件 (「済」なのに実際は部分)** → **issue 0126** (lane c):
+- **BG Thm A(6)** — `M_F ≠ 1` / `M' ⊊ M` / `M'/M_F nilpotent` が欠落。
+  特に `M_F ≠ ⊥` を主張する宣言はリポジトリに存在しない。A(3)/A(7) にも packaging 漏れ。
+- **BG §16 散文の「残ギャップ 4 件」** — 3 件は landing 済。
+  同ブロックの「S14 に real sorry 2 件」も無効 (BG/Ch4 全 35 file の実 sorry = 0)。
+
+**リポジトリ側の stale 1 件**: `OpicoreCentralizer.lean:410-413` の `fitting_not_ti_cases`
+docstring が「(d)(e) は未達」と書くが両者 landing 済 → issue 0126。
+
+survey には BG/Pf 用の警告バナーを追加済。**本 issue の 3 論点はすべて処理済ゆえ close 可**。

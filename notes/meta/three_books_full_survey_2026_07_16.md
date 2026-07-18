@@ -408,6 +408,37 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ## BG
 
+> ## ⚠⚠ BG / Peterfalvi 節も実測監査で 42% が stale と判明 (hub, 2026-07-19、issue 9154 §2)
+>
+> **未/部分/特殊化 ラベルの 111 件を実測再検証した結果: 47 件 (42%) が実体と食い違った。**
+> Isaacs 節と同じ失敗モードで、本 note は **scope 正本から降格済** (hub 裁定 9154)。
+> **着手前に必ず repo 実測で再確認すること。**
+>
+> | 判定 | 件数 | 内容 |
+> |---|---|---|
+> | `STALE_ALREADY_DONE` | 37 | note は 未/部分/特殊化 だが、実際は教科書強度で形式化済 |
+> | `STALE_PARTIAL` | 10 | ラベルと実体の程度が食い違う (**うち 2 件は「済」なのに実際は部分** = 危険側) |
+> | `CONFIRMED` | 64 | ラベルどおり = 本物の残作業 |
+>
+> **特に大きい塊**: Pf App Suzuki の I.1/I.2/I.3 Props **13 件が「未」だが実際は完了**
+> (lane b が構築済)。BG §1-§4 の特殊化債務 bullet 5 件も本文では解消済と書きながら
+> 見出しが `特殊化債務` のままで、見出しだけ読むと未解決に見える。
+>
+> **⚠ 危険側のズレ (「済」なのに実際は部分)**:
+> - **BG Thm A** — A(6) の `M_F ≠ 1` / `M' ⊊ M` / `M'/M_F nilpotent` が欠落。
+>   特に `M_F ≠ ⊥` を主張する宣言はリポジトリに**存在しない** → **issue 0126**。
+> - **BG §16 引用ブロック**「genuine residual gaps 4 件」 — 3 件は landing 済で散文が stale、
+>   残る 1 件 (Thm A の一般 `M'/M_F` nilpotent) は実在するギャップ。
+>   同ブロックの「S14 に real sorry が 2 件残る」も無効 (`OddOrder/BG/Ch4_FamilyOfMaximal/**`
+>   全 35 ファイルの実 sorry = **0**)。
+>
+> **リポジトリ側の stale も 1 件**: `S15_MF/OpicoreCentralizer.lean:410-413` の
+> `fitting_not_ti_cases` docstring が「(d)(e) は未達、15.7 の完全形式化と読むな」と書いているが、
+> (d)(e) とも別宣言として landing 済 (issue 3022 close) → issue 0126。
+>
+> 監査 workflow = `wf_27b12223-fd5` (7 バッチ並列 read-only)。
+
+
 | unit | n | 済 | 特殊化 | 部分 | 未 | mathlib |
 |---|---|---|---|---|---|---|
 | BG §1 | 27 | 20 | 3 | 1 | 0 | 3 |
