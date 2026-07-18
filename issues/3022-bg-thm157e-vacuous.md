@@ -294,6 +294,23 @@ BG は `X = X₁` を示して `p = |X|`
           (`Z q = Ks` なら `q = p`; さもなくば `Z q ⊓ Ks = ⊥` + semiprime で
           `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot`)。偽なら (e3) (Singer 鎖 =
           `card_opiCore_eq_prime_cube_singer` + `card_dvd_succ_of_primeAction_extraspecial`)。
+
+      **⚠ 手順 B の唯一の未形式化サブ補題 = `|K*| = p` (Coq `oKs`, `BGsection15.v:1178`)**
+      (2026-07-19 調査)。type `P₁` の (e2) 分岐で `Z q = K*` の場合に `q = p` を出すのに要る。
+
+      - **既存の `kstar_le_opiCore_of_inputs` (`Theorem152Helpers.lean:268`) は使えない** —
+        仮説に `hne : MF M ≠ Msigma M` を持つが、15.7(e) の設定は逆の `M_F = M_σ` (`hmf`)。
+        ⚠ 名前だけ見て流用しないこと。
+      - **正しい経路** (Coq `sKsP` を辿る): `K* ≤ M''` は **Cor 15.6 =
+        `typeP_kstar_in_mf` (`Corollary155.lean:1425`)** が与える (`1 ≠ K* ≤ M''`)。
+        あとは `M'' ≤ O_p(M_F)` を出せばよく、これは
+        `M' = M_F = M_σ` (type `P₁`、`typeP1_msigma_eq_derivedInG`) と
+        `M_F` nilpotent の分解 `M_F = O_p(M_F) × O_{p'}(M_F)`、および
+        `O_{p'}(M_F)` cyclic ⟹ 可換 (`typeF_nonabelian_cyclic_opiCore_compl`) から
+        「`M'/O_p(M_F)` 可換 ⟹ `M'' ≤ O_p(M_F)`」で出る。
+        `K* ≤ O_p(M_F)` と `|K*|` 素数 (`kstar_card_prime_of_inputs`) と
+        `O_p(M_F)` が `p`-群であることから `|K*| = p`。
+      - 見積 ~40 行。ここだけが新規の数学で、残りは既存補題の cite。
 - [x] **(d) の追加** (2026-07-18 完了)。`sigmaComplement_structure_of_not_fittingIsTI` として、
       `fitting_not_ti_cases` の bundle でなく **§12 E-setup を取る独立定理**にした (BG (d) は
       「§12-13 のとおりに取った E, E₁, E₂, E₃」についての主張なので、E-setup を引数に取る形が
