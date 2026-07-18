@@ -70,4 +70,35 @@ theorem le_relCore {H D N : Subgroup G} (hND : N ≤ D) (hNH : N ≤ H)
 
 end
 
+section /- 9C: Theorem 9.24 の仮説と N_G 補題 -/
+
+/-- Thm 9.24 の仮説: `D` の非自明部分群は `H` または `K` を真に含むどの部分群にも
+normal でない (`N ◁ L` を `L ≤ N_G(N)` で表す). -/
+def NoNormalInSupergroup (H K D : Subgroup G) : Prop :=
+  ∀ L : Subgroup G, H < L ∨ K < L →
+    ∀ N : Subgroup G, N ≠ ⊥ → N ≤ D → ¬ (L ≤ Subgroup.normalizer (N : Set G))
+
+/-- 仮説から: `N ≤ D` が nonidentity で `H` に normal (`H ≤ N_G(N)`) なら `N_G(N) = H`
+(さもなくば `N_G(N) ⊋ H` が仮説に反する). -/
+theorem normalizer_eq_left_of_noNormal {H K D : Subgroup G}
+    (hyp : NoNormalInSupergroup H K D) {N : Subgroup G} (hN : N ≠ ⊥) (hND : N ≤ D)
+    (hHN : H ≤ Subgroup.normalizer (N : Set G)) :
+    Subgroup.normalizer (N : Set G) = H := by
+  refine le_antisymm ?_ hHN
+  by_contra hle
+  exact hyp (Subgroup.normalizer (N : Set G))
+    (Or.inl (lt_of_le_of_ne hHN fun heq => hle heq.ge)) N hN hND le_rfl
+
+/-- 仮説から (K 版): `N ≤ D` が nonidentity で `K` に normal なら `N_G(N) = K`. -/
+theorem normalizer_eq_right_of_noNormal {H K D : Subgroup G}
+    (hyp : NoNormalInSupergroup H K D) {N : Subgroup G} (hN : N ≠ ⊥) (hND : N ≤ D)
+    (hKN : K ≤ Subgroup.normalizer (N : Set G)) :
+    Subgroup.normalizer (N : Set G) = K := by
+  refine le_antisymm ?_ hKN
+  by_contra hle
+  exact hyp (Subgroup.normalizer (N : Set G))
+    (Or.inr (lt_of_le_of_ne hKN fun heq => hle heq.ge)) N hN hND le_rfl
+
+end
+
 end OddOrder.Isaacs.Ch09
