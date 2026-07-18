@@ -58,9 +58,9 @@ module 名は不変ゆえ他の下流は無変更。
 
 ## やること
 
-- [ ] b が上記 A (または B) で循環を解消する
-- [ ] leaf build で `build cycle detected` が消えることを確認
-- [ ] hub が次の tick で b を再合流し、フルビルドで green を確認 → 本 issue を close
+- [x] b が **修正案 A** で循環を解消 (`Suzuki2Groups/Basic.lean` 新設 + hub を pure re-export 化、`CenterInvolutions.lean` も分離)
+- [x] 循環解消を確認
+- [x] hub が再合流し full build green を確認 (4477 jobs、`build cycle` 0 件) → **close**
 
 ## 完了条件
 
