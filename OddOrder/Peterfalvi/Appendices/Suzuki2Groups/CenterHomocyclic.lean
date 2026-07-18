@@ -78,4 +78,26 @@ theorem exists_center_homocyclic_and_invariant_eq_agemo
     (exists_homocyclic_and_invariant_eq_agemo
       (hP2.to_subgroup (Subgroup.center P)) (centerAction K) htrans)
 
+/-- For a homocyclic center of a Suzuki `2`-group, the subgroup formed by its
+identity and involutions is the last nontrivial Agemo layer of the center. -/
+theorem involutionSubgroup_subgroupOf_center_eq_lastAgemoLayer
+    {P ι : Type*} [Group P] [Finite P] (hP : IsSuzuki2Group P) {e : ℕ}
+    (ε : ↥(Subgroup.center P) ≃*
+      (ι → Multiplicative (ZMod (2 ^ e)))) (he : 0 < e) :
+    (involutionSubgroup P).subgroupOf (Subgroup.center P) =
+      Agemo ↥(Subgroup.center P) 2 (e - 1) := by
+  letI : CommGroup ↥(Subgroup.center P) :=
+    { (inferInstance : Group ↥(Subgroup.center P)) with
+      mul_comm :=
+        (inferInstance : IsMulCommutative ↥(Subgroup.center P)).is_comm.comm }
+  ext x
+  rw [Subgroup.mem_subgroupOf, mem_involutionSubgroup_iff_sq_eq_one hP]
+  constructor
+  · intro hx
+    apply (sq_eq_one_iff_mem_lastAgemoLayer ε he).mp
+    exact Subtype.ext hx
+  · intro hx
+    exact congrArg Subtype.val
+      ((sq_eq_one_iff_mem_lastAgemoLayer ε he).mpr hx)
+
 end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
