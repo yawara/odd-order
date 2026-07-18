@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.FiniteAbelian.Basic
+import Mathlib.GroupTheory.QuotientGroup.Basic
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.OmegaSubgroup
 
@@ -61,6 +62,197 @@ theorem agemo_two_eq_bot_of_equiv_pi_zmod
   intro x hx
   obtain ⟨y, rfl⟩ := mem_agemo_iff_of_comm.mp hx
   exact pow_two_pow_eq_one_of_equiv_pi_zmod ε y
+
+/-! ## Successive power layers -/
+
+/-- In `ZMod (2 ^ e)`, an element annihilated by `2 ^ (e - 1)` is twice another element. -/
+theorem zmod_two_pow_is_two_nsmul_of_annihilated
+    {e : ℕ} (he : 0 < e) (z : ZMod (2 ^ e))
+    (hz : (2 ^ (e - 1)) • z = 0) :
+    ∃ w : ZMod (2 ^ e), z = 2 • w := by
+  have hdiv : 2 ^ e ∣ 2 ^ (e - 1) * z.val := by
+    rw [← ZMod.natCast_eq_zero_iff]
+    simpa [Nat.cast_mul, nsmul_eq_mul, z.natCast_zmod_val] using hz
+  have heq : e = (e - 1) + 1 := by omega
+  have hpow : 2 ^ e = 2 ^ (e - 1) * 2 := by
+    calc
+      2 ^ e = 2 ^ ((e - 1) + 1) := congrArg (2 ^ ·) heq
+      _ = 2 ^ (e - 1) * 2 := by simp [pow_add]
+  have hdiv2 : 2 ^ (e - 1) * 2 ∣ 2 ^ (e - 1) * z.val := by
+    simpa only [hpow] using hdiv
+  have hz_even : 2 ∣ z.val := by
+    exact (Nat.mul_dvd_mul_iff_left (by positivity : 0 < 2 ^ (e - 1))).mp hdiv2
+  obtain ⟨q, hq⟩ := hz_even
+  refine ⟨q, ?_⟩
+  rw [← z.natCast_zmod_val, hq]
+  simp [nsmul_eq_mul]
+
+/-- Coordinatewise, an element killed by `2 ^ (e - 1)` in a homocyclic product is a square. -/
+theorem pi_zmod_two_pow_is_square_of_annihilated
+    {ι : Type*} {e : ℕ} (he : 0 < e)
+    (x : ι → Multiplicative (ZMod (2 ^ e)))
+    (hx : x ^ (2 ^ (e - 1)) = 1) :
+    ∃ y : ι → Multiplicative (ZMod (2 ^ e)), x = y ^ 2 := by
+  classical
+  have hcoord : ∀ i, (2 ^ (e - 1)) • (x i).toAdd = 0 := by
+    intro i
+    have hi := congrArg (fun f => (f i).toAdd) hx
+    simpa [toAdd_pow] using hi
+  choose w hw using fun i =>
+    zmod_two_pow_is_two_nsmul_of_annihilated he (x i).toAdd (hcoord i)
+  refine ⟨fun i => Multiplicative.ofAdd (w i), ?_⟩
+  funext i
+  apply Multiplicative.ext
+  simpa [toAdd_pow] using hw i
+
+/-- Model calculation for the kernel of the power map between successive Agemo layers. -/
+theorem mem_agemo_succ_of_mem_and_layer_pow_eq_one_model
+    {ι : Type*} {e s : ℕ} (hs : s < e)
+    {x : ι → Multiplicative (ZMod (2 ^ e))}
+    (hxmem : x ∈ Agemo (ι → Multiplicative (ZMod (2 ^ e))) 2 s)
+    (hxpow : x ^ (2 ^ (e - 1 - s)) = 1) :
+    x ∈ Agemo (ι → Multiplicative (ZMod (2 ^ e))) 2 (s + 1) := by
+  have he : 0 < e := by omega
+  obtain ⟨y, rfl⟩ := (mem_agemo_iff_of_comm).mp hxmem
+  have hsum : s + (e - 1 - s) = e - 1 := by omega
+  have hmul : 2 ^ s * 2 ^ (e - 1 - s) = 2 ^ (e - 1) := by
+    rw [← pow_add, hsum]
+  have hypow : y ^ (2 ^ (e - 1)) = 1 := by
+    simpa only [← pow_mul, hmul] using hxpow
+  obtain ⟨z, hz⟩ := pi_zmod_two_pow_is_square_of_annihilated he y hypow
+  apply (mem_agemo_iff_of_comm).mpr
+  refine ⟨z, ?_⟩
+  rw [hz, ← pow_mul]
+  congr 1
+  simp [pow_succ, mul_comm]
+
+/-- Transported kernel calculation for a group with a homocyclic `ZMod` product model. -/
+theorem mem_agemo_succ_of_mem_and_layer_pow_eq_one
+    {A : Type*} [CommGroup A] {ι : Type*} {e s : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e)))) (hs : s < e)
+    {x : A} (hxmem : x ∈ Agemo A 2 s)
+    (hxpow : x ^ (2 ^ (e - 1 - s)) = 1) :
+    x ∈ Agemo A 2 (s + 1) := by
+  obtain ⟨y, hy⟩ := (mem_agemo_iff_of_comm).mp hxmem
+  have hemem : ε x ∈ Agemo (ι → Multiplicative (ZMod (2 ^ e))) 2 s := by
+    apply (mem_agemo_iff_of_comm).mpr
+    exact ⟨ε y, by simpa [map_pow] using congrArg ε hy⟩
+  have hepow : (ε x) ^ (2 ^ (e - 1 - s)) = 1 := by
+    simpa [map_pow] using congrArg ε hxpow
+  have he_succ :=
+    mem_agemo_succ_of_mem_and_layer_pow_eq_one_model hs hemem hepow
+  obtain ⟨z, hz⟩ := (mem_agemo_iff_of_comm).mp he_succ
+  apply (mem_agemo_iff_of_comm).mpr
+  refine ⟨ε.symm z, ?_⟩
+  apply ε.injective
+  simpa [map_pow] using hz
+
+
+/-- The power map from the `s`-th Agemo layer onto the last nontrivial layer. -/
+def agemoLayerPowHom
+    {A : Type*} [CommGroup A] {e s : ℕ} (hs : s < e) :
+    ↥(Agemo A 2 s) →* ↥(Agemo A 2 (e - 1)) where
+  toFun x := ⟨x.1 ^ (2 ^ (e - 1 - s)), by
+    obtain ⟨y, hy⟩ := (mem_agemo_iff_of_comm).mp x.2
+    apply (mem_agemo_iff_of_comm).mpr
+    refine ⟨y, ?_⟩
+    have hsum : s + (e - 1 - s) = e - 1 := by omega
+    have hmul : 2 ^ s * 2 ^ (e - 1 - s) = 2 ^ (e - 1) := by
+      rw [← pow_add, hsum]
+    simp only [hy, ← pow_mul, hmul]⟩
+  map_one' := by ext; simp
+  map_mul' x y := by ext; simp [mul_pow]
+
+/-- The layer power map is surjective. -/
+theorem agemoLayerPowHom_surjective
+    {A : Type*} [CommGroup A] {e s : ℕ} (hs : s < e) :
+    Function.Surjective (agemoLayerPowHom (A := A) hs) := by
+  rintro ⟨x, hx⟩
+  obtain ⟨y, hy⟩ := (mem_agemo_iff_of_comm).mp hx
+  refine ⟨⟨y ^ (2 ^ s), Agemo.mem_of_eq_pow y⟩, ?_⟩
+  apply Subtype.ext
+  change (y ^ (2 ^ s)) ^ (2 ^ (e - 1 - s)) = x
+  have hsum : s + (e - 1 - s) = e - 1 := by omega
+  have hmul : 2 ^ s * 2 ^ (e - 1 - s) = 2 ^ (e - 1) := by
+    rw [← pow_add, hsum]
+  simpa only [← pow_mul, hmul] using hy.symm
+
+/-- In a homocyclic product, the kernel of the layer power map is the next Agemo layer. -/
+theorem agemoLayerPowHom_ker_eq_succ
+    {A : Type*} [CommGroup A] {ι : Type*} {e s : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e)))) (hs : s < e) :
+    (agemoLayerPowHom (A := A) hs).ker =
+      (Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s) := by
+  ext x
+  rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf]
+  constructor
+  · intro hx
+    apply mem_agemo_succ_of_mem_and_layer_pow_eq_one ε hs x.2
+    exact congrArg Subtype.val hx
+  · intro hx
+    obtain ⟨y, hy⟩ := (mem_agemo_iff_of_comm).mp hx
+    apply Subtype.ext
+    change x.1 ^ (2 ^ (e - 1 - s)) = 1
+    rw [hy, ← pow_mul]
+    have hsum : (s + 1) + (e - 1 - s) = e := by omega
+    have hmul : 2 ^ (s + 1) * 2 ^ (e - 1 - s) = 2 ^ e := by
+      rw [← pow_add, hsum]
+    rw [hmul]
+    exact pow_two_pow_eq_one_of_equiv_pi_zmod ε y
+
+/-- The quotient of two successive Agemo layers is isomorphic to the last nontrivial layer. -/
+noncomputable def agemoSuccQuotientEquivLast
+    {A : Type*} [CommGroup A] {ι : Type*} {e s : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e)))) (hs : s < e) :
+    (↥(Agemo A 2 s) ⧸
+      (Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)) ≃*
+        ↥(Agemo A 2 (e - 1)) :=
+  (QuotientGroup.quotientMulEquivOfEq
+      (agemoLayerPowHom_ker_eq_succ ε hs).symm).trans
+    (QuotientGroup.quotientKerEquivOfSurjective
+      (agemoLayerPowHom (A := A) hs) (agemoLayerPowHom_surjective hs))
+
+/-- Representative formula for `agemoSuccQuotientEquivLast`. -/
+@[simp] theorem agemoSuccQuotientEquivLast_mk
+    {A : Type*} [CommGroup A] {ι : Type*} {e s : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e)))) (hs : s < e)
+    (x : ↥(Agemo A 2 s)) :
+    agemoSuccQuotientEquivLast ε hs (QuotientGroup.mk x) =
+      agemoLayerPowHom (A := A) hs x := by
+  rfl
+
+/-- The ambient successor layer viewed inside the current layer is its first Agemo subgroup. -/
+theorem agemo_succ_subgroupOf_eq_agemo_one
+    {A : Type*} [CommGroup A] {p s : ℕ} :
+    (Agemo A p (s + 1)).subgroupOf (Agemo A p s) =
+      Agemo (Agemo A p s) p 1 := by
+  apply Subgroup.map_injective (Agemo A p s).subtype_injective
+  rw [Subgroup.subgroupOf_map_subtype,
+    inf_eq_left.mpr (Agemo.anti (Nat.le_succ s)),
+    ← agemo_succ_eq_map_agemo_one]
+
+/-- Ambient Agemo–Nakayama lifting from a generated successive layer to subgroup equality. -/
+theorem eq_agemo_of_sup_succ_eq
+    {A : Type*} [CommGroup A] [Finite A] {p s : ℕ} [Fact p.Prime]
+    (hA : IsPGroup p A) {U : Subgroup A}
+    (hUle : U ≤ Agemo A p s)
+    (hgen : U ⊔ Agemo A p (s + 1) = Agemo A p s) :
+    U = Agemo A p s := by
+  let M := Agemo A p s
+  let U' := U.subgroupOf M
+  have hU'top : U' ⊔ Agemo M p 1 = ⊤ := by
+    apply Subgroup.map_injective M.subtype_injective
+    rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr hUle, ← agemo_succ_eq_map_agemo_one,
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    exact hgen
+  have hUeq : U' = ⊤ :=
+    eq_top_of_sup_agemo_one_eq_top (hA.to_subgroup M) hU'top
+  have hmap := congrArg (fun K : Subgroup M => K.map M.subtype) hUeq
+  rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hUle,
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+  exact hmap
+
 
 /-- **Higman, Suzuki 2-groups, Lemma 1 — homogeneous-factor part**: a finite
 abelian `2`-group whose involutions all have the same Agemo height is a direct
@@ -214,5 +406,19 @@ theorem exists_homocyclic_decomposition_of_involution_heights
     MulEquiv.piCongrRight fun i =>
       MulEquiv.toAdditive.symm (ZMod.ringEquivCongr (hne i)).toAddEquiv
   exact ⟨ι, hι, e, hepos, ⟨ε.trans δ⟩⟩
+
+/-- **Higman, Suzuki 2-groups, Lemma 1 — homogeneous-factor part**, in its
+action-theoretic form: transitivity on the involutions forces a homocyclic
+decomposition. -/
+theorem exists_homocyclic_decomposition_of_transitive_involutions
+    {A X : Type*} [CommGroup A] [Finite A] [Monoid X]
+    (hA : IsPGroup 2 A) (phi : X →* MulAut A)
+    (htrans : ∀ {x y : A}, orderOf x = 2 → orderOf y = 2 →
+      ∃ a : X, phi a x = y) :
+    ∃ (ι : Type) (_ : Fintype ι) (e : ℕ), 0 < e ∧
+      Nonempty (A ≃* ((i : ι) → Multiplicative (ZMod (2 ^ e)))) := by
+  apply exists_homocyclic_decomposition_of_involution_heights hA
+  intro x y hx hy s
+  exact mem_agemo_iff_of_transitive_orderOf_two phi htrans hx hy
 
 end OddOrder.GroupTheory
