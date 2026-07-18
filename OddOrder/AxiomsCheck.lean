@@ -28,6 +28,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
@@ -726,6 +727,22 @@ section 3, Proposition 1(c). -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBruhatDecomposition
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_eq_infinityStabilizer
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardPermGroup
+
+/-! The exact standard root subgroup and distinguished order-five pair for the
+Suzuki branch of Peterfalvi Part II, Ch. I section 3, Proposition 1(c). -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootEquivStandardRoot
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_rootGroup_eq_field_sq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardRootSubgroup_eq_field_sq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardRootSubgroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.centerLine_eq_sq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_mem_standardRootSubgroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_sq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.orderOf_standardRootInvolution_mul_weylElement
 
 -- Perfectness, solvable Borel stabilizer, and simplicity of the standard Suzuki group.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_eq_one_iff
