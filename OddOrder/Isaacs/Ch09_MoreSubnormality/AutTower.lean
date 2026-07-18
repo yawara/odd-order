@@ -28,6 +28,8 @@ namespace OddOrder.Isaacs.Ch09
 
 open Subgroup
 
+open scoped Nat
+
 universe u
 
 section /- 9B: automorphism tower の型族 (Thm 9.10 の土台) -/
@@ -284,6 +286,86 @@ theorem chainAux_centralizer_inf (hZ : Subgroup.center G = ⊥) (m : ℕ) :
         rw [chainAux_succ_of_le h, chainAux_succ_of_lt (Nat.lt_succ_self j), chainAux_self,
           ← MonoidHom.range_eq_map, range_autTowerStep, inf_top_eq]
         exact centralizer_innAut_eq_bot (center_autTowerType_eq_bot hZ (m + j))
+
+/-- 鎖の底は `G_m` の像そのもの. -/
+theorem chainAux_zero_eq_range (m : ℕ) :
+    ∀ k : ℕ, chainAux G m k 0 = (autTowerEmb G m k).range
+  | 0 => by rw [chainAux_zero]; exact (MonoidHom.range_eq_top.mpr Function.surjective_id).symm
+  | k + 1 => by
+      rw [chainAux_succ_of_lt (Nat.succ_pos k), chainAux_zero_eq_range m k, autTowerEmb_succ,
+        MonoidHom.range_comp]
+
+/-- **Lemma 9.12 の適用**: 鎖の底の中心化群は自明 — `C_{G_{m+k}}(G_m の像) = 1`.
+
+`k = 0` は `C(⊤) = Z(G_m) = 1` (中心自明), `k > 0` は
+`centralizer_eq_bot_of_chain` に 4 仮説を渡すだけ. -/
+theorem centralizer_chainAux_zero_eq_bot (hZ : Subgroup.center G = ⊥) (m k : ℕ) :
+    Subgroup.centralizer (↑(chainAux G m k 0) : Set (autTowerType G (m + k))) = ⊥ := by
+  rcases Nat.eq_zero_or_pos k with rfl | hk
+  · rw [chainAux_zero, Subgroup.coe_top, Subgroup.centralizer_univ]
+    exact center_autTowerType_eq_bot hZ (m + 0)
+  · exact centralizer_eq_bot_of_chain hk (chainAux G m k)
+      (fun i hi => chainAux_le_succ m k i hi)
+      (fun i hi => chainAux_le_normalizer m k i hi)
+      (fun i hi => chainAux_centralizer_inf hZ m k i hi)
+      (chainAux_self m k)
+
+/-- 鎖の各項は環境に subnormal (`S j ◁ S (j+1) ◁ ⋯ ◁ S k = ⊤` を上から降ろす).
+
+`d` (= `k - j`) に関する帰納法. `IsSubnormal.step` は上から下へ降ろす形なので,
+`j + d = k` をパラメータに取るのが素直. -/
+theorem chainAux_isSubnormal (m k : ℕ) :
+    ∀ (d j : ℕ), j + d = k → (chainAux G m k j).IsSubnormal
+  | 0, j, hjd => by
+      have : j = k := by omega
+      subst this
+      rw [chainAux_self]
+      exact Subgroup.IsSubnormal.top
+  | d + 1, j, hjd => by
+      have hjk : j < k := by omega
+      refine Subgroup.IsSubnormal.step _ (chainAux G m k (j + 1)) (chainAux_le_succ m k j hjk)
+        (chainAux_isSubnormal m k d (j + 1) (by omega)) ?_
+      exact (Subgroup.normal_subgroupOf_iff_le_normalizer (chainAux_le_succ m k j hjk)).mpr
+        (chainAux_le_normalizer m k j hjk)
+
+/-- `G_m` の像は環境 `G_{m+k}` に subnormal. -/
+theorem chainAux_zero_isSubnormal (m k : ℕ) : (chainAux G m k 0).IsSubnormal :=
+  chainAux_isSubnormal m k k 0 (Nat.zero_add k)
+
+/-- 鎖の底の nilpotent residual は `G_m^∞` と同型 (単射 hom の像なので). -/
+noncomputable def nilpotentResidualChainAuxEquiv [Finite G] (hZ : Subgroup.center G = ⊥)
+    (m k : ℕ) :
+    ↥(nilpotentResidual (chainAux G m k 0))
+      ≃* ↥(nilpotentResidual (⊤ : Subgroup (autTowerType G m))) := by
+  rw [chainAux_zero_eq_range, MonoidHom.range_eq_map, ← map_nilpotentResidual]
+  exact (Subgroup.equivMapOfInjective _ _ (autTowerEmb_injective hZ m k)).symm
+
+/-- **一様上界** (Thm 9.10 の核): `|G_{m+k}|` は `k` に依らず `G_m` だけで抑えられる.
+
+subnormal 版 9.13 (`card_le_factorial_of_isSubnormal`) を
+「`G_m` の像 ◁◁ `G_{m+k}`, その中心化群は自明」に当て,
+`(G_m の像)^∞ ≃* G_m^∞` で右辺から `k` を消す. -/
+theorem card_autTowerType_add_le [Finite G] (hZ : Subgroup.center G = ⊥) (m k : ℕ) :
+    Nat.card (autTowerType G (m + k))
+      ≤ (Nat.card (Subgroup.center ↥(nilpotentResidual (⊤ : Subgroup (autTowerType G m))))
+          * Nat.card (MulAut ↥(nilpotentResidual (⊤ : Subgroup (autTowerType G m)))))! := by
+  have h := card_le_factorial_of_isSubnormal (chainAux_zero_isSubnormal m k)
+    (centralizer_chainAux_zero_eq_bot hZ m k)
+  rwa [Nat.card_congr (Subgroup.centerCongr (nilpotentResidualChainAuxEquiv hZ m k)).toEquiv,
+    Nat.card_congr (mulAutEquivCongr (nilpotentResidualChainAuxEquiv hZ m k))] at h
+
+/-- **Isaacs Theorem 9.10** (Wielandt automorphism tower, p. 278).
+
+`G` を有限群, `Z(G) = 1` とし `G_1 = G`, `G_{i+1} = Aut(G_i)` とすると,
+**`|G_i|` は `i` に依らない上界を持つ**. 特に `G_i` は同型を除いて有限種しかない
+(位数が有界な有限群は同型類が有限個).
+
+上界は `(|Z(G^∞)| · |Aut(G^∞)|)!` と明示的に取れる. -/
+theorem exists_card_autTowerType_le [Finite G] (hZ : Subgroup.center G = ⊥) :
+    ∃ n : ℕ, ∀ i : ℕ, Nat.card (autTowerType G i) ≤ n :=
+  ⟨(Nat.card (Subgroup.center ↥(nilpotentResidual (⊤ : Subgroup (autTowerType G 0))))
+      * Nat.card (MulAut ↥(nilpotentResidual (⊤ : Subgroup (autTowerType G 0)))))!,
+    fun i => by simpa using card_autTowerType_add_le hZ 0 i⟩
 
 end
 
