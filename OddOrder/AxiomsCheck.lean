@@ -37,6 +37,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
@@ -5214,6 +5215,14 @@ set_option linter.style.longLine false in
 -- irreducible ⟹ cyclic).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_of_faithful_isIrreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.elemAbelian_aut_action
+
+-- Peterfalvi Part II, Ch. I, Lemma 5: a fixed-point-free action on a
+-- two-dimensional projective line is irreducible; in characteristic two an odd faithful
+-- acting group is cyclic and its order divides the projective-line cardinality `|F| + 1`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isIrreducible_of_projective_no_nontrivial_fixed
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isCyclic_and_card_dvd_card_add_one_of_projective_no_nontrivial_fixed
 
 -- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
 -- representation over an algebraically closed field has cyclic centre `Z(G)`.
