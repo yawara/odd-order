@@ -85,4 +85,68 @@ theorem map_layer_eq_layer_of_fitting_eq_bot [Finite G] {H : Subgroup G}
 
 end
 
+section /- 9C: `F(G)=1` なら `E(G) ≠ 1` -/
+
+/-- `F(G) = 1` かつ `G` が非自明ならば `E(G) ≠ 1`.
+
+`F(G)=1` より `F*(G) = E(G)`. もし `E(G)=1` なら `F*(G)=1` で, Thm 9.8
+(`C_G(F*(G)) ≤ F*(G)`) が `G = C_G(1) ≤ 1` を与え `G` が自明になってしまう.
+Thm 9.24 の Case 1 で「`F(H)=1` ⇒ `E(H)>1`」として使う. -/
+theorem layer_ne_bot_of_fitting_eq_bot [Finite G] [Nontrivial G]
+    (hF : Ch01.fitting G = ⊥) : layer G ≠ ⊥ := by
+  intro hL
+  have hgf : genFitting G = ⊥ := by rw [genFitting, hF, hL, bot_sup_eq]
+  have h := centralizer_genFitting_le_genFitting (G := G)
+  rw [hgf] at h
+  have htop : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
+    rw [Subgroup.centralizer_eq_top_iff_subset]
+    intro x hx
+    rw [SetLike.mem_coe, Subgroup.mem_bot] at hx
+    subst hx
+    exact Subgroup.one_mem _
+  rw [htop] at h
+  exact top_ne_bot (le_bot_iff.mp h)
+
+end
+
+section /- 9C: ambient 値の layer `E(H)` -/
+
+/-- **ambient 値の layer** `E(H)`: 部分群 `H ≤ G` に対し `Subgroup G` の元として `E(H)` を
+与える (`nilpotentResidual` / `pResidualOf` と同じ ambient 設計). Thm 9.24 の Case 1 は
+`E(H)`, `E(K)`, `E(D)` を同じ ambient で比較するのでこの形が要る. -/
+def layerInG (H : Subgroup G) : Subgroup G := (layer ↥H).map H.subtype
+
+theorem layerInG_le (H : Subgroup G) : layerInG H ≤ H := Subgroup.map_subtype_le _
+
+theorem layerInG_top : layerInG (⊤ : Subgroup G) = layer G := by
+  rw [layerInG, ← map_layer_mulEquiv (Subgroup.topEquiv (G := G))]
+  rfl
+
+/-- `↥R` 内で計算した `E(S.subgroupOf R)` を落とすと ambient の `E(S)` (`S ≤ R`).
+`map_subtype_nilpotentResidual_subgroupOf` の layer 版. -/
+theorem map_subtype_layerInG_subgroupOf {S R : Subgroup G} (h : S ≤ R) :
+    (layerInG (S.subgroupOf R)).map R.subtype = layerInG S := by
+  have hhom : R.subtype.comp (S.subgroupOf R).subtype
+      = S.subtype.comp ((Subgroup.subgroupOfEquivOfLe h : _ ≃* ↥S) : _ →* ↥S) := by
+    ext x; rfl
+  rw [layerInG, Subgroup.map_map, hhom, ← Subgroup.map_map,
+    map_layer_mulEquiv (Subgroup.subgroupOfEquivOfLe h)]
+  rfl
+
+/-- **Isaacs Lemma 9.25 (ambient 版)**: `D ≤ H`, `F(H) = 1`, `E(H) ≤ D` ならば `E(D) = E(H)`.
+
+型レベル版 `map_layer_eq_layer_of_fitting_eq_bot` を `↥H` に適用し
+`map_subtype_layerInG_subgroupOf` で ambient に戻しただけ. -/
+theorem layerInG_eq_of_fitting_eq_bot [Finite G] {H D : Subgroup G}
+    (hF : Ch01.fitting ↥H = ⊥) (hDH : D ≤ H) (hle : layerInG H ≤ D) :
+    layerInG D = layerInG H := by
+  have hle' : layer ↥H ≤ D.subgroupOf H := Subgroup.map_le_iff_le_comap.mp hle
+  have key := map_layer_eq_layer_of_fitting_eq_bot (G := ↥H) hF hle'
+  calc layerInG D = (layerInG (D.subgroupOf H)).map H.subtype :=
+        (map_subtype_layerInG_subgroupOf hDH).symm
+    _ = (layer ↥H).map H.subtype := by rw [layerInG, key]
+    _ = layerInG H := rfl
+
+end
+
 end OddOrder.Isaacs.Ch09
