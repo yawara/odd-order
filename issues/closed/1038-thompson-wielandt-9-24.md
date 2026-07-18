@@ -108,99 +108,50 @@ proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidua
         ※ `O^p(U^k) = X^k` は `map_pResidualOf` (同変性) で得る。
       - `H`/`K` を入れ替えて `O_p(K) ≤ O_p(H)` ⇒ 等号 ⇒ `P ◁ H` かつ `P ◁ K`,
         `P > 1` ⇒ `H = N_G(P) = K` 矛盾。
-- [ ] **Case 1** (`F(H)=F(K)=1`) — ここが次の frontier (subtlety 2)。必要な infra を
-      2026-07-18 に調査済み:
-      - **ambient `layer`** `layerInG H := (layer ↥H).map H.subtype` を新設する
-        (repo 全体に ambient layer は**存在しない** — 確認済み)。`O^p` で作った
-        `pResidualOf` と同じ設計・同じ transport 補題群 (`map_subtype_layer_subgroupOf` 等)。
-      - **ambient fitting は不要**: 9.25 (`map_layer_eq_layer_of_fitting_eq_bot`) の仮説は
-        `Ch01.fitting G = ⊥` の形なので、Case 1 の仮説を `Ch01.fitting ↥H = ⊥` (= F(H)=1)
-        と書けばそのまま噛み合う。
-        ⚠ BG に `fittingInG` (S08_CenterFittingOpcore) があるが **BG は Isaacs の下流**
-        なので import 不可。将来 `GroupTheory/SubgroupInAmbient.lean` (ambient 構成の
-        canonical home) へ寄せる consolidation は別 issue 候補。
-      - `nilpotentResidual` は**既に ambient 値**で `map_nilpotentResidual` (同変性) と
-        `map_subtype_nilpotentResidual_subgroupOf` (transport) も既存 → 追加不要。
-      - 9.18 は `V.subgroupOf H` が `↥H` で subnormal であること (`V ◁ M ◁ H` の chain を
-        `IsSubnormal` で構成) が要る。normalizer の ambient ↔ subtype 往復は
-        本 session で作った `map_subtype_le_normalizer_map_subtype` /
-        `subgroupOf_le_normalizer_subgroupOf` が使える。
-      - Case 1 の筋: `U`,`V` は nilpotent でない (`U ◁ H` nilpotent なら `U ≤ F(H) = 1`)
-        → `U^∞`,`V^∞` ≠ 1 → `N_G(U^∞) = H`, `N_G(V^∞) = K` → 9.18 で `E(H) ≤ N_G(V^∞) = K`
-        → `E(H) ≤ D` → 9.25 で `E(H) = E(D) = E(K)` → `H = N_G(E(H)) = K` 矛盾。
-- [ ] 9.24 proof の組み立て (書籍 p. 283–284, ~40 行, 2 ケース):
-      - F(H)=F(K)=1: E(H),E(K)>0, 9.18 で E(H)⊆N_G(V^∞)=K, 9.25 で E(H)=E(D)=E(K),
-        H=N_G(E(H))=K 矛盾 → U or V trivial (p-群)。
-      - F(H)>1 (or F(K)): O_p(H)=P>1, 9.27 で P normalizes O^p(V)=Y, cores で
-        P ⊆ O_p(H)=O_p(K), H=N_G(P)=K 矛盾。
-      使用: F*/9.8 (C_G(F*)⊆F*), 9.18, 9.25, 9.27, `core`, `O_p` (repo `opPi`), N_G。
-- [ ] **Theorem 9.23** (Thompson corefree bound) — 進行中 (2026-07-18)。
+- [x] **Case 1** (`F(H)=F(K)=1`) — 完了 (上記 `relCore_eq_bot_or_of_fitting_eq_bot`)。
+- [x] 9.24 proof の組み立て — 完了 (`thompsonWielandt`)。
+- [x] **Theorem 9.23** (Thompson corefree bound) — **完了 (2026-07-18)**:
+      `thompsonCorefreeBound` (`ThompsonWielandt.lean`)。
+      `H` corefree 極大, `g ∉ H`, `m = |H : H ∩ H^g|` ⇒ `∃ p, |H : O_p(H)| ≤ ((m!)²)!`。
 
-  **landed**:
-  - strand B (setup) 完了: `isCoatom_map_conj` / `normalizer_eq_self_of_corefree_maximal` /
-    `noNormalInSupergroup_of_corefree_maximal` (H≠K 不要の一般形) /
-    `map_conj_ne_of_corefree_maximal` (`H^g ≠ H`)。
-  - n!-定理の相対形: `relCore_relIndex_dvd_factorial` (`|H:core_H(D)| ∣ |H:D|!`)、
-    不等式形 `relCore_relIndex_le_factorial`、
-    `relCore_relIndex_le_factorial_pred` (`|D:core_H(D)| ≤ (|H:D|-1)!`)。
+  **strand B (setup)**: `isCoatom_map_conj` / `normalizer_eq_self_of_corefree_maximal` /
+  `noNormalInSupergroup_of_corefree_maximal` / `map_conj_ne_of_corefree_maximal`。
 
-  **strand A (index 連鎖) も完了 (2026-07-18)**:
-  `thompsonWielandtCore_relIndex_le` (`|H:E| ≤ a!·b!`)、
-  `relCore_thompsonWielandtCore_relIndex_le` (`|H:U| ≤ (a!b!)!`)、
+  **strand A (index 連鎖)**: `thompsonWielandtCore_relIndex_le` (`|H:E| ≤ a!·b!`) →
+  `relCore_thompsonWielandtCore_relIndex_le` (`|H:U| ≤ (a!b!)!`) →
   `opiCoreInG_relIndex_le_of_isPGroup` (`|H:O_p(H)| ≤ |H:U|`)。
-  ヘルパ: `relIndex_ne_zero`, `factorial_pred_mul_self`。
-  ⚠ `Subgroup.relIndex_inf_le` は**全て implicit 引数** (`_ _ _` は不可)、
-  `relIndex_mul_relIndex` は**部分群 3 つが explicit** — 逆なので注意。
+  n!-定理の相対形: `relCore_relIndex_dvd_factorial` / `relCore_relIndex_le_factorial` /
+  `relCore_relIndex_le_factorial_pred` (`|D:core_H(D)| ≤ (|H:D|-1)!`)。
 
-  ### ⚠ 残る唯一の障害: 9.24 の `V`-branch をどう `H` の bound に落とすか
+  ### `V`-branch の決着 (route 1 を採用)
 
-  9.24 の結論は `IsPGroup p U ∨ IsPGroup p V`。`U`-branch は `U ◁ H` なので
-  そのまま `|H:O_p(H)| ≤ |H:U| ≤ (a!b!)!` で終わる。**`V`-branch が問題**:
-  `V ◁ K` であって `V ◁ H` ではない (Case 2 で判明した通り `V ◁ M ◁ H` の subnormal 止まり)。
-  書籍は「`H` と `K` は同型だからどちらでもよい」の一言で済ませている箇所。
+  9.24 の結論は `IsPGroup p U ∨ IsPGroup p V` で、`U ◁ H` だが `V ◁ K` (H には
+  subnormal 止まり)。書籍は「`H` と `K` は同型だからどちらでもよい」の一言。
 
-  形式化の選択肢は 2 つ (どちらも未着手):
+  - **route 2 (subnormal p-部分群 ⊆ O_p) は不採用** — repo/mathlib に該当定理が
+    無いことを grep で確認 (新規に証明する必要があり route 1 より重い)。
+  - **route 1 (共役同変性) を採用**:
+    - `GroupTheory.map_opiCoreInG_mulEquiv` (新設, `SubgroupInAmbient.lean`):
+      `(O_π(H)).map e = O_π(H.map e)` (`e : G ≃* G'`)。
+    - `opiCoreInG_relIndex_map_conj` (`ThompsonWielandt.lean`):
+      `|K : O_π(K)| = |H : O_π(H)|` (`K = H^g`)。
+      mathlib `Subgroup.relIndex_map_map_of_injective` と合成。
+    - `K` 側の index 連鎖は `thompsonWielandtCore_comm` + `inf_comm` で
+      `relCore_thompsonWielandtCore_relIndex_le K H` から得る (`E` は `H`,`K` 対称)。
 
-  **(route 1) 共役同変性で `|K:O_p(K)| = |H:O_p(H)|` に読み替える**
-  - `oPiCore` の同型同変性 `(oPiCore π A).map e = oPiCore π B` (`e : A ≃* B`) を作る。
-    `oPiCore π G = ⨆ H : {H // H.Normal ∧ IsPiGroup π H}, H.val` なので、
-    証明の形は本 session で作った `map_layer_mulEquiv` / `map_pResidual_mulEquiv` と同一
-    (`map_le_iff_le_comap` → `iSup_le` → 各元が像でも条件を満たす → `e.symm` で逆向き)。
-  - その ambient 版 `opiCoreInG π (H.map (conj g)) = (opiCoreInG π H).map (conj g)`。
-  - 加えて共役が `relIndex` を保つこと。
-  - 置き場所: `oPiCore` 版は Ch03 (定義元)、ambient 版は `GroupTheory/SubgroupInAmbient.lean`。
-    どちらも共有 leaf なので 9000 issue で claim してから着手するのが安全。
+  **`a = b` の証明**: `Subgroup.relIndex_mul_index` を `D ≤ H` と `D ≤ K` に当て、
+  `K.index = H.index` (`Subgroup.index_map_equiv`, 共役) で突き合わせて
+  `Nat.eq_of_mul_eq_mul_right`。よって bound は `(m!·m!)! = ((m!)²)!`。
 
-  **(route 2) subnormal `p`-部分群は `O_p` に入る (Wielandt) を使う**
-  - `V ◁◁ H` かつ `V` が `p`-群 ⇒ `V ≤ O_p(H)` が言えれば、`|H:O_p(H)| ≤ |H:V|` となり、
-    `|H:V| = |K:V|` (共役ゆえ `|H| = |K|`) から `≤ (a!b!)!`。
-  - この定理が repo/mathlib にあるか未調査。無ければ route 1 より重い。
-  - 利点: 共役同変性を一切作らなくてよい。
+  **`H = ⊥` の場合**: `|H:O_p(H)| = 1 ≤ 1` で自明 (書籍の "suppose that `H > 1`" に対応)。
+  `map_conj_ne_of_corefree_maximal` が `H ≠ ⊥` を要求するので先に場合分けする。
 
-  → **まず route 2 の既存性を grep で確認し、無ければ route 1** が推奨。
+  ### 副産物: `oPiCore` 同型不変性の一般化 + 重複解消 (issue 9131)
 
-  **旧メモ (strand A 用、参考)** — 使った mathlib 補題:
-  - `Subgroup.relIndex_mul_relIndex (H K L) (hHK) (hKL) : H.relIndex K * K.relIndex L
-    = H.relIndex L` (⚠ 部分群 3 つが**明示引数**、`_ _ _` が要る)
-  - `Subgroup.relIndex_inf_le : (H ⊓ K).relIndex L ≤ H.relIndex L * K.relIndex L`
-  - `Subgroup.relIndex_dvd_of_le_left (hHK : H ≤ K) : K.relIndex L ∣ H.relIndex L`
-    (→ `U ≤ O_p(H)` から `|H:O_p(H)| ∣ |H:U|`、`Nat.le_of_dvd` で不等式へ)
-  - relIndex ≠ 0 は `Subgroup.index_ne_zero_of_finite` ∘ `index_eq_zero_of_relIndex_eq_zero`
-  - `Nat.factorial_le` (単調性)
+  `Ch03.oPiCore.map_eq_of_mulEquiv` (Theorem315.lean) から `[Finite G] [Finite H]` を除去
+  (全射性でなく単射性を使う証明に差し替え)。前 session が `SubgroupInAmbient.lean` に
+  作った重複 `map_oPiCore_mulEquiv` は削除し、既存の一般化版に集約した。
 
-  手順: `|D:E| ≤ |D:M|·|D:N| ≤ (a-1)!(b-1)!` (relIndex_inf_le) →
-  `|H:E| = |D:E|·|H:D| ≤ (a-1)!(b-1)!·a = a!(b-1)! ≤ a!b!` →
-  `|H:U| ≤ (|H:E|)! ≤ (a!b!)!` (n!-定理 + factorial 単調) →
-  `U` が p-群 + `U ◁ H` ⇒ `U ≤ O_p(H)`
-  (`GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup`; `IsPGroup → IsPiSubgroup {p}`
-  の橋渡しが要るか要確認) ⇒ `|H:O_p(H)| ≤ (a!b!)!`。
-
-  **a = b = m の根拠**: `|K:D| = |H^g|/|D| = |H|/|D| = |H:D|` (共役ゆえ `|H^g| = |H|`)。
-  よって bound は `(m!·m!)! = ((m!)²)!`。
-
-  最後に `thompsonWielandt` + strand B を合成。`H = ⊥` の場合は
-  `|H:O_p(H)| = 1` で自明に成立するので先に場合分けする
-  (`normalizer_eq_self_of_corefree_maximal` が `H ≠ ⊥` を要求するため)。
 
 ## 完了条件
 

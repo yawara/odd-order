@@ -15,43 +15,117 @@ Isaacs §9B の capstone (p. 271, mmd L5006)。`Z(G) = 1` ⇒ automorphism tower
 
 - 9.11 (`InnerAutomorphisms.lean`): Inn(G) ◁ Aut(G), Z(G)=1 ⇒ C_{Aut}(Inn)=1, Z(Aut)=1。
 - 9.12 (`AutTowerBounds.lean` `centralizer_eq_bot_of_chain`): chain の centralizer 消失。
-- 9.13 (`OrderBound.lean` `card_le_of_normal_of_centralizer_eq_bot`):
-  **S ◁ G**, C_G(S)=1 ⇒ |G| ≤ |Z(S^∞)|·|Aut(S^∞)| (normal 版, divisibility も)。
+- 9.13 (`OrderBound.lean`): **S ◁◁ G** (原典どおり), C_G(S)=1 ⇒
+  |G| ≤ (|Z(S^∞)|·|Aut(S^∞)|)! (`card_le_factorial_of_isSubnormal`, 2026-07-18)。
+  normal 特殊化 `card_le_of_normal_of_centralizer_eq_bot` は階乗なしでより鋭い。
 - 9.14 (`AutTowerBounds.lean`): N ◁ G, C_G(N)≤N ⇒ |G| ∣ |Z(N)||Aut(N)| / |N|!。
-- 9.21/9.22 (`Schenkman.lean`): Schenkman **S ◁ G**, C_G(S)=1 ⇒ C_G(S^∞) ≤ S^∞。
+- 9.21/9.22 (`Schenkman.lean`): Schenkman **S ◁◁ G** (原典どおり), C_G(S)=1 ⇒
+  C_G(S^∞) ≤ S^∞ (`centralizer_nilpotentResidual_le_of_isSubnormal`, 2026-07-18)。
 - 9.16/9.18 (`NilpotentResidual.lean`/`SubnormalSocle.lean`): **S ◁◁ G** ⇒
   F(G), E(G) ≤ N_G(S^∞) (subnormal 版, F* 経由 bound 用)。
 
-## ⚠ 未解決の設計・数学ギャップ (着手前に要解決)
+## ✅ 「normal/subnormal ギャップ」の正体 = mmd の OCR 崩れ (2026-07-18 決着)
 
-**normal / subnormal のミスマッチ**: tower では `G_1` は各 `G_i` に **subnormal**
-(consecutive normal chain `G_1 ◁ G_2 ◁ ⋯ ◁ G_i`) であって **normal ではない**
-(書籍 p.278 が明言: "G is subnormal in each G_i, ... shows why subnormality theory
-is relevant")。ところが |G_i| を抑える 9.13 と、その核 9.21 は **S ◁ G (normal) を
-本質的に要求**する:
-- 9.21 の証明は `G/S` を群として使い、中間 `H ⊇ S` に `S ◁ H` を使う → normal 必須。
-- 9.13 の証明は 9.21 を呼ぶ → normal 必須。
-- 直接ルート (本 repo の 9.13) も `S^∞ ◁ G` を要求 (subnormal では不成立)。
+**旧記述は誤りだった**: 「書籍 9.13 は `S ◁ G` を要求するが tower では `G_1` は
+subnormal 止まりなので橋渡しが行間」という分析は、**mmd の抽出ミスに基づく誤診**。
 
-書籍 (p.282 "Proof of Theorem 9.13" + tower 結論) は「9.13 (S◁G) が tower の
-immediate consequence」と書くが、`G_1` subnormal でどう 9.13 を当てるかが行間。
-**この橋渡しを PDF 精読 + 必要なら Coq/ChatGPT で確定してから着手する** (CLAUDE.md
-「行間で詰まったら原文/最強モデル」)。候補:
-1. subnormal S 版の order bound を別途証明 (subnormal-9.21 が要る → 本当に成立するか?)。
-2. tower 特有の構造 (各 G_i が centerless + C_{G_i}(G_1)=1) から `F*(G_i)` 経由で
-   9.14 を直接当てる経路 (9.16/9.18 は subnormal 版なので F* ≤ N_{G_i}(G_1^∞) は言える;
-   隘路は C_{N}(G_1^∞) ≤ G_1^∞ = subnormal-9.21 相当)。
-   → `C_{G_i}(G_1^∞) ⊆ G_1^∞` を C_{G_i}(G_1)=1 (9.12) から subnormal でも導けるか要検討。
-3. PDF に mmd がドロップした補足がある可能性 (near `[MISSING_PAGE_FAIL:302]`)。
+**PDF (原典) を直接確認した結果 (p. 281 / p. 283, PDF page 294 / 296)**:
+
+- **9.13 Theorem**: _Let `S ⊲⊲ G`_ … ← **subnormal**
+- **9.21 Theorem (Schenkman)**: _Let `S ⊲⊲ G`_ … ← **subnormal**
+- 対照: 9.15 は _`S ⊲⊲ G` and `F ⊲ G`_ と **両方の記号が並ぶ**ので誤読の余地なし。
+  9.20 proof の `M ⊲ G`、9.22 proof の `C ⊲ G` は単一 `⊲` (normal)。
+
+⚠ **`references/isaacs/finite-group-theory.mmd` は subnormal `⊲⊲` を単一の
+`\triangleleft` に潰している** (Nougat の抽出崩れ)。`pdftotext` では `⊲⊲` が `«`、
+`⊲` が `<` に落ちるので、**grep で区別する場合は `«` を見る**のが早い。
+
+裏付け: 9.16/9.18 も mmd では `S \triangleleft G` だが、地の文が
+"if `S` is an arbitrary **subnormal** subgroup of `G`" / "normalizes the **subnormal**
+subgroup `S̄`" と明言しているため、本 repo では正しく `IsSubnormal` で形式化されている。
+**地の文が曖昧だった 9.13 / 9.21 だけが normal 版になった** — これが唯一の齟齬。
+
+→ **数学的ギャップは存在しない**。tower は書籍どおり 9.13 (subnormal 版) を
+`S = G_1`, ambient `G_i` で当てれば閉じる (`C_{G_i}(G_1) = 1` は 9.12)。
+やるべきは **9.21 と 9.13 の subnormal 版への一般化**。
 
 ## やること
 
-- [ ] 上記 normal/subnormal ギャップを原文精読で確定 (最優先)。
-- [ ] recursive type family `autTowerType : ℕ → Type u` (`0 ↦ G`, `n+1 ↦ MulAut (·)`)
-      + 各段の `Group` instance (再帰) + centerless の伝播 (9.11d)。
-- [ ] 埋め込み鎖 `G_i ↪ G_{i+1}` (Inn) と subnormality、C_{G_i}(G_1)=1 (9.12 適用)。
-- [ ] |G_i| の一様上界 (9.13 または subnormal 版) → `∃ n, ∀ i, Nat.card (autTowerType G i) ≤ n`。
-- [ ] leaf 例: `AutTower.lean` (import OrderBound + InnerAutomorphisms)。
+- [x] normal/subnormal ギャップを原文精読で確定 → **OCR 崩れと判明** (上記)。
+- [x] **(A) 9.21 (Schenkman) を subnormal 版に一般化 — 完了 (2026-07-18)**
+      `centralizer_nilpotentResidual_le_of_isSubnormal`. 実装は下記の見込みどおり
+      (normality を `S ⊔ C = ⊤` 分岐へ移動 / `hinterval` から `S.Normal` を導出 /
+      Dedekind は `C` 側 normal の姉妹形 `inf_sup_eq_sup_inf_of_normal_right_of_le` を新設)。
+      normal 版は特殊化として残置。
+
+  <details><summary>当初の実装計画 (記録)</summary>
+
+- [x] ~~**(A) 9.21 (Schenkman) を subnormal 版に一般化**~~ (`Schenkman.lean` `schenkman_aux`)。
+      現行の帰納核は `S.Normal` を要求。書籍 p. 283 の proof は元々 subnormal 用で、
+      本 repo が normal に落としたことで下記のステップが**消えて**いる:
+
+      > "It follows that there are no subgroups `H` with `S < H < G`, and
+      >  **since `S ⊲⊲ G`, we conclude that `S ◁ G`**"
+
+      改修点:
+      1. 仮説 `S.Normal` → `S.IsSubnormal`。
+      2. `hSnormal.subgroupOf H` (2 箇所) → mathlib `Subgroup.IsSubnormal.subgroupOf`。
+      3. **`hRnormal`/`hCnormal` (現行 L372-373) は前倒しできない**:
+         `R = S^∞` は `S` に characteristic ゆえ `S ◁◁ G` では `R ◁ G` が出ない。
+         ただし `S` は `R` を正規化し `C = C_G(R)` も正規化するので、
+         **`R`,`C` は `G₀ = S ⊔ C` に normal**。現行proof は既に
+         `by_cases hSC : S ⊔ C = ⊤` で分岐し else 側は `G₀` へ再帰しているので、
+         normality 宣言を **`S ⊔ C = ⊤` 分岐の中へ移す**だけでよい (その分岐では
+         `G₀ = ⊤ = G` ゆえ両者 normal)。
+      4. `hinterval` (中間部分群なし, 現行 L405) の後に **`S.Normal` を導出**:
+         `S = ⊤` なら自明。さもなくば mathlib
+         `Subgroup.IsSubnormal.exists_normal_and_le_and_lt_top_of_ne` で
+         `K` normal, `S ≤ K`, `K < ⊤` を取り、`hinterval K` から `K = S`。
+         以降 (L428 `IsCyclic (G ⧸ S)` 〜 L478) は**現行のまま通る**。
+      5. Dedekind (`OddOrder/Mathlib/Subgroup.lean`
+         `inf_sup_eq_sup_inf_of_normal_of_le`, `[E.Normal]` を要求) は現行
+         `(E := S)` で呼んでいる → `S` がまだ normal でない時点なので
+         **`(E := C)` 版に組み替える**か、`S ≤ H` のみで済む Dedekind
+         (`H ⊓ (S·C) = S·(H ⊓ C)`、集合積では normality 不要) を別途用意する。
+         ※ この分岐では `C ◁ G` は言える (`S` も `C` も `C` を正規化し `S ⊔ C = ⊤`)。
+
+  </details>
+
+- [x] **(B) 9.13 を subnormal 版で証明 — 完了 (2026-07-18)**:
+      `card_le_factorial_of_isSubnormal` (`OrderBound.lean`)。
+      `S ◁◁ G`, `C_G(S) = 1` ⇒ `|G| ≤ (|Z(S^∞)|·|Aut(S^∞)|)!`。
+      中間段 `card_normalizer_nilpotentResidual_le` (`|N_G(S^∞)| ≤ |Z(S^∞)|·|Aut(S^∞)|`)
+      を分けて置いた。書籍 p.281 の F* 経由ルートそのまま:
+      subnormal 9.21 を `↥N_G(S^∞)` で適用 → 9.14 → 9.16/9.18 で `F*(G) ≤ N_G(S^∞)`
+      → 9.8 + 9.14 階乗形。
+      副産物: `mulAutEquivCongr` (`AutTowerBounds.lean`) — `e : A ≃* B` から
+      `Aut(A) ≃ Aut(B)` (mathlib に `MulAut` の同型同変性が無い; 9.10 でも使う)。
+      `centralizer_subgroupOf_eq_bot` を `private` から public 化 (ファイル跨ぎ利用)。
+      **normal 版 `card_le_of_normal_of_centralizer_eq_bot` は階乗なしでより鋭いので残置。**
+
+  <details><summary>当初の実装計画 (記録)</summary>
+
+- [x] ~~**(B) 9.13 を subnormal 版で証明**~~ (`OrderBound.lean`)。
+      現行 `card_le_of_normal_of_centralizer_eq_bot` は 9.14 を `N = S^∞` に**直接**当てる
+      近道 (`S^∞ ◁ G` が要る) なので normal 専用。**現行版はより鋭い bound
+      (`|G| ≤ |Z(S^∞)||Aut(S^∞)|`, 階乗なし) なので残す**。
+      subnormal 版は書籍 p. 281 の F* 経由ルートで別途:
+      1. `|N_G(S^∞)| ≤ |Z(S^∞)|·|Aut(S^∞)|` — `N_G(S^∞)` の中で 9.14
+         (`S^∞` はそこで normal) + (A) の subnormal 9.21
+         (`S ◁◁ N_G(S^∞)`, `C_{N_G(S^∞)}(S) = 1`)。
+      2. `F*(G) = F(G)E(G) ≤ N_G(S^∞)` — **既存の subnormal 版 9.16/9.18**。
+      3. `C_G(F*(G)) ≤ F*(G)` (9.8) + 9.14 ⇒ `|G| ≤ |F*(G)|!`。
+      ⇒ `|G| ≤ (|Z(S^∞)|·|Aut(S^∞)|)!` (階乗付き, `S` の同型型のみに依存)。
+
+  </details>
+
+- [ ] **(C) tower 本体 9.10** — ここが残る frontier。(A)(B) が揃ったので gate は無い:
+      - recursive type family `autTowerType : ℕ → Type u` (`0 ↦ G`, `n+1 ↦ MulAut (·)`)
+        + 各段の `Group` instance (再帰) + centerless の伝播 (9.11d)。
+      - 埋め込み鎖 `G_i ↪ G_{i+1}` (Inn) と `G_1 ◁◁ G_i`、`C_{G_i}(G_1) = 1` (9.12)。
+      - (B) を `S = G_1`, ambient `G_i` で当てて `|G_i| ≤ (|Z(G_1^∞)||Aut(G_1^∞)|)!`
+        (i に依らない一様上界) → `∃ n, ∀ i, Nat.card (autTowerType G i) ≤ n`。
+      - leaf 例: `AutTower.lean` (import OrderBound + InnerAutomorphisms)。
 
 ## 完了条件
 
@@ -60,6 +134,10 @@ full build green + AxiomsCheck OK。
 
 ## 参照
 
-- notes/isaacs/ch09_more_subnormality.md (§9B 節)
-- OddOrder/Isaacs/Ch09_MoreSubnormality/{OrderBound,Schenkman,AutTowerBounds,InnerAutomorphisms}.lean
-- references/isaacs/finite-group-theory.mmd L5006–5145 (§9B); PDF p.278–283
+- references/isaacs/finite-group-theory.pdf **PDF p.294 (書籍 p.281) = 9.13/9.15**,
+  **PDF p.296 (書籍 p.283) = 9.21/9.22** — ⚠ mmd でなく PDF を見ること (上記 OCR 崩れ)
+- PDF ページ = 書籍ページ + 13
+- OddOrder/Isaacs/Ch09_MoreSubnormality/{Schenkman,OrderBound,AutTowerBounds,
+  NilpotentResidual,SubnormalSocle}.lean
+- mathlib `Mathlib/GroupTheory/IsSubnormal.lean` (`subgroupOf`, `trans`,
+  `exists_normal_and_le_and_lt_top_of_ne`)

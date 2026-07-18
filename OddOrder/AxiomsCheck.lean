@@ -76,6 +76,8 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
 import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
+import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
@@ -927,6 +929,20 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 -- Ch.9 (More on Subnormality): generalized Fitting F*(G) = F(G)E(G); Cor 9.9 (←) —
 -- F(G) ⊇ C_G(F(G)) implies F*(G) = F(G) (via Thm 9.7(c)).
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.genFitting_eq_fitting_of_centralizer_fitting_le
+
+-- Ch.9 §9C (Thompson–Wielandt): Thm 9.24 general form — for distinct H, K with no
+-- nonidentity subgroup of D = H ∩ K normal in a proper supergroup, U = core_H(E) or
+-- V = core_K(E) is a p-group; and Thm 9.23 (Thompson) — H corefree maximal, g ∉ H,
+-- m = |H : H ∩ H^g| gives |H : O_p(H)| ≤ ((m!)^2)! for some prime p.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.thompsonWielandt
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.thompsonCorefreeBound
+
+-- Ch.9 §9B: Thm 9.21 (Schenkman) と Thm 9.13 (order bound) の **subnormal 版**
+-- (原典どおりの仮説 `S ◁◁ G`; mmd は `⊲⊲` を `⊲` に潰していた — issue 1037/9133).
+-- 9.13 subnormal 版が Thm 9.10 (automorphism tower) の一様上界を与える。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_nilpotentResidual_le_of_isSubnormal
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.card_normalizer_nilpotentResidual_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.card_le_factorial_of_isSubnormal
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.

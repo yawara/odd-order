@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTowerBounds
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
+import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs Ch. 9 — §9B: Theorem 9.13 (order bound), p. 279–282
@@ -38,6 +40,8 @@ namespace OddOrder.Isaacs.Ch09
 
 open Subgroup
 
+open scoped Nat
+
 variable {G : Type*} [Group G]
 
 section /- 9B: Theorem 9.13 (order bound, p. 279) -/
@@ -61,6 +65,75 @@ theorem card_le_of_normal_of_centralizer_eq_bot [Finite G] {S : Subgroup G} [S.N
       * Nat.card (MulAut ↥(nilpotentResidual S)) :=
   Nat.le_of_dvd (Nat.mul_pos Nat.card_pos Nat.card_pos)
     (card_dvd_of_normal_of_centralizer_eq_bot hCS)
+
+end
+
+section /- 9B: Theorem 9.13 — subnormal 版 (書籍 p. 281 の F* 経由ルート) -/
+
+/-- `S ◁◁ G`, `C_G(S) = 1` のとき `|N_G(S^∞)| ≤ |Z(S^∞)| · |Aut(S^∞)|`.
+
+書籍 p. 281 の第一段: `S^∞` は `N = N_G(S^∞)` の中で normal であり, subnormal 版 9.21
+(`centralizer_nilpotentResidual_le_of_isSubnormal`) を `↥N` の中の `S.subgroupOf N`
+に当てると `C_N(S^∞) ≤ S^∞`. そこへ 9.14 を適用する. -/
+theorem card_normalizer_nilpotentResidual_le [Finite G] {S : Subgroup G}
+    (hS : S.IsSubnormal) (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
+    Nat.card ↥(Subgroup.normalizer (nilpotentResidual S : Set G))
+      ≤ Nat.card (Subgroup.center ↥(nilpotentResidual S))
+        * Nat.card (MulAut ↥(nilpotentResidual S)) := by
+  set N := Subgroup.normalizer (nilpotentResidual S : Set G) with hN
+  have hSN : S ≤ N := le_normalizer_nilpotentResidual S
+  -- `↥N` の中の `S` の nilpotent residual は `S^∞` を `N` に降ろしたもの
+  have hres : nilpotentResidual (S.subgroupOf N) = (nilpotentResidual S).subgroupOf N := by
+    refine Subgroup.map_injective N.subtype_injective ?_
+    rw [map_subtype_nilpotentResidual_subgroupOf hSN, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr (by rw [hN]; exact Subgroup.le_normalizer)]
+  haveI hresN : (nilpotentResidual (S.subgroupOf N)).Normal := by
+    rw [hres]
+    exact (Subgroup.normal_subgroupOf_iff_le_normalizer
+      (by rw [hN]; exact Subgroup.le_normalizer)).mpr le_rfl
+  -- subnormal 版 9.21 を `↥N` で適用
+  have h921 := centralizer_nilpotentResidual_le_of_isSubnormal (G := ↥N)
+    hS.subgroupOf (centralizer_subgroupOf_eq_bot hSN hCS)
+  -- 9.14: `|↥N| ∣ |Z(S^∞)| · |Aut(S^∞)|` (`↥(S^∞ ∩ N) ≃* ↥(S^∞)` で読み替え)
+  have hiso : ↥(nilpotentResidual (S.subgroupOf N)) ≃* ↥(nilpotentResidual S) := by
+    refine (Subgroup.equivMapOfInjective _ N.subtype N.subtype_injective).trans ?_
+    exact MulEquiv.subgroupCongr (map_subtype_nilpotentResidual_subgroupOf hSN)
+  refine Nat.le_of_dvd (Nat.mul_pos Nat.card_pos Nat.card_pos) ?_
+  have hdvd := card_dvd_card_center_mul_card_mulAut (G := ↥N) h921
+  rwa [Nat.card_congr (Subgroup.centerCongr hiso).toEquiv,
+    Nat.card_congr (mulAutEquivCongr hiso)] at hdvd
+
+/-- **Isaacs Theorem 9.13** (原典どおりの subnormal 版, p. 281): `S ◁◁ G` (有限群),
+`C_G(S) = 1` ならば `|G| ≤ (|Z(S^∞)| · |Aut(S^∞)|)!`
+(`S` の同型型のみで定まる上界).
+
+書籍 p. 281 の証明:
+1. `|N_G(S^∞)| ≤ |Z(S^∞)|·|Aut(S^∞)|` (`card_normalizer_nilpotentResidual_le`).
+2. `F*(G) = F(G)E(G) ≤ N_G(S^∞)` — 9.16 / 9.18 の **subnormal 版**.
+3. `C_G(F*(G)) ≤ F*(G)` (9.8) に 9.14 の階乗形を当てて `|G| ≤ |F*(G)|!`.
+
+⚠ 仮説は原典どおり **subnormal**. `S ◁ G` の場合はより鋭い階乗なしの bound
+(`card_le_of_normal_of_centralizer_eq_bot`) が上にあるのでそちらを使う.
+Thm 9.10 (automorphism tower) では `G_1` が `G_i` に subnormal 止まりなので
+**本定理が必要**. -/
+theorem card_le_factorial_of_isSubnormal [Finite G] {S : Subgroup G}
+    (hS : S.IsSubnormal) (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
+    Nat.card G ≤ (Nat.card (Subgroup.center ↥(nilpotentResidual S))
+      * Nat.card (MulAut ↥(nilpotentResidual S)))! := by
+  -- `F*(G) ≤ N_G(S^∞)` (9.16 + 9.18, いずれも subnormal 版)
+  have hFstar : genFitting G ≤ Subgroup.normalizer (nilpotentResidual S : Set G) :=
+    sup_le (fitting_le_normalizer_nilpotentResidual hS)
+      (layer_le_normalizer_nilpotentResidual hS)
+  -- `|G| ∣ |F*(G)|!` (9.8 + 9.14 階乗形)
+  have hGdvd : Nat.card G ∣ (Nat.card ↥(genFitting G))! :=
+    card_dvd_factorial_card_of_centralizer_le centralizer_genFitting_le_genFitting
+  -- `|F*(G)| ≤ |N_G(S^∞)| ≤ |Z(S^∞)|·|Aut(S^∞)|`
+  have hFcard : Nat.card ↥(genFitting G)
+      ≤ Nat.card (Subgroup.center ↥(nilpotentResidual S))
+        * Nat.card (MulAut ↥(nilpotentResidual S)) :=
+    (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hFstar)).trans
+      (card_normalizer_nilpotentResidual_le hS hCS)
+  exact (Nat.le_of_dvd (Nat.factorial_pos _) hGdvd).trans (Nat.factorial_le hFcard)
 
 end
 

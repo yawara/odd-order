@@ -656,6 +656,33 @@ theorem inf_sup_eq_sup_inf_of_normal_of_le
     · intro x ⟨hxM, hxA⟩
       exact ⟨hxM, Subgroup.mem_sup_right hxA⟩
 
+/-- **Dedekind / modular law, 正規性が右側の summand にある版**.
+`E, A, M ≤ G`, `A ⊴ G`, `E ≤ M` ⇒ `M ⊓ (E ⊔ A) = E ⊔ (M ⊓ A)`.
+
+`inf_sup_eq_sup_inf_of_normal_of_le` の姉妹形. `E ⊔ A` を集合積 `E · A` に分解できれば
+証明は同じなので, `mem_sup_of_normal_left` を `mem_sup_of_normal_right` に替えただけ.
+
+**用途**: Isaacs 9.21 (Schenkman) の subnormal 版. そこでは `S` の正規性は
+「中間部分群が無い」ことから**後で**出るので, Dedekind を使う時点では
+`C = C_G(S^∞)` の正規性しか手元に無い. -/
+theorem inf_sup_eq_sup_inf_of_normal_right_of_le
+    {E A M : Subgroup G} [A.Normal] (hEM : E ≤ M) :
+    M ⊓ (E ⊔ A) = E ⊔ (M ⊓ A) := by
+  apply le_antisymm
+  · intro x hx
+    have hxM : x ∈ M := hx.1
+    have hxEA : x ∈ E ⊔ A := hx.2
+    obtain ⟨e, he, a, ha, rfl⟩ := Subgroup.mem_sup_of_normal_right.mp hxEA
+    have ha_in_M : a ∈ M := by
+      have : e⁻¹ * (e * a) ∈ M := M.mul_mem (M.inv_mem (hEM he)) hxM
+      simpa [mul_assoc] using this
+    exact Subgroup.mul_mem_sup he ⟨ha_in_M, ha⟩
+  · refine sup_le ?_ ?_
+    · intro x hx
+      exact ⟨hEM hx, Subgroup.mem_sup_left hx⟩
+    · intro x ⟨hxM, hxA⟩
+      exact ⟨hxM, Subgroup.mem_sup_right hxA⟩
+
 /-- **Dedekind 直接形** (`M ⊆ E ⊔ A` 仮定下): `E, A, M ≤ G`, `E ⊴ G`, `E ≤ M ≤ E ⊔ A`
 ⇒ `M = E ⊔ (M ⊓ A)`.
 

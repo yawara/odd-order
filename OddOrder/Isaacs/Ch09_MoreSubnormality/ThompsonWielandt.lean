@@ -713,4 +713,96 @@ theorem thompsonWielandt [Finite G] (hHK : H ≠ K)
 
 end
 
+section /- 9C: Theorem 9.23 (Thompson の corefree 極大部分群の bound) -/
+
+/-- `K = H^g` のとき `|K : O_π(K)| = |H : O_π(H)|`.
+
+共役 `MulAut.conj g` は同型なので `O_π` と可換 (`map_opiCoreInG_mulEquiv`) であり,
+単射写像は相対 index を保つ (`Subgroup.relIndex_map_map_of_injective`).
+Thm 9.23 の `V`-branch で「`K` 側で得た bound を `H` 側に読み替える」ために使う
+(書籍 p. 283 が「`H` と `K` は同型だからどちらでもよい」と一言で済ませる箇所). -/
+theorem opiCoreInG_relIndex_map_conj (π : Set ℕ) (H : Subgroup G) (g : G) :
+    (GroupTheory.opiCoreInG π (H.map (MulAut.conj g : G →* G))).relIndex
+        (H.map (MulAut.conj g : G →* G))
+      = (GroupTheory.opiCoreInG π H).relIndex H := by
+  rw [← GroupTheory.map_opiCoreInG_mulEquiv π (MulAut.conj g) H]
+  exact Subgroup.relIndex_map_map_of_injective _ _ (MulAut.conj g).injective
+
+/-- **Isaacs Theorem 9.23** (Thompson; p. 283).
+
+`H` を有限群 `G` の corefree な極大部分群, `g ∈ G - H`, `m = |H : H ∩ H^g|` とすると,
+**ある素数 `p` について `|H : O_p(H)| ≤ ((m!)²)!`**.
+
+証明 (書籍 p. 283 の Thm 9.24 からの導出):
+`K = H^g` とおくと `H` は自己正規化的 (corefree 極大) ゆえ `H ≠ K` であり,
+`H`, `K` は Thm 9.24 の仮説を満たす (`noNormalInSupergroup_of_corefree_maximal`).
+`E = core_H(D) ⊓ core_K(D)`, `U = core_H(E)`, `V = core_K(E)` として `thompsonWielandt` を
+適用すると, ある `p` で `U` または `V` が `p`-群.
+
+* `U`-branch: `U ◁ H` ゆえ `U ≤ O_p(H)`, よって `|H : O_p(H)| ≤ |H : U| ≤ (a!·b!)!`
+  (index 連鎖 `relCore_thompsonWielandtCore_relIndex_le`).
+* `V`-branch: `V ◁ K` なので同じ連鎖を `K` 側に当てて `|K : O_p(K)| ≤ (b!·a!)!`
+  (`thompsonWielandtCore_comm` で `E` が `H`,`K` 対称であることを使う) とし,
+  `opiCoreInG_relIndex_map_conj` で `|H : O_p(H)| = |K : O_p(K)|` に読み替える.
+
+いずれの branch でも `a = |H : D|`, `b = |K : D|` は `|H| = |K|` (共役) から等しく
+`= m` なので, bound は `(m!·m!)! = ((m!)²)!`.
+
+(`H = 1` の場合は `|H : O_p(H)| = 1 ≤ 1` で自明 — 書籍が "suppose that `H > 1`" と
+置く場合分けに対応.) -/
+theorem thompsonCorefreeBound [Finite G] {H : Subgroup G} (hmax : IsCoatom H)
+    (hcore : H.normalCore = ⊥) {g : G} (hg : g ∉ H) :
+    ∃ p : ℕ, p.Prime ∧
+      (GroupTheory.opiCoreInG ({p} : Set ℕ) H).relIndex H
+        ≤ Nat.factorial
+            (Nat.factorial ((H ⊓ H.map (MulAut.conj g : G →* G)).relIndex H) ^ 2) := by
+  by_cases hHne : H = ⊥
+  · -- 自明な場合: `H = 1` なら `O_p(H) = 1 = H` ゆえ左辺 `= 1`, 右辺は階乗ゆえ `≥ 1`.
+    refine ⟨2, Nat.prime_two, ?_⟩
+    subst hHne
+    rw [le_bot_iff.mp (GroupTheory.opiCoreInG_le _ _), Subgroup.relIndex_self]
+    exact Nat.factorial_pos _
+  set K := H.map (MulAut.conj g : G →* G) with hKdef
+  -- Thm 9.24 の仮説を用意する
+  have hHK : H ≠ K := Ne.symm (map_conj_ne_of_corefree_maximal hmax hcore hHne hg)
+  have hyp : NoNormalInSupergroup H K (H ⊓ K) :=
+    noNormalInSupergroup_of_corefree_maximal hmax hcore g
+  obtain ⟨p, hp, hUV⟩ := thompsonWielandt H K hHK hyp
+  haveI : Fact p.Prime := ⟨hp⟩
+  refine ⟨p, hp, ?_⟩
+  -- `a = b`: `|H| = |K|` (共役) ゆえ `|H:D| = |K:D|`.
+  -- `D.relIndex H * |G:H| = |G:D| = D.relIndex K * |G:K|` と `|G:K| = |G:H|` から.
+  have hidx : (H ⊓ K).relIndex K = (H ⊓ K).relIndex H := by
+    have hKi : K.index = H.index := by rw [hKdef]; exact Subgroup.index_map_equiv H (MulAut.conj g)
+    have ha := Subgroup.relIndex_mul_index (inf_le_left : H ⊓ K ≤ H)
+    have hb := Subgroup.relIndex_mul_index (inf_le_right : H ⊓ K ≤ K)
+    rw [hKi] at hb
+    exact Nat.eq_of_mul_eq_mul_right
+      (Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite)) (hb.trans ha.symm)
+  rcases hUV with hU | hV
+  · -- `U = core_H(E)` が `p`-群: `U ◁ H` なので直接 `H` 側の連鎖で終わる.
+    calc (GroupTheory.opiCoreInG ({p} : Set ℕ) H).relIndex H
+        ≤ (relCore H (thompsonWielandtCore H K)).relIndex H :=
+          opiCoreInG_relIndex_le_of_isPGroup (relCore_le_left _ _) (le_normalizer_relCore _ _) hU
+      _ ≤ Nat.factorial
+            (Nat.factorial ((H ⊓ K).relIndex H) * Nat.factorial ((H ⊓ K).relIndex K)) :=
+          relCore_thompsonWielandtCore_relIndex_le H K
+      _ = Nat.factorial (Nat.factorial ((H ⊓ K).relIndex H) ^ 2) := by rw [hidx, sq]
+  · -- `V = core_K(E)` が `p`-群: `V ◁ K` なので `K` 側の連鎖 + 共役 transport.
+    have hVchain : (relCore K (thompsonWielandtCore H K)).relIndex K
+        ≤ Nat.factorial
+            (Nat.factorial ((H ⊓ K).relIndex K) * Nat.factorial ((H ⊓ K).relIndex H)) := by
+      have h := relCore_thompsonWielandtCore_relIndex_le K H
+      rwa [thompsonWielandtCore_comm K H, inf_comm K H] at h
+    calc (GroupTheory.opiCoreInG ({p} : Set ℕ) H).relIndex H
+        = (GroupTheory.opiCoreInG ({p} : Set ℕ) K).relIndex K :=
+          (opiCoreInG_relIndex_map_conj _ H g).symm
+      _ ≤ (relCore K (thompsonWielandtCore H K)).relIndex K :=
+          opiCoreInG_relIndex_le_of_isPGroup (relCore_le_left _ _) (le_normalizer_relCore _ _) hV
+      _ ≤ Nat.factorial
+            (Nat.factorial ((H ⊓ K).relIndex K) * Nat.factorial ((H ⊓ K).relIndex H)) := hVchain
+      _ = Nat.factorial (Nat.factorial ((H ⊓ K).relIndex H) ^ 2) := by rw [hidx, sq]
+
+end
+
 end OddOrder.Isaacs.Ch09
