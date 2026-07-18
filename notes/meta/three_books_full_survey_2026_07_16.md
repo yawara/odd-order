@@ -74,8 +74,16 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 >   (CLAUDE.md ラッパー方針に従い Lean 実体を書かない)。
 >
 > → **着手前に必ず repo を直接 grep すること** (番号 + descriptive 名の両方)。
-> 残りの 未/部分 項目 (3.16 index clause, 3.17, 3.18, 3.22, 3.26, 3.31-3.34,
-> 3.35/3.36, wreath) も同様に未検証。Isaacs 全章は現在 **sorry ゼロ**なので、
+> **2026-07-18 追加検証: 残りの 未/部分 項目も全て repo にヒットした** — Ch.3 は
+> 実質完了と見てよい。確認した所在:
+> 3.16/3.17 = `Theorem315.lean`、3.18 = `PiSeparableSeries.lean`、
+> 3.22 = `Main.lean` (**full form** `piLength_le_one_of_abelian_pi_hall` が
+> AxiomsCheck 入り — 表の「commutator 含意どまり」は誤り)、
+> 3.26/3.31/3.32 = `Ch04_Commutators/ForwardFromCh03.lean`、
+> **3.33/3.34 = `Ch04_Commutators/HartleyTurull.lean`** (2026-07-17, 宣言 8 本 —
+> 表の「Tier 2 クラスタは entirely missing」は誤り)、
+> 3.35/3.36 = `CyclicExtensions.lean` (いずれも AxiomsCheck 入り)。
+> → Ch.3 の残作業は **特殊化債務のみ** (Lem 3.1 / Lem 3.11)。Isaacs 全章は現在 **sorry ゼロ**なので、
 > sorry 数はこの章の残作業の指標にならない (未形式化項目は sorry を生まない)。
 
 
