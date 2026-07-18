@@ -1201,6 +1201,10 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal_in
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_mem_conjAct_smul_le_of_isPGroup
 
+-- Ch.9 §9D: Bartels Step 4 の道具 — 集合 𝒦(H) の共役同変性と 𝒦(H) = 𝒦(P)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.mem_kappaSet_conjAct_smul
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.kappaSet_eq_of_sylow
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms

@@ -724,4 +724,66 @@ theorem bartels_step_three {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
     _ = ConjAct.toConjAct h • strongClosureIn H Y := strongClosureIn_conjAct_smul _ _ _
     _ = strongClosureIn H Y := hLfix
 
+section /- 9D: Bartels Step 4 の道具 — 集合 `𝒦(H)` と共役作用 -/
+
+/-- **`𝒦(H)`** (Isaacs p. 291 の証明中の記法): `H` に含まれる `X` の共役 `Y` たちの
+`Y^{(G)}` 全体からなる集合。Step 4 は `G` の `𝒦(M)` への共役作用の stabilizer を見る。 -/
+def kappaSet (X H : Subgroup G) : Set (Subgroup G) :=
+  {W | ∃ Y : Subgroup G, Y ≤ H ∧ (∃ c : ConjAct G, c • X = Y) ∧ strongClosure Y = W}
+
+theorem mem_kappaSet_self (X : Subgroup G) {H : Subgroup G} (hXH : X ≤ H) :
+    strongClosure X ∈ kappaSet X H :=
+  ⟨X, hXH, ⟨1, one_smul _ _⟩, rfl⟩
+
+/-- `𝒦` は `H` について単調。 -/
+theorem kappaSet_mono {X H K : Subgroup G} (hHK : H ≤ K) : kappaSet X H ⊆ kappaSet X K := by
+  rintro W ⟨Y, hYH, hYc, rfl⟩
+  exact ⟨Y, hYH.trans hHK, hYc, rfl⟩
+
+/-- **`𝒦` の共役同変性**: `W ∈ 𝒦(H)` なら `W^g ∈ 𝒦(H^g)`。
+
+書籍 p.291 の「`(Y^{(G)})^h = (Y^h)^{(G)}` ゆえ `H` は `𝒦(H)` に共役で作用する」。 -/
+theorem mem_kappaSet_conjAct_smul {c : ConjAct G} {X H W : Subgroup G}
+    (hW : W ∈ kappaSet X H) : c • W ∈ kappaSet X (c • H) := by
+  obtain ⟨Y, hYH, ⟨d, rfl⟩, rfl⟩ := hW
+  refine ⟨c • (d • X), Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hYH, ⟨c * d, ?_⟩, ?_⟩
+  · rw [mul_smul]
+  · exact strongClosure_conjAct_smul c _
+
+
+/-- 共役は `p`-群性を保つ。 -/
+theorem isPGroup_conjAct_smul {p : ℕ} {X : Subgroup G} (hX : IsPGroup p ↥X) (c : ConjAct G) :
+    IsPGroup p ↥(c • X) :=
+  hX.of_injective (Subgroup.equivSMul c X).symm.toMonoidHom
+    (Subgroup.equivSMul c X).symm.injective
+
+/-- **`H` は `𝒦(H)` に共役で作用する** (`h ∈ H` の場合)。 -/
+theorem mem_kappaSet_smul_of_mem {X H W : Subgroup G} {h : G} (hh : h ∈ H)
+    (hW : W ∈ kappaSet X H) : ConjAct.toConjAct h • W ∈ kappaSet X H := by
+  have := mem_kappaSet_conjAct_smul (c := ConjAct.toConjAct h) hW
+  rwa [conjAct_smul_self_of_mem hh] at this
+
+/-- **Step 4 の下準備** (書籍 p. 291 「By Step 3, we also have `𝒦(M) = 𝒦(P)`」):
+`H < G` と `H` の Sylow `p`-部分群 `P` に対し `𝒦(H) = 𝒦(P)`.
+
+`⊇` は単調性。`⊆` は Step 3 で `Y` を `P` の中へ共役で送り, Step 1 で
+`(Y^h)^{(G)} = Y^{(G)}` を得る。 -/
+theorem kappaSet_eq_of_sylow {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X H P : Subgroup G} (hH : H ≠ ⊤) (hPH : P ≤ H)
+    (hXp : IsPGroup p ↥X) (hP : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex H)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤) :
+    kappaSet X H = kappaSet X P := by
+  refine Set.Subset.antisymm ?_ (kappaSet_mono hPH)
+  rintro W ⟨Y, hYH, ⟨c, rfl⟩, rfl⟩
+  obtain ⟨h, hhH, hhP, hheq⟩ :=
+    bartels_step_three hIH hYH hH (isPGroup_conjAct_smul hXp c) hP hPidx
+  have hne' : strongClosure (ConjAct.toConjAct h • (c • X)) ≠ ⊤ := by
+    have := hne (ConjAct.toConjAct h * c)
+    rwa [mul_smul] at this
+  refine ⟨ConjAct.toConjAct h • (c • X), hhP, ⟨ConjAct.toConjAct h * c, (mul_smul _ _ _)⟩, ?_⟩
+  exact bartels_step_one hIH (hhP.trans hPH) hYH hheq hne' (hne c)
+
+
+end
+
 end OddOrder.Isaacs.Ch09
