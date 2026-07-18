@@ -142,7 +142,9 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
   `existsUnique_mulEquiv_of_isComplement'` を新 leaf `Ch03_SplitExtensions/SplitExtensionUniqueness.lean`
   に実装 (∃! 込み, AxiomsCheck 入り)。旧 internal form `mulEquivSubgroupOfComplement` は
   mathlib `SemidirectProduct.mulEquivSubgroup` の純粋リネーム (下流 0 件) ゆえ削除。
-- **Lem 3.11** Solvable minimal normal subgroup is abelian; if finite, elementary abe — Stated for a finite solvable ambient G (book: arbitrary G with M solvable minimal normal, plus an infinite-abelian clause). Covers every downstream use in the b…
+- ✅ **2026-07-19 解消** — `[Finite G]` を書籍どおり `[Finite ↥M]` に弱めた
+  (`Ch03_SplitExtensions/Basic.lean` `solvable_minimal_normal_isElementaryAbelian`;
+  abelian 節は元から有限性不要)。以下は stale: ~~Lem 3.11 Solvable minimal normal subgroup is abelian; if finite, elementary abe — Stated for a finite solvable ambient G (book: arbitrary G with M solvable minimal normal, plus an infinite-abelian clause). Covers every downstream use in the b…
 
 ### Isaacs Ch.4 — Isaacs Ch.4 Commutators
 
@@ -175,9 +177,18 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **4.6** A ⊴ G abelian, G/A cyclic: G' = [A,G], G' ≅ A/(A∩Z(G)), |A| = |G'|·|A∩ — Main/CommutatorBasics.lean. All three clauses covered, but G'=[A,G] and the range identity carry [Finite G] where the book states them for arbitrary G (finitene…
-- **4.16** Finite nilpotent G: maximal normal abelian A satisfies A = C_G(A); hen — Lives OUTSIDE the chapter tree: OddOrder/GroupTheory/CriticalSubgroup.lean:166, cited as Gorenstein 5.3.12 (same statement). Statement re-read in slim pass: hyp…
-- **4.29** Coprime action ⇒ [G,A,A] = [G,A] — Main/ThreeSubgroupsCoprime.lean:394. Retains hypothesis IsSolvable A ∨ IsSolvable G, whereas the printed 4.29 is UNCONDITIONAL (the book's proof removes solvabi…
+- ✅ **2026-07-19 実測: 解消済** — 4.6 クラスタ (`commutator_eq_commutator_of_normal_abelian_cyclic_quotient`
+  / `commutatorRightHom_range_eq_commutator` / `quotientInfCenterEquivCommutator` /
+  `card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient`) は
+  **全て `[Finite G]` を持たない** (濃度形の `[Finite G]` も同日に除去済 — `Nat.card` が
+  無限を 0 に潰すので有限性不要)。以下は stale: ~~4.6 ... carry [Finite G] where the book states them for arbitrary — Main/CommutatorBasics.lean. All three clauses covered, but G'=[A,G] and the range identity carry [Finite G] where the book states them for arbitrary G (finitene…
+- ✅ **2026-07-19 実測: 特殊化ではない** — `GroupTheory/CriticalSubgroup.lean:166` の
+  statement は書籍と同一で、違いは**配置のみ** (章 tree の外)。債務ではなく記録事項。
+  以下は stale 分類: ~~4.16 Finite nilpotent G: maximal normal abelian A satisfies A = C_G(A); hen — Lives OUTSIDE the chapter tree: OddOrder/GroupTheory/CriticalSubgroup.lean:166, cited as Gorenstein 5.3.12 (same statement). Statement re-read in slim pass: hyp…
+- ✅ **2026-07-19 実測: 解消済** — 無条件版 `iterCommutator_inl_inr_two_eq_one_of_coprime`
+  (`Main/ThreeSubgroupsCoprime.lean:508`) が書籍印刷形そのもの (solvability 仮定なし)。
+  `:394` の solvable 版はその engine として併存するだけ。以下は stale:
+  ~~4.29 Coprime action ⇒ [G,A,A] = [G,A] — Retains hypothesis IsSolvable A ∨ IsSolvable G, whereas the printed 4.29 is UNCONDITIONAL (the book's proof removes solvabi…
 
 ### Isaacs Ch.5 — Isaacs Ch.5 Transfer
 
@@ -335,7 +346,10 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Thm 9.8** Bender: F*(G) ⊇ C_G(F*(G)) for every finite group — Confirmed by reading the Lean statement: OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (BG Prop 1.3, S01_FrattiniBurnside.lean:195) is exactly [Finite G][I…
+- ✅ **2026-07-19 実測: 解消済** — Ch.9 §9A の
+  `centralizer_genFitting_le_genFitting` (`Ch09_MoreSubnormality/GeneralizedFitting.lean:70`)
+  が **`[Finite G]` のみで可解性を課さない**一般形 = 書籍 Thm 9.8 そのもの。
+  BG Prop 1.3 は可解特殊化として併存するだけ。以下は stale: ~~Thm 9.8 Bender — Confirmed by reading the Lean statement: OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (BG Prop 1.3, S01_FrattiniBurnside.lean:195) is exactly [Finite G][I…
 
 ### Isaacs Ch.10 — Isaacs Ch.10 More Transfer Theory
 
@@ -393,6 +407,37 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | X.22 | 済 | S | Internal direct product criterion: G = M₁⋯M_r with M_i ⊴ G is direct iff (M₁⋯M_{k-1}) ∩ M_k = 1 | ✅ 2026-07-18 `Appendix/SubgroupBasics.lean` `iSupIndep_iff_disjoint_biSup_lt [Finite ι]` (正規族の iSupIndep ⟺ prefix-disjoint)。hard 方向 `supIndep_of_prefix`、modular law instance `disjoint_sup_of_normal`。 |
 
 ## BG
+
+> ## ⚠⚠ BG / Peterfalvi 節も実測監査で 42% が stale と判明 (hub, 2026-07-19、issue 9154 §2)
+>
+> **未/部分/特殊化 ラベルの 111 件を実測再検証した結果: 47 件 (42%) が実体と食い違った。**
+> Isaacs 節と同じ失敗モードで、本 note は **scope 正本から降格済** (hub 裁定 9154)。
+> **着手前に必ず repo 実測で再確認すること。**
+>
+> | 判定 | 件数 | 内容 |
+> |---|---|---|
+> | `STALE_ALREADY_DONE` | 37 | note は 未/部分/特殊化 だが、実際は教科書強度で形式化済 |
+> | `STALE_PARTIAL` | 10 | ラベルと実体の程度が食い違う (**うち 2 件は「済」なのに実際は部分** = 危険側) |
+> | `CONFIRMED` | 64 | ラベルどおり = 本物の残作業 |
+>
+> **特に大きい塊**: Pf App Suzuki の I.1/I.2/I.3 Props **13 件が「未」だが実際は完了**
+> (lane b が構築済)。BG §1-§4 の特殊化債務 bullet 5 件も本文では解消済と書きながら
+> 見出しが `特殊化債務` のままで、見出しだけ読むと未解決に見える。
+>
+> **⚠ 危険側のズレ (「済」なのに実際は部分)**:
+> - **BG Thm A** — A(6) の `M_F ≠ 1` / `M' ⊊ M` / `M'/M_F nilpotent` が欠落。
+>   特に `M_F ≠ ⊥` を主張する宣言はリポジトリに**存在しない** → **issue 0126**。
+> - **BG §16 引用ブロック**「genuine residual gaps 4 件」 — 3 件は landing 済で散文が stale、
+>   残る 1 件 (Thm A の一般 `M'/M_F` nilpotent) は実在するギャップ。
+>   同ブロックの「S14 に real sorry が 2 件残る」も無効 (`OddOrder/BG/Ch4_FamilyOfMaximal/**`
+>   全 35 ファイルの実 sorry = **0**)。
+>
+> **リポジトリ側の stale も 1 件**: `S15_MF/OpicoreCentralizer.lean:410-413` の
+> `fitting_not_ti_cases` docstring が「(d)(e) は未達、15.7 の完全形式化と読むな」と書いているが、
+> (d)(e) とも別宣言として landing 済 (issue 3022 close) → issue 0126。
+>
+> 監査 workflow = `wf_27b12223-fd5` (7 バッチ並列 read-only)。
+
 
 | unit | n | 済 | 特殊化 | 部分 | 未 | mathlib |
 |---|---|---|---|---|---|---|

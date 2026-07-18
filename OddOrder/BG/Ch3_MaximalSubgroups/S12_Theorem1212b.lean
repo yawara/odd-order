@@ -30,22 +30,6 @@ open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
 
-/-! ## Agemo `℧ⁿ` of an abelian group is the set of `pⁿ`-th powers -/
-
-/-- In a commutative group the agemo subgroup `℧ⁿ(H)` is the range of the `pⁿ`-th power map. -/
-theorem agemo_eq_range_powMonoidHom {H : Type*} [CommGroup H] {p n : ℕ} :
-    Agemo H p n = (powMonoidHom (p ^ n) : H →* H).range := by
-  rw [Agemo]
-  refine le_antisymm (Subgroup.closure_le _ |>.mpr ?_) ?_
-  · rintro g ⟨x, rfl⟩; exact ⟨x, rfl⟩
-  · rintro g ⟨x, rfl⟩; exact Subgroup.subset_closure ⟨x, rfl⟩
-
-/-- In a commutative group, membership in `℧ⁿ(H)` means being a `pⁿ`-th power. -/
-theorem mem_agemo_iff_of_comm {H : Type*} [CommGroup H] {p n : ℕ} {x : H} :
-    x ∈ Agemo H p n ↔ ∃ y, x = y ^ (p ^ n) := by
-  rw [agemo_eq_range_powMonoidHom, MonoidHom.mem_range]
-  exact ⟨fun ⟨y, hy⟩ => ⟨y, hy.symm⟩, fun ⟨y, hy⟩ => ⟨y, hy.symm⟩⟩
-
 /-- The maximality predicate making `S` a Sylow `p`-subgroup *of `M`* as well: any `p`-subgroup
 `R` of `M` containing `S` equals `S`. Holds because `S` is already a Sylow `p`-subgroup of `G`. -/
 theorem sylow_maximal_in_M_of_le {p : ℕ} [Fact p.Prime] {M : Subgroup G} [Finite G]

@@ -199,6 +199,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
@@ -228,9 +229,12 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
@@ -270,7 +274,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 10200
+set_option linter.style.longFile 10400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -6552,15 +6556,15 @@ otherwise `Q ⧸ C_Q(S)` is cyclic (`pRank Q q ≤ 1`) yet `pRank Q q = r_q(N_G(
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_partial_centralizer_of_abelianSylow
 
-/-! ### Agemo of an abelian group is the set of `pⁿ`-th powers (`S12_Theorem1212b`)
+/-! ### Agemo of an abelian group is the set of `pⁿ`-th powers
 
 `agemo_eq_range_powMonoidHom` / `mem_agemo_iff_of_comm`: in a commutative group `℧ⁿ(H)` equals
 the range of the `pⁿ`-th power map, so `x ∈ ℧ⁿ(H) ↔ ∃ y, x = y^(pⁿ)`. Tool for the Case 3
 `C_E(S) = E` branch (`Z = ⟨s⟩` with `Ωₐ₋₁(S) = ⟨s^{p^{a-1}}⟩` the good line). Unconditional. -/
 
-#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.agemo_eq_range_powMonoidHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.agemo_eq_range_powMonoidHom
 
-#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_agemo_iff_of_comm
+#assert_only_allowed_axioms OddOrder.GroupTheory.mem_agemo_iff_of_comm
 
 /-! ### BG Theorem 12.12: Case 3 — the `C_E(S) = E` branch (`S12_Theorem1212b`)
 
@@ -7958,6 +7962,29 @@ internal direct product `S × Q₁ ≃* Q`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sylowTwoProdQ1MulEquiv
 
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 1 and the standing
+`K`-action**: ambient conjugation gives a faithful fixed-point-free action on
+`Q`, preserves `Q₀`, and its concrete automorphism image acts regularly on the
+nonidentity involutions.  Moreover `|K| = |Q₀| - 1` and `|K|` is odd. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByK_injective
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByK_fixed_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q0_isInvariant
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.actualKActor_actsRegularlyOnInvolutions
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_eq_card_Q0_sub_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_odd
+
 /-! **Peterfalvi Appendix III, Definition 1**: Suzuki `2`-groups are encoded
 honestly as nonabelian `2`-groups with at least two involutions and a cyclic
 subgroup of automorphisms acting regularly on the involutions.  Faithfulness is
@@ -7965,6 +7992,23 @@ built into the subgroup inclusion in `MulAut`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
+
+/-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
+involution is central, and the involutions together with the identity form a
+concrete elementary-abelian `2`-subgroup.  The reverse identification with the
+whole center remains part of Higman's later structural argument. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutions_subset_center
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutionSubgroup_isElementaryAbelian
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.mem_involutionSubgroup_iff_sq_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutions_eq_involutionSubgroup_diff_identity
 
 /-! **Peterfalvi Appendix III, Lemma 1(b)**: every quadratic map over `F₂`
 has an explicit central extension whose squaring map is the original map. -/
@@ -7996,6 +8040,43 @@ order-`q` summands have `K`-invariant inverse images of order `q²`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.card_rightPreimage
+
+/-! For Higman (d), coprime fixed-point lifting makes the quotient action
+fixed-point-free.  An invariant subgroup of order `|K| + 1` is then transitive
+and simple under `K`, and two distinct invariant subgroups of the required
+orders are complementary. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.quotient_fixedPointFree_of_fixedPoints_le
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.card_coprime_of_card_eq_sub_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.restrict_transitive_of_fixedPointFree_card
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.invariant_eq_bot_or_top_of_fixedPointFree_card
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.isCompl_of_distinct_invariant_of_transitive_card
+
+/-! In the actual Part II setting, `|K|` and `|Q₀|` are coprime and the
+induced action on `Q / Q₀` is fixed-point-free.  Hence every invariant
+order-`|Q₀|` subgroup is transitive on its nonidentity elements and simple as
+a `K`-group. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_coprime_card_Q0
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByKQuotientQ0_fixed_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.quotientQ0_restrict_transitive_of_card_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.quotientQ0_invariant_eq_bot_or_top_of_card_eq
 
 /-! **Peterfalvi Part II, Ch. I §3 Lemma 5**: invariant `Q₀`-cosets and
 coprime fixed-point lifting give the free action on `K`-subgroups and the

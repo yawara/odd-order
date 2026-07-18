@@ -11,11 +11,20 @@
 > **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
-> a_re='^OddOrder/Isaacs/'   # 2026-07-19 裁定: Ch08/Ch10 も含む Isaacs 全域 (下記 ▶)
+> a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S'   # 2026-07-19: Isaacs 全域 + Pf 本文 (issue 9154 裁定)
 > b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
-> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
+> **▶▶ 2026-07-19 hub 裁定 #2 (issue 9154): lane a の Isaacs 完了 → `OddOrder/Peterfalvi/S*` を a へ**。
+> Isaacs は実 sorry 0・全 349 結果が形式化済 (hub 再測で Ch08 = 14 leaf/5,707 行、Ch10 = 6 leaf/3,643 行を確認)。
+> 残量が最大の Pf 本文 (63〜65 件、L:10 XL:6) を c が BG 残 25 件と単独で抱えていた偏りを解消するため、
+> **Pf 本文 `S*` を c → a へ移管**。c の直近 20 commit は全て `OddOrder/BG/**` で Pf 本文に非接触ゆえ境界は空。
+> c の担当 = BG 残 + Pf Appendices (NearFields/Huppert/SemilinearField/FeitSibley)。
+> c が Pf 本文の未コミット作業を持つ場合は破棄せず a へ引き継ぐ (9154 に申告)。
+> residue 2 件: Thm 6.23 standalone (a が S で閉じる) / Lem 3.7 は no-wrapper 方針ゆえ追加作業なし。
+> ⚠ **survey note は scope 正本から降格** (同裁定) — 正本は git log + issues + 実測 grep。
+
 > **▶ 2026-07-19 hub 裁定 (ユーザー確認「A は Isaacs を完全に仕上げるタスクでよいか」= YES): lane a =
 > `OddOrder/Isaacs/**` 全域**。Ch08 は b が、Ch10 は c が第一パスを完了して既に離れており
 > (実測: Ch08 の 07-16 ギャップ 25 件は全て宣言済、Ch10 は 27 件中 26 件済 — 残 Thm 10.8 のみ)、

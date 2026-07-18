@@ -172,6 +172,52 @@ instance characteristic : (Agemo G p n).Characteristic := by
 
 end Agemo
 
+/-! ## Agemo in a commutative group -/
+
+/-- In a commutative group the agemo subgroup `℧ⁿ(H)` is exactly the range
+of the `pⁿ`-th power homomorphism. -/
+theorem agemo_eq_range_powMonoidHom {H : Type*} [CommGroup H] {p n : ℕ} :
+    Agemo H p n = (powMonoidHom (p ^ n) : H →* H).range := by
+  rw [Agemo]
+  refine le_antisymm (Subgroup.closure_le _ |>.mpr ?_) ?_
+  · rintro g ⟨x, rfl⟩
+    exact ⟨x, rfl⟩
+  · rintro g ⟨x, rfl⟩
+    exact Subgroup.subset_closure ⟨x, rfl⟩
+
+/-- In a commutative group, membership in `℧ⁿ(H)` means being a `pⁿ`-th
+power. -/
+theorem mem_agemo_iff_of_comm {H : Type*} [CommGroup H] {p n : ℕ} {x : H} :
+    x ∈ Agemo H p n ↔ ∃ y, x = y ^ (p ^ n) := by
+  rw [agemo_eq_range_powMonoidHom, MonoidHom.mem_range]
+  exact ⟨fun ⟨y, hy⟩ => ⟨y, hy.symm⟩, fun ⟨y, hy⟩ => ⟨y, hy.symm⟩⟩
+
+/-- If a monoid of automorphisms acts transitively on the involutions of a
+group, then all involutions have the same membership in every Agemo subgroup.
+
+This is the first structural step in **Higman, Suzuki 2-groups, Lemma 1**:
+the height of an involution in the power filtration is constant on the actor
+orbit. No finiteness, commutativity, or 2-group assumption is needed for this
+orbit argument. -/
+theorem mem_agemo_iff_of_transitive_orderOf_two
+    {A X : Type*} [Group A] [Monoid X]
+    (phi : X →* MulAut A)
+    (htrans : ∀ {x y : A}, orderOf x = 2 → orderOf y = 2 →
+      ∃ a : X, phi a x = y)
+    {s : ℕ} {x y : A} (hx : orderOf x = 2) (hy : orderOf y = 2) :
+    x ∈ Agemo A 2 s ↔ y ∈ Agemo A 2 s := by
+  obtain ⟨a, ha⟩ := htrans hx hy
+  have hcomap :
+      (Agemo A 2 s).comap (phi a).toMonoidHom = Agemo A 2 s :=
+    Subgroup.characteristic_iff_comap_eq.mp
+      (inferInstance : (Agemo A 2 s).Characteristic) (phi a)
+  have hmem : phi a x ∈ Agemo A 2 s ↔ x ∈ Agemo A 2 s := by
+    change x ∈ (Agemo A 2 s).comap (phi a).toMonoidHom ↔
+      x ∈ Agemo A 2 s
+    rw [hcomap]
+  rw [← ha]
+  exact hmem.symm
+
 /-! ## `Ω₁` of an abelian subgroup
 
 When `H ≤ G` is abelian (carries a `CommGroup` structure), the set
