@@ -30,8 +30,8 @@ CLAUDE.md no-wrapper policy 準拠: 完成済 Isaacs Ch.7 を直接呼ぶ。教�
 
 | BG | 内容 | Isaacs FGT / repo | 状態 |
 |---|---|---|---|
-| **Thm 6.1** | G solvable odd, S∈Syl_p ⇒ `O_{p',p}(G)` が S の全 abelian normal 部分群を含む | Thm 3.21 (Hall-Higman 1.2.3) `hall_higman_1_2_3` の系 / `normal_J` 中間補題 | core 完成 (本ファイル), 一般形 TODO |
-| **Thm 6.2** | (normal-J) G solvable odd, S∈Syl_p ⇒ `Z(J(S))·O_{p'}(G) ⊴ G` | **Thm 7.6** `OddOrder.Isaacs.Ch07.normal_J` (odd-order 等価) | core 完成 (本ファイル, reduced case), 一般形 (O_{p'} 簡約) TODO |
+| **Thm 6.1** | G solvable odd, S∈Syl_p ⇒ `O_{p',p}(G)` が S の全 abelian normal 部分群を含む | `AppA.thmA4b` (BG 自身が mmd L4627 で Thm 6.1 = Thm A.4(b) と同一視) / §6 側 = `S06_Thm61.le_oPiPrimePiCore_of_abelian_normal_in_sylow` | ✅ **一般形完了** (2026-07-19、issue 3025) |
+| **Thm 6.2** | (normal-J) G solvable odd, S∈Syl_p ⇒ `Z(J(S))·O_{p'}(G) ⊴ G` | **Thm 7.6** `OddOrder.Isaacs.Ch07.normal_J` (odd-order 等価) | core 完成 (本ファイル, reduced case)。⚠ literal `J(S)` 一般形は **Glauberman ZJ に blocked** (issue 3017 → 3024)。book 推奨代替の `L(S)` 一般形は済 = `AppB_Thm62.zCenter_lOdd_sup_oPiCore_normal` |
 | **Lem 6.3(a)** | G solvable, H ⊴ G normal Hall 補群 K, H⊆G' ⇒ `⁅H,K⁆ = H` (∧ C_H(K)⊆H') | `commutator_eq_self_of_isComplement'_le_commutator` (§6.3, 本ファイル) | 第 1 結論 ✅ (Thm 10.6/Cor 10.7(a)/§15 が引用); C_H(K)⊆H' は §10 critical path 外で TODO |
 | 6.3(b)-6.4, 6.7 | solvable + p-length 1 + Frobenius factorization | Isaacs Ch.5/Ch.7 | TODO |
 
@@ -161,7 +161,12 @@ theorem normalJ_normal_of_odd [Finite G]
 
 奇数 solvable `G`、`p ≠ 2`、`P ∈ Syl_p`、`O_{p'}(G) = ⊥`、`P = C_G(Z(P))` で
 `J(P) ≤ O_{p',p}(G)`。BG Thm 6.1 (任意 abelian normal 部分群 ⊆ `O_{p',p}`) の `J(P)`
-特殊形 (reduced case)。一般形は別途 (notes/bg/s06_additional.md 残課題 3)。 -/
+特殊形 (reduced case)。
+
+**一般形は済** — `OddOrder.BG.AppA.thmA4b` (`O_{p'}(G) = ⊥` も `C_G(Z(P)) = P` も仮定せず、
+`O_{p'}` reduction を内部で行う) が BG Thm 6.1 そのもの (mmd L4627「Theorem A.4(b) is just
+Theorem 6.1」)。§6 側の入口は `S06_Thm61.le_oPiPrimePiCore_of_abelian_normal_in_sylow`
+(`thmA4b` の `p ≠ 2` を任意素数へ外したもの)。本定理はその `J(P)`-instance にすぎない。 -/
 theorem thompsonJ_le_oPiPrimePiCore_of_odd [Finite G]
     (hodd : Odd (Nat.card G)) [IsSolvable G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hp2 : p ≠ 2)
