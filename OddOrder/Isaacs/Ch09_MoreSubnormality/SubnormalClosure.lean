@@ -786,4 +786,51 @@ theorem kappaSet_eq_of_sylow {G : Type u} [Group G] [Finite G] (hIH : BartelsIH 
 
 end
 
+section /- 9D: Bartels Step 4 — 第 1 分岐 (作用の核が非自明なら矛盾) -/
+
+/-- 非自明な正規部分群による商は位数が真に小さい。 -/
+theorem card_quotient_lt_of_ne_bot [Finite G] {K : Subgroup G} [K.Normal] (hK : K ≠ ⊥) :
+    Nat.card (G ⧸ K) < Nat.card G := by
+  have hmul := Subgroup.card_mul_index K
+  have hidx0 : K.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hcard : Nat.card ↥K ≠ 1 := fun h1 => hK (Subgroup.eq_bot_of_card_eq K h1)
+  have hpos : 0 < Nat.card ↥K := Nat.card_pos
+  have h2 : 1 < Nat.card ↥K := by omega
+  have : K.index < Nat.card ↥K * K.index :=
+    (Nat.lt_mul_iff_one_lt_left (Nat.pos_of_ne_zero hidx0)).mpr h2
+  rw [hmul] at this
+  exact this
+
+/-- **`S` の商での像が subnormal かつ `K` が `S` を正規化するなら `S ◁◁ G`**。
+
+書籍 p.291 Step 4 の最後の一手 (`K·X^{(G)} ◁◁ G` かつ `X^{(G)} ◁ K·X^{(G)}`)。 -/
+theorem isSubnormal_of_map_quotient {S K : Subgroup G} [K.Normal]
+    (hnorm : K ≤ Subgroup.normalizer S)
+    (hsub : (S.map (QuotientGroup.mk' K)).IsSubnormal) : S.IsSubnormal := by
+  -- `K ⊔ S` は像の引き戻しなので subnormal.
+  have hcomap : (S.map (QuotientGroup.mk' K)).comap (QuotientGroup.mk' K) = S ⊔ K := by
+    rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+  have hLsub : (S ⊔ K).IsSubnormal := hcomap ▸ hsub.comap _
+  -- `S ◁ (S ⊔ K)` (K も S も `S` を正規化する).
+  have hle : S ≤ S ⊔ K := le_sup_left
+  have hnormal : (S.subgroupOf (S ⊔ K)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hle).mpr
+      (sup_le Subgroup.le_normalizer hnorm)
+  exact Subgroup.IsSubnormal.step S (S ⊔ K) hle hLsub hnormal
+
+/-- **Bartels Step 4 の第 1 分岐**: `G` の `𝒦(G)` への作用の核 `K` が非自明なら
+`X^{(G)}` は subnormal (= 最小反例の仮定に矛盾)。
+
+`|G/K| < |G|` なので帰納法の仮定と Lem 9.30 で `X^{(G)}` の像が `Ḡ` で subnormal,
+`K` は `X^{(G)}` を正規化するので上の補題が使える。 -/
+theorem isSubnormal_strongClosure_of_normalizing_kernel {G : Type u} [Group G] [Finite G]
+    (hIH : BartelsIH G) {X K : Subgroup G} [K.Normal] (hK : K ≠ ⊥)
+    (hnorm : K ≤ Subgroup.normalizer (strongClosure X)) :
+    (strongClosure X).IsSubnormal := by
+  refine isSubnormal_of_map_quotient hnorm ?_
+  rw [strongClosure_map X (QuotientGroup.mk' K) (QuotientGroup.mk'_surjective K)]
+  exact hIH (G ⧸ K) (card_quotient_lt_of_ne_bot hK) _
+
+end
+
 end OddOrder.Isaacs.Ch09
