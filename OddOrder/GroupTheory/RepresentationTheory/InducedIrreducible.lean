@@ -259,6 +259,74 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
     Nat.card_eq_fintype_card]
 
 open scoped Classical in
+/-- **Peterfalvi (1.5.a) + (1.5.b), normalized form**: `Res_H^G χ = ‖χ‖²·∑_β θ^β`, where `χ =
+Ind_H^G θ` and `β` runs over the distinct `G`-conjugates of `θ`.
+
+The book states (a) as `Res_H^G χ = r·∑ θ^β` with `r = |I_G(θ) : H|`, and (b) as `‖χ‖² = r`;
+combining them removes the index and leaves the norm.  Formally, divide the unnormalized Mackey
+orbit identity `|H|·Res_H χ = |I_G(θ)|·∑_β θ^β`
+(`card_smul_restrict_induce_eq_inertia_smul_orbitSum`) by `|H|`, replacing `|I_G(θ)|` by
+`|H|·‖χ‖²` (`card_mul_inner_self_induce_eq_card_inertia`). -/
+theorem restrict_induce_eq_inner_self_smul_orbitSum (θ : IrreducibleCharacter H) :
+    restrict H (induce H (θ : ClassFunction ↥H ℂ))
+      = ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
+              (induce H (θ : ClassFunction ↥H ℂ)) •
+          ∑ ψ ∈ Finset.univ.image
+            (fun x : G => ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ)), ψ := by
+  classical
+  have hcardH : (Nat.card ↥H : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have h1 := card_smul_restrict_induce_eq_inertia_smul_orbitSum (G := G) (H := H)
+    (θ : ClassFunction ↥H ℂ)
+  have h2 := card_mul_inner_self_induce_eq_card_inertia (G := G) (H := H) θ
+  refine (inv_smul_smul₀ hcardH (restrict H (induce H (θ : ClassFunction ↥H ℂ)))).symm.trans ?_
+  rw [h1, ← Nat.cast_smul_eq_nsmul ℂ, ← h2, mul_smul, inv_smul_smul₀ hcardH]
+
+open scoped Classical in
+/-- **Peterfalvi (1.5.d)**: `χ(1)·Res_H^G χ / ‖χ‖² = |G:H|·∑_β θ^β(1)·θ^β`, where `χ = Ind_H^G θ`
+for `θ ∈ Irr H` with `H ⊴ G`, and `β` runs over the distinct `G`-conjugates of `θ` (indexed as in
+(1.5.a)).
+
+The book's proof is exactly the displayed computation: by (a) and (b),
+`χ(1)·Res_H χ / ‖χ‖² = |G:H|·θ(1)·r·∑ θ^g / r = |G:H|·∑ θ^g(1)·θ^g`.  Formally,
+`restrict_induce_eq_inner_self_smul_orbitSum` cancels the `‖χ‖²`, `induce_apply_one` supplies
+`χ(1) = |G:H|·θ(1)`, and every orbit member has the same degree `θ^β(1) = θ(1)`
+(conjugation fixes `1`), so the right-hand sum is `θ(1)·∑_β θ^β`. -/
+theorem inner_self_inv_smul_apply_one_smul_restrict_induce (θ : IrreducibleCharacter H) :
+    (ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
+            (induce H (θ : ClassFunction ↥H ℂ)))⁻¹ •
+        (induce H (θ : ClassFunction ↥H ℂ) (1 : G) •
+          restrict H (induce H (θ : ClassFunction ↥H ℂ)))
+      = (H.index : ℂ) •
+          ∑ ψ ∈ Finset.univ.image
+            (fun x : G => ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ)), ψ (1 : ↥H) • ψ := by
+  classical
+  have hcardH : (Nat.card ↥H : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  -- `‖χ‖² ≠ 0`, since `|H|·‖χ‖² = |I_G(θ)| ≠ 0`.
+  have hnorm_ne : ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
+      (induce H (θ : ClassFunction ↥H ℂ)) ≠ 0 := by
+    intro h0
+    have h2 := card_mul_inner_self_induce_eq_card_inertia (G := G) (H := H) θ
+    rw [h0, mul_zero] at h2
+    exact (Nat.cast_ne_zero.mpr (Nat.card_pos (α := ↥(ClassFunction.inertia
+      (θ : ClassFunction ↥H ℂ)))).ne') h2.symm
+  -- Every orbit member has degree `θ(1)`, so the right sum is `θ(1) • ∑_β θ^β`.
+  have horb : ∑ ψ ∈ Finset.univ.image
+        (fun x : G => ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ)), ψ (1 : ↥H) • ψ
+      = (θ : ClassFunction ↥H ℂ) (1 : ↥H) •
+          ∑ ψ ∈ Finset.univ.image
+            (fun x : G => ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ)), ψ := by
+    rw [Finset.smul_sum]
+    refine Finset.sum_congr rfl fun ψ hψ => ?_
+    obtain ⟨x, -, rfl⟩ := Finset.mem_image.mp hψ
+    congr 1
+    rw [ClassFunction.conjBy_apply]
+    exact congrArg _ (Subtype.ext (by simp))
+  rw [horb, restrict_induce_eq_inner_self_smul_orbitSum θ,
+    ClassFunction.induce_apply_one H (θ : ClassFunction ↥H ℂ), smul_smul, smul_smul, smul_smul]
+  congr 1
+  field_simp
+
+open scoped Classical in
 omit [Fintype ↥H] in
 omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)] in
 /-- **The conjugate-orbit sum is a virtual character**: each summand of the orbit
