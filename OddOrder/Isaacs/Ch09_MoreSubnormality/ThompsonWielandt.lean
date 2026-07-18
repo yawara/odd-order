@@ -495,6 +495,26 @@ theorem relCore_relIndex_le_factorial [Finite G] (H D : Subgroup G) :
     (relCore H D).relIndex H ≤ Nat.factorial (D.relIndex H) :=
   Nat.le_of_dvd (Nat.factorial_pos _) (relCore_relIndex_dvd_factorial H D)
 
+/-- `D` から見た形: `|D : core_H(D)| ≤ (|H : D| - 1)!`.
+
+`|H : core_H(D)| = |D : core_H(D)| · |H : D|` を `|H : core_H(D)| ≤ |H:D|!` と
+`|H:D|! = |H:D| · (|H:D| - 1)!` に突き合わせて `|H:D|` で割ったもの.
+書籍 p. 283 の「`|D:M| ≤ (a-1)!`」に対応 (これが無いと `|H:E| ≤ a!b!` の係数が合わない). -/
+theorem relCore_relIndex_le_factorial_pred [Finite G] {H D : Subgroup G} (hDH : D ≤ H) :
+    (relCore H D).relIndex D ≤ Nat.factorial (D.relIndex H - 1) := by
+  have hane : D.relIndex H ≠ 0 := fun h =>
+    Subgroup.index_ne_zero_of_finite (Subgroup.index_eq_zero_of_relIndex_eq_zero h)
+  have hapos : 0 < D.relIndex H := Nat.pos_of_ne_zero hane
+  have hfac : Nat.factorial (D.relIndex H - 1) * D.relIndex H = Nat.factorial (D.relIndex H) := by
+    obtain ⟨n, hn⟩ := Nat.exists_eq_succ_of_ne_zero hane
+    rw [hn]
+    simp [Nat.factorial_succ, Nat.mul_comm]
+  refine Nat.le_of_mul_le_mul_right ?_ hapos
+  calc (relCore H D).relIndex D * D.relIndex H = (relCore H D).relIndex H :=
+        Subgroup.relIndex_mul_relIndex _ _ _ (relCore_le H D) hDH
+    _ ≤ Nat.factorial (D.relIndex H) := relCore_relIndex_le_factorial H D
+    _ = Nat.factorial (D.relIndex H - 1) * D.relIndex H := hfac.symm
+
 end
 
 section /- 9C: Thm 9.23 — corefree maximal の setup -/
