@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Huppert
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 
@@ -15,8 +16,9 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 
 This appendix recalls the quadratic-map model of Suzuki 2-groups and Higman's
 classification.  Definition 1 is encoded by an honest regular automorphism
-action, while Definitions 2--3 are the concrete `TypeAData` and `TypeBData`
-models re-exported from `Suzuki2Groups.Types`.
+action; Higman's theorem (d)--(e) is represented by concrete invariant
+two-summand data; and Definitions 2--3 are the concrete `TypeAData` and
+`TypeBData` models re-exported from `Suzuki2Groups.Types`.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups

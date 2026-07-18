@@ -225,6 +225,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7899,6 +7900,15 @@ nonvanishing condition implying anisotropy. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBData.map_sq
+
+/-! **Peterfalvi Appendix III, Higman theorem (d)--(e)**: the two invariant
+order-`q` summands have `K`-invariant inverse images of order `q²`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.card_leftPreimage
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.card_rightPreimage
 
 /-! **Peterfalvi Part II, Ch. I §3 Lemma 5**: invariant `Q₀`-cosets and
 coprime fixed-point lifting give the free action on `K`-subgroups and the
