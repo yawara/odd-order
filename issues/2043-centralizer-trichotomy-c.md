@@ -26,7 +26,7 @@ Peterfalvi Part II, Ch. I §3 Proposition 1(c) (pp. 105–106) を原文強度�
       (`SylowDecomposition.lean`)。
 - [x] Lemma 1/induction から `C_Q(X)` が `2`-group と分かったとき
       `C_{Q₁}(X)=1` を導く exact bridge を証明する。
-- [ ] 分類非依存の構造核
+- [x] 分類非依存の構造核
       `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)` を原文どおり証明する。
 - [ ] quotient action `L/𝒩(L)` の honest な Hypothesis/induction carrier と
       `F=O^{2′}(L)=⟨C_Q(X)^L⟩`、residual の quotient transport を構成する。

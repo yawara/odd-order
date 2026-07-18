@@ -7688,6 +7688,13 @@ factor `Q₁` has trivial centralizer of `X`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q1_inf_centralizer_eq_bot_of_isPGroup
 
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, structural core:
+for `L = C_G(X)` and `F₀ = ⟨C_Q(X)^L⟩`, the action kernel intersects
+`F₀` in exactly `Z(F₀)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_subgroupOf_normalClosure_cQ_eq_center
+
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
 `F = 𝔽_p[T] = End_{𝔽_p[T]}(E)` over which `E` is `1`-dimensional, with `|F| = |E|`.  The abstract

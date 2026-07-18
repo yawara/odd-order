@@ -269,8 +269,13 @@
    - ✅ `Q1_inf_centralizer_eq_bot_of_isPGroup`: if `C_Q(X)` is a
      `2`-group, its intersection with the odd-order `Q₁` is trivial,
      giving the source clause `C_{Q₁}(X)=1`.
-   - **Next frontier:** prove the classification-independent source identity
-     `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)`, then identify the normal closure
-     with `F = O^{2′}(C_G(X))` through the induction quotient.
+   - ✅ `normalCore_subgroupOf_normalClosure_cQ_eq_center` proves the
+     classification-independent source identity
+     `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)`. The reverse inclusion uses
+     the opposite root group `C_{Q^t}(X)` (the source OCR prints `Q′`),
+     exactly as in SS1 Proposition 1(b).
+   - **Next frontier:** identify this normal closure with
+     `F = O^{2′}(C_G(X))` through the induction quotient, then transport
+     the residual across that quotient.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
