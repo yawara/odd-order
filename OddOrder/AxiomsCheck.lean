@@ -1239,6 +1239,21 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- P は G の Sylow p (𝒦(M) の stabilizer の二分岐)。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_four
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_ne_bot_of_isPGroup
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.setwiseStabilizer_kappaSet_eq_of_isCoatom
+-- Step 4 後半: M は P を含む唯一の極大部分群。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_four_unique
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 5** — X を含む極大部分群は一意。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_five
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_sylow_ge_of_isPGroup
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.lt_inf_normalizer_of_lt_of_isPGroup
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.mem_normalizer_of_mem_normalizer_subgroupOf
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 6 と本体** — X^{(G)} は G で subnormal
+-- (Lem 9.29(a) と合わせて X^{(G)} = X の subnormal closure)。§9D 完了。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_six
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_isSubnormal_of_bartelsIH
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_isSubnormal
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
