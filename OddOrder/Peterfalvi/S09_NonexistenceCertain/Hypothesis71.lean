@@ -129,7 +129,8 @@ variable {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
 `L`-normalizer (`IsTISubset A L`), every `H(a)` is trivial (`S04.of_isTISubset`, Peterfalvi (2.3)),
 the Dade map is the canonical one (`Hypothesis.dadeMap`, an honest (2.5)/(2.6) Dade isometry by
 `isDadeMap_dadeMap`), and the `H(-)`-conjugation-invariance is automatic
-(`HConjInvariant.of_forall_H_eq_bot`).  This is the (7.1) `Hypothesis71` for a TI-set — in particular
+(`HConjInvariant.of_forall_H_eq_bot`).  This is the (7.1) `Hypothesis71` for a TI-set — in
+particular
 for `A = H^#`, `L = N_G(H)` of a Frobenius group with kernel `H` (the source of the
 `FrobeniusFamily` (7.4) hypotheses of Peterfalvi (7.10)). -/
 noncomputable def of_isTISubset

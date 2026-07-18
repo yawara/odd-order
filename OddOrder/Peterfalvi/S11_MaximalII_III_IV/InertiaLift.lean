@@ -163,7 +163,8 @@ theorem uprimeSub_le_cuSub [Finite G] (caseA : CliffordCaseAData chars) :
   (uprimeSub_le_cSub data chief).trans (cSub_le_cuSub caseA)
 
 /-- **`U' ≤ C_U(S₀)` realized inside `HU`** (`Uprime`/`uprimeSub` ⟶ `cuInHu`).  The `HU`-realized form
-of `uprimeSub_le_cuSub`: `(U'.subgroupOf M).subgroupOf HU ≤ cuInHu`.  Used to identify `λ` trivial on
+of `uprimeSub_le_cuSub`: `(U'.subgroupOf M).subgroupOf HU ≤ cuInHu`.  Used to identify `λ` trivial
+on
 `U'` as a character of `C_U(S₀)/U'` in the (9.8.d) count. -/
 theorem uprimeSub_subgroupOf_le_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
     ((uprimeSub data).subgroupOf M).subgroupOf (huSub data) ≤ cuInHu caseA :=
@@ -413,7 +414,8 @@ theorem index_cuInHu_subgroupOf_uInHu_eq_a [Finite G] (caseA : CliffordCaseAData
 
 /-- **`[HU : H·C_U(S₀)] = |Ū₁| = a`** (Peterfalvi (9.8.d) degree index).  The inertia subgroup of the
 degree-`qa` source character `θ₁·λ` has index `a` in `HU`, giving the source degree `a` and (after
-`Ind_{HU}^M`) the character degree `qa`.  Combines the second-iso step `[HU:H·C_U(S₀)] = [U:C_U(S₀)]`
+`Ind_{HU}^M`) the character degree `qa`.  Combines the second-iso step
+`[HU:H·C_U(S₀)] = [U:C_U(S₀)]`
 (`index_hcuInHu_eq_relindex_cuInHu`) with the first-iso value `[U:C_U(S₀)] = |Ū₁|`
 (`index_cuInHu_subgroupOf_uInHu_eq_a`). Here `|Ū₁| = Nat.card (aInvariantRestrictAut …).range` is
 the
@@ -1051,7 +1053,8 @@ conclusion for (9.8.d): `θ₁` need only be faithful on the *single* summand `S
 element centralizes `S₀` (lands in `C_U(S₀)`), not necessarily all of `H̄`.  The pure-algebra heart
 is `mulAut_eq_id_on_of_fixes_ne_one_on_prime` (`θ₁` faithful on the prime-order `S₀`), lifted
 through
-`aInvariantRestrictAut_coe` (which identifies the restricted action with `uActionHom` on `S₀`).  This
+`aInvariantRestrictAut_coe` (which identifies the restricted action with `uActionHom` on `S₀`).
+This
 gives `I(θ₁) ∩ U ⊆ C_U(S₀)` in the degree-`qa` inertia lift. -/
 theorem chiefFactor_caseA_char_inertia_single [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}

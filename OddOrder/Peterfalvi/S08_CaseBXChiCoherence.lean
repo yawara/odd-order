@@ -239,7 +239,8 @@ theorem xchi_inner_eq_of_anchored
   rw [hττ, hτjν, hντl, hνν]; ring
 
 /-- **The textbook case-(B) `X`-coherence on the certain-type columns** (Peterfalvi (6.8.2),
-`X_χ`-route).  The Sibley–Dade map `hyp.tau` is coherent on `certainTypeSet h46 k` with the extension
+`X_χ`-route).  The Sibley–Dade map `hyp.tau` is coherent on `certainTypeSet h46 k` with the
+extension
 `ν = xChiExtension h46 Ximg` sending each column `μ_j = columnSum χ₂` to its `(6.8.2.3)` projection
 image `Ximg χ₂` — **not** to the certain-type coherence image `cTE(μ_j)`.
 

@@ -749,7 +749,8 @@ theorem kappa_branch_dichotomy_mem_conjClassSet_zTilde [Finite G]
 
 /-- **Fixed-`W` κ-branch**: the same conclusion as `kappa_branch_dichotomy_mem_conjClassSet_zTilde`,
 but landing in the `Ẑ` of a *fixed* reference type-`P` maximal `Mref` (data `Kref, K*ref, Uref`)
-rather than in the (existentially produced) type-`P` `N`'s own `Ẑ`.  The dichotomy's `N` is type-`P`,
+rather than in the (existentially produced) type-`P` `N`'s own `Ẑ`.  The dichotomy's `N` is
+type-`P`,
 so `conjClassSet_zTilde_eq_fixed_of_isTypeP` (fix-`W`) absorbs `N`'s `Ẑ` into `Ẑ(Mref)`. -/
 theorem kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)

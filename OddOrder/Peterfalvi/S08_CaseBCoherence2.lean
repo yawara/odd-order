@@ -116,7 +116,8 @@ The only case-(B) difference from the Frobenius assembly is the **source orthogo
 since `X` is no longer all-irreducible, it is supplied by
 `inner_eq_zero_of_mem_span_of_pairwise_orthogonal`
 from the pairwise `⟨x, y⟩ = 0` (`x ∈ X`, `y ∈ Y`) — for `x = μ_j = ∑ᵢ μ_{ij}` this is
-`∑ᵢ ⟨μ_{ij}, η⟩ = 0`.  The combined extension `ν` (the (6.8.2) `τ₂`), its agreements, the mixed inner
+`∑ᵢ ⟨μ_{ij}, η⟩ = 0`.  The combined extension `ν` (the (6.8.2) `τ₂`), its agreements, the mixed
+inner
 products `hmixed` (the (6.8.2.3) content), and the cross-diagonal set `D`/`hDτ` (with the
 satisfiable
 generation `hgen`) are supplied at capstone wiring. -/

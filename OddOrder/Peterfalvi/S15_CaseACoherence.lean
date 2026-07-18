@@ -655,7 +655,8 @@ The reduction is landed sorry-free; the **sole residual** is the refuter, i.e. P
   /
   `sumnS_of_norm_one_constant_degree` / `sumnS_le_of_subset` are already landed in
   `S07_Subcoherent`;
-* the **(9.11.7)–(9.11.8) orthogonal-branch refutation** — the `S`-instance analogue of the M-instance
+* the **(9.11.7)–(9.11.8) orthogonal-branch refutation** — the `S`-instance analogue of the
+M-instance
   `NineElevenSevenEightRefutation` (`S11_NineElevenAlphaBound.lean:786`), which is *itself* still a
   named residual on the M-side (issue 9083 Phase E), i.e. the deepest genuinely-unlanded piece of
   the

@@ -496,7 +496,8 @@ are proved above, `sorry`-free.
 3. Gorenstein Thm 10.3.1 (iv)/(v)/(vi) on Frobenius complements: for odd order the Sylow
    subgroups are cyclic and the complement is metacyclic; a subgroup of order `q · r` is cyclic;
    for even order there is a unique involution and it is central.  Partly present as
-   `Ch06.isZGroup_of_isFrobeniusAction_of_odd`, `Ch06.sylow_isCyclic_or_two_quaternion_of_frobeniusAction`
+   `Ch06.isZGroup_of_isFrobeniusAction_of_odd`,
+   `Ch06.sylow_isCyclic_or_two_quaternion_of_frobeniusAction`
    and `Ch06.IsFrobeniusAction.unique_involution`; the "order `q · r` is cyclic" and metacyclic
    statements are **absent** (`OddOrder.GroupTheory.IsMetacyclic` exists but has no Frobenius
    theory attached).

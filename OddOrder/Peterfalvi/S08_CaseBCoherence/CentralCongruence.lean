@@ -589,7 +589,8 @@ This is the number-theoretic heart of Peterfalvi (6.8.2.2) ("`a ≡ 0 (mod |H:Z|
 `apply_one_sub_apply_eq_card_mul_inner` gives `f(1) − f(z₀) = |W₂|·m`; the (6.7) congruence
 `restrict_extension_Yset_charValue_cong_caseB` gives `f(z₀) ≡ f(1) (mod |H|)`, i.e.
 `f(1) − f(z₀) ≡ 0`; since that difference equals the rational integer `|W₂|·m`, the reverse bridge
-`dvd_of_intCast_algMod` yields `|H| ∣ |W₂|·m`.  The caller cancels `|W₂|` (using `|H| = |H:W₂|·|W₂|`)
+`dvd_of_intCast_algMod` yields `|H| ∣ |W₂|·m`.  The caller cancels `|W₂|` (using
+`|H| = |H:W₂|·|W₂|`)
 for `|H:W₂| ∣ m`. -/
 theorem SibleyDadeHypothesis.card_H_dvd_card_W2_mul_regCharCoeff
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]

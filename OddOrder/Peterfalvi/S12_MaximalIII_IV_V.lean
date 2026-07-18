@@ -647,7 +647,8 @@ theorem inner_conj_conj [Fintype G] [Invertible (Nat.card G : ℂ)] (φ ψ : Cla
     mul_comm]
 
 /-- For a **real** `Δ ∈ ZIrr G`, the Fourier coefficient is `conjPerm`-symmetric:
-`⟨Δ, χ̄⟩ = ⟨Δ, χ⟩`.  Since `Δ̄ = Δ` (`IsReal`), `⟨Δ, χ̄⟩ = ⟨Δ̄, χ̄⟩ = conj⟨Δ,χ⟩` (`inner_conj_conj`),
+`⟨Δ, χ̄⟩ = ⟨Δ, χ⟩`.  Since `Δ̄ = Δ` (`IsReal`), `⟨Δ, χ̄⟩ = ⟨Δ̄, χ̄⟩ = conj⟨Δ,χ⟩`
+(`inner_conj_conj`),
 and `⟨Δ,χ⟩` is a real integer (`mem_ZIrr_inner_int`), so the `conj` is inert. -/
 theorem inner_conjPerm_eq_of_isReal [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {Δ : ClassFunction G ℂ} (hΔ : Δ ∈ ZIrr G) (hr : ClassFunction.IsReal Δ)
@@ -664,7 +665,8 @@ theorem inner_conjPerm_eq_of_isReal [Finite G] [Fintype G] [Invertible (Nat.card
 
 open scoped Classical in
 /-- **Parity of the inner product of two real virtual characters orthogonal to `1`** (Peterfalvi
-(11.8.5) "`a` even from `β` real").  For `Δ₁, Δ₂ ∈ ZIrr G` (odd `G`) that are real (`IsReal`) — hence
+(11.8.5) "`a` even from `β` real").  For `Δ₁, Δ₂ ∈ ZIrr G` (odd `G`) that are real (`IsReal`) —
+hence
 with `conjPerm`-symmetric Fourier coefficients `⟨Δᵢ, χ̄⟩ = ⟨Δᵢ, χ⟩` — with `⟨Δ₂, 1⟩ = 0` (only one
 factor need be orthogonal to `1`, since the `χ = 1` term `c₁(1)·c₂(1)` vanishes), the integer
 `⟨Δ₁, Δ₂⟩` is even.  Cross-Parseval (`mem_ZIrr_inner_eq_sum_over_irr`) gives
@@ -1466,7 +1468,8 @@ theorem Hypothesis.SHCSet_span_apply_one_eq_intMul [Finite G] {M : Subgroup G} (
 open scoped FiniteInduce in
 /-- **Degree of an `S₂ = S(C) − S(HC)`-span element is an integer multiple of `qu`**, given that all
 `S₂` members share degree `qu` (the (11.8.1) uniform reducible degree — supplied as a hypothesis,
-§9-gated).  `span_induction`, as `SHCSet_span_apply_one_eq_intMul`.  The `S₂`-side degree-ratio input
+§9-gated).  `span_induction`, as `SHCSet_span_apply_one_eq_intMul`.  The `S₂`-side degree-ratio
+input
 of the (11.8.6) generation `hgen`. -/
 theorem Hypothesis.Sset_diff_span_apply_one_eq_intMul [Finite G] {M : Subgroup G}
     (hyp : Hypothesis M) {qu : ℕ}

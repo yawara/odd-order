@@ -100,7 +100,8 @@ discharged by `chiRho_eq_inner_beta_induced`.
 
 The distinguished `ζ = ζ_0` has `ζ(1) = (Ind 1_H)(1)` (`hdeg_match`), forcing `d_{ind1H} = 1`, so
 the
-certificate's `β = τ(Ind 1_H − ζ)` matches the family-difference `τ(ζ_{ind1H} − ζ_0)`.  Together with
+certificate's `β = τ(Ind 1_H − ζ)` matches the family-difference `τ(ζ_{ind1H} − ζ_0)`.  Together
+with
 `hypothesis76OfFamily` this realizes the issue-1013 goal: `Hypothesis78` (the §7 floor cited by
 `(12.16)` / `(14.11)`) is constructible from `(7.1)` + coherence alone, with no certificate assumed. -/
 noncomputable def hypothesis78OfDade

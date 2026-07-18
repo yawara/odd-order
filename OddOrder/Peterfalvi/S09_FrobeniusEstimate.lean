@@ -26,7 +26,8 @@ open OddOrder.Peterfalvi.S09.Cert
 /-- **The `ρ`-map is restriction, for a TI Dade datum** (trivial local subgroups `H(a) = ⊥`, the
 `of_isTISubset` case).  For `a ∈ A`, the `(7.2)` coset average
 `χ^ρ(a) = (1/|H(a)|) ∑_{x ∈ H(a)} χ(a·x)` collapses (each `x = 1`, so every summand is `χ(a)`) to
-`χ(a)`.  This is what makes two `Hypothesis71`'s built from the *same* TI subset — even via different
+`χ(a)`.  This is what makes two `Hypothesis71`'s built from the *same* TI subset — even via
+different
 `of_isTISubset` expressions — agree on `chiRho` (hence `chiRhoCF`/`chiRhoNormSq`). -/
 theorem chiRho_apply_of_trivial_local {G : Type*} [Group G] {A : Set G} {L : Subgroup G}
     [Fintype G] [Invertible (Nat.card G : ℂ)] (H71 : Hypothesis71 G A L)

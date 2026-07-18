@@ -1,5 +1,6 @@
 /-
-# Peterfalvi §7 — (7.8.c) building blocks: induced principal character and `betaDecomp` orthogonality
+# Peterfalvi §7 — (7.8.c) building blocks: induced principal character and `betaDecomp`
+orthogonality
 
 Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limit, CLAUDE.md
 「ファイル粒度」; second split of that file — the first, issue 0103 第 2 パス, produced

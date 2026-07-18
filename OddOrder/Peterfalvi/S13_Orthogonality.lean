@@ -16,7 +16,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 
 This leaf sits **downstream of both Clifford branches** of the (9.11) `Ptype_core_coherence`
 induction — caseA (`S11_NineElevenCaseA`) and caseB (`S13_CoreStructure`, issue 9075) are sibling
-leaves, so the case *dispatch* needs this common downstream file.  It assembles the **unconditional**
+leaves, so the case *dispatch* needs this common downstream file.  It assembles the
+**unconditional**
 `𝒮(H₀C)`-coherence (`coherent_sOf_H0C`) — the `X`-side input of the honest (11.8.6) world-bridge
 union glue `S07.coherentUnion_of_glued_of_bridge` (Coq `bridge_coherent`, no generation hypothesis)
 — which replaces the deprecated wide-`Sset \ SHCSet` uniform-degree route and the caseA-false
@@ -93,7 +94,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), unconditional: `𝒮(H₀C)` is coherent on `A₀(M)`** — the Clifford dichotomy
 `clifford_dichotomy` dispatches to caseB (landed `caseB_coherent_sOf_H0C`, issue 9075 via the (11.7)
 transfer) and caseA (`caseA_coherent_sOf_H0Cprime_of_refuter` + the same transfer).  The caseA
-**refuter** — the (9.11.2) pair-adjoining non-coherence supplied by lane-b's `S11_NineElevenCoherence`
+**refuter** — the (9.11.2) pair-adjoining non-coherence supplied by lane-b's
+`S11_NineElevenCoherence`
 induction — is the sole sorried-cite.  The `𝒮(H₀C)`-restriction witness (shared by the transfer) is
 the conjugate difference `μ̄ − μ` of a reducible μ-column (`columnSum_muColumnChar_mem_sOf_H0C`,
 `w₂ ≥ 2`), `A₀`-supported and nonzero (odd-order no-real-characters).
@@ -1011,7 +1013,8 @@ instantiated by the unconditional heir (`S_H0C_not_coherent_unconditional`,
 `S13_TypeDetermination`; the legacy sorried (11.3) route is retired, issue 9087).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` for which
-the residual `(μ₀ − ζ)^τ − ∑_i ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`.  Same statement as the
+the residual `(μ₀ − ζ)^τ − ∑_i ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`.  Same statement as
+the
 S12 version; the proof reuses the S12 residual machinery (`exists_charParameters_full`,
 `exists_coherent_extension_h114_of_orthogonal`, `tau_muColumnSum_sub_dzeta_eq_of_residualData`)
 verbatim to build the coherent extension `ν` and the column identities `hcol` from the orthogonality

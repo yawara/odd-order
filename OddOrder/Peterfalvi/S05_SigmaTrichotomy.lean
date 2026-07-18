@@ -435,7 +435,8 @@ theorem eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq (hyp : TICyclicHypothesis
 /-! ### Peterfalvi (5.8): the norm-`w₁` full-column Dade-image endgame
 
 The `σ`-coefficient analogue of `eq_smul_chiFam_diff_of_vanishOnV`, but *adopting* a single constant
-full column instead of excluding it.  Once (5.5) supplies the two-column support and `{0,±δ}` entries
+full column instead of excluding it.  Once (5.5) supplies the two-column support and `{0,±δ}`
+entries
 of `X = μ_k^{τ₁}`, this turns the norm-`w₁` data into the class-function identity
 `μ_k^{τ₁} = δ·∑_i ω_{ik}^σ` (Peterfalvi (5.8) / the (10.6) summed isometry). -/
 

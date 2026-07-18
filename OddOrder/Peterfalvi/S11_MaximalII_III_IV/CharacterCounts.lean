@@ -261,7 +261,8 @@ theorem exists_regular_not_reducible_of_odd {α : Type*} {X Xmu : Set α}
 /-- **`u = |Ū|` is odd**: `u` is the order of the range of the `U`-action `uActionHom` on the chief
 factor, so by the first isomorphism theorem `u ∣ |U.subgroupOf (U ⊔ W₁)| ∣ |U ⊔ W₁| ∣ |G|`, and
 `|G|`
-is odd (odd-order hypothesis).  The parity input `hu` to `exists_regular_not_reducible_of_odd` in the
+is odd (odd-order hypothesis).  The parity input `hu` to `exists_regular_not_reducible_of_odd` in
+the
 (9.8.c) counting argument (`u` odd + `p-1` even forces `|𝒳(H₀C)| > p-1`). -/
 theorem u_odd [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}

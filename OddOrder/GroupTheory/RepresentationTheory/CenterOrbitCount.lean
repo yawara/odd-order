@@ -123,7 +123,8 @@ theorem centerRep_apply_centerBasis (α : MulAut G) (C : ConjClasses G) :
 Applying `finrank_invariants_eq_card_orbits` to `centerRep` directly trips an instance-diamond
 `isDefEq` blowup: even *stating* `↥(Representation.invariants centerRep)` loops past 1M heartbeats,
 because the `Module k`-instance on `↥(Subalgebra.center k (MonoidAlgebra k G))` gets re-derived and
-defeq-checked against the one baked into `centerRep`.  Routing the representation and basis through a
+defeq-checked against the one baked into `centerRep`.  Routing the representation and basis through
+a
 **carrier synonym** that pins a single `Module k`-instance dissolves the diamond. -/
 
 /-- A carrier synonym for the centre `Z(k[G])` that pins one canonical `Module k`-instance, so that

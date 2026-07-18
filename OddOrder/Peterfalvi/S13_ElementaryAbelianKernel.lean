@@ -783,9 +783,11 @@ contradiction in `chief_H0_eq_bot`).
 
 The `σ` is conjugation `MulAut.conjNormal w` by the *specific* element `w = b₀⁻¹ a₀ ∈ U W₁` at which
 the commutator form `D(y,z) = ⁅ẑ, ŷ⁆` on `Ĥ = H/Q` (`Q` maximal in `H₀`) is nontrivial — **not** a
-generic generator, so it is produced together with the chain relation (hence the existential).  Proof
+generic generator, so it is produced together with the chain relation (hence the existential).
+Proof
 (Coq `FTtype34_Fcore_kernel_trivial`, `PFsection11.v`:365-540, translated top-to-bottom):
-* STEP 0 — `U` centralizes `N = H₀` (Wielandt (9.1) via `C_{H₀}(W₁) = 1`, Coq `FTtype34_facts.cH0U`);
+* STEP 0 — `U` centralizes `N = H₀` (Wielandt (9.1) via `C_{H₀}(W₁) = 1`, Coq
+`FTtype34_facts.cH0U`);
 * STEP 1/2 — `Ĥ = H/Q` is class-`2` with `Ĥ' = H₀/Q = N̂` central of order `p`
   (`exists_normal_subgroup_index_prime`, `quotient_classTwo_structure`); `D` is antisymmetric
   (`⁅b,a⁆ = ⁅a,b⁆⁻¹`) and bilinear (`commutatorElement_*`, central commutators);

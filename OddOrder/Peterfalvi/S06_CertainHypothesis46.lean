@@ -19,7 +19,8 @@ datum on `A` (`CertainTypeHypothesis`):
 * **(4.6.b)** the TI-cyclic Hypothesis (3.1) for the *ambient* group `G` (so the σ-isometry lands in
   `Irr(G)`, not just `Irr(L)`), with `W₁, W₂` matching the certain-type `W₁, W₂ ≤ ↥L` via `L ↪ G`;
 * **(4.6.c)** a normal subgroup `H ⊴ L` with `W₂ ⊆ H ⊆ K`;
-* **(4.6.d)** the covering `⋃_{h∈H^#} C_K(h)^# ⊆ A`, the enlarged set `A₀ = A ∪ V^L`, and the §4 Dade
+* **(4.6.d)** the covering `⋃_{h∈H^#} C_K(h)^# ⊆ A`, the enlarged set `A₀ = A ∪ V^L`, and the §4
+Dade
   datum on `A₀`;
 * **(4.6.e)** the Dade isometry `τ` relative to `A₀` (`FullDadeIsometryData`).
 

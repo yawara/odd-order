@@ -120,7 +120,8 @@ a
 `S12.Hypothesis M`**, which requires the type-III/IV/V (`IsTypeP1`) Dade datum — unavailable for a
 type-`P₂` maximal.  `hypothesis46OfTypePData` below is the type-uniform version: it takes the Dade
 datum (the `A₀`-Dade `dade0` and its `HConjInvariant`) and the (4.6.c) kernel-family subgroup `subH`
-**as parameters**, and assembles the `Hypothesis46` from any `TypePData M` (structural `tic`/`W₁`/`W₂`
+**as parameters**, and assembles the `Hypothesis46` from any `TypePData M` (structural
+`tic`/`W₁`/`W₂`
 reconciliation done here, type-uniformly).  A type-`P₂` caller (e.g. lane-c's `S15_HonestTypeP2A0`)
 instantiates it with `A = honestTypeP2ASet M`, `dade0 = dadeHypS0`, `subH = M_σ` (for which
 `A_covers`

@@ -293,7 +293,8 @@ on `U` fixed-point-free (`hfpf`).  Then for any finite-dimensional `k[L]`-module
 
 Proof: split `W` into its `U`-isotypic components `A i = range (centerProj φ ρᵁ i)` (over a
 splitting
-`φ : Z(k[U]) ≃ (Fin N → k)`); the trivial component `A i₀` is `Wᵁ = 0`, so `W = ⊕_{i ≠ i₀} A i`.  The
+`φ : Z(k[U]) ≃ (Fin N → k)`); the trivial component `A i₀` is `Wᵁ = 0`, so `W = ⊕_{i ≠ i₀} A i`.
+The
 Frobenius complement `E` permutes the `A i` by `simplesAction φ ∘ ψ` (item 0) and acts **freely**
 off
 `i₀` (item 1, via 3d.3c), so the free-orbit count

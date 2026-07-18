@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A1_JpGL2p
 
 /-!
-# Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 2: Lem 7.3 (formal) + Thm 7.5 normal-P + action infra (pp. 201-208)
+# Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 2: Lem 7.3 (formal) + Thm 7.5 normal-P + action
+infra (pp. 201-208)
 -/
 
 namespace OddOrder.Isaacs.Ch07

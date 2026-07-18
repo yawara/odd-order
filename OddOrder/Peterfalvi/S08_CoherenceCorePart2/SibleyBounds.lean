@@ -110,7 +110,8 @@ theorem exists_memberDegreeData (hyp : SibleyDadeHypothesis G L H)
 `χ = Ind_H^L θ ∈ X(Z) = S − S(Z)` with `H` a `p`-group and `Z` **central in `H`**
 (`Z.subgroupOf H ≤ Z(↥H)`), the source `θ` has `θ(1) = p^k` and — crucially — by [Is] Cor 2.30
 (`exists_degree_sq_le_index`, which needs `Z` central) `θ(1)² = (p^k)² ≤ |H:Z|`, while
-`χ(1) = |L:H|·p^k`.  This is exactly the `θχ`/`hθχ`/`hθsq_le_qtot` data the per-step X-chain producer
+`χ(1) = |L:H|·p^k`.  This is exactly the `θχ`/`hθχ`/`hθsq_le_qtot` data the per-step X-chain
+producer
 needs (with `qtot = |H:Z|`); it is fillable at the central `Z = Z(H)∩H′` but **not** at `Z = ⁅H,H⁆`
 (see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`). -/
 theorem exists_source_primePow_centralBound_of_mem_Xset (hyp : SibleyDadeHypothesis G L H)
@@ -772,7 +773,8 @@ theorem six_three (hyp : SibleyDadeHypothesis G L H)
 
 /-- **Peterfalvi (6.5) consequence (Frobenius case): `H` is a `p`-group.**
 
-If the full set `S` is *not* coherent, then `H` is a `p`-group for some prime `p`.  Apply `six_three`
+If the full set `S` is *not* coherent, then `H` is a `p`-group for some prime `p`.  Apply
+`six_three`
 with `M = ⊥`, `H₁ = ⁅H,H⁆`: `S(⁅H,H⁆) = Y` is coherent (`coherentYset`), `⊥ ≤ ⁅H,H⁆` and `⁅H,H⁆ ⊊ H`
 (`H` nilpotent nontrivial ⟹ not perfect), so if `|H:⁅H,H⁆| > 4|L:H|²+1` then `S(⊥) = S` would be
 coherent — contradiction.  Hence `|Abelianization H| = |H:⁅H,H⁆| ≤ 4|W₁|²+1`

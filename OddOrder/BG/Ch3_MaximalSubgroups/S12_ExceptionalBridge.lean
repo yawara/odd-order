@@ -1186,7 +1186,8 @@ elementary abelian subgroup `A` (`exists_isElementaryAbelian_card_prime_sq_of_no
 `G`-centralizer lies in `M` (`centralizer_le_of_elemAb_rank_two`, BG Proposition 12.4(a)); the
 `σ`-fusion control (`fusion_control_of_mem_sigma`, third clause `N_G(P) = (N_G(P) ⊓ M)·C_G(P)`)
 factors every `n ∈ N_G(P)` as `n = a·c` with `a ∈ N_G(P) ⊓ M ≤ M` and `c ∈ C_G(P) ≤ C_G(A) ≤ M`, so
-`N_G(P) ≤ M`.  This is the `σ`-uniqueness input to BG Lemma `sigma_compl_embedding` (the cyclicity of
+`N_G(P) ≤ M`.  This is the `σ`-uniqueness input to BG Lemma `sigma_compl_embedding` (the cyclicity
+of
 `M_σ ∩ M^g`, BG Theorem D(2)). -/
 theorem norm_noncyclic_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
