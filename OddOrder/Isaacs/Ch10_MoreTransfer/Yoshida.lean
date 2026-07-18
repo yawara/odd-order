@@ -46,7 +46,7 @@ lemma exists_ne_notMem_of_prod_mem {ι : Type*} [Fintype ι] {A : Type*}
     ∃ x, x ≠ y ∧ f x ∉ B := by
   classical
   by_contra hall
-  push_neg at hall
+  push Not at hall
   have h1 : ∏ i ∈ Finset.univ.erase y, f i ∈ B :=
     Subgroup.prod_mem _ fun i hi => hall i (Finset.ne_of_mem_erase hi)
   apply hy

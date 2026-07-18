@@ -194,3 +194,5 @@ theorem dadeOfDiff_imageSet_orthogonal_certainTypeR
   rw [OddOrder.RepresentationTheory.inner_conj_symm,
     certainTypeR_imageSet_orthogonal_dadeOfDiff hyp h46 hHK hχ₂ hdeg χ hrealχ hdiffsuppχ β hβ α hα,
     star_zero]
+
+end OddOrder.Peterfalvi.S08

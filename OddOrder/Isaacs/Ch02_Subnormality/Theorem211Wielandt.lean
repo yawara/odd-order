@@ -16,8 +16,6 @@ namespace OddOrder.Isaacs.Ch02
 section /- 2A: Subnormality basics, joins, Wielandt's F(G) (pp. 45-54) -/
 variable {G : Type*} [Group G]
 
-variable (G) in
-
 /-! ### Isaacs Thm 2.11 (Wielandt abelian-in-F(G)) -/
 
 open scoped Pointwise in
