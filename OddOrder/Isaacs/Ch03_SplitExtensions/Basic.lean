@@ -13,6 +13,7 @@ import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.Mathlib.Subgroup
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch03_SplitExtensions.SplitExtensionUniqueness
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
@@ -97,17 +98,11 @@ theorem inr_conj_inl_eq (h : H) (n : N) :
     (inr h * inl n * inr h⁻¹ : N ⋊[φ] H) = inl (φ h n) :=
   (inl_aut h n).symm
 
-/-- **Isaacs Thm 3.1** (uniqueness of split extension up to unique iso).
-`G` の正規部分群 `N` が `K` で補集合化されているとき, `N` への `K` 共役作用を介した
-半直積 `N ⋊ K` は `G` と同型.
-
-mathlib `SemidirectProduct.mulEquivSubgroup` の Isaacs 流再述 (Lemma 3.1 を
-`G₀` の具体的構成 = semidirect product に固定した形). -/
-noncomputable def mulEquivSubgroupOfComplement {G : Type*} [Group G]
-    {N K : Subgroup G} [N.Normal] (hCompl : N.IsComplement' K) :
-    N ⋊[(N.normalizerMonoidHom).comp
-      (Subgroup.inclusion (N.normalizer_eq_top ▸ le_top))] K ≃* G :=
-  SemidirectProduct.mulEquivSubgroup hCompl
+/-! **Isaacs Lemma 3.1** (split extension の同型を除く一意性) は上流 leaf
+[`SplitExtensionUniqueness`](SplitExtensionUniqueness.lean) の
+`existsUnique_mulEquiv_of_isComplement'` (書籍 p.70 の two-abstract-groups 形).
+`G₀` を `N ⋊ K` に固定した特殊形は mathlib `SemidirectProduct.mulEquivSubgroup`
+そのものなので, ラッパー方針によりここでは再述しない. -/
 
 /-- **Isaacs Thm 3.3 Horosevskii**: 有限非自明群 `G` で `σ ∈ Aut(G)` ならば `o(σ) < |G|`.
 

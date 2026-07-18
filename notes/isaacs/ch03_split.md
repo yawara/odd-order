@@ -13,7 +13,7 @@
 | Thm 3.2 part 1 (inl(N) normal) | ✅ | `inl_range_normal` instance (`range_inl_eq_ker_rightHom` + `MonoidHom.normal_ker`) |
 | Thm 3.2 part 2 (inl(N), inr(H) complementary) | ✅ | `inl_range_isComplement_inr_range` (構造 projection 経由) |
 | Thm 3.2 part 3 (conjugation = action) | ✅ | `inr_conj_inl_eq` (mathlib `inl_aut` ラッパー) |
-| Thm 3.1 (uniqueness via mulEquivSubgroup) | ✅ | `mulEquivSubgroupOfComplement` (mathlib `mulEquivSubgroup` 再述) |
+| Lem 3.1 (split extension の一意性) | ✅ (2026-07-19 書籍形へ一般化) | `existsUnique_mulEquiv_of_isComplement'` (新 leaf `SplitExtensionUniqueness.lean`). 旧 `mulEquivSubgroupOfComplement` (mathlib `mulEquivSubgroup` の純粋再述) は削除 |
 | **Thm 3.3 Horosevskii** | ✅ (2026-05-22) | `horosevskii_aut_order_lt`: `orderOf σ < Nat.card G`. Ch.2 Lucchini axiom + 半直積 (mathlib `SemidirectProduct`) + `inl_range_isComplement_inr_range` (Thm 3.2 part 2) + Lemma 2.7 (`commute_of_normal_of_disjoint`) で完全証明 (~120 行) |
 | Thm 3.4 (abelian P regular orbit) | ✅ (2026-05-21 完成, 2026-05-23 audit で確認) | `abelian_p_aut_regular_orbit` L255-424. Ch.1 §1F Thm 1.37 Brodkey + `opCore` + Lemma 2.7 + Sylow II 経由 |
 | §3B Schur-Zassenhaus (3.5-3.10) | docstring | mathlib 対応表のみ (`exists_right_complement'_of_coprime`, `IsSolvable` instance chains) |
@@ -455,3 +455,41 @@ survey (`notes/meta/three_books_full_survey_2026_07_16.md`) の Ch.3 15 件の�
 インフラ副産物: `GroupTheory/FixedSubgroup.lean` (fixedSubgroup を CoprimeAction から upstream 分割,
 issue 9106)、AxiomsCheck に 3.15/3.17/3.18/拡大閉包/3.22 を登録済み (full build green 実測 13-14 分)。
 旧 note の「3.31 は skip 可」判断は全 3 冊フェーズで失効 (survey が正本)。
+
+## 2026-07-19 Lem 3.1 の特殊化債務を解消 (issue 1039, レーン a)
+
+Ch.3 に残っていた最後の項目 (survey の `formalized_specialized` 2 件のうち Lem 3.11 は
+2026-07-18 `3cff7a105` で解消済、本件が残り) をクローズ。
+
+**旧状態**: `Basic.lean` の `mulEquivSubgroupOfComplement` = mathlib
+`SemidirectProduct.mulEquivSubgroup` に φ を渡しただけの **internal form**
+(`N ◁ G` が `K` で補われるとき `N ⋊ K ≃* G`)。書籍 p.70 の主張は **2 つの抽象群を比較する形**
+なので、`G₀ = N ⋊ H` に固定した特殊形にあたっていた。
+
+**新状態** (新 leaf [`SplitExtensionUniqueness.lean`](../../OddOrder/Isaacs/Ch03_SplitExtensions/SplitExtensionUniqueness.lean)):
+
+| 宣言 | 内容 |
+|---|---|
+| `conjAutHom N H` | `H →* MulAut N` — 正規部分群 `N` への `H` の共役作用 (mathlib `normalizerMonoidHom` を `N.normalizer = ⊤` で `H` に引き戻した仮定特殊化) |
+| `closure_union_eq_top_of_isComplement'` | 補集合対は `G` を生成する |
+| `monoidHom_eq_of_eqOn_isComplement'` | Lem 3.1 の**一意性部分**: 補集合対の上で一致する `G →* G₀` は一致 |
+| `existsUnique_mulEquiv_of_isComplement'` | **Lem 3.1 完全形**: 作用と両立する `α : N ≃* N₀`, `β : H ≃* H₀` を延長する `θ : G ≃* G₀` が一意に存在 (`∃!`) |
+
+**証明構成**: 存在は半直積経由 `G ≃* N ⋊ H ≃* N₀ ⋊ H₀ ≃* G₀`
+(`SemidirectProduct.mulEquivSubgroup` × 2 + `SemidirectProduct.congr`。congr の仮説が
+両立条件そのもの)。一意性は `IsComplement'.sup_eq_top` → `MonoidHom.eq_of_eqOn_dense`。
+書籍が `θ(hn) := h₀n₀` を直接定義して `(hn)(km) = (hk)(n^k m)` を計算するのを、半直積の
+普遍性に肩代わりさせた形。
+
+**実装メモ (再訪時の落とし穴)**: `conjAutHom` は通常の `def` なので、mathlib の
+`mulEquivSubgroup_apply` / `congr_apply_left` は **simp では発火しない** (simp の unify は
+`.instances` 透明度どまりで `conjAutHom` を展開できず、型指標 `φ` が構文的に一致しない)。
+`inl` / `inr` 上の値は `mul_one _` / `one_mul _` / `SemidirectProduct.ext` で直接
+defeq 経由で取るのが正解 (この 6 本の `have` が証明の実質)。
+
+**ラッパー方針の適用**: 旧 `mulEquivSubgroupOfComplement` は引数・型ともに mathlib と同一の
+純粋リネームで下流参照 0 件だったので削除し、対応は新 leaf の docstring と `Basic.lean` の
+`/-! ... -/` 注記に記録した (CLAUDE.md「ラッパー方針」)。
+
+⇒ **Isaacs Ch.3 は survey の未/部分・特殊化債務ともに全件クローズ**。レーン a の次の
+frontier は Ch.4 (M(G) 定義 + 4.14/4.15/4.17/4.18/4.19 Mann クラスタ, 4.12 括弧木一般化)。

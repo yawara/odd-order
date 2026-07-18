@@ -780,6 +780,11 @@ Suzuki branch of Peterfalvi Part II, Ch. I section 3, Proposition 1(c). -/
 -- A cyclic proper subgroup A, K = core_G(A) ⇒ |A:K| < |G:A|.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.lucchini_index_normalCore_lt_index
 
+-- Ch.3 (Split Extensions): Lem 3.1 split extension の同型を除く一意性
+-- N ◁ G が H で補われ N₀ ◁ G₀ が H₀ で補われ, 作用と両立する α : N ≃ N₀, β : H ≃ H₀ が
+-- あれば, それらを延長する同型 G ≃ G₀ が一意に存在する.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.existsUnique_mulEquiv_of_isComplement'
+
 -- Ch.3 (Split Extensions): Thm 3.3 Horosevskii
 -- Every automorphism of a nontrivial finite group G has order < |G|.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.horosevskii_aut_order_lt
