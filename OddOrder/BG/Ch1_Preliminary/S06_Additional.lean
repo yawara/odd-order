@@ -129,8 +129,21 @@ theorem thompsonJ_le_opCore_of_odd [Finite G]
 奇数位数 solvable `G`、`p ≠ 2`、`P ∈ Syl_p(G)` で `O_{p'}(G) = ⊥` かつ `P = C_G(Z(P))`
 のとき、`J(P) ⊴ G`。
 
-BG Thm 6.2 (`Z(J(S))·O_{p'}(G) ⊴ G`, 任意 S) の reduced case。一般形は `O_{p'}(G)` で商を
-取り本定理に簡約する (後続コミット)。 -/
+BG Thm 6.2 (`Z(J(S))·O_{p'}(G) ⊴ G`, 任意 S) の reduced case。
+
+⚠ **一般形は本定理に簡約できない** (2026-07-19 調査確定、issue 3017)。旧 docstring は
+「`O_{p'}(G)` で商を取り本定理に簡約する (後続コミット)」と書いていたが、これは**誤り**で、
+その道を辿ると行き止まりになる。障害は仮説 `C_G(Z(P)) = P` で、これは一般の奇数位数 solvable
+`G` (`O_{p'}(G) = ⊥` でも) で**自動でない** — 反例: `p = 7`、`P = 7^{1+2}` (指数 7)、
+`C₃ ≤ SL(2,7)` (`3 ∣ 7−1` ゆえ存在) として `G = P ⋊ C₃` (位数 1029) は奇数・solvable・
+`O_{7'}(G) = 1` だが、`C₃` は行列式 1 で作用するので `Z(P)` を中心化し `C_G(Z(P)) = G ≠ P`。
+
+一般形に要るのは Glauberman ZJ (p-stable + p-constrained が仮説) であって、本定理の
+`C_G(Z(P)) = P` 版ではない。BG 自身 p.49 で証明を **G** Thm 6.5.1/8.2.11 (= Gorenstein の
+ZJ) への引用で済ませており、math-comp も ZJ を形式化せず Puig の `L(S)` で代替している
+(`BGappendixAB.v:16`)。本 repo も `L(S)` 一般形は済 = `AppB_Thm62.zCenter_lOdd_sup_oPiCore_normal`
+(book の Remark が推奨する代替)。literal `J(S)` 一般形は Gorenstein Ch.8 §2 の移植待ち。
+詳細と規模見積は `S06_Thm62JS.lean` の docstring と issue 3017 を参照。 -/
 theorem normalJ_normal_of_odd [Finite G]
     (hodd : Odd (Nat.card G)) [IsSolvable G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hp2 : p ≠ 2)
