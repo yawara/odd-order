@@ -1,5 +1,5 @@
 ---
-id: 9132
+id: 9133
 slug: subnormal-vs-normal-audit
 title: "HUB: mmd 由来の normal/subnormal 取り違えを全 repo 監査"
 created: 2026-07-18

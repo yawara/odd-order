@@ -938,7 +938,7 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.thompsonCorefreeBound
 
 -- Ch.9 §9B: Thm 9.21 (Schenkman) と Thm 9.13 (order bound) の **subnormal 版**
--- (原典どおりの仮説 `S ◁◁ G`; mmd は `⊲⊲` を `⊲` に潰していた — issue 1037/9132).
+-- (原典どおりの仮説 `S ◁◁ G`; mmd は `⊲⊲` を `⊲` に潰していた — issue 1037/9133).
 -- 9.13 subnormal 版が Thm 9.10 (automorphism tower) の一様上界を与える。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_nilpotentResidual_le_of_isSubnormal
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.card_normalizer_nilpotentResidual_le
