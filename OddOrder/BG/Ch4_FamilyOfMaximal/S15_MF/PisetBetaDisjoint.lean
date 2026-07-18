@@ -577,12 +577,19 @@ of `M_σ` that is also contained in the conjugate `M_σ^g`, with `C_G(X₁) ⊄ 
 Theorem 15.7(a)) and the type-`F` trichotomy (Theorem 15.7(e), `isTypeI_of_isTypeF`) can consume the
 same witness `X₁`.  The two conjugate-membership facts `X₁ ≤ M_σ` and `X₁ ≤ M_σ^g` drive the
 `O_p(M_σ)`-noncyclicity argument (Coq `not_cycMp`), and `rank (M_F ⊓ C_G(X₁)) < 3` is the
-`E1X_facts` rank bound. -/
-theorem exists_inf_conj_fitting_orderP_witness [Finite G]
+`E1X_facts` rank bound.
+
+Stated **for a fixed `g`**, exactly as BG and Coq do (`nonTI_Fitting_structure` takes
+`g \notin M -> X :!=: 1 ->` as hypotheses): BG's argument works for *any* `g ∉ M` with
+`X = F(M) ∩ F(M)^g ≠ 1`, and the `p = |X|` step of Theorem 15.7(e) needs `p` tied to that same `X`,
+which an `∃ g` statement cannot express.  The `∃ g` form is `exists_inf_conj_fitting_orderP_witness`
+below, which just supplies a `g` from `¬FittingIsTI`. -/
+theorem exists_orderP_witness_of_inf_conj_fitting_ne_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hnotTI : ¬ FittingIsTI M) :
-    ∃ (g : G) (p : ℕ) (X₁ : Subgroup G),
-      g ∉ M ∧ p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
+    {g : G} (hgM : g ∉ M)
+    (hXne : (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) ≠ ⊥) :
+    ∃ (p : ℕ) (X₁ : Subgroup G),
+      p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
         Nat.card ↥X₁ = p ∧
         X₁ ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
         X₁ ≤ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M ∧
@@ -593,8 +600,6 @@ theorem exists_inf_conj_fitting_orderP_witness [Finite G]
         -- until 2026-07-19; BG's `p = |X|` step needs `X₁` and `X` related in the statement.
         X₁ ≤ (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) := by
   classical
-  -- Setup: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`.
-  obtain ⟨g, hgM, hXne⟩ := exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI hnotTI
   have hXcard : Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M) ≠ 1 :=
     fun h => hXne (Subgroup.card_eq_one.mp h)
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hXcard
@@ -669,7 +674,30 @@ theorem exists_inf_conj_fitting_orderP_witness [Finite G]
   have hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3 :=
     rank_lt_three_of_le_two_maximals hG hM hNmax hNneM
       (inf_le_left.trans (maxNilpotentNormalHall_le M)) (inf_le_right.trans hCGN)
-  exact ⟨g, p, X₁, hgM, hp, hpσ, hX₁card, hX₁Mσ, hX₁cMσ, hCGnotM, hrank3, hX₁leX⟩
+  exact ⟨p, X₁, hp, hpσ, hX₁card, hX₁Mσ, hX₁cMσ, hCGnotM, hrank3, hX₁leX⟩
+
+/-- **BG Theorem 15.7(e) non-TI witness, `∃ g` form** — the packaging most consumers want.  From
+`¬FittingIsTI M` alone, `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` produces some
+`g ∉ M` with `X = F(M) ∩ F(M)^g ≠ 1`, and `exists_orderP_witness_of_inf_conj_fitting_ne_bot`
+supplies the witness for it.
+
+Prefer the fixed-`g` version when the conclusion has to mention `X` itself — notably BG's
+`p = |X|` step, where the existential over `g` would decouple `p` from the intersection it is
+supposed to measure. -/
+theorem exists_inf_conj_fitting_orderP_witness [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) :
+    ∃ (g : G) (p : ℕ) (X₁ : Subgroup G),
+      g ∉ M ∧ p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
+        Nat.card ↥X₁ = p ∧
+        X₁ ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+        X₁ ≤ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M ∧
+        ¬ Subgroup.centralizer (X₁ : Set G) ≤ M ∧
+        rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3 ∧
+        X₁ ≤ (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) := by
+  obtain ⟨g, hgM, hXne⟩ := exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI hnotTI
+  obtain ⟨p, X₁, h⟩ := exists_orderP_witness_of_inf_conj_fitting_ne_bot hG hM hgM hXne
+  exact ⟨g, p, X₁, hgM, h⟩
 
 /-- **`O_p(M_F)` is noncyclic at a non-TI witness prime** (Coq `nonTI_Fitting_structure`, `not_cycMp`):
 if `M_F` contains an order-`p` subgroup `X₁` that is also contained in the conjugate `M_F^g` for
