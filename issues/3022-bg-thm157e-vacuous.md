@@ -122,6 +122,33 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       stale な注記**で、本体は実在する — 初版の本 issue はこれを信じて「未形式化」と誤記した。
       [[verify-port-state-by-number-not-coq-name]])
       よって残作業は §15 側の組み立て (`B` の構成 + `B ∈ ℰ²(P) ∩ ℰ*(P)` + 10.13 適用) のみ。
+
+      **⚠ さらに調査 (2026-07-19): `B` の構成も既に書かれている。**
+      `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` (`PisetBetaDisjoint.lean:1101`) の
+      `q = p` 分岐 (`:1118-1210`) が BG の当該段落をほぼそのまま持っている:
+      - `P := O_p(M_F)`、`X₁ ≤ P`、`P` 非可換 (`:1131`)、`C₁ = C_{M_F}(X₁)` 可換 (`:1134`)
+      - `Z := Ω₁(Z(P))` elementary abelian (`:1137-1143`)
+      - `X₁ ⊄ Z` (BG の「Clearly X₁ ≠ Z₀」、`:1155` — `X₁ ≤ Z(P)` なら `P ≤ C₁` 可換で矛盾)
+      - `X₁ ⊓ Z = ⊥` (`:1172`)、`B := X₁ ⊔ Z` elementary abelian かつ `≤ C₁` (`:1182-1191`)
+      - `|B| = p·|Z|` (`:1197`)、`log_p |B| ≤ rank C₁ < 3` (`:1202`) ⟹ `|Z| = p`
+      **これらは全て局所 `have` で、外に公開されていない**。⟹ 実作業は:
+      1. この `q = p` 分岐から `B`/`Z₀` の事実を **top-level 補題へ抽出** (`|Z₀| = p`,
+         `B = X₁ ⊔ Z₀` が rank 2 elementary abelian, `B ≤ C₁`)。
+      2. `IsMaximalElementaryAbelian p B` を示す (`GroupTheory/NarrowPGroup.lean:104` の定義 =
+         「`B` を含む elementary abelian は `B` 自身のみ」)。BG の根拠は `C_H(X₁)` の rank < 3 で、
+         `B ≤ C₁` かつ `rank C₁ < 3` から出る (rank 3 の elementary abelian が `C₁` に入れない)。
+      3. Lemma 10.13 を `A := B`, `A₀ := X₁`, `P := O_p(M_F)` で適用 → `C_G(B) ⊓ P = X₁ ⊔ Z'`
+         (`Z'` cyclic)。
+      4. `X ≤ P` (BG「X is a p-group」— 要根拠確認) と `X ≤ C_G(B)` から `X ≤ X₁ ⊔ Z'`、
+         `X` cyclic と合わせて `X = X₁`、ゆえに `p = |X|`。
+      **未確認の 1 点** = 手順 4 の「`X` は p-群」。BG は「`O_{p'}(H)` は `C_H(X₁)` 可換ゆえ可換。
+      Hence `P = O_p(H)` is not abelian and `X` is a `p`-group」と一文で済ませており、
+      この含意の根拠が原文では省略されている。ここが唯一の行間 — 詰まったら
+      [[feedback-ask-chatgpt-for-elided-gaps]] (Coq `BGsection15.v` 精読 → ChatGPT 再構成)。
+
+      **付随して必要**: `exists_inf_conj_fitting_orderP_witness` の結論に
+      `X₁ ≤ F(M) ⊓ conj g • F(M)` を追加する (構成上は真だが公開されておらず、現状 `X₁` と
+      `X` が statement 上結びついていない)。これが無いと手順 4 が書けない。
 - [ ] **(e2)/(e3) の型別分離** — **未了**。type `F` 側の exponent 条件
       (`exp(M/H) ∣ q − 1`) は `typeF_exponent_dvd_sub_one_of_invariant_card` として**存在し**、
       `isTypeI_of_isTypeF` が使っている (trichotomy へは未配線)。type `P₁` 側の
