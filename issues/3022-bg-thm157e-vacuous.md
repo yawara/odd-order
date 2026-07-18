@@ -123,6 +123,23 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       [[verify-port-state-by-number-not-coq-name]])
       よって残作業は §15 側の組み立て (`B` の構成 + `B ∈ ℰ²(P) ∩ ℰ*(P)` + 10.13 適用) のみ。
 
+      **手順 2 完了 (2026-07-19)**: `exists_rankTwo_elemAbelian_of_witness` (`WitnessPGroup`)。
+      当初は `q = p` 分岐を丸ごと top-level へ抽出する計画だったが、**その必要は無かった** —
+      `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` の結論が既に `q := p` で
+      `|Z₀| = p` / `¬ X₁ ≤ Z₀` / `Z₀ = Ω₁(Z(O_p(M_F)))` を与えるので、それを **cite して**
+      `B` を組み立てるだけで済む (`X₁ ⊓ Z₀ = ⊥`、`X₁ ≤ C_G(Z₀)`、`B` elementary abelian、
+      `|B| = p²`、`B ≤ C₁`)。大きな refactor を回避できた。
+
+      **⚠ 手順 3 の障害が判明 = ambient のずれ**: BG は `B ∈ ℰ*(P)` (**`P` の中で**極大
+      elementary abelian) と言うが、Lean の `IsMaximalElementaryAbelian p A`
+      (`GroupTheory/NarrowPGroup.lean:104`) は `∀ F : Subgroup R` と **ambient 型 `R` 全体**で
+      量化する。Lemma 10.13 (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) は
+      `A : Subgroup G` かつ `hAmax : IsMaximalElementaryAbelian p A` を取るので **ambient は `G`**。
+      ⟹ 「`P` の中で極大」から「`G` の中で極大」への橋渡しが要る (または 10.13 を
+      `Subgroup ↥P` 側で使う)。`S10_LocalLemmas.lean:441` が
+      `IsMaximalElementaryAbelian p (A.subgroupOf (S : Subgroup G))` を作っている前例なので、
+      そこの手口が転用できる見込み。**これが残る唯一の実質的な障害。**
+
       **⚠ さらに調査 (2026-07-19): `B` の構成も既に書かれている。**
       `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` (`PisetBetaDisjoint.lean:1101`) の
       `q = p` 分岐 (`:1118-1210`) が BG の当該段落をほぼそのまま持っている:

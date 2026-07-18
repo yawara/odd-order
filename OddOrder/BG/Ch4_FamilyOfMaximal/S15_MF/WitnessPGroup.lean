@@ -300,4 +300,88 @@ that pinned form, so that `fitting_not_ti_cases` can state (b) about `F(M) ⊓ F
 than about *some* cyclic subgroup of `M_F` (which would be equivalent to `M_F ≠ 1`; see issue
 3022). -/
 
+/-- **BG Theorem 15.7(e), the rank-two elementary abelian `B = X₁ × Ω₁(Z(P))`** (mmd L4266:
+*"Let `Z₀ = Ω₁(Z(P))`.  Clearly `X₁ ≠ Z₀`.  Let `B = X₁ × Z₀`.  Now we know
+`B ∈ ℰ²(P) ∩ ℰ*(P)` because `C_H(X₁)` has rank less than 3.  Thus `|Z₀| = p`"*).
+
+Step 2 of the `p = |X|` chain.  Everything about `Z₀` itself — `|Z₀| = p`, `X₁ ⊄ Z₀`, and the
+identification `Z₀ = Ω₁(Z(O_p(M_F)))` — is already delivered by
+`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` at `q := p` (its `q = p` branch *is* BG's
+rank argument), so this lemma only assembles `B` on top of it: `X₁ ∩ Z₀ = 1` from `|X₁| = p` prime
+and `X₁ ⊄ Z₀`, `X₁` centralizes `Z₀` because `Z₀ ≤ Z(P)` and `X₁ ≤ P`, and hence `B = X₁ ⊔ Z₀` is
+elementary abelian of order `p²` inside the abelian `C₁ = C_{M_F}(X₁)`.
+
+⚠ The **maximality** half of BG's `B ∈ ℰ*(P)` is *not* included: `IsMaximalElementaryAbelian` is
+stated relative to the ambient group (here `G`), whereas BG asserts maximality in `P`, and the two
+need a bridge.  Lemma 10.13 consumes the ambient-`G` form, so that bridge is the remaining gap
+(issue 3022). -/
+theorem exists_rankTwo_elemAbelian_of_witness [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ MF M)
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M)
+    (hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    (hnab : ¬ IsMulCommutative ↥(MF M)) :
+    ∃ Z : Subgroup G,
+      Z = OddOrder.BG.Ch3.S10.omega1CenterInG (opiCoreInG ({p} : Set ℕ) (MF M)) p ∧
+      Nat.card ↥Z = p ∧ Z ≤ opiCoreInG ({p} : Set ℕ) (MF M) ∧
+      X₁ ⊓ Z = ⊥ ∧ X₁ ≤ Subgroup.centralizer (Z : Set G) ∧
+      (X₁ ⊔ Z).IsElementaryAbelian p ∧
+      Nat.card ↥(X₁ ⊔ Z) = p ^ 2 ∧
+      (X₁ ⊔ Z) ≤ MF M ⊓ Subgroup.centralizer (X₁ : Set G) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁P : X₁ ≤ P :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
+  -- `p ∈ π(M_F)`, so the per-prime witness applies at `q := p`.
+  have hpπ : p ∈ (Nat.card ↥(MF M)).primeFactors :=
+    (typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM hnab).1
+  obtain ⟨Z, hZMF, hZcard, -, hX₁notZ, hZeq⟩ :=
+    exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF hCGnotM hrank3 hnab
+      hp hpπ
+  have hZdef : Z = OddOrder.BG.Ch3.S10.omega1CenterInG P p := hZeq rfl
+  have hZP : Z ≤ P := hZdef ▸ OddOrder.BG.Ch3.S10.omega1CenterInG_le P p
+  -- `X₁` centralizes `Z` (`Z ≤ Z(P)` and `X₁ ≤ P`).
+  have hX₁CZ : X₁ ≤ Subgroup.centralizer (Z : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [SetLike.mem_coe, hZdef, OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map] at hz
+    obtain ⟨z', hz', hz'eq⟩ := hz
+    have hz'c : z' ∈ Subgroup.center ↥P := (mem_omega1OfAbelian.mp hz').1
+    rw [← hz'eq]
+    simpa using (congrArg Subtype.val (Subgroup.mem_center_iff.mp hz'c ⟨x, hX₁P hx⟩)).symm
+  -- `X₁ ∩ Z = 1` (`|X₁| = p` prime and `X₁ ⊄ Z`).
+  have hX₁Zbot : X₁ ⊓ Z = ⊥ := by
+    have hdvd : Nat.card ↥(X₁ ⊓ Z) ∣ p := hX₁card ▸ Subgroup.card_dvd_of_le inf_le_left
+    rcases (Nat.dvd_prime hp).mp hdvd with h1 | hpp
+    · exact Subgroup.eq_bot_of_card_eq _ h1
+    · exact absurd (inf_eq_left.mp (Subgroup.eq_of_le_of_card_ge inf_le_left
+        (by rw [hX₁card, hpp]))) hX₁notZ
+  -- `B = X₁ ⊔ Z` is elementary abelian of order `p²`, inside the abelian `C₁ = C_{M_F}(X₁)`.
+  have hX₁ea : X₁.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hX₁card
+  have hZea : Z.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hZcard
+  have hBea : (X₁ ⊔ Z).IsElementaryAbelian p :=
+    isElementaryAbelian_sup_of_le_centralizer hX₁ea hZea hX₁CZ
+  have hBcard : Nat.card ↥(X₁ ⊔ Z) = p ^ 2 := by
+    have hX₁NZ : X₁ ≤ Subgroup.normalizer Z :=
+      hX₁CZ.trans (Subgroup.centralizer_le_normalizer (Z : Set G))
+    have hcoe : (↑X₁ * ↑Z : Set G) = ↑(X₁ ⊔ Z) :=
+      (Subgroup.coe_mul_of_left_le_normalizer_right X₁ Z hX₁NZ).symm
+    have h := Subgroup.card_HK_mul_card_inf_eq_card_mul_card X₁ Z
+    rw [hcoe, hX₁Zbot, Subgroup.card_bot, mul_one, hX₁card, hZcard] at h
+    rw [sq]
+    exact h
+  have hX₁C1 : X₁ ≤ MF M ⊓ Subgroup.centralizer (X₁ : Set G) :=
+    le_inf hX₁MF (le_centralizer_self_of_isElementaryAbelian hX₁ea)
+  have hZC1 : Z ≤ MF M ⊓ Subgroup.centralizer (X₁ : Set G) := by
+    refine le_inf hZMF (fun z hz => ?_)
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hx
+    exact (Subgroup.mem_centralizer_iff.mp (hX₁CZ hx) z hz).symm
+  exact ⟨Z, hZdef, hZcard, hZP, hX₁Zbot, hX₁CZ, hBea, hBcard, sup_le hX₁C1 hZC1⟩
+
 end OddOrder.BG.Ch4.S15
