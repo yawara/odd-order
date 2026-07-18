@@ -188,6 +188,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7609,6 +7610,33 @@ and hence the exact residual and conjugate-join conclusions. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_and_residual_of_psu3_target
+
+/-! **Peterfalvi Part II, Ch. I section 3, Proposition 1(a)**: for nontrivial
+`X <= V`, the centralizer `L = C_G(X)` acts doubly transitively on its fixed-point
+set and satisfies the full source hypothesis (A1). Its generally nonfaithful
+restricted action has intrinsic core equal to the centralizer of `L cap Q` in
+`L cap D`, and this core is contained in `L cap V`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.normalCore_stabilizer_eq_ker_of_isPretransitive
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.three_le_ncard_fixedPoints_of_le_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_isMultiplyPretransitive_two
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerHypothesisA1
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_eq_restrictedAction_ker
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_eq_centralizer_cQ
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_le_cV
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field

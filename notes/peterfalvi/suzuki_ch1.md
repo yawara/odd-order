@@ -226,5 +226,25 @@
    - Together with the PSL and Suzuki target leaves, all three target cases in
      Peterfalvi Chapter I §3 Lemma 1 are now formalized without opaque target
      hypotheses. **→ §3 Lemma 1 complete.**
+10. ✅ **§3 Prop 1(a) complete** — new leaf `CentralizerInduction.lean`.
+   - For `X ≤ V`, it equips `L = C_G(X)` with the induced action on
+     `Ω_X = fixedPoints X Ω` and proves the three source points `H`, `H^t`,
+     and `H^{ts}` are distinct. Peterfalvi uses right actions; the Lean
+     left-action representative of `H^{ts}` is `s • (t • H)`.
+   - `HypothesisA1` contains exactly all fields of source hypothesis (A1),
+     including the stabilizer, `Q D = H`, parity, and the distinguished
+     involution data. It deliberately excludes faithfulness (A2) and the
+     2-rank condition (A3), because the restricted centralizer action need not
+     be faithful.
+   - `centralizerHypothesisA1` constructs this honest carrier from §1 Prop 6;
+     `normalCore_cH_eq_restrictedAction_ker` identifies the intrinsic core in
+     `L`, and `normalCore_cH_eq_centralizer_cQ` proves the exact source formula
+     `𝒩(L) = C_{L ∩ D}(L ∩ Q)`.
+   - `normalCore_cH_le_cV` proves `𝒩(L) ≤ L ∩ V` using §1 Prop 5
+     (`V = C_D(s)`) and `s ∈ L ∩ Q`. The source assumption `1 ≠ X` is not
+     needed for part (a); it remains available for the strict-order induction
+     in the later clauses.
+   - **Next frontier:** §3 Prop 1(b), the normalizer formula, before the deeper
+     target trichotomy in part (c).
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
