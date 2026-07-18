@@ -932,6 +932,15 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- G π-separable + abelian π-Hall ⇒ [O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.piLength_le_one_of_abelian_pi_hall
 
+-- Ch.4 (Commutators): Lem 4.6 同型節 — A ⊴ G abelian + G/A cyclic ⇒ A/(A ∩ Z(G)) ≅ G'.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.nonempty_quotientInfCenterEquivCommutator
+-- 同 cardinality 節 (有限性仮定なしの一般形): |G'| · |A ∩ Z(G)| = |A|.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch04.card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+
+-- Ch.4 (Commutators): Cor 4.12 書籍形 — 任意に括弧付けした重み n の交換子は G^n に含まれる.
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch04.CommutatorTree.eval_le_lowerCentralSeries
+
 -- Ch.4 (Commutators): Lem 4.28 ⭐ **= BG Prop 1.6(a), FT クリティカル**
 -- coprime action + solvability ⇒ `G = C_G(A) · [G,A]`.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top

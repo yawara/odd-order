@@ -981,10 +981,36 @@ theorem commutatorRightHom_ker_eq {A : Subgroup G} [A.Normal]
   · intro ha
     exact (commutatorRightHom_mem_ker_iff hAb hgen a).mpr ha.2
 
-/-- **Lem 4.6 cardinality form**: For `A ⊴ G` abelian + `G ⧸ A` cyclic + `G` finite,
-`|commutator G| · |A ⊓ Z(G)| = |A|`. First iso theorem経由. -/
+/-- **Isaacs Lemma 4.6 同型節** (書籍 p.118 の displayed formula `G' ≅ A/(A ∩ Z(G))`):
+`A ⊴ G` abelian で `g · A` が `G ⧸ A` を生成するとき, 第一同型定理を
+`θ = commutatorRightHom hAb g` に適用した形.
+
+`θ.ker = (A ⊓ Z(G)).subgroupOf A` (`commutatorRightHom_ker_eq`) と
+`θ.range = G'` (`commutatorRightHom_range_eq_commutator`) を貼り合わせるだけ. -/
+noncomputable def quotientInfCenterEquivCommutator {A : Subgroup G} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    {g : G} (hgen : ∀ x : G ⧸ A, x ∈ Subgroup.zpowers ((g : G ⧸ A))) :
+    A ⧸ (A ⊓ Subgroup.center G).subgroupOf A ≃* (_root_.commutator G) :=
+  (QuotientGroup.quotientMulEquivOfEq (commutatorRightHom_ker_eq hAb hgen).symm).trans
+    ((QuotientGroup.quotientKerEquivRange (commutatorRightHom hAb g)).trans
+      (MulEquiv.subgroupCongr (commutatorRightHom_range_eq_commutator hAb hgen)))
+
+/-- **Isaacs Lemma 4.6 同型節** (生成元非依存形): `A ⊴ G` abelian + `G ⧸ A` cyclic ⇒
+`A / (A ∩ Z(G)) ≅ G'`. 書籍 p.118 の `G^{\prime}\cong A/(A\cap Z(G))` そのもの. -/
+theorem nonempty_quotientInfCenterEquivCommutator {A : Subgroup G} [A.Normal]
+    (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (hCyc : IsCyclic (G ⧸ A)) :
+    Nonempty (A ⧸ (A ⊓ Subgroup.center G).subgroupOf A ≃* (_root_.commutator G)) := by
+  obtain ⟨γ, hγ⟩ := hCyc.exists_generator
+  obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective γ
+  exact ⟨quotientInfCenterEquivCommutator hAb hγ⟩
+
+/-- **Lem 4.6 cardinality form**: `A ⊴ G` abelian + `G ⧸ A` cyclic ⇒
+`|commutator G| · |A ⊓ Z(G)| = |A|`. 第一同型定理 + Lagrange (`Subgroup.card_mul_index`).
+
+書籍は `A` が有限のときの主張として述べるが, `Nat.card` は無限を `0` に潰すので
+**有限性仮定なし**で成立する (2026-07-19 に旧 `[Finite G]` を除去). -/
 theorem card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
-    {A : Subgroup G} [A.Normal] [Finite G]
+    {A : Subgroup G} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (hCyc : IsCyclic (G ⧸ A)) :
     Nat.card (_root_.commutator G) * Nat.card (A ⊓ Subgroup.center G : Subgroup G)
       = Nat.card A := by
