@@ -559,19 +559,22 @@ theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G]
 /-- **Isaacs Thm 3.11** (書籍 p. 80): **可解な** minimal normal subgroup `M` は
 ある素数 `p` について elementary abelian p-group.
 
-⚠ 環境 `G` の可解性は**不要** (書籍どおり `M` の可解性のみ). `[Finite G]` は
-elementary abelian の結論に要る (書籍の infinite clause = abelian までは
-`solvable_minimal_normal_isAbelian` が有限性なしで与える).
+⚠ **仮定は書籍と同一** — 環境 `G` には可解性も有限性も課さない. 書籍が
+「`M` が**有限なら** elementary abelian」と述べるとおり, 有限性は **`M` にのみ**要る
+(`[Finite ↥M]`; `G` は無限でよい). 書籍の infinite clause = abelian までは
+`solvable_minimal_normal_isAbelian` が有限性なしで与える.
 環境が可解な場合は mathlib instance `subgroup_solvable_of_solvable` が
-`IsSolvable ↥M` を供給するので `[IsSolvable G]` 側の呼び出しはそのまま通る.
+`IsSolvable ↥M` を供給し, `[Finite G]` からは `Finite ↥M` が instance 解決で出るので,
+`[Finite G] [IsSolvable G]` 側の呼び出しはそのまま通る.
 
 証明: M abelian (前補題). `p ∣ |M|` を取り, `T = {x ∈ M | x^p = 1}` を M の部分群とする
 (M abelian で閉性 OK). T は M で characteristic (自己同型は p-冪を保つ).
 Cauchy で T ≠ ⊥. T.map M.subtype は characteristic-in-normal で G 正規 + ≤ M.
 M minimality で T.map M.subtype ∈ {⊥, M}. T ≠ ⊥ より T.map M.subtype = M, よって T = ⊤,
 即ち全 x ∈ M で x^p = 1. -/
-theorem solvable_minimal_normal_isElementaryAbelian [Finite G]
-    {M : Subgroup G} [IsSolvable ↥M] (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+theorem solvable_minimal_normal_isElementaryAbelian
+    {M : Subgroup G} [Finite ↥M] [IsSolvable ↥M]
+    (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by
   haveI hMnormal : M.Normal := hM.1
   have hM_ne_bot : M ≠ ⊥ := hM.2.1
