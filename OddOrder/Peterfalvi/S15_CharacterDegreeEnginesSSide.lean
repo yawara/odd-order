@@ -39,10 +39,10 @@ open OddOrder.Isaacs
 
 variable {G : Type*} [Group G]
 
-open OddOrder.Peterfalvi.S11 in
-open scoped FiniteInduce in
 set_option maxHeartbeats 800000 in
 -- raised heartbeat budget for the heavy elaboration below
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **The irreducible branch of Coq's `S1cases`** (`PFsection13.v:401-428`, issue 2035): an
 *irreducible* induced character `Ind_{PC}^S θ` (`θ ∈ Irr H`, `P ⊄ Ker θ`) lies in
 `ℤ[𝒮 ∩ Irr S]` — the integral span of the *irreducible* members of the honest §9 family
@@ -646,10 +646,10 @@ theorem H_sharp_hypothesis76_base_zeta_zero [Fintype G] [Invertible (Nat.card G 
   unfold H_sharp_hypothesis76_base
   exact OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase_zeta_zero _ _ _ _ _ _ _
 
-open scoped Classical in
-open scoped FiniteInduce in
 set_option maxHeartbeats 800000 in
 -- raised heartbeat budget for the heavy elaboration below
+open scoped Classical in
+open scoped FiniteInduce in
 /-- **The (7.7.a) coefficients of `λ^{τ₁}` at the distinguished index, over a chosen
 `𝒮₁`-base** (Peterfalvi (13.5)/(13.6), the guarded restatement of `lambda_tau1_cCoeff` —
 issue 2035 更新 #22/#24, issue 9094 案 A): with the (7.6) family based at `ζ₀ = Ind φ₀`
@@ -853,10 +853,10 @@ theorem lambda_tau1_cCoeff_base [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [hθi, hlamK]
     exact hInd0 θi θlK hne
 
-open scoped Classical in
-open scoped FiniteInduce in
 set_option maxHeartbeats 800000 in
 -- raised heartbeat budget for the heavy elaboration below
+open scoped Classical in
+open scoped FiniteInduce in
 /-- **The (7.7.a) coefficients of `η₁₀` vanish at `P`-nonkernel indices, over a chosen
 `𝒮₁`-base** (Peterfalvi (13.7), the guarded restatement of `eta10_cCoeff_orthogonal` — issue
 2035 更新 #22/#24, issue 9094 案 A): with the (7.6) family based at `ζ₀ = Ind φ₀` (`φ₀ ∈ 𝒮₁`),
