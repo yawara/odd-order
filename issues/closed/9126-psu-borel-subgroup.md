@@ -17,17 +17,17 @@ the faithful root--torus semidirect product and its exact order.
 
 ## やること
 
-- [ ] Define `BorelModel n` using `RootGroup n`, `PSUTorusParameter n`, and the
+- [x] Define `BorelModel n` using `RootGroup n`, `PSUTorusParameter n`, and the
   restricted action `psuTorusScaleHom n`.
-- [ ] Construct the root-times-torus monoid homomorphism into
+- [x] Construct the root-times-torus monoid homomorphism into
   `standardPermGroup n` and prove it injective by evaluating at the affine origin.
-- [ ] Define `standardBorel` as the actual range; prove root/torus membership and
+- [x] Define `standardBorel` as the actual range; prove root/torus membership and
   the unique root-times-torus normal form.
-- [ ] Prove `standardBorel ≤ stabilizer infinity` without asserting the reverse
+- [x] Prove `standardBorel ≤ stabilizer infinity` without asserting the reverse
   inclusion before the later Bruhat decomposition.
-- [ ] Prove the exact PSU Borel order
+- [x] Prove the exact PSU Borel order
   `2^(3*n) * ((2^(2*n)-1) / gcd(2^n+1,3))` for `0 < n`.
-- [ ] Wire the leaf into the project and axiom audit; update the Peterfalvi
+- [x] Wire the leaf into the project and axiom audit; update the Peterfalvi
   frontier after strict, module, audit, and full builds pass.
 
 ## 完了条件

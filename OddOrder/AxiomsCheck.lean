@@ -16,6 +16,7 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
@@ -370,6 +371,20 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardPermGroup_infinityStabilizer_isPretransitive
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardPermGroup_isMultiplyPretransitive
+
+-- Faithful PSU root--torus semidirect product and its standard Borel range.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.borelHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.borelHom_smul_origin
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.borelHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.mem_standardBorel_iff_existsUnique_root_torus
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardBorel_le_infinityStabilizer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_standardBorel
 
 -- Shared defining field and Tits twist for the Suzuki target in Peterfalvi Part II.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_field
