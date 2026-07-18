@@ -17,6 +17,7 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.BruhatCoordinates
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
@@ -393,6 +394,14 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardBorel_le_infinityStabilizer
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_standardBorel
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.bruhatFullTorus_eq_specialTorusWeight
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.origin_bruhat_identity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.mul_weylReciprocal_eq_one_iff_reciprocal_mul_eq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.generic_bruhat_identity
 
 -- Shared defining field and Tits twist for the Suzuki target in Peterfalvi Part II.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_field
