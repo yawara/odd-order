@@ -429,6 +429,31 @@ theorem conjBy_ne_conj_of_odd {H : Subgroup L} [H.Normal] [Invertible (Nat.card 
     fun heq => hθne (congrArg Subtype.val heq)
   exact not_isReal_of_ne_trivial_of_odd_card' hoddH hbne hreal
 
+/-- **Peterfalvi (1.5.e)**, general form.  Let `H ⊴ L` with `|L|` odd and let `θ ∈ Irr(H)`,
+`θ ≠ 1_H`.  Then `χ = Ind_H^L θ` is orthogonal to its complex conjugate `χ̄`.
+
+The book's proof: `χ̄ = Ind_H^L θ̄`, so by (1.5.c) a nonzero inner product `⟨χ, χ̄⟩` would force
+`θ̄ = θ^g` for some `g ∈ L`; since `|L|` is odd this makes `θ` real, hence `θ = 1_H` by (1.1).
+Formally: `conjBy_ne_conj_of_odd` supplies exactly the non-conjugacy `∀ g, θ^g ≠ θ̄`, and
+`inner_induce_eq_zero_of_not_conj` is the (1.5.c) orthogonality.
+
+This is the general-normal-subgroup form of `inner_induce_conj_eq_zero_of_frobenius_of_odd`,
+which assumes in addition that `L` is a Frobenius group with kernel `H` (equivalently
+`I_L(θ) = H`, making `Ind_H^L θ` irreducible).  Here the inertia group is arbitrary and
+`Ind_H^L θ` need not be irreducible — only `H ⊴ L` and `|L|` odd are used. -/
+theorem inner_induce_conj_eq_zero_of_odd {H : Subgroup L} [H.Normal]
+    [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card L))
+    (θ : IrreducibleCharacter ↥H) (hθne : θ ≠ trivialIrreducibleCharacter ↥H) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj)) = 0 := by
+  letI : Fintype ↥H := Fintype.ofFinite _
+  have hθne' : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H :=
+    fun heq => hθne (Subtype.ext heq)
+  exact inner_induce_eq_zero_of_not_conj θ
+    ⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩
+    fun g => fun hg => conjBy_ne_conj_of_odd hodd θ.isIrreducible hθne' g
+      (congrArg Subtype.val hg)
+
 /-- **No constituent of `Ind_H^L θ` is the trivial character** (`θ ≠ 1_H`, `H ⊴ L`).  If
 `Ind_H^L θ = ∑_{φ ∈ S} φ` decomposes into irreducibles, then every `φ ∈ S` is nontrivial:
 Frobenius reciprocity gives `⟨Ind_H^L θ, 1_L⟩ = ⟨θ, 1_H⟩ = 0` (`θ ≠ 1_H`, orthonormality), so the

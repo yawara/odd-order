@@ -130,6 +130,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.BG.AppE_FurtherResults
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
 import OddOrder.BG.AppA_PStability
@@ -9219,3 +9220,17 @@ three axioms (`propext`, `Classical.choice`, `Quot.sound`), in particular not on
 #assert_only_allowed_axioms OddOrder.noMinimalSimpleOdd
 #assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
 #assert_only_allowed_axioms OddOrder.feitThompson
+
+/-! **BG Appendix E, de-opacified results** (`AppE_FurtherResults`, 2026-07-18).  The appendix was a
+163-line opaque-`Prop` scaffold (every hypothesis/conclusion a free `Prop` with a self-carried
+`_holds`); it is now stated at book strength (0 opaque fields).  The following are proved
+sorry-free; the remaining E.1--E.5 statements are honest-but-sorried, gated on Hall's collecting
+process for general class `≤ p−1` (issue 3021).
+
+* `hallCollection_of_class_le_two` — E.1's collection formula in the class-`≤ 2` case, wired to
+  `GroupTheory.mul_pow_eq_commutator_pow_mul_of_class_le_two`.
+* `RegularOperatorSetup.card_A_dvd_half_p_sub_one` — **BG E.3(a) in full**: `q ∣ (p−1)/2` for the
+  regular operator group `A` of order `q` acting on `R₀` of order `p` (restrict the action to `R₀`,
+  injectivity from regularity, `q ∣ |Aut R₀| = p−1`, then `q` odd). -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection_of_class_le_two
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_A_dvd_half_p_sub_one

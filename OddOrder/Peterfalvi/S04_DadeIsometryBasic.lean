@@ -566,9 +566,14 @@ theorem dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot
 /-- The formal shape of Peterfalvi (2.4.a): the subgroups `H(a)` are
 equivariant under conjugation by `L`.
 
-This is kept as a predicate for now because the proof in the book identifies
-`H(a)` with a `π'`-core of `C_G(a)`, and that π-core API is not yet part of the
-S04 scaffold. -/
+This predicate is **always satisfied** under Hypothesis (2.2): see `Hypothesis.hConjInvariant`,
+which derives it from `mem_H_iff_coprime_orderOf`.  It is retained as a named predicate only
+because it is threaded as an explicit argument through the (2.6)–(2.10) API; every such
+argument can now be discharged by `hyp.hConjInvariant`.
+
+(The book proves this via `H(a) = O_{π'}(C_G(a))` for the global prime set
+`π = ⋃_{b ∈ A} π(|C_L(b)|)`; the repo proof uses the equivalent local characterization of
+`H(a)` by coprimality to `|C_L(a)|`, which needs no `O_{π'}` API.) -/
 def HConjInvariant (hyp : Hypothesis G A L) : Prop :=
   ∀ (a : {a : G // a ∈ A}) (l : L),
     hyp.H ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ =
@@ -783,6 +788,84 @@ theorem mem_H_of_mem_centralizer_coprime (hyp : Hypothesis G A L)
   have hxeq : x = (x ^ m) ^ j := by rw [← pow_mul, hxk]
   rw [hxeq]
   exact (hyp.H a).pow_mem hxm j
+
+/-- **Elementwise characterization of `H(a)`.**  Under Hypothesis (2.2), `H(a)` consists of
+exactly the elements of `C_G(a)` whose order is prime to `|C_L(a)|`:
+
+`x ∈ H(a) ↔ x ∈ C_G(a) ∧ gcd(o(x), |C_L(a)|) = 1`.
+
+`⊆` is (2.2.c): `o(x)` divides `|H(a)|`, which is prime to `|C_L(a)|`.  `⊇` is
+`mem_H_of_mem_centralizer_coprime`, i.e. the semidirect decomposition
+`C_G(a) = H(a) ⋊ C_L(a)` of (2.2.b).
+
+This is the `π'`-core description of `H(a)` used in the book's proof of (2.4.a), but stated
+with the *per-`a`* modulus `|C_L(a)|` in place of the global prime set
+`π = ⋃_{b ∈ A} π(|C_L(b)|)`.  The two agree here — coprimality to `|C_L(a)|` already pins
+`H(a)` down — and the local form avoids needing any `O_{π'}` API. -/
+theorem mem_H_iff_coprime_orderOf (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) (x : G) :
+    x ∈ hyp.H a ↔
+      x ∈ Subgroup.centralizer ({a.1} : Set G) ∧
+        Nat.Coprime (orderOf x) (Nat.card (centralizerIn L a.1)) := by
+  constructor
+  · intro hx
+    have hle : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) := by
+      rw [hyp.centralizer_eq_sup a]; exact le_sup_left
+    exact ⟨hle hx,
+      Nat.Coprime.coprime_dvd_left ((hyp.H a).orderOf_dvd_natCard hx)
+        (hyp.centralizer_coprime a a)⟩
+  · rintro ⟨hxC, hcop⟩
+    exact hyp.mem_H_of_mem_centralizer_coprime a hxC hcop
+
+/-- **Peterfalvi (2.4.a)**: `H(a^l) = H(a)^l` for `a ∈ A` and `l ∈ L`.
+
+Hypothesis (2.2) *implies* the equivariance predicate `HConjInvariant`; it need not be
+assumed.  By `mem_H_iff_coprime_orderOf`, membership `x ∈ H(a)` is the conjunction of two
+conditions, and conjugation by `l` transports each:
+
+* `x ∈ C_G(a^l) ↔ l⁻¹xl ∈ C_G(a)` (centralizers are conjugation-equivariant);
+* `o(l⁻¹xl) = o(x)` (conjugation preserves order);
+* `|C_L(a^l)| = |C_L(a)|` (`card_centralizerIn_conj`) — **this is where `l ∈ L` is used**,
+  since conjugation by `l` must map `C_L(a)` onto `C_L(a^l)`.
+
+The book argues via `H(a) = O_{π'}(C_G(a))` for the global prime set `π`; the local
+characterization above gives the same conclusion without any `π`-core API. -/
+theorem hConjInvariant (hyp : Hypothesis G A L) : hyp.HConjInvariant := by
+  intro a l
+  ext x
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+    hyp.mem_H_iff_coprime_orderOf ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩,
+    hyp.mem_H_iff_coprime_orderOf a]
+  have hsmul : ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) := by
+    simp [MulAut.conj]
+  rw [hsmul]
+  -- conjugation preserves order
+  have hord : orderOf ((l : G)⁻¹ * x * (l : G)) = orderOf x := by
+    have hsc : SemiconjBy (l : G) ((l : G)⁻¹ * x * (l : G)) x := by
+      show (l : G) * ((l : G)⁻¹ * x * (l : G)) = x * (l : G)
+      group
+    exact SemiconjBy.orderOf_eq (l : G) hsc
+  -- `|C_L(a^l)| = |C_L(a)|` (uses `l ∈ L`)
+  have hcard : Nat.card (centralizerIn L ((l : G) * a.1 * (l : G)⁻¹))
+      = Nat.card (centralizerIn L a.1) := card_centralizerIn_conj l.2 a.1
+  -- centralizer condition transports
+  have hcent : x ∈ Subgroup.centralizer ({(l : G) * a.1 * (l : G)⁻¹} : Set G)
+      ↔ (l : G)⁻¹ * x * (l : G) ∈ Subgroup.centralizer ({a.1} : Set G) := by
+    simp only [Subgroup.mem_centralizer_singleton_iff]
+    constructor
+    · intro h
+      have h2 : (l : G)⁻¹ * (x * ((l : G) * a.1 * (l : G)⁻¹)) * (l : G)
+          = (l : G)⁻¹ * (((l : G) * a.1 * (l : G)⁻¹) * x) * (l : G) := by rw [h]
+      calc ((l : G)⁻¹ * x * (l : G)) * a.1
+          = (l : G)⁻¹ * (x * ((l : G) * a.1 * (l : G)⁻¹)) * (l : G) := by group
+        _ = (l : G)⁻¹ * (((l : G) * a.1 * (l : G)⁻¹) * x) * (l : G) := h2
+        _ = a.1 * ((l : G)⁻¹ * x * (l : G)) := by group
+    · intro h
+      calc x * ((l : G) * a.1 * (l : G)⁻¹)
+          = (l : G) * (((l : G)⁻¹ * x * (l : G)) * a.1) * (l : G)⁻¹ := by group
+        _ = (l : G) * (a.1 * ((l : G)⁻¹ * x * (l : G))) * (l : G)⁻¹ := by rw [h]
+        _ = ((l : G) * a.1 * (l : G)⁻¹) * x := by group
+  rw [hord, hcard, hcent]
 
 open Classical in
 /-- **Orbit count for the (2.7) adjoint formula.**  For `g` in the Dade support,

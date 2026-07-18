@@ -432,6 +432,68 @@ theorem chiRho_norm_sq_le {G : Type*} [Group G] [Fintype G]
   rw [h_decomp, Complex.add_re, h_phi_eq]
   linarith
 
+/-- **Peterfalvi (7.2.b), equality case.**  `‖χ^ρ‖² = ‖χ‖²` holds **iff** `χ` lies in the
+image of the Dade map `τ`.
+
+This is the clause the book states alongside the inequality `chiRho_norm_sq_le` and which
+that theorem discards: its proof establishes the orthogonal decomposition
+`⟨χ, χ⟩ = ⟨φ, φ⟩ + ⟨χ - φ, χ - φ⟩` with `φ := τ (χ^ρ)` and `⟨φ, φ⟩ = ‖χ^ρ‖²`, then drops the
+tail via `inner_self_re_nonneg`.  Keeping the tail gives both directions:
+
+* **(⟹)** equality forces `⟨χ - φ, χ - φ⟩.re = 0`, so `χ = φ = τ (χ^ρ)` by positive
+  definiteness (`eq_zero_of_inner_self_re_eq_zero`) — in particular `χ ∈ im τ`, witnessed
+  by `χ^ρ` itself (`chiRhoSupp χ`).
+* **(⟸)** if `χ = τ α` then `χ^ρ = α` by (7.2.a) (`chiRhoCF_dadeImage_eq`), so the isometry
+  `hiso` gives `‖χ^ρ‖² = ‖α‖² = ‖τ α‖² = ‖χ‖²` — here the two complex inner products are
+  literally equal, not merely their real parts. -/
+theorem chiRho_norm_sq_eq_iff_mem_range {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hiso : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ)).re
+        = (ClassFunction.inner χ χ).re
+      ↔ ∃ α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L,
+          H71.τ α = χ := by
+  constructor
+  · intro heq
+    refine ⟨H71.chiRhoSupp χ, ?_⟩
+    set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L :=
+      H71.chiRhoSupp χ with hα_def
+    set φ : ClassFunction G ℂ := H71.τ α with hφ_def
+    have hα_coe : (α : ClassFunction L ℂ) = H71.chiRhoCF χ := rfl
+    -- `⟨φ, χ⟩ = ⟨φ, φ⟩` via the adjoint formula + isometry.
+    have h_phi_chi : ClassFunction.inner φ χ = ClassFunction.inner φ φ := by
+      have h_adj : ClassFunction.inner φ χ =
+          ClassFunction.inner (α : ClassFunction L ℂ) (H71.chiRhoCF χ) :=
+        H71.chiRho_adjoint α χ
+      have h_isom : ClassFunction.inner φ φ =
+          ClassFunction.inner (α : ClassFunction L ℂ) (α : ClassFunction L ℂ) :=
+        hiso.inner_eq α α
+      rw [h_adj, h_isom, hα_coe]
+    have h_chi_phi : ClassFunction.inner χ φ = ClassFunction.inner φ φ := by
+      rw [ClassFunction.inner_symm, h_phi_chi, ClassFunction.star_inner_self]
+    have h_decomp : ClassFunction.inner χ χ =
+        ClassFunction.inner φ φ + ClassFunction.inner (χ - φ) (χ - φ) := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+          ClassFunction.inner_sub_right, h_chi_phi, h_phi_chi]
+      ring
+    have h_phi_eq : ClassFunction.inner φ φ =
+        ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ) := by
+      rw [hφ_def]
+      exact (hiso.inner_eq α α).trans (by rw [hα_coe])
+    -- Equality kills the tail, so `χ = φ`.
+    have h_tail : (ClassFunction.inner (χ - φ) (χ - φ)).re = 0 := by
+      have hre := congrArg Complex.re h_decomp
+      rw [Complex.add_re, h_phi_eq] at hre
+      linarith
+    have hzero : χ - φ = 0 := eq_zero_of_inner_self_re_eq_zero h_tail
+    exact (sub_eq_zero.mp hzero).symm
+  · rintro ⟨α, rfl⟩
+    -- (7.2.a): `(τ α)^ρ = α`, so the isometry transports the norm verbatim.
+    rw [H71.chiRhoCF_dadeImage_eq α, hiso.inner_eq α α]
+
 open scoped Classical in
 /-- **Peterfalvi (7.3).**  The integral inequality:
 `|G|⁻¹ Σ_{g ∈ A^τ} |χ(g)|² ≥ ‖χ^ρ‖²`, with equality iff `χ` is constant on each
@@ -498,6 +560,146 @@ theorem chiRho_integral_inequality {G : Type*} [Group G] [Fintype G]
     · rw [if_neg hg, if_neg hg, star_zero, mul_zero]
   rw [h_inner_χ₁] at h72b
   exact h72b
+
+open scoped Classical in
+/-- **Peterfalvi (7.3), equality case.**  Equality holds in the integral inequality
+`‖χ^ρ‖² ≤ |G|⁻¹ Σ_{g ∈ A^τ} |χ(g)|²` **iff** `χ` is constant on every coset `a·H(a)`
+(`a ∈ A`).
+
+The book states this alongside the inequality; `chiRho_integral_inequality` proves only the
+inequality (its docstring records the `iff`).  With the (7.2.b) equality case
+(`chiRho_norm_sq_eq_iff_mem_range`) in hand it is a short step: writing `χ₁` for `χ`
+truncated to `A^τ` (as in the inequality's proof, where `χ₁^ρ = χ^ρ` and
+`‖χ₁‖² = |G|⁻¹ Σ_{A^τ} |χ|²`), equality is equivalent to `χ₁ ∈ im τ`, and
+
+* **(⟹)** a Dade image is constant on each coset — `τ α` takes the single value `α(a)` on
+  all of `(a·H(a))^G` (`IsDadeMap.map_eq_of_mem_hCoset`) — and `χ₁` agrees with `χ` on
+  `A^τ ⊇ a·H(a)`;
+* **(⟸)** if `χ` is constant on each `a·H(a)` then `χ^ρ(a) = χ(a)` (the averaging defining
+  `ρ` is over `H(a)`), and `τ (χ^ρ)` agrees with `χ₁` pointwise: on `A^τ` both equal `χ(a)`
+  at any point conjugate into `a·H(a)`, and off `A^τ` both vanish.
+
+This also makes explicit the equality instance the book invokes for `χ = 1_G` (used in (7.5)
+via the cardinality identity `|A^τ|·|L| = |A|·|G|`): the constant function is trivially
+constant on every coset. -/
+theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hiso : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ)).re =
+        (((Nat.card G : ℂ)⁻¹ *
+          ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ H71.hyp.dadeSupport),
+            ‖(χ : G → ℂ) g‖^2 : ℂ)).re
+      ↔ ∀ (a : {a : G // a ∈ A}) (h : G), h ∈ H71.hyp.H a →
+          (χ : G → ℂ) (a.1 * h) = (χ : G → ℂ) a.1 := by
+  -- `χ₁`: `χ` truncated to the Dade support (exactly as in `chiRho_integral_inequality`).
+  set χ₁ : ClassFunction G ℂ :=
+    ⟨fun g => if g ∈ H71.hyp.dadeSupport then χ g else 0,
+      fun g h => by
+        change (if h * g * h⁻¹ ∈ H71.hyp.dadeSupport then χ (h * g * h⁻¹) else 0) =
+             (if g ∈ H71.hyp.dadeSupport then χ g else 0)
+        by_cases hg : g ∈ H71.hyp.dadeSupport
+        · have hconj : h * g * h⁻¹ ∈ H71.hyp.dadeSupport :=
+            H71.hyp.conj_mem_dadeSupport hg
+          rw [if_pos hg, if_pos hconj]
+          exact χ.conj_eq g h
+        · have hconj : h * g * h⁻¹ ∉ H71.hyp.dadeSupport := fun hin =>
+            hg (H71.hyp.mem_dadeSupport_conj_iff.mp hin)
+          rw [if_neg hg, if_neg hconj]⟩ with hχ₁_def
+  have hχ₁_apply : ∀ g, (χ₁ : G → ℂ) g =
+      if g ∈ H71.hyp.dadeSupport then (χ : G → ℂ) g else 0 := fun _ => rfl
+  -- `χ₁^ρ = χ^ρ`.
+  have h_chiRhoCF_eq : H71.chiRhoCF χ₁ = H71.chiRhoCF χ := by
+    ext a
+    by_cases ha : (a : G) ∈ A
+    · rw [chiRhoCF_apply, chiRhoCF_apply,
+          H71.chiRho_of_mem _ ha, H71.chiRho_of_mem _ ha]
+      congr 1
+      refine Finset.sum_congr rfl fun x _ => ?_
+      have hmem : (a : G) * (x : G) ∈ H71.hyp.dadeSupport :=
+        H71.hyp.mem_dadeSupport_of_mem_hCoset (a := ⟨(a : G), ha⟩) x.2
+      rw [hχ₁_apply, if_pos hmem]
+    · rw [chiRhoCF_apply, chiRhoCF_apply,
+          H71.chiRho_of_not_mem _ ha, H71.chiRho_of_not_mem _ ha]
+  -- `‖χ₁‖² = |G|⁻¹ Σ_{A^τ} |χ|²`.
+  have h_inner_χ₁ :
+      ClassFunction.inner χ₁ χ₁ =
+        (Nat.card G : ℂ)⁻¹ *
+          (((∑ g ∈ Finset.univ.filter (fun x : G => x ∈ H71.hyp.dadeSupport),
+              ‖(χ : G → ℂ) g‖^2 : ℝ) : ℂ)) := by
+    rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
+        invOf_eq_inv]
+    congr 1
+    rw [Complex.ofReal_sum, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [hχ₁_apply]
+    by_cases hg : g ∈ H71.hyp.dadeSupport
+    · rw [if_pos hg, if_pos hg]
+      rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
+    · rw [if_neg hg, if_neg hg, star_zero, mul_zero]
+  -- Reduce to the (7.2.b) equality case for `χ₁`.
+  have hcast : (((Nat.card G : ℂ)⁻¹ *
+      ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ H71.hyp.dadeSupport),
+        ‖(χ : G → ℂ) g‖^2 : ℂ)) = ClassFunction.inner χ₁ χ₁ := by
+    rw [h_inner_χ₁, Complex.ofReal_sum]
+  rw [hcast, ← h_chiRhoCF_eq, H71.chiRho_norm_sq_eq_iff_mem_range hiso χ₁]
+  constructor
+  · -- A Dade image is constant on each coset `a·H(a)`.
+    rintro ⟨α, hα⟩ a h hh
+    have hmem_ah : a.1 * h ∈ H71.hyp.dadeSupport :=
+      H71.hyp.mem_dadeSupport_of_mem_hCoset hh
+    have hmem_a : a.1 ∈ H71.hyp.dadeSupport := by
+      have := H71.hyp.mem_dadeSupport_of_mem_hCoset (a := a) (Subgroup.one_mem _)
+      rwa [mul_one] at this
+    have hval_ah : (χ : G → ℂ) (a.1 * h)
+        = (α : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩ := by
+      have h1 : (χ₁ : G → ℂ) (a.1 * h) = (χ : G → ℂ) (a.1 * h) := by
+        rw [hχ₁_apply, if_pos hmem_ah]
+      rw [← h1, ← hα]
+      exact H71.isDadeMap.map_eq_of_mem_hCoset α a ⟨h, hh, rfl⟩
+    have hval_a : (χ : G → ℂ) a.1
+        = (α : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩ := by
+      have h1 : (χ₁ : G → ℂ) a.1 = (χ : G → ℂ) a.1 := by
+        rw [hχ₁_apply, if_pos hmem_a]
+      rw [← h1, ← hα]
+      exact H71.isDadeMap.map_eq_of_mem_hCoset α a
+        ⟨1, Subgroup.one_mem _, (mul_one _).symm⟩
+    rw [hval_ah, hval_a]
+  · -- Constancy on cosets exhibits `χ₁` as `τ (χ^ρ)`.
+    intro hconst
+    refine ⟨H71.chiRhoSupp χ, ?_⟩
+    ext g
+    by_cases hg : g ∈ H71.hyp.dadeSupport
+    · obtain ⟨a, h, hh, hconj⟩ := H71.hyp.mem_dadeSupport_iff.mp hg
+      -- value of `τ (χ^ρ)` at `g`: the base value `χ^ρ(a) = χ(a)`.
+      have hτ : H71.τ (H71.chiRhoSupp χ) g
+          = (H71.chiRhoSupp χ : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩ :=
+        H71.isDadeMap.map_eq_of_isConj_hCoset _ g a h hh hconj
+      have hrho : (H71.chiRhoSupp χ : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩
+          = (χ : G → ℂ) a.1 := by
+        show H71.chiRhoCF χ ⟨a.1, H71.hyp.mem_L a.2⟩ = (χ : G → ℂ) a.1
+        rw [chiRhoCF_apply, H71.chiRho_of_mem _ a.2]
+        have hsum : ∑ x : H71.hyp.H a, (χ : G → ℂ) (a.1 * (x : G))
+            = (Nat.card (H71.hyp.H a) : ℂ) * (χ : G → ℂ) a.1 := by
+          have hterm : ∀ x : H71.hyp.H a,
+              (χ : G → ℂ) (a.1 * (x : G)) = (χ : G → ℂ) a.1 :=
+            fun x => hconst a x.1 x.2
+          rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_const,
+            nsmul_eq_mul, Nat.card_eq_fintype_card, Finset.card_univ]
+        have hne : (Nat.card (H71.hyp.H a) : ℂ) ≠ 0 := by
+          rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+        rw [hsum, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
+      -- value of `χ₁` at `g`: `χ(g) = χ(a·h) = χ(a)`.
+      have hχg : (χ : G → ℂ) g = (χ : G → ℂ) a.1 := by
+        obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+        rw [← hc, χ.conj_eq, hconst a h hh]
+      show H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
+      rw [hτ, hrho, hχ₁_apply, if_pos hg, hχg]
+    · show H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
+      rw [H71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport _ g hg,
+        hχ₁_apply, if_neg hg]
 
 end Hypothesis71
 
