@@ -172,6 +172,26 @@ instance characteristic : (Agemo G p n).Characteristic := by
 
 end Agemo
 
+/-! ## Agemo in a commutative group -/
+
+/-- In a commutative group the agemo subgroup `℧ⁿ(H)` is exactly the range
+of the `pⁿ`-th power homomorphism. -/
+theorem agemo_eq_range_powMonoidHom {H : Type*} [CommGroup H] {p n : ℕ} :
+    Agemo H p n = (powMonoidHom (p ^ n) : H →* H).range := by
+  rw [Agemo]
+  refine le_antisymm (Subgroup.closure_le _ |>.mpr ?_) ?_
+  · rintro g ⟨x, rfl⟩
+    exact ⟨x, rfl⟩
+  · rintro g ⟨x, rfl⟩
+    exact Subgroup.subset_closure ⟨x, rfl⟩
+
+/-- In a commutative group, membership in `℧ⁿ(H)` means being a `pⁿ`-th
+power. -/
+theorem mem_agemo_iff_of_comm {H : Type*} [CommGroup H] {p n : ℕ} {x : H} :
+    x ∈ Agemo H p n ↔ ∃ y, x = y ^ (p ^ n) := by
+  rw [agemo_eq_range_powMonoidHom, MonoidHom.mem_range]
+  exact ⟨fun ⟨y, hy⟩ => ⟨y, hy.symm⟩, fun ⟨y, hy⟩ => ⟨y, hy.symm⟩⟩
+
 /-! ## `Ω₁` of an abelian subgroup
 
 When `H ≤ G` is abelian (carries a `CommGroup` structure), the set

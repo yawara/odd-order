@@ -6526,15 +6526,15 @@ otherwise `Q ⧸ C_Q(S)` is cyclic (`pRank Q q ≤ 1`) yet `pRank Q q = r_q(N_G(
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_partial_centralizer_of_abelianSylow
 
-/-! ### Agemo of an abelian group is the set of `pⁿ`-th powers (`S12_Theorem1212b`)
+/-! ### Agemo of an abelian group is the set of `pⁿ`-th powers
 
 `agemo_eq_range_powMonoidHom` / `mem_agemo_iff_of_comm`: in a commutative group `℧ⁿ(H)` equals
 the range of the `pⁿ`-th power map, so `x ∈ ℧ⁿ(H) ↔ ∃ y, x = y^(pⁿ)`. Tool for the Case 3
 `C_E(S) = E` branch (`Z = ⟨s⟩` with `Ωₐ₋₁(S) = ⟨s^{p^{a-1}}⟩` the good line). Unconditional. -/
 
-#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.agemo_eq_range_powMonoidHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.agemo_eq_range_powMonoidHom
 
-#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_agemo_iff_of_comm
+#assert_only_allowed_axioms OddOrder.GroupTheory.mem_agemo_iff_of_comm
 
 /-! ### BG Theorem 12.12: Case 3 — the `C_E(S) = E` branch (`S12_Theorem1212b`)
 
