@@ -150,4 +150,141 @@ theorem autTowerEmbLe_injective (hZ : Subgroup.center G = ⊥) {m r : ℕ} (h : 
 
 end
 
+section /- 9B: 単射 hom に沿った centralizer 条件の押し出し -/
+
+/-- 正規化条件は準同型像に移る: `A ≤ N_H(B)` ⇒ `f A ≤ N_K(f B)`
+(`f a · f B · f a⁻¹ = f (a B a⁻¹) = f B`). 単射性は不要. -/
+theorem map_le_normalizer_map {H K : Type*} [Group H] [Group K] (f : H →* K) {A B : Subgroup H}
+    (h : A ≤ Subgroup.normalizer (B : Set H)) :
+    A.map f ≤ Subgroup.normalizer ((B.map f : Subgroup K) : Set K) := by
+  rintro _ ⟨a, ha, rfl⟩
+  rw [Subgroup.mem_normalizer_iff]
+  have ha' := Subgroup.mem_normalizer_iff.mp (h ha)
+  intro x
+  constructor
+  · rintro ⟨b, hb, rfl⟩
+    exact ⟨a * b * a⁻¹, (ha' b).mp hb, by simp only [map_mul, map_inv]⟩
+  · rintro ⟨b, hb, hbx⟩
+    refine ⟨a⁻¹ * b * a, (ha' (a⁻¹ * b * a)).mpr ?_, ?_⟩
+    · rw [show a * (a⁻¹ * b * a) * a⁻¹ = b by group]; exact hb
+    · simp only [map_mul, map_inv, hbx]; group
+
+/-- 単射準同型は「`C_G(A) ⊓ B = 1`」を像に移す:
+`f` 単射, `C_H(A) ⊓ B = ⊥` ⇒ `C_K(f A) ⊓ f B = ⊥`.
+
+`x = f b` が `f A` の全元と可換 ⟺ `f (b*a) = f (a*b)` ⟺ `b*a = a*b` (単射性),
+つまり `b ∈ C_H(A) ⊓ B = ⊥`. 鎖の条件 (9.12 の第 3 仮説) を段ごとに押し上げるのに使う. -/
+theorem centralizer_map_inf_map_eq_bot {H K : Type*} [Group H] [Group K] {f : H →* K}
+    (hf : Function.Injective f) {A B : Subgroup H}
+    (h : Subgroup.centralizer (A : Set H) ⊓ B = ⊥) :
+    Subgroup.centralizer ((A.map f : Subgroup K) : Set K) ⊓ B.map f = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨hxC, hxB⟩ := Subgroup.mem_inf.mp hx
+  obtain ⟨b, hbB, rfl⟩ := hxB
+  rw [Subgroup.mem_centralizer_iff] at hxC
+  have hbC : b ∈ Subgroup.centralizer (A : Set H) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    have hcomm := hxC (f a) ⟨a, ha, rfl⟩
+    apply hf
+    rw [map_mul, map_mul]
+    exact hcomm
+  have hb1 : b = 1 := by
+    have hmem : b ∈ Subgroup.centralizer (A : Set H) ⊓ B := Subgroup.mem_inf.mpr ⟨hbC, hbB⟩
+    rw [h, Subgroup.mem_bot] at hmem
+    exact hmem
+  rw [Subgroup.mem_bot, hb1, map_one]
+
+end
+
+section /- 9B: `G_{m+k}` の中の鎖 (9.12 に食わせる形) -/
+
+variable (G : Type u) [Group G]
+
+/-- **tower の鎖**: `chainAux G m k j` = `G_{m+j}` の `G_{m+k}` での像 (`j ≥ k` なら `⊤`).
+
+環境を `m + k` の形に固定したまま `k` で再帰し, `j` はパラメータのまま持つのが要点.
+`(autTowerEmbLe (j ≤ r)).range` として定義すると `S j ◁ S (j+1)` を出す分解に
+`m + (k+1)` ↔ `(m+1) + k` の付け替えが入り, 鎖の 4 条件すべてに transport が波及する
+(`Nat.add` は第 2 引数で再帰するので前者しか定義的簡約しない). この形なら
+**添字の付け替えが一切出ない**.
+
+検算: `chainAux 0 1 0 = ⊤.map (step 0) = Inn(G_0)`, `chainAux 0 1 1 = ⊤`,
+`chainAux 0 2 1 = ⊤.map (step 1) = Inn(G_1)`, `chainAux 0 2 2 = ⊤`. -/
+def chainAux (m : ℕ) : ∀ k : ℕ, ℕ → Subgroup (autTowerType G (m + k))
+  | 0, _ => ⊤
+  | k + 1, j =>
+      if k + 1 ≤ j then ⊤ else (chainAux m k j).map (autTowerStep G (m + k))
+
+variable {G}
+
+@[simp] theorem chainAux_zero (m j : ℕ) : chainAux G m 0 j = ⊤ := rfl
+
+theorem chainAux_succ_of_le {m k j : ℕ} (h : k + 1 ≤ j) : chainAux G m (k + 1) j = ⊤ := by
+  rw [chainAux, if_pos h]
+
+theorem chainAux_succ_of_lt {m k j : ℕ} (h : j < k + 1) :
+    chainAux G m (k + 1) j = (chainAux G m k j).map (autTowerStep G (m + k)) := by
+  rw [chainAux, if_neg (Nat.not_le.mpr h)]
+
+/-- 鎖の上端は `⊤` (9.12 の `S r = ⊤`). -/
+@[simp] theorem chainAux_self (m k : ℕ) : chainAux G m k k = ⊤ := by
+  cases k with
+  | zero => rfl
+  | succ k => exact chainAux_succ_of_le le_rfl
+
+/-- 9.12 の第 1 仮説: `S j ≤ S (j+1)` (`j < k`). -/
+theorem chainAux_le_succ (m : ℕ) :
+    ∀ (k j : ℕ), j < k → chainAux G m k j ≤ chainAux G m k (j + 1)
+  | 0, j, hj => absurd hj (Nat.not_lt_zero j)
+  | k + 1, j, hj => by
+      rcases Nat.lt_or_ge (j + 1) (k + 1) with h | h
+      · rw [chainAux_succ_of_lt (Nat.lt_of_succ_lt h), chainAux_succ_of_lt h]
+        exact Subgroup.map_mono (chainAux_le_succ m k j (Nat.lt_of_succ_lt_succ h))
+      · rw [chainAux_succ_of_le h]
+        exact le_top
+
+/-- 9.12 の第 2 仮説: `S (j+1) ≤ N(S j)` (`j < k`).
+
+上端 (`j = k`) は `S k = Inn(G_{m+k})` が環境に normal (`innAut.normal`),
+帰納段は正規化条件を像に押す (`map_le_normalizer_map`). -/
+theorem chainAux_le_normalizer (m : ℕ) :
+    ∀ (k j : ℕ), j < k →
+      chainAux G m k (j + 1) ≤ Subgroup.normalizer ((chainAux G m k j : Subgroup _) : Set _)
+  | 0, j, hj => absurd hj (Nat.not_lt_zero j)
+  | k + 1, j, hj => by
+      rcases Nat.lt_or_ge (j + 1) (k + 1) with h | h
+      · rw [chainAux_succ_of_lt (Nat.lt_of_succ_lt h), chainAux_succ_of_lt h]
+        exact map_le_normalizer_map _ (chainAux_le_normalizer m k j (Nat.lt_of_succ_lt_succ h))
+      · -- `j = k`: `S (k+1) = ⊤`, `S k = ⊤.map (step (m+k)) = Inn(G_{m+k})` は normal
+        have hjk : j = k := Nat.le_antisymm (Nat.lt_succ_iff.mp hj) (Nat.succ_le_succ_iff.mp h)
+        subst hjk
+        -- `⊤.map (step n) = (step n).range = Inn(G_n)` (`step` は全射でないので
+        -- `map_top_of_surjective` ではなく `range_eq_map` を使う)
+        rw [chainAux_succ_of_le h, chainAux_succ_of_lt (Nat.lt_succ_self j), chainAux_self,
+          ← MonoidHom.range_eq_map, range_autTowerStep]
+        exact le_of_eq (Subgroup.normalizer_eq_top_iff.mpr innAut.normal).symm
+
+/-- 9.12 の第 3 仮説: `C(S j) ⊓ S (j+1) = ⊥` (`j < k`).
+
+上端は Lemma 9.11(c) (`centralizer_innAut_eq_bot`) そのもの,
+帰納段は `centralizer_map_inf_map_eq_bot` (単射 hom で押す). -/
+theorem chainAux_centralizer_inf (hZ : Subgroup.center G = ⊥) (m : ℕ) :
+    ∀ (k j : ℕ), j < k →
+      Subgroup.centralizer ((chainAux G m k j : Subgroup _) : Set _) ⊓ chainAux G m k (j + 1) = ⊥
+  | 0, j, hj => absurd hj (Nat.not_lt_zero j)
+  | k + 1, j, hj => by
+      rcases Nat.lt_or_ge (j + 1) (k + 1) with h | h
+      · rw [chainAux_succ_of_lt (Nat.lt_of_succ_lt h), chainAux_succ_of_lt h]
+        exact centralizer_map_inf_map_eq_bot (autTowerStep_injective hZ (m + k))
+          (chainAux_centralizer_inf hZ m k j (Nat.lt_of_succ_lt_succ h))
+      · have hjk : j = k := Nat.le_antisymm (Nat.lt_succ_iff.mp hj) (Nat.succ_le_succ_iff.mp h)
+        subst hjk
+        rw [chainAux_succ_of_le h, chainAux_succ_of_lt (Nat.lt_succ_self j), chainAux_self,
+          ← MonoidHom.range_eq_map, range_autTowerStep, inf_top_eq]
+        exact centralizer_innAut_eq_bot (center_autTowerType_eq_bot hZ (m + j))
+
+end
+
 end OddOrder.Isaacs.Ch09
