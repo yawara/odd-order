@@ -43,6 +43,7 @@ variable {G : Type*} [Group G] {H : Subgroup G} [hH : H.Normal]
 variable [Fintype G] [Fintype ↥H] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **The irreducibly-induced image has cardinality `|T| / [G:H]`** (multiplied-out form).
 
 For a conjugation-invariant Finset `T ⊆ Irr H` (`H ⊴ G`) whose every member `θ` has inertia
@@ -59,6 +60,7 @@ theorem card_image_induce_mul_index_eq
     (hinertia : ∀ θ ∈ T, IrreducibleCharacter.inertia (G := G) (H := H) θ = H) :
     (T.image (fun θ => induce H θ.toClassFunction)).card * H.index = T.card := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
   -- `|T| = ∑_{χ ∈ image} |fibre over χ|`, each fibre `= [G:H]`.
   rw [Finset.card_eq_sum_card_image (fun θ => induce H θ.toClassFunction) T]
   rw [Finset.sum_congr rfl (fun χ hχ => ?_), Finset.sum_const, smul_eq_mul, mul_comm]
@@ -72,6 +74,7 @@ theorem card_image_induce_mul_index_eq
   rw [hfib, card_filter_induce_eq_index_inertia T hT θ₀ hθ₀T, hinertia θ₀ hθ₀T]
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **The irreducibly-induced image has cardinality `|T| / [G:H]`** (division form).  Immediate
 from `card_image_induce_mul_index_eq` and `[G:H] > 0`. -/
 theorem card_image_induce_eq_div
@@ -79,6 +82,7 @@ theorem card_image_induce_eq_div
     (hT : ∀ θ ∈ T, ∀ g : G, IrreducibleCharacter.conjBy (G := G) (H := H) g θ ∈ T)
     (hinertia : ∀ θ ∈ T, IrreducibleCharacter.inertia (G := G) (H := H) θ = H) :
     (T.image (fun θ => induce H θ.toClassFunction)).card = T.card / H.index := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   have hidx : 0 < H.index := Nat.pos_of_ne_zero fun h0 => by
     have hmc := H.index_mul_card
     rw [h0, zero_mul] at hmc
@@ -86,6 +90,7 @@ theorem card_image_induce_eq_div
   rw [← card_image_induce_mul_index_eq T hT hinertia, Nat.mul_div_cancel _ hidx]
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **The irreducibly-induced image has cardinality at least `|T| / [G:H]`** (lower-bound form; no
 conjugation-invariance of `T` needed).  For *any* Finset `T ⊆ Irr H` (`H ⊴ G`) whose every member
 `θ` has inertia `I_G(θ) = H`, each induction fibre `{θ ∈ T | Ind θ = Ind θ₀}` embeds into the
@@ -101,6 +106,7 @@ theorem card_image_induce_ge_div
     (hinertia : ∀ θ ∈ T, IrreducibleCharacter.inertia (G := G) (H := H) θ = H) :
     T.card / H.index ≤ (T.image (fun θ => induce H θ.toClassFunction)).card := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
   have hidx : 0 < H.index := Nat.pos_of_ne_zero fun h0 => by
     have hmc := H.index_mul_card
     rw [h0, zero_mul] at hmc

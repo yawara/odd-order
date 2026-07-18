@@ -421,18 +421,22 @@ nontrivial on `S₀`, the pair character `ψ_{θ,λ}` has `HU`-inertia exactly `
 theorem hcuPsiPair_family_inertia_eq [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
-    [Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))]
+    [Finite ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))]
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
     (hθW : caseA_wComplement caseA ≤ θ.ker)
     (hθS0 : θ.comp caseA.S0.subtype ≠ 1)
     (lam : ↥(cuInHu caseA) →* ℂˣ)
-    [Fintype ↥(huSub data)] [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(huSub data)] [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal] :
     ClassFunction.inertia (hcuPsiPair caseA θ
         (hcuSeedHom_hinv_of_wComplement_triv caseA θ hθW) lam : ClassFunction
         ↥(hInHu data ⊔ cuInHu caseA) ℂ)
       = hInHu data ⊔ cuInHu caseA := by
+  haveI : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    Fintype.ofFinite _
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   have htriv : ∀ w ∈ caseA_wComplement caseA,
       (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
         = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by

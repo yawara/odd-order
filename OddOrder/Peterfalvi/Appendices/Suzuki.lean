@@ -20,6 +20,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)

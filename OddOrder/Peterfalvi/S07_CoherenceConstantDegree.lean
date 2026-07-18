@@ -62,6 +62,7 @@ omit [Invertible (Nat.card G : ℂ)] in
   simp [pairExtension]
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] in
 /-- `χ ↦ ε·μ` (uses `‖χ‖² = 1`, `χ ⊥ χ̄`). -/
 theorem pairExtension_chi {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
@@ -70,6 +71,7 @@ theorem pairExtension_chi {τ : IntegralCharacterMap L G} {χ : ClassFunction L 
   rw [pairExtension_apply, hχχ, hortho, one_smul, zero_smul, add_zero]
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] in
 /-- `χ̄ ↦ ε·ν` (uses `‖χ̄‖² = 1`, `χ̄ ⊥ χ`). -/
 theorem pairExtension_chiConj {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)

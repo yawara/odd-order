@@ -151,6 +151,7 @@ theorem average_mem_center : average k G ∈ Subalgebra.center k (MonoidAlgebra 
 
 variable {N : ℕ} (φ : Subalgebra.center k (MonoidAlgebra k G) ≃ₐ[k] (Fin N → k))
 
+omit [Finite G] in
 /-- **The trivial primitive central idempotent is the averaging idempotent.**  If `i₀` is the
 augmentation coordinate (`φ z i₀ = aug z` for all `z`), then `φ.symm (Pi.single i₀ 1) = average`.
 Proof: writing `a := ⟨average, _⟩ ∈ Z`, `a · ε_{i₀} = average` (since `aug ε_{i₀} = 1`), so
@@ -218,6 +219,7 @@ theorem range_centerProj_aug_eq_invariants {W : Type*} [AddCommGroup W] [Module 
 
 omit [Finite G] in
 omit [Invertible (Fintype.card G : k)] in
+omit [Fintype G] in
 /-- The augmentation coordinate `i₀` is fixed by every `simplesAction φ α` (it is *the* trivial
 simple).  Proof: applying `aug` to `centerRep_apply_symm_single` and using `aug`-invariance of
 `centerRep` (`aug_centerRep`) shows the idempotent at `simplesAction φ α i₀` has augmentation `1`,
@@ -233,6 +235,7 @@ theorem simplesAction_fixed_of_aug {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug
   exact zero_ne_one key
 
 omit [Finite G] in
+omit [Invertible (Fintype.card G : k)] in
 /-- **The augmentation coordinate exists** (the trivial simple).  There is `i₀ : Fin N` with
 `φ z i₀ = aug z` for every `z` — the augmentation read through the splitting — and it is fixed by
 every `simplesAction φ α`.  This is the simple whose isotypic component is the `G`-invariants

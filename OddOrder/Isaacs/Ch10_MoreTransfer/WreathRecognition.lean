@@ -267,6 +267,7 @@ theorem card_commutator_eq_of_elementaryAbelian_normalClosure_index_prime
     Nat.card (_root_.commutator P) = p ^ (t - 1) :=
   (lemma103_core hP hidx hEA ht hcard hgen).2.2
 
+omit [Finite P] in
 /-- **Isaacs Lemma 10.3(b), elementary abelian**: under the Lemma 10.3
 hypotheses, `P'` is elementary abelian (being a subgroup of `A`). -/
 theorem isElementaryAbelian_commutator_of_elementaryAbelian_normalClosure_index_prime
@@ -435,6 +436,7 @@ private lemma mem_of_isConj_of_mem_normal {A : Subgroup P} [A.Normal] {a b : P}
   obtain ⟨c, hc⟩ := isConj_iff.mp hab
   exact hc ▸ ‹A.Normal›.conj_mem a haA c
 
+omit hp in
 /-- Pairwise commutation (in the form required by `Finset.noncommProd`) of the
 conjugacy class of an element of an elementary abelian normal subgroup: all
 conjugates lie in the subgroup, which is abelian. This discharges the `comm`
@@ -494,6 +496,7 @@ private lemma orderOf_mk_eq_of_notMem {A : Subgroup P} [A.Normal]
   · exact absurd (orderOf_eq_one_iff.mp h1) hne
   · exact h
 
+omit [Finite P] in
 /-- For `u ∉ A` with `A` normal of prime index `p`: `u ^ k ∈ A ↔ p ∣ k`. -/
 private lemma pow_mem_iff_dvd {A : Subgroup P} [A.Normal]
     (hidx : A.index = p) {u : P} (hu : u ∉ A) (k : ℕ) :

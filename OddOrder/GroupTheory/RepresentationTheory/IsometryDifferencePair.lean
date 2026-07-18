@@ -1051,13 +1051,14 @@ If the anchors differ, the shift `c = ν_0 − ν'_0` has `‖c‖² = 2`, and e
 products of irreducible characters lie in `{0, 1}`.  With equal anchors the differences pin
 every member. -/
 theorem irreducibleCharacterFamily_eq_of_difference_eq
-    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Finite G] [Invertible (Nat.card G : ℂ)]
     {n : ℕ} [NeZero n] (hn : 2 ≤ n)
     (ν ν' : Fin n → IrreducibleCharacter G)
     (hinj' : Function.Injective ν')
     (hdiff : ∀ i, (ν i : ClassFunction G ℂ) - (ν 0 : ClassFunction G ℂ)
       = (ν' i : ClassFunction G ℂ) - (ν' 0 : ClassFunction G ℂ)) :
     ∀ i, ν i = ν' i := by
+  haveI : Fintype G := Fintype.ofFinite G
   classical
   have hanchor : ν 0 = ν' 0 := by
     by_contra h0

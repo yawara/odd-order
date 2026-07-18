@@ -253,10 +253,11 @@ open scoped commutatorElement in
 `H` (`induce_apply_eq_zero_of_not_mem_normal`).  (The regular character of `K/H`, inflated, is
 `[K:H]` on `H` and `0` off `H`.)  Feeds the linear (`H'`-kernel) part of the Peterfalvi (12.5)
 `DpsiH` decomposition — the piece `∑_{θ ∈ Irr(H/H'), θ ≠ 1} θ` vanishing on `H − H'`. -/
-theorem sum_linearClassFunction_apply_eq_zero_of_not_mem_normal [Finite K] [Fintype K]
+theorem sum_linearClassFunction_apply_eq_zero_of_not_mem_normal [Finite K]
     [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
     [Fintype ((K ⧸ H) →* ℂˣ)] (hab : ∀ x y : K, ⁅x, y⁆ ∈ H) {g : K} (hg : g ∉ H) :
     (∑ β : (K ⧸ H) →* ℂˣ, linearClassFunction (β.comp (QuotientGroup.mk' H))) g = 0 := by
+  haveI : Fintype K := Fintype.ofFinite K
   rw [← induce_trivial_eq_sum_linearClassFunction hab]
   exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal H (trivialClassFunction ↥H) hg
 

@@ -956,6 +956,7 @@ private theorem classFunction_finset_sum_apply {ι : Type*} (s : Finset ι)
 
 open scoped Classical in
 omit [Fintype ↥L] in
+omit [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Peterfalvi (2.6.b).**  The complex Dade map preserves virtual characters:
 `τ : ℤ[Irr L, A] → ℤ[Irr G]`.
 

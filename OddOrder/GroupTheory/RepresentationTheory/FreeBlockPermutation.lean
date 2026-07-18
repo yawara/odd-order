@@ -95,13 +95,15 @@ private theorem mem_invariants_iff (v : V) :
 variable {ρ H}
 
 omit [Finite ↥H] in
+omit [Fintype ι] in
 /-- **Component-transport law.** If `v` is `H`-invariant, its `(h • i)`-component is the image
 under `ρ h` of its `i`-component. -/
-private theorem proj_smul_of_mem_invariants (hW : DirectSum.IsInternal W)
+private theorem proj_smul_of_mem_invariants [Finite ι] (hW : DirectSum.IsInternal W)
     (hperm : ∀ (h : ↥H) (i : ι), (W i).map (ρ (h : G)) = W (h • i))
     {v : V} (hv : v ∈ Representation.invariants (ρ.comp H.subtype)) (h : ↥H) (i : ι) :
     proj hW (h • i) v = ρ (h : G) (proj hW i v) := by
   classical
+  haveI : Fintype ι := Fintype.ofFinite ι
   -- `ρ h v = v`, and applying `ρ h` to the decomposition reshuffles the blocks.
   have hvfix : ρ (h : G) v = v := (mem_invariants_iff ρ H v).1 hv h
   -- The reshuffled decomposition: `v = ∑ j, ρ h (proj hW j v)`, with the `j`-term in block `h•j`.
@@ -162,9 +164,10 @@ private theorem mem_orbit_out_of_mk (i : ι) :
   rwa [MulAction.orbitRel.Quotient.orbit_eq_orbit_out _ Quotient.out_eq'] at h1
 
 omit [Finite ↥H] in
+omit [Fintype ι] [DecidableEq ι] in
 /-- **Free + finite orbit partition.**  The map `(o, h) ↦ h • o.out` is a bijection from
 `Ω × H` (with `Ω` the set of `H`-orbits) onto `ι`. -/
-private theorem orbitProdEquiv_bijective [Fintype ↥H]
+private theorem orbitProdEquiv_bijective [Finite ↥H]
     (hfree : ∀ (h : ↥H) (i : ι), h • i = i → h = 1) :
     Function.Bijective
       (fun p : (Σ _ : MulAction.orbitRel.Quotient ↥H ι, ↥H) => p.2 • (p.1.out : ι)) := by
@@ -191,6 +194,7 @@ private theorem orbitProdEquiv_bijective [Fintype ↥H]
     obtain ⟨h, hh⟩ := MulAction.mem_orbit_iff.1 (mem_orbit_out_of_mk (H := H) i)
     exact ⟨⟨Quotient.mk'' i, h⟩, hh⟩
 
+omit [Finite ↥H] in
 /-- Summing a function over `ι` regroups as a double sum over orbits and group elements. -/
 private theorem sum_eq_sum_orbit [Fintype ↥H] [Fintype (MulAction.orbitRel.Quotient ↥H ι)]
     (hfree : ∀ (h : ↥H) (i : ι), h • i = i → h = 1)
@@ -212,9 +216,11 @@ private theorem smul_out_ne_out_of_ne {o o' : MulAction.orbitRel.Quotient ↥H �
     rw [Quotient.eq'']; exact (MulAction.orbitRel_apply).2 this
   rwa [Quotient.out_eq', Quotient.out_eq'] at h1
 
+omit [Finite ↥H] in
+omit [Fintype ι] in
 /-- **Per-orbit reduction of the fixed subspace.**  The fixed subspace has dimension equal to the
 sum over orbits of one representative block's dimension. -/
-private theorem finrank_invariants_eq_sum_orbit [FiniteDimensional F V] [Fintype ↥H]
+private theorem finrank_invariants_eq_sum_orbit [FiniteDimensional F V] [Finite ↥H] [Finite ι]
     [Fintype (MulAction.orbitRel.Quotient ↥H ι)]
     (hW : DirectSum.IsInternal W)
     (hfree : ∀ (h : ↥H) (i : ι), h • i = i → h = 1)
@@ -222,6 +228,8 @@ private theorem finrank_invariants_eq_sum_orbit [FiniteDimensional F V] [Fintype
     finrank F (Representation.invariants (ρ.comp H.subtype))
       = ∑ o : MulAction.orbitRel.Quotient ↥H ι, finrank F (W (o.out : ι)) := by
   classical
+  haveI : Fintype ι := Fintype.ofFinite ι
+  haveI : Fintype ↥H := Fintype.ofFinite _
   -- The map `v ↦ (proj o.out v)_o` is a linear iso `Vᴴ ≃ ∏_o W o.out`.
   let β : Representation.invariants (ρ.comp H.subtype) →ₗ[F]
       (∀ o : MulAction.orbitRel.Quotient ↥H ι, ↥(W (o.out : ι))) :=
@@ -281,6 +289,7 @@ private theorem finrank_invariants_eq_sum_orbit [FiniteDimensional F V] [Fintype
 
 end FreeBlockAux
 
+omit [Fintype ι] in
 /-- **Single free orbit: the orbit-sum map is a linear isomorphism onto the fixed subspace.**
 If `H` acts freely and transitively on a finite family of blocks `W` permuted by `ρ`, then for any
 block index `i₀` the map `w ↦ ∑_{h ∈ H} ρ h w` is a linear equivalence from `W i₀` onto the
@@ -288,12 +297,13 @@ block index `i₀` the map `w ↦ ∑_{h ∈ H} ρ h w` is a linear equivalence 
 
 Placeholder: the orbit-sum isomorphism, used to compute the per-orbit fixed dimension. -/
 theorem finrank_invariants_eq_of_isPretransitive_freeBlock
-    [FiniteDimensional F V] (hW : DirectSum.IsInternal W)
+    [Finite ι] [FiniteDimensional F V] (hW : DirectSum.IsInternal W)
     (hfree : ∀ (h : ↥H) (i : ι), h • i = i → h = 1)
     (hperm : ∀ (h : ↥H) (i : ι), (W i).map (ρ (h : G)) = W (h • i))
     [MulAction.IsPretransitive ↥H ι] (i₀ : ι) :
     finrank F (Representation.invariants (ρ.comp H.subtype)) = finrank F (W i₀) := by
   classical
+  haveI : Fintype ι := Fintype.ofFinite ι
   haveI : Fintype ↥H := Fintype.ofFinite _
   -- The orbit map `h ↦ h • i₀` is a bijection `↥H ≃ ι` (free + transitive).
   have hinj : Function.Injective (fun h : ↥H => h • i₀) := by
@@ -357,16 +367,18 @@ theorem finrank_invariants_eq_of_isPretransitive_freeBlock
     rw [ereindex]
     exact FreeBlockAux.sum_proj hW v
 
+omit [Fintype ι] in
 /-- **Free block permutation dimension formula** (BG Theorem 3.10(a) keystone).
 If a finite group `H ≤ G` acts via `ρ` on a finite-dimensional `V = ⨁ᵢ Wᵢ` (internal direct sum),
 permuting the blocks (`ρ h` maps `Wᵢ` onto `W (h • i)`) **freely** on the index set `ι`, then
 `finrank V = |H| · finrank Vᴴ`. -/
 theorem finrank_eq_card_mul_finrank_invariants_of_freeBlock
-    [FiniteDimensional F V] (hW : DirectSum.IsInternal W)
+    [Finite ι] [FiniteDimensional F V] (hW : DirectSum.IsInternal W)
     (hfree : ∀ (h : ↥H) (i : ι), h • i = i → h = 1)
     (hperm : ∀ (h : ↥H) (i : ι), (W i).map (ρ (h : G)) = W (h • i)) :
     finrank F V = Nat.card ↥H * finrank F (Representation.invariants (ρ.comp H.subtype)) := by
   classical
+  haveI : Fintype ι := Fintype.ofFinite ι
   haveI : Fintype ↥H := Fintype.ofFinite _
   haveI : Fintype (MulAction.orbitRel.Quotient ↥H ι) := Fintype.ofFinite _
   -- `finrank V = ∑ i, finrank (W i)` from the internal direct sum.

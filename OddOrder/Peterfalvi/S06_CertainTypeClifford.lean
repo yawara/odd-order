@@ -591,6 +591,7 @@ theorem induce_chiColumnDiff_eq_zero_of_mem_K [NeZero (Nat.card h.W1)]
     have hxW : x⁻¹ * k * x ∈ h.W1 ⊔ h.W2 := hx
     exact h.mem_W2_of_mem_sup_of_mem_K hxW hconjK
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.a), key vanishing**: the signed difference `μ_{ij} − μ_{0j}` of a column
 vanishes on `K`.  It equals `δ_j · Ind_W^L(ω_{ij} − ω_{0j})` (`columnFamily_spec`,
 `isometryDifferenceImage_induceZ`), which vanishes on `K`
@@ -599,6 +600,7 @@ theorem columnFamily_difference_vanishes_on_K [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
     {k : L} (hk : k ∈ h.K) :
     (h.columnFamily χ₂).difference i k = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hsd : (h.columnFamily χ₂).signedDifference i k = 0 := by
     rw [← h.columnFamily_spec χ₂ i, isometryDifferenceImage_induceZ]
     exact h.induce_chiColumnDiff_eq_zero_of_mem_K χ₂ i hk
@@ -608,6 +610,7 @@ theorem columnFamily_difference_vanishes_on_K [NeZero (Nat.card h.W1)]
     rcases (h.columnFamily χ₂).sign_eq with he | he <;> rw [he] <;> norm_num
   exact (mul_eq_zero.mp hsd).resolve_left hs
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.a), independence of `i`**: the restriction `χ_j = Res^L_K μ_{ij}` does
 not depend on the `W₁`-index `i`.  Indeed `μ_{ij} − μ_{0j}` vanishes on `K`
 (`columnFamily_difference_vanishes_on_K`), so `μ_{ij}` and `μ_{0j}` agree on `K`. -/
@@ -615,6 +618,7 @@ theorem restrict_certainType_eq [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ClassFunction.restrict h.K ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
       = ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   ext k
   rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply, ← sub_eq_zero]
   have hdiff := h.columnFamily_difference_vanishes_on_K χ₂ i k.2
@@ -632,6 +636,7 @@ theorem index_K_eq : h.K.index = Nat.card h.W1 := by
 
 variable [Invertible (Nat.card ↥h.K : ℂ)]
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.a), structure of the restriction** (core): there is an irreducible
 character `θ` of `K` equal to the restriction `χ_j = Res^L_K μ_{0j}`, with `Ind^L_K θ = ∑_i μ_{ij}`.
 
@@ -652,6 +657,7 @@ theorem exists_irreducible_restrict_certainType [NeZero (Nat.card h.W1)]
       ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)
           = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
   classical
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   haveI : Fintype ↥h.K := Fintype.ofFinite _
   -- `χ_j = Res^L_K μ_{0j}` is a genuine character
   have hχj_char : IsCharacter
@@ -735,6 +741,7 @@ theorem exists_irreducible_restrict_certainType [NeZero (Nat.card h.W1)]
       (fun i _ => (h.columnFamily χ₂).classFunction_irreducible i) (fun i _ => hθi i) hle2
   rw [hIndeq]
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.a), irreducibility of the restriction**: `χ_j = Res^L_K μ_{0j}` is an
 irreducible character of `K` (the first half of `exists_irreducible_restrict_certainType`). -/
 theorem certainTypeRestrict_isIrreducible [NeZero (Nat.card h.W1)]
@@ -745,6 +752,7 @@ theorem certainTypeRestrict_isIrreducible [NeZero (Nat.card h.W1)]
   rw [hχj_eq]
   exact θ.isIrreducible
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.a), `Ind^L_K χ_j = μ_j`**: the induction of the (irreducible) restriction
 `χ_j = Res^L_K μ_{0j}` is the column sum `μ_j = ∑_i μ_{ij}` (the second half of
 `exists_irreducible_restrict_certainType`, with `χ_j = θ`). -/
@@ -786,12 +794,14 @@ noncomputable def chiRestrict [NeZero (Nat.card h.W1)]
   ⟨ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ),
    h.certainTypeRestrict_isIrreducible χ₂⟩
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 @[simp] theorem coe_chiRestrict [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)
       = ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) :=
   rfl
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **`χ_j` is fixed by every `g ∈ L`** (in particular `g ∈ W₁^#`): it is the restriction of the
 `L`-character `μ_{0j}`, so conjugation by any `g ∈ L` fixes it (`conjBy_restrict`). -/
 theorem chiRestrict_isFixedPt [NeZero (Nat.card h.W1)]
@@ -886,6 +896,7 @@ theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
   obtain ⟨χ₂, hχ₂⟩ := hbij.surjective ⟨χ, hfix⟩
   exact ⟨χ₂, Subtype.ext_iff.mp hχ₂⟩
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **The reducible-inducing column `chiRestrict χ₂` is `L`-invariant** (issue 1012, W₁-stability for
 (9.9.b)): `chiRestrict χ₂ = Res_K μ` is the restriction of the `L`-character
 `μ = (columnFamily χ₂).mu 0`
@@ -956,6 +967,7 @@ theorem induce_isIrreducible_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
   exact isIrreducibleCharacter_induce_of_inertia_eq χ
     (h.inertia_eq_K_of_forall_chiRestrict_ne hχ)
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.b), `Ind^L_K χ ≠ μ_{ij}`**: for `χ` not among the `χ_j`, the irreducible
 `Ind^L_K χ` is distinct from every certain-type character.  By Frobenius reciprocity
 `⟨Ind^L_K χ, μ_{ij}⟩ = ⟨χ, Res^L_K μ_{ij}⟩ = ⟨χ, χ_j⟩ = 0` (`restrict_certainType_eq`, `χ ≠ χ_j`),
@@ -1026,6 +1038,7 @@ the induction family `{Ind^L_K χ : χ ∈ Irr(K)}` are exactly the `w₂` chara
 giving the count behind Peterfalvi (9.9.b)/(9.8.b) ("`𝒮(H₀)` contains exactly `p − 1` reducible
 characters", with `w₂ = p` and the trivial column `j = 0` removed by the `H̄`-nontriviality). -/
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.b), the `μ_j` are reducible**: `Ind^L_K χ_j = μ_j = ∑_i μ_{ij}` is *not*
 irreducible.  It equals the sum of the `w₁ ≥ 2` distinct irreducibles `μ_{ij}`
 (`induce_restrict_certainType_eq`, `columnFamily.injective`, `one_lt_card_W1`); an irreducible

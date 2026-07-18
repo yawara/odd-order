@@ -819,10 +819,11 @@ omit [Invertible (Nat.card G : ℂ)] in
 /-- **Restriction of the induced trivial character to a normal `H`**: `Res_H Ind_H^G 1_H = [G:H]•1_H`.
 Every `G`-conjugate of `h ∈ H` stays in `H` (normality), so `Ind_H^G 1_H` is the constant `[G:H]` on
 `H` (`induce_apply_of_mem_normal_of_const`). -/
-theorem restrict_induce_trivial (H : Subgroup G) [Fintype ↥H] [H.Normal]
+theorem restrict_induce_trivial (H : Subgroup G) [Finite ↥H] [H.Normal]
     [Invertible (Nat.card ↥H : ℂ)] :
     ClassFunction.restrict H (induce H (trivialClassFunction ↥H))
       = (H.index : ℂ) • trivialClassFunction ↥H := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   ext h
   rw [ClassFunction.restrict_apply, ClassFunction.smul_apply, trivialClassFunction_apply, mul_one,
     induce_apply_of_mem_normal_of_const (le_refl H) (trivialClassFunction ↥H)
@@ -834,10 +835,11 @@ theorem restrict_induce_trivial (H : Subgroup G) [Fintype ↥H] [H.Normal]
 /-- **Norm of the induced trivial character** `⟨Ind_H^G 1_H, Ind_H^G 1_H⟩ = [G : H]` for a normal
 `H ⊴ G` (`restrict_induce_trivial` + `⟨1_H, 1_H⟩ = 1`).  For `H ⊴ L` Frobenius this is Peterfalvi's
 `⟨Ind 1_H, Ind 1_H⟩ = e`, the source-side norm behind the (7.8.b) computation `‖β‖² = e + 1`. -/
-theorem induce_trivial_inner_self (H : Subgroup G) [Fintype ↥H] [H.Normal]
+theorem induce_trivial_inner_self (H : Subgroup G) [Finite ↥H] [H.Normal]
     [Invertible (Nat.card ↥H : ℂ)] :
     ClassFunction.inner (induce H (trivialClassFunction ↥H))
         (induce H (trivialClassFunction ↥H)) = (H.index : ℂ) := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   rw [inner_induce_eq_inner_restrict, restrict_induce_trivial, inner_smul_right, star_natCast,
     OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
       trivialClassFunction_isIrreducible, if_pos rfl, mul_one]
@@ -854,10 +856,11 @@ theorem induce_inner_induce_trivial (H : Subgroup G) [Fintype ↥H] [H.Normal]
 computation): for a normal `H` and an irreducible `φ ≠ 1_H`, the induced character `Ind_H^G φ` is
 orthogonal to the induced principal character `Ind_H^G 1_H`.  Immediate from
 `induce_inner_induce_trivial` and `⟨φ, 1_H⟩ = 0`. -/
-theorem induce_inner_induce_trivial_eq_zero_of_irreducible (H : Subgroup G) [Fintype ↥H] [H.Normal]
+theorem induce_inner_induce_trivial_eq_zero_of_irreducible (H : Subgroup G) [Finite ↥H] [H.Normal]
     [Invertible (Nat.card ↥H : ℂ)] {φ : ClassFunction ↥H ℂ} (hφ : IsIrreducibleCharacter φ)
     (hφ1 : φ ≠ trivialClassFunction ↥H) :
     ClassFunction.inner (induce H φ) (induce H (trivialClassFunction ↥H)) = 0 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   rw [induce_inner_induce_trivial,
     OddOrder.RepresentationTheory.irr_cf_inner hφ trivialClassFunction_isIrreducible, if_neg hφ1,
     mul_zero]

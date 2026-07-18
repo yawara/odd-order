@@ -270,7 +270,7 @@ theorem hcuZetaPair_liesOver_hInHu [Finite G] {M : Subgroup G}
         = hcuSeedHom (chief := chief) θ h)
     (lam : ↥(cuInHu caseA) →* ℂˣ)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Fintype ↥(hInHu data)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
@@ -286,6 +286,7 @@ theorem hcuZetaPair_liesOver_hInHu [Finite G] {M : Subgroup G}
       (linearIrreducibleCharacter ((θ.comp ((QuotientGroup.mk' chief.N).comp
         (hInHuEquivH data).toMonoidHom)))) := by
   classical
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   haveI : Fintype ↥((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)) := Fintype.ofFinite _
   haveI : Invertible (Nat.card ↥((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')

@@ -534,6 +534,7 @@ noncomputable def columnFamily [NeZero (Nat.card h.W1)]
     SignedIrreducibleDifferenceFamily L (Nat.card h.W1) :=
   (h.exists_columnSignedFamily χ₂).choose
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 theorem columnFamily_spec [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     isometryDifferenceImage h.induceZ (h.chiColumn χ₂) i =
@@ -567,11 +568,13 @@ theorem image_apply_one_eq_zero [NeZero (Nat.card h.W1)]
     ClassFunction.sub_apply, h.chiColumn_apply_one χ₂ i, h.chiColumn_apply_one χ₂ 0,
     sub_self, mul_zero]
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- The signed differences `μ_{ij} − μ_{0j}` of the column family vanish at `1`
 (same degree within a column), since the (1.4) image does and `δ_j ≠ 0`. -/
 theorem columnFamily_difference_apply_one [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     (h.columnFamily χ₂).difference i (1 : L) = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have h0 : (h.columnFamily χ₂).signedDifference i (1 : L) = 0 := by
     rw [← h.columnFamily_spec χ₂ i]; exact h.image_apply_one_eq_zero χ₂ i
   rw [SignedIrreducibleDifferenceFamily.signedDifference_apply, ClassFunction.zsmul_apply,
@@ -580,6 +583,7 @@ theorem columnFamily_difference_apply_one [NeZero (Nat.card h.W1)]
     rcases (h.columnFamily χ₂).sign_eq with he | he <;> rw [he] <;> norm_num
   exact (mul_eq_zero.mp h0).resolve_left hs
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Cross-column orthogonality of the `μ`-differences** (4.3.b proof step): for `χ₂ ≠ χ₂'`,
 `(μ_{ij} − μ_{0j}, μ_{i'j'} − μ_{0j'}) = 0`.  From the (1.4)-image cross orthogonality
 (`ind_cross_inner_eq_zero`) after removing both signs `δ_j, δ_{j'} = ±1`. -/
@@ -588,6 +592,7 @@ theorem columnFamily_difference_cross_inner_eq_zero [NeZero (Nat.card h.W1)]
     (i i' : Fin (Nat.card h.W1)) :
     ClassFunction.inner ((h.columnFamily χ₂).difference i)
       ((h.columnFamily χ₂').difference i') = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have h0 := h.ind_cross_inner_eq_zero hne i i'
   rw [h.columnFamily_spec χ₂ i, h.columnFamily_spec χ₂' i',
     SignedIrreducibleDifferenceFamily.signedDifference_apply,
@@ -602,6 +607,7 @@ theorem columnFamily_difference_cross_inner_eq_zero [NeZero (Nat.card h.W1)]
     rcases (h.columnFamily χ₂').sign_eq with he | he <;> rw [he] <;> norm_num
   exact (mul_eq_zero.mp ((mul_eq_zero.mp h0).resolve_left hs)).resolve_left hs'
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **The four cross inner products vanish** (4.3.b proof step, via (4.1)).  For `χ₂ ≠ χ₂'`
 and nonzero `k, k'`, the signed differences `μ_{kj} − μ_{0j}` and `μ_{k'j'} − μ_{0j'}` are
 orthogonal (`columnFamily_difference_cross_inner_eq_zero`) and vanish at `1`
@@ -619,6 +625,7 @@ theorem columnFamily_cross_products_zero [NeZero (Nat.card h.W1)]
         ((h.columnFamily χ₂').mu k' : ClassFunction L ℂ) = 0 ∧
       ClassFunction.inner ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
         ((h.columnFamily χ₂').mu 0 : ClassFunction L ℂ) = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hself : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1)) (m : Fin (Nat.card
       h.W1)),
       ClassFunction.inner (d.mu m : ClassFunction L ℂ) (d.mu m : ClassFunction L ℂ) = 1 := by
@@ -644,6 +651,7 @@ theorem columnFamily_cross_products_zero [NeZero (Nat.card h.W1)]
     simp only [Complex.ofReal_one, one_smul]
     exact h.columnFamily_difference_apply_one χ₂' k'
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.3.b), cross-column distinctness**: certain-type characters from
 different `W₂`-columns are distinct — `μ_{ij} ≠ μ_{i'j'}` for `χ₂ ≠ χ₂'` and any `i, i'`.
 By `columnFamily_cross_products_zero` (the four cross inner products vanish, via (4.1)),
@@ -653,6 +661,7 @@ theorem columnFamily_mu_ne [NeZero (Nat.card h.W1)]
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
     (i i' : Fin (Nat.card h.W1)) :
     (h.columnFamily χ₂).mu i ≠ (h.columnFamily χ₂').mu i' := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hz : (⟨1, h.one_lt_card_W1⟩ : Fin (Nat.card h.W1)) ≠ 0 := Fin.ne_of_val_ne (by simp)
   have hinner : ClassFunction.inner ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
       ((h.columnFamily χ₂').mu i' : ClassFunction L ℂ) = 0 := by
@@ -690,6 +699,7 @@ theorem omegaColumnDiff_linearIndependent :
   · simp only [LinearMap.comp_apply, Submodule.subtype_apply, innerDual_apply, omegaColumnDiff_coe]
     exact omegaColumnDiff_inner_omega_self h.sdiffTICyclicHypothesis p.1.2 p.2
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.3.b), all certain-type characters distinct**: the global family
 `(χ₂, i) ↦ μ_{ij}` is injective.  Within a column by the (1.4) `injective` field;
 across columns by `columnFamily_mu_ne`. -/
@@ -697,6 +707,7 @@ theorem columnFamily_mu_injective [NeZero (Nat.card h.W1)] :
     Function.Injective
       (fun p : ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) × Fin (Nat.card h.W1) =>
         (h.columnFamily p.1).mu p.2) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rintro ⟨χ₂, i⟩ ⟨χ₂', i'⟩ heq
   by_cases hχ : χ₂ = χ₂'
   · subst hχ
@@ -735,6 +746,7 @@ theorem card_supportInSubgroup_sdiff :
   rw [hcompl, hsub, hW, hW2, Nat.sub_one_mul]
 
 omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] in
+omit [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] in
 /-- `dim_ℂ CF(W, W − W₂) = (w₁ − 1)·w₂`, the dimension behind the `ω_{ij} − ω_{0j}` basis. -/
 theorem finrank_sdiffSupported :
     Module.finrank ℂ (TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis)
@@ -777,6 +789,7 @@ noncomputable def omegaColumnDiffBasis :
     rw [← Nat.card_eq_fintype_card, hc2]
   rw [e1, e2]
 
+omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- The `ω_{ij} − ω_{0j}` basis evaluated at an index pair `⟨k, l⟩` is the column difference
 `ω_{kl} − ω_{0l}` (`coe_basisOfLinearIndependentOfCardEqFinrank` on the family of
 `omegaColumnDiff_linearIndependent`). -/
@@ -809,6 +822,7 @@ theorem chiColumn_w1CharEquiv_symm [NeZero (Nat.card h.W1)]
       = h.sdiffTICyclicHypothesis.omega (h.sdiffTICyclicHypothesis.omegaProdChar k l) := by
   rw [chiColumn, Equiv.apply_symm_apply]
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **The (1.4) image of a basis vector** `ω_{kl} − ω_{0l}` is the column-`l` signed
 difference at index `e⁻¹ k`: `Ind_W^L(ω_{kl} − ω_{0l}) = (columnFamily l).signedDifference (e⁻¹ k)`. -/
 theorem induce_omegaColumnDiff_eq [NeZero (Nat.card h.W1)]
@@ -817,6 +831,7 @@ theorem induce_omegaColumnDiff_eq [NeZero (Nat.card h.W1)]
     ClassFunction.induce h.sdiffTICyclicHypothesis.W
         (h.omegaColumnDiff k 1 l : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
       = (h.columnFamily l).signedDifference (h.w1CharEquiv.symm k) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hval : (h.omegaColumnDiff k 1 l : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
       = (h.chiColumn l (h.w1CharEquiv.symm k) : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
         - (h.chiColumn l 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
@@ -932,14 +947,16 @@ theorem apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
     simpa using this
   · rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hv
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Step 4, the (1.3) masking.**  The certain-type difference `g = Res_W(δ_j·μ_{ij}) − ω_{ij}`
 vanishes on the TI set `W − W₂` — `g ⊥` the `ω_{kl} − ω_{0l}` basis
 (`certainTypeRestrictDiff_inner_basis`) feeds the masking engine. -/
 theorem certainTypeRestrictDiff_apply_eq_zero_of_mem_V [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
     {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
-    h.certainTypeRestrictDiff χ₂ i ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ = 0 :=
-  h.apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
+    h.certainTypeRestrictDiff χ₂ i ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  exact h.apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
     (fun l k => h.certainTypeRestrictDiff_inner_basis χ₂ i l k) hv
 
 /-- The canonical (3.1)-for-`L` Dade application of (4.3)(a): the §4 Dade package (2.6) on the
@@ -984,6 +1001,7 @@ theorem sigma_chiColumn_eq_certainType [NeZero (Nat.card h.W1)]
       ClassFunction.restrict_apply] at hg
     exact hg
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.3.c), first part** (the value identity).  For `x ∈ W − W₂`,
 `μ_{ij}(x) = δ_j·ω_{ij}(x)`.  This is the (1.3) value-match
 `certainTypeRestrictDiff_apply_eq_zero_of_mem_V` (`δ_j·μ_{ij}(x) = ω_{ij}(x)`) multiplied by
@@ -995,6 +1013,7 @@ theorem certainType_apply_eq_of_mem_V [NeZero (Nat.card h.W1)]
       = ((h.columnFamily χ₂).sign : ℂ)
         * (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
             ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hg := h.certainTypeRestrictDiff_apply_eq_zero_of_mem_V χ₂ i hv
   rw [certainTypeRestrictDiff, ClassFunction.sub_apply, sub_eq_zero,
     ClassFunction.restrict_apply, ClassFunction.zsmul_apply, zsmul_eq_mul] at hg
@@ -1024,6 +1043,7 @@ theorem inner_omegaColumnDiff_restrict_eq_zero [NeZero (Nat.card h.W1)]
     if_neg (hμ l (h.w1CharEquiv.symm k)), if_neg (hμ l 0)]
   ring
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.3.c), second part** (completeness).  Every irreducible character `μ` of `L`
 that is not one of the certain-type characters `μ_{ij}` vanishes on `W − W₂`.  `Res_W μ` is
 orthogonal to the `ω_{kl} − ω_{0l}` basis of `CF(W, W − W₂)`
@@ -1034,11 +1054,13 @@ theorem certainType_vanishes_of_ne [NeZero (Nat.card h.W1)]
       (i : Fin (Nat.card h.W1)), (h.columnFamily χ₂).mu i ≠ μ)
     {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
     (μ : ClassFunction L ℂ) v = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hres := h.apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
     (f := ClassFunction.restrict h.sdiffTICyclicHypothesis.W (μ : ClassFunction L ℂ))
     (fun l k => h.inner_omegaColumnDiff_restrict_eq_zero hμ l k) hv
   rwa [ClassFunction.restrict_apply] at hres
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.3.d)** (the degree congruence).  `μ_{ij}(1) ≡ δ_j (mod w₁)`: there is an
 integer `a` with `μ_{ij}(1) = δ_j + a·w₁`.
 
@@ -1051,6 +1073,7 @@ theorem certainType_degree_modEq [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ∃ a : ℤ, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) 1
       = ((h.columnFamily χ₂).sign : ℂ) + (Nat.card h.W1 : ℂ) * (a : ℂ) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   haveI : Finite L := Finite.of_fintype L
   haveI : Fintype ↥(h.W1.subgroupOf h.sdiffTICyclicHypothesis.W) := Fintype.ofFinite _
@@ -1121,6 +1144,7 @@ theorem chiColumn_one_zero_eq_trivial [NeZero (Nat.card h.W1)] :
     rw [h.w1CharEquiv_zero, MonoidHom.one_apply, MonoidHom.one_apply, one_mul]
   rw [hv, Units.val_one]
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.4), the `(0,0)` anchor**: `δ_0 = 1` and `μ_{00} = 1_L`.  The (4.3.b)
 σ-identification sends the trivial character `ω_{00} = 1_W` to `δ_0·μ_{00}`, while `σ` fixes the
 trivial character (`sigma_trivial`), so `δ_0·μ_{00} = 1_L`.  Pairing with `1_L` (irreducible)
@@ -1128,6 +1152,7 @@ forces the multiplicity `⟨μ_{00}, 1_L⟩ = 1`, i.e. `μ_{00} = 1_L`, and then
 theorem certainType_zero_column_anchor [NeZero (Nat.card h.W1)] :
     (h.columnFamily 1).sign = 1 ∧
       ((h.columnFamily 1).mu 0 : ClassFunction L ℂ) = trivialClassFunction L := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   set oneIrr : IrreducibleCharacter L :=
     ⟨trivialClassFunction L, trivialClassFunction_isIrreducible⟩ with honeIrr
@@ -1161,6 +1186,7 @@ theorem certainType_zero_column_anchor [NeZero (Nat.card h.W1)] :
 
 /-! ### Peterfalvi (4.4): the `j = 0` certain-type characters are the `K`-trivial ones -/
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.4), forward direction.**  An irreducible character `χ` of `L` whose kernel
 contains `K` is one of the `j = 0` certain-type characters `μ_{i0}`.
 
@@ -1176,6 +1202,7 @@ theorem exists_certainType_zero_column_eq_of_subset_characterKernel [NeZero (Nat
     (hker : (h.K : Set L) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction L ℂ)) :
     ∃ i, (h.columnFamily 1).mu i = χ := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   haveI := h.isMulCommutative_quotient_K
   -- (1) `χ` is linear: `χ(1) = 1`, since `χ` inflates from the abelian quotient `L/K`.
@@ -1245,6 +1272,7 @@ theorem exists_certainType_zero_column_eq_of_subset_characterKernel [NeZero (Nat
     at heqsigma
   exact Subtype.ext heqsigma.symm
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.4), converse direction.**  Each `j = 0` certain-type character `μ_{i0}` has
 `K` in its kernel.  By the forward direction every `K`-trivial irreducible is some `μ_{k0}`, so
 inflation `Irr(L/K) → Fin w₁`, `χ̄ ↦ (the k with μ_{k0} = inflate χ̄)`, is injective; as both
@@ -1254,6 +1282,7 @@ theorem subset_characterKernel_certainType_zero_column [NeZero (Nat.card h.W1)]
     (i : Fin (Nat.card h.W1)) :
     (h.K : Set L) ⊆ OddOrder.Peterfalvi.S03.characterKernel
       ((h.columnFamily 1).mu i : ClassFunction L ℂ) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   -- every inflation `inflate χ̄` is `K`-trivial, hence some `μ_{k0}` (forward direction)
   have hPsi : ∀ χbar : IrreducibleCharacter (L ⧸ h.K),
@@ -1275,13 +1304,15 @@ theorem subset_characterKernel_certainType_zero_column [NeZero (Nat.card h.W1)]
       from congrArg (fun c : IrreducibleCharacter L => (c : ClassFunction L ℂ)) hμi]
   exact subset_characterKernel_inflate (N := h.K) χbar
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.4)** (full characterization): the irreducible characters of `L` whose kernel
 contains `K` are exactly the `j = 0` certain-type characters `μ_{i0}`. -/
 theorem subset_characterKernel_iff_eq_certainType_zero_column [NeZero (Nat.card h.W1)]
     (χ : IrreducibleCharacter L) :
     (h.K : Set L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction L ℂ)
-      ↔ ∃ i, (h.columnFamily 1).mu i = χ :=
-  ⟨h.exists_certainType_zero_column_eq_of_subset_characterKernel χ,
+      ↔ ∃ i, (h.columnFamily 1).mu i = χ := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  exact ⟨h.exists_certainType_zero_column_eq_of_subset_characterKernel χ,
     fun ⟨i, hi⟩ => hi ▸ h.subset_characterKernel_certainType_zero_column i⟩
 
 end Recipe
