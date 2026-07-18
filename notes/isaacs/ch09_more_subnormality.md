@@ -479,19 +479,29 @@ action は `MulAut G` / `ConjAct G` 経由。要 `import Mathlib.Algebra.Group.S
 `sInf` 版の `subnormalClosure` を別に構成する必要はない (「subnormal の共通部分は
 subnormal」の一般族版が mathlib に無い — binary `IsSubnormal.inf` のみ — 問題を回避できる)。
 
-### 9.30 着手時の API メモ (2026-07-19、次 iteration 向け)
+### 9.30 完了 (2026-07-19) — 旧 API メモは解決済
 
-9.30 の easy direction (`f(X^{(G)}) ≤ f(X)^{(H)}`) を書きかけたが、
-`(ConjAct.toConjAct g • X).map f = ConjAct.toConjAct (f g) • (X.map f)` の
-段で pointwise API に手間取ったため未 landing (作業は破棄、tree は green)。
-
-**次回の推奨経路** (ext + simp で押すのは非効率だった):
+**Lem 9.30 は 2026-07-19 に両方向とも landing** (`strongClosure_map`)。
+記録しておいた経路がそのまま当たったので以下は解決済の手順として残す:
 1. まず補題 `ConjAct.toConjAct g • X = X.map (MulAut.conj g).toMonoidHom` を立てる。
 2. すると目的の等式は `Subgroup.map_map` 2 回 + 準同型の合成等式
    `f.comp (MulAut.conj g).toMonoidHom = (MulAut.conj (f g)).toMonoidHom.comp f`
    (`ext x; simp` で出る) に落ちる。
 3. `strongClosure_map_le` は `Subgroup.map_le_iff_le_comap` + `sSup_le` で 5 行。
 
-hard direction (全射 `f` での逆包含) は `⟨X, Y⟩` の位数最小性を使う書籍 p.291 後半の議論。
-`𝒴 = {Y | Y は X の共役 かつ f(Y) = 与えられた強共役}` から `Nat.card ↥(X ⊔ Y)` 最小の
-元を選ぶ (`Finset.exists_min_image` 等) のが要。
+hard direction (`exists_isStronglyConjugate_map_eq`) は書籍 p.291 後半どおり
+`𝒴 = {Y | Y は X の共役 かつ f(Y) = Z}` から `Nat.card ↥(X ⊔ Y)` 最小の元を選ぶ。
+**最小元の取り方は `Finset` でなく ℕ の整列性**が簡単だった:
+`S = {n | ∃ Y ∈ 𝒴, Nat.card ↥(X ⊔ Y) = n}` に対し `Nat.sInf_mem` / `Nat.sInf_le`
+(`Finite (Subgroup G)` インスタンスを要求しないで済む)。
+最小性と `X ⊔ Y' ≤ X ⊔ Y` から等号を出すのは `Subgroup.eq_of_le_of_card_ge`
+(要 `import Mathlib.Algebra.Group.Subgroup.Finite`)。
+
+### §9D 残り = 9.28 Bartels のみ
+
+`X^{(G)} = X^{••G}`。**述べ方**: `IsLeast {S | X ≤ S ∧ S.IsSubnormal} (strongClosure X)` に
+すれば subnormal closure の存在も同時に得られ、「subnormal の共通部分は subnormal」の
+一般族版 (mathlib は binary `IsSubnormal.inf` のみ) を作らずに済む。
+`≥` 側 (`X^{(G)} ≤ S` for all subnormal `S ⊇ X`) は **9.29(a) で既に済んでいる**ので、
+残る本体は **`strongClosure X` 自身が subnormal** の証明 = 書籍 p.291-292 の
+二重最小反例 (|G| 最小、次いで |X| 最小) + Step 1-6。道具は 9.29(a)-(d) / 9.30 / 9.31 が揃った。

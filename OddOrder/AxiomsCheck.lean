@@ -1162,6 +1162,11 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_le
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_strongClosure
 
+-- Ch.9 §9D: **Lem 9.30** — 全射準同型 f に対し f(X^{(G)}) = f(X)^{(image)}。
+-- (書籍は N ⊴ G / Ḡ = G/N の形。hard direction は ⟨X, Y⟩ の位数最小性を使う。)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_map
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_isStronglyConjugate_map_eq
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms
