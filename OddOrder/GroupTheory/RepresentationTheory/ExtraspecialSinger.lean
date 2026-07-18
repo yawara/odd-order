@@ -299,9 +299,9 @@ generic `OddOrder.RepresentationTheory.card_dvd_sub_one_of_faithful_line` of `Li
 
 open OddOrder.BG.Ch1_Preliminary
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply)
-open scoped IsMulCommutative in
 set_option maxHeartbeats 1600000 in
 -- raised heartbeat budget for the heavy elaboration below
+open scoped IsMulCommutative in
 /-- **Route B (BG Theorem 15.7(e), disjunct 3): `|K| ∣ p + 1`.**
 
 A cyclic `p'`-group `K` (`p` odd) acting on an extraspecial group `P` of order `p³` with the

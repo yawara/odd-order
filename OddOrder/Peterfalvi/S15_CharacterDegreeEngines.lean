@@ -61,12 +61,12 @@ theorem Q_sharp_hypothesis76_base_zeta_zero [Fintype G] [Invertible (Nat.card G 
   unfold Q_sharp_hypothesis76_base
   exact OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase_zeta_zero _ _ _ _ _ _ _
 
-open OddOrder.Peterfalvi.S11 in
-open scoped Classical in
-open scoped FiniteInduce in
 set_option maxHeartbeats 1600000 in
 -- The (7.6)-family bookkeeping (constituent expansion + per-index coefficient computation)
 -- elaborates as a single large proof term; the default budget covers only part of it.
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical in
+open scoped FiniteInduce in
 /-- **The `T`-side (13.3.c) distinguished index over a chosen base, general form**
 (Peterfalvi (13.8)-for-`T`, issue 0116):
 with the (7.6) family `Q_sharp_hypothesis76_base` based at `ζ₀ = Ind_Q^T φ₀` (`Q ⊄ Ker φ₀`,
