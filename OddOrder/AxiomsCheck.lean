@@ -81,6 +81,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
 import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
 import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
 import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
+import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
@@ -998,11 +999,17 @@ Suzuki branch of Peterfalvi Part II, Ch. I section 3, Proposition 1(c). -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.thompsonCorefreeBound
 
 -- Ch.9 §9B: Thm 9.21 (Schenkman) と Thm 9.13 (order bound) の **subnormal 版**
--- (原典どおりの仮説 `S ◁◁ G`; mmd は `⊲⊲` を `⊲` に潰していた — issue 1037/9133).
+-- (原典どおりの仮説 `S ◁◁ G`; mmd は `⊲⊲` を `⊲` に潰していた — issue 1037/9150).
 -- 9.13 subnormal 版が Thm 9.10 (automorphism tower) の一様上界を与える。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_nilpotentResidual_le_of_isSubnormal
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.card_normalizer_nilpotentResidual_le
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.card_le_factorial_of_isSubnormal
+
+-- Ch.9 §9B: **Thm 9.10 (Wielandt automorphism tower)** — `Z(G) = 1` の有限群の
+-- automorphism tower `G_{i+1} = Aut(G_i)` は位数が `i` に依らず有界
+-- (上界は `(|Z(G^∞)|·|Aut(G^∞)|)!`)。subnormal 版 9.13 + 9.12 + 9.11 で閉じる。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.card_autTowerType_add_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_card_autTowerType_le
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
