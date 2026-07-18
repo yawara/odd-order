@@ -648,3 +648,51 @@ theorem not_dvd_relIndex_inf_of_isSubnormal_in {K S P : Subgroup G} (hSK : S ≤
 同じ要領で ↥K に降ろして使う。) 同様に `exists_conjAct_smul_le_sylow` の相対版
 (`∃ h ∈ L, h • Y ≤ P ⊓ L`) も `Subgroup G` のまま述べる。これで Step 3 本体は
 bundling 無しで書けるはず。
+
+---
+
+## §9D 完了 — Bartels (9.28) 全 6 step 完成 (2026-07-19)
+
+`SubnormalClosure.lean` は **sorry-free / axiom-clean で Thm 9.28 まで完成**。
+これで **§9D (9.28–9.31) は全結果が形式化済**。
+
+| step | 実装 | 備考 |
+|---|---|---|
+| 1 | `bartels_step_one{,_le}` | 書籍より一般 (共役性でなく `Y^{(G)} ≠ ⊤` を仮定) |
+| 2 | `bartels_step_two` | + Ch.2 Wielandt 結合定理の族版 |
+| 3 | `bartels_step_three` | 相対版 9.31 + 相対版 Sylow 共役 |
+| 4 前半 | `bartels_step_four` | `P ∈ Syl_p(M) ⇒ P ∈ Syl_p(G)` |
+| 4 後半 | `bartels_step_four_unique` | `M` は `P` を含む唯一の極大部分群 |
+| 5 | `bartels_step_five` | `X` を含む極大部分群の一意性 |
+| 6 | `bartels_step_six` | 最終矛盾 |
+| 本体 | `strongClosure_isSubnormal` | `Nat.card G` の強帰納法で `BartelsIH` を供給 |
+
+### 形式化上の判断 (書籍からの逸脱)
+
+- **Step 4 の核心を切り出した** (`setwiseStabilizer_kappaSet_eq_of_isCoatom`)。書籍は
+  「stabilizer が `H` か `⊤`、`⊤` は `Z(P) ≠ 1` で矛盾」という同じ議論を前半 (`M`) と
+  後半 (`N`) で 2 度使うので、`H` を動かせる形にした。これに伴い
+  `kappaSet_eq_top_of_setwiseStabilizer_eq_top` の仮説を `X ≤ H` から
+  `X^{(G)} ∈ 𝒦(H)` に弱めてある (後半は `H = P` (Sylow) で使うので `X ≤ P` は不成立)。
+- **Step 5 は位数比較を使わない**。書籍は「`X ≤ S ∈ Syl_p(A ⊓ B)` で `|S|` 最大」を取るが、
+  実際に使うのは「`S` より真に大きい候補が無い」だけなので、部分群順序の極大元
+  (`exists_maximal_of_wellFoundedGT`) を取れば足りる。候補の述語 = `IsBartelsPairSylow`。
+- **Step 6 の「全共役が `M` に入るなら矛盾」**は `M.normalCore` 経由で書いた
+  (`normalClosure_le_normal` は normal な上界を要求するので `M` 自身には使えない)。
+
+### 副産物として切り出した汎用補題
+
+Step 4 の証明内に埋まっていた議論を再利用可能な形にした (Step 5 が両方使う):
+
+- `exists_sylow_ge_of_isPGroup` — `p`-部分群を相対 Sylow へ伸ばす (`Subgroup G` のまま)
+- `mem_normalizer_of_mem_normalizer_subgroupOf` — `↥K` 内の正規化条件を ambient へ
+- `lt_inf_normalizer_of_lt_of_isPGroup` — `p`-群の normalizer condition (`S < P ⊓ N_G(S)`)
+
+### 併せて解消した issue 0125 (Lem 9.26 / Cor 9.27 の subnormal 化)
+
+`PResidual.lean` の 9.26/9.27 は書籍の `S ◁◁ G` でなく `S ◁ G` で形式化されていた
+(issue 9150 の監査で確定した MISMATCH 2 件)。一般 subnormal 版を
+`pResidual_eq_pResidualOf_of_isSubnormal` / `le_normalizer_pResidualOf_of_isSubnormal`
+として証明し、defect-2 版は系に整理。**「書籍に gap がある」という注記 3 件は誤りだった**
+ので訂正済 (書籍は一貫して `⊲⊲` と書いている — [[mmd-collapses-subnormal-symbol]])。
+§9C 全域のページ参照も p.283/284 → p.285-288 に修正。
