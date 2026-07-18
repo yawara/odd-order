@@ -211,7 +211,14 @@
    - The same leaf computes the exact full-group order
      `q^3 * (q^3 + 1) * ((q^2 - 1) / gcd(q + 1, 3))`; all endpoints are included
      in `AxiomsCheck` and the full project build.
-   - Next upstream layer: prove simplicity of the concrete PSU standard group,
-     then transport it into the Section 3 Lemma 1 induction-hypothesis target.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/Simplicity.lean` supplies
+     Peterfalvi Chapter I §3 Lemma 1’s externally cited Huppert II.10.13 input.
+     For the exact source range `q = 2^n > 2` (`1 < n`), it proves root, Weyl,
+     and determinant-one torus generator membership in the derived subgroup,
+     perfectness, Borel solvability, and finally
+     `IsSimpleGroup (standardPermGroup n)`. The exceptional `n = 1` group of
+     order 72 is correctly excluded.
+   - Next upstream layer: transport the completed degree and simplicity facts
+     into the Section 3 Lemma 1 PSU induction-hypothesis target.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
