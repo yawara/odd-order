@@ -515,6 +515,20 @@ theorem relCore_relIndex_le_factorial_pred [Finite G] {H D : Subgroup G} (hDH : 
     _ ≤ Nat.factorial (D.relIndex H) := relCore_relIndex_le_factorial H D
     _ = Nat.factorial (D.relIndex H - 1) * D.relIndex H := hfac.symm
 
+/-- `H` に normal な `p`-部分群 `U` は `O_p(H)` に含まれるので `|H : O_p(H)| ≤ |H : U|`.
+書籍 p. 283 の「`U ◁ H` かつ `U` が `p`-群ゆえ `|H:O_p(H)| ≤ |H:U|`」に対応. -/
+theorem opiCoreInG_relIndex_le_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+    {H U : Subgroup G} (hUH : U ≤ H) (hUn : H ≤ Subgroup.normalizer (U : Set G))
+    (hU : IsPGroup p ↥U) :
+    (GroupTheory.opiCoreInG ({p} : Set ℕ) H).relIndex H ≤ U.relIndex H := by
+  have hle : U ≤ GroupTheory.opiCoreInG ({p} : Set ℕ) H :=
+    GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup hUH
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hUH).mpr hUn)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hU rfl)
+  have hUne : U.relIndex H ≠ 0 := fun h =>
+    Subgroup.index_ne_zero_of_finite (Subgroup.index_eq_zero_of_relIndex_eq_zero h)
+  exact Nat.le_of_dvd (Nat.pos_of_ne_zero hUne) (Subgroup.relIndex_dvd_of_le_left H hle)
+
 end
 
 section /- 9C: Thm 9.23 — corefree maximal の setup -/

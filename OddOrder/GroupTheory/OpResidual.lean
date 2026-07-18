@@ -53,6 +53,19 @@ theorem mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (hN : N.IsPiSubgroup 
 
 end IsPiSubgroup
 
+/-- A `p`-group is a `π`-subgroup whenever `p ∈ π` (its order is a power of `p`, so `p` is
+the only prime dividing it). -/
+theorem isPiSubgroup_of_isPGroup_of_mem {G : Type*} [Group G] [Finite G] {π : Set ℕ} {p : ℕ}
+    [Fact p.Prime] {X : Subgroup G} (hX : IsPGroup p ↥X) (hp : p ∈ π) : X.IsPiSubgroup π := by
+  intro q hq
+  obtain ⟨k, hk⟩ := hX.exists_card_eq
+  rw [hk] at hq
+  have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hq
+  have hqp : q = p :=
+    (Nat.prime_dvd_prime_iff_eq hq_prime Fact.out).mp
+      (hq_prime.dvd_of_dvd_pow (Nat.mem_primeFactors.mp hq).2.1)
+  rwa [hqp]
+
 variable (G) in
 /-- The supremum of all normal `π`-subgroups of `G`.  For finite `G`, this is the
 largest normal `π`-subgroup. -/
