@@ -78,18 +78,41 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
 
 ## やること
 
-- [ ] **(b) の修正**: `X` を `fittingInAmbient M ⊓ (MulAut.conj g • fittingInAmbient M)` として
-      束縛し、`X ≤ MF M ∧ IsCyclic X` を**その `X` について**述べる。`g` は
-      `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` が供給済なので、statement を
-      `∀ g, g ∉ M → F(M) ⊓ F(M)^g ≠ ⊥ → …` 形にするか `∃ g, …` で `g` ごと束縛する。
+- [x] **(b) の修正** (2026-07-18 完了)。`X` を `fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M`
+      に束縛し、`∀ g ∉ M` 形で `X ≤ MF M ∧ IsCyclic X` を述べた (nontriviality 仮説は不要 —
+      両結論とも `g ∉ M` だけで成立するので、`∃ g` より強い `∀ g` 形にした)。新規補題 4 件:
+      - `le_Msigma_of_isPGroup_le_fitting` — `exists_inf_conj_fitting_orderP_witness` 内の
+        local `have hMσ_of` を top-level に抽出 (重複解消)。
+      - `inf_conj_fitting_le_Msigma` — BG の「`π(X) ⊆ σ(M)` ⟹ `X ⊆ M_σ`」。
+        `mem_sigma_of_prime_dvd_card_inf_conj_fitting` (既存) で全素数を σ に落とし、
+        nilpotent `F(M)` の normal Hall 部分群 `O_{σ(M)}(F(M)) = F(M_σ)` が σ-部分群を吸収
+        (`isPiGroup_le_of_normal_isHallSubgroup` + `oPiCore_isHall_of_isNilpotent`)。
+      - `inf_conj_fitting_le_conj_Msigma` — `X^{g⁻¹} = F(M) ⊓ F(M)^{g⁻¹}` の対称性で `g⁻¹` に帰着。
+      - `inf_conj_fitting_isCyclic` — `X ≤ M_σ ⊓ M^g` cyclic (Lemma 12.17 三番目の clause)。
+      **付随して `Msigma_inf_conj_isCyclic` を S16_MainResults/TheoremsAE → S15_MF/PisetBetaDisjoint
+      へ上流移設** (S15 が consume するため; 依存は全て §12 + §15 の rank-1 helper で、S16 の
+      ものは使っていなかった)。`TaxonomyOutput` は `open ...S15` 済で無変更、AxiomsCheck の
+      namespace のみ更新。
+- [x] **末尾の恒真 disjunct を削除** (2026-07-18)。`IsMulCommutative M_F ∨ (¬IsMulCommutative M_F ∧
+      (IsTypeF M ∨ IsTypeP1 M))` は `A ∨ ¬A` で情報ゼロだったため、残さず落とした。
+      `∃ p ∈ σ(M) ∖ β(M)` は実内容なので存続 ((e) の `p = |X|` 束縛は未了)。
 - [ ] **(e) の修正**: 上記 book 3 分岐を述べ直す。**実内容はすでに repo に存在する**ので新規の
       深い数学ではなく再パッケージが主: 分岐 1 ≈ `isTypeI_of_isTypeF` の可換枝
       (`TypeP1Criteria.lean:868-893`、rank = 2 を証明済)、分岐 2 ≈ 同 非可換枝 (`:894-906`、
       `typeF_exponent_dvd_sub_one_of_invariant_card` + `typeF_nonabelian_cyclic_opiCore_compl`)。
       分岐 3 (`|O_p(H)| = p³`, `|M/H| ∣ p+1`, type `P₁`) は未形式化とみられる — 要確認。
 - [ ] **`p = |X|` の結合**: (e) の `p` を独立存在量化でなく `X` の位数として述べる。
-- [ ] **(d) の追加**: 既存の `E3_eq_bot_of_not_fittingIsTI` を結論に入れ、`E₂ ⊲ E` を
-      `E23_normal` + `E₃ = ⊥` から合成し、`E/E₂ ≅ E₁` と `cyclic` を新規に証明する。
+- [x] **(d) の追加** (2026-07-18 完了)。`sigmaComplement_structure_of_not_fittingIsTI` として、
+      `fitting_not_ti_cases` の bundle でなく **§12 E-setup を取る独立定理**にした (BG (d) は
+      「§12-13 のとおりに取った E, E₁, E₂, E₃」についての主張なので、E-setup を引数に取る形が
+      faithful)。4 条項すべて sorry-free:
+      - `E₃ = 1` — 既存 `E3_eq_bot_of_not_fittingIsTI` を cite。
+      - `E₂ ⊲ E` — `E23_normal` (`E ≤ N(E₂ ⊔ E₃)`) に `E₃ = ⊥` を代入。
+      - `E = E₁E₂` + `E₁` が `E₂` の complement — `eq_sup` に `E₃ = ⊥` を代入し、
+        τ₁ は p-rank 1・τ₂ は p-rank 2 ゆえ τ₁ ∩ τ₂ = ∅ → `|E₁|`,`|E₂|` coprime → `E₁ ⊓ E₂ = ⊥`。
+      - `E₁` cyclic — 既存 `E1_isCyclic`。
+      印字されている `E/E₂ ≅ E₁` は `quotientE2MulEquivE1` (mathlib
+      `Subgroup.IsComplement'.QuotientMulEquiv` + `subgroupOfEquivOfLe`) として別途提供。
 - [ ] 各修正後、**恒真に潰れていないこと**を確認する (「(a) から従うか?」を必ず自問)。
 - [ ] survey の BG §15 欄と `notes/bg/s15_16_audit.md` を更新。
 

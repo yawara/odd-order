@@ -5618,13 +5618,31 @@ set_option linter.style.longLine false in
 -- subgroup has a `TI` Fitting subgroup (contrapositive: `¬FittingIsTI ⟹ M` is type `F` or `P₁`).
 -- Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2
--- BG Theorem 15.7, the full `¬FittingIsTI` structure theorem (`S15_MF`, issue 7007): `M ∈ M_F ∪ M_P1`,
--- `M_F = M_σ`, a cyclic nontrivial `X ≤ M_F`, and the faithful conjunct (c) `M' ≤ F(M)` (the printed
--- equality `M' = F(M)` is an overstatement, weakened to the inclusion matching MathComp `BGsection15`).
+-- BG Theorem 15.7, the `¬FittingIsTI` structure theorem (`S15_MF`, issue 7007): `M ∈ M_F ∪ M_P1`,
+-- `M_F = M_σ`, conjunct (b) about the **pinned** intersection `X = F(M) ∩ F(M)^g` (`X ≤ M_F` and `X`
+-- cyclic, for every `g ∉ M`), and the faithful conjunct (c) `M' ≤ F(M)` (the printed equality
+-- `M' = F(M)` is an overstatement, weakened to the inclusion matching MathComp `BGsection15`).
 -- The `M' ≤ F(M)` proof is type-independent: `M' = M_σ ⊔ E'`, `E'` centralizes `M_σ` (Lemma 12.19,
--- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.  Now fully
--- sorry-free + axiom-clean (the type-`F` residual is closed; the `= F(M)` gate `C_Y(E₁) = 1` is gone).
+-- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.
+-- ⚠ **Not a complete 15.7**: conjunct (d) and the (e) trichotomy are still owed (issue 3022).  Until
+-- 2026-07-18 (b) read `∃ X, X ≤ M_F ∧ X ≠ ⊥ ∧ IsCyclic X` (equivalent to `M_F ≠ 1`) and the trailing
+-- disjunct was an `A ∨ ¬A` tautology; both are fixed/dropped.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_cases
+-- BG Theorem 15.7(b) components: `X = F(M) ∩ F(M)^g` lands in `M_σ` (every prime of `X` is in `σ(M)`,
+-- and `O_{σ(M)}(F(M)) = F(M_σ)` is a normal Hall subgroup of the nilpotent `F(M)`), likewise in
+-- `M_σ^g`, hence `X` is cyclic inside `M_σ ∩ M^g` (Lemma 12.17 third clause).  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.le_Msigma_of_isPGroup_le_fitting
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_le_Msigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_le_conj_Msigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_isCyclic
+-- BG **Theorem 15.7(d)** (`S15_MF`, issue 3022): for a §12 `E`-setup with `F(M)` not TI,
+-- `E₃ = 1` (already available separately as `E3_eq_bot_of_not_fittingIsTI`), `E₂ ⊴ E` (Lemma 12.1(e)'s
+-- `E₂E₃ ⊴ E` with `E₃ = 1`), `E = E₁E₂` (`eq_sup` with `E₃ = 1`), `E₁` complements `E₂` (τ₁ has
+-- `p`-rank 1 and τ₂ has `p`-rank 2, so `|E₁|` and `|E₂|` are coprime), and `E₁` is cyclic.  The
+-- printed `E/E₂ ≅ E₁` is `quotientE2MulEquivE1` (mathlib `IsComplement'.QuotientMulEquiv`).
+-- Both sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.sigmaComplement_structure_of_not_fittingIsTI
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.quotientE2MulEquivE1
 -- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
 -- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
 -- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive
@@ -7156,13 +7174,14 @@ from Corollary 15.3(b) (`mf_hall_centralizer_control`, axiom-clean) at the trivi
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.msigma_fusion_control
 
-/-! **BG Theorem D(2), `M_σ ∩ M^g` cyclic** (`S16_MainResults`, `Msigma_inf_conj_isCyclic`): for
+/-! **BG Theorem D(2), `M_σ ∩ M^g` cyclic** (`S15_MF/PisetBetaDisjoint`, `Msigma_inf_conj_isCyclic`;
+moved up from `S16_MainResults` on 2026-07-18 so that Theorem 15.7(b) can consume it): for
 `g ∉ M`, `M_σ ∩ M^g` is cyclic (BG Lemma 12.17 third clause).  Abelian (TI part
 `Msigma_inf_conj_inf_derived_eq_bot`), odd, and rank ≤ 1 (a noncyclic elementary abelian subgroup
 would give `C_G(A) ≤ N_G(A) ≤ M` via `norm_noncyclic_sigma`, contradicting the σ-uniqueness core),
 hence cyclic (`isCyclic_of_isMulCommutative_of_rank_le_one`).  Supplies Theorem D's `hD2`.  Axiom-clean. -/
 
-#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.Msigma_inf_conj_isCyclic
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.Msigma_inf_conj_isCyclic
 
 /-! **BG Theorem B(1)** (`S16_MainResults`, `theoremB_U_sylow_abelian_rank_le_two`): every Sylow
 subgroup of `U` is abelian of rank ≤ 2.  Standalone, faithful (explicit `U ≤ M`; restricted to
