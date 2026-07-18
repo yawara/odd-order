@@ -69,16 +69,44 @@ issue 1037 と同じ失敗モード。9.27 を normal 版と読んだ結果、**
 
 ## やること
 
-- [ ] 一般 subnormal 版 Lem 9.26 を証明する (上記の帰納経路)
-- [ ] 一般 subnormal 版 Cor 9.27 を 9.26 から導く
-- [ ] `le_normalizer_pResidualOf_of_subnormal_two{,_rel}` を一般版の系に整理
-- [ ] ThompsonWielandt の該当 call site を「書籍どおりの Cor 9.27」を cite する形に戻す
-- [ ] **上記 (3) の誤った注記 3 件を訂正**し、ページ参照を p.287/288 に直す
-- [ ] 既存の normal 版は**消さない** (bound がより鋭い等の独立価値がありうる。9150 の方針)
+- [x] 一般 subnormal 版 Lem 9.26 を証明する (上記の帰納経路)
+- [x] 一般 subnormal 版 Cor 9.27 を 9.26 から導く
+- [x] `le_normalizer_pResidualOf_of_subnormal_two{,_rel}` を一般版の系に整理
+- [x] ThompsonWielandt の該当 call site を「書籍どおりの Cor 9.27」を cite する形に戻す
+- [x] **上記 (3) の誤った注記 3 件を訂正**し、ページ参照を p.287/288 に直す
+- [x] 既存の normal 版は**消さない** (bound がより鋭い等の独立価値がありうる。9150 の方針)
 
 ## 完了条件
 
 一般 subnormal 版の 9.26 / 9.27 が sorry-free で入り、(3) の誤った注記が訂正されている。
+
+## 完了 (2026-07-19, commit 7f206f802)
+
+### 入った定理 (すべて sorry-free / axiom-clean)
+
+| 名前 | 内容 |
+|---|---|
+| `pResidual_eq_pResidualOf_of_isSubnormal` | **Lem 9.26**: `G = SP`, `S ◁◁ G`, `P ◁ G` p-群 ⇒ `O^p(G) = O^p(S)` |
+| `pResidualOf_sup_eq_of_isSubnormal` | 上の ambient 版 |
+| `le_normalizer_pResidualOf_of_isSubnormal` | **Cor 9.27**: `S ◁◁ G`, `P ◁ G` p-群 ⇒ `P ≤ N_G(O^p(S))` |
+| `le_normalizer_pResidualOf_of_isSubnormal_rel` | 上の相対形 (ambient = 部分群 `H`) |
+
+9.26 の証明は書籍の `|G|` 帰納を `Subgroup.IsSubnormal` の**構造帰納**に置換
+(書籍の `M` = 帰納の `K`)。step 段は Dedekind 則 `K = S(K ⊓ P)` +
+既存 normal 版 `pResidualOf_sup_eq` を base case として使うだけで、新規理論は不要だった
+(見立てどおり)。
+
+### defect-2 版の整理
+
+- `le_normalizer_pResidualOf_of_subnormal_two` (絶対形) は消費者 0 だったので**削除**。
+- `_rel` は normalClosure を組む ~50 行の独自証明を捨て、一般版へ長さ 2 の鎖を渡す
+  **4 行の adapter** に置換 (Thm 9.24 の Step A/D 2 箇所で使用中ゆえ名前は存置)。
+
+### ページ参照
+
+(3) の 3 件に加え、§9C 全域で p.283/284 参照が系統的にずれていたので一括修正
+(p.283 は §9B の 9.20–9.22)。正しくは **Thm 9.23 = p.285 / Thm 9.24 statement = p.286 /
+Lem 9.25–9.27 = p.287 / Thm 9.24 の証明 = pp.287–288**。
 
 ## 参照
 
