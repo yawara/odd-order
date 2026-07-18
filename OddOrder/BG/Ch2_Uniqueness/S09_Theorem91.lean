@@ -110,8 +110,7 @@ private theorem sSup_hInvariant_le_of_centralizer_le [Finite G]
   have hle : OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure hK_inv.restrict
       ≤ M.subgroupOf K := by
     rw [OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_le_iff]
-    intro b hb_ne
-    intro z hz
+    intro b hb_ne z hz
     rw [Subgroup.mem_subgroupOf]
     have hb_ne' : (b : G) ≠ 1 := fun h => hb_ne (Subtype.ext h)
     -- `z` is fixed by `b`, i.e. `z` centralizes `b`.
