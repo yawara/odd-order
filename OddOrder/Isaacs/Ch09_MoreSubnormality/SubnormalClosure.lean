@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.IsSubnormal
 
 /-!
@@ -40,6 +41,8 @@ Lemma 9.29(a) の証明は書籍では `|G|` の帰納だが、ここでも 9.31
 **`Subgroup.IsSubnormal` の構造帰納**を使う (`Ch09_MoreSubnormality/SylowSubnormal.lean`
 と同じ手口)。降りる先の normal 段は「`g ∈ K` なら `g • S = S`」だけなので自明になる。
 -/
+
+universe u
 
 namespace OddOrder.Isaacs.Ch09
 
@@ -404,6 +407,80 @@ theorem strongClosure_map [Finite G] (X : Subgroup G) (f : G →* H)
   intro Z hZ
   obtain ⟨Y, hY, rfl⟩ := exists_isStronglyConjugate_map_eq f hf hZ
   exact Subgroup.map_mono (le_sSup hY)
+
+end
+
+section /- 9D: Theorem 9.28 (Bartels) — Step 1 (p. 291) -/
+
+/-- `X ≤ K` のとき, `X^{(K)}` を `↥K` に降ろすと `↥K` の中の `X^{(↥K)}` に一致する。 -/
+theorem strongClosureIn_subgroupOf {K X : Subgroup G} (hXK : X ≤ K) :
+    (strongClosureIn K X).subgroupOf K = strongClosure (X.subgroupOf K) := by
+  rw [strongClosureIn_eq_map_strongClosure hXK, Subgroup.subgroupOf,
+    Subgroup.comap_map_eq_self_of_injective K.subtype_injective]
+
+/-- 有限群の真部分群は位数が真に小さい。 -/
+theorem card_lt_of_ne_top [Finite G] {K : Subgroup G} (hK : K ≠ ⊤) :
+    Nat.card ↥K < Nat.card G := by
+  have hmul := Subgroup.card_mul_index K
+  have hidx : K.index ≠ 1 := fun h1 => hK (Subgroup.index_eq_one.mp h1)
+  have hidx0 : K.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hpos : 0 < Nat.card ↥K := Nat.card_pos
+  have h2 : 1 < K.index := by omega
+  calc Nat.card ↥K < Nat.card ↥K * K.index := (Nat.lt_mul_iff_one_lt_right hpos).mpr h2
+    _ = Nat.card G := hmul
+
+/-- **Bartels (9.28) の帰納法の仮定**: `G` より真に位数の小さい群では `X^{(H)}` は subnormal。 -/
+def BartelsIH (G : Type u) [Group G] [Finite G] : Prop :=
+  ∀ (H : Type u) [Group H] [Finite H], Nat.card H < Nat.card G →
+    ∀ Y : Subgroup H, (strongClosure Y).IsSubnormal
+
+/-- **Bartels (9.28) Step 1, 片側** (書籍 p. 291): `Y, Z ≤ H` が `Y^{(H)} = Z^{(H)}` を
+みたし, `Y^{(G)} ≠ G` なら `Y^{(G)} ≤ Z^{(G)}`.
+
+書籍は `Y, Z` を `X` の共役に取るが, 共役性は `Y^{(G)} < G` を出すためだけに使われる
+ので, ここでは `Y^{(G)} ≠ ⊤` を直接の仮定にして一般化した。
+
+**証明** (書籍 p.291): `K = Y^{(G)}`, `U = Y^{(H)} = Z^{(H)}` とおく。
+`Z ≤ U ≤ K` で `K < G` なので帰納法の仮定から `Z^{(K)}` は `K` の中で subnormal。
+9.29(d) で `U = Z^{(U)}` なので `Y ≤ U = Z^{(U)} ≤ Z^{(K)}` (9.29(c))。
+9.29(a) を `K` の中で使って `Y^{(K)} ≤ Z^{(K)}`, 最後に `K = Y^{(K)}` (9.29(d)) と
+`Z^{(K)} ≤ Z^{(G)}` (9.29(c)) を繋ぐ。 -/
+theorem bartels_step_one_le {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {Y Z H : Subgroup G} (hYH : Y ≤ H) (hZH : Z ≤ H)
+    (hU : strongClosureIn H Y = strongClosureIn H Z)
+    (hK : strongClosure Y ≠ ⊤) :
+    strongClosure Y ≤ strongClosure Z := by
+  -- `Z ≤ U ≤ K`  (`U = Y^{(H)}`, `K = Y^{(G)}`).
+  have hZU : Z ≤ strongClosureIn H Y := by rw [hU]; exact le_strongClosureIn hZH
+  have hUK : strongClosureIn H Y ≤ strongClosure Y := strongClosureIn_le H Y
+  have hZK : Z ≤ strongClosure Y := hZU.trans hUK
+  -- 帰納法の仮定を `↥K` に適用: `Z^{(K)}` は `K` の中で subnormal.
+  have hZKsub :
+      ((strongClosureIn (strongClosure Y) Z).subgroupOf (strongClosure Y)).IsSubnormal := by
+    rw [strongClosureIn_subgroupOf hZK]
+    exact hIH ↥(strongClosure Y) (card_lt_of_ne_top hK) _
+  -- `U = Z^{(U)}` (9.29(d) 相対版).
+  have hUZ : strongClosureIn (strongClosureIn H Y) Z = strongClosureIn H Y := by
+    rw [hU]; exact strongClosureIn_strongClosureIn H Z
+  -- `Y ≤ U = Z^{(U)} ≤ Z^{(K)}`.
+  have hYZK : Y ≤ strongClosureIn (strongClosure Y) Z :=
+    ((le_strongClosureIn hYH).trans hUZ.ge).trans (strongClosureIn_mono_left hUK)
+  -- 9.29(a) を `K` の中で適用.
+  have hstep : strongClosureIn (strongClosure Y) Y ≤ strongClosureIn (strongClosure Y) Z :=
+    strongClosureIn_le_of_isSubnormal hYZK (strongClosureIn_le_right _ Z) hZKsub
+  calc strongClosure Y = strongClosureIn (strongClosure Y) Y := (strongClosureIn_self Y).symm
+    _ ≤ strongClosureIn (strongClosure Y) Z := hstep
+    _ ≤ strongClosure Z := strongClosureIn_le _ Z
+
+/-- **Bartels (9.28) Step 1** (書籍 p. 291): `Y, Z ≤ H` が `Y^{(H)} = Z^{(H)}` をみたし
+両者の `^{(G)}` が真部分群なら `Y^{(G)} = Z^{(G)}`. -/
+theorem bartels_step_one {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {Y Z H : Subgroup G} (hYH : Y ≤ H) (hZH : Z ≤ H)
+    (hU : strongClosureIn H Y = strongClosureIn H Z)
+    (hKY : strongClosure Y ≠ ⊤) (hKZ : strongClosure Z ≠ ⊤) :
+    strongClosure Y = strongClosure Z :=
+  le_antisymm (bartels_step_one_le hIH hYH hZH hU hKY)
+    (bartels_step_one_le hIH hZH hYH hU.symm hKZ)
 
 end
 
