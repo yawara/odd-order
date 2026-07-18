@@ -119,7 +119,26 @@ subgroup `S̄`" と明言しているため、本 repo では正しく `IsSubnor
 
   </details>
 
-- [ ] **(C) tower 本体 9.10** — ここが残る frontier。(A)(B) が揃ったので gate は無い:
+- [x] **(C) tower 本体 9.10 — 完了 (2026-07-18)**: `AutTower.lean`
+      `exists_card_autTowerType_le`。`Z(G)=1` の有限群で `∃ n, ∀ i, |G_i| ≤ n`
+      (上界 `(|Z(G^∞)|·|Aut(G^∞)|)!`)。full build green (4426 jobs), axiom-clean。
+
+      構成の要点:
+      - `GroupPkg` で型と `Group` instance を**同時再帰** (型だけの再帰では
+        `MulAut (G_n)` が形成できない)。`autTowerType_zero/_succ` は共に `rfl`。
+      - 鎖は `chainAux G m k j` (環境を `m+k` に固定し `j` はパラメータ)。
+        `(autTowerEmbLe (j ≤ r)).range` 版だと `m+(k+1)` ↔ `(m+1)+k` の付け替えが
+        4 条件すべてに波及するため不採用 (`autTowerEmbLe` 自体は残置)。
+      - 9.12 の 4 仮説はいずれも「上端 = 9.11 そのもの / 帰納段 = map で押す」。
+        帰納段用に `map_le_normalizer_map` と `centralizer_map_inf_map_eq_bot` を新設。
+      - `IsSubnormal` は `IsSubnormal.step` が上から降ろす形なので `j + d = k` の
+        `d` で帰納。
+      - 一様上界は subnormal 版 9.13 + `nilpotentResidualChainAuxEquiv` で `k` を消す。
+        `|Z|`/`|Aut|` の読み替えは 9.13 で作った `centerCongr`/`mulAutEquivCongr`。
+
+  <details><summary>当初の実装計画 (記録)</summary>
+
+- [x] ~~**(C) tower 本体 9.10**~~:
       - recursive type family `autTowerType : ℕ → Type u` (`0 ↦ G`, `n+1 ↦ MulAut (·)`)
         + 各段の `Group` instance (再帰) + centerless の伝播 (9.11d)。
       - 埋め込み鎖 `G_i ↪ G_{i+1}` (Inn) と `G_1 ◁◁ G_i`、`C_{G_i}(G_1) = 1` (9.12)。
@@ -170,6 +189,9 @@ def chainAux (m : ℕ) : ∀ k : ℕ, ℕ → Subgroup (autTowerType G (m + k))
 
 `Theorem 9.10` を sorry-free/axiom-clean で landing (`∃ n, ∀ i, |G_i| ≤ n` 形)。
 full build green + AxiomsCheck OK。
+→ **達成 (2026-07-18)**。full build 4426 jobs / 0 errors、
+`card_autTowerType_add_le` / `exists_card_autTowerType_le` とも 3 axiom (allowlist)。
+副産物の 9.21/9.13 subnormal 一般化も axiom-clean。
 
 ## 参照
 
