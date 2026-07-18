@@ -9160,6 +9160,19 @@ not an additional sorry in this theorem. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini
 
+-- BG **Theorem 15.7(e)**, the type-`P₁` inner disjunction `(e2) ∨ (e3)` (issue 3022, port of Coq
+-- `nonTI_Fitting_structure` :1185-1204).  Case split on the implication `K* = Z₀ → |K| ∣ p-1`:
+-- * it holds ⟹ `(e2)`, i.e. `|K| ∣ q-1` for **every** `q ∈ π(M_F)` — if `Z_q ⊓ K* = ⊥` the
+--   Frobenius engine `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot` applies directly, else
+--   `K* ≤ Z_q` and both have prime order so `Z_q = K*`, forcing `q = |K*| = p`
+--   (`kstar_card_eq_witness_prime_of_isTypeP1`) and the case hypothesis closes it;
+-- * it fails ⟹ `K* = Z₀` and `¬(|K| ∣ p-1)`, the genuine Singer case `(e3)`:
+--   `|O_p(M_F)| = p³` (`card_opiCore_eq_prime_cube_singer`) and `|K| ∣ p+1`
+--   (`card_dvd_succ_of_primeAction_extraspecial`).
+-- Sorry-free + axiom-clean.  This is the last engine needed for the faithful `(e)` trichotomy.
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.typeP1_kappaHall_dvd_sub_one_or_singer_of_not_fittingIsTI
+
 -- **W1 §16 disjunct 3, `r(O_p(M_F)) ≤ 2` assembly (lane-f, issue 8015)** — two bricks toward the
 -- type-V Singer case's `|O_p(M_F)| = p³`, both axiom-clean:
 -- * `isNarrow_opiCore_of_three_le_pRank`: `P = O_p(M_F)` is narrow once `pRank P ≥ 3` (the non-TI

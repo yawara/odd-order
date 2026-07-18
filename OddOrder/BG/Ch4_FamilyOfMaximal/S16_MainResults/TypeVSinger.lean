@@ -390,8 +390,9 @@ case analysis):
   (`card_opiCore_eq_prime_cube_singer`) and `|W₁| ∣ p + 1`
   (`card_dvd_succ_of_primeAction_extraspecial`, the symplectic/determinant-one step).
 
-⚠ The `-- (sorry 1)` / `-- (sorry 2)` markers inside the proof are **historical labels**, not live
-`sorry`s; both branches carry real proofs.
+Both branches carry real proofs; this file has no live `sorry`.  (Until 2026-07-19 the two `(e3)`
+steps were labelled `-- (sorry 1)` / `-- (sorry 2)` long after they had been discharged, which made
+`grep sorry` report phantom gaps — the labels now name their actual content.)
 
 (`hP1neIIIIV`, the sibling `M_F ≠ M_σ ⟹ III/IV` bridge, needs no trichotomy but instead the full
 nilpotent `M_F`-complement `U ≠ ⊥`, gated on `M'/M_F` nilpotent.) -/
@@ -571,5 +572,183 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
           rw [hφ k z, hcomm, mul_inv_cancel_right]
         exact hW1K ▸ OddOrder.GroupTheory.card_dvd_succ_of_primeAction_extraspecial hpodd
           hPextra hPcard3 φ hfpf hcentZ hKcyc hKp' (hW1K ▸ hdvd)
+
+/-- **BG Theorem 15.7(e), the inner `(e2)`/`(e3)` disjunction in the type-`P₁` case** (Coq
+`BGsection15.nonTI_Fitting_structure`, the segment `:1183-1204`).  For a type-`P₁` maximal `M` with
+`M_F = M_σ` and a non-TI witness `X₁` of order `p` (so `p = |X|` in BG's notation), *either* the
+`κ`-Hall `K` satisfies the Frobenius divisibility `|K| ∣ q − 1` for **every** `q ∈ π(M_F)` (disjunct
+`(e2)`; for type `P₁`, `M = M_F ⋊ K` so `M/M_F ≅ K` and `exponent (M/H) = |K|`), *or* we are in the
+Singer / `SL₂(p)` case `(e3)`: `|O_p(M_F)| = p³` and `|K| ∣ p + 1`.
+
+The split is Coq's `altP (@implyP (Ks :==: Z0) (#|K| %| p.-1))` on the *implication*
+`K* = Z₀ → |K| ∣ p − 1`, where `K* = M_σ ⊓ C_G(K)` and `Z₀ = Ω₁(Z(O_p(M_F)))`:
+
+* **implication holds ⟹ `(e2)`.**  Fix `q ∈ π(M_F)` and take the `M`-normal order-`q` witness `Z_q`
+  (`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`).  If `Z_q ⊓ K* = ⊥`, the Frobenius engine
+  `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot` gives `|K| ∣ q − 1` outright (Coq `regZq_dv_q1`).
+  Otherwise `|K*| = p` is prime (`kstar_card_eq_witness_prime_of_isTypeP1`, Coq `oKs`), so
+  `K* ≤ Z_q`, whence `p ∣ q` and `q = p`; then `K* = Z_q = Z₀` (both equal `Ω₁(Z(O_p(M_F)))` by the
+  `q = p` clause of the witness lemma) and the assumed implication delivers `|K| ∣ p − 1 = q − 1`.
+* **implication fails ⟹ `(e3)`.**  Then `K* = Z₀` and `¬(|K| ∣ p − 1)`, which is exactly the Singer
+  branch: `r(O_p(M_F)) ≤ 2` (Coq `rPle2`) from faithfulness
+  `kappaHall_inf_centralizer_opiCore_eq_bot` plus `pRank_opiCore_le_two_of_kappaHall`,
+  `|Z(O_p(M_F))| = p` (Coq `defZP`, BG Theorem 1.11) from
+  `card_center_opiCore_eq_prime_of_omega1Center_le_kstar`, hence `|O_p(M_F)| = p³`
+  (`card_opiCore_eq_prime_cube_singer`) and finally `|K| ∣ p + 1` by the symplectic/determinant-one
+  step `card_dvd_succ_of_primeAction_extraspecial`.
+
+This refines the `|W₁| ∣ p − 1` split used inside `isTypeV_of_isTypeP1_mf_eq_msigma`: there the
+`(e2)` branch only produces the divisibility at the witness prime `p`, whereas Coq's `(e2)` is the
+uniform statement over all `q ∈ π(M_F)` recorded here. -/
+theorem typeP1_kappaHall_dvd_sub_one_or_singer_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
+    {K U : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    [IsCyclic ↥K]
+    {p : ℕ} (hp : p.Prime) (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
+    (hpπ : p ∈ (Nat.card ↥(S15.MF M)).primeFactors)
+    {X₁ : Subgroup G} (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ S15.MF M)
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M)
+    (hrank3 : rank ↥(S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    (hnab : ¬ IsMulCommutative ↥(S15.MF M)) :
+    (∀ q ∈ (Nat.card ↥(S15.MF M)).primeFactors, Nat.card ↥K ∣ q - 1) ∨
+      (Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 ∧ Nat.card ↥K ∣ p + 1) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- Coq `cycHp'`: `O_{p'}(M_F)` is cyclic (the shared conjunct of `(e2)`/`(e3)`).
+  obtain ⟨-, hcyc⟩ :=
+    S15.typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM hnab
+  set Kstar : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstardef
+  -- Coq `oKs`: `|K*| = p`.
+  have hKstarCard : Nat.card ↥Kstar = p :=
+    S15.kstar_card_eq_witness_prime_of_isTypeP1 hG hM hP1 hKM hK hKstardef hmf hp hcyc
+  -- Coq `Z0`: the `M`-normal order-`p` witness `Z₀ = Ω₁(Z(O_p(M_F)))`.
+  obtain ⟨Z₀, -, hZ₀card, -, hX₁notZ₀, hZ₀eq⟩ :=
+    S15.exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF hCGnotM
+      hrank3 hnab (q := p) hp hpπ
+  have hZ₀omega : Z₀ = OddOrder.BG.Ch3.S10.omega1CenterInG
+      (opiCoreInG ({p} : Set ℕ) (S15.MF M)) p := hZ₀eq rfl
+  -- Coq `altP (@implyP (Ks :==: Z0) (#|K| %| p.-1))`.
+  by_cases himp : Kstar = Z₀ → Nat.card ↥K ∣ p - 1
+  · -- **(e2)**: the divisibility holds uniformly over `q ∈ π(M_F)`.
+    refine Or.inl fun q hqπ => ?_
+    have hq : q.Prime := Nat.prime_of_mem_primeFactors hqπ
+    obtain ⟨Zq, hZqMF, hZqcard, hZqnorm, -, hZqeq⟩ :=
+      S15.exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF hCGnotM
+        hrank3 hnab hq hqπ
+    have hZqMσ : Zq ≤ OddOrder.BG.Ch3.S10.Msigma M := hmf ▸ hZqMF
+    have hKNZq : K ≤ Subgroup.normalizer (Zq : Set G) := hKM.trans hZqnorm
+    by_cases hbot : Zq ⊓ Kstar = ⊥
+    · -- Coq `regZq_dv_q1`: `K` acts Frobenius on `Z_q`.
+      exact kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot hG hM hP1.1 hKM hK hKstardef hU
+        hZqMσ hZqcard hKNZq hbot
+    · -- `Z_q ⊓ K* ≠ ⊥` with `|K*| = p` prime ⟹ `K* ≤ Z_q` ⟹ `p ∣ q`, so `q = p` and `Z_q = Z₀`.
+      have hKstarZq : Kstar ≤ Zq := by
+        have hd : Nat.card ↥(Zq ⊓ Kstar) ∣ p := by
+          rw [← hKstarCard]; exact Subgroup.card_dvd_of_le inf_le_right
+        rcases (Nat.dvd_prime hp).mp hd with h1 | hpp
+        · exact absurd (Subgroup.eq_bot_of_card_eq _ h1) hbot
+        · exact inf_eq_right.mp (Subgroup.eq_of_le_of_card_ge inf_le_right
+            (le_of_eq (hKstarCard.trans hpp.symm)))
+      have hpq : p ∣ q := by
+        rw [← hKstarCard, ← hZqcard]; exact Subgroup.card_dvd_of_le hKstarZq
+      have hqp : q = p := ((Nat.prime_dvd_prime_iff_eq hp hq).mp hpq).symm
+      have hKstarEqZq : Kstar = Zq := Subgroup.eq_of_le_of_card_ge hKstarZq
+        (le_of_eq (hZqcard.trans (hqp.trans hKstarCard.symm)))
+      have hZqZ₀ : Zq = Z₀ := (hZqeq hqp).trans hZ₀omega.symm
+      rw [hqp]
+      exact himp (hKstarEqZq.trans hZqZ₀)
+  · -- **(e3)**: `K* = Z₀` and `¬(|K| ∣ p − 1)` — the genuine Singer / `SL₂(p)` case.
+    have hKstarZ₀ : Kstar = Z₀ := by by_contra h; exact himp fun h' => absurd h' h
+    have hdvd : ¬ Nat.card ↥K ∣ p - 1 := fun h => himp fun _ => h
+    have hZKstar : Z₀ ≤ Kstar := le_of_eq hKstarZ₀.symm
+    have hpodd : Odd p :=
+      hG.odd.of_dvd_nat ((Nat.dvd_of_mem_primeFactors hpπ).trans
+        (Subgroup.card_subgroup_dvd_card _))
+    have hKp' : ¬ p ∣ Nat.card ↥K := by
+      intro hdvdK
+      have hpfK : p ∈ (Nat.card ↥(K.subgroupOf M)).primeFactors := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+        exact Nat.mem_primeFactors.mpr ⟨hp, hdvdK, Nat.card_pos.ne'⟩
+      exact (S14.kappa_subset_sigmaCompl (hK.primeFactors_card_subset p hpfK)) hpσ
+    have hKnormP : K ≤ Subgroup.normalizer
+        (↑(opiCoreInG ({p} : Set ℕ) (S15.MF M)) : Set G) :=
+      hKM.trans (le_normalizer_opiCoreInG_of_le_normalizer ({p} : Set ℕ)
+        (S15.maxNilpotentNormalHall_le_normalizer M))
+    -- `r(O_p(M_F)) ≤ 2` (Coq `rPle2`) via faithfulness `K ⊓ C_G(O_p(M_F)) = ⊥`.
+    have hrPle2 : pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ 2 :=
+      pRank_opiCore_le_two_of_kappaHall hG hM hp hpodd hX₁card hX₁MF hrank3 hKp' hKnormP
+        (kappaHall_inf_centralizer_opiCore_eq_bot hG hM hP1 hKM hK hKstardef hU hp hX₁card hX₁MF
+          hZKstar hZ₀card hX₁notZ₀)
+        hdvd
+    have hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) :=
+      S15.opiCore_singleton_not_isMulCommutative_of_witness hG hM hp hX₁card hX₁MF hCGnotM hnab
+    -- `|Z(O_p(M_F))| = p` (Coq `defZP`, via BG Theorem 1.11).
+    have hZPcard : Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p :=
+      card_center_opiCore_eq_prime_of_omega1Center_le_kstar hG hM hP1 hmf hKM hK hKstardef
+        hp hpodd hKp' hKnormP (hZ₀omega ▸ hZKstar) (hZ₀omega ▸ hZ₀card)
+    have hPcard3 : Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 :=
+      card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
+    refine Or.inr ⟨hPcard3, ?_⟩
+    -- `|K| ∣ p + 1` (route B: the Singer / symplectic determinant-one divisibility).
+    set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+    have hPextra : OddOrder.GroupTheory.IsExtraspecial p ↥P :=
+      OddOrder.GroupTheory.IsExtraspecial.of_card_eq_prime_cube hPcard3 (fun h => hPnab ⟨⟨h⟩⟩)
+    have hPMσ : P ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+      (opiCoreInG_le _ _).trans (S15.maxNilpotentNormalHall_le_Msigma hG hM)
+    let φ : ↥K →* MulAut ↥P :=
+      (Subgroup.normalizerMonoidHom (H := P)).comp (Subgroup.inclusion hKnormP)
+    have hφ : ∀ (k : ↥K) (x : ↥P), ((φ k x : ↥P) : G) = (k : G) * (x : G) * (k : G)⁻¹ :=
+      fun _ _ => rfl
+    have hZmem : ∀ {g : G}, g ∈ Z₀ → ∃ z : ↥P, z ∈ Subgroup.center ↥P ∧ (z : G) = g := by
+      intro g hg
+      rw [hZ₀omega] at hg
+      simp only [OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map,
+        Subgroup.coe_subtype] at hg
+      obtain ⟨z, hzΩ, hzg⟩ := hg
+      exact ⟨z, OddOrder.GroupTheory.omega1OfAbelian_le hzΩ, hzg⟩
+    -- `φ k x = x` with `k ≠ 1` forces `x ∈ K* = Z₀ = Z(P) = P'`.
+    have hfpf : ∀ k : ↥K, k ≠ 1 → ∀ x : ↥P, (φ k) x = x → x ∈ commutator ↥P := by
+      intro k hk1 x hfix
+      have hkne : (k : G) ≠ 1 := fun h => hk1 (Subtype.ext h)
+      have hcm : (k : G) * (x : G) * (k : G)⁻¹ = (x : G) := by
+        have h := congrArg Subtype.val hfix; rwa [hφ k x] at h
+      have hcomm : (k : G) * (x : G) = (x : G) * (k : G) := mul_inv_eq_iff_eq_mul.mp hcm
+      have hxKstar : (x : G) ∈ Kstar := by
+        rw [← centralizer_msigma_kappaElement_eq_kstar hG hM hP1.1 hKM hK hKstardef hU k.2 hkne]
+        refine Subgroup.mem_inf.mpr ⟨hPMσ x.2, ?_⟩
+        rw [Subgroup.mem_centralizer_iff]
+        rintro g rfl
+        exact hcomm
+      obtain ⟨z, hzc, hzx⟩ := hZmem (hKstarZ₀ ▸ hxKstar)
+      have hzx' : z = x := Subtype.ext hzx
+      rw [hPextra.commutator_eq_center, ← hzx']; exact hzc
+    -- `K` centralizes `P' = Z(P) = Z₀ ≤ K* ≤ C_G(K)`.
+    have hcentZ : ∀ k : ↥K, ∀ z : ↥P, z ∈ commutator ↥P → (φ k) z = z := by
+      intro k z hz
+      rw [hPextra.commutator_eq_center] at hz
+      have hzZ : (z : G) ∈ Z₀ := by
+        rw [hZ₀omega]
+        simp only [OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map, Subgroup.coe_subtype]
+        refine ⟨z, (OddOrder.GroupTheory.mem_omega1OfAbelian).mpr ⟨hz, ?_⟩, rfl⟩
+        have hdz : orderOf z ∣ p := by
+          have h1 : orderOf (⟨z, hz⟩ : ↥(Subgroup.center ↥P)) ∣
+              Nat.card ↥(Subgroup.center ↥P) := orderOf_dvd_natCard _
+          rw [hZPcard] at h1
+          rwa [← orderOf_injective (Subgroup.center ↥P).subtype
+            Subtype.coe_injective ⟨z, hz⟩] at h1
+        exact orderOf_dvd_iff_pow_eq_one.mp hdz
+      have hzcK : (z : G) ∈ Subgroup.centralizer (K : Set G) :=
+        (hZKstar.trans (hKstardef ▸ inf_le_right)) hzZ
+      have hcomm : (k : G) * (z : G) = (z : G) * (k : G) :=
+        Subgroup.mem_centralizer_iff.mp hzcK (k : G) k.2
+      apply Subtype.ext
+      rw [hφ k z, hcomm, mul_inv_cancel_right]
+    exact OddOrder.GroupTheory.card_dvd_succ_of_primeAction_extraspecial hpodd
+      hPextra hPcard3 φ hfpf hcentZ inferInstance hKp' hdvd
 
 end OddOrder.BG.Ch4.S16
