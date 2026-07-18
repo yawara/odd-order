@@ -432,6 +432,63 @@ theorem mem_sup_zpowers_of_coprime {x : G} {a b : ℕ} (h : Nat.Coprime a b) :
 
 end
 
+/-- `p ∣ orderOf x`, `p` 素数のとき `⟨x^p⟩` は `⟨x⟩` の真部分群。 -/
+theorem zpowers_pow_lt_zpowers [Finite G] {x : G} {p : ℕ} (hp : 1 < p) (hpd : p ∣ orderOf x) :
+    Subgroup.zpowers (x ^ p) < Subgroup.zpowers x := by
+  have hord : 0 < orderOf x := orderOf_pos x
+  have hle : Subgroup.zpowers (x ^ p) ≤ Subgroup.zpowers x :=
+    (Subgroup.zpowers_le).mpr (Subgroup.pow_mem _ (Subgroup.mem_zpowers x) p)
+  refine lt_of_le_of_ne hle ?_
+  intro heq
+  have hcard : Nat.card ↥(Subgroup.zpowers (x ^ p)) = Nat.card ↥(Subgroup.zpowers x) := by
+    rw [heq]
+  rw [Nat.card_zpowers, Nat.card_zpowers, orderOf_pow, Nat.gcd_eq_right hpd] at hcard
+  have : orderOf x / p < orderOf x := Nat.div_lt_self hord hp
+  omega
+
+/-- **Bartels Step 2 の部品**: `p`-群でない有限群 (の部分群) は真部分群たちで生成される。
+
+`x ∈ X` をとり, `⟨x⟩ < X` なら済み。`⟨x⟩ = X` なら `X` は巡回で, `p`-群でないことから
+位数は相異なる 2 素数 `p ≠ q` で割れる。`⟨x^p⟩`, `⟨x^q⟩` はいずれも真部分群で,
+`Nat.Coprime p q` から `x ∈ ⟨x^p⟩ ⊔ ⟨x^q⟩` (Bezout)。 -/
+theorem le_sSup_lt_of_forall_not_isPGroup [Finite G] {X : Subgroup G}
+    (h : ∀ p : ℕ, p.Prime → ¬ IsPGroup p ↥X) :
+    X ≤ sSup {Y : Subgroup G | Y < X} := by
+  intro x hx
+  have hCX : Subgroup.zpowers x ≤ X := (Subgroup.zpowers_le).mpr hx
+  have hcard0 : Nat.card ↥X ≠ 0 := Nat.card_pos.ne'
+  rcases lt_or_eq_of_le hCX with hlt | heq
+  · have hsub : Subgroup.zpowers x ≤ sSup {Y : Subgroup G | Y < X} := le_sSup hlt
+    exact hsub (Subgroup.mem_zpowers x)
+  -- `X = ⟨x⟩` (巡回) の場合.
+  have hnX : Nat.card ↥X = orderOf x := by rw [← heq, Nat.card_zpowers]
+  have hone : Nat.card ↥X ≠ 1 := fun h1 =>
+    h 2 Nat.prime_two (IsPGroup.of_card (n := 0) (by simpa using h1))
+  obtain ⟨p, hp⟩ : (Nat.card ↥X).primeFactors.Nonempty := by
+    refine Nat.nonempty_primeFactors.mpr ?_
+    have := Nat.card_pos (α := ↥X)
+    omega
+  obtain ⟨q, hq, hqp⟩ : ∃ q ∈ (Nat.card ↥X).primeFactors, q ≠ p := by
+    by_contra hcon
+    push Not at hcon
+    have hall : ∀ r : ℕ, r.Prime → r ∣ Nat.card ↥X → r = p := fun r hr hrd =>
+      hcon r (Nat.mem_primeFactors.mpr ⟨hr, hrd, hcard0⟩)
+    exact h p (Nat.prime_of_mem_primeFactors hp)
+      (IsPGroup.of_card (Nat.eq_prime_pow_of_unique_prime_dvd hcard0
+        (fun {r} hr hrd => hall r hr hrd)))
+  have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+  have hqq : q.Prime := Nat.prime_of_mem_primeFactors hq
+  have hpd : p ∣ orderOf x := hnX ▸ Nat.dvd_of_mem_primeFactors hp
+  have hqd : q ∣ orderOf x := hnX ▸ Nat.dvd_of_mem_primeFactors hq
+  have hltp : Subgroup.zpowers (x ^ p) < X := by
+    rw [← heq]; exact zpowers_pow_lt_zpowers hpp.one_lt hpd
+  have hltq : Subgroup.zpowers (x ^ q) < X := by
+    rw [← heq]; exact zpowers_pow_lt_zpowers hqq.one_lt hqd
+  have hcop : Nat.Coprime p q := (Nat.coprime_primes hpp hqq).mpr (Ne.symm hqp)
+  have hsub : Subgroup.zpowers (x ^ p) ⊔ Subgroup.zpowers (x ^ q)
+      ≤ sSup {Y : Subgroup G | Y < X} := sup_le (le_sSup hltp) (le_sSup hltq)
+  exact hsub (mem_sup_zpowers_of_coprime (x := x) hcop)
+
 section /- 9D: Theorem 9.28 (Bartels) — Step 1 (p. 291) -/
 
 /-- `X ≤ K` のとき, `X^{(K)}` を `↥K` に降ろすと `↥K` の中の `X^{(↥K)}` に一致する。 -/
@@ -505,5 +562,37 @@ theorem bartels_step_one {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
     (bartels_step_one_le hIH hZH hYH hU.symm hKZ)
 
 end
+
+/-- **Bartels (9.28) Step 2** (書籍 p. 291): 最小反例の `X` は `p`-群。
+
+書籍の議論: `X` が `p`-群でなければ真部分群たちで生成される。
+`U = ⟨Y^{(G)} | Y < X⟩` とおくと `X ≤ U ≤ X^{(G)}` (9.29(b))。`|X|` 最小性から各
+`Y^{(G)}` は subnormal なので, Wielandt 結合定理の族版で `U ◁◁ G`。すると 9.29(a) で
+`X^{(G)} ≤ U`, 逆包含と合わせて `X^{(G)} = U ◁◁ G` となり `X` が反例であることに矛盾。 -/
+theorem bartels_step_two {G : Type u} [Group G] [Finite G] {X : Subgroup G}
+    (hXmin : ∀ Y : Subgroup G, Y < X → (strongClosure Y).IsSubnormal)
+    (hX : ¬ (strongClosure X).IsSubnormal) :
+    ∃ p : ℕ, p.Prime ∧ IsPGroup p ↥X := by
+  by_contra hcon
+  push Not at hcon
+  -- `U = ⟨Y^{(G)} | Y < X⟩`.
+  set U : Subgroup G := sSup (strongClosure '' {Y : Subgroup G | Y < X}) with hUdef
+  -- `X ≤ U` (真部分群で生成され, 各 `Y ≤ Y^{(G)}`).
+  have hXU : X ≤ U := by
+    refine (le_sSup_lt_of_forall_not_isPGroup hcon).trans (sSup_le ?_)
+    intro Y hY
+    exact (le_strongClosure Y).trans (le_sSup ⟨Y, hY, rfl⟩)
+  -- `U ≤ X^{(G)}` (9.29(b)).
+  have hUX : U ≤ strongClosure X := by
+    refine sSup_le ?_
+    rintro _ ⟨Y, hY, rfl⟩
+    exact strongClosure_mono hY.le
+  -- `U ◁◁ G` (Wielandt 結合定理の族版 + `|X|` 最小性).
+  have hUsub : U.IsSubnormal := by
+    refine OddOrder.Isaacs.Ch02.isSubnormal_sSup_of_isSubnormal ?_
+    rintro _ ⟨Y, hY, rfl⟩
+    exact hXmin Y hY
+  -- 9.29(a) で `X^{(G)} ≤ U`, ゆえ `X^{(G)} = U ◁◁ G` で矛盾.
+  exact hX (le_antisymm (strongClosure_le_of_isSubnormal hUsub X hXU) hUX ▸ hUsub)
 
 end OddOrder.Isaacs.Ch09

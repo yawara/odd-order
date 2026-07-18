@@ -1187,6 +1187,10 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- (Ch.9 §9D Bartels Step 2 が `⟨Y^{(G)} | Y < X⟩ ◁◁ G` で使う。)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch02.isSubnormal_sSup_of_isSubnormal
 
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 2** — 最小反例の X は p-群。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_two
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.le_sSup_lt_of_forall_not_isPGroup
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms
