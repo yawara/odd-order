@@ -324,17 +324,26 @@ theorem fittingIsTI_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   have hqMF : q ∈ S14.piSet (MF M) := by rw [hMFeq]; exact hqπMσ
   exact hdisj q hqMF (hσβ ▸ hqσ)
 
-/-- **BG Theorem 15.7** (mmd L4180): if `F(M)` is not TI in `G`, then `M` is in
-`M_F ∪ M_P1`, the relevant intersection is cyclic inside `M_F = M_sigma`, and
-one of the three local cases of the theorem holds.
+/-- **BG Theorem 15.7** (mmd L4249): if `F(M)` is not TI in `G`, then `M ∈ ℳ_F ∪ ℳ_{P₁}`, the
+TI-failure intersection `X = F(M) ∩ F(M)ᵍ` is cyclic inside `H = M_F = M_σ`, and `M' ⊆ F(M)`.
 
-**Proof state (2026-06-21):** conjunct (a) `M ∈ M_F ∪ M_{P₁}` is discharged from
-`fittingIsTI_of_isTypeP2` (the type-`P₂` exclusion) plus the F/P₁/P₂ trichotomy; conjunct (b)
-`M_F = M_σ` from `mf_eq_msigma_of_not_fittingIsTI`.  In the `∃ X` clause, `X` is only required to
-be *some* cyclic nontrivial subgroup of `M_F` (the Lean surface does not pin `X = F(M) ∩ F(M)ᵍ` as
-BG does — a scaffold weakening), so it is supplied by an order-`q` element of `M_σ ≠ 1`; the prime
-`p ∈ σ(M) ∖ β(M)` comes from that same `q` via the rank-core disjointness
-(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), and the final disjunct follows from (a).
+**Proof state (2026-07-18, issue 3022).**  Conjunct (a) `M ∈ ℳ_F ∪ ℳ_{P₁}` is discharged from
+`fittingIsTI_of_isTypeP2` (the type-`P₂` exclusion) plus the F/P₁/P₂ trichotomy, and `H = M_σ` from
+`mf_eq_msigma_of_not_fittingIsTI`.  Conjunct (b) is stated about the **pinned** intersection
+`F(M) ⊓ F(M)ᵍ`, universally over `g ∉ M`: `inf_conj_fitting_le_Msigma` (BG's `π(X) ⊆ σ(M)` step,
+via the normal-Hall absorption `O_{σ(M)}(F(M)) = F(M_σ)`) and `inf_conj_fitting_isCyclic` (via
+`X ≤ M_σ ∩ M^g` and Lemma 12.17's third clause `Msigma_inf_conj_isCyclic`).
+
+⚠ Until 2026-07-18 (b) read `∃ X, X ≤ M_F ∧ X ≠ ⊥ ∧ IsCyclic X`, which is merely equivalent to
+`M_F ≠ 1` — nothing bound `X` to `F(M) ∩ F(M)ᵍ`, and the proof discharged it with an order-`q`
+element of `M_σ`.  The trailing disjunct `IsMulCommutative M_F ∨ (¬IsMulCommutative M_F ∧ (a))` was
+likewise an instance of `A ∨ ¬A` and carried no information; it has been dropped rather than left in
+place.  The surviving `∃ p ∈ σ(M) ∖ β(M)` is the ambient constraint behind BG (e).
+
+**Still owed to the book (issue 3022):** conjunct (d) (`E₃ = 1`, `E₂ ⊲ E`, `E/E₂ ≅ E₁` cyclic — the
+`E₃ = 1` half exists as `E3_eq_bot_of_not_fittingIsTI` but is not part of this bundle) and the
+genuine (e) trichotomy, which pins `p = |X|` and splits into BG's three cases.  Do **not** read this
+theorem as a complete formalization of 15.7.
 
 **Faithfulness fix (2026-06-22): conjunct (c) is `M' ≤ F(M)`, not the printed `M' = F(M)`.**  BG's
 printed Theorem 15.7(c) asserts the *equality* `M' = F(M) = M_σ × O_{σ'}(F(M))`, but the equality is
@@ -360,22 +369,21 @@ is no longer a type-`F` residual): take a §12 `E`-setup `M = M_σ ⋊ E`, so `M
 theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnotTI : ¬ FittingIsTI M) :
     (S14.IsTypeF M ∨ S14.IsTypeP1 M) ∧ MF M = OddOrder.BG.Ch3.S10.Msigma M ∧
-      ∃ X : Subgroup G,
-        X ≤ MF M ∧ X ≠ ⊥ ∧ IsCyclic ↥X ∧
-        -- ⚠ conjunct (c) is `≤`, NOT `=`.  The BG book (Theorem 15.7(c)) prints the *equality*
-        -- `M' = F(M)`, but that equality is an **overstatement** in the type-`F` case (it is
-        -- equivalent to the non-derivable condition `C_Y(E₁) = 1`).  We therefore weakened it to the
-        -- faithful inclusion `M' ⊆ F(M)`, matching the authoritative MathComp formalization
-        -- (`nonTI_Fitting_structure`, which uses `M^'(1) ⊆ 'F(M)` and whose source comment states
-        -- the
-        -- printed equality "does not appear to be valid"). Full justification in the docstring
-        -- above.
-        derivedInG M ≤ fittingInAmbient M ∧
-        (∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
-          p ∉ OddOrder.BG.Ch3.S10.beta M ∧
-          (IsMulCommutative ↥(MF M) ∨
-            ¬ IsMulCommutative ↥(MF M) ∧
-              (S14.IsTypeF M ∨ S14.IsTypeP1 M))) := by
+      -- (b) stated about the BG witness `X = F(M) ∩ F(M)ᵍ` **itself**, for every `g ∉ M` (issue
+      -- 3022): the former `∃ X, X ≤ M_F ∧ X ≠ ⊥ ∧ IsCyclic X` was equivalent to `M_F ≠ 1`, since
+      -- nothing tied `X` to the TI-failure intersection.
+      (∀ g : G, g ∉ M →
+        (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) ≤ MF M ∧
+          IsCyclic ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G)) ∧
+      -- ⚠ conjunct (c) is `≤`, NOT `=`.  The BG book (Theorem 15.7(c)) prints the *equality*
+      -- `M' = F(M)`, but that equality is an **overstatement** in the type-`F` case (it is
+      -- equivalent to the non-derivable condition `C_Y(E₁) = 1`).  We therefore weakened it to the
+      -- faithful inclusion `M' ⊆ F(M)`, matching the authoritative MathComp formalization
+      -- (`nonTI_Fitting_structure`, which uses `M^'(1) ⊆ 'F(M)` and whose source comment states the
+      -- printed equality "does not appear to be valid"). Full justification in the docstring above.
+      derivedInG M ≤ fittingInAmbient M ∧
+      (∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
+        p ∉ OddOrder.BG.Ch3.S10.beta M) := by
   -- (a) `M ∈ M_F ∪ M_{P₁}`: `¬FittingIsTI` excludes type `P₂` (`fittingIsTI_of_isTypeP2`),
   -- and every maximal subgroup is type `F`, `P₁`, or `P₂`.
   have ha : S14.IsTypeF M ∨ S14.IsTypeP1 M := by
@@ -383,36 +391,14 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     by_cases hP : S14.IsTypeP M
     · exact Or.inr ((S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP).resolve_right hnP2)
     · exact Or.inl (S14.isTypeF_iff_not_isTypeP.mpr hP)
-  refine ⟨ha, mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI, ?_⟩
-  -- The Lean `∃X` clause asks only for *some* cyclic nontrivial `X ≤ M_F` (not specifically
-  -- `F(M) ∩ F(M)ᵍ`), with `M' = F(M)` and a prime `p ∈ σ ∖ β` as *independent* conjuncts, and the
-  -- final disjunct follows from (a).  So the whole clause reduces to the single deep structural
-  -- identity `M' = F(M)` (BG (c), via Corollary 15.5 + Lemma 12.1).
   have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
-  have hMσne1 : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) ≠ 1 := by
-    rw [ne_eq, Subgroup.card_eq_one]; exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
-  obtain ⟨q, hqp, hqdvd⟩ := Nat.exists_prime_and_dvd hMσne1
-  haveI : Fact q.Prime := ⟨hqp⟩
-  -- a prime `q ∈ π(M_σ) = π(M_F) ⊆ σ(M)`, with `q ∉ β(M)` by the rank-core disjointness.
-  have hqπMσ : q ∈ S14.piSet (OddOrder.BG.Ch3.S10.Msigma M) :=
-    Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, Nat.card_pos.ne'⟩
-  have hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
-    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM).1 q hqπMσ
-  have hqπMF : q ∈ S14.piSet (MF M) := by rw [hMFeq]; exact hqπMσ
-  have hqβ : q ∉ OddOrder.BG.Ch3.S10.beta M :=
-    piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI q hqπMF
-  -- an order-`q` element `x ∈ M_σ = M_F` generates a cyclic nontrivial `X = ⟨x⟩ ≤ M_F`.
-  obtain ⟨w, hw⟩ := exists_prime_orderOf_dvd_card' q hqdvd
-  have hwMF : (w : G) ∈ MF M := by rw [hMFeq]; exact w.2
-  have hwne : (w : G) ≠ 1 := by
-    have hw1 : w ≠ 1 := by
-      intro hc; rw [hc, orderOf_one] at hw; exact hqp.ne_one hw.symm
-    simpa using hw1
-  refine ⟨Subgroup.zpowers (w : G), Subgroup.zpowers_le.mpr hwMF, ?_, ?_, ?_, q, hqp, hqσ, hqβ, ?_⟩
-  · -- `X ≠ ⊥`
-    exact fun h => hwne (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_zpowers (w : G)))
-  · -- `IsCyclic X`
-    infer_instance
+  refine ⟨ha, hMFeq, ?_, ?_, ?_⟩
+  · -- **(b)** `X = F(M) ∩ F(M)ᵍ ⊆ H = M_F` and `X` cyclic, for the pinned intersection.
+    -- `X ≤ M_σ = M_F` (`inf_conj_fitting_le_Msigma`, BG's `π(X) ⊆ σ(M)` step) and `X` is cyclic
+    -- (`inf_conj_fitting_isCyclic`, via `X ≤ M_σ ∩ M^g` and Lemma 12.17's third clause).
+    intro g hgM
+    exact ⟨(inf_conj_fitting_le_Msigma hG hM hgM).trans (le_of_eq hMFeq.symm),
+      inf_conj_fitting_isCyclic hG hM hgM⟩
   · -- **`M' ≤ F(M)`** (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)` is an
     -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`). The argument is
     -- *type-independent*
@@ -466,10 +452,19 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [hFdecomp]
       exact le_sup_of_le_left (le_inf hE'cent hE'M)
     exact sup_le hMσF hE'F
-  · -- final disjunct: from (a).
-    by_cases h : IsMulCommutative ↥(MF M)
-    · exact Or.inl h
-    · exact Or.inr ⟨h, ha⟩
+  · -- `σ(M) ∖ β(M) ≠ ∅`: any prime `q ∣ |M_σ|` lies in `σ(M)` (Hall) and avoids `β(M)` by the
+    -- rank-core disjointness `π(M_F) ∩ β(M) = ∅` (recall `M_F = M_σ`).  This is the ambient
+    -- constraint behind BG (e)'s `p = |X| ∈ σ(M) − β(M)`; the full (e) trichotomy — which pins `p`
+    -- to `|X|` — is issue 3022.
+    have hMσne1 : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) ≠ 1 := by
+      rw [ne_eq, Subgroup.card_eq_one]; exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+    obtain ⟨q, hqp, hqdvd⟩ := Nat.exists_prime_and_dvd hMσne1
+    have hqπMσ : q ∈ S14.piSet (OddOrder.BG.Ch3.S10.Msigma M) :=
+      Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, Nat.card_pos.ne'⟩
+    have hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM).1 q hqπMσ
+    have hqπMF : q ∈ S14.piSet (MF M) := by rw [hMFeq]; exact hqπMσ
+    exact ⟨q, hqp, hqσ, piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI q hqπMF⟩
 
 /-- **BG Corollary 15.5(b) consequence** (mmd L4219-4226): for a type-`P₂` maximal subgroup `M`
 with `τ₂(M) = ∅`, the Fitting subgroup is exactly `M_σ`.

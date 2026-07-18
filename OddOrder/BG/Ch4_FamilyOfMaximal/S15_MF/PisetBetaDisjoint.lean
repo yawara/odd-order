@@ -1295,4 +1295,175 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
       exact hqp ((Nat.prime_dvd_prime_iff_eq hp hq).mp hdvd).symm
     exact ⟨Z, hZMF, hZcard, hMNZ, hX₁notZ, fun h => absurd h hqp⟩
 
+/-! ### The TI-failure intersection `X = F(M) ∩ F(M)ᵍ` (BG Theorem 15.7(b))
+
+BG Theorem 15.7 fixes `g ∈ G − M` with `X = F(M) ∩ F(M)^g ≠ 1` and asserts in (b) that this
+*particular* `X` satisfies `X ⊆ H = M_F` and is cyclic.  The three lemmas below supply exactly
+that pinned form, so that `fitting_not_ti_cases` can state (b) about `F(M) ⊓ F(M)^g` itself rather
+than about *some* cyclic subgroup of `M_F` (which would be equivalent to `M_F ≠ 1`; see issue
+3022). -/
+
+/-- **A `σ(M)`-`p`-subgroup of `F(M)` lies in `M_σ`**: `Z ≤ O_p(F(M)) ≤ O_{σ(M)}(F(M)) = F(M_σ)
+≤ M_σ`, the first step by nilpotence of `F(M)`.  Extracted from the local helper inside
+`exists_inf_conj_fitting_orderP_witness`, which now shares it with the `π`-graded version
+`inf_conj_fitting_le_Msigma`. -/
+theorem le_Msigma_of_isPGroup_le_fitting [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) {Z : Subgroup G}
+    (hZF : Z ≤ fittingInAmbient M) (hZp : IsPGroup p ↥Z) :
+    Z ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  have hpσ_sub : ({p} : Set ℕ) ⊆ OddOrder.BG.Ch3.S10.sigma M := by
+    intro q hq; rw [Set.mem_singleton_iff] at hq; rw [hq]; exact hpσ
+  have h1 : Z ≤ opiCoreInG ({p} : Set ℕ) (fittingInAmbient M) :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+      (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M) hZF hZp
+  have h2 : opiCoreInG ({p} : Set ℕ) (fittingInAmbient M)
+      ≤ opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M) :=
+    Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono hpσ_sub _)
+  have h3 : opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M)
+      = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) :=
+    opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma
+  exact (h1.trans h2).trans (h3 ▸ OddOrder.BG.Ch2.S08.fittingInG_le _)
+
+/-- **BG Theorem 15.7(b), containment half** (mmd L4249, *"Hence `X ⊆ M_σ`"*): the TI-failure
+intersection `X = F(M) ∩ F(M)^g` lies in `M_σ` for every `g ∉ M`.
+
+BG's argument is `π`-graded: *every* prime `p ∈ π(X)` lies in `σ(M)`
+(`mem_sigma_of_prime_dvd_card_inf_conj_fitting` — otherwise `O_{σ'}(F(M))` is cyclic and its unique
+order-`p` subgroup is normalized by both `M` and `M^g`, forcing `g ∈ M`).  So `X` is a `σ(M)`-group
+inside the nilpotent `F(M)`, and `O_{σ(M)}(F(M))` is a *normal Hall* `σ(M)`-subgroup of `F(M)`
+(`oPiCore_isHall_of_isNilpotent`), which therefore absorbs every `σ(M)`-subgroup; finally
+`O_{σ(M)}(F(M)) = F(M_σ) ≤ M_σ`. -/
+theorem inf_conj_fitting_le_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G} (hgM : g ∉ M) :
+    (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G)
+      ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  set F : Subgroup G := fittingInAmbient M with hFdef
+  set X : Subgroup G := F ⊓ MulAut.conj g • F with hXdef
+  have hXF : X ≤ F := hXdef ▸ inf_le_left
+  haveI hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  -- Every prime of `X` lies in `σ(M)` (BG's `p ∈ π(X) ⟹ p ∈ σ(M)` step).
+  have hXpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup
+      (OddOrder.BG.Ch3.S10.sigma M) (X.subgroupOf F) := by
+    intro r hr
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXF).toEquiv] at hr
+    exact mem_sigma_of_prime_dvd_card_inf_conj_fitting hG hM hgM
+      (Nat.prime_of_mem_primeFactors hr) (Nat.mem_primeFactors.mp hr).2.1
+  -- `O_{σ(M)}(F)` is a normal Hall `σ(M)`-subgroup of the nilpotent `F`, so it absorbs `X`.
+  have hle : X.subgroupOf F
+      ≤ OddOrder.Isaacs.Ch03.oPiCore (OddOrder.BG.Ch3.S10.sigma M) ↥F :=
+    OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup
+      (OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent (OddOrder.BG.Ch3.S10.sigma M)) hXpi
+  calc X = (X.subgroupOf F).map F.subtype := (Subgroup.map_subgroupOf_eq_of_le hXF).symm
+    _ ≤ (OddOrder.Isaacs.Ch03.oPiCore (OddOrder.BG.Ch3.S10.sigma M) ↥F).map F.subtype :=
+        Subgroup.map_mono hle
+    _ = opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) F := rfl
+    _ = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) :=
+        opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma
+    _ ≤ OddOrder.BG.Ch3.S10.Msigma M := OddOrder.BG.Ch2.S08.fittingInG_le _
+
+/-- **BG Theorem 15.7(b), conjugate half**: `X = F(M) ∩ F(M)^g ≤ M_σ^g`.
+
+`X` is symmetric under `g ↦ g⁻¹` up to conjugation — `X^{g⁻¹} = F(M) ∩ F(M)^{g⁻¹}` — so this is
+`inf_conj_fitting_le_Msigma` applied at `g⁻¹` (which is also outside `M`), pushed forward by `g`. -/
+theorem inf_conj_fitting_le_conj_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G} (hgM : g ∉ M) :
+    (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G)
+      ≤ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M := by
+  have hginv : g⁻¹ ∉ M := fun h => hgM (by simpa using inv_mem h)
+  -- `X^{g⁻¹} = F(M) ∩ F(M)^{g⁻¹}`, so the previous lemma at `g⁻¹` applies.
+  have hkey : MulAut.conj g⁻¹ •
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G)
+      ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    have hrw : MulAut.conj g⁻¹ •
+        (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G)
+        = fittingInAmbient M ⊓ MulAut.conj g⁻¹ • fittingInAmbient M := by
+      rw [Subgroup.smul_inf, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, inf_comm]
+    rw [hrw]
+    exact inf_conj_fitting_le_Msigma hG hM hginv
+  have hpush := (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj g)).mpr hkey
+  rwa [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul] at hpush
+
+/-- **BG Theorem D(2) — `M_σ ∩ M^g` is cyclic** (mmd L4317, BG Lemma 12.17 third clause, Coq
+`sigma_compl_embedding` cyclic part): for `g ∉ M`, the intersection `M_σ ∩ M^g` is cyclic.
+
+`M_σ ∩ M^g` is abelian (its derived subgroup lies in `(M_σ ∩ M^g) ⊓ M_σ' = 1`, the TI part
+`S12.Msigma_inf_conj_inf_derived_eq_bot`), of odd order, and of rank `≤ 1`: any noncyclic elementary
+abelian `A ≤ M_σ ∩ M^g` would, by `norm_noncyclic_sigma` (Corollary 12.4), satisfy `C_G(A) ≤ N_G(A)
+≤ M`, contradicting the σ-uniqueness core `S12.centralizer_not_le_of_isPGroup_le_Msigma_inf_conj`.
+A finite commutative odd group of rank `≤ 1` is cyclic
+(`isCyclic_of_isMulCommutative_of_rank_le_one`).  Supplies the `hD2` input of Theorem D.
+
+*Placement*: this is §12 content (Lemma 12.17 third clause) and was originally stated next to
+Theorem D in `S16_MainResults`; it lives here because its last step needs the §15 helper
+`isCyclic_of_isMulCommutative_of_rank_le_one`, and because Theorem 15.7(b)
+(`inf_conj_fitting_isCyclic`) consumes it upstream of §16. -/
+theorem Msigma_inf_conj_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G} (hg : g ∉ M) :
+    IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M) := by
+  classical
+  set K : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M with hKdef
+  have hKMσ : K ≤ OddOrder.BG.Ch3.S10.Msigma M := hKdef ▸ inf_le_left
+  -- **abelian**: `K' ≤ K ⊓ M_σ' = 1` (the TI part of Lemma 12.17).
+  have hTI : K ⊓ derivedInG (OddOrder.BG.Ch3.S10.Msigma M) = ⊥ := by
+    rw [hKdef]; exact OddOrder.BG.Ch3.S12.Msigma_inf_conj_inf_derived_eq_bot hG hM hg
+  have hder_bot : derivedInG K = ⊥ := by
+    rw [eq_bot_iff, ← hTI]
+    exact le_inf (Subgroup.map_subtype_le _)
+      (OddOrder.BG.Ch3.S12.derivedInG_le_derivedInG hKMσ)
+  have hcommK : commutator ↥K = ⊥ := by
+    have h := hder_bot
+    rwa [derivedInG, Subgroup.map_eq_bot_iff_of_injective _ K.subtype_injective] at h
+  have habelian : ∀ x y : ↥K, x * y = y * x := by
+    have hle : (⊤ : Subgroup ↥K) ≤ Subgroup.centralizer ((⊤ : Subgroup ↥K) : Set ↥K) :=
+      Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcommK
+    intro x y
+    exact Subgroup.mem_centralizer_iff.mp (hle (Subgroup.mem_top y)) x (Subgroup.mem_top x)
+  -- **odd order**.
+  have hodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
+  -- **rank ≤ 1**: a noncyclic elementary abelian `A ≤ K` contradicts the σ-uniqueness core.
+  have hrank : rank ↥K ≤ 1 := by
+    by_contra hcon
+    obtain ⟨p, hp, A, hAea, hAle, hAnc⟩ :=
+      exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K (by omega)
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hAmeet : A ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M := hKdef ▸ hAle
+    have hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma M := hAmeet.trans inf_le_left
+    have hAM : A ≤ M := hAMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+    have hAp : IsPGroup p ↥A := hAea.isPGroup
+    have hAne : A ≠ ⊥ := by rintro rfl; exact hAnc isCyclic_of_subsingleton
+    have hpdvdA : p ∣ Nat.card ↥A := by
+      obtain ⟨n, hn⟩ := hAp.exists_card_eq
+      rcases Nat.eq_zero_or_pos n with h0 | hpos
+      · exact absurd (Subgroup.card_eq_one.mp (by rw [hn, h0, pow_zero])) hAne
+      · exact hn ▸ dvd_pow_self p hpos.ne'
+    have hApσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
+        ⟨hp, hpdvdA.trans (Subgroup.card_dvd_of_le hAMσ), Nat.card_pos.ne'⟩)
+    have hNA : Subgroup.normalizer (A : Set G) ≤ M :=
+      OddOrder.BG.Ch3.S12.norm_noncyclic_sigma hG hM hApσ hAp hAM hAnc
+    have hCA : Subgroup.centralizer (A : Set G) ≤ M :=
+      (Subgroup.centralizer_le_normalizer _).trans hNA
+    exact OddOrder.BG.Ch3.S12.centralizer_not_le_of_isPGroup_le_Msigma_inf_conj
+      hG hM hg hApσ hAp hAne hAmeet hCA
+  exact isCyclic_of_isMulCommutative_of_rank_le_one habelian hodd hrank
+
+/-- **BG Theorem 15.7(b), cyclicity half** (mmd L4249, *"`X` is cyclic"*): the TI-failure
+intersection `X = F(M) ∩ F(M)^g` is cyclic for every `g ∉ M`.
+
+`X ≤ M_σ` and `X ≤ M_σ^g ≤ M^g` (the two containment lemmas above), so `X` sits inside the cyclic
+`M_σ ∩ M^g` (`Msigma_inf_conj_isCyclic`, BG Lemma 12.17 third clause — BG cites Theorem 10.1(a) and
+Lemma 12.17 at exactly this point). -/
+theorem inf_conj_fitting_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G} (hgM : g ∉ M) :
+    IsCyclic ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) := by
+  have hle : (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G)
+      ≤ (OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M : Subgroup G) :=
+    le_inf (inf_conj_fitting_le_Msigma hG hM hgM)
+      ((inf_conj_fitting_le_conj_Msigma hG hM hgM).trans
+        (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (OddOrder.BG.Ch3.S10.Msigma_le M)))
+  haveI : IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M : Subgroup G) :=
+    Msigma_inf_conj_isCyclic hG hM hgM
+  exact Subgroup.isCyclic_of_le hle
+
 end OddOrder.BG.Ch4.S15
