@@ -339,6 +339,19 @@
       the required conjugator in `V` without a free carrier or extra axiom.
     - The leaf, Suzuki hub, `OddOrder.AxiomsCheck`, and full
       `lake build OddOrder` pass with only the three allowed axioms.
-    - **Next frontier:** §3 Lemma 3 (p. 107), strongly real elements.
+15. ✅ **§3 Lemma 3** (p. 107) is formalized in `StronglyReal.lean`.
+    - `IsStronglyReal x` is the source definition: `x` is a product of two
+      nonidentity involutions.
+    - Distinctness of their fixed points is proved from SS2 Proposition 1(c),
+      and double transitivity together with the `K`-orbit on involutions in
+      `H` supplies the source's transitivity on triples `(H₁,H₂,v)`.
+    - The resulting conjugator sends `x` to `u * t` with an honestly proved
+      `u ∈ Q₀#`; no normal-form carrier or conjugacy hypothesis is posited.
+    - If `C_G(x)` had even order, its nontrivial involution lies in
+      `N_G(⟨x⟩)`.  The two source cases `y ∈ H` and `y ∉ H` use the existing
+      odd-dihedral conjugacy theorem inside that normalizer and normality of
+      `C_G(⟨x⟩)` to contradict `x ^ 2 ≠ 1`.
+    - **Next frontier:** §3 Lemma 4 (p. 107), the `PSL(2,q)` subgroup generated
+      when `st` has order three and `V ≠ 1`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

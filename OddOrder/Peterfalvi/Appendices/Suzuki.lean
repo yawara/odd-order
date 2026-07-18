@@ -37,6 +37,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
+import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)
