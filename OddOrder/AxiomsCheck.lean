@@ -87,6 +87,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
 import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
@@ -1154,6 +1155,12 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- (mmd は ⊲⊲ を ⊲ に潰すので PDF p.291 で subnormal を確認済。)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_normal
+
+-- Ch.9 §9D: **Lem 9.29** — strong conjugacy と X^{(G)} の基本性質 (a)-(d)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_le_of_isSubnormal
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_mono
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_strongClosure
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.

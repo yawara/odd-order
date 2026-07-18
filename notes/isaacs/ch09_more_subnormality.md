@@ -440,3 +440,41 @@ AutTower / AutTowerBounds / OrderBound / ThompsonWielandt
    (mathlib) がそのまま書籍の帰納段になる。
 3. **9.30** (商との両立) — `⟨X, Y⟩` の位数最小性を使う非自明な向きがある。
 4. **9.28 Bartels** (L) — 6 step の二重最小反例論法。上記 3 つが前提。
+
+### 2026-07-19 追記: 9.29 + 定義群 landing
+
+`Ch09_MoreSubnormality/SubnormalClosure.lean` (AxiomsCheck 登録済):
+
+| 宣言 | 内容 |
+|---|---|
+| `IsStronglyConjugate X Y` | `∃ g ∈ X ⊔ Y, ConjAct.toConjAct g • X = Y` (書籍 p.289 の強共役) |
+| `.rfl` / `.symm` | 反射・対称 (**推移は成り立たない** — 書籍が明記) |
+| `strongClosureIn K X` | `X^{(K)}` = `K` に含まれる強共役の `sSup` |
+| `strongClosure X` | `X^{(G)}` |
+| `strongClosure_le_of_isSubnormal` | **9.29(a)** `X ≤ S ◁◁ G ⇒ X^{(G)} ≤ S` |
+| `strongClosure_mono` | **9.29(b)** `Y ≤ X ⇒ Y^{(G)} ≤ X^{(G)}` |
+| `strongClosureIn_le` | **9.29(c)** `X^{(K)} ≤ X^{(G)}` |
+| `strongClosureIn_eq_strongClosure` (+ `strongClosureIn_self`) | **9.29(d)** |
+
+**設計判断**: 書籍の `X^{(K)}` を「`↥K` の中で計算した部分群」ではなく
+**`G` の部分群のまま `strongClosureIn K X` として定義**した。強共役性は
+「`⟨X, Y⟩` の中で共役」という**内在的**条件なので、書籍 p.290 の観察
+「`K` 内の強共役 = `G` 内の強共役で `K` に含まれるもの」が**定義の側で吸収**される。
+おかげで (c)(d) が `sSup` の単調性だけに落ちた (書籍の 1 段落が 2 行になる)。
+
+**9.29(a) の帰納**: 9.31 と同じく `IsSubnormal` の構造帰納。`step` 段では帰納法の仮定で
+`X^{(G)} ≤ K` を得たあと、強共役 `Y = g • X` の共役元 `g` が `X ⊔ Y ≤ X^{(G)} ≤ K` に
+入ることを使い、`S ◁ K` から `g • S = S` (`Subgroup.conjAct_pointwise_smul_eq_self`) で閉じる。
+書籍の「`M ◁ G` をとって降りる」帰納が constructor に置き換わる点は 9.31 と同型。
+
+**API メモ**: 部分群の共役は `ConjAct.toConjAct g • X` (pointwise action) を使う。
+`g • X` (`HSMul G (Subgroup G)`) は**インスタンスが無い** — `Subgroup` への pointwise
+action は `MulAut G` / `ConjAct G` 経由。要 `import Mathlib.Algebra.Group.Subgroup.Pointwise`。
+主要補題 = `Subgroup.pointwise_smul_le_pointwise_smul_iff` (単調性),
+`Subgroup.conjAct_pointwise_smul_eq_self` (normalizer で固定)。
+
+**§9D 残**: 9.30 (商との両立; `⟨X, Y⟩` の位数最小性を使う非自明な向きあり) →
+9.28 Bartels (6 step の二重最小反例論法)。9.28 は `IsLeast {S | X ≤ S ∧ S.IsSubnormal}
+(strongClosure X)` の形で述べれば **subnormal closure の存在も同時に得られる**ので、
+`sInf` 版の `subnormalClosure` を別に構成する必要はない (「subnormal の共通部分は
+subnormal」の一般族版が mathlib に無い — binary `IsSubnormal.inf` のみ — 問題を回避できる)。
