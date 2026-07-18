@@ -63,3 +63,54 @@ BG Thm 6.2 の role は満たされている。J(S) literal は FT gate 無の�
 拡張) は独立の major task ゆえ、着手するなら別途 Ch.7 ZJ 整備として (lane a の Ch.9 とは別、Ch.7 は
 lane c/共有)。**「一般化が数学的に無意味」ではない (genuine numbered result) が、major な upstream
 (Glauberman ZJ) 待ちの正当な繰延**。
+
+---
+
+## 判定 (2026-07-19): **blocked on issue 3024** — pending へ
+
+crux (「ZJ hypothesis discharge」) を調査し、**tractable でないことが確定**した。
+
+### 1. repo に p-stable + p-constrained 版 ZJ は無い
+
+`J`-normality の entry point を全数調査した結果、**すべて `C_G(Z(P)) = P` を経由**していた:
+
+| 定理 | 所在 | 仮説 |
+|---|---|---|
+| `Isaacs.Ch07.normal_thompsonJ_of_le_opCore` | `S7B1_NormalJ.lean:1568` | `J(P) ≤ O_p(G)` のみ |
+| `Isaacs.Ch07.thompsonJ_le_opCore_of_normal_J_hypotheses` | `S7B2_NormalJ_PComplement.lean:1308` | `p≠2`, `IsPiSeparable {p} G`, Sylow-2 可換, `O_{p'}=⊥`, **`C_G(Z(P))=P`** |
+| `Isaacs.Ch07.normal_J` | `S7B2:1425` | 同上 |
+| `BG.Ch1.S06.thompsonJ_le_opCore_of_odd` / `normalJ_normal_of_odd` / `thompsonJ_le_oPiPrimePiCore_of_odd` | `S06_Additional.lean:115/134/152` | 上の odd+solvable 特殊化 |
+
+1 番目は仮説が軽いが**使えない**: `J(P) ≤ O_p(G)` は `J(P) ⊴ G` と同値で、これは一般に偽
+(Thompson の normal-J と Glauberman ZJ の差そのもの)。
+
+なお **ZJ の仮説 2 つは repo に在る** — `BG.AppA.IsPStable` (`AppA_PStability.lean:127`) と
+p-constraint (`Isaacs.Ch07.centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot`,
+`S7B1_NormalJ.lean:68`)。**欠けているのは ZJ 定理本体**。
+
+### 2. `C_G(Z(P)) = P` は discharge できない (反例)
+
+`p = 7`、`P = 7^{1+2}` (指数 7)、`C₃ ≤ SL(2,7)` (`3 ∣ 7−1` ゆえ存在)、`G = P ⋊ C₃` (位数 1029)。
+奇数・solvable・`O_{7'}(G) = 1` だが `C₃` は行列式 1 で作用して `Z(P)` を中心化 ⟹
+`C_G(Z(P)) = G ≠ P`。
+
+### 3. BG 自身が証明を書いていない / math-comp も回避している
+
+BG p.49 (PDF; `.mmd` は該当ページを落とす) は "Proof. **G**, Theorem 6.5.1, p. 234 and
+Theorem 8.2.11, p. 279. □" のみ。**G** 8.2.11 = Glauberman ZJ。
+math-comp も ZJ を形式化せず Puig `L(S)` で代替 (`coq/theories/BGappendixAB.v:16`,
+`BGsection1.v:35`)。BG mmd L4593 も「odd order に絞れば `J(S)` の代わりに別の特性部分群で
+より短い証明になる」と述べており、**代替こそが要点**。
+
+⟹ 残るのは **Gorenstein Ch.8 §2 をまるごと移植する**道のみ = **issue 3024** (2,000-4,000 行 /
+複数 session、加えて `J(P)` の定義違い (Gorenstein=abelian 最大位数 vs repo=elementary
+abelian 最大位数) の設計判断が要る)。
+
+### 対応
+
+- 本 issue は **`pending/` のまま据え置き**、blocker が issue 3024 と確定した (従来は
+  「crux が不確実」という理由での pending だった)。恒久対象外ではない。
+- `S06_Additional.lean:130` の docstring 「一般形は `O_{p'}(G)` で商を取り本定理に簡約する
+  (後続コミット)」は**誤り**だったので訂正済 (反例と正しい経路を明記)。この docstring を
+  信じた session は行き止まりに入るところだった。
+- 隣接する tractable な穴 (**BG Thm 6.1 一般形**) を発見 → issue 3025 へ分離。
