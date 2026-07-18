@@ -66,3 +66,68 @@ Gorenstein への引用で済ませてはいない ⟹ **本 issue は形式化�
 - BG mmd `references/bg/local-analysis.mmd` L2011 (statement) 以降 (proof)。
 - survey `notes/meta/three_books_full_survey_2026_07_16.md` L481 (refutation 記録)。
 - `notes/bg/s06_additional.md` (§6 全体の状況)。
+
+---
+
+## 進捗 (2026-07-19): 上流 2 件を landed + **book の誤りを発見・修正**
+
+Thm 6.4 本体は**未完**。ただし Case 1 の hard step 2 件を standalone で landed し、
+形式化を止めていた原因 (book の誤り) を解消した。新 leaf
+`OddOrder/BG/Ch1_Preliminary/S06_Thm64.lean` (216 行)。
+
+### ⚠ BG p.50 (mmd L2031) に誤り — `H ∩ L = 1` は従わない
+
+原文は Case 1 の末尾で
+> `[H, yz] ⊆ H ∩ L = 1.`
+と書くが、**`H ∩ L = 1` は仮説から従わない**。直前の reduction が与えるのは `G = LH` と
+`L ⊴ G`、したがって `G/L ≅ H/(H ∩ L)` だけで、`H ∩ L` の自明性は何も言っていない。
+しかも `L = ⟨J₁, J₂⟩` が `π`-群であることは**本定理の結論そのもの**なので未知であり、
+`π'`-群 `H` と交わりうる。
+
+**正しい部分群は `N`**: `[H, yz] ⊆ H ∩ N = 1`。根拠:
+- `(H^y)^z = H` より `yz ∈ N_G(H)` ゆえ `[H, yz] ⊆ H`;
+- (6.3) で `y` は `HN/N` を中心化するので `h⁻¹ h^y ∈ N`、`z ∈ N` と `N ⊴ G` から
+  `h⁻¹ h^{yz} ∈ N`;
+- `N ≤ O_p(F(G))` は `p`-群で `p ∉ π(H)` ゆえ `H ∩ N = 1` — これは **BG 自身が 1 行前に
+  「`H` is a Hall `p'`-subgroup of `HN`」と書いている内容そのもの**。
+
+⟹ `L` は `N` の書き損じ。結論は健全で定理は危うくない。mmd だけでなく **PDF の紙面
+(p.50 = PDF p.63) でも確認済**。Lean 側は module docstring に記録し、
+`mem_centralizer_of_mem_normalizer_of_commutator_le` として正しい形で形式化した。
+
+### landed (いずれも sorry-free・axiom-clean、AxiomsCheck 登録済)
+
+- **`exists_centralizing_conj_sup_isPiGroup`** — **coprime `A` に対する Thm 6.4**
+  (= BG Prop 1.5(b)+(c) の joint subgroup 形)。Thm 6.4 はこれを「coprime 位数」から
+  「Hall/Fitting 仮説」へ一般化したものなので、Case 1 が最後に呼ぶエンジンそのもの。
+- **`mem_centralizer_of_mem_normalizer_of_commutator_le`** — 上記の修正済 Case-1 中心化ステップ。
+- 付随の transport 補題 4 件 (`conj_smul_eq_map` / `isPiSubgroup_of_le` /
+  `isPiGroup_subgroupOf` / `isPiSubgroup_map_subtype`)。
+
+### 残り見積 — 約 2,100-3,100 行 / 2-3 leaf / 4-8 session
+
+| 残作業 | 行 |
+|---|---|
+| `\|G\| + \|H\|` の帰納骨格 (ℕ 上の強帰納; 商・部分群は同 universe に留まる) | 150-250 |
+| 部分群 `L ⊔ H` への仮説 transport (normal-Hall ∩ 部分群、**`X/F(X)` 冪零の部分群遺伝**、商側) | 500-700 |
+| `G ⧸ N` への仮説 transport (normal-Hall 像、**`X/F(X)` 冪零の商遺伝**、第三同型) | 500-700 |
+| Case 1 assembly (極小正規 `N ≤ O_p(F(G))`、`N ≤ L`、SZ 共役、上記 2 定理) | 300-450 |
+| Case 2 (`B = H ⊓ M`、補群 `H*`、`[J₁,B] ≤ F(M)`、`O_π(F) ≤ O_π(G) = 1`、`B` が `L` を中心化) | 500-800 |
+| 2 つの Fitting 商仮説から `IsSolvable G` を導く (Prop 1.5 に要る) | 100-150 |
+
+**新しい数学は不要** — 入力はすべて repo に在る。
+
+⚠ **着手時の設計判断**: 上表の太字 2 行 (**「`X/F(X)` 冪零」が部分群・商で遺伝する**) は
+§6 に閉じない汎用 Fitting 補題で、repo に現状 home が無い。CLAUDE.md の claim-before-build に
+従い **9000 番台の shared-infra claim** を立ててから作るのが筋。
+
+### 付随して見つかった stale / 重複 (本 lane では直さない)
+
+- **`OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean:739`** (lane a territory) — §3E の節見出しが
+  「**形式化状態**: 全 stub. 完全実装は ~8-12 週の大規模作業」と書くが**誤り**。Thm 3.23 /
+  3.24 (Glauberman) / 3.28 は実装済で、今回消費した BG Prop 1.5(a)(b)(c) はその上に建っている。
+- **private helper の三重化**: `subtype_comp_conj_eq` / `map_subtype_conj_subgroupOf` が
+  `OddOrder/Mathlib/SchurZassenhausConj.lean:267,275` と
+  `BG/Ch3_MaximalSubgroups/S13_PrimeAction.lean:579,584` に `private` で重複し、今回 3 つ目を
+  作らざるを得なかった。ファイル跨ぎ `private` は CLAUDE.md 規約違反ゆえ
+  `OddOrder/Mathlib/Subgroup.lean` へ de-privatize したい (shared infra)。
