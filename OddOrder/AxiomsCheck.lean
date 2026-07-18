@@ -180,6 +180,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
@@ -7485,6 +7486,23 @@ cyclic subgroup normal in `D` asserted by Proposition 2. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_isCyclic
+
+/-! **Peterfalvi Part II, Ch. I §2, standing notation after Proposition 1**:
+`Q₁` is constructed as the unique normal `2`-complement of the nilpotent group
+`Q`. For every Sylow `2`-subgroup `S`, multiplication realizes the exact
+internal direct product `S × Q₁ ≃* Q`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q1Subgroup_isComplement'_sylowTwo
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q1Subgroup_characteristic
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.two_not_dvd_card_Q1Subgroup
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sylowTwoProdQ1MulEquiv
 
 /-! **Peterfalvi Appendix III, Definition 1**: Suzuki `2`-groups are encoded
 honestly as nonabelian `2`-groups with at least two involutions and a cyclic

@@ -62,6 +62,10 @@
        `exists_mem_center_of_normal_ne_bot_of_isNilpotent` + Cauchy) →
        `involutions_H_subset_centralizer_Q` (H∩I ⊆ Z(Q)) → **`Q0 : Subgroup G`**
        ({x∈H | x²=1}) + elementary abelian API (`commute_of_mem_Q0` 等)。
+   - ✅ **Prop 1 後の standing notation `Q=S×Q₁`** — 新 leaf
+     `SylowDecomposition.lean`。`Q₁` を free field にせず、`Q` の冪零性から一意な正規
+     `2`-補群として実構成。任意の `S : Sylow 2 Q` について complement、characteristic、
+     odd order、および multiplication による `S × Q₁ ≃* Q` を axiom-clean で証明。
 5. ✅ **§2 Prop 2 完了** — K は D の cyclic normal 部分群 (p.103)。leaf `KCyclic.lean`。
    - ✅ **基盤完了**: `conjQ0`/`ker_conjQ0` (核=W=C_D(H∩I))/`Dbar`=D/W/`conjQ0bar`
      faithful/`conjQ0bar_transitive` (Q₀^# 可移, §1 Prop 3)/`odd_card_Dbar`→
