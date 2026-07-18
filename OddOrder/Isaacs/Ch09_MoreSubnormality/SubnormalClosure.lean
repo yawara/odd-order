@@ -7,6 +7,7 @@ import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.IsSubnormal
+import OddOrder.Isaacs.Ch02_Subnormality.Basic
 
 /-!
 # Isaacs Ch. 9 — §9D: strong conjugacy と `X^{(G)}` (pp. 289-290)
@@ -407,6 +408,27 @@ theorem strongClosure_map [Finite G] (X : Subgroup G) (f : G →* H)
   intro Z hZ
   obtain ⟨Y, hY, rfl⟩ := exists_isStronglyConjugate_map_eq f hf hZ
   exact Subgroup.map_mono (le_sSup hY)
+
+end
+
+section /- 9D: Bartels Step 2 の部品 — 真部分群による生成 -/
+
+/-- `Nat.Coprime a b` なら `x ∈ ⟨x^a⟩ ⊔ ⟨x^b⟩` (Bezout)。 -/
+theorem mem_sup_zpowers_of_coprime {x : G} {a b : ℕ} (h : Nat.Coprime a b) :
+    x ∈ Subgroup.zpowers (x ^ a) ⊔ Subgroup.zpowers (x ^ b) := by
+  obtain ⟨u, v, huv⟩ : ∃ u v : ℤ, (a : ℤ) * u + (b : ℤ) * v = 1 := by
+    refine ⟨Nat.gcdA a b, Nat.gcdB a b, ?_⟩
+    have hg := Nat.gcd_eq_gcd_ab a b
+    rw [Nat.Coprime.gcd_eq_one h] at hg
+    push_cast at hg ⊢
+    linarith
+  have hx : x = (x ^ a) ^ u * (x ^ b) ^ v := by
+    rw [← zpow_natCast x a, ← zpow_natCast x b, ← zpow_mul, ← zpow_mul, ← zpow_add, huv, zpow_one]
+  have hmem : (x ^ a) ^ u * (x ^ b) ^ v ∈ Subgroup.zpowers (x ^ a) ⊔ Subgroup.zpowers (x ^ b) :=
+    mul_mem
+      (Subgroup.mem_sup_left (Subgroup.zpow_mem _ (Subgroup.mem_zpowers _) u))
+      (Subgroup.mem_sup_right (Subgroup.zpow_mem _ (Subgroup.mem_zpowers _) v))
+  rwa [← hx] at hmem
 
 end
 
