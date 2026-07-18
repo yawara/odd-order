@@ -8,16 +8,17 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
-# Isaacs Ch. 9 — §9D: Bartels の定理 (9.28) (pp. 291-292)
+# Isaacs Ch. 9 — §9D: Bartels の定理 (9.28) (pp. 290-293)
 
 Isaacs, *Finite Group Theory* (AMS GSM 92), §9D の **Theorem 9.28 (Bartels)**:
-`X^{(G)} = X^{••G}` (強共役が生成する部分群 = subnormal closure)。
+`X^{(G)} = X^{••G}` (強共役が生成する部分群 = subnormal closure)。**完成**
+(`strongClosure_isSubnormal`)。
 
 定義群と Lem 9.29 / 9.30 は sibling の
 [`StrongConjugacy`](StrongConjugacy.lean) にある (1500 行規約による prefix-split)。
 Lem 9.31 は [`SylowSubnormal`](SylowSubnormal.lean)。
 
-## 証明の構成 (書籍 p.291-292)
+## 証明の構成 (書籍 pp. 291-293)
 
 最小反例 (`|G|` 最小, 次いで `|X|` 最小) を取り 6 step で矛盾を導く。帰納法の仮定は
 `BartelsIH` として明示パラメータに持たせてあるので, 各 step は単独で sorry-free な
@@ -26,8 +27,12 @@ Lem 9.31 は [`SylowSubnormal`](SylowSubnormal.lean)。
 * **Step 1** `bartels_step_one` — `Y^{(H)} = Z^{(H)} ⇒ Y^{(G)} = Z^{(G)}`
 * **Step 2** `bartels_step_two` — 最小反例の `X` は `p`-群
 * **Step 3** `bartels_step_three` — `Y` を `H` の Sylow `p` の中へ共役で送れる
-* **Step 4** `bartels_step_four` — 極大 `M ⊇ X` の Sylow `p` は `G` の Sylow `p`
-* Step 5, 6 — 未実装
+* **Step 4** `bartels_step_four` — 極大 `M ⊇ X` の Sylow `p` は `G` の Sylow `p`;
+  `bartels_step_four_unique` — その `P` を含む極大部分群は `M` のみ
+* **Step 5** `bartels_step_five` — `X` を含む極大部分群は一意
+* **Step 6** `bartels_step_six` — 矛盾
+
+最後に `|G|` の強帰納法で `BartelsIH` を供給して `strongClosure_isSubnormal` を得る。
 -/
 
 universe u
@@ -938,6 +943,139 @@ theorem bartels_step_five {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
       ⟨C, R, hC, hR, hCR, hXS.trans hSS'.le, hS'CR, hS'p, hS'idx⟩
     exact hSS'.ne (le_antisymm hSS'.le (hSmax hS'cand hSS'.le))
   exact hAB ((key A hA hSA).trans (key B hB hSB).symm)
+
+end
+
+section /- 9D: Bartels Step 6 と Theorem 9.28 本体 (pp. 290-293) -/
+
+/-- `⊥` の強共役は `⊥` のみ。 -/
+@[simp] theorem strongClosure_bot : strongClosure (⊥ : Subgroup G) = ⊥ := by
+  refine le_antisymm (strongClosure_le ?_) bot_le
+  rintro Y ⟨g, -, rfl⟩
+  simp [Subgroup.smul_bot]
+
+/-- 反例の `X^{(G)}` は真部分群 (`⊤` は subnormal ゆえ)。 -/
+theorem strongClosure_ne_top_of_not_isSubnormal {X : Subgroup G}
+    (hX : ¬ (strongClosure X).IsSubnormal) : strongClosure X ≠ ⊤ := fun h =>
+  hX (h ▸ Subgroup.IsSubnormal.top)
+
+/-- 反例であることは共役で保たれる (`X^{(G)}` は共役同変, subnormality も共役で不変)。 -/
+theorem not_isSubnormal_strongClosure_conjAct_smul {X : Subgroup G}
+    (hX : ¬ (strongClosure X).IsSubnormal) (c : ConjAct G) :
+    ¬ (strongClosure (c • X)).IsSubnormal := by
+  rw [strongClosure_conjAct_smul]
+  intro h
+  exact hX (by simpa using h.smul c⁻¹)
+
+/-- **Bartels (9.28) Step 6** (書籍 p. 293): 最小反例からの矛盾。
+
+* `X^G` (`X` の正規閉包) が真部分群なら, `↥(X^G)` に帰納法の仮定を使うと
+  `X^{(G)} = X^{(X^G)}` が `X^G` の中で subnormal, `X^G ◁ G` と繋いで `X^{(G)} ◁◁ G` と
+  なり反例に矛盾。よって `X^G = ⊤`。
+* Step 5 で `X` を含む極大部分群 `M` は一意。`X^G = ⊤ ⊄ M` なので `M` に含まれない `X` の
+  共役 `Y = X^c` が在る (全共役が `M` に入れば `X^G ≤ core_G(M) ≤ M`)。
+* `⟨X, Y⟩` が真部分群なら極大 `N ⊇ ⟨X, Y⟩` は `X` を含むので Step 5 から `N = M`,
+  すると `Y ≤ M` で矛盾。ゆえに `⟨X, Y⟩ = ⊤`, すなわち `Y` は `X` の**強共役**。
+* すると `⊤ = ⟨X, Y⟩ ≤ X^{(G)}` となり `X^{(G)} ≠ ⊤` に矛盾。 -/
+theorem bartels_step_six {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hXp : IsPGroup p ↥X) (hXbot : X ≠ ⊥)
+    (hXsub : ¬ (strongClosure X).IsSubnormal) : False := by
+  have hKtop : strongClosure X ≠ ⊤ := strongClosure_ne_top_of_not_isSubnormal hXsub
+  have hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤ := fun c =>
+    strongClosure_ne_top_of_not_isSubnormal (not_isSubnormal_strongClosure_conjAct_smul hXsub c)
+  have hXne : X ≠ ⊤ := fun h => hKtop (top_le_iff.mp (h ▸ le_strongClosure X))
+  -- `W = X^G` (正規閉包).
+  set W : Subgroup G := Subgroup.normalClosure (X : Set G) with hWdef
+  haveI : W.Normal := Subgroup.normalClosure_normal
+  have hXW : X ≤ W := Subgroup.subset_normalClosure
+  have hWfix : ∀ g : G, ConjAct.toConjAct g • W = W := fun g =>
+    Subgroup.conjAct_pointwise_smul_eq_self
+      (by rw [Subgroup.normalizer_eq_top]; exact Subgroup.mem_top g)
+  have hKW : strongClosure X ≤ W := by
+    refine strongClosure_le ?_
+    rintro Y ⟨g, -, rfl⟩
+    calc ConjAct.toConjAct g • X ≤ ConjAct.toConjAct g • W :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hXW
+      _ = W := hWfix g
+  -- `X^G = ⊤`.
+  have hWtop : W = ⊤ := by
+    by_contra hWne
+    refine hXsub ?_
+    have h1 : ((strongClosure X).subgroupOf W).IsSubnormal := by
+      rw [← strongClosureIn_eq_strongClosure hKW, strongClosureIn_subgroupOf hXW]
+      exact hIH ↥W (card_lt_of_ne_top hWne) _
+    exact Subgroup.IsSubnormal.trans hKW h1 ‹W.Normal›.isSubnormal
+  -- Step 5 の `M`: `X` を含む (唯一の) 極大部分群.
+  obtain ⟨M, hM, hXM⟩ := (eq_top_or_exists_le_coatom X).resolve_left hXne
+  -- `M` に含まれない `X` の共役が在る.
+  have hexists : ∃ c : ConjAct G, ¬ (c • X ≤ M) := by
+    by_contra hall
+    push Not at hall
+    have hcore : (X : Set G) ⊆ (M.normalCore : Set G) := by
+      intro x hx
+      change ∀ b : G, b * x * b⁻¹ ∈ M
+      intro b
+      refine hall (ConjAct.toConjAct b) ?_
+      rw [conjAct_smul_eq_map]
+      exact ⟨x, hx, rfl⟩
+    exact hM.1 (top_le_iff.mp
+      (hWtop ▸ (Subgroup.normalClosure_le_normal hcore).trans M.normalCore_le))
+  obtain ⟨c, hcM⟩ := hexists
+  -- `⟨X, X^c⟩` は真部分群になり得ない (Step 5 の一意性).
+  have hsup : X ⊔ c • X = ⊤ := by
+    by_contra hsupne
+    obtain ⟨N, hN, hNle⟩ := (eq_top_or_exists_le_coatom (X ⊔ c • X)).resolve_left hsupne
+    have hNM : N = M :=
+      bartels_step_five hIH hXp hXbot hne hXsub hN hM (le_sup_left.trans hNle) hXM
+    exact hcM ((le_sup_right.trans hNle).trans hNM.le)
+  -- ゆえに `X^c` は `X` の強共役で, `⊤ = X ⊔ X^c ≤ X^{(G)}`.
+  have hstrong : IsStronglyConjugate X (c • X) :=
+    ⟨ConjAct.ofConjAct c, by rw [hsup]; exact Subgroup.mem_top _, by
+      rw [ConjAct.toConjAct_ofConjAct]⟩
+  exact hKtop (top_le_iff.mp (hsup ▸ sup_le (le_strongClosure X) (le_sSup hstrong)))
+
+/-- **Isaacs Theorem 9.28 (Bartels)**, 帰納法の仮定つきの形: `G` より真に小さい群で
+主張が成り立つなら `G` でも成り立つ。
+
+`|X|` 最小の反例を取り, Step 2 で `p`-群と判り, Step 6 で矛盾。 -/
+theorem strongClosure_isSubnormal_of_bartelsIH {G : Type u} [Group G] [Finite G]
+    (hIH : BartelsIH G) (X : Subgroup G) : (strongClosure X).IsSubnormal := by
+  by_contra hX
+  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  haveI : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
+  obtain ⟨X₀, hX₀, hX₀min⟩ :=
+    exists_minimal_of_wellFoundedLT
+      (fun Y : Subgroup G => ¬ (strongClosure Y).IsSubnormal) ⟨X, hX⟩
+  have hmin : ∀ Y : Subgroup G, Y < X₀ → (strongClosure Y).IsSubnormal := by
+    intro Y hY
+    by_contra hYc
+    exact hY.ne (le_antisymm hY.le (hX₀min hYc hY.le))
+  obtain ⟨p, hp, hX₀p⟩ := bartels_step_two hmin hX₀
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hX₀bot : X₀ ≠ ⊥ := by
+    intro h
+    exact hX₀ (by rw [h, strongClosure_bot]; exact Subgroup.IsSubnormal.bot)
+  exact bartels_step_six hIH hX₀p hX₀bot hX₀
+
+/-- **Isaacs Theorem 9.28 (Bartels)** (p. 290): 任意の部分群 `X ≤ G` (`G` 有限) に対し
+**`X^{(G)}` は `G` で subnormal**。
+
+Lem 9.29(a) の `X^{(G)} ≤ X^{◁◁G}` と合わせて `X^{(G)}` は `X` の **subnormal closure**
+に一致する — すなわち「`X` を含む最小の subnormal 部分群は `X` の強共役たちで生成される」。
+
+証明は `|G|` に関する強帰納法 (`BartelsIH`) + `|X|` 最小反例の 6 step
+(`bartels_step_one` 〜 `bartels_step_six`)。 -/
+theorem strongClosure_isSubnormal {G : Type u} [Group G] [Finite G] (X : Subgroup G) :
+    (strongClosure X).IsSubnormal := by
+  suffices h : ∀ n : ℕ, ∀ (H : Type u) [Group H] [Finite H], Nat.card H = n →
+      ∀ Y : Subgroup H, (strongClosure Y).IsSubnormal by
+    exact h (Nat.card G) G rfl X
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro H _ _ hcard Y
+    refine strongClosure_isSubnormal_of_bartelsIH (fun K _ _ hlt Z => ?_) Y
+    exact ih (Nat.card K) (hcard ▸ hlt) K rfl Z
 
 end
 
