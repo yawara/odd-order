@@ -551,6 +551,15 @@ theorem thompsonWielandtCore_relIndex_le [Finite G] (H K : Subgroup G) :
     _ ≤ Nat.factorial a * Nat.factorial b :=
         Nat.mul_le_mul_left _ (Nat.factorial_le (Nat.sub_le b 1))
 
+/-- **Thm 9.23 の index 連鎖 (最終形)**: `|H : U| ≤ (a!·b!)!` (`U = core_H(E)`).
+`|H:U| ≤ (|H:E|)!` (n!-定理) に `|H:E| ≤ a!b!` を factorial の単調性で合成. -/
+theorem relCore_thompsonWielandtCore_relIndex_le [Finite G] (H K : Subgroup G) :
+    (relCore H (thompsonWielandtCore H K)).relIndex H
+      ≤ Nat.factorial
+          (Nat.factorial ((H ⊓ K).relIndex H) * Nat.factorial ((H ⊓ K).relIndex K)) :=
+  (relCore_relIndex_le_factorial H (thompsonWielandtCore H K)).trans
+    (Nat.factorial_le (thompsonWielandtCore_relIndex_le H K))
+
 /-- `H` に normal な `p`-部分群 `U` は `O_p(H)` に含まれるので `|H : O_p(H)| ≤ |H : U|`.
 書籍 p. 283 の「`U ◁ H` かつ `U` が `p`-群ゆえ `|H:O_p(H)| ≤ |H:U|`」に対応. -/
 theorem opiCoreInG_relIndex_le_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
