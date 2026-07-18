@@ -142,7 +142,9 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
   `existsUnique_mulEquiv_of_isComplement'` を新 leaf `Ch03_SplitExtensions/SplitExtensionUniqueness.lean`
   に実装 (∃! 込み, AxiomsCheck 入り)。旧 internal form `mulEquivSubgroupOfComplement` は
   mathlib `SemidirectProduct.mulEquivSubgroup` の純粋リネーム (下流 0 件) ゆえ削除。
-- **Lem 3.11** Solvable minimal normal subgroup is abelian; if finite, elementary abe — Stated for a finite solvable ambient G (book: arbitrary G with M solvable minimal normal, plus an infinite-abelian clause). Covers every downstream use in the b…
+- ✅ **2026-07-19 解消** — `[Finite G]` を書籍どおり `[Finite ↥M]` に弱めた
+  (`Ch03_SplitExtensions/Basic.lean` `solvable_minimal_normal_isElementaryAbelian`;
+  abelian 節は元から有限性不要)。以下は stale: ~~Lem 3.11 Solvable minimal normal subgroup is abelian; if finite, elementary abe — Stated for a finite solvable ambient G (book: arbitrary G with M solvable minimal normal, plus an infinite-abelian clause). Covers every downstream use in the b…
 
 ### Isaacs Ch.4 — Isaacs Ch.4 Commutators
 
@@ -177,7 +179,10 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 - **4.6** A ⊴ G abelian, G/A cyclic: G' = [A,G], G' ≅ A/(A∩Z(G)), |A| = |G'|·|A∩ — Main/CommutatorBasics.lean. All three clauses covered, but G'=[A,G] and the range identity carry [Finite G] where the book states them for arbitrary G (finitene…
 - **4.16** Finite nilpotent G: maximal normal abelian A satisfies A = C_G(A); hen — Lives OUTSIDE the chapter tree: OddOrder/GroupTheory/CriticalSubgroup.lean:166, cited as Gorenstein 5.3.12 (same statement). Statement re-read in slim pass: hyp…
-- **4.29** Coprime action ⇒ [G,A,A] = [G,A] — Main/ThreeSubgroupsCoprime.lean:394. Retains hypothesis IsSolvable A ∨ IsSolvable G, whereas the printed 4.29 is UNCONDITIONAL (the book's proof removes solvabi…
+- ✅ **2026-07-19 実測: 解消済** — 無条件版 `iterCommutator_inl_inr_two_eq_one_of_coprime`
+  (`Main/ThreeSubgroupsCoprime.lean:508`) が書籍印刷形そのもの (solvability 仮定なし)。
+  `:394` の solvable 版はその engine として併存するだけ。以下は stale:
+  ~~4.29 Coprime action ⇒ [G,A,A] = [G,A] — Retains hypothesis IsSolvable A ∨ IsSolvable G, whereas the printed 4.29 is UNCONDITIONAL (the book's proof removes solvabi…
 
 ### Isaacs Ch.5 — Isaacs Ch.5 Transfer
 
