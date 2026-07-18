@@ -22,6 +22,18 @@ CLAUDE.md「ファイル粒度」の hub gate (1,500 行超ファイルへの追
 
 `OddOrder/AxiomsCheck.lean` (9790 行) は機械列挙 file ゆえ**恒久例外** (対象外)。
 
+## 経過 (lane c, 2026-07-19)
+
+- `PisetBetaDisjoint.lean`: **1473 → 1253 行** (1500 未満に復帰)。BG 15.7(e) の per-prime witness
+  `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` (219 行) を新 leaf
+  `S15_MF/WitnessPGroup.lean` へ移設した (issue 3022 の `p = |X|` 機構と同居させるため)。
+  消費側は S16 の 2 file のみで、S16 は `S15_MF` hub 経由ゆえ **import 無変更**。
+- `OpicoreCentralizer.lean`: 1485 行 (据え置き)。以後 15.7(e) の追記は `WitnessPGroup` 側に置くので
+  ここは増えない見込み。
+- `TypeP1Criteria.lean`: 1655 → **1640 行** (rank-2 議論を S15 へ抽出した分)。まだ 1500 超で watch 継続。
+- `TheoremsAE.lean`: **1800 行のまま**。表の 1800 は既に `Msigma_inf_conj_isCyclic` 移設後の値で、
+  本 tick で追加の減少は無い。watch 対象中で最大。
+
 ## やること
 
 - [ ] どちらかが **2000 行 (本リポジトリの hard 上限、CLAUDE.md 2026-07-09 裁定)** に達したら hub が
