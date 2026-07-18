@@ -263,6 +263,37 @@ BG は `X = X₁` を示して `p = |X|`
       配置: (e2)(e3) が S16 の補題を要するため、trichotomy 本体は **S16 の新 leaf**
       (`TypeVSinger` の下流) に置く。S15 の `fitting_not_ti_trichotomy` は S15 レベルの
       partial として存続させる (S15 は S16 を cite できない)。
+
+      #### 手順 (2026-07-19 確定)
+
+      **手順 A — witness extractor を per-`g` へ一般化**。`p = |X|` を述べるには `X` を固定する
+      必要があり、Coq も `g \notin M -> X :!=: 1 ->` を仮説に取る。現状の
+      `exists_inf_conj_fitting_orderP_witness` (`PisetBetaDisjoint.lean:581`) は `∃ g` 形だが、
+      **証明本体は `:597` で `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` から
+      `hgM`/`hXne` を obtain した直後、以降 `hnotTI` を使っていない** (2026-07-19 確認済 —
+      `hnotTI` の出現は署名 `:583` と `:597` の 2 箇所のみ、定理は `:684` まで)。⟹ 署名を
+      `{g : G} (hgM : g ∉ M) (hXne : X ≠ ⊥)` に変え `∃ p X₁, …` を返す形へ一般化し、
+      `:597` の obtain を削除するだけ。既存の `∃ g` 版は新版からの 2 行の導出として残す
+      (消費側 4 箇所を書き換えずに済む; 純粋リネーム wrapper ではなく genuine な特殊化)。
+
+      **手順 B — trichotomy 本体**を新 leaf `S16_MainResults/FittingNonTITrichotomy.lean` に。
+      Coq の形どおり共通 conjunct を括り出す。`|M/H|` は `Subgroup.index` 
+      (`((MF M).subgroupOf M).index`) で述べる — repo の既存イディオム
+      (`card_W1_eq_derived_index` と同じ) で、normality instance を要求せずに済む。
+      exponent 条件のみ商群 `↥M ⧸ (MF M).subgroupOf ↥M` が要るので `MF M ⊲ M` を供給する。
+      証明の骨格:
+      - `H` 可換 ⟹ (e1) (既存 `isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI` +
+        `rank_mf_eq_two_…`)。
+      - `H` 非可換 ⟹ `p = |X|` (`card_inf_conj_fitting_eq_of_not_isMulCommutative`)、共通 conjunct
+        2 件 (`opiCore_singleton_not_isMulCommutative_of_witness` /
+        `typeF_nonabelian_cyclic_opiCore_compl`)、その後 (a) で type `F` / `P₁` に分岐:
+        - type `F` ⟹ (e2): 各 `q ∈ π(H)` に per-prime witness
+          (`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`) +
+          `typeF_exponent_dvd_sub_one_of_invariant_card`。
+        - type `P₁` ⟹ Coq の含意 `Ks = Z₀ → |K| ∣ p−1` で場合分け。真なら (e2)
+          (`Z q = Ks` なら `q = p`; さもなくば `Z q ⊓ Ks = ⊥` + semiprime で
+          `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot`)。偽なら (e3) (Singer 鎖 =
+          `card_opiCore_eq_prime_cube_singer` + `card_dvd_succ_of_primeAction_extraspecial`)。
 - [x] **(d) の追加** (2026-07-18 完了)。`sigmaComplement_structure_of_not_fittingIsTI` として、
       `fitting_not_ti_cases` の bundle でなく **§12 E-setup を取る独立定理**にした (BG (d) は
       「§12-13 のとおりに取った E, E₁, E₂, E₃」についての主張なので、E-setup を引数に取る形が
