@@ -831,6 +831,39 @@ theorem isSubnormal_strongClosure_of_normalizing_kernel {G : Type u} [Group G] [
   rw [strongClosure_map X (QuotientGroup.mk' K) (QuotientGroup.mk'_surjective K)]
   exact hIH (G ⧸ K) (card_quotient_lt_of_ne_bot hK) _
 
+/-- `z` が `Y` を中心化するなら `Y^z = Y`。 -/
+theorem conjAct_smul_eq_self_of_mem_centralizer {Y : Subgroup G} {z : G}
+    (hz : z ∈ Subgroup.centralizer (Y : Set G)) : ConjAct.toConjAct z • Y = Y := by
+  refine Subgroup.conjAct_pointwise_smul_eq_self ?_
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hcomm : ∀ w ∈ Y, w * z = z * w := fun w hw => Subgroup.mem_centralizer_iff.mp hz w hw
+  constructor
+  · intro hy
+    have := hcomm y hy
+    rw [show z * y * z⁻¹ = y by rw [← this]; group]
+    exact hy
+  · intro hy
+    -- `w = z * y * z⁻¹ ∈ Y` は `z` と可換なので `y = w ∈ Y`.
+    have h3 : z * y = z * (z * y * z⁻¹) := by rw [← hcomm _ hy]; group
+    rw [mul_left_cancel h3]
+    exact hy
+
+/-- **`Z(P)` は `𝒦(P)` に自明に作用する** (書籍 p.291 Step 4)。
+
+`W ∈ 𝒦(P)` は `Y ≤ P` の `Y^{(G)}`。`z` が `P` を中心化すれば `Y^z = Y` なので
+`W^z = (Y^z)^{(G)} = W`。 -/
+theorem conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet {X P : Subgroup G} {z : G}
+    (hz : z ∈ Subgroup.centralizer (P : Set G)) {W : Subgroup G} (hW : W ∈ kappaSet X P) :
+    ConjAct.toConjAct z • W = W := by
+  obtain ⟨Y, hYP, _, rfl⟩ := hW
+  have hzY : ConjAct.toConjAct z • Y = Y := by
+    refine conjAct_smul_eq_self_of_mem_centralizer ?_
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    exact Subgroup.mem_centralizer_iff.mp hz w (hYP hw)
+  rw [← strongClosure_conjAct_smul, hzY]
+
 end
 
 end OddOrder.Isaacs.Ch09

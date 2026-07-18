@@ -1208,6 +1208,9 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- Ch.9 §9D: Bartels Step 4 の第 1 分岐 — 作用の核が非自明なら X^{(G)} は subnormal。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isSubnormal_of_map_quotient
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isSubnormal_strongClosure_of_normalizing_kernel
+-- Z(P) は 𝒦(P) に自明に作用する (Step 4 で作用の核の非自明性を出す部分)。
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
