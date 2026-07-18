@@ -204,6 +204,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7795,6 +7796,43 @@ that conclusion back to the original centralizer. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_cQ_isPGroup_of_induction
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, PSL branch:
+the quotient and actual centralizer root groups are elementary abelian of
+order `ell = |F|`, and `ell = |C_Q0(X)|`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qMulEquivPSLRoot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.q_isElementaryAbelian_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_field_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQMulEquivPSLRoot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQ_isElementaryAbelian_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQuotientQ_eq_field_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQ0_subgroupOf_eq_Q_subgroupOf_of_elementaryAbelian
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQMulEquivPSLRoot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ_isElementaryAbelian_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_field_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_field_of_psl2Target
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, distinguished-pair
 transport and order lift: the quotient pair is the image of the original
