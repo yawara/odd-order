@@ -7,6 +7,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Basic
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AgemoLayers
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanAbelian
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanNormalCover
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanFrattiniConsequences
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterHomocyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
