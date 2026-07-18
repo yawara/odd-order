@@ -244,7 +244,22 @@
      (`V = C_D(s)`) and `s ∈ L ∩ Q`. The source assumption `1 ≠ X` is not
      needed for part (a); it remains available for the strict-order induction
      in the later clauses.
-   - **Next frontier:** §3 Prop 1(b), the normalizer formula, before the deeper
-     target trichotomy in part (c).
+11. ✅ **§3 Prop 1(b) complete** — new leaf `CentralizerNormalizer.lean`.
+   - Double transitivity on `Ω_X` gives the source first factorization
+     `N_G(X) = C_G(X) N_D(X)`.  Peterfalvi writes right actions; with the
+     Lean left action the correcting centralizer element is multiplied on
+     the left.
+   - Applying §1 `invertedProdEquiv` to an inverse element of
+     `N_D(X)` preserves the source order and proves
+     `N_D(X) = N_K(X) N_V(X)`, where every normalizer is the ambient
+     intersection with `N_G(X)`.
+   - `V_inf_K_eq_bot` follows because `t` centralizes `V`, inverts
+     `K`, and `D` has odd order.  Since `K ◁ D`, the commutator of
+     `N_K(X)` with `X` lies in `X ∩ K ≤ V ∩ K = 1`; hence
+     `N_K(X) ≤ C_G(X)` and the final endpoint is
+     `N_G(X) = C_G(X) N_V(X)`.
+   - The source assumption `1 ≠ X` is not needed for part (b).
+   - **Next frontier:** §3 Prop 1(c), beginning with the induction quotient
+     `F = O^{2′}(C_G(X))` and the three target cases.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

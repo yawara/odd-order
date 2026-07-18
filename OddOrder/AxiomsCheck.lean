@@ -189,6 +189,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7637,6 +7638,29 @@ restricted action has intrinsic core equal to the centralizer of `L cap Q` in
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_le_cV
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
+the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
+retains the source order through `N_G(X) = C_G(X) N_D(X)`,
+`N_D(X) = N_K(X) N_V(X)`, and `N_K(X) <= C_G(X)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.smul_mem_fixedPoints_of_mem_normalizer
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.V_inf_K_eq_bot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_inf_D_eq_normalizer_inf_K_mul_normalizer_inf_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_inf_K_le_centralizer
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_eq_centralizer_mul_normalizer_inf_D
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_eq_centralizer_mul_normalizer_inf_V
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
