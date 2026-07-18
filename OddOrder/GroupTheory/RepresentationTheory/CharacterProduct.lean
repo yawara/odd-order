@@ -7,8 +7,6 @@ import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
-set_option linter.unusedFintypeInType false
-
 /-!
 # Pointwise product of class functions; products of characters
 
@@ -26,6 +24,8 @@ The immediate consumer is **Gallagher's theorem** (Isaacs 6.17): for `χ ∈ Irr
 preserves the norm — hence irreducible.  This feeds the constructive-Clifford decomposition of
 `Ind_H^L θ` (Peterfalvi (1.7), the general type-I `typeI_induced_char_constituents`).
 -/
+
+set_option linter.unusedFintypeInType false
 
 namespace OddOrder.RepresentationTheory
 

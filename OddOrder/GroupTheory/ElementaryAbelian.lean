@@ -8,9 +8,6 @@ import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Sylow
 import OddOrder.Mathlib.Subgroup
 
--- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
-open scoped IsMulCommutative
-
 /-!
 # Elementary Abelian Groups
 
@@ -33,6 +30,9 @@ Ch.3 (Isaacs Thm 3.11), Ch.6 (6.9/6.15), Ch.7 (J(P) 定義) 共通の shared con
   `IsPGroup p G ∧ Monoid.exponent G ∣ p` への bridge は将来追加可.
 * 将来 mathlib upstream 視野で `OddOrder/Mathlib/ElementaryAbelian.lean` 候補.
 -/
+
+-- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
+open scoped IsMulCommutative
 
 namespace OddOrder.GroupTheory
 
