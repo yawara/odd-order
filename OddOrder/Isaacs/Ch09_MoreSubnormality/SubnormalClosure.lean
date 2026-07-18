@@ -978,6 +978,27 @@ theorem kappaSet_eq_top_of_setwiseStabilizer_eq_top {X M : Subgroup G} (hXM : X 
   have := (hg (strongClosure X)).mpr (mem_kappaSet_self X hXM)
   rwa [ConjAct.toConjAct_ofConjAct] at this
 
+
+/-- **`N_G(P)` は `𝒦(P)` を保つ** (書籍 p.291 「this set is stabilized by `N_G(P)`」)。 -/
+theorem normalizer_le_setwiseStabilizer_kappaSet (X P : Subgroup G) :
+    Subgroup.normalizer P ≤ setwiseStabilizer (kappaSet X P) := by
+  intro g hg W
+  have hP : ConjAct.toConjAct g • P = P := Subgroup.conjAct_pointwise_smul_iff.mpr hg
+  have hPinv : (ConjAct.toConjAct g)⁻¹ • P = P := by
+    rw [inv_smul_eq_iff, hP]
+  constructor
+  · intro hW
+    have := mem_kappaSet_conjAct_smul (c := (ConjAct.toConjAct g)⁻¹) hW
+    rwa [inv_smul_smul, hPinv] at this
+  · intro hW
+    have := mem_kappaSet_conjAct_smul (c := ConjAct.toConjAct g) hW
+    rwa [hP] at this
+
+/-- **`C_G(P)` は `𝒦(P)` を各点固定する** (書籍 p.291 の `Z(P)` の部分)。 -/
+theorem centralizer_le_pointwiseStabilizer_kappaSet (X P : Subgroup G) :
+    Subgroup.centralizer (P : Set G) ≤ pointwiseStabilizer (kappaSet X P) :=
+  fun _ hz _ hW => conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet hz hW
+
 /-- **極大部分群の二分岐**: `M` が極大で `M ≤ K` なら `K = M` または `K = ⊤`. -/
 theorem eq_or_eq_top_of_isCoatom {M K : Subgroup G} (hM : IsCoatom M) (hMK : M ≤ K) :
     K = M ∨ K = ⊤ := by
