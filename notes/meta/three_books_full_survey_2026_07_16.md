@@ -240,14 +240,20 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### Isaacs Ch.9 — Isaacs Ch.9 More on Subnormality
 
-> ⚠ **2026-07-19 実測: 「essentially unformalized (31 件)」は全面 stale**。
-> `Ch09_MoreSubnormality/` に 15 leaf (Quasisimple / Components / Semisimple / Layer /
+> ✅ **2026-07-19 完了: Isaacs Ch.9 は全 31 結果が形式化済 (以下の表は全面 stale)**。
+> `Ch09_MoreSubnormality/` に 19 leaf (Quasisimple / Components / Semisimple / Layer /
 > LayerRestriction / GeneralizedFitting / SubnormalSocle / NilpotentResidual / PResidual /
-> Schenkman / InnerAutomorphisms / AutTower / AutTowerBounds / OrderBound / ThompsonWielandt)。
-> 番号 grep で **9.1–9.27 は全て repo にヒット** (§9A F* / §9B automorphism tower / §9C
-> Thompson–Wielandt)。
-> ⇒ **残るのは §9D のみ: 9.28 (Bartels subnormal closure) / 9.29 / 9.30 と Lem 9.31**。
-> これがレーン a の現 frontier (2026-07-19)。
+> Schenkman / InnerAutomorphisms / AutTower / AutTowerBounds / OrderBound / ThompsonWielandt /
+> SylowSubnormal / StrongConjugacy / SubnormalClosure)。
+> 番号 grep で 9.1–9.27 が全てヒット (§9A F* / §9B automorphism tower / §9C
+> Thompson–Wielandt) し、**§9D も 2026-07-19 に完了** —
+> 9.28 Bartels (`strongClosure_isSubnormal`, 6 step) / 9.29 / 9.30 / 9.31 すべて
+> sorry-free・axiom-clean。詳細 = `notes/isaacs/ch09_more_subnormality.md` の
+> 「§9D 完了」節。
+> ⚠ 併せて **9.26/9.27 が書籍の `S ◁◁ G` でなく `S ◁ G` で形式化されていた MISMATCH**
+> (issue 9150 → 0125) も解消済。
+> ⇒ レーン a の frontier は Ch.9 を離れ、**文書順で Ch.2 Lem 2.14 → Ch.5 → Ch.6 →
+> Ch.8 → Ch.10 → 付録** へ (Ch.3/Ch.4 は完了済、Ch.8/Ch.10 は 2026-07-19 裁定で a 所有)。
 
 > Isaacs Ch.9 is essentially unformalized: all 31 numbered results (9.1–9.31) lack full-strength Lean counterparts, and none of the chapter's signature concepts (quasisimple, component, layer E(G), semisimple group, F*(G), automorphism tower, subnormal closure, strong conjugacy) exist in the repo or in mathlib. This is a documented deliberate skip — notes/isaacs/ch09_more_subnormality.md records a 2026-05-23 audit showing zero uses of any Ch.9 concept in BG or Peterfalvi (FT's group is ultimately solvable, where F*=F), and fresh greps confirm the repo state matches that audit. The chapter is not entirely from scratch, though: the solvable specialization of Bender's Thm 9.8 is fully proved as BG Prop 1.3 (centralizer_fitting_le_fitting), and scattered infrastructure lowers entry costs — socle (Ch02), Thm 2.6 (the hub cited 5x by §9A proofs), S^∞ as lowerCentralSeriesInfty (Ch04), O^p as OPrime (Ch05), the n!-theorem (Ch01), ker(conjNormal)=centralizer and a |G/C| ≤ |Aut C| embedding (Ch06/Ch07), plus mathlib's IsSubnormal/IsPerfect/MulAut.conj. Surprises: Lemma 9.31 (Sylow ∩ subnormal) is missing even from mathlib despite being a basic general fact, and the Nougat-missing page 302 was verified against the PDF to contain only §9D definitions, so the enumeration is complete. Effort estimates are marginal in document order (each assumes earlier chapter results exist); the natural clusters are §9A F*-theory (~1 wk), §9B tower (~1-1.5 wk), §9C Thompson–Wielandt (~3-4 days on top of A+B), §9D Bartels (~1-1.5 wk). Slim verification pass: all flagged missing/partial labels and the Thm 9.8 specialization (statement read) were confirmed; the only substantive correction is to Lem 9.6's notes — BG Lem 1.1 (isMinimalNormal_le_fitting_and_isElementaryAbelian) does prove 'minimal normal ⟹ elementary abelian' for solvable G at full strength, contrary to the earlier note — plus minor path/name enrichments (ChainNilpotent.lean lives under Main/, two additional private conjNormal-kernel variants for 9.11).
 
