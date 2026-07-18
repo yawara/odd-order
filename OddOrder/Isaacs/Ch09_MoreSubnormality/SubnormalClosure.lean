@@ -159,6 +159,46 @@ theorem strongClosureIn_self (X : Subgroup G) :
 
 end
 
+/-! ### 共役との両立 (Isaacs p. 290, 9.29 直前の観察) -/
+
+/-- pointwise 共役作用は部分群の `⊔` と可換。 -/
+theorem conjAct_smul_sup (c : ConjAct G) (X Y : Subgroup G) :
+    c • (X ⊔ Y) = c • X ⊔ c • Y := by
+  simp only [Subgroup.pointwise_smul_def]
+  exact Subgroup.map_sup _ _ _
+
+/-- 強共役性は共役で保たれる。 -/
+theorem IsStronglyConjugate.conjAct_smul {X Y : Subgroup G} (h : IsStronglyConjugate X Y)
+    (c : ConjAct G) : IsStronglyConjugate (c • X) (c • Y) := by
+  obtain ⟨a, ha, rfl⟩ := h
+  refine ⟨c • a, ?_, ?_⟩
+  · rw [← conjAct_smul_sup]
+    exact Subgroup.smul_mem_pointwise_smul a c _ ha
+  · have hconj : ConjAct.toConjAct (c • a) = c * ConjAct.toConjAct a * c⁻¹ := by
+      simp [ConjAct.smul_def, ConjAct.toConjAct_mul, ConjAct.toConjAct_inv]
+    rw [hconj, mul_smul, mul_smul, inv_smul_smul]
+
+/-- **Isaacs p. 290 の観察**: `(X^{(G)})^g = (X^g)^{(G)}`. -/
+theorem strongClosure_conjAct_smul (c : ConjAct G) (X : Subgroup G) :
+    strongClosure (c • X) = c • strongClosure X := by
+  -- 片方向を一般に示し, `c⁻¹` と `c • X` に適用して逆向きを得る.
+  have key : ∀ (d : ConjAct G) (W : Subgroup G), strongClosure (d • W) ≤ d • strongClosure W := by
+    intro d W
+    refine sSup_le ?_
+    intro V hV
+    have hback : IsStronglyConjugate W (d⁻¹ • V) := by
+      have := hV.conjAct_smul d⁻¹
+      rwa [inv_smul_smul] at this
+    calc V = d • (d⁻¹ • V) := (smul_inv_smul d V).symm
+      _ ≤ d • strongClosure W :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (le_sSup hback)
+  refine le_antisymm (key c X) ?_
+  have h2 := key c⁻¹ (c • X)
+  rw [inv_smul_smul] at h2
+  calc c • strongClosure X ≤ c • (c⁻¹ • strongClosure (c • X)) :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h2
+    _ = strongClosure (c • X) := smul_inv_smul c _
+
 section /- 9D: Lemma 9.30 — 商への移行 (pp. 290-291) -/
 
 variable {H : Type*} [Group H]
