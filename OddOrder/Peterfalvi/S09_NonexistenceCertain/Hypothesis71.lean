@@ -432,6 +432,68 @@ theorem chiRho_norm_sq_le {G : Type*} [Group G] [Fintype G]
   rw [h_decomp, Complex.add_re, h_phi_eq]
   linarith
 
+/-- **Peterfalvi (7.2.b), equality case.**  `‖χ^ρ‖² = ‖χ‖²` holds **iff** `χ` lies in the
+image of the Dade map `τ`.
+
+This is the clause the book states alongside the inequality `chiRho_norm_sq_le` and which
+that theorem discards: its proof establishes the orthogonal decomposition
+`⟨χ, χ⟩ = ⟨φ, φ⟩ + ⟨χ - φ, χ - φ⟩` with `φ := τ (χ^ρ)` and `⟨φ, φ⟩ = ‖χ^ρ‖²`, then drops the
+tail via `inner_self_re_nonneg`.  Keeping the tail gives both directions:
+
+* **(⟹)** equality forces `⟨χ - φ, χ - φ⟩.re = 0`, so `χ = φ = τ (χ^ρ)` by positive
+  definiteness (`eq_zero_of_inner_self_re_eq_zero`) — in particular `χ ∈ im τ`, witnessed
+  by `χ^ρ` itself (`chiRhoSupp χ`).
+* **(⟸)** if `χ = τ α` then `χ^ρ = α` by (7.2.a) (`chiRhoCF_dadeImage_eq`), so the isometry
+  `hiso` gives `‖χ^ρ‖² = ‖α‖² = ‖τ α‖² = ‖χ‖²` — here the two complex inner products are
+  literally equal, not merely their real parts. -/
+theorem chiRho_norm_sq_eq_iff_mem_range {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hiso : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ)).re
+        = (ClassFunction.inner χ χ).re
+      ↔ ∃ α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L,
+          H71.τ α = χ := by
+  constructor
+  · intro heq
+    refine ⟨H71.chiRhoSupp χ, ?_⟩
+    set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L :=
+      H71.chiRhoSupp χ with hα_def
+    set φ : ClassFunction G ℂ := H71.τ α with hφ_def
+    have hα_coe : (α : ClassFunction L ℂ) = H71.chiRhoCF χ := rfl
+    -- `⟨φ, χ⟩ = ⟨φ, φ⟩` via the adjoint formula + isometry.
+    have h_phi_chi : ClassFunction.inner φ χ = ClassFunction.inner φ φ := by
+      have h_adj : ClassFunction.inner φ χ =
+          ClassFunction.inner (α : ClassFunction L ℂ) (H71.chiRhoCF χ) :=
+        H71.chiRho_adjoint α χ
+      have h_isom : ClassFunction.inner φ φ =
+          ClassFunction.inner (α : ClassFunction L ℂ) (α : ClassFunction L ℂ) :=
+        hiso.inner_eq α α
+      rw [h_adj, h_isom, hα_coe]
+    have h_chi_phi : ClassFunction.inner χ φ = ClassFunction.inner φ φ := by
+      rw [ClassFunction.inner_symm, h_phi_chi, ClassFunction.star_inner_self]
+    have h_decomp : ClassFunction.inner χ χ =
+        ClassFunction.inner φ φ + ClassFunction.inner (χ - φ) (χ - φ) := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+          ClassFunction.inner_sub_right, h_chi_phi, h_phi_chi]
+      ring
+    have h_phi_eq : ClassFunction.inner φ φ =
+        ClassFunction.inner (H71.chiRhoCF χ) (H71.chiRhoCF χ) := by
+      rw [hφ_def]
+      exact (hiso.inner_eq α α).trans (by rw [hα_coe])
+    -- Equality kills the tail, so `χ = φ`.
+    have h_tail : (ClassFunction.inner (χ - φ) (χ - φ)).re = 0 := by
+      have hre := congrArg Complex.re h_decomp
+      rw [Complex.add_re, h_phi_eq] at hre
+      linarith
+    have hzero : χ - φ = 0 := eq_zero_of_inner_self_re_eq_zero h_tail
+    exact (sub_eq_zero.mp hzero).symm
+  · rintro ⟨α, rfl⟩
+    -- (7.2.a): `(τ α)^ρ = α`, so the isometry transports the norm verbatim.
+    rw [H71.chiRhoCF_dadeImage_eq α, hiso.inner_eq α α]
+
 open scoped Classical in
 /-- **Peterfalvi (7.3).**  The integral inequality:
 `|G|⁻¹ Σ_{g ∈ A^τ} |χ(g)|² ≥ ‖χ^ρ‖²`, with equality iff `χ` is constant on each
