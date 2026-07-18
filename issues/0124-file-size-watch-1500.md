@@ -17,6 +17,7 @@ CLAUDE.md「ファイル粒度」の hub gate (1,500 行超ファイルへの追
 |---|---|---|---|
 | `OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean` | 1560 | c | 本 tick で +156 (Cn 三段論法系) → 1500 を新たに超過 |
 | `OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults/TypeP1Criteria.lean` | 1655 | c | 既に超過、本 tick で +16 |
+| `OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults/TheoremsAE.lean` | 1800 | c | 2026-07-19 tick (merge `2a2df98`) で検出。本 tick では -60 行 (15.7(b) 強化に伴う恒真 disjunct 削除) と**減少方向**だが、watch 対象中で最大。`PisetBetaDisjoint.lean` (1469) は 1500 直下ゆえ次の追記で超過見込み |
 | `OddOrder/Isaacs/Ch03_SplitExtensions/Basic.lean` | 1728 | a | 2026-07-19 tick (merge `1e1b0ed`) で追記 — 新規検出。Lem 3.1 本体は新 leaf `SplitExtensionUniqueness.lean` に切られており (lane trigger 遵守)、Basic.lean 側は薄い wrapper 追加のみ |
 
 `OddOrder/AxiomsCheck.lean` (9790 行) は機械列挙 file ゆえ**恒久例外** (対象外)。
