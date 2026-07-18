@@ -1006,8 +1006,7 @@ theorem primeFactors_centralizer_le_tau1_of_disjoint [Finite G] (hG : IsMinimalS
     refine Nat.mem_primeFactors.mpr ⟨hr_prime, ?_, Nat.card_pos.ne'⟩
     rw [← hyord]
     exact Subgroup.orderOf_dvd_natCard E hyE
-  rcases h.mem_tau_union_of_mem_primeFactors hG hrE with h12 | h3
-  rcases h12 with h1 | h2
+  rcases h.mem_tau_union_of_mem_primeFactors hG hrE with (h1 | h2) | h3
   · exact h1
   · -- `r ∈ τ₂`: then `r = p` and `⟨y⟩` is a line violating (c) or the disjointness.
     exfalso

@@ -48,7 +48,7 @@ no-real (`sSet_hasNoRealCharacters`), the Dade isometry / ZIrr-image / support f
 (`dadeIntegralCharacterMap_*_of_supported`, `sSet_caseB_member_diff_supported`), and the uniform
 degree — are landed sorry-free; the sole residual is the reducible branch of
 `sSet_memberRFamily` (+ `_orthogonal`), the `S`-instance §6 certain-type port. -/
-noncomputable def Hypothesis.sSet_coherent_dade_caseB [Finite G]
+theorem Hypothesis.sSet_coherent_dade_caseB [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G))

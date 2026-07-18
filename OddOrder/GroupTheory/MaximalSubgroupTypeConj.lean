@@ -225,6 +225,7 @@ section OpiCore
 
 variable [Finite G] (φ : MulAut G)
 
+omit [Finite G] in
 /-- **`opiCoreInG` is `MulAut`-equivariant**: `φ • O_π(H) = O_π(φ • H)`.  The `π`-core
 `oPiCore π ↥H` is characteristic, so the iso `↥H ≃* ↥(φ•H)` induced by `φ` carries it onto
 `oPiCore π ↥(φ•H)`. -/

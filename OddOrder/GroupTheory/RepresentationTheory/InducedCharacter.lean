@@ -784,8 +784,6 @@ theorem induceTerm_of_mem_normal {A H : Subgroup G} (hAH : A ≤ H) [hA : A.Norm
   have hxa : x⁻¹ * a * x ∈ H := hAH (hA.conj_mem' a ha x)
   rw [induceTerm_of_mem θ hxa]
 
-variable [Fintype G]
-
 set_option linter.unusedSectionVars false in
 set_option linter.unusedFintypeInType false in
 /-- **Value of `Ind_H^G θ` on a normal subgroup, constant case.**  Let `A ⊴ G` with `A ≤ H`,
@@ -976,7 +974,7 @@ section InduceVirtualCharacters
 
 /-! ### Induction preserves virtual characters -/
 
-variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Invertible (Nat.card G : ℂ)]
 
 set_option linter.unusedSectionVars false in
 set_option linter.unusedFintypeInType false in

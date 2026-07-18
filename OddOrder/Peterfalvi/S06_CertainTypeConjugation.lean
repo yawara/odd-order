@@ -175,6 +175,7 @@ theorem chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (w1CharEquiv_rowInv h i).symm
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **`L`-side σ conjugation closure** (the (4.9)(a) bridge ingredient).  The complex conjugate of
 the `L`-side σ-image `σ_L(ω_{ij})` is `σ_L(ω_{i'j'})` at the conjugate grid index.  Combines the
 (3.9) commutation `sigma_mapRingEquiv_comm` for `toTICyclicHypothesis` with `chiColumn_conj`.
@@ -192,7 +193,7 @@ theorem sigma_chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
   exact h.toTICyclicHypothesis.sigma_mapRingEquiv_comm rfl h.toTICyclicFullDadeApplication
     Complex.conjAe.toRingEquiv (h.chiColumn χ₂ i)
 
-omit [Fintype G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.9)(a), the `L`-character conjugation bridge.**  `δ_j·μ_{ij}̄ = δ_{j'}·μ_{i'j'}`
 at the conjugate index (`i' = rowInv i`, `j' = χ₂⁻¹`).  Apply complex conjugation `mapRingEquiv conj`
 to the (4.3.b) identity `σ_L(ω_{ij}) = δ_j·μ_{ij}`: the left side becomes `σ_L(ω_{i'j'}) = δ_{j'}·
@@ -214,7 +215,7 @@ theorem certainType_mu_conj_bridge (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)
   rw [sigma_chiColumn_conj, e2, ClassFunction.mapRingEquiv_zsmul] at key
   exact key.symm
 
-omit [Fintype G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.9)(a), `μ_{ij}̄ = μ_{i'j'}`.**  The conjugation bridge `δ_j·μ_{ij}̄ =
 δ_{j'}·μ_{i'j'}` forces the (genuine irreducible) characters equal: pairing both sides with
 `μ_{i'j'}` gives `δ_j·⟨μ_{ij}̄, μ_{i'j'}⟩ = δ_{j'}` (since `‖μ_{i'j'}‖² = 1`); as the inner product
@@ -240,7 +241,7 @@ theorem certainType_mu_conj_eq (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
   exact absurd hI.symm (by
     rcases (h.columnFamily χ₂⁻¹).sign_eq with he | he <;> rw [he] <;> norm_num)
 
-omit [Fintype G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.9)(a), `μ̄_j = μ_{j'}`** (column-sum form).  The complex conjugate of the
 certain-type column character `μ_j = ∑_i μ_{ij}` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}`
 (`j' = χ₂⁻¹`).  `mapRingEquiv conj` is additive (`map_sum`), each `μ_{ij}̄ = μ_{i'j'}`

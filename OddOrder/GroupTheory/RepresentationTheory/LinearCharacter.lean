@@ -197,6 +197,7 @@ theorem IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative [IsMulCommut
     Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative (ρ := ρ)
   rw [congrFun hχ 1, ρ.char_one, hdim, Nat.cast_one]
 
+omit [Finite G] in
 /-- Every irreducible character of a finite commutative group comes from a linear character. -/
 theorem IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
     [IsMulCommutative G] {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
@@ -227,6 +228,7 @@ theorem IsIrreducibleCharacter.apply_commutatorElement_eq_one_of_apply_one_eq_on
         = ((φ : G → ℂ) a * (φ : G → ℂ) a⁻¹) * ((φ : G → ℂ) b * (φ : G → ℂ) b⁻¹) := by ring
     _ = 1 := by rw [hainv, hbinv, mul_one]
 
+omit [Finite G] in
 /-- A degree-one irreducible character is **trivial on the commutator subgroup**: `θ(n) = 1` for
 every `n ∈ commutator G`.
 

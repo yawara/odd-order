@@ -147,7 +147,7 @@ theorem hallCollection_of_class_le_two
   · intro r hr2 _
     by_cases h : r = 2
     · subst h
-      show _ ∈ (⊤ : Subgroup G).lowerCentralSeries 1
+      change _ ∈ (⊤ : Subgroup G).lowerCentralSeries 1
       rw [Subgroup.top_lowerCentralSeries_one]
       exact Subgroup.inv_mem _
         (Subgroup.commutator_mem_commutator (Subgroup.mem_top y) (Subgroup.mem_top x))
@@ -249,7 +249,7 @@ theorem hallCollection_of_class_le_three
     intro r hr2 _
     by_cases h2 : r = 2
     · subst h2
-      simp only [if_pos rfl]
+      simp only [reduceIte]
       refine Subgroup.mul_mem _ (Subgroup.inv_mem _ (hmem2 y x)) ?_
       exact (⊤ : Subgroup G).lowerCentralSeries_antitone (by omega) he_mem
     · by_cases h3 : r = 3

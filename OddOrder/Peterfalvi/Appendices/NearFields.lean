@@ -131,7 +131,7 @@ theorem addOrderOf_eq_of_ne_zero (x y : F) (hx : x ≠ 0) (hy : y ≠ 0) :
 is an elementary abelian `f`-group for some prime `f`"): there is a prime `f` with `f • x = 0` for
 all `x ∈ F`.  Since all nonzero elements share one additive order (`addOrderOf_eq_of_ne_zero`),
 that order is forced to be prime by the divisor argument; this makes `(F, +)` elementary abelian. -/
-theorem exists_prime_char [Finite F] [Nontrivial F] :
+theorem exists_prime_char [Finite F] :
     ∃ f : ℕ, f.Prime ∧ ∀ x : F, f • x = 0 := by
   obtain ⟨x₀, hx₀⟩ := exists_ne (0 : F)
   set f := addOrderOf x₀ with hf
@@ -159,7 +159,7 @@ theorem exists_prime_char [Finite F] [Nontrivial F] :
 /-- The additive group of a finite near-field, viewed multiplicatively, is elementary abelian for
 some prime `f`.  This is the form consumed by Appendix I's `exists_field_semilinear`
 (`OddOrder.GroupTheory.IsElementaryAbelian f (Multiplicative F)`). -/
-theorem isElementaryAbelian_multiplicative [Finite F] [Nontrivial F] :
+theorem isElementaryAbelian_multiplicative [Finite F] :
     ∃ f : ℕ, f.Prime ∧ OddOrder.GroupTheory.IsElementaryAbelian f (Multiplicative F) := by
   obtain ⟨f, hf, hfx⟩ := exists_prime_char (F := F)
   refine ⟨f, hf, fun x y => mul_comm x y, fun x => ?_⟩
@@ -380,7 +380,7 @@ Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite ne
 over a finite field `K` with `|K| = |F|` (i.e. `F` carries a field structure refining its additive
 group).  Obtained by feeding the near-field data — `isElementaryAbelian_multiplicative` and
 `rightMulAction` — into `exists_field_semilinear`. -/
-theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F] [Nontrivial F]
+theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F]
     (A : Subgroup Fˣ)
     (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
     (hirr : ∀ U : Subgroup (Multiplicative F),
@@ -401,7 +401,7 @@ A commutative subgroup `A ⊆ Fˣ` of **index `2`** acts *irreducibly* on `(F, +
 multiplication: the only `A`-invariant subgroups of `(F, +)` are `⊥` and `⊤`.  If a proper
 nontrivial invariant `U` existed, the free action of `A` on `U ∖ {1}` and on its Maschke complement
 `W ∖ {1}` would force `|U|, |W| ≥ |A| + 1`, whence `|F| = |U|·|W| ≥ (|A|+1)² > 2|A|+1 = |F|`. -/
-theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finite F] [Nontrivial F]
+theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finite F]
     (A : Subgroup Fˣ)
     (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
     (hidx : A.index = 2) (U : Subgroup (Multiplicative F))
@@ -452,7 +452,7 @@ index `2`, then `(F, +)` is a `1`-dimensional vector space over a finite field `
 Combines the index-`2` irreducibility (`rightMulAction_irreducible_of_index_two`) with
 `nearField_field_structure`, discharging the irreducibility hypothesis. -/
 theorem nearField_field_structure_of_index_two.{u} {F : Type u} [NearField F] [Finite F]
-    [Nontrivial F] (A : Subgroup Fˣ)
+    (A : Subgroup Fˣ)
     (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
     (hidx : A.index = 2) :
     ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
@@ -754,7 +754,7 @@ This is `nearField_field_structure_of_index_two` with the commutativity hypothes
 cyclicity; the index-`2` irreducibility (free-orbit counting + Maschke) and Appendix I's
 `exists_field_semilinear` do the work. -/
 theorem exists_field_structure_of_cyclic_index_two.{u} {F : Type u} [NearField F] [Finite F]
-    [Nontrivial F] (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
+    (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
     ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
       Module.finrank K F = 1 ∧ Nat.card K = Nat.card F := by
   have hcomm : ∀ u v : ↥A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ) := by
@@ -789,7 +789,7 @@ whose kernel contains `A`, split on whether that kernel is all of `F^*` (field c
 to be converted into a *field structure on `F`* sharing `+` and `1` with the near-field); no piece
 of this is in the repository yet. -/
 theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F] [Finite F]
-    [Nontrivial F] (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
+    (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
     (∀ x y : F, x * y = y * x) ∨
       ∃ (r : ℕ) (K : Type u) (_ : Field K) (_ : Finite K) (d : TwistData K),
         (∃ p n : ℕ, p.Prime ∧ Odd p ∧ 0 < n ∧ r = p ^ n) ∧

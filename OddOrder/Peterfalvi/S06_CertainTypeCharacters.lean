@@ -908,6 +908,7 @@ theorem certainTypeRestrictDiff_inner_basis [NeZero (Nat.card h.W1)]
         (h.sdiffTICyclicHypothesis.omega_injective he))]
     ring
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **The (1.3)(a) masking engine for `CF(W, W − W₂)`.**  Any class function `f` on `↥W`
 orthogonal to every `ω_{kl} − ω_{0l}` basis vector vanishes on the TI set `W − W₂`.  The
 `ω_{kl} − ω_{0l}` are a basis of `CF(W, W − W₂)` (`omegaColumnDiffBasis`), so the ℂ-linear

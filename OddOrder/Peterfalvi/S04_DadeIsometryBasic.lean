@@ -842,7 +842,7 @@ theorem hConjInvariant (hyp : Hypothesis G A L) : hyp.HConjInvariant := by
   -- conjugation preserves order
   have hord : orderOf ((l : G)⁻¹ * x * (l : G)) = orderOf x := by
     have hsc : SemiconjBy (l : G) ((l : G)⁻¹ * x * (l : G)) x := by
-      show (l : G) * ((l : G)⁻¹ * x * (l : G)) = x * (l : G)
+      change (l : G) * ((l : G)⁻¹ * x * (l : G)) = x * (l : G)
       group
     exact SemiconjBy.orderOf_eq (l : G) hsc
   -- `|C_L(a^l)| = |C_L(a)|` (uses `l ∈ L`)

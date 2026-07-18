@@ -619,7 +619,7 @@ weight.  If `g` is a fixed-point-free involution on `s` and `f (g a) = f a` for 
 2.)
 This is the combinatorial core of the Peterfalvi (11.8.5) "`a` even from `β` real" parity — the
 conjugation involution `χ ↦ χ̄` on `Irr G ∖ {1}` is fixed-point-free by Peterfalvi (1.1). -/
-theorem even_sum_of_involution {α : Type*} [DecidableEq α] {s : Finset α} {f : α → ℤ}
+theorem even_sum_of_involution {α : Type*} {s : Finset α} {f : α → ℤ}
     (g : ∀ a ∈ s, α) (g_mem : ∀ a ha, g a ha ∈ s) (g_ne : ∀ a ha, g a ha ≠ a)
     (g_inv : ∀ a ha, g (g a ha) (g_mem a ha) = a) (hf : ∀ a ha, f (g a ha) = f a) :
     Even (∑ a ∈ s, f a) := by

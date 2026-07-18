@@ -927,10 +927,11 @@ as an element of the `{j≠i}`-product) both map to `x`, so injectivity forces `
 `(9.7.a)` `W₁`-orbit direct product (`noncommPiCoprod` bijective from cardinality) yield the
 independence of the summand family. -/
 theorem iSupIndep_of_noncommPiCoprod_injective_comm {K : Type*} [CommGroup K] {ι : Type*}
-    [Fintype ι] [DecidableEq ι] {S : ι → Subgroup K}
+    [Fintype ι] {S : ι → Subgroup K}
     (hcomm : Pairwise fun i j : ι => ∀ x y : K, x ∈ S i → y ∈ S j → Commute x y)
     (hinj : Function.Injective (Subgroup.noncommPiCoprod hcomm)) :
     iSupIndep S := by
+  classical
   rw [iSupIndep_def]
   intro i
   rw [Subgroup.disjoint_def]
@@ -941,7 +942,6 @@ theorem iSupIndep_of_noncommPiCoprod_injective_comm {K : Type*} [CommGroup K] {�
     rw [Subgroup.noncommPiCoprod_range, iSup_subtype]
   rw [hrange] at hxsup
   obtain ⟨f, hf⟩ := hxsup
-  classical
   set g : (∀ j : ι, ↥(S j)) := fun j =>
     if h : j = i then 1 else f ⟨j, h⟩ with hg
   have hgi : g i = 1 := by rw [hg]; simp

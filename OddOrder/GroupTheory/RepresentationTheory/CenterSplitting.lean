@@ -57,9 +57,11 @@ section Pi
 
 variable {ι : Type*} [DecidableEq ι] {C : ι → Type*} [∀ i, Semiring (C i)] [∀ i, Algebra R (C i)]
 
+omit [DecidableEq ι] in
 /-- An element of a product algebra is central iff each component is central. -/
 theorem mem_center_pi {f : ∀ i, C i} :
     f ∈ Subalgebra.center R (∀ i, C i) ↔ ∀ i, f i ∈ Subalgebra.center R (C i) := by
+  classical
   rw [Subalgebra.mem_center_iff]
   constructor
   · intro h i
@@ -85,6 +87,7 @@ def centerPiEquiv :
   map_add' f f' := by funext i; apply Subtype.ext; rfl
   commutes' r := by funext i; apply Subtype.ext; rfl
 
+omit [DecidableEq ι] in
 @[simp] theorem centerPiEquiv_apply (f : Subalgebra.center R (∀ i, C i)) (i : ι) :
     ((centerPiEquiv f i : C i)) = (f : ∀ i, C i) i := rfl
 

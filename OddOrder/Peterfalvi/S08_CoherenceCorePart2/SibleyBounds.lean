@@ -519,7 +519,7 @@ to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of the induced character 
 bounded by `ψ(1) = |L:H|·θ(1) ≤ |L:H|·|H:C|·√|C:D|`, combining `induce_apply_one`
 (`ψ(1) = |L:H|·θ(1)`) with the §6 `θ`-bound `theta_degree_le_index_mul_sqrt_index`
 (`θ(1) ≤ |H:C|·√|C:D|`).  This is the (6.2) step `ψ(1) ≤ |L:C|·√|C:D|`. -/
-theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
+theorem psi_degree_le_of_source (_hyp : SibleyDadeHypothesis G L H)
     (θ : IrreducibleCharacter ↥H) (C : Subgroup ↥H) [Finite ↥C]
     [Invertible (Nat.card ↥C : ℂ)] {N : Subgroup ↥C} [N.Normal] (D : Subgroup ↥C) (hND : N ≤ D)
     (hθN : (↑N : Set ↥C) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -528,7 +528,7 @@ theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
       (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
   haveI : Fintype ↥C := Fintype.ofFinite ↥C
-  letI : H.Normal := hyp.H_normal
+  letI : H.Normal := _hyp.H_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
   have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
       = (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re := by
@@ -621,13 +621,13 @@ When the section is `N ◁ D ≤ H` with `θ` trivial on `N` and `D ⧸ N` centr
 `degree_sq_le_index_of_central_quotient` gives `θ(1)² ≤ |H:D|` directly (no Clifford restriction),
 so `ψ = Ind_H^L θ` has `ψ(1) = |L:H|·θ(1) ≤ |L:H|·√|H:D|`.  This is the form (6.3) consumes (it
 applies (6.2) with `C = H`). -/
-theorem psi_degree_le_of_source_central (hyp : SibleyDadeHypothesis G L H)
+theorem psi_degree_le_of_source_central (_hyp : SibleyDadeHypothesis G L H)
     (θ : IrreducibleCharacter ↥H) {N : Subgroup ↥H} [N.Normal] (D : Subgroup ↥H) (hND : N ≤ D)
     (hθN : (↑N : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ))
     (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥H ⧸ N)) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
       (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
-  letI : H.Normal := hyp.H_normal
+  letI : H.Normal := _hyp.H_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨d, hd1, hd2⟩ :=
     degree_sq_le_index_of_central_quotient N θ D hND hθN hcentral

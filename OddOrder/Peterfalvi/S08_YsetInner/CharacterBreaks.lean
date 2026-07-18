@@ -65,18 +65,18 @@ theorem classFunction_eq_sum_inner_smul (φ : ClassFunction Γ ℂ) :
 
 open scoped Classical in
 omit [Invertible (Nat.card Γ : ℂ)] in
+omit [Fintype Γ] in
 /-- **Regular-character difference value over the non-inflated irreducibles** (mmd 04.8 L168,
 combined `(ρ_Γ − ρ_{Γ/N})(z) − (…)(1)` value).  For `N ⊴ Γ` and `z ∈ N^#`,
 `∑_{χ ∈ Irr Γ, N ⊄ ker χ} χ(1)·(χ(z) − χ(1)) = -|Γ|`.  This is
 `(-|Γ⧸N|) − (|Γ| − |Γ⧸N|) = -|Γ|`, from `sumNonInflatedDegreeMulChar_of_mem` (the `χ(z)` part) and
 `sumNonInflatedDegreeSq` (the `χ(1)` part). -/
-theorem sum_filter_degree_mul_charValue_sub_eq (N : Subgroup Γ) [N.Normal]
+theorem sum_filter_degree_mul_charValue_sub_eq [Finite Γ] (N : Subgroup Γ) [N.Normal]
     {z : Γ} (hz : z ∈ N) (hz1 : z ≠ 1) :
     ∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
         ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
         (a : ClassFunction Γ ℂ) 1 * ((a : ClassFunction Γ ℂ) z - (a : ClassFunction Γ ℂ) 1)
       = -(Nat.card Γ : ℂ) := by
-  haveI : Finite Γ := Finite.of_fintype Γ
   have hsplit : (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
         ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
         (a : ClassFunction Γ ℂ) 1 * ((a : ClassFunction Γ ℂ) z - (a : ClassFunction Γ ℂ) 1))

@@ -359,6 +359,7 @@ theorem caseB_column_htau1_mema
 
 omit [Invertible (Nat.card G : ℂ)] in
 omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
+omit [Fintype G] in
 /-- **(6.8.2.3) weight reconciliation `aθ = θ(1)`.**  When the source `φ` actually occurs in the
 central restriction of `θ` (`0 < constituentWeight`), the multiplicity `aθ = ⟨φ, Res^H_{W₂} θ⟩`
 equals the degree `θ(1)`.  Indeed `W₂` is central in `H`, so `Res^H_{W₂} θ = θ(1)·λ` for a unique

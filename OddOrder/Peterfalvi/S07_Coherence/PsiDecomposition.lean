@@ -189,7 +189,7 @@ theorem Y_eq_nsmul_tau1_of_lambdaForm {a : ℕ} {chi1 : ClassFunction L ℂ}
             - (lam : ℂ) • ((rc i : ℂ) • vc i) := by
       intro i _
       by_cases h : i = i₁
-      · subst h; simp only [if_pos rfl]; push_cast; rw [sub_smul]; module
+      · subst h; simp only [reduceIte]; push_cast; rw [sub_smul]; module
       · simp only [if_neg h]; push_cast; rw [sub_smul]; module
     rw [Finset.sum_congr rfl hsplit, Finset.sum_sub_distrib,
       Finset.sum_ite_eq' s i₁, if_pos hi₁, ← Finset.smul_sum]
@@ -425,7 +425,7 @@ in `ℤ[Irr G]`.  This *constructs* — does not posit — the `{X, X̄}` block 
 `|R(χ)| = ‖χ − χ̄‖² = 2` (via `tau1_agrees` and the isometry of `τ₁`) then gives
 `‖X̄‖² = |R(χ)| − |E| = 1`, while `‖X‖² = |E| = 1` and `⟨X, X̄⟩ = 0` are read off the orthonormal
 family directly. -/
-noncomputable def retargetTargetPair
+theorem retargetTargetPair
     (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
     (hχχ : ClassFunction.inner χ χ = 1)
     (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)

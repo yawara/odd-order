@@ -199,6 +199,7 @@ theorem symm_single_eq_average {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) 
   have hae : a = φ.symm (Pi.single i₀ 1) := by rw [← AlgEquiv.symm_apply_apply φ a, hsupp]
   rw [← hae]
 
+omit [Finite G] in
 /-- **The trivial isotypic projection is the averaging projection.**  For the augmentation
 coordinate `i₀`, `centerProj φ ρ i₀ = averageMap ρ`. -/
 theorem centerProj_aug_eq_averageMap {W : Type*} [AddCommGroup W] [Module k W]
@@ -208,6 +209,7 @@ theorem centerProj_aug_eq_averageMap {W : Type*} [AddCommGroup W] [Module k W]
     = asAlgebraHom ρ (average k G)
   rw [symm_single_eq_average φ haug]
 
+omit [Finite G] in
 /-- **The trivial isotypic component equals the `G`-invariants** (item 2, ingredient g).  For the
 augmentation coordinate `i₀`, `range (centerProj φ ρ i₀) = invariants ρ`.  In particular, if
 `Wᴳ = 0` then the trivial summand vanishes. -/
@@ -234,6 +236,7 @@ theorem simplesAction_fixed_of_aug {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug
   rw [if_neg (Ne.symm h)] at key
   exact zero_ne_one key
 
+omit [Fintype G] in
 omit [Finite G] in
 omit [Invertible (Fintype.card G : k)] in
 /-- **The augmentation coordinate exists** (the trivial simple).  There is `i₀ : Fin N` with

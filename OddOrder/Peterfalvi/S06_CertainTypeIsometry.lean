@@ -267,6 +267,7 @@ theorem certainType_apply_eq_of_mem_W1 (h : Hypothesis46Core A L)
       certainType_sign_eq_of_degree_eq h χ₂ χ₂' i hdeg,
       chiColumn_apply_of_mem_W1 h χ₂ i hwsub, chiColumn_apply_of_mem_W1 h χ₂' i hwsub]
 
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.8), conclusion (1)** (`Supp(μ_{ij} − μ_{ik}) ⊆ A₀`).  For nontrivial columns
 `χ₂, χ₂' ≠ 1` and equal degree `μ_{ij}(1) = μ_{ik}(1)`, every point where `μ_{ij} − μ_{ik}` is
 nonzero maps (via `L ↪ G`) into `A₀ = A ∪ V^L`.

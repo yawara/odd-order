@@ -325,7 +325,7 @@ theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
     exact hcommle (Subgroup.commutator_mem_commutator x.2 y.2)
   exact exists_extension_induce_eq_sum_distinct_irreducible hHT hθ hinertia hab hd hcop
 
-omit [Invertible (Nat.card L : ℂ)] in
+omit [Fintype L] [Invertible (Nat.card L : ℂ)] in
 /-- **Coprimality of the inertia index with the character order·degree, from a Hall subgroup.**
 For `H ⊴ L` with `gcd(|H|, [L:H]) = 1` (`H` Hall) and `θ ∈ Irr(H)` of degree `d`, the index `[T:H]`
 of `H` in any intermediate `H ≤ T ≤ L` is coprime to `o(det θ)·d`.  Indeed `[T:H] ∣ [L:H]`
@@ -336,7 +336,7 @@ the group order, `det θ ^ |H| = 1`); the Hall coprimality `gcd(|H|, [L:H]) = 1`
 
 Supplies the `hcop` hypothesis of `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le` in the
 type-I application, where `H = L_F` is a normal Hall subgroup of `L`. -/
-theorem coprime_index_orderOf_determinant_mul_of_coprime_index
+theorem coprime_index_orderOf_determinant_mul_of_coprime_index [Finite L]
     {H T : Subgroup L} [H.Normal] (hHT : H ≤ T)
     (hHall : Nat.Coprime (Nat.card ↥H) H.index)
     {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ) {d : ℕ} (hd : θ 1 = (d : ℂ)) :
@@ -394,14 +394,14 @@ theorem conjBy_conj {H : Subgroup L} [H.Normal] (g : L) (θ : ClassFunction ↥H
   rw [ClassFunction.conj_apply, ClassFunction.conjBy_apply, ClassFunction.conjBy_apply,
     ClassFunction.conj_apply]
 
-omit [Invertible (Nat.card L : ℂ)] in
+omit [Fintype L] [Invertible (Nat.card L : ℂ)] in
 /-- **In a group of odd order, no `L`-conjugate of `θ ∈ Irr(H)` (`θ ≠ 1`, `H ⊴ L`) equals its
 complex conjugate `θ̄`** (Peterfalvi (1.1)-adjacent).  If `θ^g = θ̄`, apply `^g` again and use
 `θ̄̄ = θ`: `θ^{g²} = θ`, so `g² ∈ I_L(θ)`.  Since `g` has odd order (`Odd (Nat.card L)`),
 `⟨g⟩ = ⟨g²⟩` (`g = (g²)^{(o+1)/2}`), so `g ∈ I_L(θ)` too — hence `θ^g = θ`, i.e. `θ = θ̄` is real,
 forcing `θ = 1_H` (odd order, `not_isReal_of_ne_trivial_of_odd_card'`), a contradiction.  This is the
 `θ̄ ≁_L θ` input that makes the constituents of `Ind_H^L θ` conjugate-distinct. -/
-theorem conjBy_ne_conj_of_odd {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)]
+theorem conjBy_ne_conj_of_odd [Finite L] {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)]
     (hodd : Odd (Nat.card L)) {θ : ClassFunction ↥H ℂ} (hθirr : IsIrreducibleCharacter θ)
     (hθne : θ ≠ trivialClassFunction ↥H) (g : L) :
     ClassFunction.conjBy g θ ≠ θ.conj := by

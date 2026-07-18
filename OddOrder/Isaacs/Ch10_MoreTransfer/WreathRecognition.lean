@@ -550,6 +550,7 @@ private lemma conjClass_toFinset_eq_image [DecidableEq P] {A : Subgroup P} [A.No
   · rintro ⟨i, -, rfl⟩
     exact isConj_iff.mpr ⟨u ^ i, rfl⟩
 
+omit [Finite P] in
 /-- **Isaacs Thm 10.4, class-size step**: the enumeration `i ↦ u^i · a · u^(-i)`
 (`i < p`) of the conjugacy class of a *noncentral* `a ∈ A` is injective:
 `u^(j-i)` would otherwise centralize `a`, but `C_P(a) = A` and `u^k ∈ A` forces

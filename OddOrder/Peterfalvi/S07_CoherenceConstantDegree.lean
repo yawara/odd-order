@@ -80,7 +80,7 @@ theorem pairExtension_chiConj {τ : IntegralCharacterMap L G} {χ : ClassFunctio
     pairExtension hχ χ.conj = hχ.sign • (hχ.nu : ClassFunction G ℂ) := by
   rw [pairExtension_apply, hχbar, hortho', one_smul, zero_smul, zero_add]
 
-omit [Fintype G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- `χ - χ̄ ↦ τ(χ - χ̄)` (`= ε·(μ - ν)`, `image_eq`). -/
 theorem pairExtension_diff [Finite G] {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)

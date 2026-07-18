@@ -805,7 +805,7 @@ constant `1`) — through `char_eq_on_factors_of_bijective`.  This is the (9.11.
 whose inertia is `C_U(S i) ⊓ C_U(S j) = U₁ ∩ U₁ʷ` (regular on `S i`, `S j` for the `⊆` half; trivial
 elsewhere for the `⊇` half). -/
 theorem exists_two_summand_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
-    {ι : Type*} [Finite ι] [DecidableEq ι] (S : ι → Subgroup Hbar)
+    {ι : Type*} [Finite ι] (S : ι → Subgroup Hbar)
     (hindep : iSupIndep S) (hspan : ⨆ i, S i = ⊤)
     (hp : ∀ i, (Nat.card ↥(S i)).Prime) {i j : ι} (hij : i ≠ j) :
     ∃ θ : Hbar →* ℂˣ, (∃ x ∈ S i, θ x ≠ 1) ∧ (∃ x ∈ S j, θ x ≠ 1) ∧

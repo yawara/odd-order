@@ -599,7 +599,7 @@ assembly).  In the Galois case the whole family is uniform degree `p·v`
 `p`), every member carries its (5.2.d) `R`-datum (`sSet_memberRFamily_T`), and the family
 facts (finiteness, pairwise orthogonality, conjugate-closure, no-real, Dade isometry/ZIrr/
 support, cross-orthogonality) are the landed `T`-instance inputs. -/
-noncomputable def Hypothesis.sSet_coherent_dade_caseB_T [Finite G]
+theorem Hypothesis.sSet_coherent_dade_caseB_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (pins : NuGridSupplyData hyp)
@@ -834,7 +834,7 @@ open scoped FiniteInduce in
 /-- **(9.11) base coherence of `S₁(d)`-`T` on the honest `T`-Dade map** (mirror of
 `sSetIrrDeg_coherent`): the (5.7)∘(5.3.a) uniform-degree producer on the cut, with the base
 count `h2` exposed. -/
-noncomputable def Hypothesis.sSetIrrDegT_coherent [Fintype G] [Finite G]
+theorem Hypothesis.sSetIrrDegT_coherent [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
     (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)

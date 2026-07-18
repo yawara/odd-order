@@ -350,7 +350,7 @@ theorem normal_of_card_prime_of_isFrobeniusAction_of_odd
       rwa [map_pow, map_one, Subgroup.coe_subtype] at this
     rw [hRgdef, Subgroup.mem_map] at hk
     obtain ⟨r₀, hr₀, hkval⟩ := hk
-    simp [MulAut.conj_apply] at hkval
+    simp only [MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_coe, MulAut.conj_apply] at hkval
     have hr₀r : r₀ ^ r = 1 := by
       have h : (⟨r₀, hr₀⟩ : ↥R) ^ r = 1 := by rw [← hRcard]; exact pow_card_eq_one'
       have := congrArg (Subgroup.subtype R) h

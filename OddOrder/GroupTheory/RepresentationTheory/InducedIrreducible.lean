@@ -259,6 +259,7 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
     Nat.card_eq_fintype_card]
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **Peterfalvi (1.5.a) + (1.5.b), normalized form**: `Res_H^G χ = ‖χ‖²·∑_β θ^β`, where `χ =
 Ind_H^G θ` and `β` runs over the distinct `G`-conjugates of `θ`.
 
@@ -282,6 +283,7 @@ theorem restrict_induce_eq_inner_self_smul_orbitSum (θ : IrreducibleCharacter H
   rw [h1, ← Nat.cast_smul_eq_nsmul ℂ, ← h2, mul_smul, inv_smul_smul₀ hcardH]
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **Peterfalvi (1.5.d)**: `χ(1)·Res_H^G χ / ‖χ‖² = |G:H|·∑_β θ^β(1)·θ^β`, where `χ = Ind_H^G θ`
 for `θ ∈ Irr H` with `H ⊴ G`, and `β` runs over the distinct `G`-conjugates of `θ` (indexed as in
 (1.5.a)).

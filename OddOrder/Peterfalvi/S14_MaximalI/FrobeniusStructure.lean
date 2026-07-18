@@ -244,9 +244,9 @@ theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
     ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
   ring
 
-/-- **Peterfalvi (12.1) support `A(L) = H^#` from a Frobenius witness** — the Frobenius-parameterized
-core of `typeIA_eq_sharp` (below), factored out so the (12.6) case-(b) coherence assembly can cite
-it
+/-- **Peterfalvi (12.1) support `A(L) = H^#` from a Frobenius witness** — the
+Frobenius-parameterized core of `typeIA_eq_sharp` (below), factored out so the (12.6) case-(b)
+coherence assembly can cite it
 with the `hfrob` it already has (the full `typeIA_eq_sharp` derives `hfrob` from `typeI_frobenius`,
 which is defined later).  Since `L` is Frobenius with kernel `H`, the centralizer of any `x ∈ H^#`
 lies in `H` (`IsFrobeniusGroup.centralizer_kernel_le`), so the `A(L)`-support (`centralizerSupport`
@@ -538,10 +538,10 @@ theorem Sset_diff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
-/-- **A member's conjugate-difference `χ̄ − χ` is `A(L)`-supported** (any `χ ∈ S`, no constant-degree
-needed) — the per-member support field of the (5.6) family enumeration (h56).  Off `H` both `χ` and
-`χ̄` vanish (`Sset_vanishes_off_H`); at `1`, `χ̄(1) = χ(1)` because `χ(1)` is a (real) natural
-degree
+/-- **A member's conjugate-difference `χ̄ − χ` is `A(L)`-supported** (any `χ ∈ S`, no
+constant-degree needed) — the per-member support field of the (5.6) family enumeration (h56).  Off
+`H` both `χ` and `χ̄` vanish (`Sset_vanishes_off_H`); at `1`, `χ̄(1) = χ(1)` because `χ(1)` is a
+(real) natural degree
 (`χ` irreducible), so `χ̄ − χ` is supported on `H^# = A(L)`. -/
 theorem Sset_conjDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
@@ -657,8 +657,8 @@ theorem Sset_scaledDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis 
     ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
 
 /-- **Degree data for an enumerated `S`-family** — the witness analogue of the Sibley
-`exists_sMemberDegreeData`, the integer-degree-ratio input of the (5.6) break bound (h56).  Against a
-minimal-degree anchor `χmem i₁` of degree `|L:K|`, each member has an integer ratio
+`exists_sMemberDegreeData`, the integer-degree-ratio input of the (5.6) break bound (h56).  Against
+a minimal-degree anchor `χmem i₁` of degree `|L:K|`, each member has an integer ratio
 `deg j = χmem j(1)/|L:K|` (`Sset_charValue_one_eq_mul_index`), `deg i₁ = 1`, and the scaled
 difference `χmem j − deg j·χmem i₁` is `A(L)`-supported (`Sset_scaledDiff_supported`). -/
 theorem Sset_exists_degreeData [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
@@ -687,9 +687,9 @@ theorem Sset_exists_degreeData [Finite G] {L : Subgroup G} (hyp : Hypothesis L) 
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
-/-- **Break-pair fields for `{ψ, ψ̄}`** — the witness analogue of the Sibley `sBreakPair_fields`, the
-per-`ψ` inputs the (5.6) bound `coherentDegreeSumBound_of_not_coherent` consumes (in its argument
-order): non-realness, conjugate-difference support, the `{ψ, ψ̄}` orthonormality, and the
+/-- **Break-pair fields for `{ψ, ψ̄}`** — the witness analogue of the Sibley `sBreakPair_fields`,
+the per-`ψ` inputs the (5.6) bound `coherentDegreeSumBound_of_not_coherent` consumes (in its
+argument order): non-realness, conjugate-difference support, the `{ψ, ψ̄}` orthonormality, and the
 orthogonality of `ψ`, `ψ̄` to every member of `S₁` (distinct irreducibles, since `ψ, ψ̄ ∉ S₁`). -/
 theorem Sset_breakPair_fields [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
@@ -850,9 +850,10 @@ theorem Sset_degreeSqReBound_of_not_coherent [Finite G] {L : Subgroup G} (hyp : 
     _ = 2 * ((a : ℝ) * (χ₁ 1).re) * (χ₁ 1).re := by ring
     _ = 2 * (ψ 1).re * (χ₁ 1).re := by rw [hψre]
 
-/-- **The witness kernel `K = (L_F).subgroupOf L` is normal in `↥L`** — `L_F = maxNilpotentNormalHall L`
-whose `subgroupOf L` is normal (`maxNilpotentNormalHall_subgroupOf_normal`).  Needed by the (6.2) B2
-degree-sum identity and the (6.5) engine's `hHnorm`. -/
+/-- **The witness kernel `K = (L_F).subgroupOf L` is normal in `↥L`** —
+`L_F = maxNilpotentNormalHall L` whose `subgroupOf L` is normal
+(`maxNilpotentNormalHall_subgroupOf_normal`).  Needed by the (6.2) B2 degree-sum identity and the
+(6.5) engine's `hHnorm`. -/
 theorem typeF_H_subgroupOf_normal [Finite G] {L : Subgroup G} (hyp : Hypothesis L) :
     ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
   rw [hyp.typeI.typeF.H_eq]
@@ -860,11 +861,11 @@ theorem typeF_H_subgroupOf_normal [Finite G] {L : Subgroup G} (hyp : Hypothesis 
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open scoped Classical in
-/-- **Peterfalvi (6.2) B2 — the `S(A)` degree-square identity** (witness form).  Mirror of the Sibley
-`sum_re_sq_induce_kernelFilter_eq`: over the witness kernel `K = (L_F).subgroupOf L`, the filtered
-induced family `{Ind_K^L θ | A ⊆ Ker θ, θ ≠ 1}` has degree-square sum `|L:K|·(|K:A| − 1)`, via the
-abstract B2 `sum_div_normSq_induce_kernelFilter_eq` and that each member is irreducible (`‖·‖² = 1`,
-`χ(1)` a real natural). -/
+/-- **Peterfalvi (6.2) B2 — the `S(A)` degree-square identity** (witness form).  Mirror of the
+Sibley `sum_re_sq_induce_kernelFilter_eq`: over the witness kernel `K = (L_F).subgroupOf L`, the
+filtered induced family `{Ind_K^L θ | A ⊆ Ker θ, θ ≠ 1}` has degree-square sum `|L:K|·(|K:A| − 1)`,
+via the abstract B2 `sum_div_normSq_induce_kernelFilter_eq` and that each member is irreducible
+(`‖·‖² = 1`, `χ(1)` a real natural). -/
 theorem Sset_sum_re_sq_induce_kernelFilter_eq [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     {C : Subgroup ↥L}
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
@@ -1021,8 +1022,8 @@ theorem SsubFiltration_finite [Finite G] {L : Subgroup G} (hyp : Hypothesis L) (
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Every filtration level `S(A)` is closed under conjugation** (kernel preserved by
-`characterKernel_conj`) — the conjugation-closure input of `exists_coherentBreakPair` (h56).  General
-`A` version of `SsubFiltration_commutator_closedUnderConjugate`. -/
+`characterKernel_conj`) — the conjugation-closure input of `exists_coherentBreakPair` (h56).
+General `A` version of `SsubFiltration_commutator_closedUnderConjugate`. -/
 theorem SsubFiltration_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     (A : Subgroup ↥L) : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.SsubFiltration A) := by
   classical
@@ -1235,8 +1236,8 @@ theorem Sset_tau_diff_mem_ZIrr [Finite G] {L : Subgroup G} (hyp : Hypothesis L) 
     (IrreducibleCharacter.mem_ZIrr ⟨b, Sset_isIrreducibleCharacter hyp hfrob hb⟩)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (5.2.d) difference image for a witness member** — the `difference_image` field of the
-`S07.Hypothesis`.  Each `χ ∈ S` is a non-real irreducible (`Sset_isIrreducibleCharacter`,
+/-- **Peterfalvi (5.2.d) difference image for a witness member** — the `difference_image` field of
+the `S07.Hypothesis`.  Each `χ ∈ S` is a non-real irreducible (`Sset_isIrreducibleCharacter`,
 `Sset_hasNoRealCharacters`) whose conjugate-difference `χ̄ − χ` is `A(L)`-supported
 (`Sset_diff_supported`), so the genuine Dade map sends `χ − χ̄` to a signed difference of two
 irreducibles of `G` (`dadeCharacterDifferenceImageOfDiff`). -/
@@ -1425,9 +1426,9 @@ When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, 
 `S07.Hypothesis hyp.Sset hyp.A` is assembled from the ten witness lemmas above (all seven §5.2
 fields
 plus the `coherent_of_constant_degree` inputs), and the coherence is produced by the now
-lattice-relative `coherent_of_constant_degree` (issue 9001, no global isometry needed).  Nonemptiness
-of `S` (`hcard`) comes from the nontrivial abelian kernel `H` having a nontrivial irreducible `θ`,
-whose induced pair `{Ind θ, Ind θ̄}` is two distinct non-real members. -/
+lattice-relative `coherent_of_constant_degree` (issue 9001, no global isometry needed).
+Nonemptiness of `S` (`hcard`) comes from the nontrivial abelian kernel `H` having a nontrivial
+irreducible `θ`, whose induced pair `{Ind θ, Ind θ̄}` is two distinct non-real members. -/
 theorem frobenius_typeI_coherent_of_abelianKernel [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)

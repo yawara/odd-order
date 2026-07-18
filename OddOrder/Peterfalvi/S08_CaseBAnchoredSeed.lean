@@ -46,6 +46,7 @@ variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
 omit [Invertible (Nat.card G : ℂ)] in
 omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
+omit [Fintype G] in
 /-- **(6.8.2.3) per-column central-character data** (the Q1 "central gap").
 
 For any irreducible character `θ` of `H` and a central subgroup `W₂ ≤ Z(H)`, the central **linear**

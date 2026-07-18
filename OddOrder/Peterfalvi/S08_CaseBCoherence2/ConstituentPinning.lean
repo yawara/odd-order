@@ -50,7 +50,7 @@ decomposition `Ind^H_{K.subgroupOf H}(φ∘e) = ∑ aθ·θ` recovers `Ind^M_K �
 induction in stages (`induce_induce_subgroupOf`). -/
 theorem sum_inner_restrict_smul_induce_eq_induce {M : Type*} [Group M] [Fintype M]
     [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
-    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Finite ↥H] [Finite ↥K] [Fintype ↥(K.subgroupOf H)]
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
     [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
     (φ : ClassFunction ↥K ℂ) :
@@ -60,6 +60,7 @@ theorem sum_inner_restrict_smul_induce_eq_induce {M : Type*} [Group M] [Fintype 
             (ClassFunction.restrict (K.subgroupOf H) (θ : ClassFunction ↥H ℂ))
           • ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
       = ClassFunction.induce K φ := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   rw [← induce_finset_sum_smul, ← induce_eq_sum_inner_restrict_smul]
   exact induce_induce_subgroupOf hKH φ
 
@@ -88,13 +89,14 @@ theorem inner_self_induce_eq_sum_mul_star {M : Type*} [Group M] [Fintype M]
 real) `= ‖Ind^M_N φ‖²` (`inner_self_induce_eq_sum_mul_star`) `= |M : N|`
 (`inner_induce_self_eq_index_of_le_center`).  This is the `∑ aᵢ² = |H : Z|` term of the
 Peterfalvi (6.8.2.3) `αᵢ = χᵢ − aᵢη₁` aggregate. -/
-theorem sum_inner_restrict_sq_eq_index {M : Type*} [Group M] [Fintype M]
+theorem sum_inner_restrict_sq_eq_index {M : Type*} [Group M] [Finite M]
     [Invertible (Nat.card M : ℂ)] {N : Subgroup M} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
     (hN : N ≤ Subgroup.center M) {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) :
     ∑ θ : IrreducibleCharacter M,
         ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
           * ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
       = (N.index : ℂ) := by
+  haveI : Fintype M := Fintype.ofFinite M
   have hreal : ∀ θ : IrreducibleCharacter M,
       ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
         = star (ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))) := by
@@ -120,7 +122,7 @@ by
 (`sum_inner_restrict_sq_eq_index`, the index `|↥H : K.subgroupOf H| = |H:K|`). -/
 theorem sum_smul_constituent_diff_eq {M : Type*} [Group M] [Fintype M]
     [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
-    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Finite ↥H] [Finite ↥K] [Fintype ↥(K.subgroupOf H)]
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
     [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
     (hcen : K.subgroupOf H ≤ Subgroup.center ↥H)
@@ -295,7 +297,7 @@ Combined with `sum_smul_constituent_diff_eq` (`∑ aᵢ·αᵢ = Ind^L_{W₂}φ 
 decomposition `exists_decomposition_caseB` (`τ(Ind φ − |H:Z|·η₁) = Xagg − |H:Z|·Y`), this supplies
 the
 `hagg` input `Xagg − n·Y = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)` of the pinning lemma `sum_coeff_eq_of_aggregate`. -/
-theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+theorem tau_sum_smul_image {L : Subgroup G} [Finite ↥L] [Invertible (Nat.card ↥L : ℂ)]
     {ι : Type*} (s : Finset ι) (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G)
     (α : ι → ClassFunction ↥L ℂ) (Xv Yv : ι → ClassFunction G ℂ) (a : ι → ℤ)
     (himg : ∀ i ∈ s, τ (α i) = Xv i - Yv i) :
@@ -306,6 +308,7 @@ theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card
     ← Int.cast_smul_eq_zsmul ℂ (a i) (Xv i - Yv i)]
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] in
 /-- **(6.8.2.2)→(6.8.2.3) aggregate `hagg` builder.**  Assembles the `hagg` input of
 `per_constituent_Y_eq_smul` from the three (6.8.2.2) pieces: the image decomposition
 `τ β = Xagg − n·Y` (`exists_decomposition_caseB`, `β = Ind^L_{W₂}φ − |H:Z|·η₁`, `n = |H:Z|`), the
@@ -313,7 +316,7 @@ constituent sum `β = ∑ aᵢ·αᵢ` (`sum_smul_constituent_diff_eq`), and the
 `τ(αᵢ) = Xᵢ − Yᵢ` (each `CharacterPsiDecomposition.tau1_image`, with `τ₁ = τ` for the certain-type
 `certainTypeDecompositionDa`).  Rewriting `Xagg − n·Y = τ β = τ(∑ aᵢαᵢ) = ∑ aᵢ(Xᵢ − Yᵢ)` via
 `tau_sum_smul_image` gives the aggregate `Xagg − n·Y = ∑ aᵢ·(Xᵢ − Yᵢ)`. -/
-theorem aggregate_eq_sum_of_constituent {L : Subgroup G} [Fintype ↥L]
+theorem aggregate_eq_sum_of_constituent {L : Subgroup G} [Finite ↥L]
     [Invertible (Nat.card ↥L : ℂ)]
     {ι : Type*} (s : Finset ι) (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G)
     (α : ι → ClassFunction ↥L ℂ) (Xv Yv : ι → ClassFunction G ℂ) (a : ι → ℤ)
@@ -397,7 +400,7 @@ decomposition family `{θ // 0 < aθ}`, and the weight is the `ℕ` consumed by
 `constituentWeight_spec`; the `aθ = 0` constituents drop out by `sum_eq_sum_pos_weight_subtype`). -/
 theorem sum_smul_constituent_diff_pos_weight_subtype {M : Type*} [Group M] [Fintype M]
     [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
-    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Finite ↥H] [Finite ↥K] [Fintype ↥(K.subgroupOf H)]
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
     [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
     (hcen : K.subgroupOf H ≤ Subgroup.center ↥H)

@@ -62,6 +62,7 @@ instance instSMulCommClassZModOfDistribMulAction {n : ℕ} {G A : Type*} [Monoid
 /-- Descend a `MulDistribMulAction G M` to the quotient `G ⧸ L` when the normal subgroup `L` acts
 trivially on `M`. (Used in BG Theorem 3.7's coprime chief-factor case: the conjugation action of
 `G` on a chief factor `V` factors through `Ḡ = G/L` because `L` centralizes `V`.) -/
+@[reducible]
 noncomputable def mulDistribMulActionQuotientOfTrivial {G M : Type*} [Group G] [Monoid M]
     [MulDistribMulAction G M] (L : Subgroup G) [L.Normal]
     (hL : ∀ l : G, l ∈ L → ∀ m : M, l • m = m) :

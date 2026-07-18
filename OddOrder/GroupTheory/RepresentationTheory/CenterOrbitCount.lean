@@ -146,7 +146,7 @@ theorem centerRep'_apply_centerBasis' (α : MulAut G) (C : ConjClasses G) :
     centerRep' (k := k) α (centerBasis' (k := k) C) = centerBasis' (k := k) (α • C) :=
   centerRep_apply_centerBasis α C
 
-omit [Fintype G] [Fintype (ConjClasses G)] in
+omit [Fintype G] [DecidableEq G] [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)] in
 /-- **Orbit count via the class-sum basis.**  The dimension of the `MulAut G`-invariants of
 `Z(k[G])` equals the number of orbits of `MulAut G` on conjugacy classes.  (One of the two
 computations in Peterfalvi (9.1)'s orbit-count Brauer lemma; the other, to follow, is via the
@@ -154,6 +154,7 @@ primitive-idempotent basis.) -/
 theorem finrank_centerRep_invariants_eq_card_orbits [Finite G] [Finite (ConjClasses G)] :
     finrank k ↥(Representation.invariants (centerRep' (k := k) (G := G)))
       = Nat.card (orbitRel.Quotient (MulAut G) (ConjClasses G)) := by
+  classical
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Fintype (ConjClasses G) := Fintype.ofFinite (ConjClasses G)
   exact PermutationInvariants.finrank_invariants_eq_card_orbits centerBasis' centerRep'

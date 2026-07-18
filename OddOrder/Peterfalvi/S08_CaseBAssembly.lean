@@ -334,7 +334,7 @@ theorem irreducibleDecompositionTau_X_orthogonal
 reindexed to the positive-weight subtype `{θ // 0 < aθ}` (zero-weight constituents drop) and cast to
 `ℤ`.  This is the `hsq` input of `per_phi_anchored_image` (the `n = |H : W₂|` of the (6.8.2.2)
 aggregate). -/
-theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Fintype M]
+theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Finite M]
     [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
     [Finite ↥H] [Fintype ↥(K.subgroupOf H)]
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]

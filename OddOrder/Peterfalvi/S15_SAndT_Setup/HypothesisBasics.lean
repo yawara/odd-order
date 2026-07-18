@@ -386,7 +386,7 @@ Internal discharges:
 * `h1A` = `honestTypeP2ASet_one_not_mem` (`1 ∉ A(S)`);
 * `hsuppdiff` = the equal-degree two-member support fact (member differences `A(S)`-supported),
   the same argument `sSetIrrDeg_subcoherent`'s `hiso` uses internally. -/
-noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
+theorem Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)]
     (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)

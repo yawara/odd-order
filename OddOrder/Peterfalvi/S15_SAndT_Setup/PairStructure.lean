@@ -112,12 +112,13 @@ theorem Hypothesis.p_ne_q [Finite G] (hyp : Hypothesis (G := G)) : hyp.p ≠ hyp
   have := hyp.q_prime.two_le
   omega
 
-/-- **`W₁ ≤ T'`** (local, pairing-free): the cyclic factor `W₁` (prime order `q`) lies in the derived
-subgroup `T'`.  `W₁ ≤ W ≤ T`, `T' ⊴ T` with index `[T : T'] = |W₂| = p` (`W2_isComplement_T_deriv`),
-and `q ≠ p` (`p_ne_q`); so the `q`-group `W₁` lands in the `p`-coprime-index normal `T'`
-(`subgroup_le_of_normal_coprime_index_prime`).  Unlike the `T`-side `W₁ ≤ Q` (which needs the (8.4.d)
-dual pairing), this containment is immediate from the abstract `Hypothesis` and feeds the `W₂`-side
-centralizer localisation `W₁ ≤ T' ⊓ C(W₂)` used by `reconciled_typePData_T`. -/
+/-- **`W₁ ≤ T'`** (local, pairing-free): the cyclic factor `W₁` (prime order `q`) lies in the
+derived subgroup `T'`.  `W₁ ≤ W ≤ T`, `T' ⊴ T` with index `[T : T'] = |W₂| = p`
+(`W2_isComplement_T_deriv`), and `q ≠ p` (`p_ne_q`); so the `q`-group `W₁` lands in the
+`p`-coprime-index normal `T'` (`subgroup_le_of_normal_coprime_index_prime`).  Unlike the `T`-side
+`W₁ ≤ Q` (which needs the (8.4.d) dual pairing), this containment is immediate from the abstract
+`Hypothesis` and feeds the `W₂`-side centralizer localisation `W₁ ≤ T' ⊓ C(W₂)` used by
+`reconciled_typePData_T`. -/
 theorem Hypothesis.W1_le_derivedInG_T [Finite G] (hyp : Hypothesis (G := G)) :
     hyp.W1 ≤ derivedInG hyp.T := by
   have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
@@ -199,9 +200,10 @@ theorem normalizer_H_eq_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 complement `tpd0.U` (from `typePData_of_isTypeNonI T_nonI`) both complement `Q = T_F` in `T' = QV`
 (`derived_complement` / `Q_inf_V_eq_bot` + `T_deriv_eq_QV`), so Schur–Zassenhaus conjugacy inside
 `↥T'` (`IsComplement'.exists_conj_of_coprime`, coprimality from `Q` being Hall in `T`) conjugates
-`tpd0.U` onto `V`, transporting `Group.IsNilpotent` (`tpd0.U_nilpotent`).  Structurally the mirror of
-the `S16` complement-conjugacy transport `isMulCommutative_typePData_U_of_V`.  Discharges the
-`U_nilpotent` field of `reconciled_typePData_T` without matching the full `T`-side type-`P` datum. -/
+`tpd0.U` onto `V`, transporting `Group.IsNilpotent` (`tpd0.U_nilpotent`).  Structurally the mirror
+of the `S16` complement-conjugacy transport `isMulCommutative_typePData_U_of_V`.  Discharges the
+`U_nilpotent` field of `reconciled_typePData_T` without matching the full `T`-side type-`P` datum.
+-/
 theorem Hypothesis.isNilpotent_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : Group.IsNilpotent ↥hyp.V := by
   obtain ⟨tpd0⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.T_nonI
@@ -596,8 +598,8 @@ theorem Msigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
   simp only [OddOrder.BG.Ch3.S10.Msigma]
   rw [OddOrder.BG.Ch4.S14.sigma_conj_smul_eq, ← opiCoreInG_conj_smul]
 
-/-- **Fact B (`T`-side): `W₁ = M_σ(T) ⊓ C_G(W₂)`** (the (8.4.d)-dual centralizer law for `T`, ungated
-via the type-`P` pairing — Coq `PFsection8` `typeP_cent_compl`/`FTtypeP_pair_witness`).
+/-- **Fact B (`T`-side): `W₁ = M_σ(T) ⊓ C_G(W₂)`** (the (8.4.d)-dual centralizer law for `T`,
+ungated via the type-`P` pairing — Coq `PFsection8` `typeP_cent_compl`/`FTtypeP_pair_witness`).
 
 This is the last residual of `reconciled_typePData_T` (issue 9073); it is genuine §13 pairing
 content
@@ -609,7 +611,8 @@ proved *without* assuming `(14.9)`/`IsTypeII T`, by descending to `S`'s type-`P`
   nonconjugate to `S`.
 * `Mstar` is `G`-conjugate to `T`: `theorem88_caseB` at `Mstar` (type-`P`, non-`I`, `≁ S`) leaves
   only `∃g, Mstarᵍ = T`.
-* `⊇`: `q ∈ σ(Mstar) = σ(T)` (`kappaHall_primes_subset_sigma_partner` + `sigma_conj_smul_eq`), so the
+* `⊇`: `q ∈ σ(Mstar) = σ(T)` (`kappaHall_primes_subset_sigma_partner` + `sigma_conj_smul_eq`), so
+  the
   `q`-group `W₁ ≤ T` lands in the normal Hall `σ(T)`-subgroup `M_σ(T)`
   (`sigma_subgroup_le_Msigma_of_isHall`), and `W₁ ≤ C(W₂)` (`W1_commutes_W2`).
 * `⊆`/cardinality: a fix-`W` correction (`exists_conj_eq_of_isHall_subgroupOf`, matching the two
@@ -754,8 +757,8 @@ theorem Hypothesis.reconciled_residuals_of_pairing_facts [Finite G]
     exact OddOrder.BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq
       hG hyp.T_maximal hP hW2T hFactA hFactB
 
-/-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
-withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30). `T` is type non-I (`T_nonI`), hence
+/-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for
+the withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30). `T` is type non-I (`T_nonI`), hence
 type-`P`,
 and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
 decomposition of `T`: there is a `TypePData T` with `.U = V`, `.W1 = W₂`, and `.W2 = W₁` (the dual
@@ -767,8 +770,8 @@ the *general* type-`P` structure of `T` (available from `T_nonI` at §13), recon
 `V`/`W₂`.  (The sharper `IsTypeP2 T` is *equivalent* to the (14.9) conclusion `IsTypeII T` by the BG
 type dictionary `proposition_type_classification` — `IsTypeII M ↔ IsTypeP2 M` — but is not needed
 for
-the reconciliation itself, so this stays a clean §13 obligation.)  It lives **off the FT spine**: the
-`V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
+the reconciliation itself, so this stays a clean §13 obligation.)  It lives **off the FT spine**:
+the `V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
 sorry-free.  Gated on §13; declared sorried.  (Relocated from `S15_SAndT` for the (13.9)/(13.10)
 counting layer — the type-V exclusion of `Q_sharp_isTISubset` and the `|T|` decomposition read it.) -/
 theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

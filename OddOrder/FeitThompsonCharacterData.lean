@@ -1182,6 +1182,7 @@ theorem tau3W_omegaS_column_galois_orbit (j : Fin tp.p)
   all_goals simp [ξ]
   all_goals rfl
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.9.b), vanishing transport along the row** (issue-2036 supply):
 if the `η₁₀`-value vanishes at `x`, so do all nonprincipal row-axis values.  This is the
 pointwise zero consequence of `tau3W_omegaS_row_galois_orbit`. -/

@@ -679,7 +679,7 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
         H71.isDadeMap.map_eq_of_isConj_hCoset _ g a h hh hconj
       have hrho : (H71.chiRhoSupp χ : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩
           = (χ : G → ℂ) a.1 := by
-        show H71.chiRhoCF χ ⟨a.1, H71.hyp.mem_L a.2⟩ = (χ : G → ℂ) a.1
+        change H71.chiRhoCF χ ⟨a.1, H71.hyp.mem_L a.2⟩ = (χ : G → ℂ) a.1
         rw [chiRhoCF_apply, H71.chiRho_of_mem _ a.2]
         have hsum : ∑ x : H71.hyp.H a, (χ : G → ℂ) (a.1 * (x : G))
             = (Nat.card (H71.hyp.H a) : ℂ) * (χ : G → ℂ) a.1 := by
@@ -695,9 +695,9 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
       have hχg : (χ : G → ℂ) g = (χ : G → ℂ) a.1 := by
         obtain ⟨c, hc⟩ := isConj_iff.mp hconj
         rw [← hc, χ.conj_eq, hconst a h hh]
-      show H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
+      change H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
       rw [hτ, hrho, hχ₁_apply, if_pos hg, hχg]
-    · show H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
+    · change H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
       rw [H71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport _ g hg,
         hχ₁_apply, if_neg hg]
 
