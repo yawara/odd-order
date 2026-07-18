@@ -279,21 +279,29 @@ applies part (a) to the *subgroup* `T = [R, A]`, never to `R` itself.
 **註.** Part (c) of Theorem 4.12 (`[R, A]` and `C_R(A)` cyclic, `R' ⊆ [R, A]`) is *false*
 without the textbook's standing assumption `1 ⊂ [R, A] ⊂ R` (mmd L1618 "By (a), `1 ⊂ T ⊂ R`"):
 e.g. for `p = 3`, `R = (ℤ/3)²`, and `A = ℤ/2` acting by inversion, `[R, A] = R = E₉` is not
-cyclic, so `IsCyclic [R, A]` fails even though `hp_odd, hR, hmeta, hcop, hAsolv` all hold. The
-faithful (c) additionally requires `actionCommutator φ ≠ ⊥` and `actionCommutator φ ≠ ⊤`. -/
+cyclic, so `IsCyclic [R, A]` fails even though `hp_odd, hR, hmeta, hcop` all hold. The
+faithful (c) additionally requires `actionCommutator φ ≠ ⊥` and `actionCommutator φ ≠ ⊤`.
+
+**Note (2026-07-18).** The former `IsSolvable A` hypothesis is removed (BG states 4.12 with no
+solvability assumption on the operator group `A`): `R` is a `p`-group, hence nilpotent, hence
+solvable, so the underlying coprime-action facts (Prop 1.6(a)(b), which need only
+`IsSolvable A ∨ IsSolvable R`) apply via `Or.inr`. -/
 theorem actionCommutator_inf_fixedPoints_eq_bot
     {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
     (hR : IsPGroup p R) (hmeta : OddOrder.GroupTheory.IsMetacyclic R)
     {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
-    (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) (hAsolv : IsSolvable A) :
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) :
     OddOrder.Isaacs.Ch04.actionCommutator φ ⊓ Subgroup.fixedPointsOfMulAut φ = ⊥ := by
   classical
+  -- `R` is a `p`-group, hence nilpotent, hence solvable — so no hypothesis on `A` is needed
+  -- (the underlying Prop 1.6(a)(b) only require `IsSolvable A ∨ IsSolvable G`).
+  haveI : Group.IsNilpotent R := hR.isNilpotent
   -- `T := [R, A]`, with its restricted operator action `ψT`.
   set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
   set ψT : A →* MulAut ↥T := (IsAInvariant.actionCommutator φ).toMulAutHom with hψT_def
   -- `[T, A] = T` (Prop 1.6(b), internal form — always holds).
   have hψT_top : OddOrder.Isaacs.Ch04.actionCommutator ψT = ⊤ :=
-    actionCommutator_restrict_self_eq_top hcop (Or.inl hAsolv)
+    actionCommutator_restrict_self_eq_top hcop (Or.inr inferInstance)
   -- `T` is metacyclic (subgroup of metacyclic `R`), a coprime `p`-group.
   have hT_meta : IsMetacyclic ↥T := hmeta.subgroup
   have hT_pg : IsPGroup p ↥T := hR.to_subgroup T
@@ -428,22 +436,24 @@ theorem actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
     {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
     (hR : IsPGroup p R) (hmeta : OddOrder.GroupTheory.IsMetacyclic R)
     {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
-    (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) (hAsolv : IsSolvable A)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R))
     (hT_ne_bot : OddOrder.Isaacs.Ch04.actionCommutator φ ≠ ⊥)
     (hT_ne_top : OddOrder.Isaacs.Ch04.actionCommutator φ ≠ ⊤) :
     IsCyclic (OddOrder.Isaacs.Ch04.actionCommutator φ) ∧
     IsCyclic (Subgroup.fixedPointsOfMulAut φ) ∧
     commutator R ≤ OddOrder.Isaacs.Ch04.actionCommutator φ := by
   classical
+  -- `R` is a `p`-group, hence nilpotent, hence solvable — no hypothesis on `A` is needed.
+  haveI : Group.IsNilpotent R := hR.isNilpotent
   set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
   set C : Subgroup R := Subgroup.fixedPointsOfMulAut φ with hC_def
   haveI : T.Normal := OddOrder.Isaacs.Ch04.actionCommutator.normal φ
   -- `T ⊓ C = ⊥` (part (b)).
   have hb : T ⊓ C = ⊥ :=
-    actionCommutator_inf_fixedPoints_eq_bot hp_odd hR hmeta hcop hAsolv
+    actionCommutator_inf_fixedPoints_eq_bot hp_odd hR hmeta hcop
   -- `R = C ⊔ T` (Prop 1.6(a)).
   have hsup : C ⊔ T = ⊤ :=
-    OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top hcop (Or.inl hAsolv)
+    OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top hcop (Or.inr inferInstance)
   -- `T` and `C` are `p`-groups.
   have hT_pg : IsPGroup p ↥T := hR.to_subgroup T
   have hC_pg : IsPGroup p ↥C := hR.to_subgroup C
