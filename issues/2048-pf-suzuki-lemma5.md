@@ -40,7 +40,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
   - [x] Higman Lemma 1 (p. 83): 中心を homocyclic とし、actual `K`-不変部分群を
         Agemo 層として分類する。具体的 `Q₀` は最終非自明層であり、残る中心逆包含を
         `Agemo Z(Q) 2 1 = ⊥` と正確に同値化する
-  - [ ] Higman Lemmas 2--9 を形式化し、Lemma 12 冒頭で用いる
+  - [x] Higman Lemma 2 (p. 83): 非自明 normal abelian `K`-subgroup `A` と
+        `u ∉ A` に対する `u² ∈ A²` と `[u,A] ≤ A⁴` の同時成立を排除する
+  - [ ] Higman Lemma 3 (pp. 83--84): normal invariant subgroup `C` が `A` を
+        cover し `Φ(C) = Φ(A)` なら `exp(A) ≤ 4` を証明する
+  - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
