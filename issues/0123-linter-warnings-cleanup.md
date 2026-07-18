@@ -99,6 +99,39 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
 | 12 | class 型 def の abbrev/instance マーク | 小物 wave (要挙動確認) |
 | 9+9+6+5 | maxHeartbeats unscoped / overlapping instances / def→theorem / simpa→simp | 小物 wave (overlapping は instance 引数削除 = signature 接触、要個別) |
 
+## 2026-07-19 wave (hub, 並列 6 エージェント) — 792 → 650 サイト
+
+commit: `chore(lint): 並列 wave で warning 142 サイト解消`。maxHeartbeats wave (9 件) と
+機械的 wave (12 件) を含めるとこの日で 812 → 650。
+
+### ⚠ 実測で判明した 3 点 (以後の wave はこれを前提にすること)
+
+1. **instance binder 削除は cascade する**。`[DecidableEq ι]` を削ると下流の `def` が
+   instance 依存を失い、**census に無かった warning が下流ファイルに新規発生**する。
+   さらに `S06_CertainTypeClifford` の 822→869→926→941→966 の連鎖は、最終的に
+   **一度も触っていない** `S08_CaseBCoherence2/ConstituentPinning.lean:62-113` の
+   instance 合成を壊した (`failed to synthesize`)。各段が warning 数として net-zero
+   (1 つ直すと 1 つ湧く) でもあったため、担当が 4 件とも手で revert し原状復帰。
+   ⟹ **このカテゴリは leaf build では安全性を担保できない**。1 サイトずつ full build
+   するか、下流を含めた影響範囲を先に grep で確定してから触ること。
+2. **varname (`_`-prefix) は named argument で実渡しされていると壊れる**。今回の 5 件中 2 件が該当:
+   `caseB_transfer (K := K)` (S03g_Thm310General:423) /
+   `sixTwoMemberDatum_of_reducible_member (A' := A')` (S13_SixTwoBridge:856)。
+   いずれも「型で未使用な implicit binder を named arg でしか渡せない」形ゆえ、
+   呼び出し側を書き換えない限り不可 → skip が正。wave 2 の revert と同じ罠。
+3. **longLine の「留保」裁定 (下表 608 件) は部分的に誤りだった**。571 件を実測分類すると
+   **折返し可 493 / コード行 50 / 真に不能 28** (markdown 表 25 + 100 桁以下に分割点なし 3)。
+   「docstring の分割不能な長 span が主体」ではない。今回 56 件処理、**437 件が残キュー**。
+   ⚠ `by` を同一行に含む行は wave-4b の構文破壊 pitfall ゆえ引き続き skip。
+
+### 運用上の教訓 (並列 wave の設計)
+
+- 並列エージェントへの分割は **ファイル単位で排他**にすること。「JSON の前半/後半」で割ると、
+  同一ファイルに複数エージェントが到達して衝突した (今回実際に発生、実害は自主停止で回避)。
+- エージェントに **full build を禁止しても守られないことがある**。同一 worktree で並行 full build が
+  走ると olean が churn し、無関係な上流モジュールで `failed to open ….olean` が続発して
+  leaf build の green 判定ができなくなる。次回は build 自体を hub 側に集約する。
+
 ## RULING: "unused hypothesis in type" 334 件 = **instance binder であって数学的仮説でない** (hub 裁定 2026-07-17)
 
 **誤読の訂正**: 上表の旧記載「修正 = 仮説削除 = signature 変更。教科書 faithful statement は
