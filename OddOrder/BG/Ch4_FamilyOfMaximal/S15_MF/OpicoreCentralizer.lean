@@ -536,6 +536,153 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hqπMF : q ∈ S14.piSet (MF M) := by rw [hMFeq]; exact hqπMσ
     exact ⟨q, hqp, hqσ, piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI q hqπMF⟩
 
+/-! ### Theorem 15.7(e), branch 1: `H = M_F` abelian
+
+BG's (e1) reads *"`M ∈ ℳ_F` and `H` is abelian of rank two"*.  Its two halves are proved
+separately below; the abelian hypothesis is what selects this branch. -/
+
+/-- **BG Theorem 15.7(e1), the type claim** (mmd L4262: *"If `M ∈ ℳ_{P₁}` … then Lemma 15.1(b)
+shows that `H = M_σ = M'`, contrary to Corollary 15.6, which implies that `M'' ≠ 1`.  Therefore
+`M ∈ ℳ_F`"*): when `F(M)` is not `TI` and `H = M_F` is abelian, `M` is of type `F`.
+
+By conjunct (a) `M` is of type `F` or `P₁`, so it suffices to rule out type `P₁`.  For a type-`P₁`
+maximal, `M_σ = M'` (`typeP1_msigma_eq_derivedInG`, BG's Lemma 15.1(b) step), and `M_F = M_σ` here
+(`mf_eq_msigma_of_not_fittingIsTI`), so `M' = M_F` is abelian and hence `M'' = 1`.  But Corollary
+15.6 (`typeP_kstar_in_mf`) puts the nontrivial `K* = M_σ ∩ C_G(K)` inside `M''`. -/
+theorem isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) (habel : IsMulCommutative ↥(MF M)) :
+    S14.IsTypeF M := by
+  classical
+  by_contra hnF
+  -- (a): not type `F` ⟹ type `P₁` (type `P₂` is excluded by `¬FittingIsTI`).
+  have hP : S14.IsTypeP M := by
+    by_contra h; exact hnF (S14.isTypeF_iff_not_isTypeP.mpr h)
+  have hnP2 : ¬ S14.IsTypeP2 M := fun hP2 => hnotTI (fittingIsTI_of_isTypeP2 hG hM hP2)
+  have hP1 : S14.IsTypeP1 M := (S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP).resolve_right hnP2
+  -- A Hall `κ(M)`-subgroup `K ≤ M` (Hall's theorem in the solvable `M`), and `K* = M_σ ∩ C_G(K)`.
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+  set Kstar : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstar
+  -- Lemma 15.1(b) for type `P₁`: `M_σ = M'`; with `M_F = M_σ` this makes `M'` abelian.
+  have hMσM' : OddOrder.BG.Ch3.S10.Msigma M = derivedInG M :=
+    typeP1_msigma_eq_derivedInG hG hM hP1 hKM hK hKstar
+  have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
+  have hM'eq : derivedInG M = MF M := by rw [hMFeq, hMσM']
+  -- `M'' = 1`: `M'` is the abelian `M_F`.
+  have hM''bot : derivedInG (derivedInG M) = ⊥ := by
+    rw [hM'eq, derivedInG, Subgroup.map_eq_bot_iff_of_injective _ (MF M).subtype_injective]
+    refine Subgroup.commutator_eq_bot_iff_le_centralizer.mpr fun x _ => ?_
+    rw [Subgroup.mem_centralizer_iff]
+    exact fun y _ => isMulCommutative_iff.mp habel y x
+  -- Corollary 15.6: `K* ≠ 1` and `K* ≤ M''`.
+  obtain ⟨hKne, -, -, hKle, -⟩ := typeP_kstar_in_mf hG hM hP hKM hK hKstar
+  exact hKne (le_bot_iff.mp (hM''bot ▸ hKle))
+
+/-- **BG Theorem 15.7(e1), the rank claim** (mmd L4249, *"`H` is abelian of rank two"*): when
+`F(M)` is not `TI` and `H = M_F` is abelian, `rank H = 2`.
+
+`≤ 2`: the non-TI witness gives an order-`p` subgroup `X₁ ≤ M_F` with `rank (M_F ⊓ C_G(X₁)) < 3`
+(BG's *"`C_H(X₁)` is abelian of rank less than 3"*), and `M_F` abelian makes `M_F ≤ C_G(X₁)`, so the
+intersection is `M_F` itself.  `≥ 2`: `O_p(M_F)` is abelian (inside `M_F`) and **not** cyclic
+(`not_isCyclic_opiCore_mf_of_orderP_le_conj`, Coq `not_cycMp`), so
+`2 ≤ pRank_p O_p(M_F) ≤ rank M_F`.
+
+Extracted from the inline argument of `S16`'s `isTypeI_of_isTypeF`, which now cites this. -/
+theorem rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) (habel : IsMulCommutative ↥(MF M)) :
+    rank ↥(MF M) = 2 := by
+  classical
+  obtain ⟨g, p, X₁, hgM, hp, -, hX₁card, hX₁Mσ, hX₁cMσ, -, hrank3⟩ :=
+    exists_inf_conj_fitting_orderP_witness hG hM hnotTI
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
+  have hX₁MF : X₁ ≤ MF M := le_trans hX₁Mσ (le_of_eq hMFeq.symm)
+  have hX₁cMF : X₁ ≤ MulAut.conj g • MF M := by rw [hMFeq]; exact hX₁cMσ
+  -- `p` is odd (`p = |X₁|` divides the odd `|G|`).
+  have hpOdd : Odd p := by
+    have hpdvdG : p ∣ Nat.card G := hX₁card ▸ Subgroup.card_subgroup_dvd_card X₁
+    rcases hp.eq_two_or_odd' with rfl | h
+    · exact absurd (even_iff_two_dvd.mpr hpdvdG) (Nat.not_even_iff_odd.mpr hG.odd)
+    · exact h
+  have hcommMF : ∀ a b : ↥(MF M), a * b = b * a := isMulCommutative_iff.mp habel
+  -- `≤ 2`: `M_F` abelian ⟹ `M_F ≤ C_G(X₁)`, so the witness bound applies to `M_F` itself.
+  have hMFcentr : MF M ≤ Subgroup.centralizer (X₁ : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    simpa using congrArg Subtype.val (hcommMF ⟨y, hX₁MF hy⟩ ⟨a, ha⟩)
+  have hle3 : rank ↥(MF M) < 3 := (inf_eq_left.mpr hMFcentr) ▸ hrank3
+  -- `≥ 2`: `O_p(M_F)` is abelian and noncyclic.
+  have hOpMF : opiCoreInG ({p} : Set ℕ) (MF M) ≤ MF M := opiCoreInG_le {p} (MF M)
+  have hcommOp : ∀ x y : ↥(opiCoreInG ({p} : Set ℕ) (MF M)), x * y = y * x := fun x y =>
+    Subtype.ext (by
+      simpa using congrArg Subtype.val (hcommMF ⟨(x : G), hOpMF x.2⟩ ⟨(y : G), hOpMF y.2⟩))
+  have hOpnc : ¬ IsCyclic ↥(opiCoreInG ({p} : Set ℕ) (MF M)) :=
+    not_isCyclic_opiCore_mf_of_orderP_le_conj hG hM hp hgM hX₁card hX₁MF hX₁cMF
+  have h2pRank : 2 ≤ pRank ↥(opiCoreInG ({p} : Set ℕ) (MF M)) p :=
+    two_le_pRank_of_comm_isPGroup_not_isCyclic hpOdd hcommOp
+      (isPGroup_opiCoreInG_singleton (MF M)) hOpnc
+  have hge2 : 2 ≤ rank ↥(MF M) :=
+    le_trans (le_trans h2pRank (pRank_le_rank p))
+      (rank_le_of_injective (Subgroup.inclusion_injective hOpMF))
+  omega
+
+/-- **BG Theorem 15.7(e), the trichotomy — partial form** (mmd L4249).  For `F(M)` not `TI`, BG's
+(e) splits into three cases; this states the split BG's proof actually performs (on whether
+`H = M_F` is abelian) with the content currently available on each side:
+
+* `H` abelian — BG's case (e1) **in full**: `M ∈ ℳ_F` and `H` is abelian of rank two.
+* `H` non-abelian — the part of BG's (e2)/(e3) that is **common** to both: a prime
+  `p ∈ σ(M) − β(M)` with `O_p(H)` non-abelian and `O_{p'}(H)` cyclic.
+
+⚠ **This is weaker than the printed (e), in two identified ways** (issue 3022 stays open):
+
+1. **`p` is not yet pinned to `|X|`.**  BG obtains `p = |X|` for the TI-failure intersection
+   `X = F(M) ∩ F(M)ᵍ` by showing `X = X₁` (via `Z₀ = Ω₁(Z(P))`, `B = X₁ × Z₀ ∈ ℰ²(P) ∩ ℰ*(P)`, and
+   Lemma 10.13(b)'s `C_P(X₁) = X₁ × Z` with `Z` cyclic).  Lemma 10.13 is not yet formalized, so `p`
+   here is only *the* witness prime of `exists_inf_conj_fitting_orderP_witness`.
+2. **(e2) and (e3) are not yet separated.**  BG refines the non-abelian case by type: for
+   `M ∈ ℳ_F` the exponent of `M/H` divides `q − 1` for every `q ∈ π(H)` (this half *is* available,
+   as `typeF_exponent_dvd_sub_one_of_invariant_card`, and is used by `S16`'s `isTypeI_of_isTypeF`);
+   for `M ∈ ℳ_{P₁}` one gets `|O_p(H)| = p³` and `|M/H| ∣ p + 1` (BG's Theorem 5.5(b) + Corollary
+   10.7(b) + Theorem 2.5 route), which is not formalized.
+
+What this *does* fix is that the (e) slot now carries content on both sides: the previous bundled
+form was `abelian M_F ∨ (¬abelian M_F ∧ (a))`, an instance of `A ∨ ¬A`. -/
+theorem fitting_not_ti_trichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) :
+    (S14.IsTypeF M ∧ IsMulCommutative ↥(MF M) ∧ rank ↥(MF M) = 2) ∨
+      (¬ IsMulCommutative ↥(MF M) ∧
+        ∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
+          p ∉ OddOrder.BG.Ch3.S10.beta M ∧
+          ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (MF M)) ∧
+          IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M))) := by
+  by_cases habel : IsMulCommutative ↥(MF M)
+  · -- (e1): `H` abelian ⟹ `M` is type `F` of rank two.
+    exact Or.inl ⟨isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI hG hM hnotTI habel, habel,
+      rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI hG hM hnotTI habel⟩
+  · -- (e2)/(e3) common part: `O_p(H)` non-abelian, `O_{p'}(H)` cyclic, `p ∈ σ(M) − β(M)`.
+    refine Or.inr ⟨habel, ?_⟩
+    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, -⟩ :=
+      exists_inf_conj_fitting_orderP_witness hG hM hnotTI
+    have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
+    have hX₁MF : X₁ ≤ MF M := le_trans hX₁Mσ (le_of_eq hMFeq.symm)
+    obtain ⟨hpπ, hcyc⟩ :=
+      typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM habel
+    exact ⟨p, hp, hpσ,
+      piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI p hpπ,
+      opiCore_singleton_not_isMulCommutative_of_witness hG hM hp hX₁card hX₁MF hCGnotM habel,
+      hcyc⟩
+
 /-- **BG Corollary 15.5(b) consequence** (mmd L4219-4226): for a type-`P₂` maximal subgroup `M`
 with `τ₂(M) = ∅`, the Fitting subgroup is exactly `M_σ`.
 

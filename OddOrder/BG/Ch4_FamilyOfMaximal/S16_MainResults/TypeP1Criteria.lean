@@ -834,15 +834,19 @@ the `TypeIData.alternative` trichotomy splits on whether `F(M)` is `TI`:
   (`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`).
 * `¬FittingIsTI M`: disjuncts (b)/(c) (`M_F` abelian of rank 2, or the exponent–cyclic case)
   correspond to the BG Theorem 15.7(e) trichotomy (`nonTI_Fitting_structure`, Coq `BGsection15`).
-  ⚠ The `(e)` clause of the bundled `fitting_not_ti_cases` is **logically vacuous** — it reads
-  `abelian M_F ∨ (¬abelian M_F ∧ (type F ∨ type P₁))`, whose second disjunct is already delivered by
-  that theorem's own conjunct (a), so it collapses to excluded middle (issue 3022).  This proof
-  therefore does **not** route through it: it re-derives the trichotomy directly from the non-TI
-  witness (`exists_inf_conj_fitting_orderP_witness`) by splitting on `IsMulCommutative (M_F)` and
-  invoking `not_isCyclic_opiCore_mf_of_orderP_le_conj` (abelian ⟹ rank 2) resp.
-  `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` +
-  `typeF_nonabelian_cyclic_opiCore_compl` (non-abelian ⟹ exponent/cyclic).  So the non-TI case is
-  **fully proved here**; fixing 15.7(e) would let this proof cite it instead, but is not a gate. -/
+  The abelian branch now **cites** `S15`'s BG (e1) rank half
+  (`rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI`); the argument used to be inlined here.
+  The non-abelian branch still derives its two conjuncts directly from the non-TI witness
+  (`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` + `typeF_exponent_dvd_sub_one_of_invariant_card`
+  for the exponent condition, `typeF_nonabelian_cyclic_opiCore_compl` for cyclic `O_{p'}`), because
+  BG's (e2)/(e3) refinement by type is not yet separated in `S15.fitting_not_ti_trichotomy`
+  (issue 3022: `p = |X|` and the type-`P₁` case `|O_p(H)| = p³`, `|M/H| ∣ p+1` remain).
+
+  ⚠ Historical note: until 2026-07-18 the `(e)` clause of the bundled `fitting_not_ti_cases` was
+  **logically vacuous** — it read `abelian M_F ∨ (¬abelian M_F ∧ (type F ∨ type P₁))`, whose second
+  disjunct is already delivered by that theorem's own conjunct (a), so it collapsed to excluded
+  middle.  It has been dropped, and `S15.fitting_not_ti_trichotomy` now carries content on both
+  sides. -/
 theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hF : S14.IsTypeF M) :
     OddOrder.GroupTheory.IsTypeI M := by
@@ -872,31 +876,12 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       · exact absurd (even_iff_two_dvd.mpr hpdvdG) (Nat.not_even_iff_odd.mpr hG.odd)
       · exact h
     by_cases habel : IsMulCommutative ↥(MF M)
-    · -- abelian `M_F` ⟹ disjunct (b): `rank M_F = 2`.
+    · -- abelian `M_F` ⟹ disjunct (b): `rank M_F = 2`.  This is BG (e1)'s rank half, proved in
+      -- `S15` as `rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI` (the argument used to be
+      -- inlined here; it is shared with `S15.fitting_not_ti_trichotomy` now).
       refine Or.inr (Or.inl ⟨habel, ?_⟩)
       change rank ↥(MF M) = 2
-      have hcommMF : ∀ a b : ↥(MF M), a * b = b * a := isMulCommutative_iff.mp habel
-      -- ≤ 2: `M_F` abelian ⟹ `M_F ≤ C_G(X₁)`, so `M_F ⊓ C_G(X₁) = M_F` and `rank M_F < 3`.
-      have hMFcentr : MF M ≤ Subgroup.centralizer (X₁ : Set G) := by
-        intro a ha
-        rw [Subgroup.mem_centralizer_iff]
-        intro y hy
-        simpa using congrArg Subtype.val (hcommMF ⟨y, hX₁MF hy⟩ ⟨a, ha⟩)
-      have hle3 : rank ↥(MF M) < 3 := (inf_eq_left.mpr hMFcentr) ▸ hrank3
-      -- ≥ 2: `O_p(M_F)` is abelian (`≤ M_F`) and noncyclic, so `2 ≤ pRank ≤ rank`.
-      have hOpMF : opiCoreInG ({p} : Set ℕ) (MF M) ≤ MF M := opiCoreInG_le {p} (MF M)
-      have hcommOp : ∀ x y : ↥(opiCoreInG ({p} : Set ℕ) (MF M)), x * y = y * x := fun x y =>
-        Subtype.ext
-          (by simpa using congrArg Subtype.val (hcommMF ⟨(x : G), hOpMF x.2⟩ ⟨(y : G), hOpMF y.2⟩))
-      have hOpnc : ¬ IsCyclic ↥(opiCoreInG ({p} : Set ℕ) (MF M)) :=
-        not_isCyclic_opiCore_mf_of_orderP_le_conj hG hM hp hgM hX₁card hX₁MF hX₁cMF
-      have h2pRank : 2 ≤ pRank ↥(opiCoreInG ({p} : Set ℕ) (MF M)) p :=
-        two_le_pRank_of_comm_isPGroup_not_isCyclic hpOdd hcommOp
-          (isPGroup_opiCoreInG_singleton (MF M)) hOpnc
-      have hge2 : 2 ≤ rank ↥(MF M) :=
-        le_trans (le_trans h2pRank (pRank_le_rank p))
-          (rank_le_of_injective (Subgroup.inclusion_injective hOpMF))
-      omega
+      exact rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI hG hM hTI habel
     · -- non-abelian `M_F` ⟹ disjunct (c): the exponent condition (conjunct A, via the Frobenius
       -- divisibility engine + per-prime order-`q` witnesses) and cyclic `O_{p'}(M_F)` (conjunct B).
       refine Or.inr (Or.inr ⟨fun q _hq hqπ => ?_, ?_⟩)
