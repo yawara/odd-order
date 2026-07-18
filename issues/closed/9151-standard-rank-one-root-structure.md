@@ -21,16 +21,16 @@ issue 2043 の下流 leaf を書く前に本 issue で claim する。
 
 ## やること
 
-- [ ] characteristic two の `PSL(2,F)` について公開 unipotent root model を構成し、
+- [x] characteristic two の `PSL(2,F)` について公開 unipotent root model を構成し、
       elementary abelian、exact card、標準 Borel 内 Sylow `2`、標準 Weyl 元との積の
       位数 `3` を証明する。
-- [ ] Suzuki standard action について root range が標準 Borel の Sylow `2` であること、
+- [x] Suzuki standard action について root range が標準 Borel の Sylow `2` であること、
       concrete `RootGroup m` が Appendix III Definition 1 の Suzuki `2`-groupかつ
       explicit type-A model であること、involution line の位数、標準積の位数 `5` を証明する。
-- [ ] PSU standard action について Hermitian root group の involution line とその位数、
+- [x] PSU standard action について Hermitian root group の involution line とその位数、
       root range の Sylow `2` 性、Appendix III Definition 1 の Suzuki `2`-group性、
       標準積の位数 `3` を証明する。
-- [ ] 各 endpoint を `OddOrder.AxiomsCheck` に追加する。
+- [x] 各 endpoint を `OddOrder.AxiomsCheck` に追加する。
 
 ## 完了条件
 
@@ -42,7 +42,7 @@ issue 2043 の下流 leaf を書く前に本 issue で claim する。
 
 ## 参照
 
-- `issues/2043-centralizer-trichotomy-c.md`
+- `issues/closed/2043-centralizer-trichotomy-c.md`
 - `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`, lines 177--193
 - `OddOrder/GroupTheory/SpecificGroups/Suzuki/`
 - `OddOrder/GroupTheory/SpecificGroups/ProjectiveUnitary/`

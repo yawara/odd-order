@@ -46,7 +46,7 @@ Peterfalvi Part II, Ch. I §3 Proposition 1(c) (pp. 105–106) を原文強度�
         `C_Q(X) ∩ C_D(X) = 1` から `centralizerQQuotientEquiv : C_Q(X) ≃ Q̄` を
         実構成し、`centralizer_cQ_isPGroup_of_induction` で
         `IsPGroup 2 C_Q(X)` まで戻した (`CentralizerInductionBridge.lean`)。
-- [ ] PSL(2,ℓ), Sz(ℓ), PSU(3,ℓ) 各標準モデルについて Sylow `2` 構造、
+- [x] PSL(2,ℓ), Sz(ℓ), PSU(3,ℓ) 各標準モデルについて Sylow `2` 構造、
       `|C_Q(X)|`、distinguished involution と `orderOf(st)=3/5/3` を実証明し、
       三分岐を輸送する。opaque `Prop` scaffold や free target field は使わない。
 
