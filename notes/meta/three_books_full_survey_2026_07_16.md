@@ -409,6 +409,14 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### BG App.D — BG App.D CN-Groups of Odd Order
 
+> **⚠ 2026-07-18 更新 (lane c)**: opaque-Prop scaffold を de-opacify し、**偽だった 2 文を修正**。
+> 旧 `MinimalSimpleCNHypothesis` は minimal-simplicity/nonsolvability を自由 `Prop`+`_holds` で持ち
+> 任意の奇数位数 CN 群で充足可能だったため、D.1/D.2 は「全奇数位数 CN 群」の主張になり **両方偽**
+> (D.2 は `G=C₃` で機械検査反証、D.1 は `F_{3⁶}⋊(C₇⋊C₃)` で反証)。仮説を `IsCNGroup` +
+> `IsMinimalSimpleOdd` に置換して honest 化、vacuous な `cnTheorem_reduction`/`CNTheoremReductionData`
+> は削除 (sorry 3→2、opaque 0、build green、下流 consumer 無)。**残ブロッカーは Gorenstein §14.1
+> (3-step 群 + Cor 14.1.6) のみ** = issue 3020。⚠ FT 完成による vacuous discharge は禁止 (依存順序が逆)。
+
 > BG Appendix D (pp. 153-156, mmd lines 5132-5199) is a 4-page reading guide for the Feit-Hall-Thompson CN-theorem containing exactly two numbered results, Lemmas D.1 (Sylow-TI in a minimal simple CN-group of odd order) and D.2 (P ≤ N_G(P)′); the tags (D.1)-(D.3) in the text are display equations inside D.1's proof, not results. The repo file OddOrder/BG/AppD_CNGroups.lean is a statement-level scaffold carrying all 3 of the unit's sorries with zero proof content, and its standing hypothesis MinimalSimpleCNHypothesis encodes minimal-simplicity/nonsolvability as opaque free Prop fields, so Lemma D.1 as literally stated asserts Sylow-TI for every odd-order CN group (false: an odd solvable CN group such as F_{3^6} ⋊ (C7 ⋊ C3) violates it) and none of the sorries is honestly dischargeable without first de-opacifying the hypothesis; the third sorry (cnTheorem_reduction) is even trivially dischargeable with True-instantiations, i.e. pure packaging. Supporting infrastructure is good: the ZJ input is sorry-free via the book-sanctioned L(P)/Thm B.4 substitute (AppB_Thm62.zCenter_lOdd_sup_oPiCore_normal) and the Focal Subgroup Theorem (BG Thm 1.17) is in mathlib (Subgroup.commutator_inf_eq_focalSubgroup); the one genuinely missing mathematical input is Gorenstein §14.1 solvable-CN structure theory (Cor 14.1.6, 3-step groups), absent from the entire repo and the dominant cost, making D.1 an L and D.2 an S conditional on it. Two structural caveats: math-comp/odd-order has no Coq analog of App.D, and since feitThompson is complete the honest minimal-simple-CN hypothesis is vacuous, so everything could be discharged vacuously — logically sound but defeating the appendix's expository purpose. Slim verification pass: all three flagged partial labels CONFIRMED after refutation attempts (no alternative formalization of CN-groups, Sylow-TI, focal-control, or 3-step exclusion found under any book tree or OddOrder/GroupTheory/**; mathlib and AppB citations verified by reading the sources); one strengthening — D.2 as stated is definitively false (G = C3 counterexample under True-instantiation), not merely 'likely false'.
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
@@ -418,6 +426,15 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | App.D (guide prose) | 部分 | M | Reduction package: D.1/D.2 replace Gorenstein Ch.7/8/10 passages; consequences = no 3-step… | VERIFIED partial. SORRY 3 of 3 (OddOrder/BG/AppD_CNGroups.lean:75). Not a numbered book result — packages App.D's unnumbered closing prose (confirmed in mmd lines 5193-5196: (a) no 3-step subgroup ⇒ G Thm 14.2.2; (b) D.1… |
 
 ### BG App.E — BG Appendix E: Further Results of Feit and Thompson
+
+> **⚠ 2026-07-18 更新 (lane c)**: 163 行の opaque-Prop scaffold を **482 行の book-strength 記述に
+> de-opacify** (opaque フィールド 0 / `_holds` 0 をコメント除去後に確認)。**sorry-free で証明**:
+> `hallCollection_of_class_le_two` (E.1 class≤2)、`pow_mul_of_class_le_two` (E.2(b) class≤2)、
+> **`RegularOperatorSetup.card_A_dvd_half_p_sub_one` = E.3(a) 完成** (`q ∣ (p−1)/2`)、collectionTail 補題群
+> (全 axiom-clean、E.1class≤2 と E.3(a) は AxiomsCheck 登録)。残 9 sorry は全て honest statement の下
+> (「opaque で sorry-free」より「honest + sorry」を優先)。**依存グラフは 1 根に収束: 一般 class≤p−1 の
+> Hall collecting process が付録 E 全体の唯一の unlock** (他の §4/§5/§14/§15/§16 前提は全て repo に在り)
+> = issue 3021。
 
 > Appendix E (5 numbered results: Thm E.1 Hall collection, Prop E.2 regular p-group consequences, Thm E.3/Prop E.4 Feit–Thompson 1991 regular-operator bounds, Cor E.5 Type I/II application) is essentially unformalized: AppE_FurtherResults.lean is a 163-line opaque-Prop scaffold whose 5 sorried theorems map 1:1 to E.1–E.5 but state nothing at book strength — every hypothesis and conclusion is an arbitrary `Prop` field with a self-carried `_holds` proof, so each `∃ data, ...` statement is trivially satisfiable. Substantial special cases of E.1/E.2 were already proved sorry-free for BG Prop 4.3: class-≤2 and class-≤3 collection formulas with pinned binomial exponents and the corresponding Ω₁-exponent-p / p-power-multiplicativity theorems (S04_SmallRankBasic.lean, CriticalSubgroup.lean, Isaacs Ch04 CommutatorBasics.lean) — so E.1/E.2 are partial, missing only the general-class (≤ p−1) versions, which require formalizing Hall's collecting process in full (L, the hardest single gap). E.3–E.5 have zero genuine content anywhere in the repo and no Coq analog (math-comp/odd-order formalizes only appendices A–C); E.3 is the big-ticket item (XL), E.4 is M given E.3's internals, and E.5 is mostly wiring (L) since its §12/§14/§15/§16 prerequisites are formalized. Closing this unit honestly requires rewriting all five statements, not just filling the sorries. Slim verification pass: all five flagged labels (partial/partial/missing/missing/missing) were confirmed against refutation greps (book-number citations, descriptive names, mathlib Hall–Petrescu search, Coq appendix listing) and the E.1/E.2 special-case and E.5 prerequisite claims were spot-read in the Lean sources; the only corrections are lean_name namespace fixes (OddOrder.BG.Ch1.S04 not OddOrder.BG.S04; Omega.exponent_eq_of_class_le_two lives in CriticalSubgroup.lean) plus adding the class-≤2 Hall–Petrescu special case in OddOrder/GroupTheory/CriticalSubgroup.lean to E.1.
 
