@@ -2,6 +2,7 @@ import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.FiniteIndexAnnihilator
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.GroupTheory.AInvariantComplement
+import OddOrder.GroupTheory.SolvablePrimeIndex
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
