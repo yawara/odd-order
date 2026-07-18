@@ -1225,12 +1225,13 @@ theorem Hypothesis.forall_dadeHypS_H_eq_bot [Fintype G] [Finite G]
 /-- **(13.2.e) `normedTI`, TI half — `A(S)` is a TI-subset with normalizer `S`** (Coq
 `FTtypeP_facts` (e), the `normedTI 'A0(S) G S` conclusion; PFsection13.v:197).  Closes the
 gate G2 of issue 1017 update #22: Rung B's equivalence fed by Rung C. -/
-theorem Hypothesis.isTISubset_honestTypeP2ASet [Fintype G] [Finite G]
+theorem Hypothesis.isTISubset_honestTypeP2ASet [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) :
-    OddOrder.GroupTheory.IsTISubset (honestTypeP2ASet hyp.S) hyp.S :=
-  (hyp.isTISubset_honestTypeP2ASet_iff_forall_dadeHypS_H_eq_bot hG).mpr
+    OddOrder.GroupTheory.IsTISubset (honestTypeP2ASet hyp.S) hyp.S := by
+  haveI : Fintype G := Fintype.ofFinite G
+  exact (hyp.isTISubset_honestTypeP2ASet_iff_forall_dadeHypS_H_eq_bot hG).mpr
     (hyp.forall_dadeHypS_H_eq_bot hG hnoV)
 
 open scoped FiniteInduce in
@@ -1317,7 +1318,7 @@ theorem Hypothesis.cprimeSharpS_eq_empty (hyp : Hypothesis (G := G)) :
 /-- **`(C')^# ⊆ A(S)` (as an `S`-support)** (issue 1017): the honest §9 coherence support is empty
 because `C` is abelian (`cprimeSharpS_eq_empty`), hence is contained in the Dade support without a
 type-II identification `S_F = S_σ`. -/
-theorem Hypothesis.cprimeSharpS_subset_supportA [Fintype G] [Finite G]
+theorem Hypothesis.cprimeSharpS_subset_supportA [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     hyp.cprimeSharpS ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
@@ -1348,7 +1349,7 @@ induced-support lemma `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_c
 
 The inclusion `P = S_F ≤ S_σ` is the general `maxNilpotentNormalHall_le_Msigma` theorem, so this
 support argument is uniform across the type-II/type-III alternative. -/
-theorem Hypothesis.sSet_member_support_subset_A [Fintype G] [Finite G]
+theorem Hypothesis.sSet_member_support_subset_A [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub (hyp.toTypesIIIIIIVSetupS hG))}
     (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupS hG)) :
@@ -1452,7 +1453,7 @@ consumes to build the `CharacterDifferenceImage` of an irreducible §9 member.  
 `(Ind ξ)̄ − Ind ξ` vanishes at `1` (the degree `Ind ξ(1) = q·ξ(1)` is a positive real,
 self-conjugate).
 This is the `hdiffsupp` half of the R-datum — the S-instance `R1_diffsupp` (Peterfalvi §12/§5). -/
-theorem Hypothesis.sSet_member_diffsupp [Fintype G] [Finite G]
+theorem Hypothesis.sSet_member_diffsupp [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub (hyp.toTypesIIIIIIVSetupS hG))}
     (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupS hG)) :

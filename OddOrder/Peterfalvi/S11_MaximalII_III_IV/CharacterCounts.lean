@@ -777,12 +777,13 @@ the character kernel of `θ`: each constituent of `Res^Γ_K χ` inherits `χ`'s 
 
 This is the input that makes the (9.9.a) constituent `θ` of `Res^{HU}_H χ` trivial on the
 chief-factor kernel `N` (since `H₀ ⊆ ker χ`), so `θ` is an inflation of an `H̄`-character. -/
-theorem liesOver_mem_characterKernel {Γ : Type*} [Group Γ] [Fintype Γ]
+theorem liesOver_mem_characterKernel {Γ : Type*} [Group Γ] [Finite Γ]
     [Invertible (Nat.card Γ : ℂ)] {K : Subgroup Γ} [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
     {χ : IrreducibleCharacter Γ} {θ : IrreducibleCharacter ↥K}
     (hlo : IrreducibleCharacter.LiesOver K χ θ) {g : ↥K}
     (hg : ((g : Γ)) ∈ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction Γ ℂ)) :
     g ∈ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ) := by
+  haveI : Fintype Γ := Fintype.ofFinite Γ
   refine OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
     (ψ := ClassFunction.restrict K (χ : ClassFunction Γ ℂ))
     (OddOrder.Peterfalvi.S08.isCharacter_restrict χ.isIrreducible.isCharacter K)

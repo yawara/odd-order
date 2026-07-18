@@ -554,7 +554,7 @@ Packaged as an **opaque** `ξ : Irr Γ` (with `↑ξ = Ind θ`) — stated with 
 Discharges the type-I (12.2.a) constituent structure trivially for a Frobenius `L`
 (`frobenius_typeI_induced_char_constituents`). -/
 theorem frobenius_induce_char_singleton {Γ : Type*} [Group Γ] [Fintype Γ]
-    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [H.Normal] [Fintype ↥H]
+    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [H.Normal] [Finite ↥H]
     [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card Γ)) {W : Subgroup Γ}
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup Γ H W)
     (θ : IrreducibleCharacter ↥H) (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
@@ -562,6 +562,7 @@ theorem frobenius_induce_char_singleton {Γ : Type*} [Group Γ] [Fintype Γ]
       (ξ : ClassFunction Γ ℂ) = ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∧
       ¬ ClassFunction.IsReal (ξ : ClassFunction Γ ℂ) ∧
       (ξ : ClassFunction Γ ℂ).support ⊆ (H : Set Γ) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   have hirr := isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ
   have hne_triv : (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ :
       IrreducibleCharacter Γ) ≠ trivialIrreducibleCharacter Γ := by

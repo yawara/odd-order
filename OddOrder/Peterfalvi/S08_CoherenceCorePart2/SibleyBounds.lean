@@ -520,13 +520,14 @@ bounded by `ψ(1) = |L:H|·θ(1) ≤ |L:H|·|H:C|·√|C:D|`, combining `induce_
 (`ψ(1) = |L:H|·θ(1)`) with the §6 `θ`-bound `theta_degree_le_index_mul_sqrt_index`
 (`θ(1) ≤ |H:C|·√|C:D|`).  This is the (6.2) step `ψ(1) ≤ |L:C|·√|C:D|`. -/
 theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
-    (θ : IrreducibleCharacter ↥H) (C : Subgroup ↥H) [Fintype ↥C]
+    (θ : IrreducibleCharacter ↥H) (C : Subgroup ↥H) [Finite ↥C]
     [Invertible (Nat.card ↥C : ℂ)] {N : Subgroup ↥C} [N.Normal] (D : Subgroup ↥C) (hND : N ≤ D)
     (hθN : (↑N : Set ↥C) ⊆ OddOrder.Peterfalvi.S03.characterKernel
         (ClassFunction.restrict C (θ : ClassFunction ↥H ℂ)))
     (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥C ⧸ N)) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
       (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  haveI : Fintype ↥C := Fintype.ofFinite ↥C
   letI : H.Normal := hyp.H_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
   have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
@@ -592,7 +593,7 @@ theorem six_two (hyp : SibleyDadeHypothesis G L H)
     {A B : Subgroup ↥L} [A.Normal] [B.Normal]
     (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
     (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
-    (C : Subgroup ↥H) [Fintype ↥C] [Invertible (Nat.card ↥C : ℂ)] (D : Subgroup ↥C)
+    (C : Subgroup ↥H) [Finite ↥C] [Invertible (Nat.card ↥C : ℂ)] (D : Subgroup ↥C)
     (hND : ((B.subgroupOf H).subgroupOf C) ≤ D)
     (hcentral : D.map (QuotientGroup.mk' ((B.subgroupOf H).subgroupOf C)) ≤
       Subgroup.center (↥C ⧸ (B.subgroupOf H).subgroupOf C))

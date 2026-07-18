@@ -51,7 +51,7 @@ theorem exists_glue_nu_Xset_Yset_via_map
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hW2comm : h46.W2 ≤ ⁅H, H⁆)
     (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
@@ -60,6 +60,7 @@ theorem exists_glue_nu_Xset_Yset_via_map
       (∀ x ∈ hyp.Xset h46.W2, ν x = νX x)
       ∧ (∀ y ∈ hyp.Yset, ν y = cY.extension y) := by
   classical
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
     SibleyDadeHypothesis.finite_linearCharacters_of_finite
   -- generic irreducible inner product (orthonormality of any two irreducibles)
@@ -123,7 +124,7 @@ theorem caseB_member_seam_all_Yset
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hW2comm : h46.W2 ≤ ⁅H, H⁆)
     (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
@@ -135,6 +136,7 @@ theorem caseB_member_seam_all_Yset
     {y : ClassFunction ↥L ℂ} (hy : y ∈ hyp.Yset) :
     ClassFunction.inner X (cY.extension y) = 0 := by
   classical
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   -- `y − η₁` is `H^#`-supported (equal degree `|W₁|`) and lies in the `Y`-span.
   have hydeg : y (1 : ↥L) = η₁ (1 : ↥L) :=
     (hyp.Yset_apply_one hy).trans (hyp.Yset_apply_one hη₁).symm
@@ -390,15 +392,15 @@ together with the three anchor obligations — a minimal-degree anchor `χ₁ �
 `hχ₁1`), its `p`-power divisibility `hdvd`, and a nonzero supported witness `hnonzero` — all
 constructible from the `p`-group structure at the dispatch. -/
 theorem nonempty_coherent_S_caseB_of_anchor
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H) (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
@@ -423,8 +425,12 @@ theorem nonempty_coherent_S_caseB_of_anchor
     (hnonzero : ∃ φ : ClassFunction ↥L ℂ, φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
       (hyp.Xset h46.W2) (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧ φ ≠ 0) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :=
-  nonempty_coherent_S_caseB hyp h46 hHK hW1 hcen hcZ hfpf
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  exact nonempty_coherent_S_caseB hyp h46 hHK hW1 hcen hcZ hfpf
     ⟨coherentXunionYset_caseB hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL
       hc2 hFPF hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero⟩
 
@@ -493,15 +499,15 @@ the FPF bounds `hFPF`/`hfpf`/`hcZ`, the `Y`-cardinality side condition `hYcard`,
 non-degeneracy `hXne` — are exactly the case-(B) structure that the dispatch supplies at
 `sibleySetup_is_coherent`. -/
 theorem nonempty_coherent_S_caseB_of_structure
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H) (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
@@ -516,6 +522,10 @@ theorem nonempty_coherent_S_caseB_of_structure
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   -- the minimal-degree `X`-anchor and its divisibility.
   obtain ⟨χ₁, hanchor, hχ₁1, hdvd⟩ := exists_caseB_Xset_anchor hyp hp hHp hXne
   -- the `Y`-anchor `η₁` (degree `|W₁| ≠ 0`).
@@ -551,15 +561,15 @@ by the (6.3) bound `|H:H′| ≤ 4|W₁|²+1`) is not invoked.  The weak FPF `|W
 `hFPF` and the linchpin `hcYgood`) comes from `caseB_W1_dvd_index_commutator` (`W₁` acts FPF on
 `H/H′`), independent of `W₂ ⊊ H′`. -/
 theorem nonempty_coherent_S_caseB_edge (hyp : SibleyDadeHypothesis G L H)
-    [H.Normal] [Fintype ↥H]
+    [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H) (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
@@ -570,6 +580,10 @@ theorem nonempty_coherent_S_caseB_edge (hyp : SibleyDadeHypothesis G L H)
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
   haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
   -- `W₂.subgroupOf H = commutator H` (edge), and the weak FPF `|W₁| < |H:W₂|`.

@@ -38,7 +38,7 @@ variable {G : Type*} [Group G] [Fintype G]
 variable {A : Set G} {L : Subgroup G} [Fintype ↥L]
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
-omit [Fintype ↥L] in
+omit [Fintype ↥L] [Fintype G] in
 omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Peterfalvi (4.7)**, core support statement, *structural form*.  This is the (4.7) core depending
 only on the (4.6.c)/(4.6.d) data — a normal `subH ≤ K` and the covering condition `A_covers` — and
@@ -48,7 +48,7 @@ that supplies these structural data (e.g. the §10 type-`P` setting, via `K = M'
 
 If `χ ∈ Irr(K)` satisfies `subH ⊄ Ker χ`, then every nonidentity `g ∈ K` with `χ(g) ≠ 0` maps into
 `A` (i.e. `Supp χ ⊆ A ∪ {1}`). -/
-theorem mem_A_of_apply_ne_zero_of_covers
+theorem mem_A_of_apply_ne_zero_of_covers [Finite G]
     (K : Subgroup ↥L) (subH : Subgroup ↥L) (subH_normal : subH.Normal)
     (A_covers : ∀ (hh : ↥L), hh ∈ subH → hh ≠ 1 →
       ∀ (x : ↥L), x ∈ Subgroup.centralizer ({hh} : Set ↥L) ⊓ K → x ≠ 1 → (L.subtype x) ∈ A)
@@ -59,6 +59,7 @@ theorem mem_A_of_apply_ne_zero_of_covers
     (hval : (χ : ClassFunction ↥K ℂ) g ≠ 0) :
     L.subtype (K.subtype g) ∈ A := by
   classical
+  haveI : Fintype G := Fintype.ofFinite G
   -- `subH` is normal in `K` (a normal subgroup of `L` contained in `K`).
   haveI hHK_normal : (subH.subgroupOf K).Normal := subH_normal.subgroupOf K
   -- (1.2) contrapositive: `χ(g) ≠ 0 ⟹ C_subH(g) ≠ 1`.
@@ -307,13 +308,14 @@ Peterfalvi (9.9.b)/(9.8.b) (with `w₂ = p` and `H = H̄` after the (8.4.d) real
 as the `M/H₀`-induction family). -/
 theorem Hypothesis.card_reducible_Hnontrivial_induce_eq_W2_sub_one
     (h : Hypothesis L₀) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {H : Subgroup ↥h.K} (hW2H : h.W2.subgroupOf h.K ≤ H) :
     Nat.card {χ : IrreducibleCharacter ↥h.K //
         ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))
         ∧ ¬ ((H : Set ↥h.K) ⊆ S03.characterKernel (χ : ClassFunction ↥h.K ℂ))}
       = Nat.card h.W2 - 1 := by
   classical
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite ↥(h.W1 ⊔ h.W2)
   haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
   -- the forward map sends a nontrivial column `χ₂` to its reducible, `H`-nontrivial `χ_j`
   have hfwd : ∀ p : {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₂ ≠ 1},

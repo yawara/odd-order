@@ -399,7 +399,7 @@ degree: `columnSum(1) = constituentWeight · η₁(1)`.  Indeed `columnSum(1) = 
 `constituentWeight = θ(1)` (`constituentWeight_eq_apply_one`).  This is the `h1` hypothesis that the
 support/`ZIrr` column conjuncts need. -/
 theorem caseB_column_degree_match
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
@@ -416,6 +416,7 @@ theorem caseB_column_degree_match
       = ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) :
     (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (1 : ↥L)
       = (constituentWeight hφ' θ : ℂ) * η₁ (1 : ↥L) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   rw [hcoleq, ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
   ring
@@ -425,7 +426,7 @@ theorem caseB_column_degree_match
 `(Ind^L_H θ)(1) = aθ · η₁(1)`.  Same arithmetic as `caseB_column_degree_match`, for the
 induced character directly (no column rewrite). -/
 theorem caseB_induce_degree_match
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
     [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
@@ -436,6 +437,7 @@ theorem caseB_induce_degree_match
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) (1 : ↥L)
       = (constituentWeight hφ' θ : ℂ) * η₁ (1 : ↥L) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
   ring
@@ -444,7 +446,7 @@ theorem caseB_induce_degree_match
 `Ind^L_H θ − aθ·η₁` is `H^#`-supported, by `support_indW2_sub_smul_subset_sharpImage` at `H`
 with the degree match `caseB_induce_degree_match`. -/
 theorem caseB_irr_sub_smul_support
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
     [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
@@ -455,6 +457,7 @@ theorem caseB_irr_sub_smul_support
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - constituentWeight hφ' θ • η₁).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   rw [← Nat.cast_smul_eq_nsmul ℂ]
   exact hyp.support_indW2_sub_smul_subset_sharpImage (le_refl H) _ hη₁
     (constituentWeight hφ' θ : ℂ) (caseB_induce_degree_match hyp hW2H hcen hφ' hweight hη₁)
@@ -464,7 +467,7 @@ theorem caseB_irr_sub_smul_support
 (`caseB_irr_sub_smul_support`) and a virtual character (`induce_mem_ZIrr`, `η₁` irreducible), so the
 Dade map carries it into `ZIrr G` (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`). -/
 theorem caseB_irr_htau1_mema
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
     [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
@@ -475,6 +478,7 @@ theorem caseB_irr_htau1_mema
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - constituentWeight hφ' θ • η₁)
       ∈ ZIrr G := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
     hyp.dade hyp.hconj (caseB_irr_sub_smul_support hyp hW2H hcen hφ' hweight hη₁) ?_
   exact Submodule.sub_mem _
@@ -486,11 +490,12 @@ theorem caseB_irr_htau1_mema
 supported on `H` (`support_induce_subset_of_normal`, conj preserves support), and the difference
 vanishes at `1` since `(Ind^L_H θ)(1) = |W₁|·θ(1)` is a (real) positive integer fixed by `star`. -/
 theorem caseB_irr_conj_diff_support
-    (_hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (_hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (θ : IrreducibleCharacter ↥H) :
     ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
         - ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   have hsupp : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆ (H : Set ↥L) :=
     ClassFunction.support_induce_subset_of_normal H _
   intro x hx
@@ -762,7 +767,7 @@ of
 `η₁, η̄₁` against the induced character and its conjugate vanish: each is a `Y`-member against a
 distinct irreducible (`inner_Yset_irr_eq_zero`), distinctness from non-linearity `hnonlin`. -/
 theorem caseB_hirrAnc
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
@@ -783,6 +788,7 @@ theorem caseB_hirrAnc
         ∧ ClassFunction.inner η₁.conj (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
         ∧ ClassFunction.inner η₁.conj
             (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0 := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   intro i hnotcol
   have hθne : (i.val : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
     hnonlin i (by rw [heq, trivialClassFunction_apply])
@@ -930,7 +936,7 @@ weight `aθ = constituentWeight hφ' θ`: all six conjuncts hold. The two degree
 occur in `θ`, `0 < constituentWeight`); the rest are unconditional.  This is the column-branch input
 `hcol` of the mixed per-`φ` dispatch (`caseB_per_phi_anchored_fromYset`). -/
 theorem caseB_column_bundle
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
@@ -946,6 +952,7 @@ theorem caseB_column_bundle
     {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     CaseBColBundle hyp h46 θ η₁ (constituentWeight hφ' θ) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   intro χ₂ hχ₂ hcoleq
   have h1 := caseB_column_degree_match hyp h46 hW2H hcen hφ' hweight hη₁ hcoleq
   exact ⟨(OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm,
@@ -962,7 +969,7 @@ anchor, all eight conjuncts are discharged (irreducibility, non-realness, the tw
 the two anchor orthogonalities, self-conjugate orthogonality).  This is the irreducible-branch input
 `hirr` of the mixed per-`φ` dispatch. -/
 theorem caseB_irr_bundle
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
@@ -980,6 +987,7 @@ theorem caseB_irr_bundle
     (hneη : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ η₁)
     (hneη' : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj ≠ η₁) :
     CaseBIrrBundle hyp h46 θ η₁ (constituentWeight hφ' θ) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   intro hnotcol
   have h1 := caseB_irr_induce_isIrreducible h46 hHK hθne hnotcol
   exact ⟨h1, caseB_irr_nonreal hyp h1, caseB_irr_conj_diff_support hyp θ,
@@ -994,7 +1002,7 @@ theorem caseB_irr_bundle
 constituent `i`; the column branch needs no non-linearity hypothesis (it is gated on the column
 witness equation `columnSum χ₂ = Ind^L_H θ`). -/
 theorem caseB_hcol
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
@@ -1018,7 +1026,7 @@ theorem caseB_hcol
 non-linearity hypothesis `hnonlin` (`caseB_hnonlin`): `θ ≠ 1` since `θ(1) ≠ 1`, and the two `≠ η₁`
 distinctnesses by `caseB_induce_ne_Yset` / `caseB_induce_conj_ne_Yset` (degree mismatch). -/
 theorem caseB_hirr
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]

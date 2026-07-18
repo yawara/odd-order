@@ -873,7 +873,7 @@ sum is an integer `s` (`hs`: `∑_{H#}|α|² = s`, since `∑_{x∈H}|α|² = |H
 nat-valued core to the real-valued cascade input consumed by the (13.10) analytic inequality.
 Honest hypotheses: `hχ` the (13.5.a) `a = 0` point formula; `hs` integrality; `hParseval`
 `s + α(1)² = |H|‖α‖²`; `hInflation` (13.5.c); `habelian` (13.2.b, `H` abelian + `α` faithful). -/
-theorem caseB_eta_norm_bound {S : Type*} [Group S] [Fintype S]
+theorem caseB_eta_norm_bound {S : Type*} [Group S] [Finite S]
     (α χ : S → ℂ) (A : Finset S) {Hcard P d n s : ℕ}
     (hH : 1 ≤ Hcard)
     (hχ : ∀ x ∈ A, χ x = α x)

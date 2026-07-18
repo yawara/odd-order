@@ -259,10 +259,11 @@ of dimension `|A|`.  For commutative `H` conjugation is trivial, so every functi
 function; restriction to `A` and extension-by-zero then give a linear isomorphism
 `CF(H, A) ≃ (↥A → ℂ)`.  This is the dimension input for Peterfalvi (3.4)
 (`dim CF(W, V) = (w₁−1)(w₂−1)`). -/
-theorem finrank_supportedSubmodule_eq_card {H : Type*} [Group H] [Fintype H] [IsMulCommutative H]
+theorem finrank_supportedSubmodule_eq_card {H : Type*} [Group H] [Finite H] [IsMulCommutative H]
     (A : Set H) :
     finrank ℂ (ClassFunction.supportedSubmodule (G := H) (k := ℂ) A) = Nat.card A := by
   classical
+  haveI : Fintype H := Fintype.ofFinite _
   haveI : Fintype A := Fintype.ofFinite _
   let restr : ClassFunction.supportedSubmodule (G := H) (k := ℂ) A →ₗ[ℂ] (A → ℂ) :=
     { toFun := fun φ a => (φ : ClassFunction H ℂ) (a : H)
@@ -966,12 +967,13 @@ theorem isCyclic_charGroup_subgroupOf (hyp : TICyclicHypothesis G) {H : Subgroup
 indexed by nontrivial character pairs) is linearly independent in `CF(W, V)`.  Proof by the
 biorthogonal system: the dual functional `⟨·, ω_{ij}⟩` evaluates `α_{kl}` to `δ_{(k,l),(i,j)}`
 (`alpha_inner_omega_self`/`_ne`). -/
-theorem alphaLinearIndependent (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+theorem alphaLinearIndependent (hyp : TICyclicHypothesis G) [Finite hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] (hVeq : hyp.V = hyp.Vdiff) :
     LinearIndependent ℂ
       (fun p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} ×
           {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} =>
         hyp.alpha hVeq p.1.1 p.2.1) := by
+  haveI : Fintype hyp.W := Fintype.ofFinite _
   refine LinearIndependent.of_pairwise_dual_eq_zero_one _
     (fun p => (innerDual (hyp.omega (hyp.omegaProdChar p.1.1 p.2.1))).comp
       (Submodule.subtype _)) (fun p q hpq => ?_) (fun p => ?_)

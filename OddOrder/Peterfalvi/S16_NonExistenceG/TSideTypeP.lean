@@ -180,7 +180,7 @@ assembly `𝒯` is the non-principal inflated `Irr(QV/Q)`-family, `|𝒯| = |V| 
 The `Fintype`/`Invertible` instances are taken explicitly (satisfiable from `Finite G`) so the
 `induce`-image in the statement type-checks, matching the shared-infra convention. -/
 theorem calT1_image_induce_card_eq [Finite G] (hyp : Hypothesis (G := G))
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (hQVnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal)
@@ -196,6 +196,7 @@ theorem calT1_image_induce_card_eq [Finite G] (hyp : Hypothesis (G := G))
     (𝒯.image (fun θ => OddOrder.RepresentationTheory.ClassFunction.induce
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
       = 𝒯.card / hyp.base.p := by
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   haveI := hQVnormal
   -- The shared-infra orbit count `|image| = |𝒯| / [T:QV]`, with `[T:QV] = p`.
   rw [OddOrder.RepresentationTheory.card_image_induce_eq_div 𝒯 hconj hinertia,
@@ -491,7 +492,7 @@ its two properties.  Its output `(|V| − 1)/p` then feeds the (14.9) Γ-Bessel 
 `T_typeIII_ratio_le` (still gated additionally on the `v = |V|` (13.12) `d=1` substitution + the
 S07 coherence package + the S-side `Γ` bridge). -/
 theorem T_typeIII_calT1_card_eq [Finite G] (hyp : Hypothesis (G := G))
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (hQVnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal)
@@ -536,7 +537,7 @@ This closes the **cardinality** obligation of (14.9) with no parameterized hypot
 ratio bound `T_typeIII_ratio_le` additionally needs `v = |V|` ((13.12) `d = 1`, lane-b), the T-side
 `S07.Hypothesis` coherence package, and the S-side `Γ` bridge. -/
 theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (td : TypeIIIData hyp.base.T) :
@@ -686,7 +687,7 @@ with, for `θ ∈ 𝒯`:
 and with the count `|calT1_image| = (|V| − 1)/p`.  This packages the "pure transcription" `𝒯`-build
 so the (14.9) coherence carrier `horth` is dischargeable end-to-end. -/
 theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (td : TypeIIIData hyp.base.T) :
@@ -911,7 +912,7 @@ open scoped Classical in
 /-- Compatibility projection of `T_typeIII_calT1_family_galois`, retaining the
 original family interface for coherence consumers that only need conjugate closure. -/
 theorem T_typeIII_calT1_family [Finite G] (hyp : Hypothesis (G := G))
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (td : TypeIIIData hyp.base.T) :
@@ -939,7 +940,7 @@ open scoped Classical in
 /-- Galois closure passes from a source family to its induced family. -/
 theorem inducedFamily_mapRingEquiv_mem
     {L : Type*} [Group L] [Fintype L]
-    (K : Subgroup L) [Fintype K] [Invertible (Nat.card K : ℂ)]
+    (K : Subgroup L) [Finite K] [Invertible (Nat.card K : ℂ)]
     (𝒯 : Finset (IrreducibleCharacter K))
     (hgalois : ∀ (σc : ℂ ≃+* ℂ) θ, θ ∈ 𝒯 →
       IrreducibleCharacter.galoisMap σc θ ∈ 𝒯)

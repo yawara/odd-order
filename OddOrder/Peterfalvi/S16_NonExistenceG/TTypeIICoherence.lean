@@ -290,7 +290,7 @@ single precisely-scoped deep obligation.  Its output feeds the (14.9) Γ-Bessel 
 `T_typeIII_ratio_le` (Coq `cohT1` consumed at PFsection14.v:769 `have [[Itau1T Ztau1T] Dtau1T] := cohT1`). -/
 theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (𝒯 : Finset (IrreducibleCharacter ((derivedInG hyp.base.T).subgroupOf hyp.base.T)))
@@ -311,6 +311,7 @@ theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
       ((a - b : ClassFunction ↥hyp.base.T ℂ)).support ⊆ A)
     (hcard2 : 2 ≤ calT1_set.ncard) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp07.tau calT1_set A) := by
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   haveI := hyp.base.finiteG
   -- `calT1_set` is finite (image of a `Finset`).
   have hSfin : calT1_set.Finite := by rw [hcalT1]; exact (Finset.finite_toSet _)
@@ -363,7 +364,7 @@ a `|V|`-lower bound — kept explicit, as in `T_typeIII_calT1_coherent`).  Outpu
 Γ-Bessel bound. -/
 theorem T_typeIII_calT1_isCoherent [Finite G] (hyp : Hypothesis (G := G))
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
@@ -392,6 +393,7 @@ theorem T_typeIII_calT1_isCoherent [Finite G] (hyp : Hypothesis (G := G))
           (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)) := by
   classical
   haveI := hyp.base.finiteG
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   -- Support identity `sigmaSharp T = (derivedInG T)^#` and the sharp-membership form.
   have hAK : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T = (derivedInG hyp.base.T : Set G) \ {1} :=
     T_typeIII_sigmaSharp_eq hG hyp hIII
@@ -469,8 +471,8 @@ This is the source-support input shared by the coherence construction and the (5
 eta-orthogonality argument.  Normality of T' makes each induced character vanish off T',
 while the common linear source degree makes a member difference vanish at 1. -/
 theorem T_typeIII_calT1_difference_support [Finite G] (hyp : Hypothesis (G := G))
-    [Fintype G] [Invertible (Nat.card G : ℂ)]
-    [Fintype ↥hyp.base.T] [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T)
@@ -485,6 +487,8 @@ theorem T_typeIII_calT1_difference_support [Finite G] (hyp : Hypothesis (G := G)
         (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
   classical
   haveI := hyp.base.finiteG
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   have hAK : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T =
       (derivedInG hyp.base.T : Set G) \ {1} :=
     T_typeIII_sigmaSharp_eq hG hyp hIII

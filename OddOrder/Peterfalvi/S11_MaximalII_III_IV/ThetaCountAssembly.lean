@@ -163,7 +163,7 @@ theorem exists_pairHom_eq_of_realizedH0_ker [Finite G] {M : Subgroup G}
 theorem hcuSeedHom_hinv_of_wComplement_triv [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
-    [Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))]
+    [Finite ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))]
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
     (hθW : caseA_wComplement caseA ≤ θ.ker) :
     ∀ c : ↥(cuInHu caseA), ∀ h : ↥(hInHu data),
@@ -171,6 +171,8 @@ theorem hcuSeedHom_hinv_of_wComplement_triv [Finite G] {M : Subgroup G}
           ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
             (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
         = hcuSeedHom (chief := chief) θ h := by
+  haveI : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    Fintype.ofFinite _
   have htriv : ∀ w ∈ caseA_wComplement caseA,
       (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
         = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
@@ -471,7 +473,7 @@ theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
     (lam : ↥(cuInHu caseA) →* ℂˣ)
     (hθS0 : θ.comp caseA.S0.subtype ≠ 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal]
@@ -485,6 +487,7 @@ theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
         (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
           (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) := by
   classical
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   set ζ : IrreducibleCharacter ↥(huSub data) :=
     ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
       hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩ with hζdef
@@ -546,8 +549,8 @@ theorem caseA_member_induceHU_irreducible [Finite G] {M : Subgroup G}
     (hθW : caseA_wComplement caseA ≤ θ.ker)
     (hθS0 : θ.comp caseA.S0.subtype ≠ 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
-    [Fintype ↥(hInHu data)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data) : ℂ)]
@@ -558,6 +561,8 @@ theorem caseA_member_induceHU_irreducible [Finite G] {M : Subgroup G}
         = hInHu data ⊔ cuInHu caseA) :
     IsIrreducibleCharacter (induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)) := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
   refine hcuZetaPair_induceHU_irreducible caseA θ hinv lam hθ₀ ?_
   intro hMfix
   have hlo := hcuZetaPair_liesOver_hInHu caseA θ hinv lam hθ₀

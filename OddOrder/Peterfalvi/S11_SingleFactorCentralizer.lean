@@ -192,7 +192,7 @@ The modular assembly over the landed hard direction `inertia_inf_uInHu_le_cuInHu
 `u = h⁻¹g ∈ I(θ₀) ⊓ U ≤ C_U(S₀)` by the single-factor stabilizer analysis.  This is the
 containment half of the (9.8.d) inertia lift `I = H·C_U(S₀)` — sufficient for the (9.11.1)
 divisibility, which only needs `[HU : H·C_U(S₀)] ∣ [HU : I(θ₀)]`. -/
-theorem inertia_le_hcuInHu [Fintype ↥(hInHu data)] (caseA : CliffordCaseAData chars)
+theorem inertia_le_hcuInHu [Finite ↥(hInHu data)] (caseA : CliffordCaseAData chars)
     {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
     (hreg : ∃ x ∈ caseA.S0,
       (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
@@ -202,6 +202,7 @@ theorem inertia_le_hcuInHu [Fintype ↥(hInHu data)] (caseA : CliffordCaseAData 
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
       ≤ hInHu data ⊔ cuInHu caseA := by
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
   set θ₀ := ClassFunction.compHom (hInHuEquivH data).toMonoidHom
     (ClassFunction.compHom (QuotientGroup.mk' chief.N)
       (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) with hθ₀
@@ -804,12 +805,13 @@ constant `1`) — through `char_eq_on_factors_of_bijective`.  This is the (9.11.
 whose inertia is `C_U(S i) ⊓ C_U(S j) = U₁ ∩ U₁ʷ` (regular on `S i`, `S j` for the `⊆` half; trivial
 elsewhere for the `⊇` half). -/
 theorem exists_two_summand_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
-    {ι : Type*} [Fintype ι] [DecidableEq ι] (S : ι → Subgroup Hbar)
+    {ι : Type*} [Finite ι] [DecidableEq ι] (S : ι → Subgroup Hbar)
     (hindep : iSupIndep S) (hspan : ⨆ i, S i = ⊤)
     (hp : ∀ i, (Nat.card ↥(S i)).Prime) {i j : ι} (hij : i ≠ j) :
     ∃ θ : Hbar →* ℂˣ, (∃ x ∈ S i, θ x ≠ 1) ∧ (∃ x ∈ S j, θ x ≠ 1) ∧
       ∀ k, k ≠ i → k ≠ j → ∀ x ∈ S k, θ x = 1 := by
   classical
+  haveI : Fintype ι := Fintype.ofFinite _
   have hcomm : Pairwise fun a b : ι => ∀ x y : Hbar, x ∈ S a → y ∈ S b → Commute x y :=
     fun a b _ x y _ _ => mul_comm x y
   have hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm) :=

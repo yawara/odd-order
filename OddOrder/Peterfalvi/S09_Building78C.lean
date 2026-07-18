@@ -91,13 +91,13 @@ half).  Every induced class function `Ind_K^L φ` lies in the `ℂ`-span of the 
 characters `{Ind_K^L θ : θ ∈ Irr K}`.  Expand `φ` in the irreducible basis of `CF(K)`
 (`span_irreducibleCharacter_eq_top`) and push through the linearity of induction
 (`induce_add`/`induce_smul`/`induce_zero`) by `Submodule.span_induction`. -/
-theorem induce_mem_span_induce_irr (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+theorem induce_mem_span_induce_irr (K : Subgroup L) [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)]
     (φ : ClassFunction ↥K ℂ) :
     ClassFunction.induce K φ ∈ Submodule.span ℂ
       (Set.range (fun θ : IrreducibleCharacter ↥K =>
         ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
   classical
-  haveI : Finite ↥K := Finite.of_fintype _
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   have hφ : φ ∈ Submodule.span ℂ
       (Set.range (fun θ : IrreducibleCharacter ↥K => (θ : ClassFunction ↥K ℂ))) := by
     rw [span_irreducibleCharacter_eq_top]; exact Submodule.mem_top
@@ -113,12 +113,13 @@ class function `ψ` supported inside the normal subgroup `K` lies in the `ℂ`-s
 so `ψ ∈ Ind_K^L(CF K)`) with `induce_mem_span_induce_irr`.  This is the spanning input that, after
 the degree-`0` reduction (`mem_span_psi_of_apply_one_zero`), supplies the `hspan` hypothesis of
 `chiRho_decomp_proof`. -/
-theorem supported_mem_span_induce_irr (K : Subgroup L) [K.Normal] [Fintype ↥K]
+theorem supported_mem_span_induce_irr (K : Subgroup L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] (ψ : ClassFunction L ℂ)
     (hψ : ∀ y : L, y ∉ K → ψ y = 0) :
     ψ ∈ Submodule.span ℂ
       (Set.range (fun θ : IrreducibleCharacter ↥K =>
         ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   rw [eq_induce_restrict_of_supported K ψ hψ]
   exact induce_mem_span_induce_irr K _
 
@@ -442,10 +443,11 @@ theorem chiRho_apply_eq_zeta0_of_inner_tau_uniform {G : Type*} [Group G] [Fintyp
 /-- **Induced irreducible characters have nonzero norm.**  `‖Ind_K^L θ‖² ≠ 0`, since
 `|K|·‖Ind θ‖² = |I_L(θ)| > 0` (`card_mul_inner_self_induce_eq_card_inertia`).  Supplies the
 `hnorm` hypothesis of `chiRho_decomp_proof` for the family `ζ_i = Ind θ_i` of (7.6)/(7.7.a). -/
-theorem induce_norm_ne_zero (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card L : ℂ)]
+theorem induce_norm_ne_zero (K : Subgroup L) [K.Normal] [Finite ↥K] [Invertible (Nat.card L : ℂ)]
     [Invertible (Nat.card ↥K : ℂ)] (θ : IrreducibleCharacter ↥K) :
     ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
       (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)) ≠ 0 := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   intro h0
   have hkey := card_mul_inner_self_induce_eq_card_inertia (G := L) θ
   rw [h0, mul_zero] at hkey
@@ -456,9 +458,10 @@ theorem induce_norm_ne_zero (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertib
 positive natural number `dim θ` (`irreducibleCharacter_apply_one_eq_pos_natCast`).  This supplies
 `ζ_0(1) ≠ 0` (`hz0`), hence the well-definedness of the degree ratios `d_i = ζ_i(1)/ζ_0(1)` and the
 degree relation `ζ_i(1) = d_i ζ_0(1)` for the family `ζ_i = Ind_K^L θ_i`. -/
-theorem induce_apply_one_ne_zero (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+theorem induce_apply_one_ne_zero (K : Subgroup L) [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)]
     (θ : IrreducibleCharacter ↥K) :
     ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L) ≠ 0 := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   rw [ClassFunction.induce_apply_one]
   obtain ⟨d, hd, hval⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   refine mul_ne_zero (Nat.cast_ne_zero.mpr K.index_ne_zero_of_finite) ?_
@@ -468,10 +471,11 @@ theorem induce_apply_one_ne_zero (K : Subgroup L) [Fintype ↥K] [Invertible (Na
 /-- **The induced character is real at `1`.**  `Ind_K^L θ (1) = [L:K] · θ(1)` is the natural-number
 cast `[L:K] · dim θ`, so it is fixed by complex conjugation.  Supplies `star d_i = d_i` for the
 degree ratios `d_i = ζ_i(1)/ζ_0(1)` in the `(7.8.a)` `Gamma_orth_nu` computation. -/
-theorem induce_apply_one_star (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+theorem induce_apply_one_star (K : Subgroup L) [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)]
     (θ : IrreducibleCharacter ↥K) :
     star (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L))
       = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L) := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   rw [ClassFunction.induce_apply_one]
   obtain ⟨d, _, hval⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   rw [hval, ← Nat.cast_mul]
@@ -481,7 +485,7 @@ theorem induce_apply_one_star (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.c
 family `θ : Fin (n+1) → Irr K` of pairwise non-conjugate irreducibles, the induced characters
 `ζ_i = Ind_K^L θ_i` are pairwise orthogonal — the `horth` hypothesis of `chiRho_decomp_proof`.
 Direct from `inner_induce_eq_zero_of_not_conj`. -/
-theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card L :
+theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Finite ↥K] [Invertible (Nat.card L :
     ℂ)]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
@@ -489,22 +493,24 @@ theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Inv
       ∀ g : L, IrreducibleCharacter.conjBy g (θ a) ≠ θ b) :
     ∀ a b : Fin (n + 1), a ≠ b →
       ClassFunction.inner (ClassFunction.induce K (θ a : ClassFunction ↥K ℂ))
-        (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
-  fun a b hab => inner_induce_eq_zero_of_not_conj (θ a) (θ b) (hnc a b hab)
+        (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  exact fun a b hab => inner_induce_eq_zero_of_not_conj (θ a) (θ b) (hnc a b hab)
 
 /-- **An injective induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a)).  When the
 map `i ↦ Ind_K^L θ_i` is injective, the `θ_i` are pairwise non-conjugate (a conjugacy would force
 equal inductions, `induce_eq_induce_iff_conj`), so `induce_family_orthogonal` applies.  This is the
 form of `horth` actually supplied by the enumeration of the *distinct* induced characters. -/
-theorem induce_family_orthogonal_of_injective (K : Subgroup L) [K.Normal] [Fintype ↥K]
+theorem induce_family_orthogonal_of_injective (K : Subgroup L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
     (hinj : Function.Injective
       (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) :
     ∀ a b : Fin (n + 1), a ≠ b →
       ClassFunction.inner (ClassFunction.induce K (θ a : ClassFunction ↥K ℂ))
-        (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
-  induce_family_orthogonal K θ fun a b hab g hg =>
+        (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  exact induce_family_orthogonal K θ fun a b hab g hg =>
     hab (hinj ((induce_eq_induce_iff_conj (θ a) (θ b)).mpr ⟨g, hg⟩))
 
 /-- **The difference `ψ_i = ζ_i − d_i ζ_0` is supported on `K^#`** (Peterfalvi (7.6)/(7.7.a)
@@ -512,12 +518,13 @@ hypothesis).  With `ζ = Ind_K^L θ` and the degree relation `ζ_i(1) = d_i ζ_0
 `Ind θ − d • Ind θ₀` vanishes off `K` (induction from the normal `K` is `K`-supported) and at `1`
 (degree relation), so its support lies in `K^# = K \ {1}` — the `psi_support` hypothesis of
 `chiRho_decomp_proof`. -/
-theorem induce_diff_support {K : Subgroup L} [hK : K.Normal] [Fintype ↥K]
+theorem induce_diff_support {K : Subgroup L} [hK : K.Normal] [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] (θ θ₀ : IrreducibleCharacter ↥K) (d : ℂ)
     (hd : ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L)
         = d * ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) (1 : L)) :
     (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
         - d • ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ)).support ⊆ (K : Set L) \ {1} := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   have hvanish : ∀ φ : ClassFunction ↥K ℂ, ∀ x : L, x ∉ K → ClassFunction.induce K φ x = 0 := by
     intro φ x hxK
     have hconj : x ∉ ClassFunction.conjugatesInto K := by
@@ -590,7 +597,7 @@ vectors `{ψ_i = ζ_i − d_i ζ_0 : i ≠ 0}`.
 This is the `hspan` hypothesis of `chiRho_decomp_proof`: `supported_mem_span_induce_irr` places `ψ`
 in the span of the induced irreducibles, `hcover` + `Submodule.span_mono` transports this to the
 span of `{ζ_i}`, and `mem_span_psi_of_apply_one_zero` performs the degree-`0` reduction. -/
-theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Fintype ↥K]
+theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
     (hcover : ∀ θ : IrreducibleCharacter ↥K,
@@ -598,6 +605,7 @@ theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Fintype ↥K]
     (hdeg : ∀ i : Fin (n + 1), ζ i (1 : L) = d i * ζ 0 (1 : L)) (hz0 : ζ 0 (1 : L) ≠ 0)
     {ψ : ClassFunction L ℂ} (hsupp : ∀ y : L, y ∉ K → ψ y = 0) (hψ1 : ψ (1 : L) = 0) :
     ψ ∈ Submodule.span ℂ ((fun i => ζ i - d i • ζ 0) '' {i : Fin (n + 1) | i ≠ 0}) := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   refine mem_span_psi_of_apply_one_zero ζ d hdeg hz0 ?_ hψ1
   refine Submodule.span_mono ?_ (supported_mem_span_induce_irr K ψ hsupp)
   rintro v ⟨θ, rfl⟩
@@ -660,21 +668,23 @@ noncomputable def distinctInducedFamily (K : Subgroup L) [K.Normal] [Fintype ↥
         exact congrArg Subtype.val (Equiv.symm_apply_apply e ⟨_, hmem⟩) }
 
 /-- **Existence form** of `distinctInducedFamily`, for `Prop`-level consumers. -/
-theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
+theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] :
     ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥K),
       Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) ∧
       ∀ φ : IrreducibleCharacter ↥K,
         ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
-          Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) :=
-  let F := distinctInducedFamily K
-  ⟨F.n, F.θ, F.inj, F.cover⟩
+          Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  exact
+    let F := distinctInducedFamily K
+    ⟨F.n, F.θ, F.inj, F.cover⟩
 
 /-- **Reindexing the induced family preserves injectivity.**  For any permutation `σ`, the family
 `i ↦ Ind_K^L θ_{σ i}` is injective when `i ↦ Ind_K^L θ_i` is.  Used to move the distinguished member
 to index `0` (`σ = Equiv.swap 0 j`) before applying `chiRho_eq_inner_beta_induced` (which expects
 the distinguished `ζ` at index `0`). -/
-theorem induce_family_comp_perm_injective {K : Subgroup L} [Fintype ↥K]
+theorem induce_family_comp_perm_injective {K : Subgroup L} [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ} {θ : Fin (n + 1) → IrreducibleCharacter ↥K}
     (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
     (σ : Equiv.Perm (Fin (n + 1))) :
@@ -682,7 +692,7 @@ theorem induce_family_comp_perm_injective {K : Subgroup L} [Fintype ↥K]
   hinj.comp σ.injective
 
 /-- **Reindexing the induced family preserves covering.** -/
-theorem induce_family_comp_perm_covering {K : Subgroup L} [Fintype ↥K]
+theorem induce_family_comp_perm_covering {K : Subgroup L} [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ} {θ : Fin (n + 1) → IrreducibleCharacter ↥K}
     (hcover : ∀ φ : IrreducibleCharacter ↥K,
       ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
@@ -691,6 +701,7 @@ theorem induce_family_comp_perm_covering {K : Subgroup L} [Fintype ↥K]
     ∀ φ : IrreducibleCharacter ↥K,
       ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
         Set.range (fun i => ClassFunction.induce K (θ (σ i) : ClassFunction ↥K ℂ)) := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   intro φ
   obtain ⟨i, hi⟩ := hcover φ
   exact ⟨σ.symm i, by simpa using hi⟩
@@ -704,7 +715,7 @@ The trivial character is its own induced fibre — `Ind φ = Ind 1_K ⟹ φ = 1_
 `induce_injective_of_inertia_stable` (the trivial char is conjugation-stable), so its
 `distinctInducedFamily` representative *is* `1_K`.  The swap `0 ↔ j_dist` moves the distinguished
 representative to index `0`; `j_dist ≠ j_triv` because `χ_dist ≠ Ind 1_K`. -/
-theorem exists_placed_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
+theorem exists_placed_induced_family (K : Subgroup L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
     (χdist : ClassFunction L ℂ)
     (hχ_range : χdist ∈ Set.range (fun φ : IrreducibleCharacter ↥K =>
@@ -719,6 +730,7 @@ theorem exists_placed_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
       ∀ φ : IrreducibleCharacter ↥K, ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
         Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
   classical
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   obtain ⟨φ0, hφ0⟩ := hχ_range
   obtain ⟨jd, hjd⟩ := (distinctInducedFamily K).cover φ0
   obtain ⟨jt, hjt⟩ := (distinctInducedFamily K).cover (trivialIrreducibleCharacter ↥K)
@@ -761,7 +773,7 @@ from `induce_apply_one_ne_zero`/`induce_diff_support`, and `hAK_off`/`hA_one`/`h
 is constructible from `(7.1)` data alone, with no certificate assumed. -/
 theorem chiRho_decomp_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
+    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (d : Fin (n + 1) → ℂ)
     (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
@@ -785,6 +797,7 @@ theorem chiRho_decomp_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L :
           ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
             (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) *
         ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) x := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   refine chiRho_decomp_proof H71 (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d
     psi_support (induce_family_orthogonal_of_injective K θ hinj)
     (fun i => induce_norm_ne_zero K (θ i)) hAconj ?_ χ hx
@@ -807,7 +820,7 @@ uniform coefficient identification `⟨ψ_i^τ, χ⟩ = −d_i` (available for `
 discharged by `supported_mem_span_psi` exactly as in `chiRho_decomp_induced`. -/
 theorem chiRho_apply_eq_zeta0_induced {G : Type*} [Group G] [Fintype G] {A : Set G}
     {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
+    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (d : Fin (n + 1) → ℂ)
     (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
@@ -832,6 +845,7 @@ theorem chiRho_apply_eq_zeta0_induced {G : Type*} [Group G] [Fintype G] {A : Set
         = -(d i))
     {x : ↥L} (hx : (x : G) ∈ A) :
     H71.chiRho χ x = ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) x := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   refine chiRho_apply_eq_zeta0_of_inner_tau_uniform H71
     (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d psi_support
     (induce_family_orthogonal_of_injective K θ hinj)
