@@ -9,6 +9,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.FittingHeredity
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.SylowTransport
@@ -2518,6 +2519,24 @@ set_option linter.style.longLine false in
 --   is a `p`-group with `p ∉ π(H)` — which is the sentence BG states one line earlier.  A slip of
 --   `L` for `N`; the conclusion is sound.
 -- Both sorry-free + axiom-clean.
+-- **Fitting-quotient nilpotency heredity** (issue 9157, shared infra for BG Thm 6.4): "`X/F(X)`
+-- nilpotent" — equivalently, nilpotent length ≤ 2 — is inherited along injective and surjective
+-- homomorphisms, hence by subgroups and by quotients.  The key step is that `F(X) ⊓ Y ≤ F(Y)`
+-- **always** holds (`F(X) ⊴ X` makes it normal in `Y`, and it is nilpotent as a subgroup of
+-- `F(X)`, so Fitting maximality applies); the reverse inclusion `F(Y) ≤ F(X)` is what fails in
+-- general, and is not needed.  So no extra hypothesis (subnormality etc.) is required.  Stated
+-- along homomorphisms rather than as `Y ≤ X`, because BG Thm 6.4's four transports are all
+-- "isomorphism composed with inclusion/projection" rather than literal subgroups/quotients.
+-- All axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_surjective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_le
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isNilpotent_quotient_fitting_quotient
+
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup
 #assert_only_allowed_axioms

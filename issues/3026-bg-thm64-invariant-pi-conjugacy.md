@@ -104,22 +104,29 @@ Thm 6.4 本体は**未完**。ただし Case 1 の hard step 2 件を standalone
 - 付随の transport 補題 4 件 (`conj_smul_eq_map` / `isPiSubgroup_of_le` /
   `isPiGroup_subgroupOf` / `isPiSubgroup_map_subtype`)。
 
-### 残り見積 — 約 2,100-3,100 行 / 2-3 leaf / 4-8 session
+### 残り見積 — 約 1,350-2,150 行 / 2 leaf (2026-07-19 **下方修正**)
 
 | 残作業 | 行 |
 |---|---|
 | `\|G\| + \|H\|` の帰納骨格 (ℕ 上の強帰納; 商・部分群は同 universe に留まる) | 150-250 |
-| 部分群 `L ⊔ H` への仮説 transport (normal-Hall ∩ 部分群、**`X/F(X)` 冪零の部分群遺伝**、商側) | 500-700 |
-| `G ⧸ N` への仮説 transport (normal-Hall 像、**`X/F(X)` 冪零の商遺伝**、第三同型) | 500-700 |
-| Case 1 assembly (極小正規 `N ≤ O_p(F(G))`、`N ≤ L`、SZ 共役、上記 2 定理) | 300-450 |
+| 部分群 `L ⊔ H` への仮説 transport (normal-Hall ∩ 部分群、商側) | 150-250 |
+| `G ⧸ N` への仮説 transport (normal-Hall 像、第三同型) | 150-250 |
+| Case 1 assembly (極小正規 `N ≤ O_p(F(G))`、`N ≤ L`、SZ 共役、landed 済 2 定理) | 300-450 |
 | Case 2 (`B = H ⊓ M`、補群 `H*`、`[J₁,B] ≤ F(M)`、`O_π(F) ≤ O_π(G) = 1`、`B` が `L` を中心化) | 500-800 |
 | 2 つの Fitting 商仮説から `IsSolvable G` を導く (Prop 1.5 に要る) | 100-150 |
 
 **新しい数学は不要** — 入力はすべて repo に在る。
 
-⚠ **着手時の設計判断**: 上表の太字 2 行 (**「`X/F(X)` 冪零」が部分群・商で遺伝する**) は
-§6 に閉じない汎用 Fitting 補題で、repo に現状 home が無い。CLAUDE.md の claim-before-build に
-従い **9000 番台の shared-infra claim** を立ててから作るのが筋。
+✅ **transport の Fitting 部分は完了 (issue 9157、2026-07-19)**。当初この 2 行を 500-700 行ずつと
+見積もっていたが、実際は汎用補題 `OddOrder/GroupTheory/FittingHeredity.lean` (155 行、6 定理、
+axiom-clean) で片付き、消費側は cite するだけになった。⟹ 上表を下方修正。
+使う形は **`isNilpotent_quotient_fitting_of_le`** (`H ≤ K` 共通 ambient) と
+**`isNilpotent_quotient_fitting_quotient`** (`N ⊴ X`)、および同型を挟む場合は
+`isNilpotent_quotient_fitting_of_injective/of_surjective` に `e.toMonoidHom` を渡す。
+
+⚠ 起票時に「部分群遺伝は一般には自明でなく追加仮説が要るかも」と書いたが**それは誤り**だった。
+`F(X) ⊓ Y ≤ F(Y)` は常に成立する (`F(X) ⊴ X` ゆえ `Y` で normal、`F(X)` の部分群ゆえ冪零、
+あとは Fitting 極大性)。一般に成り立たないのは逆包含 `F(Y) ≤ F(X)` だが、そちらは不要。
 
 ### 付随して見つかった stale / 重複 (本 lane では直さない)
 
