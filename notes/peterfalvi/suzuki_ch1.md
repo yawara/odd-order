@@ -274,12 +274,14 @@
      `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)`. The reverse inclusion uses
      the opposite root group `C_{Q^t}(X)` (the source OCR prints `Q′`),
      exactly as in SS1 Proposition 1(b).
-   - ✅ `centralizerResidualQuotientEquiv_of_sylow` combines that equality
-     with the shared surjective-map API to construct
-     `O^{2′}(L) / Z(O^{2′}(L)) ≃* O^{2′}(L / 𝒩(L))` once an honest
-     Sylow witness identifies `C_Q(X)` as a Sylow `2`-subgroup of `L`.
+   - ✅ `card_centralizer_eq` and `exists_sylow_two_eq_cQ_of_isPGroup`
+     formalize the source's A1 step: the structure equation makes `C_Q(X)`
+     a Sylow `2`-subgroup as soon as Lemma 1 supplies its `IsPGroup` proof.
+   - ✅ `centralizerResidualQuotientEquiv` then combines that constructed
+     witness, the center equality, and the shared surjective-map API to give
+     `O^{2′}(L) / Z(O^{2′}(L)) ≃* O^{2′}(L / 𝒩(L))`.
    - **Next frontier:** construct the quotient Hypothesis/induction carrier
-     and discharge that Sylow witness; it is deliberately not an opaque
-     field of the consumer.
+     and derive the remaining `IsPGroup 2 C_Q(X)` input; it is deliberately
+     not an opaque field of the consumer.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

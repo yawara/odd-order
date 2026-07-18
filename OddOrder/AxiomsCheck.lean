@@ -7698,7 +7698,19 @@ for `L = C_G(X)` and `F₀ = ⟨C_Q(X)^L⟩`, the action kernel intersects
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_subgroupOf_normalClosure_cQ_eq_center
 
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_centralizer_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sylow_two_le_cQ
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sylow_two_eq_cQ_of_isPGroup
+
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerResidualQuotientEquiv_of_sylow
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerResidualQuotientEquiv
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field

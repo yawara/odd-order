@@ -30,6 +30,11 @@ Peterfalvi Part II, Ch. I §3 Proposition 1(c) (pp. 105–106) を原文強度�
       `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)` を原文どおり証明する。
 - [ ] quotient action `L/𝒩(L)` の honest な Hypothesis/induction carrier と
       `F=O^{2′}(L)=⟨C_Q(X)^L⟩`、residual の quotient transport を構成する。
+  - [x] A1 構造式から `C_Q(X)` 内の Sylow `2`-subgroupを構成し、
+        `C_Q(X)` が `2`-group ならそれ自身が Sylow と証明。
+  - [x] その `IsPGroup` 入力から residual = normal closure と
+        `O^{2′}(L)/Z ≃* O^{2′}(L/𝒩(L))` を実構成。
+  - [ ] quotient Hypothesis/induction carrier を構成し `IsPGroup` 入力を導く。
 - [ ] PSL(2,ℓ), Sz(ℓ), PSU(3,ℓ) 各標準モデルについて Sylow `2` 構造、
       `|C_Q(X)|`、distinguished involution と `orderOf(st)=3/5/3` を実証明し、
       三分岐を輸送する。opaque `Prop` scaffold や free target field は使わない。
