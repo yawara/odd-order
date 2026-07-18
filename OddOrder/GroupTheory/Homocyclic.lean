@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.FiniteAbelian.Basic
+import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.OmegaSubgroup
 
 /-!
@@ -21,6 +22,45 @@ explicit using the `Agemo` filtration.
 set_option autoImplicit false
 
 namespace OddOrder.GroupTheory
+
+/-- Agemo–Nakayama lifting for a finite commutative `p`-group: if a subgroup
+together with the first Agemo layer generates the group, it is already the
+whole group. The point is that all `p`-th powers lie in the Frattini subgroup. -/
+theorem eq_top_of_sup_agemo_one_eq_top
+    {P : Type*} [CommGroup P] [Finite P] {p : ℕ} [Fact p.Prime]
+    (hP : IsPGroup p P) {U : Subgroup P}
+    (hU : U ⊔ Agemo P p 1 = ⊤) : U = ⊤ := by
+  apply frattini_nongenerating
+  have hagemo : Agemo P p 1 ≤ frattini P := by
+    rw [Agemo, Subgroup.closure_le]
+    rintro _ ⟨x, rfl⟩
+    simpa using IsPGroup.pow_mem_frattini hP x
+  apply top_unique
+  rw [← hU]
+  exact sup_le_sup le_rfl hagemo
+
+/-- A product of cyclic groups of order `2 ^ e` has exponent dividing
+`2 ^ e`. -/
+theorem pow_two_pow_eq_one_of_equiv_pi_zmod
+    {A ι : Type*} [CommGroup A] {e : ℕ}
+    (ε : A ≃* ((i : ι) → Multiplicative (ZMod (2 ^ e)))) (x : A) :
+    x ^ (2 ^ e) = 1 := by
+  apply ε.injective
+  rw [map_pow, map_one]
+  funext i
+  rw [Pi.pow_apply, Pi.one_apply, ← ofAdd_toAdd (ε x i), ← ofAdd_nsmul]
+  simp
+
+/-- The `e`-th Agemo layer of a product of cyclic groups of order `2 ^ e`
+is trivial. -/
+theorem agemo_two_eq_bot_of_equiv_pi_zmod
+    {A ι : Type*} [CommGroup A] {e : ℕ}
+    (ε : A ≃* ((i : ι) → Multiplicative (ZMod (2 ^ e)))) :
+    Agemo A 2 e = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨y, rfl⟩ := mem_agemo_iff_of_comm.mp hx
+  exact pow_two_pow_eq_one_of_equiv_pi_zmod ε y
 
 /-- **Higman, Suzuki 2-groups, Lemma 1 — homogeneous-factor part**: a finite
 abelian `2`-group whose involutions all have the same Agemo height is a direct
