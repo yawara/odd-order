@@ -16,7 +16,9 @@ Hermitian affine coordinates
 
 Its multiplication is
 
-`(a, b) * (c, d) = (a + c, b + d + star a * c)`.
+`(a, b) * (c, d) = (a + c, b + d + a * star c)`.
+
+This is Peterfalvi Part II, Chapter III §3, where `phi(x,y) = x * y^q`.
 
 The group laws are proved directly from these coordinates.  Every fiber over
 the first coordinate has exactly `q` elements, so the root group has order
@@ -56,7 +58,7 @@ variable {n : ℕ}
 instance (n : ℕ) : Mul (RootGroup n) where
   mul x y :=
     { fst := x.fst + y.fst
-      snd := x.snd + y.snd + star x.fst * y.fst
+      snd := x.snd + y.snd + x.fst * star y.fst
       condition := by
         simp only [star_add, star_mul, star_star]
         have hx := x.condition
@@ -89,7 +91,7 @@ theorem fst_mul (x y : RootGroup n) : (x * y).fst = x.fst + y.fst := rfl
 
 @[simp]
 theorem snd_mul (x y : RootGroup n) :
-    (x * y).snd = x.snd + y.snd + star x.fst * y.fst := rfl
+    (x * y).snd = x.snd + y.snd + x.fst * star y.fst := rfl
 
 @[simp]
 theorem fst_one : (1 : RootGroup n).fst = 0 := rfl
@@ -120,9 +122,9 @@ instance (n : ℕ) : Group (RootGroup n) where
     · exact CharTwo.add_self_eq_zero _
     · simp only [snd_mul, snd_inv, fst_inv]
       change (x.snd + x.fst * star x.fst) + x.snd +
-          star x.fst * x.fst = 0
+          x.fst * star x.fst = 0
       calc
-        (x.snd + x.fst * star x.fst) + x.snd + star x.fst * x.fst =
+        (x.snd + x.fst * star x.fst) + x.snd + x.fst * star x.fst =
             (x.snd + x.snd) +
               (x.fst * star x.fst + x.fst * star x.fst) := by ring
         _ = 0 := by
