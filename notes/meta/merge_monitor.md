@@ -11,11 +11,19 @@
 > **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
-> a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S'   # 2026-07-19: Isaacs 全域 + Pf 本文 (issue 9154 裁定)
+> # ⚠ 暫定 (issue 9158、a 停止中。a 復帰で下段の 9154 配分へ戻す)
+> a_re='^OddOrder/Isaacs/'
 > b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
-> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
+> # 恒久 (issue 9154、a 復帰時): a='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S' / c は Pf S* を持たない
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
+> **⏸ 2026-07-19 暫定裁定 (issue 9158): lane a が停止 → Pf 本文を c へ暫定移管**。
+> a は 05:36 以降停止 (60 秒後の wakeup が発火せずセッション終了、`ahead 0/dirty 0` ゆえ成果損失ゼロ)。
+> 9154 で a に移した Pf 本文 (63-65 件、3 冊で最大) が無主状態になり凍結するため、**c へ暫定的に戻す**。
+> **a が復帰したら本暫定は自動失効**し 9154 の配分へ戻る (a の worktree/branch は保持)。
+> c にとっては着手権の付与であって義務ではない (frontier 判断は c の自律)。
+
 > **▶▶ 2026-07-19 hub 裁定 #2 (issue 9154): lane a の Isaacs 完了 → `OddOrder/Peterfalvi/S*` を a へ**。
 > Isaacs は実 sorry 0・全 349 結果が形式化済 (hub 再測で Ch08 = 14 leaf/5,707 行、Ch10 = 6 leaf/3,643 行を確認)。
 > 残量が最大の Pf 本文 (63〜65 件、L:10 XL:6) を c が BG 残 25 件と単独で抱えていた偏りを解消するため、
