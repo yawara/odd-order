@@ -183,67 +183,29 @@ private lemma _eq_of_mul_eq_sq_of_le {a b m : ℕ} (h_eq : a * b = m * m)
       omega
     · exact _eq_of_mul_eq_of_le h_eq ha hb hm hb_pos
 
-/-- **Isaacs Thm 1.44 (a)**: `L(G)` is closed under intersection. -/
-theorem chermakDelgadoLattice_inf_mem [Finite G] {H K : Subgroup G}
-    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
-    H ⊓ K ∈ chermakDelgadoLattice G := by
-  intro L
-  have hsame : H.chermakDelgadoMeasure = K.chermakDelgadoMeasure := le_antisymm (hK H) (hH K)
-  have h_le_HK : (H ⊓ K).chermakDelgadoMeasure ≤ H.chermakDelgadoMeasure := hH _
-  have h_le_J : (H ⊔ K).chermakDelgadoMeasure ≤ H.chermakDelgadoMeasure := hH _
-  have h_43 := chermakDelgadoMeasure_mul_le H K
-  rw [← hsame] at h_43
-  have h_prod_eq : (H ⊓ K).chermakDelgadoMeasure * (H ⊔ K).chermakDelgadoMeasure
-                 = H.chermakDelgadoMeasure * H.chermakDelgadoMeasure :=
-    le_antisymm (Nat.mul_le_mul h_le_HK h_le_J) h_43
-  have hHK_eq : (H ⊓ K).chermakDelgadoMeasure = H.chermakDelgadoMeasure :=
-    (_eq_of_mul_eq_sq_of_le h_prod_eq h_le_HK h_le_J).1
-  rw [hHK_eq]
-  exact hH L
+/-- **Isaacs Lemma 1.43 (等号条件)** (p. 41): `m_G(H)·m_G(K) = m_G(D)·m_G(J)`
+(`D = H ⊓ K`, `J = H ⊔ K`) が成り立つならば **`J = HK` かつ `C_G(D) = C_G(H)·C_G(K)`**
+(いずれも集合としての等式).
 
-/-- **Isaacs Thm 1.44 (a)**: `L(G)` is closed under join. -/
-theorem chermakDelgadoLattice_sup_mem [Finite G] {H K : Subgroup G}
-    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
-    H ⊔ K ∈ chermakDelgadoLattice G := by
-  intro L
-  have hsame : H.chermakDelgadoMeasure = K.chermakDelgadoMeasure := le_antisymm (hK H) (hH K)
-  have h_le_HK : (H ⊓ K).chermakDelgadoMeasure ≤ H.chermakDelgadoMeasure := hH _
-  have h_le_J : (H ⊔ K).chermakDelgadoMeasure ≤ H.chermakDelgadoMeasure := hH _
-  have h_43 := chermakDelgadoMeasure_mul_le H K
-  rw [← hsame] at h_43
-  have h_prod_eq : (H ⊓ K).chermakDelgadoMeasure * (H ⊔ K).chermakDelgadoMeasure
-                 = H.chermakDelgadoMeasure * H.chermakDelgadoMeasure :=
-    le_antisymm (Nat.mul_le_mul h_le_HK h_le_J) h_43
-  have hJ_eq : (H ⊔ K).chermakDelgadoMeasure = H.chermakDelgadoMeasure :=
-    (_eq_of_mul_eq_sq_of_le h_prod_eq h_le_HK h_le_J).2
-  rw [hJ_eq]
-  exact hH L
+書籍の証明そのまま. 不等式 `chermakDelgadoMeasure_mul_le` の導出では
+`|HK| ≤ |J|` と `|C_H·C_K| ≤ |C_D|` の 2 箇所でしか緩みが生じないので, 等号成立時は
+両方が等号になる. あとは有限集合の包含 + 濃度一致から集合等式が出る.
 
-/-- **Isaacs Thm 1.44 (b)**: For `H, K ∈ L`: `⟨H, K⟩ = HK` (as sets). -/
-theorem chermakDelgadoLattice_sup_eq_mul [Finite G] {H K : Subgroup G}
-    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
-    ((H ⊔ K : Subgroup G) : Set G) = ↑H * ↑K := by
+(配置: 書籍では主不等式 `chermakDelgadoMeasure_mul_le` の直後だが, 証明が下の私的補助
+`_eq_of_mul_eq_of_le` を使うのでここに置く.) -/
+theorem chermakDelgadoMeasure_mul_eq_conditions [Finite G] (H K : Subgroup G)
+    (heq : H.chermakDelgadoMeasure * K.chermakDelgadoMeasure
+      = (H ⊓ K).chermakDelgadoMeasure * (H ⊔ K).chermakDelgadoMeasure) :
+    ((H ⊔ K : Subgroup G) : Set G) = (H : Set G) * (K : Set G) ∧
+      ((centralizer ((H ⊓ K : Subgroup G) : Set G) : Subgroup G) : Set G)
+        = (centralizer (H : Set G) : Set G) * (centralizer (K : Set G) : Set G) := by
   set D := H ⊓ K with hD_def
   set J := H ⊔ K with hJ_def
   set C_H : Subgroup G := centralizer (H : Set G) with hCH_def
   set C_K : Subgroup G := centralizer (K : Set G) with hCK_def
   set C_D : Subgroup G := centralizer (D : Set G) with hCD_def
   set C_J : Subgroup G := centralizer (J : Set G) with hCJ_def
-  -- Step 1: m_G(H) * m_G(K) = m_G(D) * m_G(J) (from H, K ∈ L)
-  have hsame : H.chermakDelgadoMeasure = K.chermakDelgadoMeasure := le_antisymm (hK H) (hH K)
-  have h_le_HK : D.chermakDelgadoMeasure ≤ H.chermakDelgadoMeasure := hH _
-  have h_le_J : J.chermakDelgadoMeasure ≤ H.chermakDelgadoMeasure := hH _
-  have h_43 := chermakDelgadoMeasure_mul_le H K
-  have h_prod_le : D.chermakDelgadoMeasure * J.chermakDelgadoMeasure
-                ≤ H.chermakDelgadoMeasure * K.chermakDelgadoMeasure := by
-    calc D.chermakDelgadoMeasure * J.chermakDelgadoMeasure
-        ≤ H.chermakDelgadoMeasure * H.chermakDelgadoMeasure :=
-          Nat.mul_le_mul h_le_HK h_le_J
-      _ = H.chermakDelgadoMeasure * K.chermakDelgadoMeasure := by rw [hsame]
-  have h_measure_eq : H.chermakDelgadoMeasure * K.chermakDelgadoMeasure
-                    = D.chermakDelgadoMeasure * J.chermakDelgadoMeasure :=
-    le_antisymm h_43 h_prod_le
-  -- Step 2: 両辺を H1 で分解 (Lemma 1.43 proof と同じ計算)
+  -- 主不等式の証明と同じ H1 分解.
   have hCJ_inf : C_J = C_H ⊓ C_K := centralizer_sup H K
   have h1_HK : Nat.card (↑H * ↑K : Set G) * Nat.card ↥D = Nat.card H * Nat.card K :=
     card_HK_mul_card_inf_eq_card_mul_card H K
@@ -252,7 +214,6 @@ theorem chermakDelgadoLattice_sup_eq_mul [Finite G] {H K : Subgroup G}
         = Nat.card C_H * Nat.card C_K :=
     card_HK_mul_card_inf_eq_card_mul_card C_H C_K
   rw [← hCJ_inf] at h1_CHCK
-  -- LHS の分解
   have h_LHS_decomp : H.chermakDelgadoMeasure * K.chermakDelgadoMeasure
       = (Nat.card (↑H * ↑K : Set G) * Nat.card ((C_H : Set G) * (C_K : Set G) : Set G))
         * (Nat.card ↥D * Nat.card C_J) := by
@@ -263,22 +224,18 @@ theorem chermakDelgadoLattice_sup_eq_mul [Finite G] {H K : Subgroup G}
             * (Nat.card ((C_H : Set G) * (C_K : Set G) : Set G) * Nat.card C_J) := by
             rw [h1_HK, h1_CHCK]
       _ = _ := by ring
-  -- RHS の分解
   have h_RHS_decomp : D.chermakDelgadoMeasure * J.chermakDelgadoMeasure
       = (Nat.card J * Nat.card C_D) * (Nat.card ↥D * Nat.card C_J) := by
     rw [chermakDelgadoMeasure_def, chermakDelgadoMeasure_def]
     ring
-  -- 等式を等式に: `(|HK| * |C_H * C_K|) * (|D| * |C_J|) = (|J| * |C_D|) * (|D| * |C_J|)`
-  rw [h_LHS_decomp, h_RHS_decomp] at h_measure_eq
-  -- |D| * |C_J| > 0 でキャンセル
-  have hD_pos : 0 < Nat.card ↥D := Nat.card_pos
-  have hCJ_pos : 0 < Nat.card C_J := Nat.card_pos
-  have hDCJ_pos : 0 < Nat.card ↥D * Nat.card C_J := Nat.mul_pos hD_pos hCJ_pos
+  rw [h_LHS_decomp, h_RHS_decomp] at heq
+  -- `|D|·|C_J| > 0` で両辺からキャンセル.
+  have hDCJ_pos : 0 < Nat.card ↥D * Nat.card C_J := Nat.mul_pos Nat.card_pos Nat.card_pos
   have h_cancelled :
       Nat.card (↑H * ↑K : Set G) * Nat.card ((C_H : Set G) * (C_K : Set G) : Set G)
         = Nat.card J * Nat.card C_D :=
-    Nat.eq_of_mul_eq_mul_right hDCJ_pos h_measure_eq
-  -- |HK| ≤ |J|, |C_H * C_K| ≤ |C_D|, 全て正
+    Nat.eq_of_mul_eq_mul_right hDCJ_pos heq
+  -- 2 本の包含と, それぞれの濃度不等式.
   have hHK_sub_J : (↑H * ↑K : Set G) ⊆ (J : Set G) := by
     rintro _ ⟨h, hh, k, hk, rfl⟩
     exact mul_mem (Subgroup.mem_sup_left hh) (Subgroup.mem_sup_right hk)
@@ -293,17 +250,77 @@ theorem chermakDelgadoLattice_sup_eq_mul [Finite G] {H K : Subgroup G}
     Nat.card_mono (Set.toFinite _) hHK_sub_J
   have hCHCK_le_CD : Nat.card ((C_H : Set G) * (C_K : Set G) : Set G) ≤ Nat.card C_D :=
     Nat.card_mono (Set.toFinite _) hCHCK_sub_CD
-  -- positivity: |J|, |C_H * C_K|, both > 0
-  have hJ_pos : 0 < Nat.card J := Nat.card_pos
   have hCHCK_pos : 0 < Nat.card ((C_H : Set G) * (C_K : Set G) : Set G) := by
     rw [Nat.card_pos_iff]
     refine ⟨⟨1, ?_⟩, Set.toFinite _⟩
     exact ⟨1, one_mem _, 1, one_mem _, mul_one 1⟩
-  -- |HK| * |C_H * C_K| = |J| * |C_D|, both inequalities and positivity ⟹ |HK| = |J|
-  have hHK_eq : Nat.card (↑H * ↑K : Set G) = Nat.card J :=
-    (_eq_of_mul_eq_of_le h_cancelled hHK_le_J hCHCK_le_CD hJ_pos hCHCK_pos).1
-  -- Step 3: HK ⊆ J + |HK| = |J| (finite) ⟹ HK = J
-  exact (Set.Finite.eq_of_subset_of_card_le (Set.toFinite _) hHK_sub_J hHK_eq.symm.le).symm
+  -- 積が等しく各因子が `≤` なら各因子が等しい — ここで両方の等号を取る.
+  obtain ⟨hHK_eq, hC_eq⟩ :=
+    _eq_of_mul_eq_of_le h_cancelled hHK_le_J hCHCK_le_CD Nat.card_pos hCHCK_pos
+  exact ⟨(Set.Finite.eq_of_subset_of_card_le (Set.toFinite _) hHK_sub_J hHK_eq.symm.le).symm,
+    (Set.Finite.eq_of_subset_of_card_le (Set.toFinite _) hCHCK_sub_CD hC_eq.symm.le).symm⟩
+
+/-- `H, K ∈ L(G)` ならば Lemma 1.43 の不等式は**等号**になる: measure の最大性から
+`m_G(D)·m_G(J) ≤ m_G(H)²= m_G(H)·m_G(K)` で、逆向きが 1.43。
+
+Thm 1.44 (a)(b) が共通して使う入口。 -/
+theorem chermakDelgadoLattice_measure_mul_eq [Finite G] {H K : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
+    H.chermakDelgadoMeasure * K.chermakDelgadoMeasure
+      = (H ⊓ K).chermakDelgadoMeasure * (H ⊔ K).chermakDelgadoMeasure := by
+  have hsame : H.chermakDelgadoMeasure = K.chermakDelgadoMeasure := le_antisymm (hK H) (hH K)
+  refine le_antisymm (chermakDelgadoMeasure_mul_le H K) ?_
+  calc (H ⊓ K).chermakDelgadoMeasure * (H ⊔ K).chermakDelgadoMeasure
+      ≤ H.chermakDelgadoMeasure * H.chermakDelgadoMeasure := Nat.mul_le_mul (hH _) (hH _)
+    _ = H.chermakDelgadoMeasure * K.chermakDelgadoMeasure := by rw [hsame]
+
+/-- `H, K ∈ L(G)` のとき `m_G(H⊓K) = m_G(H) = m_G(H⊔K)` (Thm 1.44 (a) の中身)。 -/
+private theorem _lattice_measure_inf_and_sup_eq [Finite G] {H K : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
+    (H ⊓ K).chermakDelgadoMeasure = H.chermakDelgadoMeasure ∧
+      (H ⊔ K).chermakDelgadoMeasure = H.chermakDelgadoMeasure := by
+  have hsame : H.chermakDelgadoMeasure = K.chermakDelgadoMeasure := le_antisymm (hK H) (hH K)
+  have h_prod_eq : (H ⊓ K).chermakDelgadoMeasure * (H ⊔ K).chermakDelgadoMeasure
+                 = H.chermakDelgadoMeasure * H.chermakDelgadoMeasure := by
+    rw [← chermakDelgadoLattice_measure_mul_eq hH hK, hsame]
+  exact _eq_of_mul_eq_sq_of_le h_prod_eq (hH _) (hH _)
+
+/-- **Isaacs Thm 1.44 (a)**: `L(G)` is closed under intersection. -/
+theorem chermakDelgadoLattice_inf_mem [Finite G] {H K : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
+    H ⊓ K ∈ chermakDelgadoLattice G := by
+  intro L
+  rw [(_lattice_measure_inf_and_sup_eq hH hK).1]
+  exact hH L
+
+/-- **Isaacs Thm 1.44 (a)**: `L(G)` is closed under join. -/
+theorem chermakDelgadoLattice_sup_mem [Finite G] {H K : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
+    H ⊔ K ∈ chermakDelgadoLattice G := by
+  intro L
+  rw [(_lattice_measure_inf_and_sup_eq hH hK).2]
+  exact hH L
+
+/-- **Isaacs Thm 1.44 (b)**: For `H, K ∈ L`: `⟨H, K⟩ = HK` (as sets).
+
+Lemma 1.43 の等号条件 (`chermakDelgadoMeasure_mul_eq_conditions`) の `J = HK` 節そのもの。
+`H, K ∈ L` は等号成立 (`chermakDelgadoLattice_measure_mul_eq`) を保証するためだけに使う。 -/
+theorem chermakDelgadoLattice_sup_eq_mul [Finite G] {H K : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
+    ((H ⊔ K : Subgroup G) : Set G) = ↑H * ↑K :=
+  (chermakDelgadoMeasure_mul_eq_conditions H K
+    (chermakDelgadoLattice_measure_mul_eq hH hK)).1
+
+/-- **Isaacs Thm 1.44 (b) の対**: `H, K ∈ L` なら `C_G(H ⊓ K) = C_G(H)·C_G(K)`.
+
+書籍 Lem 1.43 の等号条件のもう一方の節。Thm 1.44 の本文では明示されないが、
+1.43 が保証する内容なので lattice でも成り立つ。 -/
+theorem chermakDelgadoLattice_centralizer_inf_eq_mul [Finite G] {H K : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (hK : K ∈ chermakDelgadoLattice G) :
+    ((centralizer ((H ⊓ K : Subgroup G) : Set G) : Subgroup G) : Set G)
+      = (centralizer (H : Set G) : Set G) * (centralizer (K : Set G) : Set G) :=
+  (chermakDelgadoMeasure_mul_eq_conditions H K
+    (chermakDelgadoLattice_measure_mul_eq hH hK)).2
 
 /-- **Isaacs Lemma 1.42 (equality condition)**: `m_G(H) = m_G(C_G(H))` iff
 `C_G(C_G(H)) = H`. Cor 1.45 + Thm 1.44(c) で使用. -/

@@ -904,6 +904,13 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms Subgroup.chermakDelgado
 #assert_only_allowed_axioms Subgroup.card_quotient_lt_of_ne_bot
 
+-- Ch.1 (Sylow Theory): Lem 1.43 の**等号条件節** — `m_G(H)·m_G(K) = m_G(D)·m_G(J)` なら
+-- `J = HK` かつ `C_G(D) = C_G(H)·C_G(K)` (issue 9153)。Thm 1.44(b) はこの `.1`。
+#assert_only_allowed_axioms Subgroup.chermakDelgadoMeasure_mul_eq_conditions
+#assert_only_allowed_axioms Subgroup.chermakDelgadoLattice_measure_mul_eq
+#assert_only_allowed_axioms Subgroup.chermakDelgadoLattice_sup_eq_mul
+#assert_only_allowed_axioms Subgroup.chermakDelgadoLattice_centralizer_inf_eq_mul
+
 -- Ch.2 (Subnormality): Thm 2.13 Matsuyama
 -- 奇素数位数 inversion `x^t = x⁻¹` の存在 (`t ∉ O_2(G)` 下)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch02.matsuyama
