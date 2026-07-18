@@ -62,6 +62,10 @@
        `exists_mem_center_of_normal_ne_bot_of_isNilpotent` + Cauchy) →
        `involutions_H_subset_centralizer_Q` (H∩I ⊆ Z(Q)) → **`Q0 : Subgroup G`**
        ({x∈H | x²=1}) + elementary abelian API (`commute_of_mem_Q0` 等)。
+   - ✅ **Prop 1 後の standing notation `Q=S×Q₁`** — 新 leaf
+     `SylowDecomposition.lean`。`Q₁` を free field にせず、`Q` の冪零性から一意な正規
+     `2`-補群として実構成。任意の `S : Sylow 2 Q` について complement、characteristic、
+     odd order、および multiplication による `S × Q₁ ≃* Q` を axiom-clean で証明。
 5. ✅ **§2 Prop 2 完了** — K は D の cyclic normal 部分群 (p.103)。leaf `KCyclic.lean`。
    - ✅ **基盤完了**: `conjQ0`/`ker_conjQ0` (核=W=C_D(H∩I))/`Dbar`=D/W/`conjQ0bar`
      faithful/`conjQ0bar_transitive` (Q₀^# 可移, §1 Prop 3)/`odd_card_Dbar`→
@@ -226,5 +230,56 @@
    - Together with the PSL and Suzuki target leaves, all three target cases in
      Peterfalvi Chapter I §3 Lemma 1 are now formalized without opaque target
      hypotheses. **→ §3 Lemma 1 complete.**
+10. ✅ **§3 Prop 1(a) complete** — new leaf `CentralizerInduction.lean`.
+   - For `X ≤ V`, it equips `L = C_G(X)` with the induced action on
+     `Ω_X = fixedPoints X Ω` and proves the three source points `H`, `H^t`,
+     and `H^{ts}` are distinct. Peterfalvi uses right actions; the Lean
+     left-action representative of `H^{ts}` is `s • (t • H)`.
+   - `HypothesisA1` contains exactly all fields of source hypothesis (A1),
+     including the stabilizer, `Q D = H`, parity, and the distinguished
+     involution data. It deliberately excludes faithfulness (A2) and the
+     2-rank condition (A3), because the restricted centralizer action need not
+     be faithful.
+   - `centralizerHypothesisA1` constructs this honest carrier from §1 Prop 6;
+     `normalCore_cH_eq_restrictedAction_ker` identifies the intrinsic core in
+     `L`, and `normalCore_cH_eq_centralizer_cQ` proves the exact source formula
+     `𝒩(L) = C_{L ∩ D}(L ∩ Q)`.
+   - `normalCore_cH_le_cV` proves `𝒩(L) ≤ L ∩ V` using §1 Prop 5
+     (`V = C_D(s)`) and `s ∈ L ∩ Q`. The source assumption `1 ≠ X` is not
+     needed for part (a); it remains available for the strict-order induction
+     in the later clauses.
+11. ✅ **§3 Prop 1(b) complete** — new leaf `CentralizerNormalizer.lean`.
+   - Double transitivity on `Ω_X` gives the source first factorization
+     `N_G(X) = C_G(X) N_D(X)`.  Peterfalvi writes right actions; with the
+     Lean left action the correcting centralizer element is multiplied on
+     the left.
+   - Applying §1 `invertedProdEquiv` to an inverse element of
+     `N_D(X)` preserves the source order and proves
+     `N_D(X) = N_K(X) N_V(X)`, where every normalizer is the ambient
+     intersection with `N_G(X)`.
+   - `V_inf_K_eq_bot` follows because `t` centralizes `V`, inverts
+     `K`, and `D` has odd order.  Since `K ◁ D`, the commutator of
+     `N_K(X)` with `X` lies in `X ∩ K ≤ V ∩ K = 1`; hence
+     `N_K(X) ≤ C_G(X)` and the final endpoint is
+     `N_G(X) = C_G(X) N_V(X)`.
+   - The source assumption `1 ≠ X` is not needed for part (b).
+12. 🔄 **§3 Prop 1(c) in progress** — new leaf `CentralizerResidual.lean`.
+   - ✅ The standing factor `Q₁` is the actual normal `2`-complement from
+     `SylowDecomposition.lean`, not an added hypothesis.
+   - ✅ `Q1_inf_centralizer_eq_bot_of_isPGroup`: if `C_Q(X)` is a
+     `2`-group, its intersection with the odd-order `Q₁` is trivial,
+     giving the source clause `C_{Q₁}(X)=1`.
+   - ✅ `normalCore_subgroupOf_normalClosure_cQ_eq_center` proves the
+     classification-independent source identity
+     `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)`. The reverse inclusion uses
+     the opposite root group `C_{Q^t}(X)` (the source OCR prints `Q′`),
+     exactly as in SS1 Proposition 1(b).
+   - ✅ `centralizerResidualQuotientEquiv_of_sylow` combines that equality
+     with the shared surjective-map API to construct
+     `O^{2′}(L) / Z(O^{2′}(L)) ≃* O^{2′}(L / 𝒩(L))` once an honest
+     Sylow witness identifies `C_Q(X)` as a Sylow `2`-subgroup of `L`.
+   - **Next frontier:** construct the quotient Hypothesis/induction carrier
+     and discharge that Sylow witness; it is deliberately not an opaque
+     field of the consumer.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

@@ -181,6 +181,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
@@ -189,6 +190,9 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -268,6 +272,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_eq_normalClosure
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_le_of_coprime_index
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_map_of_surjective
+#assert_only_allowed_axioms Subgroup.primeComplementResidualQuotientEquiv
 
 -- Quadratic finite-field and Hermitian trace infrastructure for the PSU(3,q) target.
 #assert_only_allowed_axioms
@@ -7485,6 +7491,23 @@ cyclic subgroup normal in `D` asserted by Proposition 2. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_isCyclic
 
+/-! **Peterfalvi Part II, Ch. I §2, standing notation after Proposition 1**:
+`Q₁` is constructed as the unique normal `2`-complement of the nilpotent group
+`Q`. For every Sylow `2`-subgroup `S`, multiplication realizes the exact
+internal direct product `S × Q₁ ≃* Q`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q1Subgroup_isComplement'_sylowTwo
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q1Subgroup_characteristic
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.two_not_dvd_card_Q1Subgroup
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sylowTwoProdQ1MulEquiv
+
 /-! **Peterfalvi Appendix III, Definition 1**: Suzuki `2`-groups are encoded
 honestly as nonabelian `2`-groups with at least two involutions and a cyclic
 subgroup of automorphisms acting regularly on the involutions.  Faithfulness is
@@ -7610,6 +7633,73 @@ and hence the exact residual and conjugate-join conclusions. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_and_residual_of_psu3_target
+
+/-! **Peterfalvi Part II, Ch. I section 3, Proposition 1(a)**: for nontrivial
+`X <= V`, the centralizer `L = C_G(X)` acts doubly transitively on its fixed-point
+set and satisfies the full source hypothesis (A1). Its generally nonfaithful
+restricted action has intrinsic core equal to the centralizer of `L cap Q` in
+`L cap D`, and this core is contained in `L cap V`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.normalCore_stabilizer_eq_ker_of_isPretransitive
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.three_le_ncard_fixedPoints_of_le_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_isMultiplyPretransitive_two
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerHypothesisA1
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_eq_restrictedAction_ker
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_eq_centralizer_cQ
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_le_cV
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
+the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
+retains the source order through `N_G(X) = C_G(X) N_D(X)`,
+`N_D(X) = N_K(X) N_V(X)`, and `N_K(X) <= C_G(X)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.smul_mem_fixedPoints_of_mem_normalizer
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.V_inf_K_eq_bot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_inf_D_eq_normalizer_inf_K_mul_normalizer_inf_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_inf_K_le_centralizer
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_eq_centralizer_mul_normalizer_inf_D
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalizer_eq_centralizer_mul_normalizer_inf_V
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, first inference:
+once induction and Lemma 1 make `C_Q(X)` a `2`-group, the actual odd-order
+factor `Q₁` has trivial centralizer of `X`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q1_inf_centralizer_eq_bot_of_isPGroup
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, structural core:
+for `L = C_G(X)` and `F₀ = ⟨C_Q(X)^L⟩`, the action kernel intersects
+`F₀` in exactly `Z(F₀)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_subgroupOf_normalClosure_cQ_eq_center
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerResidualQuotientEquiv_of_sylow
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field

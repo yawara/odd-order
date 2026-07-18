@@ -101,6 +101,50 @@ theorem primeComplementResidual_index_coprime [Finite G] (p : ℕ) [Fact p.Prime
   let P : Sylow p G := Classical.choice Sylow.nonempty
   exact P.not_dvd_index (hp.trans (Subgroup.index_dvd_of_le (le_primeComplementResidual P)))
 
+/-- A surjective homomorphism maps the prime-complement residual onto the
+prime-complement residual of the codomain. -/
+theorem primeComplementResidual_map_of_surjective
+    {H : Type*} [Group H] [Finite G] {p : ℕ} [Fact p.Prime]
+    (f : G →* H) (hf : Function.Surjective f) :
+    (primeComplementResidual p G).map f = primeComplementResidual p H := by
+  rw [primeComplementResidual, map_iSup]
+  exact (Sylow.mapSurjective_surjective (p := p) hf).iSup_comp
+    (fun P : Sylow p H => (P : Subgroup H))
+
+/-- If a normal subgroup meets the prime-complement residual in its center,
+then the central quotient of the residual is the residual of the ambient
+quotient. -/
+noncomputable def primeComplementResidualQuotientEquiv
+    [Finite G] {p : ℕ} [Fact p.Prime]
+    (N : Subgroup G) [N.Normal]
+    (hcenter : N.subgroupOf (primeComplementResidual p G) =
+      center (primeComplementResidual p G)) :
+    ((primeComplementResidual p G) ⧸
+        center (primeComplementResidual p G)) ≃*
+      primeComplementResidual p (G ⧸ N) := by
+  let F : Subgroup G := primeComplementResidual p G
+  let qF : F →* G ⧸ N := (QuotientGroup.mk' N).comp F.subtype
+  have hker : qF.ker = N.subgroupOf F := by
+    ext x
+    change QuotientGroup.mk' N (x : G) = 1 ↔ (x : G) ∈ N
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+  have hrange : qF.range = primeComplementResidual p (G ⧸ N) := by
+    calc
+      qF.range = F.map (QuotientGroup.mk' N) := by
+        ext y
+        constructor
+        · rintro ⟨x, rfl⟩
+          exact ⟨x, x.2, rfl⟩
+        · rintro ⟨x, hx, rfl⟩
+          exact ⟨⟨x, hx⟩, rfl⟩
+      _ = primeComplementResidual p (G ⧸ N) :=
+        primeComplementResidual_map_of_surjective
+          (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)
+  exact
+    (QuotientGroup.quotientMulEquivOfEq (hcenter.symm.trans hker.symm)).trans
+      ((QuotientGroup.quotientKerEquivRange qF).trans
+        (MulEquiv.subgroupCongr hrange))
+
 end
 
 end Subgroup
