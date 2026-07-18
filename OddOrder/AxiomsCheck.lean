@@ -196,6 +196,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
@@ -7919,6 +7920,29 @@ internal direct product `S × Q₁ ≃* Q`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sylowTwoProdQ1MulEquiv
+
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 1 and the standing
+`K`-action**: ambient conjugation gives a faithful fixed-point-free action on
+`Q`, preserves `Q₀`, and its concrete automorphism image acts regularly on the
+nonidentity involutions.  Moreover `|K| = |Q₀| - 1` and `|K|` is odd. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByK_injective
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByK_fixed_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q0_isInvariant
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.actualKActor_actsRegularlyOnInvolutions
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_eq_card_Q0_sub_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_odd
 
 /-! **Peterfalvi Appendix III, Definition 1**: Suzuki `2`-groups are encoded
 honestly as nonabelian `2`-groups with at least two involutions and a cyclic
