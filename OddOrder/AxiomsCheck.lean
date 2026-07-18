@@ -207,6 +207,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -247,7 +248,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 9700
+set_option linter.style.longFile 9800
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -7925,6 +7926,41 @@ order `ell = |F|`, and `ell = |C_Q0(X)|`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_field_of_psl2Target
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, Suzuki branch:
+the actual centralizer root is an honest type-A Suzuki 2-group and has order
+the square of ell = |C_Q0(X)|. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qMulEquivSuzukiRoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qStandardTypeAData_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.q_isSuzuki2Group_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_field_sq_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQMulEquivSuzukiRoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQStandardTypeAData_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQ_isSuzuki2Group_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQuotientQ_eq_field_sq_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQMulEquivSuzukiRoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQStandardTypeAData_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ_isSuzuki2Group_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_field_sq_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ0EquivSuzukiCenterLine
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_field_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_centralizerQ0_sq_of_suzukiTarget
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, distinguished-pair
 transport and order lift: the quotient pair is the image of the original
