@@ -29,7 +29,7 @@ factor の指数を揃える bridge と全 invariant subgroup の分類は未実
       `OddOrder/GroupTheory/OmegaSubgroup.lean` に移設し、旧 BG consumer を再配線する
 - [x] actor の推移性が power-map range membership (= involution height) を保存する
       ことを定式化する
-- [ ] 有限可換 `2`-group の ZMod 分解で全 cyclic factor が同じ位数 `2^e` を
+- [x] 有限可換 `2`-group の ZMod 分解で全 cyclic factor が同じ位数 `2^e` を
       持つことを証明する
 - [ ] successive power layers の irreducibility から、全 invariant subgroup が
       `Agemo A 2 s` に一致することを証明する
