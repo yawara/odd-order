@@ -327,6 +327,18 @@
       every involution and therefore equals `L`.
     - The leaf build, Suzuki hub, `OddOrder.AxiomsCheck`, and full
       `lake build OddOrder` pass with only the three allowed axioms.
-    - **Next frontier:** §3 Lemma 2 (p. 107), conjugacy of subsets of `V`.
+14. ✅ **§3 Lemma 2** (p. 107) is formalized in `ConjugacyInV.lean`.
+    - The statement retains the source's full generality: `X` and `Y` are
+      arbitrary subsets of `V`, not subgroups.
+    - `K` and `V` are constructed as honest complements in `D`; the resulting
+      semidirect-product projection `dToV : D →* V` is proved to fix `V`.
+    - For an ambient conjugator `g`, Proposition 1(a) applied to `closure Y`
+      supplies a centralizing correction.  Under Lean's left action convention
+      the source element written `gh` becomes `h * g`, which lies in `D`.
+    - Applying `dToV` pointwise to the corrected conjugation equality produces
+      the required conjugator in `V` without a free carrier or extra axiom.
+    - The leaf, Suzuki hub, `OddOrder.AxiomsCheck`, and full
+      `lake build OddOrder` pass with only the three allowed axioms.
+    - **Next frontier:** §3 Lemma 3 (p. 107), strongly real elements.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
