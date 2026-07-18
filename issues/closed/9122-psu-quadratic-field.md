@@ -20,14 +20,14 @@ recognition work.
 
 ## やること
 
-- [ ] Create `GroupTheory/SpecificGroups/ProjectiveUnitary/Field.lean` for the
+- [x] Create `GroupTheory/SpecificGroups/ProjectiveUnitary/Field.lean` for the
   field of order `2^(2*n)` and the `2^n`-Frobenius conjugation.
-- [ ] Prove the conjugation has order two and install the corresponding
+- [x] Prove the conjugation has order two and install the corresponding
   nontrivial `StarRing` structure.
-- [ ] Compute the fixed-element set cardinality `2^n`.
-- [ ] Define Hermitian trace and norm, prove their values are fixed, and prove
+- [x] Compute the fixed-element set cardinality `2^n`.
+- [x] Define Hermitian trace and norm, prove their values are fixed, and prove
   every fixed trace value has exactly `2^n` preimages.
-- [ ] Wire the shared leaf into `OddOrder.lean` and `AxiomsCheck.lean`.
+- [x] Wire the shared leaf into `OddOrder.lean` and `AxiomsCheck.lean`.
 
 ## 完了条件
 
@@ -42,3 +42,13 @@ Upstream: issue 9121, commit `58052dcd2`.  Primary source: Peterfalvi Part II,
 Chapter I §3, Lemma 1 (p. 105), citing Huppert II, Satz 10.12.  Consumers:
 Hermitian unital coordinates, the standard PSU(3,q) permutation group, and §3
 Proposition 1(c).
+
+## 結果
+
+`FiniteField.Extension (GaloisField 2 n) 2 2` gives the canonical quadratic
+extension without choosing an embedding.  The generic finite-field trace and
+rank-nullity compute every trace fiber exactly; the fixed set, every Hermitian
+trace equation `b + star b = a * star a`, and the trace kernel all have cardinal
+`2^n`.  The q-Frobenius is also proved nontrivial for positive `n`.  The leaf is
+strict warning-clean, and its module build, full `OddOrder` build (4395 jobs),
+and `AxiomsCheck` build (4343 jobs) all pass.
