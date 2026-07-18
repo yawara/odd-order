@@ -17,9 +17,8 @@ lane c は BG §1-§4 完成 + §6 substantial 済。次の高価値 in-scope pi
 
 ## 残ギャップ (survey L248-)
 
-- **X.1** (部分): HK is a subgroup iff HK=KH。forward (HK=KH ⟹ ↑(H⊔K)=HK as sets) は Ch02 Basic に
-  private。converse + public 化。
-- **X.4** (未): direct-diamond correspondence (下記)。
+- **X.1** ✅ **済** (commit, DirectDiamond.lean `coe_sup_eq_mul_iff_mul_comm`): HK subgroup ⟺ ↑H*↑K=↑K*↑H。public 化。
+- **X.4** ✅ **済** (commit, DirectDiamond.lean `directDiamond_bijOn`): direct-diamond correspondence。
 - **X.5** (部分): Frattini = nongenerators。forward = mathlib `frattini_nongenerating`、converse。
 - **X.11** (部分): |K:H∩K| ≤ |G:H|, 等号 ⟺ HK=G。inequality は mathlib、等号 iff clause。
 - **X.12** (部分): coprime index ⟹ HK=G (join 形は済)、set-product 形 (∀g=hk)。
