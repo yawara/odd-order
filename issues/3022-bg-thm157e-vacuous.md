@@ -209,10 +209,60 @@ BG は `X = X₁` を示して `p = |X|`
       (PisetBetaDisjoint → OpicoreCentralizer → WitnessPGroup)。⟹ **`p = |X|` 完成後の
       「精密化された (e)」は `OpicoreCentralizer` でなく `WitnessPGroup` 側 (かその下流) に置く**
       (現 `fitting_not_ti_trichotomy` は OpicoreCentralizer に在り WitnessPGroup を cite できない)。
-- [ ] **(e2)/(e3) の型別分離** — **未了**。type `F` 側の exponent 条件
-      (`exp(M/H) ∣ q − 1`) は `typeF_exponent_dvd_sub_one_of_invariant_card` として**存在し**、
-      `isTypeI_of_isTypeF` が使っている (trichotomy へは未配線)。type `P₁` 側の
-      `|O_p(H)| = p³` と `|M/H| ∣ p + 1` (BG Thm 5.5(b) + Cor 10.7(b) + Thm 2.5 経由) は未形式化。
+- [ ] **(e2)/(e3) の分離** — **未了 (ただし残作業は assembly のみ)**。
+
+      ⚠ **2026-07-19 訂正: 本項の旧記述「type `P₁` 側の `|O_p(H)| = p³` と `|M/H| ∣ p + 1` は
+      未形式化」は誤り。** 実測したところ **(e2)(e3) の数学的内容はすべて形式化済・axiom-clean**
+      で、`isTypeV_of_isTypeP1_mf_eq_msigma` (`S16_MainResults/TypeVSinger.lean:392`) が現に
+      両分岐を証明している。旧記述は stale な docstring を信じたもの
+      ([[verify-port-state-by-number-not-coq-name]] の再発)。実在確認:
+
+      | 部品 | 所在 | 状態 |
+      |---|---|---|
+      | `\|O_p(H)\| = p³` | `TypeVSinger.lean:277` `card_opiCore_eq_prime_cube_singer` | ✅ AxiomsCheck:7474 |
+      | `\|M/H\| ∣ p+1` | `GroupTheory/RepresentationTheory/ExtraspecialSinger.lean:319` `card_dvd_succ_of_primeAction_extraspecial` | ✅ AxiomsCheck:9147 |
+      | `r(P) ≤ 2` | `TypeVSinger.lean:133` `pRank_opiCore_le_two_of_kappaHall` | ✅ AxiomsCheck:9143 |
+      | `\|Z(P)\| = p` | `TypeVSinger.lean:194` `card_center_opiCore_eq_prime_of_omega1Center_le_kstar` | ✅ AxiomsCheck:7463 |
+      | BG Thm 5.5 | `S05_NarrowAutomorphisms.lean:966` `solvableAut_of_narrow` | ✅ AxiomsCheck:2526 |
+      | BG Cor 10.7(b) | `S10_BetaRadicalCore.lean:695` `sylow_structure` (第2 conjunct) | ✅ |
+      | (e2) exponent | `TypeP1Criteria.lean:799` `typeF_exponent_dvd_sub_one_of_invariant_card` | ✅ |
+      | (e2) type-`P₁` 版 engine | `TypeP1Criteria.lean:1556` `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot` | ✅ |
+      | semiprime `C_H(k) = K*` | `TypeP1Criteria.lean:1534` `centralizer_msigma_kappaElement_eq_kstar` | ✅ |
+
+      ⚠ 併せて **stale docstring 2 件**を訂正すること (将来の誤読源):
+      `TypeVSinger.lean:255-274` (「the sole remaining content is …`sylow_structure_b` を
+      de-privatize せよ」= 完了済) と `:376-390` (「the sole remaining residual は (8.8) の
+      `W₁`-action analysis で未形式化」= 完了済)。proof 内の `-- (sorry 1)` / `-- (sorry 2)`
+      コメントも実 sorry でなく歴史的ラベル。
+
+      **⚠ さらに重要な訂正: 私の当初の「(e2) = type `F` / (e3) = type `P₁`」という読みは誤り。**
+      BG 原文でも Coq でも **(e2) に型の制約は無い** — (e2) は exponent 条件そのもので、
+      type `P₁` でも成り立ちうる。権威ある Coq (`BGsection15.v:947-950`) の形が正本:
+
+      ```coq
+      (*e*) (*1*) [/\ M \in 'M_'F, abelian H & 'r(H) = 2]
+         \/ let p := #|X| in [/\ prime p, ~~ abelian 'O_p(H), cyclic 'O_p^'(H)
+          & (*2*) {in \pi(H), forall q, exponent (M / H) %| q.-1}
+         \/ (*3*) [/\ #|'O_p(H)| = (p ^ 3)%N, M \in 'M_'P1 & #|M / H| %| p.+1] ]
+      ```
+
+      すなわち **共通 conjunct (`p = |X|` prime / `O_p(H)` 非可換 / `O_{p'}(H)` cyclic) を括り出し、
+      (e2) ∨ (e3) を内側の disjunction** にする。これが形式化目標の正本。
+
+      **Coq の (e2)/(e3) 分岐ロジック** (`BGsection15.v:1185-1204`) —
+      場合分けは含意 `Ks = Z₀ → |K| ∣ p−1` の真偽:
+      - **含意が真 ⟹ (e2)**。各 `q ∈ π(H)` について: `Z q = Ks` なら `|Z q| = q`・`|Ks| = p` から
+        `q = p` で仮定が直接効く。`Z q ≠ Ks` なら `|Ks|` 素数ゆえ `Z q ⊓ Ks = 1`、
+        semiprime (`C_H(k) = K*`) で `K` が `Z q` に半正則作用 ⟹ `|K| ∣ q−1`。
+      - **含意が偽 ⟹ `Ks = Z₀` かつ `¬(|K| ∣ p−1)` ⟹ (e3)** (Singer 鎖)。
+
+      type `F` 側 (Coq `FmaxM` 分岐) は `U₀` の Frobenius 作用 = Lean
+      `typeF_exponent_dvd_sub_one_of_invariant_card` に対応。
+
+      ⟹ **残作業は「上記部品を Coq の形の 1 定理に組み上げる」assembly のみ**。未形式化の上流は無い。
+      配置: (e2)(e3) が S16 の補題を要するため、trichotomy 本体は **S16 の新 leaf**
+      (`TypeVSinger` の下流) に置く。S15 の `fitting_not_ti_trichotomy` は S15 レベルの
+      partial として存続させる (S15 は S16 を cite できない)。
 - [x] **(d) の追加** (2026-07-18 完了)。`sigmaComplement_structure_of_not_fittingIsTI` として、
       `fitting_not_ti_cases` の bundle でなく **§12 E-setup を取る独立定理**にした (BG (d) は
       「§12-13 のとおりに取った E, E₁, E₂, E₃」についての主張なので、E-setup を引数に取る形が
