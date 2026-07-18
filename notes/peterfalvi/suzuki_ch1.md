@@ -263,8 +263,8 @@
      `N_K(X) ≤ C_G(X)` and the final endpoint is
      `N_G(X) = C_G(X) N_V(X)`.
    - The source assumption `1 ≠ X` is not needed for part (b).
-12. 🔄 **§3 Prop 1(c) in progress** — leaves `CentralizerResidual.lean` and
-    `CentralizerQuotient.lean`.
+12. 🔄 **§3 Prop 1(c) in progress** — leaves `CentralizerResidual.lean`,
+    `CentralizerQuotient.lean`, and `CentralizerInductionBridge.lean`.
    - ✅ The standing factor `Q₁` is the actual normal `2`-complement from
      `SylowDecomposition.lean`, not an added hypothesis.
    - ✅ `Q1_inf_centralizer_eq_bot_of_isPGroup`: if `C_Q(X)` is a
@@ -290,9 +290,20 @@
    - ✅ `card_centralizerActionQuotient_lt` proves from `X ≠ 1` that
      `|C_G(X)/𝒩(C_G(X))| < |G|`: otherwise `X ≤ Z(G)`, and normality plus
      faithfulness would force `X ≤ core_G(H) = 1`.
-   - **Next frontier:** connect the quotient carrier and strict card bound
-     to the induction theorem/result carrier, and derive the remaining
-     `IsPGroup 2 C_Q(X)` input.  No induction conclusion is posited as an
-     opaque field of the consumer.
+   - ✅ `TheoremAConclusion` records exactly the source conclusion of Suzuki's
+     Theorem A: a normal subgroup of odd index and one of the three concrete
+     standard actions.  The carrier retains the equivariant PSL/Sz/PSU
+     coordinates needed later, but does not posit simplicity or the
+     degree-minus-one calculation; `Q_and_residual` derives those through the
+     existing target endpoints.
+   - ✅ `centralizerQQuotientEquiv` proves the source identification
+     `C_Q(X) ≃ Q̄` from `𝒩(L) ≤ C_D(X)` and `C_Q(X) ∩ C_D(X) = 1`.
+     `centralizer_cQ_isPGroup_of_induction` applies the exact induction
+     hypothesis to the strictly smaller quotient and transports Lemma 1 back,
+     closing the missing `IsPGroup 2 C_Q(X)` input.
+   - **Next frontier:** use the retained standard-action coordinates to identify
+     the quotient root subgroup in each PSL/Sz/PSU model, then transport its
+     structure, cardinality, distinguished involution, and
+     `orderOf(st) = 3/5/3` through `centralizerQQuotientEquiv`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

@@ -193,6 +193,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7679,6 +7680,23 @@ the action faithful (A2), and preserves the four-subgroup required by (A3). -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_centralizerActionQuotient_lt
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, induction bridge:
+the concrete three-case conclusion of Suzuki's Theorem A makes the quotient
+root group a `2`-group, and the explicit equivalence `C_Q(X) ≃ Q̄` transports
+that conclusion back to the original centralizer. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.TheoremAConclusion.Q_and_residual
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQQuotientEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_cQ_isPGroup_of_quotient
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_cQ_isPGroup_of_induction
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
