@@ -928,4 +928,63 @@ theorem isSubnormal_strongClosure_of_kappaSetKernel_ne_bot {G : Type u} [Group G
 
 end
 
+section /- 9D: Bartels Step 4 — 集合としての stabilizer と極大性の二分岐 -/
+
+/-- 部分群の集合 `S` を**集合として保つ**元のなす部分群。 -/
+def setwiseStabilizer (S : Set (Subgroup G)) : Subgroup G where
+  carrier := {g : G | ∀ W : Subgroup G, ConjAct.toConjAct g • W ∈ S ↔ W ∈ S}
+  one_mem' := by intro W; simp
+  mul_mem' := by
+    intro a b ha hb W
+    rw [map_mul, mul_smul, ha, hb]
+  inv_mem' := by
+    intro a ha W
+    rw [map_inv, ← ha ((ConjAct.toConjAct a)⁻¹ • W), smul_inv_smul]
+
+theorem mem_setwiseStabilizer_iff {S : Set (Subgroup G)} {g : G} :
+    g ∈ setwiseStabilizer S ↔ ∀ W : Subgroup G, ConjAct.toConjAct g • W ∈ S ↔ W ∈ S := Iff.rfl
+
+/-- **`H` は `𝒦(H)` を保つ** (書籍 p.291 「`H` acts by conjugation on `𝒦(H)`」)。 -/
+theorem le_setwiseStabilizer_kappaSet (X H : Subgroup G) :
+    H ≤ setwiseStabilizer (kappaSet X H) := by
+  intro h hh W
+  constructor
+  · intro hW
+    have := mem_kappaSet_smul_of_mem (X := X) (H := H) (h := h⁻¹) (H.inv_mem hh) hW
+    rwa [map_inv, inv_smul_smul] at this
+  · exact mem_kappaSet_smul_of_mem hh
+
+/-- `𝒦(G)` は `G` の 1 つの軌道 (書籍 p.291 「`G` acts transitively on `𝒦(G)`」)。 -/
+theorem mem_kappaSet_top_iff {X W : Subgroup G} :
+    W ∈ kappaSet X ⊤ ↔ ∃ c : ConjAct G, c • strongClosure X = W := by
+  constructor
+  · rintro ⟨Y, -, ⟨c, rfl⟩, rfl⟩
+    exact ⟨c, (strongClosure_conjAct_smul c X).symm⟩
+  · rintro ⟨c, rfl⟩
+    refine ⟨c • X, le_top, ⟨c, rfl⟩, ?_⟩
+    exact strongClosure_conjAct_smul c X
+
+/-- **Step 4 第 1 分岐の入口**: `G` 全体が `𝒦(M)` を保つなら `𝒦(M) = 𝒦(G)`.
+
+`𝒦(G)` は `X^{(G)}` の `G`-軌道で, `X^{(G)} ∈ 𝒦(M)` なので `𝒦(M)` が `G`-安定なら
+軌道全体を含む。 -/
+theorem kappaSet_eq_top_of_setwiseStabilizer_eq_top {X M : Subgroup G} (hXM : X ≤ M)
+    (hstab : setwiseStabilizer (kappaSet X M) = ⊤) : kappaSet X M = kappaSet X ⊤ := by
+  refine Set.Subset.antisymm (kappaSet_mono le_top) ?_
+  intro W hW
+  obtain ⟨c, rfl⟩ := mem_kappaSet_top_iff.mp hW
+  have hg : ConjAct.ofConjAct c ∈ setwiseStabilizer (kappaSet X M) := by
+    rw [hstab]; exact Subgroup.mem_top _
+  have := (hg (strongClosure X)).mpr (mem_kappaSet_self X hXM)
+  rwa [ConjAct.toConjAct_ofConjAct] at this
+
+/-- **極大部分群の二分岐**: `M` が極大で `M ≤ K` なら `K = M` または `K = ⊤`. -/
+theorem eq_or_eq_top_of_isCoatom {M K : Subgroup G} (hM : IsCoatom M) (hMK : M ≤ K) :
+    K = M ∨ K = ⊤ := by
+  rcases lt_or_eq_of_le hMK with hlt | heq
+  · exact Or.inr (hM.2 K hlt)
+  · exact Or.inl heq.symm
+
+end
+
 end OddOrder.Isaacs.Ch09
