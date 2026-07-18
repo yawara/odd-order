@@ -267,6 +267,76 @@ theorem E3_eq_bot_of_not_fittingIsTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     (tau3_eq_empty_of_derivedInG_le_fittingInAmbient hG hM
       (derivedInG_le_fittingInAmbient_of_not_fittingIsTI hG hM hnotTI))
 
+/-- **BG Theorem 15.7(d)** (mmd L4249, Coq `nonTI_Fitting_structure`'s `sigma_complement` clause):
+for a §12 `E`-setup of a maximal `M` whose Fitting subgroup is **not** `TI`,
+
+* `E₃ = 1`,
+* `E₂ ⊴ E`, and
+* `E = E₁E₂` with `E₁` a complement to `E₂` — so `E/E₂ ≅ E₁` — and `E₁` cyclic.
+
+`E₃ = 1` is `E3_eq_bot_of_not_fittingIsTI` (via `τ₃(M) = ∅`, itself from conjunct (c) `M' ≤ F(M)`).
+Given that, Lemma 12.1(e)'s `E₂E₃ ⊴ E` (`SubgroupESetup.E23_normal`) collapses to `E₂ ⊴ E`, and
+`SubgroupESetup.eq_sup`'s `E = E₁E₂E₃` collapses to `E = E₁E₂`.  The primes of `τ₁(M)` have
+`p`-rank `1` in `M` and those of `τ₂(M)` have `p`-rank `2`, so `τ₁(M) ∩ τ₂(M) = ∅` and the Hall
+factors `E₁`, `E₂` have coprime orders; hence `E₁ ∩ E₂ = 1` and `E₁` complements the normal `E₂`.
+`E₁` is cyclic by Lemma 12.1(d) (`SubgroupESetup.E1_isCyclic`).
+
+The quotient isomorphism `E/E₂ ≅ E₁` that BG prints is `quotientE2MulEquivE1` below (mathlib's
+`Subgroup.IsComplement'.QuotientMulEquiv` applied to the complement produced here). -/
+theorem sigmaComplement_structure_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hnotTI : ¬ FittingIsTI M)
+    (hsetup : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃) :
+    E₃ = ⊥ ∧ E ≤ Subgroup.normalizer ((E₂ : Subgroup G) : Set G) ∧ E₁ ⊔ E₂ = E ∧
+      Subgroup.IsComplement' (E₁.subgroupOf E) (E₂.subgroupOf E) ∧ IsCyclic ↥E₁ := by
+  classical
+  have hE₃ : E₃ = ⊥ := E3_eq_bot_of_not_fittingIsTI hG hM hnotTI hsetup
+  -- `E₂ ⊴ E`: Lemma 12.1(e) gives `E ≤ N(E₂E₃)`, and `E₃ = 1`.
+  have hE₂norm : E ≤ Subgroup.normalizer ((E₂ : Subgroup G) : Set G) := by
+    have h := hsetup.E23_normal hG
+    rwa [hE₃, sup_bot_eq] at h
+  -- `E = E₁E₂`: Lemma 12.1 gives `E = E₁E₂E₃`, and `E₃ = 1`.
+  have hsup : E₁ ⊔ E₂ = E := by
+    have h := hsetup.eq_sup hG
+    rw [hE₃, sup_bot_eq] at h
+    exact h.symm
+  -- `E₁ ∩ E₂ = 1`: `τ₁(M)` has `p`-rank 1 and `τ₂(M)` has `p`-rank 2, so they are disjoint.
+  have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₂) := by
+    refine coprime_of_forall_prime_not_dvd ?_
+    intro r hr hrE₁ hrE₂
+    have hr1 : r ∈ tau1 M := hsetup.E₁_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv],
+      Nat.card_pos.ne'⟩)
+    have hr2 : r ∈ tau2 M := hsetup.E₂_hall.1 r (Nat.mem_primeFactors.mpr ⟨hr, by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₂_le).toEquiv],
+      Nat.card_pos.ne'⟩)
+    have h1 := tau1_pRank_eq_one hr1
+    have h2 := tau2_pRank_eq_two hr2
+    omega
+  have hdisj : E₁ ⊓ E₂ = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
+  -- `E₁` complements the normal `E₂` inside `↥E`.
+  haveI hnorm : (E₂.subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hsetup.E₂_le).mpr hE₂norm
+  have hcompl : Subgroup.IsComplement' (E₁.subgroupOf E) (E₂.subgroupOf E) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [Subgroup.disjoint_def]
+      intro x hx1 hx2
+      have hxG : (x : G) ∈ E₁ ⊓ E₂ :=
+        Subgroup.mem_inf.mpr ⟨Subgroup.mem_subgroupOf.mp hx1, Subgroup.mem_subgroupOf.mp hx2⟩
+      rw [hdisj, Subgroup.mem_bot] at hxG
+      exact Subtype.ext hxG
+    · rw [← Subgroup.mul_normal, ← Subgroup.subgroupOf_sup hsetup.E₁_le hsetup.E₂_le, hsup,
+        Subgroup.subgroupOf_self, Subgroup.coe_top]
+  exact ⟨hE₃, hE₂norm, hsup, hcompl, hsetup.E1_isCyclic hG⟩
+
+/-- **BG Theorem 15.7(d), the printed isomorphism `E/E₂ ≅ E₁`.**  Packages the complement produced
+by `sigmaComplement_structure_of_not_fittingIsTI` through mathlib's
+`Subgroup.IsComplement'.QuotientMulEquiv`, then transports `E₁.subgroupOf E` back to `E₁`. -/
+noncomputable def quotientE2MulEquivE1 {E E₁ E₂ : Subgroup G} [(E₂.subgroupOf E).Normal]
+    (hE₁le : E₁ ≤ E) (hcompl : Subgroup.IsComplement' (E₁.subgroupOf E) (E₂.subgroupOf E)) :
+    (↥E ⧸ E₂.subgroupOf E) ≃* ↥E₁ :=
+  hcompl.QuotientMulEquiv.trans (Subgroup.subgroupOfEquivOfLe hE₁le)
+
 /-- **BG Theorem A(8), the `FittingIsTI` clause** (mmd L4274, schematic proof: Theorem 15.7(a)(b)):
 if `M_F ≠ M_σ`, then `F(M)` is a TI-subgroup of `G`.  This is the contrapositive of the
 `M_F = M_σ` conclusion of Theorem 15.7(a) (`mf_eq_msigma_of_not_fittingIsTI`): if `F(M)` failed to

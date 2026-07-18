@@ -5484,6 +5484,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_le_Msigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_le_conj_Msigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_isCyclic
+-- BG **Theorem 15.7(d)** (`S15_MF`, issue 3022): for a §12 `E`-setup with `F(M)` not TI,
+-- `E₃ = 1` (already available separately as `E3_eq_bot_of_not_fittingIsTI`), `E₂ ⊴ E` (Lemma 12.1(e)'s
+-- `E₂E₃ ⊴ E` with `E₃ = 1`), `E = E₁E₂` (`eq_sup` with `E₃ = 1`), `E₁` complements `E₂` (τ₁ has
+-- `p`-rank 1 and τ₂ has `p`-rank 2, so `|E₁|` and `|E₂|` are coprime), and `E₁` is cyclic.  The
+-- printed `E/E₂ ≅ E₁` is `quotientE2MulEquivE1` (mathlib `IsComplement'.QuotientMulEquiv`).
+-- Both sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.sigmaComplement_structure_of_not_fittingIsTI
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.quotientE2MulEquivE1
 -- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
 -- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
 -- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive
