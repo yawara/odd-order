@@ -59,6 +59,33 @@ theorem IsComponent.conj {H : Subgroup G} (hH : IsComponent H) (g : G) :
     hH.isQuasisimple.of_mulEquiv
       (Subgroup.equivMapOfInjective H (MulAut.conj g).toMonoidHom (MulAut.conj g).injective)
 
+/-- 群同型による component の像はまた component (`IsComponent.conj` の一般化). -/
+theorem IsComponent.map_mulEquiv {K : Type*} [Group K] {H : Subgroup G} (hH : IsComponent H)
+    (e : G ≃* K) : IsComponent (H.map (e : G →* K)) where
+  isSubnormal := by
+    have := hH.isSubnormal.map (f := (e : G →* K)) e.surjective
+    simpa using this
+  isQuasisimple :=
+    hH.isQuasisimple.of_mulEquiv
+      (Subgroup.equivMapOfInjective H (e : G →* K) e.injective)
+
+/-- `(layer G).map e ≤ layer K` (`e : G ≃* K`). -/
+theorem map_layer_le_mulEquiv {K : Type*} [Group K] (e : G ≃* K) :
+    (layer G).map (e : G →* K) ≤ layer K := by
+  rw [layer, Subgroup.map_le_iff_le_comap]
+  refine sSup_le fun H hH => ?_
+  rw [← Subgroup.map_le_iff_le_comap]
+  exact (hH.map_mulEquiv e).le_layer
+
+/-- **layer は群同型と可換**: `(E(G)).map e = E(K)`. `map_conj_layer` の一般化で,
+`↥H` 内の layer を ambient に運ぶ transport (`layerInG`) に使う. -/
+theorem map_layer_mulEquiv {K : Type*} [Group K] (e : G ≃* K) :
+    (layer G).map (e : G →* K) = layer K := by
+  refine le_antisymm (map_layer_le_mulEquiv e) ?_
+  have h := Subgroup.map_mono (f := (e : G →* K)) (map_layer_le_mulEquiv e.symm)
+  rwa [Subgroup.map_map, show ((e : G →* K).comp (e.symm : K →* G)) = MonoidHom.id K from by
+    ext y; simp, Subgroup.map_id] at h
+
 /-- `map (conj g) (layer G) ≤ layer G` (component の像がまた component ゆえ). -/
 theorem map_conj_layer_le (g : G) :
     (layer G).map (MulAut.conj g).toMonoidHom ≤ layer G := by
