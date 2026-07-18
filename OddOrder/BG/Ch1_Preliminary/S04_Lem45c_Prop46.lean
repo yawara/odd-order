@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.SubgroupInAmbient
 import Mathlib.GroupTheory.Nilpotent
 import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
@@ -74,20 +75,6 @@ open OddOrder.GroupTheory
 open scoped commutatorElement
 
 variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
-
-/-- A characteristic subgroup `L` of a normal subgroup `N ⊴ W` pushes forward to a normal
-subgroup `L.map N.subtype ⊴ W`. (Local copy of the BG §3/§10 helper, to avoid a downstream
-import; the conjugation automorphism `MulAut.conjNormal w` restricts to `↥N` and fixes the
-characteristic `L`.) -/
-private theorem normal_map_subtype_of_characteristic {W : Type*} [Group W] {N : Subgroup W}
-    [N.Normal] {L : Subgroup ↥N} (hL : L.Characteristic) : (L.map N.subtype).Normal := by
-  refine ⟨fun a ha w => ?_⟩
-  obtain ⟨⟨a', ha'N⟩, ha'L, rfl⟩ := ha
-  have hmap : L.map (MulAut.conjNormal w).toMonoidHom = L :=
-    (Subgroup.characteristic_iff_map_eq.mp hL) (MulAut.conjNormal w)
-  have hmem : (MulAut.conjNormal w) ⟨a', ha'N⟩ ∈ L := by
-    rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
-  exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
 
 /-! ## BG Lemma 4.5(c): `Ω₁(Z₂(R))` is noncyclic of exponent `p`
 
@@ -231,7 +218,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal_not_isCycli
     card_prime_sq_le_omega1UpperCentralTwo_of_not_isCyclic hSpg hp_odd hSnc
   -- `Z' = Z.map S.subtype ⊴ R`.
   haveI hZ'norm : ((omega1UpperCentralTwo ↥S p).map S.subtype).Normal :=
-    normal_map_subtype_of_characteristic inferInstance
+    OddOrder.GroupTheory.normal_map_subtype_of_characteristic inferInstance
   -- Exponent `p` on `Z'`.
   have hZ'_exp : ∀ g ∈ (omega1UpperCentralTwo ↥S p).map S.subtype, g ^ p = 1 := by
     intro g hg

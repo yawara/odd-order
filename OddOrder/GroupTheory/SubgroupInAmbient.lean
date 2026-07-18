@@ -378,4 +378,17 @@ theorem map_opiCoreInG_mulEquiv {G' : Type*} [Group G'] (π : Set ℕ) (e : G �
 
 end
 
+/-- `N ⊴ W` の characteristic 部分群 `L : Subgroup ↥N` は, `↥N` から `W` へ押し出すと `W` で正規。
+共役自己同型 `MulAut.conjNormal w : MulAut ↥N` (`N ⊴ W` ゆえ各 `w ∈ W` の共役が `↥N` の自己同型に
+制限) が `L` を固定する (`characteristic_iff_map_eq`)。 -/
+theorem normal_map_subtype_of_characteristic {W : Type*} [Group W] {N : Subgroup W} [N.Normal]
+    {L : Subgroup ↥N} (hL : L.Characteristic) : (L.map N.subtype).Normal := by
+  refine ⟨fun a ha w => ?_⟩
+  obtain ⟨⟨a', ha'N⟩, ha'L, rfl⟩ := ha
+  have hmap : L.map (MulAut.conjNormal w).toMonoidHom = L :=
+    (Subgroup.characteristic_iff_map_eq.mp hL) (MulAut.conjNormal w)
+  have hmem : (MulAut.conjNormal w) ⟨a', ha'N⟩ ∈ L := by
+    rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
+  exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
+
 end OddOrder.GroupTheory
