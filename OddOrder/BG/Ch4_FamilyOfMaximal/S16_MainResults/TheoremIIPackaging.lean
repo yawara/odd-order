@@ -347,6 +347,224 @@ theorem frobeniusTypeI_of_neighbour_typeII [Finite G] (hG : OddOrder.BG.IsMinima
   · rw [hMFeq]; exact hEcompl
   · rw [hMFeq]; exact hEfrob
 
+/-! ## Clause (d): `A₀(Mᵢ) − Hᵢ` is a nonempty `TI`-subset with normalizer `Mᵢ`
+
+The remaining `(Tii)` clause.  Following BG's Theorem II proof (mmd:4569), the neighbour maximal
+`Mᵢ = N(x)` is of Type I or II.
+* **Type I** (`= 𝓜_F`, `κ(Mᵢ) = ∅`): choose `Kᵢ = ⊥`.  Then `A₀(Mᵢ) = \widehat{M_{iσ}}` and (since
+  `Mᵢ = Uᵢ M_{iσ}` for a `(κ∪σ)′`-Hall `Uᵢ`) `A₀(Mᵢ) − M_{iσ} = A(Mᵢ) − M_{iσ}`, which is `TI` by
+  Theorem B(5); the Theorem D(4) seed `x ∈ \widehat{M_{iσ}} − M_{iσ}` gives nonemptiness.
+* **Type II** (`= 𝓜_{P₂}`, `κ(Mᵢ) ≠ ∅`): choose a genuine `κ(Mᵢ)`-Hall `Kᵢ ≠ ⊥`.  The set
+  `A₀(Mᵢ) − M_{iσ}` decomposes into the two pieces `A(Mᵢ) − M_{iσ}` (`TI` by Theorem B(5)) and
+  `A₀(Mᵢ) − A(Mᵢ)` (`TI` by Theorem C(9), `theoremC_paired_structure` conjunct 10).  Their union is
+  `TI` because `A(Mᵢ)`-membership is order-determined
+  (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`) hence conjugation-invariant — the BG "distinct
+  orders across pieces" argument, *not* Theorem C(5).
+  Nonemptiness: the Theorem D(4) seed `x` (a `τ₂(Mᵢ)`-element) avoids `𝒞_G(Kᵢ^#)` because
+  `κ(Mᵢ) ∩ τ₂(Mᵢ) = ∅` (rank 1 vs 2), so `x ∈ A₀(Mᵢ) − M_{iσ}`.
+-/
+
+/-- `A₀(M)` with a trivial `κ`-Hall subgroup is exactly `\widehat{M_σ}`: `sharpSubgroup ⊥ = ∅`, so
+its `G`-conjugacy closure is empty and `A₀(M) = \widehat{M_σ} − ∅`.  The Type-I (`Kᵢ = ⊥`) shape of
+`A₀`. -/
+theorem a0Set_bot (M : Subgroup G) : A0Set M ⊥ = hatMsigma M := by
+  have hsharp : sharpSubgroup (⊥ : Subgroup G) = (∅ : Set G) := by
+    rw [sharpSubgroup]; simp
+  have hcc : conjClassSet (sharpSubgroup (⊥ : Subgroup G)) = (∅ : Set G) := by
+    rw [hsharp]; ext y; simp [conjClassSet]
+  rw [A0Set, hcc, Set.sdiff_empty]
+
+/-- **Every maximal subgroup carries a `κ`-Hall and a `(κ∪σ)′`-Hall factor.**  `Mᵢ` is solvable
+(maximal in the minimal simple `G`), so Hall subgroups for `κ(Mᵢ)` and `(κ(Mᵢ) ∪ σ(Mᵢ))′` exist
+(`hall_E_exists`), pulled back to subgroups of `G`.  Supplies the Hall data `(Kᵢ, Uᵢ)` that Theorems
+B(5)/C(9) at `Mᵢ` consume in clause (d). -/
+theorem exists_kappa_hall_pair [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {Mi : Subgroup G} (hMimax : Mi ∈ maximalSubgroups G) :
+    ∃ Ki Ui : Subgroup G, Ki ≤ Mi ∧ Ui ≤ Mi ∧
+      Ch03.IsHallSubgroup (S14.kappa Mi) (Ki.subgroupOf Mi) ∧
+      Ch03.IsHallSubgroup ((S14.kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ) (Ui.subgroupOf Mi) := by
+  haveI : IsSolvable ↥Mi := hG.solvable_of_mem_maximalSubgroups hMimax
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥Mi) (S14.kappa Mi)
+  obtain ⟨U', hU'⟩ :=
+    Ch03.hall_E_exists (G := ↥Mi) ((S14.kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
+  refine ⟨K'.map Mi.subtype, U'.map Mi.subtype, Subgroup.map_subtype_le _,
+    Subgroup.map_subtype_le _, ?_, ?_⟩
+  · have h : ((K'.map Mi.subtype).subgroupOf Mi) = K' :=
+      Subgroup.comap_map_eq_self_of_injective Mi.subtype_injective K'
+    rw [h]; exact hK'
+  · have h : ((U'.map Mi.subtype).subgroupOf Mi) = U' :=
+      Subgroup.comap_map_eq_self_of_injective Mi.subtype_injective U'
+    rw [h]; exact hU'
+
+/-- **A `τ₂(Mᵢ)`-element is not `G`-conjugate into `Kᵢ^#`** for a `κ(Mᵢ)`-Hall `Kᵢ`.  If `x` were
+conjugate to `k ∈ Kᵢ^#`, then `orderOf x = orderOf k`, so a common prime `p` divides both; `p ∈
+κ(Mᵢ)` (from `k ∈ Kᵢ`, a `κ`-group) and `p ∈ τ₂(Mᵢ)` (from the `τ₂`-primes of `x`).  But `κ(Mᵢ) ⊆
+τ₁(Mᵢ) ∪ τ₃(Mᵢ)` has `p`-rank `1` while `τ₂(Mᵢ)` has `p`-rank `2` — contradiction.  This puts the
+Theorem D(4) seed into `A₀(Mᵢ) = \widehat{M_{iσ}} − 𝒞_G(Kᵢ^#)`. -/
+theorem not_mem_conjClassSet_kappaHall_sharp_of_tau2 [Finite G]
+    {Mi Ki : Subgroup G} (hKiMi : Ki ≤ Mi)
+    (hKi : Ch03.IsHallSubgroup (S14.kappa Mi) (Ki.subgroupOf Mi))
+    {x : G} (hx1 : x ≠ 1)
+    (hxτ2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 Mi) :
+    x ∉ conjClassSet (sharpSubgroup Ki) := by
+  rintro ⟨k, hk, g, hgk⟩
+  simp only [sharpSubgroup, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hk
+  obtain ⟨hkKi, hk1⟩ := hk
+  -- `orderOf x = orderOf k` (conjugate elements).
+  have hord : orderOf x = orderOf k := by
+    have hconj : orderOf (g * k * g⁻¹) = orderOf k := by
+      have := orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective k
+      simpa [MulAut.conj_apply] using this
+    rw [← hgk]; exact hconj
+  -- a common prime `p ∣ orderOf x = orderOf k`.
+  have hkord1 : orderOf k ≠ 1 := fun h => hk1 (orderOf_eq_one_iff.mp h)
+  set p : ℕ := (orderOf k).minFac with hpdef
+  have hpp : p.Prime := Nat.minFac_prime hkord1
+  have hpdvdk : p ∣ orderOf k := Nat.minFac_dvd _
+  -- `p ∈ τ₂(Mᵢ)` via the `τ₂`-primes of `x`.
+  have hppi : p ∈ S14.piSet (Subgroup.closure ({x} : Set G)) := by
+    change p ∈ (Nat.card ↥(Subgroup.closure ({x} : Set G))).primeFactors
+    rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+    exact Nat.mem_primeFactors.mpr ⟨hpp, by rw [hord]; exact hpdvdk, (orderOf_pos x).ne'⟩
+  have hpτ2 : p ∈ tau2 Mi := hxτ2 p hppi
+  -- `p ∈ κ(Mᵢ)` since `p ∣ orderOf k ∣ |Kᵢ|` (a `κ`-number).
+  have hordk_dvd : orderOf k ∣ Nat.card ↥Ki := by
+    rw [← Subgroup.orderOf_mk k hkKi]; exact orderOf_dvd_natCard _
+  have hcardeq : Nat.card ↥(Ki.subgroupOf Mi) = Nat.card ↥Ki :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKiMi).toEquiv
+  have hpκ : p ∈ S14.kappa Mi := hKi.1 p (by
+    rw [hcardeq]
+    exact Nat.mem_primeFactors.mpr ⟨hpp, hpdvdk.trans hordk_dvd, Nat.card_pos.ne'⟩)
+  -- `p` has rank 1 (from `κ ⊆ τ₁ ∪ τ₃`) and rank 2 (from `τ₂`) — contradiction.
+  have hpRank1 : pRank ↥Mi p = 1 := by
+    rcases hpκ.2.1 with h | h
+    · exact tau1_pRank_eq_one h
+    · exact tau3_pRank_eq_one h
+  have hpRank2 : pRank ↥Mi p = 2 := tau2_pRank_eq_two hpτ2
+  rw [hpRank1] at hpRank2
+  exact absurd hpRank2 (by norm_num)
+
+/-- **`A(Mᵢ)`-membership is invariant under `G`-conjugation** (within `\widehat{M_{iσ}}`).  For `a`
+and `g·a·g⁻¹` both in `\widehat{M_{iσ}}`, `a ∈ A(Mᵢ) ↔ g·a·g⁻¹ ∈ A(Mᵢ)`: membership in `A(Mᵢ) =
+\widehat{M_{iσ}} ∩ Uᵢ M_{iσ}` reduces to membership in the normal `κ(Mᵢ)′`-Hall `Uᵢ M_{iσ}`
+(Theorem A(3)), which is order-determined (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`) hence
+conjugation-invariant.  This is BG's "distinct orders across pieces" that separates the two `TI`
+pieces of `A₀(Mᵢ) − M_{iσ}` in clause (d) for Type-II neighbours. -/
+theorem aSet_mem_conj_iff_of_hatMsigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {Mi Ui : Subgroup G} (hMi : Mi ∈ maximalSubgroups G) (hUiMi : Ui ≤ Mi)
+    (hUi : Ch03.IsHallSubgroup ((S14.kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ) (Ui.subgroupOf Mi))
+    (hnorm : ((Ui ⊔ OddOrder.BG.Ch3.S10.Msigma Mi).subgroupOf Mi).Normal)
+    {a g : G} (hahat : a ∈ hatMsigma Mi) (hbhat : g * a * g⁻¹ ∈ hatMsigma Mi) :
+    a ∈ ASet Mi Ui ↔ g * a * g⁻¹ ∈ ASet Mi Ui := by
+  have hAa : a ∈ ASet Mi Ui ↔ a ∈ (Ui ⊔ OddOrder.BG.Ch3.S10.Msigma Mi : Subgroup G) := by
+    simp only [ASet, Set.mem_inter_iff, SetLike.mem_coe]
+    exact ⟨fun h => h.2, fun h => ⟨hahat, h⟩⟩
+  have hAb : g * a * g⁻¹ ∈ ASet Mi Ui ↔
+      g * a * g⁻¹ ∈ (Ui ⊔ OddOrder.BG.Ch3.S10.Msigma Mi : Subgroup G) := by
+    simp only [ASet, Set.mem_inter_iff, SetLike.mem_coe]
+    exact ⟨fun h => h.2, fun h => ⟨hbhat, h⟩⟩
+  rw [hAa, hAb,
+    S14.mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hMi hUiMi hUi hnorm hahat.1,
+    S14.mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hMi hUiMi hUi hnorm hbhat.1]
+  refine ⟨fun h => S14.isPiElement_conj g h, fun h => ?_⟩
+  rw [show a = g⁻¹ * (g * a * g⁻¹) * (g⁻¹)⁻¹ from by group]
+  exact S14.isPiElement_conj g⁻¹ h
+
+/-- **BG Theorem II (Tii)(d)** (mmd:4569): for a neighbour maximal `Mᵢ = N(x)` (of Type I or II) the
+set `A₀(Mᵢ) − M_{iσ}` is a nonempty `TI`-subset of `G` with normalizer `Mᵢ`.  This discharges the
+`hd` clause of `exists_systemOfSupportingSubgroups` unconditionally.  See the section docstring for
+the Type I/II case split; the Type-II union `TI`-ness uses Theorems B(5) and C(9) plus the
+order-determined cross-piece exclusion `aSet_mem_conj_iff_of_hatMsigma` (BG "distinct orders"),
+*not* Theorem C(5). -/
+theorem clause_d_of_neighbour [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {Mi : Subgroup G} (hMimax : Mi ∈ maximalSubgroups G)
+    (htype : IsTypeI Mi ∨ IsTypeII Mi)
+    (hMinb : ∃ x ∈ escapingSharpSet M (ASet M U),
+      maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {Mi}) :
+    ∃ Ki : Subgroup G, Ch03.IsHallSubgroup (S14.kappa Mi) (Ki.subgroupOf Mi) ∧
+      (A0Set Mi Ki \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G)).Nonempty ∧
+      IsTISubset (A0Set Mi Ki \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G)) Mi := by
+  classical
+  -- The escaping element `x` and its `σ`-sharpness / signalizer branch.
+  obtain ⟨x, ⟨hxA, hx1, hesc⟩, hMℳ⟩ := hMinb
+  have hxσ : x ∈ S14.sigmaSharp M :=
+    mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl) hxA hx1 hesc
+  have hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h; push Not at h
+    exact hesc (centralizer_le_of_maximalSigma_le_one hG hM hxσ.1 hx1 h)
+  -- Theorem D(4) seed: `x ∈ \widehat{M_{iσ}} − M_{iσ}` (via `ASet Mi ⊤ = \widehat{M_{iσ}}`).
+  obtain ⟨_, _, _, hD4⟩ := theoremD_msigma_conjugacy_and_centralizers hG hM
+  obtain ⟨_R, _hR, N, hQN, _⟩ := hD4 x hxσ hesc
+  obtain ⟨hNmem, _, _, hseed, _, _, _⟩ := hQN
+  have hNMi : N = Mi := by
+    have h := hNmem; rw [hMℳ, Set.mem_singleton_iff] at h; exact h
+  rw [hNMi] at hseed
+  obtain ⟨hxAtop, hxnMσ⟩ := hseed
+  have hxhat : x ∈ hatMsigma Mi := hxAtop.1
+  -- The `τ₂(Mᵢ)`-primes of `x` (from the signalizer structure at `x`).
+  obtain ⟨N', ⟨hN'max, hN'C, _, _, hN't2, _, _⟩, -⟩ :=
+    signalizer_structure_of_mem_sigmaSharp hG hM hxσ hgt
+  have hN'Mi : N' = Mi := by
+    have h : N' ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) :=
+      mem_maximalSubgroupsContaining.mpr ⟨hN'max, hN'C⟩
+    rw [hMℳ, Set.mem_singleton_iff] at h; exact h
+  have hxτ2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 Mi := by
+    intro p hp; rw [← hN'Mi]; exact hN't2 p hp
+  -- Hall data `(Kᵢ, Uᵢ)` at `Mᵢ`, its Theorem A(3) normality, and Theorem B(5).
+  obtain ⟨Kg, Ui, hKgMi, hUiMi, hKg, hUi⟩ := exists_kappa_hall_pair hG hMimax
+  have hnormi : ((Ui ⊔ OddOrder.BG.Ch3.S10.Msigma Mi).subgroupOf Mi).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+        (sup_le hUiMi (OddOrder.BG.Ch3.S10.Msigma_le Mi))).mpr
+      (theoremA_ungated_conjuncts hG hMimax hKgMi hUiMi hKg rfl hUi).2.2.1
+  have hB5 : IsTISubset (ASet Mi Ui \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G)) Mi :=
+    theoremB_A_minus_Msigma_isTISubset hG hMimax hKgMi hUiMi hKg hUi
+  rcases htype with hI | hII
+  · -- **Type I** (`κ(Mᵢ) = ∅`): `Kᵢ = ⊥`, `A₀(Mᵢ) = \widehat{M_{iσ}} = A(Mᵢ)`.
+    have hκempty : S14.kappa Mi = ∅ := (proposition_type_classification hG hMimax).1.mp hI
+    have hKbotHall : Ch03.IsHallSubgroup (S14.kappa Mi) ((⊥ : Subgroup G).subgroupOf Mi) := by
+      rw [hκempty, Subgroup.bot_subgroupOf]
+      refine ⟨fun p hp => ?_, fun p _ => Set.notMem_empty p⟩
+      rw [Subgroup.card_bot, Nat.primeFactors_one] at hp
+      exact absurd hp (Finset.notMem_empty p)
+    -- `Mᵢ = Uᵢ ⊔ M_{iσ}` (Theorem A(3) with `K = ⊥`), so `A(Mᵢ) = \widehat{M_{iσ}}`.
+    have hMi_eq : Mi = (Ui ⊔ OddOrder.BG.Ch3.S10.Msigma Mi : Subgroup G) := by
+      have h := (theoremA_maximal_structure_faithful hG hMimax (bot_le : (⊥ : Subgroup G) ≤ Mi)
+        hUiMi hKbotHall rfl hUi).2.2.1
+      rwa [bot_sup_eq] at h
+    have hAset_eq_hat : ASet Mi Ui = hatMsigma Mi := by
+      rw [ASet, Set.inter_eq_left]
+      intro y hy
+      rw [SetLike.mem_coe, ← hMi_eq]; exact hy.1
+    have hA0_eq : A0Set Mi ⊥ \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G) =
+        ASet Mi Ui \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G) := by
+      rw [a0Set_bot, hAset_eq_hat]
+    refine ⟨⊥, hKbotHall, ?_, ?_⟩
+    · rw [hA0_eq]; exact ⟨x, by rw [← hAset_eq_hat] at hxhat; exact ⟨hxhat, hxnMσ⟩⟩
+    · rw [hA0_eq]; exact hB5
+  · -- **Type II** (`κ(Mᵢ) ≠ ∅`): genuine `κ`-Hall `Kᵢ ≠ ⊥`; combine B(5) + C(9).
+    have hP2 : S14.IsTypeP2 Mi := (proposition_type_classification hG hMimax).2.1.mp hII
+    have hKgne : Kg ≠ ⊥ := fun h =>
+      S14.not_isTypeP_and_isTypeF ⟨hP2.1, S15.isTypeF_of_isHall_kappa_eq_bot hKgMi hKg h⟩
+    have hC9 : IsTISubset (A0Set Mi Kg \ ASet Mi Ui) Mi := by
+      obtain ⟨_, _, _, _, _, _, _, _, _, hTIC, _, _⟩ :=
+        theoremC_paired_structure hG hMimax hKgne hKgMi hUiMi hKg rfl hUi
+      exact hTIC
+    refine ⟨Kg, hKg, ?_, ?_⟩
+    · -- Nonemptiness: `x ∈ A₀(Mᵢ) − M_{iσ}` (seed avoids `𝒞_G(Kᵢ^#)`).
+      refine ⟨x, ⟨⟨hxhat, ?_⟩, hxnMσ⟩⟩
+      exact not_mem_conjClassSet_kappaHall_sharp_of_tau2 hKgMi hKg hx1 hxτ2
+    · -- `TI`: split `A₀(Mᵢ) − M_{iσ}` on `A(Mᵢ)`-membership (order-invariant), route to B(5)/C(9).
+      rintro g ⟨a, ⟨haA0, hanMσ⟩, ⟨hgaA0, hganMσ⟩⟩
+      have hahat : a ∈ hatMsigma Mi := haA0.1
+      have hgahat : g * a * g⁻¹ ∈ hatMsigma Mi := hgaA0.1
+      have hiff := aSet_mem_conj_iff_of_hatMsigma hG hMimax hUiMi hUi hnormi hahat hgahat
+      by_cases haAset : a ∈ ASet Mi Ui
+      · exact hB5 g ⟨a, ⟨haAset, hanMσ⟩, ⟨hiff.mp haAset, hganMσ⟩⟩
+      · exact hC9 g ⟨a, ⟨haA0, haAset⟩, ⟨hgaA0, fun h => haAset (hiff.mpr h)⟩⟩
+
 /-! ## Theorem II (Tii): the system exists -/
 
 /-- **BG Theorem II (Tii)** (mmd:4571): when the escaping set `D = escapingSharpSet M (A(M))` is
@@ -550,27 +768,23 @@ minimal simple group `G` of odd order, `A(M) = ASet M U` is a *tamely imbedded s
   `exists_systemOfSupportingSubgroups` (clause (Tiii) discharged internally via Theorem D(4),
   `frobeniusTypeI_of_neighbour_typeII`).
 
-The clause `(c)` is discharged internally (`coprime_centralizer_of_neighbour`, via Lemma 14.13(a)).
-The sole remaining §16 residual is the hypothesis `hd` (clause (d), the `A₀(Mᵢ)` `TI` structure of
-Theorem B(5)/C(9) at `Mᵢ`; provable for Type-I `Mᵢ` but the Type-II "`A₀(Mᵢ)` is `TI`" theorem is not
-yet in the repository). -/
+Both remaining §16 residuals are discharged internally: clause `(c)` via
+`coprime_centralizer_of_neighbour` (Lemma 14.13(a)) and clause `(d)` via `clause_d_of_neighbour`
+(Theorem B(5) for Type-I, and B(5) + C(9) + the order-determined cross-piece exclusion for Type-II).
+Theorem II is therefore **unconditional** — no hypothesis beyond the maximal `M` and its Hall data. -/
 theorem theoremII_tamelyImbedded [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
-    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
-    (hd : ∀ Mi ∈ maximalSubgroups G, (IsTypeI Mi ∨ IsTypeII Mi) →
-      (∃ x ∈ escapingSharpSet M (ASet M U),
-        maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {Mi}) →
-      ∃ Ki : Subgroup G, Ch03.IsHallSubgroup (S14.kappa Mi) (Ki.subgroupOf Mi) ∧
-        (A0Set Mi Ki \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G)).Nonempty ∧
-        IsTISubset (A0Set Mi Ki \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G)) Mi) :
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
     TamelyImbedded M (ASet M U) := by
   refine ⟨?_, ?_⟩
   · -- (Ti)
     exact (theoremII_tame_embedding hG hM hKM hUM hK hU (Or.inl rfl)).1
   · -- (Tii)+(Tiii)
-    refine fun hne => exists_systemOfSupportingSubgroups hG hM hKM hUM hK hU hne ?_ hd
-    exact fun Mi hMimax _htype hnb x hxA hx1 =>
-      coprime_centralizer_of_neighbour hG hM hKM hUM hK hU hMimax hnb x hxA hx1
+    refine fun hne => exists_systemOfSupportingSubgroups hG hM hKM hUM hK hU hne ?_ ?_
+    · exact fun Mi hMimax _htype hnb x hxA hx1 =>
+        coprime_centralizer_of_neighbour hG hM hKM hUM hK hU hMimax hnb x hxA hx1
+    · exact fun Mi hMimax htype hnb =>
+        clause_d_of_neighbour hG hM hKM hUM hK hU hMimax htype hnb
 
 end OddOrder.BG.Ch4.S16

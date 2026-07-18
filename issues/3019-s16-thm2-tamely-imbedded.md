@@ -46,13 +46,24 @@ Thm C(9) 完全恒等式 (`a0_minus_a_eq_conj_zTilde`) + Thm A type-F nilpotent
   ⚠ `FrobeniusTypeIWithNonTIFitting` の第3 conjunct を `¬ IsTISubset(M_F#)` → repo-idiom
   `¬ S15.FittingIsTI M` (=F(M) TI) に変更 (TypeI Frobenius M では F(M)=M_σ=M_F ゆえ faithful、
   D(4) 直結、bridge 不要)。
-- [ ] **Gap 2c: clause (d) の unconditional 化** ← 残 §16 最終 gap。`theoremII_tamelyImbedded` は
-  現在 clause (d) を hypothesis `hd` で受ける conditional 形。**(d)-Type-I** は Thm B(5) (`theoremB_A_minus_Msigma_isTISubset`、
-  K_i=⊥ で A₀(Mᵢ)=A(Mᵢ)) + D(4) seed の nonemptiness で証明可 (bookkeeping)。**(d)-Type-II** は
-  **真に欠落した §16 定理**「A₀(Mᵢ) 自体が TI-subset (TypeII Mᵢ)」(book: "by Theorem C(5) and a
-  short argument") が必要 — repo には A₀−A の TI (theoremC_paired_structure) しかなく、
-  (A₀−A)∪(A−M_σ) は termwise TI でない。これを埋めれば `hd` が閉じ Thm II unconditional。
-  → 次 frontier で Thm C(5) + short argument を形式化 (or honest defer、恒久除外せず)。
+- [x] **Gap 2c: clause (d) の unconditional 化** ✅ **完了 2026-07-18** (`TheoremIIPackaging.lean`):
+  `clause_d_of_neighbour` が clause (d) を discharge → `theoremII_tamelyImbedded` から hypothesis
+  `hd` **削除**、Thm II **unconditional** (axiom-clean [propext/Classical.choice/Quot.sound]、
+  `lake build OddOrder` green 4413 jobs)。
+  - **(d)-Type-I** (`κ(Mᵢ)=∅`): `Kᵢ=⊥`。`A0Set Mᵢ ⊥ = hatMsigma Mᵢ` (`a0Set_bot`)、type-F の
+    `Mᵢ=Uᵢ⊔M_{iσ}` (Thm A(3)) で `A₀(Mᵢ)=A(Mᵢ)`、Thm B(5) が TI、D(4) seed が nonemptiness。
+  - **(d)-Type-II** (`κ(Mᵢ)≠∅`): 真の κ-Hall `Kᵢ≠⊥`。`A₀(Mᵢ)−M_{iσ}` を A(Mᵢ)-membership で
+    2 piece に split (`aSet_mem_conj_iff_of_hatMsigma`)、Thm B(5) (`A(Mᵢ)−M_{iσ}`) + Thm C(9)
+    (`theoremC_paired_structure` conjunct 10, `A₀(Mᵢ)−A(Mᵢ)`) の union が TI。nonemptiness =
+    D(4) seed が `𝒞_G(Kᵢ^#)` を避ける (`κ∩τ₂=∅`, `not_mem_conjClassSet_kappaHall_sharp_of_tau2`)。
+  - ⚠ **本 issue の「Thm C(5) が必要」判断は over-cautious だった**: C(5) は不要。BG の
+    "by Theorem C(5) and a short argument" は `A₀(Mᵢ) − A(Mᵢ)` の TI = 既存 **C(9)** で足り、
+    2 piece の union TI は既存の order-determined cross-piece exclusion (`hPieceInv` 相当、
+    `mem_U_sup_Msigma_iff_isPiElement_kappa_compl`+`isPiElement_conj`) で閉じる。
+  - 新 decl: `a0Set_bot` / `exists_kappa_hall_pair` / `not_mem_conjClassSet_kappaHall_sharp_of_tau2`
+    / `aSet_mem_conj_iff_of_hatMsigma` / `clause_d_of_neighbour` (all axiom-clean、sorry-free)。
+  - ⚠ **AxiomsCheck.lean の `theoremII_tamelyImbedded` docstring が stale** (「Conditional on `hd`…
+    Type-II needs Thm C(5)」) — hub が wire-in 時に更新要 (assert 自体は名前参照で pass 継続)。
 
 ## 完了条件
 

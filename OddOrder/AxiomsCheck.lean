@@ -8493,13 +8493,15 @@ placing `M` and its conjugate in `𝓜_σ(x)`; Thm 14.4 sharp transitivity + `N_
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_neighbour_conjugator_in_M
 /-! **BG Theorem II packaging** (`S16_MainResults.TheoremIIPackaging`, `theoremII_tamelyImbedded`):
 `A(M) = ASet M U` is a tamely imbedded subset of `G` (`TamelyImbedded M (ASet M U)`) for an
-arbitrary maximal `M` of a minimal-simple odd `G`.  Assembles (Ti) (`theoremII_tame_embedding`),
-the full (Tii) system of supporting subgroups — (a) via Thm E(2) σ-disjointness, (b) via Thm D(4)
-complements, (c) `coprime_centralizer_of_neighbour` via Lemma 14.13(a), (e) via Lemma 14.13(b) +
-Thm D(3) — and (Tiii) `frobeniusTypeI_of_neighbour_typeII` (Thm D(4)'s `IsTypeP2 N → IsTypeF M`).
-**Conditional on the explicit hypothesis `hd`** = clause (d) `A₀(Mᵢ) − Hᵢ` TI for each neighbour
-maximal `Mᵢ`: Type-I is provable (Thm B(5)), but Type-II needs the genuinely-missing §16 theorem
-"`A₀(Mᵢ)` is a TI-subset for Type-II `Mᵢ`" (Thm C(5) + short argument; issue 3019).  Axiom-clean. -/
+arbitrary maximal `M` of a minimal-simple odd `G`, **unconditionally** (hypotheses: only the
+standard `theoremII_tame_embedding` shape `hG, hM, K≤M, U≤M, hK, hU`).  Assembles (Ti)
+(`theoremII_tame_embedding`), the full (Tii) system of supporting subgroups — (a) via Thm E(2)
+σ-disjointness, (b) via Thm D(4) complements, (c) `coprime_centralizer_of_neighbour` via Lemma
+14.13(a), (d) `clause_d_of_neighbour`, (e) via Lemma 14.13(b) + Thm D(3) — and (Tiii)
+`frobeniusTypeI_of_neighbour_typeII` (Thm D(4)'s `IsTypeP2 N → IsTypeF M`).  Clause (d)
+(`A₀(Mᵢ) − Hᵢ` nonempty TI): Type-I via Thm B(5) with the type-F identity `A₀(Mᵢ)=A(Mᵢ)`; Type-II
+via Thm B(5) + Thm C(9) glued by the order-determined cross-piece exclusion (BG's "distinct
+orders"; Thm C(5) turned out **not** to be needed).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tamelyImbedded
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_systemOfSupportingSubgroups
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_conj_smul_eq_of_le_of_card_prime
