@@ -160,6 +160,68 @@ theorem natCard_fixedByConjugation (n : ℕ) (hn : 0 < n) :
   }
   rw [Nat.card_congr e, natCard_trace_ker n hn]
 
+/-- The canonical base-field embedding is fixed by quadratic conjugation. -/
+@[simp]
+theorem star_algebraMap (n : ℕ) (a : BaseField n) :
+    star (algebraMap (BaseField n) (Field n) a) =
+      algebraMap (BaseField n) (Field n) a := by
+  change conjugation n (algebraMap (BaseField n) (Field n) a) =
+    algebraMap (BaseField n) (Field n) a
+  exact (conjugation n).commutes a
+
+/-- The star-fixed elements are exactly the image of the canonical base-field embedding. -/
+theorem mem_range_algebraMap_iff_star_eq
+    (n : ℕ) (hn : 0 < n) (x : Field n) :
+    x ∈ Set.range (algebraMap (BaseField n) (Field n)) ↔ star x = x := by
+  constructor
+  · rintro ⟨a, rfl⟩
+    exact star_algebraMap n a
+  · intro hx
+    let f : BaseField n → {y : Field n // star y = y} :=
+      fun a => ⟨algebraMap (BaseField n) (Field n) a, star_algebraMap n a⟩
+    have hf_injective : Function.Injective f := by
+      intro a b hab
+      exact (algebraMap (BaseField n) (Field n)).injective
+        (congrArg Subtype.val hab)
+    have hf_card :
+        Nat.card (BaseField n) = Nat.card {y : Field n // star y = y} := by
+      rw [natCard_baseField n hn, natCard_fixedByConjugation n hn]
+    have hf_surjective : Function.Surjective f :=
+      ((Nat.bijective_iff_injective_and_card f).2
+        ⟨hf_injective, hf_card⟩).surjective
+    obtain ⟨a, ha⟩ := hf_surjective ⟨x, hx⟩
+    exact ⟨a, congrArg Subtype.val ha⟩
+
+/-- Every star-fixed field element is a Hermitian norm. -/
+theorem exists_mul_star_eq_of_star_eq
+    (n : ℕ) (hn : 0 < n) {c : Field n} (hc : star c = c) :
+    ∃ x : Field n, x * star x = c := by
+  rw [← mem_range_algebraMap_iff_star_eq n hn c] at hc
+  obtain ⟨a, rfl⟩ := hc
+  obtain ⟨x, hx⟩ := FiniteField.norm_surjective (BaseField n) (Field n) a
+  refine ⟨x, ?_⟩
+  rw [← algebraMap_norm_eq_mul_star n x, hx]
+
+/-- A nonzero star-fixed field element has a nonzero Hermitian-norm preimage. -/
+theorem exists_ne_zero_mul_star_eq_of_star_eq
+    (n : ℕ) (hn : 0 < n) {c : Field n} (hc : star c = c) (hc0 : c ≠ 0) :
+    ∃ x : Field n, x ≠ 0 ∧ x * star x = c := by
+  obtain ⟨x, hx⟩ := exists_mul_star_eq_of_star_eq n hn hc
+  refine ⟨x, ?_, hx⟩
+  intro hx0
+  apply hc0
+  simpa only [hx0, star_zero, zero_mul] using hx.symm
+
+/-- Unit-valued form of Hermitian norm surjectivity on the star-fixed locus. -/
+theorem exists_unit_mul_star_eq_of_star_eq
+    (n : ℕ) (hn : 0 < n) (c : (Field n)ˣ)
+    (hc : star (c : Field n) = (c : Field n)) :
+    ∃ x : (Field n)ˣ,
+      (x : Field n) * star (x : Field n) = (c : Field n) := by
+  obtain ⟨x, hx0, hx⟩ :=
+    exists_ne_zero_mul_star_eq_of_star_eq n hn hc (Units.ne_zero c)
+  exact ⟨Units.mk0 x hx0, hx⟩
+
 /-- Positive-degree quadratic conjugation is genuinely nontrivial. -/
 theorem exists_not_fixed_conjugation (n : ℕ) (hn : 0 < n) :
     ∃ x : Field n, star x ≠ x := by
