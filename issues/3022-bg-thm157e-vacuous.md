@@ -295,8 +295,14 @@ BG は `X = X₁` を示して `p = |X|`
           `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot`)。偽なら (e3) (Singer 鎖 =
           `card_opiCore_eq_prime_cube_singer` + `card_dvd_succ_of_primeAction_extraspecial`)。
 
-      **⚠ 手順 B の唯一の未形式化サブ補題 = `|K*| = p` (Coq `oKs`, `BGsection15.v:1178`)**
-      (2026-07-19 調査)。type `P₁` の (e2) 分岐で `Z q = K*` の場合に `q = p` を出すのに要る。
+      **✅ 手順 B の唯一の未形式化サブ補題 `|K*| = p` は完了 (2026-07-19)**。
+      `kstar_card_eq_witness_prime_of_isTypeP1` (`WitnessPGroup.lean`, sorry-free・axiom-clean、
+      AxiomsCheck 登録済)。前提の一般補題
+      `commutator_le_oPiCore_of_isMulCommutative_compl_of_isNilpotent`
+      (`S10_HallStructure.lean:396`、任意の `π` で一般化・axiom-clean) も同日完了。
+      ⟹ **15.7(e) に未形式化の数学は残っていない。手順 B の残りは既存補題の cite のみ。**
+
+      (以下は調査時の記録。) type `P₁` の (e2) 分岐で `Z q = K*` の場合に `q = p` を出すのに要る。
 
       - **既存の `kstar_le_opiCore_of_inputs` (`Theorem152Helpers.lean:268`) は使えない** —
         仮説に `hne : MF M ≠ Msigma M` を持つが、15.7(e) の設定は逆の `M_F = M_σ` (`hmf`)。
