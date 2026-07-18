@@ -102,8 +102,17 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       `typeF_exponent_dvd_sub_one_of_invariant_card` + `typeF_nonabelian_cyclic_opiCore_compl`)。
       分岐 3 (`|O_p(H)| = p³`, `|M/H| ∣ p+1`, type `P₁`) は未形式化とみられる — 要確認。
 - [ ] **`p = |X|` の結合**: (e) の `p` を独立存在量化でなく `X` の位数として述べる。
-- [ ] **(d) の追加**: 既存の `E3_eq_bot_of_not_fittingIsTI` を結論に入れ、`E₂ ⊲ E` を
-      `E23_normal` + `E₃ = ⊥` から合成し、`E/E₂ ≅ E₁` と `cyclic` を新規に証明する。
+- [x] **(d) の追加** (2026-07-18 完了)。`sigmaComplement_structure_of_not_fittingIsTI` として、
+      `fitting_not_ti_cases` の bundle でなく **§12 E-setup を取る独立定理**にした (BG (d) は
+      「§12-13 のとおりに取った E, E₁, E₂, E₃」についての主張なので、E-setup を引数に取る形が
+      faithful)。4 条項すべて sorry-free:
+      - `E₃ = 1` — 既存 `E3_eq_bot_of_not_fittingIsTI` を cite。
+      - `E₂ ⊲ E` — `E23_normal` (`E ≤ N(E₂ ⊔ E₃)`) に `E₃ = ⊥` を代入。
+      - `E = E₁E₂` + `E₁` が `E₂` の complement — `eq_sup` に `E₃ = ⊥` を代入し、
+        τ₁ は p-rank 1・τ₂ は p-rank 2 ゆえ τ₁ ∩ τ₂ = ∅ → `|E₁|`,`|E₂|` coprime → `E₁ ⊓ E₂ = ⊥`。
+      - `E₁` cyclic — 既存 `E1_isCyclic`。
+      印字されている `E/E₂ ≅ E₁` は `quotientE2MulEquivE1` (mathlib
+      `Subgroup.IsComplement'.QuotientMulEquiv` + `subgroupOfEquivOfLe`) として別途提供。
 - [ ] 各修正後、**恒真に潰れていないこと**を確認する (「(a) から従うか?」を必ず自問)。
 - [ ] survey の BG §15 欄と `notes/bg/s15_16_audit.md` を更新。
 
