@@ -129,6 +129,23 @@ theorem exists_mem_conjAct_smul_le_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prim
   rwa [Subgroup.map_subgroupOf_eq_of_le (conjAct_smul_le_of_mem hYL g.2),
     Subgroup.map_subgroupOf_eq_of_le hQL] at hmap
 
+/-- **`p`-部分群は Sylow に伸びる, 相対版**: `Y ≤ K` が `p`-群なら `Y ≤ S ≤ K` で
+`S` が `K` の Sylow `p`-部分群となる `S` が取れる (すべて `Subgroup G` の言葉)。
+
+`↥K` の `IsPGroup.exists_le_sylow` を `K.subtype` で押し出しただけ。 -/
+theorem exists_sylow_ge_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime] {K Y : Subgroup G}
+    (hYK : Y ≤ K) (hY : IsPGroup p ↥Y) :
+    ∃ S : Subgroup G, Y ≤ S ∧ S ≤ K ∧ IsPGroup p ↥S ∧ ¬ p ∣ S.relIndex K := by
+  obtain ⟨R, hR⟩ := (hY.comap_subtype (K := K)).exists_le_sylow
+  refine ⟨(R : Subgroup ↥K).map K.subtype, ?_, Subgroup.map_subtype_le _,
+    R.isPGroup'.map K.subtype, ?_⟩
+  · exact fun y hy => ⟨⟨y, hYK hy⟩, hR (Subgroup.mem_subgroupOf.mpr hy), rfl⟩
+  · have hsub : ((R : Subgroup ↥K).map K.subtype).subgroupOf K = (R : Subgroup ↥K) :=
+      Subgroup.comap_map_eq_self_of_injective K.subtype_injective _
+    change ¬ p ∣ (((R : Subgroup ↥K).map K.subtype).subgroupOf K).index
+    rw [hsub]
+    exact R.not_dvd_index
+
 section /- 9D: Bartels Step 2 の部品 — 真部分群による生成 -/
 
 /-- `Nat.Coprime a b` なら `x ∈ ⟨x^a⟩ ⊔ ⟨x^b⟩` (Bezout)。 -/
@@ -655,6 +672,51 @@ theorem dvd_relIndex_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P R 
 
 end
 
+/-- **正規化条件を ambient へ持ち上げる**: `S ≤ K` で `x ∈ K` が `↥K` の中で
+`S.subgroupOf K` を正規化するなら `x` は `G` の中で `S` を正規化する。
+
+`K` の外の `y` については `y ∉ S` かつ `x y x⁻¹ ∉ K ⊇ S` なので条件は両辺とも偽で自明。 -/
+theorem mem_normalizer_of_mem_normalizer_subgroupOf {K S : Subgroup G} (hSK : S ≤ K)
+    {x : ↥K} (hx : x ∈ Subgroup.normalizer (S.subgroupOf K)) :
+    (x : G) ∈ Subgroup.normalizer S := by
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  constructor
+  · intro hy
+    have hyK : y ∈ K := hSK hy
+    have hmem : (⟨y, hyK⟩ : ↥K) ∈ S.subgroupOf K := hy
+    have hres := (Subgroup.mem_normalizer_iff.mp hx ⟨y, hyK⟩).mp hmem
+    simpa [Subgroup.mem_subgroupOf] using hres
+  · intro hy
+    have hyK : y ∈ K := by
+      have h1 : (x : G) * y * (x : G)⁻¹ ∈ K := hSK hy
+      have hrw : y = (x : G)⁻¹ * ((x : G) * y * (x : G)⁻¹) * (x : G) := by group
+      rw [hrw]
+      exact mul_mem (mul_mem (inv_mem x.2) h1) x.2
+    have hres := (Subgroup.mem_normalizer_iff.mp hx ⟨y, hyK⟩).mpr
+      (by simpa [Subgroup.mem_subgroupOf] using hy)
+    simpa [Subgroup.mem_subgroupOf] using hres
+
+/-- **`p`-群の中では真部分群の正規化群が真に大きい** (冪零群の normalizer condition):
+`S < P` で `P` が `p`-群なら `S < P ⊓ N_G(S)`。
+
+Step 4 の Sylow 結論部と Step 5 の「`R ⊓ P > S`」の両方で使う。 -/
+theorem lt_inf_normalizer_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {S P : Subgroup G}
+    (hP : IsPGroup p ↥P) (hlt : S < P) : S < P ⊓ Subgroup.normalizer S := by
+  haveI : Group.IsNilpotent ↥P := hP.isNilpotent
+  have hsub : S.subgroupOf P < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro h
+    rw [Subgroup.subgroupOf_eq_top] at h
+    exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl S)
+  obtain ⟨x, hxN, hxS⟩ :=
+    SetLike.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
+  refine lt_of_le_of_ne (le_inf hlt.le Subgroup.le_normalizer) fun heq => hxS ?_
+  have hxmem : (x : G) ∈ P ⊓ Subgroup.normalizer S :=
+    ⟨x.2, mem_normalizer_of_mem_normalizer_subgroupOf hlt.le hxN⟩
+  rw [← heq] at hxmem
+  exact hxmem
+
 /-- **Step 4 の Sylow 結論部**: `P` が `M` の Sylow `p`-部分群で `N_G(P) ≤ M` なら
 `P` は `G` の Sylow `p`-部分群 (指数が `p` と互いに素)。
 
@@ -668,43 +730,16 @@ theorem not_dvd_index_of_normalizer_le {p : ℕ} [Fact p.Prime] [Finite G]
   have hPQeq : P = (Q : Subgroup G) := by
     by_contra hne
     have hlt : P < (Q : Subgroup G) := lt_of_le_of_ne hPQ hne
-    haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
-    have hsub : P.subgroupOf (Q : Subgroup G) < ⊤ := by
-      rw [lt_top_iff_ne_top]
-      intro h
-      rw [Subgroup.subgroupOf_eq_top] at h
-      exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl P)
-    obtain ⟨x, hxN, hxP⟩ :=
-      SetLike.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
-    -- `x` は `G` の中でも `P` を正規化する.
-    have hxG : (x : G) ∈ Subgroup.normalizer P := by
-      rw [Subgroup.mem_normalizer_iff]
-      intro y
-      constructor
-      · intro hy
-        have hyQ : y ∈ (Q : Subgroup G) := hPQ hy
-        have hmem : (⟨y, hyQ⟩ : ↥(Q : Subgroup G)) ∈ P.subgroupOf (Q : Subgroup G) := hy
-        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mp hmem
-        simpa [Subgroup.mem_subgroupOf] using hres
-      · intro hy
-        have hyQ : y ∈ (Q : Subgroup G) := by
-          have h1 : (x : G) * y * (x : G)⁻¹ ∈ (Q : Subgroup G) := hPQ hy
-          have hrw : y = (x : G)⁻¹ * ((x : G) * y * (x : G)⁻¹) * (x : G) := by group
-          rw [hrw]
-          exact mul_mem (mul_mem (inv_mem x.2) h1) x.2
-        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mpr
-          (by simpa [Subgroup.mem_subgroupOf] using hy)
-        simpa [Subgroup.mem_subgroupOf] using hres
+    obtain ⟨x, ⟨hxQ, hxN⟩, hxP⟩ :=
+      SetLike.exists_of_lt (lt_inf_normalizer_of_lt_of_isPGroup Q.isPGroup' hlt)
     -- `R = P ⊔ ⟨x⟩` は `M` の中の `P` より真に大きい `p`-部分群.
-    have hxM : (x : G) ∈ M := hN hxG
-    have hxnotP : (x : G) ∉ P := fun h => hxP h
-    set R : Subgroup G := P ⊔ Subgroup.zpowers (x : G) with hRdef
-    have hRQ : R ≤ (Q : Subgroup G) := sup_le hPQ ((Subgroup.zpowers_le).mpr x.2)
+    have hxM : x ∈ M := hN hxN
+    set R : Subgroup G := P ⊔ Subgroup.zpowers x with hRdef
+    have hRQ : R ≤ (Q : Subgroup G) := sup_le hPQ ((Subgroup.zpowers_le).mpr hxQ)
     have hRM : R ≤ M := sup_le hPM ((Subgroup.zpowers_le).mpr hxM)
     have hPR : P < R := by
-      refine lt_of_le_of_ne le_sup_left fun heq => hxnotP ?_
-      have : (x : G) ∈ R :=
-        (le_sup_right : Subgroup.zpowers (x : G) ≤ R) (Subgroup.mem_zpowers _)
+      refine lt_of_le_of_ne le_sup_left fun heq => hxP ?_
+      have : x ∈ R := (le_sup_right : Subgroup.zpowers x ≤ R) (Subgroup.mem_zpowers _)
       rwa [← heq] at this
     have hRp : IsPGroup p ↥R := Q.isPGroup'.to_le hRQ
     have hdvd : p ∣ P.relIndex R := dvd_relIndex_of_lt_of_isPGroup hRp hPR
@@ -816,6 +851,95 @@ theorem bartels_step_four_unique {G : Type u} [Group G] [Finite G] (hIH : Bartel
   have hstN := setwiseStabilizer_kappaSet_eq_of_isCoatom hIH hN hXp hPN hPp hPidxN hPbot
     hmem hne hXsub
   exact hstN.symm.trans hstM
+
+section /- 9D: Bartels Step 5 — `X` を含む極大部分群の一意性 -/
+
+/-- **Step 5 の候補**: `S` は `X` を含み, かつ相異なる 2 つの極大部分群 `A`, `B` の共通部分
+`A ⊓ B` の Sylow `p`-部分群である。
+
+書籍 p. 293 はこの条件を満たす `S` のうち `|S|` が最大のものを選ぶ。本形式化では
+**部分群順序に関する極大元**を取る — 用途は「`S` より真に大きい候補は存在しない」だけ
+なので, 位数比較を経由する必要がない。 -/
+def IsBartelsPairSylow (p : ℕ) (X S : Subgroup G) : Prop :=
+  ∃ A B : Subgroup G, IsCoatom A ∧ IsCoatom B ∧ A ≠ B ∧
+    X ≤ S ∧ S ≤ A ⊓ B ∧ IsPGroup p ↥S ∧ ¬ p ∣ S.relIndex (A ⊓ B)
+
+/-- **Bartels (9.28) Step 5** (書籍 p. 293): 最小反例の `X` を含む極大部分群は一意。
+
+背理法。`X` を含む相異なる極大部分群の対 `(A,B)` に対する `S ∈ Syl_p(A ⊓ B)` (`X ≤ S`)
+のうち極大なものを取る (`IsBartelsPairSylow`)。
+* `S ∈ Syl_p(G)` なら Step 4 後半 (`P` を含む極大部分群の一意性) で `A = B` となり矛盾。
+* `S ◁ G` なら `X ◁◁ S ◁ G` ゆえ `X ◁◁ G`, Lem 9.29(a) で `X^{(G)} = X` が subnormal と
+  なって最小反例の仮定に矛盾。よって `N_G(S) ≠ ⊤` で, `N_G(S) ≤ R` なる極大 `R` が取れる。
+* `S ≤ P ∈ Syl_p(A)` は Step 4 前半で `Syl_p(G)` の元。`S ∉ Syl_p(G)` ゆえ `S < P` で,
+  `p`-群の normalizer condition から `S < P ⊓ N_G(S) ≤ P ⊓ R ≤ A ⊓ R`。よって `A ⊓ R` の
+  Sylow `p` は `S` より真に大きく, `S` の極大性から `A = R`。同様に `B = R` で `A = B`,
+  これが矛盾。 -/
+theorem bartels_step_five {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hXp : IsPGroup p ↥X) (hXbot : X ≠ ⊥)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
+    (hXsub : ¬ (strongClosure X).IsSubnormal)
+    {M N : Subgroup G} (hM : IsCoatom M) (hN : IsCoatom N) (hXM : X ≤ M) (hXN : X ≤ N) :
+    M = N := by
+  by_contra hMN
+  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  haveI : WellFoundedGT (Subgroup G) := Finite.to_wellFoundedGT
+  have hcand : ∃ S : Subgroup G, IsBartelsPairSylow p X S := by
+    obtain ⟨S, hXS, hSMN, hSp, hSidx⟩ := exists_sylow_ge_of_isPGroup (le_inf hXM hXN) hXp
+    exact ⟨S, M, N, hM, hN, hMN, hXS, hSMN, hSp, hSidx⟩
+  obtain ⟨S, hS, hSmax⟩ := exists_maximal_of_wellFoundedGT (IsBartelsPairSylow p X) hcand
+  obtain ⟨A, B, hA, hB, hAB, hXS, hSAB, hSp, hSidx⟩ := hS
+  have hSA : S ≤ A := hSAB.trans inf_le_left
+  have hSB : S ≤ B := hSAB.trans inf_le_right
+  have hSbot : S ≠ ⊥ := fun h => hXbot (le_bot_iff.mp (h ▸ hXS))
+  -- (1) `S ∉ Syl_p(G)`: さもなくば Step 4 後半で `A = B`.
+  have hSidxG : p ∣ S.index := by
+    by_contra hdvd
+    have hSA' : ¬ p ∣ S.relIndex A := fun h => hdvd <| by
+      rw [← Subgroup.relIndex_mul_index hSA]; exact h.mul_right _
+    exact hAB (bartels_step_four_unique hIH hA (hXS.trans hSA) hXp hSA hSp hSA' hSbot
+      hne hXsub hB hSB).symm
+  -- (2) `S` は `G` に normal でない: さもなくば `X ◁◁ G` で `X^{(G)} = X` が subnormal.
+  have hNStop : Subgroup.normalizer (S : Set G) ≠ ⊤ := by
+    intro htop
+    haveI : S.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    haveI : Group.IsNilpotent ↥S := hSp.isNilpotent
+    have hXsn : X.IsSubnormal :=
+      Subgroup.IsSubnormal.trans hXS
+        (OddOrder.Isaacs.Ch02.isSubnormal_of_isNilpotent_finite (X.subgroupOf S))
+        ‹S.Normal›.isSubnormal
+    have heq : strongClosure X = X :=
+      le_antisymm (strongClosure_le_of_isSubnormal hXsn X le_rfl) (le_strongClosure X)
+    refine hXsub ?_
+    rw [heq]
+    exact hXsn
+  -- (3) `N_G(S)` を含む極大部分群 `R`.
+  obtain ⟨R, hR, hNSR⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (S : Set G))).resolve_left hNStop
+  have hSR : S ≤ R := Subgroup.le_normalizer.trans hNSR
+  -- (4) `S` を含む任意の極大部分群 `C` について `C = R`.
+  have key : ∀ C : Subgroup G, IsCoatom C → S ≤ C → C = R := by
+    intro C hC hSC
+    obtain ⟨P, hSP, hPC, hPp, hPidx⟩ := exists_sylow_ge_of_isPGroup hSC hSp
+    have hPbot : P ≠ ⊥ := fun h => hSbot (le_bot_iff.mp (h ▸ hSP))
+    -- `P ∈ Syl_p(G)` (Step 4 前半) なので `S ≠ P`, すなわち `S < P`.
+    have hPG : ¬ p ∣ P.index :=
+      bartels_step_four hIH hC (hXS.trans hSC) hXp hPC hPp hPidx hPbot hne hXsub
+    have hSPlt : S < P := lt_of_le_of_ne hSP fun h => hPG (h ▸ hSidxG)
+    -- `p`-群の normalizer condition: `S < P ⊓ N_G(S) ≤ P ⊓ R`.
+    have hlt : S < P ⊓ R :=
+      lt_of_lt_of_le (lt_inf_normalizer_of_lt_of_isPGroup hPp hSPlt) (inf_le_inf le_rfl hNSR)
+    by_contra hCR
+    -- `C ⊓ R` の Sylow `p` は `S` より真に大きい候補 — 極大性に矛盾.
+    obtain ⟨S', hPRS', hS'CR, hS'p, hS'idx⟩ :=
+      exists_sylow_ge_of_isPGroup (inf_le_inf hPC le_rfl) (hPp.to_le (inf_le_left : P ⊓ R ≤ P))
+    have hSS' : S < S' := lt_of_lt_of_le hlt hPRS'
+    have hS'cand : IsBartelsPairSylow p X S' :=
+      ⟨C, R, hC, hR, hCR, hXS.trans hSS'.le, hS'CR, hS'p, hS'idx⟩
+    exact hSS'.ne (le_antisymm hSS'.le (hSmax hS'cand hSS'.le))
+  exact hAB ((key A hA hSA).trans (key B hB hSB).symm)
+
+end
 
 end OddOrder.Isaacs.Ch09
 
