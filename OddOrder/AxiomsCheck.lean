@@ -10,6 +10,19 @@ import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -152,7 +165,15 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 /-!
@@ -191,7 +212,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 8500
+set_option linter.style.longFile 9100
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -224,6 +245,354 @@ elab "#assert_only_allowed_axioms " name:ident : command => do
 disallowed axiom(s):{indentD m!"{bad.toList}"}"
 
 /-! ### Per-chapter flagship checks. -/
+
+-- Shared prime-complement residual API used by Peterfalvi Part II, Ch. I, section 3.
+#assert_only_allowed_axioms Subgroup.normalClosure_eq_iSup_map_conj
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_eq_normalClosure
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_le_of_coprime_index
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
+
+-- Quadratic finite-field and Hermitian trace infrastructure for the PSU(3,q) target.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_baseField
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_field
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.conjugation_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.conjugation_twice
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.star_eq_conjugation
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.algebraMap_trace_eq_add_star
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.algebraMap_norm_eq_mul_star
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.finrank_trace_ker
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_trace_ker
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_trace_fiber
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.trace_eq_zero_iff_star_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_fixedByConjugation
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.star_algebraMap
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.mem_range_algebraMap_iff_star_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_mul_star_eq_of_star_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_zero_mul_star_eq_of_star_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_unit_mul_star_eq_of_star_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_not_fixed_conjugation
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_add_star_eq_mul_star
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_add_star_eq_mul_star
+
+-- Hermitian root group and q^3 + 1 unital for the PSU(3,q) target.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.fst_mul
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.snd_mul
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.fst_inv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.snd_inv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.equivSigma
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.natCard
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.isPGroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.affine_ne_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.infinity_ne_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.natCard
+
+-- Standard root, determinant-one torus, and Weyl generators for PSU(3,q).
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.rootPermHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.existsUnique_rootPerm_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.specialTorusWeightHom_eq_powMonoidHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.torusScaleHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.torusPerm_mul_rootPerm_mul_inv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_psuTorus_standard
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.reciprocal_reciprocal
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.weylPerm_apply_self
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.psuTorusPerm_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.weylPerm_mul_psuTorusPerm_mul_weylPerm
+
+-- Shared defining field and Tits twist for the Suzuki target in Peterfalvi Part II.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_field
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.iterateFrobeniusEquiv_period
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_symm
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_symm_apply
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_twice
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_sq
+
+-- Standard root group in ovoid coordinates for the Suzuki target.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.mul_def
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.one_def
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.inv_def
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.fst_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.snd_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.fst_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.snd_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.fst_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.snd_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.sq_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.sq_eq_one_iff
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.pow_four_eq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.mem_centerLine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.mk_mem_centerLine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.centerLine_le_center
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.sq_eq_one_of_mem_centerLine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.sq_mem_centerLine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.centerLineEquivField
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.centerLineMulEquivField
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.equivProd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.natCard_centerLine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.natCard
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.isPGroup
+
+-- Anisotropic norm and q^2 + 1 point carrier for the Suzuki ovoid.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_zero_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_eq_zero_iff
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_reciprocal
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm_mk
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm_eq_zero_iff_eq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_inj
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_ext
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affine_ne_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.infinity_ne_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk_ne_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.infinity_ne_affineMk
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.affineMk_inj
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.eq_infinity_or_eq_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.cases
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivOptionProd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivOptionProd_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivOptionProd_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.natCard
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.equivFin
+
+-- Standard root, torus, and Weyl permutations of the Suzuki ovoid.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPerm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPerm_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPerm_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom_apply_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom_apply_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.rootPermHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.existsUnique_rootPerm_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_ne_zero
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_fst
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_snd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_symm_fst
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_symm_snd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScaleHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScaleHom_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_affineMk
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.torusPerm_mul_rootPerm_mul_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.origin
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.origin_eq_affineMk_zero_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_fst
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_snd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_suzukiNorm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.suzukiNorm_ne_zero_of_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_weylAffine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_origin
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_affine_of_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_affineMk_of_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.suzukiNorm_ne_zero_of_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylFun_involutive
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_infinity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_origin
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_affine_of_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_affineMk_of_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_apply_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_symm
+
+-- A perfect quasiprimitive group with a solvable point stabilizer is simple.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isSimpleGroup_of_isPerfect_of_isQuasiPreprimitive_of_isSolvable_stabilizer
+
+-- The generated Suzuki permutation group and its doubly transitive action.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardGeneratorSet
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootPerm_mem_standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusPerm_mem_standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylPerm_mem_standardPermGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_le
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_rootHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_torusHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_smul_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_smul_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_smul_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_smul_affine
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_smul_affineMk
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_origin
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_affine_of_ne_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_smul_affineMk_of_ne_zero
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_sq_eq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_mul_rootHom_mul_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_exists_smul_eq_infinity
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isPretransitive
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_infinityStabilizer_isPretransitive
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isMultiplyPretransitive
+
+-- The faithful root-torus semidirect product and standard Borel subgroup.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.BorelModel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.borelHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.borelHom_apply
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.borelHom_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_mem_standardBorel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_mem_standardBorel
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.mem_standardBorel_iff_existsUnique_root_torus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_le_infinityStabilizer
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardBorel
+
+-- The explicit rank-one Bruhat decomposition and exact Suzuki-group order.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_torusScale
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_torusScale
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_mul_torusHom_mul_weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatRightRoot
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatRightRoot_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_bruhatTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_bruhatTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatRightRoot_ne_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_bruhatRightRoot_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_mul_rootHom_mul_weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.InStandardBruhatCells
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBruhatDecomposition
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_eq_infinityStabilizer
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardPermGroup
+
+-- Perfectness, solvable Borel stabilizer, and simplicity of the standard Suzuki group.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_eq_one_iff
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_fixedPointFree
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_mul_inv_surjective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.commutator_torusHom_rootHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.commutator_weylElement_torusHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_mem_commutator
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_mem_commutator
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_mem_commutator
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_isSolvable
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.commutator_standardPermGroup_eq_top
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isSimpleGroup
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A
@@ -6887,8 +7256,181 @@ through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_com
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
 (`OddOrder/Peterfalvi/Appendices/`).  Only fully unconditional, axiom-clean declarations are
-registered here; results still conditional on an open `sorry` (e.g. Appendix I's Lemma
-non-cyclic case, deferred to Gorenstein 5.4.10 / issue 2004) are intentionally absent. -/
+registered here. -/
+
+/-! **Peterfalvi, Appendix I (Huppert), Lemma and Proposition 1**: an odd `p`-group acting
+faithfully on an elementary abelian `q`-group with constant nonzero point-stabilizer order is
+cyclic and fixed-point-free.  The irreducible non-cyclic case uses a normal elementary abelian
+subgroup `R` of order `p²`; the fixed spaces of its order-`p` subgroups form a permuted
+independent family spanning the module.  Applying the per-prime result to `O_p(F(D))` gives the
+cyclic, fixed-point-free Fitting subgroup in Proposition 1.  Fully unconditional and
+axiom-clean (issue 2040). -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.pGroup_cyclic_fixedPointFree
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.fitting_cyclic_fixedPointFree
+
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 2**: the elements of `D̄` inverted by
+the involution `τ` are exactly `F(D̄)`.  The reverse inclusion constructs the inverted
+subgroup in `D̄/F(D̄)` and uses Fitting maximality.  Fully unconditional and axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inverted_mem_fitting
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_fitting_iff_tau_eq_inv
+
+/-! The next step constructs the full preimage `A` of `F(D̄)`, proves `K ⊆ A`, and
+identifies `A ∩ V = W` from the trivial `τ`-fixed locus in `F(D̄)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_fittingPreimage_of_mem_KSet
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingPreimage_inf_V
+
+/-! Applying §1 Lemma (a) to the full preimage `A` gives `A = KW`; the
+quotient-preimage cardinal formula then gives `|F(D̄)| = |K|`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingPreimageInG_eq_KSet_mul_W
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_fitting_Dbar_eq_ncard_KSet
+
+/-! A generator of cyclic `F(D̄)` lifts through `A = KW` to an element of `K`.
+The order identity forces `K = ⟨k⟩`; bundling `K` as its closure yields the
+cyclic subgroup normal in `D` asserted by Proposition 2. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_KSet_generator
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_le_D
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_normal
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_K
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_isCyclic
+
+/-! **Peterfalvi Appendix III, Definition 1**: Suzuki `2`-groups are encoded
+honestly as nonabelian `2`-groups with at least two involutions and a cyclic
+subgroup of automorphisms acting regularly on the involutions.  Faithfulness is
+built into the subgroup inclusion in `MulAut`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
+
+/-! **Peterfalvi Part II, Ch. I §2, Corollary**: nilpotence makes a Sylow
+`2`-subgroup `S ≤ Q` characteristic.  The cyclic subgroup `K` acts on `S`,
+and §1 Proposition 3 gives a regular action on its nonidentity involutions;
+therefore `S` is commutative or an honest Suzuki `2`-group. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByK
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sylowTwo_isMulCommutative_or_isSuzuki2Group
+
+/-! **Peterfalvi Part II, Ch. I §2, definition before Proposition 3**:
+`𝓛(F,A) = (F_add ⋊ Fˣ) ⋊ A`, with the natural field-automorphism action.
+The automorphism group of a finite field, and hence every subgroup `A`, is cyclic. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.fieldRingAutOnAffine
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.ringAut_isCyclic_of_finite
+
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 3 preparation**: the image `K̄` is
+`F(D̄)`, the image `V̄` is the distinguished-point stabilizer, the Fitting action on `Q₀`
+is irreducible, and `D̄ = K̄ ⋊ V̄`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Kbar_eq_fitting
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Vbar_eq_pointStabilizer
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingAction_irreducible
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.KbarSemidirectEquiv
+
+/-! **Peterfalvi Part II, Ch. I §2, Proposition 3**: `F(D̄) ≅ F_qˣ`, while `V̄`
+embeds faithfully into `Aut(F_q)` and normalizes the scalar action semilinearly.  The
+three compatible component actions assemble to `Q₀ ⋊ D̄ ≅ 𝓛(F_q, A)` with
+`|F_q| = |Q₀|`; cyclicity of finite-field automorphisms gives cyclic `V̄`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_fitting_field_model
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sQ0_addEquiv_of_finrank_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fittingScalar_companion_compat
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_semilinear_field_model
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_equivariant_field_coordinates
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_semilinear_equiv
+
+#assert_only_allowed_axioms SemidirectProduct.reassoc
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectProduct.reassocOfEquivToSemilinear
+
+/-! **Peterfalvi Part II, Ch. I section 3, Lemma 1 (group-theoretic core)**:
+the target permutation degree makes `Q` a 2-group; Proposition 1(c) makes it Sylow,
+and simplicity identifies `L` with both the prime-complement residual and the join
+of the conjugates of `Q`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_isPGroup_of_card_Omega_sub_one_eq_two_pow
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sylow_two_eq_Q
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.simple_normal_oddIndex_Q_core
+
+/-! **Peterfalvi Part II, Ch. I section 3, Lemma 1 (PSL(2,q) target)**:
+the standard projective-line action supplies the power-of-two degree, PSL simplicity,
+and hence the exact residual and conjugate-join conclusions. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.psl2_degree_twoPower
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.psl2_target_simple
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_and_residual_of_psl2_target
+
+/-! **Peterfalvi Part II, Ch. I section 3, Lemma 1 (Sz(q) target)**:
+the standard ovoid action supplies the power-of-two degree, Suzuki simplicity,
+and hence the exact residual and conjugate-join conclusions. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.suzuki_degree_twoPower
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.suzuki_target_simple
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_and_residual_of_suzuki_target
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
@@ -6911,6 +7453,21 @@ of part (a) together with the semilinearity of part (b) — every `g : MulAut E`
 field automorphisms `σ_y`.  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear
+
+/-! The scalar-enhanced form retains the concrete homomorphism `T → Fˣ` and its action law. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear_with_scalar
+
+/-! **Peterfalvi, Appendix I, Proposition 2(b)**: the elementwise field automorphisms
+attached to semilinear maps form a coherent group homomorphism; on a faithful
+one-dimensional point stabilizer this homomorphism is injective. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_semilinear_companion
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_injective_semilinear_companion
 
 /-! **Peterfalvi, Appendix II (Near-Fields), Proposition 2 — irreducibility/counting + field
 structure** (`NearFields`).  The orbit-counting engine (`add_one_le_card_of_aInvariant_ne_bot`: an
