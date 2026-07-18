@@ -130,7 +130,7 @@
      bijection from `Omega` to the standard projective line. It derives
      `|Omega| - 1 = |F| = 2^n` and transports the existing Isaacs Ch08 PSL simplicity.
    - Shared support is `GroupTheory/PrimeComplementResidual.lean`; issue 9112 is closed.
-9. **Section 3 Lemma 1, concrete Sz(q) target complete; PSU(3,q) generated action, double transitivity, and standard Borel complete**.
+9. **Section 3 Lemma 1, concrete Sz(q) target complete; PSU(3,q) action, Bruhat decomposition, and exact order complete**.
    - Shared leaf `GroupTheory/SpecificGroups/Suzuki/Field.lean` constructs the field
      of order `q = 2^(2m+1)` and the Tits twist `theta(x) = x^(2^(m+1))`.
    - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
@@ -198,9 +198,20 @@
      faithful semidirect product of the root group by the determinant-one torus.
      Evaluation at the affine origin gives injectivity and a unique root--torus
      normal form; every Borel element fixes infinity.
-   - Its exact order is `q^3 * ((q^2 - 1) / gcd(q + 1, 3))`.  The reverse
-     stabilizer inclusion is deliberately reserved for the two-cell argument.
-   - Next upstream layer: prove the PSU Bruhat decomposition, then exact full-group
-     order and simplicity.
+   - Its exact order is `q^3 * ((q^2 - 1) / gcd(q + 1, 3))`.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/BruhatCoordinates.lean`
+     constructs the determinant-one Hua parameter `b / star(b)^2` and proves
+     the origin, pole, and generic affine coordinate identities. This is the
+     left-action transport of Peterfalvi Chapter IV §3 Proposition (4)--(5),
+     not a change to the source reciprocal map.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/Bruhat.lean` proves the
+     concrete Weyl--root permutation relation, the two-cell decomposition
+     corresponding to Chapter I §1 Proposition 4(a), and the reverse stabilizer
+     inclusion. Hence the standard Borel is exactly the infinity stabilizer.
+   - The same leaf computes the exact full-group order
+     `q^3 * (q^3 + 1) * ((q^2 - 1) / gcd(q + 1, 3))`; all endpoints are included
+     in `AxiomsCheck` and the full project build.
+   - Next upstream layer: prove simplicity of the concrete PSU standard group,
+     then transport it into the Section 3 Lemma 1 induction-hypothesis target.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

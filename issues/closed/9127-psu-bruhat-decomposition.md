@@ -9,12 +9,13 @@ created: 2026-07-18
 
 ## 背景
 
-Peterfalvi Part II, Chapter I §3, Lemma 1 uses the standard `PSU(3,q)`
-structure, while Chapter IV §3 identifies the reciprocal Weyl coordinates and
-the cubic Hua parameter. Issue 9126 and commit `609fdea4f` constructed the
-faithful determinant-one root--torus Borel. No open 9000-series claim owns the
-next upstream layer: the nontrivial Weyl--root relation, two Bruhat cells,
-point-stabilizer equality, and exact full group order.
+Peterfalvi Part II, Chapter I §1, Proposition 4(a) gives the standard Bruhat
+form `G \ H = H t H = H t Q`, while Chapter IV §3 identifies the reciprocal
+Weyl coordinates and the cubic Hua parameter. The resulting concrete target
+is consumed by Chapter I §3, Lemma 1. Issue 9126 and commit `609fdea4f`
+constructed the faithful determinant-one root--torus Borel. No open 9000-series
+claim owns the next upstream layer: the nontrivial Weyl--root relation, two
+Bruhat cells, point-stabilizer equality, and exact full group order.
 
 ## 作用規約の裁定（2026-07-18）
 
@@ -30,18 +31,18 @@ Peterfalvi は右作用を用い、Chapter IV §3 の reciprocal を
 
 ## やること
 
-- [ ] Construct the determinant-one Hua/Bruhat torus parameter from the nonzero
+- [x] Construct the determinant-one Hua/Bruhat torus parameter from the nonzero
   second root coordinate and prove its underlying value is `b / star(b)^2`.
-- [ ] Use `weylReciprocal u` as the left root and Peterfalvi's `reciprocal u` as
+- [x] Use `weylReciprocal u` as the left root and Peterfalvi's `reciprocal u` as
   the right root, and prove the coordinate identities needed for the nontrivial
   relation `w R(u) w = b₁ w b₂`.
-- [ ] Prove the Weyl--root relation as equality of concrete unital permutations,
+- [x] Prove the Weyl--root relation as equality of concrete unital permutations,
   including pole, origin, and generic affine cases.
-- [ ] Prove inverse closure of the standard generators and use closure induction to
+- [x] Prove inverse closure of the standard generators and use closure induction to
   obtain the honest two-cell cover `G = B ∪ B w B` for `0 < n`.
-- [ ] Deduce `standardBorel = stabilizer infinity` and the exact group order
+- [x] Deduce `standardBorel = stabilizer infinity` and the exact group order
   `q^3 * (q^3 + 1) * ((q^2 - 1) / gcd(q + 1, 3))`.
-- [ ] Wire the Bruhat leaves into the project and axiom audit; update the
+- [x] Wire the Bruhat leaves into the project and axiom audit; update the
   Peterfalvi frontier after strict, module, audit, and full builds pass.
 
 ## 完了条件
@@ -59,3 +60,16 @@ Upstream: issue 9126, commit `609fdea4f`,
 `SpecificGroups/Suzuki/Bruhat.lean`. Text reference: Peterfalvi Part II,
 Chapter IV §3 Proposition and Corollary 2 (pp. 129-132). Next consumer: the
 exact PSU simplicity and induction-hypothesis target.
+
+## 完了記録 (2026-07-18)
+
+- Commit `867a37f64` fixed the source/Lean action dictionary by retaining
+  Peterfalvi’s `F` and defining the transported left-action Weyl coordinate
+  `J F J` separately.
+- Commit `33e6a7a85` added `BruhatCoordinates.lean`, including the honest
+  determinant-one Hua parameter and the origin, pole, and generic identities.
+- Commit `6d2c80245` added `Bruhat.lean`, proving the concrete permutation
+  relation, two-cell cover, stabilizer equality, and exact order formula.
+- Strict checks, both leaf/module builds, `OddOrder.AxiomsCheck`, and the full
+  `lake build OddOrder` (4419 jobs) all passed. No `sorry` or new axiom was
+  introduced.
