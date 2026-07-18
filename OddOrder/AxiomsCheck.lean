@@ -6667,6 +6667,17 @@ Axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.isNilpotent_complement_of_isTypeP1_mf_ne_msigma
 
+/-! **Type-`F` `M_F`-complement is nilpotent** (`S16_MainResults`, `isNilpotent_complement_of_isTypeF`):
+for a type-`F` maximal `M`, any complement `U` of `M_F` inside `M' = M_σ` (`M_F ⊔ U = M'`, `M_F ⊓ U = ⊥`)
+is nilpotent.  For type `F`, `M_F = M_σ` (Theorem 15.2(a) contrapositive), so `M'' ≤ M_σ = M_F`
+(`derivedDerived_le_Msigma`, Lemma 15.1(a)) makes `M'/M_F` abelian, a fortiori nilpotent, and
+`U ≅ M'/M_F` via the complement iso.  Together with the type-`P` (`TypePData.U_nilpotent`) and type-`P₁`
+(`isNilpotent_complement_of_isTypeP1_mf_ne_msigma`) cases this completes the `M'/M_F` nilpotent
+(T2) content of Corollary 15.5(c) across all classified maximals.  Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.isNilpotent_complement_of_isTypeF
+
 /-! **`M_F`-complement is a genuine `M'`-complement** (`S16_MainResults`,
 `isComplement'_mf_complement_of_sup_inf`): `M_F ⊔ U = M'` and `M_F ⊓ U = ⊥` give
 `IsComplement' (M_F.subgroupOf M') (U.subgroupOf M')`.  `M_F.subgroupOf M'` is normal in `↥M'`
