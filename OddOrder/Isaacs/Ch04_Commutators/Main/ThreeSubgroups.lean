@@ -148,6 +148,91 @@ theorem iterLeftCommutator_mem_lowerCentralSeries (g : G) (gs : List G) :
   simpa using iterLeftCommutator_mem_lowerCentralSeries_add 0 g
     (by simp : g ∈ (⊤ : Subgroup G)) gs
 
+/-! ### Cor 4.12 の一般形 (任意の括弧付け)
+
+書籍 p.124 の Cor 4.12 は「**重み `n` の交換子** — `G` のコピー `n` 個を任意に括弧付けした
+部分群交換子, 例えば `⁅⁅⁅G,G⁆, ⁅G,G,G⁆⁆, ⁅⁅G,G⁆,G⁆⁆` — は全て `G^n` に含まれる」。
+上の `iterLeftCommutator_*` は**左結合の元レベル**の形しか与えないので、括弧付けを
+二分木として明示的にモデル化して書籍の形を証明する。 -/
+
+/-- **重み `n` の交換子の括弧木** (Isaacs p.124 "commutator of **weight** `n`").
+葉 = `G` のコピー, 節 = 部分群交換子 `⁅-,-⁆`. -/
+inductive CommutatorTree : Type
+  | /-- `G` のコピー 1 個 (重み 1). -/ leaf : CommutatorTree
+  | /-- 2 つの交換子の交換子 `⁅l, r⁆`. -/ node : CommutatorTree → CommutatorTree →
+      CommutatorTree
+  deriving DecidableEq
+
+namespace CommutatorTree
+
+/-- 木の**重み** = 葉の個数 (Isaacs の weight). -/
+def weight : CommutatorTree → ℕ
+  | leaf => 1
+  | node l r => l.weight + r.weight
+
+/-- 括弧木が定める `G` の部分群: 葉 ↦ `⊤ = G`, 節 ↦ `⁅-,-⁆`. -/
+def eval (G : Type*) [Group G] : CommutatorTree → Subgroup G
+  | leaf => ⊤
+  | node l r => ⁅eval G l, eval G r⁆
+
+@[simp] theorem weight_leaf : leaf.weight = 1 := rfl
+
+@[simp] theorem weight_node (l r : CommutatorTree) :
+    (node l r).weight = l.weight + r.weight := rfl
+
+@[simp] theorem eval_leaf : eval G leaf = ⊤ := rfl
+
+@[simp] theorem eval_node (l r : CommutatorTree) :
+    eval G (node l r) = ⁅eval G l, eval G r⁆ := rfl
+
+/-- 重みは常に正 (葉が最低 1 個ある). -/
+theorem weight_pos (t : CommutatorTree) : 0 < t.weight := by
+  induction t with
+  | leaf => simp
+  | node l r ihl _ => simp; omega
+
+/-- **左結合の重み `n+1` の木** `⁅...⁅⁅G,G⁆,G⁆...,G⁆`. -/
+def leftTree : ℕ → CommutatorTree
+  | 0 => leaf
+  | n + 1 => node (leftTree n) leaf
+
+@[simp] theorem weight_leftTree (n : ℕ) : (leftTree n).weight = n + 1 := by
+  induction n with
+  | zero => rfl
+  | succ n ih => simp [leftTree, ih]
+
+/-- 書籍の但し書き「左結合の重み `n` の交換子は**ちょうど** `G^n`」
+(mathlib indexing で `G^{n+1} = lcs n`). -/
+@[simp] theorem eval_leftTree (n : ℕ) :
+    eval G (leftTree n) = (⊤ : Subgroup G).lowerCentralSeries n := by
+  induction n with
+  | zero => rfl
+  | succ n ih => simp [leftTree, ih]
+
+end CommutatorTree
+
+/-- **Isaacs Cor 4.12** (書籍 p.124 の完全形): `G` のコピーを**任意に括弧付け**した
+重み `n` の交換子は `G^n` に含まれる。
+
+mathlib indexing (Isaacs `G^n` = `lcs (n-1)`) で
+`t.eval G ≤ lowerCentralSeries ⊤ (t.weight - 1)`.
+
+**証明** (Isaacs p.124): 木の構造帰納法。葉は `⊤ = lcs 0`。節 `⁅X, Y⁆` は帰納法の仮定で
+`X ≤ lcs (i-1)`, `Y ≤ lcs (j-1)` (`i, j` は部分木の重み) なので, **Thm 4.11**
+(`commutator_lowerCentralSeries_le`) より
+`⁅X, Y⁆ ≤ lcs ((i-1) + (j-1) + 1) = lcs (i+j-1)`. -/
+theorem CommutatorTree.eval_le_lowerCentralSeries (t : CommutatorTree) :
+    t.eval G ≤ (⊤ : Subgroup G).lowerCentralSeries (t.weight - 1) := by
+  induction t with
+  | leaf => simp
+  | node l r ihl ihr =>
+    have hl := l.weight_pos
+    have hr := r.weight_pos
+    have hidx : (node l r).weight - 1 = (l.weight - 1) + (r.weight - 1) + 1 := by
+      simp; omega
+    rw [eval_node, hidx]
+    exact (Subgroup.commutator_mono ihl ihr).trans (commutator_lowerCentralSeries_le _ _)
+
 /-- **Isaacs Cor 4.13** (derived ⊆ lcs with exponential index):
 `derivedSeries G r ≤ lowerCentralSeries G (2^r - 1)`.
 

@@ -85,6 +85,8 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 > 3.35/3.36 = `CyclicExtensions.lean` (いずれも AxiomsCheck 入り)。
 > → Ch.3 の残作業は **特殊化債務のみ** (Lem 3.1 / Lem 3.11)。Isaacs 全章は現在 **sorry ゼロ**なので、
 > sorry 数はこの章の残作業の指標にならない (未形式化項目は sorry を生まない)。
+> **2026-07-19: その 2 件とも解消済** (Lem 3.11 = `3cff7a105`、Lem 3.1 = issue 1039)。
+> ⇒ **Isaacs Ch.3 は本 survey の全項目クローズ**。レーン a の次の frontier は Ch.4 Mann クラスタ。
 
 
 > Ch.3 is very thoroughly covered: 27 of 36 numbered results are fully formalized or mathlib-covered, including the FT-critical Hall E/C theorems (plus Hall D, which the book leaves as Problem 3C.1), Hall-Higman 1.2.3, Schur-Zassenhaus (existence = mathlib; the conjugacy Theorem 3.12 is repo-proved at full strength for both solvability cases, with the stronger conclusion that the conjugator lies in N), and the whole Glauberman coprime-action "Tier 1" (3.23-3.25, 3.27-3.30) — which lives in OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean and OddOrder/Mathlib/SchurZassenhausConj.lean, not in the Ch03 directory. The main gaps are (a) the two Burnside-gated solvability criteria 3.15 and 3.17, whose placeholder file is still intentionally empty even though Burnside p^a q^b is now proved sorry-free in Ch.7 (burnside_p_pow_q_pow), so both are unblocked; and (b) the coprime-orbit "Tier 2" cluster 3.26, 3.31-3.34 (class bijection, Hartley-Turull, orbit-size product), entirely missing though all Glauberman ingredients exist. Four results are weaker than the book: 3.22 proves only a commutator containment rather than genuine pi-length <= 1 (BG's HasPiLengthOne def exists with no theorem), 3.16 lacks the |H:H∩K|=|G:K| clause, 3.35 has only the uniqueness half, and 3.36's existence statement omits the |G/N|=m clause (degenerate witnesses satisfy it). The crossed-homomorphism machinery 3.6/3.7 was never formalized because mathlib's QuotientDiff proof route made it unnecessary; pi-Hall/pi-separable theory is repo-built (IsHallSubgroup, IsPiSeparable via an upper pi-Fitting series) and is in places stronger than the book (e.g. a Hall-subgroup generalization of Cor 3.25 in BG §1). Slim verification pass (2026-07-16): all 15 flagged missing/partial labels were re-attacked by book-number and descriptive-content greps and every one stands — no status changed (Ch07/ForwardFromCh03.lean remains a docstring-only placeholder whose theorem signatures sit inside code fences; the only near-miss is a specialized extension-closure instance isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement noted under 3.18) — and the three most load-bearing formalized results (3.12 SZ-conjugacy, 3.13/3.14 Hall E/C, 3.21 Hall-Higman 1.2.3) were read in source and confirmed at full book strength.
@@ -109,10 +111,28 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Lem 3.1** Uniqueness of split extension given N, H and the action (unique iso ex — Repo/mathlib state the canonical internal form: N normal with complement K gives G ≅ N ⋊ K. The book's two-abstract-groups form (compatible isos N≅N₀, H≅H₀ exte…
+- ~~**Lem 3.1**~~ **✅ 2026-07-19 解消 (issue 1039)** — 書籍 p.70 の two-abstract-groups 形
+  `existsUnique_mulEquiv_of_isComplement'` を新 leaf `Ch03_SplitExtensions/SplitExtensionUniqueness.lean`
+  に実装 (∃! 込み, AxiomsCheck 入り)。旧 internal form `mulEquivSubgroupOfComplement` は
+  mathlib `SemidirectProduct.mulEquivSubgroup` の純粋リネーム (下流 0 件) ゆえ削除。
 - **Lem 3.11** Solvable minimal normal subgroup is abelian; if finite, elementary abe — Stated for a finite solvable ambient G (book: arbitrary G with M solvable minimal normal, plus an infinite-abelian clause). Covers every downstream use in the b…
 
 ### Isaacs Ch.4 — Isaacs Ch.4 Commutators
+
+> ⚠ **2026-07-19 実測: 本節の per-item 表は全面 stale。Ch.4 は全項目クローズ済**
+> (レーン a、番号 + descriptive 名の両方で grep 実施)。内訳:
+> - **Mann クラスタ (4B Def M(G) / 4.14 / 4.15 / 4.17 / 4.18 / 4.19)** = `Ch04_Commutators/Mann.lean`
+>   (2026-07-17 `3e8e319a8`、874 行、AxiomsCheck 6 件登録済)。表の「未」は全て誤り。
+> - **4.16** も同 file の `centralizer_eq_self_of_maximal_abelian_normal_of_isNilpotent` で
+>   **nilpotent 一般形**まで済 (表の「p-group 特殊化」は stale)。
+> - **4.29** は `iterCommutator_inl_inr_two_eq_one_of_coprime` が既に**書籍印刷形 (無条件)**
+>   (表の「solvability 仮定が残る」は stale — 条件付き版は engine として併存するだけ)。
+> - **4.12** = 2026-07-19 に書籍形 (任意括弧付け) を `CommutatorTree` で実装
+>   (`CommutatorTree.eval_le_lowerCentralSeries`、左結合形 `eval_leftTree` = lcs も併記)。
+> - **4.6** = 2026-07-19 に同型節 `nonempty_quotientInfCenterEquivCommutator`
+>   (`A/(A ∩ Z(G)) ≅ G'`) を追加し、cardinality 節の `[Finite G]` を除去
+>   (`Nat.card` は無限を 0 に潰すので**書籍より一般**)。
+> ⇒ **Isaacs Ch.4 は残作業なし**。
 
 > Isaacs Ch.4 (Commutators, results 4.1-4.38 + Hall-Witt identity) is essentially complete: 30 of 39 surveyed items are fully formalized sorry-free in OddOrder/Isaacs/Ch04_Commutators/Main/{CommutatorBasics,ThreeSubgroups,ThreeSubgroupsCoprime,BaerTrick,ChainNilpotent}.lean, 3 are pure mathlib (4.2, 4.9 three-subgroups, Hall-Witt), and several are formalized STRONGER than the book (4.4/4.8 generalized from p-groups to arbitrary class-≤2 groups, 4.33 under p-separable instead of p-solvable, 4.13 strictly stronger than mathlib's derived_le_lower_central). The chapter's [G,A] machinery is factored differently from the book: actionCommutator (φ : A →* MulAut G) with a parallel ⁅inl G, inr A⁆ view in the semidirect product Γ = G ⋊[φ] A, and iterated chains [G,A,...,A] as iterCommutator on inl/inr ranges. The one real gap is the Mann/Ishikawa cluster 4.14-4.19 (M(G) generated by small conjugacy classes, class ≤ 3/≤ 4 bounds): deliberately skipped during the FT phase (zero BG/Peterfalvi consumers, per an explicit skip comment in ThreeSubgroups.lean); of it only 4.16 exists, in p-group form as centralizer_eq_self_of_maximal_abelian_normal in GroupTheory/CriticalSubgroup.lean (book states nilpotent G) — the whole cluster is roughly one M-sized job whose core is the counting lemma 4.17. Minor deviations: 4.12 covers only left-associated element commutators (arbitrary-bracketing subgroup form is an S job from the already-proved 4.11), 4.29 retains a solvability hypothesis the printed statement omits (S to close via the existing cyclic/Sylow restriction machinery), and 4.6 carries [Finite G] where the book is general. Supporting definitions Ω_r(P) and G^∞ are formalized (OmegaSubgroup.lean, ChainNilpotent.lean); M(G) is not. Slim verification pass: no status changed — all flagged missing/partial labels (4.12, M(G) def, 4.14, 4.15, 4.17, 4.18, 4.19) were confirmed by fresh multi-format number and descriptive-name greps across OddOrder/ (the only M(G)/Mann hits are the skip comment and unrelated Schur-multiplier and BG-numbered 4.15/4.17 results; Coq has no Mann analog), 4.16's p-group specialization was confirmed by reading the statement (IsPGroup p P hypothesis at CriticalSubgroup.lean:166), and the three most load-bearing formalized items 4.28, 4.31, 4.36 were re-read at statement level and confirmed at full book strength.
 
@@ -134,6 +154,17 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### Isaacs Ch.5 — Isaacs Ch.5 Transfer
 
+> ⚠ **2026-07-19 実測: 本節の 3 ギャップは全て stale (既にクローズ済)**。
+> - **Thm 5.10 Dietzmann** = `Ch05_Transfer/Dietzmann.lean` (`dietzmann` / `dietzmann_setFinite`、
+>   無限群でも成立する書籍形)。
+> - **Thm 5.24** = `Ch05_Transfer/NilpotentMaximal.lean`
+>   (`exists_isPGroup_of_isCoatom_of_isNilpotent`、2026-07-17 `15368c186`)。
+> - **Cor 5.4** = `Ch05_Transfer/CentralTransfer.lean` の
+>   `not_isCyclic_sylow_quotient_of_le_commutator_inf_center` が**書籍の結論そのもの**
+>   (Γ/Z の Sylow p が非巡回)。表の「弱形どまり」は stale — 弱形 (Sylow 非可換) は
+>   その前段補題として併存するだけ。
+> ⇒ **Isaacs Ch.5 は残作業なし**。
+
 > Isaacs Ch.5 is one of the most completely covered units in the repo: of the 30 numbered results, 9 are fully covered by mathlib (transfer construction 5.1/5.2, transfer-evaluation 5.5, central transfer 5.6, Burnside 5.13, cyclic-Sylow-smallest-prime 5.14, and the whole Z-group cluster 5.15/5.16, plus the focal-subgroup definitional layer in Mathlib/GroupTheory/Focal.lean), and 17 more are formalized sorry-free at full book strength in OddOrder/Isaacs/Ch05_Transfer/{Basic,Main}.lean — including the entire Frobenius normal p-complement section 5.25-5.30 with the hard Lemma 5.28 fully proved (its '骨格のみ' docstring is stale). The formalization is factored differently from the book in places, always soundly: 5.20-5.23 are stated via a new A^p(G)/O^p(G) (APrime/OPrime) infimum API and mathlib's transferFocal (target P⧸Foc instead of P/P'), and 5.11 is generalized to arbitrary abelian transfer targets. Real gaps are exactly four: Dietzmann's theorem 5.10 (missing, deliberately bypassed since mathlib's Schreier route proves Schur 5.7 without it; M), the nilpotent-maximal-subgroup theorem 5.24 (missing but all ingredients present; S), the quotient-Sylow-noncyclic half of Cor 5.4 (partial; S), and Cor 5.19 which is proved only for cyclic Sylow 2-subgroups instead of the book's direct-product-with-strict-largest-factor form (specialized; M). Surprise findings: mathlib now has a complete Focal Subgroup Theorem file (commutator_inf_eq_focalSubgroup) that the repo builds on rather than duplicating, and the repo's Frobenius theorem 5.26 plus the 5.25 fusion criterion are substantial mathlib-absent developments that BG Ch.1 cites directly (Thm 1.17/1.18 entrypoints). Slim verification pass: no labels changed — the missing/partial flags on Cor 5.4, Thm 5.10, and Thm 5.24 were each confirmed by number-citation and descriptive-content greps across OddOrder/ (including GroupTheory/** and other book trees; the only nilpotent-maximal hit, Ch07's step1_unique_maximal_containing_nilpotent, is different content), and the load-bearing formalized statements 5.21, 5.25, and 5.26 were read in source and confirmed at full book strength with sound underlying predicates.
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
@@ -147,6 +178,18 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 - **Cor 5.19** Sylow 2-subgroup a direct product of cyclics with one strictly largest — Only the special case B = ⊥ (Sylow 2-subgroup itself cyclic) is formalized; the book's general P = A × B with A strictly largest cyclic factor (via the characte…
 
 ### Isaacs Ch.6 — Isaacs, Finite Group Theory, Ch.6 Frobenius Actions
+
+> ⚠ **2026-07-19 実測: 本節の 6 ギャップは全て stale (既にクローズ済)**。
+> - **Thm 6.4** 四同値は `Ch06_FrobeniusActions/FrobeniusGroup.lean` に (1)⇒(2), (2)⇒(3),
+>   (1)⇒(4), (2)⇒(1), (3)⇒(1), (4)⇒(1) が全て存在。
+> - **Thm 6.7** = `KernelComplement.lean` (`exists_isComplement'_of_centralizer_le`)。
+> - **Cor 6.17** = `Main.lean:1314` に **full form** (Sylow は cyclic or generalized quaternion)。
+> - **Thm 6.19** = `OddComplement.lean` に action 形 + subgroup-pair 形の両方。
+> - **Thm 6.23** = Ch.7 Thm 7.1 (Thompson normal p-complement) で完備化済
+>   (`Ch07_ThompsonSubgroup/Basic.lean:22` に明記)。
+> - **Thm 6.24 Frobenius kernel nilpotent** = `KernelNilpotent.lean`
+>   (`isNilpotent_of_isFrobeniusAction` + subgroup-pair 形)。
+> ⇒ **Isaacs Ch.6 は残作業なし**。
 
 > Isaacs Ch.6 is one of the most thoroughly formalized Isaacs chapters: 19 of 24 numbered results are fully formalized sorry-free, mostly in OddOrder/Isaacs/Ch06_FrobeniusActions/ (7 files, ~8.5k lines), and nothing in the chapter is in mathlib (Frobenius actions/groups are a from-scratch repo implementation, with only DihedralGroup/QuaternionGroup and the IsZGroup API reused). The formalization is frequently STRONGER or differently factored than the book: 6.11-6.14 conclude explicit MulEquiv classifications onto concrete D/Q/SD groups; 6.23 is covered by the strictly stronger Thm 7.1 (fully proved in Ch07_ThompsonSubgroup); 6.18 factors through IsZGroup + mathlib; the repo adds extra-book API (IsFrobeniusGroup transport across isomorphisms, conjugate complements, the 2|A|+1 ≤ |N| bound, and Huppert V.8.18(b) normality in OddComplement.lean); 6.22 lives in the BG tree as BG Thm 3.7 in a prime-order-complement pair form (formalized_specialized). The genuine gaps are: Thm 6.7 (kernel-side complement existence via Schur-Zassenhaus, S — all tools present), the chapter's headline Thm 6.24 (Frobenius kernels nilpotent, M — every ingredient including Thompson 7.1 is already proved, only the induction glue is missing), plus three small statement-level gaps: the standalone (2)=>(1) direction of Thm 6.4, the composed even-case statement of Cor 6.17, and the uniqueness (vs. proved normality) conclusion of Thm 6.19 (each S). Note Main.lean's in-file status table is stale (it claims 6B/6C largely undone while 6.8-6.21 are in fact formalized). Slim verification pass: all five flagged labels (6.4/6.17/6.19 partial, 6.7/6.24 missing) were confirmed after number- and content-based refutation greps across OddOrder/GroupTheory and the BG tree, and three load-bearing formalized results (6.11, 6.21, and 6.23-via-7.1) were read in source and confirmed at full book strength, so no statuses changed; only verification evidence was added to notes (e.g. 6.4's (1)⇒(4) is proved despite a stale 'deferred' module docstring, and 6.19's uniqueness name exists only in a docstring).
 
@@ -196,6 +239,15 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Cor 8.44 | 未 | S | Orbit sizes of an automorphism action satisfy the common-divisor-graph constraints (8.41/8… | Confirmed missing. Transfer along G⋊A coset action; needs the 8.5(3) bridge. Special case A = G gives the classical class-size common-divisor graph result. |
 
 ### Isaacs Ch.9 — Isaacs Ch.9 More on Subnormality
+
+> ⚠ **2026-07-19 実測: 「essentially unformalized (31 件)」は全面 stale**。
+> `Ch09_MoreSubnormality/` に 15 leaf (Quasisimple / Components / Semisimple / Layer /
+> LayerRestriction / GeneralizedFitting / SubnormalSocle / NilpotentResidual / PResidual /
+> Schenkman / InnerAutomorphisms / AutTower / AutTowerBounds / OrderBound / ThompsonWielandt)。
+> 番号 grep で **9.1–9.27 は全て repo にヒット** (§9A F* / §9B automorphism tower / §9C
+> Thompson–Wielandt)。
+> ⇒ **残るのは §9D のみ: 9.28 (Bartels subnormal closure) / 9.29 / 9.30 と Lem 9.31**。
+> これがレーン a の現 frontier (2026-07-19)。
 
 > Isaacs Ch.9 is essentially unformalized: all 31 numbered results (9.1–9.31) lack full-strength Lean counterparts, and none of the chapter's signature concepts (quasisimple, component, layer E(G), semisimple group, F*(G), automorphism tower, subnormal closure, strong conjugacy) exist in the repo or in mathlib. This is a documented deliberate skip — notes/isaacs/ch09_more_subnormality.md records a 2026-05-23 audit showing zero uses of any Ch.9 concept in BG or Peterfalvi (FT's group is ultimately solvable, where F*=F), and fresh greps confirm the repo state matches that audit. The chapter is not entirely from scratch, though: the solvable specialization of Bender's Thm 9.8 is fully proved as BG Prop 1.3 (centralizer_fitting_le_fitting), and scattered infrastructure lowers entry costs — socle (Ch02), Thm 2.6 (the hub cited 5x by §9A proofs), S^∞ as lowerCentralSeriesInfty (Ch04), O^p as OPrime (Ch05), the n!-theorem (Ch01), ker(conjNormal)=centralizer and a |G/C| ≤ |Aut C| embedding (Ch06/Ch07), plus mathlib's IsSubnormal/IsPerfect/MulAut.conj. Surprises: Lemma 9.31 (Sylow ∩ subnormal) is missing even from mathlib despite being a basic general fact, and the Nougat-missing page 302 was verified against the PDF to contain only §9D definitions, so the enumeration is complete. Effort estimates are marginal in document order (each assumes earlier chapter results exist); the natural clusters are §9A F*-theory (~1 wk), §9B tower (~1-1.5 wk), §9C Thompson–Wielandt (~3-4 days on top of A+B), §9D Bartels (~1-1.5 wk). Slim verification pass: all flagged missing/partial labels and the Thm 9.8 specialization (statement read) were confirmed; the only substantive correction is to Lem 9.6's notes — BG Lem 1.1 (isMinimalNormal_le_fitting_and_isElementaryAbelian) does prove 'minimal normal ⟹ elementary abelian' for solvable G at full strength, contrary to the earlier note — plus minor path/name enrichments (ChainNilpotent.lean lives under Main/, two additional private conjNormal-kernel variants for 9.11).
 
@@ -649,7 +701,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | I.2 Prop 3 | 未 | M | Q_0 semidirect (D/W) isomorphic to L(F_q, A) = (F_q semidirect F_q^*) semidirect A; identi… | CONFIRMED. The essential engine (Appendix I Prop 2(a)+(b)) IS formalized sorry-free in Appendices/SemilinearField.lean (verified: 0 sorries; declarations live in namespace OddOrder.Peterfalvi.Appendices.Huppert) — Schur … |
 | I.3 Lemma 1 | 未 | L | If G satisfies the conclusion of Thm A then Q is a 2-group and L = O^{2'}(G) = normal clos… | CONFIRMED. Requires structural facts of PSL(2,q)/Sz(q)/PSU(3,q) as 2-transitive groups (degree q+1 with q a 2-power; simplicity). Gated on the absent target-group libraries; given those, S. |
 | I.3 Prop 1 | 未 | L | For 1 != X <= V: (a) C_G(X) on Omega_X satisfies (A1); (b) N_G(X) = C_G(X) N_V(X); (c) if … | CONFIRMED. The induction-hypothesis engine used by Chs II-IV. (c) needs Sylow 2-structure of PSL(2,l), Sz(l), PSU(3,l) and the order of st in each ([H] II.8.2, II.10.12; [HB] XI.3.1/3.3, XI Ex 10.7) - all absent (re-veri… |
-| I.3 Prop 2 | 未 | M | If G is not simple, the conclusion of Theorem A holds for G | CONFIRMED. Uses [Q,k] = Q bijectivity trick plus induction hypothesis on L = <I>. |
+| I.3 Prop 2 | 済 | M | If G is not simple, the conclusion of Theorem A holds for G | `InductionNonSimple.lean`: constructs `L = ⟨I⟩`, proves `[Q,k] = Q`, restricts (A1)--(A3), derives `G = LD` and odd index, and lifts induction to the concrete Theorem A conclusion. |
 | I.3 Lemma 2 | 未 | S | Subsets of V conjugate in G are conjugate in V | CONFIRMED. |
 | I.3 Lemma 3 | 未 | S | A strongly real element x with x^2 != 1 is conjugate to ut, u in Q_0^#, and /C_G(x)/ is od… | CONFIRMED. No strongly-real API in the repo (re-verified: grep strongly.real/StronglyReal empty). |
 | I.3 Lemma 4 | 未 | M | If st has order 3 and V != 1 then <Q_0, K, t> = Q_0 K cup Q_0 K t Q_0 is isomorphic to PSL… | CONFIRMED. Subgroup verification is computational; PSL(2,q) identification comes free from the induction hypothesis (order q(q-1)(q+1) < /G/), so no PSL library needed here beyond Thm A's own statement. |

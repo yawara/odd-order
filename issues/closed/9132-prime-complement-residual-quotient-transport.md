@@ -39,7 +39,7 @@ Consumer: `OddOrder/Peterfalvi/Appendices/Suzuki/CentralizerResidual.lean`.
 ## 参照
 
 - `issues/closed/9112-prime-complement-residual.md`
-- `issues/2043-centralizer-trichotomy-c.md`
+- `issues/closed/2043-centralizer-trichotomy-c.md`
 - `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`
 - `OddOrder/GroupTheory/PrimeComplementResidual.lean`
 
