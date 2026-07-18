@@ -1191,6 +1191,9 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_two
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.le_sSup_lt_of_forall_not_isPGroup
 
+-- Ch.9 §9D: `X^{(K)}` の共役両立性 (Bartels Step 3 が (Y^h)^{(H)} = (Y^{(H)})^h で使う)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_conjAct_smul
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms

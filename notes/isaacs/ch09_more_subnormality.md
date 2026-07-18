@@ -582,3 +582,30 @@ mathlib に無ければ order-iso 経由で自作する (作用は各 `c` につ
 
 さらに `BartelsIH` に加えて **`|X|` 最小性の仮定**が第 2 パラメータとして要る
 (Step 2 だけが使う)。`BartelsIH` と同様に明示 hypothesis で持たせる方針。
+
+### Bartels 進捗 (2026-07-19、Step 1-2 完了 + Step 3 の残作業)
+
+`SubnormalClosure.lean` は Step 2 まで sorry-free (AxiomsCheck 登録済)。
+
+| step | 状態 | 実装 |
+|---|---|---|
+| 1 | ✅ | `bartels_step_one` (書籍より一般 — 共役性でなく `Y^{(G)} ≠ ⊤` を仮定) |
+| 2 | ✅ | `bartels_step_two` (+ `le_sSup_lt_of_forall_not_isPGroup` / Ch.2 の Wielandt 族版) |
+| 3 | 部品 1/2 | `strongClosureIn_conjAct_smul` (相対共役両立性) は landing 済 |
+| 4-6 | 未 | |
+
+**Step 3 の残る部品** = 「有限群の `p`-部分群は与えられた Sylow `p`-部分群の中へ共役で送れる」:
+mathlib は `IsPGroup.exists_le_sylow` (ある Sylow に入る) と Sylow 共役性
+(`MulAction.exists_smul_eq` on `Sylow p L`) を別々に持つだけなので, 両者を繋ぐ
+```
+∃ g : L, ConjAct.toConjAct g • Q ≤ (P : Subgroup L)   -- Q は p-部分群, P は Sylow
+```
+を作る必要がある。⚠ さらに Bartels では `L = Y^{(H)}` が `G` の**部分群**なので、
+`↥L` で得た結論を `G` に戻す transport が要る (`Subgroup.map L.subtype` 経由)。
+`sylowInfOfIsSubnormal` (Lem 9.31 の束ねた形) が `(P ⊓ L).subgroupOf L : Sylow p ↥L` を
+供給するので、そこに上記補題を当てる。
+
+**Step 3 の筋** (書籍 p.291): `H < G` なので帰納法の仮定で `Y^{(H)} ◁◁ H`。
+Lem 9.31 で `P ∩ Y^{(H)} ∈ Syl_p(Y^{(H)})`。`Y` は `Y^{(H)}` の `p`-部分群なので
+`h ∈ Y^{(H)}` があって `Y^h ⊆ P ∩ Y^{(H)}`。`Z = Y^h` とおけば `Z ⊆ P` かつ
+`Z^{(H)} = (Y^{(H)})^h = Y^{(H)}` (h ∈ Y^{(H)} ゆえ)、Step 1 で `Y^{(G)} = Z^{(G)}`。

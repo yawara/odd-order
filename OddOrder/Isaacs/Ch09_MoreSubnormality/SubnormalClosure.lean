@@ -411,6 +411,38 @@ theorem strongClosure_map [Finite G] (X : Subgroup G) (f : G →* H)
 
 end
 
+/-- **`X^{(K)}` の共役両立性**: `(X^{(K)})^g = (X^g)^{(K^g)}`.
+
+絶対版 `strongClosure_conjAct_smul` の相対版。Bartels Step 3 が
+`(Y^h)^{(H)} = (Y^{(H)})^h` (`h ∈ H`) の形で使う。 -/
+theorem strongClosureIn_conjAct_smul (c : ConjAct G) (K X : Subgroup G) :
+    strongClosureIn (c • K) (c • X) = c • strongClosureIn K X := by
+  have key : ∀ (d : ConjAct G) (L W : Subgroup G),
+      strongClosureIn (d • L) (d • W) ≤ d • strongClosureIn L W := by
+    intro d L W
+    refine sSup_le ?_
+    rintro V ⟨hV, hVL⟩
+    have hback : IsStronglyConjugate W (d⁻¹ • V) := by
+      have := hV.conjAct_smul d⁻¹
+      rwa [inv_smul_smul] at this
+    have hbackL : d⁻¹ • V ≤ L := by
+      have := Subgroup.pointwise_smul_le_pointwise_smul_iff (a := d⁻¹) |>.mpr hVL
+      rwa [inv_smul_smul] at this
+    calc V = d • (d⁻¹ • V) := (smul_inv_smul d V).symm
+      _ ≤ d • strongClosureIn L W :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (le_sSup ⟨hback, hbackL⟩)
+  refine le_antisymm (key c K X) ?_
+  have h2 := key c⁻¹ (c • K) (c • X)
+  rw [inv_smul_smul, inv_smul_smul] at h2
+  calc c • strongClosureIn K X ≤ c • (c⁻¹ • strongClosureIn (c • K) (c • X)) :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h2
+    _ = strongClosureIn (c • K) (c • X) := smul_inv_smul c _
+
+/-- `h ∈ K` なら `K` は `h` による共役で不変。 -/
+theorem conjAct_smul_self_of_mem {K : Subgroup G} {h : G} (hh : h ∈ K) :
+    ConjAct.toConjAct h • K = K :=
+  Subgroup.conjAct_pointwise_smul_eq_self (Subgroup.le_normalizer hh)
+
 section /- 9D: Bartels Step 2 の部品 — 真部分群による生成 -/
 
 /-- `Nat.Coprime a b` なら `x ∈ ⟨x^a⟩ ⊔ ⟨x^b⟩` (Bezout)。 -/
