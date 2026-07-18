@@ -263,7 +263,7 @@
      `N_K(X) ≤ C_G(X)` and the final endpoint is
      `N_G(X) = C_G(X) N_V(X)`.
    - The source assumption `1 ≠ X` is not needed for part (b).
-12. 🔄 **§3 Prop 1(c) in progress** — leaves `CentralizerResidual.lean`,
+12. ✅ **§3 Prop 1(c) complete** — leaves `CentralizerResidual.lean`,
     `CentralizerQuotient.lean`, and `CentralizerInductionBridge.lean`.
    - ✅ The standing factor `Q₁` is the actual normal `2`-complement from
      `SylowDecomposition.lean`, not an added hypothesis.
@@ -301,9 +301,32 @@
      `centralizer_cQ_isPGroup_of_induction` applies the exact induction
      hypothesis to the strictly smaller quotient and transports Lemma 1 back,
      closing the missing `IsPGroup 2 C_Q(X)` input.
-   - **Next frontier:** use the retained standard-action coordinates to identify
-     the quotient root subgroup in each PSL/Sz/PSU model, then transport its
-     structure, cardinality, distinguished involution, and
-     `orderOf(st) = 3/5/3` through `centralizerQQuotientEquiv`.
+   - ✅ `CentralizerPSLRoot.lean`, `CentralizerSuzukiRoot.lean`, and
+     `CentralizerPSURoot.lean` identify `C_Q(X)` with each concrete root group
+     and transport the exact field/cardinality data.  The Suzuki branch also
+     constructs Appendix III Definition 2 type-A data with the target parameter.
+   - ✅ `CentralizerPSLDistinguished.lean`,
+     `CentralizerSuzukiDistinguished.lean`, and
+     `CentralizerPSUDistinguished.lean` retain the ambient Sylow pair, normalize
+     it to the standard root/Weyl pair, and prove `orderOf(st) = 3/5/3`.
+   - ✅ `CentralizerTrichotomy.lean` assembles the common residual conclusions
+     and the exact matching PSL/Sz/PSU branch.  The PSU conclusion is precisely
+     a Suzuki `2`-group of order `ℓ^3`; it does not assert the later type-B
+     conclusion.  Target build, Suzuki hub, `OddOrder.AxiomsCheck`, and full
+     `lake build OddOrder` all pass with only the three allowed axioms.
+13. ✅ **§3 Proposition 2** (pp. 106–107) is formalized in
+    `InductionNonSimple.lean`.
+    - The proof constructs the source subgroup `L = ⟨I⟩` as a proper normal
+      subgroup and follows the literal factorization `k = t(tk)`.
+    - The map `x ↦ [x,k]` is injective from `C_Q(k) = 1`, hence bijective on
+      finite `Q`, proving `Q ≤ L` without a posited carrier.
+    - The action and (A1)--(A3) are restricted honestly to `L`; double
+      transitivity gives `G = LD` and `[G : L]` odd.
+    - The induction result in `L` is lifted to `G`; the implicit final source
+      step is made explicit by proving its normal odd-index subgroup contains
+      every involution and therefore equals `L`.
+    - The leaf build, Suzuki hub, `OddOrder.AxiomsCheck`, and full
+      `lake build OddOrder` pass with only the three allowed axioms.
+    - **Next frontier:** §3 Lemma 2 (p. 107), conjugacy of subsets of `V`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

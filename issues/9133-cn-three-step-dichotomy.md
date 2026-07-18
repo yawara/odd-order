@@ -97,6 +97,14 @@ BG App.D D.1 の証明 (mmd:5155-5178) は Cor 1.6 で M を 3-step と判定し
 5. Gorenstein Lemma 10.1.3 (fpf 自己同型が `K/F` に降りる) — **不在**。
 ⟹ 2/4/5 が実質的な穴で複数 session 規模。**D.1 は未着地ゆえ `AppD_CNGroups.lean` は無変更**。
 
+⚠ **優先順位の訂正 (2026-07-18)**: 一時「配置問題 (1) を直せばブロッカーが 5→4 に減る」と書いたが
+これは**誤解を招く数え方**だった。残る 2/3/4/5 は実質的な数学的欠落なので、**配置を直しても
+Cor 1.6 の数学は 1 ミリも進まない** (純粋な準備作業)。移設自体は正当な階層衛生 (P. Hall の一般定理が
+BG 固有 file に在る) だが、**Cor 1.6 の数学が揃う段で行うのが適切**で、今単独でやる価値は低い。
+移設の規模: `centralizer_fitting_le_fitting` + private helper 2 件
+(`exists_minimal_normal_le_not_le` / `inf_subgroupOf_le_center_of_le_centralizer`) の移動 +
+BG 内 8 箇所の呼び出し更新 (no-wrapper 方針ゆえ alias は置かない)。
+
 ### 申し送り
 `IsCNGroup` は現在 `BG/AppD_CNGroups.lean` にある。AppD が Cor 1.6 を消費する段になると
 `GroupTheory` leaf ← `AppD` の循環になるため、**そのとき `IsCNGroup` を本 leaf へ移設**すること

@@ -22,15 +22,15 @@ variable {G : Type*} [Group G]
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 
-The `≥ 3` side is fully proved (`three_le_pRank_mf_of_mem_beta`: any `r ∈ π(M_F) ∩ β(M)` has
-`r_r(M_F) ≥ 3`); the proof below reduces the goal to the complementary `< 3` bound
-`pRank (M_F) r < 3`, the genuinely deep §15 content isolated as the single remaining `sorry`.
+The `≥ 3` side is `three_le_pRank_mf_of_mem_beta` (any `r ∈ π(M_F) ∩ β(M)` has `r_r(M_F) ≥ 3`); the
+proof below establishes the complementary `< 3` bound `pRank (M_F) r < 3`, the genuinely deep §15
+content.  **Both sides are now fully proved — this theorem is sorry-free and axiom-clean.**
 
-**Proved building blocks (this file):** the setup
+**Building blocks (this file):** the setup
 `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` (step 1: `g ∉ M`,
 `X = F(M) ⊓ F(M)^g ≠ ⊥`)
 and `rank_lt_three_of_le_two_maximals` (step 7 core: a subgroup in two distinct maximals has rank
-`< 3`).  The remaining assembly, with the located upstream lemmas:
+`< 3`).  The assembly, with the upstream lemmas it uses:
 
 * **(step 3, `p ∈ σ(M)`)** pick `p ∈ π(X)`, `X₁ ≤ X` of order `p`
   (`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent`: `X₁ ≤ O_p(F(M))`).  If `p ∉ σ(M)` then
@@ -353,11 +353,10 @@ Only `M' ≤ F(M)` is BG-faithful and provable; the equality holds iff `C_Y(E₁
 condition (BG only gets `M` Frobenius later, in Corollary 15.9, after `τ₂(M) = ∅`, i.e. `E₂ = 1`).
 See `notes/bg/s15_7_typeF_chatgpt_prompt.md`.
 
-`M' ≤ F(M)` is proved here for the **type-`P₁`** case (`U = ⊥` ⟹ `M' = M_σ` by Lemma 15.1(b);
-`M_σ = M_F` nilpotent ⟹ `M' = M_σ ≤ F(M)`).  The remaining residual is the **type-`F`** case of
-`M' ≤ F(M)` — now **ungated** (the `= F(M)` gate `C_Y(E₁) = 1` is gone): `M' = M_σ × E'` with `E'`
-centralizing `M_σ` (Lemma 12.19, as `π(M_σ) ∩ β = ∅`) is nilpotent normal, so `M' ≤ F(M)`; the
-remaining work is the `E`-setup + nilpotent-direct-product packaging. -/
+`M' ≤ F(M)` is **fully proved below for both types**, by a single type-independent argument (there
+is no longer a type-`F` residual): take a §12 `E`-setup `M = M_σ ⋊ E`, so `M' = M_σ ⊔ E'`; Lemma
+12.19 gives `E'` centralizing a Hall `β'`-subgroup `W ≤ M_σ`, and `π(M_σ) ∩ β(M) = ∅` forces
+`W = M_σ`, whence `E' ≤ C_G(M_σ)` and `M' = M_σ ⊔ E' ≤ F(M)` via `fitting_decomposition`. -/
 theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnotTI : ¬ FittingIsTI M) :
     (S14.IsTypeF M ∨ S14.IsTypeP1 M) ∧ MF M = OddOrder.BG.Ch3.S10.Msigma M ∧

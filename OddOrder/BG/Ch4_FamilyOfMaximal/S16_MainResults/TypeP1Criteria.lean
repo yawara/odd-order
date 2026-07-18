@@ -832,11 +832,17 @@ the `TypeIData.alternative` trichotomy splits on whether `F(M)` is `TI`:
 
 * `FittingIsTI M`: disjunct (a), `M_F#` is a `TI`-subset
   (`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`).
-* `¬FittingIsTI M`: disjuncts (b)/(c) (`M_F` abelian of rank 2, or the exponent–cyclic case) come
-  from the BG Theorem 15.7(e) trichotomy (`nonTI_Fitting_structure`, Coq `BGsection15`).  This is
-  the genuinely deep residual: the `(e)` clause of the landed `fitting_not_ti_cases` is currently
-  weakened to the tautology `abelian M_F ∨ ¬abelian M_F`, so the structured rank-2 / exponent
-  alternatives are not yet available and the non-TI case must await formalizing 15.7(e). -/
+* `¬FittingIsTI M`: disjuncts (b)/(c) (`M_F` abelian of rank 2, or the exponent–cyclic case)
+  correspond to the BG Theorem 15.7(e) trichotomy (`nonTI_Fitting_structure`, Coq `BGsection15`).
+  ⚠ The `(e)` clause of the bundled `fitting_not_ti_cases` is **logically vacuous** — it reads
+  `abelian M_F ∨ (¬abelian M_F ∧ (type F ∨ type P₁))`, whose second disjunct is already delivered by
+  that theorem's own conjunct (a), so it collapses to excluded middle (issue 3022).  This proof
+  therefore does **not** route through it: it re-derives the trichotomy directly from the non-TI
+  witness (`exists_inf_conj_fitting_orderP_witness`) by splitting on `IsMulCommutative (M_F)` and
+  invoking `not_isCyclic_opiCore_mf_of_orderP_le_conj` (abelian ⟹ rank 2) resp.
+  `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` +
+  `typeF_nonabelian_cyclic_opiCore_compl` (non-abelian ⟹ exponent/cyclic).  So the non-TI case is
+  **fully proved here**; fixing 15.7(e) would let this proof cite it instead, but is not a gate. -/
 theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hF : S14.IsTypeF M) :
     OddOrder.GroupTheory.IsTypeI M := by

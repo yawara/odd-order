@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 
 /-!
 # Frobenius-family lower bound (Peterfalvi 7.10)
@@ -105,18 +106,28 @@ end FrobeniusFamily
 
 variable {G : Type*} [Group G]
 
-/-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order and
-nilpotent Frobenius kernels, there is an index `i` for which, writing
-`e = e_i` and `h = h_i`,
+/-- Thompson's theorem (Isaacs Thm 6.24) applied to a `FrobeniusFamily`: every
+member's kernel is nilpotent.
+
+Peterfalvi derives this inside the proof of (7.10) ("By a theorem of Thompson"),
+so it is *not* a hypothesis of the book statement; condition (7.10)(a) — each
+`L i` is a Frobenius group with kernel `H i` — already forces it. -/
+theorem FrobeniusFamily.isNilpotent_kernel [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (j : Fin k) :
+    Group.IsNilpotent ↥((F.H j).subgroupOf (F.L j)) := by
+  obtain ⟨C, hC⟩ := F.isFrobenius j
+  exact hC.isNilpotent_kernel
+
+/-- **Peterfalvi (7.10).** Under `FrobeniusFamily` with `G` of odd order there is
+an index `i` for which, writing `e = e_i` and `h = h_i`,
 
 `(|G₀| - 1)/|G| ≥ (e - 1) · ((h - 2e - 1)/(e·h) + 2/(h·(h+2)))`.
 
-The explicit nilpotence input is the Sibley-coherence prerequisite.  In the FT
-consumer it is constructed from `maxNilpotentNormalHall_isNilpotent`. -/
+The nilpotence of the Frobenius kernels — the Sibley-coherence prerequisite — is
+**not** a hypothesis: it is derived from condition (7.10)(a) via Thompson's
+theorem (`FrobeniusFamily.isNilpotent_kernel`), exactly as the book does. -/
 theorem card_G0_lower_bound [Finite G] {k : ℕ}
-    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
-    (hnilp : ∀ j : Fin k,
-      Group.IsNilpotent ↥((F.H j).subgroupOf (F.L j))) :
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) :
     ∃ i : Fin k,
       ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
         ((F.e i : ℚ) - 1) *
@@ -127,16 +138,17 @@ theorem card_G0_lower_bound [Finite G] {k : ℕ}
   letI : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact F.lowerBoundTerm_of_characterEstimateData hodd
-    (F.characterEstimateData_of_isNilpotent hodd hnilp)
+    (F.characterEstimateData_of_isNilpotent hodd F.isNilpotent_kernel)
 
-/-- **Peterfalvi (7.11).** No odd-order Frobenius family with nilpotent kernels
-can have its conjugate kernel spreads cover every nonidentity element. -/
+/-- **Peterfalvi (7.11).** No odd-order Frobenius family can have its conjugate
+kernel spreads cover every nonidentity element.
+
+As in (7.10), kernel nilpotence is derived from (7.10)(a) by Thompson's theorem
+rather than assumed. -/
 theorem not_trivial_G0 [Finite G] {k : ℕ}
     (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
-    (hnilp : ∀ j : Fin k,
-      Group.IsNilpotent ↥((F.H j).subgroupOf (F.L j)))
     (hG0 : F.G0 = {(1 : G)}) : False := by
   exact not_trivial_G0_of_lowerBoundTerm F hodd
-    (card_G0_lower_bound F hodd hnilp) hG0
+    (card_G0_lower_bound F hodd) hG0
 
 end OddOrder.Peterfalvi.S09

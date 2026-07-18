@@ -11,13 +11,16 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.GroupTheory.SylowTransport
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
@@ -29,6 +32,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
@@ -203,6 +207,14 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -243,7 +255,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 9600
+set_option linter.style.longFile 10000
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -285,6 +297,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_map_of_surjective
 #assert_only_allowed_axioms Subgroup.primeComplementResidualQuotientEquiv
 
+-- Explicit carrier equivalences between Sylow subgroups and across group equivalences.
+#assert_only_allowed_axioms Sylow.mulEquiv
+#assert_only_allowed_axioms Sylow.mapEquiv
+#assert_only_allowed_axioms Sylow.coe_mapEquiv
+#assert_only_allowed_axioms Sylow.transportMulEquiv
+
 /-! Standard upper-unipotent root coordinates and the distinguished order-three
 product for the PSL(2,q) branch of Peterfalvi Part II, Ch. I section 3,
 Proposition 1(c). -/
@@ -301,6 +319,22 @@ Proposition 1(c). -/
   OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.canonicalS_sq
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.orderOf_canonicalS_mul_T
+
+-- The standard upper-unipotent root group is Sylow in PSL(2,q), q even.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.center_specialLinearGroup_fin_two_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_projectiveSpecialLinearGroup_fin_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSubgroup_index
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSubgroup_index_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSylow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.coe_rootSylow
 
 -- Quadratic finite-field and Hermitian trace infrastructure for the PSU(3,q) target.
 #assert_only_allowed_axioms
@@ -436,6 +470,59 @@ section 3, Proposition 1(c). -/
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standard_braid
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standard_st_order
+
+/-! The standard PSU root is a Sylow 2-subgroup of order q^3 and an honest
+Appendix III Suzuki 2-group. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.center_eq_centerLine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.natCard_center
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.natCard_center_eq_baseField
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.natCard_eq_baseField_cube
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootSubgroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.rootEquivStandardRoot
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_standardRootSubgroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_standardRootSubgroup_eq_baseField_cube
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.baseFieldUnitEmbedding
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.coe_baseFieldUnitEmbedding
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.baseTorusScaleHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.baseTorusScaleHom_fst
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.baseTorusScaleHom_snd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.baseTorusScaleHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootTorus
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootTorus_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootTorus_actsRegularlyOnInvolutions
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.isSuzuki2Group
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootOddCofactor
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootOddCofactor_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootSubgroup_index
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootSubgroup_index_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootSylow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.coe_standardRootSylow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardRootSubgroup_isSuzuki2Group
 
 -- Faithful PSU root--torus semidirect product and its standard Borel range.
 #assert_only_allowed_axioms
@@ -749,6 +836,43 @@ Suzuki branch of Peterfalvi Part II, Ch. I section 3, Proposition 1(c). -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_ne_one
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.Suzuki.orderOf_standardRootInvolution_mul_weylElement
+
+/-! The standard Suzuki root is a Sylow 2-subgroup and carries the concrete
+Appendix III type-A Suzuki 2-group structure. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootOddCofactor
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootOddCofactor_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup_index
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup_index_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_standardRootSylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeightUnit
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_torusWeightUnit
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeightUnit_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeightUnit_surjective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootTorus_isCyclic
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScaleHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootTorus_actsRegularlyOnInvolutions
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_pow_period
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_orderOf_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_ne_one_of_pos
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.not_isMulCommutative
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.twist_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.twist_orderOf_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.map_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.standardTypeAData
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroupTypeAData
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.isSuzuki2Group
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup_isSuzuki2Group
 
 -- Perfectness, solvable Borel stabilizer, and simplicity of the standard Suzuki group.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_eq_one_iff
@@ -7793,6 +7917,107 @@ that conclusion back to the original centralizer. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_cQ_isPGroup_of_induction
 
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, PSL branch:
+the quotient and actual centralizer root groups are elementary abelian of
+order `ell = |F|`, and `ell = |C_Q0(X)|`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qMulEquivPSLRoot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.q_isElementaryAbelian_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_field_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQMulEquivPSLRoot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQ_isElementaryAbelian_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQuotientQ_eq_field_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQ0_subgroupOf_eq_Q_subgroupOf_of_elementaryAbelian
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQMulEquivPSLRoot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ_isElementaryAbelian_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_field_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_field_of_psl2Target
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, Suzuki branch:
+the actual centralizer root is an honest type-A Suzuki 2-group and has order
+the square of ell = |C_Q0(X)|. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qMulEquivSuzukiRoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qStandardTypeAData_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.q_isSuzuki2Group_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_field_sq_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQMulEquivSuzukiRoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQStandardTypeAData_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQ_isSuzuki2Group_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQuotientQ_eq_field_sq_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQMulEquivSuzukiRoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQStandardTypeAData_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ_isSuzuki2Group_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_field_sq_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ0EquivSuzukiCenterLine
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_field_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_centralizerQ0_sq_of_suzukiTarget
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, PSU branch:
+the actual centralizer root is an honest Suzuki 2-group and has order the
+cube of `ell = |C_Q0(X)|`.  No type-B conclusion is asserted here. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qMulEquivPSURoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.q_isSuzuki2Group_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_baseField_cube_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQMulEquivPSURoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQ_isSuzuki2Group_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQuotientQ_eq_baseField_cube_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQMulEquivPSURoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ_isSuzuki2Group_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_baseField_cube_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ0EquivPSUCenterLine
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_baseField_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_centralizerQ0_cube_of_psu3Target
+
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, distinguished-pair
 transport and order lift: the quotient pair is the image of the original
 pair, and the odd action kernel does not change the order of `st`. -/
@@ -7814,6 +8039,85 @@ pair, and the odd action kernel does not change the order of `st`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_quotient_pow
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, PSL distinguished
+pair: the source structure equation becomes the standard unipotent/root
+equation in `PSL(2, ell)`.  The matrix calculation gives order three in the
+quotient, and the preceding odd-kernel bridge lifts it to the centralizer. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.orderOf_root_mul_eq_three_of_structure
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_psl2Target
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_centralizer_psl2Target
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, Suzuki
+distinguished pair: root/torus normalization identifies the transported
+pair with the standard root involution and Weyl element, whose product has
+order five; the odd-kernel bridge lifts this to the centralizer. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardStructureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardStructureConjugator_mem_standardRootSubgroup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardSuzuki_structureEquation
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_centralizer_suzukiTarget
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, PSU
+distinguished pair: root/Borel/torus normalization identifies the transported
+pair with the standard central root involution and Weyl element.  Their braid
+relation gives product order three, which the odd-kernel bridge lifts to the
+ambient centralizer. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_centralizer_psu3Target
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**: the final centralizer
+assembly combines the classification-independent residual conclusions with
+the concrete PSL, Suzuki, and PSU alternatives, including the source
+cardinalities and distinguished-product orders 3/5/3. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_trichotomy_of_induction
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 2.**  The source subgroup
+`L = ⟨I⟩` is constructed as a proper normal subgroup, contains `Q`, inherits
+(A1)--(A3), satisfies `G = LD` and has odd index.  Induction on `L` then
+returns the concrete conclusion of Suzuki's Theorem A for every nonsimple
+`G`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.oPiCore_two_compl_eq_bot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.involution_mem_normal_subgroup
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.involutionClosure_proper_normal_of_not_simple
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_le_involutionClosure
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.subgroupHypothesis
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.involutionClosure_sup_D_eq_top
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.involutionClosure_odd_index
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.theoremAConclusion_of_not_simple
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
