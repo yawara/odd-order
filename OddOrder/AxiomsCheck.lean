@@ -86,6 +86,8 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.GeneralizedFitting
 import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
 import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
@@ -1148,6 +1150,17 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- (上界は `(|Z(G^∞)|·|Aut(G^∞)|)!`)。subnormal 版 9.13 + 9.12 + 9.11 で閉じる。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.card_autTowerType_add_le
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_card_autTowerType_le
+
+-- Ch.9 §9D: **Lem 9.31** — S ◁◁ G (subnormal) と P ∈ Syl_p(G) に対し P ∩ S ∈ Syl_p(S)。
+-- (mmd は ⊲⊲ を ⊲ に潰すので PDF p.291 で subnormal を確認済。)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_normal
+
+-- Ch.9 §9D: **Lem 9.29** — strong conjugacy と X^{(G)} の基本性質 (a)-(d)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_le_of_isSubnormal
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_mono
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_le
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_strongClosure
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
