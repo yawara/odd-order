@@ -351,7 +351,37 @@
       `N_G(⟨x⟩)`.  The two source cases `y ∈ H` and `y ∉ H` use the existing
       odd-dihedral conjugacy theorem inside that normalizer and normality of
       `C_G(⟨x⟩)` to contradict `x ^ 2 ≠ 1`.
-    - **Next frontier:** §3 Lemma 4 (p. 107), the `PSL(2,q)` subgroup generated
-      when `st` has order three and `V ≠ 1`.
+16. ✅ **§3 Lemma 4** (p. 107) is formalized in exactly two leaves,
+    `OrderThreePSL.lean` and `OrderThreePSLInduction.lean`.
+    - `OrderThreePSL.lean` derives the braid relation `tst = sts` from
+      `orderOf (s * t) = 3`, proves closure of the two Bruhat cells, and
+      identifies the carrier of `⟨Q₀,K,t⟩` with
+      `Q₀K ∪ Q₀KtQ₀`.
+    - The printed inclusion `tQ₀t ⊂ Q₀KtQ₀` is missing a sharp: it is false
+      at `1 ∈ Q₀`. The formalization proves the source calculation for
+      `tQ₀#t`, sends the unit to the small cell, and thereby obtains the
+      correct unit-inclusive two-cell inclusion without asserting the false
+      literal statement.
+    - `OrderThreePSLInduction.lean` uses the orbit of the generated subgroup to
+      construct the exact (A1)--(A3) hypothesis. Its `Q₀` action is regular
+      away from the base point, hence the action is doubly transitive. A
+      kernel element lies in `K`, while fixing the distinguished-involution
+      orbit point makes it centralize `s ∈ Q₀`; the theorem
+      `Q ∩ C_G(k) = 1` for nontrivial `k ∈ K` then kills the kernel. Thus
+      faithfulness is proved rather than assumed.
+    - `V ≠ 1` makes the generated subgroup proper. Theorem A induction is
+      applied to that concrete subgroup and promoted to the whole generated
+      subgroup. The Suzuki and PSU branches contradict commutativity of
+      `Q₀`, leaving an existential finite characteristic-two field `F` with
+      `|F| = |Q₀|` and `⟨Q₀,K,t⟩ ≃ PSL(2,F)`.
+    - Independent comparison with the source proof confirms the braid,
+      two-cell, properness, induced-action, induction, and classification
+      steps, with the missing sharp as the only textual correction. After the
+      single pre-commit `main` synchronization, `lake build OddOrder` exits 0
+      over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
+      hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
+      checks pass.
+    - **Next frontier:** §3 Lemma 5 (p. 107), the cyclicity and order bound for
+      `W` when `Q` is a Suzuki `2`-group and `st` has order three.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

@@ -219,6 +219,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
 import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -8219,6 +8221,23 @@ conjugacy inside `N_G(⟨x⟩)` excludes every involution from `C_G(x)`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.stronglyReal_normalForm_and_centralizer_odd
+
+/-! **Peterfalvi Part II, Ch. I §3 Lemma 4.**  The Bruhat carrier uses
+`t Q₀# t` in the big-cell calculation (restoring the sharp omitted in
+the source), and the restricted orbit supplies the faithful Theorem A hypothesis
+used by induction to identify `⟨Q₀, K, t⟩` with `PSL(2,q)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_orderThreeGeneratedSubgroup_eq_Q0K_union_Q0KtQ0
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderThree_faithfulSMul
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderThreeHypothesisOfAction
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_orderThreeGeneratedSubgroup_mulEquiv_psl2
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
