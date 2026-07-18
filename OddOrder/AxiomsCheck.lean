@@ -104,6 +104,7 @@ import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
 import OddOrder.BG.Ch1_Preliminary.S06_Lem63b
 import OddOrder.BG.Ch1_Preliminary.S06_Thm61
+import OddOrder.BG.Ch1_Preliminary.S06_Thm64
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
@@ -2497,6 +2498,26 @@ set_option linter.style.longLine false in
 -- cleanup; no new mathematics.  Axiom-clean.
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.le_oPiPrimePiCore_of_abelian_normal_in_sylow
+
+-- BG **Theorem 6.4** upstream components (issue 3026).  Thm 6.4 itself is not yet proved (the
+-- `|G| + |H|` induction plus hypothesis transport is ~2,100-3,100 further lines); these are its two
+-- hard steps, landed standalone:
+-- * `exists_centralizing_conj_sup_isPiGroup` — Theorem 6.4 **for coprime `A`**, i.e. BG
+--   Proposition 1.5(b)+(c) in joint subgroup form.  Thm 6.4 is exactly its generalization from
+--   coprime orders to the Hall/Fitting hypotheses, so this is the engine its Case 1 ends with.
+-- * `mem_centralizer_of_mem_normalizer_of_commutator_le` — the Case-1 centralizing step, stated
+--   against the **corrected** subgroup.  ⚠ BG p.50 (mmd L2031) prints `[H, yz] ⊆ H ∩ L = 1`, but
+--   `H ∩ L = 1` does not follow: the reduction gives only `G = LH` with `L ⊴ G`, hence
+--   `G/L ≅ H/(H ∩ L)`, and `L = ⟨J₁,J₂⟩` is not known to be a `π`-group (that is the conclusion),
+--   so it may meet the `π'`-group `H`.  The intended subgroup is `N`: `yz ∈ N_G(H)` gives
+--   `[H,yz] ⊆ H`; (6.3) plus `z ∈ N ⊴ G` puts it in `N`; and `H ∩ N = 1` because `N ≤ O_p(F(G))`
+--   is a `p`-group with `p ∉ π(H)` — which is the sentence BG states one line earlier.  A slip of
+--   `L` for `N`; the conclusion is sound.
+-- Both sorry-free + axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.mem_centralizer_of_mem_normalizer_of_commutator_le
 -- BG App.A Thm A.5(1): P ◁ G p-group, X gen by P-normalized abelian p-groups
 -- ⇒ XC_G(P)/C_G(P) ⊆ O_p(G/C_G(P)). stabilityLiftAux を K=P で直接適用 + iSup 分解。
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA5_part1
