@@ -7697,6 +7697,9 @@ for `L = C_G(X)` and `F₀ = ⟨C_Q(X)^L⟩`, the action kernel intersects
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_subgroupOf_normalClosure_cQ_eq_center
 
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerResidualQuotientEquiv_of_sylow
+
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
 `F = 𝔽_p[T] = End_{𝔽_p[T]}(E)` over which `E` is `1`-dimensional, with `|F| = |E|`.  The abstract

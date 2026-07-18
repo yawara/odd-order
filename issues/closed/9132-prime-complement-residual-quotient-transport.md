@@ -29,7 +29,7 @@ Consumer: `OddOrder/Peterfalvi/Appendices/Suzuki/CentralizerResidual.lean`.
 - [x] `N.subgroupOf (primeComplementResidual p G) = center ...` から
       residual の center quotient と `primeComplementResidual p (G ⧸ N)` の
       `MulEquiv` を構成する。
-- [ ] Prop. 1(c) consumer と `OddOrder.AxiomsCheck` を配線する。
+- [x] Prop. 1(c) consumer と `OddOrder.AxiomsCheck` を配線する。
 
 ## 完了条件
 
@@ -42,3 +42,8 @@ Consumer: `OddOrder/Peterfalvi/Appendices/Suzuki/CentralizerResidual.lean`.
 - `issues/2043-centralizer-trichotomy-c.md`
 - `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`
 - `OddOrder/GroupTheory/PrimeComplementResidual.lean`
+
+## Completion
+
+Completed 2026-07-18. Surjective map transport, the quotient equivalence,
+and the Prop. 1(c) Sylow-specialized consumer are axiom-clean and build-green.

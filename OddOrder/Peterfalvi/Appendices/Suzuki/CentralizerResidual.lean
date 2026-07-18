@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
+import OddOrder.GroupTheory.PrimeComplementResidual
 
 /-!
 # Peterfalvi Part II, Ch. I §3: Proposition 1(c), centralizer residual
@@ -16,7 +17,8 @@ This file contains the target-independent structural clauses of Proposition
 1(c).  It proves that, once `C_Q(X)` is known to be a `2`-group, the
 odd-order direct factor `Q₁` has trivial centralizer of `X`. It also proves
 the source's center equality for the normal closure `⟨C_Q(X)^L⟩`; its
-identification with `O^{2′}(L)` belongs to the subsequent induction bridge.
+identification with `O^{2′}(L)` and quotient transport are packaged once
+the induction target supplies the honest Sylow witness for `C_Q(X)`.
 -/
 
 set_option autoImplicit false
@@ -156,6 +158,34 @@ theorem normalCore_subgroupOf_normalClosure_cQ_eq_center
     change (z : L) ∈ H_L.normalCore
     rw [hyp.normalCore_cH_eq_centralizer_cQ hXV]
     exact ⟨hzD, hzCQL⟩
+/-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, residual transport.
+If `C_Q(X)` is a Sylow `2`-subgroup of `L = C_G(X)`, then the preceding
+center equality identifies the central quotient of `O^{2′}(L)` with
+`O^{2′}(L / 𝒩(L))`. The Sylow hypothesis is the exact input still to be
+supplied by the induction target; it is not stored in an opaque carrier. -/
+noncomputable def centralizerResidualQuotientEquiv_of_sylow
+    {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (P : Sylow 2 (Subgroup.centralizer (X : Set G)))
+    (hP : (P : Subgroup (Subgroup.centralizer (X : Set G))) =
+      hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) :
+    let L : Subgroup G := Subgroup.centralizer (X : Set G)
+    let H_L : Subgroup L := hyp.H.subgroupOf L
+    ((Subgroup.primeComplementResidual 2 L) ⧸
+        Subgroup.center (Subgroup.primeComplementResidual 2 L)) ≃*
+      Subgroup.primeComplementResidual 2 (L ⧸ H_L.normalCore) := by
+  let L : Subgroup G := Subgroup.centralizer (X : Set G)
+  let H_L : Subgroup L := hyp.H.subgroupOf L
+  let Q_L : Subgroup L := hyp.Q.subgroupOf L
+  change ((Subgroup.primeComplementResidual 2 L) ⧸
+      Subgroup.center (Subgroup.primeComplementResidual 2 L)) ≃*
+    Subgroup.primeComplementResidual 2 (L ⧸ H_L.normalCore)
+  have hF : Subgroup.primeComplementResidual 2 L =
+      Subgroup.normalClosure (Q_L : Set L) := by
+    rw [Subgroup.primeComplementResidual_eq_normalClosure P, hP]
+  apply Subgroup.primeComplementResidualQuotientEquiv H_L.normalCore
+  rw [hF]
+  exact hyp.normalCore_subgroupOf_normalClosure_cQ_eq_center hXV
+
 end
 
 end Hypothesis

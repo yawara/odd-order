@@ -274,8 +274,12 @@
      `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)`. The reverse inclusion uses
      the opposite root group `C_{Q^t}(X)` (the source OCR prints `Q′`),
      exactly as in SS1 Proposition 1(b).
-   - **Next frontier:** identify this normal closure with
-     `F = O^{2′}(C_G(X))` through the induction quotient, then transport
-     the residual across that quotient.
+   - ✅ `centralizerResidualQuotientEquiv_of_sylow` combines that equality
+     with the shared surjective-map API to construct
+     `O^{2′}(L) / Z(O^{2′}(L)) ≃* O^{2′}(L / 𝒩(L))` once an honest
+     Sylow witness identifies `C_Q(X)` as a Sylow `2`-subgroup of `L`.
+   - **Next frontier:** construct the quotient Hypothesis/induction carrier
+     and discharge that Sylow witness; it is deliberately not an opaque
+     field of the consumer.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
