@@ -355,12 +355,13 @@ theorem hcuZetaPair_summandComplement_subset_ker [Finite G] {M : Subgroup G}
     (hWinv : OddOrder.Isaacs.Ch03.IsAInvariant (uActionHom data chief) W)
     (hθW : ∀ w ∈ W, θ w = 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)] :
     (((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data) :
         Set ↥(huSub data)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce
         (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam)) := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   haveI := caseA_realizedComplement_subgroupOf_huSub_normal hWinv
   refine OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
     (A := ((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data))
@@ -554,7 +555,7 @@ theorem hcuZetaPair_induceHU_mem_sOf [Finite G] {M : Subgroup G}
       (c : ↥(huSub data)) ∈ ((uprimeSub data).subgroupOf M).subgroupOf (huSub data) →
       lam c = 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal]
@@ -565,6 +566,7 @@ theorem hcuZetaPair_induceHU_mem_sOf [Finite G] {M : Subgroup G}
     induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
         (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)
       ∈ sOf data (chief.H0 ⊔ uprimeSub data) := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   rw [mem_sOf]
   exact ⟨⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
       hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩,
@@ -590,7 +592,7 @@ theorem hcuZetaPair_induceHU_irreducible [Finite G] {M : Subgroup G}
         = hcuSeedHom (chief := chief) θ h)
     (lam : ↥(cuInHu caseA) →* ℂˣ)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal]
     (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
@@ -601,6 +603,7 @@ theorem hcuZetaPair_induceHU_irreducible [Finite G] {M : Subgroup G}
         (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) ≠ ⊤) :
     IsIrreducibleCharacter (induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)) := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   letI : Fintype ↥M := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
@@ -759,7 +762,7 @@ theorem lam_eq_one_of_cInHu_subset_ker_zetaPair [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
     (hker : ∀ z : ↥(huSub data), z ∈ cInHu data chief →
@@ -769,6 +772,8 @@ theorem lam_eq_one_of_cInHu_subset_ker_zetaPair [Finite G] {M : Subgroup G}
           ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
             (huSub data)) ℂ)))
     (c : ↥(cInHu data chief)) : lam c = 1 := by
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) := Fintype.ofFinite _
   haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)).Normal := hcInHu_realized_normal chief
   have hdesc := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce

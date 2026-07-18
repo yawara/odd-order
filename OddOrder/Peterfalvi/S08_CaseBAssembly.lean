@@ -373,8 +373,8 @@ the `hagg` input of `per_phi_anchored_image`:
 `Xagg − |H:W₂|·Y₀ = ∑_θ aθ·((D θ).X − (D θ).Y)`.  The source aggregate's `ℂ`-scalar `(aθ : ℂ)·η₁`
 is reconciled with the family's `ℕ`-anchor `aθ • η₁` by `Nat.cast_smul_eq_nsmul`. -/
 theorem caseB_hagg
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
-    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Finite ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
     [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
     {φ : ClassFunction ↥W2 ℂ}
@@ -391,6 +391,8 @@ theorem caseB_hagg
     Xagg - (((W2.subgroupOf H).index : ℤ) : ℂ) • Y₀
       = ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
           ((constituentWeight hφ' i.val : ℤ) : ℂ) • ((D i).X - (D i).Y) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
   have hagg := aggregate_eq_sum_of_constituent (L := L) Finset.univ hyp.tau
     (fun i => ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)
       - constituentWeight hφ' i.val • η₁)
@@ -419,8 +421,8 @@ This is the route-independent (6.8.2.3) core: the `Xagg`/`hsq`/`hagg` are assemb
 (`caseB_hagg`, `sum_constituentWeight_sq_subtype`); only the family `D` (the constituent dispatch)
 and its per-`θ` orthogonality/integrality remain for the capstone. -/
 theorem caseB_per_phi_anchored
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
-    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Finite ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
     [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
     {φ : ClassFunction ↥W2 ℂ}
@@ -442,8 +444,10 @@ theorem caseB_per_phi_anchored
     (hbi : ∀ i, ClassFunction.inner (D i).Y (cY.extension η₁) = (b i : ℂ))
     (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) :
     hyp.tau (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ) - constituentWeight hφ' i.val • η₁)
-      = (D i).X - (constituentWeight hφ' i.val : ℂ) • cY.extension η₁ :=
-  per_phi_anchored_image hyp cY hη₁ Finset.univ D htau1 hXaggorth
+      = (D i).X - (constituentWeight hφ' i.val : ℂ) • cY.extension η₁ := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  exact per_phi_anchored_image hyp cY hη₁ Finset.univ D htau1 hXaggorth
     (caseB_hagg hyp hW2H hcen hφ' D htau1 hdecomp)
     (sum_constituentWeight_sq_subtype hW2H hcen hφ')
     (fun i _ => hXorth i) (fun i _ => hbi i) i (Finset.mem_univ i) i.2
@@ -585,13 +589,13 @@ column/irreducible structural bundles `hcol`/`hirr`, the `Y`-anchor `η₁` data
 support / conjugate facts), the partner anchor `η' ≠ η₁ ∈ Yset`, the per-`θ` anchor-vs-constituent
 orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp` (`exists_decomposition_caseB`). -/
 theorem caseB_per_phi_anchored_family
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
-    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Finite ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
     [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
     {φ : ClassFunction ↥W2 ℂ}
@@ -655,13 +659,13 @@ no nontrivial real irreducible), `⟨η₁, η̄₁⟩ = 0` (distinct irreducibl
 genuinely hard §5/§6 content: the per-`θ` column/irreducible bundles `hcol`/`hirr`, the per-`θ`
 anchor-vs-constituent orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp`. -/
 theorem caseB_per_phi_anchored_fromYset
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
-    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Finite ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
     [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
     {φ : ClassFunction ↥W2 ℂ}
@@ -988,9 +992,10 @@ theorem caseB_Xset_orthogonal_Yset
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
     ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0 := by
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   have hdisj : Disjoint (hyp.Xset W2) hyp.Yset := by
     have hYsub : hyp.Yset ⊆ hyp.SsubFiltration W2 :=
       hyp.SsubFiltration_antitone hW2comm

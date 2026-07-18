@@ -348,8 +348,8 @@ theorem hcuZetaPair_inertia_ne_top [Finite G] {M : Subgroup G}
     (lam : ↥(cuInHu caseA) →* ℂˣ)
     {j₁ : Fin data.q} (hnonreg : θ.comp (caseA.Hpart j₁).subtype = 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
-    [Fintype ↥(hInHu data)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data) : ℂ)]
@@ -360,6 +360,8 @@ theorem hcuZetaPair_inertia_ne_top [Finite G] {M : Subgroup G}
         = hInHu data ⊔ cuInHu caseA) :
     ClassFunction.inertia (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) ≠ ⊤ := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
   intro hMfix
   -- `ζ` lies over the inflation `θ₀` at `hInHu`.
   have hlo := hcuZetaPair_liesOver_hInHu caseA θ hinv lam hθ₀
@@ -392,8 +394,8 @@ theorem hcuZetaPair_induceHU_irreducible_of_nonRegular [Finite G] {M : Subgroup 
     (lam : ↥(cuInHu caseA) →* ℂˣ)
     {j₁ : Fin data.q} (hnonreg : θ.comp (caseA.Hpart j₁).subtype = 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
-    [Fintype ↥(hInHu data)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal]
@@ -403,6 +405,8 @@ theorem hcuZetaPair_induceHU_irreducible_of_nonRegular [Finite G] {M : Subgroup 
         = hInHu data ⊔ cuInHu caseA) :
     IsIrreducibleCharacter (induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)) := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact hcuZetaPair_induceHU_irreducible caseA θ hinv lam hθ₀
@@ -425,9 +429,9 @@ theorem caseA_exists_irreducible_source_degree_qa_induceHU_irreducible [Finite G
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (lam : ↥(cuInHu caseA) →* ℂˣ)
-    [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
-    [Fintype ↥(hInHu data)]
+    [Finite ↥(huSub data)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data) : ℂ)] :
@@ -435,6 +439,9 @@ theorem caseA_exists_irreducible_source_degree_qa_induceHU_irreducible [Finite G
       IsIrreducibleCharacter ζ ∧ ζ (1 : ↥(huSub data)) = (caseA.a : ℂ) ∧
       IsIrreducibleCharacter (induceHU data ζ) ∧
       induceHU data ζ (1 : ↥M) = ((data.q * caseA.a : ℕ) : ℂ) := by
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
   haveI := hcuInHu_normal caseA
   obtain ⟨θ, W, hWinv, hsup, hreg, htriv, j₁, hnonreg⟩ :=
     exists_source_char_hom_caseA_nonRegular caseA
@@ -588,11 +595,12 @@ If two irreducible `HU`-characters `χ, ψ` have equal `M`-inductions `Ind_{HU}^
 `w ∈ M` conjugates `ψ` to `χ` (`induce_eq_induce_iff_conj` at the `induceHU` wrapper level).  The
 raw first step of the (9.8.d) injectivity: distinct inductions ⟺ distinct `M`-conjugacy orbits. -/
 theorem induceHU_eq_imp_exists_conj [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
-    [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Finite ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
     {χ ψ : IrreducibleCharacter ↥(huSub data)}
     (h : induceHU data (χ : ClassFunction ↥(huSub data) ℂ)
       = induceHU data (ψ : ClassFunction ↥(huSub data) ℂ)) :
     ∃ w : ↥M, IrreducibleCharacter.conjBy w ψ = χ := by
+  haveI : Fintype ↥M := Fintype.ofFinite _
   haveI := huSub_normal data
   letI : Fintype ↥(huSub data) := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥M : ℂ) :=
@@ -622,12 +630,13 @@ the `W = H₂…H_q ⊆ Ker` propagation (core (1), `hcuZetaPair_summandCompleme
 full `hcrit` reduction (`hcrit_of_summand_orbit`) are now all landed; the sole residual is the
 (9.7.a) `W₁`-free-orbit datum `horbit` (`S₀^{w₁} ⊆ W`), absent from `CliffordCaseAData` (issue 1018). -/
 theorem induceHU_inj_of_conj_mem_huSub [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
-    [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Finite ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
     {χ ψ : IrreducibleCharacter ↥(huSub data)}
     (hcrit : ∀ w : ↥M, IrreducibleCharacter.conjBy w ψ = χ → (w : ↥M) ∈ huSub data)
     (h : induceHU data (χ : ClassFunction ↥(huSub data) ℂ)
       = induceHU data (ψ : ClassFunction ↥(huSub data) ℂ)) :
     χ = ψ := by
+  haveI : Fintype ↥M := Fintype.ofFinite _
   haveI := huSub_normal data
   obtain ⟨w, hw⟩ := induceHU_eq_imp_exists_conj data h
   have hwHU : (w : ↥M) ∈ huSub data := hcrit w hw
@@ -666,7 +675,7 @@ function), *not* the `W₁`-conjugate orbit; the orbit is re-derived rather than
 —
 no structure enrichment is needed, see issue 1018.) -/
 theorem hcrit_of_summand_orbit [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
-    {chief : ChiefFactorData data} [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    {chief : ChiefFactorData data} [Finite ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
     {S₀ W : Subgroup (↥data.H ⧸ chief.N)}
     {ζ₁ ζ₂ : IrreducibleCharacter ↥(huSub data)}
     (hS0notker : ¬ (((caseA_realizedComplement chief S₀).subgroupOf M).subgroupOf (huSub data) :
@@ -680,6 +689,7 @@ theorem hcrit_of_summand_orbit [Finite G] {M : Subgroup G} (data : TypesIIIIIIVS
         ClassFunction.conjByMulEquiv (H := huSub data) (w₁ : ↥M) s
           ∈ ((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data)) :
     ∀ w : ↥M, IrreducibleCharacter.conjBy w ζ₂ = ζ₁ → (w : ↥M) ∈ huSub data := by
+  haveI : Fintype ↥M := Fintype.ofFinite _
   haveI := huSub_normal data
   intro w hw
   -- decompose `w = a·w₁`, `a ∈ HU`, `w₁ ∈ W₁` (`M = HU ⋊ W₁`).
@@ -726,7 +736,7 @@ remains).  Combined with `induceHU_inj_of_conj_mem_huSub` this closes (γ) of Pe
 with `θ|_W = 1`, which holds since a member's seed `θ₁ ∈ Irr(H̄/W)`). -/
 theorem caseA_hcrit_of_member [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
-    (caseA : CliffordCaseAData chars) [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    (caseA : CliffordCaseAData chars) [Finite ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
     {ζ₁ ζ₂ : IrreducibleCharacter ↥(huSub data)}
     (hS0notker : ¬
       (((caseA_realizedComplement chief caseA.S0).subgroupOf M).subgroupOf (huSub data) :
@@ -735,8 +745,9 @@ theorem caseA_hcrit_of_member [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSe
     (hkerW₂ : (((caseA_realizedComplement chief (caseA_wComplement caseA)).subgroupOf M).subgroupOf
           (huSub data) : Set ↥(huSub data)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (ζ₂ : ClassFunction ↥(huSub data) ℂ)) :
-    ∀ w : ↥M, IrreducibleCharacter.conjBy w ζ₂ = ζ₁ → (w : ↥M) ∈ huSub data :=
-  hcrit_of_summand_orbit data hS0notker hkerW₂ (caseA_wOrbit_horbit caseA)
+    ∀ w : ↥M, IrreducibleCharacter.conjBy w ζ₂ = ζ₁ → (w : ↥M) ∈ huSub data := by
+  haveI : Fintype ↥M := Fintype.ofFinite _
+  exact hcrit_of_summand_orbit data hS0notker hkerW₂ (caseA_wOrbit_horbit caseA)
 
 /-- **Homs trivial on `W` biject with homs of the quotient `H̄/W`** (Peterfalvi (9.8.d) (β) substrate).
 A hom `θ : H̄ →* ℂˣ` with `W ≤ Ker θ` descends uniquely to `H̄/W →* ℂˣ` (`QuotientGroup.lift`,
@@ -901,12 +912,13 @@ which forces `η = θ` (distinct irreducibles orthogonal, `irreducibleCharacter_
 to
 identify the intermediate constituent's seed in the (9.8.c) step-5 assembly (a linear `ψ'` restricts
 to a single character, pinning its inflation seed). -/
-theorem eq_of_liesOver_of_restrict_eq_irr {Γ : Type*} [Group Γ] [Fintype Γ]
+theorem eq_of_liesOver_of_restrict_eq_irr {Γ : Type*} [Group Γ] [Finite Γ]
     [Invertible (Nat.card Γ : ℂ)] {K : Subgroup Γ} [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
     {χ : IrreducibleCharacter Γ} {θ η : IrreducibleCharacter ↥K}
     (hover : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver K χ θ)
     (hres : ClassFunction.restrict K (χ : ClassFunction Γ ℂ) = (η : ClassFunction ↥K ℂ)) :
     η = θ := by
+  haveI : Fintype Γ := Fintype.ofFinite Γ
   rw [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
     ClassFunction.restrictionMultiplicity_def, hres] at hover
   by_contra h
@@ -983,7 +995,7 @@ theorem caseA_reducible_eq_hcZeta [Finite G] {M : Subgroup G}
     (θbar : (↥data.H ⧸ chief.N) →* ℂˣ)
     [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
     [Fintype ↥(huSub data)] [Invertible (Nat.card ↥(huSub data) : ℂ)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
     [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
@@ -1000,6 +1012,8 @@ theorem caseA_reducible_eq_hcZeta [Finite G] {M : Subgroup G}
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
       (hcPsi chief θbar) := by
   classical
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
   haveI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
     (realizedH0supC_normal_huSub chief).subgroupOf _
@@ -1073,7 +1087,7 @@ theorem caseA_reducible_source_eq_hcZeta [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1084,6 +1098,8 @@ theorem caseA_reducible_source_eq_hcZeta [Finite G] {M : Subgroup G}
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsi chief θbar)) := by
   classical
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
   letI : Fintype ↥M := Fintype.ofFinite _
   letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
@@ -1117,8 +1133,8 @@ every *reducible* member of `𝒮(H₀)` is induced from a linear character of `
 theorem caseA_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
-    [Fintype ↥M] [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Fintype ↥M] [Finite ↥(huSub data)]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
       M).subgroupOf (huSub data)) : ℂ)]
     [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
@@ -1134,6 +1150,9 @@ theorem caseA_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSim
         ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
           (huSub data)).map (huSub data).subtype) ψ := by
   classical
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
@@ -1169,8 +1188,8 @@ this is exactly (13.3.a)'s "`μ_j` is induced from a linear character of `PC`". 
 theorem reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief)
-    [Fintype ↥M] [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Fintype ↥M] [Finite ↥(huSub data)]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
       M).subgroupOf (huSub data)) : ℂ)]
     [Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
@@ -1185,6 +1204,9 @@ theorem reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       φ = ClassFunction.induce
         ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
           (huSub data)).map (huSub data).subtype) ψ := by
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
   rcases clifford_dichotomy hG chars with hA | hB
   · obtain ⟨caseA⟩ := hA
     exact caseA_reducible_sOf_H0_isIndHC hG caseA hφ hred
@@ -1219,12 +1241,13 @@ theorem caseA_regular_inflation_inertia_eq [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hreg : ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1)
-    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)] :
+    [Finite ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)] :
     ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
         (ClassFunction.compHom (QuotientGroup.mk' chief.N)
           (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
-      = hInHu data ⊔ cInHu data chief :=
-  inertia_eq_hcInHu_caseA data chief caseA (fun i => by
+      = hInHu data ⊔ cInHu data chief := by
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  exact inertia_eq_hcInHu_caseA data chief caseA (fun i => by
     obtain ⟨x, hx, hne⟩ := (comp_subtype_ne_one_iff_exists caseA θ i).mp (hreg i)
     exact ⟨x, hx, by
       rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one,
@@ -1239,16 +1262,19 @@ theorem caseA_hcZeta_irreducible_of_regular [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hreg : ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1)
-    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [Finite ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
     [Fintype ↥(huSub data)] [Invertible (Nat.card ↥(huSub data) : ℂ)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
     [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
     IsIrreducibleCharacter (ClassFunction.induce
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
-      (hcPsi chief θ)) :=
-  hcZeta_irreducible chief θ (caseA_regular_inflation_inertia_eq caseA θ hreg)
+      (hcPsi chief θ)) := by
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  exact hcZeta_irreducible chief θ (caseA_regular_inflation_inertia_eq caseA θ hreg)
 
 set_option linter.style.openClassical false in
 open scoped Classical in
@@ -1267,9 +1293,9 @@ theorem caseA_Xmu_card_eq [Finite G] {M : Subgroup G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
-    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [Finite ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
     [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
@@ -1280,6 +1306,9 @@ theorem caseA_Xmu_card_eq [Finite G] {M : Subgroup G}
         ¬ IsIrreducibleCharacter (induceHU data ζ)).card
       = chief.p - 1 := by
   classical
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
   set RegF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
     ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1 with hRegF
   set Xθ := RegF.image fun θ =>
@@ -1332,15 +1361,20 @@ theorem caseA_exists_irreducible_sOf_H0C [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
-    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
-    [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ((↥data.H ⧸ chief.N) →* ℂˣ)]
+    [Finite ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [Finite ↥(huSub data)]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
     [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
     ∃ χ ∈ sOf data (chief.H0 ⊔ chars.C), IsIrreducibleCharacter χ ∧
       χ (1 : ↥M) = ((data.q * chars.u : ℕ) : ℂ) := by
+  haveI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
   letI : Fintype ↥M := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')

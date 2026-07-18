@@ -917,8 +917,9 @@ theorem sigma_mapRingEquiv_comm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
 
 /-- Every linear character of the finite `W` has finite multiplicative order:
 `ξ ^ |W| = 1` pointwise. -/
-theorem orderOf_char_ne_zero (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+theorem orderOf_char_ne_zero (hyp : TICyclicHypothesis G) [Finite hyp.W]
     (ξ : hyp.W →* ℂˣ) : orderOf ξ ≠ 0 := by
+  haveI : Fintype hyp.W := Fintype.ofFinite _
   have hξpow : ξ ^ Fintype.card hyp.W = 1 := by
     ext w
     rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow, pow_card_eq_one, map_one]
@@ -1154,12 +1155,12 @@ of unity as a power map (candidate for `CyclotomicGaloisAction`), and a complex 
 integral over `ℚ` and fixed by every ring automorphism of `ℂ` is rational (candidate for
 `CyclotomicGaloisAction`).  They are kept here to leave the active frontier in this leaf. -/
 
+omit [Fintype G] in
 /-- Virtual-character values are algebraic integers: each irreducible character value is a sum
 of roots of unity (`character_isIntegral`), and `IsIntegral ℤ` is closed under the `ℤ`-span
 operations. -/
-theorem isIntegral_apply_of_mem_ZIrr {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (g : G) :
+theorem isIntegral_apply_of_mem_ZIrr [Finite G] {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (g : G) :
     IsIntegral ℤ (φ g) := by
-  haveI : Finite G := Finite.of_fintype G
   induction hφ using Submodule.span_induction with
   | mem x hx =>
       obtain ⟨V, _, _, _, ρ, hchar⟩ := IsIrreducibleCharacter.isCharacter hx

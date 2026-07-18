@@ -201,7 +201,7 @@ theorem certainType_W2_le_center (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L)
     _ = w * ((k : ↥L) * (w₁ : ↥L)) := by rw [← mul_assoc, hck, mul_assoc]
     _ = w * g := by rw [hkw]
 
-omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **(6.8) case-(B) structural discharge: the FPF index bounds `hc2`/`hFPF`.**
 
 In the (4.2)/certain-type structure `L = K ⋊ W₁` with `C_K(x) = W₂` (`x ∈ W₁^#`) and the math-(B)
@@ -216,12 +216,13 @@ condition lifts from `C_K(x) = W₂` via coprime action
 This discharges the deferred FPF inputs of `exists_decomposition_caseB` (with `H := K`, `W2 := W₂`):
 * `hc2 : 2 ≤ |K : W₂|` (from `W₂ ⊊ K`),
 * `hFPF : |L : W₂| < |K : W₂|²` (from `|L : W₂| = |K : W₂| · |W₁|` and `|W₁| < |K : W₂|`). -/
-theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L)
+theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L) [Finite ↥L]
     (hW2cenK : h.W2 ≤ Subgroup.centralizer (↑h.K : Set ↥L))
     (hKW2 : ¬ h.K ≤ h.W2) :
     2 ≤ (h.W2.subgroupOf h.K).index ∧
     (h.W2.index : ℤ) < ((h.W2.subgroupOf h.K).index : ℤ) ^ 2 := by
   classical
+  haveI : Fintype ↥L := Fintype.ofFinite _
   haveI : Finite ↥L := inferInstance
   haveI : Finite ↥h.K := inferInstance
   -- `W₂` is central, hence normal in `↥L`.
@@ -362,12 +363,13 @@ This is the `∑ aᵢ² = |H : Z|` step of Peterfalvi (6.8.2.3) (`Z = W₂ ⊆ Z
 `N = W₂.subgroupOf H`): the squared multiplicities of `Ind^H_Z φ` sum to `‖Ind^H_Z φ‖² = |H : Z|`. -/
 theorem inner_induce_self_eq_index_of_le_center
     {M : Type*} [Group M] [Fintype M] [Invertible (Nat.card M : ℂ)]
-    {N : Subgroup M} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    {N : Subgroup M} [Finite ↥N] [Invertible (Nat.card ↥N : ℂ)]
     (hN : N ≤ Subgroup.center M)
     {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) :
     ClassFunction.inner (ClassFunction.induce N φ) (ClassFunction.induce N φ)
       = (N.index : ℂ) := by
   classical
+  haveI : Fintype ↥N := Fintype.ofFinite _
   haveI hNnorm : N.Normal := by
     constructor
     intro n hn g

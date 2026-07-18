@@ -301,13 +301,14 @@ irreducible (`Sset_isIrreducibleCharacter`), so its `(12.2.a)` decomposition `χ
 single term: there is `φ ∈ data.constituents` with `↑φ = χ`.  Feeds the (12.5) orthogonality
 `⟨ψ, coh.extension χ⟩ = 0` via `inner_psi_coherent_extension_eq_zero` (which is stated per
 constituent). -/
-theorem Sset_self_mem_constituents [Finite G] {L : Subgroup G} [Fintype ↥L]
+theorem Sset_self_mem_constituents [Finite G] {L : Subgroup G} [Finite ↥L]
     [Invertible (Nat.card ↥L : ℂ)] (hyp : Hypothesis L)
     {C : Subgroup ↥L}
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) (data : CharacterDecompositionData hyp χ) :
     ∃ φ : IrreducibleCharacter ↥L, (φ : ClassFunction ↥L ℂ) = χ ∧ φ ∈ data.constituents := by
   classical
+  haveI : Fintype ↥L := Fintype.ofFinite _
   haveI := hyp.finiteG
   have hirr : IsIrreducibleCharacter χ := Sset_isIrreducibleCharacter hyp hfrob hχ
   obtain ⟨φ₀, hφ₀⟩ := data.constituents_nonempty

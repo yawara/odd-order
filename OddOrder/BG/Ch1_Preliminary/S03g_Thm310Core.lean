@@ -46,7 +46,7 @@ and the condition collapses this to `|R| = p`. -/
 theorem prime_card_of_freeBlock_cond3
     [FiniteDimensional F V] [Nontrivial V] (ρ : Representation F G V)
     {R : Subgroup G} [Finite ↥R] (hRne : R ≠ ⊥)
-    {ι : Type*} [Fintype ι] [DecidableEq ι] [MulAction ↥R ι]
+    {ι : Type*} [Finite ι] [DecidableEq ι] [MulAction ↥R ι]
     {W : ι → Submodule F V} (hW : DirectSum.IsInternal W)
     (hfree : ∀ (h : ↥R) (i : ι), h • i = i → h = 1)
     (hperm : ∀ (h : ↥R) (i : ι), (W i).map (ρ (h : G)) = W (h • i))
@@ -55,6 +55,7 @@ theorem prime_card_of_freeBlock_cond3
         = finrank F (Representation.invariants (ρ.comp R.subtype))) :
     ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p := by
   classical
+  haveI : Fintype ι := Fintype.ofFinite ι
   -- Cauchy: pick `x ∈ R` of prime order `p`.
   obtain ⟨p, hp, hpdvd⟩ := (Nat.card ↥R).exists_prime_and_dvd
     (fun h1 => hRne (Subgroup.card_eq_one.mp h1))

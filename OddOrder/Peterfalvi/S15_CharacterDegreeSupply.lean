@@ -137,10 +137,10 @@ theorem caseA_exists_irreducible_witnessed [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
-    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [Finite ((↥data.H ⧸ chief.N) →* ℂˣ)]
+    [Finite ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
     [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
@@ -150,6 +150,11 @@ theorem caseA_exists_irreducible_witnessed [Finite G] {M : Subgroup G}
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsi chief θ).toClassFunction)) := by
   classical
+  haveI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  haveI : Fintype
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+    Fintype.ofFinite _
   letI : Fintype ↥M := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')

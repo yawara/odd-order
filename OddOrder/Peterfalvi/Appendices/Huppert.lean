@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S16_NonExistenceG
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.GroupTheory.PrimeOrderSubgroups
 
 /-!
 # Peterfalvi Appendix B: A Special Case of a Theorem of Huppert
@@ -37,11 +38,13 @@ Proposition 1 is now fully assembled from the per-prime step: `F(D)` is cyclic
 (`fitting_fpf_of_transitive`), and `D' ≤ F(D)` for solvable `D`
 (`commutator_le_fitting_of_isCyclic_fitting`).
 
-The single remaining `sorry` is the heart of the Lemma: the *irreducible,
-non-cyclic* case of the constant-stabilizer ⟹ fixed-point-free argument
-(Schur over `𝔽_q` + the normal type-`(p,p)` subgroup, p. 136).  Everything
-else — the reducible/Maschke reduction, the abelian-irreducible case, and the
-whole of Proposition 1 — is unconditional.
+The irreducible non-cyclic case is proved by choosing a normal elementary
+abelian subgroup `R ⊴ P` of order `p²`.  The fixed spaces `C_E(T)`, indexed by
+the order-`p` subgroups `T ≤ R`, span `E` by BG Proposition 1.16 and form an
+independent family by orbit-product projections.  Conjugation by `P` permutes
+this family, and a centrality argument supplies at least two nonzero summands,
+so part (1) gives fixed-point-freeness.  Thus the Lemma and Proposition 1 are
+both unconditional.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Huppert
@@ -412,6 +415,185 @@ theorem isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian
 
 end Lemma
 
+private noncomputable def orbitProductHom
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] : U →* U where
+  toFun := orbitProduct φ H
+  map_one' := by simp [orbitProduct]
+  map_mul' x y := by
+    simp only [orbitProduct, map_mul]
+    exact Finset.prod_mul_distrib
+
+@[simp]
+private theorem orbitProductHom_apply
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U) :
+    orbitProductHom φ H u = orbitProduct φ H u := rfl
+
+private theorem orbitProductHom_apply_of_mem_actionFixedPoints
+    {A U : Type*} [Group A] [CommGroup U]
+    (φ : A →* MulAut U) (H : Subgroup A) [Fintype H] (u : U)
+    (hu : u ∈ actionFixedPoints φ H) :
+    orbitProductHom φ H u = u ^ Nat.card H := by
+  classical
+  simp only [orbitProductHom_apply, orbitProduct]
+  have hfix : ∀ h : H, (φ (h : A)) u = u := mem_actionFixedPoints.mp hu
+  simp_rw [hfix]
+  rw [Finset.prod_const, Finset.card_univ, Fintype.card_eq_nat_card]
+
+open scoped Pointwise
+private theorem iSupIndep_of_proj
+    {M : Type*} [Group M] [IsMulCommutative M]
+    {ι : Type*} [Finite ι]
+    (V : ι → Subgroup M) (e : ι → M →* M) {m : ℕ}
+    (hfix : ∀ i, ∀ v ∈ V i, e i v = v ^ m)
+    (hkill : ∀ i j, i ≠ j → ∀ v ∈ V j, e i v = 1)
+    (hm : ∀ x : M, x ^ m = 1 → x = 1) : iSupIndep V := by
+  classical
+  letI : Fintype ι := Fintype.ofFinite ι
+  rw [iSupIndep_def]
+  intro i
+  have h := OddOrder.BG.Ch1.S03f.disjoint_biSup_biSup_of_proj
+    V e hfix hkill hm {i} (Finset.univ.erase i) (by simp)
+  have heq : (⨆ j, ⨆ (_ : j ≠ i), V j) =
+      ⨆ j ∈ Finset.univ.erase i, V j := by
+    apply le_antisymm
+    · refine iSup_le fun j => iSup_le fun hji => ?_
+      exact le_iSup_of_le j (le_iSup_of_le (by simp [hji]) le_rfl)
+    · refine iSup_le fun j => iSup_le fun hj => ?_
+      exact le_iSup_of_le j (le_iSup_of_le (Finset.ne_of_mem_erase hj) le_rfl)
+  simpa only [Finset.iSup_insert, Finset.iSup_singleton, heq] using h
+
+private noncomputable def subgroupCardPerm
+    {P : Type*} [Group P] (R : Subgroup P) [R.Normal] (p : ℕ) (x : P) :
+    Equiv.Perm {T : Subgroup R // Nat.card T = p} :=
+  Equiv.subtypeEquiv
+    (OddOrder.RepresentationTheory.conjNormalMulAut R x).mapSubgroup.toEquiv
+    (fun T => by
+      change Nat.card T = p ↔
+        Nat.card ((OddOrder.RepresentationTheory.conjNormalMulAut R x).mapSubgroup T) = p
+      rw [Subgroup.card_mapSubgroup])
+
+@[simp]
+private theorem subgroupCardPerm_apply_coe
+    {P : Type*} [Group P] (R : Subgroup P) [R.Normal] (p : ℕ) (x : P)
+    (T : {T : Subgroup R // Nat.card T = p}) :
+    ((subgroupCardPerm R p x T : {T : Subgroup R // Nat.card T = p}) : Subgroup R) =
+      (OddOrder.RepresentationTheory.conjNormalMulAut R x).mapSubgroup T :=
+  rfl
+
+private theorem actionFixedPoints_map_conj
+    {P E : Type*} [Group P] [Group E]
+    (R : Subgroup P) [R.Normal] (p : ℕ) (φ : P →* MulAut E) (x : P)
+    (T : {T : Subgroup R // Nat.card T = p}) :
+    (actionFixedPoints (φ.comp R.subtype) T).map (φ x).toMonoidHom =
+      actionFixedPoints (φ.comp R.subtype) (subgroupCardPerm R p x T) := by
+  ext u
+  constructor
+  · rintro ⟨v, hv, rfl⟩
+    have hv' := mem_actionFixedPoints.mp hv
+    change ∀ r : (subgroupCardPerm R p x T : Subgroup R),
+      (φ (r : P)) ((φ x) v) = (φ x) v
+    intro r
+    obtain ⟨t, ht, hrt⟩ := r.2
+    have htfix := hv' ⟨t, ht⟩
+    change (φ (t : P)) v = v at htfix
+    have hrtP : ((r : R) : P) = x * (t : P) * x⁻¹ := by
+      rw [← hrt]
+      rfl
+    rw [hrtP, map_mul, map_mul, map_inv, MulAut.mul_apply,
+      MulAut.mul_apply, MulAut.inv_apply_self, htfix]
+  · intro hu
+    refine ⟨(φ x)⁻¹ u, ?_, MulAut.apply_inv_self E (φ x) u⟩
+    have hu' := mem_actionFixedPoints.mp hu
+    change ∀ t : (T : Subgroup R), (φ (t : P)) ((φ x)⁻¹ u) = (φ x)⁻¹ u
+    intro t
+    have htmap :
+        (OddOrder.RepresentationTheory.conjNormalMulAut R x) t ∈
+          (OddOrder.RepresentationTheory.conjNormalMulAut R x).mapSubgroup
+            (T : Subgroup R) :=
+      Subgroup.mem_map_of_mem
+        (OddOrder.RepresentationTheory.conjNormalMulAut R x).toMonoidHom t.2
+    have hfix := hu'
+      ⟨OddOrder.RepresentationTheory.conjNormalMulAut R x t, htmap⟩
+    apply (φ x).injective
+    rw [MulAut.apply_inv_self]
+    have hconj :
+        (((OddOrder.RepresentationTheory.conjNormalMulAut R x) t : R) : P) =
+          x * (t : P) * x⁻¹ := rfl
+    change (φ
+      ((((OddOrder.RepresentationTheory.conjNormalMulAut R x) t : R) : P))) u = u at hfix
+    rw [hconj, map_mul, map_mul, map_inv, MulAut.mul_apply, MulAut.mul_apply] at hfix
+    exact hfix
+
+private theorem actionFixedPoints_iSup_card_prime_eq_top
+    {R E : Type*} [Group R] [Finite R] [Group E] [Finite E]
+    {p : ℕ} (hp : p.Prime) (hR : IsElementaryAbelian p R)
+    (hRcard : Nat.card R = p ^ 2) (ψ : R →* MulAut E)
+    (hcop : Nat.Coprime (Nat.card R) (Nat.card E))
+    (hfixTop : actionFixedPoints ψ (⊤ : Subgroup R) = ⊥) :
+    (⨆ T : {T : Subgroup R // Nat.card T = p}, actionFixedPoints ψ T) = ⊤ := by
+  letI : CommGroup R := { (inferInstance : Group R) with mul_comm := hR.comm }
+  have hRnc : ¬ IsCyclic R := hR.not_isCyclic_of_card_prime_sq hp hRcard
+  have hspanRaw :=
+    OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic ψ hcop hRnc
+  rw [eq_top_iff, ← hspanRaw]
+  change Subgroup.closure _ ≤ _
+  rw [Subgroup.closure_le]
+  rintro v ⟨Y, ⟨a, hYa⟩, hYfix⟩
+  haveI hYnorm : Y.Normal := ⟨fun y hy g => by
+    have hcomm : g * y * g⁻¹ = y := by
+      rw [hR.comm g y]
+      group
+    rwa [hcomm]⟩
+  have hYidx : Y.index = 1 ∨ Y.index = p := by
+    have hgen : ∀ z : R ⧸ Y,
+        z ∈ Subgroup.zpowers ((QuotientGroup.mk' Y) a) := by
+      intro z
+      obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective Y z
+      have hxmem : x ∈ ((Y : Set R) * (Subgroup.zpowers a : Set R)) := by
+        rw [← Subgroup.normal_mul, hYa, Subgroup.coe_top]
+        exact Set.mem_univ x
+      rw [Set.mem_mul] at hxmem
+      obtain ⟨y, hy, z', hz', hxeq⟩ := hxmem
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz'
+      refine Subgroup.mem_zpowers_iff.mpr ⟨k, ?_⟩
+      have hy1 : (QuotientGroup.mk' Y) y = 1 :=
+        (QuotientGroup.eq_one_iff y).mpr hy
+      rw [← hxeq, map_mul, hy1, one_mul, map_zpow]
+    have hcycCard : Nat.card (R ⧸ Y) =
+        orderOf ((QuotientGroup.mk' Y) a) :=
+      (orderOf_eq_card_of_forall_mem_zpowers hgen).symm
+    have hdvd : orderOf ((QuotientGroup.mk' Y) a) ∣ p := by
+      apply orderOf_dvd_of_pow_eq_one
+      rw [← map_pow, hR.pow_eq_one a, map_one]
+    rw [Subgroup.index_eq_card, hcycCard]
+    exact hp.eq_one_or_self_of_dvd _ hdvd
+  rcases hYidx with hY1 | hYp
+  · have hYtop : Y = ⊤ := Subgroup.index_eq_one.mp hY1
+    have hvTop : v ∈ actionFixedPoints ψ (⊤ : Subgroup R) := by
+      rw [mem_actionFixedPoints]
+      intro r
+      have hrY : (r : R) ∈ Y := by
+        rw [hYtop]
+        exact Subgroup.mem_top _
+      exact hYfix (r : R) hrY
+    rw [hfixTop, Subgroup.mem_bot] at hvTop
+    rw [hvTop]
+    exact Subgroup.one_mem _
+  · have hYcard : Nat.card Y = p := by
+      have hmul := Subgroup.card_mul_index Y
+      rw [hYp, hRcard] at hmul
+      exact Nat.eq_of_mul_eq_mul_right hp.pos (by simpa [pow_two] using hmul)
+    have hle :
+        actionFixedPoints ψ Y ≤
+          ⨆ T : {T : Subgroup R // Nat.card T = p}, actionFixedPoints ψ T :=
+      le_iSup (fun T : {T : Subgroup R // Nat.card T = p} =>
+        actionFixedPoints ψ T) ⟨Y, hYcard⟩
+    apply hle
+    rw [mem_actionFixedPoints]
+    intro y
+    exact hYfix y y.2
 section Maschke
 
 variable {E : Type*} [Group E] [Finite E] {P : Type*} [Group P] [Finite P]
@@ -521,10 +703,13 @@ theorem fpf_of_reducible
 `P` act faithfully on the elementary abelian `q`-group `E`.  If `|P_a|` is the same for every
 `a ∈ E^#`, then `P` is cyclic and acts without fixed points on `E`.
 
-Case split (p. 135--136): if `P` acts reducibly, `fpf_of_reducible` (Maschke + part (1));
-if irreducibly and `P` is cyclic, `fpf_of_abelian_of_irreducible` (part (2) cyclic case); the
-remaining irreducible non-cyclic case (Schur's Lemma ⟹ `E = ⊕ C_E(Tᵢ)` ⟹ part (1)) is the
-sole remaining gap.  Cyclicity then follows from
+Case split (p. 135--136): if `P` acts reducibly, `fpf_of_reducible`
+(Maschke + part (1)); if irreducibly and `P` is cyclic,
+`fpf_of_abelian_of_irreducible` (part (2) cyclic case).  In the irreducible
+non-cyclic case, choose a normal elementary abelian `R ⊴ P` of order `p²`.
+The fixed spaces of its order-`p` subgroups form a `P`-permuted independent
+family spanning `E`, with at least two nonzero members, so part (1) again gives
+fixed-point-freeness.  Cyclicity then follows from
 `isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian`.
 
 (`q ≠ p` is a hypothesis; for nontrivial `P` it is forced by the other hypotheses — `q = p`
@@ -561,22 +746,266 @@ theorem pGroup_cyclic_fixedPointFree
         refine fpf_of_abelian_of_irreducible φ hfaithful (fun x y => mul_comm x y) ?_
         intro H hH
         exact hirr H (isAInvariant_iff_smul_mem.mpr hH)
-      · -- Irreducible non-cyclic case (p. 136).  Peterfalvi's argument:
-        -- [H] III.7.5 gives a *normal* `R ⊴ P` of type `(p,p)`; Schur ([Is] 1.5)
-        -- makes `End_{𝔽_q[P]}(E)` a finite field, so `Z(P)` (in its unit group) is
-        -- cyclic, whence `|R ∩ Z(P)| = p` and `P` transitively permutes the other `p`
-        -- order-`p` subgroups `Tᵢ ≤ R`; `E = ⊕ C_E(Tᵢ)` (coprime `Z_p×Z_p` action) is
-        -- a `P`-permuted decomposition with `≥ 2` parts, so part (1)
-        -- (`fpf_of_constant_stabilizer_of_permuted_decomp`) forces `P` cyclic — contra.
-        --
-        -- STATUS (issue 2004): the normal type-`(p,p)` step ([H] III.7.5 = Gorenstein
-        -- 5.4.10, odd `p`) is now PROVED unconditionally as
-        -- `OddOrder.BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic`.
-        -- Remaining to close this sorry: (i) Schur's lemma making `End_{𝔽_q[P]}(E)` a
-        -- finite field ⟹ `Z(P)` cyclic; (ii) `|R ∩ Z(P)| = p` from `Z(P)` cyclic + `R`
-        -- normal type-`(p,p)`; (iii) the coprime `Z_p×Z_p` decomposition
-        -- `E = ⊕ C_E(Tᵢ)` feeding `fpf_of_constant_stabilizer_of_permuted_decomp`.
-        sorry
+      · -- Irreducible non-cyclic case (p. 136): decompose `E` into the fixed
+        -- spaces of the order-`p` lines in a normal subgroup `R ≅ C_p × C_p`.
+        -- Orbit-product projections give independence, while conjugation by
+        -- `P` permutes at least two nonzero summands; apply part (1).
+        letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
+        obtain ⟨R, hRnorm, hRea, hRcard⟩ :=
+          OddOrder.BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+            hP hp_odd hcyc
+        letI : R.Normal := hRnorm
+        have hRfix : actionFixedPoints φ R = ⊥ := by
+          have hCinv : IsAInvariant φ (actionFixedPoints φ R) := by
+            rw [isAInvariant_iff_smul_mem]
+            intro d e he r
+            rw [mem_actionFixedPoints] at he
+            have hmem : d⁻¹ * (r : P) * d ∈ R := by
+              have h := hRnorm.conj_mem (r : P) r.2 d⁻¹
+              simpa using h
+            calc (φ (r : P)) ((φ d) e)
+                = (φ ((r : P) * d)) e := by rw [map_mul]; rfl
+              _ = (φ (d * (d⁻¹ * (r : P) * d))) e := by
+                  rw [show (r : P) * d = d * (d⁻¹ * (r : P) * d) by group]
+              _ = (φ d) ((φ (d⁻¹ * (r : P) * d)) e) := by rw [map_mul]; rfl
+              _ = (φ d) e := by rw [he ⟨d⁻¹ * (r : P) * d, hmem⟩]
+          rcases hirr _ hCinv with hbot | htop
+          · exact hbot
+          · exfalso
+            have hRbot : R = ⊥ := by
+              rw [eq_bot_iff]
+              intro r hr
+              rw [Subgroup.mem_bot]
+              apply hfaithful
+              rw [map_one]
+              ext e
+              have he : e ∈ actionFixedPoints φ R := by
+                rw [htop]
+                exact Subgroup.mem_top e
+              simpa using mem_actionFixedPoints.mp he ⟨r, hr⟩
+            have hcard1 : Nat.card R = 1 := by rw [hRbot]; exact Subgroup.card_bot
+            rw [hRcard] at hcard1
+            have hp2 : 1 < p ^ 2 := one_lt_pow₀ (Fact.out : p.Prime).one_lt two_ne_zero
+            omega
+        have hfpf_center : ∀ x : P, x ∈ Subgroup.center P → x ≠ 1 →
+            actionFixedBy φ x = ⊥ := by
+          intro x hxZ hx1
+          have hinv : IsAInvariant φ (actionFixedBy φ x) := by
+            rw [isAInvariant_iff_smul_mem]
+            intro y e he
+            rw [mem_actionFixedBy] at he ⊢
+            have hxy : x * y = y * x := (Subgroup.mem_center_iff.mp hxZ y).symm
+            calc (φ x) ((φ y) e) = (φ (x * y)) e := by rw [map_mul]; rfl
+              _ = (φ (y * x)) e := by rw [hxy]
+              _ = (φ y) ((φ x) e) := by rw [map_mul]; rfl
+              _ = (φ y) e := by rw [he]
+          rcases hirr _ hinv with hbot | htop
+          · exact hbot
+          · exfalso
+            apply hx1
+            apply hfaithful
+            rw [map_one]
+            ext e
+            have he : e ∈ actionFixedBy φ x := by rw [htop]; exact Subgroup.mem_top e
+            simpa using mem_actionFixedBy.mp he
+        letI : CommGroup R := { (inferInstance : Group R) with mul_comm := hRea.comm }
+        set ψ : R →* MulAut E := φ.comp R.subtype with hψdef
+        set Vfam : {T : Subgroup R // Nat.card T = p} → Subgroup E := fun T =>
+          actionFixedPoints ψ T with hVfamdef
+        have hRfixTop : actionFixedPoints ψ (⊤ : Subgroup R) = ⊥ := by
+          rw [eq_bot_iff]
+          intro e he
+          rw [Subgroup.mem_bot]
+          have heR : e ∈ actionFixedPoints φ R := by
+            rw [mem_actionFixedPoints]
+            intro r
+            have h := mem_actionFixedPoints.mp he
+              ⟨r, Subgroup.mem_top r⟩
+            exact h
+          rwa [hRfix] at heR
+        have hcopRE : Nat.Coprime (Nat.card R) (Nat.card E) := by
+          obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hE.isPGroup
+          rw [hRcard, hn]
+          exact ((Nat.coprime_primes Fact.out hq).mpr (Ne.symm hqp)).pow 2 n
+        have hspan : (⨆ T : {T : Subgroup R // Nat.card T = p}, Vfam T) = ⊤ := by
+          simpa only [hVfamdef] using
+            actionFixedPoints_iSup_card_prime_eq_top
+              (Fact.out : p.Prime) hRea hRcard ψ hcopRE hRfixTop
+        have hTi_sup : ∀ i j : {T : Subgroup R // Nat.card T = p}, i ≠ j →
+            (i : Subgroup R) ⊔ (j : Subgroup R) = ⊤ := by
+          intro i j hij
+          have hdvd1 : p ∣ Nat.card ↥((i : Subgroup R) ⊔ (j : Subgroup R)) := by
+            have hdvd := Subgroup.card_dvd_of_le
+              (le_sup_left : (i : Subgroup R) ≤ (i : Subgroup R) ⊔ (j : Subgroup R))
+            rwa [i.2] at hdvd
+          have hdvd2 : Nat.card ↥((i : Subgroup R) ⊔ (j : Subgroup R)) ∣ p ^ 2 := by
+            rw [← hRcard]
+            exact Subgroup.card_subgroup_dvd_card _
+          obtain ⟨k, hk2, hkeq⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd2
+          interval_cases k
+          · rw [hkeq, pow_zero] at hdvd1
+            exact absurd (Nat.dvd_one.mp hdvd1) (Fact.out : p.Prime).ne_one
+          · exfalso
+            have hXeq : (i : Subgroup R) = (i : Subgroup R) ⊔ (j : Subgroup R) :=
+              Subgroup.eq_of_le_of_card_ge le_sup_left (by rw [i.2, hkeq, pow_one])
+            have hji : (j : Subgroup R) ≤ (i : Subgroup R) := hXeq ▸ le_sup_right
+            exact hij (Subtype.ext
+              (Subgroup.eq_of_le_of_card_ge hji (by rw [i.2, j.2])).symm)
+          · apply Subgroup.eq_top_of_card_eq
+            rw [hkeq, hRcard]
+        have hVfam_disj : ∀ i j : {T : Subgroup R // Nat.card T = p}, i ≠ j →
+            Vfam i ⊓ Vfam j = ⊥ := by
+          intro i j hij
+          rw [eq_bot_iff]
+          rintro e ⟨hei, hej⟩
+          have heTop : e ∈ actionFixedPoints ψ (⊤ : Subgroup R) := by
+            rw [mem_actionFixedPoints]
+            intro r
+            have hTi_stab : (i : Subgroup R) ≤ pointStabilizer ψ e := by
+              intro t ht
+              exact mem_pointStabilizer.mpr
+                (mem_actionFixedPoints.mp hei ⟨t, ht⟩)
+            have hTj_stab : (j : Subgroup R) ≤ pointStabilizer ψ e := by
+              intro t ht
+              exact mem_pointStabilizer.mpr
+                (mem_actionFixedPoints.mp hej ⟨t, ht⟩)
+            exact mem_pointStabilizer.mp
+              ((hTi_sup i j hij ▸ sup_le hTi_stab hTj_stab) r.2)
+          rwa [hRfixTop] at heTop
+        haveI hιfin : Finite {T : Subgroup R // Nat.card T = p} := by
+          haveI : Finite (Subgroup R) :=
+            Finite.of_injective (fun T : Subgroup R => (T : Set R)) SetLike.coe_injective
+          exact Subtype.finite
+        letI : Fintype {T : Subgroup R // Nat.card T = p} := Fintype.ofFinite _
+        letI : DecidableEq {T : Subgroup R // Nat.card T = p} := Classical.decEq _
+        haveI instSubFT : ∀ T : Subgroup R, Fintype T := fun _ => Fintype.ofFinite _
+        set efam : {T : Subgroup R // Nat.card T = p} → (E →* E) := fun T =>
+          orbitProductHom ψ (T : Subgroup R) with hefamdef
+        have hefam_cent : ∀ (i : {T : Subgroup R // Nat.card T = p}) (v : E),
+            efam i v ∈ Vfam i := by
+          intro i v
+          simp only [hefamdef, hVfamdef, orbitProductHom_apply]
+          exact orbitProduct_mem_actionFixedPoints ψ (i : Subgroup R) v
+        have hefam_fix : ∀ (i : {T : Subgroup R // Nat.card T = p})
+            (v : E), v ∈ Vfam i → efam i v = v ^ p := by
+          intro i v hv
+          simp only [hefamdef]
+          rw [orbitProductHom_apply_of_mem_actionFixedPoints
+            ψ (i : Subgroup R) v (by simpa only [hVfamdef] using hv), i.2]
+        have hefam_mem : ∀ (i j : {T : Subgroup R // Nat.card T = p})
+            (v : E), v ∈ Vfam j → efam i v ∈ Vfam j := by
+          intro i j v hv
+          rw [hVfamdef, mem_actionFixedPoints]
+          intro k
+          simp only [hefamdef, orbitProductHom_apply, orbitProduct, map_prod]
+          refine Finset.prod_congr rfl fun t _ => ?_
+          have hfix := mem_actionFixedPoints.mp (by simpa only [hVfamdef] using hv) k
+          calc
+            (ψ (k : R)) ((ψ (t : R)) v) = (ψ ((k : R) * (t : R))) v := by
+              rw [map_mul]
+              rfl
+            _ = (ψ ((t : R) * (k : R))) v := by rw [mul_comm]
+            _ = (ψ (t : R)) ((ψ (k : R)) v) := by
+              rw [map_mul]
+              rfl
+            _ = (ψ (t : R)) v := by rw [hfix]
+        have hefam_kill : ∀ (i j : {T : Subgroup R // Nat.card T = p}), i ≠ j →
+            ∀ v : E, v ∈ Vfam j → efam i v = 1 := by
+          intro i j hij v hv
+          have hmem : efam i v ∈ Vfam i ⊓ Vfam j :=
+            ⟨hefam_cent i v, hefam_mem i j v hv⟩
+          rw [hVfam_disj i j hij, Subgroup.mem_bot] at hmem
+          exact hmem
+        have hpPow_inj : ∀ x : E, x ^ p = 1 → x = 1 := by
+          intro x hx
+          have hqord : orderOf x ∣ q :=
+            orderOf_dvd_of_pow_eq_one (hE.pow_eq_one x)
+          have hpord : orderOf x ∣ p := orderOf_dvd_of_pow_eq_one hx
+          have hcopqp : Nat.Coprime q p :=
+            (Nat.coprime_primes hq Fact.out).mpr hqp
+          have hdvd : orderOf x ∣ Nat.gcd q p := Nat.dvd_gcd hqord hpord
+          rw [Nat.Coprime] at hcopqp
+          rw [hcopqp, Nat.dvd_one] at hdvd
+          exact orderOf_eq_one_iff.mp hdvd
+        have hindep : iSupIndep Vfam :=
+          iSupIndep_of_proj Vfam efam hefam_fix hefam_kill hpPow_inj
+        let perm : P → Equiv.Perm {T : Subgroup R // Nat.card T = p} :=
+          subgroupCardPerm R p
+        have hperm : ∀ (x : P) (T : {T : Subgroup R // Nat.card T = p}),
+            (Vfam T).map (φ x).toMonoidHom = Vfam (perm x T) := by
+          intro x T
+          simpa only [hVfamdef, perm] using actionFixedPoints_map_conj R p φ x T
+        have hexists : ∃ i : {T : Subgroup R // Nat.card T = p}, Vfam i ≠ ⊥ := by
+          by_contra hnone
+          push Not at hnone
+          have hbot : (⨆ i : {T : Subgroup R // Nat.card T = p}, Vfam i) = ⊥ :=
+            iSup_eq_bot.mpr hnone
+          rw [hspan] at hbot
+          exact top_ne_bot hbot
+        obtain ⟨i₀, hi₀⟩ := hexists
+        have hmove : ∃ x : P, perm x i₀ ≠ i₀ := by
+          by_contra hnone
+          push Not at hnone
+          have hmap : ∀ x : P,
+              (OddOrder.RepresentationTheory.conjNormalMulAut R x).mapSubgroup
+                (i₀ : Subgroup R) = (i₀ : Subgroup R) := by
+            intro x
+            have h := congrArg
+              (fun T : {T : Subgroup R // Nat.card T = p} => (T : Subgroup R))
+              (hnone x)
+            simpa only [perm, subgroupCardPerm_apply_coe] using h
+          set Tbar : Subgroup P := (i₀ : Subgroup R).map R.subtype with hTbar
+          have hTbarNorm : Tbar.Normal := by
+            refine ⟨fun t ht x => ?_⟩
+            rw [hTbar, Subgroup.mem_map] at ht ⊢
+            obtain ⟨r, hr, rfl⟩ := ht
+            refine ⟨OddOrder.RepresentationTheory.conjNormalMulAut R x r, ?_, rfl⟩
+            rw [← hmap x]
+            exact Subgroup.mem_map_of_mem
+              (OddOrder.RepresentationTheory.conjNormalMulAut R x).toMonoidHom hr
+          letI : Tbar.Normal := hTbarNorm
+          have hTbarCard : Nat.card Tbar = p := by
+            rw [hTbar, Subgroup.card_map_of_injective R.subtype_injective, i₀.2]
+          have hTbarCenter : Tbar ≤ Subgroup.center P :=
+            OddOrder.GroupTheory.normal_le_center_of_card_eq_prime hP hTbarCard
+          have hTcardgt : 1 < Nat.card ↥(i₀ : Subgroup R) := by
+            rw [i₀.2]
+            exact (Fact.out : p.Prime).one_lt
+          letI hTnt : Nontrivial ↥(i₀ : Subgroup R) :=
+            Finite.one_lt_card_iff_nontrivial.mp hTcardgt
+          obtain ⟨t, ht1⟩ := exists_ne (1 : ↥(i₀ : Subgroup R))
+          have htP1 : (((t : (i₀ : Subgroup R)) : R) : P) ≠ 1 := by
+            intro h
+            apply ht1
+            apply Subtype.ext
+            apply Subtype.ext
+            exact h
+          have htTbar : (((t : (i₀ : Subgroup R)) : R) : P) ∈ Tbar := by
+            rw [hTbar]
+            exact Subgroup.mem_map_of_mem R.subtype t.2
+          have htCenter : (((t : (i₀ : Subgroup R)) : R) : P) ∈ Subgroup.center P :=
+            hTbarCenter htTbar
+          have hle : Vfam i₀ ≤
+              actionFixedBy φ (((t : (i₀ : Subgroup R)) : R) : P) := by
+            intro v hv
+            change (φ (((t : (i₀ : Subgroup R)) : R) : P)) v = v
+            exact mem_actionFixedPoints.mp (by simpa only [hVfamdef] using hv) t
+          have hzero := hfpf_center
+            (((t : (i₀ : Subgroup R)) : R) : P) htCenter htP1
+          apply hi₀
+          rw [eq_bot_iff]
+          rwa [hzero] at hle
+        obtain ⟨x, hxmove⟩ := hmove
+        have htwo : ∃ i₁ i₂ : {T : Subgroup R // Nat.card T = p},
+            i₁ ≠ i₂ ∧ Vfam i₁ ≠ ⊥ ∧ Vfam i₂ ≠ ⊥ := by
+          refine ⟨i₀, perm x i₀, Ne.symm hxmove, hi₀, ?_⟩
+          intro hzero
+          apply hi₀
+          apply (Subgroup.map_injective
+            (f := (φ x).toMonoidHom) (φ x).injective)
+          rw [hperm x i₀, hzero, Subgroup.map_bot]
+        exact fpf_of_constant_stabilizer_of_permuted_decomp
+          hindep hspan hE.comm φ hfaithful perm hperm hPodd hconst htwo
     · push Not at hirr
       obtain ⟨U, hUinv, hUbot, hUtop⟩ := hirr
       exact fpf_of_reducible hqE hcop hE φ hfaithful hPodd hconst hUinv hUbot hUtop

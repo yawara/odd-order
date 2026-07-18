@@ -1168,10 +1168,11 @@ characters (`exists_ne_one_hom_of_prime_card`) through the direct-product isomor
 `(∀ i, Hpart i) ≃* Hbar` (`Subgroup.noncommPiCoprod`, bijective by independence + spanning).
 Supplies the regular `θ̄` for the Clifford case-(a) degree (`inertia_eq_hcInHu_caseA`'s `hreg`). -/
 theorem exists_regular_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
-    {ι : Type*} [Fintype ι] (Hpart : ι → Subgroup Hbar)
+    {ι : Type*} [Finite ι] (Hpart : ι → Subgroup Hbar)
     (hindep : iSupIndep Hpart) (hspan : ⨆ i, Hpart i = ⊤)
     (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime) :
     ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ Hpart i, θ x ≠ 1 := by
+  haveI : Fintype ι := Fintype.ofFinite ι
   have hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ Hpart i → y ∈ Hpart j → Commute x y :=
     fun i j _ x y _ _ => mul_comm x y
   refine exists_regular_char_of_bijective hcomm ⟨?_, ?_⟩ hp

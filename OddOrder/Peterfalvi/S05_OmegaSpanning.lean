@@ -87,11 +87,13 @@ Proof: Fourier-expand `f = Σ_χ c_χ • ω_χ` and split off
 (each difference does, and `f` does), while every value `g(w)` equals `g` at the
 `W₂`-component of `w` (`sndPart_apply_eq_apply_sndProj`) — a point of `W₂` — so `g = 0`
 identically, leaving `f` in the span of the differences. -/
-theorem supported_le_span_omega_sub_sndPart (hyp : TICyclicHypothesis G) [Fintype hyp.W]
-    [Invertible (Nat.card hyp.W : ℂ)] [Fintype (hyp.W →* ℂˣ)] :
+theorem supported_le_span_omega_sub_sndPart (hyp : TICyclicHypothesis G) [Finite hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Finite (hyp.W →* ℂˣ)] :
     ClassFunction.supportedSubmodule {w : hyp.W | w ∉ hyp.W2.subgroupOf hyp.W} ≤
       Submodule.span ℂ (Set.range (fun χ : hyp.W →* ℂˣ =>
         (hyp.omega χ : ClassFunction hyp.W ℂ) - hyp.omega (hyp.sndPart χ))) := by
+  haveI : Fintype hyp.W := Fintype.ofFinite hyp.W
+  haveI : Fintype (hyp.W →* ℂˣ) := Fintype.ofFinite (hyp.W →* ℂˣ)
   intro f hf
   have hf0 : ∀ w : hyp.W, w ∈ hyp.W2.subgroupOf hyp.W → f w = 0 := by
     intro w hw

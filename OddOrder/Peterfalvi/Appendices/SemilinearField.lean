@@ -298,6 +298,252 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
   change uLin (a x) = uLin (a (uLin.symm (uLin x)))
   rw [LinearEquiv.symm_apply_apply]
 
+/-- **Peterfalvi, Appendix I, Proposition 2(a)+(b)**, with the scalar
+realization of `T` retained.  The old `exists_field_semilinear` theorem remains
+unchanged; this stronger result is the interface required by Part II, Ch. I
+§2, Proposition 3. -/
+theorem exists_field_semilinear_with_scalar.{u} {p : ℕ} [Fact p.Prime]
+    {E : Type u} [CommGroup E] [Finite E] [Nontrivial E]
+    (hE : IsElementaryAbelian p E) {T : Type*} [CommGroup T] [Finite T]
+    (ψ : T →* MulAut E)
+    (hirr : ∀ U : Subgroup E, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤) :
+    ∃ (F : Type u) (_ : Field F) (_ : Module F (Additive E)) (_ : Finite F),
+      Module.finrank F (Additive E) = 1 ∧ Nat.card F = Nat.card E ∧
+      (∃ μ : T →* Fˣ, ∀ (t : T) (x : Additive E),
+        (μ t : F) • x = Additive.ofMul ((ψ t) (Additive.toMul x))) ∧
+      ∀ (g : MulAut E) (c : T ≃* T), (∀ t, ψ (c t) = g * ψ t * g⁻¹) →
+        ∃ σ : F ≃+* F, ∀ (a : F) (x : Additive E),
+          (MulEquiv.toAdditive g) (a • x) =
+            σ a • (MulEquiv.toAdditive g) x := by
+  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hE.pow_eq_one x.toMul
+  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
+  letI instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+    Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom
+  have key : ∀ (t : T) (x : Additive E),
+      (MonoidAlgebra.of (ZMod p) T t) • x =
+        Additive.ofMul ((ψ t) (Additive.toMul x)) := by
+    intro t x
+    rw [show (MonoidAlgebra.of (ZMod p) T t) • x =
+          ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x from rfl,
+        Representation.asAlgebraHom_of]
+    rfl
+  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
+    haveI : Nontrivial (Additive E) :=
+      inferInstanceAs (Nontrivial (Additive E))
+    refine { eq_bot_or_eq_top := fun N ↦ ?_ }
+    let H : Subgroup E :=
+      { carrier := {e : E | Additive.ofMul e ∈ N}
+        one_mem' := by
+          change Additive.ofMul (1 : E) ∈ N
+          rw [ofMul_one]
+          exact N.zero_mem
+        mul_mem' := fun {a b} ha hb => by
+          change Additive.ofMul (a * b) ∈ N
+          rw [ofMul_mul]
+          exact N.add_mem ha hb
+        inv_mem' := fun {a} ha => by
+          change Additive.ofMul a⁻¹ ∈ N
+          rw [ofMul_inv]
+          exact N.neg_mem ha }
+    have hHinv : IsAInvariant ψ H := by
+      rw [isAInvariant_iff_smul_mem]
+      intro t a ha
+      change Additive.ofMul ((ψ t) a) ∈ N
+      have hmem :
+          (MonoidAlgebra.of (ZMod p) T t) • (Additive.ofMul a) ∈ N :=
+        N.smul_mem _ (show Additive.ofMul a ∈ N from ha)
+      rw [key t (Additive.ofMul a)] at hmem
+      exact hmem
+    rcases hirr H hHinv with h | h
+    · left
+      rw [Submodule.eq_bot_iff]
+      intro x hx
+      have hxH : Additive.toMul x ∈ H := hx
+      rw [h, Subgroup.mem_bot] at hxH
+      change Additive.ofMul (Additive.toMul x) = 0
+      rw [hxH, ofMul_one]
+    · right
+      rw [Submodule.eq_top_iff']
+      intro x
+      exact (by rw [h]; exact Subgroup.mem_top _ : Additive.toMul x ∈ H)
+  let μ : T →* (Module.End (MonoidAlgebra (ZMod p) T) (Additive E))ˣ :=
+    (Units.map (Algebra.lsmul (MonoidAlgebra (ZMod p) T)
+      (MonoidAlgebra (ZMod p) T) (Additive E)).toMonoidHom).comp
+      (MonoidAlgebra.of (ZMod p) T).toHomUnits
+  refine ⟨Module.End (MonoidAlgebra (ZMod p) T) (Additive E), endField,
+    Module.End.applyModule, finite_end, finrank_end_eq_one,
+    natCard_end_eq.trans (Nat.card_congr Additive.toMul),
+    ⟨μ, ?_⟩, fun g c hc => ?_⟩
+  · intro t x
+    change (MonoidAlgebra.of (ZMod p) T t) • x = _
+    exact key t x
+  · let uLin : Additive E ≃ₗ[ZMod p] Additive E :=
+      (MulEquiv.toAdditive g).toLinearEquiv
+        (fun a x =>
+          ZMod.map_smul (MulEquiv.toAdditive g).toAddMonoidHom a x)
+    let τ : MonoidAlgebra (ZMod p) T ≃ₐ[ZMod p]
+        MonoidAlgebra (ZMod p) T :=
+      MonoidAlgebra.domCongr (ZMod p) (ZMod p) c
+    have hu_eq : ∀ t, g * ψ t = ψ (c t) * g := by
+      intro t
+      rw [hc t]
+      group
+    have hsemi : ∀ (r : MonoidAlgebra (ZMod p) T) (x : Additive E),
+        uLin (r • x) = (τ r) • (uLin x) := by
+      intro r
+      refine MonoidAlgebra.induction_on
+        (p := fun r => ∀ x : Additive E, uLin (r • x) = (τ r) • (uLin x))
+        r (fun t x => ?_) (fun a b ha hb x => ?_)
+        (fun s a ha x => ?_)
+      · have e1 : (MonoidAlgebra.of (ZMod p) T t) • x =
+            (mulAutToEnd E p (ψ t)) x := by
+          change ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x = _
+          rw [Representation.asAlgebraHom_of]
+          rfl
+        have e2 : τ (MonoidAlgebra.of (ZMod p) T t) =
+            MonoidAlgebra.of (ZMod p) T (c t) := by
+          change MonoidAlgebra.domCongr (ZMod p) (ZMod p) c
+            (MonoidAlgebra.of (ZMod p) T t) = _
+          rw [show MonoidAlgebra.of (ZMod p) T t =
+              MonoidAlgebra.single t 1 from rfl,
+            MonoidAlgebra.domCongr_single]
+          rfl
+        have e3 : (MonoidAlgebra.of (ZMod p) T (c t)) • (uLin x) =
+            (mulAutToEnd E p (ψ (c t))) (uLin x) := by
+          change ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T (c t))
+            (uLin x) = _
+          rw [Representation.asAlgebraHom_of]
+          rfl
+        rw [e1, e2, e3]
+        change mulAutToEnd E p g ((mulAutToEnd E p (ψ t)) x) =
+          (mulAutToEnd E p (ψ (c t))) (mulAutToEnd E p g x)
+        rw [← Module.End.mul_apply, ← Module.End.mul_apply,
+          ← map_mul, ← map_mul, hu_eq t]
+      · rw [add_smul, map_add, ha, hb, map_add, add_smul]
+      · rw [smul_assoc, map_smul, ha, map_smul, smul_assoc]
+    let τRing : MonoidAlgebra (ZMod p) T ≃+*
+        MonoidAlgebra (ZMod p) T := τ.toRingEquiv
+    haveI := RingHomInvPair.of_ringEquiv τRing
+    haveI := RingHomInvPair.of_ringEquiv τRing.symm
+    let eSL : Additive E
+        ≃ₛₗ[(τRing : MonoidAlgebra (ZMod p) T →+*
+          MonoidAlgebra (ZMod p) T)] Additive E :=
+      { toFun := uLin
+        map_add' := uLin.map_add
+        map_smul' := fun r x => hsemi r x
+        invFun := uLin.symm
+        left_inv := uLin.left_inv
+        right_inv := uLin.right_inv }
+    refine ⟨eSL.conjRingEquiv, fun a x => ?_⟩
+    change uLin (a • x) = eSL.conjRingEquiv a • uLin x
+    rw [Module.End.smul_def, Module.End.smul_def,
+      LinearEquiv.conjRingEquiv_apply_apply]
+    change uLin (a x) = uLin (a (uLin.symm (uLin x)))
+    rw [LinearEquiv.symm_apply_apply]
+
 end Prop2Bridge
+
+universe u v w
+
+section Prop2Companion
+
+variable {F : Type u} {E : Type v} {U : Type w}
+variable [Field F] [CommGroup E] [Module F (Additive E)] [Group U]
+
+private lemma additive_ofMul_ne_zero {s : E} (hs : s ≠ 1) :
+    Additive.ofMul s ≠ 0 := by
+  intro h
+  apply hs
+  apply Additive.ofMul.injective
+  simpa using h
+
+private lemma ringAut_eq_of_semilinear
+    {g : Additive E ≃+ Additive E} {s : Additive E} (hs : s ≠ 0)
+    {c d : F ≃+* F}
+    (hc : ∀ a : F, g (a • s) = c a • g s)
+    (hd : ∀ a : F, g (a • s) = d a • g s) : c = d := by
+  ext a
+  have hgs : g s ≠ 0 := by simpa using g.injective.ne hs
+  apply smul_left_injective F hgs
+  exact (hc a).symm.trans (hd a)
+
+/-- **Peterfalvi, Appendix I, Proposition 2(b)** (coherent semilinear companion).
+If every element of U is semilinear for some field automorphism, then those uniquely determined
+automorphisms assemble into a group homomorphism from U to the field automorphism group.
+The nonidentity point supplies the nonzero vector needed for uniqueness. -/
+theorem exists_semilinear_companion
+    (rho : U →* MulAut E) (s : E) (hs : s ≠ 1)
+    (hsemi : ∀ u : U, ∃ c : F ≃+* F, ∀ (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        c a • (MulEquiv.toAdditive (rho u)) x) :
+    ∃ companion : U →* (F ≃+* F), ∀ (u : U) (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        companion u a • (MulEquiv.toAdditive (rho u)) x := by
+  let c : U → (F ≃+* F) := fun u ↦ Classical.choose (hsemi u)
+  have hc (u : U) : ∀ (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        c u a • (MulEquiv.toAdditive (rho u)) x :=
+    Classical.choose_spec (hsemi u)
+  have hs0 : Additive.ofMul s ≠ 0 := additive_ofMul_ne_zero hs
+  have cone : c 1 = 1 := by
+    apply ringAut_eq_of_semilinear (g := MulEquiv.toAdditive (rho 1)) hs0
+    · exact fun a ↦ hc 1 a (Additive.ofMul s)
+    · intro a
+      simp
+  have cmul (u v : U) : c (u * v) = c u * c v := by
+    apply ringAut_eq_of_semilinear (g := MulEquiv.toAdditive (rho (u * v))) hs0
+    · exact fun a ↦ hc (u * v) a (Additive.ofMul s)
+    · intro a
+      rw [map_mul]
+      change (MulEquiv.toAdditive (rho u))
+          ((MulEquiv.toAdditive (rho v)) (a • Additive.ofMul s)) = _
+      rw [hc v a (Additive.ofMul s)]
+      rw [hc u (c v a) ((MulEquiv.toAdditive (rho v)) (Additive.ofMul s))]
+      rfl
+  let companion : U →* (F ≃+* F) :=
+    { toFun := c
+      map_one' := cone
+      map_mul' := cmul }
+  exact ⟨companion, hc⟩
+
+/-- **Peterfalvi, Appendix I, Proposition 2(b)** (point-stabilizer embedding).
+On a one-dimensional F-space, a faithful group of semilinear maps fixing a nonzero point embeds
+into the field automorphism group: a trivial companion fixes every scalar multiple of the point,
+hence fixes the whole space.  Together with MonoidHom.ofInjective this identifies the point
+stabilizer with a subgroup of RingAut F, exactly as in the textbook. -/
+theorem exists_injective_semilinear_companion
+    (rho : U →* MulAut E) (s : E) (hs : s ≠ 1)
+    (hdim : Module.finrank F (Additive E) = 1)
+    (hfix : ∀ u : U, rho u s = s) (hrho : Function.Injective rho)
+    (hsemi : ∀ u : U, ∃ c : F ≃+* F, ∀ (a : F) (x : Additive E),
+      (MulEquiv.toAdditive (rho u)) (a • x) =
+        c a • (MulEquiv.toAdditive (rho u)) x) :
+    ∃ companion : U →* (F ≃+* F), Function.Injective companion ∧
+      ∀ (u : U) (a : F) (x : Additive E),
+        (MulEquiv.toAdditive (rho u)) (a • x) =
+          companion u a • (MulEquiv.toAdditive (rho u)) x := by
+  obtain ⟨companion, hcompanion⟩ := exists_semilinear_companion rho s hs hsemi
+  refine ⟨companion, ?_, hcompanion⟩
+  apply (injective_iff_map_eq_one companion).2
+  intro u hu
+  apply hrho
+  have hs0 : Additive.ofMul s ≠ 0 := additive_ofMul_ne_zero hs
+  have hfixA : (MulEquiv.toAdditive (rho u)) (Additive.ofMul s) = Additive.ofMul s := hfix u
+  have hrho_one : rho u = 1 := by
+    ext x
+    apply Additive.ofMul.injective
+    change (MulEquiv.toAdditive (rho u)) (Additive.ofMul x) = Additive.ofMul x
+    obtain ⟨a, ha⟩ := exists_smul_eq_of_finrank_eq_one hdim hs0 (Additive.ofMul x)
+    rw [← ha, hcompanion u a (Additive.ofMul s), hu, hfixA]
+    rfl
+  simpa using hrho_one
+
+end Prop2Companion
 
 end OddOrder.Peterfalvi.Appendices.Huppert

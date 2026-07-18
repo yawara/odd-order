@@ -260,7 +260,7 @@ nonzero full column.  Here `G` has at most two nonzero entries, all in `{0, ±1}
 yielding three distinct nonzero `G`-entries (two non-`δ` column rows since `|ι| ≥ 3`, plus one
 off-column `δ`-point), contradicting `|Supp G| ≤ 2`.  Used for both `(b)` and `(c)` (the latter via
 the transposed grid). -/
-theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Fintype κ]
+theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Finite κ]
     (h3 : 3 ≤ Fintype.card ι) (G : ι × κ → ℂ)
     (hG2 : {x | G x ≠ 0}.ncard ≤ 2) (hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1)
     (P Q : ι × κ) (hPQ : P ≠ Q) {s : ℂ} (hs : s = 1 ∨ s = -1) (a : ι × κ → ℂ)
@@ -325,7 +325,7 @@ theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Fintype κ]
 open scoped Classical in
 /-- The row analogue of `grid_no_constant_column` (no constant nonzero full row), obtained by
 applying the column statement to the transposed grid. -/
-theorem grid_no_constant_row {ι κ : Type*} [Fintype ι] [Fintype κ]
+theorem grid_no_constant_row {ι κ : Type*} [Finite ι] [Fintype κ]
     (h3 : 3 ≤ Fintype.card κ) (G : ι × κ → ℂ)
     (hG2 : {x | G x ≠ 0}.ncard ≤ 2) (hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1)
     (P Q : ι × κ) (hPQ : P ≠ Q) {s : ℂ} (hs : s = 1 ∨ s = -1) (a : ι × κ → ℂ)

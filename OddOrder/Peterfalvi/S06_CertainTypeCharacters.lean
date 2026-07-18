@@ -124,10 +124,11 @@ theorem omegaColumnDiff_inner_omega_ne (hyp : TICyclicHypothesis L)
 divisible by `|H|`: `ψ(1) = |H|·m` for some integer `m` (the multiplicity `⟨ψ, 1_H⟩` of the
 trivial character).  The masking sum `|H|·⟨ψ, 1_H⟩ = ∑_x ψ(x)` collapses to the single
 identity term. -/
-theorem exists_apply_one_eq_card_mul_of_vanishing_off_one {H : Type*} [Group H] [Fintype H]
+theorem exists_apply_one_eq_card_mul_of_vanishing_off_one {H : Type*} [Group H] [Finite H]
     [Invertible (Nat.card H : ℂ)] {ψ : ClassFunction H ℂ} (hψ : ψ ∈ ZIrr H)
     (hvan : ∀ x : H, x ≠ 1 → ψ x = 0) :
     ∃ m : ℤ, ψ 1 = (Nat.card H : ℂ) * (m : ℂ) := by
+  haveI : Fintype H := Fintype.ofFinite H
   obtain ⟨m, hm⟩ :=
     ClassFunction.inner_mem_ZIrr_int hψ (trivialClassFunction_isIrreducible (G := H)).mem_ZIrr
   refine ⟨m, ?_⟩
@@ -230,21 +231,29 @@ noncomputable def omegaColumnDiff
     exact omega_omegaProdChar_sub_eq_zero_of_mem_W2 h.sdiffTICyclicHypothesis χ₁ χ₁' χ₂
       ((Subgroup.mem_subgroupOf).mpr hW2)⟩
 
+omit [Fintype L] in
 /-- `|W₁| ≠ 0` (it is `≥ 3` by `three_le_card_W1`), packaged as a `NeZero` instance so
 that `(0 : Fin w₁)` — the distinguished index of the (1.4) machinery — is available. -/
-theorem neZero_card_W1 : NeZero (Nat.card h.W1) :=
-  ⟨by have h3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1; omega⟩
+theorem neZero_card_W1 [Finite L] : NeZero (Nat.card h.W1) :=
+  ⟨by
+    haveI : Fintype L := Fintype.ofFinite L
+    have h3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1
+    omega⟩
 
+omit [Fintype L] in
 /-- `1 < w₁` (it is `≥ 3`), giving a nonzero index `⟨1, _⟩ : Fin w₁` for the (4.1)
 witnesses in the cross-column distinctness argument. -/
-theorem one_lt_card_W1 : 1 < Nat.card h.W1 := by
+theorem one_lt_card_W1 [Finite L] : 1 < Nat.card h.W1 := by
+  haveI : Fintype L := Fintype.ofFinite L
   have h3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1
   omega
 
+omit [Fintype L] in
 /-- The `W₁`-dual is cyclic (`isCyclic_charGroup_subgroupOf`), recorded for the power
 enumeration below. -/
-theorem isCyclic_w1CharGroup : IsCyclic ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
-  h.sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W1_le_W
+theorem isCyclic_w1CharGroup [Finite L] : IsCyclic ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := by
+  haveI : Fintype L := Fintype.ofFinite L
+  exact h.sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W1_le_W
 
 /-- The reindexing `Fin w₁ ≃ Ŵ₁`, realized as the **power enumeration** `i ↦ γ^i` of a fixed
 generator `γ` of the cyclic dual (`isCyclic_w1CharGroup`, Pontryagin self-duality
@@ -363,11 +372,13 @@ theorem isMulCommutative_quotient_K : IsMulCommutative (L ⧸ h.K) := by
   haveI := h.isCyclic_quotient_K
   infer_instance
 
+omit [Fintype L] in
 /-- The number of irreducible characters of the abelian quotient `L/K` equals `|W₁| = w₁`: via
 the linear-character bijection `Irr(L/K) ≃ Hom(L/K, ℂˣ)` (`L/K` abelian), Pontryagin duality
 (`card_monoidHom_of_hasEnoughRootsOfUnity`), and `L/K ≅ W₁`. -/
-theorem card_irreducibleCharacter_quotient_K :
+theorem card_irreducibleCharacter_quotient_K [Finite L] :
     Nat.card (IrreducibleCharacter (L ⧸ h.K)) = Nat.card ↥h.W1 := by
+  haveI : Fintype L := Fintype.ofFinite L
   haveI := h.isCyclic_quotient_K
   haveI := h.isMulCommutative_quotient_K
   have hbij : Function.Bijective (linearIrreducibleCharacter (H := L ⧸ h.K)) := by
@@ -383,12 +394,14 @@ theorem card_irreducibleCharacter_quotient_K :
   rw [key]
   exact Nat.card_congr h.isComplement.symm.QuotientMulEquiv.toEquiv
 
+omit [Fintype L] in
 /-- Inflation is a bijection `Irr(L/K) ≃ {χ ∈ Irr L | K ⊆ ker χ}`, so the two have equal
 cardinality (the half of (4.4) used to count the `K`-trivial irreducibles). -/
-theorem card_kernelContaining_quotient_K :
+theorem card_kernelContaining_quotient_K [Finite L] :
     Nat.card {χ : IrreducibleCharacter L //
         (h.K : Set L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction L ℂ)}
       = Nat.card (IrreducibleCharacter (L ⧸ h.K)) := by
+  haveI : Fintype L := Fintype.ofFinite L
   refine Nat.card_congr (Equiv.ofBijective
     (fun χbar : IrreducibleCharacter (L ⧸ h.K) =>
       ⟨inflate h.K χbar, subset_characterKernel_inflate (N := h.K) χbar⟩) ⟨?_, ?_⟩).symm
@@ -454,6 +467,7 @@ theorem isometryDifferenceImage_eq_dade [NeZero (Nat.card h.W1)]
     h.sdiffFullDadeIsometryData.toDadeIsometryData
     (h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) χ₂)).symm
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.3.b), per-column signed family** (mmd 04.6, the (4.5) consumer of
 (1.4)).  For a fixed nontrivial `W₂`-dual `χ₂` (a "column" `j`), the (1.4) machinery
 applied to `Ind_W^L` and the column family `ω_{ij}` yields a signed irreducible-difference
@@ -470,6 +484,7 @@ theorem exists_columnSignedFamily [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     ∃ data : SignedIrreducibleDifferenceFamily L (Nat.card h.W1),
       ∀ i, isometryDifferenceImage h.induceZ (h.chiColumn χ₂) i = data.signedDifference i := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   have hn : 2 ≤ Nat.card h.W1 := by
     have h3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1
@@ -525,6 +540,7 @@ theorem columnFamily_spec [NeZero (Nat.card h.W1)]
       (h.columnFamily χ₂).signedDifference i :=
   (h.exists_columnSignedFamily χ₂).choose_spec i
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Cross-column orthogonality of the (1.4) images** (4.3.b proof step): for `χ₂ ≠ χ₂'`,
 `(Ind_W^L(ω_{ij} − ω_{0j}), Ind_W^L(ω_{i'j'} − ω_{0j'})) = 0`.  The §4 Dade map on
 `CF(W, W − W₂)` is an isometry, so this equals the source cross inner product
@@ -535,16 +551,18 @@ theorem ind_cross_inner_eq_zero [NeZero (Nat.card h.W1)]
     (i i' : Fin (Nat.card h.W1)) :
     ClassFunction.inner (isometryDifferenceImage h.induceZ (h.chiColumn χ₂) i)
       (isometryDifferenceImage h.induceZ (h.chiColumn χ₂') i') = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [h.isometryDifferenceImage_eq_dade χ₂ i, h.isometryDifferenceImage_eq_dade χ₂' i',
     h.sdiffFullDadeIsometryData.inner_eq, omegaColumnDiff_coe, omegaColumnDiff_coe]
   exact omega_diff_cross_inner_eq_zero h.sdiffTICyclicHypothesis hne _ _ _ _
 
-omit [Invertible (Nat.card L : ℂ)] in
+omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- The (1.4) image of the column family vanishes at `1` (the source difference
 `ω_{ij} − ω_{0j}` has degree `0`, and `Ind` preserves that). -/
 theorem image_apply_one_eq_zero [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     isometryDifferenceImage h.induceZ (h.chiColumn χ₂) i (1 : L) = 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [isometryDifferenceImage_induceZ, ClassFunction.induce_apply_one,
     ClassFunction.sub_apply, h.chiColumn_apply_one χ₂ i, h.chiColumn_apply_one χ₂ 0,
     sub_self, mul_zero]
@@ -650,7 +668,7 @@ theorem columnFamily_mu_ne [NeZero (Nat.card h.W1)]
   rw [heq, irreducibleCharacter_inner, if_pos rfl] at hinner
   exact one_ne_zero hinner
 
-omit [Invertible (Nat.card L : ℂ)] in
+omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Linear independence of the `CF(W, W − W₂)` family** `ω_{ij} − ω_{0j}` (`i ≠ 0`, all `j`):
 the biorthogonal system `⟨ω_{i'j'} − ω_{0j'}, ω_{ij}⟩ = δ`
 (`omegaColumnDiff_inner_omega_self`/`_ne`)
@@ -661,6 +679,7 @@ theorem omegaColumnDiff_linearIndependent :
       (fun p : {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} ×
           ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) =>
         h.omegaColumnDiff p.1.1 1 p.2) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   refine LinearIndependent.of_pairwise_dual_eq_zero_one _
     (fun p => (innerDual (h.sdiffTICyclicHypothesis.omega
         (h.sdiffTICyclicHypothesis.omegaProdChar p.1.1 p.2))).comp (Submodule.subtype _))
@@ -715,7 +734,7 @@ theorem card_supportInSubgroup_sdiff :
       Fintype.card_subtype_compl]
   rw [hcompl, hsub, hW, hW2, Nat.sub_one_mul]
 
-omit [Invertible (Nat.card L : ℂ)] in
+omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- `dim_ℂ CF(W, W − W₂) = (w₁ − 1)·w₂`, the dimension behind the `ω_{ij} − ω_{0j}` basis. -/
 theorem finrank_sdiffSupported :
     Module.finrank ℂ (TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis)

@@ -776,12 +776,13 @@ forces every orbit member — in particular `θ` — to have `x` in its kernel. 
 `P ⊄ Ker θ ⟹ P ⊄ Ker (Ind θ)`. -/
 theorem mem_characterKernel_of_mem_characterKernel_induce
     {L : Type*} [Group L] [Fintype L] {H : Subgroup L} [H.Normal]
-    [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Finite ↥H] [Invertible (Nat.card ↥H : ℂ)]
     {θ : ClassFunction ↥H ℂ} (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ)
     {x : L} (hxH : x ∈ H)
     (hker : x ∈ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce H θ)) :
     (⟨x, hxH⟩ : ↥H) ∈ OddOrder.Peterfalvi.S03.characterKernel θ := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   -- the Mackey orbit identity, applied at `⟨x,hxH⟩` and at `1`
   have hid :=
     OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum

@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Layer
 import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
+import OddOrder.GroupTheory.PrimeComplementResidual
 
 /-!
 # Isaacs Ch. 9 — §9B: Lemma 9.17 / Corollary 9.18 (p. 281)
@@ -69,37 +70,6 @@ theorem isQuasisimple_of_isSimpleGroup_not_isMulCommutative
     exact ((QuotientGroup.quotientMulEquivOfEq hz).trans
       QuotientGroup.quotientBot).isSimpleGroup
 
-/-- 共役全体の join `⨆ g, S^g` は正規. -/
-theorem normal_iSup_conj (S : Subgroup G) :
-    (⨆ g : G, S.map (MulAut.conj g).toMonoidHom).Normal := by
-  constructor
-  intro x hx g
-  refine Subgroup.iSup_induction _ (C := fun y => g * y * g⁻¹ ∈
-    ⨆ h : G, S.map (MulAut.conj h).toMonoidHom) hx ?_ ?_ ?_
-  · intro h y hy
-    obtain ⟨s, hs, rfl⟩ := hy
-    refine le_iSup (fun h : G => S.map (MulAut.conj h).toMonoidHom) (g * h) ⟨s, hs, ?_⟩
-    simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
-    group
-  · simp
-  · intro y z hy hz
-    convert Subgroup.mul_mem _ hy hz using 1
-    group
-
-/-- normal closure `S^G` は共役全体の join. -/
-theorem iSup_conj_eq_normalClosure (S : Subgroup G) :
-    (⨆ g : G, S.map (MulAut.conj g).toMonoidHom) = normalClosure (S : Set G) := by
-  apply le_antisymm
-  · refine iSup_le fun g => ?_
-    rintro x ⟨s, hs, rfl⟩
-    simpa using normalClosure_normal.conj_mem _ (subset_normalClosure hs) g
-  · haveI := normal_iSup_conj S
-    refine normalClosure_le_normal fun x hx => ?_
-    have h1 : S.map (MulAut.conj (1 : G)).toMonoidHom = S := by
-      ext y
-      simp [Subgroup.mem_map]
-    exact le_iSup (fun g : G => S.map (MulAut.conj g).toMonoidHom) 1 (h1.symm ▸ hx)
-
 /-- **Isaacs Lemma 9.17** (p. 281): `S ◁◁ G`, `S` nonabelian simple ならば normal
 closure `S^G` は `G` の minimal normal subgroup. -/
 theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
@@ -111,13 +81,13 @@ theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
     ⟨hS, isQuasisimple_of_isSimpleGroup_not_isMulCommutative hsimp hnc⟩
   have hle : ∀ g : G, S.map (MulAut.conj g).toMonoidHom ≤ W := by
     intro g
-    rw [hW, ← iSup_conj_eq_normalClosure]
+    rw [hW, Subgroup.normalClosure_eq_iSup_map_conj]
     exact le_iSup (fun g : G => S.map (MulAut.conj g).toMonoidHom) g
   -- 各共役は `W` の中で normal (相異なる共役は Thm 9.4 で可換)
   have hWnorm : ∀ g : G, W ≤ Subgroup.normalizer
       ((S.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G) := by
     intro g
-    rw [hW, ← iSup_conj_eq_normalClosure]
+    rw [hW, Subgroup.normalClosure_eq_iSup_map_conj]
     refine iSup_le fun h => ?_
     rcases eq_or_ne (S.map (MulAut.conj h).toMonoidHom)
       (S.map (MulAut.conj g).toMonoidHom) with heq | hne
@@ -148,7 +118,7 @@ theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
         = ⨆ g : G, S.map (MulAut.conj g).toMonoidHom :=
       iSup_congr fun g => by
         rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr (hle g)]
-    rw [Subgroup.map_iSup, hcongr, iSup_conj_eq_normalClosure,
+    rw [Subgroup.map_iSup, hcongr, ← Subgroup.normalClosure_eq_iSup_map_conj,
       ← MonoidHom.range_eq_map, Subgroup.range_subtype, hW]
   refine ⟨normalClosure_normal, ?_, ?_⟩
   · -- `W ≠ ⊥` (`S` は simple ゆえ nontrivial)
@@ -190,7 +160,7 @@ theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
       convert hconj using 1
       group
     refine le_antisymm hNle ?_
-    rw [hW, ← iSup_conj_eq_normalClosure]
+    rw [hW, Subgroup.normalClosure_eq_iSup_map_conj]
     exact iSup_le hall
 
 /-- **Isaacs Lemma 9.17 (帰結)**: `S ◁◁ G`, `S` nonabelian simple ⇒ `S ≤ Soc(G)`. -/

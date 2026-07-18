@@ -478,15 +478,15 @@ The FPF index data (`hc2`/`hfpf`/`hFPF`) and the X/Y-cardinality conditions (`hY
 as named hypotheses, to be discharged separately (`hfpf` via `caseB_fpf_bound`, the rest from the
 final `S08:59` wiring). -/
 theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
-    [H.Normal] [Fintype ↥H]
+    [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H) (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
     (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
@@ -497,6 +497,10 @@ theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
     (hXne : (hyp.Xset h46.W2).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   have hderiv : h46.W2.subgroupOf H ≤ commutator ↥H := by
     rw [← commutator_subgroupOf_self]
     exact fun x hx => Subgroup.mem_subgroupOf.mpr (hW2comm (Subgroup.mem_subgroupOf.mp hx))
@@ -523,15 +527,15 @@ remaining index data is arithmetic: `hc2` (`|H:W₂| ≥ 9 ≥ 2`) and `hFPF`
 `index_H_eq_card_W1`).  This is the clean `hcaseB` producer feeding the dispatch skeleton
 `nonempty_coherent_S_of_c2_of_branches`. -/
 theorem nonempty_coherent_S_caseB_of_c2 (hyp : SibleyDadeHypothesis G L H)
-    [H.Normal] [Fintype ↥H]
+    [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H) (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
     (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
@@ -540,6 +544,10 @@ theorem nonempty_coherent_S_caseB_of_c2 (hyp : SibleyDadeHypothesis G L H)
     (hXne : (hyp.Xset h46.W2).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
   haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
   -- `W₂ ≤ Z(L)` (case-B central datum).

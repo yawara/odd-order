@@ -36,7 +36,7 @@ the `(7.7.a)` decomposition collapses to the single `ind1H` term: every other co
 `χ^ρ(x) = star((ζ_{ind1H} − d_{ind1H} ζ_0)^τ, χ)`; with `d_{ind1H} = 1` this is `star(β,χ)`. -/
 theorem chiRho_eq_inner_beta_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
+    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (d : Fin (n + 1) → ℂ)
     (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
@@ -68,6 +68,7 @@ theorem chiRho_eq_inner_beta_induced {G : Type*} [Group G] [Fintype G] {A : Set 
           - d ind1H • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ),
         psi_support ind1H⟩) χ) := by
   classical
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   rw [chiRho_decomp_induced H71 K θ d psi_support hinj hcover hdeg hAconj hAK_off hA_one χ hx]
   have hxK : x ∈ K := hAK_off x (by rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hx)
   refine sum_collapse_to_single (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
@@ -453,11 +454,12 @@ orbit-count `sum_div_normSq_induce_kernelFilter_eq`).  Summing `χ(1)²/‖χ‖
 nontrivially-induced characters `Ind_K^L θ` (`θ ≠ 1`) gives `[L:K]·(|K| − 1)`.  With `K = H ◁ L`
 this is `e·(h − 1)` of Peterfalvi (1.5.d). -/
 theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
-    (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] :
+    (K : Subgroup L) [K.Normal] [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)] :
     ∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
         θ ≠ trivialIrreducibleCharacter ↥K)).image
         (fun θ => ClassFunction.induce K θ.toClassFunction),
       χ 1 ^ 2 / ClassFunction.inner χ χ = (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   have hbot : (⊥ : Subgroup L).subgroupOf K = ⊥ := by
     ext x; simp
   have h := OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq (G := L) (H := K) (A := ⊥)
@@ -486,7 +488,7 @@ theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat
 `Finset.sum_image` (injectivity `hinj`); the image equality uses `hcover` and the orbit fact
 `Ind θ' = Ind 1_H ↔ θ' = 1` (via `⟨Ind θ', 1_L⟩ = 0` for `θ' ≠ 1` vs `⟨Ind 1_H, 1_L⟩ = 1`). -/
 theorem family_degree_sum {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
-    (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (K : Subgroup L) [K.Normal] [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
     (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
     (hcover : ∀ φ : IrreducibleCharacter ↥K,
@@ -498,6 +500,7 @@ theorem family_degree_sum {L : Type*} [Group L] [Fintype L] [Invertible (Nat.car
           ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
             (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) =
       (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   rw [← induce_degree_sum_bot K,
     ← Finset.sum_image (f := fun φ : ClassFunction L ℂ => φ 1 ^ 2 / ClassFunction.inner φ φ)
       (g := fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
@@ -529,7 +532,7 @@ theorem family_degree_sum {L : Type*} [Group L] [Fintype L] [Invertible (Nat.car
 with `ζ_0(1) = [L:K]` and `‖ζ_0‖² = 1`) from `family_degree_sum` gives the `(7.8.b)` quantity
 `G = Σ_{i ∈ Ioi 0, i ≠ ind1H} ζ_i(1)²/‖ζ_i‖² = [L:K]·(|K|−1) − [L:K]²` (`= e(h−1) − e²`). -/
 theorem family_degree_sum_Ioi {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
-    (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (K : Subgroup L) [K.Normal] [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
     (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
     (hcover : ∀ φ : IrreducibleCharacter ↥K,
@@ -545,6 +548,7 @@ theorem family_degree_sum_Ioi {L : Type*} [Group L] [Fintype L] [Invertible (Nat
           ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
             (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) =
       (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) - (K.index : ℂ) ^ 2 := by
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   have hIoi : (Finset.Ioi (0 : Fin (n + 1))).erase ind1H
       = (Finset.univ.erase ind1H).erase 0 := by
     ext i
@@ -1235,7 +1239,7 @@ theorem chiRho_apply_eq_zeta0_sharp
     (H71 : Hypothesis71 G A L) (H : Subgroup G)
     (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
     (hAH : A = (H : Set G) \ {1})
-    [Fintype ↥(H.subgroupOf L)] [Invertible (Nat.card ↥(H.subgroupOf L) : ℂ)] {n : ℕ}
+    [Finite ↥(H.subgroupOf L)] [Invertible (Nat.card ↥(H.subgroupOf L) : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥(H.subgroupOf L))
     (hinj : Function.Injective
       (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
@@ -1257,6 +1261,7 @@ theorem chiRho_apply_eq_zeta0_sharp
         χ = -(d i))
     {x : ↥L} (hx : (x : G) ∈ A) :
     H71.chiRho χ x = ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) x := by
+  haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
   haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   exact chiRho_apply_eq_zeta0_induced H71 (H.subgroupOf L) θ d psi_support hinj hcover hdeg
     (supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm)

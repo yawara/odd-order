@@ -192,13 +192,14 @@ theorem H_sharp_cCoeff_int [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)
 open scoped Classical in
 /-- `F`-parameterized form of `sum_filter_erase_one_normSq_eq` (instance-free interface): any
 `Finset` with the sharp-membership characterization works. -/
-theorem sum_finset_sharp_normSq_eq {L : Type*} [Group L] [Fintype L]
+theorem sum_finset_sharp_normSq_eq {L : Type*} [Group L] [Finite L]
     {K : Subgroup L} [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
     (F : Finset L) (hF : ∀ x : L, x ∈ F ↔ (x ∈ K ∧ x ≠ 1))
     (f : L → ℂ) (ψ : ClassFunction ↥K ℂ) (hagree : ∀ k : ↥K, f ↑k = ψ k)
     {n : ℕ} (hn : ClassFunction.inner ψ ψ = (n : ℂ)) :
     ∑ x ∈ F, ‖f x‖ ^ 2 = (Nat.card ↥K : ℝ) * (n : ℝ) - ‖f 1‖ ^ 2 := by
   classical
+  haveI : Fintype L := Fintype.ofFinite L
   have hFeq : F = (Finset.univ.filter (· ∈ K)).erase 1 := by
     ext x
     rw [hF, Finset.mem_erase, Finset.mem_filter]
@@ -210,11 +211,12 @@ open scoped Classical in
 /-- `F`-parameterized form of `sum_apply_erase_one_filter_subgroupOf` (instance-free
 interface). -/
 theorem sum_finset_sharp_transport [Finite G] {M : Type*} [AddCommMonoid M]
-    {K L : Subgroup G} [Fintype ↥L] (hKL : K ≤ L)
+    {K L : Subgroup G} [Finite ↥L] (hKL : K ≤ L)
     (F : Finset ↥L) (hF : ∀ x : ↥L, x ∈ F ↔ ((x : G) ∈ K ∧ x ≠ 1))
     (f : G → M) :
     ∑ x ∈ F, f ↑x = ∑ x ∈ (Set.toFinite (sharpSubgroup K)).toFinset, f x := by
   classical
+  haveI : Fintype ↥L := Fintype.ofFinite ↥L
   have hFeq : F = (Finset.univ.filter (· ∈ K.subgroupOf L)).erase 1 := by
     ext x
     rw [hF, Finset.mem_erase, Finset.mem_filter, Subgroup.mem_subgroupOf]

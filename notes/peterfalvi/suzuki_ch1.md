@@ -1,4 +1,4 @@
-# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §1 frontier
+# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §2 frontier
 
 正本ソース = `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`
 (pp. 100–107, "General Properties of G")。Coq crib は**無い** (math-comp/odd-order
@@ -29,9 +29,6 @@
    `invertedProdEquiv : Y × Z ≃ X` (explicit-inverse: `x↦(xz⁻¹,z)`, `z=w^{(|X|+1)/2}`,
    `w=(t x⁻¹ t)x`) + `card_eq_card_centralizer_mul_ncard_invertedBy : |X|=|Y||Z|`。
    奇数位数 squaring 素材 (`sq_pow_half`/`pow_half_sq`/`pow_card_eq_one_of_mem`) も汎用で内包。
-   - **⚠ Lemma (b) `⟨Z⟩ ⊴ X` は未** (Prop 5 に不要ゆえ後回し)。証明: `Y` は `Z` を正規化
-     (`y∈Y,z∈Z ⇒ yzy⁻¹∈Z`: `t(yzy⁻¹)t=(tyt)(tzt)(ty⁻¹t)=y z⁻¹ y⁻¹=(yzy⁻¹)⁻¹`)、
-     `Z⊆⟨Z⟩`、`X=YZ` (Lemma a) より `X` が `⟨Z⟩=closure(invertedBy X t)` を正規化。
 1. ✅ **Prop 5 (p.101) 完了** — `V=C_D(s)` + `W=C_D(H∩I)`。
    - `DistinguishedInvolution.lean`: `distinguishedInvolution`, `structureConjugator`,
      `structure_equation`, `eq_distinguishedPair_of_structure` (一意性)。
@@ -65,7 +62,7 @@
        `exists_mem_center_of_normal_ne_bot_of_isNilpotent` + Cauchy) →
        `involutions_H_subset_centralizer_Q` (H∩I ⊆ Z(Q)) → **`Q0 : Subgroup G`**
        ({x∈H | x²=1}) + elementary abelian API (`commute_of_mem_Q0` 等)。
-5. **§2 Prop 2 進行中** — K は D の cyclic normal 部分群 (p.103)。新 leaf `KCyclic.lean`。
+5. ✅ **§2 Prop 2 完了** — K は D の cyclic normal 部分群 (p.103)。leaf `KCyclic.lean`。
    - ✅ **基盤完了**: `conjQ0`/`ker_conjQ0` (核=W=C_D(H∩I))/`Dbar`=D/W/`conjQ0bar`
      faithful/`conjQ0bar_transitive` (Q₀^# 可移, §1 Prop 3)/`odd_card_Dbar`→
      `IsSolvable Dbar` (FT 本体)/`fitting_Dbar_cyclic_fpf_abelian` (**App I Prop 1 適用**)。
@@ -73,30 +70,122 @@
      W 上恒等ゆえ商へ降りる、involutive)。
    - ✅ **§1 Lemma (a) endo 形** (`InvertedProduct.map_eq_inv_of_forall_fixed_eq_one`):
      奇位数 X 上の involutive endo σ が 1 のみ固定 ⟹ σ 全反転 (τ は outer なので要)。
-   - **⚠ App I Prop 1 gate = `Huppert.fitting_cyclic_fixedPointFree` は当初 axiom-clean と
-     誤報告したが実は sorried** (`pGroup_cyclic_fixedPointFree` の non-cyclic case、
-     `#print axioms` で `sorryAx` 確認)。→ 上流優先で gate を進めた (下記)。
+   - ✅ **App I Prop 1 gate axiom-clean**:
+     `Huppert.pGroup_cyclic_fixedPointFree` の irreducible non-cyclic case を、正規
+     type-`(p,p)` 部分群の order-`p` fixed spaces による `P`-permuted direct
+     decomposition で閉じた。従って `fitting_Dbar_cyclic_fpf_abelian` も axiom-clean。
    - ✅ **C_D̄(τ)=V̄** (`tau_mk_eq_iff_mem_V`): τ-固定コセット = V-コセット。w=(tdt)⁻¹d∈W
      は t と可換 (W≤V) ⟹ w²=1、D 奇位数 ⟹ w=1 ⟹ tdt=d ⟺ d∈V。helper
      `sq_inverted_eq_one` (a²=1⟹(ab⁻¹ab)(b⁻¹aba)=1)。axiom-clean。
    - ✅ **C_Ā(τ)=1** (`tau_fixed_fitting_eq_one`): τ-固定 Fitting 元は 1。V̄ に属す⟹s∈Q₀^#
-     固定 (V≤C_D(s), Prop 5)、Ā は Q₀ 上 f.p.f. (App I gate) ⟹ 矛盾。**gate cite ゆえ
-     transitively sorryAx** (sorried-cite 方針)。
+     固定 (V≤C_D(s), Prop 5)、Ā は Q₀ 上 f.p.f. (App I gate) ⟹ 矛盾。
+     App I gate closure により axiom-clean。
    - ✅ **Ā⊆J** (`fitting_subset_inverted`): τ が Ā 全元を反転。Ā characteristic ⟹ τ|_Ā は
      involutive endo で 1 のみ固定 (C_Ā(τ)=1) ⟹ Lemma(a) endo 形で全反転。
-   - **次 (残り 3 step)**: **J⊆Ā** (D̄/Ā abelian ⟹ B̄=τ-反転部分群、C_B̄(τ)⊆C_Ā(τ)⊆1... 実際は
-     C_B(τ)⊆C_A(τ)⊆W ⟹ τ が B̄ 反転 ⟹ B̄ abelian normal ⟹ Fitting で B̄≤Ā;
-     `nilpotent_normal_le_fitting`) → **Ā=J** → **A=KW, |Ā|=|K|** (§1 Lemma(a) を A に:
-     A=(A∩K)(A∩V), Ā=J ⟹ K⊆A, A∩V=W) → **K=⟨k⟩ cyclic** (Ā cyclic は App I gate、K→K̄
-     単射) → K◁D (§1 Lemma(b))。
-   - **上流成果 (2026-07-18、gate 掘り下げ)**: App I Prop 1 の sorry = **Gorenstein 5.4.10
-     (odd p) = BG Lemma 4.5(a)** を証明 (issue 2004 完了):
-     `BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic` +
-     新 leaf `GroupTheory/NormalElementaryAbelianPrimeSq.lean` (不変部分空間補題 +
-     cyclic-selfcent⟹metacyclic)。**Huppert sorry の残り** = Schur⟹Z(P) cyclic + coprime
-     Z_p×Z_p 分解 = **issue 2005** (これが埋まれば App I Prop 1 gate が axiom-clean 化)。
-6. §2 Cor (S abelian or Suzuki 2-group; gate: App III Def 1) → §2 Prop 3 (𝓛(F_q,A)
-   同型; gate: App I Prop 2) → §3 (induction hypothesis 適用開始)。
-   §3 以降は PSL(2,q)/Sz(q)/PSU(3,q) の具体構造 (mathlib 未整備) に gate される項が増える。
+   - ✅ **J⊆Ā / Ā=J** (`inverted_mem_fitting` / `mem_fitting_iff_tau_eq_inv`):
+     D̄/Ā の τ-反転元部分群を引き戻した正規部分群 B̄ を構成。τ-固定元は奇位数商で
+     自明となって Ā に入り、C_Ā(τ)=1 で消える。Lemma (a) により τ は B̄ を全反転、
+     よって B̄ は abelian・nilpotent、`nilpotent_normal_le_fitting` で B̄≤Ā。逆包含と
+     合わせて Ā=J。axiom-clean。
+   - ✅ **K⊆A / A∩V=W** (`mem_fittingPreimage_of_mem_KSet` /
+     `fittingPreimage_inf_V`): A を D→D̄ の F(D̄) の full preimage として構成。K の
+     元は商で τ-反転されるため Ā=J に入り、A∩V の像は Ā 内で τ-固定なので 1、従って
+     A∩V=W。axiom-clean。
+   - ✅ **A=KW / |Ā|=|K|** (`fittingPreimageInG_eq_KSet_mul_W` /
+     `card_fitting_Dbar_eq_ncard_KSet`): A の ambient-group model に §1 Lemma (a) を適用。
+     `A∩V=W` と inverted locus `=K` から A=KW を得て、full-preimage の位数公式で
+     `|F(D̄)|=|K|`。axiom-clean。
+   - ✅ **K=⟨k⟩ cyclic / K◁D** (`exists_KSet_generator` / `coe_K` /
+     `K_isCyclic` / `K_normal`): cyclic Ā の generator の representative `d∈A` を
+     A=KW で `d=kw` と分解して `k∈K` を lift。`|Ā|=|K|` と `⟨k⟩⊆K` から
+     `K=⟨k⟩`。`K := closure KSet` の carrier を同定し、§1 Lemma (b) で D 内正規性。
+     axiom-clean。**→ §2 Prop 2 完了。**
+   - ✅ **App I gate closure (2026-07-18)**: BG Lemma 4.5(a) の正規 type-`(p,p)`
+     prerequisite と Huppert の order-`p` fixed-space decomposition の双方が
+     sorry-free で着地 (issue 2004 / 2040 完了)。
+6. ✅ **§2 Cor 完了** — 新 leaf `SylowTwo.lean`。任意の `S : Sylow 2 Q` は
+   commutative または honest な Suzuki 2-group (`sylowTwo_isMulCommutative_or_isSuzuki2Group`)。
+   - App III Definition 1 を `IsPGroup 2` + 非可換 + 異なる involution 2 個 +
+     cyclic `A ≤ MulAut S` の regular action として de-scaffold。faithful 性は subgroup inclusion に内蔵。
+   - `Q` nilpotent ⟹ `S` normal/characteristic、`conjQByK` を `S` へ制限し `A := range φ`。
+   - `s^K = H∩I` (`image_conj_KSet_eq_involutions_H`) で transporter の存在、
+     `injOn_conj_KSet` で一意性。全 endpoint axiom-clean。
+7. ✅ **§2 Prop 3 完了** — `SemilinearModel.lean`/`SemidirectReassociation.lean`/
+   `SemilinearRealization.lean`。
+   - App I Prop 2(a) から同じ有限体 `F` 上で `|F|=|Q₀|`、`F(D̄) ≃* Fˣ` を実構成。
+     推移性と `sQ0 ≠ 1` で scalar map の全射性まで証明。
+   - Prop 2(b) を `V̄` に適用して faithful `ν : V̄ →* RingAut F` を構成し、
+     `V̄ ≃* range ν`、semilinearity、`V̄` 共役と scalar action の整合性を証明。
+   - `D̄ = F(D̄) ⋊ V̄` を外部半直積へし、三重半直積を座標を保って再結合。
+     `exists_semilinear_equiv` は `Q₀ ≃* F_add`、`F(D̄) ≃* Fˣ`、
+     `V̄ ≃* A ≤ RingAut F` と三作用の同変性、`Q₀ ⋊ D̄ ≃* 𝓛(F,A)` を返す。
+   - finite-field automorphism group の cyclicity から `V̄` cyclic。全 endpoint axiom-clean。
+     `Kbar_eq_fitting` により本文の `K̄ ↔ Fˣ` と一致。**→ §2 全結果 formalized。**
+8. **Section 3 Lemma 1: conditional core and PSL(2,q) target complete**.
+   - `InductionHypothesis.lean` proves the target-independent group-theoretic core:
+     `Q` is a 2-group and `L = primeComplementResidual 2 G = sup_g Q^g` from the concrete degree
+     formula, simplicity, normality, and odd index.
+   - `InductionHypothesisPSL.lean` supplies those inputs for a finite characteristic-two
+     field `F` with `2 < |F|`, a concrete group isomorphism from `L` to `PSL(2,F)`, and an equivariant
+     bijection from `Omega` to the standard projective line. It derives
+     `|Omega| - 1 = |F| = 2^n` and transports the existing Isaacs Ch08 PSL simplicity.
+   - Shared support is `GroupTheory/PrimeComplementResidual.lean`; issue 9112 is closed.
+9. **Section 3 Lemma 1, concrete Sz(q) target complete; PSU(3,q) standard generators complete**.
+   - Shared leaf `GroupTheory/SpecificGroups/Suzuki/Field.lean` constructs the field
+     of order `q = 2^(2m+1)` and the Tits twist `theta(x) = x^(2^(m+1))`.
+   - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
+     `theta(theta(x)) = x^2`; these are the concrete identities used by the standard
+     root-group and torus formulas.
+   - `GroupTheory/SpecificGroups/Suzuki/RootGroup.lean` now constructs the nonabelian
+     root group `S(q,theta)` in ovoid coordinates, proves its explicit inverse, square,
+     exponent-four law, central involution line, exact order `q^2`, and `2`-group property.
+   - `GroupTheory/SpecificGroups/Suzuki/Ovoid.lean` proves the anisotropic norm
+     `N(x,y) = x^2*theta(x) + x*y + theta(y)`, its reciprocal identity for the Weyl
+     map, and constructs the infinity-plus-affine ovoid carrier of exact size `q^2 + 1`.
+   - `GroupTheory/SpecificGroups/Suzuki/StandardGenerators.lean` constructs faithful
+     root and torus permutation homomorphisms, the regular affine root action, the
+     root-torus conjugation formula, and the norm-controlled Weyl involution.
+   - `GroupTheory/SpecificGroups/Suzuki/GeneratedAction.lean` takes the closure of
+     the full root and torus images together with the Weyl involution, internalizes the
+     three generator families in that concrete finite permutation group, and proves its
+     standard action doubly transitive via the regular affine root action and the
+     infinity-origin Weyl swap.
+   - `GroupTheory/SpecificGroups/Suzuki/Borel.lean` realizes the root-torus subgroup
+     as a faithful semidirect product, proves unique root-times-torus normal form, shows
+     that it fixes infinity, and computes its exact order `q^2 * (q - 1)`.
+   - `GroupTheory/SpecificGroups/Suzuki/Bruhat.lean` derives the explicit Weyl--torus
+     and nontrivial Weyl--root identities from the anisotropic norm, proves the two-cell
+     decomposition `B ∪ B w B`, identifies `B` with the infinity stabilizer, and computes
+     the exact group order `q^2 * (q^2 + 1) * (q - 1)`.  This construction exists
+     for every `m`; the simplicity target below uses `0 < m`, so `q >= 8`.
+   - Shared `GroupTheory/GroupAction/PerfectQuasiprimitive.lean` proves that a
+     faithful quasiprimitive nontrivial perfect group with a solvable point stabilizer
+     is simple, by mapping the stabilizer onto every nontrivial normal quotient.
+   - `GroupTheory/SpecificGroups/Suzuki/Simplicity.lean` proves torus displacement
+     surjectivity via a fixed-point-free automorphism, places every root, torus, and
+     Weyl generator in the derived subgroup, proves the standard Borel solvable, and
+     concludes `IsSimpleGroup (standardPermGroup m)` for `0 < m`.
+   - `Peterfalvi/Appendices/Suzuki/InductionHypothesisSuzuki.lean` transports the
+     concrete ovoid degree and simplicity across an equivariant target identification,
+     then applies the target-independent core to prove that `Q` is a `2`-group and
+     identify both the `2`-complement residual and the join of the conjugates of `Q`.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/Field.lean` constructs the
+     canonical quadratic extension `GF(q^2)/GF(q)`, installs q-Frobenius as the
+     nontrivial star involution, and proves exact fixed-field and Hermitian trace-fiber
+     cardinalities `q`.  This is the common field layer for the unitary target.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/RootGroup.lean` constructs the
+     Hermitian root group with its explicit coordinate multiplication, proves all group
+     laws, exact order `q^3`, and `2`-group property, then constructs the infinity-plus-
+     affine unital carrier of exact degree `q^3 + 1`.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/StandardGenerators.lean` constructs
+     the faithful regular affine root action, the full diagonal action, and its faithful
+     determinant-one torus restriction.  It proves that the `SU(3)` diagonal parameter
+     `t` has root weight `star(t)^2 / t = t^(2q-1)` and computes the exact torus order.
+   - The same leaf constructs Peterfalvi’s reciprocal Weyl permutation
+     `(x,y) ↦ (x/y,1/y)`, proves involutivity, and proves both root--torus and
+     Weyl--torus conjugation formulas on the concrete unital.
+   - Next upstream layer: construct the generated unitary permutation group and its
+     standard Borel and Bruhat decomposition, then prove double transitivity, exact
+     order, and simplicity.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

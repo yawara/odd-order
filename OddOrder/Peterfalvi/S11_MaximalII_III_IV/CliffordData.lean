@@ -332,9 +332,10 @@ theorem sum_comp_mk'_eq {Γ : Type*} [Group Γ] [Fintype Γ] (N : Subgroup Γ) [
 `|H|/|N|`, since the restriction `mk' N |_H : ↥H → ↥(H.map (mk' N))` has kernel `N` and is onto
 (Noether's first isomorphism, `quotientKerEquivRange`).  The `|H|⁻¹·|N| = |H/N|⁻¹` normalization
 (step 3) of the (8.4.d) induction-inflation commute (issue 1012, B2). -/
-theorem card_eq_card_subgroup_mul_card_map_mk' {Γ : Type*} [Group Γ] [Fintype Γ]
+theorem card_eq_card_subgroup_mul_card_map_mk' {Γ : Type*} [Group Γ] [Finite Γ]
     {N H : Subgroup Γ} [N.Normal] (hNH : N ≤ H) :
     Nat.card ↥H = Nat.card ↥N * Nat.card ↥(H.map (QuotientGroup.mk' N)) := by
+  haveI : Fintype Γ := Fintype.ofFinite Γ
   set φ := (QuotientGroup.mk' N).comp H.subtype with hφ
   have hrange : φ.range = H.map (QuotientGroup.mk' N) := by
     rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]

@@ -208,12 +208,13 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (13.6), Core form of `λ^{τ₁}(xy)=0`**: the honest coherence field
 gives orthogonality against every `η`-grid member for the nonkernel inducing character of
 `λ`; (3.2.d) then gives vanishing on the regular mixed section. -/
-theorem lambda_tau1_apply_mul_eq_zero_core [Fintype G]
+theorem lambda_tau1_apply_mul_eq_zero_core [Finite G]
     [Invertible (Nat.card G : ℂ)]
     {hyp : Hypothesis (G := G)} (core : CharacterDegreeCore hyp)
     (lam : LambdaClusterData hyp)
     {x y : G} (hx : x ∈ hyp.W2) (hy : y ∈ hyp.W1) (hx1 : x ≠ 1) (hy1 : y ≠ 1) :
     core.tau1S lam.lambda (x * y) = 0 := by
+  haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨θ, hθirr, -, hlamEq, x₀, hx₀P, hx₀ker⟩ :=
     lam.lambda_induced_from_PC_linear
   have hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :

@@ -50,8 +50,8 @@ theorem false_of_coherentXunionYset_caseA_of_not_coherentS
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     (hZ2 : 2 ≤ Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H))
     (hfpf : 2 * Nat.card hyp.W1 ≤ Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1)
@@ -61,6 +61,8 @@ theorem false_of_coherentXunionYset_caseA_of_not_coherentS
     (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) : False := by
   classical
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   haveI := hyp.centralCommutator_normal
   -- break pair on `Sa = X(Zc) ∪ Y`, `Sb = S`.
   have hSaSb : hyp.Xset hyp.centralCommutator ∪ hyp.Yset ⊆ hyp.S := by
@@ -150,8 +152,8 @@ theorem nonempty_coherent_S_caseA_of_c2
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     (hHnonab : _root_.commutator ↥H ≠ ⊥)
     (hA : Subgroup.center ↥H ⊓ h46.W2.subgroupOf H = ⊥)
@@ -159,6 +161,8 @@ theorem nonempty_coherent_S_caseA_of_c2
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   by_contra hncoh
   set cert := h46.toCertainTypeHypothesis with hcertdef
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=

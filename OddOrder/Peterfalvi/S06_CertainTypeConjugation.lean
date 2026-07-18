@@ -44,8 +44,9 @@ finite group `W`, the Galois action of complex conjugation `Complex.conjAe` on `
 Pointwise: `(ω(χ))(w) = χ(w)` is a root of unity (`χ(w)^{|W|} = 1`), so `‖χ(w)‖ = 1` and
 `χ(w)̄ = χ(w)⁻¹ = (χ⁻¹)(w)`. -/
 theorem galoisMap_conj_omega (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
-    [Fintype hyp.W] (χ : hyp.W →* ℂˣ) :
+    [Finite hyp.W] (χ : hyp.W →* ℂˣ) :
     IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv (hyp.omega χ) = hyp.omega χ⁻¹ := by
+  haveI : Fintype hyp.W := Fintype.ofFinite hyp.W
   apply IrreducibleCharacter.ext
   apply ClassFunction.ext
   intro w
@@ -157,6 +158,7 @@ The (4.9)(a) bridge to the `L`-characters `μ_{ij}` runs through the **`L`-side*
 `G`-side holds for `σ_L`: `chiColumn` is `ω(omegaProdChar (w1CharEquiv i) χ₂)`, so conjugation sends
 it to the conjugate-index grid character, and `σ_L` intertwines the Galois action. -/
 
+omit [Fintype G] in
 /-- **Conjugation of a column source character.**  `χ_{ij}̄ = χ_{i'j'}` at the conjugate index
 (`ω_{ij} = chiColumn χ₂ i`): the Galois action of complex conjugation sends `ω(χ₁, χ₂)` to
 `ω(χ₁⁻¹, χ₂⁻¹) = ω(w1CharEquiv (rowInv i), χ₂⁻¹)`, i.e. `chiColumn χ₂⁻¹ (rowInv i)`. -/
@@ -170,6 +172,7 @@ theorem chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (fun c => h.sdiffTICyclicHypothesis.omega (h.sdiffTICyclicHypothesis.omegaProdChar c χ₂⁻¹))
     (w1CharEquiv_rowInv h i).symm
 
+omit [Fintype G] in
 /-- **`L`-side σ conjugation closure** (the (4.9)(a) bridge ingredient).  The complex conjugate of
 the `L`-side σ-image `σ_L(ω_{ij})` is `σ_L(ω_{i'j'})` at the conjugate grid index.  Combines the
 (3.9) commutation `sigma_mapRingEquiv_comm` for `toTICyclicHypothesis` with `chiColumn_conj`.
@@ -187,6 +190,7 @@ theorem sigma_chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
   exact h.toTICyclicHypothesis.sigma_mapRingEquiv_comm rfl h.toTICyclicFullDadeApplication
     Complex.conjAe.toRingEquiv (h.chiColumn χ₂ i)
 
+omit [Fintype G] in
 /-- **Peterfalvi (4.9)(a), the `L`-character conjugation bridge.**  `δ_j·μ_{ij}̄ = δ_{j'}·μ_{i'j'}`
 at the conjugate index (`i' = rowInv i`, `j' = χ₂⁻¹`).  Apply complex conjugation `mapRingEquiv conj`
 to the (4.3.b) identity `σ_L(ω_{ij}) = δ_j·μ_{ij}`: the left side becomes `σ_L(ω_{i'j'}) = δ_{j'}·
@@ -207,6 +211,7 @@ theorem certainType_mu_conj_bridge (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)
   rw [sigma_chiColumn_conj, e2, ClassFunction.mapRingEquiv_zsmul] at key
   exact key.symm
 
+omit [Fintype G] in
 /-- **Peterfalvi (4.9)(a), `μ_{ij}̄ = μ_{i'j'}`.**  The conjugation bridge `δ_j·μ_{ij}̄ =
 δ_{j'}·μ_{i'j'}` forces the (genuine irreducible) characters equal: pairing both sides with
 `μ_{i'j'}` gives `δ_j·⟨μ_{ij}̄, μ_{i'j'}⟩ = δ_{j'}` (since `‖μ_{i'j'}‖² = 1`); as the inner product
@@ -231,6 +236,7 @@ theorem certainType_mu_conj_eq (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
   exact absurd hI.symm (by
     rcases (h.columnFamily χ₂⁻¹).sign_eq with he | he <;> rw [he] <;> norm_num)
 
+omit [Fintype G] in
 /-- **Peterfalvi (4.9)(a), `μ̄_j = μ_{j'}`** (column-sum form).  The complex conjugate of the
 certain-type column character `μ_j = ∑_i μ_{ij}` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}`
 (`j' = χ₂⁻¹`).  `mapRingEquiv conj` is additive (`map_sum`), each `μ_{ij}̄ = μ_{i'j'}`
@@ -257,10 +263,11 @@ theorem certainType_columnSum_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)
 character group `(W₂.subgroupOf W) →* ℂˣ` has odd order (`= |W₂|`, dividing `|W|` odd), so it has no
 involutions: `χ₂ = χ₂⁻¹` would force `χ₂² = 1`, hence `orderOf χ₂ ∣ 2` and odd, so `χ₂ = 1`. -/
 theorem column_inv_ne_self (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     [Invertible (Nat.card ↥h.K : ℂ)]
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     χ₂⁻¹ ≠ χ₂ := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hodd : Odd (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) := by
     rw [h.card_charGroup_W2]
     exact h.W_odd.of_dvd_nat (Subgroup.card_dvd_of_le le_sup_right)

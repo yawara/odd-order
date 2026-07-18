@@ -712,12 +712,13 @@ theorem Hypothesis.sSetIrrDegT_hasNoRealCharacters [Finite G]
 open OddOrder.Peterfalvi.S11 in
 /-- **`S₁(d)`-`T`-members are supported in `A(T) ∪ {1}`** (mirror of
 `sSetIrrDeg_member_support_subset`). -/
-theorem Hypothesis.sSetIrrDegT_member_support_subset [Fintype G] [Finite G]
+theorem Hypothesis.sSetIrrDegT_member_support_subset [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ)
     {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ hyp.sSetIrrDegT hG hvd d) :
     φ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+  haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨hφsSet, _⟩ := hφ
   obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
   rw [hφeq]
@@ -726,13 +727,14 @@ theorem Hypothesis.sSetIrrDegT_member_support_subset [Fintype G] [Finite G]
 open OddOrder.Peterfalvi.S11 in
 /-- **`S₁(d)`-`T`-member differences are `A(T)`-supported** (mirror of
 `sSetIrrDeg_member_diff_supported`): equal degrees cancel at `1`. -/
-theorem Hypothesis.sSetIrrDegT_member_diff_supported [Fintype G] [Finite G]
+theorem Hypothesis.sSetIrrDegT_member_diff_supported [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ)
     {x : ClassFunction ↥hyp.T ℂ} (hx : x ∈ hyp.sSetIrrDegT hG hvd d)
     {y : ClassFunction ↥hyp.T ℂ} (hy : y ∈ hyp.sSetIrrDegT hG hvd d) :
     (x - y).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  haveI : Fintype G := Fintype.ofFinite G
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
   have hdeg : (x : ↥hyp.T → ℂ) 1 = (y : ↥hyp.T → ℂ) 1 := by rw [hx.2.2, hy.2.2]

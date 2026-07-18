@@ -89,9 +89,10 @@ theorem Xset_hasNoRealCharacters_caseB
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset h46.W2) := by
   classical
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   intro χ hχX
   -- An `X(W₂)`-member is an induced character `Ind^L_H θ` with `θ ≠ 1`.
   have hχS : χ ∈ hyp.S := hyp.Xset_subset_S hχX
@@ -553,10 +554,11 @@ theorem caseB_S_pairwise_orthogonal
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
     ∀ x ∈ hyp.S, ∀ y ∈ hyp.S, x ≠ y → ClassFunction.inner x y = 0 := by
   classical
   haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   -- helper: an irreducible `S`-member is orthogonal to every certain-type column.
   have hirr_col : ∀ z, IsIrreducibleCharacter z → z ∈ hyp.S →
       ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
@@ -604,7 +606,7 @@ theorem exists_sMemberOrthogonalFamilyW
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S) (hS₁fin : S₁.Finite) :
     ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
       Function.Injective χmem ∧
@@ -614,6 +616,7 @@ theorem exists_sMemberOrthogonalFamilyW
       (∀ i j, ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0) := by
   classical
   haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hS₁fin
   have hmemS1 : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
   refine ⟨k, χmem, fun j => (ClassFunction.inner (χmem j) (χmem j)).re,
@@ -664,7 +667,7 @@ theorem caseB_breakChar_fields
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
     {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
     (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁) :
@@ -676,6 +679,7 @@ theorem caseB_breakChar_fields
       (∀ χ ∈ S₁, ClassFunction.inner ψ.conj χ = 0) := by
   classical
   haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   -- `ψ = Ind^L_H θ` for a (nontrivial) source `θ` (membership in `S`).
   have hψS' := hψS
   rw [hyp.S_eq, Set.mem_setOf_eq] at hψS'
@@ -815,8 +819,8 @@ theorem sMember_degreeSqNormBound_of_not_coherent
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
@@ -837,6 +841,8 @@ theorem sMember_degreeSqNormBound_of_not_coherent
       ψ 1 = (a : ℂ) * η 1 ∧
       ∑ j : Fin k, ((deg j : ℝ)) ^ 2 / mc j ≤ 2 * (a : ℝ) := by
   classical
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   -- (1) the ψ-independent member family (brick 2).
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1set, hmcpos, hmemortho⟩ :=
     exists_sMemberOrthogonalFamilyW hyp h46 hHK hW1 hS₁sub hS₁fin
@@ -940,7 +946,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
@@ -963,6 +969,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1 = (a : ℂ) * η 1 ∧
       ∑ j : Fin k, ((deg j : ℝ)) ^ 2 / mc j ≤ 2 * (a : ℝ) := by
   classical
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   -- (1) the ψ-independent member family (brick 2) — identical to the irreducible-break case.
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1set, hmcpos, hmemortho⟩ :=
     exists_sMemberOrthogonalFamilyW hyp h46 hHK hW1 hS₁sub hS₁fin
@@ -1092,8 +1099,8 @@ theorem sMember_degreeSqNormReBound_of_not_coherent
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
@@ -1143,7 +1150,7 @@ theorem sMember_degreeSqNormReBound_of_not_coherent_columnBreak
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)

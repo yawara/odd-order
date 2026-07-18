@@ -383,6 +383,7 @@ theorem mem_W2_of_mem_sup_of_mem_K {a : L} (ha : a ∈ h.W1 ⊔ h.W2) (haK : a �
   rw [← hxy, hx1, one_mul]
   exact hy
 
+omit [Fintype L] in
 /-- **Peterfalvi (4.5.b), key fixed-class lemma** (mmd 04.6, (4.5.b) proof): a conjugacy class
 `C` of `K` normalized by `g ∈ W₁^#` meets `W₂`.
 
@@ -393,7 +394,7 @@ power `φⁿ =` conjugation by `gⁿ` (`gⁿ ≠ 1` because `φⁿ ≠ 1`) would
 on (`card_group_dvd_card_of_freeAction`), so `|⟨φ⟩| = ord φ` divides `|C|`, which divides `|K|`;
 but `ord φ ∣ ord g ∣ w₁` and `gcd(|K|, w₁) = 1` force `ord φ = 1`, i.e. `φ = 1`.  Then `g`
 centralizes all of `K`, so the representative `a ∈ C` lies in `C_K(g) = W₂` — contradiction. -/
-theorem conjClass_meets_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjClasses ↥h.K)
+theorem conjClass_meets_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjClasses ↥h.K)
     (hC : ConjClasses.conjByPerm (G := L) (H := h.K) g C = C) :
     ∃ c : ↥h.K, c ∈ C.carrier ∧ (c : L) ∈ h.W2 := by
   haveI := h.K_normal
@@ -507,11 +508,12 @@ theorem conjClass_meets_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjCl
     rwa [h.centralizer_W2 g hg hg1] at hmem_inf
   exact hno a ha_mem haW2
 
+omit [Fintype L] in
 /-- **Peterfalvi (4.5.b), counting bound on `g`-stable classes** (mmd 04.6, (4.5.b) proof):
 for `g ∈ W₁^#`, the number of conjugacy classes of `K` normalized by `g` is at most `w₂`.
 Each such class meets `W₂` (`conjClass_meets_W2`), and distinct classes are disjoint, so picking
 a `W₂`-representative injects the `g`-stable classes into `W₂`. -/
-theorem card_fixed_conjClasses_le_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
+theorem card_fixed_conjClasses_le_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
     Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := L) (H := h.K) g))
       ≤ Nat.card ↥h.W2 := by
   haveI := h.K_normal
@@ -533,12 +535,13 @@ theorem card_fixed_conjClasses_le_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
     _ = ConjClasses.mk (wit q) := by rw [hwit_eq]
     _ = q.1 := ConjClasses.mem_carrier_iff_mk_eq.mp (hwit_carrier q)
 
+omit [Fintype L] in
 /-- **Peterfalvi (4.5.b), `g` fixes at most `w₂` irreducibles** (mmd 04.6, (4.5.b) proof, via
 [Is] Theorem 6.32): for `g ∈ W₁^#`, conjugation by `g` fixes at most `w₂` irreducible characters
 of `K`.  Brauer's permutation lemma equates the count of `g`-fixed irreducibles with the count of
 `g`-stable conjugacy classes (`card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`),
 which is `≤ w₂` by `card_fixed_conjClasses_le_W2`. -/
-theorem card_fixed_irr_le_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
+theorem card_fixed_irr_le_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
     Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g))
       ≤ Nat.card ↥h.W2 := by
   haveI := h.K_normal
@@ -839,12 +842,14 @@ theorem chiRestrict_injective [NeZero (Nat.card h.W1)] :
 
 omit [Invertible (Nat.card L : ℂ)] in
 omit [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)] in
+omit [Fintype L] in
 /-- **The number of columns is `w₂`** (`|Ŵ₂| = |W₂|`, Pontryagin self-duality
 `card_charGroup_subgroupOf`).  Together with `chiRestrict_injective` this gives `w₂` distinct
 `χ_j ∈ Irr(K)`, matching the `card_fixed_irr_le_W2` bound. -/
-theorem card_charGroup_W2 :
-    Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 :=
-  h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
+theorem card_charGroup_W2 [Finite L] :
+    Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 := by
+  haveI : Fintype L := Fintype.ofFinite L
+  exact h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
 
 /-- **Counting collapse** (mmd 04.6, (4.5.b) proof): for `g ∈ W₁^#`, every `g`-fixed irreducible
 character of `K` is one of the `χ_j`.  The `w₂` distinct `χ_j` (`chiRestrict_injective`,
@@ -906,9 +911,10 @@ distinct `W₂`-duals `χ₂` give distinct induced characters `Ind_K^L(chiRestr
 `chiRestrict χ₂ = chiRestrict χ₂'`, hence `χ₂ = χ₂'` (`chiRestrict_injective`).  This makes the count
 of *reducible induced images* equal the count of columns (`= w₂ − 1`), the bridge from the §6 source
 count to the §9 family `{φ ∈ 𝒮(H₀) | ¬ irr φ}`. -/
-theorem induce_chiRestrict_injective [NeZero (Nat.card h.W1)] [Fintype ↥h.K] :
+theorem induce_chiRestrict_injective [NeZero (Nat.card h.W1)] [Finite ↥h.K] :
     Function.Injective (fun χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ =>
       ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
   intro χ₂ χ₂' heq
   exact (h.chiRestrict_injective
     (induce_injective_of_inertia_stable (h.chiRestrict_conjBy_eq χ₂) heq)).symm

@@ -31,22 +31,24 @@ Proposition 2 runs:
   (§1 Prop 5) fixes the point `s ∈ Q₀^#`, so fixed-point-freeness kills it.
 * `Ā ⊆ J̄`: the Lemma (a) in endomorphism form
   (`map_eq_inv_of_forall_fixed_eq_one`) applied to `τ` on `Ā`.
-* `J̄ = K̄` (image of `K`): a coset inverted by `τ` contains an element of
-  `K` (an explicit `W`-correction using that representatives commute with
-  the error term `w = d(tdt) ∈ W`).
 * `J̄ ⊆ Ā`: with `B̄` the preimage in `D̄` of the `τ`-inverted subgroup of the
   abelian quotient `D̄/Ā`, one has `C_B̄(τ) = 1`, so `τ` inverts `B̄`, making
   `B̄` an abelian normal subgroup of `D̄`; hence `J̄ ⊆ B̄ ≤ F(D̄) = Ā`
   (Fitting's theorem, `nilpotent_normal_le_fitting`).
-* Hence `Ā = K̄` is cyclic of order `|K|` (the projection `K → K̄` is
-  injective), and a generator lifts to `k ∈ K` with `K = ⟨k⟩`; normality of
-  `⟨K⟩` in `D` is §1 Lemma (b).
+* `A` is the full preimage of `Ā`.  Then `K ⊆ A` because `Ā = J̄`, while
+  `A ∩ V = W` because the `τ`-fixed locus in `Ā` is trivial.
+* Applying §1 Lemma (a) to `A` gives `A = KW`; comparison with the quotient-
+  preimage cardinal formula gives `|Ā| = |K|`.
+* A generator of cyclic `Ā` lifts through `A = KW` to some `k ∈ K`.  The order
+  equality forces `K = ⟨k⟩`; the genuine subgroup with carrier `K` is normal
+  in `D` by §1 Lemma (b).
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.Isaacs.Ch01 (fitting)
 open OddOrder.Isaacs.Ch06 (actionFixedBy)
+open scoped IsMulCommutative Pointwise
 
 namespace Hypothesis
 
@@ -408,6 +410,412 @@ lemma fitting_subset_inverted {y : hyp.Dbar} (hy : y ∈ fitting hyp.Dbar) :
     · exact ho
   -- §1 Lemma (a), endomorphism form.
   exact congrArg Subtype.val (map_eq_inv_of_forall_fixed_eq_one hodd σ hσ2 hfix ⟨y, hy⟩)
+
+/-! ## `J ⊆ Ā`: every `τ`-inverted element lies in `F(D̄)` (p. 103) -/
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103): if `τ` inverts
+`x ∈ D̄`, then `x ∈ Ā = F(D̄)`.
+
+In the abelian quotient `D̄/Ā`, the inverted elements form a subgroup; its full
+preimage `B` is normal in `D̄`.  A `τ`-fixed element of `B` maps to an involution
+in the odd-order quotient, hence lies in `Ā`, where `tau_fixed_fitting_eq_one`
+kills it.  Thus §1 Lemma (a) makes `τ` inversion on `B`, so `B` is abelian and
+Fitting maximality gives `B ≤ Ā`. -/
+lemma inverted_mem_fitting {x : hyp.Dbar} (hx : hyp.tau x = x⁻¹) :
+    x ∈ fitting hyp.Dbar := by
+  let F : Subgroup hyp.Dbar := fitting hyp.Dbar
+  have hFmap : F.map (hyp.tau : hyp.Dbar ≃* hyp.Dbar).toMonoidHom = F :=
+    (Subgroup.characteristic_iff_map_eq.mp inferInstance) hyp.tau
+  have htauF : ∀ z ∈ F, hyp.tau z ∈ F := fun z hz => by
+    rw [← hFmap]
+    exact Subgroup.mem_map_of_mem _ hz
+  let Q := hyp.Dbar ⧸ F
+  letI : IsMulCommutative Q :=
+    Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
+      hyp.fitting_Dbar_cyclic_fpf_abelian.2.2
+  letI : CommGroup Q := inferInstance
+  let tauQ : Q →* Q :=
+    QuotientGroup.map F F hyp.tau.toMonoidHom (fun z hz => htauF z hz)
+  have tauQ_mk (z : hyp.Dbar) :
+      tauQ (QuotientGroup.mk' F z) = QuotientGroup.mk' F (hyp.tau z) := rfl
+  have htauQ2 (q : Q) : tauQ (tauQ q) = q := by
+    obtain ⟨z, rfl⟩ := QuotientGroup.mk'_surjective F q
+    rw [tauQ_mk, tauQ_mk, hyp.tau_involutive]
+  let Jq : Subgroup Q := MonoidHom.eqLocus tauQ invMonoidHom
+  let B : Subgroup hyp.Dbar := Jq.comap (QuotientGroup.mk' F)
+  haveI hJqN : Jq.Normal := Subgroup.normal_of_isMulCommutative Jq
+  haveI hBN : B.Normal := hJqN.comap (QuotientGroup.mk' F)
+  have hmemB_iff (z : hyp.Dbar) :
+      z ∈ B ↔ tauQ (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ := Iff.rfl
+  have hxB : x ∈ B := by
+    rw [hmemB_iff, tauQ_mk]
+    simpa using congrArg (QuotientGroup.mk' F) hx
+  have htauB : ∀ z ∈ B, hyp.tau z ∈ B := by
+    intro z hz
+    rw [hmemB_iff, tauQ_mk]
+    have hzq : tauQ (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ :=
+      (hmemB_iff z).mp hz
+    rw [hyp.tau_involutive, ← tauQ_mk]
+    have hi := congrArg Inv.inv hzq
+    simpa using hi.symm
+  have hoddQ : Odd (Nat.card Q) := by
+    have hdvd : Nat.card Q ∣ Nat.card hyp.Dbar := by
+      rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (s := F)]
+      exact Dvd.intro _ rfl
+    rcases Nat.even_or_odd (Nat.card Q) with he | ho
+    · exact absurd hyp.odd_card_Dbar
+        (Nat.not_odd_iff_even.mpr (even_iff_two_dvd.mpr (dvd_trans he.two_dvd hdvd)))
+    · exact ho
+  have hoddB : Odd (Nat.card ↥B) := by
+    rcases Nat.even_or_odd (Nat.card ↥B) with he | ho
+    · exact absurd hyp.odd_card_Dbar
+        (Nat.not_odd_iff_even.mpr (even_iff_two_dvd.mpr
+          (dvd_trans he.two_dvd (Subgroup.card_subgroup_dvd_card B))))
+    · exact ho
+  let sigma : ↥B →* ↥B :=
+    { toFun := fun z => ⟨hyp.tau z, htauB z z.2⟩
+      map_one' := Subtype.ext (by simp)
+      map_mul' := fun a b => Subtype.ext (by push_cast; rw [map_mul]) }
+  have hsigma2 : ∀ z, sigma (sigma z) = z := fun z =>
+    Subtype.ext (hyp.tau_involutive z)
+  have hfix : ∀ z, sigma z = z → z = 1 := by
+    intro z hz
+    have hzfix : hyp.tau (z : hyp.Dbar) = z := congrArg Subtype.val hz
+    have hzJ : tauQ (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ :=
+      (hmemB_iff z).mp z.2
+    have hqfix : tauQ (QuotientGroup.mk' F z) = QuotientGroup.mk' F z := by
+      rw [tauQ_mk, hzfix]
+    have hqinv : (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ :=
+      hqfix.symm.trans hzJ
+    have hq2 : (QuotientGroup.mk' F z) ^ 2 = 1 := by
+      rw [pow_two]
+      nth_rewrite 1 [hqinv]
+      rw [inv_mul_cancel]
+    have hoddTop : Odd (Nat.card ↥(⊤ : Subgroup Q)) := by simpa using hoddQ
+    have hq1 : QuotientGroup.mk' F z = 1 :=
+      eq_one_of_sq_eq_one_of_odd_card hoddTop (Subgroup.mem_top _) hq2
+    have hzF : (z : hyp.Dbar) ∈ F :=
+      (QuotientGroup.eq_one_iff (N := F) (z : hyp.Dbar)).mp hq1
+    exact Subtype.ext (hyp.tau_fixed_fitting_eq_one hzF hzfix)
+  have hinvB : ∀ z ∈ B, hyp.tau z = z⁻¹ := by
+    intro z hz
+    exact congrArg Subtype.val
+      (map_eq_inv_of_forall_fixed_eq_one hoddB sigma hsigma2 hfix ⟨z, hz⟩)
+  haveI hBcomm : IsMulCommutative ↥B := isMulCommutative_iff.mpr fun a b => by
+    apply Subtype.ext
+    have hab := hinvB ((a : hyp.Dbar) * b) (B.mul_mem a.2 b.2)
+    rw [map_mul, hinvB a a.2, hinvB b b.2, mul_inv_rev] at hab
+    have hab' := congrArg Inv.inv hab
+    simpa [mul_inv_rev] using hab'.symm
+  letI : CommGroup ↥B := inferInstance
+  haveI : Group.IsNilpotent ↥B := inferInstance
+  exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting hxB
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
+`Ā = J̄`; membership in `F(D̄)` is equivalent to being inverted by `τ`. -/
+lemma mem_fitting_iff_tau_eq_inv {x : hyp.Dbar} :
+    x ∈ fitting hyp.Dbar ↔ hyp.tau x = x⁻¹ :=
+  ⟨hyp.fitting_subset_inverted, hyp.inverted_mem_fitting⟩
+
+/-! ## The preimage `A` and the identities `K ⊆ A`, `A ∩ V = W` (p. 103) -/
+
+/-- The subgroup of `D` called `A` in Proposition 2: the full preimage of
+`Ā = F(D̄)` under `D → D̄ = D/W`. -/
+def fittingPreimage : Subgroup ↥hyp.D :=
+  (fitting hyp.Dbar).comap (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D))
+
+/-- Membership in the Fitting preimage `A`. -/
+lemma mem_fittingPreimage_iff (d : ↥hyp.D) :
+    d ∈ hyp.fittingPreimage ↔ QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d ∈
+      fitting hyp.Dbar := Iff.rfl
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103): `K ⊆ A`.
+Every element of `K` maps to the inverted locus `J̄ = Ā`. -/
+lemma mem_fittingPreimage_of_mem_KSet {k : G} (hk : k ∈ hyp.KSet) :
+    (⟨k, hk.1⟩ : ↥hyp.D) ∈ hyp.fittingPreimage := by
+  let kD : ↥hyp.D := ⟨k, hyp.mem_D_of_mem_KSet hk⟩
+  change kD ∈ hyp.fittingPreimage
+  rw [hyp.mem_fittingPreimage_iff, hyp.mem_fitting_iff_tau_eq_inv]
+  have htauD : hyp.tauD kD = kD⁻¹ :=
+    Subtype.ext (hyp.t_conj_eq_inv_of_mem_KSet hk)
+  calc
+    hyp.tau (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) kD) =
+        QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) (hyp.tauD kD) :=
+      hyp.tauHom_mk kD
+    _ = QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) kD⁻¹ := congrArg _ htauD
+    _ = (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) kD)⁻¹ := map_inv _ _
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103): `A ∩ V = W`.
+The image of `A ∩ V` is both `τ`-fixed and in `F(D̄)`, hence trivial. -/
+lemma fittingPreimage_inf_V :
+    hyp.fittingPreimage ⊓ hyp.V.subgroupOf hyp.D = hyp.W.subgroupOf hyp.D := by
+  ext d
+  constructor
+  · rintro ⟨hdA, hdV⟩
+    change (d : G) ∈ hyp.V at hdV
+    change (d : G) ∈ hyp.W
+    have hfixed : hyp.tau (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d) =
+        QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d :=
+      (hyp.tau_mk_eq_iff_mem_V d).2 hdV
+    have hdF : QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d ∈ fitting hyp.Dbar :=
+      (hyp.mem_fittingPreimage_iff d).1 hdA
+    exact (QuotientGroup.eq_one_iff (N := hyp.W.subgroupOf hyp.D) d).mp
+      (hyp.tau_fixed_fitting_eq_one hdF hfixed)
+  · intro hdW
+    change (d : G) ∈ hyp.W at hdW
+    refine ⟨?_, ?_⟩
+    · change QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d ∈ fitting hyp.Dbar
+      have hq1 : QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d = 1 :=
+        (QuotientGroup.eq_one_iff (N := hyp.W.subgroupOf hyp.D) d).2 hdW
+      rw [hq1]
+      exact (fitting hyp.Dbar).one_mem
+    · change (d : G) ∈ hyp.V
+      exact hyp.W_le_V hdW
+
+/-! ## The decomposition A = KW and the order identity |Ā| = |K| (p. 103) -/
+
+/-- The book's subgroup A, now regarded as a subgroup of the ambient group G.
+Its subtype model above is convenient for the quotient map; this image model is
+the one to which the involution decomposition from §1 applies. -/
+def fittingPreimageInG : Subgroup G :=
+  hyp.fittingPreimage.map hyp.D.subtype
+
+lemma fittingPreimageInG_le_D : hyp.fittingPreimageInG ≤ hyp.D :=
+  Subgroup.map_subtype_le hyp.fittingPreimage
+
+lemma W_le_fittingPreimageInG : hyp.W ≤ hyp.fittingPreimageInG := by
+  intro w hw
+  change w ∈ hyp.fittingPreimage.map hyp.D.subtype
+  rw [Subgroup.mem_map]
+  let wD : ↥hyp.D := ⟨w, hyp.V_le_D (hyp.W_le_V hw)⟩
+  refine ⟨wD, ?_, rfl⟩
+  have hwsub : wD ∈ hyp.W.subgroupOf hyp.D := hw
+  rw [← hyp.fittingPreimage_inf_V] at hwsub
+  exact hwsub.1
+
+lemma KSet_subset_fittingPreimageInG : hyp.KSet ⊆ hyp.fittingPreimageInG := by
+  intro k hk
+  change k ∈ hyp.fittingPreimage.map hyp.D.subtype
+  rw [Subgroup.mem_map]
+  exact ⟨⟨k, hyp.mem_D_of_mem_KSet hk⟩,
+    hyp.mem_fittingPreimage_of_mem_KSet hk, rfl⟩
+
+/-- Conjugation by t preserves A. -/
+lemma t_conj_mem_fittingPreimageInG {x : G} (hx : x ∈ hyp.fittingPreimageInG) :
+    hyp.t * x * hyp.t ∈ hyp.fittingPreimageInG := by
+  change x ∈ hyp.fittingPreimage.map hyp.D.subtype at hx
+  rw [Subgroup.mem_map] at hx
+  obtain ⟨d, hdA, rfl⟩ := hx
+  change hyp.t * (d : G) * hyp.t ∈ hyp.fittingPreimage.map hyp.D.subtype
+  rw [Subgroup.mem_map]
+  refine ⟨hyp.tauD d, ?_, rfl⟩
+  change QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) (hyp.tauD d) ∈ fitting hyp.Dbar
+  change hyp.tau (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) d) ∈ fitting hyp.Dbar
+  have hmapeq : (fitting hyp.Dbar).map
+      (hyp.tau : hyp.Dbar ≃* hyp.Dbar).toMonoidHom = fitting hyp.Dbar :=
+    (Subgroup.characteristic_iff_map_eq.mp inferInstance) hyp.tau
+  rw [← hmapeq]
+  exact Subgroup.mem_map_of_mem _ hdA
+
+lemma odd_card_fittingPreimageInG : Odd (Nat.card hyp.fittingPreimageInG) := by
+  have hcard : Nat.card hyp.fittingPreimageInG = Nat.card hyp.fittingPreimage := by
+    exact Subgroup.card_map_of_injective hyp.D.subtype_injective
+  rw [hcard]
+  exact hyp.D_odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.fittingPreimage)
+
+/-- Inside the ambient group, the fixed part of A under conjugation by t
+is precisely W. -/
+lemma fittingPreimageInG_inf_centralizer_t :
+    hyp.fittingPreimageInG ⊓ Subgroup.centralizer ({hyp.t} : Set G) = hyp.W := by
+  apply le_antisymm
+  · intro x hx
+    have hxA : x ∈ hyp.fittingPreimageInG := hx.1
+    have hxcent : x ∈ Subgroup.centralizer ({hyp.t} : Set G) := hx.2
+    have hxD : x ∈ hyp.D := hyp.fittingPreimageInG_le_D hxA
+    change x ∈ hyp.fittingPreimage.map hyp.D.subtype at hxA
+    rw [Subgroup.mem_map] at hxA
+    obtain ⟨d, hdA, hdval⟩ := hxA
+    have hd_eq : d = ⟨x, hxD⟩ := Subtype.ext hdval
+    subst d
+    have hxV : x ∈ hyp.V := ⟨hxD, hxcent⟩
+    have hxAV : (⟨x, hxD⟩ : ↥hyp.D) ∈
+        hyp.fittingPreimage ⊓ hyp.V.subgroupOf hyp.D := ⟨hdA, hxV⟩
+    rw [hyp.fittingPreimage_inf_V] at hxAV
+    exact hxAV
+  · intro w hw
+    exact ⟨hyp.W_le_fittingPreimageInG hw, (hyp.W_le_V hw).2⟩
+
+/-- The elements of A inverted by t are exactly the book's set K. -/
+lemma invertedBy_fittingPreimageInG :
+    invertedBy hyp.fittingPreimageInG hyp.t = hyp.KSet := by
+  ext x
+  change (x ∈ hyp.fittingPreimageInG ∧ hyp.t * x * hyp.t = x⁻¹) ↔
+    (x ∈ hyp.D ∧ hyp.t * x * hyp.t = x⁻¹)
+  constructor
+  · rintro ⟨hxA, hxi⟩
+    exact ⟨hyp.fittingPreimageInG_le_D hxA, hxi⟩
+  · rintro hk
+    exact ⟨hyp.KSet_subset_fittingPreimageInG hk, hk.2⟩
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103): A = KW.
+Here multiplication is pointwise set multiplication; §1 Lemma (a) first gives
+A = WK, and W ≤ C_G(K) permits the displayed order. -/
+theorem fittingPreimageInG_eq_KSet_mul_W :
+    (hyp.fittingPreimageInG : Set G) = hyp.KSet * (hyp.W : Set G) := by
+  have hAWK : (hyp.fittingPreimageInG : Set G) =
+      (hyp.W : Set G) * hyp.KSet := by
+    ext x
+    constructor
+    · intro hx
+      obtain ⟨⟨⟨w, hw⟩, ⟨k, hk⟩⟩, heq⟩ :=
+        (invertedProdEquiv (X := hyp.fittingPreimageInG) (t := hyp.t)
+          hyp.t_mul_t hyp.odd_card_fittingPreimageInG
+          (fun _ hxA => hyp.t_conj_mem_fittingPreimageInG hxA)).surjective ⟨x, hx⟩
+      rw [Set.mem_mul]
+      refine ⟨w, ?_, k, ?_, congrArg Subtype.val heq⟩
+      · change w ∈ hyp.W
+        rw [← hyp.fittingPreimageInG_inf_centralizer_t]
+        exact hw
+      · rw [← hyp.invertedBy_fittingPreimageInG]
+        exact hk
+    · intro hx
+      rw [Set.mem_mul] at hx
+      obtain ⟨w, hw, k, hk, rfl⟩ := hx
+      exact hyp.fittingPreimageInG.mul_mem
+        (hyp.W_le_fittingPreimageInG hw) (hyp.KSet_subset_fittingPreimageInG hk)
+  rw [hAWK]
+  ext x
+  constructor
+  · intro hx
+    rw [Set.mem_mul] at hx ⊢
+    obtain ⟨w, hw, k, hk, rfl⟩ := hx
+    refine ⟨k, hk, w, hw, ?_⟩
+    exact Subgroup.mem_centralizer_iff.mp hw.2 k hk
+  · intro hx
+    rw [Set.mem_mul] at hx ⊢
+    obtain ⟨k, hk, w, hw, rfl⟩ := hx
+    refine ⟨w, hw, k, hk, ?_⟩
+    exact (Subgroup.mem_centralizer_iff.mp hw.2 k hk).symm
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
+|Ā| = |K|, where Ā = F(D̄) and |K| denotes the cardinality of the
+inverted set. -/
+theorem card_fitting_Dbar_eq_ncard_KSet :
+    Nat.card (fitting hyp.Dbar) = hyp.KSet.ncard := by
+  have hcardA : Nat.card hyp.fittingPreimageInG =
+      Nat.card hyp.W * hyp.KSet.ncard := by
+    have h := card_eq_card_centralizer_mul_ncard_invertedBy
+      (X := hyp.fittingPreimageInG) (t := hyp.t) hyp.t_mul_t
+      hyp.odd_card_fittingPreimageInG
+      (fun _ hxA => hyp.t_conj_mem_fittingPreimageInG hxA)
+    rwa [hyp.fittingPreimageInG_inf_centralizer_t,
+      hyp.invertedBy_fittingPreimageInG] at h
+  have hcardApre : Nat.card hyp.fittingPreimageInG =
+      Nat.card hyp.fittingPreimage :=
+    Subgroup.card_map_of_injective hyp.D.subtype_injective
+  have hcardWsub : Nat.card ↥(hyp.W.subgroupOf hyp.D) = Nat.card ↥hyp.W :=
+    Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (hyp.W_le_V.trans hyp.V_le_D)).toEquiv
+  have hcardPre : Nat.card hyp.fittingPreimage =
+      Nat.card (fitting hyp.Dbar) * Nat.card hyp.W := by
+    calc
+      Nat.card hyp.fittingPreimage =
+          Nat.card (fitting hyp.Dbar) *
+            Nat.card (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D)).ker :=
+        Subgroup.card_comap_eq_card_mul_card_ker
+          (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D))
+          (QuotientGroup.mk'_surjective _) (fitting hyp.Dbar)
+      _ = Nat.card (fitting hyp.Dbar) * Nat.card hyp.W := by
+        rw [QuotientGroup.ker_mk', hcardWsub]
+  apply Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥hyp.W))
+  calc
+    Nat.card hyp.W * Nat.card (fitting hyp.Dbar) =
+        Nat.card (fitting hyp.Dbar) * Nat.card hyp.W := Nat.mul_comm _ _
+    _ = Nat.card hyp.fittingPreimage := hcardPre.symm
+    _ = Nat.card hyp.fittingPreimageInG := hcardApre.symm
+    _ = Nat.card hyp.W * hyp.KSet.ncard := hcardA
+
+/-! ## The cyclic normal subgroup K (p. 103) -/
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
+there is an element k ∈ K whose powers are exactly K.
+
+Lift a generator of the cyclic group F(D̄) to A = KW, discard its W-factor,
+and compare orders using |F(D̄)| = |K|. -/
+theorem exists_KSet_generator :
+    ∃ k : G, k ∈ hyp.KSet ∧ (Subgroup.zpowers k : Set G) = hyp.KSet := by
+  let F := fitting hyp.Dbar
+  haveI : IsCyclic ↥F := hyp.fitting_Dbar_cyclic_fpf_abelian.1
+  obtain ⟨a, ha⟩ := IsCyclic.exists_generator (α := ↥F)
+  obtain ⟨d, hd⟩ := QuotientGroup.mk'_surjective
+    (N := hyp.W.subgroupOf hyp.D) (a : hyp.Dbar)
+  have hdA : d ∈ hyp.fittingPreimage := by
+    rw [hyp.mem_fittingPreimage_iff, hd]
+    exact a.2
+  have hdAG : (d : G) ∈ hyp.fittingPreimageInG := by
+    change (d : G) ∈ hyp.fittingPreimage.map hyp.D.subtype
+    rw [Subgroup.mem_map]
+    exact ⟨d, hdA, rfl⟩
+  have hdAG' : (d : G) ∈ hyp.KSet * (hyp.W : Set G) :=
+    (Set.ext_iff.mp hyp.fittingPreimageInG_eq_KSet_mul_W (d : G)).mp hdAG
+  rw [Set.mem_mul] at hdAG'
+  obtain ⟨k, hk, w, hw, hkw⟩ := hdAG'
+  let kd : ↥hyp.D := ⟨k, hyp.mem_D_of_mem_KSet hk⟩
+  let wd : ↥hyp.D := ⟨w, hyp.V_le_D (hyp.W_le_V hw)⟩
+  have hkdwd : kd * wd = d := Subtype.ext hkw
+  have hkmk : QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) kd = (a : hyp.Dbar) := by
+    rw [← hd, ← hkdwd, map_mul]
+    have hwdW : wd ∈ hyp.W.subgroupOf hyp.D := hw
+    have hwdq : QuotientGroup.mk' (hyp.W.subgroupOf hyp.D) wd = 1 :=
+      (QuotientGroup.eq_one_iff wd).mpr hwdW
+    rw [hwdq, mul_one]
+  let kG : G := kd
+  refine ⟨kG, hk, ?_⟩
+  have horder_a : orderOf a = Nat.card ↥F :=
+    orderOf_eq_card_of_forall_mem_zpowers ha
+  have horder_dvd : orderOf (a : hyp.Dbar) ∣ orderOf kG := by
+    have h := orderOf_map_dvd (QuotientGroup.mk' (hyp.W.subgroupOf hyp.D)) kd
+    rw [hkmk] at h
+    simpa [kG] using h
+  have hzp_card : (Subgroup.zpowers kG : Set G).ncard = orderOf kG := by
+    rw [← Nat.card_coe_set_eq, SetLike.coe_sort_coe, Nat.card_zpowers]
+  have hcard_le : hyp.KSet.ncard ≤ (Subgroup.zpowers kG : Set G).ncard := by
+    rw [hzp_card, ← hyp.card_fitting_Dbar_eq_ncard_KSet, ← horder_a]
+    simpa using Nat.le_of_dvd (orderOf_pos kG) horder_dvd
+  apply Set.eq_of_subset_of_ncard_le _ hcard_le
+  intro x hx
+  obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
+  exact hyp.zpow_mem_KSet hk n
+
+/-- The book's K, constructed as a genuine subgroup. The carrier equality
+below proves that taking the closure adds no elements. -/
+def K : Subgroup G := Subgroup.closure hyp.KSet
+
+lemma K_le_D : hyp.K ≤ hyp.D :=
+  (Subgroup.closure_le _).mpr (fun _ hk => hyp.mem_D_of_mem_KSet hk)
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
+K is normal in D, by §1 Lemma (b). -/
+instance K_normal : (hyp.K.subgroupOf hyp.D).Normal := by
+  simpa only [K, KSet, invertedBy] using
+    (closure_invertedBy_subgroupOf_normal hyp.t_mul_t hyp.D_odd
+      (fun x hx => hyp.t_conj_mem_D' hx))
+
+/-- The closure construction of K has exactly the original inverted set as
+its carrier. -/
+@[simp] lemma coe_K : (hyp.K : Set G) = hyp.KSet := by
+  obtain ⟨k, -, hk⟩ := hyp.exists_KSet_generator
+  change (Subgroup.closure hyp.KSet : Set G) = hyp.KSet
+  rw [← hk, Subgroup.closure_eq]
+
+/-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
+K is cyclic. -/
+instance K_isCyclic : IsCyclic ↥hyp.K := by
+  obtain ⟨k, -, hk⟩ := hyp.exists_KSet_generator
+  have hK : hyp.K = Subgroup.zpowers k := by
+    rw [K, ← hk, Subgroup.closure_eq]
+  rw [hK]
+  infer_instance
 
 end Hypothesis
 

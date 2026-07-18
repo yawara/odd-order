@@ -222,8 +222,8 @@ theorem xSum_le_two_psi_caseB
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {W2 : Subgroup ↥L} [W2.Normal]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
@@ -239,6 +239,8 @@ theorem xSum_le_two_psi_caseB
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ W2.subgroupOf H) : ℝ))
       ≤ 2 * (ψ 1).re * (η 1).re := by
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   classical
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
     sMember_degreeSqNormReBound_of_not_coherent hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin hS₁coh hηY
@@ -294,7 +296,7 @@ theorem xSum_le_two_psi_caseB_columnBreak
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {W2 : Subgroup ↥L} [W2.Normal]
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
@@ -312,6 +314,7 @@ theorem xSum_le_two_psi_caseB_columnBreak
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ W2.subgroupOf H) : ℝ))
       ≤ 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   classical
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
     sMember_degreeSqNormReBound_of_not_coherent_columnBreak hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin
@@ -364,8 +367,9 @@ theorem S_hasNoRealCharacters_caseB
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.S := by
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   classical
   intro χ hχS
   rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
@@ -406,8 +410,8 @@ theorem false_of_coherentXunionYset_caseB_of_not_coherentS
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal]
     (hW2cen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
@@ -418,6 +422,8 @@ theorem false_of_coherentXunionYset_caseB_of_not_coherentS
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
     (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) : False := by
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   classical
   -- break pair on `Sa = X(h46.W2) ∪ Y`, `Sb = S`.
   have hSaSb : hyp.Xset h46.W2 ∪ hyp.Yset ⊆ hyp.S := by
@@ -506,8 +512,8 @@ theorem nonempty_coherent_S_caseB
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal]
     (hW2cen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)

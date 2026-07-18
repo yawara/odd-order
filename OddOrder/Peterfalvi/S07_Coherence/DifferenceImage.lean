@@ -886,9 +886,11 @@ theorem inner_signSmul_pair_eq_ite
     hpair, star_intCast]
   ring
 
+omit [Fintype G] in
 /-- The two members `ε·μ` and `-ε·ν` of the two-element family are distinct. -/
-theorem signMu_ne_negSignNu (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
+theorem signMu_ne_negSignNu [Finite G] (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     hχ.sign • (hχ.muClassFunction) ≠ (-hχ.sign) • (hχ.nuClassFunction) := by
+  haveI : Fintype G := Fintype.ofFinite G
   intro h
   -- `⟨ε·μ, ε·μ⟩ = ε² = 1`, but if `ε·μ = -ε·ν` it equals `⟨ε·μ, -ε·ν⟩ = -ε²⟨μ,ν⟩ = 0`.
   have hself := hχ.inner_signSmul_pair_eq_ite (s := hχ.sign) (t := hχ.sign)
@@ -1128,7 +1130,7 @@ noncomputable def characterDifferenceImageOfIsometry
     rw [neg_sub]
   rw [hlhs, map_neg, h1, ← smul_neg, neg_sub]
 
-omit [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)] in
+omit [Finite L] [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] in
 /-- **Peterfalvi (5.9.b), the conjugate pairing of the difference image**: when `τ` commutes
 with complex conjugation on the difference `χ − χ̄` (e.g. the Dade base map on a supported
 difference, via `dadeIntegralCharacterMap_mapRingEquiv_comm`), the two irreducibles of the
@@ -1138,10 +1140,11 @@ Conjugating the image equation gives `ε·(μ̄ − ν̄) = ((χ−χ̄)^τ)‾ 
 cancelling `ε` and pairing with `μ` against the orthonormality of `Irr G` forces `ν̄ = μ`.
 This is the step of the (12.3) bar-trick that writes `(φ−φ̄)^τ = α − ᾱ`. -/
 theorem CharacterDifferenceImage.nu_eq_mu_conj
-    {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
+    {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ} [Finite G]
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
     (hcomm : τ ((χ - χ.conj).conj) = (τ (χ - χ.conj)).conj) :
     hχ.nuClassFunction = hχ.muClassFunction.conj := by
+  haveI : Fintype G := Fintype.ofFinite G
   classical
   -- Conjugating the image: `((χ−χ̄)^τ)‾ = (χ̄−χ)^τ = −(χ−χ̄)^τ`.
   have hneg : (τ (χ - χ.conj)).conj = -(τ (χ - χ.conj)) := by
