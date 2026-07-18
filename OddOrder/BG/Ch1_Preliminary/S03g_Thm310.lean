@@ -77,14 +77,20 @@ module via `prime_card_of_elemAbelian_mulDistrib`, and applies the abelian Frobe
 argument.
 
 Note: `U` abelian lets us bypass BG's `K₀`-minimal-normal reduction (BG Case 2, first half), which
-is unnecessary for the Proposition 14.2(g) application. -/
+is unnecessary for the Proposition 14.2(g) application.
+
+**Stronger than the book on the `M` axis**: BG Theorem 3.10 assumes `M` **nilpotent**, but with
+`U` abelian the argument below never uses it — the reduction to a minimal `E`-invariant normal
+subgroup `M₀` needs only that `M` is a nonidentity `E`-invariant subgroup with `(|E|,|M|) = 1`
+inside the solvable `M ⊔ E`.  The nilpotence hypothesis was therefore dropped (it was already
+inert, carried as `_hMnilp`). -/
 theorem prime_card_complement_of_frobenius_conj {G : Type*} [Group G] [Finite G]
     {E U K M : Subgroup G} (hsolv : IsSolvable ↥(M ⊔ E))
     (hUE : U ≤ E) (hKE : K ≤ E)
     (hUK_frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥E (U.subgroupOf E) (K.subgroupOf E))
     (hUab : ∀ a b : ↥U, (a : G) * (b : G) = (b : G) * (a : G))
     (hEM : E ≤ Subgroup.normalizer M)
-    (_hMnilp : Group.IsNilpotent ↥M) (hMne : M ≠ ⊥)
+    (hMne : M ≠ ⊥)
     (hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥M))
     (hCU : M ⊓ Subgroup.centralizer (U : Set G) = ⊥)
     (hcond3 : ∀ x ∈ K, x ≠ 1 →

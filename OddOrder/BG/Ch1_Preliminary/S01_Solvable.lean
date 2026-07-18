@@ -967,6 +967,78 @@ theorem centralizer_oPiPrimePiCore_le
     Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _]
   exact hHH
 
+/-- **BG Proposition 1.15(a)** (P. Hall & G. Higman, "Lemma 1.2.3"), **book statement**.
+
+BG p. 6: *Suppose that `G` is a solvable group and `p` is a prime.  Assume that `T` is a Sylow
+`p`-subgroup of `O_{p',p}(G)`.  Then `C_G(T) ⊆ O_{p',p}(G)`.*
+
+This is strictly stronger than `centralizer_oPiPrimePiCore_le` above: there the element is
+assumed to centralize **all** of `O_{π',π}(G)`, here only its Sylow `π`-layer `T`
+(and `T ⊆ O_{π',π}(G)`, so `C_G(O_{π',π}(G)) ⊆ C_G(T)`).
+
+Stated for a general π-separable `G` and a general π-layer, with "`T` is a Sylow π-subgroup of
+`O_{π',π}(G)`" replaced by the weaker and purely lattice-theoretic **covering** hypothesis
+`hcover : O_{π',π}(G) ≤ T ⊔ O_{π'}(G)` — i.e. `T` covers the quotient `O_{π',π}(G)/O_{π'}(G)`.
+A Sylow π-subgroup of `O_{π',π}(G)` satisfies this (see
+`centralizer_le_oPiPrimePiCore_of_isPGroup_of_card_eq` below), but so does `O_{π',π}(G)` itself,
+which recovers `centralizer_oPiPrimePiCore_le`.  No maximality or π-group hypothesis on `T` is
+needed: covering alone forces `T`'s image to be all of `O_π(Ḡ)`.
+
+Proof: pass to `Ḡ = G/O_{π'}(G)`.  The covering hypothesis makes the image of `T` equal to
+`O_π(Ḡ)`, so `C_G(T)` maps into `C_Ḡ(O_π(Ḡ))`, which lies in `O_π(Ḡ)` by the `O_{π'} = 1`
+Hall–Higman (`Isaacs.Ch03.hall_higman_1_2_3`); pulling back gives `O_{π',π}(G)`.
+
+`IsSolvable` callers obtain `[IsPiSeparable π G]` for free via
+`OddOrder.Isaacs.Ch03.isPiSeparable_of_solvable`. -/
+theorem centralizer_le_oPiPrimePiCore_of_cover
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ)
+    [OddOrder.Isaacs.Ch03.IsPiSeparable π G] {T : Subgroup G}
+    (hTle : T ≤ OddOrder.Isaacs.Ch03.oPiPrimePiCore π G)
+    (hcover : OddOrder.Isaacs.Ch03.oPiPrimePiCore π G
+      ≤ T ⊔ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) :
+    Subgroup.centralizer (T : Set G) ≤ OddOrder.Isaacs.Ch03.oPiPrimePiCore π G := by
+  -- `mk : G →* Ḡ`, written inline to keep all occurrences syntactically identical.
+  let mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G :=
+    QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G)
+  have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective _
+  -- `O_{π',π}(G) = comap mk (O_π(Ḡ))` (definitional).
+  have hcomap : OddOrder.Isaacs.Ch03.oPiPrimePiCore π G
+      = Subgroup.comap mk
+        (OddOrder.Isaacs.Ch03.oPiCore π (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G)) := by
+    rw [OddOrder.Isaacs.Ch03.oPiPrimePiCore]
+  -- `mk '' T = O_π(Ḡ)`: `≤` from `T ≤ O_{π',π}(G)`, `≥` from the covering hypothesis.
+  have hmapT : T.map mk
+      = OddOrder.Isaacs.Ch03.oPiCore π (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) := by
+    refine le_antisymm (Subgroup.map_le_iff_le_comap.mpr (hcomap ▸ hTle)) ?_
+    -- `O_π(Ḡ) = mk '' (comap mk O_π(Ḡ)) = mk '' O_{π',π}(G) ≤ mk '' (T ⊔ O_{π'}(G)) = mk '' T`.
+    have hMker : (OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G).map mk = ⊥ := by
+      rw [Subgroup.map_eq_bot_iff]
+      exact le_of_eq (QuotientGroup.ker_mk' _).symm
+    calc OddOrder.Isaacs.Ch03.oPiCore π (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G)
+        = (Subgroup.comap mk (OddOrder.Isaacs.Ch03.oPiCore π
+            (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G))).map mk :=
+          (Subgroup.map_comap_eq_self_of_surjective hsurj _).symm
+      _ = (OddOrder.Isaacs.Ch03.oPiPrimePiCore π G).map mk := by rw [hcomap]
+      _ ≤ (T ⊔ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G).map mk := Subgroup.map_mono hcover
+      _ = T.map mk ⊔ (OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G).map mk := Subgroup.map_sup _ _ _
+      _ = T.map mk := by rw [hMker, sup_bot_eq]
+  -- Hall–Higman on `Ḡ`, where `O_{π'}(Ḡ) = ⊥`.
+  have hbot : OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) = ⊥ :=
+    OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot {p | p ∉ π}
+  have hHH := OddOrder.Isaacs.Ch03.hall_higman_1_2_3
+    (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) π hbot
+  -- `c` centralizes `T` ⇒ `mk c` centralizes `mk '' T = O_π(Ḡ)` ⇒ `mk c ∈ O_π(Ḡ)`.
+  intro c hc
+  rw [hcomap, Subgroup.mem_comap]
+  refine hHH ?_
+  rw [Subgroup.mem_centralizer_iff]
+  rintro y hy
+  rw [← hmapT] at hy
+  obtain ⟨t, ht, rfl⟩ := hy
+  rw [← map_mul, ← map_mul]
+  exact congrArg mk (Subgroup.mem_centralizer_iff.mp hc t ht)
+
 /-- **Prop 1.15(b) core** (`O_{p'}(G) = ⊥` case, per element): every `u ∈ M := O_{p'}(C_G(R))`
 centralizes `T := O_p(G)`. Proof mirrors `BG.AppA.thmA5_part2`: `⟨u⟩` acts by conjugation on the
 `p`-group `RT := R ⊔ T`, and `C_{RT}(C_{RT}(u)) ⊆ C_{RT}(R) ⊆ C_{RT}(u)` — the second inclusion
@@ -1399,6 +1471,90 @@ theorem normal_subgroup_card_pow_le_of_pGroup
     · have h := card_comap_eq_card_mul_card_ker f hf_surj K
       rw [hf_ker, hL₀_card, hK_card] at h
       rw [h, pow_succ, mul_comm]
+
+/-- **A Sylow `p`-subgroup of `O_{p',p}(G)` covers `O_{p',p}(G)/O_{p'}(G)`**:
+`T ⊔ O_{p'}(G) = O_{p',p}(G)`.
+
+This is the bridge from the Sylow hypothesis in the book statement of BG Prop. 1.15(a) to the
+covering hypothesis of `centralizer_le_oPiPrimePiCore_of_cover`.  "`T` is a Sylow `p`-subgroup
+of `H := O_{p',p}(G)`" is spelled as "`T` is a `p`-subgroup of `H` whose order is the full
+`p`-part of `|H|`"; a bundled `P : Sylow p ↥H` supplies `hTcard` via
+`Sylow.card_eq_multiplicity`.
+
+Proof: `|H| = |O_p(Ḡ)| · |O_{p'}(G)|` with `|O_p(Ḡ)| = p ^ k` and `|O_{p'}(G)|` prime to `p`,
+so the `p`-part of `|H|` is exactly `|O_p(Ḡ)|`, whence `|T| = |O_p(Ḡ)|`.  Since
+`T ⊓ O_{p'}(G) = ⊥`, the image of `T` in `Ḡ` still has order `|O_p(Ḡ)|` and is contained in
+`O_p(Ḡ)`, so it equals `O_p(Ḡ)`; pulling back along `mk` gives `T ⊔ O_{p'}(G) = H`. -/
+theorem sup_oPiCore_compl_eq_oPiPrimePiCore_of_isSylow [IsSolvable G]
+    {T : Subgroup G} (hT : IsPGroup p T)
+    (hTle : T ≤ OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G)
+    (hTcard : Nat.card T
+      = p ^ (Nat.card (OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G)).factorization p) :
+    T ⊔ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G
+      = OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G := by
+  classical
+  let mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G :=
+    QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)
+  have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective _
+  have hker : mk.ker = OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G :=
+    QuotientGroup.ker_mk' _
+  have hcomap : OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G
+      = Subgroup.comap mk (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)
+        (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)) := by
+    rw [OddOrder.Isaacs.Ch03.oPiPrimePiCore]
+  -- `|O_{p'}(G)|` is prime to `p`, hence `T ⊓ O_{p'}(G) = ⊥`.
+  have hMcop : (Nat.card (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)).Coprime p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := {q | q ∉ ({p} : Set ℕ)}) Nat.card_pos.ne'
+      (Nat.Prime.pos (Fact.out : p.Prime)).ne'
+      (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup _) ?_
+    intro r hr
+    rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hr
+    subst hr
+    simp
+  have hpM : ¬ p ∣ Nat.card (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) :=
+    (Nat.Prime.coprime_iff_not_dvd (Fact.out : p.Prime)).mp hMcop.symm
+  have hdisj : T ⊓ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥ :=
+    inf_eq_bot_of_pGroup_coprime hT hMcop
+  -- `|H| = |O_p(Ḡ)| · |O_{p'}(G)|`.
+  have hHcard : Nat.card (OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G)
+      = Nat.card (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)
+          (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G))
+        * Nat.card (OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) := by
+    rw [hcomap, card_comap_eq_card_mul_card_ker mk hsurj, hker]
+  -- `|O_p(Ḡ)| = p ^ k`, so the `p`-part of `|H|` is `p ^ k` and `|T| = |O_p(Ḡ)|`.
+  obtain ⟨k, hk⟩ := (OddOrder.Isaacs.Ch04.isPGroup_of_isPiGroup_singleton
+    (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup
+      (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)
+      ({p} : Set ℕ))).exists_card_eq
+  have hfact : (Nat.card (OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G)).factorization p
+      = k := by
+    rw [hHcard, hk, Nat.factorization_mul (pow_ne_zero k (Nat.Prime.pos (Fact.out : p.Prime)).ne')
+      Nat.card_pos.ne', Finsupp.add_apply, Nat.Prime.factorization_pow (Fact.out : p.Prime),
+      Nat.factorization_eq_zero_of_not_dvd hpM]
+    simp
+  have hTcard' : Nat.card T = Nat.card (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)) := by
+    rw [hTcard, hfact, hk]
+  -- The image of `T` in `Ḡ` has the same order as `T` (as `T ⊓ ker mk = ⊥`).
+  have hmapcard : Nat.card (T.map mk) = Nat.card T := by
+    have h1 : Subgroup.comap mk (T.map mk)
+        = T ⊔ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
+      rw [Subgroup.comap_map_eq, hker]
+    have h2 := card_comap_eq_card_mul_card_ker mk hsurj (T.map mk)
+    rw [h1, hker, card_sup_eq_card_mul_card_of_disjoint_normal hdisj] at h2
+    exact (Nat.eq_of_mul_eq_mul_right Nat.card_pos h2).symm
+  -- Hence the image is all of `O_p(Ḡ)`.
+  have hmapT : T.map mk = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) := by
+    refine Subgroup.eq_of_le_of_card_ge
+      (Subgroup.map_le_iff_le_comap.mpr (hcomap ▸ hTle)) ?_
+    rw [hmapcard, hTcard']
+  calc T ⊔ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G
+      = Subgroup.comap mk (T.map mk) := by rw [Subgroup.comap_map_eq, hker]
+    _ = Subgroup.comap mk (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)
+          (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)) := by rw [hmapT]
+    _ = OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G := hcomap.symm
 
 end OddOrder.BG.Ch1.S01
 

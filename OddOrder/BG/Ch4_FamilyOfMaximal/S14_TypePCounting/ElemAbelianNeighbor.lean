@@ -415,7 +415,7 @@ theorem sigma_eq_beta_and_prime_card_E1_of_caseTau1 [Finite G]
   -- **Theorem 3.10(a)**: `|E₁|` has prime order.
   have hKprime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥E₁ = q :=
     OddOrder.BG.Ch1.S03.prime_card_complement_of_frobenius_conj hsolvME hUleE_sup h.E₁_le hfrob
-      hUab hEMσ hMnilp hMσne hcopEMσ hCU hcond3
+      hUab hEMσ hMσne hcopEMσ hCU hcond3
   -- **σ = β**: Lemma 12.19 gives `W` a Hall `β'`-subgroup of `M_σ` with `E' ≤ C_G(W)`; since
   -- `U ≤ E'` we get `W ≤ C_{M_σ}(U) = 1`, so `M_σ` is a `β(M)`-group, forcing `σ(M) = β(M)`.
   obtain ⟨W, hWMσ, hWHall, hE'centW⟩ :=
