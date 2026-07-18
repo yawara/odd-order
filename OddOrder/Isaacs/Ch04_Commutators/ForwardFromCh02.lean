@@ -9,8 +9,6 @@ import Mathlib.GroupTheory.Solvable
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 
-open scoped commutatorElement Pointwise
-
 /-!
 # Ch.4 → Ch.2 forward dependencies
 
@@ -51,6 +49,8 @@ open scoped commutatorElement Pointwise
 - [`notes/isaacs/ch04_commutators.md`](../../../notes/isaacs/ch04_commutators.md):
   §4A-§4B 補助補題の inventory.
 -/
+
+open scoped commutatorElement Pointwise
 
 namespace OddOrder.Isaacs.Ch04
 

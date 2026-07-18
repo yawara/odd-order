@@ -12,9 +12,6 @@ import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
 import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
 import Mathlib.LinearAlgebra.Dimension.Free
 
--- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
-open scoped IsMulCommutative
-
 /-!
 # p-Rank of a Group
 
@@ -68,6 +65,9 @@ Phase 2a 第 1 波 audit 2026-05-23 で新規 shared module 候補として確�
 詳細は `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`.
 性質補強 2026-05-30 (BG §4 最初の山, `notes/bg/s04_implementation_plan_2026_05_30.md` §4.1).
 -/
+
+-- rc2: the `IsMulCommutative → CommMonoid/CommGroup` instances are now `scoped`.
+open scoped IsMulCommutative
 
 namespace OddOrder.GroupTheory
 

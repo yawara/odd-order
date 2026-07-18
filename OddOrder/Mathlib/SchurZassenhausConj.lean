@@ -8,9 +8,6 @@ import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Sylow
 import OddOrder.Mathlib.Subgroup
 
-open scoped Pointwise
-open scoped IsMulCommutative -- rc2: IsMulCommutative→CommMonoid/CommGroup is now scoped
-
 /-!
 # Schur-Zassenhaus conjugacy (Isaacs Thm 3.12)
 
@@ -37,6 +34,9 @@ Strong induction on `|G|`.
 3. **Main induction**: combine (1), (2), Sylow C-theorem, and abelian SZ conjugacy
    to handle the two solvability cases.
 -/
+
+open scoped Pointwise
+open scoped IsMulCommutative -- rc2: IsMulCommutative→CommMonoid/CommGroup is now scoped
 
 namespace Subgroup
 
