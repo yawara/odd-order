@@ -772,4 +772,61 @@ theorem card_inf_conj_fitting_eq_of_not_isMulCommutative [Finite G]
     hrank3 hnab]
   exact hX₁card
 
+/-- **`|K*| = p` in the type-`P₁` non-TI case** (Coq `oKs`, `BGsection15.v:1178`): for a type-`P₁`
+maximal `M` with `M_F = M_σ` and cyclic `O_{p'}(M_F)`, the order of `K* = C_{M_σ}(K)` is exactly the
+witness prime `p`.
+
+This is the step that lets BG's `(e2)` branch conclude `q = p` from `Z_q = K*` (the per-prime
+witnesses satisfy `|Z_q| = q`, so `Z_q = K*` forces `q = |K*|`).
+
+The route follows Coq's `sKsP`: `K* ⊆ M''` is Corollary 15.6 (`typeP_kstar_in_mf`), and
+`M'' ⊆ O_p(M_F)` because `M' = M_σ = M_F` for type `P₁` (`typeP1_msigma_eq_derivedInG` plus `hmf`)
+and `M_F` is nilpotent with commutative `O_{p'}(M_F)`
+(`commutator_le_oPiCore_of_isMulCommutative_compl_of_isNilpotent`).  So `K*` is a `p`-group, and
+being of prime order (`kstar_card_prime_of_inputs`) it has order exactly `p`.
+
+⚠ The similarly-named `kstar_le_opiCore_of_inputs` does **not** apply here: it assumes
+`M_F ≠ M_σ`, which is the opposite of the `hmf` hypothesis of Theorem 15.7(e). -/
+theorem kstar_card_eq_witness_prime_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hmf : MF M = OddOrder.BG.Ch3.S10.Msigma M) {p : ℕ} (hp : p.Prime)
+    (hcyc : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M))) :
+    Nat.card ↥Kstar = p := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  -- `O_{p'}(M_F)` is commutative, transferred from the ambient copy to the subtype level.
+  haveI := hcyc
+  haveI hcyc' : IsCyclic ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(MF M)) := by
+    have he : ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(MF M)) ≃*
+        ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) :=
+      Subgroup.equivMapOfInjective _ (MF M).subtype (MF M).subtype_injective
+    exact isCyclic_of_surjective he.symm.toMonoidHom he.symm.surjective
+  have hab : IsMulCommutative ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(MF M)) := inferInstance
+  -- `M'' = (M_F)' ≤ O_p(M_F)`.
+  have hM'eq : derivedInG M = MF M := by
+    rw [hmf]; exact (typeP1_msigma_eq_derivedInG hG hM hP1 hKM hK hKstar).symm
+  have hderiv : derivedInG (derivedInG M) ≤ opiCoreInG ({p} : Set ℕ) (MF M) := by
+    rw [hM'eq]
+    exact Subgroup.map_mono
+      (OddOrder.BG.Ch3.S10.commutator_le_oPiCore_of_isMulCommutative_compl_of_isNilpotent _ hab)
+  -- `K* ≤ M'' ≤ O_p(M_F)`, so `K*` is a `p`-group.
+  have hKsP : Kstar ≤ opiCoreInG ({p} : Set ℕ) (MF M) :=
+    ((typeP_kstar_in_mf hG hM hP1.1 hKM hK hKstar).2.2.2.1).trans hderiv
+  have hKspg : IsPGroup p ↥Kstar :=
+    (isPGroup_opiCoreInG_singleton (MF M)).to_le hKsP
+  -- Prime order plus `p`-group forces `|K*| = p`.
+  have hprime : (Nat.card ↥Kstar).Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p) (G := ↥Kstar)).mp hKspg
+  rw [hn] at hprime ⊢
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    rw [pow_zero] at hprime
+    exact Nat.not_prime_one hprime
+  exact ((Nat.prime_dvd_prime_iff_eq hp hprime).mp (dvd_pow_self p hn0)).symm
+
 end OddOrder.BG.Ch4.S15

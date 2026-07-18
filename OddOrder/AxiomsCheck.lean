@@ -5800,6 +5800,16 @@ set_option linter.style.longLine false in
 -- order-`p` `X₁` is `X₁`.  Both sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_eq_of_not_isMulCommutative
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.card_inf_conj_fitting_eq_of_not_isMulCommutative
+-- BG **Theorem 15.7(e)**, `|K*| = p` (Coq `oKs`, `BGsection15.v:1178`): the input that lets the
+-- `(e2)` branch conclude `q = p` from `Z_q = K*`.  Following Coq's `sKsP`: `K* ⊆ M''` is
+-- Corollary 15.6 (`typeP_kstar_in_mf`), and `M'' ⊆ O_p(M_F)` since `M' = M_σ = M_F` for type `P₁`
+-- and `M_F` is nilpotent with commutative `O_{p'}(M_F)`
+-- (`commutator_le_oPiCore_of_isMulCommutative_compl_of_isNilpotent`, the general
+-- `O_{π'}` commutative ⟹ `K' ≤ O_π` fact).  So `K*` is a `p`-group of prime order, i.e. of
+-- order `p`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.kstar_card_eq_witness_prime_of_isTypeP1
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch3.S10.commutator_le_oPiCore_of_isMulCommutative_compl_of_isNilpotent
 -- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
 -- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
 -- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive
