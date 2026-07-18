@@ -384,6 +384,60 @@ noncomputable abbrev mainSubgroup (M : Subgroup G) (tau : PeterfalviType) :=
 /-- **Peterfalvi (8.10)**: the notation `A_1(M) = M_s#`, shared as `A1`. -/
 noncomputable abbrev A1 (M : Subgroup G) (tau : PeterfalviType) := OddOrder.GroupTheory.A1 M tau
 
+/-- **Peterfalvi (8.11), first clause**: if `P` is a non-trivial Sylow subgroup of `M_s`, then
+`N_G(P) ⊆ M`.
+
+Like the Hall clause below, this is a BG Section 16 consequence.  `M_s = M_σ`
+(`mainSubgroup_eq_Msigma`, BG Prop 16.1), so a non-trivial Sylow `p`-subgroup `P` of `M_s` forces
+`p ∈ σ(M)` (its order is a positive power of `p` dividing `|M_σ|`, and `π(M_σ) = σ(M)` by
+`primeFactors_Msigma_eq_sigma`).  Since `M_σ` is a Hall `σ(M)`-subgroup of `M`, the `p`-parts of
+`|M_σ|` and `|M|` agree (`factorization_Msigma_eq_of_mem_sigma`), so the image `P̄ ≤ M` is a full
+Sylow `p`-subgroup of `M`; BG Theorem A(1)'s normalizer clause
+(`normalizer_sylow_map_le_of_mem_sigma`) then gives `N_G(P̄) ≤ M`. -/
+theorem normalizer_sylow_mainSubgroup_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (hType : HasPeterfalviType tau M)
+    {p : ℕ} [Fact p.Prime] (P : Sylow p ↥(mainSubgroup M tau))
+    (hPne : (P : Subgroup ↥(mainSubgroup M tau)) ≠ ⊥) :
+    Subgroup.normalizer
+        ((((P : Subgroup ↥(mainSubgroup M tau)).map (mainSubgroup M tau).subtype : Subgroup G)
+          : Set G)) ≤ M := by
+  classical
+  have hMs : mainSubgroup M tau = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM hType
+  have hMsM : mainSubgroup M tau ≤ M := by
+    rw [hMs]; exact OddOrder.BG.Ch3.S10.Msigma_le M
+  -- `|P| = p^{v_p(|M_s|)}`, and `P ≠ ⊥` forces `v_p(|M_s|) ≠ 0`.
+  have hfac : Nat.card ↥(P : Subgroup ↥(mainSubgroup M tau))
+      = p ^ (Nat.card ↥(mainSubgroup M tau)).factorization p := P.card_eq_multiplicity
+  have hvne : (Nat.card ↥(mainSubgroup M tau)).factorization p ≠ 0 := fun h0 =>
+    hPne (Subgroup.card_eq_one.mp (by rw [hfac, h0, pow_zero]))
+  -- Hence `p ∈ σ(M)`, since `π(M_σ) = σ(M)`.
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    refine (OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hM p).mp ?_
+    rw [← hMs]
+    exact Nat.mem_primeFactors.mpr
+      ⟨Fact.out, Nat.dvd_of_factorization_pos hvne, Nat.card_pos.ne'⟩
+  -- `M_σ` is Hall `σ(M)` in `M`, so `v_p(|M_s|) = v_p(|M|)`.
+  have hvM : (Nat.card ↥(mainSubgroup M tau)).factorization p = (Nat.card ↥M).factorization p := by
+    rw [hMs]; exact OddOrder.BG.Ch3.S13.factorization_Msigma_eq_of_mem_sigma hG hM hpσ
+  -- So `P̄` is a full Sylow `p`-subgroup of `M`.
+  have hPbarM : ((P : Subgroup ↥(mainSubgroup M tau)).map (mainSubgroup M tau).subtype) ≤ M :=
+    (Subgroup.map_subtype_le _).trans hMsM
+  have hcard : Nat.card
+      ↥((((P : Subgroup ↥(mainSubgroup M tau)).map (mainSubgroup M tau).subtype)).subgroupOf M)
+      = p ^ (Nat.card ↥M).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPbarM).toEquiv,
+      Subgroup.card_map_of_injective (mainSubgroup M tau).subtype_injective, hfac, hvM]
+  set Q : Sylow p ↥M := Sylow.ofCard
+    ((((P : Subgroup ↥(mainSubgroup M tau)).map (mainSubgroup M tau).subtype)).subgroupOf M) hcard
+    with hQdef
+  have hQmap : (Q : Subgroup ↥M).map M.subtype
+      = (P : Subgroup ↥(mainSubgroup M tau)).map (mainSubgroup M tau).subtype := by
+    rw [hQdef, Sylow.coe_ofCard, Subgroup.map_subgroupOf_eq_of_le hPbarM]
+  have hnorm := OddOrder.BG.Ch3.S10.normalizer_sylow_map_le_of_mem_sigma hpσ Q
+  rwa [hQmap] at hnorm
+
 /-- **Peterfalvi (8.11)**: if `M` has one of the five Peterfalvi types, then
 `M_F` and `M_s` are Hall subgroups of `G`.
 
