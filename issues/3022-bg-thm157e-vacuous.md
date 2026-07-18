@@ -141,14 +141,27 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
          (`Z'` cyclic)。
       4. `X ≤ P` (BG「X is a p-group」— 要根拠確認) と `X ≤ C_G(B)` から `X ≤ X₁ ⊔ Z'`、
          `X` cyclic と合わせて `X = X₁`、ゆえに `p = |X|`。
-      **未確認の 1 点** = 手順 4 の「`X` は p-群」。BG は「`O_{p'}(H)` は `C_H(X₁)` 可換ゆえ可換。
-      Hence `P = O_p(H)` is not abelian and `X` is a `p`-group」と一文で済ませており、
-      この含意の根拠が原文では省略されている。ここが唯一の行間 — 詰まったら
-      [[feedback-ask-chatgpt-for-elided-gaps]] (Coq `BGsection15.v` 精読 → ChatGPT 再構成)。
+      ~~**未確認の 1 点** = 手順 4 の「`X` は p-群」~~ → **解決済 (2026-07-19)**。
+      BG は「`O_{p'}(H)` は `C_H(X₁)` 可換ゆえ可換。Hence `P = O_p(H)` is not abelian and `X` is
+      a `p`-group」と一文で済ませ根拠を書いていないが、既存の 2 事実の衝突で出る:
+      - **任意の**素数 `d ∣ |X|` について `O_d(M_F)` は非 cyclic。これは BG 冒頭の段
+        (「`O_p(M)` が cyclic なら `X₁` が `M` と `M^g` の両方で正規になり不可能」) =
+        `not_isCyclic_opiCore_mf_of_orderP_le_conj`。`X` の位数 `d` の部分群が `M_F` と `M_F^g`
+        の**両方**に入る (`inf_conj_fitting_le_Msigma` + 共役版 + `M_F = M_σ`) ので `d` で使える。
+      - 一方 `M_F` 非可換なら `O_{p'}(M_F)` は cyclic (`typeF_nonabelian_cyclic_opiCore_compl`)
+        で、`d ≠ p` なら `O_d(M_F) ≤ O_{p'}(M_F)`。
+      ⟹ `p` 以外の素数は `|X|` を割れない。**ChatGPT 相談は不要だった。**
+      形式化: `S15_MF/WitnessPGroup.lean`
+      `inf_conj_fitting_isPGroup_of_not_isMulCommutative` (sorry-free, axiom-clean)。
 
-      **付随して必要**: `exists_inf_conj_fitting_orderP_witness` の結論に
-      `X₁ ≤ F(M) ⊓ conj g • F(M)` を追加する (構成上は真だが公開されておらず、現状 `X₁` と
-      `X` が statement 上結びついていない)。これが無いと手順 4 が書けない。
+      **付随して必要** → **完了 (2026-07-19)**: `exists_inf_conj_fitting_orderP_witness` の結論に
+      `X₁ ≤ F(M) ⊓ conj g • F(M)` を追加済 (構成上真だが未公開だった)。消費側 4 箇所も更新。
+
+      **新 leaf の layering**: `mf_eq_msigma_of_not_fittingIsTI` が `OpicoreCentralizer` に在るため、
+      `WitnessPGroup` は `PisetBetaDisjoint` でなく **`OpicoreCentralizer` を import** する
+      (PisetBetaDisjoint → OpicoreCentralizer → WitnessPGroup)。⟹ **`p = |X|` 完成後の
+      「精密化された (e)」は `OpicoreCentralizer` でなく `WitnessPGroup` 側 (かその下流) に置く**
+      (現 `fitting_not_ti_trichotomy` は OpicoreCentralizer に在り WitnessPGroup を cite できない)。
 - [ ] **(e2)/(e3) の型別分離** — **未了**。type `F` 側の exponent 条件
       (`exp(M/H) ∣ q − 1`) は `typeF_exponent_dvd_sub_one_of_invariant_card` として**存在し**、
       `isTypeI_of_isTypeF` が使っている (trichotomy へは未配線)。type `P₁` 側の

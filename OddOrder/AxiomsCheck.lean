@@ -5655,6 +5655,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_trichotomy
+-- BG **Theorem 15.7(e)**, *"`X` is a `p`-group"* (`S15_MF/WitnessPGroup`, issue 3022, step 1 of the
+-- `p = |X|` chain).  BG asserts this without proof; the argument is that every prime `d ∣ |X|` has
+-- `O_d(M_F)` non-cyclic (BG's opening step `not_isCyclic_opiCore_mf_of_orderP_le_conj`, applicable
+-- at `d` because an order-`d` subgroup of `X` lies in both `M_F` and `M_F^g` — this needs the
+-- 2026-07-19 `X₁ ≤ F(M) ∩ F(M)^g` strengthening of the witness), while `O_{p'}(M_F)` *is* cyclic for
+-- non-abelian `M_F`, and `O_d(M_F) ≤ O_{p'}(M_F)` when `d ≠ p`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S15.inf_conj_fitting_isPGroup_of_not_isMulCommutative
 -- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
 -- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
 -- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive
