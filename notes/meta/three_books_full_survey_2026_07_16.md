@@ -348,7 +348,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Thm 6.2** Normal-J: Z(J(S))·O_{p'}(G) ⊴ G (G solvable odd order, S ∈ Syl_p) — The literal book statement with Thompson's J(S) is proved only in a reduced case: normalJ_normal_of_odd (S06_Additional.lean, via Isaacs Thm 7.6 normal_J) gives…
+- **Thm 6.2** Normal-J: Z(J(S))·O_{p'}(G) ⊴ G — [2026-07-18 精査] L(S) 一般形 (book 推奨代替 = AppB.zCenter_lOdd_sup_oPiCore_normal) は**済+FT 消費**、role 満たす。literal J(S): reduced case (normalJ_normal_of_odd) 済 + **O_{p'} reduction を conditional lemma で landing** (S06_Thm62JS.zCenterThompsonJ_sup_oPiCore_normal_of_reduced, sorry-free/axiom-clean, hZJ 仮定)。残 = hZJ = **Glauberman Z(J) 定理** (Isaacs 意図的省略の major result; C_G(Z(P))=P は非 abelian P で導出不可, 反例 extraspecial)。issue 3017 pending (major upstream 待ちの正当な繰延, FT gate 無)。The literal book statement with Thompson's J(S) is proved only in a reduced case: normalJ_normal_of_odd (S06_Additional.lean, via Isaacs Thm 7.6 normal_J) gives…
 
 ### BG §14 — BG §14 Maximal Subgroups of Type P and Counting
 
