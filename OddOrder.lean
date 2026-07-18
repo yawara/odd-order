@@ -86,6 +86,7 @@ import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
 import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
 import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
+import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
 import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound

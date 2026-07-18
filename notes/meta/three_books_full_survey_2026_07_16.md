@@ -15,6 +15,17 @@
 
 ## 全体集計
 
+> 🚨 **2026-07-19: Isaacs の行は全面的に信用できない (実測で全章クローズ済と判明)**。
+> 下表と per-unit 表は 2026-07-16 時点の調査結果だが、Isaacs については **Ch.1–Ch.10 +
+> 付録の全 349 結果が形式化済 (実 sorry 0)** であることが同 07-19 の実測で確定した。
+> 特に **Ch.8 (「ディレクトリすら存在しない」と断言) と Ch.10 (「Cor 10.17 のみ」) は
+> 100% 誤り** — 実体は `Ch08_PermutationGroups/` 14 leaf・`Ch10_MoreTransfer/` 6 leaf。
+> 原因は Ch.8/Ch.10 の実装が調査翌日以降 (2026-07-17〜19) に入ったこと。
+> **各行の「Confirmed missing (slim pass)」「refutation attempted, failed」等の検証文言も
+> Isaacs については無効**。BG / Peterfalvi の行は未再検証。
+> ⇒ **Isaacs のギャップを理由に作業を起こす前に、必ず番号 grep + 記述的名前 grep で
+> 実物を確認すること**。この note の Isaacs 記述を一次情報として使わない。
+
 | 冊 | 結果数 | 済 | 特殊化 | 部分 | 未 | mathlib | 実作業ギャップ (未+部分) |
 |---|---|---|---|---|---|---|---|
 | Isaacs | 349 | 143 | 8 | 23 | 101 | 74 | 124 (S:82 M:40 L:2) |
@@ -36,12 +47,19 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Isaacs Ch.5 | 34 | 21 | 1 | 1 | 2 | 9 |
 | Isaacs Ch.6 | 26 | 19 | 1 | 4 | 2 | 0 |
 | Isaacs Ch.7 | 9 | 9 | 0 | 0 | 0 | 0 |
-| Isaacs Ch.8 | 44 | 0 | 0 | 0 | 25 | 19 |
-| Isaacs Ch.9 | 34 | 0 | 1 | 4 | 29 | 0 |
-| Isaacs Ch.10 | 28 | 1 | 0 | 1 | 26 | 0 |
+| Isaacs Ch.8 | 44 | 0 → **44** | 0 | 0 | 25 → **0** | 19 |
+| Isaacs Ch.9 | 34 | 0 → **34** | 1 → **0** | 4 → **0** | 29 → **0** | 0 |
+| Isaacs Ch.10 | 28 | 1 → **28** | 0 | 1 → **0** | 26 → **0** | 0 |
 | Isaacs Appendix (The Basics) | 23 | 8 | 0 | 0 | 0 | 15 |
 
 ### Isaacs Ch.1 — Isaacs Ch.1 Sylow Theory
+
+> ✅ **2026-07-19: 唯一の「部分」だった Lem 1.43 の等号条件節もクローズ (issue 9153)**。
+> `OddOrder/GroupTheory/ChermakDelgado.lean` の
+> `chermakDelgadoMeasure_mul_eq_conditions` が書籍の 2 結論
+> (`J = HK` かつ `C_G(D) = C_G(H)·C_G(K)`) を lattice 仮定なしで与える。
+> ⇒ **Isaacs Ch.1 は残作業なし**。
+
 
 > Isaacs Ch.1 (Sylow Theory, results 1.1-1.46) is essentially complete: 45 of 46 numbered results are either fully covered by mathlib (18 results — all of classical Sylow E/C/D theory, orbit-stabilizer, Frattini argument, nilpotency TFAE, central-series comparison) or formalized sorry-free in the repo at full book strength (27 results), with the single gap being the equality-case clause of Lemma 1.43 (inequality proved; the equality consequences exist only inline for lattice members, effort S). The repo's genuinely new contributions beyond mathlib are: the strong Sylow counting congruence 1.16, the p-group normal-series lemmas 1.19/1.23 (with the normal form of Cor 1.24 living in the BG tree as normal_subgroup_card_pow_le_of_pGroup), the O_p(G) (`opCore`) and Fitting subgroup (`fitting`) definitions with extensive API (mathlib has neither), the small-order nonsimplicity theorems 1.30-1.36 including the full G ≅ S₄ classification for order 24, Brodkey theory 1.37-1.40, and the complete Chermak-Delgado theory 1.41-1.46 (factored into OddOrder/GroupTheory/ChermakDelgado.lean, with 1.42's equality condition even strengthened to an iff). Two structural notes: the formalization is often stronger or differently factored than the book (1.36 produces an explicit normal subgroup; 1.33 gives an explicit MulEquiv to Perm (Fin 4)), and mathlib-covered results are deliberately not wrapped (per project wrapper policy), with the correspondences recorded in section docstrings whose cited mathlib names I verified all exist in the pinned mathlib. Minor cosmetic point: Cor 1.24's Ch01 docstring cites only the weak (non-normal) mathlib form and does not cross-reference the full normal version already proved in BG S01_Solvable.lean. Slim verification pass: I attempted to refute and instead CONFIRMED the sole partial label (Lem 1.43 — inequality standalone at ChermakDelgado.lean:101, but the equality-case consequences J = HK and C_G(D) = C_G(H)C_G(K) exist only inline under lattice-membership hypotheses in chermakDelgadoLattice_sup_eq_mul, the centralizer-product clause never at set level, and pinned mathlib has no ChermakDelgado file), and read the actual Lean statements of the three most load-bearing formalized results — Thm 1.16 (card_sylow_modEq_one_of_max_inter), Thm 1.19 (IsPGroup.normal_inf_center_nontrivial), and Cor 1.28 (fitting + normal/characteristic/isNilpotent instances + nilpotent_normal_le_fitting) — confirming all three at full book strength, so no status changes were made.
 
@@ -50,6 +68,15 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Lem 1.43 | 部分 | S | m_G(H)·m_G(K) ≤ m_G(H∩K)·m_G(⟨H,K⟩), equality forcing J = HK and C_G(D) = C_G(H)C_G(K) | Partial label re-verified in slim pass (refutation attempted, failed). The main inequality is fully proved (ChermakDelgado.lean:101). The equality-case clause is not a standalone statement: J = HK is derived inline only … |
 
 ### Isaacs Ch.2 — Isaacs Ch.2 Subnormality
+
+> ✅ **2026-07-19 実測: 唯一のギャップとされた Lem 2.14 は既に完全形式化済 (本節は stale)**。
+> `Ch02_Subnormality/DihedralBasics.lean` (sorry-free、`Main.lean` から import 済) が
+> (a) の iff (`forall_involution_iff_conj_eq_inv`)、全反転 (`conj_eq_inv_of_notMem_zpowers`)、
+> `c*t` involution、生成 (`closure_mul_involution_eq_top`)、および (b) の
+> `C` nontrivial (`mul_ne_one_of_ne`) / `s,t ∉ C` (`left,right_notMem_zpowers_mul`) /
+> `|D:C| = 2` (`index_zpowers_mul_eq_two`) / capstone
+> (`sq_eq_one_of_notMem_zpowers_mul`) を全て book 強度で持つ。有限性も仮定していない。
+> ⇒ **Isaacs Ch.2 は残作業なし**。
 
 > Isaacs Ch.2 (Subnormality, results 2.1-2.20) is essentially completely formalized and sorry-free: 16 of 20 numbered results have full-book-strength Lean statements in OddOrder/Isaacs/Ch02_Subnormality/{Basic,Theorem211Wielandt,Main}.lean, 3 more (2.4, 2.7, and the subnormality/normal-closure definitions) are covered directly by mathlib (Subgroup.IsSubnormal.inf, Subgroup.commute_of_normal_of_disjoint) per the repo's no-wrapper policy. The only gap is Lemma 2.14 (dihedral structure of a group generated by two involutions): its Matsuyama-facing essence is in Ch02 and — beyond what the original survey recorded — the DihedralGroup identification exists in Ch06 (dihedralIsoOfInverting), leaving only (a)'s easy iff direction and (b)'s explicit C≠1/s,t∉C/|D:C|=2 packaging unstated — a small (S) task. Notable factoring differences: Lucchini 2.20's full theorem lives in Ch04_Commutators/ForwardFromCh02.lean for import-order reasons (stale comments in Ch02/Ch03 still call its K=⊥ case an 'axiom', but it is now a proven theorem with zero sorries and zero axiom declarations), and the repo goes beyond the book by deriving the single-element Baer-Suzuki p-core theorem (baerSuzuki_pCore) from Baer 2.12. End-of-section Problems (2A.x-2D.x) are not formalized, consistent with the project formalizing numbered results only. Slim-pass verification: re-read Thm 2.5, Thm 2.9, and Thm 2.12 statements and confirmed full book strength; for Lem 2.14 the 'partial' label is confirmed but its notes were corrected — the repo DOES identify the inverting index-2-cyclic configuration with mathlib's DihedralGroup via Ch06_FrobeniusActions/DQSDRecognition.lean (dihedralIsoOfInverting, general finite group), so only the trivial iff direction and part (b)'s index/membership packaging remain missing.
 
@@ -175,7 +202,9 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Cor 5.19** Sylow 2-subgroup a direct product of cyclics with one strictly largest — Only the special case B = ⊥ (Sylow 2-subgroup itself cyclic) is formalized; the book's general P = A × B with A strictly largest cyclic factor (via the characte…
+- ✅ **2026-07-19 実測: Cor 5.19 の特殊化債務も解消済** — 書籍一般形は
+  `Ch05_Transfer/SylowTwoDirectFactor.lean` (sorry-free、`Main.lean` から import 済)。
+  以下は stale: ~~Cor 5.19 Sylow 2-subgroup a direct product of cyclics with one strictly largest — Only the special case B = ⊥ (Sylow 2-subgroup itself cyclic) is formalized; the book's general P = A × B with A strictly largest cyclic factor (via the characte…
 
 ### Isaacs Ch.6 — Isaacs, Finite Group Theory, Ch.6 Frobenius Actions
 
@@ -207,6 +236,17 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 - **Thm 6.22** Solvable Frobenius kernels are nilpotent (Higman/Thompson, solvable ca — Lives in the BG tree as BG Theorem 3.7 (BG/Ch1_Preliminary/S03c_Thm37.lean:664), sorry-free. Stated in subgroup-pair form with a PRIME-ORDER complement and [IsS…
 
 ### Isaacs Ch.8 — Isaacs Ch.8 Permutation Groups
+
+> ✅ **2026-07-19 実測: 本節は 100% stale — 25 件全て形式化済 (実 sorry 0)**。
+> 前文の「no repo formalization at all — **no Ch08 directory exists**」は誤り。
+> `OddOrder/Isaacs/Ch08_PermutationGroups/` に **14 leaf / 5,707 行**が実在し、
+> ファイル名が 25 件のギャップに 1 対 1 対応する (`HalfTransitive.lean`=8.9 /
+> `PCycleJordan.lean`=8.23 / `Bochert.lean`=8.26 / `PSLSimple.lean`=8.31–8.33 /
+> `Orbitals`・`OrbitalGraph`・`Subdegrees`・`CommonDivisorGraph`=8.34–8.44)。
+> mathlib upstream 候補: `alternatingGroup_le_of_isPreprimitive_of_isCycle_mem`
+> (8.23 — mathlib では `proof_wanted` のまま)、`isSimpleGroup_projectiveSpecialLinearGroup`
+> (8.33 PSL 単純性 — mathlib 未収載)。
+
 
 > Isaacs Ch.8 (Permutation Groups, results 8.1–8.44) has no repo formalization at all — no Ch08 directory exists, nothing in OddOrder/GroupTheory covers it, and the repo never uses mathlib's IsBlock/IsPreprimitive/IsMultiplyPretransitive API (the BG §16 ConjSharplyTransitiveOn machinery and the sorried Peterfalvi Suzuki appendix, whose doubly-transitive hypotheses are opaque scaffold Props that this chapter's material would eventually discharge, are the only adjacent things). The surprise is how much mathlib now covers at full strength or stronger: all of the blocks/primitivity theory (8.11–8.16), both Jordan theorems including the general multiple-primitivity form (8.17–8.22, Chambert-Loir's Jordan.lean/MultipleTransitivity.lean/MultiplePrimitivity.lean), Iwasawa's criterion (8.30), A_n simplicity for general n ≥ 5 plus the S_n normal-subgroup classification (8.27–8.28, added 2026-04, making the repo's pre-formalization note stale), and the SL/PSL projective-space action with faithfulness, 2-transitivity, primitivity, and the degree formula (8.3, 8.29) — 19 of 44 results are status mathlib. The genuine gaps are: the §8A automorphism-action cluster (8.4–8.10, including the regular-normal-subgroup lemma 8.5 and the Passman–Isaacs half-transitive theorem 8.9), the p-cycle Jordan theorem 8.23 (an explicit proof_wanted in mathlib) with its helpers 8.24–8.25, Bochert's theorem 8.26, the PSL simplicity chain 8.31–8.33 (mathlib has transvection Gaussian elimination and SL(2) commutator lemmas but no generation/perfectness/simplicity statements — a prime upstream candidate), and the entire §8D orbital/subdegree/common-divisor-graph theory 8.34–8.44, for which mathlib has no concepts at all. Total new work is roughly: a handful of S items assembling existing mathlib pieces, plus four M-sized clusters (half-transitive, p-cycle+Bochert, PSL simplicity, §8D orbital theory). Slim verification pass: all 25 flagged missing labels were confirmed after refutation attempts (book-number greps for Isaacs 8.x in multiple formats plus descriptive-name greps — transvection, Bochert, Passman, half-transitive, subdegree, orbital, PSL/GL simplicity, semidirect/sharply/regular transitivity, three-cycle, elementary-abelian cover — across all OddOrder trees and notes; the only transvection content is BG §10's unrelated GL(2,p) lemma), and the load-bearing mathlib labels 8.2 (verified iff-form statement by Read), 8.17/8.19, 8.23 proof_wanted (Jordan.lean:462), 8.27, and 8.30 were verified against mathlib source; no status changed.
 
@@ -240,14 +280,20 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### Isaacs Ch.9 — Isaacs Ch.9 More on Subnormality
 
-> ⚠ **2026-07-19 実測: 「essentially unformalized (31 件)」は全面 stale**。
-> `Ch09_MoreSubnormality/` に 15 leaf (Quasisimple / Components / Semisimple / Layer /
+> ✅ **2026-07-19 完了: Isaacs Ch.9 は全 31 結果が形式化済 (以下の表は全面 stale)**。
+> `Ch09_MoreSubnormality/` に 19 leaf (Quasisimple / Components / Semisimple / Layer /
 > LayerRestriction / GeneralizedFitting / SubnormalSocle / NilpotentResidual / PResidual /
-> Schenkman / InnerAutomorphisms / AutTower / AutTowerBounds / OrderBound / ThompsonWielandt)。
-> 番号 grep で **9.1–9.27 は全て repo にヒット** (§9A F* / §9B automorphism tower / §9C
-> Thompson–Wielandt)。
-> ⇒ **残るのは §9D のみ: 9.28 (Bartels subnormal closure) / 9.29 / 9.30 と Lem 9.31**。
-> これがレーン a の現 frontier (2026-07-19)。
+> Schenkman / InnerAutomorphisms / AutTower / AutTowerBounds / OrderBound / ThompsonWielandt /
+> SylowSubnormal / StrongConjugacy / SubnormalClosure)。
+> 番号 grep で 9.1–9.27 が全てヒット (§9A F* / §9B automorphism tower / §9C
+> Thompson–Wielandt) し、**§9D も 2026-07-19 に完了** —
+> 9.28 Bartels (`strongClosure_isSubnormal`, 6 step) / 9.29 / 9.30 / 9.31 すべて
+> sorry-free・axiom-clean。詳細 = `notes/isaacs/ch09_more_subnormality.md` の
+> 「§9D 完了」節。
+> ⚠ 併せて **9.26/9.27 が書籍の `S ◁◁ G` でなく `S ◁ G` で形式化されていた MISMATCH**
+> (issue 9150 → 0125) も解消済。
+> ⇒ レーン a の frontier は Ch.9 を離れ、**文書順で Ch.2 Lem 2.14 → Ch.5 → Ch.6 →
+> Ch.8 → Ch.10 → 付録** へ (Ch.3/Ch.4 は完了済、Ch.8/Ch.10 は 2026-07-19 裁定で a 所有)。
 
 > Isaacs Ch.9 is essentially unformalized: all 31 numbered results (9.1–9.31) lack full-strength Lean counterparts, and none of the chapter's signature concepts (quasisimple, component, layer E(G), semisimple group, F*(G), automorphism tower, subnormal closure, strong conjugacy) exist in the repo or in mathlib. This is a documented deliberate skip — notes/isaacs/ch09_more_subnormality.md records a 2026-05-23 audit showing zero uses of any Ch.9 concept in BG or Peterfalvi (FT's group is ultimately solvable, where F*=F), and fresh greps confirm the repo state matches that audit. The chapter is not entirely from scratch, though: the solvable specialization of Bender's Thm 9.8 is fully proved as BG Prop 1.3 (centralizer_fitting_le_fitting), and scattered infrastructure lowers entry costs — socle (Ch02), Thm 2.6 (the hub cited 5x by §9A proofs), S^∞ as lowerCentralSeriesInfty (Ch04), O^p as OPrime (Ch05), the n!-theorem (Ch01), ker(conjNormal)=centralizer and a |G/C| ≤ |Aut C| embedding (Ch06/Ch07), plus mathlib's IsSubnormal/IsPerfect/MulAut.conj. Surprises: Lemma 9.31 (Sylow ∩ subnormal) is missing even from mathlib despite being a basic general fact, and the Nougat-missing page 302 was verified against the PDF to contain only §9D definitions, so the enumeration is complete. Effort estimates are marginal in document order (each assumes earlier chapter results exist); the natural clusters are §9A F*-theory (~1 wk), §9B tower (~1-1.5 wk), §9C Thompson–Wielandt (~3-4 days on top of A+B), §9D Bartels (~1-1.5 wk). Slim verification pass: all flagged missing/partial labels and the Thm 9.8 specialization (statement read) were confirmed; the only substantive correction is to Lem 9.6's notes — BG Lem 1.1 (isMinimalNormal_le_fitting_and_isElementaryAbelian) does prove 'minimal normal ⟹ elementary abelian' for solvable G at full strength, contrary to the earlier note — plus minor path/name enrichments (ChainNilpotent.lean lives under Main/, two additional private conjNormal-kernel variants for 9.11).
 
@@ -292,6 +338,14 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 - **Thm 9.8** Bender: F*(G) ⊇ C_G(F*(G)) for every finite group — Confirmed by reading the Lean statement: OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (BG Prop 1.3, S01_FrattiniBurnside.lean:195) is exactly [Finite G][I…
 
 ### Isaacs Ch.10 — Isaacs Ch.10 More Transfer Theory
+
+> ✅ **2026-07-19 実測: 本節は 100% stale — 全 28 結果が形式化済 (実 sorry 0)**。
+> 前文の「almost entirely unformalized: only Corollary 10.17 is fully formalized」は誤り。
+> `OddOrder/Isaacs/Ch10_MoreTransfer/` (6 leaf / 3,643 行) で 2026-07-17 の
+> `a98141fc8 feat(isaacs-ch10): Thm 10.18 Furtwängler + Cor 10.28 Alperin-Kuo — Ch.10 全 28
+> 結果完成` により完結。群環 `Δ(G)` 機械は `OddOrder/Algebra/AugmentationIdeal.lean` 等に
+> 切り出し済。
+
 
 > Isaacs Ch.10 (results 10.1-10.28) is almost entirely unformalized: of 28 numbered results, only Corollary 10.17 is fully formalized (as the operator-Maschke theorem exists_aInvariant_complement_of_isElementaryAbelian in OddOrder/BG/Ch1_Preliminary/OperatorMaschke.lean, built for BG's needs) and Lemma 10.13 is half done (subgroup closure of metacyclic in OddOrder/GroupTheory/IsMetacyclic.lean; quotient closure missing). All three headline clusters are missing: Yoshida's theorem 10.1 with its wreath-recognition and transfer chain (10.3-10.11, including transitivity of transfer 10.8 and Mackey transfer 10.10, both absent from mathlib as well), Huppert's metacyclic-Sylow theorem 10.12/10.15, and the entire section-10C group-ring machinery culminating in the principal ideal theorem 10.18 and Alperin-Kuo 10.28. This matches the chapter's zero forward citations from BG/Peterfalvi (repo grep hits for 'Theorem 10.x' are all BG section 10, a different book); the repo's three other 'Huppert' results (BG 4.11/4.12, Peterfalvi appendix) are distinct theorems and must not be confused with 10.12. Two mitigating surprises: mathlib's RegularWreathProduct.lean (Sylow.mulEquivIteratedWreathProduct) substantially cheapens the C_p wr C_p recognition step of 10.4, and the chapter's Isaacs-internal prerequisites (Thm 4.7, 4.8(a), 6.11, Ch.5 transfer/focal API) are already formalized, so section 10A+10B is mostly assembly-hard rather than prerequisite-blocked; section 10C needs a new augmentation-ideal Delta(G) API from scratch (a good future mathlib upstream candidate). Slim verification pass: refutation greps (wreath/pretransfer/Mackey-transfer/augmentation-ideal/Furtwangler/Alperin-Kuo/metacyclic-quotient, plus descriptive-name and cross-tree searches over GroupTheory/Algebra/BG/Peterfalvi and pinned mathlib) confirmed every flagged missing/partial label with no upgrades; the 10.17 Lean statement was re-read and confirmed at full book strength, and 10.13's file was confirmed to contain subgroup closure but no quotient closure.
 

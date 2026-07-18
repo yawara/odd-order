@@ -82,7 +82,8 @@ private theorem pRank_eq_of_mulEquiv {A B : Type*} [Group A] [Finite A] [Group B
   le_antisymm (pRank_le_of_injective (f := e.toMonoidHom) e.injective)
     (pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective)
 
-/-- If `A ⊔ N = ⊤` with `N ⊴` and `r ∤ |N|`, then `r ∤ [⊤:A]`. (Replicated from S12_Proposition1215.) -/
+/-- If `A ⊔ N = ⊤` with `N ⊴` and `r ∤ |N|`, then `r ∤ [⊤:A]`. (Replicated from
+S12_Proposition1215.) -/
 private theorem not_dvd_index_of_sup_top_normal {K' : Type*} [Group K'] [Finite K'] {r : ℕ}
     {A N : Subgroup K'} [N.Normal] (htop : A ⊔ N = ⊤) (hrN : ¬ r ∣ Nat.card ↥N) :
     ¬ r ∣ A.index := by

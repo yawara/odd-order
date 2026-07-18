@@ -8,16 +8,17 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.StrongConjugacy
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
-# Isaacs Ch. 9 — §9D: Bartels の定理 (9.28) (pp. 291-292)
+# Isaacs Ch. 9 — §9D: Bartels の定理 (9.28) (pp. 290-293)
 
 Isaacs, *Finite Group Theory* (AMS GSM 92), §9D の **Theorem 9.28 (Bartels)**:
-`X^{(G)} = X^{••G}` (強共役が生成する部分群 = subnormal closure)。
+`X^{(G)} = X^{••G}` (強共役が生成する部分群 = subnormal closure)。**完成**
+(`strongClosure_isSubnormal`)。
 
 定義群と Lem 9.29 / 9.30 は sibling の
 [`StrongConjugacy`](StrongConjugacy.lean) にある (1500 行規約による prefix-split)。
 Lem 9.31 は [`SylowSubnormal`](SylowSubnormal.lean)。
 
-## 証明の構成 (書籍 p.291-292)
+## 証明の構成 (書籍 pp. 291-293)
 
 最小反例 (`|G|` 最小, 次いで `|X|` 最小) を取り 6 step で矛盾を導く。帰納法の仮定は
 `BartelsIH` として明示パラメータに持たせてあるので, 各 step は単独で sorry-free な
@@ -26,8 +27,12 @@ Lem 9.31 は [`SylowSubnormal`](SylowSubnormal.lean)。
 * **Step 1** `bartels_step_one` — `Y^{(H)} = Z^{(H)} ⇒ Y^{(G)} = Z^{(G)}`
 * **Step 2** `bartels_step_two` — 最小反例の `X` は `p`-群
 * **Step 3** `bartels_step_three` — `Y` を `H` の Sylow `p` の中へ共役で送れる
-* **Step 4** `bartels_step_four` — 極大 `M ⊇ X` の Sylow `p` は `G` の Sylow `p`
-* Step 5, 6 — 未実装
+* **Step 4** `bartels_step_four` — 極大 `M ⊇ X` の Sylow `p` は `G` の Sylow `p`;
+  `bartels_step_four_unique` — その `P` を含む極大部分群は `M` のみ
+* **Step 5** `bartels_step_five` — `X` を含む極大部分群は一意
+* **Step 6** `bartels_step_six` — 矛盾
+
+最後に `|G|` の強帰納法で `BartelsIH` を供給して `strongClosure_isSubnormal` を得る。
 -/
 
 universe u
@@ -128,6 +133,23 @@ theorem exists_mem_conjAct_smul_le_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prim
   have hmap := Subgroup.map_mono (f := L.subtype) hg
   rwa [Subgroup.map_subgroupOf_eq_of_le (conjAct_smul_le_of_mem hYL g.2),
     Subgroup.map_subgroupOf_eq_of_le hQL] at hmap
+
+/-- **`p`-部分群は Sylow に伸びる, 相対版**: `Y ≤ K` が `p`-群なら `Y ≤ S ≤ K` で
+`S` が `K` の Sylow `p`-部分群となる `S` が取れる (すべて `Subgroup G` の言葉)。
+
+`↥K` の `IsPGroup.exists_le_sylow` を `K.subtype` で押し出しただけ。 -/
+theorem exists_sylow_ge_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime] {K Y : Subgroup G}
+    (hYK : Y ≤ K) (hY : IsPGroup p ↥Y) :
+    ∃ S : Subgroup G, Y ≤ S ∧ S ≤ K ∧ IsPGroup p ↥S ∧ ¬ p ∣ S.relIndex K := by
+  obtain ⟨R, hR⟩ := (hY.comap_subtype (K := K)).exists_le_sylow
+  refine ⟨(R : Subgroup ↥K).map K.subtype, ?_, Subgroup.map_subtype_le _,
+    R.isPGroup'.map K.subtype, ?_⟩
+  · exact fun y hy => ⟨⟨y, hYK hy⟩, hR (Subgroup.mem_subgroupOf.mpr hy), rfl⟩
+  · have hsub : ((R : Subgroup ↥K).map K.subtype).subgroupOf K = (R : Subgroup ↥K) :=
+      Subgroup.comap_map_eq_self_of_injective K.subtype_injective _
+    change ¬ p ∣ (((R : Subgroup ↥K).map K.subtype).subgroupOf K).index
+    rw [hsub]
+    exact R.not_dvd_index
 
 section /- 9D: Bartels Step 2 の部品 — 真部分群による生成 -/
 
@@ -590,18 +612,20 @@ theorem mem_kappaSet_top_iff {X W : Subgroup G} :
     refine ⟨c • X, le_top, ⟨c, rfl⟩, ?_⟩
     exact strongClosure_conjAct_smul c X
 
-/-- **Step 4 第 1 分岐の入口**: `G` 全体が `𝒦(M)` を保つなら `𝒦(M) = 𝒦(G)`.
+/-- **Step 4 第 1 分岐の入口**: `G` 全体が `𝒦(H)` を保つなら `𝒦(H) = 𝒦(G)`.
 
-`𝒦(G)` は `X^{(G)}` の `G`-軌道で, `X^{(G)} ∈ 𝒦(M)` なので `𝒦(M)` が `G`-安定なら
-軌道全体を含む。 -/
-theorem kappaSet_eq_top_of_setwiseStabilizer_eq_top {X M : Subgroup G} (hXM : X ≤ M)
-    (hstab : setwiseStabilizer (kappaSet X M) = ⊤) : kappaSet X M = kappaSet X ⊤ := by
+`𝒦(G)` は `X^{(G)}` の `G`-軌道なので, `X^{(G)} ∈ 𝒦(H)` かつ `𝒦(H)` が `G`-安定なら
+軌道全体を含む。(`X ≤ H` でなく `X^{(G)} ∈ 𝒦(H)` を仮定するのは, Step 4 後半で
+`H = P` (Sylow) に対して使うため — そこでは `X ≤ P` は成り立たない。) -/
+theorem kappaSet_eq_top_of_setwiseStabilizer_eq_top {X H : Subgroup G}
+    (hmem : strongClosure X ∈ kappaSet X H)
+    (hstab : setwiseStabilizer (kappaSet X H) = ⊤) : kappaSet X H = kappaSet X ⊤ := by
   refine Set.Subset.antisymm (kappaSet_mono le_top) ?_
   intro W hW
   obtain ⟨c, rfl⟩ := mem_kappaSet_top_iff.mp hW
-  have hg : ConjAct.ofConjAct c ∈ setwiseStabilizer (kappaSet X M) := by
+  have hg : ConjAct.ofConjAct c ∈ setwiseStabilizer (kappaSet X H) := by
     rw [hstab]; exact Subgroup.mem_top _
-  have := (hg (strongClosure X)).mpr (mem_kappaSet_self X hXM)
+  have := (hg (strongClosure X)).mpr hmem
   rwa [ConjAct.toConjAct_ofConjAct] at this
 
 
@@ -653,6 +677,51 @@ theorem dvd_relIndex_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P R 
 
 end
 
+/-- **正規化条件を ambient へ持ち上げる**: `S ≤ K` で `x ∈ K` が `↥K` の中で
+`S.subgroupOf K` を正規化するなら `x` は `G` の中で `S` を正規化する。
+
+`K` の外の `y` については `y ∉ S` かつ `x y x⁻¹ ∉ K ⊇ S` なので条件は両辺とも偽で自明。 -/
+theorem mem_normalizer_of_mem_normalizer_subgroupOf {K S : Subgroup G} (hSK : S ≤ K)
+    {x : ↥K} (hx : x ∈ Subgroup.normalizer (S.subgroupOf K)) :
+    (x : G) ∈ Subgroup.normalizer S := by
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  constructor
+  · intro hy
+    have hyK : y ∈ K := hSK hy
+    have hmem : (⟨y, hyK⟩ : ↥K) ∈ S.subgroupOf K := hy
+    have hres := (Subgroup.mem_normalizer_iff.mp hx ⟨y, hyK⟩).mp hmem
+    simpa [Subgroup.mem_subgroupOf] using hres
+  · intro hy
+    have hyK : y ∈ K := by
+      have h1 : (x : G) * y * (x : G)⁻¹ ∈ K := hSK hy
+      have hrw : y = (x : G)⁻¹ * ((x : G) * y * (x : G)⁻¹) * (x : G) := by group
+      rw [hrw]
+      exact mul_mem (mul_mem (inv_mem x.2) h1) x.2
+    have hres := (Subgroup.mem_normalizer_iff.mp hx ⟨y, hyK⟩).mpr
+      (by simpa [Subgroup.mem_subgroupOf] using hy)
+    simpa [Subgroup.mem_subgroupOf] using hres
+
+/-- **`p`-群の中では真部分群の正規化群が真に大きい** (冪零群の normalizer condition):
+`S < P` で `P` が `p`-群なら `S < P ⊓ N_G(S)`。
+
+Step 4 の Sylow 結論部と Step 5 の「`R ⊓ P > S`」の両方で使う。 -/
+theorem lt_inf_normalizer_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {S P : Subgroup G}
+    (hP : IsPGroup p ↥P) (hlt : S < P) : S < P ⊓ Subgroup.normalizer S := by
+  haveI : Group.IsNilpotent ↥P := hP.isNilpotent
+  have hsub : S.subgroupOf P < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro h
+    rw [Subgroup.subgroupOf_eq_top] at h
+    exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl S)
+  obtain ⟨x, hxN, hxS⟩ :=
+    SetLike.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
+  refine lt_of_le_of_ne (le_inf hlt.le Subgroup.le_normalizer) fun heq => hxS ?_
+  have hxmem : (x : G) ∈ P ⊓ Subgroup.normalizer S :=
+    ⟨x.2, mem_normalizer_of_mem_normalizer_subgroupOf hlt.le hxN⟩
+  rw [← heq] at hxmem
+  exact hxmem
+
 /-- **Step 4 の Sylow 結論部**: `P` が `M` の Sylow `p`-部分群で `N_G(P) ≤ M` なら
 `P` は `G` の Sylow `p`-部分群 (指数が `p` と互いに素)。
 
@@ -666,43 +735,16 @@ theorem not_dvd_index_of_normalizer_le {p : ℕ} [Fact p.Prime] [Finite G]
   have hPQeq : P = (Q : Subgroup G) := by
     by_contra hne
     have hlt : P < (Q : Subgroup G) := lt_of_le_of_ne hPQ hne
-    haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
-    have hsub : P.subgroupOf (Q : Subgroup G) < ⊤ := by
-      rw [lt_top_iff_ne_top]
-      intro h
-      rw [Subgroup.subgroupOf_eq_top] at h
-      exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl P)
-    obtain ⟨x, hxN, hxP⟩ :=
-      SetLike.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
-    -- `x` は `G` の中でも `P` を正規化する.
-    have hxG : (x : G) ∈ Subgroup.normalizer P := by
-      rw [Subgroup.mem_normalizer_iff]
-      intro y
-      constructor
-      · intro hy
-        have hyQ : y ∈ (Q : Subgroup G) := hPQ hy
-        have hmem : (⟨y, hyQ⟩ : ↥(Q : Subgroup G)) ∈ P.subgroupOf (Q : Subgroup G) := hy
-        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mp hmem
-        simpa [Subgroup.mem_subgroupOf] using hres
-      · intro hy
-        have hyQ : y ∈ (Q : Subgroup G) := by
-          have h1 : (x : G) * y * (x : G)⁻¹ ∈ (Q : Subgroup G) := hPQ hy
-          have hrw : y = (x : G)⁻¹ * ((x : G) * y * (x : G)⁻¹) * (x : G) := by group
-          rw [hrw]
-          exact mul_mem (mul_mem (inv_mem x.2) h1) x.2
-        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mpr
-          (by simpa [Subgroup.mem_subgroupOf] using hy)
-        simpa [Subgroup.mem_subgroupOf] using hres
+    obtain ⟨x, ⟨hxQ, hxN⟩, hxP⟩ :=
+      SetLike.exists_of_lt (lt_inf_normalizer_of_lt_of_isPGroup Q.isPGroup' hlt)
     -- `R = P ⊔ ⟨x⟩` は `M` の中の `P` より真に大きい `p`-部分群.
-    have hxM : (x : G) ∈ M := hN hxG
-    have hxnotP : (x : G) ∉ P := fun h => hxP h
-    set R : Subgroup G := P ⊔ Subgroup.zpowers (x : G) with hRdef
-    have hRQ : R ≤ (Q : Subgroup G) := sup_le hPQ ((Subgroup.zpowers_le).mpr x.2)
+    have hxM : x ∈ M := hN hxN
+    set R : Subgroup G := P ⊔ Subgroup.zpowers x with hRdef
+    have hRQ : R ≤ (Q : Subgroup G) := sup_le hPQ ((Subgroup.zpowers_le).mpr hxQ)
     have hRM : R ≤ M := sup_le hPM ((Subgroup.zpowers_le).mpr hxM)
     have hPR : P < R := by
-      refine lt_of_le_of_ne le_sup_left fun heq => hxnotP ?_
-      have : (x : G) ∈ R :=
-        (le_sup_right : Subgroup.zpowers (x : G) ≤ R) (Subgroup.mem_zpowers _)
+      refine lt_of_le_of_ne le_sup_left fun heq => hxP ?_
+      have : x ∈ R := (le_sup_right : Subgroup.zpowers x ≤ R) (Subgroup.mem_zpowers _)
       rwa [← heq] at this
     have hRp : IsPGroup p ↥R := Q.isPGroup'.to_le hRQ
     have hdvd : p ∣ P.relIndex R := dvd_relIndex_of_lt_of_isPGroup hRp hPR
@@ -728,14 +770,53 @@ theorem centralizer_ne_bot_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P : 
   ext
   simpa using hmem
 
-/-- **Bartels (9.28) Step 4** (書籍 p. 291): `M` が `X` を含む極大部分群, `P` が `M` の
-Sylow `p`-部分群なら `P` は `G` の Sylow `p`-部分群。
+/-- **Bartels Step 4 の核心** (書籍 pp. 292-293): 最小反例の下で `H` が極大部分群,
+`P ∈ Syl_p(H)`, かつ `X^{(G)} ∈ 𝒦(P)` ならば **`𝒦(P)` の setwise stabilizer はちょうど
+`H`**。
 
-`𝒦(M)` の setwise stabilizer は極大性から `M` 自身か `G` 全体。
-* `G` 全体なら `𝒦(M) = 𝒦(G) = 𝒦(P)` となり `C_G(P) (≠ 1)` が作用の核に入るので
-  `X^{(G)}` が subnormal となって最小反例の仮定に矛盾。
-* よって `M` 自身。`N_G(P)` は `𝒦(P) = 𝒦(M)` を保つので `N_G(P) ≤ M`, ゆえ
-  `not_dvd_index_of_normalizer_le` で結論。 -/
+`H ≤ Stab(𝒦(H))` で `𝒦(H) = 𝒦(P)` (Step 3) なので, `H` の極大性から stabilizer は
+`H` か `⊤` の二択。`⊤` の場合は `𝒦(P) = 𝒦(G)` となり, `Z(P) ≤ C_G(P) (≠ 1)` が
+`𝒦(G)` への作用の核に入るので `X^{(G)}` が subnormal となり最小反例の仮定に矛盾。
+
+書籍が Step 4 の前半 (`P ∈ Syl_p(G)`) と後半 (`M` の一意性) で 2 度使う議論なので,
+`H` を動かせる形で切り出してある。 -/
+theorem setwiseStabilizer_kappaSet_eq_of_isCoatom {G : Type u} [Group G] [Finite G]
+    (hIH : BartelsIH G) {p : ℕ} [Fact p.Prime] {X H P : Subgroup G}
+    (hH : IsCoatom H) (hXp : IsPGroup p ↥X)
+    (hPH : P ≤ H) (hPp : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex H) (hPbot : P ≠ ⊥)
+    (hmem : strongClosure X ∈ kappaSet X P)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
+    (hXsub : ¬ (strongClosure X).IsSubnormal) :
+    setwiseStabilizer (kappaSet X P) = H := by
+  have hKHP : kappaSet X H = kappaSet X P :=
+    kappaSet_eq_of_sylow hIH hH.1 hPH hXp hPp hPidx hne
+  have hle : H ≤ setwiseStabilizer (kappaSet X P) := by
+    rw [← hKHP]; exact le_setwiseStabilizer_kappaSet X H
+  rcases eq_or_eq_top_of_isCoatom hH hle with hst | hst
+  · exact hst
+  · -- stabilizer = `G`: 矛盾.
+    exfalso
+    refine hXsub (isSubnormal_strongClosure_of_kappaSetKernel_ne_bot hIH ?_)
+    rw [← kappaSet_eq_top_of_setwiseStabilizer_eq_top hmem hst]
+    intro hbot
+    exact centralizer_ne_bot_of_isPGroup hPp hPbot
+      (le_bot_iff.mp (hbot ▸ centralizer_le_pointwiseStabilizer_kappaSet X P))
+
+/-- `X ≤ M` と `𝒦(M) = 𝒦(P)` (Step 3) から `X^{(G)} ∈ 𝒦(P)`。 -/
+theorem mem_kappaSet_sylow_of_le {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X M P : Subgroup G}
+    (hM : M ≠ ⊤) (hXM : X ≤ M) (hXp : IsPGroup p ↥X)
+    (hPM : P ≤ M) (hPp : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex M)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤) :
+    strongClosure X ∈ kappaSet X P := by
+  rw [← kappaSet_eq_of_sylow hIH hM hPM hXp hPp hPidx hne]
+  exact mem_kappaSet_self X hXM
+
+/-- **Bartels (9.28) Step 4, 前半** (書籍 pp. 292-293): `M` が `X` を含む極大部分群,
+`P` が `M` の Sylow `p`-部分群なら `P` は `G` の Sylow `p`-部分群。
+
+核心補題で `Stab(𝒦(P)) = M`。`N_G(P)` は `𝒦(P)` を保つので `N_G(P) ≤ M`, ゆえ
+`not_dvd_index_of_normalizer_le` で結論。 -/
 theorem bartels_step_four {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
     {p : ℕ} [Fact p.Prime] {X M P : Subgroup G}
     (hM : IsCoatom M) (hXM : X ≤ M) (hXp : IsPGroup p ↥X)
@@ -743,22 +824,260 @@ theorem bartels_step_four {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
     (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
     (hXsub : ¬ (strongClosure X).IsSubnormal) :
     ¬ p ∣ P.index := by
-  have hKMP : kappaSet X M = kappaSet X P :=
-    kappaSet_eq_of_sylow hIH hM.1 hPM hXp hPp hPidx hne
-  rcases eq_or_eq_top_of_isCoatom hM (le_setwiseStabilizer_kappaSet X M) with hst | hst
-  · -- stabilizer = `M`: `N_G(P) ≤ M`.
-    have hNP : Subgroup.normalizer P ≤ setwiseStabilizer (kappaSet X M) := by
-      rw [hKMP]; exact normalizer_le_setwiseStabilizer_kappaSet X P
-    exact not_dvd_index_of_normalizer_le hPM hPp hPidx (hst ▸ hNP)
-  · -- stabilizer = `G`: 矛盾.
-    exfalso
-    refine hXsub (isSubnormal_strongClosure_of_kappaSetKernel_ne_bot hIH ?_)
-    have hKtop : kappaSet X ⊤ = kappaSet X P :=
-      (kappaSet_eq_top_of_setwiseStabilizer_eq_top hXM hst).symm.trans hKMP
-    rw [hKtop]
-    intro hbot
-    exact centralizer_ne_bot_of_isPGroup hPp hPbot
-      (le_bot_iff.mp (hbot ▸ centralizer_le_pointwiseStabilizer_kappaSet X P))
+  have hmem := mem_kappaSet_sylow_of_le hIH hM.1 hXM hXp hPM hPp hPidx hne
+  have hst := setwiseStabilizer_kappaSet_eq_of_isCoatom hIH hM hXp hPM hPp hPidx hPbot
+    hmem hne hXsub
+  exact not_dvd_index_of_normalizer_le hPM hPp hPidx
+    (hst ▸ normalizer_le_setwiseStabilizer_kappaSet X P)
+
+/-- **Bartels (9.28) Step 4, 後半** (書籍 p. 293): `M` は `P` を含む**唯一の**極大部分群。
+
+書籍「Also if `P ⊆ N`, where `N` is maximal in `G`, then `P ∈ Syl_p(N)`, and similar
+reasoning shows that `N` is the full stabilizer of `𝒦(P)`. Thus `N = M`.」
+
+前半で `P ∈ Syl_p(G)` なので `P ≤ N` から `P ∈ Syl_p(N)` (指数の連鎖)。よって核心補題が
+`N` にも適用でき, `N = Stab(𝒦(P)) = M`。 -/
+theorem bartels_step_four_unique {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X M P N : Subgroup G}
+    (hM : IsCoatom M) (hXM : X ≤ M) (hXp : IsPGroup p ↥X)
+    (hPM : P ≤ M) (hPp : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex M) (hPbot : P ≠ ⊥)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
+    (hXsub : ¬ (strongClosure X).IsSubnormal)
+    (hN : IsCoatom N) (hPN : P ≤ N) :
+    N = M := by
+  have hmem := mem_kappaSet_sylow_of_le hIH hM.1 hXM hXp hPM hPp hPidx hne
+  have hstM := setwiseStabilizer_kappaSet_eq_of_isCoatom hIH hM hXp hPM hPp hPidx hPbot
+    hmem hne hXsub
+  -- `P ∈ Syl_p(G)` (前半) から `P ∈ Syl_p(N)`.
+  have hidx : ¬ p ∣ P.index :=
+    bartels_step_four hIH hM hXM hXp hPM hPp hPidx hPbot hne hXsub
+  have hPidxN : ¬ p ∣ P.relIndex N := fun h => hidx <| by
+    rw [← Subgroup.relIndex_mul_index hPN]; exact h.mul_right _
+  have hstN := setwiseStabilizer_kappaSet_eq_of_isCoatom hIH hN hXp hPN hPp hPidxN hPbot
+    hmem hne hXsub
+  exact hstN.symm.trans hstM
+
+section /- 9D: Bartels Step 5 — `X` を含む極大部分群の一意性 -/
+
+/-- **Step 5 の候補**: `S` は `X` を含み, かつ相異なる 2 つの極大部分群 `A`, `B` の共通部分
+`A ⊓ B` の Sylow `p`-部分群である。
+
+書籍 p. 293 はこの条件を満たす `S` のうち `|S|` が最大のものを選ぶ。本形式化では
+**部分群順序に関する極大元**を取る — 用途は「`S` より真に大きい候補は存在しない」だけ
+なので, 位数比較を経由する必要がない。 -/
+def IsBartelsPairSylow (p : ℕ) (X S : Subgroup G) : Prop :=
+  ∃ A B : Subgroup G, IsCoatom A ∧ IsCoatom B ∧ A ≠ B ∧
+    X ≤ S ∧ S ≤ A ⊓ B ∧ IsPGroup p ↥S ∧ ¬ p ∣ S.relIndex (A ⊓ B)
+
+/-- **Bartels (9.28) Step 5** (書籍 p. 293): 最小反例の `X` を含む極大部分群は一意。
+
+背理法。`X` を含む相異なる極大部分群の対 `(A,B)` に対する `S ∈ Syl_p(A ⊓ B)` (`X ≤ S`)
+のうち極大なものを取る (`IsBartelsPairSylow`)。
+* `S ∈ Syl_p(G)` なら Step 4 後半 (`P` を含む極大部分群の一意性) で `A = B` となり矛盾。
+* `S ◁ G` なら `X ◁◁ S ◁ G` ゆえ `X ◁◁ G`, Lem 9.29(a) で `X^{(G)} = X` が subnormal と
+  なって最小反例の仮定に矛盾。よって `N_G(S) ≠ ⊤` で, `N_G(S) ≤ R` なる極大 `R` が取れる。
+* `S ≤ P ∈ Syl_p(A)` は Step 4 前半で `Syl_p(G)` の元。`S ∉ Syl_p(G)` ゆえ `S < P` で,
+  `p`-群の normalizer condition から `S < P ⊓ N_G(S) ≤ P ⊓ R ≤ A ⊓ R`。よって `A ⊓ R` の
+  Sylow `p` は `S` より真に大きく, `S` の極大性から `A = R`。同様に `B = R` で `A = B`,
+  これが矛盾。 -/
+theorem bartels_step_five {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hXp : IsPGroup p ↥X) (hXbot : X ≠ ⊥)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
+    (hXsub : ¬ (strongClosure X).IsSubnormal)
+    {M N : Subgroup G} (hM : IsCoatom M) (hN : IsCoatom N) (hXM : X ≤ M) (hXN : X ≤ N) :
+    M = N := by
+  by_contra hMN
+  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  haveI : WellFoundedGT (Subgroup G) := Finite.to_wellFoundedGT
+  have hcand : ∃ S : Subgroup G, IsBartelsPairSylow p X S := by
+    obtain ⟨S, hXS, hSMN, hSp, hSidx⟩ := exists_sylow_ge_of_isPGroup (le_inf hXM hXN) hXp
+    exact ⟨S, M, N, hM, hN, hMN, hXS, hSMN, hSp, hSidx⟩
+  obtain ⟨S, hS, hSmax⟩ := exists_maximal_of_wellFoundedGT (IsBartelsPairSylow p X) hcand
+  obtain ⟨A, B, hA, hB, hAB, hXS, hSAB, hSp, hSidx⟩ := hS
+  have hSA : S ≤ A := hSAB.trans inf_le_left
+  have hSB : S ≤ B := hSAB.trans inf_le_right
+  have hSbot : S ≠ ⊥ := fun h => hXbot (le_bot_iff.mp (h ▸ hXS))
+  -- (1) `S ∉ Syl_p(G)`: さもなくば Step 4 後半で `A = B`.
+  have hSidxG : p ∣ S.index := by
+    by_contra hdvd
+    have hSA' : ¬ p ∣ S.relIndex A := fun h => hdvd <| by
+      rw [← Subgroup.relIndex_mul_index hSA]; exact h.mul_right _
+    exact hAB (bartels_step_four_unique hIH hA (hXS.trans hSA) hXp hSA hSp hSA' hSbot
+      hne hXsub hB hSB).symm
+  -- (2) `S` は `G` に normal でない: さもなくば `X ◁◁ G` で `X^{(G)} = X` が subnormal.
+  have hNStop : Subgroup.normalizer (S : Set G) ≠ ⊤ := by
+    intro htop
+    haveI : S.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    haveI : Group.IsNilpotent ↥S := hSp.isNilpotent
+    have hXsn : X.IsSubnormal :=
+      Subgroup.IsSubnormal.trans hXS
+        (OddOrder.Isaacs.Ch02.isSubnormal_of_isNilpotent_finite (X.subgroupOf S))
+        ‹S.Normal›.isSubnormal
+    have heq : strongClosure X = X :=
+      le_antisymm (strongClosure_le_of_isSubnormal hXsn X le_rfl) (le_strongClosure X)
+    refine hXsub ?_
+    rw [heq]
+    exact hXsn
+  -- (3) `N_G(S)` を含む極大部分群 `R`.
+  obtain ⟨R, hR, hNSR⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (S : Set G))).resolve_left hNStop
+  have hSR : S ≤ R := Subgroup.le_normalizer.trans hNSR
+  -- (4) `S` を含む任意の極大部分群 `C` について `C = R`.
+  have key : ∀ C : Subgroup G, IsCoatom C → S ≤ C → C = R := by
+    intro C hC hSC
+    obtain ⟨P, hSP, hPC, hPp, hPidx⟩ := exists_sylow_ge_of_isPGroup hSC hSp
+    have hPbot : P ≠ ⊥ := fun h => hSbot (le_bot_iff.mp (h ▸ hSP))
+    -- `P ∈ Syl_p(G)` (Step 4 前半) なので `S ≠ P`, すなわち `S < P`.
+    have hPG : ¬ p ∣ P.index :=
+      bartels_step_four hIH hC (hXS.trans hSC) hXp hPC hPp hPidx hPbot hne hXsub
+    have hSPlt : S < P := lt_of_le_of_ne hSP fun h => hPG (h ▸ hSidxG)
+    -- `p`-群の normalizer condition: `S < P ⊓ N_G(S) ≤ P ⊓ R`.
+    have hlt : S < P ⊓ R :=
+      lt_of_lt_of_le (lt_inf_normalizer_of_lt_of_isPGroup hPp hSPlt) (inf_le_inf le_rfl hNSR)
+    by_contra hCR
+    -- `C ⊓ R` の Sylow `p` は `S` より真に大きい候補 — 極大性に矛盾.
+    obtain ⟨S', hPRS', hS'CR, hS'p, hS'idx⟩ :=
+      exists_sylow_ge_of_isPGroup (inf_le_inf hPC le_rfl) (hPp.to_le (inf_le_left : P ⊓ R ≤ P))
+    have hSS' : S < S' := lt_of_lt_of_le hlt hPRS'
+    have hS'cand : IsBartelsPairSylow p X S' :=
+      ⟨C, R, hC, hR, hCR, hXS.trans hSS'.le, hS'CR, hS'p, hS'idx⟩
+    exact hSS'.ne (le_antisymm hSS'.le (hSmax hS'cand hSS'.le))
+  exact hAB ((key A hA hSA).trans (key B hB hSB).symm)
+
+end
+
+section /- 9D: Bartels Step 6 と Theorem 9.28 本体 (pp. 290-293) -/
+
+/-- `⊥` の強共役は `⊥` のみ。 -/
+@[simp] theorem strongClosure_bot : strongClosure (⊥ : Subgroup G) = ⊥ := by
+  refine le_antisymm (strongClosure_le ?_) bot_le
+  rintro Y ⟨g, -, rfl⟩
+  simp [Subgroup.smul_bot]
+
+/-- 反例の `X^{(G)}` は真部分群 (`⊤` は subnormal ゆえ)。 -/
+theorem strongClosure_ne_top_of_not_isSubnormal {X : Subgroup G}
+    (hX : ¬ (strongClosure X).IsSubnormal) : strongClosure X ≠ ⊤ := fun h =>
+  hX (h ▸ Subgroup.IsSubnormal.top)
+
+/-- 反例であることは共役で保たれる (`X^{(G)}` は共役同変, subnormality も共役で不変)。 -/
+theorem not_isSubnormal_strongClosure_conjAct_smul {X : Subgroup G}
+    (hX : ¬ (strongClosure X).IsSubnormal) (c : ConjAct G) :
+    ¬ (strongClosure (c • X)).IsSubnormal := by
+  rw [strongClosure_conjAct_smul]
+  intro h
+  exact hX (by simpa using h.smul c⁻¹)
+
+/-- **Bartels (9.28) Step 6** (書籍 p. 293): 最小反例からの矛盾。
+
+* `X^G` (`X` の正規閉包) が真部分群なら, `↥(X^G)` に帰納法の仮定を使うと
+  `X^{(G)} = X^{(X^G)}` が `X^G` の中で subnormal, `X^G ◁ G` と繋いで `X^{(G)} ◁◁ G` と
+  なり反例に矛盾。よって `X^G = ⊤`。
+* Step 5 で `X` を含む極大部分群 `M` は一意。`X^G = ⊤ ⊄ M` なので `M` に含まれない `X` の
+  共役 `Y = X^c` が在る (全共役が `M` に入れば `X^G ≤ core_G(M) ≤ M`)。
+* `⟨X, Y⟩` が真部分群なら極大 `N ⊇ ⟨X, Y⟩` は `X` を含むので Step 5 から `N = M`,
+  すると `Y ≤ M` で矛盾。ゆえに `⟨X, Y⟩ = ⊤`, すなわち `Y` は `X` の**強共役**。
+* すると `⊤ = ⟨X, Y⟩ ≤ X^{(G)}` となり `X^{(G)} ≠ ⊤` に矛盾。 -/
+theorem bartels_step_six {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hXp : IsPGroup p ↥X) (hXbot : X ≠ ⊥)
+    (hXsub : ¬ (strongClosure X).IsSubnormal) : False := by
+  have hKtop : strongClosure X ≠ ⊤ := strongClosure_ne_top_of_not_isSubnormal hXsub
+  have hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤ := fun c =>
+    strongClosure_ne_top_of_not_isSubnormal (not_isSubnormal_strongClosure_conjAct_smul hXsub c)
+  have hXne : X ≠ ⊤ := fun h => hKtop (top_le_iff.mp (h ▸ le_strongClosure X))
+  -- `W = X^G` (正規閉包).
+  set W : Subgroup G := Subgroup.normalClosure (X : Set G) with hWdef
+  haveI : W.Normal := Subgroup.normalClosure_normal
+  have hXW : X ≤ W := Subgroup.subset_normalClosure
+  have hWfix : ∀ g : G, ConjAct.toConjAct g • W = W := fun g =>
+    Subgroup.conjAct_pointwise_smul_eq_self
+      (by rw [Subgroup.normalizer_eq_top]; exact Subgroup.mem_top g)
+  have hKW : strongClosure X ≤ W := by
+    refine strongClosure_le ?_
+    rintro Y ⟨g, -, rfl⟩
+    calc ConjAct.toConjAct g • X ≤ ConjAct.toConjAct g • W :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hXW
+      _ = W := hWfix g
+  -- `X^G = ⊤`.
+  have hWtop : W = ⊤ := by
+    by_contra hWne
+    refine hXsub ?_
+    have h1 : ((strongClosure X).subgroupOf W).IsSubnormal := by
+      rw [← strongClosureIn_eq_strongClosure hKW, strongClosureIn_subgroupOf hXW]
+      exact hIH ↥W (card_lt_of_ne_top hWne) _
+    exact Subgroup.IsSubnormal.trans hKW h1 ‹W.Normal›.isSubnormal
+  -- Step 5 の `M`: `X` を含む (唯一の) 極大部分群.
+  obtain ⟨M, hM, hXM⟩ := (eq_top_or_exists_le_coatom X).resolve_left hXne
+  -- `M` に含まれない `X` の共役が在る.
+  have hexists : ∃ c : ConjAct G, ¬ (c • X ≤ M) := by
+    by_contra hall
+    push Not at hall
+    have hcore : (X : Set G) ⊆ (M.normalCore : Set G) := by
+      intro x hx
+      change ∀ b : G, b * x * b⁻¹ ∈ M
+      intro b
+      refine hall (ConjAct.toConjAct b) ?_
+      rw [conjAct_smul_eq_map]
+      exact ⟨x, hx, rfl⟩
+    exact hM.1 (top_le_iff.mp
+      (hWtop ▸ (Subgroup.normalClosure_le_normal hcore).trans M.normalCore_le))
+  obtain ⟨c, hcM⟩ := hexists
+  -- `⟨X, X^c⟩` は真部分群になり得ない (Step 5 の一意性).
+  have hsup : X ⊔ c • X = ⊤ := by
+    by_contra hsupne
+    obtain ⟨N, hN, hNle⟩ := (eq_top_or_exists_le_coatom (X ⊔ c • X)).resolve_left hsupne
+    have hNM : N = M :=
+      bartels_step_five hIH hXp hXbot hne hXsub hN hM (le_sup_left.trans hNle) hXM
+    exact hcM ((le_sup_right.trans hNle).trans hNM.le)
+  -- ゆえに `X^c` は `X` の強共役で, `⊤ = X ⊔ X^c ≤ X^{(G)}`.
+  have hstrong : IsStronglyConjugate X (c • X) :=
+    ⟨ConjAct.ofConjAct c, by rw [hsup]; exact Subgroup.mem_top _, by
+      rw [ConjAct.toConjAct_ofConjAct]⟩
+  exact hKtop (top_le_iff.mp (hsup ▸ sup_le (le_strongClosure X) (le_sSup hstrong)))
+
+/-- **Isaacs Theorem 9.28 (Bartels)**, 帰納法の仮定つきの形: `G` より真に小さい群で
+主張が成り立つなら `G` でも成り立つ。
+
+`|X|` 最小の反例を取り, Step 2 で `p`-群と判り, Step 6 で矛盾。 -/
+theorem strongClosure_isSubnormal_of_bartelsIH {G : Type u} [Group G] [Finite G]
+    (hIH : BartelsIH G) (X : Subgroup G) : (strongClosure X).IsSubnormal := by
+  by_contra hX
+  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  haveI : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
+  obtain ⟨X₀, hX₀, hX₀min⟩ :=
+    exists_minimal_of_wellFoundedLT
+      (fun Y : Subgroup G => ¬ (strongClosure Y).IsSubnormal) ⟨X, hX⟩
+  have hmin : ∀ Y : Subgroup G, Y < X₀ → (strongClosure Y).IsSubnormal := by
+    intro Y hY
+    by_contra hYc
+    exact hY.ne (le_antisymm hY.le (hX₀min hYc hY.le))
+  obtain ⟨p, hp, hX₀p⟩ := bartels_step_two hmin hX₀
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hX₀bot : X₀ ≠ ⊥ := by
+    intro h
+    exact hX₀ (by rw [h, strongClosure_bot]; exact Subgroup.IsSubnormal.bot)
+  exact bartels_step_six hIH hX₀p hX₀bot hX₀
+
+/-- **Isaacs Theorem 9.28 (Bartels)** (p. 290): 任意の部分群 `X ≤ G` (`G` 有限) に対し
+**`X^{(G)}` は `G` で subnormal**。
+
+Lem 9.29(a) の `X^{(G)} ≤ X^{◁◁G}` と合わせて `X^{(G)}` は `X` の **subnormal closure**
+に一致する — すなわち「`X` を含む最小の subnormal 部分群は `X` の強共役たちで生成される」。
+
+証明は `|G|` に関する強帰納法 (`BartelsIH`) + `|X|` 最小反例の 6 step
+(`bartels_step_one` 〜 `bartels_step_six`)。 -/
+theorem strongClosure_isSubnormal {G : Type u} [Group G] [Finite G] (X : Subgroup G) :
+    (strongClosure X).IsSubnormal := by
+  suffices h : ∀ n : ℕ, ∀ (H : Type u) [Group H] [Finite H], Nat.card H = n →
+      ∀ Y : Subgroup H, (strongClosure Y).IsSubnormal by
+    exact h (Nat.card G) G rfl X
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro H _ _ hcard Y
+    refine strongClosure_isSubnormal_of_bartelsIH (fun K _ _ hlt Z => ?_) Y
+    exact ih (Nat.card K) (hcard ▸ hlt) K rfl Z
+
+end
 
 end OddOrder.Isaacs.Ch09
 

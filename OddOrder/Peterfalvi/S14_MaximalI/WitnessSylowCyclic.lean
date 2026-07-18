@@ -141,7 +141,8 @@ structure CounterexampleHypothesis where
   P0_sylow : ¬ p ∣ P0.relIndex M
   /-- The Sylow `p`-subgroup of `M/M_F` is noncyclic (so `P₀` is noncyclic). -/
   P0_noncyclic : ¬ IsCyclic ↥P0
-  /-- …and `p ∣ [M : M_F]` (so `P₀ ⊄ M_F`; together with the Hall property this gives `p ∤ |M_F|`). -/
+  /-- …and `p ∣ [M : M_F]` (so `P₀ ⊄ M_F`; together with the Hall property this gives `p ∤ |M_F|`).
+  -/
   p_dvd_index : p ∣ K.relIndex M
   /-- `p` is the smallest prime in `π`. -/
   minimal_p : ∀ q : ℕ, q.Prime → InPi (G := G) q → p ≤ q

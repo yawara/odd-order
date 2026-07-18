@@ -188,7 +188,8 @@ private theorem commBihomP_central_left {z : P} (hz : z ∈ commutator P) (y : P
       (Subgroup.mem_center_iff.mp (hP.commutator_eq_center.le hz) y).symm)
   simp only [commBihomP, MonoidHom.coe_mk, OneHom.coe_mk, hz1, map_one]
 
-/-- The commutator bihom with the **second** argument descended: `P →* (P/Z) →* Multiplicative 𝔽_p`. -/
+/-- The commutator bihom with the **second** argument descended: `P →* (P/Z) →* Multiplicative 𝔽_p`.
+-/
 private noncomputable def commBihom1 : P →* (P ⧸ commutator P) →* Multiplicative (ZMod p) where
   toFun x := QuotientGroup.lift (commutator P) (commBihomP hP x)
     (fun y hy => MonoidHom.mem_ker.mpr (commBihomP_central_right hP x hy))

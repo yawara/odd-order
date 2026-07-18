@@ -151,7 +151,8 @@ private lemma iterRightCommutator_zero (K F : Subgroup G) :
 private lemma iterRightCommutator_succ (K F : Subgroup G) (m : ℕ) :
     iterRightCommutator K F (m + 1) = ⁅iterRightCommutator K F m, F⁆ := rfl
 
-/-- **Monotonicity in the left operand**: if `K ≤ K'`, then `iterRightCommutator K F m ≤ iterRightCommutator K' F m`. -/
+/-- **Monotonicity in the left operand**: if `K ≤ K'`, then
+`iterRightCommutator K F m ≤ iterRightCommutator K' F m`. -/
 private lemma iterRightCommutator_mono_left
     {K K' F : Subgroup G} (h : K ≤ K') (m : ℕ) :
     iterRightCommutator K F m ≤ iterRightCommutator K' F m := by
@@ -161,7 +162,8 @@ private lemma iterRightCommutator_mono_left
       rw [iterRightCommutator_succ, iterRightCommutator_succ]
       exact Subgroup.commutator_mono ih le_rfl
 
-/-- **iterRightCommutator with shifted base**: `iterRightCommutator (iter K F j) F k = iter K F (j + k)`. -/
+/-- **iterRightCommutator with shifted base**:
+`iterRightCommutator (iter K F j) F k = iter K F (j + k)`. -/
 private lemma iterRightCommutator_add (K F : Subgroup G) (j k : ℕ) :
     iterRightCommutator (iterRightCommutator K F j) F k = iterRightCommutator K F (j + k) := by
   induction k with

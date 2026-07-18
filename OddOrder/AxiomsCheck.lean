@@ -37,6 +37,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
@@ -904,6 +905,13 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms Subgroup.chermakDelgado
 #assert_only_allowed_axioms Subgroup.card_quotient_lt_of_ne_bot
 
+-- Ch.1 (Sylow Theory): Lem 1.43 の**等号条件節** — `m_G(H)·m_G(K) = m_G(D)·m_G(J)` なら
+-- `J = HK` かつ `C_G(D) = C_G(H)·C_G(K)` (issue 9153)。Thm 1.44(b) はこの `.1`。
+#assert_only_allowed_axioms Subgroup.chermakDelgadoMeasure_mul_eq_conditions
+#assert_only_allowed_axioms Subgroup.chermakDelgadoLattice_measure_mul_eq
+#assert_only_allowed_axioms Subgroup.chermakDelgadoLattice_sup_eq_mul
+#assert_only_allowed_axioms Subgroup.chermakDelgadoLattice_centralizer_inf_eq_mul
+
 -- Ch.2 (Subnormality): Thm 2.13 Matsuyama
 -- 奇素数位数 inversion `x^t = x⁻¹` の存在 (`t ∉ O_2(G)` 下)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch02.matsuyama
@@ -1239,6 +1247,21 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- P は G の Sylow p (𝒦(M) の stabilizer の二分岐)。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_four
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_ne_bot_of_isPGroup
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.setwiseStabilizer_kappaSet_eq_of_isCoatom
+-- Step 4 後半: M は P を含む唯一の極大部分群。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_four_unique
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 5** — X を含む極大部分群は一意。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_five
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_sylow_ge_of_isPGroup
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.lt_inf_normalizer_of_lt_of_isPGroup
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.mem_normalizer_of_mem_normalizer_subgroupOf
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 6 と本体** — X^{(G)} は G で subnormal
+-- (Lem 9.29(a) と合わせて X^{(G)} = X の subnormal closure)。§9D 完了。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_six
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_isSubnormal_of_bartelsIH
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_isSubnormal
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
@@ -5215,6 +5238,14 @@ set_option linter.style.longLine false in
 -- irreducible ⟹ cyclic).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_of_faithful_isIrreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.elemAbelian_aut_action
+
+-- Peterfalvi Part II, Ch. I, Lemma 5: a fixed-point-free action on a
+-- two-dimensional projective line is irreducible; in characteristic two an odd faithful
+-- acting group is cyclic and its order divides the projective-line cardinality `|F| + 1`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isIrreducible_of_projective_no_nontrivial_fixed
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isCyclic_and_card_dvd_card_add_one_of_projective_no_nontrivial_fixed
 
 -- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
 -- representation over an algebraically closed field has cyclic centre `Z(G)`.

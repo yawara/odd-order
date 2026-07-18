@@ -361,7 +361,8 @@ noncomputable def coherentEqualDegree
     | smul c y _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ c ih
 
 open IntegralCharacterMap in
-/-- The `extension` field of `coherentEqualDegree` is the Fourier image map `coherentImageMap χ X`. -/
+/-- The `extension` field of `coherentEqualDegree` is the Fourier image map `coherentImageMap χ X`.
+-/
 theorem coherentEqualDegree_extension
     {τ : IntegralCharacterMap L G} {A : Set L} {n : ℕ} [NeZero n]
     {χ : Fin n → ClassFunction L ℂ} {X : Fin n → ClassFunction G ℂ}

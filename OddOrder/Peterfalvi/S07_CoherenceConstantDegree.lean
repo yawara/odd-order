@@ -372,7 +372,8 @@ theorem DiffPair.imageFam_orthogonal (hyp : Hypothesis (L := L) (G := G) S A)
     (hyp.difference_images_orthogonal hχ hζ
       (h.inner_eq_zero hyp hχ hζ) (h.inner_conj_eq_zero hyp hχ hζ))
 
-/-- The per-pair decomposition `pairDecomp` for two members `χ, ζ` in *different* conjugate pairs. -/
+/-- The per-pair decomposition `pairDecomp` for two members `χ, ζ` in *different* conjugate pairs.
+-/
 noncomputable def pairDecomp' (hyp : Hypothesis (L := L) (G := G) S A)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) (hχ : χ ∈ S) (hζ : ζ ∈ S)

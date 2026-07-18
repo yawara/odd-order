@@ -20,11 +20,11 @@ Peterfalvi Part II, Ch. I §3 Lemma 5 の `W ≤ GL(2,q)` から
 
 ## やること
 
-- [ ] 2次元表現の projective FPF から、群が非自明なら irreducibility を証明する
-- [ ] BG Theorem 2.6(a) で奇数位数作用群の可換性を得る
-- [ ] 既存 Singer cyclicity から作用群の巡回性を得る
-- [ ] projective line の自由作用と `card_of_finrank_two` から `|E| ∣ |F| + 1` を得る
-- [ ] `AxiomsCheck` と root import に配線する
+- [x] 2次元表現の projective FPF から、群が非自明なら irreducibility を証明する
+- [x] BG Theorem 2.6(a) で奇数位数作用群の可換性を得る
+- [x] 既存 Singer cyclicity から作用群の巡回性を得る
+- [x] projective line の自由作用と `card_of_finrank_two` から `|E| ∣ |F| + 1` を得る
+- [x] `AxiomsCheck` と root import に配線する
 
 ## 完了条件
 

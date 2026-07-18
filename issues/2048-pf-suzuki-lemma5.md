@@ -33,6 +33,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - [ ] `K`-不変な位数 `q²` 部分群 `X` と `X^w ≠ X` を証明する
 - [ ] `W` の projective-line 上の自由作用から `|W| ∣ q+1` を証明する
 - [ ] 一般有限体上の 2 次元表現 API から `W` の巡回性を証明する
+  - [x] projective FPF から cyclicity と `|E| ∣ |F| + 1` を得る一般定理を証明する
 - [ ] type-B 結論を含む Lemma 5 の最終定理を組み立てる
 
 ## 完了条件
