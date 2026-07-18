@@ -31,6 +31,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
@@ -245,7 +246,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 9600
+set_option linter.style.longFile 9700
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -773,6 +774,43 @@ Suzuki branch of Peterfalvi Part II, Ch. I section 3, Proposition 1(c). -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_ne_one
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.Suzuki.orderOf_standardRootInvolution_mul_weylElement
+
+/-! The standard Suzuki root is a Sylow 2-subgroup and carries the concrete
+Appendix III type-A Suzuki 2-group structure. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootOddCofactor
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootOddCofactor_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup_index
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup_index_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_standardRootSylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeightUnit
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_torusWeightUnit
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeightUnit_injective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeightUnit_surjective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootTorus_isCyclic
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScaleHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootTorus_actsRegularlyOnInvolutions
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_pow_period
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_orderOf_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.titsTwist_ne_one_of_pos
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.not_isMulCommutative
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.twist_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.twist_orderOf_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.map_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.standardTypeAData
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroupTypeAData
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.isSuzuki2Group
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup_isSuzuki2Group
 
 -- Perfectness, solvable Borel stabilizer, and simplicity of the standard Suzuki group.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_eq_one_iff
