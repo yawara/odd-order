@@ -1,4 +1,4 @@
-# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §2 frontier
+# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §3 frontier
 
 正本ソース = `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`
 (pp. 100–107, "General Properties of G")。Coq crib は**無い** (math-comp/odd-order
@@ -130,7 +130,7 @@
      bijection from `Omega` to the standard projective line. It derives
      `|Omega| - 1 = |F| = 2^n` and transports the existing Isaacs Ch08 PSL simplicity.
    - Shared support is `GroupTheory/PrimeComplementResidual.lean`; issue 9112 is closed.
-9. **Section 3 Lemma 1, concrete Sz(q) target complete; PSU(3,q) action, Bruhat decomposition, and exact order complete**.
+9. ✅ **Section 3 Lemma 1, concrete Sz(q) and PSU(3,q) targets complete**.
    - Shared leaf `GroupTheory/SpecificGroups/Suzuki/Field.lean` constructs the field
      of order `q = 2^(2m+1)` and the Tits twist `theta(x) = x^(2^(m+1))`.
    - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
@@ -218,7 +218,13 @@
      perfectness, Borel solvability, and finally
      `IsSimpleGroup (standardPermGroup n)`. The exceptional `n = 1` group of
      order 72 is correctly excluded.
-   - Next upstream layer: transport the completed degree and simplicity facts
-     into the Section 3 Lemma 1 PSU induction-hypothesis target.
+   - `Peterfalvi/Appendices/Suzuki/InductionHypothesisPSU.lean` transports the
+     unital degree for `0 < n` and simplicity for the exact source range
+     `q = 2^n > 2` (`1 < n`) across the target identifications. Its combined
+     endpoint proves that `Q` is a `2`-group and identifies `L` with both the
+     `2`-complement residual and the join of the conjugates of `Q`.
+   - Together with the PSL and Suzuki target leaves, all three target cases in
+     Peterfalvi Chapter I §3 Lemma 1 are now formalized without opaque target
+     hypotheses. **→ §3 Lemma 1 complete.**
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
