@@ -244,6 +244,7 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TamelyImbedded
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter

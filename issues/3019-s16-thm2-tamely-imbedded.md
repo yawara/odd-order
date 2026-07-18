@@ -36,12 +36,23 @@ Thm C(9) 完全恒等式 (`a0_minus_a_eq_conj_zTilde`) + Thm A type-F nilpotent
   `signalizer_neighbour_conjugator_in_M` (∃ m∈M, N(y)^m=N)。axiom-clean、AxiomsCheck 登録。
   proof = x/y 両側 Thm D(4) complement を Schur-Zass 共役 (`IsComplement'.exists_conj_of_coprime`)
   → 𝓜_σ(x) sharp transitivity + N_G(M)=M。Thm 14.4 infra は全て在庫 (blocker 無)。
-- [ ] **Gap 2b: packaging** `theoremII_tii_system_of_supporting`: `theoremII_tame_embedding` +
-  Thm D(4) (`TaxonomyOutput.lean:948` complement/escape) + Thm B(5)/C(9) TI (at M_i) +
-  `sigma_reps_pairwise_disjoint` (`TheoremsAE.lean:1551`、(a) 用) + Lemma 14.13(b) から
-  `SystemOfSupportingSubgroups M X` を構成し、A(M) が `TamelyImbedded M (A(M))` を証明。
-  (a)(b)(d) は engine 済で組立 bookkeeping、(c) は σ-disjoint から要導出、(e)/(Tiii) は 14.13(b) 依存。
-  **← 次の frontier (残 §16 最終項目)**。
+- [x] **Gap 2b: packaging** ✅ 2026-07-18 大部分完了 (`TheoremIIPackaging.lean`):
+  `theoremII_tamelyImbedded` が `TamelyImbedded M (ASet M U)` を証明 (axiom-clean、AxiomsCheck、root import)。
+  (Ti) (theoremII_tame_embedding.1) + family 構成 (N(x) の G-共役 reps、`exists_conjugacy_reps`) +
+  **(Tii)(a)** (Thm E(2) σ-disjoint) + **(b)** (D(4) complement) + **(c)** (`coprime_centralizer_of_neighbour`、14.13(a)) +
+  **(e)** (14.13(b) + D(3)) + **(Tiii)** (`frobeniusTypeI_of_neighbour_typeII`、D(4) の IsTypeP2→IsTypeF) 全て internal 証明。
+  ⚠ **def faithfulness fix** (hub): TamelyImbedded の (Tiii) を `∀sys`→`∃sys tie` に訂正 (∀sys は
+  unprovable — spurious TypeII member; book は「(Tii) の Mᵢ」= 生成された family)。
+  ⚠ `FrobeniusTypeIWithNonTIFitting` の第3 conjunct を `¬ IsTISubset(M_F#)` → repo-idiom
+  `¬ S15.FittingIsTI M` (=F(M) TI) に変更 (TypeI Frobenius M では F(M)=M_σ=M_F ゆえ faithful、
+  D(4) 直結、bridge 不要)。
+- [ ] **Gap 2c: clause (d) の unconditional 化** ← 残 §16 最終 gap。`theoremII_tamelyImbedded` は
+  現在 clause (d) を hypothesis `hd` で受ける conditional 形。**(d)-Type-I** は Thm B(5) (`theoremB_A_minus_Msigma_isTISubset`、
+  K_i=⊥ で A₀(Mᵢ)=A(Mᵢ)) + D(4) seed の nonemptiness で証明可 (bookkeeping)。**(d)-Type-II** は
+  **真に欠落した §16 定理**「A₀(Mᵢ) 自体が TI-subset (TypeII Mᵢ)」(book: "by Theorem C(5) and a
+  short argument") が必要 — repo には A₀−A の TI (theoremC_paired_structure) しかなく、
+  (A₀−A)∪(A−M_σ) は termwise TI でない。これを埋めれば `hd` が閉じ Thm II unconditional。
+  → 次 frontier で Thm C(5) + short argument を形式化 (or honest defer、恒久除外せず)。
 
 ## 完了条件
 

@@ -126,6 +126,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -8490,6 +8491,17 @@ normal Hall `N_σ ◁ N` are Schur–Zassenhaus-conjugate (`IsComplement'.exists
 placing `M` and its conjugate in `𝓜_σ(x)`; Thm 14.4 sharp transitivity + `N_G(M) = M` yield
 `m ∈ M`.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_neighbour_conjugator_in_M
+/-! **BG Theorem II packaging** (`S16_MainResults.TheoremIIPackaging`, `theoremII_tamelyImbedded`):
+`A(M) = ASet M U` is a tamely imbedded subset of `G` (`TamelyImbedded M (ASet M U)`) for an
+arbitrary maximal `M` of a minimal-simple odd `G`.  Assembles (Ti) (`theoremII_tame_embedding`),
+the full (Tii) system of supporting subgroups — (a) via Thm E(2) σ-disjointness, (b) via Thm D(4)
+complements, (c) `coprime_centralizer_of_neighbour` via Lemma 14.13(a), (e) via Lemma 14.13(b) +
+Thm D(3) — and (Tiii) `frobeniusTypeI_of_neighbour_typeII` (Thm D(4)'s `IsTypeP2 N → IsTypeF M`).
+**Conditional on the explicit hypothesis `hd`** = clause (d) `A₀(Mᵢ) − Hᵢ` TI for each neighbour
+maximal `Mᵢ`: Type-I is provable (Thm B(5)), but Type-II needs the genuinely-missing §16 theorem
+"`A₀(Mᵢ)` is a TI-subset for Type-II `Mᵢ`" (Thm C(5) + short argument; issue 3019).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tamelyImbedded
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_systemOfSupportingSubgroups
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_conj_smul_eq_of_le_of_card_prime
 
 /-! **Peterfalvi (14.11.3) support half, axiom-clean core** (`S16_G0Coprime`, lane c/γ).

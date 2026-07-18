@@ -62,16 +62,19 @@ def escapingSharpSet (M : Subgroup G) (X : Set G) : Set G :=
 with cyclic Frobenius complement, and `M_F` is not a `TI`-subset of `G`.
 
 The Frobenius kernel is `M_F = maxNilpotentNormalHall M` (for a Type-I maximal `M_F = M_σ`);
-`E` is the cyclic Frobenius complement.  "`M_F` is not a `TI`-subset in `G`" is the negation of
-the standard TI predicate applied to `M_F^#` with normalizer `N_G(M_F)`. -/
+`E` is the cyclic Frobenius complement.  "`M_F` is not a `TI`-subset in `G`" is encoded by the
+repository's standard `¬ FittingIsTI M` predicate: `FittingIsTI M` is `IsTISubset (F(M)^#) N_G(F(M))`
+for the ambient Fitting subgroup `F(M) = fittingInAmbient M`, which the §15/§16 structure theorems
+(Theorem A(8), 15.7, Theorem D(4)) all use for "the Fitting subgroup is/​is not a TI-subset".  For
+the Type-I Frobenius `M` produced here, `F(M) = M_σ = M_F`, so `¬ FittingIsTI M` is exactly
+"`M_F` is not a `TI`-subset". -/
 def FrobeniusTypeIWithNonTIFitting (M : Subgroup G) : Prop :=
   IsTypeI M ∧
   (∃ E : Subgroup G, IsCyclic ↥E ∧
     Subgroup.IsComplement' ((maxNilpotentNormalHall M).subgroupOf M) (E.subgroupOf M) ∧
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
       ((maxNilpotentNormalHall M).subgroupOf M) (E.subgroupOf M)) ∧
-  ¬ IsTISubset (sharpSubgroup (maxNilpotentNormalHall M))
-    (Subgroup.normalizer ((maxNilpotentNormalHall M : Subgroup G) : Set G))
+  ¬ OddOrder.BG.Ch4.S15.FittingIsTI M
 
 /-! ## System of supporting subgroups (Theorem II (Tii)) -/
 
@@ -128,21 +131,26 @@ structure SystemOfSupportingSubgroups (M : Subgroup G) (X : Set G) where
 relative to the maximal subgroup `M` iff conditions (Ti)–(Tiii) of Theorem II hold, namely:
 
 * **(Ti)** whenever two elements of `X` are `G`-conjugate, they are already `M`-conjugate;
-* **(Tii)** if `D = escapingSharpSet M X` is nonempty, then a
-  `SystemOfSupportingSubgroups M X` exists;
-* **(Tiii)** for any such system, if some supporting maximal `Mᵢ` is of Type II, then `M` is a
-  Frobenius group of Type I with cyclic complement and `M_F` is not a `TI`-subset
-  (`FrobeniusTypeIWithNonTIFitting M`).
+* **(Tii)+(Tiii)** if `D = escapingSharpSet M X` is nonempty, then there is a
+  `SystemOfSupportingSubgroups M X` **(Tii)** such that, if some supporting maximal `Mᵢ` **of that
+  system** is of Type II, then `M` is a Frobenius group of Type I with cyclic complement and `M_F`
+  is not a `TI`-subset (`FrobeniusTypeIWithNonTIFitting M`) **(Tiii)**.
+
+Note that (Tiii) is tied to the **existentially produced** family `Mᵢ` (the book's "the `Mᵢ`
+in (Tii)"), not universally over all abstract systems: the structure `SystemOfSupportingSubgroups`
+does not force its members to be genuine centralizer-neighbours, so a `∀ sys` reading would be
+strictly stronger than — and generally not equivalent to — the book statement (and unprovable,
+since a spurious Type-II member would force `M` Frobenius).
 
 As the Remark notes, when `D` is empty this reduces to `X` being an ordinary `TI`-subset of
-`G` (clause (Tii) is then vacuous). -/
+`G` (the (Tii)+(Tiii) clause is then vacuous). -/
 def TamelyImbedded (M : Subgroup G) (X : Set G) : Prop :=
   -- (Ti): `G`-conjugate elements of `X` are `M`-conjugate.
   (∀ a ∈ X, ∀ b ∈ X, (∃ g : G, b = g * a * g⁻¹) → ∃ m ∈ M, b = m * a * m⁻¹) ∧
-  -- (Tii): a nonempty escaping set yields a system of supporting subgroups.
-  (escapingSharpSet M X ≠ ∅ → Nonempty (SystemOfSupportingSubgroups M X)) ∧
-  -- (Tiii): a Type-II supporting subgroup forces `M` Frobenius of Type I with non-TI `M_F`.
-  (∀ sys : SystemOfSupportingSubgroups M X,
-    (∃ i, IsTypeII (sys.Mfam i)) → FrobeniusTypeIWithNonTIFitting M)
+  -- (Tii)+(Tiii): a nonempty escaping set yields a system of supporting subgroups whose Type-II
+  -- members force `M` Frobenius of Type I with non-TI `M_F`.
+  (escapingSharpSet M X ≠ ∅ →
+    ∃ sys : SystemOfSupportingSubgroups M X,
+      ((∃ i, IsTypeII (sys.Mfam i)) → FrobeniusTypeIWithNonTIFitting M))
 
 end OddOrder.BG.Ch4.S16
