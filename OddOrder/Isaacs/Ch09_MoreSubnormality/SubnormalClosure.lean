@@ -274,6 +274,42 @@ theorem strongClosureIn_eq_map_strongClosure {K X : Subgroup G} (hXK : X ≤ K) 
       rw [hround]; exact hW
     exact le_sSup ⟨(isStronglyConjugate_subgroupOf_iff hXK hWK).mp hconj, hWK⟩
 
+/-! ### Lemma 9.29 の相対版 (`X^{(K)}` 形)
+
+Bartels (9.28) の Step 1-5 は 9.29 を「`G` の中」ではなく「部分群 `K` の中」で
+繰り返し使う。本実装では `strongClosureIn` がそのまま `X^{(K)}` なので (c)(d) は
+`sSup` の単調性で済み, (a) だけが上の橋を経由する。 -/
+
+/-- **9.29(c) の相対版**: `K ≤ L` なら `X^{(K)} ≤ X^{(L)}`. -/
+theorem strongClosureIn_mono_left {K L X : Subgroup G} (hKL : K ≤ L) :
+    strongClosureIn K X ≤ strongClosureIn L X :=
+  sSup_le fun _ hY => le_sSup ⟨hY.1, hY.2.trans hKL⟩
+
+/-- **9.29(d) の相対版**: `X^{(L)} ≤ K ≤ L` なら `X^{(K)} = X^{(L)}`. -/
+theorem strongClosureIn_eq_of_le {K L X : Subgroup G} (hKL : K ≤ L)
+    (hLK : strongClosureIn L X ≤ K) : strongClosureIn K X = strongClosureIn L X :=
+  le_antisymm (strongClosureIn_mono_left hKL)
+    (sSup_le fun _ hY => le_sSup ⟨hY.1, (le_sSup hY).trans hLK⟩)
+
+/-- **9.29(d) の相対版・系**: `X^{(L)}` は自分自身の中で閉じている (`K = X^{(L)}` の場合)。 -/
+theorem strongClosureIn_strongClosureIn (L X : Subgroup G) :
+    strongClosureIn (strongClosureIn L X) X = strongClosureIn L X :=
+  strongClosureIn_eq_of_le (strongClosureIn_le_right L X) le_rfl
+
+/-- **9.29(a) の相対版**: `X ≤ S ≤ K` で `S` が `K` の中で subnormal なら `X^{(K)} ≤ S`.
+
+上の橋 (`strongClosureIn_eq_map_strongClosure`) で `↥K` に降ろし, そこで絶対版
+`strongClosure_le_of_isSubnormal` を使う。 -/
+theorem strongClosureIn_le_of_isSubnormal {K S X : Subgroup G} (hXS : X ≤ S) (hSK : S ≤ K)
+    (hS : (S.subgroupOf K).IsSubnormal) : strongClosureIn K X ≤ S := by
+  have hXK : X ≤ K := hXS.trans hSK
+  rw [strongClosureIn_eq_map_strongClosure hXK]
+  calc (strongClosure (X.subgroupOf K)).map K.subtype
+      ≤ (S.subgroupOf K).map K.subtype :=
+        Subgroup.map_mono
+          (strongClosure_le_of_isSubnormal hS _ (Subgroup.comap_mono hXS))
+    _ = S := Subgroup.map_subgroupOf_eq_of_le hSK
+
 section /- 9D: Lemma 9.30 — 商への移行 (pp. 290-291) -/
 
 variable {H : Type*} [Group H]

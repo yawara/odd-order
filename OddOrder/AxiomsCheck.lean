@@ -1174,6 +1174,10 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_map_strongClosure
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isStronglyConjugate_subgroupOf_iff
 
+-- Ch.9 §9D: Lem 9.29 の相対版 (`X^{(K)}` 形) — 9.28 の Step 1-5 が繰り返し使う。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_le_of_isSubnormal
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_of_le
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms
