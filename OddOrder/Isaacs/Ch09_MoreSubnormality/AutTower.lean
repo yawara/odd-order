@@ -84,4 +84,70 @@ theorem center_autTowerType_eq_bot (hZ : Subgroup.center G = ⊥) (n : ℕ) :
 
 end
 
+section /- 9B: tower の埋め込み鎖 `G_n ↪ G_{n+1}` (書籍 p. 278 の同一視) -/
+
+variable (G : Type u) [Group G]
+
+/-- 各段の埋め込み `G_n ↪ G_{n+1}`: 内部自己同型 `g ↦ τ_g`.
+
+`autTowerType G (n+1)` は**定義上** `MulAut (autTowerType G n)` なので
+`MulAut.conj` がそのまま `G_n →* G_{n+1}` として使える. -/
+def autTowerStep (n : ℕ) : autTowerType G n →* autTowerType G (n + 1) :=
+  MulAut.conj
+
+/-- `m` 段目から `m + k` 段目への合成埋め込み (`k` に関する再帰).
+
+`m ≤ r` を `r = m + k` の形で扱うのは, `autTowerType G (m + (k+1))` と
+`autTowerType G ((m + k) + 1)` が定義上同一で段差の付け替えが不要なため. -/
+def autTowerEmb (m : ℕ) : ∀ k : ℕ, autTowerType G m →* autTowerType G (m + k)
+  | 0 => MonoidHom.id _
+  | k + 1 => (autTowerStep G (m + k)).comp (autTowerEmb m k)
+
+variable {G}
+
+@[simp] theorem autTowerEmb_zero (m : ℕ) : autTowerEmb G m 0 = MonoidHom.id _ := rfl
+
+theorem autTowerEmb_succ (m k : ℕ) :
+    autTowerEmb G m (k + 1) = (autTowerStep G (m + k)).comp (autTowerEmb G m k) := rfl
+
+/-- 各段の埋め込みは単射 (`Z(G_n) = 1` ゆえ; Lemma 9.11). -/
+theorem autTowerStep_injective (hZ : Subgroup.center G = ⊥) (n : ℕ) :
+    Function.Injective (autTowerStep G n) :=
+  conj_injective (center_autTowerType_eq_bot hZ n)
+
+/-- 合成埋め込みも単射. -/
+theorem autTowerEmb_injective (hZ : Subgroup.center G = ⊥) (m : ℕ) :
+    ∀ k, Function.Injective (autTowerEmb G m k)
+  | 0 => Function.injective_id
+  | k + 1 => (autTowerStep_injective hZ (m + k)).comp (autTowerEmb_injective hZ m k)
+
+/-- `G_n` の `G_{n+1}` での像はちょうど `Inn(G_n)`. -/
+theorem range_autTowerStep (n : ℕ) : (autTowerStep G n).range = innAut (autTowerType G n) := rfl
+
+/-- 添字が等しければ段も等しい (`m = n` に沿った同型).
+
+`autTowerEmb` は `G_m →* G_{m+k}` の形でしか作れないが, 鎖を `G_r` の中で扱うには
+`m + (r - m) = r` の付け替えが要る. 型の等式を直接 `cast` すると扱いにくいので
+`MulEquiv` として持つ. -/
+def autTowerCongr {m n : ℕ} (h : m = n) : autTowerType G m ≃* autTowerType G n := by
+  subst h; exact MulEquiv.refl _
+
+@[simp] theorem autTowerCongr_refl (m : ℕ) :
+    autTowerCongr (G := G) (rfl : m = m) = MulEquiv.refl _ := rfl
+
+theorem autTowerCongr_injective {m n : ℕ} (h : m = n) :
+    Function.Injective (autTowerCongr (G := G) h) := (autTowerCongr h).injective
+
+variable (G) in
+/-- `m ≤ r` のときの埋め込み `G_m ↪ G_r` (`autTowerEmb` に添字の付け替えを合成). -/
+def autTowerEmbLe {m r : ℕ} (h : m ≤ r) : autTowerType G m →* autTowerType G r :=
+  (autTowerCongr (Nat.add_sub_cancel' h)).toMonoidHom.comp (autTowerEmb G m (r - m))
+
+/-- `G_m ↪ G_r` は単射. -/
+theorem autTowerEmbLe_injective (hZ : Subgroup.center G = ⊥) {m r : ℕ} (h : m ≤ r) :
+    Function.Injective (autTowerEmbLe G h) :=
+  (autTowerCongr_injective _).comp (autTowerEmb_injective hZ m (r - m))
+
+end
+
 end OddOrder.Isaacs.Ch09
