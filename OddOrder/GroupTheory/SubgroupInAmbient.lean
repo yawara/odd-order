@@ -350,27 +350,31 @@ theorem sup_normal_of_normal_left_of_normal_subgroupOf {H U C : Subgroup G} [hH 
     have := key u⁻¹ (inv_mem hu) _ hn
     rwa [show u⁻¹ * (u * n * u⁻¹) * u⁻¹⁻¹ = n by group] at this
 
-section /- `O_π` の同型・共役同変性 (issue 9131) -/
+section /- `O_π` の ambient 版の同型同変性 (issue 9131) -/
 
-/-- 一方向: `(O_π(A)).map e ≤ O_π(B)` (`e : A ≃* B`). -/
-private theorem map_oPiCore_le {A B : Type*} [Group A] [Group B] (π : Set ℕ) (e : A ≃* B) :
-    (Ch03.oPiCore π A).map (e : A →* B) ≤ Ch03.oPiCore π B := by
-  rw [Ch03.oPiCore, Subgroup.map_le_iff_le_comap]
-  refine iSup_le fun N => ?_
-  rw [← Subgroup.map_le_iff_le_comap]
-  haveI : (N.val.map (e : A →* B)).Normal := N.2.1.map _ e.surjective
-  refine Ch03.Subgroup.IsPiGroup.le_oPiCore fun q hq => N.2.2 q ?_
-  rwa [Nat.card_congr
-    (Subgroup.equivMapOfInjective N.val (e : A →* B) e.injective).toEquiv]
+/-- **`opiCoreInG` は群同型と可換**: `(O_π(H)).map e = O_π(H.map e)` (`e : G ≃* G'`).
 
-/-- **`O_π` は群同型と可換**: `(O_π(A)).map e = O_π(B)`. -/
-theorem map_oPiCore_mulEquiv {A B : Type*} [Group A] [Group B] (π : Set ℕ) (e : A ≃* B) :
-    (Ch03.oPiCore π A).map (e : A →* B) = Ch03.oPiCore π B := by
-  refine le_antisymm (map_oPiCore_le π e) ?_
-  have h := Subgroup.map_mono (f := (e : A →* B)) (map_oPiCore_le π e.symm)
-  rwa [Subgroup.map_map,
-    show ((e : A →* B).comp (e.symm : B →* A)) = MonoidHom.id B from by ext x; simp,
-    Subgroup.map_id] at h
+`Ch03.oPiCore.map_eq_of_mulEquiv` (部分群の中の `O_π` の同型不変性) を
+`e` が誘導する同型 `↥H ≃* ↥(H.map e)` に当て, `subtype` との合成を組み替えたもの.
+
+Thm 9.23 の `V`-branch (`K = H^g` について `|K : O_p(K)| = |H : O_p(H)|` を出す) で使う. -/
+theorem map_opiCoreInG_mulEquiv {G' : Type*} [Group G'] (π : Set ℕ) (e : G ≃* G')
+    (H : Subgroup G) :
+    (opiCoreInG π H).map (e : G →* G') = opiCoreInG π (H.map (e : G →* G')) := by
+  let e' : ↥H ≃* ↥(H.map (e : G →* G')) :=
+    Subgroup.equivMapOfInjective H (e : G →* G') e.injective
+  have hcomp : (H.map (e : G →* G')).subtype.comp (e' : ↥H →* ↥(H.map (e : G →* G')))
+      = (e : G →* G').comp H.subtype := by ext x; rfl
+  calc (opiCoreInG π H).map (e : G →* G')
+      = (Ch03.oPiCore π ↥H).map ((e : G →* G').comp H.subtype) := by
+        rw [opiCoreInG, Subgroup.map_map]
+    _ = (Ch03.oPiCore π ↥H).map
+          ((H.map (e : G →* G')).subtype.comp (e' : ↥H →* ↥(H.map (e : G →* G')))) := by
+        rw [hcomp]
+    _ = ((Ch03.oPiCore π ↥H).map (e' : ↥H →* ↥(H.map (e : G →* G')))).map
+          (H.map (e : G →* G')).subtype := by rw [← Subgroup.map_map]
+    _ = opiCoreInG π (H.map (e : G →* G')) := by
+        rw [Ch03.oPiCore.map_eq_of_mulEquiv π e']; rfl
 
 end
 

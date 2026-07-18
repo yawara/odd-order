@@ -951,14 +951,32 @@ theorem isPiSeparable_compl (π : Set ℕ) (G : Type*) [Group G] [Finite G]
   rw [hn] at hle
   exact top_le_iff.mp hle
 
-/-- `O_π` is invariant under group isomorphism. -/
-theorem oPiCore.map_eq_of_mulEquiv {G H : Type*} [Group G] [Finite G] [Group H] [Finite H]
+/-- 同型に沿った一方向の包含 `(O_π(G)).map e ≤ O_π(H)`.
+
+`oPiCore.map_le_of_surjective` と違い `[Finite]` を要求しない: 全射性の代わりに
+単射性を使い, `Subgroup.equivMapOfInjective` で各 normal π-部分群の位数が像でも
+変わらないことから `IsPiGroup` を移送する. -/
+private theorem oPiCore.map_le_of_mulEquiv {G H : Type*} [Group G] [Group H]
+    (π : Set ℕ) (e : G ≃* H) :
+    (oPiCore π G).map (e : G →* H) ≤ oPiCore π H := by
+  rw [oPiCore, Subgroup.map_le_iff_le_comap]
+  refine iSup_le fun N => ?_
+  rw [← Subgroup.map_le_iff_le_comap]
+  haveI : (N.val.map (e : G →* H)).Normal := N.2.1.map _ e.surjective
+  refine Subgroup.IsPiGroup.le_oPiCore fun q hq => N.2.2 q ?_
+  rwa [Nat.card_congr (Subgroup.equivMapOfInjective N.val (e : G →* H) e.injective).toEquiv]
+
+/-- `O_π` is invariant under group isomorphism.
+
+`[Finite]` は不要 (単射性のみ使う; `oPiCore.map_le_of_mulEquiv` を両向きに当てる). -/
+theorem oPiCore.map_eq_of_mulEquiv {G H : Type*} [Group G] [Group H]
     (π : Set ℕ) (e : G ≃* H) :
     (oPiCore π G).map e = oPiCore π H := by
-  refine le_antisymm (oPiCore.map_le_of_surjective π (e : G →* H) e.surjective) ?_
-  intro y hy
-  refine ⟨e.symm y, ?_, by simp⟩
-  exact oPiCore.map_le_of_surjective π (e.symm : H →* G) e.symm.surjective ⟨y, hy, rfl⟩
+  refine le_antisymm (oPiCore.map_le_of_mulEquiv π e) ?_
+  have h := Subgroup.map_mono (f := (e : G →* H)) (oPiCore.map_le_of_mulEquiv π e.symm)
+  rwa [Subgroup.map_map,
+    show ((e : G →* H).comp (e.symm : H →* G)) = MonoidHom.id H from by ext x; simp,
+    Subgroup.map_id] at h
 
 /-- **`oPiCore.comap_le_of_injective`**: injective hom `f : G →* H`, `[Finite H]` 下で
 `oPiCore π H` の preimage は `oPiCore π G` に含まれる.
