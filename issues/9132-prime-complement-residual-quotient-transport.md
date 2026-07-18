@@ -23,10 +23,10 @@ Consumer: `OddOrder/Peterfalvi/Appendices/Suzuki/CentralizerResidual.lean`.
 
 ## やること
 
-- [ ] 全射 `f : G →* H` に対し
+- [x] 全射 `f : G →* H` に対し
       `(primeComplementResidual p G).map f = primeComplementResidual p H`
       を証明する。
-- [ ] `N.subgroupOf (primeComplementResidual p G) = center ...` から
+- [x] `N.subgroupOf (primeComplementResidual p G) = center ...` から
       residual の center quotient と `primeComplementResidual p (G ⧸ N)` の
       `MulEquiv` を構成する。
 - [ ] Prop. 1(c) consumer と `OddOrder.AxiomsCheck` を配線する。

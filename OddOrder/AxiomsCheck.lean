@@ -271,6 +271,8 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_eq_normalClosure
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_le_of_coprime_index
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
+#assert_only_allowed_axioms Subgroup.primeComplementResidual_map_of_surjective
+#assert_only_allowed_axioms Subgroup.primeComplementResidualQuotientEquiv
 
 -- Quadratic finite-field and Hermitian trace infrastructure for the PSU(3,q) target.
 #assert_only_allowed_axioms
