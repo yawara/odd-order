@@ -259,3 +259,31 @@ reduction の transport に要る道具は**全部揃った**: normal Hall = `No
   `Mathlib/Subgroup.lean:515` (`Subgroup.card_quotient_lt_of_ne_bot`) と
   `SubnormalClosure.lean:440` (`Ch09.card_quotient_lt_of_ne_bot`)。
   前者が mathlib 候補配置なので後者を消して前者に寄せるのが筋。
+
+## ✅ hub による誤植の独立検証 (2026-07-19)
+
+c の「BG p. 50 の `H ∩ L = 1` は誤植で正しくは `H ∩ N = 1`」という指摘を、
+**PDF ページ画像 (book p.50 = PDF p.63) で独立に検証し、正しいと確認した。**
+
+原文の該当箇所 (Theorem 6.4 の証明、場合 1):
+
+> In this case, `H` is a Hall `p'`-subgroup of `HN`. Take `z ∈ N` such that `(H^y)^z = H`.
+> Let `L* = ⟨J₁^{yz}, J₂⟩N`. Then `yz ∈ L` and
+> `[H, yz] ⊆ H ∩ L = 1.`
+
+**`[H, yz] ⊆ H ∩ L` までは正しい** (`yz ∈ L` かつ `H` が `L` を正規化し `G = LH` ゆえ `L ⊴ G`、
+よって `[H,yz] ⊆ L`; `yz ∈ N_G(H)` ゆえ `[H,yz] ⊆ H`)。
+**しかし `H ∩ L = 1` はこの時点で正当化されていない**: `L = ⟨J₁,J₂⟩` は `π`-部分群 2 つで
+生成されるが `L` 自身が `π`-群とは限らず (それこそが本定理の結論)、`G/L ≅ H/(H∩L)` は
+`H ∩ L` の自明性を与えない。
+
+c の訂正 `H ∩ N = 1` は正当: `N ≤ O_p(F(G))` は `p`-群、`H` は `HN` の Hall `p'`-部分群
+(原文が直前に明記) ゆえ交わりは自明。`[H,yz] ⊆ N` も成立する ((6.3) で `y` が `HN/N` を
+中心化 ⟹ `h⁻¹h^y ∈ N`、`z ∈ N` と `N ⊴ G` ⟹ `h⁻¹h^{yz} ∈ N`)。
+⟹ **結論 (`yz` が `H` を中心化) は不変で、`L` を `N` に読み替えれば証明は通る。**
+
+⚠ **これは本プロジェクトが確認した初の「本物の教科書の誤り」**である。
+これまで repo に混入していた 3 件の「書籍に gap がある」という注記 (issue 0125) は
+いずれも `.mmd` の `⊲⊲`→`⊲` 潰れによる**私たちの誤読**だった。今回は
+mmd・pdftotext・**ページ画像の 3 つとも同一の印字**であることを確認しており、
+性質が異なる。
