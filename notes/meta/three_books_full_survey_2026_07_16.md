@@ -638,7 +638,23 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | App I Prop 1 | 部分 | S | Odd-order D faithful and transitive on E^# (E elementary abelian q-group) => F(D) cyclic, … | VERIFIED: stated at full book strength (all three conclusions: IsCyclic F(D), fpf, commutator D <= F(D) = D/F abelian) in OddOrder/Peterfalvi/Appendices/Huppert.lean (line 886). The whole assembly is written and proof-co… |
 | App I Lemma | 部分 | M | p odd, P a p-group faithful on elementary abelian q-group E with /P_a/ constant on E^# => … | VERIFIED: this is the location of the file's single sorry (Huppert.lean line 575, inside pGroup_cyclic_fixedPointFree at line 531). Fully proved: part (1) at greater-than-book generality (arbitrary P-permuted iSupIndep d… |
 
-### Pf App: NearFields — Peterfalvi App: On Near-Fields
+### Pf App: NearFields
+
+> **⚠ 2026-07-18 更新 (lane c) — de-opacify**: 2 sorry は共に **vacuous scaffold** だった
+> (`rankOne_affine_nearField` は任意 `(two_rank_one : Prop)` を引数に取り、
+> `cyclic_index_two_nearField_classification` は結論が `∃ classification : Prop, classification`
+> = `⟨True, trivial⟩` で証明でき **sorry が何も隠していなかった**)。両者を book-strength に書き直し。
+> 検証: opaque マーカー 0 (自由 Prop フィールド/`∃ P : Prop`/任意 Prop 引数)、旧 headline は現在
+> **sorryAx を要する**(= 本物の文になった証拠)。⚠ **Prop 1 は元の場所で直せなかった**:
+> `Suzuki.Hypothesis` が (A3) `two_rank_ge_two` を持つため、真の 2-rank-one 仮説を足すと
+> **vacuous** になる。よって (A1)+(A2) + (A3) の正確な否定を持つ別 `RankOneHypothesis` を新設
+> (充足例 `AGL(1,3) ≅ S₃` を確認)。opaque な `FiniteNearField` は既存の実 `NearField` class と
+> 重複ゆえ削除 (参照ゼロ確認済)。**新規 sorry-free**: `NearField.mul_add_of_mul_comm`(公理ゼロ依存)、
+> `exists_field_structure_of_cyclic_index_two`(Prop 2 前半を既存 sorry-free 核に接続)。
+> 既存の実資産 (NearField class / F_{r²,2} 構成 / Prop 2 解析核) は無傷。残 2 sorry のブロッカー:
+> Prop 1 = Brauer-Suzuki + Huppert III.8.2/II.3.2、Prop 2 = `exists_field_semilinear` 出力の
+> `F` 自身への正規化 transport。
+ — Peterfalvi App: On Near-Fields
 
 > Peterfalvi Appendix C (book Appendix II, "On Near-Fields", pp. 137-138) contains 2 numbered propositions plus 3 named definitions/constructions, all covered by the single file OddOrder/Peterfalvi/Appendices/NearFields.lean. The honest layer is substantial: the near-field class, the prime-characteristic/elementary-abelian lemma, the abstract F_{r²,2} twisting construction (proved more generally than the book, including the associativity the book waves through), and — surprisingly strong — the entire analytic core of Proposition 2 (index-2 irreducibility via free-orbit counting + a bespoke Maschke theorem, then the field structure through Appendix I's exists_field_semilinear), all sorry-free and generalized from cyclic to commutative index-2 subgroups. The file's 2 sorries are both vacuous opaque-Prop scaffolds, not real partial proofs: rankOne_affine_nearField (Prop 1, line 620) concludes a structure of free Prop fields from an arbitrary `two_rank_one : Prop`, and cyclic_index_two_nearField_classification (Prop 2 headline, line 628) has the trivially-provable conclusion `∃ classification : Prop, classification`. The real gaps are Proposition 1 in full (XL — blocked on Brauer-Suzuki, the rank-1 Sylow-2 classification, and Huppert II.3.2, none of which exist in repo or mathlib) plus the field-or-F_{r²,2} dichotomy tail and |Z(F*)| = r−1 of Proposition 2 (M) and the ℒ(F) regular-action correspondence (M). Note the Coq submodule offers no help here: math-comp/odd-order never formalized the Peterfalvi Part II appendices. Slim verification pass: all four flagged labels (ℒ(F) missing, Prop 1 missing, F_{r²,2} partial, Prop 2 partial) were confirmed against fresh greps (holomorph/AGL/affine/regular-normal/Brauer-Suzuki/quaternion/quadratic-character) and direct reads of NearFields.lean, Suzuki.lean, and SemilinearField.lean — no upgrades warranted (Isaacs Ch06 DQSDRecognition is quaternion recognition, not the rank-1 classification); the two load-bearing formalized entries (NearField class, char(F) lemma) were read and confirmed at full book strength; no corrections made.
 
@@ -665,6 +681,20 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Prop 2 | 未 | L | alpha -> f_alpha is a surjective homomorphism from Aut(B(n,1)) onto the semilinear maps x … | Verified: typeB_automorphism_structure (1 of the 4 sorries) is vacuous ('∃ automorphismStructure : Prop, automorphismStructure'). The real proof expands f, g in the automorphism basis of Lemma 2(a) and compares quadratic… |
 
 ### Pf App: FeitSibley — Peterfalvi Appendix E
+
+> **⚠ 2026-07-18 更新 (lane c) — de-opacify**: `Hypothesis` は `H_eq_Q_semidirect_D` 等を
+> 自由 `Prop` + `_holds` で持ち (`H=Q=D=⊥` と `True` で充足可)、`Sset`/`A`/`tau`/`d` も **posit** されていた。
+> `coherence_adjoin_or_equal_degree` / `induction_isometry` は共に vacuous。全て book-strength に書き直し:
+> `Hypothesis` は実際の部分群主張のみ (`H=Q⋊D` を `IsComplement'`+積で、TI 条件、`Q=S×Q₁`、
+> `D` の Q₁ 上 fixed-point-free)、`Sset`/`A`/`d` は **定義**に、`tau` は `Ind_H^G` として **構成**。
+> 検証: opaque マーカー 0、sorry 付き 7 定理は全て `sorryAx` を報告 (= 偶然自明でない)。
+> **新規 sorry-free**: `tau` 構成 + `tau_apply`/`S_le_H`/`Q1_le_H`/`disjoint_*`/`d_pos`/
+> `isIrreducibleCharacter_of_mem_Sset`/`zSpan_Sset_le_ZIrr` + Lemma 2(b) の実片 `tau_mem_ZIrr`/`tau_apply_one`。
+> ⚠ **sorry 3 → 5 は正しい増加**: vacuous 1 文を正直な複数文に分解したため (「opaque で sorry-free」より
+> 「honest + sorry」を優先)。Lemma 1(b) は既存 `S07.coherent_of_constant_degree` (= Pf (5.7)) ゆえ
+> no-wrapper 方針で再掲せず docstring に対応記録。残 5 sorry のブロッカー: Isaacs 7.14 mixed-degree
+> adjoin / Isaacs 6.34+6.11 / Isaacs 7.7 の Q-vanishing 特殊化 / Huppert V.13.8 / 上記全部+class-sum 合同。
+
 
 > The unit is scaffold-only: OddOrder/Peterfalvi/Appendices/FeitSibley.lean (83 lines) carries exactly the 3 repo sorries — coherence_adjoin_or_equal_degree (Lemma 1, a vacuous '∃ Props' statement), induction_isometry (Lemma 2, opaque free-Prop data), and feit_sibley_coherence (the Theorem, a real IsCoherent conclusion but over free unconstrained fields tau/Sset/A) — under an opaque-Prop Hypothesis structure whose only genuine field is (|Q|,|D|)-coprimality; no file consumes these declarations (imported only by the root OddOrder.lean, absent from AxiomsCheck) and math-comp/Coq never formalized Peterfalvi Part II, so there is no Coq analog. The surprising strength is on the sibling main-text side: the FT-path Sibley coherence, Peterfalvi (6.8) sibleySetup_is_coherent, is fully proved sorry-free, and most of the appendix's technique already exists in that framework — equal-degree coherence (5.7) coherent_of_constant_degree, the τ-generic S07 retarget/adjoin bridge plus the Dade-wired (5.6) engine xAdjoinStep, the (6.7) class-sum congruence (peterfalvi_67/_of_odd, mod-|P| Sylow form), the quadratic endgame eq_zero_or_edge_of_dvd_of_normLt, Schur's center bound (Isaacs Cor 2.30, whose docstring names this appendix as an intended consumer), the odd-order no-real-characters lemma (1.1), and the generic Isaacs CTFG 7.7 TI-induction isometry. However the appendix Theorem is genuinely distinct from (6.8) — it allows |H| even (only d = |D| odd), a non-Frobenius H = Q⋊D with D fixed-point-free only on the direct factor Q₁ of Q = S×Q₁, and the restricted family {χ : Q₁ ⊄ ker χ}, with coherence for plain induction on a TI Hall Q — so nothing here is subsumed. An honest formalization means rewriting the Hypothesis without opaque Props, re-instantiating the S07/S08 machinery on this configuration, and adapting the (6.7) congruence from Sylow-TI to Hall-TI: roughly L total for the Theorem with steps (1)-(8) (individual step efforts listed are components of that total, not additive), plus M each for honest Lemma 1 (general-isometry adjoin criterion) and Lemma 2. Its only intended consumer is the Suzuki/PSU3 appendix, itself scaffold-only. Verification pass: all flagged statuses were confirmed after refutation attempts (in particular, the Hall-TI mod-|Q| congruence of step (7) truly has no repo counterpart — all three peterfalvi_67 forms are pinned to a Sylow p-subgroup), with two note-level corrections: Lemma 2(b)'s plain TI-induction isometry (Isaacs CTFG 7.7) is in fact fully formalized generically and sorry-free (induce_apply_coe_of_isTISubset / inner_induce_eq_of_isTISubset in InducedCharacter.lean, plus TIInducedFamily extraction), leaving only instantiation plus the 2(a) Clifford argument; and Lemma 1(a)'s adjoining bridge (retarget_isCoherent* in S07_Coherence/CoherenceUnion.lean) is already generic in an arbitrary IntegralCharacterMap, with only the crux1_of_memberFamily degree-inequality collapse and xAdjoinStep wiring Dade-specialized.
 

@@ -11,6 +11,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.FixedPointCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -21,6 +22,9 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)
