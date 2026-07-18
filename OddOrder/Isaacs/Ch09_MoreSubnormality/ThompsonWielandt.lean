@@ -479,6 +479,26 @@ theorem relCore_eq_bot_or_of_fitting_eq_bot [Finite G]
 
 end
 
+section /- 9C: Thm 9.23 準備 — n!-定理の相対形 -/
+
+/-- **n!-定理の相対形**: `D ≤ H` のとき `|H : core_H(D)|` は `|H : D|!` を割る.
+
+`Ch01.normalCore_index_dvd_factorial` を `↥H` の中の `D.subgroupOf H` に適用しただけ.
+Thm 9.23 の index bound (`|H:M| ≤ a!`, `|H:U| ≤ (a!b!)!`) で使う. -/
+theorem relCore_relIndex_dvd_factorial [Finite G] (H D : Subgroup G) :
+    (relCore H D).relIndex H ∣ Nat.factorial (D.relIndex H) := by
+  have hsub : (relCore H D).subgroupOf H = (D.subgroupOf H).normalCore :=
+    Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
+  have h := (Ch01.normalCore_index_dvd_factorial (D.subgroupOf H)).2.2
+  rwa [← hsub] at h
+
+/-- 相対 index 版の不等式形 (`|H : core_H(D)| ≤ |H : D|!`). -/
+theorem relCore_relIndex_le_factorial [Finite G] (H D : Subgroup G) :
+    (relCore H D).relIndex H ≤ Nat.factorial (D.relIndex H) :=
+  Nat.le_of_dvd (Nat.factorial_pos _) (relCore_relIndex_dvd_factorial H D)
+
+end
+
 section /- 9C: Theorem 9.24 本体 -/
 
 variable (H K : Subgroup G)
