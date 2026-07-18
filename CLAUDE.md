@@ -10,7 +10,7 @@
 2. **Bender–Glauberman**, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994) — FT 局所解析 + 最終矛盾
 3. **Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000) — FT 指標理論
 
-**現フェーズ (2026-07-16〜) の scope 正本 = ギャップ調査 note** [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) (3 冊の全 815 番号付き結果を列挙・被覆判定; 実作業ギャップ 214 件 + 特殊化債務 54 件)。レーン配分の正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。
+**⚠ scope の正本 = `git log` + `issues/` + 実測 grep (2026-07-19 hub 裁定 9154 で降格)**。ギャップ調査 note [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) (3 冊の全 815 番号付き結果を列挙) は **2026-07-16 時点の出発点**として保持するが、**scope の一次情報にしない** — Isaacs だけで Ch.1/2/5/8/9/10 の 6 章が実体と食い違い、"Confirmed missing (slim pass)" のような検証済みを示す文言も無効だった (Ch.8 は「ディレクトリすら無い」と断言していたが実際は 14 leaf / 5,707 行が存在)。**未/部分ラベルは着手前に必ず実測で再確認する** ([[verify-port-state-by-number-not-coq-name]])。レーン配分の正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。
 
 PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは、まず該当の `*.pdftotext.txt` (Peterfalvi は `references/peterfalvi/pdftotext/*.txt`) を grep / Read し、記号・式・仮定は PDF ページ画像で確定する。**Nougat は新規抽出に使わない (ユーザー方針 2026-07-18)**。既存 `.mmd` は履歴として保持するが、原文照合の正本にしない。
 
