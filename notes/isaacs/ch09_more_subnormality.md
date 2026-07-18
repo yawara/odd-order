@@ -380,3 +380,63 @@ S9C,S9D}.lean` 階層配置だが **Phase 1 skip** (BG/Peterfalvi 0 件のため
 - [`ch02_subnormality.md`](ch02_subnormality.md) — **Ch.2 Thm 2.6 ⭐ 5x dep** (9.3, 9.4, 9.6, 9.17, 9.18 すべての hub).
 - [`ch01_sylow_d_fitting.md`](ch01_sylow_d_fitting.md) — `Subgroup.fitting` (9.6 で利用).
 - [`../meta/mathlib_coverage.md`](../meta/mathlib_coverage.md) — 全体 mathlib カバレッジ.
+
+## 2026-07-19 §9D 着手 — 実測した Ch.9 の現況 (レーン a)
+
+**⚠ survey の「Ch.9 is essentially unformalized (31 件)」は全面 stale。**
+番号 grep (`(Thm|Lem|Cor) 9.NN` を `Ch09_MoreSubnormality/**` + `GroupTheory/**` に対して)
+で **9.1–9.27 は全て repo にヒット**。§9A (F\*/component/layer)・§9B (automorphism tower)・
+§9C (Thompson–Wielandt) は 15 leaf で実装済:
+
+```
+Quasisimple / Components / Semisimple / Layer / LayerRestriction / GeneralizedFitting /
+SubnormalSocle / NilpotentResidual / PResidual / Schenkman / InnerAutomorphisms /
+AutTower / AutTowerBounds / OrderBound / ThompsonWielandt
+```
+
+⇒ **Ch.9 の残作業は §9D のみ** (9.28 Bartels / 9.29 / 9.30 / 9.31)。
+
+### 原文の落とし穴 (PDF で確認済)
+
+- `.mmd` の §9D は **p.289 が `[MISSING_PAGE_FAIL:302]` で欠落**している。ここに
+  **subnormal closure `X^{••G}` と strong conjugacy の定義**があるので PDF 直読が必須
+  (PDF page 302 = 書籍 p.289; offset −13)。
+  - `X^{••G}` = `X` を含む**最小の subnormal 部分群** (subnormal の共通部分が subnormal
+    なので存在)。`X^{••G} ⊆ X^G` かつ `X ◁◁ G ↔ X = X^{••G}`。
+  - `X, Y ⊆ G` が **strongly conjugate** ⇔ `⟨X, Y⟩` の中で共役 (⇔ 両方を含む任意の部分群
+    の中で共役)。同値関係ではない (反射的・対称的だが推移的でない)。
+  - `X^{(G)}` = strong conjugates が生成する部分群。**9.28 (Bartels) = `X^{(G)} = X^{••G}`**。
+- **9.29(a) と 9.31 の仮定は `⊲⊲` (subnormal)** — `.mmd` は `⊲⊲` を `⊲` に潰すので
+  normal に見える。PDF p.290/291 で確認済 ([[mmd-collapses-subnormal-symbol]] の実例が再発)。
+
+### 実装済 (2026-07-19)
+
+**Lem 9.31** = `Ch09_MoreSubnormality/SylowSubnormal.lean` (AxiomsCheck 登録済):
+
+| 宣言 | 内容 |
+|---|---|
+| `not_dvd_relIndex_inf_of_normal` | normal 段: `N ⊴ G`, `P ∈ Syl_p(G)` ⇒ `¬ p ∣ (P ⊓ N).relIndex N` |
+| `not_dvd_relIndex_inf_of_isSubnormal` | **Lem 9.31 本体** (`S ◁◁ G` 版) |
+| `sylowInfOfIsSubnormal` (+ `_coe`) | 束ねた `Sylow p ↥S` 形 |
+
+設計メモ 2 点:
+1. 「`P ∩ S` が `S` の Sylow」の内容は**指数が `p` と互いに素**の一点なので、主張を
+   `¬ p ∣ (↑P ⊓ S).relIndex S` で書き、束ねた形は `IsPGroup.toSylow` で作った
+   (`IsPGroup` 部分は `P.isPGroup'.of_injective` + `comap_subtype` で自明)。
+2. 書籍は `|G|` の帰納だが、**mathlib の `Subgroup.IsSubnormal` は inductive predicate**
+   (`top` / `step H K (H ≤ K) (K subnormal) ((H.subgroupOf K).Normal)`) なので、
+   書籍の「`S ⊆ M ◁ G` をとって降りる」が**そのまま constructor** になる。
+   `induction hS with | top | step` で ambient 型を変える強帰納法が不要になった。
+   normal 段は第二同型定理の指数版を mathlib の `relIndex` 算術
+   (`relIndex_mul_relIndex` 2 本 + `relIndex_sup_left` + `inf_relIndex_left` を約分)
+   で組む。
+
+### 次の frontier (§9D 残り)
+
+1. **定義**: `Subgroup.IsStronglyConjugate` / `strongClosure` (`X^{(G)}`) /
+   `subnormalClosure` (`X^{••G}`)。後者の存在は「subnormal の共通部分が subnormal」
+   — mathlib は binary `IsSubnormal.inf` のみなので、有限性を使った `sInf` 版が要る。
+2. **9.29** (a)-(d) — (a) は `IsSubnormal.exists_normal_and_le_and_lt_top_of_ne`
+   (mathlib) がそのまま書籍の帰納段になる。
+3. **9.30** (商との両立) — `⟨X, Y⟩` の位数最小性を使う非自明な向きがある。
+4. **9.28 Bartels** (L) — 6 step の二重最小反例論法。上記 3 つが前提。
