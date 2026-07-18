@@ -145,6 +145,7 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.BG.AppE_FurtherResults
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
 import OddOrder.BG.AppA_PStability
@@ -9172,6 +9173,19 @@ not an additional sorry in this theorem. -/
 -- Sorry-free + axiom-clean.  This is the last engine needed for the faithful `(e)` trichotomy.
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.typeP1_kappaHall_dvd_sub_one_or_singer_of_not_fittingIsTI
+
+-- BG **Theorem 15.7(e)** itself (issue 3022), in the shape of Coq `nonTI_Fitting_structure`
+-- :947-950: for any `g ∉ M` with `X = F(M) ∩ F(M)ᵍ ≠ 1`, either (e1) `M ∈ ℳ_F` with `M_F` abelian
+-- of rank 2, or — with the shared conjuncts `p = |X|` prime, `O_p(M_F)` non-abelian, `O_{p'}(M_F)`
+-- cyclic — the inner disjunction (e2) `exp(M/M_F) ∣ q-1` for every `q ∈ π(M_F)`, or (e3)
+-- `|O_p(M_F)| = p³` with `M ∈ ℳ_P₁` and `[M : M_F] ∣ p+1`.
+--
+-- ⚠ Non-vacuity: the second branch asserts `¬ IsMulCommutative (O_p(M_F))`, **not**
+-- `¬ IsMulCommutative M_F`, so it does not merely complement (e1) — the old bundled `(e)` in
+-- `fitting_not_ti_cases` had collapsed to `A ∨ ¬A`, which is precisely what issue 3022 fixed.
+-- `p` is bound to `|X|` (not existentially decoupled from it), which is what the fixed-`g`
+-- hypotheses `hgM`/`hXne` make expressible.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.fitting_not_ti_structure_e
 
 -- **W1 §16 disjunct 3, `r(O_p(M_F)) ≤ 2` assembly (lane-f, issue 8015)** — two bricks toward the
 -- type-V Singer case's `|O_p(M_F)| = p³`, both axiom-clean:

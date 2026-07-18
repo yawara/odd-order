@@ -260,6 +260,7 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TamelyImbedded
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
