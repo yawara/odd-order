@@ -85,6 +85,30 @@ theorem map_layer_eq_layer_of_fitting_eq_bot [Finite G] {H : Subgroup G}
 
 end
 
+section /- 9C: `F(G)=1` なら `E(G) ≠ 1` -/
+
+/-- `F(G) = 1` かつ `G` が非自明ならば `E(G) ≠ 1`.
+
+`F(G)=1` より `F*(G) = E(G)`. もし `E(G)=1` なら `F*(G)=1` で, Thm 9.8
+(`C_G(F*(G)) ≤ F*(G)`) が `G = C_G(1) ≤ 1` を与え `G` が自明になってしまう.
+Thm 9.24 の Case 1 で「`F(H)=1` ⇒ `E(H)>1`」として使う. -/
+theorem layer_ne_bot_of_fitting_eq_bot [Finite G] [Nontrivial G]
+    (hF : Ch01.fitting G = ⊥) : layer G ≠ ⊥ := by
+  intro hL
+  have hgf : genFitting G = ⊥ := by rw [genFitting, hF, hL, bot_sup_eq]
+  have h := centralizer_genFitting_le_genFitting (G := G)
+  rw [hgf] at h
+  have htop : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
+    rw [Subgroup.centralizer_eq_top_iff_subset]
+    intro x hx
+    rw [SetLike.mem_coe, Subgroup.mem_bot] at hx
+    subst hx
+    exact Subgroup.one_mem _
+  rw [htop] at h
+  exact top_ne_bot (le_bot_iff.mp h)
+
+end
+
 section /- 9C: ambient 値の layer `E(H)` -/
 
 /-- **ambient 値の layer** `E(H)`: 部分群 `H ≤ G` に対し `Subgroup G` の元として `E(H)` を

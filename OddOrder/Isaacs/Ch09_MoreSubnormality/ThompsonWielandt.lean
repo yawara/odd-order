@@ -374,6 +374,25 @@ theorem layerInG_le_normalizer_nilpotentResidual_of_subnormal_two [Finite G]
     (layer_le_normalizer_nilpotentResidual (G := ↥H) hsub)
   rwa [map_subtype_nilpotentResidual_subgroupOf hSH] at hlift
 
+/-- `F(H) = 1` のとき `H` に normal な非自明部分群 `U ≤ H` は nilpotent でない,
+すなわち `U^∞ ≠ 1`.
+
+(`U` が nilpotent なら `U ◁ H` より `U ≤ F(H) = 1` で矛盾.) -/
+theorem nilpotentResidual_ne_bot_of_fitting_eq_bot [Finite G] {H U : Subgroup G}
+    (hF : Ch01.fitting ↥H = ⊥) (hUH : U ≤ H)
+    (hUn : H ≤ Subgroup.normalizer (U : Set G)) (hU : U ≠ ⊥) :
+    nilpotentResidual U ≠ ⊥ := by
+  intro hres
+  haveI : (U.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hUH).mpr hUn
+  haveI : Group.IsNilpotent ↥U := nilpotentResidual_eq_bot_iff.mp hres
+  have hnil : Group.IsNilpotent ↥(U.subgroupOf H) :=
+    Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hUH).symm
+  have hle : U.subgroupOf H ≤ Ch01.fitting ↥H :=
+    (Ch02.le_fitting_iff_isNilpotent_and_isSubnormal _).mpr
+      ⟨hnil, ‹(U.subgroupOf H).Normal›.isSubnormal⟩
+  rw [hF, le_bot_iff, Subgroup.subgroupOf_eq_bot, disjoint_iff, inf_eq_left.mpr hUH] at hle
+  exact hU hle
+
 end
 
 end OddOrder.Isaacs.Ch09
