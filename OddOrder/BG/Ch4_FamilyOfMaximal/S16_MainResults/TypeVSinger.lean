@@ -62,7 +62,7 @@ theorem exists_prime_cyclic_opiCore_compl_of_isTypeV [Finite G]
     ∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥(S15.MF M)).primeFactors ∧
       IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (S15.MF M)) := by
   have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
-  obtain ⟨g, p, X₁, -, hp, -, hX₁card, hX₁Mσ, -, hCGnotM, -⟩ :=
+  obtain ⟨g, p, X₁, -, hp, -, hX₁card, hX₁Mσ, -, hCGnotM, -, -⟩ :=
     S15.exists_inf_conj_fitting_orderP_witness hG hM hnotTI
   -- `X₁ ≤ M_σ = M_F` (`mf_eq_msigma_of_not_fittingIsTI`).
   have hX₁MF : X₁ ≤ S15.MF M := by
@@ -256,54 +256,6 @@ theorem card_center_opiCore_eq_prime_of_omega1Center_le_kstar [Finite G]
   rw [hcent_eq] at hmapcard
   rw [← hmapcard, hZcard]
 
-/-- **`O_p(M_F)` is a Sylow `p`-subgroup of `G`** (Coq `sylP_G`): for a maximal `M` with
-`M_F = M_σ` and `p ∈ σ(M)`, the `p`-core `P = O_p(M_F)` is a Sylow `p`-subgroup of `G`.
-
-`P` is a `{p}`-Hall (hence Sylow) subgroup of the nilpotent `M_F = M_σ`
-(`oPiCore_isHall_of_isNilpotent`: `p ∤ [M_F : P]`), so `|P| = p^{v_p(|M_F|)}` is the full `p`-part
-of
-`|M_σ|`; and since `M_σ` is the `σ`-Hall of `G` with `p ∈ σ` (`Msigma_isHall`: `p ∤ [G : M_σ]`),
-that
-`p`-part equals `v_p(|G|)`.  Thus `|P| = p^{v_p(|G|)}`, so `Sylow.ofCard` exhibits `P` as a Sylow
-`p`-subgroup of `G`.  This is the `mFT_rank2_Sylow_cprod` Sylow input for the type-V Singer case
-(`card_opiCore_eq_prime_cube_singer`). -/
-theorem exists_sylow_eq_opiCore_of_mf_eq_msigma [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) {p : ℕ} (hp : p.Prime)
-    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) :
-    ∃ S : Sylow p G, (S : Subgroup G) = opiCoreInG ({p} : Set ℕ) (S15.MF M) := by
-  classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
-  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
-  -- `P` is a `p`-group: `|P| = p^a`.
-  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (S15.MF M)
-  obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp hPpg
-  suffices hcard : Nat.card ↥P = p ^ (Nat.card G).factorization p by
-    exact ⟨Sylow.ofCard P hcard, Sylow.coe_ofCard P hcard⟩
-  -- `v_p(|M_F|) = a`: `P = O_p(M_F)` is a `{p}`-Hall of `M_F` (`p ∤ [M_F : P]`).
-  have hP'hall : Ch03.IsHallSubgroup ({p} : Set ℕ) (Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)) :=
-    OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent _
-  have hPcard : Nat.card ↥P = Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)) :=
-    Subgroup.card_map_of_injective (S15.MF M).subtype_injective
-  have hpidxP : ¬ p ∣ (Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)).index := fun h =>
-    hP'hall.2 p (Nat.mem_primeFactors.mpr ⟨hp, h, Subgroup.index_ne_zero_of_finite⟩)
-      (Set.mem_singleton_iff.mpr rfl)
-  have hMFfact : (Nat.card ↥(S15.MF M)).factorization p = a := by
-    rw [← Subgroup.card_mul_index (Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)),
-      Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite, Finsupp.add_apply,
-      Nat.factorization_eq_zero_of_not_dvd hpidxP, add_zero, ← hPcard, ha,
-      Nat.factorization_pow_self hp]
-  -- `v_p(|G|) = v_p(|M_σ|)`: `M_σ` is the `σ`-Hall of `G`, `p ∈ σ`, so `p ∤ [G : M_σ]`.
-  have hσHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
-  have hpidxσ : ¬ p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index := fun h =>
-    hσHall.2 p (Nat.mem_primeFactors.mpr ⟨hp, h, Subgroup.index_ne_zero_of_finite⟩) hpσ
-  have hGa : (Nat.card G).factorization p = a := by
-    rw [← Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma M),
-      Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite, Finsupp.add_apply,
-      Nat.factorization_eq_zero_of_not_dvd hpidxσ, add_zero, ← hmf, hMFfact]
-  rw [ha, hGa]
-
 /-- **`|O_p(M_F)| = p³` in the type-V Singer case** (BG Theorem 15.7(e), Coq `dimP`/`oP`): the order
 of `P = O_p(M_F)` is `p³`.  The inputs `r(P) ≤ 2` (`hrPle2`, the `rPle2` step, discharged via the
 faithfulness brick `kappaHall_inf_centralizer_opiCore_eq_bot` + `pRank_opiCore_le_two_of_kappaHall`)
@@ -451,7 +403,7 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
     -- (Coq `oZ`, `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`).
     haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
     have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
-    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, hrank3⟩ :=
+    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, hrank3, -⟩ :=
       S15.exists_inf_conj_fitting_orderP_witness hG hM hTI
     haveI : Fact p.Prime := ⟨hp⟩
     have hX₁MF : X₁ ≤ S15.MF M := by

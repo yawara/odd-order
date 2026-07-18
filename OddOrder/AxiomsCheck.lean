@@ -5712,6 +5712,33 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_trichotomy
+-- BG **Theorem 15.7(e)**, *"`X` is a `p`-group"* (`S15_MF/WitnessPGroup`, issue 3022, step 1 of the
+-- `p = |X|` chain).  BG asserts this without proof; the argument is that every prime `d ∣ |X|` has
+-- `O_d(M_F)` non-cyclic (BG's opening step `not_isCyclic_opiCore_mf_of_orderP_le_conj`, applicable
+-- at `d` because an order-`d` subgroup of `X` lies in both `M_F` and `M_F^g` — this needs the
+-- 2026-07-19 `X₁ ≤ F(M) ∩ F(M)^g` strengthening of the witness), while `O_{p'}(M_F)` *is* cyclic for
+-- non-abelian `M_F`, and `O_d(M_F) ≤ O_{p'}(M_F)` when `d ≠ p`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S15.inf_conj_fitting_isPGroup_of_not_isMulCommutative
+-- BG **Theorem 15.7(e)**, the rank-two `B = X₁ × Ω₁(Z(O_p(M_F)))` (step 2 of the `p = |X|` chain).
+-- `|Z₀| = p`, `X₁ ⊄ Z₀` and `Z₀ = Ω₁(Z(O_p(M_F)))` come from the per-prime witness at `q := p`
+-- (whose `q = p` branch *is* BG's rank argument); this lemma assembles `B` on top: `X₁ ∩ Z₀ = 1`,
+-- `X₁` centralizes `Z₀` (as `Z₀ ≤ Z(P)`, `X₁ ≤ P`), so `B` is elementary abelian of order `p²`
+-- inside the abelian `C₁ = C_{M_F}(X₁)`.  ⚠ The **maximality** half of BG's `B ∈ ℰ*(P)` is not
+-- included — `IsMaximalElementaryAbelian` is relative to the ambient `G` while BG asserts it in `P`
+-- (issue 3022).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.exists_rankTwo_elemAbelian_of_witness
+-- BG **Theorem 15.7(e)**, maximality of `B = X₁ × Ω₁(Z(O_p(M_F)))` (step 3 of the `p = |X|` chain;
+-- Coq `max_rB`/`p2maxElemB`).  BG's `ℰ*(P)` means *maximal in `G`, contained in `P`* (Coq states
+-- `B \in 'E_p^2(G) :&: 'E*_p(G)`), matching `IsMaximalElementaryAbelian`'s ambient-`G` quantifier.
+-- The rank bound `rank (M_F ⊓ C_G(X₁)) < 3` only constrains subgroups inside `P`, so an arbitrary
+-- elementary abelian `A ⊇ B` is first pushed into `P`: `P = O_p(M_F)` is Sylow in `G`
+-- (`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq `sylP_G`), Sylow conjugacy gives `A^a ≤ P`, and
+-- σ-Hall tameness (BG Cor 15.3(b), `mf_hall_centralizer_control`) replaces `a` by `c = n⁻¹a` which
+-- fixes the generator of `X₁`.  Then `A^c ≤ M_F ⊓ C_G(X₁)` gives `|A| ≤ p² = |B|`, so `A = B`.
+-- Sorry-free + axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S15.isMaximalElementaryAbelian_sup_omega1Center_of_witness
 -- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
 -- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
 -- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive
@@ -7397,7 +7424,7 @@ This is the Sylow input to `mFT_rank2_Sylow_cprod` (`card_opiCore_eq_prime_cube_
 Axiom-clean. -/
 
 #assert_only_allowed_axioms
-  OddOrder.BG.Ch4.S16.exists_sylow_eq_opiCore_of_mf_eq_msigma
+  OddOrder.BG.Ch4.S15.exists_sylow_eq_opiCore_of_mf_eq_msigma
 
 /-! **Type-V disjunct-3 centre order** (`S16_MainResults`,
 `card_center_opiCore_eq_prime_of_omega1Center_le_kstar`, issue 8015): `|Z(O_p(M_F))| = p` (Coq

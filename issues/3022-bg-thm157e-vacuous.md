@@ -123,6 +123,48 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       [[verify-port-state-by-number-not-coq-name]])
       よって残作業は §15 側の組み立て (`B` の構成 + `B ∈ ℰ²(P) ∩ ℰ*(P)` + 10.13 適用) のみ。
 
+      **手順 2 完了 (2026-07-19)**: `exists_rankTwo_elemAbelian_of_witness` (`WitnessPGroup`)。
+      当初は `q = p` 分岐を丸ごと top-level へ抽出する計画だったが、**その必要は無かった** —
+      `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` の結論が既に `q := p` で
+      `|Z₀| = p` / `¬ X₁ ≤ Z₀` / `Z₀ = Ω₁(Z(O_p(M_F)))` を与えるので、それを **cite して**
+      `B` を組み立てるだけで済む (`X₁ ⊓ Z₀ = ⊥`、`X₁ ≤ C_G(Z₀)`、`B` elementary abelian、
+      `|B| = p²`、`B ≤ C₁`)。大きな refactor を回避できた。
+
+      **⚠ 手順 3 の障害と、その解決 (2026-07-19)**: BG は `B ∈ ℰ*(P)` と書き、素朴には
+      「`P` の中で極大」と読める。一方 Lean の `IsMaximalElementaryAbelian p A`
+      (`GroupTheory/NarrowPGroup.lean:104`) は `∀ F : Subgroup R` と **ambient 型全体**で量化し、
+      Lemma 10.13 は `A : Subgroup G` を取るので ambient は `G`。当初これを不整合と見て
+      `S10_LocalLemmas.lean:441` の手口の転用を考えたが、**同所は「G で極大 ⟹ 部分群 S で極大」の
+      逆向き**で使えない (P→G 方向は一般に偽)。
+
+      **Coq 精読で決着**: `coq/theories/BGsection15.v:1119` は
+      `p2maxElemB : [group of B] \in 'E_p^2(G) :&: 'E*_p(G)` — **Coq も ambient は `G`**。
+      つまり BG の `ℰ*(P)` は「`P` に含まれる `G`-極大」の意で、repo の
+      `elemAbelianOfRankIn p n H X := X ∈ elemAbelianOfRank G p n ∧ X ≤ H` と同じ読み。
+      **不整合ではなく、私の記法の誤読だった。**
+
+      証明の核は同 file の `max_rB` (:1100-1113) で、**`A` を共役で `P` に押し込んでから rank 評価**:
+
+      1. `P = O_p(M_F)` は **`G` の Sylow p-部分群** (`M_σ` が `G` の σ-Hall
+         = `Msigma_isHall` (`S10_HallStructure:584`)、`p ∈ σ(M)`、`M_σ = M_F` nilpotent ゆえ
+         `O_p(M_σ)` がその Sylow p)。
+      2. `A` は p-群なので、ある `a` で `A^a ≤ P` (mathlib `IsPGroup.exists_le_sylow` + Sylow 共役)。
+      3. `a` は `X₁` を正規化するとは限らないので **σ-Hall tameness = BG Cor 15.3(b)** で補正:
+         `x₁ ∈ P` と `x₁^a ∈ P` が `G`-共役なら `∃ b ∈ N_G(P)`, `x₁^a = x₁^b`。
+         **Lean に在る** — `mf_hall_centralizer_control` (`TIFailure.lean:1311`) の第 2 conjunct が
+         まさにこれ (`∀ x ∈ H, ∀ y ∈ H, G-共役 → ∃ n ∈ N_G(H), …`)。`H := P` を `M_σ` の
+         `piSet`-Hall 部分群として渡す。
+      4. `a * b⁻¹` は `X₁` を正規化し `A^(ab⁻¹) ≤ P^(b⁻¹) = P`。よって
+         `rank A = rank A^(ab⁻¹) ≤ rank (M_F ⊓ C_G(X₁)) < 3` (既存 `hrank3`)。
+
+      `|B| = p²` と合わせ、`B ⊆ A` elementary abelian なら `|A| ≤ p²` ゆえ `A = B`。
+      **入力 4 点すべて repo に実在を確認済み** — 未形式化の上流は無く、組み立てのみ。
+
+      **手順 4 (最終段) も Coq で確認済** (`defX`, :1128-1137): `X ≤ C_P(B)` を出し
+      (`X ≤ P` は `inf_conj_fitting_isPGroup_of_not_isMulCommutative` + `X ≤ M_F`;
+      `C_P(X₁) = C_P(B)` は `P` が `Z₀ ≤ Z(P)` を中心化するから)、10.13(b) で
+      `C_P(B) = X₁ × Z` (`Z` cyclic)、`X` cyclic かつ `X₁ ⊓ Z = ⊥` から `X = X₁`。
+
       **⚠ さらに調査 (2026-07-19): `B` の構成も既に書かれている。**
       `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` (`PisetBetaDisjoint.lean:1101`) の
       `q = p` 分岐 (`:1118-1210`) が BG の当該段落をほぼそのまま持っている:
@@ -141,14 +183,27 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
          (`Z'` cyclic)。
       4. `X ≤ P` (BG「X is a p-group」— 要根拠確認) と `X ≤ C_G(B)` から `X ≤ X₁ ⊔ Z'`、
          `X` cyclic と合わせて `X = X₁`、ゆえに `p = |X|`。
-      **未確認の 1 点** = 手順 4 の「`X` は p-群」。BG は「`O_{p'}(H)` は `C_H(X₁)` 可換ゆえ可換。
-      Hence `P = O_p(H)` is not abelian and `X` is a `p`-group」と一文で済ませており、
-      この含意の根拠が原文では省略されている。ここが唯一の行間 — 詰まったら
-      [[feedback-ask-chatgpt-for-elided-gaps]] (Coq `BGsection15.v` 精読 → ChatGPT 再構成)。
+      ~~**未確認の 1 点** = 手順 4 の「`X` は p-群」~~ → **解決済 (2026-07-19)**。
+      BG は「`O_{p'}(H)` は `C_H(X₁)` 可換ゆえ可換。Hence `P = O_p(H)` is not abelian and `X` is
+      a `p`-group」と一文で済ませ根拠を書いていないが、既存の 2 事実の衝突で出る:
+      - **任意の**素数 `d ∣ |X|` について `O_d(M_F)` は非 cyclic。これは BG 冒頭の段
+        (「`O_p(M)` が cyclic なら `X₁` が `M` と `M^g` の両方で正規になり不可能」) =
+        `not_isCyclic_opiCore_mf_of_orderP_le_conj`。`X` の位数 `d` の部分群が `M_F` と `M_F^g`
+        の**両方**に入る (`inf_conj_fitting_le_Msigma` + 共役版 + `M_F = M_σ`) ので `d` で使える。
+      - 一方 `M_F` 非可換なら `O_{p'}(M_F)` は cyclic (`typeF_nonabelian_cyclic_opiCore_compl`)
+        で、`d ≠ p` なら `O_d(M_F) ≤ O_{p'}(M_F)`。
+      ⟹ `p` 以外の素数は `|X|` を割れない。**ChatGPT 相談は不要だった。**
+      形式化: `S15_MF/WitnessPGroup.lean`
+      `inf_conj_fitting_isPGroup_of_not_isMulCommutative` (sorry-free, axiom-clean)。
 
-      **付随して必要**: `exists_inf_conj_fitting_orderP_witness` の結論に
-      `X₁ ≤ F(M) ⊓ conj g • F(M)` を追加する (構成上は真だが公開されておらず、現状 `X₁` と
-      `X` が statement 上結びついていない)。これが無いと手順 4 が書けない。
+      **付随して必要** → **完了 (2026-07-19)**: `exists_inf_conj_fitting_orderP_witness` の結論に
+      `X₁ ≤ F(M) ⊓ conj g • F(M)` を追加済 (構成上真だが未公開だった)。消費側 4 箇所も更新。
+
+      **新 leaf の layering**: `mf_eq_msigma_of_not_fittingIsTI` が `OpicoreCentralizer` に在るため、
+      `WitnessPGroup` は `PisetBetaDisjoint` でなく **`OpicoreCentralizer` を import** する
+      (PisetBetaDisjoint → OpicoreCentralizer → WitnessPGroup)。⟹ **`p = |X|` 完成後の
+      「精密化された (e)」は `OpicoreCentralizer` でなく `WitnessPGroup` 側 (かその下流) に置く**
+      (現 `fitting_not_ti_trichotomy` は OpicoreCentralizer に在り WitnessPGroup を cite できない)。
 - [ ] **(e2)/(e3) の型別分離** — **未了**。type `F` 側の exponent 条件
       (`exp(M/H) ∣ q − 1`) は `typeF_exponent_dvd_sub_one_of_invariant_card` として**存在し**、
       `isTypeI_of_isTypeF` が使っている (trichotomy へは未配線)。type `P₁` 側の
