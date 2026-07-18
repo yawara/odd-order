@@ -29,6 +29,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
 
 /-!
