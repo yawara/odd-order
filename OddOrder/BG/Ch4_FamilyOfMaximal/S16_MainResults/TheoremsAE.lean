@@ -742,6 +742,224 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       exact hbκne (Subgroup.mem_bot.mp
         (kappaHall_inf_Kstar_eq_bot hKM hK hKstar ▸ Subgroup.mem_inf.mpr ⟨hbκK, hbκK'⟩))
 
+/-- **`\widehat{M_σ}` is closed under `M`-conjugation**: for `m ∈ M` and `a ∈ \widehat{M_σ}`,
+also `m a m⁻¹ ∈ \widehat{M_σ}`.  Membership `\widehat{M_σ} = {a ∈ M | M_σ ⊓ C_G(a) ≠ 1}` is
+preserved because `M_σ ◁ M` (so `m·(M_σ ⊓ C_G(a))·m⁻¹ = M_σ ⊓ C_G(m a m⁻¹)`): a nonidentity
+witness `z ∈ M_σ ⊓ C_G(a)` conjugates to a nonidentity `m z m⁻¹ ∈ M_σ ⊓ C_G(m a m⁻¹)`.  The
+`\widehat{M_σ}` half of the `M`-conjugation invariance of `A_0(M) − A(M)` for BG Theorem C(9). -/
+theorem hatMsigma_conj_mem {M : Subgroup G} {m a : G} (hm : m ∈ M) (ha : a ∈ hatMsigma M) :
+    m * a * m⁻¹ ∈ hatMsigma M := by
+  obtain ⟨haM, haC⟩ := ha
+  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hmN : m ∈ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
+    ((Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le M)).mp hMσN) hm
+  refine ⟨M.mul_mem (M.mul_mem hm haM) (M.inv_mem hm), ?_⟩
+  intro hbot
+  obtain ⟨z, hzmem, hz1⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left haC
+  obtain ⟨hzMσ, hzC⟩ := Subgroup.mem_inf.mp hzmem
+  have hzMσ' : m * z * m⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma M :=
+    (Subgroup.mem_normalizer_iff.mp hmN z).mp hzMσ
+  have hzC' : m * z * m⁻¹ ∈ Subgroup.centralizer ({m * a * m⁻¹} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hcomm : z * a = a * z := Subgroup.mem_centralizer_singleton_iff.mp hzC
+    calc (m * z * m⁻¹) * (m * a * m⁻¹) = m * (z * a) * m⁻¹ := by group
+      _ = m * (a * z) * m⁻¹ := by rw [hcomm]
+      _ = (m * a * m⁻¹) * (m * z * m⁻¹) := by group
+  have hmem : m * z * m⁻¹ ∈
+      OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({m * a * m⁻¹} : Set G) :=
+    Subgroup.mem_inf.mpr ⟨hzMσ', hzC'⟩
+  rw [hbot, Subgroup.mem_bot] at hmem
+  refine hz1 ?_
+  have hcong := congrArg (fun g => m⁻¹ * g * m) hmem
+  simpa [mul_assoc] using hcong
+
+/-- **BG Theorem C(9), the `⊇` half `Ẑ ⊆ A_0(M) − A(M)`** (mmd L4400): every element `t ∈ Ẑ` of the
+exceptional set lies in `A_0(M) − A(M)`.  Together with the `M`-conjugation closure of
+`A_0(M) − A(M)` this gives `𝒞_M(Ẑ) ⊆ A_0(M) − A(M)` (`conj_zTilde_subset_a0_minus_a`), the reverse
+of `a0_minus_a_subset_conj_zTilde`.
+
+Write `t = k·k*` with `k ∈ K`, `k* ∈ K*` (the internal direct product `Z = K × K*`), both
+nonidentity because `t ∉ K ∪ K*`.  Then:
+
+* `t ∈ \widehat{M_σ}`: `t ∈ M` (`K, K* ≤ M`) and `k* ∈ K* ⊆ M_σ` centralizes `t = k·k*` (it
+  commutes with `k ∈ K` since `K* = C_{M_σ}(K)`, and with itself), so `1 ≠ k* ∈ M_σ ⊓ C_G(t)`.
+* `t ∉ 𝒞_G(K^#)`: `k ∈ K` is a `κ`-element and `k* ∈ M_σ` a `σ`-element with `σ ∩ κ = ∅`, so
+  their orders are coprime and `orderOf t = orderOf k · orderOf k*`; a prime `p ∣ orderOf k* ≠ 1`
+  lies in `σ ⊆ κᶜ` and divides `orderOf t`.  But a `G`-conjugate of `y ∈ K^#` is a `κ`-element
+  (equal order), so `orderOf t` would be a `κ`-number — contradiction.
+* `t ∉ U M_σ` (`= M'`): else `k = t·k*⁻¹ ∈ K ⊓ M' = 1` (Theorem 14.7's `K ∩ M' = 1`),
+  contradicting `k ≠ 1`. -/
+theorem zTilde_subset_a0_minus_a [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    S14.zTilde K Kstar ⊆ A0Set M K \ ASet M U := by
+  classical
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
+  have hKstarC : Kstar ≤ Subgroup.centralizer (K : Set G) := by rw [hKstar]; exact inf_le_right
+  have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  have hM'eq : derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+    (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
+  -- `K ⊓ M' = ⊥` (`M' = U M_σ` complements the Hall `κ`-subgroup `K`, Theorem 14.7).
+  have hKM'bot : K ⊓ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) = ⊥ := by
+    have hcompl := (typeP_duality hG hM hP hKM hK hKstar).1
+    have hdisj : Disjoint ((derivedInG M).subgroupOf M) (K.subgroupOf M) := hcompl.disjoint
+    rw [← hM'eq, eq_bot_iff]
+    intro yk hyk
+    rw [Subgroup.mem_inf] at hyk
+    have hmemMinf : (⟨yk, hKM hyk.1⟩ : ↥M) ∈ (K.subgroupOf M) ⊓ ((derivedInG M).subgroupOf M) :=
+      Subgroup.mem_inf.mpr ⟨Subgroup.mem_subgroupOf.mpr hyk.1, Subgroup.mem_subgroupOf.mpr hyk.2⟩
+    rw [disjoint_iff.mp hdisj.symm, Subgroup.mem_bot] at hmemMinf
+    rw [Subgroup.mem_bot]; exact Subtype.ext_iff.mp hmemMinf
+  -- every element of the `κ`-Hall `K` is a `κ`-element.
+  have hKpi : ∀ x : G, x ∈ K → OddOrder.GroupTheory.IsPiElement (S14.kappa M) x := by
+    intro x hx p hp
+    have hcardK : Nat.card ↥(K.subgroupOf M) = Nat.card ↥K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+    refine hK.1 p ?_
+    rw [hcardK]
+    have hord : orderOf x ∣ Nat.card ↥K := by
+      rw [← Subgroup.orderOf_mk x hx]; exact orderOf_dvd_natCard _
+    exact Nat.primeFactors_mono hord Nat.card_pos.ne' hp
+  -- ## Main argument.
+  intro t ht
+  rw [S14.zTilde, Set.mem_sdiff, Set.mem_union, not_or] at ht
+  obtain ⟨htKK, htnK, htnKstar⟩ := ht
+  -- decompose `t = k · k*` (`K ◁ K ⊔ K*` since `K*` centralizes `K`).
+  have hKnorm : (K ⊔ Kstar : Subgroup G) ≤ Subgroup.normalizer (K : Set G) :=
+    sup_le Subgroup.le_normalizer (hKstarC.trans (Subgroup.centralizer_le_normalizer _))
+  haveI : (K.subgroupOf (K ⊔ Kstar)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hKnorm
+  have hsuptop : (K.subgroupOf (K ⊔ Kstar)) ⊔ (Kstar.subgroupOf (K ⊔ Kstar)) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
+  obtain ⟨ka, hka, ksb, hksb, hkab⟩ := Subgroup.mem_sup_of_normal_left.mp
+    (hsuptop ▸ Subgroup.mem_top (⟨t, SetLike.mem_coe.mp htKK⟩ : ↥(K ⊔ Kstar)))
+  set k : G := (ka : G) with hkdef
+  set kstar : G := (ksb : G) with hksdef
+  have hkK : k ∈ K := Subgroup.mem_subgroupOf.mp hka
+  have hkstarKstar : kstar ∈ Kstar := Subgroup.mem_subgroupOf.mp hksb
+  have hkkstar : k * kstar = t := by
+    have := congrArg Subtype.val hkab; simpa using this
+  have hkstarM : kstar ∈ M := (hKstarMσ.trans hMσM) hkstarKstar
+  have hkstarMσ : kstar ∈ OddOrder.BG.Ch3.S10.Msigma M := hKstarMσ hkstarKstar
+  have hcomm : Commute k kstar :=
+    Subgroup.mem_centralizer_iff.mp (hKstarC hkstarKstar) k (SetLike.mem_coe.mpr hkK)
+  have hkne : k ≠ 1 := fun h =>
+    htnKstar (SetLike.mem_coe.mpr (by rw [← hkkstar, h, one_mul]; exact hkstarKstar))
+  have hkstarne : kstar ≠ 1 := fun h =>
+    htnK (SetLike.mem_coe.mpr (by rw [← hkkstar, h, mul_one]; exact hkK))
+  -- **(C1)** `t ∈ \widehat{M_σ}`, witness `k* ∈ M_σ ⊓ C_G(t)`.
+  have htHat : t ∈ hatMsigma M := by
+    refine ⟨by rw [← hkkstar]; exact M.mul_mem (hKM hkK) hkstarM, ?_⟩
+    intro hbot
+    have hkstarCt : kstar ∈ Subgroup.centralizer ({t} : Set G) := by
+      rw [Subgroup.mem_centralizer_singleton_iff, ← hkkstar]
+      calc kstar * (k * kstar) = (kstar * k) * kstar := by group
+        _ = (k * kstar) * kstar := by rw [hcomm.eq.symm]
+    exact hkstarne
+      (Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_inf.mpr ⟨hkstarMσ, hkstarCt⟩))
+  -- **(C2)** `t ∉ 𝒞_G(K^#)`.
+  have htnc : t ∉ conjClassSet (sharpSubgroup K) := by
+    rintro ⟨y, hy, g, hgy⟩
+    rw [sharpSubgroup, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hy
+    obtain ⟨hyK, hy1⟩ := hy
+    have hordty : orderOf t = orderOf y := by
+      rw [← hgy]
+      have h := MulEquiv.orderOf_eq (MulAut.conj g) y
+      rwa [MulAut.conj_apply] at h
+    have htκ : OddOrder.GroupTheory.IsPiElement (S14.kappa M) t :=
+      fun p hp => hKpi y hyK p (hordty ▸ hp)
+    have hkstarσ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) kstar :=
+      S14.isPiElement_sigma_of_mem_Msigma hkstarMσ
+    have hkκ : OddOrder.GroupTheory.IsPiElement (S14.kappa M) k := hKpi k hkK
+    have hcop : Nat.Coprime (orderOf k) (orderOf kstar) := by
+      rw [Nat.coprime_iff_gcd_eq_one]
+      by_contra hne
+      obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+      rw [Nat.dvd_gcd_iff] at hpdvd
+      have hpk : p ∈ (orderOf k).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.1, (orderOf_pos k).ne'⟩
+      have hpks : p ∈ (orderOf kstar).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.2, (orderOf_pos kstar).ne'⟩
+      exact (S14.kappa_subset_sigmaCompl (hkκ p hpk)) (hkstarσ p hpks)
+    have hordt : orderOf t = orderOf k * orderOf kstar := by
+      rw [← hkkstar]; exact hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop
+    have h1lt : 1 < orderOf kstar := by
+      have h0 := orderOf_pos kstar
+      have h1 : orderOf kstar ≠ 1 := fun h => hkstarne (orderOf_eq_one_iff.mp h)
+      omega
+    obtain ⟨p, hp⟩ := Nat.nonempty_primeFactors.mpr h1lt
+    have hp_dvd_t : p ∣ orderOf t := by
+      rw [hordt]; exact Dvd.dvd.mul_left (Nat.dvd_of_mem_primeFactors hp) (orderOf k)
+    have hp_pf_t : p ∈ (orderOf t).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨Nat.prime_of_mem_primeFactors hp, hp_dvd_t, (orderOf_pos t).ne'⟩
+    exact (S14.kappa_subset_sigmaCompl (htκ p hp_pf_t)) (hkstarσ p hp)
+  -- **(C3)** `t ∉ U M_σ`.
+  have htnM' : t ∉ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    intro htM'
+    have hkstarM' : kstar ∈ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) :=
+      (hKstarMσ.trans le_sup_right) hkstarKstar
+    have hkM' : k ∈ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := by
+      have hkeq : k = t * kstar⁻¹ := by rw [← hkkstar]; group
+      rw [hkeq]
+      exact Subgroup.mul_mem _ (SetLike.mem_coe.mp htM') (Subgroup.inv_mem _ hkstarM')
+    exact hkne (Subgroup.mem_bot.mp (hKM'bot ▸ Subgroup.mem_inf.mpr ⟨hkK, hkM'⟩))
+  exact ⟨⟨htHat, htnc⟩, fun htA => htnM' htA.2⟩
+
+/-- **BG Theorem C(9), `𝒞_M(Ẑ) ⊆ A_0(M) − A(M)`** (mmd L4400): the `M`-conjugation closure of `Ẑ`
+is contained in `A_0(M) − A(M)`.  `zTilde_subset_a0_minus_a` places `Ẑ` inside `A_0(M) − A(M)`, and
+the three defining conditions of `A_0(M) − A(M)` are each `M`-conjugation invariant: `\widehat{M_σ}`
+by `hatMsigma_conj_mem`, `∉ 𝒞_G(K^#)` by the `G`-conjugation invariance of `𝒞_G`
+(`mem_conjClassSet_conj_iff`), and `∉ U M_σ = M'` by `M' ◁ M`. -/
+theorem conj_zTilde_subset_a0_minus_a [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    conjClassSetIn M (S14.zTilde K Kstar) ⊆ A0Set M K \ ASet M U := by
+  have hcore := zTilde_subset_a0_minus_a hG hM hP hKM hUM hK hKstar hU
+  have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  have hM'eq : derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+    (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
+  rintro y ⟨t, htz, m, hmM, rfl⟩
+  obtain ⟨⟨htHat, htnc⟩, htnA⟩ := hcore htz
+  have htnM' : t ∉ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) :=
+    fun h => htnA ⟨htHat, h⟩
+  refine ⟨⟨hatMsigma_conj_mem hmM htHat, ?_⟩, ?_⟩
+  · rw [mem_conjClassSet_conj_iff]; exact htnc
+  · intro hyA
+    have hyd : m * t * m⁻¹ ∈ derivedInG M := by
+      rw [hM'eq]; exact SetLike.mem_coe.mp hyA.2
+    have hmnorm : m ∈ Subgroup.normalizer (derivedInG M) :=
+      OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hmM
+    have htd : t ∈ derivedInG M := (Subgroup.mem_normalizer_iff.mp hmnorm t).mpr hyd
+    rw [hM'eq] at htd
+    exact htnM' (SetLike.mem_coe.mpr htd)
+
+/-- **BG Theorem C(9), the identity `A_0(M) − A(M) = 𝒞_M(Ẑ)`** (mmd L4400; schematic proof:
+Proposition 14.2(d) + Theorem A(3),(5)).  Combines the `⊆` half `a0_minus_a_subset_conj_zTilde`
+(each element of `A_0(M) − A(M)` is `M`-conjugate into `Ẑ`) with the `⊇` half
+`conj_zTilde_subset_a0_minus_a` (`𝒞_M(Ẑ) ⊆ A_0(M) − A(M)`).  Here `𝒞_M(Ẑ) = conjClassSetIn M Ẑ` is
+the union of the `M`-conjugacy classes of `Ẑ = Z − (K ∪ K*)`.  The TI-ness of this set (the other
+assertion of C(9)) is the conjunct 10 of `theoremC_paired_structure`. -/
+theorem a0_minus_a_eq_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    A0Set M K \ ASet M U = conjClassSetIn M (S14.zTilde K Kstar) := by
+  refine Set.Subset.antisymm (fun a ha => ?_)
+    (conj_zTilde_subset_a0_minus_a hG hM hP hKM hUM hK hKstar hU)
+  obtain ⟨m, hmM, t, htz, hamt⟩ :=
+    a0_minus_a_subset_conj_zTilde hG hM hP hKM hUM hK hKstar hU a ha
+  exact ⟨t, htz, m, hmM, hamt.symm⟩
+
 /-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P₂` maximal subgroup** (BG `kappa_complement`;
 the Frobenius complement `E = K ⋉ U` of Proposition 14.2(a), with `U = E₂E₃` the `M_σ`-complement's
 derived subgroup).  There is a `κ(M)`-Hall `K₀` and a nontrivial abelian `(κ(M)∪σ(M))'`-Hall `U₀`,

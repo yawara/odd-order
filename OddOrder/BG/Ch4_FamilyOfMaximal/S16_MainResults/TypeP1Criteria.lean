@@ -451,6 +451,62 @@ theorem isComplement'_mf_complement_of_sup_inf [Finite G] {M U : Subgroup G}
     rw [← hidx, Subgroup.card_mul_index]
   exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
 
+open scoped IsMulCommutative in
+/-- **Type-`F` `M_F`-complement is nilpotent** (`M'/M_F` nilpotent, the **type-`F` half** of the
+deferred Corollary 15.5(c) `M'/M_F` nilpotent clause; BG Lemma 15.1(a) branch): any complement `U`
+of `M_F` in `M'` (`M_F ⊔ U = M'`, `M_F ⊓ U = ⊥`) is nilpotent.
+
+For a type-`F` maximal subgroup `M`, the Fitting kernel coincides with the `σ`-core, `M_F = M_σ`
+(BG Theorem A(8); obtained here as the contrapositive of Theorem 15.2(a) `mf_ne_msigma ⟹ M ∈ ℳ_𝓟₁`,
+since a type-`F` `M` is not of type `P`).  BG Lemma 15.1(a) gives `M'' ⊆ M_σ = M_F`
+(`derivedDerived_le_Msigma` = Corollary 12.10(b)), i.e. `commutator ↥M' ≤ M_F.subgroupOf M'`, so the
+quotient `M'/M_F` is **abelian** (`Subgroup.Normal.quotient_commutative_iff_commutator_le`), a
+fortiori nilpotent.  The complement `U` is isomorphic to `M'/M_F` — `M_F.subgroupOf M'` is normal in
+`↥M'` and `U` is its complement (`isComplement'_mf_complement_of_sup_inf`), so
+`IsComplement'.QuotientMulEquiv` gives `↥M' ⧸ M_F.subgroupOf M' ≃* ↥(U.subgroupOf M') ≃* ↥U` — hence
+`U` is nilpotent.  This is the type-`F`/Peterfalvi-`I` counterpart of the type-`P₁`
+`isNilpotent_complement_of_isTypeP1_mf_ne_msigma` and the type-`P` `TypePData.U_nilpotent`; together
+they discharge the Types II–V (T2) condition `M'/M_F` nilpotent for every classified maximal `M`. -/
+theorem isNilpotent_complement_of_isTypeF [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hF : S14.IsTypeF M)
+    (hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M)
+    (hinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
+    Group.IsNilpotent ↥U := by
+  classical
+  set M' := derivedInG M with hM'def
+  set N := maxNilpotentNormalHall M with hNdef
+  -- **`M_F = M_σ` for type `F`** (Theorem 15.2(a) contrapositive: `M_F ≠ M_σ ⟹ M ∈ ℳ_𝓟₁ ⊆ ℳ_𝓟`,
+  -- but a type-`F` maximal subgroup is not of type `P`).
+  have hMFeq : N = OddOrder.BG.Ch3.S10.Msigma M := by
+    by_contra hne
+    exact (S14.isTypeF_iff_not_isTypeP.mp hF)
+      (S14.isTypeP_of_isTypeP1 (isTypeP1_of_mf_ne_msigma hG hM hne))
+  have hNle : N ≤ M' := hsup ▸ le_sup_left
+  have hUle : U ≤ M' := hsup ▸ le_sup_right
+  -- `N.subgroupOf M'` is normal in `↥M'` (`M' ≤ M ≤ N_G(M_F)`).
+  have hM'M : M' ≤ M := Subgroup.map_subtype_le _
+  haveI hNnorm : (N.subgroupOf M').Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hNle).mpr
+      (hM'M.trans (maxNilpotentNormalHall_le_normalizer M))
+  -- **`M'' ⊆ M_σ = M_F`** (BG Lemma 15.1(a) / Corollary 12.10(b)), recast as
+  -- `commutator ↥M' ≤ M_F.subgroupOf M'`.
+  have hcomm : commutator ↥M' ≤ N.subgroupOf M' := by
+    have h2 : derivedInG M' ≤ N := by
+      rw [hMFeq]; exact OddOrder.BG.Ch4.S15.derivedDerived_le_Msigma hG hM
+    intro x hx
+    rw [Subgroup.mem_subgroupOf]
+    exact h2 (Subgroup.mem_map_of_mem _ hx)
+  -- `M'/M_F` is abelian, a fortiori nilpotent.
+  haveI hQcomm : IsMulCommutative (↥M' ⧸ N.subgroupOf M') :=
+    Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm
+  haveI hQnil : Group.IsNilpotent (↥M' ⧸ N.subgroupOf M') := CommGroup.isNilpotent
+  -- `U ≅ M'/M_F` via the complement iso, transferring nilpotency.
+  have hcompl : (U.subgroupOf M').IsComplement' (N.subgroupOf M') :=
+    (isComplement'_mf_complement_of_sup_inf hsup hinf).symm
+  exact Group.nilpotent_of_mulEquiv
+    (hcompl.QuotientMulEquiv.trans (Subgroup.subgroupOfEquivOfLe hUle))
+
 /-- **Coprime inner-induced conjugation is trivial**: if `x` normalizes `N`, `orderOf x` is coprime
 to `|N|`, and conjugation by `x` agrees on `N` with conjugation by some `n ∈ N` (so `x` induces an
 *inner* automorphism of `N`), then `x` centralizes `N`.
