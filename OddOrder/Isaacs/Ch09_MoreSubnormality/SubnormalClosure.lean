@@ -89,6 +89,14 @@ theorem strongClosure_le {X S : Subgroup G} (h : ∀ Y, IsStronglyConjugate X Y 
 theorem strongClosureIn_le_right (K X : Subgroup G) : strongClosureIn K X ≤ K :=
   sSup_le fun _ hY => hY.2
 
+/-- 部分群の共役 `ConjAct` 作用を `Subgroup.map` で書き換える (以下の計算用). -/
+theorem conjAct_smul_eq_map (g : G) (X : Subgroup G) :
+    ConjAct.toConjAct g • X = X.map (MulAut.conj g).toMonoidHom := by
+  ext y
+  simp only [Subgroup.pointwise_smul_def, Subgroup.mem_map,
+    MulDistribMulAction.toMonoidEnd_apply, MulDistribMulAction.toMonoidHom_apply,
+    ConjAct.toConjAct_smul, MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
+
 /-! ### Lemma 9.29 -/
 
 /-- **Isaacs Lemma 9.29(a)** (p. 290): `X ⊆ S ◁◁ G` なら `X^{(G)} ⊆ S`.
@@ -199,17 +207,76 @@ theorem strongClosure_conjAct_smul (c : ConjAct G) (X : Subgroup G) :
         Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h2
     _ = strongClosure (c • X) := smul_inv_smul c _
 
+/-! ### 部分群への制限 (`X^{(K)}` と `↥K` 内の `X^{(G)}` の橋)
+
+Bartels (9.28) の帰納法の仮定は「`G` より小さい**群**」について述べられるので, 書籍が
+`X^{(K)}` と書くところを `↥K` の中で計算した `strongClosure (X.subgroupOf K)` に
+読み替える必要がある。本実装の `strongClosureIn K X` (= `G` の部分群のまま持つ形) と
+それを繋ぐのが以下。 -/
+
+/-- `g ∈ K`, `X ≤ K` なら共役 `X^g` も `K` に含まれる。 -/
+theorem conjAct_smul_le_of_mem {K X : Subgroup G} (hXK : X ≤ K) {g : G} (hg : g ∈ K) :
+    ConjAct.toConjAct g • X ≤ K := by
+  rw [conjAct_smul_eq_map]
+  rintro _ ⟨x, hx, rfl⟩
+  exact mul_mem (mul_mem hg (hXK hx)) (inv_mem hg)
+
+/-- 共役は `subgroupOf` と可換 (共役元が `K` に属するとき)。 -/
+theorem conjAct_smul_subgroupOf {K X : Subgroup G} (g : ↥K) :
+    (ConjAct.toConjAct (g : G) • X).subgroupOf K = ConjAct.toConjAct g • (X.subgroupOf K) := by
+  ext x
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+    Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_subgroupOf]
+  congr! 1
+
+/-- **強共役性は `K` への制限と両立する** (`X, Y ≤ K` のとき)。
+
+書籍 p.290 の「`K` 内の強共役 = `G` 内の強共役で `K` に含まれるもの」の, 本実装
+(`G` の部分群のまま持つ形) と `↥K` の中で計算する形との橋。 -/
+theorem isStronglyConjugate_subgroupOf_iff {K X Y : Subgroup G} (hXK : X ≤ K) (hYK : Y ≤ K) :
+    IsStronglyConjugate (X.subgroupOf K) (Y.subgroupOf K) ↔ IsStronglyConjugate X Y := by
+  constructor
+  · rintro ⟨g, hg, hgX⟩
+    refine ⟨(g : G), ?_, ?_⟩
+    · rw [← Subgroup.subgroupOf_sup hXK hYK, Subgroup.mem_subgroupOf] at hg
+      exact hg
+    · -- 両辺は `K` に含まれるので `subgroupOf K` の単射性で比較する.
+      have hle : ConjAct.toConjAct (g : G) • X ≤ K := conjAct_smul_le_of_mem hXK g.2
+      have := (conjAct_smul_subgroupOf (K := K) (X := X) g).trans hgX
+      have hmap := congrArg (fun W : Subgroup ↥K => W.map K.subtype) this
+      simpa [Subgroup.map_subgroupOf_eq_of_le hle, Subgroup.map_subgroupOf_eq_of_le hYK]
+        using hmap
+  · rintro ⟨g, hg, rfl⟩
+    have hgK : g ∈ K := (sup_le hXK hYK) hg
+    refine ⟨⟨g, hgK⟩, ?_, ?_⟩
+    · rw [← Subgroup.subgroupOf_sup hXK hYK, Subgroup.mem_subgroupOf]
+      exact hg
+    · exact (conjAct_smul_subgroupOf (K := K) (X := X) ⟨g, hgK⟩).symm
+
+/-- **`X^{(K)}` の橋**: `X ≤ K` なら `strongClosureIn K X` は `↥K` の中で計算した
+`X^{(G)}` の像に一致する。 -/
+theorem strongClosureIn_eq_map_strongClosure {K X : Subgroup G} (hXK : X ≤ K) :
+    strongClosureIn K X = (strongClosure (X.subgroupOf K)).map K.subtype := by
+  refine le_antisymm (sSup_le ?_) ?_
+  · rintro Y ⟨hY, hYK⟩
+    calc Y = (Y.subgroupOf K).map K.subtype := (Subgroup.map_subgroupOf_eq_of_le hYK).symm
+      _ ≤ _ := Subgroup.map_mono
+          (le_sSup ((isStronglyConjugate_subgroupOf_iff hXK hYK).mpr hY))
+  · rw [Subgroup.map_le_iff_le_comap]
+    refine sSup_le ?_
+    intro W hW
+    rw [← Subgroup.map_le_iff_le_comap]
+    have hWK : W.map K.subtype ≤ K := by
+      rintro _ ⟨w, _, rfl⟩; exact w.2
+    have hround : (W.map K.subtype).subgroupOf K = W := by
+      rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective K.subtype_injective]
+    have hconj : IsStronglyConjugate (X.subgroupOf K) ((W.map K.subtype).subgroupOf K) := by
+      rw [hround]; exact hW
+    exact le_sSup ⟨(isStronglyConjugate_subgroupOf_iff hXK hWK).mp hconj, hWK⟩
+
 section /- 9D: Lemma 9.30 — 商への移行 (pp. 290-291) -/
 
 variable {H : Type*} [Group H]
-
-/-- 部分群の共役 `ConjAct` 作用を `Subgroup.map` で書き換える (以下の計算用). -/
-theorem conjAct_smul_eq_map (g : G) (X : Subgroup G) :
-    ConjAct.toConjAct g • X = X.map (MulAut.conj g).toMonoidHom := by
-  ext y
-  simp only [Subgroup.pointwise_smul_def, Subgroup.mem_map,
-    MulDistribMulAction.toMonoidEnd_apply, MulDistribMulAction.toMonoidHom_apply,
-    ConjAct.toConjAct_smul, MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
 
 /-- 共役と準同型像の交換: `f(X^g) = f(X)^{f(g)}`. -/
 theorem map_conjAct_smul (g : G) (X : Subgroup G) (f : G →* H) :
