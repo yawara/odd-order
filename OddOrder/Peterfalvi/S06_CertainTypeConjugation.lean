@@ -60,7 +60,8 @@ theorem galoisMap_conj_omega (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G
   rw [Complex.inv_eq_conj hnorm]
   rfl
 
-/-- **Conjugation of a certain-type σ-image.**  The complex conjugate of `ω_{ij}^σ` is the σ-image of
+/-- **Conjugation of a certain-type σ-image.**  The complex conjugate of `ω_{ij}^σ` is the σ-image
+of
 the inverse grid character `(P_{ij})⁻¹` (`P_{ij} = omegaProdCharTic h χ₂ i`).  Combines the (3.9)
 Galois commutation `sigma_mapRingEquiv_comm` (σ intertwines the cyclotomic Galois action) with
 `galoisMap_conj_omega` (conjugation inverts the linear character).  This is the (3.9) ingredient of
@@ -141,7 +142,8 @@ theorem omegaProdCharTic_inv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
 /-- **σ-grid conjugation closure** (the (4.9)(a) grid identity through σ).  The complex conjugate of
 the certain-type σ-image `ω_{ij}^σ` is the σ-image `ω_{i'j'}^σ` at the conjugate grid index
 (`j' = χ₂⁻¹`, `i' = rowInv i`).  Combines `certainTypeOmegaSigma_conj` (conjugation = inverse grid
-character through σ) with `omegaProdCharTic_inv` (the inverse is the conjugate-index grid character). -/
+character through σ) with `omegaProdCharTic_inv` (the inverse is the conjugate-index grid
+character). -/
 theorem certainTypeOmegaSigma_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
@@ -247,7 +249,8 @@ omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.9)(a), `μ̄_j = μ_{j'}`** (column-sum form).  The complex conjugate of the
 certain-type column character `μ_j = ∑_i μ_{ij}` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}`
 (`j' = χ₂⁻¹`).  `mapRingEquiv conj` is additive (`map_sum`), each `μ_{ij}̄ = μ_{i'j'}`
-(`certainType_mu_conj_eq`), and the row reindexing `i ↦ rowInv i` is a permutation (`rowInvEquiv`). -/
+(`certainType_mu_conj_eq`), and the row reindexing `i ↦ rowInv i` is a permutation
+(`rowInvEquiv`). -/
 theorem certainType_columnSum_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :

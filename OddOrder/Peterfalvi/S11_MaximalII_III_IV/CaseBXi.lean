@@ -333,7 +333,8 @@ theorem caseA_wOrbit_horbit [Finite G] {M : Subgroup G}
     have hxs : (x_s : G) = ((s : ↥M) : G) := by rw [← hx_sval]; rfl
     rw [hxs]
 
-/-- **`realized W ⊆ Ker ζ_{θ₁,λ}`** (Peterfalvi (9.8.d) (γ) core (1)): the realized summand-complement
+/-- **`realized W ⊆ Ker ζ_{θ₁,λ}`** (Peterfalvi (9.8.d) (γ) core (1)): the realized
+summand-complement
 `W = H₂…H_q` lies in the character kernel of `ζ_{θ₁,λ} = Ind_{H·C_U(S₀)}^{HU}(ψ_{θ₁,λ})`, given
 `θ|_W = 1` and `W` `U`-invariant.  Since the pair `ψ_{θ₁,λ}` is `1` on the realized `W`
 (`hcuPsiPair_realizedComplement_subset_characterKernel`) and `W ◁ HU`
@@ -573,7 +574,8 @@ theorem hcuZetaPair_induceHU_mem_sOf [Finite G] {M : Subgroup G}
       hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩,
     hcuZetaPair_mem_xiOf caseA θ hθnt hinv lam hlam hθ₀, rfl⟩
 
-/-- **`Ind_{HU}^M ζ_{θ₁,λ}` is irreducible** (Peterfalvi (9.8.d) (iv), `hIM`-gated).  Given the source
+/-- **`Ind_{HU}^M ζ_{θ₁,λ}` is irreducible** (Peterfalvi (9.8.d) (iv), `hIM`-gated).  Given the
+source
 character `ζ_{θ₁,λ}` is not `W₁`-fixed (`hIM : I_{HU-ambient}(ζ) ≠ ⊤`, i.e. `I_M(ζ) ≠ M`), the
 `M`-induction `Ind_{HU}^M ζ` is irreducible. Since `HU ◁ M` with `[M:HU] = q` prime,
 `HU ≤ I_M(ζ) ≤ M`
@@ -1171,7 +1173,8 @@ theorem hcConjDescend_comp_regular_iff [Finite G] {M : Subgroup G}
 /-- **Conjugation-commute at the `IrreducibleCharacter` level**: `(hcPsi θ)^g = hcPsi (θ ∘ A_g)`.
 The `IrreducibleCharacter`-level form of `hcPsi_conjBy_eq` (`coe_conjBy` +
 `IrreducibleCharacter.ext`),
-the shape consumed by the conjugation-closure hypothesis of `card_filter_induce_eq_index_inertia`. -/
+the shape consumed by the conjugation-closure hypothesis of
+`card_filter_induce_eq_index_inertia`. -/
 theorem hcPsi_irreducibleConjBy_eq [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
@@ -1181,7 +1184,8 @@ theorem hcPsi_irreducibleConjBy_eq [Finite G] {M : Subgroup G}
   apply IrreducibleCharacter.ext
   rw [IrreducibleCharacter.coe_conjBy, hcPsi_conjBy_eq]
 
-/-- **The regular-inflated set is `HU`-conjugation-closed** (`oXtheta` `T`-invariance).  For a regular
+/-- **The regular-inflated set is `HU`-conjugation-closed** (`oXtheta` `T`-invariance).  For a
+regular
 seed `θ` (nontrivial on every Clifford factor `Hpart i`) and `g ∈ HU`, the conjugate `(hcPsi θ)^g`
 equals `hcPsi θ'` for the regular seed `θ' = θ ∘ A_g`: the commute `hcPsi_irreducibleConjBy_eq`
 gives
@@ -1216,7 +1220,8 @@ theorem comp_subtype_ne_one_iff_exists {M : Subgroup G}
     exists_prop]
 
 open scoped Classical in
-/-- **The `oXtheta` count** (Peterfalvi (9.8) `oXtheta`): `u · |Xθ| = (p-1)^q`, where `Xθ` is the set
+/-- **The `oXtheta` count** (Peterfalvi (9.8) `oXtheta`): `u · |Xθ| = (p-1)^q`, where `Xθ` is the
+set
 of distinct `HU`-induced characters `Ind_{HC}^{HU}(hcPsi θ)` over regular seeds `θ` (nontrivial on
 every Clifford factor `Hpart i`).  The induction `θ ↦ Ind(hcPsi θ)` is `u`-to-1: its fibres are the
 `HU`-conjugation orbits (`card_filter_induce_eq_index_inertia`, using the `T`-invariance

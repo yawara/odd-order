@@ -87,7 +87,8 @@ hypotheses (`w1 ∣ idx − 1`, the fixed-point-free outputs) together with the 
 group-theoretic inputs (the two fixed-point-free actions and the chain index identity) are isolated
 as named obligations for the case-(B) (6.8.3) extension.  This supplies the `hfpf` hypothesis of
 `false_of_w2_break_arith` (with `idxHZ = |H:Z|`).  Mirrors the *single*-factor case-(A) bound
-`2|W₁| ≤ |Z| − 1` (`centralCommutator_card_subgroupOf_lower`), which only needs FPF on `Z` itself. -/
+`2|W₁| ≤ |Z| − 1` (`centralCommutator_card_subgroupOf_lower`), which only needs FPF on `Z`
+itself. -/
 theorem two_mul_add_one_sq_le_of_two_fpf_factors {w1 idxHHc idxHcZ idxHZ : ℕ}
     (hw1odd : Odd w1)
     (h1odd : Odd idxHHc) (h1gt : 1 < idxHHc) (h1dvd : w1 ∣ idxHHc - 1)

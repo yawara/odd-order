@@ -75,7 +75,8 @@ From `S(A)` coherent and `S(B)` not coherent (`S(A) ⊆ S(B)`), there is a break
 * the (6.2) bound from `sSubFiltration_sum_le_two_psi_caseB`, whose `hψirr` is discharged by
   `member_isIrreducible_of_W2_le` (using `W₂ ≤ B`), and whose `Y`-anchor `η ∈ Yset` lies in `S₁`
   because `Y = S(⁅H,H⁆) ⊆ S(A) ⊆ S₁` (using `A ≤ ⁅H,H⁆`).
-The bound's `|L:H|·(|H:A|−1) ≤ 2ψ(1)·η(1)` is divided by `η(1) = |W₁| = |L:H|` to the stated form. -/
+The bound's `|L:H|·(|H:A|−1) ≤ 2ψ(1)·η(1)` is divided by `η(1) = |W₁| = |L:H|` to the stated
+form. -/
 theorem six_two_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)

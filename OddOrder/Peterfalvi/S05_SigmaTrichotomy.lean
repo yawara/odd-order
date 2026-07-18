@@ -264,7 +264,8 @@ theorem eq_smul_chiFam_diff_of_all_sigmaCoeff_zero (hyp : TICyclicHypothesis G) 
     (φ := X - (s : ℂ) • (hyp.chiFam hVeq app P1 - hyp.chiFam hVeq app P2)) (by rw [hself]; simp)
   rwa [sub_eq_zero] at hfin
 
-/-- **Norm-`2` Dade-image trichotomy endgame** (Peterfalvi (4.8) conclusion (3) / (10.5)).  A virtual
+/-- **Norm-`2` Dade-image trichotomy endgame** (Peterfalvi (4.8) conclusion (3) / (10.5)).  A
+virtual
 character `X ∈ ℤ[Irr G]` with `‖X‖² = 2` whose difference `ψ = X − s·(χ_{P₁} − χ_{P₂})` (`s = ±1`,
 `P₁ ≠ P₂`) vanishes on `V` satisfies `X = s·(χ_{P₁} − χ_{P₂})`.
 

@@ -1005,7 +1005,8 @@ and `B₃ = A rt j₁ = {ma, -fa, χ8}` the transversal cell, the configuration 
 by an O-step; finally `χ8 ∈ B₂`).  (3.5.4.5): in the passive cell `B₄ = A rc j₁`, `χ ∉ B₄`
 (`pencilCell` ⊥ `B₁`); `ma, -fa ∉ B₄` (each forces the other in, contradicting `L(B₄,B₃)`, using
 `-χ ∉ B₄` from the *same-row* `noNeg`); so `χ8 ∈ B₄`; then `fb ∉ B₄` (share with `B₂` is `χ8`),
-forcing `-mb ∈ B₄` (share with `B₁`); but then `O(B₄, A rb j₀)` forces `mb ∈ B₄` too — impossible. -/
+forcing `-mb ∈ B₄` (share with `B₁`); but then `O(B₄, A rb j₀)` forces `mb ∈ B₄` too —
+impossible. -/
 theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : κ}
     (hab : ra ≠ rb) (hac : ra ≠ rc) (hbc : rb ≠ rc)
     (_hat : ra ≠ rt) (hbt : rb ≠ rt) (hct : rc ≠ rt) (hj : j₀ ≠ j₁)

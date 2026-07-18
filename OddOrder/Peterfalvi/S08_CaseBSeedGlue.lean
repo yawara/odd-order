@@ -434,7 +434,8 @@ theorem nonempty_coherent_S_caseB_of_anchor
     ⟨coherentXunionYset_caseB hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL
       hc2 hFPF hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero⟩
 
-/-- **Minimal-degree `p`-power anchor for `X(W₂)`.**  In case (B) (`H` a `p`-group), a minimal-degree
+/-- **Minimal-degree `p`-power anchor for `X(W₂)`.**  In case (B) (`H` a `p`-group), a
+minimal-degree
 `X`-member `χ₁` divides every other: its degree ratio is a positive natural.  This is the case-(B)
 analogue of `exists_charValue_one_eq_mul_xBaseBlock_anchor`, but with the minimality coming from a
 direct minimum-degree selection (`Set.exists_min_image` over `(f 1).re`) rather than from membership

@@ -679,7 +679,8 @@ theorem typePData_card_abelianization_derived_eq_relIndex_C [Finite G] {M : Subg
   exact Nat.eq_of_mul_eq_mul_left hpos hkey
 
 open OddOrder.Peterfalvi.S11 in
-/-- **Peterfalvi (11.8.1), the abelianization order `|M'{}^{ab}| = d`** — the assembled `|M'/M''| = d`
+/-- **Peterfalvi (11.8.1), the abelianization order `|M'{}^{ab}| = d`** — the assembled
+`|M'/M''| = d`
 input to the `|S(HC)| = n` count, given the two structural facts of (11.5)/(11.7): `M'' = HC`
 (`hM2`, i.e. `secondDerivedInAmbient M = H ⊔ C`) and `H₀ = 1` (`hN`, i.e. `chief.N = ⊥`).
 
@@ -688,7 +689,8 @@ Chains the three sorry-free pieces: `|M'{}^{ab}| = |U : C|`
 (`u_eq_relIndex_C`, given `H₀ = 1`), and `u = d` (`charParam_d_eq_u`).  The two hypotheses are
 Peterfalvi (11.5) `secondDerived_eq_HC` and (11.7) `H_elementaryAbelian` — proven in `S13`
 (downstream of this file), so `card_SHCSet_filter_eq_charParam_n` (below) discharges its
-`|M'/M''| = d` obligation by threading them from the `FeitThompson` layer where `S13` is available. -/
+`|M'/M''| = d` obligation by threading them from the `FeitThompson` layer where `S13` is
+available. -/
 theorem Hypothesis.card_abelianization_derived_eq_charParam_d [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M)

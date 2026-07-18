@@ -855,12 +855,14 @@ noncomputable def
     data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 
-/-- **(6.6)/(6.8.1), central-`Zc`, completeness-exposing form (redesign L2 outer shell, withCover).**
+/-- **(6.6)/(6.8.1), central-`Zc`, completeness-exposing form (redesign L2 outer shell,
+withCover).**
 Same as
 `Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
 but the `hstepData` producer receives the Xset-cover completeness witness `hcover` (finding #6),
 which
-the monolith needs to build `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…` consumer. -/
+the monolith needs to build `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…`
+consumer. -/
 noncomputable def
     Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius
     (hyp : SibleyDadeHypothesis G L H)
@@ -973,7 +975,8 @@ theorem characterDegree_re_le_of_not_mem_pairUnion (hyp : SibleyDadeHypothesis G
 real degree-square sum is a natural number `totalN`, and an injective member subfamily `memb`
 contained in `Xfin`, the natural degree-square sum splits as members `+` tail (`Xfin ∖ members`)
 `= totalN`.  Pure `Finset.sum_image` + `Finset.sum_sdiff` + an ℝ→ℕ cast; no character theory.  The
-producer supplies `deg φ = |L:H|·p^(eφ)` and `totalN = |L:H|·(|H|−|H:Z|)` (via `sum_re_sq_Xset_eq`). -/
+producer supplies `deg φ = |L:H|·p^(eφ)` and `totalN = |L:H|·(|H|−|H:Z|)` (via
+`sum_re_sq_Xset_eq`). -/
 theorem natSum_partition_of_realSum {α : Type*} [DecidableEq α]
     (Xfin : Finset α) (deg : α → ℕ) (totalN : ℕ)
     (hXsum : (∑ φ ∈ Xfin, ((deg φ : ℝ)) ^ 2) = (totalN : ℝ))

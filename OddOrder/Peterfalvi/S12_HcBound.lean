@@ -59,7 +59,8 @@ the (11.8.1) §9 counts).  Given the §9 setup `data` (`toTypesIIIIIIVSetup`) an
 `tau`/`H0CprimeSupport`/`quotientSemidirectFrobenius` (used only by the (9.11) coherence, not by the
 degree fact `caseB_degree_qu`).  So the §9 *degree* analysis — `clifford_dichotomy` (9.7) and the
 `μ_j(1) = qu` of (9.8)/(9.9) — becomes available on the §10 `Hypothesis`.  (`tau := hyp.tau` records
-the genuine Dade map for the coherence use; the support/`Prop` are placeholders for the count use.) -/
+the genuine Dade map for the coherence use; the support/`Prop` are placeholders for the count
+use.) -/
 noncomputable def Hypothesis.mkSection11CharacterData [Finite G] {M : Subgroup G} (hyp : Hypothesis
     M)
     (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
@@ -73,7 +74,8 @@ noncomputable def Hypothesis.mkSection11CharacterData [Finite G] {M : Subgroup G
   quotientSemidirectFrobenius := True
 
 open OddOrder.Peterfalvi.S11 in
-/-- **§9 degree `qu` on the §10 `Hypothesis`, case (b) branch** (validating `mkSection11CharacterData`
+/-- **§9 degree `qu` on the §10 `Hypothesis`, case (b) branch** (validating
+`mkSection11CharacterData`
 end-to-end).  Via the constructed `Section11CharacterData`, the (9.7) Clifford dichotomy
 (`clifford_dichotomy`, proven) splits into case (a)/(b); in case (b), `caseB_degree_qu` gives that
 every member of the §9 family `𝒮(H₀C')` has degree `q·u = q·|Ū|`.  This is the §9 half of the

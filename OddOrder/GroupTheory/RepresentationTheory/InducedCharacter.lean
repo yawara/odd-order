@@ -375,7 +375,8 @@ If `ψ = (∑ i ∈ s, a i • Ind_H^G (θ i)) + c` pointwise, with `H ⊴ G`, t
 
 This is the final "constant on `H − H'`" step shared by Peterfalvi (12.5) (`Res_H(ψ^ρ) =
 ∑_λ a_λ Ind_{H'}^H λ + a·1_H`) and (12.15) (the analogous `ρ_M`-image decomposition on `K − K'`);
-establishing the decomposition itself is the Clifford-theoretic content upstream of this reduction. -/
+establishing the decomposition itself is the Clifford-theoretic content upstream of this
+reduction. -/
 theorem apply_eq_of_eq_sum_smul_induce_add_const {ι : Type*} (H : Subgroup G)
     [Invertible (Nat.card H : k)] [H.Normal] (ψ : ClassFunction G k) (s : Finset ι)
     (a : ι → k) (θ : ι → ClassFunction ↥H k) (c : k)
@@ -814,7 +815,8 @@ section InducedTrivialNorm
 variable [Invertible (Nat.card G : ℂ)]
 
 omit [Invertible (Nat.card G : ℂ)] in
-/-- **Restriction of the induced trivial character to a normal `H`**: `Res_H Ind_H^G 1_H = [G:H]•1_H`.
+/-- **Restriction of the induced trivial character to a normal `H`**:
+`Res_H Ind_H^G 1_H = [G:H]•1_H`.
 Every `G`-conjugate of `h ∈ H` stays in `H` (normality), so `Ind_H^G 1_H` is the constant `[G:H]` on
 `H` (`induce_apply_of_mem_normal_of_const`). -/
 theorem restrict_induce_trivial (H : Subgroup G) [Finite ↥H] [H.Normal]

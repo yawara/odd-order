@@ -214,7 +214,8 @@ gives `dade.psi(x·g) = dade.psi(x)` for `g ∈ H_M = K`, provided the two input
   (`coherent_extension_constituent_orthogonal_Rset_of_nonconjugate`, since
   `dade.psi = coh.extension χ_L`
   lies in `ℤ[R(χ_L)]` and `R(χ_L) ⊥ R(χ_M)`); needs the coherence `coh` and `L ≠ M` in scope;
-* `hxK`: `x ∉ K` — `x` is a nontrivial `p`-element and `p ∤ |K| = |M_F|` (`K` is the `p'`-Hall `M_F`). -/
+* `hxK`: `x ∉ K` — `x` is a nontrivial `p`-element and `p ∤ |K| = |M_F|` (`K` is the `p'`-Hall
+`M_F`). -/
 theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
     (hyp : Hypothesis L)
@@ -514,7 +515,8 @@ is recovered from the **complex conjugate** `ζ̄_0 = Ind θ̄_0 ∈ S` (`Sset_c
 second member of the *same degree*, distinct from `ζ_0` because `L` has odd order (no nontrivial
 real irreducible, `not_isReal_of_ne_trivial_of_odd_card'`).
 `coherence_extension_orthogonal_constOne`
-then forces `⟨ν ζ_0, 1_G⟩ = 0`.  Holds for **any** nontrivial `θ_0` (degree-`e`/linearity unused). -/
+then forces `⟨ν ζ_0, 1_G⟩ = 0`.  Holds for **any** nontrivial `θ_0` (degree-`e`/linearity
+unused). -/
 theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)

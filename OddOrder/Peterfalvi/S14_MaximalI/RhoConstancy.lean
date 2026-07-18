@@ -47,7 +47,8 @@ theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
   have hwMF : w ∈ maxNilpotentNormalHall L := hzrw ▸ mul_mem hzMF hrMF
   exact ⟨w, SetLike.mem_coe.mpr hwMF, g, hgwy⟩
 
-/- (Removed 2026-07-02, lane b: `dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius`
+/- (Removed 2026-07-02, lane b:
+`dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius`
 claimed `Ã(L) ⊆ 𝒞_G(L_F)` for Frobenius `L`.  Under the faithful per-`x` signalizer of (8.14)
 (`S10.ftSupportKernel`) this is **false** when `A(L)` has an escaping element `x`: the coset factor
 `r ∈ R(x) = C_{(N[x])_F}(x)` is a nontrivial `σ(L)′`-element commuting with `x`, so `x·r` has order
@@ -71,7 +72,8 @@ theorem conjClassSet_sigmaSharp_disjoint_of_nonconjugate [Finite G]
     (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG
       (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hL1 hL2 hnc)
 
-/-- The difference `φ − φ̄` of a constituent is supported in `A(L)` (each constituent is supported in
+/-- The difference `φ − φ̄` of a constituent is supported in `A(L)` (each constituent is supported
+in
 `A(L) ∪ {1}` by `data.supported`, and `(φ − φ̄)(1) = 0` by equal degree — `φ(1)` is real). -/
 theorem constituentDiff_support_subset {L : Subgroup G} {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
@@ -1379,7 +1381,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 supported in a trivial-`H` sub-support `A₁ ⊆ A(L)` (an `L`-invariant subset on which the type-I Dade
 stabilizers vanish), the Dade isometry `τ` acts as induction `Ind_L^G`.  This instantiates the
 general step-3 bridge `dadeMap_eq_induce_of_supported_on_trivial_H` at the type-I Dade map `hyp.tau`
-(via `dadeIntegralCharacterMap_apply_of_support`, and `inclusion` to widen the support from `A₁`). -/
+(via `dadeIntegralCharacterMap_apply_of_support`, and `inclusion` to widen the support from
+`A₁`). -/
 theorem typeI_tau_eq_induce_of_supported_trivial_H {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     {A₁ : Set G} (hA₁A : A₁ ⊆ hyp.ambientA)
     (hA₁norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
@@ -1536,7 +1539,8 @@ theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G}
   rw [ClassFunction.sub_apply, hev, sub_self]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
+/-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents
+`φ₁, φ₂ ∈ S(χ)`,
 the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.
 
 Proof (now genuine, modulo the §8 support obligation): `φ₁ − φ₂` is supported on the non-escaping
@@ -1544,7 +1548,8 @@ part `A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (`constituent_diff_support_subset_none
 `L`-invariant (`escaping_conj_mem_iff` + `A(L)` `L`-invariant) and carries only trivial Dade
 stabilizers (`ftSupportKernel = ⊥` off the escaping set, via `H_eq_ftSupportKernel`).  On such a
 trivial-`H` support the type-I Dade isometry coincides with `Ind_L^G`
-(`typeI_tau_eq_induce_of_supported_trivial_H`, i.e. pin (b) steps 1–3 + the restriction assembly). -/
+(`typeI_tau_eq_induce_of_supported_trivial_H`, i.e. pin (b) steps 1–3 + the restriction
+assembly). -/
 theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
@@ -1613,7 +1618,8 @@ def InHKernel {L : Subgroup G} (hyp : Hypothesis L) (φ : IrreducibleCharacter �
     OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ)
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Toward (12.4) pin (c'), the off-kernel direction** (genuine): every constituent `φ ∈ S(χ)` of a
+/-- **Toward (12.4) pin (c'), the off-kernel direction** (genuine): every constituent `φ ∈ S(χ)` of
+a
 member `χ = Ind_H^L θ ∈ S` (`θ ≠ 1_H`) is off-kernel, `H ⊄ ker φ`.  If `H ⊆ ker φ` then `Res_H φ` is
 constant `= φ(1)` on `H` (`= φ(1)·1_H`), so by Frobenius
 `⟨χ, φ⟩ = ⟨θ, Res_H φ⟩ = star(φ(1))·⟨θ, 1_H⟩
@@ -1852,7 +1858,8 @@ theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G]
   rw [hblock, hdecomp, Sset_vanishes_off_H hyp χ.2 hg, mul_zero]
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family `R(χ)` (`χ ∈ S`) is
+/-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family `R(χ)` (`χ ∈ S`)
+is
 constant on each coset `xH` with `x ∈ L − H`.
 
 Proof: write `Res_L ψ = γ + β` by the Fourier expansion (`sum_inner_irreducibleCharacter_smul`),

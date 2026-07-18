@@ -736,7 +736,8 @@ If `x ≠ 1`, any prime `p ∣ orderOf x` divides `|G|`, hence is a `σ`-prime o
 (`exists_mem_sigma_of_prime_dvd_card`); then `sigmaPart M x ≠ 1` (else `x` would be a
 `σ(M)′`-element
 avoiding `p`), so `sigma_decomposition x` is nonempty.  (Placed after
-`exists_mem_sigma_of_prime_dvd_card`, which it cites; the genuine `sigmaLength` is defined earlier.) -/
+`exists_mem_sigma_of_prime_dvd_card`, which it cites; the genuine `sigmaLength` is defined
+earlier.) -/
 theorem sigmaLength_eq_zero_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (x : G) :
     sigmaLength x = 0 ↔ x = 1 := by
   rw [sigmaLength, Set.ncard_eq_zero (Set.toFinite _)]
@@ -844,7 +845,8 @@ theorem sigmaLength_eq_one_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 /-- The **genuine** `SigmaDecompositionData`: `length := sigmaLength` (the honestly constructed
 σ-length) with `length_one_iff` discharged by `sigmaLength_eq_one_iff` (Coq `ell_sigma1P`).  This
 *realizes* the carrier the scaffold only posited — downstream consumers can be fed this in place of
-`dummySigmaDecomposition` ([[scaffold-sorry-free-not-done]]: the posited interface is constructible). -/
+`dummySigmaDecomposition` ([[scaffold-sorry-free-not-done]]: the posited interface is
+constructible). -/
 noncomputable def genuineSigmaDecomposition [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) : SigmaDecompositionData G where
   length := sigmaLength

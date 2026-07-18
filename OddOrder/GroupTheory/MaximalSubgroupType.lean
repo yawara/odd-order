@@ -180,7 +180,8 @@ theorem TypePData.card_W1_eq_derived_index {M : Subgroup G} (data : TypePData M)
 
 /-- The complement `U` of `H = M_F` in `M' = [M,M]` has order the canonical index
 `[M' : M_F]`, independent of the choice of type-`P` witness (`derived_complement`).  In particular
-any two `TypePData` on the same `M` have `|U|` equal — used to transfer `U ≠ 1` between witnesses. -/
+any two `TypePData` on the same `M` have `|U|` equal — used to transfer `U ≠ 1` between
+witnesses. -/
 theorem TypePData.card_U_eq_index {M : Subgroup G} (data : TypePData M) :
     Nat.card ↥data.U = ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).index := by
   rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.U_le).toEquiv, ← data.H_eq,
@@ -189,7 +190,8 @@ theorem TypePData.card_U_eq_index {M : Subgroup G} (data : TypePData M) :
 /-- **Peterfalvi (13.1.b) `S' = PU` / BG Theorem C(3) `M' = U M_σ`** (type-data form): the derived
 subgroup of a type-`P` maximal subgroup is the join of its Fitting kernel `M_F` and the complement
 `U`, `M' = M_F ⊔ U`.  Immediate from the `derived_complement` field (`U` complements `H = M_F` in
-`M'`).  This is the `S_deriv_eq_PU` field of `Section16TypePStructure`, sourced from the type data. -/
+`M'`).  This is the `S_deriv_eq_PU` field of `Section16TypePStructure`, sourced from the type
+data. -/
 theorem TypePData.derivedInG_eq_fitting_sup_U {M : Subgroup G} (data : TypePData M) :
     derivedInG M = maxNilpotentNormalHall M ⊔ data.U := by
   rw [← data.H_eq]

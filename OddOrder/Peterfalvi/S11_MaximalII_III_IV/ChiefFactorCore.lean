@@ -196,7 +196,8 @@ theorem sSet_subset_ZIrr [Finite G] (data : TypesIIIIIIVSetup M) :
 
 /-! ### The genuine subgroups `C = C_U(H̄)`, `U' = [U,U]`, `C' = [C,C]` of Peterfalvi (9.5) -/
 
-/-- The `U`-action on the chief factor `H̄ = ↥H ⧸ N` (Peterfalvi (9.5)), as the hom from `U` (realised
+/-- The `U`-action on the chief factor `H̄ = ↥H ⧸ N` (Peterfalvi (9.5)), as the hom from `U`
+(realised
 inside `U ⊔ W₁`) to `Aut(H̄)`.  Its range has order `u` (`u_eq_card_quotient`); its kernel is
 `C = C_U(H̄)`. -/
 noncomputable def uActionHom (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :=
@@ -528,7 +529,8 @@ theorem uInHu_inf_hcInHu_eq_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIII
     exact (cInHu data chief).mul_mem hh_c ccmem
   · exact le_inf (cInHu_le_uInHu data chief) le_sup_right
 
-/-- **(9.9.a) index step (A): `[HU:HC] = [U:C]` realized form `HC.index = (cInHu.subgroupOf uInHu).index`.**
+/-- **(9.9.a) index step (A): `[HU:HC] = [U:C]` realized form
+`HC.index = (cInHu.subgroupOf uInHu).index`.**
 The second isomorphism theorem for `HC ◁ HU` with `uInHu ⊔ HC = ⊤`:
 `HU ⧸ HC ≃ uInHu ⧸ (uInHu ⊓ HC)`,
 and `uInHu ⊓ HC = cInHu` (`uInHu_inf_hcInHu_eq_cInHu`). -/
@@ -785,7 +787,8 @@ theorem mulAut_eq_one_of_fixes_regular_on_prime_span {Hbar : Type*} [Group Hbar]
   exact Subtype.ext_iff.mp (hinj hval)
 
 open OddOrder.RepresentationTheory in
-/-- **Single-factor non-Galois (9.8.d) core, structural form** (Peterfalvi (9.8.d)): given a *single*
+/-- **Single-factor non-Galois (9.8.d) core, structural form** (Peterfalvi (9.8.d)): given a
+*single*
 order-`p`, `φg`-invariant subgroup `S₀` of `H̄` and an irreducible character `θ` nontrivial on `S₀`,
 any `φg` fixing `θ` acts as the identity **on `S₀`** (not necessarily on all of `H̄`).  This is the
 single-factor analog of `mulAut_eq_one_of_fixes_regular_on_prime_span` (whose conclusion `φg = 1`
@@ -825,7 +828,8 @@ theorem mulAut_eq_id_on_of_fixes_ne_one_on_prime {Hbar : Type*} [Group Hbar] [Fi
   exact Subtype.ext_iff.mp (hinj hval)
 
 open OddOrder.RepresentationTheory in
-/-- **Single-factor easy inertia core (Peterfalvi (9.8.d) `C_U(H₁) ⊆ I(θ₁)`).**  Given a decomposition
+/-- **Single-factor easy inertia core (Peterfalvi (9.8.d) `C_U(H₁) ⊆ I(θ₁)`).**  Given a
+decomposition
 `H̄ = S₀ ⊕ W` (internal direct product: `S₀ ⊓ W = ⊥`, `S₀ ⊔ W = ⊤`) of the abelian chief factor, an
 automorphism `φg` that fixes `S₀` **pointwise** and preserves `W`, and an irreducible character `θ`
 **trivial on `W`**, then `φg` fixes `θ`: `θ (φg x) = θ x` for all `x`.  This is the easy half of the
@@ -1050,7 +1054,8 @@ theorem char_eq_on_factors_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite 
 `char_eq_on_factors_of_bijective`).  Two characters of `Hbar` that agree on every factor `S i` are
 equal: the factors span `Hbar` (`noncommPiCoprod` surjective), so a character is determined by its
 per-factor data.  The `⟸` half of the free-`W1`-orbit separation of `(9.8.c)` — per-factor agreement
-forces global equality (the `⟹` half, global equality restricting to the factors, is `congr_fun`). -/
+forces global equality (the `⟹` half, global equality restricting to the factors, is
+`congr_fun`). -/
 theorem char_eq_of_eq_on_factors {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
     {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
     (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
@@ -1629,9 +1634,11 @@ theorem centralizer_W2bar_quotient [Finite G] {M : Subgroup G}
       rw [QuotientGroup.ker_mk']; exact hN'le),
     chiefFactor_centralizer_inf_derived x hxW1 hxG1]
 
-/-- **Peterfalvi (8.4.d), `centralizer_W̄₂`** (the `N' = H₀` instance of `centralizer_W2bar_quotient`):
+/-- **Peterfalvi (8.4.d), `centralizer_W̄₂`** (the `N' = H₀` instance of
+`centralizer_W2bar_quotient`):
 in `L = ↥M ⧸ H₀`, for a nontrivial `x̄ ∈ W̄₁`, `C_L(x̄) ⊓ K̄ = W̄₂` where `K̄ = M'/H₀` and
-`W̄₂ = W₂ H₀/H₀`.  This is the (8.4.d) certain-type `centralizer_W₂` field of `S06.Hypothesis (M/H₀)`. -/
+`W̄₂ = W₂ H₀/H₀`.  This is the (8.4.d) certain-type `centralizer_W₂` field of
+`S06.Hypothesis (M/H₀)`. -/
 theorem chiefFactor_centralizer_W2bar [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     [(chief.H0.subgroupOf M).Normal]

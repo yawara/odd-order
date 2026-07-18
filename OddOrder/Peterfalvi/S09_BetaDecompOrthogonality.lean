@@ -246,11 +246,13 @@ theorem inner_family_diff (K : Subgroup L) [K.Normal] [Finite ↥K]
   exact inner_family_diff_gen (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
     (induce_family_orthogonal_of_injective K θ hinj) d hi0 hi_ind hind0
 
-/-- **The inner product `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`, generic family form** (Peterfalvi (7.8.a)).  For an
+/-- **The inner product `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`, generic family form** (Peterfalvi (7.8.a)).  For
+an
 arbitrary pairwise-orthogonal family `ζ` (`horth`), with `β = (ζ_{ind1H} − ζ_0)^τ` and the coherence
 agreement `ζ_i^ν − d_i ζ_0^ν = (ζ_i − d_i ζ_0)^τ` (`hagree_i`), the Dade isometry turns the `G`-side
 inner product into `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²` (`inner_family_diff_gen`).
-Instantiated by the `induce`-specific `inner_beta_nuDiff` and the `Hypothesis78`-level constructor. -/
+Instantiated by the `induce`-specific `inner_beta_nuDiff` and the `Hypothesis78`-level
+constructor. -/
 theorem inner_beta_nuDiff_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L)
@@ -395,7 +397,8 @@ theorem inner_beta_nu_eq_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : 
   rw [ClassFunction.inner_sub_right, ClassFunction.inner_smul_right, hζ0norm, mul_one] at key
   linear_combination key
 
-/-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`** (Peterfalvi (7.8.a)).  With `a = ⟨β, ζ_0^ν⟩ + 1`
+/-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`** (Peterfalvi (7.8.a)).  With
+`a = ⟨β, ζ_0^ν⟩ + 1`
 and `‖ζ_0‖² = 1` (the distinguished `ζ_0 ∈ Irr L`), `inner_beta_nuDiff` (`⟨β, ζ_j^ν − d_j ζ_0^ν⟩ =
 star(d_j) ‖ζ_0‖²`) rearranges to `⟨β, ζ_j^ν⟩ = star(d_j)(⟨β, ζ_0^ν⟩ + 1)` for `j ≠ 0,
 ind1H`.  This is
@@ -580,7 +583,8 @@ theorem betaDecomp_gamma_orth_one_gen {G : Type*} [Group G] [Fintype G]
     Hypothesis71.constOne_inner_self_eq_one]
   ring
 
-/-- **Peterfalvi (7.8.a), `Γ ⊥ 1_G`** (the `Gamma_orth_one` field of `BetaDecomp`).  For the residual
+/-- **Peterfalvi (7.8.a), `Γ ⊥ 1_G`** (the `Gamma_orth_one` field of `BetaDecomp`).  For the
+residual
 `Γ = β − (1_G − ζ_0^ν + a · W)`, `⟨Γ, 1_G⟩ = ⟨β,1_G⟩ − ⟨1_G,1_G⟩ + ⟨ζ_0^ν,1_G⟩ − a⟨W,1_G⟩`, where
 `⟨β,1_G⟩ = ⟨Ind 1_K − ζ_0, 1_L⟩ = 1 − 0 = 1` (`inner_tau_supported_constOne` +
 `inner_induce_trivialChar_constOne_eq_one`/`inner_induce_constOne_eq_zero`), `⟨1_G,1_G⟩ = 1`,

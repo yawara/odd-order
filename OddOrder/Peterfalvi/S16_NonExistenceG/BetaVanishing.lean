@@ -28,7 +28,8 @@ variable {G : Type*} [Group G]
 
 /-! **Peterfalvi (14.12)** (`field_normalizer_of_L_conj_M`, the `L ≅ M` case) is assembled
 **after** (14.7) `field_normalizer_of_U_characteristic`, which it reduces to: when `L` is conjugate
-to `M`, `H` is cyclic, so `U ≤ H` is characteristic and (14.7) applies.  See it just after (14.7). -/
+to `M`, `H` is cyclic, so `U ≤ H` is characteristic and (14.7) applies.  See it just after
+(14.7). -/
 
 /-- **Peterfalvi (14.13)**: the final comparison case assumes `L` and `M` are
 not conjugate and sets `h = |H|`. -/

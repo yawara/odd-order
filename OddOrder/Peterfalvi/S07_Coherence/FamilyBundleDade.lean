@@ -944,7 +944,8 @@ the prior coherence:
 Only the genuine (6.6) source-side content remains as input: the family bundle `B` (degrees,
 pairwise
 orthogonality of `S₁`), the family memberships/supports/non-vanishing, the per-member family data
-(`Dmem`/`hmemTau1`/`hmemOrtho`, exactly the `DadeChainStep` fields), and the degree inequality (c). -/
+(`Dmem`/`hmemTau1`/`hmemOrtho`, exactly the `DadeChainStep` fields), and the degree inequality
+(c). -/
 theorem dade_Y_collapse_of_family
     (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
     {S₁ : Set (ClassFunction (↥L) ℂ)}

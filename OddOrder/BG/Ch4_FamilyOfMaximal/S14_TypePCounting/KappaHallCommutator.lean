@@ -203,7 +203,8 @@ then `⁅E, Q⁆ ≤ C_G(Q)` and `Q ≤ F(E)` (the S5 helper), contradicting `Q 
 A prime `p ∈ π(K')` lies in `τ₂(M)`: otherwise `p ∈ τ₁(M) ∪ τ₃(M)` has `r_p(M) = 1`, and a line
 `A ∈ ℰ_p¹` of `K' ≤ C_G(M_σ)` would have `C_{M_σ}(A) = M_σ ≠ 1`, contradicting Lemma 14.1.  The
 `C_{K'}(Q) = 1` fixed-point-freeness comes from the coprime identity `⁅K', Q⁆ = K'` (BG **G** 8.5.4,
-`commutator_commutator_right_eq` in `↥E`) and the coprime complement `fitting_coprime_abelian_decomp`. -/
+`commutator_commutator_right_eq` in `↥E`) and the coprime complement
+`fitting_coprime_abelian_decomp`. -/
 theorem exists_typeF_complement_cyclic_commutator [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ Q : Subgroup G} {q : ℕ}

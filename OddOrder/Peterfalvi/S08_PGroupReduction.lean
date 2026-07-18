@@ -88,7 +88,8 @@ via the explicit `L`-conjugation `w x w⁻¹ = x`).  Together with the Hall copr
 This wires `isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` into the capstone via the
 `W₁`-conjugation action, isolating `hfix` (the (4.6)/(6.4.c) fixed-point condition) and `hbound`
 (the
-contrapositive of Theorem (6.3)) as the residual obligations of the (6.8)(c2) `p`-group reduction. -/
+contrapositive of Theorem (6.3)) as the residual obligations of the (6.8)(c2) `p`-group
+reduction. -/
 theorem exists_isPGroup_H_of_c2_of_card_le (hyp : SibleyDadeHypothesis G L H)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥hyp.W1))
     (hfix : ∀ w : ↥hyp.W1, w ≠ 1 → ∀ x : ↥H,
@@ -470,7 +471,8 @@ theorem caseB_W2_le_center_L (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     | inv x _ ihx => exact ihx.inv_left
   exact hcomm
 
-/-- **Peterfalvi (6.8) case-B coherence from c2 data** (discharges `hcaseB` of the dispatch skeleton).
+/-- **Peterfalvi (6.8) case-B coherence from c2 data** (discharges `hcaseB` of the dispatch
+skeleton).
 Given the case-B math condition `W₂ ⊆ Z(H)` (`hcen`) and the `p`-group structure, derive the
 structural inputs `hderiv` (W₂ ⊆ commutator via `commutator_subgroupOf_self`), `hcZ` (`|W₂|` prime),
 and `hW2cenL` (`caseB_W2_le_center_L`), then feed `nonempty_coherent_S_caseB_of_structure`

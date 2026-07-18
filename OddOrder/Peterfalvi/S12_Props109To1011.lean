@@ -593,7 +593,8 @@ open scoped FiniteInduce in
 (`muGridAlpha_tau_inner_self`) and `‖ζ^{τ₁}‖² = 1` (`SHC_extension_inner_self`):
 `⟨X, ζ^{τ₁}⟩ = ⟨α^τ, ζ^{τ₁}⟩ + n‖ζ^{τ₁}‖² = −n + n = 0` and
 `‖X‖² = ‖α^τ‖² + 2n⟨α^τ, ζ^{τ₁}⟩ + n²‖ζ^{τ₁}‖² = (2+n²) − 2n² + n² = 2`.  SHC port of
-`muGridAlpha_tau_X_inner`, the norm-`2` input to the SHC Dade-image trichotomy (SHC `alpha_tau_image`). -/
+`muGridAlpha_tau_X_inner`, the norm-`2` input to the SHC Dade-image trichotomy (SHC
+`alpha_tau_image`). -/
 theorem Hypothesis.SHC_muGridAlpha_tau_X_inner [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
@@ -845,7 +846,8 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
 forces `a ∈ {0, 1, 2}`.  (If `a ∉ {0, 1, 2}` then `a ≤ −1` or `a ≥ 3`, so `a² − 2a ≥ 3` and
 `n·(a² − 2a) ≥ 2·3 = 6 > 2`.)  This is the numeric heart of (11.8.2)'s `a = 0/1/2` conclusion, fed
 by
-the projection-norm bound `(a − n)² + (|S₁| − 1)a² ≤ n² + 2` once `|S₁| = n` (Peterfalvi (11.8.1)). -/
+the projection-norm bound `(a − n)² + (|S₁| − 1)a² ≤ n² + 2` once `|S₁| = n` (Peterfalvi
+(11.8.1)). -/
 theorem charParam_a_mem_of_norm_ineq {a : ℤ} {n : ℕ} (hn : 2 ≤ n)
     (h : (n : ℤ) * (a ^ 2 - 2 * a) ≤ 2) : a = 0 ∨ a = 1 ∨ a = 2 := by
   have hn2 : (2 : ℤ) ≤ (n : ℤ) := by exact_mod_cast hn
@@ -1181,7 +1183,8 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5) `G`-side (5.3.b) sum over `S₁`** `(∑_{β∈R} β, ∑_r ω_{r0}^σ) = 0`: each
 `β = λ^{τ₁}` (`hRrev`) is a degree-`w₁` `S(HC)` coherent image, non-real
 (`inducedFamily_degree_w1_conj_ne`),
-so `(λ^{τ₁}, ∑_r ω_{r0}^σ) = 0` (`SHC_extension_inner_zeroColumnOmegaSigma_sum`), summed over `R`. -/
+so `(λ^{τ₁}, ∑_r ω_{r0}^σ) = 0` (`SHC_extension_inner_zeroColumnOmegaSigma_sum`), summed over
+`R`. -/
 theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))

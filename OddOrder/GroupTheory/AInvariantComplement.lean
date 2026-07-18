@@ -28,7 +28,8 @@ namespace OddOrder.GroupTheory
 variable {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
 
 /-- **Invariant Schur–Zassenhaus, complement form.**  A `φ`-invariant normal Hall subgroup `N` of a
-finite solvable group has a `φ`-invariant complement `U`, provided the action is coprime to `|G|`. -/
+finite solvable group has a `φ`-invariant complement `U`, provided the action is coprime to
+`|G|`. -/
 theorem exists_aInvariant_complement_of_normal_isHall [IsSolvable G] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     {N : Subgroup G} [N.Normal] (_hN_inv : IsAInvariant φ N)

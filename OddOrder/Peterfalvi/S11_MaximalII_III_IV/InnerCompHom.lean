@@ -1116,7 +1116,8 @@ theorem hcZeta_induceHU_apply_one [Finite G] {M : Subgroup G}
     (huSub data)) := Fintype.ofFinite _
   rw [induceHU_apply_one_eq_q_mul, hcZeta_apply_one chars θ, Nat.cast_mul]
 
-/-- **`Ind_{HU}^M ζ ∈ 𝒮(H₀C)`**: the (9.8.c) degree-`qu` character is a member of `𝒮(H₀C)`, witnessed
+/-- **`Ind_{HU}^M ζ ∈ 𝒮(H₀C)`**: the (9.8.c) degree-`qu` character is a member of `𝒮(H₀C)`,
+witnessed
 by its source `ζ ∈ 𝒳(H₀C)` (`hcZeta_mem_xiOf`). -/
 theorem hcZeta_induceHU_mem_sOf [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}

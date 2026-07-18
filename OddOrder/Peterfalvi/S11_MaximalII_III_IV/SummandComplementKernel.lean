@@ -630,7 +630,8 @@ while a nontrivial `w₁` moves `S₀ = H₁` into `W` (Clifford permutation `H�
 The `cfker`-conjugation half (`mem_characterKernel_conjBy` / `subsetCharacterKernel_conjBy_iff`),
 the `W = H₂…H_q ⊆ Ker` propagation (core (1), `hcuZetaPair_summandComplement_subset_ker`), and the
 full `hcrit` reduction (`hcrit_of_summand_orbit`) are now all landed; the sole residual is the
-(9.7.a) `W₁`-free-orbit datum `horbit` (`S₀^{w₁} ⊆ W`), absent from `CliffordCaseAData` (issue 1018). -/
+(9.7.a) `W₁`-free-orbit datum `horbit` (`S₀^{w₁} ⊆ W`), absent from `CliffordCaseAData` (issue
+1018). -/
 theorem induceHU_inj_of_conj_mem_huSub [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     [Finite ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
     {χ ψ : IrreducibleCharacter ↥(huSub data)}
@@ -751,7 +752,8 @@ theorem caseA_hcrit_of_member [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSe
   haveI : Fintype ↥M := Fintype.ofFinite _
   exact hcrit_of_summand_orbit data hS0notker hkerW₂ (caseA_wOrbit_horbit caseA)
 
-/-- **Homs trivial on `W` biject with homs of the quotient `H̄/W`** (Peterfalvi (9.8.d) (β) substrate).
+/-- **Homs trivial on `W` biject with homs of the quotient `H̄/W`** (Peterfalvi (9.8.d) (β)
+substrate).
 A hom `θ : H̄ →* ℂˣ` with `W ≤ Ker θ` descends uniquely to `H̄/W →* ℂˣ` (`QuotientGroup.lift`,
 inverse `comp (mk' W)`), giving `|{θ | W ≤ Ker θ}| = |H̄/W →* ℂˣ|`.  The counting bridge for the
 `θ`-numerator of the (9.8.d) domain count. -/
@@ -777,7 +779,8 @@ theorem card_hom_triv_W_eq_card_quotient [Finite G] {M : Subgroup G}
       QuotientGroup.mk'_apply]
 
 open scoped Classical in
-/-- **θ-count** (Peterfalvi (9.8.d) (β) numerator): the number of homs `θ : H̄ →* ℂˣ` *trivial on the
+/-- **θ-count** (Peterfalvi (9.8.d) (β) numerator): the number of homs `θ : H̄ →* ℂˣ` *trivial on
+the
 summand complement* `W` and *nontrivial on `S₀`* equals `p − 1`.
 
 Since `S₀ ⊔ W = ⊤`, `S₀ ⊓ W = ⊥` with `|S₀| = p`, the quotient `H̄/W ≅ S₀` (via the complement,
@@ -1077,7 +1080,8 @@ theorem caseA_reducible_eq_hcZeta [Finite G] {M : Subgroup G}
 
 set_option maxHeartbeats 1000000 in
 -- raised heartbeat budget for the heavy elaboration below
-/-- **step 5 consequence (caseA): a reducible `𝒮(H₀)`-member is `Ind_{HU}^M(Ind_{HC}(hcPsi θbar))` for
+/-- **step 5 consequence (caseA): a reducible `𝒮(H₀)`-member is `Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`
+for
 a regular seed `θbar`.**  A reducible `φ = Ind_{HU}^M χ ∈ 𝒮(H₀)` has `M`-fixed source `χ`
 (`inertia_eq_top_of_induceHU_not_irreducible`); the case-agnostic cardinality argument
 `reducible_mem_sOf_H0C` places `φ ∈ 𝒮(H₀C)`, and `Ind`-injectivity on reducibles
@@ -1219,7 +1223,8 @@ theorem reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
 /-- **step 5 consequence (9.8.b degree, caseA): a reducible `𝒮(H₀)`-member has degree `qu`.**  By
 `caseA_reducible_source_eq_hcZeta` the reducible `φ = Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`, whose
 degree
-is `q·u` (`hcZeta_induceHU_apply_one`).  The degree half of `caseA_character_counts` conjunct (b). -/
+is `q·u` (`hcZeta_induceHU_apply_one`).  The degree half of `caseA_character_counts` conjunct
+(b). -/
 theorem caseA_reducible_induceHU_apply_one_eq_qu [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)

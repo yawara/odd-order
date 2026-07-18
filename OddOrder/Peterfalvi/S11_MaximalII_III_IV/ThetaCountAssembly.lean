@@ -342,7 +342,8 @@ theorem card_hom_triv_N_eq_card_quotient_general {K : Type*} [Group K] [Finite K
 
 
 open scoped commutatorElement in
-/-- **Peterfalvi (9.8.d)** (count substrate).  `⁅cuInHu, cuInHu⁆ ≤ U'` realized: the derived subgroup
+/-- **Peterfalvi (9.8.d)** (count substrate).  `⁅cuInHu, cuInHu⁆ ≤ U'` realized: the derived
+subgroup
 of the realized `C_U(S₀)` lands in the realized `U' = [U,U]`, since `C_U(S₀) ≤ U`. Makes the
 quotient
 `C_U(S₀)/U'` abelian, so its linear characters number `[C_U(S₀):U']` (Pontryagin). -/

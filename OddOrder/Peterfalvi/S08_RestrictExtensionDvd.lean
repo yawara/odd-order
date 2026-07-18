@@ -142,7 +142,8 @@ theorem dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius
     push_cast; ring
   · exact dvd_sub hacc (dvd_mul_right _ _)
 
-/-- **(6.8.1) `a ∣ b`**, case (A) / c2 mirror of `dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius`.
+/-- **(6.8.1) `a ∣ b`**, case (A) / c2 mirror of
+`dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius`.
 The `a ∣ c` input uses the case-(A) `dvd_inner_restrict_extension_Yset_c2_caseA`
 (cert data `hK`/`hW1`/`hA`) instead of `hF`. -/
 theorem dvd_inner_tau_scaledDiff_extension_Yset_c2_caseA
@@ -312,7 +313,8 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_c2_caseA
     hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, if_neg (Ne.symm hne), if_pos rfl]
   ring
 
-/-- **(6.8.1) norm of the cross-diagonal image** (mmd 04.8 L176: `‖χ₁−aη₁‖² = 1+a²`).  For `η = η₁ ∈ Y`
+/-- **(6.8.1) norm of the cross-diagonal image** (mmd 04.8 L176: `‖χ₁−aη₁‖² = 1+a²`).  For
+`η = η₁ ∈ Y`
 and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`:
 `⟨(χ₁−aη₁)^τ, (χ₁−aη₁)^τ⟩ = 1 + a²`.
 
@@ -420,14 +422,16 @@ theorem inner_self_tau_scaledDiff_c2_caseA
     hXY, hYX, star_natCast]
   ring
 
-/-- **(6.8.1) the degree ratio `a` satisfies `a ≥ 2`** (mmd 04.8 L176: "Since `X ∩ Y = ∅`, `a > 1`").
+/-- **(6.8.1) the degree ratio `a` satisfies `a ≥ 2`** (mmd 04.8 L176: "Since `X ∩ Y = ∅`,
+`a > 1`").
 For an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`, the ratio `a ≥ 2`.
 
 If `a ≤ 1` then (as `χ₁` is a positive-degree irreducible, `a ≥ 1`, so) `a = 1`, hence the source
 `θ` (with `χ₁ = Ind_H^L θ`, `θ ≠ 1`, `χ₁(1) = |W₁|·θ(1)`) has degree `θ(1) = a = 1`, so `θ` is a
 nontrivial **linear** character (`exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one`); then
 `χ₁ = Ind_H^L θ ∈ Y = S(H')` (`mem_Yset_iff_exists_linear_source`), contradicting `χ₁ ∈ X` and the
-disjointness `X(Zc) ∩ Y = ∅`.  This is the `2 ≤ a` input of `eq_zero_or_edge_of_dvd_of_normBound`. -/
+disjointness `X(Zc) ∩ Y = ∅`.  This is the `2 ≤ a` input of
+`eq_zero_or_edge_of_dvd_of_normBound`. -/
 theorem two_le_degreeRatio_of_mem_Xset_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)

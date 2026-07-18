@@ -163,7 +163,8 @@ theorem sSubFiltration_sum_le_two_psi_caseB
 `sSubFiltration_sum_le_two_psi_caseB`: the break `ψ` adjoined to discharge non-coherence is a
 reducible certain-type column `μ_b = columnSum χ₂b`.  Same `(6.2)` conclusion
 `|L:K|·(|H/A|−1) ≤ 2·μ_b(1)·η(1)`, via the column member-family bound
-`sMember_degreeSqNormReBound_of_not_coherent_columnBreak` and the same `S(A)`-degree-sum identity. -/
+`sMember_degreeSqNormReBound_of_not_coherent_columnBreak` and the same `S(A)`-degree-sum
+identity. -/
 theorem sSubFiltration_sum_le_two_psi_caseB_columnBreak
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)

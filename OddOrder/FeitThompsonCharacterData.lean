@@ -247,7 +247,8 @@ fields of `hyp46Smp` — the κ-Hall grid instance, `tic` reconciliations, `M_σ
 (`honestTypeP2ASet_conj_mem`, honest) — **without** the Dade data.  The (4.7)/(4.8)-(1) support
 engines (`certainType_diff_supp_subset_A0`) run on this core, so their producer applications
 (`muS_diff_support`) do not require the full `A₀(S)`-Dade package bundled by `hyp46Smp`.
-Both packages are axiom-clean; the split records the support theorem's true prerequisite boundary. -/
+Both packages are axiom-clean; the split records the support theorem's true prerequisite
+boundary. -/
 noncomputable def hyp46SmpCore :
     OddOrder.Peterfalvi.S06.Hypothesis46Core
       (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.S) mp.S :=

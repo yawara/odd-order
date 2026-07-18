@@ -420,7 +420,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
 multiplicity-one sum of a nonempty finite set of equal-degree, non-real irreducible constituents,
 each supported in `A(L) ∪ {1}`.  Body = §8 type-`F` Clifford theory: (8.2.c) `I(θ) ∩ U ⊆ U₁` +
-induced-degree (1.7.c) for the equal degree, `(Res_H φ, 1_H) = 0` (1.5.a) + (1.2) for the support. -/
+induced-degree (1.7.c) for the equal degree, `(Res_H φ, 1_H) = 0` (1.5.a) + (1.2) for the
+support. -/
 theorem typeI_induced_char_constituents [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :

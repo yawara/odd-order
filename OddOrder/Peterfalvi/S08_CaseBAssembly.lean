@@ -589,7 +589,8 @@ constituent `θ = i.val` of `Ind^L_{W₂} φ` (with `aᵢ = ⟨φ, Res^H_{W₂} 
 The remaining inputs are exactly the genuine §5/§6 content discharged at the capstone: the per-`θ`
 column/irreducible structural bundles `hcol`/`hirr`, the `Y`-anchor `η₁` data (`hη₁` and its real /
 support / conjugate facts), the partner anchor `η' ≠ η₁ ∈ Yset`, the per-`θ` anchor-vs-constituent
-orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp` (`exists_decomposition_caseB`). -/
+orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp`
+(`exists_decomposition_caseB`). -/
 theorem caseB_per_phi_anchored_family
     (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
@@ -650,7 +651,8 @@ theorem caseB_per_phi_anchored_family
     (fun j => caseB_phi_family_tau1 hyp h46 hW2H hφ' j)
     hXaggorth hdecomp (b := fun j => (hY j).choose) hX (fun j => (hY j).choose_spec) i
 
-/-- **Peterfalvi (6.8.2.3), the per-`φ` anchored image — `Y`-anchor data internalized.**  Strengthens
+/-- **Peterfalvi (6.8.2.3), the per-`φ` anchored image — `Y`-anchor data internalized.**
+Strengthens
 `caseB_per_phi_anchored_family` by discharging the entire `η₁`-anchor / partner block from
 `η₁ ∈ Yset` alone, via the textbook choice of partner `η' = η̄₁` (the complex conjugate): `η̄₁ ∈ Y`
 (`Yset_closedUnderConjugate`), `η₁ ≠ η̄₁` (`Yset_hasNoRealCharacters`, Peterfalvi (5.2.a): odd order
@@ -860,7 +862,8 @@ theorem caseB_inner_irr_columnSum_eq_zero
   simpa using hkron
 
 omit [Invertible (Nat.card ↥H : ℂ)] in
-/-- **(6.8.2) distinct certain-type columns are orthogonal** — `⟨columnSum h46 χ₂, columnSum h46 χ₂'⟩
+/-- **(6.8.2) distinct certain-type columns are orthogonal** — `⟨columnSum h46 χ₂, columnSum h46
+χ₂'⟩
 = 0` for `χ₂ ≠ χ₂'`.  By additivity over `columnSum = ∑_i μ_{ij}`, it reduces to the cross-column
 grid orthogonality `⟨μ_{ij}, μ_{i'j'}⟩ = 0` (`columnFamily_cross_products_zero`, Peterfalvi (4.1)),
 read off via the same `i, i' = 0` case split as `columnFamily_mu_ne`.
@@ -960,14 +963,16 @@ theorem caseB_irr_orthogonal_columnBase
   · obtain ⟨χ₂, -, rfl⟩ := hS₀ x hx
     exact caseB_inner_irr_conj_columnSum_eq_zero hyp h46 hW1 hirr χ₂
 
-/-- **(6.8.2) `S`-member dichotomy: column or irreducible** — the `S`-level cover lifting the per-`θ`
+/-- **(6.8.2) `S`-member dichotomy: column or irreducible** — the `S`-level cover lifting the
+per-`θ`
 `caseB_induce_column_or_irreducible` over `S = {Ind^L_H θ | θ ≠ 1}`.  Every member of the Sibley set
 `S` is either a non-trivial certain-type column `columnSum h46 χ₂` or an irreducible character.
 
 This is the cover used to assemble the case-(B) `X = 𝒳(W₂)`-coherence (`X ⊆ S`): every `X`-member
 splits into the certain-type column part (coherent as a set) or the irreducible part (adjoined as a
 `{χ, χ̄}` pair).  It also feeds the `X ⊥ Y` orthogonality `hpair` of the `X ∪ Y` glue (a column is
-`⊥ Y` by `inner_columnSum_Yset_eq_zero`; an irreducible `X`-member is `⊥ Y` by degree/distinctness). -/
+`⊥ Y` by `inner_columnSum_Yset_eq_zero`; an irreducible `X`-member is `⊥ Y` by
+degree/distinctness). -/
 theorem caseB_S_member_column_or_irreducible
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)

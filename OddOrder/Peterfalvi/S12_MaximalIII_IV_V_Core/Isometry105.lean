@@ -694,7 +694,8 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
   simp
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.5) M-side inner product** `(α_{ij}, μ₀ − ζ) = n − δ`, where `μ₀ = ∑_{i'} μ_{i'0}`
+/-- **Peterfalvi (11.8.5) M-side inner product** `(α_{ij}, μ₀ − ζ) = n − δ`, where
+`μ₀ = ∑_{i'} μ_{i'0}`
 is the column-`0` sum (`0 < j`).  Within column `0` the `μ_{i'0}` are orthonormal, so only `i' = i`
 survives in `(δ·μ_{i0}, μ₀)`, giving `−δ`; `μ_{ij}` (column `j ≠ 0`) is cross-column to column `0`;
 `ζ` (degree `w₁ > 1`) is degree-distinct from every `μ_{i'0}` (degree `1`) and from
@@ -906,11 +907,13 @@ theorem Hypothesis.muColumn_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMini
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 open scoped FiniteInduce in
-/-- **`∑_{i'} μ_{i'0} − ζ` is `A_0`-supported** (Peterfalvi (11.8.5)).  The column-`0` sum `μ₀` and the
+/-- **`∑_{i'} μ_{i'0} − ζ` is `A_0`-supported** (Peterfalvi (11.8.5)).  The column-`0` sum `μ₀` and
+the
 degree-`w₁` irreducible `ζ` are both induced from the normal `M' = [M,M]`, so both vanish off `M'`;
 and `(μ₀ − ζ)(1) = w₁·1 − w₁ = 0`, so the support lies in `M'^# ⊆ A_0`.  Companion of
 `muColumn_sub_conj_support` with `k = 0`, `d = 1` and `ζ` in place of `ζ̄`, used to transport the
-(11.8.5) `M`-side inner product `(α_{ij}, μ₀ − ζ)` to the Dade image via `tau_inner_eq_of_supported`. -/
+(11.8.5) `M`-side inner product `(α_{ij}, μ₀ − ζ)` to the Dade image via
+`tau_inner_eq_of_supported`. -/
 theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (_hζirr : IsIrreducibleCharacter ζ)
@@ -957,7 +960,8 @@ theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.I
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.5), `M`-side transferred to the Dade image** `(α_{ij}^τ, (μ₀ − ζ)^τ) = n − δ`,
+/-- **Peterfalvi (11.8.5), `M`-side transferred to the Dade image**
+`(α_{ij}^τ, (μ₀ − ζ)^τ) = n − δ`,
 where `μ₀ = ∑_{i'} μ_{i'0}`.  Both `α_{ij}` (`muGrid_alpha_support`) and `μ₀ − ζ`
 (`zeroColumnSum_sub_zeta_support`) are `A_0`-supported, so the Dade isometry `τ` preserves their
 inner

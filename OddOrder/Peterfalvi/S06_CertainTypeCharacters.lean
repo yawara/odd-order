@@ -824,7 +824,8 @@ theorem chiColumn_w1CharEquiv_symm [NeZero (Nat.card h.W1)]
 
 omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **The (1.4) image of a basis vector** `ω_{kl} − ω_{0l}` is the column-`l` signed
-difference at index `e⁻¹ k`: `Ind_W^L(ω_{kl} − ω_{0l}) = (columnFamily l).signedDifference (e⁻¹ k)`. -/
+difference at index `e⁻¹ k`:
+`Ind_W^L(ω_{kl} − ω_{0l}) = (columnFamily l).signedDifference (e⁻¹ k)`. -/
 theorem induce_omegaColumnDiff_eq [NeZero (Nat.card h.W1)]
     (l : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
     (k : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :

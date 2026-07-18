@@ -1036,7 +1036,8 @@ with
 
 This is the essential SHC ingredient of the (5.3.b) `⟨ω^σ, ζ^{τ₁}⟩ = 0` argument (via
 `inner_left_eq_zero_of_inner_sub_eq_zero` and the coherence-free `(ζ − ζ̄)^τ ⊥ ω^σ`), which the
-(11.8.5) `a = 0` step needs — the by-contradiction has `SHC_isCoherent` but not the full-`S` `coh`. -/
+(11.8.5) `a = 0` step needs — the by-contradiction has `SHC_isCoherent` but not the full-`S`
+`coh`. -/
 theorem Hypothesis.tau_zeta_sub_conj_eq_SHC_extension [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))

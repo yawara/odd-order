@@ -98,7 +98,8 @@ theorem mem_of_conj_mem_conj (hA : IsTISubset A L) {g h a b : G}
     rw [e, hab]; group
   rw [key]; exact hb
 
-/-- **Distinct conjugates of a TI-subset are disjoint**: if the conjugator ratio `h⁻¹·g ∉ L`, then no
+/-- **Distinct conjugates of a TI-subset are disjoint**: if the conjugator ratio `h⁻¹·g ∉ L`, then
+no
 element is simultaneously a `g`-conjugate and an `h`-conjugate of elements of `A` — i.e. `g·A·g⁻¹`
 and `h·A·h⁻¹` are disjoint.  This is the disjoint-union step of the conjugate-union counting
 `|A^G| = [G : L]·|A|`: the conjugates are indexed by cosets `gL` (via `mem_of_conj_mem_conj`) and

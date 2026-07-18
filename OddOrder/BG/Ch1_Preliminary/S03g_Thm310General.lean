@@ -132,7 +132,8 @@ theorem invariants_lift_map_eq_of_trivial (ρ : Representation F G V) {K₀ : Su
     rw [MonoidHom.comp_apply, hX]
     exact hg
 
-/-- **Case B transfer brick — the complement's order is unchanged by the lift** (issue 8013 piece 3).
+/-- **Case B transfer brick — the complement's order is unchanged by the lift** (issue 8013 piece
+3).
 A Frobenius complement `R` meets the kernel trivially (`R ∩ K₀ = ⊥`, here `K₀ ⊆ K`), so the quotient
 map `mk' K₀` is injective on `R` and `|R·K₀/K₀| = |R|`.  Used to transfer `|R'| = p` (the quotient
 conclusion (a)) back to `|R| = p`. -/
@@ -181,7 +182,8 @@ trivially, the lifted representation `ρ̄ = QuotientGroup.lift K₀ ρ` on `G �
 irreducible:
 its subrepresentations are the same submodules as those of `ρ` (a submodule is `ρ̄`-invariant iff
 `ρ`-invariant, since `ρ̄ ⟦g⟧ = ρ g` and `mk'` is surjective), so the simple-order structure carries
-over.  Supplies the `[IsIrreducible ρ̄]` instance needed to apply the induction hypothesis to `ρ̄`. -/
+over.  Supplies the `[IsIrreducible ρ̄]` instance needed to apply the induction hypothesis to
+`ρ̄`. -/
 theorem isIrreducible_lift_of_trivial [Nontrivial V] (ρ : Representation F G V) [ρ.IsIrreducible]
     {K₀ : Subgroup G} [K₀.Normal] (hker : ∀ x ∈ K₀, ρ x = 1) :
     Representation.IsIrreducible (QuotientGroup.lift K₀ ρ hker) := by
@@ -208,7 +210,8 @@ fixed-point-freely on the quotient `K / K₀`: a class `k̄` fixed by `r` (`⁅r
 
 This transfers the Frobenius hypothesis of BG Theorem 3.10 to `KR/K₀` in Case B of the `K₀`
 reduction.  Mirrors `OddOrder.BG.Ch4.S15.fpf_of_centralizer_inf_le`, but the fixed-point source is
-`C_K(r) = 1` (the conjugation-action fixed points are `⊥` directly) and the target is the kernel `K`. -/
+`C_K(r) = 1` (the conjugation-action fixed points are `⊥` directly) and the target is the kernel
+`K`. -/
 theorem fpf_lift_of_centralizer_bot [Finite G] {K₀ K : Subgroup G} [K₀.Normal] {r : G}
     (hrK : r ∈ Subgroup.normalizer (K : Set G)) (hK₀K : K₀ ≤ K)
     (hKK₀ : K ≤ Subgroup.normalizer (K₀ : Set G)) (hrK₀ : r ∈ Subgroup.normalizer (K₀ : Set G))

@@ -849,7 +849,8 @@ The explicit `TypeIOrthogonalityGridData` producer
 distinguished degree-`e` member via `exists_Sset_apply_one_eq_index`, so its `phi_mem` **is** the
 required `phi ∈ typeIHyp.Sset` membership.  This theorem therefore just instantiates that producer
 at `Mdata.coherent78` (using the symmetric non-type-I carrier for its T-side inputs) and
-projects the chosen member's membership; no false uniqueness of the two class functions is required. -/
+projects the chosen member's membership; no false uniqueness of the two class functions is
+required. -/
 theorem exists_betaMGridData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

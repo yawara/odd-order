@@ -352,7 +352,8 @@ theorem sum_induce_mul_apply_eq_zero_of_not_mem_normal
     ClassFunction.induce_apply_eq_zero_of_not_mem_normal N (θ : ClassFunction ↥N ℂ) hg, mul_zero]
 
 open scoped commutatorElement in
-/-- **The general Peterfalvi (1.7.b): H-level equal degree** (the fact (12.5) consumes).  For `N ⊴ L`
+/-- **The general Peterfalvi (1.7.b): H-level equal degree** (the fact (12.5) consumes).  For
+`N ⊴ L`
 with inertia `T = I_L(θ)`, `T/N` abelian, and a `T`-constituent `ψ` over `θ'`, every irreducible
 constituent `φ` of `Ind_N^L θ` has degree `φ(1) = [L:T]·ψ(1)`.
 
@@ -595,7 +596,8 @@ theorem induce_inertia_constituents_apply_one_eq
     induce_inertia_constituent_apply_one_eq hNT hab θ hinertia ψ hover φ₂ hφ₂]
 
 open scoped commutatorElement in
-/-- **Equal degree of the constituents of `Ind_{[HH,HH]}^{HH} ρ`** (Peterfalvi (1.7.b) specialised to
+/-- **Equal degree of the constituents of `Ind_{[HH,HH]}^{HH} ρ`** (Peterfalvi (1.7.b) specialised
+to
 the derived subgroup — the exact `H' = [H,H]` case (12.5) needs, self-contained).  For a finite `HH`
 and `ρ ∈ Irr [HH,HH]`, any two constituents `θ₁, θ₂` of `Ind_{[HH,HH]}^{HH} ρ` have equal degree.
 Since `HH/[HH,HH]` is abelian, every inertia quotient `I(ρ)/[HH,HH]` is abelian, so

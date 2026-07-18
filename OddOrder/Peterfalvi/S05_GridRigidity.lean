@@ -53,7 +53,8 @@ open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 
-/-- **Norm-`1` support bound** (abstract).  A norm-`1` virtual character `X` (i.e. `X ∈ ±Irr(G)`) has
+/-- **Norm-`1` support bound** (abstract).  A norm-`1` virtual character `X` (i.e. `X ∈ ±Irr(G)`)
+has
 at most one nonzero inner product against an orthonormal family `(χ i)` of virtual characters.  By
 the norm-`1` classifier `X = ε·μ`; any `χ i` with `⟨X, χ i⟩ ≠ 0` equals `±μ`, and two distinct such
 indices would give `⟨χ i, χ i'⟩ = ±1 ≠ 0`, contradicting orthonormality.  Abstract form of
@@ -192,7 +193,8 @@ theorem inner_grid_eq_zero_or_pm_one_of_inner_self_two {Idx : Type*}
       rcases hcβ with hcβ | hcβ <;> rcases hε with hε | hε <;> rw [hcβ, hε] <;> norm_num
     · rw [if_neg hαe, if_neg hβe]; left; ring
 
-/-- The difference-grid formula: `⟨X − s·(χ_{P₁} − χ_{P₂}), χ pq⟩ = ⟨X, χ pq⟩ − s·([P₁=pq] − [P₂=pq])`.
+/-- The difference-grid formula:
+`⟨X − s·(χ_{P₁} − χ_{P₂}), χ pq⟩ = ⟨X, χ pq⟩ − s·([P₁=pq] − [P₂=pq])`.
 As the family is orthonormal, the `s`-part contributes `∓s` exactly at `P₁, P₂`.  Abstract form of
 `sigmaCoeff_sub_smul_chiFam_diff`.  The `if`-indicators use the caller-supplied `[DecidableEq Idx]`,
 so that at a concrete grid index `ι × κ` they resolve to the same `instDecidableEqProd` as the
@@ -216,7 +218,8 @@ theorem inner_sub_smul_grid_diff {Idx : Type*} [DecidableEq Idx]
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, ClassFunction.inner_sub_left,
     h1, h2]
 
-/-- **All-zero Fourier endgame** (abstract).  If every inner product of `ψ = X − s·(χ_{P₁} − χ_{P₂})`
+/-- **All-zero Fourier endgame** (abstract).  If every inner product of
+`ψ = X − s·(χ_{P₁} − χ_{P₂})`
 against the orthonormal family vanishes (with `‖X‖² = 2`, `P₁ ≠ P₂`, `s = ±1`), then
 `X = s·(χ_{P₁} − χ_{P₂})`.  `⟨ψ, χ_{P₁}⟩ = ⟨ψ, χ_{P₂}⟩ = 0` pins `⟨X, χ_{P₁}⟩ = s`,
 `⟨X, χ_{P₂}⟩ = −s`; then `‖ψ‖² = ‖X‖² − 2 = 0` (orthonormality, `s² = 1`), so `ψ = 0`.  Abstract

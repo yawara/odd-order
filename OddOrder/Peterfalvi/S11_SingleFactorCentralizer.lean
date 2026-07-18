@@ -857,7 +857,8 @@ open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
 
 variable [Finite G] {M : Subgroup G}
 
-/-- **Per-summand char-inertia (generic summand).**  For *any* order-`p` `U`-invariant summand `S` of
+/-- **Per-summand char-inertia (generic summand).**  For *any* order-`p` `U`-invariant summand `S`
+of
 the chief factor `H̄` and an irreducible `θ` nontrivial on `S`, a `U`-element `g` fixing `θ` acts
 trivially on `S` (`aInvariantRestrictAut hSinv g = 1`, i.e. `g ∈ C_U(S)`).  This generalises the
 a-owned `chiefFactor_caseA_char_inertia_single` from the distinguished generator `S₀ = caseA.S0` to
@@ -893,7 +894,8 @@ theorem caseA_char_inertia_of_summand {data : TypesIIIIIIVSetup M} {chief : Chie
 `caseA_char_inertia_of_summand` once per summand (both order-`p` and `U`-invariant by
 `Hpart_order`/`Hpart_aInvariant`).  This is the `⊆`-half of the (9.11.2) inertia identity
 `I(θ) ⊓ U = U₁ ∩ U₁ʷ` (take `i = 0`, `j` = the `W₁`-translate index of `S₀ʷ`); the reverse `⊇` is
-"fixing both summands ⟹ fixing `θ`", and the index of the intersection is then forced into `{u, a}`. -/
+"fixing both summands ⟹ fixing `θ`", and the index of the intersection is then forced into
+`{u, a}`. -/
 theorem caseA_char_inertia_two_summands {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
     {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
@@ -965,7 +967,8 @@ summands (`Hpart_iSupIndep` + `Hpart_iSup` + `Hpart_order`): for two distinct su
 there is a linear character `θ` of `H̄` nontrivial on `H_i`, `H_j` and trivial on every other
 summand.
 Feeding this `θ` to `caseA_char_inertia_two_summands` (`⊆`) and
-`caseA_centralizes_two_summands_fixes_char` (`⊇`) identifies its inertia as `C_U(H_i) ⊓ C_U(H_j)`. -/
+`caseA_centralizes_two_summands_fixes_char` (`⊇`) identifies its inertia as
+`C_U(H_i) ⊓ C_U(H_j)`. -/
 theorem exists_caseA_two_summand_char {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) {i j : Fin data.q}
     (hij : i ≠ j) :
@@ -1069,7 +1072,8 @@ theorem inflation_fixing_imp_action_fixing {data : TypesIIIIIIVSetup M}
   exact congrFun (congrArg (fun f : ClassFunction (↥data.H ⧸ chief.N) ℂ =>
     (f : (↥data.H ⧸ chief.N) → ℂ)) hfix2) x
 
-/-- **(9.11.2) HU-inertia bridge (`⊆` half): fixing the inflated two-summand `θ₀` in `HU` centralizes
+/-- **(9.11.2) HU-inertia bridge (`⊆` half): fixing the inflated two-summand `θ₀` in `HU`
+centralizes
 both summands.**  For a chief-factor character `θbar` regular on the two Clifford summands `H_i`,
 `H_j`, a realized `U`-element `g` in the `HU`-inertia of the inflation `θ₀` (`hfix`) centralizes
 both

@@ -97,7 +97,8 @@ theorem invariants_toRepresentation_eq_of_inf_eq (ρ : Representation F G V)
   apply Submodule.map_injective_of_injective (Submodule.injective_subtype W.toSubmodule)
   rw [invariants_toRepresentation_map_eq, invariants_toRepresentation_map_eq, h]
 
-/-- **Invariants distribute over an internal direct sum of subrepresentations** (issue 8013 piece 5).
+/-- **Invariants distribute over an internal direct sum of subrepresentations** (issue 8013 piece
+5).
 For two subrepresentations `W₀, W₁ ≤ ρ` that meet trivially (`W₀ ⊓ W₁ = ⊥`), the `H`-invariants of
 their sum split: `C_V(H) ⊓ (W₀ ⊔ W₁) = (C_V(H) ⊓ W₀) ⊔ (C_V(H) ⊓ W₁)`.  This is NOT general lattice
 distributivity (which fails for submodules); it uses that `W₀, W₁` are `H`-stable, so an `H`-fixed
@@ -497,7 +498,8 @@ theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
 
 Both `|M|` and `|C_M(R)|` are powers of `p` with exponents `finrank (Additive M)` and
 `finrank C_M(R)` (`Module.card_eq_pow_finrank`); the rank formula `(b)`
-`finrank (Additive M) = |R| · finrank C_M(R)` turns the first into the `|R|`-th power of the second. -/
+`finrank (Additive M) = |R| · finrank C_M(R)` turns the first into the `|R|`-th power of the
+second. -/
 theorem card_eq_pow_card_invariants_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
     {H : Type*} [Group H] [Finite H] [IsSolvable H]
     {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]

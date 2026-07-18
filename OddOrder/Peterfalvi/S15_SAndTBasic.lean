@@ -64,7 +64,8 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
 /- `reconciled_typePData_T` (T-side type-`P` reconciliation) relocated to
 `S15_SAndT_Setup` for the (13.9)/(13.10) counting layer (same namespace; citations unchanged). -/
 
-/- `Q ⊓ V = ⊥` is now the honest `Hypothesis.Q_inf_V_eq_bot` field (threaded from the §16 constructor
+/- `Q ⊓ V = ⊥` is now the honest `Hypothesis.Q_inf_V_eq_bot` field (threaded from the §16
+constructor
 via `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)); the former
 `Q_inf_V_eq_bot_of_reconciled` — which derived it circularly from the sorried
 `reconciled_typePData_T`
@@ -248,7 +249,8 @@ theorem conj_W2_mem_centralizer_W1 [Finite G] (_hG : OddOrder.BG.IsMinimalSimple
       _ = y := by group
   exact (mul_inv_eq_iff_eq_mul.mp hn').symm
 
-/-- **`T`-side analogue of the carried `S_U_commutative` fact** (Pf (13.2.a), V-side): the complement
+/-- **`T`-side analogue of the carried `S_U_commutative` fact** (Pf (13.2.a), V-side): the
+complement
 `V` of the type-II member `T` is commutative.  Here `IsTypeII T` is a hypothesis
 (the (14.9) `T_typeII` conclusion, supplied by the caller).  Sources the `T`-side type-`P` structure
 from the off-spine `reconciled_typePData_T` (not the withdrawn `Tdata` carrier). -/
@@ -865,7 +867,8 @@ theorem normalizer_W1_le_QW2_of_D_eq_bot [Finite G]
   exact normalizer_W1_within_T_of_D_eq_bot hG hyp hTTypeII hDbot
     (Subgroup.mem_inf.mpr ⟨hg, hgT⟩)
 
-/-- **Peterfalvi (13.16), structural core** (Coq `FTtypeP_norm_cent_compl`, `PFsection13.v:1519`), the
+/-- **Peterfalvi (13.16), structural core** (Coq `FTtypeP_norm_cent_compl`, `PFsection13.v:1519`),
+the
 three atomic facts carrying the content of (13.16), **assembled** for the (14.9) type-II member `T`:
 
 * `W₁ ≤ Q` (`W1_le_Q`, proven) — the `T`-side dual of `W₂ ≤ P`, placing the cyclic `q`-factor `W₁`

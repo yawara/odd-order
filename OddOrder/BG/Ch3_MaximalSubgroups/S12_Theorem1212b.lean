@@ -1186,7 +1186,8 @@ theorem exists_cyclic_Enormal_regular_of_CES_eq [Finite G] (hG : IsMinimalSimple
     exact inf_centralizer_eq_bot_of_line_le_cyclic (S.isPGroup'.to_le hZS) hLZ
       (by rw [Nat.card_zpowers, hwG_ord]) hwG_good
 
-/-- **Regular cyclic line in an abelian Sylow `p`-subgroup** (`exists_cyclic_Enormal_regular_of_CES_eq`
+/-- **Regular cyclic line in an abelian Sylow `p`-subgroup**
+(`exists_cyclic_Enormal_regular_of_CES_eq`
 with the two hypotheses used *only* for the `E ≤ N_G(Z)` conclusion removed).  In
 `exists_cyclic_Enormal_regular_of_CES_eq` the regularity input `hreg` is never used in the
 `C_E(S)=E` branch, and `hCES` is used solely to derive `E ≤ C_G(S)` (`hEC`) for `E ≤ N_G(Z)`.

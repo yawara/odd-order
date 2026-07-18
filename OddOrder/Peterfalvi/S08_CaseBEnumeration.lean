@@ -118,7 +118,8 @@ theorem Xset_hasNoRealCharacters_caseB
   · -- irreducible branch: non-real by odd order.
     exact caseB_irr_nonreal hyp hirr
 
-/-- **Peterfalvi (6.8.2) case-(B) conjugate-pair cover of `X(W₂)`** with base the certain-type column
+/-- **Peterfalvi (6.8.2) case-(B) conjugate-pair cover of `X(W₂)`** with base the certain-type
+column
 set `certainTypeSet h46 k`.
 
 Produces the four conjuncts `hpair0`/`hpair1`/`hpairs`/`hcover` of the norm-weighted X-chain fold
@@ -1144,7 +1145,8 @@ theorem sMember_degreeSqNormReBound_of_not_coherent
 
 /-- **(6.8.3) case-(B) norm-weighted member-family degree bound (real form), reducible COLUMN
 break.**  The real-part repackaging of `sMember_degreeSqNormBound_of_not_coherent_columnBreak`,
-mirroring `sMember_degreeSqNormReBound_of_not_coherent` for the column break `μ_b = columnSum χ₂b`. -/
+mirroring `sMember_degreeSqNormReBound_of_not_coherent` for the column break
+`μ_b = columnSum χ₂b`. -/
 theorem sMember_degreeSqNormReBound_of_not_coherent_columnBreak
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)

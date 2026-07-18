@@ -65,7 +65,8 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_
     (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
     hyp.coherentYset ν hagreeX hagreeY hmixed D hDτ hgen
 
-/-- **Peterfalvi (6.8.1) image orthogonality `himg_ortho` via (4.1)** (Frobenius case, mmd 04.8 L166).
+/-- **Peterfalvi (6.8.1) image orthogonality `himg_ortho` via (4.1)** (Frobenius case, mmd 04.8
+L166).
 `X(Zc)^{τ₂} ⊥ Y^{τ₁}`: for `χ ∈ X(Zc)`, `η ∈ Y`, the coherent images are orthogonal,
 `⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  This is the "by (4.1)" step, **independent** of the deep `b ≡ 0` argument.
 
@@ -383,7 +384,8 @@ theorem inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius
           ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension a),
         ClassFunction.inner_smul_left, ih, mul_zero]
 
-/-- **Case-(A)/c2 mirror of `inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius`.**
+/-- **Case-(A)/c2 mirror of
+`inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius`.**
 Same as the Frobenius original, with `hF` replaced by the certain-type case-(A) bundle
 `cert`/`hK`/`hW1`/`hA`, and the Frobenius adapters replaced by their `_c2_caseA` counterparts. -/
 theorem inner_extension_span_Xset_centralCommutator_Yset_eq_zero_c2_caseA
@@ -418,7 +420,8 @@ to every *supported* `X(Zc)`-combination.  For `η ∈ Y` and `x ∈ ℤ[X(Zc), 
 `⟨Res^G_L(η^{τ₁}), x⟩_L = 0`.  By Dade reciprocity (`inner_tau_eq_inner_restrict`,
 `⟨x^τ, η^{τ₁}⟩_G = ⟨x, Res_L(η^{τ₁})⟩_L`) and `x^τ = x^{τ₂}` (supported), this reduces to the span
 form of `himg_ortho` (`⟨x^{τ₂}, η^{τ₁}⟩_G = 0`).  Hence the `X`-components of `Res^G_L(η^{τ₁})` are
-all proportional to `dᵢ`, i.e. `Res^G_L(η^{τ₁}) = c·∑dᵢχᵢ + χ′` with `χ′ ⊥ X(Zc)` (mmd 04.8 L170). -/
+all proportional to `dᵢ`, i.e. `Res^G_L(η^{τ₁}) = c·∑dᵢχᵢ + χ′` with `χ′ ⊥ X(Zc)` (mmd 04.8
+L170). -/
 theorem inner_restrict_extension_Yset_mem_span_Xset_eq_zero_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)

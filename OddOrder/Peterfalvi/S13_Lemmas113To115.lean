@@ -807,7 +807,8 @@ engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` is fed:
 The genuine world-bridge wiring (set-decomposition rewrite + engine instantiation + the
 source-orthogonality discharge) is proven here; only the §14/§9 glue inputs remain as parameters,
 to be supplied once the `𝒮(H₀C)`-side character theory lands.  Downstream, `coherent(S(H₀C))` feeds
-`coherent_S_of_coherent_SH0C` (**already sorry-free**) to give `coherent(S)`, contradicting (11.3). -/
+`coherent_S_of_coherent_SH0C` (**already sorry-free**) to give `coherent(S)`, contradicting
+(11.3). -/
 noncomputable def coherent_SOf_H0C_of_glued [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.HC) hyp.base.A0)
     (hY : OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau

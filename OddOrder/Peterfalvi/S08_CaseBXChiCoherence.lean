@@ -114,7 +114,8 @@ theorem xChiExtension_mu_ne_zero
   exact hi hp2
 
 omit [Invertible (Nat.card ↥H : ℂ)] in
-/-- **The `X_χ`-extension on a column sum**: `ν(μ_j) = ν(∑_i μ_{ij}) = Ximg χ₂`.  Only the `0`-th-row
+/-- **The `X_χ`-extension on a column sum**: `ν(μ_j) = ν(∑_i μ_{ij}) = Ximg χ₂`.  Only the
+`0`-th-row
 term survives (`xChiExtension_mu_zero`/`xChiExtension_mu_ne_zero`). -/
 theorem xChiExtension_columnSum
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) [NeZero (Nat.card h46.W1)]
@@ -144,7 +145,8 @@ theorem characterPsiDecomposition_X_mem_ZIrr
     rw [Int.cast_smul_eq_zsmul ℂ (D.coeff α) α]
     exact Submodule.smul_mem _ (D.coeff α) (D.imageFamily.mem_ZIrr α hα))
 
-/-- **The cross-column isometry `hXinner` follows from the anchored image `hXanchored`** (no separate
+/-- **The cross-column isometry `hXinner` follows from the anchored image `hXanchored`** (no
+separate
 Y-pinning argument needed).  Writing `Xⱼ = τ(μⱼ − a₀·η₁) + a₀·ν₁` (`ν₁ = η₁^{τ₁}`, from the
 `(6.8.2.3)` anchored image), the Dade isometry of `τ` on the `H^#`-supported `μⱼ − a₀·η₁` plus
 `Xⱼ ⊥ ν₁` (`hmix`), `column ⊥ Y`, and `‖η₁‖² = ‖ν₁‖² = 1` give
@@ -253,7 +255,8 @@ All three coherence conditions reduce to column-level facts, free of the `T = 0`
 * `extension_mem_ZIrr` — `Ximg χ₂ ∈ ℤ[Irr G]` (`hXzirr`).
 
 `hXanchored`/`hXinner`/`hXzirr` are the `(6.8.2.3)` per-column outputs (to be discharged from
-`columnDecompositionTau` + the `(6.8.2.2)` aggregate `Y`-pinning); none requires `Ximg χ₂ = cTE(μ_j)`. -/
+`columnDecompositionTau` + the `(6.8.2.2)` aggregate `Y`-pinning); none requires
+`Ximg χ₂ = cTE(μ_j)`. -/
 noncomputable def certainTypeSet_isCoherent_via_anchoredImages
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)

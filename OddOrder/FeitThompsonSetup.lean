@@ -141,14 +141,16 @@ theorem cardCertainTypeT_W2 : Nat.card ↥(mp.certainTypeT hG).W2 = tp.q := by
 
 include hG in
 /-- The key subgroup identity (T-side): `tp.W.subgroupOf mp.T = certainTypeT.sdiff.W`.  Both equal
-`(mp.Kstar ⊔ mp.K).subgroupOf mp.T` (`tp.W = mp.K ⊔ mp.Kstar` and `certainTypeT.sdiff.W = W₁ ⊔ W₂`). -/
+`(mp.Kstar ⊔ mp.K).subgroupOf mp.T` (`tp.W = mp.K ⊔ mp.Kstar` and
+`certainTypeT.sdiff.W = W₁ ⊔ W₂`). -/
 theorem tpW_subgroupOf_T_eq :
     tp.W.subgroupOf mp.T = (mp.certainTypeT hG).sdiffTICyclicHypothesis.W := by
   change tp.W.subgroupOf mp.T = (mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2
   rw [certainTypeT_W1_eq hG mp, certainTypeT_W2_eq hG mp,
     ← Subgroup.subgroupOf_sup mp.Kstar_le_T (k_le_T hG mp), sup_comm, ← tp.W_eq_kappa_join hG]
 
-/-- The `W`-identification equiv (T-side) `↥tp.W ≃* ↥(certainTypeT.sdiff.W)`: `tp.W ≃ tp.W.subgroupOf
+/-- The `W`-identification equiv (T-side) `↥tp.W ≃* ↥(certainTypeT.sdiff.W)`: `tp.W ≃
+tp.W.subgroupOf
 mp.T` then transported along `tpW_subgroupOf_T_eq`.  Mirrors `gridEquivE` with `inf_le_right`. -/
 noncomputable def gridEquivE_T :
     ↥tp.W ≃* ↥(mp.certainTypeT hG).sdiffTICyclicHypothesis.W :=
@@ -234,7 +236,8 @@ theorem chi2enum_finNeg (j : Fin tp.p) :
 
 include hG in
 /-- The key subgroup identity: `tp.W.subgroupOf mp.S = certainTypeS.sdiff.W`.  Both equal
-`(mp.K ⊔ mp.Kstar).subgroupOf mp.S` (`tp.W = mp.K ⊔ mp.Kstar` and `certainTypeS.sdiff.W = W₁ ⊔ W₂`). -/
+`(mp.K ⊔ mp.Kstar).subgroupOf mp.S` (`tp.W = mp.K ⊔ mp.Kstar` and
+`certainTypeS.sdiff.W = W₁ ⊔ W₂`). -/
 theorem tpW_subgroupOf_eq :
     tp.W.subgroupOf mp.S = (mp.certainTypeS hG).sdiffTICyclicHypothesis.W := by
   change tp.W.subgroupOf mp.S = (mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2
@@ -270,7 +273,8 @@ noncomputable def deltaS (j : Fin tp.p) : ℤ :=
 theorem eqQ_zero : eqQ hG mp tp ⟨0, tp.q_prime.pos⟩ = 0 := by
   apply Fin.ext; simp [eqQ]
 
-/-- **The S-side (13.1.e) `mu_definition` identity** — the cd producer's `mu_definition` field for the
+/-- **The S-side (13.1.e) `mu_definition` identity** — the cd producer's `mu_definition` field for
+the
 S-side grid.  Inducing the transported `ω`-column difference `Ind_W^S(ω_{ij} − ω_{0j})` gives the
 signed `μ`-difference `δ_j (μ_{ij} − μ_{0j})`, via `S06.induce_chiColumn_diff_mu_diff` after the
 `compHom`/`subgroupCongr` transport collapse. -/

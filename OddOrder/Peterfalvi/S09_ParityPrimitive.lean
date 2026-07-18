@@ -28,7 +28,8 @@ namespace OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G] [Finite G]
 
-/-- **The conjugation involution's only fixed point is the trivial character** (odd order).  Combines
+/-- **The conjugation involution's only fixed point is the trivial character** (odd order).
+Combines
 `IrreducibleCharacter.conjPerm_eq_self_iff` (fixed point ↔ real) with Peterfalvi (1.1)
 `not_isReal_of_ne_trivial_of_odd_card'` (odd order ⟹ only the trivial irreducible is real).  This is
 the self-conjugate case in the (7.9) parity `cfdot_real_vchar_even` orbit-pairing argument. -/

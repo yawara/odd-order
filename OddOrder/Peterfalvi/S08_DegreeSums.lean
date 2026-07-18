@@ -133,7 +133,8 @@ theorem sMember_support_subset_H (hyp : SibleyDadeHypothesis G L H)
 degree (`χ(1) = χ'(1)`) the difference `χ − χ'` is supported on `H^# = sharpImage H`: both are
 supported on `H` (`sMember_support_subset_H`) and the difference vanishes at `1` (equal degree).
 This is the `hsuppdiff` input of `coherentEqualDegree_fromDade` for the equal-minimal-degree base
-block `S₀` (`irreducibleCharacterDifference χ j = χⱼ − χ₀`), and the (5.6) `χ − a·χ₁` support shape. -/
+block `S₀` (`irreducibleCharacterDifference χ j = χⱼ − χ₀`), and the (5.6) `χ − a·χ₁` support
+shape. -/
 theorem sMember_diffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
     {χ χ' : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hχ'S : χ' ∈ hyp.S) (hdeg : χ 1 = χ' 1) :
     (χ - χ').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by

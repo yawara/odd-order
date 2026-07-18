@@ -629,7 +629,8 @@ theorem restrict_certainType_eq [NeZero (Nat.card h.W1)]
 omit [Fintype L] in
 omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] in
 /-- **`[L : K] = w₁`** (mmd 04.6, (4.5) proof): the index of the normal subgroup `K` equals
-`|W₁|`, since `K` is a complement to `W₁` in `L` (`L/K ≅ W₁` via `isComplement.QuotientMulEquiv`). -/
+`|W₁|`, since `K` is a complement to `W₁` in `L` (`L/K ≅ W₁` via
+`isComplement.QuotientMulEquiv`). -/
 theorem index_K_eq : h.K.index = Nat.card h.W1 := by
   rw [Subgroup.index_eq_card]
   exact Nat.card_congr h.isComplement.symm.QuotientMulEquiv.toEquiv
@@ -778,7 +779,8 @@ omit [Fintype L] in
 omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)] in
 /-- **Bridge: inertia ↔ conjugation-permutation fixed point.**  For `g : L` and `θ ∈ Irr(K)`, `g`
 lies in the inertia group of `θ` iff `θ` is fixed by the conjugation permutation
-`IrreducibleCharacter.conjByPerm g` (whose fixed-point count is bounded by `card_fixed_irr_le_W2`). -/
+`IrreducibleCharacter.conjByPerm g` (whose fixed-point count is bounded by
+`card_fixed_irr_le_W2`). -/
 theorem mem_inertia_iff_isFixedPt_conjByPerm (g : L) (θ : IrreducibleCharacter ↥h.K) :
     g ∈ IrreducibleCharacter.inertia (G := L) (H := h.K) θ ↔
       Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) θ := by
@@ -897,7 +899,8 @@ theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
   exact ⟨χ₂, Subtype.ext_iff.mp hχ₂⟩
 
 omit [Fintype ↥(h.W1 ⊔ h.W2)] in
-/-- **The reducible-inducing column `chiRestrict χ₂` is `L`-invariant** (issue 1012, W₁-stability for
+/-- **The reducible-inducing column `chiRestrict χ₂` is `L`-invariant** (issue 1012, W₁-stability
+for
 (9.9.b)): `chiRestrict χ₂ = Res_K μ` is the restriction of the `L`-character
 `μ = (columnFamily χ₂).mu 0`
 (`coe_chiRestrict`), so conjugation by any `g ∈ L` fixes it (`μ` is a class function of `L`,

@@ -179,7 +179,8 @@ vanishing `C_V(K) = 0`) lands the hypotheses of the terminal. -/
 
 section ElemAbelian
 
-/-- **BG Theorem 3.10(a)+(b), elementary-abelian module case** (rank form).  With the `ZMod p`-module
+/-- **BG Theorem 3.10(a)+(b), elementary-abelian module case** (rank form).  With the
+`ZMod p`-module
 structure on `Additive M` supplied as a genuine instance binder (so tensor-product instance
 synthesis
 over `ZMod p` is not blocked by a `letI`-local module): `|R|` is prime **(a)** and

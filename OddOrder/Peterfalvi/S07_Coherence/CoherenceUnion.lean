@@ -908,7 +908,8 @@ noncomputable def retarget_isCoherent_of_supportedDecomposition
 
 open scoped Classical in
 open OddOrder.RepresentationTheory in
-/-- **(5.6.3) supported per-step coherence, `hperElem` discharged from the member family (X-family).**
+/-- **(5.6.3) supported per-step coherence, `hperElem` discharged from the member family
+(X-family).**
 
 The X-family analogue of `retarget_isCoherent_of_decompositions_and_memberFamily`: routes through
 the

@@ -159,7 +159,8 @@ theorem Hypothesis.sSet_coherent_indS_caseB [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
-/-- **Honest §9 character data on `S`** (issue 2035 step 3; support corrected to `A(S)`, issue 1017):
+/-- **Honest §9 character data on `S`** (issue 2035 step 3; support corrected to `A(S)`, issue
+1017):
 the `mkSection11CharacterDataS` mirror with the *genuine* coherence inputs — `tau := Ind_S^G`
 (`indS`,
 Peterfalvi (13.2.e)) and `H0CprimeSupport := A(S)` (`supportInSubgroup (honestTypeP2ASet S) S`, the
@@ -360,7 +361,8 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Scaled-difference support for `𝒮`-members** (issue 1017 step (c), the honest-`A(S)` analogue of
+/-- **Scaled-difference support for `𝒮`-members** (issue 1017 step (c), the honest-`A(S)` analogue
+of
 the general `inducedKernelFamily_scaledDiff_support`).  For members `φ, ψ ∈ 𝒮` with a matching
 scaled
 degree `φ(1) = c·ψ(1)` (`c : ℕ`), the difference `φ − c·ψ` vanishes at `1`, so — since every
