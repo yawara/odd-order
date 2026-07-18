@@ -421,4 +421,38 @@ theorem exists_homocyclic_decomposition_of_transitive_involutions
   intro x y hx hy s
   exact mem_agemo_iff_of_transitive_orderOf_two phi htrans hx hy
 
+/-- In a homocyclic abelian `2`-group of exponent `2 ^ e`, the elements whose
+square is one are exactly the last nontrivial Agemo layer. -/
+theorem sq_eq_one_iff_mem_lastAgemoLayer
+    {A ι : Type*} [CommGroup A] {e : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e)))) (he : 0 < e)
+    {x : A} :
+    x ^ 2 = 1 ↔ x ∈ Agemo A 2 (e - 1) := by
+  constructor
+  · intro hx2
+    have hmem : ∀ s : ℕ, s ≤ e - 1 → x ∈ Agemo A 2 s := by
+      intro s
+      induction s with
+      | zero =>
+          intro _
+          rw [agemo_zero_eq_top]
+          exact Subgroup.mem_top x
+      | succ s ih =>
+          intro hs
+          apply mem_agemo_succ_of_mem_and_layer_pow_eq_one ε (by omega)
+          · exact ih (by omega)
+          · apply orderOf_dvd_iff_pow_eq_one.mp
+            exact (orderOf_dvd_of_pow_eq_one hx2).trans
+              (dvd_pow_self 2 (by omega))
+    exact hmem (e - 1) le_rfl
+  · intro hx
+    obtain ⟨y, rfl⟩ := (mem_agemo_iff_of_comm).mp hx
+    rw [← pow_mul]
+    have hmul : 2 ^ (e - 1) * 2 = 2 ^ e := by
+      calc
+        2 ^ (e - 1) * 2 = 2 ^ ((e - 1) + 1) := by simp [pow_add]
+        _ = 2 ^ e := by congr 1; omega
+    rw [hmul]
+    exact pow_two_pow_eq_one_of_equiv_pi_zmod ε y
+
 end OddOrder.GroupTheory
