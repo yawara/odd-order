@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
 import OddOrder.GroupTheory.SubgroupInAmbient
 
@@ -345,6 +346,33 @@ theorem pResidualOf_relCore_eq_bot_or [Finite G] {p : ℕ} [Fact p.Prime]
   have hH := normalizer_eq_left_of_noNormal hyp hP hPD
     (GroupTheory.le_normalizer_opiCoreInG _ H)
   exact hHK (hH.symm.trans (normalizer_eq_right_of_noNormal hyp hP hPD hKn))
+
+end
+
+section /- 9C: Case 1 の道具 — Cor 9.18 の相対形 -/
+
+/-- **Isaacs Corollary 9.18 の相対形 (subnormal defect 2)**: `S ≤ T ≤ H` で `T` が `H` に,
+`S` が `T` に normal ならば `E(H) ≤ N_G(S^∞)`.
+
+Thm 9.24 Case 1 で `H` を ambient, `T = core_H(D) = M`, `S = core_K(E) = V` として使う.
+Case 2 の 9.27 と違い 9.18 は**元々 subnormal 版**なので, `V ◁ M ◁ H` から
+`↥H` 内の subnormal 性を組めばそのまま通る (書籍の `V ◁ H` は不要). -/
+theorem layerInG_le_normalizer_nilpotentResidual_of_subnormal_two [Finite G]
+    {H S T : Subgroup G} (hST : S ≤ T) (hTH : T ≤ H)
+    (hTn : H ≤ Subgroup.normalizer (T : Set G))
+    (hSn : T ≤ Subgroup.normalizer (S : Set G)) :
+    layerInG H ≤ Subgroup.normalizer (nilpotentResidual S : Set G) := by
+  have hSH : S ≤ H := hST.trans hTH
+  haveI hT' : (T.subgroupOf H).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hTH).mpr hTn
+  have hnorm : ((S.subgroupOf H).subgroupOf (T.subgroupOf H)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (Subgroup.comap_mono hST)).mpr
+      (subgroupOf_le_normalizer_subgroupOf hSn)
+  have hsub : (S.subgroupOf H).IsSubnormal :=
+    Subgroup.IsSubnormal.step _ _ (Subgroup.comap_mono hST) hT'.isSubnormal hnorm
+  have hlift := map_subtype_le_normalizer_map_subtype
+    (layer_le_normalizer_nilpotentResidual (G := ↥H) hsub)
+  rwa [map_subtype_nilpotentResidual_subgroupOf hSH] at hlift
 
 end
 
