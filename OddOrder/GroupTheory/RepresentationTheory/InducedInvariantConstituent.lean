@@ -119,6 +119,128 @@ theorem induce_invariant_constituent_apply_one_eq [Finite K] [Fintype K] [Fintyp
     rw [← hΦβ]
   rw [hcoe, ClassFunction.mul_apply, linearClassFunction_apply, map_one, Units.val_one, mul_one]
 
+open scoped commutatorElement Classical in
+/-- **Peterfalvi (1.7.b), the constituent count `|T:H| = n·e²`.**  For `H ⊴ K` with `K/H` abelian
+and a `K`-invariant `θ ∈ Irr H`, let `n` be the number of irreducible constituents of `Ind_H^K θ`
+and `e = ⟨Res_H ψ, θ⟩` the (common) multiplicity, `ψ` any one constituent.  Then
+`[K : H] = n·e²`.
+
+This is the degree bookkeeping of the book's proof of (1.7.b), verbatim:
+`|T:H|θ(1) = (Ind_H^T θ)(1) = n e² θ(1)`.  Concretely, expand `Ind_H^K θ` in `Irr K`
+(`sum_inner_irreducibleCharacter_smul`) and evaluate at `1`, so that
+`[K:H]·θ(1) = ∑_φ ⟨Ind θ, φ⟩·φ(1)`; only constituents contribute.  For each constituent `φ`,
+its multiplicity is `⟨Ind θ, φ⟩ = ⟨Res φ, θ⟩ = e` (`inner_induce_coe_eq_restrictionMultiplicity`
+plus `restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq`, applicable because all constituents
+share the degree `ψ(1)` by `induce_invariant_constituent_apply_one_eq`), and its degree is
+`φ(1) = ψ(1) = e·θ(1)` (the invariant Clifford restriction `Res_H ψ = e·θ` at `1`).  Hence the sum
+is `n·e·(e·θ(1))`, and cancelling `θ(1) ≠ 0` gives `[K:H] = n·e²`. -/
+theorem index_eq_card_induce_constituents_mul_sq_of_invariant [Finite K] [Fintype K] [Fintype ↥H]
+    [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
+    [Finite (IrreducibleCharacter ↥H)] [Finite (IrreducibleCharacter K)]
+    [Finite ((K ⧸ H) →* ℂˣ)]
+    (hab : ∀ x y : K, ⁅x, y⁆ ∈ H)
+    (θ : IrreducibleCharacter ↥H) (ψ : IrreducibleCharacter K)
+    (hover : IrreducibleCharacter.LiesOver H ψ θ)
+    (hinv : ∀ g : K, IrreducibleCharacter.conjBy g θ = θ) :
+    (H.index : ℂ)
+      = ((Finset.univ.filter fun φ : IrreducibleCharacter K =>
+            ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+              (φ : ClassFunction K ℂ) ≠ 0).card : ℂ)
+        * ClassFunction.restrictionMultiplicity H (ψ : ClassFunction K ℂ)
+            (θ : ClassFunction ↥H ℂ) ^ 2 := by
+  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite _
+  haveI : Fintype ((K ⧸ H) →* ℂˣ) := Fintype.ofFinite _
+  set e := ClassFunction.restrictionMultiplicity H (ψ : ClassFunction K ℂ)
+    (θ : ClassFunction ↥H ℂ) with he
+  -- Work with an abstract Finset of constituents (avoids `DecidablePred` instance mismatch).
+  suffices hkey : ∀ S : Finset (IrreducibleCharacter K),
+      (∀ φ : IrreducibleCharacter K, φ ∈ S ↔
+          ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+            (φ : ClassFunction K ℂ) ≠ 0) →
+      (H.index : ℂ) = (S.card : ℂ) * e ^ 2 by
+    exact hkey _ fun φ =>
+      ⟨fun h => (Finset.mem_filter.mp h).2,
+        fun h => Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩⟩
+  intro S hSmem
+  -- `ψ(1) = e·θ(1)` from the invariant Clifford restriction `Res_H ψ = e·θ`.
+  have hψ1 : (ψ : ClassFunction K ℂ) (1 : K) = e * (θ : ClassFunction ↥H ℂ) (1 : ↥H) := by
+    have hres := restrict_eq_restrictionMultiplicity_smul_of_invariant ψ θ hover hinv
+    have h1 : ClassFunction.restrict H (ψ : ClassFunction K ℂ) (1 : ↥H)
+        = (e • (θ : ClassFunction ↥H ℂ)) (1 : ↥H) := by rw [hres]
+    rwa [ClassFunction.restrict_apply, ClassFunction.smul_apply, Subgroup.coe_one] at h1
+  -- Fourier expansion of `Ind_H^K θ` in `Irr K`, evaluated at `1`.
+  have hdeg : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) (1 : K)
+      = ∑ φ : IrreducibleCharacter K,
+          ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+            (φ : ClassFunction K ℂ) * (φ : ClassFunction K ℂ) (1 : K) := by
+    conv_lhs => rw [← sum_inner_irreducibleCharacter_smul
+      (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))]
+    rw [ClassFunction.sum_apply]
+    exact Finset.sum_congr rfl fun φ _ => ClassFunction.smul_apply ..
+  -- Non-constituents drop out.
+  have hsub : ∑ φ ∈ S, ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+          (φ : ClassFunction K ℂ) * (φ : ClassFunction K ℂ) (1 : K)
+      = ∑ φ : IrreducibleCharacter K,
+          ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+            (φ : ClassFunction K ℂ) * (φ : ClassFunction K ℂ) (1 : K) := by
+    refine Finset.sum_subset (Finset.subset_univ S) fun φ _ hφ => ?_
+    have hz : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (φ : ClassFunction K ℂ) = 0 := by
+      by_contra hne
+      exact hφ ((hSmem φ).mpr hne)
+    rw [hz, zero_mul]
+  -- Each constituent contributes `e·(e·θ(1))`.
+  have hterm : ∀ φ ∈ S, ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (φ : ClassFunction K ℂ) * (φ : ClassFunction K ℂ) (1 : K)
+      = e * (e * (θ : ClassFunction ↥H ℂ) (1 : ↥H)) := by
+    intro φ hφ
+    have hne : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (φ : ClassFunction K ℂ) ≠ 0 := (hSmem φ).mp hφ
+    have hlo : IrreducibleCharacter.LiesOver H φ θ :=
+      (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H φ θ).mp hne
+    have hd : (φ : ClassFunction K ℂ) (1 : K) = (ψ : ClassFunction K ℂ) (1 : K) :=
+      induce_invariant_constituent_apply_one_eq hab θ ψ hover hinv φ hne
+    have hm : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (φ : ClassFunction K ℂ) = e := by
+      rw [inner_induce_coe_eq_restrictionMultiplicity, he]
+      exact restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq hlo hover hd
+    rw [hm, hd, hψ1]
+  have hcard : ∑ φ ∈ S, ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+          (φ : ClassFunction K ℂ) * (φ : ClassFunction K ℂ) (1 : K)
+      = (S.card : ℂ) * (e * (e * (θ : ClassFunction ↥H ℂ) (1 : ↥H))) := by
+    rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul]
+  -- Cancel the nonzero degree `θ(1)`.
+  have hθ1 : (θ : ClassFunction ↥H ℂ) (1 : ↥H) ≠ 0 := by
+    obtain ⟨d, hd, hdeq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    rw [hdeq]; exact_mod_cast hd.ne'
+  have hfin : (H.index : ℂ) * (θ : ClassFunction ↥H ℂ) (1 : ↥H)
+      = ((S.card : ℂ) * e ^ 2) * (θ : ClassFunction ↥H ℂ) (1 : ↥H) := by
+    rw [← ClassFunction.induce_apply_one H (θ : ClassFunction ↥H ℂ), hdeg, ← hsub, hcard]; ring
+  exact mul_right_cancel₀ hθ1 hfin
+
+open scoped commutatorElement Classical in
+/-- **Peterfalvi (1.7.b), the count in the book's divided form `n = |T:H|/e²`.**  Restatement of
+`index_eq_card_induce_constituents_mul_sq_of_invariant` solved for `n`, legitimate because
+`e = ⟨Res_H ψ, θ⟩ ≠ 0` (`ψ` lies over `θ`), so `e² ≠ 0`. -/
+theorem card_induce_constituents_eq_index_div_sq_of_invariant [Finite K] [Fintype K] [Fintype ↥H]
+    [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
+    [Finite (IrreducibleCharacter ↥H)] [Finite (IrreducibleCharacter K)]
+    [Finite ((K ⧸ H) →* ℂˣ)]
+    (hab : ∀ x y : K, ⁅x, y⁆ ∈ H)
+    (θ : IrreducibleCharacter ↥H) (ψ : IrreducibleCharacter K)
+    (hover : IrreducibleCharacter.LiesOver H ψ θ)
+    (hinv : ∀ g : K, IrreducibleCharacter.conjBy g θ = θ) :
+    ((Finset.univ.filter fun φ : IrreducibleCharacter K =>
+          ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+            (φ : ClassFunction K ℂ) ≠ 0).card : ℂ)
+      = (H.index : ℂ)
+        / ClassFunction.restrictionMultiplicity H (ψ : ClassFunction K ℂ)
+            (θ : ClassFunction ↥H ℂ) ^ 2 := by
+  have he : ClassFunction.restrictionMultiplicity H (ψ : ClassFunction K ℂ)
+      (θ : ClassFunction ↥H ℂ) ≠ 0 := hover
+  rw [eq_div_iff (pow_ne_zero 2 he)]
+  exact (index_eq_card_induce_constituents_mul_sq_of_invariant hab θ ψ hover hinv).symm
+
 open scoped commutatorElement in
 /-- **Peterfalvi (1.7.b), lifted to the full group via the Clifford correspondence.**  For `N ⊴ L`
 with `θ ∈ Irr N`, inertia `T = I_L(θ)`, and `T/N` abelian, the induced character `Ind_N^L θ`

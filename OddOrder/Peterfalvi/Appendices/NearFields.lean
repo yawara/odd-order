@@ -14,10 +14,53 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 
 The appendix uses finite near-fields to describe the 2-rank one case of the
 Suzuki theorem and records the special Zassenhaus classification needed there.
+
+## Honesty status
+
+Every statement in this file is a genuine assertion about near-fields: there are
+no opaque `Prop` fields and no self-carried `_holds` proofs anywhere.
+
+**What was opaque before (2026-07-18 de-opacification).**
+
+* `FiniteNearField` was a structure whose fields `finite`, `additive_group`,
+  `multiplicative_group`, `right_distrib` were arbitrary `Prop`s carrying their
+  own proofs.  It is **deleted**: the file already contains the real `NearField`
+  class (`AddCommGroup` + `GroupWithZero` + right distributivity), which is what
+  every statement now uses.
+* `RankOneNearFieldData` had `affine_model`, `Q_identification`,
+  `D_identification`, `unique_involution_in_H` as free `Prop` + `_holds`.  It is
+  replaced by `AffineNearFieldModel`, whose fields are the actual embedding
+  `F ↪ G`, normality, the complement `G = F ⋊ H`, the multiplicative
+  identification `Q ≃* Fˣ` *with* its conjugation compatibility, the faithful
+  action of `D` by near-field automorphisms, uniqueness of the involution in
+  `H`, and the order formula for products of distinct involutions.
+* `rankOne_affine_nearField` took an **arbitrary `(two_rank_one : Prop)`**
+  argument and concluded `∃ data, data.affine_model`, i.e. nothing.  It now
+  takes a real `RankOneHypothesis` (Peterfalvi (A1)–(A2) plus the *negation* of
+  (A3), which is what "2-rank one" means) and concludes the existence of an
+  `AffineNearFieldModel`.  Note the old statement could not even be repaired in
+  place: it was phrased over `Suzuki.Hypothesis`, which *contains* (A3)
+  (`two_rank_ge_two`), so a genuine 2-rank-one hypothesis added to it would have
+  made the theorem vacuous.
+* `cyclic_index_two_nearField_classification` took an arbitrary
+  `(cyclic_index_two : Prop)` and concluded `∃ classification : Prop,
+  classification` — provable by `⟨True, trivial⟩`; its `sorry` hid nothing.  It
+  now states the actual dichotomy (field or `F_{r²,2}`, with `|Z(F^*)| = r - 1`).
+
+Per-result status:
+
+| Result | Status |
+|---|---|
+| near-field basics, Maschke, `F_{r²,2}` twisting | **proved, sorry-free** (unchanged) |
+| App. C Prop 2, irreducibility half (`rightMulAction_irreducible_of_index_two`) | **proved** |
+| App. C Prop 2, field half (`nearField_field_structure_of_index_two`) | **proved** (unchanged) |
+| `NearField.mul_add_of_mul_comm` (commutative ⇒ distributive) | **proved, sorry-free** (new) |
+| `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
+| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` |
+| App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | honest statement, `sorry` |
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
--- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
 /-- **A finite group acting freely on a finite type divides its cardinality**: if every stabilizer
 is trivial, then `|G| ∣ |α|` (each orbit has size `|G|`, and the orbits partition `α`).  General
@@ -49,6 +92,14 @@ class NearField (F : Type*) extends AddCommGroup F, GroupWithZero F where
 /-- The right distributive law in a near-field. -/
 theorem NearField.add_mul {F : Type*} [NearField F] (a b c : F) :
     (a + b) * c = a * c + b * c := NearField.right_distrib a b c
+
+/-- **A near-field with commutative multiplication is a field** (the meaning of the first
+alternative in Peterfalvi, Appendix C, Proposition 2).  A near-field only postulates the *right*
+distributive law; if multiplication is commutative the left law follows, so `F` is a commutative
+division ring, i.e. a field. -/
+theorem NearField.mul_add_of_mul_comm {F : Type*} [NearField F]
+    (hcomm : ∀ x y : F, x * y = y * x) (a b c : F) : a * (b + c) = a * b + a * c := by
+  rw [hcomm a (b + c), NearField.add_mul, hcomm b a, hcomm c a]
 
 section NearFieldBasics
 
@@ -581,50 +632,175 @@ end Twisted
 
 end TwistedNearField
 
-variable {G Ω F : Type*} [Group G] [MulAction G Ω] [Finite G]
+section PropositionOne
 
-/-- A lightweight carrier for finite near-field structure.  The algebraic laws
-are proposition fields until a reusable near-field API is introduced. -/
-structure FiniteNearField where
-  carrier_nonempty : Nonempty F
-  finite : Prop
-  finite_holds : finite
-  additive_group : Prop
-  additive_group_holds : additive_group
-  multiplicative_group : Prop
-  multiplicative_group_holds : multiplicative_group
-  right_distrib : Prop
-  right_distrib_holds : right_distrib
+open scoped Pointwise
 
-/-- **Peterfalvi Appendix C, Proposition 1**: a 2-rank one group satisfying
-Suzuki hypotheses (A1)--(A2) is an affine group over a finite near-field. -/
-structure RankOneNearFieldData
-    (hyp : Suzuki.Hypothesis (G := G) (Ω := Ω)) where
-  nearField : FiniteNearField (F := F)
-  Sigma : Type*
-  affine_model : Prop
-  affine_model_holds : affine_model
-  Q_identification : Prop
-  Q_identification_holds : Q_identification
-  D_identification : Prop
-  D_identification_holds : D_identification
-  unique_involution_in_H : Prop
-  unique_involution_in_H_holds : unique_involution_in_H
+/-- **Peterfalvi Appendix C, Proposition 1, hypotheses** (p. 137): the Part II hypotheses
+**(A1)** and **(A2)** (p. 97) together with "`G` has 2-rank `1`".
 
-/-- **Peterfalvi Appendix C, Proposition 1**. -/
-theorem rankOne_affine_nearField
-    (hyp : Suzuki.Hypothesis (G := G) (Ω := Ω))
-    (two_rank_one : Prop) :
-    two_rank_one → ∃ data : RankOneNearFieldData (F := F) hyp,
-      data.affine_model := by
+The fields are exactly those of `Suzuki.Hypothesis` *except* (A3), which is replaced by its
+negation.  This has to be a separate structure: `Suzuki.Hypothesis` carries
+`two_rank_ge_two : ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1` as a field, so bolting a
+genuine 2-rank-one hypothesis onto it would produce contradictory (hence vacuous) hypotheses.
+
+`two_rank_one` says `G` has **no** Klein four subgroup, i.e. 2-rank `≤ 1`; equality holds because
+`Q_even` forces an involution to exist (Cauchy).  The hypotheses are satisfiable: e.g.
+`G = AGL(1, 3) ≅ S₃` acting on three points, with `Q` of order `2` and `D = 1`. -/
+structure RankOneHypothesis (G Ω : Type*) [Group G] [MulAction G Ω] [Finite G] where
+  /-- the base point of `Ω`; `H` is its stabilizer -/
+  basept : Ω
+  /-- (A1): the action is doubly transitive -/
+  doubly_transitive : MulAction.IsMultiplyPretransitive G Ω 2
+  /-- (A2): the action is faithful -/
+  faithful : FaithfulSMul G Ω
+  H : Subgroup G
+  Q : Subgroup G
+  D : Subgroup G
+  H_def : H = MulAction.stabilizer G basept
+  /-- the distinguished involution `t ∈ G - H` -/
+  t : G
+  t_sq : t ^ 2 = 1
+  t_ne_one : t ≠ 1
+  t_not_mem_H : t ∉ H
+  D_def : D = H ⊓ H.map (MulAut.conj t).toMonoidHom
+  Q_le_H : Q ≤ H
+  Q_normal_in_H : ∀ h ∈ H, ∀ x ∈ Q, h * x * h⁻¹ ∈ Q
+  Q_inf_D_eq_bot : Q ⊓ D = ⊥
+  Q_mul_D_eq_H : (Q : Set G) * (D : Set G) = (H : Set G)
+  Q_even : Even (Nat.card Q)
+  D_odd : Odd (Nat.card D)
+  /-- `G` has 2-rank one: it contains no elementary abelian subgroup of order `4`.
+  This is the negation of Part II's hypothesis (A3). -/
+  two_rank_one : ¬ ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1
+
+/-- **Peterfalvi Appendix C, Proposition 1, conclusion**: the affine near-field model of `G`.
+
+The book asserts an isomorphism `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ` identifying `Q` with `F^*` and `D`
+with `Σ`.  Internally this says: `F` sits in `G` as a normal subgroup complemented by `H`
+(`G = F ⋊ H`), the conjugation action of `Q` on `F` is right multiplication by `F^*` under an
+isomorphism `Q ≃* Fˣ`, and `D` acts faithfully on `F` by near-field automorphisms.  A "near-field
+automorphism" is an additive equivalence that is also multiplicative — spelled out as `dAut` +
+`dAut_mul` rather than through a bundled automorphism group.
+
+The final two clauses of the proposition ("`H` has only one involution"; "if `u ≠ v` are
+involutions of `G` then `|uv|` is the characteristic of `F`") are the last three fields; `char` is
+the characteristic in the sense of `exists_prime_char`. -/
+structure AffineNearFieldModel {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) (F : Type*) [NearField F] where
+  /-- `(F, +)` embedded in `G`. -/
+  emb : Multiplicative F →* G
+  emb_injective : Function.Injective emb
+  /-- `F ⊴ G`. -/
+  range_normal : (MonoidHom.range emb).Normal
+  /-- `G = F ⋊ H`. -/
+  isComplement : Subgroup.IsComplement' (MonoidHom.range emb) hyp.H
+  /-- `Q` is identified with `F^*`. -/
+  qEquiv : ↥hyp.Q ≃* Fˣ
+  /-- The identification `Q ≃* F^*` turns conjugation into right multiplication, i.e. it realizes
+  `F ⋊ Q ≅ F ⋊ F^* = 𝓛(F)`. -/
+  qEquiv_conj : ∀ (q : ↥hyp.Q) (x : F),
+    (q : G) * emb (Multiplicative.ofAdd x) * (q : G)⁻¹
+      = emb (Multiplicative.ofAdd (x * ((qEquiv q : Fˣ) : F)))
+  /-- `D` acts on `F` by additive bijections … -/
+  dAut : ↥hyp.D → (F ≃+ F)
+  /-- … which are multiplicative, i.e. near-field automorphisms … -/
+  dAut_mul : ∀ (g : ↥hyp.D) (x y : F), dAut g (x * y) = dAut g x * dAut g y
+  /-- … faithfully, so that `D` *is* a group `Σ` of automorphisms of `F` … -/
+  dAut_injective : Function.Injective dAut
+  /-- … and the action is the conjugation action inside `G`. -/
+  dAut_conj : ∀ (g : ↥hyp.D) (x : F),
+    (g : G) * emb (Multiplicative.ofAdd x) * (g : G)⁻¹ = emb (Multiplicative.ofAdd (dAut g x))
+  /-- `H` has exactly one involution. -/
+  unique_involution_in_H : ∃! u : ↥hyp.H, (u : G) ^ 2 = 1 ∧ (u : G) ≠ 1
+  /-- The characteristic of the near-field `F`. -/
+  char : ℕ
+  char_prime : char.Prime
+  char_spec : ∀ x : F, char • x = 0
+  /-- If `u ≠ v` are involutions of `G` then `|uv|` is the characteristic of `F`. -/
+  orderOf_mul_of_involutions : ∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v →
+    orderOf (u * v) = char
+
+/-- **Peterfalvi Appendix C, Proposition 1** (p. 137).  If `G` satisfies (A1) and (A2) and has
+2-rank `1`, then `G` is the affine group of a finite near-field: there is a near-field `F` and a
+group `Σ` of automorphisms of `F` with `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ`, identifying `Q` with `F^*`
+and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct involutions `u, v ∈ G`,
+`|uv|` equals the characteristic of `F`.
+
+**Status: honestly stated, not proved.**  Peterfalvi's proof consumes three results that are not
+available here: (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert,
+*Endliche Gruppen* I, Kapitel III, Satz 8.2) — 2-rank one is exactly this; (ii) the **Brauer–Suzuki
+theorem** `G = O_{2'}(G) C_G(u)`, which is not formalized in this repository; (iii) Huppert Kapitel
+II, Satz 3.2, giving the elementary abelian normal complement `G = F ⋊ H` for the solvable
+`O_{2'}(G)` (solvable by Feit–Thompson).  With those in hand, the near-field structure on `F` comes
+from the regular action of `Q` on `F^#` by the standard transport recorded on p. 137 (choose the
+`D`-fixed point of `F^#` as the multiplicative identity), which *is* elementary and would be the
+first piece to formalize once (i)–(iii) exist. -/
+theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) :
+    ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
   sorry
 
-/-- **Peterfalvi Appendix C, Proposition 2**: a finite near-field whose
-multiplicative group has a cyclic subgroup of index two is either a field or the
-exceptional near-field `F_{r^2,2}`. -/
-theorem cyclic_index_two_nearField_classification
-    (nearField : FiniteNearField (F := F)) (cyclic_index_two : Prop) :
-    cyclic_index_two → ∃ classification : Prop, classification := by
+end PropositionOne
+
+section PropositionTwo
+
+/-- **Peterfalvi Appendix C, Proposition 2, first half** (proved, sorry-free), stated with the
+book's hypothesis: if the multiplicative group `F^*` of a finite near-field has a **cyclic**
+subgroup `A` of index `2`, then `(F, +)` is a `1`-dimensional vector space over a finite field `K`
+with `|K| = |F|`.
+
+This is `nearField_field_structure_of_index_two` with the commutativity hypothesis discharged from
+cyclicity; the index-`2` irreducibility (free-orbit counting + Maschke) and Appendix I's
+`exists_field_semilinear` do the work. -/
+theorem exists_field_structure_of_cyclic_index_two.{u} {F : Type u} [NearField F] [Finite F]
+    [Nontrivial F] (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
+    ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
+      Module.finrank K F = 1 ∧ Nat.card K = Nat.card F := by
+  have hcomm : ∀ u v : ↥A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ) := by
+    letI : CommGroup ↥A := hcyc.commGroup
+    intro u v
+    simpa using congrArg Subtype.val (mul_comm u v)
+  exact nearField_field_structure_of_index_two A hcomm hidx
+
+/-- **Peterfalvi Appendix C, Proposition 2** (pp. 137--138).  Let `F` be a finite near-field whose
+multiplicative group `F^*` has a **cyclic** subgroup `A` of index `2`.  Then either `F` is a field
+(equivalently, by `NearField.mul_add_of_mul_comm`, its multiplication is commutative), or there is
+an `r` which is a power of an odd prime such that `F ≅ F_{r²,2}` — the twisted near-field carried by
+`TwistData` on `K = 𝔽_{r²}` — and in that case `|Z(F^*)| = r - 1`.
+
+An isomorphism of near-fields is an additive equivalence that is also multiplicative, spelled out
+here rather than bundled.
+
+**Status: honestly stated, `sorry`.**  The first half of Peterfalvi's proof is **proved**, in this
+file, sorry-free: `rightMulAction_irreducible_of_index_two` is the counting argument
+`|F| = 2|A| + 1 ≥ (|A|+1)²` ruling out a proper invariant decomposition, and
+`exists_field_structure_of_cyclic_index_two` (cited in the proof below) is the resulting field
+structure via Appendix I, Proposition 2.
+
+What remains is the *tail*: normalize the field `K` obtained from `exists_field_semilinear` so that
+its unit `1` is the near-field unit and `x ∘ y = x·y` for `y ∈ A` (the module structure only gives
+`finrank = 1`, so the normalization is the choice of basis vector `1`), then run the semilinearity
+clause of `exists_field_semilinear` to produce the homomorphism `y ↦ σ_y` from `F^*` to `Aut K`
+whose kernel contains `A`, split on whether that kernel is all of `F^*` (field case) or of index `2`
+(then `σ_y : x ↦ x^r` and `F ≅ F_{r²,2}`), and finally compute `Z(F^*) = 𝔽_r^*` from
+`x ∈ Z(F^*) ↔ x^r = x`.  The missing formal prerequisite is the normalized transport of the
+`exists_field_semilinear` output onto the near-field `F` itself (a `Module K F` with `finrank 1` has
+to be converted into a *field structure on `F`* sharing `+` and `1` with the near-field); no piece
+of this is in the repository yet. -/
+theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F] [Finite F]
+    [Nontrivial F] (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
+    (∀ x y : F, x * y = y * x) ∨
+      ∃ (r : ℕ) (K : Type u) (_ : Field K) (_ : Finite K) (d : TwistData K),
+        (∃ p n : ℕ, p.Prime ∧ Odd p ∧ 0 < n ∧ r = p ^ n) ∧
+        Nat.card K = r ^ 2 ∧
+        (∃ e : F ≃+ Twisted d, ∀ x y : F, e (x * y) = e x * e y) ∧
+        Nat.card ↥(Subgroup.center Fˣ) = r - 1 := by
+  -- The proved first half: `A` acts irreducibly, so `F` carries a field structure of the same size.
+  obtain ⟨_K, _hK, _hMod, _hKfin, _hrank, _hcard⟩ :=
+    exists_field_structure_of_cyclic_index_two A hcyc hidx
   sorry
+
+end PropositionTwo
 
 end OddOrder.Peterfalvi.Appendices.NearFields

@@ -867,6 +867,83 @@ theorem hConjInvariant (hyp : Hypothesis G A L) : hyp.HConjInvariant := by
         _ = ((l : G) * a.1 * (l : G)⁻¹) * x := by group
   rw [hord, hcard, hcent]
 
+/-- **Peterfalvi (2.4.c)**: `N_G(a·H(a)) = C_G(a)` for `a ∈ A`.
+
+Stated elementwise: `g` stabilizes the coset `H(a)·a` under conjugation exactly when `g`
+centralizes `a`.  (`H(a) ≤ C_G(a)`, so `H(a)·a = a·H(a)` is the book's coset `aH(a)`.)
+
+`⊇` is the book's implicit converse: a `g ∈ C_G(a)` normalizes `H(a)` (`H_normalized`, applied
+to `g` and to `g⁻¹`) and fixes `a`, hence permutes the coset.
+
+`⊆` is the book's argument "`a^g = (a^g)_π = a`, and so `g ∈ C_G(a)`", with the local modulus
+`|C_L(a)|` in place of the global prime set `π` (as in `mem_H_iff_coprime_orderOf`): since
+`a ∈ H(a)·a`, stability gives `g·a·g⁻¹ = u·a` for some `u ∈ H(a)`.  Now `u` commutes with `a`
+(`H(a) ≤ C_G(a)`) and `o(u) ∣ |H(a)|` is prime to `o(a) ∣ |C_L(a)|`
+(`centralizer_coprime`), so `o(u·a) = o(u)·o(a)`; but conjugation preserves order, so
+`o(u·a) = o(a)`, forcing `o(u) = 1`, i.e. `u = 1` and `g·a·g⁻¹ = a`. -/
+theorem conj_coset_H_eq_iff_mem_centralizer (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) (g : G) :
+    (fun x => g * x * g⁻¹) '' ((↑(hyp.H a) : Set G) * ({a.1} : Set G))
+        = (↑(hyp.H a) : Set G) * ({a.1} : Set G)
+      ↔ g ∈ Subgroup.centralizer ({a.1} : Set G) := by
+  have hHC : (hyp.H a : Subgroup G) ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [hyp.centralizer_eq_sup a]; exact le_sup_left
+  constructor
+  · intro himg
+    -- `a ∈ H(a)·a`, so `g·a·g⁻¹ = u·a` for some `u ∈ H(a)`.
+    have hamem : a.1 ∈ (↑(hyp.H a) : Set G) * ({a.1} : Set G) :=
+      ⟨1, (hyp.H a).one_mem, a.1, Set.mem_singleton _, one_mul _⟩
+    have hga : g * a.1 * g⁻¹ ∈ (↑(hyp.H a) : Set G) * ({a.1} : Set G) := by
+      rw [← himg]; exact ⟨a.1, hamem, rfl⟩
+    obtain ⟨u, hu, b, hb, hueq⟩ := hga
+    rw [Set.mem_singleton_iff] at hb
+    subst hb
+    -- `u` commutes with `a`, and their orders are coprime.
+    have hueq' : u * a.1 = g * a.1 * g⁻¹ := hueq
+    have hcomm : Commute u a.1 := Subgroup.mem_centralizer_singleton_iff.mp (hHC hu)
+    have hcop : Nat.Coprime (orderOf u) (orderOf a.1) := by
+      refine Nat.Coprime.coprime_dvd_left ((hyp.H a).orderOf_dvd_natCard hu) ?_
+      refine Nat.Coprime.coprime_dvd_right ?_ (hyp.centralizer_coprime a a)
+      exact (centralizerIn L a.1).orderOf_dvd_natCard
+        (mem_centralizerIn.mpr ⟨hyp.mem_L a.2, rfl⟩)
+    -- Conjugation preserves order, so `o(u)·o(a) = o(a)`, i.e. `o(u) = 1`.
+    have hordconj : orderOf (g * a.1 * g⁻¹) = orderOf a.1 :=
+      SemiconjBy.orderOf_eq g⁻¹ (show g⁻¹ * (g * a.1 * g⁻¹) = a.1 * g⁻¹ by group)
+    have hordmul : orderOf (u * a.1) = orderOf u * orderOf a.1 :=
+      hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop
+    have hkey : orderOf u * orderOf a.1 = orderOf a.1 := by
+      rw [← hordmul, hueq', hordconj]
+    have hone : orderOf u = 1 :=
+      Nat.eq_of_mul_eq_mul_right (orderOf_pos a.1) (by rw [one_mul]; exact hkey)
+    have hu1 : u = 1 := orderOf_eq_one_iff.mp hone
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hfix : g * a.1 * g⁻¹ = a.1 := by rw [← hueq', hu1, one_mul]
+    calc g * a.1 = (g * a.1 * g⁻¹) * g := by group
+      _ = a.1 * g := by rw [hfix]
+  · intro hg
+    have hga : g * a.1 * g⁻¹ = a.1 := by
+      have := Subgroup.mem_centralizer_singleton_iff.mp hg
+      calc g * a.1 * g⁻¹ = (a.1 * g) * g⁻¹ := by rw [this]
+        _ = a.1 := by group
+    ext y
+    constructor
+    · rintro ⟨x, ⟨u, hu, b, hb, rfl⟩, rfl⟩
+      rw [Set.mem_singleton_iff] at hb
+      subst hb
+      refine ⟨g * u * g⁻¹, hyp.H_normalized a g hg u hu, a.1, Set.mem_singleton _, ?_⟩
+      calc g * u * g⁻¹ * a.1 = (g * u * g⁻¹) * (g * a.1 * g⁻¹) := by rw [hga]
+        _ = g * (u * a.1) * g⁻¹ := by group
+    · rintro ⟨u, hu, b, hb, rfl⟩
+      rw [Set.mem_singleton_iff] at hb
+      subst hb
+      have huinv : g⁻¹ * u * g ∈ hyp.H a := by
+        have := hyp.H_normalized a g⁻¹ (Subgroup.inv_mem _ hg) u hu
+        rwa [inv_inv] at this
+      refine ⟨(g⁻¹ * u * g) * a.1, ⟨g⁻¹ * u * g, huinv, a.1, Set.mem_singleton _, rfl⟩, ?_⟩
+      calc g * ((g⁻¹ * u * g) * a.1) * g⁻¹
+          = u * (g * a.1 * g⁻¹) := by group
+        _ = u * a.1 := by rw [hga]
+
 open Classical in
 /-- **Orbit count for the (2.7) adjoint formula.**  For `g` in the Dade support,
 the centralizers `|C_L(a)|`, summed over the `a ∈ A` whose coset `aH(a)` meets

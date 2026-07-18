@@ -36,10 +36,36 @@ D.1 の証明 (mmd L5155-5178) が要するもの:
 3. BG Thm 6.2 (Glauberman `Z(J(P)) ⊴ M`) ← **repo にあり** (ZJ / `L(P)`+Thm B.4 代替)。
 4. Focal Subgroup Thm (BG Thm 1.17) ← **mathlib にあり** (`Subgroup.commutator_inf_eq_focalSubgroup`)。
 
-⟹ ブロッカーは **Gorenstein §14.1 (3-step 群の定義 + Cor 14.1.6) のみ**。CLAUDE.md の
-「BG が **G** を引いて証明を省く箇所は Gorenstein 原文を読んで Lean に書き起こす」に該当するので
-**対象外にせず** `OddOrder/GroupTheory/` の新 leaf に書く (shared infra ゆえ着手前に 9000 claim 検討)。
-D.2 は D.1 が入れば短い (Focal Subgroup + 単純性から `G' = G`)。
+⟹ ブロッカーは **Gorenstein §14.1 (3-step 群の定義 + Cor 14.1.6) のみ**。D.2 は D.1 が入れば短い
+(Focal Subgroup + 単純性から `G' = G`)。
+
+### ⚠ Isaacs で代替可能か = **不可** (2026-07-18 検証済)
+
+CLAUDE.md 方針「BG の **G** 引用はまず Isaacs に読み替え、Isaacs が欠く場合のみ Gorenstein」に従い
+検証した結果、**これは Isaacs 代替不可**:
+- Isaacs `finite-group-theory.mmd` に **`CN-group`/`CN group` の記述はゼロ**、`3-step group` もゼロ。
+- Gorenstein の当該箇所は **§14.2「CN-groups of odd order」という CN 専用の構造論**であり、
+  汎用 p-可解理論ではない ([[bg-gorenstein-reread-as-isaacs]] が言う「ほぼ既存被覆」の例外に当たる)。
+
+### ただし「Gorenstein Ch.14 を全形式化する」必要は無い (scope 限定)
+
+BG が実際に使うのは **Cor 14.1.6 の二者択一だけ**:
+> 可解 `N` が `O_p(N) ≠ 1` なら、**`N` は p に関する 3-step 群** であるか、
+> **`O_p(N)` が `N` の Sylow p-部分群** であるかのいずれか (Gorenstein 原文 7877 行の用法で確認)。
+
+BG は対偶で使う: `P∩M ≠ O_p(M)` (= `O_p(M)` が Sylow でない) ⟹ M は 3-step 群。
+そこから使う帰結も **2 つだけ**: `O_{p'}(M) = 1` と `M/O_{p,p'}(M)` が非自明 p-群。
+
+その証明に要る下部構造 (Hall-Higman 1.2.3 = `Isaacs.Ch03.hall_higman_1_2_3`、`O_{p',p}` 系、
+ZJ/Thompson subgroup = `Isaacs/Ch07_ThompsonSubgroup/**`) は **Isaacs 経由で repo に既に在る**。
+また BG 自身が「§14.1 は G が奇数位数なら少し易しくなる」「G の Thm 7.6.1/10.2.1 は BG の
+Thm 4.18(b)/3.7 で置換可」と注記している (mmd L5150)。
+
+⟹ **やるべきは「CN 群に対する 3-step 二者択一 (Cor 14.1.6) とその 2 帰結」を、奇数位数の簡約と
+既存 Isaacs 級機構を使って自前で証明すること**。CLAUDE.md の「BG が **G** を引いて証明を省く箇所は
+Gorenstein 原文を読んで Lean に書き起こす」がまさにこれ。**「Gorenstein の章節を独立に全形式化する」
+ことではない** (それは CLAUDE.md が明示的に禁じている)。`OddOrder/GroupTheory/` の新 leaf
+(shared infra ゆえ着手前に 9000 claim)。
 
 ## ⚠ vacuous discharge は禁止
 
