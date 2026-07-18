@@ -10227,17 +10227,18 @@
      "id": "Lem 1",
      "kind": "Lemma",
      "name": "Central extensions of elementary abelian 2-groups correspond to F_2-quadratic maps: (a) squaring induces a quadratic map V->W; (b) every quadratic map arises from an explicit cocycle extension; (c) isomorphism criterion g.q = q'.f; (d) automorphisms trivial on V and W form a group isomorphic to Hom(V,W)",
-     "status": "missing",
+     "status": "partial",
      "effort": "M",
      "lean_names": [
-      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.square_map_quadratic",
-      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticMapData"
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.extension",
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.range_inl_le_center",
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.sq_eq_inl_q"
      ],
      "mathlib_names": [
       "QuadraticMap",
       "GroupExtension"
      ],
-     "notes": "Verified: only part (a) has a scaffold declaration (square_map_quadratic, 1 of the file's 4 sorries) and its statement is vacuous — it takes arbitrary Props hW hV and concludes Nonempty QuadraticMapData whose fields are opaque Props. Parts (b)(c)(d) have no Lean counterpart; repo-wide grep for quadratic/cocycle/central-extension infrastructure hits nothing outside this file (the only other 'cocycle' mention is an Isaacs Ch03 docstring table pointing at mathlib GroupCohomology). Real work: basis-dependent cocycle construction for (b), normal-form argument for (c), Hom(V,W) computation for (d)."
+     "notes": "2026-07-18 lane-b update: Lemma 1(b) is fully formalized by the explicit bilinear twisted-product construction in Suzuki2Groups/QuadraticExtensions.lean, including central kernel, quotient, and square-map recovery, sorry-free and AxiomsCheck-registered. Parts (a), (c), and (d) remain."
     },
     {
      "id": "Lem 2",
@@ -10269,27 +10270,31 @@
      "id": "Def 2",
      "kind": "Definition",
      "name": "The group A(n,phi): central extension of F = F_{2^n} by F attached (via Lemma 1(b)) to the quadratic map x -> x*phi(x); type A = isomorphic to some A(n,phi) with phi nontrivial of odd order",
-     "status": "missing",
+     "status": "formalized",
      "effort": "S",
      "lean_names": [
-      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SuzukiTypeData"
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeAModel",
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeAData",
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsTypeA"
      ],
      "mathlib_names": [
       "GaloisField"
      ],
-     "notes": "Verified: SuzukiTypeData.typeA is an opaque Prop — the group A(n,phi) is never constructed, and no construction exists elsewhere (repo GaloisField uses are all in BG AppC, unrelated). The honest definition is short (S) but gated on the Lemma 1(b) cocycle construction; mathlib's GaloisField / finite-field Aut API supplies F and phi."
+     "notes": "2026-07-18 lane-b update: Types.lean defines the source quadratic map a*phi(a), its actual Lemma 1(b) central extension, and TypeAData with a finite characteristic-two field of order 2^n, nontrivial odd-order phi, and a group equivalence to the model. Sorry-free and AxiomsCheck-registered."
     },
     {
      "id": "Def 3",
      "kind": "Definition",
      "name": "The group B(n,phi,epsilon): central extension of F by F x F attached to the quadratic map (a,b) -> a*phi(a) + epsilon*a*phi(b) + b*phi(b), with the anisotropy condition on epsilon; type B = isomorphic to some B(n,phi,epsilon)",
-     "status": "missing",
+     "status": "formalized",
      "effort": "S",
      "lean_names": [
-      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SuzukiTypeData"
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBModel",
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBData",
+      "OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsTypeB"
      ],
      "mathlib_names": [],
-     "notes": "Verified: SuzukiTypeData.typeB is an opaque Prop; B(n,phi,epsilon) is never constructed anywhere in the repo. Same gating as Def 2 (needs Lemma 1(b) construction); the epsilon anisotropy condition is a one-line hypothesis. The structure also carries typeC_or_typeD as an opaque Prop, matching the book's remark that types C/D need no explicit definition."
+     "notes": "2026-07-18 lane-b update: Types.lean defines the exact three-term source quadratic map, epsilon in F*, the stated nonvanishing condition and its anisotropy consequence, and TypeBData with a genuine group equivalence to the quadratic-extension model. Sorry-free and AxiomsCheck-registered."
     },
     {
      "id": "Thm (Higman)",
@@ -10328,7 +10333,7 @@
      "notes": "Verified: typeB_automorphism_structure (1 of the 4 sorries) is vacuous ('∃ automorphismStructure : Prop, automorphismStructure'). The real proof expands f, g in the automorphism basis of Lemma 2(a) and compares quadratic-map coefficients via Lemma 2(c) with indices mod 2n; depends on Lemma 1(d), Lemma 2, and Prop 1. Estimate 1-2 weeks after upstream items land. Re-verified: SemilinearField.lean is the Huppert-appendix (App I) Prop 2 core (End-ring field structure for a cyclic normal irreducible action, exists_field_semilinear) — different appendix, does not cover Aut(B(n,1))."
     }
    ],
-   "summary": "This appendix (Peterfalvi appendix on Suzuki 2-groups, pp. 139-143; repo file OddOrder/Peterfalvi/Appendices/Suzuki2Groups.lean labels it \"Appendix D\") has essentially zero genuine formalization: the Lean file is an opaque-Prop scaffold in which every theorem statement is vacuous (existentials over structures whose fields are arbitrary Props), so all 4 sorries (square_map_quadratic = Lemma 1(a), higman_classification = the Theorem, typeB_field_model = Prop 1, typeB_automorphism_structure = Prop 2) mask statements with no mathematical content, and Lemma 1(b)-(d), Lemma 2, and Definitions 2-3 are not even stated. There is no Coq analog to lean on — math-comp/odd-order never formalized Peterfalvi Part II or its appendices — and the only importer (FeitSibley.lean) uses none of these declarations, so the whole unit is greenfield. The one structurally notable item is the unnumbered \"Theorem\" (Higman's classification of Suzuki 2-groups): the book itself takes it as given, citing Higman 1963 / Huppert-Blackburn VIII 7.9, so an honest formalization must either import ~20+ pages of hard 2-group analysis (XL) or keep it as an explicit stated hypothesis. Mathlib supplies useful ingredients: QuadraticMap covers the preamble's char-2 quadratic-map definition, linearIndependent_monoidHom gives the Dedekind-independence core of Lemma 2, and GroupExtension/GaloisField give central-extension and finite-field infrastructure, but none of the numbered results themselves. Verification pass: all flagged labels (7 missing, 1 partial) were confirmed against the source mmd, the full Lean file, and repo-wide descriptive-name greps (Higman/Suzuki-2-group, quadratic map/cocycle/central extension, automorphism bases, semilinear) — no hidden coverage was found in OddOrder/GroupTheory, OddOrder/Algebra, or other book trees, the zero-consumer claim was re-verified repo-wide, and no statuses changed.",
+   "summary": "2026-07-18 lane-b update: Lemma 1(b) and Definitions 2-3 are now concretely formalized; the historical 2026-07-16 zero-coverage wording below is stale for those three entries. This appendix (Peterfalvi appendix on Suzuki 2-groups, pp. 139-143; repo file OddOrder/Peterfalvi/Appendices/Suzuki2Groups.lean labels it \"Appendix D\") has essentially zero genuine formalization: the Lean file is an opaque-Prop scaffold in which every theorem statement is vacuous (existentials over structures whose fields are arbitrary Props), so all 4 sorries (square_map_quadratic = Lemma 1(a), higman_classification = the Theorem, typeB_field_model = Prop 1, typeB_automorphism_structure = Prop 2) mask statements with no mathematical content, and Lemma 1(b)-(d), Lemma 2, and Definitions 2-3 are not even stated. There is no Coq analog to lean on — math-comp/odd-order never formalized Peterfalvi Part II or its appendices — and the only importer (FeitSibley.lean) uses none of these declarations, so the whole unit is greenfield. The one structurally notable item is the unnumbered \"Theorem\" (Higman's classification of Suzuki 2-groups): the book itself takes it as given, citing Higman 1963 / Huppert-Blackburn VIII 7.9, so an honest formalization must either import ~20+ pages of hard 2-group analysis (XL) or keep it as an explicit stated hypothesis. Mathlib supplies useful ingredients: QuadraticMap covers the preamble's char-2 quadratic-map definition, linearIndependent_monoidHom gives the Dedekind-independence core of Lemma 2, and GroupExtension/GaloisField give central-extension and finite-field infrastructure, but none of the numbered results themselves. Verification pass: all flagged labels (7 missing, 1 partial) were confirmed against the source mmd, the full Lean file, and repo-wide descriptive-name greps (Higman/Suzuki-2-group, quadratic map/cocycle/central extension, automorphism bases, semilinear) — no hidden coverage was found in OddOrder/GroupTheory, OddOrder/Algebra, or other book trees, the zero-consumer claim was re-verified repo-wide, and no statuses changed.",
    "unit": "Peterfalvi App: On Suzuki 2-Groups",
    "_short": "Pf App: Suzuki2Groups",
    "_book": "Peterfalvi"

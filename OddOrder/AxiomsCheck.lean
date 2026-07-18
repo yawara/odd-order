@@ -225,6 +225,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 /-!
@@ -7884,6 +7885,19 @@ has an explicit central extension whose squaring map is the original map. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.sq_eq_inl_q
+
+/-! **Peterfalvi Appendix III, Definitions 2--3**: the type-A and type-B
+groups are concrete quadratic central extensions, with the source type-B
+nonvanishing condition implying anisotropy. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeAModel.sq_eq_inl_quadraticMap
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.typeBQuadraticMap_anisotropic
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBData.map_sq
 
 /-! **Peterfalvi Part II, Ch. I §2, Corollary**: nilpotence makes a Sylow
 `2`-subgroup `S ≤ Q` characteristic.  The cyclic subgroup `K` acts on `S`,
