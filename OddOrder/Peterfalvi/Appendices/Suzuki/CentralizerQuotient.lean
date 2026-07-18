@@ -9,7 +9,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 # Peterfalvi Part II, Ch. I §3: the centralizer quotient hypothesis
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
-2000), Part II, Ch. I §3, pp. 106–107.
+2000), Part II, Ch. I §3, pp. 105–106.
 
 In Proposition 1(c), Peterfalvi puts `L = C_G(X)`, divides the induced
 action of `L` on `Ω_X` by its kernel `𝒩(L)`, and applies induction to this
@@ -308,7 +308,7 @@ namespace Hypothesis
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω)
 
-section /- §3, Proposition 1(c): faithful centralizer quotient (pp. 106–107) -/
+section /- §3, Proposition 1(c): faithful centralizer quotient (pp. 105–106) -/
 
 variable {X : Subgroup G}
 

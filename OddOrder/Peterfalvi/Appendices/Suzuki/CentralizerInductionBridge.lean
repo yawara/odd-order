@@ -13,7 +13,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 2000), Part II, Theorem A (pp. 96–97) and Ch. I §3, Proposition 1(c)
-(pp. 106–107).
+(pp. 105–106).
 
 This file records the conclusion of Suzuki's Theorem A as concrete standard
 action coordinates for its three target families.  Applying the source
@@ -134,7 +134,7 @@ theorem TheoremAConclusion.Q_and_residual (result : TheoremAConclusion G Omega)
 
 end
 
-section /- Ch. I §3 Proposition 1(c): the centralizer root group (pp. 106–107) -/
+section /- Ch. I §3 Proposition 1(c): the centralizer root group (pp. 105–106) -/
 
 variable (hyp : Hypothesis G Omega) {X : Subgroup G}
 
