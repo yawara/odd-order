@@ -27,11 +27,22 @@
 > **残 = Thm 9.10** (Wielandt aut tower 本体; recursive type family + tower の `G_1`
 > subnormal と 9.13/9.21 normal のミスマッチ解決が要る = **issue 1037** に詳細)。
 >
-> **§9C 着手 (2026-07-18)**: `LayerRestriction.lean` (**Lem 9.25**
-> `map_layer_eq_layer_of_fitting_eq_bot`: F(G)=1, E(G)≤H ⇒ E(G)=E(H))。
-> 残 §9C = 9.26/9.27 (O^p 版 9.15; **O^p = p-residual の定義 API が未整備** — 要新設,
-> `nilpotentResidual` と同型の induction) → 9.24/9.23 (Thompson-Wielandt 本体, 重い)。
-> §9D (Bartels 9.28–9.31) も未着手。
+> **§9C 進行中 (2026-07-18)**: `LayerRestriction.lean` (**Lem 9.25**
+> `map_layer_eq_layer_of_fitting_eq_bot`: F(G)=1, E(G)≤H ⇒ E(G)=E(H)) +
+> `PResidual.lean` (**O^p = p-residual** の定義・core API: `pResidual p G`,
+> characteristic/normal, **核心 `isPGroup_quotient_pResidual`** G/O^p(G) は p-群,
+> 普遍性易しい向き; **Cor 9.27** `pResidual_map_subtype_normal` S◁G ⇒ O^p(S)◁G,
+> 補助 `map_subtype_normal_of_characteristic` char部分群 of normal は normal)。
+> ⚠ 別レーンの `OddOrder/GroupTheory/PrimeComplementResidual` は O^{p'} (Sylow-p 生成,
+> 商 p'-群) で **O^p とは双対・別物** (重複でない)。
+> **残 §9C**:
+>   - **Lem 9.26** (O^p(SP)=O^p(S), O^p 版 9.15): pResidual の subtype transport が要る
+>     (↥S ↔ ambient の IsPGroup 商転送; ~80 行, 9.15 と同型だが O^p は級数無しで手作業)。
+>     standalone (9.24 は 9.27 を使い 9.26 不使用)。
+>   - **Thm 9.24** (一般 Thompson-Wielandt, L5155): **major, 多反復**。statement 自体が
+>     H,K,D,M=core_H(D),N,E,U,V + 複雑仮説。core_H(D) transport (`normalCore` in ↥H) 新設 +
+>     ~40 行 dense proof (F*/9.8/9.18/9.25/9.27/cores/O_p)。deps は全 landed。
+>   - **Thm 9.23** (Thompson corefree bound) は 9.24 の系。§9D (Bartels 9.28–9.31) 未着手。
 >
 > Schenkman 実装メモ: 9.22 は `inf_center_ne_bot_of_normal_of_isNilpotent`
 > (nilpotent 群の nontrivial normal は中心と交わる; upper central series 帰納) が核。
