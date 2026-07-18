@@ -142,4 +142,28 @@ theorem pResidual_le_of_isPGroup_quotient {N : Subgroup G} [N.Normal]
     (hN : IsPGroup p (G ⧸ N)) : pResidual p G ≤ N :=
   sInf_le ⟨inferInstance, hN⟩
 
+/-- 正規部分群 `S ◁ G` の characteristic 部分群 `C` は `G` に normal (`C.map S.subtype ◁ G`).
+`g` 共役は `S` 上の自己同型 `conjNormal g` を誘導し, characteristic ゆえ `C` を保つ. -/
+theorem map_subtype_normal_of_characteristic {S : Subgroup G} [S.Normal]
+    (C : Subgroup ↥S) [C.Characteristic] : (C.map S.subtype).Normal := by
+  refine ⟨fun n hn g => ?_⟩
+  rw [Subgroup.mem_map] at hn
+  obtain ⟨c, hc, rfl⟩ := hn
+  have hcC : MulAut.conjNormal g c ∈ C :=
+    Subgroup.mem_comap.mp
+      ((Subgroup.characteristic_iff_comap_eq.mp ‹C.Characteristic› (MulAut.conjNormal g)).symm ▸ hc)
+  have heq : g * S.subtype c * g⁻¹ = S.subtype (MulAut.conjNormal g c) :=
+    (MulAut.conjNormal_apply g c).symm
+  rw [heq]
+  exact Subgroup.mem_map_of_mem _ hcC
+
+/-- **Isaacs Corollary 9.27** (p. 283): `S ◁ G` ならば `O^p(S) ◁ G` (ambient で
+`(O^p ↥S).map S.subtype`), 特に任意の `P ≤ G` (書籍では `P ◁ G` p-群) が `O^p(S)` を正規化する.
+
+書籍は 9.26 (`O^p(SP) = O^p(S)`) を経由するが, `O^p(S)` は `S` に characteristic なので
+`S ◁ G` から直接 `G`-normal (より一般に `P` の p-群性は不要). -/
+theorem pResidual_map_subtype_normal {S : Subgroup G} [S.Normal] :
+    ((pResidual p ↥S).map S.subtype).Normal :=
+  map_subtype_normal_of_characteristic _
+
 end OddOrder.Isaacs.Ch09
