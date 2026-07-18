@@ -232,15 +232,18 @@ theorem le_centralizer_of_isMinimalNormal {E F : Subgroup G}
         show j + 1 = k from hj.symm]
     exact hk_iter
 
-/-- **Helper**: 部分群 `E` で `↥E` 冪零 + 非自明 ⇒ `⁅E, E⁆ < E`.
+/-- **Helper**: 部分群 `E` で `↥E` 可解 + 非自明 ⇒ `⁅E, E⁆ < E`.
 
-mathlib `IsSolvable.commutator_lt_of_ne_bot` の冪零部分群版 (ambient `G` の可解性は不要).
-証明は mathlib 版を mirror: `IsSolvable ↥E ← IsNilpotent ↥E` + `map_subtype_lt_map_subtype`. -/
-theorem commutator_lt_self_of_isNilpotent_subtype
+mathlib `IsSolvable.commutator_lt_of_ne_bot` は**環境** `[IsSolvable G]` を要求するが,
+証明が実際に使うのは `↥E` の可解性だけ (`↥E` 内で `commutator_lt_top_of_nontrivial` を
+当てて `E.subtype` で押す). ambient の可解性を仮定しない Isaacs 3.11 で要る形.
+
+冪零の場合は mathlib instance `IsNilpotent.to_isSolvable` が `IsSolvable ↥E` を供給する
+ので, 呼び出し側は `[Group.IsNilpotent ↥E]` のままでよい. -/
+theorem commutator_lt_self_of_isSolvable_subtype
     {G : Type*} [Group G]
-    (E : Subgroup G) [Group.IsNilpotent ↥E] [Nontrivial ↥E] :
+    (E : Subgroup G) [IsSolvable ↥E] [Nontrivial ↥E] :
     ⁅E, E⁆ < E := by
-  haveI : IsSolvable ↥E := IsNilpotent.to_isSolvable
   rw [← E.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
       Subgroup.map_subtype_lt_map_subtype]
   exact IsSolvable.commutator_lt_top_of_nontrivial ↥E
@@ -257,7 +260,7 @@ theorem isCommutative_of_isMinimalNormal_of_isNilpotent_subtype
     ∀ x ∈ E, ∀ y ∈ E, x * y = y * x := by
   haveI hEnormal : E.Normal := hMin.1
   haveI hE_NT : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hMin.2.1
-  have hcomm_lt : ⁅E, E⁆ < E := commutator_lt_self_of_isNilpotent_subtype E
+  have hcomm_lt : ⁅E, E⁆ < E := commutator_lt_self_of_isSolvable_subtype E
   have hCommNormal : (⁅E, E⁆ : Subgroup G).Normal := inferInstance
   have hcomm_eq_bot : ⁅E, E⁆ = ⊥ := by
     rcases hMin.2.2 ⁅E, E⁆ hCommNormal hcomm_lt.le with h | h

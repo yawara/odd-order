@@ -19,6 +19,22 @@
 > Pf Appendices の旧「凍結 scaffold (どのレーンも編集しない)」は失効 — 新フェーズでは b (Suzuki 系) /
 > c (NearFields/Huppert/SemilinearField/FeitSibley) が実 statement 置換で所有 (reallocation note §0-1)。
 >
+> **🔢 issue 採番衝突の是正 (hub 裁定 2026-07-18、lane a が 9150 で提起)**: `issues/SEQUENCE.<base>` は
+> **ブランチごとに存在するただのカウンタ**なので、単独では信用できない。2 系統の実害が確認された:
+> **(a) 共有 9000 レンジ** — 全レーンが自分の複製を増分するため同番号を同時払い出し (実在衝突 9125/9132/9133)。
+> レンジ分割の設計思想「1 レンジ = 1 書き手」が、共有前提の 9000 でだけ破れていた。
+> **(b) カウンタの巻き戻り** — レーン再作成やマージ解決でカウンタが過去値へ戻り、単一書き手のレンジでも
+> 衝突 (実在衝突 1036/1037/1038 = FT エンドゲーム期の `case-a-*` と現フェーズ Isaacs Ch09 issue)。
+> ⟹ **恒久対策 = `bin/new-issue` を修正済**: 採番を `max(SEQUENCE, 実在 issue ファイルの最大番号) + 1` から
+> 導出し (issues/ + pending/ + closed/ を走査)、さらに**番号のみの衝突ガード**を追加 (従来は「番号+slug」
+> 一致時しか弾かず、slug が違えば同番号が通る穴があった)。(b) は完全に解消、(a) も main 取り込み済みなら
+> 解消する (CLAUDE.md の起動時 `git merge main` が前提)。
+> ⟹ **hub の tick での扱い**: 合流後に `ls issues/*.md | xargs -n1 basename | sed 's/-.*//' | sort | uniq -d`
+> で **open な同番号**を検査し、出たら hub が改番する。**改番は参照数が少ない方**を動かす (churn 最小)。
+> 先例 = 9133 三重衝突: c の `cn-three-step-dichotomy` は AxiomsCheck.lean から 2 箇所参照済ゆえ据え置き、
+> 参照ゼロの b `standard-rank-one-root-structure` を 9151 へ改番 / a は自ら 9150 へ退避。
+> ⚠ **closed 済の historical 衝突 (9125/9132/1036-1038) は改番しない** — 参照が壊れるだけで益がない。
+>
 > **▶ carve-out (hub 裁定 2026-07-18 監視 tick — merge 5ecd19df): b の Suzuki 前提補題群を BG §4 +
 > Huppert に許可**。b の Suzuki チェーン (App B → Ch.I-III) は **Gorenstein 5.4.10 (= BG Lemma 4.5(a),
 > odd p)** と Huppert の補題を prerequisite として要求する。b はこれらを以下で証明:

@@ -1,5 +1,5 @@
 ---
-id: 9133
+id: 9151
 slug: standard-rank-one-root-structure
 title: "Standard PSL/Sz/PSU root subgroup structure and distinguished products"
 created: 2026-07-18
