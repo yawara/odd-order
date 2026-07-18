@@ -505,3 +505,51 @@ hard direction (`exists_isStronglyConjugate_map_eq`) は書籍 p.291 後半ど�
 `≥` 側 (`X^{(G)} ≤ S` for all subnormal `S ⊇ X`) は **9.29(a) で既に済んでいる**ので、
 残る本体は **`strongClosure X` 自身が subnormal** の証明 = 書籍 p.291-292 の
 二重最小反例 (|G| 最小、次いで |X| 最小) + Step 1-6。道具は 9.29(a)-(d) / 9.30 / 9.31 が揃った。
+
+## 9.28 Bartels の形式化プラン (2026-07-19、原文 p.291-292 を精読して確定)
+
+**主張**: `X^{(G)} = X^{••G}`。**述べ方の決定**:
+`IsLeast {S : Subgroup G | X ≤ S ∧ S.IsSubnormal} (strongClosure X)`。
+これなら subnormal closure の存在も同時に得られ、「subnormal の共通部分は subnormal」の
+一般族版 (mathlib は binary `IsSubnormal.inf` のみ) を作らずに済む。
+**下界の部分 (`∀ S, X ≤ S → S.IsSubnormal → strongClosure X ≤ S`) は 9.29(a) で済み**。
+残る本体 = **`(strongClosure X).IsSubnormal`**。
+
+### 帰納の形
+
+書籍は二重最小反例 (|G| 最小 → その中で |X| 最小)。Lean では ambient 群が
+**部分群 (Step 6 の `X^G`) と商 (Step 4 の `G/K`) の両方に移る**ので、全群にわたる
+`Nat.card` 強帰納が要る。各 Step は IH を明示パラメータに取る補題として書けば
+**それぞれ sorry-free な定理**になる (scaffold にしない):
+
+```lean
+/-- `G` より真に小さい群では Bartels が成立するという帰納法の仮定。 -/
+def BartelsIH (G : Type u) [Group G] [Finite G] : Prop :=
+  ∀ (H : Type u) [Group H] [Finite H], Nat.card H < Nat.card G →
+    ∀ Y : Subgroup H, (strongClosure Y).IsSubnormal
+```
+
+### 6 steps と使う道具 (すべて手元にある)
+
+| step | 主張 | 使う既存結果 |
+|---|---|---|
+| 1 | `Y, Z` が `X` の共役で `Y^{(H)} = Z^{(H)}` (`Y, Z ≤ H`) なら `Y^{(G)} = Z^{(G)}` | 9.29(c)(d) + IH |
+| 2 | `X` は `p`-群 | 9.29(a)(b) + `|X|` 最小性 (`X = ⟨Y | Y < X⟩`) |
+| 3 | `Y ≤ H < G` (`Y` は `X` の共役), `P ∈ Syl_p(H)` ⇒ ∃ `Z ≤ P` (`X` の共役) で `Y^{(G)} = Z^{(G)}` | **Lem 9.31** (実装済) + Step 1 |
+| 4 | `M` 極大 ⊇ `X`, `P ∈ Syl_p(M)` ⇒ `P ∈ Syl_p(G)` かつ `M` は `P` を含む唯一の極大部分群 | **Lem 9.30** (実装済) + Step 3 + `𝒦(H)` への共役作用 |
+| 5 | `X` を含む極大部分群は一意 | Step 4 + `|S|` 最大性の選択 |
+| 6 | 矛盾 | Step 5 + `X^G = G` (IH) + 強共役の定義 |
+
+### 先に要る infra 2 本 (次 iteration の着手点)
+
+1. **`strongClosure (c • X) = c • strongClosure X`** (`c : ConjAct G`) — 書籍 p.290 の
+   9.29 直前の観察 `(X^{(G)})^g = (X^g)^{(G)}`。Step 1/3/4 が全部これを使う。
+   証明: `IsStronglyConjugate` が `c •` で保たれることを示し、`≤` を 1 方向だけ証明して
+   `c⁻¹` と `c • X` に適用 → 逆向きを得る (`sSup` を smul で押し通す補題が不要になる)。
+2. **部分群 `K` への制限の橋**: `X ≤ K` のとき
+   `strongClosureIn K X = (strongClosure (X.subgroupOf K)).map K.subtype`。
+   Step 1/3 が「`↥K` の中で計算した `X^{(K)}`」と本実装の `strongClosureIn K X` を
+   行き来するのに必要 (IH は `↥K` に対して述べられるため)。
+
+⚠ `Subgroup` の pointwise 作用で sup の分配 (`c • (X ⊔ Y) = c • X ⊔ c • Y`) が要る。
+mathlib に無ければ order-iso 経由で自作する (作用は各 `c` について束の自己同型)。
