@@ -127,6 +127,45 @@ subgroup `S̄`" と明言しているため、本 repo では正しく `IsSubnor
         (i に依らない一様上界) → `∃ n, ∀ i, Nat.card (autTowerType G i) ≤ n`。
       - leaf 例: `AutTower.lean` (import OrderBound + InnerAutomorphisms)。
 
+### (C) 鎖の作り方 — 設計メモ (2026-07-18, 実装前に確定)
+
+⚠ **素朴な `S i := (autTowerEmbLe (i ≤ r)).range` は筋が悪い**。
+`S m ◁ S (m+1)` を出すには
+`embLe (m ≤ r) = embLe (m+1 ≤ r) ∘ autTowerStep m` の分解が要るが、
+これは `m + (k+1)` と `(m+1) + k` の付け替えを含む。Lean の `Nat.add` は
+第 2 引数で再帰するので前者は定義的簡約するが後者はしない (`Nat.succ_add` は帰納法)。
+結果として分解補題ごとに transport が要り、鎖の 4 条件すべてに波及する。
+
+**採る形: 環境そのものを再帰で作り、`j` はパラメータのまま持つ**。
+
+```
+def chainAux (m : ℕ) : ∀ k : ℕ, ℕ → Subgroup (autTowerType G (m + k))
+  | 0,     _ => ⊤
+  | k + 1, j => if k + 1 ≤ j then ⊤
+                else (chainAux m k j).map (autTowerStep G (m + k))
+```
+
+`chainAux 0 r j` = `G_j` の `G_r` での像 (`j ≥ r` なら `⊤`)。検算:
+`chainAux 0 1 0 = ⊤.map(step 0) = innAut(G_0)`、`chainAux 0 1 1 = ⊤`、
+`chainAux 0 2 1 = ⊤.map(step 1) = innAut(G_1)`、`chainAux 0 2 2 = ⊤`。
+**添字の付け替えが一切出ない** (ambient は常に `m + k` の形のまま)。
+
+9.12 の 4 条件は `k` の帰納法で出る。各々、上端 `j + 1 = k + 1` が base、
+`j + 1 ≤ k` が帰納段 (`map` で押す):
+
+- `S j ≤ S (j+1)`: 帰納段は `Subgroup.map_mono`、上端は `S (k+1) = ⊤` で自明。
+- `S (j+1) ≤ N(S j)`: 上端は `S k = ⊤.map (step (m+k)) = innAut(G_{m+k})` が
+  ambient `G_{m+k+1}` に normal (`innAut.normal`)。帰納段は像の正規性の押し出し。
+- `C(S j) ⊓ S (j+1) = ⊥`: 上端は `centralizer_innAut_eq_bot` (9.11(c)) そのもの。
+  帰納段には **単射 hom の補題**が要る:
+  `f` 単射, `C_G(A) ⊓ B = ⊥` ⇒ `C_H(A.map f) ⊓ B.map f = ⊥`。
+  (`x = f b` が `f a` 全てと可換 ⟺ `f (b*a) = f (a*b)` ⟺ `b*a = a*b`、単射性より。)
+- `S r = ⊤`: `chainAux 0 r r` は `r ≤ r` 側なので定義から `⊤`。
+
+その後 `S 0 ◁◁ G_r` を鎖から `IsSubnormal` に変換 (mathlib `isSubnormal_iff` か
+`IsSubnormal.step` の反復) し、`card_le_factorial_of_isSubnormal` を当てる。
+`S 0 ≃* G` (単射 hom の像) なので `(S 0)^∞ ≃* G^∞`、上界は `r` に依らない。
+
 ## 完了条件
 
 `Theorem 9.10` を sorry-free/axiom-clean で landing (`∃ n, ∀ i, |G_i| ≤ n` 形)。
