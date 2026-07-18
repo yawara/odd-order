@@ -62,7 +62,7 @@ theorem exists_prime_cyclic_opiCore_compl_of_isTypeV [Finite G]
     ∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥(S15.MF M)).primeFactors ∧
       IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (S15.MF M)) := by
   have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
-  obtain ⟨g, p, X₁, -, hp, -, hX₁card, hX₁Mσ, -, hCGnotM, -⟩ :=
+  obtain ⟨g, p, X₁, -, hp, -, hX₁card, hX₁Mσ, -, hCGnotM, -, -⟩ :=
     S15.exists_inf_conj_fitting_orderP_witness hG hM hnotTI
   -- `X₁ ≤ M_σ = M_F` (`mf_eq_msigma_of_not_fittingIsTI`).
   have hX₁MF : X₁ ≤ S15.MF M := by
@@ -451,7 +451,7 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
     -- (Coq `oZ`, `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`).
     haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
     have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
-    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, hrank3⟩ :=
+    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, hrank3, -⟩ :=
       S15.exists_inf_conj_fitting_orderP_witness hG hM hTI
     haveI : Fact p.Prime := ⟨hp⟩
     have hX₁MF : X₁ ≤ S15.MF M := by

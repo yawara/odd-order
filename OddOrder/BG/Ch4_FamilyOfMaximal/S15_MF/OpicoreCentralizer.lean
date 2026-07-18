@@ -600,7 +600,7 @@ theorem rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI [Finite G]
     (hnotTI : ¬ FittingIsTI M) (habel : IsMulCommutative ↥(MF M)) :
     rank ↥(MF M) = 2 := by
   classical
-  obtain ⟨g, p, X₁, hgM, hp, -, hX₁card, hX₁Mσ, hX₁cMσ, -, hrank3⟩ :=
+  obtain ⟨g, p, X₁, hgM, hp, -, hX₁card, hX₁Mσ, hX₁cMσ, -, hrank3, -⟩ :=
     exists_inf_conj_fitting_orderP_witness hG hM hnotTI
   haveI : Fact p.Prime := ⟨hp⟩
   have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
@@ -672,7 +672,7 @@ theorem fitting_not_ti_trichotomy [Finite G]
       rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI hG hM hnotTI habel⟩
   · -- (e2)/(e3) common part: `O_p(H)` non-abelian, `O_{p'}(H)` cyclic, `p ∈ σ(M) − β(M)`.
     refine Or.inr ⟨habel, ?_⟩
-    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, -⟩ :=
+    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, -, -⟩ :=
       exists_inf_conj_fitting_orderP_witness hG hM hnotTI
     have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
     have hX₁MF : X₁ ≤ MF M := le_trans hX₁Mσ (le_of_eq hMFeq.symm)
