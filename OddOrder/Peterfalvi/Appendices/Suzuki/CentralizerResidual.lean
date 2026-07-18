@@ -18,12 +18,14 @@ This file contains the target-independent structural clauses of Proposition
 odd-order direct factor `Q₁` has trivial centralizer of `X`. It also proves
 the source's center equality for the normal closure `⟨C_Q(X)^L⟩`; its
 identification with `O^{2′}(L)` and quotient transport are packaged once
-the induction target supplies the honest Sylow witness for `C_Q(X)`.
+the induction target supplies the honest proof that `C_Q(X)` is a `2`-group.
 -/
 
 set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
+
+open MulAction
 
 namespace Hypothesis
 
@@ -158,6 +160,122 @@ theorem normalCore_subgroupOf_normalClosure_cQ_eq_center
     change (z : L) ∈ H_L.normalCore
     rw [hyp.normalCore_cH_eq_centralizer_cQ hXV]
     exact ⟨hzD, hzCQL⟩
+
+/-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, structure
+equation inherited from §1 Proposition 4(b):
+`|C_G(X)| = |C_Q(X)| |C_D(X)| (|C_Q(X)| + 1)`. -/
+theorem card_centralizer_eq {X : Subgroup G} (hXV : X ≤ hyp.V) :
+    let L : Subgroup G := Subgroup.centralizer (X : Set G)
+    let Q_L : Subgroup L := hyp.Q.subgroupOf L
+    let D_L : Subgroup L := hyp.D.subgroupOf L
+    Nat.card L =
+      Nat.card Q_L * Nat.card D_L * (Nat.card Q_L + 1) := by
+  let L : Subgroup G := Subgroup.centralizer (X : Set G)
+  let H_L : Subgroup L := hyp.H.subgroupOf L
+  let Q_L : Subgroup L := hyp.Q.subgroupOf L
+  let D_L : Subgroup L := hyp.D.subgroupOf L
+  let Λ : Type _ := ↥(fixedPoints X Ω)
+  change Nat.card L =
+    Nat.card Q_L * Nat.card D_L * (Nat.card Q_L + 1)
+  have hXD : X ≤ hyp.D := hXV.trans hyp.V_le_D
+  have hQcard : Nat.card Q_L = Nat.card ↥(hyp.Q ⊓ L) := by
+    change Nat.card ↥(hyp.Q.subgroupOf L) = Nat.card ↥(hyp.Q ⊓ L)
+    rw [← Subgroup.inf_subgroupOf_right hyp.Q L]
+    exact Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (K := L) inf_le_right).toEquiv
+  have hDcard : Nat.card D_L = Nat.card ↥(hyp.D ⊓ L) := by
+    change Nat.card ↥(hyp.D.subgroupOf L) = Nat.card ↥(hyp.D ⊓ L)
+    rw [← Subgroup.inf_subgroupOf_right hyp.D L]
+    exact Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (K := L) inf_le_right).toEquiv
+  have hHcard : Nat.card H_L = Nat.card ↥(hyp.H ⊓ L) := by
+    change Nat.card ↥(hyp.H.subgroupOf L) = Nat.card ↥(hyp.H ⊓ L)
+    rw [← Subgroup.inf_subgroupOf_right hyp.H L]
+    exact Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (K := L) inf_le_right).toEquiv
+  have hcardH : Nat.card H_L = Nat.card Q_L * Nat.card D_L := by
+    rw [hHcard, hQcard, hDcard]
+    exact hyp.card_cH_eq hXD
+  have hcardΛ : Nat.card Λ = Nat.card Q_L + 1 := by
+    change Nat.card ↥(fixedPoints X Ω) = Nat.card Q_L + 1
+    rw [Nat.card_coe_set_eq, hyp.ncard_fixedPoints hXD, hQcard]
+  let a1 := hyp.centralizerHypothesisA1 hXV
+  have h2 : IsMultiplyPretransitive L Λ 2 := a1.doubly_transitive
+  have hpre : IsPretransitive L Λ :=
+    isPretransitive_of_is_two_pretransitive
+  have hidx : H_L.index = Nat.card Λ := by
+    change a1.H.index = Nat.card Λ
+    rw [a1.H_def]
+    exact index_stabilizer_of_transitive L a1.basept
+  have hmul : Nat.card H_L * H_L.index = Nat.card L :=
+    H_L.card_mul_index
+  rw [hcardH, hidx, hcardΛ] at hmul
+  exact hmul.symm
+
+/-- The A1 structure equation makes `C_Q(X)` contain a Sylow
+`2`-subgroup of `C_G(X)`. -/
+theorem exists_sylow_two_le_cQ {X : Subgroup G}
+    (hXV : X ≤ hyp.V) :
+    let L : Subgroup G := Subgroup.centralizer (X : Set G)
+    let Q_L : Subgroup L := hyp.Q.subgroupOf L
+    ∃ P : Sylow 2 L, (P : Subgroup L) ≤ Q_L := by
+  let L : Subgroup G := Subgroup.centralizer (X : Set G)
+  let Q_L : Subgroup L := hyp.Q.subgroupOf L
+  let D_L : Subgroup L := hyp.D.subgroupOf L
+  change ∃ P : Sylow 2 L, (P : Subgroup L) ≤ Q_L
+  have hXD : X ≤ hyp.D := hXV.trans hyp.V_le_D
+  have h3 : 3 ≤ (fixedPoints X Ω).ncard :=
+    hyp.three_le_ncard_fixedPoints_of_le_V hXV
+  have hQcard : Nat.card Q_L = Nat.card ↥(hyp.Q ⊓ L) := by
+    change Nat.card ↥(hyp.Q.subgroupOf L) = Nat.card ↥(hyp.Q ⊓ L)
+    rw [← Subgroup.inf_subgroupOf_right hyp.Q L]
+    exact Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (K := L) inf_le_right).toEquiv
+  have hDcard : Nat.card D_L = Nat.card ↥(hyp.D ⊓ L) := by
+    change Nat.card ↥(hyp.D.subgroupOf L) = Nat.card ↥(hyp.D ⊓ L)
+    rw [← Subgroup.inf_subgroupOf_right hyp.D L]
+    exact Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (K := L) inf_le_right).toEquiv
+  have hQeven : Even (Nat.card Q_L) := by
+    rw [hQcard]
+    exact hyp.even_card_cQ hXD h3
+  have hDodd : Odd (Nat.card D_L) := by
+    rw [hDcard]
+    exact hyp.D_odd.of_dvd_nat (Subgroup.card_dvd_of_le inf_le_left)
+  have hQ0 : Nat.card Q_L ≠ 0 := Nat.card_pos.ne'
+  have hodd : Odd (Nat.card D_L * (Nat.card Q_L + 1)) :=
+    hDodd.mul (Even.add_one hQeven)
+  have hm0 : Nat.card D_L * (Nat.card Q_L + 1) ≠ 0 :=
+    fun h => by simp [h] at hodd
+  have hfact : (Nat.card L).factorization 2 =
+      (Nat.card Q_L).factorization 2 := by
+    rw [hyp.card_centralizer_eq hXV, mul_assoc,
+      Nat.factorization_mul hQ0 hm0, Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd
+        (Nat.two_dvd_ne_zero.mpr (Nat.odd_iff.mp hodd)), add_zero]
+  obtain ⟨P₀⟩ : Nonempty (Sylow 2 Q_L) := Sylow.nonempty
+  have hcard : Nat.card ((P₀ : Subgroup Q_L).map Q_L.subtype) =
+      2 ^ (Nat.card L).factorization 2 := by
+    rw [Nat.card_congr (Subgroup.equivMapOfInjective _ Q_L.subtype
+      Q_L.subtype_injective).toEquiv.symm, hfact]
+    exact P₀.card_eq_multiplicity
+  exact ⟨Sylow.ofCard _ hcard, by
+    rw [Sylow.coe_ofCard]
+    exact Subgroup.map_subtype_le _⟩
+
+/-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**: once Lemma 1
+shows that `C_Q(X)` is a `2`-group, the A1 structure equation makes it
+a Sylow `2`-subgroup of `C_G(X)`. -/
+theorem exists_sylow_two_eq_cQ_of_isPGroup
+    {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hCQ : IsPGroup 2
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    ∃ P : Sylow 2 (Subgroup.centralizer (X : Set G)),
+      (P : Subgroup (Subgroup.centralizer (X : Set G))) =
+        hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)) := by
+  obtain ⟨P, hP⟩ := hyp.exists_sylow_two_le_cQ hXV
+  exact ⟨P, (P.is_maximal' hCQ hP).symm⟩
+
 /-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, residual transport.
 If `C_Q(X)` is a Sylow `2`-subgroup of `L = C_G(X)`, then the preceding
 center equality identifies the central quotient of `O^{2′}(L)` with
@@ -186,6 +304,24 @@ noncomputable def centralizerResidualQuotientEquiv_of_sylow
   rw [hF]
   exact hyp.normalCore_subgroupOf_normalClosure_cQ_eq_center hXV
 
+/-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, residual
+transport from the source input that `C_Q(X)` is a `2`-group.  The
+Sylow witness and the identification
+`O^{2′}(C_G(X)) = ⟨C_Q(X)^{C_G(X)}⟩` are constructed from A1 rather than
+accepted as extra carrier fields. -/
+noncomputable def centralizerResidualQuotientEquiv
+    {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hCQ : IsPGroup 2
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    let L : Subgroup G := Subgroup.centralizer (X : Set G)
+    let H_L : Subgroup L := hyp.H.subgroupOf L
+    ((Subgroup.primeComplementResidual 2 L) ⧸
+        Subgroup.center (Subgroup.primeComplementResidual 2 L)) ≃*
+      Subgroup.primeComplementResidual 2 (L ⧸ H_L.normalCore) := by
+  let hex := hyp.exists_sylow_two_eq_cQ_of_isPGroup hXV hCQ
+  let P := Classical.choose hex
+  have hP := Classical.choose_spec hex
+  exact hyp.centralizerResidualQuotientEquiv_of_sylow hXV P hP
 end
 
 end Hypothesis

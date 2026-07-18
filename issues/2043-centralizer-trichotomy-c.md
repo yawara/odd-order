@@ -28,8 +28,24 @@ Peterfalvi Part II, Ch. I §3 Proposition 1(c) (pp. 105–106) を原文強度�
       `C_{Q₁}(X)=1` を導く exact bridge を証明する。
 - [x] 分類非依存の構造核
       `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)` を原文どおり証明する。
-- [ ] quotient action `L/𝒩(L)` の honest な Hypothesis/induction carrier と
+- [x] quotient action `L/𝒩(L)` の honest な Hypothesis/induction carrier と
       `F=O^{2′}(L)=⟨C_Q(X)^L⟩`、residual の quotient transport を構成する。
+  - [x] A1 構造式から `C_Q(X)` 内の Sylow `2`-subgroupを構成し、
+        `C_Q(X)` が `2`-group ならそれ自身が Sylow と証明。
+  - [x] その `IsPGroup` 入力から residual = normal closure と
+        `O^{2′}(L)/Z ≃* O^{2′}(L/𝒩(L))` を実構成。
+  - [x] `L/𝒩(L)` の実 quotient action を構成し、`H̄`, `Q̄`, `D̄`, `t̄` を
+        image として輸送して (A1)、exact kernel から (A2)、odd kernel から
+        four-subgroup (A3) を証明した honest `Hypothesis` carrier を構成。
+  - [x] `X ≠ 1` から `|L/𝒩(L)| < |G|` を証明。
+  - [x] Suzuki Theorem A の結論を、正規・奇数指数の subgroup と
+        PSL/Sz/PSU 各標準作用への concrete equivariant coordinates からなる
+        `TheoremAConclusion` として構成。quotient `Hypothesis` と strict card bound を
+        source induction hypothesis へ接続し、Lemma 1 から quotient root group が
+        `2`-group であることを導いた。さらに kernel ≤ `C_D(X)` と
+        `C_Q(X) ∩ C_D(X) = 1` から `centralizerQQuotientEquiv : C_Q(X) ≃ Q̄` を
+        実構成し、`centralizer_cQ_isPGroup_of_induction` で
+        `IsPGroup 2 C_Q(X)` まで戻した (`CentralizerInductionBridge.lean`)。
 - [ ] PSL(2,ℓ), Sz(ℓ), PSU(3,ℓ) 各標準モデルについて Sylow `2` 構造、
       `|C_Q(X)|`、distinguished involution と `orderOf(st)=3/5/3` を実証明し、
       三分岐を輸送する。opaque `Prop` scaffold や free target field は使わない。

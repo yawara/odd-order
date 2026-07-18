@@ -111,10 +111,12 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
@@ -125,6 +127,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.TISubsetCounting
