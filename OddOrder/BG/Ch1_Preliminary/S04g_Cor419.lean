@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 
 /-!
@@ -45,18 +46,6 @@ open scoped commutatorElement
 section Cor419
 
 variable {G : Type*} [Group G]
-
-/-- **characteristic in normal is normal** (push-forward版): `N ⊴ G` の characteristic
-部分群 `L : Subgroup ↥N` を `↥N` から `G` へ押し出すと `G` で正規。 -/
-private theorem normal_map_subtype_of_characteristic {N : Subgroup G} [N.Normal]
-    {L : Subgroup ↥N} (hL : L.Characteristic) : (L.map N.subtype).Normal := by
-  refine ⟨fun a ha w => ?_⟩
-  obtain ⟨⟨a', ha'N⟩, ha'L, rfl⟩ := ha
-  have hmap : L.map (MulAut.conjNormal w).toMonoidHom = L :=
-    (Subgroup.characteristic_iff_map_eq.mp hL) (MulAut.conjNormal w)
-  have hmem : (MulAut.conjNormal w) ⟨a', ha'N⟩ ∈ L := by
-    rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
-  exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
 
 /-- **`U ⊓ (V ⊔ W) ≤ V`** の Dedekind 版: `V ≤ U`, `W ⊴ G`, `U ⊓ W ≤ V` なら
 `U ⊓ (V ⊔ W) ≤ V`。`W` normal ゆえ `V ⊔ W` の元は `v * w` の形。 -/
@@ -238,8 +227,8 @@ theorem commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal
   set W : Subgroup G := (Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} ↥Gstar).map Gstar.subtype
     with hW
   set T : Subgroup G := (Ch03.oPiPrimePiCore {p} ↥Gstar).map Gstar.subtype with hT
-  haveI hW_normal : W.Normal := by rw [hW]; exact normal_map_subtype_of_characteristic hWsub_char
-  haveI hT_normal : T.Normal := by rw [hT]; exact normal_map_subtype_of_characteristic hTsub_char
+  haveI hW_normal : W.Normal := by rw [hW]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hWsub_char
+  haveI hT_normal : T.Normal := by rw [hT]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hTsub_char
   have hW_le_T : W ≤ T := by
     rw [hW, hT]; exact Subgroup.map_mono (Ch03.oPiCore_compl_le_oPiPrimePiCore _ _)
   have hT_le : T ≤ Gstar := by rw [hT]; exact Subgroup.map_subtype_le _

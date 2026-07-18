@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
 
 /-!
@@ -404,25 +405,12 @@ theorem isPGroup_le_centralizer_of_isNilpotent {W : Type*} [Group W] [Finite W]
   exact (Subgroup.commute_of_normal_of_disjoint _ _ hQnorm hPWnorm hdis x y
     (hXQ hx) (hPPW hy)).symm.eq
 
-/-- `N ⊴ W` の characteristic 部分群 `L : Subgroup ↥N` は, `↥N` から `W` へ押し出すと `W` で正規。
-共役自己同型 `MulAut.conjNormal w : MulAut ↥N` (`N ⊴ W` ゆえ各 `w ∈ W` の共役が `↥N` の自己同型に
-制限) が `L` を固定する (`characteristic_iff_map_eq`)。 -/
-theorem normal_map_subtype_of_characteristic {W : Type*} [Group W] {N : Subgroup W} [N.Normal]
-    {L : Subgroup ↥N} (hL : L.Characteristic) : (L.map N.subtype).Normal := by
-  refine ⟨fun a ha w => ?_⟩
-  obtain ⟨⟨a', ha'N⟩, ha'L, rfl⟩ := ha
-  have hmap : L.map (MulAut.conjNormal w).toMonoidHom = L :=
-    (Subgroup.characteristic_iff_map_eq.mp hL) (MulAut.conjNormal w)
-  have hmem : (MulAut.conjNormal w) ⟨a', ha'N⟩ ∈ L := by
-    rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
-  exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
-
 /-- **Cor 10.9(a) 核 (`X ⊄ M'` の `W` nilpotent 判定)** (一般・unconditional): `W` が
 `{p,q}`-群 (`p ≠ q`), 正規 Sylow `q`-部分群 `Qs` を持ち, `N ⊴ W` が nilpotent で `W/N` が
 `q`-群なら `W` は nilpotent。
 
 `N` nilpotent ⟹ Sylow `p` `PN` が `N` で正規・characteristic (`Sylow.characteristic_of_normal`)、
-`N ⊴ W` で押し出すと `W` で正規 (`normal_map_subtype_of_characteristic`)。`W/N` が `q`-群ゆえ
+`N ⊴ W` で押し出すと `W` で正規 (`OddOrder.GroupTheory.normal_map_subtype_of_characteristic`)。`W/N` が `q`-群ゆえ
 `|W|_p = |N|_p` で `PN.map N.subtype` は `W` の Sylow `p`。正規 Sylow `p`/`q` で全 Sylow 正規
 (`Sylow.unique_of_normal`)、よって `W` nilpotent (`Group.isNilpotent_of_finite_tfae` 3→0)。
 BG Cor 10.9(a) の `X ⊄ M'` (`p < q`) ケースで `W` の nilpotency に使う。 -/
@@ -452,7 +440,7 @@ theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W]
       p ^ (Nat.card W).factorization p := by
     rw [Subgroup.card_subtype, Sylow.card_eq_multiplicity PN, hfact]
   haveI hPpnorm : ((PN : Subgroup ↥N).map N.subtype).Normal :=
-    normal_map_subtype_of_characteristic hPNchar
+    OddOrder.GroupTheory.normal_map_subtype_of_characteristic hPNchar
   set Psyl : Sylow p W := Sylow.ofCard _ hPpcard with hPsyl
   have hPsyl_coe : (Psyl : Subgroup W) = (PN : Subgroup ↥N).map N.subtype :=
     Sylow.coe_ofCard _ hPpcard

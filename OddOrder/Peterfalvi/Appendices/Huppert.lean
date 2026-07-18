@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Peterfalvi.S16_NonExistenceG
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.GroupTheory.PrimeOrderSubgroups
@@ -1191,7 +1192,7 @@ theorem opCore_fitting_map_subtype_eq [Finite D] (p : ℕ) [Fact p.Prime] :
     (opCore p ↥(fitting D)).map (fitting D).subtype = opCore p D := by
   apply le_antisymm
   · haveI : ((opCore p ↥(fitting D)).map (fitting D).subtype).Normal :=
-      normal_map_subtype_of_characteristic (opCore.characteristic p ↥(fitting D))
+      OddOrder.GroupTheory.normal_map_subtype_of_characteristic (opCore.characteristic p ↥(fitting D))
     exact normal_pgroup_le_opCore ((opCore_isPGroup p ↥(fitting D)).map (fitting D).subtype)
   · have hofit : opCore p D ≤ fitting D := opCore_le_fitting ⟨p, Fact.out⟩ D
     haveI : ((opCore p D).subgroupOf (fitting D)).Normal := Subgroup.normal_subgroupOf
@@ -1217,7 +1218,7 @@ theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
     have hPchar : (↑P : Subgroup ↥(fitting D)).Characteristic :=
       Sylow.characteristic_of_normal P hPnorm
     haveI hPmap_norm : ((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype).Normal :=
-      normal_map_subtype_of_characteristic hPchar
+      OddOrder.GroupTheory.normal_map_subtype_of_characteristic hPchar
     have hPmap_pg : IsPGroup p ((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) :=
       P.isPGroup'.map (fitting D).subtype
     have hmap_le : (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype ≤ opCore p D :=

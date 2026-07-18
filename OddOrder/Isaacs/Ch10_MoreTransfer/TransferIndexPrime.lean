@@ -376,7 +376,7 @@ variable {P : Type*} [Group P] [Finite P]
 
 /-- A characteristic subgroup of a normal subgroup, pushed into the ambient
 group, is normal. (Local copy of
-`OddOrder.BG.Ch3.normal_map_subtype_of_characteristic` — the BG leaf is
+`OddOrder.GroupTheory.normal_map_subtype_of_characteristic` — the BG leaf is
 downstream of Isaacs, so it cannot be imported here; candidate for
 consolidation into `OddOrder/GroupTheory/`.) -/
 private lemma normal_map_subtype_of_char {W : Type*} [Group W] {N : Subgroup W}
