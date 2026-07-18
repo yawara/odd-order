@@ -357,21 +357,31 @@ end
 section /- 9B: Theorem 9.21 (Schenkman, 一般形, p. 282) -/
 
 /-- Schenkman 9.21 の帰納核 (`Nat.card G ≤ n` で帰納, `∀ G` を内側量化).
-`S ◁ G`, `C_G(S) = ⊥` ⇒ `C_G(S^∞) ≤ S^∞`. -/
+`S ◁◁ G`, `C_G(S) = ⊥` ⇒ `C_G(S^∞) ≤ S^∞`.
+
+⚠ 仮説は **subnormal** (書籍 p. 283 の原文どおり; mmd は `⊲⊲` を `⊲` に潰している).
+normal に落とすと proof 中の "since `S ⊲⊲ G`, we conclude that `S ◁ G`" のステップが
+消えてしまい, Thm 9.10 (automorphism tower) に当てられなくなる. -/
 private theorem schenkman_aux (n : ℕ) :
     ∀ (G : Type u) [Group G] [Finite G], Nat.card G ≤ n →
-      ∀ (S : Subgroup G), S.Normal → Subgroup.centralizer (S : Set G) = ⊥ →
+      ∀ (S : Subgroup G), S.IsSubnormal → Subgroup.centralizer (S : Set G) = ⊥ →
         Subgroup.centralizer (↑(nilpotentResidual S) : Set G) ≤ nilpotentResidual S := by
   induction n with
   | zero => intro G _ _ hcard; exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
   | succ n IH =>
-    intro G _ _ hcard S hSnormal hCS
-    haveI := hSnormal
+    intro G _ _ hcard S hSsub hCS
     set R := nilpotentResidual S with hR
     set C := Subgroup.centralizer (R : Set G) with hC
-    haveI hRnormal : R.Normal := by rw [hR]; infer_instance
-    haveI hCnormal : C.Normal := by rw [hC]; infer_instance
     have hRS : R ≤ S := nilpotentResidual_le S
+    -- `S ◁◁ G` では `R = S^∞` も `C = C_G(R)` も `G` に normal とは限らない
+    -- (`R` は `S` に characteristic なだけ). ただし `S` は `R` を正規化し
+    -- (`le_normalizer_nilpotentResidual`), `C` は `R` を中心化するので,
+    -- **両者とも `S ⊔ C` には normal**. 書籍 p. 283 の
+    -- "Since `S` normalizes `S^∞`, it also normalizes `C`, and hence `SC` is a group,
+    --  and it is no loss to assume that `SC = G`" に対応する.
+    have hSCnormR : S ⊔ C ≤ Subgroup.normalizer (R : Set G) :=
+      sup_le (le_normalizer_nilpotentResidual S)
+        (by rw [hC]; exact Subgroup.centralizer_le_normalizer _)
     -- Step A: `C ⊓ S ≤ R` (`↥S` で 9.22)
     have hStepA : C ⊓ S ≤ R := by
       intro x hx
@@ -400,14 +410,17 @@ private theorem schenkman_aux (n : ℕ) :
       rw [hR, ← map_subtype_nilpotentResidual_top S]
       exact Subgroup.mem_map_of_mem _ hxRS
     by_cases hSC : S ⊔ C = ⊤
-    · -- SC = G の場合
+    · -- SC = G の場合. ここでは `S ⊔ C = ⊤` なので `R`, `C` は `G` に normal になる.
+      haveI hRnormal : R.Normal :=
+        Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp (by rw [← hSC]; exact hSCnormR))
+      haveI hCnormal : C.Normal := by rw [hC]; infer_instance
       -- 中間部分群がない: `S ≤ H → H = S ∨ H = ⊤`
       have hinterval : ∀ H : Subgroup G, S ≤ H → H = S ∨ H = ⊤ := by
         intro H hSH
         rcases eq_or_ne H ⊤ with rfl | hHtop
         · exact Or.inr rfl
         · refine Or.inl ?_
-          haveI hSHn : (S.subgroupOf H).Normal := hSnormal.subgroupOf H
+          have hSHn : (S.subgroupOf H).IsSubnormal := hSsub.subgroupOf
           have hcardH : Nat.card ↥H ≤ n := by
             have hlt : Nat.card ↥H < Nat.card G :=
               lt_of_not_ge fun hge => hHtop (Subgroup.eq_top_of_le_card _ hge)
@@ -420,10 +433,22 @@ private theorem schenkman_aux (n : ℕ) :
             exact coe_mem_residual_of_mem_subgroupOf hSH
               (hIHH (mem_centralizer_residual_subgroupOf hSH hxH hxC))
           have hHeq : H = S ⊔ (H ⊓ C) := by
-            have hmod := Subgroup.inf_sup_eq_sup_inf_of_normal_of_le (E := S) (A := C) (M := H) hSH
+            -- ⚠ この時点で `S` の正規性はまだ無い (下で `hinterval` から導く) ので,
+            -- Dedekind は **`C` 側が normal** の姉妹形を使う.
+            have hmod :=
+              Subgroup.inf_sup_eq_sup_inf_of_normal_right_of_le (E := S) (A := C) (M := H) hSH
             rwa [hSC, inf_top_eq] at hmod
           rw [hHeq]
           exact sup_eq_left.mpr (hHC.trans hRS)
+      -- **書籍 p. 283 の核心ステップ**: 中間部分群が無く `S ◁◁ G` ゆえ `S ◁ G`.
+      -- (proper subnormal は proper normal に含まれる — `hinterval` でそれが `S` に潰れる.)
+      haveI hSnormal : S.Normal := by
+        rcases eq_or_ne S ⊤ with rfl | hSne
+        · infer_instance
+        · obtain ⟨K, hKnormal, hSK, hKlt⟩ := hSsub.exists_normal_and_le_and_lt_top_of_ne hSne
+          rcases hinterval K hSK with h | h
+          · exact h ▸ hKnormal
+          · exact absurd h hKlt.ne
       -- `G/S` cyclic
       haveI hcyc : IsCyclic (G ⧸ S) := by
         have hsub : ∀ B : Subgroup (G ⧸ S), B = ⊥ ∨ B = ⊤ := by
@@ -463,7 +488,7 @@ private theorem schenkman_aux (n : ℕ) :
       have h915 : nilpotentResidual (⊤ : Subgroup G) = R := by
         rw [hR]
         exact nilpotentResidual_top_eq_of_isSubnormal_sup_nilpotent (S := S) (F := C)
-          hSnormal.isSubnormal hSC
+          hSsub hSC
       have hZG : Subgroup.center G = ⊥ := by
         rw [eq_bot_iff]
         intro z hz
@@ -480,7 +505,7 @@ private theorem schenkman_aux (n : ℕ) :
       set G₀ := S ⊔ C with hG₀
       intro c hc
       have hcG₀ : c ∈ G₀ := Subgroup.mem_sup_right hc
-      haveI hS₀normal : (S.subgroupOf G₀).Normal := hSnormal.subgroupOf G₀
+      have hS₀normal : (S.subgroupOf G₀).IsSubnormal := hSsub.subgroupOf
       have hcardG₀ : Nat.card ↥G₀ ≤ n := by
         have hlt : Nat.card ↥G₀ < Nat.card G :=
           lt_of_not_ge fun hge => hSC (Subgroup.eq_top_of_le_card _ hge)
@@ -490,12 +515,21 @@ private theorem schenkman_aux (n : ℕ) :
       exact coe_mem_residual_of_mem_subgroupOf le_sup_left
         (hIH (mem_centralizer_residual_subgroupOf le_sup_left hcG₀ hc))
 
-/-- **Isaacs Theorem 9.21** (Schenkman, p. 282): `S ◁ G` (有限群), `C_G(S) = 1` ならば
-`C_G(S^∞) ≤ S^∞`. -/
+/-- **Isaacs Theorem 9.21** (Schenkman, p. 283): `S ◁◁ G` (有限群), `C_G(S) = 1` ならば
+`C_G(S^∞) ≤ S^∞`.
+
+⚠ 仮説は原典どおり **subnormal**. `references/isaacs/*.mmd` は `⊲⊲` を `⊲` に潰すので
+mmd を典拠にすると normal 版に見える (PDF p. 283 で確認済; issue 1037 / 9132). -/
+theorem centralizer_nilpotentResidual_le_of_isSubnormal [Finite G] {S : Subgroup G}
+    (hS : S.IsSubnormal) (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
+    Subgroup.centralizer (↑(nilpotentResidual S) : Set G) ≤ nilpotentResidual S :=
+  schenkman_aux (Nat.card G) G le_rfl S hS hCS
+
+/-- Thm 9.21 の normal 特殊化 (`S ◁ G`). 既存の下流はこちらを呼ぶ. -/
 theorem centralizer_nilpotentResidual_le_of_centralizer_eq_bot [Finite G] {S : Subgroup G}
     [hS : S.Normal] (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
     Subgroup.centralizer (↑(nilpotentResidual S) : Set G) ≤ nilpotentResidual S :=
-  schenkman_aux (Nat.card G) G le_rfl S hS hCS
+  centralizer_nilpotentResidual_le_of_isSubnormal hS.isSubnormal hCS
 
 end
 
