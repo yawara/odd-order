@@ -27,7 +27,7 @@ factor の指数を揃える bridge と全 invariant subgroup の分類は未実
 
 - [x] 可換群で `Agemo H p n = (powMonoidHom (p^n)).range` と membership API を
       `OddOrder/GroupTheory/OmegaSubgroup.lean` に移設し、旧 BG consumer を再配線する
-- [ ] actor の推移性が power-map range membership (= involution height) を保存する
+- [x] actor の推移性が power-map range membership (= involution height) を保存する
       ことを定式化する
 - [ ] 有限可換 `2`-group の ZMod 分解で全 cyclic factor が同じ位数 `2^e` を
       持つことを証明する
