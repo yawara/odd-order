@@ -19,6 +19,7 @@ import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.ElementaryAbelianFamily
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.HallCollection
+import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.MackeyTransfer

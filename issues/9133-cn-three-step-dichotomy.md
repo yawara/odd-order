@@ -52,6 +52,57 @@ BG App.D D.1 の証明 (mmd:5155-5178) は Cor 1.6 で M を 3-step と判定し
 - **Lemma 1.2 (CN 固有)**: `q`-元が `p`-元を中心化するなら Sylow `p` を中心化する等 — **新規**。
 - Thm 1.3.1(ii) / 7.6.2 / 10.1.3 (fpf 自己同型) — 一般論、要在庫確認。
 
+## 進捗 (2026-07-18): **Tier B 到達** — 新 leaf `OddOrder/GroupTheory/CNGroupStructure.lean` (516 行)
+
+**新設した基盤** (repo にも mathlib にも `O_{p,p'}` / `O_{p,p',p}` が存在しなかったので自作):
+`opPPrimeCore p G` = `O_{p,p'}(G)`、`opPPrimePCore p G` = `O_{p,p',p}(G)` (既存 `Ch03.oPiPrimePiCore`
+と同形の `comap (mk' …)`、`Normal` instance 付き)。
+
+**定義** `IsThreeStepGroup G p` — 原典 3 条件を**逐語**で 4 フィールド化 (条件 2 は
+`opPPrimePCore = ⊤` と `opPPrimeCore ≠ ⊤` に分解)。自由 Prop フィールド 0 (検証済)。
+
+**Tier A (BG D.1 が実際に消費する 2 帰結) — 両方 sorry-free**:
+- `IsThreeStepGroup.oPiCore_pPrime_eq_bot` — `O_{p'}(G) = ⊥`。
+- `IsThreeStepGroup.isPGroup_quotient` + `nontrivial_quotient` — `G/O_{p,p'}(G)` が非自明 p-群。
+⟹ BG D.1 の「定義と短い議論から」の部分はこれで埋まる。
+
+**Tier B — Gorenstein Ch.12 §1 Lemma 1.2**: `commute_of_cn_of_commute_ne_one` (sorry-free)。
+`C_G(x)`→`C_G(x₁)`→`C_G(y)`→`C_G(y₁)` の 4 パス論法。⚠ **Sylow でなく任意の p-/q-部分群**で証明
+(証明がそれ以上を使わないため) = 一般化であって弱化ではない。
+他に sorry-free: `IsFrobeniusGroup.eq_bot_of_normal_of_inf_kernel_eq_bot` (再利用可能な一般 Frobenius)、
+`IsThreeStepGroup.isSolvable` (Lemma 1.4 の可解性半分)、`commute_of_isNilpotent_of_isPGroup` 他。
+**全 25 宣言 axiom-clean**、AxiomsCheck に 5 件登録。
+
+### 非空性 (vacuity) の監査結果
+1. **符号化が記法どおりであること**を証明で担保: `opPPrimeCore_map_mk_eq` が条件 3 の核 = 
+   `O_{p'}(G/O_p(G))`、`oPiCore_subgroupOf_map_subtype` が条件 1 の核 = `O_p(G)` を示す
+   ⟹ `comap`/`subgroupOf` 符号化が黙って `⊥`/`⊤` に潰れていないことを排除。
+2. **条件群が同時使用可能** (偶然矛盾でない): `isSolvable` が条件 1 (巡回補群) と条件 2 (p-群商) を
+   意図した経路で消費して実結論を出す — 退化符号化ならこの経路は通らない。
+3. **具体的 witness (議論のみ、Lean 未構成)**: `F_{3⁶} ⋊ (C₇ ⋊ C₃)` (位数 3⁷·7) が `p=3` で 3-step。
+   `O_3 = F_{3⁶}`、`O_{3,3'} = F_{3⁶}·C₇` は Frobenius (ord_7(3)=6 ゆえ `F_{3⁶}` は自由 `F_3[C₇]`-加群)、
+   `G/O_3 = C₇⋊C₃` は Frobenius (3 ∣ 7−1)、`G/O_{3,3'} = C₃` 非自明。
+   ⚠ **これは AppD docstring が D.1 の反例に使う群と同一** — 3-step 群が D.1 の反例形そのものゆえ整合。
+   → **Lean での witness 構成は未了 = 監査の唯一の穴** (follow-up)。
+
+### 残 sorry は 1 件のみ = Cor 1.6 (`oPiCore_isSylow_or_isThreeStepGroup`)
+正直かつ完全な形で statement 済 (`[IsSolvable G]` + CN + `O_p(G) ≠ ⊥` → Sylow ∨ 3-step)。ブロッカー:
+1. `C_G(F(G)) ≤ F(G)` — **repo に在る** (`OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting`) が
+   **`OddOrder.BG` 配下**。`GroupTheory` leaf が `BG` を import するのは階層衛生上まずいので、
+   まず `Isaacs`/`GroupTheory` へ移設したい。⚠ **数学的障害でなく配置の問題**。
+2. Gorenstein Thm 5.3.5 (互いに素な作用 `K = [R,K]·C_K(R)`) — **不在**。
+3. Gorenstein Thm 10.3.1(iv)(v) (位数 `qr` の部分群は巡回 / metacyclic 補群) — **不在**
+   (`IsMetacyclic` はあるが Frobenius 理論と未接続)。
+4. Gorenstein Thm 1.3.1(ii) (全 Sylow が巡回 or 四元数 ⟹ 構造) — **不在**。
+5. Gorenstein Lemma 10.1.3 (fpf 自己同型が `K/F` に降りる) — **不在**。
+⟹ 2/4/5 が実質的な穴で複数 session 規模。**D.1 は未着地ゆえ `AppD_CNGroups.lean` は無変更**。
+
+### 申し送り
+`IsCNGroup` は現在 `BG/AppD_CNGroups.lean` にある。AppD が Cor 1.6 を消費する段になると
+`GroupTheory` leaf ← `AppD` の循環になるため、**そのとき `IsCNGroup` を本 leaf へ移設**すること
+(現状 Lemma 1.2 は CN 仮説を展開形 `∀ z ≠ 1, IsNilpotent ↥(centralizer {z})` で取っており、
+これは `IsCNGroup` と定義的に同一ゆえ重複定義は無い)。
+
 ## 段階的完了条件 (tier)
 
 1. **tier 1**: `IsThreeStepGroup` を定義 → Cor 1.6 を証明 → BG App.D の D.1 → D.2 を閉じる。
