@@ -17,6 +17,7 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
@@ -235,7 +236,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 9400
+set_option linter.style.longFile 9600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -409,6 +410,25 @@ Proposition 1(c). -/
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardPermGroup_infinityStabilizer_isPretransitive
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardPermGroup_isMultiplyPretransitive
+
+/-! The central square-one line and distinguished order-three pair in the
+Hermitian root group for the PSU(3,q) branch of Peterfalvi Part II, Ch. I,
+section 3, Proposition 1(c). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.sq_eq_one_iff_fst_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.centerLine_le_center
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.natCard_centerLine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.not_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.centralInvolution_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standard_braid
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standard_st_order
 
 -- Faithful PSU root--torus semidirect product and its standard Borel range.
 #assert_only_allowed_axioms
