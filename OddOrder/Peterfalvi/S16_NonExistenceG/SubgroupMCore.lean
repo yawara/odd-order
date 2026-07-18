@@ -1463,3 +1463,5 @@ theorem classFunction_sum_apply {ι : Type*} {k : Type*} [CommRing k]
   | empty => simp
   | @insert a s ha ih =>
       rw [Finset.sum_insert ha, ClassFunction.add_apply, ih, Finset.sum_insert ha]
+
+end OddOrder.Peterfalvi.S16
