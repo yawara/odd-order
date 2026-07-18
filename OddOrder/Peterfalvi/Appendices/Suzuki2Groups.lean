@@ -3,10 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 
 /-!

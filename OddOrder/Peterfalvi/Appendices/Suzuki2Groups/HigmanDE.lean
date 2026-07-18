@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.ElementaryAbelian
-import OddOrder.Isaacs.Ch04_Commutators.Main
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Peterfalvi Appendix III: Higman's two-summand conclusions

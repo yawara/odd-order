@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
-import OddOrder.Peterfalvi.Appendices.Huppert
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
 
 /-!
 # Peterfalvi Appendix III: invariant summands under a Frobenius action
