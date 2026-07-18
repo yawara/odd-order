@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.SubgroupInAmbient
 
@@ -30,7 +32,9 @@ packaging.  Per-result status:
 | Result | Status |
 |---|---|
 | E.1 general (`hallCollection`) | honest statement, `sorry` (needs Hall's collecting process) |
-| E.1 class `≤ 2` (`hallCollection_of_class_le_two`) | **proved, sorry-free** |
+| E.1 class `≤ 3` (`hallCollection_of_class_le_three`) | **proved, sorry-free** (all `n`) |
+| E.1 class `≤ 2` (`hallCollection_of_class_le_two`) | **proved, sorry-free** (subsumed by the above) |
+| E.1 general framework | `OddOrder/GroupTheory/HallCollection.lean`, **sorry-free** |
 | E.2 Step 1 (`pow_mul_of_commutator_pow_eq_one`) | **proved**, but cites the sorried E.1 |
 | E.2(a) (`omega_pow_eq_one_of_lowerCentralSeries_eq_bot`) | honest statement, `sorry` |
 | E.2(a) class `≤ 2` | already in repo: `GroupTheory.Omega.pow_eq_one_of_class_le_two` |
@@ -59,32 +63,19 @@ section HallCollection
 variable {G : Type*} [Group G]
 
 /-- The ordered product `c₂ ^ e₂ ⋯ cₙ ^ eₙ` with `eᵣ = C(n, r)`, i.e. the
-right-hand tail of BG Theorem E.1. -/
-def collectionTail (c : ℕ → G) (n : ℕ) : G :=
-  ((List.range' 2 (n - 1)).map fun r => c r ^ n.choose r).prod
+right-hand tail of BG Theorem E.1.
+
+This is BG's name for the general ordered tail
+`OddOrder.GroupTheory.hallTail` (`OddOrder/GroupTheory/HallCollection.lean`),
+which carries the reusable collapse/absorption lemmas; the two are definitionally
+equal, and the App.E-facing lemmas below are stated for this name. -/
+def collectionTail (c : ℕ → G) (n : ℕ) : G := hallTail c n
 
 @[simp] theorem collectionTail_zero (c : ℕ → G) : collectionTail c 0 = 1 := by
   simp [collectionTail]
 
 @[simp] theorem collectionTail_one (c : ℕ → G) : collectionTail c 1 = 1 := by
   simp [collectionTail]
-
-/-- Every factor of the collection tail with index `≥ 3` being trivial collapses
-the tail to its `r = 2` term. -/
-theorem collectionTail_eq_of_eq_one_of_three_le (c : ℕ → G) {n : ℕ} (hn : 2 ≤ n)
-    (h : ∀ r, 3 ≤ r → c r = 1) : collectionTail c n = c 2 ^ n.choose 2 := by
-  have htail : ∀ m k : ℕ, 3 ≤ m →
-      ((List.range' m k).map fun r => c r ^ n.choose r).prod = 1 := by
-    intro m k hm
-    refine List.prod_eq_one ?_
-    intro z hz
-    simp only [List.mem_map] at hz
-    obtain ⟨r, hr, rfl⟩ := hz
-    have hr3 : 3 ≤ r := le_trans hm (List.mem_range'_1.mp hr).1
-    rw [h r hr3, one_pow]
-  have hsplit : n - 1 = (n - 2) + 1 := by omega
-  rw [collectionTail, hsplit, List.range'_succ, List.map_cons, List.prod_cons,
-    htail (2 + 1) (n - 2) (by omega), mul_one]
 
 /-- **BG Theorem E.1** (Philip Hall's collection formula).  Let
 `G = G₁ ⊇ G₂ ⊇ ⋯` be the lower central series of `G`, take `x y : G` and a
@@ -95,8 +86,43 @@ positive integer `n`, and let `eᵣ = C(n, r)`.  Then there are elements
 
 **Status: honestly stated, not proved.**  The proof is Hall's commutator
 collecting process (BG cites Suzuki, *Group Theory II*, pp. 37--41; also Huppert,
-*Endliche Gruppen I*, pp. 315--318), which is not yet formalized in this
-repository.  The class-`≤ 2` case is proved sorry-free just below. -/
+*Endliche Gruppen I*, pp. 315--318).  Proved sorry-free below for nilpotence
+class `≤ 3` (`hallCollection_of_class_le_three`, all `n` at once), which subsumes
+the class-`≤ 2` case (`hallCollection_of_class_le_two`).
+
+**Precise obstruction to the general case.**  The reusable framework lives in
+`OddOrder/GroupTheory/HallCollection.lean` (all sorry-free): the exact one-step
+recursion `pow_succ_collect`
+
+`xⁿ yⁿ = (x y)ⁿ T  ⟹  x^{n+1} y^{n+1} = (x y)^{n+1} (⁅x⁻¹, ((x y)ⁿ)⁻¹⁆ T)^y`,
+
+the weight law `commutatorElement_mem_lowerCentralSeries_add`
+(`[G_i, G_j] ≤ G_{i+j}`), and the reduction `exists_hallCollection_of_residue`,
+which shows that E.1 for a fixed `n` is exactly a congruence *modulo* `γ_n`
+(the top exponent `C(n, n) = 1` absorbs any `γ_n`-residue, so there is no hidden
+exactness to prove).
+
+What is missing is the induction on the *weight* `k`.  Suppose the weights
+`2, …, k - 1` have been collected, leaving a residue `w(n) ∈ γ_k`.  One must
+produce `c_k ∈ γ_k` with `w(n) ≡ c_k^{C(n,k)} (mod γ_{k+1})`, i.e. one must know
+that `w(n)` is a `C(n,k)`-th power in the abelian group `γ_k / γ_{k+1}`.  That is
+a genuine divisibility statement, and it is what Hall's collecting process
+establishes: in the free group `γ_k / γ_{k+1}` is free abelian on the basic
+commutators of weight `k`, and the coefficient of each basic commutator in
+`w(n)` is a `ℤ`-polynomial in `n` divisible by `C(n,k)`.
+
+Two prerequisites for that argument are absent from both mathlib and this
+repository: (i) free nilpotent groups together with a basis of *basic
+commutators* for each factor `γ_k / γ_{k+1}` (mathlib has `FreeGroup` but no
+free nilpotent quotient and no basic-commutator basis — `Mathlib/GroupTheory/
+Commutator/**` and `Mathlib/GroupTheory/Nilpotent.lean` contain neither
+`Petrescu` nor `collecting`), and (ii) the polynomiality in `n` of the collection
+coefficients (Hall polynomials / Lazard).  Building (i) is the real cost; once
+it exists, the weight induction above closes E.1 by the standard argument.
+
+The class-`≤ 3` case avoids all of this because there the residue lives in the
+*central* factor `γ₃`, whose two generators are explicit — see
+`class_three_tail_aux`. -/
 theorem hallCollection (x y : G) (n : ℕ) :
     ∃ c : ℕ → G,
       (∀ r, 2 ≤ r → r ≤ n → c r ∈ (⊤ : Subgroup G).lowerCentralSeries (r - 1)) ∧
@@ -133,7 +159,7 @@ theorem hallCollection_of_class_le_two
       fun g => (Subgroup.mem_center_iff.mp hz g).symm
     rcases Nat.lt_or_ge n 2 with hn | hn
     · interval_cases n <;> simp
-    · rw [collectionTail_eq_of_eq_one_of_three_le _ hn
+    · rw [collectionTail, hallTail_eq_of_eq_one_of_three_le _ hn
         (fun r hr => if_neg (by omega : ¬ r = 2))]
       rw [if_pos (rfl : (2 : ℕ) = 2), Nat.choose_two_right]
       -- `(x*y)^n = ⁅y,x⁆^{n(n-1)/2} * x^n * y^n` with `⁅y,x⁆` central.
@@ -142,6 +168,120 @@ theorem hallCollection_of_class_le_two
       rw [mul_pow_eq_commutator_pow_mul_of_class_le_two hcl x y n, inv_pow,
         mul_assoc (⁅y, x⁆ ^ (n * (n - 1) / 2)) (x ^ n) (y ^ n), hw.eq, mul_assoc,
         mul_inv_cancel, mul_one]
+
+/-- The abstract shape of the class-`≤ 3` tail identity.  With `C = ⁅y, x⁆` and
+`d₁, d₂` the two weight-`3` commutators (central under `γ₄ = 1`), the collected
+tail `c₂ ^ m c₃ ^ k` with `c₂ = C⁻¹ e`, `c₃ = e`, `e = (d₁ d₂²)⁻¹` is exactly the
+inverse of the class-`≤ 3` collection factor.
+
+The point is the Pascal identity `m + k = C(n,2) + C(n,3) = C(n+1,3)`: the
+weight-`3` exponent produced by the collecting process is `C(n+1,3)`, and it
+splits as the *sum* of the two Hall exponents `C(n,2)` (contributed by the
+weight-`3` part of `c₂`) and `C(n,3)` (contributed by `c₃`).  This is what makes
+Hall's binomial exponents come out right at weight `3`. -/
+private theorem class_three_tail_aux {K : Type*} [Group K] (C d₁ d₂ : K) (m k : ℕ)
+    (h₁ : ∀ g : K, Commute d₁ g) (h₂ : ∀ g : K, Commute d₂ g) :
+    (C⁻¹ * (d₁ * d₂ ^ 2)⁻¹) ^ m * ((d₁ * d₂ ^ 2)⁻¹) ^ k
+      = (C ^ m * d₁ ^ (m + k) * d₂ ^ (2 * (m + k)))⁻¹ := by
+  have hcomm : ∀ g : K, Commute (d₁ * d₂ ^ 2)⁻¹ g := fun g =>
+    (Commute.mul_left (h₁ g) ((h₂ g).pow_left 2)).inv_left
+  have hsplit : (d₁ * d₂ ^ 2) ^ (m + k) = d₁ ^ (m + k) * d₂ ^ (2 * (m + k)) := by
+    rw [(h₁ (d₂ ^ 2)).mul_pow, ← pow_mul]
+  calc (C⁻¹ * (d₁ * d₂ ^ 2)⁻¹) ^ m * ((d₁ * d₂ ^ 2)⁻¹) ^ k
+      = C⁻¹ ^ m * ((d₁ * d₂ ^ 2)⁻¹) ^ m * ((d₁ * d₂ ^ 2)⁻¹) ^ k := by
+        rw [(hcomm C⁻¹).symm.mul_pow]
+    _ = C⁻¹ ^ m * ((d₁ * d₂ ^ 2)⁻¹) ^ (m + k) := by rw [mul_assoc, ← pow_add]
+    _ = ((d₁ * d₂ ^ 2)⁻¹) ^ (m + k) * C⁻¹ ^ m := ((hcomm (C⁻¹ ^ m)).pow_left (m + k)).eq.symm
+    _ = (C ^ m * (d₁ * d₂ ^ 2) ^ (m + k))⁻¹ := by
+        rw [mul_inv_rev (C ^ m) ((d₁ * d₂ ^ 2) ^ (m + k)), inv_pow, inv_pow]
+    _ = (C ^ m * d₁ ^ (m + k) * d₂ ^ (2 * (m + k)))⁻¹ := by rw [hsplit, mul_assoc]
+
+/-- **BG Theorem E.1, class-`≤ 3` case** (proved, sorry-free).  If `γ₄(G) = 1`
+(mathlib: `lowerCentralSeries ⊤ 3 = ⊥`), then Hall's collection formula holds for
+every `x, y` and every `n`, with
+
+`c₂ = ⁅y, x⁆⁻¹ (d₁ d₂²)⁻¹ ∈ G₂`,  `c₃ = (d₁ d₂²)⁻¹ ∈ G₃`,  `cᵣ = 1` for `r ≥ 4`,
+
+where `d₁ = ⁅⁅y, x⁆, x⁆` and `d₂ = ⁅⁅y, x⁆, y⁆` are the two weight-`3`
+commutators (central, since `γ₄ = 1`).
+
+This strictly generalizes `hallCollection_of_class_le_two`.  The proof runs the
+repo's class-`≤ 3` collection identity
+`OddOrder.BG.Ch1.S04.mul_pow_eq_collect_of_triple_central`
+(BG Proposition 4.3(a), `(4.4)`), whose weight-`3` exponents are `C(n+1,3)` and
+`2 C(n+1,3)`, and converts them into Hall's shape by the Pascal splitting
+`C(n+1,3) = C(n,2) + C(n,3)` (`class_three_tail_aux`).
+
+Note that this is genuinely a *class* restriction and not an `n` restriction: it
+gives Theorem E.1 for all `n` at once, for every group of nilpotence class
+`≤ 3`. -/
+theorem hallCollection_of_class_le_three
+    (hγ : (⊤ : Subgroup G).lowerCentralSeries 3 = ⊥) (x y : G) (n : ℕ) :
+    ∃ c : ℕ → G,
+      (∀ r, 2 ≤ r → r ≤ n → c r ∈ (⊤ : Subgroup G).lowerCentralSeries (r - 1)) ∧
+      x ^ n * y ^ n = (x * y) ^ n * collectionTail c n := by
+  classical
+  -- Weight bookkeeping: `⁅a,b⁆ ∈ γ₂`, `⁅⁅a,b⁆,c⁆ ∈ γ₃`, and `γ₄ = 1`.
+  have hmem2 : ∀ a b : G, ⁅a, b⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 1 := by
+    intro a b
+    rw [Subgroup.top_lowerCentralSeries_one]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top a) (Subgroup.mem_top b)
+  have hmem3 : ∀ a b z : G, ⁅⁅a, b⁆, z⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 2 :=
+    fun a b z => Subgroup.commutator_mem_commutator (hmem2 a b) (Subgroup.mem_top z)
+  have hc4 : ∀ a b z w : G, ⁅⁅⁅a, b⁆, z⁆, w⁆ = 1 := by
+    intro a b z w
+    have hmem : ⁅⁅⁅a, b⁆, z⁆, w⁆ ∈ (⊤ : Subgroup G).lowerCentralSeries 3 :=
+      Subgroup.commutator_mem_commutator (hmem3 a b z) (Subgroup.mem_top w)
+    rwa [hγ, Subgroup.mem_bot] at hmem
+  have hc3 : ∀ a b z : G, ⁅⁅a, b⁆, z⁆ ∈ Subgroup.center G := fun a b z =>
+    Subgroup.mem_center_iff.2 fun g =>
+      ((commutatorElement_eq_one_iff_commute.1 (hc4 a b z g)).symm).eq
+  -- The two central weight-`3` commutators and the collected weight-`3` element `e`.
+  have hd₁ : ∀ g : G, Commute ⁅⁅y, x⁆, x⁆ g :=
+    fun g => (Subgroup.mem_center_iff.mp (hc3 y x x) g).symm
+  have hd₂ : ∀ g : G, Commute ⁅⁅y, x⁆, y⁆ g :=
+    fun g => (Subgroup.mem_center_iff.mp (hc3 y x y) g).symm
+  have he_mem : (⁅⁅y, x⁆, x⁆ * ⁅⁅y, x⁆, y⁆ ^ 2)⁻¹ ∈ (⊤ : Subgroup G).lowerCentralSeries 2 :=
+    Subgroup.inv_mem _ (Subgroup.mul_mem _ (hmem3 y x x) (Subgroup.pow_mem _ (hmem3 y x y) 2))
+  refine ⟨fun r => if r = 2 then ⁅y, x⁆⁻¹ * (⁅⁅y, x⁆, x⁆ * ⁅⁅y, x⁆, y⁆ ^ 2)⁻¹
+      else if r = 3 then (⁅⁅y, x⁆, x⁆ * ⁅⁅y, x⁆, y⁆ ^ 2)⁻¹ else 1, ?_, ?_⟩
+  · -- Memberships: `c₂ ∈ γ₂`, `c₃ ∈ γ₃`, `cᵣ = 1` otherwise.
+    intro r hr2 _
+    by_cases h2 : r = 2
+    · subst h2
+      simp only [if_pos rfl]
+      refine Subgroup.mul_mem _ (Subgroup.inv_mem _ (hmem2 y x)) ?_
+      exact (⊤ : Subgroup G).lowerCentralSeries_antitone (by omega) he_mem
+    · by_cases h3 : r = 3
+      · subst h3
+        exact he_mem
+      · simp only [if_neg h2, if_neg h3]
+        exact Subgroup.one_mem _
+  · rcases Nat.lt_or_ge n 2 with hn | hn
+    · interval_cases n <;> simp
+    · -- Collapse the tail to its weight-`2` and weight-`3` factors.
+      rw [collectionTail, hallTail_eq_of_eq_one_of_four_le _ hn
+        (fun r hr => by rw [if_neg (by omega : ¬ r = 2), if_neg (by omega : ¬ r = 3)])]
+      rw [if_pos (rfl : (2 : ℕ) = 2), if_neg (by norm_num : ¬ (3 : ℕ) = 2),
+        if_pos (rfl : (3 : ℕ) = 3)]
+      -- Run BG (4.4) and match exponents by Pascal `C(n+1,3) = C(n,2) + C(n,3)`.
+      rw [OddOrder.BG.Ch1.S04.mul_pow_eq_collect_of_triple_central hc3 hc4 x y n,
+        Nat.choose_succ_succ n 2]
+      have hkey := class_three_tail_aux ⁅y, x⁆ ⁅⁅y, x⁆, x⁆ ⁅⁅y, x⁆, y⁆
+        (n.choose 2) (n.choose 3) hd₁ hd₂
+      calc x ^ n * y ^ n = x ^ n * y ^ n * 1 := (mul_one _).symm
+        _ = x ^ n * y ^ n *
+              ((⁅y, x⁆ ^ n.choose 2 * ⁅⁅y, x⁆, x⁆ ^ (n.choose 2 + n.choose 3)
+                  * ⁅⁅y, x⁆, y⁆ ^ (2 * (n.choose 2 + n.choose 3)))
+                * ((⁅y, x⁆⁻¹ * (⁅⁅y, x⁆, x⁆ * ⁅⁅y, x⁆, y⁆ ^ 2)⁻¹) ^ n.choose 2
+                  * ((⁅⁅y, x⁆, x⁆ * ⁅⁅y, x⁆, y⁆ ^ 2)⁻¹) ^ n.choose 3)) := by
+              rw [hkey, mul_inv_cancel]
+        _ = x ^ n * y ^ n * ⁅y, x⁆ ^ n.choose 2
+              * ⁅⁅y, x⁆, x⁆ ^ (n.choose 2 + n.choose 3)
+              * ⁅⁅y, x⁆, y⁆ ^ (2 * (n.choose 2 + n.choose 3))
+              * ((⁅y, x⁆⁻¹ * (⁅⁅y, x⁆, x⁆ * ⁅⁅y, x⁆, y⁆ ^ 2)⁻¹) ^ n.choose 2
+                  * ((⁅⁅y, x⁆, x⁆ * ⁅⁅y, x⁆, y⁆ ^ 2)⁻¹) ^ n.choose 3) := by
+              simp only [mul_assoc]
 
 end HallCollection
 
@@ -169,7 +309,7 @@ theorem pow_mul_of_commutator_pow_eq_one {p : ℕ} (hp : p.Prime)
     x ^ p * y ^ p = (x * y) ^ p := by
   obtain ⟨c, hc, hform⟩ := hallCollection x y p
   have htail : collectionTail c p = 1 := by
-    rw [collectionTail]
+    rw [collectionTail, hallTail]
     refine List.prod_eq_one ?_
     intro z hz
     simp only [List.mem_map] at hz
