@@ -111,7 +111,12 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       - **分岐 2/3 (H 非可換) = (e2)(e3) の共通部分のみ**: `p ∈ σ(M) − β(M)`、`O_p(H)` 非可換
         (`opiCore_singleton_not_isMulCommutative_of_witness`)、`O_{p'}(H)` cyclic
         (`typeF_nonabelian_cyclic_opiCore_compl`)。
-- [ ] **`p = |X|` の結合** — **未了 (ただし前提は揃っている)**。BG は `X = X₁` を示して `p = |X|`
+- [x] **`p = |X|` の結合** — **完了 (2026-07-19)**。以下 4 段すべて sorry-free・axiom-clean、
+      新 leaf `S15_MF/WitnessPGroup.lean` に集約。最終形 =
+      `inf_conj_fitting_eq_of_not_isMulCommutative` (`X = X₁`) と
+      `card_inf_conj_fitting_eq_of_not_isMulCommutative` (`|X| = p`)。
+      (以下は着手前の調査メモ)
+BG は `X = X₁` を示して `p = |X|`
       を得る: `Z₀ = Ω₁(Z(P))`、`B = X₁ × Z₀ ∈ ℰ²(P) ∩ ℰ*(P)` (`C_H(X₁)` の rank < 3 による)、
       そこから `|Z₀| = p` と `Z(P)` cyclic、最後に **Lemma 10.13(b)** で
       `C_P(X₁) = C_P(B) = X₁ × Z` (Z cyclic)。
@@ -227,6 +232,19 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
 (b)(d)(e) が (a) から独立な内容を主張し、`p = |X|` の結合が復元され、book strength・sorry-free・
 axiom-clean で証明されること。(c) は `≤` のまま (MathComp 準拠、上記理由)。
 ⚠ **現状の (b)(e) を「証明済」と数えない**。(e) だけ直して閉じない。
+
+### `p = |X|` chain の完成 (2026-07-19)
+
+| 段 | 内容 | 定理 |
+|---|---|---|
+| 1 | `X` は p-群 (BG は根拠を書いていない) | `inf_conj_fitting_isPGroup_of_not_isMulCommutative` |
+| 2 | `B = X₁ × Ω₁(Z(P))` が rank 2 elementary abelian | `exists_rankTwo_elemAbelian_of_witness` |
+| 3 | `B` が (ambient `G` で) 極大 — Sylow 押し込み + σ-Hall tameness | `isMaximalElementaryAbelian_sup_omega1Center_of_witness` |
+| 4 | Lemma 10.13(b) → `X = X₁`、ゆえに `p = \|X\|` | `inf_conj_fitting_eq_of_not_isMulCommutative` / `card_…` |
+
+段 4 の詰め (BG の "Thus X = X₁" 一言) は: `X ⊓ Z = ⊥` (非自明なら位数 `p` の部分群を含み、
+`X` cyclic ゆえそれは `X₁` に一致 → `X₁ ⊓ Z = ⊥` に矛盾)、そして `x = u·v` 分解と `X₁` の指数 `p`
+から `x^p = v^p ∈ X ⊓ Z = 1` ⟹ `X` の指数が `p` を割る ⟹ cyclic + `X₁ ≤ X` で `X = X₁`。
 
 ### 進捗 (2026-07-18)
 
