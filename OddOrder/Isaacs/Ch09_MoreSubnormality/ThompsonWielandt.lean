@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
 import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
+import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
 # Isaacs Ch. 9 — §9C: Thompson–Wielandt (Theorems 9.23/9.24), p. 283–284
@@ -86,6 +87,56 @@ theorem normalizer_eq_right_of_noNormal {H K D : Subgroup G}
   by_contra hle
   exact hyp (Subgroup.normalizer (N : Set G))
     (Or.inr (lt_of_le_of_ne hKN fun heq => hle heq.ge)) N hN hND le_rfl
+
+end
+
+section /- 9C: Thm 9.24 の記号 (`E`, `U`, `V`) と subnormal chain -/
+
+variable (H K : Subgroup G)
+
+/-- **Thm 9.24 の `E`**: `E = core_H(D) ⊓ core_K(D)` (`D = H ⊓ K`).
+書籍の `M = core_H(D)`, `N = core_K(D)` はそれぞれ `relCore H (H ⊓ K)`,
+`relCore K (H ⊓ K)`; `U = relCore H (thompsonWielandtCore H K)`,
+`V = relCore K (thompsonWielandtCore H K)`. -/
+def thompsonWielandtCore : Subgroup G :=
+  relCore H (H ⊓ K) ⊓ relCore K (H ⊓ K)
+
+theorem thompsonWielandtCore_comm : thompsonWielandtCore H K = thompsonWielandtCore K H := by
+  rw [thompsonWielandtCore, thompsonWielandtCore, inf_comm H K, inf_comm]
+
+/-- `V = core_K(E) ≤ E ≤ M = core_H(D)`: Case 2 の subnormal chain `V ◁ M ◁ H` の包含部分. -/
+theorem relCore_thompsonWielandtCore_le_relCore :
+    relCore K (thompsonWielandtCore H K) ≤ relCore H (H ⊓ K) :=
+  (relCore_le K (thompsonWielandtCore H K)).trans inf_le_left
+
+/-- `M = core_H(D)` は `V = core_K(E)` を正規化する (`M ≤ D ≤ K ≤ N_G(V)`):
+Case 2 の subnormal chain `V ◁ M ◁ H` の normality 部分.
+
+⚠ ここが書籍 p. 284 の「`V ◁ M ◁ H`, so `V ◁ H`」の箇所. 実際に得られるのは
+`V ◁ M ◁ H` (subnormal) までで `V ◁ H` ではないため, 下流では normal 版でなく
+subnormal 版の Cor 9.27 (`le_normalizer_pResidualOf_of_subnormal_two_rel`) を使う. -/
+theorem relCore_le_normalizer_relCore_thompsonWielandtCore :
+    relCore H (H ⊓ K)
+      ≤ Subgroup.normalizer ((relCore K (thompsonWielandtCore H K) : Subgroup G) : Set G) :=
+  ((relCore_le H (H ⊓ K)).trans inf_le_right).trans
+    (le_normalizer_relCore K (thompsonWielandtCore H K))
+
+/-- **Thm 9.24 Case 2 の Step A** (書籍 p. 284): `P = O_p(H)` は `Y = O^p(V)` を正規化する.
+
+書籍は「`V ◁ H` かつ `P ◁ H` ゆえ Cor 9.27」と述べるが, 実際には `V ◁ M ◁ H` (subnormal)
+なので subnormal 版 Cor 9.27 の相対形を `H` を ambient として適用する. -/
+theorem opiCoreInG_le_normalizer_pResidualOf_relCore [Finite G] {p : ℕ} [Fact p.Prime] :
+    GroupTheory.opiCoreInG ({p} : Set ℕ) H
+      ≤ Subgroup.normalizer
+          (pResidualOf p (relCore K (thompsonWielandtCore H K)) : Set G) :=
+  le_normalizer_pResidualOf_of_subnormal_two_rel
+    (relCore_thompsonWielandtCore_le_relCore H K)
+    (relCore_le_left H (H ⊓ K))
+    (GroupTheory.opiCoreInG_le _ H)
+    (le_normalizer_relCore H (H ⊓ K))
+    (GroupTheory.le_normalizer_opiCoreInG _ H)
+    (relCore_le_normalizer_relCore_thompsonWielandtCore H K)
+    (GroupTheory.isPGroup_opiCoreInG_singleton H)
 
 end
 
