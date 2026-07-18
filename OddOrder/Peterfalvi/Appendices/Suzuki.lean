@@ -14,6 +14,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
