@@ -279,6 +279,73 @@ theorem opiCoreInG_le_relCore_right [Finite G] {p : ℕ} [Fact p.Prime]
   rw [hgx]
   exact hy
 
+/-- **Thm 9.24 Case 2 の Step F** (書籍 p. 284): `O_p(H) ≤ O_p(K)`.
+
+Step E で `P = O_p(H) ≤ N = core_K(D)`; `N ≤ D ≤ H ≤ N_G(P)` ゆえ `P ◁ N`, よって
+`P ≤ O_p(N)`. さらに `N ◁ K` ゆえ `O_p(N) ◁ K` で `O_p(N) ≤ O_p(K)`. -/
+theorem opiCoreInG_le_opiCoreInG [Finite G] {p : ℕ} [Fact p.Prime]
+    (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hX : pResidualOf p (relCore H (thompsonWielandtCore H K)) ≠ ⊥)
+    (hY : pResidualOf p (relCore K (thompsonWielandtCore H K)) ≠ ⊥) :
+    GroupTheory.opiCoreInG ({p} : Set ℕ) H ≤ GroupTheory.opiCoreInG ({p} : Set ℕ) K := by
+  set P := GroupTheory.opiCoreInG ({p} : Set ℕ) H with hPdef
+  set N := relCore K (H ⊓ K) with hNdef
+  have hPN : P ≤ N := opiCoreInG_le_relCore_right H K hyp hX hY
+  have hND : N ≤ H ⊓ K := relCore_le K (H ⊓ K)
+  have hNnP : N ≤ Subgroup.normalizer (P : Set G) :=
+    (hND.trans inf_le_left).trans (GroupTheory.le_normalizer_opiCoreInG _ H)
+  -- `P ◁ N` ゆえ `P ≤ O_p(N)`
+  have h1 : P ≤ GroupTheory.opiCoreInG ({p} : Set ℕ) N :=
+    GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup hPN
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hPN).mpr hNnP)
+      (GroupTheory.isPiSubgroup_opiCoreInG _ H)
+  -- `N ◁ K` ゆえ `O_p(N) ◁ K`, よって `O_p(N) ≤ O_p(K)`
+  have hONK : GroupTheory.opiCoreInG ({p} : Set ℕ) N ≤ K :=
+    (GroupTheory.opiCoreInG_le _ _).trans (hND.trans inf_le_right)
+  have h2 : GroupTheory.opiCoreInG ({p} : Set ℕ) N
+      ≤ GroupTheory.opiCoreInG ({p} : Set ℕ) K :=
+    GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup hONK
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hONK).mpr
+        (GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer _
+          (le_normalizer_relCore K (H ⊓ K))))
+      (GroupTheory.isPiSubgroup_opiCoreInG _ _)
+  exact h1.trans h2
+
+/-- **Thm 9.24 の Case 2** (書籍 p. 284): ある素数 `p` で `O_p(H) ≠ 1` (すなわち `F(H) > 1`)
+ならば `O^p(U) = 1` または `O^p(V) = 1`, つまり `U` または `V` が `p`-群.
+
+証明: `X = O^p(U) ≠ 1` かつ `Y = O^p(V) ≠ 1` と仮定する. Step F とその `H`/`K` 対称版から
+`O_p(H) ≤ O_p(K) ≤ O_p(H)` すなわち `P := O_p(H) = O_p(K)`. Step C より `P ≤ D` で,
+`P` は `H` にも `K` にも normal, かつ `P ≠ 1` なので仮説から `H = N_G(P) = K` となり
+`H ≠ K` に矛盾. -/
+theorem pResidualOf_relCore_eq_bot_or [Finite G] {p : ℕ} [Fact p.Prime]
+    (hHK : H ≠ K) (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hP : GroupTheory.opiCoreInG ({p} : Set ℕ) H ≠ ⊥) :
+    pResidualOf p (relCore H (thompsonWielandtCore H K)) = ⊥ ∨
+      pResidualOf p (relCore K (thompsonWielandtCore H K)) = ⊥ := by
+  by_contra hcon
+  push_neg at hcon
+  obtain ⟨hX, hY⟩ := hcon
+  -- `H`/`K` を入れ替えた仮説
+  have hyp' : NoNormalInSupergroup K H (K ⊓ H) := by rw [inf_comm]; exact hyp.symm
+  have hX' : pResidualOf p (relCore K (thompsonWielandtCore K H)) ≠ ⊥ := by
+    rw [thompsonWielandtCore_comm K H]; exact hY
+  have hY' : pResidualOf p (relCore H (thompsonWielandtCore K H)) ≠ ⊥ := by
+    rw [thompsonWielandtCore_comm K H]; exact hX
+  -- Step F を両向きに使って `O_p(H) = O_p(K)`
+  have heq : GroupTheory.opiCoreInG ({p} : Set ℕ) H
+      = GroupTheory.opiCoreInG ({p} : Set ℕ) K :=
+    le_antisymm (opiCoreInG_le_opiCoreInG H K hyp hX hY)
+      (opiCoreInG_le_opiCoreInG K H hyp' hX' hY')
+  -- `P ≤ D` かつ `H`, `K` の両方に normal ゆえ `H = N_G(P) = K`
+  have hPD : GroupTheory.opiCoreInG ({p} : Set ℕ) H ≤ H ⊓ K := opiCoreInG_le_inf H K hyp hY
+  have hKn : K ≤ Subgroup.normalizer
+      ((GroupTheory.opiCoreInG ({p} : Set ℕ) H : Subgroup G) : Set G) := by
+    rw [heq]; exact GroupTheory.le_normalizer_opiCoreInG _ K
+  have hH := normalizer_eq_left_of_noNormal hyp hP hPD
+    (GroupTheory.le_normalizer_opiCoreInG _ H)
+  exact hHK (hH.symm.trans (normalizer_eq_right_of_noNormal hyp hP hPD hKn))
+
 end
 
 end OddOrder.Isaacs.Ch09
