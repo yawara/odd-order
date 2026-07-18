@@ -1374,66 +1374,6 @@ theorem msigma_fusion_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [normalizer_Msigma_eq_self hG hM] at hnN
   exact ⟨n, hnN, hnconj⟩
 
-/-- **BG Theorem D(2) — `M_σ ∩ M^g` is cyclic** (mmd L4317, BG Lemma 12.17 third clause, Coq
-`sigma_compl_embedding` cyclic part): for `g ∉ M`, the intersection `M_σ ∩ M^g` is cyclic.
-
-`M_σ ∩ M^g` is abelian (its derived subgroup lies in `(M_σ ∩ M^g) ⊓ M_σ' = 1`, the TI part
-`S12.Msigma_inf_conj_inf_derived_eq_bot`), of odd order, and of rank `≤ 1`: any noncyclic elementary
-abelian `A ≤ M_σ ∩ M^g` would, by `norm_noncyclic_sigma` (Corollary 12.4), satisfy `C_G(A) ≤ N_G(A)
-≤ M`, contradicting the σ-uniqueness core `S12.centralizer_not_le_of_isPGroup_le_Msigma_inf_conj`.
-A finite commutative odd group of rank `≤ 1` is cyclic
-(`isCyclic_of_isMulCommutative_of_rank_le_one`,
-the §15 rank-1 ⇒ cyclic step).  Supplies the `hD2` input of Theorem D. -/
-theorem Msigma_inf_conj_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G} (hg : g ∉ M) :
-    IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M) := by
-  classical
-  set K : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M with hKdef
-  have hKMσ : K ≤ OddOrder.BG.Ch3.S10.Msigma M := hKdef ▸ inf_le_left
-  -- **abelian**: `K' ≤ K ⊓ M_σ' = 1` (the TI part of Lemma 12.17).
-  have hTI : K ⊓ derivedInG (OddOrder.BG.Ch3.S10.Msigma M) = ⊥ := by
-    rw [hKdef]; exact OddOrder.BG.Ch3.S12.Msigma_inf_conj_inf_derived_eq_bot hG hM hg
-  have hder_bot : derivedInG K = ⊥ := by
-    rw [eq_bot_iff, ← hTI]
-    exact le_inf (Subgroup.map_subtype_le _)
-      (OddOrder.BG.Ch3.S12.derivedInG_le_derivedInG hKMσ)
-  have hcommK : commutator ↥K = ⊥ := by
-    have h := hder_bot
-    rwa [derivedInG, Subgroup.map_eq_bot_iff_of_injective _ K.subtype_injective] at h
-  have habelian : ∀ x y : ↥K, x * y = y * x := by
-    have hle : (⊤ : Subgroup ↥K) ≤ Subgroup.centralizer ((⊤ : Subgroup ↥K) : Set ↥K) :=
-      Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcommK
-    intro x y
-    exact Subgroup.mem_centralizer_iff.mp (hle (Subgroup.mem_top y)) x (Subgroup.mem_top x)
-  -- **odd order**.
-  have hodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
-  -- **rank ≤ 1**: a noncyclic elementary abelian `A ≤ K` contradicts the σ-uniqueness core.
-  have hrank : rank ↥K ≤ 1 := by
-    by_contra hcon
-    obtain ⟨p, hp, A, hAea, hAle, hAnc⟩ :=
-      exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K (by omega)
-    haveI : Fact p.Prime := ⟨hp⟩
-    have hAmeet : A ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M := hKdef ▸ hAle
-    have hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma M := hAmeet.trans inf_le_left
-    have hAM : A ≤ M := hAMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
-    have hAp : IsPGroup p ↥A := hAea.isPGroup
-    have hAne : A ≠ ⊥ := by rintro rfl; exact hAnc isCyclic_of_subsingleton
-    have hpdvdA : p ∣ Nat.card ↥A := by
-      obtain ⟨n, hn⟩ := hAp.exists_card_eq
-      rcases Nat.eq_zero_or_pos n with h0 | hpos
-      · exact absurd (Subgroup.card_eq_one.mp (by rw [hn, h0, pow_zero])) hAne
-      · exact hn ▸ dvd_pow_self p hpos.ne'
-    have hApσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
-      OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
-        ⟨hp, hpdvdA.trans (Subgroup.card_dvd_of_le hAMσ), Nat.card_pos.ne'⟩)
-    have hNA : Subgroup.normalizer (A : Set G) ≤ M :=
-      OddOrder.BG.Ch3.S12.norm_noncyclic_sigma hG hM hApσ hAp hAM hAnc
-    have hCA : Subgroup.centralizer (A : Set G) ≤ M :=
-      (Subgroup.centralizer_le_normalizer _).trans hNA
-    exact OddOrder.BG.Ch3.S12.centralizer_not_le_of_isPGroup_le_Msigma_inf_conj
-      hG hM hg hApσ hAp hAne hAmeet hCA
-  exact S15.isCyclic_of_isMulCommutative_of_rank_le_one habelian hodd hrank
-
 /-- **Dichotomy `|𝓜_σ(x)| ≤ 1 ⟹ C_G(x) ≤ M`** (the converse of
 `maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`, Coq Theorem 14.4's `not_sCX_M`
 direction): for `x ∈ M_σ^#` with at most one `σ`-maximal, `C_G(x) ≤ M`.  If some `c ∈ C_G(x)` escaped

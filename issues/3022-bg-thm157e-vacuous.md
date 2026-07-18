@@ -78,10 +78,24 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
 
 ## やること
 
-- [ ] **(b) の修正**: `X` を `fittingInAmbient M ⊓ (MulAut.conj g • fittingInAmbient M)` として
-      束縛し、`X ≤ MF M ∧ IsCyclic X` を**その `X` について**述べる。`g` は
-      `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` が供給済なので、statement を
-      `∀ g, g ∉ M → F(M) ⊓ F(M)^g ≠ ⊥ → …` 形にするか `∃ g, …` で `g` ごと束縛する。
+- [x] **(b) の修正** (2026-07-18 完了)。`X` を `fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M`
+      に束縛し、`∀ g ∉ M` 形で `X ≤ MF M ∧ IsCyclic X` を述べた (nontriviality 仮説は不要 —
+      両結論とも `g ∉ M` だけで成立するので、`∃ g` より強い `∀ g` 形にした)。新規補題 4 件:
+      - `le_Msigma_of_isPGroup_le_fitting` — `exists_inf_conj_fitting_orderP_witness` 内の
+        local `have hMσ_of` を top-level に抽出 (重複解消)。
+      - `inf_conj_fitting_le_Msigma` — BG の「`π(X) ⊆ σ(M)` ⟹ `X ⊆ M_σ`」。
+        `mem_sigma_of_prime_dvd_card_inf_conj_fitting` (既存) で全素数を σ に落とし、
+        nilpotent `F(M)` の normal Hall 部分群 `O_{σ(M)}(F(M)) = F(M_σ)` が σ-部分群を吸収
+        (`isPiGroup_le_of_normal_isHallSubgroup` + `oPiCore_isHall_of_isNilpotent`)。
+      - `inf_conj_fitting_le_conj_Msigma` — `X^{g⁻¹} = F(M) ⊓ F(M)^{g⁻¹}` の対称性で `g⁻¹` に帰着。
+      - `inf_conj_fitting_isCyclic` — `X ≤ M_σ ⊓ M^g` cyclic (Lemma 12.17 三番目の clause)。
+      **付随して `Msigma_inf_conj_isCyclic` を S16_MainResults/TheoremsAE → S15_MF/PisetBetaDisjoint
+      へ上流移設** (S15 が consume するため; 依存は全て §12 + §15 の rank-1 helper で、S16 の
+      ものは使っていなかった)。`TaxonomyOutput` は `open ...S15` 済で無変更、AxiomsCheck の
+      namespace のみ更新。
+- [x] **末尾の恒真 disjunct を削除** (2026-07-18)。`IsMulCommutative M_F ∨ (¬IsMulCommutative M_F ∧
+      (IsTypeF M ∨ IsTypeP1 M))` は `A ∨ ¬A` で情報ゼロだったため、残さず落とした。
+      `∃ p ∈ σ(M) ∖ β(M)` は実内容なので存続 ((e) の `p = |X|` 束縛は未了)。
 - [ ] **(e) の修正**: 上記 book 3 分岐を述べ直す。**実内容はすでに repo に存在する**ので新規の
       深い数学ではなく再パッケージが主: 分岐 1 ≈ `isTypeI_of_isTypeF` の可換枝
       (`TypeP1Criteria.lean:868-893`、rank = 2 を証明済)、分岐 2 ≈ 同 非可換枝 (`:894-906`、
