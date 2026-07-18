@@ -213,6 +213,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -8064,6 +8065,14 @@ ambient centralizer. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_psu3Target
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_centralizer_psu3Target
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**: the final centralizer
+assembly combines the classification-independent residual conclusions with
+the concrete PSL, Suzuki, and PSU alternatives, including the source
+cardinalities and distinguished-product orders 3/5/3. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_trichotomy_of_induction
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
