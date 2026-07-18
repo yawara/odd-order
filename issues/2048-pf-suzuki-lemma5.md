@@ -30,6 +30,8 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         位数 `q²` の inverse-image API を定義する
   - [x] ambient `K` action の忠実性・固定点自由性、`Q₀`-不変性、actual actor の
         involution 上の正則性と `|K| = q - 1` を証明する
+  - [x] quotient の固定点自由性から summand 上の推移性・単純性・
+        distinct summands の complementarity を得る一般 bridge を証明する
   - [ ] `Z(Q) = Q₀` を確立し、Higman Lemmas 11--12 (pp. 89--92) から
         actual two-summand split を構成する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を

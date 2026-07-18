@@ -229,6 +229,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
@@ -7989,6 +7990,26 @@ order-`q` summands have `K`-invariant inverse images of order `q²`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.card_rightPreimage
+
+/-! For Higman (d), coprime fixed-point lifting makes the quotient action
+fixed-point-free.  An invariant subgroup of order `|K| + 1` is then transitive
+and simple under `K`, and two distinct invariant subgroups of the required
+orders are complementary. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.quotient_fixedPointFree_of_fixedPoints_le
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.card_coprime_of_card_eq_sub_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.restrict_transitive_of_fixedPointFree_card
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.invariant_eq_bot_or_top_of_fixedPointFree_card
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.isCompl_of_distinct_invariant_of_transitive_card
 
 /-! **Peterfalvi Part II, Ch. I §3 Lemma 5**: invariant `Q₀`-cosets and
 coprime fixed-point lifting give the free action on `K`-subgroups and the
