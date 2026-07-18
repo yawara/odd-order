@@ -436,10 +436,10 @@ theorem Hypothesis.zSpan_sSet_degree_zero_support [Finite G]
     subst h
     exact absurd hφ1 hz
 
-open OddOrder.Peterfalvi.S11 in
-open scoped FiniteInduce in
 set_option maxHeartbeats 1600000 in
 -- raised heartbeat budget for the heavy elaboration below
+open OddOrder.Peterfalvi.S11 in
+open scoped FiniteInduce in
 /-- **Peterfalvi (9.11.1), the `S`-instance (5.6) pair-bound residual** (issue 1017 step (c); the
 `S`-mirror of `S11.NineElevenPairBound`, whose M-side provider `S11.nineElevenPairBound` requires
 `htype : IsTypeIII M ∨ IsTypeIV M` — false for the type-II `S` — so it must be rebuilt in the
