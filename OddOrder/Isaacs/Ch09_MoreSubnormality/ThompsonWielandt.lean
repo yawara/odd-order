@@ -395,4 +395,87 @@ theorem nilpotentResidual_ne_bot_of_fitting_eq_bot [Finite G] {H U : Subgroup G}
 
 end
 
+section /- 9C: Thm 9.24 の Case 1 (`F(H) = F(K) = 1`) -/
+
+variable (H K : Subgroup G)
+
+/-- Case 1 の片側ステップ: `F(H)=1` で `V ≠ 1` ならば `E(H) ≤ D`.
+
+`V ◁ M ◁ H` に 9.18 の相対形を当てて `E(H) ≤ N_G(V^∞)`; 仮説から `N_G(V^∞) = K` なので
+`E(H) ≤ K`, さらに `E(H) ≤ H` と合わせて `E(H) ≤ D`. -/
+theorem layerInG_le_inf_of_fitting_eq_bot [Finite G]
+    (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hFK : Ch01.fitting ↥K = ⊥)
+    (hV : relCore K (thompsonWielandtCore H K) ≠ ⊥) :
+    layerInG H ≤ H ⊓ K := by
+  set V := relCore K (thompsonWielandtCore H K) with hVdef
+  have hVK : V ≤ K := relCore_le_left K _
+  have hVn : K ≤ Subgroup.normalizer (V : Set G) := le_normalizer_relCore K _
+  have hVres : nilpotentResidual V ≠ ⊥ :=
+    nilpotentResidual_ne_bot_of_fitting_eq_bot hFK hVK hVn hV
+  have hVresD : nilpotentResidual V ≤ H ⊓ K :=
+    (nilpotentResidual_le V).trans
+      ((relCore_le K (thompsonWielandtCore H K)).trans (thompsonWielandtCore_le H K))
+  have hKres : Subgroup.normalizer (nilpotentResidual V : Set G) = K :=
+    normalizer_eq_right_of_noNormal hyp hVres hVresD
+      (hVn.trans (normalizer_le_normalizer_nilpotentResidual V))
+  refine le_inf (layerInG_le H) ?_
+  -- 9.18 の相対形 (`V ◁ M ◁ H`)
+  exact (layerInG_le_normalizer_nilpotentResidual_of_subnormal_two
+    (relCore_thompsonWielandtCore_le_relCore H K)
+    (relCore_le_left H (H ⊓ K))
+    (le_normalizer_relCore H (H ⊓ K))
+    (relCore_le_normalizer_relCore_thompsonWielandtCore H K)).trans_eq hKres
+
+/-- **Thm 9.24 の Case 1** (書籍 p. 284): `F(H) = F(K) = 1` ならば `U = 1` または `V = 1`
+(特に `U` または `V` は任意の素数について `p`-群).
+
+証明: `U ≠ 1` かつ `V ≠ 1` と仮定する. `F(H)=F(K)=1` より `U`, `V` は nilpotent でなく
+`U^∞`, `V^∞` は `D` の非自明部分群で `H`, `K` にそれぞれ normal, よって
+`N_G(U^∞) = H`, `N_G(V^∞) = K`. 9.18 (相対形) から `E(H) ≤ N_G(V^∞) = K`, つまり
+`E(H) ≤ D`; 9.25 (ambient 版) で `E(D) = E(H)`. 同様に `E(D) = E(K)`. よって
+`E(H) = E(K)` は `D` の非自明部分群で `H` にも `K` にも normal となり,
+仮説から `H = N_G(E(H)) = K` で `H ≠ K` に矛盾. -/
+theorem relCore_eq_bot_or_of_fitting_eq_bot [Finite G]
+    (hHK : H ≠ K) (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hFH : Ch01.fitting ↥H = ⊥) (hFK : Ch01.fitting ↥K = ⊥) :
+    relCore H (thompsonWielandtCore H K) = ⊥ ∨
+      relCore K (thompsonWielandtCore H K) = ⊥ := by
+  by_contra hcon
+  push_neg at hcon
+  obtain ⟨hU, hV⟩ := hcon
+  -- `H`/`K` を入れ替えた仮説
+  have hyp' : NoNormalInSupergroup K H (K ⊓ H) := by rw [inf_comm]; exact hyp.symm
+  have hU' : relCore H (thompsonWielandtCore K H) ≠ ⊥ := by
+    rw [thompsonWielandtCore_comm K H]; exact hU
+  -- `E(H) ≤ D` と `E(K) ≤ D`
+  have hEH : layerInG H ≤ H ⊓ K := layerInG_le_inf_of_fitting_eq_bot H K hyp hFK hV
+  have hEK : layerInG K ≤ H ⊓ K := by
+    have := layerInG_le_inf_of_fitting_eq_bot K H hyp' hFH hU'
+    rwa [inf_comm] at this
+  -- 9.25 (ambient 版) で `E(D) = E(H)` かつ `E(D) = E(K)`
+  have hDH : layerInG (H ⊓ K) = layerInG H :=
+    layerInG_eq_of_fitting_eq_bot hFH inf_le_left hEH
+  have hDK : layerInG (H ⊓ K) = layerInG K :=
+    layerInG_eq_of_fitting_eq_bot hFK inf_le_right hEK
+  have hEeq : layerInG H = layerInG K := hDH.symm.trans hDK
+  -- `E(H) ≠ 1`
+  haveI : Nontrivial ↥H := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro hHbot
+    exact hU (le_bot_iff.mp ((relCore_le_left H _).trans hHbot.le))
+  have hLne : layerInG H ≠ ⊥ := by
+    rw [layerInG, Ne, Subgroup.map_eq_bot_iff_of_injective _ H.subtype_injective]
+    exact layer_ne_bot_of_fitting_eq_bot hFH
+  -- `E(H)` は `H` にも `K` にも normal ゆえ `H = N_G(E(H)) = K`
+  have hHn : H ≤ Subgroup.normalizer (layerInG H : Set G) :=
+    le_normalizer_map_subtype_of_normal (inferInstance : (layer ↥H).Normal)
+  have hKn : K ≤ Subgroup.normalizer (layerInG H : Set G) := by
+    rw [hEeq]
+    exact le_normalizer_map_subtype_of_normal (inferInstance : (layer ↥K).Normal)
+  exact hHK ((normalizer_eq_left_of_noNormal hyp hLne hEH hHn).symm.trans
+    (normalizer_eq_right_of_noNormal hyp hLne hEH hKn))
+
+end
+
 end OddOrder.Isaacs.Ch09
