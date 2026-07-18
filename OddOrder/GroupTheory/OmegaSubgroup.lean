@@ -192,6 +192,44 @@ theorem mem_agemo_iff_of_comm {H : Type*} [CommGroup H] {p n : ℕ} {x : H} :
   rw [agemo_eq_range_powMonoidHom, MonoidHom.mem_range]
   exact ⟨fun ⟨y, hy⟩ => ⟨y, hy.symm⟩, fun ⟨y, hy⟩ => ⟨y, hy.symm⟩⟩
 
+/-- The zeroth Agemo layer of any group is the whole group. -/
+theorem agemo_zero_eq_top {A : Type*} [Group A] {p : ℕ} :
+    Agemo A p 0 = ⊤ := by
+  ext x
+  simp only [Subgroup.mem_top, iff_true]
+  simpa using (Agemo.mem_of_eq_pow (G := A) (p := p) (n := 0) x)
+
+/-- The successor Agemo layer consists exactly of the `p`-th powers of
+elements in the preceding layer. -/
+theorem mem_agemo_succ_iff {A : Type*} [CommGroup A] {p s : ℕ} {x : A} :
+    x ∈ Agemo A p (s + 1) ↔ ∃ y : A, y ∈ Agemo A p s ∧ x = y ^ p := by
+  rw [mem_agemo_iff_of_comm]
+  constructor
+  · rintro ⟨z, rfl⟩
+    refine ⟨z ^ (p ^ s), mem_agemo_iff_of_comm.mpr ⟨z, rfl⟩, ?_⟩
+    rw [Nat.pow_succ, pow_mul]
+  · rintro ⟨y, hy, rfl⟩
+    obtain ⟨z, rfl⟩ := mem_agemo_iff_of_comm.mp hy
+    refine ⟨z, ?_⟩
+    rw [Nat.pow_succ, pow_mul]
+
+/-- Subgroup-valued form of `mem_agemo_succ_iff`: taking `p`-th powers
+inside `Agemo A p s`, then mapping back to `A`, gives the successor layer. -/
+theorem agemo_succ_eq_map_agemo_one {A : Type*} [CommGroup A] {p s : ℕ} :
+    Agemo A p (s + 1) =
+      (Agemo (Agemo A p s) p 1).map (Agemo A p s).subtype := by
+  ext x
+  rw [mem_agemo_succ_iff]
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    refine Subgroup.mem_map.mpr ⟨⟨y ^ p, Subgroup.pow_mem _ hy p⟩, ?_, rfl⟩
+    exact mem_agemo_iff_of_comm.mpr ⟨⟨y, hy⟩, by simp⟩
+  · rintro hx
+    obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp hx
+    obtain ⟨z, hz⟩ := mem_agemo_iff_of_comm.mp hy
+    refine ⟨z, z.2, ?_⟩
+    simpa using hyx.symm.trans (congrArg Subtype.val hz)
+
 /-- If a monoid of automorphisms acts transitively on the involutions of a
 group, then all involutions have the same membership in every Agemo subgroup.
 
