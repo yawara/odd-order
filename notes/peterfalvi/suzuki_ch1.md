@@ -130,7 +130,7 @@
      bijection from `Omega` to the standard projective line. It derives
      `|Omega| - 1 = |F| = 2^n` and transports the existing Isaacs Ch08 PSL simplicity.
    - Shared support is `GroupTheory/PrimeComplementResidual.lean`; issue 9112 is closed.
-9. **Section 3 Lemma 1, concrete Sz(q) target complete; PSU(3,q) standard generators complete**.
+9. **Section 3 Lemma 1, concrete Sz(q) target complete; PSU(3,q) generated action and double transitivity complete**.
    - Shared leaf `GroupTheory/SpecificGroups/Suzuki/Field.lean` constructs the field
      of order `q = 2^(2m+1)` and the Tits twist `theta(x) = x^(2^(m+1))`.
    - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
@@ -184,8 +184,15 @@
    - The same leaf constructs Peterfalvi’s reciprocal Weyl permutation
      `(x,y) ↦ (x/y,1/y)`, proves involutivity, and proves both root--torus and
      Weyl--torus conjugation formulas on the concrete unital.
-   - Next upstream layer: construct the generated unitary permutation group and its
-     standard Borel and Bruhat decomposition, then prove double transitivity, exact
-     order, and simplicity.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/GeneratedAction.lean` takes the
+     honest closure of the root, determinant-one torus, and Weyl permutations inside
+     the finite symmetric group.  It internalizes the three generator families with
+     faithful root and torus maps and both conjugation relations.
+   - Root regularity on the affine chart together with the infinity--origin Weyl swap
+     proves transitivity, affine transitivity of the infinity stabilizer, and hence
+     `IsMultiplyPretransitive ... 2` on the exact `q^3 + 1` carrier.
+   - Next upstream layer: construct the standard Borel as the faithful root--torus
+     semidirect product, then the Bruhat decomposition, exact group order, and
+     simplicity.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

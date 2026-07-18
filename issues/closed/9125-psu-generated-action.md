@@ -18,16 +18,16 @@ the generators, and proving double transitivity.
 
 ## やること
 
-- [ ] Define the standard generator set and its subgroup closure in
+- [x] Define the standard generator set and its subgroup closure in
   `Equiv.Perm (Unital n)`, using the determinant-one torus rather than the
   larger full diagonal group.
-- [ ] Internalize the root, PSU-torus, and Weyl generators as elements of the
+- [x] Internalize the root, PSU-torus, and Weyl generators as elements of the
   closure; retain faithful root and torus homomorphisms and explicit actions.
-- [ ] Prove transitivity by moving every point to infinity using a root
+- [x] Prove transitivity by moving every point to infinity using a root
   translation followed by Weyl.
-- [ ] Prove that the infinity stabilizer is transitive on the affine chart,
+- [x] Prove that the infinity stabilizer is transitive on the affine chart,
   then derive `IsMultiplyPretransitive ... 2`.
-- [ ] Wire the leaf into the project and axiom audit; update the Peterfalvi
+- [x] Wire the leaf into the project and axiom audit; update the Peterfalvi
   frontier after strict, module, audit, and full builds pass.
 
 ## 完了条件
