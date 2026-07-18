@@ -46,3 +46,20 @@ docstring 注記して pending 化** (feedback-generalize-specialized-fully の�
 
 - BG mmd L1990-1994 (Thm 6.2 + Remark)、App.B (B.4/L(S))、既存 AppB_Thm62 / S06_Additional /
   Isaacs Ch07 (normal_J, ZJ)、survey L351
+
+## 進捗 (2026-07-18) — O_{p'} reduction 済 (conditional)、残 = Glauberman ZJ
+
+`S06_Thm62JS.zCenterThompsonJ_sup_oPiCore_normal_of_reduced` (commit): O_{p'} reduction を
+conditional lemma として sorry-free・axiom-clean で landing (hZJ = O_{p'}=1 の J-ZJ case を仮定)。
+L(S) 一般形の reduction を mirror。
+
+**残 gap = hZJ = Glauberman Z(J) 定理** (Z(J(S))◁G, odd solvable, O_{p'}=1)。Isaacs FGT が意図的に
+省いた major result (L(S) substitute の存在理由)。repo の `Ch07.normal_J` は `C_G(Z(P))=P` を要求し
+非 abelian P で導出不可 (反例: extraspecial P)。⟹ 標準 Glauberman ZJ (p-stability from oddness +
+p-constrainedness) の形式化が要る = **major**。
+
+**判断 (pending 理由)**: book 自身が L(S) を推奨代替として提示し L(S) 一般形は済 + FT 消費ゆえ
+BG Thm 6.2 の role は満たされている。J(S) literal は FT gate 無の低優先。Glauberman ZJ (Isaacs Ch.7
+拡張) は独立の major task ゆえ、着手するなら別途 Ch.7 ZJ 整備として (lane a の Ch.9 とは別、Ch.7 は
+lane c/共有)。**「一般化が数学的に無意味」ではない (genuine numbered result) が、major な upstream
+(Glauberman ZJ) 待ちの正当な繰延**。
