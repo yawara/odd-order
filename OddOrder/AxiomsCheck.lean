@@ -1232,6 +1232,11 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- P が M の Sylow p で N_G(P) ≤ M なら P は G の Sylow p (Step 4 の結論部)。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_index_of_normalizer_le
 
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 4** — 極大 M ⊇ X と M の Sylow p である P に対し
+-- P は G の Sylow p (𝒦(M) の stabilizer の二分岐)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_four
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_ne_bot_of_isPGroup
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms
