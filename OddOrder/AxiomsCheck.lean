@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.GroupTheory.SylowTransport
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
@@ -283,6 +284,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_map_of_surjective
 #assert_only_allowed_axioms Subgroup.primeComplementResidualQuotientEquiv
+
+-- Explicit carrier equivalences between Sylow subgroups and across group equivalences.
+#assert_only_allowed_axioms Sylow.mulEquiv
+#assert_only_allowed_axioms Sylow.mapEquiv
+#assert_only_allowed_axioms Sylow.coe_mapEquiv
+#assert_only_allowed_axioms Sylow.transportMulEquiv
 
 /-! Standard upper-unipotent root coordinates and the distinguished order-three
 product for the PSL(2,q) branch of Peterfalvi Part II, Ch. I section 3,

@@ -113,6 +113,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
+import OddOrder.GroupTheory.SylowTransport
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
