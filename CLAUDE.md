@@ -14,6 +14,8 @@
 
 PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは PDF を直接読まず、まず該当の `.mmd` を grep / Read してトークン効率を上げる。
 
+**⚠ ただし normal / subnormal の判定に `.mmd` を使わない (2026-07-19 に監査で確定)**。Nougat は subnormal `⊲⊲` を単一の `⊲` に潰すので、**教科書が subnormal を要求する仮説を normal で形式化してしまう** (実害: Isaacs 9.13/9.21 の取り違え → Thm 9.10 が「書籍に gap がある」と誤診されて frontier 停止 = issue 1037。同型の誤った「書籍 gap」注記が 3 件混入 = issue 0125)。**判定には `pdftotext` 抽出を使う** — `references/{isaacs,bg,gorenstein}/*.pdftotext.txt` と `references/peterfalvi/pdftotext/*.txt` に生成済 (再生成は `pdftotext <book>.pdf <out>.txt`)。ここでは **`⊲⊲` → `«`、`⊲` → `<`** に落ちる。⚠ `«` は数字間だと中黒 `·` の OCR ノイズなので、**両側が大文字の部分群記号**であることを条件に絞る。最終的な決定打は `Read` で **PDF ページ画像**を見ること (Isaacs は PDF ページ = 書籍ページ + 13)。手順と実績は issue 9150 / [[mmd-collapses-subnormal-symbol]]。
+
 **Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`.mmd`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
 
 ## 進捗の測り方 — 実質的証明の積み上げ (sorry 数ではない)
@@ -58,6 +60,19 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 - **最小 import (mathlib の衛生)**: 各ファイルは必要な module だけ import する。一般には import DAG を浅くし full build 並列化 + fan-out 縮小に効く。**ただし FT の spine (§1→§16 が直列依存) のように深い base closure を共有するファイル群では推移閉包が不変ゆえ速度改善はほぼ無い** (2026-06-05 実測: S09 4分割を minimal-import 化しても full build 3580 jobs 不変)。よって本リポジトリでの minimal-import の価値は **DAG 衛生 + 可読性 + upstream 適性**が主で、速度ではない。**注意: `lake exe shake` は本リポジトリで誤判定が多い** (実使用中の import を removable と誤報する) ので鵜呑みにせず必ず build/grep で検証する。
 - **`private` をファイル跨ぎで使わない**: 複数ファイルで使う補題は適切な namespace 付き public にする (mathlib は `private` を真に局所な helper に限定)。
 - **計測事実 (2026-06-05)**: `lake build` はファイル単位で全再 elaboration するが、1 ファイルの再 elaboration は **import closure 読み込み固定費 (~5s) が支配的**で行数差は小さい (S09 4440 行 ≈5.5s、分割後 leaf 2544 行 ≈4.7s)。よって**ファイル分割の主目的は速度でなく minimal-import による DAG 衛生 + 可読性 + upstream 適性**。速度の主レバーは「**開発中は leaf build で回し、full build は commit 直前のみ**」。過度な細分化 (<~300 行が乱立) は固定 ~5s/ファイルが効いて逆効果。詳細は [ROADMAP.md#ファイル粒度とトレーサビリティ](ROADMAP.md)。**ただし行数が elaboration を支配し始める例外もある** (2026-06-11 実測: S08 11.8k 行 ≈21s、S03f_Thm36 3.8k 行 ≈50s) — frontier ファイルがこの域に入ると編集ループを直撃する。
+- **🚫 `git merge main` 後のフルビルドは冗長 — やらない (ユーザー 2026-07-19)**。**main は hub が
+  合流のたびにフルビルドで gate している**ので、レーンが起動時/定期の `git merge main` で main を
+  取り込んだ直後に、確認目的でフルビルドを回すのは**二重検証で無駄**。所要 10〜16 分 × レーン数 ×
+  同期回数が丸ごと空費になり、同一 worktree で並行すると olean が churn して他の leaf build まで
+  巻き添えにする (2026-07-19 実測)。
+  - **レーンの正しいビルド規律**: 自分が触った leaf を `lake build <Module>` で検証する。**それだけ**。
+    main 取り込みの検証は不要。commit 直前のフルビルドも原則不要 (下記のとおり hub が gate する)。
+  - **統合の gate は hub 側 1 箇所に集約**: hub は `git merge --no-ff <lane>` を全レーン分まとめてから
+    **フルビルドを 1 回**回し、green + AxiomsCheck OK + sorry 非退行 を確認して push する。
+    マージした組み合わせ特有の破綻 (下流の instance 合成崩れ等) はここで必ず捕まる。
+  - **subagent にも同じ規律を課す**: 並列エージェントに `lake build OddOrder` (フル) を実行させない。
+    検証は leaf build のみとし、フルビルドは親 (hub) が最後に 1 回だけ回す。
+    ⚠ 禁止しても破るエージェントが実在したので、**タスク指示の冒頭に明示**すること。
 - **分割の owner と trigger (2026-06-11 メカニズム化)**: 上記原則は 2026-06-05〜06-11 の 6 日間に ~170 commits / +13k 行すり抜けられた (S08 5.5k→11.8k、S05 は制定後誕生で 4k 化)。文言でなく以下のメカニズムが正:
   - **lane (書き手) の trigger**: 教科書の**次の主結果番号**に着手するときは**新 leaf を切るのがデフォルト**。同一ファイル追記は「現に証明中の定理の helper」のみ。frontier ファイルが **1,500 行超**になったら停止して分割 (または hub に委任)。
   - **hub (合流側) の gate**: 合流 tick で 1,500 行超ファイルへの追記を検出 → ⚠ flag 報告 + 分割 issue 起票。**分割の実施 owner は hub** (lane の frontier と衝突しない凍結境界で prefix-split: 先頭 K 宣言を上流ファイルへ、残りが import する。前方参照は構文上不可能ゆえ任意の宣言境界で安全)。手順詳細 = [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md)。
