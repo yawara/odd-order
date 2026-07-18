@@ -39,27 +39,47 @@ Isaacs §9C の主結果 (p. 283, mmd L5155)。§9C の tool 群は 2026-07-18 �
 
 書籍 proof (p.283–284) を精読して判明した、着手前に解決すべき点:
 
-1. **normal / subnormal**: `V = core_K(E)` は `K` に normal だが `H` には
-   **subnormal のみ** (`V ◁ M ◁ H`, M=core_H(D))。書籍は "V◁H" と書くが:
-   - Case 1 の 9.18 適用 (E(H)⊆N_G(V^∞)) は 9.18 が subnormal 版なので **OK**
-     (`layer_le_normalizer_nilpotentResidual` は `S.IsSubnormal`)。要: V.subgroupOf H が
-     ↥H で subnormal (V◁M◁H の chain を IsSubnormal で構成)。
-   - Case 2 の 9.27 適用 (P normalizes O^p(V)) は現行 `pResidual_map_subtype_normal` が
-     **V ◁ H (normal) を要求**。V subnormal では O^p(V)◁H が言えない可能性。
-     → **subnormal 版 9.27 (V◁◁H, P◁H p-群 ⇒ P≤N_G(O^p(V))) が要るか要検討**
-     (O^p の 9.16/9.18 相当 = 「F(G),E(G)≤N_G(S^∞) の O^p 版」)。
+1. ~~**normal / subnormal**~~ → **✅ 解決 (2026-07-18)**。下記「subtlety 1 の決着」参照。
 2. **nested transport**: Case 1 は 9.18/9.25/Fitting を `↥H`,`↥K`,`↥D` 内で適用し
    ambient に戻す必要 (E(↥H) と E(D) の関係、F(↥H)=⊥ from F(H)=1 等)。深い多段 subtype。
+   → `O^p` 側は ambient 化済 (`pResidualOf`)。`layer`/`nilpotentResidual` 側の
+   transport が Case 1 の残作業。
 3. **Fitting**: F(H)=1 ⇔ Fitting ↥H = ⊥; nilpotent normal ≤ Fitting (Ch01) を ↥H で。
 
-→ 9.24 本体は上記 (特に 1 の subnormal-9.27) を確定してから着手する dedicated effort。
-deps (relCore/N_G/O^p/9.18/9.25/9.8) は landed。
+## subtlety 1 の決着 (2026-07-18, landed)
+
+**書籍は誤り (行間でなく非自明なギャップ)**: p. 284 は「`V ◁ K` ゆえ `V ◁ M ◁ H`,
+so `V ◁ H`」と書くが、`V ◁ M ◁ H` は **subnormal であって normal ではない**
+(subnormal から normal は一般に従わない)。同じ jump は後段の `U^k ◁ N ◁ D` にもある。
+
+- **Case 1** (9.18 適用) は 9.18 自体が subnormal 版なので書籍のままで **OK**。
+- **Case 2** (9.27 適用) は normal 版では足りず、**subnormal 版 9.27 が真に必要**。
+  → 本 repo で証明した (defect 2 で足り、subnormal 帰納は不要):
+
+  `le_normalizer_pResidualOf_of_subnormal_two`: `S ◁ T ◁ G`, `P ◁ G` が p-群
+  ⇒ `P ≤ N_G(O^p(S))`。証明は `G₀ = S ⊔ P` 内での `S` の normal closure `R` を取り、
+  `S ≤ R ≤ T` から `S ◁ R`、Dedekind で `R = S ⊔ (R⊓P)`、`R⊓P ◁ R` は p-群 ゆえ
+  Lemma 9.26 (ambient 版 `pResidualOf_sup_eq`) で `O^p(R) = O^p(S)`;
+  `R ◁ G₀ ⊇ P` ゆえ `P ≤ N_G(R) ≤ N_G(O^p(R))`。
+
+  ⚠ Dedekind は**要素計算**で証明した — `Subgroup G` の束は一般に modular でなく
+  (mathlib の `IsModularLattice` instance は **CommGroup 限定**)、効いているのは
+  `P ◁ G` から `S ⊔ P = S·P` (集合の積) になること。
+
+**併せて landed した `O^p` の ambient API** (`pResidualOf p S : Subgroup G`):
+`nilpotentResidual` と同じ ambient 設計。`map_pResidualOf` (同型同変性 —
+proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidualOf`
+(`N_G(S) ≤ N_G(O^p(S))`)、`map_subtype_pResidualOf_subgroupOf` (↥R ↔ ambient)、
+`pResidualOf_eq_bot_iff_isPGroup`、`pResidualOf_sup_eq` (9.26 ambient)。
+`isPGroup_quotient_comap` / `comap_mem_pQuotientNormals` は `G ≃* G` から
+一般の `e : G ≃* K` へ一般化。
 
 ## やること
 
 - [x] `core_H(D)` (relative normalCore) の infra。
 - [x] 仮説 predicate + N_G 補題 + pResidual_eq_bot_iff。
-- [ ] 上記 subtlety 1 (subnormal-9.27) を確定 (原文/再構成)。
+- [x] 上記 subtlety 1 (subnormal-9.27) を確定 → **書籍の誤りと判明・subnormal 版を証明**。
+- [x] `O^p` の ambient API (`pResidualOf` + 同変性 + 9.26 ambient 版)。
 - [ ] 9.24 statement の形式化 (上記仮説を Prop で; "H または K を真に含む部分群" の量化)。
 - [ ] 9.24 proof (書籍 p. 283–284, ~40 行, 2 ケース):
       - F(H)=F(K)=1: E(H),E(K)>0, 9.18 で E(H)⊆N_G(V^∞)=K, 9.25 で E(H)=E(D)=E(K),
