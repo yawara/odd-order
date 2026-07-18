@@ -1175,6 +1175,47 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_map_strongClosure
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isStronglyConjugate_subgroupOf_iff
 
+-- Ch.9 §9D: Lem 9.29 の相対版 (`X^{(K)}` 形) — 9.28 の Step 1-5 が繰り返し使う。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_le_of_isSubnormal
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_of_le
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 1** — Y^{(H)} = Z^{(H)} かつ Y^{(G)} ≠ G ⇒ Y^{(G)} = Z^{(G)}。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_one
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_one_le
+
+-- Ch.2 (Subnormality): Thm 2.5 の族版 — subnormal 部分群の集合の sSup は subnormal。
+-- (Ch.9 §9D Bartels Step 2 が `⟨Y^{(G)} | Y < X⟩ ◁◁ G` で使う。)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch02.isSubnormal_sSup_of_isSubnormal
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 2** — 最小反例の X は p-群。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_two
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.le_sSup_lt_of_forall_not_isPGroup
+
+-- Ch.9 §9D: `X^{(K)}` の共役両立性 (Bartels Step 3 が (Y^h)^{(H)} = (Y^{(H)})^h で使う)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_conjAct_smul
+-- 有限群の p-部分群は与えられた Sylow の中へ共役で送れる (Bartels Step 3 の部品 2/2)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_conjAct_smul_le_sylow
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 3** — Y ≤ H < G の p-群を H の Sylow の中へ送る。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_three
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal_in
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_mem_conjAct_smul_le_of_isPGroup
+
+-- Ch.9 §9D: Bartels Step 4 の道具 — 集合 𝒦(H) の共役同変性と 𝒦(H) = 𝒦(P)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.mem_kappaSet_conjAct_smul
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.kappaSet_eq_of_sylow
+
+-- Ch.9 §9D: Bartels Step 4 の第 1 分岐 — 作用の核が非自明なら X^{(G)} は subnormal。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isSubnormal_of_map_quotient
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isSubnormal_strongClosure_of_normalizing_kernel
+-- Z(P) は 𝒦(P) に自明に作用する (Step 4 で作用の核の非自明性を出す部分)。
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet
+-- 𝒦(G) への作用の核 (各点固定部分群) と Step 4 第 1 分岐への接続。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.pointwiseStabilizer_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isSubnormal_strongClosure_of_kappaSetKernel_ne_bot
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms
