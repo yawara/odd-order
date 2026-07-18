@@ -126,6 +126,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -7148,6 +7149,13 @@ cyclic; `M' = U M_σ`; the unique non-conjugate type-`P` partner `M*` (Theorem 1
 Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremC_paired_structure
+/-! **BG Theorem C(5)** (`S16_MainResults.TheoremC5`, `theoremC_5_overgroup_unique`): the one
+conjunct of Theorem C not carried by `theoremC_paired_structure` — for prime-order `X ≤ K*`,
+`𝓜(C_G(X)) = {M}`, and (for the Thm 14.7 partner `M*`, exposed via the verbatim C(4) `∃!`
+predicate) for prime-order `Y ≤ K`, `𝓜(C_G(Y)) = {M*}`.  Both halves reduce to Proposition 14.2(c)
+(`typeP_structure` conjunct 6) applied to `M` resp. the dual partner from `typeP_duality`.
+Completes Theorem C's conjuncts C(1)–C(11).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremC_5_overgroup_unique
 
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
