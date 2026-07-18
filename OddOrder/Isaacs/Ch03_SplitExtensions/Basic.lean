@@ -529,18 +529,37 @@ theorem normal_le_of_complement_prime_of_inf_eq_bot
 `Subgroup.IsElementaryAbelian` (subgroup form) の双方を利用可能. -/
 
 open scoped commutatorElement in
-/-- Thm 3.11 の前半: 可解群の minimal normal subgroup は abelian.
+/-- `⁅H, H⁆ < H` (`H ≠ ⊥`) — mathlib `IsSolvable.commutator_lt_of_ne_bot` の一般化.
 
-証明: M 可解 (G 可解の部分群), M ≠ ⊥ (minimal normal) ⇒
-`IsSolvable.commutator_lt_of_ne_bot` で `⁅M, M⁆ < M`. `⁅M, M⁆ ⊴ G` (commutator of normals).
+mathlib 版は**環境** `[IsSolvable G]` を要求するが, 証明が実際に使うのは `↥H` の
+可解性だけ (`↥H` 内で `commutator_lt_top_of_nontrivial` を当てて `H.subtype` で押す).
+Isaacs 3.11 は「`M` が可解な minimal normal」であって環境の可解性は仮定しないので,
+この形が要る. -/
+theorem commutator_lt_of_ne_bot_of_isSolvable_coe {G : Type*} [Group G] {H : Subgroup G}
+    [IsSolvable ↥H] (hH : H ≠ ⊥) : ⁅H, H⁆ < H := by
+  rw [← Subgroup.nontrivial_iff_ne_bot] at hH
+  rw [← H.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
+    Subgroup.map_subtype_lt_map_subtype]
+  exact IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H)
+
+open scoped commutatorElement in
+/-- **Isaacs Thm 3.11 の前半** (書籍 p. 80): `M` が可解な minimal normal subgroup なら abelian.
+
+⚠ 環境 `G` の可解性も有限性も**不要** — 書籍どおり `M` の可解性のみを仮定する
+(書籍の infinite clause もこの形で入る). 環境が可解な場合は
+mathlib instance `subgroup_solvable_of_solvable` が `IsSolvable ↥M` を供給するので,
+`[IsSolvable G]` 側の呼び出しはそのまま通る.
+
+証明: `M ≠ ⊥` (minimal normal) と `M` 可解で `⁅M, M⁆ < M`
+(`commutator_lt_of_ne_bot_of_isSolvable_coe`). `⁅M, M⁆ ⊴ G` (commutator of normals).
 M の minimality で `⁅M, M⁆ = ⊥`, よって M abelian. -/
-theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G] [Finite G] [IsSolvable G]
-    {M : Subgroup G} (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G]
+    {M : Subgroup G} [IsSolvable ↥M] (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     ∀ x ∈ M, ∀ y ∈ M, x * y = y * x := by
   haveI hMnormal : M.Normal := hM.1
   have hM_ne_bot : M ≠ ⊥ := hM.2.1
   -- ⁅M, M⁆ < M (M solvable, M ≠ ⊥).
-  have hcomm_lt : ⁅M, M⁆ < M := IsSolvable.commutator_lt_of_ne_bot hM_ne_bot
+  have hcomm_lt : ⁅M, M⁆ < M := commutator_lt_of_ne_bot_of_isSolvable_coe hM_ne_bot
   -- ⁅M, M⁆ ⊴ G (commutator of normals: mathlib auto-instance).
   have hCommNormal : (⁅M, M⁆ : Subgroup G).Normal := inferInstance
   -- By minimality of M, ⁅M, M⁆ = ⊥ or = M. Strict < rules out =.
@@ -554,16 +573,22 @@ theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G] [Finite G] [IsSo
   rw [hcomm_eq_bot, Subgroup.mem_bot] at hcomm_xy
   exact commutatorElement_eq_one_iff_mul_comm.mp hcomm_xy
 
-/-- **Isaacs Thm 3.11**: 可解群 `G` の minimal normal subgroup は ある素数 `p` について
-elementary abelian p-group.
+/-- **Isaacs Thm 3.11** (書籍 p. 80): **可解な** minimal normal subgroup `M` は
+ある素数 `p` について elementary abelian p-group.
+
+⚠ 環境 `G` の可解性は**不要** (書籍どおり `M` の可解性のみ). `[Finite G]` は
+elementary abelian の結論に要る (書籍の infinite clause = abelian までは
+`solvable_minimal_normal_isAbelian` が有限性なしで与える).
+環境が可解な場合は mathlib instance `subgroup_solvable_of_solvable` が
+`IsSolvable ↥M` を供給するので `[IsSolvable G]` 側の呼び出しはそのまま通る.
 
 証明: M abelian (前補題). `p ∣ |M|` を取り, `T = {x ∈ M | x^p = 1}` を M の部分群とする
 (M abelian で閉性 OK). T は M で characteristic (自己同型は p-冪を保つ).
 Cauchy で T ≠ ⊥. T.map M.subtype は characteristic-in-normal で G 正規 + ≤ M.
 M minimality で T.map M.subtype ∈ {⊥, M}. T ≠ ⊥ より T.map M.subtype = M, よって T = ⊤,
 即ち全 x ∈ M で x^p = 1. -/
-theorem solvable_minimal_normal_isElementaryAbelian [Finite G] [IsSolvable G]
-    {M : Subgroup G} (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+theorem solvable_minimal_normal_isElementaryAbelian [Finite G]
+    {M : Subgroup G} [IsSolvable ↥M] (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by
   haveI hMnormal : M.Normal := hM.1
   have hM_ne_bot : M ≠ ⊥ := hM.2.1
