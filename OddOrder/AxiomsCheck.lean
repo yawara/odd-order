@@ -210,6 +210,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
@@ -8035,6 +8036,22 @@ quotient, and the preceding odd-kernel bridge lifts it to the centralizer. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_centralizer_psl2Target
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, Suzuki
+distinguished pair: root/torus normalization identifies the transported
+pair with the standard root involution and Weyl element, whose product has
+order five; the odd-kernel bridge lifts this to the centralizer. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardStructureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardStructureConjugator_mem_standardRootSubgroup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardSuzuki_structureEquation
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_suzukiTarget
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_centralizer_suzukiTarget
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
