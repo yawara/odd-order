@@ -213,6 +213,72 @@ theorem opiCoreInG_le_inf [Finite G] {p : ℕ} [Fact p.Prime]
     ((opiCoreInG_le_normalizer_pResidualOf_relCore H K).trans_eq
       (normalizer_pResidualOf_relCore_eq_right H K p hyp hY))
 
+/-- **Thm 9.24 Case 2 の Step D** (書籍 p. 284): 各 `k ∈ K` で `P = O_p(H) ≤ H^k`.
+
+書籍の議論: `U ◁ H` ゆえ `U ◁ N`, よって `U^k ◁ N^k = N ◁ D`. `D` を ambient として
+subnormal 版 Cor 9.27 を適用すると `P` は `O^p(U^k) = X^k` を正規化し,
+`P ≤ N_G(X^k) = N_G(X)^k = H^k`.
+
+(ここでも `U^k ◁ N ◁ D` は subnormal であって `U^k ◁ D` ではないので, 書籍の
+「`U^k ◁ D`」という記述は Step A と同じ jump を含む — subnormal 版で埋める.) -/
+theorem opiCoreInG_le_map_conj [Finite G] {p : ℕ} [Fact p.Prime]
+    (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hX : pResidualOf p (relCore H (thompsonWielandtCore H K)) ≠ ⊥)
+    (hY : pResidualOf p (relCore K (thompsonWielandtCore H K)) ≠ ⊥)
+    {k : G} (hk : k ∈ K) :
+    GroupTheory.opiCoreInG ({p} : Set ℕ) H ≤ H.map (MulAut.conj k : G →* G) := by
+  set U := relCore H (thompsonWielandtCore H K) with hU
+  set N := relCore K (H ⊓ K) with hN
+  set P := GroupTheory.opiCoreInG ({p} : Set ℕ) H with hP
+  set c := (MulAut.conj k : G →* G) with hc
+  -- `N` は `k ∈ K` の共役で不変
+  have hNfix : N.map c = N :=
+    Subgroup.mem_normalizer_iff_map_conj_eq.mp (le_normalizer_relCore K (H ⊓ K) hk)
+  have hUN : U ≤ N := (relCore_le H (thompsonWielandtCore H K)).trans inf_le_right
+  have hND : N ≤ H ⊓ K := relCore_le K (H ⊓ K)
+  have hNnU : N ≤ Subgroup.normalizer (U : Set G) :=
+    (hND.trans inf_le_left).trans (le_normalizer_relCore H (thompsonWielandtCore H K))
+  -- `N ≤ N_G(U^k)` (共役で移して `N^k = N`)
+  have hNnUk : N ≤ Subgroup.normalizer ((U.map c : Subgroup G) : Set G) :=
+    calc N = N.map c := hNfix.symm
+      _ ≤ (Subgroup.normalizer (U : Set G)).map c := Subgroup.map_mono hNnU
+      _ = Subgroup.normalizer ((U.map c : Subgroup G) : Set G) :=
+          map_normalizer_mulEquiv (MulAut.conj k) U
+  -- `D` を ambient とする subnormal 版 Cor 9.27
+  have key : P ≤ Subgroup.normalizer (pResidualOf p (U.map c) : Set G) :=
+    le_normalizer_pResidualOf_of_subnormal_two_rel
+      ((Subgroup.map_mono hUN).trans_eq hNfix) hND
+      (opiCoreInG_le_inf H K hyp hY)
+      (inf_le_right.trans (le_normalizer_relCore K (H ⊓ K)))
+      (inf_le_left.trans (GroupTheory.le_normalizer_opiCoreInG _ H))
+      hNnUk (GroupTheory.isPGroup_opiCoreInG_singleton H)
+  -- `N_G(O^p(U^k)) = N_G(X^k) = N_G(X)^k = H^k`
+  rw [← map_pResidualOf (MulAut.conj k) U,
+    ← map_normalizer_mulEquiv (MulAut.conj k) (pResidualOf p U),
+    normalizer_pResidualOf_relCore_eq H K p hyp hX] at key
+  exact key
+
+/-- **Thm 9.24 Case 2 の Step E** (書籍 p. 284): `P = O_p(H) ≤ core_K(D) = N`.
+
+Step D の `P ≤ H^k` (∀ `k ∈ K`) と `P ≤ K` から `P ≤ D^k` (∀ `k`), これは
+`le_relCore_iff` により `P ≤ core_K(D)` に他ならない. -/
+theorem opiCoreInG_le_relCore_right [Finite G] {p : ℕ} [Fact p.Prime]
+    (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hX : pResidualOf p (relCore H (thompsonWielandtCore H K)) ≠ ⊥)
+    (hY : pResidualOf p (relCore K (thompsonWielandtCore H K)) ≠ ⊥) :
+    GroupTheory.opiCoreInG ({p} : Set ℕ) H ≤ relCore K (H ⊓ K) := by
+  have hPK : GroupTheory.opiCoreInG ({p} : Set ℕ) H ≤ K :=
+    (opiCoreInG_le_inf H K hyp hY).trans inf_le_right
+  rw [le_relCore_iff hPK]
+  intro g hg x hx
+  refine ⟨?_, K.mul_mem (K.mul_mem hg (hPK hx)) (K.inv_mem hg)⟩
+  -- `H` 成分: Step D を `k := g⁻¹` で使うと `x ∈ H^{g⁻¹}`, すなわち `g * x * g⁻¹ ∈ H`
+  obtain ⟨y, hy, hxy⟩ := opiCoreInG_le_map_conj H K hyp hX hY (K.inv_mem hg) hx
+  have hxy' : g⁻¹ * y * g = x := by simpa using hxy
+  have hgx : g * x * g⁻¹ = y := by rw [← hxy']; group
+  rw [hgx]
+  exact hy
+
 end
 
 end OddOrder.Isaacs.Ch09

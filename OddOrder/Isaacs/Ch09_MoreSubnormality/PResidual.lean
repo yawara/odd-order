@@ -298,6 +298,43 @@ theorem le_normalizer_map_subtype_of_normal {H : Subgroup G} {A : Subgroup ↥H}
   rw [← Subgroup.normal_subgroupOf_iff_le_normalizer (Subgroup.map_subtype_le A), heq]
   exact hA
 
+/-- **正規化群は同型と可換**: `N_G(A).map e = N_K(A.map e)`.
+特に `e = MulAut.conj g` で `N_G(A^g) = N_G(A)^g` (Thm 9.24 Case 2 の
+`N_G(X^k) = H^k` に使う). mathlib に無いので与える. -/
+theorem map_normalizer_mulEquiv {K : Type*} [Group K] (e : G ≃* K) (A : Subgroup G) :
+    (Subgroup.normalizer (A : Set G)).map (e : G →* K)
+      = Subgroup.normalizer ((A.map (e : G →* K) : Subgroup K) : Set K) := by
+  have hmem : ∀ x : G, (e x ∈ Subgroup.normalizer ((A.map (e : G →* K) : Subgroup K) : Set K))
+      ↔ x ∈ Subgroup.normalizer (A : Set G) := by
+    intro x
+    rw [Subgroup.mem_normalizer_iff, Subgroup.mem_normalizer_iff]
+    have hconj : ∀ n : G, e x * e n * (e x)⁻¹ = e (x * n * x⁻¹) := by
+      intro n; simp [map_mul, map_inv]
+    have hmap : ∀ n : G, (e n ∈ (A.map (e : G →* K) : Subgroup K)) ↔ n ∈ A := by
+      intro n
+      constructor
+      · rintro ⟨a, ha, hea⟩
+        have han : a = n := e.injective (by simpa using hea)
+        rwa [han] at ha
+      · intro hn
+        exact ⟨n, hn, rfl⟩
+    constructor
+    · intro h n
+      have h2 := h (e n)
+      rw [hconj n, hmap n, hmap (x * n * x⁻¹)] at h2
+      exact h2
+    · intro h m
+      obtain ⟨n, rfl⟩ := e.surjective m
+      rw [hconj n, hmap n, hmap (x * n * x⁻¹)]
+      exact h n
+  ext y
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact (hmem x).mpr hx
+  · intro hy
+    obtain ⟨x, rfl⟩ := e.surjective y
+    exact ⟨x, (hmem x).mp hy, rfl⟩
+
 /-- `↥R` 内で計算した `O^p(S.subgroupOf R)` を落とすと ambient の `O^p(S)` (`S ≤ R`).
 `map_subtype_nilpotentResidual_subgroupOf` の `O^p` 版. -/
 theorem map_subtype_pResidualOf_subgroupOf {S R : Subgroup G} (h : S ≤ R) :
