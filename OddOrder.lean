@@ -115,6 +115,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.TISubsetCounting
 import OddOrder.GroupTheory.ZGroup

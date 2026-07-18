@@ -153,9 +153,13 @@
    - `GroupTheory/SpecificGroups/Suzuki/Borel.lean` realizes the root-torus subgroup
      as a faithful semidirect product, proves unique root-times-torus normal form, shows
      that it fixes infinity, and computes its exact order `q^2 * (q - 1)`.
-   - Next upstream layer: prove the rank-one Bruhat factorization for this generated group,
-     derive its exact order `q^2 * (q^2 + 1) * (q - 1)` and simplicity, then feed the
-     concrete simple target and degree into Lemma 1. After Sz(q), construct the PSU(3,q)
-     target of degree `q^3 + 1`.
+   - `GroupTheory/SpecificGroups/Suzuki/Bruhat.lean` derives the explicit Weyl--torus
+     and nontrivial Weyl--root identities from the anisotropic norm, proves the two-cell
+     decomposition `B ∪ B w B`, identifies `B` with the infinity stabilizer, and computes
+     the exact group order `q^2 * (q^2 + 1) * (q - 1)`.  This construction exists
+     for every `m`; the simplicity target below uses `0 < m`, so `q >= 8`.
+   - Next upstream layer: prove simplicity of the concrete Suzuki group and feed the
+     simple target and degree into Lemma 1. After Sz(q), construct the PSU(3,q) target
+     of degree `q^3 + 1`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

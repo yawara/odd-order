@@ -17,6 +17,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -205,7 +206,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 8900
+set_option linter.style.longFile 9100
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -465,6 +466,24 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.mem_standardBorel_iff_existsUnique_root_torus
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_le_infinityStabilizer
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardBorel
+
+-- The explicit rank-one Bruhat decomposition and exact Suzuki-group order.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_torusScale
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylAffine_torusScale
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_mul_torusHom_mul_weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.suzukiNorm_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatRightRoot
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatRightRoot_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.coe_bruhatTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_bruhatTorus
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.bruhatRightRoot_ne_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.suzukiNorm_bruhatRightRoot_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_mul_rootHom_mul_weylElement
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.InStandardBruhatCells
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBruhatDecomposition
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_eq_infinityStabilizer
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardPermGroup
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A

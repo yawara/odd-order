@@ -18,13 +18,19 @@ Suzuki Bruhat construction.
 
 ## やること
 
-- [ ] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Bruhat.lean`.
-- [ ] Prove the Weyl-torus conjugation relation inside `standardPermGroup`.
-- [ ] Prove the explicit nontrivial-root Bruhat identity from the ovoid formulas.
-- [ ] Prove every generated element lies in `B` or the double cell `B w B`.
-- [ ] Identify `standardBorel` with the stabilizer of infinity.
-- [ ] Derive the exact group order `q^2 * (q^2 + 1) * (q - 1)`.
-- [ ] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
+- [x] Add `OddOrder/GroupTheory/SpecificGroups/Suzuki/Bruhat.lean`.
+- [x] Prove the Weyl-torus conjugation relation inside `standardPermGroup`.
+- [x] Prove the explicit nontrivial-root Bruhat identity from the ovoid formulas.
+- [x] Prove every generated element lies in `B` or the double cell `B w B`.
+- [x] Identify `standardBorel` with the stabilizer of infinity.
+- [x] Derive the exact group order `q^2 * (q^2 + 1) * (q - 1)`.
+- [x] Wire the leaf into `OddOrder.lean` and `OddOrder.AxiomsCheck`.
+
+## 実施結果
+
+`Bruhat.lean` now contains the concrete Weyl relations, closure-induction Bruhat
+decomposition, stabilizer identification, and exact order proof.  The leaf is strict
+warning-clean and all public declarations are registered in `AxiomsCheck.lean`.
 
 ## 完了条件
 
