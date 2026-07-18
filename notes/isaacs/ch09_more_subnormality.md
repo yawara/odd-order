@@ -609,3 +609,42 @@ mathlib は `IsPGroup.exists_le_sylow` (ある Sylow に入る) と Sylow 共役
 Lem 9.31 で `P ∩ Y^{(H)} ∈ Syl_p(Y^{(H)})`。`Y` は `Y^{(H)}` の `p`-部分群なので
 `h ∈ Y^{(H)}` があって `Y^h ⊆ P ∩ Y^{(H)}`。`Z = Y^h` とおけば `Z ⊆ P` かつ
 `Z^{(H)} = (Y^{(H)})^h = Y^{(H)}` (h ∈ Y^{(H)} ゆえ)、Step 1 で `Y^{(G)} = Z^{(G)}`。
+
+### Step 3 本体の実行プラン (2026-07-19、部品完了後に確定)
+
+部品は 2 つとも landing 済 (`strongClosureIn_conjAct_smul` / `exists_conjAct_smul_le_sylow`)。
+残るのは **transport 設計**で、ここが Step 3 の実質。
+
+**想定 statement** (`Y^{(G)} = Z^{(G)}` は Step 1 の系にして分離する):
+```lean
+theorem bartels_step_three (hIH : BartelsIH G) {p : ℕ} [Fact p.Prime]
+    {Y H : Subgroup G} (hYH : Y ≤ H) (hH : H ≠ ⊤) (hY : IsPGroup p ↥Y) (P : Sylow p ↥H) :
+    ∃ h ∈ H, ConjAct.toConjAct h • Y ≤ (P : Subgroup ↥H).map H.subtype ∧
+      strongClosureIn H (ConjAct.toConjAct h • Y) = strongClosureIn H Y
+```
+
+**筋** (`L := strongClosureIn H Y = Y^{(H)}`):
+1. `hLsub : (L.subgroupOf H).IsSubnormal` — IH を ↥H に適用 (`card_lt_of_ne_top hH`) し
+   `strongClosureIn_subgroupOf hYH` で書き換え。
+2. Lem 9.31 を **↥H の中で** `L.subgroupOf H` と `P` に適用 → `P ⊓ L` が `L` の Sylow p。
+3. `Y ≤ L` は p-群なので `exists_conjAct_smul_le_sylow` を **↥L の中で**適用
+   → `h ∈ L` で `h • Y ≤ P ⊓ L`。
+4. `Z = h • Y ≤ P`。`Z^{(H)} = h • (Y^{(H)}) = h • L = L`
+   (`strongClosureIn_conjAct_smul` + `conjAct_smul_self_of_mem`; `h ∈ L ≤ H` なので `h • H = H`)。
+
+**⚠ transport の設計判断が要る点** (次 session の最初にここを決める):
+`sylowInfOfIsSubnormal` は `S : Subgroup A` が `A` で subnormal + `Sylow p A` から
+`Sylow p ↥S` を作る。ambient を `A = ↥H` にすると結論が `Sylow p ↥(L.subgroupOf H)` と
+**二重 subtype**になり、`↥L` へ移すのに `Subgroup.subgroupOfEquivOfLe` (`L.subgroupOf H ≃* L`)
+に沿った `Sylow` の transport (`Sylow.comapOfInjective` 等) が要る。
+
+**推奨**: 二重 subtype を避けるため、**9.31 の相対版**を先に作る:
+```lean
+theorem not_dvd_relIndex_inf_of_isSubnormal_in {K S P : Subgroup G} (hSK : S ≤ K) (hPK : P ≤ K)
+    (hS : (S.subgroupOf K).IsSubnormal) (hP : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex K) :
+    ¬ p ∣ (P ⊓ S).relIndex S
+```
+(すべて `Subgroup G` のまま。既存の絶対版を橋 `strongClosureIn_eq_map_strongClosure` と
+同じ要領で ↥K に降ろして使う。) 同様に `exists_conjAct_smul_le_sylow` の相対版
+(`∃ h ∈ L, h • Y ≤ P ⊓ L`) も `Subgroup G` のまま述べる。これで Step 3 本体は
+bundling 無しで書けるはず。
