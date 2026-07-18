@@ -59,6 +59,26 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### Isaacs Ch.3 — Isaacs Ch.3 Split Extensions
 
+> ⚠ **この節の per-item 表は 2026-07-18 時点で stale** (lane a 確認)。
+> 本文の "slim verification pass (**2026-07-16**)" 以降に入った形式化が反映されていない。
+> **実測で反証済みの項目**:
+> - **Lem 3.6 「未」→ 実際は完了**: `Ch03_SplitExtensions/CrossedHomomorphism.lean`
+>   (commit `b21ea73b5`, 2026-07-17) が (a)(b)(c)(d) 全部を**非可換係数**で実装済み。
+>   表が「mathlib の `oneCocycles` は可換係数限定」と指摘したギャップは、
+>   まさにその形で埋まっている。
+> - **Thm 3.15 「未」→ 実際は完了**: `Ch07_ThompsonSubgroup/ForwardFromCh03.lean`
+>   (commit `dcfb8f906`, 2026-07-17) が Burnside 経由で証明済み。表が言う
+>   「docstring-only placeholder」はもう当てはまらない (実 theorem が入っている)。
+> - **Lem 3.7 は「未」でなく意図的な no-wrapper 判断**: `CrossedHomomorphism.lean`
+>   の docstring に mathlib `leftTransversals.diff` との逐条対応表がある
+>   (CLAUDE.md ラッパー方針に従い Lean 実体を書かない)。
+>
+> → **着手前に必ず repo を直接 grep すること** (番号 + descriptive 名の両方)。
+> 残りの 未/部分 項目 (3.16 index clause, 3.17, 3.18, 3.22, 3.26, 3.31-3.34,
+> 3.35/3.36, wreath) も同様に未検証。Isaacs 全章は現在 **sorry ゼロ**なので、
+> sorry 数はこの章の残作業の指標にならない (未形式化項目は sorry を生まない)。
+
+
 > Ch.3 is very thoroughly covered: 27 of 36 numbered results are fully formalized or mathlib-covered, including the FT-critical Hall E/C theorems (plus Hall D, which the book leaves as Problem 3C.1), Hall-Higman 1.2.3, Schur-Zassenhaus (existence = mathlib; the conjugacy Theorem 3.12 is repo-proved at full strength for both solvability cases, with the stronger conclusion that the conjugator lies in N), and the whole Glauberman coprime-action "Tier 1" (3.23-3.25, 3.27-3.30) — which lives in OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean and OddOrder/Mathlib/SchurZassenhausConj.lean, not in the Ch03 directory. The main gaps are (a) the two Burnside-gated solvability criteria 3.15 and 3.17, whose placeholder file is still intentionally empty even though Burnside p^a q^b is now proved sorry-free in Ch.7 (burnside_p_pow_q_pow), so both are unblocked; and (b) the coprime-orbit "Tier 2" cluster 3.26, 3.31-3.34 (class bijection, Hartley-Turull, orbit-size product), entirely missing though all Glauberman ingredients exist. Four results are weaker than the book: 3.22 proves only a commutator containment rather than genuine pi-length <= 1 (BG's HasPiLengthOne def exists with no theorem), 3.16 lacks the |H:H∩K|=|G:K| clause, 3.35 has only the uniqueness half, and 3.36's existence statement omits the |G/N|=m clause (degenerate witnesses satisfy it). The crossed-homomorphism machinery 3.6/3.7 was never formalized because mathlib's QuotientDiff proof route made it unnecessary; pi-Hall/pi-separable theory is repo-built (IsHallSubgroup, IsPiSeparable via an upper pi-Fitting series) and is in places stronger than the book (e.g. a Hall-subgroup generalization of Cor 3.25 in BG §1). Slim verification pass (2026-07-16): all 15 flagged missing/partial labels were re-attacked by book-number and descriptive-content greps and every one stands — no status changed (Ch07/ForwardFromCh03.lean remains a docstring-only placeholder whose theorem signatures sit inside code fences; the only near-miss is a specialized extension-closure instance isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement noted under 3.18) — and the three most load-bearing formalized results (3.12 SZ-conjugacy, 3.13/3.14 Hall E/C, 3.21 Hall-Higman 1.2.3) were read in source and confirmed at full book strength.
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
