@@ -89,7 +89,15 @@ proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidua
       副産物の shared infra: `map_normalizer_mulEquiv` (`N_G(A^g) = N_G(A)^g`、mathlib 不在)。
       ⚠ 書籍の subnormal→normal jump は **2 箇所**あった (`V ◁ H` と `U^k ◁ D`);
       両方とも subnormal 版 Cor 9.27 で埋まる。
-- [ ] 9.24 statement の形式化 (∃ p, U or V が p-群)。
+- [x] **Thm 9.24 完成 (2026-07-18)** — `thompsonWielandt`:
+      `∃ p, p.Prime ∧ (IsPGroup p U ∨ IsPGroup p V)`。2 ケース統合済み。
+      `exists_prime_opiCoreInG_ne_bot` (`F ≠ 1 ⇒ ∃ p, O_p ≠ 1`、
+      `fitting_eq_iSup_primeFactors` + `Ch04.oPiCore_singleton_eq_opCore` 経由) で
+      Case 2 の入口を作った。
+- [x] **Case 1 完成 (2026-07-18)** — `relCore_eq_bot_or_of_fitting_eq_bot`。
+      補助: `layerInG_le_inf_of_fitting_eq_bot` (`E(H) ≤ D`)、
+      `layer_ne_bot_of_fitting_eq_bot` (F=1 ⇒ E≠1、Thm 9.8 経由)、
+      `nilpotentResidual_ne_bot_of_fitting_eq_bot` (U ◁ H 非自明 ⇒ U^∞ ≠ 1)。
 - [x] ~~Case 2 の残り~~ (完了; 手順は下記に保存):
       - `X = O^p(U) ≠ ⊥`, `Y = O^p(V) ≠ ⊥` と仮定 → `N_G(X) = H`, `N_G(Y) = K`
         (`normalizer_eq_left/right_of_noNormal`; `X ◁ H` は `U ◁ H` + `O^p` char)。
