@@ -994,7 +994,7 @@ vanishes off `(H^#)^G` — both are induced from linear characters of `H = PC` w
 (the Core `mu_col` witness and the λ-cluster witness thread the *guarded*
 `tau1S_apply_induce_sub`), so the difference is `H^#`-supported — whence
 `λ^{τ₁}(x) = δ ∑_i η_{i1}(x)` there by the (13.3.c) column formula. -/
-theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G] [Fintype G]
+theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G]
     [Invertible (Nat.card G : ℂ)]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp) {x : G}
@@ -1003,6 +1003,7 @@ theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G] [Fintype G]
       core.tau1S lam.lambda x
         = (δ : ℂ) * ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ x := by
   classical
+  haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨j, δ, θμ, -, hδ, hθμirr, hθμ1, hθμP, hμInd, hμτ⟩ := core.mu_col_tau1_eta_col_one
   obtain ⟨θl, hθlirr, hθl1, hlamEq, x₀, hx₀P, hx₀ker⟩ := lam.lambda_induced_from_PC_linear
   have hθlP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :

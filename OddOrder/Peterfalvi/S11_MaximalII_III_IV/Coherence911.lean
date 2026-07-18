@@ -287,7 +287,7 @@ theorem hcZeta_irreducible [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
@@ -300,6 +300,9 @@ theorem hcZeta_irreducible [Finite G] {M : Subgroup G}
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
       (hcPsi chief θ : ClassFunction
         ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)) :=
+  letI : Fintype
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+    Fintype.ofFinite _
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq (hcPsi chief θ)
     (hcPsi_inertia_eq_hc chief θ hθ₀)
 
@@ -509,7 +512,7 @@ theorem hcZetaPair_irreducible [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (lam : ↥(cInHu data chief) →* ℂˣ)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) : ℂ)]
@@ -522,6 +525,9 @@ theorem hcZetaPair_irreducible [Finite G] {M : Subgroup G}
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
       (hcPsiPair chief θ lam : ClassFunction
         ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)) :=
+  letI : Fintype
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+    Fintype.ofFinite _
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq (hcPsiPair chief θ lam)
     (hcPsiPair_inertia_eq_hc chief θ lam hθ₀)
 
@@ -622,7 +628,7 @@ theorem hcZetaPair_H0supCprime_subset_ker [Finite G] {M : Subgroup G}
       (c : ↥(huSub data)) ∈ ((cprimeSub data chief).subgroupOf M).subgroupOf (huSub data) →
       lam c = 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Finite ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
     [Invertible (Nat.card
         ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) : ℂ)] :
     ((((chief.H0 ⊔ cprimeSub data chief).subgroupOf M).subgroupOf (huSub data) :
@@ -630,6 +636,9 @@ theorem hcZetaPair_H0supCprime_subset_ker [Finite G] {M : Subgroup G}
       OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsiPair chief θ lam)) := by
+  haveI : Fintype
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+    Fintype.ofFinite _
   haveI := realizedH0supCprime_normal_huSub chief
   exact OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
     (A := ((chief.H0 ⊔ cprimeSub data chief).subgroupOf M).subgroupOf (huSub data))
@@ -919,12 +928,13 @@ theorem hcuZetaPair_H0supUprime_subset_ker [Finite G] {M : Subgroup G}
       (c : ↥(huSub data)) ∈ ((uprimeSub data).subgroupOf M).subgroupOf (huSub data) →
       lam c = 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)] :
     ((((chief.H0 ⊔ uprimeSub data).subgroupOf M).subgroupOf (huSub data) :
         Set ↥(huSub data))) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce
         (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam)) := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   haveI := realizedH0supUprime_normal_huSub chief
   exact OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
     (A := ((chief.H0 ⊔ uprimeSub data).subgroupOf M).subgroupOf (huSub data))

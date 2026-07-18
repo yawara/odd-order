@@ -501,7 +501,7 @@ open scoped Classical in
 theorem typeIII_induced_source_support [Finite G]
     (hyp : Hypothesis (G := G))
     [Fintype ↥hyp.base.T]
-    [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible
       (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
@@ -512,6 +512,7 @@ theorem typeIII_induced_source_support [Finite G]
         θ.toClassFunction).support ⊆
       ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
         Set ↥hyp.base.T) := by
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   haveI : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
     T_derivedSubgroupOf_normal hyp
   intro x hx
@@ -524,7 +525,7 @@ open scoped Classical in
 theorem typeIII_induced_source_degree [Finite G]
     (hyp : Hypothesis (G := G))
     [Fintype ↥hyp.base.T]
-    [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible
       (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ)]
@@ -535,6 +536,7 @@ theorem typeIII_induced_source_degree [Finite G]
     ClassFunction.induce
       ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
         θ.toClassFunction 1 = (hyp.base.p : ℂ) := by
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   rw [ClassFunction.induce_apply_one, T_derived_index_eq_p hyp,
     hθ1, mul_one]
 
@@ -552,7 +554,7 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm [Finite G]
     (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G]
     [fintypeT : Fintype ↥hyp.base.T]
-    [fintypeK : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [invertibleG : Invertible (Nat.card G : ℂ)]
     [invertibleT : Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [invertibleK :
@@ -609,10 +611,6 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm [Finite G]
       OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype hyp.base.T :=
     Subsingleton.elim _ _
   subst fintypeT
-  have hfk : fintypeK =
-      OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype
-        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Subsingleton.elim _ _
-  subst fintypeK
   have hig : invertibleG =
       OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
   subst invertibleG
@@ -691,7 +689,7 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_
     (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G]
     [fintypeT : Fintype ↥hyp.base.T]
-    [fintypeK : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [invertibleG : Invertible (Nat.card G : ℂ)]
     [invertibleT : Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [invertibleK :
@@ -759,10 +757,6 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_
       OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype hyp.base.T :=
     Subsingleton.elim _ _
   subst fintypeT
-  have hfk : fintypeK =
-      OddOrder.Peterfalvi.S12.FiniteInduce.finiteSubFintype
-        ((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Subsingleton.elim _ _
-  subst fintypeK
   have hig : invertibleG =
       OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
   subst invertibleG
@@ -858,7 +852,7 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_and_anchor_orthogonal
     (hyp : Hypothesis (G := G))
     [fintypeG : Fintype G]
     [fintypeT : Fintype ↥hyp.base.T]
-    [fintypeK : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [invertibleG : Invertible (Nat.card G : ℂ)]
     [invertibleT : Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [invertibleK :

@@ -160,11 +160,12 @@ if `N ⊴ Γ`, `N ≤ K`, `χ ∈ Irr Γ` and `N ⊄ Ker χ`, then `Σ_{y ∈ K}
 left-translation reindexings `y ↦ n·y` of `↥K` over `n ∈ N` reduces to the coset-sum
 vanishing `sum_apply_mul_eq_zero_of_not_subset_characterKernel`. -/
 theorem sum_subgroup_apply_eq_zero_of_not_subset_characterKernel {N K : Subgroup Γ}
-    [N.Normal] [Fintype ↥N] [Fintype ↥K] (hNK : N ≤ K) {χ : ClassFunction Γ ℂ}
+    [N.Normal] [Finite ↥N] [Fintype ↥K] (hNK : N ≤ K) {χ : ClassFunction Γ ℂ}
     (hχ : IsIrreducibleCharacter χ)
     (hker : ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)) :
     ∑ y : ↥K, χ (y : Γ) = 0 := by
   classical
+  haveI : Fintype ↥N := Fintype.ofFinite ↥N
   have hcard : ((Fintype.card ↥N : ℕ) : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.mpr Fintype.card_pos.ne'
   refine mul_left_cancel₀ hcard ?_
@@ -190,7 +191,7 @@ formula expands this into subgroup sums of `ζ` over the conjugates `x⁻¹Kx �
 which contains `N` (normality of `N` in `Γ`), so each vanishes by
 `sum_subgroup_apply_eq_zero_of_not_subset_characterKernel`. -/
 theorem inner_induce_trivial_induce_eq_zero [Invertible (Nat.card Γ : ℂ)]
-    {D N K : Subgroup Γ} [hD : D.Normal] [hNn : N.Normal] [Fintype ↥K] [Fintype ↥D]
+    {D N K : Subgroup Γ} [hD : D.Normal] [hNn : N.Normal] [Finite ↥K] [Finite ↥D]
     [Invertible (Nat.card ↥K : ℂ)] [Invertible (Nat.card ↥D : ℂ)]
     (hNK : N ≤ K) (hKD : K ≤ D)
     {ζ : ClassFunction ↥D ℂ} (hζirr : IsIrreducibleCharacter ζ)
@@ -198,6 +199,8 @@ theorem inner_induce_trivial_induce_eq_zero [Invertible (Nat.card Γ : ℂ)]
     ClassFunction.inner (ClassFunction.induce K (trivialClassFunction ↥K))
       (ClassFunction.induce D ζ) = 0 := by
   classical
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  haveI : Fintype ↥D := Fintype.ofFinite ↥D
   haveI : (N.subgroupOf D).Normal := hNn.subgroupOf D
   haveI : Fintype ↥(N.subgroupOf D) := Fintype.ofFinite _
   -- the subgroup sum `Σ_{y ∈ K} (Ind_D ζ)(y)` vanishes
@@ -279,12 +282,13 @@ variable {Γ : Type*} [Group Γ] [Fintype Γ]
 double count `Σ_{y∈K} #{x | x⁻¹yx ∈ K} = Σ_{x∈Γ} |K ∩ xKx⁻¹|` finishes.  This is
 Peterfalvi (9.11.4)'s `‖γ‖²` double-coset count in unnormalized integer form. -/
 theorem inner_induce_trivial_self_mul_card_sq [Invertible (Nat.card Γ : ℂ)]
-    (K : Subgroup Γ) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] :
+    (K : Subgroup Γ) [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)] :
     ClassFunction.inner (ClassFunction.induce K (trivialClassFunction ↥K))
         (ClassFunction.induce K (trivialClassFunction ↥K))
       * ((Nat.card ↥K : ℂ) * (Nat.card ↥K : ℂ))
       = ((∑ x : Γ, Nat.card ↥(K ⊓ MulAut.conj x • K) : ℕ) : ℂ) := by
   classical
+  haveI : Fintype ↥K := Fintype.ofFinite ↥K
   -- the value of `Ind_K 1` at `y ∈ K` is `(1/|K|)·#{x | x⁻¹yx ∈ K}`
   have hval : ∀ y : ↥K,
       (ClassFunction.induce K (trivialClassFunction ↥K)) (y : Γ)
@@ -671,12 +675,14 @@ theorem nineElevenGamma_support (data : TypesIIIIIIVSetup M) {U₁ : Subgroup G}
 omit [Finite G] in
 /-- `γ ∈ ℤ[Irr M]`: `Ind` of the (irreducible) trivial character is a virtual character. -/
 theorem nineElevenGamma_mem_ZIrr (data : TypesIIIIIIVSetup M) (U₁ : Subgroup G)
-    [Fintype ↥M] [Fintype ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)]
+    [Fintype ↥M] [Finite ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)]
     [Invertible (Nat.card ↥M : ℂ)]
     [Invertible (Nat.card ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M) : ℂ)] :
     ClassFunction.induce (data.H.subgroupOf M ⊔ U₁.subgroupOf M)
-      (trivialClassFunction ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)) ∈ ZIrr ↥M :=
-  ClassFunction.induce_mem_ZIrr _ trivialClassFunction_isIrreducible.mem_ZIrr
+      (trivialClassFunction ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)) ∈ ZIrr ↥M := by
+  haveI : Fintype ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M) :=
+    Fintype.ofFinite ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)
+  exact ClassFunction.induce_mem_ZIrr _ trivialClassFunction_isIrreducible.mem_ZIrr
 
 /-- **`γ(1) = q·a`** (Peterfalvi (9.11.4)): the degree of `γ = Ind_{HU₁}^M 1` is the index
 `[M : HU₁] = [M : HU]·[HU : HU₁] = q·[U : U₁] = q·a`.  This is what cancels against the
@@ -734,8 +740,8 @@ omit [Finite G] in
 averaging-projector engine `inner_induce_trivial_induce_eq_zero` at `N = H`, `K = H·U₁`,
 `D = HU` — the kernel-avoidance `H ⊄ Ker ζ` is the defining `𝒳`-membership. -/
 theorem nineElevenGamma_inner_induceHU (data : TypesIIIIIIVSetup M) {U₁ : Subgroup G}
-    [Fintype ↥M] [Fintype ↥(huSub data)]
-    [Fintype ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)]
+    [Fintype ↥M] [Finite ↥(huSub data)]
+    [Finite ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M) : ℂ)]
     (hU₁U : U₁ ≤ data.U) {ζ : IrreducibleCharacter ↥(huSub data)} (hζ : ζ ∈ xiSet data) :
@@ -756,7 +762,7 @@ configuration `C = U′ ≤ U₁`) and the (9.11.2) TI-identity `hTI`
 (the `NineElevenTwoTIWitness`). -/
 theorem nineElevenGamma_inner_self_mul_u {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) {U₁ : Subgroup G} {a : ℕ}
-    [Fintype ↥M] [Fintype ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)]
+    [Fintype ↥M] [Finite ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)]
     [Invertible (Nat.card ↥M : ℂ)]
     [Invertible (Nat.card ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M) : ℂ)]
     (hU₁U : U₁ ≤ data.U) (hUpU₁ : uprimeSub data ≤ U₁)

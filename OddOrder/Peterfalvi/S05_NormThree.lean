@@ -46,15 +46,16 @@ functions, which we assemble here (general finite group) from linear independenc
 (`linearIndependent_irreducibleCharacter`) and completeness
 (`classFunction_eq_zero_of_orthogonal`). -/
 
+omit [Fintype G] in
 /-- **Completeness of `Irr` (spanning form).** The irreducible characters span `CF(G)`: for any
 `f`, the difference `f - ∑_χ ⟨f, χ⟩ • χ` is orthogonal to every irreducible character (by
 orthonormality of `Irr`), hence zero by `classFunction_eq_zero_of_orthogonal`, so
 `f = ∑_χ ⟨f, χ⟩ • χ` lies in the span. -/
-theorem classFunction_span_irreducibleCharacter_eq_top [Invertible (Nat.card G : ℂ)] :
+theorem classFunction_span_irreducibleCharacter_eq_top [Finite G] [Invertible (Nat.card G : ℂ)] :
     Submodule.span ℂ (Set.range (fun χ : IrreducibleCharacter G => (χ : ClassFunction G ℂ)))
       = ⊤ := by
+  haveI : Fintype G := Fintype.ofFinite G
   classical
-  haveI : Finite G := Finite.of_fintype G
   haveI : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter
   haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   rw [eq_top_iff]

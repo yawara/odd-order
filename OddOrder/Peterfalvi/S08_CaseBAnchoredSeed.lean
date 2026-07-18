@@ -263,15 +263,15 @@ anchored producer (`caseB_per_phi_anchored_fromYset`), then rewrites `Ind^L_H θ
 the
 uniform `a₀` and the `Ximg` packaging, handled at the `∀`-column assembly). -/
 theorem caseB_column_anchored_image
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H)
     (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
@@ -289,6 +289,9 @@ theorem caseB_column_anchored_image
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁)
         = X - (a : ℂ) • hyp.coherentYset.extension η₁ := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
   have hWne := caseB_column_W2_nonconstant h46 hHK hχ₂
   have hθirr : IsIrreducibleCharacter
@@ -350,15 +353,15 @@ The proof mirrors `caseB_column_anchored_image` (central char + (6.8.2.2) aggreg
 per-`φ` producer) with `θ` taken directly instead of `Res^H μ_{0,χ₂}`, plus the `X ⊥ Y^{τ₁}` call
 with the textbook partner `η' = η̄₁` reconstructed from `η₁ ∈ Y`. -/
 theorem caseB_member_anchored_image
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H)
     (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
@@ -386,6 +389,10 @@ theorem caseB_member_anchored_image
       ClassFunction.inner X (cY.extension η₁) = 0 ∧
       X ∈ ZIrr G := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
   obtain ⟨φ, hφ', hφirr, hφ1, hweight, hreseq⟩ := exists_central_phi_data hW2H hcen θ
   have hφne : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ
@@ -687,15 +694,15 @@ Extracts `θ = Res^H μ_{0,χ₂}` (irreducible by `certainTypeRestrict_isIrredu
 `Ind^L_H θ = columnSum χ₂` (`columnSum_eq_induce_H`), and derives the support from the equal-degree
 `sMember_smulDiffSupport_of_charValue_eq`. -/
 theorem caseB_column_anchored_full
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H)
     (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
@@ -723,6 +730,9 @@ theorem caseB_column_anchored_full
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   have hWne := caseB_column_W2_nonconstant h46 hHK hχ₂
   have hθirr : IsIrreducibleCharacter
       (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
@@ -879,15 +889,15 @@ This is the uniform (6.8.2.3) datum for the **whole** of `X` — the per-member 
 `Xset W₂ ∪ Y` coherence seed (Peterfalvi (6.8.2), built via the anchored-image isometry `τ₂`, *not*
 the `(6.6)` chain — see roadmap cont.¹²). -/
 theorem caseB_Xset_member_anchored
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
-    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    [Finite ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
     (hW2H : h46.W2 ≤ H)
     (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
@@ -913,6 +923,10 @@ theorem caseB_Xset_member_anchored
       X ∈ ZIrr G ∧
       (χ - a • η₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   obtain ⟨hχS, hχnotsub⟩ := hyp.mem_Xset.mp hχ
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, hθne1, hχeq⟩ := hχS

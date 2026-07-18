@@ -852,7 +852,7 @@ theorem hcuZetaPair_irreducible [Finite G] {M : Subgroup G}
         = hcuSeedHom (chief := chief) θ h)
     (lam : ↥(cuInHu caseA) →* ℂˣ)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal]
@@ -861,8 +861,9 @@ theorem hcuZetaPair_irreducible [Finite G] {M : Subgroup G}
           (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
         = hInHu data ⊔ cuInHu caseA) :
     IsIrreducibleCharacter (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
-      (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)) :=
-  OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
+      (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)) := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  exact OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
     (hcuPsiPair caseA θ hinv lam)
     (hcuPsiPair_inertia_eq_hcu caseA θ hinv lam hθ₀)
 
@@ -1098,13 +1099,14 @@ theorem caseA_exists_irreducible_source_degree_qa [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (lam : ↥(cuInHu caseA) →* ℂˣ)
-    [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(huSub data)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)] :
     ∃ ζ : ClassFunction ↥(huSub data) ℂ,
       IsIrreducibleCharacter ζ ∧ ζ (1 : ↥(huSub data)) = (caseA.a : ℂ) ∧
       induceHU data ζ (1 : ↥M) = ((data.q * caseA.a : ℕ) : ℂ) := by
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
   haveI := hcuInHu_normal caseA
   obtain ⟨θ, W, hWinv, hsup, hreg, htriv⟩ := exists_source_char_hom_caseA caseA
   -- the seed inertia `inertia(θ₀) = H·C_U(S₀)` from the full inertia lift
@@ -1413,8 +1415,10 @@ The `q` conjugates `S₀^w` (`w ∈ W₁`), each of order `p`, span `H̄` (`case
 theorem caseA_wOrbit_iSupIndep [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
-    [Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))] :
+    [Finite ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))] :
     iSupIndep (caseA_wOrbit caseA) := by
+  haveI : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    Fintype.ofFinite _
   classical
   haveI : chief.N.Normal := chief.N_normal
   haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
@@ -1488,7 +1492,7 @@ conjugates `W = ⨆_{w≠1} S₀^w`.  Together with `caseA_S0_sup_wComplement` t
 theorem caseA_S0_inf_wComplement [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
-    [Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))] :
+    [Finite ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))] :
     caseA.S0 ⊓ caseA_wComplement caseA = ⊥ := by
   have hdisj : Disjoint (caseA_wOrbit caseA 1) (⨆ (w) (_ : w ≠ 1), caseA_wOrbit caseA w) :=
     (iSupIndep_def.mp (caseA_wOrbit_iSupIndep caseA)) 1

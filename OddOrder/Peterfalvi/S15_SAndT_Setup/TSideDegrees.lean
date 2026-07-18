@@ -1020,7 +1020,7 @@ identification `P = M_σ(S)` is only used for a *membership*, so the `T`-side ne
 `Q ≤ M_σ(T)` (`maxNilpotentNormalHall_le_Msigma`, valid for every maximal subgroup, type III
 included); every other ingredient (`support_induce_subset_conjugatesIntoSet`, the (1.2) core,
 `honestTypeP2ASet_conj_mem`) is `M`-generic. -/
-theorem Hypothesis.sSet_member_support_subset_A_T [Fintype G] [Finite G]
+theorem Hypothesis.sSet_member_support_subset_A_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
     {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter
@@ -1029,6 +1029,7 @@ theorem Hypothesis.sSet_member_support_subset_A_T [Fintype G] [Finite G]
     (induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+  haveI : Fintype G := Fintype.ofFinite G
   classical
   have hHQ : ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q :=
     hyp.toTypesIIIIIIVSetupT_H_eq hG hvd
@@ -1106,12 +1107,13 @@ open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **`𝒯`-members are supported in `A(T) ∪ {1}`** (full-family form; mirror of
 `sSet_member_support_subset`). -/
-theorem Hypothesis.sSet_member_support_subset_T [Fintype G] [Finite G]
+theorem Hypothesis.sSet_member_support_subset_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
     {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     φ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+  haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨ξ, hξ, rfl⟩ := hφ
   exact hyp.sSet_member_support_subset_A_T hG hvd hξ
 
@@ -1121,7 +1123,7 @@ open scoped FiniteInduce in
 `sSet_caseB_member_diff_supported`; the `hsuppdiff` input of the caseB (5.7) coherence engine
 on `T`): both members have the uniform degree `p·v` (`sSet_caseB_apply_one_eq_vp`), so the
 difference vanishes at `1` and its support lands in `A(T)`. -/
-theorem Hypothesis.sSet_caseB_member_diff_supported_T [Fintype G] [Finite G]
+theorem Hypothesis.sSet_caseB_member_diff_supported_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
     {chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)}
@@ -1131,6 +1133,7 @@ theorem Hypothesis.sSet_caseB_member_diff_supported_T [Fintype G] [Finite G]
     {y : ClassFunction ↥hyp.T ℂ} (hy : y ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     (x - y).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  haveI : Fintype G := Fintype.ofFinite G
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
   have hdeg : (x : ↥hyp.T → ℂ) 1 = (y : ↥hyp.T → ℂ) 1 := by
@@ -1199,7 +1202,7 @@ open scoped FiniteInduce in
 `𝒯`-member source `Ind_{HU}^T ξ`, the conjugate difference is `A(T)`-supported — the support
 lands in `A(T) ∪ {1}` (`sSet_member_support_subset_A_T`) and the value at `1` is the real
 positive degree, so `1` drops out.  The `hdiffsupp` half of the irreducible `R`-datum. -/
-theorem Hypothesis.sSet_member_diffsupp_T [Fintype G] [Finite G]
+theorem Hypothesis.sSet_member_diffsupp_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
     {ξ : OddOrder.RepresentationTheory.IrreducibleCharacter
@@ -1210,6 +1213,7 @@ theorem Hypothesis.sSet_member_diffsupp_T [Fintype G] [Finite G]
         - induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
           (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+  haveI : Fintype G := Fintype.ofFinite G
   set φ : ClassFunction ↥hyp.T ℂ :=
     induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
       (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ) with hφ

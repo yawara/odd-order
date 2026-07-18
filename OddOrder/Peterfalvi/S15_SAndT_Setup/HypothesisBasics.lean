@@ -240,11 +240,12 @@ open OddOrder.Peterfalvi.S11 in
 /-- **`S₁(d)`-members are supported in `A(S) ∪ {1}`** (issue 1017, extracted from the `hmem_supp`
 local of `sSetIrrDeg_subcoherent`/`sSetIrrDeg_coherent`).  A member `φ = Ind_{HU}^S ξ` has
 `φ.support ⊆ A(S) ∪ {1}` by the honest (4.7) support fact `sSet_member_support_subset_A`. -/
-theorem Hypothesis.sSetIrrDeg_member_support_subset [Fintype G] [Finite G]
+theorem Hypothesis.sSetIrrDeg_member_support_subset [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (d : ℂ)
     {φ : ClassFunction ↥hyp.S ℂ} (hφ : φ ∈ hyp.sSetIrrDeg hG d) :
     φ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
+  haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨hφsSet, _⟩ := hφ
   obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
   rw [hφeq]
@@ -256,13 +257,14 @@ open OddOrder.Peterfalvi.S11 in
 For `x, y ∈ S₁(d)` (hence `x(1) = d = y(1)`), the difference `x − y` vanishes at `1`, so its support
 avoids `{1}` and lands in `A(S)` (`sSetIrrDeg_member_support_subset` minus the identity).  This is
 the (A)-engine `hsupp` (with `y = x̄`) and the (5.3.a) `hconjsupp` / (5.7) `hsuppdiff` input. -/
-theorem Hypothesis.sSetIrrDeg_member_diff_supported [Fintype G] [Finite G]
+theorem Hypothesis.sSetIrrDeg_member_diff_supported [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (d : ℂ)
     {x : ClassFunction ↥hyp.S ℂ} (hx : x ∈ hyp.sSetIrrDeg hG d)
     {y : ClassFunction ↥hyp.S ℂ} (hy : y ∈ hyp.sSetIrrDeg hG d) :
     (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
+  haveI : Fintype G := Fintype.ofFinite G
   have hdeg : (x : ↥hyp.S → ℂ) 1 = (y : ↥hyp.S → ℂ) 1 := by rw [hx.2.2, hy.2.2]
   rcases (ClassFunction.support_sub_subset x y hz) with h | h
   · rcases hyp.sSetIrrDeg_member_support_subset hG d hx h with h' | h'
@@ -1029,11 +1031,12 @@ open OddOrder.Peterfalvi.S11 in
 /-- **`𝒮`-members are supported in `A(S) ∪ {1}`** (issue 1017, the full-family analogue of
 `sSetIrrDeg_member_support_subset`).  Every `φ = Ind_{HU}^S ξ ∈ 𝒮` has `φ.support ⊆ A(S) ∪ {1}` by
 the honest (4.7) support fact `sSet_member_support_subset_A`. -/
-theorem Hypothesis.sSet_member_support_subset [Fintype G] [Finite G]
+theorem Hypothesis.sSet_member_support_subset [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {φ : ClassFunction ↥hyp.S ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
     φ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
+  haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨ξ, hξ, rfl⟩ := hφ
   exact hyp.sSet_member_support_subset_A hG hξ
 
@@ -1042,7 +1045,7 @@ open OddOrder.Peterfalvi.S11 in
 input of the caseB (5.7) coherence engine).  For `x, y ∈ 𝒮` both of the uniform degree `q·u`
 (`sSet_caseB_apply_one_eq_qu`), the difference `x − y` vanishes at `1`, so its support avoids `{1}`
 and lands in `A(S)` (`sSet_member_support_subset` minus the identity). -/
-theorem Hypothesis.sSet_caseB_member_diff_supported [Fintype G] [Finite G]
+theorem Hypothesis.sSet_caseB_member_diff_supported [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
@@ -1052,6 +1055,7 @@ theorem Hypothesis.sSet_caseB_member_diff_supported [Fintype G] [Finite G]
     (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
+  haveI : Fintype G := Fintype.ofFinite G
   have hdeg : (x : ↥hyp.S → ℂ) 1 = (y : ↥hyp.S → ℂ) 1 := by
     rw [hyp.sSet_caseB_apply_one_eq_qu hG chars caseB hx,
       hyp.sSet_caseB_apply_one_eq_qu hG chars caseB hy]

@@ -135,7 +135,7 @@ span that vanishes at `1` is supported on `(T')# = A₁(T)`. -/
 theorem tSideCoherentExtension_conj [Finite G]
     (hyp : Hypothesis (G := G))
     [Fintype G] [Fintype ↥hyp.base.T]
-    [Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
+    [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]
     [Invertible (Nat.card G : ℂ)]
     [Invertible (Nat.card ↥hyp.base.T : ℂ)]
     [Invertible
@@ -160,6 +160,7 @@ theorem tSideCoherentExtension_conj [Finite G]
     (hirr : ∀ χ ∈ S, IsIrreducibleCharacter χ)
     {ζ : ClassFunction ↥hyp.base.T ℂ} (hζ : ζ ∈ S) :
     (coh.extension ζ).conj = coh.extension ζ.conj := by
+  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   let K := (derivedInG hyp.base.T).subgroupOf hyp.base.T
   haveI : K.Normal := T_derivedSubgroupOf_normal hyp
   have hSsub : S ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily K ⊥ := by

@@ -680,7 +680,7 @@ theorem certainType_central_restriction
   rw [htriv, trivialClassFunction_apply, one_mul] at hzval
   exact hzval
 
-omit [Invertible (Nat.card G : ℂ)] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
 /-- **(6.8.2.3) constituent weight = degree (central multiplicity).**  For an irreducible `θ` of `H`
 whose central restriction is `Res^H_Z θ = θ(1)·φ` (`certainType_central_restriction`,
@@ -694,7 +694,7 @@ This is the weight reconciliation `aθ = θ(1)` for the (6.8.2.3) `αθ`-aggrega
 `aθ = ⟨φ, Res θ⟩` (`sum_smul_constituent_diff_eq`) equals the degree ratio `θ(1) = χθ(1)/|W₁|` used
 in
 the per-constituent decomposition, so the two index conventions coincide on the constituents. -/
-theorem inner_central_restrict_eq_apply_one [Fintype ↥H]
+theorem inner_central_restrict_eq_apply_one [Finite ↥H]
     (θ : IrreducibleCharacter ↥H) {W2 : Subgroup ↥L}
     [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
     {φ : ClassFunction ↥(W2.subgroupOf H) ℂ} (hφ : IsIrreducibleCharacter φ)
@@ -703,6 +703,7 @@ theorem inner_central_restrict_eq_apply_one [Fintype ↥H]
     ClassFunction.inner φ
         (ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ))
       = (θ : ClassFunction ↥H ℂ) 1 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   have hφφ : ClassFunction.inner φ φ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
       (⟨φ, hφ⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
