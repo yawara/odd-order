@@ -5656,6 +5656,18 @@ set_option linter.style.longLine false in
 -- Both sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.sigmaComplement_structure_of_not_fittingIsTI
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.quotientE2MulEquivE1
+-- BG **Theorem 15.7(e)** (`S15_MF`, issue 3022), replacing the former `A ∨ ¬A` slot.  Branch (e1)
+-- (`M_F` abelian) is **complete**: `M ∈ ℳ_F` (type-`P₁` is excluded because `M_σ = M'` for type `P₁`
+-- would make `M'' = 1`, contradicting Corollary 15.6's `1 ≠ K* ≤ M''`) and `rank M_F = 2` (abelian
+-- `M_F` centralizes the witness `X₁`, so the witness bound `rank (M_F ⊓ C_G(X₁)) < 3` applies to
+-- `M_F` itself; and `O_p(M_F)` is abelian noncyclic, giving `2 ≤ pRank ≤ rank`).  The non-abelian
+-- branch carries the part common to BG (e2)/(e3): `p ∈ σ(M) − β(M)`, `O_p(M_F)` non-abelian,
+-- `O_{p'}(M_F)` cyclic.  ⚠ **Still weaker than the book**: `p` is not yet pinned to `|X|` (needs
+-- Lemma 10.13(b), unformalized), and (e2)/(e3) are not separated by type (the type-`P₁` conjuncts
+-- `|O_p(H)| = p³`, `|M/H| ∣ p+1` are unformalized).  All three sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_trichotomy
 -- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
 -- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
 -- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive

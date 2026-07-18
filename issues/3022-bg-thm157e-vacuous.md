@@ -96,12 +96,63 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
 - [x] **末尾の恒真 disjunct を削除** (2026-07-18)。`IsMulCommutative M_F ∨ (¬IsMulCommutative M_F ∧
       (IsTypeF M ∨ IsTypeP1 M))` は `A ∨ ¬A` で情報ゼロだったため、残さず落とした。
       `∃ p ∈ σ(M) ∖ β(M)` は実内容なので存続 ((e) の `p = |X|` 束縛は未了)。
-- [ ] **(e) の修正**: 上記 book 3 分岐を述べ直す。**実内容はすでに repo に存在する**ので新規の
-      深い数学ではなく再パッケージが主: 分岐 1 ≈ `isTypeI_of_isTypeF` の可換枝
-      (`TypeP1Criteria.lean:868-893`、rank = 2 を証明済)、分岐 2 ≈ 同 非可換枝 (`:894-906`、
-      `typeF_exponent_dvd_sub_one_of_invariant_card` + `typeF_nonabelian_cyclic_opiCore_compl`)。
-      分岐 3 (`|O_p(H)| = p³`, `|M/H| ∣ p+1`, type `P₁`) は未形式化とみられる — 要確認。
-- [ ] **`p = |X|` の結合**: (e) の `p` を独立存在量化でなく `X` の位数として述べる。
+- [~] **(e) の修正** — **部分完了 (2026-07-18)**。`fitting_not_ti_trichotomy` として、BG の証明が
+      実際に行う場合分け (`H = M_F` が可換か否か) の形で述べ直した。恒真スロットは解消済み
+      (両枝が case 判定述語以外の内容を持つ)。
+      - **分岐 1 (H 可換) = BG (e1) を完全形式化**:
+        - `isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI` (**新規**) — 「H 可換 ⟹ M ∈ ℳ_F」。
+          type `P₁` を排除する BG の議論をそのまま形式化: type `P₁` なら
+          `typeP1_msigma_eq_derivedInG` で `M_σ = M'`、`M_F = M_σ` と合わせ `M' = M_F` 可換 ⟹
+          `M'' = 1`。しかし Cor 15.6 (`typeP_kstar_in_mf`) が `1 ≠ K* ≤ M''` を与えるので矛盾。
+          **この条項はどこにも無かった** (`isTypeI_of_isTypeF` は type F を仮説に持つので不要だった)。
+        - `rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI` (**S16 から S15 へ抽出**) —
+          `isTypeI_of_isTypeF` 内にインライン展開されていた rank = 2 の議論を独立補題化。
+          S16 側は cite に置換 (重複 ~25 行を削除)。
+      - **分岐 2/3 (H 非可換) = (e2)(e3) の共通部分のみ**: `p ∈ σ(M) − β(M)`、`O_p(H)` 非可換
+        (`opiCore_singleton_not_isMulCommutative_of_witness`)、`O_{p'}(H)` cyclic
+        (`typeF_nonabelian_cyclic_opiCore_compl`)。
+- [ ] **`p = |X|` の結合** — **未了 (ただし前提は揃っている)**。BG は `X = X₁` を示して `p = |X|`
+      を得る: `Z₀ = Ω₁(Z(P))`、`B = X₁ × Z₀ ∈ ℰ²(P) ∩ ℰ*(P)` (`C_H(X₁)` の rank < 3 による)、
+      そこから `|Z₀| = p` と `Z(P)` cyclic、最後に **Lemma 10.13(b)** で
+      `C_P(X₁) = C_P(B) = X₁ × Z` (Z cyclic)。
+      ⚠ **Lemma 10.13 は形式化済**: `S10_LocalLemmas.lean:975`
+      `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` が (a)(b)(c) 全条項を持ち、(b) は
+      `∃ Z, Z ≤ P ∧ IsCyclic Z ∧ Ω₁(Z(P)) ≤ Z ∧ A₀ ⊓ Z = ⊥ ∧ C_G(A) ⊓ P = A₀ ⊔ Z` の形。
+      (`S10_HallStructureCore.lean:53` の「statement skeleton を配置済」は **scaffold 期の
+      stale な注記**で、本体は実在する — 初版の本 issue はこれを信じて「未形式化」と誤記した。
+      [[verify-port-state-by-number-not-coq-name]])
+      よって残作業は §15 側の組み立て (`B` の構成 + `B ∈ ℰ²(P) ∩ ℰ*(P)` + 10.13 適用) のみ。
+
+      **⚠ さらに調査 (2026-07-19): `B` の構成も既に書かれている。**
+      `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` (`PisetBetaDisjoint.lean:1101`) の
+      `q = p` 分岐 (`:1118-1210`) が BG の当該段落をほぼそのまま持っている:
+      - `P := O_p(M_F)`、`X₁ ≤ P`、`P` 非可換 (`:1131`)、`C₁ = C_{M_F}(X₁)` 可換 (`:1134`)
+      - `Z := Ω₁(Z(P))` elementary abelian (`:1137-1143`)
+      - `X₁ ⊄ Z` (BG の「Clearly X₁ ≠ Z₀」、`:1155` — `X₁ ≤ Z(P)` なら `P ≤ C₁` 可換で矛盾)
+      - `X₁ ⊓ Z = ⊥` (`:1172`)、`B := X₁ ⊔ Z` elementary abelian かつ `≤ C₁` (`:1182-1191`)
+      - `|B| = p·|Z|` (`:1197`)、`log_p |B| ≤ rank C₁ < 3` (`:1202`) ⟹ `|Z| = p`
+      **これらは全て局所 `have` で、外に公開されていない**。⟹ 実作業は:
+      1. この `q = p` 分岐から `B`/`Z₀` の事実を **top-level 補題へ抽出** (`|Z₀| = p`,
+         `B = X₁ ⊔ Z₀` が rank 2 elementary abelian, `B ≤ C₁`)。
+      2. `IsMaximalElementaryAbelian p B` を示す (`GroupTheory/NarrowPGroup.lean:104` の定義 =
+         「`B` を含む elementary abelian は `B` 自身のみ」)。BG の根拠は `C_H(X₁)` の rank < 3 で、
+         `B ≤ C₁` かつ `rank C₁ < 3` から出る (rank 3 の elementary abelian が `C₁` に入れない)。
+      3. Lemma 10.13 を `A := B`, `A₀ := X₁`, `P := O_p(M_F)` で適用 → `C_G(B) ⊓ P = X₁ ⊔ Z'`
+         (`Z'` cyclic)。
+      4. `X ≤ P` (BG「X is a p-group」— 要根拠確認) と `X ≤ C_G(B)` から `X ≤ X₁ ⊔ Z'`、
+         `X` cyclic と合わせて `X = X₁`、ゆえに `p = |X|`。
+      **未確認の 1 点** = 手順 4 の「`X` は p-群」。BG は「`O_{p'}(H)` は `C_H(X₁)` 可換ゆえ可換。
+      Hence `P = O_p(H)` is not abelian and `X` is a `p`-group」と一文で済ませており、
+      この含意の根拠が原文では省略されている。ここが唯一の行間 — 詰まったら
+      [[feedback-ask-chatgpt-for-elided-gaps]] (Coq `BGsection15.v` 精読 → ChatGPT 再構成)。
+
+      **付随して必要**: `exists_inf_conj_fitting_orderP_witness` の結論に
+      `X₁ ≤ F(M) ⊓ conj g • F(M)` を追加する (構成上は真だが公開されておらず、現状 `X₁` と
+      `X` が statement 上結びついていない)。これが無いと手順 4 が書けない。
+- [ ] **(e2)/(e3) の型別分離** — **未了**。type `F` 側の exponent 条件
+      (`exp(M/H) ∣ q − 1`) は `typeF_exponent_dvd_sub_one_of_invariant_card` として**存在し**、
+      `isTypeI_of_isTypeF` が使っている (trichotomy へは未配線)。type `P₁` 側の
+      `|O_p(H)| = p³` と `|M/H| ∣ p + 1` (BG Thm 5.5(b) + Cor 10.7(b) + Thm 2.5 経由) は未形式化。
 - [x] **(d) の追加** (2026-07-18 完了)。`sigmaComplement_structure_of_not_fittingIsTI` として、
       `fitting_not_ti_cases` の bundle でなく **§12 E-setup を取る独立定理**にした (BG (d) は
       「§12-13 のとおりに取った E, E₁, E₂, E₃」についての主張なので、E-setup を引数に取る形が
@@ -121,6 +172,24 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
 (b)(d)(e) が (a) から独立な内容を主張し、`p = |X|` の結合が復元され、book strength・sorry-free・
 axiom-clean で証明されること。(c) は `≤` のまま (MathComp 準拠、上記理由)。
 ⚠ **現状の (b)(e) を「証明済」と数えない**。(e) だけ直して閉じない。
+
+### 進捗 (2026-07-18)
+
+| 条項 | 状態 |
+|---|---|
+| (a) | ✅ 元から faithful |
+| (b) | ✅ **完了** — X を束縛、`∀ g ∉ M` 形 |
+| (c) | ✅ `≤` のまま正しい (MathComp 準拠) |
+| (d) | ✅ **完了** — `sigmaComplement_structure_of_not_fittingIsTI` + `quotientE2MulEquivE1` |
+| (e) | ⚠ **部分** — (e1) 完全、(e2)(e3) は共通部分のみ。残 = `p = \|X\|` (Lemma 10.13(b) 依存) と型別分離 |
+
+**本 issue を閉じる条件 = 残り 2 チェックボックス** (`p = |X|` / (e2)(e3) 分離)。
+どちらも **§15 内で完結する組み立て作業**で、上流の未形式化 gate は無い (Lemma 10.13 は形式化済 —
+上記参照)。type `P₁` 側の `|O_p(H)| = p³` / `|M/H| ∣ p+1` だけは BG Thm 5.5(b) + Cor 10.7(b) +
+Thm 2.5 の被覆確認が要る。
+
+⚠ **ファイル行数**: `S15_MF/OpicoreCentralizer.lean` は本作業で 1485 行。CLAUDE.md の分割 trigger
+(1500 行) 直下なので、**次にこのファイルへ追記する前に分割**すること。
 
 ## 下流への影響 (blocking ではない)
 
