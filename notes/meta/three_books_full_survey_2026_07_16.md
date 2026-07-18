@@ -177,8 +177,14 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **4.6** A ⊴ G abelian, G/A cyclic: G' = [A,G], G' ≅ A/(A∩Z(G)), |A| = |G'|·|A∩ — Main/CommutatorBasics.lean. All three clauses covered, but G'=[A,G] and the range identity carry [Finite G] where the book states them for arbitrary G (finitene…
-- **4.16** Finite nilpotent G: maximal normal abelian A satisfies A = C_G(A); hen — Lives OUTSIDE the chapter tree: OddOrder/GroupTheory/CriticalSubgroup.lean:166, cited as Gorenstein 5.3.12 (same statement). Statement re-read in slim pass: hyp…
+- ✅ **2026-07-19 実測: 解消済** — 4.6 クラスタ (`commutator_eq_commutator_of_normal_abelian_cyclic_quotient`
+  / `commutatorRightHom_range_eq_commutator` / `quotientInfCenterEquivCommutator` /
+  `card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient`) は
+  **全て `[Finite G]` を持たない** (濃度形の `[Finite G]` も同日に除去済 — `Nat.card` が
+  無限を 0 に潰すので有限性不要)。以下は stale: ~~4.6 ... carry [Finite G] where the book states them for arbitrary — Main/CommutatorBasics.lean. All three clauses covered, but G'=[A,G] and the range identity carry [Finite G] where the book states them for arbitrary G (finitene…
+- ✅ **2026-07-19 実測: 特殊化ではない** — `GroupTheory/CriticalSubgroup.lean:166` の
+  statement は書籍と同一で、違いは**配置のみ** (章 tree の外)。債務ではなく記録事項。
+  以下は stale 分類: ~~4.16 Finite nilpotent G: maximal normal abelian A satisfies A = C_G(A); hen — Lives OUTSIDE the chapter tree: OddOrder/GroupTheory/CriticalSubgroup.lean:166, cited as Gorenstein 5.3.12 (same statement). Statement re-read in slim pass: hyp…
 - ✅ **2026-07-19 実測: 解消済** — 無条件版 `iterCommutator_inl_inr_two_eq_one_of_coprime`
   (`Main/ThreeSubgroupsCoprime.lean:508`) が書籍印刷形そのもの (solvability 仮定なし)。
   `:394` の solvable 版はその engine として併存するだけ。以下は stale:
@@ -340,7 +346,10 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Thm 9.8** Bender: F*(G) ⊇ C_G(F*(G)) for every finite group — Confirmed by reading the Lean statement: OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (BG Prop 1.3, S01_FrattiniBurnside.lean:195) is exactly [Finite G][I…
+- ✅ **2026-07-19 実測: 解消済** — Ch.9 §9A の
+  `centralizer_genFitting_le_genFitting` (`Ch09_MoreSubnormality/GeneralizedFitting.lean:70`)
+  が **`[Finite G]` のみで可解性を課さない**一般形 = 書籍 Thm 9.8 そのもの。
+  BG Prop 1.3 は可解特殊化として併存するだけ。以下は stale: ~~Thm 9.8 Bender — Confirmed by reading the Lean statement: OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (BG Prop 1.3, S01_FrattiniBurnside.lean:195) is exactly [Finite G][I…
 
 ### Isaacs Ch.10 — Isaacs Ch.10 More Transfer Theory
 
