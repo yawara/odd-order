@@ -84,8 +84,13 @@ proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidua
 - [x] **Case 2 の Step A**: `O_p(H) ≤ N_G(O^p(V))`
       (`opiCoreInG_le_normalizer_pResidualOf_relCore`)。`O_p` は既存の shared infra
       `GroupTheory.opiCoreInG {p} H` を使用 (import 経路 Ch03 → Ch09 で cycle なし)。
+- [x] **Case 2 完成 (2026-07-18)** — `pResidualOf_relCore_eq_bot_or`:
+      `O_p(H) ≠ 1` ⇒ `O^p(U) = 1` ∨ `O^p(V) = 1`。Step A–F すべて sorry-free。
+      副産物の shared infra: `map_normalizer_mulEquiv` (`N_G(A^g) = N_G(A)^g`、mathlib 不在)。
+      ⚠ 書籍の subnormal→normal jump は **2 箇所**あった (`V ◁ H` と `U^k ◁ D`);
+      両方とも subnormal 版 Cor 9.27 で埋まる。
 - [ ] 9.24 statement の形式化 (∃ p, U or V が p-群)。
-- [ ] **Case 2 の残り** (ここが次の frontier; Case 1 の transport 不要で進められる):
+- [x] ~~Case 2 の残り~~ (完了; 手順は下記に保存):
       - `X = O^p(U) ≠ ⊥`, `Y = O^p(V) ≠ ⊥` と仮定 → `N_G(X) = H`, `N_G(Y) = K`
         (`normalizer_eq_left/right_of_noNormal`; `X ◁ H` は `U ◁ H` + `O^p` char)。
       - Step A で `P = O_p(H) ≤ N_G(Y) = K` ⇒ `P ≤ D`, `P ◁ D`。
@@ -95,9 +100,26 @@ proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidua
         ※ `O^p(U^k) = X^k` は `map_pResidualOf` (同変性) で得る。
       - `H`/`K` を入れ替えて `O_p(K) ≤ O_p(H)` ⇒ 等号 ⇒ `P ◁ H` かつ `P ◁ K`,
         `P > 1` ⇒ `H = N_G(P) = K` 矛盾。
-- [ ] **Case 1** (`F(H)=F(K)=1`) — subtlety 2 (layer/nilpotentResidual の nested
-      transport) が残作業。`O^p` 側と同様に `layer`/`nilpotentResidual` の
-      subgroupOf ↔ ambient transport を用意する必要あり。
+- [ ] **Case 1** (`F(H)=F(K)=1`) — ここが次の frontier (subtlety 2)。必要な infra を
+      2026-07-18 に調査済み:
+      - **ambient `layer`** `layerInG H := (layer ↥H).map H.subtype` を新設する
+        (repo 全体に ambient layer は**存在しない** — 確認済み)。`O^p` で作った
+        `pResidualOf` と同じ設計・同じ transport 補題群 (`map_subtype_layer_subgroupOf` 等)。
+      - **ambient fitting は不要**: 9.25 (`map_layer_eq_layer_of_fitting_eq_bot`) の仮説は
+        `Ch01.fitting G = ⊥` の形なので、Case 1 の仮説を `Ch01.fitting ↥H = ⊥` (= F(H)=1)
+        と書けばそのまま噛み合う。
+        ⚠ BG に `fittingInG` (S08_CenterFittingOpcore) があるが **BG は Isaacs の下流**
+        なので import 不可。将来 `GroupTheory/SubgroupInAmbient.lean` (ambient 構成の
+        canonical home) へ寄せる consolidation は別 issue 候補。
+      - `nilpotentResidual` は**既に ambient 値**で `map_nilpotentResidual` (同変性) と
+        `map_subtype_nilpotentResidual_subgroupOf` (transport) も既存 → 追加不要。
+      - 9.18 は `V.subgroupOf H` が `↥H` で subnormal であること (`V ◁ M ◁ H` の chain を
+        `IsSubnormal` で構成) が要る。normalizer の ambient ↔ subtype 往復は
+        本 session で作った `map_subtype_le_normalizer_map_subtype` /
+        `subgroupOf_le_normalizer_subgroupOf` が使える。
+      - Case 1 の筋: `U`,`V` は nilpotent でない (`U ◁ H` nilpotent なら `U ≤ F(H) = 1`)
+        → `U^∞`,`V^∞` ≠ 1 → `N_G(U^∞) = H`, `N_G(V^∞) = K` → 9.18 で `E(H) ≤ N_G(V^∞) = K`
+        → `E(H) ≤ D` → 9.25 で `E(H) = E(D) = E(K)` → `H = N_G(E(H)) = K` 矛盾。
 - [ ] 9.24 proof の組み立て (書籍 p. 283–284, ~40 行, 2 ケース):
       - F(H)=F(K)=1: E(H),E(K)>0, 9.18 で E(H)⊆N_G(V^∞)=K, 9.25 で E(H)=E(D)=E(K),
         H=N_G(E(H))=K 矛盾 → U or V trivial (p-群)。
