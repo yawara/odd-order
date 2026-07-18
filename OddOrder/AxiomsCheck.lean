@@ -5759,6 +5759,16 @@ set_option linter.style.longLine false in
 -- Sorry-free + axiom-clean.
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S15.isMaximalElementaryAbelian_sup_omega1Center_of_witness
+-- BG **Theorem 15.7(e)**, `p = |X|` (step 4, the last of the chain; Coq `defX`).  `X` is a `p`-group
+-- inside `P = O_p(M_F)` and cyclic, and it centralizes `B = X₁ ⊔ Z₀` (it contains `X₁` and is
+-- abelian; `Z₀ ≤ Z(P)` is centralized by all of `P`), so Lemma 10.13(b) at `A := B`, `A₀ := X₁`
+-- puts `X` inside `C_G(B) ⊓ P = X₁ ⊔ Z` with `Z` cyclic and `X₁ ∩ Z = 1`.  Then `X ∩ Z = 1` (a
+-- nontrivial `X ∩ Z` would contain an order-`p` subgroup, which in the cyclic `X` must be `X₁`,
+-- contradicting `X₁ ∩ Z = 1`), and every `x ∈ X` factors as `u·v` with `u ∈ X₁` of order dividing
+-- `p`, so `x^p = v^p ∈ X ∩ Z = 1`.  A cyclic group of exponent dividing `p` containing the
+-- order-`p` `X₁` is `X₁`.  Both sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.inf_conj_fitting_eq_of_not_isMulCommutative
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.card_inf_conj_fitting_eq_of_not_isMulCommutative
 -- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
 -- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
 -- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive

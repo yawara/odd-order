@@ -257,23 +257,22 @@ theorem card_center_opiCore_eq_prime_of_omega1Center_le_kstar [Finite G]
   rw [← hmapcard, hZcard]
 
 /-- **`|O_p(M_F)| = p³` in the type-V Singer case** (BG Theorem 15.7(e), Coq `dimP`/`oP`): the order
-of `P = O_p(M_F)` is `p³`.  The inputs `r(P) ≤ 2` (`hrPle2`, the `rPle2` step, discharged via the
-faithfulness brick `kappaHall_inf_centralizer_opiCore_eq_bot` + `pRank_opiCore_le_two_of_kappaHall`)
-and `P` non-abelian (`hPnab`) are in hand.
+of `P = O_p(M_F)` is `p³`.  **Complete and axiom-clean** (`AxiomsCheck`); all four inputs are
+discharged:
 
-All four inputs are now discharged: `r(P) ≤ 2` (`hrPle2`), `P` non-abelian (`hPnab`), `P` Sylow of
-`G` (`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq `sylP_G`), and `|Z(P)| = p` (`hZPcard`,
-`card_center_opiCore_eq_prime_of_omega1Center_le_kstar`, Coq `defZP` via BG Theorem 1.11).  The sole
-remaining content is the **Blackburn rank-2 Sylow central-product structure**
-(`mFT_rank2_Sylow_cprod`,
-Coq §10.7b; Lean `S10.sylow_structure_b`, currently `private`): a Sylow `P` with `r(P) ≤ 2` and `P`
-non-abelian is a central product `S ∘ C` of a nonabelian `p³` `S = Ω₁` with cyclic `C`; with
-`|Z(P)| = p` the cyclic factor `C = Z(P)` collapses into `Z(S)`, leaving `|P| = |S| = p³`. To
-finish:
-de-privatize/expose `sylow_structure_b`, build the `p′`-Hall complement `V` of `P` in `N_G(P)`
-(Schur–Zassenhaus), convert `pRank ≤ 2` to `rank ≤ 2` (`rank_le_pRank_of_isPGroup`), and collapse
-the
-central product using `hZPcard`. -/
+* `r(P) ≤ 2` (`hrPle2`, the `rPle2` step, via the faithfulness brick
+  `kappaHall_inf_centralizer_opiCore_eq_bot` + `pRank_opiCore_le_two_of_kappaHall`),
+* `P` non-abelian (`hPnab`),
+* `P` Sylow of `G` (`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq `sylP_G`),
+* `|Z(P)| = p` (`hZPcard`, `card_center_opiCore_eq_prime_of_omega1Center_le_kstar`, Coq `defZP` via
+  BG Theorem 1.11).
+
+The **Blackburn rank-2 Sylow central-product structure** (BG Corollary 10.7(b), Coq
+`mFT_rank2_Sylow_cprod`) enters through the public `S10.sylow_structure` (second conjunct, gated on
+`rank ≤ 2`): `P` is abelian (excluded by `hPnab`) or a central product `P₁ ∘ P₂` with `P₁`
+exponent-`p` extraspecial of order `p³` and `P₂` cyclic with `Ω₁(P₂) = Z(P₁)`.  Then `|Z(P)| = p`
+collapses the cyclic factor — `P₂ ≤ Z(P)` forces `|P₂| = p`, so `P₂ = Ω₁(P₂) = Z(P₁) ≤ P₁` and
+`P = P₁ ⊔ P₂ = P₁` — leaving `|P| = |P₁| = p³`. -/
 theorem card_opiCore_eq_prime_cube_singer [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (_hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
@@ -379,13 +378,20 @@ the `alternative` disjunction on `H = M_F`.  As for the type-`F` bridge `isTypeI
 `FittingIsTI M` case is discharged directly (disjunct (a): `M_F#` is a `TI`-subset, via
 `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`).
 
-The sole remaining residual is thus the genuinely-deep **`¬FittingIsTI` case of Peterfalvi (8.8) /
-BG Theorem 15.7(d)(e)** (Coq `BGsection15` `nonTI_Fitting_structure`): either `M_F` abelian of rank
-2
-with `|W₁| ∣ p - 1`, or `O_p(M_F)` of order `p³` with `|W₁| ∣ p + 1` (the Suzuki/`SL₂`-type
-structures).  Unlike the type-`F` trichotomy (`isTypeI_of_isTypeF`, whose non-TI cases are `rank = 2`
-/ `exp U ∣ p - 1`), the type-V alternatives carry the `W₁`-Frobenius divisibilities `|W₁| ∣ p ∓ 1`,
-which need the `W₁`-action analysis of (8.8) not yet formalized.
+The `¬FittingIsTI` case — **Peterfalvi (8.8) / BG Theorem 15.7(e)** (Coq `BGsection15`
+`nonTI_Fitting_structure`) — is now discharged in full, so this theorem is complete and axiom-clean.
+It splits on the Frobenius divisibility `|W₁| ∣ p − 1` (matching Coq's `Ks = Z₀ → |K| ∣ p.-1`
+case analysis):
+
+* `|W₁| ∣ p − 1` holds: disjunct (e2) directly, with `O_{p'}(M_F)` cyclic.
+* otherwise the genuine **Singer / `SL₂(p)`** case (e3): `Z ⊓ K* ≠ ⊥` (else the Frobenius engine
+  `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot` would give `|K| = |W₁| ∣ p − 1`), hence
+  `Z ≤ K* = Z₀ = Z(P)` (Coq `defKs`/`defZP`), giving `|O_p(M_F)| = p³`
+  (`card_opiCore_eq_prime_cube_singer`) and `|W₁| ∣ p + 1`
+  (`card_dvd_succ_of_primeAction_extraspecial`, the symplectic/determinant-one step).
+
+⚠ The `-- (sorry 1)` / `-- (sorry 2)` markers inside the proof are **historical labels**, not live
+`sorry`s; both branches carry real proofs.
 
 (`hP1neIIIIV`, the sibling `M_F ≠ M_σ ⟹ III/IV` bridge, needs no trichotomy but instead the full
 nilpotent `M_F`-complement `U ≠ ⊥`, gated on `M'/M_F` nilpotent.) -/
@@ -492,12 +498,11 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
         card_center_opiCore_eq_prime_of_omega1Center_le_kstar hG hM hP1 hmf hKM hK hKstardef
           hp hpodd hKp' hKnormP (hZomega ▸ hZKstar) (hZomega ▸ hZcard)
       refine Or.inr (Or.inr ⟨p, hp, hHMF ▸ hpπ, ?_, ?_, hHMF ▸ hcyc⟩)
-      · -- (sorry 1) `|O_p(M_F)| = p³`.  All four inputs (`r(P) ≤ 2`, `P` non-abelian, `P` Sylow of
-        -- `G`, `|Z(P)| = p`) are discharged; the residual is the `mFT_rank2_Sylow_cprod`
-        -- central-product structure (Coq §10.7b, Lean `sylow_structure_b`), isolated in
-        -- `card_opiCore_eq_prime_cube_singer`.
+      · -- (e3) conjunct 1: `|O_p(M_F)| = p³`.  All four inputs (`r(P) ≤ 2`, `P` non-abelian,
+        -- `P` Sylow of `G`, `|Z(P)| = p`) are discharged, and the `mFT_rank2_Sylow_cprod`
+        -- central-product structure (Coq §10.7b) enters via `S10.sylow_structure`.
         exact card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
-      · -- (sorry 2) `|W₁| ∣ p + 1` via route B (Singer/`SL₂(p)` symplectic divisibility).
+      · -- (e3) conjunct 2: `|W₁| ∣ p + 1` via route B (Singer/`SL₂(p)` symplectic divisibility).
         haveI : Fact p.Prime := ⟨hp⟩
         have hPcard3 : Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 :=
           card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
