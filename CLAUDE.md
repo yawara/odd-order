@@ -12,11 +12,11 @@
 
 **現フェーズ (2026-07-16〜) の scope 正本 = ギャップ調査 note** [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) (3 冊の全 815 番号付き結果を列挙・被覆判定; 実作業ギャップ 214 件 + 特殊化債務 54 件)。レーン配分の正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。
 
-PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは PDF を直接読まず、まず該当の `.mmd` を grep / Read してトークン効率を上げる。
+PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは、まず該当の `*.pdftotext.txt` (Peterfalvi は `references/peterfalvi/pdftotext/*.txt`) を grep / Read し、記号・式・仮定は PDF ページ画像で確定する。**Nougat は新規抽出に使わない (ユーザー方針 2026-07-18)**。既存 `.mmd` は履歴として保持するが、原文照合の正本にしない。
 
 **⚠ ただし normal / subnormal の判定に `.mmd` を使わない (2026-07-19 に監査で確定)**。Nougat は subnormal `⊲⊲` を単一の `⊲` に潰すので、**教科書が subnormal を要求する仮説を normal で形式化してしまう** (実害: Isaacs 9.13/9.21 の取り違え → Thm 9.10 が「書籍に gap がある」と誤診されて frontier 停止 = issue 1037。同型の誤った「書籍 gap」注記が 3 件混入 = issue 0125)。**判定には `pdftotext` 抽出を使う** — `references/{isaacs,bg,gorenstein}/*.pdftotext.txt` と `references/peterfalvi/pdftotext/*.txt` に生成済 (再生成は `pdftotext <book>.pdf <out>.txt`)。ここでは **`⊲⊲` → `«`、`⊲` → `<`** に落ちる。⚠ `«` は数字間だと中黒 `·` の OCR ノイズなので、**両側が大文字の部分群記号**であることを条件に絞る。最終的な決定打は `Read` で **PDF ページ画像**を見ること (Isaacs は PDF ページ = 書籍ページ + 13)。手順と実績は issue 9150 / [[mmd-collapses-subnormal-symbol]]。
 
-**Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`.mmd`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
+**Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`pdftotext`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
 
 ## 進捗の測り方 — 実質的証明の積み上げ (sorry 数ではない)
 
@@ -184,10 +184,10 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | `notes/` | ミニロードマップ・調査メモ |
 | `issues/` | ファイルベース issue (open は直下, `pending/` `closed/` で状態管理) |
 | `bin/` | 雑用スクリプト (`new-issue` 等) |
-| `references/` (gitignored) | PDF + Nougat 抽出 Markdown — 別 private リポ `odd-order-references` |
-| `references/{isaacs,bg}/*.{pdf,mmd}` | 教科書原典と抽出物 (フラット) |
-| `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/*.mmd` | Peterfalvi だけ章別 PDF を `pdf/` に集約 |
-| `references/README.md` | Nougat セットアップ・抽出手順 (GPU マシン用) |
+| `references/` (gitignored) | PDF + `pdftotext -layout` 抽出 text — 別 private リポ `odd-order-references` |
+| `references/{isaacs,bg,gorenstein}/*.pdf`, `*.pdftotext.txt` | 原典/補助原典と検索用 text (フラット) |
+| `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 |
+| `references/README.md` | 参照資料の配置・取得 provenance・`pdftotext` 手順 |
 
 ## ツールチェイン
 
