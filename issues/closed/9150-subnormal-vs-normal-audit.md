@@ -56,16 +56,34 @@ pdftotext references/isaacs/finite-group-theory.pdf - | grep -n "«"
 `Normal`/`IsSubnormal` トークンを拾う方式では、2.6 のように「S は subnormal だが
 M は minimal **normal**」という結果で M の binder を誤って拾う。**必ず statement を読む**。
 
-### BG / Peterfalvi
+### BG / Peterfalvi — 走査完了、**リスクなし**
 
-未走査。両書は subnormal の使用が少ないと見込まれるが要確認 (下記チェックリスト)。
+**Peterfalvi: subnormal を一切使っていない**。`«` は 90 行あるが全て OCR ノイズ
+(`≪` = much-less-than、または崩れ)。決め手は**記号に依存しない交差検証**で、
+**"subnormal" という語の出現が pdftotext / .mmd ともに 0 件**。⟹ 監査対象なし。
+
+**BG: 語の出現 8 件、いずれも地の文・証明内で、番号付き結果の仮説ではない**。
+- L607/610 = `⊲⊲` 記法の定義 + 「冪零群の任意の部分群は subnormal」の注意書き
+- L3359/3376、L6093/6105 = 証明の中の一歩
+- L8485/8955 = 記法一覧・索引
+
+`«` は BG では 40 行あるが、**大半は `σ` の OCR ノイズ** (`Hall «(M)-subgroup` = `Hall σ(M)-subgroup`)。
+真の `⊲⊲` は 3 箇所のみ (L606 定義 / L3609 "Since F is nilpotent, A ⊲⊲ F" / L3869 "Since R is a
+p-group, A ⊲⊲ R") で、いずれも証明内。
+
+⚠ **偽陽性の実例**: `Proposition 10.11(a)` が pdftotext で `K i «T` と出るため subnormal 候補に
+見えたが、PDF ページ画像 (p.78 = PDF p.91) で確認すると実体は **`K ∉ 𝒰`** (script U の非所属) で、
+subnormal とは無関係だった。**`«` を見たら必ずページ画像で確認する**という本 issue の方針どおり。
+
+⟹ **normal/subnormal 取り違えのリスクは Isaacs に固有**。BG / Peterfalvi では statement レベルの
+監査対象は存在しない。
 
 ## やること
 
 - [x] Isaacs 全体を `«` で走査し、`⊲⊲` を含む定理番号を列挙する。(28 件)
 - [x] 各番号について repo の対応宣言の binder が `IsSubnormal` か `Normal` かを照合。(23 件確認、MISMATCH 2)
-- [ ] BG / Peterfalvi でも同様の走査 (両書とも subnormal を使う箇所は少ないはずだが要確認)。
-- [ ] 取り違えが見つかったら、**normal 版は消さず**に subnormal 版を追加する
+- [x] BG / Peterfalvi でも同様の走査 → **リスクなし** (Pf は語の出現 0、BG は証明内のみ)。
+- [x] 取り違えが見つかったら、**normal 版は消さず**に subnormal 版を追加する
       (normal 版の方が bound が鋭い等、独立の価値があるケースがある — 実例:
       Isaacs 9.13 の repo 版は `|G| ≤ |Z(S^∞)||Aut(S^∞)|` で書籍の階乗版より鋭い)。
 - [x] 発見をレーンに配分 → **issue 0125** (lane a: Isaacs 全域)。
