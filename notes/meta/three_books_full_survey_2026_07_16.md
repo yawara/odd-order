@@ -435,6 +435,16 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### BG App.E — BG Appendix E: Further Results of Feit and Thompson
 
+> **⚠ 2026-07-18 追記 (lane c) — Hall collecting process 着手 (issue 9132)**: 新 leaf
+> `GroupTheory/HallCollection.lean` (sorry 0、全 axiom-clean) に**収集過程の枠組み**を landing —
+> 1 ステップ漸化式 `pow_succ_collect` (公理 propext のみ)、深さ管理 (`[γᵢ,γⱼ] ≤ γ_{i+j}`)、
+> 尾部の崩壊/吸収補題、および `exists_hallCollection_of_residue` (固定 `n` の E.1 は `γ_n` を法とする
+> 合同そのもの = 隠れた exactness を仮定していない保証)。さらに `AppE.hallCollection_of_class_le_three`
+> で **`γ₃=1` なら全 `n` について E.1** を証明 (既存 class≤2 を真に包含、Pascal 分割
+> `C(n+1,3)=C(n,2)+C(n,3)` が weight 3 の二項係数を出す鍵)。⚠ 一般形 `hallCollection` の statement は
+> **逐語不変** (弱化なし)、sorry 22→22。残る唯一の障害 = 自由冪零群の basic-commutator 基底 +
+> 収集係数の多項式性 (Hall 多項式/Lazard) — mathlib に不在。詳細 = issue 9132。
+>
 > **⚠ 2026-07-18 更新 (lane c)**: 163 行の opaque-Prop scaffold を **482 行の book-strength 記述に
 > de-opacify** (opaque フィールド 0 / `_holds` 0 をコメント除去後に確認)。**sorry-free で証明**:
 > `hallCollection_of_class_le_two` (E.1 class≤2)、`pow_mul_of_class_le_two` (E.2(b) class≤2)、

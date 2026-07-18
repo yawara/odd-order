@@ -135,6 +135,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.GroupTheory.HallCollection
+import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.BG.AppE_FurtherResults
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -9468,3 +9470,41 @@ process for general class `≤ p−1` (issue 3021).
   injectivity from regularity, `q ∣ |Aut R₀| = p−1`, then `q` odd). -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection_of_class_le_two
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_A_dvd_half_p_sub_one
+
+/-! **Hall's collecting process — framework + class ≤ 3** (`GroupTheory.HallCollection`,
+`BG.AppE_FurtherResults`, issue 9132).  The general BG E.1 (`AppE.hallCollection`) remains honestly
+sorried; its single obstruction is the basic-commutator basis of `γ_k/γ_{k+1}` for free nilpotent
+groups plus polynomiality of the collection coefficients (Hall polynomials/Lazard) — absent from
+mathlib.  Proved sorry-free here:
+
+* `pow_succ_collect` — the one-step collection recursion
+  `x^n y^n = (xy)^n T ⟹ x^(n+1) y^(n+1) = (xy)^(n+1) * (⁅x⁻¹,((xy)^n)⁻¹⁆ * T)^y` (the engine).
+* `exists_hallCollection_of_residue` — E.1 for fixed `n` is exactly a congruence mod `γ_n`
+  (the top slot absorbs any residue), so no hidden exactness is being assumed.
+* `AppE.hallCollection_of_class_le_three` — **BG E.1 for all `n` whenever `γ₃ = 1`**, strictly
+  subsuming the previous class-≤2 case; the Pascal split `C(n+1,3) = C(n,2)+C(n,3)` is what makes
+  the binomial exponents come out in Hall's shape at weight 3. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.pow_succ_collect
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_hallCollection_of_residue
+#assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection_of_class_le_three
+
+/-! **CN-group structure: the 3-step dichotomy, Tier A + B** (`GroupTheory.CNGroupStructure`,
+issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
+copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
+`O_{p,p',p}` did not exist in repo or mathlib and are built here.  The dichotomy itself
+(`oPiCore_isSylow_or_isThreeStepGroup`, Cor 1.6) is honestly stated and still sorried — its
+blockers (Gorenstein Thm 5.3.5 coprime action, Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are
+recorded in issue 9133.  Proved sorry-free here:
+
+* `IsThreeStepGroup.oPiCore_pPrime_eq_bot` — `O_{p'}(G) = 1`;
+* `IsThreeStepGroup.isPGroup_quotient` / `nontrivial_quotient` — `G/O_{p,p'}(G)` a nontrivial
+  `p`-group.  **These two are exactly what BG App.D's D.1 consumes** from "the definition of a
+  3-step group and a short argument".
+* `commute_of_cn_of_commute_ne_one` — **Gorenstein Ch.12 §1 Lemma 1.2**, proved for arbitrary
+  `p`- and `q`-subgroups (a generalization of the book's Sylow statement, not a weakening).
+* `IsThreeStepGroup.isSolvable` — the solvability half of Lemma 1.4. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.oPiCore_pPrime_eq_bot
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isPGroup_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.commute_of_cn_of_commute_ne_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isSolvable
