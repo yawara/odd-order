@@ -52,3 +52,25 @@ full build green + AxiomsCheck OK。
 - OddOrder/Isaacs/Ch03_SplitExtensions/Basic.lean:100-110
 - mathlib `SemidirectProduct.mulEquivSubgroup`, `Subgroup.IsComplement'`
 - 先行例: Lem 3.11 の一般化 (`3cff7a105`) — 環境の仮定を落として書籍形に寄せた
+
+---
+
+## 完了 (2026-07-19)
+
+書籍 p.70 の two-abstract-groups 形を新 leaf
+`OddOrder/Isaacs/Ch03_SplitExtensions/SplitExtensionUniqueness.lean` に実装。
+
+| 宣言 | 役割 |
+|---|---|
+| `conjAutHom N H : H →* MulAut N` | `N ◁ G` への `H` の共役作用 (mathlib `normalizerMonoidHom` の仮定特殊化) |
+| `closure_union_eq_top_of_isComplement'` | `closure (N ∪ H) = ⊤` |
+| `monoidHom_eq_of_eqOn_isComplement'` | 一意性部分 (補集合対上で一致する `G →* G₀` は一致) |
+| `existsUnique_mulEquiv_of_isComplement'` | **Lem 3.1 完全形** (`∃! θ : G ≃* G₀`, `α`/`β` を延長) |
+
+- 存在 = `G ≃* N ⋊ H ≃* N₀ ⋊ H₀ ≃* G₀` (`SemidirectProduct.mulEquivSubgroup` ×2 +
+  `SemidirectProduct.congr`; congr の仮説が両立条件そのもの)。
+- 一意性 = `IsComplement'.sup_eq_top` → `MonoidHom.eq_of_eqOn_dense`。
+- チェックリスト「既存 `mulEquivSubgroupOfComplement` の位置づけ」: 下流参照 0 件かつ
+  mathlib `SemidirectProduct.mulEquivSubgroup` と引数・型が同一の純粋リネームだったので
+  **削除** (CLAUDE.md ラッパー方針)。対応は新 leaf の docstring と `Basic.lean` の注記に記録。
+- AxiomsCheck に `existsUnique_mulEquiv_of_isComplement'` を登録。sorry-free / 標準 3 公理のみ。

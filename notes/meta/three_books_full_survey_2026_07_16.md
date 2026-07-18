@@ -85,6 +85,8 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 > 3.35/3.36 = `CyclicExtensions.lean` (いずれも AxiomsCheck 入り)。
 > → Ch.3 の残作業は **特殊化債務のみ** (Lem 3.1 / Lem 3.11)。Isaacs 全章は現在 **sorry ゼロ**なので、
 > sorry 数はこの章の残作業の指標にならない (未形式化項目は sorry を生まない)。
+> **2026-07-19: その 2 件とも解消済** (Lem 3.11 = `3cff7a105`、Lem 3.1 = issue 1039)。
+> ⇒ **Isaacs Ch.3 は本 survey の全項目クローズ**。レーン a の次の frontier は Ch.4 Mann クラスタ。
 
 
 > Ch.3 is very thoroughly covered: 27 of 36 numbered results are fully formalized or mathlib-covered, including the FT-critical Hall E/C theorems (plus Hall D, which the book leaves as Problem 3C.1), Hall-Higman 1.2.3, Schur-Zassenhaus (existence = mathlib; the conjugacy Theorem 3.12 is repo-proved at full strength for both solvability cases, with the stronger conclusion that the conjugator lies in N), and the whole Glauberman coprime-action "Tier 1" (3.23-3.25, 3.27-3.30) — which lives in OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean and OddOrder/Mathlib/SchurZassenhausConj.lean, not in the Ch03 directory. The main gaps are (a) the two Burnside-gated solvability criteria 3.15 and 3.17, whose placeholder file is still intentionally empty even though Burnside p^a q^b is now proved sorry-free in Ch.7 (burnside_p_pow_q_pow), so both are unblocked; and (b) the coprime-orbit "Tier 2" cluster 3.26, 3.31-3.34 (class bijection, Hartley-Turull, orbit-size product), entirely missing though all Glauberman ingredients exist. Four results are weaker than the book: 3.22 proves only a commutator containment rather than genuine pi-length <= 1 (BG's HasPiLengthOne def exists with no theorem), 3.16 lacks the |H:H∩K|=|G:K| clause, 3.35 has only the uniqueness half, and 3.36's existence statement omits the |G/N|=m clause (degenerate witnesses satisfy it). The crossed-homomorphism machinery 3.6/3.7 was never formalized because mathlib's QuotientDiff proof route made it unnecessary; pi-Hall/pi-separable theory is repo-built (IsHallSubgroup, IsPiSeparable via an upper pi-Fitting series) and is in places stronger than the book (e.g. a Hall-subgroup generalization of Cor 3.25 in BG §1). Slim verification pass (2026-07-16): all 15 flagged missing/partial labels were re-attacked by book-number and descriptive-content greps and every one stands — no status changed (Ch07/ForwardFromCh03.lean remains a docstring-only placeholder whose theorem signatures sit inside code fences; the only near-miss is a specialized extension-closure instance isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement noted under 3.18) — and the three most load-bearing formalized results (3.12 SZ-conjugacy, 3.13/3.14 Hall E/C, 3.21 Hall-Higman 1.2.3) were read in source and confirmed at full book strength.
@@ -109,7 +111,10 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Lem 3.1** Uniqueness of split extension given N, H and the action (unique iso ex — Repo/mathlib state the canonical internal form: N normal with complement K gives G ≅ N ⋊ K. The book's two-abstract-groups form (compatible isos N≅N₀, H≅H₀ exte…
+- ~~**Lem 3.1**~~ **✅ 2026-07-19 解消 (issue 1039)** — 書籍 p.70 の two-abstract-groups 形
+  `existsUnique_mulEquiv_of_isComplement'` を新 leaf `Ch03_SplitExtensions/SplitExtensionUniqueness.lean`
+  に実装 (∃! 込み, AxiomsCheck 入り)。旧 internal form `mulEquivSubgroupOfComplement` は
+  mathlib `SemidirectProduct.mulEquivSubgroup` の純粋リネーム (下流 0 件) ゆえ削除。
 - **Lem 3.11** Solvable minimal normal subgroup is abelian; if finite, elementary abe — Stated for a finite solvable ambient G (book: arbitrary G with M solvable minimal normal, plus an infinite-abelian clause). Covers every downstream use in the b…
 
 ### Isaacs Ch.4 — Isaacs Ch.4 Commutators
