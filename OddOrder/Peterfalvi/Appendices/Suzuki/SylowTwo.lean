@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Basic
 
 /-!
 # Peterfalvi Part II, Ch. I §2 Corollary: Sylow 2-subgroups of Q

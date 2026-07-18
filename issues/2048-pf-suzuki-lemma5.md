@@ -32,7 +32,13 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         involution 上の正則性と `|K| = q - 1` を証明する
   - [x] quotient の固定点自由性から summand 上の推移性・単純性・
         distinct summands の complementarity を得る一般 bridge を証明する
-  - [ ] `Z(Q) = Q₀` を確立し、Higman Lemmas 11--12 (pp. 89--92) から
+  - [x] actual `K` action を `Q/Q₀` へ降ろし、固定点自由性と
+        order-`q` invariant summand の推移性・単純性を証明する
+  - [x] Higman p. 79 の easy direction: 有限 Suzuki `2`-groupの全 involution が
+        中心に入り、involution と単位元からなる具体的 elementary-abelian
+        `2`-subgroupを構成する
+  - [ ] Higman Lemmas 4, 6--9 と分類終端を形式化して中心の逆包含を証明し、
+        `Z(Q) = Q₀` を確立する。その後 Lemmas 11--12 (pp. 89--92) から
         actual two-summand split を構成する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する

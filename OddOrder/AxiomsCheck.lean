@@ -227,10 +227,12 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
@@ -7961,6 +7963,23 @@ built into the subgroup inclusion in `MulAut`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
 
+/-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
+involution is central, and the involutions together with the identity form a
+concrete elementary-abelian `2`-subgroup.  The reverse identification with the
+whole center remains part of Higman's later structural argument. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutions_subset_center
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutionSubgroup_isElementaryAbelian
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.mem_involutionSubgroup_iff_sq_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutions_eq_involutionSubgroup_diff_identity
+
 /-! **Peterfalvi Appendix III, Lemma 1(b)**: every quadratic map over `F₂`
 has an explicit central extension whose squaring map is the original map. -/
 
@@ -8011,6 +8030,23 @@ orders are complementary. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.isCompl_of_distinct_invariant_of_transitive_card
+
+/-! In the actual Part II setting, `|K|` and `|Q₀|` are coprime and the
+induced action on `Q / Q₀` is fixed-point-free.  Hence every invariant
+order-`|Q₀|` subgroup is transitive on its nonidentity elements and simple as
+a `K`-group. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_coprime_card_Q0
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQByKQuotientQ0_fixed_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.quotientQ0_restrict_transitive_of_card_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.quotientQ0_invariant_eq_bot_or_top_of_card_eq
 
 /-! **Peterfalvi Part II, Ch. I §3 Lemma 5**: invariant `Q₀`-cosets and
 coprime fixed-point lifting give the free action on `K`-subgroups and the
