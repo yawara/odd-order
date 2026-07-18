@@ -315,8 +315,9 @@ end
 
 section /- 9B: Theorem 9.21 (Schenkman 一般形) の subtype transport 補助 -/
 
-/-- `C_G(S) = ⊥`, `S ≤ K` ⇒ `C_{↥K}(S.subgroupOf K) = ⊥`. -/
-private theorem centralizer_subgroupOf_eq_bot {K S : Subgroup G} (hSK : S ≤ K)
+/-- `C_G(S) = ⊥`, `S ≤ K` ⇒ `C_{↥K}(S.subgroupOf K) = ⊥`.
+(9.13 subnormal 版が `↥N_G(S^∞)` で使うため public.) -/
+theorem centralizer_subgroupOf_eq_bot {K S : Subgroup G} (hSK : S ≤ K)
     (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
     Subgroup.centralizer ((S.subgroupOf K : Subgroup ↥K) : Set ↥K) = ⊥ := by
   rw [eq_bot_iff]

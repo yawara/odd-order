@@ -15,10 +15,12 @@ Isaacs §9B の capstone (p. 271, mmd L5006)。`Z(G) = 1` ⇒ automorphism tower
 
 - 9.11 (`InnerAutomorphisms.lean`): Inn(G) ◁ Aut(G), Z(G)=1 ⇒ C_{Aut}(Inn)=1, Z(Aut)=1。
 - 9.12 (`AutTowerBounds.lean` `centralizer_eq_bot_of_chain`): chain の centralizer 消失。
-- 9.13 (`OrderBound.lean` `card_le_of_normal_of_centralizer_eq_bot`):
-  **S ◁ G**, C_G(S)=1 ⇒ |G| ≤ |Z(S^∞)|·|Aut(S^∞)| (normal 版, divisibility も)。
+- 9.13 (`OrderBound.lean`): **S ◁◁ G** (原典どおり), C_G(S)=1 ⇒
+  |G| ≤ (|Z(S^∞)|·|Aut(S^∞)|)! (`card_le_factorial_of_isSubnormal`, 2026-07-18)。
+  normal 特殊化 `card_le_of_normal_of_centralizer_eq_bot` は階乗なしでより鋭い。
 - 9.14 (`AutTowerBounds.lean`): N ◁ G, C_G(N)≤N ⇒ |G| ∣ |Z(N)||Aut(N)| / |N|!。
-- 9.21/9.22 (`Schenkman.lean`): Schenkman **S ◁ G**, C_G(S)=1 ⇒ C_G(S^∞) ≤ S^∞。
+- 9.21/9.22 (`Schenkman.lean`): Schenkman **S ◁◁ G** (原典どおり), C_G(S)=1 ⇒
+  C_G(S^∞) ≤ S^∞ (`centralizer_nilpotentResidual_le_of_isSubnormal`, 2026-07-18)。
 - 9.16/9.18 (`NilpotentResidual.lean`/`SubnormalSocle.lean`): **S ◁◁ G** ⇒
   F(G), E(G) ≤ N_G(S^∞) (subnormal 版, F* 経由 bound 用)。
 
@@ -50,7 +52,15 @@ subgroup `S̄`" と明言しているため、本 repo では正しく `IsSubnor
 ## やること
 
 - [x] normal/subnormal ギャップを原文精読で確定 → **OCR 崩れと判明** (上記)。
-- [ ] **(A) 9.21 (Schenkman) を subnormal 版に一般化** (`Schenkman.lean` `schenkman_aux`)。
+- [x] **(A) 9.21 (Schenkman) を subnormal 版に一般化 — 完了 (2026-07-18)**
+      `centralizer_nilpotentResidual_le_of_isSubnormal`. 実装は下記の見込みどおり
+      (normality を `S ⊔ C = ⊤` 分岐へ移動 / `hinterval` から `S.Normal` を導出 /
+      Dedekind は `C` 側 normal の姉妹形 `inf_sup_eq_sup_inf_of_normal_right_of_le` を新設)。
+      normal 版は特殊化として残置。
+
+  <details><summary>当初の実装計画 (記録)</summary>
+
+- [x] ~~**(A) 9.21 (Schenkman) を subnormal 版に一般化**~~ (`Schenkman.lean` `schenkman_aux`)。
       現行の帰納核は `S.Normal` を要求。書籍 p. 283 の proof は元々 subnormal 用で、
       本 repo が normal に落としたことで下記のステップが**消えて**いる:
 
@@ -79,7 +89,23 @@ subgroup `S̄`" と明言しているため、本 repo では正しく `IsSubnor
          (`H ⊓ (S·C) = S·(H ⊓ C)`、集合積では normality 不要) を別途用意する。
          ※ この分岐では `C ◁ G` は言える (`S` も `C` も `C` を正規化し `S ⊔ C = ⊤`)。
 
-- [ ] **(B) 9.13 を subnormal 版で証明** (`OrderBound.lean`)。
+  </details>
+
+- [x] **(B) 9.13 を subnormal 版で証明 — 完了 (2026-07-18)**:
+      `card_le_factorial_of_isSubnormal` (`OrderBound.lean`)。
+      `S ◁◁ G`, `C_G(S) = 1` ⇒ `|G| ≤ (|Z(S^∞)|·|Aut(S^∞)|)!`。
+      中間段 `card_normalizer_nilpotentResidual_le` (`|N_G(S^∞)| ≤ |Z(S^∞)|·|Aut(S^∞)|`)
+      を分けて置いた。書籍 p.281 の F* 経由ルートそのまま:
+      subnormal 9.21 を `↥N_G(S^∞)` で適用 → 9.14 → 9.16/9.18 で `F*(G) ≤ N_G(S^∞)`
+      → 9.8 + 9.14 階乗形。
+      副産物: `mulAutEquivCongr` (`AutTowerBounds.lean`) — `e : A ≃* B` から
+      `Aut(A) ≃ Aut(B)` (mathlib に `MulAut` の同型同変性が無い; 9.10 でも使う)。
+      `centralizer_subgroupOf_eq_bot` を `private` から public 化 (ファイル跨ぎ利用)。
+      **normal 版 `card_le_of_normal_of_centralizer_eq_bot` は階乗なしでより鋭いので残置。**
+
+  <details><summary>当初の実装計画 (記録)</summary>
+
+- [x] ~~**(B) 9.13 を subnormal 版で証明**~~ (`OrderBound.lean`)。
       現行 `card_le_of_normal_of_centralizer_eq_bot` は 9.14 を `N = S^∞` に**直接**当てる
       近道 (`S^∞ ◁ G` が要る) なので normal 専用。**現行版はより鋭い bound
       (`|G| ≤ |Z(S^∞)||Aut(S^∞)|`, 階乗なし) なので残す**。
@@ -91,7 +117,9 @@ subgroup `S̄`" と明言しているため、本 repo では正しく `IsSubnor
       3. `C_G(F*(G)) ≤ F*(G)` (9.8) + 9.14 ⇒ `|G| ≤ |F*(G)|!`。
       ⇒ `|G| ≤ (|Z(S^∞)|·|Aut(S^∞)|)!` (階乗付き, `S` の同型型のみに依存)。
 
-- [ ] **(C) tower 本体 9.10**:
+  </details>
+
+- [ ] **(C) tower 本体 9.10** — ここが残る frontier。(A)(B) が揃ったので gate は無い:
       - recursive type family `autTowerType : ℕ → Type u` (`0 ↦ G`, `n+1 ↦ MulAut (·)`)
         + 各段の `Group` instance (再帰) + centerless の伝播 (9.11d)。
       - 埋め込み鎖 `G_i ↪ G_{i+1}` (Inn) と `G_1 ◁◁ G_i`、`C_{G_i}(G_1) = 1` (9.12)。

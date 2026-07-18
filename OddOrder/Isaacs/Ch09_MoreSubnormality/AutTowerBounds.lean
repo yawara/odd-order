@@ -165,6 +165,19 @@ theorem mulAutPermNeOne_injective (M : Type*) [Group M] :
   · exact congrArg Subtype.val
       (congrArg (fun p : Equiv.Perm {y : M // y ≠ 1} => p ⟨x, hx⟩) h)
 
+/-- 群同型 `e : A ≃* B` が誘導する `Aut(A) ≃ Aut(B)` (`f ↦ e ∘ f ∘ e⁻¹`).
+
+mathlib に `MulAut` の同型同変性は無い (`AlgEquiv.autCongr` の群版が欠けている).
+位数の比較にしか使わないので `MulEquiv` でなく `Equiv` で十分.
+
+**用途**: Thm 9.13 subnormal 版で `↥(S^∞ ∩ N) ≃* ↥(S^∞)` に沿って `|Aut(·)|` を
+読み替える. Thm 9.10 (automorphism tower) でも各段の `Aut` の比較に使う. -/
+def mulAutEquivCongr {A B : Type*} [Group A] [Group B] (e : A ≃* B) : MulAut A ≃ MulAut B where
+  toFun f := (e.symm.trans f).trans e
+  invFun g := (e.trans g).trans e.symm
+  left_inv f := by ext x; simp
+  right_inv g := by ext x; simp
+
 /-- `|Aut(M)| ∣ (|M| − 1)!` (`M ∖ {1}` への忠実作用 + Lagrange). -/
 theorem card_mulAut_dvd_factorial_pred (M : Type*) [Group M] [Finite M] :
     Nat.card (MulAut M) ∣ (Nat.card M - 1)! := by
