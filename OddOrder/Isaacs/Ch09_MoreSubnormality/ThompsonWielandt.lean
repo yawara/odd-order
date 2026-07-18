@@ -89,6 +89,11 @@ def NoNormalInSupergroup (H K D : Subgroup G) : Prop :=
   ∀ L : Subgroup G, H < L ∨ K < L →
     ∀ N : Subgroup G, N ≠ ⊥ → N ≤ D → ¬ (L ≤ Subgroup.normalizer (N : Set G))
 
+/-- 仮説は `H`, `K` について対称. -/
+theorem NoNormalInSupergroup.symm {H K D : Subgroup G} (hyp : NoNormalInSupergroup H K D) :
+    NoNormalInSupergroup K H D :=
+  fun L hL N hN hND => hyp L hL.symm N hN hND
+
 /-- 仮説から: `N ≤ D` が nonidentity で `H` に normal (`H ≤ N_G(N)`) なら `N_G(N) = H`
 (さもなくば `N_G(N) ⊋ H` が仮説に反する). -/
 theorem normalizer_eq_left_of_noNormal {H K D : Subgroup G}
@@ -184,6 +189,29 @@ theorem opiCoreInG_le_normalizer_pResidualOf_relCore [Finite G] {p : ℕ} [Fact 
     (GroupTheory.le_normalizer_opiCoreInG _ H)
     (relCore_le_normalizer_relCore_thompsonWielandtCore H K)
     (GroupTheory.isPGroup_opiCoreInG_singleton H)
+
+/-- Step B の `K` 版: `Y = O^p(V) ≠ 1` ならば `N_G(Y) = K`. -/
+theorem normalizer_pResidualOf_relCore_eq_right (p : ℕ)
+    (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hY : pResidualOf p (relCore K (thompsonWielandtCore H K)) ≠ ⊥) :
+    Subgroup.normalizer
+        (pResidualOf p (relCore K (thompsonWielandtCore H K)) : Set G) = K := by
+  have h := normalizer_pResidualOf_relCore_eq K H p
+    (by rw [inf_comm]; exact hyp.symm : NoNormalInSupergroup K H (K ⊓ H))
+    (by rwa [thompsonWielandtCore_comm])
+  rwa [thompsonWielandtCore_comm] at h
+
+/-- **Thm 9.24 Case 2 の Step C** (書籍 p. 284): `Y = O^p(V) ≠ 1` ならば
+`P = O_p(H) ≤ D = H ⊓ K`.
+
+Step A で `P ≤ N_G(Y)`, Step B (K 版) で `N_G(Y) = K`, また `P ≤ H` は自明. -/
+theorem opiCoreInG_le_inf [Finite G] {p : ℕ} [Fact p.Prime]
+    (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hY : pResidualOf p (relCore K (thompsonWielandtCore H K)) ≠ ⊥) :
+    GroupTheory.opiCoreInG ({p} : Set ℕ) H ≤ H ⊓ K :=
+  le_inf (GroupTheory.opiCoreInG_le _ H)
+    ((opiCoreInG_le_normalizer_pResidualOf_relCore H K).trans_eq
+      (normalizer_pResidualOf_relCore_eq_right H K p hyp hY))
 
 end
 
