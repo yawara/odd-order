@@ -44,6 +44,13 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         `u ∉ A` に対する `u² ∈ A²` と `[u,A] ≤ A⁴` の同時成立を排除する
   - [ ] Higman Lemma 3 (pp. 83--84): normal invariant subgroup `C` が `A` を
         cover し `Φ(C) = Φ(A)` なら `exp(A) ≤ 4` を証明する
+    - [x] normal actor-invariant subgroup の subtype 上で honest な cover を定義し、
+          `Φ(C) ≤ A` と原文 p. 83 の `Φ(C) = A ∨ Φ(C) = Φ(A)` を証明する
+    - [x] `Φ(C) = Φ(A)` から `[C,A] ≤ A²`、`C² ≤ A²`、
+          `[C,A²] ≤ A⁴` を ambient subgroup として証明する
+    - [ ] homocyclic 座標上で `α ≡ 1 mod A²` から `α = 1 - 2ν` を lift し、
+          commuting idempotent/common-eigenvector 論と Lemma 2 を接続して
+          `exp(A) ≤ 4` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
@@ -74,6 +81,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/peterfalvi/pdftotext/08.0_pp_139_143_On_Suzuki_2-Groups.txt`
 - `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`
 - `references/higman/suzuki-2-groups.pdftotext.txt`
+- `references/higman/p83_84_lemmas_1_3.layout.txt`
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
