@@ -4972,6 +4972,10 @@ set_option linter.style.longLine false in
 -- κ/κ'-decompose `a = a_κ·a_{κ'}`, conjugate `a_κ` into `K`, then `a_{κ'} ∈ M' ⊓ (K ⊔ K*) = K*`.
 -- Discharges conjunct 10 (`A_0(M) − A(M)` TI) of `theoremC_paired_structure`.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.a0_minus_a_subset_conj_zTilde
+-- BG Theorem C(9), the full identity `A_0(M) − A(M) = 𝒞_M(Ẑ)` (`S16_MainResults`): completes C(9) by
+-- adding the reverse `⊇` inclusion `𝒞_M(Ẑ) ⊆ A_0(M) − A(M)` (via `zTilde ⊆ A_0(M) − A(M)`, transported
+-- by `M`-conjugation) to the existing `⊆` half.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.a0_minus_a_eq_conj_zTilde
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
