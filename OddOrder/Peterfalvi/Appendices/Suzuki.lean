@@ -25,6 +25,9 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)

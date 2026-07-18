@@ -12,10 +12,12 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
@@ -26,6 +28,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
@@ -133,6 +136,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.GroupTheory.HallCollection
+import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.BG.AppE_FurtherResults
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -195,6 +200,9 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -235,7 +243,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 9400
+set_option linter.style.longFile 9600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -276,6 +284,23 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_map_of_surjective
 #assert_only_allowed_axioms Subgroup.primeComplementResidualQuotientEquiv
+
+/-! Standard upper-unipotent root coordinates and the distinguished order-three
+product for the PSL(2,q) branch of Peterfalvi Part II, Ch. I section 3,
+Proposition 1(c). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSubgroup_isElementaryAbelian
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_rootSubgroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.canonicalT_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.canonicalS_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.orderOf_canonicalS_mul_T
 
 -- Quadratic finite-field and Hermitian trace infrastructure for the PSU(3,q) target.
 #assert_only_allowed_axioms
@@ -392,6 +417,25 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardPermGroup_infinityStabilizer_isPretransitive
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardPermGroup_isMultiplyPretransitive
+
+/-! The central square-one line and distinguished order-three pair in the
+Hermitian root group for the PSU(3,q) branch of Peterfalvi Part II, Ch. I,
+section 3, Proposition 1(c). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.sq_eq_one_iff_fst_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.centerLine_le_center
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.natCard_centerLine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.not_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.centralInvolution_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standard_braid
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standard_st_order
 
 -- Faithful PSU root--torus semidirect product and its standard Borel range.
 #assert_only_allowed_axioms
@@ -689,6 +733,22 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBruhatDecomposition
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_eq_infinityStabilizer
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardPermGroup
+
+/-! The exact standard root subgroup and distinguished order-five pair for the
+Suzuki branch of Peterfalvi Part II, Ch. I section 3, Proposition 1(c). -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootSubgroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootEquivStandardRoot
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_rootGroup_eq_field_sq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardRootSubgroup_eq_field_sq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardRootSubgroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.centerLine_eq_sq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_mem_standardRootSubgroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_sq
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardRootInvolution_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.orderOf_standardRootInvolution_mul_weylElement
 
 -- Perfectness, solvable Borel stabilizer, and simplicity of the standard Suzuki group.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_eq_one_iff
@@ -7683,6 +7743,64 @@ restricted action has intrinsic core equal to the centralizer of `L cap Q` in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_le_cV
 
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, quotient carrier:
+dividing the centralizer action by its exact kernel transports (A1), makes
+the action faithful (A2), and preserves the four-subgroup required by (A3). -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientHypothesisA1
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotient_faithful
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotient_twoRankGeTwo
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientHypothesis
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_centralizerActionQuotient_lt
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, induction bridge:
+the concrete three-case conclusion of Suzuki's Theorem A makes the quotient
+root group a `2`-group, and the explicit equivalence `C_Q(X) ≃ Q̄` transports
+that conclusion back to the original centralizer. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.TheoremAConclusion.Q_and_residual
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQQuotientEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_cQ_isPGroup_of_quotient
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_cQ_isPGroup_of_induction
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, distinguished-pair
+transport and order lift: the quotient pair is the image of the original
+pair, and the odd action kernel does not change the order of `st`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.orderOf_mul_eq_prime_of_pow_mem_odd_kernel
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.V_le_centralizer_structureConjugator
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.distinguishedInvolution_mem_centralizer_of_le_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mem_centralizer_of_le_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotient_distinguishedPair_eq_images
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_quotient_pow
+
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
 retains the source order through `N_G(X) = C_G(X) N_D(X)`,
@@ -7721,7 +7839,19 @@ for `L = C_G(X)` and `F₀ = ⟨C_Q(X)^L⟩`, the action kernel intersects
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_subgroupOf_normalClosure_cQ_eq_center
 
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_centralizer_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sylow_two_le_cQ
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sylow_two_eq_cQ_of_isPGroup
+
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerResidualQuotientEquiv_of_sylow
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerResidualQuotientEquiv
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
@@ -9347,3 +9477,41 @@ process for general class `≤ p−1` (issue 3021).
   injectivity from regularity, `q ∣ |Aut R₀| = p−1`, then `q` odd). -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection_of_class_le_two
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_A_dvd_half_p_sub_one
+
+/-! **Hall's collecting process — framework + class ≤ 3** (`GroupTheory.HallCollection`,
+`BG.AppE_FurtherResults`, issue 9132).  The general BG E.1 (`AppE.hallCollection`) remains honestly
+sorried; its single obstruction is the basic-commutator basis of `γ_k/γ_{k+1}` for free nilpotent
+groups plus polynomiality of the collection coefficients (Hall polynomials/Lazard) — absent from
+mathlib.  Proved sorry-free here:
+
+* `pow_succ_collect` — the one-step collection recursion
+  `x^n y^n = (xy)^n T ⟹ x^(n+1) y^(n+1) = (xy)^(n+1) * (⁅x⁻¹,((xy)^n)⁻¹⁆ * T)^y` (the engine).
+* `exists_hallCollection_of_residue` — E.1 for fixed `n` is exactly a congruence mod `γ_n`
+  (the top slot absorbs any residue), so no hidden exactness is being assumed.
+* `AppE.hallCollection_of_class_le_three` — **BG E.1 for all `n` whenever `γ₃ = 1`**, strictly
+  subsuming the previous class-≤2 case; the Pascal split `C(n+1,3) = C(n,2)+C(n,3)` is what makes
+  the binomial exponents come out in Hall's shape at weight 3. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.pow_succ_collect
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_hallCollection_of_residue
+#assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection_of_class_le_three
+
+/-! **CN-group structure: the 3-step dichotomy, Tier A + B** (`GroupTheory.CNGroupStructure`,
+issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
+copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
+`O_{p,p',p}` did not exist in repo or mathlib and are built here.  The dichotomy itself
+(`oPiCore_isSylow_or_isThreeStepGroup`, Cor 1.6) is honestly stated and still sorried — its
+blockers (Gorenstein Thm 5.3.5 coprime action, Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are
+recorded in issue 9133.  Proved sorry-free here:
+
+* `IsThreeStepGroup.oPiCore_pPrime_eq_bot` — `O_{p'}(G) = 1`;
+* `IsThreeStepGroup.isPGroup_quotient` / `nontrivial_quotient` — `G/O_{p,p'}(G)` a nontrivial
+  `p`-group.  **These two are exactly what BG App.D's D.1 consumes** from "the definition of a
+  3-step group and a short argument".
+* `commute_of_cn_of_commute_ne_one` — **Gorenstein Ch.12 §1 Lemma 1.2**, proved for arbitrary
+  `p`- and `q`-subgroups (a generalization of the book's Sylow statement, not a weakening).
+* `IsThreeStepGroup.isSolvable` — the solvability half of Lemma 1.4. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.oPiCore_pPrime_eq_bot
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isPGroup_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.commute_of_cn_of_commute_ne_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isSolvable

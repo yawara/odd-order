@@ -46,11 +46,46 @@ BG App.E の E.1 (Hall collection 公式) の一般形。現在 `AppE_FurtherRes
 - `GroupTheory.Omega.pow_eq_one_of_class_le_two`、class≤3 collection 公式 (`S04_SmallRankBasic.lean`)。
 - `Isaacs/Ch04_Commutators/CommutatorBasics.lean` の交換子基本補題群。
 
+## 進捗 (2026-07-18): 枠組み + class ≤ 3 まで landing、一般形は障害を特定して継続中
+
+**新 leaf `OddOrder/GroupTheory/HallCollection.lean` (249 行、sorry 0、全 axiom-clean)**:
+- `hallTail` — 順序付き尾部 `c₂^{C(n,2)}⋯cₙ^{C(n,n)}` (旧 `AppE.collectionTail` と**定義が字面まで同一**)。
+  崩壊/吸収補題: `hallTail_block_eq_one` / `_eq_of_eq_one_of_three_le` / `_eq_of_eq_one_of_four_le` /
+  `hallTail_eq_prefix_mul_top` (最上位スロットの指数は `C(n,n)=1`)。
+- **`pow_succ_collect`** — 収集の 1 ステップ漸化式 (エンジン):
+  `x^n y^n = (xy)^n T ⟹ x^(n+1) y^(n+1) = (xy)^(n+1) * (⁅x⁻¹,((xy)^n)⁻¹⁆ * T)^y`。**公理は propext のみ**。
+- 深さ管理: `conj_mem_lowerCentralSeries` / `pow_succ_collect_mem` /
+  `commutatorElement_mem_lowerCentralSeries_add` (`[γᵢ,γⱼ] ≤ γ_{i+j}`)。
+- **`exists_hallCollection_of_residue`** — 固定 `n` の E.1 は `γ_n` を法とする合同そのもの
+  (最上位スロットが残差を吸収)。⟹ **隠れた exactness を仮定していないことの保証**。
+
+**`AppE.hallCollection_of_class_le_three`** — `γ₃ = 1` なら **全 `n` について E.1** が成立。
+既存 class≤2 を真に包含。`c₂ = ⁅y,x⁆⁻¹(d₁d₂²)⁻¹`, `c₃ = (d₁d₂²)⁻¹`, `cᵣ=1 (r≥4)` と明示。
+repo の `BG.Ch1.S04.mul_pow_eq_collect_of_triple_central` を走らせ、その weight-3 指数
+`C(n+1,3)`, `2C(n+1,3)` を **Pascal 分割 `C(n+1,3) = C(n,2)+C(n,3)`** で Hall の形に変換
+(= weight 3 で二項係数が正しく出る理由)。
+
+⚠ **`hallCollection` (一般形) の statement は完全に不変** (diff で逐語一致を確認済) — 弱化なし。
+repo 全体 sorry 22 → 22 (偽の削減なし)。AxiomsCheck に 3 件登録。
+
+### 残る唯一の障害 (docstring にも記載)
+
+枠組みにより E.1 は weight 帰納に帰着した。開いているのは:
+> weight `2..k−1` を収集した残差 `w(n) ∈ γ_k` が、`γ_k/γ_{k+1}` の中で **`C(n,k)` 乗**であることを示す段。
+
+これに必要なのは **(i) 自由冪零群と各 `γ_k/γ_{k+1}` の basic-commutator 基底**、
+**(ii) 収集係数の `n` に関する多項式性 (Hall 多項式 / Lazard)**。
+mathlib には `FreeGroup` はあるが**自由冪零商も basic commutator も無く**、`Petrescu`/`collecting` も皆無。
+class ≤ 3 が回避できるのは、残差が中心 `γ₃` に落ち生成元が 2 つと明示できるため。
+
+⟹ 次段は (i)(ii) の形式化。いずれも独立した shared infra で、これ自体が相当量。
+
 ## 完了条件
 
 `HallCollection.lean` で一般形を book strength・sorry-free・axiom-clean で証明 →
 `AppE_FurtherResults.lean` の `hallCollection` を接続 → E.2 以降を順に解錠。
 AxiomsCheck 登録、survey 更新、本 claim を close。
+(現状: 枠組み + class≤3 済。一般形は上記 (i)(ii) 待ち。)
 
 ## 参照
 - issue 3021 (App.E de-opacify 済 + 依存グラフ)、`OddOrder/BG/AppE_FurtherResults.lean`。

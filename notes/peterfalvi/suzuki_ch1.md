@@ -263,7 +263,8 @@
      `N_K(X) ≤ C_G(X)` and the final endpoint is
      `N_G(X) = C_G(X) N_V(X)`.
    - The source assumption `1 ≠ X` is not needed for part (b).
-12. 🔄 **§3 Prop 1(c) in progress** — new leaf `CentralizerResidual.lean`.
+12. 🔄 **§3 Prop 1(c) in progress** — leaves `CentralizerResidual.lean`,
+    `CentralizerQuotient.lean`, and `CentralizerInductionBridge.lean`.
    - ✅ The standing factor `Q₁` is the actual normal `2`-complement from
      `SylowDecomposition.lean`, not an added hypothesis.
    - ✅ `Q1_inf_centralizer_eq_bot_of_isPGroup`: if `C_Q(X)` is a
@@ -274,12 +275,35 @@
      `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)`. The reverse inclusion uses
      the opposite root group `C_{Q^t}(X)` (the source OCR prints `Q′`),
      exactly as in SS1 Proposition 1(b).
-   - ✅ `centralizerResidualQuotientEquiv_of_sylow` combines that equality
-     with the shared surjective-map API to construct
-     `O^{2′}(L) / Z(O^{2′}(L)) ≃* O^{2′}(L / 𝒩(L))` once an honest
-     Sylow witness identifies `C_Q(X)` as a Sylow `2`-subgroup of `L`.
-   - **Next frontier:** construct the quotient Hypothesis/induction carrier
-     and discharge that Sylow witness; it is deliberately not an opaque
-     field of the consumer.
+   - ✅ `card_centralizer_eq` and `exists_sylow_two_eq_cQ_of_isPGroup`
+     formalize the source's A1 step: the structure equation makes `C_Q(X)`
+     a Sylow `2`-subgroup as soon as Lemma 1 supplies its `IsPGroup` proof.
+   - ✅ `centralizerResidualQuotientEquiv` then combines that constructed
+     witness, the center equality, and the shared surjective-map API to give
+     `O^{2′}(L) / Z(O^{2′}(L)) ≃* O^{2′}(L / 𝒩(L))`.
+   - ✅ `CentralizerQuotient.lean` constructs the actual action of
+     `L/𝒩(L)` on `Ω_X`.  The exact action kernel gives faithfulness (A2);
+     the images of `C_H(X)`, `C_Q(X)`, `C_D(X)`, and `t` satisfy every A1
+     field; and `𝒩(L) ≤ C_D(X)` with odd order preserves an elementary
+     abelian four-subgroup (A3).  Thus `centralizerQuotientHypothesis`
+     returns the complete honest `Hypothesis` required by induction.
+   - ✅ `card_centralizerActionQuotient_lt` proves from `X ≠ 1` that
+     `|C_G(X)/𝒩(C_G(X))| < |G|`: otherwise `X ≤ Z(G)`, and normality plus
+     faithfulness would force `X ≤ core_G(H) = 1`.
+   - ✅ `TheoremAConclusion` records exactly the source conclusion of Suzuki's
+     Theorem A: a normal subgroup of odd index and one of the three concrete
+     standard actions.  The carrier retains the equivariant PSL/Sz/PSU
+     coordinates needed later, but does not posit simplicity or the
+     degree-minus-one calculation; `Q_and_residual` derives those through the
+     existing target endpoints.
+   - ✅ `centralizerQQuotientEquiv` proves the source identification
+     `C_Q(X) ≃ Q̄` from `𝒩(L) ≤ C_D(X)` and `C_Q(X) ∩ C_D(X) = 1`.
+     `centralizer_cQ_isPGroup_of_induction` applies the exact induction
+     hypothesis to the strictly smaller quotient and transports Lemma 1 back,
+     closing the missing `IsPGroup 2 C_Q(X)` input.
+   - **Next frontier:** use the retained standard-action coordinates to identify
+     the quotient root subgroup in each PSL/Sz/PSU model, then transport its
+     structure, cardinality, distinguished involution, and
+     `orderOf(st) = 3/5/3` through `centralizerQQuotientEquiv`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
