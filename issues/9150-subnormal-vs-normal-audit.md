@@ -1,5 +1,5 @@
 ---
-id: 9133
+id: 9150
 slug: subnormal-vs-normal-audit
 title: "HUB: mmd 由来の normal/subnormal 取り違えを全 repo 監査"
 created: 2026-07-18
@@ -56,3 +56,18 @@ pdftotext references/isaacs/finite-group-theory.pdf - | grep -n "«"
 - issue 1037 (Isaacs 9.10 / 9.13 / 9.21 — 実害の初出)
 - memory `mmd-collapses-subnormal-symbol`
 - mathlib `Mathlib/GroupTheory/IsSubnormal.lean`
+
+## ⚠ 9000 レンジの採番衝突について (hub 案件)
+
+本 issue は 9132 → 9133 → **9150** と 2 度改番している。原因は
+**`issues/SEQUENCE.9000` がブランチごとに存在する**こと: 各レーンが自分の複製を
+インクリメントするため、同じ番号を同時に払い出してしまう。
+
+2026-07-18 時点で main に実在する衝突: **9125 / 9132 / 9133** (9133 は三重)。
+本 issue は 9150 へ退避したが、**残る衝突は他レーン所有なので触っていない**。
+
+hub への提案 (採番機構自体の是正が要る):
+- `SEQUENCE.9000` を main 専用にして 9000 番の払い出しを hub 経由にする、または
+- レーンごとに 9000 レンジ内のサブレンジを割る (例 a=9100-9199, b=9200-9299, c=9300-9399)、
+  あるいは
+- `bin/new-issue` が採番前に `git fetch origin main` して main 側の最大値も見る。
