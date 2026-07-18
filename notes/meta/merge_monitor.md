@@ -11,11 +11,19 @@
 > **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
-> a_re='^OddOrder/Isaacs/'   # ただし Ch08_PermutationGroups/・Ch10_MoreTransfer/ は除外 (= b/c 所有)
-> b_re='^OddOrder/Isaacs/Ch08_PermutationGroups/|^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
-> c_re='^OddOrder/Isaacs/Ch10_MoreTransfer/|^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
+> a_re='^OddOrder/Isaacs/'   # 2026-07-19 裁定: Ch08/Ch10 も含む Isaacs 全域 (下記 ▶)
+> b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
+> **▶ 2026-07-19 hub 裁定 (ユーザー確認「A は Isaacs を完全に仕上げるタスクでよいか」= YES): lane a =
+> `OddOrder/Isaacs/**` 全域**。Ch08 は b が、Ch10 は c が第一パスを完了して既に離れており
+> (実測: Ch08 の 07-16 ギャップ 25 件は全て宣言済、Ch10 は 27 件中 26 件済 — 残 Thm 10.8 のみ)、
+> 現に b は Pf App Suzuki、c は BG のみを編集している。Isaacs の残余 (Thm 10.8 + 全章の
+> 特殊化/部分の格上げ + Ch.9 §9D の Thm 9.28 Bartels) を **1 レーンが通しで仕上げる**方が
+> 境界コストが無い。⟹ b_re/c_re から Isaacs 節を削除。b/c が Isaacs を触る必要が生じたら
+> 従来どおり additive は shared 扱い (既存宣言の statement 改変のみ hub flag)。
+>
 > Pf Appendices の旧「凍結 scaffold (どのレーンも編集しない)」は失効 — 新フェーズでは b (Suzuki 系) /
 > c (NearFields/Huppert/SemilinearField/FeitSibley) が実 statement 置換で所有 (reallocation note §0-1)。
 >

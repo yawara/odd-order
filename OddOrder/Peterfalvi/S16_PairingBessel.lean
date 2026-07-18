@@ -266,8 +266,7 @@ theorem normEstimates (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     intro i hi
     exact data.zeta_irreducible_at hG (Finset.mem_erase.mp hi).1
   · -- Distinct indices give distinct characters.
-    intro i _ j _ hij
-    intro heq
+    intro i _ j _ hij heq
     exact hij (data.inj heq)
 
 /-- `d_0 = 1` (the distinguished source is linear: `ζ_0(1) = e = [L:H]·θ_0(1)`). -/

@@ -217,6 +217,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -1161,6 +1162,18 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_mono
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_le
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_strongClosure
+
+-- Ch.9 §9D: **Lem 9.30** — 全射準同型 f に対し f(X^{(G)}) = f(X)^{(image)}。
+-- (書籍は N ⊴ G / Ḡ = G/N の形。hard direction は ⟨X, Y⟩ の位数最小性を使う。)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_map
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_isStronglyConjugate_map_eq
+
+-- Ch.9 §9D: 書籍 p.290 の観察 (X^{(G)})^g = (X^g)^{(G)} — 9.28 Bartels の Step 1/3/4 が使う。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosure_conjAct_smul
+
+-- Ch.9 §9D: `X^{(K)}` と ↥K 内で計算した `X^{(G)}` の橋 (9.28 の帰納法が ↥K に降りるのに必要)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_map_strongClosure
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isStronglyConjugate_subgroupOf_iff
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
@@ -8178,6 +8191,24 @@ returns the concrete conclusion of Suzuki's Theorem A for every nonsimple
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.theoremAConclusion_of_not_simple
+
+/-! **Peterfalvi Part II, Ch. I §3 Lemma 2.**  The internal complement
+`D = K ⋊ V` supplies the source's canonical homomorphism `D → V`.
+Double transitivity first corrects an arbitrary ambient conjugator into
+`D`, and projection then gives a conjugator in `V` for arbitrary subsets
+of `V`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.K_isComplement_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.dToV_of_mem_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_D_conj_image_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_V_conj_image_eq
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof

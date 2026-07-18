@@ -1204,14 +1204,10 @@ private noncomputable def semiDihedralIsoOfTwistNormalized
     rintro (i | i) (j | j) <;> simp only [fwd, SemiDihedralGroup.c_mul_c,
       SemiDihedralGroup.c_mul_ca, SemiDihedralGroup.ca_mul_c, SemiDihedralGroup.ca_mul_ca,
       ← hr_def]
-    · change c ^ (i + j).val = c ^ i.val * c ^ j.val
-      exact hc_addval i j
-    · change a * c ^ (r * i + j).val = c ^ i.val * (a * c ^ j.val)
-      rw [← mul_assoc, h_pow_a, mul_assoc, ← hc_addval]
-    · change a * c ^ (i + j).val = a * c ^ i.val * c ^ j.val
-      rw [mul_assoc, ← hc_addval]
-    · change c ^ (r * i + j).val = a * c ^ i.val * (a * c ^ j.val)
-      calc c ^ (r * i + j).val
+    · exact hc_addval i j
+    · rw [← mul_assoc, h_pow_a, mul_assoc, ← hc_addval]
+    · rw [mul_assoc, ← hc_addval]
+    · calc c ^ (r * i + j).val
           = c ^ (r * i).val * c ^ j.val := hc_addval (r * i) j
         _ = (a * a) * c ^ (r * i).val * c ^ j.val := by
           rw [show a * a = 1 from by rw [← sq, h_a_sq], one_mul]

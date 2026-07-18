@@ -1278,9 +1278,9 @@ theorem caseA_hcZeta_irreducible_of_regular [Finite G] {M : Subgroup G}
   exact hcZeta_irreducible chief θ (caseA_regular_inflation_inertia_eq caseA θ hreg)
 
 set_option linter.style.openClassical false in
-open scoped Classical in
 set_option maxHeartbeats 1000000 in
 -- raised heartbeat budget for the heavy elaboration below
+open scoped Classical in
 /-- **|Xmu| = p-1** (Peterfalvi (9.8.c), the reducible-inducing regular seeds).  `Xmu` = the
 `Xθ`-members `ζ = Ind_{HC}(hcPsi θ)` (regular `θ`) whose `M`-induction `Ind_{HU}^M ζ` is
 *reducible*.
@@ -1349,9 +1349,9 @@ theorem caseA_Xmu_card_eq [Finite G] {M : Subgroup G}
     reducible_count_sOf_H0 hG chief]
 
 set_option linter.style.openClassical false in
-open scoped Classical in
 set_option maxHeartbeats 1000000 in
 -- raised heartbeat budget for the heavy elaboration below
+open scoped Classical in
 /-- **Peterfalvi (9.8.c): `𝒮(H₀C)` contains an irreducible character of degree `qu`.**  The parity
 dichotomy `exists_regular_not_reducible_of_odd` applied to `X = Xθ` (`u·|Xθ| = (p-1)^q` by
 `oXtheta_count`, `p-1` even as `p ∤ |G|` is odd, `u` odd by `u_odd`) and its `p-1`-element subfamily

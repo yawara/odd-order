@@ -26,9 +26,9 @@
 
 | lane | worktree | クラスタ | 主所有 | ODD_ISSUE_BASE |
 |---|---|---|---|---|
-| **a** | `/home/ywr/odd-order-a` | Isaacs 本文完備化 | `OddOrder/Isaacs/**` (Ch08/Ch10 を除く)。Ch.2–6 gaps → Ch.9 (新設 `Ch09_MoreSubnormality/`) → 付録 (新設 `AppX_Basics/`) | 1000 |
-| **b** | `/home/ywr/odd-order-b` | 置換群 → Suzuki チェーン | `OddOrder/Isaacs/Ch08_PermutationGroups/**` (新設) + `OddOrder/Peterfalvi/Appendices/{Suzuki,Suzuki2Groups}*.lean` | 2000 |
-| **c** | `/home/ywr/odd-order-c` | Isaacs Ch.10 + BG 残 + Pf 残 | `OddOrder/Isaacs/Ch10_MoreTransfer/**` (新設) + `OddOrder/BG/**` + `OddOrder/Peterfalvi/S*.lean` (本文 partial/specialized) + `Appendices/{NearFields,Huppert,SemilinearField,FeitSibley}.lean` | 3000 |
+| **a** | `/home/ywr/odd-order-a` | Isaacs 完全仕上げ | `OddOrder/Isaacs/**` (**2026-07-19 裁定で Ch08/Ch10 込みの全域**)。Ch.2–6 gaps → Ch.9 (新設 `Ch09_MoreSubnormality/`) → 付録 (新設 `AppX_Basics/`) | 1000 |
+| **b** | `/home/ywr/odd-order-b` | Suzuki チェーン (Ch.8 は 2026-07-19 に a へ返還) | `OddOrder/Peterfalvi/Appendices/{Suzuki,Suzuki2Groups}*.lean` | 2000 |
+| **c** | `/home/ywr/odd-order-c` | BG 残 + Pf 残 (Ch.10 は 2026-07-19 に a へ返還) | `OddOrder/BG/**` + `OddOrder/Peterfalvi/S*.lean` (本文 partial/specialized) + `Appendices/{NearFields,Huppert,SemilinearField,FeitSibley}.lean` | 3000 |
 
 - shared infra (`OddOrder/GroupTheory/**`, `OddOrder/Algebra/**`, `OddOrder/Mathlib/**`, root `OddOrder/*.lean`) =
   所有なし、**claim-before-build (9000 番台 issue)** 継続。hub/main = base 0。

@@ -367,7 +367,6 @@ private lemma card_setOfPowEqOne_inf_le_prime
     intro x
     apply Subtype.ext
     change ((x : T) ^ p : T) = (1 : T)
-    push_cast
     have h_mem : (x : T) ∈ K := (Subgroup.mem_inf.mp x.2).1
     exact h_mem
   have h_card_eq : Nat.card (K ⊓ C : Subgroup T) = Monoid.exponent (K ⊓ C : Subgroup T) :=
@@ -493,7 +492,6 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
       intro x
       apply Subtype.ext
       change ((x : T) ^ p : T) = (1 : T)
-      push_cast
       have h_mem : (x : T) ∈ K := x.2
       change (x : T) ^ p = 1 at h_mem
       exact h_mem
