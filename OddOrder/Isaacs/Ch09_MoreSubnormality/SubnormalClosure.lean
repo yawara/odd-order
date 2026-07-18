@@ -928,4 +928,162 @@ theorem isSubnormal_strongClosure_of_kappaSetKernel_ne_bot {G : Type u} [Group G
 
 end
 
+section /- 9D: Bartels Step 4 — 集合としての stabilizer と極大性の二分岐 -/
+
+/-- 部分群の集合 `S` を**集合として保つ**元のなす部分群。 -/
+def setwiseStabilizer (S : Set (Subgroup G)) : Subgroup G where
+  carrier := {g : G | ∀ W : Subgroup G, ConjAct.toConjAct g • W ∈ S ↔ W ∈ S}
+  one_mem' := by intro W; simp
+  mul_mem' := by
+    intro a b ha hb W
+    rw [map_mul, mul_smul, ha, hb]
+  inv_mem' := by
+    intro a ha W
+    rw [map_inv, ← ha ((ConjAct.toConjAct a)⁻¹ • W), smul_inv_smul]
+
+theorem mem_setwiseStabilizer_iff {S : Set (Subgroup G)} {g : G} :
+    g ∈ setwiseStabilizer S ↔ ∀ W : Subgroup G, ConjAct.toConjAct g • W ∈ S ↔ W ∈ S := Iff.rfl
+
+/-- **`H` は `𝒦(H)` を保つ** (書籍 p.291 「`H` acts by conjugation on `𝒦(H)`」)。 -/
+theorem le_setwiseStabilizer_kappaSet (X H : Subgroup G) :
+    H ≤ setwiseStabilizer (kappaSet X H) := by
+  intro h hh W
+  constructor
+  · intro hW
+    have := mem_kappaSet_smul_of_mem (X := X) (H := H) (h := h⁻¹) (H.inv_mem hh) hW
+    rwa [map_inv, inv_smul_smul] at this
+  · exact mem_kappaSet_smul_of_mem hh
+
+/-- `𝒦(G)` は `G` の 1 つの軌道 (書籍 p.291 「`G` acts transitively on `𝒦(G)`」)。 -/
+theorem mem_kappaSet_top_iff {X W : Subgroup G} :
+    W ∈ kappaSet X ⊤ ↔ ∃ c : ConjAct G, c • strongClosure X = W := by
+  constructor
+  · rintro ⟨Y, -, ⟨c, rfl⟩, rfl⟩
+    exact ⟨c, (strongClosure_conjAct_smul c X).symm⟩
+  · rintro ⟨c, rfl⟩
+    refine ⟨c • X, le_top, ⟨c, rfl⟩, ?_⟩
+    exact strongClosure_conjAct_smul c X
+
+/-- **Step 4 第 1 分岐の入口**: `G` 全体が `𝒦(M)` を保つなら `𝒦(M) = 𝒦(G)`.
+
+`𝒦(G)` は `X^{(G)}` の `G`-軌道で, `X^{(G)} ∈ 𝒦(M)` なので `𝒦(M)` が `G`-安定なら
+軌道全体を含む。 -/
+theorem kappaSet_eq_top_of_setwiseStabilizer_eq_top {X M : Subgroup G} (hXM : X ≤ M)
+    (hstab : setwiseStabilizer (kappaSet X M) = ⊤) : kappaSet X M = kappaSet X ⊤ := by
+  refine Set.Subset.antisymm (kappaSet_mono le_top) ?_
+  intro W hW
+  obtain ⟨c, rfl⟩ := mem_kappaSet_top_iff.mp hW
+  have hg : ConjAct.ofConjAct c ∈ setwiseStabilizer (kappaSet X M) := by
+    rw [hstab]; exact Subgroup.mem_top _
+  have := (hg (strongClosure X)).mpr (mem_kappaSet_self X hXM)
+  rwa [ConjAct.toConjAct_ofConjAct] at this
+
+
+/-- **`N_G(P)` は `𝒦(P)` を保つ** (書籍 p.291 「this set is stabilized by `N_G(P)`」)。 -/
+theorem normalizer_le_setwiseStabilizer_kappaSet (X P : Subgroup G) :
+    Subgroup.normalizer P ≤ setwiseStabilizer (kappaSet X P) := by
+  intro g hg W
+  have hP : ConjAct.toConjAct g • P = P := Subgroup.conjAct_pointwise_smul_iff.mpr hg
+  have hPinv : (ConjAct.toConjAct g)⁻¹ • P = P := by
+    rw [inv_smul_eq_iff, hP]
+  constructor
+  · intro hW
+    have := mem_kappaSet_conjAct_smul (c := (ConjAct.toConjAct g)⁻¹) hW
+    rwa [inv_smul_smul, hPinv] at this
+  · intro hW
+    have := mem_kappaSet_conjAct_smul (c := ConjAct.toConjAct g) hW
+    rwa [hP] at this
+
+/-- **`C_G(P)` は `𝒦(P)` を各点固定する** (書籍 p.291 の `Z(P)` の部分)。 -/
+theorem centralizer_le_pointwiseStabilizer_kappaSet (X P : Subgroup G) :
+    Subgroup.centralizer (P : Set G) ≤ pointwiseStabilizer (kappaSet X P) :=
+  fun _ hz _ hW => conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet hz hW
+
+/-- **極大部分群の二分岐**: `M` が極大で `M ≤ K` なら `K = M` または `K = ⊤`. -/
+theorem eq_or_eq_top_of_isCoatom {M K : Subgroup G} (hM : IsCoatom M) (hMK : M ≤ K) :
+    K = M ∨ K = ⊤ := by
+  rcases lt_or_eq_of_le hMK with hlt | heq
+  · exact Or.inr (hM.2 K hlt)
+  · exact Or.inl heq.symm
+
+end
+
+section /- 9D: Bartels Step 4 — `N_G(P) ≤ M` から `P ∈ Syl_p(G)` を出す道具 -/
+
+/-- `R` が `p`-群で `P < R` なら `p ∣ |R : P|`. -/
+theorem dvd_relIndex_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P R : Subgroup G}
+    (hR : IsPGroup p ↥R) (hlt : P < R) : p ∣ P.relIndex R := by
+  change p ∣ (P.subgroupOf R).index
+  have hne : P.subgroupOf R ≠ ⊤ := fun h => by
+    rw [Subgroup.subgroupOf_eq_top] at h
+    exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl P)
+  have hidx1 : (P.subgroupOf R).index ≠ 1 := fun h => hne (Subgroup.index_eq_one.mp h)
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp hR
+  have hdvd : (P.subgroupOf R).index ∣ p ^ n := hn ▸ Subgroup.index_dvd_card (P.subgroupOf R)
+  obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
+  rcases Nat.eq_zero_or_pos k with rfl | hkpos
+  · rw [pow_zero] at hk; exact absurd hk hidx1
+  · rw [hk]; exact dvd_pow_self p hkpos.ne'
+
+end
+
+/-- **Step 4 の Sylow 結論部**: `P` が `M` の Sylow `p`-部分群で `N_G(P) ≤ M` なら
+`P` は `G` の Sylow `p`-部分群 (指数が `p` と互いに素)。
+
+`P ≤ Q ∈ Syl_p(G)` を取る。`P < Q` なら `Q` は `p`-群 (ゆえ nilpotent) なので正規化条件から
+`N_Q(P) > P`, その元は `N_G(P) ≤ M` に入るので `M` の中に `P` より真に大きい `p`-部分群
+ができ, `dvd_relIndex_of_lt_of_isPGroup` で `p ∣ |M : P|` となって矛盾。 -/
+theorem not_dvd_index_of_normalizer_le {p : ℕ} [Fact p.Prime] [Finite G]
+    {M P : Subgroup G} (hPM : P ≤ M) (hP : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex M)
+    (hN : Subgroup.normalizer P ≤ M) : ¬ p ∣ P.index := by
+  obtain ⟨Q, hPQ⟩ := hP.exists_le_sylow
+  have hPQeq : P = (Q : Subgroup G) := by
+    by_contra hne
+    have hlt : P < (Q : Subgroup G) := lt_of_le_of_ne hPQ hne
+    haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+    have hsub : P.subgroupOf (Q : Subgroup G) < ⊤ := by
+      rw [lt_top_iff_ne_top]
+      intro h
+      rw [Subgroup.subgroupOf_eq_top] at h
+      exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl P)
+    obtain ⟨x, hxN, hxP⟩ :=
+      SetLike.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
+    -- `x` は `G` の中でも `P` を正規化する.
+    have hxG : (x : G) ∈ Subgroup.normalizer P := by
+      rw [Subgroup.mem_normalizer_iff]
+      intro y
+      constructor
+      · intro hy
+        have hyQ : y ∈ (Q : Subgroup G) := hPQ hy
+        have hmem : (⟨y, hyQ⟩ : ↥(Q : Subgroup G)) ∈ P.subgroupOf (Q : Subgroup G) := hy
+        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mp hmem
+        simpa [Subgroup.mem_subgroupOf] using hres
+      · intro hy
+        have hyQ : y ∈ (Q : Subgroup G) := by
+          have h1 : (x : G) * y * (x : G)⁻¹ ∈ (Q : Subgroup G) := hPQ hy
+          have hrw : y = (x : G)⁻¹ * ((x : G) * y * (x : G)⁻¹) * (x : G) := by group
+          rw [hrw]
+          exact mul_mem (mul_mem (inv_mem x.2) h1) x.2
+        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mpr
+          (by simpa [Subgroup.mem_subgroupOf] using hy)
+        simpa [Subgroup.mem_subgroupOf] using hres
+    -- `R = P ⊔ ⟨x⟩` は `M` の中の `P` より真に大きい `p`-部分群.
+    have hxM : (x : G) ∈ M := hN hxG
+    have hxnotP : (x : G) ∉ P := fun h => hxP h
+    set R : Subgroup G := P ⊔ Subgroup.zpowers (x : G) with hRdef
+    have hRQ : R ≤ (Q : Subgroup G) := sup_le hPQ ((Subgroup.zpowers_le).mpr x.2)
+    have hRM : R ≤ M := sup_le hPM ((Subgroup.zpowers_le).mpr hxM)
+    have hPR : P < R := by
+      refine lt_of_le_of_ne le_sup_left fun heq => hxnotP ?_
+      have : (x : G) ∈ R :=
+        (le_sup_right : Subgroup.zpowers (x : G) ≤ R) (Subgroup.mem_zpowers _)
+      rwa [← heq] at this
+    have hRp : IsPGroup p ↥R := Q.isPGroup'.to_le hRQ
+    have hdvd : p ∣ P.relIndex R := dvd_relIndex_of_lt_of_isPGroup hRp hPR
+    have hchain : P.relIndex R * R.relIndex M = P.relIndex M :=
+      Subgroup.relIndex_mul_relIndex _ _ _ le_sup_left hRM
+    exact hPidx (hchain ▸ Dvd.dvd.mul_right hdvd _)
+  rw [hPQeq]
+  exact Q.not_dvd_index
+
 end OddOrder.Isaacs.Ch09

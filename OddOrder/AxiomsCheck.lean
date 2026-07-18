@@ -1218,6 +1218,16 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.pointwiseStabilizer_normal
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.isSubnormal_strongClosure_of_kappaSetKernel_ne_bot
+-- 集合としての stabilizer と 𝒦(M) = 𝒦(G) (Step 4 の二分岐の入口)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.le_setwiseStabilizer_kappaSet
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.kappaSet_eq_top_of_setwiseStabilizer_eq_top
+-- N_G(P) は 𝒦(P) を保ち, C_G(P) は各点固定する (Step 4 の両分岐が使う)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.normalizer_le_setwiseStabilizer_kappaSet
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_le_pointwiseStabilizer_kappaSet
+-- p-群の真部分群は指数が p で割れる (Step 4 の Sylow 結論部の道具)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.dvd_relIndex_of_lt_of_isPGroup
+-- P が M の Sylow p で N_G(P) ≤ M なら P は G の Sylow p (Step 4 の結論部)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_index_of_normalizer_le
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
