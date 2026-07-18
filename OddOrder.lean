@@ -19,6 +19,7 @@ import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.ElementaryAbelianFamily
 import OddOrder.GroupTheory.FittingHeredity
+import OddOrder.GroupTheory.NormalHallHeredity
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.CNGroupStructure

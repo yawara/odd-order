@@ -28,11 +28,19 @@ The two heredity statements are then obtained by exhibiting the right `K`:
   `f : X →* Y`, take `K = f(F(X))`.  It is nilpotent as an image of `F(X)`, and `Y/K` is a
   quotient of `X/F(X)`.
 
-The hypothesis-transport shapes actually consumed downstream are stated as corollaries:
+Three convenient shapes are stated as corollaries:
 `isNilpotent_quotient_fitting_subgroup` (`H : Subgroup X`),
 `isNilpotent_quotient_fitting_of_le` (`H ≤ K`, both subgroups of a common ambient group),
 and `isNilpotent_quotient_fitting_quotient` (`N ⊴ X`).  Transport along an isomorphism
 `e : Y ≃* X` is `isNilpotent_quotient_fitting_of_injective e.toMonoidHom e.injective`.
+
+⚠ **The corollaries alone do not discharge BG Theorem 6.4's transports.**  Of the four the
+induction performs, only `G₀ ⊓ S ≤ G₀` is a direct `_of_le` hit; the other three are
+isomorphism-mediated and need `_of_injective`/`_of_surjective` together with a hom the *consumer*
+must supply.  In particular the subgroup-side hypothesis "`(↥S ⧸ G₀.subgroupOf S)/F(…)` is
+nilpotent" needs an **injective** hom `↥S ⧸ G₀.subgroupOf S →* G ⧸ G₀`.  Mathlib has the map
+(`QuotientGroup.quotientMapSubgroupOfOfLe`) but **no injectivity lemma for it**, so that kernel
+computation is a genuine remaining step — see issue 3026.
 
 Note that `Isaacs.Ch01.fitting` is the subtype-level Fitting subgroup, so `F(Y)` for a
 subgroup `Y` of `X` is `Isaacs.Ch01.fitting ↥Y`.  This is *not* the ambient-group
