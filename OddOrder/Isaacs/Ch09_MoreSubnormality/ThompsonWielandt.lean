@@ -45,6 +45,28 @@ theorem le_normalizer_relCore (H D : Subgroup G) :
     H ≤ Subgroup.normalizer (relCore H D : Set G) :=
   le_normalizer_map_subtype_of_normal (Subgroup.normalCore_normal _)
 
+/-- `core_H(D)` の元の特徴づけ: `x ∈ core_H(D) ⟺ x ∈ H` かつ `H` のすべての共役で `D` に入る.
+(`core_H(D) = ⋂_{h ∈ H} D^h ⊓ H` の元レベル版; Thm 9.24 Case 2 で
+「`P ⊆ D^k` がすべての `k ∈ K` で成り立つ ⇒ `P ⊆ core_K(D)`」に使う.) -/
+theorem mem_relCore_iff {H D : Subgroup G} {x : G} :
+    x ∈ relCore H D ↔ x ∈ H ∧ ∀ h ∈ H, h * x * h⁻¹ ∈ D := by
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    refine ⟨y.2, fun h hh => ?_⟩
+    simpa [Subgroup.mem_subgroupOf] using hy ⟨h, hh⟩
+  · rintro ⟨hxH, hconj⟩
+    refine ⟨⟨x, hxH⟩, fun b => ?_, rfl⟩
+    simpa [Subgroup.mem_subgroupOf] using hconj (b : G) b.2
+
+/-- `core_H(D)` への包含判定: `P ≤ H` のとき `P ≤ core_H(D) ⟺ P` のすべての `H`-共役が `D` の中. -/
+theorem le_relCore_iff {H D P : Subgroup G} (hPH : P ≤ H) :
+    P ≤ relCore H D ↔ ∀ h ∈ H, ∀ x ∈ P, h * x * h⁻¹ ∈ D := by
+  constructor
+  · intro hle h hh x hx
+    exact (mem_relCore_iff.mp (hle hx)).2 h hh
+  · intro hconj x hx
+    exact mem_relCore_iff.mpr ⟨hPH hx, fun h hh => hconj h hh x hx⟩
+
 /-- `core_H(D)` の最大性: `N ≤ D`, `N ≤ H`, `N` が `H` に normal (`H ≤ N_G(N)`) なら
 `N ≤ core_H(D)`. -/
 theorem le_relCore {H D N : Subgroup G} (hND : N ≤ D) (hNH : N ≤ H)
@@ -120,6 +142,31 @@ theorem relCore_le_normalizer_relCore_thompsonWielandtCore :
       ≤ Subgroup.normalizer ((relCore K (thompsonWielandtCore H K) : Subgroup G) : Set G) :=
   ((relCore_le H (H ⊓ K)).trans inf_le_right).trans
     (le_normalizer_relCore K (thompsonWielandtCore H K))
+
+theorem thompsonWielandtCore_le : thompsonWielandtCore H K ≤ H ⊓ K :=
+  inf_le_left.trans (relCore_le H (H ⊓ K))
+
+/-- `U = core_H(E) ◁ H` ゆえ `X = O^p(U)` も `H` に normal (`O^p` は characteristic). -/
+theorem le_normalizer_pResidualOf_relCore (p : ℕ) :
+    H ≤ Subgroup.normalizer
+        (pResidualOf p (relCore H (thompsonWielandtCore H K)) : Set G) :=
+  (le_normalizer_relCore H _).trans (normalizer_le_normalizer_pResidualOf p _)
+
+/-- `X = O^p(U) ≤ U ≤ E ≤ D`. -/
+theorem pResidualOf_relCore_le_inf (p : ℕ) :
+    pResidualOf p (relCore H (thompsonWielandtCore H K)) ≤ H ⊓ K :=
+  (pResidualOf_le p _).trans
+    ((relCore_le H (thompsonWielandtCore H K)).trans (thompsonWielandtCore_le H K))
+
+/-- **Thm 9.24 Case 2 の Step B**: `X = O^p(U) ≠ 1` ならば `N_G(X) = H`
+(仮説「`D` の非自明部分群は `H` を真に含む部分群に normal でない」から). -/
+theorem normalizer_pResidualOf_relCore_eq (p : ℕ)
+    (hyp : NoNormalInSupergroup H K (H ⊓ K))
+    (hX : pResidualOf p (relCore H (thompsonWielandtCore H K)) ≠ ⊥) :
+    Subgroup.normalizer
+        (pResidualOf p (relCore H (thompsonWielandtCore H K)) : Set G) = H :=
+  normalizer_eq_left_of_noNormal hyp hX (pResidualOf_relCore_le_inf H K p)
+    (le_normalizer_pResidualOf_relCore H K p)
 
 /-- **Thm 9.24 Case 2 の Step A** (書籍 p. 284): `P = O_p(H)` は `Y = O^p(V)` を正規化する.
 
