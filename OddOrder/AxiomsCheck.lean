@@ -128,6 +128,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -7187,6 +7189,13 @@ cyclic; `M' = U M_σ`; the unique non-conjugate type-`P` partner `M*` (Theorem 1
 Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremC_paired_structure
+/-! **BG Theorem C(5)** (`S16_MainResults.TheoremC5`, `theoremC_5_overgroup_unique`): the one
+conjunct of Theorem C not carried by `theoremC_paired_structure` — for prime-order `X ≤ K*`,
+`𝓜(C_G(X)) = {M}`, and (for the Thm 14.7 partner `M*`, exposed via the verbatim C(4) `∃!`
+predicate) for prime-order `Y ≤ K`, `𝓜(C_G(Y)) = {M*}`.  Both halves reduce to Proposition 14.2(c)
+(`typeP_structure` conjunct 6) applied to `M` resp. the dual partner from `typeP_duality`.
+Completes Theorem C's conjuncts C(1)–C(11).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremC_5_overgroup_unique
 
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
@@ -8522,6 +8531,27 @@ conjugacy), and the type-`P₁` core (`kstar_isHall_sigmaM_of_partner` = Coq `Pt
 `sMhallKs`, via 14.2(f) `typeP_sigma_subgroup_le_Msigma` + σ-disjoint commutator). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.kstar_isHall_sigmaM_of_partner
+/-! **BG Lemma 14.13(b)** (`S16_Lemma1413`, `signalizer_neighbour_conjugator_in_M`): in the
+situation of Theorem 14.4 with `1 < |𝓜_σ(x)|`, if `y ∈ M_σ^#`, `C_G(y) ⊄ M`, and `N(y)^g = N`,
+then the conjugator can be chosen inside `M` (`∃ m ∈ M, N(y)^m = N`).  The `M`-conjugation choice
+underlying Theorem II (Tii)(e).  Proof (BG): the `x`- and `y`-side Thm D(4) complements of the
+normal Hall `N_σ ◁ N` are Schur–Zassenhaus-conjugate (`IsComplement'.exists_conj_of_coprime`),
+placing `M` and its conjugate in `𝓜_σ(x)`; Thm 14.4 sharp transitivity + `N_G(M) = M` yield
+`m ∈ M`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_neighbour_conjugator_in_M
+/-! **BG Theorem II packaging** (`S16_MainResults.TheoremIIPackaging`, `theoremII_tamelyImbedded`):
+`A(M) = ASet M U` is a tamely imbedded subset of `G` (`TamelyImbedded M (ASet M U)`) for an
+arbitrary maximal `M` of a minimal-simple odd `G`, **unconditionally** (hypotheses: only the
+standard `theoremII_tame_embedding` shape `hG, hM, K≤M, U≤M, hK, hU`).  Assembles (Ti)
+(`theoremII_tame_embedding`), the full (Tii) system of supporting subgroups — (a) via Thm E(2)
+σ-disjointness, (b) via Thm D(4) complements, (c) `coprime_centralizer_of_neighbour` via Lemma
+14.13(a), (d) `clause_d_of_neighbour`, (e) via Lemma 14.13(b) + Thm D(3) — and (Tiii)
+`frobeniusTypeI_of_neighbour_typeII` (Thm D(4)'s `IsTypeP2 N → IsTypeF M`).  Clause (d)
+(`A₀(Mᵢ) − Hᵢ` nonempty TI): Type-I via Thm B(5) with the type-F identity `A₀(Mᵢ)=A(Mᵢ)`; Type-II
+via Thm B(5) + Thm C(9) glued by the order-determined cross-piece exclusion (BG's "distinct
+orders"; Thm C(5) turned out **not** to be needed).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tamelyImbedded
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_systemOfSupportingSubgroups
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_conj_smul_eq_of_le_of_card_prime
 
 /-! **Peterfalvi (14.11.3) support half, axiom-clean core** (`S16_G0Coprime`, lane c/γ).

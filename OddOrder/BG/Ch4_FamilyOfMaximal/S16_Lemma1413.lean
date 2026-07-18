@@ -635,4 +635,140 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
   exact ⟨hFM, ht2M,
     typeF_frobenius_of_tau2_prime_free hG hM hFM ht2M hqπM hqσM⟩
 
+/-! ## BG Lemma 14.13(b) -/
+
+/-- **BG Lemma 14.13(b)** (mmd L4149; used to prove Theorem II (Tii)(e), mmd:4571): assume the
+situation of Theorem 14.4 with `|𝓜_σ(x)| > 1`, so `N = N(x)` is the unique maximal subgroup over
+`C_G(x)`.  If `y ∈ M_σ^#`, `C_G(y) ⊄ M`, `g ∈ G`, and `N(y)^g = N`, then `M` already contains an
+element `m` with `N(y)^m = N` (the conjugator can be chosen in `M`).
+
+Here `N` is pinned as the unique maximal over `C_G(x)` by `hN`, and `Ny = N(y)` as the unique
+maximal over `C_G(y)` by `hNy` (Theorem 14.4 / Theorem D(4) make both singletons under the escape
+hypotheses).
+
+Proof (following BG): since `C_G(y) ⊄ M`, Theorem 14.4 (`exists_RData_escape_structure`) shows
+`N(y)` is defined and, together with the `x`-side escape, gives that **both** `M ∩ N` and
+`(M ∩ N(y))^g` complement `N_σ` in `N`.  By Schur–Zassenhaus conjugacy of complements of the
+normal Hall subgroup `N_σ ◁ N` (`IsComplement'.exists_conj_of_coprime`, using `N` solvable),
+there is `n ∈ N_σ` with
+`(M ∩ N(y))^{gn} = M ∩ N`.  Then `x ∈ M ∩ N ⊆ M^{ng}`, so `M` and `M^{ng}` both lie in `𝓜_σ(x)`;
+Theorem 14.4's sharp transitivity (`exists_conj_centralizer_of_mem_maximalSigma`) yields
+`c ∈ C_N(x)` with `M^{c(ng)} = M`.  Hence `m = c(ng) ∈ N_G(M) = M` and
+`N(y)^m = N^{...} = N`. -/
+theorem signalizer_neighbour_conjugator_in_M [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard)
+    {N : Subgroup G}
+    (hN : maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {N})
+    {y : G} (hyM : y ∈ S14.sigmaSharp M)
+    (hyesc : ¬ Subgroup.centralizer ({y} : Set G) ≤ M)
+    {Ny : Subgroup G}
+    (hNy : maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) = {Ny})
+    {g : G} (hg : MulAut.conj g • Ny = N) :
+    ∃ m ∈ M, MulAut.conj m • Ny = N := by
+  classical
+  have hx1 : x ≠ 1 := hxM.2
+  -- `x` escapes `M` (from `|𝓜_σ(x)| > 1`).
+  have hxesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M := by
+    intro hle
+    rw [maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le hG hM hxM.1 hx1 hle,
+      Set.ncard_singleton] at hgt
+    exact lt_irrefl 1 hgt
+  -- `N` is the unique maximal over `C_G(x)`: `C_G(x) ≤ N`, `N` maximal, `N` solvable.
+  have hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) := by
+    rw [hN]; rfl
+  have hNmax : N ∈ maximalSubgroups G := (mem_maximalSubgroupsContaining.mp hNmem).1
+  have hCxN : Subgroup.centralizer ({x} : Set G) ≤ N :=
+    (mem_maximalSubgroupsContaining.mp hNmem).2
+  haveI hNsolv : IsSolvable ↥N := hG.solvable_of_mem_maximalSubgroups hNmax
+  -- `x`-side complement: `M ∩ N` complements `N_σ` in `N`.
+  obtain ⟨_, _, hExuX⟩ := exists_RData_escape_structure hG hM hxM hxesc
+  obtain ⟨Nx', hNx'P, -⟩ := hExuX
+  have hNx'eq : Nx' = N := by
+    have := hNx'P.1; rw [hN, Set.mem_singleton_iff] at this; exact this
+  have hcomplX : Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
+      ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) := by
+    have h := hNx'P.2.2.2.2.2.1; rwa [hNx'eq] at h
+  -- `y`-side complement: `M ∩ N(y)` complements `N(y)_σ` in `N(y)`.
+  obtain ⟨_, _, hExuY⟩ := exists_RData_escape_structure hG hM hyM hyesc
+  obtain ⟨Ny'', hNy''P, -⟩ := hExuY
+  have hNy''eq : Ny'' = Ny := by
+    have := hNy''P.1; rw [hNy, Set.mem_singleton_iff] at this; exact this
+  have hcomplY : Subgroup.IsComplement' ((M ⊓ Ny).subgroupOf Ny)
+      ((OddOrder.BG.Ch3.S10.Msigma Ny).subgroupOf Ny) := by
+    have h := hNy''P.2.2.2.2.2.1; rwa [hNy''eq] at h
+  -- Transport the `y`-complement by `g`: `(M ∩ N(y))^g = M^g ∩ N` complements `N_σ` in `N`.
+  have hcomplYg : Subgroup.IsComplement' ((MulAut.conj g • M ⊓ N).subgroupOf N)
+      ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) := by
+    have h := isComplement'_subgroupOf_pointwise_smul (MulAut.conj g) hcomplY
+    rw [Subgroup.smul_inf, ← Msigma_conj_smul g Ny, hg] at h
+    exact h
+  -- Schur–Zassenhaus conjugacy of the two complements of `N_σ ◁ N` inside `↥N`.
+  haveI hNσ'normal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hcop : Nat.Coprime (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N))
+      ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).index :=
+    (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hNmax).coprime_index
+  haveI hNσ'solv : IsSolvable ↥((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) :=
+    solvable_of_solvable_injective ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).subtype_injective
+  obtain ⟨n', hn'mem, hn'conj⟩ :=
+    (hcomplYg.symm).exists_conj_of_coprime hcop (Or.inl hNσ'solv) hcomplX.symm
+  -- `n = ↑n' ∈ M_σ(N) ≤ N`.
+  set n : G := (n' : G) with hndef
+  have hnMσN : n ∈ OddOrder.BG.Ch3.S10.Msigma N := Subgroup.mem_subgroupOf.mp hn'mem
+  have hnN : n ∈ N := OddOrder.BG.Ch3.S10.Msigma_le N hnMσN
+  have hconjN : MulAut.conj n • N = N :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hnN)
+  -- Map the `↥N`-conjugacy back to `G`: `(M^g ∩ N)^n = M ∩ N`.
+  have hn'smul : MulAut.conj n' • ((MulAut.conj g • M ⊓ N).subgroupOf N)
+      = (M ⊓ N).subgroupOf N := by
+    rw [Subgroup.pointwise_smul_def]; exact hn'conj
+  have hmapback : MulAut.conj n • (MulAut.conj g • M ⊓ N) = M ⊓ N := by
+    have h := congrArg (Subgroup.map N.subtype) hn'smul
+    rwa [map_subtype_conj_smul_subgroupOf n' (inf_le_right : MulAut.conj g • M ⊓ N ≤ N),
+      Subgroup.map_subgroupOf_eq_of_le (inf_le_right : M ⊓ N ≤ N)] at h
+  -- `L = M^{ng} = M` conjugated by `n·g`; `L ∩ N = M ∩ N`.
+  have hLdef : MulAut.conj n • (MulAut.conj g • M) = MulAut.conj (n * g) • M := by
+    rw [← mul_smul, ← map_mul]
+  have hLN : MulAut.conj (n * g) • M ⊓ N = M ⊓ N := by
+    have h := hmapback
+    rwa [Subgroup.smul_inf, hLdef, hconjN] at h
+  -- `L` is a maximal subgroup and `x ∈ L`.
+  have hLmax : MulAut.conj (n * g) • M ∈ maximalSubgroups G :=
+    mem_maximalSubgroups_of_isConjugateSubgroup hM ⟨n * g, rfl⟩
+  have hxMmem : x ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hxM.1
+  have hxN : x ∈ N := hCxN (Subgroup.mem_centralizer_singleton_iff.mpr rfl)
+  have hxL : x ∈ MulAut.conj (n * g) • M := by
+    have hxLN : x ∈ MulAut.conj (n * g) • M ⊓ N := by
+      rw [hLN]; exact Subgroup.mem_inf.mpr ⟨hxMmem, hxN⟩
+    exact (Subgroup.mem_inf.mp hxLN).1
+  -- `x ∈ M_σ(L)` (a `σ(L)`-subgroup lands in the `σ(L)`-Hall `M_σ(L)`).
+  have hxpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma (MulAut.conj (n * g) • M))
+      (Subgroup.zpowers x) := by
+    intro p hp
+    rw [Nat.card_zpowers] at hp
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    exact OddOrder.BG.Ch3.S10.sigma_conj (n * g)
+      (S14.isPiElement_sigma_of_mem_Msigma hxM.1 p hp)
+  have hxMσL : x ∈ OddOrder.BG.Ch3.S10.Msigma (MulAut.conj (n * g) • M) :=
+    OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hLmax) (Subgroup.zpowers_le.mpr hxL) hxpi
+      (Subgroup.mem_zpowers x)
+  -- Sharp transitivity: `c ∈ C_G(x)` with `L^c = M`.
+  obtain ⟨c, hcC, hcconj⟩ := S14.exists_conj_centralizer_of_mem_maximalSigma hG
+    (S14.genuineSigmaDecomposition hG) (S14.Msigma_ell1 hG hM hxM.1 hx1)
+    (show MulAut.conj (n * g) • M ∈ S14.maximalSigmaSubgroupsOfElement x from ⟨hLmax, hxMσL⟩)
+    (show M ∈ S14.maximalSigmaSubgroupsOfElement x from ⟨hM, hxM.1⟩)
+  -- `m = c·(n·g) ∈ N_G(M) = M`.
+  have hmconj : MulAut.conj (c * (n * g)) • M = M := by rw [map_mul, mul_smul]; exact hcconj
+  have hmM : c * (n * g) ∈ M := by
+    rw [← S14.normalizer_eq_self_of_mem_maximalSubgroups hG hM]
+    exact mem_normalizer_of_conj_smul_eq_self hmconj
+  -- `N(y)^m = N`.
+  have hcN : MulAut.conj c • N = N :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (hCxN hcC))
+  refine ⟨c * (n * g), hmM, ?_⟩
+  rw [map_mul, map_mul, mul_smul, mul_smul, hg, hconjN, hcN]
+
 end OddOrder.BG.Ch4.S16

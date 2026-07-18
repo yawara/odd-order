@@ -1,5 +1,5 @@
 ---
-id: 9112
+id: 9125
 slug: lane-c-reallocation
 title: "[撤回] lane c reallocation 相談 — 前提が事実誤認 (Ch.10 は lane c 既完成、frontier 多数残存)"
 created: 2026-07-18
