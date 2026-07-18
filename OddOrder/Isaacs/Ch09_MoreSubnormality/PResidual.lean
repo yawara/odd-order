@@ -142,4 +142,96 @@ theorem pResidual_le_of_isPGroup_quotient {N : Subgroup G} [N.Normal]
     (hN : IsPGroup p (G ⧸ N)) : pResidual p G ≤ N :=
   sInf_le ⟨inferInstance, hN⟩
 
+/-- `O^p(G) = ⊥ ⟺ G は p-群`. (`G/O^p(G)` が p-群なので `O^p(G)=⊥` なら `G` も; 逆は
+`G/⊥ ≅ G` が p-群ゆえ `O^p(G) ≤ ⊥`.) -/
+theorem pResidual_eq_bot_iff_isPGroup [Finite G] [Fact p.Prime] :
+    pResidual p G = ⊥ ↔ IsPGroup p G := by
+  constructor
+  · intro h
+    exact (((isPGroup_quotient_pResidual (p := p) (G := G)).of_equiv
+      (QuotientGroup.quotientMulEquivOfEq h)).of_equiv QuotientGroup.quotientBot)
+  · intro hG
+    exact le_bot_iff.mp
+      (pResidual_le_of_isPGroup_quotient (hG.of_equiv QuotientGroup.quotientBot.symm))
+
+/-- 正規部分群 `S ◁ G` の characteristic 部分群 `C` は `G` に normal (`C.map S.subtype ◁ G`).
+`g` 共役は `S` 上の自己同型 `conjNormal g` を誘導し, characteristic ゆえ `C` を保つ. -/
+theorem map_subtype_normal_of_characteristic {S : Subgroup G} [S.Normal]
+    (C : Subgroup ↥S) [C.Characteristic] : (C.map S.subtype).Normal := by
+  refine ⟨fun n hn g => ?_⟩
+  rw [Subgroup.mem_map] at hn
+  obtain ⟨c, hc, rfl⟩ := hn
+  have hcC : MulAut.conjNormal g c ∈ C :=
+    Subgroup.mem_comap.mp
+      ((Subgroup.characteristic_iff_comap_eq.mp ‹C.Characteristic› (MulAut.conjNormal g)).symm ▸ hc)
+  have heq : g * S.subtype c * g⁻¹ = S.subtype (MulAut.conjNormal g c) :=
+    (MulAut.conjNormal_apply g c).symm
+  rw [heq]
+  exact Subgroup.mem_map_of_mem _ hcC
+
+/-- **Isaacs Corollary 9.27** (p. 283): `S ◁ G` ならば `O^p(S) ◁ G` (ambient で
+`(O^p ↥S).map S.subtype`), 特に任意の `P ≤ G` (書籍では `P ◁ G` p-群) が `O^p(S)` を正規化する.
+
+書籍は 9.26 (`O^p(SP) = O^p(S)`) を経由するが, `O^p(S)` は `S` に characteristic なので
+`S ◁ G` から直接 `G`-normal (より一般に `P` の p-群性は不要). -/
+theorem pResidual_map_subtype_normal {S : Subgroup G} [S.Normal] :
+    ((pResidual p ↥S).map S.subtype).Normal :=
+  map_subtype_normal_of_characteristic _
+
+/-- **Isaacs Lemma 9.26** (p. 283): `G = SP`, `S ◁ G`, `P ◁ G` p-群 ⇒ `O^p(G) = O^p(S)`
+(ambient: `pResidual p G = (pResidual p ↥S).map S.subtype`). `O^p` 版の Lemma 9.15.
+
+証明: `R_S := O^p(S)` は `S` に characteristic ゆえ `◁ G`, `R_S ≤ S`, `R_S.subgroupOf S =
+O^p(↥S)`. `G/S` は p-群 (`G=SP`). `⊆`: `[G:R_S] = [S:R_S][G:S] = p^a·p^b` で `G/R_S` p-群
+→ 普遍性。`⊇`: `↥S/(R_G⊓S).subgroupOf S ↪ G/R_G` (p-群) ゆえ `O^p(↥S) ≤ (R_G⊓S).subgroupOf S`,
+map して `R_S ≤ R_G`. -/
+theorem pResidual_eq_map_subtype_of_sup_isPGroup [Finite G] [Fact p.Prime]
+    {S P : Subgroup G} [S.Normal] [P.Normal] (hP : IsPGroup p ↥P) (hSP : S ⊔ P = ⊤) :
+    pResidual p G = (pResidual p ↥S).map S.subtype := by
+  set R_S := (pResidual p ↥S).map S.subtype with hRS
+  set R_G := pResidual p G with hRG
+  haveI : R_S.Normal := pResidual_map_subtype_normal
+  have hRS_le_S : R_S ≤ S := Subgroup.map_subtype_le _
+  have hRSsub : R_S.subgroupOf S = pResidual p ↥S :=
+    Subgroup.comap_map_eq_self_of_injective S.subtype_injective _
+  -- `G/S` は p-群 (`G = SP`)
+  have hGS : IsPGroup p (G ⧸ S) := by
+    have hPmap : P.map (QuotientGroup.mk' S) = ⊤ := by
+      apply Subgroup.comap_injective (QuotientGroup.mk'_surjective S)
+      rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk', Subgroup.comap_top, sup_comm, hSP]
+    have h := hP.map (QuotientGroup.mk' S)
+    rw [hPmap] at h
+    exact h.of_equiv Subgroup.topEquiv
+  apply le_antisymm
+  · -- `O^p(G) ≤ R_S`: `G/R_S` は p-群
+    apply pResidual_le_of_isPGroup_quotient
+    obtain ⟨a, ha⟩ := (IsPGroup.iff_card (p := p)).mp (isPGroup_quotient_pResidual (G := ↥S))
+    obtain ⟨b, hb⟩ := (IsPGroup.iff_card (p := p)).mp hGS
+    refine IsPGroup.of_card (n := a + b) ?_
+    have h1 : R_S.relIndex S = p ^ a :=
+      calc R_S.relIndex S = (R_S.subgroupOf S).index := rfl
+        _ = Nat.card (↥S ⧸ R_S.subgroupOf S) := (R_S.subgroupOf S).index_eq_card
+        _ = Nat.card (↥S ⧸ pResidual p ↥S) := by rw [hRSsub]
+        _ = p ^ a := ha
+    have h2 : S.index = p ^ b := by rw [S.index_eq_card]; exact hb
+    have hab : Nat.card (G ⧸ R_S) = p ^ a * p ^ b := by
+      rw [← Subgroup.index_eq_card, ← Subgroup.relIndex_mul_index hRS_le_S, h1, h2]
+    rw [hab, ← pow_add]
+  · -- `R_S ≤ O^p(G)`
+    haveI : (R_G ⊓ S).Normal := inferInstance
+    have hkey : pResidual p ↥S ≤ (R_G ⊓ S).subgroupOf S := by
+      apply pResidual_le_of_isPGroup_quotient
+      have hkerf : ((QuotientGroup.mk' R_G).comp S.subtype).ker = (R_G ⊓ S).subgroupOf S := by
+        rw [← MonoidHom.comap_ker, QuotientGroup.ker_mk']
+        exact (Subgroup.inf_subgroupOf_right R_G S).symm
+      have e : (↥S ⧸ (R_G ⊓ S).subgroupOf S)
+          ≃* ((QuotientGroup.mk' R_G).comp S.subtype).range :=
+        (QuotientGroup.quotientMulEquivOfEq hkerf.symm).trans
+          (QuotientGroup.quotientKerEquivRange _)
+      exact ((isPGroup_quotient_pResidual (G := G)).to_subgroup _).of_equiv e.symm
+    calc R_S = (pResidual p ↥S).map S.subtype := hRS
+      _ ≤ ((R_G ⊓ S).subgroupOf S).map S.subtype := Subgroup.map_mono hkey
+      _ = (R_G ⊓ S) ⊓ S := Subgroup.subgroupOf_map_subtype _ _
+      _ ≤ R_G := inf_le_left.trans inf_le_left
+
 end OddOrder.Isaacs.Ch09
