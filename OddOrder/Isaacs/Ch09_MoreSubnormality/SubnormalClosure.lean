@@ -1086,4 +1086,52 @@ theorem not_dvd_index_of_normalizer_le {p : ℕ} [Fact p.Prime] [Finite G]
   rw [hPQeq]
   exact Q.not_dvd_index
 
+/-- 非自明な有限 `p`-群 `P` の中心化群は非自明 (`Z(P) ≠ 1` から)。 -/
+theorem centralizer_ne_bot_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P : Subgroup G}
+    (hP : IsPGroup p ↥P) (hPbot : P ≠ ⊥) : Subgroup.centralizer (P : Set G) ≠ ⊥ := by
+  haveI : Nontrivial ↥P := (Subgroup.nontrivial_iff_ne_bot P).mpr hPbot
+  haveI := hP.center_nontrivial
+  obtain ⟨z, hz⟩ := exists_ne (1 : ↥(Subgroup.center ↥P))
+  refine fun hbot => hz ?_
+  have hmem : ((z : ↥P) : G) ∈ Subgroup.centralizer (P : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    have := Subgroup.mem_center_iff.mp z.2 ⟨w, hw⟩
+    exact congrArg Subtype.val this
+  rw [hbot, Subgroup.mem_bot] at hmem
+  ext
+  simpa using hmem
+
+/-- **Bartels (9.28) Step 4** (書籍 p. 291): `M` が `X` を含む極大部分群, `P` が `M` の
+Sylow `p`-部分群なら `P` は `G` の Sylow `p`-部分群。
+
+`𝒦(M)` の setwise stabilizer は極大性から `M` 自身か `G` 全体。
+* `G` 全体なら `𝒦(M) = 𝒦(G) = 𝒦(P)` となり `C_G(P) (≠ 1)` が作用の核に入るので
+  `X^{(G)}` が subnormal となって最小反例の仮定に矛盾。
+* よって `M` 自身。`N_G(P)` は `𝒦(P) = 𝒦(M)` を保つので `N_G(P) ≤ M`, ゆえ
+  `not_dvd_index_of_normalizer_le` で結論。 -/
+theorem bartels_step_four {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X M P : Subgroup G}
+    (hM : IsCoatom M) (hXM : X ≤ M) (hXp : IsPGroup p ↥X)
+    (hPM : P ≤ M) (hPp : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex M) (hPbot : P ≠ ⊥)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
+    (hXsub : ¬ (strongClosure X).IsSubnormal) :
+    ¬ p ∣ P.index := by
+  have hKMP : kappaSet X M = kappaSet X P :=
+    kappaSet_eq_of_sylow hIH hM.1 hPM hXp hPp hPidx hne
+  rcases eq_or_eq_top_of_isCoatom hM (le_setwiseStabilizer_kappaSet X M) with hst | hst
+  · -- stabilizer = `M`: `N_G(P) ≤ M`.
+    have hNP : Subgroup.normalizer P ≤ setwiseStabilizer (kappaSet X M) := by
+      rw [hKMP]; exact normalizer_le_setwiseStabilizer_kappaSet X P
+    exact not_dvd_index_of_normalizer_le hPM hPp hPidx (hst ▸ hNP)
+  · -- stabilizer = `G`: 矛盾.
+    exfalso
+    refine hXsub (isSubnormal_strongClosure_of_kappaSetKernel_ne_bot hIH ?_)
+    have hKtop : kappaSet X ⊤ = kappaSet X P :=
+      (kappaSet_eq_top_of_setwiseStabilizer_eq_top hXM hst).symm.trans hKMP
+    rw [hKtop]
+    intro hbot
+    exact centralizer_ne_bot_of_isPGroup hPp hPbot
+      (le_bot_iff.mp (hbot ▸ centralizer_le_pointwiseStabilizer_kappaSet X P))
+
 end OddOrder.Isaacs.Ch09
