@@ -1224,6 +1224,8 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- N_G(P) は 𝒦(P) を保ち, C_G(P) は各点固定する (Step 4 の両分岐が使う)。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.normalizer_le_setwiseStabilizer_kappaSet
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_le_pointwiseStabilizer_kappaSet
+-- p-群の真部分群は指数が p で割れる (Step 4 の Sylow 結論部の道具)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.dvd_relIndex_of_lt_of_isPGroup
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.

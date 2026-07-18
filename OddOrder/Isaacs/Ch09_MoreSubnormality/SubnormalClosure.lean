@@ -1008,4 +1008,23 @@ theorem eq_or_eq_top_of_isCoatom {M K : Subgroup G} (hM : IsCoatom M) (hMK : M �
 
 end
 
+section /- 9D: Bartels Step 4 — `N_G(P) ≤ M` から `P ∈ Syl_p(G)` を出す道具 -/
+
+/-- `R` が `p`-群で `P < R` なら `p ∣ |R : P|`. -/
+theorem dvd_relIndex_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P R : Subgroup G}
+    (hR : IsPGroup p ↥R) (hlt : P < R) : p ∣ P.relIndex R := by
+  change p ∣ (P.subgroupOf R).index
+  have hne : P.subgroupOf R ≠ ⊤ := fun h => by
+    rw [Subgroup.subgroupOf_eq_top] at h
+    exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl P)
+  have hidx1 : (P.subgroupOf R).index ≠ 1 := fun h => hne (Subgroup.index_eq_one.mp h)
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp hR
+  have hdvd : (P.subgroupOf R).index ∣ p ^ n := hn ▸ Subgroup.index_dvd_card (P.subgroupOf R)
+  obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
+  rcases Nat.eq_zero_or_pos k with rfl | hkpos
+  · rw [pow_zero] at hk; exact absurd hk hidx1
+  · rw [hk]; exact dvd_pow_self p hkpos.ne'
+
+end
+
 end OddOrder.Isaacs.Ch09
