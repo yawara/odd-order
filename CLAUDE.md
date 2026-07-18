@@ -65,8 +65,9 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
   取り込んだ直後に、確認目的でフルビルドを回すのは**二重検証で無駄**。所要 10〜16 分 × レーン数 ×
   同期回数が丸ごと空費になり、同一 worktree で並行すると olean が churn して他の leaf build まで
   巻き添えにする (2026-07-19 実測)。
-  - **レーンの正しいビルド規律**: 自分が触った leaf を `lake build <Module>` で検証する。**それだけ**。
-    main 取り込みの検証は不要。commit 直前のフルビルドも原則不要 (下記のとおり hub が gate する)。
+  - **レーンの正しいビルド規律**: 自分が触った leaf を `lake build <Module>` で検証する。
+    **main 取り込みそのものを検証するフルビルドは打たない** (main は検証済み)。フルビルドを回すのは
+    「自分の変更が leaf build では捕まえきれない疑いがあるとき」だけ (leaf は stale-green を返しうる)。
   - **統合の gate は hub 側 1 箇所に集約**: hub は `git merge --no-ff <lane>` を全レーン分まとめてから
     **フルビルドを 1 回**回し、green + AxiomsCheck OK + sorry 非退行 を確認して push する。
     マージした組み合わせ特有の破綻 (下流の instance 合成崩れ等) はここで必ず捕まる。
