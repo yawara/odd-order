@@ -209,7 +209,15 @@ BG は `X = X₁` を示して `p = |X|`
       (PisetBetaDisjoint → OpicoreCentralizer → WitnessPGroup)。⟹ **`p = |X|` 完成後の
       「精密化された (e)」は `OpicoreCentralizer` でなく `WitnessPGroup` 側 (かその下流) に置く**
       (現 `fitting_not_ti_trichotomy` は OpicoreCentralizer に在り WitnessPGroup を cite できない)。
-- [ ] **(e2)/(e3) の分離** — **未了 (ただし残作業は assembly のみ)**。
+- [x] **(e2)/(e3) の分離** — **完了 (2026-07-19)**。新 leaf
+      `S16_MainResults/FittingNonTITrichotomy.lean` の `fitting_not_ti_structure_e` が Coq
+      `nonTI_Fitting_structure` (:947-950) と同形の (e) を sorry-free・axiom-clean で述べる
+      (AxiomsCheck 登録済)。共通 conjunct を括り出し (e2) ∨ (e3) を内側 disjunction にした。
+      新規の橋渡し 2 件 = `exponent_quotient_mf_eq_exponent_typeFData_U` (type F で
+      `exp(M ⧸ M_F) = exp U`) と `index_mf_subgroupOf_eq_card_kappaHall` (type P₁ で
+      `[M : M_F] = |K|`)。(e2) 側は `exp ∣ |M ⧸ M_F| = [M:M_F] = |K|` と辿れるので
+      cyclicity 不要だった。
+      (以下は着手前の調査メモ。)
 
       ⚠ **2026-07-19 訂正: 本項の旧記述「type `P₁` 側の `|O_p(H)| = p³` と `|M/H| ∣ p + 1` は
       未形式化」は誤り。** 実測したところ **(e2)(e3) の数学的内容はすべて形式化済・axiom-clean**
@@ -328,8 +336,16 @@ BG は `X = X₁` を示して `p = |X|`
       - `E₁` cyclic — 既存 `E1_isCyclic`。
       印字されている `E/E₂ ≅ E₁` は `quotientE2MulEquivE1` (mathlib
       `Subgroup.IsComplement'.QuotientMulEquiv` + `subgroupOfEquivOfLe`) として別途提供。
-- [ ] 各修正後、**恒真に潰れていないこと**を確認する (「(a) から従うか?」を必ず自問)。
-- [ ] survey の BG §15 欄と `notes/bg/s15_16_audit.md` を更新。
+- [x] 各修正後、**恒真に潰れていないこと**を確認する (「(a) から従うか?」を必ず自問)。
+      **確認済 (2026-07-19)**: `fitting_not_ti_structure_e` の第2枝は
+      `¬IsMulCommutative (O_p(M_F))` を主張しており、**`¬IsMulCommutative (M_F)` ではない**ので
+      (e1) の否定にならない (= `A ∨ ¬A` に潰れていない)。また `p` は `|X|` に束縛されており、
+      `∃ p` で decoupled ではない — これは手順 A の per-`g` 化で初めて書けるようになった。
+- [x] survey の BG §15 欄と `notes/bg/s15_16_audit.md` を更新 (2026-07-19)。
+- [x] **(follow-up)** 下流の重複解消は **issue 3023 に分離** (`isTypeI_of_isTypeF` /
+      `isTypeV_of_isTypeP1_mf_eq_msigma` の非TI分岐再導出を cite に置換)。本 issue では
+      「既存定理を一切変更しない」方針で進めたため未実施。両者とも正しく axiom-clean ゆえ
+      緊急性は無く、maintainability の改善。
 
 ## 完了条件
 
@@ -358,9 +374,10 @@ axiom-clean で証明されること。(c) は `≤` のまま (MathComp 準拠�
 | (b) | ✅ **完了** — X を束縛、`∀ g ∉ M` 形 |
 | (c) | ✅ `≤` のまま正しい (MathComp 準拠) |
 | (d) | ✅ **完了** — `sigmaComplement_structure_of_not_fittingIsTI` + `quotientE2MulEquivE1` |
-| (e) | ⚠ **部分** — (e1) 完全、(e2)(e3) は共通部分のみ。残 = `p = \|X\|` (Lemma 10.13(b) 依存) と型別分離 |
+| (e) | ✅ **完了 (2026-07-19)** — `fitting_not_ti_structure_e` が Coq 同形で (e1)/(e2)/(e3) 全条項 |
 
-**本 issue を閉じる条件 = 残り 2 チェックボックス** (`p = |X|` / (e2)(e3) 分離)。
+**本 issue の完了条件は満たされた (2026-07-19)**。(旧記述: 残り 2 チェックボックス =
+`p = |X|` / (e2)(e3) 分離。)
 どちらも **§15 内で完結する組み立て作業**で、上流の未形式化 gate は無い (Lemma 10.13 は形式化済 —
 上記参照)。type `P₁` 側の `|O_p(H)| = p³` / `|M/H| ∣ p+1` だけは BG Thm 5.5(b) + Cor 10.7(b) +
 Thm 2.5 の被覆確認が要る。
