@@ -73,13 +73,15 @@ Frobenius reciprocity reduces `⟨LHS, χ⟩` to `⟨ψ∘e, Res_{K.subgroupOf H
 strips the transport to give `⟨ψ, Res_K χ⟩ = ⟨Ind^M_K ψ, χ⟩` (Frobenius). -/
 theorem induce_induce_subgroupOf {M : Type*} [Group M] [Fintype M] [Invertible (Nat.card M : ℂ)]
     {K H : Subgroup M} (hKH : K ≤ H)
-    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Fintype ↥H] [Finite ↥K] [Finite ↥(K.subgroupOf H)]
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
     [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
     (ψ : ClassFunction ↥K ℂ) :
     ClassFunction.induce H (ClassFunction.induce (K.subgroupOf H)
         (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom ψ))
       = ClassFunction.induce K ψ := by
+  haveI : Fintype ↥K := Fintype.ofFinite _
+  haveI : Fintype ↥(K.subgroupOf H) := Fintype.ofFinite _
   set e := Subgroup.subgroupOfEquivOfLe hKH with he
   have hres : ∀ χ : IrreducibleCharacter M,
       ClassFunction.restrict (K.subgroupOf H)

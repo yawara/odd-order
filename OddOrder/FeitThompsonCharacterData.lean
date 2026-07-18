@@ -813,6 +813,7 @@ theorem tau3W_omegaS_pair_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
   rw [hv]
   exact map_intCast _ n
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- **Peterfalvi (3.2.d), `η`-grid form** (issue-2034 supply): a class function of `G`
 orthogonal to the whole grid `tau3W (omegaS i j)` vanishes on the regular set
 `Ŵ = W ∖ (W₁ ∪ W₂)`.  Transfer of the S05 completeness
@@ -1121,6 +1122,7 @@ theorem orderOf_omegaSChar_column_base :
   · exact absurd (orderOf_eq_one_iff.mp h) hne
   · exact h
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- Full Galois orbit of the nonprincipal row-axis `η`-characters. -/
 theorem tau3W_omegaS_row_galois_orbit (i : Fin tp.q)
     (hi : i ≠ ⟨0, tp.q_prime.pos⟩) :
@@ -1150,6 +1152,7 @@ theorem tau3W_omegaS_row_galois_orbit (i : Fin tp.q)
   all_goals simp [ξ]
   all_goals rfl
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
 /-- Full Galois orbit of the nonprincipal column-axis `η`-characters. -/
 theorem tau3W_omegaS_column_galois_orbit (j : Fin tp.p)
     (hj : j ≠ ⟨0, tp.p_prime.pos⟩) :

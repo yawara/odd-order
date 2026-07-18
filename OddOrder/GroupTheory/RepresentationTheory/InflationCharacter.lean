@@ -670,13 +670,14 @@ is the Clifford-correspondent existence input: a constituent of `Res_{HC} χ` no
 lying over a nontrivial chief-factor character, in Peterfalvi (9.9.a). -/
 theorem exists_constituent_not_subset_characterKernel
     {A B : Subgroup G} [Fintype ↥B] [Invertible (Nat.card ↥B : ℂ)]
-    [Fintype (IrreducibleCharacter ↥B)]
+    [Finite (IrreducibleCharacter ↥B)]
     (hAB : A ≤ B) (χ : IrreducibleCharacter G)
     (hAχ : ¬ ((A : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ))) :
     ∃ ψ : IrreducibleCharacter ↥B, IrreducibleCharacter.LiesOver B χ ψ ∧
       ¬ ((A.subgroupOf B : Set ↥B) ⊆
         OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥B ℂ)) := by
   classical
+  haveI : Fintype (IrreducibleCharacter ↥B) := Fintype.ofFinite _
   by_contra hcon
   push Not at hcon
   apply hAχ

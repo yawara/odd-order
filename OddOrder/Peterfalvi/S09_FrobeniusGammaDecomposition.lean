@@ -41,9 +41,11 @@ variable (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
 private noncomputable abbrev localH78 :=
   F.hypothesis78 i hodd hnilp C hFrob
 
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- The zeroth degree ratio in the concrete Frobenius family is one. -/
 theorem hypothesis78_d_zero_eq_one :
     (localH78 F i hodd hnilp C hFrob).hyp76.d 0 = 1 := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
   have hz0 : H78.hyp76.zeta 0 (1 : ↥(F.L i)) ≠ 0 := by
@@ -53,11 +55,13 @@ theorem hypothesis78_d_zero_eq_one :
     rw [one_mul]
     exact H78.hyp76.zeta_one_eq_d_mul 0)).symm
 
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- Every concrete Frobenius-family degree ratio is fixed by complex conjugation. -/
 theorem hypothesis78_star_d_at
     (r : Fin ((localH78 F i hodd hnilp C hFrob).hyp76.n + 1)) :
     star ((localH78 F i hodd hnilp C hFrob).hyp76.d r) =
       (localH78 F i hodd hnilp C hFrob).hyp76.d r := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
   have hzeta : ∀ s, H78.hyp76.zeta s =
@@ -78,6 +82,7 @@ theorem hypothesis78_star_d_at
     rw [eq_div_iff hz0]
     exact (H78.hyp76.zeta_one_eq_d_mul r).symm
   rw [hd, star_div₀, hreal r, hreal 0]
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- The weighted coherent sum projects onto each non-principal source image
 with coefficient equal to the corresponding local degree ratio. -/
 theorem hypothesis78_weightedNuSum_inner_nu_zeta_eq_d_at
@@ -88,6 +93,7 @@ theorem hypothesis78_weightedNuSum_inner_nu_zeta_eq_d_at
         ((localH78 F i hodd hnilp C hFrob).nu
           ((localH78 F i hodd hnilp C hFrob).hyp76.zeta r)) =
       (localH78 F i hodd hnilp C hFrob).hyp76.d r := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
   have hzeta : ∀ s, H78.hyp76.zeta s =
@@ -119,6 +125,7 @@ theorem hypothesis78_weightedNuSum_inner_nu_zeta_eq_d_at
   exact H78.hyp76.zeta_one_eq_d_mul r
 
 
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- On every nonzero, non-principal member, the concrete coherent extension
 agrees with the Dade map on the degree-zero source difference. -/
 theorem hypothesis78_coherence_agreement_at
@@ -134,6 +141,7 @@ theorem hypothesis78_coherence_agreement_at
         (localH78 F i hodd hnilp C hFrob).hyp76.d r •
           (localH78 F i hodd hnilp C hFrob).nu
             ((localH78 F i hodd hnilp C hFrob).hyp76.zeta 0) := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   classical
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
@@ -184,6 +192,7 @@ theorem hypothesis78_coherence_agreement_at
   rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob]
   exact hagree
 
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- The coherent degree-zero difference is supported on the local Dade support. -/
 theorem hypothesis78_nu_zeta_sub_d_smul_support_at
     {r : Fin ((localH78 F i hodd hnilp C hFrob).hyp76.n + 1)}
@@ -194,6 +203,7 @@ theorem hypothesis78_nu_zeta_sub_d_smul_support_at
           (localH78 F i hodd hnilp C hFrob).nu
             ((localH78 F i hodd hnilp C hFrob).hyp76.zeta 0)).support
       ⊆ (localH78 F i hodd hnilp C hFrob).hyp76.hyp71.hyp.dadeSupport := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   rw [← F.hypothesis78_coherence_agreement_at i hodd hnilp C hFrob hr]
   intro g hg
@@ -249,6 +259,7 @@ theorem hypothesis79_weightedNuSum_cross_zeta_eq_zero_at
     mul_zero]
 
 omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
+omit [Fintype ↥((F.H j).subgroupOf (F.L j))] in
 /-- Expanding the selected beta decomposition against a coherent source image
 of a distinct family leaves only the Gamma term. -/
 theorem hypothesis79_beta_inner_nu_zeta_eq_gamma
@@ -284,6 +295,8 @@ theorem hypothesis79_beta_inner_nu_zeta_eq_gamma
     hone, hzeta, hweighted, mul_zero]
   ring
 
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
+omit [Fintype ↥((F.H j).subgroupOf (F.L j))] in
 /-- The coefficient of Gamma on any source image in a distinct Frobenius
 family is its local degree ratio times the distinguished beta coefficient. -/
 theorem hypothesis79_gamma_inner_nu_zeta_eq_d_mul
@@ -300,6 +313,8 @@ theorem hypothesis79_gamma_inner_nu_zeta_eq_d_mul
           (F.hypothesis78 i hodd hnilp_i C_i hFrob_i).beta
           ((F.hypothesis78 j hodd hnilp_j C_j hFrob_j).nu
             ((F.hypothesis78 j hodd hnilp_j C_j hFrob_j).hyp76.zeta 0)) := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  haveI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
   let H78i := F.hypothesis78 i hodd hnilp_i C_i hFrob_i
   let H78j := F.hypothesis78 j hodd hnilp_j C_j hFrob_j
   let H79 :=
@@ -355,6 +370,8 @@ theorem hypothesis79_exists_integral_beta_zeta_coefficient :
       (F.hypothesis78_isCoherent_sourceSet j hodd hnilp_j C_j hFrob_j)
       (F.hypothesis78_nu_eq j hodd hnilp_j C_j hFrob_j) h0
   exact ClassFunction.inner_mem_ZIrr_int hbetaZ hnuZ
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
+omit [Fintype ↥((F.H j).subgroupOf (F.L j))] in
 /-- The cross-family integer coefficient is exactly the orthogonal projection
 coefficient of Gamma onto the other family's weighted coherent sum. -/
 theorem hypothesis79_gamma_inner_weightedNuSum_eq_mul_self
@@ -371,6 +388,8 @@ theorem hypothesis79_gamma_inner_weightedNuSum_eq_mul_self
       (x : ℂ) * ClassFunction.inner
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  haveI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
   classical
   let H78j := F.hypothesis78 j hodd hnilp_j C_j hFrob_j
   let coeff : Fin (H78j.hyp76.n + 1) → ℂ := fun r =>
@@ -447,6 +466,8 @@ theorem hypothesis79_gamma_inner_weightedNuSum_eq_mul_self
   rw [hpoint r hr]
   ring
 
+omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
+omit [Fintype ↥((F.H j).subgroupOf (F.L j))] in
 /-- Rational-weight form of the Gamma projection identity used in Peterfalvi
 (7.10). -/
 theorem hypothesis79_gamma_inner_weightedNuSum_eq_mul_BsumWeight
@@ -461,6 +482,8 @@ theorem hypothesis79_gamma_inner_weightedNuSum_eq_mul_BsumWeight
     ClassFunction.inner hBD_i.Gamma
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum =
       (x : ℂ) * (F.BsumWeight j : ℂ) := by
+  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  haveI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
   calc
     ClassFunction.inner hBD_i.Gamma
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum =

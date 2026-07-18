@@ -1345,7 +1345,7 @@ a nonidentity `w ∈ W₂ ⊆ M_σ^#`, `W ≤ C_M(w)` (abelian), so the `σ`-sha
 (`escaping_sigmaSharp_disjoint_centralizer`) at `w` kills every common prime.  This reduces the
 exceptional-support coprimality to the σ-sharp one — the `V^M` half of the engine's
 `centralizer_coprime`. -/
-theorem coprime_FT_signalizer_centralizerIn_typePV [Fintype G]
+theorem coprime_FT_signalizer_centralizerIn_typePV [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypePData M)
     {a : G} (haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
@@ -1354,6 +1354,7 @@ theorem coprime_FT_signalizer_centralizerIn_typePV [Fintype G]
     Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
       (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)) := by
   classical
+  haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨v, hv, m, hmM, hmv⟩ := hb
   have hvW : v ∈ data.W := by
     have hv' := hv; simp only [typePV, Set.mem_sdiff] at hv'; exact hv'.1
@@ -1730,7 +1731,7 @@ theorem dadeSupportHypothesisData_of_subset_escaping_sigmaSharp [Fintype G]
 `b ∈ A_0(M)`, `|R(a)|` is coprime to `|C_M(b)|`.  Splits `A_0 = A(M) ∪ V^M`: for `b ∈ A(M) = M_σ^#`
 it is the σ-sharp coprimality (`escaping_sigmaSharp_disjoint_centralizer`); for `b ∈ V^M` it is
 `coprime_FT_signalizer_centralizerIn_typePV`. -/
-theorem coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 [Fintype G]
+theorem coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypePData M)
     (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M)
@@ -1739,6 +1740,7 @@ theorem coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 [Fintype G]
     {b : G} (hb : b ∈ typePA0 M data) :
     Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
       (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)) := by
+  haveI : Fintype G := Fintype.ofFinite G
   simp only [typePA0, Set.mem_union] at hb
   rcases hb with hpb | hvb
   · rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1] at hpb

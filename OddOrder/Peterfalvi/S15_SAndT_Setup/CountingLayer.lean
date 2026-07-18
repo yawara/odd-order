@@ -833,8 +833,9 @@ theorem P_conj_forall_not_le_T [Finite G]
 
 open scoped Classical in
 /-- `|K^#| = |K| − 1`, `Finset` form. -/
-theorem card_sharp_toFinset [Fintype G] (K : Subgroup G) :
+theorem card_sharp_toFinset [Finite G] (K : Subgroup G) :
     (Set.toFinite (sharpSubgroup K)).toFinset.card = Nat.card ↥K - 1 := by
+  haveI : Fintype G := Fintype.ofFinite G
   classical
   have h : (Set.toFinite (sharpSubgroup K)).toFinset
       = (Finset.univ.filter (· ∈ K)).erase 1 := by
@@ -850,11 +851,12 @@ theorem card_sharp_toFinset [Fintype G] (K : Subgroup G) :
 
 /-- **Peterfalvi (13.10.3), ℕ form**: `|G| = 1 + |G₀| + [G:S]·|H^#| + [G:T]·|Q^#|` — the
 `f = 1` instance of the four-piece split. -/
-theorem Hypothesis.card_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem Hypothesis.card_univ_split [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G))
     (hcardQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p) (hvd : hyp.v * hyp.d ≠ 1) :
     Nat.card G = 1 + hyp.G0Finset.card
       + hyp.S.index * (Nat.card ↥hyp.H - 1) + hyp.T.index * (Nat.card ↥hyp.Q - 1) := by
+  haveI : Fintype G := Fintype.ofFinite G
   have h := hyp.sum_univ_split hG (fun _ => (1 : ℕ)) (fun _ _ => rfl) hcardQ hvd
   simp only [← Finset.card_eq_sum_ones, Finset.card_univ, smul_eq_mul,
     card_sharp_toFinset] at h

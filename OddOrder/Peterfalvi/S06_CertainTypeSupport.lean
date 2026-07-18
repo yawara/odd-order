@@ -86,6 +86,7 @@ theorem mem_A_of_apply_ne_zero_of_covers [Finite G]
   exact Subgroup.mem_inf.mpr
     ⟨Subgroup.mem_centralizer_singleton_iff.mpr hcomm.symm, hgL_K⟩
 
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Peterfalvi (4.7)**, core support statement.  Under Hypothesis (4.6), if
 `χ ∈ Irr(K)` satisfies `H ⊄ Ker χ`, then every nonidentity `g ∈ K` with `χ(g) ≠ 0`
 maps into `A` (i.e. `Supp χ ⊆ A ∪ {1}`).

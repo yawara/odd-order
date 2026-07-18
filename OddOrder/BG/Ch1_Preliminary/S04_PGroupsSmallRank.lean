@@ -125,6 +125,7 @@ private theorem deltaHom_apply [S.Normal]
     (hSR : ⁅S, (⊤ : Subgroup R)⁆ ≤ (Subgroup.center (↥S)).map S.subtype) (g : R) (s : ↥S) :
     (deltaHom hSR g s : ↥S) = MulAut.conjNormal g s * s⁻¹ := rfl
 
+omit [Finite R] in
 /-- `δ_g = 1` (the trivial homomorphism) iff `g` centralizes `S`: `δ_g(s) = 1` says
 `g s g⁻¹ = s` for every `s ∈ S`. -/
 private theorem deltaHom_eq_one_iff_mem_centralizer [S.Normal]
@@ -180,6 +181,7 @@ private noncomputable def deltaQuot [S.Normal] (hS : IsExtraspecial p (↥S))
   QuotientGroup.lift (Subgroup.center (↥S)) (deltaHom hSR g) (center_le_ker_deltaHom hS hSR g)
 
 omit [Fact (Nat.Prime p)] in
+omit [Finite R] in
 @[simp]
 private theorem deltaQuot_mk [S.Normal] (hS : IsExtraspecial p (↥S))
     (hSR : ⁅S, (⊤ : Subgroup R)⁆ ≤ (Subgroup.center (↥S)).map S.subtype) (g : R) (s : ↥S) :

@@ -68,7 +68,7 @@ their **own** central `φ_θ` (read off from `θ` via the central restriction), 
 shared `φ`.  Positivity is immediate from `⟨φ_θ, Res θ⟩ = θ(1)·⟨φ_θ,φ_θ⟩ = θ(1) ≠ 0`. -/
 theorem exists_central_phi_data
     {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
-    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)] [Fintype ↥H]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)] [Finite ↥H]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
     (θ : IrreducibleCharacter ↥H) :
     ∃ (φ : ClassFunction ↥W2 ℂ)
@@ -78,6 +78,7 @@ theorem exists_central_phi_data
       ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ)
         = (θ : ClassFunction ↥H ℂ) 1 •
           ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨φN, hφNirr, hφN1, hres, _⟩ :=
     θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
   set e := Subgroup.subgroupOfEquivOfLe hW2H with he
@@ -224,11 +225,12 @@ to the existential form at `H = K` and reduced to the underlying `L`-values of `
 theorem caseB_column_W2_nonconstant
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     ∃ w : ↥(h46.W2.subgroupOf H),
       (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) (w : ↥H)
         ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1 := by
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   classical
   by_contra hc
   push Not at hc
@@ -1059,10 +1061,11 @@ and sends each column `columnSum χ₂ = ∑_i μ_{iχ₂}` to its image. -/
 theorem grid_mu_notMem_Xset
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
-    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [NeZero (Nat.card h46.W1)] [Finite ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
     ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) ∉ hyp.Xset h46.W2 := by
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   intro hmem
   have hS := hyp.Xset_subset_S hmem
   rw [hyp.S_eq, Set.mem_setOf_eq] at hS

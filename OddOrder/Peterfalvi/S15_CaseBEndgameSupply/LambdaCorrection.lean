@@ -156,7 +156,7 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (13.6), `λ(xy)=0` in chosen-base form**: the chosen family member for
 `λ` vanishes off `H`, while the mixed product `x·y` has order divisible by `q` and therefore
 cannot lie in `H`. -/
-theorem LambdaClusterData.apply_mul_eq_zero_base [Fintype G]
+theorem LambdaClusterData.apply_mul_eq_zero_base [Finite G]
     [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (lam : LambdaClusterData hyp)

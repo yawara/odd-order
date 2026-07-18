@@ -288,12 +288,13 @@ theorem columnSum_apply_one (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
 certain-type columns have the same degree `∑_i μ_{ij}(1) = ∑_i μ_{ik}(1)`, their signs coincide
 (reduce to the per-row `(4.8)` sign equality at any row via the degree bridge). -/
 theorem certainType_columnSign_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ}
     (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
-    (h.columnFamily χ₂).sign = (h.columnFamily χ₂').sign :=
-  certainType_sign_eq_of_degree_eq h.toCore χ₂ χ₂' 0
+    (h.columnFamily χ₂).sign = (h.columnFamily χ₂').sign := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  exact certainType_sign_eq_of_degree_eq h.toCore χ₂ χ₂' 0
     (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg 0)
 
 /-- **`Supp(μ_j − μ_k) ⊆ supportInSubgroup A L`** for same-degree certain-type columns.  Both
@@ -462,10 +463,11 @@ theorem certainTypeExtension_eq_dade_of_mem_zSupportedSpan (h : Hypothesis46 A L
 complex conjugate `μ_{k⁻¹} = mapRingEquiv conj μ_k` (`certainType_columnSum_conj`), and the degree
 `μ_k(1) = ∑_i μ_{ik}(1)` is a sum of positive integers, hence fixed by complex conjugation. -/
 theorem columnSum_inv_apply_one (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     (∑ i, ((h.columnFamily k⁻¹).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h.columnFamily k).mu i : ClassFunction ↥L ℂ) 1) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [← columnSum_apply_one, ← columnSum_apply_one]
   have h1 : columnSum h k⁻¹
       = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (columnSum h k) := by

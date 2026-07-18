@@ -98,6 +98,7 @@ theorem colT_finNeg (i : Fin tp.q) :
     Units.val_inv_eq_inv_val]
   exact Units.val_inv_eq_inv_val _
 
+omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- `rowDualT j` agrees with the S-side dual on a transported `mp.Kstar`-element. -/
 theorem rowDualT_apply_mem_Kstar (j : Fin tp.p) (w : ↥tp.W)
     (hw : (w : G) ∈ mp.Kstar) :

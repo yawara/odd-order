@@ -48,7 +48,7 @@ invariant Clifford restriction `restrict_eq_restrictionMultiplicity_smul_of_inva
 irreducible constituents `ψ·Inf(β)` of `Ind_H^K θ`, each of degree `ψ(1)`. -/
 theorem induce_smul_eq_mul_sum_of_invariant [Finite K] [Fintype K] [Fintype ↥H]
     [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
-    [Fintype (IrreducibleCharacter ↥H)] [Fintype ((K ⧸ H) →* ℂˣ)]
+    [Finite (IrreducibleCharacter ↥H)] [Fintype ((K ⧸ H) →* ℂˣ)]
     (hab : ∀ x y : K, ⁅x, y⁆ ∈ H)
     (θ : IrreducibleCharacter ↥H) (ψ : IrreducibleCharacter K)
     (hover : IrreducibleCharacter.LiesOver H ψ θ)
@@ -57,6 +57,7 @@ theorem induce_smul_eq_mul_sum_of_invariant [Finite K] [Fintype K] [Fintype ↥H
         ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
       = (ψ : ClassFunction K ℂ) *
           ∑ β : (K ⧸ H) →* ℂˣ, linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
+  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite _
   have h3 := induce_restrict_eq_mul_sum_linearClassFunction hab (ψ : ClassFunction K ℂ)
   have h4 := restrict_eq_restrictionMultiplicity_smul_of_invariant ψ θ hover hinv
   rw [h4, ClassFunction.induce_smul] at h3
@@ -76,7 +77,7 @@ and `e = ⟨Res ψ, θ⟩ ≠ 0` (`ψ` over `θ`), some `β` has `φ = ψ·Inf(�
 Peterfalvi (12.5) where the coprime Gallagher decomposition does not. -/
 theorem induce_invariant_constituent_apply_one_eq [Finite K] [Fintype K] [Fintype ↥H]
     [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
-    [Fintype (IrreducibleCharacter ↥H)] [Fintype ((K ⧸ H) →* ℂˣ)]
+    [Finite (IrreducibleCharacter ↥H)] [Finite ((K ⧸ H) →* ℂˣ)]
     (hab : ∀ x y : K, ⁅x, y⁆ ∈ H)
     (θ : IrreducibleCharacter ↥H) (ψ : IrreducibleCharacter K)
     (hover : IrreducibleCharacter.LiesOver H ψ θ)
@@ -86,6 +87,8 @@ theorem induce_invariant_constituent_apply_one_eq [Finite K] [Fintype K] [Fintyp
         (φ : ClassFunction K ℂ) ≠ 0) :
     (φ : ClassFunction K ℂ) (1 : K) = (ψ : ClassFunction K ℂ) (1 : K) := by
   classical
+  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite _
+  haveI : Fintype ((K ⧸ H) →* ℂˣ) := Fintype.ofFinite _
   -- The irreducible twists `ψ·Inf(β)`, bundled.
   set Φ : ((K ⧸ H) →* ℂˣ) → IrreducibleCharacter K := fun β =>
     ⟨(ψ : ClassFunction K ℂ) * linearClassFunction (β.comp (QuotientGroup.mk' H)),
@@ -134,10 +137,10 @@ extension `χ`.  Feeds the `H'/H`-level equal-degree that Peterfalvi (12.5) need
 theorem induce_smul_eq_sum_induce_mul_of_invariant_inertia
     {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
     {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
-    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Finite ↥N] [Finite ↥T] [Fintype ↥(N.subgroupOf T)]
     [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
     [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
-    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    [Finite (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
     (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
     (θ : IrreducibleCharacter ↥N)
     (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
@@ -156,6 +159,9 @@ theorem induce_smul_eq_sum_induce_mul_of_invariant_inertia
           ClassFunction.induce T ((ψ : ClassFunction ↥T ℂ) *
             linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T)))) := by
   classical
+  haveI : Fintype ↥N := Fintype.ofFinite _
+  haveI : Fintype ↥T := Fintype.ofFinite _
+  haveI : Fintype (IrreducibleCharacter ↥(N.subgroupOf T)) := Fintype.ofFinite _
   set θ' : IrreducibleCharacter ↥(N.subgroupOf T) :=
     ⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
         (θ : ClassFunction ↥N ℂ),
@@ -198,10 +204,10 @@ vanishes off the normal `N` (`induce_apply_eq_zero_of_not_mem_normal`).  Each `�
 theorem sum_induce_mul_apply_eq_zero_of_not_mem_normal
     {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
     {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
-    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Finite ↥N] [Finite ↥T] [Fintype ↥(N.subgroupOf T)]
     [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
     [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
-    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    [Finite (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
     (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
     (θ : IrreducibleCharacter ↥N)
     (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
@@ -216,6 +222,9 @@ theorem sum_induce_mul_apply_eq_zero_of_not_mem_normal
     (∑ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ,
         ClassFunction.induce T ((ψ : ClassFunction ↥T ℂ) *
           linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T))))) g = 0 := by
+  haveI : Fintype ↥N := Fintype.ofFinite _
+  haveI : Fintype ↥T := Fintype.ofFinite _
+  haveI : Fintype (IrreducibleCharacter ↥(N.subgroupOf T)) := Fintype.ofFinite _
   rw [← induce_smul_eq_sum_induce_mul_of_invariant_inertia hNT hab θ hinertia ψ hover,
     ClassFunction.smul_apply,
     ClassFunction.induce_apply_eq_zero_of_not_mem_normal N (θ : ClassFunction ↥N ℂ) hg, mul_zero]
@@ -235,10 +244,10 @@ abelian-quotient inertia, no coprimality — as Peterfalvi (12.5) needs at `H'/H
 theorem induce_inertia_constituent_apply_one_eq
     {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
     {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
-    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Finite ↥N] [Finite ↥T] [Fintype ↥(N.subgroupOf T)]
     [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
     [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
-    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    [Finite (IrreducibleCharacter ↥(N.subgroupOf T))] [Finite ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
     (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
     (θ : IrreducibleCharacter ↥N)
     (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
@@ -251,6 +260,10 @@ theorem induce_inertia_constituent_apply_one_eq
         (φ : ClassFunction L ℂ) ≠ 0) :
     (φ : ClassFunction L ℂ) (1 : L) = (T.index : ℂ) * (ψ : ClassFunction ↥T ℂ) (1 : ↥T) := by
   classical
+  haveI : Fintype ↥N := Fintype.ofFinite _
+  haveI : Fintype ↥T := Fintype.ofFinite _
+  haveI : Fintype (IrreducibleCharacter ↥(N.subgroupOf T)) := Fintype.ofFinite _
+  haveI : Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ) := Fintype.ofFinite _
   set θ'cf : ClassFunction ↥(N.subgroupOf T) ℂ :=
     ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
       (θ : ClassFunction ↥N ℂ) with hθ'cf
@@ -306,7 +319,7 @@ degree
 theorem inner_induce_constituent_eq_of_apply_one_eq {H : Type*} [Group H]
     [Fintype H] [Invertible (Nat.card H : ℂ)]
     {N : Subgroup H} [hN : N.Normal] [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
-    [Fintype (IrreducibleCharacter ↥N)]
+    [Finite (IrreducibleCharacter ↥N)]
     {φ₁ φ₂ : IrreducibleCharacter H} {ρ : IrreducibleCharacter ↥N}
     (h₁ : IrreducibleCharacter.LiesOver (G := H) (H := N) φ₁ ρ)
     (h₂ : IrreducibleCharacter.LiesOver (G := H) (H := N) φ₂ ρ)
@@ -314,6 +327,7 @@ theorem inner_induce_constituent_eq_of_apply_one_eq {H : Type*} [Group H]
     ClassFunction.inner (ClassFunction.induce N (ρ : ClassFunction ↥N ℂ)) (φ₁ : ClassFunction H ℂ)
       = ClassFunction.inner (ClassFunction.induce N (ρ : ClassFunction ↥N ℂ))
           (φ₂ : ClassFunction H ℂ) := by
+  haveI : Fintype (IrreducibleCharacter ↥N) := Fintype.ofFinite _
   rw [inner_induce_coe_eq_restrictionMultiplicity, inner_induce_coe_eq_restrictionMultiplicity]
   exact restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq h₁ h₂ hdeg
 
@@ -334,7 +348,7 @@ Blocks with no non-trivial constituent contribute `0` termwise. -/
 theorem constant_off_normal_of_inner_block_const {G : Type*} [Group G] [Finite G]
     [Fintype G] [Invertible (Nat.card G : ℂ)]
     {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
-    [Fintype (IrreducibleCharacter G)]
+    [Finite (IrreducibleCharacter G)]
     (g : ClassFunction G ℂ)
     (hcoeff : ∀ (θ₁ θ₂ : IrreducibleCharacter G) (ρ : IrreducibleCharacter ↥H),
         θ₁ ≠ trivialIrreducibleCharacter G → θ₂ ≠ trivialIrreducibleCharacter G →
@@ -350,6 +364,7 @@ theorem constant_off_normal_of_inner_block_const {G : Type*} [Group G] [Finite G
     {x y : G} (hx : x ∉ H) (hy : y ∉ H) :
     g x = g y := by
   classical
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   obtain ⟨parts, hcover, hdisj, hchar⟩ := exists_induce_constituent_partition (G := G) (H := H)
   have hg_eval : ∀ z : G, g z = ∑ θ : IrreducibleCharacter G,
       ClassFunction.inner g (θ : ClassFunction G ℂ) * (θ : ClassFunction G ℂ) z := by
@@ -433,10 +448,10 @@ the
 theorem induce_inertia_constituents_apply_one_eq
     {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
     {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
-    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Finite ↥N] [Finite ↥T] [Fintype ↥(N.subgroupOf T)]
     [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
     [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
-    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    [Finite (IrreducibleCharacter ↥(N.subgroupOf T))] [Finite ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
     (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
     (θ : IrreducibleCharacter ↥N)
     (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
@@ -450,6 +465,10 @@ theorem induce_inertia_constituents_apply_one_eq
     (hφ₂ : ClassFunction.inner (ClassFunction.induce N (θ : ClassFunction ↥N ℂ))
         (φ₂ : ClassFunction L ℂ) ≠ 0) :
     (φ₁ : ClassFunction L ℂ) (1 : L) = (φ₂ : ClassFunction L ℂ) (1 : L) := by
+  haveI : Fintype ↥N := Fintype.ofFinite _
+  haveI : Fintype ↥T := Fintype.ofFinite _
+  haveI : Fintype (IrreducibleCharacter ↥(N.subgroupOf T)) := Fintype.ofFinite _
+  haveI : Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ) := Fintype.ofFinite _
   rw [induce_inertia_constituent_apply_one_eq hNT hab θ hinertia ψ hover φ₁ hφ₁,
     induce_inertia_constituent_apply_one_eq hNT hab θ hinertia ψ hover φ₂ hφ₂]
 
@@ -461,7 +480,7 @@ Since `HH/[HH,HH]` is abelian, every inertia quotient `I(ρ)/[HH,HH]` is abelian
 `induce_inertia_constituents_apply_one_eq` applies with `N = [HH,HH]`, `T = I(ρ)`, `hab` from
 `⁅x,y⁆ ∈ ⁅⊤,⊤⁆`, and a Clifford correspondent `ψ` from `exists_liesOver_of_subgroup`. -/
 theorem commutator_induce_constituents_apply_one_eq {HH : Type*} [Group HH] [Finite HH]
-    [Fintype HH] [Invertible (Nat.card HH : ℂ)]
+    [Invertible (Nat.card HH : ℂ)]
     [Fintype ↥(commutator HH)] [Invertible (Nat.card ↥(commutator HH) : ℂ)]
     (ρ : IrreducibleCharacter ↥(commutator HH))
     (θ₁ θ₂ : IrreducibleCharacter HH)
@@ -469,6 +488,7 @@ theorem commutator_induce_constituents_apply_one_eq {HH : Type*} [Group HH] [Fin
     (h₂ : IrreducibleCharacter.LiesOver (commutator HH) θ₂ ρ) :
     (θ₁ : ClassFunction HH ℂ) 1 = (θ₂ : ClassFunction HH ℂ) 1 := by
   classical
+  haveI : Fintype HH := Fintype.ofFinite HH
   have hNT : commutator HH ≤ ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ) :=
     ClassFunction.subgroup_le_inertia _
   haveI : Fintype ↥(ClassFunction.inertia (ρ : ClassFunction ↥(commutator HH) ℂ)) :=

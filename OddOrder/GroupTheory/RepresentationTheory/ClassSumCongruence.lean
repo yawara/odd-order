@@ -850,6 +850,7 @@ theorem centralCharacterOfRep_eq_of_card_eq_of_character_eq (ρ : Representation
     sum_character_eq_card_mul ρ (ConjClasses.mk z) (g := z) rfl,
     sum_character_eq_card_mul ρ (ConjClasses.mk z') (g := z') rfl, hcard, hchar]
 
+omit [Fintype G] in
 omit [Fintype (ConjClasses G)] in
 omit [DecidableEq (ConjClasses G)] in
 /-- **Class-size constancy from centralizer constancy inside a subgroup.**  If the ambient
@@ -860,7 +861,7 @@ centralizers `C_G(z)` and `C_G(z')` both lie in `L`, then equality of the `L`-ce
 This is the group-theoretic bridge used in Peterfalvi (6.7): the TI condition puts
 `C_G(x) ≤ L` for `x ∈ P^#`, so a hypothesis that `|C_L(x)|` is constant on `Z^#` can be read as
 constancy of the ambient class size. -/
-theorem card_class_eq_of_inf_centralizer_card_eq (L : Subgroup G) {z z' : G}
+theorem card_class_eq_of_inf_centralizer_card_eq [Finite G] (L : Subgroup G) {z z' : G}
     (hz : Subgroup.centralizer ({z} : Set G) ≤ L)
     (hz' : Subgroup.centralizer ({z'} : Set G) ≤ L)
     (hcard : Nat.card ↥(L ⊓ Subgroup.centralizer ({z} : Set G))

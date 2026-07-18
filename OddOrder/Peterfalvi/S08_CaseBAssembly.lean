@@ -336,7 +336,7 @@ reindexed to the positive-weight subtype `{θ // 0 < aθ}` (zero-weight constitu
 aggregate). -/
 theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Fintype M]
     [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
-    [Fintype ↥H] [Fintype ↥(K.subgroupOf H)]
+    [Finite ↥H] [Fintype ↥(K.subgroupOf H)]
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
     (hcen : K.subgroupOf H ≤ Subgroup.center ↥H)
     {φ : ClassFunction ↥K ℂ}
@@ -345,6 +345,7 @@ theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Fintype M]
     ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
         ((constituentWeight hφ' i.val : ℤ)) ^ 2 = ((K.subgroupOf H).index : ℤ) := by
   classical
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   -- the full square-sum over `Irr H`, in `ℤ`-form
   have hfull : (∑ θ : IrreducibleCharacter ↥H, ((constituentWeight hφ' θ : ℤ)) ^ 2)
       = ((K.subgroupOf H).index : ℤ) := by

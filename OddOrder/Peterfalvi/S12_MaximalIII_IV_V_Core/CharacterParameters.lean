@@ -531,12 +531,13 @@ automorphism `u` of `ℂ` with `σ(ω_{0,χ₂^k}) = (σ(ω_{0,χ₂}))^u`, henc
 integer `δ·μ(1)` (degrees are positive, signs `±1`) forces `μ_{0,χ₂^k}(1) = μ_{0,χ₂}(1)`. -/
 theorem columnFamily_mu_zero_apply_one_pow {L : Type*} [Group L] [Fintype L]
     [Invertible (Nat.card L : ℂ)] (h : OddOrder.Peterfalvi.S06.Hypothesis L)
-    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [NeZero (Nat.card h.W1)] [Finite ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) {k : ℕ}
     (hk : k.Coprime (orderOf (h.toTICyclicHypothesis.omegaProdChar 1 χ₂))) :
     ((h.columnFamily (χ₂ ^ k)).mu 0 : ClassFunction L ℂ) 1
       = ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   -- (3.9.b): the Galois automorphism `u` relating the row-`0` source to its `k`-th power
   obtain ⟨u, hu, -⟩ := h.toTICyclicHypothesis.exists_mapRingEquiv_sigma_omega_pow rfl
@@ -588,11 +589,12 @@ identity `δ_{χ₂^k}·μ_{0,χ₂^k} = (δ_{χ₂}·μ_{0,χ₂})^u`, evaluate
 (10.3): "It follows that `δ_j = δ_1` and `μ_{0j}(1) = μ_{01}(1)`." -/
 theorem columnFamily_mu_zero_sign_pow {L : Type*} [Group L] [Fintype L]
     [Invertible (Nat.card L : ℂ)] (h : OddOrder.Peterfalvi.S06.Hypothesis L)
-    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [NeZero (Nat.card h.W1)] [Finite ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) {k : ℕ}
     (hk : k.Coprime (orderOf (h.toTICyclicHypothesis.omegaProdChar 1 χ₂))) :
     (h.columnFamily (χ₂ ^ k)).sign = (h.columnFamily χ₂).sign := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   obtain ⟨u, hu, -⟩ := h.toTICyclicHypothesis.exists_mapRingEquiv_sigma_omega_pow rfl
     h.toTICyclicFullDadeApplication (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) hk
@@ -636,11 +638,12 @@ group has prime order, every nontrivial column shares the common sign `δ`.  Mir
 other) but for the sign via `columnFamily_mu_zero_sign_pow`. -/
 theorem columnFamily_mu_zero_sign_eq_of_ne_one {L : Type*} [Group L] [Fintype L]
     [Invertible (Nat.card L : ℂ)] (h : OddOrder.Peterfalvi.S06.Hypothesis L)
-    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [NeZero (Nat.card h.W1)] [Finite ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (hp : (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).Prime)
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) :
     (h.columnFamily χ₂').sign = (h.columnFamily χ₂).sign := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   haveI : Finite ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
     (Nat.card_pos_iff.mp hp.pos).2
@@ -676,12 +679,13 @@ cross-column (j-independence) half of (10.3):
 all the columns `0 < j < w₂` have degree `d = μ_{0j}(1)` independent of `j`. -/
 theorem columnFamily_mu_zero_apply_one_eq_of_ne_one {L : Type*} [Group L] [Fintype L]
     [Invertible (Nat.card L : ℂ)] (h : OddOrder.Peterfalvi.S06.Hypothesis L)
-    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [NeZero (Nat.card h.W1)] [Finite ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (hp : (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).Prime)
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) :
     ((h.columnFamily χ₂').mu 0 : ClassFunction L ℂ) 1
       = ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   -- a prime cardinality forces the dual group to be finite
   haveI : Finite ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
