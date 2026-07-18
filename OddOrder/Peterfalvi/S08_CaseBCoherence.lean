@@ -35,7 +35,8 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
-/-- **(6.8.2.2) norm preservation `‖α^τ‖² = ‖α‖²`** for `α = Ind^L_{W₂}φ − c·η₁` (`α(1) = 0`).  Since
+/-- **(6.8.2.2) norm preservation `‖α^τ‖² = ‖α‖²`** for `α = Ind^L_{W₂}φ − c·η₁` (`α(1) = 0`).
+Since
 `Supp(α) ⊆ H^#` (`support_indW2_sub_smul_subset_sharpImage`), the Dade isometry on the supported
 singleton `{α}` (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) gives
 `⟨α^τ, α^τ⟩ = ⟨α, α⟩`.  This is the source of the norm bound `‖α^τ‖² = ‖α‖² = |L:Z| + |H:Z|²` in the
@@ -160,7 +161,8 @@ theorem SibleyDadeHypothesis.coherentYset_extension_Yset_diff_eq_tau
   exact hyp.coherentYset.extends_on_supported (η' - η₁) hmem
 
 omit [Fintype G] [Fintype ↥L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
-/-- **Inertia of a class function on a central subgroup is everything.**  If `W₂ ≤ Z(↥L)` (so `W₂` is
+/-- **Inertia of a class function on a central subgroup is everything.**  If `W₂ ≤ Z(↥L)` (so `W₂`
+is
 normal), conjugation by any `g ∈ ↥L` fixes each `w ∈ W₂` (`g·w·g⁻¹ = w`, centrality), hence
 `conjBy g φ = φ` for every class function `φ` of `W₂`, i.e. `I_{↥L}(φ) = ⊤`.
 
@@ -203,7 +205,8 @@ theorem inner_self_induce_eq_index_of_le_center
   have hW2ne : (Nat.card ↥W2 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   exact mul_left_cancel₀ hW2ne hcard
 
-/-- **(6.8.2.2) single cross-term `⟨Ind_{W₂}φ, η⟩ = 0`** for a *nontrivial* `φ ∈ Irr W₂` and `η ∈ Y`.
+/-- **(6.8.2.2) single cross-term `⟨Ind_{W₂}φ, η⟩ = 0`** for a *nontrivial* `φ ∈ Irr W₂` and
+`η ∈ Y`.
 By Frobenius reciprocity `⟨Ind_{W₂}φ, η⟩ = ⟨φ, Res^L_{W₂}η⟩`, and `Res^L_{W₂}η` is the constant
 `|W₁|`
 on `W₂` (each `η ∈ Y` is constant `η(1) = |W₁|` on `⁅H,H⁆ ⊇ W₂`,
@@ -211,7 +214,8 @@ on `W₂` (each `η ∈ Y` is constant `η(1) = |W₁|` on `⁅H,H⁆ ⊇ W₂`,
 `|W₂|⁻¹·(∑_{w} φ(w))·\overline{|W₁|} = 0` since `∑_w φ(w) = 0` for the nontrivial `φ`
 (`sum_apply_eq_zero_of_ne_trivial`).
 
-This is the cross term of the (6.8.2.2) norm `‖α‖² = ‖Ind_{W₂}φ‖² + |H:Z|²` (`⟨Ind_{W₂}φ, η₁⟩ = 0`). -/
+This is the cross term of the (6.8.2.2) norm `‖α‖² = ‖Ind_{W₂}φ‖² + |H:Z|²`
+(`⟨Ind_{W₂}φ, η₁⟩ = 0`). -/
 theorem SibleyDadeHypothesis.inner_induce_W2_Yset_eq_zero
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     {W2 : Subgroup ↥L} [Invertible (Nat.card ↥W2 : ℂ)] (hW2comm : W2 ≤ ⁅H, H⁆)
@@ -264,7 +268,8 @@ theorem SibleyDadeHypothesis.inner_self_indW2_sub_smul_eq
   ring
 
 open scoped Classical in
-/-- **(6.8.2.2) coefficient dichotomy** (the case-(B) analogue of `coeff_eq_neg_or_edge_of_frobenius`).
+/-- **(6.8.2.2) coefficient dichotomy** (the case-(B) analogue of
+`coeff_eq_neg_or_edge_of_frobenius`).
 For `α = Ind^L_{W₂}φ − |H:Z|·η₁` (`φ` nontrivial linear, `η₁ ∈ Y`), the multiplicity
 `⟨α^τ, η₁^{τ₁}⟩` is either `−|H:Z|` or (when `|Y| = 2`) `0`.
 

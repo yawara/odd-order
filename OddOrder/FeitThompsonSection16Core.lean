@@ -764,7 +764,8 @@ so
 `typePData_of_kappaHall_hallComplement` produces a `TypePData M` with the **chosen** factor
 `data.W₁ = K`.  This is the bridge the §16 producer needs to carry a `TypePData mp.S` whose `W₁` is
 the maximal-pair κ-Hall `mp.K` — the last carrier step before Peterfalvi `basic_structure` (13.2),
-the residual gate being only that the type-II member `mp.S` of the pair is type-`P₂` (Pf (13.2.a)). -/
+the residual gate being only that the type-II member `mp.S` of the pair is type-`P₂` (Pf
+(13.2.a)). -/
 theorem exists_typePData_W1_eq_of_isTypeP2 {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {M K : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
@@ -1045,7 +1046,8 @@ noncomputable def Section16MaximalPair.certainTypeS {G : Type*} [Group G] [Finit
       BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
         (Subgroup.card_eq_one.mpr hbot))
 
-/-- **The T-side §6 certain-type Hypothesis** (cd producer building block): `mp.T` with `W₁ = mp.Kstar`,
+/-- **The T-side §6 certain-type Hypothesis** (cd producer building block): `mp.T` with
+`W₁ = mp.Kstar`,
 `W₂ = mp.K` (the roles of the two factors swap for the partner).  The pairing relation `mp.K =
 M_σ(T) ⊓ C(mp.Kstar)` is `mp.K_eq`. -/
 noncomputable def Section16MaximalPair.certainTypeT {G : Type*} [Group G] [Finite G]

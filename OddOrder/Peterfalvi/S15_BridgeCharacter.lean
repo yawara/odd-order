@@ -262,7 +262,8 @@ theorem betaGrid_apply_one_eq_zero_of_c_eq_one [Finite G]
     mul_one, hyp.mu_apply_one_eq_u hG ⟨0, hyp.q_prime.pos⟩ j hj0, sub_self]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **(13.18.b), Frobenius half** (`FiniteInduce`-instance form): `‖Ind_{PW₁}^S 1‖²_S = (u−1)/q + 1`.
+/-- **(13.18.b), Frobenius half** (`FiniteInduce`-instance form):
+`‖Ind_{PW₁}^S 1‖²_S = (u−1)/q + 1`.
 The wrapper `indPW1_inner_self` bridges to arbitrary `Fintype`/`Invertible` instances. -/
 private theorem indPW1_inner_self_aux [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hc1 : hyp.c = 1) :

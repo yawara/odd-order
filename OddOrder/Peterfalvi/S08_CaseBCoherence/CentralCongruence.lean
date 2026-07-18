@@ -227,7 +227,8 @@ theorem SibleyDadeHypothesis.Yset_mapRingEquiv_mem (hyp : SibleyDadeHypothesis G
   have hh : χ h = 1 := hinj (key.trans (map_one _).symm)
   simpa using hh
 
-/-- **(6.8.2.1) input — `hZA`.**  Every nontrivial element of `⁅H, H⁆` maps into `H^# = sharpImage H`.
+/-- **(6.8.2.1) input — `hZA`.**  Every nontrivial element of `⁅H, H⁆` maps into
+`H^# = sharpImage H`.
 Since `⁅H, H⁆ ≤ H`, a nontrivial `z ∈ ⁅H, H⁆` lands in `H` with `(z : G) ≠ 1`. -/
 theorem SibleyDadeHypothesis.coe_mem_sharpImage_of_mem_commutator
     (_hyp : SibleyDadeHypothesis G L H) {z : ↥L} (hz : z ∈ ⁅H, H⁆) (hz1 : z ≠ 1) :
@@ -455,7 +456,8 @@ and `Z := Z.map L.subtype`: `hZP` (`Z ≤ H`), `hZnormal` (central ⇒ normal), 
 (`H^#` TI / `|L|` odd), `hPz` (`Ĥ ≤ L ≤ C_G(z)` since `z` is central), and the `|C_L(·)|`-constancy
 clause of `hconst` (both sides `= |L|` by `inf_centralizer_eq_of_mem_center`).  The modulus
 `|Ĥ| = |H|` via `card_map_of_injective`.  This is the (6.8)(c2) coprimality-only analogue of the
-(6.8.1) Frobenius adapter; the Sylow is supplied by the `cases` side condition `gcd(|H|,|W₁|) = 1`. -/
+(6.8.1) Frobenius adapter; the Sylow is supplied by the `cases` side condition
+`gcd(|H|,|W₁|) = 1`. -/
 theorem SibleyDadeHypothesis.peterfalvi_67_central (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)

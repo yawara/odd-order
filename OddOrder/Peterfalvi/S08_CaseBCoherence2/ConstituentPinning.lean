@@ -114,7 +114,8 @@ theorem sum_inner_restrict_sq_eq_index {M : Type*} [Group M] [Finite M]
     ← inner_self_induce_eq_sum_mul_star]
   exact inner_induce_self_eq_index_of_le_center hN hφ
 
-/-- **(6.8.2.3) `αᵢ` aggregate** (Peterfalvi (6.8.2.3): `∑ aᵢαᵢ = Ind^L_{W₂} φ − |H:Z|·η₁`).  Summing
+/-- **(6.8.2.3) `αᵢ` aggregate** (Peterfalvi (6.8.2.3): `∑ aᵢαᵢ = Ind^L_{W₂} φ − |H:Z|·η₁`).
+Summing
 the differences `αθ = χθ − aθ·η₁` (`χθ = Ind^M_H θ`, `aθ = ⟨φ∘e, Res_{K.subgroupOf H} θ⟩`) weighted
 by
 `aθ` recovers `Ind^M_K φ − |H:K|·η₁`.  Mechanical combination of the two aggregate halves:
@@ -351,7 +352,8 @@ number (Clifford [Is] Thm 6.5, `restrictionMultiplicity_natCast`): a nonnegative
 for the `φ`-first inner-product slot used by the (6.8.2.3) constituent aggregate
 `sum_smul_constituent_diff_eq` (which weights `αθ = Ind^M_H θ − aθ·η₁` by `aθ = ⟨φ, Res θ⟩`). This
 is
-the source of the natural-number weight `a : ι → ℕ` consumed by the pinning `per_constituent_Y_eq_smul`. -/
+the source of the natural-number weight `a : ι → ℕ` consumed by the pinning
+`per_constituent_Y_eq_smul`. -/
 theorem exists_inner_restrict_natCast {M : Type*} [Group M] [Finite M] {N : Subgroup M}
     [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
     {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) (θ : IrreducibleCharacter M) :
@@ -932,7 +934,8 @@ theorem inner_coherentYset_extension_certainTypeRImage_eq_zero
   · rw [inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hη hη' hne χ₂' i,
       mul_zero]
 
-/-- **(6.8.2.3) seam-1, decomposition form: `⟨D.X, Y^{τ₁}⟩ = 0` (the `hXorth` for `per_constituent`).**
+/-- **(6.8.2.3) seam-1, decomposition form: `⟨D.X, Y^{τ₁}⟩ = 0` (the `hXorth` for
+`per_constituent`).**
 For any `(5.4)` decomposition `D` whose image-family members are covered by the reducible `R(μ_j)`
 set
 (`himg`: every `α ∈ D.imageFamily.imageSet` is some `certainTypeRImage h46 χ₂ χ₂' p`), the
@@ -1033,7 +1036,8 @@ theorem inner_certainTypeExtension_columnSum_coherent_extension_eq_zero
 /-- **(6.8.2) case-(B) column–`Y` mixed orthogonality** (`Y`-specialization of
 `inner_certainTypeExtension_columnSum_coherent_extension_eq_zero`).  `⟨ν(μ_j), η^{τ₁}⟩ = 0` for
 `η ∈ Y`: the conjugate `η̄ ∈ Y` (`Yset_closedUnderConjugate`), `⟨η, η̄⟩ = 0` and `η − η̄` is
-`H^#`-supported (equal degree).  The column-`Y` `hmixed` input of `coherentXunionYset_caseB_of_glued`. -/
+`H^#`-supported (equal degree).  The column-`Y` `hmixed` input of
+`coherentXunionYset_caseB_of_glued`. -/
 theorem inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)

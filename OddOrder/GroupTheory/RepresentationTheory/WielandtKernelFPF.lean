@@ -286,7 +286,8 @@ variable {k : Type*} [Field k] [IsAlgClosed k]
 variable {L : Type*} [Group L] [Finite L] {W : Type*} [AddCommGroup W] [Module k W]
 variable [FiniteDimensional k W]
 
-/-- **Peterfalvi (9.1), the kernel-FPF dimension fact (†).**  Let `L` be finite, `U ◁ L` a `p′`-group
+/-- **Peterfalvi (9.1), the kernel-FPF dimension fact (†).**  Let `L` be finite, `U ◁ L` a
+`p′`-group
 (`char k ∤ |U|`), `E ≤ L` with `U ⊔ E = ⊤` and `|E|` coprime to `|U|`, the conjugation action of `E`
 on `U` fixed-point-free (`hfpf`).  Then for any finite-dimensional `k[L]`-module `W` with no
 `U`-invariants (`Wᵁ = 0`), `dim W = |E| · dim Wᴱ`.

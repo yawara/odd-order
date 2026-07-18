@@ -592,7 +592,8 @@ Applied to the chief factor `H̄` under the restricted `U`-action, with the piec
 of
 a minimal `U`-invariant `S₀` (each `U`-irreducible of order `|S₀| = p^d`), this gives
 `|H̄| = (p^d)^k`,
-i.e. `q = d·k` — the divisibility `d ∣ q` underlying the Clifford dichotomy (`q` prime ⟹ `d ∈ {1, q}`). -/
+i.e. `q = d·k` — the divisibility `d ∣ q` underlying the Clifford dichotomy (`q` prime ⟹
+`d ∈ {1, q}`). -/
 theorem exists_supIndep_aInvariant_family_of_iSup {K : Type*} [Group K] [Finite K]
     {A : Type*} [Group A] {φ : A →* MulAut K} {ι : Type*} [Finite ι]
     {S : ι → Subgroup K} {n : ℕ}
@@ -663,7 +664,8 @@ theorem exists_supIndep_aInvariant_family_of_iSup {K : Type*} [Group K] [Finite 
     _ = ∏ _i : (t : Finset ι), n := Finset.prod_congr rfl (fun i _ => hfac i)
     _ = n ^ t.card := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_coe]
 
-/-- **(9.7) order step** (cardinality corollary): a finite group `K` whose elements pairwise commute,
+/-- **(9.7) order step** (cardinality corollary): a finite group `K` whose elements pairwise
+commute,
 the join `⨆ i, S i` of `φ`-invariant subgroups each trivial or `φ`-irreducible of common order `n`,
 has order a power of `n`.  Forgets the `SupIndep` partition of
 `exists_supIndep_aInvariant_family_of_iSup`. -/
@@ -781,12 +783,14 @@ the subgroup level via `SingerField`: an abelian group acting faithfully and irr
 elementary abelian `p`-group is cyclic with order dividing `|K| - 1`. -/
 
 open OddOrder.RepresentationTheory in
-/-- The descended representation `elabRepresentation p φ` on `Additive K` is irreducible exactly when
+/-- The descended representation `elabRepresentation p φ` on `Additive K` is irreducible exactly
+when
 the `φ`-action is irreducible at the subgroup level (`K` nontrivial; every `φ`-invariant subgroup of
 `K` is `⊥` or `⊤`).  `ZMod p`-submodules of `Additive K` are the subgroups of `K`
 (`AddSubgroup.toZModSubmodule`/`toSubgroup'`) and the action correspondence is
 `elabRepresentation_apply`.  Stated as `IsSimpleOrder (Subrepresentation …)` (= `IsIrreducible`,
-definitionally) to avoid pulling in the `Field (ZMod p)` instance and its `ZMod`-semiring diamond. -/
+definitionally) to avoid pulling in the `Field (ZMod p)` instance and its `ZMod`-semiring
+diamond. -/
 theorem elabRepresentation_isIrreducible {A K : Type*} [Group A] [CommGroup K] {p : ℕ}
     [Module (ZMod p) (Additive K)] {φ : A →* MulAut K} (hnt : Nontrivial K)
     (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤) :

@@ -37,7 +37,8 @@ variable {G : Type*} [Group G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **The `𝒮(H₀U′)` stratum sits inside `𝒮 = 𝒮(H₀C′)`** (mirror; issue 2035): `C′ = [C,C] ≤ [U,U] = U′`
+/-- **The `𝒮(H₀U′)` stratum sits inside `𝒮 = 𝒮(H₀C′)`** (mirror; issue 2035):
+`C′ = [C,C] ≤ [U,U] = U′`
 by commutator monotonicity (`cSub_le_U`), so `H₀ ⊔ C′ ≤ H₀ ⊔ U′` and `sOf` is antitone
 (`sSet_eq_sOf_H0Cprime` dictionary).  Shared brick of the (9.11.1) extraction and the (9.11.3)
 class-equation wiring. -/
@@ -63,7 +64,8 @@ theorem Hypothesis.sOf_H0Uprime_subset_sSet_T [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Every `𝒯 = sSet(setupT)`-member has positive `Snorm` weight** (mirror; issue 2035; the `T`-instance mirror
+/-- **Every `𝒯 = sSet(setupT)`-member has positive `Snorm` weight** (mirror; issue 2035; the
+`T`-instance mirror
 of `S13.sOf_mem_Snorm_pos`): `Snorm χ = (χ(1).re)²/⟨χ,χ⟩.re` with `χ(1) = q·d` a positive
 natural degree (`induceHU_apply_one_eq_q_mul`) and `⟨χ,χ⟩.re > 0` (the landed embedding
 `sSet_subset_inducedKernelFamily` + `S08.inducedKernelFamily_inner_self_real_pos`). -/
@@ -95,7 +97,8 @@ theorem Hypothesis.sSet_mem_Snorm_pos_T [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Peterfalvi (9.11.1), the `𝒮₂ = 𝒮₁` extraction — `T`-instance residual** (mirror; issue 2035; the
+/-- **Peterfalvi (9.11.1), the `𝒮₂ = 𝒮₁` extraction — `T`-instance residual** (mirror; issue 2035;
+the
 `T`-mirror of the M-side `S13.caseA_sTwo_subset_degreeQaCut`, Coq `PFsection9.v:1626-1680`
 `eqS12`).  At the equality configuration the degree-`qa` irreducible cut `𝒮₁′` of `𝒮(H₀U′)`
 alone already saturates the (9.11.1) bound `2q²au` exactly (`sumnS_irreducible_constant_degree`
@@ -186,7 +189,8 @@ theorem Hypothesis.nineElevenSTwoExtractionT [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Peterfalvi (9.11.6), `𝒮₃`-coherence on the honest Dade map** (mirror; issue 2035; the `T`-instance
+/-- **Peterfalvi (9.11.6), `𝒮₃`-coherence on the honest Dade map** (mirror; issue 2035; the
+`T`-instance
 mirror of `S13.caseA_sThree_coherent`).  In the equality configuration every `𝒮₃ = 𝒮 ∖ 𝒮₂`-member
 has uniform degree `q·u` (`hS3deg`), so the (5.7) norm-general coherence producer
 `S07.uniform_degree_coherence_of_families` fires with an arbitrary pivot `χ₀ ∈ 𝒮₃`: per-member
@@ -546,7 +550,8 @@ theorem Hypothesis.nineElevenAlphaSupportT [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Peterfalvi (9.11.4) at the `T`-instance: the cleared Mackey-norm bundle** (mirror; issue 2035; the
+/-- **Peterfalvi (9.11.4) at the `T`-instance: the cleared Mackey-norm bundle** (mirror; issue 2035;
+the
 `T`-mirror of `S13.caseA_nineElevenFour_norm_inputs`).  In the equality configuration (`C = U′`,
 the (9.8.d) count) there is `N : ℕ` with `N·u = (a+1)·u + (q−1)·a²`, realized as `N = ‖α‖²` for
 the `A(T)`-supported virtual character `α = γ − ψ₁ ∈ ℤ[Irr S]` — `γ = Ind_{HU₁}^T 1` at the

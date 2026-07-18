@@ -52,7 +52,8 @@ theorem realizedH0supC_subgroupOf_hInHu_eq {M : Subgroup G}
 /-- **realized `H₀` in `hInHu` = `N` pulled back along `hInHuEquivH`**: the realized `H₀`,
 as a subgroup of `hInHu`, is `chief.N.comap hInHuEquivH`.  Via `hInHuEquivH_coe` + `chief.H0_eq`
 (`H₀ = N.map H.subtype`): `x ∈ realized H₀ ⟺ ((x:M):G) ∈ H₀ ⟺ (hInHuEquivH x : G) ∈ H₀ ⟺
-hInHuEquivH x ∈ N`.  Feeds `QuotientGroup.congr hInHuEquivH` for `hInHu/realizedH₀ ≅ ↥H ⧸ N = H̄`. -/
+hInHuEquivH x ∈ N`.  Feeds `QuotientGroup.congr hInHuEquivH` for `hInHu/realizedH₀ ≅ ↥H ⧸ N =
+H̄`. -/
 theorem realizedH0_subgroupOf_hInHu_eq_comap {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data)
@@ -145,7 +146,8 @@ theorem hcHom_surjective [Finite G] {M : Subgroup G}
 /-- **`θ ↦ hcPsi θ` is injective**: `hcPsi θ = linearIrreducibleCharacter (θ ∘ hcHom)`; distinct `θ`
 give distinct `θ ∘ hcHom` (`hcHom` surjective, `MonoidHom.cancel_right`), hence distinct linear
 characters (`linearIrreducibleCharacter_injective`).  So the regular seeds `θ` inject into the
-`HC`-linear characters `hcPsi θ`, giving `|{hcPsi θ | θ regular}| = (p-1)^q` for the `oXtheta` count. -/
+`HC`-linear characters `hcPsi θ`, giving `|{hcPsi θ | θ regular}| = (p-1)^q` for the `oXtheta`
+count. -/
 theorem hcPsi_injective [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     Function.Injective (hcPsi chief) := by
@@ -264,7 +266,8 @@ theorem hcPsi_inertia_le [Finite G] {M : Subgroup G}
 /-- **`inertia(ψ) = HC`**: the inertia of the `HC`-linear character `ψ` in `HU` is exactly `HC`.
 `le_antisymm` of `hcPsi_inertia_le` (`inertia(ψ) ≤ inertia(θ₀) = HC`, via the seed `hθ₀`) and
 `subgroup_le_inertia` (`HC ≤ inertia(ψ)`).  This is the `inertia = H` hypothesis of
-`isIrreducibleCharacter_induce_of_inertia_eq`, making `Ind_{HC}^{HU} ψ` irreducible of degree `u`. -/
+`isIrreducibleCharacter_induce_of_inertia_eq`, making `Ind_{HC}^{HU} ψ` irreducible of degree
+`u`. -/
 theorem hcPsi_inertia_eq_hc [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
@@ -762,7 +765,8 @@ cuInHu`) and showing `hcuPairHom` kills each: on `h₀` the `θ`-extension `hcuT
 `H` (`hcuLambdaHom_eq_one_of_mem_hInHu`); on `u'` the `θ`-extension dies on the complement `C_U(S₀)`
 (`hcuThetaHom_inclusion_cuInHu`) and the `λ`-lift restricts to `λ` trivial on `U'`. -/
 
-/-- **`hcuSeedHom θ` kills `H₀`**: the seed hom `θ ∘ mk'(N) ∘ hInHuEquivH` is trivial on the realized
+/-- **`hcuSeedHom θ` kills `H₀`**: the seed hom `θ ∘ mk'(N) ∘ hInHuEquivH` is trivial on the
+realized
 `H₀` inside `hInHu`, since `hInHuEquivH` carries realized-`H₀` to `N`
 (`realizedH0_subgroupOf_hInHu_eq_comap`) which `mk'(N)` kills.  Independent of `θ` (it is the
 kernel condition `H₀ ⊆ Ker` for the `θ₀`-inflation). -/

@@ -289,7 +289,8 @@ theorem crux_of_frobenius
 open scoped Classical in
 /-- **(6.8.1) crux `hDτ` (generic `m, n ≥ 3` case)**, case (A) / c2 mirror of `crux_of_frobenius`.
 Delegates to `crux_of_third_anchor_c2_caseA` with the good case from
-`inner_tau_scaledDiff_extension_Yset_eq_neg_c2_caseA` (cert data `hK`/`hW1`/`hA`) instead of `hF`. -/
+`inner_tau_scaledDiff_extension_Yset_eq_neg_c2_caseA` (cert data `hK`/`hW1`/`hA`) instead of
+`hF`. -/
 theorem crux_c2_caseA
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
@@ -511,7 +512,8 @@ theorem hgen_withDiagonal_c2_caseA
       (Submodule.subset_span (Set.mem_union_right _ (Set.mem_singleton _)))
 
 open scoped Classical in
-/-- **(6.8.1) `X`-difference isometry, degree-ratio form** (mmd 04.8 L176: the `n ≥ 3` exclusion uses
+/-- **(6.8.1) `X`-difference isometry, degree-ratio form** (mmd 04.8 L176: the `n ≥ 3` exclusion
+uses
 `(χ₃ − d₃χ₁)^τ` for ANY third `X`-member `χ₃`, of any degree).  For `η₁ ∈ Y`, `χ₁ ∈ X(Zc)` with
 `χ₁(1) = a·|W₁|`, and a second member `χ₃ ∈ X(Zc)`, `χ₃ ≠ χ₁`, with degree ratio `d` (`χ₃(1) =
 d·χ₁(1)`):  `⟨(χ₁−aη₁)^τ, (χ₃−d·χ₁)^τ⟩ = −d`.  Generalizes

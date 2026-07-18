@@ -361,7 +361,8 @@ restriction `|N|·Res_N(Ind^M_N φ) = ∑_{x∈M} φ^{x⁻¹} = |M|·φ` collaps
 `⟨Ind φ, Ind φ⟩ = ⟨φ, Res(Ind φ)⟩` then gives `|N|·‖Ind φ‖² = |M|`, i.e. `‖Ind φ‖² = |M:N|`.
 
 This is the `∑ aᵢ² = |H : Z|` step of Peterfalvi (6.8.2.3) (`Z = W₂ ⊆ Z(H)`, applied with `M = ↥H`,
-`N = W₂.subgroupOf H`): the squared multiplicities of `Ind^H_Z φ` sum to `‖Ind^H_Z φ‖² = |H : Z|`. -/
+`N = W₂.subgroupOf H`): the squared multiplicities of `Ind^H_Z φ` sum to
+`‖Ind^H_Z φ‖² = |H : Z|`. -/
 theorem inner_induce_self_eq_index_of_le_center
     {M : Type*} [Group M] [Fintype M] [Invertible (Nat.card M : ℂ)]
     {N : Subgroup M} [Finite ↥N] [Invertible (Nat.card ↥N : ℂ)]

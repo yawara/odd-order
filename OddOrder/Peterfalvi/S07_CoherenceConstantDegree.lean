@@ -465,7 +465,8 @@ theorem commonImage_inner_conj (hyp : Hypothesis (L := L) (G := G) S A)
   set D₀ := pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀) with hD₀
   rw [D₀.imageFamily.image_eq, D₀.inner_X_sum, ← D₀.inner_self_chi_eq_sum_coeff, hirr χ₀ hχ₀]
 
-/-- **(5.7) fact (B) at `ζ̄₀`: `⟨β, (χ₀ − ζ̄₀)^τ⟩ = 1`.**  `(χ₀ − ζ̄₀)^τ = (χ₀ − ζ₀)^τ + (ζ₀ − ζ̄₀)^τ`;
+/-- **(5.7) fact (B) at `ζ̄₀`: `⟨β, (χ₀ − ζ̄₀)^τ⟩ = 1`.**
+`(χ₀ − ζ̄₀)^τ = (χ₀ − ζ₀)^τ + (ζ₀ − ζ̄₀)^τ`;
 the first gives `1` (reference), the second is `∑_{R(ζ₀)} α ⊥ R(χ₀)`. -/
 theorem commonImage_inner_refconj (hyp : Hypothesis (L := L) (G := G) S A)
     (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)

@@ -26,6 +26,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - [x] Appendix III Lemma 1(b) の quadratic central extension を実体化する
 - [x] Definition 3 の具体的 `TypeBData` を実体化する
 - [ ] Higman Theorem (d),(e) の Lemma 5 用 payload を実体化する
+  - [x] quotient の2つの不変 summand・同変同型と位数 `q²` の逆像を実体化する
+  - [ ] type-B 同値と actual `Q/Q₀`, `K` action を接続する
+- [x] invariant `Q₀`-coset の coprime fixed-point lifting から
+      自由作用と位数整除を得る一般補題を証明する
 - [ ] `K`-不変な位数 `q²` 部分群 `X` と `X^w ≠ X` を証明する
 - [ ] `W` の projective-line 上の自由作用から `|W| ∣ q+1` を証明する
 - [ ] 一般有限体上の 2 次元表現 API から `W` の巡回性を証明する

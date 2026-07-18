@@ -406,7 +406,8 @@ theorem typeP_family_Z_lt_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   · exact hNM (hanti hNmax hM (heq ▸ hZM))
 
 /-- **BG 14.7, `|Mᵢ| ≥ 2z`** (mmd L4033): the cardinality form of `Z ⊊ Mᵢ`, the lower bound the
-density inequality needs (`|𝒞_G(M̃ᵢ)| ≥ (1/kᵢ − 1/2z)|G|`).  From `Z < N` (proper), `[N : Z] ≥ 2`. -/
+density inequality needs (`|𝒞_G(M̃ᵢ)| ≥ (1/kᵢ − 1/2z)|G|`).  From `Z < N` (proper),
+`[N : Z] ≥ 2`. -/
 theorem typeP_family_two_mul_card_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))

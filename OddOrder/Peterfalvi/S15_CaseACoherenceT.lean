@@ -34,7 +34,8 @@ variable {G : Type*} [Group G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Peterfalvi (9.11.4)–(9.11.8), the norm bound — `T`-instance residual** (mirror; issue 2035; the
+/-- **Peterfalvi (9.11.4)–(9.11.8), the norm bound — `T`-instance residual** (mirror; issue 2035;
+the
 `T`-mirror of the M-side `S13.NineElevenNormBound` discharge
 (`nineElevenNormBound_of_sevenEightRefutation` + `nineElevenSevenEightRefutation`, issue 9083
 Phases D/E, both landed M-side)).  **(9.11.4)**: `α = Ind_{HU₁}^T 1 − ψ₁` is an `A(T)`-supported
@@ -498,7 +499,8 @@ theorem Hypothesis.nineElevenEqualityRefutationT [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Peterfalvi (9.11.1)–(9.11.8), the `T`-instance equality-configuration refutation** (mirror; issue 2035,
+/-- **Peterfalvi (9.11.1)–(9.11.8), the `T`-instance equality-configuration refutation** (mirror;
+issue 2035,
 consumed by `sSet_coherent_indT_caseA`, mirroring the M-instance
 `nineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation`).
 

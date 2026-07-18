@@ -337,7 +337,8 @@ and `K` not perfect, there is an element `x ∈ Ω₁(P₀)^#` (order dividing `
 
 Proof: apply the centralizer core `exists_mem_centralizer_inf_not_le_commutator` to the abelian
 noncyclic `P₀` acting by conjugation on `K`, yielding `y ∈ P₀^#` with `C_K(y) ⊄ K'`; then pass to
-the order-`p` power `x = y ^ (|y| / p)` — its centralizer contains `C_K(y)`, so still escapes `K'`. -/
+the order-`p` power `x = y ^ (|y| / p)` — its centralizer contains `C_K(y)`, so still escapes
+`K'`. -/
 theorem exists_orderP_centralizer_witness [Finite G]
     (ctr : CounterexampleHypothesis (G := G))
     (habelian : IsMulCommutative ↥ctr.P0)

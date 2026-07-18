@@ -216,7 +216,8 @@ theorem pRank_eq_of_mem_sigma [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prim
 `(P ⊔ R)`-invariant Sylow subgroup `S` of `C_{M_σ}(P)`, then `C_{M_σ}(P) ⊆ C_{M_σ}(R)`. Reduces
 Thm 13.4 to the per-prime core: `C_{M_σ}(P)` is "generated" by such Sylows (order argument
 `eq_of_le_of_forall_full_prime_pow` applied to `C_{M_σ}(P) ⊓ C_G(R)`), each constructed by
-`exists_aInvariant_sylow_subgroup` (`P ⊔ R ≤ E` is a `σ(M)'`-group, coprime to `C_{M_σ}(P) ≤ M_σ`). -/
+`exists_aInvariant_sylow_subgroup` (`P ⊔ R ≤ E` is a `σ(M)'`-group, coprime to
+`C_{M_σ}(P) ≤ M_σ`). -/
 theorem msigma_centralizer_le_of_invariant_sylow_centralized [Finite G]
     (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     {P R : Subgroup G} (hPE : P ≤ E)

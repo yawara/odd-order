@@ -68,7 +68,8 @@ theorem Hypothesis.muColumn_tau1_inner_self [Finite G] {M : Subgroup G}
   exact hyp.muGrid_column_sum_inner_self hG hodd k
 
 open scoped FiniteInduce in
-/-- **§10 `α_{ij}^τ` is a virtual character of `G`** (Peterfalvi (10.5)): `α_{ij} = μ_{ij} − δ·μ_{i0}
+/-- **§10 `α_{ij}^τ` is a virtual character of `G`** (Peterfalvi (10.5)): `α_{ij} = μ_{ij} −
+δ·μ_{i0}
 −
 n·ζ` is a virtual character of `M` (`muGrid_isIrreducible`, `ζ` irreducible) and is `A_0`-supported
 (`muGrid_alpha_support`), so its Dade image lies in `ℤ[Irr G]`
@@ -611,7 +612,8 @@ orthonormal `σ`-image family (`exists_alignedOmegaSigmaGrid_chiFam_family`), an
 `X − δ·(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V` (`muGridPsi_vanishes_on_typePV` together with the
 `ζ^{τ₁}`-vanishing `tau1_zeta_vanishes_on_typePV`).  The norm-`2` Dade-image trichotomy
 `eq_smul_chiFam_diff_of_vanishOnV` (the §5 generalisation of the §6 `(4.8)` endgame) then forces
-`X = δ·(χ_{P_{ij}} − χ_{P_{i0}})`.  (`alpha_tau_image` is the thin `CharacterParameters` corollary.) -/
+`X = δ·(χ_{P_{ij}} − χ_{P_{i0}})`.  (`alpha_tau_image` is the thin `CharacterParameters`
+corollary.) -/
 theorem Hypothesis.tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (k : Fin hyp.w2) (hjk : j ≠ k) (hk0 : k ≠ 0)
@@ -1048,7 +1050,8 @@ already-established `ζ̄^{τ₁}`-vanishing (`tau1_zeta_vanishes_on_typePV` for
 
 Crucially this route avoids the `ζ̄^{τ₁} ⊥ Im σ` (§5 (5.3.b)/(5.5)) input that the direct (10.6)(a)
 reduction would require: the `(5.5)`-for-columns decomposition determines `μ_k^{τ₁}` directly, and
-its vanishing on `V` uses only the (already-honest) single-character `ζ̄^{τ₁}`-vanishing plus (4.7). -/
+its vanishing on `V` uses only the (already-honest) single-character `ζ̄^{τ₁}`-vanishing plus
+(4.7). -/
 theorem Hypothesis.muColumn_tau1_vanishes_on_typePV [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
     (k : Fin hyp.w2) {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)

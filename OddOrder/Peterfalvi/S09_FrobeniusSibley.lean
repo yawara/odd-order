@@ -44,7 +44,8 @@ lemma sharpImage_subgroupOf_eq (F : FrobeniusFamily G k) (i : Fin k) :
   rw [OddOrder.Peterfalvi.S08.sharpImage, hmap]
   rfl
 
-/-- **The (7.1) datum in the sharpImage coordinate.**  `Hypothesis71 G (sharpImage ((H_i).subgroupOf L_i)) L_i`
+/-- **The (7.1) datum in the sharpImage coordinate.**
+`Hypothesis71 G (sharpImage ((H_i).subgroupOf L_i)) L_i`
 — the same TI-subset Dade datum as `hypothesis71`, but with the support written in the
 `SibleyDadeHypothesis`/coherence coordinate (`sharpImage H = (H_i)^#` via
 `sharpImage_subgroupOf_eq`).

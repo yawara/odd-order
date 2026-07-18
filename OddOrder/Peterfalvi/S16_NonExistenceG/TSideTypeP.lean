@@ -278,7 +278,8 @@ theorem T_typeIII_card_W1 [Finite G] (hyp : Hypothesis (G := G))
     Nat.card ↥td.typeP.W1 = hyp.base.p := by
   rw [td.typeP.card_W1_eq_derived_index, T_derived_index_eq_p hyp]
 
-/-- **The intrinsic type-III complement has order `|V|`** (ungated, canonical): `|td.typeP.U| = |V|`.
+/-- **The intrinsic type-III complement has order `|V|`** (ungated, canonical):
+`|td.typeP.U| = |V|`.
 `|td.typeP.U| = [T' : M_F]` (`card_U_eq_index`, `M_F = Q`), and `[T' : M_F] = |QV/Q| = |V|`
 (`Subgroup.index_eq_card` + `T_card_quot_Q_derived_eq_card_V`).  The equality is **canonical** —
 both

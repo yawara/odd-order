@@ -435,7 +435,8 @@ section TargetPairGen
 variable {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
 variable [Fintype G] [Invertible (Nat.card G : ℂ)]
 
-/-- The target pair `{X, X̄}` of Peterfalvi (5.6.3) for a **possibly reducible** `χ`: bundled with the
+/-- The target pair `{X, X̄}` of Peterfalvi (5.6.3) for a **possibly reducible** `χ`: bundled with
+the
 **Gram-matching** norms `‖X‖² = ‖χ‖²`, `‖X̄‖² = ‖χ̄‖²` (the `‖·‖² = 1` generalization of
 `CharacterPsiDecomposition.RetargetTargetPair`).  Here `X = D.X` and `X̄ = X − (χ − χ̄)^τ`. -/
 structure RetargetTargetPairGen (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0) where

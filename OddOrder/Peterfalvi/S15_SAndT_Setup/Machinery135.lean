@@ -760,7 +760,8 @@ theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
   nlinarith [mul_nonneg (by linarith : (0 : ℤ) ≤ (Pm1 : ℤ) - 2 * u) (sq_nonneg b),
     mul_nonneg (by positivity : (0 : ℤ) ≤ 2 * (u : ℤ)) hb]
 
-/-- **Arithmetic assembly of Peterfalvi (13.6)**: the norm lower bound `∑_{x∈H#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²`.
+/-- **Arithmetic assembly of Peterfalvi (13.6)**: the norm lower bound
+`∑_{x∈H#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²`.
 
 For the irreducible `λ ∈ S` of degree `λ(1) = u q` induced from a linear character of `H = PC`
 (`‖λ‖² = 1`, `a = 1`), the (13.5) decomposition gives `s = (|S| − λ(1)²) − 2λ(1)α(1) + sₐ` where
@@ -888,7 +889,8 @@ theorem caseB_eta_norm_bound {S : Type*} [Group S] [Finite S]
   have h := (Nat.cast_le (α := ℝ)).mpr hnat
   rwa [Nat.cast_sub hH, Nat.cast_one] at h
 
-/-- **Arithmetic assembly of Peterfalvi (13.8)**: the norm lower bound `∑_{x∈H#}|η₀₁(x)|² ≥ |S'| − u²`.
+/-- **Arithmetic assembly of Peterfalvi (13.8)**: the norm lower bound
+`∑_{x∈H#}|η₀₁(x)|² ≥ |S'| − u²`.
 
 By (13.3.c) there are `j` and `δ = ±1` with `μ_j^{τ₁} = δ ∑_{0≤i<q} η_{i1}`, so the (13.5)
 hypothesis
@@ -901,7 +903,8 @@ and
 `2u ≤ |P|−1` (13.2.c), the cross terms are nonnegative — setting `b = δ·α(1)`,
 `−2δu·α(1) + (|P|−1)α(1)² = (|P|−1)b² − 2ub ≥ 0` (`caseB_quadratic_nonneg`) — whence
 `firstTerm ≤ s`.
-Carrier-free arithmetic core; the character-theoretic decomposition is supplied by the (13.5) engine. -/
+Carrier-free arithmetic core; the character-theoretic decomposition is supplied by the (13.5)
+engine. -/
 theorem caseB_eta01_norm_core {Pm1 u : ℕ} {firstTerm s sₐ : ℝ} {α1 δ : ℤ}
     (hδ : δ ^ 2 = 1)
     (hdecomp : s = firstTerm - 2 * (δ : ℝ) * u * α1 + sₐ)
@@ -1023,7 +1026,8 @@ theorem S_normalizes_H_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   calc a = (l : G)⁻¹ * ((l : G) * a * (l : G)⁻¹) * (l : G) := by group
     _ = 1 := by rw [heq]; group
 
-/-- **Peterfalvi (13.5)/(7.1)**: the §4 Dade hypothesis for the TI-subset `(S, H^#)`.  Since `H^#` is a
+/-- **Peterfalvi (13.5)/(7.1)**: the §4 Dade hypothesis for the TI-subset `(S, H^#)`.  Since `H^#`
+is a
 TI-subset of `G` with normalizer `S` ((8.5.a)/(8.6.a)), `S04.of_isTISubset` builds the Dade datum
 (whose local subgroups `H(a) = ⊥`) whose isometry is the `τ = Ind_S^G` powering the (13.5)
 ρ-machinery
@@ -1051,15 +1055,18 @@ noncomputable def H_sharp_dadeHypothesis [Fintype G] (hG : OddOrder.BG.IsMinimal
   · intro x hx
     exact hHS (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1
 
-/-- The (13.5) Dade datum `(S, H^#)` is `S`-conjugation invariant: for the TI-subset construction the
-local subgroups `H(a) = ⊥`, so `HConjInvariant` holds vacuously (`HConjInvariant.of_forall_H_eq_bot`). -/
+/-- The (13.5) Dade datum `(S, H^#)` is `S`-conjugation invariant: for the TI-subset construction
+the
+local subgroups `H(a) = ⊥`, so `HConjInvariant` holds vacuously
+(`HConjInvariant.of_forall_H_eq_bot`). -/
 theorem H_sharp_hconj [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (H_sharp_dadeHypothesis hG hyp).HConjInvariant :=
   OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
-/-- **Peterfalvi (13.5)/(7.1)**: the (7.1) ρ-hypothesis for `(S, H^#)`.  Mirrors `S14.toHypothesis71`:
+/-- **Peterfalvi (13.5)/(7.1)**: the (7.1) ρ-hypothesis for `(S, H^#)`.  Mirrors
+`S14.toHypothesis71`:
 the Dade isometry `τ` is the `fullDadeIsometryData` of the (13.5) Dade datum
 `H_sharp_dadeHypothesis`,
 and conjugation invariance is `H_sharp_hconj`.  This is the (7.1) datum on which `chiRho` (the `ρ`

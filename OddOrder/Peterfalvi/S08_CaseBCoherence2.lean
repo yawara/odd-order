@@ -147,7 +147,8 @@ noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
     cX cY ν hagreeX hagreeY
     (inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair) hmixed D hDτ hgen
 
-/-- **(6.8.2) case-(B) `{μ_j}`-coherence transported to `hyp.tau`.**  The reducible column characters
+/-- **(6.8.2) case-(B) `{μ_j}`-coherence transported to `hyp.tau`.**  The reducible column
+characters
 `μ_j` (`= certainTypeSet h46 k`, the certain-type set of Peterfalvi (4.9)) are coherent via
 `certainType_isCoherent`, but with respect to the *enlarged* Dade map
 `dadeIntegralCharacterMap h46.dade0 h46.tau` on `A₀ = A ∪ V^L`.  Since the `μ_j`-differences are
@@ -326,7 +327,8 @@ noncomputable def columnRFamilyTau
   image_eq := by
     rw [hmapagree]; exact (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).image_eq
 
-/-- **(6.8.2.3) column constituent decomposition for `hyp.tau`.**  The (5.4) decomposition data for a
+/-- **(6.8.2.3) column constituent decomposition for `hyp.tau`.**  The (5.4) decomposition data for
+a
 reducible column `μ_j = columnSum χ₂` against the Sibley–Dade map `hyp.tau`, built by `ofProjection`
 from the retargeted family `columnRFamilyTau` and `hyp.tau`'s `H^#`-inner-preservation
 (`dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`). This is the column
@@ -407,7 +409,8 @@ noncomputable def irreducibleDecompositionTau
     ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ hreal hdiffsupp hdiffasupp htau1_mema
     hχaχ1 hχbaraχ1 hχχbar'
 
-/-- **(6.8.2.3) per-constituent anchored image, mixed family (assembly skeleton).**  Given the per-`φ`
+/-- **(6.8.2.3) per-constituent anchored image, mixed family (assembly skeleton).**  Given the
+per-`φ`
 decomposition family `D` (one (5.4) decomposition `CharacterPsiDecomposition hyp.tau (χ i) (aᵢ·η₁)`
 per constituent — built by dispatching `columnDecompositionTau` / `irreducibleDecompositionTau`),
 with
@@ -662,7 +665,8 @@ a **nontrivial linear** character `φ` of `Z`.
 Direct application of `IsIrreducibleCharacter.exists_central_linear_restriction` (Schur central
 scalars).  `φ ≠ 1_Z` follows from `Z ⊄ Ker θ`: were `φ` trivial, `θ(z) = φ(z)·θ(1) = θ(1)` for every
 `z ∈ Z`, i.e. `Z ⊆ Ker θ`.  `φ` is kept over `↥(W₂.subgroupOf H)` here; the identification with a
-character of `↥W₂` (for the (6.8.2.2) `Ind_{W₂}` interface) is a localized transport at that seam. -/
+character of `↥W₂` (for the (6.8.2.2) `Ind_{W₂}` interface) is a localized transport at that
+seam. -/
 theorem certainType_central_restriction
     (θ : IrreducibleCharacter ↥H) {W2 : Subgroup ↥L}
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)

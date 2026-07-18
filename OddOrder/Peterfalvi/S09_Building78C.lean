@@ -247,7 +247,8 @@ theorem eq_zero_on_A_of_inner_zero [Invertible (Nat.card L : ℂ)] (A : Set L)
   have h0 : supportedProj A hA η x = 0 := by rw [hproj_zero]; rfl
   rwa [supportedProj_apply, if_pos hx] at h0
 
-/-- **Peterfalvi (7.7.a), the Gram entry.**  For a pairwise-orthogonal family `ζ : Fin (n+1) → CF(L)`
+/-- **Peterfalvi (7.7.a), the Gram entry.**  For a pairwise-orthogonal family
+`ζ : Fin (n+1) → CF(L)`
 and the difference vectors `ψ_j = ζ_j − d_j ζ_0` (`j ≥ 1`), the inner product `⟨ψ_j, ζ_i⟩` (`i ≥ 1`)
 is the diagonal entry `‖ζ_j‖²` when `i = j` and `0` otherwise: the `ζ_0` term drops out (`0 ≠ i`)
 and
@@ -312,7 +313,8 @@ This **discharges the `Hypothesis76.chiRho_decomp` certificate** of Peterfalvi (
 the candidate `Σ c̄_i/‖ζ_i‖² ζ_i` and `χ^ρ` have the same inner products `c_j` against the spanning
 `{ψ_j}` (`chiRho_adjoint` on one side, `inner_psi_candidate_eq` on the other), so their difference
 is
-orthogonal to a spanning set of `CF(L,A)` and hence vanishes on `A` (`eq_zero_on_A_of_inner_zero`). -/
+orthogonal to a spanning set of `CF(L,A)` and hence vanishes on `A`
+(`eq_zero_on_A_of_inner_zero`). -/
 theorem chiRho_decomp_proof {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L) {n : ℕ}
@@ -938,7 +940,8 @@ The induced family `ζ_i = Ind_{H}^L θ_i` is the `exists_distinct_induced_famil
 distinct induced characters, the degree ratios are `d_i = ζ_i(1)/ζ_0(1)`, and `chiRho_decomp` is
 discharged by `chiRho_decomp_induced` (its `hinj`/`hcover` from the enumeration, the geometric
 `A = H^#` inputs from `Subgroup.mem_subgroupOf` + normality of `H`).  This realizes the issue-1013
-goal: `Hypothesis76` (hence the `(7.7.a)` content) is constructible from coherence/`(7.1)` data alone. -/
+goal: `Hypothesis76` (hence the `(7.7.a)` content) is constructible from coherence/`(7.1)` data
+alone. -/
 noncomputable def hypothesis76OfFamily
     {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -1100,7 +1103,8 @@ general form of the trivial-base normalization.  Peterfalvi re-chooses the (7.7)
 application ((7.8.b) "we use (7.7) with `ζ₀ ∈ 𝒮 − {ζ}`"; (13.5) takes `ζ₀ ∈ 𝒮₁`): the (13.5)
 coefficient computations need a **`P`-nonkernel** base (issue 2035 更新 #22 — with the trivial
 base the τ₁-conversion `(ζ_i − ζ₀)^{τ₁} = Ind(ζ_i − ζ₀)` is not available, `Ind 1_H ∉ ℤ[𝒮]`),
-which this builder provides at `φ₀ := θ_{μ_{j₀}}` (the `μ`-column source, `mu_j_isIndPC_not_ker`). -/
+which this builder provides at `φ₀ := θ_{μ_{j₀}}` (the `μ`-column source,
+`mu_j_isIndPC_not_ker`). -/
 noncomputable def hypothesis76OfDadeBase
     {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]

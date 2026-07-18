@@ -202,7 +202,8 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
 
 The `μ`-column degree, the case-agnostic `A(S)`-support of column differences, and the
 arbitrary-column generalization of `tauS_muColumn_diff_eq` — the column-independence infrastructure
-for the (13.3.c) pin (`MuColumnPin`) and the all-reducible pinned-coherence glue (`S15_CaseACoherence`). -/
+for the (13.3.c) pin (`MuColumnPin`) and the all-reducible pinned-coherence glue
+(`S15_CaseACoherence`). -/
 
 open scoped FiniteInduce in
 /-- **μ-column degree** (Peterfalvi (13.3.a), case-agnostic): `(∑ᵢ μ_{ij})(1) = q·u` for `j ≠ 0`.
@@ -444,7 +445,8 @@ noncomputable def Hypothesis.sSet_reducible_memberRFamily [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Per-member orthonormal Dade `R`-family over `𝒮 = sSet`** (issue 1017, the `R` input of the (5.7)
+/-- **Per-member orthonormal Dade `R`-family over `𝒮 = sSet`** (issue 1017, the `R` input of the
+(5.7)
 coherence engine `uniform_degree_coherence_of_families`, the honest `S`-instance analogue of the
 M-instance `caseB_sOf_memberRFamily`, `S13_MaximalIII_IV.lean:546`).  **Clifford-case-agnostic**:
 the
@@ -528,7 +530,8 @@ theorem Hypothesis.mu_colSum_ne_of_inner_zero [Finite G] (hyp : Hypothesis (G :=
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **The honest `'A0`-Dade image of an `A(S)`-supported class function vanishes on the regular set**
+/-- **The honest `'A0`-Dade image of an `A(S)`-supported class function vanishes on the regular
+set**
 (the vanishing core of `S15.coherentIndS_image_inner_eta_eq_zero`, generalized from `ζ − ζ̄` to any
 `A(S)`-supported `f`).  For `f.support ⊆ A(S) = honestTypeP2ASet S` and a regular `W`-element
 `x ∈ conjClassSet (W ∖ (W₁ ∪ W₂))` (a `typePV`-point of the `S`-data, hence in `A₀(S)`), the Dade

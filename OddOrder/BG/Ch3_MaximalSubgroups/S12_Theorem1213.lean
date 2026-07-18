@@ -246,7 +246,8 @@ theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial {Q : Type*} [Group Q] [F
 /-- **`G`-level Heisenberg line-conjugacy** (transport of
 `exists_conj_smul_zpowers_eq_of_expPExtraspecial` to subgroups of `G`): for `a, b ∈ Q` (exp-`p`
 extraspecial), with `a, b ∉ Z(Q)` and `b ∈ ⟨a⟩ ⊔ Z(Q)`, there is `g ∈ Q` with `g⟨a⟩g⁻¹ = ⟨b⟩`.
-Lift `a, b` to `↥Q`, apply the type-level lemma, and transport the conjugacy back along `Q.subtype`. -/
+Lift `a, b` to `↥Q`, apply the type-level lemma, and transport the conjugacy back along
+`Q.subtype`. -/
 theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial_le [Finite G] {p : ℕ} [Fact p.Prime]
     {Q : Subgroup G} (hQ_es : IsExpPExtraspecial p ↥Q) {a b : G} (haQ : a ∈ Q) (hbQ : b ∈ Q)
     (ha : a ∉ (Subgroup.center ↥Q).map Q.subtype) (hb : b ∉ (Subgroup.center ↥Q).map Q.subtype)
@@ -490,7 +491,8 @@ theorem exists_line_maximalContaining_eq_of_Malpha_ne_bot [Finite G] (hG : IsMin
 /-- **An exp-`p` extraspecial `Q ≤ G` contains `A ∈ ℰ²_p(G)`** (the `A ∈ ℰ²(Q)` of BG 12.13,
 mmd L3391): `Q` is a non-cyclic `p`-group (`[Q,Q] = Z(Q) ≠ 1`), so it has an elementary abelian
 subgroup of order `p²` (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`), whose image
-in `G` is the required `A` (`elemAbelianOfRank G p 2` asks only `IsElementaryAbelian ∧ |A| = p²`). -/
+in `G` is the required `A` (`elemAbelianOfRank G p 2` asks only
+`IsElementaryAbelian ∧ |A| = p²`). -/
 theorem exists_elemAbelianOfRank_two_le_of_expPExtraspecial [Finite G]
     (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {Q : Subgroup G}
     (hQ : IsExpPExtraspecial p ↥Q) :
@@ -520,9 +522,11 @@ theorem exists_elemAbelianOfRank_two_le_of_expPExtraspecial [Finite G]
   · exact hEea.map Q.subtype_injective
   · rw [Subgroup.card_map_of_injective Q.subtype_injective, hEcard]
 
-/-- **`⟨a⟩ ⊔ Z(Q) ∈ ℰ²(Q)` for `a ∈ Q ∖ Z(Q)`** in an exp-`p` extraspecial `Q` with `pRank_p(G) ≤ 2`:
+/-- **`⟨a⟩ ⊔ Z(Q) ∈ ℰ²(Q)` for `a ∈ Q ∖ Z(Q)`** in an exp-`p` extraspecial `Q` with
+`pRank_p(G) ≤ 2`:
 `a` has order `p` and centralizes the (central) `Z(Q)`, so `⟨a⟩ ⊔ Z(Q)` is elementary abelian; it
-strictly contains `Z(Q)` (order `p`) and has order `≤ p²` (by `pRank_p(G) ≤ 2`), hence order `p²`. -/
+strictly contains `Z(Q)` (order `p`) and has order `≤ p²` (by `pRank_p(G) ≤ 2`), hence order
+`p²`. -/
 theorem zpowers_sup_center_mem_elemAbelianOfRank_two [Finite G] {p : ℕ} [Fact p.Prime]
     {Q : Subgroup G} (hQ_es : IsExpPExtraspecial p ↥Q) (hpRank : pRank G p ≤ 2)
     {a : G} (haQ : a ∈ Q) (haZ : a ∉ (Subgroup.center ↥Q).map Q.subtype) :

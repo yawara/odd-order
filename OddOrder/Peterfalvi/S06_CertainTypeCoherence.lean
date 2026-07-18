@@ -185,7 +185,8 @@ theorem certainTypeExtension_mem_ZIrr (h : Hypothesis46 A L) [NeZero (Nat.card h
 /-- **Generator-level isometry**: `⟨ν(μ_j), ν(μ_l)⟩ = ⟨μ_j, μ_l⟩`.  Pulling out the signs gives
 `δ_j δ_l ⟨∑ω_{ij}^σ, ∑ω_{il}^σ⟩ = δ_j δ_l ⟨μ_j, μ_l⟩` (`certainType_omega_sum_isometry`).  When
 `χ₂ = χ₂'` the two signs coincide and `δ_j² = 1`; when `χ₂ ≠ χ₂'` the Gram entry
-`⟨μ_j, μ_l⟩ = 0` (`columnFamily_mu_sum_inner`) absorbs the signs.  No degree hypothesis is needed. -/
+`⟨μ_j, μ_l⟩ = 0` (`columnFamily_mu_sum_inner`) absorbs the signs.  No degree hypothesis is
+needed. -/
 theorem certainTypeExtension_columnSum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
@@ -332,7 +333,8 @@ theorem columnDiff_support_subset (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)
   `τ(μ_j − μ_k) = h.dade0.dadeMap ⟨·⟩` (`dadeIntegralCharacterMap_apply_of_support`)
   `= h.tau.toDadeMap ⟨·⟩` (`IsDadeMap.unique`) `= δ_j ∑(ω^σ − ω^σ)`
   (`certainType_diff_dade_sum_eq`, after identifying `⟨μ_j − μ_k, _⟩ = ∑ certainTypeDiffSupported`);
-* LHS: `ν(μ_j − μ_k) = δ_j ∑ω_{ij}^σ − δ_k ∑ω_{ik}^σ`, and `δ_j = δ_k` (`certainType_columnSign_eq`). -/
+* LHS: `ν(μ_j − μ_k) = δ_j ∑ω_{ij}^σ − δ_k ∑ω_{ik}^σ`, and `δ_j = δ_k`
+(`certainType_columnSign_eq`). -/
 theorem certainTypeExtension_columnDiff_eq_dade (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
@@ -443,7 +445,8 @@ theorem mem_span_columnDiff_of_mem_zSupportedSpan (h : Hypothesis46 A L) [NeZero
 /-- **Peterfalvi (4.9)(b), `τ`-agreement (`IsCoherent.extends_on_supported`)**: on the supported
 lattice `Z[𝒯, A]`, the coherent extension `ν` coincides with the Dade map `τ`.  Reduce to the
 generating differences `μ_j − μ_k` (`mem_span_columnDiff_of_mem_zSupportedSpan`), where `ν = τ`
-(`certainTypeExtension_columnDiff_eq_dade`), and extend over the `ℤ`-span (`eq_on_zSpan_of_eq_on`). -/
+(`certainTypeExtension_columnDiff_eq_dade`), and extend over the `ℤ`-span
+(`eq_on_zSpan_of_eq_on`). -/
 theorem certainTypeExtension_eq_dade_of_mem_zSupportedSpan (h : Hypothesis46 A L)
     [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
@@ -477,7 +480,8 @@ theorem columnSum_inv_apply_one (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily k).mu i)
   rw [hd, map_natCast]
 
-/-- **Peterfalvi (4.9)(a)/(b), nonzero (`IsCoherent.nonzero`)**: `μ̄_k − μ_k` is a nonzero element of
+/-- **Peterfalvi (4.9)(a)/(b), nonzero (`IsCoherent.nonzero`)**: `μ̄_k − μ_k` is a nonzero element
+of
 `Z[𝒯, A]`.  Both `μ̄_k = μ_{k⁻¹}` and `μ_k` lie in `𝒯` (`k⁻¹ ≠ 1`, same degree by
 `columnSum_inv_apply_one`); the difference is `A`-supported (`columnDiff_support_subset`) and
 nonzero
@@ -505,7 +509,8 @@ theorem certainType_nonzero (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
 `τ = dadeIntegralCharacterMap h.dade0 h.tau` is *coherent* on the certain-type set
 `𝒯 = {μ_j | μ_j(1) = μ_k(1)}`: the global `ℤ`-linear extension `ν = certainTypeExtension h`
 (`μ_{ij} ↦ δ_j ω_{ij}^σ`) is an isometry on `Z[𝒯]` agreeing with `τ` on `Z[𝒯, A]` and landing in
-`ℤ[Irr G]`, and `Z[𝒯, A] ≠ 0`.  This is the (4.9) input the §8 case-B coherence capstone consumes. -/
+`ℤ[Irr G]`, and `Z[𝒯, A] ≠ 0`.  This is the (4.9) input the §8 case-B coherence capstone
+consumes. -/
 noncomputable def certainType_isCoherent (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]

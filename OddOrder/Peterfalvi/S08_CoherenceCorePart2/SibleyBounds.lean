@@ -198,7 +198,8 @@ theorem sMember_index_le_two_psi (hyp : SibleyDadeHypothesis G L H)
   exact le_of_mul_le_mul_left key hidx_pos
 
 open scoped Classical in
-/-- **(6.8.3) X-sum break bound.**  The (5.6)/B1 bound applied to the breaking coherent set `S₁ ⊇ X`:
+/-- **(6.8.3) X-sum break bound.**  The (5.6)/B1 bound applied to the breaking coherent set
+`S₁ ⊇ X`:
 `∑_{χ∈X} χ(1)² ≤ 2ψ(1)·χ₁(1)`.  Since `X ⊆ S₁` and `S₁` enumerates as a member family bounded by
 `sMember_degreeSqReBound_of_not_coherent`, the `X`-sum `(H.index)·(|H| − |H:Z|)`
 (`sum_re_sq_Xset_eq`) is dominated by the full family sum, which the (5.6) break bounds by

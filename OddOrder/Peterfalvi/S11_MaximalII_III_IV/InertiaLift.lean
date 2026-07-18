@@ -135,7 +135,8 @@ theorem hcuInHu_normal (caseA : CliffordCaseAData chars) :
   sup_normal_of_normal_left_of_normal_subgroupOf (cuInHu_le_uInHu caseA)
     (hInHu_sup_uInHu_eq_top data)
 
-/-- **`ker(uActionHom) ≤ ker(aInvariantRestrictAut S₀)`**: an element acting trivially on the *whole*
+/-- **`ker(uActionHom) ≤ ker(aInvariantRestrictAut S₀)`**: an element acting trivially on the
+*whole*
 chief factor `H̄` acts trivially on the summand `S₀ ≤ H̄`.  The subgroup inclusion behind
 `C = C_U(H̄) ≤ C_U(S₀)`. -/
 theorem ker_uActionHom_le_ker_aInvariantRestrictAut (caseA : CliffordCaseAData chars) :
@@ -162,7 +163,8 @@ theorem uprimeSub_le_cuSub [Finite G] (caseA : CliffordCaseAData chars) :
     uprimeSub data ≤ cuSub caseA :=
   (uprimeSub_le_cSub data chief).trans (cSub_le_cuSub caseA)
 
-/-- **`U' ≤ C_U(S₀)` realized inside `HU`** (`Uprime`/`uprimeSub` ⟶ `cuInHu`).  The `HU`-realized form
+/-- **`U' ≤ C_U(S₀)` realized inside `HU`** (`Uprime`/`uprimeSub` ⟶ `cuInHu`).  The `HU`-realized
+form
 of `uprimeSub_le_cuSub`: `(U'.subgroupOf M).subgroupOf HU ≤ cuInHu`.  Used to identify `λ` trivial
 on
 `U'` as a character of `C_U(S₀)/U'` in the (9.8.d) count. -/
@@ -276,7 +278,8 @@ noncomputable def hcuLambdaHom [Finite G] (caseA : CliffordCaseAData chars)
       ((QuotientGroup.mk' ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data))).comp
         (MulEquiv.subgroupCongr (hcuInHu_eq_cuInHu_sup_hInHu caseA)).toMonoidHom))
 
-/-- **`hcuLambdaHom` kills `H`** (mirrors `hcLambdaHom_eq_one_of_mem_hInHu`): the `λ`-lift is trivial
+/-- **`hcuLambdaHom` kills `H`** (mirrors `hcLambdaHom_eq_one_of_mem_hInHu`): the `λ`-lift is
+trivial
 on the `H`-part of `H·C_U(S₀)` (the quotient map by `hInHu` kills it).  So the pair character
 `θ₁·λ` restricts on `hInHu` to the plain seed inflation `θ₀`, and the (9.8.d) inertia lift
 `inertia_eq_hcuInHu` applies to the pair unchanged. -/
@@ -381,10 +384,12 @@ theorem index_hcuInHu_eq_relindex_cuInHu [Finite G] (caseA : CliffordCaseAData c
   rw [hsplit, mul_comm (((cuInHu caseA).subgroupOf (uInHu data)).index)] at hmul
   exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hmul
 
-/-- **`[U : C_U(S₀)] = |Ū₁|`** (realized `(cuInHu.subgroupOf uInHu).index = |range(aInvariantRestrictAut S₀)|`).
+/-- **`[U : C_U(S₀)] = |Ū₁|`** (realized
+`(cuInHu.subgroupOf uInHu).index = |range(aInvariantRestrictAut S₀)|`).
 Mirrors `index_cInHu_subgroupOf_uInHu_eq_u`: the first isomorphism theorem for the restricted
 `U`-action `aInvariantRestrictAut caseA.S0_aInvariant` on `S₀`, whose image `Ū₁` has order the index
-`a` of `C_U(S₀)` in `U`.  This is the value `clifford_caseA_data` assigns to `CliffordCaseAData.a`. -/
+`a` of `C_U(S₀)` in `U`.  This is the value `clifford_caseA_data` assigns to
+`CliffordCaseAData.a`. -/
 theorem index_cuInHu_subgroupOf_uInHu_eq_a [Finite G] (caseA : CliffordCaseAData chars) :
     ((cuInHu caseA).subgroupOf (uInHu data)).index
       = Nat.card ↥(aInvariantRestrictAut caseA.S0_aInvariant).range := by
@@ -412,7 +417,8 @@ theorem index_cuInHu_subgroupOf_uInHu_eq_a [Finite G] (caseA : CliffordCaseAData
     rw [hI, hII, mul_comm]
   exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hcancel
 
-/-- **`[HU : H·C_U(S₀)] = |Ū₁| = a`** (Peterfalvi (9.8.d) degree index).  The inertia subgroup of the
+/-- **`[HU : H·C_U(S₀)] = |Ū₁| = a`** (Peterfalvi (9.8.d) degree index).  The inertia subgroup of
+the
 degree-`qa` source character `θ₁·λ` has index `a` in `HU`, giving the source degree `a` and (after
 `Ind_{HU}^M`) the character degree `qa`.  Combines the second-iso step
 `[HU:H·C_U(S₀)] = [U:C_U(S₀)]`

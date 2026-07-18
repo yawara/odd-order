@@ -57,7 +57,8 @@ theorem le_of_card_coprime_index {C : Type*} [Group C]
 
 omit [Invertible (Nat.card G : ℂ)] in
 omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] in
-/-- **The `H`-field of an `S04.Hypothesis` is determined by `(G, A, L)`.**  Two Dade hypotheses on the
+/-- **The `H`-field of an `S04.Hypothesis` is determined by `(G, A, L)`.**  Two Dade hypotheses on
+the
 same data agree on every `H(a)`: each is the normal complement of `C_L(a)` in `C_G(a)`
 (`centralizer_eq_sup`/`centralizer_disjoint`/`H_normalized`), of order coprime to `|C_L(a)|`
 (`centralizer_coprime`).  Working inside `↥C_G(a)`, `[C_G(a) : H(a)] = |C_L(a)|`

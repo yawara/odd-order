@@ -124,7 +124,8 @@ noncomputable def Hypothesis.columnImageFamily [Finite G]
 
 
 open scoped Classical FiniteInduce in
-/-- **§10 column `OrthonormalCharacterImageFamily`, coherence-free** ((5.2.d) for the reducible column
+/-- **§10 column `OrthonormalCharacterImageFamily`, coherence-free** ((5.2.d) for the reducible
+column
 `μ_j`): the difference-image family `R(μ_j) = {δ·ω_{ij}^σ} ∪ {−δ·ω_{ij'}^σ}` of the column character
 `μ_j = ∑_i μ_{ij}` against the §10 Dade isometry `hyp.tau`.  This is the §10 analogue of the §6
 `certainTypeR`, built directly on `hyp.tau` (an `IntegralCharacterMap`) instead of the §6 Dade map.
@@ -604,7 +605,8 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_eq [Finite G]
         rw [smul_smul, hδsq, one_smul]
 
 open scoped FiniteInduce in
-/-- **§10 (2.7) adjoint at the trivial character**: for an `A_0`-supported class function `φ` on `M`,
+/-- **§10 (2.7) adjoint at the trivial character**: for an `A_0`-supported class function `φ` on
+`M`,
 the Dade image `φ^τ = hyp.tau φ` has the same trivial-character multiplicity as `φ`,
 `⟨φ^τ, 1_G⟩ = ⟨φ, 1_M⟩`.
 

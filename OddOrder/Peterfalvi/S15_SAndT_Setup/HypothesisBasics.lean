@@ -97,7 +97,8 @@ order.  A real `Ind_{HU}^M χ` would force `χ̄ = χ^g` for some `g ∈ M` (`in
 `induce_eq_induce_iff_conj`), impossible in odd order (`conjBy_ne_conj_of_odd`: a nontrivial
 irreducible of an odd-order group is never `M`-conjugate to its dual).  `𝒳`-membership `H ⊄ Ker χ`
 supplies the nontriviality (`Ker 1 = univ ⊇ hInHu`).  The `𝒮`-instance of the general
-`inducedKernelFamily_hasNoRealCharacters`; the `no_real_characters` input for `S07.irrSubcoherent`. -/
+`inducedKernelFamily_hasNoRealCharacters`; the `no_real_characters` input for
+`S07.irrSubcoherent`. -/
 theorem sSet_hasNoRealCharacters {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M)
     (hodd : Odd (Nat.card ↥M)) :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters (sSet data) := by
@@ -310,7 +311,8 @@ Dade-independent family inputs:
 The `hconj` field requires `d` to be real (`star d = d`); this holds for the genuine degree values
 `d = q·s` (positive natural), supplied by the caller.  This is the (5.3.a) subcoherence hypothesis
 on
-a uniform-degree family, ready for `coherent_subset_of_constant_degree` (the (9.11) base + Galois). -/
+a uniform-degree family, ready for `coherent_subset_of_constant_degree` (the (9.11) base +
+Galois). -/
 noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -757,7 +759,8 @@ open OddOrder.Peterfalvi.S11 in
 /-- **`𝒮(⊥) = 𝒮`** (issue 1017 step (a) helper): the `⊥`-kernel demand of `𝒮(Y)` is vacuous — only
 the identity lies in `⊥`, and `1 ∈ Ker χ` always — so every `Ind_{HU}^M ξ ∈ 𝒮` already lies in
 `𝒮(⊥)`.  Generic in `data` (the collapse core extracted from the linchpin `sSet_eq_sOf_H0Cprime`);
-it identifies the degenerate `S`-instance kernel strata (`H₀ = C′ = U′ = ⊥`) with the full family. -/
+it identifies the degenerate `S`-instance kernel strata (`H₀ = C′ = U′ = ⊥`) with the full
+family. -/
 theorem sOf_bot_eq_sSet {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
     sOf data (⊥ : Subgroup G) = sSet data := by
   apply Set.Subset.antisymm (sOf_subset_sSet _ _)

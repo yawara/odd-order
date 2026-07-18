@@ -288,7 +288,8 @@ theorem inf_centralizer_centralCommutator_map (hyp : SibleyDadeHypothesis G L H)
     have := congrArg (L.subtype) hcH
     simpa using this
 
-/-- **(6.7)-wiring step (c′), case (A) / c2 form: `(L:Subgroup G) ⊓ C_G(↑w) = H.map L.subtype`.**  The
+/-- **(6.7)-wiring step (c′), case (A) / c2 form: `(L:Subgroup G) ⊓ C_G(↑w) = H.map L.subtype`.**
+The
 (c2) analogue of `inf_centralizer_centralCommutator_map`, supplying the centralizer-card constancy
 clause of Peterfalvi (6.7)'s `hconst` from the case-(A) `C_↥L(w) = H`
 (`centralizer_centralCommutator_eq_c2_caseA`).  The subgroup manipulation is identical to the

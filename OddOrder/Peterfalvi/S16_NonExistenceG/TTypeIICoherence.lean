@@ -291,7 +291,8 @@ This is the honest §16 coherence assembly point for (14.9): it consumes only th
 `coherent_of_constant_degree`) and the parameterized Dade setup, leaving the type-`P` Dade base as
 the
 single precisely-scoped deep obligation.  Its output feeds the (14.9) Γ-Bessel bound
-`T_typeIII_ratio_le` (Coq `cohT1` consumed at PFsection14.v:769 `have [[Itau1T Ztau1T] Dtau1T] := cohT1`). -/
+`T_typeIII_ratio_le` (Coq `cohT1` consumed at PFsection14.v:769
+`have [[Itau1T Ztau1T] Dtau1T] := cohT1`). -/
 theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
     [Fintype G] [Invertible (Nat.card G : ℂ)]
     [Fintype ↥hyp.base.T] [Finite ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T)]

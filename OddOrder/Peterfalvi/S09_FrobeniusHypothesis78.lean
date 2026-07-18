@@ -95,7 +95,8 @@ noncomputable def sibleyToHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
     (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeIsometryData.isDadeMap
   hConjInvariant := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
 
-/-- **The distinguished character for the `i`-th Frobenius member** (Peterfalvi (7.8)/(12.13) analog).
+/-- **The distinguished character for the `i`-th Frobenius member** (Peterfalvi (7.8)/(12.13)
+analog).
 The Sibley family `S = {Ind θ | θ ∈ Irr K_i, θ ≠ 1}` contains a member of degree `[L_i:K_i]`, namely
 `Ind_{K_i}^{L_i} θ` for a nontrivial **linear** `θ`. Exists because `K_i = (H_i).subgroupOf L_i` is
 a

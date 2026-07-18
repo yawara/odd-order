@@ -111,7 +111,12 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       - **分岐 2/3 (H 非可換) = (e2)(e3) の共通部分のみ**: `p ∈ σ(M) − β(M)`、`O_p(H)` 非可換
         (`opiCore_singleton_not_isMulCommutative_of_witness`)、`O_{p'}(H)` cyclic
         (`typeF_nonabelian_cyclic_opiCore_compl`)。
-- [ ] **`p = |X|` の結合** — **未了 (ただし前提は揃っている)**。BG は `X = X₁` を示して `p = |X|`
+- [x] **`p = |X|` の結合** — **完了 (2026-07-19)**。以下 4 段すべて sorry-free・axiom-clean、
+      新 leaf `S15_MF/WitnessPGroup.lean` に集約。最終形 =
+      `inf_conj_fitting_eq_of_not_isMulCommutative` (`X = X₁`) と
+      `card_inf_conj_fitting_eq_of_not_isMulCommutative` (`|X| = p`)。
+      (以下は着手前の調査メモ)
+BG は `X = X₁` を示して `p = |X|`
       を得る: `Z₀ = Ω₁(Z(P))`、`B = X₁ × Z₀ ∈ ℰ²(P) ∩ ℰ*(P)` (`C_H(X₁)` の rank < 3 による)、
       そこから `|Z₀| = p` と `Z(P)` cyclic、最後に **Lemma 10.13(b)** で
       `C_P(X₁) = C_P(B) = X₁ × Z` (Z cyclic)。
@@ -204,10 +209,91 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       (PisetBetaDisjoint → OpicoreCentralizer → WitnessPGroup)。⟹ **`p = |X|` 完成後の
       「精密化された (e)」は `OpicoreCentralizer` でなく `WitnessPGroup` 側 (かその下流) に置く**
       (現 `fitting_not_ti_trichotomy` は OpicoreCentralizer に在り WitnessPGroup を cite できない)。
-- [ ] **(e2)/(e3) の型別分離** — **未了**。type `F` 側の exponent 条件
-      (`exp(M/H) ∣ q − 1`) は `typeF_exponent_dvd_sub_one_of_invariant_card` として**存在し**、
-      `isTypeI_of_isTypeF` が使っている (trichotomy へは未配線)。type `P₁` 側の
-      `|O_p(H)| = p³` と `|M/H| ∣ p + 1` (BG Thm 5.5(b) + Cor 10.7(b) + Thm 2.5 経由) は未形式化。
+- [ ] **(e2)/(e3) の分離** — **未了 (ただし残作業は assembly のみ)**。
+
+      ⚠ **2026-07-19 訂正: 本項の旧記述「type `P₁` 側の `|O_p(H)| = p³` と `|M/H| ∣ p + 1` は
+      未形式化」は誤り。** 実測したところ **(e2)(e3) の数学的内容はすべて形式化済・axiom-clean**
+      で、`isTypeV_of_isTypeP1_mf_eq_msigma` (`S16_MainResults/TypeVSinger.lean:392`) が現に
+      両分岐を証明している。旧記述は stale な docstring を信じたもの
+      ([[verify-port-state-by-number-not-coq-name]] の再発)。実在確認:
+
+      | 部品 | 所在 | 状態 |
+      |---|---|---|
+      | `\|O_p(H)\| = p³` | `TypeVSinger.lean:277` `card_opiCore_eq_prime_cube_singer` | ✅ AxiomsCheck:7474 |
+      | `\|M/H\| ∣ p+1` | `GroupTheory/RepresentationTheory/ExtraspecialSinger.lean:319` `card_dvd_succ_of_primeAction_extraspecial` | ✅ AxiomsCheck:9147 |
+      | `r(P) ≤ 2` | `TypeVSinger.lean:133` `pRank_opiCore_le_two_of_kappaHall` | ✅ AxiomsCheck:9143 |
+      | `\|Z(P)\| = p` | `TypeVSinger.lean:194` `card_center_opiCore_eq_prime_of_omega1Center_le_kstar` | ✅ AxiomsCheck:7463 |
+      | BG Thm 5.5 | `S05_NarrowAutomorphisms.lean:966` `solvableAut_of_narrow` | ✅ AxiomsCheck:2526 |
+      | BG Cor 10.7(b) | `S10_BetaRadicalCore.lean:695` `sylow_structure` (第2 conjunct) | ✅ |
+      | (e2) exponent | `TypeP1Criteria.lean:799` `typeF_exponent_dvd_sub_one_of_invariant_card` | ✅ |
+      | (e2) type-`P₁` 版 engine | `TypeP1Criteria.lean:1556` `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot` | ✅ |
+      | semiprime `C_H(k) = K*` | `TypeP1Criteria.lean:1534` `centralizer_msigma_kappaElement_eq_kstar` | ✅ |
+
+      ⚠ 併せて **stale docstring 2 件**を訂正すること (将来の誤読源):
+      `TypeVSinger.lean:255-274` (「the sole remaining content is …`sylow_structure_b` を
+      de-privatize せよ」= 完了済) と `:376-390` (「the sole remaining residual は (8.8) の
+      `W₁`-action analysis で未形式化」= 完了済)。proof 内の `-- (sorry 1)` / `-- (sorry 2)`
+      コメントも実 sorry でなく歴史的ラベル。
+
+      **⚠ さらに重要な訂正: 私の当初の「(e2) = type `F` / (e3) = type `P₁`」という読みは誤り。**
+      BG 原文でも Coq でも **(e2) に型の制約は無い** — (e2) は exponent 条件そのもので、
+      type `P₁` でも成り立ちうる。権威ある Coq (`BGsection15.v:947-950`) の形が正本:
+
+      ```coq
+      (*e*) (*1*) [/\ M \in 'M_'F, abelian H & 'r(H) = 2]
+         \/ let p := #|X| in [/\ prime p, ~~ abelian 'O_p(H), cyclic 'O_p^'(H)
+          & (*2*) {in \pi(H), forall q, exponent (M / H) %| q.-1}
+         \/ (*3*) [/\ #|'O_p(H)| = (p ^ 3)%N, M \in 'M_'P1 & #|M / H| %| p.+1] ]
+      ```
+
+      すなわち **共通 conjunct (`p = |X|` prime / `O_p(H)` 非可換 / `O_{p'}(H)` cyclic) を括り出し、
+      (e2) ∨ (e3) を内側の disjunction** にする。これが形式化目標の正本。
+
+      **Coq の (e2)/(e3) 分岐ロジック** (`BGsection15.v:1185-1204`) —
+      場合分けは含意 `Ks = Z₀ → |K| ∣ p−1` の真偽:
+      - **含意が真 ⟹ (e2)**。各 `q ∈ π(H)` について: `Z q = Ks` なら `|Z q| = q`・`|Ks| = p` から
+        `q = p` で仮定が直接効く。`Z q ≠ Ks` なら `|Ks|` 素数ゆえ `Z q ⊓ Ks = 1`、
+        semiprime (`C_H(k) = K*`) で `K` が `Z q` に半正則作用 ⟹ `|K| ∣ q−1`。
+      - **含意が偽 ⟹ `Ks = Z₀` かつ `¬(|K| ∣ p−1)` ⟹ (e3)** (Singer 鎖)。
+
+      type `F` 側 (Coq `FmaxM` 分岐) は `U₀` の Frobenius 作用 = Lean
+      `typeF_exponent_dvd_sub_one_of_invariant_card` に対応。
+
+      ⟹ **残作業は「上記部品を Coq の形の 1 定理に組み上げる」assembly のみ**。未形式化の上流は無い。
+      配置: (e2)(e3) が S16 の補題を要するため、trichotomy 本体は **S16 の新 leaf**
+      (`TypeVSinger` の下流) に置く。S15 の `fitting_not_ti_trichotomy` は S15 レベルの
+      partial として存続させる (S15 は S16 を cite できない)。
+
+      #### 手順 (2026-07-19 確定)
+
+      **手順 A — witness extractor を per-`g` へ一般化**。`p = |X|` を述べるには `X` を固定する
+      必要があり、Coq も `g \notin M -> X :!=: 1 ->` を仮説に取る。現状の
+      `exists_inf_conj_fitting_orderP_witness` (`PisetBetaDisjoint.lean:581`) は `∃ g` 形だが、
+      **証明本体は `:597` で `exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` から
+      `hgM`/`hXne` を obtain した直後、以降 `hnotTI` を使っていない** (2026-07-19 確認済 —
+      `hnotTI` の出現は署名 `:583` と `:597` の 2 箇所のみ、定理は `:684` まで)。⟹ 署名を
+      `{g : G} (hgM : g ∉ M) (hXne : X ≠ ⊥)` に変え `∃ p X₁, …` を返す形へ一般化し、
+      `:597` の obtain を削除するだけ。既存の `∃ g` 版は新版からの 2 行の導出として残す
+      (消費側 4 箇所を書き換えずに済む; 純粋リネーム wrapper ではなく genuine な特殊化)。
+
+      **手順 B — trichotomy 本体**を新 leaf `S16_MainResults/FittingNonTITrichotomy.lean` に。
+      Coq の形どおり共通 conjunct を括り出す。`|M/H|` は `Subgroup.index` 
+      (`((MF M).subgroupOf M).index`) で述べる — repo の既存イディオム
+      (`card_W1_eq_derived_index` と同じ) で、normality instance を要求せずに済む。
+      exponent 条件のみ商群 `↥M ⧸ (MF M).subgroupOf ↥M` が要るので `MF M ⊲ M` を供給する。
+      証明の骨格:
+      - `H` 可換 ⟹ (e1) (既存 `isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI` +
+        `rank_mf_eq_two_…`)。
+      - `H` 非可換 ⟹ `p = |X|` (`card_inf_conj_fitting_eq_of_not_isMulCommutative`)、共通 conjunct
+        2 件 (`opiCore_singleton_not_isMulCommutative_of_witness` /
+        `typeF_nonabelian_cyclic_opiCore_compl`)、その後 (a) で type `F` / `P₁` に分岐:
+        - type `F` ⟹ (e2): 各 `q ∈ π(H)` に per-prime witness
+          (`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`) +
+          `typeF_exponent_dvd_sub_one_of_invariant_card`。
+        - type `P₁` ⟹ Coq の含意 `Ks = Z₀ → |K| ∣ p−1` で場合分け。真なら (e2)
+          (`Z q = Ks` なら `q = p`; さもなくば `Z q ⊓ Ks = ⊥` + semiprime で
+          `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot`)。偽なら (e3) (Singer 鎖 =
+          `card_opiCore_eq_prime_cube_singer` + `card_dvd_succ_of_primeAction_extraspecial`)。
 - [x] **(d) の追加** (2026-07-18 完了)。`sigmaComplement_structure_of_not_fittingIsTI` として、
       `fitting_not_ti_cases` の bundle でなく **§12 E-setup を取る独立定理**にした (BG (d) は
       「§12-13 のとおりに取った E, E₁, E₂, E₃」についての主張なので、E-setup を引数に取る形が
@@ -227,6 +313,19 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
 (b)(d)(e) が (a) から独立な内容を主張し、`p = |X|` の結合が復元され、book strength・sorry-free・
 axiom-clean で証明されること。(c) は `≤` のまま (MathComp 準拠、上記理由)。
 ⚠ **現状の (b)(e) を「証明済」と数えない**。(e) だけ直して閉じない。
+
+### `p = |X|` chain の完成 (2026-07-19)
+
+| 段 | 内容 | 定理 |
+|---|---|---|
+| 1 | `X` は p-群 (BG は根拠を書いていない) | `inf_conj_fitting_isPGroup_of_not_isMulCommutative` |
+| 2 | `B = X₁ × Ω₁(Z(P))` が rank 2 elementary abelian | `exists_rankTwo_elemAbelian_of_witness` |
+| 3 | `B` が (ambient `G` で) 極大 — Sylow 押し込み + σ-Hall tameness | `isMaximalElementaryAbelian_sup_omega1Center_of_witness` |
+| 4 | Lemma 10.13(b) → `X = X₁`、ゆえに `p = \|X\|` | `inf_conj_fitting_eq_of_not_isMulCommutative` / `card_…` |
+
+段 4 の詰め (BG の "Thus X = X₁" 一言) は: `X ⊓ Z = ⊥` (非自明なら位数 `p` の部分群を含み、
+`X` cyclic ゆえそれは `X₁` に一致 → `X₁ ⊓ Z = ⊥` に矛盾)、そして `x = u·v` 分解と `X₁` の指数 `p`
+から `x^p = v^p ∈ X ⊓ Z = 1` ⟹ `X` の指数が `p` を割る ⟹ cyclic + `X₁ ≤ X` で `X = X₁`。
 
 ### 進捗 (2026-07-18)
 

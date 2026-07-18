@@ -149,7 +149,8 @@ open scoped Classical in
 homomorphism** `((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm ι`.  The underlying permutation is the
 (unique)
 `π` with `ψ (Pi.single i 1) = Pi.single (π i) 1`; multiplicativity is forced by that uniqueness.
-This makes `MulAut`-actions on the index set (the simples of a group algebra) genuine group actions. -/
+This makes `MulAut`-actions on the index set (the simples of a group algebra) genuine group
+actions. -/
 noncomputable def algAutPerm : ((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm ι where
   toFun ψ := Classical.choose (algEquiv_permutes_single ψ)
   map_one' := by

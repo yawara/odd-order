@@ -192,7 +192,8 @@ open OddOrder.GroupTheory
 
 variable {G : Type*} [Group G]
 
-/-- **The `M`-seeded canonical-pair data, κ-ordered form**: `exists_section16MaximalPairCore_data_around`
+/-- **The `M`-seeded canonical-pair data, κ-ordered form**:
+`exists_section16MaximalPairCore_data_around`
 together with the (13.2.a)-deep ordering `|K| < |W₁|` (`isTypeP2_of_typeP_kappaHall_lt`
 contrapositive).  ⚠ This ordering routes through (10.10) ← (10.8); order-free consumers — the
 (10.7)/(10.8) chain — must use the `Core` form (issue 1020 Phase 1a). -/

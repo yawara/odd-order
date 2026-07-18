@@ -492,7 +492,8 @@ theorem Hypothesis.nineElevenEqualityRefutationS [Finite G]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
-/-- **Peterfalvi (9.11.1)–(9.11.8), the `S`-instance equality-configuration refutation** (issue 1017,
+/-- **Peterfalvi (9.11.1)–(9.11.8), the `S`-instance equality-configuration refutation** (issue
+1017,
 the sole residual of `sSet_coherent_indS_caseA`, mirroring the M-instance
 `nineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation`).
 
@@ -1041,7 +1042,8 @@ coefficient has `P ⊄ ker s` (`constituent_P_not_subset_characterKernel`), so `
 lies in `sSet` by witness `s`; the coefficient-weighted `ℤ`-sum lands in `zSpan sSet`.  This
 grounds the family
 membership on the proven S06 setup (`typePData_toS06Hypothesis` for `S` supplies the certain-type
-Hypothesis, though only its `S'`-family shape is needed here); no prime-TI residue dichotomy is used. -/
+Hypothesis, though only its `S'`-family shape is needed here); no prime-TI residue dichotomy is
+used. -/
 theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
@@ -1187,7 +1189,8 @@ open scoped FiniteInduce in
 /-- **(13.2.d) τ₁ sends the `H`-induced family into `ℤ[Irr G]`** (issue 2035 step 5a): for
 irreducible `θ` of `H = PC` with `P ⊄ Ker θ`, `τ₁ (Ind_{PC}^S θ) ∈ ℤ[Irr G]`.  From the coherence
 field `extension_mem_ZIrr` (virtual-character codomain on all of `ℤ[𝒮]`) and the family membership
-`induce_H_mem_zSpan_S`.  Honest engine for the `CharacterDegreeData` `tau1S_induce_mem_ZIrr` field. -/
+`induce_H_mem_zSpan_S`.  Honest engine for the `CharacterDegreeData` `tau1S_induce_mem_ZIrr`
+field. -/
 theorem Hypothesis.tau1S_ofHonest_induce_mem_ZIrr [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

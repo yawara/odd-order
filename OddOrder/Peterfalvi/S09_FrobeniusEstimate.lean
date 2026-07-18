@@ -238,7 +238,8 @@ Assembles the (7.8) `Hypothesis78` and feeds the bundled §7 producer `zetaNuRho
 four
 genuine inputs: `hzeta0nu` (`ζ_0^ν ⊥ 1_G`, `F.hzeta0nu`), `hζ0norm` (`‖ζ_0‖² = 1`, Frobenius),
 `a`/`ha` (`(β, ζ_0^ν) + 1 ∈ ℤ`, `exists_betaDecomp_a`), and `hsmall` (`2e + 1 ≤ h`,
-`IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel`).  Mirrors `S14.witness_L_zeta_bound`. -/
+`IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel`).  Mirrors
+`S14.witness_L_zeta_bound`. -/
 theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
     [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
@@ -411,7 +412,8 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     rw [he, hh, hzn] at hbound
     exact hbound
 
-/-- **The (7.8.b) bound in the family `chiRhoNormSq` coordinate** (the `hi`/`hχ` shape for the (7.10)
+/-- **The (7.8.b) bound in the family `chiRhoNormSq` coordinate** (the `hi`/`hχ` shape for the
+(7.10)
 assembly).  The distinguished coherent image `χ = ζ_0^ν = ν(Ind θ_0)` is norm-`1` and satisfies the
 (7.8.b) bound `1 − e_i/h_i ≤ (F.familyHypothesis71).chiRhoNormSq χ i`.  Immediate from
 `zetaNuRhoNormSq_ge` once the ambient `Fintype`/`Invertible` on `↥L_i` are pinned to

@@ -70,7 +70,8 @@ theorem card_Q_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 `M_F` is automorphism-equivariant (`maxNilpotentNormalHall_pointwise_smul`), so
 `conj g • L_F = maxNilpotentNormalHall (conj g • L) = maxNilpotentNormalHall T = Q`; conjugation
-preserves cardinality, so `|L_F| = |Q| = q^p` (`card_Q_eq`, now proven for the (14.9) type-II `T`). -/
+preserves cardinality, so `|L_F| = |Q| = q^p` (`card_Q_eq`, now proven for the (14.9) type-II
+`T`). -/
 theorem tConjugate_card_LF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
     {L : Subgroup G} {g : G} (hconj : MulAut.conj g • L = hyp.T) :
@@ -99,7 +100,8 @@ structural data.  **Now proven**: part (1) is `tConjugate_card_LF` (via `card_Q_
 `W₁ ≤ L_F` places the `q`-group `W₁ ⊆ N_G(U) ⊆ L` in the normal `q`-Hall `L_F`
 (`pgroup_le_of_normal_coprime_index`); part (3) `L_F ⊓ U = ⊥` from `|L_F| = q^p` coprime to `|U|`
 (the `U ⋊ W₁` Frobenius gives `(|U|, q) = 1`).  `IsTypeII T` is threaded from
-`exists_typeI_maximal_overNormalizer_U` (via (14.9) `T_typeII`); `hNUL` is the `N_G(U) ⊆ L` context. -/
+`exists_typeI_maximal_overNormalizer_U` (via (14.9) `T_typeII`); `hNUL` is the `N_G(U) ⊆ L`
+context. -/
 theorem tConjugate_fitting_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
     {L : Subgroup G} {g : G} (hconj : MulAut.conj g • L = hyp.T)
@@ -438,7 +440,8 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
 
 /-- **`T`-side dual of `typeI_overNormalizer_U_le_fitting`** (Pf (13.17.b), V-side): for `T` type II
 and a type-`I` maximal `L` over `N_G(V)`, `V ⊆ L_F`.  Mirror; cites the (8.17.a) coprimality
-`card_LF_coprime_pq` (gated, BG Thm E) and the V-side FPF residual `typeI_V_le_fitting_of_coprime`. -/
+`card_LF_coprime_pq` (gated, BG Thm E) and the V-side FPF residual
+`typeI_V_le_fitting_of_coprime`. -/
 theorem typeI_overNormalizer_V_le_fitting [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

@@ -89,7 +89,8 @@ structure XAdjoinStepInputW {A : Set G}
     ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0
   /-- The anchor is irreducible: `mc i₁ = 1`. -/
   hanchorNorm : mc i₁ = 1
-  /-- Per-member ν-aux decomposition `Dmem i : CharacterPsiDecomposition τ (χmem i) 0` — for case (B)
+  /-- Per-member ν-aux decomposition `Dmem i : CharacterPsiDecomposition τ (χmem i) 0` — for case
+  (B)
   built from `certainTypeR`/`certainTypeDecompositionDa` (reducible columns) or
   `memberExtensionDecomposition` (irreducibles). -/
   Dmem : ∀ i ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
@@ -157,7 +158,8 @@ theorem exists_indexed_projection_of_orthogonal_ZIrr {G : Type*} [Group G] [Fint
     · intro hni; exact absurd hi hni
   rw [hsum, hcZ i hi, sub_self]
 
-/-- **Norm-weighted crux1** (Peterfalvi (5.6.1)/(5.6.2) for a reducible member family).  The weighted
+/-- **Norm-weighted crux1** (Peterfalvi (5.6.1)/(5.6.2) for a reducible member family).  The
+weighted
 analogue of `crux1_of_memberFamily`: the member family `χmem` is orthogonal with real squared norms
 `mc i` (`hmemortho i j = if i=j then mc i else 0`), the anchor is irreducible (`hanchorNorm : mc i₁
 = 1`), and the degree bound is the **weighted** `2a < ∑ deg(i)²/mc i`.  Then the crux inner product
@@ -603,7 +605,8 @@ noncomputable def xAdjoinStepW_k
     hS₁ χ χ.conj hdiffsuppχ hdiffasuppχ hχχne hχbarχbarne hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
     (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
 
-/-- **The per-step weighted X-adjoin** (bundled form).  A `XAdjoinStepInputW` yields the coherence of
+/-- **The per-step weighted X-adjoin** (bundled form).  A `XAdjoinStepInputW` yields the coherence
+of
 `S₁ ∪ {χ, χ̄}` — the weighted analogue of `XAdjoinStepInput.adjoin`, for the (weighted) X-chain fold
 `coherentOfPairChainCover`.  Pure pass-through to `xAdjoinStepW`. -/
 noncomputable def XAdjoinStepInputW.adjoin
@@ -703,7 +706,8 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
     Dmem hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
-/-- **Norm-weighted (5.6) degree-square bound, reducible BREAK (contrapositive of `xAdjoinStepW_k`).**
+/-- **Norm-weighted (5.6) degree-square bound, reducible BREAK (contrapositive of
+`xAdjoinStepW_k`).**
 
 The `‖χ‖² ≠ 1` analogue of `coherentDegreeSqNormBound_of_not_coherentW`: if `S₁` is coherent but
 `S₁ ∪ {χ, χ̄}` is **not** — for a possibly **reducible** break `χ` whose decomposition `Da` is

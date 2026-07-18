@@ -672,7 +672,8 @@ factor need be orthogonal to `1`, since the `χ = 1` term `c₁(1)·c₂(1)` van
 `⟨Δ₁, Δ₂⟩` is even.  Cross-Parseval (`mem_ZIrr_inner_eq_sum_over_irr`) gives
 `⟨Δ₁,Δ₂⟩ = ∑_χ c₁(χ)c₂(χ)` with `cᵢ(χ) = ⟨Δᵢ,χ⟩ ∈ ℤ`; the `χ = 1` term vanishes, and on `Irr ∖ {1}`
 the conjugation involution `conjPerm` is fixed-point-free (`conjPerm_eq_self_iff` +
-`not_isReal_of_ne_trivial_of_odd_card'`) with `cᵢ` invariant, so `even_sum_of_involution` applies. -/
+`not_isReal_of_ne_trivial_of_odd_card'`) with `cᵢ` invariant, so `even_sum_of_involution`
+applies. -/
 theorem even_inner_of_conjPerm_symmetric [Finite G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] (hodd : Odd (Nat.card G))
     {Δ₁ Δ₂ : ClassFunction G ℂ} (h₁ : Δ₁ ∈ ZIrr G) (h₂ : Δ₂ ∈ ZIrr G)
@@ -1099,7 +1100,8 @@ theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
   rw [hinner]; ring
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (11.8.6) opening identity** `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, `δ = 1`).
+/-- **Peterfalvi (11.8.6) opening identity** `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`,
+`δ = 1`).
 Given the `a = 0` Dade images `α_{ij}^τ = ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}` for all `i` (`halpha`,
 Peterfalvi (11.8.2)+(11.8.5), `SHC_tau_muGridAlpha_eq` at `δ = 1`) and the (11.8.4) value
 `(μ₀ − ζ)^τ = ∑_i ω_{i0}^σ − ζ^{τ₁}` (`h114`), the `M`-level identity
@@ -1314,7 +1316,8 @@ since `[M : M'] = w₁` (`TypePData.card_W1_eq_derived_index`; `M' = derivedInG 
 foundational (11.8.1) degree-factoring for the world-bridge: the degree of any member `y = Ind θ`
 of `S = inducedFamily M` is `w₁` times a source degree `θ(1)`, so the two-degree-class structure
 `{w₁, qu = d·w₁}` of `𝒮(C)` reduces to `θ(1) ∈ {1, d}`.  (The reducible members' `θ(1) = d` is the
-§9 `reducible_mem_sOf_H0_apply_one_eq_qu` content; this lemma supplies the `[M:M']`-factoring half.) -/
+§9 `reducible_mem_sOf_H0_apply_one_eq_qu` content; this lemma supplies the `[M:M']`-factoring
+half.) -/
 theorem Hypothesis.induce_derived_apply_one_eq_w1_mul [Finite G] {M : Subgroup G}
     (hyp : Hypothesis M)
     (θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M)) :
@@ -1421,7 +1424,8 @@ theorem Hypothesis.exists_muGrid_column_eq_of_inducedFamily_reducible [Finite G]
     exact hyeq
 
 open scoped FiniteInduce in
-/-- **Reducible members of `S = inducedFamily M` have degree `q·u = qu`** — the reducible-side of the
+/-- **Reducible members of `S = inducedFamily M` have degree `q·u = qu`** — the reducible-side of
+the
 (11.8.1) uniform-degree structure of `𝒮₂ = Sset \ SHCSet`.  A reducible `inducedFamily`-member is a
 nonzero μ-column (`exists_muGrid_column_eq_of_inducedFamily_reducible`, the (9.5)/(4.5.b) family
 identification), which lies in `𝒮(H₀) = sOf ... chief.H0`
@@ -1503,7 +1507,8 @@ theorem Hypothesis.SHCSet_inner_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : 
   exact inducedFamily_pairwiseOrthogonal hx.1 hy.1 hne
 
 open scoped FiniteInduce in
-/-- **`ℤ[S(HC)] ⊥ ℤ[S₂]`** (span-level `hsrc_ortho` for the (11.8.6) union): the `ℤ`-lattices spanned
+/-- **`ℤ[S(HC)] ⊥ ℤ[S₂]`** (span-level `hsrc_ortho` for the (11.8.6) union): the `ℤ`-lattices
+spanned
 by `S(HC)` and `S₂ = S(C) − S(HC)` are orthogonal, lifted from the set-level
 `SHCSet_inner_diff_eq_zero` by bi-additivity of the inner product (`span_induction` on both
 arguments).  This is the exact `hsrc_ortho` hypothesis
@@ -1553,7 +1558,8 @@ theorem Hypothesis.Sset_eq_SHCSet_union_diff [Finite G] {M : Subgroup G} (hyp : 
 
 
 open scoped Classical FiniteInduce in
-/-- **(11.8.6) gluing wrapper: `S(C) = S(HC) ∪ S₂` coherence from the glued `τ₃` data** (sorry-free).
+/-- **(11.8.6) gluing wrapper: `S(C) = S(HC) ∪ S₂` coherence from the glued `τ₃` data**
+(sorry-free).
 The pure-algebra half of Peterfalvi (11.8.6): given the two coherences `coh` (`S(HC) = S₁`, `τ₁`)
 and
 `hY` (`S₂ = S(C) − S(HC)`, `τ₂`), a glued integral map `ν` agreeing with `coh.extension` on `S₁` and

@@ -1015,7 +1015,8 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D
         (hrepsMax _ (e.symm j.down).2) (hrepsMax _ (e.symm k.down).2) hnc
 
-/-- **Peterfalvi (8.18.c)**: the final support-exclusion relation in Section 10.  For **non-conjugate
+/-- **Peterfalvi (8.18.c)**: the final support-exclusion relation in Section 10.  For
+**non-conjugate
 type-I** maximal subgroups `S, T`, the sharp sets `A₁(S) = (S_F)^#` and `A₁(T) = (T_F)^#` cannot
 mutually support each other.
 

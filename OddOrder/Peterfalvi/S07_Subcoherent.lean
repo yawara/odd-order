@@ -446,7 +446,8 @@ theorem sumnS_image_eq_anchorSq_mul {ι : Type*} (s : Finset ι) (χmem : ι →
   ring
 
 open scoped Classical in
-/-- **Peterfalvi (9.11): the `extend_coherent`-firing precondition (raw `sumnS` ⟹ normalized bound).**
+/-- **Peterfalvi (9.11): the `extend_coherent`-firing precondition (raw `sumnS` ⟹ normalized
+bound).**
 
 The bridge from the (9.11) squeeze `lb0 < sumnS S₁` (raw degree-sum form) to the anchor-normalized
 degree bound `2·a < ∑ᵢ deg(i)²/mc(i)` that `xAdjoinStepW`/`retarget_isCoherent_of_decompositions`

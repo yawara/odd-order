@@ -659,7 +659,8 @@ theorem honestTypeP2ASet_subset {M : Subgroup G} :
   Subgroup.map_subtype_le _ hy.1
 
 /-- **`A(S)` is `M`-conjugation invariant.**  Both `M_σ` (`Msigma`) and `M' = derivedInG M` are
-`M`-normal, so conjugating `y ∈ A(S)` and its centralized `M_σ`-witness by `m ∈ M` stays in `A(S)`. -/
+`M`-normal, so conjugating `y ∈ A(S)` and its centralized `M_σ`-witness by `m ∈ M` stays in
+`A(S)`. -/
 theorem honestTypeP2ASet_conj_mem [Finite G] {M : Subgroup G} {m : G} (hm : m ∈ M) {y : G}
     (hy : y ∈ honestTypeP2ASet M) : m * y * m⁻¹ ∈ honestTypeP2ASet M := by
   obtain ⟨hyM', hy1, x, hxσ, hyC⟩ := hy
@@ -736,7 +737,8 @@ theorem escaping_honestTypeP2ASet_mem_sigmaSharp [Finite G]
   exact OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl)
     (honestTypeP2ASet_subset_ASet hG hM hKM hUM hKne hK hU haA) haA.2.1 haesc
 
-/-- **(8.13.c2) coprimality for the type-`P₂` support** (the `σ`-decomposition core, `P₂` form).  For
+/-- **(8.13.c2) coprimality for the type-`P₂` support** (the `σ`-decomposition core, `P₂` form).
+For
 an escaping `a ∈ M_σ^#` and any `w ∈ A(S)`, no prime `p ∈ σ(N[a])` divides `|C_S(w)|`.  Mirrors the
 type-I `escaping_sigma_disjoint_centralizer`: a common prime `p ∈ σ(N[a]) ∩ π(S)` fires
 `non_disjoint_signalizer_frobenius`, making `S` Frobenius with kernel `S_σ`; the `A(S)`-point `w`
@@ -1072,7 +1074,8 @@ theorem dadeSupportHypothesisData_honestTypeP2ASet [Fintype G] [Finite G]
       rwa [show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x from by group] at this,
       fun h => honestTypeP2ASet_conj_mem hm h⟩
 
-/-- **(13.2.e) `S`-instance Dade hypothesis** (issue 1017 update #10, step 1): the `Hypothesis`-level
+/-- **(13.2.e) `S`-instance Dade hypothesis** (issue 1017 update #10, step 1): the
+`Hypothesis`-level
 instantiation of `dadeSupportHypothesisData_honestTypeP2ASet` at the type-`P` maximal `S`
 (via `hyp.S_maximal`/`hyp.S_isTypeP`), packaging the honest §16 support
 `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` (`honestTypeP2ASet hyp.S`) as an `S04.Hypothesis`. This is the
@@ -1102,7 +1105,8 @@ theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
   (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.S_maximal (hyp.S_isTypeP hG)).some.hconj
 
 open scoped FiniteInduce in
-/-- **(13.2.e) `S`-instance `dade = Ind` bridge** (issue 1017): for the honest type-`P₂` maximal `S`,
+/-- **(13.2.e) `S`-instance `dade = Ind` bridge** (issue 1017): for the honest type-`P₂` maximal
+`S`,
 on a class function `f` supported in a trivial-`H` sub-support `A₁ ⊆ A(S)` (an `S`-invariant subset
 on which the `S`-instance Dade stabilizers vanish), the honest (13.2.e) Dade isometry
 `τ = dadeIntegralCharacterMap (dadeHypS hG) …` acts as plain induction `Ind_S^G`.  This is the exact
@@ -1138,7 +1142,8 @@ theorem Hypothesis.sInstance_dade_eq_induce_of_supported_trivial_H [Fintype G] [
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H (hyp.dadeHypS hG)
     hA₁A hA₁norm hH₁ ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
-/-- **(Rung B, reduction step 1) `dadeHypS.H a = ftSupportKernel S (A(S)) a`.**  The `S`-instance Dade
+/-- **(Rung B, reduction step 1) `dadeHypS.H a = ftSupportKernel S (A(S)) a`.**  The `S`-instance
+Dade
 stabilizer at a support point `a` is the faithful per-`x` (8.14) signalizer kernel
 `R(a) = ftSupportKernel S (A(S)) a`, read off the `H_eq_ftSupportKernel` field of the underlying
 `DadeSupportHypothesisData` (the very `.some` witness `dadeHypS` is projected from).  This is the
@@ -1259,7 +1264,8 @@ theorem Hypothesis.sInstance_dade_eq_induce [Fintype G] [Finite G]
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of
 `C' = [C, C]`, viewed inside `↥S` via `C' ≤ C ≤ U ≤ S`.  This is the genuine `H0CprimeSupport`
-of the honest §9 character data on `S`, replacing the `∅`-placeholder of `mkSection11CharacterDataS`. -/
+of the honest §9 character data on `S`, replacing the `∅`-placeholder of
+`mkSection11CharacterDataS`. -/
 def Hypothesis.cprimeSharpS (hyp : Hypothesis (G := G)) : Set ↥hyp.S :=
   OddOrder.Peterfalvi.S04.sharp ((hyp.Cprime).subgroupOf hyp.S : Set ↥hyp.S)
 

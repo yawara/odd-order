@@ -940,7 +940,8 @@ theorem certainTypeOmegaSigma_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W
 open scoped Classical in
 /-- **`σ`-image column-sum orthonormality.**  `⟨∑_i ω_{ij}^σ, ∑_i ω_{ij'}^σ⟩ = w₁·δ_{jj'}`:
 the column sums of the `σ`-images are orthogonal for distinct columns and have norm² `w₁`
-(the `w₁` orthonormal entries) on the diagonal.  Bilinear expansion + `certainTypeOmegaSigma_inner`. -/
+(the `w₁` orthonormal entries) on the diagonal.  Bilinear expansion +
+`certainTypeOmegaSigma_inner`. -/
 theorem certainTypeOmegaSigma_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :

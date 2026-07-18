@@ -343,7 +343,8 @@ theorem hypothesis78_nu_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card 
   exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
 
 open OddOrder.Peterfalvi.S09.Cert in
-/-- **`β̄ − β = νζ − νζ̄`** (Frobenius; the `hbeta_conj_sub` input to `delta_isReal`).  `β = τ⟨ζ_ind − ζ⟩`
+/-- **`β̄ − β = νζ − νζ̄`** (Frobenius; the `hbeta_conj_sub` input to `delta_isReal`).
+`β = τ⟨ζ_ind − ζ⟩`
 with `ζ_ind = Ind 1_K` real; conjugating (`dadeIntegralCharacterMap_mapRingEquiv_comm` at `conjAe`)
 gives `β̄ = τ⟨ζ_ind − ζ̄⟩`, so `β̄ − β = τ⟨ζ − ζ̄⟩` (`LinearMap.map_sub`).  The agreement
 (`coherence_hagree_dadeMap`, `di = 1` by equal degrees) rewrites that to `νζ − νζ̄`.  `ζ_ind ∉ S`,

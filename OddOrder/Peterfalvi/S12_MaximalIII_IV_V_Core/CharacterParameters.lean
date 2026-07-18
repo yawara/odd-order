@@ -244,7 +244,8 @@ irreducibles (`sigma_inner_irreducibleCharacter`), and the index map `(i, j) ↦
 injective** (`linearIrreducibleCharacter`/`e`-precompose/`omegaProdChar_inj`/`w1CharEquiv`/`χ₂` all
 injective), so the Gram matrix is the identity.  This is the `orthonormal` field of the column
 `OrthonormalCharacterImageFamily` (issue 1009): it makes the `2w₁` signed σ-images
-`{δ·ω_{ij}^σ} ∪ {−δ·ω_{ij'}^σ}` orthonormal (same-column rows `i ≠ i'` and cross-column `j ≠ j'`). -/
+`{δ·ω_{ij}^σ} ∪ {−δ·ω_{ij'}^σ}` orthonormal (same-column rows `i ≠ i'` and cross-column
+`j ≠ j'`). -/
 theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hodd : Odd (Nat.card G)) (i i' : Fin hyp.w1) (j j' : Fin hyp.w2) :
@@ -1631,7 +1632,8 @@ structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   /-- (10.3) the parity input: `n` is even and positive, so `n ≥ 2`.  `d = μ_{ij}(1)` divides the
   odd `|M|` (a character degree), hence is odd; with `δ = ±1`, `w₁` odd and `n·w₁ = d − δ`, `n` is
   even, and `d > 1` forces `n > 0`.  This is the (10.3) fact used by (10.5)'s Cauchy–Schwarz
-  (`n < 2` contradiction); de-opaqued (no longer a carried hypothesis of the §10 (10.5) endpoint). -/
+  (`n < 2` contradiction); de-opaqued (no longer a carried hypothesis of the §10 (10.5)
+  endpoint). -/
   two_le_n : 2 ≤ n
   /-- (10.5): `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.  De-opaqued from a free field + placeholder
   formula to the genuine definition in terms of the `μ`-grid, `δ`, `n` and `ζ`. -/
@@ -1673,7 +1675,8 @@ noncomputable def tau1 {M : Subgroup G} [Fintype G] [Fintype ↥M]
 
 end CoherentHypothesis
 
-/-- **Peterfalvi (8.8) for `M`, used at the start of (10.3)**: there is a maximal subgroup `S` of `G`
+/-- **Peterfalvi (8.8) for `M`, used at the start of (10.3)**: there is a maximal subgroup `S` of
+`G`
 of **Type II** such that `|S : [S,S]| = w₂`.
 
 This is exactly the opening sentence of the proof of (10.3) ("By Theorem (8.8), there is a maximal
@@ -1921,7 +1924,8 @@ theorem w2_prime_and_parameter_independence [Finite G]
   obtain ⟨params, -, h2⟩ := hyp.exists_charParameters hG
   exact ⟨params, hyp.w2_prime hG, h2⟩
 
-/-- **Every degree-`w₁` irreducible of `M` is non-real (`χ̄ ≠ χ`), Peterfalvi (1.1)**.  A degree-`w₁`
+/-- **Every degree-`w₁` irreducible of `M` is non-real (`χ̄ ≠ χ`), Peterfalvi (1.1)**.  A
+degree-`w₁`
 irreducible character `χ` of the *odd-order* group `M` is *nontrivial* (`χ(1) = w₁ > 1`), so by
 `not_isReal_of_ne_trivial_of_odd_card'` (the only self-conjugate irreducible of an odd group is the
 trivial one) `χ` is not real, i.e. `χ.conj ≠ χ`.  No induced-character / orbit argument is needed.
@@ -1944,7 +1948,8 @@ theorem Hypothesis.inducedFamily_degree_w1_conj_ne [Finite G]
     omega
   exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hModd hne
 
-/-- **`ζ` is non-real (`ζ̄ ≠ ζ`)** — the `hzconj` input to the (10.6.b) Dade-value lemmas, **directly
+/-- **`ζ` is non-real (`ζ̄ ≠ ζ`)** — the `hzconj` input to the (10.6.b) Dade-value lemmas,
+**directly
 from Peterfalvi (1.1)**.  Thin `CharacterParameters` specialisation of
 `inducedFamily_degree_w1_conj_ne` at `χ = params.zeta`. -/
 theorem Hypothesis.zeta_conj_ne [Finite G]

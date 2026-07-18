@@ -341,7 +341,8 @@ open scoped commutatorElement in
 `(H₀ ⊔ C).subgroupOf M ◁ ↥M`.  `M = H ⊔ (U ⊔ W₁)` (`M_complement`, `derivedInG = H ⊔ U`) normalizes
 `H₀ ⊔ C` generator-class by generator-class: `M ≤ N(H₀)` (9.4) handles the `H₀` part throughout,
 while the `C` part splits — `U W₁ ≤ N(C)` *exactly* (`cSub_normalized_by_uW1`), and `H` normalizes
-`H₀C` because `⁅H, C⁆ ≤ H₀` (`commutator_cSub_H_le_H0`) lets `H₀` absorb the `H`-conjugates of `C`. -/
+`H₀C` because `⁅H, C⁆ ≤ H₀` (`commutator_cSub_H_le_H0`) lets `H₀` absorb the `H`-conjugates of
+`C`. -/
 theorem chiefFactor_H0supC_subgroupOf_normal [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     ((chief.H0 ⊔ cSub data chief).subgroupOf M).Normal := by
@@ -1131,7 +1132,8 @@ A clean **cardinality** argument that avoids the full §9 character construction
 number `p − 1` (`reducible_count_sOf_H0C` / `reducible_count_sOf_H0`).  A subset of equal finite
 cardinality is the whole set (`Set.eq_of_subset_of_ncard_le`, finiteness from `p − 1 ≠ 0` as `p` is
 prime).  Hence every reducible `𝒮(H₀)`-member already lies in `𝒮(H₀C)`.  Together with
-`forall_mem_sOf_H0C_apply_one_eq_qu` (degree), this is the full (9.9.b) degree+membership conjunct. -/
+`forall_mem_sOf_H0C_apply_one_eq_qu` (degree), this is the full (9.9.b) degree+membership
+conjunct. -/
 theorem reducible_mem_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) :

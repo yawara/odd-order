@@ -605,4 +605,171 @@ theorem isMaximalElementaryAbelian_sup_omega1Center_of_witness [Finite G]
       _ ≤ p ^ 2 := Nat.pow_le_pow_right hp.one_lt.le hlog
   exact (Subgroup.eq_of_le_of_card_ge hBA (by rw [hBcard]; exact hAcardle)).symm
 
+/-- **BG Theorem 15.7(e), `p = |X|`** (mmd L4266, *"Moreover, by Lemma 10.13(b),
+`C_P(X₁) = C_P(B) = X₁ × Z` with `Z` cyclic.  Thus `X = X₁`"*; Coq `defX`).
+
+The last step of the `p = |X|` chain: the TI-failure intersection `X = F(M) ∩ F(M)ᵍ` is *exactly*
+the order-`p` witness `X₁`, so `|X| = p`.
+
+`X` is a `p`-group (`inf_conj_fitting_isPGroup_of_not_isMulCommutative`) inside `M_F`, hence inside
+`P = O_p(M_F)`, and it is cyclic (Theorem 15.7(b)).  It centralizes `B = X₁ ⊔ Z₀`: it contains `X₁`
+and is abelian, and `Z₀ ≤ Z(P)` is centralized by all of `P`.  So Lemma 10.13(b), applied at
+`A := B` and `A₀ := X₁`, puts `X` inside `C_G(B) ⊓ P = X₁ ⊔ Z` with `Z` cyclic and `X₁ ∩ Z = 1`.
+
+Then `X ∩ Z = 1`: otherwise `X ∩ Z` would contain an order-`p` subgroup, which in the *cyclic* `X`
+must be `X₁` itself (`eq_of_le_isCyclic_of_card_eq`), contradicting `X₁ ∩ Z = 1`.  Finally every
+`x ∈ X` factors as `x = u·v` with `u ∈ X₁`, `v ∈ Z` (they commute, both lying in `C_G(B)`), and
+`X₁` has exponent `p`, so `x^p = v^p ∈ X ∩ Z = 1`.  A cyclic group of exponent dividing `p`
+containing the order-`p` group `X₁` is `X₁`. -/
+theorem inf_conj_fitting_eq_of_not_isMulCommutative [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) {g : G} (hgM : g ∉ M) {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) (hX₁card : Nat.card ↥X₁ = p)
+    (hX₁X : X₁ ≤ (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G))
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M)
+    (hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    (hnab : ¬ IsMulCommutative ↥(MF M)) :
+    (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) = X₁ := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set X : Subgroup G := fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M with hXdef
+  have hmf : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
+  have hXMF : X ≤ MF M := (inf_conj_fitting_le_Msigma hG hM hgM).trans (le_of_eq hmf.symm)
+  have hX₁MF : X₁ ≤ MF M := hX₁X.trans hXMF
+  have hXpg : IsPGroup p ↥X :=
+    inf_conj_fitting_isPGroup_of_not_isMulCommutative hG hM hnotTI hgM hp hX₁card hX₁MF hCGnotM hnab
+  have hXP : X ≤ P :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hXMF hXpg
+  haveI hXcyc : IsCyclic ↥X := inf_conj_fitting_isCyclic hG hM hgM
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁P : X₁ ≤ P :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
+  have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
+  -- The rank-two `B = X₁ ⊔ Z₀` and its maximality.
+  obtain ⟨Z₀, hZ₀def, hZ₀card, hZ₀P, hX₁Z₀bot, hX₁CZ₀, hBea, hBcard, hBC1⟩ :=
+    exists_rankTwo_elemAbelian_of_witness hG hM hp hX₁card hX₁MF hCGnotM hrank3 hnab
+  have hBmax := isMaximalElementaryAbelian_sup_omega1Center_of_witness hG hM hmf hp hpσ hX₁card
+    hX₁MF hrank3 hZ₀P hBea hBcard
+  have hBP : (X₁ ⊔ Z₀) ≤ P := sup_le hX₁P hZ₀P
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (MF M)
+  have hPnab : ¬ IsMulCommutative ↥P :=
+    opiCore_singleton_not_isMulCommutative_of_witness hG hM hp hX₁card hX₁MF hCGnotM hnab
+  have hpG : p ∈ (Nat.card G).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hp, hX₁card ▸ Subgroup.card_subgroup_dvd_card X₁, Nat.card_pos.ne'⟩
+  have hX₁ea : X₁.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hX₁card
+  have hX₁neZ₀ : X₁ ≠ OddOrder.BG.Ch3.S10.omega1CenterInG P p := by
+    rw [← hZ₀def]
+    intro h
+    rw [h, inf_idem] at hX₁Z₀bot
+    exact hX₁ne (h.trans hX₁Z₀bot)
+  -- Lemma 10.13(b) at `A := B`, `A₀ := X₁`.
+  obtain ⟨-, ⟨Z, hZP, hZcyc, -, hX₁Zbot, hCPB⟩, -⟩ :=
+    OddOrder.BG.Ch3.S10.nonabelian_pSubgroup_rankTwo_elemAbelian_structure hG hpG
+      ⟨hBea, hBcard⟩ hBmax hPpg hPnab hBP ⟨⟨hX₁ea, by rw [hX₁card, pow_one]⟩, le_sup_left⟩
+      hX₁neZ₀
+  -- `X ≤ C_G(B) ⊓ P = X₁ ⊔ Z`.
+  have hXCZ₀ : X ≤ Subgroup.centralizer (Z₀ : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [SetLike.mem_coe, hZ₀def, OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map] at hz
+    obtain ⟨z', hz', hz'eq⟩ := hz
+    have hz'c : z' ∈ Subgroup.center ↥P := (mem_omega1OfAbelian.mp hz').1
+    rw [← hz'eq]
+    simpa using (congrArg Subtype.val (Subgroup.mem_center_iff.mp hz'c ⟨x, hXP hx⟩)).symm
+  have hXCB : X ≤ Subgroup.centralizer ((X₁ ⊔ Z₀ : Subgroup G) : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    have hXab : ∀ u v : ↥X, u * v = v * u := fun u v =>
+      (IsCyclic.commGroup (α := ↥X)).mul_comm u v
+    have hxX₁ : ∀ y ∈ X₁, y * x = x * y := fun y hy => by
+      simpa using congrArg Subtype.val (hXab ⟨y, hX₁X hy⟩ ⟨x, hx⟩)
+    have hxZ₀ : ∀ y ∈ Z₀, y * x = x * y := fun y hy =>
+      Subgroup.mem_centralizer_iff.mp (hXCZ₀ hx) y hy
+    have hcoe : (↑X₁ * ↑Z₀ : Set G) = ↑(X₁ ⊔ Z₀) :=
+      (Subgroup.coe_mul_of_left_le_normalizer_right X₁ Z₀
+        (hX₁CZ₀.trans (Subgroup.centralizer_le_normalizer _))).symm
+    have hwset : w ∈ (↑X₁ * ↑Z₀ : Set G) := by rw [hcoe]; exact hw
+    obtain ⟨u, hu, v, hv, rfl⟩ := hwset
+    rw [mul_assoc, hxZ₀ v hv, ← mul_assoc, hxX₁ u hu, mul_assoc]
+  have hXsup : X ≤ X₁ ⊔ Z := hCPB ▸ le_inf hXCB hXP
+  -- `X ∩ Z = 1`.
+  have hXZbot : X ⊓ Z = ⊥ := by
+    by_contra hne
+    obtain ⟨y, hyne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hne
+    have hypg : IsPGroup p ↥(X ⊓ Z) := hXpg.to_le inf_le_left
+    obtain ⟨w, hw⟩ := exists_prime_orderOf_dvd_card' (G := ↥(X ⊓ Z)) p
+      (by
+        have h1 : 1 < Nat.card ↥(X ⊓ Z) :=
+          Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot _).mpr hne)
+        obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hypg
+        have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; omega
+        exact hk ▸ dvd_pow_self p hk0)
+    set W : Subgroup G := (Subgroup.zpowers w).map (X ⊓ Z).subtype with hWdef
+    have hWcard : Nat.card ↥W = p := by
+      rw [hWdef, Subgroup.card_map_of_injective (X ⊓ Z).subtype_injective, Nat.card_zpowers, hw]
+    have hWX : W ≤ X := (hWdef ▸ Subgroup.map_subtype_le _ : W ≤ X ⊓ Z).trans inf_le_left
+    have hWZ : W ≤ Z := (hWdef ▸ Subgroup.map_subtype_le _ : W ≤ X ⊓ Z).trans inf_le_right
+    have hWX₁ : W = X₁ :=
+      eq_of_le_isCyclic_of_card_eq (C := X) hWX hX₁X (by rw [hWcard, hX₁card])
+    exact hX₁ne (le_bot_iff.mp (hX₁Zbot ▸ le_inf (hWX₁ ▸ le_refl W) (hWX₁ ▸ hWZ)))
+  -- Every `x ∈ X` has `x^p ∈ X ⊓ Z = 1`, so `X` has exponent dividing `p`.
+  have hZCX₁ : Z ≤ Subgroup.centralizer (X₁ : Set G) := by
+    intro z hz
+    have hmem : z ∈ Subgroup.centralizer ((X₁ ⊔ Z₀ : Subgroup G) : Set G) ⊓ P := by
+      rw [hCPB]; exact (le_sup_right : Z ≤ X₁ ⊔ Z) hz
+    exact Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr le_sup_left) hmem.1
+  have hX₁CZ : X₁ ≤ Subgroup.centralizer (Z : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    exact (Subgroup.mem_centralizer_iff.mp (hZCX₁ hz) y hy).symm
+  have hXexp : ∀ x ∈ X, x ^ p = 1 := by
+    intro x hx
+    have hcoe : (↑X₁ * ↑Z : Set G) = ↑(X₁ ⊔ Z) :=
+      (Subgroup.coe_mul_of_left_le_normalizer_right X₁ Z
+        (hX₁CZ.trans (Subgroup.centralizer_le_normalizer _))).symm
+    have hxset : x ∈ (↑X₁ * ↑Z : Set G) := by rw [hcoe]; exact hXsup hx
+    obtain ⟨u, hu, v, hv, rfl⟩ := hxset
+    have hcomm : Commute u v := Subgroup.mem_centralizer_iff.mp (hZCX₁ hv) u hu
+    have hup : u ^ p = 1 := by
+      have hsub : (⟨u, hu⟩ : ↥X₁) ^ p = 1 := by rw [← hX₁card]; exact pow_card_eq_one'
+      simpa using congrArg Subtype.val hsub
+    have hxp : (u * v) ^ p = v ^ p := by rw [hcomm.mul_pow, hup, one_mul]
+    have hmem : (u * v) ^ p ∈ X ⊓ Z := ⟨pow_mem hx p, hxp ▸ pow_mem hv p⟩
+    rw [hXZbot, Subgroup.mem_bot] at hmem
+    exact hmem
+  -- A cyclic group of exponent dividing `p` containing the order-`p` `X₁` equals `X₁`.
+  refine (Subgroup.eq_of_le_of_card_ge hX₁X ?_).symm
+  have hXcard_dvd : Nat.card ↥X ∣ p := by
+    obtain ⟨x, hx⟩ := hXcyc.exists_generator
+    have hord : orderOf x ∣ p := orderOf_dvd_of_pow_eq_one (by
+      have := hXexp (x : G) x.2
+      exact Subtype.ext (by simpa using this))
+    have : Nat.card ↥X = orderOf x := by
+      rw [← Nat.card_zpowers x, (Subgroup.eq_top_iff' _).mpr hx]
+      exact (Nat.card_congr (Subgroup.topEquiv).toEquiv).symm
+    rw [this]; exact hord
+  rcases (Nat.dvd_prime hp).mp hXcard_dvd with h1 | hpp
+  · exact absurd (le_bot_iff.mp (Subgroup.eq_bot_of_card_eq _ h1 ▸ hX₁X)) hX₁ne
+  · rw [hpp, hX₁card]
+
+/-- **BG Theorem 15.7(e), `p = |X|`** — the cardinality form BG's (e2)/(e3) actually quote.
+Immediate from `inf_conj_fitting_eq_of_not_isMulCommutative` (`X = X₁`) and `|X₁| = p`. -/
+theorem card_inf_conj_fitting_eq_of_not_isMulCommutative [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) {g : G} (hgM : g ∉ M) {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) (hX₁card : Nat.card ↥X₁ = p)
+    (hX₁X : X₁ ≤ (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G))
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M)
+    (hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    (hnab : ¬ IsMulCommutative ↥(MF M)) :
+    Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) = p := by
+  rw [inf_conj_fitting_eq_of_not_isMulCommutative hG hM hnotTI hgM hp hpσ hX₁card hX₁X hCGnotM
+    hrank3 hnab]
+  exact hX₁card
+
 end OddOrder.BG.Ch4.S15

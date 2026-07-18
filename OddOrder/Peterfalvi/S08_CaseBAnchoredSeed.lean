@@ -1144,7 +1144,8 @@ theorem caseBXsetExtension_grid
   rw [(OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr_basis ℂ _
     ((h46.columnFamily χ₂).mu i)]
 
-/-- On a certain-type column `columnSum χ₂` the dichotomy extension sends it to `Ximg (columnSum χ₂)`:
+/-- On a certain-type column `columnSum χ₂` the dichotomy extension sends it to
+`Ximg (columnSum χ₂)`:
 every grid member maps via the column extension (`caseBXsetExtension_grid`), and only the `0`-row
 survives (`xChiExtension_columnSum`). -/
 theorem caseBXsetExtension_columnSum

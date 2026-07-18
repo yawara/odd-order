@@ -40,7 +40,8 @@ variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
 omit [Fintype ↥L] [Fintype G] in
 omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
-/-- **Peterfalvi (4.7)**, core support statement, *structural form*.  This is the (4.7) core depending
+/-- **Peterfalvi (4.7)**, core support statement, *structural form*.  This is the (4.7) core
+depending
 only on the (4.6.c)/(4.6.d) data — a normal `subH ≤ K` and the covering condition `A_covers` — and
 **not** on the Dade isometry (`dade0`/`tau`) of `Hypothesis46`.  It therefore applies in any setting
 that supplies these structural data (e.g. the §10 type-`P` setting, via `K = M'`, `subH = M_F`, and

@@ -273,7 +273,8 @@ theorem E3_not_regular_of_mem_kappa_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalS
   rw [hg]
   exact ha z hzPw
 
-/-- **BG Proposition 14.2's `κ(M) ⊆ τ₁(M)` case entry** (mirror of `E3_not_regular_of_mem_kappa_tau3`):
+/-- **BG Proposition 14.2's `κ(M) ⊆ τ₁(M)` case entry** (mirror of
+`E3_not_regular_of_mem_kappa_tau3`):
 a prime `p ∈ κ(M) ∩ τ₁(M)` forces `E₁ ≠ 1` and makes `E₁` act non-regularly on `M_σ` (the
 `κ`-witness `P ∈ ℰ_p¹(M)` is `M`-conjugate into the Hall `τ₁`-piece `E₁`, transporting
 `C_{M_σ}` nontriviality).  Feeds `κ(M) = τ₁(M)` and the `K^* ≠ 1` conjunct of case `τ₁`. -/
@@ -494,7 +495,8 @@ theorem maximalContaining_centralizer_of_le_Msigma_centralizer_E [Finite G]
       S = T := fun T hTM hTq hST => eq_of_le_of_isPGroup_card_eq_factorization hScard hTM hTq hST
   exact (maximalContaining_eq_singleton_of_E1 hG h hqσ (le_refl E₁) hE1ne hX hXC hSMσ hSq hSmax).1
 
-/-- **BG Proposition 14.2(c)**, `C(E₁)` form (for case `κ ⊆ τ₁`, where `K^* = C_{M_σ}(K) = C_{M_σ}(E₁)`
+/-- **BG Proposition 14.2(c)**, `C(E₁)` form (for case `κ ⊆ τ₁`, where
+`K^* = C_{M_σ}(K) = C_{M_σ}(E₁)`
 after the WLOG `K = E₁`): if `X ∈ ℰ_q¹(G)` lies in `M_σ ⊓ C(E₁)`, then `𝓜(C_G(X)) = {M}`.  Same as
 `maximalContaining_centralizer_of_le_Msigma_centralizer_E` but takes `X ≤ M_σ ⊓ C(E₁)` directly
 (Lemma 13.6 with `P = E₁`). -/
@@ -1305,7 +1307,8 @@ of `x` ranging over the maximal subgroups `M`. -/
 noncomputable def sigmaDecomposition [Finite G] (x : G) : Set G :=
   {y | ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ y = sigmaPart M x} \ {1}
 
-/-- **BG `sigma_length x = #|sigma_decomposition x|`** (Coq `sigma_length`).  `sigmaLength_eq_zero_iff`
+/-- **BG `sigma_length x = #|sigma_decomposition x|`** (Coq `sigma_length`).
+`sigmaLength_eq_zero_iff`
 (Coq `ell_sigma0P`) is proved further down, after `exists_mem_sigma_of_prime_dvd_card`. -/
 noncomputable def sigmaLength [Finite G] (x : G) : ℕ :=
   (sigmaDecomposition x).ncard
@@ -1617,7 +1620,8 @@ theorem sigma_cover_decomposition_signalizer [Finite G] (hG : OddOrder.BG.IsMini
   sigma_cover_decomposition hG hM hN (not_conj_of_mem_Msigma_of_tau2 hxM hx1 hxτ2)
     hxM hx1 hx'N hcomm
 
-/-- **`x` is a `σ`-part of the cover element `x · x'`** (Coq `mem_sigma_cover_decomposition`): immediate
+/-- **`x` is a `σ`-part of the cover element `x · x'`** (Coq `mem_sigma_cover_decomposition`):
+immediate
 from `sigma_cover_decomposition_signalizer`, `x ∈ {x} ∪ {x'}^#`.  Used in BG Lemma 14.5(a). -/
 theorem mem_sigma_cover_decomposition_signalizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
