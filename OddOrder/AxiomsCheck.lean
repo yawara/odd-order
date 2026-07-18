@@ -209,6 +209,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLRoot
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSLDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerSuzukiRoot
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSURoot
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7962,6 +7963,35 @@ the square of ell = |C_Q0(X)|. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_field_of_suzukiTarget
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_centralizerQ0_sq_of_suzukiTarget
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, PSU branch:
+the actual centralizer root is an honest Suzuki 2-group and has order the
+cube of `ell = |C_Q0(X)|`.  No type-B conclusion is asserted here. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.qMulEquivPSURoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.q_isSuzuki2Group_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_baseField_cube_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQMulEquivPSURoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientQ_isSuzuki2Group_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQuotientQ_eq_baseField_cube_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQMulEquivPSURoot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ_isSuzuki2Group_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_baseField_cube_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerCQ0EquivPSUCenterLine
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerQ0_eq_baseField_of_psu3Target
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_centralizerCQ_eq_centralizerQ0_cube_of_psu3Target
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, distinguished-pair
 transport and order lift: the quotient pair is the image of the original
