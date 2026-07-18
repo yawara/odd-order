@@ -34,7 +34,12 @@ Peterfalvi Part II, Ch. I §3 Proposition 1(c) (pp. 105–106) を原文強度�
         `C_Q(X)` が `2`-group ならそれ自身が Sylow と証明。
   - [x] その `IsPGroup` 入力から residual = normal closure と
         `O^{2′}(L)/Z ≃* O^{2′}(L/𝒩(L))` を実構成。
-  - [ ] quotient Hypothesis/induction carrier を構成し `IsPGroup` 入力を導く。
+  - [x] `L/𝒩(L)` の実 quotient action を構成し、`H̄`, `Q̄`, `D̄`, `t̄` を
+        image として輸送して (A1)、exact kernel から (A2)、odd kernel から
+        four-subgroup (A3) を証明した honest `Hypothesis` carrier を構成。
+  - [x] `X ≠ 1` から `|L/𝒩(L)| < |G|` を証明。
+  - [ ] quotient `Hypothesis` と strict card bound を induction theorem/result carrier
+        へ接続し、Lemma 1 から `IsPGroup 2 C_Q(X)` を導く。
 - [ ] PSL(2,ℓ), Sz(ℓ), PSU(3,ℓ) 各標準モデルについて Sylow `2` 構造、
       `|C_Q(X)|`、distinguished involution と `orderOf(st)=3/5/3` を実証明し、
       三分岐を輸送する。opaque `Prop` scaffold や free target field は使わない。

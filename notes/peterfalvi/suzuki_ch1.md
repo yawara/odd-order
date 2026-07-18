@@ -263,7 +263,8 @@
      `N_K(X) ≤ C_G(X)` and the final endpoint is
      `N_G(X) = C_G(X) N_V(X)`.
    - The source assumption `1 ≠ X` is not needed for part (b).
-12. 🔄 **§3 Prop 1(c) in progress** — new leaf `CentralizerResidual.lean`.
+12. 🔄 **§3 Prop 1(c) in progress** — leaves `CentralizerResidual.lean` and
+    `CentralizerQuotient.lean`.
    - ✅ The standing factor `Q₁` is the actual normal `2`-complement from
      `SylowDecomposition.lean`, not an added hypothesis.
    - ✅ `Q1_inf_centralizer_eq_bot_of_isPGroup`: if `C_Q(X)` is a
@@ -280,8 +281,18 @@
    - ✅ `centralizerResidualQuotientEquiv` then combines that constructed
      witness, the center equality, and the shared surjective-map API to give
      `O^{2′}(L) / Z(O^{2′}(L)) ≃* O^{2′}(L / 𝒩(L))`.
-   - **Next frontier:** construct the quotient Hypothesis/induction carrier
-     and derive the remaining `IsPGroup 2 C_Q(X)` input; it is deliberately
-     not an opaque field of the consumer.
+   - ✅ `CentralizerQuotient.lean` constructs the actual action of
+     `L/𝒩(L)` on `Ω_X`.  The exact action kernel gives faithfulness (A2);
+     the images of `C_H(X)`, `C_Q(X)`, `C_D(X)`, and `t` satisfy every A1
+     field; and `𝒩(L) ≤ C_D(X)` with odd order preserves an elementary
+     abelian four-subgroup (A3).  Thus `centralizerQuotientHypothesis`
+     returns the complete honest `Hypothesis` required by induction.
+   - ✅ `card_centralizerActionQuotient_lt` proves from `X ≠ 1` that
+     `|C_G(X)/𝒩(C_G(X))| < |G|`: otherwise `X ≤ Z(G)`, and normality plus
+     faithfulness would force `X ≤ core_G(H) = 1`.
+   - **Next frontier:** connect the quotient carrier and strict card bound
+     to the induction theorem/result carrier, and derive the remaining
+     `IsPGroup 2 C_Q(X)` input.  No induction conclusion is posited as an
+     opaque field of the consumer.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

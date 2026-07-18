@@ -192,6 +192,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7659,6 +7660,25 @@ restricted action has intrinsic core equal to the centralizer of `L cap Q` in
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normalCore_cH_le_cV
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, quotient carrier:
+dividing the centralizer action by its exact kernel transports (A1), makes
+the action faithful (A2), and preserves the four-subgroup required by (A3). -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientHypothesisA1
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotient_faithful
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotient_twoRankGeTwo
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotientHypothesis
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_centralizerActionQuotient_lt
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
