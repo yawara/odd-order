@@ -169,14 +169,14 @@ theorem psuTorusHom_injective (n : ℕ) : Function.Injective (psuTorusHom n) := 
 theorem weylElement_smul_affine_of_ne_one {n : ℕ}
     (u : RootGroup n) (hu : u ≠ 1) :
     weylElement n • Unital.affine u =
-      Unital.affine (RootGroup.reciprocal u hu) :=
+      Unital.affine (RootGroup.weylReciprocal u hu) :=
   Unital.weylPerm_affine_of_ne_one u hu
 
 theorem weylElement_smul_affine_of_snd_ne_zero {n : ℕ}
     (u : RootGroup n) (hu : u.snd ≠ 0) :
     weylElement n • Unital.affine u =
       Unital.affine
-        (RootGroup.reciprocal u ((RootGroup.ne_one_iff_snd_ne_zero u).mpr hu)) :=
+        (RootGroup.weylReciprocal u ((RootGroup.ne_one_iff_snd_ne_zero u).mpr hu)) :=
   Unital.weylPerm_affine_of_snd_ne_zero u hu
 
 /-- The Weyl generator is an involution inside the generated subgroup. -/

@@ -1,4 +1,4 @@
-# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §2 frontier
+# Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §3 frontier
 
 正本ソース = `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`
 (pp. 100–107, "General Properties of G")。Coq crib は**無い** (math-comp/odd-order
@@ -130,7 +130,7 @@
      bijection from `Omega` to the standard projective line. It derives
      `|Omega| - 1 = |F| = 2^n` and transports the existing Isaacs Ch08 PSL simplicity.
    - Shared support is `GroupTheory/PrimeComplementResidual.lean`; issue 9112 is closed.
-9. **Section 3 Lemma 1, concrete Sz(q) target complete; PSU(3,q) generated action, double transitivity, and standard Borel complete**.
+9. ✅ **Section 3 Lemma 1, concrete Sz(q) and PSU(3,q) targets complete**.
    - Shared leaf `GroupTheory/SpecificGroups/Suzuki/Field.lean` constructs the field
      of order `q = 2^(2m+1)` and the Tits twist `theta(x) = x^(2^(m+1))`.
    - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
@@ -181,9 +181,12 @@
      the faithful regular affine root action, the full diagonal action, and its faithful
      determinant-one torus restriction.  It proves that the `SU(3)` diagonal parameter
      `t` has root weight `star(t)^2 / t = t^(2q-1)` and computes the exact torus order.
-   - The same leaf constructs Peterfalvi’s reciprocal Weyl permutation
-     `(x,y) ↦ (x/y,1/y)`, proves involutivity, and proves both root--torus and
-     Weyl--torus conjugation formulas on the concrete unital.
+   - Peterfalvi uses right actions and writes `F(x,y) = (x/y,1/y)`.  Lean uses
+     left root translations and therefore identifies its affine coordinate with the
+     inverse source coordinate.  The same leaf retains `F` as `reciprocal` and uses
+     the transported Weyl map `J F J(x,y) = (x/star(y),1/y)` as
+     `weylReciprocal`. It proves involutivity and both root--torus and Weyl--torus
+     conjugation formulas on the concrete unital.
    - `GroupTheory/SpecificGroups/ProjectiveUnitary/GeneratedAction.lean` takes the
      honest closure of the root, determinant-one torus, and Weyl permutations inside
      the finite symmetric group.  It internalizes the three generator families with
@@ -195,9 +198,33 @@
      faithful semidirect product of the root group by the determinant-one torus.
      Evaluation at the affine origin gives injectivity and a unique root--torus
      normal form; every Borel element fixes infinity.
-   - Its exact order is `q^3 * ((q^2 - 1) / gcd(q + 1, 3))`.  The reverse
-     stabilizer inclusion is deliberately reserved for the two-cell argument.
-   - Next upstream layer: prove the PSU Bruhat decomposition, then exact full-group
-     order and simplicity.
+   - Its exact order is `q^3 * ((q^2 - 1) / gcd(q + 1, 3))`.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/BruhatCoordinates.lean`
+     constructs the determinant-one Hua parameter `b / star(b)^2` and proves
+     the origin, pole, and generic affine coordinate identities. This is the
+     left-action transport of Peterfalvi Chapter IV §3 Proposition (4)--(5),
+     not a change to the source reciprocal map.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/Bruhat.lean` proves the
+     concrete Weyl--root permutation relation, the two-cell decomposition
+     corresponding to Chapter I §1 Proposition 4(a), and the reverse stabilizer
+     inclusion. Hence the standard Borel is exactly the infinity stabilizer.
+   - The same leaf computes the exact full-group order
+     `q^3 * (q^3 + 1) * ((q^2 - 1) / gcd(q + 1, 3))`; all endpoints are included
+     in `AxiomsCheck` and the full project build.
+   - `GroupTheory/SpecificGroups/ProjectiveUnitary/Simplicity.lean` supplies
+     Peterfalvi Chapter I §3 Lemma 1’s externally cited Huppert II.10.13 input.
+     For the exact source range `q = 2^n > 2` (`1 < n`), it proves root, Weyl,
+     and determinant-one torus generator membership in the derived subgroup,
+     perfectness, Borel solvability, and finally
+     `IsSimpleGroup (standardPermGroup n)`. The exceptional `n = 1` group of
+     order 72 is correctly excluded.
+   - `Peterfalvi/Appendices/Suzuki/InductionHypothesisPSU.lean` transports the
+     unital degree for `0 < n` and simplicity for the exact source range
+     `q = 2^n > 2` (`1 < n`) across the target identifications. Its combined
+     endpoint proves that `Q` is a `2`-group and identifies `L` with both the
+     `2`-complement residual and the join of the conjugates of `Q`.
+   - Together with the PSL and Suzuki target leaves, all three target cases in
+     Peterfalvi Chapter I §3 Lemma 1 are now formalized without opaque target
+     hypotheses. **→ §3 Lemma 1 complete.**
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
