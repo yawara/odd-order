@@ -24,8 +24,8 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - [x] `w ∈ W#` に対して §3 Proposition 1(c) と忠実性から
       `Q ∩ C_G(w) = Q₀` を証明する
 - [x] Appendix III Lemma 1(b) の quadratic central extension を実体化する
-- [ ] Definition 3 の具体的 `TypeBData` と Higman Theorem (d),(e) の
-      Lemma 5 用 payload を実体化する
+- [x] Definition 3 の具体的 `TypeBData` を実体化する
+- [ ] Higman Theorem (d),(e) の Lemma 5 用 payload を実体化する
 - [ ] `K`-不変な位数 `q²` 部分群 `X` と `X^w ≠ X` を証明する
 - [ ] `W` の projective-line 上の自由作用から `|W| ∣ q+1` を証明する
 - [ ] 一般有限体上の 2 次元表現 API から `W` の巡回性を証明する

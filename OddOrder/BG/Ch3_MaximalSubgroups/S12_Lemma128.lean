@@ -269,7 +269,7 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
     (Subgroup.normal_subgroupOf_iff_le_normalizer hBN).mpr le_rfl
   have hB_le_FN : B ≤ Ch2.S08.fittingInG N :=
     Ch2.S08.le_fittingInG_of_normal_isPiSubgroup_singleton hBN hBnormal
-      (isPiSubgroup_of_isPGroup_of_mem hB.1.isPGroup rfl)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hB.1.isPGroup rfl)
   set FN : Subgroup G := Ch2.S08.fittingInG N with hFNdef
   haveI hFNnilp : Group.IsNilpotent ↥FN := Ch2.S08.fittingInG_isNilpotent N
   have hFN_le_N : FN ≤ N := Ch2.S08.fittingInG_le N

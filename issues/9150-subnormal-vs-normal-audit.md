@@ -36,15 +36,39 @@ grep レシピ (Isaacs 全体で subnormal 記号を含む文を拾う):
 pdftotext references/isaacs/finite-group-theory.pdf - | grep -n "«"
 ```
 
+## 監査結果 (Isaacs、2026-07-19 hub 実施)
+
+**手順**: `pdftotext` で全文抽出 → 文字文脈の `«` (両側が大文字の部分群記号) だけを拾い、
+作用ドット `a«g` の OCR ノイズ (13 行) を除外 → **真の `⊲⊲` 使用 28 件**を特定 →
+うち 23 件を **PDF ページ画像**で 1 件ずつ確認 (6 エージェント並列、read-only)。
+
+**結果: 21 件 OK / 2 件 MISMATCH**。
+
+- OK: 1.46 / 2.5 / 2.6 / 2.7 / 2.8 / 2.10 / 2.11 / 2.12 / 2.13 / 4.8 / 9.3 / 9.6 / 9.8 /
+  9.13 / 9.20 / 9.21 / 9.31。**9.13 と 9.21 は issue 1037 対応で修正済**を確認。
+- **MISMATCH: Lem 9.26 / Cor 9.27** → **issue 0125** に切り出し (lane a へ配分)。
+- ⚠ 副産物として、**「書籍に gap がある」という誤った注記 3 件**を発見
+  (ThompsonWielandt.lean:143-145 / 180-181、PResidual.lean:410-411)。
+  ページ画像で確認したところ書籍は一貫して `V ⊲⊲ H` と書いており、gap は存在しない。
+  issue 1037 と同じ mmd 由来の誤読。0125 に訂正項目として記載。
+
+**機械照合の第一印象は当てにならない**という教訓: 宣言の近傍 22 行で最初に現れる
+`Normal`/`IsSubnormal` トークンを拾う方式では、2.6 のように「S は subnormal だが
+M は minimal **normal**」という結果で M の binder を誤って拾う。**必ず statement を読む**。
+
+### BG / Peterfalvi
+
+未走査。両書は subnormal の使用が少ないと見込まれるが要確認 (下記チェックリスト)。
+
 ## やること
 
-- [ ] Isaacs 全体を `«` で走査し、`⊲⊲` を含む定理番号を列挙する。
-- [ ] 各番号について repo の対応宣言の binder が `IsSubnormal` か `Normal` かを照合。
+- [x] Isaacs 全体を `«` で走査し、`⊲⊲` を含む定理番号を列挙する。(28 件)
+- [x] 各番号について repo の対応宣言の binder が `IsSubnormal` か `Normal` かを照合。(23 件確認、MISMATCH 2)
 - [ ] BG / Peterfalvi でも同様の走査 (両書とも subnormal を使う箇所は少ないはずだが要確認)。
 - [ ] 取り違えが見つかったら、**normal 版は消さず**に subnormal 版を追加する
       (normal 版の方が bound が鋭い等、独立の価値があるケースがある — 実例:
       Isaacs 9.13 の repo 版は `|G| ≤ |Z(S^∞)||Aut(S^∞)|` で書籍の階乗版より鋭い)。
-- [ ] 発見をレーンに配分 (該当章の owner レーンへ)。
+- [x] 発見をレーンに配分 → **issue 0125** (lane a: Isaacs 全域)。
 
 ## 完了条件
 

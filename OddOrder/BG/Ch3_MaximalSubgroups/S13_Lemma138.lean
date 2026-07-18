@@ -215,7 +215,7 @@ theorem hall_le_of_fitting_prime [Finite G] (hG : IsMinimalSimpleOdd G)
   have hNX'M : Subgroup.normalizer
       ((MulAut.conj a • (opiCoreInG ({s} : Set ℕ) H) : Subgroup G) : Set G) ≤ M :=
     S10.normalizer_le_of_nontrivial_beta_subgroup hG hM hX'M hX'ne
-      (isPiSubgroup_of_isPGroup_of_mem hX's hsβ)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hX's hsβ)
   -- `conj a • H ≤ N_G(X') ≤ M`, hence `H ≤ M^{a⁻¹}`.
   have hconjH : MulAut.conj a • H ≤ M := by
     have h1 : MulAut.conj a • H ≤
@@ -237,7 +237,7 @@ theorem hall_le_of_fitting_prime [Finite G] (hG : IsMinimalSimpleOdd G)
   have htσ : t ∈ S10.sigma M := S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M htβ)
   have hNY : Subgroup.normalizer (Y : Set G) ≤ M :=
     S10.normalizer_le_of_nontrivial_beta_subgroup hG hM hYM hYne
-      (isPiSubgroup_of_isPGroup_of_mem hYt htβ)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hYt htβ)
   have hcollapse : MulAut.conj a⁻¹ • M = M :=
     conj_eq_self_of_sigma_pSubgroup_normalizer_le hG hM htσ hYne hYt hNY hYM (hYH.trans hHg)
   rwa [hcollapse] at hHg
@@ -1270,7 +1270,7 @@ theorem gap3_centralizer_Malpha_P_le_Mstar [Finite G] (hG : IsMinimalSimpleOdd G
   -- (iii) `N_G(R) ⊆ M*` (Prop 10.14(d): `R` a nonidentity `β(M*)`-subgroup of `M*`).
   have hNGR : Subgroup.normalizer (R : Set G) ≤ Mstar :=
     S10.normalizer_le_of_nontrivial_beta_subgroup hG hMstar hRMstar hRne
-      (isPiSubgroup_of_isPGroup_of_mem hRr hrβ)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hRr hrβ)
   -- (iii) chain: `M_α ⊓ C(P) ≤ M_σ ⊓ C(P) ≤ M_σ ⊓ C(R) ≤ C(R) ≤ N_G(R) ≤ M*`.
   have h134 := centralizer_msigma_le_of_commute_tau1 hG hM hp hrσ hP hRmem hPM hRM hRC
   exact (inf_le_inf_right (Subgroup.centralizer (P : Set G)) (S10.Malpha_le_Msigma hG hM)).trans
