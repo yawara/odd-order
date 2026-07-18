@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
@@ -275,6 +276,23 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_index_coprime
 #assert_only_allowed_axioms Subgroup.primeComplementResidual_map_of_surjective
 #assert_only_allowed_axioms Subgroup.primeComplementResidualQuotientEquiv
+
+/-! Standard upper-unipotent root coordinates and the distinguished order-three
+product for the PSL(2,q) branch of Peterfalvi Part II, Ch. I section 3,
+Proposition 1(c). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSubgroup_isElementaryAbelian
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_rootSubgroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.canonicalT_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.canonicalS_sq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.orderOf_canonicalS_mul_T
 
 -- Quadratic finite-field and Hermitian trace infrastructure for the PSU(3,q) target.
 #assert_only_allowed_axioms
