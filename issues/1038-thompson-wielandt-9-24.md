@@ -80,8 +80,25 @@ proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidua
 - [x] 仮説 predicate + N_G 補題 + pResidual_eq_bot_iff。
 - [x] 上記 subtlety 1 (subnormal-9.27) を確定 → **書籍の誤りと判明・subnormal 版を証明**。
 - [x] `O^p` の ambient API (`pResidualOf` + 同変性 + 9.26 ambient 版)。
-- [ ] 9.24 statement の形式化 (上記仮説を Prop で; "H または K を真に含む部分群" の量化)。
-- [ ] 9.24 proof (書籍 p. 283–284, ~40 行, 2 ケース):
+- [x] 記号 `E`/`U`/`V` (`thompsonWielandtCore H K` = `E`) と subnormal chain `V ◁ M ◁ H`。
+- [x] **Case 2 の Step A**: `O_p(H) ≤ N_G(O^p(V))`
+      (`opiCoreInG_le_normalizer_pResidualOf_relCore`)。`O_p` は既存の shared infra
+      `GroupTheory.opiCoreInG {p} H` を使用 (import 経路 Ch03 → Ch09 で cycle なし)。
+- [ ] 9.24 statement の形式化 (∃ p, U or V が p-群)。
+- [ ] **Case 2 の残り** (ここが次の frontier; Case 1 の transport 不要で進められる):
+      - `X = O^p(U) ≠ ⊥`, `Y = O^p(V) ≠ ⊥` と仮定 → `N_G(X) = H`, `N_G(Y) = K`
+        (`normalizer_eq_left/right_of_noNormal`; `X ◁ H` は `U ◁ H` + `O^p` char)。
+      - Step A で `P = O_p(H) ≤ N_G(Y) = K` ⇒ `P ≤ D`, `P ◁ D`。
+      - `k ∈ K` に対し `U^k ◁ N ◁ D` に**同じ相対版 9.27** を `D` を ambient として適用
+        → `P ≤ N_G(X^k) = H^k` ⇒ `P ≤ D^k` (全 `k`) ⇒ `P ≤ core_K(D) = N`
+        (`le_relCore`) ⇒ `O_p(H) ≤ O_p(N) ≤ O_p(K)`。
+        ※ `O^p(U^k) = X^k` は `map_pResidualOf` (同変性) で得る。
+      - `H`/`K` を入れ替えて `O_p(K) ≤ O_p(H)` ⇒ 等号 ⇒ `P ◁ H` かつ `P ◁ K`,
+        `P > 1` ⇒ `H = N_G(P) = K` 矛盾。
+- [ ] **Case 1** (`F(H)=F(K)=1`) — subtlety 2 (layer/nilpotentResidual の nested
+      transport) が残作業。`O^p` 側と同様に `layer`/`nilpotentResidual` の
+      subgroupOf ↔ ambient transport を用意する必要あり。
+- [ ] 9.24 proof の組み立て (書籍 p. 283–284, ~40 行, 2 ケース):
       - F(H)=F(K)=1: E(H),E(K)>0, 9.18 で E(H)⊆N_G(V^∞)=K, 9.25 で E(H)=E(D)=E(K),
         H=N_G(E(H))=K 矛盾 → U or V trivial (p-群)。
       - F(H)>1 (or F(K)): O_p(H)=P>1, 9.27 で P normalizes O^p(V)=Y, cores で
