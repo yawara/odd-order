@@ -142,6 +142,18 @@ theorem pResidual_le_of_isPGroup_quotient {N : Subgroup G} [N.Normal]
     (hN : IsPGroup p (G ⧸ N)) : pResidual p G ≤ N :=
   sInf_le ⟨inferInstance, hN⟩
 
+/-- `O^p(G) = ⊥ ⟺ G は p-群`. (`G/O^p(G)` が p-群なので `O^p(G)=⊥` なら `G` も; 逆は
+`G/⊥ ≅ G` が p-群ゆえ `O^p(G) ≤ ⊥`.) -/
+theorem pResidual_eq_bot_iff_isPGroup [Finite G] [Fact p.Prime] :
+    pResidual p G = ⊥ ↔ IsPGroup p G := by
+  constructor
+  · intro h
+    exact (((isPGroup_quotient_pResidual (p := p) (G := G)).of_equiv
+      (QuotientGroup.quotientMulEquivOfEq h)).of_equiv QuotientGroup.quotientBot)
+  · intro hG
+    exact le_bot_iff.mp
+      (pResidual_le_of_isPGroup_quotient (hG.of_equiv QuotientGroup.quotientBot.symm))
+
 /-- 正規部分群 `S ◁ G` の characteristic 部分群 `C` は `G` に normal (`C.map S.subtype ◁ G`).
 `g` 共役は `S` 上の自己同型 `conjNormal g` を誘導し, characteristic ゆえ `C` を保つ. -/
 theorem map_subtype_normal_of_characteristic {S : Subgroup G} [S.Normal]
