@@ -10,6 +10,7 @@ import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.FittingHeredity
+import OddOrder.GroupTheory.NormalHallHeredity
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.SylowTransport
@@ -2536,6 +2537,32 @@ set_option linter.style.longLine false in
   OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_le
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isNilpotent_quotient_fitting_quotient
+
+-- **Normal-Hall heredity** (issue 3026, companion to `FittingHeredity`): "normal Hall subgroup",
+-- spelled `Normal` + `Nat.Coprime (Nat.card ↥K) K.index`, transports along injective and
+-- surjective homomorphisms, hence to subgroups (`subgroupOf`) and quotients (`map (mk' N)`).
+-- Stated hom-level for the same reason as `FittingHeredity`: three of BG Thm 6.4's four
+-- transports are isomorphism-mediated.  Needs **no finiteness** — `Nat.card`/`index` are `0` in
+-- the infinite case and the divisibilities hold unconditionally.  Only the subgroup direction
+-- uses normality (via `relIndex_dvd_index_of_normal`), so the surjective lemma omits it.
+-- All axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.coprime_card_index_comap_of_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.coprime_card_index_map_of_surjective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.normal_coprime_card_index_subgroupOf
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.normal_coprime_card_index_map_mk'
+
+-- BG **Theorem 6.4** solvability input (issue 3026): `X/F(X)` nilpotent forces `X` solvable
+-- (`F(X)` nilpotent ⟹ solvable, quotient nilpotent ⟹ solvable, extension), and the Thm-6.4-shaped
+-- assembly deriving `IsSolvable G` from the hypotheses on `G₀` and `G/G₀`.  BG Proposition 1.5,
+-- the engine Case 1 ends with, requires solvability.  Axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.isSolvable_of_isNilpotent_quotient_fitting
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.isSolvable_of_isNilpotent_quotient_fitting_of_normal
 
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup

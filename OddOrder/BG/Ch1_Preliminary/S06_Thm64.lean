@@ -31,6 +31,15 @@ BG の証明 (`|G| + |H|` の帰納法) は二つの場合に分かれ, どち�
 * `mem_centralizer_of_mem_normalizer_of_commutator_le` — 場合 1 の
   「`yz` は `H` を中心化する」段 (下記の**誤植訂正**込み)。
 
+* `isSolvable_of_isNilpotent_quotient_fitting_of_normal` — Theorem 6.4 の二つの Fitting 商
+  仮説 (`G₀/F(G₀)` と `(G/G₀)/F(G/G₀)` が冪零) から `G` の可解性を導く段。Proposition 1.5
+  (場合 1 のエンジン `exists_centralizing_conj_sup_isPiGroup` が使う) が可解性を要求するので
+  必要になる。
+
+正規 Hall 部分群の仮説を部分群 `L ⊔ H` と商 `G ⧸ N` へ移す部分は
+`OddOrder.GroupTheory.NormalHallHeredity`, Fitting 商の仮説を移す部分は
+`OddOrder.GroupTheory.FittingHeredity` にある (どちらも汎用補題なので `GroupTheory/` 側)。
+
 ## ⚠ 原文の誤植 (p. 50)
 
 BG p. 50 の場合 1 は, `y ∈ L` と `z ∈ N` を取って `H^{yz} = H` としたのち
@@ -211,6 +220,42 @@ theorem mem_centralizer_of_mem_normalizer_of_commutator_le {N H : Subgroup G}
     calc t * h = t * (t⁻¹ * h * t) := by rw [← hbot]
       _ = h * t := by group
   exact h3.symm
+
+/-! ## Fitting 商の冪零性からの可解性 (Proposition 1.5 を呼ぶための前提) -/
+
+/-- **Fitting 長 `≤ 2` の有限群は可解**: `X/F(X)` が冪零なら `X` は可解。
+
+`F(X)` は冪零 (`Isaacs.Ch01.fitting.isNilpotent`) ゆえ可解, 仮定より `X/F(X)` も冪零ゆえ
+可解, そして可解群による可解群の拡大は可解 (`solvable_of_ker_le_range` を
+`F(X) ↪ X ↠ X/F(X)` に適用; `ker (mk' F(X)) = F(X) = range F(X).subtype`)。 -/
+theorem isSolvable_of_isNilpotent_quotient_fitting {X : Type*} [Group X] [Finite X]
+    (h : Group.IsNilpotent (X ⧸ Ch01.fitting X)) : IsSolvable X := by
+  haveI := h
+  haveI : Group.IsNilpotent ↥(Ch01.fitting X) := Ch01.fitting.isNilpotent
+  refine solvable_of_ker_le_range (Ch01.fitting X).subtype
+    (QuotientGroup.mk' (Ch01.fitting X)) ?_
+  rw [QuotientGroup.ker_mk', Subgroup.range_subtype]
+
+/-- **BG Theorem 6.4 の可解性の段**: `N ⊴ X` について `N/F(N)` と `(X/N)/F(X/N)` が
+ともに冪零なら `X` は可解。
+
+Theorem 6.4 の仮説はまさに `N = G₀` に対するこの形 (`G₀` は `G` の正規 Hall 部分群で
+`G₀/F(G₀)` と `(G/G₀)/F(G/G₀)` が冪零) なので, 本補題が場合 1 のエンジンである
+Proposition 1.5 (`exists_centralizing_conj_sup_isPiGroup` の `[IsSolvable ↥N]` 仮説) を
+使えるようにする。
+
+証明: `isSolvable_of_isNilpotent_quotient_fitting` を `↥N` と `X ⧸ N` に適用して
+`IsSolvable ↥N`, `IsSolvable (X ⧸ N)` を得, 再び `solvable_of_ker_le_range` を
+`N ↪ X ↠ X/N` に適用する。Hall 性はここでは不要。 -/
+theorem isSolvable_of_isNilpotent_quotient_fitting_of_normal {X : Type*} [Group X] [Finite X]
+    (N : Subgroup X) [N.Normal]
+    (hN : Group.IsNilpotent (↥N ⧸ Ch01.fitting ↥N))
+    (hQ : Group.IsNilpotent ((X ⧸ N) ⧸ Ch01.fitting (X ⧸ N))) :
+    IsSolvable X := by
+  haveI : IsSolvable ↥N := isSolvable_of_isNilpotent_quotient_fitting hN
+  haveI : IsSolvable (X ⧸ N) := isSolvable_of_isNilpotent_quotient_fitting hQ
+  refine solvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) ?_
+  rw [QuotientGroup.ker_mk', Subgroup.range_subtype]
 
 end OddOrder.BG.Ch1.S06
 
