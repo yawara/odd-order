@@ -326,8 +326,7 @@ theorem pResidualOf_relCore_eq_bot_or [Finite G] {p : ℕ} [Fact p.Prime]
     pResidualOf p (relCore H (thompsonWielandtCore H K)) = ⊥ ∨
       pResidualOf p (relCore K (thompsonWielandtCore H K)) = ⊥ := by
   by_contra hcon
-  push_neg at hcon
-  obtain ⟨hX, hY⟩ := hcon
+  obtain ⟨hX, hY⟩ := not_or.mp hcon
   -- `H`/`K` を入れ替えた仮説
   have hyp' : NoNormalInSupergroup K H (K ⊓ H) := by rw [inf_comm]; exact hyp.symm
   have hX' : pResidualOf p (relCore K (thompsonWielandtCore K H)) ≠ ⊥ := by
@@ -443,8 +442,7 @@ theorem relCore_eq_bot_or_of_fitting_eq_bot [Finite G]
     relCore H (thompsonWielandtCore H K) = ⊥ ∨
       relCore K (thompsonWielandtCore H K) = ⊥ := by
   by_contra hcon
-  push_neg at hcon
-  obtain ⟨hU, hV⟩ := hcon
+  obtain ⟨hU, hV⟩ := not_or.mp hcon
   -- `H`/`K` を入れ替えた仮説
   have hyp' : NoNormalInSupergroup K H (K ⊓ H) := by rw [inf_comm]; exact hyp.symm
   have hU' : relCore H (thompsonWielandtCore K H) ≠ ⊥ := by
@@ -499,6 +497,81 @@ theorem relCore_relIndex_le_factorial [Finite G] (H D : Subgroup G) :
 
 end
 
+section /- 9C: Thm 9.23 — corefree maximal の setup -/
+
+/-- 極大部分群の共役はまた極大 (共役は部分群束の順序同型). -/
+theorem isCoatom_map_conj {H : Subgroup G} (hmax : IsCoatom H) (g : G) :
+    IsCoatom (H.map (MulAut.conj g : G →* G)) := by
+  have hinj : Function.Injective (MulAut.conj g : G →* G) := (MulAut.conj g).injective
+  constructor
+  · intro htop
+    refine hmax.1 ?_
+    have hmaptop : H.map (MulAut.conj g : G →* G)
+        = (⊤ : Subgroup G).map (MulAut.conj g : G →* G) := by
+      rw [htop, Subgroup.map_top_of_surjective _ (MulAut.conj g).surjective]
+    exact Subgroup.map_injective hinj hmaptop
+  · intro L hL
+    -- `L` を `conj g⁻¹` で戻すと `H` を真に含むので `⊤`
+    have hLback : H < L.map (MulAut.conj g⁻¹ : G →* G) := by
+      rw [show H = (H.map (MulAut.conj g : G →* G)).map (MulAut.conj g⁻¹ : G →* G) from by
+        rw [Subgroup.map_map,
+          show ((MulAut.conj g⁻¹ : G →* G).comp (MulAut.conj g : G →* G)) = MonoidHom.id G from by
+            ext x; simp [MulAut.conj_apply, mul_assoc], Subgroup.map_id]]
+      exact (Subgroup.map_lt_map_iff_of_injective (MulAut.conj g⁻¹).injective).mpr hL
+    have htop := hmax.2 _ hLback
+    have := congrArg (Subgroup.map (MulAut.conj g : G →* G)) htop
+    rwa [Subgroup.map_map,
+      show ((MulAut.conj g : G →* G).comp (MulAut.conj g⁻¹ : G →* G)) = MonoidHom.id G from by
+        ext x; simp [MulAut.conj_apply, mul_assoc], Subgroup.map_id,
+      Subgroup.map_top_of_surjective _ (MulAut.conj g).surjective] at this
+
+/-- corefree な極大部分群は自己正規化的: `core_G(H) = 1`, `H` 極大, `H ≠ 1` ⇒ `N_G(H) = H`.
+
+(`H < N_G(H)` なら極大性から `N_G(H) = G`, つまり `H ◁ G` で `H ≤ core_G(H) = 1`.) -/
+theorem normalizer_eq_self_of_corefree_maximal {H : Subgroup G}
+    (hmax : IsCoatom H) (hcore : H.normalCore = ⊥) (hHne : H ≠ ⊥) :
+    Subgroup.normalizer (H : Set G) = H := by
+  by_contra hne
+  have hlt : H < Subgroup.normalizer (H : Set G) :=
+    lt_of_le_of_ne Subgroup.le_normalizer (Ne.symm hne)
+  haveI : H.Normal := Subgroup.normalizer_eq_top_iff.mp (hmax.2 _ hlt)
+  exact hHne (le_bot_iff.mp (hcore ▸ Subgroup.normal_le_normalCore.mpr le_rfl))
+
+/-- **Thm 9.23 の setup**: `H` が corefree な極大部分群 (`H ≠ 1`) で `g ∉ H` のとき,
+`K = H^g` は `H` と異なり, `H`, `K` は Thm 9.24 の仮説を満たす.
+
+`H` も `K` も極大なので, これらを真に含む部分群は `G` のみ; `core_G(H) = 1` より
+`D ≤ H` の非自明部分群は `G` に normal になれない.
+
+(`H ≠ K` は別の仮説であり本補題には不要 — そちらは
+`map_conj_ne_of_corefree_maximal` が `g ∉ H` と `H ≠ 1` から与える.) -/
+theorem noNormalInSupergroup_of_corefree_maximal {H : Subgroup G}
+    (hmax : IsCoatom H) (hcore : H.normalCore = ⊥) (g : G) :
+    NoNormalInSupergroup H (H.map (MulAut.conj g : G →* G))
+      (H ⊓ H.map (MulAut.conj g : G →* G)) := by
+  intro L hL N hN hND hLnorm
+  -- `L = ⊤` (`H` も `K` も極大)
+  have hLtop : L = ⊤ := by
+    rcases hL with h | h
+    · exact hmax.2 _ h
+    · exact (isCoatom_map_conj hmax g).2 _ h
+  subst hLtop
+  -- `N ◁ G` かつ `N ≤ H` ゆえ `N ≤ core_G(H) = 1`
+  haveI : N.Normal := Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp hLnorm)
+  exact hN (le_bot_iff.mp
+    (hcore ▸ Subgroup.normal_le_normalCore.mpr (hND.trans inf_le_left)))
+
+/-- corefree 極大 `H ≠ 1` と `g ∉ H` から `K = H^g ≠ H`
+(`N_G(H) = H` ゆえ `g` は `H` を正規化しない). -/
+theorem map_conj_ne_of_corefree_maximal {H : Subgroup G}
+    (hmax : IsCoatom H) (hcore : H.normalCore = ⊥) (hHne : H ≠ ⊥) {g : G} (hg : g ∉ H) :
+    H.map (MulAut.conj g : G →* G) ≠ H := by
+  intro heq
+  exact hg ((normalizer_eq_self_of_corefree_maximal hmax hcore hHne)
+    ▸ Subgroup.mem_normalizer_iff_map_conj_eq.mpr heq)
+
+end
+
 section /- 9C: Theorem 9.24 本体 -/
 
 variable (H K : Subgroup G)
@@ -509,12 +582,13 @@ theorem exists_prime_opiCoreInG_ne_bot [Finite G] {H : Subgroup G}
     (hF : Ch01.fitting ↥H ≠ ⊥) :
     ∃ p : ℕ, p.Prime ∧ GroupTheory.opiCoreInG ({p} : Set ℕ) H ≠ ⊥ := by
   by_contra hcon
-  push_neg at hcon
+  have hcon' : ∀ q : ℕ, q.Prime → GroupTheory.opiCoreInG ({q} : Set ℕ) H = ⊥ :=
+    fun q hq => not_ne_iff.mp fun h => hcon ⟨q, hq, h⟩
   refine hF ?_
   rw [Ch01.fitting_eq_iSup_primeFactors]
   refine iSup_eq_bot.mpr fun p => ?_
   haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
-  have h := hcon (p : ℕ) (Nat.prime_of_mem_primeFactors p.2)
+  have h := hcon' (p : ℕ) (Nat.prime_of_mem_primeFactors p.2)
   rw [GroupTheory.opiCoreInG, Subgroup.map_eq_bot_iff_of_injective _ H.subtype_injective] at h
   rwa [← Ch04.oPiCore_singleton_eq_opCore]
 
