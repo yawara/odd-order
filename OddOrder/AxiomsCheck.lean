@@ -197,6 +197,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerNormalizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerResidual
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerQuotient
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerInductionBridge
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerDistinguishedBridge
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -7752,6 +7753,28 @@ that conclusion back to the original centralizer. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_cQ_isPGroup_of_induction
+
+/-! **Peterfalvi Part II, Ch. I §3 Proposition 1(c)**, distinguished-pair
+transport and order lift: the quotient pair is the image of the original
+pair, and the odd action kernel does not change the order of `st`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.orderOf_mul_eq_prime_of_pow_mem_odd_kernel
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.V_le_centralizer_structureConjugator
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.distinguishedInvolution_mem_centralizer_of_le_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mem_centralizer_of_le_V
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizerQuotient_distinguishedPair_eq_images
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderOf_distinguishedInvolution_mul_t_of_quotient_pow
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
