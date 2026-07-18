@@ -1223,7 +1223,8 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) where
   Hpart : Fin data.q → Subgroup (↥data.H ⧸ chief.N)
   Hpart_order : ∀ i, Nat.card ↥(Hpart i) = chief.p
-  /-- The `q` order-`p` Clifford summands span the chief factor `H̄` (non-opaque (9.7) structure). -/
+  /-- The `q` order-`p` Clifford summands span the chief factor `H̄` (non-opaque (9.7) structure).
+  -/
   Hpart_iSup : ⨆ i, Hpart i = ⊤
   /-- Each Clifford summand is `U`-invariant (non-opaque (9.7) structure). -/
   Hpart_aInvariant : ∀ i, IsAInvariant (uActionHom data chief) (Hpart i)

@@ -322,7 +322,8 @@ private theorem conj_smul_le_normalizer_of_le_normalizer {S Q : Subgroup G} {g :
     group
   rw [hyeq, conj_smul_eq_self_of_mem_normalizer hyN]
 
-/-- **Conjugation commutes with the normalizer** (equality form): `conj g • N(Q) = N(conj g • Q)`. -/
+/-- **Conjugation commutes with the normalizer** (equality form): `conj g • N(Q) = N(conj g • Q)`.
+-/
 private theorem conj_smul_normalizer_eq (g : G) (Q : Subgroup G) :
     MulAut.conj g • Subgroup.normalizer (Q : Set G)
       = Subgroup.normalizer ((MulAut.conj g • Q : Subgroup G) : Set G) := by

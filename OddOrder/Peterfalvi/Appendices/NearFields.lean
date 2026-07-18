@@ -534,7 +534,8 @@ theorem twMul_ne_zero {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) : d.twMul x y ≠ 
 theorem add_twMul (a b c : K) : d.twMul (a + b) c = d.twMul a c + d.twMul b c := by
   simp [twMul, map_add, add_mul]
 
-/-- Composing the twist automorphisms adds their exponents: `twAut a (twAut b x) = twAut (a+b) x`. -/
+/-- Composing the twist automorphisms adds their exponents: `twAut a (twAut b x) = twAut (a+b) x`.
+-/
 theorem twAut_twAut (a b : ZMod 2) (x : K) : d.twAut a (d.twAut b x) = d.twAut (a + b) x := by
   rw [twAut_add]; rfl
 

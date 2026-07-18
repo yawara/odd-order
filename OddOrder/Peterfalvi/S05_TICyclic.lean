@@ -359,7 +359,8 @@ noncomputable def omegaEquiv (hyp : TICyclicHypothesis G) :
     hyp.omegaEquiv χ = hyp.omega χ :=
   rfl
 
-/- 3.3 (cont.): `W = W₁ × W₂` as an internal direct product, used to split `ω_{ij} = ω_{i0}·ω_{0j}` -/
+/- 3.3 (cont.): `W = W₁ × W₂` as an internal direct product, used to split `ω_{ij} = ω_{i0}·ω_{0j}`
+-/
 
 /-- `W₁` and `W₂`, viewed inside `↥W`, intersect trivially (from `W_disjoint`). -/
 theorem W1_subgroupOf_inf_W2_subgroupOf_eq_bot (hyp : TICyclicHypothesis G) :

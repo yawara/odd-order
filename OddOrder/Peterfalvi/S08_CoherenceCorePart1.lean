@@ -499,7 +499,8 @@ the case (c1)/(c2) disjunction (`S06.CertainTypeHypothesis`) — are added next,
 structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     (L : Subgroup G) [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
     (H : Subgroup ↥L) [Invertible (Nat.card ↥H : ℂ)] where
-  /-- A complement-side subgroup `W₁`; the split `L = H ⋊ W₁` is added in the next migration step. -/
+  /-- A complement-side subgroup `W₁`; the split `L = H ⋊ W₁` is added in the next migration step.
+  -/
   W1 : Subgroup ↥L
   H_ne_bot : H ≠ ⊥
   H_normal : H.Normal

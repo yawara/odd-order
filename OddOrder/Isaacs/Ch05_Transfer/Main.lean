@@ -1029,7 +1029,8 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
     have hcg_val_eq : c * g = (t_N : G) * (u_N : G) := by
       have h := congrArg Subtype.val htu_eq
       exact h.symm
-    -- y = (cg) • x = (t_N.val * u_N.val) • x = t_N.val • (u_N.val • x) = u_N.val • x (t centralizes uxu⁻¹ ∈ P)
+    -- y = (cg) • x = (t_N.val * u_N.val) • x = t_N.val • (u_N.val • x) = u_N.val • x (t centralizes
+    -- uxu⁻¹ ∈ P)
     refine ⟨(u_N : G), hu_in_P, ?_⟩
     -- Goal: u_N.val * x * u_N.val⁻¹ = y
     -- First: y = (cg) x (cg)⁻¹. From c * y = y * c, y = c y c⁻¹ = c (g x g⁻¹) c⁻¹ = (cg) x (cg)⁻¹.

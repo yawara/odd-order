@@ -27,7 +27,8 @@ character of `H·C_U(S₀)` trivial on the realized `H₀` is a pair character `
 `H ⋊ C_U(S₀)` complement (`hInHu_isComplement'_cuInHu_in_hcuInHu`).  Feeds the (9.8.d) count
 (image-family `Mtheta`, conjBy-closed via kernel-stability, `|Mtheta| = (p-1)·[C_U(S₀):U′]`). -/
 
-/-- **Peterfalvi (9.8.d)** (count substrate). Uniqueness: hom on hInHu ⊔ cuInHu determined by restriction to hInHu and cuInHu. -/
+/-- **Peterfalvi (9.8.d)** (count substrate). Uniqueness: hom on hInHu ⊔ cuInHu determined by
+restriction to hInHu and cuInHu. -/
 theorem hom_eq_of_eqOn_hInHu_cuInHu [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
@@ -94,7 +95,8 @@ theorem exists_hcuSeedHom_eq_of_realizedH0_ker [Finite G] {M : Subgroup G}
     QuotientGroup.mk'_apply, QuotientGroup.lift_mk, hfH', MonoidHom.comp_apply,
     MulEquiv.coe_toMonoidHom, MulEquiv.symm_apply_apply]
 
-/-- **Peterfalvi (9.8.d)** (count substrate). hinv holds for ANY hom into abelian ℂˣ (conjugation is inner). -/
+/-- **Peterfalvi (9.8.d)** (count substrate). hinv holds for ANY hom into abelian ℂˣ (conjugation is
+inner). -/
 theorem hcuSeedHom_hinv_of_comp [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
@@ -159,7 +161,8 @@ theorem exists_pairHom_eq_of_realizedH0_ker [Finite G] {M : Subgroup G}
       hcuLambdaHom_inclusion, hlam, MonoidHom.comp_apply]
 
 
-/-- **Peterfalvi (9.8.d)** (count substrate). Uniform hinv for a family θ: W = caseA_wComplement, θ trivial on W. -/
+/-- **Peterfalvi (9.8.d)** (count substrate). Uniform hinv for a family θ: W = caseA_wComplement, θ
+trivial on W. -/
 theorem hcuSeedHom_hinv_of_wComplement_triv [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
@@ -184,7 +187,8 @@ theorem hcuSeedHom_hinv_of_wComplement_triv [Finite G] {M : Subgroup G}
       (caseA_S0_sup_wComplement caseA) htriv)
 
 
-/-- **Peterfalvi (9.8.d)** (count substrate). hcuSeedHom is injective in θ (mk' surjective, hInHuEquivH iso). -/
+/-- **Peterfalvi (9.8.d)** (count substrate). hcuSeedHom is injective in θ (mk' surjective,
+hInHuEquivH iso). -/
 theorem hcuSeedHom_injective [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     Function.Injective (hcuSeedHom (chief := chief) (data := data)) := by
@@ -264,7 +268,8 @@ theorem hcuPsiPair_injective_pair [Finite G] {M : Subgroup G}
     exact Units.val_injective this
 
 
-/-- **Peterfalvi (9.8.d)** (count substrate). characterKernel of a linear character = ker of the hom (as sets). -/
+/-- **Peterfalvi (9.8.d)** (count substrate). characterKernel of a linear character = ker of the hom
+(as sets). -/
 theorem mem_characterKernel_linearIrreducibleCharacter {H : Type*} [Group H] [Finite H]
     (f : H →* ℂˣ) (g : H) :
     g ∈ OddOrder.Peterfalvi.S03.characterKernel

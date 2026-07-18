@@ -165,7 +165,8 @@ noncomputable def algAutPerm : ((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm
       Classical.choose_spec (algEquiv_permutes_single ψ₂) i,
       Classical.choose_spec (algEquiv_permutes_single ψ₁) _, Equiv.Perm.mul_apply]
 
-/-- Defining property of `algAutPerm`: `ψ` sends `Pi.single i 1` to `Pi.single (algAutPerm ψ i) 1`. -/
+/-- Defining property of `algAutPerm`: `ψ` sends `Pi.single i 1` to `Pi.single (algAutPerm ψ i) 1`.
+-/
 theorem algAutPerm_apply_single (ψ : (ι → k) ≃ₐ[k] (ι → k)) (i : ι) :
     ψ (Pi.single i (1 : k)) = Pi.single (algAutPerm ψ i) 1 := by
   classical exact Classical.choose_spec (algEquiv_permutes_single ψ) i
