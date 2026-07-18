@@ -55,3 +55,22 @@ canonical home に置く方が正しいと判断。
 
 BG レーンの所有ファイルなので、実施は BG 担当レーン (または hub) が行う。
 lane a は canonical 版を追加するところまで。
+
+## ⚠ 追記 (2026-07-18): 3 つ目の重複が判明
+
+`OddOrder/GroupTheory/SubgroupInAmbient.lean:147` に
+`isPiSubgroup_singleton_of_isPGroup` (`IsPGroup q ↥H → IsPiSubgroup {q} H`) が
+**既にあった**。これは今回追加した一般版 `isPiSubgroup_of_isPGroup_of_mem` の
+singleton 特殊化 (`isPiSubgroup_of_isPGroup_of_mem hH rfl` で得られる)。
+
+つまり現状 3 箇所に同内容がある:
+1. `GroupTheory/OpResidual.lean` — `isPiSubgroup_of_isPGroup_of_mem` (一般 π、今回追加、canonical)
+2. `GroupTheory/SubgroupInAmbient.lean:147` — `isPiSubgroup_singleton_of_isPGroup` (singleton)
+3. `BG/Ch3_MaximalSubgroups/S12_ExceptionalBridge.lean:129` — 一般 π (BG ローカル)
+
+**反省**: lane a は Thm 9.23 step (v) の実装時に (2) を見落とし、
+既に import していたファイルの中に使える補題があったのに一般版を新設した。
+一般版そのものは BG の重複解消に資するので残す価値があるが、
+着手前の grep が singleton 形を拾えていなかった (検索語が `_of_mem` 寄りだった)。
+
+- [ ] (2) を (1) の系に置換するか、単に (1) へ寄せて削除する。
