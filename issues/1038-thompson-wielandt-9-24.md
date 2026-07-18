@@ -144,7 +144,42 @@ proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidua
     不等式形 `relCore_relIndex_le_factorial`、
     `relCore_relIndex_le_factorial_pred` (`|D:core_H(D)| ≤ (|H:D|-1)!`)。
 
-  **残り (strand A の index 連鎖)** — 使う mathlib 補題は調査済み:
+  **strand A (index 連鎖) も完了 (2026-07-18)**:
+  `thompsonWielandtCore_relIndex_le` (`|H:E| ≤ a!·b!`)、
+  `relCore_thompsonWielandtCore_relIndex_le` (`|H:U| ≤ (a!b!)!`)、
+  `opiCoreInG_relIndex_le_of_isPGroup` (`|H:O_p(H)| ≤ |H:U|`)。
+  ヘルパ: `relIndex_ne_zero`, `factorial_pred_mul_self`。
+  ⚠ `Subgroup.relIndex_inf_le` は**全て implicit 引数** (`_ _ _` は不可)、
+  `relIndex_mul_relIndex` は**部分群 3 つが explicit** — 逆なので注意。
+
+  ### ⚠ 残る唯一の障害: 9.24 の `V`-branch をどう `H` の bound に落とすか
+
+  9.24 の結論は `IsPGroup p U ∨ IsPGroup p V`。`U`-branch は `U ◁ H` なので
+  そのまま `|H:O_p(H)| ≤ |H:U| ≤ (a!b!)!` で終わる。**`V`-branch が問題**:
+  `V ◁ K` であって `V ◁ H` ではない (Case 2 で判明した通り `V ◁ M ◁ H` の subnormal 止まり)。
+  書籍は「`H` と `K` は同型だからどちらでもよい」の一言で済ませている箇所。
+
+  形式化の選択肢は 2 つ (どちらも未着手):
+
+  **(route 1) 共役同変性で `|K:O_p(K)| = |H:O_p(H)|` に読み替える**
+  - `oPiCore` の同型同変性 `(oPiCore π A).map e = oPiCore π B` (`e : A ≃* B`) を作る。
+    `oPiCore π G = ⨆ H : {H // H.Normal ∧ IsPiGroup π H}, H.val` なので、
+    証明の形は本 session で作った `map_layer_mulEquiv` / `map_pResidual_mulEquiv` と同一
+    (`map_le_iff_le_comap` → `iSup_le` → 各元が像でも条件を満たす → `e.symm` で逆向き)。
+  - その ambient 版 `opiCoreInG π (H.map (conj g)) = (opiCoreInG π H).map (conj g)`。
+  - 加えて共役が `relIndex` を保つこと。
+  - 置き場所: `oPiCore` 版は Ch03 (定義元)、ambient 版は `GroupTheory/SubgroupInAmbient.lean`。
+    どちらも共有 leaf なので 9000 issue で claim してから着手するのが安全。
+
+  **(route 2) subnormal `p`-部分群は `O_p` に入る (Wielandt) を使う**
+  - `V ◁◁ H` かつ `V` が `p`-群 ⇒ `V ≤ O_p(H)` が言えれば、`|H:O_p(H)| ≤ |H:V|` となり、
+    `|H:V| = |K:V|` (共役ゆえ `|H| = |K|`) から `≤ (a!b!)!`。
+  - この定理が repo/mathlib にあるか未調査。無ければ route 1 より重い。
+  - 利点: 共役同変性を一切作らなくてよい。
+
+  → **まず route 2 の既存性を grep で確認し、無ければ route 1** が推奨。
+
+  **旧メモ (strand A 用、参考)** — 使った mathlib 補題:
   - `Subgroup.relIndex_mul_relIndex (H K L) (hHK) (hKL) : H.relIndex K * K.relIndex L
     = H.relIndex L` (⚠ 部分群 3 つが**明示引数**、`_ _ _` が要る)
   - `Subgroup.relIndex_inf_le : (H ⊓ K).relIndex L ≤ H.relIndex L * K.relIndex L`

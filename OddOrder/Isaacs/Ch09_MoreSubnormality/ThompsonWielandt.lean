@@ -495,6 +495,17 @@ theorem relCore_relIndex_le_factorial [Finite G] (H D : Subgroup G) :
     (relCore H D).relIndex H ≤ Nat.factorial (D.relIndex H) :=
   Nat.le_of_dvd (Nat.factorial_pos _) (relCore_relIndex_dvd_factorial H D)
 
+/-- 有限群では相対 index は非零. -/
+theorem relIndex_ne_zero [Finite G] (A B : Subgroup G) : A.relIndex B ≠ 0 := fun h =>
+  Subgroup.index_ne_zero_of_finite (Subgroup.index_eq_zero_of_relIndex_eq_zero h)
+
+/-- `(a-1)! · a = a!` (`a ≠ 0`). -/
+theorem factorial_pred_mul_self {a : ℕ} (ha : a ≠ 0) :
+    Nat.factorial (a - 1) * a = Nat.factorial a := by
+  obtain ⟨n, hn⟩ := Nat.exists_eq_succ_of_ne_zero ha
+  rw [hn]
+  simp [Nat.factorial_succ, Nat.mul_comm]
+
 /-- `D` から見た形: `|D : core_H(D)| ≤ (|H : D| - 1)!`.
 
 `|H : core_H(D)| = |D : core_H(D)| · |H : D|` を `|H : core_H(D)| ≤ |H:D|!` と
@@ -502,18 +513,66 @@ theorem relCore_relIndex_le_factorial [Finite G] (H D : Subgroup G) :
 書籍 p. 283 の「`|D:M| ≤ (a-1)!`」に対応 (これが無いと `|H:E| ≤ a!b!` の係数が合わない). -/
 theorem relCore_relIndex_le_factorial_pred [Finite G] {H D : Subgroup G} (hDH : D ≤ H) :
     (relCore H D).relIndex D ≤ Nat.factorial (D.relIndex H - 1) := by
-  have hane : D.relIndex H ≠ 0 := fun h =>
-    Subgroup.index_ne_zero_of_finite (Subgroup.index_eq_zero_of_relIndex_eq_zero h)
+  have hane : D.relIndex H ≠ 0 := relIndex_ne_zero D H
   have hapos : 0 < D.relIndex H := Nat.pos_of_ne_zero hane
-  have hfac : Nat.factorial (D.relIndex H - 1) * D.relIndex H = Nat.factorial (D.relIndex H) := by
-    obtain ⟨n, hn⟩ := Nat.exists_eq_succ_of_ne_zero hane
-    rw [hn]
-    simp [Nat.factorial_succ, Nat.mul_comm]
+  have hfac := factorial_pred_mul_self hane
   refine Nat.le_of_mul_le_mul_right ?_ hapos
   calc (relCore H D).relIndex D * D.relIndex H = (relCore H D).relIndex H :=
         Subgroup.relIndex_mul_relIndex _ _ _ (relCore_le H D) hDH
     _ ≤ Nat.factorial (D.relIndex H) := relCore_relIndex_le_factorial H D
     _ = Nat.factorial (D.relIndex H - 1) * D.relIndex H := hfac.symm
+
+/-- **Thm 9.23 の index 連鎖** (書籍 p. 283): `|H : E| ≤ a! · b!`
+(`a = |H : D|`, `b = |K : D|`, `D = H ⊓ K`, `E = core_H(D) ⊓ core_K(D)`).
+
+`|D:E| ≤ |D:M|·|D:N| ≤ (a-1)!(b-1)!` (`relIndex_inf_le` + `relCore_relIndex_le_factorial_pred`
+を `H` 側・`K` 側それぞれに) の後, `|H:E| = |D:E|·a ≤ (a-1)!(b-1)!·a = a!·(b-1)! ≤ a!·b!`. -/
+theorem thompsonWielandtCore_relIndex_le [Finite G] (H K : Subgroup G) :
+    (thompsonWielandtCore H K).relIndex H
+      ≤ Nat.factorial ((H ⊓ K).relIndex H) * Nat.factorial ((H ⊓ K).relIndex K) := by
+  set D := H ⊓ K with hD
+  set a := D.relIndex H with hA
+  set b := D.relIndex K with hB
+  have hane : a ≠ 0 := relIndex_ne_zero D H
+  -- `|D:E| ≤ (a-1)! * (b-1)!`
+  have hDE : (thompsonWielandtCore H K).relIndex D
+      ≤ Nat.factorial (a - 1) * Nat.factorial (b - 1) :=
+    Subgroup.relIndex_inf_le.trans
+      (Nat.mul_le_mul (relCore_relIndex_le_factorial_pred inf_le_left)
+        (relCore_relIndex_le_factorial_pred inf_le_right))
+  -- `|H:E| = |D:E| * a`
+  have hsplit : (thompsonWielandtCore H K).relIndex D * a = (thompsonWielandtCore H K).relIndex H :=
+    Subgroup.relIndex_mul_relIndex _ _ _ (thompsonWielandtCore_le H K) inf_le_left
+  calc (thompsonWielandtCore H K).relIndex H
+      = (thompsonWielandtCore H K).relIndex D * a := hsplit.symm
+    _ ≤ (Nat.factorial (a - 1) * Nat.factorial (b - 1)) * a := Nat.mul_le_mul_right _ hDE
+    _ = (Nat.factorial (a - 1) * a) * Nat.factorial (b - 1) := by ring
+    _ = Nat.factorial a * Nat.factorial (b - 1) := by rw [factorial_pred_mul_self hane]
+    _ ≤ Nat.factorial a * Nat.factorial b :=
+        Nat.mul_le_mul_left _ (Nat.factorial_le (Nat.sub_le b 1))
+
+/-- **Thm 9.23 の index 連鎖 (最終形)**: `|H : U| ≤ (a!·b!)!` (`U = core_H(E)`).
+`|H:U| ≤ (|H:E|)!` (n!-定理) に `|H:E| ≤ a!b!` を factorial の単調性で合成. -/
+theorem relCore_thompsonWielandtCore_relIndex_le [Finite G] (H K : Subgroup G) :
+    (relCore H (thompsonWielandtCore H K)).relIndex H
+      ≤ Nat.factorial
+          (Nat.factorial ((H ⊓ K).relIndex H) * Nat.factorial ((H ⊓ K).relIndex K)) :=
+  (relCore_relIndex_le_factorial H (thompsonWielandtCore H K)).trans
+    (Nat.factorial_le (thompsonWielandtCore_relIndex_le H K))
+
+/-- `H` に normal な `p`-部分群 `U` は `O_p(H)` に含まれるので `|H : O_p(H)| ≤ |H : U|`.
+書籍 p. 283 の「`U ◁ H` かつ `U` が `p`-群ゆえ `|H:O_p(H)| ≤ |H:U|`」に対応. -/
+theorem opiCoreInG_relIndex_le_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+    {H U : Subgroup G} (hUH : U ≤ H) (hUn : H ≤ Subgroup.normalizer (U : Set G))
+    (hU : IsPGroup p ↥U) :
+    (GroupTheory.opiCoreInG ({p} : Set ℕ) H).relIndex H ≤ U.relIndex H := by
+  have hle : U ≤ GroupTheory.opiCoreInG ({p} : Set ℕ) H :=
+    GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup hUH
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hUH).mpr hUn)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hU rfl)
+  have hUne : U.relIndex H ≠ 0 := fun h =>
+    Subgroup.index_ne_zero_of_finite (Subgroup.index_eq_zero_of_relIndex_eq_zero h)
+  exact Nat.le_of_dvd (Nat.pos_of_ne_zero hUne) (Subgroup.relIndex_dvd_of_le_left H hle)
 
 end
 
