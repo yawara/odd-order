@@ -443,6 +443,29 @@ theorem conjAct_smul_self_of_mem {K : Subgroup G} {h : G} (hh : h ∈ K) :
     ConjAct.toConjAct h • K = K :=
   Subgroup.conjAct_pointwise_smul_eq_self (Subgroup.le_normalizer hh)
 
+/-- `ConjAct` による共役作用と `MulAut.conj` による共役作用は一致する
+(mathlib の `Sylow` は後者を使うので橋が要る)。 -/
+theorem conjAct_smul_eq_mulAut_smul (g : G) (X : Subgroup G) :
+    ConjAct.toConjAct g • X = MulAut.conj g • X := by
+  rw [conjAct_smul_eq_map, Subgroup.pointwise_smul_def]
+  rfl
+
+/-- **有限群の `p`-部分群は与えられた Sylow `p`-部分群の中へ共役で送れる**。
+
+mathlib は `IsPGroup.exists_le_sylow` (ある Sylow に入る) と Sylow の共役性を
+別々に持つだけなので, その 2 つを繋ぐ。Bartels Step 3 が使う。 -/
+theorem exists_conjAct_smul_le_sylow {L : Type*} [Group L] [Finite L] {p : ℕ} [Fact p.Prime]
+    {Q : Subgroup L} (hQ : IsPGroup p Q) (P : Sylow p L) :
+    ∃ g : L, ConjAct.toConjAct g • Q ≤ (P : Subgroup L) := by
+  obtain ⟨R, hR⟩ := hQ.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq L R P
+  refine ⟨g, ?_⟩
+  rw [conjAct_smul_eq_mulAut_smul]
+  calc MulAut.conj g • Q ≤ MulAut.conj g • (R : Subgroup L) :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hR
+    _ = ((g • R : Sylow p L) : Subgroup L) := Sylow.coe_subgroup_smul.symm
+    _ = (P : Subgroup L) := by rw [hg]
+
 section /- 9D: Bartels Step 2 の部品 — 真部分群による生成 -/
 
 /-- `Nat.Coprime a b` なら `x ∈ ⟨x^a⟩ ⊔ ⟨x^b⟩` (Bezout)。 -/
