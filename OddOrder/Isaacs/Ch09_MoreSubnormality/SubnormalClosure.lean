@@ -590,18 +590,20 @@ theorem mem_kappaSet_top_iff {X W : Subgroup G} :
     refine ⟨c • X, le_top, ⟨c, rfl⟩, ?_⟩
     exact strongClosure_conjAct_smul c X
 
-/-- **Step 4 第 1 分岐の入口**: `G` 全体が `𝒦(M)` を保つなら `𝒦(M) = 𝒦(G)`.
+/-- **Step 4 第 1 分岐の入口**: `G` 全体が `𝒦(H)` を保つなら `𝒦(H) = 𝒦(G)`.
 
-`𝒦(G)` は `X^{(G)}` の `G`-軌道で, `X^{(G)} ∈ 𝒦(M)` なので `𝒦(M)` が `G`-安定なら
-軌道全体を含む。 -/
-theorem kappaSet_eq_top_of_setwiseStabilizer_eq_top {X M : Subgroup G} (hXM : X ≤ M)
-    (hstab : setwiseStabilizer (kappaSet X M) = ⊤) : kappaSet X M = kappaSet X ⊤ := by
+`𝒦(G)` は `X^{(G)}` の `G`-軌道なので, `X^{(G)} ∈ 𝒦(H)` かつ `𝒦(H)` が `G`-安定なら
+軌道全体を含む。(`X ≤ H` でなく `X^{(G)} ∈ 𝒦(H)` を仮定するのは, Step 4 後半で
+`H = P` (Sylow) に対して使うため — そこでは `X ≤ P` は成り立たない。) -/
+theorem kappaSet_eq_top_of_setwiseStabilizer_eq_top {X H : Subgroup G}
+    (hmem : strongClosure X ∈ kappaSet X H)
+    (hstab : setwiseStabilizer (kappaSet X H) = ⊤) : kappaSet X H = kappaSet X ⊤ := by
   refine Set.Subset.antisymm (kappaSet_mono le_top) ?_
   intro W hW
   obtain ⟨c, rfl⟩ := mem_kappaSet_top_iff.mp hW
-  have hg : ConjAct.ofConjAct c ∈ setwiseStabilizer (kappaSet X M) := by
+  have hg : ConjAct.ofConjAct c ∈ setwiseStabilizer (kappaSet X H) := by
     rw [hstab]; exact Subgroup.mem_top _
-  have := (hg (strongClosure X)).mpr (mem_kappaSet_self X hXM)
+  have := (hg (strongClosure X)).mpr hmem
   rwa [ConjAct.toConjAct_ofConjAct] at this
 
 
@@ -728,14 +730,53 @@ theorem centralizer_ne_bot_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P : 
   ext
   simpa using hmem
 
-/-- **Bartels (9.28) Step 4** (書籍 p. 291): `M` が `X` を含む極大部分群, `P` が `M` の
-Sylow `p`-部分群なら `P` は `G` の Sylow `p`-部分群。
+/-- **Bartels Step 4 の核心** (書籍 pp. 292-293): 最小反例の下で `H` が極大部分群,
+`P ∈ Syl_p(H)`, かつ `X^{(G)} ∈ 𝒦(P)` ならば **`𝒦(P)` の setwise stabilizer はちょうど
+`H`**。
 
-`𝒦(M)` の setwise stabilizer は極大性から `M` 自身か `G` 全体。
-* `G` 全体なら `𝒦(M) = 𝒦(G) = 𝒦(P)` となり `C_G(P) (≠ 1)` が作用の核に入るので
-  `X^{(G)}` が subnormal となって最小反例の仮定に矛盾。
-* よって `M` 自身。`N_G(P)` は `𝒦(P) = 𝒦(M)` を保つので `N_G(P) ≤ M`, ゆえ
-  `not_dvd_index_of_normalizer_le` で結論。 -/
+`H ≤ Stab(𝒦(H))` で `𝒦(H) = 𝒦(P)` (Step 3) なので, `H` の極大性から stabilizer は
+`H` か `⊤` の二択。`⊤` の場合は `𝒦(P) = 𝒦(G)` となり, `Z(P) ≤ C_G(P) (≠ 1)` が
+`𝒦(G)` への作用の核に入るので `X^{(G)}` が subnormal となり最小反例の仮定に矛盾。
+
+書籍が Step 4 の前半 (`P ∈ Syl_p(G)`) と後半 (`M` の一意性) で 2 度使う議論なので,
+`H` を動かせる形で切り出してある。 -/
+theorem setwiseStabilizer_kappaSet_eq_of_isCoatom {G : Type u} [Group G] [Finite G]
+    (hIH : BartelsIH G) {p : ℕ} [Fact p.Prime] {X H P : Subgroup G}
+    (hH : IsCoatom H) (hXp : IsPGroup p ↥X)
+    (hPH : P ≤ H) (hPp : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex H) (hPbot : P ≠ ⊥)
+    (hmem : strongClosure X ∈ kappaSet X P)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
+    (hXsub : ¬ (strongClosure X).IsSubnormal) :
+    setwiseStabilizer (kappaSet X P) = H := by
+  have hKHP : kappaSet X H = kappaSet X P :=
+    kappaSet_eq_of_sylow hIH hH.1 hPH hXp hPp hPidx hne
+  have hle : H ≤ setwiseStabilizer (kappaSet X P) := by
+    rw [← hKHP]; exact le_setwiseStabilizer_kappaSet X H
+  rcases eq_or_eq_top_of_isCoatom hH hle with hst | hst
+  · exact hst
+  · -- stabilizer = `G`: 矛盾.
+    exfalso
+    refine hXsub (isSubnormal_strongClosure_of_kappaSetKernel_ne_bot hIH ?_)
+    rw [← kappaSet_eq_top_of_setwiseStabilizer_eq_top hmem hst]
+    intro hbot
+    exact centralizer_ne_bot_of_isPGroup hPp hPbot
+      (le_bot_iff.mp (hbot ▸ centralizer_le_pointwiseStabilizer_kappaSet X P))
+
+/-- `X ≤ M` と `𝒦(M) = 𝒦(P)` (Step 3) から `X^{(G)} ∈ 𝒦(P)`。 -/
+theorem mem_kappaSet_sylow_of_le {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X M P : Subgroup G}
+    (hM : M ≠ ⊤) (hXM : X ≤ M) (hXp : IsPGroup p ↥X)
+    (hPM : P ≤ M) (hPp : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex M)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤) :
+    strongClosure X ∈ kappaSet X P := by
+  rw [← kappaSet_eq_of_sylow hIH hM hPM hXp hPp hPidx hne]
+  exact mem_kappaSet_self X hXM
+
+/-- **Bartels (9.28) Step 4, 前半** (書籍 pp. 292-293): `M` が `X` を含む極大部分群,
+`P` が `M` の Sylow `p`-部分群なら `P` は `G` の Sylow `p`-部分群。
+
+核心補題で `Stab(𝒦(P)) = M`。`N_G(P)` は `𝒦(P)` を保つので `N_G(P) ≤ M`, ゆえ
+`not_dvd_index_of_normalizer_le` で結論。 -/
 theorem bartels_step_four {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
     {p : ℕ} [Fact p.Prime] {X M P : Subgroup G}
     (hM : IsCoatom M) (hXM : X ≤ M) (hXp : IsPGroup p ↥X)
@@ -743,22 +784,38 @@ theorem bartels_step_four {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
     (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
     (hXsub : ¬ (strongClosure X).IsSubnormal) :
     ¬ p ∣ P.index := by
-  have hKMP : kappaSet X M = kappaSet X P :=
-    kappaSet_eq_of_sylow hIH hM.1 hPM hXp hPp hPidx hne
-  rcases eq_or_eq_top_of_isCoatom hM (le_setwiseStabilizer_kappaSet X M) with hst | hst
-  · -- stabilizer = `M`: `N_G(P) ≤ M`.
-    have hNP : Subgroup.normalizer P ≤ setwiseStabilizer (kappaSet X M) := by
-      rw [hKMP]; exact normalizer_le_setwiseStabilizer_kappaSet X P
-    exact not_dvd_index_of_normalizer_le hPM hPp hPidx (hst ▸ hNP)
-  · -- stabilizer = `G`: 矛盾.
-    exfalso
-    refine hXsub (isSubnormal_strongClosure_of_kappaSetKernel_ne_bot hIH ?_)
-    have hKtop : kappaSet X ⊤ = kappaSet X P :=
-      (kappaSet_eq_top_of_setwiseStabilizer_eq_top hXM hst).symm.trans hKMP
-    rw [hKtop]
-    intro hbot
-    exact centralizer_ne_bot_of_isPGroup hPp hPbot
-      (le_bot_iff.mp (hbot ▸ centralizer_le_pointwiseStabilizer_kappaSet X P))
+  have hmem := mem_kappaSet_sylow_of_le hIH hM.1 hXM hXp hPM hPp hPidx hne
+  have hst := setwiseStabilizer_kappaSet_eq_of_isCoatom hIH hM hXp hPM hPp hPidx hPbot
+    hmem hne hXsub
+  exact not_dvd_index_of_normalizer_le hPM hPp hPidx
+    (hst ▸ normalizer_le_setwiseStabilizer_kappaSet X P)
+
+/-- **Bartels (9.28) Step 4, 後半** (書籍 p. 293): `M` は `P` を含む**唯一の**極大部分群。
+
+書籍「Also if `P ⊆ N`, where `N` is maximal in `G`, then `P ∈ Syl_p(N)`, and similar
+reasoning shows that `N` is the full stabilizer of `𝒦(P)`. Thus `N = M`.」
+
+前半で `P ∈ Syl_p(G)` なので `P ≤ N` から `P ∈ Syl_p(N)` (指数の連鎖)。よって核心補題が
+`N` にも適用でき, `N = Stab(𝒦(P)) = M`。 -/
+theorem bartels_step_four_unique {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {X M P N : Subgroup G}
+    (hM : IsCoatom M) (hXM : X ≤ M) (hXp : IsPGroup p ↥X)
+    (hPM : P ≤ M) (hPp : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex M) (hPbot : P ≠ ⊥)
+    (hne : ∀ c : ConjAct G, strongClosure (c • X) ≠ ⊤)
+    (hXsub : ¬ (strongClosure X).IsSubnormal)
+    (hN : IsCoatom N) (hPN : P ≤ N) :
+    N = M := by
+  have hmem := mem_kappaSet_sylow_of_le hIH hM.1 hXM hXp hPM hPp hPidx hne
+  have hstM := setwiseStabilizer_kappaSet_eq_of_isCoatom hIH hM hXp hPM hPp hPidx hPbot
+    hmem hne hXsub
+  -- `P ∈ Syl_p(G)` (前半) から `P ∈ Syl_p(N)`.
+  have hidx : ¬ p ∣ P.index :=
+    bartels_step_four hIH hM hXM hXp hPM hPp hPidx hPbot hne hXsub
+  have hPidxN : ¬ p ∣ P.relIndex N := fun h => hidx <| by
+    rw [← Subgroup.relIndex_mul_index hPN]; exact h.mul_right _
+  have hstN := setwiseStabilizer_kappaSet_eq_of_isCoatom hIH hN hXp hPN hPp hPidxN hPbot
+    hmem hne hXsub
+  exact hstN.symm.trans hstM
 
 end OddOrder.Isaacs.Ch09
 
