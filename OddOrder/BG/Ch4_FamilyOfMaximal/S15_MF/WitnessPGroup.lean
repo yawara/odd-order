@@ -1,4 +1,4 @@
-import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.OpicoreCentralizer
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure
 
 /-!
 # BG Theorem 15.7(e) — pinning the witness prime to the TI-failure intersection
@@ -383,5 +383,226 @@ theorem exists_rankTwo_elemAbelian_of_witness [Finite G]
     intro x hx
     exact (Subgroup.mem_centralizer_iff.mp (hX₁CZ hx) z hz).symm
   exact ⟨Z, hZdef, hZcard, hZP, hX₁Zbot, hX₁CZ, hBea, hBcard, sup_le hX₁C1 hZC1⟩
+
+/-- **`O_p(M_F)` is a Sylow `p`-subgroup of `G`** (Coq `sylP_G`): for a maximal `M` with
+`M_F = M_σ` and `p ∈ σ(M)`, the `p`-core `P = O_p(M_F)` is a Sylow `p`-subgroup of `G`.
+
+`P` is a `{p}`-Hall (hence Sylow) subgroup of the nilpotent `M_F = M_σ`
+(`oPiCore_isHall_of_isNilpotent`: `p ∤ [M_F : P]`), so `|P| = p^{v_p(|M_F|)}` is the full `p`-part
+of
+`|M_σ|`; and since `M_σ` is the `σ`-Hall of `G` with `p ∈ σ` (`Msigma_isHall`: `p ∤ [G : M_σ]`),
+that
+`p`-part equals `v_p(|G|)`.  Thus `|P| = p^{v_p(|G|)}`, so `Sylow.ofCard` exhibits `P` as a Sylow
+`p`-subgroup of `G`.  This is the `mFT_rank2_Sylow_cprod` Sylow input for the type-V Singer case
+(`card_opiCore_eq_prime_cube_singer`). -/
+theorem exists_sylow_eq_opiCore_of_mf_eq_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hmf : MF M = OddOrder.BG.Ch3.S10.Msigma M) {p : ℕ} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) :
+    ∃ S : Sylow p G, (S : Subgroup G) = opiCoreInG ({p} : Set ℕ) (MF M) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
+  -- `P` is a `p`-group: `|P| = p^a`.
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (MF M)
+  obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp hPpg
+  suffices hcard : Nat.card ↥P = p ^ (Nat.card G).factorization p by
+    exact ⟨Sylow.ofCard P hcard, Sylow.coe_ofCard P hcard⟩
+  -- `v_p(|M_F|) = a`: `P = O_p(M_F)` is a `{p}`-Hall of `M_F` (`p ∤ [M_F : P]`).
+  have hP'hall : Ch03.IsHallSubgroup ({p} : Set ℕ) (Ch03.oPiCore ({p} : Set ℕ) ↥(MF M)) :=
+    OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent _
+  have hPcard : Nat.card ↥P = Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ) ↥(MF M)) :=
+    Subgroup.card_map_of_injective (MF M).subtype_injective
+  have hpidxP : ¬ p ∣ (Ch03.oPiCore ({p} : Set ℕ) ↥(MF M)).index := fun h =>
+    hP'hall.2 p (Nat.mem_primeFactors.mpr ⟨hp, h, Subgroup.index_ne_zero_of_finite⟩)
+      (Set.mem_singleton_iff.mpr rfl)
+  have hMFfact : (Nat.card ↥(MF M)).factorization p = a := by
+    rw [← Subgroup.card_mul_index (Ch03.oPiCore ({p} : Set ℕ) ↥(MF M)),
+      Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite, Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hpidxP, add_zero, ← hPcard, ha,
+      Nat.factorization_pow_self hp]
+  -- `v_p(|G|) = v_p(|M_σ|)`: `M_σ` is the `σ`-Hall of `G`, `p ∈ σ`, so `p ∤ [G : M_σ]`.
+  have hσHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+  have hpidxσ : ¬ p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index := fun h =>
+    hσHall.2 p (Nat.mem_primeFactors.mpr ⟨hp, h, Subgroup.index_ne_zero_of_finite⟩) hpσ
+  have hGa : (Nat.card G).factorization p = a := by
+    rw [← Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma M),
+      Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite, Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hpidxσ, add_zero, ← hmf, hMFfact]
+  rw [ha, hGa]
+
+/-- **BG Theorem 15.7(e), maximality of `B = X₁ × Ω₁(Z(P))`** (mmd L4266 *"`B ∈ ℰ²(P) ∩ ℰ*(P)`
+because `C_H(X₁)` has rank less than 3"*; Coq `BGsection15.v` `max_rB` / `p2maxElemB`).
+
+Note BG's `ℰ*(P)` means *maximal in `G`, contained in `P`* — the Coq statement is
+`B \in 'E_p^2(G) :&: 'E*_p(G)`, and `IsMaximalElementaryAbelian` here likewise quantifies over the
+ambient `G`.
+
+The rank bound `rank (M_F ⊓ C_G(X₁)) < 3` only constrains subgroups **inside** `P`, so an arbitrary
+elementary abelian `A ⊇ B` must first be pushed into `P` by conjugation:
+
+* `P = O_p(M_F)` is a Sylow `p`-subgroup of `G` (`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq
+  `sylP_G`), so Sylow conjugacy gives `a` with `A^a ≤ P`.
+* `a` need not normalize `X₁`.  It is corrected by **σ-Hall tameness** (BG Corollary 15.3(b),
+  `mf_hall_centralizer_control`): `x₁` and `x₁^a` both lie in the Hall subgroup `P` of `M_σ` and are
+  `G`-conjugate, so `x₁^a = x₁^n` for some `n ∈ N_G(P)`.  Then `c = n⁻¹a` centralizes `x₁` — hence
+  normalizes `X₁` — and still satisfies `A^c ≤ P`.
+* `A` is abelian and contains `X₁`, so `A ≤ C_G(X₁)`; as `c` normalizes `X₁`, also `A^c ≤ C_G(X₁)`.
+  Thus `A^c ≤ M_F ⊓ C_G(X₁)`, whose rank is `< 3`, giving `|A| = |A^c| ≤ p²`.
+
+Since `|B| = p²` and `B ≤ A`, this forces `A = B`. -/
+theorem isMaximalElementaryAbelian_sup_omega1Center_of_witness [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hmf : MF M = OddOrder.BG.Ch3.S10.Msigma M) {p : ℕ} {X₁ Z : Subgroup G} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ MF M)
+    (hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    (hZP : Z ≤ opiCoreInG ({p} : Set ℕ) (MF M))
+    (hBea : (X₁ ⊔ Z).IsElementaryAbelian p)
+    (hBcard : Nat.card ↥(X₁ ⊔ Z) = p ^ 2) :
+    IsMaximalElementaryAbelian p (X₁ ⊔ Z) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁P : X₁ ≤ P :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
+  have hPMF : P ≤ MF M := opiCoreInG_le _ _
+  refine ⟨hBea, fun A hAea hBA => ?_⟩
+  -- `A` is a `p`-group containing `X₁`, and abelian, so `A ≤ C_G(X₁)`.
+  have hApg : IsPGroup p ↥A := hAea.isPGroup
+  have hX₁A : X₁ ≤ A := le_sup_left.trans hBA
+  have hACX₁ : A ≤ Subgroup.centralizer (X₁ : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    simpa using congrArg Subtype.val (hAea.1 ⟨y, hX₁A hy⟩ ⟨x, hx⟩)
+  -- `P` is a Sylow `p`-subgroup of `G` (Coq `sylP_G`); push `A` into it.
+  obtain ⟨SP, hSP⟩ := exists_sylow_eq_opiCore_of_mf_eq_msigma hG hM hmf hp hpσ
+  obtain ⟨SA, hASA⟩ := hApg.exists_le_sylow
+  obtain ⟨a, ha⟩ := MulAction.exists_smul_eq G SA SP
+  have hAaP : MulAut.conj a • A ≤ P := by
+    have h1 : MulAut.conj a • A ≤ MulAut.conj a • (SA : Subgroup G) :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hASA
+    have h2 : MulAut.conj a • (SA : Subgroup G) = (SP : Subgroup G) := by
+      rw [← ha]; rfl
+    rw [hPdef]
+    rw [hSP] at h2
+    exact h1.trans (le_of_eq h2)
+  -- A generator `x₁` of the order-`p` group `X₁`.
+  have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
+  obtain ⟨x₁', hx₁ne'⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hX₁ne
+  set x₁ : G := (x₁' : G) with hx₁val
+  have hx₁X : x₁ ∈ X₁ := x₁'.2
+  have hx₁ne : x₁ ≠ 1 := fun h => hx₁ne' (Subtype.ext h)
+  have hX₁gen : Subgroup.zpowers x₁ = X₁ := by
+    refine Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hx₁X) ?_
+    have hdvd : Nat.card ↥(Subgroup.zpowers x₁) ∣ p :=
+      hX₁card ▸ Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hx₁X)
+    rcases (Nat.dvd_prime hp).mp hdvd with h1 | hpp
+    · exact absurd (Subgroup.mem_bot.mp ((Subgroup.eq_bot_of_card_eq _ h1) ▸
+        Subgroup.mem_zpowers x₁)) hx₁ne
+    · rw [hX₁card, hpp]
+  -- σ-Hall tameness (BG Cor 15.3(b)) at the Hall subgroup `P` of `M_σ`.
+  have hPMσ : P ≤ OddOrder.BG.Ch3.S10.Msigma M := hmf ▸ hPMF
+  have hPne : P ≠ ⊥ := fun h => hX₁ne (le_bot_iff.mp (h ▸ hX₁P))
+  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := hmf ▸ hMFnil
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (MF M)
+  have hPpiSet : S14.piSet P = ({p} : Set ℕ) := by
+    ext q
+    simp only [S14.piSet, Set.mem_setOf_eq, Set.mem_singleton_iff]
+    constructor
+    · intro hq
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hPpg
+      have hqd := (Nat.mem_primeFactors.mp hq).2.1
+      rw [hk] at hqd
+      exact (Nat.prime_dvd_prime_iff_eq (Nat.mem_primeFactors.mp hq).1 hp).mp
+        ((Nat.mem_primeFactors.mp hq).1.dvd_of_dvd_pow hqd)
+    · intro hqp
+      rw [hqp]
+      have h1 : 1 < Nat.card ↥P :=
+        Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot P).mpr hPne)
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hPpg
+      have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; omega
+      exact Nat.mem_primeFactors.mpr ⟨hp, hk ▸ dvd_pow_self p hk0, Nat.card_pos.ne'⟩
+  have hPsubOf : P.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)
+      = Ch03.oPiCore ({p} : Set ℕ) ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+    rw [hPdef, hmf, opiCoreInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective (OddOrder.BG.Ch3.S10.Msigma M).subtype_injective]
+  have hPhall : Ch03.IsHallSubgroup (S14.piSet P)
+      (P.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) := by
+    rw [hPpiSet, hPsubOf]
+    exact OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent _
+  have htame := (mf_hall_centralizer_control hG hM hPMσ hPhall hPne).2
+  have hx₁P : x₁ ∈ P := hX₁P hx₁X
+  have hax₁P : a * x₁ * a⁻¹ ∈ P := by
+    refine hAaP ?_
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    simpa [MulAut.smul_def, MulAut.conj_apply, mul_assoc] using hX₁A hx₁X
+  obtain ⟨n, hnN, hn⟩ := htame x₁ hx₁P (a * x₁ * a⁻¹) hax₁P ⟨a, rfl⟩
+  -- `c = n⁻¹a` fixes `x₁`, and still maps `A` into `P`.
+  set c : G := n⁻¹ * a with hcdef
+  have hcx₁ : c * x₁ * c⁻¹ = x₁ := by
+    have hstep : n⁻¹ * (a * x₁ * a⁻¹) * n = x₁ := by
+      rw [hn]; group
+    calc c * x₁ * c⁻¹ = n⁻¹ * (a * x₁ * a⁻¹) * n := by rw [hcdef]; group
+      _ = x₁ := hstep
+  have hAcP : MulAut.conj c • A ≤ P := by
+    have hnP : MulAut.conj n⁻¹ • P = P :=
+      conj_smul_eq_self_of_mem_normalizer (inv_mem hnN)
+    calc MulAut.conj c • A = MulAut.conj n⁻¹ • (MulAut.conj a • A) := by
+          rw [hcdef, ← mul_smul, ← map_mul]
+      _ ≤ MulAut.conj n⁻¹ • P := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hAaP
+      _ = P := hnP
+  -- `A ≤ C_G(X₁)` and `c` fixes `x₁`, so `A^c ≤ C_G(X₁)` too.
+  have hAcCX₁ : MulAut.conj c • A ≤ Subgroup.centralizer (X₁ : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hy
+    set z : G := c⁻¹ * y * c with hzdef
+    have hzA : z ∈ A := by
+      simpa [MulAut.smul_def, MulAut.conj_apply, hzdef, mul_assoc] using hy
+    have hyz : y = c * z * c⁻¹ := by rw [hzdef]; group
+    have hzx₁ : z * x₁ = x₁ * z :=
+      (Subgroup.mem_centralizer_iff.mp (hACX₁ hzA) x₁ hx₁X).symm
+    have hcomm : Commute y x₁ := by
+      show y * x₁ = x₁ * y
+      calc y * x₁ = c * z * c⁻¹ * (c * x₁ * c⁻¹) := by rw [← hyz, hcx₁]
+        _ = c * (z * x₁) * c⁻¹ := by group
+        _ = c * (x₁ * z) * c⁻¹ := by rw [hzx₁]
+        _ = (c * x₁ * c⁻¹) * (c * z * c⁻¹) := by group
+        _ = x₁ * y := by rw [hcx₁, ← hyz]
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    rw [← hX₁gen, SetLike.mem_coe, Subgroup.mem_zpowers_iff] at hw
+    obtain ⟨k, rfl⟩ := hw
+    exact ((hcomm.zpow_right k).symm : _)
+  -- `A^c ≤ M_F ⊓ C_G(X₁)`, whose `p`-rank is `< 3`; hence `|A| ≤ p²`.
+  set C1 : Subgroup G := MF M ⊓ Subgroup.centralizer (X₁ : Set G) with hC1def
+  have hAcC1 : MulAut.conj c • A ≤ C1 := le_inf (hAcP.trans hPMF) hAcCX₁
+  have hAcea : (MulAut.conj c • A).IsElementaryAbelian p :=
+    OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+      (Subgroup.equivSMul (MulAut.conj c) A) hAea
+  have hAccard : Nat.card ↥(MulAut.conj c • A) = Nat.card ↥A :=
+    (Nat.card_congr (Subgroup.equivSMul (MulAut.conj c) A).toEquiv).symm
+  have hlog : Nat.log p (Nat.card ↥A) ≤ 2 := by
+    have hA'ea : ((MulAut.conj c • A).subgroupOf C1).IsElementaryAbelian p :=
+      OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe hAcC1).symm hAcea
+    have hA'card : Nat.card ↥((MulAut.conj c • A).subgroupOf C1)
+        = Nat.card ↥(MulAut.conj c • A) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAcC1).toEquiv
+    have h1 : Nat.log p (Nat.card ↥A) ≤ pRank ↥C1 p := by
+      rw [← hAccard, ← hA'card]; exact le_pRank _ hA'ea
+    have h2 : pRank ↥C1 p ≤ rank ↥C1 := pRank_le_rank p
+    have h3 : rank ↥C1 < 3 := hrank3
+    omega
+  have hAcardle : Nat.card ↥A ≤ p ^ 2 := by
+    have hApow : Nat.card ↥A = p ^ (Nat.log p (Nat.card ↥A)) := by
+      rw [hAea.log_card_eq_finrank]; exact hAea.card_eq_pow_finrank
+    calc Nat.card ↥A = p ^ (Nat.log p (Nat.card ↥A)) := hApow
+      _ ≤ p ^ 2 := Nat.pow_le_pow_right hp.one_lt.le hlog
+  exact (Subgroup.eq_of_le_of_card_ge hBA (by rw [hBcard]; exact hAcardle)).symm
 
 end OddOrder.BG.Ch4.S15
