@@ -861,6 +861,16 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 > 以下の 2026-07-16 survey 本文の「zero genuine formalization」「Lemma 1(b) と
 > Definitions 2--3 は未記述」という記述は、この3項目について stale。
 
+> **✅ 2026-07-19 更新 (lane b) — Higman 1963 Lemma 1**:
+> `Suzuki2Groups/AgemoLayers.lean` と `HigmanAbelian.lean` で、involution 上
+> transitive な作用を持つ有限可換 `2`-group が homocyclic であり、その
+> invariant subgroups がちょうど Agemo filtration `A^(2^s)` であることを
+> sorry-free に証明した。保存済み Higman PDF の p.83 と `pdftotext -layout`
+> 抽出を正本として、原文の involution-height、successive quotient
+> irreducibility、power-map lifting をすべて実装した。これは Appendix III の
+> unnumbered Higman classification 全体を閉じるものではないため、下表の
+> `Thm (Higman)` は引き続き「未」。
+
 > This appendix (Peterfalvi appendix on Suzuki 2-groups, pp. 139-143; repo file OddOrder/Peterfalvi/Appendices/Suzuki2Groups.lean labels it "Appendix D") has essentially zero genuine formalization: the Lean file is an opaque-Prop scaffold in which every theorem statement is vacuous (existentials over structures whose fields are arbitrary Props), so all 4 sorries (square_map_quadratic = Lemma 1(a), higman_classification = the Theorem, typeB_field_model = Prop 1, typeB_automorphism_structure = Prop 2) mask statements with no mathematical content, and Lemma 1(b)-(d), Lemma 2, and Definitions 2-3 are not even stated. There is no Coq analog to lean on — math-comp/odd-order never formalized Peterfalvi Part II or its appendices — and the only importer (FeitSibley.lean) uses none of these declarations, so the whole unit is greenfield. The one structurally notable item is the unnumbered "Theorem" (Higman's classification of Suzuki 2-groups): the book itself takes it as given, citing Higman 1963 / Huppert-Blackburn VIII 7.9, so an honest formalization must either import ~20+ pages of hard 2-group analysis (XL) or keep it as an explicit stated hypothesis. Mathlib supplies useful ingredients: QuadraticMap covers the preamble's char-2 quadratic-map definition, linearIndependent_monoidHom gives the Dedekind-independence core of Lemma 2, and GroupExtension/GaloisField give central-extension and finite-field infrastructure, but none of the numbered results themselves. Verification pass: all flagged labels (7 missing, 1 partial) were confirmed against the source mmd, the full Lean file, and repo-wide descriptive-name greps (Higman/Suzuki-2-group, quadratic map/cocycle/central extension, automorphism bases, semilinear) — no hidden coverage was found in OddOrder/GroupTheory, OddOrder/Algebra, or other book trees, the zero-consumer claim was re-verified repo-wide, and no statuses changed.
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
