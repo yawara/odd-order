@@ -221,8 +221,10 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
 import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 /-!
@@ -261,7 +263,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 10000
+set_option linter.style.longFile 10200
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -7874,6 +7876,15 @@ built into the subgroup inclusion in `MulAut`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
 
+/-! **Peterfalvi Appendix III, Lemma 1(b)**: every quadratic map over `F₂`
+has an explicit central extension whose squaring map is the original map. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.range_inl_le_center
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.sq_eq_inl_q
+
 /-! **Peterfalvi Part II, Ch. I §2, Corollary**: nilpotence makes a Sylow
 `2`-subgroup `S ≤ Q` characteristic.  The cyclic subgroup `K` acts on `S`,
 and §1 Proposition 3 gives a regular action on its nonidentity involutions;
@@ -8316,6 +8327,12 @@ used by induction to identify `⟨Q₀, K, t⟩` with `PSL(2,q)`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_orderThreeGeneratedSubgroup_mulEquiv_psl2
+
+/-! **Peterfalvi Part II, Ch. I §3 Lemma 5** (first reduction): for every
+`1 ≠ w ∈ W`, Proposition 1(c) and faithfulness give `C_Q(w) = Q₀`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_inf_centralizer_singleton_eq_Q0_of_orderThree
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof
