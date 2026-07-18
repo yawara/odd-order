@@ -1211,6 +1211,10 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- Z(P) は 𝒦(P) に自明に作用する (Step 4 で作用の核の非自明性を出す部分)。
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet
+-- 𝒦(G) への作用の核 (各点固定部分群) と Step 4 第 1 分岐への接続。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.pointwiseStabilizer_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isSubnormal_strongClosure_of_kappaSetKernel_ne_bot
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.

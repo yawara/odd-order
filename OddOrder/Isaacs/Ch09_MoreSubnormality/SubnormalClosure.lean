@@ -866,4 +866,66 @@ theorem conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet {X P : Subgroup 
 
 end
 
+section /- 9D: Bartels Step 4 — 作用の核 (各点固定部分群) -/
+
+/-- 共役作用は `⊤` を固定する。 -/
+@[simp] theorem conjAct_smul_top (c : ConjAct G) : c • (⊤ : Subgroup G) = ⊤ := by
+  rw [Subgroup.pointwise_smul_def]
+  exact Subgroup.map_top_of_surjective _ (MulDistribMulAction.toMulEquiv G c).surjective
+
+/-- 部分群の集合 `S` を**各点固定**する元のなす部分群 (= `S` への共役作用の核)。 -/
+def pointwiseStabilizer (S : Set (Subgroup G)) : Subgroup G where
+  carrier := {g : G | ∀ W ∈ S, ConjAct.toConjAct g • W = W}
+  one_mem' := by intro W _; simp
+  mul_mem' := by
+    intro a b ha hb W hW
+    rw [map_mul, mul_smul, hb W hW, ha W hW]
+  inv_mem' := by
+    intro a ha W hW
+    rw [map_inv, inv_smul_eq_iff, ha W hW]
+
+theorem mem_pointwiseStabilizer_iff {S : Set (Subgroup G)} {g : G} :
+    g ∈ pointwiseStabilizer S ↔ ∀ W ∈ S, ConjAct.toConjAct g • W = W := Iff.rfl
+
+/-- 各点固定元は各 `W ∈ S` を正規化する。 -/
+theorem mem_normalizer_of_mem_pointwiseStabilizer {S : Set (Subgroup G)} {g : G}
+    (hg : g ∈ pointwiseStabilizer S) {W : Subgroup G} (hW : W ∈ S) :
+    g ∈ Subgroup.normalizer W :=
+  Subgroup.conjAct_pointwise_smul_iff.mp (hg W hW)
+
+/-- `S` が共役で閉じていれば各点固定部分群は正規。 -/
+theorem pointwiseStabilizer_normal {S : Set (Subgroup G)}
+    (hS : ∀ (c : ConjAct G) (W : Subgroup G), W ∈ S → c • W ∈ S) :
+    (pointwiseStabilizer S).Normal := by
+  constructor
+  intro g hg h W hW
+  have hW' : (ConjAct.toConjAct h)⁻¹ • W ∈ S := hS _ W hW
+  have hfix := hg _ hW'
+  have : ConjAct.toConjAct (h * g * h⁻¹) • W
+      = ConjAct.toConjAct h • (ConjAct.toConjAct g • ((ConjAct.toConjAct h)⁻¹ • W)) := by
+    rw [map_mul, map_mul, map_inv, mul_smul, mul_smul]
+  rw [this, hfix, smul_inv_smul]
+
+/-- `𝒦(G)` は共役で閉じている。 -/
+theorem kappaSet_top_conjAct_smul_mem (X : Subgroup G) (c : ConjAct G) (W : Subgroup G)
+    (hW : W ∈ kappaSet X ⊤) : c • W ∈ kappaSet X ⊤ := by
+  have := mem_kappaSet_conjAct_smul (c := c) hW
+  rwa [conjAct_smul_top] at this
+
+/-- したがって `𝒦(G)` への作用の核は正規部分群。 -/
+instance kappaSetKernel_normal (X : Subgroup G) :
+    (pointwiseStabilizer (kappaSet X ⊤)).Normal :=
+  pointwiseStabilizer_normal (kappaSet_top_conjAct_smul_mem X)
+
+/-- **Step 4 第 1 分岐への接続**: `𝒦(G)` への作用の核が非自明なら `X^{(G)} ◁◁ G`
+(= 最小反例の仮定に矛盾)。 -/
+theorem isSubnormal_strongClosure_of_kappaSetKernel_ne_bot {G : Type u} [Group G] [Finite G]
+    (hIH : BartelsIH G) {X : Subgroup G}
+    (hK : pointwiseStabilizer (kappaSet X ⊤) ≠ ⊥) :
+    (strongClosure X).IsSubnormal :=
+  isSubnormal_strongClosure_of_normalizing_kernel hIH hK fun _ hg =>
+    mem_normalizer_of_mem_pointwiseStabilizer hg (mem_kappaSet_self X le_top)
+
+end
+
 end OddOrder.Isaacs.Ch09
