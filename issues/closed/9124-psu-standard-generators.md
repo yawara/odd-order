@@ -19,15 +19,15 @@ and the eventual simplicity proof.
 
 ## やること
 
-- [ ] Complete the quadratic-field norm-image API needed by unitary torus
+- [x] Complete the quadratic-field norm-image API needed by unitary torus
   parameters, without introducing a redundant fixed-subfield carrier.
-- [ ] Construct the faithful root-group permutations of the unital and prove
+- [x] Construct the faithful root-group permutations of the unital and prove
   regularity on the affine points.
-- [ ] Construct the unitary torus weight and its root-group automorphisms, then
+- [x] Construct the unitary torus weight and its root-group automorphisms, then
   realize them as permutations fixing infinity and the affine origin.
-- [ ] Construct the Weyl involution swapping infinity and the origin, with the
+- [x] Construct the Weyl involution swapping infinity and the origin, with the
   explicit nonzero-coordinate formula `(a,b) ↦ (a/b, 1/b)`.
-- [ ] Prove the generator action and conjugation formulas required by the next
+- [x] Prove the generator action and conjugation formulas required by the next
   Borel and Bruhat leaves; wire the leaf into the project and axiom audit.
 
 ## 完了条件

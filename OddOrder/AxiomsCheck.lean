@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
@@ -314,6 +315,28 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.infinity_ne_affine
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.natCard
+
+-- Standard root, determinant-one torus, and Weyl generators for PSU(3,q).
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.rootPermHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.existsUnique_rootPerm_affine
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.specialTorusWeightHom_eq_powMonoidHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.torusScaleHom_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.torusPerm_mul_rootPerm_mul_inv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_psuTorus_standard
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.reciprocal_reciprocal
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.weylPerm_apply_self
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.psuTorusPerm_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.weylPerm_mul_psuTorusPerm_mul_weylPerm
 
 -- Shared defining field and Tits twist for the Suzuki target in Peterfalvi Part II.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_field
