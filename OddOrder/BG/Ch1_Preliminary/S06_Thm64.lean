@@ -17,8 +17,25 @@ Chapter I §6 (p. 50), mmd `references/bg/local-analysis.mmd` L2011–L2038.
 > and `J₂` of `G`. Then there exists an element `x ∈ ⟨J₁, J₂⟩` such that `⟨J₁ˣ, J₂⟩` is a
 > `π`-group and `x` centralizes `H`.
 
-**状態**: 本ファイルは Theorem 6.4 本体の**上流部品**を提供する (本体は未形式化)。
-BG の証明 (`|G| + |H|` の帰納法) は二つの場合に分かれ, どちらも下の部品を骨格に使う。
+**状態**: 本ファイルは Theorem 6.4 の**主張** (`Thm64Statement`)・**帰納骨格**
+(`thm64_of_ih`)・**上流部品**を提供する。**帰納法の二つの場合 (下記) は未証明**なので
+Theorem 6.4 本体はまだ得られていない。
+
+## 帰納骨格 (`|G| + |H|` の強帰納法)
+
+* `Thm64Statement` — 定理の主張そのもの (仮説を含意の連鎖で並べた形)。
+* `Thm64IH` — 帰納法の仮定。`OddOrder.Isaacs.Ch09.BartelsIH` と同じく**明示パラメータ**
+  にしてあるので, 場合 1 / 場合 2 をそれぞれ単独の定理として書ける。
+* `card_add_card_strongInduction` — 測度 `Nat.card G + Nat.card H` に関する強帰納原理。
+  群の**型そのもの**を量化してあるので, 部分群 `↥S`・商 `G ⧸ N`・元の `G` という
+  型の違う 3 通りの降下を一つの帰納法で扱える (三者とも `G` と同じ universe に留まる)。
+* `card_lt_card_of_lt` / `card_quotient_add_card_map_mk'_lt` /
+  `card_subgroup_add_card_subgroupOf_lt` — その 3 通りの降下で測度が減ることの証明。
+* `thm64_of_ih` — 「`Thm64IH` のもとで主張が言えれば全体が言える」。
+  **残る数学的内容はすべてこの `step` の側** = BG の場合 1 (`π(F(G)) ⊄ π(H)`) と
+  場合 2 (`π(F(G)) ⊆ π(H)`)。
+
+## 上流部品
 
 * `exists_centralizing_conj_sup_isPiGroup` — **Prop 1.5(b)+(c) の subgroup 合成形**。
   BG が Theorem 6.4 の場合 1 の最終段で「By Proposition 1.5, there exists `w ∈ C_{L*}(H)`
@@ -36,9 +53,18 @@ BG の証明 (`|G| + |H|` の帰納法) は二つの場合に分かれ, どち�
   (場合 1 のエンジン `exists_centralizing_conj_sup_isPiGroup` が使う) が可解性を要求するので
   必要になる。
 
+* `inf_eq_bot_of_isPiSubgroup_compl` — `π'`-部分群と `π`-部分群は交わらない。場合 1 の
+  「`H` is a Hall `p'`-subgroup of `HN`」⟹ `H ∩ N = 1` の段で,
+  `mem_centralizer_of_mem_normalizer_of_commutator_le` の仮説を供給する。
+
+* `le_of_isPiSubgroup_of_quotient_isPiGroup` — **(6.2)**「`L` contains every `π`-subgroup
+  of `G`」。`G/L` が `π'`-群であることから従う。
+
 正規 Hall 部分群の仮説を部分群 `L ⊔ H` と商 `G ⧸ N` へ移す部分は
 `OddOrder.GroupTheory.NormalHallHeredity`, Fitting 商の仮説を移す部分は
 `OddOrder.GroupTheory.FittingHeredity` にある (どちらも汎用補題なので `GroupTheory/` 側)。
+後者の `isNilpotent_quotient_fitting_quotient_subgroupOf` が使う単射性
+`QuotientGroup.map_subgroupOf_subtype_injective` は `OddOrder.Mathlib.QuotientGroup`。
 
 ## ⚠ 原文の誤植 (p. 50)
 
@@ -110,6 +136,63 @@ theorem isPiSubgroup_map_subtype {π : Set ℕ} {N : Subgroup G} {P : Subgroup �
     (hP : Ch03.Subgroup.IsPiGroup π P) : Subgroup.IsPiSubgroup π (P.map N.subtype) := by
   intro p hp
   exact hP p (by rwa [Subgroup.card_map_of_injective N.subtype_injective] at hp)
+
+/-- The image of a `π`-subgroup under any homomorphism is a `π`-subgroup (its order
+divides). -/
+theorem isPiSubgroup_map [Finite G] {π : Set ℕ} {H : Type*} [Group H] {P : Subgroup G}
+    (f : G →* H) (hP : Subgroup.IsPiSubgroup π P) : Subgroup.IsPiSubgroup π (P.map f) := by
+  intro p hp
+  obtain ⟨hprime, hdvd, -⟩ := Nat.mem_primeFactors.mp hp
+  exact hP p (Nat.mem_primeFactors.mpr
+    ⟨hprime, hdvd.trans (Subgroup.card_map_dvd P f), Nat.card_pos.ne'⟩)
+
+/-- Every subgroup of a `π`-group is a `π`-subgroup. -/
+theorem isPiSubgroup_of_isPiGroup [Finite G] {π : Set ℕ} (P : Subgroup G)
+    (h : Ch03.IsPiGroup π G) : Subgroup.IsPiSubgroup π P := by
+  intro p hp
+  obtain ⟨hprime, hdvd, -⟩ := Nat.mem_primeFactors.mp hp
+  exact h p (Nat.mem_primeFactors.mpr
+    ⟨hprime, hdvd.trans (Subgroup.card_subgroup_dvd_card P), Nat.card_pos.ne'⟩)
+
+/-! ## `π`-群 と `π'`-群 の交わりは自明 -/
+
+/-- `π`-部分群でも `π'`-部分群でもある部分群は自明。位数が `1` でなければ素因子 `p` を持ち,
+`p ∈ π` と `p ∉ π` が同時に成り立って矛盾する。 -/
+theorem eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl [Finite G] {π : Set ℕ} {P : Subgroup G}
+    (hπ : Subgroup.IsPiSubgroup π P) (hπ' : Subgroup.IsPiSubgroup πᶜ P) : P = ⊥ := by
+  by_contra hne
+  have hcard : Nat.card ↥P ≠ 1 := fun h => hne (Subgroup.eq_bot_of_card_eq P h)
+  obtain ⟨p, hp, hdvd⟩ := Nat.exists_prime_and_dvd hcard
+  have hmem : p ∈ (Nat.card ↥P).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hp, hdvd, Nat.card_pos.ne'⟩
+  exact (hπ' p hmem) (hπ p hmem)
+
+/-- **`π'`-部分群と `π`-部分群は交わらない**: `H` が `π'`-部分群, `N` が `π`-部分群なら
+`H ⊓ N = ⊥`。
+
+BG Theorem 6.4 の場合 1 で「`H` is a Hall `p'`-subgroup of `HN`」から
+`H ∩ N = 1` を得る段がまさにこれ (`N ≤ O_p(F(G))` は `p`-群, `p ∉ π(H)`)。
+`mem_centralizer_of_mem_normalizer_of_commutator_le` の仮説 `hdisj` を供給する。 -/
+theorem inf_eq_bot_of_isPiSubgroup_compl [Finite G] {π : Set ℕ} {H N : Subgroup G}
+    (hH : Subgroup.IsPiSubgroup πᶜ H) (hN : Subgroup.IsPiSubgroup π N) : H ⊓ N = ⊥ :=
+  eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl (isPiSubgroup_of_le inf_le_right hN)
+    (isPiSubgroup_of_le inf_le_left hH)
+
+/-- **BG Theorem 6.4 (6.2)** (p. 50): `N ⊴ G` の商 `G/N` が `π'`-群なら, `G` の任意の
+`π`-部分群 `P` は `N` に含まれる。
+
+原文は `G = LH` かつ `G/L ≅ H/(H ∩ L)` が `π'`-群であることから
+「`L` contains every `π`-subgroup of `G`」を結論する箇所。
+
+証明: 像 `PN/N` は `π`-群 (`|P|` を割る) かつ `π'`-群 (`|G/N|` を割る) なので自明,
+すなわち `P ≤ ker (G → G/N) = N`。 -/
+theorem le_of_isPiSubgroup_of_quotient_isPiGroup [Finite G] {π : Set ℕ} {N : Subgroup G}
+    [N.Normal] (hQ : Ch03.IsPiGroup πᶜ (G ⧸ N)) {P : Subgroup G}
+    (hP : Subgroup.IsPiSubgroup π P) : P ≤ N := by
+  have himg : P.map (QuotientGroup.mk' N) = ⊥ :=
+    eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl (isPiSubgroup_map _ hP)
+      (isPiSubgroup_of_isPiGroup _ hQ)
+  rwa [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at himg
 
 /-! ## BG Proposition 1.5(b)+(c), subgroup 合成形 -/
 
@@ -256,6 +339,139 @@ theorem isSolvable_of_isNilpotent_quotient_fitting_of_normal {X : Type*} [Group 
   haveI : IsSolvable (X ⧸ N) := isSolvable_of_isNilpotent_quotient_fitting hQ
   refine solvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) ?_
   rw [QuotientGroup.ker_mk', Subgroup.range_subtype]
+
+/-! ## 帰納法の測度 `|G| + |H|` とその減少 -/
+
+/-- 有限群の真部分群のあいだでも位数は真に減る: `K < H` なら `|K| < |H|`。
+
+`K.subgroupOf H ≠ ⊤` を経由して `Ch04.subgroup_card_lt_of_ne_top` を `↥H` の中で使い,
+`Subgroup.subgroupOfEquivOfLe` で `|K.subgroupOf H| = |K|` に戻す。 -/
+theorem card_lt_card_of_lt [Finite G] {K H : Subgroup G} (hlt : K < H) :
+    Nat.card ↥K < Nat.card ↥H := by
+  have hne : K.subgroupOf H ≠ ⊤ := fun htop =>
+    hlt.ne (le_antisymm hlt.le (Subgroup.subgroupOf_eq_top.mp htop))
+  have hcard : Nat.card ↥(K.subgroupOf H) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hlt.le).toEquiv
+  have := Ch04.subgroup_card_lt_of_ne_top (G := ↥H) hne
+  omega
+
+/-- **場合 1 の測度減少**: `1 ≠ N ⊴ G` について, 商へ降りた対 `(G ⧸ N, HN/N)` の測度
+`|G/N| + |HN/N|` は `|G| + |H|` より真に小さい。
+
+`|G/N| < |G|` は `N ≠ 1` から, `|HN/N| ≤ |H|` は像の位数が整除することから。 -/
+theorem card_quotient_add_card_map_mk'_lt [Finite G] {N : Subgroup G} [N.Normal] (hN : N ≠ ⊥)
+    (H : Subgroup G) :
+    Nat.card (G ⧸ N) + Nat.card ↥(H.map (QuotientGroup.mk' N)) < Nat.card G + Nat.card ↥H := by
+  have h1 : Nat.card (G ⧸ N) < Nat.card G := Subgroup.card_quotient_lt_of_ne_bot hN
+  have h2 : Nat.card ↥(H.map (QuotientGroup.mk' N)) ≤ Nat.card ↥H :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.card_map_dvd H _)
+  omega
+
+/-- **reduction step (`G = LH` としてよい) の測度減少**: 真部分群 `S < G` について,
+部分群へ降りた対 `(↥S, H ⊓ S)` の測度 `|S| + |H ⊓ S|` は `|G| + |H|` より真に小さい。
+
+`|S| < |G|` は `S ≠ ⊤` から, `|H.subgroupOf S| ≤ |H|` は `H.subgroupOf S = H.comap S.subtype`
+が `S.subtype` 単射ゆえ `H` に埋め込まれることから (`Subgroup.card_comap_dvd_of_injective`)。 -/
+theorem card_subgroup_add_card_subgroupOf_lt [Finite G] {S : Subgroup G} (hS : S ≠ ⊤)
+    (H : Subgroup G) :
+    Nat.card ↥S + Nat.card ↥(H.subgroupOf S) < Nat.card G + Nat.card ↥H := by
+  have h1 : Nat.card ↥S < Nat.card G := Ch04.subgroup_card_lt_of_ne_top hS
+  have h2 : Nat.card ↥(H.subgroupOf S) ≤ Nat.card ↥H :=
+    Nat.le_of_dvd Nat.card_pos
+      (Subgroup.card_comap_dvd_of_injective H S.subtype S.subtype_injective)
+  omega
+
+/-! ## `|G| + |H|` に関する強帰納法 -/
+
+universe u
+
+/-- **測度 `|G| + |H|` に関する強帰納法**: 群の型 `G` と部分群 `H` の対を
+`Nat.card G + Nat.card H` で整列させた強帰納原理。
+
+BG Theorem 6.4 の帰納法は次の 3 通りの降下を行うが, いずれも **`G` と同じ universe に
+留まる** (`↥S : Type u`, `G ⧸ N : Type u`) ので, ℕ 上の強帰納法に落とせる:
+
+* 部分群への降下 `↥(L ⊔ H)` (「`G = LH` としてよい」の reduction) —
+  `card_subgroup_add_card_subgroupOf_lt`,
+* 商への降下 `G ⧸ N` (`N` は `O_p(F(G))` 内の極小正規部分群; 場合 1) —
+  `card_quotient_add_card_map_mk'_lt`,
+* `G` はそのままで `H` を真部分群 `H*` に取り替える降下 (場合 2) — `card_lt_card_of_lt`。
+
+三者は型が違う (`↥S` / `G ⧸ N` / `G`) ため, **群の型そのものを量化した** 形でしか
+帰納法は回らない。`motive` を `∀ (G : Type u) [Group G] [Finite G], Subgroup G → Prop`
+と取るのがその形。 -/
+theorem card_add_card_strongInduction
+    {motive : ∀ (X : Type u) [Group X] [Finite X], Subgroup X → Prop}
+    (step : ∀ (X : Type u) [Group X] [Finite X] (H : Subgroup X),
+      (∀ (Y : Type u) [Group Y] [Finite Y] (H' : Subgroup Y),
+          Nat.card Y + Nat.card ↥H' < Nat.card X + Nat.card ↥H → motive Y H') →
+        motive X H)
+    (X : Type u) [Group X] [Finite X] (H : Subgroup X) : motive X H := by
+  suffices h : ∀ n : ℕ, ∀ (Y : Type u) [Group Y] [Finite Y] (H' : Subgroup Y),
+      Nat.card Y + Nat.card ↥H' = n → motive Y H' from h _ X H rfl
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro Y _ _ H' hcard
+    exact step Y H' fun Z _ _ H'' hlt => ih _ (hcard ▸ hlt) Z H'' rfl
+
+/-! ## Theorem 6.4 の statement と帰納骨格 -/
+
+/-- **BG Theorem 6.4 の主張** (p. 50), 与えられたデータ `(G, π, H, G₀, J₁, J₂)` に対する形。
+
+> `H` が `π'`-部分群, `G₀` が正規 Hall 部分群で `G₀/F(G₀)` と `(G/G₀)/F(G/G₀)` が冪零,
+> `H` が `π`-部分群 `J₁, J₂` を正規化するとき, ある `x ∈ ⟨J₁, J₂⟩` が存在して
+> `⟨J₁ˣ, J₂⟩` は `π`-群で `x` は `H` を中心化する。
+
+* 「`G₀` が Hall 部分群」は `π` に依らない綴り `Nat.Coprime |G₀| [G:G₀]` で書く
+  (`OddOrder.GroupTheory.NormalHallHeredity` と同じ convention)。
+* 共役は本ファイルの他の補題と同じく左作用 `MulAut.conj x • J₁ = x J₁ x⁻¹` を使う。
+  BG の `J₁ˣ = x⁻¹ J₁ x` とは `x ↦ x⁻¹` の違いだけで, `x ∈ ⟨J₁,J₂⟩` も
+  `x ∈ C_G(H)` も逆元で閉じているので主張は同値。 -/
+def Thm64Statement {X : Type*} [Group X] [Finite X] (π : Set ℕ) (H G₀ J₁ J₂ : Subgroup X)
+    [G₀.Normal] : Prop :=
+  Subgroup.IsPiSubgroup πᶜ H →
+  Nat.Coprime (Nat.card ↥G₀) G₀.index →
+  Group.IsNilpotent (↥G₀ ⧸ Ch01.fitting ↥G₀) →
+  Group.IsNilpotent ((X ⧸ G₀) ⧸ Ch01.fitting (X ⧸ G₀)) →
+  Subgroup.IsPiSubgroup π J₁ →
+  Subgroup.IsPiSubgroup π J₂ →
+  H ≤ Subgroup.normalizer (J₁ : Set X) →
+  H ≤ Subgroup.normalizer (J₂ : Set X) →
+  ∃ x ∈ J₁ ⊔ J₂, Subgroup.IsPiSubgroup π ((MulAut.conj x • J₁) ⊔ J₂) ∧
+    x ∈ Subgroup.centralizer (H : Set X)
+
+/-- **BG Theorem 6.4 の帰納法の仮定**: 測度 `|G'| + |H'|` が `|G| + |H|` より真に小さい
+すべての対で Theorem 6.4 が成り立つ, という主張。
+
+`OddOrder.Isaacs.Ch09.BartelsIH` と同じ設計で, 帰納法の仮定を**明示パラメータ**にして
+おくことで, 証明の各場合 (BG の場合 1 / 場合 2) をそれぞれ**単独で sorry-free な定理**
+として書けるようにする。帰納法自体は `thm64_of_ih` が閉じる。 -/
+def Thm64IH (X : Type u) [Group X] [Finite X] (H : Subgroup X) : Prop :=
+  ∀ (Y : Type u) [Group Y] [Finite Y] (H' : Subgroup Y),
+    Nat.card Y + Nat.card ↥H' < Nat.card X + Nat.card ↥H →
+    ∀ (π : Set ℕ) (G₀ : Subgroup Y) [G₀.Normal] (J₁ J₂ : Subgroup Y),
+      Thm64Statement π H' G₀ J₁ J₂
+
+/-- **Theorem 6.4 の帰納骨格**: 「帰納法の仮定 `Thm64IH G H` のもとで `(G, H)` について
+主張が成り立つ」を示せば, すべての `(G, H)` について主張が従う。
+
+`card_add_card_strongInduction` を motive
+`fun G _ _ H => ∀ π G₀ J₁ J₂, Thm64Statement π H G₀ J₁ J₂` に適用しただけ。
+**数学的内容はすべて `step` の側にある** — 現状 `step` は未証明で, BG の
+場合 1 (`π(F(G)) ⊄ π(H)`) と場合 2 (`π(F(G)) ⊆ π(H)`) がそれぞれ残っている。 -/
+theorem thm64_of_ih
+    (step : ∀ (X : Type u) [Group X] [Finite X] (H : Subgroup X), Thm64IH X H →
+      ∀ (π : Set ℕ) (G₀ : Subgroup X) [G₀.Normal] (J₁ J₂ : Subgroup X),
+        Thm64Statement π H G₀ J₁ J₂)
+    (X : Type u) [Group X] [Finite X] (π : Set ℕ) (H G₀ : Subgroup X) [G₀.Normal]
+    (J₁ J₂ : Subgroup X) : Thm64Statement π H G₀ J₁ J₂ := by
+  revert π G₀ J₁ J₂
+  refine card_add_card_strongInduction
+    (motive := fun Y _ _ H' => ∀ (π : Set ℕ) (G₀ : Subgroup Y) [G₀.Normal] (J₁ J₂ : Subgroup Y),
+      Thm64Statement π H' G₀ J₁ J₂) ?_ X H
+  intro Y _ _ H' hIH
+  exact step Y H' (fun Z _ _ H'' hlt => hIH Z H'' hlt)
 
 end OddOrder.BG.Ch1.S06
 

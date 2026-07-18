@@ -172,3 +172,90 @@ axiom-clean) で片付き、消費側は cite するだけになった。⟹ 上
 `normal_coprime_card_index_subgroupOf` と**同じ内容を ~15 行インラインで再導出**している
 (`relIndex` の手計算 + `inf_subgroupOf_left`/`subgroupOfEquivOfLe`)。de-dup 候補。
 新設した汎用補題に価値があったことの傍証でもある。
+
+---
+
+## 進捗 (2026-07-19 第3波): 単射性 + 帰納骨格 + (6.2) — 残り Case 1/Case 2 のみ
+
+### landed (すべて sorry-free・axiom-clean `[propext, Classical.choice, Quot.sound]`)
+
+**1. `OddOrder/Mathlib/QuotientGroup.lean` (新規 117 行) — 前波の ⚠ 残作業を解消**
+
+mathlib の `QuotientGroup.quotientMapSubgroupOfOfLe` に核・単射性の補題が無い件を埋めた。
+
+- `QuotientGroup.ker_quotientMapSubgroupOfOfLe` (:54) — 核 =
+  `(B'.subgroupOf A).map (mk' (A'.subgroupOf A))`。`QuotientGroup.ker_map` + comap の同定。
+- `QuotientGroup.quotientMapSubgroupOfOfLe_injective_iff` (:77) — **単射 ⟺ `A ⊓ B' ≤ A'`**。
+  `h' : A' ≤ B'` 込みで読むと「`A` の中では `A'` が既に `B'` の全 trace」の意 (`A ⊓ A' = A ⊓ B'`)。
+  `A' = B'` なら常に成立。
+- `QuotientGroup.quotientMapSubgroupOfOfLe_injective` (:96) — mpr 方向の便利形。
+- `QuotientGroup.map_subgroupOf_subtype_injective` (:109) — 消費側の具体形:
+  `↥S ⧸ N.subgroupOf S →* G ⧸ N` (= `QuotientGroup.map (N.subgroupOf S) N S.subtype le_rfl`)
+  は単射。**第二同型定理を埋め込みとして読んだもの** (`S/(S ⊓ N) ↪ G/N`)。
+  mathlib の `quotientInfEquivProdNormalQuotient` は `SN/N` への同型止まりで埋め込みは無い。
+
+⚠ **一般形は具体形を包含しない**: `quotientMapSubgroupOfOfLe` の値域は部分群型の商
+`↥B ⧸ …` なので `B := ⊤` としても `↥(⊤ : Subgroup G) ≃* G` の transport が残る。
+よって具体形は `QuotientGroup.map` から直接証明した (核が**定義的に** `N.subgroupOf S`)。
+4 定理とも `@[to_additive]` 付きで加法版も生成済 (`QuotientAddGroup.*`)。
+
+**2. `OddOrder/GroupTheory/FittingHeredity.lean:179` — 消費側 corollary**
+
+- `isNilpotent_quotient_fitting_quotient_subgroupOf` — `N ⊴ X` で `(X/N)/F(X/N)` 冪零なら
+  任意の `S ≤ X` について `(S/(S ⊓ N))/F(…)` も冪零。上の埋め込み + `_of_injective`。
+  module docstring の ⚠ ブロック (「単射性は genuine remaining step」) を解消済に更新。
+
+**3. `OddOrder/BG/Ch1_Preliminary/S06_Thm64.lean` — 帰納骨格 (Piece 2) と (6.2)**
+
+測度と降下:
+- `card_lt_card_of_lt` (:349) — `K < H` ⟹ `|K| < |H|` (mathlib に無い)。
+- `card_quotient_add_card_map_mk'_lt` (:362) — 場合 1 の降下 `(G ⧸ N, HN/N)`。
+- `card_subgroup_add_card_subgroupOf_lt` (:375) — reduction の降下 `(↥S, H ⊓ S)`。
+
+強帰納法と statement:
+- `card_add_card_strongInduction` (:403) — **測度 `Nat.card G + Nat.card H` に関する強帰納原理**。
+  `motive : ∀ (X : Type u) [Group X] [Finite X], Subgroup X → Prop` と**群の型を量化**する形。
+  `↥S`・`G ⧸ N`・`G` の 3 種の降下が型は違えど**同じ universe に留まる**ので成立する
+  (elaborate 確認済 — universe polymorphism の懸念は実在しなかった)。
+- `Thm64Statement` (:431) — 定理の主張。Hall 性は π 非依存の `Nat.Coprime |G₀| [G:G₀]`
+  (`NormalHallHeredity` と同 convention)、共役は左作用 `MulAut.conj x • J₁`
+  (BG の `J₁ˣ` とは `x ↦ x⁻¹` 違いだが `⟨J₁,J₂⟩` も `C_G(H)` も逆元で閉じるので同値)。
+- `Thm64IH` (:450) — 帰納法の仮定。`Ch09.BartelsIH` と同じく**明示パラメータ**設計なので
+  場合 1 / 場合 2 をそれぞれ**単独で sorry-free な定理**として書ける。
+- `thm64_of_ih` (:463) — 骨格を閉じる。**残る数学は全部 `step` の側**。
+
+BG の名前付きステップ 2 件:
+- `inf_eq_bot_of_isPiSubgroup_compl` (:176) — `π'`-部分群 ⊓ `π`-部分群 = `⊥`。
+  場合 1 の「`H` is a Hall `p'`-subgroup of `HN`」⟹ `H ∩ N = 1`。
+  第1波の `mem_centralizer_of_mem_normalizer_of_commutator_le` の `hdisj` を供給する。
+- `le_of_isPiSubgroup_of_quotient_isPiGroup` (:189) — **(6.2)**「`L` contains every
+  `π`-subgroup of `G`」。`G/L` が `π'`-群であることから。
+- 支持補題 `isPiSubgroup_map` (:142) / `isPiSubgroup_of_isPiGroup` (:150) /
+  `eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl` (:161)。
+
+### 残り (Case 1 / Case 2 の中身のみ)
+
+| 残作業 | 行 |
+|---|---|
+| ~~`quotientMapSubgroupOfOfLe` の単射性~~ ✅ **完了** | ~~50-100~~ |
+| ~~`\|G\| + \|H\|` の帰納骨格~~ ✅ **完了** (measure 3 + 強帰納 + statement + IH) | ~~150-250~~ |
+| ~~(6.2)~~ ✅ **完了** | — |
+| **reduction 「`G = LH` としてよい」の実施** (6 仮説を `↥(L ⊔ H)` へ transport し結論を押し戻す) | 200-350 |
+| **Case 1** (極小正規 `N ≤ O_p(F(G))` の取得、`N ≤ L`、SZ 共役 `z`、landed 済 2 定理の合成) | 300-450 |
+| **Case 2** (`B = H ⊓ M`、補群 `H*`、`[J₁,B] ≤ F(M)`、`O_π(F) ≤ O_π(G) = 1`、`B` が `L` を中心化) | 500-800 |
+
+reduction の transport に要る道具は**全部揃った**: normal Hall = `NormalHallHeredity`
+(`normal_coprime_card_index_subgroupOf` / `_map_mk'`)、Fitting 商 = `FittingHeredity`
+(`isNilpotent_quotient_fitting_of_le` / `_quotient` / `_quotient_subgroupOf`)、
+測度減少 = 上記 3 件。**新しい数学はやはり不要**。
+
+### 併せて見つかった重複 (本 lane では直さない)
+
+- **`Nat.card ↥K < Nat.card G` (真部分群) が 3 箇所に重複**:
+  `Isaacs/Ch04_Commutators/Main/BaerTrick.lean:1021` (`Ch04.subgroup_card_lt_of_ne_top`)、
+  `Isaacs/Ch09_MoreSubnormality/SubnormalClosure.lean:241` (`Ch09.card_lt_of_ne_top`)、
+  さらに `BaerTrick.lean:557` に同内容の local `have` が 3 つ目。
+- **`Nat.card (G ⧸ K) < Nat.card G` が 2 箇所**:
+  `Mathlib/Subgroup.lean:515` (`Subgroup.card_quotient_lt_of_ne_bot`) と
+  `SubnormalClosure.lean:440` (`Ch09.card_quotient_lt_of_ne_bot`)。
+  前者が mathlib 候補配置なので後者を消して前者に寄せるのが筋。
