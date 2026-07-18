@@ -142,6 +142,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.TISubsetCounting
 import OddOrder.GroupTheory.ZGroup
+import OddOrder.Mathlib.QuotientGroup
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup

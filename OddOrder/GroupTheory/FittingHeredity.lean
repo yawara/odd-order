@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Mathlib.QuotientGroup
 
 /-!
 # Heredity of "`X/F(X)` is nilpotent" for subgroups and quotients
@@ -28,19 +29,20 @@ The two heredity statements are then obtained by exhibiting the right `K`:
   `f : X →* Y`, take `K = f(F(X))`.  It is nilpotent as an image of `F(X)`, and `Y/K` is a
   quotient of `X/F(X)`.
 
-Three convenient shapes are stated as corollaries:
+Four convenient shapes are stated as corollaries:
 `isNilpotent_quotient_fitting_subgroup` (`H : Subgroup X`),
 `isNilpotent_quotient_fitting_of_le` (`H ≤ K`, both subgroups of a common ambient group),
-and `isNilpotent_quotient_fitting_quotient` (`N ⊴ X`).  Transport along an isomorphism
-`e : Y ≃* X` is `isNilpotent_quotient_fitting_of_injective e.toMonoidHom e.injective`.
+`isNilpotent_quotient_fitting_quotient` (`N ⊴ X`), and
+`isNilpotent_quotient_fitting_quotient_subgroupOf` (`↥S ⧸ N.subgroupOf S` for `S ≤ X`,
+`N ⊴ X`).  Transport along an isomorphism `e : Y ≃* X` is
+`isNilpotent_quotient_fitting_of_injective e.toMonoidHom e.injective`.
 
-⚠ **The corollaries alone do not discharge BG Theorem 6.4's transports.**  Of the four the
-induction performs, only `G₀ ⊓ S ≤ G₀` is a direct `_of_le` hit; the other three are
-isomorphism-mediated and need `_of_injective`/`_of_surjective` together with a hom the *consumer*
-must supply.  In particular the subgroup-side hypothesis "`(↥S ⧸ G₀.subgroupOf S)/F(…)` is
-nilpotent" needs an **injective** hom `↥S ⧸ G₀.subgroupOf S →* G ⧸ G₀`.  Mathlib has the map
-(`QuotientGroup.quotientMapSubgroupOfOfLe`) but **no injectivity lemma for it**, so that kernel
-computation is a genuine remaining step — see issue 3026.
+The last of these is the subgroup-side transport of BG Theorem 6.4's second hypothesis:
+"`(G/G₀)/F(G/G₀)` is nilpotent" must be carried to `↥S ⧸ G₀.subgroupOf S` for a subgroup
+`S ≤ G`.  It needs an **injective** hom `↥S ⧸ G₀.subgroupOf S →* G ⧸ G₀`, which mathlib does
+not supply; the required kernel computation now lives in `OddOrder.Mathlib.QuotientGroup`
+(`QuotientGroup.map_subgroupOf_subtype_injective`, together with the general injectivity
+criterion `QuotientGroup.quotientMapSubgroupOfOfLe_injective_iff`).
 
 Note that `Isaacs.Ch01.fitting` is the subtype-level Fitting subgroup, so `F(Y)` for a
 subgroup `Y` of `X` is `Isaacs.Ch01.fitting ↥Y`.  This is *not* the ambient-group
@@ -160,4 +162,26 @@ theorem isNilpotent_quotient_fitting_quotient [Finite X] (N : Subgroup X) [N.Nor
   isNilpotent_quotient_fitting_of_surjective (QuotientGroup.mk' N)
     (QuotientGroup.mk'_surjective N) h
 
+/-- **Subgroup-side transport of a nilpotent Fitting quotient**: if `N ⊴ X` and
+`(X/N)/F(X/N)` is nilpotent, then for every subgroup `S ≤ X` the quotient
+`(S/(S ⊓ N))/F(S/(S ⊓ N))` is nilpotent as well.
+
+Here `S/(S ⊓ N)` is spelled `↥S ⧸ N.subgroupOf S`, and the point is that this group embeds
+into `X/N` by the second isomorphism theorem — the embedding is
+`QuotientGroup.map_subgroupOf_subtype_injective`, proved in `OddOrder.Mathlib.QuotientGroup`
+because mathlib states no injectivity result for the maps it induces between subgroup
+quotients.  With the embedding in hand this is just
+`isNilpotent_quotient_fitting_of_injective`.
+
+This is the shape BG Theorem 6.4 needs when its induction descends from `G` to the subgroup
+`L ⊔ H`: the hypothesis "`(G/G₀)/F(G/G₀)` is nilpotent" has to become the corresponding
+statement for `(L ⊔ H)/(G₀ ⊓ (L ⊔ H))`. -/
+theorem isNilpotent_quotient_fitting_quotient_subgroupOf [Finite X] (S N : Subgroup X)
+    [N.Normal] (h : Group.IsNilpotent ((X ⧸ N) ⧸ Ch01.fitting (X ⧸ N))) :
+    Group.IsNilpotent ((↥S ⧸ N.subgroupOf S) ⧸ Ch01.fitting (↥S ⧸ N.subgroupOf S)) :=
+  isNilpotent_quotient_fitting_of_injective
+    (QuotientGroup.map (N.subgroupOf S) N S.subtype le_rfl)
+    (QuotientGroup.map_subgroupOf_subtype_injective S N) h
+
 end OddOrder.GroupTheory
+

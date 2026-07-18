@@ -9,6 +9,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.Mathlib.QuotientGroup
 import OddOrder.GroupTheory.FittingHeredity
 import OddOrder.GroupTheory.NormalHallHeredity
 import OddOrder.GroupTheory.MinimalInvariantNormal
@@ -2563,6 +2564,39 @@ set_option linter.style.longLine false in
   OddOrder.BG.Ch1.S06.isSolvable_of_isNilpotent_quotient_fitting
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.isSolvable_of_isNilpotent_quotient_fitting_of_normal
+
+-- **Injectivity of `quotientMapSubgroupOfOfLe`** (issue 3026): mathlib defines the induced map
+-- on `subgroupOf` quotients but supplies no injectivity lemma.  The criterion is `A ⊓ B' ≤ A'`
+-- (with `h' : A' ≤ B'`, i.e. `A'` is already the full trace of `B'` on `A`).
+-- ⚠ The general lemma does **not** subsume the concrete consumer form: `quotientMapSubgroupOfOfLe`
+-- lands in `↥B ⧸ …`, so taking `B := ⊤` still leaves a transport across `↥(⊤ : Subgroup G) ≃* G`.
+-- Hence `map_subgroupOf_subtype_injective` — the second isomorphism theorem read as an embedding
+-- `S/(S ⊓ N) ↪ G/N` — is proved directly off `QuotientGroup.map`.  All carry `@[to_additive]`.
+#assert_only_allowed_axioms QuotientGroup.ker_quotientMapSubgroupOfOfLe
+#assert_only_allowed_axioms QuotientGroup.quotientMapSubgroupOfOfLe_injective_iff
+#assert_only_allowed_axioms QuotientGroup.quotientMapSubgroupOfOfLe_injective
+#assert_only_allowed_axioms QuotientGroup.map_subgroupOf_subtype_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isNilpotent_quotient_fitting_quotient_subgroupOf
+
+-- BG **Theorem 6.4** π-transport helpers and **(6.2)** ("`L` contains every `π`-subgroup of `G`"),
+-- plus the descent measures for the `|G| + |H|` induction.  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.isPiSubgroup_map
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.isPiSubgroup_of_isPiGroup
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.inf_eq_bot_of_isPiSubgroup_compl
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.le_of_isPiSubgroup_of_quotient_isPiGroup
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.card_lt_card_of_lt
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.card_quotient_add_card_map_mk'_lt
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.card_subgroup_add_card_subgroupOf_lt
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.card_add_card_strongInduction
+
+-- ⚠ `thm64_of_ih` is axiom-clean but **carries no mathematics of its own**: it is exactly the
+-- instantiation of `card_add_card_strongInduction`, and every remaining step of BG Theorem 6.4
+-- sits in its `step` hypothesis (Case 1 `π(F(G)) ⊄ π(H)` and Case 2 `π(F(G)) ⊆ π(H)`, both still
+-- unproved).  Do not read its presence as Theorem 6.4 being formalized
+-- ([[scaffold-sorry-free-not-done]]).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_of_ih
 
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup
