@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Huppert
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 
 /-!
 # Peterfalvi Appendix III: On Suzuki 2-Groups
@@ -14,13 +14,14 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 
 This appendix recalls the quadratic-map model of Suzuki 2-groups and Higman's
 classification.  Definition 1 is encoded by an honest regular automorphism
-action; the remaining quadratic-form and classification obligations are kept
-explicit.
+action, while Definitions 2--3 are the concrete `TypeAData` and `TypeBData`
+models re-exported from `Suzuki2Groups.Types`.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
--- The remaining classification scaffolds follow the opaque-Prop convention in
--- notes/meta/scaffold_opaque_prop_convention.md.
+-- The declarations below predate the concrete type models and are retained for
+-- compatibility only.  Their opaque `Prop` fields do not count as coverage and
+-- must not be cited in new proofs.
 
 variable {P V W F : Type*} [Group P]
 
