@@ -1196,6 +1196,11 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- 有限群の p-部分群は与えられた Sylow の中へ共役で送れる (Bartels Step 3 の部品 2/2)。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_conjAct_smul_le_sylow
 
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 3** — Y ≤ H < G の p-群を H の Sylow の中へ送る。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_three
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal_in
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_mem_conjAct_smul_le_of_isPGroup
+
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
 #assert_only_allowed_axioms

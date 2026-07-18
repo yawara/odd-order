@@ -8,6 +8,7 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.GroupTheory.Index
 import Mathlib.GroupTheory.IsSubnormal
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Isaacs Ch. 9 — §9D: strong conjugacy と `X^{(G)}` (pp. 289-290)
@@ -466,6 +467,42 @@ theorem exists_conjAct_smul_le_sylow {L : Type*} [Group L] [Finite L] {p : ℕ} 
     _ = ((g • R : Sylow p L) : Subgroup L) := Sylow.coe_subgroup_smul.symm
     _ = (P : Subgroup L) := by rw [hg]
 
+/-! ### Bartels Step 3 の部品 — 相対版 (すべて `Subgroup G` のまま)
+
+`↥H` / `↥L` を ambient にすると `Sylow p ↥(L.subgroupOf H)` のような二重 subtype が
+出てしまうので, 9.31 と「p-部分群の Sylow 内共役」を `Subgroup G` の言葉に直しておく。
+どちらも 9.29(a) 相対版と同じく「↥K に降ろして絶対版を使う」だけ。 -/
+
+/-- **Lem 9.31 の相対版**: `S ≤ K` が `K` の中で subnormal, `P ≤ K` が `K` の Sylow `p`
+なら `P ⊓ S` は `S` の Sylow `p` (指数が `p` と互いに素)。 -/
+theorem not_dvd_relIndex_inf_of_isSubnormal_in [Finite G] {p : ℕ} [Fact p.Prime]
+    {K S P : Subgroup G} (hSK : S ≤ K)
+    (hS : (S.subgroupOf K).IsSubnormal) (hP : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex K) :
+    ¬ p ∣ (P ⊓ S).relIndex S := by
+  have hPsub : IsPGroup p ↥(P.subgroupOf K) := hP.comap_subtype
+  have hidx : ¬ p ∣ (P.subgroupOf K).index := hPidx
+  have habs := not_dvd_relIndex_inf_of_isSubnormal hS (hPsub.toSylow hidx)
+  have hinf : P.subgroupOf K ⊓ S.subgroupOf K = (P ⊓ S).subgroupOf K := by
+    ext x; simp [Subgroup.mem_subgroupOf, Subgroup.mem_inf]
+  rw [hPsub.toSylow_coe hidx, hinf, Subgroup.relIndex_subgroupOf hSK] at habs
+  exact habs
+
+/-- **p-部分群の Sylow 内共役, 相対版**: `Y ≤ L` が `p`-群, `Q ≤ L` が `L` の Sylow `p`
+なら, ある `h ∈ L` で `Y^h ≤ Q`。 -/
+theorem exists_mem_conjAct_smul_le_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+    {L Y Q : Subgroup G} (hYL : Y ≤ L) (hQL : Q ≤ L) (hY : IsPGroup p ↥Y)
+    (hQ : IsPGroup p ↥Q) (hQidx : ¬ p ∣ Q.relIndex L) :
+    ∃ h ∈ L, ConjAct.toConjAct h • Y ≤ Q := by
+  have hQsub : IsPGroup p ↥(Q.subgroupOf L) := hQ.comap_subtype
+  have hidx : ¬ p ∣ (Q.subgroupOf L).index := hQidx
+  obtain ⟨g, hg⟩ := exists_conjAct_smul_le_sylow (Q := Y.subgroupOf L) hY.comap_subtype
+    (hQsub.toSylow hidx)
+  rw [hQsub.toSylow_coe hidx, ← conjAct_smul_subgroupOf] at hg
+  refine ⟨(g : G), g.2, ?_⟩
+  have hmap := Subgroup.map_mono (f := L.subtype) hg
+  rwa [Subgroup.map_subgroupOf_eq_of_le (conjAct_smul_le_of_mem hYL g.2),
+    Subgroup.map_subgroupOf_eq_of_le hQL] at hmap
+
 section /- 9D: Bartels Step 2 の部品 — 真部分群による生成 -/
 
 /-- `Nat.Coprime a b` なら `x ∈ ⟨x^a⟩ ⊔ ⟨x^b⟩` (Bezout)。 -/
@@ -649,5 +686,42 @@ theorem bartels_step_two {G : Type u} [Group G] [Finite G] {X : Subgroup G}
     exact hXmin Y hY
   -- 9.29(a) で `X^{(G)} ≤ U`, ゆえ `X^{(G)} = U ◁◁ G` で矛盾.
   exact hX (le_antisymm (strongClosure_le_of_isSubnormal hUsub X hXU) hUX ▸ hUsub)
+
+/-- **Bartels (9.28) Step 3** (書籍 p. 291): `Y ≤ H < G` (`Y` は `p`-群) と `H` の
+Sylow `p`-部分群 `P` に対し, `Y` の共役 `Z ≤ P` で `Z^{(H)} = Y^{(H)}` となるものが取れる。
+
+書籍の議論: `H < G` なので帰納法の仮定で `L = Y^{(H)}` は `H` の中で subnormal。
+Lem 9.31 (相対版) で `P ⊓ L` は `L` の Sylow `p`。`Y` は `L` の `p`-部分群なので
+`h ∈ L` があって `Y^h ≤ P ⊓ L`。`h ∈ L ≤ H` より `H^h = H`, `L^h = L` なので
+`(Y^h)^{(H)} = (Y^{(H)})^h = L`。
+
+(書籍の結論 `Y^{(G)} = Z^{(G)}` は Step 1 を繋げば出る。) -/
+theorem bartels_step_three {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
+    {p : ℕ} [Fact p.Prime] {Y H P : Subgroup G} (hYH : Y ≤ H) (hH : H ≠ ⊤)
+    (hY : IsPGroup p ↥Y) (hP : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex H) :
+    ∃ h ∈ H, ConjAct.toConjAct h • Y ≤ P ∧
+      strongClosureIn H (ConjAct.toConjAct h • Y) = strongClosureIn H Y := by
+  have hYL : Y ≤ strongClosureIn H Y := le_strongClosureIn hYH
+  have hLH : strongClosureIn H Y ≤ H := strongClosureIn_le_right H Y
+  -- `Y^{(H)}` は `H` の中で subnormal (帰納法の仮定を ↥H に適用).
+  have hLsub : ((strongClosureIn H Y).subgroupOf H).IsSubnormal := by
+    rw [strongClosureIn_subgroupOf hYH]
+    exact hIH ↥H (card_lt_of_ne_top hH) _
+  -- 9.31 相対版: `P ⊓ Y^{(H)}` は `Y^{(H)}` の Sylow `p`.
+  have hPL : ¬ p ∣ (P ⊓ strongClosureIn H Y).relIndex (strongClosureIn H Y) :=
+    not_dvd_relIndex_inf_of_isSubnormal_in hLH hLsub hP hPidx
+  have hPLp : IsPGroup p ↥(P ⊓ strongClosureIn H Y) :=
+    hP.of_injective (Subgroup.inclusion inf_le_left) (Subgroup.inclusion_injective _)
+  -- `Y` を `P ⊓ Y^{(H)}` の中へ共役で送る.
+  obtain ⟨h, hhL, hhY⟩ :=
+    exists_mem_conjAct_smul_le_of_isPGroup hYL inf_le_right hY hPLp hPL
+  refine ⟨h, hLH hhL, hhY.trans inf_le_left, ?_⟩
+  have hHfix : ConjAct.toConjAct h • H = H := conjAct_smul_self_of_mem (hLH hhL)
+  have hLfix : ConjAct.toConjAct h • strongClosureIn H Y = strongClosureIn H Y :=
+    conjAct_smul_self_of_mem hhL
+  calc strongClosureIn H (ConjAct.toConjAct h • Y)
+      = strongClosureIn (ConjAct.toConjAct h • H) (ConjAct.toConjAct h • Y) := by rw [hHfix]
+    _ = ConjAct.toConjAct h • strongClosureIn H Y := strongClosureIn_conjAct_smul _ _ _
+    _ = strongClosureIn H Y := hLfix
 
 end OddOrder.Isaacs.Ch09
