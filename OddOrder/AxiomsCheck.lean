@@ -103,6 +103,7 @@ import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
 import OddOrder.BG.Ch1_Preliminary.S06_Lem63b
+import OddOrder.BG.Ch1_Preliminary.S06_Thm61
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
@@ -2488,6 +2489,14 @@ set_option linter.style.longLine false in
 -- BG App.A Thm A.4(b) (= Gorenstein 6.5.2 翻訳 = BG Thm 6.1): P∈Syl_p, A abelian normal of P
 -- ⇒ A ⊆ O_{p',p}(G). A.4(c) の stabilityLiftAux を K=O_p(G/O_{p'}) で再利用。
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA4b
+-- BG **Theorem 6.1** on the §6 side (issue 3025): `O_{p',p}(G)` contains every abelian normal
+-- subgroup of a Sylow `p`-subgroup, for **any** prime `p` (solvable `G` of odd order).  The
+-- mathematical content is `thmA4b` above — BG itself identifies Thm 6.1 with Thm A.4(b)
+-- (mmd L4627) — and this drops its vacuous `p ≠ 2` hypothesis: for `p = 2` an odd-order `G` has
+-- trivial Sylow `2`-subgroup, so `A = ⊥`.  Removing that hypothesis is the specialization-debt
+-- cleanup; no new mathematics.  Axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.le_oPiPrimePiCore_of_abelian_normal_in_sylow
 -- BG App.A Thm A.5(1): P ◁ G p-group, X gen by P-normalized abelian p-groups
 -- ⇒ XC_G(P)/C_G(P) ⊆ O_p(G/C_G(P)). stabilityLiftAux を K=P で直接適用 + iSup 分解。
 #assert_only_allowed_axioms OddOrder.BG.AppA.thmA5_part1

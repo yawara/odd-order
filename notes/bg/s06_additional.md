@@ -21,12 +21,26 @@
 - BG **Thm 6.1** = Hall-Higman (Gorenstein **6.5.2**)、BG **Thm 6.2** = Glauberman ZJ (Gorenstein **6.5.1** + 8.2.11)。いずれも「任意 Sylow S・`P=C_G(Z(P))` 仮定なし」の**完全形**。
 - repo の `normal_J` は Isaacs **Thm 7.6**(仮説 `O_{p'}=1` ∧ `P=C_G(Z(P))` ⇒ `J(P)⊴G`)で、Isaacs はこれを **Thompson normal p-complement (7.1) の補題**として使う。一般 ZJ とは別物。`P=C_G(Z(P))` ギャップは O_{p'}-商簡約では埋まらない。
 - ⇒ **Thm 6.1 (Hall-Higman) / Thm 6.2 (ZJ) はともに実質的な新規証明**。今回の reduced case (`normalJ_normal_of_odd` 等) は J(P)-instance の特殊形で、一般形の足場ではあるが直接の前段ではない。
+  - ⚠ **2026-07-19 追記 — この行は Thm 6.1 については誤り**。Thm 6.1 の一般形は「新規証明」を
+    要さず、**App.A 側に `thmA4b` として既に存在していた** (下記残課題 3 参照)。Thm 6.2 (ZJ) に
+    ついては正しく、実際 Gorenstein Ch.8 §2 の全面移植を要すると確定した (issue 3024)。
 
 残タスク (難度順):
 1. **(infra)** `opCore p G ≤ oPiPrimePiCore {p} G` 橋 (O_p ≤ O_{p',p})。`IsPiGroup.le_oPiCore` + `IsPGroup.map` + `map_le_iff_le_comap`。注意: `oPiPrimePiCore` の `{q | q ∉ {p}}` と `normal_J` の `{q | q ≠ p}` の set 同値 (`Set.mem_singleton_iff`)。自己完結・再利用可。
 2. **Lem 6.3** (solvable: normal Hall H + complement K, H⊆G' ⇒ H=[H,K] ∧ C_H(K)⊆H')。BG Prop 1.5(d)/1.6(d) = Ch04 (`fixedPoints_sup/inf_actionCommutator`) 済で**最も tractable**。
-3. **Thm 6.1** (Hall-Higman 一般形): §7B internals (`centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot` = HH 3.21, `center_sylow_le_opCore_of_oPiCorePrime_eq_bot`) を再利用して abelian normal A ≤ O_{p',p} を構築。中規模。
-4. **Thm 6.2** (Glauberman ZJ 一般形): 最大。完全 ZJ argument。Thm 6.1 + §7B 機械 + 新規。
+3. ~~**Thm 6.1** (Hall-Higman 一般形)~~ → ✅ **完了** (2026-07-19、issue 3025)。⚠ ただし
+   **本項の想定は誤りだった**: 「§7B internals を再利用して新規に構築」する必要は無く、
+   **一般形は既に `OddOrder.BG.AppA.thmA4b` (`AppA_PStability.lean:1387`) として存在していた**
+   (`O_{p'}(G) = ⊥` も `C_G(Z(P)) = P` も仮定せず、`O_{p'}` reduction を内部で実行)。
+   BG 自身 mmd L4627 で「Theorem A.4(b) is just Theorem 6.1」と同一視している。
+   §6 側の入口 = `S06_Thm61.le_oPiPrimePiCore_of_abelian_normal_in_sylow` で、実質は
+   `thmA4b` の `p ≠ 2` (奇数位数下で vacuous) を任意素数へ外しただけ。新規の数学は無し。
+4. **Thm 6.2** (Glauberman ZJ 一般形): ⚠ **blocked** (2026-07-19 確定、issue 3017 → **3024**)。
+   literal `J(S)` 一般形は Gorenstein Ch.8 §2 (Glauberman ZJ) の全面移植を要し
+   (2,000-4,000 行/複数 session)、repo には p-stable+p-constrained 版 ZJ が無い。
+   `C_G(Z(P)) = P` は反例あり (位数 1029 の `7^{1+2} ⋊ C₃`) で discharge 不可。
+   **book 推奨代替の `L(S)` 一般形は済** = `AppB_Thm62.zCenter_lOdd_sup_oPiCore_normal`。
+   math-comp も ZJ を形式化せず `L(S)` で代替している。
 5. Thm 6.4 (J₁/J₂ 共役, 長い帰納), Lem 6.5/6.6 (p-length 1 系)。
 
 **ROADMAP 上の位置**: **Phase 2a 第 2 波** (Phase 1 Ch.7 完成必須, §1+§3+§4 完了直後).
