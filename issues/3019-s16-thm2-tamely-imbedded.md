@@ -26,18 +26,22 @@ Thm C(9) 完全恒等式 (`a0_minus_a_eq_conj_zTilde`) + Thm A type-F nilpotent
 
 ## やること (推奨順、subagent 提案)
 
-- [ ] **Gap 1: 定義** `SystemOfSupportingSubgroups` + `TamelyImbedded` structure を新 leaf
-  (`S16_MainResults/TamelyImbedded.lean`) に。既存 object のみ使用・**新数学なし**。faithful に
-  (Ti)-(Tiii) を mmd:4555-4575 からミラー。⚠ 定義は load-bearing ゆえ book と精密照合してから commit。
-  FT Def 9.1(ii) の一般形との差 (BG (Tii)(d)) を docstring 注記。
-- [ ] **Gap 2a: Lemma 14.13(b)** (mmd L4135) を `S16_Lemma1413.lean` に追加 (14.13(a)=`:292` の sibling)。
-  「x∈D に対し M で選んだ共役 y∈D + C_G(y)=C_{H_i}(y)C_M(y)⊆M_i」。Thm 14.4 の ~5 行帰結 (effort S)
-  だが **新 math** (Lean/Coq 双方に不在)。これが (Tii)(e)/(Tiii) の crux。
+- [x] **Gap 1: 定義** ✅ 2026-07-18 完了 (`S16_MainResults/TamelyImbedded.lean`):
+  `TamelyImbedded` + `SystemOfSupportingSubgroups` + `FrobeniusTypeIWithNonTIFitting`。
+  mmd:4555-4575 に faithful、(Ti)-(Tiii)+(a)-(e)、既存 object のみ (新数学なし)、build green。
+  ⚠ **faithfulness fix**: D は `escapingSharpSet` (x≠1 込み、book 忠実) を新設して使用 —
+  subagent の初版は `escapingCentralizerSet` (x≠1 欠、1∈A(M) ゆえ D 常に非空になる誤り) だった
+  ので hub 検証で訂正。FT Def 9.1(ii)(e) 差を docstring 注記。root import 済。
+- [x] **Gap 2a: Lemma 14.13(b)** ✅ 2026-07-18 完了 (`S16_Lemma1413.lean`、14.13(a) sibling):
+  `signalizer_neighbour_conjugator_in_M` (∃ m∈M, N(y)^m=N)。axiom-clean、AxiomsCheck 登録。
+  proof = x/y 両側 Thm D(4) complement を Schur-Zass 共役 (`IsComplement'.exists_conj_of_coprime`)
+  → 𝓜_σ(x) sharp transitivity + N_G(M)=M。Thm 14.4 infra は全て在庫 (blocker 無)。
 - [ ] **Gap 2b: packaging** `theoremII_tii_system_of_supporting`: `theoremII_tame_embedding` +
   Thm D(4) (`TaxonomyOutput.lean:948` complement/escape) + Thm B(5)/C(9) TI (at M_i) +
   `sigma_reps_pairwise_disjoint` (`TheoremsAE.lean:1551`、(a) 用) + Lemma 14.13(b) から
-  `SystemOfSupportingSubgroups M X` を構成。(a)(b)(d) は engine 済で組立 bookkeeping、(c) は
-  σ-disjoint から要導出、(e)/(Tiii) は 14.13(b) 依存。
+  `SystemOfSupportingSubgroups M X` を構成し、A(M) が `TamelyImbedded M (A(M))` を証明。
+  (a)(b)(d) は engine 済で組立 bookkeeping、(c) は σ-disjoint から要導出、(e)/(Tiii) は 14.13(b) 依存。
+  **← 次の frontier (残 §16 最終項目)**。
 
 ## 完了条件
 

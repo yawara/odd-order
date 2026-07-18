@@ -8482,6 +8482,14 @@ conjugacy), and the type-`P₁` core (`kstar_isHall_sigmaM_of_partner` = Coq `Pt
 `sMhallKs`, via 14.2(f) `typeP_sigma_subgroup_le_Msigma` + σ-disjoint commutator). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.kstar_isHall_sigmaM_of_partner
+/-! **BG Lemma 14.13(b)** (`S16_Lemma1413`, `signalizer_neighbour_conjugator_in_M`): in the
+situation of Theorem 14.4 with `1 < |𝓜_σ(x)|`, if `y ∈ M_σ^#`, `C_G(y) ⊄ M`, and `N(y)^g = N`,
+then the conjugator can be chosen inside `M` (`∃ m ∈ M, N(y)^m = N`).  The `M`-conjugation choice
+underlying Theorem II (Tii)(e).  Proof (BG): the `x`- and `y`-side Thm D(4) complements of the
+normal Hall `N_σ ◁ N` are Schur–Zassenhaus-conjugate (`IsComplement'.exists_conj_of_coprime`),
+placing `M` and its conjugate in `𝓜_σ(x)`; Thm 14.4 sharp transitivity + `N_G(M) = M` yield
+`m ∈ M`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_neighbour_conjugator_in_M
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_conj_smul_eq_of_le_of_card_prime
 
 /-! **Peterfalvi (14.11.3) support half, axiom-clean core** (`S16_G0Coprime`, lane c/γ).
