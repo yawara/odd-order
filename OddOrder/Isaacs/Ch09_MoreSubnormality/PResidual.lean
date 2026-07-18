@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.GroupTheory.IsSubnormal
 import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.Order.Minimal
@@ -11,7 +12,7 @@ import Mathlib.Order.Minimal
 /-!
 # The `p`-residual `O^p(G)` (Isaacs Ch. 9 §9C 準備)
 
-`O^p(G)` = **`p`-residual** = 商が `p`-群になる最小の正規部分群 (書籍 p. 283 の
+`O^p(G)` = **`p`-residual** = 商が `p`-群になる最小の正規部分群 (書籍 p. 287 の
 Lemma 9.26 で使う). 「`G/N` が `p`-群となる正規部分群 `N` の交わり」として定義し API を与える:
 
 - `pResidual p G` (= `O^p(G)`): `sInf {N | N ◁ G ∧ IsPGroup p (G/N)}`.
@@ -181,17 +182,21 @@ theorem map_subtype_normal_of_characteristic {S : Subgroup G} [S.Normal]
   rw [heq]
   exact Subgroup.mem_map_of_mem _ hcC
 
-/-- **Isaacs Corollary 9.27** (p. 283): `S ◁ G` ならば `O^p(S) ◁ G` (ambient で
-`(O^p ↥S).map S.subtype`), 特に任意の `P ≤ G` (書籍では `P ◁ G` p-群) が `O^p(S)` を正規化する.
+/-- **Isaacs Corollary 9.27 の normal 特殊形** (p. 287): `S ◁ G` ならば `O^p(S) ◁ G`
+(ambient で `(O^p ↥S).map S.subtype`), 特に任意の `P ≤ G` が `O^p(S)` を正規化する.
 
-書籍は 9.26 (`O^p(SP) = O^p(S)`) を経由するが, `O^p(S)` は `S` に characteristic なので
-`S ◁ G` から直接 `G`-normal (より一般に `P` の p-群性は不要). -/
+書籍の 9.27 は `S ◁◁ G` (subnormal) 仮説で, 9.26 (`O^p(SP) = O^p(S)`) を経由する.
+`S ◁ G` の場合は `O^p(S)` が `S` に characteristic ゆえ直接 `G`-normal が出る (この形では
+`P` の p-群性も不要). 書籍どおりの一般 subnormal 版は
+`le_normalizer_pResidualOf_of_isSubnormal`. -/
 theorem pResidual_map_subtype_normal {S : Subgroup G} [S.Normal] :
     ((pResidual p ↥S).map S.subtype).Normal :=
   map_subtype_normal_of_characteristic _
 
-/-- **Isaacs Lemma 9.26** (p. 283): `G = SP`, `S ◁ G`, `P ◁ G` p-群 ⇒ `O^p(G) = O^p(S)`
-(ambient: `pResidual p G = (pResidual p ↥S).map S.subtype`). `O^p` 版の Lemma 9.15.
+/-- **Isaacs Lemma 9.26 の normal 特殊形** (p. 287): `G = SP`, `S ◁ G`, `P ◁ G` p-群 ⇒
+`O^p(G) = O^p(S)` (ambient: `pResidual p G = (pResidual p ↥S).map S.subtype`).
+`O^p` 版の Lemma 9.15. 書籍どおりの一般 subnormal 版 (`S ◁◁ G`) は
+`pResidual_eq_pResidualOf_of_isSubnormal` — その証明が本補題を base case として使う.
 
 証明: `R_S := O^p(S)` は `S` に characteristic ゆえ `◁ G`, `R_S ≤ S`, `R_S.subgroupOf S =
 O^p(↥S)`. `G/S` は p-群 (`G=SP`). `⊆`: `[G:R_S] = [S:R_S][G:S] = p^a·p^b` で `G/R_S` p-群
@@ -348,7 +353,7 @@ theorem map_subtype_pResidualOf_subgroupOf {S R : Subgroup G} (h : S ≤ R) :
 
 end
 
-section /- 9C: Lemma 9.26 の ambient 版と Cor 9.27 の subnormal 版 -/
+section /- 9C: Lemma 9.26 / Corollary 9.27 (pp. 287-288) — normal 特殊形と書籍どおりの subnormal 版 -/
 
 open scoped Pointwise
 
@@ -404,80 +409,124 @@ theorem pResidualOf_sup_eq [Finite G] [Fact p.Prime] {S P R : Subgroup G}
     _ = (pResidualOf p (S.subgroupOf R)).map R.subtype := by rw [key]; rfl
     _ = pResidualOf p S := map_subtype_pResidualOf_subgroupOf hSR
 
-/-- **Isaacs Corollary 9.27 の subnormal (defect 2) 版**: `S ◁ T`, `T ◁ G` で
-`P ◁ G` が `p`-群ならば `P` は `O^p(S)` を正規化する.
+/-- **Isaacs Lemma 9.26** (p. 287, 書籍どおりの subnormal 版): `G = SP` で `S ◁◁ G` かつ
+`P ◁ G` が `p`-群ならば `O^p(G) = O^p(S)`.
 
-⚠ 書籍 p. 284 (Thm 9.24 の証明) は `V ◁ M ◁ H` から「`V ◁ H`」と書いて normal 版の
-Cor 9.27 を適用するが, subnormal から normal は一般には従わない. 実際に必要なのは本補題.
+書籍は `|G|` の帰納で `S ≤ M ◁ G`, `M < G` を選ぶが, `Subgroup.IsSubnormal` が inductive
+predicate なのでその構造帰納で置き換える (書籍の `M` = 帰納の `K`):
+* `top` 段 (`S = ⊤`): 自明 (`pResidualOf_top`).
+* `step` 段 (`S ◁ K`, `K ◁◁ G`): `S ≤ K` から `K ⊔ P = ⊤` なので帰納法の仮定が
+  `O^p(G) = O^p(K)` を与える. 一方 `P ◁ G` ゆえ `S ⊔ P = S·P` (集合の積) で Dedekind 則が
+  `K = S(K ⊓ P)` を与え, `K ⊓ P ◁ K` は `p`-群だから normal 版 `pResidualOf_sup_eq` が
+  `O^p(K) = O^p(S)` を与える.
 
-証明: `G₀ = S ⊔ P` の中で `S` の normal closure を取り ambient に落としたものを `R` とする.
-`S ≤ R ≤ T` ゆえ `S ◁ R`; modular law で `R = S ⊔ (R ⊓ P)`; `R ⊓ P ◁ R` は `p`-群.
-よって Lemma 9.26 (ambient 版) から `O^p(R) = O^p(S)`. 一方 `R` は `G₀ ⊇ P` で normal
-なので `P ≤ N_G(R) ≤ N_G(O^p(R)) = N_G(O^p(S))`. -/
-theorem le_normalizer_pResidualOf_of_subnormal_two [Finite G] [Fact p.Prime]
-    {S T P : Subgroup G} [T.Normal] [P.Normal] (hST : S ≤ T)
-    (hSn : T ≤ Subgroup.normalizer (S : Set G)) (hP : IsPGroup p ↥P) :
+`P` を全称量化した形で述べるのは, 構造帰納の motive が `S` のみに依存する必要があるため
+(`step` 段では同じ `P` を `K` に対して使う). -/
+theorem pResidual_eq_pResidualOf_of_isSubnormal [Finite G] [Fact p.Prime]
+    {S : Subgroup G} (hS : S.IsSubnormal) :
+    ∀ P : Subgroup G, P.Normal → IsPGroup p ↥P → S ⊔ P = ⊤ →
+      pResidual p G = pResidualOf p S := by
+  induction hS with
+  | top => intro _ _ _ _; exact pResidualOf_top.symm
+  | step S K hle _ hSnorm ih =>
+    intro P hPnorm hP hsup
+    haveI := hPnorm
+    have hKP : K ⊔ P = ⊤ := by
+      rw [eq_top_iff, ← hsup]; exact sup_le_sup_right hle P
+    have hSn : K ≤ Subgroup.normalizer (S : Set G) :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer hle).mp hSnorm
+    have hKPn : K ≤ Subgroup.normalizer ((K ⊓ P : Subgroup G) : Set G) := by
+      rw [← Subgroup.normal_subgroupOf_iff_le_normalizer (inf_le_left : K ⊓ P ≤ K),
+        Subgroup.inf_subgroupOf_left]
+      exact hPnorm.subgroupOf K
+    -- Dedekind (modular) 則: `P ◁ G` ゆえ `S ⊔ P = S·P` (集合の積) なので要素計算でよい
+    -- (`Subgroup G` の束は一般には modular でない — mathlib の instance は CommGroup 限定).
+    have hded : S ⊔ (K ⊓ P) = K := by
+      refine le_antisymm (sup_le hle inf_le_left) fun k hk => ?_
+      have hkmem : k ∈ ((S : Set G) * (P : Set G)) := by
+        have h : k ∈ ((S ⊔ P : Subgroup G) : Set G) := by
+          rw [SetLike.mem_coe, hsup]; exact Subgroup.mem_top k
+        rwa [Subgroup.mul_normal S P] at h
+      obtain ⟨s, hs, x, hx, rfl⟩ := hkmem
+      have hxK : x ∈ K := by
+        have h := K.mul_mem (K.inv_mem (hle hs)) hk
+        simpa using h
+      exact Subgroup.mul_mem_sup hs ⟨hxK, hx⟩
+    have hKPp : IsPGroup p ↥(K ⊓ P) :=
+      hP.of_injective (Subgroup.inclusion (inf_le_right : K ⊓ P ≤ P))
+        (Subgroup.inclusion_injective _)
+    rw [ih P hPnorm hP hKP]
+    exact pResidualOf_sup_eq hle inf_le_left hSn hKPn hKPp hded
+
+/-- **Isaacs Lemma 9.26 (ambient 版, subnormal)**: `R = S ⊔ P` で `S` が `↥R` の中で
+subnormal, `P` が `R` に正規な `p`-群ならば `O^p(R) = O^p(S)`.
+
+型レベル版を `↥R` に適用し `map_subtype_pResidualOf_subgroupOf` で ambient に戻しただけ
+(normal 版 `pResidualOf_sup_eq` と同じ持ち上げ方). -/
+theorem pResidualOf_sup_eq_of_isSubnormal [Finite G] [Fact p.Prime] {S P R : Subgroup G}
+    (hSR : S ≤ R) (hPR : P ≤ R) (hS : (S.subgroupOf R).IsSubnormal)
+    (hPn : R ≤ Subgroup.normalizer (P : Set G))
+    (hP : IsPGroup p ↥P) (hsup : S ⊔ P = R) :
+    pResidualOf p R = pResidualOf p S := by
+  haveI : (P.subgroupOf R).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPR).mpr hPn
+  have hP' : IsPGroup p ↥(P.subgroupOf R) :=
+    hP.of_injective (Subgroup.subgroupOfEquivOfLe hPR).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hPR).injective
+  have hsup' : S.subgroupOf R ⊔ P.subgroupOf R = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hSR hPR, hsup, Subgroup.subgroupOf_self]
+  have key := pResidual_eq_pResidualOf_of_isSubnormal (G := ↥R) hS (P.subgroupOf R)
+    inferInstance hP' hsup'
+  calc pResidualOf p R = (pResidual p ↥R).map R.subtype := rfl
+    _ = (pResidualOf p (S.subgroupOf R)).map R.subtype := by rw [key]
+    _ = pResidualOf p S := map_subtype_pResidualOf_subgroupOf hSR
+
+/-- **Isaacs Corollary 9.27** (p. 287, 書籍どおりの subnormal 版): `S ◁◁ G` かつ `P ◁ G` が
+`p`-群ならば `P` は `O^p(S)` を正規化する.
+
+書籍の証明そのまま: Lemma 9.26 を `SP` の中で使うと `O^p(SP) = O^p(S)` で, 左辺は `SP` に
+characteristic ゆえ `P ≤ SP` に正規化される. -/
+theorem le_normalizer_pResidualOf_of_isSubnormal [Finite G] [Fact p.Prime]
+    {S P : Subgroup G} (hS : S.IsSubnormal) [P.Normal] (hP : IsPGroup p ↥P) :
     P ≤ Subgroup.normalizer (pResidualOf p S : Set G) := by
-  set G₀ := S ⊔ P with hG₀
-  have hSG₀ : S ≤ G₀ := le_sup_left
-  have hPG₀ : P ≤ G₀ := le_sup_right
-  -- `R` := `↥G₀` 内での `S` の normal closure を ambient に落としたもの
-  set R₀ := Subgroup.normalClosure ((S.subgroupOf G₀ : Subgroup ↥G₀) : Set ↥G₀) with hR₀
-  haveI hR₀norm : R₀.Normal := Subgroup.normalClosure_normal
-  set R := R₀.map G₀.subtype with hR
-  have hRG₀ : R ≤ G₀ := Subgroup.map_subtype_le _
-  -- `S ≤ R`
-  have hSRle : S ≤ R := by
-    have h1 : S.subgroupOf G₀ ≤ R₀ := Subgroup.le_normalClosure
-    have := Subgroup.map_mono (f := G₀.subtype) h1
-    rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hSG₀] at this
-  -- `R ≤ T` (`S` の共役はすべて `T` の中)
-  have hRT : R ≤ T := by
-    haveI : (T.subgroupOf G₀).Normal := ‹T.Normal›.subgroupOf G₀
-    have h1 : R₀ ≤ T.subgroupOf G₀ :=
-      Subgroup.normalClosure_le_normal (Subgroup.comap_mono hST)
-    have := Subgroup.map_mono (f := G₀.subtype) h1
-    rw [Subgroup.subgroupOf_map_subtype] at this
-    exact this.trans inf_le_left
-  -- `P ≤ N_G(R)` (`R₀ ◁ ↥G₀` かつ `P ≤ G₀`)
-  have hPnR : P ≤ Subgroup.normalizer (R : Set G) :=
-    hPG₀.trans (le_normalizer_map_subtype_of_normal hR₀norm)
-  -- Lemma 9.26 (ambient 版) を `R = S ⊔ (R ⊓ P)` に適用
-  have hRPnorm : R ≤ Subgroup.normalizer ((R ⊓ P : Subgroup G) : Set G) := by
-    rw [← Subgroup.normal_subgroupOf_iff_le_normalizer (inf_le_left : R ⊓ P ≤ R),
-      Subgroup.inf_subgroupOf_left]
-    exact ‹P.Normal›.subgroupOf R
-  -- Dedekind (modular) law: `P ◁ G` ゆえ `S ⊔ P = S·P` (集合の積) なので要素計算でよい
-  -- (`Subgroup G` の束は一般には modular でない — mathlib の instance は CommGroup 限定).
-  have hsup : S ⊔ (R ⊓ P) = R := by
-    refine le_antisymm (sup_le hSRle inf_le_left) fun r hr => ?_
-    have hrmem : r ∈ ((S : Set G) * (P : Set G)) := by
-      have h : r ∈ ((S ⊔ P : Subgroup G) : Set G) := by
-        rw [SetLike.mem_coe, ← hG₀]; exact hRG₀ hr
-      rwa [Subgroup.mul_normal S P] at h
-    obtain ⟨s, hs, x, hx, rfl⟩ := hrmem
-    have hxR : x ∈ R := by
-      have h := R.mul_mem (R.inv_mem (hSRle hs)) hr
-      simpa using h
-    exact Subgroup.mul_mem_sup hs ⟨hxR, hx⟩
-  have hRP : IsPGroup p ↥(R ⊓ P) :=
-    hP.of_injective (Subgroup.inclusion (inf_le_right : R ⊓ P ≤ P))
-      (Subgroup.inclusion_injective _)
-  have key : pResidualOf p R = pResidualOf p S :=
-    pResidualOf_sup_eq hSRle inf_le_left (hRT.trans hSn) hRPnorm hRP hsup
-  calc P ≤ Subgroup.normalizer (R : Set G) := hPnR
-    _ ≤ Subgroup.normalizer (pResidualOf p R : Set G) := normalizer_le_normalizer_pResidualOf p R
+  have hPn : S ⊔ P ≤ Subgroup.normalizer (P : Set G) := by
+    rw [Subgroup.normalizer_eq_top]; exact le_top
+  have key : pResidualOf p (S ⊔ P) = pResidualOf p S :=
+    pResidualOf_sup_eq_of_isSubnormal le_sup_left le_sup_right hS.subgroupOf hPn hP rfl
+  calc P ≤ S ⊔ P := le_sup_right
+    _ ≤ Subgroup.normalizer ((S ⊔ P : Subgroup G) : Set G) := Subgroup.le_normalizer
+    _ ≤ Subgroup.normalizer (pResidualOf p (S ⊔ P) : Set G) :=
+        normalizer_le_normalizer_pResidualOf p _
     _ = Subgroup.normalizer (pResidualOf p S : Set G) := by rw [key]
 
 end
 
-/-- **Corollary 9.27 の subnormal 版 (相対形)**: ambient 群を部分群 `H` に取り替えた形.
-`S ≤ T ≤ H`, `P ≤ H` で `T`, `P` が `H` に normal, `S` が `T` に normal, `P` が `p`-群
-ならば `P ≤ N_G(O^p(S))`.
+/-- **Isaacs Corollary 9.27 の相対形**: ambient 群を部分群 `H` に取り替えた形.
+`S ≤ H` が `↥H` の中で subnormal, `P ≤ H` が `H` に正規な `p`-群ならば
+`P ≤ N_G(O^p(S))`.
 
-Thm 9.24 の Case 2 はこの形で使う (`H` が ambient, `T = core_H(D)`, `S = core_K(E) = V`,
-`P = O_p(H)`; いずれも `G` には normal でない). 絶対版を `↥H` に適用し
-`map_subtype_le_normalizer_map_subtype` で ambient に戻す. -/
+Thm 9.24 の Case 2 はこの形で使う (`H` が ambient; `S = V`, `P = O_p(H)` はいずれも `G` に
+は normal でない). 絶対版を `↥H` に適用し `map_subtype_le_normalizer_map_subtype` で
+ambient に戻す. -/
+theorem le_normalizer_pResidualOf_of_isSubnormal_rel [Finite G] [Fact p.Prime]
+    {H S P : Subgroup G} (hSH : S ≤ H) (hPH : P ≤ H)
+    (hS : (S.subgroupOf H).IsSubnormal)
+    (hPn : H ≤ Subgroup.normalizer (P : Set G)) (hP : IsPGroup p ↥P) :
+    P ≤ Subgroup.normalizer (pResidualOf p S : Set G) := by
+  haveI : (P.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPH).mpr hPn
+  have hPpg : IsPGroup p ↥(P.subgroupOf H) :=
+    hP.of_injective (Subgroup.subgroupOfEquivOfLe hPH).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hPH).injective
+  have key := le_normalizer_pResidualOf_of_isSubnormal (G := ↥H) hS hPpg
+  have hlift := map_subtype_le_normalizer_map_subtype key
+  rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPH,
+    map_subtype_pResidualOf_subgroupOf hSH] at hlift
+
+/-- **Corollary 9.27 の defect 2 相対形** (呼び出し側の便宜): `S ◁ T ◁ H` (いずれも `H` の
+中での話) と `P ◁ H` が `p`-群という形から `P ≤ N_G(O^p(S))` を得る.
+
+`(S.subgroupOf H).IsSubnormal` を長さ 2 の鎖から組み立てて
+`le_normalizer_pResidualOf_of_isSubnormal_rel` に渡すだけ. Thm 9.24 の Case 2 は
+Step A (`V ◁ M ◁ H`) と Step D (`U^k ◁ N ◁ D`) の 2 箇所でこの形を使う. -/
 theorem le_normalizer_pResidualOf_of_subnormal_two_rel [Finite G] [Fact p.Prime]
     {H S T P : Subgroup G} (hST : S ≤ T) (hTH : T ≤ H) (hPH : P ≤ H)
     (hTn : H ≤ Subgroup.normalizer (T : Set G))
@@ -485,16 +534,10 @@ theorem le_normalizer_pResidualOf_of_subnormal_two_rel [Finite G] [Fact p.Prime]
     (hSn : T ≤ Subgroup.normalizer (S : Set G)) (hP : IsPGroup p ↥P) :
     P ≤ Subgroup.normalizer (pResidualOf p S : Set G) := by
   haveI : (T.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hTH).mpr hTn
-  haveI : (P.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPH).mpr hPn
-  have hSH : S ≤ H := hST.trans hTH
-  have hPpg : IsPGroup p ↥(P.subgroupOf H) :=
-    hP.of_injective (Subgroup.subgroupOfEquivOfLe hPH).toMonoidHom
-      (Subgroup.subgroupOfEquivOfLe hPH).injective
-  have key := le_normalizer_pResidualOf_of_subnormal_two (G := ↥H)
-    (S := S.subgroupOf H) (T := T.subgroupOf H) (P := P.subgroupOf H)
-    (Subgroup.comap_mono hST) (subgroupOf_le_normalizer_subgroupOf hSn) hPpg
-  have hlift := map_subtype_le_normalizer_map_subtype key
-  rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPH,
-    map_subtype_pResidualOf_subgroupOf hSH] at hlift
+  have hSTH : S.subgroupOf H ≤ T.subgroupOf H := Subgroup.comap_mono hST
+  refine le_normalizer_pResidualOf_of_isSubnormal_rel (hST.trans hTH) hPH ?_ hPn hP
+  exact Subgroup.IsSubnormal.step _ _ hSTH ‹(T.subgroupOf H).Normal›.isSubnormal
+    ((Subgroup.normal_subgroupOf_iff_le_normalizer hSTH).mpr
+      (subgroupOf_le_normalizer_subgroupOf hSn))
 
 end OddOrder.Isaacs.Ch09

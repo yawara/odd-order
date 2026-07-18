@@ -10,7 +10,7 @@ import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
-# Isaacs Ch. 9 — §9C: Thompson–Wielandt (Theorems 9.23/9.24), p. 283–284
+# Isaacs Ch. 9 — §9C: Thompson–Wielandt (Theorems 9.23/9.24), pp. 285–288
 
 まず `core_H(D)` (相対 normalCore = `D` に含まれ `H` に normal な最大部分群) の infra を
 用意する. Theorem 9.24 の statement (`M = core_H(D)`, `N = core_K(D)`, `E = M∩N`,
@@ -141,9 +141,9 @@ theorem relCore_thompsonWielandtCore_le_relCore :
 /-- `M = core_H(D)` は `V = core_K(E)` を正規化する (`M ≤ D ≤ K ≤ N_G(V)`):
 Case 2 の subnormal chain `V ◁ M ◁ H` の normality 部分.
 
-⚠ ここが書籍 p. 284 の「`V ◁ M ◁ H`, so `V ◁ H`」の箇所. 実際に得られるのは
-`V ◁ M ◁ H` (subnormal) までで `V ◁ H` ではないため, 下流では normal 版でなく
-subnormal 版の Cor 9.27 (`le_normalizer_pResidualOf_of_subnormal_two_rel`) を使う. -/
+書籍 p. 287 (Thm 9.24 の証明冒頭) の「Since `V ◁ K`, we have `V ◁ M ◁ H`, so `V ◁◁ H`」
+に対応する. 書籍も `V ◁◁ H` (subnormal) までしか主張していないので, 下流では書籍どおり
+subnormal 仮説の Cor 9.27 (`le_normalizer_pResidualOf_of_subnormal_two_rel`) を使う. -/
 theorem relCore_le_normalizer_relCore_thompsonWielandtCore :
     relCore H (H ⊓ K)
       ≤ Subgroup.normalizer ((relCore K (thompsonWielandtCore H K) : Subgroup G) : Set G) :=
@@ -175,10 +175,11 @@ theorem normalizer_pResidualOf_relCore_eq (p : ℕ)
   normalizer_eq_left_of_noNormal hyp hX (pResidualOf_relCore_le_inf H K p)
     (le_normalizer_pResidualOf_relCore H K p)
 
-/-- **Thm 9.24 Case 2 の Step A** (書籍 p. 284): `P = O_p(H)` は `Y = O^p(V)` を正規化する.
+/-- **Thm 9.24 Case 2 の Step A** (書籍 p. 288): `P = O_p(H)` は `Y = O^p(V)` を正規化する.
 
-書籍は「`V ◁ H` かつ `P ◁ H` ゆえ Cor 9.27」と述べるが, 実際には `V ◁ M ◁ H` (subnormal)
-なので subnormal 版 Cor 9.27 の相対形を `H` を ambient として適用する. -/
+書籍は「Since `V ◁◁ H` and `P ◁ H`, it follows by Corollary 9.27 that `P` normalizes
+`Y = O^p(V)`」と述べる. その Cor 9.27 (subnormal 仮説) の相対形を `H` を ambient として
+適用する — 鎖は `V ◁ M ◁ H` (defect 2). -/
 theorem opiCoreInG_le_normalizer_pResidualOf_relCore [Finite G] {p : ℕ} [Fact p.Prime] :
     GroupTheory.opiCoreInG ({p} : Set ℕ) H
       ≤ Subgroup.normalizer
@@ -203,7 +204,7 @@ theorem normalizer_pResidualOf_relCore_eq_right (p : ℕ)
     (by rwa [thompsonWielandtCore_comm])
   rwa [thompsonWielandtCore_comm] at h
 
-/-- **Thm 9.24 Case 2 の Step C** (書籍 p. 284): `Y = O^p(V) ≠ 1` ならば
+/-- **Thm 9.24 Case 2 の Step C** (書籍 p. 288): `Y = O^p(V) ≠ 1` ならば
 `P = O_p(H) ≤ D = H ⊓ K`.
 
 Step A で `P ≤ N_G(Y)`, Step B (K 版) で `N_G(Y) = K`, また `P ≤ H` は自明. -/
@@ -215,14 +216,12 @@ theorem opiCoreInG_le_inf [Finite G] {p : ℕ} [Fact p.Prime]
     ((opiCoreInG_le_normalizer_pResidualOf_relCore H K).trans_eq
       (normalizer_pResidualOf_relCore_eq_right H K p hyp hY))
 
-/-- **Thm 9.24 Case 2 の Step D** (書籍 p. 284): 各 `k ∈ K` で `P = O_p(H) ≤ H^k`.
+/-- **Thm 9.24 Case 2 の Step D** (書籍 p. 288): 各 `k ∈ K` で `P = O_p(H) ≤ H^k`.
 
-書籍の議論: `U ◁ H` ゆえ `U ◁ N`, よって `U^k ◁ N^k = N ◁ D`. `D` を ambient として
-subnormal 版 Cor 9.27 を適用すると `P` は `O^p(U^k) = X^k` を正規化し,
-`P ≤ N_G(X^k) = N_G(X)^k = H^k`.
-
-(ここでも `U^k ◁ N ◁ D` は subnormal であって `U^k ◁ D` ではないので, 書籍の
-「`U^k ◁ D`」という記述は Step A と同じ jump を含む — subnormal 版で埋める.) -/
+書籍の議論: `U ◁ H` ゆえ `U ◁ N`, よって `U^k ◁ N^k = N`; 「Since `N ◁ D`, we have
+`U^k ◁◁ D`, and by Corollary 9.27 applied in the group `D`」— `D` を ambient として
+Cor 9.27 (subnormal 仮説) を適用すると `P` は `O^p(U^k) = X^k` を正規化し,
+`P ≤ N_G(X^k) = N_G(X)^k = H^k`. 鎖は `U^k ◁ N ◁ D` (defect 2). -/
 theorem opiCoreInG_le_map_conj [Finite G] {p : ℕ} [Fact p.Prime]
     (hyp : NoNormalInSupergroup H K (H ⊓ K))
     (hX : pResidualOf p (relCore H (thompsonWielandtCore H K)) ≠ ⊥)
@@ -260,7 +259,7 @@ theorem opiCoreInG_le_map_conj [Finite G] {p : ℕ} [Fact p.Prime]
     normalizer_pResidualOf_relCore_eq H K p hyp hX] at key
   exact key
 
-/-- **Thm 9.24 Case 2 の Step E** (書籍 p. 284): `P = O_p(H) ≤ core_K(D) = N`.
+/-- **Thm 9.24 Case 2 の Step E** (書籍 p. 288): `P = O_p(H) ≤ core_K(D) = N`.
 
 Step D の `P ≤ H^k` (∀ `k ∈ K`) と `P ≤ K` から `P ≤ D^k` (∀ `k`), これは
 `le_relCore_iff` により `P ≤ core_K(D)` に他ならない. -/
@@ -281,7 +280,7 @@ theorem opiCoreInG_le_relCore_right [Finite G] {p : ℕ} [Fact p.Prime]
   rw [hgx]
   exact hy
 
-/-- **Thm 9.24 Case 2 の Step F** (書籍 p. 284): `O_p(H) ≤ O_p(K)`.
+/-- **Thm 9.24 Case 2 の Step F** (書籍 p. 288): `O_p(H) ≤ O_p(K)`.
 
 Step E で `P = O_p(H) ≤ N = core_K(D)`; `N ≤ D ≤ H ≤ N_G(P)` ゆえ `P ◁ N`, よって
 `P ≤ O_p(N)`. さらに `N ◁ K` ゆえ `O_p(N) ◁ K` で `O_p(N) ≤ O_p(K)`. -/
@@ -313,7 +312,7 @@ theorem opiCoreInG_le_opiCoreInG [Finite G] {p : ℕ} [Fact p.Prime]
       (GroupTheory.isPiSubgroup_opiCoreInG _ _)
   exact h1.trans h2
 
-/-- **Thm 9.24 の Case 2** (書籍 p. 284): ある素数 `p` で `O_p(H) ≠ 1` (すなわち `F(H) > 1`)
+/-- **Thm 9.24 の Case 2** (書籍 p. 288): ある素数 `p` で `O_p(H) ≠ 1` (すなわち `F(H) > 1`)
 ならば `O^p(U) = 1` または `O^p(V) = 1`, つまり `U` または `V` が `p`-群.
 
 証明: `X = O^p(U) ≠ 1` かつ `Y = O^p(V) ≠ 1` と仮定する. Step F とその `H`/`K` 対称版から
@@ -427,7 +426,7 @@ theorem layerInG_le_inf_of_fitting_eq_bot [Finite G]
     (le_normalizer_relCore H (H ⊓ K))
     (relCore_le_normalizer_relCore_thompsonWielandtCore H K)).trans_eq hKres
 
-/-- **Thm 9.24 の Case 1** (書籍 p. 284): `F(H) = F(K) = 1` ならば `U = 1` または `V = 1`
+/-- **Thm 9.24 の Case 1** (書籍 pp. 287-288): `F(H) = F(K) = 1` ならば `U = 1` または `V = 1`
 (特に `U` または `V` は任意の素数について `p`-群).
 
 証明: `U ≠ 1` かつ `V ≠ 1` と仮定する. `F(H)=F(K)=1` より `U`, `V` は nilpotent でなく
@@ -510,7 +509,7 @@ theorem factorial_pred_mul_self {a : ℕ} (ha : a ≠ 0) :
 
 `|H : core_H(D)| = |D : core_H(D)| · |H : D|` を `|H : core_H(D)| ≤ |H:D|!` と
 `|H:D|! = |H:D| · (|H:D| - 1)!` に突き合わせて `|H:D|` で割ったもの.
-書籍 p. 283 の「`|D:M| ≤ (a-1)!`」に対応 (これが無いと `|H:E| ≤ a!b!` の係数が合わない). -/
+書籍 p. 286 の「`|D:M| ≤ (a-1)!`」に対応 (これが無いと `|H:E| ≤ a!b!` の係数が合わない). -/
 theorem relCore_relIndex_le_factorial_pred [Finite G] {H D : Subgroup G} (hDH : D ≤ H) :
     (relCore H D).relIndex D ≤ Nat.factorial (D.relIndex H - 1) := by
   have hane : D.relIndex H ≠ 0 := relIndex_ne_zero D H
@@ -522,7 +521,7 @@ theorem relCore_relIndex_le_factorial_pred [Finite G] {H D : Subgroup G} (hDH : 
     _ ≤ Nat.factorial (D.relIndex H) := relCore_relIndex_le_factorial H D
     _ = Nat.factorial (D.relIndex H - 1) * D.relIndex H := hfac.symm
 
-/-- **Thm 9.23 の index 連鎖** (書籍 p. 283): `|H : E| ≤ a! · b!`
+/-- **Thm 9.23 の index 連鎖** (書籍 p. 286): `|H : E| ≤ a! · b!`
 (`a = |H : D|`, `b = |K : D|`, `D = H ⊓ K`, `E = core_H(D) ⊓ core_K(D)`).
 
 `|D:E| ≤ |D:M|·|D:N| ≤ (a-1)!(b-1)!` (`relIndex_inf_le` + `relCore_relIndex_le_factorial_pred`
@@ -561,7 +560,7 @@ theorem relCore_thompsonWielandtCore_relIndex_le [Finite G] (H K : Subgroup G) :
     (Nat.factorial_le (thompsonWielandtCore_relIndex_le H K))
 
 /-- `H` に normal な `p`-部分群 `U` は `O_p(H)` に含まれるので `|H : O_p(H)| ≤ |H : U|`.
-書籍 p. 283 の「`U ◁ H` かつ `U` が `p`-群ゆえ `|H:O_p(H)| ≤ |H:U|`」に対応. -/
+書籍 p. 286 の「`U ◁ H` かつ `U` が `p`-群ゆえ `|H:O_p(H)| ≤ |H:U|`」に対応. -/
 theorem opiCoreInG_relIndex_le_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
     {H U : Subgroup G} (hUH : U ≤ H) (hUn : H ≤ Subgroup.normalizer (U : Set G))
     (hU : IsPGroup p ↥U) :
@@ -671,14 +670,14 @@ theorem exists_prime_opiCoreInG_ne_bot [Finite G] {H : Subgroup G}
   rw [GroupTheory.opiCoreInG, Subgroup.map_eq_bot_iff_of_injective _ H.subtype_injective] at h
   rwa [← Ch04.oPiCore_singleton_eq_opCore]
 
-/-- **Isaacs Theorem 9.24** (Thompson–Wielandt の一般形; p. 283).
+/-- **Isaacs Theorem 9.24** (Thompson–Wielandt の一般形; p. 286).
 
 相異なる部分群 `H`, `K` について `D = H ⊓ K` とし,「`D` の非自明部分群は `H` または `K` を
 真に含むどの部分群にも normal でない」(`NoNormalInSupergroup`) を仮定する.
 `E = core_H(D) ⊓ core_K(D)` (`thompsonWielandtCore`), `U = core_H(E)`, `V = core_K(E)`
 とおくと, **ある素数 `p` で `U` または `V` が `p`-群**.
 
-証明は書籍 p. 284 の 2 ケース:
+証明は書籍 pp. 287-288 の 2 ケース:
 * `F(H) = F(K) = 1` (`relCore_eq_bot_or_of_fitting_eq_bot`): `U` または `V` が自明.
 * さもなくば (対称性より `F(H) > 1` として) ある `p` で `O_p(H) > 1`
   (`pResidualOf_relCore_eq_bot_or`): `O^p(U) = 1` または `O^p(V) = 1`, すなわち
@@ -720,7 +719,7 @@ section /- 9C: Theorem 9.23 (Thompson の corefree 極大部分群の bound) -/
 共役 `MulAut.conj g` は同型なので `O_π` と可換 (`map_opiCoreInG_mulEquiv`) であり,
 単射写像は相対 index を保つ (`Subgroup.relIndex_map_map_of_injective`).
 Thm 9.23 の `V`-branch で「`K` 側で得た bound を `H` 側に読み替える」ために使う
-(書籍 p. 283 が「`H` と `K` は同型だからどちらでもよい」と一言で済ませる箇所). -/
+(書籍 pp. 286-287 が「`H` と `K` は同型だからどちらでもよい」と一言で済ませる箇所). -/
 theorem opiCoreInG_relIndex_map_conj (π : Set ℕ) (H : Subgroup G) (g : G) :
     (GroupTheory.opiCoreInG π (H.map (MulAut.conj g : G →* G))).relIndex
         (H.map (MulAut.conj g : G →* G))
@@ -728,12 +727,12 @@ theorem opiCoreInG_relIndex_map_conj (π : Set ℕ) (H : Subgroup G) (g : G) :
   rw [← GroupTheory.map_opiCoreInG_mulEquiv π (MulAut.conj g) H]
   exact Subgroup.relIndex_map_map_of_injective _ _ (MulAut.conj g).injective
 
-/-- **Isaacs Theorem 9.23** (Thompson; p. 283).
+/-- **Isaacs Theorem 9.23** (Thompson; p. 285).
 
 `H` を有限群 `G` の corefree な極大部分群, `g ∈ G - H`, `m = |H : H ∩ H^g|` とすると,
 **ある素数 `p` について `|H : O_p(H)| ≤ ((m!)²)!`**.
 
-証明 (書籍 p. 283 の Thm 9.24 からの導出):
+証明 (書籍 p. 286 の Thm 9.24 からの導出):
 `K = H^g` とおくと `H` は自己正規化的 (corefree 極大) ゆえ `H ≠ K` であり,
 `H`, `K` は Thm 9.24 の仮説を満たす (`noNormalInSupergroup_of_corefree_maximal`).
 `E = core_H(D) ⊓ core_K(D)`, `U = core_H(E)`, `V = core_K(E)` として `thompsonWielandt` を
