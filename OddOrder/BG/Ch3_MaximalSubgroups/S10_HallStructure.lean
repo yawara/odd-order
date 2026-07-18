@@ -384,6 +384,22 @@ theorem oPiCore_isHall_of_isNilpotent
     rwa [hidx_eq] at hpidx
   exact (Ch03.oPiCore.isPiGroup {q | q ∉ π} p hpOπc) hpπ
 
+/-- **Commutative `π'`-core forces the derived subgroup into the `π`-core**:
+if `K` is finite nilpotent and `O_{π'}(K)` is commutative, then `K' ≤ O_π(K)`.
+
+証明: `top_le_oPiCore_sup_compl_of_isNilpotent` により `O_π(K) ⊔ O_{π'}(K) = ⊤`, かつ
+`O_π(K) ⊴ K` なので `K ⧸ O_π(K)` は可換群 `O_{π'}(K)` の準同型像となり可換. よって
+`K' ≤ O_π(K)` (mathlib `Subgroup.Normal.commutator_le_of_self_sup_commutative_eq_top`
+がこの議論そのもの).
+
+`π := {p}` と取れば「`O_{p'}(K)` が可換な有限冪零群では `K' ≤ O_p(K)`」の形になる. -/
+theorem commutator_le_oPiCore_of_isMulCommutative_compl_of_isNilpotent
+    {K : Type*} [Group K] [Finite K] [Group.IsNilpotent K] (π : Set ℕ)
+    (hab : IsMulCommutative ↥(Ch03.oPiCore πᶜ K)) :
+    commutator K ≤ Ch03.oPiCore π K :=
+  Subgroup.Normal.commutator_le_of_self_sup_commutative_eq_top
+    (top_le_iff.mp (top_le_oPiCore_sup_compl_of_isNilpotent π)) hab
+
 /-- **BG Theorem 10.2(b), Hall-`σ` quotient as the Fitting `σ`-core**:
 inside the nilpotent group `F(M/M_α)`, the image of any Hall `σ(M)`-subgroup
 is exactly `O_{σ(M)}(F(M/M_α))`. -/
@@ -950,3 +966,4 @@ theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
 
 
 end OddOrder.BG.Ch3.S10
+
