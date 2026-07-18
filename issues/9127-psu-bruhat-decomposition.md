@@ -16,12 +16,25 @@ faithful determinant-one root--torus Borel. No open 9000-series claim owns the
 next upstream layer: the nontrivial Weyl--root relation, two Bruhat cells,
 point-stabilizer equality, and exact full group order.
 
+## 作用規約の裁定（2026-07-18）
+
+Peterfalvi は右作用を用い、Chapter IV §3 の reciprocal を
+`F(a,b) = (a/b, 1/b)` と書く。Lean 側は `MulAction` に合わせた左作用と
+左 root translation を採用するため、affine 座標を root inversion
+`J(u) = u⁻¹` で移送する。したがって標準 Weyl 写像は
+`J ∘ F ∘ J(a,b) = (a/star(b), 1/b)` である。これは同じ作用の共役表示で
+あり、原文の `F` 自体を変更するものではない。ユーザー承認により左作用を
+維持するこの設計を採用した。これに伴い Hua parameter は
+`b / star(b)^2`、Bruhat relation の左右 root はそれぞれ `J F J(u)` と
+`F(u)` になる。
+
 ## やること
 
 - [ ] Construct the determinant-one Hua/Bruhat torus parameter from the nonzero
-  second root coordinate and prove its underlying value is `star(b) / b^2`.
-- [ ] Define the right root parameter and prove the coordinate identities needed
-  for the nontrivial relation `w R(u) w = b₁ w b₂`.
+  second root coordinate and prove its underlying value is `b / star(b)^2`.
+- [ ] Use `weylReciprocal u` as the left root and Peterfalvi's `reciprocal u` as
+  the right root, and prove the coordinate identities needed for the nontrivial
+  relation `w R(u) w = b₁ w b₂`.
 - [ ] Prove the Weyl--root relation as equality of concrete unital permutations,
   including pole, origin, and generic affine cases.
 - [ ] Prove inverse closure of the standard generators and use closure induction to

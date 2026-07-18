@@ -344,6 +344,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.reciprocal_reciprocal
 #assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.snd_inv_eq_star
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.weylReciprocal_weylReciprocal
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.weylReciprocal_scalePoint_weylReciprocal
+#assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.weylPerm_apply_self
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.psuTorusPerm_injective

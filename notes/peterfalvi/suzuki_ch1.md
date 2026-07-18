@@ -181,9 +181,12 @@
      the faithful regular affine root action, the full diagonal action, and its faithful
      determinant-one torus restriction.  It proves that the `SU(3)` diagonal parameter
      `t` has root weight `star(t)^2 / t = t^(2q-1)` and computes the exact torus order.
-   - The same leaf constructs Peterfalvi’s reciprocal Weyl permutation
-     `(x,y) ↦ (x/y,1/y)`, proves involutivity, and proves both root--torus and
-     Weyl--torus conjugation formulas on the concrete unital.
+   - Peterfalvi uses right actions and writes `F(x,y) = (x/y,1/y)`.  Lean uses
+     left root translations and therefore identifies its affine coordinate with the
+     inverse source coordinate.  The same leaf retains `F` as `reciprocal` and uses
+     the transported Weyl map `J F J(x,y) = (x/star(y),1/y)` as
+     `weylReciprocal`. It proves involutivity and both root--torus and Weyl--torus
+     conjugation formulas on the concrete unital.
    - `GroupTheory/SpecificGroups/ProjectiveUnitary/GeneratedAction.lean` takes the
      honest closure of the root, determinant-one torus, and Weyl permutations inside
      the finite symmetric group.  It internalizes the three generator families with
