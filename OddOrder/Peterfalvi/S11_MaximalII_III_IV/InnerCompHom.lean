@@ -1190,7 +1190,8 @@ theorem hcZeta_induceHU_irreducible [Finite G] {M : Subgroup G}
       (hcPsi chief θ), hcZeta_irreducible chief θ hθ₀⟩ : IrreducibleCharacter ↥(huSub data)) hIeq
 
 /-- **Conjunct (c) of (9.8.c), `hIM`-gated assembly**: given the not-`W₁`-fixed datum (`hIM`), the
-(9.8.c) construction `Ind_{HU}^M ζ` witnesses an irreducible `𝒮(H₀C)`-member of degree `qu`.  Bundles
+(9.8.c) construction `Ind_{HU}^M ζ` witnesses an irreducible `𝒮(H₀C)`-member of degree `qu`.
+Bundles
 the membership (`hcZeta_induceHU_mem_sOf`), irreducibility (`hcZeta_induceHU_irreducible`), and
 degree
 (`hcZeta_induceHU_apply_one`).  Discharging `hIM` (the free-`W₁`-orbit propagation `θ̄^{w₀}≠θ̄ ⟹
@@ -1500,7 +1501,8 @@ summand `Hpart i` iff `θbar` is (`q = quotientMulAutHom`).  A form-alignment wr
 `caseA_uActionHom_comp_subtype_eq_one_iff`: `uActionHom data chief ⟨a, ·⟩ = quotientMulAutHom a`
 (`uActionHom` is `quotientMulAutHom ∘ U.subgroupOf.subtype`), so the `Ū`-action on the factors
 matches
-`q(a)`.  Combined with the orbit equality `θbar∘q(a) = θbar∘q(w)` (`exists_uPart_..._of_fixed`), this
+`q(a)`.  Combined with the orbit equality `θbar∘q(a) = θbar∘q(w)` (`exists_uPart_..._of_fixed`),
+this
 makes the nontrivial-`Hpart` set invariant under the `W₁`-twist `q(w)`. -/
 theorem caseA_theta_comp_quotient_uPart_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -1532,7 +1534,8 @@ theorem comp_quotient_uPart_comp_subtype_eq_one_iff_of_aInvariant [Finite G] {M 
 
 /-- **step 2 D₂: precompose–pointwise-smul bridge**.  A character `θ` is trivial on the translate
 `a • S` (`a : MulAut K`) iff its precomposition `θ ∘ a` is trivial on `S` (any element of `a • S` is
-`a s` for `s ∈ S`).  Used with `a = q(v)` (`quotientMulAutHom`) and `S = S₀` to turn nontriviality on
+`a s` for `s ∈ S`).  Used with `a = q(v)` (`quotientMulAutHom`) and `S = S₀` to turn nontriviality
+on
 the Clifford summand `Hpart i = q(orbitRep i) • S₀` into nontriviality of `θbar ∘ q(orbitRep i)` on
 the generator `S₀`, the last bridge of the (9.8.c) surjectivity regularity argument. -/
 theorem comp_subtype_pointwise_smul_eq_one_iff {K : Type*} [Group K] (a : MulAut K)

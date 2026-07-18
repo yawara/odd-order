@@ -556,7 +556,8 @@ the
 `card_fixedPoints_conjByPermIrr…` + `IsPGroup.card_modEq_card_fixedPoints`), whence `Ind χ` is a
 fresh
 irreducible (`induce_isIrreducible_of_forall_chiRestrict_ne`) distinct from every `μ_{ij}`
-(`induce_ne_certainType_of_forall_chiRestrict_ne`).  Assembling the residue case (by definition) with
+(`induce_ne_certainType_of_forall_chiRestrict_ne`).  Assembling the residue case (by definition)
+with
 that induced-irreducible case gives exactly the dichotomy `PrimeTIResidueData.prTIres_irr_cases`
 posits.  So the constructor of `PrimeTIResidueData` is a **bridge from an `S06.Hypothesis`**, not a
 from-scratch `cyclicTIiso` port (issue 9014): the single genuinely-deep field is discharged by

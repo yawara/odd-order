@@ -462,7 +462,8 @@ gives `|L_F|` prime to `q`, so `W₁ ∩ L_F = 1`; were `U ∩ L_F = 1`, `U W₁
 fixed-point-freely on `L_F`, forcing `L_F = 1` by (9.1).  The genuine §13 structural obligation
 feeding (13.17); see issue 2009.
 
-*Skeleton status (Phase 2):* the assembly is proven — `U ≠ ⊥` (from `fitting_lt_derived`), `N_G(U) ≠ ⊤`
+*Skeleton status (Phase 2):* the assembly is proven — `U ≠ ⊥` (from `fitting_lt_derived`),
+`N_G(U) ≠ ⊤`
 (simplicity), the maximal `L ⊇ N_G(U)`, and the (8.8.b4) trichotomy dispatch, with the type-II
 property `N_G(U) ⊄ S` wired in through `not_normalizer_U_le_S ∘ exists_conj_typeP_U_of_coprime ∘
 coprime_card_U_card_P_of_disjoint`.  Four documented gates remain: `hdisj` (Phase 0(b) carrier
@@ -625,7 +626,8 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
 
 /-- **`S`-side dual of `tConjugate_fitting_data`** (Pf (13.17.a), V-side L~S exclusion input): for a
 maximal `L` conjugate to `S`, the Fitting kernel `L_F` is a `p`-group of order `p^q` containing `W₂`
-and meeting `V` trivially.  **Now proven** (the V-side mirror of `tConjugate_fitting_data`): part (1)
+and meeting `V` trivially.  **Now proven** (the V-side mirror of `tConjugate_fitting_data`): part
+(1)
 `|L_F| = p^q` from the proven `card_P_eq` via the `S`-conjugation equivariance of `M_F`; part (2)
 `W₂ ≤ L_F` places the `p`-group `W₂ ⊆ N_G(V) ⊆ L` in the normal `p`-Hall `L_F`; part (3)
 `L_F ⊓ V = ⊥`

@@ -168,7 +168,8 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff
 /-- **(5.2.e) irreducible break-pair vs certain-type column cross-orthogonality** `R(χ) ⊥ R(μ_j)`.
 The `R(μ_j) ⊥ R(χ)` lemma `certainTypeR_imageSet_orthogonal_dadeOfDiff` with the two families
 swapped, by conjugate symmetry of the inner product.  This is the member-side ingredient when the
-**break** is a reducible certain-type column (the family roles are reversed from the irreducible-break
+**break** is a reducible certain-type column (the family roles are reversed from the
+irreducible-break
 `caseB_member_orthoDatum`): an irreducible member `x = Ind θ` has image family `R(x) =
 dadeOrthonormalCharacterImageFamilyOfDiff`, which must be orthogonal to the column break's
 `R(μ_j) = certainTypeR`. -/

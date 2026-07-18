@@ -170,7 +170,8 @@ theorem isElementaryAbelian_multiplicative [Finite F] :
 /-- The right-multiplication action of a commutative subgroup `A ⊆ Fˣ` on `(F, +)` (written
 multiplicatively), as a monoid homomorphism into `MulAut (Multiplicative F)`.  Right multiplication
 is additive (`rightMul`); the homomorphism property needs `A` commutative (`hcomm`), since right
-multiplication is otherwise only an anti-homomorphism.  Together with `isElementaryAbelian_multiplicative`
+multiplication is otherwise only an anti-homomorphism.  Together with
+`isElementaryAbelian_multiplicative`
 this is the data fed to Appendix I's `exists_field_semilinear`. -/
 noncomputable def rightMulAction (A : Subgroup Fˣ)
     (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) :

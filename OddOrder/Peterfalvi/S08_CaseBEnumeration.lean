@@ -123,7 +123,8 @@ set `certainTypeSet h46 k`.
 
 Produces the four conjuncts `hpair0`/`hpair1`/`hpairs`/`hcover` of the norm-weighted X-chain fold
 `xChainCoherentW` (with `S₀ = certainTypeSet h46 k`, `X = hyp.Xset h46.W2`), packaged with an
-irreducible-character sequence `χs` witnessing the pair members.  Assembled from the Γ-generic engine
+irreducible-character sequence `χs` witnessing the pair members.  Assembled from the Γ-generic
+engine
 `exists_conjugatePairCover_general` (no `X`-irreducibility hypothesis needed); the pair members are
 the **non-`S₀`** `X`-members.
 

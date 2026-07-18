@@ -162,7 +162,8 @@ theorem subsingleton_of_isPGroup_of_not_dvd {p : ℕ} [Fact p.Prime] {Δ : Type*
 /-- **Peterfalvi (6.5)(b) reduction core: a finite nilpotent group with `p`-group abelianization is
 a `p`-group.**
 
-Let `P` be the Sylow `p`-subgroup, normal since `Γ` is nilpotent.  The quotient `Q = Γ ⧸ P` has order
+Let `P` be the Sylow `p`-subgroup, normal since `Γ` is nilpotent.  The quotient `Q = Γ ⧸ P` has
+order
 `[Γ:P]` coprime to `p`, so `Abelianization Q` — both a `p`-group (a homomorphic image of
 `Abelianization Γ`, `Abelianization.map` of `Γ ↠ Q`) and of order dividing `[Γ:P]` — is trivial.
 Hence `Q` is perfect (`commutator Q = ⊤`); being nilpotent (a quotient of `Γ`) and hence solvable,

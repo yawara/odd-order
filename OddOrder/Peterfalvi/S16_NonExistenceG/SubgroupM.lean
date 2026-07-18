@@ -775,7 +775,8 @@ theorem conj_smul_sdiff_sup_eq_of_normalizer_eq [Finite G] {W W1 W2 : Subgroup G
 /-- **Orbit measure of a TI-subset** `|𝒞_G(A)|/|G| = |A|/|N|` — the real-valued form of the §8
 TI-counting `ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:N]`).  For a TI-subset `A` with
 normalizer-bound `N` stabilizing `A`, the conjugacy-saturation `𝒞_G(A) = A^G` has relative measure
-`|A|/|N|` in `G`.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(Q#)^G` into a
+`|A|/|N|` in `G`.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(Q#)^G` into
+a
 `1/|N_G(·)|`-term (Pf 04.16 lines 109–115). -/
 theorem orbit_normSq_term [Finite G] {A : Set G} {L : Subgroup G}
     (hTI : OddOrder.GroupTheory.IsTISubset A L)

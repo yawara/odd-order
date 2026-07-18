@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_ThompsonPComplementFinal
 
 /-!
-# Isaacs FGT Ch.7 (Thompson subgroup) — S7D part 1: Burnside p^a q^b setup (Thm 7.8 stmt, scaffolding, Steps 2-9 decomp, faithful-action bridge) (pp. 219-222)
+# Isaacs FGT Ch.7 (Thompson subgroup) — S7D part 1: Burnside p^a q^b setup (Thm 7.8 stmt,
+scaffolding, Steps 2-9 decomp, faithful-action bridge) (pp. 219-222)
 -/
 
 namespace OddOrder.Isaacs.Ch07

@@ -1258,7 +1258,8 @@ theorem prime_dvd_orderOf_piPart [Finite G] {π : Set ℕ} {p : ℕ} (hp : p.Pri
   · exact absurd hpπ (hpiB p (Nat.mem_primeFactors.mpr ⟨hp, h, (orderOf_pos b).ne'⟩))
 
 /-- **The `π`-part is multiplicative on commuting elements** (Coq `consttM`): for commuting `x, y`,
-`piPart π (x * y) = piPart π x * piPart π y`.  Both `π`-parts are powers of `x`, `y`, so they commute
+`piPart π (x * y) = piPart π x * piPart π y`.  Both `π`-parts are powers of `x`, `y`, so they
+commute
 (as do the two `π′`-parts and the cross pairs), letting `x * y = (xπ yπ)(xπ′ yπ′)` be rearranged
 into
 a commuting `π`-element times `π′`-element; uniqueness of the `π`-decomposition
@@ -1385,7 +1386,8 @@ theorem mem_of_coprime_index [Finite G] {M N : Subgroup G} (_hNM : N ≤ M)
 /-- **The index `[M : U ⊔ M_σ]` is a `κ(M)`-number** (`M` maximal, `M_σ` the `σ(M)`-Hall, `U` a
 `(κ∪σ)′`-Hall).  Since `M_σ ≤ U ⊔ M_σ` and `U ≤ U ⊔ M_σ`, `[M : U⊔M_σ]` divides both `[M : M_σ]` (a
 `σ′`-number, `Msigma_subgroupOf_isHall`) and `[M : U]` (a `κ∪σ`-number, `hU`), so each of its primes
-avoids `σ` yet lies in `κ ∪ σ`, i.e. in `κ(M)`.  Combined with `mem_of_coprime_index`, this gives the
+avoids `σ` yet lies in `κ ∪ σ`, i.e. in `κ(M)`.  Combined with `mem_of_coprime_index`, this gives
+the
 `A(M)`-piece absorption "a `κ(M)′`-element of `M` lies in `U ⊔ M_σ`" of BG Theorem E. -/
 theorem index_U_sup_Msigma_primeFactors_subset_kappa [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
@@ -1429,7 +1431,8 @@ theorem card_sup_dvd_mul_of_normal {H N : Subgroup G} [N.Normal] :
 (`card_sup_dvd_mul_of_normal`, `M_σ ◁ M`) and `π(U), π(M_σ) ⊆ κ′`, so any `x ∈ U⊔M_σ` is a
 `κ′`-element; backward, `[M:U⊔M_σ]` is a `κ`-number
 (`index_U_sup_Msigma_primeFactors_subset_kappa`),
-coprime to a `κ′`-element's order, so `mem_of_coprime_index` puts it in `U⊔M_σ`.  The `A(M)`-piece of
+coprime to a `κ′`-element's order, so `mem_of_coprime_index` puts it in `U⊔M_σ`.  The `A(M)`-piece
+of
 BG Theorem E's "distinct orders": `U⊔M_σ`-membership of an element of `M` is order-determined. -/
 theorem mem_U_sup_Msigma_iff_isPiElement_kappa_compl [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)

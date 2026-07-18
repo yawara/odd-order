@@ -32,9 +32,11 @@ carrier previously held six free `_formula : Prop` placeholders (the
 statements** about `β_j`/`Γ`, tied to `hyp`, the grid `hyp.eta`, and `S`:
 
 * `support_formula` — **(13.18.a)** the support of `β_j` is contained in `S`'s η-carrier support;
-* `norm_formula` — **(13.18.b)** `‖β_j‖²_S = (u−1)/q + 2` (its Frobenius `Ind` half is the sorry-free
+* `norm_formula` — **(13.18.b)** `‖β_j‖²_S = (u−1)/q + 2` (its Frobenius `Ind` half is the
+sorry-free
   `norm_induce_one_frobenius`);
-* `Gamma_orthogonal_one` — **(13.18.c)** `(Γ, 1_G) = 0`, the residual is orthogonal to the principal;
+* `Gamma_orthogonal_one` — **(13.18.c)** `(Γ, 1_G) = 0`, the residual is orthogonal to the
+principal;
 * `Gamma_real` — **(13.18.c)** `Γ` is real (`Γ.conj = Γ`);
 * `Y_norm_bound` — **(13.18.d)** for any split `Γ = X + Y` (`X ⊥ Y`, `Y ⊥` grid), `‖Y‖² ≤ (u−1)/q`.
 
@@ -1057,7 +1059,8 @@ The Coq `A0beta` (`PFsection13.v:1870`), obtained from `PVSbeta` (`β_j ∈ 'CF(
 `Ind_{PW₁}^S 1` against `μ_{0j}` off `P^# ∪ V_S`, using the `W₁`-class `normedTI` structure in
 `S̄ = S/P = Ū ⋊ W̄₁` (Coq `gammaW1`) together with the prime-`TI` residue value `prTIirr_id`; both
 bottom out at the shared prime-`TI` residue content (issue 9014) that connects the free `μ`-grid to
-the σ-residue theory.  **This single `'A0`-support obligation is what both `gammaGrid_orthogonal_one`
+the σ-residue theory.  **This single `'A0`-support obligation is what both
+`gammaGrid_orthogonal_one`
 and `gammaGrid_Y_norm_bound` reduce to** (the honest `'A0`-Dade=Ind bridge
 `sInstance_dade0_eq_induce`, issue 9076, then discharges the remaining Dade content). -/
 theorem betaGrid_A0_support_of_c_eq_one [Finite G]
@@ -1073,12 +1076,14 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(13.18.c)** `⟨Γ, 1_G⟩ = 0`.
 
 **De-scaffolded** (issue 9076): the `'A0(S)` `normedTI` content the old docstring flagged as
-"missing" is now supplied by the honest `'A0`-Dade=Ind bridge `sInstance_dade0_eq_induce`.  Reduction
+"missing" is now supplied by the honest `'A0`-Dade=Ind bridge `sInstance_dade0_eq_induce`.
+Reduction
 (Coq `oGamma1`): `⟨Γ,1⟩ = ⟨τ_S β_{#1},1⟩ − ⟨1,1⟩ + ⟨η_{01},1⟩`, and
 * `⟨1,1⟩ = 1` (`constOne_inner_self_eq_one`);
 * `⟨η_{01},1⟩ = 0` — grid orthogonality: `1_G = η_{00}` (`eta_principal_eq_trivial`) and `η_{01} ⊥
   η_{00}` (`eta_orthonormal`);
-* `⟨τ_S β_{#1},1_G⟩ = 1` — the bridge gives `τ_S β_{#1} = Ind_S^G β_{#1}` (needs `β_{#1}` supported in
+* `⟨τ_S β_{#1},1_G⟩ = 1` — the bridge gives `τ_S β_{#1} = Ind_S^G β_{#1}` (needs `β_{#1}` supported
+in
   `'A0(S)`, `betaGrid_A0_support`), so by Frobenius reciprocity (`inner_induce_eq_inner_restrict`)
   `⟨Ind_S^G β_{#1}, 1_G⟩ = ⟨β_{#1}, 1_S⟩ = ⟨Ind_{PW₁}^S 1, 1_S⟩ − ⟨μ_{01}, 1_S⟩ = 1 − 0`, where
   `⟨Ind 1, 1_S⟩ = 1` (`inner_induce_trivialChar_constOne_eq_one`) and `⟨μ_{01}, 1_S⟩ = 0` (`μ_{01}`

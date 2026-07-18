@@ -456,7 +456,8 @@ input).  For a degree-`w₁` irreducible `ζ ∈ S(HC)` with `ζ̄ ≠ ζ`, the 
 `ζ^{τ₁} = SHC_isCoherent.extension ζ` vanishes on `V = typePV`.
 
 Port of `tau1_zeta_vanishes_on_typePV` to the `S(HC)`-coherence (the (11.8) by-contradiction lacks
-the full-`S` `coh`).  Same argument as `SHC_extension_inner_alignedOmegaSigma_eq_zero`, but concluded
+the full-`S` `coh`).  Same argument as `SHC_extension_inner_alignedOmegaSigma_eq_zero`, but
+concluded
 against every `χ_{pq}` (`eq_zero_of_mem_V_of_inner_chiFam_eq_zero`, Peterfalvi (3.2.d)) rather than
 a
 single aligned grid vector: `(ζ − ζ̄)^τ = ζ^{τ₁} − ζ̄^{τ₁}` (`tau_zeta_sub_conj_eq_SHC_extension`)
@@ -544,7 +545,8 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
 open scoped FiniteInduce in
 /-- **`S(HC)` `τ₁`-image vanishes on `V`** for any degree-`w₁` irreducible `χ ∈ inducedFamily M`.
 The non-reality hypothesis `χ̄ ≠ χ` of `SHC_tau1_zeta_vanishes_on_typePV` is discharged via
-`inducedFamily_degree_w1_conj_ne` (Peterfalvi (1.1)), so this needs only `χ ∈ S(HC)`.  Used to vanish
+`inducedFamily_degree_w1_conj_ne` (Peterfalvi (1.1)), so this needs only `χ ∈ S(HC)`.  Used to
+vanish
 the `∑_{λ∈S₁} λ^{τ₁}` correction of the (11.8.2) residual `X = α^τ + nζ^{τ₁} − a∑λ^{τ₁}` on `V` in
 the general `a ∈ {0, 2}` case. -/
 theorem Hypothesis.SHC_extension_vanishes_on_typePV [Finite G] {M : Subgroup G}
@@ -841,7 +843,8 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
 
 /-- **Peterfalvi (11.8.2) arithmetic core**: the integer inequality `n·(a² − 2a) ≤ 2` with `2 ≤ n`
 forces `a ∈ {0, 1, 2}`.  (If `a ∉ {0, 1, 2}` then `a ≤ −1` or `a ≥ 3`, so `a² − 2a ≥ 3` and
-`n·(a² − 2a) ≥ 2·3 = 6 > 2`.)  This is the numeric heart of (11.8.2)'s `a = 0/1/2` conclusion, fed by
+`n·(a² − 2a) ≥ 2·3 = 6 > 2`.)  This is the numeric heart of (11.8.2)'s `a = 0/1/2` conclusion, fed
+by
 the projection-norm bound `(a − n)² + (|S₁| − 1)a² ≤ n² + 2` once `|S₁| = n` (Peterfalvi (11.8.1)). -/
 theorem charParam_a_mem_of_norm_ineq {a : ℤ} {n : ℕ} (hn : 2 ≤ n)
     (h : (n : ℤ) * (a ^ 2 - 2 * a) ≤ 2) : a = 0 ∨ a = 1 ∨ a = 2 := by
@@ -1138,7 +1141,8 @@ theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5) `G`-side `ω`-grid pairing** `(ω_{ij}^σ − ω_{i0}^σ, ∑_r ω_{r0}^σ) = −1`
 (`0 < j`).  By `alignedOmegaSigmaGrid_inner`: `(ω_{ij}^σ, ω_{r0}^σ) = 0` (`j ≠ 0`) and
-`(ω_{i0}^σ, ω_{r0}^σ) = [i = r]`, so the sum is `0 − 1 = −1`.  Feeds the `(α_{ij}^τ, ∑ω_{r0}^σ) = −δ`
+`(ω_{i0}^σ, ω_{r0}^σ) = [i = r]`, so the sum is `0 − 1 = −1`.  Feeds the
+`(α_{ij}^τ, ∑ω_{r0}^σ) = −δ`
 step of the (11.8.5) two-way computation. -/
 theorem Hypothesis.alignedOmegaSigma_diff_inner_zeroColumnSum [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)

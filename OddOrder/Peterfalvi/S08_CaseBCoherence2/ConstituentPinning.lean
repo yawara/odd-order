@@ -671,7 +671,8 @@ theorem ticVdiffV_not_mem_conjugatesOfSet_K {A : Set G}
 
 /-- **(6.8.2.3) anchor: the Dade image of an `H^#`-supported function vanishes on `V`.**
 For `α` supported on `H^# = sharpImage H`, the Sibley Dade image `α^τ = hyp.tau α` vanishes on the
-`(ticVdiff h46)`-exceptional set `V`.  Since `α^τ = dadeIntegralCharacterMap hyp.dade …` is a genuine
+`(ticVdiff h46)`-exceptional set `V`.  Since `α^τ = dadeIntegralCharacterMap hyp.dade …` is a
+genuine
 Dade image, it vanishes off `conjugatesOfSet H^#`
 (`map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot`
 via `dade_H_eq_bot`); and `V` is disjoint from `conjugatesOfSet H^# ⊆ conjugatesOfSet (K^G)` by
@@ -968,7 +969,8 @@ theorem inner_decomposition_X_coherentYset_extension_eq_zero
 Specializes `inner_decomposition_X_coherentYset_extension_eq_zero` to the textbook choice of the
 distinct second anchor `η' = η̄₁` (the complex conjugate): `η̄₁ ∈ Y` (`Yset_closedUnderConjugate`)
 and `η₁ ≠ η̄₁` since `Y` has no real characters (`Yset_hasNoRealCharacters`, Peterfalvi (5.2.a): an
-odd-order group has no nontrivial real irreducible).  So the `hXorth` `⟨D.X, η₁^{τ₁}⟩ = 0` needs only
+odd-order group has no nontrivial real irreducible).  So the `hXorth` `⟨D.X, η₁^{τ₁}⟩ = 0` needs
+only
 `η₁ ∈ Y` — the second anchor is internalized.  This is the exact `hXorth` the capstone supplies to
 `per_constituent_Y_eq_smul` for `Y = η₁^{τ₁}`. -/
 theorem inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset

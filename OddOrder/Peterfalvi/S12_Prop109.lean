@@ -638,7 +638,8 @@ family `χ : Fin n → Irr(M)` (`n ≥ 2`) of irreducible characters, each a mem
 
 This is the (11.8) materialization bridge.  Every input of the equal-degree coherence producer
 `coherentEqualDegree_fromDade` is discharged from the §10 `Hypothesis` data with no opaque field:
-* the `(5.1)` base map is `τ = dadeIntegralCharacterMap hyp.dadeData.dade …` (definitionally `hyp.tau`);
+* the `(5.1)` base map is `τ = dadeIntegralCharacterMap hyp.dadeData.dade …` (definitionally
+`hyp.tau`);
 * the support is `A₀(M) = supportInSubgroup (typePA0 M) M` (definitionally `hyp.A0`);
 * the signed-difference supports `(χⱼ − χ₀).support ⊆ A₀(M)` are `inducedFamily_sub_support` (the
   members share a degree, so each difference vanishes off `M'^#`);

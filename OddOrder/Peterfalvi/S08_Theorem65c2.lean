@@ -9,7 +9,8 @@ import OddOrder.Peterfalvi.S08_CaseBAssembly
 /-!
 # Peterfalvi (6.2)/(6.3)/(6.5) for case (c2): the certain-type `p`-group reduction chain
 
-**Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000), §6, (6.2)/(6.3)/(6.5).
+**Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000), §6,
+(6.2)/(6.3)/(6.5).
 
 This leaf assembles the **case-(c2)** (certain-type) analogue of the Frobenius (c1) chain
 `six_two_index_bound → six_two_central → six_three_index_bound → six_three →
@@ -20,7 +21,8 @@ isPGroup_of_not_coherent` (`S08_CoherenceCorePart2`), which produces the index b
 The c2 chain mirrors c1 with a three-brick swap (Frobenius → `h46`):
 * `exists_coherentBreakPair` → `exists_coherentBreakPair_general` (members need not be irreducible),
 * `SsubFiltration_hasNoRealCharacters hF` → `S_hasNoRealCharacters_caseB`,
-* `sMember_index_le_two_psi hF` → `sSubFiltration_sum_le_two_psi_caseB` (the norm-weighted (5.6) (6.2)
+* `sMember_index_le_two_psi hF` → `sSubFiltration_sum_le_two_psi_caseB` (the norm-weighted (5.6)
+(6.2)
   bound, `S08_Theorem63`).
 
 The only genuinely new ingredient is **break-irreducibility**: the (5.6) brick demands the break `ψ`
@@ -203,7 +205,8 @@ theorem six_three_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
 for `M ≤ H₁ ≤ ⁅H,H⁆` with `S(H₁)` coherent and `4|L:K|²+1 < |H:H₁|`, `S(M)` is coherent.  Mirror of
 `six_three` (`S08_CoherenceCorePart2:3750`); `hF` becomes the certain-type `(h46, hHK, hW1)`, and
 the
-per-step `(6.3)` index bound is `six_three_index_bound_c2`.  The break admitted by that bound need no
+per-step `(6.3)` index bound is `six_three_index_bound_c2`.  The break admitted by that bound need
+no
 longer be irreducible — the `column/irreducible` dispatch in `six_two_index_bound_c2` removed the
 `W₂ ≤ B` requirement, so the induction may descend below `W₂` (where column-transition breaks
 occur).

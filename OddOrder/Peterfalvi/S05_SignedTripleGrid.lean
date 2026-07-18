@@ -1612,7 +1612,8 @@ open scoped Classical in
 /-- **(3.5.5)/(3.5) symmetric orthonormal family** (the `w₂ ≥ 5` heart of (3.5)): a symmetric grid
 (`≥ 4` rows and columns) with column-commons `z j` (in every `A · j`) and row-commons `w i` (in
 every `A i ·`) admits interior thirds `φ i j` with `A i j = {z j, w i, φ i j}`, and the combined
-family `(w i, z j, φ i j)` is **orthonormal** (`⟨·, ·⟩ = δ`).  Establishes the six pairwise relations
+family `(w i, z j, φ i j)` is **orthonormal** (`⟨·, ·⟩ = δ`).  Establishes the six pairwise
+relations
 (column-commons via `common_ne_other_column_mem`, row-commons via `common_ne_other_row_mem`,
 interior
 thirds via `third_not_mem_far_cell` for the far case and `L`-relations for the same row/column, plus

@@ -442,7 +442,8 @@ theorem complement_card_p_or_pq_V_of_c_eq_one [Finite G]
 
 /-- **Frobenius index bridge** (Pf (14.11), structural): for a type-I maximal `M` with
 `TypeIFrobeniusData`, the index `|M : M_F|` of the Fitting kernel equals the order of the Frobenius
-complement.  Immediate from the complement structure `M = M_F ⋊ complement` (`IsComplement'`) and the
+complement.  Immediate from the complement structure `M = M_F ⋊ complement` (`IsComplement'`) and
+the
 kernel identity `typeF.H = M_F`.  Supplies the `e = |M : K| = p q` half of `MHypothesis`
 (`e_eq_index` + `complement_card_eq_pq`): combined with the V-side `complement_card_eq_pq`
 (`= p q`),

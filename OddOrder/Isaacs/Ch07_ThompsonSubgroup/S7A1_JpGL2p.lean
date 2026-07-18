@@ -24,7 +24,8 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 
 /-!
-# Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 1: J(P) def, Thm 7.1 stmt, Lem 7.3 GL(2,p) lemma (pp. 201-208)
+# Isaacs FGT Ch.7 (Thompson subgroup) — S7A part 1: J(P) def, Thm 7.1 stmt, Lem 7.3 GL(2,p) lemma
+(pp. 201-208)
 -/
 
 namespace OddOrder.Isaacs.Ch07

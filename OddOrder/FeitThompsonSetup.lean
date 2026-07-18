@@ -425,7 +425,8 @@ theorem muS_apply_of_not_mem_W2 (i : Fin tp.q) (j : Fin tp.p) (w : G) (hwW : w �
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
 /-- **Value of `certainTypeS`'s product character on a transported `mp.K`-element**: only the
-`W₁`-factor `a` survives (`wFst` is the identity, `wSnd` is trivial, on a `W₁`-element).  This is the
+`W₁`-factor `a` survives (`wFst` is the identity, `wSnd` is trivial, on a `W₁`-element).  This is
+the
 `tp.W1`-restriction value used (with its `tp.W2` mirror) to discharge the S/T-shared-`ω` symmetry on
 the generators via `monoidHom_eq_of_eqOn_W1_W2`. -/
 theorem omegaProdCharS_apply_mem_K

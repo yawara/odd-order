@@ -15,7 +15,8 @@ The (4.9)(a) argument relates the **complex conjugate** of a certain-type column
 another
 column: `μ̄_j = μ_{j'}` with `j' ≠ j` (because `j ≠ 0` and `|W|` is odd).  The bridge is the σ-side
 Galois equivariance (3.9): conjugation is the cyclotomic automorphism `z ↦ z̄`, so `(ω_{ij}^σ)̄ =
-(ω̄_{ij})^σ`, and `ω̄_{ij}` is again a grid character `ω_{i'j'}` (the conjugate of a linear character
+(ω̄_{ij})^σ`, and `ω̄_{ij}` is again a grid character `ω_{i'j'}` (the conjugate of a linear
+character
 is its inverse).
 
 This file develops the conjugation foundation:
@@ -195,7 +196,8 @@ theorem sigma_chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Peterfalvi (4.9)(a), the `L`-character conjugation bridge.**  `δ_j·μ_{ij}̄ = δ_{j'}·μ_{i'j'}`
-at the conjugate index (`i' = rowInv i`, `j' = χ₂⁻¹`).  Apply complex conjugation `mapRingEquiv conj`
+at the conjugate index (`i' = rowInv i`, `j' = χ₂⁻¹`).  Apply complex conjugation
+`mapRingEquiv conj`
 to the (4.3.b) identity `σ_L(ω_{ij}) = δ_j·μ_{ij}`: the left side becomes `σ_L(ω_{i'j'}) = δ_{j'}·
 μ_{i'j'}` (`sigma_chiColumn_conj` then (4.3.b) again), the right side `δ_j·μ_{ij}̄`
 (`mapRingEquiv_zsmul`, `δ_j ∈ ℤ`).  Since the `μ` are genuine irreducible characters this forces

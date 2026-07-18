@@ -96,7 +96,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `χ = Ind θ_lin ∈ S` of `exists_distinguished_char` (`θ_lin` nontrivial linear, so `χ ≠ Ind 1_K` by
 `induce_ne_trivialChar_induce`): the distinguished char lands at index `0` with induced degree
 `[L:K]` (`= e`), the trivial char `1_K` lands at some `ind1H ≠ 0`, and the family is
-injective/covering.  `K = (L_F).subgroupOf L` is normal in `L` (`maxNilpotentNormalHall_..._normal`).
+injective/covering.  `K = (L_F).subgroupOf L` is normal in `L`
+(`maxNilpotentNormalHall_..._normal`).
 This is the family input to the witness-`L` `Hypothesis78`. -/
 theorem exists_witness_placed_family {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
     ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))

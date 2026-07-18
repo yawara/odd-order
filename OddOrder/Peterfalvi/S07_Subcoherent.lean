@@ -189,7 +189,8 @@ every field of `subcoherent` restricts: `sub_in1`/`sub_in2` restrict the per-mem
 the
 cross-orthogonality; `sub_iso_to`/`zchar_subset` restrict the isometry; the family predicates
 restrict
-along the inclusion.  This is the first glue step of the (9.11) `Ptype_core_coherence` derived-series
+along the inclusion.  This is the first glue step of the (9.11) `Ptype_core_coherence`
+derived-series
 induction (`PFsection9.v:1484`), where the full type-P subcoherent family is cut down to
 `S_ H0C'` (and again to the uniform-degree sub-family `S1`) before `uniform_degree_coherence` fires.
 

@@ -10,7 +10,8 @@ import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 # BG Theorem 3.10 for elementary abelian `M` — the reducible-module induction (issue 8013, piece 5)
 
 `prime_card_and_finrank_of_frobenius_general` (piece 3) proves BG Theorem 3.10 (a)+(b) in the
-**irreducible**-module case for a general Frobenius kernel.  The §15.2 application (issue 8012 step 4)
+**irreducible**-module case for a general Frobenius kernel.  The §15.2 application (issue 8012 step
+4)
 acts on `M = Q̄`, an elementary abelian group that may be **reducible** as a module for the
 Frobenius
 group `KD`.  BG handles this by Case 1 of the Theorem 3.10 proof (mmd L1287-1317): an induction on
@@ -100,7 +101,8 @@ theorem invariants_toRepresentation_eq_of_inf_eq (ρ : Representation F G V)
 For two subrepresentations `W₀, W₁ ≤ ρ` that meet trivially (`W₀ ⊓ W₁ = ⊥`), the `H`-invariants of
 their sum split: `C_V(H) ⊓ (W₀ ⊔ W₁) = (C_V(H) ⊓ W₀) ⊔ (C_V(H) ⊓ W₁)`.  This is NOT general lattice
 distributivity (which fails for submodules); it uses that `W₀, W₁` are `H`-stable, so an `H`-fixed
-vector's (unique, by disjointness) decomposition has `H`-fixed components.  Hence the `finrank`s add,
+vector's (unique, by disjointness) decomposition has `H`-fixed components.  Hence the `finrank`s
+add,
 which drives the additive step of the reducible-module induction. -/
 theorem finrank_inf_invariants_sup_of_disjoint (ρ : Representation F G V) [FiniteDimensional F V]
     (W₀ W₁ : Subrepresentation ρ) (H : Subgroup G)

@@ -309,7 +309,8 @@ theorem gap_coefficients_nonzero_of_delta_parity [Fintype G]
   omega
 
 /-- **Peterfalvi (14.9), the character body** — the structural `≤` half of the ratio comparison, the
-sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming `T`
+sole deep obligation of (14.9).  Coq `PFsection14` `FTtypeP_min_typeII`, lines 737--853: assuming
+`T`
 is type III, build `calT1 = seqIndD QV T QV Q` (the degree-`p` induced characters of `T`, from
 `T' = Q ⊔ V` via `T_deriv_eq_QV`), coherent by uniform-degree coherence
 (`S07.coherent_of_constant_degree` / Coq `uniform_degree_coherence`).
@@ -887,7 +888,8 @@ III/IV
 hypothesis `hnoV` (instantiate with the axiom-clean `no_typeV_maximal_unconditional`,
 `S12_Noncoherence`; issue 9087), so `M_F ≠ M_σ` and `T` is Type III or IV. Excluding Type IV — the
 genuine (11.9) Galois/character
-content — is the isolated residual `T_not_isTypeIV_of_isTypeP1`.  The Type-V exclusion and the III/IV
+content — is the isolated residual `T_not_isTypeIV_of_isTypeP1`.  The Type-V exclusion and the
+III/IV
 structural wiring (incl. the `TypeIIIData.normalizer_le` field, bundled into the clause-(c)
 disjunction) are proven here. -/
 theorem T_isTypeIII_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

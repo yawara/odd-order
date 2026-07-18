@@ -1090,7 +1090,8 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (6.2) index bound = h56** (witness form, `∃θ`) — the (5.6) break-member oracle the
 (6.5) engine `nonempty_coherent_SOf_bot_of_index_dvd` consumes.  If `S(A) ⊆ S(B)` (`A`-filtration
 inside `B`-filtration), `K/(A.subgroupOf K)` not perfect (`hAcomm`), `S(A)` coherent and `S(B)` not,
-then a break member `ψ = Ind_K^L θ ∈ S(B)` (`B ⊆ Ker θ`) satisfies `|K:A| − 1 ≤ 2·ψ(1).re`.  Combines
+then a break member `ψ = Ind_K^L θ ∈ S(B)` (`B ⊆ Ker θ`) satisfies `|K:A| − 1 ≤ 2·ψ(1).re`.
+Combines
 `exists_coherentBreakPair`, the degree-`|L:K|` anchor (`exists_mem_SsubFiltration_degree_index`),
 and
 `Sset_index_le_two_psi`.  Mirror of the Sibley `six_two_index_bound`. -/

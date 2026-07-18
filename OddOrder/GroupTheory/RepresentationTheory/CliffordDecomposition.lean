@@ -399,7 +399,8 @@ omit [Fintype L] [Invertible (Nat.card L : ℂ)] in
 complex conjugate `θ̄`** (Peterfalvi (1.1)-adjacent).  If `θ^g = θ̄`, apply `^g` again and use
 `θ̄̄ = θ`: `θ^{g²} = θ`, so `g² ∈ I_L(θ)`.  Since `g` has odd order (`Odd (Nat.card L)`),
 `⟨g⟩ = ⟨g²⟩` (`g = (g²)^{(o+1)/2}`), so `g ∈ I_L(θ)` too — hence `θ^g = θ`, i.e. `θ = θ̄` is real,
-forcing `θ = 1_H` (odd order, `not_isReal_of_ne_trivial_of_odd_card'`), a contradiction.  This is the
+forcing `θ = 1_H` (odd order, `not_isReal_of_ne_trivial_of_odd_card'`), a contradiction.  This is
+the
 `θ̄ ≁_L θ` input that makes the constituents of `Ind_H^L θ` conjugate-distinct. -/
 theorem conjBy_ne_conj_of_odd [Finite L] {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)]
     (hodd : Odd (Nat.card L)) {θ : ClassFunction ↥H ℂ} (hθirr : IsIrreducibleCharacter θ)
@@ -510,7 +511,8 @@ theorem forall_mem_not_isReal_of_induce_eq_sum_of_odd
 Since `θ̄ ≁_L θ` (`conjBy_ne_conj_of_odd`), `⟨Ind_H^L θ, Ind_H^L θ̄⟩ = 0`
 (`inner_induce_eq_zero_of_not_conj`); and `Ind_H^L θ̄ = (Ind_H^L θ)̄ = ∑_{φ∈S} φ̄` (`conj_induce`).
 Expanding the pairing by orthonormality, `⟨∑ φ, ∑ φ̄⟩` counts the pairs `(φ, φ') ∈ S × S` with
-`φ = φ'̄`; that count being `0` means no such pair exists.  This is the conjugate-distinctness clause
+`φ = φ'̄`; that count being `0` means no such pair exists.  This is the conjugate-distinctness
+clause
 of `typeI_induced_char_constituents`. -/
 theorem forall_mem_conj_ne_of_odd
     {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card L))

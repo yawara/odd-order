@@ -643,7 +643,8 @@ kernel iff `χbar` contains the image `A.map f` in its character kernel:
 
 Pointwise, `(compHom f χbar)(x) = χbar(f x)` and `(compHom f χbar)(1) = χbar(1)`, so `x` lies in the
 kernel of the inflation iff `f x` lies in the kernel of `χbar`; ranging `x` over `A` matches the
-image `A.map f`.  This is the `H ⊄ ker χ ↔ H̄ ⊄ ker χ̄` bridge of the §9↔§6 reducible-count bijection
+image `A.map f`.  This is the `H ⊄ ker χ ↔ H̄ ⊄ ker χ̄` bridge of the §9↔§6 reducible-count
+bijection
 (issue 1012): the §9 family `𝒳(H₀) ⊆ Irr(HU)` condition `H ⊄ ker` transports to the §6 condition
 `H̄ ⊄ ker` on `Irr(K̄)` under the inflation `K̄ = HU/H₀ → HU`. -/
 theorem subset_characterKernel_compHom_iff {H G : Type*} [Group H] [Group G]

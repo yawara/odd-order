@@ -208,7 +208,8 @@ theorem normalizer_W2_le_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rwa [hNorm] at hgN
 
 /-- **Peterfalvi (13.12) `c = 1`, usable form**: `U ⊓ C_G(P) = ⊥` — no nonidentity element of the
-complement `U` centralizes the Fitting kernel `P = S_F` (`U` acts faithfully on `P`).  Immediate from
+complement `U` centralizes the Fitting kernel `P = S_F` (`U` acts faithfully on `P`).  Immediate
+from
 `C_eq_bot` and `C = U ⊓ C_G(P)` (`C_eq`).  The Maschke/Wielandt core of (13.16) concludes
 `N_U(W₂) ≤ U ⊓ C_G(P) = ⊥`. -/
 theorem U_inf_centralizer_P_eq_bot_of_c_eq_one [Finite G]
@@ -656,7 +657,8 @@ in the repo (see `notes/peterfalvi/s15_s_and_t.md`, the (13.16) core plan block)
 * use the **full** `U ⋊ W₁` Frobenius (not `K ⋊ W₁`), so no `Frobenius_subl` is needed — `U`
   abelian ⟹ `U ≤ N_G(⁅P,K⁆)`, and the Wielandt fixed-point theorem
   (`frobenius_kernel_centralizes_of_complement_fpf`, `N := ⁅P,K⁆`) yields `U ≤ C_G(⁅P,K⁆)`;
-* use **Gorenstein Thm 2.3** `P = C_P(K) × ⁅P,K⁆` (`fixedPoints_inf_actionCommutator_eq_bot_of_abelian`
+* use **Gorenstein Thm 2.3** `P = C_P(K) × ⁅P,K⁆`
+(`fixedPoints_inf_actionCommutator_eq_bot_of_abelian`
   for the coprime `K`-action on the abelian `P`) instead of a Maschke complement to `W₂`.
 
   The `W₁`-fixed-point-freeness on `⁅P,K⁆` is `C_{⁅P,K⁆}(W₁) = ⁅P,K⁆ ⊓ C_P(W₁) = ⁅P,K⁆ ⊓ W₂ ⊆
@@ -1040,7 +1042,8 @@ theorem W_sdiff_nonempty [Finite G] (hyp : Hypothesis (G := G)) :
 Phase 0): for `S` of type II, if the complement `U` meets the Fitting kernel `P = S_F` trivially
 (`P ⊓ U = ⊥`), then `|U|` is coprime to `|P|`.
 
-This is the *derivable* half of the (13.2) faithfulness datum.  `P = S_F = maxNilpotentNormalHall M'`
+This is the *derivable* half of the (13.2) faithfulness datum.
+`P = S_F = maxNilpotentNormalHall M'`
 (`TypeIIData.derived_fitting_eq`) is a **relative Hall** subgroup of `M' = derivedInG S`
 (`maxNilpotentNormalHall_isHall`: `(M_F).subgroupOf M'` is Hall in `↥M'`), so `|P|` is coprime to
 its

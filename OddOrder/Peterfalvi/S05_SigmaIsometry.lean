@@ -431,7 +431,8 @@ theorem exists_sigma (hyp : TICyclicHypothesis G) [Fintype hyp.W]
 
 open scoped Classical in
 /-- **Peterfalvi (3.7) support input**: the 4-term combination
-`ω_{pq} + ω_{p'q'} − ω_{pq'} − ω_{p'q}` lies in `CF(W, V)`.  On `W₁` the `W₂`-parts (`q`) collapse to
+`ω_{pq} + ω_{p'q'} − ω_{pq'} − ω_{p'q}` lies in `CF(W, V)`.  On `W₁` the `W₂`-parts (`q`) collapse
+to
 `1`, on `W₂` the `W₁`-parts (`p`) collapse, so the combination vanishes on `W₁ ∪ W₂`. -/
 theorem omegaCombo_mem_supportedSubmodule (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
     (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :

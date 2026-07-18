@@ -420,7 +420,8 @@ def typePA0 (M : Subgroup G) (data : TypePData M) : Set G :=
 
 `typePA M = centralizerSupport (M#) M'` is by definition `{y ∈ M' | y ≠ 1 ∧ ∃ x ∈ M#, y ∈ C_G(x)}`,
 but the centralizer condition is vacuous on `(M')#`: every `y ∈ (M')# ⊆ M#` centralizes itself
-(`x = y`).  Hence `A(M) = (M')# = sharpSubgroup (derivedInG M)`, the sharp of the **normal** subgroup
+(`x = y`).  Hence `A(M) = (M')# = sharpSubgroup (derivedInG M)`, the sharp of the **normal**
+subgroup
 `M' = derivedInG M ⊴ M`.  This is the `A = H#` shape (with `H = M'`) that Peterfalvi (10.8) needs to
 apply the (7.6)/(7.8.b) coherence norm estimate to `(M, A(M))`.
 

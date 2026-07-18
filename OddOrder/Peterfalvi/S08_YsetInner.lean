@@ -613,7 +613,8 @@ theorem inner_dadeDiff_conjDifference_eq_zero
 /-- **(5.2.e) Dade `R(·)`-family orthogonality via *difference* supports (induced case).**
 
 `R(x) ⊥ R(χ)` for the difference-support Dade families `dadeOrthonormalCharacterImageFamilyOfDiff`
-whenever `x, x̄ ⊥ χ, χ̄`.  Mirrors `dadeOrthonormalCharacterImageFamily_orthogonal` but reduces — via
+whenever `x, x̄ ⊥ χ, χ̄`.  Mirrors `dadeOrthonormalCharacterImageFamily_orthogonal` but reduces —
+via
 `toOrthonormalImage_orthogonal` and `orthogonal_of_signedDifference_inner_eq_zero` — to the
 *difference-support* orthogonality `inner_dadeDiff_conjDifference_eq_zero`, so it applies to the
 **unsupported induced** X-members.  This is the `hortho` ingredient of

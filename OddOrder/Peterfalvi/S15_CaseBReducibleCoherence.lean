@@ -240,7 +240,8 @@ and whose auxiliary isometry is the coherent extension `ν = hS₂coh.extension`
 input (non-realness cross-orthogonality `⟨φ, φ̄⟩ = 0`, conjugate-difference support
 `(φ̄ − φ) ⊆ A(S)`,
 `ν`-integrality `νφ ∈ ℤ[Irr G]`, the sponsoring-lattice `ℤ[φ, φ̄]` inner-preservation and
-`ν(φ − φ̄) = τ(φ − φ̄)`) discharged from the family layer via `sSet_subset_inducedKernelFamily`.  The
+`ν(φ − φ̄) = τ(φ − φ̄)`) discharged from the family layer via `sSet_subset_inducedKernelFamily`.
+The
 `S`-instance analogue of `memberExtensionDecomposition`, with the case-agnostic family in place of
 the
 irreducible-only `dadeOrthonormalCharacterImageFamilyOfDiff`. -/
@@ -308,7 +309,8 @@ the auxiliary isometry, so `Da.tau1 = τ`) whose image family is the case-agnost
 `sSet_memberRFamily hG hnoV hχ`; the difference set `{χ − χ̄, χ − a·χ₁}` is `A(S)`-supported
 (`sSet_member_conjDiff_supported` + `hdiffasupp`), so the Dade isometry preserves the
 sponsoring-lattice
-inner products (`dadeIntegralCharacterMap_inner_eq_on_supported_span`).  The `S`-instance analogue of
+inner products (`dadeIntegralCharacterMap_inner_eq_on_supported_span`).  The `S`-instance analogue
+of
 `decompositionDaFromDadeOfDiff`, case-agnostic in `χ`. -/
 noncomputable def Hypothesis.sSet_breakPsiDecomp [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -359,7 +361,8 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Scaled-difference support for `𝒮`-members** (issue 1017 step (c), the honest-`A(S)` analogue of
-the general `inducedKernelFamily_scaledDiff_support`).  For members `φ, ψ ∈ 𝒮` with a matching scaled
+the general `inducedKernelFamily_scaledDiff_support`).  For members `φ, ψ ∈ 𝒮` with a matching
+scaled
 degree `φ(1) = c·ψ(1)` (`c : ℕ`), the difference `φ − c·ψ` vanishes at `1`, so — since every
 `𝒮`-member
 is supported in `A(S) ∪ {1}` (`sSet_member_support_subset`, the honest (4.7) support) — its support

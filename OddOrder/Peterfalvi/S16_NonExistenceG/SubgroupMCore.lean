@@ -1413,7 +1413,8 @@ theorem finNeg_eq_self_iff {n : ℕ} (hn : 0 < n) (hodd : Odd n) (i : Fin n) :
 `n₀₀ = 1`, summed against a `±1`-sign grid `ε`, has complex norm `≥ 1`.
 
 This packages the conjugation involution `(i,j) ↦ (−i,−j)` on `Fin q × Fin p` (whose unique fixed
-point is `(0,0)`, since `q`, `p` are odd) and feeds it to `one_le_norm_signed_paired_sum`.  It is the
+point is `(0,0)`, since `q`, `p` are odd) and feeds it to `one_le_norm_signed_paired_sum`.  It is
+the
 exact arithmetic consumed by `generic_character_bound` (14.11.3) and the dual (14.16) parity
 contradiction once the `(3.9)` integrality/pairing facts of the `η`-grid are supplied. -/
 theorem one_le_norm_eta_grid_signed_sum {q p : ℕ} (hq : 0 < q) (hp : 0 < p)

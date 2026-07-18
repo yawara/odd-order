@@ -248,7 +248,8 @@ upstream — `H` abelian ⟹ `⁅H,H⁆ = ⊥` ⟹ `SOf ⁅H,H⁆ = SOf ⊥`, co
 
 This is the honest (6.5)(c) assembly engine: the genuine residual obligations are exactly the
 parameters — the **(5.6) break-member oracle** `h56` (the remaining character-theoretic core), the
-**`S(H′)` coherence** `hcoh` (constant-degree (5.7)), and the filtration `SOf`.  Everything numeric —
+**`S(H′)` coherence** `hcoh` (constant-degree (5.7)), and the filtration `SOf`.  Everything numeric
+—
 the (6.3) descent, the (6.5.b) `p`-group reduction, the `p²`-index gap, and the (6.5.c) arithmetic —
 is proved here.  Oddness side-conditions are discharged from `|L|` odd (`hLodd`). -/
 theorem nonempty_coherent_SOf_bot_of_index_dvd [Finite ↥L] [Group.IsNilpotent ↥H]

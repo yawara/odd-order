@@ -985,7 +985,8 @@ hypotheses:
 * **(9.11.3)** the `HŪ/(H₀C)` class equation `hclass` (`|Ū| + Σχ(1)² = p^q·u`, its character side
   `sum_xiOf_H0C_degreeSq` landed) and the `W₁`-orbit split `hn` (`n = q·|𝒮₄| + (p−1)`), giving the
   cleared count (`nineElevenThree_count`).
-* **(9.11.4)** the Mackey norm `hnorm` (`‖α‖²·u = (a+1)u + (q−1)a²`), whose `‖α‖² = ‖γ‖²+1` reduction
+* **(9.11.4)** the Mackey norm `hnorm` (`‖α‖²·u = (a+1)u + (q−1)a²`), whose `‖α‖² = ‖γ‖²+1`
+reduction
   is `cfnorm_sub_irreducible_orthogonal` and whose `‖γ‖²` is the non-normal-`HU₁` double-coset
   count.
 

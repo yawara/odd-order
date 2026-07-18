@@ -353,7 +353,8 @@ open scoped FiniteInduce in
 holds for **one** nontrivial column `j₀ ≠ 0`, then it holds for **every** nontrivial column `j ≠ 0`.
 
 Immediate from the column-independence `muColumn_tau1_diff_eq`: for any `j ≠ 0`,
-`μ_j^{τ₁} = μ_{j₀}^{τ₁} + (μ_j^{τ₁} − μ_{j₀}^{τ₁}) = δ·∑_i ω_{i j₀}^σ + δ·(∑_i ω_{ij}^σ − ∑_i ω_{i j₀}^σ)
+`μ_j^{τ₁} = μ_{j₀}^{τ₁} + (μ_j^{τ₁} − μ_{j₀}^{τ₁}) = δ·∑_i ω_{i j₀}^σ + δ·(∑_i ω_{ij}^σ − ∑_i ω_{i
+j₀}^σ)
 = δ·∑_i ω_{ij}^σ`.  This isolates the remaining content of the full (10.6)(a) summed isometry to the
 **(5.8) full-column endgame on a single column `j₀`** (which, once the column
 `OrthonormalCharacterImageFamily` is available — HUB issue 1010 — pins that one column). -/

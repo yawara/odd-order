@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 
 /-!
-# Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.13/6.14 D/Q/SD recognition + Thm 6.12 first enlargement (pp. 192-193)
+# Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.13/6.14 D/Q/SD recognition + Thm 6.12 first
+enlargement (pp. 192-193)
 -/
 
 namespace OddOrder.Isaacs.Ch06
