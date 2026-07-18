@@ -41,20 +41,8 @@ theorem relCore_le (H D : Subgroup G) : relCore H D ≤ D :=
 
 /-- `core_H(D)` は `H` に normal (`H ≤ N_G(core_H(D))`). -/
 theorem le_normalizer_relCore (H D : Subgroup G) :
-    H ≤ Subgroup.normalizer (relCore H D : Set G) := by
-  haveI : ((D.subgroupOf H).normalCore).Normal := Subgroup.normalCore_normal _
-  have key : ∀ h ∈ H, ∀ y ∈ relCore H D, h * y * h⁻¹ ∈ relCore H D := by
-    intro h hh y hy
-    obtain ⟨c, hc, rfl⟩ := hy
-    refine ⟨⟨h, hh⟩ * c * (⟨h, hh⟩)⁻¹,
-      ‹((D.subgroupOf H).normalCore).Normal›.conj_mem c hc ⟨h, hh⟩, ?_⟩
-    simp
-  intro h hh
-  rw [Subgroup.mem_normalizer_iff]
-  intro y
-  refine ⟨fun hy => key h hh y hy, fun hy => ?_⟩
-  have hk := key h⁻¹ (H.inv_mem hh) _ hy
-  simpa [mul_assoc] using hk
+    H ≤ Subgroup.normalizer (relCore H D : Set G) :=
+  le_normalizer_map_subtype_of_normal (Subgroup.normalCore_normal _)
 
 /-- `core_H(D)` の最大性: `N ≤ D`, `N ≤ H`, `N` が `H` に normal (`H ≤ N_G(N)`) なら
 `N ≤ core_H(D)`. -/
