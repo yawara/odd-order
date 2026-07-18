@@ -392,6 +392,14 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### BG App.C — BG App.C The Final Contradiction
 
+> **⚠ 2026-07-18 判断 (lane c)**: App.C 本体 (Theorem C / Lem C.1-C.3 / final_contradiction) は既に
+> sorry-free・axiom-clean で完了。残る Rem(II) (SL(2,2^q) の具体例) と Rem(V) (奇素数 wlog) は
+> **illustrative であって番号付き定理でない**ため **低優先繰延** (⚠ 恒久対象外ではない —
+> CLAUDE.md「文献引用のみ/例示も低優先繰延」)。判断理由: Rem(II) の形式化は SL(2,2^q) の群構成と
+> Thm C 配置の instance 化が必要で、例示目的に対し労力が大きい。かつ lane b が
+> `GroupTheory/SpecificGroups/{Suzuki,ProjectiveUnitary}/**` で類似の有限群構成を進行中のため、
+> **その資産が揃ってから着手する方が安上がり** (重複構築の回避)。Rem(IV)/Prob 1 は従来どおり低優先繰延。
+
 > BG Appendix C is essentially complete: Theorem C and Lemmas C.1-C.3 are all machine-checked, sorry-free, and axiom-clean, with the final bridge (final_contradiction) wiring Theorem C against Peterfalvi Section 16's field-normalizer data to kill the minimal counterexample. Lemmas C.1 and C.2 are at full (or slightly better than) book strength on the concrete field GaloisField p q — notably the q>=5 branch of C.2 is a complete class-sum/character-theoretic proof (Frobenius character classification, structure constants, column orthogonality, Cauchy-Schwarz error bound), and the Lean C.2 never even uses condition (A). The factoring is inverted relative to the book and is the one surprise: the finite-field and character halves live in OddOrder/BG/AppC_*.lean, while the generators-and-relations group argument of Lemma C.3 (Steps 1-4, Remarks (X)/(XI) via Isaacs Thm 4.34 coprime decomposition) is proved on the Peterfalvi side (S16_AppendixC3/S16_CoreSetup/S16_CoreBounds/S16_NonExistenceGCore) on the transported configuration, with FieldNormalizerData genuinely constructed (fieldNormalizerData_of_repr), not posited. The only specialization: Theorem C, hypothesis (B), and Lemma C.3 are stated for the S16 configuration (Q elementary abelian q-group, p,q odd, inside the odd minimal counterexample) rather than the book's abstract standalone form with an arbitrary finite abelian p'-group Q — full strength for FT, but the abstract Theorem C (e.g. the SL(2,2^q) instance) is not expressible. Genuine gaps are marginal: the illustrative SL(2,2^q) example (Remark II), the trivial odd-primes wlog (Remark V), and the out-of-scope literature items (Remark IV / Problem 1). Slim verification pass: all four flagged missing labels (Rem II, IV, V, Prob 1) were confirmed by content-based grep (the repo's only SL(2) material is the unrelated Isaacs Ch07 Lem 7.4), and the load-bearing statements theoremC/final_contradiction, NormSet.lemmaC1 (AppC_NormSet.lean:1459), and NormSet.lemmaC2 (actually housed in AppC_LemmaC2.lean:25, with (A) literally an unused argument) were read and confirmed at the claimed strength — no status changes, only note refinements (final_contradiction's extra S16 standing hypotheses hnoV/hncH0C, and the AppC_LemmaC2.lean location).
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
