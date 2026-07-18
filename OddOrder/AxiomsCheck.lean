@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.SylowTransport
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
@@ -307,6 +308,22 @@ Proposition 1(c). -/
   OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.canonicalS_sq
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.orderOf_canonicalS_mul_T
+
+-- The standard upper-unipotent root group is Sylow in PSL(2,q), q even.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.center_specialLinearGroup_fin_two_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_projectiveSpecialLinearGroup_fin_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSubgroup_index
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSubgroup_index_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.rootSylow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.coe_rootSylow
 
 -- Quadratic finite-field and Hermitian trace infrastructure for the PSU(3,q) target.
 #assert_only_allowed_axioms
