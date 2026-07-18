@@ -462,7 +462,7 @@ orthogonality `⟨χ,χ̄⟩ = ⟨χ̄,χ⟩ = 0`, `(5.5)` gives `X = ∑_{α∈
 `‖X‖² = ‖χ‖²`;
 the source-pair norm `|R(χ)| = ‖χ − χ̄‖² = ‖χ‖² + ‖χ̄‖²` then gives
 `‖X̄‖² = |R(χ)| − |E| = ‖χ̄‖²`.  No `‖χ‖² = 1` assumption. -/
-noncomputable def retargetTargetPair_gen
+theorem retargetTargetPair_gen
     (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
     (hχχbar : ClassFunction.inner χ χ.conj = 0)
     (hχbarχ : ClassFunction.inner χ.conj χ = 0) :

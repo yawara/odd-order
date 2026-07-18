@@ -43,7 +43,8 @@ in-repo assembler `S07.irrSubcoherent`, threading:
 * the isometry `tSideDadeMap_isometry_diff` (fed the family-supportedness `hSsupp`).
 
 Everything here is **ungated**: it needs only the intrinsic type-III support identity
-`T_typeIII_sigmaSharp_eq` and the induced-character bricks, no S-side βₛ / (13.12) input.  Its output
+`T_typeIII_sigmaSharp_eq` and the induced-character bricks, no S-side βₛ / (13.12) input.  Its
+output
 is exactly the `hyp07` argument that `T_typeIII_calT1_coherent` consumes to produce coherence. -/
 noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
     [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -257,7 +258,8 @@ carrying `tauT` and the seven §5.2 fields), this produces coherence via the pro
 `S07.coherent_of_constant_degree` (Coq `uniform_degree_coherence`), **proving everything else** from
 `calT1`'s structure + the proven count:
 
-* `hirr` — each `ζ = Ind_{QV}^T θ (θ ∈ 𝒯)` is irreducible (`isIrreducibleCharacter_induce_of_inertia_eq`
+* `hirr` — each `ζ = Ind_{QV}^T θ (θ ∈ 𝒯)` is irreducible
+(`isIrreducibleCharacter_induce_of_inertia_eq`
   fed the inertia fact `hinertia : I_T(θ) = QV`, the same input feeding the count), so `⟨ζ,ζ⟩ = 1`
   (`IsIrreducibleCharacter.inner_self_eq_one`);
 * `hconst`/`hdeg0` — each `ζ` has degree `ζ(1) = [T:QV]·θ(1) = p·1 = p ≠ 0`
@@ -276,9 +278,11 @@ them via `dadeIntegralCharacterMap_mem_ZIrr_of_supported` etc.):
 
 * `hZIrr : ∀ a b ∈ calT1_set, hyp07.tau (a − b) ∈ ZIrr G` — the Dade-map integrality on member
   differences (Coq `Ztau1T` from the `subcoherent` datum);
-* `h1A : (1 : ↥T) ∉ A` and `hsuppdiff : ∀ a b ∈ calT1_set, (a − b).support ⊆ A` — the support/`A`-facts
+* `h1A : (1 : ↥T) ∉ A` and `hsuppdiff : ∀ a b ∈ calT1_set, (a − b).support ⊆ A` — the
+support/`A`-facts
   (Coq `A = T^#`, so `1 ∉ A` and every member difference vanishes off `T^#`);
-* `hcard2 : 2 ≤ calT1_set.ncard` — the size bound `2 ≤ (|V|−1)/p` (arithmetic on `|V|`, from the proven
+* `hcard2 : 2 ≤ calT1_set.ncard` — the size bound `2 ≤ (|V|−1)/p` (arithmetic on `|V|`, from the
+proven
   count `T_typeIII_calT1_card`; kept explicit since it needs a `|V|`-lower bound not carried by the
   intrinsic datum here).
 

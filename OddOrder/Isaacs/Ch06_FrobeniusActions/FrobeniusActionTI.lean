@@ -26,7 +26,8 @@ import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
 
 /-!
-# Isaacs FGT Ch.6 (Frobenius actions) — Frobenius action basics, Lemma 6.5 TI counting, subgroup-partition helper (pp. 177-183)
+# Isaacs FGT Ch.6 (Frobenius actions) — Frobenius action basics, Lemma 6.5 TI counting,
+subgroup-partition helper (pp. 177-183)
 -/
 
 namespace OddOrder.Isaacs.Ch06

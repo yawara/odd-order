@@ -49,7 +49,7 @@ section PureLinearAlgebra
 variable {R M : Type*} [Field R] [AddCommGroup M] [Module R M]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-omit [Fintype ι] in
+omit [Fintype ι] [DecidableEq ι] in
 /-- **A map preserving a nonzero top-degree alternating form has determinant `1`.**
 
 If `ω : M [⋀^ι]→ₗ[R] R` is a nonzero alternating form indexed by a basis `e : Basis ι R M`, and
@@ -60,6 +60,7 @@ theorem det_eq_one_of_compLinearMap_alternating [Finite ι]
     (e : Basis ι R M) (ω : M [⋀^ι]→ₗ[R] R)
     (hω : ω ≠ 0) {f : M →ₗ[R] M} (hf : ω.compLinearMap f = ω) :
     LinearMap.det f = 1 := by
+  classical
   haveI : Fintype ι := Fintype.ofFinite ι
   have hbasis : ω e ≠ 0 := (ω.map_basis_ne_zero_iff e).mpr hω
   -- `ω (f ∘ e) = ω e` (preservation) and `= ω e * det f` (top-form scaling).
@@ -247,6 +248,7 @@ theorem commPairing_ofMul (x y : P) :
           by
   rw [commPairing_mk, commBihom2_mk]
 
+omit [Finite P] in
 /-- The commutator form is **alternating**: `b(v, v) = 0`. -/
 theorem commPairing_self (v : Additive (P ⧸ commutator P)) : commPairing hP v v = 0 := by
   obtain ⟨q, rfl⟩ := Additive.ofMul.surjective v
@@ -255,6 +257,7 @@ theorem commPairing_self (v : Additive (P ⧸ commutator P)) : commPairing hP v 
     show (⟨⁅x, x⁆, commutatorElement_mem_commutator_top x x⟩ : ↥(commutator P)) = 1 from
       Subtype.ext (commutatorElement_self x), map_one, toAdd_one]
 
+omit [Finite P] in
 /-- The commutator form is **non-degenerate** when `P` is non-abelian: some value is nonzero. -/
 theorem commPairing_ne (hnonab : ¬ ∀ a b : P, a * b = b * a) :
     ∃ v w, commPairing hP v w ≠ 0 := by

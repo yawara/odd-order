@@ -188,8 +188,8 @@ theorem conjClassSetIn_typePV_centralizer_le_M {M : Subgroup G} (data : TypePDat
 
 /-- **Escaping `A₀(S)`-points come from the `A(S)`-part**: since `V^S`-points do not escape
 (`conjClassSetIn_typePV_centralizer_le_M`), any escaping point of `A₀(S)` lies in `A(S)` and escapes
-there too.  This reduces the Dade engine's escaping-`σ`-sharp and coprimality obligations for `A₀(S)`
-to the already-established `honestTypeP2ASet` ones. -/
+there too.  This reduces the Dade engine's escaping-`σ`-sharp and coprimality obligations for
+`A₀(S)` to the already-established `honestTypeP2ASet` ones. -/
 theorem escaping_honestTypeP2A0Set_mem_honestTypeP2ASet {M : Subgroup G} (data : TypePData M)
     {a : G} (ha : a ∈ escapingCentralizerSet M (honestTypeP2A0Set M data)) :
     a ∈ escapingCentralizerSet M (honestTypeP2ASet M) := by
@@ -315,8 +315,8 @@ theorem exists_sigma_prime_dvd_orderOf_typePV [Finite G]
 /-- **`𝒞_G(K₀#)`-points are nonidentity `κ`-elements** (issue 9076 piece 4c): every `G`-conjugate of
 a nontrivial element of the `κ(M)`-Hall `K₀` is a nonidentity `κ(M)`-element.  A `k ∈ K₀#` has
 `orderOf k ∣ |K₀|`, a `κ`-number (`hK`), so `k` is a `κ`-element; conjugation preserves this
-(`isPiElement_conj`) and non-triviality.  This is the exclusion input for both `A(S)` (`κ′`-elements)
-and `V^S` (`σ`-prime carriers) against `A0Set M K₀ = hatMsigma M ∖ 𝒞_G(K₀#)`. -/
+(`isPiElement_conj`) and non-triviality.  This is the exclusion input for both `A(S)`
+(`κ′`-elements) and `V^S` (`σ`-prime carriers) against `A0Set M K₀ = hatMsigma M ∖ 𝒞_G(K₀#)`. -/
 theorem kappaHall_conjClassSet_isPiElement [Finite G] {M K₀ : Subgroup G} (hKM : K₀ ≤ M)
     (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
     {w : G} (hw : w ∈ conjClassSet (OddOrder.GroupTheory.sharpSubgroup K₀)) :
@@ -374,11 +374,12 @@ theorem aSet_subset_A0Set [Finite G]
   exact (hxκ' p hpf) (hxκ p hpf)
 
 /-- **`V^S ⊆ A0Set M K₀`** (issue 9076 piece 4c): the `M`-conjugacy closure of the exceptional
-regular set `V = typePV` embeds into the `A_0(M)`-set.  `V ⊆ hatMsigma M` (`typePV_subset_hatMsigma`)
-extends to the closure because `hatMsigma M` is `M`-conjugation invariant (`M_σ ◁ M`); and a
-`V`-point carries a `σ`-prime (`exists_sigma_prime_dvd_orderOf_typePV`), `σ ⊆ κ′`
-(`kappa_subset_sigmaCompl`), so it is not a `κ`-element, hence off the pure-`κ` set `𝒞_G(K₀#)`
-(conjugation-invariant, `mem_conjClassSet_conj_iff`). -/
+regular set `V = typePV` embeds into the `A_0(M)`-set.  `V ⊆ hatMsigma M`
+(`typePV_subset_hatMsigma`) extends to the closure because `hatMsigma M` is `M`-conjugation
+invariant (`M_σ ◁ M`); and a `V`-point carries a `σ`-prime
+(`exists_sigma_prime_dvd_orderOf_typePV`), `σ ⊆ κ′` (`kappa_subset_sigmaCompl`), so it is not a
+`κ`-element, hence off the pure-`κ` set `𝒞_G(K₀#)` (conjugation-invariant,
+`mem_conjClassSet_conj_iff`). -/
 theorem conjClassSetIn_typePV_subset_A0Set [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K₀ : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hKM : K₀ ≤ M)
@@ -444,10 +445,10 @@ theorem honestTypeP2A0Set_subset_A0Set [Finite G]
       (aSet_subset_A0Set hG hM hKM hUM hK hU)
   · exact conjClassSetIn_typePV_subset_A0Set hG hM hKM hK data
 
-/-- **Tame conjugation for the honest type-`P₂` `A₀`-support** (BG §16 Theorem II): two `G`-conjugate
-elements of `A₀(M) = A(M) ∪ V^M` are already `M`-conjugate.  This is the first conjunct of BG Theorem
-II (`OddOrder.BG.Ch4.S16.theoremII_tame_embedding` with `X = A0Set M K`): for the tame embedding, a
-`G`-fusion of support points is controlled by `N_G(M) = M`.
+/-- **Tame conjugation for the honest type-`P₂` `A₀`-support** (BG §16 Theorem II): two
+`G`-conjugate elements of `A₀(M) = A(M) ∪ V^M` are already `M`-conjugate.  This is the first
+conjunct of BG Theorem II (`OddOrder.BG.Ch4.S16.theoremII_tame_embedding` with `X = A0Set M K`): for
+the tame embedding, a `G`-fusion of support points is controlled by `N_G(M) = M`.
 
 Discharge route (issue 9076 piece 4c): bridge the honest support `honestTypeP2A0Set M data` into
 BG's
@@ -474,9 +475,10 @@ theorem honestTypeP2A0Set_tame_conj [Finite G]
   obtain ⟨m, hmM, hmb⟩ := hII.1 a (hsub ha) b (hsub hb) ⟨g, hg.symm⟩
   exact ⟨m, hmM, hmb⟩
 
-/-- **(8.13.a), the mixed `A(S)`–`V^S` case is vacuous**: an `A(S)`-point is never `G`-conjugate to a
-`V^S`-point.  An `A(S) = honestTypeP2ASet` element lies in `S' = derivedInG S`, while a `V^S`-point
-lies **outside** `S'` (`typePData_typePV_not_mem_derived`, the nontrivial `W₁`-component).
+/-- **(8.13.a), the mixed `A(S)`–`V^S` case is vacuous**: an `A(S)`-point is never `G`-conjugate to
+a `V^S`-point.  An `A(S) = honestTypeP2ASet` element lies in `S' = derivedInG S`, while a
+`V^S`-point lies **outside** `S'` (`typePData_typePV_not_mem_derived`, the nontrivial
+`W₁`-component).
 
 Proved (issue 9076 piece 4c) via the honest-support tame conjugation `honestTypeP2A0Set_tame_conj`
 (BG §16 Theorem II): if `a` and `b` were `G`-conjugate, they would be **`M`-conjugate**
@@ -530,7 +532,8 @@ hold for `A₀(S) = A(S) ∪ V^S`.  Assembled through the `σ`-decomposition eng
   is the vacuity `not_isConj_honestTypeP2ASet_typePV` (the one deep `'A0`-`normedTI` pin).
 
 This is the `S`-side Dade datum the (13.18) row-`0` cross-relation `τ_S(μ_{0j} − μ_{01}) =
-η_{0j} − η_{01}` actually needs (the `μ`-differences are `A₀(S)`-supported, not `A(S)`-supported). -/
+η_{0j} − η_{01}` actually needs (the `μ`-differences are `A₀(S)`-supported, not `A(S)`-supported).
+-/
 theorem dadeSupportHypothesisData_honestTypeP2A0Set [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hTP : OddOrder.BG.Ch4.S14.IsTypeP M) (data : TypePData M) :
@@ -617,9 +620,9 @@ theorem Hypothesis.dadeHypT0_hconj [Fintype G] [Finite G]
     (hyp.dadeHypT0 hG hTP Tdata).HConjInvariant :=
   (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.T_maximal hTP Tdata).some.hconj
 
-/-- **`dadeHypS0.H a = ftSupportKernel S (A₀(S)) a`** (A₀ analogue of `dadeHypS_H_eq_ftSupportKernel`).
-The `'A0(S)`-instance Dade stabilizer at a support point `a` is the faithful (8.14) signalizer
-kernel
+/-- **`dadeHypS0.H a = ftSupportKernel S (A₀(S)) a`** (A₀ analogue of
+`dadeHypS_H_eq_ftSupportKernel`). The `'A0(S)`-instance Dade stabilizer at a support point `a` is
+the faithful (8.14) signalizer kernel
 `R(a) = ftSupportKernel S (A₀(S)) a`, read off the `H_eq_ftSupportKernel` field of the underlying
 `DadeSupportHypothesisData` that `dadeHypS0` is projected from. -/
 theorem Hypothesis.dadeHypS0_H_eq_ftSupportKernel [Fintype G] [Finite G]
@@ -630,11 +633,12 @@ theorem Hypothesis.dadeHypS0_H_eq_ftSupportKernel [Fintype G] [Finite G]
   (dadeSupportHypothesisData_honestTypeP2A0Set hG hyp.S_maximal (hyp.S_isTypeP hG)
     hyp.Sdata).some.H_eq_ftSupportKernel a
 
-/-- **All `'A0(S)`-instance Dade stabilizers vanish** (the (13.2.e) `A₀` `normedTI` conclusion): since
-no `A₀(S)`-point escapes (`escaping_honestTypeP2A0Set_eq_empty`), the faithful kernel
+/-- **All `'A0(S)`-instance Dade stabilizers vanish** (the (13.2.e) `A₀` `normedTI` conclusion):
+since no `A₀(S)`-point escapes (`escaping_honestTypeP2A0Set_eq_empty`), the faithful kernel
 `ftSupportKernel S (A₀(S)) a` is `⊥` at every support point
-(`ftSupportKernel_eq_bot_of_not_escaping`).  This is the trivial-stabilizer input the `τ_S = Ind_S^G`
-Dade=Ind bridge consumes (for (13.18.c) `⟨Γ,1_G⟩ = 0` and pin C `tauS_mu_row0_vanish_on_V`). -/
+(`ftSupportKernel_eq_bot_of_not_escaping`).  This is the trivial-stabilizer input the
+`τ_S = Ind_S^G` Dade=Ind bridge consumes (for (13.18.c) `⟨Γ,1_G⟩ = 0` and pin C
+`tauS_mu_row0_vanish_on_V`). -/
 theorem Hypothesis.forall_dadeHypS0_H_eq_bot [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

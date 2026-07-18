@@ -446,7 +446,8 @@ open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **Per-member orthonormal Dade `R`-family over `𝒮 = sSet`** (issue 1017, the `R` input of the (5.7)
 coherence engine `uniform_degree_coherence_of_families`, the honest `S`-instance analogue of the
-M-instance `caseB_sOf_memberRFamily`, `S13_MaximalIII_IV.lean:546`).  **Clifford-case-agnostic**: the
+M-instance `caseB_sOf_memberRFamily`, `S13_MaximalIII_IV.lean:546`).  **Clifford-case-agnostic**:
+the
 construction depends on nothing beyond `η ∈ 𝒮` and its conjugate (the two Clifford cases were only
 ever
 threaded to obtain the member+conjugate equal-degree fact, which is automatic — `η̄(1) = η(1)`), so
@@ -804,7 +805,8 @@ reductions `sSet_memberRFamily_imageSet_of_{irr,red}`:
   `⟨φ, ξ̄⟩`, `⟨φ, ξ⟩` (`inner_conj_conj`), so `0`;
 * **irr × red** / **red × irr** — `sSet_irr_memberRFamily_eta_inner` (`⟨η-grid, R(irr)⟩ = 0`
   from the (13.19.b) rigidity engine), transported by `inner_conj_symm` / `inner_neg`;
-* **red × red** — `eta_orthonormal`, the four columns pairwise distinct (`mu_colSum_ne_of_inner_zero`
+* **red × red** — `eta_orthonormal`, the four columns pairwise distinct
+(`mu_colSum_ne_of_inner_zero`
   on `⟨φ, ξ⟩ = ⟨φ, ξ̄⟩ = ⟨φ̄, ξ⟩ = ⟨φ̄, ξ̄⟩ = 0`, so `{jφ, kφ} ∩ {jξ, kξ} = ∅`). -/
 theorem Hypothesis.sSet_memberRFamily_orthogonal [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)

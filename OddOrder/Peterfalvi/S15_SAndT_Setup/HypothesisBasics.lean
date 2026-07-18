@@ -22,7 +22,8 @@ variable {G : Type*} [Group G]
 /-! ### Dade-independent subcoherence inputs for the §9 induced family `𝒮`
 
 The (5.3.a) subcoherence assembler `S07.irrSubcoherent` needs, besides the Dade isometry, the family
-properties `hconj`/`hreal`/`hortho` of `𝒮 = Ind_{HU}^M 𝒳`.  These are **Dade-independent** — provable
+properties `hconj`/`hreal`/`hortho` of `𝒮 = Ind_{HU}^M 𝒳`.  These are **Dade-independent** —
+provable
 directly from the induced-character conjugation identity and the orthogonality of distinct-orbit
 inductions — so they can be discharged ahead of the (13.2.e) Dade-isometry foundation.  Here we land
 `hconj` (conjugate-closure); it feeds the honest §9 subcoherence assembly that re-grounds
@@ -307,7 +308,8 @@ Dade-independent family inputs:
   brick `dadeIntegralCharacterMap_inner_eq_of_supported` (only the supportedness halves are used).
 
 The `hconj` field requires `d` to be real (`star d = d`); this holds for the genuine degree values
-`d = q·s` (positive natural), supplied by the caller.  This is the (5.3.a) subcoherence hypothesis on
+`d = q·s` (positive natural), supplied by the caller.  This is the (5.3.a) subcoherence hypothesis
+on
 a uniform-degree family, ready for `coherent_subset_of_constant_degree` (the (9.11) base + Galois). -/
 noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
@@ -386,7 +388,7 @@ Internal discharges:
 * `h1A` = `honestTypeP2ASet_one_not_mem` (`1 ∉ A(S)`);
 * `hsuppdiff` = the equal-degree two-member support fact (member differences `A(S)`-supported),
   the same argument `sSetIrrDeg_subcoherent`'s `hiso` uses internally. -/
-noncomputable def Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
+theorem Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     [Fintype ↥hyp.S] [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)]
     (d : ℂ) (hd : star d = d) (hd0 : d ≠ 0)
@@ -1304,8 +1306,11 @@ theorem Hypothesis.mkSection11CharacterDataS_u_eq [Finite G]
 `S`.  Faithful obligation on the §16 σ-structure (`BasicStructureGated` docstring).
 
 `U_commutative` (13.2.a U-side) and `P_order` (13.2.b order part) are now **genuine**:
-* `U_commutative` from the carried `S_U_commutative` (BG Lemma 15.1(b) `typeP_hall_derived_eq_and_abelian`, `U` the `(κ∪σ)'`-Hall, supplied at construction);
-* `P_order` = `|P| = p^q` from `card_P_eq` fed by the carried `Sdata_W2_eq` (the intrinsic dual factor `Sdata.W2 = C_{S'}(W₁#)` equals the abstract `W₂ = K*`, via `typePData_of_kappaHall_hallComplement_W2`).
+* `U_commutative` from the carried `S_U_commutative` (BG Lemma 15.1(b)
+`typeP_hall_derived_eq_and_abelian`, `U` the `(κ∪σ)'`-Hall, supplied at construction);
+* `P_order` = `|P| = p^q` from `card_P_eq` fed by the carried `Sdata_W2_eq` (the intrinsic dual
+factor `Sdata.W2 = C_{S'}(W₁#)` equals the abstract `W₂ = K*`, via
+`typePData_of_kappaHall_hallComplement_W2`).
 
 The `A_0(S)`/`τ_S` clauses are the opaque scaffold Props (`True`).  The two former concrete
 residuals are now **genuine** (both discharged ungated on the `S`-instance `toTypesIIIIIIVSetupS`):

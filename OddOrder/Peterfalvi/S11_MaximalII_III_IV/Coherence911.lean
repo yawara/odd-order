@@ -82,7 +82,8 @@ theorem realizedH0_map_hInHuEquivH_eq_N {M : Subgroup G}
 /-- **Second isomorphism `HC/H₀C ≅ H̄`**: `(hInHu ⊔ H₀C)/H₀C ≃* ↥H ⧸ N`.  Composes
 `quotientInfEquivProdNormalQuotient hInHu (realized H₀C)` (`HC/H₀C ≅ hInHu/(H₀C∩hInHu)`) with
 `QuotientGroup.congr hInHuEquivH` (`hInHu/realizedH₀ ≅ ↥H ⧸ N`, using
-`realizedH0supC_subgroupOf_hInHu_eq` + `realizedH0_map_hInHuEquivH_eq_N`).  The inflation `θ̄ ∘ this`
+`realizedH0supC_subgroupOf_hInHu_eq` + `realizedH0_map_hInHuEquivH_eq_N`).  The inflation
+`θ̄ ∘ this`
 gives the `HC`-linear character `ψ` of the (9.8.c) construction.  Type inferred to avoid the
 `⊔`/`⧸` precedence trap. -/
 noncomputable def hcQuotientEquivHbar [Finite G] {M : Subgroup G}
@@ -281,7 +282,8 @@ theorem hcPsi_inertia_eq_hc [Finite G] {M : Subgroup G}
   exact (hInHu_sup_realizedH0supC chief).ge
 
 /-- **`ζ = Ind_{HC}^{HU}(ψ)` is irreducible** (degree `u`): direct from
-`isIrreducibleCharacter_induce_of_inertia_eq` and `inertia(ψ) = HC` (`hcPsi_inertia_eq_hc`).  This is
+`isIrreducibleCharacter_induce_of_inertia_eq` and `inertia(ψ) = HC` (`hcPsi_inertia_eq_hc`).  This
+is
 the degree-`u` irreducible character of `𝒳(H₀C)` over `θ₀` in the (9.8.c) construction. -/
 theorem hcZeta_irreducible [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)

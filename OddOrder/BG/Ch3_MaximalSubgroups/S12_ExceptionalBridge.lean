@@ -125,19 +125,6 @@ theorem le_of_le_sup_of_coprime_card [Finite G] {N P H : Subgroup G}
     rwa [hπdef, QuotientGroup.ker_mk'] at this
   exact Subgroup.mem_subgroupOf.mp h2
 
-/-- A nontrivial `p`-group is a `π`-subgroup whenever `p ∈ π`. -/
-theorem isPiSubgroup_of_isPGroup_of_mem [Finite G] {π : Set ℕ} {p : ℕ} [Fact p.Prime]
-    {X : Subgroup G} (hX : IsPGroup p ↥X) (hp : p ∈ π) :
-    Subgroup.IsPiSubgroup π X := by
-  intro q hq
-  obtain ⟨k, hk⟩ := hX.exists_card_eq
-  rw [hk] at hq
-  have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hq
-  have hdvd : q ∣ p ^ k := (Nat.mem_primeFactors.mp hq).2.1
-  have hqp : q = p :=
-    (Nat.prime_dvd_prime_iff_eq hq_prime Fact.out).mp (hq_prime.dvd_of_dvd_pow hdvd)
-  rwa [hqp]
-
 end S12
 
 namespace S11
@@ -390,7 +377,7 @@ theorem normalizer_Malpha_sup_sylow_of_mem_sigma [Finite G] (hG : IsMinimalSimpl
     rw [Subgroup.mem_subgroupOf]
     exact S10.sigma_subgroup_le_Msigma_of_isHall
       (S10.isHall_Msigma_Malpha hG hM).1 (Subgroup.map_subtype_le _)
-      (isPiSubgroup_of_isPGroup_of_mem (SM.isPGroup'.map _) hp)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem (SM.isPGroup'.map _) hp)
       (Subgroup.mem_map_of_mem _ hx)
   -- hence `Sb ≤ F(M/M_α)`, which is nilpotent.
   have hSb_F : (Sb : Subgroup (↥M ⧸ N)) ≤ Ch01.fitting (↥M ⧸ N) := by
@@ -448,7 +435,7 @@ theorem commutator_le_inf_Msigma_of_normalizer_le [Finite G] (hG : IsMinimalSimp
     by_cases hpσ : p ∈ S10.sigma Mstar
     · have hAMσ : A ≤ S10.Msigma Mstar :=
         S10.sigma_subgroup_le_Msigma_of_isHall (S10.isHall_Msigma_Malpha hG hMstar).1
-          hAMstar (isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
+          hAMstar (Subgroup.isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
       rw [sup_eq_left.mpr hAMσ]
       exact le_normalizer_opiCoreInG _ _
     · obtain ⟨P, h111⟩ :=
@@ -954,14 +941,14 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
     have hAC : A ≤ Subgroup.centralizer ((S10.Msigma M : Subgroup G) : Set G) :=
       le_centralizer_swap hgen
     have h1011 := S10.rank_centralizer_Msigma_inf_le_one hG hM hAM
-      (isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
     rw [inf_eq_right.mpr hAC] at h1011
     have h2 := two_le_rank_of_mem_elemAbelianOfRank_two hA
     omega
   -- (4) `A ≤ M_σ` and a Sylow `p`-subgroup `Pg` of `M_σ` containing `A`.
   have hAMσ : A ≤ S10.Msigma M := S10.sigma_subgroup_le_Msigma_of_isHall
     (S10.isHall_Msigma_Malpha hG hM).1 hAM
-    (isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
+    (Subgroup.isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
   obtain ⟨PW, hAPW⟩ := hA.1.isPGroup.comap_subtype.exists_le_sylow (G := S10.Msigma M)
   set Pg : Subgroup G := (PW : Subgroup ↥(S10.Msigma M)).map (S10.Msigma M).subtype
     with hPgdef
@@ -1044,7 +1031,7 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
     intro R hPR hRM hRpg
     have hRMσ : R ≤ S10.Msigma M := S10.sigma_subgroup_le_Msigma_of_isHall
       (S10.isHall_Msigma_Malpha hG hM).1 hRM
-      (isPiSubgroup_of_isPGroup_of_mem hRpg hpσ)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hRpg hpσ)
     have hle : (PW : Subgroup ↥(S10.Msigma M)) ≤ R.subgroupOf (S10.Msigma M) := by
       refine le_trans (fun x hx => Subgroup.mem_subgroupOf.mpr ?_) (Subgroup.comap_mono hPR)
       rw [hPgdef]
@@ -1107,7 +1094,7 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
     have hSq_le : (Sq : Subgroup ↥M).map M.subtype ≤ S10.Malpha M := by
       refine S10.alpha_subgroup_le_Malpha_of_isHall (S10.isHall_Msigma_Malpha hG hM).2.1
         (Subgroup.map_subtype_le _) ?_
-      exact isPiSubgroup_of_isPGroup_of_mem (Sq.isPGroup'.map _) hqα
+      exact Subgroup.isPiSubgroup_of_isPGroup_of_mem (Sq.isPGroup'.map _) hqα
     have hSq_le' : (Sq : Subgroup ↥M).map M.subtype ≤
         Subgroup.centralizer (A : Set G) ⊓ M :=
       le_inf (hSq_le.trans hMαC) (Subgroup.map_subtype_le _)
@@ -1186,7 +1173,8 @@ elementary abelian subgroup `A` (`exists_isElementaryAbelian_card_prime_sq_of_no
 `G`-centralizer lies in `M` (`centralizer_le_of_elemAb_rank_two`, BG Proposition 12.4(a)); the
 `σ`-fusion control (`fusion_control_of_mem_sigma`, third clause `N_G(P) = (N_G(P) ⊓ M)·C_G(P)`)
 factors every `n ∈ N_G(P)` as `n = a·c` with `a ∈ N_G(P) ⊓ M ≤ M` and `c ∈ C_G(P) ≤ C_G(A) ≤ M`, so
-`N_G(P) ≤ M`.  This is the `σ`-uniqueness input to BG Lemma `sigma_compl_embedding` (the cyclicity of
+`N_G(P) ≤ M`.  This is the `σ`-uniqueness input to BG Lemma `sigma_compl_embedding` (the cyclicity
+of
 `M_σ ∩ M^g`, BG Theorem D(2)). -/
 theorem norm_noncyclic_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]

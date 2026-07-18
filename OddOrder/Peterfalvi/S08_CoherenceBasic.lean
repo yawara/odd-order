@@ -1323,7 +1323,8 @@ noncomputable def Xset_centralCommutator_isCoherent_of_c2_caseA
   exact hyp.Xset_centralCommutator_isCoherent_of_irreducible_X hX hXne hp hp3 hHp hidxp
 
 /-- **(6.8.1)/(6.8), L3 outer shell:** `X(Zc) ∪ Y` is coherent, given the (6.8.1) `τ₃` glue data
-`ν`.  Mirrors `coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner` but at
+`ν`.  Mirrors `coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner` but
+at
 the central `Zc` and **stopping at the union coherence** (`Xset Zc ∪ Yset ⊊ S` in general, so the
 final `Xset_union_Yset_eq_S` collapse is unavailable; the gap is closed separately by L4
 `false_of_coherentXunionYset_of_not_coherentS`).  The `X`-coherence is the L2 monolith
@@ -1371,7 +1372,8 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_of_frobenius
 hypothesis `hgen` (without the cross-diagonals `D`) is **false** in the (6.8.1) situation — the
 supported cross-diagonal `χ₁ − a·η₁ ∈ ℤ[X(Zc) ∪ Y]` is not a sum of a supported `X`-combination and
 a supported `Y`-combination (see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`, framing correction
-#2, and the `coherentUnion_of_glued_withDiagonal` docstring).  Here `D` carries those cross-diagonals
+#2, and the `coherentUnion_of_glued_withDiagonal` docstring).  Here `D` carries those
+cross-diagonals
 with `hDτ : ∀ d ∈ D, ν d = τ d` (the (6.8.1) `b ≡ 0` conclusion
 `(χ₁ − a·η₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}`), and `hgen` is the satisfiable generation including `D`. -/
 noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_general

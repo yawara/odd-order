@@ -211,7 +211,7 @@ theorem tau2_prime_eq_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   -- extend `B` to a maximal `A`-invariant `q`-subgroup `Qs` of `G`.
   have hB_inv : B ∈ hInvariant ⊤ A {q} := by
     refine ⟨le_top, hAcentB.trans (Subgroup.centralizer_le_normalizer _), ?_⟩
-    exact isPiSubgroup_of_isPGroup_of_mem hB.1.isPGroup rfl
+    exact Subgroup.isPiSubgroup_of_isPGroup_of_mem hB.1.isPGroup rfl
   obtain ⟨Qs, hQs, hBQs⟩ := exists_le_hInvariantStar hB_inv
   -- `q ∈ π(C_G(A))` and `A` is maximal elementary abelian (Lemma 12.1(g)).
   have hBC : B ≤ Subgroup.centralizer (A : Set G) := le_centralizer_swap hAcentB
@@ -853,7 +853,7 @@ theorem fitting_eq_sup_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd G)
   have hA₀_le_F : A₀ ≤ Ch2.S08.fittingInG M :=
     Ch2.S08.le_fittingInG_of_normal_isPiSubgroup_singleton hA₀M
       ((Subgroup.normal_subgroupOf_iff_le_normalizer hA₀M).mpr hA₀_norm)
-      (isPiSubgroup_of_isPGroup_of_mem hA₀pg rfl)
+      (Subgroup.isPiSubgroup_of_isPGroup_of_mem hA₀pg rfl)
   have hJ_le_F : S10.Msigma M ⊔ A₀ ≤ Ch2.S08.fittingInG M := sup_le hMσ_le_F hA₀_le_F
   -- `|F(M)| ∣ |M_σ ⊔ A₀|`: per-prime analysis of the nilpotent `F(M)`.
   haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG M) := Ch2.S08.fittingInG_isNilpotent M
@@ -932,7 +932,7 @@ theorem fitting_eq_sup_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd G)
       · refine le_trans ?_ le_sup_left
         exact S10.sigma_subgroup_le_Msigma_of_isHall
           (S10.isHall_Msigma_Malpha hG h.mem_maximal).1 hFq_le_M
-          (isPiSubgroup_of_isPGroup_of_mem hFq_pg hσ)
+          (Subgroup.isPiSubgroup_of_isPGroup_of_mem hFq_pg hσ)
       · have hqp : q = p := hprime_eq q hq_prime hτ2
         subst hqp
         exact le_trans (habs Fq hM_norm_Fq hFq_pg hFq_le_M) le_sup_right
@@ -1006,8 +1006,7 @@ theorem primeFactors_centralizer_le_tau1_of_disjoint [Finite G] (hG : IsMinimalS
     refine Nat.mem_primeFactors.mpr ⟨hr_prime, ?_, Nat.card_pos.ne'⟩
     rw [← hyord]
     exact Subgroup.orderOf_dvd_natCard E hyE
-  rcases h.mem_tau_union_of_mem_primeFactors hG hrE with h12 | h3
-  rcases h12 with h1 | h2
+  rcases h.mem_tau_union_of_mem_primeFactors hG hrE with (h1 | h2) | h3
   · exact h1
   · -- `r ∈ τ₂`: then `r = p` and `⟨y⟩` is a line violating (c) or the disjointness.
     exfalso

@@ -170,7 +170,8 @@ open scoped FiniteInduce in
 `certainTypeOmegaSigma_eq_chiFam`): `alignedOmegaSigmaGrid i j` is the `σ`-image of the irreducible
 (linear) character `η = compHom e (chiColumn χ₂ i)` of `tic.W` — `chiColumn` is `ω(omegaProdChar …)`
 hence a `linearIrreducibleCharacter`, and `compHom` of a linear character is again linear
-(`compHom_linearIrreducibleCharacter`).  By `sigma_irreducibleCharacter` it is the orthonormal family
+(`compHom_linearIrreducibleCharacter`).  By `sigma_irreducibleCharacter` it is the orthonormal
+family
 vector `χ_P` at the index `P = omegaIrrEquiv.symm η`.  This is what lets the (10.5) Dade-image
 trichotomy reuse the §6 `(4.8)` endgame (`sigmaCoeff_psi_eq`, `grid_trichotomy`). -/
 theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family [Finite G]
@@ -863,7 +864,8 @@ theorem Hypothesis.muColumnSign_eq_of_ne [Finite G]
 
 open scoped FiniteInduce in
 /-- **§10 column-`0` sign** (Peterfalvi (10.3) / (4.4) `δ_0 = 1`): the sign `δ_0` of the trivial
-column is `1`.  The column-`0` dual is the trivial character (`finCardEquivCharacterGroup_zero`), and
+column is `1`.  The column-`0` dual is the trivial character (`finCardEquivCharacterGroup_zero`),
+and
 the trivial column has sign `1` (`certainType_zero_column_anchor.1`, the `μ_{00} = 1_L` anchor).
 This is the `δ_0 = 1` normalisation used by the (10.5) Dade-image identity (the column-`0` term in
 `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` is reconciled against `ω_{i0}^σ` with unit sign). -/

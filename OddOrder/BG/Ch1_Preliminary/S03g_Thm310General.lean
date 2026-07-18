@@ -156,7 +156,8 @@ complement `R·K₀/K₀`) transfers back to `ρ` on `G` (kernel `K`, complement
 order is unchanged (`card_map_mk'_eq_of_disjoint`) and so is the `finrank` of its invariants
 (`invariants_lift_map_eq_of_trivial`), so `(a)` `|R| = p` and `(b)`
 `finrank V = |R| · finrank C_V(R)`
-carry over verbatim.  The induction (Case B) supplies the quotient conclusion `hquot` by applying the
+carry over verbatim.  The induction (Case B) supplies the quotient conclusion `hquot` by applying
+the
 induction hypothesis to `ρ̄` (whose kernel `K/K₀` is strictly smaller). -/
 theorem caseB_transfer (ρ : Representation F G V) {K₀ K R : Subgroup G} [K₀.Normal]
     (hker : ∀ x ∈ K₀, ρ x = 1) (hdisj : Disjoint R K₀)
@@ -425,7 +426,8 @@ private theorem frobenius_general_aux [IsAlgClosed F] [FiniteDimensional F V] [N
           hRne' hKmapne hKcard' hcop' hCVK' hFrob' hcond3' rfl)
 
 /-- **BG Theorem 3.10(a)+(b), general (possibly non-abelian) kernel** (mmd L1267-1357, the
-irreducible-module case = Case 2 of the proof).  Let `ρ` be an irreducible representation of a finite
+irreducible-module case = Case 2 of the proof).  Let `ρ` be an irreducible representation of a
+finite
 solvable group `G` over an algebraically closed field `F` (`char F ∤ |K|`, encoded by
 `(|K| : F) ≠ 0`), with `K ⊴ G` a Frobenius kernel and `R ≤ G` a complement acting fixed-point-freely
 (`hFrob`) and in prime manner (`hcond3`), coprimely (`Coprime |R| |K|`), with trivial invariants

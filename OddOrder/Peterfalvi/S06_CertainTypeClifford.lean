@@ -919,7 +919,8 @@ theorem chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
 /-- **`induce` is injective on the reducible-inducing columns** (issue 1012, (9.9.b) source↔image):
 distinct `W₂`-duals `χ₂` give distinct induced characters `Ind_K^L(chiRestrict χ₂)`.  Each column is
 `L`-inertia-stable (`chiRestrict_conjBy_eq`), so `induce_injective_of_inertia_stable` forces
-`chiRestrict χ₂ = chiRestrict χ₂'`, hence `χ₂ = χ₂'` (`chiRestrict_injective`).  This makes the count
+`chiRestrict χ₂ = chiRestrict χ₂'`, hence `χ₂ = χ₂'` (`chiRestrict_injective`).  This makes the
+count
 of *reducible induced images* equal the count of columns (`= w₂ − 1`), the bridge from the §6 source
 count to the §9 family `{φ ∈ 𝒮(H₀) | ¬ irr φ}`. -/
 theorem induce_chiRestrict_injective [NeZero (Nat.card h.W1)] [Finite ↥h.K] :

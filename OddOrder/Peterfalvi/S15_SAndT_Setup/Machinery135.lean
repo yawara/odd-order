@@ -1079,7 +1079,8 @@ noncomputable def H_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (13.5)/(7.6)**: the (7.6) coherent-family datum for `(S, H^#)`, with its (7.7.a)
-certificate.  Built from the (7.1) ρ-hypothesis `H_sharp_hypothesis71` and the Dade-isometry property
+certificate.  Built from the (7.1) ρ-hypothesis `H_sharp_hypothesis71` and the Dade-isometry
+property
 via `S09.hypothesis76OfDade` (issue-1013: the whole `Hypothesis76`, *including* the (7.7.a)
 `chiRho_decomp`, is constructible from `(7.1)` data alone — the induced family `{Ind_H^S θ}` is the
 `exists_distinct_induced_family` enumeration, the certificate is `chiRho_decomp_induced`). The
@@ -1186,7 +1187,8 @@ theorem H_sharp_tau_eq_induce [Fintype G] [Invertible (Nat.card G : ℂ)]
 subgroups of a (7.1) datum are trivial (`H(a) = ⊥`, as for the TI-subset Dade construction
 `H_sharp_dadeHypothesis`), the `ρ`-map is the identity on the support — `χ^ρ(a) = χ(a)` for `a ∈ A`.
 Direct from the `chiRho` definition: the average `|H(a)|⁻¹ ∑_{x∈H(a)} χ(a·x)` over `H(a) = ⊥` is the
-single term `χ(a·1) = χ(a)`.  This identifies the (13.5.a) point formula's left side with `χ` itself,
+single term `χ(a·1) = χ(a)`.  This identifies the (13.5.a) point formula's left side with `χ`
+itself,
 so the (7.7.a) `chiRho_explicit_formula` decomposition reads off `χ(x)` on `H^#` directly. -/
 theorem chiRho_eq_self_of_H_eq_bot {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     (H71 : OddOrder.Peterfalvi.S09.Hypothesis71 G A L)

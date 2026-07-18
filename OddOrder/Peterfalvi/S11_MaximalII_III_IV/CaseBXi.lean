@@ -959,7 +959,8 @@ theorem hcConjDescend_hcHom [Finite G] {M : Subgroup G}
   rw [QuotientGroup.mk'_apply]
 
 /-- **Conjugation-commute for `hcPsi`**: `conjBy g (hcPsi θ) = hcPsi (θ ∘ A_g)` for `g ∈ HU`, where
-`A_g = hcConjDescend g`.  Pointwise: `(conjBy g (hcPsi θ)) y = (hcPsi θ)(g·y·g⁻¹) = θ(hcHom(g·y·g⁻¹))
+`A_g = hcConjDescend g`.  Pointwise: `(conjBy g (hcPsi θ)) y = (hcPsi θ)(g·y·g⁻¹) =
+θ(hcHom(g·y·g⁻¹))
 = θ(A_g(hcHom y)) = (hcPsi (θ∘A_g)) y`, using the factoring `hcConjDescend_hcHom`.  This is the
 `HU`-conjugation ↔ `Ū`-precomposition equivariance: the `HU`-orbit of `hcPsi θ` consists of the
 `hcPsi (θ∘A_g)`, so the regular-inflated set is conjugation-closed (modulo the case-A regularity of
@@ -1184,7 +1185,8 @@ theorem hcPsi_irreducibleConjBy_eq [Finite G] {M : Subgroup G}
 seed `θ` (nontrivial on every Clifford factor `Hpart i`) and `g ∈ HU`, the conjugate `(hcPsi θ)^g`
 equals `hcPsi θ'` for the regular seed `θ' = θ ∘ A_g`: the commute `hcPsi_irreducibleConjBy_eq`
 gives
-the identity, and `hcConjDescend_comp_regular_iff` gives the regularity of `θ'`.  This is exactly the
+the identity, and `hcConjDescend_comp_regular_iff` gives the regularity of `θ'`.  This is exactly
+the
 conjugation-closure hypothesis `hT` of `card_filter_induce_eq_index_inertia` for the induction
 `θ ↦ Ind_{HC}^{HU}(hcPsi θ)` over `T = {hcPsi θ | θ regular}`, whose fibres have size `u`
 (`hcPsi_inertia_index_eq_u`), giving the `oXtheta` count `u·|Xθ| = (p-1)^q`

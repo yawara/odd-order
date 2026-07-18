@@ -9,9 +9,11 @@ import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 
 Assembles the proven pieces into the **abelian-kernel** case of BG Theorem 3.10(a):
 
-* free block dimension keystone (`FreeBlockPermutation.finrank_eq_card_mul_finrank_invariants_of_freeBlock`),
+* free block dimension keystone
+(`FreeBlockPermutation.finrank_eq_card_mul_finrank_invariants_of_freeBlock`),
 * the `|R|`-prime assembly (`prime_card_of_freeBlock_cond3`),
-* the weight-space spanning decomposition (`S03e.iSup_weightSpace_eq_top` + `iSupIndep_weightSpace`),
+* the weight-space spanning decomposition (`S03e.iSup_weightSpace_eq_top` +
+`iSupIndep_weightSpace`),
 * Frobenius freeness on weight characters (`weightChar_eq_one_of_conjChar_fixed`).
 
 The blocks are the `K`-weight spaces (over an algebraically closed field, abelian `K`,

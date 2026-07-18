@@ -45,7 +45,8 @@ theorem conj_ne_one {m a : G} (ha : a ≠ 1) : m * a * m⁻¹ ≠ 1 := fun h =>
     simpa using h2)
 
 /-- `A(M)` is `M`-conjugation invariant: `m·A(M)·m⁻¹ = A(M)` pointwise.  The centralizer witness
-`x ∈ H^#` transports along the `M`-normality of `H = M_F` (`maxNilpotentNormalHall_le_normalizer`). -/
+`x ∈ H^#` transports along the `M`-normality of `H = M_F` (`maxNilpotentNormalHall_le_normalizer`).
+-/
 theorem typeIA_conj_mem (M : Subgroup G) (data : TypeIData M) {m : G} (hm : m ∈ M) {a : G}
     (ha : a ∈ typeIA M data) : m * a * m⁻¹ ∈ typeIA M data := by
   obtain ⟨haM, ha1, x, hx, hax⟩ := ha
@@ -952,9 +953,10 @@ theorem typePA_eq_sigmaSharp_of_isTypeP1 [Finite G]
   rfl
 
 /-- **Escaping type-`P₁` support points are `σ`-sharp** (the soundness lemma for the type-`P₁` Dade
-engine): for a type-`P₁` maximal, an escaping point of `A(M) = (M')#` lies in `M_σ#`.  Immediate from
-`typePA = M_σ#` (`typePA_eq_sigmaSharp_of_isTypeP1`).  This is the type-`P₁` analogue of the type-`I`
-`escaping_typeIA_mem_A1`, but with no `ASet`/`mem_sigmaSharp_of_mem_aSet_of_escape` detour. -/
+engine): for a type-`P₁` maximal, an escaping point of `A(M) = (M')#` lies in `M_σ#`.  Immediate
+from `typePA = M_σ#` (`typePA_eq_sigmaSharp_of_isTypeP1`).  This is the type-`P₁` analogue of the
+type-`I` `escaping_typeIA_mem_A1`, but with no `ASet`/`mem_sigmaSharp_of_mem_aSet_of_escape` detour.
+-/
 theorem escaping_typePA_mem_sigmaSharp_of_isTypeP1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (data : TypePData M) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) {a : G}
@@ -1181,16 +1183,17 @@ theorem conjClassSetIn_typePV_isConj_conj_in_M {M : Subgroup G} (data : TypePDat
 
 /-- **Peterfalvi (8.13.a) for the `σ`-sharp support**: two `G`-conjugate elements of `M_σ^#`
 are already `M`-conjugate.  This is the `σ`-sharp analogue of `typeIA_isConj_conj_in_M`, but proved
-*natively* from the `σ`-decomposition (BG Theorem 14.4, `exists_conj_centralizer_of_mem_maximalSigma`)
-rather than through the BG §16 tame embedding.  Since `A₁(M) = M_σ^#` for every Peterfalvi type
-(`A1_eq_sigmaSharp`) and `A(M) = (M')^# = M_σ^#` for type `P₁` (`typePA_eq_sigmaSharp_of_isTypeP1`),
-this one lemma discharges the Dade-engine `conj_in_L` obligation on `A₁` uniformly and on the
-type-`P₁` `A(M)`.
+*natively* from the `σ`-decomposition (BG Theorem 14.4,
+`exists_conj_centralizer_of_mem_maximalSigma`) rather than through the BG §16 tame embedding.  Since
+`A₁(M) = M_σ^#` for every Peterfalvi type (`A1_eq_sigmaSharp`) and `A(M) = (M')^# = M_σ^#` for type
+`P₁` (`typePA_eq_sigmaSharp_of_isTypeP1`), this one lemma discharges the Dade-engine `conj_in_L`
+obligation on `A₁` uniformly and on the type-`P₁` `A(M)`.
 
 Both `M` and `g^{-1}Mg` are `σ`-maximals of `a` — the latter is a conjugate of `M` containing
 `a = g^{-1}bg` (`b ∈ M`), so `maximalConjugatesContaining_eq_maximalSigma` places it in `𝓜_σ(a)`.
 Theorem 14.4 gives `c ∈ C_G(a)` with `cMc^{-1} = g^{-1}Mg`, whence `gc ∈ N_G(M) = M`
-(`normalizer_eq_self_of_mem_maximalSubgroups`) is the `M`-conjugator: `(gc)a(gc)^{-1} = gag^{-1} = b`. -/
+(`normalizer_eq_self_of_mem_maximalSubgroups`) is the `M`-conjugator:
+`(gc)a(gc)^{-1} = gag^{-1} = b`. -/
 theorem sigmaSharp_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {a b : G} (ha : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
@@ -1319,8 +1322,8 @@ theorem not_isConj_typePA_typePV_of_isTypeP1 [Finite G]
 /-- **Peterfalvi (8.13.a) for the type-`P₁` `A_0`-support**: two `G`-conjugate elements of
 `A_0(M) = A(M) ∪ V^M` are `M`-conjugate.  Three cases: both in `A(M) = M_σ^#`
 (`sigmaSharp_isConj_conj_in_M`), both in `V^M` (`conjClassSetIn_typePV_isConj_conj_in_M`), or one of
-each — the *mixed* case is vacuous (`not_isConj_typePA_typePV_of_isTypeP1`).  This is the `conj_in_L`
-obligation for the type-`P₁` `A_0(M)` Dade support. -/
+each — the *mixed* case is vacuous (`not_isConj_typePA_typePV_of_isTypeP1`).  This is the
+`conj_in_L` obligation for the type-`P₁` `A_0(M)` Dade support. -/
 theorem typePA0_isConj_conj_in_M_of_isTypeP1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypePData M)
@@ -1648,9 +1651,9 @@ theorem ftSupportKernel_conj_smul_escaping_sigmaSharp [Finite G]
       ftSupportKernel_eq_bot_of_not_escaping hesc, Subgroup.smul_bot]
 
 /-- **Faithful (8.15) datum for an `M`-invariant `X ⊆ M` whose escaping points are `σ`-sharp**
-(the general `σ`-decomposition engine).  Generalises `dadeSupportHypothesisData_of_subset_sigmaSharp`
-from `X ⊆ M_σ^#` to `X ⊆ M` with escaping points in `M_σ^#`, taking the `(8.13.a)` `conj_in_L` and
-the
+(the general `σ`-decomposition engine).  Generalises
+`dadeSupportHypothesisData_of_subset_sigmaSharp` from `X ⊆ M_σ^#` to `X ⊆ M` with escaping points in
+`M_σ^#`, taking the `(8.13.a)` `conj_in_L` and the
 `(8.13.c2)` coprimality as inputs (the escaping structure `(8.13.c1)` is still the `σ`-generic
 `escaping_sigmaSharp_signalizer_structure`).  Instantiated at `X = A_0(M)` for type `P₁`. -/
 theorem dadeSupportHypothesisData_of_subset_escaping_sigmaSharp [Fintype G]

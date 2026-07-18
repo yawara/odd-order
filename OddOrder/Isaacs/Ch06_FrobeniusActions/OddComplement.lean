@@ -350,7 +350,7 @@ theorem normal_of_card_prime_of_isFrobeniusAction_of_odd
       rwa [map_pow, map_one, Subgroup.coe_subtype] at this
     rw [hRgdef, Subgroup.mem_map] at hk
     obtain ⟨r₀, hr₀, hkval⟩ := hk
-    simp [MulAut.conj_apply] at hkval
+    simp only [MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_coe, MulAut.conj_apply] at hkval
     have hr₀r : r₀ ^ r = 1 := by
       have h : (⟨r₀, hr₀⟩ : ↥R) ^ r = 1 := by rw [← hRcard]; exact pow_card_eq_one'
       have := congrArg (Subgroup.subtype R) h
@@ -536,7 +536,8 @@ theorem IsFrobeniusGroup.conjComplement {G : Type*} [Group G] [Finite G] {N A : 
 /-- **Size condition for an odd-order Frobenius group**: if a finite Frobenius group has kernel `N`
 and complement `A` both of **odd** order, with `N ≠ ⊥`, then `2|A| + 1 ≤ |N|` (equivalently
 `e ≤ (h-1)/2`).  The complement acts freely on `N#`, so `|A| ∣ |N| - 1` (`card_kernel_modEq_one`,
-Isaacs 6.1); as `|N|` is odd, `|N| - 1` is even, and an odd divisor of an even number is at most half
+Isaacs 6.1); as `|N|` is odd, `|N| - 1` is even, and an odd divisor of an even number is at most
+half
 of it, so `|N| - 1 ≥ 2|A|`.  This is the `2e + 1 ≤ h` (`smallIndex`) input to the Peterfalvi §7
 `(7.8.b)` norm bound. -/
 theorem IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel {G : Type*} [Group G]

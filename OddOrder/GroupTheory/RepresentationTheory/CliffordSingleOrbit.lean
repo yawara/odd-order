@@ -266,7 +266,8 @@ partition into the constituent-sets of the induced characters `Ind_H^G λ` (`λ 
 the *same* block), via `cap φ := {θ | ⟨Ind_H λ(φ), θ⟩ ≠ 0}` where `λ(φ)` is a chosen constituent of
 `Res_H φ` (`exists_liesOver`).  `PairwiseDisjoint` from `exists_conj_of_common_induce_constituent`
 (a shared constituent forces `λ`-conjugacy) + conjugation-closure of `Res_H φ` constituents
-(`liesOver_conjBy_iff`); cover from `φ ∈ cap φ`.  The `trivIset`/`cover` packaging for the Peterfalvi
+(`liesOver_conjBy_iff`); cover from `φ ∈ cap φ`.  The `trivIset`/`cover` packaging for the
+Peterfalvi
 (12.5) `DpsiH` Fourier regrouping (`Finset.sum_biUnion`). -/
 theorem exists_induce_constituent_partition [Finite G]
     [Invertible (Nat.card G : ℂ)]

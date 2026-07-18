@@ -35,7 +35,8 @@ variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 The (6.8.2.3) capstone needs the **map agreement** `dadeIntegralCharacterMap h46.dade0 h46.tau φ =
 hyp.tau φ` on `H^#`-supported `φ`.  Since the only *data* field of `S04.Hypothesis` is the `H(a)`
 assignment (every other field is a `Prop`), this reduces to the equality of the `H`-fields of
-`h46.dade0.restrict A` and `hyp.dade` — both the normal Hall complement of `C_L(a)` in `C_G(a)`.  The
+`h46.dade0.restrict A` and `hyp.dade` — both the normal Hall complement of `C_L(a)` in `C_G(a)`.
+The
 following two general lemmas are the group-theoretic core of that uniqueness: a subgroup of order
 coprime to a normal subgroup's index is contained in it (so the running images in `C ⧸ N` are
 trivial), whence the normal complement of a fixed subgroup is unique. -/
@@ -359,6 +360,7 @@ theorem caseB_column_htau1_mema
 
 omit [Invertible (Nat.card G : ℂ)] in
 omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
+omit [Fintype G] in
 /-- **(6.8.2.3) weight reconciliation `aθ = θ(1)`.**  When the source `φ` actually occurs in the
 central restriction of `θ` (`0 < constituentWeight`), the multiplicity `aθ = ⟨φ, Res^H_{W₂} θ⟩`
 equals the degree `θ(1)`.  Indeed `W₂` is central in `H`, so `Res^H_{W₂} θ = θ(1)·λ` for a unique

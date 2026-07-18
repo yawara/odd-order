@@ -153,7 +153,8 @@ theorem normalizer_W1_le_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 /-- **Peterfalvi (13.16), Frobenius fixed-point-freeness of `W₂` on `V`**: `C_V(W₂) = ⊥` — no
 nonidentity element of the complement `V` centralizes `W₂`.
 
-The `T`-side dual of `centralizer_W1_inf_U_eq_bot`.  On the `S`-side the `U ⋊ W₁` Frobenius structure
+The `T`-side dual of `centralizer_W1_inf_U_eq_bot`.  On the `S`-side the `U ⋊ W₁` Frobenius
+structure
 comes from `basic_structure`; here the `V ⋊ W₂` Frobenius structure is read off the reconciled
 type-`P`
 decomposition of `T` (`reconciled_typePData_T` + `typeP_uW1_frobenius`), with `V ≠ ⊥` supplied by

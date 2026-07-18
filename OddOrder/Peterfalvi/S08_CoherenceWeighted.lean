@@ -779,7 +779,8 @@ theorem coherentDegreeSqNormBound_of_not_coherentW_k
 The weighted analogue of `xChainCoherent`: folds the per-step weighted adjoin `xAdjoinStepW` (via
 `XAdjoinStepInputW.adjoin`) over a degree-monotone conjugate-pair cover of `X`, from a coherent base
 `S₀` — for case (B), the reducible certain-type column set `certainTypeSet`, coherent via
-`certainTypeSet_isCoherent_tau_canonical`.  Each step adjoins the irreducible pair `(χs i, χ̄s i)` to
+`certainTypeSet_isCoherent_tau_canonical`.  Each step adjoins the irreducible pair `(χs i, χ̄s i)`
+to
 the accumulator `pairUnion S₀ pair i` through the bundled weighted input `hstep i`, whose member
 family ranges over the **(possibly reducible)** accumulator members — exactly the case-(B) X-chain
 the unweighted `xChainCoherent` cannot express (its `XAdjoinStepInput` bakes in member

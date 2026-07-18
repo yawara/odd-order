@@ -110,7 +110,8 @@ theorem exists_memberDegreeData (hyp : SibleyDadeHypothesis G L H)
 `χ = Ind_H^L θ ∈ X(Z) = S − S(Z)` with `H` a `p`-group and `Z` **central in `H`**
 (`Z.subgroupOf H ≤ Z(↥H)`), the source `θ` has `θ(1) = p^k` and — crucially — by [Is] Cor 2.30
 (`exists_degree_sq_le_index`, which needs `Z` central) `θ(1)² = (p^k)² ≤ |H:Z|`, while
-`χ(1) = |L:H|·p^k`.  This is exactly the `θχ`/`hθχ`/`hθsq_le_qtot` data the per-step X-chain producer
+`χ(1) = |L:H|·p^k`.  This is exactly the `θχ`/`hθχ`/`hθsq_le_qtot` data the per-step X-chain
+producer
 needs (with `qtot = |H:Z|`); it is fillable at the central `Z = Z(H)∩H′` but **not** at `Z = ⁅H,H⁆`
 (see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`). -/
 theorem exists_source_primePow_centralBound_of_mem_Xset (hyp : SibleyDadeHypothesis G L H)
@@ -519,7 +520,7 @@ to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of the induced character 
 bounded by `ψ(1) = |L:H|·θ(1) ≤ |L:H|·|H:C|·√|C:D|`, combining `induce_apply_one`
 (`ψ(1) = |L:H|·θ(1)`) with the §6 `θ`-bound `theta_degree_le_index_mul_sqrt_index`
 (`θ(1) ≤ |H:C|·√|C:D|`).  This is the (6.2) step `ψ(1) ≤ |L:C|·√|C:D|`. -/
-theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
+theorem psi_degree_le_of_source (_hyp : SibleyDadeHypothesis G L H)
     (θ : IrreducibleCharacter ↥H) (C : Subgroup ↥H) [Finite ↥C]
     [Invertible (Nat.card ↥C : ℂ)] {N : Subgroup ↥C} [N.Normal] (D : Subgroup ↥C) (hND : N ≤ D)
     (hθN : (↑N : Set ↥C) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -528,7 +529,7 @@ theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
       (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
   haveI : Fintype ↥C := Fintype.ofFinite ↥C
-  letI : H.Normal := hyp.H_normal
+  letI : H.Normal := _hyp.H_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
   have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
       = (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re := by
@@ -621,13 +622,13 @@ When the section is `N ◁ D ≤ H` with `θ` trivial on `N` and `D ⧸ N` centr
 `degree_sq_le_index_of_central_quotient` gives `θ(1)² ≤ |H:D|` directly (no Clifford restriction),
 so `ψ = Ind_H^L θ` has `ψ(1) = |L:H|·θ(1) ≤ |L:H|·√|H:D|`.  This is the form (6.3) consumes (it
 applies (6.2) with `C = H`). -/
-theorem psi_degree_le_of_source_central (hyp : SibleyDadeHypothesis G L H)
+theorem psi_degree_le_of_source_central (_hyp : SibleyDadeHypothesis G L H)
     (θ : IrreducibleCharacter ↥H) {N : Subgroup ↥H} [N.Normal] (D : Subgroup ↥H) (hND : N ≤ D)
     (hθN : (↑N : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ))
     (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥H ⧸ N)) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
       (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
-  letI : H.Normal := hyp.H_normal
+  letI : H.Normal := _hyp.H_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨d, hd1, hd2⟩ :=
     degree_sq_le_index_of_central_quotient N θ D hND hθN hcentral
@@ -772,7 +773,8 @@ theorem six_three (hyp : SibleyDadeHypothesis G L H)
 
 /-- **Peterfalvi (6.5) consequence (Frobenius case): `H` is a `p`-group.**
 
-If the full set `S` is *not* coherent, then `H` is a `p`-group for some prime `p`.  Apply `six_three`
+If the full set `S` is *not* coherent, then `H` is a `p`-group for some prime `p`.  Apply
+`six_three`
 with `M = ⊥`, `H₁ = ⁅H,H⁆`: `S(⁅H,H⁆) = Y` is coherent (`coherentYset`), `⊥ ≤ ⁅H,H⁆` and `⁅H,H⁆ ⊊ H`
 (`H` nilpotent nontrivial ⟹ not perfect), so if `|H:⁅H,H⁆| > 4|L:H|²+1` then `S(⊥) = S` would be
 coherent — contradiction.  Hence `|Abelianization H| = |H:⁅H,H⁆| ≤ 4|W₁|²+1`

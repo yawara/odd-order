@@ -1340,7 +1340,8 @@ induced-support lemma `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_c
 
 * `support_induce_subset_conjugatesIntoSet`: a nonvanishing point `x` of `Ind_{HU}^S ξ` is
   `S`-conjugate to a point `w ∈ HU` of `Supp ξ`;
-* the (4.7) **core** (Peterfalvi (1.2), `irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`
+* the (4.7) **core** (Peterfalvi (1.2),
+`irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`
   contrapositive) forces a nontrivial `d ∈ H = P = S_F ≤ S_σ` centralizing `w`, and the covering
   condition puts `w ∈ A(S)` (via `mem_honestTypeP2ASet`: `w ∈ S' = M'`, `w ≠ 1`, `w` centralizes
   `d ∈ S_σ#`);

@@ -17,7 +17,8 @@ where the free permutation comes from the Frobenius hypothesis.
 
 ## Main statements
 
-* `prime_card_of_freeBlock_cond3` — `|R|` prime from a free block action + the prime-action condition.
+* `prime_card_of_freeBlock_cond3` — `|R|` prime from a free block action + the prime-action
+condition.
 -/
 
 open Module LinearMap

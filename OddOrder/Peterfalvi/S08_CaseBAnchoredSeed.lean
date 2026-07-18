@@ -46,6 +46,7 @@ variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
 omit [Invertible (Nat.card G : ℂ)] in
 omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card ↥H : ℂ)] in
+omit [Fintype G] in
 /-- **(6.8.2.3) per-column central-character data** (the Q1 "central gap").
 
 For any irreducible character `θ` of `H` and a central subgroup `W₂ ≤ Z(H)`, the central **linear**
@@ -176,7 +177,8 @@ uniform-`cY` form of `exists_decomposition_caseB_coherentYset`.  Given the good 
 `hgood : ⟨(Ind^L_{W₂}φ − |H:W₂|·η₁)^τ, cY.extension η₁⟩ = −|H:W₂|` (supplied uniformly across all
 `φ`
 by `SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB`, folding in the `m = 2` relabel),
-produces the anchored decomposition against `cY` with `X ⊥ cY.extension(𝒴)` and `X ∈ ZIrr`.  Replaces
+produces the anchored decomposition against `cY` with `X ⊥ cY.extension(𝒴)` and `X ∈ ZIrr`.
+Replaces
 the `coeff_eq_neg_or_edge_caseB` + `hYcard` derivation by the `hgood` hypothesis; the rest of the
 proof (`orthogonal_tau_indW2_add_extension_general_caseB`, already `cY`-generic) is unchanged.  This
 is the bottom of the `hYcard`-free case-(B) `X ∪ Y`-coherence chain. -/
@@ -1195,7 +1197,8 @@ theorem caseBXsetExtension_eq
   · exact caseBXsetExtension_irr hyp h46 Ximg hirr hmem
 
 /-- **(6.8.2) supported generation by scaled differences** (the varying-degree analogue of
-`mem_span_columnDiff_of_mem_zSupportedSpan`).  Given an anchor `χ₁ ∈ S₁` (with `χ₁(1) ≠ 0`) such that
+`mem_span_columnDiff_of_mem_zSupportedSpan`).  Given an anchor `χ₁ ∈ S₁` (with `χ₁(1) ≠ 0`) such
+that
 every `f ∈ S₁` has degree `f(1) = d·χ₁(1)` for some `d : ℕ` (the integral degree ratio, available
 for
 `X`-members since `H` is a `p`-group), every supported (degree-`0`) `φ ∈ Z[S₁, H^#]` lies in the
@@ -1462,7 +1465,8 @@ cannot be folded onto `certainTypeSet` alone.
 reusing brick 3's `Y`-anchored field assembly (`sMember_degreeSqNormBound`) and handling the `X ⊥ Y`
 seam in-chain via `hortho_mem`.  See roadmap cont.¹⁰.
 
-*(The map-convention fact and the `xChainCoherentW`-wrapper structure stay reusable for the corrected
+*(The map-convention fact and the `xChainCoherentW`-wrapper structure stay reusable for the
+corrected
 base; only the base/`X` sets change.)*
 
 **(6.6) case-(B) weighted `X`-coherence chain consumer** (gated on the per-step weighted adjoin

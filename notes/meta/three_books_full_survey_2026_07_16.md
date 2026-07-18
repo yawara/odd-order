@@ -19,8 +19,8 @@
 |---|---|---|---|---|---|---|---|
 | Isaacs | 349 | 143 | 8 | 23 | 101 | 74 | 124 (S:82 M:40 L:2) |
 | BG | 228 | 177 | 20 | 14 | 13 | 4 | 25 (S:10 M:11 L:3 XL:1) |
-| Peterfalvi | 238 | 147 | 26 | 12 | 53 | 0 | 65 (S:25 M:24 L:10 XL:6) |
-| **計** | **815** | 467 | 54 | 49 | 167 | 78 | **214** (S:117 M:75 L:15 XL:7) |
+| Peterfalvi | 238 | 149 | 26 | 13 | 50 | 0 | 63 (S:23 M:24 L:10 XL:6) |
+| **計** | **815** | 469 | 54 | 50 | 164 | 78 | **212** (S:115 M:75 L:15 XL:7) |
 
 status 定義: **済** = 教科書強度の Lean statement が sorry-free / **特殊化** = 存在するが教科書より狭い (要判定・要一般化) /
 **部分** = 一部のみ or sorried / **未** = 対応物なし (反証 grep 済) / **mathlib** = mathlib が完全被覆 (wrapper 不要、対応は docstring/notes 記録)。
@@ -566,7 +566,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Pf App: Suzuki | 32 | 0 | 0 | 0 | 32 | 0 |
 | Pf App: Huppert | 3 | 1 | 0 | 2 | 0 | 0 |
 | Pf App: NearFields | 6 | 2 | 0 | 2 | 2 | 0 |
-| Pf App: Suzuki2Groups | 8 | 0 | 0 | 1 | 7 | 0 |
+| Pf App: Suzuki2Groups | 8 | 2 | 0 | 2 | 4 | 0 |
 | Pf App: FeitSibley | 13 | 0 | 0 | 1 | 12 | 0 |
 
 ### Pf §3 — Peterfalvi §3 Preliminary Results from Character Theory, results
@@ -703,8 +703,8 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | I.3 Prop 1 | 未 | L | For 1 != X <= V: (a) C_G(X) on Omega_X satisfies (A1); (b) N_G(X) = C_G(X) N_V(X); (c) if … | CONFIRMED. The induction-hypothesis engine used by Chs II-IV. (c) needs Sylow 2-structure of PSL(2,l), Sz(l), PSU(3,l) and the order of st in each ([H] II.8.2, II.10.12; [HB] XI.3.1/3.3, XI Ex 10.7) - all absent (re-veri… |
 | I.3 Prop 2 | 済 | M | If G is not simple, the conclusion of Theorem A holds for G | `InductionNonSimple.lean`: constructs `L = ⟨I⟩`, proves `[Q,k] = Q`, restricts (A1)--(A3), derives `G = LD` and odd index, and lifts induction to the concrete Theorem A conclusion. |
 | I.3 Lemma 2 | 済 | S | Subsets of V conjugate in G are conjugate in V | `ConjugacyInV.lean`: retains arbitrary subsets, corrects an ambient conjugator into `D` via the doubly transitive centralizer action, and applies the honestly constructed canonical projection `D → V`. |
-| I.3 Lemma 3 | 未 | S | A strongly real element x with x^2 != 1 is conjugate to ut, u in Q_0^#, and /C_G(x)/ is od… | CONFIRMED. No strongly-real API in the repo (re-verified: grep strongly.real/StronglyReal empty). |
-| I.3 Lemma 4 | 未 | M | If st has order 3 and V != 1 then <Q_0, K, t> = Q_0 K cup Q_0 K t Q_0 is isomorphic to PSL… | CONFIRMED. Subgroup verification is computational; PSL(2,q) identification comes free from the induction hypothesis (order q(q-1)(q+1) < /G/), so no PSL library needed here beyond Thm A's own statement. |
+| I.3 Lemma 3 | 済 | S | A strongly real element x with x^2 != 1 is conjugate to ut, u in Q_0^#, and /C_G(x)/ is od… | `StronglyReal.lean`: defines strongly real elements at book strength, derives the `u*t` normal form from transitivity on fixed-point triples, and proves centralizer parity by the source's odd-dihedral conjugacy argument inside `N_G(<x>)`. |
+| I.3 Lemma 4 | 済 | M | If st has order 3 and V != 1 then <Q_0, K, t> = Q_0 K cup Q_0 K t Q_0 is isomorphic to PSL… | `OrderThreePSL.lean` proves the braid and exact two-cell carrier equality (correcting the printed missing sharp: only `tQ₀#t` lies in the big cell); `OrderThreePSLInduction.lean` constructs the faithful doubly transitive orbit action and (A1)--(A3), proves the subgroup proper from `V != 1`, applies induction, excludes Suzuki/PSU by commutativity of `Q₀`, and yields an existential finite characteristic-two field `F` with `|F| = |Q₀|` and the required PSL equivalence. |
 | I.3 Lemma 5 | 未 | M | If st has order 3 and Q is a Suzuki 2-group of order q^3 then W is cyclic, /W/ divides q+1… | CONFIRMED. Gated on the Appendix III theorem (Higman classification of Suzuki 2-groups - scaffold-only, higman_classification sorried in Suzuki2Groups.lean, verified) and GL(2,q) subgroup structure ([H] II.8). |
 | Thm B | 未 | XL | Chapter II (first case): under (B1) (some prime-order P <= V with C_G(P) of 2-rank 1) the … | CONFIRMED missing, but the external-needs list is CORRECTED in three places. (1) The Wielandt fixed-point theorem [HB] XI.12.4 IS in the repo, sorry-free and axiom-clean, contrary to the earlier note: OddOrder.GroupTheor… |
 | Thm C | 未 | L | Chapter III section 1: Q is a 2-group (i.e. Q_1 = 1) | CONFIRMED. structure_of_H (Suzuki.lean:133, sorry) is the opaque scaffold for Ch III. Proof is a coherence/character argument: gated on the Feit-Sibley theorem (Appendix IV; feit_sibley_coherence scaffold-only in FeitSib… |
@@ -757,15 +757,20 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### Pf App: Suzuki2Groups — Peterfalvi App: On Suzuki 2-Groups
 
+> **⚠ 2026-07-18 更新 (lane b)**: Appendix III Lemma 1(b) と Definitions
+> 2--3 は concrete な quadratic central extension として sorry-free で完了した。
+> 以下の 2026-07-16 survey 本文の「zero genuine formalization」「Lemma 1(b) と
+> Definitions 2--3 は未記述」という記述は、この3項目について stale。
+
 > This appendix (Peterfalvi appendix on Suzuki 2-groups, pp. 139-143; repo file OddOrder/Peterfalvi/Appendices/Suzuki2Groups.lean labels it "Appendix D") has essentially zero genuine formalization: the Lean file is an opaque-Prop scaffold in which every theorem statement is vacuous (existentials over structures whose fields are arbitrary Props), so all 4 sorries (square_map_quadratic = Lemma 1(a), higman_classification = the Theorem, typeB_field_model = Prop 1, typeB_automorphism_structure = Prop 2) mask statements with no mathematical content, and Lemma 1(b)-(d), Lemma 2, and Definitions 2-3 are not even stated. There is no Coq analog to lean on — math-comp/odd-order never formalized Peterfalvi Part II or its appendices — and the only importer (FeitSibley.lean) uses none of these declarations, so the whole unit is greenfield. The one structurally notable item is the unnumbered "Theorem" (Higman's classification of Suzuki 2-groups): the book itself takes it as given, citing Higman 1963 / Huppert-Blackburn VIII 7.9, so an honest formalization must either import ~20+ pages of hard 2-group analysis (XL) or keep it as an explicit stated hypothesis. Mathlib supplies useful ingredients: QuadraticMap covers the preamble's char-2 quadratic-map definition, linearIndependent_monoidHom gives the Dedekind-independence core of Lemma 2, and GroupExtension/GaloisField give central-extension and finite-field infrastructure, but none of the numbered results themselves. Verification pass: all flagged labels (7 missing, 1 partial) were confirmed against the source mmd, the full Lean file, and repo-wide descriptive-name greps (Higman/Suzuki-2-group, quadratic map/cocycle/central extension, automorphism bases, semilinear) — no hidden coverage was found in OddOrder/GroupTheory, OddOrder/Algebra, or other book trees, the zero-consumer claim was re-verified repo-wide, and no statuses changed.
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
 |---|---|---|---|---|
-| Lem 1 | 未 | M | Central extensions of elementary abelian 2-groups correspond to F_2-quadratic maps: (a) sq… | Verified: only part (a) has a scaffold declaration (square_map_quadratic, 1 of the file's 4 sorries) and its statement is vacuous — it takes arbitrary Props hW hV and concludes Nonempty QuadraticMapData whose fields are … |
+| Lem 1 | 部分 | M | Central extensions of elementary abelian 2-groups correspond to F_2-quadratic maps: (a)--(d) | ✅ 2026-07-18: part (b) is fully formalized in `Suzuki2Groups/QuadraticExtensions.lean`: explicit twisted-product group, central kernel, quotient, and square-map recovery, sorry-free and AxiomsCheck-registered. Parts (a), (c), (d) remain. |
 | Lem 2 | 未 | M | For F a finite field of characteristic 2: (a) F_2-linear maps F->F form an F-space with ba… | Verified: no theorem exists — only the structure FiniteFieldTwoMapBasis whose three fields are opaque Props (content-free packaging, not among the 4 sorries). Repo-wide grep for automorphism-basis / Frobenius-basis / F_2… |
 | Def 1 | 部分 | S | Suzuki 2-group: nonabelian 2-group with at least two involutions admitting a cyclic group … | Verified partial: IsSuzuki2Group exists and its nonabelian field is honest (¬ IsMulCommutative P), but atLeastTwoInvolutions and cyclic_regular_automorphism_group are opaque Prop fields carrying no content, and the 2-gro… |
-| Def 2 | 未 | S | The group A(n,phi): central extension of F = F_{2^n} by F attached (via Lemma 1(b)) to the… | Verified: SuzukiTypeData.typeA is an opaque Prop — the group A(n,phi) is never constructed, and no construction exists elsewhere (repo GaloisField uses are all in BG AppC, unrelated). The honest definition is short (S) b… |
-| Def 3 | 未 | S | The group B(n,phi,epsilon): central extension of F by F x F attached to the quadratic map … | Verified: SuzukiTypeData.typeB is an opaque Prop; B(n,phi,epsilon) is never constructed anywhere in the repo. Same gating as Def 2 (needs Lemma 1(b) construction); the epsilon anisotropy condition is a one-line hypothesi… |
+| Def 2 | 済 | S | The group A(n,phi): central extension attached to `a ↦ a*phi(a)`; type A classification | ✅ 2026-07-18: `Suzuki2Groups/Types.lean` defines the actual quadratic map and extension, with finite characteristic-two field data, `phi ≠ 1`, odd `orderOf phi`, and a group equivalence `TypeAData.equivModel`; sorry-free and AxiomsCheck-registered. |
+| Def 3 | 済 | S | The group B(n,phi,epsilon): central extension attached to the source quadratic map; type B classification | ✅ 2026-07-18: `Suzuki2Groups/Types.lean` defines the exact three-term quadratic map, `ε ∈ Fˣ`, the source nonvanishing condition and its anisotropy consequence, plus the genuine group equivalence `TypeBData.equivModel`; sorry-free and AxiomsCheck-registered. |
 | Thm (Higman) | 未 | XL | Higman's classification of Suzuki 2-groups: (a) involutions of P are exactly Z(P)#, Z elem… | Verified: higman_classification (1 of the 4 sorries) is vacuous — it concludes '∃ data : SuzukiTypeData P, data.typeA ∨ data.typeB ∨ data.typeC_or_typeD' where all three disjuncts are opaque Prop fields (instantiable wit… |
 | Prop 1 | 未 | M | For B(n,1,epsilon) there is a field structure on E = F x F (namely F_{2^{2n}} via a root o… | Verified: typeB_field_model (1 of the 4 sorries) is vacuous — 'hB : Prop -> ∃ fieldModel : Prop, fieldModel' states nothing. The book proof is a half page (irreducibility from anisotropy, adjoin a root, norm-form identif… |
 | Prop 2 | 未 | L | alpha -> f_alpha is a surjective homomorphism from Aut(B(n,1)) onto the semilinear maps x … | Verified: typeB_automorphism_structure (1 of the 4 sorries) is vacuous ('∃ automorphismStructure : Prop, automorphismStructure'). The real proof expands f, g in the automorphism basis of Lemma 2(a) and compares quadratic… |

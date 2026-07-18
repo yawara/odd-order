@@ -463,7 +463,8 @@ Ind_{H·C_U(S₀)}^{HU} ψ_{θ,λ}` whose seed `θ` is *nontrivial on `S₀`* is
 realized `S₀`: `realized S₀ ⊄ Ker ζ`.  If it were, then (`liesOver_mem_characterKernel`, `ζ` lying
 over `ψ`) `ψ` would vanish on the realized `S₀ ⊆ H·C_U(S₀)`, i.e. `θ₀ = 1` on `S₀`
 (`hcuPsiPair_apply_inclusion`, with `mk'(N)∘hInHuEquivH` surjective onto `S₀`), contradicting
-`θ|_S₀ ≠ 1`.  Single-`S₀` restriction of the `H ⊄ Ker` argument `hcuZetaPair_mem_xiSet`; supplies the
+`θ|_S₀ ≠ 1`.  Single-`S₀` restriction of the `H ⊄ Ker` argument `hcuZetaPair_mem_xiSet`; supplies
+the
 `hS0notker` input of `caseA_hcrit_of_member` (the (γ) `W₁`-injectivity). -/
 theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -645,7 +646,8 @@ nontrivial character of the order-`p` factor `S₀ = H₁`, `λ ∈ Irr(C_U(S₀
 inertia subgroup `H·C_U(S₀)`, of index `[HU : H·C_U(S₀)] = a` in `HU` — established here by
 `index_hcuInHu_eq_caseA_a` (`= caseA.a`, via the second/first-isomorphism chain
 `index_hcuInHu_eq_relindex_cuInHu` + `index_cuInHu_subgroupOf_uInHu_eq_a`, using the `C_U(S₀)`
-realization `cuSub`/`cuInHu` and its normality `hcuInHu_normal`).  The carrier's `a` is now pinned to
+realization `cuSub`/`cuInHu` and its normality `hcuInHu_normal`).  The carrier's `a` is now pinned
+to
 this genuine index `|Ū₁| = |U:C_U(S₀)|` (`CliffordCaseAData.a_eq_card_restrictAut_range`) — without
 that pin the degree-`qa` claim referenced a free field and was not honestly provable.
 

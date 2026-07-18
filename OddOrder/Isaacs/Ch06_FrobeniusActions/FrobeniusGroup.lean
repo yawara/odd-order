@@ -7,7 +7,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 import OddOrder.Mathlib.Subgroup
 
 /-!
-# Isaacs FGT Ch.6 (Frobenius actions) — finite abelian Z-groups, Lemma 6.16, Frobenius group Thm 6.4 (pp. 184-193)
+# Isaacs FGT Ch.6 (Frobenius actions) — finite abelian Z-groups, Lemma 6.16, Frobenius group Thm 6.4
+(pp. 184-193)
 -/
 
 namespace OddOrder.Isaacs.Ch06

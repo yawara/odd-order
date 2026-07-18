@@ -80,7 +80,7 @@ theorem pairExtension_chiConj {τ : IntegralCharacterMap L G} {χ : ClassFunctio
     pairExtension hχ χ.conj = hχ.sign • (hχ.nu : ClassFunction G ℂ) := by
   rw [pairExtension_apply, hχbar, hortho', one_smul, zero_smul, zero_add]
 
-omit [Fintype G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- `χ - χ̄ ↦ τ(χ - χ̄)` (`= ε·(μ - ν)`, `image_eq`). -/
 theorem pairExtension_diff [Finite G] {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
@@ -593,7 +593,8 @@ theorem CharacterPsiDecomposition_X_mem_ZIrr {τ : IntegralCharacterMap L G}
 Faithful to Peterfalvi: `hirr` (`S ⊆ Irr L`, the (5.3.a) setting), `hconst` (equal degree), and the
 Dade-side facts `hZIrr` (`τ` maps supported member differences into `ℤ[Irr G]`), `h1A` (`1 ∉ A`,
 i.e. `A = L^#`) and `hsuppdiff` (member differences are `A`-supported) are discharged by the §13
-consumer from the Dade isometry.  The proof follows (5.7) directly: if `S` is a single conjugate pair
+consumer from the Dade isometry.  The proof follows (5.7) directly: if `S` is a single conjugate
+pair
 it is the (5.2.d) base case; otherwise the auxiliary isometry `χⱼ ↦ β − (χ₀ − χⱼ)^τ` (with
 `β = χ₀^{τ₁}` the common `R(χ₀)`-projection, independent of the auxiliary member) is an orthonormal
 retargeting, fed to the equal-degree coherence builder `coherentEqualDegree`.

@@ -936,7 +936,8 @@ the prior coherence:
 * `hXortho` — `R(χ) ⊥ S₁^{τ₁}` ((5.5)+(5.2.e)) — from the per-member (5.5) decompositions
   (`inner_extension_member_orthogonal_imageSet`, then conjugate symmetry and
   `extends_on_supported`);
-* the `ZIrr`-memberships — `χ₁^{τ₁} ∈ ℤ[Irr G]` from `dadeIntegralCharacterMap_mem_ZIrr_of_supported`;
+* the `ZIrr`-memberships — `χ₁^{τ₁} ∈ ℤ[Irr G]` from
+`dadeIntegralCharacterMap_mem_ZIrr_of_supported`;
 * the norm data `mc i = ‖χᵢ‖²` (real and positive, the latter from `χᵢ ≠ 0`), with `‖χ₁‖² ∈ ℤ`
   from `inner_mem_ZIrr_int`.
 

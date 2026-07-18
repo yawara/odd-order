@@ -11,7 +11,8 @@ import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 /-!
 # Peterfalvi (9.7)(a): the non-Galois imprimitive `u`-bound `u ≤ (p^q − 1)/(p − 1)`
 
-The non-Galois branch of the `typeP_Galois` `u`-bound dichotomy (issue 9000, W2 instance tail).  When
+The non-Galois branch of the `typeP_Galois` `u`-bound dichotomy (issue 9000, W2 instance tail).
+When
 the `U`-action on the chief factor `H̄ = H/N` is imprimitive (Clifford case (a),
 `CliffordCaseAData`),
 `H̄` decomposes into `q` order-`p` blocks `Hpart i` permuted by `W₁`, and the image `Ū` embeds into

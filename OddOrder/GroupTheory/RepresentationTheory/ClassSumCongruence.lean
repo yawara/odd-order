@@ -1481,7 +1481,7 @@ This is the algebraic part of Peterfalvi's passage from the sum form of (6.7.2) 
 theorem centralCharacterOfRep_sum_inZ_eq_identity_add_nonidentity
     (ρ : Representation ℂ G V) [IsIrreducible ρ] (Z : Subgroup G)
     (Ci Cj : ConjClasses G) {α : ℂ}
-    (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ (ConjClasses.mk w) = α) :
+    (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ(ConjClasses.mk w) = α) :
     (∑ Cs ∈ Finset.univ.filter (fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z),
         ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)))
       = ρ.character 1 *
@@ -1583,7 +1583,7 @@ theorem centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset [Finite G
     {Ci Cj : ConjClasses G}
     (hCi : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Ci)
     (hCj : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Cj)
-    {α : ℂ} (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ (ConjClasses.mk w) = α) :
+    {α : ℂ} (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ(ConjClasses.mk w) = α) :
     ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
       ≡ ρ.character 1 *
           (((classSum Ci * classSum Cj) (1 : G) : ℂ)

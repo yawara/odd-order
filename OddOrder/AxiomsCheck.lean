@@ -218,8 +218,14 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerPSUDistinguished
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
+import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
+import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 /-!
@@ -258,7 +264,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 10000
+set_option linter.style.longFile 10200
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -1174,6 +1180,57 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- Ch.9 §9D: `X^{(K)}` と ↥K 内で計算した `X^{(G)}` の橋 (9.28 の帰納法が ↥K に降りるのに必要)。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_map_strongClosure
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isStronglyConjugate_subgroupOf_iff
+
+-- Ch.9 §9D: Lem 9.29 の相対版 (`X^{(K)}` 形) — 9.28 の Step 1-5 が繰り返し使う。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_le_of_isSubnormal
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_eq_of_le
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 1** — Y^{(H)} = Z^{(H)} かつ Y^{(G)} ≠ G ⇒ Y^{(G)} = Z^{(G)}。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_one
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_one_le
+
+-- Ch.2 (Subnormality): Thm 2.5 の族版 — subnormal 部分群の集合の sSup は subnormal。
+-- (Ch.9 §9D Bartels Step 2 が `⟨Y^{(G)} | Y < X⟩ ◁◁ G` で使う。)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch02.isSubnormal_sSup_of_isSubnormal
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 2** — 最小反例の X は p-群。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_two
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.le_sSup_lt_of_forall_not_isPGroup
+
+-- Ch.9 §9D: `X^{(K)}` の共役両立性 (Bartels Step 3 が (Y^h)^{(H)} = (Y^{(H)})^h で使う)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.strongClosureIn_conjAct_smul
+-- 有限群の p-部分群は与えられた Sylow の中へ共役で送れる (Bartels Step 3 の部品 2/2)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_conjAct_smul_le_sylow
+
+-- Ch.9 §9D: **Thm 9.28 (Bartels) Step 3** — Y ≤ H < G の p-群を H の Sylow の中へ送る。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.bartels_step_three
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal_in
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.exists_mem_conjAct_smul_le_of_isPGroup
+
+-- Ch.9 §9D: Bartels Step 4 の道具 — 集合 𝒦(H) の共役同変性と 𝒦(H) = 𝒦(P)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.mem_kappaSet_conjAct_smul
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.kappaSet_eq_of_sylow
+
+-- Ch.9 §9D: Bartels Step 4 の第 1 分岐 — 作用の核が非自明なら X^{(G)} は subnormal。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isSubnormal_of_map_quotient
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.isSubnormal_strongClosure_of_normalizing_kernel
+-- Z(P) は 𝒦(P) に自明に作用する (Step 4 で作用の核の非自明性を出す部分)。
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.conjAct_smul_eq_self_of_mem_centralizer_of_mem_kappaSet
+-- 𝒦(G) への作用の核 (各点固定部分群) と Step 4 第 1 分岐への接続。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.pointwiseStabilizer_normal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isSubnormal_strongClosure_of_kappaSetKernel_ne_bot
+-- 集合としての stabilizer と 𝒦(M) = 𝒦(G) (Step 4 の二分岐の入口)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.le_setwiseStabilizer_kappaSet
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.kappaSet_eq_top_of_setwiseStabilizer_eq_top
+-- N_G(P) は 𝒦(P) を保ち, C_G(P) は各点固定する (Step 4 の両分岐が使う)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.normalizer_le_setwiseStabilizer_kappaSet
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_le_pointwiseStabilizer_kappaSet
+-- p-群の真部分群は指数が p で割れる (Step 4 の Sylow 結論部の道具)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.dvd_relIndex_of_lt_of_isPGroup
+-- P が M の Sylow p で N_G(P) ≤ M なら P は G の Sylow p (Step 4 の結論部)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_index_of_normalizer_le
 
 -- Ch.6 (Frobenius Actions): Cor 6.17 full form — Sylow subgroups of a Frobenius complement
 -- are cyclic or generalized quaternion.
@@ -7830,6 +7887,28 @@ built into the subgroup inclusion in `MulAut`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
 
+/-! **Peterfalvi Appendix III, Lemma 1(b)**: every quadratic map over `F₂`
+has an explicit central extension whose squaring map is the original map. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.range_inl_le_center
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.sq_eq_inl_q
+
+/-! **Peterfalvi Appendix III, Definitions 2--3**: the type-A and type-B
+groups are concrete quadratic central extensions, with the source type-B
+nonvanishing condition implying anisotropy. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeAModel.sq_eq_inl_quadraticMap
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.typeBQuadraticMap_anisotropic
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBData.map_sq
+
 /-! **Peterfalvi Part II, Ch. I §2, Corollary**: nilpotence makes a Sylow
 `2`-subgroup `S ≤ Q` characteristic.  The cyclic subgroup `K` acts on `S`,
 and §1 Proposition 3 gives a regular action on its nonidentity involutions;
@@ -8230,6 +8309,54 @@ of `V`. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_V_conj_image_eq
+
+/-! **Peterfalvi Part II, Ch. I §3 Lemma 3.**  Strongly real elements whose
+square is nontrivial are conjugate to `u * t` with `u ∈ Q₀#`; odd-dihedral
+conjugacy inside `N_G(⟨x⟩)` excludes every involution from `C_G(x)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_fixedPoint_of_involution
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fixedPoints_ne_of_mul_sq_ne_one
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_smul_pair_and_conj_involution
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_isConj_mul_t_of_stronglyReal
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_natCard_odd_of_mem_Q0_mul_t
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_natCard_odd_of_stronglyReal
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.stronglyReal_normalForm_and_centralizer_odd
+
+/-! **Peterfalvi Part II, Ch. I §3 Lemma 4.**  The Bruhat carrier uses
+`t Q₀# t` in the big-cell calculation (restoring the sharp omitted in
+the source), and the restricted orbit supplies the faithful Theorem A hypothesis
+used by induction to identify `⟨Q₀, K, t⟩` with `PSL(2,q)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_orderThreeGeneratedSubgroup_eq_Q0K_union_Q0KtQ0
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderThree_faithfulSMul
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderThreeHypothesisOfAction
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_orderThreeGeneratedSubgroup_mulEquiv_psl2
+
+/-! **Peterfalvi Part II, Ch. I §3 Lemma 5** (first reduction): for every
+`1 ≠ w ∈ W`, Proposition 1(c) and faithfulness give `C_Q(w) = Q₀`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_inf_centralizer_singleton_eq_Q0_of_orderThree
 
 /-! **Peterfalvi Part II, Ch. I §3 Proposition 1(b)**: for `X <= V`,
 the ambient normalizer factors as `N_G(X) = C_G(X) N_V(X)`.  The proof

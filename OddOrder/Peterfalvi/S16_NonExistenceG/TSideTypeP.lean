@@ -105,7 +105,8 @@ theorem T_Q_subgroupOf_derived_normal (hyp : Hypothesis (G := G)) :
 
 /-- **The `T`-side complement `Q ⋊ V = QV = T'`** (Coq `defQV`): `Q` (normal in `T'`, being `T_F`
 restricted) and `V` complement inside `derivedInG T`, from `Q ⊔ V = T'` (`T_deriv_eq_QV`) and
-`Q ⊓ V = ⊥` (`Q_inf_V_eq_bot`).  The `sdprod` giving `QV/Q ≅ V`.  Mirrors the complement built inside
+`Q ⊓ V = ⊥` (`Q_inf_V_eq_bot`).  The `sdprod` giving `QV/Q ≅ V`.  Mirrors the complement built
+inside
 `S15.coprime_card_V_card_Q_of_disjoint`. -/
 theorem T_Q_isComplement_V_derived [Finite G] (hyp : Hypothesis (G := G)) :
     Subgroup.IsComplement' (hyp.base.Q.subgroupOf (derivedInG hyp.base.T))
@@ -279,7 +280,8 @@ theorem T_typeIII_card_W1 [Finite G] (hyp : Hypothesis (G := G))
 
 /-- **The intrinsic type-III complement has order `|V|`** (ungated, canonical): `|td.typeP.U| = |V|`.
 `|td.typeP.U| = [T' : M_F]` (`card_U_eq_index`, `M_F = Q`), and `[T' : M_F] = |QV/Q| = |V|`
-(`Subgroup.index_eq_card` + `T_card_quot_Q_derived_eq_card_V`).  The equality is **canonical** — both
+(`Subgroup.index_eq_card` + `T_card_quot_Q_derived_eq_card_V`).  The equality is **canonical** —
+both
 sides are the intrinsic index `[T':M_F]` — so it needs *no* reconciliation of `td.typeP.U` with the
 abstract `V` (the source of `calT1`'s abelian-quotient count `size = (v−1)/p`). -/
 theorem T_typeIII_card_U [Finite G] (hyp : Hypothesis (G := G))
@@ -679,7 +681,8 @@ coherence assembler `T_typeIII_calT1_isCoherent` consumes, not just the count.  
 with, for `θ ∈ 𝒯`:
 * `hinertia : I_T(θ) = QV` (via `inertia_inflate_eq_of_frobeniusQuotient`, the quotient Frobenius);
 * `hne : θ ≠ 1` (inflation of a non-principal `θ̄`, injective on `Irr`);
-* `hlinear : θ(1) = 1` (inflation of a *linear* `θ̄`, since `QV/Q ≅ U` is abelian, `td.U_commutative`);
+* `hlinear : θ(1) = 1` (inflation of a *linear* `θ̄`, since `QV/Q ≅ U` is abelian,
+`td.U_commutative`);
 * `hconj𝒯 : θ̄ ∈ 𝒯` (**complex** conjugate, `compHom` commutes with `star`, and `Irr(QV/Q)` is
   complex-conj-closed with non-principality preserved);
 * `hgalois𝒯 : θ ∈ 𝒯 ⟹ σθ ∈ 𝒯` for every coefficient automorphism `σ`, since inflation
@@ -1059,7 +1062,8 @@ step 3) — the `tau_isometry_diff`/`hiso` input of `S07.irrSubcoherent` (and of
 `coherent_of_constant_degree`).  For a family `S` all of whose member-difference class functions
 `a − b` (`a, b ∈ S`) are supported in `supportInSubgroup (sigmaSharp T) T = A₁(T)`, the genuine §10
 Dade isometry preserves their inner products, via
-`S07.dadeIntegralCharacterMap_inner_eq_on_supported_span`.  This mirrors `S14.Sset_tau_isometry_diff`
+`S07.dadeIntegralCharacterMap_inner_eq_on_supported_span`.  This mirrors
+`S14.Sset_tau_isometry_diff`
 exactly (both reduce to the same supported-span inner-preservation lemma); the family-supportedness
 hypothesis packages the (14.9) fact that `calT1` member differences vanish off `T^#`. -/
 theorem tSideDadeMap_isometry_diff (hyp : Hypothesis (G := G)) [Fintype G] [Fintype ↥hyp.base.T]
@@ -1092,10 +1096,12 @@ theorem tSideDadeMap_isometry_diff (hyp : Hypothesis (G := G)) [Fintype G] [Fint
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
 
 /-- **The T-side Dade support `A₁(T) = T_σ^#` is exactly `(T')^# = QV^#`** (issue 9072, step 3
-support identity).  For type-III `T`, the Peterfalvi "main subgroup" `T_s = T'` (`mainSubgroup .III =
+support identity).  For type-III `T`, the Peterfalvi "main subgroup" `T_s = T'` (`mainSubgroup .III
+=
 derivedInG`), and the support bridge `A1_eq_sigmaSharp` (Peterfalvi (8.10) + `mainSubgroup_eq_Msigma`,
 here `T' = M_σ(T)` for the type-`P₁` regime that type-III inhabits) gives
-`sigmaSharp T = A₁(T) = (T_s)^# = (T')^#`.  Concretely `sigmaSharp T = (derivedInG T : Set G) \ {1}`.
+`sigmaSharp T = A₁(T) = (T_s)^# = (T')^#`.  Concretely
+`sigmaSharp T = (derivedInG T : Set G) \ {1}`.
 
 This is the linchpin making the (14.9) coherence support facts derivable *without* any cross-lane
 type-`P` char structure: the induced members `Ind_{QV}^T θ` vanish off the normal `QV = T' =

@@ -656,6 +656,32 @@ theorem isSubnormal_sup_of_isSubnormal [Finite G] {S T : Subgroup G}
     (hS : S.IsSubnormal) (hT : T.IsSubnormal) : (S ⊔ T).IsSubnormal :=
   isSubnormal_sup_aux (Nat.card G) G le_rfl hS hT
 
+/-- **Isaacs Thm 2.5 の有限族版** (`Finset` 形): subnormal 部分群の有限族の `sup` は subnormal.
+
+二項版 `isSubnormal_sup_of_isSubnormal` を `Finset` 帰納で回すだけ. -/
+theorem isSubnormal_finsetSup_of_isSubnormal [Finite G] {S : Finset (Subgroup G)}
+    (h : ∀ K ∈ S, K.IsSubnormal) : (S.sup id).IsSubnormal := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simp only [Finset.sup_empty]; exact Subgroup.IsSubnormal.bot
+  | insert a s ha ih =>
+    rw [Finset.sup_insert]
+    exact isSubnormal_sup_of_isSubnormal (h a (Finset.mem_insert_self a s))
+      (ih fun K hK => h K (Finset.mem_insert_of_mem hK))
+
+/-- **Isaacs Thm 2.5 の族版**: 有限群では subnormal 部分群の**任意の**集合の `sSup` が
+subnormal (部分群の集合は自動的に有限).
+
+Isaacs Ch.9 §9D (Bartels 9.28 Step 2) が「`⟨Y^{(G)} | Y < X⟩ ◁◁ G`」で使う. -/
+theorem isSubnormal_sSup_of_isSubnormal [Finite G] {S : Set (Subgroup G)}
+    (h : ∀ K ∈ S, K.IsSubnormal) : (sSup S).IsSubnormal := by
+  classical
+  have hfin : S.Finite := Set.toFinite S
+  have hcoe : sSup S = hfin.toFinset.sup id := by
+    rw [Finset.sup_id_eq_sSup, Set.Finite.coe_toFinset]
+  rw [hcoe]
+  exact isSubnormal_finsetSup_of_isSubnormal fun K hK => h K (hfin.mem_toFinset.mp hK)
+
 open scoped Pointwise in
 /-- **Isaacs Lemma 2.10**: if `H ≤ G` and `H · H^x = G` (as sets) for some `x ∈ G`,
 then `H = G`.

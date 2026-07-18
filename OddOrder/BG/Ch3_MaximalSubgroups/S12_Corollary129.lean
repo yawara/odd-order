@@ -133,7 +133,7 @@ theorem commutator_decomp_of_tau1_action [Finite G] (hG : IsMinimalSimpleOdd G)
   -- Proposition 10.11(d) with `K := A`, `P := Q`:
   -- `[A,Q] ≤ C_G(M_σ)`, `[A,Q]` cyclic, `M ≤ N_G([A,Q])`.
   have hA_pi : Subgroup.IsPiSubgroup (S10.sigma M)ᶜ A :=
-    isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hp.1
+    Subgroup.isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hp.1
   have hA_q' : Subgroup.IsPiSubgroup (({q} : Set ℕ)ᶜ) A := by
     intro r hr
     rw [hA.2] at hr

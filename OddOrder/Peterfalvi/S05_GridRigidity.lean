@@ -27,7 +27,8 @@ virtual characters `χ : ι × κ → CF(G)` indexed by a rectangular grid, taki
 additive separability (the (3.7) identity) as a hypothesis.  It does **not** mention the
 `σ`-isometry, the `TICyclicHypothesis`, or any side-specific data, so both
 
-* `S05` (the `σ`-image family `chiFam`, `eq_smul_chiFam_diff_of_vanishOnV` — the concrete (4.8)/(10.5)
+* `S05` (the `σ`-image family `chiFam`, `eq_smul_chiFam_diff_of_vanishOnV` — the concrete
+(4.8)/(10.5)
   Dade-image endgame), and
 * `S15` (the `η`-grid `η_{ij} = ω_{ij}^{τ₃}` of the (13.18) `S`-side cross-relation)
 
@@ -218,7 +219,8 @@ theorem inner_sub_smul_grid_diff {Idx : Type*} [DecidableEq Idx]
 /-- **All-zero Fourier endgame** (abstract).  If every inner product of `ψ = X − s·(χ_{P₁} − χ_{P₂})`
 against the orthonormal family vanishes (with `‖X‖² = 2`, `P₁ ≠ P₂`, `s = ±1`), then
 `X = s·(χ_{P₁} − χ_{P₂})`.  `⟨ψ, χ_{P₁}⟩ = ⟨ψ, χ_{P₂}⟩ = 0` pins `⟨X, χ_{P₁}⟩ = s`,
-`⟨X, χ_{P₂}⟩ = −s`; then `‖ψ‖² = ‖X‖² − 2 = 0` (orthonormality, `s² = 1`), so `ψ = 0`.  Abstract form
+`⟨X, χ_{P₂}⟩ = −s`; then `‖ψ‖² = ‖X‖² − 2 = 0` (orthonormality, `s² = 1`), so `ψ = 0`.  Abstract
+form
 of `eq_smul_chiFam_diff_of_all_sigmaCoeff_zero`. -/
 theorem eq_smul_grid_diff_of_all_inner_zero {Idx : Type*}
     (χ : Idx → ClassFunction G ℂ)

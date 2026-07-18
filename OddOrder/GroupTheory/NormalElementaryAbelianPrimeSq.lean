@@ -44,6 +44,7 @@ namespace OddOrder.GroupTheory
 
 variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
 
+omit [Finite R] in
 /-- A subgroup of the centre is normal. -/
 private theorem normal_of_le_center {H : Subgroup R} (hH : H ≤ Subgroup.center R) :
     H.Normal :=
@@ -51,6 +52,7 @@ private theorem normal_of_le_center {H : Subgroup R} (hH : H ≤ Subgroup.center
     rw [(Subgroup.mem_center_iff.mp (hH hn) g), mul_assoc, mul_inv_cancel, mul_one]
     exact hn⟩
 
+omit [Finite R] in
 /-- An element of order dividing `p`, if nontrivial, generates a subgroup of order
 `p`. -/
 private theorem card_zpowers_eq_prime_of_pow {z : R} (hzp : z ^ p = 1) (hz1 : z ≠ 1) :
@@ -196,7 +198,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_of_normal_not_isCyclic
   rw [hk]
   refine Nat.pow_le_pow_right hp.pos ?_
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   interval_cases k
   · exact hVnc (by
       haveI : Subsingleton V := (Nat.card_eq_one_iff_unique.mp (by rw [hk, pow_zero])).1

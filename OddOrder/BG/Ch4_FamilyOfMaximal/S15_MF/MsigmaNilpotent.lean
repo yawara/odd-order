@@ -384,7 +384,7 @@ theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
       (coprime_of_forall_prime_not_dvd (fun r hr hrA hrO => ?_))
     have hrq : r = q := by
       have hπA : Subgroup.IsPiSubgroup ({q} : Set ℕ) A :=
-        isPiSubgroup_of_isPGroup_of_mem hA rfl
+        Subgroup.isPiSubgroup_of_isPGroup_of_mem hA rfl
       exact hπA r (Nat.mem_primeFactors.mpr ⟨hr, hrA, Nat.card_pos.ne'⟩)
     rw [hrq] at hr hrO
     exact (isPiSubgroup_opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) q

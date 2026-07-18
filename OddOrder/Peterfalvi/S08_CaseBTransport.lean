@@ -355,7 +355,8 @@ theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L) [
 
 /-- **Norm of a character induced from a central subgroup** (a (6.8.2.3) ingredient).  If `N` is a
 central subgroup of a finite group `M` and `φ ∈ Irr N` (necessarily linear), then
-`‖Ind^M_N φ‖² = |M : N|`.  Indeed `N ⊴ M` (central), conjugation acts trivially on `N`, so the Mackey
+`‖Ind^M_N φ‖² = |M : N|`.  Indeed `N ⊴ M` (central), conjugation acts trivially on `N`, so the
+Mackey
 restriction `|N|·Res_N(Ind^M_N φ) = ∑_{x∈M} φ^{x⁻¹} = |M|·φ` collapses; Frobenius reciprocity
 `⟨Ind φ, Ind φ⟩ = ⟨φ, Res(Ind φ)⟩` then gives `|N|·‖Ind φ‖² = |M|`, i.e. `‖Ind φ‖² = |M:N|`.
 

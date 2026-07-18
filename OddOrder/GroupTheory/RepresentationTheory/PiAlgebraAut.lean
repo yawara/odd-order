@@ -146,7 +146,8 @@ theorem single_one_inj {i j : ι} (h : (Pi.single i (1 : k) : ι → k) = Pi.sin
 
 open scoped Classical in
 /-- The coordinate permutation underlying an algebra automorphism of `ι → k`, as a **monoid
-homomorphism** `((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm ι`.  The underlying permutation is the (unique)
+homomorphism** `((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm ι`.  The underlying permutation is the
+(unique)
 `π` with `ψ (Pi.single i 1) = Pi.single (π i) 1`; multiplicativity is forced by that uniqueness.
 This makes `MulAut`-actions on the index set (the simples of a group algebra) genuine group actions. -/
 noncomputable def algAutPerm : ((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm ι where

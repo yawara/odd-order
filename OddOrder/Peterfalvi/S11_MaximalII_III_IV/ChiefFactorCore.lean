@@ -304,7 +304,8 @@ theorem cSub_normalized_by_uW1 [Finite G] (data : TypesIIIIIIVSetup M)
 open scoped IsMulCommutative in
 /-- **`C_U(H) ≤ C = C_U(H̄)`** (`U ∩ centralizer H ≤ cSub`): a `U`-element centralizing `H` (in `G`)
 acts trivially on the chief factor quotient `H̄ = H/N`, hence lies in `ker(uActionHom)`, i.e. in
-`C = cSub`.  Centralizing `H` pointwise makes conjugation trivial on every coset `hN`, so the induced
+`C = cSub`.  Centralizing `H` pointwise makes conjugation trivial on every coset `hN`, so the
+induced
 automorphism of `H̄` is the identity.  This is the containment `[U,U] ≤ C(H) ⟹ U' ≤ C` behind
 Peterfalvi (9.8.d)'s `U' ≤ C_U(S₀)` and the (9.9) `C' = [C,C]` normality inputs. -/
 theorem mem_cSub_of_mem_U_of_centralizes [Finite G] {M : Subgroup G}
@@ -447,7 +448,8 @@ theorem hInHu_sup_uInHu_eq_top (data : TypesIIIIIIVSetup M) :
 
 /-- **Peterfalvi (9.9.a), the inertia subgroup is normal: `HC ◁ HU`.**  Realized as
 `hInHu ⊔ cInHu ◁ huSub`, by the abstract `sup_normal_of_normal_left_of_normal_subgroupOf`:
-`H ◁ HU` (`hInHu_normal`), `C ◁ U` (`cInHu_normal`), `H ⊔ U = ⊤` (`hInHu_sup_uInHu_eq_top`).  This is
+`H ◁ HU` (`hInHu_normal`), `C ◁ U` (`cInHu_normal`), `H ⊔ U = ⊤` (`hInHu_sup_uInHu_eq_top`).  This
+is
 the normality `isIrreducibleCharacter_induce_of_inertia_eq` needs to make `Ind_{HC}^{HU} ψ`
 irreducible in the (9.9.a) Clifford-degree argument. -/
 theorem hcInHu_normal (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
@@ -699,7 +701,8 @@ theorem mulAut_eq_one_of_fixes_ne_one_hom {K : Type*} [Group K] [Finite K]
 open OddOrder.RepresentationTheory in
 /-- **Per-factor stabilizer = centralizer** (Peterfalvi (9.8) `def_Itheta`, character form): for an
 abelian prime-order group `K`, an automorphism `α` fixing a nontrivial irreducible character `θ` is
-the identity.  `θ` is linear (`exists_linearIrreducibleCharacter_eq_of_isMulCommutative`), so it is a
+the identity.  `θ` is linear (`exists_linearIrreducibleCharacter_eq_of_isMulCommutative`), so it is
+a
 faithful homomorphism `χ : K →* ℂˣ` (`injective_of_prime_card_of_ne_one`), and `α` fixing `χ` forces
 `α = 1`.  Applied per order-`p` chief-factor summand of the non-Galois (9.7) decomposition. -/
 theorem mulAut_eq_one_of_fixes_irr_ne_trivial_of_prime_card {K : Type*} [Group K] [Finite K]
@@ -723,7 +726,8 @@ theorem mulAut_eq_one_of_fixes_irr_ne_trivial_of_prime_card {K : Type*} [Group K
 
 /-- **An automorphism trivial on a spanning family of subgroups is the identity.**  The fixed
 points `{x | α x = x}` form a subgroup containing each `K i`, hence `⨆ i, K i = ⊤`; so `α` fixes
-everything.  Piece (D) of the non-Galois (9.8) inertia: `φ(g)` trivial on each order-`p` chief-factor
+everything.  Piece (D) of the non-Galois (9.8) inertia: `φ(g)` trivial on each order-`p`
+chief-factor
 summand `Hpart i` (which span `H̄`) is trivial on `H̄`. -/
 theorem mulAut_eq_one_of_eq_id_on_iSup {H : Type*} [Group H] (α : MulAut H)
     {ι : Type*} (K : ι → Subgroup H) (hspan : ⨆ i, K i = ⊤)
@@ -927,10 +931,11 @@ as an element of the `{j≠i}`-product) both map to `x`, so injectivity forces `
 `(9.7.a)` `W₁`-orbit direct product (`noncommPiCoprod` bijective from cardinality) yield the
 independence of the summand family. -/
 theorem iSupIndep_of_noncommPiCoprod_injective_comm {K : Type*} [CommGroup K] {ι : Type*}
-    [Fintype ι] [DecidableEq ι] {S : ι → Subgroup K}
+    [Fintype ι] {S : ι → Subgroup K}
     (hcomm : Pairwise fun i j : ι => ∀ x y : K, x ∈ S i → y ∈ S j → Commute x y)
     (hinj : Function.Injective (Subgroup.noncommPiCoprod hcomm)) :
     iSupIndep S := by
+  classical
   rw [iSupIndep_def]
   intro i
   rw [Subgroup.disjoint_def]
@@ -941,7 +946,6 @@ theorem iSupIndep_of_noncommPiCoprod_injective_comm {K : Type*} [CommGroup K] {�
     rw [Subgroup.noncommPiCoprod_range, iSup_subtype]
   rw [hrange] at hxsup
   obtain ⟨f, hf⟩ := hxsup
-  classical
   set g : (∀ j : ι, ↥(S j)) := fun j =>
     if h : j = i then 1 else f ⟨j, h⟩ with hg
   have hgi : g i = 1 := by rw [hg]; simp
@@ -1090,7 +1094,8 @@ noncomputable def charRestrictEquiv {Hbar : Type*} [CommGroup Hbar] [Finite Hbar
 
 /-- **The count of regular characters** (Peterfalvi (9.8) `oXtheta` numerator, `card_pffun_on`):
 on an internal direct product `Hbar = ⊕ᵢ Sᵢ` of `q = |ι|` factors each of order `p`, the characters
-nontrivial on *every* factor number `(p-1)^q`.  Via `charRestrictEquiv` these correspond to tuples of
+nontrivial on *every* factor number `(p-1)^q`.  Via `charRestrictEquiv` these correspond to tuples
+of
 nonzero per-factor characters; each factor `Sᵢ` (order `p`) has `p` characters
 (`card_monoidHom_of_hasEnoughRootsOfUnity`), hence `p-1` nonzero ones, and the product is
 `(p-1)^q`. -/
@@ -1308,12 +1313,14 @@ centralize `H`), `H̄ = H/H_0` is a chief factor of `M`, `|H̄| = p^q`, and (typ
 *Faithfulness note.* The printed (9.6) asserts `|W̄_2| = p` for the **image** `W̄_2 = C_{H̄}(W_1)`,
 which for type II is strictly smaller than the full `W_2 = C_H(W_1)` (the carrier never pins
 `|W_2|`,
-only `|W_1|` is prime).  The earlier formalization stated the **unconditional** `|W_2| = p`, which is
+only `|W_1|` is prime).  The earlier formalization stated the **unconditional** `|W_2| = p`, which
+is
 *false* for type II: `|W_2|^q = |H| = p^q·|H_0|` (by (9.3) + `quotient_order`) gives `|W_2| = p`
 only when `H_0 = 1`.  We therefore state the faithful, carrier-provable form: `|W_2| = p` only in
 the types III/IV branch (where `|W_2| = p` directly, `typeIII_IV_p_eq_W2`), together with the
 genuine
-order conclusion `|H̄| = p^q` (`quotient_order`).  The image fact `|W̄_2| = p` needs the (non-opaque)
+order conclusion `|H̄| = p^q` (`quotient_order`).  The image fact `|W̄_2| = p` needs the
+(non-opaque)
 chief-factor structure and is delivered by `typeP_chiefFactor_card`. -/
 theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
@@ -1470,7 +1477,8 @@ theorem chiefFactor_H0supC_inf_H_eq_H0 {M : Subgroup G}
   simpa [hc1] using hh₀
 
 /-- **`H ⊓ H₀C = H₀` inside `HU`** (realized form): `hInHu ⊓ (H₀C).subgroupOf = (H₀).subgroupOf`.
-Realization of `chiefFactor_H0supC_inf_H_eq_H0` (`(H₀⊔C) ⊓ H = H₀`).  The `H ∩ H₀C = H₀` input of the
+Realization of `chiefFactor_H0supC_inf_H_eq_H0` (`(H₀⊔C) ⊓ H = H₀`).  The `H ∩ H₀C = H₀` input of
+the
 second isomorphism `HC/H₀C ≅ H̄` (`HC = H·H₀C`, so `HC/H₀C ≅ H/(H∩H₀C) = H/H₀ = H̄`) behind the
 (9.8.c) irreducible-character construction. -/
 theorem hInHu_inf_realizedH0supC_eq_realizedH0 {M : Subgroup G}

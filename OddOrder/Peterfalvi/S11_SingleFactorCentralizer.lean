@@ -805,7 +805,7 @@ constant `1`) — through `char_eq_on_factors_of_bijective`.  This is the (9.11.
 whose inertia is `C_U(S i) ⊓ C_U(S j) = U₁ ∩ U₁ʷ` (regular on `S i`, `S j` for the `⊆` half; trivial
 elsewhere for the `⊇` half). -/
 theorem exists_two_summand_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
-    {ι : Type*} [Finite ι] [DecidableEq ι] (S : ι → Subgroup Hbar)
+    {ι : Type*} [Finite ι] (S : ι → Subgroup Hbar)
     (hindep : iSupIndep S) (hspan : ⨆ i, S i = ⊤)
     (hp : ∀ i, (Nat.card ↥(S i)).Prime) {i j : ι} (hij : i ≠ j) :
     ∃ θ : Hbar →* ℂˣ, (∃ x ∈ S i, θ x ≠ 1) ∧ (∃ x ∈ S j, θ x ≠ 1) ∧
@@ -982,7 +982,8 @@ the two-summand character `exists_caseA_two_summand_char`, the `⊆` containment
 `caseA_centralizes_two_summands_fixes_char` — there is a linear character `θ` of `H̄` whose
 `U`-inertia
 is *exactly* the two-summand centralizer: for `g ∈ U`, `g` fixes `θ` **iff** `g` centralizes both
-Clifford summands `H_i`, `H_j` (`aInvariantRestrictAut … g = 1`).  This is the `Ū`-side of Peterfalvi
+Clifford summands `H_i`, `H_j` (`aInvariantRestrictAut … g = 1`).  This is the `Ū`-side of
+Peterfalvi
 (9.11.2): the inertia of the two-summand `θ` is `C_U(H_i) ⊓ C_U(H_j) = U₁ ∩ U₁ʷ`.  The `⊆` direction
 casts `θ` to the linear irreducible `linearIrreducibleCharacter θ` (whose `ClassFunction` values are
 `θ`'s, `linearIrreducibleCharacter_apply`) and applies the regular two-summand char-inertia; the `⊇`
@@ -1017,7 +1018,8 @@ theorem caseA_inertia_iff_centralizes_two_summands {data : TypesIIIIIIVSetup M}
 an
 element of `C = C_U(H̄)`) acts trivially on every Clifford summand `H_k`
 (`aInvariantRestrictAut (Hpart_aInvariant k) g = 1`), because the restricted action is a restriction
-of `uActionHom g = 1`.  This is the easy `⊆`-direction of the (9.11.2) final identity `C = U₁ ∩ U₁ʷ`:
+of `uActionHom g = 1`.  This is the easy `⊆`-direction of the (9.11.2) final identity
+`C = U₁ ∩ U₁ʷ`:
 `C ⊆ C_U(H_i) ⊓ C_U(H_j)` (the reverse `⊇` is the deep degree argument). Realized to `G`-subgroups
 it
 gives `cSub ≤ C_U(H_i) ⊓ C_U(H_j)` (cf. the landed `cSub_le_cuSub` for the generator `S₀`). -/

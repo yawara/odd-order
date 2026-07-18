@@ -810,7 +810,7 @@ From `hle`: `S₄·qu ≤ q·(‖α‖²·u) = (a+1)qu + q(q−1)a²`; substitut
 to bound the `u`-linear part `(aq+q+2a)u ≤ (aq+q+2a)a²` gives `(2a+1)^q − 1 ≤ (q+2)a³ + q²a² + 2qa`,
 refuted by `nineElevenFive_arithmetic_contradiction`.  This is what the (9.11.6)–(9.11.8) coherence
 contradiction (or directly the maximality refutation) feeds. -/
-theorem nineElevenFive_refutation {q a u S4 N : ℕ} (hq : 3 ≤ q) (ha : 1 ≤ a) (hu : 1 ≤ u)
+theorem nineElevenFive_refutation {q a u S4 N : ℕ} (hq : 3 ≤ q) (ha : 1 ≤ a) (_hu : 1 ≤ u)
     (hua2 : u ≤ a * a)
     (hcount : S4 * (q * u) + 2 * a * q + 2 * a * u + 1 = (2 * a + 1) ^ q)
     (hnorm : N * u = (a + 1) * u + (q - 1) * a ^ 2)
@@ -829,7 +829,7 @@ theorem nineElevenFive_refutation {q a u S4 N : ℕ} (hq : 3 ≤ q) (ha : 1 ≤ 
   -- Clear the `q − 1` subtraction (`q ≥ 3`), then combine as a polynomial inequality.
   obtain ⟨q', rfl⟩ : ∃ q', q = q' + 1 := ⟨q - 1, by omega⟩
   simp only [Nat.add_sub_cancel] at key1 ⊢
-  nlinarith [key1, key2, ha, hu, sq_nonneg a, Nat.zero_le q']
+  nlinarith [key1, key2, ha, _hu, sq_nonneg a, Nat.zero_le q']
 
 end FiveArithmetic
 
@@ -985,7 +985,8 @@ hypotheses:
 * **(9.11.3)** the `HŪ/(H₀C)` class equation `hclass` (`|Ū| + Σχ(1)² = p^q·u`, its character side
   `sum_xiOf_H0C_degreeSq` landed) and the `W₁`-orbit split `hn` (`n = q·|𝒮₄| + (p−1)`), giving the
   cleared count (`nineElevenThree_count`).
-* **(9.11.4)** the Mackey norm `hnorm` (`‖α‖²·u = (a+1)u + (q−1)a²`), whose `‖α‖² = ‖γ‖²+1` reduction
+* **(9.11.4)** the Mackey norm `hnorm` (`‖α‖²·u = (a+1)u + (q−1)a²`), whose `‖α‖² = ‖γ‖²+1`
+reduction
   is `cfnorm_sub_irreducible_orthogonal` and whose `‖γ‖²` is the non-normal-`HU₁` double-coset
   count.
 

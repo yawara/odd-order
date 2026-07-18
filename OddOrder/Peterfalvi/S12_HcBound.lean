@@ -92,7 +92,8 @@ theorem Hypothesis.forall_sOf_H0Cprime_degree_qu_caseB [Finite G]
   caseB_degree_qu hG (hyp.mkSection11CharacterData data chief) caseB
 
 /-- **Bridge to the §9 (repo S11) character analysis.**  A §10 type-III/IV `Hypothesis` yields the
-§9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is the
+§9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is
+the
 `Hypothesis` → `Section11CharacterData` bridge the (11.8.1) §9 counts need: with it,
 `exists_chiefFactorData` produces the chief factor `H̄ = H/H₀`, and `caseB_degree_qu` supplies
 `μ_j(1) = qu` for the §10 character parameters.  The generic (9.11) shortcut formerly attached
@@ -132,7 +133,8 @@ This is the `U/C_U(H̄)`-quotient of the Frobenius congruence `|U| ≡ 1 (mod q)
 `W₁` acts fixed-point-freely on `U` (`typeP_uW1_frobenius`) and this descends to the chief-factor
 image `Ū` — a homomorphic image of `U` under the `U W₁`-equivariant action map `quotientMulAutHom` —
 by the general Frobenius-group image congruence
-`IsFrobeniusGroup.card_range_comp_subtype_modEq_one` (Isaacs Cor 6.2 + Lemma 6.1).  Together with the
+`IsFrobeniusGroup.card_range_comp_subtype_modEq_one` (Isaacs Cor 6.2 + Lemma 6.1).  Together with
+the
 μ-grid degree `d = |Ū|` (from `caseB_degree_qu`, the μ-grid ↔ §9-family correspondence) this is the
 §9 half of `charParam_d_modEq_one`. -/
 theorem Hypothesis.mkSection11CharacterData_u_modEq_one [Finite G] {M : Subgroup G}

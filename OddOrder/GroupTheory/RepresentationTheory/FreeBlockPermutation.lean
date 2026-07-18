@@ -194,7 +194,7 @@ private theorem orbitProdEquiv_bijective [Finite ↥H]
     obtain ⟨h, hh⟩ := MulAction.mem_orbit_iff.1 (mem_orbit_out_of_mk (H := H) i)
     exact ⟨⟨Quotient.mk'' i, h⟩, hh⟩
 
-omit [Finite ↥H] in
+omit [Finite ↥H] [DecidableEq ι] in
 /-- Summing a function over `ι` regroups as a double sum over orbits and group elements. -/
 private theorem sum_eq_sum_orbit [Fintype ↥H] [Fintype (MulAction.orbitRel.Quotient ↥H ι)]
     (hfree : ∀ (h : ↥H) (i : ι), h • i = i → h = 1)

@@ -1314,7 +1314,7 @@ private theorem mem_of_mem_centralizer_pow_eq_one
     exact this.eq
   exact (hE.le_of_le_centralizer hX hEcent) (Subgroup.mem_zpowers x)
 
-omit [IsSolvable G] [Fact (Nat.Prime p)] in
+omit [Finite G] [IsSolvable G] [Fact (Nat.Prime p)] in
 /-- **O_{p'}(G) = ⊥ ⟹ O_{p',p}(G) = O_p(G)**: if the lower `p'`-layer is trivial, the
 `O_{p',p}` layer collapses to the `p`-radical. (`oPiPrimePiCore π G = comap (mk' M) (oPiCore π
 (G/M))` with `M = ⊥`; `mk' ⊥` is the inverse of `quotientBot`, and `oPiCore` transports.) -/

@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ
 
 /-!
-# Isaacs FGT Ch.7 (Thompson subgroup) — S7B part 2 + S7C: normal-J close + Thm 7.1 proof + Thm 7.7 (pp. 209-219)
+# Isaacs FGT Ch.7 (Thompson subgroup) — S7B part 2 + S7C: normal-J close + Thm 7.1 proof + Thm 7.7
+(pp. 209-219)
 -/
 
 namespace OddOrder.Isaacs.Ch07

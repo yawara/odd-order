@@ -503,7 +503,8 @@ Forward (`C_U(H) ≤ cSub`) is `mem_cSub_of_mem_U_of_centralizes` (centralizing 
 `H̄`).
 Reverse (`cSub ≤ C_U(H)`) uses `H₀ = 1` (`chief_N_eq_bot`: `N = ⊥`, so `H̄ = H/⊥`, and a
 `cSub`-element
-— acting trivially on `H̄` — centralizes `H` since the quotient by `⊥` is injective).  This makes the
+— acting trivially on `H̄` — centralizes `H` since the quotient by `⊥` is injective).  This makes
+the
 capstone family `𝒮(H₀ ⊔ C)` coincide with the (9.11) family `𝒮(H₀ ⊔ cSub)`, the connector for the
 `hY` route (issue 1019 update⁴⁸). -/
 theorem C_eq_cSub_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

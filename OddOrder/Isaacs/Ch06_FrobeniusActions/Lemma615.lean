@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
 
 /-!
-# Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.15 characteristic elementary-abelian p^2 (odd + p=2 cases) (pp. 193-197)
+# Isaacs FGT Ch.6 (Frobenius actions) — Lemma 6.15 characteristic elementary-abelian p^2 (odd + p=2
+cases) (pp. 193-197)
 -/
 
 namespace OddOrder.Isaacs.Ch06

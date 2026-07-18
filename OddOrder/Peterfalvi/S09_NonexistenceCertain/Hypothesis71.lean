@@ -129,7 +129,8 @@ variable {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
 `L`-normalizer (`IsTISubset A L`), every `H(a)` is trivial (`S04.of_isTISubset`, Peterfalvi (2.3)),
 the Dade map is the canonical one (`Hypothesis.dadeMap`, an honest (2.5)/(2.6) Dade isometry by
 `isDadeMap_dadeMap`), and the `H(-)`-conjugation-invariance is automatic
-(`HConjInvariant.of_forall_H_eq_bot`).  This is the (7.1) `Hypothesis71` for a TI-set — in particular
+(`HConjInvariant.of_forall_H_eq_bot`).  This is the (7.1) `Hypothesis71` for a TI-set — in
+particular
 for `A = H^#`, `L = N_G(H)` of a Frobenius group with kernel `H` (the source of the
 `FrobeniusFamily` (7.4) hypotheses of Peterfalvi (7.10)). -/
 noncomputable def of_isTISubset
@@ -679,7 +680,7 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
         H71.isDadeMap.map_eq_of_isConj_hCoset _ g a h hh hconj
       have hrho : (H71.chiRhoSupp χ : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩
           = (χ : G → ℂ) a.1 := by
-        show H71.chiRhoCF χ ⟨a.1, H71.hyp.mem_L a.2⟩ = (χ : G → ℂ) a.1
+        change H71.chiRhoCF χ ⟨a.1, H71.hyp.mem_L a.2⟩ = (χ : G → ℂ) a.1
         rw [chiRhoCF_apply, H71.chiRho_of_mem _ a.2]
         have hsum : ∑ x : H71.hyp.H a, (χ : G → ℂ) (a.1 * (x : G))
             = (Nat.card (H71.hyp.H a) : ℂ) * (χ : G → ℂ) a.1 := by
@@ -695,9 +696,9 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
       have hχg : (χ : G → ℂ) g = (χ : G → ℂ) a.1 := by
         obtain ⟨c, hc⟩ := isConj_iff.mp hconj
         rw [← hc, χ.conj_eq, hconst a h hh]
-      show H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
+      change H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
       rw [hτ, hrho, hχ₁_apply, if_pos hg, hχg]
-    · show H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
+    · change H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
       rw [H71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport _ g hg,
         hχ₁_apply, if_neg hg]
 

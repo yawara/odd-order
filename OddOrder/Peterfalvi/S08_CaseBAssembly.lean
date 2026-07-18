@@ -334,7 +334,7 @@ theorem irreducibleDecompositionTau_X_orthogonal
 reindexed to the positive-weight subtype `{θ // 0 < aθ}` (zero-weight constituents drop) and cast to
 `ℤ`.  This is the `hsq` input of `per_phi_anchored_image` (the `n = |H : W₂|` of the (6.8.2.2)
 aggregate). -/
-theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Fintype M]
+theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Finite M]
     [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
     [Finite ↥H] [Fintype ↥(K.subgroupOf H)]
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
@@ -537,7 +537,8 @@ theorem caseB_constituentDecomposition_X_orthogonal
 …).Y, cY.extension η₁⟩ ∈ ℤ`, via the route-independent `psiDecomp_Y_inner_int`: the image side is
 `⊥ cY.extension η₁` (`caseB_constituentDecomposition_X_orthogonal`), the `τ₁`-image is a virtual
 character (`caseB_constituentDecomposition_tau1_mem_ZIrr`, read through
-`caseB_constituentDecomposition_tau1`), and the anchor `cY.extension η₁ ∈ ZIrr G` (`hνZc1`).  This is
+`caseB_constituentDecomposition_tau1`), and the anchor `cY.extension η₁ ∈ ZIrr G` (`hνZc1`).  This
+is
 the `hbi` of `caseB_per_phi_anchored` for the dispatch family. -/
 theorem caseB_constituentDecomposition_Y_inner_int
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
@@ -656,7 +657,8 @@ theorem caseB_per_phi_anchored_family
 ⇒
 no nontrivial real irreducible), `⟨η₁, η̄₁⟩ = 0` (distinct irreducibles), and `η₁ − η̄₁`
 `H^#`-supported
-(equal degree `Yset_apply_one`, `sMember_diffSupport_of_charValue_eq`).  The remaining inputs are the
+(equal degree `Yset_apply_one`, `sMember_diffSupport_of_charValue_eq`).  The remaining inputs are
+the
 genuinely hard §5/§6 content: the per-`θ` column/irreducible bundles `hcol`/`hirr`, the per-`θ`
 anchor-vs-constituent orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp`. -/
 theorem caseB_per_phi_anchored_fromYset

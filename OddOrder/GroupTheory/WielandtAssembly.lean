@@ -44,7 +44,8 @@ local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch03.IsAInvariant.quotientMu
 identity `finrank_elab_identity`, discharged from that identity in `wielandtPerFactor_of_dim`.
 
 The exponent `p` is required to be *prime* (not merely an exponent): this is what makes `↥N` an
-`𝔽_p`-vector space, the form in which the dimension identity (⋆) lives.  Primality is not recoverable
+`𝔽_p`-vector space, the form in which the dimension identity (⋆) lives.  Primality is not
+recoverable
 from `IsElementaryAbelian p ↥N` alone (e.g. `IsElementaryAbelian 6 (ZMod 2)` holds), so it is
 carried
 explicitly. -/
