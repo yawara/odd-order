@@ -478,3 +478,20 @@ action は `MulAut G` / `ConjAct G` 経由。要 `import Mathlib.Algebra.Group.S
 (strongClosure X)` の形で述べれば **subnormal closure の存在も同時に得られる**ので、
 `sInf` 版の `subnormalClosure` を別に構成する必要はない (「subnormal の共通部分は
 subnormal」の一般族版が mathlib に無い — binary `IsSubnormal.inf` のみ — 問題を回避できる)。
+
+### 9.30 着手時の API メモ (2026-07-19、次 iteration 向け)
+
+9.30 の easy direction (`f(X^{(G)}) ≤ f(X)^{(H)}`) を書きかけたが、
+`(ConjAct.toConjAct g • X).map f = ConjAct.toConjAct (f g) • (X.map f)` の
+段で pointwise API に手間取ったため未 landing (作業は破棄、tree は green)。
+
+**次回の推奨経路** (ext + simp で押すのは非効率だった):
+1. まず補題 `ConjAct.toConjAct g • X = X.map (MulAut.conj g).toMonoidHom` を立てる。
+2. すると目的の等式は `Subgroup.map_map` 2 回 + 準同型の合成等式
+   `f.comp (MulAut.conj g).toMonoidHom = (MulAut.conj (f g)).toMonoidHom.comp f`
+   (`ext x; simp` で出る) に落ちる。
+3. `strongClosure_map_le` は `Subgroup.map_le_iff_le_comap` + `sSup_le` で 5 行。
+
+hard direction (全射 `f` での逆包含) は `⟨X, Y⟩` の位数最小性を使う書籍 p.291 後半の議論。
+`𝒴 = {Y | Y は X の共役 かつ f(Y) = 与えられた強共役}` から `Nat.card ↥(X ⊔ Y)` 最小の
+元を選ぶ (`Finset.exists_min_image` 等) のが要。
