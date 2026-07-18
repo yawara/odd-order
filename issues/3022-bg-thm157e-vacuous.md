@@ -130,15 +130,40 @@ book の `M' = F(M)` は type-`F` で**overstatement**であり、権威ある M
       `B` を組み立てるだけで済む (`X₁ ⊓ Z₀ = ⊥`、`X₁ ≤ C_G(Z₀)`、`B` elementary abelian、
       `|B| = p²`、`B ≤ C₁`)。大きな refactor を回避できた。
 
-      **⚠ 手順 3 の障害が判明 = ambient のずれ**: BG は `B ∈ ℰ*(P)` (**`P` の中で**極大
-      elementary abelian) と言うが、Lean の `IsMaximalElementaryAbelian p A`
-      (`GroupTheory/NarrowPGroup.lean:104`) は `∀ F : Subgroup R` と **ambient 型 `R` 全体**で
-      量化する。Lemma 10.13 (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) は
-      `A : Subgroup G` かつ `hAmax : IsMaximalElementaryAbelian p A` を取るので **ambient は `G`**。
-      ⟹ 「`P` の中で極大」から「`G` の中で極大」への橋渡しが要る (または 10.13 を
-      `Subgroup ↥P` 側で使う)。`S10_LocalLemmas.lean:441` が
-      `IsMaximalElementaryAbelian p (A.subgroupOf (S : Subgroup G))` を作っている前例なので、
-      そこの手口が転用できる見込み。**これが残る唯一の実質的な障害。**
+      **⚠ 手順 3 の障害と、その解決 (2026-07-19)**: BG は `B ∈ ℰ*(P)` と書き、素朴には
+      「`P` の中で極大」と読める。一方 Lean の `IsMaximalElementaryAbelian p A`
+      (`GroupTheory/NarrowPGroup.lean:104`) は `∀ F : Subgroup R` と **ambient 型全体**で量化し、
+      Lemma 10.13 は `A : Subgroup G` を取るので ambient は `G`。当初これを不整合と見て
+      `S10_LocalLemmas.lean:441` の手口の転用を考えたが、**同所は「G で極大 ⟹ 部分群 S で極大」の
+      逆向き**で使えない (P→G 方向は一般に偽)。
+
+      **Coq 精読で決着**: `coq/theories/BGsection15.v:1119` は
+      `p2maxElemB : [group of B] \in 'E_p^2(G) :&: 'E*_p(G)` — **Coq も ambient は `G`**。
+      つまり BG の `ℰ*(P)` は「`P` に含まれる `G`-極大」の意で、repo の
+      `elemAbelianOfRankIn p n H X := X ∈ elemAbelianOfRank G p n ∧ X ≤ H` と同じ読み。
+      **不整合ではなく、私の記法の誤読だった。**
+
+      証明の核は同 file の `max_rB` (:1100-1113) で、**`A` を共役で `P` に押し込んでから rank 評価**:
+
+      1. `P = O_p(M_F)` は **`G` の Sylow p-部分群** (`M_σ` が `G` の σ-Hall
+         = `Msigma_isHall` (`S10_HallStructure:584`)、`p ∈ σ(M)`、`M_σ = M_F` nilpotent ゆえ
+         `O_p(M_σ)` がその Sylow p)。
+      2. `A` は p-群なので、ある `a` で `A^a ≤ P` (mathlib `IsPGroup.exists_le_sylow` + Sylow 共役)。
+      3. `a` は `X₁` を正規化するとは限らないので **σ-Hall tameness = BG Cor 15.3(b)** で補正:
+         `x₁ ∈ P` と `x₁^a ∈ P` が `G`-共役なら `∃ b ∈ N_G(P)`, `x₁^a = x₁^b`。
+         **Lean に在る** — `mf_hall_centralizer_control` (`TIFailure.lean:1311`) の第 2 conjunct が
+         まさにこれ (`∀ x ∈ H, ∀ y ∈ H, G-共役 → ∃ n ∈ N_G(H), …`)。`H := P` を `M_σ` の
+         `piSet`-Hall 部分群として渡す。
+      4. `a * b⁻¹` は `X₁` を正規化し `A^(ab⁻¹) ≤ P^(b⁻¹) = P`。よって
+         `rank A = rank A^(ab⁻¹) ≤ rank (M_F ⊓ C_G(X₁)) < 3` (既存 `hrank3`)。
+
+      `|B| = p²` と合わせ、`B ⊆ A` elementary abelian なら `|A| ≤ p²` ゆえ `A = B`。
+      **入力 4 点すべて repo に実在を確認済み** — 未形式化の上流は無く、組み立てのみ。
+
+      **手順 4 (最終段) も Coq で確認済** (`defX`, :1128-1137): `X ≤ C_P(B)` を出し
+      (`X ≤ P` は `inf_conj_fitting_isPGroup_of_not_isMulCommutative` + `X ≤ M_F`;
+      `C_P(X₁) = C_P(B)` は `P` が `Z₀ ≤ Z(P)` を中心化するから)、10.13(b) で
+      `C_P(B) = X₁ × Z` (`Z` cyclic)、`X` cyclic かつ `X₁ ⊓ Z = ⊥` から `X = X₁`。
 
       **⚠ さらに調査 (2026-07-19): `B` の構成も既に書かれている。**
       `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` (`PisetBetaDisjoint.lean:1101`) の
