@@ -109,6 +109,7 @@ omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
   h.w1CharEquiv.apply_symm_apply _
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- `rowInv` is an **involution** (`(w1CharEquiv i)⁻¹` inverts), hence a permutation of the rows. -/
 theorem rowInv_rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
     rowInv h (rowInv h i) = i := by
@@ -159,6 +160,7 @@ The (4.9)(a) bridge to the `L`-characters `μ_{ij}` runs through the **`L`-side*
 it to the conjugate-index grid character, and `σ_L` intertwines the Galois action. -/
 
 omit [Fintype G] in
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Conjugation of a column source character.**  `χ_{ij}̄ = χ_{i'j'}` at the conjugate index
 (`ω_{ij} = chiColumn χ₂ i`): the Galois action of complex conjugation sends `ω(χ₁, χ₂)` to
 `ω(χ₁⁻¹, χ₂⁻¹) = ω(w1CharEquiv (rowInv i), χ₂⁻¹)`, i.e. `chiColumn χ₂⁻¹ (rowInv i)`. -/
@@ -198,13 +200,14 @@ to the (4.3.b) identity `σ_L(ω_{ij}) = δ_j·μ_{ij}`: the left side becomes `
 (`mapRingEquiv_zsmul`, `δ_j ∈ ℤ`).  Since the `μ` are genuine irreducible characters this forces
 `μ_{ij}̄ = μ_{i'j'}` (and `δ_j = δ_{j'}`), the heart of (4.9)(a). -/
 theorem certainType_mu_conj_bridge (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     (h.columnFamily χ₂).sign •
         ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
           ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
       = (h.columnFamily χ₂⁻¹).sign •
           ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have e2 := h.sigma_chiColumn_eq_certainType χ₂⁻¹ (rowInv h i)
   have key := congrArg (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv)
     (h.sigma_chiColumn_eq_certainType χ₂ i)
@@ -217,10 +220,11 @@ omit [Fintype G] in
 `μ_{i'j'}` gives `δ_j·⟨μ_{ij}̄, μ_{i'j'}⟩ = δ_{j'}` (since `‖μ_{i'j'}‖² = 1`); as the inner product
 of two irreducibles is `0` or `1` and `δ_{j'} ≠ 0`, it must be `1`, i.e. `μ_{ij}̄ = μ_{i'j'}`. -/
 theorem certainType_mu_conj_eq (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv ((h.columnFamily χ₂).mu i)
       = (h.columnFamily χ₂⁻¹).mu (rowInv h i) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   by_contra hne
   have hb := certainType_mu_conj_bridge h χ₂ i
   rw [← IrreducibleCharacter.galoisMap_apply_coe,
@@ -242,11 +246,12 @@ certain-type column character `μ_j = ∑_i μ_{ij}` is the conjugate column `μ
 (`j' = χ₂⁻¹`).  `mapRingEquiv conj` is additive (`map_sum`), each `μ_{ij}̄ = μ_{i'j'}`
 (`certainType_mu_conj_eq`), and the row reindexing `i ↦ rowInv i` is a permutation (`rowInvEquiv`). -/
 theorem certainType_columnSum_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
         (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
       = ∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [← ClassFunction.mapRingEquivLinear_apply, map_sum]
   simp only [ClassFunction.mapRingEquivLinear_apply]
   have hterm : ∀ i, ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
@@ -291,12 +296,13 @@ character:
 (`columnFamily_mu_sum_inner`), so `⟨μ̄_k, μ_k⟩ = 0 ≠ w₁ = ‖μ_k‖²`.  This is the nonvanishing
 `0 ≠ μ̄_k − μ_k ∈ Z[T, A]` input to the (4.9)(a) coherence (`IsCoherent.nonzero`). -/
 theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     [Invertible (Nat.card ↥h.K : ℂ)]
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
         (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
       ≠ ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [certainType_columnSum_conj]
   intro heq
   have h0 := columnFamily_mu_sum_inner h χ₂⁻¹ χ₂

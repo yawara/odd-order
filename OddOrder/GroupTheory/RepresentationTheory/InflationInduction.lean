@@ -190,12 +190,14 @@ Peterfalvi's "(13.18.b) `Ind_{PW₁}^S 1 ⊥ μ_{0j}` because `P ⊄ ker μ_{0j}
 irreducible `inflate N χ̄` with `N ⊆ ker` (`subset_characterKernel_inflate`), so it differs from `ψ`
 (which has `N ⊄ ker`) and is orthogonal to it (`irreducibleCharacter_inner_eq_ite`). -/
 theorem inner_compHom_mk'_irreducible_eq_zero_of_not_subset_ker {N : Subgroup G} [N.Normal]
-    [Fintype G] [Fintype (G ⧸ N)] [Fintype (IrreducibleCharacter (G ⧸ N))]
+    [Fintype G] [Finite (G ⧸ N)] [Finite (IrreducibleCharacter (G ⧸ N))]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card (G ⧸ N) : ℂ)]
     (φ : ClassFunction (G ⧸ N) ℂ) (ψ : IrreducibleCharacter G)
     (hψ : ¬ ((N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction G ℂ))) :
     ClassFunction.inner (ClassFunction.compHom (QuotientGroup.mk' N) φ)
         (ψ : ClassFunction G ℂ) = 0 := by
+  haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
+  haveI : Fintype (IrreducibleCharacter (G ⧸ N)) := Fintype.ofFinite _
   have compHom_sum : ∀ (s : Finset (IrreducibleCharacter (G ⧸ N)))
       (a : IrreducibleCharacter (G ⧸ N) → ℂ),
       ClassFunction.compHom (QuotientGroup.mk' N)

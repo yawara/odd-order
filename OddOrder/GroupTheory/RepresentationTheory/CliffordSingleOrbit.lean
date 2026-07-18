@@ -177,14 +177,15 @@ Immediate from Clifford's single-orbit theorem: `⟨Ind θᵢ, χ⟩ ≠ 0 ⟺ �
 of the induced-from-`H'` partition of `Irr H` used in Peterfalvi (12.5). -/
 theorem exists_conj_of_common_induce_constituent
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Finite ↥H] [Invertible (Nat.card ↥H : ℂ)]
     {θ₁ θ₂ : IrreducibleCharacter ↥H} {χ : IrreducibleCharacter G}
     (h₁ : ClassFunction.inner (ClassFunction.induce H (θ₁ : ClassFunction ↥H ℂ))
         (χ : ClassFunction G ℂ) ≠ 0)
     (h₂ : ClassFunction.inner (ClassFunction.induce H (θ₂ : ClassFunction ↥H ℂ))
         (χ : ClassFunction G ℂ) ≠ 0) :
-    ∃ g : G, IrreducibleCharacter.conjBy g θ₁ = θ₂ :=
-  (restrictionConstituentsSingleOrbit_of_isIrreducible (H := H) χ).exists_conj
+    ∃ g : G, IrreducibleCharacter.conjBy g θ₁ = θ₂ := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  exact (restrictionConstituentsSingleOrbit_of_isIrreducible (H := H) χ).exists_conj
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₁).mp h₁)
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₂).mp h₂)
 
@@ -197,7 +198,7 @@ normal `H ⊴ G` and non-`G`-conjugate `θ₁, θ₂ ∈ Irr H`, the sets of irr
 Peterfalvi (12.5) `DpsiH` regrouping (`Finset.sum_biUnion`). -/
 theorem induce_constituents_disjoint_of_not_conj [Fintype G] [Invertible (Nat.card G : ℂ)]
     [Fintype (IrreducibleCharacter G)]
-    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Finite ↥H] [Invertible (Nat.card ↥H : ℂ)]
     {θ₁ θ₂ : IrreducibleCharacter ↥H}
     (hnc : ¬ ∃ g : G, IrreducibleCharacter.conjBy g θ₁ = θ₂) :
     Disjoint
@@ -207,6 +208,7 @@ theorem induce_constituents_disjoint_of_not_conj [Fintype G] [Invertible (Nat.ca
       (Finset.univ.filter fun χ : IrreducibleCharacter G =>
         ClassFunction.inner (ClassFunction.induce H (θ₂ : ClassFunction ↥H ℂ))
           (χ : ClassFunction G ℂ) ≠ 0) := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   rw [Finset.disjoint_left]
   intro χ hχ1 hχ2
@@ -221,11 +223,12 @@ constituent `ρ`) and Frobenius (`inner_induce_ne_zero_iff_liesOver`).  With
 `{φ : ⟨Ind_H ρ, φ⟩ ≠ 0}` cover and pairwise-partition `Irr G` — the `trivIset`+`cover` of the
 Peterfalvi (12.5) `DpsiH` regrouping. -/
 theorem exists_induce_inner_ne_zero [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
-    {H : Subgroup G} [_hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    {H : Subgroup G} [_hH : H.Normal] [Finite ↥H] [Invertible (Nat.card ↥H : ℂ)]
     (φ : IrreducibleCharacter G) :
     ∃ ρ : IrreducibleCharacter ↥H,
       ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
         (φ : ClassFunction G ℂ) ≠ 0 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   obtain ⟨ρ, hρ⟩ := IrreducibleCharacter.exists_liesOver (H := H) φ
   exact ⟨ρ, (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H φ ρ).mpr hρ⟩
 
@@ -234,10 +237,11 @@ irreducible `ψ` of `G` (`σ` is a constituent of `Res_H ψ`, i.e. `⟨Ind_H σ,
 character `Ind_H^G σ` has positive degree `[G:H]·σ(1)`, hence is nonzero, hence — by completeness
 (`classFunction_eq_zero_of_orthogonal`) — not orthogonal to every irreducible of `G`.  This supplies
 the Clifford correspondent `ψ` over `θ'` in the Peterfalvi (1.7.b)/(12.5) inertia setup. -/
-theorem exists_liesOver_of_subgroup [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+theorem exists_liesOver_of_subgroup [Finite G] [Invertible (Nat.card G : ℂ)]
     {H : Subgroup G} [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
     (σ : IrreducibleCharacter ↥H) :
     ∃ ψ : IrreducibleCharacter G, IrreducibleCharacter.LiesOver H ψ σ := by
+  haveI : Fintype G := Fintype.ofFinite G
   classical
   have hne : ClassFunction.induce H (σ : ClassFunction ↥H ℂ) ≠ 0 := by
     intro hzero
@@ -265,7 +269,7 @@ the *same* block), via `cap φ := {θ | ⟨Ind_H λ(φ), θ⟩ ≠ 0}` where `λ
 (`liesOver_conjBy_iff`); cover from `φ ∈ cap φ`.  The `trivIset`/`cover` packaging for the Peterfalvi
 (12.5) `DpsiH` Fourier regrouping (`Finset.sum_biUnion`). -/
 theorem exists_induce_constituent_partition [Finite G]
-    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card G : ℂ)]
     {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
     [Fintype (IrreducibleCharacter G)] :
     ∃ parts : Finset (Finset (IrreducibleCharacter G)),
@@ -273,6 +277,7 @@ theorem exists_induce_constituent_partition [Finite G]
       (↑parts : Set (Finset (IrreducibleCharacter G))).PairwiseDisjoint id ∧
       ∀ A ∈ parts, ∃ ρ : IrreducibleCharacter ↥H, ∀ θ : IrreducibleCharacter G,
         θ ∈ A ↔ IrreducibleCharacter.LiesOver H θ ρ := by
+  haveI : Fintype G := Fintype.ofFinite G
   classical
   let lam : IrreducibleCharacter G → IrreducibleCharacter ↥H :=
     fun φ => (IrreducibleCharacter.exists_liesOver (H := H) φ).choose
@@ -327,15 +332,17 @@ This is the `Res_H ψ = e·θ` input of the general Peterfalvi (1.7.b) — with 
 decomposition `Ind_H^T(Res ψ) = ψ·∑_β Inf(β)` it gives `e·Ind_H^T θ = ψ·∑_β Inf(β)`, whose
 constituents `ψ·Inf(β)` all have the common degree `ψ(1) = e·θ(1)`. -/
 theorem restrict_eq_restrictionMultiplicity_smul_of_invariant
-    {H : Subgroup G} [hH : H.Normal] [Fintype G] [Fintype ↥H]
+    {H : Subgroup G} [hH : H.Normal] [Finite G] [Fintype ↥H]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
-    [Fintype (IrreducibleCharacter ↥H)]
+    [Finite (IrreducibleCharacter ↥H)]
     (χ : IrreducibleCharacter G) (θ : IrreducibleCharacter ↥H)
     (hover : IrreducibleCharacter.LiesOver H χ θ)
     (hinv : ∀ g : G, IrreducibleCharacter.conjBy g θ = θ) :
     ClassFunction.restrict H (χ : ClassFunction G ℂ)
       = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) (θ : ClassFunction ↥H ℂ)
           • (θ : ClassFunction ↥H ℂ) := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   classical
   have hsingle := restrictionConstituentsSingleOrbit_of_isIrreducible (H := H) χ
   conv_lhs => rw [← sum_inner_irreducibleCharacter_smul
@@ -365,15 +372,17 @@ a normal subgroup `H ⊴ G`, and a constituent `θ₀` of `Res^G_H χ`, the degr
 contributes, each term equal to `⟨Res χ,θ₀⟩·θ₀(1)` (common multiplicity, conjugation-invariant
 degree). -/
 theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia
-    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Finite G] [Invertible (Nat.card G : ℂ)]
     {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
-    [Fintype (IrreducibleCharacter ↥H)]
+    [Finite (IrreducibleCharacter ↥H)]
     (χ : IrreducibleCharacter G) (θ₀ : IrreducibleCharacter ↥H)
     (hθ₀ : IrreducibleCharacter.LiesOver (G := G) (H := H) χ θ₀) :
     (χ : ClassFunction G ℂ) (1 : G)
       = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) (θ₀ : ClassFunction ↥H ℂ)
           * ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
           * (θ₀ : ClassFunction ↥H ℂ) 1 := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   classical
   have hsingle := restrictionConstituentsSingleOrbit_of_isIrreducible (G := G) (H := H) χ
   have hcommon :=
@@ -419,9 +428,9 @@ common nonzero factor `[G:I(ρ)]·ρ(1)`.  With the general (1.7.b) equal degree
 `Ind_H^G ρ`, this gives their **common multiplicity `e`** — the coefficient-matching `a_ρ = c_ρ/e`
 of the Peterfalvi (12.5) `DpsiH` decomposition. -/
 theorem restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq
-    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Finite G] [Invertible (Nat.card G : ℂ)]
     {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
-    [Fintype (IrreducibleCharacter ↥H)]
+    [Finite (IrreducibleCharacter ↥H)]
     {φ₁ φ₂ : IrreducibleCharacter G} {ρ : IrreducibleCharacter ↥H}
     (h₁ : IrreducibleCharacter.LiesOver (G := G) (H := H) φ₁ ρ)
     (h₂ : IrreducibleCharacter.LiesOver (G := G) (H := H) φ₂ ρ)
@@ -429,6 +438,8 @@ theorem restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq
     ClassFunction.restrictionMultiplicity H (φ₁ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ)
       = ClassFunction.restrictionMultiplicity H (φ₂ : ClassFunction G ℂ)
           (ρ : ClassFunction ↥H ℂ) := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   have e1 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₁ ρ h₁
   have e2 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₂ ρ h₂
   rw [hdeg] at e1
@@ -505,12 +516,13 @@ Unlike `coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce` (which needs
 together with the Clifford lower bound `χ(1) = e · [G:I_G(θ₀)] · θ₀(1)` it forces the constituent
 multiplicity `e = 1`, so an `H₀C'`-kernel character of `HU` has degree exactly `[HU:HC] = u`. -/
 theorem apply_one_le_induce_apply_one_of_liesOver
-    [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype (IrreducibleCharacter G)]
+    [Fintype G] [Invertible (Nat.card G : ℂ)] [Finite (IrreducibleCharacter G)]
     {I : Subgroup G} [Fintype ↥I] [Invertible (Nat.card ↥I : ℂ)]
     (χ : IrreducibleCharacter G) (ψ : IrreducibleCharacter ↥I)
     (hover : IrreducibleCharacter.LiesOver I χ ψ) :
     (χ : ClassFunction G ℂ) (1 : G) ≤
       ClassFunction.induce I (ψ : ClassFunction ↥I ℂ) (1 : G) := by
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite (IrreducibleCharacter G)
   classical
   -- For each irreducible `η` of `G`, the coefficient `⟨Ind ψ, η⟩` equals the restriction
   -- multiplicity `⟨Res η, ψ⟩` (Frobenius + the real-valuedness of the multiplicity).
@@ -591,9 +603,9 @@ constituent upper bound `χ(1) ≤ (Ind_I^G ψ)(1) = [G : I] · ψ(1) = [G : I]`
 degree `u = [HU : HC]`" (9.9.a): with `H = H`, `I = HC` and `θ₀` a nontrivial chief-factor character
 (inertia `HC` by `inertia_eq_hcInHu`). -/
 theorem apply_one_eq_index_of_liesOver_linear_inertia
-    [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype (IrreducibleCharacter G)]
+    [Finite G] [Invertible (Nat.card G : ℂ)] [Finite (IrreducibleCharacter G)]
     {H : Subgroup G} [H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
-    [Fintype (IrreducibleCharacter ↥H)]
+    [Finite (IrreducibleCharacter ↥H)]
     {I : Subgroup G} [Fintype ↥I] [Invertible (Nat.card ↥I : ℂ)]
     (χ : IrreducibleCharacter G) (θ₀ : IrreducibleCharacter ↥H) (ψ : IrreducibleCharacter ↥I)
     (hθ₀over : IrreducibleCharacter.LiesOver H χ θ₀)
@@ -602,6 +614,9 @@ theorem apply_one_eq_index_of_liesOver_linear_inertia
     (hψover : IrreducibleCharacter.LiesOver I χ ψ)
     (hψdeg : (ψ : ClassFunction ↥I ℂ) (1 : ↥I) = 1) :
     (χ : ClassFunction G ℂ) (1 : G) = (I.index : ℂ) := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite (IrreducibleCharacter G)
+  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   classical
   -- The constituent multiplicity `e = ⟨Res χ, θ₀⟩` is a non-negative integer `m`, and `m ≥ 1`
   -- because `χ` lies over `θ₀`.

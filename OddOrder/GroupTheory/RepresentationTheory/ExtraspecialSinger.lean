@@ -49,15 +49,18 @@ section PureLinearAlgebra
 variable {R M : Type*} [Field R] [AddCommGroup M] [Module R M]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+omit [Fintype ι] in
 /-- **A map preserving a nonzero top-degree alternating form has determinant `1`.**
 
 If `ω : M [⋀^ι]→ₗ[R] R` is a nonzero alternating form indexed by a basis `e : Basis ι R M`, and
 `f : M →ₗ[R] M` preserves it (`ω ∘ fⁱ = ω`), then `det f = 1`.  This is the abstract content of
 "`K` preserves the symplectic commutator form ⟹ `K ⊆ Sp = SL₂` ⟹ `det = 1`": any alternating
 top-form is `ω(e) • e.det`, and `e.det (f ∘ e) = det f · e.det e = det f`. -/
-theorem det_eq_one_of_compLinearMap_alternating (e : Basis ι R M) (ω : M [⋀^ι]→ₗ[R] R)
+theorem det_eq_one_of_compLinearMap_alternating [Finite ι]
+    (e : Basis ι R M) (ω : M [⋀^ι]→ₗ[R] R)
     (hω : ω ≠ 0) {f : M →ₗ[R] M} (hf : ω.compLinearMap f = ω) :
     LinearMap.det f = 1 := by
+  haveI : Fintype ι := Fintype.ofFinite ι
   have hbasis : ω e ≠ 0 := (ω.map_basis_ne_zero_iff e).mpr hω
   -- `ω (f ∘ e) = ω e` (preservation) and `= ω e * det f` (top-form scaling).
   have h2 : ω (⇑f ∘ ⇑e) = ω ⇑e := by
@@ -236,6 +239,7 @@ private theorem commBihom2_mk (x y : P) :
   simp only [commBihom2, commBihom1, QuotientGroup.lift_mk', MonoidHom.coe_mk, OneHom.coe_mk]
   rfl
 
+omit [Finite P] in
 /-- Value of the commutator form on representatives: `b(x̄, ȳ) = toAdd (ζ ⁅x, y⁆)`. -/
 theorem commPairing_ofMul (x y : P) :
     commPairing hP (Additive.ofMul (QuotientGroup.mk x)) (Additive.ofMul (QuotientGroup.mk y)) =

@@ -37,7 +37,7 @@ variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 `isometryDifferenceImage_induceZ`) for columns `χ₂` and `1`, with `Ind` additivity. -/
 theorem fourcorner_signedDiff_eq_induce (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Invertible (Nat.card ↥h.K : ℂ)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     (h.columnFamily χ₂).signedDifference i - (h.columnFamily 1).signedDifference i
       = ClassFunction.induce h.sdiffTICyclicHypothesis.W
@@ -45,6 +45,7 @@ theorem fourcorner_signedDiff_eq_induce (h : Hypothesis46 A L) [NeZero (Nat.card
             - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
             - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
               - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite ↥(h.W1 ⊔ h.W2)
   rw [← h.columnFamily_spec χ₂ i, ← h.columnFamily_spec 1 i,
     h.isometryDifferenceImage_induceZ χ₂ i, h.isometryDifferenceImage_induceZ 1 i]
   simp only [← h.sdiffTICyclicHypothesis.induceLinear_apply]

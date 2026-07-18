@@ -206,6 +206,7 @@ theorem card_mul_inner_induce (θ ψ : ClassFunction ↥H ℂ) :
     rw [inner_smul_right, star_natCast, ← inner_induce_eq_inner_restrict]
   rw [← key, card_smul_restrict_induce, inner_sum_right]
 
+omit [Fintype ↥H] in
 /-- **Induced characters from non-conjugate irreducibles are orthogonal.**
 
 If no `G`-conjugate of `θ` equals `ψ` (the two irreducibles of `H` lie in distinct `G`-orbits),
@@ -217,6 +218,7 @@ theorem inner_induce_eq_zero_of_not_conj (θ ψ : IrreducibleCharacter H)
     (h : ∀ g : G, IrreducibleCharacter.conjBy g θ ≠ ψ) :
     ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
       (induce H (ψ : ClassFunction ↥H ℂ)) = 0 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   have hcardH : (Nat.card H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
   apply mul_left_cancel₀ hcardH
@@ -226,6 +228,7 @@ theorem inner_induce_eq_zero_of_not_conj (θ ψ : IrreducibleCharacter H)
   intro hθ
   exact h x (by rw [hθ]; simp)
 
+omit [Fintype ↥H] in
 /-- **Norm of an induced irreducible character** ([Is] Thm 6.34, norm part).
 
 For an irreducible character `θ` of `H ⊴ G`, `|H| · ‖Ind_H^G θ‖² = |I_G(θ)|`, equivalently
@@ -239,6 +242,7 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
         ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
           (induce H (θ : ClassFunction ↥H ℂ))
       = (Nat.card ↥(ClassFunction.inertia (θ : ClassFunction ↥H ℂ)) : ℂ) := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   rw [card_mul_inner_self_induce]
   have hterm : ∀ x : G,
@@ -312,6 +316,7 @@ theorem orbitSum_inner_orbitSum_eq_zero_of_induce_ne [Finite H]
   rw [IrreducibleCharacter.coe_conjBy, IrreducibleCharacter.coe_conjBy] at h3
   rw [h3]
 
+omit [Fintype ↥H] in
 /-- **Induced irreducibles coincide iff the sources are `G`-conjugate.**  For `θ, ψ ∈ Irr H`
 (`H ⊴ G`), `Ind_H^G θ = Ind_H^G ψ` exactly when some `G`-conjugate of `θ` equals `ψ`.
 
@@ -323,6 +328,7 @@ so `Ind θ = Ind ψ` would force `‖Ind ψ‖² = 0`, contradicting `|H| · ‖
 theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
     induce H (θ : ClassFunction ↥H ℂ) = induce H (ψ : ClassFunction ↥H ℂ) ↔
       ∃ g : G, IrreducibleCharacter.conjBy g θ = ψ := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   constructor
   · intro heq
@@ -343,6 +349,7 @@ theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
     haveI : Fintype G := Fintype.ofFinite G
     rw [IrreducibleCharacter.coe_conjBy, induce_conjBy_eq]
 
+omit [Fintype ↥H] in
 /-- **Induction is injective at an inertia-stable irreducible.**  If `θ ∈ Irr H` (`H ⊴ G`) is fixed
 by every `G`-conjugation (`I_G(θ) = G`, i.e. its conjugation orbit is the singleton `{θ}`), then
 `Ind_H^G θ = Ind_H^G ψ` forces `ψ = θ`: the fibre of `ψ ↦ Ind ψ` over `Ind θ` is that singleton
@@ -352,6 +359,7 @@ route: `Res_H (Ind θ) = [G:H] · θ` for `G`-stable `θ`). -/
 theorem induce_injective_of_inertia_stable {θ ψ : IrreducibleCharacter H}
     (hθ : ∀ g : G, IrreducibleCharacter.conjBy g θ = θ)
     (h : induce H (θ : ClassFunction ↥H ℂ) = induce H (ψ : ClassFunction ↥H ℂ)) : ψ = θ := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ ψ).mp h
   rw [← hg]; exact hθ g
 
@@ -378,6 +386,7 @@ omit [Fintype H] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
   simp
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **Fibre cardinality = inertia index.**  Inside a conjugation-invariant Finset `T` of
 irreducibles, the fibre `{θ ∈ T | Ind θ = Ind θ₀}` of the induction map equals the whole
 `G`-orbit of `θ₀` (by `induce_eq_induce_iff_conj` and `T`-invariance), so its cardinality is
@@ -388,6 +397,7 @@ theorem card_filter_induce_eq_index_inertia (T : Finset (IrreducibleCharacter H)
     (θ₀ : IrreducibleCharacter H) (hθ₀ : θ₀ ∈ T) :
     (T.filter fun θ => induce H θ.toClassFunction = induce H θ₀.toClassFunction).card
       = (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   rw [← card_conjByOrbit_eq_index_inertia (G := G) (H := H) θ₀,
     Nat.card_coe_set_eq, ← Set.ncard_coe_finset]
   congr 1
@@ -401,6 +411,7 @@ theorem card_filter_induce_eq_index_inertia (T : Finset (IrreducibleCharacter H)
     exact ⟨hg ▸ hT θ₀ hθ₀ g, g⁻¹, by rw [← hg, ← IrreducibleCharacter.conjBy_mul]; simp⟩
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **Peterfalvi (6.2), step 4a — the orbit-counted degree-sum identity.**  For a conjugation-
 invariant Finset `T ⊆ Irr H` (`H ⊴ G`), summing `χ(1)²/‖χ‖²` over the induced characters
 `S = {Ind_H^G θ | θ ∈ T}` equals `[G:H] · ∑_{θ∈T} θ(1)²`.
@@ -415,6 +426,7 @@ theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
     ∑ χ ∈ T.image (fun θ => induce H θ.toClassFunction),
         χ 1 ^ 2 / ClassFunction.inner χ χ
       = (H.index : ℂ) * ∑ θ ∈ T, θ.toClassFunction 1 ^ 2 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   have hcH : (Nat.card ↥H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
   rw [Finset.mul_sum, ← Finset.sum_fiberwise_of_maps_to
     (fun θ (hθ : θ ∈ T) => Finset.mem_image_of_mem (fun θ => induce H θ.toClassFunction) hθ)]
@@ -459,6 +471,7 @@ theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
   linear_combination (θ₀.toClassFunction 1 ^ 2 * (H.index : ℂ)) * hAB
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **The abelian rebase identity** (Peterfalvi (13.5)/(7.7.a) rebase input, issue 2035 #79):
 for an abelian normal `H ⊴ G`, the distinct induced irreducibles weighted by their inverse
 squared norms sum to zero at every `g ≠ 1`.  Summing over the whole of `Irr H` gives the
@@ -472,6 +485,7 @@ theorem sum_image_induce_div_normSq_apply_eq_zero
     ∑ χ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).image
         (fun θ => induce H θ.toClassFunction),
       χ g / ClassFunction.inner χ χ = 0 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   -- (1) second orthogonality at the abelian `H`: `∑_{θ ∈ Irr H} θ(y) = 0` for `y ≠ 1`
   have hIrr : ∀ y : ↥H, y ≠ 1 →
@@ -682,6 +696,7 @@ theorem exists_zsmul_irreducibleCharacter_of_inner_self_one
   rw [hrepr]
   exact Int.cast_smul_eq_zsmul ℂ (c α₀) α₀
 
+omit [Fintype ↥H] in
 /-- **[Is] Theorem 6.34** (Frobenius/Dade induced irreducibility).
 
 For `H ⊴ G` and an irreducible character `θ` of `H` whose inertia group in `G` is just `H`
@@ -695,6 +710,7 @@ Norm `1` with positive degree forces irreducibility. -/
 theorem isIrreducibleCharacter_induce_of_inertia_eq (θ : IrreducibleCharacter H)
     (hfree : ClassFunction.inertia (θ : ClassFunction ↥H ℂ) = H) :
     IsIrreducibleCharacter (induce H (θ : ClassFunction ↥H ℂ)) := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   have hmem : induce H (θ : ClassFunction ↥H ℂ) ∈ ZIrr G :=
     induce_mem_ZIrr H θ.property.mem_ZIrr
   have hcardH : (Nat.card H : ℂ) ≠ 0 := by
@@ -715,6 +731,7 @@ theorem isIrreducibleCharacter_induce_of_inertia_eq (θ : IrreducibleCharacter H
     rw [induce_apply_one, hθ1, Nat.cast_mul]
   exact isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos hmem hnorm hpos
 
+omit [Fintype ↥H] in
 /-- Frobenius-group form of **[Is] Theorem 6.34**.
 
 In a Frobenius group with kernel `H`, inducing any nontrivial irreducible character of `H`
@@ -728,6 +745,7 @@ theorem isIrreducibleCharacter_induce_of_frobeniusGroup {W : Subgroup G}
   isIrreducibleCharacter_induce_of_inertia_eq θ
     (inertia_eq_of_frobeniusGroup hF hθ_ne)
 
+omit [Fintype ↥H] in
 /-- **Norm of a Frobenius-induced character is `1`.**  In a Frobenius group with kernel `H`, a
 nontrivial irreducible `θ` of `H` induces with `‖Ind_H^G θ‖² = |I_G(θ)|/|H| = 1` — the inertia is
 `H` (`inertia_eq_of_frobeniusGroup`), so `card_mul_inner_self_induce_eq_card_inertia` reads
@@ -738,12 +756,14 @@ theorem inner_self_induce_eq_one_of_frobeniusGroup {W : Subgroup G}
     (θ : IrreducibleCharacter H) (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
     ClassFunction.inner (induce H (θ : ClassFunction H ℂ))
       (induce H (θ : ClassFunction H ℂ)) = 1 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   have hcardH : (Nat.card H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
   have h := card_mul_inner_self_induce_eq_card_inertia θ
   rw [inertia_eq_of_frobeniusGroup hF hθ_ne] at h
   exact mul_left_cancel₀ hcardH (by rw [h, mul_one])
 
 open scoped Classical in
+omit [Fintype ↥H] in
 /-- **Odd-order Frobenius: a nontrivial induced irreducible is orthogonal to its complex
 conjugate.**  In a Frobenius group `G` of odd order with kernel `H`, for `θ ∈ Irr H`, `θ ≠ 1`,
 the induced `Ind_H^G θ` is irreducible (`isIrreducibleCharacter_induce_of_frobeniusGroup`) and
@@ -755,6 +775,7 @@ theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {W : Subgroup G}
     (θ : IrreducibleCharacter H) (hθ : θ ≠ trivialIrreducibleCharacter H) :
     ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction H ℂ))
       (ClassFunction.induce H ((θ : ClassFunction H ℂ).conj)) = 0 := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
   -- `θ̄` is again a nontrivial irreducible character of `H`.
   have hθbar_ne : (⟨(θ : ClassFunction H ℂ).conj, θ.isIrreducible.conj⟩ :
       IrreducibleCharacter H) ≠ trivialIrreducibleCharacter H := by

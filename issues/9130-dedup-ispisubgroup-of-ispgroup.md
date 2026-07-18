@@ -1,11 +1,17 @@
 ---
-id: 9128
+id: 9130
 slug: dedup-ispisubgroup-of-ispgroup
 title: "isPiSubgroup_of_isPGroup_of_mem を GroupTheory へ集約 (BG の重複を削除)"
 created: 2026-07-18
 ---
 
 # isPiSubgroup_of_isPGroup_of_mem を GroupTheory へ集約 (BG の重複を削除)
+
+## 採番の経緯
+
+当初 9128 で採番したが、並行レーンが同じ 9128 (`9128-psu-simplicity`) を先に main へ
+merge していたため 9130 に振り直した (SEQUENCE.9000 の merge conflict で発覚)。
+先行 commit `b00ad49f3` のメッセージは旧番号 9128 を参照している。
 
 ## 背景
 

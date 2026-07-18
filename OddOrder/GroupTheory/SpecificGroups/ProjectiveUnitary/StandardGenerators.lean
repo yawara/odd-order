@@ -17,8 +17,16 @@ the Hermitian unital of size `q³ + 1`:
 * a diagonal parameter `c` acts by `(x,y) |-> (c*x, c*star(c)*y)`;
 * the determinant-one torus consists of the parameters
   `c = star(t)^2 / t = t^(2q-1)`;
-* the Weyl element interchanges infinity and the affine origin and sends a
-  non-origin point `(x,y)` to `(x/y, 1/y)`.
+* the Weyl element interchanges infinity and the affine origin and, in the
+  left-translation convention used here, sends a non-origin point `(x,y)` to
+  `(x/star(y), 1/y)`.
+
+Peterfalvi uses right actions and writes the reciprocal map as
+`F(x,y) = (x/y, 1/y)`. Lean uses left actions and the root translations below
+are left multiplications. Identifying the Lean affine coordinate with the
+inverse of Peterfalvi's coordinate therefore transports the Weyl map to
+`J ∘ F ∘ J(x,y) = (x/star(y), 1/y)`, where `J(u) = u⁻¹`. This is an
+inversion-conjugate realization of the same standard action.
 
 The formulas are from Peterfalvi, Part II, Chapter III §3 (pp. 119–121) and
 Chapter IV §3. They provide the concrete group-action target needed for
@@ -391,7 +399,7 @@ theorem ne_one_iff_snd_ne_zero {n : ℕ} (u : RootGroup n) :
     u ≠ 1 ↔ u.snd ≠ 0 :=
   not_congr (eq_one_iff_snd_eq_zero u)
 
-/-- The reciprocal affine point used by the unitary Weyl element. -/
+/-- Peterfalvi's reciprocal affine point in the source's right-action coordinates. -/
 noncomputable def reciprocal {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
     RootGroup n :=
   { fst := u.fst / u.snd
@@ -433,6 +441,51 @@ theorem reciprocal_reciprocal {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
   · simp only [reciprocal_snd]
     field_simp
 
+/-- The Weyl reciprocal adapted to left root translations. Under the affine
+dictionary “Lean `u` = Peterfalvi `x⁻¹`”, Peterfalvi's right-action reciprocal
+`F` is transported to `J ∘ F ∘ J`, where `J` is root inversion. -/
+noncomputable def weylReciprocal {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
+    RootGroup n :=
+  (reciprocal u⁻¹ (inv_ne_one.mpr hu))⁻¹
+
+@[simp]
+theorem weylReciprocal_fst {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
+    (weylReciprocal u hu).fst = u.fst / star u.snd := by
+  simp only [weylReciprocal, fst_inv, reciprocal_fst, snd_inv_eq_star]
+
+@[simp]
+theorem weylReciprocal_snd {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
+    (weylReciprocal u hu).snd = 1 / u.snd := by
+  have hb : u.snd ≠ 0 := (ne_one_iff_snd_ne_zero u).mp hu
+  have hsb : star u.snd ≠ 0 := (star_ne_zero (R := Field n)).2 hb
+  change 1 / u⁻¹.snd + (u⁻¹.fst / u⁻¹.snd) *
+      star (u⁻¹.fst / u⁻¹.snd) = 1 / u.snd
+  rw [snd_inv_eq_star, fst_inv, star_div₀, star_star]
+  field_simp
+  calc
+    u.snd + u.fst * star u.fst =
+        u.snd + (u.snd + star u.snd) := by rw [u.condition]
+    _ = star u.snd := by
+      rw [← add_assoc, CharTwo.add_self_eq_zero, zero_add]
+
+theorem weylReciprocal_ne_one {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
+    weylReciprocal u hu ≠ 1 := by
+  rw [weylReciprocal]
+  exact inv_ne_one.mpr (reciprocal_ne_one u⁻¹ (inv_ne_one.mpr hu))
+
+/-- The left-translation reciprocal coordinate map is involutive. -/
+@[simp]
+theorem weylReciprocal_weylReciprocal {n : ℕ}
+    (u : RootGroup n) (hu : u ≠ 1) :
+    weylReciprocal (weylReciprocal u hu) (weylReciprocal_ne_one u hu) = u := by
+  have hb : u.snd ≠ 0 := (ne_one_iff_snd_ne_zero u).mp hu
+  have hsb : star u.snd ≠ 0 := (star_ne_zero (R := Field n)).2 hb
+  ext
+  · simp only [weylReciprocal_fst, weylReciprocal_snd, star_div₀, star_one]
+    field_simp
+  · simp only [weylReciprocal_snd]
+    field_simp
+
 end RootGroup
 
 namespace Unital
@@ -443,7 +496,7 @@ noncomputable def weylPoint (n : ℕ) : Unital n → Unital n
   | some u =>
       @dite _ (u = 1) (Classical.propDecidable _)
         (fun _ => infinity n)
-        (fun hu => affine (RootGroup.reciprocal u hu))
+        (fun hu => affine (RootGroup.weylReciprocal u hu))
 
 /-- The standard unitary Weyl point function is an involution. -/
 theorem weylPoint_involutive (n : ℕ) : Function.Involutive (weylPoint n) := by
@@ -455,8 +508,8 @@ theorem weylPoint_involutive (n : ℕ) : Function.Involutive (weylPoint n) := by
       by_cases hu : u = 1
       · subst u
         simp [weylPoint, infinity, affine]
-      · have hrec : RootGroup.reciprocal u hu ≠ 1 :=
-          RootGroup.reciprocal_ne_one u hu
+      · have hrec : RootGroup.weylReciprocal u hu ≠ 1 :=
+          RootGroup.weylReciprocal_ne_one u hu
         simp [weylPoint, affine, hu, hrec]
 
 /-- The actual unitary Weyl permutation: it swaps infinity and the affine origin. -/
@@ -478,14 +531,15 @@ theorem weylPerm_origin (n : ℕ) :
 
 @[simp]
 theorem weylPerm_affine_of_ne_one {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
-    weylPerm n (affine u) = affine (RootGroup.reciprocal u hu) := by
+    weylPerm n (affine u) = affine (RootGroup.weylReciprocal u hu) := by
   classical
   simp [weylPerm, weylPoint, affine, hu]
 
 theorem weylPerm_affine_of_snd_ne_zero {n : ℕ} (u : RootGroup n)
     (hu : u.snd ≠ 0) :
     weylPerm n (affine u) =
-      affine (RootGroup.reciprocal u ((RootGroup.ne_one_iff_snd_ne_zero u).mpr hu)) := by
+      affine (RootGroup.weylReciprocal u
+        ((RootGroup.ne_one_iff_snd_ne_zero u).mpr hu)) := by
   exact weylPerm_affine_of_ne_one u ((RootGroup.ne_one_iff_snd_ne_zero u).mpr hu)
 
 @[simp]
@@ -524,6 +578,28 @@ theorem reciprocal_scalePoint_reciprocal {n : ℕ}
     field_simp
   · simp only [reciprocal_snd, scalePoint_snd, coe_weylParameterHom, torusWeight,
       star_inv₀, star_star]
+    field_simp
+
+/-- Conjugating a diagonal scaling by the left-translation reciprocal map
+still gives conjugate-inverse scaling. -/
+theorem weylReciprocal_scalePoint_weylReciprocal {n : ℕ}
+    (c : GeneralTorusParameter n) (u : RootGroup n) (hu : u ≠ 1) :
+    weylReciprocal (scalePoint c (weylReciprocal u hu))
+        (scalePoint_ne_one c (weylReciprocal u hu)
+          (weylReciprocal_ne_one u hu)) =
+      scalePoint (weylParameterHom n c) u := by
+  have hc : (c : Field n) ≠ 0 := Units.ne_zero c
+  have hsc : star (c : Field n) ≠ 0 :=
+    (star_ne_zero (R := Field n)).2 hc
+  have hb : u.snd ≠ 0 := (ne_one_iff_snd_ne_zero u).mp hu
+  have hsb : star u.snd ≠ 0 := (star_ne_zero (R := Field n)).2 hb
+  ext
+  · simp only [weylReciprocal_fst, weylReciprocal_snd, scalePoint_fst,
+      scalePoint_snd, coe_weylParameterHom, torusWeight, star_mul, star_div₀,
+      star_one, star_star]
+    field_simp
+  · simp only [weylReciprocal_snd, scalePoint_snd, coe_weylParameterHom,
+      torusWeight, star_inv₀, star_star]
     field_simp
 
 end RootGroup
@@ -581,10 +657,11 @@ theorem weylPerm_mul_torusPerm_mul_weylPerm {n : ℕ}
           torusPerm n (weylParameterHom n c) (affine u)
         rw [weylPerm_affine_of_ne_one u hu, torusPerm_affine,
           weylPerm_affine_of_ne_one _
-            (RootGroup.scalePoint_ne_one c (RootGroup.reciprocal u hu)
-              (RootGroup.reciprocal_ne_one u hu)),
+            (RootGroup.scalePoint_ne_one c (RootGroup.weylReciprocal u hu)
+              (RootGroup.weylReciprocal_ne_one u hu)),
           torusPerm_affine]
-        exact congrArg affine (RootGroup.reciprocal_scalePoint_reciprocal c u hu)
+        exact congrArg affine
+          (RootGroup.weylReciprocal_scalePoint_weylReciprocal c u hu)
 
 /-- The same Weyl conjugation relation inside the determinant-one torus action. -/
 theorem weylPerm_mul_psuTorusPerm_mul_weylPerm {n : ℕ}

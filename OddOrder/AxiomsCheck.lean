@@ -17,6 +17,8 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Simplicity
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
@@ -184,6 +186,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSU
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
@@ -224,7 +227,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 9200
+set_option linter.style.longFile 9400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -344,6 +347,12 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.reciprocal_reciprocal
 #assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.snd_inv_eq_star
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.weylReciprocal_weylReciprocal
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup.weylReciprocal_scalePoint_weylReciprocal
+#assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.weylPerm_apply_self
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.psuTorusPerm_injective
@@ -387,6 +396,46 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardBorel_le_infinityStabilizer
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_standardBorel
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.bruhatFullTorus_eq_specialTorusWeight
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.origin_bruhat_identity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.mul_weylReciprocal_eq_one_iff_reciprocal_mul_eq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.generic_bruhat_identity
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Unital.weylPerm_mul_rootPerm_mul_weylPerm_eq_bruhat
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardBruhatRelations
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardBruhatDecomposition
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardBorel_eq_infinityStabilizer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_standardPermGroup
+
+-- Perfectness, solvable stabilizer, and simplicity of PSU(3,q) for q > 2.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.psuTorusScale_fixedPointFree_of_torusWeight_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.psuTorusScale_mul_inv_surjective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.commutator_psuTorusHom_rootHom
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.bruhatTorus_surjective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.rootHom_mem_commutator
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.weylElement_mem_commutator
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.psuTorusHom_mem_commutator
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.commutator_standardPermGroup_eq_top
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardBorel_isSolvable
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.standardPermGroup_isSimpleGroup
 
 -- Shared defining field and Tits twist for the Suzuki target in Peterfalvi Part II.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_field
@@ -7546,6 +7595,19 @@ and hence the exact residual and conjugate-join conclusions. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_and_residual_of_suzuki_target
+
+/-! **Peterfalvi Part II, Ch. I section 3, Lemma 1 (PSU(3,q) target)**:
+the Hermitian-unital action supplies the power-of-two degree, PSU simplicity,
+and hence the exact residual and conjugate-join conclusions. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.psu3_degree_twoPower
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.psu3_target_simple
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_and_residual_of_psu3_target
 
 /-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
 group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field

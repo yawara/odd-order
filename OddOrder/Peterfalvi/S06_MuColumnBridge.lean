@@ -43,7 +43,7 @@ characters satisfy `Ind_W^L(ω_{iχ₂} − ω_{0χ₂}) = δ_{χ₂} (μ_{iχ�
 from `induce_omegaColumnDiff_eq` once the signed difference is written out. -/
 theorem induce_omegaColumnDiff_mu_diff {L : Type*} [Group L] [Fintype L]
     [Invertible (Nat.card L : ℂ)] (h : Hypothesis L) [NeZero (Nat.card h.W1)]
-    [Fintype (h.W1 ⊔ h.W2 : Subgroup L)]
+    [Finite (h.W1 ⊔ h.W2 : Subgroup L)]
     [Invertible (Nat.card (h.W1 ⊔ h.W2 : Subgroup L) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ClassFunction.induce h.sdiffTICyclicHypothesis.W
@@ -51,6 +51,7 @@ theorem induce_omegaColumnDiff_mu_diff {L : Type*} [Group L] [Fintype L]
           ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
       = (h.columnFamily χ₂).sign •
           ((h.columnFamily χ₂).classFunction i - (h.columnFamily χ₂).classFunction 0) := by
+  haveI : Fintype (h.W1 ⊔ h.W2 : Subgroup L) := Fintype.ofFinite _
   rw [h.induce_omegaColumnDiff_eq χ₂ (h.w1CharEquiv i), Equiv.symm_apply_apply]
 
 /-- **Peterfalvi (13.1.e), the `ω`/`μ`-grid difference form** — the exact shape consumed by the
@@ -66,7 +67,7 @@ Inducing the `W₂`-column `ω`-grid difference `ω_{ij} − ω_{0j}` of the cer
 certain-type member can discharge `mu_definition` by this lemma plus the column reindexing. -/
 theorem induce_chiColumn_diff_mu_diff {L : Type*} [Group L] [Fintype L]
     [Invertible (Nat.card L : ℂ)] (h : Hypothesis L) [NeZero (Nat.card h.W1)]
-    [Fintype (h.W1 ⊔ h.W2 : Subgroup L)]
+    [Finite (h.W1 ⊔ h.W2 : Subgroup L)]
     [Invertible (Nat.card (h.W1 ⊔ h.W2 : Subgroup L) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ClassFunction.induce h.sdiffTICyclicHypothesis.W
@@ -75,6 +76,7 @@ theorem induce_chiColumn_diff_mu_diff {L : Type*} [Group L] [Fintype L]
       = (h.columnFamily χ₂).sign •
           (((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
             - ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) := by
+  haveI : Fintype (h.W1 ⊔ h.W2 : Subgroup L) := Fintype.ofFinite _
   have hchi : (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
         - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
       = (h.omegaColumnDiff (h.w1CharEquiv i) 1 χ₂ :

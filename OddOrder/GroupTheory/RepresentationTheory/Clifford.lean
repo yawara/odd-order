@@ -1142,6 +1142,7 @@ theorem IsCharacter.add {χ ψ : ClassFunction G ℂ} (hχ : IsCharacter χ) (h�
   rw [hprod, ClassFunction.add_apply, congrFun hρ g, congrFun hσ g]
 
 omit [Finite G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- Genuine characters are closed under `ℕ`-scalar multiples. -/
 theorem IsCharacter.nsmul {χ : ClassFunction G ℂ} (hχ : IsCharacter χ) (n : ℕ) :
     IsCharacter (n • χ) := by
@@ -1150,6 +1151,7 @@ theorem IsCharacter.nsmul {χ : ClassFunction G ℂ} (hχ : IsCharacter χ) (n :
   | succ k ih => rw [succ_nsmul]; exact ih.add hχ
 
 omit [Finite G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- Genuine characters are closed under finite sums. -/
 theorem IsCharacter.sum {ι : Type*} {s : Finset ι} {f : ι → ClassFunction G ℂ}
     (h : ∀ i ∈ s, IsCharacter (f i)) : IsCharacter (∑ i ∈ s, f i) := by
@@ -1160,6 +1162,8 @@ theorem IsCharacter.sum {ι : Type*} {s : Finset ι} {f : ι → ClassFunction G
       rw [Finset.sum_cons]
       exact (h a (Finset.mem_cons_self a s)).add (ih fun i hi => h i (Finset.mem_cons_of_mem hi))
 
+omit [Finite G] in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
 set_option linter.unusedFintypeInType false in
 /-- **Reverse decomposition.**  A non-negative-integer combination of irreducible characters is a
 genuine character.  This is the converse of `exists_natFinsupp_eq_sum` and the engine behind

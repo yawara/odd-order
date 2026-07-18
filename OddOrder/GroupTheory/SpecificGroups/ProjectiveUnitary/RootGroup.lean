@@ -106,6 +106,12 @@ theorem fst_inv (x : RootGroup n) : x⁻¹.fst = x.fst := rfl
 theorem snd_inv (x : RootGroup n) :
     x⁻¹.snd = x.snd + x.fst * star x.fst := rfl
 
+/-- Root inversion conjugates the second Hermitian coordinate. -/
+@[simp]
+theorem snd_inv_eq_star (x : RootGroup n) : x⁻¹.snd = star x.snd := by
+  rw [snd_inv, ← x.condition]
+  rw [← add_assoc, CharTwo.add_self_eq_zero, zero_add]
+
 instance (n : ℕ) : Group (RootGroup n) where
   mul_assoc x y z := by
     ext

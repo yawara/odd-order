@@ -163,6 +163,7 @@ theorem IsIrreducibleCharacter.apply_ne_zero_of_apply_one_eq_one {φ : ClassFunc
   exact one_ne_zero hmul
 
 
+omit [Finite G] in
 /-- A degree-one irreducible character is induced by a multiplicative linear character
 `G →* ℂˣ`.
 
@@ -203,6 +204,7 @@ theorem IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_isMulComm
   hφ.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one
     hφ.apply_one_eq_one_of_isMulCommutative
 
+omit [Finite G] in
 /-- A degree-one irreducible character **kills commutators**: `θ(⁅a,b⁆) = θ(1) = 1`.
 
 `θ` is a homomorphism into the commutative monoid `(ℂ, ·)` on the (nonvanishing) values, so the

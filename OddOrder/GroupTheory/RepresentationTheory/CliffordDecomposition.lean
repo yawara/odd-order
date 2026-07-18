@@ -184,7 +184,7 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
     {H T : Subgroup L} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
     [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
-    [Fintype ((↥T ⧸ H.subgroupOf T) →* ℂˣ)]
+    [Finite ((↥T ⧸ H.subgroupOf T) →* ℂˣ)]
     {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
     (hinertia : ClassFunction.inertia (G := L) θ = T)
     (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ H.subgroupOf T)
@@ -199,6 +199,7 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
         (φ : ClassFunction L ℂ) = ClassFunction.induce T
           (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T))))) := by
   classical
+  haveI : Fintype ((↥T ⧸ H.subgroupOf T) →* ℂˣ) := Fintype.ofFinite _
   letI : Fintype ↥H := Fintype.ofFinite _
   letI : Fintype ↥T := Fintype.ofFinite _
   obtain ⟨χ, hχ, hres, hdecomp, hirr⟩ :=
@@ -293,7 +294,7 @@ theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
     {H U U1 T : Subgroup L} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)
     [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
     [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
-    [Fintype ((↥T ⧸ H.subgroupOf T) →* ℂˣ)]
+    [Finite ((↥T ⧸ H.subgroupOf T) →* ℂˣ)]
     {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
     (hinertia : ClassFunction.inertia (G := L) θ = T)
     (hHU : H ⊔ U = ⊤)
@@ -393,6 +394,7 @@ theorem conjBy_conj {H : Subgroup L} [H.Normal] (g : L) (θ : ClassFunction ↥H
   rw [ClassFunction.conj_apply, ClassFunction.conjBy_apply, ClassFunction.conjBy_apply,
     ClassFunction.conj_apply]
 
+omit [Invertible (Nat.card L : ℂ)] in
 /-- **In a group of odd order, no `L`-conjugate of `θ ∈ Irr(H)` (`θ ≠ 1`, `H ⊴ L`) equals its
 complex conjugate `θ̄`** (Peterfalvi (1.1)-adjacent).  If `θ^g = θ̄`, apply `^g` again and use
 `θ̄̄ = θ`: `θ^{g²} = θ`, so `g² ∈ I_L(θ)`.  Since `g` has odd order (`Odd (Nat.card L)`),

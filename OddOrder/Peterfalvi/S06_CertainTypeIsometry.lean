@@ -179,12 +179,13 @@ By the degree congruence (4.3.d), `μ_{ij}(1) ≡ δ_j` and `μ_{ik}(1) ≡ δ_k
 equal-degree hypothesis forces `w₁ ∣ (δ_j − δ_k)`.  Since `δ_j, δ_k ∈ {±1}` and `w₁ ≥ 3`
 (`W₁ ≠ 1` of odd order), the only multiple of `w₁` in `[-2, 2]` is `0`. -/
 theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46Core A L)
-    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [NeZero (Nat.card h.W1)] [Finite ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     (h.columnFamily χ₂).sign = (h.columnFamily χ₂').sign := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   obtain ⟨a, ha⟩ := h.certainType_degree_modEq χ₂ i
   obtain ⟨b, hb⟩ := h.certainType_degree_modEq χ₂' i
   have hw3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1
@@ -240,7 +241,7 @@ On `W₁^# ⊆ W − W₂` the (4.3.c) value identity gives `μ_{ij}(w) = δ_j·
 column-independence of `ω` on `W₁` (`chiColumn_apply_of_mem_W1`) make these equal.  At `1` it is
 the equal-degree hypothesis. -/
 theorem certainType_apply_eq_of_mem_W1 (h : Hypothesis46Core A L)
-    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [NeZero (Nat.card h.W1)] [Finite ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
@@ -248,6 +249,7 @@ theorem certainType_apply_eq_of_mem_W1 (h : Hypothesis46Core A L)
     {w : ↥L} (hw : w ∈ h.W1) :
     ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) w
       = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) w := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   by_cases hw1 : w = 1
   · rw [hw1]; exact hdeg
   · -- `w ∈ W₁^# ⊆ sdiff.V = W − W₂`
@@ -279,7 +281,7 @@ Proof by cases on `z`:
   `L.subtype z` is an `L`-conjugate of it, i.e. lies in `V^L`. -/
 theorem certainType_diff_supp_subset_A0 (h : Hypothesis46Core A L)
     [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
     (i : Fin (Nat.card h.W1))
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
@@ -288,6 +290,7 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46Core A L)
     (hz : (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
           - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) z ≠ 0) :
     L.subtype z ∈ (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V : Set G) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [ClassFunction.sub_apply, sub_ne_zero] at hz
   by_cases hz1 : z = 1
   · exact absurd (by rw [hz1]; exact hdeg) hz
@@ -520,7 +523,7 @@ open scoped Classical in
 `∓δ_j` exactly at the two grid positions `P_{ij}, P_{ik}`:
 `a(pq) = ⟨φ, χ_{pq}⟩ − δ_j·([P_{ij} = pq] − [P_{ik} = pq])`. -/
 theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
     (φ : ClassFunction G ℂ)
@@ -535,6 +538,7 @@ theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
               0)
             - (if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) = pq
                 then (1 : ℂ) else 0)) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff]
   rw [certainTypeOmegaSigma_eq_chiFam, certainTypeOmegaSigma_eq_chiFam,
     ClassFunction.inner_sub_left, ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign,
@@ -827,10 +831,11 @@ bridge from the set `T = {μ_j | μ_j(1) = μ_k(1)}` of Peterfalvi (4.9) to (4.8
 /-- **Column-degree constancy.**  Every `μ_{ij}` in column `j` has degree `μ_{0j}(1)`
 (`columnFamily_difference_apply_one`: `(μ_{ij} − μ_{0j})(1) = 0`). -/
 theorem columnFamily_mu_apply_one_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
       = ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have h0 := h.columnFamily_difference_apply_one χ₂ i
   simp only [SignedIrreducibleDifferenceFamily.difference_apply_one,
     SignedIrreducibleDifferenceFamily.classFunction_apply] at h0
@@ -841,13 +846,14 @@ theorem columnFamily_mu_apply_one_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.
 each column is degree-constant (`columnFamily_mu_apply_one_eq`), so both sums are `w₁` times the
 anchor degree, and `w₁ ≠ 0` cancels. -/
 theorem forall_columnFamily_mu_apply_one_eq_of_sum_eq (h : Hypothesis46 A L)
-    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [NeZero (Nat.card h.W1)] [Finite ↥(h.W1 ⊔ h.W2)]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
     (hdeg : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
         = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have ej : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
       = (Nat.card h.W1 : ℂ) * ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
     rw [Finset.sum_congr rfl (fun i _ => columnFamily_mu_apply_one_eq h χ₂ i),
@@ -960,11 +966,12 @@ the certain-type characters `μ_{ij}` are distinct irreducibles of `L` (`columnF
 within a column, `columnFamily_mu_ne` across columns), so the column sums `μ_j = ∑_i μ_{ij}` are
 orthogonal for distinct columns and have norm² `w₁` on the diagonal. -/
 theorem columnFamily_mu_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
         (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ))
       = if χ₂ = χ₂' then (Nat.card h.W1 : ℂ) else 0 := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [inner_sum_left]
   simp_rw [inner_sum_right, irreducibleCharacter_inner_eq_ite]
   by_cases hc : χ₂ = χ₂'
@@ -990,12 +997,13 @@ Hence the `Z`-linear map `μ_j ↦ δ_k ∑_i ω_{ij}^σ` of (4.9)(b) is an isom
 contributes `δ_k·conj(δ_k) = δ_k² = 1`, so `⟨δ_k ∑_i ω_{ij}^σ, δ_k ∑_i ω_{ij'}^σ⟩ = w₁·δ_{jj'}
 = ⟨μ_j, μ_{j'}⟩`. -/
 theorem certainType_omega_sum_isometry (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
-    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Finite ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
     (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     ClassFunction.inner (∑ i, certainTypeOmegaSigma h χ₂ i) (∑ i, certainTypeOmegaSigma h χ₂' i)
       = ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
           (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) := by
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [certainTypeOmegaSigma_sum_inner, columnFamily_mu_sum_inner]
 
 end OddOrder.Peterfalvi.S06

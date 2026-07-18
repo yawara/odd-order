@@ -455,7 +455,7 @@ theorem hcuZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
         = hcuSeedHom (chief := chief) θ h)
     (lam : ↥(cuInHu caseA) →* ℂˣ)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal]
@@ -466,6 +466,7 @@ theorem hcuZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
     (⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
         hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩ :
         IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
+  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   classical
   set ζ : IrreducibleCharacter ↥(huSub data) :=
     ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
@@ -523,7 +524,7 @@ theorem hcuZetaPair_mem_xiOf [Finite G] {M : Subgroup G}
       (c : ↥(huSub data)) ∈ ((uprimeSub data).subgroupOf M).subgroupOf (huSub data) →
       lam c = 1)
     [Fintype ↥(huSub data)]
-    [Fintype ↥(hInHu data ⊔ cuInHu caseA)]
+    [Finite ↥(hInHu data ⊔ cuInHu caseA)]
     [Invertible (Nat.card ↥(huSub data) : ℂ)]
     [Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ)]
     [(hInHu data ⊔ cuInHu caseA).Normal]

@@ -217,11 +217,12 @@ A grid character of a column is orthogonal to every `Y`-member.  Both are irredu
 theorem inner_columnFamily_mu_Yset_eq_zero
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
-    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [NeZero (Nat.card h46.W1)] [Finite ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
     (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
     ClassFunction.inner ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) η = 0 := by
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη
   have hne : ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) ≠ η := by
     intro heq
@@ -366,13 +367,14 @@ Kronecker delta (both irreducible), and positivity forces it to be `1`.  This re
 multiplicity weight with the degree ratio `θ(1) = χθ(1)/|W₁|` of (6.8.2.3). -/
 theorem constituentWeight_eq_apply_one
     {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
-    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)] [Fintype ↥H]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)] [Finite ↥H]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
     {φ : ClassFunction ↥W2 ℂ}
     (hφ' : IsIrreducibleCharacter
       (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
     {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ) :
     (constituentWeight hφ' θ : ℂ) = (θ : ClassFunction ↥H ℂ) 1 := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨lam, hlamirr, _hlam1, hres, _⟩ :=
     θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
   have hspec := constituentWeight_spec hφ' θ
