@@ -1027,4 +1027,63 @@ theorem dvd_relIndex_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P R 
 
 end
 
+/-- **Step 4 の Sylow 結論部**: `P` が `M` の Sylow `p`-部分群で `N_G(P) ≤ M` なら
+`P` は `G` の Sylow `p`-部分群 (指数が `p` と互いに素)。
+
+`P ≤ Q ∈ Syl_p(G)` を取る。`P < Q` なら `Q` は `p`-群 (ゆえ nilpotent) なので正規化条件から
+`N_Q(P) > P`, その元は `N_G(P) ≤ M` に入るので `M` の中に `P` より真に大きい `p`-部分群
+ができ, `dvd_relIndex_of_lt_of_isPGroup` で `p ∣ |M : P|` となって矛盾。 -/
+theorem not_dvd_index_of_normalizer_le {p : ℕ} [Fact p.Prime] [Finite G]
+    {M P : Subgroup G} (hPM : P ≤ M) (hP : IsPGroup p ↥P) (hPidx : ¬ p ∣ P.relIndex M)
+    (hN : Subgroup.normalizer P ≤ M) : ¬ p ∣ P.index := by
+  obtain ⟨Q, hPQ⟩ := hP.exists_le_sylow
+  have hPQeq : P = (Q : Subgroup G) := by
+    by_contra hne
+    have hlt : P < (Q : Subgroup G) := lt_of_le_of_ne hPQ hne
+    haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+    have hsub : P.subgroupOf (Q : Subgroup G) < ⊤ := by
+      rw [lt_top_iff_ne_top]
+      intro h
+      rw [Subgroup.subgroupOf_eq_top] at h
+      exact absurd (lt_of_lt_of_le hlt h) (lt_irrefl P)
+    obtain ⟨x, hxN, hxP⟩ :=
+      SetLike.exists_of_lt (Group.normalizerCondition_of_isNilpotent _ hsub)
+    -- `x` は `G` の中でも `P` を正規化する.
+    have hxG : (x : G) ∈ Subgroup.normalizer P := by
+      rw [Subgroup.mem_normalizer_iff]
+      intro y
+      constructor
+      · intro hy
+        have hyQ : y ∈ (Q : Subgroup G) := hPQ hy
+        have hmem : (⟨y, hyQ⟩ : ↥(Q : Subgroup G)) ∈ P.subgroupOf (Q : Subgroup G) := hy
+        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mp hmem
+        simpa [Subgroup.mem_subgroupOf] using hres
+      · intro hy
+        have hyQ : y ∈ (Q : Subgroup G) := by
+          have h1 : (x : G) * y * (x : G)⁻¹ ∈ (Q : Subgroup G) := hPQ hy
+          have hrw : y = (x : G)⁻¹ * ((x : G) * y * (x : G)⁻¹) * (x : G) := by group
+          rw [hrw]
+          exact mul_mem (mul_mem (inv_mem x.2) h1) x.2
+        have hres := (Subgroup.mem_normalizer_iff.mp hxN ⟨y, hyQ⟩).mpr
+          (by simpa [Subgroup.mem_subgroupOf] using hy)
+        simpa [Subgroup.mem_subgroupOf] using hres
+    -- `R = P ⊔ ⟨x⟩` は `M` の中の `P` より真に大きい `p`-部分群.
+    have hxM : (x : G) ∈ M := hN hxG
+    have hxnotP : (x : G) ∉ P := fun h => hxP h
+    set R : Subgroup G := P ⊔ Subgroup.zpowers (x : G) with hRdef
+    have hRQ : R ≤ (Q : Subgroup G) := sup_le hPQ ((Subgroup.zpowers_le).mpr x.2)
+    have hRM : R ≤ M := sup_le hPM ((Subgroup.zpowers_le).mpr hxM)
+    have hPR : P < R := by
+      refine lt_of_le_of_ne le_sup_left fun heq => hxnotP ?_
+      have : (x : G) ∈ R :=
+        (le_sup_right : Subgroup.zpowers (x : G) ≤ R) (Subgroup.mem_zpowers _)
+      rwa [← heq] at this
+    have hRp : IsPGroup p ↥R := Q.isPGroup'.to_le hRQ
+    have hdvd : p ∣ P.relIndex R := dvd_relIndex_of_lt_of_isPGroup hRp hPR
+    have hchain : P.relIndex R * R.relIndex M = P.relIndex M :=
+      Subgroup.relIndex_mul_relIndex _ _ _ le_sup_left hRM
+    exact hPidx (hchain ▸ Dvd.dvd.mul_right hdvd _)
+  rw [hPQeq]
+  exact Q.not_dvd_index
+
 end OddOrder.Isaacs.Ch09
