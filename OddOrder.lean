@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.ConjClassCardinality
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.CoprimeAbelianPGroup
 import OddOrder.GroupTheory.CoprimeFrobeniusKernel
 import OddOrder.GroupTheory.CriticalSubgroup
@@ -116,6 +117,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.TISubsetCounting
 import OddOrder.GroupTheory.ZGroup

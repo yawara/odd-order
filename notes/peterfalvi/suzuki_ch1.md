@@ -130,7 +130,7 @@
      bijection from `Omega` to the standard projective line. It derives
      `|Omega| - 1 = |F| = 2^n` and transports the existing Isaacs Ch08 PSL simplicity.
    - Shared support is `GroupTheory/PrimeComplementResidual.lean`; issue 9112 is closed.
-9. **Section 3 Lemma 1, Sz(q) target in progress**.
+9. **Section 3 Lemma 1, concrete Sz(q) construction complete; target wiring next**.
    - Shared leaf `GroupTheory/SpecificGroups/Suzuki/Field.lean` constructs the field
      of order `q = 2^(2m+1)` and the Tits twist `theta(x) = x^(2^(m+1))`.
    - The leaf proves the full Frobenius period, `theta^(-1)(x) = x^(2^m)`, and
@@ -158,8 +158,15 @@
      decomposition `B ∪ B w B`, identifies `B` with the infinity stabilizer, and computes
      the exact group order `q^2 * (q^2 + 1) * (q - 1)`.  This construction exists
      for every `m`; the simplicity target below uses `0 < m`, so `q >= 8`.
-   - Next upstream layer: prove simplicity of the concrete Suzuki group and feed the
-     simple target and degree into Lemma 1. After Sz(q), construct the PSU(3,q) target
-     of degree `q^3 + 1`.
+   - Shared `GroupTheory/GroupAction/PerfectQuasiprimitive.lean` proves that a
+     faithful quasiprimitive nontrivial perfect group with a solvable point stabilizer
+     is simple, by mapping the stabilizer onto every nontrivial normal quotient.
+   - `GroupTheory/SpecificGroups/Suzuki/Simplicity.lean` proves torus displacement
+     surjectivity via a fixed-point-free automorphism, places every root, torus, and
+     Weyl generator in the derived subgroup, proves the standard Borel solvable, and
+     concludes `IsSimpleGroup (standardPermGroup m)` for `0 < m`.
+   - Next upstream layer: package this concrete simple group and the proved degree
+     `q^2 + 1` as the Sz(q) input to Lemma 1. After Sz(q), construct the PSU(3,q)
+     target of degree `q^3 + 1`.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

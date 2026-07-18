@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Field
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup
@@ -18,6 +19,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
@@ -424,6 +426,10 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.Suzuki.Ovoid.weylPerm_symm
 
+-- A perfect quasiprimitive group with a solvable point stabilizer is simple.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isSimpleGroup_of_isPerfect_of_isQuasiPreprimitive_of_isSolvable_stabilizer
+
 -- The generated Suzuki permutation group and its doubly transitive action.
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardGeneratorSet
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup
@@ -484,6 +490,19 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBruhatDecomposition
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_eq_infinityStabilizer
 #assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.natCard_standardPermGroup
+
+-- Perfectness, solvable Borel stabilizer, and simplicity of the standard Suzuki group.
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusWeight_eq_one_iff
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_fixedPointFree
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusScale_mul_inv_surjective
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.commutator_torusHom_rootHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.commutator_weylElement_torusHom
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.torusHom_mem_commutator
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.rootHom_mem_commutator
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.weylElement_mem_commutator
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardBorel_isSolvable
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.commutator_standardPermGroup_eq_top
+#assert_only_allowed_axioms OddOrder.GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isSimpleGroup
 
 -- Ch.1 (Sylow Theory): Thm 1.41 Chermak-Delgado main theorem
 -- ∃ characteristic abelian N, |G:N| ≤ |G:A|² ∀ abelian A
