@@ -103,6 +103,21 @@ if ! [[ "$current" =~ ^[0-9]+$ ]]; then
   exit 1
 fi
 
+# SEQUENCE は「ブランチごとに存在するただのカウンタ」なので単独では信用しない:
+#   (a) レーン worktree ごとに複製が増分される共有レンジ (9000) で同番号が同時に出る
+#   (b) レーン再作成やマージ解決でカウンタが過去値へ巻き戻る (実害: 1036-1038, 9125/9132/9133)
+# ⟹ 実在する issue ファイルの最大番号も走査し, 大きい方を採用する (hub 裁定 2026-07-18).
+max_file=0
+for d in "$ISSUES_DIR" "$ISSUES_DIR/pending" "$ISSUES_DIR/closed"; do
+  [[ -d "$d" ]] || continue
+  for f in "$d"/[0-9][0-9][0-9][0-9]-*.md; do
+    [[ -e "$f" ]] || continue
+    n=$(basename "$f"); n="${n%%-*}"; n=$((10#$n))
+    if (( n >= base && n < RANGE_END && n > max_file )); then max_file=$n; fi
+  done
+done
+if (( max_file > current )); then current=$max_file; fi
+
 next=$((current + 1))
 
 # レンジ使い切りチェック
@@ -123,6 +138,16 @@ if [[ -e "$filepath" ]] \
   echo "Error: $filename はすでに存在" >&2
   exit 1
 fi
+
+# 番号のみの衝突も弾く (slug が違えば通ってしまう穴を塞ぐ; 上の max 走査の保険)
+for d in "$ISSUES_DIR" "$ISSUES_DIR/pending" "$ISSUES_DIR/closed"; do
+  for f in "$d/${padded}-"*.md; do
+    [[ -e "$f" ]] || continue
+    echo "Error: 番号 $padded は既に使用済: $f" >&2
+    echo "       SEQUENCE.$base が巻き戻っているか, 共有レンジで他レーンと衝突した可能性." >&2
+    exit 1
+  done
+done
 
 # YAML frontmatter 用に title をダブルクォート文字列としてエスケープ
 title_yaml=$(printf '%s' "$title" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')

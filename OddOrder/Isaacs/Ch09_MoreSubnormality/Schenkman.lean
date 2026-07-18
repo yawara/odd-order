@@ -520,7 +520,7 @@ private theorem schenkman_aux (n : ℕ) :
 `C_G(S^∞) ≤ S^∞`.
 
 ⚠ 仮説は原典どおり **subnormal**. `references/isaacs/*.mmd` は `⊲⊲` を `⊲` に潰すので
-mmd を典拠にすると normal 版に見える (PDF p. 283 で確認済; issue 1037 / 9133). -/
+mmd を典拠にすると normal 版に見える (PDF p. 283 で確認済; issue 1037 / 9150). -/
 theorem centralizer_nilpotentResidual_le_of_isSubnormal [Finite G] {S : Subgroup G}
     (hS : S.IsSubnormal) (hCS : Subgroup.centralizer (S : Set G) = ⊥) :
     Subgroup.centralizer (↑(nilpotentResidual S) : Set G) ≤ nilpotentResidual S :=
