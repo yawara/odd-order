@@ -529,20 +529,6 @@ theorem normal_le_of_complement_prime_of_inf_eq_bot
 `Subgroup.IsElementaryAbelian` (subgroup form) の双方を利用可能. -/
 
 open scoped commutatorElement in
-/-- `⁅H, H⁆ < H` (`H ≠ ⊥`) — mathlib `IsSolvable.commutator_lt_of_ne_bot` の一般化.
-
-mathlib 版は**環境** `[IsSolvable G]` を要求するが, 証明が実際に使うのは `↥H` の
-可解性だけ (`↥H` 内で `commutator_lt_top_of_nontrivial` を当てて `H.subtype` で押す).
-Isaacs 3.11 は「`M` が可解な minimal normal」であって環境の可解性は仮定しないので,
-この形が要る. -/
-theorem commutator_lt_of_ne_bot_of_isSolvable_coe {G : Type*} [Group G] {H : Subgroup G}
-    [IsSolvable ↥H] (hH : H ≠ ⊥) : ⁅H, H⁆ < H := by
-  rw [← Subgroup.nontrivial_iff_ne_bot] at hH
-  rw [← H.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
-    Subgroup.map_subtype_lt_map_subtype]
-  exact IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H)
-
-open scoped commutatorElement in
 /-- **Isaacs Thm 3.11 の前半** (書籍 p. 80): `M` が可解な minimal normal subgroup なら abelian.
 
 ⚠ 環境 `G` の可解性も有限性も**不要** — 書籍どおり `M` の可解性のみを仮定する
@@ -551,7 +537,7 @@ mathlib instance `subgroup_solvable_of_solvable` が `IsSolvable ↥M` を供給
 `[IsSolvable G]` 側の呼び出しはそのまま通る.
 
 証明: `M ≠ ⊥` (minimal normal) と `M` 可解で `⁅M, M⁆ < M`
-(`commutator_lt_of_ne_bot_of_isSolvable_coe`). `⁅M, M⁆ ⊴ G` (commutator of normals).
+(`Ch04.commutator_lt_self_of_isSolvable_subtype`). `⁅M, M⁆ ⊴ G` (commutator of normals).
 M の minimality で `⁅M, M⁆ = ⊥`, よって M abelian. -/
 theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G]
     {M : Subgroup G} [IsSolvable ↥M] (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
@@ -559,7 +545,9 @@ theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G]
   haveI hMnormal : M.Normal := hM.1
   have hM_ne_bot : M ≠ ⊥ := hM.2.1
   -- ⁅M, M⁆ < M (M solvable, M ≠ ⊥).
-  have hcomm_lt : ⁅M, M⁆ < M := commutator_lt_of_ne_bot_of_isSolvable_coe hM_ne_bot
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  have hcomm_lt : ⁅M, M⁆ < M :=
+    OddOrder.Isaacs.Ch04.commutator_lt_self_of_isSolvable_subtype M
   -- ⁅M, M⁆ ⊴ G (commutator of normals: mathlib auto-instance).
   have hCommNormal : (⁅M, M⁆ : Subgroup G).Normal := inferInstance
   -- By minimality of M, ⁅M, M⁆ = ⊥ or = M. Strict < rules out =.
