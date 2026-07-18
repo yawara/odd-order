@@ -134,8 +134,38 @@ proof 後段の `O^p(U^k) = X^k` に必要)、`normalizer_le_normalizer_pResidua
       - F(H)>1 (or F(K)): O_p(H)=P>1, 9.27 で P normalizes O^p(V)=Y, cores で
         P ⊆ O_p(H)=O_p(K), H=N_G(P)=K 矛盾。
       使用: F*/9.8 (C_G(F*)⊆F*), 9.18, 9.25, 9.27, `core`, `O_p` (repo `opPi`), N_G。
-- [ ] **Theorem 9.23** (Thompson corefree bound): 9.24 の系。corefree maximal H,
-      K=H^g, a=b=m で `|H:O_p(H)| ≤ ((m!)²)!`。index bounds は 9.14 (n!-thm) 経由。
+- [ ] **Theorem 9.23** (Thompson corefree bound) — 進行中 (2026-07-18)。
+
+  **landed**:
+  - strand B (setup) 完了: `isCoatom_map_conj` / `normalizer_eq_self_of_corefree_maximal` /
+    `noNormalInSupergroup_of_corefree_maximal` (H≠K 不要の一般形) /
+    `map_conj_ne_of_corefree_maximal` (`H^g ≠ H`)。
+  - n!-定理の相対形: `relCore_relIndex_dvd_factorial` (`|H:core_H(D)| ∣ |H:D|!`)、
+    不等式形 `relCore_relIndex_le_factorial`、
+    `relCore_relIndex_le_factorial_pred` (`|D:core_H(D)| ≤ (|H:D|-1)!`)。
+
+  **残り (strand A の index 連鎖)** — 使う mathlib 補題は調査済み:
+  - `Subgroup.relIndex_mul_relIndex (H K L) (hHK) (hKL) : H.relIndex K * K.relIndex L
+    = H.relIndex L` (⚠ 部分群 3 つが**明示引数**、`_ _ _` が要る)
+  - `Subgroup.relIndex_inf_le : (H ⊓ K).relIndex L ≤ H.relIndex L * K.relIndex L`
+  - `Subgroup.relIndex_dvd_of_le_left (hHK : H ≤ K) : K.relIndex L ∣ H.relIndex L`
+    (→ `U ≤ O_p(H)` から `|H:O_p(H)| ∣ |H:U|`、`Nat.le_of_dvd` で不等式へ)
+  - relIndex ≠ 0 は `Subgroup.index_ne_zero_of_finite` ∘ `index_eq_zero_of_relIndex_eq_zero`
+  - `Nat.factorial_le` (単調性)
+
+  手順: `|D:E| ≤ |D:M|·|D:N| ≤ (a-1)!(b-1)!` (relIndex_inf_le) →
+  `|H:E| = |D:E|·|H:D| ≤ (a-1)!(b-1)!·a = a!(b-1)! ≤ a!b!` →
+  `|H:U| ≤ (|H:E|)! ≤ (a!b!)!` (n!-定理 + factorial 単調) →
+  `U` が p-群 + `U ◁ H` ⇒ `U ≤ O_p(H)`
+  (`GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup`; `IsPGroup → IsPiSubgroup {p}`
+  の橋渡しが要るか要確認) ⇒ `|H:O_p(H)| ≤ (a!b!)!`。
+
+  **a = b = m の根拠**: `|K:D| = |H^g|/|D| = |H|/|D| = |H:D|` (共役ゆえ `|H^g| = |H|`)。
+  よって bound は `(m!·m!)! = ((m!)²)!`。
+
+  最後に `thompsonWielandt` + strand B を合成。`H = ⊥` の場合は
+  `|H:O_p(H)| = 1` で自明に成立するので先に場合分けする
+  (`normalizer_eq_self_of_corefree_maximal` が `H ≠ ⊥` を要求するため)。
 
 ## 完了条件
 
