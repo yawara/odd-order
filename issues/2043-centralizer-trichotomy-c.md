@@ -24,7 +24,7 @@ Peterfalvi Part II, Ch. I §3 Proposition 1(c) (pp. 105–106) を原文強度�
 - [x] `Q₁` を `Q` の正規 `2`-補群として実構成し、任意の `S : Sylow 2 Q` に対する
       complement、characteristic、odd order、`S × Q₁ ≃* Q` を証明する
       (`SylowDecomposition.lean`)。
-- [ ] Lemma 1/induction から `C_Q(X)` が `2`-group と分かったとき
+- [x] Lemma 1/induction から `C_Q(X)` が `2`-group と分かったとき
       `C_{Q₁}(X)=1` を導く exact bridge を証明する。
 - [ ] 分類非依存の構造核
       `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)` を原文どおり証明する。

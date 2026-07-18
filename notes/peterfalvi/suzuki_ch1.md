@@ -263,7 +263,14 @@
      `N_K(X) ≤ C_G(X)` and the final endpoint is
      `N_G(X) = C_G(X) N_V(X)`.
    - The source assumption `1 ≠ X` is not needed for part (b).
-   - **Next frontier:** §3 Prop 1(c), beginning with the induction quotient
-     `F = O^{2′}(C_G(X))` and the three target cases.
+12. 🔄 **§3 Prop 1(c) in progress** — new leaf `CentralizerResidual.lean`.
+   - ✅ The standing factor `Q₁` is the actual normal `2`-complement from
+     `SylowDecomposition.lean`, not an added hypothesis.
+   - ✅ `Q1_inf_centralizer_eq_bot_of_isPGroup`: if `C_Q(X)` is a
+     `2`-group, its intersection with the odd-order `Q₁` is trivial,
+     giving the source clause `C_{Q₁}(X)=1`.
+   - **Next frontier:** prove the classification-independent source identity
+     `𝒩(L) ∩ ⟨C_Q(X)^L⟩ = Z(⟨C_Q(X)^L⟩)`, then identify the normal closure
+     with `F = O^{2′}(C_G(X))` through the induction quotient.
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
