@@ -7,6 +7,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
 import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Isaacs Ch. 9 — §9C: Thompson–Wielandt (Theorems 9.23/9.24), p. 283–284
@@ -475,6 +476,67 @@ theorem relCore_eq_bot_or_of_fitting_eq_bot [Finite G]
     exact le_normalizer_map_subtype_of_normal (inferInstance : (layer ↥K).Normal)
   exact hHK ((normalizer_eq_left_of_noNormal hyp hLne hEH hHn).symm.trans
     (normalizer_eq_right_of_noNormal hyp hLne hEH hKn))
+
+end
+
+section /- 9C: Theorem 9.24 本体 -/
+
+variable (H K : Subgroup G)
+
+/-- `F(H) ≠ 1` ならばある素数 `p` で `O_p(H) ≠ 1`
+(`F = ⨆_{p ∈ pf} O_p` ゆえ, すべての `O_p` が自明なら `F` も自明). -/
+theorem exists_prime_opiCoreInG_ne_bot [Finite G] {H : Subgroup G}
+    (hF : Ch01.fitting ↥H ≠ ⊥) :
+    ∃ p : ℕ, p.Prime ∧ GroupTheory.opiCoreInG ({p} : Set ℕ) H ≠ ⊥ := by
+  by_contra hcon
+  push_neg at hcon
+  refine hF ?_
+  rw [Ch01.fitting_eq_iSup_primeFactors]
+  refine iSup_eq_bot.mpr fun p => ?_
+  haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+  have h := hcon (p : ℕ) (Nat.prime_of_mem_primeFactors p.2)
+  rw [GroupTheory.opiCoreInG, Subgroup.map_eq_bot_iff_of_injective _ H.subtype_injective] at h
+  rwa [← Ch04.oPiCore_singleton_eq_opCore]
+
+/-- **Isaacs Theorem 9.24** (Thompson–Wielandt の一般形; p. 283).
+
+相異なる部分群 `H`, `K` について `D = H ⊓ K` とし,「`D` の非自明部分群は `H` または `K` を
+真に含むどの部分群にも normal でない」(`NoNormalInSupergroup`) を仮定する.
+`E = core_H(D) ⊓ core_K(D)` (`thompsonWielandtCore`), `U = core_H(E)`, `V = core_K(E)`
+とおくと, **ある素数 `p` で `U` または `V` が `p`-群**.
+
+証明は書籍 p. 284 の 2 ケース:
+* `F(H) = F(K) = 1` (`relCore_eq_bot_or_of_fitting_eq_bot`): `U` または `V` が自明.
+* さもなくば (対称性より `F(H) > 1` として) ある `p` で `O_p(H) > 1`
+  (`pResidualOf_relCore_eq_bot_or`): `O^p(U) = 1` または `O^p(V) = 1`, すなわち
+  `U` または `V` が `p`-群. -/
+theorem thompsonWielandt [Finite G] (hHK : H ≠ K)
+    (hyp : NoNormalInSupergroup H K (H ⊓ K)) :
+    ∃ p : ℕ, p.Prime ∧
+      (IsPGroup p ↥(relCore H (thompsonWielandtCore H K)) ∨
+        IsPGroup p ↥(relCore K (thompsonWielandtCore H K))) := by
+  by_cases hFH : Ch01.fitting ↥H = ⊥
+  · by_cases hFK : Ch01.fitting ↥K = ⊥
+    · -- Case 1: `F(H) = F(K) = 1` — `U` か `V` が自明 (任意の素数で `p`-群)
+      refine ⟨2, Nat.prime_two, ?_⟩
+      rcases relCore_eq_bot_or_of_fitting_eq_bot H K hHK hyp hFH hFK with h | h
+      · exact Or.inl (by rw [h]; exact IsPGroup.of_bot)
+      · exact Or.inr (by rw [h]; exact IsPGroup.of_bot)
+    · -- Case 2 (`F(K) > 1`): `H`, `K` を入れ替えて適用
+      obtain ⟨p, hp, hPK⟩ := exists_prime_opiCoreInG_ne_bot hFK
+      haveI : Fact p.Prime := ⟨hp⟩
+      have hyp' : NoNormalInSupergroup K H (K ⊓ H) := by rw [inf_comm]; exact hyp.symm
+      rcases pResidualOf_relCore_eq_bot_or K H (Ne.symm hHK) hyp' hPK with h | h
+      · exact ⟨p, hp, Or.inr (by
+          rw [thompsonWielandtCore_comm H K]; exact (pResidualOf_eq_bot_iff_isPGroup _).mp h)⟩
+      · exact ⟨p, hp, Or.inl (by
+          rw [thompsonWielandtCore_comm H K]; exact (pResidualOf_eq_bot_iff_isPGroup _).mp h)⟩
+  · -- Case 2 (`F(H) > 1`)
+    obtain ⟨p, hp, hPH⟩ := exists_prime_opiCoreInG_ne_bot hFH
+    haveI : Fact p.Prime := ⟨hp⟩
+    rcases pResidualOf_relCore_eq_bot_or H K hHK hyp hPH with h | h
+    · exact ⟨p, hp, Or.inl ((pResidualOf_eq_bot_iff_isPGroup _).mp h)⟩
+    · exact ⟨p, hp, Or.inr ((pResidualOf_eq_bot_iff_isPGroup _).mp h)⟩
 
 end
 
