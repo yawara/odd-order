@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S16_NonExistenceG
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.GroupTheory.PrimeOrderSubgroups
+import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
 
 /-!
 # Peterfalvi Appendix B: A Special Case of a Theorem of Huppert
@@ -1016,22 +1017,6 @@ end Maschke
 section Proposition1
 
 variable {D E : Type*} [Group D] [Group E]
-
-/-- **Peterfalvi Appendix B, Proposition 1 — irreducibility from transitivity**: a group
-acting transitively on `E^#` acts irreducibly, i.e. every `D`-invariant subgroup of `E` is
-`⊥` or `⊤`.  (`E ⋊ D` then acts doubly transitively on `E`, p. 135.) -/
-theorem isAInvariant_eq_bot_or_top_of_transitive
-    (φ : D →* MulAut E)
-    (htrans : ∀ a b : E, a ≠ 1 → b ≠ 1 → ∃ g : D, (φ g) a = b)
-    {U : Subgroup E} (hU : IsAInvariant φ U) : U = ⊥ ∨ U = ⊤ := by
-  rcases eq_or_ne U ⊥ with h | h
-  · exact Or.inl h
-  · refine Or.inr (eq_top_iff.mpr fun b _ => ?_)
-    rcases eq_or_ne b 1 with rfl | hb1
-    · exact one_mem U
-    · obtain ⟨a, haU, ha1⟩ := (Subgroup.bot_or_exists_ne_one U).resolve_left h
-      obtain ⟨g, hg⟩ := htrans a b ha1 hb1
-      exact hg ▸ hU.smul_mem g haU
 
 /-- **Peterfalvi Appendix B, Proposition 1 — no normal `q`-subgroup**: a faithful irreducible
 action of `D` on the elementary abelian `q`-group `E` admits no nontrivial normal `q`-subgroup.
