@@ -18,6 +18,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanKernel
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanImageOrder
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanFinalCase
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanLowerCentralGraded
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanLowerCentralSpectrum
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterHomocyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
