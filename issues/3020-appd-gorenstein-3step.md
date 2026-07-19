@@ -1,7 +1,7 @@
 ---
 id: 3020
 slug: appd-gorenstein-3step
-title: "BG App.D D.1/D.2 の唯一のブロッカー = Gorenstein §14.1 (3-step 群 + Cor 14.1.6)"
+title: "BG App.D D.1/D.2 のブロッカー = Gorenstein §14.1 (3-step 群 + Cor 14.1.6) — 2026-07-19 に大幅縮小"
 created: 2026-07-18
 ---
 
@@ -25,7 +25,21 @@ created: 2026-07-18
 (構成要素は D.1 + D.2 + Gorenstein Thm 14.2.2 で、honest 化後は無内容な wrapper。no-wrapper 方針違反)
 は**削除**。sorry 3 → 2 (D.1/D.2 のみ)、opaque フィールド 0、build green。下流 consumer は無し。
 
-## 残: D.1 の証明に必要な Gorenstein §14.1 (repo に不在)
+## ⚠ 2026-07-19 更新 — 「repo に不在」は解消済み (issue 9133)
+
+**以下の「不在」記述は 2026-07-18 時点のもので、もう正しくない。**
+Gorenstein §14.1 (手元の版では Ch.12 §1) は `OddOrder/GroupTheory/CNGroupStructure.lean` で構築中:
+
+- **3-step 群の定義** `IsThreeStepGroup` — 逐語で形式化済。D.1 が実際に消費する 2 帰結
+  (`oPiCore_pPrime_eq_bot` / `isPGroup_quotient` + `nontrivial_quotient`) は **sorry-free**。
+- **Cor 14.1.6** = `oPiCore_isSylow_or_isThreeStepGroup` — **Thm 1.5 から sorry-free で導出済**。
+- 残 sorry は **Thm 1.5 本体のみ** (`solvableCN_nilpotent_or_frobenius_or_threeStep`)。
+  その step 1 / 2 / 3 は証明済で、残るのは「`A` の冪零性」と最終組み立て。
+
+⟹ D.1 のブロッカーは「Gorenstein §14.1 全体」から **「Thm 1.5 の組み立て」**に縮小した。
+最新の step 単位の状態は **issue 9133** が正本。
+
+## 残: D.1 の証明に必要な Gorenstein §14.1 (⚠ 以下 2026-07-18 時点の記述、上記で更新済)
 
 D.1 の証明 (mmd L5155-5178) が要するもの:
 
@@ -86,4 +100,6 @@ D.1 → D.2 を book strength・sorry-free・axiom-clean で証明。AppD の so
 ## 参照
 - `OddOrder/BG/AppD_CNGroups.lean` (de-opacify 済)、mmd L5132-5199 (App.D)。
 - Gorenstein `references/gorenstein/finite-groups.{pdf,mmd}` Ch.14 §14.1。
-- [[bg-gorenstein-reread-as-isaacs]] (まず Isaacs/repo/mathlib を grep — 今回は 3-step 群が真に不在)。
+- [[bg-gorenstein-reread-as-isaacs]] (まず Isaacs/repo/mathlib を grep)。⚠ なお 9133 の実測で、
+  当初「不在」とした前提のうち 3 件は誤りだった (Thm 5.3.5 / `C_G(F)≤F` の配置 / Thm 10.3.1(v))。
+- issue 9133 (CN 3-step dichotomy) — **本 issue の残作業の正本**。

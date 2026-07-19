@@ -603,6 +603,14 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ### BG App.D — BG App.D CN-Groups of Odd Order
 
+> **⚠ 2026-07-19 訂正 (lane c, issue 9133)**: 下記散文の「the one genuinely missing mathematical
+> input is Gorenstein §14.1 solvable-CN structure theory (Cor 14.1.6, 3-step groups), **absent
+> from the entire repo**」は**もう正しくない**。`OddOrder/GroupTheory/CNGroupStructure.lean` に
+> 3-step 群の定義 + Cor 1.6 (Thm 1.5 から sorry-free で導出) が在る。残 sorry は Thm 1.5 本体のみ
+> (step 1/2/3 は証明済)。また同 issue の実測で、当初「不在」とされた前提のうち **3 件が誤り**
+> だった (Gorenstein Thm 5.3.5 は repo に在り証明も使わない / `C_G(F)≤F` は配置問題 /
+> Thm 10.3.1(v) は Isaacs Thm 6.9 の対偶として repo に在る)。最新は issue 9133 / 3020 が正本。
+
 > **⚠ 2026-07-18 更新 (lane c)**: opaque-Prop scaffold を de-opacify し、**偽だった 2 文を修正**。
 > 旧 `MinimalSimpleCNHypothesis` は minimal-simplicity/nonsolvability を自由 `Prop`+`_holds` で持ち
 > 任意の奇数位数 CN 群で充足可能だったため、D.1/D.2 は「全奇数位数 CN 群」の主張になり **両方偽**
