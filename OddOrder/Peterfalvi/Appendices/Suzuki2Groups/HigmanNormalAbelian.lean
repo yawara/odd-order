@@ -29,7 +29,7 @@ open scoped commutatorElement
 /-- A nontrivial invariant subgroup of a finite `2`-group contains every
 involution when the actor is transitive on involutions.  This is the
 observation used in Higman's proof of Lemma 2. -/
-private theorem involutions_subset_of_nontrivial_invariant
+theorem involutions_subset_of_nontrivial_invariant
     {P : Type*} [Group P] [Finite P]
     (hP : IsPGroup 2 P) (X : Subgroup (MulAut P))
     (htrans : ∀ x ∈ involutions P, ∀ y ∈ involutions P,

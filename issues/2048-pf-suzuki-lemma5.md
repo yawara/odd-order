@@ -42,7 +42,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         `Agemo Z(Q) 2 1 = ⊥` と正確に同値化する
   - [x] Higman Lemma 2 (p. 83): 非自明 normal abelian `K`-subgroup `A` と
         `u ∉ A` に対する `u² ∈ A²` と `[u,A] ≤ A⁴` の同時成立を排除する
-  - [ ] Higman Lemma 3 (pp. 83--84): normal invariant subgroup `C` が `A` を
+  - [x] Higman Lemma 3 (pp. 83--84): normal invariant subgroup `C` が `A` を
         cover し `Φ(C) = Φ(A)` なら `exp(A) ≤ 4` を証明する
     - [x] normal actor-invariant subgroup の subtype 上で honest な cover を定義し、
           `Φ(C) ≤ A` と原文 p. 83 の `Φ(C) = A ∨ Φ(C) = Φ(A)` を証明する
@@ -61,9 +61,26 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
     - [x] Lemma 2 により `ker ν̄ = A` を示す
     - [x] `0`/`1` dichotomy と第一同型定理から像の位数 `2`、
           従って `C/A` の位数 `2` を証明する
-    - [ ] 原文 p. 84 の二場合分けを接続して `exp(A) ≤ 4` を結論する
+    - [x] 原文 p. 84 の二場合分けを接続し、
+          `NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq` として
+          `∀ a : A, a ^ 4 = 1` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
+    - [x] 原文の `Lᵢ = Hᵢ / (Hᵢ² Hᵢ₊₁)` を actual lower-central quotient として
+          構成し、ambient denominator、elementary-abelian 性、標準 `F₂`-module、
+          誘導作用・表現を `HigmanLowerCentralGraded` に実装する
+    - [x] commutator から alternating・作用同変な `L₁ × L₁ → L₂` を構成し、
+          その値が `L₂` を span することを証明する
+      - [x] 二重の `QuotientGroup.lift` で代表元公式を持つ commutator pairing を構成する
+      - [x] `ZMod 2`-双線形化と degree-2 alternating linearization を構成する
+      - [x] commutator closure から pairing の値の span が `L₂` に等しいことを証明する
+      - [x] 誘導自己同型作用に関する commutator pairing の equivariance を証明する
+    - [ ] 非零 `L₂` 上の推移性から Higman Lemma 4 と直後の scalar-extension
+          corollary を証明する
+      - [ ] Singer finite field への base change と Frobenius eigenbasis
+            `λ^(2^i)` を構成する
+      - [ ] bracket weights `λ^(2^i+2^j)` と full span を接続し、
+            `L₁ ≃ L₂` から primitive-root contradiction を導く
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
@@ -93,6 +110,13 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`
 - `references/higman/suzuki-2-groups.pdftotext.txt`
 - `references/higman/p83_84_lemmas_1_3.layout.txt`
+- `references/higman/p84_85_lemmas_3_6.layout.txt`
+- `references/higman/p85_lemmas_4_6.raw.txt`
+- `references/higman/pages/suzuki-2-groups-p085.png`
+- `references/higman/p86_87_lemmas_6_10.layout.txt`
+- `references/higman/p86_87_lemmas_6_10.raw.txt`
+- `references/higman/pages/suzuki-2-groups-p086.png`
+- `references/higman/pages/suzuki-2-groups-p087.png`
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
