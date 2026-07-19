@@ -27,6 +27,18 @@
 > c の queue は BG に十分残る: issue 0126 (Thm A(6))、9132 (Hall collecting process =
 > App.E 全体の unlock)、9133 (CN 3-step = App.D の unlock)、App.D/E の実 sorry 11 件。
 
+> **🔢 2026-07-19 hub 裁定 (issue 0130): shared-infra claim をレーン別サブバンドへ — 共有 `SEQUENCE.9000` 凍結**。
+> 2026-07-18 の補強 (`max(SEQUENCE, 実在ファイル最大)+1`) は「main 取り込み済みなら解消する」を前提に
+> していたが、**同日 20 時台に 2 度衝突**して前提が成り立たないことが実証された:
+> **(i) 9163** — b (codex 駆動) が main から 23 commits 遅れた stale checkout で採番 (a の
+> `typepa-mssharp-rescope` と衝突)。**(ii) 9164** — b が (i) を自己検出して 9164 へ改番した直後、
+> a も main 取り込み済みの状態から次番号 9164 (`dedup-ringaut-algaut-bridge`) を引いて**再衝突**。
+> ⟹ 未マージ期間が存在する限り共有カウンタは原理的に衝突する。
+> ⟹ **claim も自レーン専用バンドから採る**: **9200=a / 9300=b / 9400=c / 9500=hub** (幅 100)。
+> `bin/new-issue` を 100 の倍数 base 対応に修正済 (1000 の倍数 → 幅 1000、それ以外 → 幅 100)。
+> 9000-9199 は歴史的レンジとして凍結 (改番しない)。**「9xxx = shared claim」の grep 規約は不変**。
+> hub の tick 検査 (`ls issues/*.md | ... | uniq -d`) は従来どおり残す (保険)。
+>
 > **📏 2026-07-19 hub 指摘 (issue 9160、lane b 宛、優先度 低)**: b の新設 leaf 32 本の
 > **中央値 177 行・平均 246 行** (c は 497/647) で、23 本が CLAUDE.md の目安 300 行を下回る。
 > 特に `Higman*` 系 9-10 本は issue 2048 (Suzuki Lemma 5) という**単一の目標への部品**で、
