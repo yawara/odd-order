@@ -1,4 +1,5 @@
 import OddOrder.Algebra.AugmentationIdeal
+import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.FiniteIndexAnnihilator
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.GroupTheory.AInvariantComplement
