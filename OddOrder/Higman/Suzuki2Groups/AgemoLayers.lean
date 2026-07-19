@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.Homocyclic
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Basic
+import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
 /-!
 # Higman Lemma 1: successive Agemo layers
@@ -23,7 +23,9 @@ the power mappings are linear and all these quotients are irreducible.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -126,4 +128,4 @@ theorem agemoSuccQuotientAction_transitive_on_nonidentity
   apply Subtype.ext
   exact hg
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

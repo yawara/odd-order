@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Order.Atoms.Finite
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 
@@ -21,7 +21,7 @@ honestly and proves the cover--Frattini paragraph on p. 83.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -201,4 +201,4 @@ theorem ambientFrattini_right_eq_left_or_leftFrattini
 
 end NormalInvariantCover
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

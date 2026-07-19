@@ -69,6 +69,14 @@ CLAUDE.md「ファイル粒度」の目安は **1 ファイル ≈ 300–1,500 �
   Lemma 5 に向けて動いている今の状態は、その推奨形とも読める。
 - ⟹ **問題になるのは「Lemma 5 が締まった後もこの粒度で凍結すること」**。
 
+## 2026-07-19 provenance module 分離
+
+ユーザー裁定により、既存18 filesを増殖させず移設した: source-neutral `Basic` は
+`OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/`、Higman 原典側17 leavesは
+`OddOrder/Higman/Suzuki2Groups/`。Peterfalvi 固有6 leavesは旧 Appendix III 配下に残した。
+今回の path/namespace 移設は新たな micro-leaf 分割ではなく、統合triggerも従来どおり
+issue 2048 完了時とする。
+
 ## やること (Lemma 5 = issue 2048 が締まった時点で)
 
 - [ ] `Higman*` 系の leaf を**トピック単位で統合**する。目安は 1 ファイル 300–1,500 行。

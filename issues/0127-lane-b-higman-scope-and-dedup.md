@@ -1,12 +1,12 @@
 ---
 id: 127
 slug: lane-b-higman-scope-and-dedup
-title: "HUB: lane b の Higman プログラム — 方針判断 (保留) + 審査で確定した重複 2 件・空 scaffold 4 件"
+title: "HUB: lane b の Higman プログラム — 方針確定 + 審査で確定した重複 2 件・空 scaffold 4 件"
 created: 2026-07-19
-owner: hub (①② 実施) / ユーザー裁定待ち (③)
+owner: hub (①② 実施) / lane b (③ Higman 完遂)
 ---
 
-# lane b の Higman プログラム — 審査結果と保留中の方針判断
+# lane b の Higman プログラム — 審査結果と確定方針
 
 2026-07-19 の hub tick で lane b の新規 1905 行 (`HigmanLowerCentralGraded.lean` 982 /
 `HigmanFinalCase.lean` 894) を 4 観点で審査した (honesty / 教科書強度 / 重複 / 粒度、
@@ -62,38 +62,41 @@ grep でも**どの leaf も cite していない**ことを確認済 ⟹ 不健
 
 - [ ] issue 2048 / 9160 の統合時に削除する (今すぐ消すと b の active frontier と衝突するため保留)
 
-## ③ ⏸ 保留中の方針判断 — **ユーザー裁定待ち**
+## ③ ✅ 2026-07-19 ユーザー裁定: Higman を完遂
 
-**論点**: Peterfalvi は Higman の定理を「it is proved in [Hi]」と**引用しているだけ**で、本文に証明が無い。
-CLAUDE.md は「文献引用のみで本文に証明が無い結果・open problem は**恒久対象外にせず低優先繰延**」と
-定めている。lane b は現在この Higman の Lemma 1-12 プログラム (実質**4 冊目の原典**) に全能力を投じ、
-既に ~24 leaf。一方 3 冊本体には ~90 項目が残っている。
+ユーザーは「higmanの証明を進めましょう」と裁定した。したがって lane b は再配分せず、
+Higman Lemmas 1--13 と分類終端を原文順に完遂する。上記の hub 再配分案は判断履歴として
+残すが、本裁定により superseded。
 
-⟹ 規約に照らすと **b は「低優先繰延」対象を最優先で回している**状態。
+同時に文献 provenance を明示する三層境界を確定した。
 
-| 選択肢 | 内容 |
-|---|---|
-| **継続** | b はこのまま Higman を完遂。仕事の質は審査済みで本物、教科書原文とも照合済み |
-| **再配分** | b を 3 冊本体の残項目へ移し、Higman は現状凍結して繰延 |
+- source-neutral な `IsSuzuki2Group` 等は `OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/**`
+- Higman 原典の証明は `OddOrder/Higman/Suzuki2Groups/**`
+- Peterfalvi Appendix III の再掲・Lemma 5 適用は
+  `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/**`
 
-**hub の見立て**: 規約に従えば**再配分が筋**。ただし (i) b の 24 leaf は sorry-free の実証明で
-捨てるのではなく凍結・後日再開になる、(ii) Peterfalvi Appendix III を honest に閉じるには
-(axiom 禁止ゆえ) 結局いつか必要になる — の 2 点で判断が割れうるため、レーン 1 本の方向を
-変える決定として保留し、ユーザーに提示した (2026-07-19)。**未回答**。
-
-⚠ b は 2026-07-19 に 4 回セッション停止している (自作業 commit が 11:34 → 12:37 → 13:19 → 14:19
-で以後途絶)。**再開前に本項を決めるのが効率的** — 再配分なら Higman の途中から復帰させる意味が無い。
+分類定理の薄い Peterfalvi wrapper は作らず、完成後は Higman の主定理を直接利用する。
 
 ## ④ 粒度 (参考、action なし)
 
-Higman* が 10 → **14 ファイル**。[issue 9160](9160-lane-b-leaf-granularity.md) の統合対象が **39% 増**。
+`Higman*` は名称上 **15 ファイル** (原典側14 + Peterfalvi adapter `HigmanDE` 1)。[issue 9160](9160-lane-b-leaf-granularity.md) の統合対象が **39% 増**。
 新規 2 leaf 自体は 982 / 894 行で 300-1500 の帯に収まり規約準拠。9160 自身が統合を issue 2048 の
 完了時まで繰延しているので違反ではないが、「放置すれば解決」ではないことを記録しておく。
 
 ## 完了条件
 
-① の重複 2 件が解消し full build green、② が 2048/9160 統合時に削除され、③ が裁定される。
+① の重複 2 件が解消し full build green、② が 2048/9160 統合時に削除される。③ は裁定済み。
 
 ## 参照
 - issue 2048 (Suzuki Lemma 5 = b の frontier) / 9160 (leaf 粒度) / 9161 (同型の dedup、実施済)
 - CLAUDE.md「進捗の測り方」(opaque-Prop scaffold / 特殊化債務 / 低優先繰延)
+
+## 2026-07-19 夕 hub 検証 (合流 tick)
+
+③ の「ユーザー裁定: 継続」を hub が独立検証した。b (codex) セッションのトランスクリプト
+(`~/.codex/sessions/2026/07/19/rollout-2026-07-19T17-25-*.jsonl`) に実ユーザー発言
+「higmanの証明を進めしょう。文献を明らかにするためにBG, Isaacs, Peterfalviに続きちゃんと
+モジュールを切る？…」を確認 — ③ の裁定と三層 module 境界 (GroupTheory/SpecificGroups/Suzuki2Group /
+OddOrder/Higman / Pf Appendices) は正規。step 1.5 の正本 regex (merge_monitor.md 冒頭ブロック) の
+b_re に `^OddOrder/Higman/` 等を hub が反映済 (b はレーン表のみ更新していたので二重管理分を同期)。
+merge a07d32aab で合流。

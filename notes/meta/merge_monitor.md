@@ -12,7 +12,7 @@
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
 > a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S'   # 2026-07-19 11:29 恒久復帰 (issue 9154)
-> b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
+> b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有
 > c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
@@ -135,9 +135,14 @@
 | lane | branch | worktree | 現行役割 | 所有 (step 1.5 range-check の正) | issue base |
 |---|---|---|---|---|---|
 | **a** | `a` | `/home/ywr/odd-order-a` | Isaacs 本文 + Peterfalvi 本文 (2026-07-19 11:29 復帰、9154 の恒久配分) | `^OddOrder/Isaacs/\|^OddOrder/Peterfalvi/S` | 1000 |
-| **b** | `b` | `/home/ywr/odd-order-b` | Pf Appendices の Suzuki 系 (現 frontier = issue 2048 Suzuki Lemma 5) | `^OddOrder/Peterfalvi/Appendices/(Suzuki\|Suzuki2Groups)` | 2000 |
+| **b** | `b` | `/home/ywr/odd-order-b` | Suzuki 系 + 引用元 Higman 原典 (frontier = issue 2048) | `^OddOrder/Higman/\|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/\|^OddOrder/Peterfalvi/Appendices/(Suzuki\|Suzuki2Groups)` | 2000 |
 | **c** | `c` | `/home/ywr/odd-order-c` | BG 残 + Pf Appendices の非 Suzuki 系 (issue 0126 / 9132 / 9133) | `^OddOrder/BG/\|^OddOrder/Peterfalvi/Appendices/(NearFields\|Huppert\|SemilinearField\|FeitSibley)` | 3000 |
 | ~~**d**~~ | — | — | ⚰ 退役 (2026-07-07) | — | (4000) |
+
+> **✅ 2026-07-19 lane b Higman 継続・module 境界 (ユーザー裁定)**: b は再配分せず
+> Higman 原典を完遂する。source-neutral な Suzuki 2-group 基本定義は `OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/**`、
+> 原典 Lemmas 1--13 は `OddOrder/Higman/Suzuki2Groups/**`、Peterfalvi Appendix III の再掲・適用は
+> `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/**`。詳細と未了dedupは issue 0127。
 
 branch/worktree audit は `a` / `b` / `c` と `main` の **4 本**。
 ⚠ 2026-07-15 の「A単独 / audit は a と main のみ」体制は**失効** (2026-07-16 レーン再作成)。

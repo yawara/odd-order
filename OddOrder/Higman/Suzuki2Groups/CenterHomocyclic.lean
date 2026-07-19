@@ -3,8 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterInvolutions
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 
 /-!
 # The center of a Suzuki 2-group is homocyclic
@@ -22,7 +22,9 @@ Peterfalvi Appendix III theorem (a), `Z(P) ≤ Q₀`.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -100,4 +102,4 @@ theorem involutionSubgroup_subgroupOf_center_eq_lastAgemoLayer
     exact congrArg Subtype.val
       ((sq_eq_one_iff_mem_lastAgemoLayer ε he).mpr hx)
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

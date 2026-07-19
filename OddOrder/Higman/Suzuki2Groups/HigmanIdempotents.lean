@@ -9,7 +9,7 @@ import Mathlib.LinearAlgebra.Projection
 import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.Tactic.NoncommRing
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanEndomorphismLift
+import OddOrder.Higman.Suzuki2Groups.HigmanEndomorphismLift
 
 /-!
 # Higman Lemma 3: commuting idempotents modulo two
@@ -35,7 +35,7 @@ set_option autoImplicit false
 
 open Function
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
 
@@ -345,4 +345,4 @@ theorem all_end_eq_zero_or_one_of_transitive_conjugates
 
 end TransitiveActor
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanIdempotentAction
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
 
 /-!
 # Higman Lemma 3: a chosen commuting idempotent family on `A / A²`
@@ -26,7 +26,7 @@ exponent-at-most-four conclusion of Higman's Lemma 3 are not claimed here.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -342,4 +342,4 @@ theorem subgroupConjInv_mul
       MulAut.conjNormal (H := A) (u : P)⁻¹
   exact conjNormal_mul_inv (A := A) (u := (u : P)) (v := (v : P))
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

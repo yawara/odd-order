@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 
 /-!
 # Higman Lemma 2: normal abelian invariant subgroups
@@ -20,7 +20,9 @@ sentence by the Agemo--Nakayama lifting established for Lemma 1.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -174,4 +176,4 @@ theorem no_sq_mem_agemo_one_and_commutator_le_agemo_two
     group
   rwa [heq] at hmem
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

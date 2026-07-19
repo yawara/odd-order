@@ -236,7 +236,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterInvolutions
+import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
@@ -8182,7 +8182,7 @@ subgroup of automorphisms acting regularly on the involutions.  Faithfulness is
 built into the subgroup inclusion in `MulAut`. -/
 
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
+  OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
 
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
@@ -8190,16 +8190,16 @@ concrete elementary-abelian `2`-subgroup.  The reverse identification with the
 whole center remains part of Higman's later structural argument. -/
 
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutions_subset_center
+  OddOrder.Higman.Suzuki2Groups.involutions_subset_center
 
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutionSubgroup_isElementaryAbelian
+  OddOrder.Higman.Suzuki2Groups.involutionSubgroup_isElementaryAbelian
 
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.mem_involutionSubgroup_iff_sq_eq_one
+  OddOrder.Higman.Suzuki2Groups.mem_involutionSubgroup_iff_sq_eq_one
 
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.involutions_eq_involutionSubgroup_diff_identity
+  OddOrder.Higman.Suzuki2Groups.involutions_eq_involutionSubgroup_diff_identity
 
 /-! **Peterfalvi Appendix III, Lemma 1(b)**: every quadratic map over `F₂`
 has an explicit central extension whose squaring map is the original map. -/

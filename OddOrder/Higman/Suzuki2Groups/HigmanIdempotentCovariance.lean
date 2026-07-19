@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanIdempotentFamily
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentFamily
 
 /-!
 # Higman Lemma 3: covariance and the zero-or-one conclusion
@@ -28,7 +28,9 @@ final exponent-at-most-four conclusion are not claimed here.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -388,4 +390,4 @@ theorem subgroupConjFamily_all_modTwo_eq_zero_or_one
     ε he subgroupConjInv_mul
     (restricted_involutions_transitive act hAinv htrans)
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups
