@@ -226,3 +226,50 @@ hinfl via hypothesis76AlphaFun_inflation + F↔H^# + |P-in-S| = p^q (card_P_eq))
 最終 `eta01_Hsharp_norm_lower_core` (T 側 :361-389 mirror;
 hu = two_mul_u_le (Canonicalization:94)、
 sum_apply_erase_one_filter_subgroupOf + H_le_S)。
+
+## iteration 4 進捗 (2026-07-19)
+
+**完了** (commits 7b3cdb50f, 次 commit):
+- `Hypothesis.exists_muS_index_eta01_core` — 核心の distinguished family index
+  (T 側 550 行の mirror、sorry 0)。spelling 罠 (H76.H.subgroupOf S vs
+  hyp.H.subgroupOf S) は T 側と同じ ∃-repackaging (`⟨θ0.val, θ0.2, by rw; congr!⟩`)。
+- `H_sharp_hypothesis76_base_cCoeff_int` (S 側は τ = Ind_S^G なので
+  preserves_virtualCharacters 不要 — induce_mem_ZIrr で直)。
+- `Hypothesis.exists_etaS_alphaFun_one_int_core` (α(1) ∈ ℤ)。
+- import 追加: S15_CharacterDegreeEngines (generic `hypothesis76AlphaFun_one_int` が
+  T 側 file の GenericAlphaIntegrality 節に居るため)。
+
+**残 (次 iteration)**:
+1. `exists_caseB_data_eta01_S_core` — T 側 `exists_caseB_data_eta10_T_core`
+   (Eta10Correction.lean:207-353) の mirror。ζ := (q : ℂ)⁻¹ • (H76.zeta i₁)、
+   α := hypothesis76AlphaFun H76 (P.subgroupOf S) eta01。7 成分:
+   - hvanish: `H76.zeta_eq_zero_of_not_mem_H` (x ∉ H.subgroupOf S)
+   - hinner: `hypothesis76_zeta_inner_alphaFun_eq_zero H76 (P.subgroupOf S) eta01 i₁ hi₁ker`
+     + q⁻¹ scaling (T 側 :246-272 の hext/calc パターン)
+   - hχ point formula: `hypothesis76_point_formula H76 (fun _ => rfl) (P.subgroupOf S)
+     eta01 i₁ hi₁pos hi₁ker hmiddle x hxsharp` + htail rfl + hi₁c (δ) + hnormP (q)
+     (T 側 :273-289; sharp 変換は mem_sharp)
+     ⚠ T 側の erase-filter は Q^# = K'-sharp と一致したが、S 側は台 = H^#
+     (erase 1 (filter (· ∈ H.subgroupOf S))) で point formula の適用域も H^#
+     (psiSupp の A = sharp H) — T 側 :277-280 の hxsharp 構成は
+     sharp (hyp.Q : Set G) だった → S 側は sharp (hyp.H : Set G)。
+   - hfirstTerm: ∑_S ‖q⁻¹ ζ‖² − ‖q⁻¹ ζ(1)‖² = |S′| − u²
+     (T 側 :290-311: sum_normSq_eq_card_mul_inner + zetaNormSq = q + scaling
+     + card_S_eq_deriv_mul_q; ζ(1) = uq → u)
+   - hcross: (ζ(1)·conj α(1)).re = u·α1 (T 側 :312-322)
+   - hδ2
+   - hinfl: (p^q − 1)·α1² ≤ ∑_{H^#}‖α‖²
+     (T 側 :323-353: hF ↔ H76.H-sharp 変換 + hypothesis76AlphaFun_inflation +
+     |H.subgroupOf S| ... ⚠ T 側は台の card = q^p を使った (K' = H76.H = Q)。
+     S 側の K' = P ⊊ H = H76.H — inflation の generic 形は
+     `hypothesis76AlphaFun_inflation H76 K' χ F hF hP'H` で係数は (|K'|-in-S の card − 1)?
+     **実測必要**: generic lemma の係数が |K'| − 1 か |H76.H| − 1 か。
+     (13.7) の exists_caseB_data_eta10_H_core は係数 (p^q − 1) = |P| − 1 を出している
+     ので K' = P.subgroupOf S で (|K'| − 1) のはず。card: card_P_eq hG (W2 経由?
+     hyp.card_P_eq hG hyp.Sdata_W2_eq — CountingLayer:335 の card_S_val 内用法参照)。
+2. `eta01_Hsharp_norm_lower_core` — 最終 (T 側 :361-389 mirror):
+   `(Nat.card ↥(derivedInG hyp.S) : ℝ) − (hyp.u : ℝ)² ≤ ∑_{x ∈ sharpSubgroup hyp.H} ‖eta01 x‖²`
+   via caseB_eta01_norm_bound (S := ↥hyp.S, H := hyp.H.subgroupOf hyp.S,
+   Pm1 := p^q − 1, u := hyp.u, firstTerm := |S′| − u²) + two_mul_u_le hG +
+   sum_apply_erase_one_filter_subgroupOf (hyp.H_le_S)。
+3. AxiomsCheck pin (最終 theorem + 主要中間) + frontier note 更新 + issue close。
