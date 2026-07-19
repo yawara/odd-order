@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Invariants
+import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.LinearAlgebra.TensorProduct.Basis
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.LinearAlgebra.TensorProduct.Pi
 import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
@@ -214,5 +216,103 @@ theorem baseChangeRepresentation_comp
     (K : Type*) [Field K] [Algebra F K]
     (ρ : Representation F G V) (φ : H →* G) :
     baseChangeRepresentation K (ρ.comp φ) = (baseChangeRepresentation K ρ).comp φ := rfl
+
+
+/-! ## Detecting invariant copies after base change -/
+
+universe uBaseChangeF uBaseChangeK uBaseChangeC uBaseChangeV uBaseChangeW
+
+/-- The coefficient of a base-changed vector at one basis element of the
+extension field. This is kept private; the public API is the descent theorem
+below. -/
+private noncomputable def baseChangeCoordinate
+    {F : Type uBaseChangeF} {K : Type uBaseChangeK}
+    {V : Type uBaseChangeV} {ι : Type*}
+    [Field F] [AddCommGroup K] [Module F K]
+    [AddCommGroup V] [Module F V] [DecidableEq ι]
+    (b : Module.Basis ι F K) (i : ι) : K ⊗[F] V →ₗ[F] V where
+  toFun z := TensorProduct.equivFinsuppOfBasisLeft b z i
+  map_add' x y := by simp
+  map_smul' a x := by simp
+
+/-- Taking one coefficient in the extension-field factor commutes with every
+endomorphism defined over the ground field. -/
+private theorem baseChangeCoordinate_apply_baseChange
+    {F : Type uBaseChangeF} {K : Type uBaseChangeK}
+    {V : Type uBaseChangeV} {ι : Type*}
+    [Field F] [Field K] [Algebra F K]
+    [AddCommGroup V] [Module F V] [DecidableEq ι]
+    (b : Module.Basis ι F K) (i : ι) (T : Module.End F V)
+    (z : K ⊗[F] V) :
+    baseChangeCoordinate (F := F) (K := K) (V := V) b i (T.baseChange K z) =
+      T (baseChangeCoordinate (F := F) (K := K) (V := V) b i z) := by
+  induction z using TensorProduct.induction_on with
+  | zero => simp [baseChangeCoordinate]
+  | tmul a v => simp [baseChangeCoordinate]
+  | add x y hx hy => simp [hx, hy]
+
+/-- An injective ground-field-linear intertwiner from an irreducible
+representation into the base change of another irreducible representation
+descends to an equivalence of the original representations. -/
+theorem exists_equiv_of_injective_intertwiner_to_baseChange
+    {F : Type uBaseChangeF} {K : Type uBaseChangeK}
+    {C : Type uBaseChangeC} {V : Type uBaseChangeV}
+    {W : Type uBaseChangeW}
+    [Field F] [Field K] [Algebra F K] [Group C]
+    [AddCommGroup V] [Module F V]
+    [AddCommGroup W] [Module F W]
+    (rhoV : Representation F C V) (rhoW : Representation F C W)
+    (hirrV : Representation.IsIrreducible rhoV)
+    (hirrW : Representation.IsIrreducible rhoW)
+    (f : V →ₗ[F] K ⊗[F] W)
+    (hf : Function.Injective f)
+    (hinter : ∀ c v, f (rhoV c v) = (rhoW c).baseChange K (f v)) :
+    ∃ e : V ≃ₗ[F] W, ∀ c v, e (rhoV c v) = rhoW c (e v) := by
+  letI : Representation.IsIrreducible rhoV := hirrV
+  letI : Representation.IsIrreducible rhoW := hirrW
+  haveI : Nontrivial V := by
+    haveI : Nontrivial (Subrepresentation rhoV) := IsSimpleOrder.toNontrivial
+    have hsub : Nontrivial (Submodule F V) :=
+      (Subrepresentation.toSubmodule_injective (ρ := rhoV)).nontrivial
+    exact (Submodule.nontrivial_iff F).mp hsub
+  obtain ⟨v, hv⟩ := exists_ne (0 : V)
+  have hfv : f v ≠ 0 := by
+    intro hzero
+    apply hv
+    apply hf
+    simpa using hzero
+  classical
+  let bK := Module.Free.chooseBasis F K
+  let eK := TensorProduct.equivFinsuppOfBasisLeft (N := W) bK
+  have heK : eK (f v) ≠ 0 := by
+    intro hzero
+    apply hfv
+    apply eK.injective
+    simpa using hzero
+  obtain ⟨i, hi⟩ := Finsupp.ne_iff.mp heK
+  have hi' : eK (f v) i ≠ 0 := by simpa using hi
+  let g : V →ₗ[F] W := (baseChangeCoordinate bK i).comp f
+  have hgv : g v ≠ 0 := by
+    change eK (f v) i ≠ 0
+    exact hi'
+  have hginter : ∀ c x, g (rhoV c x) = rhoW c (g x) := by
+    intro c x
+    change baseChangeCoordinate bK i (f (rhoV c x)) =
+      rhoW c (baseChangeCoordinate bK i (f x))
+    rw [hinter]
+    exact baseChangeCoordinate_apply_baseChange bK i (rhoW c) (f x)
+  let gi : Representation.IntertwiningMap rhoV rhoW :=
+    g.intertwiningMap_of_isIntertwiningMap rhoV rhoW hginter
+  have hgi : gi ≠ 0 := by
+    intro hzero
+    have hz : gi v = 0 := by rw [hzero]; rfl
+    exact hgv hz
+  have hbij : Function.Bijective gi :=
+    (Representation.IsIrreducible.bijective_or_eq_zero gi).resolve_right hgi
+  let e := gi.ofBijective hbij
+  refine ⟨e.toLinearEquiv, ?_⟩
+  intro c x
+  change g (rhoV c x) = rhoW c (g x)
+  exact hginter c x
 
 end OddOrder.RepresentationTheory

@@ -8184,6 +8184,16 @@ built into the subgroup inclusion in `MulAut`. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
 
+/-! **Higman Lemma 4 and its Corollary**: the first two lower-central layers
+are not equivariantly isomorphic, even as an invariant ground-field copy after
+an arbitrary scalar extension of the second layer. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.not_exists_equivariant_linearEquiv_of_higman_bracket
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.not_exists_injective_intertwiner_to_baseChange_of_higman_bracket
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the

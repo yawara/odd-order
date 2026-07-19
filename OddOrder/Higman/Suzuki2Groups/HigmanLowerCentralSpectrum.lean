@@ -463,11 +463,12 @@ theorem exists_frobeniusEigenbasis_of_charpoly_eq_minpoly
 
 /-! ## Singer field model -/
 
-universe uSinger
+universe uSinger uSingerF uSingerC uSingerV
 
 /-- A transitive action on the nonzero vectors is irreducible. -/
 theorem representation_isIrreducible_of_transitive_nonzero
-    {F C V : Type uSinger} [Field F] [Group C] [AddCommGroup V] [Module F V]
+    {F : Type uSingerF} {C : Type uSingerC} {V : Type uSingerV}
+    [Field F] [Group C] [AddCommGroup V] [Module F V]
     (rho : Representation F C V) [Nontrivial V]
     (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w) :
     Representation.IsIrreducible rho := by
@@ -925,5 +926,46 @@ theorem not_exists_equivariant_linearEquiv_of_higman_bracket
     Module.End.hasEigenvalue_of_hasEigenvector
       ⟨Module.End.mem_eigenspace_iff.mpr hsecond, hsecondNe⟩
   exact higman_spectral_contradiction T₂ n hn lambda hprim hpairSpan hlambda
+
+
+/-! ## Higman's Lemma 4 corollary -/
+
+/-- **Higman Lemma 4, Corollary** (p. 85). For every extension field `K/F₂`,
+the base change of the second layer has no `C`-invariant `F₂`-subspace which
+is `C`-isomorphic to the first layer. -/
+theorem not_exists_injective_intertwiner_to_baseChange_of_higman_bracket
+    {K : Type uK} {C V₁ V₂ : Type uMain}
+    [Field K] [Algebra (ZMod 2) K]
+    [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V₁] [Module (ZMod 2) V₁] [Finite V₁]
+    [AddCommGroup V₂] [Module (ZMod 2) V₂] [Finite V₂]
+    (rho₁ : Representation (ZMod 2) C V₁)
+    (rho₂ : Representation (ZMod 2) C V₂)
+    (n : ℕ) (hn : 2 ≤ n)
+    (hfin₂ : Module.finrank (ZMod 2) V₂ = n)
+    (hirr₁ : Representation.IsIrreducible rho₁)
+    (hfaith₁ : Function.Injective rho₁)
+    (beta : LinearMap.BilinMap (ZMod 2) V₁ V₂)
+    (hbetaEquiv : ∀ c x y,
+      rho₂ c (beta x y) = beta (rho₁ c x) (rho₁ c y))
+    (hbetaAlt : ∀ x, beta x x = 0)
+    (hbetaSpan : Submodule.span (ZMod 2)
+      (Set.range fun z : V₁ × V₁ => beta z.1 z.2) = ⊤)
+    (htrans₂ : ∀ v w : V₂, v ≠ 0 → w ≠ 0 →
+      ∃ c : C, rho₂ c v = w) :
+    ¬ ∃ f : V₁ →ₗ[ZMod 2] K ⊗[ZMod 2] V₂,
+      Function.Injective f ∧
+      ∀ c v, f (rho₁ c v) = (rho₂ c).baseChange K (f v) := by
+  letI : Nontrivial V₂ :=
+    Module.nontrivial_of_finrank_pos (by rw [hfin₂]; omega)
+  have hirr₂ : Representation.IsIrreducible rho₂ :=
+    representation_isIrreducible_of_transitive_nonzero rho₂ htrans₂
+  rintro ⟨f, hf, hinter⟩
+  obtain ⟨e, he⟩ :=
+    OddOrder.RepresentationTheory.exists_equiv_of_injective_intertwiner_to_baseChange
+      rho₁ rho₂ hirr₁ hirr₂ f hf hinter
+  exact not_exists_equivariant_linearEquiv_of_higman_bracket
+    rho₁ rho₂ n hn hfin₂ hirr₁ hfaith₁ beta hbetaEquiv hbetaAlt hbetaSpan htrans₂
+    ⟨e, he⟩
 
 end OddOrder.Higman.Suzuki2Groups
