@@ -52,7 +52,7 @@ theorem Hypothesis.sSet_coherent_extension_eq_sum_memberRFamily_T [Finite G]
     (c' : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) F
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {ψ : ClassFunction ↥hyp.T ℂ} (hψT : ψ ∈ F) (hψcT : ψ.conj ∈ F) :
     ∃ E ⊆ (hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2
         (hFsub hψT)).imageSet,
@@ -65,7 +65,7 @@ theorem Hypothesis.sSet_coherent_extension_eq_sum_memberRFamily_T [Finite G]
   have hχχbar : ClassFunction.inner ψ ψ.conj = 0 :=
     sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) (hFsub hψT) (hFsub hψcT) hne
   have hdiffsupp : ((ψ - ψ.conj : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
     rw [show (ψ - ψ.conj : ClassFunction ↥hyp.T ℂ) = -(ψ.conj - ψ) from by abel,
       ClassFunction.support_neg]
     exact hyp.sSet_member_conjDiff_supported_T hG hvd (hFsub hψT)
@@ -116,11 +116,11 @@ theorem Hypothesis.sSet_coherent_extension_cross_orthogonal_T [Finite G]
     (c₁ : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) T₁
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     (c₂ : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) T₂
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {ψ lam : ClassFunction ↥hyp.T ℂ}
     (hψT : ψ ∈ T₁) (hψcT : ψ.conj ∈ T₁) (hlamT : lam ∈ T₂) (hlamcT : lam.conj ∈ T₂)
     (hne1 : ψ ≠ lam) (hne2 : ψ ≠ lam.conj) :
@@ -176,14 +176,14 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
     (hS₂cohD : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) S₂
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)))
     (_hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂).Nonempty)
     (hnopairD : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
           ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
         (S₂ ∪ {χ, χ.conj})
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)))
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)))
     (h2a : 2 * caseA.a = chief.p - 1)
     (hCUprime : chars.C = chars.Uprime)
     (hS3deg : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
@@ -204,7 +204,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     (γ ψ₁ : ClassFunction ↥hyp.T ℂ)
     (hψ₁S₂ : ψ₁ ∈ S₂)
     (_hψ₁irr : IsIrreducibleCharacter ψ₁)
@@ -213,7 +213,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
     (_hγ1 : (γ : ↥hyp.T → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupT hG hvd).q * caseA.a : ℕ) : ℂ))
     (hγorth : ∀ φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd), ClassFunction.inner γ φ = 0)
     (hαsupp : ((γ - ψ₁ : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     (hc : ∀ lam ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
       ClassFunction.inner
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
@@ -393,7 +393,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
     push_cast
     ring
   have hβsupp : ((lam₁ - e • ψ₁ : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T :=
     hyp.sSet_scaledDiff_support_T hG hvd hlam₁S₃.1 hψ₁sSet hβdegℂ
   have hβsmul : (lam₁ - e • ψ₁ : ClassFunction ↥hyp.T ℂ) = lam₁ - ((e : ℕ) : ℂ) • ψ₁ := by
     rw [Nat.cast_smul_eq_nsmul]
@@ -417,7 +417,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
   -- ── supported differences and their `τ₁`/`τ₃` images
   have hψdiffsupp : ∀ φ ∈ S₂,
       ((φ - ψ₁ : ClassFunction ↥hyp.T ℂ)).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+        OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
     intro φ hφ
     have h := hyp.sSet_scaledDiff_support_T hG hvd (hS₂S hφ) hψ₁sSet (c := 1)
       (by rw [hS2deg φ hφ, hψ₁deg, Nat.cast_one, one_mul])
@@ -432,7 +432,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
       ⟨Submodule.sub_mem _ (Submodule.subset_span hφ) (Submodule.subset_span hψ₁S₂),
         hψdiffsupp φ hφ⟩).symm
   have hDsupp : ((lam₁ - lam₁.conj : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
     rw [show (lam₁ - lam₁.conj : ClassFunction ↥hyp.T ℂ) = -(lam₁.conj - lam₁) from by abel,
       ClassFunction.support_neg]
     exact hyp.sSet_member_conjDiff_supported_T hG hvd hlam₁S₃.1
@@ -640,7 +640,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
       (hyp.dadeHypT hG hTP)
       ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) (S₂ ∪ {lam₁,
           lam₁.conj})
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) := by
     refine OddOrder.Peterfalvi.S13.isCoherent_union_pair_of_bridge (E := ((e : ℕ) : ℤ))
       hS₂fin hON1 hON2
       (fun φ hφ ξ hξ => c₁.extension_inner_eq φ ξ (Submodule.subset_span hφ)
@@ -682,7 +682,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
       exact hTBeq
     · -- the bridge support (`ℤ`-scalar form)
       show ((lam₁ - ((e : ℕ) : ℤ) • ψ₁ : ClassFunction ↥hyp.T ℂ)).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T
+        OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T
       simp only [natCast_zsmul]
       exact hβsupp
   exact hnopairD lam₁ hlam₁S₃ ⟨hunion⟩

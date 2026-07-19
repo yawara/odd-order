@@ -427,10 +427,10 @@ theorem nuT_rowSum_eq_induce (i : Fin tp.q) :
 noncomputable def hyp46TmpCore (Tdata : TypePData mp.T)
     (hW1 : Tdata.W1 = tp.W2) (hW2 : Tdata.W2 = tp.W1) :
     OddOrder.Peterfalvi.S06.Hypothesis46Core
-      (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.T) mp.T :=
+      (OddOrder.Peterfalvi.S10.typePACore mp.T) mp.T :=
   { toHypothesis := mp.certainTypeT hG
     L_normalizes_A := fun l _ ha =>
-      OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha
+      OddOrder.Peterfalvi.S10.typePACore_conj_mem l.2 ha
     tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis Tdata hG.odd
     tic_W1 := by
       change Tdata.W1 = _
@@ -462,7 +462,7 @@ noncomputable def hyp46TmpCore (Tdata : TypePData mp.T)
       rw [certainTypeT_K_eq, Subgroup.mem_subgroupOf] at hxD
       rw [Subgroup.mem_subgroupOf] at hhσ
       rw [Subgroup.mem_centralizer_iff] at hxC
-      rw [OddOrder.Peterfalvi.S15.mem_honestTypeP2ASet]
+      rw [OddOrder.Peterfalvi.S10.mem_typePACore]
       refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
       · simpa using hx1
       · simpa using hh1
@@ -482,7 +482,7 @@ theorem nuT_diff_support (Tdata : TypePData mp.T) (_hU : Tdata.U = tp.V)
     (hdeg : nuT hG mp tp i j 1 = nuT hG mp tp k j 1) :
     (nuT hG mp tp i j - nuT hG mp tp k j).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.T Tdata) mp.T := by
+        (OddOrder.Peterfalvi.S10.typePACore0 mp.T Tdata) mp.T := by
   classical
   haveI : NeZero (Nat.card ↥(hyp46TmpCore hG mp tp Tdata hW1 hW2).W1) :=
     inferInstanceAs (NeZero (Nat.card ↥(mp.certainTypeT hG).W1))

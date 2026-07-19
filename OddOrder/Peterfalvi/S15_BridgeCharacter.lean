@@ -823,7 +823,7 @@ of the honest **`'A0(S)`-Dade** `dadeHypS0` (support `A₀(S) = A(S) ∪ V^S`), 
 (Coq `prDade_sub_TIirr_on`), and `V_S ⊄ S' ⊇ A(S)`, so with the old `dadeHypS` map the `V_S`-part
 fell in the arbitrary linear-extension region and the statement was **unprovable as stated**; the
 `'A0`-Dade correction fixes that (`dadeHypS0` inherits one deep FT-support pin,
-`not_isConj_honestTypeP2ASet_typePV`).
+`not_isConj_typePACore_typePV`).
 
 Remaining to discharge the `sorry` (rigidity engine now available): `X := τ_S(μ-diff)` has
 `‖X‖² = 2` (Dade isometry) and `X ∈ ZIrr`; it agrees with `η_{0j} − η_{01}` on the regular set via
@@ -1033,17 +1033,17 @@ theorem sharpP_union_V_subset_A0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     (hyp : Hypothesis (G := G)) :
     sharpSubgroup hyp.P ∪
         conjClassSetIn hyp.S (typePV hyp.S hyp.Sdata)
-      ⊆ honestTypeP2A0Set hyp.S hyp.Sdata := by
+      ⊆ S10.typePACore0 hyp.S hyp.Sdata := by
   have hPle_Ms : hyp.P ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
     rw [hyp.P_eq_SF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
   intro z hz
   rcases hz with hzP | hzV
   · -- `P^# ⊆ A(S) ⊆ A₀(S)`.
-    refine honestTypeP2ASet_subset_A0Set hyp.Sdata ?_
+    refine typePACore_subset_A0Set hyp.Sdata ?_
     obtain ⟨hzP_mem, hz1⟩ := hzP
     rw [Set.mem_singleton_iff] at hz1
-    refine mem_honestTypeP2ASet.mpr ⟨?_, hz1, z, ⟨hPle_Ms hzP_mem, ?_⟩, ?_⟩
+    refine S10.mem_typePACore.mpr ⟨?_, hz1, z, ⟨hPle_Ms hzP_mem, ?_⟩, ?_⟩
     · have hPle : hyp.P ≤ derivedInG hyp.S := by
         rw [hyp.S_deriv_eq_PU]; exact le_sup_left
       exact hPle hzP_mem
@@ -1068,7 +1068,7 @@ theorem betaGrid_A0_support_of_c_eq_one [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hc1 : hyp.c = 1) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
     (betaGrid hyp j).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S hyp.Sdata) hyp.S := by
   intro z hz
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
   exact sharpP_union_V_subset_A0 hG hyp (betaGrid_support_of_c_eq_one hG hyp hc1 j hj hz)
@@ -1679,15 +1679,15 @@ theorem tauT_nuRow_diff_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hseq, hreq, ← Finset.sum_sub_distrib]
   -- `A(T)`-support of the row difference.
   have hAsupp : (η - (η : ClassFunction ↥hyp.T ℂ).conj).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
     rw [show (η - (η : ClassFunction ↥hyp.T ℂ).conj)
         = -((η : ClassFunction ↥hyp.T ℂ).conj - η) from by abel,
       ClassFunction.support_neg]
     exact hyp.sSet_member_conjDiff_supported_T hG hvd hη
   have hA0supp : (η - (η : ClassFunction ↥hyp.T ℂ).conj).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (honestTypeP2ASet_subset_A0Set Tdata))
+      (typePACore_subset_A0Set Tdata))
   -- the honest `A`-Dade agrees with the `A₀`-Dade on the `A(T)`-supported row difference.
   have hτeq : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))

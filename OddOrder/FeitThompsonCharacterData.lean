@@ -184,15 +184,15 @@ that avoids the two-instance grid identification): a §6 `Hypothesis46 (A(S)) S`
 (`certainType_diff_supp_subset_A0`, `certainType_diff_dade_apply_eq_of_mem_V`) apply to `muS`
 directly.  The `tic` reconciliations are the `W₁/W₂/K`-equalities of the two §6 instances
 (`sdataS06_*`/`certainTypeS_*_eq`); the Dade data is the honest `'A0(S)`-Dade of
-`dadeSupportHypothesisData_honestTypeP2A0Set`; the kernel-family subgroup is `M_σ(S)` with the
-`A(S)`-covering of `mem_honestTypeP2ASet` (mirroring `S15.Hypothesis.hyp46S`). -/
+`dadeSupportHypothesisData_typePACore0`; the kernel-family subgroup is `M_σ(S)` with the
+`A(S)`-covering of `mem_typePACore` (mirroring `S15.Hypothesis.hyp46S`). -/
 noncomputable def hyp46Smp :
     OddOrder.Peterfalvi.S06.Hypothesis46
-      (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.S) mp.S :=
+      (OddOrder.Peterfalvi.S10.typePACore mp.S) mp.S :=
   { toHypothesis := mp.certainTypeS hG
-    dade := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+    dade := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
           mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).restrict Set.subset_union_left
-        (fun l _ ha => OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha)
+        (fun l _ ha => OddOrder.Peterfalvi.S10.typePACore_conj_mem l.2 ha)
     tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis tp.Sdata hG.odd
     tic_W1 := by
       change tp.Sdata.W1 = _
@@ -224,7 +224,7 @@ noncomputable def hyp46Smp :
       rw [certainTypeS_K_eq, Subgroup.mem_subgroupOf] at hxD
       rw [Subgroup.mem_subgroupOf] at hhσ
       rw [Subgroup.mem_centralizer_iff] at hxC
-      rw [OddOrder.Peterfalvi.S15.mem_honestTypeP2ASet]
+      rw [OddOrder.Peterfalvi.S10.mem_typePACore]
       refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
       · simpa using hx1
       · simpa using hh1
@@ -233,27 +233,27 @@ noncomputable def hyp46Smp :
         have hcomm := hxC (hh : ↥mp.S) rfl
         have := congrArg (mp.S.subtype) hcomm
         simpa using this
-    dade0 := (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+    dade0 := (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
         mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade
-    tau := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+    tau := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
           mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).fullDadeIsometryData
-      (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_honestTypeP2A0Set hG
+      (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
         mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.hconj }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **The Dade-free (4.6) core on the `muS` producer instance** (issue 9081): the structural
 fields of `hyp46Smp` — the κ-Hall grid instance, `tic` reconciliations, `M_σ(S)` kernel family,
 `A(S)`-covering, and the `L`-conjugation invariance of `A(S)`
-(`honestTypeP2ASet_conj_mem`, honest) — **without** the Dade data.  The (4.7)/(4.8)-(1) support
+(`typePACore_conj_mem`, honest) — **without** the Dade data.  The (4.7)/(4.8)-(1) support
 engines (`certainType_diff_supp_subset_A0`) run on this core, so their producer applications
 (`muS_diff_support`) do not require the full `A₀(S)`-Dade package bundled by `hyp46Smp`.
 Both packages are axiom-clean; the split records the support theorem's true prerequisite
 boundary. -/
 noncomputable def hyp46SmpCore :
     OddOrder.Peterfalvi.S06.Hypothesis46Core
-      (OddOrder.Peterfalvi.S15.honestTypeP2ASet mp.S) mp.S :=
+      (OddOrder.Peterfalvi.S10.typePACore mp.S) mp.S :=
   { toHypothesis := mp.certainTypeS hG
-    L_normalizes_A := fun l _ ha => OddOrder.Peterfalvi.S15.honestTypeP2ASet_conj_mem l.2 ha
+    L_normalizes_A := fun l _ ha => OddOrder.Peterfalvi.S10.typePACore_conj_mem l.2 ha
     tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis tp.Sdata hG.odd
     -- The structural proofs are verbatim copies of the `hyp46Smp` fields so this core remains
     -- definitionally independent of the full `A₀(S)`-Dade package.
@@ -287,7 +287,7 @@ noncomputable def hyp46SmpCore :
       rw [certainTypeS_K_eq, Subgroup.mem_subgroupOf] at hxD
       rw [Subgroup.mem_subgroupOf] at hhσ
       rw [Subgroup.mem_centralizer_iff] at hxC
-      rw [OddOrder.Peterfalvi.S15.mem_honestTypeP2ASet]
+      rw [OddOrder.Peterfalvi.S10.mem_typePACore]
       refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
       · simpa using hx1
       · simpa using hh1
@@ -310,7 +310,7 @@ theorem muS_diff_support (i : Fin tp.q) {j k : Fin tp.p}
     (hdeg : muS hG mp tp i j 1 = muS hG mp tp i k 1) :
     (muS hG mp tp i j - muS hG mp tp i k).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.S tp.Sdata) mp.S := by
+        (OddOrder.Peterfalvi.S10.typePACore0 mp.S tp.Sdata) mp.S := by
   classical
   haveI : NeZero (Nat.card ↥(hyp46SmpCore hG mp tp).W1) :=
     inferInstanceAs (NeZero (Nat.card ↥(mp.certainTypeS hG).W1))

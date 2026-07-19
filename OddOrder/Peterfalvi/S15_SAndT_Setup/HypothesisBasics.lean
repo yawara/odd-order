@@ -186,7 +186,7 @@ noncomputable def Hypothesis.sSet_member_differenceImage [Fintype G] [Finite G]
   -- The difference support `((φ)̄ − φ).support ⊆ supportInSubgroup A(S) S` (the `hdiffsupp` input).
   have hdiffsupp :
       ((φ : ClassFunction ↥hyp.S ℂ).conj - (φ : ClassFunction ↥hyp.S ℂ)).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S :=
+        OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S :=
     hyp.sSet_member_diffsupp hG hξ
   -- Package via the general (5.3.a) Dade R-datum constructor.
   exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
@@ -246,7 +246,7 @@ theorem Hypothesis.sSetIrrDeg_member_support_subset [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (d : ℂ)
     {φ : ClassFunction ↥hyp.S ℂ} (hφ : φ ∈ hyp.sSetIrrDeg hG d) :
     φ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S ∪ {1} := by
   haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨hφsSet, _⟩ := hφ
   obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
@@ -263,7 +263,7 @@ theorem Hypothesis.sSetIrrDeg_member_diff_supported [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) (d : ℂ)
     {x : ClassFunction ↥hyp.S ℂ} (hx : x ∈ hyp.sSetIrrDeg hG d)
     {y : ClassFunction ↥hyp.S ℂ} (hy : y ∈ hyp.sSetIrrDeg hG d) :
-    (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+    (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
   haveI : Fintype G := Fintype.ofFinite G
@@ -319,7 +319,7 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     (d : ℂ) (hd : star d = d) :
     OddOrder.Peterfalvi.S07.Hypothesis (L := ↥hyp.S) (G := G)
       (hyp.sSetIrrDeg hG d)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) := by
   classical
   -- The honest (13.2.e) Dade isometry `τ = Ind_S^G`.
   set τ := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
@@ -328,7 +328,7 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
   -- `sSetIrrDeg_closedUnderConjugate`.
   have hconjmem := hyp.sSetIrrDeg_closedUnderConjugate hG d hd
   refine OddOrder.Peterfalvi.S07.irrSubcoherent τ
-    (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
+    (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)
     (fun φ hφ => ?_) ?_ ?_ ?_ ?_ ?_
   · -- `Rdatum`: `φ ∈ S₁(d) ⇒ ∃ ξ ∈ 𝒳, φ = Ind ξ` (irreducible).  The `∃` witness is extracted via
     -- `choose` (not `obtain`) so it may be eliminated into the data goal
@@ -387,7 +387,7 @@ Internal discharges:
   irreducibles), so the honest Dade map sends it into `ℤ[Irr G]`;
 * `hconst` = definitional uniform degree `φ(1) = d`;
 * `hdeg0` = exposed `d ≠ 0`;
-* `h1A` = `honestTypeP2ASet_one_not_mem` (`1 ∉ A(S)`);
+* `h1A` = `S10.typePACore_one_not_mem` (`1 ∉ A(S)`);
 * `hsuppdiff` = the equal-degree two-member support fact (member differences `A(S)`-supported),
   the same argument `sSetIrrDeg_subcoherent`'s `hiso` uses internally. -/
 theorem Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
@@ -399,9 +399,9 @@ theorem Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
       (hyp.sSetIrrDeg hG d)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   classical
-  set A := OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S with hA
+  set A := OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S with hA
   -- The landed (5.3.a) subcoherence structure on `S₁(d)`; its `.tau` is the honest Dade map.
   set hyp' := hyp.sSetIrrDeg_subcoherent hG d hd with hhyp'
   -- `hSfin`: `S₁(d)` injects into `IrreducibleCharacter ↥S` (a `Finite` type) —
@@ -470,7 +470,7 @@ theorem Hypothesis.sSetIrrDeg_coherent_indS [Finite G]
     (h2 : 2 ≤ (hyp.sSetIrrDeg hG d).ncard) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (hyp.sSetIrrDeg hG d)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) :=
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) :=
   (hyp.sSetIrrDeg_coherent hG d hd hd0 h2).map fun c =>
     c.congrMap fun φ hφ => by
       rw [hyp.indS_apply]
@@ -545,7 +545,7 @@ theorem Hypothesis.sSetIrrDeg_qa_coherent_indS_caseA [Finite G]
     (caseA : CliffordCaseAData chars) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (hyp.sSetIrrDeg hG (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   have hqpos : 0 < (hyp.toTypesIIIIIIVSetupS hG).q := Nat.card_pos
   exact hyp.sSetIrrDeg_coherent_indS hG hnoV _ (star_natCast _)
     (Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hqpos.ne' caseA.a_pos.ne'))
@@ -1040,7 +1040,7 @@ theorem Hypothesis.sSet_member_support_subset [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {φ : ClassFunction ↥hyp.S ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
     φ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∪ {1} := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S ∪ {1} := by
   haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨ξ, hξ, rfl⟩ := hφ
   exact hyp.sSet_member_support_subset_A hG hξ
@@ -1057,7 +1057,7 @@ theorem Hypothesis.sSet_caseB_member_diff_supported [Finite G]
     (caseB : CliffordCaseBData chars)
     {x : ClassFunction ↥hyp.S ℂ} (hx : x ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     {y : ClassFunction ↥hyp.S ℂ} (hy : y ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
-    (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+    (x - y).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
   haveI : Fintype G := Fintype.ofFinite G

@@ -206,7 +206,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
       (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   classical
   haveI := hyp.finiteG
   obtain ⟨χ₀, hχ₀⟩ := hS₃ne
@@ -225,7 +225,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
   have hsuppdiff : ∀ a ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ∀ b ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ((a - b : ClassFunction ↥hyp.S ℂ)).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+        OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
     intro a ha b hb
     have h := hyp.sSet_scaledDiff_support hG ha.1 hb.1 (c := 1)
       (by rw [hS3deg a ha, hS3deg b hb, Nat.cast_one, one_mul])
@@ -446,13 +446,13 @@ the solvable `K = H ⊔ U₁`; `U₁` is a Hall `σ′`-subgroup of `K` (`|K| = 
 (`exists_cuSubOf_centralizer_witness`), whence `y` centralizes `g⁻¹ x₀ g ∈ H^# ⊆ S_σ^#`
 (`H` is `K`-normal; `H ≤ M_σ` suffices — general type `P`).  In both cases `y ∈ S′` since
 `K ≤ H ⊔ U = S′`. -/
-theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf [Finite G]
+theorem Hypothesis.mem_typePACore_of_mem_H_sup_cuSubOf [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)}
     (chars : Section11CharacterData (hyp.toTypesIIIIIIVSetupS hG) chief)
     (caseA : CliffordCaseAData chars) (i : Fin (hyp.toTypesIIIIIIVSetupS hG).q)
     {y : G} (hy : y ∈ (hyp.toTypesIIIIIIVSetupS hG).H ⊔ cuSubOf caseA i) (hy1 : y ≠ 1) :
-    y ∈ honestTypeP2ASet hyp.S := by
+    y ∈ S10.typePACore hyp.S := by
   classical
   -- dictionary: `H = P ≤ S_σ` (the `≤` suffices at every use — general type `P`) and
   -- `S′ = H ⊔ U`
@@ -591,7 +591,7 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf [Finite G]
           = (g : G)⁻¹ * (((g : G) * y * (g : G)⁻¹) * x₀) * (g : G) := by group
         _ = (g : G)⁻¹ * (x₀ * ((g : G) * y * (g : G)⁻¹)) * (g : G) := by rw [h1]
         _ = ((g : G)⁻¹ * x₀ * (g : G)) * y := by group
-    rw [mem_honestTypeP2ASet]
+    rw [S10.mem_typePACore]
     exact ⟨hKderiv hy, hy1, (g : G)⁻¹ * x₀ * (g : G),
       ⟨SetLike.mem_coe.mpr (hHMs hx₁H), fun h => hx₁ne (Set.mem_singleton_iff.mp h)⟩,
       Subgroup.mem_centralizer_singleton_iff.mpr hcent⟩
@@ -602,7 +602,7 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf [Finite G]
       (Subgroup.zpowers_le.mpr hyS) hhzpow
     have hhMs := OddOrder.BG.Ch4.S14.mem_Msigma_of_isPiElement_sigma_of_mem hG
       hyp.S_maximal hhS (OddOrder.BG.Ch4.S14.isPiElement_piPart _ y)
-    rw [mem_honestTypeP2ASet]
+    rw [S10.mem_typePACore]
     refine ⟨hKderiv hy, hy1, OddOrder.BG.Ch4.S14.piPart (OddOrder.BG.Ch3.S10.sigma hyp.S) y,
       ⟨SetLike.mem_coe.mpr hhMs, fun h => hone (Set.mem_singleton_iff.mp h)⟩, ?_⟩
     rw [Subgroup.mem_centralizer_singleton_iff]
@@ -616,7 +616,7 @@ open scoped FiniteInduce in
 (issue 1017; the Coq gap-patch site `PFsection9.v:1478-1484`).  For the explicit TI-witness
 `U₁ = cuSubOf caseA i = C_U(H̄ᵢ)` and a degree-`qa` member `ψ₁ ∈ 𝒮`, the difference
 `α = Ind_{HU₁}^S 1 − ψ₁` is supported in `A(S) = {y ∈ (S′)^# | ∃ x ∈ S_σ^#, y ∈ C(x)}`
-(`mem_honestTypeP2ASet`; `H = S_σ = Msigma`).  The M-side dispatches this via
+(`S10.mem_typePACore`; `H = S_σ = Msigma`).  The M-side dispatches this via
 `A(M) = (M′)^#` (`mderivSharp_subset_A0`), **false** here (`A(S) ⊊ (S′)^#` strictly); the honest
 route is the book's patched (9.11.4) argument: `supp γ ⊆ ⋃_g (HU₁)^g`
 (`support_induce_subset_conjugatesInto`), and `HU₁^# ⊆ A(S)` by the commuting Hall decomposition
@@ -639,7 +639,7 @@ theorem Hypothesis.nineElevenAlphaSupportS [Finite G]
         (trivialClassFunction ↥((hyp.toTypesIIIIIIVSetupS hG).H.subgroupOf hyp.S
           ⊔ (cuSubOf caseA i).subgroupOf hyp.S))
       - ψ₁).support
-      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
   classical
   haveI := hyp.finiteG
   haveI : Fintype G := Fintype.ofFinite G
@@ -686,13 +686,13 @@ theorem Hypothesis.nineElevenAlphaSupportS [Finite G]
       have h2 : z = c * (c⁻¹ * z * c) * c⁻¹ := by group
       rw [h2, h1]
       group
-    have hwA := hyp.mem_honestTypeP2ASet_of_mem_H_sup_cuSubOf hG chars caseA i hwG hwne
+    have hwA := hyp.mem_typePACore_of_mem_H_sup_cuSubOf hG chars caseA i hwG hwne
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
     have hzeq : (z : G) = (c : G) * ((c⁻¹ * z * c : ↥hyp.S) : G) * (c : G)⁻¹ := by
       push_cast
       group
     rw [hzeq]
-    exact honestTypeP2ASet_conj_mem c.2 hwA
+    exact S10.typePACore_conj_mem c.2 hwA
   · -- `z ∈ Supp ψ₁`: the (4.7) member support minus the identity
     rcases hyp.sSet_member_support_subset hG hψ₁mem hψ with h | h
     · exact h
@@ -732,7 +732,7 @@ theorem Hypothesis.nineElevenFourNormInputsS [Finite G]
         + ((hyp.toTypesIIIIIIVSetupS hG).q - 1) * caseA.a ^ 2 ∧
       ∃ α : ClassFunction ↥hyp.S ℂ,
         α ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S ∧
-        α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S ∧
+        α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S ∧
         ClassFunction.inner α α = (N : ℂ) := by
   classical
   haveI := hyp.finiteG

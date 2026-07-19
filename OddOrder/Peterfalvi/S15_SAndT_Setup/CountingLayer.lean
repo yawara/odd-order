@@ -678,10 +678,10 @@ along the `T`-normalized `Q` (`exists_mul_of_mem_sup_of_normalized`); `d ∈ D =
 centralizes `Q` (`D_eq`), so for `q ≠ 1` the pair `(q, z)` witnesses `z ∈ C_{T'}(q)^#` with
 `q ∈ Q^# ⊆ T_σ^#` (`maxNilpotentNormalHall_le_Msigma`), while for `q = 1` (so `z = d ∈ D^#`)
 any `x ∈ Q^#` (`Q_ne_bot`) serves as the `T_σ^#`-witness. -/
-theorem Hypothesis.mem_honestTypeP2ASet_of_mem_Q_sup_D [Finite G]
+theorem Hypothesis.mem_typePACore_of_mem_Q_sup_D [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {z : G} (hz : z ∈ hyp.Q ⊔ hyp.D) (hz1 : z ≠ 1) :
-    z ∈ honestTypeP2ASet hyp.T := by
+    z ∈ S10.typePACore hyp.T := by
   have hQT' : hyp.Q ≤ derivedInG hyp.T := hyp.T_deriv_eq_QV ▸ le_sup_left
   have hDV : hyp.D ≤ hyp.V := hyp.D_eq ▸ inf_le_left
   have hVT' : hyp.V ≤ derivedInG hyp.T := hyp.T_deriv_eq_QV ▸ le_sup_right
@@ -701,12 +701,12 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_Q_sup_D [Finite G]
   by_cases hq1 : q = 1
   · -- `z = d ∈ D^#`: any `x ∈ Q^#` is the `T_σ^#`-witness (`D` centralizes all of `Q`)
     obtain ⟨x, hx1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hyp.Q_ne_bot
-    refine mem_honestTypeP2ASet.mpr ⟨hzT', hz1, (x : G),
+    refine S10.mem_typePACore.mpr ⟨hzT', hz1, (x : G),
       ⟨hQMs x.2, fun h => hx1 (Subtype.ext h)⟩, ?_⟩
     rw [hq1, one_mul]
     exact Subgroup.centralizer_le (Set.singleton_subset_iff.mpr x.2) hdC
   · -- `q ≠ 1`: `q` itself is the witness — `q` and `d` both centralize `q`
-    refine mem_honestTypeP2ASet.mpr ⟨hzT', hz1, q, ⟨hQMs hq, hq1⟩, ?_⟩
+    refine S10.mem_typePACore.mpr ⟨hzT', hz1, q, ⟨hQMs hq, hq1⟩, ?_⟩
     exact Subgroup.mul_mem _
       (Subgroup.mem_centralizer_singleton_iff.mpr rfl)
       (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hq) hdC)
@@ -714,8 +714,8 @@ theorem Hypothesis.mem_honestTypeP2ASet_of_mem_Q_sup_D [Finite G]
 /-- **(13.2.e)-for-`T`, `K^# = (QD)^#` TI-centralizer gate** ((13.4) structural gate, issue 9013
 追記⁶ (c)): every nonidentity element of `K = QD` has its `G`-centralizer inside `T`.
 Discharged through the honest `A(T)`-support (issue 0116 step 4): `(QD)^# ⊆ A(T)`
-(`mem_honestTypeP2ASet_of_mem_Q_sup_D`), and no `A(T)`-point escapes a type-`P` maximal
-(`escaping_honestTypeP2ASet_eq_empty`, the proven (13.2.e) core via BG Theorem D(4)); the
+(`mem_typePACore_of_mem_Q_sup_D`), and no `A(T)`-point escapes a type-`P` maximal
+(`escaping_typePACore_eq_empty`, the proven (13.2.e) core via BG Theorem D(4)); the
 type-V exclusion feeding the latter is Peterfalvi (10.10)
 (`no_typeV_maximal_unconditional`, whose remaining upstream gap is the (6.5) gate, issue
 2022), and `T` is type `P` from `T_nonI` (`isTypeP_of_isTypeNonI`). -/
@@ -725,15 +725,15 @@ theorem QD_sharp_centralizer_le_T [Finite G]
       Subgroup.centralizer ({(z : G)} : Set G) ≤ hyp.T := by
   intro z hzQD hz1
   have hz1' : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext h)
-  have hmemA : (z : G) ∈ honestTypeP2ASet hyp.T :=
-    hyp.mem_honestTypeP2ASet_of_mem_Q_sup_D _hG hzQD hz1'
+  have hmemA : (z : G) ∈ S10.typePACore hyp.T :=
+    hyp.mem_typePACore_of_mem_Q_sup_D _hG hzQD hz1'
   have hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T :=
     OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI _hG hyp.T_maximal hyp.T_nonI
   by_contra hesc
   have hz_esc : (z : G) ∈
-      OddOrder.GroupTheory.escapingCentralizerSet hyp.T (honestTypeP2ASet hyp.T) :=
+      OddOrder.GroupTheory.escapingCentralizerSet hyp.T (S10.typePACore hyp.T) :=
     ⟨hmemA, hesc⟩
-  rw [escaping_honestTypeP2ASet_eq_empty _hG
+  rw [escaping_typePACore_eq_empty _hG
     (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional _hG) hyp.T_maximal hTP] at hz_esc
   exact Set.notMem_empty _ hz_esc
 
