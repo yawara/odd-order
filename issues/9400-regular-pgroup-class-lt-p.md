@@ -108,3 +108,33 @@ theorem aux (p : ℕ) [Fact p.Prime] (n : ℕ) :
 `H < ⊤` なら `Nat.card ↥H < Nat.card R` (要: 該当 mathlib 補題の実測。
 `Subgroup.card_lt_card_of_lt` は見つからなかったので index 経由か
 `Nat.card_eq_card_subgroup_mul_index` などから導く)。
+
+## ⭐ 2026-07-20 (2): characteristic-in-normal 依存が消えた + 汎用部品が全部そろった
+
+**設計上の改善**: `Ω₁(M)` を `M.subtype` で押し出す代わりに、**「M の p-捻れ元」を
+ambient の部分群として直接定義**する (`torsionOf M p hclosed`) と、**正規性が自明**になる
+(共役は「M に入る」も「p 乗が 1」も明らかに保つ)。
+⟹ **`normal_map_subtype_of_characteristic` (closed issue 9109 の複製問題) が不要**。
+前節の「配置の訂正」の理由のうち、この 1 件は解消した。
+
+`RegularPGroup.lean` (128 行、sorry 0、axiom-clean) に帰納が要る部品が**全部そろった**:
+
+- `lowerCentralSeries_eq_bot_of_subgroup` — class の上界は部分群に遺伝
+  (非推奨 API を避け `Subgroup.top_subtype_lowerCentralSeries` + `lowerCentralSeries_mono` 経由)。
+- `Omega.pow_eq_one_of_mul_closed` — Ω₁ の指数を「p-捻れ元が積で閉じる」に還元。
+- ⭐ `torsionOf` / `torsionOf_normal` — 正規部分群の p-捻れ元は**正規部分群**。
+- ⭐ `commutator_le_of_closure_pair` — `G = ⟨x,y⟩` かつ `y ∈ N ⊴ G` ⟹ `G/N` は x の像で
+  生成される巡回群 ⟹ アーベル ⟹ **`G' ≤ N`**。
+- `card_lt_card_of_lt_top` — 有限群の真部分群は位数が真に小さい。
+
+### 残る配置の論点: E.2 Step 1 の置き場所
+
+帰納は最後に **Step 1** (`class < p` かつ `G'` の指数が p ⟹ `x^p·y^p = (xy)^p`) を使う。
+現在これは `AppE.pow_mul_of_commutator_pow_eq_one` として AppE にあり、`hallCollection`
+経由で `exists_hallPetresco` に依存している。選択肢:
+
+- (A) 帰納を AppE に書く — Step 1 がそのまま使える。ビルドが遅い (2 分超/回)。
+- (B) **Step 1 を `RegularPGroup.lean` へ移す** (`exists_hallPetresco` から直接証明) —
+  Step 1 は BG の番号付き結果ではなく Prop E.2 の内部ステップなので、AppE から移して
+  AppE 側は E.2(a)(b) から GroupTheory 版を呼ぶ形にすれば**ラッパーも複製も生じない**。
+  帰納全体が GroupTheory に収まりビルドが速い。**(B) を推奨**。
