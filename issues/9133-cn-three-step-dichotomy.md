@@ -258,6 +258,62 @@ BG 内 8 箇所の呼び出し更新 (no-wrapper 方針ゆえ alias は置かな
 (現状 Lemma 1.2 は CN 仮説を展開形 `∀ z ≠ 1, IsNilpotent ↥(centralizer {z})` で取っており、
 これは `IsCNGroup` と定義的に同一ゆえ重複定義は無い)。
 
+## 進捗 (2026-07-19 その4): **Thm 1.5 の完全な証明経路を確定 — 残ブロッカー 0**
+
+原文精読 + 実測で、**Gorenstein の行間 (Ā ⊴ Ḡ の暗黙の前提) を埋める完全経路**を確定した。
+「`A` の冪零性」は経路から消滅 (直接巡回性へ)、Lemma 10.1.3 は初等 (~25 行) と判明。
+
+### 原文の行間 (重要な発見)
+
+Thm 1.5 末尾の「P̄ が Ā に regular に作用 ⟹ P̄Ā Frobenius」は **Ā ⊴ Ḡ を暗黙に前提**する
+(regular 作用には正規性が要る; 抽象的には反例あり — S₄ = Ḡ, p=3, Ā=D₈ は「可解 + O_p=1 +
+冪零 Hall p' + p/p' 非可換」を全て満たすが Ā ⋬ Ḡ)。埋める経路 = **|A| 奇 ⟹ A 巡回 ⟹
+N̄ := O_{p'}(Ḡ) 巡回 ⟹ Aut(N̄) 可換 ⟹ Ḡ' ≤ C_Ḡ(N̄) ≤ N̄ ⟹ Ḡ/N̄ 可換 ⟹ Ā ⊴ Ḡ**。
+
+### 確定経路 (使用部品は全て実在確認済)
+
+0. **(i)**: `Group.IsNilpotent G` なら終了。以下 G 非冪零、`F := fitting G ≠ ⊥`
+   (`fitting_ne_bot_of_solvable_nontrivial`)、`A` = Hall π(F)' (`hall_exists_of_piSeparable`)。
+1. **(†)**: F が p-群のとき、p'-元 x ≠ 1 は p-元 k ≠ 1 と可換になれない。
+   [r ∣ ord x を取り x' := x^(ord x/r)、Lemma 1.2 (P = Sylow ∋ k, Q = ⟨x'⟩) ⟹ x' が
+   Sylow p 全体を中心化 ⟹ F ≤ Sylow (正規 p-部分群) ⟹ x' ∈ C(F) ≤ F ⟹ r = p ✗]
+2. **(‡) = Lemma 10.1.3 の適用**: Ḡ := G/F で「mk a (a ∈ A, mk a ≠ 1, p ∤ ord a) は Ḡ の
+   非自明 p-元 ū と非可換」。[K := comap mk' ⟨ū⟩ は p-群 (`IsPGroup.comap_of_ker_isPGroup`)、
+   a は (†) より K に fpf 作用、**新補題 L1** (fpf は商に降りる、coset 形:
+   `k⁻¹(xkx⁻¹) ∈ F → k ∈ F`、twisted map 全単射で ~25 行) ⟹ ū = 1 ✗]
+3. **G = FA なら (ii)**: `isFrobeniusGroup_fitting_of_isComplement` (済)。
+4. **G ⊋ FA なら π(F) = {p}**: |π| ≥ 2 と仮定 → 各 p ∈ π で N := (F の Sylow r, r ≠ p) は
+   `O_r(G) ≠ ⊥` を与え step 3 (`exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting`、済) で
+   `O_p(G)` Sylow ⟹ F が Hall π ⟹ |F||A| = |G| = |FA| ✗。以降 F = O_p(G) は p-群、A は
+   Hall p'、A ≠ ⊥ (さもなくば G は p-群で冪零 ✗ `IsPGroup.isNilpotent`)。
+5. **|A| 奇**: 2 ∣ |A| なら t ∈ A involution (Cauchy)。**新補題 L3**: fpf involution は
+   F を反転 (twisted map 全射) ⟹ ∀g, ⁅t,g⁆ が F を中心化 (計算) ⟹ ⁅t,g⁆ ∈ C(F) ≤ F ⟹
+   **mk t ∈ Z(Ḡ)**。p ∣ |Ḡ| (G ⊋ FA) の p-元と可換 ⟹ (‡) ✗。
+6. **A 巡回**: `isZGroup_of_isFrobeniusAction_of_odd` + Isaacs 6.19
+   (`existsUnique_card_prime_of_isFrobeniusAction_of_odd` / `normal_of_card_prime_...` —
+   **OddComplement.lean に既存**、冪零性ステップ丸ごと不要) ⟹ 相異なる素数 q,r の唯一の
+   位数-q/r 部分群 R_q, R_r ⊴ A は可換 (`commute_of_normal_of_disjoint`) ⟹ **Lemma 1.2** で
+   A の Sylow q × Sylow r が元ごと可換 (R_q ≤ 全 Sylow q) ⟹ C_A(Q₀) が全素数の Sylow を含み
+   `eq_top_of_forall_exists_sylow_le` ⟹ Q₀ ≤ Z(A) ⟹ `centerIn ≠ ⊥` ⟹
+   `isNilpotent_of_centerIn_ne_bot` + mathlib instance `IsZGroup + IsNilpotent → IsCyclic`。
+7. **Ā ⊴ Ḡ**: N̄ := O_{p'}(Ḡ) ≠ ⊥ [O_p(Ḡ) = ⊥ (comap は正規 p-群 ≤ F) ⟹ F(Ḡ) は p'-群]、
+   N̄ ≤ Ā (Hall 極大性)、N̄ 巡回 (≤ Ā ≅ A)。C_Ḡ(N̄) は (‡) より p-元なし ⟹ p'-正規 ⟹ ≤ N̄。
+   `IsCyclic.mulAutMulEquiv` (Aut 可換) ⟹ Ḡ' ≤ C_Ḡ(N̄) ≤ N̄ ⟹ Ḡ/N̄ 可換 ⟹ Ā ⊴ Ḡ ⟹
+   **Ā = N̄** (正規 p'-群 ≤ O_{p'})。
+8. **IsThreeStepGroup 組み立て**: 条件1 = FA (= comap N̄ = F ⊔ A) 上の Frobenius (kernel F,
+   complement A subgroupOf, fpf = step 2 済, 巡回 ✓ 奇 ✓)。条件2a = G/FA が p-群 ([G:FA] は
+   p-冪) ⟹ `opPPrimePCore_eq_top_iff`。条件2b = FA ≠ ⊤ ✓。条件3 = Ḡ Frobenius kernel
+   Ā = N̄, complement P̄ (Sylow p of Ḡ; `isComplement'_iff_card_mul_and_disjoint`,
+   conj_frobenius = (‡))。
+
+### 実装レイアウト
+
+- **新 leaf** `OddOrder/GroupTheory/FixedPointFreeConjugation.lean` (~180 行):
+  twisted-map 全単射 + L1 (fpf 商降下 = Gorenstein Lemma 10.1.3 coset 形) + L3
+  (involution 反転 + `⁅t,g⁆ ∈ centralizer F`)。generic (CN 非依存)。
+- **CNGroupStructure.lean 追記** (~400 行): (†) / (‡) / A-巡回性 / Thm 1.5 本体。
+  1500 行接近時は hub に分割委任。
+
 ## 段階的完了条件 (tier)
 
 1. **tier 1**: `IsThreeStepGroup` を定義 → Cor 1.6 を証明 → BG App.D の D.1 → D.2 を閉じる。
