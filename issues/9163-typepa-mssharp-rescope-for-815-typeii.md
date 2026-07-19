@@ -101,9 +101,61 @@ Pf 本文 frontier の次項目として **(9.11) の type-II 一般化**に着�
 ⟹ **裁定 (Option A vs B′) の波及先に (9.11) M 側も加えて評価されたい**。
 なお §15 が既に B′ を実装して回っている事実は、B′ 側の実現可能性の証拠になる。
 
+---
+
+## ✅ hub 裁定 (2026-07-19 22:5x) — **Option B′ で確定。Option A は却下し 9008 を re-open しない**
+
+### 1. 判定と実測根拠
+
+| 観点 | Option A (`typePA` を M_s^# 添字へ訂正) | **Option B′ (採用)** |
+|---|---|---|
+| 波及 | `typePA` は repo 内 **346 hit**。うち `typePA_eq_sharpSubgroup_derivedInG` の **rw が 38 箇所** (S10_MinimalSimpleBasic / S13_MaximalIII_IV ほか)。全てに `IsTypeP1` 仮説が伝播 | **ゼロ** |
+| cross-lane | `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting/Basics.lean` と `.../S16_MainResults/Notation.lean` が `MaximalSubgroupType` を import = **他レーン consumer に波及** | 影響なし |
+| 実現可能性 | 未実証 | **既に実装され稼働中** — `honestTypeP2ASet M = centralizerSupport (sharpSubgroup (Msigma M)) (derivedInG M)` (`S15_SAndT_Setup/SubcoherenceInputs.lean:73`) の上で (9.11) S 側 `Hypothesis.sSet_coherent_indS_A` が**型仮説を一切取らずに**通っている |
+
+⟹ Option A は「1 本の def で全型を書籍どおりに立てる」という美点に対し、38 箇所の仮説伝播 +
+他レーン波及という代価が釣り合わない。**B′ 確定**。
+
+### 2. ただし「新 def を並置する」のではなく **既存 `honestTypeP2ASet` を正本に昇格**する
+
+9163 本文の B′ 案は「型 II 用に別 def を新設」だが、**それは既に在る**。三つ目の def を作らず、
+既存を格上げすること (二重定義の管理コストを避ける):
+
+- **改名**: `honestTypeP2ASet` → **`typePACore`**。現名は「type P₂ 用の一時策」に読めるが、実体は
+  書籍 (8.10) の `A(M) = ⋃_{x ∈ M_s^#} C_{M′}(x)^#` **そのもの** (全型で正しい) なので、
+  名前をその事実に合わせる。旧名の参照は `S15_NineElevenSteps.lean` ほか **lane a 所有 file 内のみ** ゆえ単純置換でよい。
+  `honestTypeP2A0Set` も同様に `typePACore0` へ。
+- **置き場所**: **`OddOrder/Peterfalvi/S10_StructureSetup.lean`** (または同レベルの新 leaf)。
+  S10 系 consumer と S15 の**共通上流**で、`Msigma` と `typePA` の両方が既に closure にある
+  (`S10_MinimalSimpleBasic` は `S10_StructureSetup` のみを import して `Msigma` を 60 箇所使用)。
+  ⚠ **`OddOrder/GroupTheory/MaximalSubgroupType.lean` には置かない** — `Msigma` は
+  `BG/Ch3_MaximalSubgroups/S10_HallStructureCore.lean:112` にあり、GroupTheory 側から import すると
+  層が逆転する (BG/Ch4 が `MaximalSubgroupType` を import している)。
+- **橋渡し補題**: `IsTypeP1 M data → typePACore M = typePA M data` (P₁ では `M_s = M′`)。
+  これで既存 P₁ consumer は**一切変更不要**のまま、型 II 側は `typePACore` で立つ。
+- `typePA` 側の docstring (`MaximalSubgroupType.lean:436` の caveat) に「書籍忠実版は
+  `typePACore`、本 def は P₁ 域専用」と相互参照を入れる。
+
+### 3. 本裁定で unblock される範囲 (= lane a の次の割当)
+
+9163 が gate していた 4 件を **B′ 上で順に進める**。着手順は上流優先 + 文書順:
+
+1. **(8.15) type-II instance** (issue 1042 着手順 3) — claim 2 の A 側差し替え + claim 3 の
+   `S10_SubcoherentTypeP` A パラメータ差し替え
+2. **(8.18) の一般化** — `TypeIData S/T` 固定を外す。併せて type-II consumer が structure field
+   `cross_zero` として仮定している分を**導出に置換**
+3. **(9.11) M 側の type-II 拡張** — `S12_MaximalIII_IV_V_Core/Hypothesis.lean:353` の
+   `type_alt` を type-II 込みに広げ、`base.A0` を `typePACore` 上に建て直す
+4. 上記で残る packaging 層の辞書同一視 (`htype`/`hncH0C`) の整理
+
+### 4. lane b への影響
+
+**なし**。b の S12/S14 consumer は `typePA` のまま不変 (P₁ 域専用であることが docstring で明示される
+だけ)。b が型 II の A(M) を要する箇所に来たら `typePACore` を cite する。
+
 ## 参照
 
-- issues/closed/9008 (Option B 裁定と re-open 条件)
+- issues/closed/9008 (Option B 裁定と re-open 条件 — **本裁定で re-open しないことを確定**)
 - issues/closed/1043-pf-9-7-full-fidelity.md ((9.7) 完了; 次項目調査で本追記に至った)
 - issues/1042-pf-8-15-dade-hypothesis-instances.md (着手順 3 の gate 注記)
 - OddOrder/GroupTheory/MaximalSubgroupType.lean:436 (`typePA_eq_sharpSubgroup_derivedInG` の
