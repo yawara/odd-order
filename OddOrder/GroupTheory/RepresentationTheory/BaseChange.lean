@@ -32,14 +32,123 @@ of `F` and `V* = F* ⊗_F V`").
 * `baseChangeRepresentation K ρ` — the scalar extension `Representation K G (K ⊗[F] V)`.
 * `baseChangeRepresentation_apply_tmul` — action on a simple tensor.
 * `baseChangeRepresentation_faithful` — faithfulness survives a faithfully flat extension.
+* `LinearMap.baseChange₂ A b` — scalar extension of a mixed bilinear map
+  `M →ₗ[R] N →ₗ[R] P` in both inputs and its output.
 
 The fixed-space / `C_V(R)` transfer lemmas (`C_V(R) = 0 ⟹ C_{V*}(R) = 0`, dimension invariance)
 build on this; see the `invariants` lemmas below.
 -/
 
-namespace OddOrder.RepresentationTheory
-
 open scoped TensorProduct
+
+namespace LinearMap
+
+universe uMixedR uMixedA uMixedM uMixedN uMixedP
+
+variable {R : Type uMixedR} {A : Type uMixedA}
+variable {M : Type uMixedM} {N : Type uMixedN} {P : Type uMixedP}
+variable [CommSemiring R] [CommSemiring A] [Algebra R A]
+variable [AddCommMonoid M] [Module R M]
+variable [AddCommMonoid N] [Module R N]
+variable [AddCommMonoid P] [Module R P]
+
+variable (A) in
+/-- Extend scalars in both inputs and the output of a mixed bilinear map.
+
+Unlike `LinearMap.BilinMap.baseChange`, the two input modules may differ. -/
+def baseChange₂ (b : M →ₗ[R] N →ₗ[R] P) :
+    (A ⊗[R] M) →ₗ[A] (A ⊗[R] N) →ₗ[A] (A ⊗[R] P) :=
+  (TensorProduct.lift.equiv (.id A)
+      (A ⊗[R] M) (A ⊗[R] N) (A ⊗[R] P)).symm
+    ((TensorProduct.lift b).baseChange A ∘ₗ
+      (TensorProduct.AlgebraTensorModule.distribBaseChange
+        R A M N).symm.toLinearMap)
+
+/-- Evaluation of `baseChange₂` on pure tensors. -/
+@[simp]
+theorem baseChange₂_tmul (b : M →ₗ[R] N →ₗ[R] P)
+    (a c : A) (m : M) (n : N) :
+    b.baseChange₂ A (a ⊗ₜ[R] m) (c ⊗ₜ[R] n) =
+      (a * c) ⊗ₜ[R] b m n := by
+  simp [baseChange₂]
+
+/-- Equivariance of a mixed bilinear map survives extension of scalars. -/
+theorem baseChange₂_equivariant
+    (b : M →ₗ[R] N →ₗ[R] P)
+    (Tₘ : Module.End R M) (Tₙ : Module.End R N) (Tₚ : Module.End R P)
+    (h : ∀ x y, Tₚ (b x y) = b (Tₘ x) (Tₙ y))
+    (u : A ⊗[R] M) (v : A ⊗[R] N) :
+    Tₚ.baseChange A (b.baseChange₂ A u v) =
+      b.baseChange₂ A (Tₘ.baseChange A u) (Tₙ.baseChange A v) := by
+  induction u using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a x =>
+      induction v using TensorProduct.induction_on with
+      | zero => simp
+      | tmul c y => simp [h]
+      | add v w hv hw => simp [hv, hw]
+  | add u w hu hw => simp [hu, hw]
+
+/-- Full spanning range of a mixed bilinear map survives scalar extension. -/
+theorem baseChange₂_span_eq_top
+    (b : M →ₗ[R] N →ₗ[R] P)
+    (hspan : Submodule.span R
+      (Set.range fun z : M × N => b z.1 z.2) = ⊤) :
+    Submodule.span A
+      (Set.range fun z : (A ⊗[R] M) × (A ⊗[R] N) =>
+        b.baseChange₂ A z.1 z.2) = ⊤ := by
+  let f : (M ⊗[R] N) →ₗ[R] P := TensorProduct.lift b
+  have hsets :
+      Set.image2 (fun x y => b x y)
+          (↑(⊤ : Submodule R M) : Set M)
+          (↑(⊤ : Submodule R N) : Set N) =
+        Set.range (fun z : M × N => b z.1 z.2) := by
+    ext z
+    constructor
+    · rintro ⟨x, _hx, y, _hy, rfl⟩
+      exact ⟨(x, y), rfl⟩
+    · rintro ⟨⟨x, y⟩, rfl⟩
+      exact ⟨x, Submodule.mem_top, y, Submodule.mem_top, rfl⟩
+  have hmap2 : Submodule.map₂ b ⊤ ⊤ = ⊤ := by
+    rw [Submodule.map₂_eq_span_image2, hsets, hspan]
+  have hmapIncl :
+      LinearMap.range
+          (TensorProduct.mapIncl (⊤ : Submodule R M) (⊤ : Submodule R N)) = ⊤ := by
+    rw [TensorProduct.range_mapIncl, TensorProduct.map₂_mk_top_top_eq_top]
+  have hrange : LinearMap.range f = ⊤ := by
+    rw [← LinearMap.range_comp_of_range_eq_top f hmapIncl]
+    rw [← TensorProduct.map₂_eq_range_lift_comp_mapIncl, hmap2]
+  have hsurj : Function.Surjective f := LinearMap.range_eq_top.mp hrange
+  have hsurjA : Function.Surjective (f.baseChange A) :=
+    LinearMap.baseChange_surjective A hsurj
+  let S : Submodule A (A ⊗[R] P) :=
+    Submodule.span A
+      (Set.range fun z : (A ⊗[R] M) × (A ⊗[R] N) =>
+        b.baseChange₂ A z.1 z.2)
+  have hsimple (a : A) (t : M ⊗[R] N) :
+      f.baseChange A (a ⊗ₜ[R] t) ∈ S := by
+    induction t using TensorProduct.induction_on with
+    | zero => simp [S]
+    | tmul x y =>
+        apply Submodule.subset_span
+        refine ⟨(a ⊗ₜ[R] x, 1 ⊗ₜ[R] y), ?_⟩
+        simp [f]
+    | add t w ht hw =>
+        rw [TensorProduct.tmul_add, map_add]
+        exact S.add_mem ht hw
+  apply Submodule.eq_top_iff'.mpr
+  intro z
+  obtain ⟨t, rfl⟩ := hsurjA z
+  induction t using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a t => exact hsimple a t
+  | add t w ht hw =>
+      rw [map_add]
+      exact S.add_mem ht hw
+
+end LinearMap
+
+namespace OddOrder.RepresentationTheory
 
 /-- Scalar extension of a representation along a field extension.
 
