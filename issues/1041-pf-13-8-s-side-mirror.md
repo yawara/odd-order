@@ -150,3 +150,79 @@ grep で確定してから `Eta01Correction.lean` を書き始める。
 ## 完了済み
 
 - [x] stage (i): `Hypothesis.eta01` 定義 (DegreesFirstSplit.lean, commit 25689c81d)
+
+## iteration 3 進捗 (2026-07-19)
+
+**完了** (commit 9e02862ab):
+- `eta01_mem_ZIrr` (DegreesFirstSplit)
+- 新 leaf `S15_CaseBEndgameSupply/Eta01Correction.lean` (hub 登録済):
+  `etaColumn_inner_eta01` / `muColumnSum_ne_of_ne` /
+  `CharacterDegreeCore.exists_eta01_column_data` (j₀/c₀/δ/φ₀ packaged;
+  clean=(1,2,1), p=3 flip=(2,1,−1))
+
+**次に書くもの = S 側 hTau1IndEta mirror** (最重量、~300 行)。T 側の完全な手本 =
+`exists_muT_index_core_of_base_condition` (CharacterDegreeEngines.lean:84-630)。
+**⚠ hyp レベルで書く** (core レベル不可 — sSet member (Ind_HU ξ) の grid 直交
+`coherentIndS_image_inner_eta_eq_zero` は core の field に無い)。статement:
+
+```
+theorem Hypothesis.exists_muS_index_core_of_base_condition
+    (hG hnoV hyp chief) (φ₀ : Irr (H.subgroupOf S)) (hφ₀P : P-nonkernel)
+    (hφ₀base : Ind φ₀ irreducible ∨ ⟨τ₁S(Ind φ₀), η₀₁⟩ = 0) :
+    ∃ i₁ δ, 0 < i₁ ∧ P-nonkernel (zeta i₁) ∧ δ² = 1 ∧
+      (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff hyp.eta01 i₁ = δ ∧
+      (∀ i, 0 < i → i ≠ i₁ → P-nonkernel (zeta i) → cCoeff hyp.eta01 i = 0) ∧
+      zetaNormSq i₁ = q ∧ zeta i₁ 1 = (u*q : ℕ)
+```
+
+T 側 → S 側の対応表 (行番号は T 側):
+- :155 hetaRow → 済 `etaColumn_inner_eta01`
+- :175 pinned row obtain → 済 `exists_eta01_column_data` (ただし hyp-level 化:
+  core := hyp.characterDegreeCore hG hnoV chief で core.tau1S = tau1S_ofHonest は rfl)
+- :217 ν_r = Ind θr (nu_i_isIndQD + K=Q transport) → S 側は exists_eta01_column_data
+  の hμeq (μ_{j₀} = Ind θ_{j₀}) が直接与える (transport 不要、mu_j_isIndPC_not_ker 由来)
+- :231 hQkerNu (Q ⊄ Ker ν_r) → μ_{j₀} の P-nonkernel 版。
+  `mu_j_isIndPC_not_ker` (EnginesSSide:445) が θ の P-nonkernel を持つ;
+  S-level kernel 判定は subsetCharacterKernel_induce_of_subgroupOf の逆向き
+  ((1.6.a) mem_characterKernel_of_mem_characterKernel_induce) で降ろす
+  (:945-964 eta10_cCoeff_base_eq_zero の hθiP パターン流用)
+- :354 hTau1IndEta (2 段展開) → **核心**。S 側の内部手本 =
+  `induce_H_mem_zSpan_S` (CaseACoherence.lean:1047; HU = huSub data,
+  H-in-HU ≤ HU, compHom transport, induce_induce_subgroupOf,
+  induce_eq_sum_inner_restrict_smul, hcoefNat via
+  isCharacter_restrict + exists_natCast_inner_irreducible)。
+  ⚠ **S 側は data.H = P ≠ H** (toTypesIIIIIIVSetupS_H_eq? → DegreesFirstSplit:948:
+  data.H = hyp.P): hInHu data = P-in-HU。hmem (constituent ∈ sSet = 𝒳-witness) は
+  `constituent_P_not_subset_characterKernel` に (A = P-in-HU ≤ K' = H-in-HU) の
+  2 段で渡す — T 側は A = K' = Q-in-HU だった。θ' の kernel guard も
+  ((P-in-HU)-in-(H-in-HU)) 形に transport (induce_H_mem_zSpan_S 内部と同一)。
+  - 既約 constituent → `coherentIndS_image_inner_eta_eq_zero`
+    (tau1S_ofHonest_zSpanIrr_inner_eta:288 の呼び方を流用; 引数 =
+    sSet_closedUnderConjugate / sSet_hasNoRealCharacters +oddCardS /
+    conjDiff supported / coherent_H0Cprime_S) at (0,1)
+  - 可約 constituent → `sSet_reducible_eq_muColumnSum` → 列 c:
+    c = j₀ なら exfalso (⟨Ind θ, μ_{j₀}⟩ = 0 (hInd0: 相異 H-induction 直交、
+    inner_induce_eq_zero_of_not_conj) vs ℕ-係数展開で n s ≥ k s·q > 0;
+    T 側 :456-501 の mirror — nuRow_inner → muColumn_inner_self,
+    sSet_pairwiseOrthogonal は共通)
+    c ≠ j₀ → exists_eta01_column_data の orthogonality 節
+- :506 family cover → zeta_family_cover ⟨θ_{j₀}, irr⟩ (transport 不要)
+- :516 hi₁pos → ⟨τ₁ 比較⟩: base ⟨τ₁ Ind φ₀, η₀₁⟩ = 0 (exists_eta01_column_data
+  の c₀-orthogonality から) vs δ ≠ 0
+- :530 hzeta_one/hd1 → K = H.subgroupOf S abelian (H_mulCommutative;
+  eta10_cCoeff_base_eq_zero :884-906 と同一パターン)
+- :551 hc1/hmiddle → cCoeff 展開 + tau1S_apply_induce_sub bridge
+  (eta10_cCoeff_base_eq_zero :966-987 パターン + i₁ 例外は δ)
+- zetaNormSq i₁ = q: zeta i₁ = μ_{j₀} → `muColumn_inner_self` +
+  Hypothesis76.zetaNormSq def (T 側 :290-293 の hnormP mirror)
+- zeta i₁ 1 = uq: `mu_j_degree` (CountingLayer:433)
+
+**その後**: base cCoeff-int mirror (`Q_sharp_hypothesis76_base_cCoeff_int`
+CharacterDegreeEngines:716 → H_sharp 版; H_sharp_dadeHypothesis/H_sharp_hconj は
+Machinery135:1039/1062 に既存) → α(1)∈ℤ (hypothesis76AlphaFun_one_int) →
+`exists_caseB_data_eta01_S_core` (T 側 :207-353 mirror; ζ := q⁻¹ • zeta i₁,
+hfirstTerm = |S′|−u² via card_S_eq_deriv_mul_q + sum_normSq_eq_card_mul_inner;
+hinfl via hypothesis76AlphaFun_inflation + F↔H^# + |P-in-S| = p^q (card_P_eq)) →
+最終 `eta01_Hsharp_norm_lower_core` (T 側 :361-389 mirror;
+hu = two_mul_u_le (Canonicalization:94)、
+sum_apply_erase_one_filter_subgroupOf + H_le_S)。
