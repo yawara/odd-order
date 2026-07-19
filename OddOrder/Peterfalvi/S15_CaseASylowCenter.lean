@@ -129,8 +129,8 @@ theorem sylow_center_le_U_sylow_of_centralizer_witness [Finite G]
   have hPle_Ms : hyp.P ≤ OddOrder.BG.Ch3.S10.Msigma hyp.S := by
     rw [hyp.P_eq_SF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal
-  have hxA : x ∈ honestTypeP2ASet hyp.S := by
-    refine mem_honestTypeP2ASet.mpr ⟨?_, hx1, (z : G), ⟨hPle_Ms hzP, ?_⟩, ?_⟩
+  have hxA : x ∈ S10.typePACore hyp.S := by
+    refine S10.mem_typePACore.mpr ⟨?_, hx1, (z : G), ⟨hPle_Ms hzP, ?_⟩, ?_⟩
     · have hUderived : hyp.U ≤ derivedInG hyp.S := by
         rw [hyp.S_deriv_eq_PU]
         exact le_sup_right
@@ -139,7 +139,7 @@ theorem sylow_center_le_U_sylow_of_centralizer_witness [Finite G]
     · rw [Subgroup.mem_centralizer_singleton_iff]
       exact (Subgroup.mem_centralizer_singleton_iff.mp hzCx).symm
   have hcentralizerS : Subgroup.centralizer ({x} : Set G) ≤ hyp.S :=
-    (hyp.isTISubset_honestTypeP2ASet hG
+    (hyp.isTISubset_typePACore hG
       (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG)).centralizer_le hxA
   have hRgpg : IsPGroup r Rg := by
     simpa only [Rg] using R.isPGroup'.map K.subtype

@@ -1019,7 +1019,7 @@ supported in `A(T) ∪ {1}`.  Mirror of `sSet_member_support_subset_A` — the S
 identification `P = M_σ(S)` is only used for a *membership*, so the `T`-side needs just
 `Q ≤ M_σ(T)` (`maxNilpotentNormalHall_le_Msigma`, valid for every maximal subgroup, type III
 included); every other ingredient (`support_induce_subset_conjugatesIntoSet`, the (1.2) core,
-`honestTypeP2ASet_conj_mem`) is `M`-generic. -/
+`S10.typePACore_conj_mem`) is `M`-generic. -/
 theorem Hypothesis.sSet_member_support_subset_A_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hvd : hyp.v * hyp.d ≠ 1)
@@ -1028,7 +1028,7 @@ theorem Hypothesis.sSet_member_support_subset_A_T [Finite G]
     (hξ : ξ ∈ xiSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     (induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T ∪ {1} := by
   haveI : Fintype G := Fintype.ofFinite G
   classical
   have hHQ : ((hyp.toTypesIIIIIIVSetupT hG hvd).H : Subgroup G) = hyp.Q :=
@@ -1039,7 +1039,7 @@ theorem Hypothesis.sSet_member_support_subset_A_T [Finite G]
   have hcore : ∀ w : ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)),
       (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ) w ≠ 0 →
       ((w : ↥hyp.T) : G) ≠ 1 →
-      ((w : ↥hyp.T) : G) ∈ honestTypeP2ASet hyp.T := by
+      ((w : ↥hyp.T) : G) ∈ S10.typePACore hyp.T := by
     intro w hwval hwne
     haveI := hInHu_normal (hyp.toTypesIIIIIIVSetupT hG hvd)
     have hCne : OddOrder.Peterfalvi.S03.centralizerInSubgroup
@@ -1060,7 +1060,7 @@ theorem Hypothesis.sSet_member_support_subset_A_T [Finite G]
         = ((w : ↥hyp.T) : G) * ((d : ↥hyp.T) : G) := by
       have := congrArg (fun t : ↥hyp.T => (t : G)) (Subtype.ext_iff.mp hd_comm)
       simpa using this
-    rw [mem_honestTypeP2ASet]
+    rw [S10.mem_typePACore]
     refine ⟨?_, hwne, ((d : ↥hyp.T) : G), ?_, ?_⟩
     · have hwHU : (w : ↥hyp.T) ∈ (derivedInG hyp.T).subgroupOf hyp.T := by
         rw [← huSub_eq_derivedInG_subgroupOf]; exact w.2
@@ -1098,10 +1098,10 @@ theorem Hypothesis.sSet_member_support_subset_A_T [Finite G]
     apply hx1
     have hxG : (x : G) = 1 := by rw [hxeq, he]; group
     exact Subtype.ext hxG
-  have hwA : ((w : ↥hyp.T) : G) ∈ honestTypeP2ASet hyp.T := hcore w hw_val hwne
+  have hwA : ((w : ↥hyp.T) : G) ∈ S10.typePACore hyp.T := hcore w hw_val hwne
   refine Or.inl ?_
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hxeq]
-  exact honestTypeP2ASet_conj_mem c.2 hwA
+  exact S10.typePACore_conj_mem c.2 hwA
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -1112,7 +1112,7 @@ theorem Hypothesis.sSet_member_support_subset_T [Finite G]
     (hvd : hyp.v * hyp.d ≠ 1)
     {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     φ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T ∪ {1} := by
   haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨ξ, hξ, rfl⟩ := hφ
   exact hyp.sSet_member_support_subset_A_T hG hvd hξ
@@ -1132,7 +1132,7 @@ theorem Hypothesis.sSet_caseB_member_diff_supported_T [Finite G]
     {x : ClassFunction ↥hyp.T ℂ} (hx : x ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
     {y : ClassFunction ↥hyp.T ℂ} (hy : y ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     (x - y).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
   haveI : Fintype G := Fintype.ofFinite G
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
@@ -1180,20 +1180,20 @@ theorem Hypothesis.T_isTypeP [Finite G]
 
 /-- **(13.2.e) `T`-instance Dade hypothesis** (mirror of `dadeHypS`; the `A(T)`-Dade datum for
 the caseB-`T` (5.7) coherence).  Runs at general type `P` (issue 2035 #85): the underlying
-construction is `dadeSupportHypothesisData_honestTypeP2ASet`, weakened to `IsTypeP` — supplied
+construction is `dadeSupportHypothesisData_typePACore`, weakened to `IsTypeP` — supplied
 ungated by `T_isTypeP`. -/
 noncomputable def Hypothesis.dadeHypT [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) :
-    OddOrder.Peterfalvi.S04.Hypothesis G (honestTypeP2ASet hyp.T) hyp.T :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hTP).some.dade
+    OddOrder.Peterfalvi.S04.Hypothesis G (S10.typePACore hyp.T) hyp.T :=
+  (dadeSupportHypothesisData_typePACore hG hyp.T_maximal hTP).some.dade
 
 /-- **(13.2.e) `T`-instance Dade `H`-conjugation invariance** (mirror of `dadeHypS_hconj`). -/
 theorem Hypothesis.dadeHypT_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) :
     (hyp.dadeHypT hG hTP).HConjInvariant :=
-  (dadeSupportHypothesisData_honestTypeP2ASet hG hyp.T_maximal hTP).some.hconj
+  (dadeSupportHypothesisData_typePACore hG hyp.T_maximal hTP).some.hconj
 
 
 open OddOrder.Peterfalvi.S11 in
@@ -1212,7 +1212,7 @@ theorem Hypothesis.sSet_member_diffsupp_T [Finite G]
           (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
         - induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
           (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).support
-      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
   haveI : Fintype G := Fintype.ofFinite G
   set φ : ClassFunction ↥hyp.T ℂ :=
     induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
@@ -1247,7 +1247,7 @@ theorem Hypothesis.sSet_member_conjDiff_supported_T [Finite G]
     (hvd : hyp.v * hyp.d ≠ 1)
     {η : ClassFunction ↥hyp.T ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     ((η : ClassFunction ↥hyp.T ℂ).conj - η).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
   haveI := hyp.finiteG
   letI : Fintype G := Fintype.ofFinite G
   obtain ⟨ξ, hξ, rfl⟩ := hη

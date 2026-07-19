@@ -84,27 +84,27 @@ noncomputable def Hypothesis.residueS [Finite G] (hyp : Hypothesis (G := G))
 
 The `(13.18)` support pin `S15.Hypothesis.tauS_mu_row0_diff_support` places the `μ`-column
 difference
-support inside `honestTypeP2A0Set = honestTypeP2ASet ∪ V^S`, whose `A`-part
-`honestTypeP2ASet = centralizerSupport (M_σ^#) S'` is the **honest** Peterfalvi (8.10)/(13.2.e)
+support inside `S10.typePACore0 = S10.typePACore ∪ V^S`, whose `A`-part
+`S10.typePACore = centralizerSupport (M_σ^#) S'` is the **honest** Peterfalvi (8.10)/(13.2.e)
 type-`P₂` support (indexed over the *core* `M_σ^#`; issue 9008 Option A).  The old
 `typePA = centralizerSupport S^# S' = (S')^#` is the **over-claim** (issue 9008 phantom): it wrongly
 includes the Frobenius-complement points `U^#` (where `C_{S_σ} = 1`).
 
 **The pin's support target is therefore correct, and the `(13.18)` route is clean**: the S06
 certain-type bound `certainTypeDiffSupported : SupportedClassFunctions (A ∪ V^S) L` is **parametric
-in the Hypothesis46 support `A`** — so a `Hypothesis46 (honestTypeP2ASet S) ↥S` (built with lane-c's
-`dadeHypS0`, whose support is exactly `honestTypeP2A0Set`) delivers the pin's honest support
-`honestTypeP2A0Set` *directly*, with no `typePA0` over-claim in the way.  The remaining pin-2/3
-assembly is thus the type-`P₂` `Hypothesis46`-for-`S` (`A = honestTypeP2ASet`, `dade0 = dadeHypS0`),
+in the Hypothesis46 support `A`** — so a `Hypothesis46 (S10.typePACore S) ↥S` (built with lane-c's
+`dadeHypS0`, whose support is exactly `S10.typePACore0`) delivers the pin's honest support
+`S10.typePACore0` *directly*, with no `typePA0` over-claim in the way.  The remaining pin-2/3
+assembly is thus the type-`P₂` `Hypothesis46`-for-`S` (`A = S10.typePACore`, `dade0 = dadeHypS0`),
 which lives in lane-c's `S15_HonestTypeP2A0` (it consumes `dadeHypS0`); cf. issue 9076.
 
 The lemma below just records the containment `honest ⊆ over-claim` (immediate from `M_σ ≤ S` and
 `centralizerSupport` monotonicity in its source), a sanity check on the two support notions. -/
-theorem honestTypeP2ASet_subset_typePA {M : Subgroup G}
+theorem typePACore_subset_typePA {M : Subgroup G}
     (data : OddOrder.GroupTheory.TypePData M) :
-    honestTypeP2ASet M ⊆ OddOrder.GroupTheory.typePA M data := by
+    S10.typePACore M ⊆ OddOrder.GroupTheory.typePA M data := by
   intro y hy
-  rw [mem_honestTypeP2ASet] at hy
+  rw [S10.mem_typePACore] at hy
   obtain ⟨hyM', hy1, x, hx, hxcent⟩ := hy
   simp only [OddOrder.GroupTheory.typePA, OddOrder.GroupTheory.centralizerSupport,
     Set.mem_setOf_eq]
@@ -123,9 +123,9 @@ datum (the `A₀`-Dade `dade0` and its `HConjInvariant`) and the (4.6.c) kernel-
 **as parameters**, and assembles the `Hypothesis46` from any `TypePData M` (structural
 `tic`/`W₁`/`W₂`
 reconciliation done here, type-uniformly).  A type-`P₂` caller (e.g. lane-c's `S15_HonestTypeP2A0`)
-instantiates it with `A = honestTypeP2ASet M`, `dade0 = dadeHypS0`, `subH = M_σ` (for which
+instantiates it with `A = S10.typePACore M`, `dade0 = dadeHypS0`, `subH = M_σ` (for which
 `A_covers`
-holds, `honestTypeP2ASet = ⋃_{z∈M_σ#} C_{S'}(z)#`), unblocking the (13.18)
+holds, `S10.typePACore = ⋃_{z∈M_σ#} C_{S'}(z)#`), unblocking the (13.18)
 `certainTypeDiffSupported`
 / `certainType_diff_dade_eq` residue facts.  Mirrors `toHypothesis46` field-for-field, with the Dade
 and `subH` hoisted to parameters. -/

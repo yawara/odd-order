@@ -110,7 +110,7 @@ theorem Hypothesis.nuRow_diff_supported [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
     {r s : Fin hyp.q} (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) (hs : s ≠ ⟨0, hyp.q_prime.pos⟩) :
     ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
   intro z hz
   have hz0 : ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j)) z ≠ 0 := hz
   have hxmem : (∑ j : Fin hyp.p, hyp.nu r j) ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) :=
@@ -150,7 +150,7 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {r s : Fin hyp.q} (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) (hs : s ≠ ⟨0, hyp.q_prime.pos⟩)
     (hrs : r ≠ s) :
     c.extension (∑ j : Fin hyp.p, hyp.nu r j) - c.extension (∑ j : Fin hyp.p, hyp.nu s j)
@@ -160,7 +160,7 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
   have hAsupp := hyp.nuRow_diff_supported hG pins hvd chief hr hs
   have hmemSpan : ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j)) ∈
       OddOrder.Peterfalvi.S07.zSupportedSpan (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) :=
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) :=
     ⟨Submodule.sub_mem _
       (Submodule.subset_span (sOf_subset_sSet _ chief.H0
         (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief r hr)))
@@ -168,7 +168,7 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
         (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief s hs))),
       hAsupp⟩
   have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-    (honestTypeP2ASet_subset_A0Set Tdata))
+    (typePACore_subset_A0Set Tdata))
   rw [← map_sub, c.extends_on_supported _ hmemSpan, hyp.indT_apply,
     ← hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp,
     show ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j))
@@ -183,7 +183,7 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 `(5.3.b)-T` input).
 
 For a conjugate-closed no-real family `𝒮` of characters of the type-`P₂` maximal `T` whose
-conjugate differences are `A(T) = honestTypeP2ASet T`-supported, and a coherence
+conjugate differences are `A(T) = S10.typePACore T`-supported, and a coherence
 `coh : IsCoherent (Ind_T^G) 𝒮 A(T)` of the induction map `τ = Ind_T^G` (`hyp.indT`), every
 coherent image `coh.extension ζ` (`ζ ∈ 𝒮` irreducible) is orthogonal to the entire `η`-grid.
 The coherent conjugate difference agrees with the `A₀(T)`-Dade image
@@ -200,9 +200,9 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
     (hconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S)
     (hnoReal : OddOrder.Peterfalvi.S03.HasNoRealCharacters S)
     (hsupp : ∀ ζ ∈ S, (ζ - ζ.conj).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT S
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {ζ : ClassFunction ↥hyp.T ℂ} (hζ : ζ ∈ S)
     (hζirr : IsIrreducibleCharacter ζ) :
     ∀ (i : Fin hyp.q) (j : Fin hyp.p),
@@ -215,13 +215,13 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
   have hdiffSupp := hsupp ζ hζ
   have hdiffSupported : ζ - ζ.conj ∈
       OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) S
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) :=
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) :=
     ⟨hdiffSpan, hdiffSupp⟩
   -- `A(T) ⊆ A₀(T)`, so the difference is also `A₀(T)`-supported (the `dadeHypT0` support).
   have hA0Supp : (ζ - ζ.conj).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hdiffSupp.trans
-      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (honestTypeP2ASet_subset_A0Set Tdata))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (typePACore_subset_A0Set Tdata))
   -- `τ = Ind_T^G` equals the `A₀(T)`-Dade image on the `A₀(T)`-supported difference.
   have hmaps : hyp.indT (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
@@ -281,7 +281,7 @@ theorem Hypothesis.coherentIndT_extension_irr_vanish_regular [Finite G]
     (Tdata : TypePData hyp.T) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {ξ : ClassFunction ↥hyp.T ℂ} (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
     (hξirr : IsIrreducibleCharacter ξ)
     {x : G} (hx : x ∈ OddOrder.GroupTheory.conjClassSet
@@ -322,7 +322,7 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {ξ : ClassFunction ↥hyp.T ℂ} (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
     (hξirr : IsIrreducibleCharacter ξ)
     {i : Fin hyp.q} (hi : i ≠ ⟨0, hyp.q_prime.pos⟩)
@@ -356,7 +356,7 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
     ring
   -- `γ` is `A(T)`-supported: members are supported in `A(T) ∪ {1}` and `γ(1) = 0`
   have hγsupp : γ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
     intro z hz
     have hz0 : γ z ≠ 0 := hz
     have hz1 : z ≠ 1 := fun h => hz0 (h ▸ hγ1)
@@ -380,9 +380,9 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
       · exact h'
       · exact absurd (Set.mem_singleton_iff.mp h') hz1
   have hγA0supp : γ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hγsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (honestTypeP2ASet_subset_A0Set Tdata))
+      (typePACore_subset_A0Set Tdata))
   -- `c(γ)` is the honest `A₀(T)`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
@@ -467,7 +467,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {ξ : ClassFunction ↥hyp.T ℂ} (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
     (hξirr : IsIrreducibleCharacter ξ)
     {i : Fin hyp.q} (hi : i ≠ ⟨0, hyp.q_prime.pos⟩) :
@@ -500,7 +500,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
   have hagree : ∀ φ : ClassFunction ↥hyp.T ℂ,
       φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T)
         (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) →
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) →
       hyp.indT φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) φ :=
     fun φ hφ => by
@@ -751,7 +751,7 @@ theorem Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     (hpivot : c.extension (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
       = ∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j)
     {i : Fin hyp.q} (hi : i ≠ ⟨0, hyp.q_prime.pos⟩) :
@@ -783,7 +783,7 @@ coherent extension of `𝒯` on `Ind_T^G` (`coherentImageMap` over the orthogona
 
 Isometry: ν-rows are pairwise `p·[r=s]`-orthogonal, matched by the η-rows (`nuRow_inner` /
 `etaRow_inner`).  τ-agreement: an `A(T)`-supported lattice element vanishes at `1`
-(`honestTypeP2ASet_one_not_mem`); since every reducible row shares degree `p·v`
+(`S10.typePACore_one_not_mem`); since every reducible row shares degree `p·v`
 (`nuRow_apply_one`), the residual `ν₀ − Ind_T^G` is `(x 1 / p·v)`-proportional to the
 row-independent constant `r = η-row₁ − Ind_T^G(ν-row₁)` (from the per-column prime-`TI`
 cross-relation `tauT_nu_cross` through `tInstance_dade0_eq_induce`), hence vanishes there. -/
@@ -800,7 +800,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
       ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
     ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
         (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T),
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T),
       c.extension (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
         = ∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j := by
   haveI := hyp.finiteG
@@ -820,7 +820,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
     exact absurd hcard (lt_irrefl 0)
   have hpne0 : (hyp.p : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.p_prime.pos.ne'
   have hone_notin : (1 : ↥hyp.T) ∉
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
     rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
     simp
   -- the family, its finiteness, and the per-member row datum (all members reducible)
@@ -883,7 +883,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
     · subst hr1; rw [sub_self, map_zero, sub_self]
     · have hAsupp := hyp.nuRow_diff_supported hG pins hvd chief hr0 hi1_0
       have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-        (honestTypeP2ASet_subset_A0Set Tdata))
+        (typePACore_subset_A0Set Tdata))
       rw [hyp.indT_apply, ← hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp,
         show ((∑ j : Fin hyp.p, hyp.nu r j)
             - (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j))
@@ -980,7 +980,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
   -- the supported-agreement field
   have hextends : ∀ x : ClassFunction ↥hyp.T ℂ,
       x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) F
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) →
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) →
       ν₀ x = hyp.indT x := by
     rintro x ⟨hxspan, hxsupp⟩
     have hx1 : x 1 = 0 := by
@@ -1005,7 +1005,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
   -- the nonzero supported witness `ν-row₁ − ν-row₂`
   have hnonzero : ∃ φ : ClassFunction ↥hyp.T ℂ,
       φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) F
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) ∧
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) ∧
         φ ≠ 0 := by
     refine ⟨(∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
         - (∑ j : Fin hyp.p, hyp.nu ⟨2, h2lt⟩ j), ?_, ?_⟩
@@ -1079,7 +1079,7 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T),
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T),
       (∀ i : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ →
         c.extension (∑ j : Fin hyp.p, hyp.nu i j) = ∑ j : Fin hyp.p, hyp.eta i j) ∨
       (hyp.q = 3 ∧ ∀ i i' : Fin hyp.q, i ≠ ⟨0, hyp.q_prime.pos⟩ →

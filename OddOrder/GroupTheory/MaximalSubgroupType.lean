@@ -418,6 +418,28 @@ requires `A_0(M) ⊆ M`, and the `G`-closure of the nonempty `V` cannot lie in t
 def typePA0 (M : Subgroup G) (data : TypePData M) : Set G :=
   typePA M data ∪ conjClassSetIn M (typePV M data)
 
+/-- **A `centralizerSupport` over a sharp source collapses to the sharp of its host** as soon as
+the host lies inside the source subgroup: the centralizer condition is then vacuous, because every
+`y ∈ H^# ⊆ K^#` centralizes itself (take `x = y`).  So
+`centralizerSupport (K^#) H = H^#` whenever `H ≤ K`.
+
+This is the degenerate case of Peterfalvi's `⋃_{x ∈ K^#} C_H(x)^#` construction (8.10): the union
+is only informative when the index subgroup `K` is *smaller* than the host `H`.  It specialises to
+`typePA_eq_sharpSubgroup_derivedInG` (`K = M`, `H = M'`) and, in the type-`P₁` regime where
+`M_σ = M'`, to the `typePACore`/`typePA` bridge (`K = H = M'`; see
+`OddOrder.Peterfalvi.S10.typePACore_eq_typePA_of_isTypeP1`). -/
+theorem centralizerSupport_sharpSubgroup_of_le {K H : Subgroup G} (hHK : H ≤ K) :
+    centralizerSupport (sharpSubgroup K) H = sharpSubgroup H := by
+  ext y
+  simp only [centralizerSupport, sharpSubgroup, Set.mem_setOf_eq, Set.mem_sdiff_singleton]
+  constructor
+  · rintro ⟨h1, h2, -⟩
+    exact ⟨h1, h2⟩
+  · rintro ⟨h1, h2⟩
+    exact ⟨h1, h2, y, ⟨hHK h1, h2⟩,
+      Subgroup.mem_centralizer_iff.mpr fun g hg => by
+        rw [Set.mem_singleton_iff] at hg; subst hg; rfl⟩
+
 /-- **The type-`P` support is the sharp of the derived subgroup**: `A(M) = (M')#`.
 
 `typePA M = centralizerSupport (M#) M'` is by definition `{y ∈ M' | y ≠ 1 ∧ ∃ x ∈ M#, y ∈ C_G(x)}`,
@@ -427,23 +449,20 @@ subgroup
 `M' = derivedInG M ⊴ M`.  This is the `A = H#` shape (with `H = M'`) that Peterfalvi (10.8) needs to
 apply the (7.6)/(7.8.b) coherence norm estimate to `(M, A(M))`.
 
-**Caveat (issue 9008)**: `typePA = (M')#` equals Peterfalvi's actual `A(M)` only for type `P₁`
-(BG III/IV/V, where `M_σ = M'`).  Peterfalvi (8.10) indexes over the **core** `M_s^# = M_σ^#`
-(`A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`), so for type `P₂` (type II, `M_σ ⊊ M'`) the true `A(M)` is the
-strictly smaller `(M')# ∩ hatMsigma`, excluding the Frobenius-complement points `U^#`.  The `.mmd`
-extraction of (8.10) dropped the `M_s → M` subscript; `typePA` is faithful only in the `P₁` regime,
-which is all any consumer uses (`dadeSupportHypotheses_typeP` carries an `IsTypeP1` hypothesis). -/
+**Caveat (issue 9008, settled by the 9163 hub ruling)**: `typePA = (M')#` equals Peterfalvi's
+actual `A(M)` only for type `P₁` (BG III/IV/V, where `M_σ = M'`).  Peterfalvi (8.10) indexes over
+the **core** `M_s^# = M_σ^#` (`A(M) = ⋃_{x∈M_σ^#} C_{M'}(x)^#`), so for type `P₂` (type II,
+`M_σ ⊊ M'`) the true `A(M)` is the strictly smaller `(M')# ∩ hatMsigma`, excluding the
+Frobenius-complement points `U^#`.
+
+**The book-literal `A(M)`, valid for every type, is
+`OddOrder.Peterfalvi.S10.typePACore`** (`S10_StructureSetup.lean`); this `typePA` is the
+`P₁`-regime specialisation, kept because that is the regime all of its consumers use
+(`dadeSupportHypotheses_typeP` carries an `IsTypeP1` hypothesis).  The two agree on `P₁` by
+`typePACore_eq_typePA_of_isTypeP1`.  `typePA` may not be used for type `P₂` (= type II). -/
 theorem typePA_eq_sharpSubgroup_derivedInG (M : Subgroup G) (data : TypePData M) :
-    typePA M data = sharpSubgroup (derivedInG M) := by
-  ext y
-  simp only [typePA, centralizerSupport, sharpSubgroup, Set.mem_setOf_eq, Set.mem_sdiff_singleton]
-  constructor
-  · rintro ⟨h1, h2, -⟩
-    exact ⟨h1, h2⟩
-  · rintro ⟨h1, h2⟩
-    exact ⟨h1, h2, y, ⟨Subgroup.map_subtype_le _ h1, h2⟩,
-      Subgroup.mem_centralizer_iff.mpr fun g hg => by
-        rw [Set.mem_singleton_iff] at hg; subst hg; rfl⟩
+    typePA M data = sharpSubgroup (derivedInG M) :=
+  centralizerSupport_sharpSubgroup_of_le (Subgroup.map_subtype_le _)
 
 /-- Peterfalvi (8.14), the thickened `A_1(M)` attached to a supporting maximal
 subgroup `L`. -/

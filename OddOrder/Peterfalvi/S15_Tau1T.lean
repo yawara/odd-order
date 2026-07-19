@@ -55,7 +55,7 @@ noncomputable def Hypothesis.coherentIndT_pinned [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) :=
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) :=
   (hyp.sSet_coherent_indT_A_pinned hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief).choose
 
 open OddOrder.Peterfalvi.S11 in
@@ -179,7 +179,7 @@ theorem Hypothesis.tau1T_ofHonest_extends_on_supported [Finite G]
     (φ : ClassFunction ↥hyp.T ℂ)
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) :
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)) :
     hyp.tau1T_ofHonest hG hnoV pins hvd hTP Tdata hU hW1 hW2 chief φ
       = ClassFunction.induce hyp.T φ := by
   have h := (hyp.coherentIndT_pinned hG hnoV pins hvd hTP Tdata hU hW1 hW2
@@ -226,7 +226,7 @@ theorem Hypothesis.zSpan_sSet_support_subset_T [Finite G]
     {φ : ClassFunction ↥hyp.T ℂ}
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))) :
     φ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T ∪ {1} := by
   induction hφ using Submodule.span_induction with
   | mem x hx => exact hyp.sSet_member_support_subset_T hG hvd hx
   | zero => simp
@@ -249,7 +249,7 @@ theorem Hypothesis.zSpan_sSet_degree_zero_support_T [Finite G]
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupT hG hvd)))
     (hφ1 : φ (1 : ↥hyp.T) = 0) :
     φ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
   intro z hz
   rcases hyp.zSpan_sSet_support_subset_T hG hvd hφ hz with h | h
   · exact h

@@ -233,7 +233,7 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
     nu i j 1 = nu k j 1 →
     (nu i j - nu k j).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set T Tdata) T
+        (OddOrder.Peterfalvi.S10.typePACore0 T Tdata) T
   nu_apply_of_not_mem_W1 : ∀ (i : Fin q) (j : Fin p) (w : G)
     (hwW : w ∈ W) (hwT : w ∈ T), w ∉ (W1 : Set G) →
     nu i j ⟨w, hwT⟩ = (deltaPrime i : ℂ) * omega i j ⟨w, hwW⟩
@@ -259,7 +259,7 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
     mu i j 1 = mu i k 1 →
     (mu i j - mu i k).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set S Sdata) S
+        (OddOrder.Peterfalvi.S10.typePACore0 S Sdata) S
   /-- **Peterfalvi (4.3.c), value identity** (Coq `prTIirr_id`; issues 9076/9014): on `W ∖ W₂`
   the `μ`-grid is the signed `ω`-grid, `μ_{ij}(w) = δ_j·ω_{ij}(w)`. -/
   mu_apply_of_not_mem_W2 : ∀ (i : Fin q) (j : Fin p) (w : G) (hwW : w ∈ W)
@@ -410,7 +410,7 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
     mu i j 1 = mu i k 1 →
     (mu i j - mu i k).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.S tp.Sdata) mp.S
+        (OddOrder.Peterfalvi.S10.typePACore0 mp.S tp.Sdata) mp.S
   /-- **Peterfalvi (4.3.c), value identity** (Coq `prTIirr_id`; issues 9076/9014): on `W ∖ W₂`
   the `μ`-grid is the signed `ω`-grid, `μ_{ij}(w) = δ_j·ω_{ij}(w)`. -/
   mu_apply_of_not_mem_W2 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : G) (hwW : w ∈ tp.W)
@@ -481,7 +481,7 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
     nu i j 1 = nu k j 1 →
     (nu i j - nu k j).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set mp.T Tdata) mp.T
+        (OddOrder.Peterfalvi.S10.typePACore0 mp.T Tdata) mp.T
   nu_apply_of_not_mem_W1 : ∀ (i : Fin tp.q) (j : Fin tp.p) (w : G)
     (hwW : w ∈ tp.W) (hwT : w ∈ mp.T), w ∉ (tp.W1 : Set G) →
     nu i j ⟨w, hwT⟩ = (deltaPrime i : ℂ) * omega i j ⟨w, hwW⟩

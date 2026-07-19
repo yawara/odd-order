@@ -15,7 +15,7 @@ This is the `S`-side mirror of the proven T-side template
 
 Let `𝒮` be a conjugate-closed, no-real family of irreducible characters of the type-`P₂`
 maximal subgroup `S`, whose member differences `ζ − ζ̄` are supported on the honest type-`P₂`
-Dade support `A(S) = honestTypeP2ASet S` (which lies inside `S' = derivedInG S`).  Given a
+Dade support `A(S) = S10.typePACore S` (which lies inside `S' = derivedInG S`).  Given a
 coherence `coh : IsCoherent (Ind_S^G) 𝒮 A(S)` of the induction map `τ = Ind_S^G` (Peterfalvi
 (13.2.e), `hyp.indS`), every coherent image `τ₁ ζ = coh.extension ζ` is orthogonal to the whole
 shared `η`-grid.
@@ -38,7 +38,7 @@ Both `A(S)` (the coherence / difference support) and `A₀(S) = A(S) ∪ (V^S)` 
 support) enter, exactly as `A₁(T) = sigmaSharp T` and `typePA0 T` do on the T-side.
 
 The coherence `coh` is taken as a hypothesis (as on the T-side), with support the **honest
-Dade support** `A(S) = honestTypeP2ASet S` (`⊆ S'`) — the analogue of the T-side
+Dade support** `A(S) = S10.typePACore S` (`⊆ S'`) — the analogue of the T-side
 `A₁(T) = sigmaSharp T`.  This is **not** the support of the §9/§11 coherence
 `Hypothesis.coherent_H0Cprime_S`: that carries the *kernel* support `(H₀C')^# = cprimeSharpS`,
 which for the honest type-`P₂` `S` degenerates to `∅` (`cprimeSharpS_eq_empty`, since
@@ -61,7 +61,7 @@ open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 (the `S`-side mirror of `S16.T_typeIII_coherent_image_inner_eta_eq_zero`).
 
 For a conjugate-closed no-real family `𝒮` of irreducible characters of the type-`P₂` maximal
-`S` whose differences are `A(S) = honestTypeP2ASet S`-supported, and a coherence
+`S` whose differences are `A(S) = S10.typePACore S`-supported, and a coherence
 `coh : IsCoherent (Ind_S^G) 𝒮 A(S)` of the (13.2.e) induction map `τ = Ind_S^G` (`hyp.indS`),
 every coherent image `coh.extension ζ` (`ζ ∈ 𝒮` irreducible) is orthogonal to the entire
 `η`-grid. -/
@@ -75,9 +75,9 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
     (hconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S)
     (hnoReal : OddOrder.Peterfalvi.S03.HasNoRealCharacters S)
     (hsupp : ∀ ζ ∈ S, (ζ - ζ.conj).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS S
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))
     {ζ : ClassFunction ↥hyp.S ℂ} (hζ : ζ ∈ S)
     (hζirr : IsIrreducibleCharacter ζ) :
     ∀ (i : Fin hyp.q) (j : Fin hyp.p),
@@ -98,14 +98,14 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
   have hdiffSupp := hsupp ζ hζ
   have hdiffSupported : ζ - ζ.conj ∈
       OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.S) S
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) :=
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) :=
     ⟨hdiffSpan, hdiffSupp⟩
   -- `A(S) ⊆ A₀(S)`, so the difference is also `A₀(S)`-supported (the `dadeHypS0` support).
   have hA0Supp : (ζ - ζ.conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+        (S10.typePACore0 hyp.S hyp.Sdata) hyp.S :=
     hdiffSupp.trans
-      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (honestTypeP2ASet_subset_A0Set hyp.Sdata))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (typePACore_subset_A0Set hyp.Sdata))
   -- (13.2.e) `τ = Ind_S^G` equals the `A₀(S)`-Dade image on the `A₀(S)`-supported difference.
   have hmaps : hyp.indS (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
@@ -134,11 +134,11 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
           rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq, ← hyp.W_eq_join]
         rw [hWeq]; exact hw.1
       · rw [hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hw.2
-    have hwA0 : w ∈ honestTypeP2A0Set hyp.S hyp.Sdata :=
+    have hwA0 : w ∈ S10.typePACore0 hyp.S hyp.Sdata :=
       Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
       ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hA0Supp]
-    let a : {a : G // a ∈ honestTypeP2A0Set hyp.S hyp.Sdata} := ⟨w, hwA0⟩
+    let a : {a : G // a ∈ S10.typePACore0 hyp.S hyp.Sdata} := ⟨w, hwA0⟩
     have hwh : w ∈ (hyp.dadeHypS0 hG).hCoset a :=
       ⟨1, (hyp.dadeHypS0 hG).H a |>.one_mem, by simp [a]⟩
     rw [(hyp.dadeHypS0 hG).isDadeMap_dadeMap.map_eq_of_mem_hCoset _ a hwh]
@@ -146,8 +146,8 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
     have hwSupp : (⟨w, (hyp.dadeHypS0 hG).mem_L hwA0⟩ : ↥hyp.S) ∈ (ζ - ζ.conj).support :=
       ClassFunction.mem_support.mpr hne
     -- the source is `A(S)`-supported, so `w ∈ A(S) ⊆ S' = derivedInG S`.
-    have hwA : w ∈ honestTypeP2ASet hyp.S := hdiffSupp hwSupp
-    have hwDeriv : w ∈ derivedInG hyp.S := honestTypeP2ASet_subset_derived hwA
+    have hwA : w ∈ S10.typePACore hyp.S := hdiffSupp hwSupp
+    have hwDeriv : w ∈ derivedInG hyp.S := S10.typePACore_subset_derived hwA
     -- but a regular `W`-element lies outside the derived subgroup.
     exact (OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.Sdata hwV) hwDeriv
   -- the straightforward `dirr`-input norms.

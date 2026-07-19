@@ -75,7 +75,7 @@ theorem Hypothesis.coherentIndS_muColumn_diff [Finite G]
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))
     {j k : Fin hyp.p} (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) (hk : k ≠ ⟨0, hyp.p_prime.pos⟩)
     (hjk : j ≠ k) :
     c.extension (∑ i : Fin hyp.q, hyp.mu i j) - c.extension (∑ i : Fin hyp.q, hyp.mu i k)
@@ -84,7 +84,7 @@ theorem Hypothesis.coherentIndS_muColumn_diff [Finite G]
   haveI := hyp.finiteG
   have hmemSpan : ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k)) ∈
       OddOrder.Peterfalvi.S07.zSupportedSpan (sSet (hyp.toTypesIIIIIIVSetupS hG))
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) :=
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) :=
     ⟨Submodule.sub_mem _
       (Submodule.subset_span (sOf_subset_sSet _ chief.H0 (hyp.mu_colSum_mem_sOf_H0 hG chief j hj)))
       (Submodule.subset_span (sOf_subset_sSet _ chief.H0 (hyp.mu_colSum_mem_sOf_H0 hG chief k hk))),
@@ -106,7 +106,7 @@ theorem Hypothesis.coherentIndS_extension_irr_vanish_regular [Finite G]
     (hyp : Hypothesis (G := G))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))
     {ξ : ClassFunction ↥hyp.S ℂ} (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hξirr : IsIrreducibleCharacter ξ)
     {x : G} (hx : x ∈ OddOrder.GroupTheory.conjClassSet
@@ -143,7 +143,7 @@ theorem Hypothesis.coherentIndS_muColumn_vanish_regular [Finite G]
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))
     {ξ : ClassFunction ↥hyp.S ℂ} (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hξirr : IsIrreducibleCharacter ξ)
     {j : Fin hyp.p} (hj : j ≠ ⟨0, hyp.p_prime.pos⟩)
@@ -177,7 +177,7 @@ theorem Hypothesis.coherentIndS_muColumn_vanish_regular [Finite G]
     ring
   -- `γ` is `A(S)`-supported: members are supported in `A(S) ∪ {1}` and `γ(1) = 0`
   have hγsupp : γ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
     intro z hz
     have hz0 : γ z ≠ 0 := hz
     have hz1 : z ≠ 1 := fun h => hz0 (h ▸ hγ1)
@@ -201,9 +201,9 @@ theorem Hypothesis.coherentIndS_muColumn_vanish_regular [Finite G]
       · exact h'
       · exact absurd (Set.mem_singleton_iff.mp h') hz1
   have hγA0supp : γ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S hyp.Sdata) hyp.S :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S hyp.Sdata) hyp.S :=
     hγsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (honestTypeP2ASet_subset_A0Set hyp.Sdata))
+      (typePACore_subset_A0Set hyp.Sdata))
   -- `c(γ)` is the honest `A₀`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
@@ -251,7 +251,7 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))
     {ξ : ClassFunction ↥hyp.S ℂ} (hξ : ξ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hξirr : IsIrreducibleCharacter ξ)
     {j : Fin hyp.p} (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
@@ -283,7 +283,7 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
   have hagree : ∀ φ : ClassFunction ↥hyp.S ℂ,
       φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.S)
         (sSet (hyp.toTypesIIIIIIVSetupS hG))
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) →
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) →
       hyp.indS φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) φ := fun φ hφ => by
     rw [hyp.indS_apply, hyp.sInstance_dade_eq_induce hG hnoV hφ.2]
@@ -527,7 +527,7 @@ theorem Hypothesis.coherentIndS_muColumn_eq_etaColumn_of_pivot [Finite G]
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG))
     (c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))
     (hpivot : c.extension (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
       = ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩)
     {j : Fin hyp.p} (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
