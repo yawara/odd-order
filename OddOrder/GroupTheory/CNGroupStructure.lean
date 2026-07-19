@@ -8,6 +8,7 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.GroupTheory.FittingSelfCentralizing
 import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.GroupTheory.FixedPointFreeConjugation
 
 /-!
 # Three-step groups (Gorenstein, Ch. 12 §1)
@@ -802,6 +803,137 @@ theorem isFrobeniusGroup_fitting_of_isComplement [Finite G] [IsSolvable G]
   ne_bot_kernel := hFne
   ne_bot_complement := hAne
   conj_frobenius := conj_ne_of_isHallSubgroup_fitting_pPrime hCN hA
+
+/-! ## Steps 4-6 of Theorem 1.5: the case `G ⊋ F(G)A`
+
+When `π(F(G))` has been reduced to a single prime `p` (step 3), Gorenstein passes to
+`Ḡ = G/F` and shows `Ḡ` is a Frobenius group with kernel `O_{p'}(Ḡ)`.  The two lemmas here
+supply the commuting obstructions that drive that endgame:
+
+* `not_commute_of_not_dvd_orderOf_of_isPGroup_fitting` — **(†)** in `G` itself, no nontrivial
+  `p'`-element commutes with a nontrivial `p`-element (a strengthening of step 2 from elements
+  of `F` to arbitrary `p`-elements);
+* `not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting` — **(‡)** the same obstruction one
+  floor up: in `Ḡ = G/F(G)`, the image of a `p'`-element commutes with no nontrivial
+  `p`-element of `Ḡ`.  This is where Gorenstein's Lemma 10.1.3
+  (`mem_of_inv_mul_conj_mem_of_fixedPointFree`) is consumed. -/
+
+/-- **(†).**  In a finite solvable CN-group whose Fitting subgroup is a `p`-group, no
+nontrivial element of order prime to `p` commutes with a nontrivial `p`-element.
+
+If `x` (with `p ∤ |x|`) commuted with the `p`-element `k ≠ 1`, a power `x'` of `x` of prime
+order `r ≠ p` still would; Lemma 1.2 then makes `x'` centralize a full Sylow `p`-subgroup
+`P ⊇ F(G)`, so `x' ∈ C_G(F(G)) ≤ F(G)`, forcing `r = p` — absurd. -/
+theorem not_commute_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [IsSolvable G]
+    (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
+    {p : ℕ} [Fact p.Prime] (hF : IsPGroup p ↥(Ch01.fitting G))
+    {x k : G} (hx1 : x ≠ 1) (hxp : ¬ p ∣ orderOf x)
+    (hk1 : k ≠ 1) (hkp : IsPGroup p ↥(Subgroup.zpowers k)) :
+    ¬ Commute x k := by
+  intro hxy
+  -- A power `x'` of `x` of prime order `r ≠ p`.
+  obtain ⟨r, hr, hrx⟩ := Nat.exists_prime_and_dvd (fun h => hx1 (orderOf_eq_one_iff.mp h))
+  haveI : Fact r.Prime := ⟨hr⟩
+  have hrp : r ≠ p := fun hc => hxp (hc ▸ hrx)
+  obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers x)) r
+    (by rw [Nat.card_zpowers]; exact hrx)
+  set x' : G := (x₀ : G) with hx'def
+  have hx'ord : orderOf x' = r := by
+    rw [hx'def, ← hx₀]
+    exact (orderOf_mk_eq x₀.2).symm
+  have hx'1 : x' ≠ 1 := by
+    intro hc
+    rw [hc, orderOf_one] at hx'ord
+    exact hr.one_lt.ne' hx'ord.symm
+  have hx'k : Commute x' k := by
+    obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp x₀.2
+    rw [hx'def, ← hn]
+    exact hxy.zpow_left n
+  -- Lemma 1.2 with the Sylow `p`-subgroup containing `k`.
+  obtain ⟨P, hkP⟩ := hkp.exists_le_sylow
+  have hall := commute_of_cn_of_commute_ne_one hCN (Ne.symm hrp) P.isPGroup'
+    (IsPGroup.of_card (by rw [Nat.card_zpowers, hx'ord, pow_one]))
+    (hkP (Subgroup.mem_zpowers k)) hk1 (Subgroup.mem_zpowers x') hx'1 hx'k.symm
+  -- `F(G) ≤ P`: the normal `p`-group `F(G)` lies in `O_p(G)`, the meet of the Sylows.
+  have hFP : Ch01.fitting G ≤ (P : Subgroup G) := by
+    refine ((Ch04.isPiGroup_singleton_of_isPGroup hF).le_oPiCore).trans ?_
+    rw [Ch04.oPiCore_singleton_eq_opCore]
+    exact Ch01.opCore_le P
+  -- `x'` centralizes `F(G)`, hence lies in it; but its order is prime to `p`.
+  have hx'F : x' ∈ Ch01.fitting G := by
+    refine centralizer_fitting_le_fitting ?_
+    rw [Subgroup.mem_centralizer_iff]
+    intro f hf
+    exact (hall f (hFP hf) x' (Subgroup.mem_zpowers x')).eq
+  have hrF : r ∣ Nat.card ↥(Ch01.fitting G) := by
+    rw [← hx'ord, ← orderOf_mk_eq hx'F]
+    exact orderOf_dvd_natCard _
+  obtain ⟨n, hn⟩ := hF.exists_card_eq
+  rw [hn] at hrF
+  exact hrp ((Nat.prime_dvd_prime_iff_eq hr Fact.out).mp (hr.dvd_of_dvd_pow hrF))
+
+/-- **(‡).**  In a finite solvable CN-group `G` with `F := F(G)` a `p`-group, the image in
+`G/F` of a nontrivial element `a` of order prime to `p` commutes with no nontrivial `p`-element
+of `G/F`.
+
+If `mk a` commuted with the `p`-element `u ≠ 1`, the preimage `K` of `⟨u⟩` would be a `p`-group
+normalized by `a` on which `a` acts fixed-point-freely (by (†)); by descent
+(`mem_of_inv_mul_conj_mem_of_fixedPointFree`, Gorenstein Lemma 10.1.3) the fixed coset of any
+representative of `u` collapses, i.e. `u = 1`. -/
+theorem not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [IsSolvable G]
+    (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
+    {p : ℕ} [Fact p.Prime] (hF : IsPGroup p ↥(Ch01.fitting G))
+    {a : G} (hap : ¬ p ∣ orderOf a)
+    (ha1 : QuotientGroup.mk' (Ch01.fitting G) a ≠ 1)
+    {u : G ⧸ Ch01.fitting G} (hu1 : u ≠ 1)
+    (hup : IsPGroup p ↥(Subgroup.zpowers u)) :
+    ¬ Commute (QuotientGroup.mk' (Ch01.fitting G) a) u := by
+  intro hcomm
+  have ha1' : a ≠ 1 := fun hc => ha1 (by rw [hc, map_one])
+  -- The preimage `K` of `⟨u⟩` is a `p`-group containing `F(G)`.
+  set K : Subgroup G := (Subgroup.zpowers u).comap (QuotientGroup.mk' (Ch01.fitting G))
+    with hKdef
+  have hFK : Ch01.fitting G ≤ K := by
+    intro f hf
+    rw [hKdef, Subgroup.mem_comap, QuotientGroup.mk'_apply,
+      (QuotientGroup.eq_one_iff f).mpr hf]
+    exact Subgroup.one_mem _
+  have hKp : IsPGroup p ↥K := by
+    refine hup.comap_of_ker_isPGroup _ ?_
+    rw [QuotientGroup.ker_mk']
+    exact hF
+  -- `a` normalizes `K` because `mk a` centralizes `⟨u⟩`.
+  have haK : ∀ f ∈ K, a * f * a⁻¹ ∈ K := by
+    intro f hfK
+    rw [hKdef, Subgroup.mem_comap] at hfK ⊢
+    rw [map_mul, map_mul, map_inv]
+    obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hfK
+    rw [← hn, (hcomm.zpow_right n).eq]
+    simpa [mul_assoc] using Subgroup.zpow_mem _ (Subgroup.mem_zpowers u) n
+  -- `a` acts fixed-point-freely on `K`, by (†).
+  have hfpf : ∀ f ∈ K, a * f * a⁻¹ = f → f = 1 := by
+    intro f hfK hfix
+    by_contra hf1
+    refine not_commute_of_not_dvd_orderOf_of_isPGroup_fitting hCN hF ha1' hap hf1
+      (hKp.to_le (Subgroup.zpowers_le.mpr hfK)) ?_
+    have h := congrArg (· * a) hfix
+    have hc : a * f = f * a := by simpa [mul_assoc] using h
+    exact hc
+  -- A representative of `u` has its coset fixed by `a`; descend (Lemma 10.1.3).
+  obtain ⟨k₀, hk₀⟩ := QuotientGroup.mk'_surjective (Ch01.fitting G) u
+  have hk₀K : k₀ ∈ K := by
+    rw [hKdef, Subgroup.mem_comap, hk₀]
+    exact Subgroup.mem_zpowers u
+  have hmem : k₀⁻¹ * (a * k₀ * a⁻¹) ∈ Ch01.fitting G := by
+    have h1 : (QuotientGroup.mk' (Ch01.fitting G)) (k₀⁻¹ * (a * k₀ * a⁻¹)) = 1 := by
+      simp only [map_mul, map_inv, hk₀]
+      rw [hcomm.eq]
+      group
+    rwa [← QuotientGroup.ker_mk' (Ch01.fitting G), MonoidHom.mem_ker]
+  have hk₀F : k₀ ∈ Ch01.fitting G :=
+    mem_of_inv_mul_conj_mem_of_fixedPointFree hFK
+      (fun f hf => (Ch01.fitting.normal G).conj_mem f hf a) hfpf hk₀K hmem
+  exact hu1 (by rw [← hk₀, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact hk₀F)
 
 /-! ## Gorenstein Ch. 12 §1 Theorem 1.5 and Corollary 1.6
 
