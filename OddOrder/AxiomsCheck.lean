@@ -10872,6 +10872,8 @@ Hub ruling 9163 (Option B′) / issues 1042, 9008. -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.centralizerSupport_sharpSubgroup_of_le
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_eq_typePA_of_isTypeP1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore0_eq_typePA0_of_isTypeP1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_eq_A1_of_isTypeP1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.not_isTypeP1_of_mem_typePACore_not_mem_A1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_conj_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subset_hatMsigma
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_one_not_mem
