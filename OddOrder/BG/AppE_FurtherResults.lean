@@ -7,6 +7,7 @@ import OddOrder.BG.Ch1_Preliminary.S04_SmallRankBasic
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.HallCollection
+import OddOrder.GroupTheory.HallPetresco
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.SubgroupInAmbient
 
@@ -84,50 +85,43 @@ positive integer `n`, and let `eᵣ = C(n, r)`.  Then there are elements
 
 `xⁿ yⁿ = (x y)ⁿ c₂^{e₂} ⋯ cₙ^{eₙ}`.
 
-**Status: honestly stated, not proved.**  The proof is Hall's commutator
-collecting process (BG cites Suzuki, *Group Theory II*, pp. 37--41; also Huppert,
-*Endliche Gruppen I*, pp. 315--318).  Proved sorry-free below for nilpotence
-class `≤ 3` (`hallCollection_of_class_le_three`, all `n` at once), which subsumes
-the class-`≤ 2` case (`hallCollection_of_class_le_two`).
+**Proved** (2026-07-20), by Mann's form of Hall's collecting process — see
+`OddOrder/GroupTheory/HallPetresco.lean` for the general `m`-generator statement
+`OddOrder.GroupTheory.HallPetresco.exists_hallPetresco`, of which this is the
+two-generator case.  BG gives no proof, citing Suzuki, *Group Theory II*,
+pp. 37--41 and Huppert, *Endliche Gruppen I*, pp. 315--318; the argument
+formalised here is the short one of Dixon--du Sautoy--Mann--Segal, *Analytic
+Pro-p Groups*, 2nd ed., Appendix A (contributed by A. Mann).
 
-**Precise obstruction to the general case.**  The reusable framework lives in
-`OddOrder/GroupTheory/HallCollection.lean` (all sorry-free): the exact one-step
-recursion `pow_succ_collect`
+The idea is to *de-specialise*: instead of collecting `xⁿ yⁿ` directly — which
+forces one to count how often each commutator appears, and hence to know that
+the collection coefficients are `ℤ`-polynomials in `n` divisible by `C(n,k)` —
+one gives each of the `n` copies of a generator its own letter, indexed by a
+*slot*.  The expanded word is collected **once**, into blocks indexed by the set
+of slots each factor touches; substituting the assignment attached to a slot set
+`A` (which kills the letters outside `A`) shows that a block's value depends only
+on `|A|`, and the binomial coefficient `C(n,k)` appears simply as the number of
+`k`-element subsets of an `n`-element set.  In particular **no free nilpotent
+groups, no basic-commutator bases and no Hall polynomials are needed**.
 
-`xⁿ yⁿ = (x y)ⁿ T  ⟹  x^{n+1} y^{n+1} = (x y)^{n+1} (⁅x⁻¹, ((x y)ⁿ)⁻¹⁆ T)^y`,
-
-the weight law `commutatorElement_mem_lowerCentralSeries_add`
-(`[G_i, G_j] ≤ G_{i+j}`), and the reduction `exists_hallCollection_of_residue`,
-which shows that E.1 for a fixed `n` is exactly a congruence *modulo* `γ_n`
-(the top exponent `C(n, n) = 1` absorbs any `γ_n`-residue, so there is no hidden
-exactness to prove).
-
-What is missing is the induction on the *weight* `k`.  Suppose the weights
-`2, …, k - 1` have been collected, leaving a residue `w(n) ∈ γ_k`.  One must
-produce `c_k ∈ γ_k` with `w(n) ≡ c_k^{C(n,k)} (mod γ_{k+1})`, i.e. one must know
-that `w(n)` is a `C(n,k)`-th power in the abelian group `γ_k / γ_{k+1}`.  That is
-a genuine divisibility statement, and it is what Hall's collecting process
-establishes: in the free group `γ_k / γ_{k+1}` is free abelian on the basic
-commutators of weight `k`, and the coefficient of each basic commutator in
-`w(n)` is a `ℤ`-polynomial in `n` divisible by `C(n,k)`.
-
-Two prerequisites for that argument are absent from both mathlib and this
-repository: (i) free nilpotent groups together with a basis of *basic
-commutators* for each factor `γ_k / γ_{k+1}` (mathlib has `FreeGroup` but no
-free nilpotent quotient and no basic-commutator basis — `Mathlib/GroupTheory/
-Commutator/**` and `Mathlib/GroupTheory/Nilpotent.lean` contain neither
-`Petrescu` nor `collecting`), and (ii) the polynomiality in `n` of the collection
-coefficients (Hall polynomials / Lazard).  Building (i) is the real cost; once
-it exists, the weight induction above closes E.1 by the standard argument.
-
-The class-`≤ 3` case avoids all of this because there the residue lives in the
-*central* factor `γ₃`, whose two generators are explicit — see
-`class_three_tail_aux`. -/
+Sharper statements proved separately below: `hallCollection_of_class_le_two` and
+`hallCollection_of_class_le_three` give the same conclusion for *all* `n` at once
+with explicit `cᵣ`, for nilpotence class `≤ 2`, resp. `≤ 3`. -/
 theorem hallCollection (x y : G) (n : ℕ) :
     ∃ c : ℕ → G,
       (∀ r, 2 ≤ r → r ≤ n → c r ∈ (⊤ : Subgroup G).lowerCentralSeries (r - 1)) ∧
       x ^ n * y ^ n = (x * y) ^ n * collectionTail c n := by
-  sorry
+  rcases n with _ | m
+  · exact ⟨fun _ => 1, fun r hr2 hr0 => absurd hr0 (by omega), by simp⟩
+  obtain ⟨τ, hmem, hτ1, hprod⟩ :=
+    OddOrder.GroupTheory.HallPetresco.exists_hallPetresco (G := G) [x, y] (Nat.le_add_left 1 m)
+  refine ⟨τ, fun r hr2 hrn => hmem r (by omega) hrn, ?_⟩
+  have hτ : τ 1 = x * y := by simpa using hτ1
+  have hlhs : (([x, y] : List G).map fun g => g ^ (m + 1)).prod = x ^ (m + 1) * y ^ (m + 1) := by
+    simp
+  rw [hlhs] at hprod
+  rw [hprod, List.range'_succ, List.map_cons, List.prod_cons, hτ, Nat.choose_one_right]
+  rfl
 
 /-- **BG Theorem E.1, class-`≤ 2` case** (proved, sorry-free).  When `G` has
 nilpotence class at most `2` every `cᵣ` with `r ≥ 3` may be taken trivial, and

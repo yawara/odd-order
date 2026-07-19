@@ -8288,6 +8288,12 @@ composition with the degree-two bracket is the actual trilinear commutator
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutatorTrilinear_span_eq_top
 
+/-! **Finite eigenspace sum separation**: in a zero sum of eigenvectors,
+the terms with any fixed eigenvalue also sum to zero. -/
+
+#assert_only_allowed_axioms
+  Module.End.sum_filter_weight_eq_zero_of_sum_eq_zero
+
 /-! **Neumann's order-three fixed-point-free theorem**, used by the parity
 step of Higman Lemma 6.  Burnside's holomorph argument gives the right
 2-Engel law; the Hopkins--Levi/Hall--Witt calculation gives exponent three
@@ -8363,6 +8369,9 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_sum_eq_zero_of_square_formula
 
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_weightFiber_sum_eq_zero
+
 /-! **Higman Lemma 6, distinct triple-weight exclusion**: three distinct
 Frobenius exponents cannot be congruent modulo `2^n - 1` to a pair weight.
 For a primitive Singer root, the corresponding eigenspace is therefore zero
@@ -8379,6 +8388,35 @@ whenever the target is spanned by pair-weight eigenspaces. -/
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.primitiveRoot_threeDistinctWeight_eigenspace_eq_bot
+
+/-! **Higman Lemma 6, repeated-index candidates**: a repeated Frobenius
+triple with pair weight is one of the two predecessor-index terms in the
+source. Their inner pairs cannot both have the permitted cyclic gap when the
+Frobenius period is odd. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.HasHigmanPairGap.comm
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.repeated_frobeniusWeight_pairWeight_candidates
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_pairWeight_injective
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_pairWeight_eq_pairWeight_candidates
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.not_both_adjacent_pairGaps_of_odd
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.HigmanExponentPair.not_both_predecessor_pairGaps_of_odd
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_pairWeight_eq_frobeniusShift_imp_pairGap
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_lowerCentralPairGapSupport_of_frobeniusEigenbases
 
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
