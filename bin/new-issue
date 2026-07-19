@@ -60,6 +60,19 @@ if (( base % 100 != 0 )); then
   echo "Error: --base は 100 の倍数 (got: '$base'). レンジ重複を防ぐため" >&2
   exit 1
 fi
+# base 9000 は凍結 (hub 裁定 2026-07-19, issue 0130): 幅 1000 ゆえレンジ [9000,10000) が
+# レーン別サブバンド 9200/9300/9400/9500 を丸ごと飲み込み、実在ファイル走査が他レーンの
+# 番号を拾って衝突する。shared-infra claim は必ずレーン別サブバンドから採る。
+if (( base == 9000 )); then
+  cat >&2 <<'FROZEN'
+Error: --base 9000 は凍結レンジ (9000-9199 = 2026-07-19 以前の shared-infra claim の履歴).
+       shared-infra claim はレーン別サブバンドを使う:
+         lane a → --base 9200   lane b → --base 9300
+         lane c → --base 9400   hub    → --base 9500
+       (理由と経緯: issues/closed/0130-*.md, notes/meta/issue_management.md)
+FROZEN
+  exit 1
+fi
 # レンジ幅: 1000 の倍数 → 1000 (レーン本体), それ以外の 100 の倍数 → 100
 # (= 9000 番台 shared-infra claim をレーン別サブバンドに割るための細分割.
 #  9200=a / 9300=b / 9400=c / 9500=hub, 9600 以降は将来レーン・枯渇時の再割当用)

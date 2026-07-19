@@ -81,7 +81,7 @@ issues/
 | **2000** | **2000-2999** | **lane b** (Suzuki チェーン) | `issues/SEQUENCE.2000` |
 | **3000** | **3000-3999** | **lane c** (BG 残 + Pf Appendices 非 Suzuki 系) | `issues/SEQUENCE.3000` |
 | 4000+ | (1000 ごと) | 追加の ad-hoc 並行セッション | `issues/SEQUENCE.N` |
-| ~~9000~~ | 9000-9199 | shared-infra claim の**歴史的レンジ** (共有カウンタ、2026-07-19 に凍結) | `issues/SEQUENCE.9000` |
+| ~~9000~~ | 9000-9199 | shared-infra claim の**歴史的レンジ** (共有カウンタ、2026-07-19 に凍結。`new-issue` は `--base 9000` を**エラーで拒否**する — 幅 1000 ゆえレンジがサブバンドを飲み込むため) | `issues/SEQUENCE.9000` (参照のみ) |
 | **9200** | **9200-9299** | **shared-infra claim — lane a** | `issues/SEQUENCE.9200` |
 | **9300** | **9300-9399** | **shared-infra claim — lane b** | `issues/SEQUENCE.9300` |
 | **9400** | **9400-9499** | **shared-infra claim — lane c** | `issues/SEQUENCE.9400` |
