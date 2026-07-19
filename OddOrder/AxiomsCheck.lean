@@ -240,6 +240,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
@@ -8249,7 +8250,25 @@ composition with the degree-two bracket is the actual trilinear commutator
   OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_equivariant
 
 #assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_equivariant_representation
+
+#assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutatorTrilinear_span_eq_top
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralLayerZero_action_eq_one_of_second_third_action_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralLayerRepresentation_ker_inf_le_ker_zero
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.finrank_eq_of_faithful_irreducible_and_faithful_transitive_nonzero
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralLayerZero_finrank_eq_one_of_equivariant_linearEquiv
 
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
