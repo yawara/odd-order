@@ -360,3 +360,27 @@ Thm 1.5 / Cor 1.6 / fpf toolbox / (†)(‡) / 巡回性 / endgame helpers の 1
 **着手時に `IsCNGroup` を `CNGroupStructure.lean` へ移設**すること (Lemma 1.2 の展開形仮説と
 定義的に同一)。また `CNGroupStructure.lean` は 1865 行 (>1500 trigger) — 凍結 prefix
 (cores + `IsThreeStepGroup` + BG 消費帰結) を `ThreeStepGroup.lean` へ分割予定。
+
+---
+
+## ✅ 消費側も完了 (2026-07-19): BG App.D D.1/D.2 が sorry-free
+
+本 issue の成果 (Thm 1.5 → Cor 1.6) を実際に消費して **BG App.D の D.1/D.2 を証明**した
+(issue 3020 が正本)。その過程で 3-step 群の帰結を 1 つ追加:
+
+**`IsThreeStepGroup.inf_sylow_eq_oPiCore`** (`GroupTheory/ThreeStepGroup.lean`) —
+3-step 群では相異なる Sylow p-部分群の交わりがちょうど `O_p(G)`。
+BG App.D が「3-step 群の定義と short argument から」で済ませる display (D.2) の一般形。
+
+証明の骨 (全 6 宣言 axiom-clean、AxiomsCheck 登録済):
+- `sylow_inf_opPPrimeCore_eq_oPiCore` (任意の有限群): `S ∩ O_{p,p'}(G) = O_p(G)`
+- `sylow_sup_eq_top_of_isPGroup_quotient` (任意の有限群): `G/N` が p-群なら `S ⊔ N = ⊤`
+- ⟹ `isComplement'_quotient_sylow` → `isFrobeniusGroup_quotient_sylow`
+  (補群であれば自動的に Frobenius 補群 — Frobenius 条件は核だけで書けるので
+  定義が与える補群 `B` から Isaacs Thm 6.4 (4)⇒(1) で任意の Sylow 像へ移せる)
+- Frobenius 補群は TI (Isaacs Thm 6.4 (1)⇒(2)) → comap で引き戻す
+
+また `oPiCore_le_sylow` (正規 p-部分群は全 Sylow に入る) を public 化
+(同内容が 2 ファイルで `private` に重複していた)。
+
+**本 issue の残債は「Thm 1.3.1(ii) による clause (ii) の補群の細分」のみ** (Cor 1.6 には不要)。
