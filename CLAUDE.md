@@ -18,7 +18,7 @@ PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private �
 
 **Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`pdftotext`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
 
-**外部形式化の参照 (`coq/` 以外; ユーザー裁定 2026-07-19)**: 同じ定理を扱う外部の形式化 (他の証明支援系のライブラリ、個人リポジトリ等) は **`coq/` と同じ posture で参照してよい** — 証明戦略のヒント・前提の所在確認・規模感の把握に**読む**。禁じられるのは**コピペ (逐語の複製)** だけで、それを避ければよい。判断軸は**ライセンス上の複製可否**のみであり、**「AI 生成だから」は使用可否の基準にならない** (Lean の証明はコンパイラが検証するので出自による信頼度差が最も小さく、そもそも本プロジェクト自体が AI エージェント駆動)。実在するリスクは「証明が間違っている」でなく「**定理の文が思ったものと違う**」(隠れた仮定・自明化する定義) で、これは人間が書いた形式化でも同じ — statement を読む / `#print axioms` / carrier の構成可能性、という既存の検証手順で扱う ([[scaffold-sorry-free-not-done]])。⚠ 外部リポジトリについて issue/notes に事実を書くときは、**自分で確認したか subagent の未検証報告か**を明示する (行数・sorry 有無・ライセンス表記を実測事実と同じ調子で書かない)。
+**外部形式化の参照 (`coq/` 以外; ユーザー裁定 2026-07-19)**: 同じ定理を扱う外部の形式化 (他の証明支援系のライブラリ、個人リポジトリ等) は **`coq/` と同じ posture で参照してよい** — 証明戦略のヒント・前提の所在確認・規模感の把握に**読む**。禁じられるのは**コピペ (逐語の複製)** だけで、それを避ければよい。判断軸は**ライセンス上の複製可否**のみであり、**「AI 生成だから」は使用可否の基準にならない** (Lean の証明はコンパイラが検証するので出自による信頼度差が最も小さく、そもそも本プロジェクト自体が AI エージェント駆動)。実在するリスクは「証明が間違っている」でなく「**定理の文が思ったものと違う**」(隠れた仮定・自明化する定義) で、これは人間が書いた形式化でも同じ — statement を読む / `#print axioms` / carrier の構成可能性、という既存の検証手順で扱う ([[scaffold-sorry-free-not-done]])。⚠ 外部リポジトリについて issue/notes に事実を書くときは、**自分で確認したか subagent の未検証報告か**を明示する (行数・sorry 有無・ライセンス表記を実測事実と同じ調子で書かない)。現在取り込み済のもの: **`references/erdos90/`** (submodule [plby/Erdos90](https://github.com/plby/Erdos90); 名目は Erdős unit distance 予想だが支持ライブラリに **Hall–Petresco (= BG Thm E.1) の完全形式化**を含む。**LICENSE 無し ⟹ コピペ不可**、ビルドもしない = `.lean` を Read/grep するだけ。取得は `git submodule update --init references/erdos90`)。
 
 ## 進捗の測り方 — 実質的証明の積み上げ (sorry 数ではない)
 
@@ -189,6 +189,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | `references/` (gitignored) | PDF + `pdftotext -layout` 抽出 text — 別 private リポ `odd-order-references` |
 | `references/{isaacs,bg,gorenstein}/*.pdf`, `*.pdftotext.txt` | 原典/補助原典と検索用 text (フラット) |
 | `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 |
+| `references/erdos90/` (submodule) | [plby/Erdos90](https://github.com/plby/Erdos90) — 外部 Lean 4 形式化。**Hall–Petresco (BG Thm E.1) を含む**。⚠ LICENSE 無し ⟹ **参照可・コピペ不可**、ビルドしない |
 | `references/README.md` | 参照資料の配置・取得 provenance・`pdftotext` 手順 |
 
 ## ツールチェイン
