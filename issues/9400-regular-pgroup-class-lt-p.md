@@ -64,3 +64,47 @@ Hall の収集公式 (Thm E.1) が証明できた (issue 9132) ので、その�
 
 E.2(a) (`AppE.omega_pow_eq_one_of_lowerCentralSeries_eq_bot`) が sorry-free になり、
 E.2(b) (`AppE.pow_mul_of_commutator_le_omega`) も解錠される。本 claim を close。
+
+## 補助補題の実測 (2026-07-20) — ⚠ 配置の見直しが必要
+
+| 要るもの | 実測結果 |
+|---|---|
+| 真部分群を含む極大部分群の存在 | `IsCoatomic.eq_top_or_exists_le_coatom` (`Mathlib/Order/Atoms.lean:335`)。有限なら `isCoatomic_of_orderTop_gt_wellFounded` (:510) で instance が立つ |
+| 冪零 ⟹ 極大部分群は正規 | `Group.isNilpotent_of_finite_tfae` (`Mathlib/GroupTheory/Nilpotent.lean:1237`) の項目 3 = `∀ H, IsCoatom H → H.Normal`。直接には `NormalizerCondition.normal_of_coatom` + `normalizerCondition_of_isNilpotent` |
+| `γ_{p-1} = ⊥ ⟹ IsNilpotent` | `Group.nilpotent_iff_lowerCentralSeries` (:500) |
+| `Ω_n` が characteristic | **repo に既にある**: `OddOrder.GroupTheory.Omega.characteristic` instance (`OmegaSubgroup.lean:91`) |
+| **characteristic in normal ⟹ ambient で normal** | ⚠ 下記 |
+| 巡回商 ⟹ `commutator ≤ N` | mathlib に直接名なし。`⁅x,y⁆` の像が 1 になることから素朴に出る (数行) |
+
+### ⚠ 配置の訂正: induction は `GroupTheory/` に置けない
+
+「`N ⊴ W`、`L` char `↥N` ⟹ `(L.map N.subtype).Normal`」が要る (Ω₁(M) ⊴ R の段)。
+これは **closed issue 9109** の対象で、**public 版は
+`OddOrder.BG.Ch3.normal_map_subtype_of_characteristic`
+(`BG/Ch3_MaximalSubgroups/S10_BetaRadicalGlobal.lean:409`) にしかない**。
+`OddOrder/GroupTheory/` は Ch3 より上流なので import できず、ここに induction を書くと
+**6 site 目の複製**になる (9109 は既に 5 site を数えており、同名 public 化は Huppert.lean の
+無修飾参照と衝突して build を壊すことも実測済 = naive な consolidation 不可)。
+
+⟹ **E.2(a) の帰納本体は `OddOrder/BG/AppE_FurtherResults.lean` に直接書く**
+(E.2 Step 1 `pow_mul_of_commutator_pow_eq_one` が同ファイルにあるので、別 leaf に切ると
+循環 import になる。同ファイルなら Ch3 経由で上記 public 補題が使える)。
+現在 ~640 行なので +250 行程度は粒度規約 (≤1500) 内。
+
+`GroupTheory/RegularPGroup.lean` には**汎用の還元 2 本だけを残す**
+(`lowerCentralSeries_eq_bot_of_subgroup` / `Omega.pow_eq_one_of_mul_closed`) —
+どちらも上記補題を必要とせず、上流に置く価値がある。
+
+### 帰納の形 (型レベル)
+
+部分群を型として扱う必要があるので、`Nat.card` に関する数値の帰納で群を量化する:
+
+```lean
+theorem aux (p : ℕ) [Fact p.Prime] (n : ℕ) :
+    ∀ (R : Type u) [Group R] [Finite R], Nat.card R < n →
+      (⊤ : Subgroup R).lowerCentralSeries (p - 1) = ⊥ →
+      ∀ x y : R, x ^ p = 1 → y ^ p = 1 → (x * y) ^ p = 1
+```
+`H < ⊤` なら `Nat.card ↥H < Nat.card R` (要: 該当 mathlib 補題の実測。
+`Subgroup.card_lt_card_of_lt` は見つからなかったので index 経由か
+`Nat.card_eq_card_subgroup_mul_index` などから導く)。
