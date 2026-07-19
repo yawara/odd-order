@@ -1129,7 +1129,7 @@ theorem commutator_le_fitting_of_isCyclic_fitting
     (IsCyclic.mulAutMulEquiv (G := ↥F)).toMonoidHom.commGroupOfInjective
       (IsCyclic.mulAutMulEquiv (G := ↥F)).injective
   refine (Abelianization.commutator_subset_ker (MulAut.conjNormal (H := F))).trans ?_
-  refine le_trans ?_ (hF ▸ OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (G := D))
+  refine le_trans ?_ (hF ▸ OddOrder.GroupTheory.centralizer_fitting_le_fitting (G := D))
   intro g hg
   rw [MonoidHom.mem_ker] at hg
   rw [Subgroup.mem_centralizer_iff]

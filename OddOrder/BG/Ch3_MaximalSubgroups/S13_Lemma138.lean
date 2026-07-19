@@ -851,7 +851,7 @@ theorem commutator_le_Malpha_of_coprime_le_derived [Finite G] (hG : IsMinimalSim
         (orderOf (⟨π ⟨a, haM⟩, haF⟩ : ↥(Ch01.fitting (↥Mstar ⧸ N))))
         (orderOf (⟨π ⟨b, hbM⟩, hbF⟩ : ↥(Ch01.fitting (↥Mstar ⧸ N)))) := by
       rw [Subgroup.orderOf_mk, Subgroup.orderOf_mk]; exact hcop_ord
-    have hc := S10.commute_of_coprime_orderOf_of_isNilpotent
+    have hc := OddOrder.GroupTheory.commute_of_coprime_orderOf_of_isNilpotent
       (L := ↥(Ch01.fitting (↥Mstar ⧸ N))) hcop'
     exact hc.map (Ch01.fitting (↥Mstar ⧸ N)).subtype
   have hker : π ⁅(⟨a, haM⟩ : ↥Mstar), (⟨b, hbM⟩ : ↥Mstar)⁆ = 1 := by

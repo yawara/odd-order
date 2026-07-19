@@ -440,7 +440,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
     -- **(3.10)** `C_H(V) = V` (Proposition 1.3 `centralizer_fitting_le_fitting` + `V` abelian).
     have hCHV : Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting ↥H : Subgroup ↥H) : Set ↥H)
         = OddOrder.Isaacs.Ch01.fitting ↥H := by
-      refine le_antisymm OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting ?_
+      refine le_antisymm OddOrder.GroupTheory.centralizer_fitting_le_fitting ?_
       intro v hv
       rw [Subgroup.mem_centralizer_iff]
       intro w hw
@@ -741,7 +741,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           simp only [QuotientGroup.mk'_apply, ← QuotientGroup.mk_mul, hcomm]
         have hPQ_le_F : P.map (QuotientGroup.mk' V)
             ≤ OddOrder.Isaacs.Ch01.fitting (↥H ⧸ V) :=
-          hPQ_le.trans OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting
+          hPQ_le.trans OddOrder.GroupTheory.centralizer_fitting_le_fitting
         have hPQ_p : IsPGroup p ↥(P.map (QuotientGroup.mk' V)) := hPp.map _
         obtain ⟨k, hk⟩ := hPQ_p.exists_card_eq
         have hk0 : k = 0 := by
@@ -1020,7 +1020,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         rw [Subgroup.coe_mul, Subgroup.coe_mul]
         exact Subgroup.mem_centralizer_iff.mp hc (k : ↥H) (Subgroup.mem_subgroupOf.mp hk)
       have hcF : (⟨c, hcN⟩ : ↥N) ∈ OddOrder.Isaacs.Ch01.fitting ↥N :=
-        OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (hKN_fit ▸ hcC)
+        OddOrder.GroupTheory.centralizer_fitting_le_fitting (hKN_fit ▸ hcC)
       rw [← hKN_fit] at hcF
       exact Subgroup.mem_subgroupOf.mp hcF
     -- ===== Phase C (3.17)–(3.21): the action of `R₀` =====
@@ -1110,7 +1110,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       rw [hACQ, top_le_iff] at hAC_le
       have hFQ_top : OddOrder.Isaacs.Ch01.fitting (↥H ⧸ V) = ⊤ := by
         rw [eq_top_iff, ← hAC_le]
-        exact OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting
+        exact OddOrder.GroupTheory.centralizer_fitting_le_fitting
       apply hfalse_of_pndvd
       intro hdvd
       apply hp_ndvd

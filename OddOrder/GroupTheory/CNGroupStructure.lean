@@ -541,25 +541,22 @@ Hall `π(F)'`-subgroup `A` (`Ch03.hall_exists_of_piSeparable`).  Lemma 1.2
 (`commute_of_cn_of_commute_ne_one`, proved above) shows no nonidentity element of `A`
 centralizes a nonidentity element of `F`, so `FA` is Frobenius; a second application of
 Lemma 1.2 shows `A` is nilpotent, and `π(F)` is then shown to be a single prime unless
-`G = FA`.  Beyond Lemma 1.2 and Hall's theorem the proof still needs, none of which is in the
-repository at the required strength:
+`G = FA`.  Beyond Lemma 1.2, Hall's theorem and `C_G(F(G)) ≤ F(G)` (Gorenstein Thm 6.1.3, now
+available here as `centralizer_fitting_le_fitting`), the proof still needs, neither of which is
+in the repository at the required strength:
 
-1. `C_G(F(G)) ≤ F(G)` for solvable `G` (Gorenstein Thm 6.1.3).  Present as
-   `OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting`, but under `OddOrder.BG`; importing it
-   here would make a `GroupTheory` leaf depend on `BG`, so it wants relocating first.  This is
-   a layering chore, not a mathematical gap.
-2. Gorenstein Thm 10.3.1 (iv)/(v)/(vi) on Frobenius complements — of the three, "a subgroup of
+1. Gorenstein Thm 10.3.1 (iv)/(v)/(vi) on Frobenius complements — of the three, "a subgroup of
    order `q · r` is cyclic" and the metacyclic structure (with Thm 7.6.2) are **absent**;
    `Ch06.isZGroup_of_isFrobeniusAction_of_odd`,
    `Ch06.sylow_isCyclic_or_two_quaternion_of_frobeniusAction` and
    `Ch06.IsFrobeniusAction.unique_involution` cover the rest.
-3. Gorenstein Thm 1.3.1(ii), the structure of a group all of whose Sylow subgroups are cyclic or
-   generalized quaternion.  **Absent** — needed only for the omitted clause of (ii) above.
-4. Gorenstein Lemma 10.1.3, that a fixed-point-free automorphism of `K` induces a fixed-point-free
+2. Gorenstein Lemma 10.1.3, that a fixed-point-free automorphism of `K` induces a fixed-point-free
    automorphism of `K/F` for an invariant `F`.  **Absent.**
 
-Items 2 and 4 are the substantive gaps on the path to Corollary 1.6; item 3 is needed only to
-retire the book-strength debt recorded above.  (An earlier revision of this list also named
+Both are substantive gaps on the path to Corollary 1.6.  Gorenstein Thm 1.3.1(ii) (the structure
+of a group all of whose Sylow subgroups are cyclic or generalized quaternion) is also absent, but
+is needed only to retire the book-strength debt recorded above.  (An earlier revision of this list
+also named
 Gorenstein Thm 5.3.5, the coprime-action factorization `K = [R,K] · C_K(R)`, as absent; it is
 in fact present as `OddOrder.BG.Ch3.S13.subgroup_coprime_decomposition`, and Gorenstein's proof
 of Theorem 1.5 does not use it.) -/
