@@ -29,7 +29,7 @@
 | §6 | (6.5)(a) | **✅ 2026-07-19 解消** | 「K/H₁ は L の chief factor」節を `isChiefFactor_of_relIndex_le_of_odd_dvd` (S08_CoherenceCorePart1.lean:135) として形式化。旧状況: feeder 3 つは揃っていたが wrapper が無く、`IsChiefFactor` (`OddOrder/GroupTheory/ChiefFactor.lean:50`) は S08*/S12* から参照ゼロだった。 |
 | §6 | (6.6) | 部分 | 特徴づけ半分は Z-generic (`Xset_eq_irreducible_not_subset_characterKernel`, S08_DegreeSums/CoherenceGlue.lean:491)。coherence 半分は `Z = hyp.centralCommutator` に固定 + `3 ≤ p` / `IsPGroup p ↥H` / `Coprime H.index p`。 |
 | §7 | (7.8) | **STALE → 済** | 一般形は `Hypothesis78` 層に実在 (`BetaDecomp` S09_NonexistenceCertain/QuadraticTerm.lean:916, `betaDecompOfFacts` S09_CertificateDischarge.lean:689, `NormEstimates` CoherenceFormula.lean:75)。FrobeniusFamily は consumer にすぎない。追加引数は本文の「S は coherent」前提そのもので特殊化でない。 |
-| §7 | (7.9) | 部分 | `Hypothesis79` + `conclusion_of_…_parity` (TwoFamilies.lean:344) は一般。**Frobenius 専用は `hdelta_even` のみ** (`FrobeniusFamily.hypothesis79_delta_even`, S09_FrobeniusParity.lean:60)。feeder は generic (`cfdot_real_vchar_even` S09_ParityPrimitive.lean:148 ほか)。 |
+| §7 | (7.9) | **✅ 2026-07-19 解消** | 唯一 Frobenius 専用だった parity step を `Hypothesis79.delta_even` (S09_TwoFamiliesParity.lean, 新規 leaf) として Hypothesis (7.9) 一般形で証明。`FrobeniusFamily.hypothesis79_delta_even` は その instantiation に縮小 ⟹ (7.9) から `FrobeniusFamily` 依存が消えた。 |
 | §8 | (8.11) | **STALE → 済** | Sylow-normalizer 節 `normalizer_sylow_mainSubgroup_le` (S10_StructureSetup.lean:395) + Hall 節 (:449) が揃う。 |
 | §8 | (8.15) | CONFIRMED 特殊化 | 型別 3 インスタンス (typeI / typeP₁ / typeII)。**type-I の (4.6) 版が無く、(5.2) 節は皆無** (S10_StructureSetup.lean:703 に TODO 明記)。⚠ 先に `typePA` を `M_σ^#` 添字へ直す必要 (現状 `(M')^#`; P₂ 版は false-as-stated = issue 9008)。 |
 | §8 | (8.18) | CONFIRMED 特殊化 | (a)(b)(c) すべて `TypeIData S/T` 固定 (S10_MinimalSimpleStructure.lean:404/481/575)。隣の (8.17.c) は `IsTypeI ∨ IsTypeII` で書けている (:107) のが対比。type-II consumer は (8.18.b) を導出せず structure field `cross_zero` として**仮定**している。 |
@@ -44,8 +44,8 @@
 
 1. ~~(6.5)(a) chief factor 節~~ **✅ 2026-07-19 完了**。
 2. ~~(9.10) の `caseB` 除去~~ **✅ 2026-07-19 完了**。
-3. **(7.9) `hdelta_even` の一般化** — `Hypothesis79` は既に一般で、Frobenius 専用は `hdelta_even` 1 個だけ。feeder (`cfdot_real_vchar_even` ほか) は generic ゆえ次の frontier。
-4. (6.3) standalone 無条件化 → (11.8) ∀ 化 → (6.6) の Z-generic 化。
+3. ~~(7.9) `hdelta_even` の一般化~~ **✅ 2026-07-19 完了**。
+4. **(6.3) standalone 無条件化 → (11.8) ∀ 化 → (6.6) の Z-generic 化** (次の frontier)。
 5. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
 6. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。

@@ -188,6 +188,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusGammaNormEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusBsumEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusGoodIndexEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
+import OddOrder.Peterfalvi.S09_TwoFamiliesParity
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
@@ -10082,11 +10083,16 @@ all-type-I `FittingIsTI` gate (`allTypeI_fittingIsTI`, Pf (8.13.c1)+(2.3), `S14`
 /-! **Peterfalvi (7.9) Frobenius-family conclusion `hypothesis79_conclusion`, axiom-clean**
 (lane a, 2026-07-13, issue 0044 cont.⁴⁹).  The (7.9) dichotomy `⟨β_i, ζ_j^ν⟩ ≠ 0 ∨
 ⟨β_j, ζ_i^ν⟩ ≠ 0` for distinct members of a `FrobeniusFamily`, via the parity route:
-`hdelta_even` (`hypothesis79_delta_even`) assembles `Δ ∈ ℤ[Irr G]` (Sibley coherence), `Δ` real
+`hdelta_even` assembles `Δ ∈ ℤ[Irr G]` (Sibley coherence), `Δ` real
 (the delta-reality milestone `hypothesis78_delta_isReal`), `⟨Δ, 1⟩ = 0`, and the odd-order
 parity primitive `cfdot_real_vchar_even`.  Tripwire: this is the `hbeta_ne` source for the
 good-index norm estimates consumed by the completed (7.10) `card_G0_lower_bound`
-assembly on the (12.17) chain (`theorem88_caseB_holds` → FT spine). -/
+assembly on the (12.17) chain (`theorem88_caseB_holds` → FT spine).
+
+**2026-07-19 (lane a)**: the parity step is now proved at `Hypothesis79` generality as
+`Hypothesis79.delta_even` (`S09_TwoFamiliesParity`), and `hypothesis79_delta_even` is its
+Frobenius instantiation — this removed the last `FrobeniusFamily` dependence from (7.9). -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S09.Hypothesis79.delta_even
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_delta_even
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S09.FrobeniusFamily.hypothesis79_conclusion
 
