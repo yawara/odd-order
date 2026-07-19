@@ -134,16 +134,32 @@ call site repoint・全 leaf build green):
 付随して axiom-clean で証明: `sylow_fitting_map_le_oPiCore` (`F(G)` の Sylow `p` は `O_p(G)` 内) /
 `commute_of_mem_fitting_of_coprime_orderOf` / `orderOf_mk_eq`。
 
+### Thm 1.5 step 3 (`exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting`) — **axiom-clean**
+
+> CN 群で `O_p(G) ≠ 1` かつ `F(G)` が位数 `p`-prime な非自明正規部分群 `N` を含むなら、
+> `O_p(G)` は既に Sylow `p`。
+
+= 原文が「`G ⊋ FA` なら `π(F)` は単一素数」を示す論法 (`N = O_{p'}(F)` で適用)。
+1. `O_p(G)` が `N` を中心化 (両者冪零 `F(G)` 内・位数互いに素) → 2. Lemma 1.2 で Sylow `p` 全体に
+格上げ → 3. `C = C_G(N)` は正規かつ冪零 → 4. `P` は冪零 `C` の Sylow ゆえ char → `G` で正規 →
+5. 正規 `p`-部分群は `O_p(G)` 内ゆえ `P = O_p(G)`。
+⚠ **原文より一般形**: 書籍の可解性仮定は論法が使わないので落とした。
+
 ### 残 sorry は 1 件 = **Thm 1.5** (`solvableCN_nilpotent_or_frobenius_or_threeStep`)
 
-可解 CN 群は「冪零 ∨ 核 `F(G)` の Frobenius ∨ ある素数に関する 3-step」。**step 2 は済**。残りは:
+可解 CN 群は「冪零 ∨ 核 `F(G)` の Frobenius ∨ ある素数に関する 3-step」。**step 2 / step 3 は済**。
+残りは:
 
+0. **step 1 (setup) の組み立て** — `G = F(G)` なら冪零 (case i)、さもなくば `C_G(F) ≤ F` (移設済) +
+   Hall `π'`-部分群 `A` (`Ch03.hall_exists_of_piSeparable`) を取り、**step 2 で `F A` が Frobenius**。
+   ⟹ **repo の道具だけで書ける。次の着手はここ** (中間結果「冪零 ∨ `F(G)A` が Frobenius」)。
 1. **`A` の冪零性** — Gorenstein Thm 10.3.1(iv)(v) (位数 `qr` の部分群は巡回 / metacyclic 補群)
    が **不在** (`IsMetacyclic` はあるが Frobenius 理論と未接続)。ここが load-bearing。
    ⚠ 奇数位数なら `Ch06.isZGroup_of_isFrobeniusAction_of_odd` が使えるので、**BG App.D が要求する
    のは奇数位数の場合だけ**である点を着手時に再評価する価値あり (原文の偶数位数分岐 =
    `unique_involution` は repo に在る)。
-2. **`π(F)` が単一素数** — repo の道具で書けるはず (Lemma 1.2 + `C_G(F) ≤ F`)。未着手。
+2. ~~**`π(F)` が単一素数**~~ — **step 3 として 2026-07-19 完了**
+   (`exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting`)。
 3. **最終ステップ** (`P` が `Ā` に regular に作用 ⟹ `PA` Frobenius) — Gorenstein Lemma 10.1.3
    (fpf 自己同型が `K/F` に降りる) が **不在**。
 4. Gorenstein Thm 1.3.1(ii) (全 Sylow が巡回 or 四元数 ⟹ 構造) — **不在**。
