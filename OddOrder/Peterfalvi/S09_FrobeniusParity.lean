@@ -3,8 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S09_FrobeniusConjIndex
-import OddOrder.Peterfalvi.S09_ParityPrimitive
+import OddOrder.Peterfalvi.S09_TwoFamiliesParity
 
 /-!
 # Peterfalvi (7.9) conclusion for a Frobenius family (pp. 41-42)
@@ -77,29 +76,20 @@ theorem hypothesis79_delta_even [Fintype G] [Invertible (Nat.card G : ℂ)]
           (F.hypothesis79 i j hij hodd hnilp_i C_i hFrob_i hnilp_j C_j hFrob_j).second.delta
         = (z : ℂ) ∧ Even z := by
   classical
-  set H79 := F.hypothesis79 i j hij hodd hnilp_i C_i hFrob_i hnilp_j C_j hFrob_j with hH79
-  -- `Δ ∈ ℤ[Irr G]` for both members, off the Sibley coherence.
-  obtain ⟨hδ₁Z, hδ₂Z, -, -⟩ :=
-    H79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
-      (F.hypothesis78_isCoherent_sourceSet i hodd hnilp_i C_i hFrob_i)
-      (F.hypothesis78_nu_eq i hodd hnilp_i C_i hFrob_i)
-      (F.hypothesis78_isCoherent_sourceSet j hodd hnilp_j C_j hFrob_j)
-      (F.hypothesis78_nu_eq j hodd hnilp_j C_j hFrob_j)
-      (F.hypothesis78_ind1H_mem_ZIrr i hodd hnilp_i C_i hFrob_i)
-      (F.hypothesis78_zeta_irreducible i hodd hnilp_i C_i hFrob_i)
-      (F.hypothesis78_ind1H_mem_ZIrr j hodd hnilp_j C_j hFrob_j)
-      (F.hypothesis78_zeta_irreducible j hodd hnilp_j C_j hFrob_j)
-  -- Parity primitive on the two real virtual characters.
-  obtain ⟨m, a, b, hm, ha, hb, heven⟩ :=
-    cfdot_real_vchar_even hodd hδ₁Z
-      (F.hypothesis78_delta_isReal i hodd hnilp_i C_i hFrob_i) hδ₂Z
-      (F.hypothesis78_delta_isReal j hodd hnilp_j C_j hFrob_j)
-  -- `a = ⟨Δ_i, 1_G⟩ = 0` (`constOne` and the trivial character coincide definitionally).
-  have horth : ClassFunction.inner H79.first.delta
-      ((trivialIrreducibleCharacter G : IrreducibleCharacter G) : ClassFunction G ℂ) = 0 :=
-    H79.first.delta_orth_one (F.hypothesis78_betaDecomp i hodd hnilp_i C_i hFrob_i)
-  have ha0 : a = 0 := by exact_mod_cast ha.trans horth
-  exact ⟨m, hm.symm, by simpa [ha0] using heven⟩
+  -- The whole parity argument is the generic `Hypothesis79.delta_even`
+  -- (`S09_TwoFamiliesParity`); this layer only supplies the Frobenius-side producers.
+  exact (F.hypothesis79 i j hij hodd hnilp_i C_i hFrob_i hnilp_j C_j hFrob_j).delta_even
+    (F.hypothesis78_isCoherent_sourceSet i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_nu_eq i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_isCoherent_sourceSet j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_nu_eq j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_ind1H_mem_ZIrr i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_zeta_irreducible i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_ind1H_mem_ZIrr j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_zeta_irreducible j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_delta_isReal i hodd hnilp_i C_i hFrob_i)
+    (F.hypothesis78_delta_isReal j hodd hnilp_j C_j hFrob_j)
+    (F.hypothesis78_betaDecomp i hodd hnilp_i C_i hFrob_i)
 
 /-- **Peterfalvi (7.9) for a Frobenius family**: for distinct members `i ≠ j`,
 `⟨β_i, ζ_j^{ν_j}⟩ ≠ 0` or `⟨β_j, ζ_i^{ν_i}⟩ ≠ 0`.

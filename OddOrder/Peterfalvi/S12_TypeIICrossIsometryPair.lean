@@ -1450,23 +1450,22 @@ theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
     (exists_typeIICrossIsometryData_at_pair hG coh' hz1 hμd hT hKstar hSW1 hSW2
       hlam_mem hlam_irr hnu_mem hnu_red hdeg).elim fun pkg =>
       pkg.elim hG hmu hos hzS hz1 hzconj hδpm hδj
-  -- the §9 Clifford dichotomy
-  rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG chars with hA | hB
-  · -- Case A: (9.8.c) irreducible + (9.8.b) reducible degree — contradiction
+  -- Split on the exceptional condition first: in the exceptional case (9.10) now selects the
+  -- Clifford branch itself (`..._of_trigger`), so no case carrier is needed here.
+  by_cases hex : ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
+      IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)
+  · -- non-exceptional: the degree-`q·u` irreducible exists — contradiction.  The reducible
+    -- degree fact for `nu` is the one place the (9.7) dichotomy is still needed.
     exfalso
-    obtain ⟨caseA⟩ := hA
-    obtain ⟨-, hbred, ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩, -⟩ :=
-      OddOrder.Peterfalvi.S11.caseA_character_counts hG chars caseA
-    have hnu_deg := (hbred nu hnu_mem hnu_red).1
-    exact hleft lam
-      (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
-      hlam_irr (by rw [hlam_deg, hnu_deg])
-  · -- Case B: split on the exceptional condition
-    obtain ⟨caseB⟩ := hB
-    by_cases hex : ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
-        IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)
-    · -- non-exceptional: the degree-`q·u` irreducible exists — contradiction
-      exfalso
+    rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG chars with hA | hB
+    · obtain ⟨caseA⟩ := hA
+      obtain ⟨-, hbred, ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩, -⟩ :=
+        OddOrder.Peterfalvi.S11.caseA_character_counts hG chars caseA
+      have hnu_deg := (hbred nu hnu_mem hnu_red).1
+      exact hleft lam
+        (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
+        hlam_irr (by rw [hlam_deg, hnu_deg])
+    · obtain ⟨caseB⟩ := hB
       obtain ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩ := hex
       obtain ⟨-, -, hbred, -⟩ :=
         OddOrder.Peterfalvi.S11.caseB_character_counts hG chars caseB
@@ -1474,13 +1473,13 @@ theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
       exact hleft lam
         (OddOrder.Peterfalvi.S11.sOf_antitone data le_sup_left hlam_mem)
         hlam_irr (by rw [hlam_deg, hnu_deg])
-    · -- exceptional: (9.10) gives the `H ⊔ U` Frobenius on the `derivedInG mp.S` carrier
-      have hfrobHU := (OddOrder.Peterfalvi.S11.exceptional_case_frobenius_realization
-        hG chars caseB hex).2.2 (section16_S_isTypeII hG mp)
-      have hM'eq : derivedInG mp.S = data.typeP.H ⊔ data.typeP.U := by
-        rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]
-      rw [hM'eq]
-      exact hfrobHU
+  · -- exceptional: (9.10) gives the `H ⊔ U` Frobenius on the `derivedInG mp.S` carrier
+    have hfrobHU := (OddOrder.Peterfalvi.S11.exceptional_case_frobenius_realization_of_trigger
+      hG chars hex).2.2 (section16_S_isTypeII hG mp)
+    have hM'eq : derivedInG mp.S = data.typeP.H ⊔ data.typeP.U := by
+      rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]
+    rw [hM'eq]
+    exact hfrobHU
 
 open scoped Classical FiniteInduce Pointwise in
 /-- **Peterfalvi (10.7)** (setup form, pair-witness route; Coq `Frob_der1_type2`): under

@@ -1130,6 +1130,45 @@ theorem exceptional_case_frobenius_realization [Finite G]
   rw [← hM'eq]
   exact hfrob2
 
+/-- **Peterfalvi (9.10)** (trigger form — the book's own statement).
+
+Identical to `exceptional_case_frobenius_realization` except that the Clifford case-(b)
+carrier is **derived** rather than assumed: the exceptional trigger `hno` alone selects
+case (b) of the (9.7) dichotomy.
+
+Indeed, in case (a) the count (9.8.c) (`caseA_character_counts`, third conjunct) produces an
+irreducible member of `𝒮(H₀C)` of degree `q·u`; since `C′ ≤ C` (`Cprime_le_C`) and `𝒮` is
+antitone (`sOf_antitone`), that member also lies in `𝒮(H₀C′)` — contradicting `hno`.  So the
+dichotomy collapses to case (b) and `exceptional_case_frobenius_realization` applies.
+
+This is what removes the last specialization from (9.10): the case dispatch used to be done
+inline at the consumer (`S12_TypeIICrossIsometryPair`) rather than inside the theorem. -/
+theorem exceptional_case_frobenius_realization_of_trigger [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (hno : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
+        IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)) :
+    (∀ g : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)),
+        uActionHom data chief g ≠ 1 →
+          MonoidHom.FixedPointFree (uActionHom data chief g)) ∧
+      chars.u = (chief.p ^ data.q - 1) / (chief.p - 1) ∧
+      (IsTypeII M →
+        OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(data.H ⊔ data.U)
+          (data.H.subgroupOf (data.H ⊔ data.U))
+          (data.U.subgroupOf (data.H ⊔ data.U))) := by
+  rcases clifford_dichotomy hG chars with hA | hB
+  · -- Case (a) is refuted by the trigger itself.
+    exfalso
+    obtain ⟨caseA⟩ := hA
+    obtain ⟨-, -, ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩, -⟩ :=
+      caseA_character_counts hG chars caseA
+    exact hno ⟨lam, sOf_antitone data (sup_le_sup_left (Section11CharacterData.Cprime_le_C chars) chief.H0) hlam_mem,
+      hlam_irr, hlam_deg⟩
+  · obtain ⟨caseB⟩ := hB
+    exact exceptional_case_frobenius_realization hG chars caseB hno
+
+
 /-- **Peterfalvi (9.8.d), existence form**: in case (9.7.a) the family `𝒮(H₀U′)` contains an
 irreducible character of degree `q·a` — the character `λ` of the (11.9.c) non-Galois
 contradiction (`ψ = μ_j − (u/a)λ`, issue 1024).  Positivity of the (9.8.d) count
