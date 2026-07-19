@@ -42,7 +42,7 @@ set_option autoImplicit false
 
 open Module Polynomial
 open OddOrder.RepresentationTheory
-open scoped BigOperators TensorProduct IsMulCommutative
+open scoped BigOperators TensorProduct IsMulCommutative Fin.NatCast
 
 namespace OddOrder.Higman.Suzuki2Groups
 
@@ -828,6 +828,336 @@ theorem primitiveRoot_threeDistinctWeight_eigenspace_eq_bot
       hn lambda hprim i j k hij hik hjk p hp.symm
   have hd := (Module.End.eigenspaces_iSupIndep T).disjoint_biSup hnot
   rwa [hspan, disjoint_top] at hd
+
+/-! ## Repeated-index binary weights -/
+
+/-- The oriented cyclic gap from `i` to `j` in Higman's Frobenius index
+cycle. -/
+def higmanCyclicGap {n : ℕ} [NeZero n] (i j : Fin n) : ZMod n :=
+  ZMod.finEquiv n j - ZMod.finEquiv n i
+
+/-- The unordered pair `{i,j}` has one of Higman's two cyclic gaps `±r`. -/
+def HasHigmanPairGap {n : ℕ} [NeZero n]
+    (r : ZMod n) (i j : Fin n) : Prop :=
+  higmanCyclicGap i j = r ∨ higmanCyclicGap i j = -r
+
+theorem HasHigmanPairGap.comm
+    {n : ℕ} [NeZero n] {r : ZMod n} {i j : Fin n} :
+    HasHigmanPairGap r i j ↔ HasHigmanPairGap r j i := by
+  have hneg : higmanCyclicGap j i = -higmanCyclicGap i j := by
+    simp only [higmanCyclicGap]
+    ring
+  constructor
+  · rintro (h | h)
+    · right
+      rw [hneg, h]
+    · left
+      rw [hneg, h, neg_neg]
+  · rintro (h | h)
+    · right
+      rw [← neg_eq_iff_eq_neg, ← hneg, h]
+    · left
+      apply neg_injective
+      rw [← hneg, h]
+
+/-- The next Frobenius index, with indices read cyclically modulo `n`. -/
+private def cyclicSuccIndex {n : ℕ} (hn : 0 < n) (i : Fin n) : Fin n :=
+  ⟨(i.val + 1) % n, Nat.mod_lt _ hn⟩
+
+private theorem twoPowers_sum_le_modulus
+    {n : ℕ} (a b : Fin n) (hab : a ≠ b) :
+    2 ^ a.val + 2 ^ b.val ≤ 2 ^ n - 1 := by
+  let S : Finset ℕ := {a.val, b.val}
+  let R : Finset ℕ := Finset.range n
+  have hSsub : S ⊆ R := by
+    intro x hx
+    simp only [S, Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with rfl | rfl
+    · exact Finset.mem_range.mpr a.isLt
+    · exact Finset.mem_range.mpr b.isLt
+  have habv : a.val ≠ b.val := fun h => hab (Fin.ext h)
+  have hSsum : (∑ x ∈ S, 2 ^ x) = 2 ^ a.val + 2 ^ b.val := by
+    simp [S, habv]
+  rw [← hSsum]
+  calc
+    (∑ x ∈ S, 2 ^ x) ≤ ∑ x ∈ R, 2 ^ x :=
+      Finset.sum_le_sum_of_subset_of_nonneg hSsub (fun _ _ _ => by positivity)
+    _ = 2 ^ n - 1 := by
+      simpa [R] using (Nat.geomSum_eq (m := 2) (by omega) n)
+
+private theorem onePower_le_modulus
+    {n : ℕ} (_hn : 2 ≤ n) (a : Fin n) :
+    2 ^ a.val ≤ 2 ^ n - 1 := by
+  let S : Finset ℕ := {a.val}
+  let R : Finset ℕ := Finset.range n
+  have hSsub : S ⊆ R := by
+    intro x hx
+    have hx' : x = a.val := by
+      simpa only [S, Finset.mem_singleton] using hx
+    exact Finset.mem_range.mpr (hx' ▸ a.isLt)
+  have hSsum : (∑ x ∈ S, 2 ^ x) = 2 ^ a.val := by simp [S]
+  rw [← hSsum]
+  calc
+    (∑ x ∈ S, 2 ^ x) ≤ ∑ x ∈ R, 2 ^ x :=
+      Finset.sum_le_sum_of_subset_of_nonneg hSsub (fun _ _ _ => by positivity)
+    _ = 2 ^ n - 1 := by
+      simpa [R] using (Nat.geomSum_eq (m := 2) (by omega) n)
+
+private theorem twoDistinctPowers_eq_twoDistinctPowers_candidates
+    {a b i j : ℕ} (hab : a ≠ b) (hij : i ≠ j)
+    (h : 2 ^ a + 2 ^ b = 2 ^ i + 2 ^ j) :
+    (a = i ∧ b = j) ∨ (a = j ∧ b = i) := by
+  let S : Finset ℕ := {a, b}
+  let T : Finset ℕ := {i, j}
+  have hSsum : (∑ x ∈ S, 2 ^ x) = 2 ^ a + 2 ^ b := by
+    simp [S, hab]
+  have hTsum : (∑ x ∈ T, 2 ^ x) = 2 ^ i + 2 ^ j := by
+    simp [T, hij]
+  have hST : S = T := by
+    apply Finset.geomSum_injective (n := 2) (by omega)
+    change (∑ x ∈ S, 2 ^ x) = ∑ x ∈ T, 2 ^ x
+    rw [hSsum, hTsum, h]
+  have haT : a ∈ T := by rw [← hST]; simp [S]
+  have hbT : b ∈ T := by rw [← hST]; simp [S]
+  simp only [T, Finset.mem_insert, Finset.mem_singleton] at haT hbT
+  rcases haT with hai | haj <;> rcases hbT with hbi | hbj
+  · exact (hab (hai.trans hbi.symm)).elim
+  · exact Or.inl ⟨hai, hbj⟩
+  · exact Or.inr ⟨haj, hbi⟩
+  · exact (hab (haj.trans hbj.symm)).elim
+
+private theorem onePower_ne_twoDistinctPowers
+    {a i j : ℕ} (hij : i ≠ j) :
+    2 ^ a ≠ 2 ^ i + 2 ^ j := by
+  intro h
+  let S : Finset ℕ := {a}
+  let T : Finset ℕ := {i, j}
+  have hSsum : (∑ x ∈ S, 2 ^ x) = 2 ^ a := by simp [S]
+  have hTsum : (∑ x ∈ T, 2 ^ x) = 2 ^ i + 2 ^ j := by
+    simp [T, hij]
+  have hST : S = T := by
+    apply Finset.geomSum_injective (n := 2) (by omega)
+    change (∑ x ∈ S, 2 ^ x) = ∑ x ∈ T, 2 ^ x
+    rw [hSsum, hTsum, h]
+  have hcard := congrArg Finset.card hST
+  simp [S, T, hij] at hcard
+
+/-- Doubling a binary Frobenius digit advances its index cyclically modulo
+`2^n - 1`. -/
+private theorem double_twoPower_modEq_cyclicSucc
+    {n : ℕ} (hn : 2 ≤ n) (b : Fin n) :
+    Nat.ModEq (2 ^ n - 1) (2 ^ b.val + 2 ^ b.val)
+      (2 ^ (cyclicSuccIndex (by omega) b).val) := by
+  let c := cyclicSuccIndex (by omega : 0 < n) b
+  have hpow : 2 ^ b.val + 2 ^ b.val = 2 ^ (b.val + 1) := by
+    rw [pow_succ]
+    omega
+  by_cases hlt : b.val + 1 < n
+  · have hc : c.val = b.val + 1 := by
+      simp [c, cyclicSuccIndex, Nat.mod_eq_of_lt hlt]
+    rw [hpow, hc]
+  · have hbn : b.val + 1 = n := by omega
+    have hc : c.val = 0 := by simp [c, cyclicSuccIndex, hbn]
+    rw [hpow, hbn, hc, pow_zero]
+    have hpowpos : 0 < 2 ^ n := by positivity
+    convert (Nat.ModEq.modulus_mul_add
+      (m := 2 ^ n - 1) (a := 1) (b := 1)) using 1
+    all_goals omega
+
+private theorem normalizedTwoPower_modEq_pairWeight_candidates
+    {n : ℕ} (hn : 2 ≤ n) (a c : Fin n) (p : HigmanExponentPair n)
+    (hmod : Nat.ModEq (2 ^ n - 1)
+      (2 ^ a.val + 2 ^ c.val)
+      (2 ^ p.1.1.val + 2 ^ p.1.2.val)) :
+    (a = p.1.1 ∧ c = p.1.2) ∨
+      (a = p.1.2 ∧ c = p.1.1) := by
+  by_cases hac : a = c
+  · subst c
+    let d := cyclicSuccIndex (by omega : 0 < n) a
+    have hsingle : Nat.ModEq (2 ^ n - 1)
+        (2 ^ d.val) (2 ^ p.1.1.val + 2 ^ p.1.2.val) :=
+      (double_twoPower_modEq_cyclicSucc hn a).symm.trans hmod
+    have hsingle_le := onePower_le_modulus hn d
+    have hpair_le := twoPowers_sum_le_modulus p.1.1 p.1.2 (by omega)
+    have hsingle_pos : 0 < 2 ^ d.val := by positivity
+    have hpair_pos : 0 < 2 ^ p.1.1.val + 2 ^ p.1.2.val := by positivity
+    have hle : 2 ^ d.val ≤ 2 ^ p.1.1.val + 2 ^ p.1.2.val := by
+      apply hsingle.le_of_lt_add
+      omega
+    have hge : 2 ^ p.1.1.val + 2 ^ p.1.2.val ≤ 2 ^ d.val := by
+      apply hsingle.symm.le_of_lt_add
+      omega
+    exact (onePower_ne_twoDistinctPowers (by omega)
+      (Nat.le_antisymm hle hge)).elim
+  · have hleft_le := twoPowers_sum_le_modulus a c hac
+    have hright_le := twoPowers_sum_le_modulus p.1.1 p.1.2 (by omega)
+    have hleft_pos : 0 < 2 ^ a.val + 2 ^ c.val := by positivity
+    have hright_pos : 0 < 2 ^ p.1.1.val + 2 ^ p.1.2.val := by positivity
+    have hle : 2 ^ a.val + 2 ^ c.val ≤
+        2 ^ p.1.1.val + 2 ^ p.1.2.val := by
+      apply hmod.le_of_lt_add
+      omega
+    have hge : 2 ^ p.1.1.val + 2 ^ p.1.2.val ≤
+        2 ^ a.val + 2 ^ c.val := by
+      apply hmod.symm.le_of_lt_add
+      omega
+    have heq : 2 ^ a.val + 2 ^ c.val =
+        2 ^ p.1.1.val + 2 ^ p.1.2.val := Nat.le_antisymm hle hge
+    rcases twoDistinctPowers_eq_twoDistinctPowers_candidates
+        (fun h => hac (Fin.ext h)) (by omega) heq with h | h
+    · exact Or.inl ⟨Fin.ext h.1, Fin.ext h.2⟩
+    · exact Or.inr ⟨Fin.ext h.1, Fin.ext h.2⟩
+
+private theorem finEquiv_eq_natCast
+    {n : ℕ} [NeZero n] (i : Fin n) :
+    ZMod.finEquiv n i = (i.val : ZMod n) := by
+  cases n with
+  | zero => exact Fin.elim0 i
+  | succ n =>
+      change i = (i.val : Fin (n + 1))
+      apply Fin.ext
+      simp
+
+private theorem zmodSucc_eq_finPred
+    {n : ℕ} [NeZero n] (b j : Fin n)
+    (h : ((b.val + 1 : ℕ) : ZMod n) = (j.val : ZMod n)) :
+    b = j - 1 := by
+  apply (ZMod.finEquiv n).injective
+  rw [map_sub]
+  apply eq_sub_of_add_eq
+  rw [map_one, finEquiv_eq_natCast b, finEquiv_eq_natCast j]
+  simpa only [Nat.cast_add, Nat.cast_one] using h
+
+/-- **Higman Lemma 6 (p. 86), repeated-index candidates.**
+
+If the weight of `[[u_a,u_b],u_b]` is one of Higman's pair weights, then,
+cyclically modulo `n`, its indices are `(i,j-1,j-1)` or
+`(j,i-1,i-1)` for that pair `i < j`. -/
+theorem repeated_frobeniusWeight_pairWeight_candidates
+    {n : ℕ} [NeZero n] (hn : 2 ≤ n)
+    (a b : Fin n) (p : HigmanExponentPair n)
+    (hmod : Nat.ModEq (2 ^ n - 1)
+      (2 ^ a.val + 2 ^ b.val + 2 ^ b.val)
+      (2 ^ p.1.1.val + 2 ^ p.1.2.val)) :
+    (a = p.1.1 ∧ b = p.1.2 - 1) ∨
+      (a = p.1.2 ∧ b = p.1.1 - 1) := by
+  let c := cyclicSuccIndex (by omega : 0 < n) b
+  have hdouble := double_twoPower_modEq_cyclicSucc hn b
+  have hnormalized : Nat.ModEq (2 ^ n - 1)
+      (2 ^ a.val + 2 ^ c.val)
+      (2 ^ p.1.1.val + 2 ^ p.1.2.val) := by
+    have hraw : Nat.ModEq (2 ^ n - 1)
+        (2 ^ a.val + 2 ^ b.val + 2 ^ b.val)
+        (2 ^ a.val + 2 ^ c.val) := by
+      simpa only [add_assoc] using Nat.ModEq.rfl.add hdouble
+    exact hraw.symm.trans hmod
+  have hcastSucc : ((b.val + 1 : ℕ) : ZMod n) = (c.val : ZMod n) := by
+    change ((b.val + 1 : ℕ) : ZMod n) =
+      (((b.val + 1) % n : ℕ) : ZMod n)
+    exact (ZMod.natCast_mod _ _).symm
+  rcases normalizedTwoPower_modEq_pairWeight_candidates hn a c p hnormalized with h | h
+  · left
+    constructor
+    · exact h.1
+    · apply zmodSucc_eq_finPred
+      rw [hcastSucc, h.2]
+  · right
+    constructor
+    · exact h.1
+    · apply zmodSucc_eq_finPred
+      rw [hcastSucc, h.2]
+
+/-- Pair weights attached to distinct increasing Frobenius-index pairs are
+distinct for a primitive Singer root. -/
+theorem primitiveRoot_pairWeight_injective
+    {F : Type*} [Field F] {n : ℕ} (hn : 2 ≤ n)
+    (lambda : F) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1)) :
+    Function.Injective (fun p : HigmanExponentPair n =>
+      lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) := by
+  intro p q hpq
+  have hfinite : IsOfFinOrder lambda :=
+    hprim.isOfFinOrder (Nat.sub_ne_zero_of_lt
+      (Nat.one_lt_pow (by omega : n ≠ 0) (by omega)))
+  have hmod : Nat.ModEq (2 ^ n - 1)
+      (2 ^ p.1.1.val + 2 ^ p.1.2.val)
+      (2 ^ q.1.1.val + 2 ^ q.1.2.val) := by
+    have h := hfinite.pow_eq_pow_iff_modEq.mp hpq
+    rwa [← hprim.eq_orderOf] at h
+  rcases normalizedTwoPower_modEq_pairWeight_candidates
+      hn p.1.1 p.1.2 q hmod with h | h
+  · exact Subtype.ext (Prod.ext h.1 h.2)
+  · exact (by omega : False).elim
+
+/-- In an odd cyclic index group, a nonzero gap `d` cannot have both of its
+adjacent gaps `d-1` and `d+1` in the same unordered class `±r`. -/
+theorem not_both_adjacent_pairGaps_of_odd
+    {n : ℕ} (hnodd : Odd n) {d r : ZMod n} (hd : d ≠ 0) :
+    ¬ ((d - 1 = r ∨ d - 1 = -r) ∧
+      (d + 1 = r ∨ d + 1 = -r)) := by
+  rintro ⟨hminus, hplus⟩
+  have false_of_one_add_one_eq_zero
+      (h : (1 : ZMod n) + 1 = 0) : False := by
+    have hone : (1 : ZMod n) = 0 :=
+      (ZMod.add_self_eq_zero_iff_eq_zero hnodd).mp h
+    apply hd
+    calc
+      d = d * 1 := (mul_one d).symm
+      _ = d * 0 := congrArg (d * ·) hone
+      _ = 0 := mul_zero d
+  rcases hminus with hminus | hminus <;>
+    rcases hplus with hplus | hplus
+  · apply false_of_one_add_one_eq_zero
+    calc
+      (1 : ZMod n) + 1 = (d + 1) - (d - 1) := by ring
+      _ = r - r := by rw [hminus, hplus]
+      _ = 0 := sub_self r
+  · apply hd
+    apply (ZMod.add_self_eq_zero_iff_eq_zero hnodd).mp
+    calc
+      d + d = (d - 1) + (d + 1) := by ring
+      _ = r + -r := by rw [hminus, hplus]
+      _ = 0 := add_neg_cancel r
+  · apply hd
+    apply (ZMod.add_self_eq_zero_iff_eq_zero hnodd).mp
+    calc
+      d + d = (d - 1) + (d + 1) := by ring
+      _ = -r + r := by rw [hminus, hplus]
+      _ = 0 := neg_add_cancel r
+  · apply false_of_one_add_one_eq_zero
+    calc
+      (1 : ZMod n) + 1 = (d + 1) - (d - 1) := by ring
+      _ = (-r) - (-r) := by rw [hminus, hplus]
+      _ = 0 := sub_self (-r)
+
+/-- **Higman Lemma 6 (p. 86), odd-gap obstruction in source indices.**
+
+For `i < j`, the two repeated candidates use the inner pairs
+`{i,j-1}` and `{j,i-1}` (indices modulo `n`). When `n` is odd, these
+pairs cannot both have Higman's permitted gap `±r`. -/
+theorem HigmanExponentPair.not_both_predecessor_pairGaps_of_odd
+    {n : ℕ} [NeZero n] (hnodd : Odd n) (p : HigmanExponentPair n)
+    (r : ZMod n) :
+    ¬ (HasHigmanPairGap r p.1.1 (p.1.2 - 1) ∧
+      HasHigmanPairGap r p.1.2 (p.1.1 - 1)) := by
+  rintro ⟨hleft, hright⟩
+  let d := higmanCyclicGap p.1.1 p.1.2
+  have hd : d ≠ 0 := by
+    intro hd0
+    have heq : ZMod.finEquiv n p.1.2 = ZMod.finEquiv n p.1.1 :=
+      sub_eq_zero.mp hd0
+    exact (by omega : p.1.2 ≠ p.1.1) ((ZMod.finEquiv n).injective heq)
+  have hgapMinus : higmanCyclicGap p.1.1 (p.1.2 - 1) = d - 1 := by
+    simp only [higmanCyclicGap, d, map_sub, map_one]
+    ring
+  have hright' : HasHigmanPairGap r (p.1.1 - 1) p.1.2 :=
+    HasHigmanPairGap.comm.mp hright
+  have hgapPlus : higmanCyclicGap (p.1.1 - 1) p.1.2 = d + 1 := by
+    simp only [higmanCyclicGap, d, map_sub, map_one]
+    ring
+  apply not_both_adjacent_pairGaps_of_odd hnodd hd
+  constructor
+  · simpa only [HasHigmanPairGap, hgapMinus] using hleft
+  · simpa only [HasHigmanPairGap, hgapPlus] using hright'
 
 /-! ## Pair-weight eigenspace spanning -/
 
