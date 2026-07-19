@@ -562,4 +562,162 @@ theorem card_uActionHom_range_modEq_one [Finite G] {M : Subgroup G}
     Nat.card_congr (QuotientGroup.quotientKerEquivRange (uActionHom data chief)).toEquiv
   rwa [hQcard] at hmod
 
+/-! ### The scalar-character ↔ restricted-automorphism order bridge (Peterfalvi (9.7.a), issue
+1043)
+
+The Clifford integer `a` of `CliffordCaseAData` is pinned as the order of the *automorphism* image
+`|range (aInvariantRestrictAut S0_aInvariant)|`, while the (9.7.a) order-`a` ratio embedding
+(`exists_blockScalarRatioEmbedding_of_blocks_pow_eq_one`, `TypePGaloisUBound`) consumes the order
+of the *module scalar* image `|range (lineScalarChar (aInvariantSubrep …))|`.  These agree: the two
+homomorphisms have the same domain and the **same kernel** — both kernels are "acts trivially on
+the block" — so the first isomorphism theorem identifies the range cardinalities. -/
+
+/-- **Triviality criterion for the restricted automorphism**: `aInvariantRestrictAut hS a = 1` iff
+`a` fixes `S` pointwise (through `φ`). -/
+theorem aInvariantRestrictAut_eq_one_iff {K A : Type*} [Group K] [Group A] {φ : A →* MulAut K}
+    {S : Subgroup K} (hS : IsAInvariant φ S) (a : A) :
+    aInvariantRestrictAut hS a = 1 ↔ ∀ x ∈ S, φ a x = x := by
+  constructor
+  · intro h x hx
+    have hy := aInvariantRestrictAut_coe hS a ⟨x, hx⟩
+    rw [h] at hy
+    simpa using hy.symm
+  · intro h
+    refine MulEquiv.ext fun y => Subtype.ext ?_
+    rw [aInvariantRestrictAut_coe]
+    exact h y y.2
+
+/-- **Kernel agreement**: on an order-`p` (`𝔽_p`-line) invariant block `J`, the line scalar
+character of the associated subrepresentation and the restricted automorphism hom have the same
+kernel — both are "acts trivially on `J`" (`lineScalarChar_eq_one_iff` on the module side,
+`aInvariantRestrictAut_eq_one_iff` on the group side, matched through `elabRepresentation`). -/
+theorem lineScalarChar_aInvariantSubrep_ker_eq {A K : Type*} [Group A] [CommGroup K]
+    {p : ℕ} [Fact p.Prime] [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
+    {J : Subgroup K} (hJ : IsAInvariant φ J)
+    (hdim : Module.finrank (ZMod p)
+      (aInvariantSubrep (p := p) hJ).toSubmodule = 1) :
+    (lineScalarChar (aInvariantSubrep (p := p) hJ).toRepresentation hdim).ker
+      = (aInvariantRestrictAut hJ).ker := by
+  ext a
+  rw [MonoidHom.mem_ker, MonoidHom.mem_ker, lineScalarChar_eq_one_iff,
+    aInvariantRestrictAut_eq_one_iff]
+  constructor
+  · intro h x hx
+    have hv := congrArg Subtype.val
+      (h ⟨Additive.ofMul x, (mem_symm_elabSubmoduleSubgroupEquiv J _).mpr hx⟩)
+    have hv' : elabRepresentation p φ a (Additive.ofMul x) = Additive.ofMul x := hv
+    rw [elabRepresentation_apply] at hv'
+    exact Additive.ofMul.injective hv'
+  · intro h v
+    refine Subtype.ext ?_
+    have hv : elabRepresentation p φ a (v : Additive K) = (v : Additive K) := by
+      have hmem : Additive.toMul (v : Additive K) ∈ J :=
+        (mem_symm_elabSubmoduleSubgroupEquiv J _).mp v.2
+      calc elabRepresentation p φ a (v : Additive K)
+          = elabRepresentation p φ a (Additive.ofMul (Additive.toMul (v : Additive K))) := rfl
+        _ = Additive.ofMul (φ a (Additive.toMul (v : Additive K))) :=
+            elabRepresentation_apply p φ a _
+        _ = Additive.ofMul (Additive.toMul (v : Additive K)) := by rw [h _ hmem]
+        _ = (v : Additive K) := rfl
+    exact hv
+
+/-- **Order bridge** (Peterfalvi (9.7.a), issue 1043 step 1): the image of the line scalar
+character on an invariant `𝔽_p`-line block has the same cardinality as the image of the restricted
+automorphism hom — first isomorphism theorem over the kernel agreement
+`lineScalarChar_aInvariantSubrep_ker_eq`.  Instantiated at `J = S0` this pins the scalar-character
+image order to the Clifford integer `a` (`CliffordCaseAData.a_eq_card_restrictAut_range`). -/
+theorem card_range_lineScalarChar_aInvariantSubrep {A K : Type*} [Group A] [CommGroup K]
+    {p : ℕ} [Fact p.Prime] [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
+    {J : Subgroup K} (hJ : IsAInvariant φ J)
+    (hdim : Module.finrank (ZMod p)
+      (aInvariantSubrep (p := p) hJ).toSubmodule = 1) :
+    Nat.card (lineScalarChar (aInvariantSubrep (p := p) hJ).toRepresentation hdim).range
+      = Nat.card (aInvariantRestrictAut hJ).range := by
+  rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange
+      (lineScalarChar (aInvariantSubrep (p := p) hJ).toRepresentation hdim)).toEquiv,
+    ← Nat.card_congr (QuotientGroup.quotientKerEquivRange
+      (aInvariantRestrictAut hJ)).toEquiv,
+    lineScalarChar_aInvariantSubrep_ker_eq hJ hdim]
+
+/-! ### Orbit transport of the block image order (Peterfalvi (9.7.a), issue 1043 step 2)
+
+Peterfalvi p. 51: "As `H_i` is conjugate to `H₁` under `W₁`, `|U/C_U(H_i)| = a`."  The summands
+are the `UW₁`-translates `Hpart j = q(orbitRep j) • S₀` (`CliffordCaseAData.Hpart_orbit`), and
+`U ⊴ UW₁` (the Frobenius kernel, `typeP_uW1_frobenius`), so conjugating the acting element by
+`orbitRep j` intertwines the restricted actions on `S₀` and on `Hpart j`; the two restriction
+homs then differ by precomposition with a `MulAut` of the domain, leaving the kernel cardinality
+— hence the image cardinality — unchanged. -/
+
+section OrbitTransport
+
+variable [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+  {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+
+/-- **All Clifford summands have image order `a`** (Peterfalvi (9.7.a), "`U/C_U(H_i)` is ... of
+order `a` for all `i`"): the `U`-action image on every block `Hpart j` has the cardinality of the
+image on the orbit generator `S₀` — the Clifford integer `caseA.a`. -/
+theorem caseA_card_range_restrictAut_Hpart (caseA : CliffordCaseAData chars) (j : Fin data.q) :
+    Nat.card (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).range = caseA.a := by
+  classical
+  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+    (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
+  set Γ := ↥(data.typeP.U ⊔ data.typeP.W1)
+  set q' : Γ →* MulAut (↥data.H ⧸ chief.N) := quotientMulAutHom chief.N_aInvariant with hq'
+  set r : Γ := caseA.orbitRep j with hr
+  -- conjugation of the (normal) `U`-part domain by `r⁻¹`
+  set c : MulAut ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    MulAut.conjNormal r⁻¹ with hc
+  set f₁ := aInvariantRestrictAut (caseA.Hpart_aInvariant j) with hf₁
+  set f₀ := aInvariantRestrictAut caseA.S0_aInvariant with hf₀
+  set g := f₀.comp c.toMonoidHom with hg
+  -- the acting automorphism of the conjugated element: `q'(ι(c u)) = q'(r)⁻¹ ∘ q'(ι u) ∘ q'(r)`
+  have hact : ∀ u : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)),
+      ∀ z : ↥data.H ⧸ chief.N,
+      uActionHom data chief (c u) z = (q' r)⁻¹ (uActionHom data chief u (q' r z)) := by
+    intro u z
+    have hcoe : ((c u : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) : Γ)
+        = r⁻¹ * (u : Γ) * r := by
+      rw [hc, MulAut.conjNormal_apply, inv_inv]
+    have : uActionHom data chief (c u) = q' (r⁻¹ * (u : Γ) * r) := by
+      rw [uActionHom, MonoidHom.comp_apply]
+      exact congrArg q' hcoe
+    rw [this, map_mul, map_mul, map_inv]
+    rfl
+  -- kernels agree: both are "acts trivially on the translated block"
+  have hker : f₁.ker = g.ker := by
+    ext u
+    rw [MonoidHom.mem_ker, MonoidHom.mem_ker, hg, MonoidHom.comp_apply, hf₁, hf₀,
+      aInvariantRestrictAut_eq_one_iff, aInvariantRestrictAut_eq_one_iff]
+    simp only [MulEquiv.coe_toMonoidHom]
+    constructor
+    · intro h y hy
+      rw [hact u y]
+      have hmem : q' r y ∈ caseA.Hpart j := by
+        rw [caseA.Hpart_orbit j]
+        exact Subgroup.smul_mem_pointwise_smul y (q' r) caseA.S0 hy
+      rw [h _ hmem]
+      exact (q' r).symm_apply_apply y
+    · intro h x hx
+      have hy : (q' r)⁻¹ x ∈ caseA.S0 := by
+        rw [caseA.Hpart_orbit j] at hx
+        exact Subgroup.mem_pointwise_smul_iff_inv_smul_mem.mp hx
+      have := h _ hy
+      rw [hact u ((q' r)⁻¹ x)] at this
+      have hxx : q' r ((q' r)⁻¹ x) = x := (q' r).apply_symm_apply x
+      rw [hxx] at this
+      exact (q' r)⁻¹.injective (by rw [this])
+  -- first isomorphism theorem: equal kernels ⟹ equal image cardinalities
+  have h1 : Nat.card f₁.range = Nat.card g.range := by
+    rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange f₁).toEquiv,
+      ← Nat.card_congr (QuotientGroup.quotientKerEquivRange g).toEquiv, hker]
+  -- precomposition with the domain automorphism does not change the range
+  have h2 : g.range = f₀.range := by
+    rw [hg, MonoidHom.range_comp]
+    have : c.toMonoidHom.range = ⊤ := MonoidHom.range_eq_top.mpr c.surjective
+    rw [this]
+    exact (MonoidHom.range_eq_map f₀).symm
+  rw [h1, h2, ← caseA.a_eq_card_restrictAut_range]
+
+end OrbitTransport
+
 end OddOrder.Peterfalvi.S11
