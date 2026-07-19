@@ -24,6 +24,7 @@ import OddOrder.GroupTheory.NormalHallHeredity
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.CNGroupStructure
+import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.MackeyTransfer
