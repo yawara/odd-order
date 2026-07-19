@@ -26,11 +26,11 @@ character-theoretic fields are **produced**, not posited:
   `Hypothesis.exists_nu_extension_eq_alignedRow_at_pair` (the assembled grid transpose of
   issue 9079: (9.8) classification → (5.8) dichotomy → pair transpose → fiber sweep).
 
-The remaining four fields (`lam_ortho_grid`, `zeta_ortho_grid`, `zeta_lam_ortho`,
+The other four fields (`lam_ortho_grid`, `zeta_ortho_grid`, `zeta_lam_ortho`,
 `cross_zero`) are the **(5.3.b) / (8.18.b) support-geometry obligations** (obligation 3 of
-the (10.7) frontier note `notes/peterfalvi/s10_7_derived_frobenius.md`) — they are `sorry`d
-here as the explicit remaining work, so this file is the single discharge point for the
-gate's residual.
+the (10.7) frontier note `notes/peterfalvi/s10_7_derived_frobenius.md`).  They are **all
+discharged in this file** (via `typeII_tau_diff_inner_chiFam_eq_zero` and
+`typeII_R_mem_inner_chiFam_eq_zero`); the file is sorry-free.
 -/
 
 namespace OddOrder.Peterfalvi.S12
@@ -1344,8 +1344,8 @@ grid fields **honestly produced**: `tau2` is the (5.7) `T2`-coherent extension
 (`exists_nu_extension_eq_alignedRow_at_pair`).
 
 The four support-geometry fields ((5.3.b) grid orthogonality and the (8.18.b)
-cross-support vanishing) are the remaining obligation-3 content — `sorry`d here as the
-explicit frontier (see the module docstring). -/
+cross-support vanishing) are the obligation-3 content, all discharged in this file
+(see the module docstring). -/
 theorem exists_typeIICrossIsometryData_at_pair [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp}

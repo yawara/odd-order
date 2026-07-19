@@ -82,6 +82,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
@@ -1115,6 +1116,11 @@ Appendix III type-A Suzuki 2-group structure. -/
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+
+-- Ch.6 (Frobenius Actions): Thm 6.23 (Thompson) — normal `p`-complement from the
+-- normalizers of the nonidentity characteristic subgroups of a Sylow `p`-subgroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer
 
 -- Ch.6 (Frobenius Actions): Thm 6.24 (Thompson) — Frobenius kernels are nilpotent
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.isNilpotent_of_isFrobeniusAction
@@ -9897,8 +9903,10 @@ the (9.11.1) `𝒮₂ = 𝒮₁` extraction (the saturated-bound subset form and
 `R`-dispatch cross-orthogonality, and the `τ₃`-coherence of `𝒮₃` (Peterfalvi (5.7) at the
 uniform degree `qu`).  The `Hypothesis`-level corollaries (`caseA_nineElevenTwo_tiWitness`,
 `nineElevenNormBound_of_sevenEightRefutation`, `coherent_sOf_H0Cprime_of_sevenEightRefutation`)
-carry the pre-existing upstream `C_eq_cSub` sorryAx debt (as the Phase-B/C corollaries and
-caseB do) and join this list when (11.5)/`H0_eq_Hprime` closes. -/
+were long annotated here as carrying a "pre-existing upstream `C_eq_cSub` sorryAx debt".
+**That note was stale** (2026-07-19 lane a, verified by `#print axioms`): `C_eq_cSub_of_noncoherent`
+(`S13_CoreStructure.lean:511`) and the whole chain are sorry-free, so the corollaries are
+axiom-clean and are pinned below. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenTwoTIWitness_of_degree_dichotomy
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.conj_smul_cuSubOf_of_Hpart_smul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.forall_w1_exists_Hpart_smul
@@ -9908,20 +9916,31 @@ caseB do) and join this list when (11.5)/`H0_eq_Hprime` closes. -/
   OddOrder.Peterfalvi.S13.card_le_inner_self_re_of_orthonormal_inner_int_ne
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.sOf_H0Cprime_memberRFamily_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sThree_coherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_nineElevenTwo_tiWitness
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.nineElevenNormBound_of_sevenEightRefutation
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_sevenEightRefutation
 
 /-! **Peterfalvi (9.11.7)–(9.11.8) coherent-pair adjunction, axiom-clean** (issue 9083 Phase
 E-final, lane a).  The union-pair coherent extension (Coq `extend_coherent_with` +
 `bridge_coherent`, Peterfalvi (5.6.3)), the (5.5) partial-sum evaluation of coherent
 extensions (Coq `mem_coherent_sum_subseq`), the `coherent_ortho` cross-orthogonality, and
 the (9.11.7)–(9.11.8) projection budget (`‖Γ‖² = 1`, `Δ = 0`, `b = 0`, and the bridge
-`β^τ = Γ − e·τ₁ψ₁`).  The discharge `nineElevenSevenEightRefutation` itself and the (9.11)
-capstones `coherent_sOf_H0Cprime` / `coherent_sOf_H0C` carry the pre-existing upstream
-`C_eq_cSub` sorryAx debt (as the Phase-B/C corollaries and caseB do) and join this list
-when (11.5)/`H0_eq_Hprime` closes. -/
+`β^τ = Γ − e·τ₁ψ₁`).  The discharge `nineElevenSevenEightRefutation` and the (9.11)
+capstones `coherent_sOf_H0Cprime` / `coherent_sOf_H0C` were long annotated here as carrying a
+"pre-existing upstream `C_eq_cSub` sorryAx debt".  **That note was stale** (2026-07-19 lane a,
+verified by `#print axioms`): all three depend only on `propext` / `Classical.choice` /
+`Quot.sound`, so they are pinned below together with the (9.11) capstones. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.unionPairExtension
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.isCoherent_union_pair_of_bridge
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_eq_sum_memberRFamily
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_cross_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.nineElevenSevenEightRefutation
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_equality_refutation
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0C
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.exists_bridge_target_of_budget
 
 /-! **Peterfalvi (8.13), axiom-clean** (lane a, 2026-07-12).  The escaping-centralizer control:

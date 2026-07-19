@@ -12,7 +12,8 @@
 - `lake exe cache get` 再実行 = **~5 min + ~3 GB DL**
 - `references/` (gitignored 別 private リポ) も再取得
 
-mathlib は `lakefile.toml` で `v4.30.0-rc2` に pin されており worktree 間で drift しないので, **mathlib パッケージと references を main worktree から symlink で共有**するのが最適.
+mathlib は `lakefile.toml` で **exact SHA** (`rev = "360da6fa…"`) に pin されており worktree 間で drift しないので, **mathlib パッケージと references を main worktree から symlink で共有**するのが最適.
+(toolchain は `lean-toolchain` = `leanprover/lean4:v4.32.0-rc1`、2026-07-09 bump。pin は toolchain tag でなく mathlib の SHA で効く。)
 
 ## セットアップ手順
 
@@ -23,7 +24,7 @@ mathlib は `lakefile.toml` で `v4.30.0-rc2` に pin されており worktree �
 - slug は作業範囲を表す:
   - 章単位: `isaacs-ch05`, `bg-s03`, `peterfalvi-s04`
   - 単一 issue 攻略: `issue-0002-pcomplement` 等
-  - 現行 (2026-07-02) の常設レーンは slug = `a`/`b`/`c` (`/home/ywr/odd-order-{a,b,c}`; 配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md))
+  - 現行 (2026-07-19) の常設レーンは slug = `a`/`b`/`c` (`/home/ywr/odd-order-{a,b,c}`; 配分の正本 = [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md)。旧 `ft_lane_reallocation_2026_06_28.md` は 2026-07-16 に SUPERSEDED)
 - 衝突確認: `ls -d /home/ywr/odd-order*`
 
 ### 2. 作成 + symlink + olean warm-start コピー (5 コマンド)
@@ -56,8 +57,10 @@ echo "references" >> /home/ywr/odd-order/.git/info/exclude
 ### 5. issue 採番レンジの割り当て (並行発行の衝突予防)
 
 並行セッションが `bin/new-issue` で同じ番号を取らないよう, この worktree に
-**採番 base** を割り当てる (1000 の倍数; main = 0)。**Peterfalvi 系は base 1000 で固定**、
-その他の並行 worktree は 2000 以降の未使用値:
+**採番 base** を割り当てる (1000 の倍数; main = 0)。⚠ **base は「本」でなく「レーン」に固定**
+(2026-07-16 配分、2026-07-19 再確認): **a = 1000 / b = 2000 / c = 3000**。
+旧記載「Peterfalvi 系は base 1000 で固定・2000 以降は未使用値」は失効 — 2000/3000 は
+新規 ad-hoc worktree に払い出してよい空き値ではない:
 
 ```bash
 # 例: Peterfalvi worktree (base 1000 固定) — セッション冒頭で

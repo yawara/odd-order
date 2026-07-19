@@ -84,6 +84,9 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
       形は無事)。修正形 = `by` / `fun h =>` 直後で改行。今後の折り返しスクリプトは
       same-line `by` を含む行を skip 対象にする。
 - [ ] wave 5: `show`→`change` batch 2 (active 近傍) + open scoped Classical 14 件。
+- [x] 2026-07-19 夕 (Opus hub, commit `e5c32e00`): deprecation 5 件 (`push_neg`→`push Not` ×4、
+      `Set.ncard_image_of_injOn`→`Set.InjOn.ncard_image` ×2) + 未参照 binder `_`-prefix 3 件。
+      full build green で検証。同 tick で**残キューを実測し直し 650 → 192 に訂正** (下記)。
 
 ## 残キュー (2026-07-17 夜再 census、green full build unique 1245 件)
 
@@ -98,6 +101,35 @@ warning も replay する) を `sort -u` で unique 化して取得 (2026-07-17,
 | 14 | open scoped Classical | wave 5 (個別判断) |
 | 12 | class 型 def の abbrev/instance マーク | 小物 wave (要挙動確認) |
 | 9+9+6+5 | maxHeartbeats unscoped / overlapping instances / def→theorem / simpa→simp | 小物 wave (overlapping は instance 引数削除 = signature 接触、要個別) |
+
+## 🔄 2026-07-19 夕 hub tick: 残キューを実測し直した — **650 ではなく 192**
+
+上の「残キュー」表 (1245 件) も下の「650 サイト」も**過大**だった。green full build 後の
+実測 (全レーン合流済 main、commit `e5c32e00` 時点) は **warning 総数 192 行**:
+
+| 件数 | linter | 対応 |
+|---|---|---|
+| 121 | style.longLine | 残キュー最大。ソース側実測は 130 行 (差分 = scoped `set_option … in` で無効化されている分) |
+| 23 | declaration uses sorry | **対象外** (本物の frontier = AppE 9 / FeitSibley 5 / Suzuki2Groups 4 / AppD 2 / NearFields 2 / CNGroupStructure 1) |
+| 14 | open scoped Classical | wave 5 (個別判断) |
+| 9+1 | unused instance in type | 旧表の 334 → **10**。うち 7 が `S06_CertainTypeClifford` = 下記 pitfall 1 の cascade 実績あり、要 full build |
+| 8+1 | 上記の継続行 (`* 'X':`) | — |
+| 4 | Variable name 未参照 | 旧表 17 → 4。うち 2 は named-arg、2 は証明本体で実使用 (下記) ⟹ **実質すべて対応困難** |
+| 3 | 自動 include された section variable 未使用 | `omit … in` |
+| 3+2+1 | `change` 系 / `show` tactic / try-instead | 小物 |
+| 1 | mathlib フォルダ全体 import | 個別 |
+
+**残キューが縮んだ理由**: 旧 census (2026-07-17 夜) 以降の wave に加え、レーンの通常作業
+(leaf 化・実証明・リファクタ) が warning ごとコードを置き換えたため。⟹ **wave 着手前に必ず
+census を取り直す** — 古い件数で計画すると存在しないサイトを探すことになる。
+
+### ⚠ census の取り方 (罠あり)
+
+`lake build OddOrder` は cached module の warning を replay するが、**取りこぼすことがある**。
+実例: `TheoremIIPackaging.lean:496` の `push_neg` は replay に現れなかったが、実際には
+deprecation warning を出しており、修正後に leaf build すると消えた (= 本物だった)。
+⟹ **replay の件数は下限として扱う**。カテゴリによってはソース側で直接数える方が確実
+(例: longLine = `awk 'length>100'`、ただし file/scoped の `linter.style.longLine false` を除外)。
 
 ## 2026-07-19 wave (hub, 並列 6 エージェント) — 792 → 650 サイト
 

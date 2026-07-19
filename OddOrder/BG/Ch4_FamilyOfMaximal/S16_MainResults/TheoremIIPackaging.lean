@@ -112,7 +112,7 @@ theorem conj_smul_eq_bot_iff (m : G) (H : Subgroup G) :
 both factors are stable under conjugation by `m ∈ M` (`M_σ ◁ M` gives the `\widehat{M_σ}` factor,
 and the normality of `U M_σ` in `M` — Theorem A(3), passed as `hnorm` — gives the other). -/
 theorem aSet_conj_closed {M U : Subgroup G}
-    (hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal) (hUM : U ≤ M)
+    (hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal) (_hUM : U ≤ M)
     {m x : G} (hm : m ∈ M) (hx : x ∈ ASet M U) : m * x * m⁻¹ ∈ ASet M U := by
   obtain ⟨⟨hxM, hxC⟩, hxUMσ⟩ := hx
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
@@ -245,7 +245,7 @@ theorem coprime_centralizer_of_neighbour [Finite G] (hG : OddOrder.BG.IsMinimalS
   have hxiσ : xi ∈ S14.sigmaSharp M :=
     mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl) hxiA hxi1 hxiesc
   have hgtxi : 1 < (S14.maximalSigmaSubgroupsOfElement xi).ncard := by
-    by_contra h; push_neg at h
+    by_contra h; push Not at h
     exact hxiesc (centralizer_le_of_maximalSigma_le_one hG hM hxiσ.1 hxi1 h)
   -- `FT_signalizerBase x_i = Mi`
   have hbr : 1 < (S14.maximalSigmaSubgroupsOfElement xi).ncard ∧
@@ -404,7 +404,7 @@ Theorem D(4) seed into `A₀(Mᵢ) = \widehat{M_{iσ}} − 𝒞_G(Kᵢ^#)`. -/
 theorem not_mem_conjClassSet_kappaHall_sharp_of_tau2 [Finite G]
     {Mi Ki : Subgroup G} (hKiMi : Ki ≤ Mi)
     (hKi : Ch03.IsHallSubgroup (S14.kappa Mi) (Ki.subgroupOf Mi))
-    {x : G} (hx1 : x ≠ 1)
+    {x : G} (_hx1 : x ≠ 1)
     (hxτ2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 Mi) :
     x ∉ conjClassSet (sharpSubgroup Ki) := by
   rintro ⟨k, hk, g, hgk⟩
@@ -690,7 +690,7 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
     have hxσ : x ∈ S14.sigmaSharp M :=
       mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl) hxA hx1 hesc
     have hgtx : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard := by
-      by_contra h; push_neg at h
+      by_contra h; push Not at h
       exact hesc (centralizer_le_of_maximalSigma_le_one hG hM hxσ.1 hx1 h)
     obtain ⟨Nx, hNx⟩ :=
       maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape hG hM hxσ hesc
@@ -707,7 +707,7 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
     have hxiσ : xi ∈ S14.sigmaSharp M :=
       mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl) hxiA hxi1 hxiesc
     have hgtxi : 1 < (S14.maximalSigmaSubgroupsOfElement xi).ncard := by
-      by_contra h; push_neg at h
+      by_contra h; push Not at h
       exact hxiesc (centralizer_le_of_maximalSigma_le_one hG hM hxiσ.1 hxi1 h)
     -- Lemma 14.13(b): move the conjugator `Nx → Mfam i` into `M`.
     have hgeq : MulAut.conj g • Nx = Mfam i := hg0.trans hi.symm

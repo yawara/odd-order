@@ -12,7 +12,7 @@
 ## 0. 配分原則
 
 - 単位 = ギャップ調査の**独立クラスタ** (数学的独立 + ファイル territory 非交差)。クラスタ間依存は
-  「Isaacs Ch.8 → Pf App Suzuki」の 1 本のみで、これは同一レーン (b) 内に閉じた。
+  「Isaacs Ch.8 → Pf App Suzuki」の 1 本のみ。⚠ 当初は同一レーン (b) 内に閉じていたが、**2026-07-19 に Ch.8 が a へ返還されたため現在は a → b のレーン間依存**。
 - 各レーンは自クラスタ内を**上流優先 + 文書順** (冊間 = Isaacs → BG → Peterfalvi) で進める。
 - **担当 unit の特殊化債務 (`formalized_specialized`) の一般化も作業項目**。unit に着手したら missing/partial と
   併せて specialized を番号順で一般化する — docstring 注記で済ませてよいのは一般化が数学的に無意味な場合のみ
@@ -26,9 +26,9 @@
 
 | lane | worktree | クラスタ | 主所有 | ODD_ISSUE_BASE |
 |---|---|---|---|---|
-| **a** | `/home/ywr/odd-order-a` | Isaacs 完全仕上げ | `OddOrder/Isaacs/**` (**2026-07-19 裁定で Ch08/Ch10 込みの全域**)。Ch.2–6 gaps → Ch.9 (新設 `Ch09_MoreSubnormality/`) → 付録 (新設 `AppX_Basics/`) | 1000 |
+| **a** | `/home/ywr/odd-order-a` | Isaacs 完全仕上げ + Peterfalvi 本文 | `OddOrder/Isaacs/**` (**2026-07-19 裁定 9154 で Ch08/Ch10 込みの全域**) + **`OddOrder/Peterfalvi/S*.lean` (Pf 本文全域、同 9154 で c から移管)**。⚠ 旧記載の frontier (Ch.2–6 gaps → Ch.9 → 付録) は**消化済** — `Ch09_MoreSubnormality/` は 2026-07-17 に新設され 18 leaf が存在 | 1000 |
 | **b** | `/home/ywr/odd-order-b` | Suzuki チェーン (Ch.8 は 2026-07-19 に a へ返還) | `OddOrder/Peterfalvi/Appendices/{Suzuki,Suzuki2Groups}*.lean` | 2000 |
-| **c** | `/home/ywr/odd-order-c` | BG 残 + Pf 残 (Ch.10 は 2026-07-19 に a へ返還) | `OddOrder/BG/**` + `OddOrder/Peterfalvi/S*.lean` (本文 partial/specialized) + `Appendices/{NearFields,Huppert,SemilinearField,FeitSibley}.lean` | 3000 |
+| **c** | `/home/ywr/odd-order-c` | BG 残 + Pf Appendices の非 Suzuki 系 (Ch.10 は 2026-07-19 に a へ返還) | `OddOrder/BG/**` + `Appendices/{NearFields,Huppert,SemilinearField,FeitSibley}.lean`。⚠ **Pf 本文 `OddOrder/Peterfalvi/S*.lean` は 2026-07-19 裁定 9154 で a へ移管** (9158 で一時 c へ暫定移管したが a 復帰により失効) | 3000 |
 
 - shared infra (`OddOrder/GroupTheory/**`, `OddOrder/Algebra/**`, `OddOrder/Mathlib/**`, root `OddOrder/*.lean`) =
   所有なし、**claim-before-build (9000 番台 issue)** 継続。hub/main = base 0。
@@ -54,11 +54,16 @@
 
 結果 id ごとの内容・現状・メモ = 調査 note の per-unit 表が正本。
 
-## 3. 再作成手順 (レーンは 2026-07-15 に全退役・worktree/branch 削除済み)
+## 3. 再作成手順 (⚠ **2026-07-19 現在 a/b/c は稼働中** — 下記は将来また全退役したときの手順)
+
+2026-07-15 の全退役後、**2026-07-16〜17 に 3 レーンとも再作成済み**。branch `a`/`b`/`c` と
+worktree `/home/ywr/odd-order-{a,b,c}` は現存するので、**下記をそのまま実行すると `-b` が
+「branch は既に存在する」で失敗する**。現況確認は `git worktree list` が正。
 
 ```bash
+# 全退役状態からの新規作成時のみ (branch が存在しないことを git branch で確認してから)
 cd /home/ywr/odd-order
-git worktree add /home/ywr/odd-order-a -b a   # 旧 branch は削除済みなので -b で新規
+git worktree add /home/ywr/odd-order-a -b a
 git worktree add /home/ywr/odd-order-b -b b
 git worktree add /home/ywr/odd-order-c -b c
 ```
@@ -68,12 +73,14 @@ git worktree add /home/ywr/odd-order-c -b c
 `/loop` self-pacing 自走 (wakeup 60s 固定)。hub 監視 cron は [`merge_monitor.md`](merge_monitor.md) 冒頭の
 現行指定で再作成 (cron は session-only、[[cron-dies-on-model-switch]])。
 
-## 4. 新設ディレクトリ命名 (mathlib 互換・記述的英語)
+## 4. ディレクトリ命名 (mathlib 互換・記述的英語) — ⚠ 下 3 つは 2026-07-17 に**作成済**
 
-- `OddOrder/Isaacs/Ch08_PermutationGroups/` (入口 `Main.lean`、以下 topic leaves)
-- `OddOrder/Isaacs/Ch09_MoreSubnormality/`
-- `OddOrder/Isaacs/Ch10_MoreTransfer/`
-- `OddOrder/Isaacs/AppX_Basics/`
+- `OddOrder/Isaacs/Ch08_PermutationGroups/` (入口 `Main.lean`、以下 topic leaves) — **既存 14 leaf**
+- `OddOrder/Isaacs/Ch09_MoreSubnormality/` — **既存 18 leaf**
+- `OddOrder/Isaacs/Ch10_MoreTransfer/` — **既存 6 leaf**
+- ~~`OddOrder/Isaacs/AppX_Basics/`~~ — **作られていない**。Isaacs 付録の作業は既存の
+  `OddOrder/Isaacs/Appendix/` (`DirectDiamond.lean` / `SubgroupBasics.lean`) に landing しており、
+  新ディレクトリを切る予定は無い
 
 BG/Pf の新 leaf は既存規約 (記述的英語、1500 行で分割、hub = pure re-export) に従う。
 

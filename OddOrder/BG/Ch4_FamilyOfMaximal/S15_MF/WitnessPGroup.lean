@@ -458,7 +458,7 @@ theorem isMaximalElementaryAbelian_sup_omega1Center_of_witness [Finite G]
     (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
     (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ MF M)
     (hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
-    (hZP : Z ≤ opiCoreInG ({p} : Set ℕ) (MF M))
+    (_hZP : Z ≤ opiCoreInG ({p} : Set ℕ) (MF M))
     (hBea : (X₁ ⊔ Z).IsElementaryAbelian p)
     (hBcard : Nat.card ↥(X₁ ⊔ Z) = p ^ 2) :
     IsMaximalElementaryAbelian p (X₁ ⊔ Z) := by
