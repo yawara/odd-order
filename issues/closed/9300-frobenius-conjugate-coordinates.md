@@ -1,5 +1,5 @@
 ---
-id: 9164
+id: 9300
 slug: frobenius-conjugate-coordinates
 title: "Frobenius conjugate-coordinate basis for finite-field Singer models"
 created: 2026-07-19

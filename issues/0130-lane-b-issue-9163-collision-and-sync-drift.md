@@ -73,10 +73,18 @@ a 側は既に main へ合流済 (`fae731ae3`)、b 側は未コミット (`AM`)�
 - 正本更新: `CLAUDE.md` (3 箇所) / `notes/meta/issue_management.md` / `notes/meta/merge_monitor.md`。
 - **「9xxx = shared claim」の grep 規約は不変** — `ls issues/9*.md` で全レーンの open claim を走査できる。
 
-### lane b への指示 (次の main 同期で反映)
+### 実施 (2026-07-19 20:35、hub tick で完了)
 
-`issues/9164-frobenius-conjugate-coordinates.md` は **9300 番台 (b のバンド)** へ再改番する
-(`--base 9300` → 9300)。9164 は a の `dedup-ringaut-algaut-bridge` が main 上で確定済み。
+b は Lemma 5 完成と同時に 9164 を **closed** にして合流したため、hub が main 側で改番した:
+
+- `issues/closed/9164-frobenius-conjugate-coordinates.md` → **`issues/closed/9300-...`**
+  (frontmatter `id: 9300`)、`issues/SEQUENCE.9300` = 9300 を作成
+- 参照 1 件を追随: `issues/2048-pf-suzuki-lemma5.md:102`
+- **9164 は a の `dedup-ringaut-algaut-bridge` が保持** (open、`issues/1043` から参照されており
+  参照数が多い側を据え置く = 2026-07-18 の改番規則どおり)
+- 検査: open+closed+pending 全体で 9163/9164 の重複なし
+  (残る 1036/1037/1038・9125・9132 は改番しない歴史的 closed 衝突)
+
 以後 b の shared-infra claim は `export ODD_ISSUE_BASE=9300`。
 
 ## 完了条件
