@@ -1027,7 +1027,7 @@ theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
         (MulAut.conj g).injective).toEquiv).symm
     have hsubeq : (A.map (MulAut.conj g).toMonoidHom).subgroupOf data.W
         = A.subgroupOf data.W := by
-      apply OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥data.W)
+      apply OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq (C := ↥data.W)
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hmap_le).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv, hcard]
     have hmapeq : A.map (MulAut.conj g).toMonoidHom = A := by

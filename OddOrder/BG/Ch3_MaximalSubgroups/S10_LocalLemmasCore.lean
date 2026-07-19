@@ -9,6 +9,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
 import OddOrder.GroupTheory.NilpotentCoprimeCommute
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # BG §10 局所補題 — Core (Prop 10.11, Lemma 10.12)
@@ -52,31 +53,6 @@ private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] [Finite G] (P : 
 `mulAut_smul_eq_map` of the BG `Ch1`/`Ch2` files). Shared by Prop 10.11(b)/(d). -/
 theorem conjSmul_eq_map (φ : MulAut G) (H : Subgroup G) :
     φ • H = H.map (φ : G →* G) := by rw [Subgroup.pointwise_smul_def]; rfl
-
-/-- **Cyclic uniqueness by order**: in a finite cyclic group, two subgroups of equal
-cardinality coincide. (Each order-`d` subgroup equals the unique order-`d` kernel
-`(powMonoidHom d).ker`.) Used in 10.11(c)/(d) to transport `M`-normalisation along the
-cyclic `Z` to its subgroups.
-
-This duplicates `S10_BetaRadical.cyclic_subgroup_eq_of_card_eq` (a sibling §10 leaf); the
-shared helper should be hoisted into `S10_HallStructure` (public here since Lemma 12.18 uses it
-for the `Ω₁` bookkeeping in `S12_Lemma1218`). -/
-theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic C]
-    {H₁ H₂ : Subgroup C} (h : Nat.card H₁ = Nat.card H₂) : H₁ = H₂ := by
-  letI : CommGroup C := IsCyclic.commGroup
-  have key : ∀ {N : Subgroup C} {d : ℕ}, Nat.card N = d → N = (powMonoidHom d : C →* C).ker := by
-    intro N d hN
-    have hN_le : N ≤ (powMonoidHom d : C →* C).ker := by
-      intro g hg
-      rw [MonoidHom.mem_ker, powMonoidHom_apply]
-      have hg1 : (⟨g, hg⟩ : N) ^ Nat.card N = 1 := pow_card_eq_one'
-      have := congrArg (Subtype.val) hg1
-      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one, hN] at this
-    have hd_dvd : d ∣ Nat.card C := hN ▸ N.card_subgroup_dvd_card
-    have hker_card : Nat.card (powMonoidHom d : C →* C).ker = d := by
-      rw [IsCyclic.card_powMonoidHom_ker (G := C) d, Nat.gcd_eq_right hd_dvd]
-    exact Subgroup.eq_of_le_of_card_ge hN_le (by rw [hker_card, hN])
-  exact (key (d := Nat.card H₁) rfl).trans (key (d := Nat.card H₁) h.symm).symm
 
 /-- In a minimal counterexample the trivial subgroup is *not* uniquely maximal: if `M₀` were
 the unique maximal subgroup of `G`, every proper subgroup would lie in `M₀`, so any `g ∉ M₀`
@@ -670,7 +646,6 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
   have h2 := congrArg (Subgroup.map Z.subtype) h1
   rwa [Subgroup.map_subgroupOf_eq_of_le hle, Subgroup.map_subgroupOf_eq_of_le hX_le_Z] at h2
 
-
 /-- **BG Lemma 10.5** (mmd MISSING_PAGE, PDF p.87): `p ∈ σ(M)'`, `X ∈ ℰ_p¹(G)`,
 `N_G(X) ⊆ M` なら `r_p(M) = 2`、`p` は ideal でなく、`X ⊆ A` となる `A ∈ ℰ_p²(G)` が存在する。 -/
 theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -1176,6 +1151,5 @@ theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
     have hmem : q ∈ sigma M ∩ sigma H := ⟨hqσM, Msigma_isPiGroup H q hq⟩
     rw [hσ_disj] at hmem
     exact absurd hmem (Set.notMem_empty q)
-
 
 end OddOrder.BG.Ch3.S10

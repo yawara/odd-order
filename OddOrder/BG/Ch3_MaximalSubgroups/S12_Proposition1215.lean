@@ -8,6 +8,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # BG §12 Proposition 12.15 — σ(M)-subgroup / maximal interaction
@@ -37,26 +38,6 @@ open scoped Pointwise
 open scoped commutatorElement
 
 variable {G : Type*} [Group G]
-
-/-- In a finite cyclic group, two subgroups of equal cardinality are equal (each order-`d`
-subgroup is the unique kernel `(powMonoidHom d).ker`). Replicated from the private helper in
-`S10_BetaRadicalGlobal`; used to make subgroups of a cyclic group characteristic. -/
-private theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic C]
-    {K L : Subgroup C} (h : Nat.card K = Nat.card L) : K = L := by
-  letI : CommGroup C := IsCyclic.commGroup
-  have key : ∀ {M : Subgroup C} {d : ℕ}, Nat.card M = d → M = (powMonoidHom d : C →* C).ker := by
-    intro M d hM
-    have hM_le : M ≤ (powMonoidHom d : C →* C).ker := by
-      intro g hg
-      rw [MonoidHom.mem_ker, powMonoidHom_apply]
-      have hg1 : (⟨g, hg⟩ : M) ^ Nat.card M = 1 := pow_card_eq_one'
-      have := congrArg (Subtype.val) hg1
-      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one, hM] at this
-    have hd_dvd : d ∣ Nat.card C := hM ▸ M.card_subgroup_dvd_card
-    have hker_card : Nat.card (powMonoidHom d : C →* C).ker = d := by
-      rw [IsCyclic.card_powMonoidHom_ker (G := C) d, Nat.gcd_eq_right hd_dvd]
-    exact Subgroup.eq_of_le_of_card_ge hM_le (by rw [hker_card, hM])
-  exact (key (d := Nat.card K) rfl).trans (key (d := Nat.card K) h.symm).symm
 
 /-- **p-group normalizer condition packaged for BG 12.15(b)/(c)**: if `T'` is a finite `q`-group,
 `S ≤ T'`, and `S = T' ⊓ N_G(S)` (i.e. `S` is self-normalizing in `T'`), then `S = T'`. Indeed
