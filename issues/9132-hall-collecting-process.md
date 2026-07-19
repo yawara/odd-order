@@ -90,3 +90,40 @@ AxiomsCheck 登録、survey 更新、本 claim を close。
 ## 参照
 - issue 3021 (App.E de-opacify 済 + 依存グラフ)、`OddOrder/BG/AppE_FurtherResults.lean`。
 - ⚠ shared infra (`OddOrder/GroupTheory/**`) ゆえ他レーンは着手前に本 claim を確認のこと。
+
+## 出典調査 (2026-07-19、App.D 完了後に実測)
+
+**BG は E.1 を証明していない** — 本文は引用のみ (PDF p.157):
+> "The following result was proved by Philip Hall ... using his commutator collecting process.
+> It may be found on pp. 37-41 of [26] and in many other books (e.g., [17, pp. 315-318])."
+
+- `[26]` = **Suzuki, _Group Theory II_** (Grundlehren 248, 1986) — `references/` に無い。
+- `[17]` = **Huppert, _Endliche Gruppen I_** (Grundlehren 134, 1967) — `references/` に無い。
+- **Gorenstein には無い** (唯一の追加参照可能書): Ch.5 は §1 Frattini / §2-§3 p'-自己同型 /
+  §4 p-groups of small depth / §5 extra-special / §6 associated Lie ring。
+  regular p-group も collection formula も節が無く、`grep "collection\|regular p-group"` も空振り。
+- **mathlib に無し** (`grep -rl "Petrescu\|collecting\|collection formula" Mathlib/GroupTheory/` = 空)。
+- **Coq math-comp/odd-order にも無し** (`coq/theories/` に `BGappendixD/E` 自体が存在しない —
+  App.D/E は FT 経路外ゆえ Coq 形式化の対象外)。
+
+⟹ **参照可能な証明本体がどこにも無い**。自前で古典証明を再構成する (impasse なら
+[[feedback-ask-chatgpt-for-elided-gaps]] の手順)。CLAUDE.md の「文献引用のみで本文に証明が
+無い結果は恒久対象外にせず低優先繰延」に該当するが、**BG の残 sorry は App.E の 9 件のみ**
+なので lane c の frontier としては live。
+
+## 障害の正確な形 (2026-07-19 に独立検証)
+
+repo の `exists_hallCollection_of_residue` により、E.1 は「weight `k` ごとに `γ_{k+1}` を法として
+合わせる」帰納に帰着している (最上位スロットの指数 `C(n,n)=1` が残差を吸収するため)。
+その帰納段で必要なのは:
+
+> 残差 `R ∈ γ_k` の `γ_k/γ_{k+1}` (アーベル) における類が、**ある固定元 `c` の `C(n,k)` 乗**であること。
+
+アーベル群の元が一般に `C(n,k)` 乗であるとは限らないので、これは自動でない。成立する理由は
+`F = F(x,y)` の中で `γ_k(F)/γ_{k+1}(F)` が **weight `k` の basic commutator を基底とする自由
+アーベル群**であり、収集係数が `n` の整数値多項式で、weight `k` 成分がちょうど `C(n,k)` の定数倍に
+なること (Hall 多項式)。⟹ issue 記載の (i)(ii) が本当に要る、という当初評価を**再確認**した。
+
+なお `⁅a, bⁿ⁆ ≡ ∏_i ⁅a,b;i⁆^{C(n,i)}` (左正規化交換子の 1 変数収集) は `n` の帰納で
+独立に証明でき、weight 2 の係数が `C(n,1)=n` → Pascal で `C(n+1,2)` を出す仕組みそのもの。
+**次段の最初の一歩はこれ** (自由群不要・自己完結)。
