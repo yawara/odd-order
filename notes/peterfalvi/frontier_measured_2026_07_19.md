@@ -39,7 +39,7 @@
 | §9 | (9.11) | CONFIRMED 特殊化 | `coherent_sOf_H0Cprime` (S13_Orthogonality.lean:1197) は `S13.Hypothesis M` + `IsTypeIII ∨ IsTypeIV`。type-II は §15 の S/T instance 別経路。**repo に `Hypothesis (9.5)` オブジェクトが存在しない** (§9 の仮説は S11 の 3 carrier に分散)。 |
 | §10 | (10.11) | 部分 | 第 1 主張 (|W1|,|W2| prime) は一般 (`theorem88_caseB_prime_orders`, S12_MaximalIII_IV_V.lean:1682)。type-II 残余は §15 の S/T pair instance のみ。 |
 | §11 | (11.8) | **✅ 2026-07-19 解消 (∀ 化)** | 教科書形は ∀ ζ (PDF p.65-67: 任意の `ζ ∈ S(HC)` に対し直交性を仮定して (11.8.4)-(11.8.6) で (11.3) と矛盾)。`zeta_residual_not_orthogonal_H0C_of_refuter` (S13_Orthogonality.lean) として ∀ 形を主定理化し、旧 `exists_zeta_...` は witness packaging の系に降格 (consumer 3 箇所は無変更)。鍵は新規 `S12.Hypothesis.exists_charParameters_full_of_zeta` — parameters を**与えられた ζ の周りで**組む。⚠ 次数 `ζ(1) = w₁` は**特殊化でない**: `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` の台条件 (`alpha_support`) がまさにそれを要求する (`n·w₁ = d − δ` + `μ_{i0}(1) = 1` ⟹ `α_{ij}(1) = 0`)。残る狭さは `S12.inducedFamily M` 固定 + `IsTypeIII ∨ IsTypeIV` のみ。S16 側の同文重複 (`member_residual_not_orthogonal_H0C_of_refuter` + member-pinned producer 2 件) は issue 1040 で削除済 (consumer 2 件は S13 版 cite に置換)。 |
-| §13 | (13.8) | CONFIRMED 特殊化 (**中規模** — 2026-07-19 再実測で下方修正, issue 1041) | 書籍 (13.8) 本体 = **S 側** (`H = PC`, `∑_{H^#}|η₀₁|² ≥ |S′|−u²`; PDF p.79)。repo 済は「applied to T」instance (`eta10_Qsharp_norm_lower_core`)。⚠ **旧記述「4 ピース全て S 側未存在」は過大** — 実測: (13.3.c) S 側 `tau1S_ofHonest_mu_col_eta_col_one` / (7.6) base `H_sharp_hypothesis76_base` / α integrality `H_sharp_cCoeff_int`+`H_sharp_alphaFun_inflation_finset` / (13.7) S 側パッケージ `exists_caseB_data_eta10_H_core` は**全て既存**。残 = (i) `eta01` 定義 (ii) μ-column→H76 index 変換 (mirror of `exists_muT_index_core_of_base_condition`) (iii) α(1)∈ℤ mirror (iv) `exists_caseB_data_eta01_S_core` (v) 最終 `eta01_Hsharp_norm_lower_core`。詳細 = issue 1041。 |
+| §13 | (13.8) | **✅ 2026-07-19 解消 (S 側 mirror 完成, issue 1041)** | 書籍 (13.8) 本体 = S 側 `∑_{H^#}|η₀₁|² ≥ |S′|−u²` を `eta01_Hsharp_norm_lower_core` (S15_CaseBEndgameSupply/Eta01Correction.lean) として実証明 (仮定 hG のみ、sorry 0、axiom-clean 実測済)。distinguished index (`exists_muS_index_eta01_core`) は T 側 550 行の完全 mirror (2 段 constituent 展開 + ℕ-係数直交カウント)。「applied to T」instance (`eta10_Qsharp_norm_lower_core`) と両輪が揃った。 |
 
 ## (5.6) エンジンの norm 一般化 (2026-07-19, lane a)
 
@@ -130,7 +130,7 @@ anchor `χ₁` の既約性も norm 1 も**要求していない**。証明は `
 5. ~~(5.3.a)/(5.3.b) の一般 producer~~ **着手不要** — (5.3.a) は `irrSubcoherent` で実在、
    (5.3.b) は構成不能かつ consumer ゼロで「作らない」が既定裁定 (上記自己訂正節)。
 6. ~~(11.8) ∀ 化~~ **✅ 2026-07-19 完了**。~~(6.6) の Z-generic 化~~ **✅ 2026-07-19 完了** (issue 1040 の dedup も同日完了)。→ **(13.8) S 側 mirror** (次の frontier)。
-7. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
+7. ~~(13.8) S 側 mirror~~ **✅ 2026-07-19 完了** (issue 1041)。
 8. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。
 
