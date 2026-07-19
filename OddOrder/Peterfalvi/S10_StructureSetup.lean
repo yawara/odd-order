@@ -570,6 +570,17 @@ theorem A1_subset_typeA [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   | I => exact OddOrder.BG.Ch3.S10.Msigma_le M
   | _ => exact OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
 
+/-- **`A₁(M) = M_σ^#` for every Peterfalvi type**: `A₁(M) = M_s^#` by (8.10), and `M_s = M_σ`
+by (8.11)'s Reference (BG Proposition 16.1, `mainSubgroup_eq_Msigma`).  Type-uniform form of
+`S10Interface.A1_eq_sigmaSharp_of_typeI_or_II`. -/
+theorem A1_eq_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
+    A1 M tau = OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  show OddOrder.GroupTheory.sharpSubgroup (OddOrder.GroupTheory.mainSubgroup M tau) = _
+  rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
+  rfl
+
 /-- A type-`P₁` maximal is not of Peterfalvi Type I: Type I is BG type `F` (`κ(M) = ∅`,
 `isTypeI_iff_isTypeF`) while type `P₁` has `κ(M)` nonempty. -/
 theorem ne_typeI_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

@@ -398,6 +398,39 @@ theorem mem_zpowers_mul_right_of_coprime [Finite G] {b k : G} (hcomm : Commute b
   have hz := OddOrder.BG.Ch4.S14.piPart_mem_zpowers π (b * k)
   rwa [hmul] at hz
 
+/-- **Peterfalvi (8.13.b), `D ⊆ A₁` conjunct, type-uniform**: an escaping point of `A(M)` lies
+in the sharp core `A₁(M)`, for a maximal subgroup of *any* Peterfalvi type.
+
+Both halves go through BG's `D ⊆ M_σ^#` reduction of Theorem II conjunct 2
+(`mem_sigmaSharp_of_mem_aSet_of_escape`), fed through the respective `ASet` bridge —
+`typeIA_subset_ASet` on Type I, `typePACore_subset_ASet` on the types of class `𝒫` — and land in
+`A₁(M) = M_σ^#` (`A1_eq_sigmaSharp`, valid for every type).  The matched `κ`-Hall /
+`(κ ∪ σ)′`-Hall pair the `𝒫`-side reduction needs is supplied by
+`typeP_exists_kappa_hall_pair`. -/
+theorem escaping_typeA_mem_A1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M)
+    {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M
+      (OddOrder.GroupTheory.typeA M tau)) :
+    a ∈ A1 M tau := by
+  classical
+  by_cases htauI : tau = PeterfalviType.I
+  · subst htauI
+    obtain ⟨dM⟩ : IsTypeI M := htau
+    refine escaping_typeIA_mem_A1 hG hM dM ?_
+    rwa [OddOrder.GroupTheory.typeA_eq_typeIA dM] at ha
+  · have hTP : OddOrder.BG.Ch4.S14.IsTypeP M := by
+      cases tau with
+      | I => exact absurd rfl htauI
+      | II => exact OddOrder.BG.Ch4.S16.isTypeP_of_isTypeII hG hM htau
+      | III => exact OddOrder.BG.Ch4.S16.isTypeP_of_isTypeIII hG hM htau
+      | IV => exact OddOrder.BG.Ch4.S16.isTypeP_of_isTypeIV hG hM htau
+      | V => exact OddOrder.BG.Ch4.S16.isTypeP_of_isTypeV hG hM htau
+    obtain ⟨K₀, U₀, hKM, hUM, hKne, hK, hU⟩ := typeP_exists_kappa_hall_pair hG hM hTP
+    rw [typeA_eq_typePACore hG hM htau htauI] at ha
+    rw [A1_eq_sigmaSharp hG hM htau]
+    exact escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha
+
 /-- **Peterfalvi (8.12.b), type-`𝒫` half**: for a type-`𝒫` maximal `T` and a point
 `b ∈ A(T) = typePACore T` whose order is coprime to `|T_σ|`, `T` is the unique maximal subgroup
 of `G` containing `C_G(b)`.
