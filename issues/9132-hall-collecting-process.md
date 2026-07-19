@@ -186,3 +186,77 @@ metabelian (= `γ₂` アーベル) は **class ≤ 3 を真に含み、どの c
 - [ ] 1 変数収集 (List.prod) を `Finset.sum` へ渡す橋。
 - [ ] 展開式 → 二重和 → `Finset.sum_comm` → 畳み込み → Pascal → `c_r` の定義。
 - [ ] `AppE.hallCollection` の metabelian 特殊化を接続 (一般形の sorry は残す)。
+
+## ⚠ 2026-07-19 深夜: 文献調査で方針転換 — Lazard–Leibman ルートへ
+
+subagent 2 本で「最短既知証明」と「既存形式化」を調査。**本 issue の従来の記述に
+誤りが 2 つ**あったので訂正する。
+
+### 訂正 1: 「自由冪零群 + basic commutator + Hall 多項式が要る」は誤り
+
+**Mann の初等証明**が存在する: Dixon–du Sautoy–**Mann**–Segal, _Analytic Pro-p Groups_
+2nd ed. (CUP 1999) **Appendix A, pp. 355-357** (2.5 頁)。公開 PDF:
+`https://www.sas.rochester.edu/mth/sites/doug-ravenel/otherpapers/ddsms.pdf`
+(PDF p.374-376)。二項係数は **`{1..n}` の t 元部分集合の個数**という純粋な数え上げ
+から出る (Hall 多項式の「多項式性」を経由しない)。
+筋: `2n` 文字の自由群 `F` で `P_A := (∏_{j∈A} z₁ⱼ)(∏_{j∈A} z₂ⱼ)` を collection し、
+`P_A = ∏_{∅≠B⊆A} Q_B` (`Q_S` は S の全ブロックに触れる交換子の積 ⟹ `Q_S ∈ γ_{|S|}`)
+を作ってから `z₁ⱼ ↦ x, z₂ⱼ ↦ y` に特殊化する。同じサイズの `B` が `C(t,s)` 個ある
+ことがそのまま指数になる。⚠ **`Q_S` の定義を再帰にすれば分解も support 性質も
+自動**なので、**全内容は `Q_S ∈ γ_{|S|}(F)` 一点**に落ちる (自由積 `A₁∗⋯∗Aₙ` で
+`⋂ⱼ ker(ブロック j を潰す) ≤ γₙ`)。
+
+### 訂正 2: 「Petrescu 1977」は幻
+
+実体は **J. Petresco, _Sur les commutateurs_, Math. Z. 61 (1954) 348-356**。
+BG の文献表に Petresco/Petrescu の項目は無い (grep 済; BG は Huppert [17] と
+Suzuki [26] のみ引用)。以後 **Hall–Petresco** と綴る。
+
+### 既存形式化の状況 (2026-07-19 実測)
+
+- **mathlib4 / Coq mathcomp / Isabelle AFP / Metamath / HOL Light / Mizar /
+  agda-unimath: すべて無し。**
+- mathcomp は weight 2 のみ (`solvable/commutator.v:126` `expMg_Rmul`)。
+  **`coq/theories/BGsection4.v:62-89` は weight 3 を証明ローカルの `have expMR_fg`
+  で手書き**しており、名前付き補題にしていない (= Gonthier らも regular p-group 理論を
+  作らず必要な低 class 切り詰めをその場で証明した)。
+- ⚠ **`plby/Erdos90`** (Lean 4, AI 生成, 2026-06) に `petresco_two_generators` として
+  完全形式化が存在する。ただし **LICENSE ファイルが無い (license: null)** ので
+  **参照も複製も不可** — coq submodule のような「行間補完に読む」扱いもしない。
+  同 repo は Magnus 埋め込み + basic commutator の重いルート (Hall 部分だけで ~6k 行、
+  import closure 25k 行) を採っている。**軽いルートを選ぶ判断を支持する材料**として
+  だけ記録する。
+- mathlib には **`⁅γᵢ,γⱼ⁆ ≤ γ_{i+j}` すら無い** (本 repo は
+  `Isaacs.Ch04.commutator_lowerCentralSeries_le` として保有)。
+
+### 訂正 3: metabelian ルートは critical path 外 (前節の計画を撤回)
+
+`[γ₂,γ₂] ≤ γ₄` ゆえ **class ≤ 3 ⟹ metabelian**。逆は偽で metabelian は真に広いが、
+**最初の非 metabelian ケースが class 4** で、BG が要る class ≤ p−1 (p ≥ 5) を含まない。
+⟹ metabelian 版は genuine な定理だが **E.1 を unlock しない**。前節の組み立て計算は
+正しいが、一般形の前に書く価値は低い。**採用しない**。
+
+### 採用ルート = Lazard–Leibman (多項式列)
+
+`∂_h f(n) := f(n+h)·f(n)⁻¹`。`f ∈ poly(Γ_•)` ⟺ k 重差分が常に `Γ_k` に入る。
+
+1. ✅ **済 (2026-07-19)**: `n ↦ aⁿbⁿ` が多項式列であることの**閉じた形**
+   (`OddOrder/GroupTheory/PolynomialSequences.lean`, 184 行, sorry 0):
+   `∂_{h_k}⋯∂_{h_1}(aᵐbᵐ)(n) = ⁅a^{h_k},⁅…,⁅a^{h_2},b^{h_1}⁆…⁆⁆^{a^{n+h₁}}`。
+   ⟹ `mulFwdDiffList_pow_mul_pow_mem`: k 重差分 ∈ γ_k。
+   **これが Hall–Petresco のうち `aⁿbⁿ` 固有の内容の全部**。
+2. [ ] `n ↦ a^{C(n,i)}` (`a ∈ Γᵢ`) が多項式列 (差分は `⟨a⟩` 内に留まり、指数は
+   `C(n,i)` の有限差分)。
+3. [ ] `Γ_{c+1} = 1`, `h ∈ poly`, `h(0)=⋯=h(c)=1` ⟹ `h ≡ 1`
+   (`∂₁h ∈ poly(Γ_{•+1})` で c の帰納)。
+4. [ ] ★ **Lazard–Leibman**: `poly(Γ_•)` が点ごとの積で閉じる。Leibniz 則
+   `∂_h(fg) = (∂_h f)·(∂_h g)^{f}` + `⁅poly(Γ_{•+i}), poly(Γ_{•+j})⁆ ⊆ poly(Γ_{•+i+j})`。
+   **唯一の重い部品** (~300-600 行見込み)。純代数で自由群もリストも不要、**再利用可能**。
+5. [ ] Taylor 展開: `c_t := (∏_{s<t} c_s^{C(t,s)})⁻¹ g(t)` (Newton 再帰) と置くと
+   2+4 より `h(n) := (∏_{s<t}c_s^{C(n,s)})⁻¹ g(n)` が多項式列で `h(0)=…=h(t−1)=1`、
+   3 の議論 (`(∂₁)^t h(0)` が `h(t)^{±1}` に潰れる) から `c_t ∈ Γ_t`。⟹ E.1。
+   ※ 本 repo の `exists_hallCollection_of_residue` (E.1 は γ_n を法とする合同)
+   がちょうどこの Newton 形の別表現。
+
+fallback = Mann ルート (段 4 の代わりに collection process 本体; リスト書き換え +
+入れ子の整礎停止で ~300-700 行、単発使い捨て)。
