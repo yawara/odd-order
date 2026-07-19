@@ -103,8 +103,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
       - [x] candidateの actor-equivarianceを証明してactual uniquenessを適用し、
             `exists_lowerCentralSquareMap_eq_frobeniusSum` として actual square mapの
             表示公式を結論する
-    - [ ] Higman Lemma 6: `H² = H₂` の下で `L₃` が `L₂` と
+    - [x] Higman Lemma 6: `H² = H₂` の下で `L₃` が `L₂` と
           `ξ`-同型でないことを actual lower-central layers 上で証明する
+      - [x] §4 の actor を有限 2 群 `H` 上の faithful な奇数位数 cyclic
+            automorphism group として明示し、`H² = H₂ = Φ(H)` と Burnside の
+            operator theorem から `L₁` 作用の faithfulness を導出する
       - [x] 代表元 `[x,y]` から actual `L₂ × L₁ → L₃` を二重 quotient descent で
             構成し、`F₂`-双線形性、full span、ambient automorphism equivariance を証明する
       - [x] `L₁ × L₁ → L₂` と合成した actual triple commutator
@@ -126,7 +129,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               ことを Cauchy で示し、商作用の位数も 3 であることを証明する
         - [x] Neumann の class-two 結論と `L₃ ≠ 0` を矛盾させ、
               `lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv` を得る
-      - [ ] pair/triple Frobenius weight の指数算術と
+      - [x] pair/triple Frobenius weight の指数算術と
             `[u²,u] = 1` の actual square-map 接続から triple bracket を消去する
         - [x] 相異なる `i,j,k` の三項 weight は modulo `2^n-1` でどの pair
               weight とも一致しないことを示し、対応 eigenspace を `⊥` にする
@@ -145,7 +148,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               triple-bracket 項をゼロにする
         - [x] 非零項の固有値を pair-weight range に戻して対応 fiber を適用し、
               actual basis triple-bracket の全項をゼロにする
-      - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
+      - [x] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
@@ -186,5 +189,6 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
 - `OddOrder/Higman/Suzuki2Groups/HigmanSquareMap.lean`
+- `OddOrder/Higman/Suzuki2Groups/HigmanTripleBracketContradiction.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/QuadraticExtensions.lean`

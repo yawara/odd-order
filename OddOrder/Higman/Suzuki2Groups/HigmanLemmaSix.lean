@@ -23,7 +23,8 @@ zero and hence force `L₃ = 0`.
 The later sections establish Higman's odd-dimension reduction through the
 order-three fixed-point-free theorem, connect `[u²,u] = 1` to the
 triple-commutator sum from p. 86, and eliminate both its distinct- and
-repeated-weight terms. The remaining frontier is the final contradiction.
+repeated-weight terms. The source-facing contradiction is assembled in
+`HigmanTripleBracketContradiction`.
 -/
 
 set_option autoImplicit false

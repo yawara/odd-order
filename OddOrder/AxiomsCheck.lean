@@ -244,6 +244,7 @@ import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
 import OddOrder.GroupTheory.FixedPointFreeOrderThree
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
@@ -8397,6 +8398,9 @@ whenever the target is spanned by pair-weight eigenspaces. -/
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_all_terms_eq_zero
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.not_exists_equivariant_linearEquiv_of_higman_tripleBracket
 
 /-! **Higman Lemma 6, repeated-index candidates**: a repeated Frobenius
 triple with pair weight is one of the two predecessor-index terms in the
