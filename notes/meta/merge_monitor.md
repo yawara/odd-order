@@ -18,6 +18,14 @@
 > # 恒久 (issue 9154、a 復帰時): a='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S' / c は Pf S* を持たない
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
+> **📏 2026-07-19 hub 指摘 (issue 9160、lane b 宛、優先度 低)**: b の新設 leaf 32 本の
+> **中央値 177 行・平均 246 行** (c は 497/647) で、23 本が CLAUDE.md の目安 300 行を下回る。
+> 特に `Higman*` 系 9-10 本は issue 2048 (Suzuki Lemma 5) という**単一の目標への部品**で、
+> 「1 ファイル = 1 トピック」に照らすと 1〜3 ファイルに収まるべき塊。
+> ⚠ **即時是正は不要** — 作業中 frontier を小 leaf に置くのは CLAUDE.md の推奨形でもあり、
+> 現時点でビルド時間に悪影響も無い。**問題は「Lemma 5 が締まった後もこの粒度で凍結すること」**。
+> ⟹ 2048 を締めた区切りで topic 単位に統合する。詳細と落とし穴は issue 9160。
+
 > **⏸ 2026-07-19 暫定裁定 (issue 9158): lane a が停止 → Pf 本文を c へ暫定移管**。
 > a は 05:36 以降停止 (60 秒後の wakeup が発火せずセッション終了、`ahead 0/dirty 0` ゆえ成果損失ゼロ)。
 > 9154 で a に移した Pf 本文 (63-65 件、3 冊で最大) が無主状態になり凍結するため、**c へ暫定的に戻す**。
