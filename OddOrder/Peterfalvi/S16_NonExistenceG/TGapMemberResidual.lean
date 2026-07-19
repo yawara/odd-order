@@ -313,11 +313,17 @@ theorem exists_s13Hypothesis_for_member [Finite G]
     caseB_of_97 := True }, rfl, hparams⟩
 
 /-- **Peterfalvi (11.8), residual non-orthogonality for a specified family
-member.**  This is the arbitrary-member strengthening of
-`S13.exists_zeta_residual_not_orthogonal_H0C_of_refuter`.  Its proof is the
-same (11.8.1)--(11.8.6) chain, with the member-preserving parameter and
-Section 13 producers above preventing the distinguished character from being
-reselected. -/
+member.**  The arbitrary-member (`∀ ζ`) form, proved here via the
+member-preserving `exists_s13Hypothesis_for_member` so the distinguished
+character is not reselected.
+
+⚠ **DUPLICATE as of 2026-07-19 — see issue 1040.**  `S13.zeta_residual_not_orthogonal_H0C_of_refuter`
+(added when (11.8) was generalized to the book's `∀ ζ` form) has the *same statement* and lives
+**upstream** in S13 = §11, where (11.8) belongs; it reaches it via
+`S12.Hypothesis.exists_charParameters_full_of_zeta` (parameters assembled around a given `ζ`)
+rather than a pinned S13 `Hypothesis`.  The dedup — make this a citation of the S13 form and
+re-check whether `exists_s13Hypothesis_for_member` still has independent value — is deferred to
+issue 1040 rather than done inline, to keep the (11.8) generalization commit reviewable. -/
 theorem member_residual_not_orthogonal_H0C_of_refuter [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)

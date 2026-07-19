@@ -1453,13 +1453,21 @@ noncomputable def caseBXset_isCoherent
     | add x y _ _ ihx ihy => rw [map_add]; exact Submodule.add_mem _ ihx ihy
     | smul a x _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ a ih
 
-/-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
+/-- **⚠ Structural record — the recorded obstruction is GONE as of 2026-07-19; re-evaluate before
+reusing this note.**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
-`xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
-hypothesis is unsatisfiable at step 0**: `XAdjoinStepInputW` requires a **norm-1 anchor** in the
-accumulator (`hanchorNorm : mc i₁ = 1`), and the base `certainTypeSet h46 k` has **no** norm-1
-member (every column has `‖μ_k‖² = |W₁| > 1`, `S06_CertainTypeConjugation`).  So the weighted chain
-cannot be folded onto `certainTypeSet` alone.
+`xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting).
+
+The original record read: "the `hstep` hypothesis is unsatisfiable at step 0, because
+`XAdjoinStepInputW` requires a **norm-1 anchor** in the accumulator (`hanchorNorm : mc i₁ = 1`) and
+the base `certainTypeSet h46 k` has **no** norm-1 member (every column has `‖μ_k‖² = |W₁| > 1`,
+`S06_CertainTypeConjugation`)".  **That requirement no longer exists**: the (5.6) engine was
+generalized to an arbitrary anchor norm (`S08.crux1_of_memberFamilyW`; Peterfalvi (5.6) never
+assumes the anchor is irreducible, and its proof carries `‖χ₁‖²` symbolically), and
+`XAdjoinStepInputW` has no `hanchorNorm` field any more.  ⚠ This says only that *this particular*
+obstruction is removed — whether folding the weighted chain onto `certainTypeSet` alone is now
+actually viable has **not** been re-checked (the other `hstep` obligations were never analysed,
+since the norm-1 blocker made the question moot).
 
 **Viable architecture instead**: fold the weighted chain onto base `certainTypeSet ∪ Y` (the
 `Y`-anchor `η` has `‖η‖² = 1`), building `IsCoherent hyp.tau (Xset W₂ ∪ Y)` — the **seed directly**,
