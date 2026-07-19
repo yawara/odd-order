@@ -42,7 +42,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         `Agemo Z(Q) 2 1 = ⊥` と正確に同値化する
   - [x] Higman Lemma 2 (p. 83): 非自明 normal abelian `K`-subgroup `A` と
         `u ∉ A` に対する `u² ∈ A²` と `[u,A] ≤ A⁴` の同時成立を排除する
-  - [ ] Higman Lemma 3 (pp. 83--84): normal invariant subgroup `C` が `A` を
+  - [x] Higman Lemma 3 (pp. 83--84): normal invariant subgroup `C` が `A` を
         cover し `Φ(C) = Φ(A)` なら `exp(A) ≤ 4` を証明する
     - [x] normal actor-invariant subgroup の subtype 上で honest な cover を定義し、
           `Φ(C) ≤ A` と原文 p. 83 の `Φ(C) = A ∨ Φ(C) = Φ(A)` を証明する
@@ -61,7 +61,9 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
     - [x] Lemma 2 により `ker ν̄ = A` を示す
     - [x] `0`/`1` dichotomy と第一同型定理から像の位数 `2`、
           従って `C/A` の位数 `2` を証明する
-    - [ ] 原文 p. 84 の二場合分けを接続して `exp(A) ≤ 4` を結論する
+    - [x] 原文 p. 84 の二場合分けを接続し、
+          `NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq` として
+          `∀ a : A, a ^ 4 = 1` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
