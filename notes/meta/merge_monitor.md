@@ -834,6 +834,27 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-19 (tick #1、Fable hub — 20 分監視で再開) — ✅ a/b 合流 + gate が捕捉した main 破綻 3 件を hub 修復、census 23 不変。cron 再作成 (`0f146c30`, 20 分 `7,27,47`、ユーザー指示)**:
+  **起動時検査**: main worktree に未コミット 1 行 (`ActualKActor.lean:128` の namespace 修正) を発見 →
+  根因 = Higman 移行 (a07d32aab) の call-site 取りこぼしで **committed HEAD が clean checkout から
+  full build 不能**だった (gate は未コミット修正込み worktree で通過していた)。leaf build 検証の上
+  `debc95813` で commit。⚠ 教訓: **gate 後に `git status` が clean であることも push 前チェックに含める**
+  (dirty なまま gate を通すと「working tree だけ green」を作る)。
+  **a** = `e60cf26c6` (⭐ **Pf (13.8) S 側完成** — (13.3.c) distinguished family index + (13.5.a) 整数性 +
+  ∑_{H^#}|η₀₁|² ≥ |S′| − u²、issue 1041 close) を merge `2cad89c1d`。
+  **b** = `145ddfe51` (Higman Lemma 4 scalar-extension corollary、共有 BaseChange 追記、claim 9162 close)
+  を merge `61958aaa2`。**c** = 変化なし (0 ahead)。範囲逸脱なし・新 axiom なし・採番重複なし。
+  **full build gate が a 由来の 2 破綻を捕捉 → hub 修復 `df13d6e0e` (issue 0128)**:
+  (1) `H_sharp_hypothesis76_base_cCoeff_int` が LambdaCorrection:34 (旧 [Fintype][Invertible]) と
+  Eta01Correction:614 (a 新規 [Finite G]) に**同名重複** → hub aggregator import で環境衝突。
+  dedup = **旧 binder 版を正**とし新版削除 + import repoint。⚠ 逆方向 (新版を正) は scoped 版の
+  statement に ambient instance が焼き込まれ binder 文脈 consumer と unify 不能 (type mismatch 実測、
+  [[lean-instance-defeq-traps]]) — 「hypothesis が弱い = 一般」は錯覚で、適用可能文脈は旧版が広い。
+  (2) a の AxiomsCheck 登録 3 件 ((13.8) 系) の宣言モジュールが **import closure 外** →
+  `import ...S15_CaseBEndgameSupply` 追記 (step 3b 型)。⚠ 両破綻とも **leaf build では構造的に
+  検出不能** (同名衝突は aggregator でのみ顕在化 / AxiomsCheck は lane が build しない) — gate 集約
+  設計の正当性の実証例。最終 gate: **4513 jobs green** / AxiomsCheck 全 OK / sorry 23 不変。push 済。
+  a は self-broken (次回 main sync で解消、issues/0128 で申し送り)。
 - **2026-07-17 (tick #29、Fable hub — /model 切替で監視再開) — ✅ wave 4b 中断分回収 + b/c 合流、census 18 不変。cron 再作成 (`590a4277`, 15 分 `7,22,37,52`)**:
   セッション開始時に前 Opus セッションの **wave 4b Workflow 中断** (55 .lean dirty、build gate 前) を検出 →
   build gate が**折返しスクリプトの構文バグ 3 箇所**を検出、手動修正 (⚠ 教訓: 改行して行頭に `.method` を
