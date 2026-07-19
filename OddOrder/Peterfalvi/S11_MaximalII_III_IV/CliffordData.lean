@@ -43,6 +43,50 @@ theorem chiefFactor_quotient_card [Finite G] {M : Subgroup G} {data : TypesIIIII
   rw [(Subgroup.index_eq_card chief.N).symm]
   exact Nat.eq_of_mul_eq_mul_right Nat.card_pos key
 
+/-- **`|C_{H̄}(W₁)| = p`** (Peterfalvi (9.6)).  The `W₁`-fixed points of the chief factor
+`H̄ = ↥H ⧸ N` have order exactly `p`: this is the second clause of
+`coprimeFrobeniusChiefFactor_card` (Wielandt's fixed-point formula), with all of its hypotheses
+read off `chief`.
+
+Both `chiefFactor_W2_not_le_H0` (which needs `C_{H̄}(W₁) ≠ ⊥`) and Peterfalvi (9.7.b) (which
+needs a base point `s ∈ W̄₂^#`) consume this. -/
+theorem chiefFactor_card_fixedByE [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    Nat.card ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).fixedByE = chief.p := by
+  haveI := chief.N_normal
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  have hHbar : Nat.card (↥data.H ⧸ chief.N) ≠ 1 := by
+    rw [chiefFactor_quotient_card chief]
+    exact (Nat.one_lt_pow (Nat.card_pos (α := ↥data.W1)).ne' chief.p_prime.one_lt).ne'
+  have hUnorm : ((typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).U).Normal :=
+    (typeP_uW1_frobenius data.typeP hU).isNormal
+  have hEcyc := typeP_quotient_fixedByE_cyclic data.typeP hU chief.N_aInvariant
+  exact (coprimeFrobeniusChiefFactor_card
+    (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant) hUnorm chief.p_prime
+    chief.quotient_elementaryAbelian chief.quotient_chiefFactor chief.U_noncentral_on_quotient
+    hEcyc hHbar).2
+
+/-- **The base point `s ∈ W̄₂^#` of Peterfalvi (9.7.b).**  Since `|C_{H̄}(W₁)| = p ≠ 1`, the
+`W₁`-fixed points of the chief factor contain a nontrivial element.  Peterfalvi normalizes the
+field model at such an `s` (`φ(s) = 1`); being `W₁`-fixed (`s^w = s`) is exactly what collapses
+the twist identity to `ψ(x)η(w) = ψ(w⁻¹xw)`. -/
+theorem chiefFactor_exists_fixedByE_ne_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ∃ s : ↥data.H ⧸ chief.N,
+      s ∈ (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).fixedByE ∧ s ≠ 1 := by
+  haveI := chief.N_normal
+  have hbot : (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).fixedByE ≠ ⊥ := by
+    intro h
+    have h1 := chiefFactor_card_fixedByE chief
+    rw [h] at h1
+    simp only [Nat.card_eq_fintype_card] at h1
+    exact chief.p_prime.ne_one (by simpa using h1.symm)
+  obtain ⟨⟨s, hs⟩, hs1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hbot
+  exact ⟨s, hs, fun h => hs1 (Subtype.ext h)⟩
+
 /-- **Peterfalvi (8.4.d) `W2_nontrivial` input: `W₂ ⊄ H₀`.**  The `W₁`-fixed points of the chief
 factor `H̄ = ↥H ⧸ N` have order `p ≠ 1` (`coprimeFrobeniusChiefFactor_card`, Wielandt), and they are
 the image of `C_H(W₁) = W₂` (`map_fixedSubgroup_eq_fixedSubgroup_quotient`).  So `C_H(W₁) ⊄ N`, i.e.
@@ -54,22 +98,12 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
   change ¬ data.typeP.W2 ≤ chief.H0
   haveI := chief.N_normal
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
-  have hHbar : Nat.card (↥data.H ⧸ chief.N) ≠ 1 := by
-    rw [chiefFactor_quotient_card chief]
-    exact (Nat.one_lt_pow (Nat.card_pos (α := ↥data.W1)).ne' chief.p_prime.one_lt).ne'
-  have hUnorm : ((typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).U).Normal :=
-    (typeP_uW1_frobenius data.typeP hU).isNormal
-  have hEcyc := typeP_quotient_fixedByE_cyclic data.typeP hU chief.N_aInvariant
-  have hcard := coprimeFrobeniusChiefFactor_card
-    (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant) hUnorm chief.p_prime
-    chief.quotient_elementaryAbelian chief.quotient_chiefFactor chief.U_noncentral_on_quotient
-    hEcyc hHbar
   have hfixne : (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE ≠ ⊥ := by
     intro h
     have h1 : Nat.card ↥(typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE =
         1 :=
       by rw [h]; simp
-    exact chief.p_prime.ne_one (hcard.2.symm.trans h1)
+    exact chief.p_prime.ne_one ((chiefFactor_card_fixedByE chief).symm.trans h1)
   have hcopHW1 : Nat.Coprime
       (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card ↥data.H) :=
     (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
