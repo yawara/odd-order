@@ -66,6 +66,13 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           `∀ a : A, a ^ 4 = 1` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
+    - [x] 原文の `Lᵢ = Hᵢ / (Hᵢ² Hᵢ₊₁)` を actual lower-central quotient として
+          構成し、ambient denominator、elementary-abelian 性、標準 `F₂`-module、
+          誘導作用・表現を `HigmanLowerCentralGraded` に実装する
+    - [ ] commutator から alternating・作用同変な `L₁ × L₁ → L₂` を構成し、
+          その値が `L₂` を span することを証明する
+    - [ ] 非零 `L₂` 上の推移性から Higman Lemma 4 と直後の scalar-extension
+          corollary を証明する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
@@ -95,6 +102,9 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`
 - `references/higman/suzuki-2-groups.pdftotext.txt`
 - `references/higman/p83_84_lemmas_1_3.layout.txt`
+- `references/higman/p84_85_lemmas_3_6.layout.txt`
+- `references/higman/p85_lemmas_4_6.raw.txt`
+- `references/higman/pages/suzuki-2-groups-p085.png`
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
