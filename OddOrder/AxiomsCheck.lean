@@ -191,6 +191,8 @@ import OddOrder.Peterfalvi.S09_FrobeniusSelectedEstimate
 import OddOrder.Peterfalvi.S09_TwoFamiliesParity
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
+import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_GaloisFieldModel
@@ -10847,3 +10849,41 @@ D.2 are proved; the leaf is `sorry`-free.  The chain is:
 #assert_only_allowed_axioms OddOrder.BG.AppD.inf_le_oPiCore_normalizer_zCenterLOdd
 #assert_only_allowed_axioms OddOrder.BG.AppD.sylow_eq_of_nontrivial_inter
 #assert_only_allowed_axioms OddOrder.BG.AppD.sylow_le_commutator_normalizer
+
+/-! ## Peterfalvi (8.10)/(8.15): the book-literal support `A(M)` and the claim-2 producers
+
+**(8.10)** (p. 47) sets `M_s = M_F` (types I, II, V) / `M' ` (types III, IV) and, for `M` of type
+`𝒫`, `A(M) = ⋃_{x∈M_s^#} C_{M'}(x)^#`, `A₀(M) = A(M) ∪ V^M`.  By (8.11)'s Reference, `M_s` is BG's
+`M_σ`, so `typePACore` is the book's `A(M)` verbatim — for **every** type, unlike the `P₁`
+specialisation `typePA = (M')^#` (issue 9008; the two agree exactly on `P₁`, which is
+`typePACore_eq_typePA_of_isTypeP1`, the formalisation of the book's own remark "`A₁(M) = A(M) =
+(M')^#` if `M` is of Type III, IV or V").
+
+**(8.15), claim 2**: for `M` of type `𝒫`, Hypothesis (4.6) holds with `L = M`, `K = M'`,
+`A = A(M)`, `A₀ = A₀(M)` and `H = M_F` **or** `H = M_s`.  `typePData_toHypothesis46_ofSupport` is
+the support-parametric core; the `typePACore_*` instances are the book-literal ones (valid for
+type II), the `typePData_*` ones the `P₁` specialisation.  On `typePACore` the (4.6.d) covering is
+the defining property of the support; on `typePA` it is free because `A = K^#`.
+
+**(8.15), claim 3**: `inducedKernelFamily_subcoherent` (consumer shape `A = A₀(M)`) and
+`inducedKernelFamily_subcoherent_sharp` (the book's literal `A = M^#`).
+
+Hub ruling 9163 (Option B′) / issues 1042, 9008. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.centralizerSupport_sharpSubgroup_of_le
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_eq_typePA_of_isTypeP1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore0_eq_typePA0_of_isTypeP1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_conj_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subset_hatMsigma
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_one_not_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.conj_mem_typePA
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePData_toHypothesis46_ofSupport
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePData_toHypothesis46
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePData_toHypothesis46_hallKernel
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePData_toHypothesis46_derived
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_toHypothesis46
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_toHypothesis46_core
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_toHypothesis46_hallKernel
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.mderivSharp_subset_supportInSubgroup_typePA0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedKernelFamily_member_support_subset_derivedInG
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedKernelFamily_subcoherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedKernelFamily_subcoherent_sharp
