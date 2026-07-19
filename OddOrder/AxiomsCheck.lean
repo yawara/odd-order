@@ -10506,7 +10506,13 @@ its blockers (Gorenstein Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are rec
 * `exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting` — **Theorem 1.5, step 3**: in a CN-group
   with `O_p(G) ≠ 1`, a nontrivial normal subgroup of `F(G)` of order prime to `p` already forces
   `O_p(G)` to be Sylow.  This is how Gorenstein collapses `π(F(G))` to a single prime.  Proved
-  without the solvability hypothesis the book carries, which the argument never uses. -/
+  without the solvability hypothesis the book carries, which the argument never uses.
+* `isNilpotent_of_fitting_eq_top` / `conj_ne_of_isHallSubgroup_fitting_pPrime` /
+  `isFrobeniusGroup_fitting_of_isComplement` — **Theorem 1.5, step 1**: the setup (case (i)), the
+  regular action of a Hall `π(F)'`-subgroup on `F(G)`, and the bridge to case (ii).
+* `isNilpotent_of_centerIn_ne_bot` — in a CN-group a subgroup with nontrivial centre is
+  nilpotent.  This is the last move of Gorenstein's "`A` is nilpotent" step, reducing it to
+  `Z(A) ≠ 1`. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
 #assert_only_allowed_axioms OddOrder.GroupTheory.not_commute_of_coprime_orderOf_card_fitting
@@ -10514,6 +10520,10 @@ its blockers (Gorenstein Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are rec
 #assert_only_allowed_axioms OddOrder.GroupTheory.commute_of_mem_fitting_of_coprime_orderOf
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting
+#assert_only_allowed_axioms OddOrder.GroupTheory.isNilpotent_of_fitting_eq_top
+#assert_only_allowed_axioms OddOrder.GroupTheory.conj_ne_of_isHallSubgroup_fitting_pPrime
+#assert_only_allowed_axioms OddOrder.GroupTheory.isFrobeniusGroup_fitting_of_isComplement
+#assert_only_allowed_axioms OddOrder.GroupTheory.isNilpotent_of_centerIn_ne_bot
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.oPiCore_pPrime_eq_bot
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isPGroup_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
