@@ -1204,12 +1204,6 @@ private theorem le_of_sylow_le [Finite G] {K X : Subgroup G}
     rw [Subgroup.map_iSup]
     exact iSup_le (hSyl r)
 
-/-- A minimal simple group is perfect: `G' = G` (`G'` is normal and `≠ ⊥`, else `G` abelian). -/
-private theorem commutator_eq_top [Finite G] (hG : IsMinimalSimpleOdd G) : commutator G = ⊤ := by
-  refine (hG.simple.eq_bot_or_eq_top_of_normal (commutator G) inferInstance).resolve_left ?_
-  intro h
-  exact hG.notSolvable ⟨1, by rw [derivedSeries_one]; exact h⟩
-
 /-- **σ basic fact, every Sylow** (mmd L2655): for `p ∈ σ(M)` and *any* Sylow `p`-subgroup `P` of
 `M`, its image `P̄` is a Sylow `p`-subgroup of `G`. Same argument as `exists_sylow_le_of_mem_sigma`
 but for an arbitrary Sylow `P`, using `normalizer_sylow_map_le_of_mem_sigma`. -/
@@ -1308,7 +1302,7 @@ theorem sylow_le_derived_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
   have hPbar_focal : Pbar.focalSubgroup = Pbar := by
     have h := Subgroup.commutator_inf_eq_focalSubgroup S
     rw [hS] at h
-    rw [← h, commutator_eq_top hG, top_inf_eq]
+    rw [← h, hG.commutator_eq_top, top_inf_eq]
   -- `(P̄.subgroupOf M).focalSubgroup = M' ⊓ P̄` (Focal Thm inside `↥M`).
   have hP_focal : (Pbar.subgroupOf M).focalSubgroup = commutator ↥M ⊓ (P : Subgroup ↥M) := by
     rw [hPbar_subOf, ← Subgroup.commutator_inf_eq_focalSubgroup P]

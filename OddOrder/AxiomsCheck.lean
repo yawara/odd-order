@@ -205,6 +205,7 @@ import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
+import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
@@ -282,7 +283,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 10600
+set_option linter.style.longFile 10800
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -10607,3 +10608,36 @@ the Hall complement, and the assembled Theorem 1.5 / Corollary 1.6:
 #assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_singleton_eq_top_of_isPGroup
 #assert_only_allowed_axioms OddOrder.GroupTheory.solvableCN_nilpotent_or_frobenius_or_threeStep
 #assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_isSylow_or_isThreeStepGroup
+
+/-! **BG Appendix D: CN-groups of odd order — COMPLETE** (issues 3020 / 9133).  Lemmas D.1 and
+D.2 are proved; the leaf is `sorry`-free.  The chain is:
+
+* `IsCNGroup.to_subgroup` — the CN condition passes to subgroups, which is what lets Gorenstein's
+  Corollary 1.6 apply to the local subgroup `M`.
+* `MinimalSimpleCNHypothesis.oPiCore_eq_bot` / `IsMinimalSimpleOdd.commutator_eq_top` — the two
+  facts simplicity contributes (`O_p(G) = 1`, `G' = G`).
+* `exists_sylow_eq_inf_subgroupOf` — BG's first display: `P ∩ M ∈ Syl_p(M)`.
+* `sylow_le_and_eq_normalizer` — **the step BG omits**.  The text applies Theorem 6.2 to `M` and
+  the *full* Sylow `p`-subgroup `P`, which presupposes `P ≤ M`; here Theorem 6.2 is applied to
+  `S = P ∩ M`, the maximal choice of `M` gives `M = N_G(Z(L(S)))`, and `Z(L(S))` being
+  characteristic in `S` forces `N_P(S) = S`, hence `S = P`.
+* `inf_eq_oPiCore_of_maximal` — **display (D.2)**, `P ∩ Q = O_p(M)`.
+* `inf_le_oPiCore_normalizer_zCenterLOdd` — the form the endgame consumes: *every* Sylow
+  `p`-subgroup `R ≠ P` meets `P` inside `O_p(N_G(Z(L(P))))`, one and the same subgroup because
+  `N_G(Z(L(P)))` depends on `P` alone.
+* `sylow_eq_of_nontrivial_inter` — **Lemma D.1** (Sylow subgroups are TI).
+* `sylow_le_commutator_normalizer` — **Lemma D.2**, proved without BG's `P ≠ 1` hypothesis
+  (the argument never uses it). -/
+#assert_only_allowed_axioms OddOrder.BG.IsMinimalSimpleOdd.commutator_eq_top
+#assert_only_allowed_axioms OddOrder.BG.AppD.IsCNGroup.to_subgroup
+#assert_only_allowed_axioms OddOrder.BG.AppD.MinimalSimpleCNHypothesis.oPiCore_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.AppD.exists_maximal_sylow_inter
+#assert_only_allowed_axioms OddOrder.BG.AppD.exists_maximal_oPiCore_ne_bot
+#assert_only_allowed_axioms OddOrder.BG.AppD.exists_sylow_eq_inf_subgroupOf
+#assert_only_allowed_axioms OddOrder.BG.AppD.isThreeStepGroup_of_maximal
+#assert_only_allowed_axioms OddOrder.BG.AppD.sylow_le_and_eq_normalizer
+#assert_only_allowed_axioms OddOrder.BG.AppD.inf_eq_oPiCore_of_maximal
+#assert_only_allowed_axioms OddOrder.BG.AppD.isThreeStepGroup_and_inf_eq_oPiCore
+#assert_only_allowed_axioms OddOrder.BG.AppD.inf_le_oPiCore_normalizer_zCenterLOdd
+#assert_only_allowed_axioms OddOrder.BG.AppD.sylow_eq_of_nontrivial_inter
+#assert_only_allowed_axioms OddOrder.BG.AppD.sylow_le_commutator_normalizer

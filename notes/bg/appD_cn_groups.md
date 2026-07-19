@@ -7,7 +7,36 @@ ROADMAP 上の位置: Phase 2 本筋外 (歴史的価値, optional).
 
 **更新 (2026-07-02)**: 3-decl skeleton `OddOrder/BG/AppD_CNGroups.lean` が存在 (sorried 3 theorems: `sylow_eq_of_nontrivial_inter` / `sylow_le_commutator_normalizer` / `cnTheorem_reduction`)。off-spine・consumer 0・凍結 (memory [[ft-settled-findings]])。
 
-## TL;DR — FT 本筋外、CN-theorem を BG 機械で短縮
+## ✅ 完了 (2026-07-19) — D.1 / D.2 とも証明済 (sorry-free / axiom-clean)
+
+**下の 2026-07-02 までの記述 (「skip 推奨」「凍結」「sorried skeleton」) はすべて無効**。
+2026-07-16 の全 3 冊フェーズ移行で App.D は正規のスコープ内になり、issue 3020 / 9133 の
+経路で完了した。現在の構成 (`AppD_CNGroups.lean` は pure re-export hub):
+
+| leaf | 内容 |
+|---|---|
+| `AppD_CNGroups/Basic.lean` | `IsCNGroup` / `MinimalSimpleCNHypothesis` / CN の部分群継承 / `O_p(G)=⊥` |
+| `AppD_CNGroups/MaximalSylowIntersection.lean` | BG p.153-154 の局所解析全ステップ |
+| `AppD_CNGroups/SylowTI.lean` | **Lemma D.1** + **Lemma D.2** |
+
+上流: Gorenstein Ch.12 §1 Cor 1.6 (`GroupTheory.CNGroupStructure`, issue 9133) /
+3-step 群の Sylow 交わり定理 (`GroupTheory.ThreeStepGroup.IsThreeStepGroup.inf_sylow_eq_oPiCore`) /
+BG Thm 6.2 の `L(P)` 版 (`AppB.zCenter_lOdd_sup_oPiCore_normal`) /
+mathlib の焦点部分群定理。
+
+**書籍の行間 2 件** (詳細は issue 3020):
+1. BG は `M` に Thm 6.2 を当てて `Z(J(P)) ⊴ M` とするが、これは `P ≤ M` を前提しており、
+   その時点では未証明。`S = P ∩ M` に当ててから `M = N_G(Z(L(S)))` → `N_P(S) = S` → `S = P`
+   と補修した (`sylow_le_and_eq_normalizer`)。
+2. 終盤が「別の極大 `Q'`」に (D.2) を再適用できるのは `N_G(Z(L(P)))` が `P` だけで決まるから。
+   `inf_le_oPiCore_normalizer_zCenterLOdd` として明示化した。
+
+⚠ **`feitThompson` からの vacuous discharge は依然として禁止** (CN 定理は FT の *入力*)。
+本形式化はその経路を使っていない。
+
+---
+
+## TL;DR — FT 本筋外、CN-theorem を BG 機械で短縮 (⚠ 2026-07-02 時点の評価、上記で無効)
 
 CN-condition は「∀ x ≠ 1, C_G(x) nilpotent」. Feit, Hall, Thompson (1960) が CN-group of odd order は solvable を証明 (FT 1963 の予兆). BG App.D はその局所解析部を BG §1-§9 (特に **Thm 6.2 normal-J**) と Focal Subgroup Theorem (Thm 1.17) で短縮する **ガイド節**.
 

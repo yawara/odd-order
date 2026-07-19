@@ -76,6 +76,15 @@ theorem solvable_of_isCoatom (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : 
     IsSolvable M :=
   hG.solvable_of_lt_top M hM.lt_top
 
+/-- A minimal simple group is perfect: `G' = G`.
+
+`G'` is normal, so simplicity leaves `⊥` or `⊤`; `G' = ⊥` would make `G` solvable of derived
+length `1`. -/
+theorem commutator_eq_top (hG : IsMinimalSimpleOdd G) : commutator G = ⊤ := by
+  refine (hG.simple.eq_bot_or_eq_top_of_normal (commutator G) inferInstance).resolve_left ?_
+  intro h
+  exact hG.notSolvable ⟨1, by rw [derivedSeries_one]; exact h⟩
+
 /-- The `ℳ`-membership form of `solvable_of_isCoatom`. -/
 theorem solvable_of_mem_maximalSubgroups (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G) :
