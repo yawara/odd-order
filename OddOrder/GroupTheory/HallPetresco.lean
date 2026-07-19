@@ -387,6 +387,42 @@ theorem hallValue_mem_lowerCentralSeries {k : ℕ} (hk : 1 ≤ k) (hkN : k ≤ F
 
 end BlockValue
 
+/-! ## The Hall–Petresco formula -/
+
+/-- ⭐ **The Hall–Petresco formula** (P. Hall's collection formula; BG Theorem
+E.1 in the `m`-generator form).  For any generators `x₁, …, x_m` of any group and
+any `n ≥ 1` there are elements `τ_k ∈ γ_k` with `τ_1 = x₁ ⋯ x_m` and
+
+`x₁ⁿ ⋯ x_mⁿ = τ_1^{C(n,1)} · τ_2^{C(n,2)} ⋯ τ_n^{C(n,n)}`.
+
+No nilpotency, no bound on the class, no restriction on `G`.  The proof is
+Mann's (Dixon–du Sautoy–Mann–Segal, *Analytic Pro-p Groups*, 2nd ed., App. A):
+collect the *expanded* word, in which each of the `n` copies of a generator has
+its own slot, once and for all; substituting the slot sets `A` shows that a
+collected block depends only on `|A|`, and the binomial coefficients appear as
+the number of `k`-element subsets of an `n`-element set. -/
+theorem exists_hallPetresco (xs : List G) {n : ℕ} (hn : 1 ≤ n) :
+    ∃ τ : ℕ → G,
+      (∀ k, 1 ≤ k → k ≤ n → τ k ∈ (⊤ : Subgroup G).lowerCentralSeries (k - 1)) ∧
+      τ 1 = xs.prod ∧
+      (xs.map fun g => g ^ n).prod
+        = ((List.range' 1 n).map fun k => τ k ^ n.choose k).prod := by
+  classical
+  obtain ⟨j⟩ : Nonempty (Fin n) := Fin.pos_iff_nonempty.mp hn
+  obtain ⟨blk, hblk, hval⟩ :=
+    FormalCommutator.exists_split_supports (G := G) (slot : G × Fin n → Fin n)
+      (expandedWord (Fin n) xs)
+  have hcardL : Fintype.card (Fin n) = n := Fintype.card_fin n
+  refine ⟨hallValue blk, fun k hk1 hkn => ?_, ?_, ?_⟩
+  · exact hallValue_mem_lowerCentralSeries hblk hval hk1 (by rw [hcardL]; exact hkn)
+  · have h := prod_pow_card_eq_prod_hallValue hblk hval (A := ({j} : Finset (Fin n)))
+      ⟨j, by simp⟩
+    rw [Finset.card_singleton] at h
+    simpa using h.symm
+  · have h := prod_pow_card_eq_prod_hallValue hblk hval
+      (A := (Finset.univ : Finset (Fin n))) ⟨j, Finset.mem_univ j⟩
+    rwa [Finset.card_univ, hcardL] at h
+
 end HallPetresco
 
 end OddOrder.GroupTheory
