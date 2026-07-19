@@ -151,6 +151,80 @@ theorem prod_pow_card_eq {xs : List G} {blk : Finset L → List (FormalCommutato
           fun S => if S ⊆ A then blockValue blk S else 1).prod := by
   rw [← evalWord_expandedWord xs A, hval, map_evalWord_blk_eq hblk A]
 
+/-! ## Counting subsets: where the binomial coefficients come from
+
+The support list is the concatenation of its cardinality levels, so the product
+above splits level by level.  Inside level `k` only the subsets of `A` survive,
+there are `C(|A|, k)` of them, and — once they are known to have a common value —
+their ordered product is that value raised to `C(|A|, k)`.
+-/
+
+/-- An ordered product over a concatenation of blocks. -/
+theorem prod_map_flatMap {α β : Type*} (l : List α) (g : α → List β) (F : β → G) :
+    ((l.flatMap g).map F).prod = (l.map fun a => ((g a).map F).prod).prod := by
+  induction l with
+  | nil => simp
+  | cons a t ih => simp [List.flatMap_cons, List.map_append, List.prod_append, ih]
+
+/-- Entries multiplied by `1` may be dropped from an ordered product. -/
+theorem prod_map_ite_eq_prod_filter {α : Type*} (p : α → Prop) [DecidablePred p] (h : α → G)
+    (l : List α) :
+    (l.map fun a => if p a then h a else 1).prod
+      = ((l.filter fun a => decide (p a)).map h).prod := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+      rw [List.map_cons, List.prod_cons, ih, List.filter_cons]
+      by_cases hp : p a <;> simp [hp]
+
+/-- **The count.**  Among all supports of cardinality `k`, exactly `C(|A|, k)`
+are contained in `A`. -/
+theorem length_filter_levelList (A : Finset L) (k : ℕ) :
+    ((levelList L k).filter fun S => decide (S ⊆ A)).length = A.card.choose k := by
+  have hnd : ((levelList L k).filter fun S => decide (S ⊆ A)).Nodup :=
+    (nodup_levelList k).filter _
+  have htf : ((levelList L k).filter fun S => decide (S ⊆ A)).toFinset = A.powersetCard k := by
+    ext S
+    simp [levelList, Finset.mem_powersetCard, and_comm]
+  rw [← List.toFinset_card_of_nodup hnd, htf, Finset.card_powersetCard]
+
+/-- **One level contributes a binomial power.**  If all the subsets of `A` of
+cardinality `k` carry the same value `v`, the level-`k` factor of the collection
+formula is `v ^ C(|A|, k)`. -/
+theorem prod_level_eq_pow {A : Finset L} {k : ℕ} {F : Finset L → G} {v : G}
+    (hF : ∀ S ∈ levelList L k, S ⊆ A → F S = v) :
+    ((levelList L k).map fun S => if S ⊆ A then F S else 1).prod = v ^ A.card.choose k := by
+  rw [prod_map_ite_eq_prod_filter (· ⊆ A) F,
+    List.prod_eq_pow_card _ v ?_, List.length_map, length_filter_levelList]
+  intro x hx
+  obtain ⟨S, hS, rfl⟩ := List.mem_map.mp hx
+  rw [List.mem_filter] at hS
+  exact hF S hS.1 (of_decide_eq_true hS.2)
+
+/-- The collection formula, split into cardinality levels. -/
+theorem prod_supportList_eq_levels (F : Finset L → G) (k K : ℕ) :
+    ((supportList L k K).map F).prod
+      = ((List.range' k K).map fun i => ((levelList L i).map F).prod).prod :=
+  prod_map_flatMap _ _ _
+
+/-- Splitting an ordered product over `[1, …, N]` at an index `n` past which all
+factors are trivial. -/
+theorem prod_range'_split_of_eq_one (F : ℕ → G) {n N : ℕ} (h1 : 1 ≤ n) (hn : n ≤ N)
+    (htail : ∀ k, n < k → F k = 1) :
+    ((List.range' 1 N).map F).prod = ((List.range' 1 (n - 1)).map F).prod * F n := by
+  have hcat : List.range' 1 N = List.range' 1 (n - 1) ++ List.range' n (N - n + 1) := by
+    have h := @List.range'_append 1 (n - 1) (N - n + 1) 1
+    rw [show 1 + 1 * (n - 1) = n by omega, show n - 1 + (N - n + 1) = N by omega] at h
+    exact h.symm
+  have htailprod : ((List.range' (n + 1) (N - n)).map F).prod = 1 := by
+    refine List.prod_eq_one fun z hz => ?_
+    obtain ⟨k, hk, rfl⟩ := List.mem_map.mp hz
+    exact htail k (List.mem_range'_1.mp hk).1
+  rw [hcat, List.map_append, List.prod_append,
+    show N - n + 1 = (N - n) + 1 from rfl, Nat.add_comm (N - n) 1,
+    show (1 : ℕ) + (N - n) = (N - n) + 1 by omega, List.range'_succ, List.map_cons,
+    List.prod_cons, htailprod, mul_one]
+
 end HallPetresco
 
 end OddOrder.GroupTheory
