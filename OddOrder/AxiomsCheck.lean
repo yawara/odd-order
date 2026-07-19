@@ -8330,6 +8330,23 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
 
+/-! **Higman Lemma 6, distinct triple-weight exclusion**: three distinct
+Frobenius exponents cannot be congruent modulo `2^n - 1` to a pair weight.
+For a primitive Singer root, the corresponding eigenspace is therefore zero
+whenever the target is spanned by pair-weight eigenspaces. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.three_distinct_twoPowers_ne_two_distinct_twoPowers
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.three_distinct_frobeniusWeight_not_modEq_pairWeight
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_threeDistinctWeight_ne_pairWeight
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_threeDistinctWeight_eigenspace_eq_bot
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
