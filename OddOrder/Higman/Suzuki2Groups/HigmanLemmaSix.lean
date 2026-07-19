@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
+import OddOrder.GroupTheory.FixedPointFreeOrderThree
 
 /-!
 # Higman's Lemma 6
@@ -29,7 +30,8 @@ namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
-open scoped IsMulCommutative
+open OddOrder.Isaacs.Ch03
+open scoped commutatorElement IsMulCommutative
 
 universe uH uC uMain
 
@@ -226,5 +228,292 @@ theorem lowerCentralLayerZero_finrank_eq_one_of_equivariant_linearEquiv
     (lowerCentralLayerRepresentation phi 0)
     (lowerCentralLayerRepresentation phi 1)
     hirr hfaith hfaithOne htrans
+
+/-! ## The class-three quotient -/
+
+/-- If squares in one lower-central term lie in the next term, then the same
+holds one step farther down the lower-central series.
+
+For a generator `[x,y]` of `H_(i+1)`, the identity
+`[x²,y] = [x,[x,y]] [x,y]²` shows that its square lies in `H_(i+2)`:
+the first factor is already one step deeper, while `x² ∈ H_(i+1)` puts the
+left-hand side there as well.  Closure under products is checked in the
+abelian factor `H_(i+1)/H_(i+2)`. -/
+theorem lowerCentralTerm_succ_squares_le_of_squares_le
+    (H : Type uH) [Group H] (i : ℕ)
+    (hSq : (Agemo (↥(lowerCentralTerm H i)) 2 1).map
+      (lowerCentralTerm H i).subtype ≤ lowerCentralTerm H (i + 1)) :
+    (Agemo (↥(lowerCentralTerm H (i + 1))) 2 1).map
+      (lowerCentralTerm H (i + 1)).subtype ≤ lowerCentralTerm H (i + 2) := by
+  let S : Set H :=
+    {c | ∃ x ∈ lowerCentralTerm H i,
+      ∃ y ∈ (⊤ : Subgroup H), ⁅x, y⁆ = c}
+  have hterm : lowerCentralTerm H (i + 1) = Subgroup.closure S := by
+    rfl
+  have hsquares : ∀ z ∈ lowerCentralTerm H (i + 1),
+      z ^ 2 ∈ lowerCentralTerm H (i + 2) := by
+    intro z hz
+    have hz' : z ∈ Subgroup.closure S := hterm ▸ hz
+    refine Subgroup.closure_induction
+      (p := fun z _ => z ^ 2 ∈ lowerCentralTerm H (i + 2)) ?_ ?_ ?_ ?_ hz'
+    · intro c hc
+      rcases hc with ⟨x, hx, y, hy, rfl⟩
+      have hxSq : x ^ 2 ∈ lowerCentralTerm H (i + 1) := by
+        apply hSq
+        apply Subgroup.mem_map.mpr
+        refine ⟨(⟨x, hx⟩ : lowerCentralTerm H i) ^ 2, ?_, ?_⟩
+        · simpa using (Agemo.mem_of_eq_pow
+            (G := ↥(lowerCentralTerm H i)) (p := 2) (n := 1)
+            (⟨x, hx⟩ : lowerCentralTerm H i))
+        · simp
+      have hxy : ⁅x, y⁆ ∈ lowerCentralTerm H (i + 1) := by
+        change ⁅x, y⁆ ∈ ⁅lowerCentralTerm H i, (⊤ : Subgroup H)⁆
+        exact Subgroup.commutator_mem_commutator hx hy
+      have hleft : ⁅x ^ 2, y⁆ ∈ lowerCentralTerm H (i + 2) := by
+        change ⁅x ^ 2, y⁆ ∈
+          ⁅lowerCentralTerm H (i + 1), (⊤ : Subgroup H)⁆
+        exact Subgroup.commutator_mem_commutator hxSq hy
+      have hconj : ⁅x, ⁅x, y⁆⁆ ∈ lowerCentralTerm H (i + 2) := by
+        have hmem : ⁅x, ⁅x, y⁆⁆ ∈
+            ⁅(⊤ : Subgroup H), lowerCentralTerm H (i + 1)⁆ :=
+          Subgroup.commutator_mem_commutator (Subgroup.mem_top x) hxy
+        rw [Subgroup.commutator_comm] at hmem
+        exact hmem
+      have hid : ⁅x, y⁆ ^ 2 = ⁅x, ⁅x, y⁆⁆⁻¹ * ⁅x ^ 2, y⁆ := by
+        rw [pow_two x, commutatorElement_mul_left_eq_conj_mul]
+        simp only [commutatorElement_def, pow_two]
+        group
+      rw [hid]
+      exact (lowerCentralTerm H (i + 2)).mul_mem
+        ((lowerCentralTerm H (i + 2)).inv_mem hconj) hleft
+    · simp
+    · intro a b ha hb haSq hbSq
+      let N := lowerCentralTerm H (i + 2)
+      letI : N.Normal := by
+        dsimp [N, lowerCentralTerm]
+        infer_instance
+      let q : H →* H ⧸ N := QuotientGroup.mk' N
+      have habN : ⁅a, b⁆ ∈ N := by
+        change ⁅a, b⁆ ∈ lowerCentralTerm H (i + 2)
+        change ⁅a, b⁆ ∈
+          ⁅lowerCentralTerm H (i + 1), (⊤ : Subgroup H)⁆
+        exact Subgroup.commutator_mem_commutator
+          (hterm ▸ ha) (Subgroup.mem_top b)
+      have hab : Commute (q a) (q b) := by
+        apply commutatorElement_eq_one_iff_mul_comm.mp
+        rw [← map_commutatorElement]
+        exact (QuotientGroup.eq_one_iff _).mpr habN
+      apply (QuotientGroup.eq_one_iff _).mp
+      change q ((a * b) ^ 2) = 1
+      rw [map_pow, map_mul, hab.mul_pow]
+      have haOne : q a ^ 2 = 1 := by
+        rw [← map_pow]
+        exact (QuotientGroup.eq_one_iff _).mpr haSq
+      have hbOne : q b ^ 2 = 1 := by
+        rw [← map_pow]
+        exact (QuotientGroup.eq_one_iff _).mpr hbSq
+      rw [haOne, hbOne, one_mul]
+    · intro a _ha haSq
+      simpa [inv_pow] using (lowerCentralTerm H (i + 2)).inv_mem haSq
+  rw [Subgroup.map_le_iff_le_comap, Agemo, Subgroup.closure_le]
+  rintro _ ⟨x, rfl⟩
+  change (x : H) ^ 2 ∈ lowerCentralTerm H (i + 2)
+  exact hsquares (x : H) x.2
+
+local instance instLemmaSixLowerCentralTermThreeNormal
+    (H : Type uH) [Group H] :
+    (lowerCentralTerm H 3).Normal := by
+  dsimp [lowerCentralTerm]
+  infer_instance
+
+/-- Fixed-point-freeness on Higman's first three elementary layers descends
+directly to `H/H₄`, once their square kernels are the consecutive
+lower-central terms.
+
+No coprime fixed-point lifting is needed here.  If a coset of `x` is fixed,
+then `φ(a)x · z = x` for some `z ∈ H₄`.  The same relation fixes the
+classes of `x` successively in `L₁`, `L₂`, and `L₃`, forcing
+`x ∈ H₂`, then `H₃`, and finally `H₄`. -/
+theorem classThreeQuotient_fixedPointFree_of_lowerCentralLayers
+    {A : Type uC} {H : Type uH} [Group A] [Group H]
+    (phi : A →* MulAut H) (a : A)
+    (hK₀ : lowerCentralLayerKernelInAmbient H 0 = lowerCentralTerm H 1)
+    (hK₁ : lowerCentralLayerKernelInAmbient H 1 = lowerCentralTerm H 2)
+    (hK₂ : lowerCentralLayerKernelInAmbient H 2 = lowerCentralTerm H 3)
+    (hfree₀ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 0 a))
+    (hfree₁ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 1 a))
+    (hfree₂ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 2 a)) :
+    MonoidHom.FixedPointFree
+      ((IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a) := by
+  intro q hq
+  obtain ⟨x, rfl⟩ :=
+    QuotientGroup.mk'_surjective (lowerCentralTerm H 3) q
+  change QuotientGroup.mk' (lowerCentralTerm H 3) ((phi a) x) =
+    QuotientGroup.mk' (lowerCentralTerm H 3) x at hq
+  obtain ⟨z, hz₃, hrel⟩ :=
+    (QuotientGroup.mk'_eq_mk' (N := lowerCentralTerm H 3)).mp hq
+  have hzTerm (i : ℕ) (hi : i ≤ 3) : z ∈ lowerCentralTerm H i :=
+    (show (⊤ : Subgroup H).lowerCentralSeries 3 ≤
+        (⊤ : Subgroup H).lowerCentralSeries i from
+      (⊤ : Subgroup H).lowerCentralSeries_antitone hi) hz₃
+  have layerFix (i : ℕ) (hi : i ≤ 3) (hx : x ∈ lowerCentralTerm H i)
+      (hzK : z ∈ lowerCentralLayerKernelInAmbient H i) :
+      lowerCentralLayerAction phi i a
+          (QuotientGroup.mk' (lowerCentralLayerKernel H i) ⟨x, hx⟩) =
+        QuotientGroup.mk' (lowerCentralLayerKernel H i) ⟨x, hx⟩ := by
+    rw [lowerCentralLayerAction_apply_mk]
+    apply (QuotientGroup.mk'_eq_mk'
+      (N := lowerCentralLayerKernel H i)).mpr
+    let zi : lowerCentralTerm H i := ⟨z, hzTerm i hi⟩
+    have hzi : zi ∈ lowerCentralLayerKernel H i := by
+      have : zi ∈ (lowerCentralLayerKernelInAmbient H i).subgroupOf
+          (lowerCentralTerm H i) := hzK
+      rwa [lowerCentralLayerKernelInAmbient_subgroupOf] at this
+    refine ⟨zi, hzi, ?_⟩
+    apply Subtype.ext
+    exact hrel
+  have hx₀ : x ∈ lowerCentralTerm H 0 := by
+    simp [lowerCentralTerm]
+  have hzK₀ : z ∈ lowerCentralLayerKernelInAmbient H 0 := by
+    rw [hK₀]
+    exact hzTerm 1 (by omega)
+  have hxKer₀ : (⟨x, hx₀⟩ : lowerCentralTerm H 0) ∈
+      lowerCentralLayerKernel H 0 :=
+    (QuotientGroup.eq_one_iff _).mp
+      (hfree₀ _ (layerFix 0 (by omega) hx₀ hzK₀))
+  have hxK₀ : x ∈ lowerCentralLayerKernelInAmbient H 0 :=
+    ⟨⟨x, hx₀⟩, hxKer₀, rfl⟩
+  have hx₁ : x ∈ lowerCentralTerm H 1 := by
+    rwa [hK₀] at hxK₀
+  have hzK₁ : z ∈ lowerCentralLayerKernelInAmbient H 1 := by
+    rw [hK₁]
+    exact hzTerm 2 (by omega)
+  have hxKer₁ : (⟨x, hx₁⟩ : lowerCentralTerm H 1) ∈
+      lowerCentralLayerKernel H 1 :=
+    (QuotientGroup.eq_one_iff _).mp
+      (hfree₁ _ (layerFix 1 (by omega) hx₁ hzK₁))
+  have hxK₁ : x ∈ lowerCentralLayerKernelInAmbient H 1 :=
+    ⟨⟨x, hx₁⟩, hxKer₁, rfl⟩
+  have hx₂ : x ∈ lowerCentralTerm H 2 := by
+    rwa [hK₁] at hxK₁
+  have hzK₂ : z ∈ lowerCentralLayerKernelInAmbient H 2 := by
+    rw [hK₂]
+    exact hzTerm 3 (by omega)
+  have hxKer₂ : (⟨x, hx₂⟩ : lowerCentralTerm H 2) ∈
+      lowerCentralLayerKernel H 2 :=
+    (QuotientGroup.eq_one_iff _).mp
+      (hfree₂ _ (layerFix 2 (by omega) hx₂ hzK₂))
+  have hxK₂ : x ∈ lowerCentralLayerKernelInAmbient H 2 :=
+    ⟨⟨x, hx₂⟩, hxKer₂, rfl⟩
+  apply (QuotientGroup.eq_one_iff x).mpr
+  rwa [hK₂] at hxK₂
+
+/-- Higman's hypothesis `H² = H₂` propagates down the lower-central series,
+so fixed-point-freeness on `L₁,L₂,L₃` gives a fixed-point-free action on
+`H/H₄`. -/
+theorem classThreeQuotient_fixedPointFree_of_agemo_eq
+    {A : Type uC} {H : Type uH} [Group A] [Group H]
+    (phi : A →* MulAut H) (a : A)
+    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1)
+    (hfree₀ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 0 a))
+    (hfree₁ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 1 a))
+    (hfree₂ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 2 a)) :
+    MonoidHom.FixedPointFree
+      ((IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a) := by
+  have hSq₀ : LowerCentralSquaresLieInSecond H :=
+    lowerCentralSquaresLieInSecond_of_agemo_eq H hAgemo
+  have hSq₁ :
+      (Agemo (↥(lowerCentralTerm H 1)) 2 1).map
+          (lowerCentralTerm H 1).subtype ≤ lowerCentralTerm H 2 := by
+    simpa using lowerCentralTerm_succ_squares_le_of_squares_le H 0 hSq₀
+  have hSq₂ :
+      (Agemo (↥(lowerCentralTerm H 2)) 2 1).map
+          (lowerCentralTerm H 2).subtype ≤ lowerCentralTerm H 3 := by
+    simpa using lowerCentralTerm_succ_squares_le_of_squares_le H 1 hSq₁
+  apply classThreeQuotient_fixedPointFree_of_lowerCentralLayers phi a
+  · exact lowerCentralLayerKernelInAmbient_zero_eq_of_squares_le H hSq₀
+  · rw [lowerCentralLayerKernelInAmbient_eq, sup_eq_right.mpr hSq₁]
+  · rw [lowerCentralLayerKernelInAmbient_eq, sup_eq_right.mpr hSq₂]
+  · exact hfree₀
+  · exact hfree₁
+  · exact hfree₂
+
+/-- The fourth lower-central term vanishes in `H/H₄`. -/
+theorem classThreeQuotient_lowerCentralSeries_three_eq_bot
+    (H : Type uH) [Group H] :
+    (⊤ : Subgroup (H ⧸ lowerCentralTerm H 3)).lowerCentralSeries 3 = ⊥ := by
+  rw [← Subgroup.map_top_of_surjective
+      (QuotientGroup.mk' (lowerCentralTerm H 3))
+      (QuotientGroup.mk'_surjective _),
+    ← Subgroup.map_lowerCentralSeries]
+  change (lowerCentralTerm H 3).map
+      (QuotientGroup.mk' (lowerCentralTerm H 3)) = ⊥
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+
+/-- If Higman's third layer `L₃` is nontrivial, then the third
+lower-central term of `H/H₄` is nontrivial. -/
+theorem classThreeQuotient_lowerCentralSeries_two_ne_bot
+    (H : Type uH) [Group H]
+    [Nontrivial (lowerCentralLayer H 2)] :
+    (⊤ : Subgroup (H ⧸ lowerCentralTerm H 3)).lowerCentralSeries 2 ≠ ⊥ := by
+  rw [← Subgroup.map_top_of_surjective
+      (QuotientGroup.mk' (lowerCentralTerm H 3))
+      (QuotientGroup.mk'_surjective _),
+    ← Subgroup.map_lowerCentralSeries]
+  change (lowerCentralTerm H 2).map
+      (QuotientGroup.mk' (lowerCentralTerm H 3)) ≠ ⊥
+  rw [ne_eq, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+  intro hle
+  have hnextTop :
+      (lowerCentralTerm H 3).subgroupOf (lowerCentralTerm H 2) = ⊤ := by
+    apply top_unique
+    intro x _
+    exact hle x.2
+  have hkernelTop : lowerCentralLayerKernel H 2 = ⊤ := by
+    rw [lowerCentralLayerKernel, hnextTop, sup_top_eq]
+  exact (QuotientGroup.nontrivial_iff.mp (by infer_instance)) hkernelTop
+
+/-- Higman's quotient `H/H₄` has nilpotency class exactly three whenever
+`L₃` is nontrivial. -/
+theorem classThreeQuotient_nilpotencyClass_eq_three
+    (H : Type uH) [Group H]
+    [Nontrivial (lowerCentralLayer H 2)] :
+    Group.nilpotencyClass (H ⧸ lowerCentralTerm H 3) = 3 := by
+  letI : Group.IsNilpotent (H ⧸ lowerCentralTerm H 3) :=
+    Subgroup.nilpotent_iff_lowerCentralSeries.mpr
+      ⟨3, classThreeQuotient_lowerCentralSeries_three_eq_bot H⟩
+  have hle : Group.nilpotencyClass (H ⧸ lowerCentralTerm H 3) ≤ 3 :=
+    Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp
+      (classThreeQuotient_lowerCentralSeries_three_eq_bot H)
+  have hnle : ¬ Group.nilpotencyClass (H ⧸ lowerCentralTerm H 3) ≤ 2 := by
+    intro hc
+    exact classThreeQuotient_lowerCentralSeries_two_ne_bot H
+      (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr hc)
+  exact le_antisymm hle (Nat.succ_le_iff.mpr (lt_of_not_ge hnle))
+
+/-- **Higman Lemma 6, parity-step contradiction (p. 85).**
+
+Under `H² = H₂`, an operator which is fixed-point-free on `L₁,L₂,L₃`
+is fixed-point-free on `H/H₄`.  If its induced automorphism has order
+three, Neumann's theorem makes that quotient class at most two, contradicting
+the nontrivial third layer. -/
+theorem classThreeQuotientAction_orderOf_ne_three
+    {A : Type uC} {H : Type uH} [Group A] [Group H] [Finite H]
+    (phi : A →* MulAut H) (a : A)
+    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1)
+    [Nontrivial (lowerCentralLayer H 2)]
+    (hfree₀ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 0 a))
+    (hfree₁ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 1 a))
+    (hfree₂ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 2 a)) :
+    orderOf ((IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a) ≠ 3 := by
+  intro horder
+  have hfree :=
+    classThreeQuotient_fixedPointFree_of_agemo_eq
+      phi a hAgemo hfree₀ hfree₁ hfree₂
+  have hclassTwo :=
+    lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three
+      ((IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a)
+      hfree horder
+  exact classThreeQuotient_lowerCentralSeries_two_ne_bot H hclassTwo
 
 end OddOrder.Higman.Suzuki2Groups
