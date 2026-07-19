@@ -48,11 +48,11 @@ theorem typePACore_subset_ASet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
     (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
       ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M)) :
-    S10.typePACore M ⊆ OddOrder.BG.Ch4.S16.ASet M U₀ := by
+    typePACore M ⊆ OddOrder.BG.Ch4.S16.ASet M U₀ := by
   have hderiv : derivedInG M = U₀ ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
     (OddOrder.BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
   intro y hy
-  refine ⟨S10.typePACore_subset_hatMsigma hy, ?_⟩
+  refine ⟨typePACore_subset_hatMsigma hy, ?_⟩
   have hyM' : y ∈ derivedInG M := hy.1
   rw [hderiv] at hyM'
   exact hyM'
@@ -67,7 +67,7 @@ theorem escaping_typePACore_mem_sigmaSharp [Finite G]
     (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
     (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
       ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
-    {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (S10.typePACore M)) :
+    {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typePACore M)) :
     a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
   obtain ⟨haA, haesc⟩ := ha
   exact OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU (Or.inl rfl)
@@ -85,7 +85,7 @@ theorem coprime_FT_signalizer_centralizerIn_typePACore [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {a : G} (haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
     (haesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
-    {w : G} (hw : w ∈ S10.typePACore M) :
+    {w : G} (hw : w ∈ typePACore M) :
     Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
       (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M w)) := by
   classical
@@ -145,7 +145,7 @@ theorem typePACore_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
     (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
       ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M))
-    {a b : G} (ha : a ∈ S10.typePACore M) (hb : b ∈ S10.typePACore M) (hab : IsConj a b) :
+    {a b : G} (ha : a ∈ typePACore M) (hb : b ∈ typePACore M) (hab : IsConj a b) :
     ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b := by
   have hII := OddOrder.BG.Ch4.S16.theoremII_tame_embedding hG hM hKM hUM hK hU
     (X := OddOrder.BG.Ch4.S16.ASet M U₀) (Or.inl rfl)
