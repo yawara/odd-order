@@ -1171,7 +1171,7 @@ theorem oPiPrimeCore_eq_bot_of_minimal_counterexample.{u}
         (G := G) (N := N) hp_coprime P.isPGroup')
   have hCZ_image :=
     hasNormalPComplement_centralizer_map_of_coprime_kernel
-      (G := G) (N := N) hp_coprime hZ_ne hZ_p (hHyp P).1
+      (G := G) (N := N) hp_coprime hZ_p (hHyp P).1
   have hCZbar :
       OddOrder.Isaacs.Ch05.HasNormalPComplement p
         ↥(Subgroup.centralizer
@@ -1196,7 +1196,7 @@ theorem oPiPrimeCore_eq_bot_of_minimal_counterexample.{u}
         (G := G) (N := N) hp_coprime P.isPGroup')
   have hNJ_image :=
     hasNormalPComplement_normalizer_map_of_coprime_kernel
-      (G := G) (N := N) hp_coprime hJ_ne hJ_p (hHyp P).2
+      (G := G) (N := N) hp_coprime hJ_p (hHyp P).2
   have hNJbar :
       OddOrder.Isaacs.Ch05.HasNormalPComplement p
         ↥(Subgroup.normalizer
