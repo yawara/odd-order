@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
 # Three-step groups (Gorenstein, Ch. 12 §1)
@@ -466,15 +467,108 @@ theorem commute_of_cn_of_commute_ne_one [Finite G]
     Subgroup.mem_centralizer_singleton_iff.mpr (commute_of_mem_centerIn hb y₁.2).eq
   exact commute_of_le_nilpotent_of_isPGroup (hCN _ hy₁1) hpq hPc hQc hP hQ
 
-/-! ## Gorenstein Ch. 12 §1 Corollary 1.6
+/-! ## Gorenstein Ch. 12 §1 Theorem 1.5 and Corollary 1.6
 
-> If `G` is a solvable CN-group and `O_p(G) ≠ 1`, then either `O_p(G)` is an `S_p`-subgroup of
-> `G` or `G` is a 3-step group with respect to `p`.
+> **Theorem 1.5.** If `G` is a solvable CN-group, then one of the following holds:
+> (i) `G` is nilpotent; (ii) `G` is a Frobenius group whose complement is either cyclic or the
+> direct product of a cyclic group of odd order and a generalized quaternion group;
+> (iii) `G` is a 3-step group.
+>
+> **Corollary 1.6.** If `G` is a solvable CN-group and `O_p(G) ≠ 1`, then either `O_p(G)` is an
+> `S_p`-subgroup of `G` or `G` is a 3-step group with respect to `p`.
 
-Corollary 1.6 is immediate from **Theorem 1.5** (a solvable CN-group is nilpotent, or Frobenius
-with complement cyclic or the direct product of a cyclic group of odd order with a generalized
-quaternion group, or a 3-step group).  Theorem 1.5 is not yet formalized; see the blocker list
-in the docstring of `oPiCore_isSylow_or_isThreeStepGroup` below. -/
+Theorem 1.5 is stated below (`solvableCN_nilpotent_or_frobenius_or_threeStep`) and is the only
+remaining `sorry` of this file; Corollary 1.6 is derived from it `sorry`-free.
+
+The two cases of Theorem 1.5 that do *not* immediately hand back a 3-step group both produce a
+normal nilpotent subgroup of index prime to `p` — all of `G` in case (i), the Fitting subgroup
+in case (ii), whose index is the order of the Frobenius complement and hence prime to `|F(G)|`.
+That shared step is isolated as `exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index`.
+-/
+
+/-- If a finite group `G` has a nilpotent normal subgroup `N` whose index is prime to `p`, then
+`O_p(G)` is a Sylow `p`-subgroup of `G`.
+
+Since `p ∤ [G : N]`, a Sylow `p`-subgroup `R` of `N` already has the full `p`-part of `|G|`, so
+its image in `G` is Sylow.  `R` is normal in the nilpotent group `N`, hence characteristic in
+`N`, hence normal in `G`; being a normal `p`-subgroup it lies in `O_p(G)`.  But `O_p(G)` is
+itself a `p`-group containing the Sylow subgroup `R`, so maximality forces equality. -/
+theorem exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
+    [Finite G] {p : ℕ} [Fact p.Prime] {N : Subgroup G} [N.Normal] [Group.IsNilpotent ↥N]
+    (hidx : ¬ p ∣ N.index) :
+    ∃ P : Sylow p G, (P : Subgroup G) = Ch03.oPiCore ({p} : Set ℕ) G := by
+  classical
+  -- The `p`-part of `|G|` is already attained inside `N`.
+  have hfact : (Nat.card ↥N).factorization p = (Nat.card G).factorization p := by
+    have hmul : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+    rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+      Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hidx, add_zero]
+  obtain ⟨R⟩ := (inferInstance : Nonempty (Sylow p ↥N))
+  haveI hRnormal : (R : Subgroup ↥N).Normal := Ch01.Sylow.normal_of_isNilpotent R
+  haveI hRchar : (R : Subgroup ↥N).Characteristic := Sylow.characteristic_of_normal R hRnormal
+  set Rmap : Subgroup G := (R : Subgroup ↥N).map N.subtype with hRmapdef
+  haveI hRmapNormal : Rmap.Normal := normal_map_subtype_of_characteristic hRchar
+  have hRpg : IsPGroup p ↥Rmap := R.isPGroup'.map N.subtype
+  have hRcard : Nat.card ↥Rmap = p ^ (Nat.card G).factorization p := by
+    rw [hRmapdef, Subgroup.card_map_of_injective N.subtype_injective, R.card_eq_multiplicity,
+      hfact]
+  -- `Rmap` is a Sylow `p`-subgroup of `G`.
+  obtain ⟨P, hPle⟩ := IsPGroup.exists_le_sylow hRpg
+  have hRP : Rmap = (P : Subgroup G) :=
+    Subgroup.eq_of_le_of_card_ge hPle
+      (le_of_eq (P.card_eq_multiplicity.trans hRcard.symm))
+  -- A normal `p`-subgroup lies in `O_p(G)`, which is itself a `p`-group.
+  have hle : Rmap ≤ Ch03.oPiCore ({p} : Set ℕ) G :=
+    (Ch04.isPiGroup_singleton_of_isPGroup hRpg).le_oPiCore
+  have hOp : IsPGroup p ↥(Ch03.oPiCore ({p} : Set ℕ) G) :=
+    Ch04.isPGroup_of_isPiGroup_singleton (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
+  exact ⟨P, (P.is_maximal' hOp (hRP ▸ hle)).symm⟩
+
+/-- **Gorenstein Ch. 12 §1 Theorem 1.5**, in the form Corollary 1.6 consumes.
+
+A solvable CN-group is nilpotent, or a Frobenius group with kernel `F(G)`, or a 3-step group
+with respect to some prime.
+
+**Book-strength debt.**  Gorenstein's clause (ii) additionally pins the Frobenius complement
+down to "cyclic, or the direct product of a cyclic group of odd order and a generalized
+quaternion group" (his Theorem 1.3.1(ii)).  That refinement is omitted here because the
+repository has no `IsGeneralizedQuaternion` predicate yet and Corollary 1.6 does not consume it;
+stating the weaker disjunct keeps this `sorry` conservative.  Restoring the full clause is
+tracked in issue 9133.
+
+**Status: not yet proved.**  Gorenstein's argument sets `F = F(G)` and, when `G ≠ F`, takes a
+Hall `π(F)'`-subgroup `A` (`Ch03.hall_exists_of_piSeparable`).  Lemma 1.2
+(`commute_of_cn_of_commute_ne_one`, proved above) shows no nonidentity element of `A`
+centralizes a nonidentity element of `F`, so `FA` is Frobenius; a second application of
+Lemma 1.2 shows `A` is nilpotent, and `π(F)` is then shown to be a single prime unless
+`G = FA`.  Beyond Lemma 1.2 and Hall's theorem the proof still needs, none of which is in the
+repository at the required strength:
+
+1. `C_G(F(G)) ≤ F(G)` for solvable `G` (Gorenstein Thm 6.1.3).  Present as
+   `OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting`, but under `OddOrder.BG`; importing it
+   here would make a `GroupTheory` leaf depend on `BG`, so it wants relocating first.  This is
+   a layering chore, not a mathematical gap.
+2. Gorenstein Thm 10.3.1 (iv)/(v)/(vi) on Frobenius complements — of the three, "a subgroup of
+   order `q · r` is cyclic" and the metacyclic structure (with Thm 7.6.2) are **absent**;
+   `Ch06.isZGroup_of_isFrobeniusAction_of_odd`,
+   `Ch06.sylow_isCyclic_or_two_quaternion_of_frobeniusAction` and
+   `Ch06.IsFrobeniusAction.unique_involution` cover the rest.
+3. Gorenstein Thm 1.3.1(ii), the structure of a group all of whose Sylow subgroups are cyclic or
+   generalized quaternion.  **Absent** — needed only for the omitted clause of (ii) above.
+4. Gorenstein Lemma 10.1.3, that a fixed-point-free automorphism of `K` induces a fixed-point-free
+   automorphism of `K/F` for an invariant `F`.  **Absent.**
+
+Items 2 and 4 are the substantive gaps on the path to Corollary 1.6; item 3 is needed only to
+retire the book-strength debt recorded above.  (An earlier revision of this list also named
+Gorenstein Thm 5.3.5, the coprime-action factorization `K = [R,K] · C_K(R)`, as absent; it is
+in fact present as `OddOrder.BG.Ch3.S13.subgroup_coprime_decomposition`, and Gorenstein's proof
+of Theorem 1.5 does not use it.) -/
+theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
+    (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G))) :
+    Group.IsNilpotent G ∨
+      (∃ A : Subgroup G, Ch06.IsFrobeniusGroup G (Ch01.fitting G) A) ∨
+      (∃ q : ℕ, q.Prime ∧ IsThreeStepGroup G q) := by
+  sorry
 
 /-- **Gorenstein Ch. 12 §1 Corollary 1.6**: for a solvable CN-group `G` with `O_p(G) ≠ 1`,
 either `O_p(G)` is a Sylow `p`-subgroup of `G`, or `G` is a 3-step group with respect to `p`.
@@ -484,34 +578,61 @@ Sylow in `M`, `M` is a 3-step group, and then only `IsThreeStepGroup.oPiCore_pPr
 `IsThreeStepGroup.isPGroup_quotient` / `nontrivial_quotient` are consumed — all three of which
 are proved above, `sorry`-free.
 
-**Status: not yet proved.**  It reduces to Gorenstein's Theorem 1.5, whose proof needs, beyond
-`commute_of_cn_of_commute_ne_one` (Lemma 1.2, proved above) and
-`Ch03.hall_exists_of_piSeparable` (present):
+Derived from `solvableCN_nilpotent_or_frobenius_or_threeStep` (Theorem 1.5) by dispatching its
+three cases:
 
-1. `C_G(F(G)) ≤ F(G)` for solvable `G` (Gorenstein Thm 6.1.3).  Present in this repository as
-   `OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting`, but in `OddOrder.BG`; importing it here
-   would make a `GroupTheory` leaf depend on `BG`.  It should be relocated to `OddOrder.Isaacs`
-   or `OddOrder.GroupTheory` first.
-2. Gorenstein Thm 5.3.5, the coprime-action factorization `K = [R, K] · C_K(R)`.  **Absent.**
-3. Gorenstein Thm 10.3.1 (iv)/(v)/(vi) on Frobenius complements: for odd order the Sylow
-   subgroups are cyclic and the complement is metacyclic; a subgroup of order `q · r` is cyclic;
-   for even order there is a unique involution and it is central.  Partly present as
-   `Ch06.isZGroup_of_isFrobeniusAction_of_odd`,
-   `Ch06.sylow_isCyclic_or_two_quaternion_of_frobeniusAction`
-   and `Ch06.IsFrobeniusAction.unique_involution`; the "order `q · r` is cyclic" and metacyclic
-   statements are **absent** (`OddOrder.GroupTheory.IsMetacyclic` exists but has no Frobenius
-   theory attached).
-4. Gorenstein Thm 1.3.1(ii), the structure of a group all of whose Sylow subgroups are cyclic or
-   generalized quaternion.  **Absent.**
-5. Gorenstein Lemma 10.1.3, that a fixed-point-free automorphism of `K` induces a fixed-point-free
-   automorphism of `K/F` for an invariant `F`.  **Absent.**
-
-Items 2, 4 and 5 are the substantive gaps. -/
+* `G` nilpotent — apply the index lemma with `N = ⊤`;
+* `G` Frobenius with kernel `F(G)` — the index of `F(G)` is the order of the complement, which
+  is prime to `|F(G)|`, and `p` divides `|F(G)|` because `1 ≠ O_p(G) ≤ F(G)`;
+* `G` a 3-step group with respect to `q` — then `q = p`, since a 3-step group with respect to
+  `q` has `O_{q'}(G) = 1` (`oPiCore_pPrime_eq_bot`) while `O_p(G) ≠ 1`. -/
 theorem oPiCore_isSylow_or_isThreeStepGroup [Finite G] {p : ℕ} [Fact p.Prime] [IsSolvable G]
     (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
     (hne : Ch03.oPiCore ({p} : Set ℕ) G ≠ ⊥) :
     (∃ P : Sylow p G, (P : Subgroup G) = Ch03.oPiCore ({p} : Set ℕ) G) ∨
       IsThreeStepGroup G p := by
-  sorry
+  classical
+  -- `O_p(G)` is a nontrivial `p`-group, so `p` divides its order.
+  have hOp : IsPGroup p ↥(Ch03.oPiCore ({p} : Set ℕ) G) :=
+    Ch04.isPGroup_of_isPiGroup_singleton (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
+  have hpdvdOp : p ∣ Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ) G) := by
+    obtain ⟨n, hn⟩ := hOp.exists_card_eq
+    rcases Nat.eq_zero_or_pos n with rfl | hpos
+    · exact absurd (Subgroup.eq_bot_of_card_eq _ (by simpa using hn)) hne
+    · exact hn ▸ dvd_pow_self p hpos.ne'
+  rcases solvableCN_nilpotent_or_frobenius_or_threeStep hCN with hnil | ⟨A, hFrob⟩ | ⟨q, hq, h3⟩
+  · -- (i) `G` nilpotent: take `N = ⊤`, of index `1`.
+    haveI := hnil
+    exact Or.inl (exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
+      (N := (⊤ : Subgroup G))
+      (by rw [Subgroup.index_top]; exact Nat.Prime.not_dvd_one Fact.out))
+  · -- (ii) `G` Frobenius with kernel `F(G)`: `[G : F(G)] = |A|` is prime to `p`.
+    refine Or.inl (exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
+      (N := Ch01.fitting G) ?_)
+    have hindex : (Ch01.fitting G).index = Nat.card ↥A :=
+      hFrob.isComplement.symm.index_eq_card
+    have hleF : Ch03.oPiCore ({p} : Set ℕ) G ≤ Ch01.fitting G := by
+      haveI : Group.IsNilpotent ↥(Ch03.oPiCore ({p} : Set ℕ) G) := hOp.isNilpotent
+      exact Ch01.nilpotent_normal_le_fitting
+    have hpF : p ∣ Nat.card ↥(Ch01.fitting G) :=
+      hpdvdOp.trans (Subgroup.card_dvd_of_le hleF)
+    have hcop : Nat.Coprime (Nat.card ↥(Ch01.fitting G)) (Nat.card ↥A) :=
+      hFrob.coprime_card_kernel_complement
+    rw [hindex]
+    intro hpA
+    exact (Fact.out : p.Prime).ne_one (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hpF hpA))
+  · -- (iii) `G` a 3-step group with respect to `q`: necessarily `q = p`.
+    haveI : Fact q.Prime := ⟨hq⟩
+    rcases eq_or_ne q p with rfl | hqp
+    · exact Or.inr h3
+    · exfalso
+      refine hne (le_bot_iff.mp ?_)
+      rw [← h3.oPiCore_pPrime_eq_bot]
+      refine Ch03.Subgroup.IsPiGroup.le_oPiCore (π := {r : ℕ | r ≠ q}) ?_
+      intro r hr
+      have hrp := Ch03.oPiCore.isPiGroup ({p} : Set ℕ) (G := G) r hr
+      simp only [Set.mem_singleton_iff] at hrp
+      subst hrp
+      exact Ne.symm hqp
 
 end OddOrder.GroupTheory
