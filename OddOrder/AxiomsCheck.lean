@@ -10445,9 +10445,10 @@ mathlib.  Proved sorry-free here:
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
 `O_{p,p',p}` did not exist in repo or mathlib and are built here.  The dichotomy itself
-(`oPiCore_isSylow_or_isThreeStepGroup`, Cor 1.6) is honestly stated and still sorried — its
-blockers (Gorenstein Thm 5.3.5 coprime action, Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are
-recorded in issue 9133.  Proved sorry-free here:
+(`oPiCore_isSylow_or_isThreeStepGroup`, Cor 1.6) is now **derived sorry-free from Theorem 1.5**
+(`solvableCN_nilpotent_or_frobenius_or_threeStep`), which is the file's only remaining `sorry`;
+its blockers (Gorenstein Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are recorded in issue
+9133.  Proved sorry-free here:
 
 * `IsThreeStepGroup.oPiCore_pPrime_eq_bot` — `O_{p'}(G) = 1`;
 * `IsThreeStepGroup.isPGroup_quotient` / `nontrivial_quotient` — `G/O_{p,p'}(G)` a nontrivial
@@ -10455,7 +10456,12 @@ recorded in issue 9133.  Proved sorry-free here:
   3-step group and a short argument".
 * `commute_of_cn_of_commute_ne_one` — **Gorenstein Ch.12 §1 Lemma 1.2**, proved for arbitrary
   `p`- and `q`-subgroups (a generalization of the book's Sylow statement, not a weakening).
-* `IsThreeStepGroup.isSolvable` — the solvability half of Lemma 1.4. -/
+* `IsThreeStepGroup.isSolvable` — the solvability half of Lemma 1.4.
+* `exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index` — the step shared by the two
+  non-3-step cases of Cor 1.6: a nilpotent normal subgroup of index prime to `p` forces `O_p(G)`
+  to be Sylow. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.oPiCore_pPrime_eq_bot
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isPGroup_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
