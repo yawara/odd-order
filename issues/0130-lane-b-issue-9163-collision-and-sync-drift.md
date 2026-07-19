@@ -87,16 +87,22 @@ b は Lemma 5 完成と同時に 9164 を **closed** にして合流したため
 
 以後 b の shared-infra claim は `export ODD_ISSUE_BASE=9300`。
 
+### lane b 実施結果 (2026-07-19)
+
+Frobenius 座標 claim は完了状態を保ったまま
+`issues/closed/9300-frobenius-conjugate-coordinates.md` へ改番し、consumer の参照と
+`SEQUENCE.9300` も 9300 に揃えた。歴史的 `SEQUENCE.9000` は凍結値 9164 のまま保持する。
+
 ## 完了条件
 
 - `ls issues/**/9163-*` が 1 件のみ (main の typepa 側)
-- lane b の Frobenius 座標 issue が 9164 として main に合流し、参照も全て 9164
+- lane b の Frobenius 座標 issue が 9300 として main に合流し、参照も全て 9300
 - `git rev-list --count b..main` = 0
 
 ## 参照
 
 - `issues/9163-typepa-mssharp-rescope-for-815-typeii.md` (main 側, 正)
-- lane b worktree: `issues/9163-frobenius-conjugate-coordinates.md` (改番対象)
+- `issues/closed/9300-frobenius-conjugate-coordinates.md` (改番済み)
 - `issues/2048-pf-suzuki-lemma5.md` (consumer)
-- `OddOrder/GroupTheory/RepresentationTheory/FrobeniusCoordinates.lean` (lane b 未 commit)
+- `OddOrder/GroupTheory/RepresentationTheory/FrobeniusCoordinates.lean` (`1d2baabb1` で main 合流済み)
 - `notes/meta/issue_management.md` 「並行セッションの採番レンジ」
