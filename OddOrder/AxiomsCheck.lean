@@ -9112,6 +9112,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy
 
+-- Peterfalvi (9.10), trigger form: the exceptional hypothesis alone selects Clifford case (b)
+-- (case (a) is refuted by its own (9.8.c) degree-`q·u` irreducible, moved into `𝒮(H₀C′)` by
+-- `Cprime_le_C` + `sOf_antitone`), so the theorem no longer takes the case carrier as input.
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.exceptional_case_frobenius_realization_of_trigger
+
 /-! **Peterfalvi (9.7.b) chief-factor Galois-field model, axiom-clean** (lane a, issue 1031).
 The actual case-(b) irreducibility proof feeds the shared faithful irreducible Singer constructor,
 giving `H/H₀ ≃+ GF(p^q)` and an injective scalar realization of `Ū`.  When `C_U(H/H₀) = 1`, the

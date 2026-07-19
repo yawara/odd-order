@@ -34,19 +34,20 @@
 | §8 | (8.15) | CONFIRMED 特殊化 | 型別 3 インスタンス (typeI / typeP₁ / typeII)。**type-I の (4.6) 版が無く、(5.2) 節は皆無** (S10_StructureSetup.lean:703 に TODO 明記)。⚠ 先に `typePA` を `M_σ^#` 添字へ直す必要 (現状 `(M')^#`; P₂ 版は false-as-stated = issue 9008)。 |
 | §8 | (8.18) | CONFIRMED 特殊化 | (a)(b)(c) すべて `TypeIData S/T` 固定 (S10_MinimalSimpleStructure.lean:404/481/575)。隣の (8.17.c) は `IsTypeI ∨ IsTypeII` で書けている (:107) のが対比。type-II consumer は (8.18.b) を導出せず structure field `cross_zero` として**仮定**している。 |
 | §9 | (9.7) | 部分 | 二分岐 `clifford_dichotomy` (CuS0.lean:1811) は axiom-clean。狭いのは 2 点: case (a) の埋め込み先が `((𝔽_p)ˣ)^{q−1}` (order-`a` 巡回でない, S11_ImprimitiveUBound.lean:265) / case (b) の **`W₁ ≅ Aut F` 節が repo に皆無** (S11_GaloisFieldModel.lean:31 は体表現のみ)。 |
-| §9 | **(9.10)** | 部分 (小) | `exceptional_case_frobenius_realization` (ThetaCountAssembly.lean:1027) が `caseB` を**仮説**に取る。`hno` から case (a) を内部で排除すればよい。**feeder 実在**: `caseA_exists_irreducible_sOf_H0C` (SummandComplementKernel.lean:1368) を `sOf_antitone` (ChiefFactorCore.lean:173) + `Cprime_le_C` (:651) で `𝒮(H₀C′)` へ移す。dispatch は現在 consumer 側 inline (S12_TypeIICrossIsometryPair.lean:1454-1485)。 |
+| §9 | (9.10) | **✅ 2026-07-19 解消** | trigger 形 `exceptional_case_frobenius_realization_of_trigger` (ThetaCountAssembly.lean:1146) を追加 — `caseB` carrier を仮説に取らず、`hno` だけから Clifford case (b) を選ぶ (case (a) は自身の (9.8.c) 由来の次数 `q·u` 既約元を `Cprime_le_C` + `sOf_antitone` で `𝒮(H₀C′)` へ移して `hno` と矛盾)。consumer (S12_TypeIICrossIsometryPair) の inline dispatch も解消。 |
 | §9 | (9.11) | CONFIRMED 特殊化 | `coherent_sOf_H0Cprime` (S13_Orthogonality.lean:1197) は `S13.Hypothesis M` + `IsTypeIII ∨ IsTypeIV`。type-II は §15 の S/T instance 別経路。**repo に `Hypothesis (9.5)` オブジェクトが存在しない** (§9 の仮説は S11 の 3 carrier に分散)。 |
 | §10 | (10.11) | 部分 | 第 1 主張 (|W1|,|W2| prime) は一般 (`theorem88_caseB_prime_orders`, S12_MaximalIII_IV_V.lean:1682)。type-II 残余は §15 の S/T pair instance のみ。 |
 | §11 | (11.8) | CONFIRMED 特殊化 | `exists_zeta_residual_not_orthogonal_H0C_of_refuter` (S13_Orthogonality.lean:1036) — ∃ でなく ∀ が本文形。加えて ζ が**次数 `w₁`** と `S12.inducedFamily M` に固定 + `IsTypeIII ∨ IsTypeIV`。証明本体は既に ζ-generic。 |
-| §13 | (13.8) | CONFIRMED 特殊化 | 側非依存エンジンは完備 (`caseB_eta01_norm_core`/`_bound`, S15_SAndT_Setup/Machinery135.lean:908/937)。**T 側 instance のみ** (`eta10_Qsharp_norm_lower_core`, Eta10Correction.lean:361)。S 側 mirror には `exists_caseB_data_eta01_S_core` を 1 本書けばよい (下流は全て側非依存)。 |
+| §13 | (13.8) | CONFIRMED 特殊化 (**規模大**) | 側非依存エンジンは完備 (`caseB_eta01_norm_core`/`_bound`, S15_SAndT_Setup/Machinery135.lean:908/937)。**T 側 instance のみ** (`eta10_Qsharp_norm_lower_core`, Eta10Correction.lean:361)。⚠ **「S 側 producer を 1 本書けば閉じる」は誤り (2026-07-19 実測で訂正)** — carrier 上に **`eta01` という関数がそもそも存在しない** (`grep eta01` は Machinery135 の **側非依存エンジン名/docstring** にしか当たらない; carrier が持つのは `hyp.eta10` のみ)。T 側 producer `exists_caseB_data_eta10_T_core` が依存する 4 ピース (`exists_muT_index_caseB_core` / `exists_etaT_alphaFun_one_int_core` / `Q_sharp_hypothesis76_base` / `reconciled_typePData_T`) は**いずれも S 側版が未存在**。⟹ 着手すると (i) `eta01` の定義、(ii) `P^#` 上の Hypothesis76 base、(iii) S 側 μ index core、(iv) S 側 α 関数、(v) mirror 組み立て、の 5 段になる。 |
 
 ## 推奨着手順 (上流優先 + 文書順)
 
 1. ~~(6.5)(a) chief factor 節~~ **✅ 2026-07-19 完了**。
-2. **(9.10) の `caseB` 除去** — feeder 実在、dispatch を consumer から定理内へ移すだけ。
-3. **(13.8) S 側 mirror** — 下流が全て側非依存ゆえ 1 本で閉じる。
-4. (7.9) `hdelta_even` の一般化 → (6.3) standalone 無条件化 → (11.8) ∀ 化。
-5. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので後 (特に (8.15) は
+2. ~~(9.10) の `caseB` 除去~~ **✅ 2026-07-19 完了**。
+3. **(7.9) `hdelta_even` の一般化** — `Hypothesis79` は既に一般で、Frobenius 専用は `hdelta_even` 1 個だけ。feeder (`cfdot_real_vchar_even` ほか) は generic ゆえ次の frontier。
+4. (6.3) standalone 無条件化 → (11.8) ∀ 化 → (6.6) の Z-generic 化。
+5. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
+6. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。
 
 ## Lean 側の stale docstring (2026-07-19 に修正済)
