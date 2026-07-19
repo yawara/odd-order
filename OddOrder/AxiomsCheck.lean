@@ -8369,6 +8369,9 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_sum_eq_zero_of_square_formula
 
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_weightFiber_sum_eq_zero
+
 /-! **Higman Lemma 6, distinct triple-weight exclusion**: three distinct
 Frobenius exponents cannot be congruent modulo `2^n - 1` to a pair weight.
 For a primitive Singer root, the corresponding eigenspace is therefore zero

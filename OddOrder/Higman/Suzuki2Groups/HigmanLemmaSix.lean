@@ -993,4 +993,96 @@ theorem lowerCentralTripleCommutator_sum_eq_zero_of_square_formula
     (lowerCentralSquareMapBaseChange K H hSq x)
     ((1 : K) ⊗ₜ[ZMod 2] x) hq hx hself
 
+/-- **Higman Lemma 6 (p. 86), separation of the triple sum by weight.**
+
+The zero sum of actual scalar-extended triple commutators splits into its
+individual eigenvalue fibers. The first two indices are packaged as an
+increasing pair, so the repeated candidates remain explicit in each fiber. -/
+theorem lowerCentralTripleCommutator_weightFiber_sum_eq_zero
+    (K : Type uK) [Field K] [DecidableEq K] [Algebra (ZMod 2) K]
+    {H : Type uH} {X : Type uX} [Group H] [Group X]
+    (phi : X →* MulAut H) (g : X)
+    (n : ℕ) (lambda : K)
+    (b : Fin n → K ⊗[ZMod 2] Additive (lowerCentralLayer H 0))
+    (hb : ∀ i,
+      (lowerCentralLayerRepresentation phi 0 g).baseChange K (b i) =
+        lambda ^ (2 ^ i.val) • b i)
+    (hsum : ∑ i : Fin n, ∑ j : Fin n with i < j, ∑ k : Fin n,
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H (b i) (b j))
+        (b k) = 0)
+    (mu : K) :
+    ∑ z : HigmanExponentPair n × Fin n with
+        lambda ^ (2 ^ z.1.1.1.val + 2 ^ z.1.1.2.val + 2 ^ z.2.val) = mu,
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H
+          (b z.1.1.1) (b z.1.1.2))
+        (b z.2) = 0 := by
+  classical
+  let I := HigmanExponentPair n × Fin n
+  let T : Module.End K
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 2)) :=
+    (lowerCentralLayerRepresentation phi 2 g).baseChange K
+  let weight : I → K := fun z =>
+    lambda ^ (2 ^ z.1.1.1.val + 2 ^ z.1.1.2.val + 2 ^ z.2.val)
+  let term : I → K ⊗[ZMod 2] Additive (lowerCentralLayer H 2) := fun z =>
+    lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+      (lowerCentralCommutatorBilinearBaseChange K H
+        (b z.1.1.1) (b z.1.1.2))
+      (b z.2)
+  have htermEigen : ∀ z ∈ (Finset.univ : Finset I),
+      T (term z) = weight z • term z := by
+    intro z _hz
+    have hbeta := lowerCentralCommutatorBilinearBaseChange_eigenweight
+      K phi g
+      (lambda ^ (2 ^ z.1.1.1.val))
+      (lambda ^ (2 ^ z.1.1.2.val))
+      (b z.1.1.1) (b z.1.1.2) (hb z.1.1.1) (hb z.1.1.2)
+    have hgamma := lowerCentralDegreeThreeCommutatorBilinearBaseChange_eigenweight
+      K phi g
+      (lambda ^ (2 ^ z.1.1.1.val) * lambda ^ (2 ^ z.1.1.2.val))
+      (lambda ^ (2 ^ z.2.val))
+      (lowerCentralCommutatorBilinearBaseChange K H
+        (b z.1.1.1) (b z.1.1.2))
+      (b z.2) hbeta (hb z.2)
+    simpa only [T, term, weight, pow_add, mul_assoc] using hgamma
+  have hpairs :
+      (∑ p : HigmanExponentPair n, ∑ k : Fin n,
+        lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+          (lowerCentralCommutatorBilinearBaseChange K H
+            (b p.1.1) (b p.1.2))
+          (b k)) =
+        ∑ i : Fin n, ∑ j : Fin n with i < j, ∑ k : Fin n,
+          lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+            (lowerCentralCommutatorBilinearBaseChange K H (b i) (b j))
+            (b k) := by
+    let pred : Fin n × Fin n → Prop := fun p => p.1.1 < p.2.1
+    let pairTerm : Fin n × Fin n →
+        K ⊗[ZMod 2] Additive (lowerCentralLayer H 2) := fun p =>
+      ∑ k : Fin n,
+        lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+          (lowerCentralCommutatorBilinearBaseChange K H (b p.1) (b p.2))
+          (b k)
+    have hsub :
+        (∑ p : Subtype pred, pairTerm p.1) =
+          ∑ p ∈ Finset.univ.filter pred, pairTerm p := by
+      exact (Finset.sum_subtype
+        (Finset.univ.filter pred) (by simp [pred]) pairTerm).symm
+    rw [show (∑ p : HigmanExponentPair n, ∑ k : Fin n,
+        lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+          (lowerCentralCommutatorBilinearBaseChange K H
+            (b p.1.1) (b p.1.2))
+          (b k)) = ∑ p : Subtype pred, pairTerm p.1 by rfl]
+    rw [hsub, ← Finset.univ_product_univ, Finset.sum_filter,
+      Finset.sum_product]
+    simp only [pairTerm, Finset.sum_filter]
+    rfl
+  have hsum' : ∑ z : I, term z = 0 := by
+    simp only [I, Fintype.sum_prod_type, term]
+    exact hpairs.trans hsum
+  simpa only [I, weight, term, Finset.sum_filter, Finset.mem_univ,
+    true_and] using
+    (Module.End.sum_filter_weight_eq_zero_of_sum_eq_zero
+      T (Finset.univ : Finset I) weight term htermEigen hsum' mu)
+
 end OddOrder.Higman.Suzuki2Groups

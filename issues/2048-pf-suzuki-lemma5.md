@@ -138,7 +138,8 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               permitted gap `±r` を持てないことを `ZMod n` 上で証明する
         - [x] actual `L₂` の Frobenius eigenbasis と bracket の full span を接続し、
               全ての非零 basis bracket が一つの cyclic gap `±r` に支えられることを示す
-        - [ ] weight 成分ごとに上の和を分離し、odd-gap 排他から二候補を消去する
+        - [x] actual triple-bracket の零和を固有値 fiber ごとに分離する
+        - [ ] 各 pair-weight fiber を二つの repeated 候補へ縮約し、odd-gap 排他から消去する
       - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
