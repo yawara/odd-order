@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
 import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
-import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
 import Mathlib.Algebra.Module.Submodule.Bilinear
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.FieldTheory.Finite.Basic
@@ -387,6 +387,84 @@ theorem charpoly_eq_minpoly_of_conj_lmul
       rw [Algebra.leftMulMatrix_apply, LinearMap.charpoly_toMatrix]
     _ = minpoly F lambda := by
       simpa [pb, PowerBasis.ofAdjoinEqTop_gen] using charpoly_leftMulMatrix pb
+
+
+/-- A field generator has a full Frobenius orbit, so a linear operator whose
+characteristic polynomial is its minimal polynomial admits the Frobenius
+conjugates as a full eigenbasis after scalar extension. No multiplicative
+primitive-root hypothesis is used. -/
+theorem exists_frobeniusEigenbasis_of_generator_and_charpoly
+    {K : Type uEigenK} {V : Type uEigenV}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    [FiniteDimensional (ZMod 2) V]
+    (T : Module.End (ZMod 2) V)
+    (m : ℕ)
+    (hfinK : Module.finrank (ZMod 2) K = m)
+    (lambda : K)
+    (hgen : Algebra.adjoin (ZMod 2) ({lambda} : Set K) = ⊤)
+    (hchar : T.charpoly = minpoly (ZMod 2) lambda) :
+    ∃ b : Basis (Fin m) K (K ⊗[ZMod 2] V), ∀ i,
+      T.baseChange K (b i) = lambda ^ (2 ^ i.val) • b i := by
+  let weight : Fin m → K := fun i ↦ lambda ^ (2 ^ i.val)
+  let TK : Module.End K (K ⊗[ZMod 2] V) := T.baseChange K
+  have hroot (i : Fin m) : TK.charpoly.IsRoot (weight i) := by
+    change (T.baseChange K).charpoly.IsRoot (weight i)
+    rw [LinearMap.charpoly_baseChange, hchar]
+    let σ : K →ₐ[ZMod 2] K :=
+      FiniteField.frobeniusAlgHom (ZMod 2) K ^ i.val
+    have hσ : σ lambda = weight i := by
+      simp [σ, weight, AlgHom.coe_pow,
+        FiniteField.coe_frobeniusAlgHom, pow_iterate]
+    rw [Polynomial.IsRoot, eval_map_algebraMap, ← hσ,
+      Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]
+  have heig (i : Fin m) : TK.HasEigenvalue (weight i) := by
+    rw [Module.End.hasEigenvalue_iff_isRoot_charpoly]
+    exact hroot i
+  let v : Fin m → K ⊗[ZMod 2] V :=
+    fun i ↦ (heig i).exists_hasEigenvector.choose
+  have hv (i : Fin m) : TK.HasEigenvector (weight i) (v i) :=
+    (heig i).exists_hasEigenvector.choose_spec
+  have hfrob : Function.Injective
+      (fun i : Fin m ↦
+        FiniteField.frobeniusAlgHom (ZMod 2) K ^ i.val) := by
+    intro i j hij
+    have hcast : Fin.cast hfinK.symm i = Fin.cast hfinK.symm j := by
+      apply (FiniteField.bijective_frobeniusAlgHom_pow (ZMod 2) K).1
+      simpa using hij
+    exact Fin.cast_injective hfinK.symm hcast
+  have hweight : Function.Injective weight := by
+    intro i j hij
+    apply hfrob
+    apply AlgHom.ext_of_adjoin_eq_top hgen
+    intro x hx
+    have hx' : x = lambda := Set.mem_singleton_iff.mp hx
+    subst x
+    simpa [weight, AlgHom.coe_pow,
+      FiniteField.coe_frobeniusAlgHom, pow_iterate] using hij
+  have hli : LinearIndependent K v :=
+    Module.End.eigenvectors_linearIndependent' TK weight hweight v hv
+  let pb : PowerBasis (ZMod 2) K :=
+    PowerBasis.ofAdjoinEqTop (Algebra.IsIntegral.isIntegral lambda) hgen
+  have hminDegree : (minpoly (ZMod 2) lambda).natDegree = m := by
+    calc
+      (minpoly (ZMod 2) lambda).natDegree = pb.dim := by
+        simp [pb]
+      _ = Module.finrank (ZMod 2) K := (pb.finrank).symm
+      _ = m := hfinK
+  have hfinV : Module.finrank (ZMod 2) V = m := by
+    rw [← T.charpoly_natDegree, hchar, hminDegree]
+  have hcard : Fintype.card (Fin m) =
+      Module.finrank K (K ⊗[ZMod 2] V) := by
+    rw [Fintype.card_fin, Module.finrank_baseChange, hfinV]
+  let b : Basis (Fin m) K (K ⊗[ZMod 2] V) :=
+    basisOfLinearIndependentOfCardEqFinrank' v hli hcard
+  refine ⟨b, fun i ↦ ?_⟩
+  have hb : b i = v i := by
+    change basisOfLinearIndependentOfCardEqFinrank' v hli hcard i = v i
+    rw [coe_basisOfLinearIndependentOfCardEqFinrank']
+  rw [hb]
+  exact (hv i).apply_eq_smul
 
 
 /-- If an `F₂`-endomorphism has the minimal polynomial of a primitive element of a finite

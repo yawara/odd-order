@@ -237,6 +237,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
@@ -8194,6 +8195,42 @@ an arbitrary scalar extension of the second layer. -/
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.not_exists_injective_intertwiner_to_baseChange_of_higman_bracket
+
+/-! **Higman Lemma 5**: the source square-subgroup hypothesis feeds the actual
+quadratic square map.  A normalized Frobenius-conjugate simultaneous
+eigenbasis makes the upper-triangular candidate equivariant; Lemma 4's
+Corollary then identifies it with the actual map and yields Higman's displayed
+pairwise formula after scalar extension. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquaresLieInSecond_of_agemo_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareQuadraticMap_polarBilin
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.upperQuadraticMap_apply_frobenius_sum
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.polarBilin_upperQuadraticMap
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareMapBaseChange_eq_of_add_law_and_equivariant
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.includeRight_eq_sum_conjugateTensorBasis
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_singerConjugateBasis_of_faithful_irreducible
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.upperQuadraticMap_equivariant_of_eigenbasis
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareMapBaseChange_eq_upperQuadraticCandidate
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_lowerCentralSquareMap_eq_frobeniusSum
 
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
