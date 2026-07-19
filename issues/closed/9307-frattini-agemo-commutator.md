@@ -19,9 +19,9 @@ propagation とともに `OddOrder/GroupTheory/OmegaSubgroup.lean` に置く。
 
 ## やること
 
-- [ ] 既存の汎用 `commutator_agemo_one_map_le_agemo_two_map` を GroupTheory へ移す
-- [ ] 平方元および `Agemo P 2 1` に対する交換子評価を追加する
-- [ ] Higman Lemma 9 consumer を新 API に接続する
+- [x] 既存の汎用 `commutator_agemo_one_map_le_agemo_two_map` を GroupTheory へ移す
+- [x] 平方元および `Agemo P 2 1` に対する交換子評価を追加する
+- [x] Higman Lemma 9 consumer を新 API に接続する
 
 ## 完了条件
 
@@ -34,3 +34,5 @@ propagation とともに `OddOrder/GroupTheory/OmegaSubgroup.lean` に置く。
 - `issues/2048-pf-suzuki-lemma5.md`
 - `issues/closed/9306-commutator-le-agemo-two-one.md`
 - `references/higman/pages/suzuki-2-groups-p087.png`
+- `ac2c9bcfd` (`feat(group-theory): propagate square commutators`)
+- `844d2d5f1` (`feat(higman): complete lemma nine`)

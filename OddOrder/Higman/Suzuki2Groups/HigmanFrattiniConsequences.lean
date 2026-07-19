@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 
 /-!

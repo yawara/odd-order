@@ -64,7 +64,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
     - [x] 原文 p. 84 の二場合分けを接続し、
           `NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq` として
           `∀ a : A, a ^ 4 = 1` を結論する
-  - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
+  - [x] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian subgroup の指数境界 `exp(A) ≤ 4` と `Φ(G) ≤ A` を構成する
     - [x] 原文の `Lᵢ = Hᵢ / (Hᵢ² Hᵢ₊₁)` を actual lower-central quotient として
           構成し、ambient denominator、elementary-abelian 性、標準 `F₂`-module、
@@ -169,11 +169,20 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
       - [x] actual `L₂ ≃ A/A²`, `L₃ ≃ A²/A⁴` と actor-equivariance を構成する
       - [x] `exp(A) > 2` のとき power map `L₂ ≃ξ L₃` を構成し、Lemma 6 と矛盾させる
             (`higmanLemmaEight_pow_two_eq_one`, `cd97f2d75`)
-    - [ ] Higman Lemma 9 (current source frontier): Lemmas 3, 7, 8 の三分岐から maximal abelian normal
+    - [x] Higman Lemma 9 (p. 87): Lemmas 3, 7, 8 の三分岐から maximal abelian normal
           invariant subgroup `A` に対する `exp(A) ≤ 4` と `Φ(G) ≤ A` を証明する
+      - [x] `[P,A] ≤ A²` から shared Agemo commutator API で
+            `[Φ(P),A] ≤ A⁴` を導き、`A ⊔ Φ(P)` 内の cover と Lemma 2 witness を構成する
+      - [x] cover の Frattini subgroup を `A` と同定し、Lemma 7 branch を最大性で排除、
+            Lemma 8 branch から `exp(A) ≤ 2` を得る
+      - [x] `A = Z(P)` と nilpotency class `≤ 2` を実証明して `Φ(P) ≤ A` を閉じ、
+            両結論を公開 endpoint `higmanLemmaNine` にまとめる (`844d2d5f1`)
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
+    - [ ] Higman Lemma 10 (current source frontier): characteristic `2` の proper odd-degree
+          finite field extensionで、任意の `r : ℤ`, `ε` に対する非零 `α` と
+          `Tr(α · Frob^r(α) · ε) = 0` を構成する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
