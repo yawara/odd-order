@@ -1302,6 +1302,11 @@ Appendix III type-A Suzuki 2-group structure. -/
 -- its order-`r` subgroups centralize the commutator, and every prime-order subgroup is normal.
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.isZGroup_of_isFrobeniusAction_of_odd
+-- Isaacs Cor 6.18 proper: `A'` and `A/A'` cyclic of coprime orders (Cor 6.17 + Thm 5.16).
+-- Previously each use site re-derived the clause it needed from the `IsZGroup` instance; this
+-- is the composite the book states.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isCyclic_commutator_abelianization_coprime_of_isFrobeniusAction_of_odd
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.centralizes_commutator_of_card_prime_coprime
 #assert_only_allowed_axioms

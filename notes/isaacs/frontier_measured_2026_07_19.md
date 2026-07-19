@@ -116,9 +116,17 @@ repo 側の方針明記: `Ch08_PermutationGroups/RegularNormal.lean:38-42`。
 1. **✅ 修正済 (本 note と同 commit)**: `Ch03_SplitExtensions/Basic.lean:449` が Thm 3.9 の mathlib 名として
    `isSolvable_iff_derivedSeries_eq_bot` を挙げていたが、**この名前は mathlib に存在しない**
    (群版は `isSolvable_def`; `derivedSeries_eq_bot_iff` は Lie 代数版)。→ `isSolvable_def` に訂正。
-2. **6.18 に単一の citable 宣言が無い** — repo は 6.17 を名前付きで証明し、6.18 の 3 つの帰結は
-   mathlib `IsZGroup` API から 3 箇所で inline に再導出している。下流が「6.18」を cite したいなら
-   合成を 1 本の定理として名付ける価値がある (低優先)。
+2. **✅ 解消済 (2026-07-19)**: 6.18 に単一の citable 宣言が無かった件 →
+   `isCyclic_commutator_abelianization_coprime_of_isFrobeniusAction_of_odd`
+   (`Ch06_FrobeniusActions/OddComplement.lean`, Step 1 の直後) として書籍どおりの合成
+   (`A'` と `A/A'` が巡回・位数互いに素) を命名。証明は書籍と同じ 2 行 — Cor 6.17
+   (`isZGroup_of_isFrobeniusAction_of_odd`) で Z-群、あとは Thm 5.16 = mathlib の
+   `IsZGroup.isCyclic_commutator` / `isCyclic_abelianization` / `coprime_commutator_index`。
+   axiom-clean・AxiomsCheck 登録済。
+3. **✅ 解消済 (2026-07-19)**: `Ch05_Transfer/Basic.lean` の Cor 5.19 docstring が
+   「原版への一般化は…extensible」と**未実装であるかのように**書いていたが、一般形は
+   `not_isSimpleGroup_of_sylow_two_cyclic_strict_max_factor`
+   (`Ch05_Transfer/SylowTwoDirectFactor.lean:73`) として**実装済**だった。相互参照を張って訂正。
 3. **mathlib 版が Isaacs と逐語一致しない 4 件** (いずれも下流で困らないことを確認済):
    - 8.21: mathlib は Jordan 集合 2 つでなく「集合とその平行移動 `s ∩ g • s`」版のみ。Isaacs が
      8.22/8.18 の証明で使うのはこの場合だけなので実害なし。
