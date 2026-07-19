@@ -115,7 +115,9 @@ frontier_measured_2026_07_19.md §9 行の狭さ 2 点の解消。書籍 stateme
      `caseB_etaHom : W₁ →* Multiplicative (AddAut F)`。**MonoidHom 合成**で定義したので
      map_one'/map_mul' は自動 (w1ActionHom → MulAut.congr (toMultiplicativeRight e) →
      MulAutMultiplicative)。`caseB_etaHom_apply` = 書籍の φ(h)η(w) = φ(h^w)。
-   - **⬜ twist 恒等式**: 骨格は左作用で以下 (PDF p.52 を左作用に翻訳済):
+   - **✅ twist 恒等式** (`w1_conj_mem_uActionHom_range` / `caseB_conjIdx` /
+     `caseB_etaHom_scalar_mul` / `caseB_etaHom_twist` / `caseB_etaHom_mul_scalars`)。
+     骨格は左作用で以下 (PDF p.52 を左作用に翻訳済):
      `w • (u • h) = (w u w⁻¹) • (w • h)` (作用が MonoidHom ゆえ map_mul 2 回)
      ⟹ `η(w)(t * μ u) = μ(w u w⁻¹) * η(w)(t)`  … (*)
      `t = e (ofMul s) = 1` を代入し `w • s = s` (s は W₁-固定) から `η(w)(1) = 1`
@@ -123,8 +125,14 @@ frontier_measured_2026_07_19.md §9 行の狭さ 2 点の解消。書籍 stateme
      (**) を (*) に戻して `η(w)(t * μ u) = η(w)(t) * η(w)(μ u)` = 抽象層の hmul。
      ⚠ `w u w⁻¹ ∈ U` に U ◁ U⊔W₁ が要る (`(typeP_uW1_frobenius data hU).isNormal`)。
      群版の共役式は `uActionHom_conjNormal` (`S11_ImprimitiveUBound.lean:~100`)。
-4. **組み立て**: 1-3 → `ringAutHomOfAddAutHom` → 単射 (|W̄₂| = p < p^q ゆえ W₁ は H̄ に忠実)
-   → `natCard_ringAut_galoisField` で onto。
+4. **✅ 組み立て** — `caseB_exists_galoisField_repr_withAut` (S11_GaloisFieldModel.lean)。
+   **(9.7.b) の「W₁ ↔ Aut F」節がこれで実証明済**: H̄ ↔ F (加法)・Ū ↔ U* (乗法)・
+   W₁ ↔ Aut F (全単射 η, 自然作用) を 1 本の ∃ 文で返す。
+   - `w1ActionHom_injective`: 核は |W₁| = q 素数の部分群ゆえ ⊥ or ⊤、⊤ なら
+     |C_H̄(W₁)| = |H̄| すなわち p = p^q で q ≥ 2 に矛盾 → ⊥。
+   - `caseB_etaHom_injective` → `ringAutHomOfAddAutHom_injective` +
+     `natCard_ringAut_galoisField` (|Aut F| = q) → `Nat.bijective_iff_injective_and_card`。
+   - `Finite (RingAut F)` は既証の位数 = q ≠ 0 から `Nat.finite_of_card_ne_zero`。
 5. **系**: u ⊥ (p−1) / u ∣ (p^q−1)/(p−1)。
    ⚠ **これは `CliffordCaseBData` の既存フィールド `u_coprime_p_sub_one` /
    `u_dvd_norm_quotient` として既に仮定されている** — (9.7.b) を実証明したら
