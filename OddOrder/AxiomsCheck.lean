@@ -10911,7 +10911,14 @@ Hub ruling 9163 (Option B′) / issues 1042, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_eq_typePA_of_isTypeP1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore0_eq_typePA0_of_isTypeP1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_eq_A1_of_isTypeP1
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.not_isTypeP1_of_mem_typePACore_not_mem_A1
+#assert_only_allowed_axioms OddOrder.GroupTheory.typeA_eq_typeIA
+#assert_only_allowed_axioms OddOrder.GroupTheory.A1_subset_typeA
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typeA_eq_typePACore
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.A1_subset_typeA
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ne_typeI_of_isTypeP1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typeA_eq_A1_of_isTypeP1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.not_isTypeP1_of_mem_typeA_not_mem_A1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.isTypeI_or_isTypeII_of_mem_typeA_not_mem_A1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_conj_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subset_hatMsigma
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_one_not_mem

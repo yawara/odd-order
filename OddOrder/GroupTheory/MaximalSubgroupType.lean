@@ -401,6 +401,56 @@ theorem sharpSubgroup_H_subset_typeIA {M : Subgroup G} (data : TypeIData M) :
   refine ⟨data.typeF.H_le hy.1, fun h1 => hy.2 h1, y, hy, ?_⟩
   exact Subgroup.mem_centralizer_iff.mpr fun g hg => by rw [Set.mem_singleton_iff.mp hg]
 
+/-! ### Peterfalvi (8.10): the type-uniform support `A(M)`
+
+(8.10) defines `A(M)` by two clauses,
+
+* `M` of Type I: `A(M) = A₀(M) = ⋃_{x∈H^#} C_M(x)^#` (`H = M_F = M_s`);
+* `M` of type `𝒫`: `A(M) = ⋃_{x∈M_s^#} C_{M'}(x)^#`, `A₀(M) = A(M) ∪ V^M`;
+
+which differ **only in the host of the centralizers** — `M` versus `M'` — since the index
+subgroup is `M_s = mainSubgroup M tau` in both (`H = M_F = M_s` for Type I).  `typeA` below is
+that common shape.  It is what lets (8.18) be stated the way the book states it, for two
+non-conjugate maximal subgroups with no type hypothesis at all. -/
+
+/-- **Peterfalvi (8.10)**: the host of the centralizers in `A(M) = ⋃_{x∈M_s^#} C_K(x)^#` — the
+whole of `M` for Type I, and the derived subgroup `M' = [M,M]` for the types of class `𝒫`
+(Types II, III, IV, V). -/
+noncomputable def supportHost (M : Subgroup G) (tau : PeterfalviType) : Subgroup G :=
+  match tau with
+  | .I => M
+  | _ => derivedInG M
+
+/-- **Peterfalvi (8.10)**, the type-uniform support `A(M) = ⋃_{x ∈ M_s^#} C_K(x)^#` with
+`K = supportHost M tau`.  It specialises to `typeIA` on Type I (`typeA_eq_typeIA`) and to the
+book-literal `OddOrder.Peterfalvi.S10.typePACore` on the types of class `𝒫`
+(`typeA_eq_typePACore`). -/
+noncomputable def typeA (M : Subgroup G) (tau : PeterfalviType) : Set G :=
+  centralizerSupport (sharpSubgroup (mainSubgroup M tau)) (supportHost M tau)
+
+@[simp] theorem supportHost_typeI (M : Subgroup G) : supportHost M .I = M := rfl
+
+theorem supportHost_of_ne_typeI (M : Subgroup G) {tau : PeterfalviType} (h : tau ≠ .I) :
+    supportHost M tau = derivedInG M := by
+  cases tau <;> first | exact absurd rfl h | rfl
+
+/-- **`A₁(M) ⊆ A(M)`** (the first inclusion of (8.10)'s closing sentence), for every type:
+a nonidentity `x ∈ M_s` centralizes itself, and `M_s ≤ K` — for Type I because `M_s = M_F ≤ M`,
+otherwise because `M_s` lies in `M'`.  Both containments are supplied by the caller as `hle`,
+since they are §15/§16 facts rather than definitional ones. -/
+theorem A1_subset_typeA {M : Subgroup G} {tau : PeterfalviType}
+    (hle : mainSubgroup M tau ≤ supportHost M tau) : A1 M tau ⊆ typeA M tau := by
+  intro y hy
+  exact ⟨hle hy.1, fun h1 => hy.2 h1, y, hy,
+    Subgroup.mem_centralizer_iff.mpr fun g hg => by rw [Set.mem_singleton_iff.mp hg]⟩
+
+/-- **(8.10) on Type I**: the type-uniform `A(M)` is the type-I support `typeIA`
+(`H = M_F = M_s`, `TypeFData.H_eq`). -/
+theorem typeA_eq_typeIA {M : Subgroup G} (data : TypeIData M) :
+    typeA M .I = typeIA M data := by
+  rw [typeA, typeIA, data.typeF.H_eq]
+  rfl
+
 /-- The `A(M)` set associated to type `P` data. -/
 def typePA (M : Subgroup G) (_data : TypePData M) : Set G :=
   centralizerSupport (sharpSubgroup M) (derivedInG M)
