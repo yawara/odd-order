@@ -110,3 +110,51 @@ BG 原文 (pdftotext L7922-8010) の Step 2 が使うもの:
 E.3(b) 第 1 節 (`omega_pow_eq_one`) が E.3 全体の入口。上表の repo 補題を実測で
 名前確認してから Step 2 を組む。E.3(c) は Step 2 の固有値計数、E.3(d) は Step 4
 (Schur–Zassenhaus)、E.4 は E.3 を全部消費、E.5 は §14 counting + Cor 15.9。
+
+## E.3(b) Step 2 が cite する repo 補題 — 正確な signature (2026-07-20 実測)
+
+**`OddOrder.BG.Ch1.S05.lemma52`** (`S05_NarrowSCN.lean:1181`) — **BG Lemma 5.2**:
+```lean
+theorem lemma52 [Finite R] {p : ℕ} [Fact p.Prime] (hp : Odd p) (hpg : IsPGroup p R)
+    (h3 : 3 ≤ pRank R p) (E : Subgroup R) (hEcard : Nat.card ↥E = p ^ 2)
+    (hEstar : IsMaximalElementaryAbelian p E) :
+    ¬ E ≤ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) ∧
+    (Nat.card ↥(omega1Center R p) = p ∧
+      (omega1UpperCentralTwo R p).IsElementaryAbelian p ∧
+      Nat.card ↥(omega1UpperCentralTwo R p) = p ^ 2) ∧
+    (Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)).index = p
+```
+⟹ BG の `T = C_R(Ω₁(Z₂(R)))` は repo では
+`Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)`。**`|R : T| = p` が直接出る**。
+
+**`narrow_centralizer_decomp`** (`S05_NarrowCharacterization.lean:726`) — **BG Theorem 5.3(d)**。
+docstring に「**下流 App.E E.3 が cite**」と明記されており、まさに本用途で用意済:
+```lean
+theorem narrow_centralizer_decomp [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp : Odd p) (hpg : IsPGroup p R) (h3 : 3 ≤ pRank R p) (hnarrow : IsNarrow p R)
+    (S : Subgroup R) (hScard : Nat.card ↥S = p)
+    (hSrank : pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2) :
+    IsCyclic ↥(C_R(S) ⊓ T) ∧ S ⊓ commutator R = ⊥ ∧ S ⊓ T = ⊥ ∧
+    Subgroup.centralizer (S : Set R) = S ⊔ (C_R(S) ⊓ T)
+```
+⟹ BG Step 2 の `R₀ ∩ T = 1` と `C_R(R₀) = R₀ × C_T(R₀)` がそのまま。
+
+**その他**: `exists_narrow_witness_of_three_le_pRank` (`S05_NarrowSCN.lean:1207`) が
+`IsNarrow` から BG の `R₀`(位数 p) + `R₁`(cyclic) + `C_R(R₀) = R₀ ⊔ R₁` を取り出す。
+`narrow_iff_exists_card_prime_centralizer_pRank_le_two` (Cor 5.4) で narrow 性を供給。
+`scn3_nonempty_of_three_le_pRank` が `SCN₃` を供給。
+
+### ⟹ E.3(b) 第 1 節の組み立て手順 (次段)
+
+1. `|S| ≤ p³` の場合分けを潰す (BG: 「`q ≥ 3` なので位数 `p³` 以下の p 群を調べれば従う」)。
+2. `|S| ≥ p⁴` として `SCN(S)` から `r(S) ≥ 3`、`Z = Ω₁(Z(S))` に `|Z| = p`,
+   `C_S(R₀) = R₀ × Z` (setup の `C_R(R₀) = R₀ × R₁` から)。
+3. `S` が narrow (Cor 5.4: 位数 p の `R₀` で `r(C_S(R₀)) ≤ 2`)。
+4. `lemma52` で `|S : T| = p`、`narrow_centralizer_decomp` で `R₀ ⊓ T = ⊥` と分解。
+5. Thm 5.5 の鎖 (`S05_NarrowAutomorphisms.lean:418` 以降) で A-不変列
+   `T = H₀ ⊃ … ⊃ Hₙ = 1`, `H_i = [R₀, H_{i-1}]`, `|H_{i-1}:H_i| = p`。
+6. `H₁ = S₂` と `|S/S'| = p²` (E.7)、帰納で `H_i = S_{i+1}`。
+7. 極大性と **Prop E.2** (完了済) の矛盾で `Ω₁(R)` 自体が指数 p。
+
+⚠ 手順 1 の「位数 `p³` 以下の p 群の検査」は BG が省略している箇所。repo の
+`S04_PGroupsSmallRank.lean` に該当補題があるか着手時に実測すること。
