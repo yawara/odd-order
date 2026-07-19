@@ -54,8 +54,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           `4(ν² - ν) = 0` を導く
     - [x] homocyclic `ZMod` 座標で `ν mod 2` の冪等性を証明し、有限可換
           idempotent 族の common `0`/`1` eigenvector と推移作用の一般帰結を証明する
-    - [ ] 実際の `A/A²` 上で `u ↦ ν̄(u)` の可換性・`X`-共役性を証明し、
-          common-eigenvector 論と Lemma 2 を接続して `exp(A) ≤ 4` を結論する
+    - [x] 実際の `A/A²` 上で `u ↦ ν̄(u)` を加法準同型として構成し、
+          その像が pairwise commuting な冪等作用素族であることを証明する
+    - [x] ambient `X`-作用から `ν̄` の共変性を導き、common-eigenvector 論と
+          involution 推移性から各 `ν̄(u)` が `0` または `1` であることを証明する
+    - [ ] Lemma 2 により `ker ν̄ = A` を示し、像の位数 `2` と `C/A` の位数 `2`、
+          原文の最終場合分けを接続して `exp(A) ≤ 4` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
