@@ -384,8 +384,9 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Higman source frontier (issue 2048):** Lemma 4 本体は `17a033729` で完了。
-      直後の scalar-extension corollary、続いて原典 Lemma 5 を進める。
+    - **Higman source frontier (issue 2048):** Lemma 4 本体と、任意の拡大体における
+      `F₂`-linear invariant copy を排除する直後の Corollary は完了。次は原典 Lemma 5 の
+      squaring map の scalar-extension 公式と一意性を進める。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論を、完成した Higman payloadへ接続する。
 

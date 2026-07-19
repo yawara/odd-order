@@ -82,8 +82,9 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             `L₁ ≃ L₂` から primitive-root contradiction を導く
       - [x] `not_exists_equivariant_linearEquiv_of_higman_bracket`
             (`17a033729`) として landing
-    - [ ] Lemma 4 直後の scalar-extension corollary: 任意の拡大体上で
-          `L₁` と同型な invariant subspace が `L₂` に存在しないことを示す
+    - [x] Lemma 4 直後の scalar-extension corollary: 任意の拡大体上で
+          `L₁` と同型な `F₂`-linear invariant subspace が `L₂` に存在しないことを
+          `not_exists_injective_intertwiner_to_baseChange_of_higman_bracket` として示す
     - [ ] Higman Lemma 5: `H² = H₂` の下で平方写像 `L₁ → L₂` の
           scalar-extension 公式と一意性を構成する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
