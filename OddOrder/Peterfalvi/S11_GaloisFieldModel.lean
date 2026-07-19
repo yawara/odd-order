@@ -21,6 +21,7 @@ opaque proposition `CliffordCaseBData.field_model`.
 namespace OddOrder.Peterfalvi.S11
 
 open OddOrder.GroupTheory OddOrder.RepresentationTheory OddOrder.Isaacs.Ch03
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
@@ -241,6 +242,52 @@ theorem caseB_addSubgroup_closure_scalarRange_eq_top [Finite G] {M : Subgroup G}
       refine le_antisymm le_top (fun y _ => ?_)
       obtain ⟨z, rfl⟩ := e.surjective y
       exact (htop ▸ (Subgroup.mem_top (Additive.toMul z)) : Additive.toMul z ∈ J)
+
+/-- **The `W₁`-action on the chief factor `H̄`** — the `W₁` analogue of `uActionHom`
+(`ChiefFactorCore.lean`), both being restrictions of the full `UW₁`-action
+`quotientMulAutHom chief.N_aInvariant` to a factor of `U ⊔ W₁`. -/
+noncomputable def w1ActionHom {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) →*
+      MulAut (↥data.H ⧸ chief.N) :=
+  (quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+    (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype
+
+/-- **The map `η` of Peterfalvi (9.7.b)**: the `W₁`-action on `H̄` transported to the field model
+by `e`, i.e. `η(w)` is the `e`-conjugate of `w`'s action — the book's defining property
+`φ(h)η(w) = φ(h^w)`.
+
+A priori `η(w)` is only an *additive* automorphism of `F`; the upgrade to a field automorphism is
+the content of (9.7.b) and goes through `ringAutHomOfAddAutHom`.  `AddAut F` is an additive group
+in mathlib, so the codomain is its multiplicative incarnation `Multiplicative (AddAut F)`. -/
+noncomputable def caseB_etaHom {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} [Fact chief.p.Prime]
+    (e : Additive (↥data.H ⧸ chief.N) ≃+ GaloisField chief.p data.q) :
+    ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) →*
+      Multiplicative (AddAut (GaloisField chief.p data.q)) :=
+  (((MulAutMultiplicative (GaloisField chief.p data.q)).toMonoidHom).comp
+      (MulAut.congr (AddEquiv.toMultiplicativeRight e)).toMonoidHom).comp
+    (w1ActionHom data chief)
+
+/-- `η(w)` is literally `e`-conjugation of `w`'s action (definitional form). -/
+theorem caseB_etaHom_apply' {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} [Fact chief.p.Prime]
+    (e : Additive (↥data.H ⧸ chief.N) ≃+ GaloisField chief.p data.q)
+    (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    (y : GaloisField chief.p data.q) :
+    Multiplicative.toAdd (caseB_etaHom (chief := chief) e w) y
+      = e (Additive.ofMul (w1ActionHom data chief w (Additive.toMul (e.symm y)))) := rfl
+
+/-- **The defining property of `η`** (Peterfalvi (9.7.b): `φ(h)η(w) = φ(h^w)`). -/
+@[simp] theorem caseB_etaHom_apply {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} [Fact chief.p.Prime]
+    (e : Additive (↥data.H ⧸ chief.N) ≃+ GaloisField chief.p data.q)
+    (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    (h : ↥data.H ⧸ chief.N) :
+    Multiplicative.toAdd (caseB_etaHom (chief := chief) e w) (e (Additive.ofMul h))
+      = e (Additive.ofMul (w1ActionHom data chief w h)) := by
+  rw [caseB_etaHom_apply', e.symm_apply_apply]
+  rfl
 
 /-- The realized subgroup `C = C_U(H̄)` being trivial makes `uActionHom` injective. -/
 theorem uActionHom_injective_of_cSub_eq_bot [Finite G] {M : Subgroup G}
