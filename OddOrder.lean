@@ -348,6 +348,7 @@ import OddOrder.Peterfalvi.S09_TwoFamiliesParity
 import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 import OddOrder.Peterfalvi.S10_BGInterface
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S11_GaloisFieldModel

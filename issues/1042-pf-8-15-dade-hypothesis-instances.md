@@ -34,9 +34,25 @@ created: 2026-07-19
   hub に設計確認 (typePA の M_s^# 添字化 or 別 def 新設) を出すこと。無断で typePA を
   再定義しない (shared infra、lane b の S12/S14 consumer に波及)。
 
+## 進捗
+
+- **着手順 1 完了 (2026-07-19)**: `OddOrder/Peterfalvi/S10_SubcoherentTypeP.lean` 新設。
+  - (5.2) の repo 対応物 = `S07.Hypothesis` (既約メンバー形、2 元 `CharacterDifferenceImage`
+    固定) と確認。可変長 R (可約 μ 列) は S07_Subcoherent の corrected module note
+    (2026-07-06 hub 検証) どおり `S06.certainTypeR`/`columnImageFamilyCohFree` 側が正本 —
+    `S07.Hypothesis` 形の (8.15.3) は既約部分家族が honest な全内容。
+  - `inducedKernelFamily_subcoherent` (A = A₀(M)、consumer 形) +
+    `inducedKernelFamily_subcoherent_sharp` (A = M^#、書籍 (5.2.b) 字義形; narrowing
+    Z[S,M^#] ⊆ CF(M,(M′)^#) 込み) を `irrSubcoherent` 経由で構成。
+    supporting: `mderivSharp_subset_supportInSubgroup_typePA0` ((8.10) 包含の §8 レベル形)、
+    `inducedKernelFamily_member_support_subset_derivedInG`。
+  - 全 4 宣言 axiom-clean (`propext`/`Classical.choice`/`Quot.sound` のみ、#print axioms 確認)。
+  - 注: 文言は「type III/IV」でなく **P₁ regime** (typePA 忠実域 = 9008 裁定) で scoping。
+    statement 自体は素の `TypePData` で成立 (IsTypeP1 は入力 datum `d` の producer 側)。
+
 ## 着手順 (ungated → gated)
 
-1. **主張 3 の type III/IV 形** (M_s = M′ なので現行 typePA 綴りと整合、ungated):
+1. ~~**主張 3 の type III/IV 形**~~ ✅ 上記 (2026-07-19)。旧計画:
    `Hypothesis (5.2)` の repo 対応物を確認 (S07 の coherence context;
    (5.2) = 「S ⊆ Irr L induced family + τ isometry」形の仮説) し、
    (1.5.e) + (5.3.b) 経由で instance を証明。
