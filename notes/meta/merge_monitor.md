@@ -47,7 +47,7 @@
 > **Pf 本文 `S*` を c → a へ移管**。c の直近 20 commit は全て `OddOrder/BG/**` で Pf 本文に非接触ゆえ境界は空。
 > c の担当 = BG 残 + Pf Appendices (NearFields/Huppert/SemilinearField/FeitSibley)。
 > c が Pf 本文の未コミット作業を持つ場合は破棄せず a へ引き継ぐ (9154 に申告)。
-> residue 2 件: Thm 6.23 standalone (a が S で閉じる) / Lem 3.7 は no-wrapper 方針ゆえ追加作業なし。
+> residue 2 件: ~~Thm 6.23 standalone (a が S で閉じる)~~ **✅ 2026-07-19 a が完了** (`Isaacs/Ch06_FrobeniusActions/ThompsonPComplement.lean`, axiom-clean) / Lem 3.7 は no-wrapper 方針ゆえ追加作業なし。
 > ⚠ **survey note は scope 正本から降格** (同裁定) — 正本は git log + issues + 実測 grep。
 
 > **▶ 2026-07-19 hub 裁定 (ユーザー確認「A は Isaacs を完全に仕上げるタスクでよいか」= YES): lane a =

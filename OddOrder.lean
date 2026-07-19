@@ -311,6 +311,7 @@ import OddOrder.Peterfalvi.S08_CaseBAssembly
 import OddOrder.Peterfalvi.S08_CaseBXunionY
 import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
 import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S08_CrossOrthogonality
 import OddOrder.Peterfalvi.S08_CaseBHortho
 import OddOrder.Peterfalvi.S08_CaseBEnumeration
 import OddOrder.Peterfalvi.S08_CoherenceWeighted

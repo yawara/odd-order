@@ -1023,7 +1023,9 @@ The first Frobenius conjunct is now the **genuine** `H̄ ⋊ Ū`-Frobenius conte
 (`chiefFactor_caseB_action_fpf`, from `caseB.actsIrreducibly`), replacing the former opaque
 `quotientSemidirectFrobenius : Prop` field (de-scaffold, issues 1012/2035).  The remaining type-II
 `HU`-Frobenius clause (`[S,S]` Frobenius with kernel `S_F`, Peterfalvi (10.7)) is the genuine
-character-theoretic Frobenius criterion, gated on `H₀ = 1` ((11.7) ← (10.8)); left `sorry`. -/
+character-theoretic Frobenius criterion, gated on `H₀ = 1` ((11.7) ← (10.8)); it is **proved
+here** (`caseB_no_irreducible_forces_C_bot` → `U` cyclic → `S10.typeF_frobenius_of_card_eq_exponent`
+→ Schur-Zassenhaus conjugacy), so all three conjuncts are discharged and the file is sorry-free. -/
 theorem exceptional_case_frobenius_realization [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}

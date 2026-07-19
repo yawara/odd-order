@@ -659,10 +659,10 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Pf §4 | 14 | 7 | 7 | 0 | 0 | 0 |
 | Pf §5 | 9 | 9 | 0 | 0 | 0 | 0 |
 | Pf §6 | 10 | 10 | 0 | 0 | 0 | 0 |
-| Pf §7 | 9 | 7 | 2 | 0 | 0 | 0 |
+| Pf §7 | 9 | 9 | 0 | 0 | 0 | 0 |
 | Pf §8 | 8 | 3 | 5 | 0 | 0 | 0 |
 | Pf §9 | 11 | 7 | 4 | 0 | 0 | 0 |
-| Pf §10 | 18 | 15 | 2 | 1 | 0 | 0 |
+| Pf §10 | 18 | 16 | 2 | 0 | 0 | 0 |
 | Pf §11 | 11 | 8 | 3 | 0 | 0 | 0 |
 | Pf §12 | 11 | 10 | 1 | 0 | 0 | 0 |
 | Pf §13 | 9 | 8 | 1 | 0 | 0 | 0 |
@@ -708,8 +708,8 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **(5.3)** (a) S subset Irr L implies Hypothesis (5.2); (b) Hypothesis (5.2) for  — (a) fully formalized at book strength: irrSubcoherent (S07_Subcoherent.lean:129, Coq irr_subcoherent) assembles the six-field S07.Hypothesis; the per-member R-d…
-- **(5.8)** Image of a reducible column mu_k under a coherent extension: mu_k^tau1 — The two-branch dichotomy is proven sorry-free as typeII_nu_tau2_dichotomy (S12_TypeIIColumnPin.lean:794) for the type-II S-side column, and the aligned positive…
+- **(5.3)** ✅ **解消 (2026-07-19 lane a)** — (a) S subset Irr L implies Hypothesis (5.2); (b) Hypothesis (5.2) for  — (a) fully formalized at book strength: irrSubcoherent (S07_Subcoherent.lean:129, Coq irr_subcoherent) assembles the six-field S07.Hypothesis; the per-member R-d… 【2026-07-19 lane a 更新: (5.2.e) の 3 層のうち irr×irr (`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`) と red×red (`certainTypeR_imageSet_orthogonal_certainTypeR`) は元から抽象。残る **mixed irr×red** が Sibley/type-P/type-II の 3 つの instance コピー (証明はアンカー 1 個を除いて逐語同一) だった。 これを Hypothesis (4.6) 一般形 `certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV` (`S08_CrossOrthogonality.lean`, 新規 leaf) として抽出 — carrier の代わりに V 上の消滅アンカーを 明示仮説に取る。3 コピーはそれぞれ自分のアンカーを渡す 1 行の適用に置換 (重複証明 296 行を削除)。 ⟹ mixed 層も抽象化され、特殊化債務は解消。】
+- **(5.8)** ⚠ **記述が stale (2026-07-19 lane a 実測)** — Image of a reducible column mu_k under a coherent extension: mu_k^tau1 【二分岐そのものは **type-II 専用ではなく既に抽象**: `eq_smul_chiFam_column_of_vanishOnV` (S05_SigmaTrichotomy.lean:461) が素の `TICyclicHypothesis G` 上で本文どおりの選言を結論し (IsMinimalSimpleOdd も maximal subgroup も type-II も不要)、その組合せ核 `grid_eq_const_column_of_two_col` (S05_GridTrichotomy.lean:366) は群論を一切含まない。`typeII_nu_tau2_dichotomy` は定理でなく**その適用**。 残るのは第 2 分岐の一意性 rider (「j と k のみ同次数」) だが、consumer は `exists_nu_extension_eq_alignedRow_at_pair` (S12_TypeIIGridTranspose.lean:913) が符号を `∃ delta', delta' = 1 ∨ delta' = -1` に吸収するため**どちらの分岐が発火したか決める必要が無い**。 ⟹ 債務でなく設計選択。】
 
 ### Pf §8 — Peterfalvi §8 Some Coherence Theorems, results
 
@@ -745,7 +745,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
 |---|---|---|---|---|
-| (8.11) | 済 | S | N_G(P) ≤ M for nontrivial Sylow P of M_s; M_F and M_s are Hall subgroups of G | CONFIRMED partial after targeted refutation attempt (grep by number in all formats, by descriptive names, by Sylow×Msigma/mainSubgroup combinations). The Hall conjunct is fully proved for all five types (hall_maxNilpoten… 【**2026-07-19 hub 監査で訂正: 部分 → 済**】実測で教科書強度・sorry-free と確認。所在: OddOrder/Peterfalvi/S10_StructureSetup.lean:397 `normalizer_sylow_mainSubgroup_le` (docstring: **Peterfalvi (8.11), first clause**)。Hall conjunct は同 file:450 `hall_maxNilpotentNormalHall_and_mainSubgroup`。 |
+| (8.11) | 済 | S | N_G(P) ≤ M for nontrivial Sylow P of M_s; M_F and M_s are Hall subgroups of G | CONFIRMED partial after targeted refutation attempt (grep by number in all formats, by descriptive names, by Sylow×Msigma/mainSubgroup combinations). The Hall conjunct is fully proved for all five types (hall_maxNilpoten… 【**2026-07-19 hub 監査で訂正: 部分 → 済**】【2026-07-19 lane a 更新: **Sylow-normalizer 側も実在** — `normalizer_sylow_mainSubgroup_le` (S10_StructureSetup.lean:397) が「`P` が `M_s` の非自明 Sylow ⇒ `N_G(P) ≤ M`」を BG Thm A(1) 経由で証明済 (sorry 無し)。Hall 側は同 file:449。両 conjunct が揃うので 部分→済。 survey の「no Peterfalvi-shaped Sylow-normalizer statement exists anywhere」は誤り。】 |
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
