@@ -32,7 +32,7 @@ consumer は issue 2048 の Higman Lemma 5。
 - [x] multiplication の base change が座標ごとに重み `u^(2^i)` を持つことを
       証明する
 - [x] field model を移送した基底で全 actor の同時対角化 API を証明する
-- [ ] Higman の upper-triangular candidate へ接続し、issue 2048 の consumer を
+- [x] Higman の upper-triangular candidate へ接続し、issue 2048 の consumer を
       対象ビルドする
 
 ## 完了条件

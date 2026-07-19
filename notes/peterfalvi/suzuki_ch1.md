@@ -384,9 +384,12 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Higman source frontier (issue 2048):** Lemma 4 本体と、任意の拡大体における
-      `F₂`-linear invariant copy を排除する直後の Corollary は完了。次は原典 Lemma 5 の
-      squaring map の scalar-extension 公式と一意性を進める。
+    - **Higman source frontier (issue 2048):** Lemma 5 は完了。
+      `FrobeniusCoordinates.lean` で full Singer-order を仮定しない normalized
+      Frobenius-conjugate simultaneous eigenbasis を構成し、candidate の
+      actor-equivariance と actual uniqueness を接続した。
+      `exists_lowerCentralSquareMap_eq_frobeniusSum` が原典 p. 85 の actual square-map
+      表示公式を与える。次の source frontier は Higman Lemma 6。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論を、完成した Higman payloadへ接続する。
 
