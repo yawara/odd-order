@@ -130,8 +130,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             `[u²,u] = 1` の actual square-map 接続から triple bracket を消去する
         - [x] 相異なる `i,j,k` の三項 weight は modulo `2^n-1` でどの pair
               weight とも一致しないことを示し、対応 eigenspace を `⊥` にする
-        - [ ] 重複添字の二候補を odd `n` で高々一項へ絞り、
-              `[u²,u] = 1` の weight 成分式で両方を消去する
+        - [x] actual `[u^(2),u] = 0` を平方写像へ接続し、Lemma 5 の Frobenius
+              basis 展開式を仮定する bridge から triple-bracket sum をゼロにする
+        - [ ] 重複添字の二候補を odd `n` で高々一項へ絞り、weight 成分ごとに
+              上の和を分離して両方を消去する
       - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
