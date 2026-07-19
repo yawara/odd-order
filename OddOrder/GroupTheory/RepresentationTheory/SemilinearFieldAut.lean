@@ -7,6 +7,7 @@ import Mathlib.Algebra.Ring.Equiv
 import Mathlib.Algebra.Ring.Aut
 import Mathlib.Algebra.Group.End
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.Algebra.Ring.AddAut
 import Mathlib.FieldTheory.Finite.GaloisField
 
 /-!
@@ -119,6 +120,42 @@ theorem ringAutHomOfAddAutHom_injective {W : Type*} [Group W]
   refine Multiplicative.toAdd.injective (AddEquiv.ext fun x => ?_)
   have := congrArg (fun f : RingAut F => f x) h
   simpa using this
+
+/-! ## Base-point normalization of a scalar field model
+
+Peterfalvi (9.7.b) picks `s ∈ W̄₂^#` and takes for `φ : H̄ → F` the additive isomorphism
+determined by `h = s·φ(h)` — in particular `φ(s) = 1`.  That normalization is what makes the
+twist identity collapse: substituting `h = s` into
+`(φ(h)ψ(x))η(w) = (φ(h)η(w))ψ(w⁻¹xw)` gives `ψ(x)η(w) = ψ(w⁻¹xw)`.
+
+A model produced by the Singer construction is *not* normalized, but normalizing costs nothing:
+rescaling by the unit `(e s)⁻¹` is an additive automorphism of `F` that commutes past the
+scalars (`F` is commutative), so it preserves the intertwining property.
+-/
+
+section BasePoint
+
+/-- **Base-point normalization.**  Given an additive model `e : M ≃+ F` intertwining a scalar
+action (`e (act c x) = μ c * e x`) and a base point `s` with `e s ≠ 0`, rescaling by `(e s)⁻¹`
+produces a model with the *same* scalars in which `s ↦ 1`.
+
+This supplies the `φ(s) = 1` normalization of Peterfalvi (9.7.b) from the unnormalized model that
+the Singer construction returns. -/
+theorem exists_normalized_of_scalar_model {M F : Type*} [Add M] [Field F]
+    {C : Type*} (act : C → M → M) (e : M ≃+ F) (μ : C → Fˣ)
+    (hcompat : ∀ (c : C) (x : M), e (act c x) = (μ c : F) * e x)
+    {s : M} (hs : e s ≠ 0) :
+    ∃ e' : M ≃+ F, (∀ (c : C) (x : M), e' (act c x) = (μ c : F) * e' x) ∧ e' s = 1 := by
+  refine ⟨e.trans (Multiplicative.toAdd (AddAut.mulLeft (Units.mk0 (e s) hs)⁻¹)), ?_, ?_⟩
+  · intro c x
+    change ((Units.mk0 (e s) hs)⁻¹ : F) * e (act c x)
+      = (μ c : F) * (((Units.mk0 (e s) hs)⁻¹ : F) * e x)
+    rw [hcompat c x]
+    ring
+  · change ((Units.mk0 (e s) hs)⁻¹ : F) * e s = 1
+    exact inv_mul_cancel₀ hs
+
+end BasePoint
 
 /-! ## The order of `Aut F` for a finite field
 
