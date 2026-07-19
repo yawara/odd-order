@@ -384,16 +384,15 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Higman source frontier (issue 2048):** Lemmas 4--8 は完了。
-      Lemma 8 では `C² = C'` と exact lower-central chain
-      `C₂ = A`, `C₃ = A²`, `C₄ = A⁴` を証明し、actual
-      `L₂(C) ≃ A/A²`, `L₃(C) ≃ A²/A⁴` と actor-equivariant power map
-      `L₂(C) ≃ L₃(C)` を構成した。公開 endpoint
-      `higmanLemmaEight_pow_two_eq_one` はこの同型を Lemma 6 の triple-bracket
-      obstruction に接続し、原文 p. 87 の `C' = A ⟹ exp(A) ≤ 2` を与える。
-      次の source frontier は Higman Lemma 9: Lemmas 3, 7, 8 の三分岐から
-      maximal abelian normal invariant subgroup `A` に対する
-      `exp(A) ≤ 4` と `Φ(G) ≤ A` を証明する。
+    - **Higman source frontier (issue 2048):** Lemmas 4--9 は完了。
+      Lemma 9 では `[P,A] ≤ A²` を Agemo の square-commutator propagation に接続し、
+      `A ⊔ Φ(P)` 内の cover と Lemma 2 witness から `Φ(C)=A` を導いた。
+      Lemma 7 branch は maximality と矛盾し、Lemma 8 branch は `exp(A) ≤ 2` を与える。
+      そこから `A = Z(P)`、nilpotency class `≤ 2`、`Φ(P) ≤ A` を実証明し、公開 endpoint
+      `higmanLemmaNine` は原文 p. 87 の両結論 `exp(A) ≤ 4` と `Φ(P) ≤ A` をまとめる。
+      次の source frontier は Higman Lemma 10 (pp. 87--88): characteristic `2` の
+      proper odd-degree finite field extensionに対し、任意の `r : ℤ`, `ε` から
+      非零 `α` と `Tr(α · Frob^r(α) · ε) = 0` を構成する有限体補題である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
