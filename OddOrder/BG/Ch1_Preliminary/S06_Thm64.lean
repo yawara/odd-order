@@ -20,8 +20,9 @@ Chapter I §6 (p. 50), mmd `references/bg/local-analysis.mmd` L2011–L2038.
 > `π`-group and `x` centralizes `H`.
 
 **状態**: 本ファイルは Theorem 6.4 の**主張** (`Thm64Statement`)・**帰納骨格**
-(`thm64_of_ih`)・**上流部品**を提供する。**帰納法の二つの場合 (下記) は未証明**なので
-Theorem 6.4 本体はまだ得られていない。
+(`thm64_of_ih`)・reduction「`G = LH` としてよい」(`thm64_of_sup_ne_top`)・
+**場合 1 の完全な証明** (`thm64_case_fitting_primes_not_subset`)・上流部品を提供する。
+**残るのは場合 2 (`π(F(G)) ⊆ π(H)`) のみ**なので Theorem 6.4 本体はまだ得られていない。
 
 ## 帰納骨格 (`|G| + |H|` の強帰納法)
 
@@ -34,8 +35,27 @@ Theorem 6.4 本体はまだ得られていない。
 * `card_lt_card_of_lt` / `card_quotient_add_card_map_mk'_lt` /
   `card_subgroup_add_card_subgroupOf_lt` — その 3 通りの降下で測度が減ることの証明。
 * `thm64_of_ih` — 「`Thm64IH` のもとで主張が言えれば全体が言える」。
-  **残る数学的内容はすべてこの `step` の側** = BG の場合 1 (`π(F(G)) ⊄ π(H)`) と
-  場合 2 (`π(F(G)) ⊆ π(H)`)。
+  残る数学的内容はこの `step` の側 = BG の場合 1 (`π(F(G)) ⊄ π(H)`, **証明済**) と
+  場合 2 (`π(F(G)) ⊆ π(H)`, **未証明**)。
+
+## 場合 1 (`π(F(G)) ⊄ π(H)`) — 証明済
+
+* `thm64_case_fitting_primes_not_subset` / `thm64_case_exists_prime_not_mem` —
+  `G = LH` (`J₁ ⊔ J₂ ⊔ H = ⊤`) と帰納法の仮定のもとで, 場合 1 の結論を出す。
+  後者は例外素数 `p ∈ π(F(G)) ∖ π(H)` を明示的に取った形。原文は `O_p(F(G))` 内の
+  **極小**正規部分群 `N` を取るが, 極小性は証明中で一度も使われない (使うのは
+  `N ≠ 1`・`N ⊴ G`・`N` が `p`-群だけ) ので, ここでは `N := O_p(G)` を直接使う。
+* その道具立て:
+  `mem_normalizer_iff_conj_smul_eq` / `map_conj_smul_eq` / `map_le_normalizer_map` /
+  `le_normalizer_sup` / `conj_smul_eq_self_of_mem_centralizer` / `le_normalizer_conj_smul`
+  (共役・正規化・中心化の相互作用),
+  `isPiSubgroup_conj` / `coprime_card_of_isPiSubgroup_compl` / `isPiSubgroup_of_isPGroup`
+  (`π`-性の移送と互いに素性),
+  `card_eq_card_mul_card_map_mk'` / `isPiSubgroup_of_map_mk'`
+  (`N ⊴ G` に沿った `|P| = |N| · |P/N|` と `π`-性の合成),
+  `opCore_ne_bot_of_mem_primeFactors_card_fitting` (`p ∈ π(F(G))` ⟹ `O_p(G) ≠ 1`),
+  `exists_conj_smul_eq_of_sup_eq` (Schur–Zassenhaus の共役性; 共役子が `N` に取れる),
+  `commutator_mem_of_quotient_centralizes` / `sup_eq_sup_of_map_mk'_eq` (商での計算)。
 
 ## reduction 「`G = LH` としてよい」
 
@@ -595,5 +615,479 @@ theorem thm64_of_sup_ne_top {X : Type u} [Group X] [Finite X] (π : Set ℕ)
   thm64_of_le_proper_subgroup π H G₀ J₁ J₂ (J₁ ⊔ J₂ ⊔ H) hIH
     (le_sup_left.trans le_sup_left) (le_sup_right.trans le_sup_left) le_sup_right hne
 
-end OddOrder.BG.Ch1.S06
 
+
+/-! ## 場合 1 の道具立て: 共役・正規化・`π`-性の相互作用 -/
+
+/-- `g ∈ N_G(K)` ⟺ `g` による共役が `K` を保つ。
+
+mathlib の `Subgroup.mem_normalizer_iff_map_conj_eq` を本ファイルで使う `MulAut.conj` の
+点ごと作用の綴りに直しただけのもの。 -/
+theorem mem_normalizer_iff_conj_smul_eq {K : Subgroup G} {g : G} :
+    g ∈ Subgroup.normalizer (K : Set G) ↔ MulAut.conj g • K = K := by
+  rw [conj_smul_eq_map]
+  exact Subgroup.mem_normalizer_iff_map_conj_eq
+
+/-- 準同型は共役作用と交換する: `f (g K g⁻¹) = f g · f K · (f g)⁻¹`。 -/
+theorem map_conj_smul_eq {G' : Type*} [Group G'] (f : G →* G') (g : G) (K : Subgroup G) :
+    (MulAut.conj g • K).map f = MulAut.conj (f g) • K.map f := by
+  rw [conj_smul_eq_map, conj_smul_eq_map, Subgroup.map_map, Subgroup.map_map]
+  congr 1
+  ext x
+  simp
+
+/-- 正規化の仮説は準同型の像へ移る: `H ≤ N_G(K)` なら `f H ≤ N_{G'}(f K)`。
+
+場合 1 で帰納法の仮定を `G ⧸ N` で使うとき, 仮説 `H ≤ N_G(J₁)`, `H ≤ N_G(J₂)` を
+商へ運ぶのに要る。 -/
+theorem map_le_normalizer_map {G' : Type*} [Group G'] (f : G →* G') {H K : Subgroup G}
+    (h : H ≤ Subgroup.normalizer (K : Set G)) :
+    H.map f ≤ Subgroup.normalizer ((K.map f : Subgroup G') : Set G') := by
+  rintro _ ⟨x, hx, rfl⟩
+  rw [mem_normalizer_iff_conj_smul_eq, ← map_conj_smul_eq,
+    mem_normalizer_iff_conj_smul_eq.mp (h hx)]
+
+/-- 二つの部分群を正規化する部分群は, その join も正規化する。
+
+BG が「`H` normalizes `J₁` and `J₂`, hence `H` normalizes `L = ⟨J₁, J₂⟩`」と述べる段
+(p. 50, mmd L2015)。 -/
+theorem le_normalizer_sup {H J₁ J₂ : Subgroup G}
+    (h₁ : H ≤ Subgroup.normalizer (J₁ : Set G)) (h₂ : H ≤ Subgroup.normalizer (J₂ : Set G)) :
+    H ≤ Subgroup.normalizer ((J₁ ⊔ J₂ : Subgroup G) : Set G) := fun _ hx =>
+  Subgroup.normalizer_inf_normalizer_le_normalizer_sup J₁ J₂ ⟨h₁ hx, h₂ hx⟩
+
+/-- `K` を中心化する元による共役は `K` 上恒等, したがって `K` を保つ。 -/
+theorem conj_smul_eq_self_of_mem_centralizer {K : Subgroup G} {g : G}
+    (hg : g ∈ Subgroup.centralizer (K : Set G)) : MulAut.conj g • K = K := by
+  have hfix : ∀ k ∈ K, g * k * g⁻¹ = k := by
+    intro k hk
+    have hk' : k * g = g * k := Subgroup.mem_centralizer_iff.mp hg k hk
+    rw [← hk']
+    group
+  rw [conj_smul_eq_map]
+  refine le_antisymm ?_ fun x hx => ⟨x, hx, hfix x hx⟩
+  rintro _ ⟨k, hk, rfl⟩
+  change g * k * g⁻¹ ∈ K
+  rw [hfix k hk]
+  exact hk
+
+/-- `t` が `H` を中心化し `H` が `J` を正規化するなら, `H` は共役 `t J t⁻¹` も正規化する。
+
+BG p. 50 の場合 1 で「Thus `yz` centralizes `H`. Hence `H` normalizes `J₁^{yz}`」と
+述べる段。 -/
+theorem le_normalizer_conj_smul {H J : Subgroup G} {t : G}
+    (ht : t ∈ Subgroup.centralizer (H : Set G))
+    (hJ : H ≤ Subgroup.normalizer (J : Set G)) :
+    H ≤ Subgroup.normalizer ((MulAut.conj t • J : Subgroup G) : Set G) := by
+  intro h hh
+  rw [mem_normalizer_iff_conj_smul_eq, ← mul_smul]
+  have hcomm : MulAut.conj h * MulAut.conj t = MulAut.conj t * MulAut.conj h := by
+    rw [← map_mul, ← map_mul, Subgroup.mem_centralizer_iff.mp ht h hh]
+  rw [hcomm, mul_smul, mem_normalizer_iff_conj_smul_eq.mp (hJ hh)]
+
+/-- `π`-部分群の共役はまた `π`-部分群。 -/
+theorem isPiSubgroup_conj [Finite G] {π : Set ℕ} {K : Subgroup G} (g : G)
+    (hK : Subgroup.IsPiSubgroup π K) : Subgroup.IsPiSubgroup π (MulAut.conj g • K) := by
+  rw [conj_smul_eq_map]
+  exact isPiSubgroup_map _ hK
+
+/-- `π'`-部分群と `π`-部分群の位数は互いに素。素因子集合が交わらないことを
+`Nat.disjoint_primeFactors` で互いに素へ翻訳する。 -/
+theorem coprime_card_of_isPiSubgroup_compl [Finite G] {σ : Set ℕ} {A B : Subgroup G}
+    (hA : Subgroup.IsPiSubgroup σᶜ A) (hB : Subgroup.IsPiSubgroup σ B) :
+    Nat.Coprime (Nat.card ↥A) (Nat.card ↥B) := by
+  rw [← Nat.disjoint_primeFactors Nat.card_pos.ne' Nat.card_pos.ne', Finset.disjoint_left]
+  intro q hqA hqB
+  exact hA q hqA (hB q hqB)
+
+/-- `p`-群は `{p}`-部分群。 -/
+theorem isPiSubgroup_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime] {K : Subgroup G}
+    (hK : IsPGroup p K) : Subgroup.IsPiSubgroup ({p} : Set ℕ) K := by
+  obtain ⟨n, hn⟩ := hK.exists_card_eq
+  intro q hq
+  rw [hn] at hq
+  have hqprime : q.Prime := Nat.prime_of_mem_primeFactors hq
+  simp only [Set.mem_singleton_iff]
+  exact (Nat.prime_dvd_prime_iff_eq hqprime Fact.out).mp
+    (hqprime.dvd_of_dvd_pow (Nat.dvd_of_mem_primeFactors hq))
+
+/-! ## `N ⊴ G ≤ P` に沿った位数の分解 -/
+
+/-- **Lagrange の三段形**: `N ⊴ G` と `N ≤ P` について `|P| = |N| · |P N / N|`。
+
+`(N.subgroupOf P).index = |P/N|` は mathlib の `Subgroup.relIndex_ker`
+(`ker f` の相対指数が像の位数に等しい) を `f = QuotientGroup.mk' N` に適用したもの。 -/
+theorem card_eq_card_mul_card_map_mk' [Finite G] {N P : Subgroup G} [N.Normal] (hNP : N ≤ P) :
+    Nat.card ↥P = Nat.card ↥N * Nat.card ↥(P.map (QuotientGroup.mk' N)) := by
+  have hidx : (N.subgroupOf P).index = Nat.card ↥(P.map (QuotientGroup.mk' N)) := by
+    have h := Subgroup.relIndex_ker (QuotientGroup.mk' N) (K := P)
+    rw [QuotientGroup.ker_mk'] at h
+    exact h
+  have hcard : Nat.card ↥(N.subgroupOf P) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNP).toEquiv
+  have hmul := Subgroup.card_mul_index (N.subgroupOf P)
+  rw [hcard, hidx] at hmul
+  exact hmul.symm
+
+/-- `N ⊴ G` が `σ`-群で商 `P/N` も `σ`-群なら `P` 自身が `σ`-群。
+
+BG p. 50 の場合 1 で「By (6.3), `L*` has order relatively prime to the order of `H`」を
+得る段で使う (`L* / N` は `π`-群, `N` は `p`-群, `H` は `π'`-群かつ `p ∤ |H|`)。 -/
+theorem isPiSubgroup_of_map_mk' [Finite G] {σ : Set ℕ} {N P : Subgroup G} [N.Normal]
+    (hNP : N ≤ P) (hN : Subgroup.IsPiSubgroup σ N)
+    (hPq : Subgroup.IsPiSubgroup σ (P.map (QuotientGroup.mk' N))) :
+    Subgroup.IsPiSubgroup σ P := by
+  intro q hq
+  have hqprime : q.Prime := Nat.prime_of_mem_primeFactors hq
+  have hdvd : q ∣ Nat.card ↥N * Nat.card ↥(P.map (QuotientGroup.mk' N)) := by
+    rw [← card_eq_card_mul_card_map_mk' hNP]
+    exact Nat.dvd_of_mem_primeFactors hq
+  rcases (Nat.Prime.dvd_mul hqprime).mp hdvd with h | h
+  · exact hN q (Nat.mem_primeFactors.mpr ⟨hqprime, h, Nat.card_pos.ne'⟩)
+  · exact hPq q (Nat.mem_primeFactors.mpr ⟨hqprime, h, Nat.card_pos.ne'⟩)
+
+/-! ## 場合 1 の入力: `p ∈ π(F(G))` から非自明な正規 `p`-部分群 -/
+
+/-- `p` が `|F(G)|` を割るなら `O_p(G) ≠ 1`。
+
+`F(G)` は冪零 (`Ch01.fitting.isNilpotent`) なので Sylow `p`-部分群 `P` は `F(G)` で
+正規 (`Ch01.Sylow.normal_of_isNilpotent`), したがって特性的
+(`Sylow.characteristic_of_normal`), したがって像 `P ≤ G` は `F(G) ⊴ G` を経て `G` で正規。
+`p`-群ゆえ Isaacs Problem 1B.2 (`Ch01.normal_pgroup_le_opCore`) で `O_p(G)` に入り,
+`|P| = p^{v_p(|F(G)|)} > 1` なので `O_p(G) ≠ 1`。
+
+BG p. 50 の場合 1 が「Let `N` be a minimal normal subgroup of `G` contained in
+`O_p(F(G))`」と述べる箇所の入力。なお原文は極小性を要求するが, **場合 1 の証明は
+`N` の極小性を一度も使わない** (使うのは `N ≠ 1`・`N ⊴ G`・`N` が `p`-群の三点だけ)
+ので, ここでは `O_p(G)` をそのまま採る。`O_p(F(G)) = O_p(G)` なので同じものである。 -/
+theorem opCore_ne_bot_of_mem_primeFactors_card_fitting [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(Ch01.fitting G)).primeFactors) : Ch01.opCore p G ≠ ⊥ := by
+  classical
+  haveI : Group.IsNilpotent ↥(Ch01.fitting G) := Ch01.fitting.isNilpotent
+  set P : Sylow p ↥(Ch01.fitting G) := default with hPdef
+  haveI hPnormal : (P : Subgroup ↥(Ch01.fitting G)).Normal := Ch01.Sylow.normal_of_isNilpotent P
+  haveI : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
+    Sylow.characteristic_of_normal _ hPnormal
+  haveI : (((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype)).Normal :=
+    inferInstance
+  have hle : (P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype ≤ Ch01.opCore p G :=
+    Ch01.normal_pgroup_le_opCore (P.2.map (Ch01.fitting G).subtype)
+  -- `|P| = p ^ v_p(|F(G)|) > 1`
+  have hPcard : Nat.card ↥(P : Subgroup ↥(Ch01.fitting G))
+      = p ^ (Nat.card ↥(Ch01.fitting G)).factorization p := P.card_eq_multiplicity
+  have hpos : 0 < (Nat.card ↥(Ch01.fitting G)).factorization p :=
+    Nat.Prime.factorization_pos_of_dvd Fact.out (Nat.card_pos.ne')
+      (Nat.dvd_of_mem_primeFactors hp)
+  have hPone : Nat.card ↥(P : Subgroup ↥(Ch01.fitting G)) ≠ 1 := by
+    rw [hPcard]
+    exact Nat.ne_of_gt (Nat.one_lt_pow hpos.ne' (Fact.out : p.Prime).one_lt)
+  intro hbot
+  refine hPone ?_
+  have hmapbot : (P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype = ⊥ :=
+    le_bot_iff.mp (hbot ▸ hle)
+  have hcardmap : Nat.card ↥((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype)
+      = Nat.card ↥(P : Subgroup ↥(Ch01.fitting G)) :=
+    Subgroup.card_map_of_injective (Ch01.fitting G).subtype_injective
+  rw [hmapbot, Subgroup.card_bot] at hcardmap
+  exact hcardmap.symm
+
+/-! ## 場合 1 の Schur-Zassenhaus 段 -/
+
+/-- **同じ `N`-剰余をもつ二つの補群は `N` の元で共役** (Schur-Zassenhaus の共役性)。
+
+`N ⊴ G` について `H ⊓ N = K ⊓ N = 1` かつ `H N = K N` なら, `H` と `K` は共に
+`HN` の中で `N` の補群なので, ある `z ∈ N` で `z K z⁻¹ = H`。
+
+BG p. 50 の場合 1 の「In this case, `H` is a Hall `p'`-subgroup of `HN`.
+Take `z ∈ N` such that `(H^y)^z = H`」の段。共役子が `N` の内部に取れることが
+本質的 (`Subgroup.IsComplement'.exists_conj_of_coprime` はそれを与える)。 -/
+theorem exists_conj_smul_eq_of_sup_eq [Finite G] {N H K : Subgroup G} [N.Normal]
+    (hsolv : IsSolvable ↥N) (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥H))
+    (hHN : H ⊓ N = ⊥) (hKN : K ⊓ N = ⊥) (hsup : H ⊔ N = K ⊔ N) :
+    ∃ z ∈ N, MulAut.conj z • K = H := by
+  classical
+  have hHU : H ≤ H ⊔ N := le_sup_left
+  have hNU : N ≤ H ⊔ N := le_sup_right
+  have hKU : K ≤ H ⊔ N := hsup ▸ le_sup_left
+  haveI : (N.subgroupOf (H ⊔ N)).Normal := (inferInstance : N.Normal).subgroupOf _
+  -- `↥(H ⊔ N)` の中で `H`, `K` はともに `N` の補群
+  have hcompl : ∀ A : Subgroup G, A ≤ H ⊔ N → A ⊓ N = ⊥ → A ⊔ N = H ⊔ N →
+      Subgroup.IsComplement' (N.subgroupOf (H ⊔ N)) (A.subgroupOf (H ⊔ N)) := by
+    intro A hAU hAN hAsup
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [disjoint_iff]
+      refine le_antisymm (fun x hx => ?_) bot_le
+      obtain ⟨hxN, hxA⟩ := Subgroup.mem_inf.mp hx
+      have hx1 : (x : G) ∈ (⊥ : Subgroup G) := by
+        rw [← hAN]
+        exact ⟨Subgroup.mem_subgroupOf.mp hxA, Subgroup.mem_subgroupOf.mp hxN⟩
+      exact Subgroup.mem_bot.mpr (Subtype.ext (Subgroup.mem_bot.mp hx1))
+    · rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup hNU hAU, sup_comm N A, hAsup,
+        Subgroup.subgroupOf_self]
+      exact Subgroup.coe_top
+  have hcomplH := hcompl H hHU hHN rfl
+  have hcomplK := hcompl K hKU hKN hsup.symm
+  -- 位数と指数の互いに素性
+  have hcardN : Nat.card ↥(N.subgroupOf (H ⊔ N)) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNU).toEquiv
+  have hcardH : Nat.card ↥(H.subgroupOf (H ⊔ N)) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHU).toEquiv
+  have hidx : (N.subgroupOf (H ⊔ N)).index = Nat.card ↥H := by
+    rw [hcomplH.symm.index_eq_card, hcardH]
+  have hcop' : Nat.Coprime (Nat.card ↥(N.subgroupOf (H ⊔ N)))
+      (N.subgroupOf (H ⊔ N)).index := by
+    rw [hcardN, hidx]; exact hcop
+  haveI : IsSolvable ↥N := hsolv
+  haveI : IsSolvable ↥(N.subgroupOf (H ⊔ N)) :=
+    solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hNU).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hNU).injective
+  obtain ⟨n, hnN, hnconj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop' (Or.inl inferInstance) hcomplK hcomplH
+  refine ⟨(n : G), Subgroup.mem_subgroupOf.mp hnN, ?_⟩
+  have hpush : ((K.subgroupOf (H ⊔ N)).map (MulAut.conj n).toMonoidHom).map (H ⊔ N).subtype
+      = (H.subgroupOf (H ⊔ N)).map (H ⊔ N).subtype := by rw [hnconj]
+  rw [map_subtype_conj_subgroupOf n K hKU, Subgroup.map_subgroupOf_eq_of_le hHU] at hpush
+  rw [conj_smul_eq_map]
+  exact hpush
+
+/-! ## 場合 1 の交換子計算 -/
+
+/-- `z ∈ N` かつ `yN` が `HN/N` を中心化するなら, `t = z y` は各 `h ∈ H` について
+`h⁻¹ h^t ∈ N` を満たす。
+
+BG p. 50 の場合 1 で `mem_centralizer_of_mem_normalizer_of_commutator_le` の仮説
+`hcomm` を供給する段。計算はすべて商 `G ⧸ N` の中で行う: `zN = 1` ゆえ `tN = yN` で,
+`yN` は `hN` と可換だから `(h⁻¹ h^t)N = 1`。 -/
+theorem commutator_mem_of_quotient_centralizes {N H : Subgroup G} [N.Normal] {y z : G}
+    (hz : z ∈ N)
+    (hy : (QuotientGroup.mk' N) y ∈ Subgroup.centralizer
+      ((H.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))) :
+    ∀ h ∈ H, h⁻¹ * ((z * y)⁻¹ * h * (z * y)) ∈ N := by
+  intro h hh
+  have hzq : (QuotientGroup.mk' N) z = 1 := by
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact hz
+  have hhq : (QuotientGroup.mk' N) h ∈ H.map (QuotientGroup.mk' N) :=
+    Subgroup.mem_map_of_mem _ hh
+  have hcomm : (QuotientGroup.mk' N) h * (QuotientGroup.mk' N) y
+      = (QuotientGroup.mk' N) y * (QuotientGroup.mk' N) h :=
+    Subgroup.mem_centralizer_iff.mp hy _ hhq
+  have hgoal : (QuotientGroup.mk' N) (h⁻¹ * ((z * y)⁻¹ * h * (z * y))) = 1 := by
+    simp only [map_mul, map_inv, hzq, one_mul]
+    calc ((QuotientGroup.mk' N) h)⁻¹ *
+            (((QuotientGroup.mk' N) y)⁻¹ * (QuotientGroup.mk' N) h * (QuotientGroup.mk' N) y)
+        = ((QuotientGroup.mk' N) h)⁻¹ *
+            (((QuotientGroup.mk' N) y)⁻¹ *
+              ((QuotientGroup.mk' N) h * (QuotientGroup.mk' N) y)) := by group
+      _ = ((QuotientGroup.mk' N) h)⁻¹ *
+            (((QuotientGroup.mk' N) y)⁻¹ *
+              ((QuotientGroup.mk' N) y * (QuotientGroup.mk' N) h)) := by rw [hcomm]
+      _ = 1 := by group
+  rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hgoal
+
+/-- `A N/N = B N/N` なら `A N = B N`。`ker (G → G/N) = N ≤ A ⊔ N` なので
+`A ⊔ N = (A N/N) の逆像` であることによる。 -/
+theorem sup_eq_sup_of_map_mk'_eq {N A B : Subgroup G} [N.Normal]
+    (h : A.map (QuotientGroup.mk' N) = B.map (QuotientGroup.mk' N)) : A ⊔ N = B ⊔ N := by
+  have key : ∀ C : Subgroup G,
+      C ⊔ N = (C.map (QuotientGroup.mk' N)).comap (QuotientGroup.mk' N) := by
+    intro C
+    have hker : (QuotientGroup.mk' N).ker ≤ C ⊔ N := by
+      rw [QuotientGroup.ker_mk']; exact le_sup_right
+    have hbot : N.map (QuotientGroup.mk' N) = ⊥ :=
+      (Subgroup.map_eq_bot_iff _).mpr (le_of_eq (QuotientGroup.ker_mk' N).symm)
+    conv_lhs => rw [← Subgroup.comap_map_eq_self hker]
+    rw [Subgroup.map_sup, hbot, sup_bot_eq]
+  rw [key A, key B, h]
+
+
+/-! ## BG Theorem 6.4 の場合 1 (`π(F(G)) ⊄ π(H)`) -/
+
+/-- **BG Theorem 6.4, 場合 1** (p. 50, mmd L2019–L2035), 例外素数 `p` を明示した形。
+
+`G = LH` (`hsup`, 一般の場合は `thm64_of_sup_ne_top` で還元済) を仮定した帰納段のうち,
+`π(F(G)) ⊄ π(H)` の場合。原文の段どりに沿った証明:
+
+1. `H` が `J₁, J₂` を正規化するので `L := ⟨J₁, J₂⟩` も正規化し, `G = LH` より `L ⊴ G`
+   (`le_normalizer_sup` + `Subgroup.normalizer_eq_top_iff`)。
+2. `N := O_p(G)` は非自明な正規 `p`-部分群
+   (`opCore_ne_bot_of_mem_primeFactors_card_fitting`)。原文は `O_p(F(G))` 内の**極小**
+   正規部分群を取るが, 極小性は場合 1 の証明で一度も使われない (使うのは `N ≠ 1`・
+   `N ⊴ G`・`N` が `p`-群の三点だけ) ので `O_p(G) = O_p(F(G))` をそのまま採る。
+3. `G/L ≅ H/(H ∩ L)` は `p'`-群なので **(6.2)** で `N ≤ L`
+   (`le_of_isPiSubgroup_of_quotient_isPiGroup`)。
+4. 仮説 8 個を `G ⧸ N` へ移して帰納法の仮定を使う (`NormalHallHeredity` の
+   `normal_coprime_card_index_map_mk'`, `FittingHeredity` の
+   `isNilpotent_quotient_fitting_of_surjective`, `map_le_normalizer_map`)。測度減少は
+   `card_quotient_add_card_map_mk'_lt`。得られる `y ∈ L` が **(6.3)**
+   「`⟨J₁ʸ, J₂⟩N/N` は `π`-群で `y` は `HN/N` を中心化する」を満たす。
+5. `H` は `HN` の Hall `p'`-部分群なので Schur–Zassenhaus の共役性で `z ∈ N` を取り
+   `z (y H y⁻¹) z⁻¹ = H` (`exists_conj_smul_eq_of_sup_eq`)。
+6. `t := zy` は `H` を中心化する (`mem_centralizer_of_mem_normalizer_of_commutator_le`)。
+   ⚠ この段の原文 `[H, yz] ⊆ H ∩ L = 1` は誤植で, 正しくは `H ∩ N = 1` —
+   ファイル冒頭の注記を参照。
+7. `L* := ⟨J₁ᵗ, J₂⟩N` は `H` に正規化され (`le_normalizer_conj_smul`), `L*/N` が `π`-群・
+   `N` が `p`-群なので `|L*|` は `|H|` と互いに素 (`isPiSubgroup_of_map_mk'` +
+   `coprime_card_of_isPiSubgroup_compl`)。よって Proposition 1.5
+   (`exists_centralizing_conj_sup_isPiGroup`) が `w ∈ C_{L*}(H)` を与える。
+8. `x := wt` が求める元 (`L* ≤ L` と `t ∈ L` から `x ∈ L`, 中心化元の積は中心化元)。 -/
+theorem thm64_case_exists_prime_not_mem {X : Type u} [Group X] [Finite X] (π : Set ℕ)
+    (H G₀ J₁ J₂ : Subgroup X) [G₀.Normal] (hIH : Thm64IH X H)
+    (hsup : J₁ ⊔ J₂ ⊔ H = ⊤) {p : ℕ}
+    (hpF : p ∈ (Nat.card ↥(Ch01.fitting X)).primeFactors)
+    (hpH : p ∉ (Nat.card ↥H).primeFactors) :
+    Thm64Statement π H G₀ J₁ J₂ := by
+  intro hH hG₀hall hG₀nil hQnil hJ₁pi hJ₂pi hJ₁norm hJ₂norm
+  classical
+  haveI hpfact : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpF⟩
+  haveI hXsolv : IsSolvable X :=
+    isSolvable_of_isNilpotent_quotient_fitting_of_normal G₀ hG₀nil hQnil
+  -- `H` は `p ∉ π(H)` ゆえ `{p}'`-部分群
+  have hHp : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ H := by
+    intro q hq
+    simp only [Set.mem_compl_iff, Set.mem_singleton_iff]
+    rintro rfl
+    exact hpH hq
+  -- ## 1. `L := ⟨J₁, J₂⟩` は `G = LH` ゆえ `G` で正規
+  have hHnormL : H ≤ Subgroup.normalizer ((J₁ ⊔ J₂ : Subgroup X) : Set X) :=
+    le_normalizer_sup hJ₁norm hJ₂norm
+  haveI hLnormal : (J₁ ⊔ J₂ : Subgroup X).Normal := by
+    rw [← Subgroup.normalizer_eq_top_iff, ← top_le_iff, ← hsup]
+    exact sup_le Subgroup.le_normalizer hHnormL
+  -- ## 2. `N := O_p(G)` は非自明な正規 `p`-部分群で `H ⊓ N = ⊥`
+  obtain ⟨N, hNnormal, hNp, hNne⟩ :
+      ∃ N : Subgroup X, N.Normal ∧ Subgroup.IsPiSubgroup ({p} : Set ℕ) N ∧ N ≠ ⊥ :=
+    ⟨Ch01.opCore p X, Ch01.opCore.normal p X,
+      isPiSubgroup_of_isPGroup (Ch01.opCore_isPGroup p X),
+      opCore_ne_bot_of_mem_primeFactors_card_fitting hpF⟩
+  haveI : N.Normal := hNnormal
+  have hHN : H ⊓ N = ⊥ := inf_eq_bot_of_isPiSubgroup_compl hHp hNp
+  -- ## 3. (6.2): `G/L` は `H` の像なので `p'`-群, ゆえに `N ≤ L`
+  have hHmapL : H.map (QuotientGroup.mk' (J₁ ⊔ J₂)) = ⊤ := by
+    have h1 : ((J₁ ⊔ J₂) ⊔ H).map (QuotientGroup.mk' (J₁ ⊔ J₂)) = ⊤ := by
+      rw [hsup]
+      exact Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective _)
+    have hbot : (J₁ ⊔ J₂).map (QuotientGroup.mk' (J₁ ⊔ J₂)) = ⊥ :=
+      (Subgroup.map_eq_bot_iff _).mpr (le_of_eq (QuotientGroup.ker_mk' _).symm)
+    rwa [Subgroup.map_sup, hbot, bot_sup_eq] at h1
+  have hNL : N ≤ J₁ ⊔ J₂ := by
+    refine le_of_isPiSubgroup_of_quotient_isPiGroup (π := ({p} : Set ℕ)) ?_ hNp
+    have h1 : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (H.map (QuotientGroup.mk' (J₁ ⊔ J₂))) :=
+      isPiSubgroup_map _ hHp
+    rw [hHmapL] at h1
+    intro q hq
+    exact h1 q (by rwa [Subgroup.card_top])
+  -- ## 4. `G ⧸ N` で帰納法の仮定 — (6.3)
+  haveI hG₀mapnormal : (G₀.map (QuotientGroup.mk' N)).Normal :=
+    (OddOrder.GroupTheory.normal_coprime_card_index_map_mk' inferInstance hG₀hall N).1
+  have hmeas : Nat.card (X ⧸ N) + Nat.card ↥(H.map (QuotientGroup.mk' N))
+      < Nat.card X + Nat.card ↥H := card_quotient_add_card_map_mk'_lt hNne H
+  have hG₀nil' : Group.IsNilpotent
+      (↥(G₀.map (QuotientGroup.mk' N)) ⧸ Ch01.fitting ↥(G₀.map (QuotientGroup.mk' N))) :=
+    OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_surjective
+      ((QuotientGroup.mk' N).subgroupMap G₀)
+      (MonoidHom.subgroupMap_surjective _ _) hG₀nil
+  have hlecomap : G₀ ≤ (G₀.map (QuotientGroup.mk' N)).comap (QuotientGroup.mk' N) :=
+    Subgroup.map_le_iff_le_comap.mp le_rfl
+  have hQnil' : Group.IsNilpotent
+      (((X ⧸ N) ⧸ G₀.map (QuotientGroup.mk' N)) ⧸
+        Ch01.fitting ((X ⧸ N) ⧸ G₀.map (QuotientGroup.mk' N))) := by
+    refine OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_surjective
+      (QuotientGroup.map G₀ (G₀.map (QuotientGroup.mk' N)) (QuotientGroup.mk' N) hlecomap)
+      ?_ hQnil
+    intro q
+    obtain ⟨q', rfl⟩ := QuotientGroup.mk_surjective q
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q'
+    exact ⟨QuotientGroup.mk x, rfl⟩
+  obtain ⟨ybar, hybarmem, hybarpi, hybarc⟩ :=
+    hIH (X ⧸ N) (H.map (QuotientGroup.mk' N)) hmeas π (G₀.map (QuotientGroup.mk' N))
+      (J₁.map (QuotientGroup.mk' N)) (J₂.map (QuotientGroup.mk' N))
+      (isPiSubgroup_map _ hH)
+      (OddOrder.GroupTheory.normal_coprime_card_index_map_mk' inferInstance hG₀hall N).2
+      hG₀nil' hQnil'
+      (isPiSubgroup_map _ hJ₁pi) (isPiSubgroup_map _ hJ₂pi)
+      (map_le_normalizer_map _ hJ₁norm) (map_le_normalizer_map _ hJ₂norm)
+  rw [← Subgroup.map_sup] at hybarmem
+  obtain ⟨y, hyL, rfl⟩ := hybarmem
+  -- ## 5. Schur–Zassenhaus: `z ∈ N` で `z (y H y⁻¹) z⁻¹ = H`
+  have hconjHmap : (MulAut.conj y • H).map (QuotientGroup.mk' N)
+      = H.map (QuotientGroup.mk' N) := by
+    rw [map_conj_smul_eq, conj_smul_eq_self_of_mem_centralizer hybarc]
+  obtain ⟨z, hzN, hzconj⟩ :=
+    exists_conj_smul_eq_of_sup_eq (N := N) (H := H) (K := MulAut.conj y • H) inferInstance
+      (coprime_card_of_isPiSubgroup_compl hHp hNp).symm hHN
+      (inf_eq_bot_of_isPiSubgroup_compl (isPiSubgroup_conj y hHp) hNp)
+      (sup_eq_sup_of_map_mk'_eq hconjHmap).symm
+  -- ## 6. `t = zy` は `H` を中心化する (原文の `H ∩ L = 1` は `H ∩ N = 1` の誤植)
+  have htconj : MulAut.conj (z * y) • H = H := by
+    rw [map_mul, mul_smul, hzconj]
+  have htc : z * y ∈ Subgroup.centralizer (H : Set X) :=
+    mem_centralizer_of_mem_normalizer_of_commutator_le hHN
+      (mem_normalizer_iff_conj_smul_eq.mpr htconj)
+      (commutator_mem_of_quotient_centralizes hzN hybarc)
+  have htL : z * y ∈ (J₁ ⊔ J₂ : Subgroup X) := (J₁ ⊔ J₂).mul_mem (hNL hzN) hyL
+  -- ## 7. `L* = ⟨J₁ᵗ, J₂⟩N` に Proposition 1.5 を当てる
+  have hJ₁tpi : Subgroup.IsPiSubgroup π (MulAut.conj (z * y) • J₁) :=
+    isPiSubgroup_conj _ hJ₁pi
+  have hJ₁tnorm : H ≤ Subgroup.normalizer ((MulAut.conj (z * y) • J₁ : Subgroup X) : Set X) :=
+    le_normalizer_conj_smul htc hJ₁norm
+  have hNnormH : H ≤ Subgroup.normalizer (N : Set X) := by
+    rw [Subgroup.normalizer_eq_top_iff.mpr hNnormal]
+    exact le_top
+  have hLstarnorm : H ≤ Subgroup.normalizer
+      (((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X) : Set X) :=
+    le_normalizer_sup (le_normalizer_sup hJ₁tnorm hJ₂norm) hNnormH
+  have hzq : (QuotientGroup.mk' N) z = 1 := by
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact hzN
+  have hLstarmap : ((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X).map
+        (QuotientGroup.mk' N)
+      = (MulAut.conj ((QuotientGroup.mk' N) y) • J₁.map (QuotientGroup.mk' N))
+          ⊔ J₂.map (QuotientGroup.mk' N) := by
+    have hbot : N.map (QuotientGroup.mk' N) = ⊥ :=
+      (Subgroup.map_eq_bot_iff _).mpr (le_of_eq (QuotientGroup.ker_mk' N).symm)
+    rw [Subgroup.map_sup, Subgroup.map_sup, hbot, sup_bot_eq, map_conj_smul_eq, map_mul, hzq,
+      one_mul]
+  have hLstarpi : Subgroup.IsPiSubgroup (π ∪ ({p} : Set ℕ))
+      ((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X) := by
+    refine isPiSubgroup_of_map_mk' le_sup_right (hNp.mono Set.subset_union_right) ?_
+    rw [hLstarmap]
+    exact hybarpi.mono Set.subset_union_left
+  have hcop : Nat.Coprime (Nat.card ↥H)
+      (Nat.card ↥((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X)) := by
+    refine coprime_card_of_isPiSubgroup_compl ?_ hLstarpi
+    intro q hq
+    simp only [Set.mem_compl_iff, Set.mem_union, Set.mem_singleton_iff, not_or]
+    exact ⟨hH q hq, hHp q hq⟩
+  haveI : IsSolvable ↥((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X) := inferInstance
+  obtain ⟨w, hwmem, hwc, hwpi⟩ :=
+    exists_centralizing_conj_sup_isPiGroup (A := H)
+      (N := ((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X)) hLstarnorm hcop
+      (J₁ := MulAut.conj (z * y) • J₁) (J₂ := J₂)
+      (le_sup_left.trans le_sup_left) hJ₁tpi hJ₁tnorm
+      (le_sup_right.trans le_sup_left) hJ₂pi hJ₂norm
+  -- ## 8. `x := w t`
+  have hLstarL : ((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X) ≤ J₁ ⊔ J₂ := by
+    refine sup_le (sup_le ?_ le_sup_right) hNL
+    calc MulAut.conj (z * y) • J₁
+        ≤ MulAut.conj (z * y) • (J₁ ⊔ J₂ : Subgroup X) :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr le_sup_left
+      _ = J₁ ⊔ J₂ := Subgroup.Normal.conj_smul_eq_self _ _
+  refine ⟨w * (z * y), (J₁ ⊔ J₂).mul_mem (hLstarL hwmem) htL, ?_, ?_⟩
+  · rw [map_mul, mul_smul]
+    exact hwpi
+  · exact (Subgroup.centralizer (H : Set X)).mul_mem hwc htc
+
+/-- **BG Theorem 6.4, 場合 1** (p. 50) — 原文どおりの場合分けの綴り `π(F(G)) ⊄ π(H)`。
+
+`thm64_case_exists_prime_not_mem` に例外素数を渡すだけ。 -/
+theorem thm64_case_fitting_primes_not_subset {X : Type u} [Group X] [Finite X] (π : Set ℕ)
+    (H G₀ J₁ J₂ : Subgroup X) [G₀.Normal] (hIH : Thm64IH X H)
+    (hsup : J₁ ⊔ J₂ ⊔ H = ⊤)
+    (hnotsub : ¬ (Nat.card ↥(Ch01.fitting X)).primeFactors ⊆ (Nat.card ↥H).primeFactors) :
+    Thm64Statement π H G₀ J₁ J₂ := by
+  obtain ⟨p, hpF, hpH⟩ := Finset.not_subset.mp hnotsub
+  exact thm64_case_exists_prime_not_mem π H G₀ J₁ J₂ hIH hsup hpF hpH
+
+
+end OddOrder.BG.Ch1.S06

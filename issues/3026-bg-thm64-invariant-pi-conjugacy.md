@@ -334,3 +334,46 @@ Case 1 が第2波の商側 transport (`normal_coprime_card_index_map_mk'` /
 `MonoidHom.subgroupComap` (`Mathlib/Algebra/Group/Subgroup/Map.lean:496`) に
 `subgroupComap_surjective_of_surjective` はあるが**単射版が無い**。今回は
 `MulEquiv.subgroupCongr` + `Subgroup.subgroupOfEquivOfLe` で迂回したので新規 infra は不要だった。
+
+---
+
+## 進捗 (2026-07-19 第5波): **Case 1 完了** — 残りは Case 2 のみ
+
+`S06_Thm64.lean` 599 → 1093 行。17 宣言、すべて sorry-free・axiom-clean・AxiomsCheck 登録済。
+
+- **`thm64_case_exists_prime_not_mem`** (`:934`) — 例外素数 `p` を明示的に取る主力形。
+- **`thm64_case_fitting_primes_not_subset`** (`:1084`) — BG の場合分けそのままの形
+  (`¬ π(F(G)) ⊆ π(H)`)。
+- 補助 15 件 (共役/normalizer/centralizer 6 件、π-算術 5 件、Case 1 固有 4 件)。
+
+### book からの意図的な単純化 2 点 (いずれも弱化ではない)
+
+1. **極小正規部分群は不要だった**。BG は `O_p(F(G))` 内の極小正規 `N` を取るが、Case 1 の議論は
+   極小性を一切使わず `N ⊴ G`・`N ≠ 1`・`N` が `p`-群 しか要らない。⟹ `N := O_p(G)` を直接取った
+   (`= O_p(F(G))`)。`exists_minimal_normal_le` は結局呼んでいない。
+2. **BG (6.2) は `π := {p}` で instantiate する**。`G/L ≅ H/(H∩L)` が `p′`-群なのは `p ∉ π(H)`
+   ゆえで、周囲の `π` で instantiate すると `p ∈ π` が不明なので型が付かない。
+
+erratum は指示どおり処理済 — `mem_centralizer_of_mem_normalizer_of_commutator_le` に
+`hdisj := H ⊓ N = ⊥` (`inf_eq_bot_of_isPiSubgroup_compl` 由来) を渡しており、`H ∩ L` は使っていない。
+
+### ⚠ 見積表の予測が外れた箇所 (記録)
+
+- Case 1 の行数見積 300-450 に対し実測 ~470 行 (docstring 込み)。**今回は見積が当たった**
+  (これまでの波は 2-3 倍高かった)。
+- ⚠ **「Case 1 が `isNilpotent_quotient_fitting_quotient` の消費者になる」という予測は誤りだった**。
+  Case 1 が実際に使うのは `isNilpotent_quotient_fitting_of_surjective` の 2 回適用
+  (`G₀N/N` を `G₀` の商として、`(X/N)/(G₀N/N)` を `X/G₀` の商として)。
+  plain な `_quotient` corollary は **repo 全体で消費者ゼロのまま**。
+  `NormalHallHeredity.normal_coprime_card_index_map_mk'` の方は予測どおり初めて消費された。
+
+### 残り = **Case 2 のみ** (`π(F(G)) ⊆ π(H)`)
+
+Case 2 が landed すれば `thm64_of_ih` の `step` は**新しい数学ゼロの 3 分岐 dispatch**:
+`by_cases J₁ ⊔ J₂ ⊔ H = ⊤` → `thm64_of_sup_ne_top`、次に primeFactors 包含で
+`thm64_case_fitting_primes_not_subset` / Case 2。
+
+Case 2 は BG の (6.1) と `M = G₀ or G` の分岐の唯一の消費者 (Case 1 はどちらも触っていない)。
+
+⚠ **配置**: `S06_Thm64.lean` は既に 1093 行。Case 2 (500-800 見積) は 1500 行 trigger を
+超えるので、**sibling leaf `S06_Thm64Case2.lean` に置くこと**。
