@@ -238,6 +238,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
@@ -8231,6 +8232,23 @@ pairwise formula after scalar extension. -/
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.exists_lowerCentralSquareMap_eq_frobeniusSum
+
+/-! **Higman Lemma 6, degree-three group-theoretic layer**: the actual mixed
+commutator descends to `L₂ × L₁ → L₃`, spans `L₃`, and is equivariant.  Its
+composition with the degree-two bracket is the actual trilinear commutator
+`[[x,y],z]`, whose values also span `L₃`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.quotient_layerKernel_two_lowerCentralSeries_two_le_center
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_span_eq_top
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_equivariant
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutatorTrilinear_span_eq_top
 
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a

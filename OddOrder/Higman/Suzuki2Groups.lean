@@ -20,6 +20,7 @@ import OddOrder.Higman.Suzuki2Groups.HigmanFinalCase
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
 
