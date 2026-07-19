@@ -904,19 +904,6 @@ theorem A1_subset_typeIA (M : Subgroup G) (data : TypeIData M) :
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 
-/-- **`M`-conjugation invariance of `sharpSubgroup H`** when `M` normalizes `H` (general helper for
-the type-`τ` Dade-support sets `A₁(M) = M_s#`, `A(M) = (M')#`, all of the form `sharpSubgroup H`
-with `H ⊴ M`). -/
-theorem sharpSubgroup_conj_mem {H : Subgroup G} {m : G}
-    (hn : m ∈ Subgroup.normalizer (H : Set G)) {a : G}
-    (ha : a ∈ OddOrder.GroupTheory.sharpSubgroup H) :
-    m * a * m⁻¹ ∈ OddOrder.GroupTheory.sharpSubgroup H := by
-  obtain ⟨haH, ha1⟩ := (Set.mem_sdiff a).mp ha
-  rw [Subgroup.mem_normalizer_iff] at hn
-  refine (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr ((hn a).mp (SetLike.mem_coe.mp haH)), ?_⟩
-  exact fun h => (conj_ne_one (fun h1 => ha1 (Set.mem_singleton_iff.mpr h1)))
-    (Set.mem_singleton_iff.mp h)
-
 /-- **`M`-conjugation invariance of `A₁(M) = M_s#`** for every Peterfalvi type: `M_s` is `M_F`
 (types I, II, V) or `M'` (types III, IV), both `⊴ M`. -/
 theorem A1_conj_mem (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviType) {m : G}
@@ -1240,7 +1227,7 @@ Here `X` is `A_1(M)` (any Peterfalvi type) or the type-`P` support `A_0(M)` of (
 faithful **`P₁` regime** (`IsTypeP1`, i.e. types III/IV/V; issue 9008: the repo `typePA0`
 over-claims for type `P₂` = II — its `A`-part `(M')^#` includes the Frobenius-complement points
 `U^#` that Peterfalvi's actual `A(M)` excludes, and for those the escape control is not a
-(8.13) fact.  The honest type-II support is the strictly smaller `honestTypeP2A0Set`, S15).
+(8.13) fact.  The honest type-II support is the strictly smaller `typePACore0`, S15).
 
 The `D ⊆ A₁(M)` clause is the (8.13.b) escape reduction: `V^M`-points are non-escaping and the
 `A`-part is already `σ`-sharp (`escaping_typePA0_mem_sigmaSharp_of_isTypeP1`), while

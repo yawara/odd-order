@@ -62,10 +62,10 @@ theorem Hypothesis.nuGridSupply_swap [Finite G]
       unfold OddOrder.GroupTheory.typePV
       rw [Sdata.W_eq, hyp.Sdata.W_eq, hW1', hW2',
         hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]
-    have hA0 : honestTypeP2A0Set hyp.S Sdata = honestTypeP2A0Set hyp.S hyp.Sdata := by
-      simp only [honestTypeP2A0Set, hPV]
+    have hA0 : S10.typePACore0 hyp.S Sdata = S10.typePACore0 hyp.S hyp.Sdata := by
+      simp only [S10.typePACore0, hPV]
     change (hyp.mu j i - hyp.mu j k).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.S Sdata) hyp.S
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S Sdata) hyp.S
     rw [hA0]
     exact hyp.mu_diff_support j hi hk hdeg
 

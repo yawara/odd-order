@@ -179,7 +179,7 @@ theorem Hypothesis.dadeT0_apply_eq_zero_of_regular [Fintype G] [Finite G]
     (Tdata : TypePData hyp.T) (hW1 : Tdata.W1 = hyp.W2) (hW2 : Tdata.W2 = hyp.W1)
     {f : ClassFunction ↥hyp.T ℂ}
     (hf : f.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     {x : G} (hx : x ∈ OddOrder.GroupTheory.conjClassSet
       ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)))) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
@@ -191,30 +191,30 @@ theorem Hypothesis.dadeT0_apply_eq_zero_of_regular [Fintype G] [Finite G]
     ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
       f).of_isConj (isConj_iff.mpr ⟨g, hg⟩)]
   have hA0supp : f.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (honestTypeP2ASet_subset_A0Set Tdata))
+      (typePACore_subset_A0Set Tdata))
   have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.T Tdata := by
     refine ⟨?_, ?_⟩
     · have hWeq : (Tdata.W : Set G) = (hyp.W : Set G) := by
         rw [Tdata.W_eq, hW1, hW2, sup_comm, ← hyp.W_eq_join]
       rw [hWeq]; exact hw.1
     · rw [hW1, hW2, Set.union_comm]; exact hw.2
-  have hwA0 : w ∈ honestTypeP2A0Set hyp.T Tdata :=
+  have hwA0 : w ∈ S10.typePACore0 hyp.T Tdata :=
     Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
     (hyp.dadeHypT0 hG hTP Tdata)
     ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
     hA0supp]
-  let a : {a : G // a ∈ honestTypeP2A0Set hyp.T Tdata} := ⟨w, hwA0⟩
+  let a : {a : G // a ∈ S10.typePACore0 hyp.T Tdata} := ⟨w, hwA0⟩
   have hwh : w ∈ (hyp.dadeHypT0 hG hTP Tdata).hCoset a :=
     ⟨1, (hyp.dadeHypT0 hG hTP Tdata).H a |>.one_mem, by simp [a]⟩
   rw [(hyp.dadeHypT0 hG hTP Tdata).isDadeMap_dadeMap.map_eq_of_mem_hCoset _ a hwh]
   by_contra hne
   have hwSupp : (⟨w, (hyp.dadeHypT0 hG hTP Tdata).mem_L hwA0⟩ : ↥hyp.T) ∈ f.support :=
     ClassFunction.mem_support.mpr hne
-  have hwA : w ∈ honestTypeP2ASet hyp.T := hf hwSupp
-  have hwDeriv : w ∈ derivedInG hyp.T := honestTypeP2ASet_subset_derived hwA
+  have hwA : w ∈ S10.typePACore hyp.T := hf hwSupp
+  have hwDeriv : w ∈ derivedInG hyp.T := S10.typePACore_subset_derived hwA
   exact (OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived Tdata hwV) hwDeriv
 
 
@@ -258,7 +258,7 @@ theorem Hypothesis.sSet_memberRFamily_T_imageSet_of_irr [Finite G]
     (hirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
     ∃ (hr : ¬ ClassFunction.IsReal (η : ClassFunction ↥hyp.T ℂ))
       (hs : ((η : ClassFunction ↥hyp.T ℂ).conj - (η : ClassFunction ↥hyp.T ℂ)).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T),
+        OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T),
       (hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
           (hyp.dadeHypT hG hTP) (hyp.dadeHypT_hconj hG hTP) ⟨η, hirr⟩ hr hs).imageSet := by
@@ -357,7 +357,7 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
     (hφirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ)
     (hr : ¬ ClassFunction.IsReal (φ : ClassFunction ↥hyp.T ℂ))
     (hs : ((φ : ClassFunction ↥hyp.T ℂ).conj - (φ : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     {α : ClassFunction G ℂ}
     (hα : α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
       (hyp.dadeHypT hG hTP) (hyp.dadeHypT_hconj hG hTP) ⟨φ, hφirr⟩ hr hs).imageSet)
@@ -394,16 +394,16 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
     have := cd.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
   have hdiffsupp' : ((φ : ClassFunction ↥hyp.T ℂ)
       - (φ : ClassFunction ↥hyp.T ℂ).conj).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
     rw [show (φ : ClassFunction ↥hyp.T ℂ) - (φ : ClassFunction ↥hyp.T ℂ).conj =
         -((φ : ClassFunction ↥hyp.T ℂ).conj - (φ : ClassFunction ↥hyp.T ℂ)) by abel,
       ClassFunction.support_neg]
     exact hs
   have hA0supp' : ((φ : ClassFunction ↥hyp.T ℂ)
       - (φ : ClassFunction ↥hyp.T ℂ).conj).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hdiffsupp'.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (honestTypeP2ASet_subset_A0Set Tdata))
+      (typePACore_subset_A0Set Tdata))
   have hcdimg : (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
           ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
@@ -468,10 +468,10 @@ theorem Hypothesis.dadeOfDiff_orthogonal_typeP_T [Finite G]
     (x χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.T)
     (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction ↥hyp.T ℂ))
     (hxdiffsupp : ((x : ClassFunction ↥hyp.T ℂ).conj - (x : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     (hχreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥hyp.T ℂ))
     (hχdiffsupp : ((χ : ClassFunction ↥hyp.T ℂ).conj - (χ : ClassFunction ↥hyp.T ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     (hxχ : ClassFunction.inner (x : ClassFunction ↥hyp.T ℂ) (χ : ClassFunction ↥hyp.T ℂ) = 0)
     (hxχbar :
       ClassFunction.inner (x : ClassFunction ↥hyp.T ℂ) (χ : ClassFunction ↥hyp.T ℂ).conj = 0)
@@ -613,7 +613,7 @@ theorem Hypothesis.sSet_coherent_dade_caseB_T [Finite G]
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)) := by
   classical
   -- Pivot: a nonzero reducible ν-row `ν₁ = ∑_j ν_{1j} ∈ 𝒯` (self-norm `p`).
   have hi0 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
@@ -717,7 +717,7 @@ theorem Hypothesis.sSetIrrDegT_member_support_subset [Finite G]
     (hvd : hyp.v * hyp.d ≠ 1) (d : ℂ)
     {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ hyp.sSetIrrDegT hG hvd d) :
     φ.support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T ∪ {1} := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T ∪ {1} := by
   haveI : Fintype G := Fintype.ofFinite G
   obtain ⟨hφsSet, _⟩ := hφ
   obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
@@ -733,7 +733,7 @@ theorem Hypothesis.sSetIrrDegT_member_diff_supported [Finite G]
     {x : ClassFunction ↥hyp.T ℂ} (hx : x ∈ hyp.sSetIrrDegT hG hvd d)
     {y : ClassFunction ↥hyp.T ℂ} (hy : y ∈ hyp.sSetIrrDegT hG hvd d) :
     (x - y).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T := by
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
   haveI : Fintype G := Fintype.ofFinite G
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
@@ -776,7 +776,7 @@ noncomputable def Hypothesis.sSet_member_differenceImage_T [Fintype G] [Finite G
     sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG) ⟨ξ, hξ, rfl⟩
   have hdiffsupp :
       ((φ : ClassFunction ↥hyp.T ℂ).conj - (φ : ClassFunction ↥hyp.T ℂ)).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T :=
+        OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T :=
     hyp.sSet_member_diffsupp_T hG hvd hξ
   exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
     (hyp.dadeHypT hG hTP) (hyp.dadeHypT_hconj hG hTP) φ hreal hdiffsupp
@@ -805,13 +805,13 @@ noncomputable def Hypothesis.sSetIrrDegT_subcoherent [Fintype G] [Finite G]
     (d : ℂ) (hd : star d = d) :
     OddOrder.Peterfalvi.S07.Hypothesis (L := ↥hyp.T) (G := G)
       (hyp.sSetIrrDegT hG hvd d)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) := by
   classical
   have hconjmem := hyp.sSetIrrDegT_closedUnderConjugate hG hvd d hd
   refine OddOrder.Peterfalvi.S07.irrSubcoherent
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
       ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
-    (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)
+    (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     (fun φ hφ => ?_) ?_ ?_ ?_ ?_ ?_
   · have hφsSet : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) := hφ.1
     have hirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter φ := hφ.2.1
@@ -845,9 +845,9 @@ theorem Hypothesis.sSetIrrDegT_coherent [Fintype G] [Finite G]
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
       (hyp.sSetIrrDegT hG hvd d)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)) := by
   classical
-  set A := OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T with hA
+  set A := OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T with hA
   set hyp' := hyp.sSetIrrDegT_subcoherent hG hvd hTP d hd with hhyp'
   have hSfin : (hyp.sSetIrrDegT hG hvd d).Finite := hyp.sSetIrrDegT_finite hG hvd d
   have hirr : ∀ ζ ∈ hyp.sSetIrrDegT hG hvd d, ClassFunction.inner ζ ζ = 1 :=
@@ -937,7 +937,7 @@ theorem Hypothesis.sSetIrrDegT_coherent_indT [Finite G]
     (h2 : 2 ≤ (hyp.sSetIrrDegT hG hvd d).ncard) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (hyp.sSetIrrDegT hG hvd d)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) :=
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)) :=
   (hyp.sSetIrrDegT_coherent hG hvd hTP d hd hd0 h2).map fun c =>
     c.congrMap fun φ hφ => by
       rw [hyp.indT_apply]
@@ -967,7 +967,7 @@ theorem Hypothesis.sSetIrrDegT_pa_coherent_indT_caseA [Finite G]
     (caseA : CliffordCaseAData chars) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indT
       (hyp.sSetIrrDegT hG hvd (((hyp.toTypesIIIIIIVSetupT hG hvd).q * caseA.a : ℕ) : ℂ))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.T) hyp.T)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)) := by
   have hqpos : 0 < (hyp.toTypesIIIIIIVSetupT hG hvd).q := Nat.card_pos
   exact hyp.sSetIrrDegT_coherent_indT hG hnoV hvd hTP _ (star_natCast _)
     (Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hqpos.ne' caseA.a_pos.ne'))

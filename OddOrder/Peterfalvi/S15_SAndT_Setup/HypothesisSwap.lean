@@ -112,7 +112,7 @@ structure NuGridSupplyData [Finite G] (hyp : Hypothesis (G := G)) : Prop where
     i ≠ ⟨0, hyp.q_prime.pos⟩ → k ≠ ⟨0, hyp.q_prime.pos⟩ →
     hyp.nu i j 1 = hyp.nu k j 1 →
     (hyp.nu i j - hyp.nu k j).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2A0Set hyp.T Tdata) hyp.T
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T
   /-- **Peterfalvi (4.3.c) at `T`, value identity** (Coq `prTIirr_id`): on `W ∖ W₁` the
   `ν`-grid is the signed `ω`-grid, `ν_{ij}(w) = δ'_i·ω_{ij}(w)`. -/
   nu_apply_of_not_mem_W1 : ∀ (i : Fin hyp.q) (j : Fin hyp.p) (w : G) (hwW : w ∈ hyp.W)

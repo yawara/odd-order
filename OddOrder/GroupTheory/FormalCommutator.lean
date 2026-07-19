@@ -174,6 +174,20 @@ theorem evalWord_append (f : X → G) (l₁ l₂ : List (FormalCommutator X)) :
     evalWord f (l₁ ++ l₂) = evalWord f l₁ * evalWord f l₂ := by
   simp [evalWord, List.map_append]
 
+/-- A word of bare variables evaluates to the ordered product of their values. -/
+@[simp] theorem evalWord_map_of (f : X → G) (l : List X) :
+    evalWord f (l.map FreeMagma.of) = (l.map f).prod := by
+  simp [evalWord, List.map_map, Function.comp_def]
+
+/-- Evaluation turns a concatenation of subwords into the product of their
+values. -/
+theorem evalWord_flatMap {ι : Type*} (f : X → G) (l : List ι)
+    (F : ι → List (FormalCommutator X)) :
+    evalWord f (l.flatMap F) = (l.map fun a => evalWord f (F a)).prod := by
+  induction l with
+  | nil => simp
+  | cons a t ih => rw [List.flatMap_cons, evalWord_append, ih, List.map_cons, List.prod_cons]
+
 /-- The swap identity at the level of words: exchanging the first two factors of
 a word costs one extra factor, their formal bracket. -/
 theorem evalWord_swap (f : X → G) (u v : FormalCommutator X)
@@ -181,6 +195,66 @@ theorem evalWord_swap (f : X → G) (u v : FormalCommutator X)
     evalWord f (u :: v :: l) = evalWord f (v :: u :: (u * v) :: l) := by
   simp only [evalWord_cons, ← mul_assoc]
   rw [eval_mul_comm f u v]
+
+/-! ## Substitution
+
+Hall's argument compares one formal word evaluated at different assignments: the
+assignment attached to a set `A` of labels kills every variable labelled outside
+`A`.  The two lemmas below say what that does — factors whose support escapes
+`A` die, and the surviving factors do not notice which `A ⊇ support` was used.
+-/
+
+section Substitution
+
+variable [DecidableEq L]
+
+/-- **Killing labels outside `A` kills every factor whose support escapes `A`.** -/
+theorem eval_eq_one_of_not_subset (label : X → L) {A : Finset L} {f : X → G}
+    (hf : ∀ x : X, label x ∉ A → f x = 1) {c : FormalCommutator X}
+    (hc : ¬ support label c ⊆ A) : eval f c = 1 := by
+  induction c using FreeMagma.recOnMul with
+  | ih1 x =>
+      have hx : label x ∉ A := by
+        simpa [support_of, Finset.singleton_subset_iff] using hc
+      simp [hf x hx]
+  | ih2 u v hu hv =>
+      rw [support_mul, Finset.union_subset_iff] at hc
+      rw [eval_mul]
+      rcases not_and_or.mp hc with h | h
+      · rw [hu h]; group
+      · rw [hv h]; group
+
+/-- **Only the labels in the support matter.**  Two assignments agreeing on the
+variables whose labels occur in `c` give `c` the same value. -/
+theorem eval_congr (label : X → L) {f f' : X → G} {c : FormalCommutator X}
+    (h : ∀ x : X, label x ∈ support label c → f x = f' x) : eval f c = eval f' c := by
+  induction c using FreeMagma.recOnMul with
+  | ih1 x => exact h x (by simp)
+  | ih2 u v hu hv =>
+      rw [eval_mul, eval_mul, hu fun x hx => h x (by simp [hx]),
+        hv fun x hx => h x (by simp [hx])]
+
+/-- Word form of `eval_eq_one_of_not_subset`. -/
+theorem evalWord_eq_one_of_not_subset (label : X → L) {A : Finset L} {f : X → G}
+    (hf : ∀ x : X, label x ∉ A → f x = 1) {l : List (FormalCommutator X)}
+    (hl : ∀ c ∈ l, ¬ support label c ⊆ A) : evalWord f l = 1 := by
+  induction l with
+  | nil => simp
+  | cons c t ih =>
+      rw [evalWord_cons, eval_eq_one_of_not_subset label hf (hl c (by simp)),
+        ih fun d hd => hl d (List.mem_cons_of_mem _ hd), one_mul]
+
+/-- Word form of `eval_congr`. -/
+theorem evalWord_congr (label : X → L) {f f' : X → G} {l : List (FormalCommutator X)}
+    (h : ∀ c ∈ l, ∀ x : X, label x ∈ support label c → f x = f' x) :
+    evalWord f l = evalWord f' l := by
+  induction l with
+  | nil => simp
+  | cons c t ih =>
+      rw [evalWord_cons, evalWord_cons, eval_congr label (h c (by simp)),
+        ih fun d hd => h d (List.mem_cons_of_mem _ hd)]
+
+end Substitution
 
 /-- An ordered product of formal commutators all of weight at least `w` lies in
 the book's `γ_w`. -/

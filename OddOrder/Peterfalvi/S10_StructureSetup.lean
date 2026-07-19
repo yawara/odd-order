@@ -384,6 +384,148 @@ noncomputable abbrev mainSubgroup (M : Subgroup G) (tau : PeterfalviType) :=
 /-- **Peterfalvi (8.10)**: the notation `A_1(M) = M_s#`, shared as `A1`. -/
 noncomputable abbrev A1 (M : Subgroup G) (tau : PeterfalviType) := OddOrder.GroupTheory.A1 M tau
 
+/-- **`M`-conjugation invariance of `sharpSubgroup H`** when `M` normalizes `H` (general helper for
+the type-`τ` Dade-support sets `A₁(M) = M_s#`, `A(M) = (M')#`, all of the form `sharpSubgroup H`
+with `H ⊴ M`). -/
+theorem sharpSubgroup_conj_mem {H : Subgroup G} {m : G}
+    (hn : m ∈ Subgroup.normalizer (H : Set G)) {a : G}
+    (ha : a ∈ OddOrder.GroupTheory.sharpSubgroup H) :
+    m * a * m⁻¹ ∈ OddOrder.GroupTheory.sharpSubgroup H := by
+  obtain ⟨haH, ha1⟩ := (Set.mem_sdiff a).mp ha
+  rw [Subgroup.mem_normalizer_iff] at hn
+  refine (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr ((hn a).mp (SetLike.mem_coe.mp haH)), ?_⟩
+  intro h
+  refine ha1 (Set.mem_singleton_iff.mpr ?_)
+  have harw : a = m⁻¹ * (m * a * m⁻¹) * m := by group
+  rw [harw, Set.mem_singleton_iff.mp h]
+  group
+
+/-! ### (8.10): the book-literal, core-indexed support `A(M) = ⋃_{x ∈ M_s^#} C_{M'}(x)^#`
+
+Peterfalvi (8.10) (p. 47) sets `M_s = M_F` for types I, II, V and `M_s = M'` for types III, IV,
+and — for `M` of type `𝒫` — defines
+
+  `A(M) = ⋃_{x ∈ M_s^#} C_{M'}(x)^#`,   `A₀(M) = A(M) ∪ V^M`.
+
+By (8.11) (Reference: [BG], Proposition 16.1) the group `M_s` **is** BG's `M_σ`, so the index set
+is `Msigma M` and `typePACore` below is the book's `A(M)` verbatim, for **every** type.  The
+`typePA` of `MaximalSubgroupType.lean` is the `P₁` specialisation `A(M) = (M')^#` — correct exactly
+when `M_σ = M'`, i.e. for types III/IV/V, which is what the book records right after (8.10)
+("`A₁(M) = A(M) = (M')^#` if `M` is of Type III, IV or V").  The bridge is
+`typePACore_eq_typePA_of_isTypeP1`.  Issue 9008 / hub ruling 9163 (Option B′). -/
+
+/-- **Peterfalvi (8.10)**: the book-literal type-`𝒫` support `A(M) = ⋃_{x ∈ M_s^#} C_{M'}(x)^#`,
+the nonidentity elements of `M' = derivedInG M` centralizing some nonidentity element of the core
+`M_s = M_σ`.  Faithful for every Peterfalvi type; for type `P₂` (= type II, `M_σ = M_F ⊊ M'`) it is
+strictly smaller than `typePA = (M')^#`, which over-claims the Frobenius-complement points `U^#`
+(they centralize nothing in `M_σ^#`).
+
+Unlike `typePA` this takes **no** `TypePData` argument: the book's `A(M)` depends only on `M`. -/
+def typePACore (M : Subgroup G) : Set G :=
+  OddOrder.GroupTheory.centralizerSupport
+    (OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)) (derivedInG M)
+
+/-- **Peterfalvi (8.10)**: `A₀(M) = A(M) ∪ V^M` on the book-literal `A(M) = typePACore M`, with
+`V^M = conjClassSetIn M (typePV M data)` the **`M`**-conjugacy closure of the cyclic-TI regular set
+`V = W ∖ (W₁ ∪ W₂)` (Coq `class_support V L`; the `G`-closure would not fit inside the proper `M`,
+cf. the `typePA0` docstring). -/
+def typePACore0 (M : Subgroup G) (data : TypePData M) : Set G :=
+  typePACore M ∪ OddOrder.GroupTheory.conjClassSetIn M (OddOrder.GroupTheory.typePV M data)
+
+@[simp] theorem mem_typePACore {M : Subgroup G} {y : G} :
+    y ∈ typePACore M ↔
+      y ∈ derivedInG M ∧ y ≠ 1 ∧
+        ∃ x ∈ OddOrder.GroupTheory.sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M),
+          y ∈ Subgroup.centralizer ({x} : Set G) :=
+  Iff.rfl
+
+/-- Every element of `A(M)` is a nonidentity element of `G`. -/
+theorem typePACore_subset_sharp {M : Subgroup G} :
+    typePACore M ⊆ OddOrder.Peterfalvi.S04.sharp (Set.univ : Set G) := by
+  rintro y ⟨-, hy1, -⟩
+  exact OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ y, hy1⟩
+
+/-- **`1 ∉ A(M)`**: the support consists of nonidentity elements (`typePACore_subset_sharp`).
+This is the `h1notA` input the Dade-coherence producer `S07.coherentEqualDegree_fromDade`
+requires (`1 ∉ A` guarantees the induced difference `τ(χ_j − χ_0)` sees the whole Dade
+support). -/
+theorem typePACore_one_not_mem {M : Subgroup G} : (1 : G) ∉ typePACore M := fun h =>
+  (OddOrder.Peterfalvi.S04.mem_sharp.mp (typePACore_subset_sharp h)).2 rfl
+
+/-- `A(M) ⊆ M'` (the support lives in the derived subgroup). -/
+theorem typePACore_subset_derived {M : Subgroup G} :
+    typePACore M ⊆ (derivedInG M : Set G) := fun _ hy => hy.1
+
+/-- `A(M) ⊆ M`. -/
+theorem typePACore_subset {M : Subgroup G} : typePACore M ⊆ (M : Set G) := fun _ hy =>
+  Subgroup.map_subtype_le _ hy.1
+
+/-- **`A(M)` is `M`-conjugation invariant.**  Both `M_σ` (`Msigma`) and `M' = derivedInG M` are
+`M`-normal, so conjugating `y ∈ A(M)` and its centralized `M_σ`-witness by `m ∈ M` stays in
+`A(M)`. -/
+theorem typePACore_conj_mem [Finite G] {M : Subgroup G} {m : G} (hm : m ∈ M) {y : G}
+    (hy : y ∈ typePACore M) : m * y * m⁻¹ ∈ typePACore M := by
+  obtain ⟨hyM', hy1, x, hxσ, hyC⟩ := hy
+  have hmM' : m ∈ Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) :=
+    OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm
+  have hmMσ : m ∈ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M hm
+  refine ⟨?_, ?_, m * x * m⁻¹, ?_, ?_⟩
+  · -- `m·y·m⁻¹ ∈ M'` since `m ∈ M ≤ N_G(M')`.
+    exact (Subgroup.mem_normalizer_iff.mp hmM' y).mp hyM'
+  · exact fun h => hy1 (by
+      have hyeq : y = m⁻¹ * (m * y * m⁻¹) * m := by group
+      rw [hyeq, h]; group)
+  · exact sharpSubgroup_conj_mem hmMσ hxσ
+  · -- `m·y·m⁻¹` centralizes `m·x·m⁻¹`.
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+    calc m * y * m⁻¹ * (m * x * m⁻¹)
+        = m * (y * x) * m⁻¹ := by group
+      _ = m * (x * y) * m⁻¹ := by rw [hyC]
+      _ = m * x * m⁻¹ * (m * y * m⁻¹) := by group
+
+/-- **`A(M) ⊆ hatMsigma M`** (BG Theorem-E notation): every `A(M)`-point centralizes a nonidentity
+`M_σ`-element, so `M_σ ⊓ C_G(y) ≠ ⊥`, and lies in `M' ≤ M`. -/
+theorem typePACore_subset_hatMsigma [Finite G] {M : Subgroup G} :
+    typePACore M ⊆ OddOrder.BG.Ch4.S16.hatMsigma M := by
+  rintro y ⟨hyM', -, x, hxσ, hyC⟩
+  obtain ⟨hxMσ, hx1⟩ := (Set.mem_sdiff _).mp hxσ
+  refine ⟨Subgroup.map_subtype_le _ hyM', ?_⟩
+  -- `x ∈ M_σ ⊓ C_G(y)` is a nonidentity witness (`y ∈ C_G(x) ↔ x ∈ C_G(y)`).
+  intro hbot
+  have hxCy : x ∈ Subgroup.centralizer ({y} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+    exact hyC.symm
+  have : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) :=
+    Subgroup.mem_inf.mpr ⟨SetLike.mem_coe.mp hxMσ, hxCy⟩
+  rw [hbot] at this
+  exact hx1 (Set.mem_singleton_iff.mpr (Subgroup.mem_bot.mp this))
+
+/-- **The `P₁` bridge: `typePACore M = typePA M data` for type `P₁`.**  Peterfalvi records this
+right after (8.10): "`A₁(M) = A(M) = (M')^#` if `M` is of Type III, IV or V".  Formally, type `P₁`
+gives `M' = M_σ` (`isTypeP1_derivedInG_eq_Msigma`), so the index subgroup of the union coincides
+with its host and the centralizer condition collapses
+(`centralizerSupport_sharpSubgroup_of_le`), leaving `(M')^# = typePA M data`.
+
+This is the compatibility statement that lets every existing type-`P₁` consumer of `typePA` stay
+unchanged while type `P₂` (= type II) is served by `typePACore` (hub ruling 9163, Option B′). -/
+theorem typePACore_eq_typePA_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M)
+    (data : TypePData M) :
+    typePACore M = typePA M data := by
+  rw [typePACore, ← OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hM hP1,
+    OddOrder.GroupTheory.centralizerSupport_sharpSubgroup_of_le (le_refl (derivedInG M)),
+    typePA_eq_sharpSubgroup_derivedInG]
+
+/-- **`A₀` form of the `P₁` bridge**: `typePACore0 M data = typePA0 M data` for type `P₁`
+(both `A₀`'s add the same `V^M`). -/
+theorem typePACore0_eq_typePA0_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M)
+    (data : TypePData M) :
+    typePACore0 M data = typePA0 M data := by
+  rw [typePACore0, typePA0, typePACore_eq_typePA_of_isTypeP1 hG hM hP1 data]
+
 /-- **Peterfalvi (8.11), first clause**: if `P` is a non-trivial Sylow subgroup of `M_s`, then
 `N_G(P) ⊆ M`.
 

@@ -520,7 +520,7 @@ theorem tSideDadeMap_inner_tauSbetaGrid_eq_zero_of_exact_supports [Finite G]
   have hbetaA0 : (OddOrder.Peterfalvi.S15.betaGrid hyp.base
       ⟨1, by have := hyp.base.three_le_p; omega⟩).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (OddOrder.Peterfalvi.S15.honestTypeP2A0Set hyp.base.S hyp.base.Sdata)
+        (OddOrder.Peterfalvi.S10.typePACore0 hyp.base.S hyp.base.Sdata)
         hyp.base.S := by
     intro y hy
     exact OddOrder.Peterfalvi.S15.sharpP_union_V_subset_A0 hG hyp.base (hbeta hy)

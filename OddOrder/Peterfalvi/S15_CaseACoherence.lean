@@ -68,11 +68,11 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
     (hS₂S : S₂ ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hS₂conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂)
     (hS₂coh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS S₂
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)))
     (hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
     (hnopair : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS (S₂ ∪ {χ, χ.conj})
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)))
     (h2a : 2 * caseA.a = chief.p - 1)
     (hCUprime : chars.C = chars.Uprime)
     (hS3deg : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
@@ -101,7 +101,7 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
   obtain ⟨cohS₂_indS⟩ := hS₂coh
   have hindS_dade : ∀ f : ClassFunction ↥hyp.S ℂ,
       f ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.S) S₂
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) →
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) →
       hyp.indS f = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f := fun f hf => by
     rw [hyp.indS_apply, ← hyp.sInstance_dade_eq_induce hG hnoV
@@ -109,14 +109,14 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
   have hS₂cohD : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))) S₂
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) :=
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) :=
     ⟨cohS₂_indS.congrMap hindS_dade⟩
   have hnopairD : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
           ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
         (S₂ ∪ {χ, χ.conj})
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
     intro χ hχ
     rintro ⟨c⟩
     refine hnopair χ hχ ⟨c.congrMap (fun f hf => ?_)⟩
@@ -233,7 +233,7 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
       linear_combination h2
     exact Nat.cast_injective h3
   have hαsupp : ((γ - ψ₁ : ClassFunction ↥hyp.S ℂ)).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S :=
+      OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S :=
     hyp.nineElevenAlphaSupportS hG chars caseA ⟨0, hq0⟩ hψ₁sSet hψ₁deg
   -- `α^τ ∈ ℤ[Irr G]`, norm preservation
   have hταZIrr : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
@@ -270,14 +270,14 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
           (c₃.extension lam') := by
     intro lam hlam lam' hlam'
     have hdiffsupp : ((lam - lam' : ClassFunction ↥hyp.S ℂ)).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S := by
+        OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
       have h := hyp.sSet_scaledDiff_support hG hlam.1 hlam'.1 (c := 1)
         (by rw [hS3deg lam hlam, hS3deg lam' hlam', Nat.cast_one, one_mul])
       rwa [one_smul] at h
     have hzss : (lam - lam' : ClassFunction ↥hyp.S ℂ)
         ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
           (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂)
-          (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S) :=
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) :=
       OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
         ⟨Submodule.sub_mem _ (Submodule.subset_span hlam) (Submodule.subset_span hlam'),
           hdiffsupp⟩
@@ -415,11 +415,11 @@ theorem Hypothesis.nineElevenEqualityRefutationS [Finite G]
     (hS₂S : S₂ ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hS₂conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂)
     (hS₂coh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS S₂
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)))
     (hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
     (hnopair : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS (S₂ ∪ {χ, χ.conj})
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)))
     (h2a : 2 * caseA.a = chief.p - 1)
     (hCUprime : chars.C = chars.Uprime)
     (hS3deg : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
@@ -532,11 +532,11 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation [Finite G]
     (hS₂S : S₂ ⊆ sSet (hyp.toTypesIIIIIIVSetupS hG))
     (hS₂conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂)
     (hS₂coh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS S₂
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)))
     (hS₃ne : (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂).Nonempty)
     (hnopair : ∀ χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS (S₂ ∪ {χ, χ.conj})
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S))) :
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))) :
     False := by
   classical
   letI : Fintype ↥hyp.S := Fintype.ofFinite _
@@ -671,7 +671,7 @@ theorem Hypothesis.sSet_coherent_indS_caseA [Finite G]
     (caseA : CliffordCaseAData chars) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   classical
   -- Peterfalvi (9.11) non-Galois: the maximal-coherent-subfamily refutation.  The degree-`q·a`
   -- irreducible cut `S₁(q·a)` is the coherent conjugation-closed base prefix
@@ -717,7 +717,7 @@ theorem Hypothesis.sSet_coherent_indS_A [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S)) := by
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   rcases clifford_dichotomy hG (hyp.mkSection11CharacterDataS_honest hG chief) with hA | hB
   · exact hyp.sSet_coherent_indS_caseA hG hnoV (hyp.mkSection11CharacterDataS_honest hG chief)
       hA.some
@@ -748,7 +748,7 @@ theorem Hypothesis.sSet_coherent_indS_A_pinned [Finite G]
     (chief : ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
     ∃ c : OddOrder.Peterfalvi.S07.IsCoherent hyp.indS
       (sSet (hyp.toTypesIIIIIIVSetupS hG))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (honestTypeP2ASet hyp.S) hyp.S),
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S),
       (∀ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →
         c.extension (∑ i : Fin hyp.q, hyp.mu i j) = ∑ i : Fin hyp.q, hyp.eta i j) ∨
       (hyp.p = 3 ∧ ∀ j j' : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ →

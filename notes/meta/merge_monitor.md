@@ -27,6 +27,20 @@
 > c の queue は BG に十分残る: issue 0126 (Thm A(6))、9132 (Hall collecting process =
 > App.E 全体の unlock)、9133 (CN 3-step = App.D の unlock)、App.D/E の実 sorry 11 件。
 
+> **🕳 2026-07-20 hub tick への追加検査: 新 leaf が root import に載っているか**。
+> レーンが新設した leaf が `OddOrder.lean` から到達不能だと **`lake build OddOrder` の閉包に
+> 入らず、フルビルド gate が一切検証しない**。実害: c の `FormalCommutator` /
+> `FormalCollection` / `PolynomialSequences` の 3 本が未検証のまま 2 tick 通過した
+> (登録して job 数 4528 → 4532 で実測確認、幸い green だった)。
+> ⟹ **合流のたびに `git diff --name-only main...<lane>` の新規 `.lean` を拾い、
+> `OddOrder.lean` からの到達性を確認する**。未登録なら hub が import を追加してから gate を回す。
+> 全数監査は次の 1 行 (orphan 0 が正常):
+> ```
+> python3 - <<'EOF'  # OddOrder/** の全 leaf のうち誰からも import されないものを列挙
+> ... (実装は本 tick の hub 手順を参照; AxiomsCheck は例外)
+> EOF
+> ```
+>
 > **🛑 2026-07-19 hub tick への追加検査 (issue 0131): レーン停止の検出**。
 > レーンが「main 同期直後の clean 状態」で `ScheduleWakeup` を呼ばずに turn を終え、**黙って止まる**
 > 事故が同日 2 回 (a 05:36 → 5h51m 空転 / c 21:19 → 38 分で検出)。成果損失はゼロだが frontier が凍る。
