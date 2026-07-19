@@ -27,6 +27,14 @@
 > c の queue は BG に十分残る: issue 0126 (Thm A(6))、9132 (Hall collecting process =
 > App.E 全体の unlock)、9133 (CN 3-step = App.D の unlock)、App.D/E の実 sorry 11 件。
 
+> **🛑 2026-07-19 hub tick への追加検査 (issue 0131): レーン停止の検出**。
+> レーンが「main 同期直後の clean 状態」で `ScheduleWakeup` を呼ばずに turn を終え、**黙って止まる**
+> 事故が同日 2 回 (a 05:36 → 5h51m 空転 / c 21:19 → 38 分で検出)。成果損失はゼロだが frontier が凍る。
+> ⟹ **各 tick で `~/.claude/projects/-home-ywr-odd-order-<lane>/*.jsonl` の最終更新時刻を見る**。
+> `git log` の最終 commit 時刻だけでは「大きめのコミットを書いている最中」と区別できない
+> (c は 21:00 時点では実際に生きていた)。transcript が ~20 分以上止まっていれば停止と判定し、
+> **報告する** (unsupervised レーンへ hub からメッセージは送れない = 再開はユーザー操作)。
+>
 > **🔢 2026-07-19 hub 裁定 (issue 0130): shared-infra claim をレーン別サブバンドへ — 共有 `SEQUENCE.9000` 凍結**。
 > 2026-07-18 の補強 (`max(SEQUENCE, 実在ファイル最大)+1`) は「main 取り込み済みなら解消する」を前提に
 > していたが、**同日 20 時台に 2 度衝突**して前提が成り立たないことが実証された:
