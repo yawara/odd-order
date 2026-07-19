@@ -30,6 +30,7 @@ set_option autoImplicit false
 
 namespace OddOrder.Higman.Suzuki2Groups
 
+open Module
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
 open OddOrder.Isaacs.Ch03
@@ -725,6 +726,164 @@ theorem lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
       phi a horder hAgemo hfreeZero hfreeOne hfreeTwo
   exact (classThreeQuotientAction_orderOf_ne_three
     phi a hAgemo hfreeZero hfreeOne hfreeTwo) hquotOrder
+
+/-! ## The repeated-index weight orbit -/
+
+private theorem twoPower_cyclicAdd_modEq
+    {n : ℕ} [NeZero n] (a s : Fin n) :
+    Nat.ModEq (2 ^ n - 1) (2 ^ (a.val + s.val)) (2 ^ (a + s).val) := by
+  have hpowpos : 0 < 2 ^ n := by positivity
+  have hbase : Nat.ModEq (2 ^ n - 1) (2 ^ n) 1 := by
+    convert Nat.add_modEq_left (n := 2 ^ n - 1) (a := 1) using 1; omega
+  by_cases hwrap : n ≤ a.val + s.val
+  · have hval : (a + s).val = a.val + s.val - n := by
+      rw [Fin.val_add_eq_ite]
+      simp [hwrap]
+    have hsum : a.val + s.val = n + (a.val + s.val - n) := by omega
+    rw [hsum, pow_add, hval]
+    simpa using hbase.mul
+      (Nat.ModEq.refl (2 ^ (a.val + s.val - n)))
+  · have hval : (a + s).val = a.val + s.val := by
+      rw [Fin.val_add_eq_ite]
+      simp [hwrap]
+    rw [hval]
+
+/-- **Higman Lemma 6 (p. 86), Frobenius-orbit pair gaps.**
+
+If a pair weight is a Frobenius conjugate of the weight attached to `p`,
+then its unordered cyclic index gap is the same `±` gap as that of `p`. -/
+theorem primitiveRoot_pairWeight_eq_frobeniusShift_imp_pairGap
+    {F : Type*} [Field F] {n : ℕ} [NeZero n] (hn : 2 ≤ n)
+    (lambda : F) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (i j : Fin n) (p : HigmanExponentPair n) (s : Fin n)
+    (h : lambda ^ (2 ^ i.val + 2 ^ j.val) =
+      (lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) ^ (2 ^ s.val)) :
+    HasHigmanPairGap (higmanCyclicGap p.1.1 p.1.2) i j := by
+  let a : Fin n := p.1.1 + s
+  let b : Fin n := p.1.2 + s
+  have hab : a ≠ b := by
+    intro hab
+    exact (by omega : p.1.1 ≠ p.1.2) (add_right_cancel hab)
+  have hamod := twoPower_cyclicAdd_modEq p.1.1 s
+  have hbmod := twoPower_cyclicAdd_modEq p.1.2 s
+  have hmod : Nat.ModEq (2 ^ n - 1)
+      ((2 ^ p.1.1.val + 2 ^ p.1.2.val) * 2 ^ s.val)
+      (2 ^ a.val + 2 ^ b.val) := by
+    rw [add_mul, ← pow_add, ← pow_add]
+    exact hamod.add hbmod
+  have horbit :
+      (lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) ^ (2 ^ s.val) =
+        lambda ^ (2 ^ a.val + 2 ^ b.val) := by
+    rw [← pow_mul]
+    exact pow_eq_pow_of_modEq hmod hprim.pow_eq_one
+  have hpairs : (i = a ∧ j = b) ∨ (i = b ∧ j = a) :=
+    primitiveRoot_pairWeight_eq_pairWeight_candidates
+      hn lambda hprim i j a b hab (h.trans horbit)
+  have hgap : higmanCyclicGap a b = higmanCyclicGap p.1.1 p.1.2 := by
+    simp only [a, b, higmanCyclicGap, map_add]
+    ring
+  have habGap : HasHigmanPairGap
+      (higmanCyclicGap p.1.1 p.1.2) a b := Or.inl hgap
+  rcases hpairs with hp | hp
+  · rw [hp.1, hp.2]
+    exact habGap
+  · rw [hp.1, hp.2]
+    exact HasHigmanPairGap.comm.mpr habGap
+
+private theorem hasEigenvalue_mem_range_of_eigenspaces_iSup_eq_top
+    {K V κ : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (T : Module.End K V) (weight : κ → K)
+    (hspan : ⨆ mu ∈ Set.range weight, T.eigenspace mu = ⊤)
+    {mu : K} (hmu : T.HasEigenvalue mu) : mu ∈ Set.range weight := by
+  by_contra hnot
+  have hd := (Module.End.eigenspaces_iSupIndep T).disjoint_biSup hnot
+  rw [hspan, disjoint_top] at hd
+  exact hmu hd
+
+/-- **Higman Lemma 6 (pp. 85--86), the single pair-gap orbit.**
+
+Suppose the first two actual lower-central layers have Frobenius-conjugate
+eigenbases for the same actor. The spanning actual bracket makes the first
+second-layer eigenvalue a pair weight. Every nonzero basis bracket then has a
+pair weight in that eigenvalue's Frobenius orbit, hence all such brackets are
+supported on one unordered cyclic gap `±r`. -/
+theorem exists_lowerCentralPairGapSupport_of_frobeniusEigenbases
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    {H : Type uH} {C : Type uC} [Group H] [Group C]
+    (phi : C →* MulAut H) (c : C)
+    {n : ℕ} [NeZero n] (hn : 2 ≤ n)
+    (lambda nu : K) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (b₁ : Basis (Fin n) K
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 0)))
+    (hb₁ : ∀ i,
+      (lowerCentralLayerRepresentation phi 0 c).baseChange K (b₁ i) =
+        lambda ^ (2 ^ i.val) • b₁ i)
+    (b₂ : Basis (Fin n) K
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 1)))
+    (hb₂ : ∀ s,
+      (lowerCentralLayerRepresentation phi 1 c).baseChange K (b₂ s) =
+        nu ^ (2 ^ s.val) • b₂ s) :
+    ∃ p : HigmanExponentPair n,
+      nu = lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val) ∧
+      ∀ i j : Fin n,
+        lowerCentralCommutatorBilinearBaseChange K H (b₁ i) (b₁ j) ≠ 0 →
+          HasHigmanPairGap (higmanCyclicGap p.1.1 p.1.2) i j := by
+  let T₁ : Module.End K
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) :=
+    (lowerCentralLayerRepresentation phi 0 c).baseChange K
+  let T₂ : Module.End K
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 1)) :=
+    (lowerCentralLayerRepresentation phi 1 c).baseChange K
+  let beta := lowerCentralCommutatorBilinearBaseChange K H
+  have hbetaEquiv : ∀ x y, T₂ (beta x y) = beta (T₁ x) (T₁ y) := by
+    intro x y
+    exact lowerCentralCommutatorBilinearBaseChange_equivariant K phi c x y
+  have hpairSpan : ⨆ eta ∈ Set.range (fun p : HigmanExponentPair n ↦
+      lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)), T₂.eigenspace eta = ⊤ :=
+    iSup_frobeniusPairWeight_eigenspace_eq_top_of_bilinear
+      n lambda T₁ T₂ b₁ hb₁ beta hbetaEquiv
+      (lowerCentralCommutatorBilinearBaseChange_self K H)
+      (lowerCentralCommutatorBilinearBaseChange_span_eq_top K H)
+  let i₀ : Fin n := ⟨0, by omega⟩
+  have hnuEigen : T₂ (b₂ i₀) = nu • b₂ i₀ := by
+    simpa [i₀] using hb₂ i₀
+  have hnuHas : T₂.HasEigenvalue nu :=
+    Module.End.hasEigenvalue_of_hasEigenvector
+      ⟨Module.End.mem_eigenspace_iff.mpr hnuEigen, b₂.ne_zero i₀⟩
+  obtain ⟨p, hp⟩ := hasEigenvalue_mem_range_of_eigenspaces_iSup_eq_top
+    T₂ (fun p : HigmanExponentPair n ↦
+      lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) hpairSpan hnuHas
+  refine ⟨p, hp.symm, ?_⟩
+  have hOrbitSpan : ⨆ eta ∈ Set.range (fun s : Fin n ↦ nu ^ (2 ^ s.val)),
+      T₂.eigenspace eta = ⊤ := by
+    apply top_unique
+    rw [← b₂.span_eq]
+    apply Submodule.span_le.mpr
+    rintro _ ⟨s, rfl⟩
+    apply Submodule.mem_iSup_of_mem (nu ^ (2 ^ s.val))
+    apply Submodule.mem_iSup_of_mem (show
+      nu ^ (2 ^ s.val) ∈ Set.range (fun t : Fin n ↦ nu ^ (2 ^ t.val)) from
+      ⟨s, rfl⟩)
+    exact Module.End.mem_eigenspace_iff.mpr (hb₂ s)
+  intro i j hne
+  have heigen : T₂ (beta (b₁ i) (b₁ j)) =
+      lambda ^ (2 ^ i.val + 2 ^ j.val) • beta (b₁ i) (b₁ j) := by
+    simpa only [T₁, T₂, beta, pow_add] using
+      lowerCentralCommutatorBilinearBaseChange_eigenweight
+        K phi c (lambda ^ (2 ^ i.val)) (lambda ^ (2 ^ j.val))
+        (b₁ i) (b₁ j) (hb₁ i) (hb₁ j)
+  have hhas : T₂.HasEigenvalue
+      (lambda ^ (2 ^ i.val + 2 ^ j.val)) :=
+    Module.End.hasEigenvalue_of_hasEigenvector
+      ⟨Module.End.mem_eigenspace_iff.mpr heigen, hne⟩
+  obtain ⟨s, hs⟩ := hasEigenvalue_mem_range_of_eigenspaces_iSup_eq_top
+    T₂ (fun s : Fin n ↦ nu ^ (2 ^ s.val)) hOrbitSpan hhas
+  apply primitiveRoot_pairWeight_eq_frobeniusShift_imp_pairGap
+    hn lambda hprim i j p s
+  calc
+    lambda ^ (2 ^ i.val + 2 ^ j.val) = nu ^ (2 ^ s.val) := hs.symm
+    _ = (lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) ^ (2 ^ s.val) :=
+      congrArg (fun z : K => z ^ (2 ^ s.val)) hp.symm
 
 /-! ## The square identity and the triple-bracket sum -/
 

@@ -1088,6 +1088,34 @@ theorem primitiveRoot_pairWeight_injective
   · exact Subtype.ext (Prod.ext h.1 h.2)
   · exact (by omega : False).elim
 
+/-- Equality of two binary pair weights for a primitive Singer root identifies
+the two index pairs up to order. The second pair is assumed distinct; the
+conclusion in particular excludes a repeated first pair. -/
+theorem primitiveRoot_pairWeight_eq_pairWeight_candidates
+    {F : Type*} [Field F] {n : ℕ} (hn : 2 ≤ n)
+    (lambda : F) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (a b c d : Fin n) (hcd : c ≠ d)
+    (h : lambda ^ (2 ^ a.val + 2 ^ b.val) =
+      lambda ^ (2 ^ c.val + 2 ^ d.val)) :
+    (a = c ∧ b = d) ∨ (a = d ∧ b = c) := by
+  have hfinite : IsOfFinOrder lambda :=
+    hprim.isOfFinOrder (Nat.sub_ne_zero_of_lt
+      (Nat.one_lt_pow (by omega : n ≠ 0) (by omega)))
+  have hmod : Nat.ModEq (2 ^ n - 1)
+      (2 ^ a.val + 2 ^ b.val) (2 ^ c.val + 2 ^ d.val) := by
+    have h' := hfinite.pow_eq_pow_iff_modEq.mp h
+    rwa [← hprim.eq_orderOf] at h'
+  rcases lt_trichotomy c d with hlt | heq | hgt
+  · let p : HigmanExponentPair n := ⟨(c, d), hlt⟩
+    simpa only [p] using
+      normalizedTwoPower_modEq_pairWeight_candidates hn a b p hmod
+  · exact (hcd heq).elim
+  · let p : HigmanExponentPair n := ⟨(d, c), hgt⟩
+    rcases normalizedTwoPower_modEq_pairWeight_candidates
+        hn a b p (by simpa only [p, add_comm] using hmod) with hp | hp
+    · exact Or.inr hp
+    · exact Or.inl hp
+
 /-- In an odd cyclic index group, a nonzero gap `d` cannot have both of its
 adjacent gaps `d-1` and `d+1` in the same unordered class `±r`. -/
 theorem not_both_adjacent_pairGaps_of_odd
