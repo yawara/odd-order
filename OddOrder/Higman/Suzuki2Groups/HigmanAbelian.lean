@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AgemoLayers
+import OddOrder.Higman.Suzuki2Groups.AgemoLayers
 
 /-!
 # Higman's abelian invariant-subgroup lemma
@@ -25,7 +25,9 @@ Agemo filtration.  The proof follows Higman's original two sentences:
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -142,4 +144,4 @@ theorem exists_homocyclic_and_invariant_eq_agemo
   exact ⟨ι, hι, e, he, ⟨ε⟩, fun _ hU =>
     exists_eq_agemo_of_invariant hA φ htrans ε hU⟩
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

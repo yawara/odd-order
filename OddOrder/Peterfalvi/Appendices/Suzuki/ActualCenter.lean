@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterHomocyclic
+import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
 
 /-!
 # The actual Suzuki center and its Higman filtration
@@ -26,7 +26,8 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
-open Suzuki2Groups
+open OddOrder.Higman.Suzuki2Groups
+open OddOrder.GroupTheory.Suzuki2Group
 
 namespace Hypothesis
 

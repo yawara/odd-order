@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanKernel
+import OddOrder.Higman.Suzuki2Groups.HigmanKernel
 
 /-!
 # Higman Lemma 3: the image and quotient have order two
@@ -21,7 +21,9 @@ here.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -190,4 +192,4 @@ theorem actualHigmanFamily_quotient_natCard_eq_two
   exact F.modTwoHom_quotient_natCard_eq_two
     hAC hAcomm ε he hzeroOne hker
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

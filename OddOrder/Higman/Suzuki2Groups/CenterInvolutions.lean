@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.OmegaSubgroup
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Basic
+import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
 /-!
 # Peterfalvi Appendix III: central involutions
@@ -25,7 +25,9 @@ is the whole center, belongs to Higman's later structural argument and is not
 claimed here.
 -/
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 
@@ -93,4 +95,4 @@ theorem involutions_eq_involutionSubgroup_diff_identity [Finite P]
   ext x
   simp [involutions, mem_involutionSubgroup_iff_sq_eq_one hP]
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

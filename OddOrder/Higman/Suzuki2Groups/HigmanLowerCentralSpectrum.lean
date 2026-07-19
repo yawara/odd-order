@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanLowerCentralGraded
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
 import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
@@ -43,7 +43,7 @@ open Module Polynomial
 open OddOrder.RepresentationTheory
 open scoped TensorProduct IsMulCommutative
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
 
 universe uR uK uM uN uH uX
 
@@ -926,4 +926,4 @@ theorem not_exists_equivariant_linearEquiv_of_higman_bracket
       ⟨Module.End.mem_eigenspace_iff.mpr hsecond, hsecondNe⟩
   exact higman_spectral_contradiction T₂ n hn lambda hprim hpairSpan hlambda
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

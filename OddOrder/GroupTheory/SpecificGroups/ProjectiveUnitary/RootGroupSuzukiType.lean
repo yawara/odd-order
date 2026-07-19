@@ -3,9 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Sylow
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Bruhat
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
 /-!
 # The unitary root group as a Sylow subgroup and a Suzuki 2-group
@@ -35,7 +36,7 @@ namespace OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary
 
 noncomputable section
 
-open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+open OddOrder.GroupTheory.Suzuki2Group
 
 section /- Appendix III / Part II, Chapter I §3: exact center and order -/
 

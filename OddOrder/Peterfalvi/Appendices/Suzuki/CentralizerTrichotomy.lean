@@ -126,7 +126,7 @@ structure CentralizerSuzukiData (hyp : Hypothesis G Omega) (X : Subgroup G)
   distinguishedProduct_order :
     orderOf (hyp.distinguishedInvolution * hyp.t) = 5
   cQ_isSuzuki2Group :
-    OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
+    OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
       ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
   natCard_cQ0_eq_field :
     Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) =
@@ -160,7 +160,7 @@ structure CentralizerPSUData (hyp : Hypothesis G Omega) (X : Subgroup G)
   distinguishedProduct_order :
     orderOf (hyp.distinguishedInvolution * hyp.t) = 3
   cQ_isSuzuki2Group :
-    OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsSuzuki2Group
+    OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
       ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
   natCard_cQ0_eq_baseField :
     Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) =

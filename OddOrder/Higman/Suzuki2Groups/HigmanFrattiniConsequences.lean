@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 
 /-!
@@ -19,7 +19,7 @@ commutator estimate propagates from A squared to A to the fourth power.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
 open scoped commutatorElement
@@ -159,4 +159,4 @@ theorem commutator_agemo_one_map_le_agemo_two_map
   rw [heq']
   simpa using Subgroup.mem_map_of_mem A.subtype hd2
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

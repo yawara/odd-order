@@ -43,7 +43,7 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis
 
 open OddOrder.GroupTheory
 open OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary
-open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+open OddOrder.GroupTheory.Suzuki2Group
 
 universe u v
 

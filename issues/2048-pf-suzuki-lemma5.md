@@ -75,12 +75,17 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
       - [x] `ZMod 2`-双線形化と degree-2 alternating linearization を構成する
       - [x] commutator closure から pairing の値の span が `L₂` に等しいことを証明する
       - [x] 誘導自己同型作用に関する commutator pairing の equivariance を証明する
-    - [ ] 非零 `L₂` 上の推移性から Higman Lemma 4 と直後の scalar-extension
-          corollary を証明する
-      - [ ] Singer finite field への base change と Frobenius eigenbasis
+    - [x] 非零 `L₂` 上の推移性から source-facing な Higman Lemma 4 を証明する
+      - [x] Singer finite field への base change と Frobenius eigenbasis
             `λ^(2^i)` を構成する
-      - [ ] bracket weights `λ^(2^i+2^j)` と full span を接続し、
+      - [x] bracket weights `λ^(2^i+2^j)` と full span を接続し、
             `L₁ ≃ L₂` から primitive-root contradiction を導く
+      - [x] `not_exists_equivariant_linearEquiv_of_higman_bracket`
+            (`17a033729`) として landing
+    - [ ] Lemma 4 直後の scalar-extension corollary: 任意の拡大体上で
+          `L₁` と同型な invariant subspace が `L₂` に存在しないことを示す
+    - [ ] Higman Lemma 5: `H² = H₂` の下で平方写像 `L₁ → L₂` の
+          scalar-extension 公式と一意性を構成する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
