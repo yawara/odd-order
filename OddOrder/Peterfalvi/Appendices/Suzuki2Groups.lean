@@ -12,6 +12,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanFrattiniConsequences
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanEndomorphismLift
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanIdempotents
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanIdempotentAction
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanIdempotentFamily
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.CenterHomocyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
