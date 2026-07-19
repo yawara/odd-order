@@ -103,3 +103,46 @@ D.1 → D.2 を book strength・sorry-free・axiom-clean で証明。AppD の so
 - [[bg-gorenstein-reread-as-isaacs]] (まず Isaacs/repo/mathlib を grep)。⚠ なお 9133 の実測で、
   当初「不在」とした前提のうち 3 件は誤りだった (Thm 5.3.5 / `C_G(F)≤F` の配置 / Thm 10.3.1(v))。
 - issue 9133 (CN 3-step dichotomy) — **本 issue の残作業の正本**。
+
+---
+
+## ✅ 完了 (2026-07-19) — D.1 / D.2 とも sorry-free・axiom-clean
+
+`AppD_CNGroups.lean` を **pure re-export hub** にし、実体を 3 leaf に分割:
+
+| leaf | 内容 | 行 |
+|---|---|---|
+| `AppD_CNGroups/Basic.lean` | `IsCNGroup` / `MinimalSimpleCNHypothesis` / CN の部分群継承 / `O_p(G)=⊥` | 130 |
+| `AppD_CNGroups/MaximalSylowIntersection.lean` | 局所解析 (BG p.153-154 の全ステップ) | 449 |
+| `AppD_CNGroups/SylowTI.lean` | **Lemma D.1** + **Lemma D.2** | 208 |
+
+### 使った上流 (すべて既存 or 本 issue の姉妹 9133 で構築済)
+
+- **Cor 1.6** = `GroupTheory.oPiCore_isSylow_or_isThreeStepGroup` (issue 9133、sorry-free)
+- **display (D.2) の "short argument"** = `IsThreeStepGroup.inf_sylow_eq_oPiCore`
+  (2026-07-19 に本作業で追加。3-step 群では相異なる Sylow p の交わりがちょうど `O_p(G)`。
+  経路: Sylow の像が `G/O_p` で Frobenius 補群 → 補群は TI)
+- **BG Thm 6.2** = `AppB.zCenter_lOdd_sup_oPiCore_normal` (`L(P)` 版。BG が明示的に許可)
+- **Focal Subgroup Theorem** = mathlib `Subgroup.commutator_inf_eq_focalSubgroup`
+
+### ⚠ 発見: BG が省いたステップ (書籍の gap ではなく行間)
+
+BG は `M` に Thm 6.2 を当てて `Z(J(P)) ⊴ M` を得るが、これは **`P ≤ M` を前提**している。
+その時点で確立済なのは `P ∩ M ∈ Syl_p(M)` だけで、`P ≤ M` はまだ出ていない (循環に見える)。
+
+**補修** (`sylow_le_and_eq_normalizer`): Thm 6.2 を `S = P ∩ M` に当てて `Z(L(S)) ⊴ M`
+→ `M ≤ N_G(Z(L(S)))` → M の極大性で `M = N_G(Z(L(S)))` → `Z(L(S))` は `S` で characteristic
+ゆえ `N_G(S) ≤ M` → `N_P(S) ≤ P ∩ M = S` → p-群の正規化条件で `S = P`。
+⟹ 以降 BG の記述はすべて字義どおり正しい。
+
+### ⚠ もう 1 つの行間: 終盤が要求する「任意の R」
+
+BG の終盤は `P^t ≠ P` に対し「`P ∩ Q'` が極大な `Q'`」を取り直して (D.2) を再適用する。
+これが成り立つのは **`M = N_G(Z(L(P)))` が `P` だけで決まる**から。本形式化では
+`inf_le_oPiCore_normalizer_zCenterLOdd` (∀ `R ≠ P`, `P ∩ R ≤ O_p(N_G(Z(L(P))))`) として
+明示的に切り出した。`Q` 側の極大性は**不要** — `O_p(M) ≤ P ∩ Q` は
+`O_p(M)·N_Q(D)` を含む Sylow `R` を取り `R ≠ P` に `hmax` を当てて出る。
+
+### D.2 は BG より一般
+
+BG は `P ≠ 1` を仮定するが証明が使わないので落とした (`P = 1` なら結論は自明)。
