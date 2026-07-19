@@ -8292,6 +8292,15 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
   OddOrder.RepresentationTheory.finrank_eq_of_faithful_irreducible_and_faithful_transitive_nonzero
 
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.representation_fixedVector_eq_zero_of_faithful_irreducible
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.representation_fixedVector_eq_zero_of_faithful_transitive_nonzero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_ne_one_orderOf_eq_three_of_even_faithful_transitive_nonzero
+
+#assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralLayerZero_finrank_eq_one_of_equivariant_linearEquiv
 
 #assert_only_allowed_axioms
@@ -8311,6 +8320,15 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.classThreeQuotientAction_orderOf_ne_three
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralLayers_fixedPointFree_of_lemmaSix_hypotheses
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.classThreeQuotientAction_orderOf_eq_three
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
 
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a

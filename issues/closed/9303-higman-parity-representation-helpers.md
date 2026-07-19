@@ -21,17 +21,28 @@ Higman の multiplicative layer action への adapter と `H/H₄` consumer は
 
 ## やること
 
-- [ ] faithful irreducible commutative action の fixed-vector lemma
-- [ ] faithful transitive-on-nonzero action の fixed-vector lemma
-- [ ] 偶数 `𝔽₂`-dimension から位数 3 actor を構成する Singer/Cauchy lemma
-- [ ] Higman Lemma 6 の lower-central layer consumer へ接続する
+- [x] faithful irreducible commutative action の fixed-vector lemma
+- [x] faithful transitive-on-nonzero action の fixed-vector lemma
+- [x] 偶数 `𝔽₂`-dimension から位数 3 actor を構成する Singer/Cauchy lemma
+- [x] Higman Lemma 6 の lower-central layer consumer へ接続する
 
 ## 完了条件
 
 - 新 `axiom` / `sorry` / opaque carrier なし
-- [ ] 汎用表現論 leaf の targeted build が通る
-- [ ] Higman consumer の targeted build が通る
-- [ ] public endpoints を `OddOrder/AxiomsCheck.lean` の監査対象へ追加する
+- [x] 汎用表現論 leaf の targeted build が通る
+- [x] Higman consumer の targeted build が通る
+- [x] public endpoints を `OddOrder/AxiomsCheck.lean` の監査対象へ追加する
+
+## 2026-07-19 checkpoint
+
+`FrobeniusCoordinates.lean` に二つの generic fixed-vector lemma と
+even-dimensional Singer/Cauchy lemma を追加した。`HigmanLemmaSix.lean` では
+これらを actual lower-central layer actions へ移し、`H/H₄` 上の位数 3
+fixed-point-free automorphism を構成して Neumann の class-two theorem と
+矛盾させた。これにより原文 p. 85 の `dim L₂` odd の段落が閉じた。
+
+B レーンでは上記二つの targeted leaf build を確認し、main が担当する
+full build / AxiomsCheck build は重ねて実行していない。
 
 ## 参照
 

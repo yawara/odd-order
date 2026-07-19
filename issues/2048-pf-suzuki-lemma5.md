@@ -118,8 +118,14 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               (`L₃` への移送は既存の equivariant-equivalence API)
         - [x] actor order と Singer field の Frobenius period を接続し、
               `finrank L₁ = finrank L₂` を仮定せず導く
-      - [ ] Neumann の位数 3 fixed-point-free automorphism theorem を形式化し、
+      - [x] Neumann の位数 3 fixed-point-free automorphism theorem を形式化し、
             `finrank L₂` が奇数であることを導く
+        - [x] `H² = H₂` から平方包含を `H₂,H₃` へ伝播し、各 layer の
+              fixed-point-free 性を `H/H₄` へ直接降ろす
+        - [x] 偶数次元なら faithful transitive Singer actor に位数 3 の元が存在する
+              ことを Cauchy で示し、商作用の位数も 3 であることを証明する
+        - [x] Neumann の class-two 結論と `L₃ ≠ 0` を矛盾させ、
+              `lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv` を得る
       - [ ] pair/triple Frobenius weight の指数算術と
             `[u²,u] = 1` の actual square-map 接続から triple bracket を消去する
       - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
