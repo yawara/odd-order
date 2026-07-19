@@ -331,6 +331,51 @@ noncomputable def caseB_conjIdx {M : Subgroup G} (data : TypesIIIIIIVSetup M)
       (w1ActionHom data chief w)⁻¹,
     w1_conj_mem_uActionHom_range data chief w u.2⟩
 
+/-- **`W₁` acts faithfully on the chief factor `H̄`** (Peterfalvi (9.7.b), the injectivity of `η`).
+The kernel is a subgroup of `W₁`, which has prime order `q`, so it is `⊥` or all of `W₁`.  The
+latter would make every element of `H̄` `W₁`-fixed, forcing `|C_{H̄}(W₁)| = |H̄|`, i.e. `p = p^q` —
+impossible since `q` is prime, hence `≥ 2`. -/
+theorem w1ActionHom_injective [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    (chief : ChiefFactorData data) :
+    Function.Injective (w1ActionHom data chief) := by
+  haveI := chief.N_normal
+  have hcardW1 : Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) = data.q :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : data.typeP.W1 ≤ _)).toEquiv
+  haveI : Fact (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).Prime :=
+    ⟨hcardW1 ▸ data.nontrivial.2.1⟩
+  rw [← MonoidHom.ker_eq_bot_iff]
+  rcases (w1ActionHom data chief).ker.eq_bot_or_eq_top_of_prime_card with hbot | htop
+  · exact hbot
+  refine absurd (chiefFactor_card_fixedByE chief) ?_
+  have hfixtop : (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).fixedByE = ⊤ := by
+    refine eq_top_iff.mpr fun h _ => ?_
+    intro l hl
+    have hker : w1ActionHom data chief ⟨l, hl⟩ = 1 := by
+      have : (⟨l, hl⟩ : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+          ∈ (w1ActionHom data chief).ker := htop ▸ Subgroup.mem_top _
+      exact this
+    exact congrArg (fun f : MulAut (↥data.H ⧸ chief.N) => f h) hker
+  rw [hfixtop, Nat.card_congr Subgroup.topEquiv.toEquiv, chiefFactor_quotient_card chief]
+  have hq : 2 ≤ data.q := data.nontrivial.2.1.two_le
+  have hp : 2 ≤ chief.p := chief.p_prime.two_le
+  have : chief.p ^ 1 < chief.p ^ data.q :=
+    Nat.pow_lt_pow_right (by omega) (by omega)
+  simpa using this.ne'
+
+/-- `η` is injective, since it is `e`-conjugation applied to the faithful `W₁`-action. -/
+theorem caseB_etaHom_injective [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} [Fact chief.p.Prime]
+    (e : Additive (↥data.H ⧸ chief.N) ≃+ GaloisField chief.p data.q) :
+    Function.Injective (caseB_etaHom (chief := chief) e) := by
+  intro w w' hww
+  refine w1ActionHom_injective chief (MulEquiv.ext fun x => ?_)
+  have hx := congrArg
+    (fun f : Multiplicative (AddAut (GaloisField chief.p data.q)) =>
+      Multiplicative.toAdd f (e (Additive.ofMul x))) hww
+  simp only [caseB_etaHom_apply] at hx
+  exact Additive.ofMul.injective (e.injective hx)
+
 section CaseBTwist
 
 variable {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
