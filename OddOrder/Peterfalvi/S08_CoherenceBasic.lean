@@ -1047,72 +1047,74 @@ theorem mem_xSetFinset_iff_mem_Xset (hyp : SibleyDadeHypothesis G L H)
       exact hφnotZ (hyp.mem_SsubFiltration.mpr ⟨θ', hne', hker', hθ'eq.symm⟩)
 
 open scoped Classical in
-/-- **(6.6)/(6.8) X = S − S(Zc) coherence — the L2 producer, generalized over the irreducibility
-input.**  `X(Zc)` is coherent (`Zc = Z(H) ∩ H′` central) given **only** that every `X`-member is
-irreducible (`hX`), that `X` is nonempty (`hXne`), and that `|L:H|` is coprime to `p` (`hidxp`).
-Builds the per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` for every chain step and
-feeds
-it to the `…withCover…` generic shell.  The Frobenius case (`…_of_frobenius`) and the
-certain-type/case-A case (`…_of_c2_caseA`) are thin specializations differing only in how
-`hX`/`hXne`/`hidxp` are produced (`isIrreducibleCharacter_of_mem_Xset_of_frobenius` +
-`hF.coprime_card_kernel_complement` vs `isIrreducibleCharacter_of_mem_Xset_c2_caseA` +
-`cert.card_coprime`). -/
-noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
+/-- **Peterfalvi (6.6)(b): `X = S − S(Z)` is coherent — the Z-generic form.**  For any normal
+subgroup `Z` of `L` with `Z ≤ H` central in `H` (`Z.subgroupOf H ≤ Z(H)`, the book's
+`Z ⊆ Z(K)`), the set `X(Z) = S − S(Z)` is coherent, given that every `X`-member is irreducible
+(`hX` — the book's hypothesis `𝒳 ⊆ Irr L`), that `X` is nonempty (`hXne` — in the book from
+`Z ≠ 1` via (1.1)), that `H` is a `p`-group for a prime `p ≥ 3` (the book reduces to this case
+by (6.5), and `p` is odd since `|L|` is), and that `|L:H|` is coprime to `p` (`hidxp`, from
+(6.4.c)/(6.5.c)).  Builds the per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` for
+every chain step and feeds it to the `…withCover…` generic shell.  The central-commutator
+(`Zc = Z(H) ∩ H′`) instantiations (`…_of_frobenius`, `…_of_c2_caseA`) are thin specializations
+differing only in how `hX`/`hXne`/`hidxp` are produced
+(`isIrreducibleCharacter_of_mem_Xset_of_frobenius` + `hF.coprime_card_kernel_complement` vs
+`isIrreducibleCharacter_of_mem_Xset_c2_caseA` + `cert.card_coprime`). -/
+noncomputable def Xset_isCoherent_of_irreducible_X
     (hyp : SibleyDadeHypothesis G L H)
-    (hX : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ)
-    (hXne : (hyp.Xset hyp.centralCommutator).Nonempty)
+    {Z : Subgroup ↥L} [Z.Normal] (hZle : Z ≤ H)
+    (hZcent : Z.subgroupOf H ≤ Subgroup.center ↥H)
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    (hXne : (hyp.Xset Z).Nonempty)
     {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
     (hidxp : Nat.Coprime H.index p) :
-    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   letI : H.Normal := hyp.H_normal
-  haveI := hyp.centralCommutator_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
   haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
   haveI : Fact p.Prime := ⟨hp⟩
   -- the common-index degree exponent over `X(Zc)`
-  have hdegX : ∀ φ ∈ hyp.Xset hyp.centralCommutator,
+  have hdegX : ∀ φ ∈ hyp.Xset Z,
       ∃ kφ : ℕ, (φ : ClassFunction ↥L ℂ) 1 = ((H.index * p ^ kφ : ℕ) : ℂ) :=
     fun φ hφ => hyp.exists_index_primePow_degree_of_mem_S hp hHp (hyp.Xset_subset_S hφ)
   choose! e he using hdegX
   -- `qtot = |H:Zc| = p^mq`
-  haveI : (hyp.centralCommutator.subgroupOf H).Normal :=
-    hyp.centralCommutator_normal.subgroupOf H
+  haveI : (Z.subgroupOf H).Normal := ‹Z.Normal›.subgroupOf H
   choose mq hmq using
-    exists_primePow_card_quotient_of_isPGroup hp hHp (hyp.centralCommutator.subgroupOf H)
-  have hZle : Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) ≤ Nat.card ↥H :=
+    exists_primePow_card_quotient_of_isPGroup hp hHp (Z.subgroupOf H)
+  have hZqle : Nat.card (↥H ⧸ Z.subgroupOf H) ≤ Nat.card ↥H :=
     Nat.le_of_dvd Nat.card_pos (Subgroup.card_quotient_dvd_card _)
   refine hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
-    (Z := hyp.centralCommutator) hyp.centralCommutator_le hX hXne ?_
+    (Z := Z) hZle hX hXne ?_
   intro pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi
   -- `χs i ∈ X(Zc)`
-  have hχiX : (χs i : ClassFunction ↥L ℂ) ∈ hyp.Xset hyp.centralCommutator := by
+  have hχiX : (χs i : ClassFunction ↥L ℂ) ∈ hyp.Xset Z := by
     refine hpairs i hi ?_
     simp [OddOrder.Peterfalvi.S07.pairSet, hpair0 i hi]
   -- central degree bound for the head
   choose mχ hχdeg hχsq using hyp.exists_source_primePow_centralBound_of_mem_Xset hp hHp
-    hyp.centralCommutator_subgroupOf_le_center hχiX
+    hZcent hχiX
   -- member-family enumeration
   choose k χmem hconj using
-    hyp.exists_pairUnion_memberFamily_of_irreducible_X hyp.centralCommutator_le
+    hyp.exists_pairUnion_memberFamily_of_irreducible_X hZle
       hX hpair0 hpair1 hpairs hi
   obtain ⟨hχinj, hrange, -, -, -, -, -, -⟩ := hconj
   -- members lie in `X(Zc)`
-  have hmemX : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Xset hyp.centralCommutator := by
+  have hmemX : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Xset Z := by
     intro j
     have : (χmem j : ClassFunction ↥L ℂ) ∈
-        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock hyp.centralCommutator) pair i :=
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i :=
             by
       rw [← hrange]; exact Set.mem_range_self j
     rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp this with hbase | ⟨j', hj', hj'pair⟩
     · exact hyp.xBaseBlock_subset _ hbase
     · exact hpairs j' (hj'.trans hi) hj'pair
   -- base-block anchor
-  have hbbne : (hyp.xBaseBlock hyp.centralCommutator).Nonempty := by
+  have hbbne : (hyp.xBaseBlock Z).Nonempty := by
     rw [← Set.ncard_pos (hyp.xSet_finite_of_irreducible_X hX |>.subset
         (hyp.xBaseBlock_subset _))]
     exact lt_of_lt_of_le (by norm_num) (hyp.two_le_xBaseBlock_ncard_of_irreducible_X
-      hyp.centralCommutator_le hX hXne)
+      hZle hX hXne)
   choose i₁ hanchor using hyp.exists_xBaseBlock_anchor_index hrange hbbne
   -- the `X(Zc)` index Finset (the `sum_re_sq_Xset_eq` domain) and its coe
   set XF := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
@@ -1120,17 +1122,17 @@ noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
               (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
           (fun θ => ClassFunction.induce H θ.toClassFunction) \
         (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
-            (↑(hyp.centralCommutator.subgroupOf H) : Set ↥H) ⊆
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆
                 OddOrder.Peterfalvi.S03.characterKernel
                 (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
           (fun θ => ClassFunction.induce H θ.toClassFunction) with hXFdef
-  have hmemXF : ∀ φ, φ ∈ XF ↔ φ ∈ hyp.Xset hyp.centralCommutator := by
-    intro φ; rw [hXFdef]; exact hyp.mem_xSetFinset_iff_mem_Xset (Z := hyp.centralCommutator) φ
+  have hmemXF : ∀ φ, φ ∈ XF ↔ φ ∈ hyp.Xset Z := by
+    intro φ; rw [hXFdef]; exact hyp.mem_xSetFinset_iff_mem_Xset (Z := Z) φ
   -- real degree-square sum over `XF`
   have hrealSum : (∑ φ ∈ XF, ((H.index * p ^ e φ : ℕ) : ℝ) ^ 2)
       = (H.index : ℝ) * ((Nat.card ↥H : ℝ)
-          - (Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) : ℝ)) := by
-    rw [← hyp.sum_re_sq_Xset_eq_of_irreducible_X (Z := hyp.centralCommutator)
+          - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
+    rw [← hyp.sum_re_sq_Xset_eq_of_irreducible_X (Z := Z)
       (fun χ hχ => hX χ ((hmemXF χ).mp hχ))]
     refine Finset.sum_congr rfl (fun φ hφ => ?_)
     have hφX := (hmemXF φ).mp hφ
@@ -1163,9 +1165,9 @@ noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
       idx := H.index
       d₁ := H.index * p ^ e (χmem i₁ : ClassFunction ↥L ℂ)
       dχ := H.index * p ^ mχ
-      qtot := Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H)
-      c := H.index * (Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1)
-      total := H.index * (Nat.card ↥H - Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H))
+      qtot := Nat.card (↥H ⧸ Z.subgroupOf H)
+      c := H.index * (Nat.card ↥(Z.subgroupOf H) - 1)
+      total := H.index * (Nat.card ↥H - Nat.card (↥H ⧸ Z.subgroupOf H))
       θ₁ := p ^ e (χmem i₁ : ClassFunction ↥L ℂ)
       θχ := p ^ mχ
       m₁ := e (χmem i₁ : ClassFunction ↥L ℂ)
@@ -1195,7 +1197,7 @@ noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
         obtain ⟨hφXF, hφnotmem⟩ := hφtailF
         have hφX := (hmemXF (tElt t)).mp hφXF
         have hφnotpair : tElt t ∉ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L)
-            (hyp.xBaseBlock hyp.centralCommutator) pair i := by
+            (hyp.xBaseBlock Z) pair i := by
           intro hmem
           rw [← hrange] at hmem
           obtain ⟨j, hj⟩ := hmem
@@ -1215,16 +1217,16 @@ noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
         show (∑ j : Fin k, (H.index * p ^ e (χmem j : ClassFunction ↥L ℂ))
               * (H.index * p ^ e (χmem j : ClassFunction ↥L ℂ)))
             + (∑ i : Fin tailF.card, (H.index * p ^ e (tElt i)) * (H.index * p ^ e (tElt i)))
-            = H.index * (Nat.card ↥H - Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H))
+            = H.index * (Nat.card ↥H - Nat.card (↥H ⧸ Z.subgroupOf H))
         rw [show (∑ i : Fin tailF.card, (H.index * p ^ e (tElt i)) * (H.index * p ^ e (tElt i)))
               = ∑ x ∈ tailF, (H.index * p ^ e x) * (H.index * p ^ e x) from
             hreindex (fun x => (H.index * p ^ e x) * (H.index * p ^ e x))]
         exact natSum_partition_of_realSum XF (fun φ => H.index * p ^ e φ)
-          (H.index * (Nat.card ↥H - Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H)))
-          (by rw [hrealSum]; push_cast [Nat.cast_sub hZle]; ring) hinj hsub
+          (H.index * (Nat.card ↥H - Nat.card (↥H ⧸ Z.subgroupOf H)))
+          (by rw [hrealSum]; push_cast [Nat.cast_sub hZqle]; ring) hinj hsub
       hqtot := hmq
       hθsq_le_qtot := by rw [← pow_two]; exact hχsq
-      htotal := hyp.index_mul_card_sub_factor (Z := hyp.centralCommutator)
+      htotal := hyp.index_mul_card_sub_factor (Z := Z)
       hidx_p := hidxp }
 
 open scoped Classical in
@@ -1260,7 +1262,9 @@ noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
   have hidxp : Nat.Coprime H.index p := by
     rw [hyp.index_H_eq_card_W1]
     exact (Nat.Coprime.coprime_dvd_left hpdvd hF.coprime_card_kernel_complement).symm
-  exact hyp.Xset_centralCommutator_isCoherent_of_irreducible_X
+  haveI := hyp.centralCommutator_normal
+  exact hyp.Xset_isCoherent_of_irreducible_X hyp.centralCommutator_le
+    hyp.centralCommutator_subgroupOf_le_center
     (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
     (hyp.Xset_centralCommutator_nonempty hF hHnonab) hp hp3 hHp hidxp
 
@@ -1270,7 +1274,7 @@ The CertainType/(c2) analogue of `Xset_centralCommutator_isCoherent_of_frobenius
 hypothesis `Z(H) ⊓ W₂ = 1` (`hA`): `W₁` still acts fixed-point-freely on `Zc = Z(H) ∩ H′`
 (`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`), so the same central-`Zc` coherence
 machinery
-of `Xset_centralCommutator_isCoherent_of_irreducible_X` applies. The three
+of `Xset_isCoherent_of_irreducible_X` applies. The three
 irreducibility/coprimality
 inputs are produced from the certain-type data: `hX` from
 `isIrreducibleCharacter_of_mem_Xset_c2_caseA`,
@@ -1323,7 +1327,8 @@ noncomputable def Xset_centralCommutator_isCoherent_of_c2_caseA
     have hcop := cert.card_coprime
     rw [hK] at hcop
     exact (Nat.Coprime.coprime_dvd_left hpdvd hcop).symm
-  exact hyp.Xset_centralCommutator_isCoherent_of_irreducible_X hX hXne hp hp3 hHp hidxp
+  exact hyp.Xset_isCoherent_of_irreducible_X hyp.centralCommutator_le
+    hyp.centralCommutator_subgroupOf_le_center hX hXne hp hp3 hHp hidxp
 
 /-- **(6.8.1)/(6.8), L3 outer shell:** `X(Zc) ∪ Y` is coherent, given the (6.8.1) `τ₃` glue data
 `ν`.  Mirrors `coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner` but
