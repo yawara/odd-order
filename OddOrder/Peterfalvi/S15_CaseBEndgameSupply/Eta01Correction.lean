@@ -688,4 +688,194 @@ theorem Hypothesis.exists_etaS_alphaFun_one_int_core [Finite G]
 
 end
 
+section /- (13.8): the `(S, H^#)` correction package and the norm bound (p. 79) -/
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.5)/(13.8), the `(S, H^#)` correction package** (mirror of
+`exists_caseB_data_eta10_T_core`): the normalized distinguished `μ`-column
+`ζ = q⁻¹·μ_{j₀}`, the `P`-kernel tail `α`, the point formula `η₀₁ = δζ + α` on `H^#`,
+the exact first term `|S′| − u²`, the cross term `u·α(1)`, and the `(|P|−1)α(1)²`
+inflation bound — the seven inputs of `caseB_eta01_norm_bound`. -/
+theorem Hypothesis.exists_caseB_data_eta01_S_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    ∃ (ζ α : ↥hyp.S → ℂ) (α1 δ : ℤ),
+      (∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → ζ x = 0) ∧
+      (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
+        ζ x * (starRingEnd ℂ) (α x)) = 0 ∧
+      (∀ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1,
+        hyp.eta01 ↑x = (δ : ℂ) * ζ x + α x) ∧
+      ((∑ x : ↥hyp.S, ‖ζ x‖ ^ 2) - ‖ζ 1‖ ^ 2
+        = (Nat.card ↥(derivedInG hyp.S) : ℝ) - (hyp.u : ℝ) ^ 2) ∧
+      ((ζ 1 * (starRingEnd ℂ) (α 1)).re = (hyp.u : ℝ) * (α1 : ℝ)) ∧
+      δ ^ 2 = 1 ∧
+      ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ((α1 : ℤ) : ℝ) ^ 2
+        ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1, ‖α x‖ ^ 2 := by
+  classical
+  haveI := hyp.finiteG
+  have hnoV := OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG
+  obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
+    (hyp.toTypesIIIIIIVSetupS hG)
+  obtain ⟨φ₀, i₁, δ, _hφ₀P, hi₁pos, hi₁ker, hδ2, hi₁c, hmiddle, hnormQ, hdeg⟩ :=
+    hyp.exists_muS_index_eta01_core hG hnoV chief
+  obtain ⟨α1, hα1⟩ := hyp.exists_etaS_alphaFun_one_int_core hG φ₀
+  let H76 := H_sharp_hypothesis76_base hG hyp φ₀
+  have hqC : (hyp.q : ℂ) ≠ 0 := by
+    exact_mod_cast (show hyp.q ≠ 0 from hyp.q_prime.ne_zero)
+  have hqR : (hyp.q : ℝ) ≠ 0 := by
+    exact_mod_cast (show hyp.q ≠ 0 from hyp.q_prime.ne_zero)
+  have hvanishZ : ∀ x : ↥hyp.S, x ∉ hyp.H.subgroupOf hyp.S → H76.zeta i₁ x = 0 :=
+    fun x hx => H76.zeta_eq_zero_of_not_mem_H i₁ x
+      (fun hmem => hx (Subgroup.mem_subgroupOf.mpr hmem))
+  refine ⟨fun x => ((hyp.q : ℂ))⁻¹ * H76.zeta i₁ x,
+    hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01, α1, δ,
+    ?_, ?_, ?_, ?_, ?_, hδ2, ?_⟩
+  · intro x hx
+    change ((hyp.q : ℂ))⁻¹ * H76.zeta i₁ x = 0
+    rw [hvanishZ x hx, mul_zero]
+  · have hfull := hypothesis76_zeta_inner_alphaFun_eq_zero H76
+      (hyp.P.subgroupOf hyp.S) hyp.eta01 i₁ hi₁ker
+    have hext : (∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
+        H76.zeta i₁ x * (starRingEnd ℂ)
+          (hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 x))
+        = ∑ x : ↥hyp.S, H76.zeta i₁ x * (starRingEnd ℂ)
+            (hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 x) := by
+      rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+        (· ∈ hyp.H.subgroupOf hyp.S)
+        (fun x => H76.zeta i₁ x * (starRingEnd ℂ)
+          (hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 x))]
+      have h0 : ∑ x ∈ Finset.univ.filter (fun x => ¬ x ∈ hyp.H.subgroupOf hyp.S),
+          H76.zeta i₁ x * (starRingEnd ℂ)
+            (hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 x) = 0 := by
+        refine Finset.sum_eq_zero fun x hx => ?_
+        rw [hvanishZ x (Finset.mem_filter.mp hx).2, zero_mul]
+      rw [h0, add_zero]
+    calc
+      ∑ x ∈ Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S),
+          ((hyp.q : ℂ))⁻¹ * H76.zeta i₁ x * (starRingEnd ℂ)
+            (hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 x)
+          = ((hyp.q : ℂ))⁻¹ * ∑ x ∈ Finset.univ.filter
+              (· ∈ hyp.H.subgroupOf hyp.S), H76.zeta i₁ x * (starRingEnd ℂ)
+                (hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 x) := by
+            rw [Finset.mul_sum]
+            exact Finset.sum_congr rfl fun x _ => by ring
+      _ = 0 := by rw [hext, hfull, mul_zero]
+  · intro x hx
+    obtain ⟨hx1, hxmem⟩ := Finset.mem_erase.mp hx
+    have hxH : (↑x : G) ∈ hyp.H :=
+      Subgroup.mem_subgroupOf.mp (Finset.mem_filter.mp hxmem).2
+    have hxsharp : (↑x : G) ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) := by
+      refine OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hxH, ?_⟩
+      intro h1
+      exact hx1 (Subtype.ext h1)
+    have hpt := hypothesis76_point_formula H76 (fun _ => rfl)
+      (hyp.P.subgroupOf hyp.S) hyp.eta01 i₁ hi₁pos hi₁ker hmiddle x hxsharp
+    have htail : (∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).filter
+          (fun i => (hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i)),
+        (star (H76.cCoeff hyp.eta01 i) / H76.zetaNormSq i) * H76.zeta i x)
+        = hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 x := rfl
+    rw [hpt, htail, hi₁c, star_intCast, hnormQ]
+    ring
+  · have hpars : ((∑ x : ↥hyp.S, ‖H76.zeta i₁ x‖ ^ 2 : ℝ) : ℂ)
+        = (Nat.card ↥hyp.S : ℂ) * (hyp.q : ℂ) := by
+      rw [sum_normSq_eq_card_mul_inner, ← OddOrder.Peterfalvi.S09.Hypothesis76.zetaNormSq,
+        hnormQ]
+    have hparsR : ∑ x : ↥hyp.S, ‖H76.zeta i₁ x‖ ^ 2
+        = (Nat.card ↥hyp.S : ℝ) * (hyp.q : ℝ) := by
+      exact_mod_cast hpars
+    have hscale : ∀ x : ↥hyp.S,
+        ‖((hyp.q : ℂ))⁻¹ * H76.zeta i₁ x‖ ^ 2
+          = ((hyp.q : ℝ))⁻¹ ^ 2 * ‖H76.zeta i₁ x‖ ^ 2 := by
+      intro x
+      rw [norm_mul, mul_pow, norm_inv, Complex.norm_natCast]
+    have hζ1 : ‖((hyp.q : ℂ))⁻¹ * H76.zeta i₁ 1‖ ^ 2 = (hyp.u : ℝ) ^ 2 := by
+      rw [hdeg, norm_mul, norm_inv, Complex.norm_natCast, Complex.norm_natCast]
+      rw [show ((hyp.u * hyp.q : ℕ) : ℝ) = (hyp.u : ℝ) * (hyp.q : ℝ) from by
+        push_cast; ring]
+      field_simp
+    have hSq : (Nat.card ↥hyp.S : ℝ)
+        = (Nat.card ↥(derivedInG hyp.S) : ℝ) * (hyp.q : ℝ) := by
+      exact_mod_cast hyp.card_S_eq_deriv_mul_q
+    rw [Finset.sum_congr rfl (fun x _ => hscale x), ← Finset.mul_sum, hparsR, hζ1, hSq]
+    field_simp
+  · have hζ1u : ((hyp.q : ℂ))⁻¹ * H76.zeta i₁ 1 = ((hyp.u : ℕ) : ℂ) := by
+      rw [hdeg, show ((hyp.u * hyp.q : ℕ) : ℂ) = (hyp.u : ℂ) * (hyp.q : ℂ) from by
+        push_cast; ring]
+      field_simp
+    change ((((hyp.q : ℂ))⁻¹ * H76.zeta i₁ 1) *
+        (starRingEnd ℂ) (hypothesis76AlphaFun H76
+          (hyp.P.subgroupOf hyp.S) hyp.eta01 1)).re = (hyp.u : ℝ) * (α1 : ℝ)
+    rw [hζ1u, hα1]
+    rw [show ((hyp.u : ℕ) : ℂ) = (((hyp.u : ℕ) : ℝ) : ℂ) from by push_cast; ring,
+      show ((α1 : ℤ) : ℂ) = (((α1 : ℤ) : ℝ) : ℂ) from by push_cast; ring,
+      Complex.conj_ofReal, ← Complex.ofReal_mul, Complex.ofReal_re]
+  · have hF : ∀ x : ↥hyp.S,
+        x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1 ↔
+          ((x : G) ∈ H76.H ∧ x ≠ 1) := by
+      intro x
+      rw [Finset.mem_erase, Finset.mem_filter]
+      constructor
+      · rintro ⟨h1, -, h2⟩
+        exact ⟨Subgroup.mem_subgroupOf.mp h2, h1⟩
+      · rintro ⟨h2, h1⟩
+        exact ⟨h1, Finset.mem_univ _, Subgroup.mem_subgroupOf.mpr h2⟩
+    have hP'H : ∀ x : ↥hyp.S, x ∈ hyp.P.subgroupOf hyp.S → (x : G) ∈ H76.H := by
+      intro x hx
+      exact (show hyp.P ≤ hyp.H from le_sup_left) (Subgroup.mem_subgroupOf.mp hx)
+    have hinfl := hypothesis76AlphaFun_inflation H76 (hyp.P.subgroupOf hyp.S)
+      hyp.eta01 _ hF hP'H
+    have hPS : hyp.P ≤ hyp.S := by
+      rw [hyp.P_eq_SF]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    have hcardPS : Nat.card ↥(hyp.P.subgroupOf hyp.S) = hyp.p ^ hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPS).toEquiv]
+      exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+    have hpq1 : (1 : ℕ) ≤ hyp.p ^ hyp.q :=
+      Nat.one_le_pow _ _ (by have := hyp.three_le_p; omega)
+    have hcoeff : ((Nat.card ↥(hyp.P.subgroupOf hyp.S) : ℝ)) - 1
+        = ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) := by
+      rw [hcardPS, Nat.cast_sub hpq1]
+      norm_num
+    have hval : ‖hypothesis76AlphaFun H76 (hyp.P.subgroupOf hyp.S) hyp.eta01 1‖ ^ 2
+        = ((α1 : ℤ) : ℝ) ^ 2 := by
+      rw [hα1, Complex.norm_intCast, sq_abs]
+    rw [← hval, ← hcoeff]
+    exact hinfl
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.8)**: `∑_{x∈H^#} |η₀₁(x)|² ≥ |S′| − u²` (`H = PC`; p. 79) — the book's
+literal `S`-side statement (issue 1041; `eta10_Qsharp_norm_lower_core` is the
+"(13.8) applied to `T`" instance of (13.10.2)).  Chains the `(S, H^#)` correction package
+into the side-independent engine `caseB_eta01_norm_bound`; the (13.2.c) bound
+`2u ≤ |P| − 1` is `two_mul_u_le`. -/
+theorem Hypothesis.eta01_Hsharp_norm_lower_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    (Nat.card ↥(derivedInG hyp.S) : ℝ) - (hyp.u : ℝ) ^ 2
+      ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖hyp.eta01 x‖ ^ 2 := by
+  classical
+  haveI := hyp.finiteG
+  obtain ⟨ζ, α, α1, δ, hvanish, hinner, hχ, hfirstTerm, hcross, hδ, hinfl⟩ :=
+    hyp.exists_caseB_data_eta01_S_core hG
+  have hHS : hyp.H ≤ hyp.S := hyp.H_le_S
+  have hu := hyp.two_mul_u_le hG
+  have hengine : (Nat.card ↥(derivedInG hyp.S) : ℝ) - (hyp.u : ℝ) ^ 2
+      ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1,
+          ‖hyp.eta01 ↑x‖ ^ 2 := by
+    have h := caseB_eta01_norm_bound (S := ↥hyp.S) (hyp.H.subgroupOf hyp.S)
+      ζ α (fun x => hyp.eta01 ↑x)
+      (Pm1 := hyp.p ^ hyp.q - 1) (u := hyp.u)
+      (firstTerm := (Nat.card ↥(derivedInG hyp.S) : ℝ) - (hyp.u : ℝ) ^ 2)
+      (α1 := α1) (δ := δ)
+      hvanish (by convert hinner using 2)
+      (fun x hx => hχ x (by convert hx using 2))
+      hfirstTerm hcross hδ
+      (by convert hinfl using 2; congr!) hu
+    convert h using 2; congr!
+  rwa [sum_apply_erase_one_filter_subgroupOf hHS
+    (fun y => ‖hyp.eta01 y‖ ^ 2)] at hengine
+
+end
+
 end OddOrder.Peterfalvi.S15

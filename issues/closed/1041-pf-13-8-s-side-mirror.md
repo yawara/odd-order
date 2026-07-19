@@ -273,3 +273,21 @@ sum_apply_erase_one_filter_subgroupOf + H_le_S)。
    Pm1 := p^q − 1, u := hyp.u, firstTerm := |S′| − u²) + two_mul_u_le hG +
    sum_apply_erase_one_filter_subgroupOf (hyp.H_le_S)。
 3. AxiomsCheck pin (最終 theorem + 主要中間) + frontier note 更新 + issue close。
+
+## 解決 (2026-07-19, iteration 5)
+
+全 5 段完成、sorry 0、axiom-clean 実測済 (#print axioms = 標準 3 axiom のみ):
+
+- `Hypothesis.eta01` 定義 + `eta01_mem_ZIrr` (DegreesFirstSplit.lean)
+- 新 leaf `S15_CaseBEndgameSupply/Eta01Correction.lean` (~800 行, hub 登録済):
+  1. `etaColumn_inner_eta01` / `muColumnSum_ne_of_ne` /
+     `CharacterDegreeCore.exists_eta01_column_data` ((13.3.c)→(13.5) 入力)
+  2. `Hypothesis.exists_muS_index_eta01_core` (distinguished family index; 核心)
+  3. `H_sharp_hypothesis76_base_cCoeff_int` + `exists_etaS_alphaFun_one_int_core`
+  4. `Hypothesis.exists_caseB_data_eta01_S_core` (correction package 7 成分)
+  5. `Hypothesis.eta01_Hsharp_norm_lower_core` — **(13.8) 本体**:
+     `|S′| − u² ≤ ∑_{x∈H^#} ‖η₀₁(x)‖²` (仮定は hG のみ!)
+- AxiomsCheck に 3 pin 追加。
+- 実装上の学び: family subgroup 綴り (H76.H.subgroupOf S) は ∃-repackaging で吸収 /
+  `set` は既得 hypothesis の型を fold しないので `let` (T 側パターン) /
+  S 側は τ = Ind_S^G ゆえ integrality が Q 側より単純。

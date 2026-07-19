@@ -10406,6 +10406,15 @@ the assembled T-side case-(b) facts to Lean/mathlib's standard three axioms. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_of_q_lt_p_core
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.T_caseB_facts_unconditional
 
+/-! Peterfalvi (13.8), the book's literal `S`-side statement (issue 1041):
+`∑_{x∈H^#}|η₀₁(x)|² ≥ |S′| − u²` over the `(S, H^#)` chosen-base (7.6) family, together
+with its distinguished-index and correction-package suppliers.  Sorry-free chain. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.exists_muS_index_eta01_core
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.exists_caseB_data_eta01_S_core
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.eta01_Hsharp_norm_lower_core
+
 -- Ch.10 (More Transfer Theory) §10A: Thm 10.1 Yoshida — P Sylow, v(G) < P/P' ⇒
 -- G は C_p ≀ C_p 上へ全射 / Thm 10.11 (self-normalizing 系の帰結)
 #assert_only_allowed_axioms
