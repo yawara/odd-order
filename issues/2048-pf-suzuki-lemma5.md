@@ -58,8 +58,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           その像が pairwise commuting な冪等作用素族であることを証明する
     - [x] ambient `X`-作用から `ν̄` の共変性を導き、common-eigenvector 論と
           involution 推移性から各 `ν̄(u)` が `0` または `1` であることを証明する
-    - [ ] Lemma 2 により `ker ν̄ = A` を示し、像の位数 `2` と `C/A` の位数 `2`、
-          原文の最終場合分けを接続して `exp(A) ≤ 4` を結論する
+    - [x] Lemma 2 により `ker ν̄ = A` を示す
+    - [x] `0`/`1` dichotomy と第一同型定理から像の位数 `2`、
+          従って `C/A` の位数 `2` を証明する
+    - [ ] 原文 p. 84 の二場合分けを接続して `exp(A) ≤ 4` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
