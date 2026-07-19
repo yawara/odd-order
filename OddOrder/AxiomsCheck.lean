@@ -4958,10 +4958,6 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.residual_not_orthogonal_of_transposed_reindexing
 set_option linter.style.longLine false in
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_charParameters_full_for_member
-set_option linter.style.longLine false in
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_s13Hypothesis_for_member
-set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_support
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.typeIII_induced_source_degree

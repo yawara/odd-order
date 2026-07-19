@@ -63,3 +63,21 @@ Hypothesis」を必要とするかで決まる。着手時に grep で確認す�
 - 新規 producer: `S12.Hypothesis.exists_charParameters_full_of_zeta`
   (S12_MaximalIII_IV_V_Core/CharacterParameters.lean)
 - frontier note: `notes/peterfalvi/frontier_measured_2026_07_19.md` の §11 (11.8) 行
+
+## 解決 (2026-07-19)
+
+issue の cite 置換案よりさらに進め、CLAUDE.md ラッパー方針 (純リネーム wrapper は repo 内 theorem
+にも書かない) に従い **S16 側 3 宣言を削除**し consumer を S13/S12 版へ直結した:
+
+- `S16.member_residual_not_orthogonal_H0C_of_refuter` → 削除。consumer 2 件
+  (TGapMemberResidual `member_residual_not_orthogonal_of_transposed_alignment` /
+  TGapGridAlignment `member_residual_not_orthogonal_eta_of_refuter`) は
+  `S13.zeta_residual_not_orthogonal_H0C_of_refuter` を直接 cite (ζ が implicit になるだけで他は同一)。
+- `S16.exists_s13Hypothesis_for_member` → 削除 (consumer は上記重複のみ = 0 に)。
+  「member に pin した S13 Hypothesis」は現状どこも必要としない (∀ ζ 形が member 適用を吸収)。
+- `S16.exists_charParameters_full_for_member` → 削除。**これも statement 同一の重複**と着手時に判明
+  (`S12.Hypothesis.exists_charParameters_full_of_zeta` と結論が完全一致、ζ explicit/implicit の差のみ)。
+- AxiomsCheck の pin 2 行 (4961/4963) を削除。TGapMemberResidual ヘッダに削除経緯を記録。
+
+検証: `lake build` TGapMemberResidual + TGapNonorthogonality + TGapGridAlignment green (4229 jobs)。
+sorry 増減なし (削除した 3 宣言は sorry-free、残存側も sorry-free)。フルビルドは hub gate に委譲。
