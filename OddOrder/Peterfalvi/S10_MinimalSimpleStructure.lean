@@ -485,6 +485,60 @@ theorem typeP_centralizer_unique_of_mem_typePACore [Finite G]
   exact OddOrder.BG.Ch4.S16.uniqueMaximal_of_kappaSigmaCompl_element hG hT
     (Subgroup.map_subtype_le U') hUhall (Subgroup.map_subtype_le _ hbM') hb1 hyπ hCne
 
+/-- **Peterfalvi (8.12.b), type-uniform form**: for *any* maximal subgroup `T` and any point
+`b ∈ A(T)` whose order is coprime to `|T_s| = |T_σ|`, `T` is the unique maximal subgroup of `G`
+containing `C_G(b)`.
+
+Assembles the book's two clauses of (8.12) on the type-uniform support `typeA`: Type I through
+`typeI_centralizer_le_and_unique` (there `A(T) ⊆ T` and `κ(T) = ∅`), the types of class `𝒫`
+through `typeP_centralizer_unique_of_mem_typePACore` (there `A(T) ⊆ T'`).  The identification of
+`A(T)` with the respective clause of (8.10) is `typeA_eq_typeIA` / `typeA_eq_typePACore`, and
+`M_F = M_σ` on Type I is Proposition 16.1.
+
+This is the shape (8.18.a) consumes: "Since `x` has order prime to `|T_s|`, it follows from
+(8.12.b) that `T` is the unique maximal subgroup of `G` such that `C_G(x) ⊂ T`." -/
+theorem centralizer_unique_of_mem_typeA [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {T : Subgroup G} (hT : T ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau T)
+    (hW1hall : ∀ data : TypePData T, OddOrder.Isaacs.Ch03.IsHallSubgroup
+      (OddOrder.BG.Ch4.S14.kappa T) (data.W1.subgroupOf T))
+    {b : G} (hbA : b ∈ OddOrder.GroupTheory.typeA T tau)
+    (hcop : Nat.Coprime (orderOf b) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma T))) :
+    maximalSubgroupsContaining (Subgroup.centralizer ({b} : Set G)) = {T} := by
+  classical
+  by_cases htauI : tau = PeterfalviType.I
+  · -- Type I: `A(T) = typeIA T dT ⊆ T`, and `M_F = M_σ` supplies the (8.12.b) coprimality.
+    subst htauI
+    obtain ⟨dT⟩ : IsTypeI T := htau
+    rw [OddOrder.GroupTheory.typeA_eq_typeIA dT] at hbA
+    obtain ⟨hbT, hb1, u, huH, hbu⟩ := hbA
+    have hMF : maxNilpotentNormalHall T = OddOrder.BG.Ch3.S10.Msigma T :=
+      OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+        hG hT (Or.inl ⟨dT⟩)
+    have hwit : ∃ h ∈ maxNilpotentNormalHall T, h ≠ 1 ∧ Commute b h :=
+      ⟨u, by rw [← dT.typeF.H_eq]; exact huH.1,
+        fun he => huH.2 (Set.mem_singleton_iff.mpr he),
+        Subgroup.mem_centralizer_singleton_iff.mp hbu⟩
+    obtain ⟨hle, huniq⟩ :=
+      typeI_centralizer_le_and_unique hG hT dT hbT hb1 (by rw [hMF]; exact hcop) hwit
+    ext L
+    simp only [mem_maximalSubgroupsContaining, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨hLmax, hLle⟩
+      exact huniq L (mem_maximalSubgroups.mpr hLmax) hLle
+    · rintro rfl
+      exact ⟨mem_maximalSubgroups.mp hT, hle⟩
+  · -- Types II--V: `A(T) = typePACore T ⊆ T'`, and the `κ`-side is free.
+    obtain ⟨data⟩ : Nonempty (TypePData T) := by
+      cases tau with
+      | I => exact absurd rfl htauI
+      | II => exact ⟨(Classical.choice (htau : IsTypeII T)).typeP⟩
+      | III => exact ⟨(Classical.choice (htau : IsTypeIII T)).typeP⟩
+      | IV => exact ⟨(Classical.choice (htau : IsTypeIV T)).typeP⟩
+      | V => exact ⟨(Classical.choice (htau : IsTypeV T)).typeP⟩
+    rw [typeA_eq_typePACore hG hT htau htauI] at hbA
+    exact typeP_centralizer_unique_of_mem_typePACore hG hT data (hW1hall data) hbA hcop
+
 /-- **(8.18.a), conjugation-free core**: if `x ∈ A₁(S)` and some conjugate `g·x·g⁻¹ ∈ A(T)` for
 non-conjugate type-I `S, T`, then `x` is an escaping point of `A(S)` and its centralizer lies in
 the `T`-conjugate `g⁻¹·T·g`.  Genuine except the (8.12.b) pin: the `σ`-order bookkeeping is
