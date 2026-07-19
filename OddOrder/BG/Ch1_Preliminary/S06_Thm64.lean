@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
+import OddOrder.GroupTheory.FittingHeredity
+import OddOrder.GroupTheory.NormalHallHeredity
 
 /-!
 # BG §6: Theorem 6.4 — coprime engine and the centralizing-conjugator step
@@ -34,6 +36,16 @@ Theorem 6.4 本体はまだ得られていない。
 * `thm64_of_ih` — 「`Thm64IH` のもとで主張が言えれば全体が言える」。
   **残る数学的内容はすべてこの `step` の側** = BG の場合 1 (`π(F(G)) ⊄ π(H)`) と
   場合 2 (`π(F(G)) ⊆ π(H)`)。
+
+## reduction 「`G = LH` としてよい」
+
+* `thm64_of_le_proper_subgroup` — `J₁, J₂, H` が真部分群 `S < G` に共に含まれるなら,
+  帰納法の仮定を `↥S` の内部で使うだけで結論が出る。仮説 8 個を `↥S` へ移し
+  (`NormalHallHeredity` / `FittingHeredity` / `subgroupOf_le_normalizer_subgroupOf`),
+  得られた `x` を `S.subtype` で押し戻す。
+* `thm64_of_sup_ne_top` — その BG の文言どおりの形 (`S = ⟨J₁, J₂⟩ ⊔ H = LH`)。
+  これにより `step` の証明では `G = LH` を仮定してよい。
+* `subgroupOf_le_normalizer_subgroupOf` — 正規化の仮説を部分群 `↥S` へ移す段。
 
 ## 上流部品
 
@@ -472,6 +484,116 @@ theorem thm64_of_ih
       Thm64Statement π H' G₀ J₁ J₂) ?_ X H
   intro Y _ _ H' hIH
   exact step Y H' (fun Z _ _ H'' hlt => hIH Z H'' hlt)
+
+/-! ## reduction 「`G = LH` としてよい」 -/
+
+/-- `H` が `K` を正規化するなら, 任意の部分群 `S` の内部でも `H.subgroupOf S` は
+`K.subgroupOf S` を正規化する。
+
+`↥S` の元の積・逆元は台のそれ (`Subgroup.coe_mul`, `Subgroup.coe_inv`) なので,
+`Subgroup.mem_normalizer_iff` の同値がそのまま `subgroupOf` の言葉に移る。
+`S` については何も仮定しない (`H ≤ S` すら要らない — `H.subgroupOf S` は `H ⊓ S` を見るだけ)。 -/
+theorem subgroupOf_le_normalizer_subgroupOf {S H K : Subgroup G}
+    (hH : H ≤ Subgroup.normalizer (K : Set G)) :
+    H.subgroupOf S ≤ Subgroup.normalizer ((K.subgroupOf S : Subgroup ↥S) : Set ↥S) := by
+  intro x hx
+  have hxG : (x : G) ∈ Subgroup.normalizer (K : Set G) := hH (Subgroup.mem_subgroupOf.mp hx)
+  rw [Subgroup.mem_normalizer_iff]
+  intro n
+  simpa [Subgroup.mem_subgroupOf] using Subgroup.mem_normalizer_iff.mp hxG (n : G)
+
+/-- **BG Theorem 6.4 の reduction「`G = LH` と仮定してよい」の一般形** (p. 50, mmd L2015)。
+
+`J₁`, `J₂`, `H` がどれも**真**部分群 `S < G` に含まれるなら, 帰納法の仮定を `↥S` の内部で
+使うだけで Theorem 6.4 の結論が `G` について得られる。
+
+証明は二段:
+
+1. **仮説 8 個を `↥S` へ移す**。`π`-部分群性は `isPiGroup_subgroupOf`, 正規 Hall 性は
+   `OddOrder.GroupTheory.normal_coprime_card_index_subgroupOf`, `G₀` 側の Fitting 商は
+   `↥(G₀.subgroupOf S) ≃* ↥(G₀ ⊓ S)` (`MulEquiv.subgroupCongr` と
+   `Subgroup.subgroupOfEquivOfLe`) を挟んで
+   `OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_le` (`G₀ ⊓ S ≤ G₀`),
+   商側の Fitting 商は
+   `OddOrder.GroupTheory.isNilpotent_quotient_fitting_quotient_subgroupOf`,
+   正規化は `subgroupOf_le_normalizer_subgroupOf`。測度 `|S| + |H ⊓ S|` が
+   `|G| + |H|` より小さいことは `card_subgroup_add_card_subgroupOf_lt`。
+2. **結論を `S.subtype` で押し戻す**。`x ∈ J₁ ⊔ J₂` は `Subgroup.map_subgroupOf_eq_of_le`,
+   `π`-群性は `isPiSubgroup_map` と `map_subtype_conj_subgroupOf` (共役と `subgroupOf` の
+   交換), 中心化は `↥S` の積が台の積であることから。 -/
+theorem thm64_of_le_proper_subgroup {X : Type u} [Group X] [Finite X] (π : Set ℕ)
+    (H G₀ J₁ J₂ S : Subgroup X) [G₀.Normal] (hIH : Thm64IH X H)
+    (hJ₁S : J₁ ≤ S) (hJ₂S : J₂ ≤ S) (hHS : H ≤ S) (hSne : S ≠ ⊤) :
+    Thm64Statement π H G₀ J₁ J₂ := by
+  intro hH hG₀hall hG₀nil hQnil hJ₁pi hJ₂pi hJ₁norm hJ₂norm
+  -- ## 1. 仮説を `↥S` へ移す
+  have hmeas : Nat.card ↥S + Nat.card ↥(H.subgroupOf S) < Nat.card X + Nat.card ↥H :=
+    card_subgroup_add_card_subgroupOf_lt hSne H
+  have hH' : Subgroup.IsPiSubgroup πᶜ (H.subgroupOf S) := isPiGroup_subgroupOf hHS hH
+  have hJ₁pi' : Subgroup.IsPiSubgroup π (J₁.subgroupOf S) := isPiGroup_subgroupOf hJ₁S hJ₁pi
+  have hJ₂pi' : Subgroup.IsPiSubgroup π (J₂.subgroupOf S) := isPiGroup_subgroupOf hJ₂S hJ₂pi
+  have hG₀hall' : Nat.Coprime (Nat.card ↥(G₀.subgroupOf S)) (G₀.subgroupOf S).index :=
+    (OddOrder.GroupTheory.normal_coprime_card_index_subgroupOf hG₀hall S).2
+  have hG₀nil' : Group.IsNilpotent (↥(G₀.subgroupOf S) ⧸ Ch01.fitting ↥(G₀.subgroupOf S)) := by
+    -- `G₀ ⊓ S ≤ G₀` の遺伝を `↥(G₀.subgroupOf S) ≃* ↥(G₀ ⊓ S)` で移す。
+    have e : ↥(G₀.subgroupOf S) ≃* ↥(G₀ ⊓ S) :=
+      (MulEquiv.subgroupCongr (Subgroup.inf_subgroupOf_right G₀ S)).symm.trans
+        (Subgroup.subgroupOfEquivOfLe inf_le_right)
+    exact OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_injective e.toMonoidHom
+      e.injective (OddOrder.GroupTheory.isNilpotent_quotient_fitting_of_le inf_le_left hG₀nil)
+  have hQnil' : Group.IsNilpotent
+      ((↥S ⧸ G₀.subgroupOf S) ⧸ Ch01.fitting (↥S ⧸ G₀.subgroupOf S)) :=
+    OddOrder.GroupTheory.isNilpotent_quotient_fitting_quotient_subgroupOf S G₀ hQnil
+  have hJ₁norm' : H.subgroupOf S ≤
+      Subgroup.normalizer ((J₁.subgroupOf S : Subgroup ↥S) : Set ↥S) :=
+    subgroupOf_le_normalizer_subgroupOf hJ₁norm
+  have hJ₂norm' : H.subgroupOf S ≤
+      Subgroup.normalizer ((J₂.subgroupOf S : Subgroup ↥S) : Set ↥S) :=
+    subgroupOf_le_normalizer_subgroupOf hJ₂norm
+  -- ## 2. 帰納法の仮定を `↥S` の内部で使う
+  obtain ⟨x, hxmem, hxpi, hxc⟩ :=
+    hIH ↥S (H.subgroupOf S) hmeas π (G₀.subgroupOf S) (J₁.subgroupOf S) (J₂.subgroupOf S)
+      hH' hG₀hall' hG₀nil' hQnil' hJ₁pi' hJ₂pi' hJ₁norm' hJ₂norm'
+  -- ## 3. 結論を `S.subtype` に沿って押し戻す
+  refine ⟨(x : X), ?_, ?_, ?_⟩
+  · -- `x ∈ J₁ ⊔ J₂`: `⊔` は `map` と交換し, `J₁ ≤ S`, `J₂ ≤ S` で `subgroupOf` が戻る。
+    have hmapsup : ((J₁.subgroupOf S) ⊔ (J₂.subgroupOf S)).map S.subtype = J₁ ⊔ J₂ := by
+      rw [Subgroup.map_sup, Subgroup.map_subgroupOf_eq_of_le hJ₁S,
+        Subgroup.map_subgroupOf_eq_of_le hJ₂S]
+    rw [← hmapsup]
+    exact Subgroup.mem_map_of_mem S.subtype hxmem
+  · -- `⟨J₁ˣ, J₂⟩` が `π`-群: 像は `π`-部分群 (`isPiSubgroup_map`) で, その像を計算する。
+    have hconj : (MulAut.conj x • J₁.subgroupOf S).map S.subtype = MulAut.conj (x : X) • J₁ := by
+      rw [conj_smul_eq_map, map_subtype_conj_subgroupOf x J₁ hJ₁S, conj_smul_eq_map]
+    have hmap : ((MulAut.conj x • J₁.subgroupOf S) ⊔ J₂.subgroupOf S).map S.subtype
+        = (MulAut.conj (x : X) • J₁) ⊔ J₂ := by
+      rw [Subgroup.map_sup, hconj, Subgroup.map_subgroupOf_eq_of_le hJ₂S]
+    have hpi := isPiSubgroup_map (π := π) S.subtype hxpi
+    rwa [hmap] at hpi
+  · -- `x ∈ C_G(H)`: `↥S` の中での可換性を台へ落とす。
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    have hmem : (⟨h, hHS hh⟩ : ↥S) ∈ ((H.subgroupOf S : Subgroup ↥S) : Set ↥S) :=
+      Subgroup.mem_subgroupOf.mpr hh
+    simpa using congrArg Subtype.val (Subgroup.mem_centralizer_iff.mp hxc _ hmem)
+
+/-- **BG Theorem 6.4 の reduction「`G = LH` としてよい」** (p. 50, mmd L2015):
+
+> Since `H` normalizes `J₁` and `J₂`, `H` normalizes `L`. We can assume that `G = LH`.
+
+`L := ⟨J₁, J₂⟩ = J₁ ⊔ J₂` は `H` に正規化されるので `S := L ⊔ H` は積 `LH` に他ならない。
+`S ≠ G` のときは帰納法の仮定を `↥S` の内部で使えば結論が出る
+(`thm64_of_le_proper_subgroup`) ので, 帰納法の各場合を証明するときは `S = G`,
+すなわち `G = LH` を仮定してよい。
+
+なお Lean の部分群束では `J₁ ⊔ J₂ ⊔ H` は無条件に部分群なので, 原文が `H` による `L` の
+正規化から `LH` が部分群であることを導く段は形式化の上では不要になる (正規化の仮説は
+代わりに `hJ₁norm`, `hJ₂norm` を `↥S` へ移す段で使われる)。 -/
+theorem thm64_of_sup_ne_top {X : Type u} [Group X] [Finite X] (π : Set ℕ)
+    (H G₀ J₁ J₂ : Subgroup X) [G₀.Normal] (hIH : Thm64IH X H)
+    (hne : J₁ ⊔ J₂ ⊔ H ≠ ⊤) : Thm64Statement π H G₀ J₁ J₂ :=
+  thm64_of_le_proper_subgroup π H G₀ J₁ J₂ (J₁ ⊔ J₂ ⊔ H) hIH
+    (le_sup_left.trans le_sup_left) (le_sup_right.trans le_sup_left) le_sup_right hne
 
 end OddOrder.BG.Ch1.S06
 

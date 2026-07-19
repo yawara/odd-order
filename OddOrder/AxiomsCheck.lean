@@ -2598,6 +2598,18 @@ set_option linter.style.longLine false in
 -- ([[scaffold-sorry-free-not-done]]).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_of_ih
 
+-- BG **Theorem 6.4**, the "we may assume `G = LH`" reduction (issue 3026 wave 4).  If
+-- `J₁ ⊔ J₂ ⊔ H` is a proper subgroup, the inductive step follows from the induction hypothesis
+-- applied inside it: all eight hypotheses transport (π-conditions, normal-Hall via
+-- `NormalHallHeredity`, both Fitting-quotient conditions via `FittingHeredity` — the
+-- quotient-side one is exactly what wave 3's `map_subgroupOf_subtype_injective` was built for),
+-- and both conclusions push back out along `S.subtype`.  Stated for an **arbitrary** proper `S`
+-- containing `J₁, J₂, H` — the proof never uses the shape `L ⊔ H` — with the BG-shaped
+-- `thm64_of_sup_ne_top` as a one-line specialization.  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.subgroupOf_le_normalizer_subgroupOf
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_of_le_proper_subgroup
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_of_sup_ne_top
+
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup
 #assert_only_allowed_axioms
