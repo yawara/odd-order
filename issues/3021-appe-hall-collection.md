@@ -158,3 +158,38 @@ theorem narrow_centralizer_decomp [Finite R] {p : ℕ} [Fact p.Prime]
 
 ⚠ 手順 1 の「位数 `p³` 以下の p 群の検査」は BG が省略している箇所。repo の
 `S04_PGroupsSmallRank.lean` に該当補題があるか着手時に実測すること。
+
+## ⚠ 2026-07-20: 手順 1 (`|S| ≤ p³`) の対応物と、既存の同型証明を発見
+
+### (i) BG が省略する「位数 p³ 以下の p 群の検査」
+
+`S04_PGroupsSmallRank.lean` に必要な形が既にある:
+
+- **`card_le_prime_cube_of_pRank_le_two_of_exponent_prime`** (:508) —
+  `r(R) ≤ 2` かつ指数 p ⟹ `|R| ≤ p³`。E.3 Step 2 の `|S| ≤ p³` 分岐はこの**対偶**
+  (`|S| > p³` ⟹ `r(S) ≥ 3`) として使える。実際 BG も直後に `r(S) ≥ 3` を出しているので、
+  **`|S| ≤ p³` の個別検査を経由せずこの補題で直接 `r(S) ≥ 3` を取る方が短い**。
+- **`nilpotencyClass_le_of_card_le_pow`** (:686) — `|G| ≤ p^{j+1}` ⟹ `cl(G) ≤ j`。
+  小さい位数での class 評価が要るときはこれ。
+
+### (ii) ⚠ 既存 `omega1_pow_eq_one_of_pRank_le_two_of_three_lt` (:819) は
+### 今回の `pow_mul_eq_one_of_class_lt` と**同型の帰納**
+
+BG Prop 4.3 の `r(R) ≤ 2` 版で、docstring を読むと骨格が完全に一致する:
+「`⟨x,y⟩ ≠ R'` なら IH / `⟨x⟩ = R'` なら abelian / それ以外は極大正規 `S ⊇ ⟨x⟩` を取り
+IH で `Ω₁(S)` の指数 p …」。違いは最後の詰めだけ — 既存版は `|Ω₁(S)| ≤ p³` から
+`|R'| ≤ p⁴` → `cl ≤ 3` → weight-3 交換子が中心、と**class ≤ 3 に落として**閉じるのに対し、
+今回の `GroupTheory.pow_mul_eq_one_of_class_lt` は **Hall の公式 (E.1) で任意の class < p**
+を直接扱う。
+
+⟹ **E.1 が証明できた今、既存の `r(R) ≤ 2` 版は今回の一般版から導ける可能性が高い**
+(`r(R) ≤ 2` かつ `p > 3` ⟹ class < p を示せばよい)。これは特殊化債務の解消候補。
+⚠ ただし `S04_PGroupsSmallRank.lean` は BG Ch1 の leaf で **AppE より上流**なので、
+GroupTheory 版を cite する形に書き換えるのは import 的には可能 (GroupTheory ⊂ 上流)。
+着手は E.3 完了後の低優先タスクとし、**先に E.3 本体を進める**。
+
+### 更新した手順 1
+
+× 「`|S| ≤ p³` の場合分けを潰す」
+○ **`card_le_prime_cube_of_pRank_le_two_of_exponent_prime` の対偶で
+   `|S| > p³` ⟹ `r(S) ≥ 3` を直接得る** (BG の (E.1)-(E.3) 相当をまとめて飛ばせる)。
