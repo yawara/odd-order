@@ -966,6 +966,12 @@ theorem Hypothesis.mu_j_isIndPC [Finite G]
 noncomputable def Hypothesis.eta10 (hyp : Hypothesis (G := G)) : ClassFunction G ℂ :=
   hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩
 
+/-- The transposed distinguished entry `η₀₁ = τ₃(ω₀₁)` of the (13.8)/(13.9) estimates
+(the `S`-side counterpart of `eta10`; Peterfalvi (13.8) bounds `∑_{x∈H^#}|η₀₁(x)|²`
+from below, issue 1041). -/
+noncomputable def Hypothesis.eta01 (hyp : Hypothesis (G := G)) : ClassFunction G ℂ :=
+  hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hyp.p_prime.one_lt⟩
+
 open scoped FiniteInduce in
 /-- **`η₁₀` is a virtual character of `G`** — real content of the 3002-threaded grid:
 `η₁₀ = τ₃(ω₁₀)` (`eta_eq_tau_omega`), `ω₁₀ ∈ ZIrr W` (`omega_mem_ZIrr`), and `τ₃` preserves

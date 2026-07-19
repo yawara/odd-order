@@ -3881,7 +3881,7 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.mem_xSetFinset_iff_mem_Xset
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_centralCommutator_isCoherent_of_irreducible_X
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_of_irreducible_X
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_centralCommutator_isCoherent_of_c2_caseA
