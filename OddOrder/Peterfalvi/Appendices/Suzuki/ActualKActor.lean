@@ -125,7 +125,7 @@ instance actualKActor_isCyclic : IsCyclic ↥hyp.actualKActor :=
 `Q`.  Transitivity and sharpness are precisely the two clauses of §1
 Proposition 3, transported from ambient conjugation to `conjQByK`. -/
 theorem actualKActor_actsRegularlyOnInvolutions :
-    Suzuki2Groups.ActsRegularlyOnInvolutions hyp.actualKActor := by
+    OddOrder.GroupTheory.Suzuki2Group.ActsRegularlyOnInvolutions hyp.actualKActor := by
   intro x hx y hy
   have hx2G : ((x : ↥hyp.Q) : G) ^ 2 = 1 :=
     congrArg Subtype.val hx.1
