@@ -174,6 +174,7 @@ Lean 技術的 instance、repo の方が一般な場合、他ファイルに一�
 | 番号 | 内容 | 対応 |
 |---|---|---|
 | **7.7** | `hP_neBot : P ≠ ⊥` 追加。書籍は「If `P` is a `p`-subgroup of `G`」のみ | 計 **6 宣言**から削除 (Ch02 の `normalizer_map_of_coprime_kernel` + Ch07 の 4 宣言 + 外部 caller 2 箇所)。仮説は死んでいた (Ch02 側が既に `_hP_neBot` と未使用束縛)。⚠ **同ファイルの別補題 `map_ne_bot_of_coprime_kernel` (Ch02_Subnormality/Main.lean:455) は本当に使う** (:474 で `apply hP_neBot`) ので手を付けていない |
+| **5.22** | **結論の欠落** (仮説の狭さでない): 書籍の第 2 結論 `G/A^p(G) ≅ H/A^p(H)` (= 「H が p-transfer を制御する」本体) が無かった | `quotient_aPrime_mulEquiv_of_controlsFusionIn` (Ch05_Transfer/Basic.lean、第 1 結論の直後) を新設。`H ⊔ A^p(G) = ⊤` (Sylow index と `p`-冪 index の互いに素性 + `P ≤ H`) を出し、第 2 同型定理 `QuotientGroup.quotientInfEquivProdNormalQuotient` + `QuotientGroup.congr` 2 回で `↥H ⧸ A^p(H) ≃* G ⧸ A^p(G)`。⚠ `rw` で部分群を書き換えると商の `Normal` instance 依存で motive が壊れるので、**全て `QuotientGroup.congr` による transport で組んだ** |
 | **7.8** (Burnside `p^a q^b`) | `hpq : p ≠ q` 追加。書籍は「Let `G` be a finite group of order `p^a q^b`, where `p` and `q` are primes」だけで相異性を課さない | 削除し `p = q` 分岐を追加 (`\|G\| = p^(a+b)` の `p`-群 ⇒ 冪零 ⇒ 可解)。**下流の実害も解消**: `Ch07/ForwardFromCh03.lean` は素因子が 1 個のとき `hpq` を満たすためだけに**偽の第 2 素数** (`if p = 2 then 3 else 2`) を捏造していた |
 
 ### ⬜ 未解消 (実装方針つき)
@@ -181,7 +182,6 @@ Lean 技術的 instance、repo の方が一般な場合、他ファイルに一�
 | 番号 | Lean | 狭さ | 一般化方針 |
 |---|---|---|---|
 | **7.5** | `sylow_normal_of_elementary_normal_P_theorem` (S7A2_NormalPThm75.lean:1217) | 条件 (5) `\|V : C_V(P)\| ≤ p` を**全ての** Sylow `p` 部分群について要求。書籍は結論に現れる 1 つの `P` についてのみ | 帰納法の都合 (⟨P,Q⟩ descent) だが、repo に橋渡し補題が既にある: `actionCentralizer_map_conj_index` (同ファイル:478、共役部分群の action-centralizer は index 等しい) + Sylow 共役性で単一 `P` 形から ∀ 形を導ける。**interface 債務** (両形は同値) ゆえ低優先 |
-| **5.22** | `APrime_eq_subgroupOf_APrime_of_controlsFusionIn` (Ch05_Transfer/Basic.lean:1283) | **結論**が書籍の 2 つのうち 1 つだけ。書籍は `A^p(H) = H ∩ A^p(G)` に加えて `G/A^p(G) ≅ H/A^p(H)` (= 「H が p-transfer を制御する」本体) も主張。repo に `ControlsPTransfer` 述語は無い | ⚠ 仮説の狭さでなく**結論の欠落**。材料は同じ証明内に既にある (`hHA_top : H ⊔ A = ⊤`, Basic.lean:1322-1331)。これと既述の `A^p(H) = H ⊓ A^p(G)` に第 2 同型定理を当てれば `H/A^p(H) ≅ H A^p(G)/A^p(G) = G/A^p(G)`。数行 |
 
 ### 債務なしと判定した章 (Ch.5–10)
 
