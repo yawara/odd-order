@@ -76,14 +76,45 @@ anchor `χ₁` の既約性も norm 1 も**要求していない**。証明は `
 (S08_CaseBEnumeration の 2 箇所、`η` の既約性経由) も dead code になり削除**。
 残る (6.3) の未充足仮説は **`hdatum` のみ** ((5.6) 適用側の grid decomposition)。
 
+## ⚠ 「(6.3) 無条件化」の再定義 — `hdatum` は債務でなく教科書の standing hypothesis
+
+`hanchor` を閉じた後、(6.3) に残る `hdatum` を調べた結果、**「一般に供給する」は
+そもそも達成すべき目標ではない**ことが判明した (PDF p.25 実測)。
+
+- `hdatum` = **Peterfalvi (5.2.d) + (5.2.e)**:
+  (d) `χ ∈ S` に対し `(χ − χ̄)^τ = ∑_{α ∈ R(χ)} α` (`R(χ)` は `ℤ[Irr G]` の正規直交部分集合)、
+  (e) `φ` が `{χ, χ̄}` に直交するなら `R(φ) ⊥ R(χ)`。
+- これらは **Hypothesis (5.2) の仮説そのもの**で、教科書も導出していない。Theorem (5.6) は
+  Hypothesis (5.2) の下で証明される。
+- 教科書が (5.2) を**供給する**のは **(5.3) の 2 経路だけ**:
+  - **(5.3.a)** (5.2.a)+(5.2.b)+`S ⊆ Irr L` ⟹ (5.2)。(`‖(χ−χ̄)^τ‖² = 2` ゆえ `|R(χ)| = 2`、
+    (5.2.e) は (4.1) から)
+  - **(5.3.b)** Hypothesis (4.6)+(5.2.a)+`S ⊆ {Ind_K^L θ | H ⊄ Ker θ}` ⟹ (5.2)。可約 member は
+    `μ_j` (0 < j < w₂) で、(4.9) より `R(μ_j) = {δ_j ω^σ_{ij}, −δ_j ω^σ_{ik} | 0 ≤ i < w₁}`。
+- ⟹ repo が `six_two_general` / `six_three_of_six_two_oracle` / `exists_source_index_le_two_psi_of_break`
+  で `hdatum` (と `h56`) を**パラメータとして担いでいるのは教科書に忠実**であって特殊化債務でない。
+  「(6.3) standalone 無条件化」は `hanchor` の分で**完了**とみなす。
+
+**⟹ 真の未形式化はここ: (5.3) の一般 producer が repo に無い**。
+`S07.Hypothesis` (S07_Coherence/NormInequalities.lean:592) が (5.2) の carrier
+(`difference_image` = (5.2.d)、`difference_images_orthogonal` = (5.2.e)) で、docstring が
+「a carrier for later theorems, **not a proof that the hypotheses hold**」と明言している。
+producer は per-setting の ad hoc 構成のみ (S15_TSetMemberRFamily.lean:806、
+S16_NonExistenceG/TTypeIICoherence.lean:70)。**(5.3.a) / (5.3.b) を一般形で書くのが次の上流仕事**
+(§5 は §6 より文書順で上流)。(5.3.b) は §4 の (4.6)/(4.9) μ-grid に依存するので (5.3.a) が先。
+
 ## 推奨着手順 (上流優先 + 文書順)
 
 1. ~~(6.5)(a) chief factor 節~~ **✅ 2026-07-19 完了**。
 2. ~~(9.10) の `caseB` 除去~~ **✅ 2026-07-19 完了**。
 3. ~~(7.9) `hdelta_even` の一般化~~ **✅ 2026-07-19 完了**。
-4. **(6.3) standalone 無条件化 → (11.8) ∀ 化 → (6.6) の Z-generic 化** (次の frontier)。
-5. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
-6. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
+4. ~~(6.2) `hanchor` の一般供給~~ **✅ 2026-07-19 完了** ((5.6) エンジンの norm 一般化)。
+   `hdatum` 側は上記のとおり教科書 (5.2) の仮説ゆえ「無条件化」対象外。
+5. **(5.3.a) の一般 producer** (`S ⊆ Irr L` ⟹ `S07.Hypothesis`) → **(5.3.b)** (μ-grid 版)
+   (次の frontier)。§5 は §6 より上流ゆえ (11.8)/(6.6) より先。
+6. **(11.8) ∀ 化 → (6.6) の Z-generic 化**。
+7. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
+8. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。
 
 ## Lean 側の stale docstring (2026-07-19 に修正済)
