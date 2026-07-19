@@ -263,3 +263,66 @@ Suzuki [26] のみ引用)。以後 **Hall–Petresco** と綴る。
 
 fallback = Mann ルート (段 4 の代わりに collection process 本体; リスト書き換え +
 入れ子の整礎停止で ~300-700 行、単発使い捨て)。
+
+## ⭐ 2026-07-19 深夜 (2): Erdos90 を実読 → **Mann ルートに決定** (ユーザー承認)
+
+`references/erdos90` を submodule として取り込み、**自分で実読**した。前節で
+subagent 報告に基づき書いた「Erdos90 は Magnus + basic commutator の重いルート」は
+**誤り**。実際は **Mann/DDMS の support 論法そのもの**だった ⟹ 「重いルートを避けて
+Lazard–Leibman」という前節の判断根拠が消えたので、評価をやり直して **Mann に切替**。
+
+### Erdos90 の構造 (実測)
+
+- `petrescoTerm x (w+1) = (∏_{j<w} petrescoTerm x (j+1)^C(w+1,j+1))⁻¹ · (∏ xᵢ^{w+1})`
+  — **Newton 再帰で定義** ⟹ 恒等式は定義から自明。内容は全部
+  `petresco_lower_series : petrescoTerm x w ∈ γ_w` に集約 (本 repo の
+  `exists_hallCollection_of_residue` と同じ見立て)。
+- 変数 = `G × Fin w` (生成元 × コピースロット)、`FormalCommutator X = FreeMagma X`、
+  `formalWeight = 葉の個数`。形式語の積を **slot-support の濃度順にブロック分けして整列**し、
+  ブロックの support がちょうど `S` なら weight ≥ |S|。
+- ⭐ **整列の停止性を fuel で回避** (`collectFormalAux : ℕ → List → List`)。停止性の内容が
+  「1 パスで selected 因子が 1 個減る」という**数え上げ補題**に落ちる。交換で生じる補正
+  `⁅u,v⁆` の support は和集合 ⟹ 濃度順に処理していれば真に大きく selected でない、が効く。
+- `petresco_collected_term` (collected value が |S| にしか依らない) = Mann Step 3。
+  strong induction on |S| + 部分集合の個数 `C(|S|,k)` + Newton 再帰。
+- 分量: `HallEmbeddings.lean` 12,167 行のうち **先頭 ~2,400 行**が Petresco 用
+  (support ~380 / 収集エンジン ~900 / projected 版 ~380 / Petresco 固有 ~450)。
+  ⚠ **厳密 support 版と projected 版の両方**を持っているが、**Hall には projected 版だけで足りる**。
+- ⚠ **LICENSE 無し ⟹ コピペ不可**。Mann の数学的論証から自分で書く
+  (fuel は Lean の定石であって彼らの表現ではない)。
+
+### 両ルートの再評価
+
+| | **Mann (support 論法)** | Lazard–Leibman |
+|---|---|---|
+| 分量見積 | 800–1,000 行 | 800–1,300 行 |
+| リスク | **低** (完全実装が現存 ⟹ 閉じることが確認済、各段は初等的リスト操作、fuel で停止性リスク消滅) | **中〜高** (crux = 積で閉じることは**どの証明支援系にも例が無い**; Leibman 原論文 ~30 頁) |
+| 再利用性 | 低 (Hall 専用) | 高いが**本 repo に他の需要が無い** ⟹ 実質の利点薄 |
+| 一般性 | **m 生成元版がそのまま出る** (CLAUDE.md「特殊化債務は一般化する」に合致) | 2 生成元のみ |
+
+⟹ **Mann 採用** (ユーザー承認 2026-07-19)。決め手は「分量同等・片方だけリスクが実測で潰れている」
+＋ m 生成元版が副産物。
+
+### 実装計画 (Mann)
+
+新 leaf `OddOrder/GroupTheory/FormalCommutator.lean` + `HallCollectionCore.lean` 予定。
+
+- [ ] `FormalCommutator X := FreeMagma X`、`weight = length`、`support`/`projSupport`、
+      評価 `evalFC f (mul u v) = ⁅(evalFC u)⁻¹, (evalFC v)⁻¹⁆`
+      (**古典規約 `[a,b]=a⁻¹b⁻¹ab`**; mathlib 規約だと交換恒等式に逆元が入るため。
+      `E(u)·E(v) = E(v)·E(u)·E(⁅u,v⁆_formal)` が無条件で成り立つ形を選ぶ)。
+- [ ] weight ≥ |projSupport| (葉の個数 ≥ ラベル像の濃度) / `evalFC c ∈ γ_{weight c}`。
+- [ ] 収集エンジン: `extract`(fuel) → `collect` → support ごとの `split` → 濃度順の
+      `splitSubsets`。不変量 = 「残りの因子の support 濃度は ≥ |S|」。
+- [ ] Petresco 固有: 展開語 (生成元 × スロット) → 収集 → `collectedValue w S`。
+- [ ] `collectedValue w S = hallTerm xs |S|` (strong induction on |S| + `C(|S|,k)` 個数)。
+- [ ] `hallTerm xs w ∈ γ_w` ⟹ `AppE.hallCollection` を接続 (2 生成元は `xs = [x,y]`)。
+
+### 併せて訂正するもの
+
+- `AppE_FurtherResults.lean` の `hallCollection` docstring (~L105-125) が
+  「(i) 自由冪零群 + basic commutator、(ii) Hall 多項式が両方とも不在なのが本当の障害」と
+  書いているが**反証済**。Mann ルートはどちらも要らない。
+- `PolynomialSequences.lean` (184 行、sorry 0、axiom-clean) は**残す** —
+  「`n ↦ aⁿbⁿ` は多項式列」は独立した本物の結果。ただし Mann ルートでは critical path 外に
+  なるので docstring にその旨を明記する。
