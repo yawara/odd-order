@@ -1092,6 +1092,48 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
   haveI := isNilpotent_of_centerIn_ne_bot hCN hcin
   infer_instance
 
+/-! ### Small counting helpers for the endgame -/
+
+/-- `|H ⊔ N| * |H ⊓ N| = |H| * |N|` for `N` normal (second isomorphism theorem). -/
+theorem card_sup_mul_card_inf_eq [Finite G] (H N : Subgroup G) [N.Normal] :
+    Nat.card ↥(H ⊔ N) * Nat.card ↥(H ⊓ N) = Nat.card ↥H * Nat.card ↥N := by
+  have h1 : Nat.card ↥H =
+      Nat.card (↥H ⧸ (N.subgroupOf H)) * Nat.card ↥(N.subgroupOf H) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup _
+  have h2 : Nat.card ↥(H ⊔ N) =
+      Nat.card (↥(H ⊔ N) ⧸ (N.subgroupOf (H ⊔ N))) * Nat.card ↥(N.subgroupOf (H ⊔ N)) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup _
+  have h3 : Nat.card ↥(N.subgroupOf (H ⊔ N)) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  have h4 : Nat.card ↥(N.subgroupOf H) = Nat.card ↥(H ⊓ N) :=
+    Nat.card_congr ⟨fun x => ⟨x.1.1, x.1.2, x.2⟩, fun x => ⟨⟨x.1, x.2.1⟩, x.2.2⟩,
+      fun _ => rfl, fun _ => rfl⟩
+  have h5 : Nat.card (↥H ⧸ (N.subgroupOf H)) =
+      Nat.card (↥(H ⊔ N) ⧸ (N.subgroupOf (H ⊔ N))) :=
+    Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient H N).toEquiv
+  rw [h2, h3, ← h4, ← h5, h1]
+  ring
+
+/-- A positive natural number all of whose prime factors are `p` is a power of `p`. -/
+theorem eq_pow_factorization_of_primeFactors_subset {n p : ℕ} (hn : n ≠ 0)
+    (h : n.primeFactors ⊆ {p}) : n = p ^ n.factorization p := by
+  rcases Finset.subset_singleton_iff.mp h with h0 | h1
+  · rcases Nat.primeFactors_eq_empty.mp h0 with rfl | rfl
+    · exact absurd rfl hn
+    · simp
+  · conv_lhs => rw [← Nat.prod_factorization_pow_eq_self hn,
+      Nat.prod_factorization_eq_prod_primeFactors, h1, Finset.prod_singleton]
+
+/-- A `p`-group has `O_p = ⊤`. -/
+theorem oPiCore_singleton_eq_top_of_isPGroup {X : Type*} [Group X] [Finite X] {p : ℕ}
+    [Fact p.Prime] (hX : IsPGroup p X) : Ch03.oPiCore ({p} : Set ℕ) X = ⊤ := by
+  rw [eq_top_iff]
+  have htop : IsPGroup p ↥(⊤ : Subgroup X) := by
+    intro x
+    obtain ⟨n, hn⟩ := hX (x : X)
+    exact ⟨n, Subtype.ext (by simpa using hn)⟩
+  exact (Ch04.isPiGroup_singleton_of_isPGroup htop).le_oPiCore
+
 /-! ## Gorenstein Ch. 12 §1 Theorem 1.5 and Corollary 1.6
 
 > **Theorem 1.5.** If `G` is a solvable CN-group, then one of the following holds:
