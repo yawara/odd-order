@@ -397,6 +397,94 @@ theorem mem_zpowers_mul_right_of_coprime [Finite G] {b k : G} (hcomm : Commute b
   have hz := OddOrder.BG.Ch4.S14.piPart_mem_zpowers π (b * k)
   rwa [hmul] at hz
 
+/-- **Peterfalvi (8.12.b), type-`𝒫` half**: for a type-`𝒫` maximal `T` and a point
+`b ∈ A(T) = typePACore T` whose order is coprime to `|T_σ|`, `T` is the unique maximal subgroup
+of `G` containing `C_G(b)`.
+
+The book states (8.12) for Types I **and** II, splitting on `M = H ⋊ U` (Type I) versus
+`[M,M] = H ⋊ U` (Type II), and asks for `X ⊆ U^#`.  It is that second clause which makes the
+`κ`-side free here: an `A(T)`-point already lies in `T' = derivedInG T` by (8.10), and `T'`
+complements the `κ(T)`-Hall `W₁` in `T` (`TypePData.M_complement`), so the index of `W₁` is
+`|T'|` and no prime of `κ(T)` can divide `orderOf b`.  The `σ`-side is the assumed coprimality
+with `|T_σ|` (`π(T_σ) = σ(T)` via `Msigma_isHall`).  So `b` is a `(κ(T) ∪ σ(T))′`-element and BG
+Lemma 15.1(c) (`uniqueMaximal_of_kappaSigmaCompl_element`, the type-generic core of (8.12.b))
+applies — its `M_σ ⊓ C_G(b) ≠ ⊥` input being exactly the `M_σ^#`-witness that membership in
+`A(T)` carries.
+
+Contrast `typeI_centralizer_le_and_unique`, the Type-I half, which must conjugate `⟨x⟩` into the
+complement by Hall D/C: there `x` is only known to lie in `T`, and `κ(T) = ∅` is what rescues
+the argument.  For type `𝒫` the (8.10) host `M'` does that work outright, so no Hall conjugation
+is needed.
+
+`hW1hall` is an explicit hypothesis so that this stays upstream of §12
+(`S12.typePData_W1_isHallSubgroup_kappa` discharges it from `hG`/`hT`/`IsTypeP T`). -/
+theorem typeP_centralizer_unique_of_mem_typePACore [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {T : Subgroup G} (hT : T ∈ maximalSubgroups G)
+    (data : TypePData T)
+    (hW1hall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa T)
+      (data.W1.subgroupOf T))
+    {b : G} (hbA : b ∈ typePACore T)
+    (hcop : Nat.Coprime (orderOf b) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma T))) :
+    maximalSubgroupsContaining (Subgroup.centralizer ({b} : Set G)) = {T} := by
+  classical
+  haveI : IsSolvable ↥T := hG.solvable_of_mem_maximalSubgroups hT
+  obtain ⟨hbM', hb1, u, huS, hbu⟩ := hbA
+  have hcardT' : Nat.card ((derivedInG T).subgroupOf T) = Nat.card (derivedInG T) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.map_subtype_le _)).toEquiv
+  -- `b` is a `(κ(T) ∪ σ(T))′`-element.
+  have hyπ : OddOrder.GroupTheory.IsPiElement
+      ((OddOrder.BG.Ch4.S14.kappa T ∪ OddOrder.BG.Ch3.S10.sigma T)ᶜ) b := by
+    intro q hq
+    obtain ⟨hqp, hqdvd, -⟩ := Nat.mem_primeFactors.mp hq
+    simp only [Set.mem_compl_iff, Set.mem_union, not_or]
+    refine ⟨?_, ?_⟩
+    · -- `q ∉ κ(T)`: `q ∣ |b| ∣ |T′| = index(W₁)`, and a `κ`-Hall has `κ`-free index.
+      intro hqκ
+      have hbord : orderOf b ∣ Nat.card (derivedInG T) :=
+        Subgroup.orderOf_dvd_natCard _ hbM'
+      have hqidx : q ∣ (data.W1.subgroupOf T).index := by
+        rw [data.M_complement.index_eq_card, hcardT']
+        exact hqdvd.trans hbord
+      exact hW1hall.2 q (Nat.mem_primeFactors.mpr
+        ⟨hqp, hqidx, Subgroup.index_ne_zero_of_finite⟩) hqκ
+    · -- `q ∉ σ(T)`: `σ`-primes divide `|T_σ|`, coprime to `orderOf b` by hypothesis.
+      intro hqσ
+      have hHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hT
+      have hqnidx : ¬ q ∣ (OddOrder.BG.Ch3.S10.Msigma T).index := fun hdvd =>
+        hHall.2 q (Nat.mem_primeFactors.mpr
+          ⟨hqp, hdvd, Subgroup.index_ne_zero_of_finite⟩) hqσ
+      have hqG : q ∣ Nat.card G := hqdvd.trans (orderOf_dvd_natCard b)
+      have hqMσ : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma T) := by
+        rcases (Nat.Prime.dvd_mul hqp).mp
+          ((Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma T)) ▸ hqG) with h | h
+        · exact h
+        · exact absurd h hqnidx
+      have hgcd : q ∣ Nat.gcd (orderOf b) (Nat.card (OddOrder.BG.Ch3.S10.Msigma T)) :=
+        Nat.dvd_gcd hqdvd hqMσ
+      rw [Nat.Coprime.gcd_eq_one hcop] at hgcd
+      exact hqp.one_lt.ne' (Nat.dvd_one.mp hgcd)
+  -- a `(κ ∪ σ)′`-Hall of the solvable `T` (Hall E)
+  obtain ⟨U', hU'⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥T)
+    ((OddOrder.BG.Ch4.S14.kappa T ∪ OddOrder.BG.Ch3.S10.sigma T)ᶜ)
+  have hUeq : (U'.map T.subtype).subgroupOf T = U' :=
+    Subgroup.comap_map_eq_self_of_injective T.subtype_injective U'
+  have hUhall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa T ∪ OddOrder.BG.Ch3.S10.sigma T)ᶜ)
+      ((U'.map T.subtype).subgroupOf T) := by
+    rw [hUeq]; exact hU'
+  -- the `A(T)`-witness `u ∈ M_σ^#` is the nontrivial `M_σ`-centralizer input of 15.1(c)
+  have hCne : OddOrder.BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer ({b} : Set G) ≠ ⊥ := by
+    intro hbot
+    have humem : u ∈ OddOrder.BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer ({b} : Set G) := by
+      refine Subgroup.mem_inf.mpr ⟨huS.1, Subgroup.mem_centralizer_iff.mpr fun z hz => ?_⟩
+      rw [Set.mem_singleton_iff] at hz
+      subst hz
+      exact Subgroup.mem_centralizer_singleton_iff.mp hbu
+    rw [hbot] at humem
+    exact huS.2 (Set.mem_singleton_iff.mpr (Subgroup.mem_bot.mp humem))
+  exact OddOrder.BG.Ch4.S16.uniqueMaximal_of_kappaSigmaCompl_element hG hT
+    (Subgroup.map_subtype_le U') hUhall (Subgroup.map_subtype_le _ hbM') hb1 hyπ hCne
+
 /-- **(8.18.a), conjugation-free core**: if `x ∈ A₁(S)` and some conjugate `g·x·g⁻¹ ∈ A(T)` for
 non-conjugate type-I `S, T`, then `x` is an escaping point of `A(S)` and its centralizer lies in
 the `T`-conjugate `g⁻¹·T·g`.  Genuine except the (8.12.b) pin: the `σ`-order bookkeeping is
