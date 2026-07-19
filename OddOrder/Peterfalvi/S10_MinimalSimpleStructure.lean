@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
+import OddOrder.Peterfalvi.S10_TypePSupport
 
 /-!
 # TAIL
