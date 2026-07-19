@@ -65,7 +65,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           `NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq` として
           `∀ a : A, a ^ 4 = 1` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
-        maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
+        maximal abelian subgroup の指数境界 `exp(A) ≤ 4` と `Φ(G) ≤ A` を構成する
     - [x] 原文の `Lᵢ = Hᵢ / (Hᵢ² Hᵢ₊₁)` を actual lower-central quotient として
           構成し、ambient denominator、elementary-abelian 性、標準 `F₂`-module、
           誘導作用・表現を `HigmanLowerCentralGraded` に実装する
@@ -150,6 +150,26 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               actual basis triple-bracket の全項をゼロにする
       - [x] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる
+    - [x] Higman Lemma 7 (p. 86): `A = Φ(C)` かつ `C' ≤ A²` なら `C` は可換
+      - [x] 平方写像 `c ↦ c²` を actual `L₁(C) → A/A²` に降ろし、全射性と
+            actor-equivariance を証明する
+      - [x] cover 既約性から平方写像を
+            `lowerCentralLayerZeroToAgemoZeroLinearEquiv` に上げる
+      - [x] actual `L₂(C)` を分類で得る successive Agemo factor へ同変同型し、
+            非可換 `C` なら `L₂(C)` が非自明であることを証明する
+      - [x] involution 推移性、actor の奇数位数・忠実性、Agemo power equivalence を
+            `LemmaSevenSpectralCertificate.false` に接続する
+      - [x] 同型仮定を内部構成した source-facing endpoint
+            `higmanLemmaSeven_isMulCommutative` として landing (`01b037909`)
+    - [ ] Higman Lemma 8 (current source frontier, p. 87):
+          `C' = A` なら `exp(A) ≤ 2`
+      - [ ] cover と `C' = A` から `C² = C'`
+            (`Agemo C 2 1 = commutator C`) を証明する
+      - [ ] actual lower-central terms を `C₂ = A`, `C₃ = A²`, `C₄ = A⁴` と同定する
+      - [ ] actual `L₂ ≃ A/A²`, `L₃ ≃ A²/A⁴` と actor-equivariance を構成する
+      - [ ] `exp(A) > 2` のとき power map `L₂ ≃ξ L₃` を構成し、Lemma 6 と矛盾させる
+    - [ ] Higman Lemma 9: Lemmas 3, 7, 8 の三分岐から maximal abelian normal
+          invariant subgroup `A` に対する `exp(A) ≤ 4` と `Φ(G) ≤ A` を証明する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
@@ -190,5 +210,8 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/higman/SOURCE.md`
 - `OddOrder/Higman/Suzuki2Groups/HigmanSquareMap.lean`
 - `OddOrder/Higman/Suzuki2Groups/HigmanTripleBracketContradiction.lean`
+- `OddOrder/Higman/Suzuki2Groups/HigmanLowerCentralGraded.lean`
+- `OddOrder/Higman/Suzuki2Groups/HigmanCoverAbelian.lean`
+- `OddOrder/Higman/Suzuki2Groups/HigmanCoverPowerOverlap.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/QuadraticExtensions.lean`

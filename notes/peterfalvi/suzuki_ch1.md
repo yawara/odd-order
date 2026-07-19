@@ -384,13 +384,17 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Higman source frontier (issue 2048):** Lemma 5 は完了。
-      `FrobeniusCoordinates.lean` で full Singer-order を仮定しない normalized
-      Frobenius-conjugate simultaneous eigenbasis を構成し、candidate の
-      actor-equivariance と actual uniqueness を接続した。
-      `exists_lowerCentralSquareMap_eq_frobeniusSum` が原典 p. 85 の actual square-map
-      表示公式を与える。次の source frontier は Higman Lemma 6。
+    - **Higman source frontier (issue 2048):** Lemmas 4--7 は完了。
+      Lemma 7 では actual square map から `L₁(C) ≃ A/A²` を構成し、actual
+      `L₂(C)` の Agemo factor model、involution 推移性、actor の忠実性を
+      `LemmaSevenSpectralCertificate.false` へ接続した。公開 endpoint
+      `higmanLemmaSeven_isMulCommutative` は原文 p. 86 の
+      `A = Φ(C), C' ≤ A² ⟹ C is abelian` を同型仮定なしで与える。
+      次の source frontier は Higman Lemma 8 (p. 87):
+      `C' = A ⟹ exp(A) ≤ 2`。actual `L₂ = A/A²`, `L₃ = A²/A⁴` の power-map
+      同型を構成し、Lemma 6 で排除する。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
-      type-B 結論を、完成した Higman payloadへ接続する。
+      type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
+      接続する。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
