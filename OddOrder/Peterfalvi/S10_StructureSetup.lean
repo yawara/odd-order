@@ -546,16 +546,81 @@ theorem typePACore_eq_A1_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
         show _ = OddOrder.GroupTheory.sharpSubgroup (OddOrder.GroupTheory.mainSubgroup M tau)
         rw [hms]
 
+/-- **(8.10) on the types of class `𝒫`**: the type-uniform support `A(M) = typeA M tau` is the
+book-literal `typePACore M`.  The index subgroup is `M_s = M_σ` for every type
+(`mainSubgroup_eq_Msigma`, BG Proposition 16.1) and, off Type I, the host of the centralizers is
+`M'`.  Together with `typeA_eq_typeIA` this identifies `typeA` with (8.10) on the nose. -/
+theorem typeA_eq_typePACore [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M) (h : tau ≠ PeterfalviType.I) :
+    OddOrder.GroupTheory.typeA M tau = typePACore M := by
+  rw [OddOrder.GroupTheory.typeA, OddOrder.GroupTheory.supportHost_of_ne_typeI M h,
+    OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau, typePACore]
+
+/-- **`A₁(M) ⊆ A(M)` for every type** (the first inclusion of (8.10)'s closing sentence).
+`M_s = M_σ` lies in the host of `A(M)`: inside `M` on Type I (`Msigma_le`), inside `M'`
+elsewhere (`Msigma_le_derived`). -/
+theorem A1_subset_typeA [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
+    A1 M tau ⊆ OddOrder.GroupTheory.typeA M tau := by
+  refine OddOrder.GroupTheory.A1_subset_typeA ?_
+  rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
+  cases tau with
+  | I => exact OddOrder.BG.Ch3.S10.Msigma_le M
+  | _ => exact OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+
+/-- A type-`P₁` maximal is not of Peterfalvi Type I: Type I is BG type `F` (`κ(M) = ∅`,
+`isTypeI_iff_isTypeF`) while type `P₁` has `κ(M)` nonempty. -/
+theorem ne_typeI_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
+    tau ≠ PeterfalviType.I := by
+  rintro rfl
+  obtain ⟨p, hp⟩ := hP1.1
+  exact absurd ((OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp htau ▸ hp)
+    (Set.notMem_empty p)
+
+/-- **Peterfalvi (8.10), last sentence, uniform form**: `A₁(M) = A(M)` for a type-`P₁` maximal
+(Types III, IV, V), stated on the type-uniform support `typeA`. -/
+theorem typeA_eq_A1_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
+    OddOrder.GroupTheory.typeA M tau = A1 M tau :=
+  (typeA_eq_typePACore hG hM htau (ne_typeI_of_isTypeP1 hG hM hP1 htau)).trans
+    (typePACore_eq_A1_of_isTypeP1 hG hM hP1 htau)
+
 /-- **The type step in the proof of Peterfalvi (8.18.a)**: a point of `A(M)` outside `A₁(M)`
 rules out type `P₁`, so — by the (8.8) taxonomy — `M` is of Type I or II.  Contrapositive of
-`typePACore_eq_A1_of_isTypeP1`, which is (8.10)'s "`A₁(M) = A(M)` for Types III, IV, V". -/
-theorem not_isTypeP1_of_mem_typePACore_not_mem_A1 [Finite G]
+`typeA_eq_A1_of_isTypeP1`, which is (8.10)'s "`A₁(M) = A(M)` for Types III, IV, V".
+
+Peterfalvi (8.18.a): "Since `A(T) − A₁(T) ≠ ∅`, `T` is of Type I or II." -/
+theorem not_isTypeP1_of_mem_typeA_not_mem_A1 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {tau : PeterfalviType} (htau : HasPeterfalviType tau M)
-    {x : G} (hxA : x ∈ typePACore M) (hxA1 : x ∉ A1 M tau) :
+    {x : G} (hxA : x ∈ OddOrder.GroupTheory.typeA M tau) (hxA1 : x ∉ A1 M tau) :
     ¬ OddOrder.BG.Ch4.S14.IsTypeP1 M := fun hP1 =>
-  hxA1 (typePACore_eq_A1_of_isTypeP1 hG hM hP1 htau ▸ hxA)
+  hxA1 (typeA_eq_A1_of_isTypeP1 hG hM hP1 htau ▸ hxA)
+
+/-- **Peterfalvi (8.18.a), type conclusion**: if `A(M) − A₁(M) ≠ ∅` then `M` is of Type I or
+Type II.  Every maximal subgroup carries a Peterfalvi type (`exists_peterfalviType`), Type I is
+BG type `F`, Type II is BG type `P₂`, and Types III/IV/V are exactly the type-`P₁` ones — which
+`not_isTypeP1_of_mem_typeA_not_mem_A1` excludes. -/
+theorem isTypeI_or_isTypeII_of_mem_typeA_not_mem_A1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M)
+    {x : G} (hxA : x ∈ OddOrder.GroupTheory.typeA M tau) (hxA1 : x ∉ A1 M tau) :
+    IsTypeI M ∨ IsTypeII M := by
+  have hnP1 := not_isTypeP1_of_mem_typeA_not_mem_A1 hG hM htau hxA hxA1
+  have hcls := OddOrder.BG.Ch4.S16.proposition_type_classification hG hM
+  cases tau with
+  | I => exact Or.inl htau
+  | II => exact Or.inr htau
+  | III => exact absurd (hcls.2.2.1.mp (Or.inl htau)).1 hnP1
+  | IV => exact absurd (hcls.2.2.1.mp (Or.inr htau)).1 hnP1
+  | V => exact absurd (hcls.2.2.2.1.mp htau).1 hnP1
 
 /-- **`A₀` form of the `P₁` bridge**: `typePACore0 M data = typePA0 M data` for type `P₁`
 (both `A₀`'s add the same `V^M`). -/
