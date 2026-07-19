@@ -150,9 +150,11 @@ call site repoint・全 leaf build green):
 可解 CN 群は「冪零 ∨ 核 `F(G)` の Frobenius ∨ ある素数に関する 3-step」。**step 2 / step 3 は済**。
 残りは:
 
-0. **step 1 (setup) の組み立て** — `G = F(G)` なら冪零 (case i)、さもなくば `C_G(F) ≤ F` (移設済) +
-   Hall `π'`-部分群 `A` (`Ch03.hall_exists_of_piSeparable`) を取り、**step 2 で `F A` が Frobenius**。
-   ⟹ **repo の道具だけで書ける。次の着手はここ** (中間結果「冪零 ∨ `F(G)A` が Frobenius」)。
+0. ~~**step 1 (setup) の組み立て**~~ — **2026-07-19 完了** (3 件とも axiom-clean):
+   `isNilpotent_of_fitting_eq_top` (case i) / `conj_ne_of_isHallSubgroup_fitting_pPrime`
+   (Hall `π(F)'`-部分群が `F(G)` 上に固定点なしで作用 = step 2 を `conj_frobenius` の形に包む) /
+   `isFrobeniusGroup_fitting_of_isComplement` (case ii への橋渡し)。
+   ⟹ **repo の道具だけで書ける部分は step 1/2/3 で出揃った**。
 1. **`A` の冪零性** — Gorenstein Thm 10.3.1(iv)(v) (位数 `qr` の部分群は巡回 / metacyclic 補群)
    が **不在** (`IsMetacyclic` はあるが Frobenius 理論と未接続)。ここが load-bearing。
    ⚠ 奇数位数なら `Ch06.isZGroup_of_isFrobeniusAction_of_odd` が使えるので、**BG App.D が要求する
@@ -166,6 +168,60 @@ call site repoint・全 leaf build green):
    ⚠ **Cor 1.6 には不要** — 下記「book-strength 債務」を解消するときだけ要る。
 
 **D.1 は未着地ゆえ `AppD_CNGroups.lean` は無変更**。
+
+## 進捗 (2026-07-19 その3): **「`A` の冪零性」のブロッカーは幻だった — 完全な経路を確定**
+
+### 実測でわかったこと (3 度目の stale "不在" ラベル)
+
+**Gorenstein Thm 10.3.1(v)「`A` の位数 `pq` の部分群は巡回」は repo に既にある**:
+`OddOrder.Isaacs.Ch06.false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime`
+(`FrobeniusGroup.lean:1204`、**Isaacs Thm 6.9**) — 「Frobenius actor は位数 `p*q` の非巡回部分群を
+含み得ない」= (v) の対偶。descriptive 名で grep しなかったための取りこぼし。
+本 issue でこれが **3 件目**の誤 "不在" (先の 2 件 = Gorenstein Thm 5.3.5、`C_G(F) ≤ F` の配置)。
+
+⚠ また **Gorenstein Ch.10 に (v) の証明本体は無い** (Thm 3.1 の Proof は偶数位数の (vi) だけを示し、
+(iv)(v) は Thm 2.7.6 / 5.3.14 / 5.4.11 / 7.6.2 に引用で丸投げ)。原文を追う方針だと Ch.5 まで
+遡ることになるが、**Isaacs 経由で既に repo にある**ので不要。
+
+### 確定した経路 (metacyclic も Thm 1.3.1(ii) も不要)
+
+`A` = Hall `π(F)'`-部分群 (= `F(G)` 上の Frobenius 補群、step 2 で確立済) が冪零であることの証明:
+
+1. `A` の位数が奇なら Z-群 (全 Sylow 巡回) — `Ch06.isZGroup_of_isFrobeniusAction_of_odd` ✅ repo
+2. `A' = 1` なら `A` 可換 ⟹ 冪零。以下 `A' ≠ 1`。
+3. mathlib `IsZGroup.coprime_commutator_index` (`gcd(|A'|, [A:A']) = 1`) +
+   `IsZGroup.isCyclic_commutator` (`A'` 巡回) ✅ mathlib
+   ⟹ `q ∣ |A'|` を取ると **`A'` の Sylow `q` は `A` の Sylow `q`** かつ `A'` で char ゆえ `A` で正規。
+4. `Ω₁(Q)` は `Q` で char ⟹ `A` で正規。他の素数 `r` と Sylow `R` について `Ω₁(Q)Ω₁(R)` は
+   位数 `qr` の部分群 ⟹ **Isaacs Thm 6.9 (上記) で巡回** ⟹ `Ω₁(Q)` が `Ω₁(R)` を中心化。
+5. **Lemma 1.2** (既証) ⟹ `Q` が `R` を中心化。全ての `r` について成り立ち `Q` 自身可換ゆえ
+   `Q ≤ Z(A)`、`Q ≠ 1`。
+6. `isNilpotent_of_centerIn_ne_bot` (下記、2026-07-19 追加) ⟹ **`A` 冪零**。
+
+⟹ **旧ブロッカー 1 (`A` の冪零性) は新規前提ゼロで書ける**。metacyclic (Thm 7.6.2) も
+Thm 1.3.1(ii) も経路上に不要 (Gorenstein は metacyclic 経由で `Ω₁(Q) ⊴ A` を得るが、
+mathlib の Z-群 API で `A'` 経由の方が短い)。
+
+### 追加した補題 (**axiom-clean**、AxiomsCheck 登録済)
+
+`isNilpotent_of_centerIn_ne_bot` — CN 群で中心が非自明な部分群は冪零 (`1 ≠ z ∈ Z(A)` について
+`A ≤ C_G(z)` で `C_G(z)` は CN 仮説より冪零)。上記 step 6。
+
+### 残ブロッカーは 1 件のみ
+
+**Gorenstein Lemma 10.1.3** (fpf 自己同型が `K/F` に降りる) — 最終ステップ (`P` が `Ā` に regular に
+作用 ⟹ `PA` Frobenius ⟹ 3-step) で load-bearing。**着手前に必ず実測せよ** — 本 issue の "不在"
+ラベルは 3/4 が誤りだった。`Isaacs/Ch06_FrobeniusActions/` と
+`BG/Ch1_Preliminary/S03c_Thm37.lean` (`kernel_acts_trivially_of_coprime_fixedPointFree`,
+`chiefFactor_fixedPointFree`) を descriptive 名で先に grep すること。
+
+### 次の着手 (2026-07-19 時点)
+
+**上記「確定した経路」の step 1-6 を Lean で書く**。新規前提は不要で、必要な部品は全て
+repo / mathlib にある。実装上の主な手間は `Ω₁(Q)Ω₁(R)` の位数 `qr` の部分群としての扱い
+(`Ω₁(Q) ⊴ A` ゆえ積が部分群、位数は `q * r`) と Sylow の char 性の transport。
+
+その後に残るのは Gorenstein Lemma 10.1.3 のみ (上記のとおり要実測)。
 
 ### ⚠ 旧ブロッカーリストの訂正 (2026-07-19、実測)
 

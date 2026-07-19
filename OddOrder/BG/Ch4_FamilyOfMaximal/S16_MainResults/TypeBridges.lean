@@ -524,7 +524,7 @@ theorem typePData_not_dvd_card_W2_of_card_W1_prime [Finite G] {M : Subgroup G}
   have hyW : (y : G) ∈ data.W := hW2leW y.2
   have h1 : (Subgroup.zpowers (x : G)).subgroupOf data.W
       = (Subgroup.zpowers (y : G)).subgroupOf data.W := by
-    refine OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq ?_
+    refine OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq ?_
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.zpowers_le.mpr hxW)).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.zpowers_le.mpr hyW)).toEquiv,
       Nat.card_zpowers, Nat.card_zpowers, hxord, hyord]

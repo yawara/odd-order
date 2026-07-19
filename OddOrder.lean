@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.ConjClassSet
 import OddOrder.GroupTheory.ConjClassCardinality
 import OddOrder.GroupTheory.CoprimeAction
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive

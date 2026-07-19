@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # BG §10 β-radical spine — Prop 10.14 (β(G)-prime の global 構造)
@@ -23,29 +24,6 @@ open scoped Pointwise commutatorElement
 variable {G : Type*} [Group G]
 
 /-! ## Proposition 10.14 — β(G)-prime の global 構造 (mmd L2894) -/
-
-/-- **Cyclic uniqueness by order**: in a finite cyclic group, two subgroups of equal
-cardinality coincide. (Each order-`d` subgroup equals the unique order-`d` kernel
-`(powMonoidHom d).ker`; this is the order-`d` generalisation of the order-`p` argument in
-`OddOrder.BG.Ch1_Preliminary.S04`.) Used in Prop 10.14(c): a subgroup of the cyclic `N_P(X)`
-is characteristic. -/
-private theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic C]
-    {K L : Subgroup C} (h : Nat.card K = Nat.card L) : K = L := by
-  letI : CommGroup C := IsCyclic.commGroup
-  -- Each order-`d` subgroup `M` equals the unique order-`d` kernel `(powMonoidHom d).ker`.
-  have key : ∀ {M : Subgroup C} {d : ℕ}, Nat.card M = d → M = (powMonoidHom d : C →* C).ker := by
-    intro M d hM
-    have hM_le : M ≤ (powMonoidHom d : C →* C).ker := by
-      intro g hg
-      rw [MonoidHom.mem_ker, powMonoidHom_apply]
-      have hg1 : (⟨g, hg⟩ : M) ^ Nat.card M = 1 := pow_card_eq_one'
-      have := congrArg (Subtype.val) hg1
-      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one, hM] at this
-    have hd_dvd : d ∣ Nat.card C := hM ▸ M.card_subgroup_dvd_card
-    have hker_card : Nat.card (powMonoidHom d : C →* C).ker = d := by
-      rw [IsCyclic.card_powMonoidHom_ker (G := C) d, Nat.gcd_eq_right hd_dvd]
-    exact Subgroup.eq_of_le_of_card_ge hM_le (by rw [hker_card, hM])
-  exact (key (d := Nat.card K) rfl).trans (key (d := Nat.card K) h.symm).symm
 
 /-- **Monotonicity of `𝒰` under inclusion within a proper subgroup** (the fiddly lemma of
 Prop 10.14(b)): if `A ∈ 𝒰`, `A ≤ R`, and `R` is proper, then `R ∈ 𝒰`. The unique maximal
@@ -547,6 +525,5 @@ theorem isPGroup_le_centralizer_of_isNilpotent_ambient {W : Subgroup G} [Finite 
   have hcomm := hcent ⟨y, hyW⟩ hymem
   have := congrArg (Subtype.val) hcomm
   simpa using this
-
 
 end OddOrder.BG.Ch3.S10

@@ -644,6 +644,22 @@ theorem isNilpotent_of_le_of_isNilpotent {H K : Subgroup G}
   haveI := hK
   exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hHK)
 
+/-- **In a CN-group, a subgroup with nontrivial centre is nilpotent.**
+
+For `1 ≠ z ∈ Z(A)` we have `A ≤ C_G(z)`, and `C_G(z)` is nilpotent by the CN hypothesis.
+
+This is the last move of Gorenstein's argument that the Hall `π(F(G))'`-subgroup `A` of
+Theorem 1.5 is nilpotent, and it reduces that claim to `Z(A) ≠ 1`.  Gorenstein gets `Z(A) ≠ 1`
+from the Frobenius-complement structure of `A` (his Theorem 10.3.1(iv)/(v)), which is the part
+still missing from this repository. -/
+theorem isNilpotent_of_centerIn_ne_bot [Finite G]
+    (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
+    {A : Subgroup G} (hZ : centerIn A ≠ ⊥) : Group.IsNilpotent ↥A := by
+  obtain ⟨z, hzne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hZ
+  have hz1 : (z : G) ≠ 1 := fun h => hzne (Subtype.ext h)
+  refine isNilpotent_of_le_of_isNilpotent (fun a ha => ?_) (hCN (z : G) hz1)
+  exact Subgroup.mem_centralizer_singleton_iff.mpr (commute_of_mem_centerIn ha z.2).eq
+
 /-- **Gorenstein Ch. 12 §1, Theorem 1.5, step 3.**
 
 In a CN-group, if `O_p(G) ≠ 1` and `F(G)` contains a nontrivial normal subgroup `N` of order
@@ -728,6 +744,64 @@ theorem exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting
     rwa [Sylow.coe_subtype, Subgroup.map_subgroupOf_eq_of_le hPC] at hmap
   -- Step 5: a normal `p`-subgroup lies in `O_p(G)`, so `P = O_p(G)`.
   exact ⟨P, le_antisymm (Ch04.isPiGroup_singleton_of_isPGroup P.isPGroup').le_oPiCore hOpP⟩
+
+/-! ## Step 1 of Theorem 1.5: the setup
+
+Gorenstein sets `F = F(G)`; if `G = F` then `G` is nilpotent and case (i) holds, and otherwise he
+takes a Hall `π(F)'`-subgroup `A` (available since `G` is solvable) and shows `F A` is Frobenius.
+The three lemmas here are the setup, the regular-action conclusion in the form
+`Ch06.IsFrobeniusGroup` wants, and the bridge to case (ii). -/
+
+/-- `F(G) = G` forces `G` nilpotent — case (i) of Theorem 1.5. -/
+theorem isNilpotent_of_fitting_eq_top [Finite G] (h : Ch01.fitting G = ⊤) :
+    Group.IsNilpotent G := by
+  haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) := h ▸ Ch01.fitting.isNilpotent (G := G)
+  exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
+
+/-- A Hall `π(F(G))'`-subgroup acts on `F(G)` with no nonidentity fixed points.
+
+This is `not_commute_of_coprime_orderOf_card_fitting` (Theorem 1.5, step 2) packaged in the form
+`Ch06.IsFrobeniusGroup.conj_frobenius` expects: the Hall condition makes every element of `A`
+have order prime to `|F(G)|`. -/
+theorem conj_ne_of_isHallSubgroup_fitting_pPrime [Finite G] [IsSolvable G]
+    (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
+    {A : Subgroup G}
+    (hA : Ch03.IsHallSubgroup
+      {r : ℕ | r ∉ (Nat.card ↥(Ch01.fitting G)).primeFactors} A) :
+    ∀ a ∈ A, a ≠ 1 → ∀ n ∈ Ch01.fitting G, n ≠ 1 → a * n * a⁻¹ ≠ n := by
+  intro a ha ha1 n hn hn1 hconj
+  refine not_commute_of_coprime_orderOf_card_fitting hCN hn hn1 ha1 ?_ ?_
+  · -- `|a|` is prime to `|F(G)|`: a common prime factor would have to lie in and out of `π(F)`.
+    rw [Nat.Coprime]
+    by_contra hne
+    obtain ⟨r, hr, hrdvd⟩ := Nat.exists_prime_and_dvd hne
+    have hra : r ∣ Nat.card ↥A :=
+      (hrdvd.trans (Nat.gcd_dvd_left _ _)).trans
+        (by rw [← orderOf_mk_eq ha]; exact orderOf_dvd_natCard _)
+    have hrF : r ∣ Nat.card ↥(Ch01.fitting G) := hrdvd.trans (Nat.gcd_dvd_right _ _)
+    exact hA.1 r (Nat.mem_primeFactors.mpr ⟨hr, hra, Nat.card_pos.ne'⟩)
+      (Nat.mem_primeFactors.mpr ⟨hr, hrF, Nat.card_pos.ne'⟩)
+  · -- `Commute n a` is exactly the conjugation identity assumed for contradiction.
+    have : a * n = n * a := by
+      have := congrArg (· * a) hconj
+      simpa [mul_assoc] using this
+    exact this.symm
+
+/-- **Case (ii) of Theorem 1.5**: if a Hall `π(F(G))'`-subgroup `A` complements `F(G)` in `G`,
+then `G` is a Frobenius group with kernel `F(G)` and complement `A`. -/
+theorem isFrobeniusGroup_fitting_of_isComplement [Finite G] [IsSolvable G]
+    (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
+    {A : Subgroup G}
+    (hA : Ch03.IsHallSubgroup
+      {r : ℕ | r ∉ (Nat.card ↥(Ch01.fitting G)).primeFactors} A)
+    (hcompl : Subgroup.IsComplement' (Ch01.fitting G) A)
+    (hFne : Ch01.fitting G ≠ ⊥) (hAne : A ≠ ⊥) :
+    Ch06.IsFrobeniusGroup G (Ch01.fitting G) A where
+  isNormal := Ch01.fitting.normal G
+  isComplement := hcompl
+  ne_bot_kernel := hFne
+  ne_bot_complement := hAne
+  conj_frobenius := conj_ne_of_isHallSubgroup_fitting_pPrime hCN hA
 
 /-! ## Gorenstein Ch. 12 §1 Theorem 1.5 and Corollary 1.6
 
