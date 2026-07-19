@@ -32,8 +32,8 @@
 | §7 | (7.8) | **STALE → 済** | 一般形は `Hypothesis78` 層に実在 (`BetaDecomp` S09_NonexistenceCertain/QuadraticTerm.lean:916, `betaDecompOfFacts` S09_CertificateDischarge.lean:689, `NormEstimates` CoherenceFormula.lean:75)。FrobeniusFamily は consumer にすぎない。追加引数は本文の「S は coherent」前提そのもので特殊化でない。 |
 | §7 | (7.9) | **✅ 2026-07-19 解消** | 唯一 Frobenius 専用だった parity step を `Hypothesis79.delta_even` (S09_TwoFamiliesParity.lean, 新規 leaf) として Hypothesis (7.9) 一般形で証明。`FrobeniusFamily.hypothesis79_delta_even` は その instantiation に縮小 ⟹ (7.9) から `FrobeniusFamily` 依存が消えた。 |
 | §8 | (8.11) | **STALE → 済** | Sylow-normalizer 節 `normalizer_sylow_mainSubgroup_le` (S10_StructureSetup.lean:395) + Hall 節 (:449) が揃う。 |
-| §8 | (8.15) | CONFIRMED 特殊化 | 型別 3 インスタンス (typeI / typeP₁ / typeII)。**type-I の (4.6) 版が無く、(5.2) 節は皆無** (S10_StructureSetup.lean:703 に TODO 明記)。⚠ 先に `typePA` を `M_σ^#` 添字へ直す必要 (現状 `(M')^#`; P₂ 版は false-as-stated = issue 9008)。 |
-| §8 | (8.18) | CONFIRMED 特殊化 | (a)(b)(c) すべて `TypeIData S/T` 固定 (S10_MinimalSimpleStructure.lean:404/481/575)。隣の (8.17.c) は `IsTypeI ∨ IsTypeII` で書けている (:107) のが対比。type-II consumer は (8.18.b) を導出せず structure field `cross_zero` として**仮定**している。 |
+| §8 | (8.15) | **✅ 2026-07-19 ungated 分解消 (issue 1042)** | 主張 3 ((5.2) instance) = `S10_SubcoherentTypeP.lean` (既約部分家族の `S07.Hypothesis`、A₀ 形 + M^# 字義形; 可約 μ 列は S07_Subcoherent note どおり certainType 側が正本)。主張 2 ((4.6) instance) = `S10_Hypothesis46TypeP.lean` (H パラメータ化一般形 + `_hallKernel`/`_derived` 両選択、hHall 明示化で axiom-clean)。**残 = type-II の忠実 A(M) を要する部分のみ → hub issue 9163** (typePA M_s^# 添字化 Option A vs 新 def B′)。 |
+| §8 | (8.18) | CONFIRMED 特殊化 (**9163 に gated**, 2026-07-19 実測) | (a)(b)(c) すべて `TypeIData S/T` 固定 (S10_MinimalSimpleStructure.lean:404/481/575)。書籍 (8.18) は S, T 型仮定なし (PDF p.49 確認; 「A(T)−A₁(T) ≠ ∅ ⟹ T type I/II」は証明中で導出)。type-II 側へ広げるには **type II の忠実 A(T)** が要る = P₂ 域 typePA 問題 → **(8.15) type-II 残と同じ hub issue 9163 に gated**。`cross_zero` 導出も同gate。 |
 | §9 | (9.7) | 部分 | 二分岐 `clifford_dichotomy` (CuS0.lean:1811) は axiom-clean。狭いのは 2 点: case (a) の埋め込み先が `((𝔽_p)ˣ)^{q−1}` (order-`a` 巡回でない, S11_ImprimitiveUBound.lean:265) / case (b) の **`W₁ ≅ Aut F` 節が repo に皆無** (S11_GaloisFieldModel.lean:31 は体表現のみ)。 |
 | §9 | (9.10) | **✅ 2026-07-19 解消** | trigger 形 `exceptional_case_frobenius_realization_of_trigger` (ThetaCountAssembly.lean:1146) を追加 — `caseB` carrier を仮説に取らず、`hno` だけから Clifford case (b) を選ぶ (case (a) は自身の (9.8.c) 由来の次数 `q·u` 既約元を `Cprime_le_C` + `sOf_antitone` で `𝒮(H₀C′)` へ移して `hno` と矛盾)。consumer (S12_TypeIICrossIsometryPair) の inline dispatch も解消。 |
 | §9 | (9.11) | CONFIRMED 特殊化 | `coherent_sOf_H0Cprime` (S13_Orthogonality.lean:1197) は `S13.Hypothesis M` + `IsTypeIII ∨ IsTypeIV`。type-II は §15 の S/T instance 別経路。**repo に `Hypothesis (9.5)` オブジェクトが存在しない** (§9 の仮説は S11 の 3 carrier に分散)。 |
@@ -133,6 +133,10 @@ anchor `χ₁` の既約性も norm 1 も**要求していない**。証明は `
 7. ~~(13.8) S 側 mirror~~ **✅ 2026-07-19 完了** (issue 1041)。
 8. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。
+   **2026-07-19 更新**: (8.15) の ungated 分 (主張 2+3 の P₁ 域) は完了 (issue 1042、上表)。
+   (8.15) type-II 残 + (8.18) 一般化は **hub issue 9163** (typePA 設計裁定) に gated。
+   ⟹ 次の ungated frontier = **(9.7)** (case (a) の embedding 巡回化 + case (b) の
+   `W₁ ≅ Aut F` 節新設) → (9.11) hstep → (10.11)。
 
 ## Lean 側の stale docstring (2026-07-19 に修正済)
 

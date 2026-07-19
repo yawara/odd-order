@@ -50,6 +50,21 @@ created: 2026-07-19
   - 注: 文言は「type III/IV」でなく **P₁ regime** (typePA 忠実域 = 9008 裁定) で scoping。
     statement 自体は素の `TypePData` で成立 (IsTypeP1 は入力 datum `d` の producer 側)。
 
+- **着手順 2 完了 (2026-07-19)**: `OddOrder/Peterfalvi/S10_Hypothesis46TypeP.lean` 新設。
+  - `typePData_toHypothesis46`: (8.15.2) の一般形 — 素の `TypePData` + claim-1 datum +
+    hodd + hHall から `S06.Hypothesis46 (typePA M data) M` を、**(4.6.c) の H を
+    パラメータ** (normal, W₂ ≤ H ≤ K) として構成。(4.6.d) covering は A(M) = K^# ゆえ
+    全 H ≤ K で自明 — 書籍が両選択を許す理由がそのまま形式化に写る。
+  - 両 instance: `_hallKernel` (H = M_F = data.H; type II では これが忠実な M_s 選択) /
+    `_derived` (H = K = M′ = P₁ 域の M_s; S12 版 `toHypothesis46` の選択)。
+  - `conj_mem_typePA`: A(M) の M-安定性の bare 形 (S12 `le_normalizer_typePA` の脱 bundle 化)。
+  - **hHall を明示パラメータ化**したことで S12 版と違い sorry 非継承 — 全 4 宣言 axiom-clean
+    (#print axioms 確認)。scoped `S12.FiniteInduce` instance 規律に注意 (binder 混在不可、
+    memory の既知トラップ — 実際に一度踏んで修正)。
+- **着手順 3 (gated) 起票 (2026-07-19)**: hub 設計確認 issue **9163** を起票
+  (typePA の M_s^# 添字化 Option A vs 新 def 並置 Option B′; 9008 re-open trigger)。
+  hub 裁定待ちの間、lane a は次 frontier へ進む。
+
 ## 着手順 (ungated → gated)
 
 1. ~~**主張 3 の type III/IV 形**~~ ✅ 上記 (2026-07-19)。旧計画:
