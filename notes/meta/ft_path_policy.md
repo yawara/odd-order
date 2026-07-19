@@ -116,12 +116,20 @@ feitThompson                                       OddOrder/FeitThompson.lean   
   └ noMinimalSimpleOdd_of_section16 → BG.AppC.final_contradiction → S16.nonexistence_of_G   ✅
 ```
 
-残 obligation は FT 層でなく **Pf §9–§16 の分散実 sorry（~74、comment-strip census 2026-07-02）**に住む:
-- **唯一の bare FT-spine sorry** = `S12.exists_zeta_residual_not_orthogonal`（Pf 11.8、lane a frontier）
-  — proven な `card_kappaHall_lt_of_isTypeIIIorIV` が cite する唯一の残余。
-- theorem88 route の sorried floor = `exists_typeICovering` ×2（lane b、route B = 8022/0096）+
-  `S09.card_G0_lower_bound`（lane a、issue 0044 裁定 2026-07-02）。
-- `Peterfalvi.S16.Hypothesis` は **flat record**（現在地 = `S16_NonExistenceGCore.lean`）。
+> ⚠ **以下 4 点は 2026-07-02 時点の FT endgame の記述で、2026-07-19 の実測では全て失効**
+> (FT は 2026-07-15 に axiom-clean 完成)。履歴として残す。
+>
+> - ~~残 obligation は Pf §9–§16 の分散実 sorry (~74)~~ → **Pf の実 sorry は 11 件のみで、
+>   §3–§16 本文には 1 件も無い**。全 11 件が Appendices 3 file に住む
+>   (`FeitSibley` 5 / `Suzuki2Groups` 4 / `NearFields` 2、2026-07-19 comment-strip census)。
+> - ~~唯一の bare FT-spine sorry = `S12.exists_zeta_residual_not_orthogonal`~~ → **その名の宣言は
+>   もはや存在しない**。後継 = `S13.exists_zeta_residual_not_orthogonal_H0C_of_refuter`
+>   (`S13_Orthogonality.lean:1036`)。
+> - ~~theorem88 route の sorried floor = `exists_typeICovering` ×2 + `S09.card_G0_lower_bound`~~ →
+>   **両者とも sorry-free な file に住む** (`S14_MaximalI/TypeICovering.lean:251` /
+>   `S09_Uniqueness/...`)。sorried floor は解消済。
+> - ~~`Peterfalvi.S16.Hypothesis` の現在地 = `S16_NonExistenceGCore.lean`~~ → **正しくは
+>   `S16_CoreLemmas.lean:48`** (namespace `OddOrder.Peterfalvi.S16`)。
 
 ---
 
@@ -134,12 +142,15 @@ Isaacs Ch.1–7 ✅ → BG App.A/B ✅ → BG §1–§16 local 解析 → **BG �
 （`BG.Ch4_FamilyOfMaximal.S16_MainResults`: Thm A–E / Prop 16.1 / Thm I–II）。
 Pf §10 が `S16_MainResults` を **import 済**（statements 在・sorried・cite 可）= **G1 ゲート**。
 担当 = ~~lanes F / G / H~~（旧レーン名 = 履歴。現行 3 レーン a/b/c、正本 =
-[`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)）。**真の FT ボトルネック**（§14–16 が active frontier）。
+[`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md)）。
+⚠ ~~**真の FT ボトルネック**（§14–16 が active frontier）~~ = **失効** — `feitThompson` は
+2026-07-15 に axiom-clean 完成し、BG §14–16 / Pf §14–16 は実 sorry 0。
 
 ### Track C — character theory（→ G2）
 Pf §3–§9 character API（Dade isometry, coherence, 指標 index 族）。
-Pf §10–16 spine がこれを consume = **G2 ゲート**。担当 = ~~lane B~~（旧レーン名 = 履歴。現行は
-coherence infra = lane b、正本 = `ft_lane_reallocation_2026_06_28.md`）。
+Pf §10–16 spine がこれを consume = **G2 ゲート**。担当 = ~~lane B~~（旧レーン名 = 履歴）。
+⚠ **現行の lane b は coherence infra ではなく Pf Appendices の Suzuki 系** (`Suzuki`/`Suzuki2Groups`)。
+配分の正本 = [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md)。
 
 ### 合流 — Pf §10–16 spine
 G1（BG §16, import 済 — spine 消費は sorry-free の Prop 16.1 のみ、BG は 2026-07-02 凍結完了）と
