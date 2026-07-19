@@ -112,6 +112,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             (`HigmanLowerCentralDegreeThree.lean`)
       - [ ] `L₂ ≃ξ L₃` から各 layer 上の actor kernel/order の一致と
             `finrank L₁ = finrank L₂` を原文 p. 85 の議論どおり導く
+        - [x] actual mixed bracket の full span と `L₁` の既約性から
+              `ker ρ₂ ∩ ker ρ₃ ≤ ker ρ₁` を証明する
+        - [x] `L₂ ≃ξ L₃` と `L₁` 作用の忠実性から `L₂` 作用の忠実性を導く
+              (`L₃` への移送は既存の equivariant-equivalence API)
+        - [ ] actor order と Singer order を接続し、`finrank L₁ = finrank L₂` を導く
       - [ ] Neumann の位数 3 fixed-point-free automorphism theorem を形式化し、
             `finrank L₂` が奇数であることを導く
       - [ ] pair/triple Frobenius weight の指数算術と

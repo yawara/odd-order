@@ -662,6 +662,35 @@ theorem lowerCentralDegreeThreeCommutatorBilinear_equivariant
     (lowerCentralDegreeThreePairing_equivariant_of_apply_mk
       phi b hb g (Additive.toMul u) (Additive.toMul v))
 
+/-- The same equivariance statement written entirely in representation
+notation. -/
+theorem lowerCentralDegreeThreeCommutatorBilinear_equivariant_representation
+    {H : Type uH} {X : Type uX} [Group H] [Group X]
+    (phi : X →* MulAut H) (g : X)
+    (u : Additive (lowerCentralLayer H 1))
+    (v : Additive (lowerCentralLayer H 0)) :
+    lowerCentralLayerRepresentation phi 2 g
+        (lowerCentralDegreeThreeCommutatorBilinear H u v) =
+      lowerCentralDegreeThreeCommutatorBilinear H
+        (lowerCentralLayerRepresentation phi 1 g u)
+        (lowerCentralLayerRepresentation phi 0 g v) := by
+  have hu := lowerCentralLayerRepresentation_apply
+    phi 1 g (Additive.toMul u)
+  have hv := lowerCentralLayerRepresentation_apply
+    phi 0 g (Additive.toMul v)
+  have hu' :
+      lowerCentralLayerRepresentation phi 1 g u =
+        Additive.ofMul
+          (lowerCentralLayerAction phi 1 g (Additive.toMul u)) := by
+    simpa only [ofMul_toMul] using hu
+  have hv' :
+      lowerCentralLayerRepresentation phi 0 g v =
+        Additive.ofMul
+          (lowerCentralLayerAction phi 0 g (Additive.toMul v)) := by
+    simpa only [ofMul_toMul] using hv
+  rw [hu', hv']
+  exact lowerCentralDegreeThreeCommutatorBilinear_equivariant phi g u v
+
 /-! ## The actual triple commutator -/
 
 /-- The trilinear map induced by the actual iterated commutator
