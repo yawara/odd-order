@@ -9173,6 +9173,30 @@ model transports along `U.subgroupOf (U ⊔ W₁) ≃ U`; no legacy opaque `fiel
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_of_cSub_eq_bot
 
+/-! **Peterfalvi (9.7.b) `W₁ ≅ Aut F` clause, axiom-clean** (lane a, issue 1043 (b)).
+The book upgrades `η(w)` from an additive to a *field* automorphism, then counts.  Chain:
+base point `s ∈ W̄₂^#` (`chiefFactor_exists_fixedByE_ne_one`, from `|C_{H̄}(W₁)| = p`) normalizes
+the Singer model to `φ(s) = 1` (`…_basePoint`); `U*` generates `F` additively
+(`…_scalarRange_eq_top`); the twist identity `η(w)(μ u) = μ(w u w⁻¹)` — where `φ(s) = 1` and
+`s^w = s` collapse the displayed identity — gives multiplicativity against every scalar
+(`caseB_etaHom_mul_scalars`); the shared abstract layer `ringAutHomOfAddAutHom` then lands `η` in
+`RingAut F`; and injectivity (`w1ActionHom_injective`, via `|W₁| = q` prime and `p ≠ p^q`) plus
+`|Aut F| = q` (`natCard_ringAut_galoisField`) makes it onto. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_card_fixedByE
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_exists_fixedByE_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_basePoint
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.caseB_addSubgroup_closure_scalarRange_eq_top
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_etaHom_twist
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_etaHom_mul_scalars
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.w1ActionHom_injective
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_withAut
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ringAutHomOfAddAutHom_injective
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.natCard_ringAut_galoisField
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.addSubgroup_closure_eq_top_of_irreducible
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_normalized_of_scalar_model
+
 -- Peterfalvi §13 (= repo `S13_MaximalIII_IV`, types III/IV) structural cluster.  After de-opacifying
 -- the `Hypothesis` scaffold (the `C = C_U(H)` field and the deleted opaque conclusion-Props), the
 -- two *unconditional* inclusions of (11.5)/(11.6) are axiom-clean: `secondDerived_le_HC`
