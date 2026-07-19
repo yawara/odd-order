@@ -229,3 +229,35 @@ GroupTheory 版を cite する形に書き換えるのは import 的には可能
 
 ⚠ `Subgroup R` と `Subgroup ↥S` (`subgroupOf`) の往復が多くなるので、可能な限り
 **ambient (`Subgroup R`) の言明**で書き、`↥S` に降りるのは pRank / 指数の評価だけにする。
+
+## 2026-07-20: 補題 (1) は **repo に既存** — 重複を回避
+
+`OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer`
+(`Ch4_FamilyOfMaximal/S15_MF/PisetBetaDisjoint.lean:935`):
+```lean
+theorem isMulCommutative_sup_of_le_centralizer {A B : Subgroup G}
+    (hA : IsMulCommutative ↥A) (hB : IsMulCommutative ↥B)
+    (hAB : A ≤ Subgroup.centralizer (B : Set G)) : IsMulCommutative ↥(A ⊔ B)
+```
+AppE は `S16_MainResults` を import しており S15 はその上流なので**そのまま使える**。
+⟹ 「`C_R(R₀) = R₀ ⊔ R₁` はアーベル」は新規に書かず、これに
+`R₀` の可換性 (位数 p ⟹ cyclic)、`R₁_cyclic`、`R₀ ≤ C_R(R₁)` (= `R₁ ≤ C_R(R₀)` の対称形、
+`centralizer_eq` から) を渡すだけ。
+
+## 残る唯一の新規補題 = (2) `pRank ↥(C_R(R₀)) p ≤ 2`
+
+`C = R₀ ⊔ R₁` はアーベル、`|R₀| = p`、`R₁` cyclic、`Disjoint R₀ R₁`。
+**証明の筋** (elementary abelian `A ≤ C` について `|A| ≤ p²` を示す):
+- `A ⊓ R₁` は cyclic p 群 `R₁` の elementary abelian 部分群 ⟹ **位数 ≤ p**
+  (cyclic p 群の位数 p の部分群は高々 1 つ; repo に
+  `card_omega1OfAbelian_eq_of_isCyclic` = `OmegaSubgroup.lean:379` あり)。
+- `C` アーベル ⟹ `R₁ ⊴ C`、第二同型定理で `A/(A ⊓ R₁) ≅ AR₁/R₁ ≤ C/R₁`。
+- `C/R₁ = (R₀ ⊔ R₁)/R₁ ≅ R₀/(R₀ ⊓ R₁) = R₀` (`Disjoint R₀ R₁`) ⟹ **位数 p**。
+- ⟹ `|A| = |A ⊓ R₁| · |A/(A ⊓ R₁)| ≤ p · p = p²` ⟹ `Nat.log p |A| ≤ 2`。
+- `pRank` は `⨆ A : {A // IsElementaryAbelian p A}, Nat.log p |A|` (`PRank.lean:423`) なので
+  `ciSup_le` で閉じる (添字型は `⊥` で nonempty)。
+
+⚠ 一般形 (「アーベル群が cyclic 部分群を指数 p で含むなら p-rank ≤ 2」) で書けば
+`S04_SmallRankBasic.lean` (:1080 に `not_le_pRank_of_pRank_le_two` がある = topical な home)
+に置くのが筋。ただし同 leaf は上流でリビルドが重いので、**2 消費者目が出るまでは
+AppE の private helper で可**。その場合は本 issue に promotion フラグを残すこと。
