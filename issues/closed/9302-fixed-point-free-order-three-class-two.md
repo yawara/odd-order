@@ -27,22 +27,23 @@ fixed-point-free order-three calculus をこの shared GroupTheory leaf に置�
       `⁅⁅x,y⁆,z⁆ ^ 3 = 1` を right 2-Engel 条件から証明する
 - [x] fixed-point-free な位数 3 作用から `3 ∤ |G|` を証明する
 - [x] 上記を合成し `(⊤ : Subgroup G).lowerCentralSeries 2 = ⊥` を得る
-- [ ] Higman Lemma 6 の `H/H₄` consumer へ接続する
+- [x] Higman Lemma 6 の `H/H₄` consumer へ接続する
 
 ## 完了条件
 
 - 新 `axiom` / `sorry` / opaque carrier なし
 - [x] `lake build OddOrder.GroupTheory.FixedPointFreeOrderThree` が通る
-- Higman consumer の targeted leaf build が通る
+- [x] Higman consumer の targeted leaf build が通る
 - [x] public endpoint を `OddOrder/AxiomsCheck.lean` の監査対象へ追加する
 
 ## 2026-07-19 checkpoint
 
 `OddOrder/GroupTheory/FixedPointFreeOrderThree.lean` に一般の有限群版を
-実装し、targeted build を確認した。B レーンでは main が実施する full
-build / AxiomsCheck build は重ねて実行していない。残 frontier は Higman
-原文どおりの `H/H₄` 上の induced action 構成と、その fixed-point-free
-性・class exactly three の接続である。
+実装し、targeted build を確認した。さらに
+`H² = H₂` から `H₂² ≤ H₃`, `H₃² ≤ H₄` を下中心列上で帰納的に証明し、
+`L₁,L₂,L₃` の fixed-point-free 性を `H/H₄` へ直接降ろした。
+`L₃ ≠ 0` からこの商の class が exactly three であることも接続済みである。
+B レーンでは main が実施する full build / AxiomsCheck build は重ねて実行していない。
 
 ## 参照
 

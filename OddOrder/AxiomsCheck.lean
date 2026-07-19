@@ -8294,6 +8294,24 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralLayerZero_finrank_eq_one_of_equivariant_linearEquiv
 
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTerm_succ_squares_le_of_squares_le
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.classThreeQuotient_fixedPointFree_of_agemo_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.classThreeQuotient_lowerCentralSeries_three_eq_bot
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.classThreeQuotient_lowerCentralSeries_two_ne_bot
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.classThreeQuotient_nilpotencyClass_eq_three
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.classThreeQuotientAction_orderOf_ne_three
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
