@@ -132,8 +132,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               weight とも一致しないことを示し、対応 eigenspace を `⊥` にする
         - [x] actual `[u^(2),u] = 0` を平方写像へ接続し、Lemma 5 の Frobenius
               basis 展開式を仮定する bridge から triple-bracket sum をゼロにする
-        - [ ] 重複添字の二候補を odd `n` で高々一項へ絞り、weight 成分ごとに
-              上の和を分離して両方を消去する
+        - [x] repeated weight が原典の二候補
+              `[[u_i,u_{j-1}],u_{j-1}]`, `[[u_j,u_{i-1}],u_{i-1}]` に限ることを
+              binary exponent 算術で示し、odd `n` では両方の inner pair が同時に
+              permitted gap `±r` を持てないことを `ZMod n` 上で証明する
+        - [ ] actual `L₂` の single Frobenius orbit / bracket-support を接続し、
+              weight 成分ごとに上の和を分離して二候補を消去する
       - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から

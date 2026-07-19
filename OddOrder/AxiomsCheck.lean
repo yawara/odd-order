@@ -8378,6 +8378,23 @@ whenever the target is spanned by pair-weight eigenspaces. -/
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.primitiveRoot_threeDistinctWeight_eigenspace_eq_bot
 
+/-! **Higman Lemma 6, repeated-index candidates**: a repeated Frobenius
+triple with pair weight is one of the two predecessor-index terms in the
+source. Their inner pairs cannot both have the permitted cyclic gap when the
+Frobenius period is odd. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.HasHigmanPairGap.comm
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.repeated_frobeniusWeight_pairWeight_candidates
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.not_both_adjacent_pairGaps_of_odd
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.HigmanExponentPair.not_both_predecessor_pairGaps_of_odd
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
