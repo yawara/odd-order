@@ -138,3 +138,31 @@ ambient の部分群として直接定義**する (`torsionOf M p hclosed`) と�
   Step 1 は BG の番号付き結果ではなく Prop E.2 の内部ステップなので、AppE から移して
   AppE 側は E.2(a)(b) から GroupTheory 版を呼ぶ形にすれば**ラッパーも複製も生じない**。
   帰納全体が GroupTheory に収まりビルドが速い。**(B) を推奨**。
+
+## ✅ 2026-07-20: 完了 — Prop E.2(a)(b) を証明 (AppE sorry 9 → 7)
+
+`OddOrder/GroupTheory/RegularPGroup.lean` (227 行、sorry 0、axiom-clean):
+
+- `lowerCentralSeries_eq_bot_of_subgroup` — class の上界は部分群に遺伝。
+- `Omega.pow_eq_one_of_mul_closed` — Ω₁ の指数を「p-捻れ元が積で閉じる」に還元。
+- `torsionOf` / `torsionOf_normal` — 正規部分群の p-捻れ元は正規部分群
+  (⚠ これで characteristic-in-normal 補題 = closed issue 9109 の複製問題を回避)。
+- `commutator_le_of_closure_pair` — `G = ⟨x,y⟩`, `y ∈ N ⊴ G` ⟹ `G' ≤ N`。
+- `card_lt_card_of_lt_top` — 有限群の真部分群は位数が真に小さい。
+- ⭐ `pow_mul_pow_eq_pow_of_commutator_exponent` — **Step 1 の一般形**
+  (class < p かつ `G'` の指数が p ⟹ p 乗写像は乗法的)。Hall の公式から直接。
+- ⭐⭐ `pow_mul_eq_one_of_class_lt` — **E.2(a) の核心の帰納** (`|R|` の帰納、3 分岐)。
+
+AppE 側 (`AppE_FurtherResults.lean`):
+- `omega_pow_eq_one_of_lowerCentralSeries_eq_bot` (E.2(a)) と
+  `pow_mul_of_commutator_le_omega` (E.2(b)) が **sorry-free / axiom-clean**。
+
+### 副産物 3 件
+
+1. **一般化**: BG は E.2(a)(b) を p 群について述べるが **`IsPGroup` 仮説は未使用**
+   (有限性 + `γ_p = 1` で足りる) ⟹ 両方から削除 (特殊化債務の返済)。
+2. **重複解消**: AppE の `pow_mul_of_commutator_pow_eq_one` (Step 1 の特殊形) を削除し、
+   一般形を GroupTheory に一本化 (Step 1 は BG の番号付き結果でなく内部ステップ)。
+3. `RegularPGroup.lean` は Ω₁/正規化/巡回商まわりの再利用可能な部品置き場になった。
+
+本 claim は close 相当。App.E の残りは E.3(b)(c)(d) / E.4 / E.5 (issue 3021)。
