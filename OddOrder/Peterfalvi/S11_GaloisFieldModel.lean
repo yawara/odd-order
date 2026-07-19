@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # Peterfalvi (9.7.b) — the chief-factor Galois-field model
@@ -133,6 +134,44 @@ theorem caseB_exists_galoisField_repr [Finite G] {M : Subgroup G}
     ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
       e₀ (Additive.ofMul x)
   exact h
+
+/-- **Peterfalvi (9.7.b), the base-point normalized field model.**  The book takes for `φ` the
+additive isomorphism `H̄ ≃+ F` determined by `h = s·φ(h)` for a chosen `s ∈ W̄₂^#`, so that
+`φ(s) = 1`.  That normalization is what collapses the twist identity: substituting `h = s` into
+`(φ(h)ψ(x))η(w) = (φ(h)η(w))ψ(w⁻¹xw)` yields `ψ(x)η(w) = ψ(w⁻¹xw)`, whence `η(w)` is
+multiplicative against every scalar in `U*`.
+
+The Singer construction of `caseB_exists_galoisField_repr` returns an *unnormalized* `e`;
+rescaling by the unit `(e s)⁻¹` fixes that at no cost, since scalars commute past the rescaling
+(`exists_normalized_of_scalar_model`).  Any `s ≠ 1` works here — the caller supplies the
+`W₁`-fixed one from `W̄₂ = C_{H̄}(W₁)`, which is what makes `s^w = s` available downstream. -/
+theorem caseB_exists_galoisField_repr_basePoint [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
+    {s : ↥data.H ⧸ chief.N} (hs : s ≠ 1) :
+    letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+    ∃ (e : Additive (↥data.H ⧸ chief.N) ≃+ GaloisField chief.p data.q)
+      (μ : ↥(MonoidHom.range (uActionHom data chief)) →*
+        (GaloisField chief.p data.q)ˣ),
+      Function.Injective μ ∧
+      (∀ (u : ↥(MonoidHom.range (uActionHom data chief)))
+        (x : ↥data.H ⧸ chief.N),
+        e (Additive.ofMul ((MonoidHom.range (uActionHom data chief)).subtype u x)) =
+          ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
+            e (Additive.ofMul x)) ∧
+      e (Additive.ofMul s) = 1 := by
+  letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  obtain ⟨e, μ, hμinj, hcompat⟩ := caseB_exists_galoisField_repr chars caseB
+  have hs0 : e (Additive.ofMul s) ≠ 0 := fun h =>
+    hs (by simpa using e.injective (h.trans (map_zero e).symm))
+  obtain ⟨e', hcompat', hnorm⟩ :=
+    OddOrder.RepresentationTheory.exists_normalized_of_scalar_model
+      (act := fun (u : ↥(MonoidHom.range (uActionHom data chief)))
+        (x : Additive (↥data.H ⧸ chief.N)) =>
+          Additive.ofMul ((MonoidHom.range (uActionHom data chief)).subtype u
+            (Additive.toMul x)))
+      e (fun u => μ u) (fun u x => hcompat u (Additive.toMul x)) hs0
+  exact ⟨e', μ, hμinj, fun u x => hcompat' u (Additive.ofMul x), hnorm⟩
 
 /-- The realized subgroup `C = C_U(H̄)` being trivial makes `uActionHom` injective. -/
 theorem uActionHom_injective_of_cSub_eq_bot [Finite G] {M : Subgroup G}
