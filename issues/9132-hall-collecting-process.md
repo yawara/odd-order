@@ -220,12 +220,15 @@ Suzuki [26] のみ引用)。以後 **Hall–Petresco** と綴る。
   **`coq/theories/BGsection4.v:62-89` は weight 3 を証明ローカルの `have expMR_fg`
   で手書き**しており、名前付き補題にしていない (= Gonthier らも regular p-group 理論を
   作らず必要な低 class 切り詰めをその場で証明した)。
-- ⚠ **`plby/Erdos90`** (Lean 4, AI 生成, 2026-06) に `petresco_two_generators` として
-  完全形式化が存在する。ただし **LICENSE ファイルが無い (license: null)** ので
-  **参照も複製も不可** — coq submodule のような「行間補完に読む」扱いもしない。
-  同 repo は Magnus 埋め込み + basic commutator の重いルート (Hall 部分だけで ~6k 行、
-  import closure 25k 行) を採っている。**軽いルートを選ぶ判断を支持する材料**として
-  だけ記録する。
+- **`plby/Erdos90`** (Lean 4, 2026-06) に `petresco_two_generators` として完全形式化が
+  存在する、と subagent が報告 (⚠ **以下は subagent 報告のままで未検証** — 私は
+  リポジトリを開いていない。行数・sorry 有無・ライセンス表記はいずれも要確認):
+  Magnus 埋め込み + basic commutator の重いルート (Hall 部分だけで ~6k 行、
+  import closure 25k 行) を採っているとのこと。**軽いルート (Lazard–Leibman) を
+  選ぶ判断を支持する規模感の材料**として記録する。
+  **扱い (ユーザー裁定 2026-07-19): 参照してよい。コピペしなければよい。**
+  = `coq/` submodule と同じ posture (戦略のヒント・前提の所在確認に読む、
+  Lean へ直訳しない)。詳細は CLAUDE.md「外部形式化の参照」節。
 - mathlib には **`⁅γᵢ,γⱼ⁆ ≤ γ_{i+j}` すら無い** (本 repo は
   `Isaacs.Ch04.commutator_lowerCentralSeries_le` として保有)。
 
