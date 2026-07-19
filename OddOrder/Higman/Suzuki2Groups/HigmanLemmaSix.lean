@@ -21,9 +21,10 @@ image is zero or all of `L₁`; the latter would make the full-span bracket
 zero and hence force `L₃ = 0`.
 
 The later sections establish Higman's odd-dimension reduction through the
-order-three fixed-point-free theorem and connect `[u²,u] = 1` to the
-triple-commutator sum from p. 86.  The remaining frontier is the
-repeated-index pair-weight separation and final contradiction.
+order-three fixed-point-free theorem, connect `[u²,u] = 1` to the
+triple-commutator sum from p. 86, and eliminate its repeated-weight fibers.
+The remaining frontier is the distinct-weight eigenspace connection and
+final contradiction.
 -/
 
 set_option autoImplicit false
@@ -1084,5 +1085,183 @@ theorem lowerCentralTripleCommutator_weightFiber_sum_eq_zero
     true_and] using
     (Module.End.sum_filter_weight_eq_zero_of_sum_eq_zero
       T (Finset.univ : Finset I) weight term htermEigen hsum' mu)
+
+set_option maxHeartbeats 800000 in
+-- The finite repeated-weight classification has four nested orientation cases.
+/-- **Higman Lemma 6 (p. 86), repeated-weight fiber elimination.**
+
+Assume the actual first-layer brackets are supported on one unordered cyclic
+gap. In a pair-weight fiber, every nonzero triple bracket has a repeated
+third index. The binary-weight classification leaves one predecessor
+candidate on either side of the target pair. Each side contains at most one
+term, while oddness of the dimension rules out nonzero terms on both sides.
+Since the whole fiber sums to zero, every term in it vanishes. -/
+theorem lowerCentralTripleCommutator_pairWeightFiber_terms_eq_zero
+    (K : Type uK) [Field K] [DecidableEq K] [Algebra (ZMod 2) K]
+    (H : Type uH) [Group H]
+    {n : ℕ} [NeZero n] (hn : 2 ≤ n) (hnodd : Odd n)
+    (lambda : K) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (b : Fin n → K ⊗[ZMod 2] Additive (lowerCentralLayer H 0))
+    (r : ZMod n)
+    (hsupport : ∀ i j : Fin n,
+      lowerCentralCommutatorBilinearBaseChange K H (b i) (b j) ≠ 0 →
+        HasHigmanPairGap r i j)
+    (hdistinct : ∀ (q : HigmanExponentPair n) (k : Fin n),
+      k ≠ q.1.1 → k ≠ q.1.2 →
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H
+          (b q.1.1) (b q.1.2)) (b k) = 0)
+    (p : HigmanExponentPair n)
+    (hfiber : ∑ z : HigmanExponentPair n × Fin n with
+        lambda ^ (2 ^ z.1.1.1.val + 2 ^ z.1.1.2.val + 2 ^ z.2.val) =
+          lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val),
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H
+          (b z.1.1.1) (b z.1.1.2)) (b z.2) = 0) :
+    ∀ z : HigmanExponentPair n × Fin n,
+      lambda ^ (2 ^ z.1.1.1.val + 2 ^ z.1.1.2.val + 2 ^ z.2.val) =
+          lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val) →
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H
+          (b z.1.1.1) (b z.1.1.2)) (b z.2) = 0 := by
+  classical
+  let I := HigmanExponentPair n × Fin n
+  let weight : I → K := fun z =>
+    lambda ^ (2 ^ z.1.1.1.val + 2 ^ z.1.1.2.val + 2 ^ z.2.val)
+  let target : K := lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)
+  let term : I → K ⊗[ZMod 2] Additive (lowerCentralLayer H 2) := fun z =>
+    lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+      (lowerCentralCommutatorBilinearBaseChange K H
+        (b z.1.1.1) (b z.1.1.2)) (b z.2)
+  let fiber : Finset I := Finset.univ.filter fun z => weight z = target
+  let IsLeft : I → Prop := fun z =>
+    (z.1.1.1 = p.1.1 ∧ z.1.1.2 = p.1.2 - 1 ∧ z.2 = z.1.1.2) ∨
+    (z.1.1.2 = p.1.1 ∧ z.1.1.1 = p.1.2 - 1 ∧ z.2 = z.1.1.1)
+  let IsRight : I → Prop := fun z =>
+    (z.1.1.1 = p.1.2 ∧ z.1.1.2 = p.1.1 - 1 ∧ z.2 = z.1.1.2) ∨
+    (z.1.1.2 = p.1.2 ∧ z.1.1.1 = p.1.1 - 1 ∧ z.2 = z.1.1.1)
+  have hfinite : IsOfFinOrder lambda :=
+    hprim.isOfFinOrder (Nat.sub_ne_zero_of_lt
+      (Nat.one_lt_pow (by omega : n ≠ 0) (by omega)))
+  have classify : ∀ z : I, weight z = target → term z ≠ 0 →
+      (IsLeft z ∧ HasHigmanPairGap r p.1.1 (p.1.2 - 1)) ∨
+      (IsRight z ∧ HasHigmanPairGap r p.1.2 (p.1.1 - 1)) := by
+    rintro ⟨q, k⟩ hweight hterm
+    have hbeta : lowerCentralCommutatorBilinearBaseChange K H
+        (b q.1.1) (b q.1.2) ≠ 0 := by
+      intro hzero
+      apply hterm
+      simp only [term]
+      rw [hzero]
+      simp
+    have hgap := hsupport q.1.1 q.1.2 hbeta
+    have hmod : Nat.ModEq (2 ^ n - 1)
+        (2 ^ q.1.1.val + 2 ^ q.1.2.val + 2 ^ k.val)
+        (2 ^ p.1.1.val + 2 ^ p.1.2.val) := by
+      have hm := hfinite.pow_eq_pow_iff_modEq.mp hweight
+      rwa [← hprim.eq_orderOf] at hm
+    by_cases hk₁ : k = q.1.1
+    · have hcand := repeated_frobeniusWeight_pairWeight_candidates hn
+        q.1.2 q.1.1 p (by
+          simpa only [hk₁, add_comm, add_left_comm, add_assoc] using hmod)
+      rcases hcand with hcand | hcand
+      · left
+        constructor
+        · right
+          exact ⟨hcand.1, hcand.2, hk₁⟩
+        · apply HasHigmanPairGap.comm.mp
+          simpa only [hcand.1, hcand.2] using hgap
+      · right
+        constructor
+        · right
+          exact ⟨hcand.1, hcand.2, hk₁⟩
+        · apply HasHigmanPairGap.comm.mp
+          simpa only [hcand.1, hcand.2] using hgap
+    · by_cases hk₂ : k = q.1.2
+      · have hcand := repeated_frobeniusWeight_pairWeight_candidates hn
+          q.1.1 q.1.2 p (by simpa only [hk₂] using hmod)
+        rcases hcand with hcand | hcand
+        · left
+          constructor
+          · left
+            exact ⟨hcand.1, hcand.2, hk₂⟩
+          · simpa only [hcand.1, hcand.2] using hgap
+        · right
+          constructor
+          · left
+            exact ⟨hcand.1, hcand.2, hk₂⟩
+          · simpa only [hcand.1, hcand.2] using hgap
+      · exact (hterm (hdistinct q k hk₁ hk₂)).elim
+  have left_unique : ∀ z w : I, IsLeft z → IsLeft w → z = w := by
+    rintro ⟨q, k⟩ ⟨q', k'⟩ hq hq'
+    dsimp only [IsLeft] at hq hq'
+    rcases hq with hq | hq <;> rcases hq' with hq' | hq'
+    · apply Prod.ext
+      · apply Subtype.ext
+        apply Prod.ext <;> simp_all
+      · simp_all
+    · exfalso
+      have hlt := q.2
+      have hlt' := q'.2
+      fin_omega
+    · exfalso
+      have hlt := q.2
+      have hlt' := q'.2
+      fin_omega
+    · apply Prod.ext
+      · apply Subtype.ext
+        apply Prod.ext <;> simp_all
+      · simp_all
+  have right_unique : ∀ z w : I, IsRight z → IsRight w → z = w := by
+    rintro ⟨q, k⟩ ⟨q', k'⟩ hq hq'
+    dsimp only [IsRight] at hq hq'
+    rcases hq with hq | hq <;> rcases hq' with hq' | hq'
+    · apply Prod.ext
+      · apply Subtype.ext
+        apply Prod.ext <;> simp_all
+      · simp_all
+    · exfalso
+      have hlt := q.2
+      have hlt' := q'.2
+      fin_omega
+    · exfalso
+      have hlt := q.2
+      have hlt' := q'.2
+      fin_omega
+    · apply Prod.ext
+      · apply Subtype.ext
+        apply Prod.ext <;> simp_all
+      · simp_all
+  have atMostOne : ∀ z w : I, z ∈ fiber → w ∈ fiber →
+      term z ≠ 0 → term w ≠ 0 → z = w := by
+    intro z w hz hw hzne hwne
+    have hzw : weight z = target := (Finset.mem_filter.mp hz).2
+    have hww : weight w = target := (Finset.mem_filter.mp hw).2
+    rcases classify z hzw hzne with ⟨hzL, hgapL⟩ | ⟨hzR, hgapR⟩
+    · rcases classify w hww hwne with ⟨hwL, _⟩ | ⟨hwR, hgapR⟩
+      · exact left_unique z w hzL hwL
+      · exact (p.not_both_predecessor_pairGaps_of_odd hnodd r
+          ⟨hgapL, hgapR⟩).elim
+    · rcases classify w hww hwne with ⟨hwL, hgapL⟩ | ⟨hwR, _⟩
+      · exact (p.not_both_predecessor_pairGaps_of_odd hnodd r
+          ⟨hgapL, hgapR⟩).elim
+      · exact right_unique z w hzR hwR
+  have hsum : Finset.sum fiber term = 0 := by
+    simpa only [fiber, term, weight, target, I, Finset.sum_filter,
+      Finset.mem_univ, true_and] using hfiber
+  intro z hzweight
+  change term z = 0
+  have hzmem : z ∈ fiber := by
+    simp only [fiber, Finset.mem_filter, Finset.mem_univ, true_and]
+    exact hzweight
+  by_contra hzne
+  have hothers : ∀ w ∈ fiber, w ≠ z → term w = 0 := by
+    intro w hw hwz
+    by_contra hwne
+    exact hwz (atMostOne w z hw hzmem hwne hzne)
+  have hsingle : Finset.sum fiber term = term z :=
+    Finset.sum_eq_single_of_mem z hzmem hothers
+  rw [hsingle] at hsum
+  exact hzne hsum
 
 end OddOrder.Higman.Suzuki2Groups
