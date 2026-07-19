@@ -449,8 +449,22 @@ survey (`notes/meta/three_books_full_survey_2026_07_16.md`) の Ch.3 15 件の�
 | Thm 3.31 | `exists_abelian_fixedPoint_replacement` (+ solvable 段 / 積公式; \|H\|=\|G\| 強化) | `Ch04/HartleyTurull.lean` |
 | Thm 3.36 補完 | `Nat.card (G ⧸ N₀) = m` 節追加 | `CyclicExtensions.lean` (§3F を Main から分割) |
 
-**残り (進行中/未着手)**: Thm 3.34 (agent 実装中 → `HartleyTurull.lean`)、Thm 3.35 existence 半分
-(agent 実装中 → `CyclicExtensions.lean`)、wreath 一般形 (§3A、未着手 — mathlib は regular のみ)。
+~~**残り (進行中/未着手)**: Thm 3.34 (agent 実装中 → `HartleyTurull.lean`)、Thm 3.35 existence 半分
+(agent 実装中 → `CyclicExtensions.lean`)、wreath 一般形 (§3A、未着手 — mathlib は regular のみ)。~~
+
+**⚠ 上記 3 件はいずれも完了済 — 記述が stale だった (2026-07-19 実測で訂正, レーン a)**:
+
+| 旧記述 | 実測 |
+|---|---|
+| Thm 3.34「agent 実装中」 | **✅ 完了**。`exists_orbit_card_mul_of_coprime_orbit_card` (`OddOrder/Isaacs/Ch04_Commutators/HartleyTurull.lean:1118`)。**Ch.3 でなく Ch.4 に在る** — 本 note 自身が上で説明しているとおり Tier 2 (3.31-3.34) は Ch.4 §4C-§4D 依存ゆえ Ch.4 配置。同ファイル冒頭の対応表も ✅ 済。 |
+| Thm 3.35 existence「agent 実装中」 | **✅ 完了**。`CyclicExtensions.lean` は 742 行・実 sorry 0。 |
+| wreath 一般形「未着手」 | **✅ 完了**。`OddOrder/Isaacs/Ch03_SplitExtensions/WreathProduct.lean` (160 行・22 宣言・実 sorry 0)。`Ω` 上の一般 wreath product を実装し、`wreathEquivRegular` で mathlib の `RegularWreathProduct` (regular のみ) との整合も記録済。 |
+
+⚠ **教訓**: 本 note の「未着手」ラベルは着手判断に使わない。**ファイル名で探して無いことを「未形式化」と結論しない**
+(Thm 3.34 は `Ch03_SplitExtensions/HartleyTurull.lean` が存在しないが、Ch.4 に記述的名前で在った)。
+番号 + 記述的名前で grep すること ([[verify-port-state-by-number-not-coq-name]])。
+**Isaacs 全体の実 sorry = 0 (2026-07-19 実測)** なので、残作業は sorry でなく被覆/特殊化債務であり、
+それを判定するには章ごとの実測 pass が要る (Pf 本文の `frontier_measured_2026_07_19.md` に相当するものが Isaacs には未整備)。
 
 インフラ副産物: `GroupTheory/FixedSubgroup.lean` (fixedSubgroup を CoprimeAction から upstream 分割,
 issue 9106)、AxiomsCheck に 3.15/3.17/3.18/拡大閉包/3.22 を登録済み (full build green 実測 13-14 分)。
