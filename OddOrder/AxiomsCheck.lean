@@ -82,6 +82,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
@@ -1115,6 +1116,11 @@ Appendix III type-A Suzuki 2-group structure. -/
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+
+-- Ch.6 (Frobenius Actions): Thm 6.23 (Thompson) — normal `p`-complement from the
+-- normalizers of the nonidentity characteristic subgroups of a Sylow `p`-subgroup
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer
 
 -- Ch.6 (Frobenius Actions): Thm 6.24 (Thompson) — Frobenius kernels are nilpotent
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch06.isNilpotent_of_isFrobeniusAction
