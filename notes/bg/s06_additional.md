@@ -35,6 +35,12 @@
    BG 自身 mmd L4627 で「Theorem A.4(b) is just Theorem 6.1」と同一視している。
    §6 側の入口 = `S06_Thm61.le_oPiPrimePiCore_of_abelian_normal_in_sylow` で、実質は
    `thmA4b` の `p ≠ 2` (奇数位数下で vacuous) を任意素数へ外しただけ。新規の数学は無し。
+3.5. ~~**Thm 6.4**~~ → ✅ **完了** (2026-07-19、issue 3026)。無条件形
+   `S06_Thm64Case2.exists_centralizing_conj_sup_isPiGroup_of_normalHall`。`|G|+|H|` の強帰納で、
+   reduction「`G = LH` としてよい」+ `π(F(G)) ⊆ π(H)` の 2 分岐。⚠ 過程で **BG p.50 の誤植**を
+   発見・訂正した (原文 `[H,yz] ⊆ H ∩ L = 1` の `L` は `N` の書き損じ; 結論は健全)。
+   Coq は本定理を「revised proof に不要」として落としており repo にも consumer は無いが、
+   CLAUDE.md「進捗の測り方」に従い正面から形式化した。
 4. **Thm 6.2** (Glauberman ZJ 一般形): ⚠ **blocked** (2026-07-19 確定、issue 3017 → **3024**)。
    literal `J(S)` 一般形は Gorenstein Ch.8 §2 (Glauberman ZJ) の全面移植を要し
    (2,000-4,000 行/複数 session)、repo には p-stable+p-constrained 版 ZJ が無い。

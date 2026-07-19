@@ -215,6 +215,7 @@ import OddOrder.BG.Ch1_Preliminary.S06_Thm61
 import OddOrder.BG.Ch1_Preliminary.S06_Lem63b
 import OddOrder.BG.Ch1_Preliminary.S06_Thm62JS
 import OddOrder.BG.Ch1_Preliminary.S06_Thm64
+import OddOrder.BG.Ch1_Preliminary.S06_Thm64Case2
 import OddOrder.BG.Ch1_Preliminary.OperatorQuotientAction
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.BG.Ch1_Preliminary.S04b_Thm412

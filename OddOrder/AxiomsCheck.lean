@@ -108,6 +108,7 @@ import OddOrder.BG.Ch1_Preliminary.S05_Thm420b
 import OddOrder.BG.Ch1_Preliminary.S06_Lem63b
 import OddOrder.BG.Ch1_Preliminary.S06_Thm61
 import OddOrder.BG.Ch1_Preliminary.S06_Thm64
+import OddOrder.BG.Ch1_Preliminary.S06_Thm64Case2
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
@@ -2640,6 +2641,43 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_conj_smul_eq_of_sup_eq
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.commutator_mem_of_quotient_centralizes
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.sup_eq_sup_of_map_mk'_eq
+
+/-! ### BG Theorem 6.4 — complete (issue 3026)
+
+`exists_centralizing_conj_sup_isPiGroup_of_normalHall` is **BG Theorem 6.4** (p. 50, mmd L2011)
+unconditionally: for `H` a `π'`-subgroup normalizing `π`-subgroups `J₁, J₂`, and `G₀` a normal Hall
+subgroup with `G₀/F(G₀)` and `(G/G₀)/F(G/G₀)` nilpotent, there is `x ∈ ⟨J₁,J₂⟩` with `⟨J₁ˣ,J₂⟩` a
+`π`-group and `x` centralizing `H`.
+
+Proved by strong induction on `|G| + |H|` (`thm64_of_ih` + `thm64_step`), whose inductive step is a
+three-way dispatch: the reduction "we may assume `G = LH`" (`thm64_of_sup_ne_top`), then Case 1
+(`thm64_case_fitting_primes_not_subset`) / Case 2 (`thm64_case_fitting_primes_subset`) on whether
+`π(F(G)) ⊆ π(H)`.
+
+⚠ **The printed book contains an error** which this formalization corrects: BG p.50 ends Case 1
+with `[H, yz] ⊆ H ∩ L = 1`, but `H ∩ L = 1` does not follow — the reduction only gives `G = LH`
+with `L ⊴ G`, hence `G/L ≅ H/(H ∩ L)`, and `L = ⟨J₁,J₂⟩` being a `π`-group is the theorem's own
+*conclusion*.  The correct subgroup is `N`, where `H ⊓ N = ⊥` holds for the reason BG states one
+line earlier.  See `mem_centralizer_of_mem_normalizer_of_commutator_le`.
+
+Three deviations from the book's route, none a weakening (all documented in the leaf):
+`O_π(G) = 1` is bypassed (only "`F(G)` is a `π'`-group" is needed); Case 2 does not assume
+`G = LH` (its induction shrinks `H`, keeping `G` fixed); and `[J₁,B] ≤ F(M)` goes via
+lower-central-series descent rather than building `O_{π'}` for nilpotent groups.
+All nine declarations axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup_of_normalHall
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_step
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_case_fitting_primes_subset
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.eq_bot_of_commutator_eq_self
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.commutator_commutator_right_eq_of_le_normalizer
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.mem_centralizer_sup
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S06.exists_normalHall_isNilpotent_quotient_fitting
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.inf_ne_bot_of_prime_dvd_card
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.inf_le_centralizer_of_isPiSubgroup
 
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup
