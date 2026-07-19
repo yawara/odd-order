@@ -161,14 +161,15 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             `LemmaSevenSpectralCertificate.false` に接続する
       - [x] 同型仮定を内部構成した source-facing endpoint
             `higmanLemmaSeven_isMulCommutative` として landing (`01b037909`)
-    - [ ] Higman Lemma 8 (current source frontier, p. 87):
+    - [x] Higman Lemma 8 (p. 87):
           `C' = A` なら `exp(A) ≤ 2`
-      - [ ] cover と `C' = A` から `C² = C'`
+      - [x] cover と `C' = A` から `C² = C'`
             (`Agemo C 2 1 = commutator C`) を証明する
-      - [ ] actual lower-central terms を `C₂ = A`, `C₃ = A²`, `C₄ = A⁴` と同定する
-      - [ ] actual `L₂ ≃ A/A²`, `L₃ ≃ A²/A⁴` と actor-equivariance を構成する
-      - [ ] `exp(A) > 2` のとき power map `L₂ ≃ξ L₃` を構成し、Lemma 6 と矛盾させる
-    - [ ] Higman Lemma 9: Lemmas 3, 7, 8 の三分岐から maximal abelian normal
+      - [x] actual lower-central terms を `C₂ = A`, `C₃ = A²`, `C₄ = A⁴` と同定する
+      - [x] actual `L₂ ≃ A/A²`, `L₃ ≃ A²/A⁴` と actor-equivariance を構成する
+      - [x] `exp(A) > 2` のとき power map `L₂ ≃ξ L₃` を構成し、Lemma 6 と矛盾させる
+            (`higmanLemmaEight_pow_two_eq_one`, `cd97f2d75`)
+    - [ ] Higman Lemma 9 (current source frontier): Lemmas 3, 7, 8 の三分岐から maximal abelian normal
           invariant subgroup `A` に対する `exp(A) ≤ 4` と `Φ(G) ≤ A` を証明する
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
