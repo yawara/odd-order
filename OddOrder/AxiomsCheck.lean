@@ -66,6 +66,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
@@ -1735,6 +1736,28 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+
+/-! ### Peterfalvi (1.7)(a) — Clifford correspondence, distinctness half
+
+`induce_eq_sum_smul_induce_of_inertia_eq` is Peterfalvi (1.7)(a) verbatim: with `H ⊴ G`,
+`T = I_G(θ)` and `Ind_H^T θ = ∑_{ψ ∈ S} e_ψ • ψ`, each `Ind_T^G ψ` is irreducible, they are
+**pairwise distinct**, and `Ind_H^G θ = ∑_{ψ ∈ S} e_ψ • Ind_T^G ψ`.  No coprimality, `T/H` need not
+be abelian, the `e_ψ` are unrestricted.
+
+The distinctness clause (`eq_of_induce_eq_induce_of_liesOver_of_inertia_eq`) was the one genuinely
+missing piece of Pf §3 — the irreducibility half already existed, and the `T/H`-abelian distinctness
+elsewhere is (1.7)(b), not general (a).  It is proved by the book's θ-part count: both `ψ, ψ'` occur
+once in `Res_T χ`, so `⟨Res_H χ, θ⟩ ≥ e + e'`, while the two Clifford degree formulas pin
+`⟨Res_H χ, θ⟩ = e`, forcing `e' = 0`.  `sum_restrictionMultiplicity_mul_le_restrictionMultiplicity`
+is the family-indexed θ-part bound it runs on (a strict generalization of the pre-existing
+one-element lemma).  All axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_restrictionMultiplicity_mul_le_restrictionMultiplicity
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.eq_of_induce_eq_induce_of_liesOver_of_inertia_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induce_eq_sum_smul_induce_of_inertia_eq
 -- RepresentationTheory (Singer, case-(9.7.b) entry): a faithful irreducible abelian action on an
 -- `F_p`-module of order `p^q` is realized by multiplication on `GF(p^q)`, with no order
 -- assumption on the acting group.

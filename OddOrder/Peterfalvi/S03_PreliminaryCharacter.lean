@@ -543,7 +543,10 @@ The forward direction is elementary from the value formula
 `ClassFunction.induce_apply_of_mem_normal_of_const`: when `θ` is constant on `A`, every term
 of the induction sum at `a ∈ A` is that constant, so `Ind_H^G θ` is constant on `A` as well.
 The backward direction (the converse) is [Is] *Character Theory* Lemma 2.21, an eigenvalue
-argument on the genuine character `θ`, and is **not** formalised here. -/
+argument on the genuine character `θ`; it is proved below, elementwise and for irreducible
+`θ`, as `mem_characterKernel_of_mem_characterKernel_induce` (§ "Kernel descent along
+induction"), via the Mackey orbit identity and the triangle-equality keystone
+`irreducibleCharacter_mem_characterKernel_of_natSum_value_eq`. -/
 
 section InducedKernel
 
@@ -575,7 +578,8 @@ contained in the kernel of the induced character `Ind_H^G θ` (as a subgroup of 
 
 This is the elementary half of (1.6.a): when `θ` is constant on `A`, so is `Ind_H^G θ` (every
 term of the induction sum at `a ∈ A` is `θ` evaluated at a conjugate `x⁻¹ a x ∈ A`, hence the
-common constant).  The converse is [Is] Lemma 2.21 and is not formalised here.
+common constant).  The converse is [Is] Lemma 2.21, proved below for irreducible `θ` as
+`mem_characterKernel_of_mem_characterKernel_induce`.
 
 The (6.6) use case is the contrapositive: if `Z ⊄ Ker (Ind_H^G θ)` then `Z ⊄ Ker θ`. -/
 theorem subsetCharacterKernel_induce_of_subgroupOf (hAH : A ≤ H) [A.Normal]

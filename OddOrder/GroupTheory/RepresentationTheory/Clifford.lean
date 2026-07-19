@@ -28,9 +28,13 @@ the `G`-conjugation action on `Irr H`:
 > in `G` (so `t = [G : T]`) and `e_χ = ⟨Res χ, θ⟩_H` is the common multiplicity.
 
 A companion result ([Is] Thm 6.11) is the **inertia bijection**: induction from `T`
-gives a bijection between `Irr(T)` lying over `θ` and `Irr(G)` lying over `θ`. The
-precise statement is left as a TODO since it requires extra setup
-(`InducedCharacter` numerical Frobenius reciprocity + multiplicity counting).
+gives a bijection between `Irr(T)` lying over `θ` and `Irr(G)` lying over `θ`.  Both
+halves of the map itself are now proved in `CliffordCorrespondence.lean` — it lands in
+`Irr(G)` (`isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq`) and it is injective
+(`eq_of_induce_eq_induce_of_liesOver_of_inertia_eq`), which together give Peterfalvi
+(1.7.a) (`induce_eq_sum_smul_induce_of_inertia_eq`).  What is still left as a TODO is
+only the packaging as an `Equiv`, i.e. the surjectivity clause (every `χ ∈ Irr(G)` over
+`θ` is induced from `T`); no current consumer needs it.
 
 ## Status
 

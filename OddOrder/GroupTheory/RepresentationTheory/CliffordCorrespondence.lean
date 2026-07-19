@@ -14,6 +14,11 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 irreducibility half**: let `H ⊴ G`, `θ ∈ Irr(H)` with inertia group `T = I_G(θ)`, and let
 `ψ ∈ Irr(T)` lie over `θ`.  Then `Ind_T^G ψ` is **irreducible**.
 
+The same θ-part count gives the **injectivity half** (`ψ ↦ Ind_T^G ψ` is injective on the
+characters of `T` lying over `θ`), and the two together with induction in stages assemble
+**Peterfalvi (1.7.a)** verbatim: for `Ind_H^T θ = ∑ᵢ eᵢψᵢ` with distinct `ψᵢ ∈ Irr(T)`, the
+`χᵢ = Ind_T^G ψᵢ` are distinct irreducible characters of `G` and `Ind_H^G θ = ∑ᵢ eᵢχᵢ`.
+
 The proof is the θ-part counting argument (no Mackey formula needed): for any irreducible
 constituent `χ` of `Ind_T^G ψ` with multiplicity `m = ⟨Ind ψ, χ⟩ ≥ 1`,
 
@@ -37,7 +42,11 @@ maximal subgroup.
 
 * `isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq` — the Clifford correspondence
   irreducibility: `Ind_{I_G(θ)}^G ψ` is irreducible for `ψ ∈ Irr(I_G(θ))` over `θ`.
-* `restrictionMultiplicity_mul_le_restrictionMultiplicity` — the θ-part lower bound.
+* `eq_of_induce_eq_induce_of_liesOver_of_inertia_eq` — the Clifford correspondence
+  injectivity (Peterfalvi (1.7.a), distinctness half).
+* `induce_eq_sum_smul_induce_of_inertia_eq` — Peterfalvi (1.7.a), the packaged statement.
+* `restrictionMultiplicity_mul_le_restrictionMultiplicity` — the θ-part lower bound, and
+  `sum_restrictionMultiplicity_mul_le_restrictionMultiplicity` its family form.
 * `induce_eq_coe_of_inner_eq_one_of_apply_one_eq` — degree exhaustion: a multiplicity-one
   irreducible constituent of the same degree exhausts the induced character.
 
@@ -271,6 +280,90 @@ theorem restrictionMultiplicity_mul_le_restrictionMultiplicity
     _ = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) θ :=
         (h1.trans h2).symm
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+open scoped ComplexOrder in
+/-- **The θ-part lower bound, summed over a family**: for any finite set `S` of irreducible
+characters of `T` (with `H ≤ T`), the multiplicity of `θ` in `Res_H χ` is at least
+`∑_{ρ ∈ S} ⟨Res_T χ, ρ⟩ · ⟨Res_H ρ, θ⟩`.
+
+Same expansion as `restrictionMultiplicity_mul_le_restrictionMultiplicity` (which is the
+one-element case): `⟨Res_H χ, θ⟩ = ∑_ρ ⟨Res_T χ, ρ⟩·⟨Res ρ, θ'⟩` over **all** `ρ ∈ Irr(T)`,
+a sum of products of non-negative integers, so dropping the terms outside `S` only decreases
+it (`Finset.sum_le_sum_of_subset_of_nonneg`).  The two-element case is what separates two
+distinct Clifford correspondents (`eq_of_induce_eq_induce_of_liesOver_of_inertia_eq`). -/
+theorem sum_restrictionMultiplicity_mul_le_restrictionMultiplicity
+    {H T : Subgroup G} (hHT : H ≤ T)
+    [Fintype ↥T] [Invertible (Nat.card ↥T : ℂ)]
+    [Fintype ↥(H.subgroupOf T)] [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
+    [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (χ : IrreducibleCharacter G) (S : Finset (IrreducibleCharacter ↥T))
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ) :
+    ∑ ρ ∈ S,
+        ClassFunction.restrictionMultiplicity T (χ : ClassFunction G ℂ) (ρ : ClassFunction ↥T ℂ)
+          * ClassFunction.restrictionMultiplicity (H.subgroupOf T) (ρ : ClassFunction ↥T ℂ)
+              (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ)
+      ≤ ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) θ := by
+  classical
+  haveI : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
+  letI : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
+  set θ' : ClassFunction ↥(H.subgroupOf T) ℂ :=
+    ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ with hθ'
+  have hθ'irr : IsIrreducibleCharacter θ' :=
+    IsIrreducibleCharacter.compHom_of_surjective (Subgroup.subgroupOfEquivOfLe hHT).surjective hθ
+  -- the H-level multiplicity, transported to `H.subgroupOf T`
+  have h1 : ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) θ
+      = ClassFunction.inner (ClassFunction.restrict (H.subgroupOf T)
+          (ClassFunction.restrict T (χ : ClassFunction G ℂ))) θ' := by
+    rw [ClassFunction.restrict_subgroupOf_restrict hHT, hθ']
+    exact (inner_compHom_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hHT)
+      (ClassFunction.restrict H (χ : ClassFunction G ℂ)) θ).symm
+  -- expand `Res_T χ` into irreducibles of `T` and push through
+  have hres_sum : ∀ (s : Finset (IrreducibleCharacter ↥T))
+      (F : IrreducibleCharacter ↥T → ClassFunction ↥T ℂ),
+      ClassFunction.restrict (H.subgroupOf T) (∑ ρ ∈ s, F ρ)
+        = ∑ ρ ∈ s, ClassFunction.restrict (H.subgroupOf T) (F ρ) := by
+    intro s F
+    induction s using Finset.induction_on with
+    | empty =>
+        ext y
+        simp
+    | insert a s ha ih =>
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.restrict_add, ih]
+  have h2 : ClassFunction.inner (ClassFunction.restrict (H.subgroupOf T)
+        (ClassFunction.restrict T (χ : ClassFunction G ℂ))) θ'
+      = ∑ ρ : IrreducibleCharacter ↥T,
+          ClassFunction.inner (ClassFunction.restrict T (χ : ClassFunction G ℂ))
+              (ρ : ClassFunction ↥T ℂ)
+            * ClassFunction.inner (ClassFunction.restrict (H.subgroupOf T)
+                (ρ : ClassFunction ↥T ℂ)) θ' := by
+    conv_lhs => rw [← sum_inner_irreducibleCharacter_smul (G := ↥T)
+      (ClassFunction.restrict T (χ : ClassFunction G ℂ))]
+    rw [hres_sum, inner_sum_left]
+    refine Finset.sum_congr rfl fun ρ _ => ?_
+    rw [ClassFunction.restrict_smul, ClassFunction.inner_smul_left]
+  -- every summand is a product of non-negative integers
+  have hnn : ∀ ρ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥T)), ρ ∉ S →
+      (0 : ℂ) ≤ ClassFunction.inner (ClassFunction.restrict T (χ : ClassFunction G ℂ))
+          (ρ : ClassFunction ↥T ℂ)
+        * ClassFunction.inner (ClassFunction.restrict (H.subgroupOf T)
+            (ρ : ClassFunction ↥T ℂ)) θ' := by
+    intro ρ _ _
+    refine mul_nonneg ?_ ?_
+    · exact ClassFunction.restrictionMultiplicity_nonneg T χ.isIrreducible ρ.isIrreducible
+    · exact ClassFunction.restrictionMultiplicity_nonneg (H.subgroupOf T) ρ.isIrreducible hθ'irr
+  -- dropping the terms outside `S` only decreases the (non-negative) full sum
+  calc ∑ ρ ∈ S,
+        ClassFunction.restrictionMultiplicity T (χ : ClassFunction G ℂ) (ρ : ClassFunction ↥T ℂ)
+          * ClassFunction.restrictionMultiplicity (H.subgroupOf T) (ρ : ClassFunction ↥T ℂ) θ'
+      ≤ ∑ ρ : IrreducibleCharacter ↥T,
+          ClassFunction.inner (ClassFunction.restrict T (χ : ClassFunction G ℂ))
+              (ρ : ClassFunction ↥T ℂ)
+            * ClassFunction.inner (ClassFunction.restrict (H.subgroupOf T)
+                (ρ : ClassFunction ↥T ℂ)) θ' :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ S) hnn
+    _ = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) θ :=
+        (h1.trans h2).symm
+
 open scoped ComplexOrder in
 /-- **The Clifford correspondence, irreducibility half** (Isaacs, *Character Theory*,
 Theorem 6.11; issue 9002 (G3)).  Let `H ⊴ G` and let `θ ∈ Irr(H)` have inertia group
@@ -438,5 +531,189 @@ theorem isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq
   have hfinal := induce_eq_coe_of_inner_eq_one_of_apply_one_eq ψ χ h1 hdeg
   rw [hfinal]
   exact χ.isIrreducible
+
+open scoped ComplexOrder in
+/-- **Peterfalvi (1.7.a), distinctness half** (the injectivity of the Clifford correspondence,
+[Is] *Character Theory*, Theorem 6.11).  Let `H ⊴ G` and let `θ ∈ Irr(H)` have inertia group
+exactly `T`.  If `ψ, ψ' ∈ Irr(T)` both lie over `θ` and `Ind_T^G ψ = Ind_T^G ψ'`, then
+`ψ = ψ'`.  In the book's notation: the characters `χᵢ = Ind_T^G ψᵢ` attached to the distinct
+constituents `ψᵢ` of `Ind_H^T θ` are pairwise **distinct**.
+
+θ-part counting, as in the irreducibility half.  Write `χ = Ind_T^G ψ = Ind_T^G ψ'`,
+irreducible by `isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq`.  Frobenius
+reciprocity gives `⟨Res_T χ, ψ⟩ = ⟨χ, χ⟩ = 1 = ⟨Res_T χ, ψ'⟩`, so the two-element case of
+`sum_restrictionMultiplicity_mul_le_restrictionMultiplicity` bounds `⟨Res_H χ, θ⟩ ≥ e + e'`,
+where `e = ⟨Res_H ψ, θ⟩ ≥ 1` and `e' = ⟨Res_H ψ', θ⟩ ≥ 1`.  But the two Clifford degree
+formulas `χ(1) = ⟨Res_H χ, θ⟩·[G:T]·θ(1)` (at `(G, H)`, using `I_G(θ) = T`) and
+`χ(1) = [G:T]·ψ(1) = [G:T]·e·θ(1)` (at `(T, H)`, where `θ` is invariant) force
+`⟨Res_H χ, θ⟩ = e`, whence `e' = 0` — contradicting that `ψ'` lies over `θ`. -/
+theorem eq_of_induce_eq_induce_of_liesOver_of_inertia_eq
+    {H T : Subgroup G} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)
+    [Invertible (Nat.card ↥T : ℂ)]
+    [Fintype ↥(H.subgroupOf T)] [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hinertia : ClassFunction.inertia (G := G) θ = T)
+    (ψ ψ' : IrreducibleCharacter ↥T)
+    (hover : ClassFunction.restrictionMultiplicity (H.subgroupOf T)
+        (ψ : ClassFunction ↥T ℂ)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ) ≠ 0)
+    (hover' : ClassFunction.restrictionMultiplicity (H.subgroupOf T)
+        (ψ' : ClassFunction ↥T ℂ)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ) ≠ 0)
+    (heq : ClassFunction.induce T (ψ : ClassFunction ↥T ℂ)
+        = ClassFunction.induce T (ψ' : ClassFunction ↥T ℂ)) :
+    ψ = ψ' := by
+  classical
+  by_contra hne
+  letI : Fintype ↥T := Fintype.ofFinite _
+  letI : Fintype ↥H := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥H : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Finite (IrreducibleCharacter ↥H) := finite_irreducibleCharacter (G := ↥H)
+  haveI : Finite (IrreducibleCharacter ↥(H.subgroupOf T)) :=
+    finite_irreducibleCharacter (G := ↥(H.subgroupOf T))
+  -- bundled forms, with definitional coercion bridges
+  set θb : IrreducibleCharacter ↥H := ⟨θ, hθ⟩ with hθb
+  have hθ'irr : IsIrreducibleCharacter (ClassFunction.compHom
+      (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ) :=
+    IsIrreducibleCharacter.compHom_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hHT).surjective hθ
+  set θ'b : IrreducibleCharacter ↥(H.subgroupOf T) :=
+    ⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ, hθ'irr⟩
+    with hθ'b
+  have hcoeθ : (θb : ClassFunction ↥H ℂ) = θ := rfl
+  have hcoeθ' : (θ'b : ClassFunction ↥(H.subgroupOf T) ℂ)
+      = ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ := rfl
+  -- `χ = Ind_T^G ψ` is irreducible (the correspondence's irreducibility half)
+  have hirr : IsIrreducibleCharacter (ClassFunction.induce T (ψ : ClassFunction ↥T ℂ)) :=
+    isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq hHT hθ hinertia ψ hover
+  obtain ⟨χ, hχ⟩ : ∃ χ : IrreducibleCharacter G,
+      (χ : ClassFunction G ℂ) = ClassFunction.induce T (ψ : ClassFunction ↥T ℂ) :=
+    ⟨⟨_, hirr⟩, rfl⟩
+  -- both `ψ` and `ψ'` occur in `Res_T χ` with multiplicity one
+  have hself : ClassFunction.inner (χ : ClassFunction G ℂ) (χ : ClassFunction G ℂ) = 1 := by
+    classical simpa using irreducibleCharacter_inner_eq_ite χ χ
+  have hinner : ClassFunction.inner (ClassFunction.induce T (ψ : ClassFunction ↥T ℂ))
+      (χ : ClassFunction G ℂ) = 1 := by
+    rw [← hχ]; exact hself
+  have hinner' : ClassFunction.inner (ClassFunction.induce T (ψ' : ClassFunction ↥T ℂ))
+      (χ : ClassFunction G ℂ) = 1 := by
+    rw [← heq, ← hχ]; exact hself
+  have hmψ : ClassFunction.restrictionMultiplicity T (χ : ClassFunction G ℂ)
+      (ψ : ClassFunction ↥T ℂ) = 1 := by
+    rw [← inner_induce_coe_eq_restrictionMultiplicity ψ χ]; exact hinner
+  have hmψ' : ClassFunction.restrictionMultiplicity T (χ : ClassFunction G ℂ)
+      (ψ' : ClassFunction ↥T ℂ) = 1 := by
+    rw [← inner_induce_coe_eq_restrictionMultiplicity ψ' χ]; exact hinner'
+  -- the two-element θ-part bound `e + e' ≤ ⟨Res_H χ, θ⟩`
+  have hpair := sum_restrictionMultiplicity_mul_le_restrictionMultiplicity (G := G) hHT χ
+    ({ψ, ψ'} : Finset (IrreducibleCharacter ↥T)) hθ
+  rw [Finset.sum_pair hne, hmψ, hmψ', one_mul, one_mul] at hpair
+  -- pass to the natural-number degrees and multiplicities
+  obtain ⟨dθ, hdθpos, hdθ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θb
+  rw [hcoeθ] at hdθ
+  obtain ⟨dψ, hdψpos, hdψ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ψ
+  obtain ⟨eψ, heψ⟩ := IrreducibleCharacter.restrictionMultiplicity_natCast
+    (H := H.subgroupOf T) ψ θ'b
+  rw [hcoeθ'] at heψ
+  obtain ⟨eψ', heψ'⟩ := IrreducibleCharacter.restrictionMultiplicity_natCast
+    (H := H.subgroupOf T) ψ' θ'b
+  rw [hcoeθ'] at heψ'
+  obtain ⟨eχ, heχ⟩ := IrreducibleCharacter.restrictionMultiplicity_natCast (H := H) χ θb
+  rw [hcoeθ] at heχ
+  rw [heψ, heψ', heχ] at hpair
+  have hpairN : eψ + eψ' ≤ eχ := by exact_mod_cast hpair
+  have heψ1 : 1 ≤ eψ := by
+    rcases Nat.eq_zero_or_pos eψ with h | h
+    · exact absurd (by rw [heψ, h, Nat.cast_zero]) hover
+    · exact h
+  have heψ'1 : 1 ≤ eψ' := by
+    rcases Nat.eq_zero_or_pos eψ' with h | h
+    · exact absurd (by rw [heψ', h, Nat.cast_zero]) hover'
+    · exact h
+  -- `ψ(1) = eψ·θ(1)`, since `θ'` is `T`-invariant (`T = I_G(θ)`)
+  have hoverψ : IrreducibleCharacter.LiesOver (H := H.subgroupOf T) ψ θ'b := by
+    change ClassFunction.restrictionMultiplicity (H.subgroupOf T) (ψ : ClassFunction ↥T ℂ)
+        (θ'b : ClassFunction ↥(H.subgroupOf T) ℂ) ≠ 0
+    rw [hcoeθ']; exact hover
+  have hstep1 := apply_one_eq_restrictionMultiplicity_mul_index_inertia
+    (G := ↥T) (H := H.subgroupOf T) ψ θ'b hoverψ
+  have hinvT : ∀ t : ↥T, ClassFunction.conjBy ((t : G)) θ = θ := fun t => by
+    have hmem : (t : G) ∈ ClassFunction.inertia (G := G) θ := by
+      rw [hinertia]; exact t.2
+    exact (ClassFunction.mem_inertia).mp hmem
+  have hinertia' : IrreducibleCharacter.inertia (G := ↥T) (H := H.subgroupOf T) θ'b = ⊤ :=
+    inertia_compHom_subgroupOfEquivOfLe_eq_top hHT hinvT
+  rw [hcoeθ', hinertia', Subgroup.index_top, Nat.cast_one, mul_one, heψ,
+    ClassFunction.compHom_apply, map_one, hdθ, hdψ] at hstep1
+  have hstep1N : dψ = eψ * dθ := by exact_mod_cast hstep1
+  -- `χ(1) = eχ·[G:T]·θ(1)` (Clifford at `(G, H)`) and `χ(1) = [G:T]·ψ(1)` (degree of `Ind`)
+  have hoverχ : IrreducibleCharacter.LiesOver (H := H) χ θb := by
+    change ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+        (θb : ClassFunction ↥H ℂ) ≠ 0
+    rw [hcoeθ, heχ]
+    exact Nat.cast_ne_zero.mpr (by omega)
+  have hdegχ := apply_one_eq_restrictionMultiplicity_mul_index_inertia
+    (G := G) (H := H) χ θb hoverχ
+  have hinertiaχ : IrreducibleCharacter.inertia (G := G) (H := H) θb = T := hinertia
+  obtain ⟨dχ, hdχpos, hdχ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  rw [hcoeθ, hinertiaχ, heχ, hdθ, hdχ] at hdegχ
+  have hdegχN : dχ = eχ * T.index * dθ := by exact_mod_cast hdegχ
+  have hdegind : dχ = T.index * dψ := by
+    have h : (χ : ClassFunction G ℂ) (1 : G)
+        = ClassFunction.induce T (ψ : ClassFunction ↥T ℂ) (1 : G) := by rw [hχ]
+    rw [hdχ, ClassFunction.induce_apply_one, hdψ] at h
+    exact_mod_cast h
+  -- the two formulas force `eχ = eψ`, so `eψ' = 0` — contradicting `hover'`
+  have hTpos : 0 < T.index := Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  have hcancel : eχ * (T.index * dθ) = eψ * (T.index * dθ) := by
+    calc eχ * (T.index * dθ) = eχ * T.index * dθ := by ring
+      _ = dχ := hdegχN.symm
+      _ = T.index * dψ := hdegind
+      _ = T.index * (eψ * dθ) := by rw [hstep1N]
+      _ = eψ * (T.index * dθ) := by ring
+  have heχeψ : eχ = eψ :=
+    Nat.eq_of_mul_eq_mul_right (Nat.mul_pos hTpos hdθpos) hcancel
+  omega
+
+open scoped ComplexOrder in
+/-- **Peterfalvi (1.7.a)**.  Let `H ⊴ G`, let `θ ∈ Irr(H)` have inertia group `T = I_G(θ)`,
+and write `Ind_H^T θ = ∑_{i=1}^n eᵢ ψᵢ` with the `ψᵢ` distinct elements of `Irr(T)`.  Put
+`χᵢ = Ind_T^G ψᵢ`.  Then the `χᵢ` are irreducible characters of `G`, they are pairwise
+distinct, and `Ind_H^G θ = ∑_{i=1}^n eᵢ χᵢ`.
+
+The book cites [Is] Theorem 6.11 for the whole statement.  Here the three clauses are
+`isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq` (irreducibility),
+`eq_of_induce_eq_induce_of_liesOver_of_inertia_eq` (distinctness), and induction in stages
+(`induce_induce_subgroupOf`) together with the linearity of induction (`ClassFunction.induce_sum`,
+`ClassFunction.induce_smul`) for the decomposition.  As in the book, the decomposition
+`Ind_H^T θ = ∑ eᵢ ψᵢ` is a hypothesis on a finite family `S = {ψ₁, …, ψₙ} ⊆ Irr(T)`; that each
+`ψᵢ` lies over `θ` — automatic for the constituents of `Ind_H^T θ` — is what makes the Clifford
+correspondence apply, and the coefficients `eᵢ` are unrestricted (no coprimality, and `T/H` need
+not be abelian). -/
+theorem induce_eq_sum_smul_induce_of_inertia_eq
+    {H T : Subgroup G} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)
+    [Invertible (Nat.card ↥H : ℂ)] [Fintype ↥T] [Invertible (Nat.card ↥T : ℂ)]
+    [Fintype ↥(H.subgroupOf T)] [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hinertia : ClassFunction.inertia (G := G) θ = T)
+    (S : Finset (IrreducibleCharacter ↥T)) (e : IrreducibleCharacter ↥T → ℂ)
+    (hover : ∀ ψ ∈ S, ClassFunction.restrictionMultiplicity (H.subgroupOf T)
+        (ψ : ClassFunction ↥T ℂ)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ) ≠ 0)
+    (hdecomp : ClassFunction.induce (H.subgroupOf T)
+          (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ)
+        = ∑ ψ ∈ S, e ψ • (ψ : ClassFunction ↥T ℂ)) :
+    (∀ ψ ∈ S, IsIrreducibleCharacter (ClassFunction.induce T (ψ : ClassFunction ↥T ℂ)))
+      ∧ (∀ ψ ∈ S, ∀ ψ' ∈ S, ClassFunction.induce T (ψ : ClassFunction ↥T ℂ)
+            = ClassFunction.induce T (ψ' : ClassFunction ↥T ℂ) → ψ = ψ')
+      ∧ ClassFunction.induce H θ
+          = ∑ ψ ∈ S, e ψ • ClassFunction.induce T (ψ : ClassFunction ↥T ℂ) := by
+  refine ⟨fun ψ hψ =>
+      isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq hHT hθ hinertia ψ (hover ψ hψ),
+    fun ψ hψ ψ' hψ' hind => eq_of_induce_eq_induce_of_liesOver_of_inertia_eq hHT hθ hinertia
+      ψ ψ' (hover ψ hψ) (hover ψ' hψ') hind, ?_⟩
+  rw [← induce_induce_subgroupOf (M := G) hHT θ, hdecomp, ClassFunction.induce_sum]
+  exact Finset.sum_congr rfl fun ψ _ => ClassFunction.induce_smul T (e ψ) _
 
 end OddOrder.RepresentationTheory
