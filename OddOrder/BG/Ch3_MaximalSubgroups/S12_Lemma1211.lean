@@ -763,7 +763,7 @@ private theorem le_of_ne_bot_of_le_cyclic {q : ℕ} [Fact q.Prime] [Finite G]
   have hT₀'T : T₀' ≤ T := Subgroup.map_subtype_le _
   -- cyclic `Q` 内で位数 `q` の部分群は一意。
   have hQ₀eq : Q₀.subgroupOf Q = T₀'.subgroupOf Q := by
-    apply S10.cyclic_subgroup_eq_of_card_eq (C := ↥Q)
+    apply OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq (C := ↥Q)
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ₀Q).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hT₀'T.trans hTQ)).toEquiv,
       hQ₀card, hT₀'card]

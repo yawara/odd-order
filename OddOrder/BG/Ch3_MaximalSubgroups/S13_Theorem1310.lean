@@ -317,7 +317,7 @@ theorem line_le_of_ne_bot_of_le_cyclic [Finite G] {q : ℕ} [Fact q.Prime]
     rw [hT₀'def, Subgroup.card_map_of_injective T.subtype_injective, hT₀card, pow_one]
   have hT₀'T : T₀' ≤ T := Subgroup.map_subtype_le _
   have hQ₀eq : Q₀.subgroupOf Q = T₀'.subgroupOf Q := by
-    apply S10.cyclic_subgroup_eq_of_card_eq (C := ↥Q)
+    apply OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq (C := ↥Q)
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ₀Q).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hT₀'T.trans hTQ)).toEquiv,
       hQ₀card, hT₀'card]

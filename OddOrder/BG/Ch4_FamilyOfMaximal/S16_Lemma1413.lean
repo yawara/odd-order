@@ -132,7 +132,7 @@ theorem exists_conj_smul_eq_of_le_of_card_prime [Finite G] {N : Subgroup G} {p :
       (MulAut.conj n).injective).symm.toEquiv, hA'card]
   -- Two order-`p` subgroups of the cyclic `Q` coincide.
   have heqQ : (MulAut.conj n • A' : Subgroup ↥N).subgroupOf Q = B'.subgroupOf Q :=
-    OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥(Q : Subgroup ↥N)) (by
+    OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq (C := ↥(Q : Subgroup ↥N)) (by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hnA'Q).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hB'Q).toEquiv, hnA'card, hB'card])
   have heq : (MulAut.conj n • A' : Subgroup ↥N) = B' := by

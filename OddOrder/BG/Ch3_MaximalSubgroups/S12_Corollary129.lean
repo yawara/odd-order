@@ -49,7 +49,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
 - `Isaacs.Ch05.fitting_coprime_abelian_decomp` (coprime 作用の分解)。
 - Hall 移送 = `Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall` (trivial 作用) +
   `Ch1.S06.exists_conj_eq_of_isHall_subgroupOf`。
-- cyclic 一意性 = `S10.cyclic_subgroup_eq_of_card_eq` + `S10.isCyclic_of_pRank_le_one`。
+- cyclic 一意性 = `OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq` + `S10.isCyclic_of_pRank_le_one`。
 -/
 
 namespace OddOrder.BG.Ch3.S12
@@ -276,7 +276,7 @@ theorem commutator_decomp_of_tau1_action [Finite G] (hG : IsMinimalSimpleOdd G)
     haveI : IsCyclic ↥SylG := S10.isCyclic_of_pRank_le_one hSylG_pg hodd_q hSylG_rank
     -- Uniqueness of order-`q` subgroups in the cyclic `SylG`: `Q = conj m • Q'`.
     have hkey : Q.subgroupOf SylG = (MulAut.conj ((m : G)) • Q').subgroupOf SylG := by
-      apply S10.cyclic_subgroup_eq_of_card_eq
+      apply OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le_SylG).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ'm_le).toEquiv,
         hQcard, card_conj_smul, hQ'_card]

@@ -726,7 +726,7 @@ theorem isTISubset_sdiff_sup_of_normalizer_eq [Finite G] {W W1 W2 : Subgroup G}
       (Nat.card_congr (Subgroup.equivMapOfInjective A (MulAut.conj g).toMonoidHom
         (MulAut.conj g).injective).toEquiv).symm
     have hsubeq : (A.map (MulAut.conj g).toMonoidHom).subgroupOf W = A.subgroupOf W := by
-      apply OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥W)
+      apply OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq (C := ↥W)
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hmap_le).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv, hcard]
     have hmapeq : A.map (MulAut.conj g).toMonoidHom = A := by
