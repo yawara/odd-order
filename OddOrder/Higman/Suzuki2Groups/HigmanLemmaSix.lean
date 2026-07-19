@@ -20,7 +20,8 @@ actual bracket `L₂ × L₁ → L₃` vanish on that image.  Irreducibility say
 image is zero or all of `L₁`; the latter would make the full-span bracket
 zero and hence force `L₃ = 0`.
 
-The later sections of this file will add the odd-dimension reduction and the
+The later sections establish Higman's odd-dimension reduction through the
+order-three fixed-point-free theorem.  The remaining frontier is the
 pair/triple Frobenius-weight argument from the rest of Higman's proof.
 -/
 
@@ -515,5 +516,213 @@ theorem classThreeQuotientAction_orderOf_ne_three
       ((IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a)
       hfree horder
   exact classThreeQuotient_lowerCentralSeries_two_ne_bot H hclassTwo
+
+/-! ## The odd-dimension reduction -/
+
+/-- The multiplicative lower-central-layer action is fixed-point-free iff
+its associated linear map has no nonzero fixed vector. -/
+theorem lowerCentralLayerAction_fixedPointFree_iff
+    {H : Type uH} {C : Type uC} [Group H] [Group C]
+    (phi : C →* MulAut H) (i : Nat) (a : C) :
+    MonoidHom.FixedPointFree (lowerCentralLayerAction phi i a) ↔
+      ∀ v : Additive (lowerCentralLayer H i),
+        lowerCentralLayerRepresentation phi i a v = v → v = 0 := by
+  constructor
+  · intro hfree v hv
+    apply Additive.toMul.injective
+    change Additive.toMul v = 1
+    apply hfree
+    apply Additive.ofMul.injective
+    calc
+      Additive.ofMul
+          (lowerCentralLayerAction phi i a (Additive.toMul v)) =
+          lowerCentralLayerRepresentation phi i a
+            (Additive.ofMul (Additive.toMul v)) :=
+        (lowerCentralLayerRepresentation_apply
+          phi i a (Additive.toMul v)).symm
+      _ = v := by simpa only [ofMul_toMul] using hv
+  · intro hfree q hq
+    apply Additive.ofMul.injective
+    change Additive.ofMul q = 0
+    apply hfree
+    simpa only [lowerCentralLayerRepresentation_apply] using
+      congrArg Additive.ofMul hq
+
+/-- Irreducibility and faithfulness make a nontrivial actor fixed-point-free
+on a lower-central layer. -/
+theorem lowerCentralLayerAction_fixedPointFree_of_faithful_irreducible
+    {H : Type uH} {C : Type uC} [Group H] [CommGroup C]
+    (phi : C →* MulAut H) (i : Nat)
+    (hirr : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation phi i))
+    (hfaith : Function.Injective
+      (lowerCentralLayerRepresentation phi i))
+    (a : C) (ha : a ≠ 1) :
+    MonoidHom.FixedPointFree (lowerCentralLayerAction phi i a) := by
+  rw [lowerCentralLayerAction_fixedPointFree_iff]
+  exact representation_fixedVector_eq_zero_of_faithful_irreducible
+    (lowerCentralLayerRepresentation phi i) hirr hfaith a ha
+
+/-- Faithfulness and transitivity on nonzero vectors make a nontrivial actor
+fixed-point-free on a lower-central layer. -/
+theorem lowerCentralLayerAction_fixedPointFree_of_faithful_transitive_nonzero
+    {H : Type uH} {C : Type uC} [Group H] [CommGroup C]
+    (phi : C →* MulAut H) (i : Nat)
+    (hfaith : Function.Injective
+      (lowerCentralLayerRepresentation phi i))
+    (htrans : ∀ v w : Additive (lowerCentralLayer H i),
+      v ≠ 0 → w ≠ 0 → ∃ c : C,
+        lowerCentralLayerRepresentation phi i c v = w)
+    (a : C) (ha : a ≠ 1) :
+    MonoidHom.FixedPointFree (lowerCentralLayerAction phi i a) := by
+  rw [lowerCentralLayerAction_fixedPointFree_iff]
+  exact representation_fixedVector_eq_zero_of_faithful_transitive_nonzero
+    (lowerCentralLayerRepresentation phi i) hfaith htrans a ha
+
+/-- An equivariant linear equivalence transports fixed-point-freeness
+between lower-central layers. -/
+theorem lowerCentralLayerAction_fixedPointFree_of_equivariant_linearEquiv
+    {H : Type uH} {C : Type uC} [Group H] [Group C]
+    (phi : C →* MulAut H) (i j : Nat)
+    (e : Additive (lowerCentralLayer H i) ≃ₗ[ZMod 2]
+      Additive (lowerCentralLayer H j))
+    (hequiv : ∀ c v,
+      e (lowerCentralLayerRepresentation phi i c v) =
+        lowerCentralLayerRepresentation phi j c (e v))
+    (a : C)
+    (hfree : MonoidHom.FixedPointFree (lowerCentralLayerAction phi i a)) :
+    MonoidHom.FixedPointFree (lowerCentralLayerAction phi j a) := by
+  rw [lowerCentralLayerAction_fixedPointFree_iff] at hfree ⊢
+  intro w hw
+  obtain ⟨v, rfl⟩ := e.surjective w
+  have hv : lowerCentralLayerRepresentation phi i a v = v := by
+    apply e.injective
+    rw [hequiv, hw]
+  rw [hfree v hv, map_zero]
+
+/-- The exact `L₁/L₂/L₃` fixed-point-free package needed by Higman's parity
+step. -/
+theorem lowerCentralLayers_fixedPointFree_of_lemmaSix_hypotheses
+    {H : Type uH} {C : Type uC} [Group H] [CommGroup C]
+    (phi : C →* MulAut H)
+    (hirr : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation phi 0))
+    (hfaith : Function.Injective
+      (lowerCentralLayerRepresentation phi 0))
+    [Nontrivial (Additive (lowerCentralLayer H 1))]
+    (htrans : ∀ v w : Additive (lowerCentralLayer H 1),
+      v ≠ 0 → w ≠ 0 → ∃ c : C,
+        lowerCentralLayerRepresentation phi 1 c v = w)
+    (e : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2]
+      Additive (lowerCentralLayer H 2))
+    (hequiv : ∀ c v,
+      e (lowerCentralLayerRepresentation phi 1 c v) =
+        lowerCentralLayerRepresentation phi 2 c (e v))
+    (a : C) (ha : a ≠ 1) :
+    MonoidHom.FixedPointFree (lowerCentralLayerAction phi 0 a) ∧
+      MonoidHom.FixedPointFree (lowerCentralLayerAction phi 1 a) ∧
+      MonoidHom.FixedPointFree (lowerCentralLayerAction phi 2 a) := by
+  have hfaithOne : Function.Injective
+      (lowerCentralLayerRepresentation phi 1) :=
+    lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
+      phi hirr hfaith e hequiv
+  have hfreeZero : MonoidHom.FixedPointFree
+      (lowerCentralLayerAction phi 0 a) :=
+    lowerCentralLayerAction_fixedPointFree_of_faithful_irreducible
+      phi 0 hirr hfaith a ha
+  have hfreeOne : MonoidHom.FixedPointFree
+      (lowerCentralLayerAction phi 1 a) :=
+    lowerCentralLayerAction_fixedPointFree_of_faithful_transitive_nonzero
+      phi 1 hfaithOne htrans a ha
+  have hfreeTwo : MonoidHom.FixedPointFree
+      (lowerCentralLayerAction phi 2 a) :=
+    lowerCentralLayerAction_fixedPointFree_of_equivariant_linearEquiv
+      phi 1 2 e hequiv a hfreeOne
+  exact ⟨hfreeZero, hfreeOne, hfreeTwo⟩
+
+/-- A nontrivial actor of order three which is fixed-point-free on
+`L₁,L₂,L₃` induces an automorphism of order three on `H/H₄`. -/
+theorem classThreeQuotientAction_orderOf_eq_three
+    {A : Type uC} {H : Type uH} [Group A] [Group H] [Finite H]
+    (phi : A →* MulAut H) (a : A)
+    (horder : orderOf a = 3)
+    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1)
+    [Nontrivial (lowerCentralLayer H 2)]
+    (hfree₀ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 0 a))
+    (hfree₁ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 1 a))
+    (hfree₂ : MonoidHom.FixedPointFree (lowerCentralLayerAction phi 2 a)) :
+    orderOf ((IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a) = 3 := by
+  let psi :=
+    (IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a
+  have hdvd : orderOf psi ∣ 3 := by
+    have hmap := orderOf_map_dvd
+      (IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a
+    simpa only [horder] using hmap
+  rcases (Nat.dvd_prime Nat.prime_three).mp hdvd with hone | hthree
+  · have hpsi : psi = 1 := orderOf_eq_one_iff.mp hone
+    have hfree : MonoidHom.FixedPointFree psi :=
+      classThreeQuotient_fixedPointFree_of_agemo_eq
+        phi a hAgemo hfree₀ hfree₁ hfree₂
+    obtain ⟨q, hq⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
+      (classThreeQuotient_lowerCentralSeries_two_ne_bot H)
+    have hqOne : (q : H ⧸ lowerCentralTerm H 3) = 1 := by
+      apply hfree
+      rw [hpsi]
+      rfl
+    exact absurd (Subtype.ext hqOne) hq
+  · exact hthree
+
+/-- **Higman Lemma 6, odd-dimension reduction (p. 85).**
+
+Assume `H² = H₂`, the action on `L₁` is faithful irreducible, the action on
+`L₂#` is transitive, and `L₂ ≃ L₃` equivariantly.  If `dim L₂` were even,
+the faithful transitive Singer action would contain an actor of order three.
+It is fixed-point-free on `L₁,L₂,L₃`, hence on `H/H₄`; Neumann's theorem then
+forces that quotient to have class at most two, contrary to `L₃ ≠ 0`.
+Therefore `dim L₂` is odd. -/
+theorem lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
+    {H : Type uH} {C : Type uC} [Group H] [Finite H]
+    [CommGroup C] [Finite C]
+    (phi : C →* MulAut H)
+    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1)
+    (hirr : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation phi 0))
+    (hfaith : Function.Injective
+      (lowerCentralLayerRepresentation phi 0))
+    [Nontrivial (Additive (lowerCentralLayer H 1))]
+    (htrans : ∀ v w : Additive (lowerCentralLayer H 1),
+      v ≠ 0 → w ≠ 0 → ∃ c : C,
+        lowerCentralLayerRepresentation phi 1 c v = w)
+    (e : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2]
+      Additive (lowerCentralLayer H 2))
+    (hequiv : ∀ c v,
+      e (lowerCentralLayerRepresentation phi 1 c v) =
+        lowerCentralLayerRepresentation phi 2 c (e v)) :
+    Odd (Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer H 1))) := by
+  apply Nat.not_even_iff_odd.mp
+  intro heven
+  letI : Nontrivial (Additive (lowerCentralLayer H 2)) :=
+    e.symm.toEquiv.nontrivial
+  letI : Nontrivial (lowerCentralLayer H 2) :=
+    (show Function.Injective
+        (fun x : Additive (lowerCentralLayer H 2) => x.toMul) from
+      fun _ _ h => h).nontrivial
+  have hfaithOne : Function.Injective
+      (lowerCentralLayerRepresentation phi 1) :=
+    lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
+      phi hirr hfaith e hequiv
+  obtain ⟨a, ha, horder⟩ :=
+    exists_ne_one_orderOf_eq_three_of_even_faithful_transitive_nonzero
+      (lowerCentralLayerRepresentation phi 1) hfaithOne htrans heven
+  obtain ⟨hfreeZero, hfreeOne, hfreeTwo⟩ :=
+    lowerCentralLayers_fixedPointFree_of_lemmaSix_hypotheses
+      phi hirr hfaith htrans e hequiv a ha
+  have hquotOrder : orderOf
+      ((IsAInvariant.lowerCentralSeries phi 3).quotientMulAutHom a) = 3 :=
+    classThreeQuotientAction_orderOf_eq_three
+      phi a horder hAgemo hfreeZero hfreeOne hfreeTwo
+  exact (classThreeQuotientAction_orderOf_ne_three
+    phi a hAgemo hfreeZero hfreeOne hfreeTwo) hquotOrder
 
 end OddOrder.Higman.Suzuki2Groups

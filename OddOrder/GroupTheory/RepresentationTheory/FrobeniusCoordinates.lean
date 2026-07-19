@@ -411,6 +411,80 @@ theorem exists_singerConjugateBasis_of_faithful_irreducible
 
 universe uHelperF uHelperC uHelperV uHelperW uGenerator
 
+/-- In a faithful irreducible representation of a commutative group, every
+nontrivial actor has no nonzero fixed vector. -/
+theorem representation_fixedVector_eq_zero_of_faithful_irreducible
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [CommGroup C] [AddCommGroup V] [Module F V]
+    (rho : Representation F C V)
+    (hirr : Representation.IsIrreducible rho)
+    (hfaith : Function.Injective rho)
+    (a : C) (ha : a ≠ 1) :
+    ∀ v : V, rho a v = v → v = 0 := by
+  let d : Module.End F V := rho a - 1
+  let W : Subrepresentation rho :=
+    { toSubmodule := LinearMap.ker d
+      apply_mem_toSubmodule := by
+        intro c v hv
+        rw [LinearMap.mem_ker] at hv ⊢
+        change rho a (rho c v) - rho c v = 0
+        change rho a v - v = 0 at hv
+        calc
+          rho a (rho c v) - rho c v =
+              rho c (rho a v) - rho c v := by
+                rw [← Module.End.mul_apply, ← Module.End.mul_apply,
+                  ← map_mul, ← map_mul, mul_comm]
+          _ = 0 := by rw [← map_sub, hv, map_zero] }
+  letI : Representation.IsIrreducible rho := hirr
+  intro v hv
+  have hvW : v ∈ W := by
+    change v ∈ LinearMap.ker d
+    rw [LinearMap.mem_ker]
+    change rho a v - v = 0
+    rw [hv, sub_self]
+  rcases eq_bot_or_eq_top W with hW | hW
+  · rw [hW] at hvW
+    change v ∈ (⊥ : Submodule F V) at hvW
+    exact (Submodule.mem_bot F).mp hvW
+  · have hker : LinearMap.ker d = ⊤ := by
+      change W.toSubmodule = ⊤
+      rw [hW]
+      rfl
+    have hd : d = 0 := LinearMap.ker_eq_top.mp hker
+    have haRho : rho a = 1 := by
+      change rho a = LinearMap.id
+      change rho a - 1 = 0 at hd
+      exact sub_eq_zero.mp hd
+    exact (ha (hfaith (by simpa only [map_one] using haRho))).elim
+
+/-- A faithful action of a commutative group which is transitive on nonzero
+vectors has no nonzero fixed vector for a nontrivial actor. -/
+theorem representation_fixedVector_eq_zero_of_faithful_transitive_nonzero
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [CommGroup C] [AddCommGroup V] [Module F V]
+    (rho : Representation F C V)
+    (hfaith : Function.Injective rho)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 →
+      ∃ c : C, rho c v = w)
+    (a : C) (ha : a ≠ 1) :
+    ∀ v : V, rho a v = v → v = 0 := by
+  intro v hv
+  by_contra hv0
+  have haRho : rho a = 1 := by
+    ext w
+    by_cases hw : w = 0
+    · subst w
+      simp
+    · obtain ⟨c, hc⟩ := htrans v w hv0 hw
+      calc
+        rho a w = rho a (rho c v) := by rw [hc]
+        _ = rho c (rho a v) := by
+          rw [← Module.End.mul_apply, ← Module.End.mul_apply,
+            ← map_mul, ← map_mul, mul_comm]
+        _ = rho c v := by rw [hv]
+        _ = w := hc
+  exact ha (hfaith (by simpa only [map_one] using haRho))
+
 /-- A faithful action of an abelian group which is transitive on the nonzero
 vectors is regular there, so the actor has one fewer element than the space. -/
 theorem natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
@@ -456,6 +530,43 @@ theorem natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
     Fintype.card_congr (Equiv.ofBijective orbit ⟨horbit_injective, horbit_surjective⟩)
   rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq] at hcard
   simpa [Nat.card_eq_fintype_card] using hcard
+
+private theorem three_dvd_two_pow_sub_one_of_even
+    {n : ℕ} (hn : Even n) : 3 ∣ 2 ^ n - 1 := by
+  have h := Nat.pow_sub_one_dvd_pow_sub_one (x := 2) hn.two_dvd
+  norm_num at h ⊢
+  exact h
+
+/-- If a finite commutative group acts faithfully and transitively on the
+nonzero vectors of an even-dimensional `𝔽₂`-space, it contains a nonidentity
+actor of order three. -/
+theorem exists_ne_one_orderOf_eq_three_of_even_faithful_transitive_nonzero
+    {C : Type uHelperC} {V : Type uHelperV}
+    [CommGroup C] [Finite C]
+    [AddCommGroup V] [Module (ZMod 2) V] [Finite V] [Nontrivial V]
+    (rho : Representation (ZMod 2) C V)
+    (hfaith : Function.Injective rho)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w)
+    (hn : Even (Module.finrank (ZMod 2) V)) :
+    ∃ a : C, a ≠ 1 ∧ orderOf a = 3 := by
+  have hcardV : Nat.card V =
+      2 ^ Module.finrank (ZMod 2) V := by
+    rw [Module.natCard_eq_pow_finrank (K := ZMod 2)]
+    norm_num [Nat.card_eq_fintype_card]
+  have hcardC : Nat.card C =
+      2 ^ Module.finrank (ZMod 2) V - 1 := by
+    rw [natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
+      (F := ZMod 2) (C := C) (V := V) rho hfaith htrans,
+      hcardV]
+  have hdvd : 3 ∣ Nat.card C := by
+    rw [hcardC]
+    exact three_dvd_two_pow_sub_one_of_even hn
+  letI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card' 3 hdvd
+  refine ⟨a, ?_, ha⟩
+  intro haOne
+  rw [haOne, orderOf_one] at ha
+  omega
 
 /-- Cyclic specialization: a generator of the faithful transitive actor has
 full Singer order. -/
