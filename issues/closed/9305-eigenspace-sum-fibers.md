@@ -16,8 +16,8 @@ Higman Lemma 6 (p. 86) の triple-bracket sum を weight 成分ごとに分離�
 
 ## やること
 
-- [ ] `Module.End.eigenspaces_iSupIndep` から有限和の weight fiber 分離を証明する
-- [ ] 公開定理を axiom audit に登録する
+- [x] `Module.End.eigenspaces_iSupIndep` から有限和の weight fiber 分離を証明する
+- [x] 公開定理を axiom audit に登録する
 
 ## 完了条件
 

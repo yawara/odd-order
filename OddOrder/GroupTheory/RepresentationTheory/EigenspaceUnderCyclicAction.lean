@@ -25,8 +25,59 @@ The proposition fixes an invertible linear transformation `g` of finite order
 
 This file starts the Lean package for that notation.  The first facts are the
 periodicity facts and the first endomorphism-block definitions needed before
-the direct-sum and block-matrix parts of Prop 2.4 can be stated cleanly.
+the direct-sum and block-matrix parts of Prop 2.4 can be stated cleanly.  It
+also records a finite-sum consequence of the independence of eigenspaces:
+each fixed-eigenvalue fiber of a zero sum of eigenvectors is itself zero.
 -/
+
+open scoped BigOperators
+
+namespace Module.End
+
+universe uFiberK uFiberV uFiberI
+
+/-- In a finite zero sum of eigenvectors, the sum of the terms having any
+fixed eigenvalue is zero. Terms themselves are allowed to vanish. -/
+theorem sum_filter_weight_eq_zero_of_sum_eq_zero
+    {K : Type uFiberK} {V : Type uFiberV} {I : Type uFiberI}
+    [Field K] [DecidableEq K] [AddCommGroup V] [Module K V]
+    (T : Module.End K V) (s : Finset I)
+    (weight : I → K) (v : I → V)
+    (hv : ∀ i ∈ s, T (v i) = weight i • v i)
+    (hsum : ∑ i ∈ s, v i = 0) (mu : K) :
+    ∑ i ∈ s with weight i = mu, v i = 0 := by
+  classical
+  let component : K → V := fun a =>
+    ∑ i ∈ s with weight i = a, v i
+  have hcomponent_mem (a : K) : component a ∈ T.eigenspace a := by
+    dsimp only [component]
+    apply Submodule.sum_mem
+    intro i hi
+    rw [Finset.mem_filter] at hi
+    exact Module.End.mem_eigenspace_iff.mpr (by
+      simpa only [hi.2] using hv i hi.1)
+  have hpartition :
+      ∑ a ∈ s.image weight, component a = ∑ i ∈ s, v i := by
+    simpa only [component] using
+      (Finset.sum_fiberwise_of_maps_to
+        (s := s) (t := s.image weight) (g := weight)
+        (fun i hi => Finset.mem_image.mpr ⟨i, hi, rfl⟩) v)
+  have hcomponents_zero :
+      ∀ a ∈ s.image weight, component a = 0 :=
+    ((iSupIndep_iff_finsetSum_eq_zero_imp_eq_zero T.eigenspace).mp
+      T.eigenspaces_iSupIndep)
+      (s.image weight) component
+      (fun a _ha => hcomponent_mem a)
+      (hpartition.trans hsum)
+  by_cases hmu : mu ∈ s.image weight
+  · simpa only [component] using hcomponents_zero mu hmu
+  · have hempty : s.filter (fun i => weight i = mu) = ∅ := by
+      apply Finset.filter_eq_empty_iff.mpr
+      intro i his hiw
+      exact hmu (Finset.mem_image.mpr ⟨i, his, hiw⟩)
+    simp [hempty]
+
+end Module.End
 
 namespace OddOrder
 namespace RepresentationTheory
