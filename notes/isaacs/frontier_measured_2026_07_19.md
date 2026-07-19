@@ -165,9 +165,38 @@ Lean 技術的 instance、repo の方が一般な場合、他ファイルに一�
 `R` p-群 ⇒ nilpotent ⇒ solvable を経由して `Or.inr` を渡していたが、その経由ごと不要になった
 (BG はレーン c 所管だが、上流の一般化に伴う 1 行の call-site 追随ゆえ本 commit に含める)。
 
-### ⬜ 未解消
+## 特殊化債務 pass — Ch.5–Ch.10 + Appendix 実測 (2026-07-19)
 
-**Ch.1–Ch.4 の特殊化債務は全て解消済** (7 件検出 → 7 件実装)。次は Ch.5→Ch.10 の同様の照合。
+**Ch.6 / Ch.8 / Ch.9 / Ch.10 / Appendix は債務なし**と判定 (照合済)。検出は Ch.5 と Ch.7 のみ 4 件。
+
+### ✅ 解消済
+
+| 番号 | 内容 | 対応 |
+|---|---|---|
+| **7.8** (Burnside `p^a q^b`) | `hpq : p ≠ q` 追加。書籍は「Let `G` be a finite group of order `p^a q^b`, where `p` and `q` are primes」だけで相異性を課さない | 削除し `p = q` 分岐を追加 (`\|G\| = p^(a+b)` の `p`-群 ⇒ 冪零 ⇒ 可解)。**下流の実害も解消**: `Ch07/ForwardFromCh03.lean` は素因子が 1 個のとき `hpq` を満たすためだけに**偽の第 2 素数** (`if p = 2 then 3 else 2`) を捏造していた |
+
+### ⬜ 未解消 (実装方針つき)
+
+| 番号 | Lean | 狭さ | 一般化方針 |
+|---|---|---|---|
+| **7.7** | `normalizer_and_centralizer_map_of_coprime_kernel` / `centralizer_map_of_coprime_kernel` (S7B2_NormalJ_PComplement.lean:1575/1492) ほか計 4-5 宣言 | `hP_neBot : P ≠ ⊥` 追加。書籍は「If `P` is a `p`-subgroup of `G`」のみ | **仮説は死んでいる**: 委譲先の `Ch02.normalizer_map_of_coprime_kernel` (Ch02_Subnormality/Main.lean:491) が既に `_hP_neBot` (アンダースコア = 未使用) で束縛している。⚠ ただし同ファイル :455 の**別**補題 `map_ne_bot_of_coprime_kernel` は本当に使う (:474 で `apply hP_neBot`) ので、そちらは残すこと。binder 削除 + caller (Main.lean:788 系) の追随のみ |
+| **7.5** | `sylow_normal_of_elementary_normal_P_theorem` (S7A2_NormalPThm75.lean:1217) | 条件 (5) `\|V : C_V(P)\| ≤ p` を**全ての** Sylow `p` 部分群について要求。書籍は結論に現れる 1 つの `P` についてのみ | 帰納法の都合 (⟨P,Q⟩ descent) だが、repo に橋渡し補題が既にある: `actionCentralizer_map_conj_index` (同ファイル:478、共役部分群の action-centralizer は index 等しい) + Sylow 共役性で単一 `P` 形から ∀ 形を導ける。**interface 債務** (両形は同値) ゆえ低優先 |
+| **5.22** | `APrime_eq_subgroupOf_APrime_of_controlsFusionIn` (Ch05_Transfer/Basic.lean:1283) | **結論**が書籍の 2 つのうち 1 つだけ。書籍は `A^p(H) = H ∩ A^p(G)` に加えて `G/A^p(G) ≅ H/A^p(H)` (= 「H が p-transfer を制御する」本体) も主張。repo に `ControlsPTransfer` 述語は無い | ⚠ 仮説の狭さでなく**結論の欠落**。材料は同じ証明内に既にある (`hHA_top : H ⊔ A = ⊤`, Basic.lean:1322-1331)。これと既述の `A^p(H) = H ⊓ A^p(G)` に第 2 同型定理を当てれば `H/A^p(H) ≅ H A^p(G)/A^p(G) = G/A^p(G)`。数行 |
+
+### 債務なしと判定した章 (Ch.5–10)
+
+- **Ch.6**: 24 件すべて書籍強度。6.22 は素数位数 + `[IsSolvable N]` だが、**同ファイルに一般形**
+  `isNilpotent_of_isFrobeniusAction` (KernelNilpotent.lean:365 = 6.24、可解性不要) が在るので債務でない。
+- **Ch.8**: 全件書籍以上。8.4/8.7 は任意の可除環へ、8.31/8.32/8.33 は無限体も被覆、
+  8.37 は任意の非対角 orbital (書籍は極小のもの)、8.43 は書籍の「成分ちょうど 3 個」仮定を落とす、
+  など **repo の方が一般**な箇所が多数。
+- **Ch.9 / Ch.10 / Appendix**: 全件一致または repo の方が一般 (10.6/10.11/9.30/9.29/10.14/9.5/X.22)。
+  内部特殊化はすべて一般形の兄弟が在る (9.13/9.21/9.26/9.27 の subnormal 版、10.18 の一般 Thm 10.25 =
+  `OddOrder.Algebra.transfer_pow_relindex_eq_one`)。
+
+⚠ 境界例として記録のみ (債務でない): 9.10 は結論が「\|G_i\| ≤ n」で書籍の「同型類は有限個」より弱いが
+**Isaacs 自身の証明目標がその形** (p.278); 9.28 は `subnormalClosure` 定義が無いだけで内容は完備;
+5.11 / 5.26 は第 2 同型定理の言い換え / TFAE の分割で内容は同じ。
 
 <!-- 旧・未解消表 (全件解消済につき空)
 | 番号 | Lean | 狭さ | 一般化方針 |

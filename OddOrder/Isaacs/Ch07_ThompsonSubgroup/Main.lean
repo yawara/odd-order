@@ -906,12 +906,24 @@ properties of `M`.
 **Implementation strategy**: the actual 9-step argument is encapsulated in
 the local axiom `noNonsolvableSimplePaQb` (issue 0032).  We carry out the
 strong-induction-on-`Nat.card` reduction, peel off the simplicity reduction
-via `isSimpleGroup_of_minCounterexample`, then invoke the axiom. -/
+via `isSimpleGroup_of_minCounterexample`, then invoke the axiom.
+
+⚠ **書籍どおり `p ≠ q` を仮定しない** (2026-07-19 に一般化)。Isaacs 7.8 は
+「Let `G` be a finite group of order `p^a q^b`, where `p` and `q` are primes」とだけ言い
+相異性を課さない。`p = q` は `|G| = p^(a+b)` すなわち `p`-群の場合で、冪零ゆえ可解
+(`IsPGroup.isNilpotent` + `IsNilpotent.to_isSolvable`) — 下の第 1 分岐がそれ。
+これにより下流 (`ForwardFromCh03`) が素因子 1 個のときに**偽の第 2 素数を捏造して**
+`hpq` を満たす必要がなくなった。 -/
 theorem burnside_p_pow_q_pow.{u}
     {G : Type u} [Group G] [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    (hpq : p ≠ q)
     (hG_order : ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b) :
     IsSolvable G := by
+  rcases eq_or_ne p q with rfl | hpq
+  · -- `p = q`: `|G| = p^(a+b)` is a `p`-group, hence nilpotent, hence solvable.
+    obtain ⟨a, b, hab⟩ := hG_order
+    haveI hGp : IsPGroup p G := IsPGroup.of_card (n := a + b) (by rw [hab, pow_add])
+    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    infer_instance
   classical
   -- Strong induction on `Nat.card` via an explicit motive over arbitrary finite
   -- groups whose order divides `|G|`.

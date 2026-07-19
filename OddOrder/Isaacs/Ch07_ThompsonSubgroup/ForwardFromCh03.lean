@@ -103,7 +103,7 @@ theorem isSolvable_of_pcomplement_exists.{u} {G : Type u} [Group G] [Finite G]
       rw [h2, Finset.prod_pair hpq]
     haveI : Fact p.Prime := ⟨hp⟩
     haveI : Fact q.Prime := ⟨hq⟩
-    exact burnside_p_pow_q_pow hpq ⟨_, _, hfact⟩
+    exact burnside_p_pow_q_pow ⟨_, _, hfact⟩
   · -- ≥ 3 個の素因子: 相異なる素因子 p, q, r を取り Wielandt へ.
     rw [not_le] at hsmall
     obtain ⟨p, hpS⟩ :=
