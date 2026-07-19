@@ -51,6 +51,18 @@ territory 分割は coordination のためにあるので、a の gate が外れ
 - `--base 9000` は 2026-07-19 に**凍結** (`bin/new-issue` がエラーで拒否)。理由 = 幅 1000 ゆえ
   レンジ [9000,10000) がサブバンドを飲み込むため。詳細は issues/closed/0130。
 
+## ⚠ 状態: lane a は 22:46 に**自分で loop を停止**している (再開はユーザー操作)
+
+a は 9303 を起票した直後、`ScheduleWakeup({stop: true})` で loop を明示停止し
+PushNotification でユーザーに通知した。理由 (transcript): 「territory 内で取れる行動は
+hub issue の起票が最後。hub 裁定を待って空転するか、他レーンの仕事を一方的に取るかに
+なるので止める」。**issue 0131 の「黙って止まる」障害とは別物** (これは理由つきの意図的停止で、
+通知も出している)。
+
+⟹ 本裁定 (9163 + 本 issue) が main に landing した今、**a を再開すれば即座に着手できる**。
+再開時の指示は「main を同期して issue 9163 の hub 裁定節と issue 9500 を読み、
+9163 §3 の項目 1 から始める」で足りる。
+
 ## 完了条件
 
 - lane a が 9163 §3 の項目 1 に着手し、`typePACore` の昇格が main に landing すること。
