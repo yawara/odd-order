@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S15_SAndT_Setup
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
+import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
 
 /-!
 # Peterfalvi (8.10)/(8.15): the honest type-`P₂` `A₀`-support `A₀(S) = A(S) ∪ V^S`
@@ -682,59 +683,40 @@ theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
     ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **The type-`P₂` `Hypothesis46`-for-`S`** (issue 9076 piece 4c-4; the (13.18) pin-2/3 route).
-Assembles the §6 certain-type `Hypothesis46 (S10.typePACore S) ↥S` from the type-uniform
-constructor `hypothesis46OfTypePData` (`S13_PrimeTIResidueBridge`): the type-`P` datum `hyp.Sdata`
-(with `IsTypeP S` from `S_nonI`), the honest `A(S)`-support with its `'A0(S)`-Dade `dadeHypS0`, and
-the kernel-family subgroup `subH = M_σ` — for which the covering `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#`
-holds
-(`S10.mem_typePACore`).  This supplies the `certainTypeDiffSupported` /
-`certainType_diff_dade_apply_eq_of_mem_V` residue facts behind the `(13.18)` support/`V`-value pins
-(`tauS_mu_row0_diff_support` / `tauS_mu_row0_vanish_on_V`), which then discharge once `hyp.mu` is
-grounded to `residueS.mu2` (b-side grid field, cf. `mu_row0_ne`).  **Ungated** — pure structural
-assembly (no grounding needed to *build* the `Hypothesis46`). -/
+/-- **The type-`P₂` `Hypothesis46`-for-`S`** (issue 9076 piece 4c-4; the (13.18) pin-2/3 route):
+the (13.1) `S`-instance of Peterfalvi **(8.15), claim 2** at the book's `H = M_s` choice.
+
+Delegates to the §8-level producer `S10.typePACore_toHypothesis46_core` (hub ruling 9163,
+Option B′): the type-`P` datum `hyp.Sdata`, the book-literal `A(S) = S10.typePACore S` with its
+`'A0(S)`-Dade `dadeHypS0`, and the kernel-family subgroup `H = M_s = M_σ`, for which the (4.6.d)
+covering `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` is the *definition* of the support.  The two remaining
+side conditions are `W₂ ≤ M_F ≤ M_σ` (`W2_le`/`H_eq` + `maxNilpotentNormalHall_le_Msigma`) and
+`M_σ ≤ S'` (`Msigma_le_derived`).
+
+This supplies the `certainTypeDiffSupported` / `certainType_diff_dade_apply_eq_of_mem_V` residue
+facts behind the `(13.18)` support/`V`-value pins (`tauS_mu_row0_diff_support` /
+`tauS_mu_row0_vanish_on_V`), which then discharge once `hyp.mu` is grounded to `residueS.mu2`
+(b-side grid field, cf. `mu_row0_ne`).  **Ungated** — pure structural assembly (no grounding
+needed to *build* the `Hypothesis46`).
+
+The (8.4.a) Hall coprimality `hHall` is discharged here by `S12.typePData_W1_hall_coprime`
+(axiom-clean); the §8 producer takes it as a parameter because (8.15.2) *cites* (8.4.a) rather
+than proving it, and because that discharge needs `hG`/`hM`/`IsTypeP`, which the §8 statement
+does not. -/
 noncomputable def Hypothesis.hyp46S [Finite G] (hyp : Hypothesis (G := G))
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     OddOrder.Peterfalvi.S06.Hypothesis46 (S10.typePACore hyp.S) hyp.S :=
-  hypothesis46OfTypePData hG hyp.S_maximal
-    (hyp.S_isTypeP hG) hyp.Sdata hG.odd
-    (S10.typePACore hyp.S) (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
-    (fun l _ ha => S10.typePACore_conj_mem l.2 ha)
-    ((OddOrder.BG.Ch3.S10.Msigma hyp.S).subgroupOf hyp.S)
-    (by rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance)
+  S10.typePACore_toHypothesis46_core hyp.Sdata hG.odd
+    (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime hG hyp.S_maximal (hyp.S_isTypeP hG)
+      hyp.Sdata)
+    (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
     (by
-      -- `W₂ ≤ H = maxNilpotentNormalHall S ≤ M_σ` (`W2_le`/`H_eq` +
-      -- `maxNilpotentNormalHall_le_Msigma`).
-      refine Subgroup.subgroupOf_mono hyp.S ?_
+      -- `W₂ ≤ M_F = maxNilpotentNormalHall S ≤ M_σ`.
       have hW2H : hyp.Sdata.W2 ≤ hyp.Sdata.H := le_trans hyp.Sdata.W2_le inf_le_left
       rw [hyp.Sdata.H_eq] at hW2H
       exact le_trans hW2H
         (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hyp.S_maximal))
-    (by
-      -- `M_σ ≤ S'` (`Msigma_le_derived`).
-      exact Subgroup.subgroupOf_mono hyp.S
-        (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.S_maximal))
-    (by
-      -- **`A_covers`**: for `hh ∈ M_σ#` and `x ∈ C_S(hh) ⊓ S'` with `x ≠ 1`, the point `↑x` lies in
-      -- `A(S) = ⋃_{z∈M_σ#} C_{S'}(z)#` — witnessed by `z = ↑hh` (the covering
-      -- `S10.mem_typePACore`).
-      intro hh hhσ hh1 x hx hx1
-      rw [Subgroup.mem_inf] at hx
-      obtain ⟨hxC, hxD⟩ := hx
-      rw [Subgroup.mem_subgroupOf] at hxD hhσ
-      rw [Subgroup.mem_centralizer_iff] at hxC
-      rw [S10.mem_typePACore]
-      refine ⟨hxD, ?_, (hh : G), ⟨hhσ, ?_⟩, ?_⟩
-      · -- `↑x ≠ 1`
-        simpa using hx1
-      · -- `↑hh ≠ 1`
-        simpa using hh1
-      · -- `↑x ∈ C_G(↑hh)` from `x ∈ C_S(hh)`
-        rw [Subgroup.mem_centralizer_iff]
-        rintro g rfl
-        have hcomm := hxC (hh : ↥hyp.S) rfl
-        have := congrArg (hyp.S.subtype) hcomm
-        simpa using this)
+    (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.S_maximal)
 
 /-! ### Prime-`TI` pins for the (13.18) `S`-side cross-relation (issue 9076 piece 4c-4)
 

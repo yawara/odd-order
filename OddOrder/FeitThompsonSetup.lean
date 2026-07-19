@@ -51,7 +51,7 @@ variable (tp : Section16TypePStructure mp)
 /-! #### The two §6 Hypothesis instances of `S` share their `W₁`/`W₂` (issue 2038)
 
 The κ-Hall instance `mp.certainTypeS` (grid producer, `muS`) and the `Sdata`-instance
-`typePData_toS06Hypothesis tp.Sdata` (the `hypothesis46OfTypePData`/engines side) carry
+`typePData_toS06Hypothesis tp.Sdata` (the `S10.typePData_toHypothesis46_ofSupport`/engines side) carry
 propositionally equal cyclic factors: `Sdata.W1 = tp.W1 = mp.K` and `Sdata.W2 = tp.W2 =
 mp.Kstar`.  These equalities ground the per-`ω` rigidity identification of the two `μ`-grids
 (`irreducibleCharacterFamily_eq_of_difference_eq`). -/
