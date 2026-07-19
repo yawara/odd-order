@@ -209,12 +209,13 @@ For an escaping `z ∈ M_σ^#` and any `w ∈ M_σ^#`, no prime `p ∈ σ(N[z])`
 a common `p ∈ σ(N[z]) ∩ π(S)` makes `S` Frobenius with kernel `S_σ` and `τ₂(S) = ∅`; `w ∈ S_σ`
 absorbs a Cauchy `p`-element of `C_S(w)` into `S_σ`, so `p ∈ σ(S)`, forcing `N[z]` conjugate to `S`
 (`sigma_disjoint_of_nonconjugate`) and transporting `τ₂(N[z]) ∋ π(⟨z⟩) ≠ ∅` onto `τ₂(S) = ∅`. -/
-theorem escaping_sigmaSharp_disjoint_centralizer [Finite G]
+theorem escaping_sigmaSharp_disjoint_centralizer_of_witness [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
     (hS : S ∈ maximalSubgroups G)
     {z : G} (hσz : z ∈ OddOrder.BG.Ch4.S14.sigmaSharp S)
     (hzesc : ¬ Subgroup.centralizer ({z} : Set G) ≤ S)
-    {w : G} (hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma S) (hw1 : w ≠ 1)
+    {w : G} (hwS : w ∈ S) (hw1 : w ≠ 1)
+    (hwit : ∃ x ∈ OddOrder.BG.Ch3.S10.Msigma S, x ≠ 1 ∧ Commute w x)
     {p : ℕ} (hpp : p.Prime)
     (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase z))
     (hpC : p ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn S w)) : False := by
@@ -243,7 +244,8 @@ theorem escaping_sigmaSharp_disjoint_centralizer [Finite G]
       rw [Subgroup.mem_centralizer_singleton_iff]
       exact Subtype.ext hcomm.eq
     exact Subgroup.mem_subgroupOf.mp (hcent humem)
-  have hwS : w ∈ S := OddOrder.BG.Ch3.S10.Msigma_le S hwMσ
+  obtain ⟨xw, hxwMσ, hxw1, hxwc⟩ := hwit
+  have hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma S := hker hwS hxwMσ hxw1 hxwc
   -- a Cauchy `p`-element of `C_S(w)` lies in `S_σ` (absorption), so `p ∈ σ(S)`.
   haveI : Fact p.Prime := ⟨hpp⟩
   obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' p hpC
@@ -312,6 +314,21 @@ theorem escaping_sigmaSharp_disjoint_centralizer [Finite G]
       rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul],
     tau2_conj_smul'] at hp₀tau2
   exact htau2S p₀ hp₀p hp₀tau2
+
+/-- **The `w ∈ M_σ^#` form of `escaping_sigmaSharp_disjoint_centralizer_of_witness`**: a point of
+`M_σ^#` is its own centralizing witness. -/
+theorem escaping_sigmaSharp_disjoint_centralizer [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hS : S ∈ maximalSubgroups G)
+    {z : G} (hσz : z ∈ OddOrder.BG.Ch4.S14.sigmaSharp S)
+    (hzesc : ¬ Subgroup.centralizer ({z} : Set G) ≤ S)
+    {w : G} (hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma S) (hw1 : w ≠ 1)
+    {p : ℕ} (hpp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase z))
+    (hpC : p ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn S w)) : False :=
+  escaping_sigmaSharp_disjoint_centralizer_of_witness hG hS hσz hzesc
+    (OddOrder.BG.Ch3.S10.Msigma_le S hwMσ) hw1 ⟨w, hwMσ, hw1, Commute.refl w⟩ hpp hpσ hpC
+
 
 /-- **The (8.13.c2) coprimality core**: for an escaping point `z` of the type-I support `A(S)`,
 no prime of `σ(N[z])` (`N[z] = FT_signalizerBase z` the supporting maximal) divides `|C_S(w)|`

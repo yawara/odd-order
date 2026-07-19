@@ -98,15 +98,27 @@ type 𝒫 では A(T) ⊆ T′ という (8.10) の host がそのまま効く�
    (commit 2bc126ded)。旧 `..._typeIA` は一般版からの 6 行の導出に置換
    (signature 不変 ⟹ (8.18.c) 側の consumer 無変更)。
 
-### ⛏ 残り 3-5
+### ✅ 3-4 完了 (2026-07-20)
 
-3. (8.18.b) `exists_A1_conj_mem_typeIA_of_not_disjoint` を一般化。
-   要る型一様素材: `escaping_typeIA_mem_A1` (escaping ⟹ A₁) の型一様版、
-   および (8.17.c) `Ã₁(S) ∩ Ã₁(T) = ∅` の型一様版。
-4. (8.18.c) `ftThickenedSupport_mixed_disjoint_of_nonconjugate` を一般化。
-   `supported_sigma_coprime` ((8.13.c2) 側) の型仮定も洗う必要あり。
-5. 一般化後、`S12.Hypothesis.cross_dade_inner_eq_zero_at_pair` (canonical pair 固定の
+3. **(8.18.b)** = `exists_A1_conj_mem_typeA_of_not_disjoint` (commit 62f72468f)。
+   併せて (8.17.c) `ftThickenedSupport_A1_disjoint_of_nonconjugate` と
+   `ftThickenedSupport_A1_subset_conjClassSet_Mtilde` の Type I/II 制限も撤去
+   (制限の由来は `A1_eq_sigmaSharp_of_typeI_or_II` 1 箇所だけで、全型版
+   `A1_eq_sigmaSharp` を入れれば外れる)。型一様 (8.13.b) `escaping_typeA_mem_A1` と
+   型一様 (8.13.c2) `coprime_FT_signalizer_centralizerIn_typeA` も新設。
+4. **(8.18.c)** = `ftThickenedSupport_mixed_disjoint_of_nonconjugate_typeA`。
+   経路上の型仮定も順に撤去:
+   - `escaping_sigmaSharp_disjoint_centralizer` を **witness 形**
+     (`..._of_witness`: `w ∈ S` + 「w が M_σ の非単位元と可換」) に一般化。
+     旧形はその 2 行の系。これで type-I/type-𝒫 双方の Frobenius 吸収が 1 本に集約。
+   - `escaping_sigma_disjoint_centralizer_typeA` / `supported_sigma_coprime_typeA` を新設。
+   旧 Type-I 版はすべて一般版からの数行の導出に置換 (signature 不変)。
+
+### ⛏ 残り 5
+
+5. `S12.Hypothesis.cross_dade_inner_eq_zero_at_pair` (canonical pair 固定の
    (8.18.b) 適用、`Section16MaximalPairCore` 依存) を一般版で置換できるか検討。
+   ⚠ これは §12 (lane b territory 寄り) なので、着手前に所有を確認すること。
 
 ## 参照
 
