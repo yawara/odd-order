@@ -941,8 +941,10 @@ noncomputable def hypothesis79OfNonconjugate
     rw [dataL.dadeSupport_eq hG, dataM.dadeSupport_eq hG, dataL.typeIA_eq_A1 hG,
       dataM.typeIA_eq_A1 hG]
     exact OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_disjoint_of_nonconjugate hG hL hM
-      (Or.inl ⟨dataL.typeIHyp.typeI⟩) (Or.inl ⟨dataM.typeIHyp.typeI⟩)
-      (Or.inl rfl) (Or.inl rfl) hnc
+      (show OddOrder.GroupTheory.HasPeterfalviType OddOrder.GroupTheory.PeterfalviType.I L from
+        ⟨dataL.typeIHyp.typeI⟩)
+      (show OddOrder.GroupTheory.HasPeterfalviType OddOrder.GroupTheory.PeterfalviType.I M from
+        ⟨dataM.typeIHyp.typeI⟩) hnc
 
 /-- **The (7.9) cross-orthogonality for the pair**: `⟨ζ_L^ν, ζ_M^ν⟩ = 0`, via the
 conjugate-index mechanism of both sides. -/
