@@ -70,3 +70,23 @@ Lean の結論は `M_F ≤ M_σ` と `M_σ ≤ M'` **のみ**。すなわち以�
 
 - issue 9154 §2 (BG/Pf 実測監査、本 issue の出所) / issue 3022 (15.7、close 済)
 - 監査 workflow: `wf_27b12223-fd5`
+
+## 🔎 hub 追加調査 (2026-07-19): `M_F ≠ ⊥` の攻略経路
+
+「`M_F ≠ ⊥` を主張する宣言が無い」と書いたが、**材料は既に揃っている**ことを確認した。
+c が着手するときの起点として記録する。
+
+- **`M_F` の定義**: `MF M = maxNilpotentNormalHall M`
+  (`S15_MF/SetupLemma151.lean:28`、`sSup` 構成の `abbrev`)。
+- **使える汎用補題**: `OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial`
+  — 「非自明可解群の Fitting 部分群は非自明」。既に BG 内で 2 箇所が使用
+  (`S05_NarrowPGroups.lean:767`、`S10_BetaRadicalGlobal.lean:307`)。
+- **先例**: `S08_FittingOfMaximal.lean:439` が `fittingInG M ≠ ⊥` を
+  「`p ∈ π(F(M))` なら `F(M)` は非自明」という形で inline に出している。
+
+⟹ 経路は「`F(M) ≤ M_F`」を経由するのが素直: `F(M)` は `M` の nilpotent normal 部分群で、
+`M_F` は nilpotent normal **Hall** 部分群の `sSup` ゆえ、`F(M)` の Hall 部分 (σ-part) が
+`M_F` に入る。`M` が非自明可解なら `F(M) ≠ ⊥` (上記汎用補題) から `M_F ≠ ⊥`。
+⚠ ただし `M_F` は Hall 条件が付くので `F(M) ≤ M_F` はそのままでは成り立たない可能性がある
+(§15 の `mf_eq_msigma_of_not_fittingIsTI` 等が `M_F = M_σ` を与える文脈に注意)。
+**この一段だけが実作業**で、他は既存補題の組み合わせ。
