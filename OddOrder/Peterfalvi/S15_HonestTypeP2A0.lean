@@ -221,7 +221,7 @@ theorem escaping_typePACore0_eq_empty [Finite G]
 /-! ### The `A₀(S) ⊆ A0Set M K₀` bridge (issue 9076 piece 4c)
 
 The honest support `S10.typePACore0 M data = A(S) ∪ V^S` embeds into BG's Theorem-E set
-`A0Set M K₀ = hatMsigma M ∖ 𝒞_G(K₀#)`.  The `A(S)`-part uses `typePACore_subset_ASet`
+`A0Set M K₀ = hatMsigma M ∖ 𝒞_G(K₀#)`.  The `A(S)`-part uses `S10.typePACore_subset_ASet`
 composed with `ASet ⊆ A0Set`; the `V^S`-part uses `typePV_subset_hatMsigma` (conjugacy-closed) plus
 the order argument that a `V`-point carries a `σ`-prime while `K₀#` is pure `κ`.  The order pieces
 all reduce to: `𝒞_G(K₀#)`-points are nonidentity `κ`-elements
@@ -430,7 +430,7 @@ theorem conjClassSetIn_typePV_subset_A0Set [Finite G]
     exact OddOrder.BG.Ch4.S14.kappa_subset_sigmaCompl (hvκ p hpf) hpσ
 
 /-- **`A₀(S) ⊆ A0Set M K₀`** (issue 9076 piece 4c): the honest type-`P₂` support embeds into BG's
-Theorem-E set.  `A(S)`-part via `typePACore_subset_ASet` + `aSet_subset_A0Set`; `V^S`-part via
+Theorem-E set.  `A(S)`-part via `S10.typePACore_subset_ASet` + `aSet_subset_A0Set`; `V^S`-part via
 `conjClassSetIn_typePV_subset_A0Set`.  This is the bridge feeding `theoremII_tame_embedding` for
 `typePACore0_tame_conj`. -/
 theorem typePACore0_subset_A0Set [Finite G]
@@ -442,7 +442,7 @@ theorem typePACore0_subset_A0Set [Finite G]
     (data : TypePData M) :
     S10.typePACore0 M data ⊆ OddOrder.BG.Ch4.S16.A0Set M K₀ := by
   apply Set.union_subset
-  · exact (typePACore_subset_ASet hG hM hKM hUM hKne hK hU).trans
+  · exact (S10.typePACore_subset_ASet hG hM hKM hUM hKne hK hU).trans
       (aSet_subset_A0Set hG hM hKM hUM hK hU)
   · exact conjClassSetIn_typePV_subset_A0Set hG hM hKM hK data
 
@@ -529,7 +529,7 @@ hold for `A₀(S) = A(S) ∪ V^S`.  Assembled through the `σ`-decomposition eng
   (`escaping_typePACore0_mem_typePACore`, since `V^S` does not escape) plus the generic
   `V`-part coprimality (`coprime_FT_signalizer_centralizerIn_typePV`);
 * the `isConj → M`-conjugate obligation — the `A`–`A` and `V`–`V` cases are
-  `typePACore_isConj_conj_in_M` / `conjClassSetIn_typePV_isConj_conj_in_M`, and the mixed case
+  `S10.typePACore_isConj_conj_in_M` / `conjClassSetIn_typePV_isConj_conj_in_M`, and the mixed case
   is the vacuity `not_isConj_typePACore_typePV` (the one deep `'A0`-`normedTI` pin).
 
 This is the `S`-side Dade datum the (13.18) row-`0` cross-relation `τ_S(μ_{0j} − μ_{01}) =
@@ -541,17 +541,17 @@ theorem dadeSupportHypothesisData_typePACore0 [Fintype G] [Finite G]
     Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (S10.typePACore0 M data)) := by
   classical
   obtain ⟨K₀, U₀, hKM, hUM, hKne, hK, hU⟩ :=
-    OddOrder.Peterfalvi.S15.typeP_exists_kappa_hall_pair hG hM hTP
+    OddOrder.Peterfalvi.S10.typeP_exists_kappa_hall_pair hG hM hTP
   refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
     (typePACore0_subset data) (typePACore0_ne_one data)
-    (fun a ha => escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU
+    (fun a ha => S10.escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU
       (escaping_typePACore0_mem_typePACore data ha))
     ?_ ?_ ?_ ?_
   · -- `isConj → M`-conjugate: A–A / A–V (vacuous) / V–A (vacuous) / V–V.
     intro a ha b hb hab
     rcases ha with hpa | hva
     · rcases hb with hpb | hvb
-      · exact typePACore_isConj_conj_in_M hG hM hKM hUM hKne hK hU hpa hpb hab
+      · exact S10.typePACore_isConj_conj_in_M hG hM hKM hUM hKne hK hU hpa hpb hab
       · exact (not_isConj_typePACore_typePV hG hM data hKM hUM hKne hK hU hpa hvb hab).elim
     · rcases hb with hpb | hvb
       · exact (not_isConj_typePACore_typePV hG hM data hKM hUM hKne hK hU hpb hva
@@ -560,9 +560,9 @@ theorem dadeSupportHypothesisData_typePACore0 [Fintype G] [Finite G]
   · -- coprimality: the escaping point is in `A(S)`; `b` is in `A(S)` or `V^S`.
     intro a ha b hb
     have haA := escaping_typePACore0_mem_typePACore data ha
-    have haσ := escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU haA
+    have haσ := S10.escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU haA
     rcases hb with hpb | hvb
-    · exact coprime_FT_signalizer_centralizerIn_typePACore hG hM haσ ha.2 hpb
+    · exact S10.coprime_FT_signalizer_centralizerIn_typePACore hG hM haσ ha.2 hpb
     · exact OddOrder.Peterfalvi.S10.coprime_FT_signalizer_centralizerIn_typePV hG hM data haσ
         ha.2 hvb
   · -- nonempty: `M_σ^# ⊆ A(S) ⊆ A₀(S)`.
