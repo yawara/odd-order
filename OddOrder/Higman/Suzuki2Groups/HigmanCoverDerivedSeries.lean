@@ -3,8 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
-import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian
 
 /-!
 # Higman Lemma 8: derived and power series of a cover
@@ -23,7 +22,9 @@ set_option autoImplicit false
 namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
+open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.Isaacs.Ch03
+open scoped IsMulCommutative
 
 namespace NormalInvariantCover
 
@@ -300,6 +301,352 @@ theorem lowerCentralTerm_maps_eq_first_agemo_terms_of_derived_map_eq_left
       h.left.2 h.right.2 hAcomm classify 2 1 hmapTwo hsquaresTwo
   exact ⟨hmapOne, hmapTwo, hmapThree⟩
 
+/-- **Higman, Suzuki 2-groups, Lemma 8 (p. 87), Frattini bridge.**
+
+For a finite `2`-group cover with `C' = A`, the equality `C² = C'` makes the
+zeroth lower-central layer denominator equal to `C'`.  Hence `Φ(C) = A`.
+No commutativity or invariant-subgroup classification is needed here. -/
+theorem ambientFrattini_eq_left_of_derived_map_eq_left
+    {P X : Type*} [Group P] [Group X]
+    {act : X →* MulAut P} {A C : Subgroup P}
+    [Finite C] (h : NormalInvariantCover act A C)
+    (hC : IsPGroup 2 C)
+    (hderived : (_root_.commutator C).map C.subtype = A) :
+    ambientFrattini C = A := by
+  have htermOne : lowerCentralTerm C 1 = _root_.commutator C := by
+    rw [lowerCentralTerm, Subgroup.top_lowerCentralSeries_one]
+  have hAgemo : Agemo C 2 1 = lowerCentralTerm C 1 :=
+    (h.agemo_one_eq_commutator_of_derived_map_eq_left hC hderived).trans
+      htermOne.symm
+  rw [ambientFrattini,
+    ← lowerCentralLayerKernelInAmbient_zero_eq_frattini C hC,
+    lowerCentralLayerKernelInAmbient_eq,
+    agemo_lowerCentralTerm_zero_map_eq, hAgemo, sup_idem, htermOne, hderived]
+
+/-- **Higman, Suzuki 2-groups, Lemma 8 (p. 87), layer denominators.**
+
+Under the exact lower-central chain `C₂=A`, `C₃=A²`, `C₄=A⁴`, the actual
+denominators of `L₂(C)` and `L₃(C)` map respectively to `A²` and `A⁴` in the
+common ambient group. -/
+theorem lowerCentralLayerKernel_maps_eq_first_agemo_terms_of_derived_map_eq_left
+    {P X : Type*} [Group P] [Group X]
+    {act : X →* MulAut P} {A C : Subgroup P}
+    [Finite C] (h : NormalInvariantCover act A C)
+    (hC : IsPGroup 2 C) (hAcomm : IsMulCommutative A)
+    (classify :
+      letI : CommGroup A :=
+        { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+      ∀ U : Subgroup A, IsAInvariant h.left.2.restrict U →
+        ∃ s : ℕ, U = Agemo A 2 s)
+    (hderived : (_root_.commutator C).map C.subtype = A) :
+    (lowerCentralLayerKernelInAmbient C 1).map C.subtype =
+        (Agemo A 2 1).map A.subtype ∧
+      (lowerCentralLayerKernelInAmbient C 2).map C.subtype =
+        (Agemo A 2 2).map A.subtype := by
+  have htermOne : lowerCentralTerm C 1 = _root_.commutator C := by
+    rw [lowerCentralTerm, Subgroup.top_lowerCentralSeries_one]
+  have hAgemo : Agemo C 2 1 = lowerCentralTerm C 1 :=
+    (h.agemo_one_eq_commutator_of_derived_map_eq_left hC hderived).trans
+      htermOne.symm
+  have hSqZero : LowerCentralSquaresLieInSecond C :=
+    lowerCentralSquaresLieInSecond_of_agemo_eq C hAgemo
+  have hSqOne : (Agemo (lowerCentralTerm C 1) 2 1).map
+      (lowerCentralTerm C 1).subtype ≤ lowerCentralTerm C 2 := by
+    simpa using
+      lowerCentralTerm_succ_squares_le_of_squares_le C 0 hSqZero
+  have hSqTwo : (Agemo (lowerCentralTerm C 2) 2 1).map
+      (lowerCentralTerm C 2).subtype ≤ lowerCentralTerm C 3 := by
+    simpa using
+      lowerCentralTerm_succ_squares_le_of_squares_le C 1 hSqOne
+  obtain ⟨_hmapOne, hmapTwo, hmapThree⟩ :=
+    h.lowerCentralTerm_maps_eq_first_agemo_terms_of_derived_map_eq_left
+      hC hAcomm classify hderived
+  have hKernelOne : lowerCentralLayerKernelInAmbient C 1 =
+      lowerCentralTerm C 2 := by
+    rw [lowerCentralLayerKernelInAmbient_eq, sup_eq_right.mpr hSqOne]
+  have hKernelTwo : lowerCentralLayerKernelInAmbient C 2 =
+      lowerCentralTerm C 3 := by
+    rw [lowerCentralLayerKernelInAmbient_eq, sup_eq_right.mpr hSqTwo]
+  constructor
+  · rw [hKernelOne]
+    exact hmapTwo
+  · rw [hKernelTwo]
+    exact hmapThree
+
+/-- **Higman, Suzuki 2-groups, Lemma 8 (p. 87), power-factor bridge.**
+
+If `C' = A`, Higman's exact lower-central chain identifies the actual layers
+`L₂(C)` and `L₃(C)` with `A/A²` and `A²/A⁴`.  When the latter factor is
+nontrivial, irreducibility of `A/A²` upgrades the actual square map to an
+equivariant linear equivalence between these two lower-central layers. -/
+theorem exists_lowerCentralLayerOne_linearEquiv_layerTwo_of_derived_map_eq_left
+    {P X : Type*} [Group P] [Group X]
+    {act : X →* MulAut P} {A C : Subgroup P}
+    [Finite C] (h : NormalInvariantCover act A C)
+    (hC : IsPGroup 2 C) (hAcomm : IsMulCommutative A)
+    (classify :
+      letI : CommGroup A :=
+        { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+      ∀ U : Subgroup A, IsAInvariant h.left.2.restrict U →
+        ∃ s : ℕ, U = Agemo A 2 s)
+    (hderived : (_root_.commutator C).map C.subtype = A) :
+    letI : CommGroup A :=
+      { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+    letI : IsMulCommutative (lowerCentralLayer C 1) :=
+      lowerCentralLayerIsMulCommutative C 1
+    letI : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
+      lowerCentralLayerZmodModule C 1
+    letI : IsMulCommutative (lowerCentralLayer C 2) :=
+      lowerCentralLayerIsMulCommutative C 2
+    letI : Module (ZMod 2) (Additive (lowerCentralLayer C 2)) :=
+      lowerCentralLayerZmodModule C 2
+    ∀ (_hirr : Representation.IsIrreducible
+        (agemoSuccQuotientRepresentation h.left.2.restrict 0))
+      (_hA1 : Nontrivial (AgemoSuccQuotient A 1)),
+    ∃ E : Additive (lowerCentralLayer C 1) ≃ₗ[ZMod 2]
+        Additive (lowerCentralLayer C 2),
+      ∀ g q,
+        E (lowerCentralLayerRepresentation h.right.2.restrict 1 g q) =
+          lowerCentralLayerRepresentation h.right.2.restrict 2 g (E q) := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  letI : IsMulCommutative (lowerCentralLayer C 1) :=
+    lowerCentralLayerIsMulCommutative C 1
+  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
+    lowerCentralLayerZmodModule C 1
+  letI : IsMulCommutative (lowerCentralLayer C 2) :=
+    lowerCentralLayerIsMulCommutative C 2
+  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 2)) :=
+    lowerCentralLayerZmodModule C 2
+  intro hirr hA1
+  letI : Nontrivial (AgemoSuccQuotient A 1) := hA1
+  obtain ⟨hmapOne, hmapTwo, _hmapThree⟩ :=
+    h.lowerCentralTerm_maps_eq_first_agemo_terms_of_derived_map_eq_left
+      hC hAcomm classify hderived
+  obtain ⟨hkernelOne, hkernelTwo⟩ :=
+    h.lowerCentralLayerKernel_maps_eq_first_agemo_terms_of_derived_map_eq_left
+      hC hAcomm classify hderived
+  have hmapOne' : (lowerCentralTerm C 1).map C.subtype =
+      (Agemo A 2 0).map A.subtype := by
+    rw [agemo_zero_eq_top, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype]
+    exact hmapOne
+  let E1 := lowerCentralLayerLinearEquivAgemoSuccAt
+    A C hAcomm 1 0 hmapOne' hkernelOne
+  let E2 := lowerCentralLayerLinearEquivAgemoSuccAt
+    A C hAcomm 2 1 hmapTwo hkernelTwo
+  have hE1 : ∀ g q,
+      E1 (lowerCentralLayerRepresentation h.right.2.restrict 1 g q) =
+        agemoSuccQuotientRepresentation h.left.2.restrict 0 g (E1 q) :=
+    lowerCentralLayerLinearEquivAgemoSuccAt_equivariant
+      act A C hAcomm h.left.2 h.right.2 1 0 hmapOne' hkernelOne
+  have hE2 : ∀ g q,
+      E2 (lowerCentralLayerRepresentation h.right.2.restrict 2 g q) =
+        agemoSuccQuotientRepresentation h.left.2.restrict 1 g (E2 q) :=
+    lowerCentralLayerLinearEquivAgemoSuccAt_equivariant
+      act A C hAcomm h.left.2 h.right.2 2 1 hmapTwo hkernelTwo
+  obtain ⟨Ep, hEp⟩ :=
+    exists_agemoZero_linearEquiv_succ_of_irreducible
+      h.left.2.restrict 1 hirr
+  have hE2symm : ∀ g q,
+      E2.symm (agemoSuccQuotientRepresentation h.left.2.restrict 1 g q) =
+        lowerCentralLayerRepresentation h.right.2.restrict 2 g
+          (E2.symm q) := by
+    intro g q
+    apply E2.injective
+    rw [E2.apply_symm_apply, hE2, E2.apply_symm_apply]
+  let E : Additive (lowerCentralLayer C 1) ≃ₗ[ZMod 2]
+      Additive (lowerCentralLayer C 2) :=
+    E1.trans (Ep.trans E2.symm)
+  refine ⟨E, ?_⟩
+  intro g q
+  change E2.symm (Ep (E1
+    (lowerCentralLayerRepresentation h.right.2.restrict 1 g q))) =
+      lowerCentralLayerRepresentation h.right.2.restrict 2 g
+        (E2.symm (Ep (E1 q)))
+  rw [hE1, hEp, hE2symm]
+
 end NormalInvariantCover
+
+local instance lemmaEightLayerIsMulCommutative
+    (H : Type*) [Group H] (i : ℕ) :
+    IsMulCommutative (lowerCentralLayer H i) :=
+  lowerCentralLayerIsMulCommutative H i
+
+noncomputable local instance lemmaEightLayerModTwo
+    (H : Type*) [Group H] (i : ℕ) :
+    Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
+  lowerCentralLayerZmodModule H i
+
+/-- **Higman, Suzuki 2-groups, Lemma 8 (p. 87).**
+
+Let `A` be an abelian normal actor-invariant subgroup and `C` a normal
+actor-invariant subgroup covering `A`. If `C' = A`, then `A` has exponent
+at most two. The actual `L₂(C) ≃ L₃(C)` used in the contradiction is
+constructed from the square map and the exact lower-central chain above. -/
+theorem higmanLemmaEight_pow_two_eq_one
+    {P : Type*} [Group P] [Finite P]
+    (hP : IsPGroup 2 P)
+    (X : Subgroup (MulAut P))
+    (hXcyc : IsCyclic X)
+    (hreg : ActsRegularlyOnInvolutions X)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (A C : Subgroup P)
+    (hcover : NormalInvariantCover X.subtype A C)
+    (hAcomm : IsMulCommutative A)
+    (hderived : (_root_.commutator C).map C.subtype = A) :
+    ∀ a : A, a ^ 2 = 1 := by
+  letI : A.Normal := hcover.left.1
+  letI : IsCyclic X := hXcyc
+  letI : CommGroup X := IsCyclic.commGroup
+  by_contra hnotexp
+  have hCtwo : IsPGroup 2 C := hP.to_subgroup C
+  have hAne : A ≠ ⊥ := by
+    intro hAbot
+    apply hnotexp
+    intro a
+    have haone : a = 1 := by
+      apply Subtype.ext
+      have ha : (a : P) ∈ (⊥ : Subgroup P) := by
+        rw [← hAbot]
+        exact a.property
+      simpa using ha
+    rw [haone]
+    simp
+  letI : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+  obtain ⟨x, y, hx, hy, hxy⟩ := hmulti
+  have htransP : ∀ a ∈ involutions P, ∀ b ∈ involutions P,
+      ∃ g : X, (g : MulAut P) a = b := by
+    intro a ha b hb
+    obtain ⟨g, hg, _⟩ := hreg a ha b hb
+    exact ⟨g, hg⟩
+  have hinvA : involutions P ⊆ A :=
+    involutions_subset_of_nontrivial_invariant
+      hP X htransP hcover.left.2 hAne
+  have htransA : ∀ a ∈ involutions A, ∀ b ∈ involutions A,
+      ∃ g : X, hcover.left.2.restrict g a = b := by
+    intro a ha b hb
+    have haP : (a : P) ∈ involutions P := by
+      refine ⟨congrArg Subtype.val ha.1, ?_⟩
+      intro ha1
+      exact ha.2 (Subtype.ext ha1)
+    have hbP : (b : P) ∈ involutions P := by
+      refine ⟨congrArg Subtype.val hb.1, ?_⟩
+      intro hb1
+      exact hb.2 (Subtype.ext hb1)
+    obtain ⟨g, hg⟩ := htransP (a : P) haP (b : P) hbP
+    exact ⟨g, Subtype.ext hg⟩
+  obtain ⟨ι, hι, e, he, hε, classify⟩ :=
+    exists_homocyclic_and_invariant_eq_agemo
+      (hP.to_subgroup A) hcover.left.2.restrict htransA
+  letI : Fintype ι := hι
+  obtain ⟨ε⟩ := hε
+  have heTwo : 1 < e := by
+    by_contra h
+    have heOne : e ≤ 1 := by omega
+    apply hnotexp
+    intro a
+    have hpow : a ^ (2 ^ e) = 1 :=
+      pow_two_pow_eq_one_of_equiv_pi_zmod ε a
+    have horder : orderOf a ∣ 2 ^ e :=
+      orderOf_dvd_iff_pow_eq_one.mpr hpow
+    have hdvd : 2 ^ e ∣ 2 := by
+      simpa using Nat.pow_dvd_pow 2 heOne
+    exact orderOf_dvd_iff_pow_eq_one.mp (horder.trans hdvd)
+  let xA : A := ⟨x, hinvA hx⟩
+  let yA : A := ⟨y, hinvA hy⟩
+  have hxA : xA ∈ involutions A := by
+    refine ⟨Subtype.ext hx.1, ?_⟩
+    intro hx1
+    exact hx.2 (congrArg Subtype.val hx1)
+  have hyA : yA ∈ involutions A := by
+    refine ⟨Subtype.ext hy.1, ?_⟩
+    intro hy1
+    exact hy.2 (congrArg Subtype.val hy1)
+  have hxyA : xA ≠ yA := by
+    intro h
+    exact hxy (congrArg Subtype.val h)
+  have hncycZero : ¬ IsCyclic (AgemoSuccQuotient A 0) :=
+    not_isCyclic_agemoQuotient_of_two_involutions
+      ε (by omega) (by omega) hxA hyA hxyA
+  have hncycOne : ¬ IsCyclic (AgemoSuccQuotient A 1) :=
+    not_isCyclic_agemoQuotient_of_two_involutions
+      ε (by omega) (by omega) hxA hyA hxyA
+  letI : Nontrivial (AgemoSuccQuotient A 1) :=
+    Nontrivial.of_not_isCyclic hncycOne
+  letI : Nontrivial (AgemoSuccQuotient A 0) :=
+    Nontrivial.of_not_isCyclic hncycZero
+  have htransAZero : ∀ v w : Additive (AgemoSuccQuotient A 0),
+      v ≠ 0 → w ≠ 0 →
+        ∃ g : X,
+          agemoSuccQuotientRepresentation hcover.left.2.restrict 0 g v = w := by
+    intro v w hv hw
+    have hv' : v.toMul ≠ 1 := by simpa using hv
+    have hw' : w.toMul ≠ 1 := by simpa using hw
+    obtain ⟨g, hg⟩ :=
+      agemoSuccQuotientAction_transitive_on_nonidentity
+        hcover.left.2.restrict ε htransA he v.toMul w.toMul hv' hw'
+    exact ⟨g, Additive.toMul.injective hg⟩
+  have hirrAZero : Representation.IsIrreducible
+      (agemoSuccQuotientRepresentation hcover.left.2.restrict 0) :=
+    representation_isIrreducible_of_transitive_nonzero
+      (agemoSuccQuotientRepresentation hcover.left.2.restrict 0) htransAZero
+  obtain ⟨E, hE⟩ :=
+    hcover.exists_lowerCentralLayerOne_linearEquiv_layerTwo_of_derived_map_eq_left
+      hCtwo hAcomm (fun U hU => by
+        obtain ⟨s, _hs, hsU⟩ := classify U hU
+        exact ⟨s, hsU⟩) hderived hirrAZero inferInstance
+  obtain ⟨hmapOne, _hmapTwo, _hmapThree⟩ :=
+    hcover.lowerCentralTerm_maps_eq_first_agemo_terms_of_derived_map_eq_left
+      hCtwo hAcomm (fun U hU => by
+        obtain ⟨s, _hs, hsU⟩ := classify U hU
+        exact ⟨s, hsU⟩) hderived
+  obtain ⟨hkernelOne, _hkernelTwo⟩ :=
+    hcover.lowerCentralLayerKernel_maps_eq_first_agemo_terms_of_derived_map_eq_left
+      hCtwo hAcomm (fun U hU => by
+        obtain ⟨s, _hs, hsU⟩ := classify U hU
+        exact ⟨s, hsU⟩) hderived
+  have hmapOne' : (lowerCentralTerm C 1).map C.subtype =
+      (Agemo A 2 0).map A.subtype := by
+    rw [agemo_zero_eq_top, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype]
+    exact hmapOne
+  let EOne := lowerCentralLayerLinearEquivAgemoSuccAt
+    A C hAcomm 1 0 hmapOne' hkernelOne
+  have hEOne : ∀ g q,
+      EOne (lowerCentralLayerRepresentation hcover.right.2.restrict 1 g q) =
+        agemoSuccQuotientRepresentation hcover.left.2.restrict 0 g (EOne q) :=
+    lowerCentralLayerLinearEquivAgemoSuccAt_equivariant
+      X.subtype A C hAcomm hcover.left.2 hcover.right.2
+        1 0 hmapOne' hkernelOne
+  have hfinrank : 2 ≤ Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer C 1)) :=
+    finrank_ge_two_of_linearEquiv_agemoSucc 0 EOne hncycZero
+  have htransTwo : ∀ v w : Additive (lowerCentralLayer C 1),
+      v ≠ 0 → w ≠ 0 →
+        ∃ g : X,
+          lowerCentralLayerRepresentation hcover.right.2.restrict 1 g v = w :=
+    transitive_nonzero_of_equivariant_agemoSucc
+      (lowerCentralLayerRepresentation hcover.right.2.restrict 1)
+      hcover.left.2.restrict ε htransA he EOne hEOne
+  have hPhi : NormalInvariantCover.ambientFrattini C = A :=
+    hcover.ambientFrattini_eq_left_of_derived_map_eq_left hCtwo hderived
+  have hirrZero : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation hcover.right.2.restrict 0) :=
+    hcover.lowerCentralLayerZeroRepresentation_isIrreducible hP hPhi
+  have hAgemo : Agemo C 2 1 = lowerCentralTerm C 1 :=
+    (hcover.agemo_one_eq_commutator_of_derived_map_eq_left
+      hCtwo hderived).trans (by
+        rw [lowerCentralTerm, Subgroup.top_lowerCentralSeries_one])
+  have hXodd : Odd (Nat.card X) :=
+    actor_card_odd_of_regular_on_involutions hP X hreg ⟨x, hx⟩
+  have hrestrict : Function.Injective hcover.right.2.restrict :=
+    NormalInvariantCover.restrict_injective_of_regular_on_involutions
+      hP X hreg hcover
+  exact (not_exists_equivariant_linearEquiv_of_higman_tripleBracket
+    hCtwo hcover.right.2.restrict hrestrict hXodd hAgemo
+    (Module.finrank (ZMod 2) (Additive (lowerCentralLayer C 1)))
+    hfinrank rfl hirrZero htransTwo) ⟨E, hE⟩
 
 end OddOrder.Higman.Suzuki2Groups
