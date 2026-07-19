@@ -47,6 +47,16 @@ lane a の推奨 = **Option B′** (波及ゼロ、9008 の「P₁ 域は現状�
 type II instance が必要とする最小追加)。ただし cross-lane 影響 (lane b の S12/S14) を持つのは
 Option A のみなので、hub の裁定対象は「A を再検討するか、B′ で確定するか」。
 
+## 追記 (2026-07-19, lane a): (8.18) も本裁定に gated
+
+(8.15) だけでなく **(8.18) の一般化も同じ gate に当たる** (frontier note 項目 8 の次候補として
+実測): 書籍 (8.18) は S, T を型仮定なしの非共役 maximal で述べ、証明中で
+「A(T) − A₁(T) ≠ ∅ ⟹ T は type I/II」を導出する (PDF p.49 確認済)。repo の (8.18.a/b/c) は
+`TypeIData S/T` 固定 (S10_MinimalSimpleStructure.lean:404/481/575) で、type-II 側へ広げるには
+**type II の忠実な A(T)** が要る — つまり P₂ 域の typePA 問題そのもの。type-II consumer が
+(8.18.b) を導出せず structure field `cross_zero` として仮定している件も、この gate が解けるまで
+解消不能。⟹ 本裁定の scope は (8.15) type-II instance + (8.18) 一般化 + cross_zero 導出の 3 件。
+
 ## やること
 
 - [ ] hub: Option A vs B′ を裁定 (必要なら consumer grep で波及を実測)
