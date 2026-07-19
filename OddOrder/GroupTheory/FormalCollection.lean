@@ -25,7 +25,9 @@ The "created brackets stay unselected" hypothesis is not available for an
 arbitrary word: in Hall's argument it holds only because the factors still in
 play all have support at least as large as the one being collected.  That side
 condition is carried here as an abstract invariant `P` which is preserved by
-bracketing.
+bracketing.  (The invariant only has to survive the brackets the process
+actually creates, so `hP` may assume that the right factor is selected and the
+left one is not — exactly the situation of a transposition.)
 
 ## Main results
 
@@ -35,6 +37,11 @@ bracketing.
 * `FormalCommutator.collect_split` — running the pass with fuel `l.countP sel`
   splits the word into a prefix of selected factors followed by a suffix with
   none, without changing its value.
+* `FormalCommutator.card_lt_card_support_mul` — a transposition performed while
+  collecting a support `T` creates a factor of *strictly larger* support.
+* `FormalCommutator.split_level` — running the passes for all supports of one
+  cardinality `k` splits the word into one exact-support block per support,
+  followed by a residue whose factors all have support of cardinality `> k`.
 -/
 
 namespace OddOrder.GroupTheory
@@ -115,7 +122,7 @@ inherited by formal brackets and that forbids a created bracket from being
 selected, one extraction pulls out a selected factor, keeps the invariant, and
 lowers the number of selected factors by exactly one. -/
 theorem extract_spec (sel : FormalCommutator X → Bool) {P : FormalCommutator X → Prop}
-    (hP : ∀ u v : FormalCommutator X, P u → P (u * v))
+    (hP : ∀ u v : FormalCommutator X, P u → ¬ sel u → sel v → P (u * v))
     (hclosed : ∀ u v : FormalCommutator X, P u → ¬ sel u → sel v → ¬ sel (u * v))
     {l : List (FormalCommutator X)} {v : FormalCommutator X}
     {r : List (FormalCommutator X)} (hl : ∀ c ∈ l, P c) (h : extract sel l = some (v, r)) :
@@ -144,7 +151,7 @@ theorem extract_spec (sel : FormalCommutator X → Bool) {P : FormalCommutator X
               rcases List.mem_cons.mp hc with rfl | hc
               · exact hPu
               rcases List.mem_cons.mp hc with rfl | hc
-              · exact hP _ _ hPu
+              · exact hP _ _ hPu hu hselv
               · exact hPs c hc
             · have hbr : sel (u * w) = false := by
                 simpa using hclosed u w hPu hu hselv
@@ -208,7 +215,7 @@ theorem evalWord_collectAux (f : X → G) (sel : FormalCommutator X → Bool) :
 tail containing none of them — at the cost of the recorded brackets, and without
 changing the value of the word. -/
 theorem collect_split (sel : FormalCommutator X → Bool) {P : FormalCommutator X → Prop}
-    (hP : ∀ u v : FormalCommutator X, P u → P (u * v))
+    (hP : ∀ u v : FormalCommutator X, P u → ¬ sel u → sel v → P (u * v))
     (hclosed : ∀ u v : FormalCommutator X, P u → ¬ sel u → sel v → ¬ sel (u * v)) :
     ∀ (n : ℕ) (l : List (FormalCommutator X)), l.countP sel = n → (∀ c ∈ l, P c) →
       ∃ p s : List (FormalCommutator X),
@@ -239,6 +246,122 @@ theorem collect_split (sel : FormalCommutator X → Bool) {P : FormalCommutator 
             rcases List.mem_cons.mp hc with rfl | hc
             · exact hPv
             · exact hPps c hc
+
+/-! ## One level of the process
+
+Hall's process runs the passes above once for each possible support, in
+increasing order of the support's cardinality.  Sorting by cardinality is what
+makes the passes fit together: a bracket created while collecting a support `T`
+has support *strictly larger* than `T` (`card_lt_card_support_mul`), so it can
+never disturb another support of the same cardinality, and after the whole level
+is done every surviving factor has support of cardinality at least `k + 1`.
+-/
+
+section Level
+
+variable {L : Type*} [DecidableEq L]
+
+/-- The selector "this factor has support exactly `T`". -/
+def supportSel (label : X → L) (T : Finset L) (c : FormalCommutator X) : Bool :=
+  decide (support label c = T)
+
+@[simp] theorem supportSel_eq_true_iff (label : X → L) (T : Finset L)
+    (c : FormalCommutator X) :
+    supportSel label T c = true ↔ support label c = T := by simp [supportSel]
+
+/-- **A transposition strictly grows the support.**  If `u` survived the pass for
+`T` (its support is not `T`, and is at least as large), then bracketing it with a
+factor of support exactly `T` produces a factor whose support is strictly larger
+than `T`.  This is why collecting one support never disturbs another support of
+the same size. -/
+theorem card_lt_card_support_mul (label : X → L) {T : Finset L} {u v : FormalCommutator X}
+    (hu : T.card ≤ (support label u).card) (hune : support label u ≠ T)
+    (hv : support label v = T) :
+    T.card < (support label (u * v)).card := by
+  rw [support_mul, hv]
+  have hsub : T ⊆ support label u ∪ T := Finset.subset_union_right
+  rcases lt_or_eq_of_le (Finset.card_le_card hsub) with h | h
+  · exact h
+  · refine absurd ?_ hune
+    have hEq : T = support label u ∪ T :=
+      Finset.eq_of_subset_of_card_le hsub (le_of_eq h.symm)
+    exact Finset.eq_of_subset_of_card_le (hEq ▸ Finset.subset_union_left) hu
+
+/-- **One level of the collecting process.**  Let `Ts` list supports all of
+cardinality `k`, and let every factor of `l` have support of cardinality at least
+`k`, those of cardinality exactly `k` being listed in `Ts`.  Then `l` can be
+rewritten, without changing its value, as one block per member of `Ts` — the
+block for `T` consisting of factors of support exactly `T` — followed by a
+residue in which every factor has support of cardinality at least `k + 1`. -/
+theorem split_level (f : X → G) (label : X → L) (k : ℕ) :
+    ∀ Ts : List (Finset L), (∀ T ∈ Ts, T.card = k) →
+      ∀ l : List (FormalCommutator X),
+        (∀ c ∈ l, k ≤ (support label c).card ∧
+          ((support label c).card = k → support label c ∈ Ts)) →
+        ∃ (blocks : List (List (FormalCommutator X))) (res : List (FormalCommutator X)),
+          List.Forall₂ (fun T q => ∀ c ∈ q, support label c = T) Ts blocks ∧
+          evalWord f l = evalWord f (blocks.flatten ++ res) ∧
+          ∀ c ∈ res, k + 1 ≤ (support label c).card := by
+  intro Ts
+  induction Ts with
+  | nil =>
+      intro _ l hl
+      refine ⟨[], l, List.Forall₂.nil, by simp, ?_⟩
+      intro c hc
+      obtain ⟨hge, hmem⟩ := hl c hc
+      rcases eq_or_lt_of_le hge with heq | hlt
+      · exact absurd (hmem heq.symm) (by simp)
+      · omega
+  | cons T Ts' ih =>
+      intro hcard l hl
+      have hT : T.card = k := hcard T (by simp)
+      set sel := supportSel label T with hsel
+      set P : FormalCommutator X → Prop := fun c =>
+        k ≤ (support label c).card ∧
+          ((support label c).card = k → support label c ∈ T :: Ts') with hPdef
+      -- a bracket created by the pass has strictly larger support, so it is
+      -- neither selected nor of cardinality `k`
+      have hgrow : ∀ u v : FormalCommutator X, P u → ¬ sel u → sel v →
+          k < (support label (u * v)).card := by
+        intro u v hPu hu hv
+        have hune : support label u ≠ T := by
+          simpa [hsel, supportSel] using hu
+        have hveq : support label v = T := by simpa [hsel] using hv
+        have := card_lt_card_support_mul label (hT ▸ hPu.1) hune hveq
+        omega
+      have hP : ∀ u v : FormalCommutator X, P u → ¬ sel u → sel v → P (u * v) := by
+        intro u v hPu hu hv
+        have h := hgrow u v hPu hu hv
+        exact ⟨le_of_lt h, fun hk => absurd hk (by omega)⟩
+      have hclosed : ∀ u v : FormalCommutator X, P u → ¬ sel u → sel v → ¬ sel (u * v) := by
+        intro u v hPu hu hv
+        have h := hgrow u v hPu hu hv
+        simp only [hsel, supportSel_eq_true_iff]
+        intro hcon
+        rw [hcon, hT] at h
+        omega
+      obtain ⟨p, s, hsplit, hpsel, hs0, hPps⟩ :=
+        collect_split sel hP hclosed (l.countP sel) l rfl (fun c hc => hl c hc)
+      have hvalue : evalWord f l = evalWord f p * evalWord f s := by
+        rw [← evalWord_collectAux f sel (l.countP sel) l, hsplit, evalWord_append]
+      have hsne : ∀ c ∈ s, support label c ≠ T := by
+        intro c hc
+        have := List.countP_eq_zero.mp hs0 c hc
+        simpa [hsel, supportSel] using this
+      obtain ⟨blocks', res', hforall', hval', hres'⟩ :=
+        ih (fun T' hT' => hcard T' (List.mem_cons_of_mem _ hT')) s (by
+          intro c hc
+          obtain ⟨hge, hmem⟩ := hPps c (List.mem_append_right p hc)
+          refine ⟨hge, fun hk => ?_⟩
+          rcases List.mem_cons.mp (hmem hk) with h | h
+          · exact absurd h (hsne c hc)
+          · exact h)
+      refine ⟨p :: blocks', res', List.Forall₂.cons (fun c hc => ?_) hforall', ?_, hres'⟩
+      · simpa [hsel] using hpsel c hc
+      · rw [hvalue, hval', List.flatten_cons, List.append_assoc, evalWord_append,
+          evalWord_append, evalWord_append]
+
+end Level
 
 end FormalCommutator
 
