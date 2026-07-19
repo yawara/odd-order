@@ -10494,14 +10494,15 @@ mathlib.  Proved sorry-free here:
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_hallCollection_of_residue
 #assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection_of_class_le_three
 
-/-! **CN-group structure: the 3-step dichotomy, Tier A + B** (`GroupTheory.CNGroupStructure`,
+/-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
-`O_{p,p',p}` did not exist in repo or mathlib and are built here.  The dichotomy itself
-(`oPiCore_isSylow_or_isThreeStepGroup`, Cor 1.6) is now **derived sorry-free from Theorem 1.5**
-(`solvableCN_nilpotent_or_frobenius_or_threeStep`), which is the file's only remaining `sorry`;
-its blockers (Gorenstein Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are recorded in issue
-9133.  Proved sorry-free here:
+`O_{p,p',p}` did not exist in repo or mathlib and are built here.  **Theorem 1.5**
+(`solvableCN_nilpotent_or_frobenius_or_threeStep`) and the dichotomy **Corollary 1.6**
+(`oPiCore_isSylow_or_isThreeStepGroup`) are both proved; the leaf is `sorry`-free (2026-07-19).
+The remaining book-strength debt — clause (ii)'s refinement of the Frobenius complement to
+"cyclic or odd-cyclic × generalized quaternion" (Gorenstein Thm 1.3.1(ii)) — is recorded in
+issue 9133.  Supporting results proved here:
 
 * `IsThreeStepGroup.oPiCore_pPrime_eq_bot` — `O_{p'}(G) = 1`;
 * `IsThreeStepGroup.isPGroup_quotient` / `nontrivial_quotient` — `G/O_{p,p'}(G)` a nontrivial
@@ -10549,3 +10550,50 @@ its blockers (Gorenstein Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are rec
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.commute_of_cn_of_commute_ne_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isSolvable
+
+/-! **Theorem 1.5 endgame** (issue 9133, completed 2026-07-19).  The fixed-point-free
+conjugation toolbox (`GroupTheory.FixedPointFreeConjugation` — Gorenstein Ch.10 §1 Lemmas
+1.1/1.3/1.4 in coset form), the commuting obstructions (†)/(‡) of steps 4–6, the cyclicity of
+the Hall complement, and the assembled Theorem 1.5 / Corollary 1.6:
+
+* `exists_inv_mul_conj_eq` / `mem_of_inv_mul_conj_mem_of_fixedPointFree` /
+  `conj_eq_inv_of_orderTwo_of_fixedPointFree` /
+  `commutatorElement_mem_centralizer_of_orderTwo_of_fixedPointFree` — the twisted map is
+  surjective; fpf descends to quotients; fpf involutions invert, so their commutators
+  centralize.
+* `not_commute_of_not_dvd_orderOf_of_isPGroup_fitting` (†) /
+  `not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting` (‡) — no nontrivial `p'`-element
+  commutes with a nontrivial `p`-element, in `G` and in `G/F(G)`.
+* `isCyclic_of_cn_of_conj_frobenius_of_odd` — steps 5–6: an odd-order fpf-acting subgroup of a
+  CN-group is cyclic.
+* `commutatorElement_mem_centralizer_of_isCyclic_normal` / `isFrobeniusGroup_subgroupOf_sup` /
+  `mulEquivMapOfInfKerEqBot` / `comap_oPiCore_quotient_congr` /
+  `exists_isFrobeniusGroup_map_quotient_congr` — endgame helpers: commutators centralize a
+  cyclic normal subgroup (abelian `MulAut`), a fpf action packages as a Frobenius structure on
+  `A ⊔ F`, and quotient-transport along an equality of normal subgroups.
+* `card_sup_mul_card_inf_eq` / `eq_pow_factorization_of_primeFactors_subset` /
+  `oPiCore_singleton_eq_top_of_isPGroup` — counting helpers.
+* **`solvableCN_nilpotent_or_frobenius_or_threeStep` — Gorenstein Ch.12 §1 Theorem 1.5.**
+* **`oPiCore_isSylow_or_isThreeStepGroup` — Gorenstein Ch.12 §1 Corollary 1.6**, the input to
+  BG App.D Lemma D.1. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_inv_mul_conj_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.mem_of_inv_mul_conj_mem_of_fixedPointFree
+#assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_inv_of_orderTwo_of_fixedPointFree
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.commutatorElement_mem_centralizer_of_orderTwo_of_fixedPointFree
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.not_commute_of_not_dvd_orderOf_of_isPGroup_fitting
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting
+#assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_cn_of_conj_frobenius_of_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.commutatorElement_mem_centralizer_of_isCyclic_normal
+#assert_only_allowed_axioms OddOrder.GroupTheory.isFrobeniusGroup_subgroupOf_sup
+#assert_only_allowed_axioms OddOrder.GroupTheory.mulEquivMapOfInfKerEqBot
+#assert_only_allowed_axioms OddOrder.GroupTheory.comap_oPiCore_quotient_congr
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_isFrobeniusGroup_map_quotient_congr
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_sup_mul_card_inf_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.eq_pow_factorization_of_primeFactors_subset
+#assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_singleton_eq_top_of_isPGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.solvableCN_nilpotent_or_frobenius_or_threeStep
+#assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_isSylow_or_isThreeStepGroup
