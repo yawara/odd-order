@@ -465,9 +465,36 @@ private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
   どちらの場合も真部分の正規部分群が存在する. -/
 theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    {a : ℕ} (ha : 1 ≤ a) (hpq : p ≠ q) (hcard : Nat.card G = p ^ a * q) :
+    {a : ℕ} (ha : 1 ≤ a) (hcard : Nat.card G = p ^ a * q) :
     ∃ N : Subgroup G, N.Normal ∧ N ≠ ⊥ ∧ N ≠ ⊤ := by
   classical
+  rcases eq_or_ne p q with rfl | hpq
+  · -- `p = q`: `|G| = p^(a+1)` with `a + 1 ≥ 2`, so `G` is a `p`-group of order `≥ p²`.
+    have hp1 : 1 < p := (Fact.out (p := p.Prime)).one_lt
+    have hcard' : Nat.card G = p ^ (a + 1) := by rw [hcard, pow_succ]
+    haveI : Nontrivial G := by
+      rcases subsingleton_or_nontrivial G with hs | hn
+      · exact absurd ((Nat.card_eq_one_iff_unique.mpr ⟨hs, ⟨1⟩⟩).symm.trans hcard')
+          (Nat.one_lt_pow (by omega) hp1).ne
+      · exact hn
+    have hGp : IsPGroup p G := IsPGroup.of_card hcard'
+    rcases eq_or_ne (Subgroup.center G) ⊤ with hctop | hcne
+    · -- `G` is abelian: a subgroup of order `p` is normal, nontrivial and proper.
+      obtain ⟨H, hH⟩ := Sylow.exists_subgroup_card_pow_prime (G := G) p
+        (n := 1) (by rw [hcard']; exact pow_dvd_pow p (by omega))
+      haveI : H.Normal := Subgroup.normalizer_eq_top_iff.mp
+        (top_le_iff.mp (hctop ▸ Subgroup.center_le_normalizer (H : Set G)))
+      refine ⟨H, inferInstance, ?_, ?_⟩
+      · intro hbot
+        rw [hbot, Subgroup.card_bot, pow_one] at hH
+        omega
+      · intro htop
+        rw [htop, Nat.card_congr (Subgroup.topEquiv (G := G)).toEquiv, hcard'] at hH
+        have := Nat.pow_right_injective hp1 hH
+        omega
+    · -- the centre is a proper nontrivial normal subgroup.
+      exact ⟨Subgroup.center G, inferInstance,
+        (Subgroup.nontrivial_iff_ne_bot _).mp hGp.center_nontrivial, hcne⟩
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Fintype (Sylow p G) := Fintype.ofFinite _
   haveI : Fintype (Sylow q G) := Fintype.ofFinite _
@@ -645,11 +672,11 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
 `G` は単純でない. -/
 theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    {a : ℕ} (ha : 1 ≤ a) (hpq : p ≠ q) (hcard : Nat.card G = p ^ a * q) :
+    {a : ℕ} (ha : 1 ≤ a) (hcard : Nat.card G = p ^ a * q) :
     ¬ IsSimpleGroup G := by
   intro h_simple
   obtain ⟨N, hN_normal, hN_ne_bot, hN_ne_top⟩ :=
-    exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime ha hpq hcard
+    exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime ha hcard
   haveI : IsSimpleGroup G := h_simple
   rcases hN_normal.eq_bot_or_eq_top with hbot | htop
   · exact hN_ne_bot hbot
@@ -743,13 +770,25 @@ variable {G : Type*} [Group G] {p : ℕ} [Fact p.Prime]
 `P ⊓ (n • T) ⊆ P ⊓ N ⊆ n • ↑S`, 一方 `P ⊓ (n • T) ⊆ n • T` 自明,
 合わせて `P ⊓ (n • T) ⊆ n • D`.  `n⁻¹ • ` で `n⁻¹ • P ⊓ T ⊆ D`.
 最小性で等号: `n⁻¹ • P ⊓ T = D`, 特に `D ≤ n⁻¹ • P`, つまり `n • D ≤ P`.
-`n ∈ N = N_G(K)`, `K ≤ D` から `K = n • K ≤ n • D ≤ P`. -/
+`n ∈ N = N_G(K)`, `K ≤ D` から `K = n • K ≤ n • D ≤ P`.
+
+⚠ **`hmin` は書籍どおり「包含**極小**」** (2026-07-19 に一般化)。以前は「全 Sylow 対の
+交わりの中で位数**最小**」を要求していたが、Isaacs の statement は「`D = S ∩ T` is minimal
+in the set of intersections of two Sylow p-subgroups」であり、**Isaacs 自身が p.61
+(Thm 2.18 の注) で両者を区別している**: 「minimal member … means that no member of the set
+is properly contained in M. Of course, if M is chosen to have minimal order … then M will
+necessarily be minimal in this sense, **but not conversely**」。
+よって位数最小版は包含極小版より真に狭く、包含極小だが位数最小でない対を渡せなかった。
+証明側では `hmin` は 1 箇所 (Step 8) でしか使われず、そこは
+`Subgroup.eq_of_le_of_card_ge` で等号を出していただけなので、包含極小形は**直接適用**になる。
+repo 内の唯一の caller (Thm 1.37) は位数最小の対を作るので、そこで弱形へ落として渡す。
+なお Ch.2 の Zenkov (2.18) は元から**正しく包含極小**を使っている。 -/
 theorem opCore_eq_inf_of_minimal_sylow_inter
     [Finite G]
     (S T : Sylow p G)
     (hmin : ∀ S' T' : Sylow p G,
-        Nat.card ((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G) ≤
-        Nat.card ((S' : Subgroup G) ⊓ (T' : Subgroup G) : Subgroup G))
+        (S' : Subgroup G) ⊓ (T' : Subgroup G) ≤ (S : Subgroup G) ⊓ (T : Subgroup G) →
+        (S' : Subgroup G) ⊓ (T' : Subgroup G) = (S : Subgroup G) ⊓ (T : Subgroup G))
     {K : Subgroup G} (hKD : K ≤ (S : Subgroup G) ⊓ (T : Subgroup G))
     (hSN : (S : Subgroup G) ≤ normalizer K) (hTN : (T : Subgroup G) ≤ normalizer K) :
     K ≤ opCore p G := by
@@ -842,13 +881,7 @@ theorem opCore_eq_inf_of_minimal_sylow_inter
     rw [hP'def]; exact Sylow.coe_subgroup_smul
   have hP'T_le_D : (P' : Subgroup G) ⊓ (T : Subgroup G) ≤ D := by
     rw [hP'_coe]; exact hnInvP_T_le_D
-  have hcard_ge : Nat.card D ≤
-      Nat.card ((P' : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G) := by
-    have := hmin P' T
-    simpa [hDdef] using this
-  haveI : Finite D := inferInstance
-  have hP'T_eq_D : (P' : Subgroup G) ⊓ (T : Subgroup G) = D :=
-    Subgroup.eq_of_le_of_card_ge hP'T_le_D hcard_ge
+  have hP'T_eq_D : (P' : Subgroup G) ⊓ (T : Subgroup G) = D := hmin P' T hP'T_le_D
   -- Step 9: D ≤ ↑P', so MulAut.conj n • D ≤ ↑P (re-conjugating).
   have hD_le_P' : D ≤ (P' : Subgroup G) := hP'T_eq_D ▸ inf_le_left
   have hnD_le_P : MulAut.conj (n : G) • D ≤ (P : Subgroup G) := by
@@ -906,10 +939,13 @@ theorem exists_pair_inf_eq_opCore_of_abelian
       ⟨(default : Sylow p G × Sylow p G), Finset.mem_univ _⟩
   obtain ⟨S, T⟩ := ST
   refine ⟨S, T, ?_⟩
+  -- A pair of *minimum order* intersection is in particular *inclusion-minimal*, which is
+  -- the (weaker) hypothesis the book's Thm 1.38 actually assumes.
   have hmin' : ∀ S' T' : Sylow p G,
-      Nat.card ((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G) ≤
-      Nat.card ((S' : Subgroup G) ⊓ (T' : Subgroup G) : Subgroup G) :=
-    fun S' T' => hmin (S', T') (Finset.mem_univ _)
+      (S' : Subgroup G) ⊓ (T' : Subgroup G) ≤ (S : Subgroup G) ⊓ (T : Subgroup G) →
+      (S' : Subgroup G) ⊓ (T' : Subgroup G) = (S : Subgroup G) ⊓ (T : Subgroup G) :=
+    fun S' T' hle =>
+      Subgroup.eq_of_le_of_card_ge hle (hmin (S', T') (Finset.mem_univ _))
   refine le_antisymm ?_ (le_inf (opCore_le S) (opCore_le T))
   -- For abelian Sylow R containing D ≤ R: r ∈ R commutes with d ∈ D ≤ R,
   -- so MulAut.conj r fixes D pointwise ⇒ R ≤ N_G(D).
