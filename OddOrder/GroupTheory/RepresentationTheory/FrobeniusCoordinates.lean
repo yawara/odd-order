@@ -30,6 +30,11 @@ The final theorem also packages a faithful irreducible abelian
 `𝔽₂`-representation as multiplication through an embedding into a Galois
 field.  Together these constructions give the normalized coordinates used in
 Higman's square-map formula without a primitive-root hypothesis.
+
+The final section combines this Singer model with a faithful action that is
+transitive on the nonzero vectors of a second module.  The two modules must
+then have the same dimension over `𝔽₂`; this is the dimension step in Higman's
+Lemma 6.
 -/
 
 set_option autoImplicit false
@@ -401,5 +406,223 @@ theorem exists_singerConjugateBasis_of_faithful_irreducible
     exact baseChange_eigen_conjugateTensorBasisOfLinearEquiv
       (GaloisField 2 m) e (rho c)
       (mu c : GaloisField 2 m) (hcompat c) i
+
+/-! ## Faithful transitive Singer actions -/
+
+universe uHelperF uHelperC uHelperV uHelperW uGenerator
+
+/-- A faithful action of an abelian group which is transitive on the nonzero
+vectors is regular there, so the actor has one fewer element than the space. -/
+theorem natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [CommGroup C] [Finite C]
+    [AddCommGroup V] [Module F V] [Finite V] [Nontrivial V]
+    (rho : Representation F C V)
+    (hfaith : Function.Injective rho)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w) :
+    Nat.card C = Nat.card V - 1 := by
+  classical
+  letI : Fintype C := Fintype.ofFinite C
+  letI : Fintype V := Fintype.ofFinite V
+  obtain ⟨v, hv⟩ : ∃ v : V, v ≠ 0 := exists_ne 0
+  let orbit : C → {w : V // w ≠ 0} := fun c ↦
+    ⟨rho c v, fun hzero ↦ hv (by
+      have h := congrArg (rho c⁻¹) hzero
+      simpa [← map_mul] using h)⟩
+  have horbit_injective : Function.Injective orbit := by
+    intro c d hcd
+    apply hfaith
+    ext w
+    by_cases hw : w = 0
+    · subst w
+      simp
+    · obtain ⟨g, hg⟩ := htrans v w hv hw
+      have hcv : rho c v = rho d v := Subtype.ext_iff.mp hcd
+      calc
+        rho c w = rho c (rho g v) := by rw [hg]
+        _ = rho (c * g) v := by rw [map_mul]; rfl
+        _ = rho (g * c) v := by rw [mul_comm]
+        _ = rho g (rho c v) := by rw [map_mul]; rfl
+        _ = rho g (rho d v) := by rw [hcv]
+        _ = rho (g * d) v := by rw [map_mul]; rfl
+        _ = rho (d * g) v := by rw [mul_comm]
+        _ = rho d (rho g v) := by rw [map_mul]; rfl
+        _ = rho d w := by rw [hg]
+  have horbit_surjective : Function.Surjective orbit := by
+    intro w
+    obtain ⟨c, hc⟩ := htrans v w.1 hv w.2
+    exact ⟨c, Subtype.ext hc⟩
+  have hcard : Fintype.card C = Fintype.card {w : V // w ≠ 0} :=
+    Fintype.card_congr (Equiv.ofBijective orbit ⟨horbit_injective, horbit_surjective⟩)
+  rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq] at hcard
+  simpa [Nat.card_eq_fintype_card] using hcard
+
+/-- Cyclic specialization: a generator of the faithful transitive actor has
+full Singer order. -/
+theorem exists_generator_orderOf_eq_pow_sub_one_of_faithful_transitive_nonzero
+    {C V : Type uGenerator} [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V] [Module (ZMod 2) V] [Finite V] [Nontrivial V]
+    (rho : Representation (ZMod 2) C V)
+    (n : ℕ) (hfin : Module.finrank (ZMod 2) V = n)
+    (hfaith : Function.Injective rho)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w) :
+    ∃ c : C, orderOf c = 2 ^ n - 1 := by
+  have hcardV : Nat.card V = 2 ^ n := by
+    rw [Module.natCard_eq_pow_finrank (K := ZMod 2), hfin]
+    norm_num [Nat.card_eq_fintype_card]
+  obtain ⟨c, hc⟩ := IsCyclic.exists_generator (α := C)
+  refine ⟨c, (orderOf_eq_card_of_forall_mem_zpowers hc).trans ?_⟩
+  rw [natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
+      (F := ZMod 2) (C := C) (V := V) rho hfaith htrans,
+    hcardV]
+
+/-- Faithfulness transfers across an equivariant linear equivalence. -/
+theorem representation_faithful_of_equivariant_linearEquiv
+    {F : Type uHelperF} {C : Type uHelperC}
+    {V : Type uHelperV} {W : Type uHelperW}
+    [Field F] [Group C]
+    [AddCommGroup V] [Module F V] [AddCommGroup W] [Module F W]
+    (rhoV : Representation F C V) (rhoW : Representation F C W)
+    (e : V ≃ₗ[F] W)
+    (he : ∀ c v, e (rhoV c v) = rhoW c (e v))
+    (hfaithV : Function.Injective rhoV) : Function.Injective rhoW := by
+  intro c d hcd
+  apply hfaithV
+  ext v
+  apply e.injective
+  rw [he, he, hcd]
+
+private theorem exponent_dvd_of_pow_sub_one_dvd_pow_sub_one
+    {p a b : ℕ} (hp : 2 ≤ p) (h : p ^ a - 1 ∣ p ^ b - 1) : a ∣ b := by
+  have hgcd : p ^ Nat.gcd a b - 1 = p ^ a - 1 := by
+    rw [← Nat.pow_sub_one_gcd_pow_sub_one, Nat.gcd_eq_left h]
+  have hpow : p ^ Nat.gcd a b = p ^ a := by
+    have hpos₁ : 0 < p ^ Nat.gcd a b := by positivity
+    have hpos₂ : 0 < p ^ a := by positivity
+    omega
+  have : Nat.gcd a b = a := Nat.pow_right_injective hp hpow
+  exact (Nat.gcd_eq_left_iff_dvd).mp this
+
+/-- A faithful irreducible cyclic `𝔽₂`-action and a faithful action of the
+same actor which is transitive on the nonzero vectors have equal dimensions.
+
+The transitive action makes the actor order `2 ^ n - 1`.  In the Singer field
+of the irreducible action, a generator of that order generates the whole field.
+Its Frobenius period gives one dimension divisibility; its multiplicative order
+gives the reverse divisibility. -/
+theorem finrank_eq_of_faithful_irreducible_and_faithful_transitive_nonzero
+    {C V₁ V₂ : Type uGenerator}
+    [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V₁] [Module (ZMod 2) V₁] [Finite V₁]
+    [AddCommGroup V₂] [Module (ZMod 2) V₂] [Finite V₂] [Nontrivial V₂]
+    (rho₁ : Representation (ZMod 2) C V₁)
+    (rho₂ : Representation (ZMod 2) C V₂)
+    (hirr₁ : Representation.IsIrreducible rho₁)
+    (hfaith₁ : Function.Injective rho₁)
+    (hfaith₂ : Function.Injective rho₂)
+    (htrans₂ : ∀ v w : V₂, v ≠ 0 → w ≠ 0 → ∃ c : C, rho₂ c v = w) :
+    Module.finrank (ZMod 2) V₁ = Module.finrank (ZMod 2) V₂ := by
+  classical
+  letI : Representation.IsIrreducible rho₁ := hirr₁
+  letI : Nontrivial V₁ := by
+    by_contra h
+    rw [not_nontrivial_iff_subsingleton] at h
+    exact bot_ne_top (α := Subrepresentation rho₁)
+      (Subrepresentation.toSubmodule_injective (Subsingleton.elim _ _))
+  let m := Module.finrank (ZMod 2) V₁
+  let n := Module.finrank (ZMod 2) V₂
+  have hm : m ≠ 0 := Module.finrank_pos.ne'
+  obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := C)
+  have hcardV₂ : Nat.card V₂ = 2 ^ n := by
+    rw [Module.natCard_eq_pow_finrank (K := ZMod 2)]
+    norm_num [Nat.card_eq_fintype_card, n]
+  have hcardC : Nat.card C = 2 ^ n - 1 := by
+    rw [natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
+      (F := ZMod 2) (C := C) (V := V₂) rho₂ hfaith₂ htrans₂,
+      hcardV₂]
+  have hcorder : orderOf c = 2 ^ n - 1 :=
+    (orderOf_eq_card_of_forall_mem_zpowers hcgen).trans hcardC
+  obtain ⟨e, mu, hmu, hcompat⟩ :=
+    exists_galoisFieldLinearModel_of_faithful_irreducible
+      rho₁ m hm rfl hirr₁ hfaith₁
+  let K := GaloisField 2 m
+  let lambda : K := (mu c : K)
+  have hlambdaOrder : orderOf lambda = 2 ^ n - 1 := by
+    exact orderOf_units.trans ((orderOf_injective mu hmu c).trans hcorder)
+  let A : Subalgebra (ZMod 2) K :=
+    Algebra.adjoin (ZMod 2) ({lambda} : Set K)
+  let W : Subrepresentation rho₁ :=
+    { toSubmodule := A.toSubmodule.comap e.toLinearMap
+      apply_mem_toSubmodule := by
+        intro g v hv
+        change e (rho₁ g v) ∈ A
+        rw [hcompat]
+        apply A.mul_mem
+        · have hgpow : g ∈ Submonoid.powers c := by
+            exact (isOfFinOrder_of_finite c).mem_powers_iff_mem_zpowers.mpr
+              (hcgen g)
+          obtain ⟨k, rfl⟩ := hgpow
+          change (mu (c ^ k) : K) ∈ A
+          rw [map_pow]
+          exact A.pow_mem
+            (Algebra.self_mem_adjoin_singleton (ZMod 2) lambda) k
+        · exact hv }
+  have hWne : W ≠ ⊥ := by
+    intro hW
+    have hone : e.symm (1 : K) ∈ W := by
+      change e (e.symm (1 : K)) ∈ A
+      rw [e.apply_symm_apply]
+      exact A.one_mem
+    rw [hW] at hone
+    have hzero : e.symm (1 : K) = 0 := hone
+    have : (1 : K) = 0 := by
+      rw [← e.apply_symm_apply (1 : K), hzero, map_zero]
+    exact one_ne_zero this
+  have hWtop : W = ⊤ := (eq_bot_or_eq_top W).resolve_left hWne
+  have hgen : Algebra.adjoin (ZMod 2) ({lambda} : Set K) = ⊤ := by
+    rw [eq_top_iff]
+    intro x _
+    have hx : e.symm x ∈ W := by
+      rw [hWtop]
+      exact Submodule.mem_top
+    change e (e.symm x) ∈ A at hx
+    simpa [A] using hx
+  have hlambdaPow : lambda ^ (2 ^ n) = lambda := by
+    have hq : lambda ^ (2 ^ n - 1) = 1 := by
+      rw [← hlambdaOrder]
+      exact pow_orderOf_eq_one lambda
+    calc
+      lambda ^ (2 ^ n) = lambda ^ ((2 ^ n - 1) + 1) := by
+        rw [Nat.sub_add_cancel (Nat.one_le_pow n 2 (by omega))]
+      _ = lambda ^ (2 ^ n - 1) * lambda := by rw [pow_succ]
+      _ = lambda := by rw [hq, one_mul]
+  let sigma := FiniteField.frobeniusAlgHom (ZMod 2) K
+  have hsigma : sigma ^ n = 1 := by
+    apply AlgHom.ext_of_adjoin_eq_top hgen
+    intro x hx
+    rw [Set.mem_singleton_iff] at hx
+    subst x
+    dsimp [sigma]
+    simpa only [AlgHom.coe_pow, FiniteField.coe_frobeniusAlgHom,
+      pow_iterate, ZMod.card, AlgHom.one_apply] using hlambdaPow
+  have hm_dvd_n : m ∣ n := by
+    have h := orderOf_dvd_of_pow_eq_one hsigma
+    rw [FiniteField.orderOf_frobeniusAlgHom (ZMod 2) K,
+      show Module.finrank (ZMod 2) K = m from GaloisField.finrank 2 hm] at h
+    exact h
+  have hlambdaCardPow : lambda ^ (2 ^ m - 1) = 1 := by
+    have hlambdaNe : lambda ≠ 0 := Units.ne_zero (mu c)
+    haveI : Fintype K := Fintype.ofFinite K
+    have hcardK : Fintype.card K = 2 ^ m := by
+      rw [← Nat.card_eq_fintype_card, GaloisField.card 2 m hm]
+    rw [← hcardK]
+    exact FiniteField.pow_card_sub_one_eq_one lambda hlambdaNe
+  have hq_dvd : 2 ^ n - 1 ∣ 2 ^ m - 1 := by
+    rw [← hlambdaOrder]
+    exact orderOf_dvd_of_pow_eq_one hlambdaCardPow
+  have hn_dvd_m : n ∣ m :=
+    exponent_dvd_of_pow_sub_one_dvd_pow_sub_one
+      (p := 2) (by omega) hq_dvd
+  exact Nat.dvd_antisymm hm_dvd_n hn_dvd_m
 
 end OddOrder.RepresentationTheory
