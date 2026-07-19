@@ -400,7 +400,7 @@ lemma ncard_involutions_map_conj_eq_card_involutions_H :
           {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
             hyp.H.map (MulAut.conj u).toMonoidHom =
               hyp.H.map (MulAut.conj hyp.t).toMonoidHom}).ncard :=
-        (Set.ncard_image_of_injOn (hbij.injOn.mono hTA)).symm
+        (Set.InjOn.ncard_image (hbij.injOn.mono hTA)).symm
     _ = {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧
           u ∈ hyp.H.map (MulAut.conj hyp.t).toMonoidHom}.ncard := by
         rw [himg]
@@ -543,7 +543,7 @@ lemma image_conj_KSet_eq_involutions_H {s : G} (hsH : s ∈ hyp.H)
       simpa [mul_assoc] using h2
     · exact mul_mem (mul_mem (inv_mem hkH) hsH) hkH
   refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
-  rw [Set.ncard_image_of_injOn (hyp.injOn_conj_KSet hsH hs2 hs1),
+  rw [Set.InjOn.ncard_image (hyp.injOn_conj_KSet hsH hs2 hs1),
     ← hyp.ncard_KSet_eq]
 
 
