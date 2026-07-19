@@ -237,6 +237,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
@@ -8195,6 +8196,42 @@ an arbitrary scalar extension of the second layer. -/
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.not_exists_injective_intertwiner_to_baseChange_of_higman_bracket
 
+/-! **Higman Lemma 5**: the source square-subgroup hypothesis feeds the actual
+quadratic square map.  A normalized Frobenius-conjugate simultaneous
+eigenbasis makes the upper-triangular candidate equivariant; Lemma 4's
+Corollary then identifies it with the actual map and yields Higman's displayed
+pairwise formula after scalar extension. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquaresLieInSecond_of_agemo_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareQuadraticMap_polarBilin
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.upperQuadraticMap_apply_frobenius_sum
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.polarBilin_upperQuadraticMap
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareMapBaseChange_eq_of_add_law_and_equivariant
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.includeRight_eq_sum_conjugateTensorBasis
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_singerConjugateBasis_of_faithful_irreducible
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.upperQuadraticMap_equivariant_of_eigenbasis
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareMapBaseChange_eq_upperQuadraticCandidate
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_lowerCentralSquareMap_eq_frobeniusSum
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
@@ -10550,6 +10587,16 @@ issue 9133.  Supporting results proved here:
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.commute_of_cn_of_commute_ne_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isSolvable
+-- **BG App.D display (D.2)**, general form (`GroupTheory.ThreeStepGroup`): in a 3-step group two
+-- distinct Sylow `p`-subgroups intersect in exactly `O_p(G)`.  This is the "short argument" BG
+-- leaves to the reader after invoking Corollary 1.6; the route is that the image of a Sylow
+-- `p`-subgroup in `G/O_p(G)` is a Frobenius complement, and Frobenius complements are TI.
+#assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_le_sylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylow_sup_eq_top_of_isPGroup_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylow_inf_opPPrimeCore_eq_oPiCore
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isComplement'_quotient_sylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isFrobeniusGroup_quotient_sylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.inf_sylow_eq_oPiCore
 
 /-! **Theorem 1.5 endgame** (issue 9133, completed 2026-07-19).  The fixed-point-free
 conjugation toolbox (`GroupTheory.FixedPointFreeConjugation` — Gorenstein Ch.10 §1 Lemmas

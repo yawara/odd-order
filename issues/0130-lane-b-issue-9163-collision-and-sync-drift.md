@@ -55,16 +55,54 @@ lane b 自身が衝突を検出済み:
 「9163 が 1 件のみ・b 側が未使用番号へ移動済み」を検証するだけでよい。
 20:10 時点では未実施 (b の WIP 継続中)。
 
+## 追記 (2026-07-19 20:25) — 9164 で**再衝突**、根治策としてレーン別サブバンドへ
+
+b は 9163 → **9164** へ自力で改番したが、ほぼ同時刻に a も main 取り込み済みの状態から
+次番号 **9164** (`dedup-ringaut-algaut-bridge`) を引き、**同日 2 度目の衝突**が発生した。
+a 側は既に main へ合流済 (`fae731ae3`)、b 側は未コミット (`AM`)。
+
+⟹ **共有カウンタ `SEQUENCE.9000` は原理的に衝突する** (未マージ期間がある限り、
+2026-07-18 の `max(SEQUENCE, 実在ファイル最大)+1` 補強でも防げない)。
+
+### 根治策 (hub 裁定、実施済)
+
+- **shared-infra claim をレーン別サブバンド化**: **9200=a / 9300=b / 9400=c / 9500=hub** (幅 100)。
+  SEQUENCE ファイルが別なので構造的に衝突しない。9000-9199 は歴史的レンジとして凍結。
+- `bin/new-issue` を **100 の倍数 base 対応**に修正 (1000 の倍数 → 幅 1000、それ以外 → 幅 100)。
+  自己テスト済 (`--base 9500` → 9500 採番 / 端数 base は従来どおり reject)。
+- 正本更新: `CLAUDE.md` (3 箇所) / `notes/meta/issue_management.md` / `notes/meta/merge_monitor.md`。
+- **「9xxx = shared claim」の grep 規約は不変** — `ls issues/9*.md` で全レーンの open claim を走査できる。
+
+### 実施 (2026-07-19 20:35、hub tick で完了)
+
+b は Lemma 5 完成と同時に 9164 を **closed** にして合流したため、hub が main 側で改番した:
+
+- `issues/closed/9164-frobenius-conjugate-coordinates.md` → **`issues/closed/9300-...`**
+  (frontmatter `id: 9300`)、`issues/SEQUENCE.9300` = 9300 を作成
+- 参照 1 件を追随: `issues/2048-pf-suzuki-lemma5.md:102`
+- **9164 は a の `dedup-ringaut-algaut-bridge` が保持** (open、`issues/1043` から参照されており
+  参照数が多い側を据え置く = 2026-07-18 の改番規則どおり)
+- 検査: open+closed+pending 全体で 9163/9164 の重複なし
+  (残る 1036/1037/1038・9125・9132 は改番しない歴史的 closed 衝突)
+
+以後 b の shared-infra claim は `export ODD_ISSUE_BASE=9300`。
+
+### lane b 実施結果 (2026-07-19)
+
+Frobenius 座標 claim は完了状態を保ったまま
+`issues/closed/9300-frobenius-conjugate-coordinates.md` へ改番し、consumer の参照と
+`SEQUENCE.9300` も 9300 に揃えた。歴史的 `SEQUENCE.9000` は凍結値 9164 のまま保持する。
+
 ## 完了条件
 
 - `ls issues/**/9163-*` が 1 件のみ (main の typepa 側)
-- lane b の Frobenius 座標 issue が 9164 として main に合流し、参照も全て 9164
+- lane b の Frobenius 座標 issue が 9300 として main に合流し、参照も全て 9300
 - `git rev-list --count b..main` = 0
 
 ## 参照
 
 - `issues/9163-typepa-mssharp-rescope-for-815-typeii.md` (main 側, 正)
-- lane b worktree: `issues/9163-frobenius-conjugate-coordinates.md` (改番対象)
+- `issues/closed/9300-frobenius-conjugate-coordinates.md` (改番済み)
 - `issues/2048-pf-suzuki-lemma5.md` (consumer)
-- `OddOrder/GroupTheory/RepresentationTheory/FrobeniusCoordinates.lean` (lane b 未 commit)
+- `OddOrder/GroupTheory/RepresentationTheory/FrobeniusCoordinates.lean` (`1d2baabb1` で main 合流済み)
 - `notes/meta/issue_management.md` 「並行セッションの採番レンジ」
