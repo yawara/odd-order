@@ -152,6 +152,25 @@ theorem isZGroup_of_isFrobeniusAction_of_odd
     haveI : Subsingleton P := (Nat.card_eq_one_iff_unique.mp hcard).1
     exact isCyclic_of_subsingleton
 
+/-- **Isaacs Cor 6.18** (p. 187): a Frobenius complement `A` of odd order has `A'` and `A/A'`
+cyclic, of coprime orders.
+
+Isaacs' proof is exactly two steps: `A` is a Z-group by Cor 6.17
+(`isZGroup_of_isFrobeniusAction_of_odd`, Step 1 above), and the conclusion is then Thm 5.16 —
+which is mathlib's `IsZGroup.isCyclic_commutator` / `IsZGroup.isCyclic_abelianization` /
+`IsZGroup.coprime_commutator_index`.
+
+The three conclusions were already available pointwise (each use site re-derived the one it
+needed from the `IsZGroup` instance); this names the composite so downstream can cite (6.18)
+as a single result, matching the book. -/
+theorem isCyclic_commutator_abelianization_coprime_of_isFrobeniusAction_of_odd
+    (hFrob : IsFrobeniusAction A U) (hodd : Odd (Nat.card A)) :
+    IsCyclic (commutator A) ∧ IsCyclic (Abelianization A) ∧
+      (Nat.card (commutator A)).Coprime (commutator A).index := by
+  haveI : IsZGroup A := isZGroup_of_isFrobeniusAction_of_odd hFrob hodd
+  exact ⟨IsZGroup.isCyclic_commutator A, IsZGroup.isCyclic_abelianization,
+    IsZGroup.coprime_commutator_index A⟩
+
 /-- **Step 2.** In a finite Frobenius complement `A` of odd order, a subgroup `R` of prime
 order `r` not dividing `|A'|` (`A' = commutator A`) centralizes `A'`.
 

@@ -765,8 +765,11 @@ private lemma cyclic_finite_unique_order_two
 /-- **Isaacs Cor 5.19** (cyclic Sylow_2 版): `G` 非可換 finite + `P ∈ Syl_2(G)` cyclic
 非自明 ⇒ `G` 単純でない.
 
-Isaacs 原版は `P = A × B` with `A` cyclic strictly largest (本実装は `B = ⊥` の特殊化).
-原版への一般化は同じ Thm 5.18 強形 + 適切な characteristic 部分群選択で extensible.
+Isaacs 原版は `P = A × B` with `A` cyclic strictly largest で, 本定理はその `B = ⊥` 特殊化.
+**一般形は実装済** — `not_isSimpleGroup_of_sylow_two_cyclic_strict_max_factor`
+(`OddOrder/Isaacs/Ch05_Transfer/SylowTwoDirectFactor.lean:73`). 本定理はその `B = ⊥` の場合
+に相当するが, cyclic Sylow₂ 版として独立に有用なので残してある (一般形からの薄い
+再導出ではなく別証明 — `Disjoint A B` や `P` abelian を要さない分, 仮定が素直).
 
 **証明**: `P` cyclic Sylow_2, `|P| = 2^a, a ≥ 1`. Cauchy で order-2 元 `t ∈ P` を取る.
 任意 `n ∈ N_G(P)` で `n * t * n⁻¹ ∈ P` (normalizer) かつ order 2 (semiconjugate);
