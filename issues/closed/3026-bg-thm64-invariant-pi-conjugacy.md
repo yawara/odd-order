@@ -377,3 +377,61 @@ Case 2 は BG の (6.1) と `M = G₀ or G` の分岐の唯一の消費者 (Case
 
 ⚠ **配置**: `S06_Thm64.lean` は既に 1093 行。Case 2 (500-800 見積) は 1500 行 trigger を
 超えるので、**sibling leaf `S06_Thm64Case2.lean` に置くこと**。
+
+---
+
+## ✅ 完了 (2026-07-19 第6波): **BG Thm 6.4 を無条件形で完全形式化**
+
+新 leaf `S06_Thm64Case2.lean` (497 行、9 定理)。すべて sorry-free・axiom-clean・AxiomsCheck 登録済。
+
+**最終形** = `exists_centralizing_conj_sup_isPiGroup_of_normalHall` (`:483`):
+
+```lean
+(π : Set ℕ) (H G₀ J₁ J₂ : Subgroup X) [G₀.Normal]
+(hH : Subgroup.IsPiSubgroup πᶜ H)
+(hG₀hall : Nat.Coprime (Nat.card ↥G₀) G₀.index)
+(hG₀nil : Group.IsNilpotent (↥G₀ ⧸ Ch01.fitting ↥G₀))
+(hQnil : Group.IsNilpotent ((X ⧸ G₀) ⧸ Ch01.fitting (X ⧸ G₀)))
+(hJ₁pi hJ₂pi …) (hJ₁norm hJ₂norm …) :
+∃ x ∈ J₁ ⊔ J₂, Subgroup.IsPiSubgroup π ((MulAut.conj x • J₁) ⊔ J₂) ∧
+  x ∈ Subgroup.centralizer (H : Set X)
+```
+
+mmd L2011 と逐条一致 (仮説 6 つ・結論 2 つとも欠落なし)。`⟨J₁,J₂⟩ = J₁ ⊔ J₂`。
+
+構造: `|G| + |H|` の強帰納 (`thm64_of_ih` + `thm64_step`)。`thm64_step` は 3 分岐 dispatch
+(`thm64_of_sup_ne_top` / `thm64_case_fitting_primes_not_subset` /
+`thm64_case_fitting_primes_subset`) で新しい数学ゼロ — 予告どおり。
+
+### book の route からの逸脱 3 点 (いずれも弱化ではない、docstring に記録済)
+
+1. **`O_π(G) = 1` を経由しない**。BG は (6.4) で `O_π(G)=1` を出して `K₁ = [J₁,B] ⊆ O_π(F) ⊆
+   O_π(G) = 1` と潰すが、実際に要るのは「`F(G)` が `π'`-群」だけ。`K₁ ≤ F(M) ≤ F(G)`
+   (`Ch01.fitting_map_subtype_le_fitting`) と `K₁` が π かつ π′ であることから直接出る。
+   ⟹ `OpResidual.opPi` は不使用 — 好都合だった (`opPi` には「π-部分群である」補題が現状無く、
+   book の route だと新規 infra が要るところだった)。
+2. **Case 2 は `G = LH` を仮定しない**。BG は「`G = LH` としてよい」の後に全証明を置くが、
+   Case 2 の帰納は `G` を固定して `H` を `H*` に縮めるので `hsup` は不要。
+   `thm64_step` は先に reduction を通すので組み立ては不変。
+3. **`[J₁,B] ≤ F(M)` は LCS 降下で示した**。BG は `BF/F ⊆ O_{π'}(M/F)` と論じるが、
+   coprime 作用で `⁅J₁,B⁆` が self-reproducing (BG Prop 1.6(b)) であることと、冪零群の
+   self-reproducing 部分群が下降中心列の全項に入ることを使った。冪零群向け `O_{π'}` の構築を回避。
+
+### 綴りの convention (既存踏襲)
+
+- Hall は π に依らない `Nat.Coprime |G₀| [G:G₀]` (`NormalHallHeredity` と同じ)。
+- 共役は左作用 `MulAut.conj x • J₁ = x J₁ x⁻¹`。BG の `J₁ˣ = x⁻¹ J₁ x` とは `x ↦ x⁻¹` の
+  違いだけで、`⟨J₁,J₂⟩` も `C_G(H)` も逆元閉ゆえ同値。
+- `[Finite X]` を付す (BG は「`G` is a group」と書くが §6 全体が有限群の議論)。
+
+### ⚠ 新たな重複 (やむを得ず発生)
+
+`commutator_commutator_right_eq_of_le_normalizer` が
+`BG/Ch3_MaximalSubgroups/S13_Lemma138.lean:771` の同名定理と**文・証明とも同一**。
+Ch.3 は Ch.1 の下流なので import できず再導出せざるを得なかった。
+正しい解は `OddOrder/GroupTheory/` へ hoist して両者が cite すること。
+
+## 本 issue は close
+
+BG Thm 6.4 は完全形式化された。BG §6 の残りは **6.2 のみ** (issue 3024 = Gorenstein Ch.8 §2
+Glauberman ZJ に blocked)。

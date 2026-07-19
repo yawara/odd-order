@@ -22,7 +22,10 @@ Chapter I §6 (p. 50), mmd `references/bg/local-analysis.mmd` L2011–L2038.
 **状態**: 本ファイルは Theorem 6.4 の**主張** (`Thm64Statement`)・**帰納骨格**
 (`thm64_of_ih`)・reduction「`G = LH` としてよい」(`thm64_of_sup_ne_top`)・
 **場合 1 の完全な証明** (`thm64_case_fitting_primes_not_subset`)・上流部品を提供する。
-**残るのは場合 2 (`π(F(G)) ⊆ π(H)`) のみ**なので Theorem 6.4 本体はまだ得られていない。
+残る**場合 2 (`π(F(G)) ⊆ π(H)`)** と, そこから組み上がる **Theorem 6.4 本体**
+(`exists_centralizing_conj_sup_isPiGroup_of_normalHall`) は sibling leaf
+`OddOrder.BG.Ch1_Preliminary.S06_Thm64Case2` にある (本ファイルは 1,100 行あり,
+場合 2 を追記すると分割 trigger を超えるため)。
 
 ## 帰納骨格 (`|G| + |H|` の強帰納法)
 
