@@ -8392,6 +8392,9 @@ whenever the target is spanned by pair-weight eigenspaces. -/
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.primitiveRoot_threeDistinctWeight_eigenspace_eq_bot
 
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_eq_zero_of_threeDistinct
+
 /-! **Higman Lemma 6, repeated-index candidates**: a repeated Frobenius
 triple with pair weight is one of the two predecessor-index terms in the
 source. Their inner pairs cannot both have the permitted cyclic gap when the
