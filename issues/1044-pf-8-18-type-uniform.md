@@ -67,10 +67,29 @@ issue 9163 §3 項目 2 の実体 (同 issue の 2026-07-20 追記で「cross_ze
 - `BG.Ch4.S15.typeP_hall_derived_eq_and_abelian` — type 𝒫 で `M' = U₀ ⊔ M_σ`。
 - `S15.typeP2_exists_matched_kappa_hall_pair` — matched κ-Hall / (κ∪σ)′-Hall ペアの存在。
 
+### 実測した最短経路 (2026-07-20): Hall 共役なしで (κ∪σ)′-元が出る
+
+`uniqueMaximal_of_kappaSigmaCompl_element` の実際の入力は
+`(hUM : U ≤ M) (hU : IsHallSubgroup (κ ∪ σ)ᶜ (U.subgroupOf M)) (hyM : y ∈ M) (hy1 : y ≠ 1)`
+`(hyπ : IsPiElement (κ(M) ∪ σ(M))ᶜ y) (hyC : M_σ ⊓ C_G(y) ≠ ⊥)` で、
+結論は `maximalSubgroupsContaining (C_G(y)) = {M}` (TheoremsAE.lean:216)。
+
+type-I 版が Hall D/C を回しているのは「位数が |T_F| と素」から `hyπ` を作るためだが、
+**type 𝒫 では x ∈ A(T) ⊆ T′ という所属だけで κ-側が落ちる**:
+
+- p | orderOf x かつ x ∈ T′ ⟹ p | |T′|。
+- (8.4.a) の Hall 互素性 `Nat.Coprime |T′| |W₁|` (= `typePData_W1_hall_coprime`、axiom-clean)
+  より p ∤ |W₁|。W₁ は κ(T)-Hall なので p ∉ κ(T)。
+- p ∉ σ(T) は「位数が |T_σ| と素」+ `primeFactors_Msigma_eq_sigma` から (型-I 版と同じ)。
+
+⟹ **Hall D/C の再演は不要**。type-I 版が Hall を要したのは x ∈ T しか無いためで、
+type 𝒫 では A(T) ⊆ T′ という (8.10) の host がそのまま効く。
+
 ## 着手順
 
-1. `typeII_centralizer_le_and_unique` (または型一様な `centralizer_le_and_unique`) を
-   `derivedInG T` 内の Hall D/C で証明。
+1. `typeP_centralizer_le_and_unique`: 上記経路で `IsPiElement (κ∪σ)ᶜ x` を作り
+   `uniqueMaximal_of_kappaSigmaCompl_element` に渡す。
+   (κ∪σ)ᶜ-Hall U の存在は `Ch03.hall_E_exists` / `typeP2_exists_matched_kappa_hall_pair`。
 2. `escaping_supported_of_A1_conj_mem_typeIA` を `typeA` + `tau` パラメータ化して
    `escaping_supported_of_A1_conj_mem_typeA` に一般化 (旧名は消して consumer を貼り替え)。
 3. (8.18.b) `exists_A1_conj_mem_typeIA_of_not_disjoint` を同様に一般化。
