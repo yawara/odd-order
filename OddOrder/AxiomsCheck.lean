@@ -2610,6 +2610,37 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_of_le_proper_subgroup
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_of_sup_ne_top
 
+-- BG **Theorem 6.4, Case 1** (`π(F(G)) ⊄ π(H)`) — issue 3026 wave 5.  With `G = LH` available
+-- from the reduction, pick `p ∈ π(F(G)) ∖ π(H)`, take `N := O_p(G)`, get `N ≤ L` from BG (6.2),
+-- descend to `G ⧸ N` by the induction hypothesis, correct by a Schur–Zassenhaus conjugator
+-- `z ∈ N`, and finish with `exists_centralizing_conj_sup_isPiGroup` (Theorem 6.4 for coprime `A`).
+--
+-- ⚠ The centralizing step uses the **corrected** subgroup: BG p.50 prints `[H, yz] ⊆ H ∩ L = 1`,
+-- but `H ∩ L = 1` does not follow; the right subgroup is `N`, and `H ⊓ N = ⊥` comes from
+-- `inf_eq_bot_of_isPiSubgroup_compl`.  See `mem_centralizer_of_mem_normalizer_of_commutator_le`.
+--
+-- Two simplifications over the book: minimality of `N` is never used (only `N ⊴ G`, `N ≠ 1`,
+-- `N` a `p`-group), so `O_p(G)` is taken directly; and BG (6.2) is instantiated at `π := {p}`
+-- rather than the ambient `π`, since `G/L` is a `p′`-group but `p ∈ π` is unknown.
+-- All axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_case_exists_prime_not_mem
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.thm64_case_fitting_primes_not_subset
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.mem_normalizer_iff_conj_smul_eq
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.map_conj_smul_eq
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.map_le_normalizer_map
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.le_normalizer_sup
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.conj_smul_eq_self_of_mem_centralizer
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.le_normalizer_conj_smul
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.isPiSubgroup_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.coprime_card_of_isPiSubgroup_compl
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.isPiSubgroup_of_isPGroup
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.card_eq_card_mul_card_map_mk'
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.isPiSubgroup_of_map_mk'
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.opCore_ne_bot_of_mem_primeFactors_card_fitting
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_conj_smul_eq_of_sup_eq
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.commutator_mem_of_quotient_centralizes
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.sup_eq_sup_of_map_mk'_eq
+
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.exists_centralizing_conj_sup_isPiGroup
 #assert_only_allowed_axioms
