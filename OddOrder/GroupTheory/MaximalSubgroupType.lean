@@ -430,6 +430,14 @@ noncomputable def typeA (M : Subgroup G) (tau : PeterfalviType) : Set G :=
 
 @[simp] theorem supportHost_typeI (M : Subgroup G) : supportHost M .I = M := rfl
 
+/-- The host of `A(M)` lies in `M`: it is `M` itself on Type I and `M' ≤ M` otherwise. -/
+theorem supportHost_le (M : Subgroup G) (tau : PeterfalviType) : supportHost M tau ≤ M := by
+  cases tau <;> first | exact le_rfl | exact Subgroup.map_subtype_le _
+
+/-- `A(M) ⊆ M` for every type. -/
+theorem typeA_subset {M : Subgroup G} {tau : PeterfalviType} :
+    typeA M tau ⊆ (M : Set G) := fun _ hy => supportHost_le M tau hy.1
+
 theorem supportHost_of_ne_typeI (M : Subgroup G) {tau : PeterfalviType} (h : tau ≠ .I) :
     supportHost M tau = derivedInG M := by
   cases tau <;> first | exact absurd rfl h | rfl

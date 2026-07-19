@@ -10937,6 +10937,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.escaping_supported_of_A1_conj_mem_typeA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.A1_eq_sigmaSharp
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.escaping_typeA_mem_A1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.coprime_FT_signalizer_centralizerIn_typeA
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_subset_conjClassSet_Mtilde
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_disjoint_of_nonconjugate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.exists_A1_conj_mem_typeA_of_not_disjoint
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_conj_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subset_hatMsigma
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_one_not_mem

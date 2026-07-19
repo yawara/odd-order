@@ -77,19 +77,21 @@ theorem FT_signalizer_eq_Rsub_of_escape [Finite G] (hG : OddOrder.BG.IsMinimalSi
       ⊓ Subgroup.centralizer ({x} : Set G) = _
   rw [hbase_eq, hN'_eq]
 
-/-- **The faithful thickened `A₁`-support lands in the `M̃`-cover**:
-`Ã₁(M) ⊆ 𝒞_G(M̃)` for type-I/II `M`.  Escaping points contribute `x·R(x)` with
+/-- **The faithful thickened `A₁`-support lands in the `M̃`-cover**: `Ã₁(M) ⊆ 𝒞_G(M̃)`, for a
+maximal subgroup of **any** Peterfalvi type.  Escaping points contribute `x·R(x)` with
 `R(x) = FT_signalizer x = Rsub x` (the defining generators of `M̃`); non-escaping points
-contribute the bare `x = x·1 ∈ M̃`. -/
+contribute the bare `x = x·1 ∈ M̃`.
+
+The only place the type entered was `A₁(M) = M_σ^#`, which holds for every type
+(`A1_eq_sigmaSharp`); the rest of the argument is type-agnostic. -/
 theorem ftThickenedSupport_A1_subset_conjClassSet_Mtilde [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M)
-    {tau : PeterfalviType} (htau : tau = PeterfalviType.I ∨ tau = PeterfalviType.II) :
+    (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
     ftThickenedSupport M (A1 M tau) ⊆
       conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG
         (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) M) := by
-  have hA1σ : A1 M tau = OddOrder.BG.Ch4.S14.sigmaSharp M :=
-    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hM hType htau
+  have hA1σ : A1 M tau = OddOrder.BG.Ch4.S14.sigmaSharp M := A1_eq_sigmaSharp hG hM htau
   rintro y ⟨x, hxA1, hy⟩
   have hxσ : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := hA1σ ▸ hxA1
   refine conjClassSet_mono ?_ hy
@@ -102,20 +104,19 @@ theorem ftThickenedSupport_A1_subset_conjClassSet_Mtilde [Finite G]
     exact ⟨x, hxσ, r, by rw [hr]; exact one_mem _, rfl⟩
 
 /-- **Peterfalvi (8.17.c), `Ã₁`-disjointness** (the disjointness core of BG Theorem E /
-Coq `FT_Dade1_support_disjoint`): the faithful thickened `A₁`-supports of non-conjugate
-type-I/II maximal subgroups are disjoint.  Sorry-free: both supports embed in the disjoint
-`𝒞_G(M̃)`-covers (`conjClassSet_Mtilde_disjoint`, BG 14.5(b)). -/
+Coq `FT_Dade1_support_disjoint`): the faithful thickened `A₁`-supports of **any** two
+non-conjugate maximal subgroups are disjoint — the book states (8.17) over a full system of
+representatives of the conjugacy classes of maximal subgroups, with no type hypothesis.  Both
+supports embed in the disjoint `𝒞_G(M̃)`-covers (`conjClassSet_Mtilde_disjoint`, BG 14.5(b)). -/
 theorem ftThickenedSupport_A1_disjoint_of_nonconjugate [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L1 L2 : Subgroup G}
     (hL1 : L1 ∈ maximalSubgroups G) (hL2 : L2 ∈ maximalSubgroups G)
-    (hT1 : IsTypeI L1 ∨ IsTypeII L1) (hT2 : IsTypeI L2 ∨ IsTypeII L2)
     {tau1 tau2 : PeterfalviType}
-    (ht1 : tau1 = PeterfalviType.I ∨ tau1 = PeterfalviType.II)
-    (ht2 : tau2 = PeterfalviType.I ∨ tau2 = PeterfalviType.II)
+    (ht1 : HasPeterfalviType tau1 L1) (ht2 : HasPeterfalviType tau2 L2)
     (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup L1 L2) :
     Disjoint (ftThickenedSupport L1 (A1 L1 tau1)) (ftThickenedSupport L2 (A1 L2 tau2)) :=
-  Disjoint.mono (ftThickenedSupport_A1_subset_conjClassSet_Mtilde hG hL1 hT1 ht1)
-    (ftThickenedSupport_A1_subset_conjClassSet_Mtilde hG hL2 hT2 ht2)
+  Disjoint.mono (ftThickenedSupport_A1_subset_conjClassSet_Mtilde hG hL1 ht1)
+    (ftThickenedSupport_A1_subset_conjClassSet_Mtilde hG hL2 ht2)
     (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG
       (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hL1 hL2 hnc)
 
@@ -431,6 +432,33 @@ theorem escaping_typeA_mem_A1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [A1_eq_sigmaSharp hG hM htau]
     exact escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha
 
+/-- **Peterfalvi (8.13.c2), type-uniform**: for an escaping point `a` of `A(M)` and *any*
+`b ∈ A(M)`, the signalizer `R(a)` has order coprime to `|C_M(b)|`, for a maximal subgroup of any
+Peterfalvi type.
+
+Type I is the last conjunct of `escaping_typeIA_signalizer_structure`; the types of class `𝒫`
+are `coprime_FT_signalizer_centralizerIn_typePACore`.  The `σ`-sharpness of `a` that the
+`𝒫`-side needs is `escaping_typeA_mem_A1` composed with `A1_eq_sigmaSharp`. -/
+theorem coprime_FT_signalizer_centralizerIn_typeA [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M)
+    {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M
+      (OddOrder.GroupTheory.typeA M tau))
+    {b : G} (hb : b ∈ OddOrder.GroupTheory.typeA M tau) :
+    Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+      (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)) := by
+  classical
+  by_cases htauI : tau = PeterfalviType.I
+  · subst htauI
+    obtain ⟨dM⟩ : IsTypeI M := htau
+    rw [OddOrder.GroupTheory.typeA_eq_typeIA dM] at ha hb
+    exact (escaping_typeIA_signalizer_structure hG hM dM ha).2.2.2 b hb
+  · have haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
+      A1_eq_sigmaSharp hG hM htau ▸ escaping_typeA_mem_A1 hG hM htau ha
+    rw [typeA_eq_typePACore hG hM htau htauI] at ha hb
+    exact coprime_FT_signalizer_centralizerIn_typePACore hG hM haσ ha.2 hb
+
 /-- **Peterfalvi (8.12.b), type-`𝒫` half**: for a type-`𝒫` maximal `T` and a point
 `b ∈ A(T) = typePACore T` whose order is coprime to `|T_σ|`, `T` is the unique maximal subgroup
 of `G` containing `C_G(b)`.
@@ -683,34 +711,47 @@ theorem escaping_supported_of_A1_conj_mem_typeIA [Finite G]
   rwa [OddOrder.GroupTheory.typeA_eq_typeIA dS] at hres
 
 
-/-- **(8.18.b) for a type-I pair**: a nonempty intersection of the thickened supports
-`Ã₁(S) ∩ Ã(T) ≠ ∅` descends to a *bare* intersection: some `x ∈ A₁(S)` has a conjugate in
-`A(T)`.  Genuine: an escaping `A(T)`-point would put the intersection inside
-`Ã₁(S) ∩ Ã₁(T) = ∅` (the proven (8.17.c)); for a non-escaping point the thickening on the
-`T`-side is trivial and the `S`-side coset collapses through the `π`-part power argument
-(`mem_zpowers_mul_right_of_coprime`, orders coprime by the (8.13.c2) pin). -/
-theorem exists_A1_conj_mem_typeIA_of_not_disjoint [Finite G]
+/-- **Peterfalvi (8.18.b), type-uniform**: for two **non-conjugate maximal subgroups** `S, T`
+with no type hypothesis, a nonempty intersection of the thickened supports `Ã₁(S) ∩ Ã(T) ≠ ∅`
+descends to a *bare* intersection: some `x ∈ A₁(S)` has a conjugate in `A(T)`.  Together with
+(8.18.a) this is the book's "there is a conjugate of `T` supporting `S` iff
+`Ã₁(S) ∩ Ã(T) ≠ ∅`".
+
+The book's argument, followed step by step:
+
+* if the `T`-side point `a` **escapes**, it lies in `A₁(T)` (`escaping_typeA_mem_A1`, (8.13.b))
+  and the thickenings agree there, so the intersection would sit inside
+  `Ã₁(S) ∩ Ã₁(T) = ∅` — the type-uniform (8.17.c)
+  (`ftThickenedSupport_A1_disjoint_of_nonconjugate`);
+* otherwise the `T`-side thickening is trivial (`R(a) = 1`), so `y` is a bare conjugate of `a`.
+  On the `S`-side, `y` is a conjugate of `b·k` with `k ∈ R(b)`; `|R(b)|` is coprime to
+  `|C_S(b)|` by (8.13.c2) (`coprime_FT_signalizer_centralizerIn_typeA`) and `b` commutes with
+  `k`, so `b` is a power of `b·k` (`mem_zpowers_mul_right_of_coprime`) and the corresponding
+  power of `a` is the required conjugate of `b`.  Powers stay inside the `A(T)`-data: the host
+  is a subgroup and so is each centralizer. -/
+theorem exists_A1_conj_mem_typeA_of_not_disjoint [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
-    (dS : TypeIData S) (dT : TypeIData T)
+    {tauS tauT : PeterfalviType}
+    (htauS : HasPeterfalviType tauS S) (htauT : HasPeterfalviType tauT T)
     (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T)
-    (hint : ¬ Disjoint (ftThickenedSupport S (A1 S PeterfalviType.I))
-      (ftThickenedSupport T (typeIA T dT))) :
-    ∃ x u : G, x ∈ A1 S PeterfalviType.I ∧ u * x * u⁻¹ ∈ typeIA T dT := by
+    (hint : ¬ Disjoint (ftThickenedSupport S (A1 S tauS))
+      (ftThickenedSupport T (OddOrder.GroupTheory.typeA T tauT))) :
+    ∃ x u : G, x ∈ A1 S tauS ∧ u * x * u⁻¹ ∈ OddOrder.GroupTheory.typeA T tauT := by
   rw [Set.not_disjoint_iff] at hint
   obtain ⟨y, ⟨b, hbA1, hyb⟩, ⟨a, haA, hya⟩⟩ := hint
-  by_cases haesc : a ∈ OddOrder.GroupTheory.escapingCentralizerSet T (typeIA T dT)
-  · -- escaping `a`: `y ∈ Ã₁(S) ∩ Ã₁(T)`, contradicting the proven (8.17.c).
+  by_cases haesc : a ∈ OddOrder.GroupTheory.escapingCentralizerSet T
+      (OddOrder.GroupTheory.typeA T tauT)
+  · -- escaping `a`: `y ∈ Ã₁(S) ∩ Ã₁(T)`, contradicting the type-uniform (8.17.c).
     exfalso
-    have haA1 : a ∈ A1 T PeterfalviType.I := escaping_typeIA_mem_A1 hG hT dT haesc
-    have hyT1 : y ∈ ftThickenedSupport T (A1 T PeterfalviType.I) := by
+    have haA1 : a ∈ A1 T tauT := escaping_typeA_mem_A1 hG hT htauT haesc
+    have hyT1 : y ∈ ftThickenedSupport T (A1 T tauT) := by
       refine ⟨a, haA1, ?_⟩
       rwa [ftSupportKernel_eq_of_escaping haesc,
         ← ftSupportKernel_eq_of_escaping (⟨haA1, haesc.2⟩ :
-          a ∈ OddOrder.GroupTheory.escapingCentralizerSet T (A1 T PeterfalviType.I))] at hya
+          a ∈ OddOrder.GroupTheory.escapingCentralizerSet T (A1 T tauT))] at hya
     exact Set.disjoint_left.mp
-      (ftThickenedSupport_A1_disjoint_of_nonconjugate hG hS hT (Or.inl ⟨dS⟩) (Or.inl ⟨dT⟩)
-        (Or.inl rfl) (Or.inl rfl) hnc)
+      (ftThickenedSupport_A1_disjoint_of_nonconjugate hG hS hT htauS htauT hnc)
       ⟨b, hbA1, hyb⟩ hyT1
   · -- non-escaping `a`: the `T`-side thickening is trivial, `y ~ a`.
     rw [ftSupportKernel_eq_bot_of_not_escaping haesc] at hya
@@ -718,37 +759,36 @@ theorem exists_A1_conj_mem_typeIA_of_not_disjoint [Finite G]
     rw [SetLike.mem_coe, Subgroup.mem_bot] at hr0
     subst hr0
     simp only [mul_one] at hw
-    -- `S`-side: `y = v·(b·k)·v⁻¹`.
     obtain ⟨t', ⟨k, hk, rfl⟩, v, hv⟩ := hyb
     have hb1 : b ≠ 1 := fun h =>
       ((Set.mem_sdiff b).mp hbA1).2 (Set.mem_singleton_iff.mpr h)
     obtain ⟨haT, ha1, hwitA⟩ := haA
-    by_cases hbesc : b ∈ OddOrder.GroupTheory.escapingCentralizerSet S (A1 S PeterfalviType.I)
+    have hbA : b ∈ OddOrder.GroupTheory.typeA S tauS := A1_subset_typeA hG hS htauS hbA1
+    by_cases hbesc : b ∈ OddOrder.GroupTheory.escapingCentralizerSet S (A1 S tauS)
     · -- thick `S`-side: extract `b` as a power of `b·k`.
       rw [SetLike.mem_coe, ftSupportKernel_eq_of_escaping hbesc] at hk
-      have hbescA : b ∈ OddOrder.GroupTheory.escapingCentralizerSet S (typeIA S dS) :=
-        ⟨A1_subset_typeIA S dS hbesc.1, hbesc.2⟩
-      have hcards := (escaping_typeIA_signalizer_structure hG hS dS hbescA).2.2.2 b
-        (A1_subset_typeIA S dS hbesc.1)
+      have hbescA : b ∈ OddOrder.GroupTheory.escapingCentralizerSet S
+          (OddOrder.GroupTheory.typeA S tauS) :=
+        ⟨A1_subset_typeA hG hS htauS hbesc.1, hbesc.2⟩
+      have hcards := coprime_FT_signalizer_centralizerIn_typeA hG hS htauS hbescA hbA
       have hob : orderOf b ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn S b) :=
         Subgroup.orderOf_dvd_natCard _
           (OddOrder.Peterfalvi.S04.mem_centralizerIn.mpr
-            ⟨(A1_subset_typeIA S dS hbA1).1, rfl⟩)
+            ⟨OddOrder.GroupTheory.typeA_subset hbA, rfl⟩)
       have hok : orderOf k ∣ Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer b) :=
         Subgroup.orderOf_dvd_natCard _ hk
       have hcop : Nat.Coprime (orderOf b) (orderOf k) :=
         ((Nat.Coprime.coprime_dvd_left hok hcards).coprime_dvd_right hob).symm
       have hcomm : Commute b k := by
-        have := OddOrder.BG.Ch4.S16.FT_signalizer_le_centralizer b hk
-        exact (Subgroup.mem_centralizer_singleton_iff.mp this).symm
+        have hkc := OddOrder.BG.Ch4.S16.FT_signalizer_le_centralizer b hk
+        exact (Subgroup.mem_centralizer_singleton_iff.mp hkc).symm
       obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp
         (mem_zpowers_mul_right_of_coprime hcomm hcop)
-      -- `a = u·(b·k)·u⁻¹` with `u := w⁻¹·v`; then `a^n = u·b·u⁻¹ ∈ A(T)`.
       set u := w⁻¹ * v with hudef
       have hau : a = u * (b * k) * u⁻¹ := by
-        have : w * a * w⁻¹ = v * (b * k) * v⁻¹ := by rw [hw, hv]
+        have hwv : w * a * w⁻¹ = v * (b * k) * v⁻¹ := by rw [hw, hv]
         calc a = w⁻¹ * (w * a * w⁻¹) * w := by group
-          _ = w⁻¹ * (v * (b * k) * v⁻¹) * w := by rw [this]
+          _ = w⁻¹ * (v * (b * k) * v⁻¹) * w := by rw [hwv]
           _ = u * (b * k) * u⁻¹ := by rw [hudef]; group
       have hazn : a ^ n = u * b * u⁻¹ := by
         rw [hau]
@@ -758,23 +798,38 @@ theorem exists_A1_conj_mem_typeIA_of_not_disjoint [Finite G]
       refine ⟨b, u, hbA1, ?_⟩
       rw [← hazn]
       obtain ⟨h, hh, hah⟩ := hwitA
-      refine ⟨Subgroup.zpow_mem T haT n, ?_, h, hh, ?_⟩
-      · rw [hazn]
-        exact conj_ne_one hb1
-      · exact Subgroup.zpow_mem _ hah n
+      exact ⟨Subgroup.zpow_mem _ haT n, by rw [hazn]; exact conj_ne_one hb1,
+        h, hh, Subgroup.zpow_mem _ hah n⟩
     · -- trivial `S`-side: `k = 1`, `a = u·b·u⁻¹` directly.
       rw [SetLike.mem_coe, ftSupportKernel_eq_bot_of_not_escaping hbesc,
         Subgroup.mem_bot] at hk
       subst hk
       simp only [mul_one] at hv
       refine ⟨b, w⁻¹ * v, hbA1, ?_⟩
-      have : w⁻¹ * v * b * (w⁻¹ * v)⁻¹ = a := by
+      have heq : w⁻¹ * v * b * (w⁻¹ * v)⁻¹ = a := by
         have h1 : w * a * w⁻¹ = v * b * v⁻¹ := by rw [hw, hv]
         calc w⁻¹ * v * b * (w⁻¹ * v)⁻¹ = w⁻¹ * (v * b * v⁻¹) * w := by group
           _ = w⁻¹ * (w * a * w⁻¹) * w := by rw [h1]
           _ = a := by group
-      rw [show w⁻¹ * v * b * (w⁻¹ * v)⁻¹ = a from this]
+      rw [heq]
       exact ⟨haT, ha1, hwitA⟩
+
+/-- **(8.18.b) for a type-I pair**: the both-Type-I specialisation of
+`exists_A1_conj_mem_typeA_of_not_disjoint`, phrased on `typeIA` (`typeA_eq_typeIA`).  Kept for
+the (8.18.c) chain below, which is still stated for a Type-I pair (issue 1044). -/
+theorem exists_A1_conj_mem_typeIA_of_not_disjoint [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
+    (dS : TypeIData S) (dT : TypeIData T)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T)
+    (hint : ¬ Disjoint (ftThickenedSupport S (A1 S PeterfalviType.I))
+      (ftThickenedSupport T (typeIA T dT))) :
+    ∃ x u : G, x ∈ A1 S PeterfalviType.I ∧ u * x * u⁻¹ ∈ typeIA T dT := by
+  obtain ⟨x, u, hx, hu⟩ := exists_A1_conj_mem_typeA_of_not_disjoint hG hS hT
+    (tauS := PeterfalviType.I) (tauT := PeterfalviType.I) ⟨dS⟩ ⟨dT⟩ hnc
+    (by rwa [OddOrder.GroupTheory.typeA_eq_typeIA dT])
+  exact ⟨x, u, hx, by rwa [OddOrder.GroupTheory.typeA_eq_typeIA dT] at hu⟩
+
 
 /-- **Peterfalvi (8.18.c) for a type-I pair** (mixed `Ã₁ ∩ Ã` disjointness): for non-conjugate
 type-I maximal subgroups `S, T`, `Ã₁(S) ∩ Ã(T) = ∅` or `Ã₁(T) ∩ Ã(S) = ∅`.
