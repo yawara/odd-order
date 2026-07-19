@@ -143,6 +143,8 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               repeated 候補へ縮約し、odd-gap 排他と零和から全項を消去する
         - [x] `L₃` の pair-weight eigenspace span を使い、distinct-index の actual
               triple-bracket 項をゼロにする
+        - [x] 非零項の固有値を pair-weight range に戻して対応 fiber を適用し、
+              actual basis triple-bracket の全項をゼロにする
       - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
