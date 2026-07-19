@@ -23,6 +23,9 @@ import OddOrder.GroupTheory.FittingHeredity
 import OddOrder.GroupTheory.NormalHallHeredity
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.HallCollection
+import OddOrder.GroupTheory.FormalCommutator
+import OddOrder.GroupTheory.FormalCollection
+import OddOrder.GroupTheory.PolynomialSequences
 import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.IsExtraspecial
