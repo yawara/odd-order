@@ -42,6 +42,9 @@ left one is not — exactly the situation of a transposition.)
 * `FormalCommutator.split_level` — running the passes for all supports of one
   cardinality `k` splits the word into one exact-support block per support,
   followed by a residue whose factors all have support of cardinality `> k`.
+* `FormalCommutator.exists_split_supports` — **the collecting process**: running
+  all levels leaves no residue, so every formal word equals the concatenation of
+  one exact-support block per nonempty support, ordered by cardinality.
 -/
 
 namespace OddOrder.GroupTheory
@@ -293,20 +296,20 @@ cardinality `k`, and let every factor of `l` have support of cardinality at leas
 rewritten, without changing its value, as one block per member of `Ts` — the
 block for `T` consisting of factors of support exactly `T` — followed by a
 residue in which every factor has support of cardinality at least `k + 1`. -/
-theorem split_level (f : X → G) (label : X → L) (k : ℕ) :
+theorem split_level (label : X → L) (k : ℕ) :
     ∀ Ts : List (Finset L), (∀ T ∈ Ts, T.card = k) →
       ∀ l : List (FormalCommutator X),
         (∀ c ∈ l, k ≤ (support label c).card ∧
           ((support label c).card = k → support label c ∈ Ts)) →
         ∃ (blocks : List (List (FormalCommutator X))) (res : List (FormalCommutator X)),
           List.Forall₂ (fun T q => ∀ c ∈ q, support label c = T) Ts blocks ∧
-          evalWord f l = evalWord f (blocks.flatten ++ res) ∧
+          (∀ f : X → G, evalWord f l = evalWord f (blocks.flatten ++ res)) ∧
           ∀ c ∈ res, k + 1 ≤ (support label c).card := by
   intro Ts
   induction Ts with
   | nil =>
       intro _ l hl
-      refine ⟨[], l, List.Forall₂.nil, by simp, ?_⟩
+      refine ⟨[], l, List.Forall₂.nil, fun f => by simp, ?_⟩
       intro c hc
       obtain ⟨hge, hmem⟩ := hl c hc
       rcases eq_or_lt_of_le hge with heq | hlt
@@ -342,7 +345,8 @@ theorem split_level (f : X → G) (label : X → L) (k : ℕ) :
         omega
       obtain ⟨p, s, hsplit, hpsel, hs0, hPps⟩ :=
         collect_split sel hP hclosed (l.countP sel) l rfl (fun c hc => hl c hc)
-      have hvalue : evalWord f l = evalWord f p * evalWord f s := by
+      have hvalue : ∀ f : X → G, evalWord f l = evalWord f p * evalWord f s := by
+        intro f
         rw [← evalWord_collectAux f sel (l.countP sel) l, hsplit, evalWord_append]
       have hsne : ∀ c ∈ s, support label c ≠ T := by
         intro c hc
@@ -358,8 +362,92 @@ theorem split_level (f : X → G) (label : X → L) (k : ℕ) :
           · exact h)
       refine ⟨p :: blocks', res', List.Forall₂.cons (fun c hc => ?_) hforall', ?_, hres'⟩
       · simpa [hsel] using hpsel c hc
-      · rw [hvalue, hval', List.flatten_cons, List.append_assoc, evalWord_append,
+      · intro f
+        rw [hvalue f, hval' f, List.flatten_cons, List.append_assoc, evalWord_append,
           evalWord_append, evalWord_append]
+
+/-! ## The whole process
+
+Running the levels in increasing order of cardinality exhausts the word: after
+level `k` every surviving factor has support of cardinality `> k`, and no
+support can be larger than `L` itself.
+-/
+
+variable [Fintype L]
+
+/-- All subsets of `L` of a given cardinality, as a list. -/
+noncomputable def levelList (L : Type*) [Fintype L] [DecidableEq L] (k : ℕ) :
+    List (Finset L) :=
+  (Finset.univ.powersetCard k).toList
+
+theorem card_of_mem_levelList {k : ℕ} {T : Finset L} (h : T ∈ levelList L k) : T.card = k :=
+  (Finset.mem_powersetCard.mp (Finset.mem_toList.mp h)).2
+
+theorem mem_levelList {k : ℕ} {T : Finset L} (h : T.card = k) : T ∈ levelList L k :=
+  Finset.mem_toList.mpr (Finset.mem_powersetCard.mpr ⟨Finset.subset_univ _, h⟩)
+
+/-- The list of all supports of cardinality `k, k+1, …, k+K-1`, in that order. -/
+noncomputable def supportList (L : Type*) [Fintype L] [DecidableEq L] (k K : ℕ) :
+    List (Finset L) :=
+  (List.range' k K).flatMap (levelList L)
+
+/-- **Running `K` consecutive levels.**  Starting from a word all of whose
+factors have support of cardinality at least `k`, the levels `k, …, k+K-1`
+rewrite it — without changing its value — into one exact-support block per
+support of those cardinalities, followed by a residue whose factors all have
+support of cardinality at least `k + K`. -/
+theorem split_levels (label : X → L) :
+    ∀ (K k : ℕ) (l : List (FormalCommutator X)),
+      (∀ c ∈ l, k ≤ (support label c).card) →
+      ∃ (blocks : List (List (FormalCommutator X))) (res : List (FormalCommutator X)),
+        List.Forall₂ (fun T q => ∀ c ∈ q, support label c = T) (supportList L k K) blocks ∧
+        (∀ f : X → G, evalWord f l = evalWord f (blocks.flatten ++ res)) ∧
+        ∀ c ∈ res, k + K ≤ (support label c).card := by
+  intro K
+  induction K with
+  | zero =>
+      intro k l hl
+      exact ⟨[], l, by simp [supportList], fun f => by simp, by simpa using hl⟩
+  | succ K ih =>
+      intro k l hl
+      obtain ⟨blocks₁, res₁, hforall₁, hval₁, hres₁⟩ :=
+        split_level (G := G) label k (levelList L k) (fun _ hT => card_of_mem_levelList hT) l
+          (fun c hc => ⟨hl c hc, fun hk => mem_levelList hk⟩)
+      obtain ⟨blocks₂, res₂, hforall₂, hval₂, hres₂⟩ := ih (k + 1) res₁ hres₁
+      refine ⟨blocks₁ ++ blocks₂, res₂, ?_, ?_, ?_⟩
+      · have hcat : supportList L k (K + 1) = levelList L k ++ supportList L (k + 1) K := by
+          simp [supportList, List.range'_succ]
+        rw [hcat]
+        exact List.rel_append hforall₁ hforall₂
+      · intro f
+        rw [hval₁ f, evalWord_append, hval₂ f, evalWord_append, List.flatten_append,
+          evalWord_append, evalWord_append, mul_assoc]
+      · intro c hc
+        have := hres₂ c hc
+        omega
+
+/-- **The collecting process.**  Every formal word is equal, as a group element,
+to the concatenation of one block per nonempty support, ordered by cardinality,
+the block for `S` consisting of factors whose support is exactly `S`.
+
+There is no residue: a surviving factor would need a support larger than `L`. -/
+theorem exists_split_supports (label : X → L) (l : List (FormalCommutator X)) :
+    ∃ blocks : List (List (FormalCommutator X)),
+      List.Forall₂ (fun T q => ∀ c ∈ q, support label c = T)
+        (supportList L 1 (Fintype.card L)) blocks ∧
+      ∀ f : X → G, evalWord f l = evalWord f blocks.flatten := by
+  obtain ⟨blocks, res, hforall, hval, hres⟩ :=
+    split_levels (G := G) label (Fintype.card L) 1 l
+      (fun c _ => Finset.card_pos.mpr (support_nonempty label c))
+  refine ⟨blocks, hforall, ?_⟩
+  have hnil : res = [] := by
+    rcases res with _ | ⟨c, t⟩
+    · rfl
+    · have hcard : (support label c).card ≤ Fintype.card L := by
+        simpa [Finset.card_univ] using Finset.card_le_univ (support label c)
+      exact absurd (hres c (by simp)) (by omega)
+  intro f
+  rw [hval f, hnil, List.append_nil]
 
 end Level
 
