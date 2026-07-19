@@ -90,3 +90,27 @@ c が着手するときの起点として記録する。
 ⚠ ただし `M_F` は Hall 条件が付くので `F(M) ≤ M_F` はそのままでは成り立たない可能性がある
 (§15 の `mf_eq_msigma_of_not_fittingIsTI` 等が `M_F = M_σ` を与える文脈に注意)。
 **この一段だけが実作業**で、他は既存補題の組み合わせ。
+
+## 🔎 hub 横断監査 (2026-07-19): 「教科書が誤り」と主張する箇所は 2 件のみ、いずれも根拠あり
+
+issue 0125 で「書籍に gap」注記 3 件が全て `.mmd` 由来の**私たちの誤読**だったため、
+同種の未検証な主張が他に無いか repo 全体を洗った (`誤植|typo|book is wrong|overstatement|
+does not appear to be valid|erratum` 等で grep)。
+
+**結果: 教科書自体の誤りを主張しているのは次の 2 件だけで、どちらも独立の裏付けがある。**
+
+| 箇所 | 主張 | 裏付け |
+|---|---|---|
+| `BG/Ch1_Preliminary/S06_Thm64.lean:81` | Thm 6.4 の証明 p.50 で `H ∩ L = 1` は誤植、正しくは `H ∩ N = 1` | **hub が PDF ページ画像で独立検証済** (issue 3026)。mmd/pdftotext/画像の 3 つとも同一印字 |
+| `S15_MF/OpicoreCentralizer.lean:418` | Thm 15.7(c) の等号 `M' = F(M)` は overstatement、正しくは包含 `M' ⊆ F(M)` | **MathComp `BGsection15.v` の source comment が同一の指摘**を明記 (*"the first equality of part (c) does not appear to be valid"*) — curl で独立確認済。加えて `M' = F(M) ⟺ C_Y(E₁) = 1` の還元も提示 |
+
+その他の `overstatement` 言及 (S15_BridgeCharacter / TypeBridges / TypeP1Criteria / AxiomsCheck)
+は**すべて repo 自身の過去の宣言が強すぎた**という記録で、教科書への瑕疵指摘ではない (issue 3003 系)。
+
+⟹ **未検証の「書籍が誤り」主張は残っていない。**
+
+⚠ ただし本監査で、上表 2 件目のファイル `OpicoreCentralizer.lean:414-416` に
+**本 issue が指摘した stale 段落**が現存することを再確認した
+(「Still owed to the book (issue 3022): conjunct (d) … Do **not** read this theorem as a
+complete formalization of 15.7」— (d)(e) とも landing 済で 3022 は close 済)。
+上記「やること」の該当項目は引き続き有効。
