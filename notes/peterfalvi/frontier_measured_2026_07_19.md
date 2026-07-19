@@ -38,7 +38,7 @@
 | §9 | (9.10) | **✅ 2026-07-19 解消** | trigger 形 `exceptional_case_frobenius_realization_of_trigger` (ThetaCountAssembly.lean:1146) を追加 — `caseB` carrier を仮説に取らず、`hno` だけから Clifford case (b) を選ぶ (case (a) は自身の (9.8.c) 由来の次数 `q·u` 既約元を `Cprime_le_C` + `sOf_antitone` で `𝒮(H₀C′)` へ移して `hno` と矛盾)。consumer (S12_TypeIICrossIsometryPair) の inline dispatch も解消。 |
 | §9 | (9.11) | CONFIRMED 特殊化 | `coherent_sOf_H0Cprime` (S13_Orthogonality.lean:1197) は `S13.Hypothesis M` + `IsTypeIII ∨ IsTypeIV`。type-II は §15 の S/T instance 別経路。**repo に `Hypothesis (9.5)` オブジェクトが存在しない** (§9 の仮説は S11 の 3 carrier に分散)。 |
 | §10 | (10.11) | 部分 | 第 1 主張 (|W1|,|W2| prime) は一般 (`theorem88_caseB_prime_orders`, S12_MaximalIII_IV_V.lean:1682)。type-II 残余は §15 の S/T pair instance のみ。 |
-| §11 | (11.8) | CONFIRMED 特殊化 | `exists_zeta_residual_not_orthogonal_H0C_of_refuter` (S13_Orthogonality.lean:1036) — ∃ でなく ∀ が本文形。加えて ζ が**次数 `w₁`** と `S12.inducedFamily M` に固定 + `IsTypeIII ∨ IsTypeIV`。証明本体は既に ζ-generic。 |
+| §11 | (11.8) | **✅ 2026-07-19 解消 (∀ 化)** | 教科書形は ∀ ζ (PDF p.65-67: 任意の `ζ ∈ S(HC)` に対し直交性を仮定して (11.8.4)-(11.8.6) で (11.3) と矛盾)。`zeta_residual_not_orthogonal_H0C_of_refuter` (S13_Orthogonality.lean) として ∀ 形を主定理化し、旧 `exists_zeta_...` は witness packaging の系に降格 (consumer 3 箇所は無変更)。鍵は新規 `S12.Hypothesis.exists_charParameters_full_of_zeta` — parameters を**与えられた ζ の周りで**組む。⚠ 次数 `ζ(1) = w₁` は**特殊化でない**: `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` の台条件 (`alpha_support`) がまさにそれを要求する (`n·w₁ = d − δ` + `μ_{i0}(1) = 1` ⟹ `α_{ij}(1) = 0`)。残る狭さは `S12.inducedFamily M` 固定 + `IsTypeIII ∨ IsTypeIV` のみ。 |
 | §13 | (13.8) | CONFIRMED 特殊化 (**規模大**) | 側非依存エンジンは完備 (`caseB_eta01_norm_core`/`_bound`, S15_SAndT_Setup/Machinery135.lean:908/937)。**T 側 instance のみ** (`eta10_Qsharp_norm_lower_core`, Eta10Correction.lean:361)。⚠ **「S 側 producer を 1 本書けば閉じる」は誤り (2026-07-19 実測で訂正)** — carrier 上に **`eta01` という関数がそもそも存在しない** (`grep eta01` は Machinery135 の **側非依存エンジン名/docstring** にしか当たらない; carrier が持つのは `hyp.eta10` のみ)。T 側 producer `exists_caseB_data_eta10_T_core` が依存する 4 ピース (`exists_muT_index_caseB_core` / `exists_etaT_alphaFun_one_int_core` / `Q_sharp_hypothesis76_base` / `reconciled_typePData_T`) は**いずれも S 側版が未存在**。⟹ 着手すると (i) `eta01` の定義、(ii) `P^#` 上の Hypothesis76 base、(iii) S 側 μ index core、(iv) S 側 α 関数、(v) mirror 組み立て、の 5 段になる。 |
 
 ## (5.6) エンジンの norm 一般化 (2026-07-19, lane a)
@@ -129,7 +129,7 @@ anchor `χ₁` の既約性も norm 1 も**要求していない**。証明は `
    `hdatum` 側は上記のとおり教科書 (5.2) の仮説ゆえ「無条件化」対象外。
 5. ~~(5.3.a)/(5.3.b) の一般 producer~~ **着手不要** — (5.3.a) は `irrSubcoherent` で実在、
    (5.3.b) は構成不能かつ consumer ゼロで「作らない」が既定裁定 (上記自己訂正節)。
-6. **(11.8) ∀ 化 → (6.6) の Z-generic 化** (次の frontier)。
+6. ~~(11.8) ∀ 化~~ **✅ 2026-07-19 完了**。→ **(6.6) の Z-generic 化** (次の frontier)。
 7. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
 8. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。
