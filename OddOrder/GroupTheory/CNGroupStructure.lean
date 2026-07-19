@@ -644,6 +644,22 @@ theorem isNilpotent_of_le_of_isNilpotent {H K : Subgroup G}
   haveI := hK
   exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hHK)
 
+/-- **In a CN-group, a subgroup with nontrivial centre is nilpotent.**
+
+For `1 ≠ z ∈ Z(A)` we have `A ≤ C_G(z)`, and `C_G(z)` is nilpotent by the CN hypothesis.
+
+This is the last move of Gorenstein's argument that the Hall `π(F(G))'`-subgroup `A` of
+Theorem 1.5 is nilpotent, and it reduces that claim to `Z(A) ≠ 1`.  Gorenstein gets `Z(A) ≠ 1`
+from the Frobenius-complement structure of `A` (his Theorem 10.3.1(iv)/(v)), which is the part
+still missing from this repository. -/
+theorem isNilpotent_of_centerIn_ne_bot [Finite G]
+    (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
+    {A : Subgroup G} (hZ : centerIn A ≠ ⊥) : Group.IsNilpotent ↥A := by
+  obtain ⟨z, hzne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hZ
+  have hz1 : (z : G) ≠ 1 := fun h => hzne (Subtype.ext h)
+  refine isNilpotent_of_le_of_isNilpotent (fun a ha => ?_) (hCN (z : G) hz1)
+  exact Subgroup.mem_centralizer_singleton_iff.mpr (commute_of_mem_centerIn ha z.2).eq
+
 /-- **Gorenstein Ch. 12 §1, Theorem 1.5, step 3.**
 
 In a CN-group, if `O_p(G) ≠ 1` and `F(G)` contains a nontrivial normal subgroup `N` of order
