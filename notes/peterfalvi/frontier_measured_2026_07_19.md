@@ -95,13 +95,30 @@ anchor `χ₁` の既約性も norm 1 も**要求していない**。証明は `
   で `hdatum` (と `h56`) を**パラメータとして担いでいるのは教科書に忠実**であって特殊化債務でない。
   「(6.3) standalone 無条件化」は `hanchor` の分で**完了**とみなす。
 
-**⟹ 真の未形式化はここ: (5.3) の一般 producer が repo に無い**。
-`S07.Hypothesis` (S07_Coherence/NormInequalities.lean:592) が (5.2) の carrier
-(`difference_image` = (5.2.d)、`difference_images_orthogonal` = (5.2.e)) で、docstring が
-「a carrier for later theorems, **not a proof that the hypotheses hold**」と明言している。
-producer は per-setting の ad hoc 構成のみ (S15_TSetMemberRFamily.lean:806、
-S16_NonExistenceG/TTypeIICoherence.lean:70)。**(5.3.a) / (5.3.b) を一般形で書くのが次の上流仕事**
-(§5 は §6 より文書順で上流)。(5.3.b) は §4 の (4.6)/(4.9) μ-grid に依存するので (5.3.a) が先。
+### ⚠ 「(5.3) が未形式化」は誤り — 自己訂正 (同日、着手前に実測して撤回)
+
+上記から「次の上流仕事は (5.3.a)/(5.3.b) の一般 producer を書くこと」と一旦書いたが、
+**着手前の実測で誤りと判明した**。`S07.Hypothesis` の producer を `ofIrreducible` /
+`Hypothesis.of` 等の名前で grep して 0 件だったための false negative
+([[verify-port-state-by-number-not-coq-name]] そのもの)。実際は:
+
+- **(5.3.a) は実在** = `OddOrder.Peterfalvi.S07.irrSubcoherent`
+  (`S07_Subcoherent.lean:151`)。`τ`/`A`/per-member `Rdatum`/(5.2.a,c) 述語/差の台条件/
+  格子 isometry から `S07.Hypothesis` を組む**抽象一般形**。(5.2.e) は
+  `orthogonal_of_signedDifference_inner_eq_zero` + isometry + `inner_conjugateDifference_eq_zero`
+  で導出済。consumer 実在 (例 `sSetIrrDegT_subcoherent`, S15_TSetMemberRFamily.lean:799)。
+- **(5.3.b) = Coq `prDade_subcoherent` は「作らない」が既定裁定** (`S07_Subcoherent.lean:280-300`,
+  2026-07-06 CORRECTED 注記)。理由 2 点: (i) `S07.Hypothesis.difference_image` は
+  **2 元の `CharacterDifferenceImage` を固定**するが Coq `subcoherent` の `R` は可変長
+  (既約 2 / 可約 `μ_j` は `2w₁`) ゆえ `prDade` 形の `S07.Hypothesis` は**構成不能**、
+  (ii) **consumer ゼロ** — 可約列の coherence は `S07.IsCoherent` として直接
+  (`certainType_isCoherent`, S06:505) 消費される。可約 R-datum の中身自体は
+  `S06.certainTypeR` / `columnImageFamilyCohFree` / `sixTwoDecompositionData` として
+  **既に sorry-free で存在**。
+
+⟹ **§5 (5.2)/(5.3) 層に未形式化は無い**。同 note の「Multi-session build outline」
+(`S07_Subcoherent.lean:278-345`) が §5→§9 の live な残作業の正本で、そこが指す残りは
+**(9.11) の pair-adjoining induction の `hstep` データ** (S15 に局在) であって §5 ではない。
 
 ## 推奨着手順 (上流優先 + 文書順)
 
@@ -110,9 +127,9 @@ S16_NonExistenceG/TTypeIICoherence.lean:70)。**(5.3.a) / (5.3.b) を一般形�
 3. ~~(7.9) `hdelta_even` の一般化~~ **✅ 2026-07-19 完了**。
 4. ~~(6.2) `hanchor` の一般供給~~ **✅ 2026-07-19 完了** ((5.6) エンジンの norm 一般化)。
    `hdatum` 側は上記のとおり教科書 (5.2) の仮説ゆえ「無条件化」対象外。
-5. **(5.3.a) の一般 producer** (`S ⊆ Irr L` ⟹ `S07.Hypothesis`) → **(5.3.b)** (μ-grid 版)
-   (次の frontier)。§5 は §6 より上流ゆえ (11.8)/(6.6) より先。
-6. **(11.8) ∀ 化 → (6.6) の Z-generic 化**。
+5. ~~(5.3.a)/(5.3.b) の一般 producer~~ **着手不要** — (5.3.a) は `irrSubcoherent` で実在、
+   (5.3.b) は構成不能かつ consumer ゼロで「作らない」が既定裁定 (上記自己訂正節)。
+6. **(11.8) ∀ 化 → (6.6) の Z-generic 化** (次の frontier)。
 7. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
 8. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。
