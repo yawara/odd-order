@@ -6,18 +6,19 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.PGroup
 
 /-!
-# Peterfalvi Appendix III: Suzuki 2-group definition
+# Suzuki 2-groups
 
-T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
-2000), Appendix III, Definition 1, p. 139.
+G. Higman, “Suzuki 2-groups,” *Illinois Journal of Mathematics* 7 (1963),
+79--96, p. 79.  See also T. Peterfalvi, *Character Theory for the Odd Order
+Theorem*, Appendix III, Definition 1, p. 141.
 
-This leaf contains the definition-level API shared by the Appendix III
-classification and its Part II applications.  Keeping it independent of the
-classification hub lets individual structural lemmas import the definition
-without importing the full appendix.
+This source-neutral leaf contains the definition-level API shared by Higman’s
+classification, Peterfalvi’s Appendix III restatement, and concrete groups
+whose root subgroups are Suzuki 2-groups.  The paper-specific classification
+proof lives under `OddOrder.Higman.Suzuki2Groups`.
 -/
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.GroupTheory.Suzuki2Group
 
 variable {P : Type*} [Group P]
 
@@ -31,7 +32,8 @@ def ActsRegularlyOnInvolutions (A : Subgroup (MulAut P)) : Prop :=
   ∀ x ∈ involutions P, ∀ y ∈ involutions P,
     ∃! a : ↥A, (a : MulAut P) x = y
 
-/-- **Peterfalvi Appendix III, Definition 1**: a Suzuki `2`-group is a
+/-- **Higman, Suzuki 2-groups, p. 79; Peterfalvi Appendix III, Definition 1**:
+a Suzuki `2`-group is a
 nonabelian `2`-group with at least two involutions and a cyclic group of
 automorphisms acting faithfully and regularly on its involutions.
 
@@ -43,4 +45,4 @@ def IsSuzuki2Group (P : Type*) [Group P] : Prop :=
     (∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y) ∧
     ∃ A : Subgroup (MulAut P), IsCyclic ↥A ∧ ActsRegularlyOnInvolutions A
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.GroupTheory.Suzuki2Group

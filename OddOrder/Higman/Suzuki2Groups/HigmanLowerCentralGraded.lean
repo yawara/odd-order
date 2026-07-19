@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AgemoLayers
+import OddOrder.Higman.Suzuki2Groups.AgemoLayers
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
 
 /-!
@@ -27,7 +27,7 @@ linearization, and its full-span theorem for the spectral argument.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -979,4 +979,4 @@ theorem lowerCentralCommutatorBilinear_equivariant
       (Additive.toMul u) (Additive.toMul v))
 
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

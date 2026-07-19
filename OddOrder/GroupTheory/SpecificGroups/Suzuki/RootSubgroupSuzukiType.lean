@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 import Mathlib.FieldTheory.Finite.Basic
 
 /-!
@@ -32,7 +32,7 @@ namespace OddOrder.GroupTheory.SpecificGroups.Suzuki
 
 noncomputable section
 
-open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+open OddOrder.GroupTheory.Suzuki2Group
 
 section Sylow
 

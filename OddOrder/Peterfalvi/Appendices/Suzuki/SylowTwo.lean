@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Basic
+import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
 /-!
 # Peterfalvi Part II, Ch. I §2 Corollary: Sylow 2-subgroups of Q
@@ -60,7 +60,7 @@ def conjQByK : ↥hyp.K →* MulAut ↥hyp.Q where
 `2`-subgroup of `Q` is either commutative or a Suzuki `2`-group. -/
 theorem sylowTwo_isMulCommutative_or_isSuzuki2Group (S : Sylow 2 ↥hyp.Q) :
     IsMulCommutative ↥(S : Subgroup ↥hyp.Q) ∨
-      Suzuki2Groups.IsSuzuki2Group ↥(S : Subgroup ↥hyp.Q) := by
+      OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥(S : Subgroup ↥hyp.Q) := by
   letI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
   letI hSnorm : (S : Subgroup ↥hyp.Q).Normal := inferInstance
   letI : (S : Subgroup ↥hyp.Q).Characteristic :=

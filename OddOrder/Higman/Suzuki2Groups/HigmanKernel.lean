@@ -3,8 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanIdempotentCovariance
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanNormalAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentCovariance
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalAbelian
 
 /-!
 # Higman Lemma 3: the kernel of the quotient endomorphism family
@@ -26,7 +26,9 @@ here.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -335,4 +337,4 @@ theorem actualHigmanFamily_modTwoHom_ker_eq
     exact (actualHigmanFamily_modTwo_eq_zero_iff_mem
       hP X htrans hAC hAcomm hAinv hAne hΦ ε he u F).mpr hu
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

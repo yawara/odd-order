@@ -20,7 +20,7 @@ linearly, so no incompatible elementwise choice is made.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
 
@@ -155,4 +155,4 @@ theorem exists_addEnd_eq_one_sub_two
         _ = ((1 : AddMonoid.End (Additive A)) -
             (2 • νAdd : AddMonoid.End (Additive A))) x := hsub.symm
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

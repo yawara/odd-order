@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanNormalCover
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanImageOrder
+import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
+import OddOrder.Higman.Suzuki2Groups.HigmanImageOrder
 
 /-!
 # Higman Lemma 3: final case split
@@ -20,7 +20,9 @@ the exponent of the normal abelian subgroup. The subgroup denoted
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 
@@ -891,4 +893,4 @@ theorem NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq
           classify layerNotCyclic hcard hsq F u hu hzD)
   · exact pow_four_eq_one_of_homocyclic_of_not_three_le ε he a
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups

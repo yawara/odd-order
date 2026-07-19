@@ -1,8 +1,11 @@
 # Peterfalvi Part II (A Theorem of Suzuki) — Ch. I §3 frontier
 
-正本ソース = `references/peterfalvi/05.3_pp_100_107_General_Properties_of_G.mmd`
-(pp. 100–107, "General Properties of G")。Coq crib は**無い** (math-comp/odd-order
-は Part I のみ)。行間は本文 PDF + ChatGPT。
+Peterfalvi 正本ソース =
+`references/peterfalvi/pdftotext/05.3_pp_100_107_General_Properties_of_G.txt` +
+`references/peterfalvi/pdf/05.3_pp_100_107_General_Properties_of_G.pdf`。
+Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は Part I のみ)。
+引用元の Higman 証明は `references/higman/suzuki-2-groups.pdf`、保持済み
+`pdftotext` とページ画像を正本とし、Lean 本体は `OddOrder/Higman/Suzuki2Groups/**` に置く。
 
 ファイル: `OddOrder/Peterfalvi/Appendices/Suzuki/` (hub `Suzuki.lean` は pure re-export)。
 - `Basic.lean` — 仮説 (A1)–(A3) `Hypothesis` 構造 + 記法 `K,V,W` + dictionary
@@ -381,7 +384,9 @@
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Next frontier:** §3 Lemma 5 (p. 107), the cyclicity and order bound for
-      `W` when `Q` is a Suzuki `2`-group and `st` has order three.
+    - **Higman source frontier (issue 2048):** Lemma 4 本体は `17a033729` で完了。
+      直後の scalar-extension corollary、続いて原典 Lemma 5 を進める。
+    - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
+      type-B 結論を、完成した Higman payloadへ接続する。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。

@@ -6,9 +6,9 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Basic
 import OddOrder.GroupTheory.PRank
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AgemoLayers
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanFrattiniConsequences
-import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanIdempotents
+import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+import OddOrder.Higman.Suzuki2Groups.HigmanFrattiniConsequences
+import OddOrder.Higman.Suzuki2Groups.HigmanIdempotents
 
 /-!
 # Higman Lemma 3: the actual idempotent action on `A / A²`
@@ -34,7 +34,9 @@ here.
 
 set_option autoImplicit false
 
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory.Suzuki2Group
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch03
@@ -463,4 +465,4 @@ theorem conjNormal_actor_apply_inv
 
 end ConjugationFamily
 
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+end OddOrder.Higman.Suzuki2Groups
