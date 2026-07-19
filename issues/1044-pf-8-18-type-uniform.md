@@ -87,16 +87,26 @@ type 𝒫 では A(T) ⊆ T′ という (8.10) の host がそのまま効く�
 
 ## 着手順
 
-1. `typeP_centralizer_le_and_unique`: 上記経路で `IsPiElement (κ∪σ)ᶜ x` を作り
-   `uniqueMaximal_of_kappaSigmaCompl_element` に渡す。
-   (κ∪σ)ᶜ-Hall U の存在は `Ch03.hall_E_exists` / `typeP2_exists_matched_kappa_hall_pair`。
-2. `escaping_supported_of_A1_conj_mem_typeIA` を `typeA` + `tau` パラメータ化して
-   `escaping_supported_of_A1_conj_mem_typeA` に一般化 (旧名は消して consumer を貼り替え)。
-3. (8.18.b) `exists_A1_conj_mem_typeIA_of_not_disjoint` を同様に一般化。
-   `escaping_typeIA_mem_A1` (escaping ⟹ A₁) の型一様版が要る。
+### ✅ 1-2 完了 (2026-07-20)
+
+1. **(8.12.b) の type-𝒫 半分** = `S10.typeP_centralizer_unique_of_mem_typePACore`
+   (commit 4a7c0c6ce)。上記「Hall 共役不要」経路がそのまま通った。
+1'. **(8.12.b) 型一様形** = `S10.centralizer_unique_of_mem_typeA` (commit b0b809817)。
+   Type I → `typeI_centralizer_le_and_unique`、Type II--V → type-𝒫 半分 へ dispatch。
+   κ-Hall 仮説は `tauT ≠ .I → ∀ data : TypePData T, ...` (Type I 分岐では未使用)。
+2. **(8.18.a) core の型一様化** = `S10.escaping_supported_of_A1_conj_mem_typeA`
+   (commit 2bc126ded)。旧 `..._typeIA` は一般版からの 6 行の導出に置換
+   (signature 不変 ⟹ (8.18.c) 側の consumer 無変更)。
+
+### ⛏ 残り 3-5
+
+3. (8.18.b) `exists_A1_conj_mem_typeIA_of_not_disjoint` を一般化。
+   要る型一様素材: `escaping_typeIA_mem_A1` (escaping ⟹ A₁) の型一様版、
+   および (8.17.c) `Ã₁(S) ∩ Ã₁(T) = ∅` の型一様版。
 4. (8.18.c) `ftThickenedSupport_mixed_disjoint_of_nonconjugate` を一般化。
+   `supported_sigma_coprime` ((8.13.c2) 側) の型仮定も洗う必要あり。
 5. 一般化後、`S12.Hypothesis.cross_dade_inner_eq_zero_at_pair` (canonical pair 固定の
-   (8.18.b) 適用) を一般版で置換できるか検討。
+   (8.18.b) 適用、`Section16MaximalPairCore` 依存) を一般版で置換できるか検討。
 
 ## 参照
 
