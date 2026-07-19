@@ -10550,6 +10550,16 @@ issue 9133.  Supporting results proved here:
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.commute_of_cn_of_commute_ne_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isSolvable
+-- **BG App.D display (D.2)**, general form (`GroupTheory.ThreeStepGroup`): in a 3-step group two
+-- distinct Sylow `p`-subgroups intersect in exactly `O_p(G)`.  This is the "short argument" BG
+-- leaves to the reader after invoking Corollary 1.6; the route is that the image of a Sylow
+-- `p`-subgroup in `G/O_p(G)` is a Frobenius complement, and Frobenius complements are TI.
+#assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_le_sylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylow_sup_eq_top_of_isPGroup_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylow_inf_opPPrimeCore_eq_oPiCore
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isComplement'_quotient_sylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isFrobeniusGroup_quotient_sylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.inf_sylow_eq_oPiCore
 
 /-! **Theorem 1.5 endgame** (issue 9133, completed 2026-07-19).  The fixed-point-free
 conjugation toolbox (`GroupTheory.FixedPointFreeConjugation` — Gorenstein Ch.10 §1 Lemmas

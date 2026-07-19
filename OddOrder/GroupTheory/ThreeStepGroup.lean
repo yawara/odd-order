@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
 # Three-step groups (Gorenstein, Ch. 12 §1)
@@ -38,8 +39,11 @@ formalized wholesale.
 * `IsThreeStepGroup.oPiCore_pPrime_eq_bot` — a 3-step group has `O_{p'}(G) = 1`.
 * `IsThreeStepGroup.isPGroup_quotient` / `IsThreeStepGroup.nontrivial_quotient` — for a 3-step
   group `G/O_{p,p'}(G)` is a nontrivial `p`-group.
+* `IsThreeStepGroup.inf_sylow_eq_oPiCore` — in a 3-step group two *distinct* Sylow
+  `p`-subgroups intersect in exactly `O_p(G)`.  This is BG Appendix D's display (D.2), which
+  the text obtains from "the definition of a 3-step group and a short argument".
 
-These last two are exactly the facts BG Lemma D.1 extracts from Corollary 1.6.
+These three are exactly the facts BG Lemma D.1 extracts from Corollary 1.6.
 
 ## Conventions
 
@@ -154,6 +158,63 @@ theorem oPiCore_subgroupOf_map_subtype (p : ℕ) (G : Type*) [Group G] :
     ((Ch03.oPiCore ({p} : Set ℕ) G).subgroupOf (opPPrimeCore p G)).map
         (opPPrimeCore p G).subtype = Ch03.oPiCore ({p} : Set ℕ) G :=
   Subgroup.map_subgroupOf_eq_of_le (oPiCore_le_opPPrimeCore p G)
+
+/-! ### How a Sylow `p`-subgroup sits across `O_{p,p'}(G)`
+
+Two facts about an arbitrary finite group, used below to identify the image of a Sylow
+`p`-subgroup in `G/O_p(G)` as a complement to `O_{p,p'}(G)/O_p(G)`. -/
+
+/-- `O_p(G)` lies in every Sylow `p`-subgroup: it is a normal `p`-subgroup. -/
+theorem oPiCore_le_sylow [Finite G] {p : ℕ} [Fact p.Prime] (S : Sylow p G) :
+    Ch03.oPiCore ({p} : Set ℕ) G ≤ (S : Subgroup G) := by
+  rw [Ch04.oPiCore_singleton_eq_opCore]
+  exact Ch01.opCore_le S
+
+/-- A Sylow `p`-subgroup covers every quotient of `G` that is a `p`-group. -/
+theorem sylow_sup_eq_top_of_isPGroup_quotient [Finite G] {p : ℕ} [Fact p.Prime]
+    {N : Subgroup G} [N.Normal] (hN : IsPGroup p (G ⧸ N)) (S : Sylow p G) :
+    (S : Subgroup G) ⊔ N = ⊤ := by
+  -- The image of `S` is a Sylow `p`-subgroup of the `p`-group `G/N`, hence everything.
+  have hmap : (S : Subgroup G).map (QuotientGroup.mk' N) = ⊤ := by
+    have hSyl : ((S.mapSurjective (QuotientGroup.mk'_surjective N) : Sylow p (G ⧸ N)) :
+        Subgroup (G ⧸ N)) = (S : Subgroup G).map (QuotientGroup.mk' N) :=
+      Sylow.coe_mapSurjective _ _
+    rw [← hSyl]
+    exact ((S.mapSurjective (QuotientGroup.mk'_surjective N)).3
+      (hN.to_subgroup ⊤) le_top).symm
+  have := Subgroup.comap_map_eq (QuotientGroup.mk' N) (S : Subgroup G)
+  rw [hmap, QuotientGroup.ker_mk'] at this
+  simpa using this.symm
+
+/-- A Sylow `p`-subgroup meets `O_{p,p'}(G)` exactly in `O_p(G)`: the quotient
+`O_{p,p'}(G)/O_p(G)` is a `p'`-group, so it can absorb nothing more of `S`. -/
+theorem sylow_inf_opPPrimeCore_eq_oPiCore [Finite G] {p : ℕ} [Fact p.Prime] (S : Sylow p G) :
+    (S : Subgroup G) ⊓ opPPrimeCore p G = Ch03.oPiCore ({p} : Set ℕ) G := by
+  refine le_antisymm ?_ (le_inf (oPiCore_le_sylow S) (oPiCore_le_opPPrimeCore p G))
+  set mk := QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G) with hmk
+  -- The image of `S ⊓ O_{p,p'}(G)` downstairs is a `p`-subgroup of the `p'`-group `O_{p'}`.
+  set H := ((S : Subgroup G) ⊓ opPPrimeCore p G).map mk with hH
+  have hHle : H ≤ Ch03.oPiCore {q : ℕ | q ≠ p} (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G) := by
+    rw [hH, ← opPPrimeCore_map_mk_eq p G]
+    exact Subgroup.map_mono inf_le_right
+  have hHp : IsPGroup p ↥H := (S.2.to_inf_left (K := opPPrimeCore p G)).map mk
+  have hHbot : H = ⊥ := by
+    refine eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl (π := {q : ℕ | q ≠ p}) hHle ?_ ?_
+    · exact fun r hr => Ch03.oPiCore.isPiGroup {q : ℕ | q ≠ p} r hr
+    · intro r hr
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hHp
+      rw [hk] at hr
+      obtain ⟨hrp, hrdvd, -⟩ := Nat.mem_primeFactors.mp hr
+      have hrp' : r = p := (Nat.prime_dvd_prime_iff_eq hrp Fact.out).mp
+        (hrp.dvd_of_dvd_pow hrdvd)
+      simp [hrp']
+  -- A trivial image means `S ⊓ O_{p,p'}(G)` sits inside the kernel `O_p(G)`.
+  intro x hx
+  have : mk x = 1 := by
+    have : mk x ∈ H := Subgroup.mem_map_of_mem _ hx
+    rw [hHbot, Subgroup.mem_bot] at this
+    exact this
+  rwa [hmk, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at this
 
 /-! ## A general Frobenius lemma
 
@@ -286,6 +347,124 @@ Immediate from the proper inclusion `G ⊋ O_{p,p'}(G)`. -/
 theorem nontrivial_quotient (h : IsThreeStepGroup G p) :
     Nontrivial (G ⧸ opPPrimeCore p G) := by
   exact QuotientGroup.nontrivial_iff.mpr h.opPPrimeCore_ne_top
+
+/-! ### Consequence (c): distinct Sylow `p`-subgroups meet exactly in `O_p(G)`
+
+BG Appendix D derives the displayed identity `P ∩ Q = O_p(M)` (D.2) from "the definition of a
+3-step group and a short argument".  This is that argument, in the generality it proves.
+
+The image `S̄` of a Sylow `p`-subgroup in `Ḡ = G/O_p(G)` is a *complement* to the Frobenius
+kernel `K̄ = O_{p,p'}(G)/O_p(G)`: it meets `K̄` trivially because `S ⊓ O_{p,p'}(G) = O_p(G)`
+(`sylow_inf_opPPrimeCore_eq_oPiCore`) and it covers `Ḡ/K̄ ≅ G/O_{p,p'}(G)`, a `p`-group by
+consequence (b).  A complement to a Frobenius kernel is automatically a *Frobenius* complement,
+because the Frobenius condition can be read off the kernel alone (`C_Ḡ(k) ≤ K̄` for `1 ≠ k ∈ K̄`,
+Isaacs Thm 6.4 (4)).  Frobenius complements form a trivial-intersection family
+(Isaacs Thm 6.4 (1) ⇒ (2)), so distinct `S̄`, `T̄` meet trivially — which upstairs says that
+`S ⊓ T` is exactly the kernel `O_p(G)` of the quotient map. -/
+
+/-- In a 3-step group the image of a Sylow `p`-subgroup in `G/O_p(G)` is a complement to the
+Frobenius kernel `O_{p,p'}(G)/O_p(G)`. -/
+theorem isComplement'_quotient_sylow [Finite G] [Fact p.Prime] (h : IsThreeStepGroup G p)
+    (S : Sylow p G) :
+    Subgroup.IsComplement'
+      ((opPPrimeCore p G).map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G)))
+      ((S : Subgroup G).map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G))) := by
+  set mk := QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G) with hmk
+  have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective _
+  have hker : mk.ker = Ch03.oPiCore ({p} : Set ℕ) G := QuotientGroup.ker_mk' _
+  have hkerS : mk.ker ≤ (S : Subgroup G) := by rw [hker]; exact oPiCore_le_sylow S
+  have hkerK : mk.ker ≤ opPPrimeCore p G := by rw [hker]; exact oPiCore_le_opPPrimeCore p G
+  haveI hKnormal : ((opPPrimeCore p G).map mk).Normal := by
+    rw [hmk, opPPrimeCore_map_mk_eq]; infer_instance
+  have hdisj : Disjoint ((opPPrimeCore p G).map mk) ((S : Subgroup G).map mk) := by
+    rw [disjoint_iff]
+    refine Subgroup.comap_injective hsurj ?_
+    rw [Subgroup.comap_inf, Subgroup.comap_map_eq_self hkerK, Subgroup.comap_map_eq_self hkerS,
+      MonoidHom.comap_bot, hker, inf_comm]
+    exact sylow_inf_opPPrimeCore_eq_oPiCore S
+  have hsup : (opPPrimeCore p G).map mk ⊔ (S : Subgroup G).map mk = ⊤ := by
+    rw [sup_comm, ← Subgroup.map_sup,
+      sylow_sup_eq_top_of_isPGroup_quotient h.isPGroup_quotient S]
+    exact Subgroup.map_top_of_surjective mk hsurj
+  refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj ?_
+  rw [← Subgroup.normal_mul, hsup]
+  rfl
+
+/-- In a 3-step group the image of *any* Sylow `p`-subgroup in `G/O_p(G)` is a Frobenius
+complement to `O_{p,p'}(G)/O_p(G)`.
+
+Condition (3) of the definition supplies *some* complement `B`; the Frobenius property it
+carries is a statement about the kernel alone, so it transfers to the Sylow image. -/
+theorem isFrobeniusGroup_quotient_sylow [Finite G] [Fact p.Prime] (h : IsThreeStepGroup G p)
+    (S : Sylow p G) :
+    Ch06.IsFrobeniusGroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)
+      ((opPPrimeCore p G).map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G)))
+      ((S : Subgroup G).map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G))) := by
+  obtain ⟨B, hB⟩ := h.frobenius_quotient
+  refine Ch06.IsFrobeniusGroup.of_centralizer_kernel_le hB.isNormal
+    (h.isComplement'_quotient_sylow S) hB.ne_bot_kernel ?_ hB.centralizer_kernel_le
+  -- The Sylow image is nontrivial: otherwise `S ≤ O_{p,p'}(G)`, forcing `O_{p,p'}(G) = ⊤`.
+  intro hbot
+  refine h.opPPrimeCore_ne_top ?_
+  have hSle : (S : Subgroup G) ≤ opPPrimeCore p G := by
+    intro x hx
+    have hmem : (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G)) x ∈
+        (S : Subgroup G).map (QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G)) :=
+      Subgroup.mem_map_of_mem _ hx
+    rw [hbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hmem
+    exact oPiCore_le_opPPrimeCore p G hmem
+  have hsup := sylow_sup_eq_top_of_isPGroup_quotient h.isPGroup_quotient S
+  rwa [sup_eq_right.mpr hSle] at hsup
+
+/-- **BG Appendix D, display (D.2)** in its general form: in a 3-step group two *distinct* Sylow
+`p`-subgroups intersect in exactly `O_p(G)`.
+
+This is the "short argument" BG leaves to the reader after invoking Gorenstein's Corollary
+1.6. -/
+theorem inf_sylow_eq_oPiCore [Finite G] [Fact p.Prime] (h : IsThreeStepGroup G p)
+    {S T : Sylow p G} (hST : (S : Subgroup G) ≠ (T : Subgroup G)) :
+    (S : Subgroup G) ⊓ (T : Subgroup G) = Ch03.oPiCore ({p} : Set ℕ) G := by
+  set mk := QuotientGroup.mk' (Ch03.oPiCore ({p} : Set ℕ) G) with hmk
+  have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective _
+  have hker : mk.ker = Ch03.oPiCore ({p} : Set ℕ) G := QuotientGroup.ker_mk' _
+  have hkerS : mk.ker ≤ (S : Subgroup G) := by rw [hker]; exact oPiCore_le_sylow S
+  have hkerT : mk.ker ≤ (T : Subgroup G) := by rw [hker]; exact oPiCore_le_sylow T
+  set Sbar : Sylow p (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G) := S.mapSurjective hsurj with hSbar
+  set Tbar : Sylow p (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G) := T.mapSurjective hsurj with hTbar
+  have hScoe : (Sbar : Subgroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) =
+      (S : Subgroup G).map mk := by rw [hSbar]; simp
+  have hTcoe : (Tbar : Subgroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) =
+      (T : Subgroup G).map mk := by rw [hTbar]; simp
+  -- The two images are distinct (both contain the kernel, so `comap` undoes `map`).
+  have hne : (Sbar : Subgroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) ≠
+      (Tbar : Subgroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) := by
+    rw [hScoe, hTcoe]
+    intro hEq
+    refine hST ?_
+    have hcomap := congrArg (Subgroup.comap mk) hEq
+    rwa [Subgroup.comap_map_eq_self hkerS, Subgroup.comap_map_eq_self hkerT] at hcomap
+  -- Downstairs they are conjugate Sylow subgroups, and Frobenius complements are TI.
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G) Sbar Tbar
+  have hconj : (Tbar : Subgroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) =
+      Subgroup.map (MulAut.conj g).toMonoidHom
+        (Sbar : Subgroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) := by
+    rw [← hg, Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def]
+    rfl
+  have hgnot : g ∉ (Sbar : Subgroup (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G)) := by
+    intro hgmem
+    refine hne ?_
+    rw [hconj]
+    ext x
+    simp only [Subgroup.mem_map, MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
+    refine ⟨fun hx => ⟨g⁻¹ * x * g, mul_mem (mul_mem (inv_mem hgmem) hx) hgmem, by group⟩, ?_⟩
+    rintro ⟨y, hy, rfl⟩
+    exact mul_mem (mul_mem hgmem hy) (inv_mem hgmem)
+  have hTI := (h.isFrobeniusGroup_quotient_sylow S).trivialIntersection g (hScoe ▸ hgnot)
+  rw [← hScoe, ← hconj] at hTI
+  -- Pull the trivial intersection back through the quotient map.
+  have hpull := congrArg (Subgroup.comap mk) hTI
+  rwa [Subgroup.comap_inf, hScoe, hTcoe, Subgroup.comap_map_eq_self hkerS,
+    Subgroup.comap_map_eq_self hkerT, MonoidHom.comap_bot, hker] at hpull
 
 /-! ### Gorenstein Lemma 1.4 (solvability half)
 
