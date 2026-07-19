@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.RepresentationTheory.Irreducible
 import OddOrder.GroupTheory.Homocyclic
+import OddOrder.GroupTheory.PRank
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
 
@@ -48,6 +50,11 @@ noncomputable def agemoSuccQuotientAction
   let hHnext : IsAInvariant φ (Agemo A 2 (s + 1)) :=
     IsAInvariant.of_characteristic φ
   exact (hHs.subgroupOf hHnext).quotientMulAutHom
+
+/-- The `s`-th successive Agemo quotient. -/
+abbrev AgemoSuccQuotient (A : Type*) [CommGroup A] (s : ℕ) :=
+  ↥(Agemo A 2 s) ⧸
+    (Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)
 
 /-! ## Power maps from the zeroth factor -/
 
@@ -125,6 +132,136 @@ theorem agemoZeroQuotientToSuccPowHom_equivariant
     ((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)))
   apply Subtype.ext
   simp [agemoZeroToLayerPowHom, map_pow]
+
+/-! ## Elementary-abelian and linear-representation bridge -/
+
+/-- Every successive Agemo quotient has exponent two. -/
+theorem agemoSuccQuotient_two_nsmul_eq_zero
+    {A : Type*} [CommGroup A] (s : ℕ)
+    (q : Additive (AgemoSuccQuotient A s)) : 2 • q = 0 := by
+  obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective q.toMul
+  apply Additive.toMul.injective
+  change q.toMul ^ 2 = 1
+  rw [← hx, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff,
+    agemo_succ_subgroupOf_eq_agemo_one]
+  exact Agemo.mem_of_eq_pow x
+
+/-- Each successive Agemo quotient is an elementary abelian `2`-group. -/
+theorem agemoSuccQuotient_isElementaryAbelian
+    {A : Type*} [CommGroup A] (s : ℕ) :
+    IsElementaryAbelian 2 (AgemoSuccQuotient A s) := by
+  refine ⟨fun x y ↦ mul_comm x y, ?_⟩
+  intro q
+  apply Additive.ofMul.injective
+  simpa [ofMul_pow] using
+    agemoSuccQuotient_two_nsmul_eq_zero s (Additive.ofMul q)
+
+/-- Canonical `F₂`-module structure on a successive Agemo quotient. -/
+noncomputable instance agemoSuccQuotientModTwoModule
+    {A : Type*} [CommGroup A] (s : ℕ) :
+    Module (ZMod 2) (Additive (AgemoSuccQuotient A s)) :=
+  AddCommGroup.zmodModule (agemoSuccQuotient_two_nsmul_eq_zero s)
+
+/-- A multiplicative automorphism of an elementary abelian `2`-group as a
+linear equivalence of its additive copy. -/
+noncomputable def mulAutToZModTwoLinearEquiv
+    {M : Type*} [CommGroup M] [Module (ZMod 2) (Additive M)] :
+    MulAut M ≃* (Additive M ≃ₗ[ZMod 2] Additive M) :=
+  (AddEquiv.toMultiplicativeLeft (AddAutAdditive (G := M))).symm.trans
+    AddAut.toZModLinearEquiv
+
+/-- The action on a successive Agemo quotient, viewed as an `F₂`
+representation. -/
+noncomputable def agemoSuccQuotientRepresentation
+    {A X : Type*} [CommGroup A] [Group X]
+    (φ : X →* MulAut A) (s : ℕ) :
+    Representation (ZMod 2) X (Additive (AgemoSuccQuotient A s)) where
+  toFun g :=
+    (mulAutToZModTwoLinearEquiv
+      (agemoSuccQuotientAction φ s g)).toLinearMap
+  map_one' := by
+    rw [map_one]
+    exact Module.End.one_eq_id.symm
+  map_mul' g h := by
+    simp [mulAutToZModTwoLinearEquiv, agemoSuccQuotientAction]
+
+/-- Linear form of the actual zeroth-to-`s`-th power homomorphism. -/
+noncomputable def agemoZeroToSuccLinearMap
+    {A : Type*} [CommGroup A] (s : ℕ) :
+    Additive (AgemoSuccQuotient A 0) →ₗ[ZMod 2]
+      Additive (AgemoSuccQuotient A s) :=
+  (agemoZeroQuotientToSuccPowHom s).toAdditive.toZModLinearMap 2
+
+@[simp] theorem agemoZeroToSuccLinearMap_apply
+    {A : Type*} [CommGroup A] (s : ℕ)
+    (q : Additive (AgemoSuccQuotient A 0)) :
+    agemoZeroToSuccLinearMap s q =
+      Additive.ofMul (agemoZeroQuotientToSuccPowHom s q.toMul) :=
+  rfl
+
+/-- The linear power map is surjective. -/
+theorem agemoZeroToSuccLinearMap_surjective
+    {A : Type*} [CommGroup A] (s : ℕ) :
+    Function.Surjective (agemoZeroToSuccLinearMap (A := A) s) := by
+  intro q
+  obtain ⟨r, hr⟩ :=
+    agemoZeroQuotientToSuccPowHom_surjective s q.toMul
+  refine ⟨Additive.ofMul r, ?_⟩
+  apply Additive.toMul.injective
+  exact hr
+
+/-- The linear power map intertwines the zeroth and `s`-th quotient
+representations. -/
+theorem agemoZeroToSuccLinearMap_equivariant
+    {A X : Type*} [CommGroup A] [Group X]
+    (φ : X →* MulAut A) (s : ℕ) (g : X)
+    (q : Additive (AgemoSuccQuotient A 0)) :
+    agemoZeroToSuccLinearMap s
+        (agemoSuccQuotientRepresentation φ 0 g q) =
+      agemoSuccQuotientRepresentation φ s g
+        (agemoZeroToSuccLinearMap s q) := by
+  apply Additive.toMul.injective
+  exact agemoZeroQuotientToSuccPowHom_equivariant φ s g q.toMul
+
+/-- If the zeroth Agemo factor is irreducible, every nontrivial successive
+factor is equivariantly linearly equivalent to it.  This is the precise
+power-factor step used in Higman's `ξ`-composition-factor argument. -/
+theorem exists_agemoZero_linearEquiv_succ_of_irreducible
+    {A X : Type*} [CommGroup A] [Group X]
+    (φ : X →* MulAut A) (s : ℕ)
+    (hirr : Representation.IsIrreducible
+      (agemoSuccQuotientRepresentation φ 0))
+    [Nontrivial (AgemoSuccQuotient A s)] :
+    ∃ e : Additive (AgemoSuccQuotient A 0) ≃ₗ[ZMod 2]
+        Additive (AgemoSuccQuotient A s),
+      ∀ g q,
+        e (agemoSuccQuotientRepresentation φ 0 g q) =
+          agemoSuccQuotientRepresentation φ s g (e q) := by
+  let f : Representation.IntertwiningMap
+      (agemoSuccQuotientRepresentation φ 0)
+      (agemoSuccQuotientRepresentation φ s) :=
+    (agemoZeroToSuccLinearMap s).intertwiningMap_of_isIntertwiningMap
+      (agemoSuccQuotientRepresentation φ 0)
+      (agemoSuccQuotientRepresentation φ s)
+      (agemoZeroToSuccLinearMap_equivariant φ s)
+  letI : Representation.IsIrreducible
+      (agemoSuccQuotientRepresentation φ 0) := hirr
+  have hsurj : Function.Surjective f := by
+    change Function.Surjective (agemoZeroToSuccLinearMap (A := A) s)
+    exact agemoZeroToSuccLinearMap_surjective s
+  have hfne : f ≠ 0 := by
+    intro hf
+    have hlin : f.toLinearMap = 0 :=
+      congrArg Representation.IntertwiningMap.toLinearMap hf
+    exact LinearMap.ne_zero_of_surjective hsurj hlin
+  have hinj : Function.Injective f :=
+    (Representation.IsIrreducible.injective_or_eq_zero f).resolve_right hfne
+  let e : Additive (AgemoSuccQuotient A 0) ≃ₗ[ZMod 2]
+      Additive (AgemoSuccQuotient A s) :=
+    LinearEquiv.ofBijective f.toLinearMap ⟨hinj, hsurj⟩
+  refine ⟨e, ?_⟩
+  intro g q
+  exact agemoZeroToSuccLinearMap_equivariant φ s g q
 
 /-- The power-map equivalence from a successive Agemo quotient to the last
 nontrivial layer intertwines the induced and restricted actions. -/

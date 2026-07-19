@@ -302,14 +302,6 @@ noncomputable def actualAgemoOneQuotientAction
     (φ : X →* MulAut A) : X →* MulAut (A ⧸ Agemo A 2 1) :=
   (IsAInvariant.of_characteristic φ).quotientMulAutHom
 
-/-- A multiplicative automorphism as a `ZMod 2`-linear equivalence on its
-additive copy. -/
-noncomputable def mulAutToZModTwoLinearEquiv
-    {M : Type*} [CommGroup M] [Module (ZMod 2) (Additive M)] :
-    MulAut M ≃* (Additive M ≃ₗ[ZMod 2] Additive M) :=
-  (AddEquiv.toMultiplicativeLeft (AddAutAdditive (G := M))).symm.trans
-    AddAut.toZModLinearEquiv
-
 /-- The actual `A/A²` action as a representation over `ZMod 2`. -/
 noncomputable def actualAgemoOneQuotientRepresentation
     {A X : Type*} [CommGroup A] [Group X]
