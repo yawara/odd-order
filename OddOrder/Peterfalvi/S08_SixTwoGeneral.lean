@@ -798,11 +798,17 @@ theorem inducedKernelFamily_nonempty_of_commutator_ne_top {X : Subgroup ↥L}
   exact ⟨φ, hφ⟩
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
-/-- **The degree-`|L:K|` anchor from a non-invariant linear source** (the `hanchor` discharge):
-a degree-one source `θ ∈ Irr K` trivial on `X` whose inertia group in `L` is exactly `K`
-induces to an *irreducible* member of `S(X)` of degree `|L:K|` ([Is] Thm 6.34,
+/-- **The degree-`|L:K|` anchor from a non-invariant linear source**: a degree-one source
+`θ ∈ Irr K` trivial on `X` whose inertia group in `L` is exactly `K` induces to an *irreducible*
+member of `S(X)` of degree `|L:K|` ([Is] Thm 6.34,
 `isIrreducibleCharacter_induce_of_inertia_eq`).  In the §11 application the inertia condition
-is the nontrivial `W₁`-action on the linear characters of `K/X`. -/
+is the nontrivial `W₁`-action on the linear characters of `K/X`.
+
+⚠ **No longer the `hanchor` discharge** (2026-07-19): `hanchor` was weakened to the textbook form
+("`S(A')` contains a *character* of degree `|L:K|`", Peterfalvi (6.2) p. 30) once the (5.6) engine
+became norm-general, and is now discharged by `exists_inducedKernelFamily_member_degree_index`
+with no inertia input.  This theorem survives on its own merits — irreducibility of `Ind_K^L θ`
+is used elsewhere (`S12_Section9Counts`, `S12_TypeVCaseC`, `S13_MaximalIII_IVBasic`). -/
 theorem exists_anchor_of_linear_of_inertia_eq {X : Subgroup ↥L}
     (θ : IrreducibleCharacter ↥K)
     (hθne : θ ≠ trivialIrreducibleCharacter ↥K)

@@ -9321,7 +9321,8 @@ model transports along `U.subgroupOf (U ⊔ W₁) ≃ U`; no legacy opaque `fiel
 -- `M_σ ⊓ C(W₁) = W₂` (with `M_σ` `S`-invariant) gives the order.  No character theory; this is the
 -- group-theoretic half that, paired with the §11 reduction `w₂ < w₁`, closes the unique bare
 -- `feitThompson` sorry `card_kappaHall_lt_of_isTypeIIIorIV` (whose residual is now the genuine
--- Peterfalvi (11.8) refuter core `S13.exists_zeta_residual_not_orthogonal_H0C_of_refuter` — the
+-- Peterfalvi (11.8) refuter core `S13.zeta_residual_not_orthogonal_H0C_of_refuter` (the book's
+-- `∀ ζ` form; `exists_zeta_...` is its witness packaging) — the
 -- §14 Sibley glue (6.7)/(5.8) and the (9.11) caseA refuter, issues 1019/1020); it also supplies,
 -- with
 -- `typeP_duality`, the (8.8) Type-II partner `S10.exists_typeII_maximal_with_w2_of_typeP`.
