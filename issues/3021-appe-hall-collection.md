@@ -60,3 +60,53 @@ Hall collecting process (一般 class ≤ p−1) を形式化 → E.1 一般形 
 - 既存特殊例: `GroupTheory.mul_pow_eq_commutator_pow_mul_of_class_le_two` (CriticalSubgroup.lean:657)、
   `GroupTheory.Omega.pow_eq_one_of_class_le_two`。
 - 関連: issue 3020 (App.D の Gorenstein §14.1 ブロッカー)。
+
+## ⭐ 2026-07-20: E.1 / E.2(a) / E.2(b) 完了 — AppE sorry 9 → 7
+
+- **E.1** (`hallCollection`) = Hall–Petresco 公式。Mann ルートで証明 (issue 9132、close 相当)。
+  一般形 `GroupTheory.HallPetresco.exists_hallPetresco` は **m 生成元**・冪零性の仮定なし。
+- **E.2 Step 1** = `GroupTheory.pow_mul_pow_eq_pow_of_commutator_exponent` (一般形、
+  AppE の特殊形は削除して重複解消)。
+- **E.2(a)(b)** = `omega_pow_eq_one_of_lowerCentralSeries_eq_bot` /
+  `pow_mul_of_commutator_le_omega`。issue 9400 (`GroupTheory/RegularPGroup.lean`) の
+  `pow_mul_eq_one_of_class_lt` 経由。⚠ **`IsPGroup` 仮説は未使用だったので両方から削除**
+  (特殊化債務の返済)。
+
+すべて sorry-free / axiom-clean。依存グラフの根 (E.1) と第 2 段 (E.2) が開いた。
+
+## 残り 7 sorry と、E.3(b) の前提の実測 (2026-07-20)
+
+| 宣言 | 書籍 |
+|---|---|
+| `RegularOperatorSetup.omega_pow_eq_one` | E.3(b) 第 1 節 (Ω₁(R) の指数が p) |
+| `RegularOperatorSetup.R₀_not_le_derived_omega` | E.3(b) 第 2 節 |
+| `RegularOperatorSetup.card_omega_abelianization` | E.3(b) 第 3 節 (`|Ω₁/Ω₁'| = p²`) |
+| `RegularOperatorSetup.card_omega_le` | E.3(c) (`|Ω₁(R)| ≤ p^q`) |
+| `RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini` | E.3(d) |
+| `RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p` | E.4 |
+| `maximalSubgroups_isTypeI_or_isTypeII` | E.5 |
+
+### ⭐ E.3(b) Step 2 の前提は**全部 repo に在る** (新規 infra は不要)
+
+BG 原文 (pdftotext L7922-8010) の Step 2 が使うもの:
+
+| BG の引用 | repo の所在 |
+|---|---|
+| `SCN(S)` / `IsSCN₃` | `Ch1_Preliminary/S04_SmallRankBasic.lean:1041` |
+| Lemma 4.5 | `Ch1_Preliminary/S04_PGroupsSmallRank.lean` (1043, 1372 で使用) |
+| **Lemma 5.2** (`T = C_R(W)` の中心構造) | `Ch1_Preliminary/S05_NarrowSCN.lean:422` 以降 |
+| **Theorem 5.3(d)** | `S05_Narrow*` 群 (Ch3 の `S12_Corollary1214.lean:292` が引用) |
+| Theorem 5.5 の (5.5) 以降の鎖 | `Ch1_Preliminary/S05_NarrowAutomorphisms.lean:418` 以降 |
+| **Proposition E.2** | ✅ 本 issue で今回完了 |
+
+⟹ **E.3(b) は組み立て作業**であって、新しい基盤の構築ではない。Step 2 の筋:
+`|S| ≥ p⁴` と仮定 → `V ∈ SCN(S)` から `r(S) ≥ 3` → `Z = Ω₁(Z(S))` に対し `|Z| = p`,
+`C_S(R₀) = R₀ × Z` → S は narrow → Lemma 5.2 + Thm 5.3(d) で `T char S`,
+`|S:T| = |C_T(R₀)| = p`, `R₀ ∩ T = 1` → Thm 5.5 の鎖で A-不変列 `T = H₀ ⊃ … ⊃ Hₙ = 1`
+(`|H_{i-1}:H_i| = p`) → `H₁ = S₂` かつ `|S/S'| = p²` (E.7) → 帰納で `H_i = S_{i+1}`。
+
+### 次段の着手順
+
+E.3(b) 第 1 節 (`omega_pow_eq_one`) が E.3 全体の入口。上表の repo 補題を実測で
+名前確認してから Step 2 を組む。E.3(c) は Step 2 の固有値計数、E.3(d) は Step 4
+(Schur–Zassenhaus)、E.4 は E.3 を全部消費、E.5 は §14 counting + Cor 15.9。
