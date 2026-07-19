@@ -12,7 +12,7 @@
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
 > a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S'   # 2026-07-19 11:29 恒久復帰 (issue 9154)
-> b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
+> b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有
 > c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```

@@ -90,3 +90,13 @@ Higman Lemmas 1--13 と分類終端を原文順に完遂する。上記の hub �
 ## 参照
 - issue 2048 (Suzuki Lemma 5 = b の frontier) / 9160 (leaf 粒度) / 9161 (同型の dedup、実施済)
 - CLAUDE.md「進捗の測り方」(opaque-Prop scaffold / 特殊化債務 / 低優先繰延)
+
+## 2026-07-19 夕 hub 検証 (合流 tick)
+
+③ の「ユーザー裁定: 継続」を hub が独立検証した。b (codex) セッションのトランスクリプト
+(`~/.codex/sessions/2026/07/19/rollout-2026-07-19T17-25-*.jsonl`) に実ユーザー発言
+「higmanの証明を進めしょう。文献を明らかにするためにBG, Isaacs, Peterfalviに続きちゃんと
+モジュールを切る？…」を確認 — ③ の裁定と三層 module 境界 (GroupTheory/SpecificGroups/Suzuki2Group /
+OddOrder/Higman / Pf Appendices) は正規。step 1.5 の正本 regex (merge_monitor.md 冒頭ブロック) の
+b_re に `^OddOrder/Higman/` 等を hub が反映済 (b はレーン表のみ更新していたので二重管理分を同期)。
+merge a07d32aab で合流。
