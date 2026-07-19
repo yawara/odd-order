@@ -655,12 +655,6 @@ theorem nineElevenPairBound [Finite G]
     · rw [if_neg hij]
       exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
         (hmemfam i) (hmemfam j) (fun h => hij (hinj h))
-  have hanchorNorm : (ClassFunction.inner (χmem i₁) (χmem i₁)).re = 1 := by
-    have hval : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
-      have h := irreducibleCharacter_inner_eq_ite
-        (⟨χmem i₁, hχ₁irr⟩ : IrreducibleCharacter ↥M) ⟨χmem i₁, hχ₁irr⟩
-      rwa [if_pos rfl] at h
-    rw [hval, Complex.one_re]
   -- ── fire the norm-weighted (5.6) engine (contrapositive of `xAdjoinStepW_k`)
   have hbound := OddOrder.Peterfalvi.S08.coherentDegreeSqNormBound_of_not_coherentW_k
     hyp.base.dadeData.dade hyp.base.hconj cohS₂
@@ -670,7 +664,7 @@ theorem nineElevenPairBound [Finite G]
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
     hmemdegdiffsupp (fun j _ => hmemS1set j)
     (fun j => (ClassFunction.inner (χmem j) (χmem j)).re) (fun j _ => hmcpos j)
-    (fun i _ j _ => hmemortho i j) hanchorNorm
+    (fun i _ j _ => hmemortho i j)
     (fun i _ => Dfun (χmem i) (hmemS1set i))
     Da hDatau1
     (fun i _ => hDorth (χmem i) (hmemS1set i))

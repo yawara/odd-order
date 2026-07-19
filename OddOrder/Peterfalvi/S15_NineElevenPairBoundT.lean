@@ -457,12 +457,6 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
     · rw [if_neg hij]
       exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
         (hmemfam i) (hmemfam j) (fun h => hij (hinj h))
-  have hanchorNorm : (ClassFunction.inner (χmem i₁) (χmem i₁)).re = 1 := by
-    have hval : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
-      have h := irreducibleCharacter_inner_eq_ite
-        (⟨χmem i₁, hχ₁irr⟩ : IrreducibleCharacter ↥hyp.T) ⟨χmem i₁, hχ₁irr⟩
-      rwa [if_pos rfl] at h
-    rw [hval, Complex.one_re]
   have hχcnotS₂ : (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
       (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)).conj
         ∉ S₂ := by
@@ -621,7 +615,7 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
     hmemdegdiffsupp (fun j _ => hmemS1set j)
     (fun j => (ClassFunction.inner (χmem j) (χmem j)).re) (fun j _ => hmcpos j)
-    (fun i _ j _ => hmemortho i j) hanchorNorm
+    (fun i _ j _ => hmemortho i j)
     (fun i _ => (memberDatum i).1)
     Da hDatau1 hortho_mem (fun i _ => (memberDatum i).2.2)
     hdiffasuppχ htau1ψ ha1 hSgen hgen hnc

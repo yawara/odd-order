@@ -479,7 +479,7 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
     (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
-    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁) (hχ₁irr : IsIrreducibleCharacter χ₁)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
     (hχ₁deg : χ₁ 1 = (K.index : ℂ))
     {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
     (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
@@ -540,12 +540,6 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
       rw [one_mul, ← hdegeq i₁, hχ₁deg]
     have h1 := mul_right_cancel₀ hKidx_ne h
     exact_mod_cast h1
-  have hanchorNorm : mc i₁ = 1 := by
-    have hval : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
-      have h := irreducibleCharacter_inner_eq_ite
-        (⟨χmem i₁, hχ₁irr⟩ : IrreducibleCharacter ↥L) ⟨χmem i₁, hχ₁irr⟩
-      rwa [if_pos rfl] at h
-    simp only [hmc, hval, Complex.one_re]
   -- (5) break-character fields
   obtain ⟨hreal, hψψne, hψbψbne, hψbψ, hψψb, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
     inducedKernelFamily_breakChar_fields hodd hKsupp hS₁sub hψB hψnotS1 hψcnotS1
@@ -590,7 +584,7 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
     ψ hdiffsuppψ hψψne hψbψbne hψψb hψbψ hψ_S1 hψbar_S1
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
     hmemdegdiffsupp (fun j _ => hmemS1set j) mc (fun j _ => hmcpos j)
-    (fun i _ j _ => hmemortho i j) hanchorNorm
+    (fun i _ j _ => hmemortho i j)
     (fun χ hχ => (datum (χmem χ) (hmemS1set χ)).1)
     Da hDatau1
     (fun i _ => (datum (χmem i) (hmemS1set i)).2.1)
@@ -635,7 +629,7 @@ theorem inducedKernelFamily_SA_sum_le_two_psi_k
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {A' : Subgroup ↥L} [A'.Normal] (hSAsub : inducedKernelFamily K A' ⊆ S₁)
-    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁) (hχ₁irr : IsIrreducibleCharacter χ₁)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
     (hχ₁deg : χ₁ 1 = (K.index : ℂ))
     {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
     (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
@@ -660,7 +654,7 @@ theorem inducedKernelFamily_SA_sum_le_two_psi_k
   classical
   obtain ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, hfambound⟩ :=
     inducedKernelFamily_degreeSqNormReBound_of_break_k hyp hconj hodd hKsupp h1A hS₁sub hS₁fin
-      hS₁coh hχ₁S₁ hχ₁irr hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da hDatau1 datum hnc
+      hS₁coh hχ₁S₁ hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da hDatau1 datum hnc
   have hSAsum := sum_re_div_normSq_inducedKernelFamily_eq (K := K) (X := A')
   set SAfilt := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
           (↑(A'.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -993,8 +987,7 @@ theorem exists_source_index_le_two_psi_of_break
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     {A' B : Subgroup ↥L} [A'.Normal]
-    (hanchor : ∃ χ₁ ∈ inducedKernelFamily K A',
-      IsIrreducibleCharacter χ₁ ∧ χ₁ 1 = (K.index : ℂ))
+    (hanchor : ∃ χ₁ ∈ inducedKernelFamily K A', χ₁ 1 = (K.index : ℂ))
     (hSBne : (inducedKernelFamily K B).Nonempty)
     (hdatum : ∀ (S₁ : Set (ClassFunction ↥L ℂ)),
       OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
@@ -1030,7 +1023,7 @@ theorem exists_source_index_le_two_psi_of_break
       (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤
         2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re := by
   classical
-  obtain ⟨χ₁, hχ₁A', hχ₁irr, hχ₁deg⟩ := hanchor
+  obtain ⟨χ₁, hχ₁A', hχ₁deg⟩ := hanchor
   -- the nonzero supported witness for `ℤ[S(B)]`: a conjugate difference of any member.
   obtain ⟨φ₀, hφ₀⟩ := hSBne
   have hne : ∃ φ : ClassFunction ↥L ℂ,
@@ -1072,7 +1065,7 @@ theorem exists_source_index_le_two_psi_of_break
     χ₁ (hSaS₁ hχ₁A') a hψdeg hbreak
   -- the (6.2) `S(A')`-sum bound at the break.
   have hbound := inducedKernelFamily_SA_sum_le_two_psi_k hyp hconj hodd hKsupp h1A
-    hS₁bot hS₁fin hcoh hSaS₁ (hSaS₁ hχ₁A') hχ₁irr hχ₁deg hψB hψnotS₁ hψcnotS₁ hψdeg
+    hS₁bot hS₁fin hcoh hSaS₁ (hSaS₁ hχ₁A') hχ₁deg hψB hψnotS₁ hψcnotS₁ hψdeg
     Da hDatau1
     (fun χ hχ => ⟨(hdat χ hχ).choose, (hdat χ hχ).choose_spec⟩)
     hbreak

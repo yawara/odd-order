@@ -1124,7 +1124,7 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) hdiffsuppχ
     hχχne hχbarχbarne hχχbar hχbarχ hμ_S1 hμbar_S1 s id (fun _ => 1) χ₁ hχ₁s
     hmemdegdiffsupp (fun x hx => hsS₁ (Finset.mem_coe.mpr hx)) (fun _ => (1 : ℝ))
-    (fun _ _ => one_pos) hmemortho rfl Dmem Da hDatau1 hortho_mem htau1Dmem
+    (fun _ _ => one_pos) hmemortho Dmem Da hDatau1 hortho_mem htau1Dmem
     hdiffasupp' htau1_memaχ rfl hDeg' hSgen hgen
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in

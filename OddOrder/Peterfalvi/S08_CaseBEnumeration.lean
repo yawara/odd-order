@@ -855,15 +855,6 @@ theorem sMember_degreeSqNormBound_of_not_coherent
   have hηdeg : η 1 = (Nat.card hyp.W1 : ℂ) := hyp.Yset_apply_one hηY
   have hanchordeg : χmem i₁ 1 = (Nat.card hyp.W1 : ℂ) := by rw [hi₁eq]; exact hηdeg
   have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
-  -- the anchor has unit weight (`‖η‖² = 1`).
-  have hanchorNorm : mc i₁ = 1 := by
-    have h := hmemortho i₁ i₁; rw [if_pos rfl] at h
-    have h1 : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
-      have hirr : IsIrreducibleCharacter (χmem i₁) := by rw [hi₁eq]; exact hηirr
-      have := irreducibleCharacter_inner_eq_ite (⟨χmem i₁, hirr⟩ : IrreducibleCharacter ↥L)
-        ⟨χmem i₁, hirr⟩
-      rwa [if_pos rfl] at this
-    rw [h1] at h; exact_mod_cast h.symm
   -- (3) the degree data against the anchor `χmem i₁`.
   choose deg hdeg_pos hdeg_eq using fun j =>
     hyp.sMember_charValue_one_eq_mul_anchor (hmemS j) hanchordeg
@@ -923,7 +914,6 @@ theorem sMember_degreeSqNormBound_of_not_coherent
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁) hmemdegdiffsupp
     (fun i _ => hmemS1set i) mc (fun i _ => hmcpos i)
     (fun i _ j _ => by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h])
-    hanchorNorm
     (fun i _ => (datum i).1) (fun i _ => (datum i).2.1) (fun i _ => (datum i).2.2)
     hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
   -- (8) package the output, converting the anchor `χmem i₁` to `η`.
@@ -981,14 +971,6 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
   have hηdeg : η 1 = (Nat.card hyp.W1 : ℂ) := hyp.Yset_apply_one hηY
   have hanchordeg : χmem i₁ 1 = (Nat.card hyp.W1 : ℂ) := by rw [hi₁eq]; exact hηdeg
   have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
-  have hanchorNorm : mc i₁ = 1 := by
-    have h := hmemortho i₁ i₁; rw [if_pos rfl] at h
-    have h1 : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
-      have hirr : IsIrreducibleCharacter (χmem i₁) := by rw [hi₁eq]; exact hηirr
-      have := irreducibleCharacter_inner_eq_ite (⟨χmem i₁, hirr⟩ : IrreducibleCharacter ↥L)
-        ⟨χmem i₁, hirr⟩
-      rwa [if_pos rfl] at this
-    rw [h1] at h; exact_mod_cast h.symm
   choose deg hdeg_pos hdeg_eq using fun j =>
     hyp.sMember_charValue_one_eq_mul_anchor (hmemS j) hanchordeg
   have hdeg_i₁ : deg i₁ = 1 := by
@@ -1080,7 +1062,6 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁) hmemdegdiffsupp
     (fun i _ => hmemS1set i) mc (fun i _ => hmcpos i)
     (fun i _ j _ => by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h])
-    hanchorNorm
     (fun i _ => (datum i).1) Da rfl (fun i _ => (datum i).2.1) (fun i _ => (datum i).2.2)
     hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
   -- (8) package the output, converting the anchor `χmem i₁` to `η`.

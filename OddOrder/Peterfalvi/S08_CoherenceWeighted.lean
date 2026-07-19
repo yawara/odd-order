@@ -50,7 +50,8 @@ family `χmem : ι → ClassFunction ↥L ℂ` is a family of (possibly reducibl
 
 * orthogonality `⟨χmem i, χmem j⟩ = if i = j then ⟨χmem i, χmem i⟩ else 0` (the diagonal is the
   squared norm `‖χmem i‖²`, not forced to `1`);
-* anchor `χmem i₁` irreducible (`hanchorNorm : ⟨χmem i₁, χmem i₁⟩ = 1`), of degree-ratio `1`;
+* anchor `χmem i₁` of degree-ratio `1` (`ha1 : deg i₁ = 1`) — its **norm is unconstrained**, matching
+  Peterfalvi (5.6), whose only anchor hypothesis is `χ₁(1) ∣ χ(1)` (see `crux1_of_memberFamilyW`);
 * the **weighted** degree bound `2a < ∑_{i∈s} deg(i)² / ‖χmem i‖²`.
 
 The break member `χ` is irreducible (norm one) as in the unweighted version.  Compare
@@ -87,8 +88,6 @@ structure XAdjoinStepInputW {A : Set G}
   /-- Orthogonality with the **squared-norm diagonal** `mc i = ‖χmem i‖²` (not forced to `1`). -/
   hmemortho : ∀ i ∈ s, ∀ j ∈ s,
     ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0
-  /-- The anchor is irreducible: `mc i₁ = 1`. -/
-  hanchorNorm : mc i₁ = 1
   /-- Per-member ν-aux decomposition `Dmem i : CharacterPsiDecomposition τ (χmem i) 0` — for case
   (B)
   built from `certainTypeR`/`certainTypeDecompositionDa` (reducible columns) or
@@ -159,18 +158,26 @@ theorem exists_indexed_projection_of_orthogonal_ZIrr {G : Type*} [Group G] [Fint
   rw [hsum, hcZ i hi, sub_self]
 
 /-- **Norm-weighted crux1** (Peterfalvi (5.6.1)/(5.6.2) for a reducible member family).  The
-weighted
-analogue of `crux1_of_memberFamily`: the member family `χmem` is orthogonal with real squared norms
-`mc i` (`hmemortho i j = if i=j then mc i else 0`), the anchor is irreducible (`hanchorNorm : mc i₁
-= 1`), and the degree bound is the **weighted** `2a < ∑ deg(i)²/mc i`.  Then the crux inner product
-`⟨τ(χ−a·χ₁), ν χ₁⟩ = −a`.
+weighted analogue of `crux1_of_memberFamily`: the member family `χmem` is orthogonal with real
+squared norms `mc i` (`hmemortho i j = if i=j then mc i else 0`) and the degree bound is the
+**weighted** `2a < ∑ deg(i)²/mc i`.  Then the crux inner product `⟨τ(χ−a·χ₁), ν χ₁⟩ = −a·‖χ₁‖²`.
+
+**The anchor norm is arbitrary** — no `mc i₁ = 1` (equivalently, no anchor irreducibility).  This
+tracks Peterfalvi (5.6) exactly: its hypotheses are only that `S₁` is coherent, `χ₁(1) ∣ χ(1)`, and
+`2χ(1)χ₁(1) < ∑ χᵢ(1)²/‖χᵢ‖²`; the proof carries `‖χ₁‖²` symbolically throughout, e.g. (5.6.1)'s
+`(Y, χ₁^τ₁) = (a − λ/‖χ₁‖²)‖χ₁‖² = a‖χ₁‖² − λ`.  Requiring `‖χ₁‖² = 1` would be a genuine
+specialization: the (6.2) anchor is `Ind_K^L θ` for a linear `θ ∈ Irr(K/A)`, which is reducible
+unless `θ` has inertia group `K`.
 
 The proof is the orthonormal `crux1` with `1 ↦ mc i`: the orthogonal projection
 (`exists_indexed_projection_of_orthogonal_ZIrr`) gives integer `cZ i = ⟨Da.Y, ν χᵢ⟩` and the
-*rational* expansion `Da.Y = ∑ (cZ i/mc i)·ν χᵢ + Z`; with `cZ i = a·[i=i₁] − (a+μ)·deg i` and the
-anchor norm `mc i₁ = 1`, this is the `λ`-form `∑ (a·[i=i₁] − λ·rc i)·ν χᵢ` with `λ = a+μ`,
-`rc i = deg i/mc i`; the (5.6.2) engine `lambda_eq_zero_and_Z_eq_zero` (already norm-general) then
-forces `λ = 0`, i.e. `μ = −a`.  Here `∑ rc² · mc = ∑ deg²/mc` is the weighted bound. -/
+*rational* expansion `Da.Y = ∑ (cZ i/mc i)·ν χᵢ + Z`; with `cZ i = a·mc i₁·[i=i₁] − λ·deg i` this is
+the `λ`-form `∑ (a·[i=i₁] − λ·rc i)·ν χᵢ` with `λ = a·mc i₁ + μ`, `rc i = deg i/mc i` (the anchor
+coefficient `cZ i₁/mc i₁ = a − λ/mc i₁` is where the norm must be divided back out).  `λ` is an
+*integer* because `mc i₁ = ⟨ν χ₁, ν χ₁⟩` is one — `ν χ₁ ∈ ℤ[Irr G]` and `ν` is an isometry — which is
+the norm-general replacement for `mc i₁ = 1`.  The (5.6.2) engine `lambda_eq_zero_and_Z_eq_zero` is
+already norm-general (`hψ : ‖ψ‖² = a²·mc i₁`, `hr₁ : rc i₁ · mc i₁ = 1` from `deg i₁ = 1`); it forces
+`λ = 0`, i.e. `μ = −a·mc i₁`.  Here `∑ rc² · mc = ∑ deg²/mc` is the weighted bound. -/
 theorem crux1_of_memberFamilyW {A : Set G}
     (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
@@ -189,16 +196,15 @@ theorem crux1_of_memberFamilyW {A : Set G}
     (mc : ι → ℝ) (hmempos : ∀ i ∈ s, 0 < mc i)
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
       ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0)
-    (hanchorNorm : mc i₁ = 1)
     (hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y (hS₁.extension (χmem i)) =
-      (a : ℂ) * (if i = i₁ then 1 else 0) -
-        ((a : ℂ) + ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁))
+      (a : ℂ) * (mc i₁ : ℂ) * (if i = i₁ then 1 else 0) -
+        ((a : ℂ) * (mc i₁ : ℂ) + ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁))
           (hS₁.extension (χmem i₁))) * (deg i : ℂ))
     (hμZ : τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁) ∈ ZIrr G)
     (ha1 : deg i₁ = 1)
     (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2 / mc i) :
     ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁))
-      (hS₁.extension (χmem i₁)) = -(a : ℂ) := by
+      (hS₁.extension (χmem i₁)) = -((a : ℂ) * (mc i₁ : ℂ)) := by
   classical
   have hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G :=
     fun i hi => hS₁.extension_mem_ZIrr (χmem i) (Submodule.subset_span (hmemS1 i hi))
@@ -210,16 +216,23 @@ theorem crux1_of_memberFamilyW {A : Set G}
     intro i hi j hj
     rw [hS₁.extension_inner_eq (χmem i) (χmem j) (Submodule.subset_span (hmemS1 i hi))
       (Submodule.subset_span (hmemS1 j hj)), hmemortho i hi j hj]
+  -- **Integrality of the anchor norm** (the norm-general stand-in for `mc i₁ = 1`):
+  -- `mc i₁ = ⟨ν χ₁, ν χ₁⟩` and `ν χ₁ ∈ ℤ[Irr G]`, so the norm is an integer `n₁`.
+  obtain ⟨n₁, hn₁⟩ := ClassFunction.inner_mem_ZIrr_int (hνZ i₁ hi₁) (hνZ i₁ hi₁)
+  have hmc₁C : ((mc i₁ : ℝ) : ℂ) = (n₁ : ℂ) := by
+    have h := horth i₁ hi₁ i₁ hi₁
+    rw [if_pos rfl, hn₁] at h
+    exact h.symm
   -- orthogonal integer projection of `Da.Y`
   obtain ⟨cZ, Z, hcZval, hYsum, hZortho⟩ :=
     exists_indexed_projection_of_orthogonal_ZIrr hDaY_ZIrr s
       (fun i => hS₁.extension (χmem i)) mc hνZ hmempos horth
-  set lam : ℤ := (a : ℤ) + μ with hlam_def
-  -- coefficient identification `cZ i = a·[i=i₁] − λ·deg i` (in `ℂ`)
+  set lam : ℤ := n₁ * (a : ℤ) + μ with hlam_def
+  -- coefficient identification `cZ i = a·mc i₁·[i=i₁] − λ·deg i` (in `ℂ`)
   have hcoeff_eq : ∀ i ∈ s, (cZ i : ℂ) =
-      (a : ℂ) * (if i = i₁ then 1 else 0) - (lam : ℂ) * (deg i : ℂ) := by
+      (a : ℂ) * (mc i₁ : ℂ) * (if i = i₁ then 1 else 0) - (lam : ℂ) * (deg i : ℂ) := by
     intro i hi
-    rw [← hcZval i hi, hcoeffval i hi, hμeq, hlam_def]; push_cast; ring
+    rw [← hcZval i hi, hcoeffval i hi, hμeq, hmc₁C, hlam_def]; push_cast; ring
   -- the `λ`-form of `Da.Y`, with `rc i = deg i / mc i`
   have hY : Da.Y =
       (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0)
@@ -233,10 +246,11 @@ theorem crux1_of_memberFamilyW {A : Set G}
     · subst h
       have hci := hcoeff_eq i hi
       rw [if_pos rfl] at hci
-      have hciR : (cZ i : ℝ) = (a : ℝ) - (lam : ℝ) * (deg i : ℝ) := by
-        have : (cZ i : ℂ) = (a : ℂ) - (lam : ℂ) * (deg i : ℂ) := by rw [hci]; ring
+      have hciR : (cZ i : ℝ) = (a : ℝ) * mc i - (lam : ℝ) * (deg i : ℝ) := by
+        have : (cZ i : ℂ) = (((a : ℝ) * mc i - (lam : ℝ) * (deg i : ℝ) : ℝ) : ℂ) := by
+          rw [hci]; push_cast; ring
         exact_mod_cast this
-      rw [if_pos rfl, hanchorNorm, hciR]; field_simp
+      rw [if_pos rfl, hciR]; field_simp
     · have hci := hcoeff_eq i hi
       rw [if_neg h] at hci
       have hciR : (cZ i : ℝ) = -((lam : ℝ) * (deg i : ℝ)) := by
@@ -255,15 +269,19 @@ theorem crux1_of_memberFamilyW {A : Set G}
   obtain ⟨hlam0, -⟩ := Da.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) lam Z
     (fun i => hS₁.extension (χmem i)) mc (fun i => (deg i : ℝ) / mc i)
     hY horth hZortho hψ
-    (by simp only [ha1, hanchorNorm, Nat.cast_one]; norm_num)
+    (by
+      have hmi : mc i₁ ≠ 0 := (hmempos i₁ hi₁).ne'
+      field_simp
+      exact_mod_cast ha1)
     (by positivity)
     (by
       refine hDeg.trans_le (le_of_eq ?_)
       refine Finset.sum_congr rfl fun i hi => ?_
       have hmi : mc i ≠ 0 := (hmempos i hi).ne'
       field_simp)
-  have hμval : μ = -(a : ℤ) := by simp only [hlam_def] at hlam0; omega
-  rw [hμeq, hμval]; push_cast; ring
+  have hμval : μ = -(n₁ * (a : ℤ)) := by
+    rw [hlam_def] at hlam0; linarith
+  rw [hμeq, hμval]; push_cast [← hmc₁C]; ring
 
 /-- **Norm-weighted (5.6) forward adjoin engine (general members).**
 
@@ -317,7 +335,6 @@ noncomputable def xAdjoinStepW
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
       ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
         if i = j then (mc i : ℂ) else 0)
-    (hanchorNorm : mc i₁ = 1)
     (Dmem : ∀ i ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       (χmem i) 0)
@@ -378,8 +395,8 @@ noncomputable def xAdjoinStepW
   have hDaY_ZIrr : Da.Y ∈ ZIrr G := by
     rw [hYeq]; exact Submodule.sub_mem _ hDaX_ZIrr htau1_memaχ
   have hchi1chi1 : ClassFunction.inner (χmem i₁ : ClassFunction ↥L ℂ)
-      (χmem i₁ : ClassFunction ↥L ℂ) = 1 := by
-    rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl]; exact_mod_cast hanchorNorm
+      (χmem i₁ : ClassFunction ↥L ℂ) = ((mc i₁ : ℝ) : ℂ) := by
+    rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl]
   -- (5.2.e) `⟨Da.X, ν χᵢ⟩ = 0` per member.
   have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
       0 :=
@@ -401,8 +418,8 @@ noncomputable def xAdjoinStepW
   -- The (5.6.1) member coefficient `⟨Da.Y, ν χᵢ⟩` in the `lambda_eq_zero_and_Z_eq_zero` form.
   have hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y
       (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
-      (a : ℂ) * (if i = i₁ then 1 else 0) -
-        ((a : ℂ) + ClassFunction.inner
+      (a : ℂ) * ((mc i₁ : ℝ) : ℂ) * (if i = i₁ then 1 else 0) -
+        ((a : ℂ) * ((mc i₁ : ℝ) : ℂ) + ClassFunction.inner
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
             ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
           (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ))) * (deg i : ℂ) := by
@@ -412,18 +429,18 @@ noncomputable def xAdjoinStepW
     rw [hmemortho i₁ hi₁ i hi] at key
     rw [key]
     rcases eq_or_ne i i₁ with h | h
-    · subst h; simp [hanchorNorm]
-    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]
+    · subst h; simp
+    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
   -- crux1 via the λ-form collapse.
   have hcrux1 : ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
         ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
-      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -(a : ℂ) :=
+      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -((a : ℂ) * ((mc i₁ : ℝ) : ℂ)) :=
     crux1_of_memberFamilyW hyp hconj
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
       hS₁ (χ : ClassFunction ↥L ℂ) s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da
       hDaY_ZIrr hmemS1
-      mc hmempos hmemortho hanchorNorm hcoeffval htau1_memaχ ha1 hDeg
+      mc hmempos hmemortho hcoeffval htau1_memaχ ha1 hDeg
   -- crux2 clean: `⟨τ(χ − χ̄), ν χ₁⟩ = 0` from `R(χ) ⊥ R(χ₁)`.
   have hcrux2 : ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
@@ -488,7 +505,6 @@ noncomputable def xAdjoinStepW_k
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
       ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
         if i = j then (mc i : ℂ) else 0)
-    (hanchorNorm : mc i₁ = 1)
     {a : ℕ}
     (Dmem : ∀ i ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
@@ -538,8 +554,8 @@ noncomputable def xAdjoinStepW_k
   have hDaY_ZIrr : Da.Y ∈ ZIrr G := by
     rw [hYeq]; exact Submodule.sub_mem _ hDaX_ZIrr htau1_memaχ
   have hchi1chi1 : ClassFunction.inner (χmem i₁ : ClassFunction ↥L ℂ)
-      (χmem i₁ : ClassFunction ↥L ℂ) = 1 := by
-    rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl]; exact_mod_cast hanchorNorm
+      (χmem i₁ : ClassFunction ↥L ℂ) = ((mc i₁ : ℝ) : ℂ) := by
+    rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl]
   -- (5.2.e) `⟨Da.X, ν χᵢ⟩ = 0` per member.
   have hXortho : ∀ i ∈ s,
       ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) = 0 :=
@@ -561,8 +577,8 @@ noncomputable def xAdjoinStepW_k
   -- The (5.6.1) member coefficient `⟨Da.Y, ν χᵢ⟩`.
   have hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y
       (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
-      (a : ℂ) * (if i = i₁ then 1 else 0) -
-        ((a : ℂ) + ClassFunction.inner
+      (a : ℂ) * ((mc i₁ : ℝ) : ℂ) * (if i = i₁ then 1 else 0) -
+        ((a : ℂ) * ((mc i₁ : ℝ) : ℂ) + ClassFunction.inner
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
             (χ - a • (χmem i₁ : ClassFunction ↥L ℂ)))
           (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ))) * (deg i : ℂ) := by
@@ -572,17 +588,17 @@ noncomputable def xAdjoinStepW_k
     rw [hmemortho i₁ hi₁ i hi] at key
     rw [key]
     rcases eq_or_ne i i₁ with h | h
-    · subst h; simp [hanchorNorm]
-    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]
+    · subst h; simp
+    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
   -- crux1 via the weighted λ-form collapse.
   have hcrux1 : ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
         (χ - a • (χmem i₁ : ClassFunction ↥L ℂ)))
-      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -(a : ℂ) :=
+      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -((a : ℂ) * ((mc i₁ : ℝ) : ℂ)) :=
     crux1_of_memberFamilyW hyp hconj
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
       hS₁ χ s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da hDaY_ZIrr hmemS1
-      mc hmempos hmemortho hanchorNorm hcoeffval htau1_memaχ ha1 hDeg
+      mc hmempos hmemortho hcoeffval htau1_memaχ ha1 hDeg
   -- crux2 clean: `⟨τ(χ − χ̄), ν χ₁⟩ = 0` from `R(χ) = Da.imageFamily ⊥ R(χ₁)`.
   have hcrux2 : ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
@@ -623,7 +639,7 @@ noncomputable def XAdjoinStepInputW.adjoin
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
   xAdjoinStepW hyp hconj hS₁ χ inp.hrealχ inp.hdiffsuppχ inp.hχχ inp.hχbarχbar inp.hχχbar
     inp.hχbarχ inp.hχ_S1 inp.hχbar_S1 inp.s inp.χmem inp.deg inp.i₁ inp.hi₁
-    inp.hmemdegdiffsupp inp.hmemS1 inp.mc inp.hmempos inp.hmemortho inp.hanchorNorm
+    inp.hmemdegdiffsupp inp.hmemS1 inp.mc inp.hmempos inp.hmemortho
     inp.Dmem inp.hortho_mem inp.htau1Dmem inp.hdiffasuppχ inp.htau1_memaχ inp.ha1 inp.hDeg
     inp.hSgen inp.hgen
 
@@ -669,7 +685,6 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
       ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
         if i = j then (mc i : ℂ) else 0)
-    (hanchorNorm : mc i₁ = 1)
     (Dmem : ∀ i ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       (χmem i) 0)
@@ -703,7 +718,7 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
   by_contra hlt
   push Not at hlt
   exact hnc ⟨xAdjoinStepW hyp hconj hS₁ χ hrealχ hdiffsuppχ hχχ hχbarχbar hχχbar hχbarχ
-    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
+    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho
     Dmem hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
 /-- **Norm-weighted (5.6) degree-square bound, reducible BREAK (contrapositive of
@@ -739,7 +754,6 @@ theorem coherentDegreeSqNormBound_of_not_coherentW_k
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
       ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
         if i = j then (mc i : ℂ) else 0)
-    (hanchorNorm : mc i₁ = 1)
     {a : ℕ}
     (Dmem : ∀ i ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
@@ -775,7 +789,7 @@ theorem coherentDegreeSqNormBound_of_not_coherentW_k
   by_contra hlt
   push Not at hlt
   exact hnc ⟨xAdjoinStepW_k hyp hconj hS₁ χ hdiffsuppχ hχχne hχbarχbarne hχχbar hχbarχ
-    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
+    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho
     Dmem Da hDatau1 hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
 /-- **(T-A2, norm-weighted) The X-family coherence chain fold.**
