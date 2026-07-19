@@ -28,9 +28,10 @@ set_option autoImplicit false
 namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
 open scoped IsMulCommutative
 
-universe uH uC
+universe uH uC uMain
 
 local instance instLemmaSixLowerCentralLayerIsMulCommutative
     (H : Type uH) [Group H] (i : ℕ) :
@@ -191,5 +192,39 @@ theorem lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
       phi hirr c hc hc₂
   apply hfaith
   simpa only [map_one] using hc₀
+
+/-- **Higman Lemma 6, dimension step (p. 85).**
+
+If `L₂` and `L₃` are equivariantly isomorphic, the kernel comparison makes
+the transitive action on `L₂#` faithful.  The faithful irreducible action on
+`L₁` and the faithful transitive action on `L₂` then have the same dimension
+by the Singer-field Frobenius-period argument. -/
+theorem lowerCentralLayerZero_finrank_eq_one_of_equivariant_linearEquiv
+    {H C : Type uMain} [Group H] [Finite H]
+    [CommGroup C] [IsCyclic C] [Finite C]
+    (phi : C →* MulAut H)
+    (hirr : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation phi 0))
+    (hfaith : Function.Injective
+      (lowerCentralLayerRepresentation phi 0))
+    [Nontrivial (Additive (lowerCentralLayer H 1))]
+    (htrans : ∀ v w : Additive (lowerCentralLayer H 1),
+      v ≠ 0 → w ≠ 0 → ∃ c : C,
+        lowerCentralLayerRepresentation phi 1 c v = w)
+    (e : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2]
+      Additive (lowerCentralLayer H 2))
+    (hequiv : ∀ c v,
+      e (lowerCentralLayerRepresentation phi 1 c v) =
+        lowerCentralLayerRepresentation phi 2 c (e v)) :
+    Module.finrank (ZMod 2) (Additive (lowerCentralLayer H 0)) =
+      Module.finrank (ZMod 2) (Additive (lowerCentralLayer H 1)) := by
+  have hfaithOne : Function.Injective
+      (lowerCentralLayerRepresentation phi 1) :=
+    lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
+      phi hirr hfaith e hequiv
+  exact finrank_eq_of_faithful_irreducible_and_faithful_transitive_nonzero
+    (lowerCentralLayerRepresentation phi 0)
+    (lowerCentralLayerRepresentation phi 1)
+    hirr hfaith hfaithOne htrans
 
 end OddOrder.Higman.Suzuki2Groups

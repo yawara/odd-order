@@ -8264,6 +8264,12 @@ composition with the degree-two bracket is the actual trilinear commutator
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
 
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.finrank_eq_of_faithful_irreducible_and_faithful_transitive_nonzero
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralLayerZero_finrank_eq_one_of_equivariant_linearEquiv
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
