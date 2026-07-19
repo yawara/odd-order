@@ -41,10 +41,23 @@ being dischargeable by `True`-instantiation).
 ## Status
 
 D.1 and D.2 are stated at book strength and remain `sorry`-free-pending: their proofs need
-**Gorenstein Ch. 14 §14.1** (the definition of a *3-step group* and Corollary 14.1.6), which is
-absent from this repository.  This is the sanctioned "Gorenstein as line-filler" case (BG cites
-**G** for a proof it omits).  See the tracking issue.  D.2 is short *given* D.1 (Focal Subgroup
-Theorem plus `G' = G` from simplicity).
+**Gorenstein Ch. 14 §14.1** (the definition of a *3-step group* and Corollary 14.1.6).  This is
+the sanctioned "Gorenstein as line-filler" case (BG cites **G** for a proof it omits).  D.2 is
+short *given* D.1 (Focal Subgroup Theorem plus `G' = G` from simplicity).
+
+**Update 2026-07-19** (issue 9133): that input is no longer absent.  In the edition transcribed
+under `references/` the material is Chapter 12 §1, and it is being built in
+`OddOrder.GroupTheory.CNGroupStructure`:
+
+* `IsThreeStepGroup` — the definition, transcribed verbatim, with the two consequences D.1
+  actually consumes (`oPiCore_pPrime_eq_bot`, `isPGroup_quotient` / `nontrivial_quotient`)
+  proved `sorry`-free;
+* `oPiCore_isSylow_or_isThreeStepGroup` — **Corollary 1.6, derived `sorry`-free** from
+  Theorem 1.5 (`solvableCN_nilpotent_or_frobenius_or_threeStep`), which is now the single
+  remaining `sorry` on this path; its steps 1, 2 and 3 are themselves proved.
+
+So D.1's blocker has narrowed from "all of Gorenstein §14.1" to "the assembly of Theorem 1.5".
+See the tracking issue for the current step-by-step state.
 
 ⚠ Do **not** discharge these vacuously from `feitThompson`.  The CN-theorem is an *input* to
 Feit--Thompson (BG p. 153: it "is actually needed in **FT**, although not for the part covered by
@@ -86,8 +99,9 @@ structure MinimalSimpleCNHypothesis (G : Type*) [Group G] [Finite G] : Prop wher
 
 Proof (BG, following **G**): needs Gorenstein Cor. 14.1.6 (a solvable `M` with `O_p(M) ≠ 1` and
 `P ∩ M ≠ O_p(M)` is a *3-step group* for `p`) together with BG Theorem 6.2 (Glauberman
-`Z(J(P)) ⊴ M`, present in this repository via the `L(P)` / Theorem B.4 substitute).  Gorenstein
-§14.1 is not yet formalized here. -/
+`Z(J(P)) ⊴ M`, present in this repository via the `L(P)` / Theorem B.4 substitute).  Corollary
+14.1.6 is `OddOrder.GroupTheory.oPiCore_isSylow_or_isThreeStepGroup`, proved modulo Gorenstein's
+Theorem 1.5 (see the module docstring); this proof is not yet assembled. -/
 theorem sylow_eq_of_nontrivial_inter [Finite G] {p : ℕ} [Fact p.Prime]
     (hyp : MinimalSimpleCNHypothesis G) (P Q : Sylow p G)
     (hinter : ((P : Subgroup G) ⊓ (Q : Subgroup G)) ≠ ⊥) :
