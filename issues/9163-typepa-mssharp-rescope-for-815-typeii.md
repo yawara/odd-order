@@ -161,3 +161,84 @@ Pf 本文 frontier の次項目として **(9.11) の type-II 一般化**に着�
 - OddOrder/GroupTheory/MaximalSubgroupType.lean:436 (`typePA_eq_sharpSubgroup_derivedInG` の
   caveat docstring = 9008 の要約)
 - OddOrder/Peterfalvi/S10_SubcoherentTypeP.lean / S10_Hypothesis46TypeP.lean (P₁ 側完了分)
+
+---
+
+## 2026-07-20 lane a: 裁定に沿った実装記録 + 実測による前提訂正
+
+### ✅ 昇格 (§2) 完了 — commit 92983806b
+
+`honestTypeP2ASet` → `typePACore` / `honestTypeP2A0Set` → `typePACore0` を
+`OddOrder/Peterfalvi/S10_StructureSetup.lean` の (8.10)--(8.13) 節へ移設・改名 (2 重定義は作らず)。
+初等 API (`mem_typePACore`, `_subset_sharp`, `_one_not_mem`, `_subset_derived`, `_subset`,
+`_conj_mem`, `_subset_hatMsigma`) も同時に昇格。橋渡し `typePACore_eq_typePA_of_isTypeP1` /
+`typePACore0_eq_typePA0_of_isTypeP1` を追加、既存 `typePA` consumer は無変更。
+
+裁定文書の「lane a 所有 file 内のみ」は**実測では不正確**だった: 改名は 30 files に及び、
+`OddOrder/FeitThompson{CharacterData,NuGrid,Section16Core}.lean` と `AxiomsCheck.lean` も含む。
+ただし当時 b/c はいずれもこれらに触れていなかった (b = BaseChange/AxiomsCheck、
+c = CLAUDE.md/issue のみ) ので衝突なしで完了。
+
+副産物として `centralizerSupport_sharpSubgroup_of_le` (H ≤ K なら
+`centralizerSupport (K^#) H = H^#`) を一般形で切り出し、`typePA_eq_sharpSubgroup_derivedInG` を
+その 1 行の系にした (証明の重複解消)。`sharpSubgroup_conj_mem` は S10_MinimalSimpleBasic から
+S10_StructureSetup へ上げた (同一 namespace ゆえ consumer 無変更)。
+
+### ✅ §3 項目 1 ((8.15) type-II instance) 完了 — commit 106bbe509
+
+- `typePData_toHypothesis46_ofSupport`: support `A` と (4.6.c) の `H` を両方パラメータ化した
+  claim-2 の core。既存 `typePData_toHypothesis46` (A = typePA) はその系、signature 不変。
+- `typePACore_toHypothesis46` / `_core` / `_hallKernel`: A = typePACore 上の 3 instance。
+  `_core` が書籍の H = M_s = M_σ 選択 (Coq `FT_prDade_hyp` 相当)。
+- 重複解消: `S13_PrimeTIResidueBridge.hypothesis46OfTypePData` (同じ field 組み立ての
+  type-uniform 版) を削除し、唯一の consumer `S15.Hypothesis.hyp46S` を
+  `S10.typePACore_toHypothesis46_core` への委譲に置換。
+- 全宣言 axiom-clean、AxiomsCheck 登録済。`lake build OddOrder.AxiomsCheck` green (4483 jobs)。
+
+**数学的要点**: (4.6.d) covering の向きが 2 系列で反転する。`typePA` では `A = K^#` ゆえ
+covering は任意の `H ≤ K` で自明だが support が P₂ で過大主張。`typePACore` では support が
+正確で covering は `H ≤ M_s` に対する support の定義そのもの。書籍が (8.15.2) を core `M_s` を
+手にした状態で述べる理由がそのまま形式化に写った。
+
+### ⚠ 前提訂正: `cross_zero` は「仮定」ではなく既に導出済み (item 2 後半は空)
+
+本 issue §3 項目 2 は「type-II consumer が structure field `cross_zero` として仮定している分を
+導出に置換」としていたが、**実測では既に導出されている**:
+
+- `S12.TypeIICrossIsometryData.cross_zero` (S12_TypeIIFrobenius.lean:1081) は
+  producer `S12.exists_typeIICrossIsometryData_at_pair`
+  (S12_TypeIICrossIsometryPair.lean:1390) が
+  `tau1_muColumn_sub_zeta_inner_extension_diff_eq_zero_at_pair` から供給。
+- その下流 `cross_dade_inner_eq_zero_at_pair` (同 :1023) が (8.18.b) の本体で、
+  型一様な (8.12.b) = `BG.Ch4.S16.uniqueMaximal_of_kappaSigmaCompl_element` に落ちている。
+- 3 宣言とも `#print axioms` = propext / Classical.choice / Quot.sound のみ。
+
+⟹ item 2 の実体は「cross_zero の導出化」ではなく **(8.18) 全体の一般化** のみ。
+現状の (8.18) 導出は canonical pair 固定 (`Section16MaximalPairCore G`; `mp.T` = type P₁、
+`mp.S` = type II) で、書籍の「型仮定なしの非共役 maximal ペア」には未一般化 = 特殊化債務。
+
+### item 2 ((8.18) 一般化) の実測した gate — typePA ではなく「型一様な A(M)」
+
+書籍 (8.18) (PDF p.49) は S, T を型仮定なしの非共役 maximal で述べる。証明の型判定ステップ
+「Since A(T) − A₁(T) ≠ ∅, T is of Type I or II」は (8.10) 末尾の
+「A₁(M) = A(M) = (M')^# if M is of Type III, IV or V」の対偶で、これは
+**commit 26f9dd17b で形式化済** (`typePACore_eq_A1_of_isTypeP1` /
+`not_isTypeP1_of_mem_typePACore_not_mem_A1`、axiom-clean)。
+
+残る真の gate は **型一様な `A(M)` の def が repo に無いこと**:
+- 添字側は既に型一様 (`mainSubgroup M tau = Msigma M`、全 5 型、`mainSubgroup_eq_Msigma`)。
+- host 側だけが分岐する: type I は `M` (`typeIA M data = centralizerSupport (M_F^#) M`)、
+  type 𝒫 は `M'` (`typePACore M = centralizerSupport (M_σ^#) M'`)。
+- ⟹ `A M tau = centralizerSupport (sharpSubgroup (mainSubgroup M tau)) (host M tau)`
+  (host: I ↦ M、他 ↦ derivedInG M) を新設し、両既存 def への橋渡しを付けるのが次の一手。
+  これは lane a 所有の `MaximalSubgroupType.lean` 内で完結する (claim 不要)。
+
+前提として要る (8.12.b) / (8.17.a) はいずれも**型一様版が既に repo に在る**ことを実測で確認:
+- (8.12.b) 型一様: `BG.Ch4.S16.uniqueMaximal_of_kappaSigmaCompl_element`
+  (S16_MainResults/TheoremsAE.lean:216)、および部分群版
+  `BG.Ch4.S14.typeP_hall_small_subgroup_cyclic_tau2` (S14_TypePCounting/LocalStructure.lean:486)。
+  Peterfalvi 側ラッパー `S10.typeI_or_typeII_centralizer_unique_hall` の型仮定は
+  `M_F = M_σ` 変換のためだけで、型一様版を直接呼べば外せる。
+- (8.17.a) 型一様: `S10.BGTheoremECoverData.primeFactors_cover` / `_disjoint`
+  (S10_MinimalSimpleStructure.lean:655/660)、producer `S10.bgTheoremE_cover_data` (同 :886)
+  は型仮定ゼロ (`hG` のみ)。
