@@ -180,9 +180,16 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
-    - [ ] Higman Lemma 10 (current source frontier): characteristic `2` の proper odd-degree
+    - [x] Higman Lemma 10: characteristic `2` の proper odd-degree
           finite field extensionで、任意の `r : ℤ`, `ε` に対する非零 `α` と
           `Tr(α · Frob^r(α) · ε) = 0` を構成する
+      - [x] 原文冒頭の `gcd(1+2^r,2^m-1)` の奇偶二分法と power-map 全射 branch を証明する
+      - [x] 標数 `2` の twisted quadratic map に対する Chevalley--Warning の
+            source-neutral bridge を `OddOrder.Algebra` に構成する (issue 9308)
+      - [x] 負の整数 Frobenius 反復も含む exact endpoint `higmanLemmaTen` を証明する
+            (`42e744a4f`)
+    - [ ] Higman Lemma 11 (current source frontier): `K`-length `2` の Suzuki `2`-group を
+          原文の有限体座標群 `A(n, θ)` と同型にする
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
@@ -216,6 +223,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/higman/p86_87_lemmas_6_10.raw.txt`
 - `references/higman/pages/suzuki-2-groups-p086.png`
 - `references/higman/pages/suzuki-2-groups-p087.png`
+- `references/higman/pages/suzuki-2-groups-p088.png`
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
 - `OddOrder/Higman/Suzuki2Groups/HigmanSquareMap.lean`
@@ -223,5 +231,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `OddOrder/Higman/Suzuki2Groups/HigmanLowerCentralGraded.lean`
 - `OddOrder/Higman/Suzuki2Groups/HigmanCoverAbelian.lean`
 - `OddOrder/Higman/Suzuki2Groups/HigmanCoverPowerOverlap.lean`
+- `OddOrder/Higman/Suzuki2Groups/HigmanFiniteFieldTrace.lean`
+- `OddOrder/Algebra/ChevalleyWarning.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/QuadraticExtensions.lean`

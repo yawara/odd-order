@@ -16,14 +16,17 @@ subfield 分解とは独立に閉じられる。この次数・次元論は Higm
 
 ## やること
 
-- [ ] 双線形写像 `B` と線形自己同型 `T` から座標二次式を構成する
-- [ ] `2 * finrank W < finrank V` のとき非零 `x` で `B x (T x) = 0` を証明する
-- [ ] Higman Lemma 10 の有限体 trace 写像から利用する
+- [x] 双線形写像 `B` と線形自己同型 `T` から座標二次式を構成する
+- [x] `2 * finrank W < finrank V` のとき非零 `x` で `B x (T x) = 0` を証明する
+- [x] Higman Lemma 10 の有限体 trace 写像から利用する
 
 ## 完了条件
 
 新しい Algebra leaf と Higman consumer の対象 build が通り、sorry / axiom を
 追加せず Lemma 10 の exact statement を閉じる。
+
+完了: `OddOrder.Algebra.exists_ne_zero_bilinear_twist_zero` を `dbcc7c182`、
+Higman consumer `higmanLemmaTen` を `42e744a4f` で landing。両対象 build は green。
 
 ## 参照
 
