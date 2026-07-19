@@ -99,7 +99,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             `lowerCentralSquareMapBaseChange` に source-facing に instantiate する
       - [x] 一般の faithful irreducible cyclic `L₁` actionから、full Singer-orderを
             仮定せず normalized Frobenius-conjugate eigenbasisを構成する
-            (`FrobeniusCoordinates.lean`, issue 9164)
+            (`FrobeniusCoordinates.lean`, issue 9300)
       - [x] candidateの actor-equivarianceを証明してactual uniquenessを適用し、
             `exists_lowerCentralSquareMap_eq_frobeniusSum` として actual square mapの
             表示公式を結論する
