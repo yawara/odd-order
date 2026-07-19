@@ -53,6 +53,42 @@ theorem exists_blockScalarRatioEmbedding_of_blocks {p : ℕ} [Fact p.Prime]
       (finrank_eq_one_of_card_eq_prime (hBcard i))),
     blockScalarRatioHom_injective _ hconst⟩
 
+/-- **Peterfalvi (9.7)(a), order-`a` refinement of the block-scalar ratio embedding.**  Under the
+same imprimitive block hypotheses, if every block scalar character is killed by `a`
+(`hpow` — concretely `a = |U : C_U(H₁)|` is the common image order of the `q` block characters,
+the `W₁`-conjugacy of the blocks making it independent of the block), then the ratio embedding
+lands in the product of `n` copies of the **`a`-torsion subgroup** of `(ZMod p)ˣ` — the unique
+cyclic subgroup of order `a` of the cyclic `(ZMod p)ˣ` when `a ∣ p − 1`.  This is the book's
+"`Ū` is isomorphic to a subgroup of the direct product of `q − 1` cyclic groups of order `a`"
+(p. 51), refining `exists_blockScalarRatioEmbedding_of_blocks` (whose codomain forgets the order
+information; Peterfalvi (14.6) needs the `a`-form). -/
+theorem exists_blockScalarRatioEmbedding_of_blocks_pow_eq_one {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation
+              (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation
+                (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1)
+    {a : ℕ}
+    (hpow : ∀ (i : Fin (n + 1)) (u : U),
+      (lineScalarChar (B i).toRepresentation
+          (finrank_eq_one_of_card_eq_prime (hBcard i)) u) ^ a = 1) :
+    ∃ ψ : U →* (Fin n → (ZMod p)ˣ),
+      Function.Injective ψ ∧ ∀ (u : U) (i : Fin n), (ψ u i) ^ a = 1 := by
+  refine ⟨blockScalarRatioHom (fun i => lineScalarChar (B i).toRepresentation
+      (finrank_eq_one_of_card_eq_prime (hBcard i))),
+    blockScalarRatioHom_injective _ hconst, ?_⟩
+  intro u i
+  change (lineScalarChar (B i.succ).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard i.succ)) u
+      / lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0)) u) ^ a = 1
+  rw [div_pow, hpow, hpow, div_one]
+
 /-- The scalar-character identity on an order-`p` subrepresentation, viewed in the ambient
 representation.  This avoids exposing the subtype module's implementation instances to callers
 that assemble the block identities into an equality on the whole representation. -/
