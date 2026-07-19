@@ -649,7 +649,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 |---|---|---|---|---|---|---|
 | Pf §1-2 | 4 | 4 | 0 | 0 | 0 | 0 |
 | Pf §3 | 10 | 10 | 0 | 0 | 0 | 0 |
-| Pf §4 | 14 | 6 | 7 | 1 | 0 | 0 |
+| Pf §4 | 14 | 7 | 7 | 0 | 0 | 0 |
 | Pf §5 | 9 | 9 | 0 | 0 | 0 | 0 |
 | Pf §6 | 10 | 10 | 0 | 0 | 0 | 0 |
 | Pf §7 | 9 | 7 | 2 | 0 | 0 | 0 |
@@ -683,7 +683,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 | 結果 | 状態 | 規模 | 内容 | メモ |
 |---|---|---|---|---|
-| (2.4) | 部分 | S | (a) H(a^x)=H(a)^x for x∈L; (b) conjugate cosets aH(a), bH(b) force a ~_L b; (c) N_G(aH(a))… | Label verified against source (refutation attempted, failed). (b) fully proved (isConj_in_L_of_mul_H, via the CRT cross-rigidity isConj_of_isConj_mul). (a) is NOT derived from (2.2) in general: the S04_DadeIsometryBasic.… 【2026-07-18 lane c 更新: (2.4.a) を Hypothesis (2.2) から導出 (`Hypothesis.hConjInvariant` / `mem_H_iff_coprime_orderOf`, S04_DadeIsometryBasic.lean)。O_{π'} API 不要の局所版で解決。`HConjInvariant` 引数は全て `hyp.hConjInvariant` で discharge 可能 (signature 無変更)。残る gap は (2.4.c) の normalizer 等式のみ。】 |
+| (2.4) | 済 | S | (a) H(a^x)=H(a)^x for x∈L; (b) conjugate cosets aH(a), bH(b) force a ~_L b; (c) N_G(aH(a))… | Label verified against source (refutation attempted, failed). (b) fully proved (isConj_in_L_of_mul_H, via the CRT cross-rigidity isConj_of_isConj_mul). (a) is NOT derived from (2.2) in general: the S04_DadeIsometryBasic.… 【2026-07-18 lane c 更新: (2.4.a) を Hypothesis (2.2) から導出 (`Hypothesis.hConjInvariant` / `mem_H_iff_coprime_orderOf`, S04_DadeIsometryBasic.lean)。O_{π'} API 不要の局所版で解決。`HConjInvariant` 引数は全て `hyp.hConjInvariant` で discharge 可能 (signature 無変更)。残る gap は (2.4.c) の normalizer 等式のみ。】【2026-07-19 lane a 更新: **その (2.4.c) も既に形式化済** — `conj_coset_H_eq_iff_mem_centralizer` (S04_DadeIsometryBasic.lean:880) が `g` が coset `H(a)·a` を共役で安定化する ⟺ `g ∈ C_G(a)` を elementwise 形で証明 (= `N_G(aH(a)) = C_G(a)`)。sorry 無し。(a)(b)(c) 全て本文強度ゆえ 部分→済。⟹ **Pf §4 は 14/14 完了**。残るのは `hconj` 明示引数の signature cleanup のみで、これは強度の債務でない (数学的には全て `hyp.hConjInvariant` で discharge 可能)。】 |
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 

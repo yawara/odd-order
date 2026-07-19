@@ -12,7 +12,7 @@ ROADMAP 上の位置: **第 5 波 (Ch.6 完了後、Ch.10 と並列可)** — **
 
 **Phase 1 内で本書最重要章の一つ**. 章本体は **わずか 8 結果** (Thm 7.1 + Lemma 7.2-7.4, 7.7 + Thm 7.5-7.6, 7.8) で短いが、各定理が独立に **BG/Peterfalvi 経由の FT 経路で本質的**:
 
-- **Thm 7.1 (Thompson)** = Ch.6 Thm 6.23 の改良版で **本書での Frobenius kernel nilpotent (6.24) 完備化の最後のピース**. Ch.6 で `axiom`/`sorry` 化された 6.23 を本章で書き換え.
+- **Thm 7.1 (Thompson)** = Ch.6 Thm 6.23 の改良版で **本書での Frobenius kernel nilpotent (6.24) 完備化の最後のピース**. ✅ 完了 — 6.23 (characteristic-subgroup 形) は Thm 7.1 から導出済 (`Ch06_FrobeniusActions/ThompsonPComplement.lean`). なお 6.23 が `axiom`/`sorry` で置かれたことは一度も無い (この記述は当初計画のまま残っていた).
 - **Thm 7.6 normal-J theorem** ≡ **BG Theorem 6.2** (`Z(J(S))·O_{p'}(G) ⊴ G` for solvable G of odd order). **BG §8, §9 (Uniqueness Theorem) で 7 ヶ所超で直接引用** (L2456, L2480, L2482, L2511, L2515, L5014, L5032). BG App.A "Prerequisites and p-Stability" は **Thm A.4(b) として Thm 7.6 を再述**し、これに依拠する形で BG §6 の Theorem 6.1 ("`O_{p',p}(G)` contains every abelian normal subgroup of S") を導出.
 - **Thm 7.5 normal-P theorem** = `p`-solvable + abelian Sylow-2 + 忠実作用 + `|V:C_V(P)| ≤ p` ⇒ `P ⊴ G`. Thm 7.6 の induction step として中で使う.
 - **Thm 7.8 Burnside p^a q^b** — character-free Goldschmidt-Bender-Matsuyama 証明. BG/Peterfalvi 直接被引用は無いが Phase 1 完成度のため必須 (BG L2633 が "we can obtain Burnside's `p^a q^b` very easily now" と本章手法の応用例として言及).

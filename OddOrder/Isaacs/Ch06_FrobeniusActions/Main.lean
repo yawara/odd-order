@@ -16,9 +16,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 6
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | 進行中: 6.1/6.2/6.3/6.4/6.5/6.6 ✅, 6.7 保留 |
-| 6B | Frobenius complement Sylow 構造 | 6.8 – 6.21 | 進行中: 6.13/6.14/6.16 ✅ |
-| 6C | Frobenius kernel nilpotent + Thompson | 6.22 – 6.24 | 未着手 |
+| 6A | Frobenius action の定義と equivalences | 6.1 – 6.7 | ✅ (6.7 = `KernelComplement`) |
+| 6B | Frobenius complement Sylow 構造 | 6.8 – 6.21 | ✅ (6.8 = `FrobeniusActionTI`, 6.19 = `OddComplement`) |
+| 6C | Frobenius kernel nilpotent + Thompson | 6.22 – 6.24 | ✅ (6.22 = BG Thm 3.7 経由, 6.23 = `ThompsonPComplement`, 6.24 = `KernelNilpotent`) |
 
 ## 方針
 

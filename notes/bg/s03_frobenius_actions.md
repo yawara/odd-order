@@ -92,7 +92,7 @@ BG は Lemma 3.2 の直後, すぐに Thompson の結果を引用 (proof なし)
 | Isaacs | BG | 説明 |
 |---|---|---|
 | 6.22 | L1199-1219 (Thm 3.7) | solvable Frobenius kernel ⇒ nilpotent (Higman) |
-| 6.23 | — | Thompson normal p-complement (statement のみ, Ch.7 で改良版証明) |
+| 6.23 | — | Thompson normal p-complement ✅ (`Isaacs/Ch06_FrobeniusActions/ThompsonPComplement.lean`, Ch.7 Thm 7.1 から導出) |
 | 6.24 | L825 Note | Frobenius kernel ⇒ nilpotent (Thompson, 一般版) |
 
 ### Phase 2a での扱い

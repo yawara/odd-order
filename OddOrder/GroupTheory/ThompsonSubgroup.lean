@@ -310,4 +310,40 @@ theorem thompsonJ_map_conj_eq_of_mem_normalizer [Finite G] {p : ℕ} {P : Subgro
   have hinj : Function.Injective (MulAut.conj g).toMonoidHom := (MulAut.conj g).injective
   rw [← thompsonJ_map_of_injective hinj P p, hP_conj]
 
+/-! ### `J(P)` is characteristic in `P`
+
+Isaacs Thm 7.2 (`thompsonJ_eq_of_le_of_le`) gives the stronger statement that `J(P)` is
+characteristic in every intermediate `J(P) ≤ Q ≤ P`; the bare characteristic-in-`P`
+property is what the local hypotheses of Isaacs Thm 6.23 quantify over, so it is recorded
+here in the `Subgroup ↥P` form that `Subgroup.Characteristic` expects. -/
+
+/-- Computing `J` inside `↥P` and pushing forward along `P.subtype` agrees with computing
+`J(P)` in the ambient group. -/
+theorem thompsonJ_top_map_subtype [Finite G] (P : Subgroup G) (p : ℕ) :
+    (thompsonJ (⊤ : Subgroup ↥P) p).map P.subtype = thompsonJ P p := by
+  rw [← thompsonJ_map_of_injective P.subtype_injective (⊤ : Subgroup ↥P) p,
+    ← MonoidHom.range_eq_map, P.range_subtype]
+
+/-- `J(P)`, viewed inside `↥P`, is `J` of the whole group `↥P`. -/
+theorem thompsonJ_subgroupOf_self [Finite G] (P : Subgroup G) (p : ℕ) :
+    (thompsonJ P p).subgroupOf P = thompsonJ (⊤ : Subgroup ↥P) p := by
+  rw [← thompsonJ_top_map_subtype P p, Subgroup.subgroupOf,
+    Subgroup.comap_map_eq_self_of_injective P.subtype_injective]
+
+/-- **`J(H)` is characteristic** (top form): every automorphism of `H` permutes the
+maximum-order elementary abelian subgroups of `H`, hence fixes their join. -/
+instance thompsonJ_top_characteristic [Finite G] (p : ℕ) :
+    (thompsonJ (⊤ : Subgroup G) p).Characteristic := by
+  refine Subgroup.characteristic_iff_map_eq.mpr fun ϕ => ?_
+  rw [← thompsonJ_map_of_injective ϕ.injective (⊤ : Subgroup G) p]
+  congr 1
+  simp
+
+/-- **`J(P)` is characteristic in `P`** (Isaacs Ch.7, p. 201): a special case of Thm 7.2,
+stated in the `Subgroup ↥P` form used by the local hypotheses of Isaacs Thm 6.23. -/
+instance thompsonJ_subgroupOf_characteristic [Finite G] (P : Subgroup G) (p : ℕ) :
+    ((thompsonJ P p).subgroupOf P).Characteristic := by
+  rw [thompsonJ_subgroupOf_self]
+  infer_instance
+
 end Subgroup

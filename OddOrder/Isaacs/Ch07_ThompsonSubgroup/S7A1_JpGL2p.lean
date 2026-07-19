@@ -62,23 +62,21 @@ theorem thompsonJ_eq_of_le [Finite G] {P Q : Subgroup G} {p : ℕ}
     Subgroup.thompsonJ Q p = Subgroup.thompsonJ P p :=
   Subgroup.thompsonJ_eq_of_le_of_le hJQ hQP
 
-/-! ### Thm 7.1 — Thompson normal p-complement (statement 保留)
+/-! ### Thm 7.1 — Thompson normal p-complement ✅ (実体は §7C)
 
 **Isaacs Thm 7.1** (Thompson, mmd L3721):
 
 > `p ≠ 2`, `P ∈ Syl_p(G)`, `C_G(Z(P))` と `N_G(J(P))` が normal p-complement を持つ
 > ⇒ G が normal p-complement を持つ.
 
-**先行 def 依存**: `Group.HasNormalPComplement G p` (Ch.5 で実装予定, 設計判断
-[`notes/isaacs/ch07_thompson.md`](../../../notes/isaacs/ch07_thompson.md) §設計判断 (2)).
+**実体**: `S7C_ThompsonPComplementFinal.thompson_normal_p_complement_of_local_hypotheses`
+(§7C Steps 1-7 = counterexample-minimum + Thm 7.6 normal-J + Thm 5.26 Frobenius
+normal p-complement + Lem 7.7 (N/C `p'`-quotient)).
+`HasNormalPComplement` の def は `Ch05_Transfer.Basic`.
 
-**proof 戦略** (§7C, Steps 1-7): counterexample-minimum + Thm 7.6 normal-J +
-Thm 5.26 Frobenius normal p-complement + Lem 7.7 (N/C `p'`-quotient).
-
-**下流**: Ch.6 Thm 6.23 (`axiom`/`sorry`) を本定理で書き換え, 6.24 (Frobenius
-kernel nilpotent) を完備化. BG/Peterfalvi 直接被引用は無し (Ch.6 経由のみ).
-
-着手は Ch.5 §5E (5.26) + 本ファイル §7B (7.6) + §7C (7.7) 完成後. -/
+**下流**: Ch.6 Thm 6.23 (characteristic-subgroup 形) を本定理から導出
+(`Ch06_FrobeniusActions.ThompsonPComplement`), 6.24 (Frobenius kernel nilpotent) を完備化.
+BG/Peterfalvi 直接被引用は無し (Ch.6 経由のみ). -/
 
 /-! ### Lem 7.3 — GL(2,p) 補題
 

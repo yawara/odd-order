@@ -154,6 +154,7 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
