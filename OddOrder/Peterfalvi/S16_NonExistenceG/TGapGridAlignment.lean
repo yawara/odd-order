@@ -1274,7 +1274,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8), eta-grid endpoint** (Coq `FTtype34_not_ortho_cycTIiso`):
 the Section 12 residual of a degree-`w₁` member `ζ` is *not* orthogonal to the
 shared eta grid.  This transports the canonical refuter
-`member_residual_not_orthogonal_H0C_of_refuter` through the global sigma/eta
+`S13.zeta_residual_not_orthogonal_H0C_of_refuter` through the global sigma/eta
 grid identification: the zero-column sum becomes the eta zero-row sum via the
 zero-preserving transposed row enumeration, and each pairing entry is hit
 through the aligned product pointer.  The Dade-image identification of the
@@ -1309,8 +1309,8 @@ theorem member_residual_not_orthogonal_eta_of_refuter [Finite G]
         (source - ∑ j' : Fin base.p, base.eta ⟨0, base.q_prime.pos⟩ j')
         (base.eta i j) = 0 := by
   intro horth
-  apply member_residual_not_orthogonal_H0C_of_refuter hG s12 htype hM2 hHcard
-    hrefute zeta hzetaS hzetairr hzeta1
+  apply OddOrder.Peterfalvi.S13.zeta_residual_not_orthogonal_H0C_of_refuter hG s12 htype hM2
+    hHcard hrefute hzetaS hzetairr hzeta1
   intro i j
   have hglobal : ∀ (a : Fin s12.w1) (b : Fin s12.w2),
       s12.alignedOmegaSigmaGrid hG hG.odd a b =
