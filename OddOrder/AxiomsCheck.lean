@@ -10524,6 +10524,9 @@ its blockers (Gorenstein Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are rec
 #assert_only_allowed_axioms OddOrder.GroupTheory.conj_ne_of_isHallSubgroup_fitting_pPrime
 #assert_only_allowed_axioms OddOrder.GroupTheory.isFrobeniusGroup_fitting_of_isComplement
 #assert_only_allowed_axioms OddOrder.GroupTheory.isNilpotent_of_centerIn_ne_bot
+-- `Ω₁` of a cyclic subgroup has order exactly `p` (`GroupTheory.OmegaSubgroup`); the input to
+-- the `Ω₁(Q)Ω₁(R)` step of Gorenstein's "`A` is nilpotent" argument (issue 9133).
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_omega1OfAbelian_eq_of_isCyclic
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.oPiCore_pPrime_eq_bot
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isPGroup_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
