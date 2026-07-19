@@ -626,7 +626,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > 各 lane の commit 後は main clean を確認してから次 lane を訪問する。
 
 1. 各レーンを訪問した時点で未マージ確認: `git log --oneline main..<branch>`。
-   **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
+   **⚠ あわせて未 push も確認する: `git rev-list --count origin/main..main`**
+   （2026-07-19 に実害。前 tick がフルビルド実行中にセッション切断で落ち、a/c のマージ commit は
+   main に残ったまま **gate も push も未完了**になった。次 tick で「全レーン 0 → 変化なし」と
+   即終了すると、この**未検証コミットが main に居座り続ける**。)
+   **「全レーン未マージ 0」かつ「未 push 0」の両方が成り立つときだけ**「変化なし」1行報告で
+   即終了（build を走らせない）。未 push が残っていれば**マージが 0 でも gate を回して push する**。
    未マージがあれば `bin/count-sorry` を記録し、直ちに
    `git merge --no-ff --no-commit <branch>` → `tip=$(git rev-parse MERGE_HEAD)` とする。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
