@@ -141,7 +141,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [x] actual triple-bracket の零和を固有値 fiber ごとに分離する
         - [x] distinct-index 項の消滅を仮定した各 pair-weight fiber を二つの
               repeated 候補へ縮約し、odd-gap 排他と零和から全項を消去する
-        - [ ] `L₃` の pair-weight eigenspace span を使い、distinct-index の actual
+        - [x] `L₃` の pair-weight eigenspace span を使い、distinct-index の actual
               triple-bracket 項をゼロにする
       - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる

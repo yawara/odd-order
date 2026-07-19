@@ -22,9 +22,8 @@ zero and hence force `L₃ = 0`.
 
 The later sections establish Higman's odd-dimension reduction through the
 order-three fixed-point-free theorem, connect `[u²,u] = 1` to the
-triple-commutator sum from p. 86, and eliminate its repeated-weight fibers.
-The remaining frontier is the distinct-weight eigenspace connection and
-final contradiction.
+triple-commutator sum from p. 86, and eliminate both its distinct- and
+repeated-weight terms. The remaining frontier is the final contradiction.
 -/
 
 set_option autoImplicit false
@@ -1086,12 +1085,68 @@ theorem lowerCentralTripleCommutator_weightFiber_sum_eq_zero
     (Module.End.sum_filter_weight_eq_zero_of_sum_eq_zero
       T (Finset.univ : Finset I) weight term htermEigen hsum' mu)
 
+/-- **Higman Lemma 6 (p. 86), three-distinct-index terms.**
+
+If the third-layer action is spanned by the pair-weight eigenspaces and the
+three Frobenius indices are distinct, the actual scalar-extended triple
+commutator lies in an eigenspace which the binary-weight exclusion makes
+zero. -/
+theorem lowerCentralTripleCommutator_eq_zero_of_threeDistinct
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    {H : Type uH} {X : Type uX} [Group H] [Group X]
+    (phi : X →* MulAut H) (g : X)
+    {n : ℕ} (hn : 3 ≤ n)
+    (lambda : K) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (b : Fin n → K ⊗[ZMod 2] Additive (lowerCentralLayer H 0))
+    (hb : ∀ i,
+      (lowerCentralLayerRepresentation phi 0 g).baseChange K (b i) =
+        lambda ^ (2 ^ i.val) • b i)
+    (hspan : ⨆ mu ∈ Set.range (fun p : HigmanExponentPair n ↦
+        lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)),
+      Module.End.eigenspace
+        ((lowerCentralLayerRepresentation phi 2 g).baseChange K :
+          Module.End K (K ⊗[ZMod 2] Additive (lowerCentralLayer H 2))) mu = ⊤)
+    (i j k : Fin n) (hij : i ≠ j) (hik : i ≠ k) (hjk : j ≠ k) :
+    lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+      (lowerCentralCommutatorBilinearBaseChange K H (b i) (b j))
+      (b k) = 0 := by
+  let T₃ : Module.End K
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 2)) :=
+    (lowerCentralLayerRepresentation phi 2 g).baseChange K
+  let term : K ⊗[ZMod 2] Additive (lowerCentralLayer H 2) :=
+    lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+      (lowerCentralCommutatorBilinearBaseChange K H (b i) (b j))
+      (b k)
+  have hbeta := lowerCentralCommutatorBilinearBaseChange_eigenweight
+    K phi g
+    (lambda ^ (2 ^ i.val)) (lambda ^ (2 ^ j.val))
+    (b i) (b j) (hb i) (hb j)
+  have hgamma := lowerCentralDegreeThreeCommutatorBilinearBaseChange_eigenweight
+    K phi g
+    (lambda ^ (2 ^ i.val) * lambda ^ (2 ^ j.val))
+    (lambda ^ (2 ^ k.val))
+    (lowerCentralCommutatorBilinearBaseChange K H (b i) (b j))
+    (b k) hbeta (hb k)
+  have heigen :
+      T₃ term = lambda ^ (2 ^ i.val + 2 ^ j.val + 2 ^ k.val) • term := by
+    simpa only [T₃, term, pow_add, mul_assoc] using hgamma
+  have hbot :
+      T₃.eigenspace (lambda ^ (2 ^ i.val + 2 ^ j.val + 2 ^ k.val)) = ⊥ :=
+    primitiveRoot_threeDistinctWeight_eigenspace_eq_bot
+      hn lambda hprim T₃ hspan i j k hij hik hjk
+  have hmem : term ∈
+      T₃.eigenspace (lambda ^ (2 ^ i.val + 2 ^ j.val + 2 ^ k.val)) :=
+    Module.End.mem_eigenspace_iff.mpr heigen
+  rw [hbot] at hmem
+  simpa only [term, Submodule.mem_bot] using hmem
+
 set_option maxHeartbeats 800000 in
 -- The finite repeated-weight classification has four nested orientation cases.
 /-- **Higman Lemma 6 (p. 86), repeated-weight fiber elimination.**
 
 Assume the actual first-layer brackets are supported on one unordered cyclic
-gap. In a pair-weight fiber, every nonzero triple bracket has a repeated
+gap and that every three-distinct-index triple bracket vanishes. In a
+pair-weight fiber, every nonzero triple bracket therefore has a repeated
 third index. The binary-weight classification leaves one predecessor
 candidate on either side of the target pair. Each side contains at most one
 term, while oddness of the dimension rules out nonzero terms on both sides.
@@ -1259,9 +1314,6 @@ theorem lowerCentralTripleCommutator_pairWeightFiber_terms_eq_zero
     intro w hw hwz
     by_contra hwne
     exact hwz (atMostOne w z hw hzmem hwne hzne)
-  have hsingle : Finset.sum fiber term = term z :=
-    Finset.sum_eq_single_of_mem z hzmem hothers
-  rw [hsingle] at hsum
-  exact hzne hsum
+  exact hzne (Finset.eq_zero_of_sum_eq_zero hsum hothers z hzmem)
 
 end OddOrder.Higman.Suzuki2Groups
