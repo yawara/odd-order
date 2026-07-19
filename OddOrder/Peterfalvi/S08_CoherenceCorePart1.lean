@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
 
 /-!
@@ -115,6 +116,68 @@ theorem six_five_chief_factor_contradiction {LK KH2 H2H1 KH1 : ℕ} (hLK : 1 ≤
     False :=
   six_five_index_contradiction hLK
     (by rw [hmul]; exact Nat.mul_le_mul hKH2 hH2H1) hKH1le
+
+/-- **Peterfalvi (6.5)(a), chief-factor clause**: `K/H₁` is a chief factor of `L`.
+
+This is the group-theoretic half of (6.5)(a); the companion index bound
+`|K : H₁| ≤ 4|L : K|² + 1` is the (6.3) input `hbound` here (Peterfalvi states it as the
+contrapositive of Theorem (6.3), so at the call sites it arrives from the non-coherence of
+`S(M)`).
+
+The two hypotheses are exactly the ones the book uses:
+
+* `hodd` — `|L|` is odd (Hypothesis (6.4)(a)).
+* `hdvd` — the Frobenius divisibility supplied by Hypothesis (6.4)(c): since `L/H₁` is a
+  Frobenius group with kernel `K/H₁`, its complement of order `|L : K|` acts
+  fixed-point-freely on each `L`-normal section between `H₁` and `K`, so `|L : K|` divides
+  `|K : W| − 1` and `|W : H₁| − 1`.
+
+**Proof** (book, p. 31): suppose an `L`-normal `W` sits strictly between `H₁` and `K`.  Both
+`|K : W|` and `|W : H₁|` are odd (they divide the odd `|L|`) and exceed `1`, so `hdvd` plus
+`two_mul_add_one_le_of_odd_dvd` forces each to be `≥ 2|L : K| + 1`.  Multiplying,
+`|K : H₁| = |K : W|·|W : H₁| ≥ (2|L : K| + 1)² > 4|L : K|² + 1`, contradicting `hbound`
+(`six_five_chief_factor_contradiction`). -/
+theorem isChiefFactor_of_relIndex_le_of_odd_dvd {L : Type*} [Group L] [Finite L]
+    {K H₁ : Subgroup L} [K.Normal] [H₁.Normal]
+    (hodd : Odd (Nat.card L)) (hlt : H₁ < K)
+    (hdvd : ∀ W : Subgroup L, W.Normal → H₁ ≤ W → W ≤ K →
+      K.index ∣ W.relIndex K - 1 ∧ K.index ∣ H₁.relIndex W - 1)
+    (hbound : H₁.relIndex K ≤ 4 * K.index ^ 2 + 1) :
+    OddOrder.GroupTheory.IsChiefFactor K H₁ := by
+  classical
+  refine ⟨inferInstance, inferInstance, hlt, ?_⟩
+  intro W hWnormal hH₁W hWK
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨hWne₁, hWneK⟩ := hcon
+  -- Oddness of the three indices: each divides `|L|`.
+  have hoddLK : Odd K.index := hodd.of_dvd_nat K.index_dvd_card
+  have hoddKW : Odd (W.relIndex K) :=
+    hodd.of_dvd_nat ((Subgroup.relIndex_dvd_index_of_le hWK).trans W.index_dvd_card)
+  have hoddWH₁ : Odd (H₁.relIndex W) :=
+    hodd.of_dvd_nat ((Subgroup.relIndex_dvd_index_of_le hH₁W).trans H₁.index_dvd_card)
+  -- `1 < |K : W|` and `1 < |W : H₁|`, since both inclusions are strict.
+  have hposKW : 0 < W.relIndex K := Nat.pos_of_ne_zero (by
+    intro h0; simp [h0] at hoddKW)
+  have hposWH₁ : 0 < H₁.relIndex W := Nat.pos_of_ne_zero (by
+    intro h0; simp [h0] at hoddWH₁)
+  have hKW1 : 1 < W.relIndex K := by
+    have hne : W.relIndex K ≠ 1 := fun h =>
+      hWneK (le_antisymm hWK (Subgroup.relIndex_eq_one.mp h))
+    omega
+  have hWH₁1 : 1 < H₁.relIndex W := by
+    have hne : H₁.relIndex W ≠ 1 := fun h =>
+      hWne₁ (le_antisymm (Subgroup.relIndex_eq_one.mp h) hH₁W)
+    omega
+  -- `|L : K| ≥ 1`.
+  have hLK1 : 1 ≤ K.index := hoddLK.pos
+  -- The book's two lower bounds, then the arithmetic contradiction.
+  obtain ⟨hdKW, hdWH₁⟩ := hdvd W hWnormal hH₁W hWK
+  refine six_five_chief_factor_contradiction hLK1
+    (two_mul_add_one_le_of_odd_dvd hoddLK hoddKW hdKW hKW1)
+    (two_mul_add_one_le_of_odd_dvd hoddLK hoddWH₁ hdWH₁ hWH₁1) ?_ hbound
+  rw [Nat.mul_comm]
+  exact (Subgroup.relIndex_mul_relIndex H₁ W K hH₁W hWK).symm
 
 /-- **Peterfalvi (6.5)(c)** : `|L:K|` does not divide `p − 1`.  If it did then
 `p ≥ 2|L:K|+1` (`two_mul_add_one_le_of_odd_dvd`), and since `K/M` is a

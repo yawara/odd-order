@@ -3900,6 +3900,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_index_contradiction
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_chief_factor_contradiction
+-- Peterfalvi (6.5)(a), chief-factor clause (group-theoretic form)
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.isChiefFactor_of_relIndex_le_of_odd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_c_contradiction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.XAdjoinStepInput.adjoin
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_eq_zero

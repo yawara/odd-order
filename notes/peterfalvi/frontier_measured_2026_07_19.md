@@ -26,7 +26,7 @@
 | §6 | (6.2) | **STALE → 一般形あり** | `six_two_general` (S08_Theorem62_63_Standalone.lean:349) — Sibley/Frobenius/nilpotent/solvable いずれも不要。survey が指す file が誤り。`h56` 仮説は残る。 |
 | §6 | (6.3) | 部分 | `six_three_of_six_two_oracle` (:383) は一般。`h56` には一般 producer `exists_source_index_le_two_psi_of_break` (S08_SixTwoGeneral.lean:987) があり、無条件 consumer `typeV_sixFiveA_bound` (S12_Noncoherence.lean:325, axiom-pinned) で実際に discharge 済。**残: standalone 無条件 (6.3)** — `h56` を (6.1)+(5.6) だけから導く。 |
 | §6 | (6.4) | **STALE** | 一般定理群は抽象 (6.1) 三つ組 `(τ, A0, SOf)` で parametrize 済。`SibleyDadeHypothesis` は (6.6)/(6.8) の X/Y-set 用 carrier にすぎない。 |
-| §6 | **(6.5)(a)** | **CONFIRMED 欠落** | 「K/H₁ は L の chief factor」節がどこにも無い。`IsChiefFactor` は `OddOrder/GroupTheory/ChiefFactor.lean:50` に存在するが S08*/S12* から参照ゼロ。**feeder 3 つは揃っている** (`six_five_chief_factor_contradiction` S08_CoherenceCorePart1.lean:112 / `isPGroup_of_card_le_of_isFrobeniusAction` :231 / (6.3) の index bound) ので**残りは wrapper のみ**。 |
+| §6 | (6.5)(a) | **✅ 2026-07-19 解消** | 「K/H₁ は L の chief factor」節を `isChiefFactor_of_relIndex_le_of_odd_dvd` (S08_CoherenceCorePart1.lean:135) として形式化。旧状況: feeder 3 つは揃っていたが wrapper が無く、`IsChiefFactor` (`OddOrder/GroupTheory/ChiefFactor.lean:50`) は S08*/S12* から参照ゼロだった。 |
 | §6 | (6.6) | 部分 | 特徴づけ半分は Z-generic (`Xset_eq_irreducible_not_subset_characterKernel`, S08_DegreeSums/CoherenceGlue.lean:491)。coherence 半分は `Z = hyp.centralCommutator` に固定 + `3 ≤ p` / `IsPGroup p ↥H` / `Coprime H.index p`。 |
 | §7 | (7.8) | **STALE → 済** | 一般形は `Hypothesis78` 層に実在 (`BetaDecomp` S09_NonexistenceCertain/QuadraticTerm.lean:916, `betaDecompOfFacts` S09_CertificateDischarge.lean:689, `NormEstimates` CoherenceFormula.lean:75)。FrobeniusFamily は consumer にすぎない。追加引数は本文の「S は coherent」前提そのもので特殊化でない。 |
 | §7 | (7.9) | 部分 | `Hypothesis79` + `conclusion_of_…_parity` (TwoFamilies.lean:344) は一般。**Frobenius 専用は `hdelta_even` のみ** (`FrobeniusFamily.hypothesis79_delta_even`, S09_FrobeniusParity.lean:60)。feeder は generic (`cfdot_real_vchar_even` S09_ParityPrimitive.lean:148 ほか)。 |
@@ -42,7 +42,7 @@
 
 ## 推奨着手順 (上流優先 + 文書順)
 
-1. **(6.5)(a) chief factor 節** — feeder 3 つ揃い、wrapper のみ。§6 = 文書順最上流の実ギャップ。
+1. ~~(6.5)(a) chief factor 節~~ **✅ 2026-07-19 完了**。
 2. **(9.10) の `caseB` 除去** — feeder 実在、dispatch を consumer から定理内へ移すだけ。
 3. **(13.8) S 側 mirror** — 下流が全て側非依存ゆえ 1 本で閉じる。
 4. (7.9) `hdelta_even` の一般化 → (6.3) standalone 無条件化 → (11.8) ∀ 化。
@@ -55,7 +55,6 @@
   → 実際は全て discharge 済・file は sorry-free。
 - `S11_MaximalII_III_IV/ThetaCountAssembly.lean:1025` — (9.10) type-II `HU`-Frobenius 節を
   「left `sorry`」→ 実際は本文中で証明済。
-- ⚠ **未検証で残した疑い**: `AxiomsCheck.lean:9905-9924` が
-  `coherent_sOf_H0Cprime`/`coherent_sOf_H0C` について「upstream `C_eq_cSub` の sorryAx 債務を
-  引き継ぐ」と注記するが、`C_eq_cSub_of_noncoherent` (S13_CoreStructure.lean:511) を含め
-  当該 file は sorry-free。`#print axioms` で確認して注記を直すこと。
+- `AxiomsCheck.lean:9906/9925` が (9.11) 系 8 宣言について「upstream `C_eq_cSub` の sorryAx
+  債務を引き継ぐ」と注記していた件 → **`#print axioms` で実測し全て allowlist 3 axiom のみと確認**。
+  注記を訂正し、8 宣言 (capstone `coherent_sOf_H0Cprime` / `coherent_sOf_H0C` を含む) を pin 済。
