@@ -1125,4 +1125,59 @@ theorem Hypothesis.exists_charParameters_full [Finite G]
     rw [hde] at hs
     exact hs
 
+/-- **(10.2)/(10.3) character parameters built around a *given* `ζ`** — the `∀ ζ` form of
+`exists_charParameters_full`.
+
+`exists_charParameters_full` picks its own `ζ` via `exists_zeta_in_inducedFamily_degree_w1`; the
+consumers that state a property "for every `ζ ∈ S` of degree `w₁`" (Peterfalvi (11.8)/(11.9), whose
+book form quantifies over `ζ ∈ S(HC)`) need the parameters assembled around a `ζ` handed to them.
+
+Nothing but the three `ζ`-fields depends on the choice: `d`, `δ`, `n`, `μ`, `ω^σ` and the arithmetic
+come from `exists_charParamArith`, and the only field coupling `ζ` to the grid is
+`alpha_support` (`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` supported on `A₀`), whose producer
+`muGrid_alpha_support` is **already `ζ`-generic** — it takes exactly `hζS` and `hζdeg : ζ(1) = w₁`
+(these are what make `α_{ij}` vanish at `1`, via `n·w₁ = d − δ` and `μ_{i0}(1) = 1`).  So the
+degree condition is not a repo artefact: it is precisely what `α`'s support demands. -/
+theorem Hypothesis.exists_charParameters_full_of_zeta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζdeg : ζ 1 = (hyp.w1 : ℂ)) :
+    ∃ params : CharacterParameters hyp,
+      params.zeta = ζ ∧
+      params.mu = hyp.muGrid hG hG.odd ∧
+      params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd ∧
+      params.zeta ∈ inducedFamily M ∧ params.zeta 1 = (hyp.w1 : ℂ) ∧
+      params.zeta.conj ≠ params.zeta ∧
+      (params.delta = 1 ∨ params.delta = -1) ∧
+      (∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨d, delta, n, hd1, hnf, hn2, hdi, hδindep⟩ := hyp.exists_charParamArith hG hG.odd
+  refine ⟨{ zeta := ζ
+            zeta_mem_S := hζS
+            zeta_irreducible := hζirr
+            d := d
+            delta := delta
+            n := n
+            w2_prime := hyp.w2_prime hG
+            d_gt_one := hd1
+            mu := hyp.muGrid hG hG.odd
+            omegaSigma := hyp.alignedOmegaSigmaGrid hG hG.odd
+            degree_independent := hdi
+            n_formula := hnf
+            two_le_n := hn2
+            alpha_support := fun i j hj =>
+              hyp.muGrid_alpha_support hG hG.odd hj hζS (hdi i j hj)
+                (hyp.muGrid_zero_column_apply_one hG hG.odd i) hζdeg hnf (hδindep j hj)
+            typeV_parameter_formula := True
+            typeV_coherence_formula := True },
+    rfl, rfl, rfl, hζS, hζdeg, ?_, ?_, hδindep⟩
+  · exact hyp.zeta_conj_ne hG hζdeg
+  · have hw2 : 2 ≤ hyp.w2 := (hyp.w2_prime hG).two_le
+    have hj : (⟨1, by omega⟩ : Fin hyp.w2) ≠ 0 := by simp [Fin.ext_iff]
+    have hde := hδindep ⟨1, by omega⟩ hj
+    have hs := hyp.muColumnSign_eq_one_or_neg_one hG hG.odd ⟨1, by omega⟩
+    rw [hde] at hs
+    exact hs
+
 end OddOrder.Peterfalvi.S12
