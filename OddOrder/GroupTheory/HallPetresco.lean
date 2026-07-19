@@ -105,55 +105,51 @@ the others unaware of `A` — each of them evaluates as if only its own slots
 existed.
 -/
 
-/-- The value of a collected block, evaluated at the assignment of *its own*
-support.  By `evalWord_congr` this is what any `assign A` with `A ⊇ S` returns. -/
-def pairValue (p : Finset L × List (FormalCommutator (G × L))) : G :=
-  evalWord (assign p.1) p.2
+/-- The value of the block attached to a support, evaluated at the assignment of
+that very support.  By `evalWord_congr` this is what any `assign A` with
+`A ⊇ S` returns. -/
+def blockValue (blk : Finset L → List (FormalCommutator (G × L))) (S : Finset L) : G :=
+  evalWord (assign S) (blk S)
 
 /-- **Substituting a slot set.**  In a decomposition of a word into exact-support
 blocks, the assignment of `A` kills every block whose support is not contained in
 `A` and evaluates the remaining ones independently of `A`. -/
-theorem evalWord_flatten_eq_filter {supports : List (Finset L)}
-    {blocks : List (List (FormalCommutator (G × L)))}
-    (h : List.Forall₂ (fun T q => ∀ c ∈ q, support slot c = T) supports blocks)
-    (A : Finset L) :
-    evalWord (assign A) blocks.flatten
-      = (((supports.zip blocks).filter fun p => decide (p.1 ⊆ A)).map pairValue).prod := by
-  induction h with
-  | nil => simp
-  | @cons T q ss bs hhead _ ih =>
-      rw [List.flatten_cons, evalWord_append, ih, List.zip_cons_cons, List.filter_cons]
-      by_cases hTA : T ⊆ A
-      · have hq : evalWord (assign A) q = evalWord (assign T) q := by
-          refine evalWord_congr slot fun c hc x hx => ?_
-          rw [hhead c hc] at hx
-          simp [assign, hx, hTA hx]
-        simp only [hTA, decide_true, if_true, List.map_cons, List.prod_cons]
-        rw [hq]
-        rfl
-      · have hq : evalWord (assign A) q = 1 := by
-          refine evalWord_eq_one_of_not_subset (A := A) slot
-            (fun x hx => by simp only [assign, if_neg hx]) ?_
-          intro c hc
-          rw [hhead c hc]
-          exact hTA
-        simp [hTA, hq]
+theorem map_evalWord_blk_eq {supports : List (Finset L)}
+    {blk : Finset L → List (FormalCommutator (G × L))}
+    (hblk : ∀ S ∈ supports, ∀ c ∈ blk S, support slot c = S) (A : Finset L) :
+    (supports.map fun S => evalWord (assign A) (blk S)).prod
+      = (supports.map fun S => if S ⊆ A then blockValue blk S else 1).prod := by
+  refine congrArg List.prod (List.map_congr_left fun S hS => ?_)
+  by_cases hSA : S ⊆ A
+  · rw [if_pos hSA]
+    refine evalWord_congr slot fun c hc x hx => ?_
+    rw [hblk S hS c hc] at hx
+    simp [assign, hx, hSA hx]
+  · rw [if_neg hSA]
+    refine evalWord_eq_one_of_not_subset (A := A) slot
+      (fun x hx => by simp only [assign, if_neg hx]) ?_
+    intro c hc
+    rw [hblk S hS c hc]
+    exact hSA
 
 /-- **The specialised collection formula.**  Fix a decomposition of the expanded
 word into exact-support blocks.  Then for every slot set `A`,
 
-`x₁^{|A|} ⋯ x_m^{|A|} = ∏_{∅ ≠ S ⊆ A} (value of the block of S)`,
+`x₁^{|A|} ⋯ x_m^{|A|} = ∏_{∅ ≠ S ⊆ A} blockValue S`,
 
-the product taken in increasing order of `|S|`.  Both sides now depend on `A`
-alone, and the right-hand side only through which subsets `A` has. -/
-theorem prod_pow_card_eq_filter {xs : List G} {supports : List (Finset L)}
-    {blocks : List (List (FormalCommutator (G × L)))}
-    (h : List.Forall₂ (fun T q => ∀ c ∈ q, support slot c = T) supports blocks)
-    (hval : ∀ f : G × L → G, evalWord f (expandedWord L xs) = evalWord f blocks.flatten)
+the product taken in increasing order of `|S|`.  The left-hand side depends on
+`A` only through `|A|`, while the right-hand side depends on it only through
+which subsets `A` has — the tension that forces `blockValue S` to depend only on
+`|S|`, and produces the binomial exponents by counting subsets. -/
+theorem prod_pow_card_eq {xs : List G} {blk : Finset L → List (FormalCommutator (G × L))}
+    (hblk : ∀ S ∈ supportList L 1 (Fintype.card L), ∀ c ∈ blk S, support slot c = S)
+    (hval : ∀ f : G × L → G, evalWord f (expandedWord L xs)
+      = ((supportList L 1 (Fintype.card L)).map fun S => evalWord f (blk S)).prod)
     (A : Finset L) :
     (xs.map fun g => g ^ A.card).prod
-      = (((supports.zip blocks).filter fun p => decide (p.1 ⊆ A)).map pairValue).prod := by
-  rw [← evalWord_expandedWord xs A, hval, evalWord_flatten_eq_filter h A]
+      = ((supportList L 1 (Fintype.card L)).map
+          fun S => if S ⊆ A then blockValue blk S else 1).prod := by
+  rw [← evalWord_expandedWord xs A, hval, map_evalWord_blk_eq hblk A]
 
 end HallPetresco
 
