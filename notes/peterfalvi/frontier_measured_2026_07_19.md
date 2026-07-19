@@ -24,7 +24,8 @@
 | §5 | (5.3)(b) | **✅ 2026-07-19 解消** | (5.2.e) mixed irr×red を `certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV` (S08_CrossOrthogonality.lean) に一般化。3 instance コピー→1 定理。 |
 | §5 | (5.8) | **STALE / 債務でない** | 二分岐は既に抽象 (`eq_smul_chiFam_column_of_vanishOnV`, S05_SigmaTrichotomy.lean:461, 素の `TICyclicHypothesis`)。一意性 rider は consumer が符号を `∃ delta'` に吸収するため不要 = 設計選択。 |
 | §6 | (6.2) | **STALE → 一般形あり** | `six_two_general` (S08_Theorem62_63_Standalone.lean:349) — Sibley/Frobenius/nilpotent/solvable いずれも不要。survey が指す file が誤り。`h56` 仮説は残る。 |
-| §6 | (6.3) | 部分 (**次の frontier / 道筋確定**) | `six_three_of_six_two_oracle` (S08_Theorem62_63_Standalone.lean:383) は一般。`h56` の一般 producer `exists_source_index_le_two_psi_of_break` (S08_SixTwoGeneral.lean:987) も実在し、無条件 consumer `typeV_sixFiveA_bound` (S12_Noncoherence.lean:325, axiom-pinned) で discharge 済。**残るのは producer の 2 仮説 `hanchor` / `hdatum` を文脈依存でなく一般に供給すること**。⚠ うち `hanchor` は債務でない — **教科書 (6.2) の証明が自分で導いている**: p.30「Since `K` is solvable, `K/A` has a non-trivial irreducible character of degree 1, whence `S(A)` contains a character of degree `|L:K|`」。Hypothesis (6.1) は `K` solvable を含むので、**「非自明可解群は非自明な 1 次指標を持つ」+ `inducedKernelFamily` 所属 + 次数計算**の 補題 1 本で `hanchor` は消える。repo の `six_two_general` は `IsSolvable K` すら仮定しない(教科書より広い) ため、その分 `h56` を仮説で受けている構図。`hdatum` は (5.6) 適用側の grid decomposition で、こちらは別途。⚠⚠ **着手前に必ず解消すべき食い違い**: repo の `hanchor` は `IsIrreducibleCharacter χ₁ ∧ χ₁ 1 = K.index` と**既約性を要求**するが、教科書 p.30 の当該文は「`S(A)` contains a **character** of degree `|L:K|`」と言うだけで**既約性を主張していない**。よって「可解 ⟹ 非自明 1 次指標」だけでは repo の `hanchor` は作れない。先に (i) producer 側で既約性が本当に要るのか (使用箇所を読む)、(ii) 要らないなら `hanchor` を弱めて教科書どおりにする、を決めること。材料自体は揃っている: `Nontrivial (Abelianization …)` / `Nontrivial (Abelianization … →* ℂˣ)` のパターンが CaseBXi.lean:690/698 に、`inducedKernelFamily` の定義が S08_SixTwoGeneral.lean:54 に。 |
+| §6 | (6.2) `hanchor` | **✅ 2026-07-19 解消** | 下表の (6.3) 行にあった「`inertia θ = K` をどう供給するか」という gap は**存在しなかった** — repo 側の (5.6) エンジンが anchor の既約性を要求していたのが**特殊化債務**だった。Peterfalvi (5.6) の仮説は `S₁` coherent / `χ₁(1) ∣ χ(1)` / `2χ(1)χ₁(1) < ∑ χᵢ(1)²/‖χᵢ‖²` の 3 つのみで、証明は `‖χ₁‖²` を**記号のまま担ぐ** ((5.6.1) の `(Y, χ₁^τ₁) = (a − λ/‖χ₁‖²)‖χ₁‖² = a‖χ₁‖² − λ`)。エンジンを norm-general 化して `hanchorNorm : mc i₁ = 1` を全廃 → `hanchor` は教科書どおり「`S(A')` は次数 `|L:K|` の character を含む」に弱まり、**既存の `exists_inducedKernelFamily_member_degree_index` (S08_SixTwoGeneral.lean:143) がそのまま discharge**。詳細は下記「(5.6) エンジンの norm 一般化」節。 |
+| §6 | (6.3) | **✅ 2026-07-19 決着** (下記 2 節参照) | `six_three_of_six_two_oracle` (S08_Theorem62_63_Standalone.lean:383) は一般。`h56` の producer `exists_source_index_le_two_psi_of_break` (S08_SixTwoGeneral.lean) の 2 仮説のうち **`hanchor` は解消** ((5.6) エンジンの norm 一般化 → 既存 `exists_inducedKernelFamily_member_degree_index` で discharge)。**`hdatum` は債務でない** — Peterfalvi (5.2.d)+(5.2.e) そのもので、教科書も Hypothesis (5.2) の**仮説として担いでいる** (導出していない)。⟹ repo が `h56`/`hdatum` をパラメータで受けるのは忠実。⚠ 旧記述にあった「本当の gap は `inertia θ = K` の供給」は**誤診** — 撤回済 ([[repo-stronger-hypothesis-is-specialization-not-gap]])。真の未形式化は **(5.3) の一般 producer**。 |
 | §6 | (6.4) | **STALE** | 一般定理群は抽象 (6.1) 三つ組 `(τ, A0, SOf)` で parametrize 済。`SibleyDadeHypothesis` は (6.6)/(6.8) の X/Y-set 用 carrier にすぎない。 |
 | §6 | (6.5)(a) | **✅ 2026-07-19 解消** | 「K/H₁ は L の chief factor」節を `isChiefFactor_of_relIndex_le_of_odd_dvd` (S08_CoherenceCorePart1.lean:135) として形式化。旧状況: feeder 3 つは揃っていたが wrapper が無く、`IsChiefFactor` (`OddOrder/GroupTheory/ChiefFactor.lean:50`) は S08*/S12* から参照ゼロだった。 |
 | §6 | (6.6) | 部分 | 特徴づけ半分は Z-generic (`Xset_eq_irreducible_not_subset_characterKernel`, S08_DegreeSums/CoherenceGlue.lean:491)。coherence 半分は `Z = hyp.centralCommutator` に固定 + `3 ≤ p` / `IsPGroup p ↥H` / `Coprime H.index p`。 |
@@ -37,17 +38,100 @@
 | §9 | (9.10) | **✅ 2026-07-19 解消** | trigger 形 `exceptional_case_frobenius_realization_of_trigger` (ThetaCountAssembly.lean:1146) を追加 — `caseB` carrier を仮説に取らず、`hno` だけから Clifford case (b) を選ぶ (case (a) は自身の (9.8.c) 由来の次数 `q·u` 既約元を `Cprime_le_C` + `sOf_antitone` で `𝒮(H₀C′)` へ移して `hno` と矛盾)。consumer (S12_TypeIICrossIsometryPair) の inline dispatch も解消。 |
 | §9 | (9.11) | CONFIRMED 特殊化 | `coherent_sOf_H0Cprime` (S13_Orthogonality.lean:1197) は `S13.Hypothesis M` + `IsTypeIII ∨ IsTypeIV`。type-II は §15 の S/T instance 別経路。**repo に `Hypothesis (9.5)` オブジェクトが存在しない** (§9 の仮説は S11 の 3 carrier に分散)。 |
 | §10 | (10.11) | 部分 | 第 1 主張 (|W1|,|W2| prime) は一般 (`theorem88_caseB_prime_orders`, S12_MaximalIII_IV_V.lean:1682)。type-II 残余は §15 の S/T pair instance のみ。 |
-| §11 | (11.8) | CONFIRMED 特殊化 | `exists_zeta_residual_not_orthogonal_H0C_of_refuter` (S13_Orthogonality.lean:1036) — ∃ でなく ∀ が本文形。加えて ζ が**次数 `w₁`** と `S12.inducedFamily M` に固定 + `IsTypeIII ∨ IsTypeIV`。証明本体は既に ζ-generic。 |
+| §11 | (11.8) | **✅ 2026-07-19 解消 (∀ 化)** | 教科書形は ∀ ζ (PDF p.65-67: 任意の `ζ ∈ S(HC)` に対し直交性を仮定して (11.8.4)-(11.8.6) で (11.3) と矛盾)。`zeta_residual_not_orthogonal_H0C_of_refuter` (S13_Orthogonality.lean) として ∀ 形を主定理化し、旧 `exists_zeta_...` は witness packaging の系に降格 (consumer 3 箇所は無変更)。鍵は新規 `S12.Hypothesis.exists_charParameters_full_of_zeta` — parameters を**与えられた ζ の周りで**組む。⚠ 次数 `ζ(1) = w₁` は**特殊化でない**: `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` の台条件 (`alpha_support`) がまさにそれを要求する (`n·w₁ = d − δ` + `μ_{i0}(1) = 1` ⟹ `α_{ij}(1) = 0`)。残る狭さは `S12.inducedFamily M` 固定 + `IsTypeIII ∨ IsTypeIV` のみ。 |
 | §13 | (13.8) | CONFIRMED 特殊化 (**規模大**) | 側非依存エンジンは完備 (`caseB_eta01_norm_core`/`_bound`, S15_SAndT_Setup/Machinery135.lean:908/937)。**T 側 instance のみ** (`eta10_Qsharp_norm_lower_core`, Eta10Correction.lean:361)。⚠ **「S 側 producer を 1 本書けば閉じる」は誤り (2026-07-19 実測で訂正)** — carrier 上に **`eta01` という関数がそもそも存在しない** (`grep eta01` は Machinery135 の **側非依存エンジン名/docstring** にしか当たらない; carrier が持つのは `hyp.eta10` のみ)。T 側 producer `exists_caseB_data_eta10_T_core` が依存する 4 ピース (`exists_muT_index_caseB_core` / `exists_etaT_alphaFun_one_int_core` / `Q_sharp_hypothesis76_base` / `reconciled_typePData_T`) は**いずれも S 側版が未存在**。⟹ 着手すると (i) `eta01` の定義、(ii) `P^#` 上の Hypothesis76 base、(iii) S 側 μ index core、(iv) S 側 α 関数、(v) mirror 組み立て、の 5 段になる。 |
+
+## (5.6) エンジンの norm 一般化 (2026-07-19, lane a)
+
+**発端**: (6.3) の frontier 調査で「repo の `hanchor` が anchor の既約性を要求するが、教科書 p.30 は
+"`S(A)` contains a **character** of degree `|L:K|`" としか言わない」という食い違いを flag していた。
+前回の追調査は「本当の gap は `inertia θ = K` (= θ が L-不変でない) の供給」と結論したが、
+**これは誤りだった**。
+
+**教科書の実測 (PDF p.26-27, p.30)**: Theorem (5.6) の仮説は
+(a) `S₁` coherent, (b) `χ₁(1) ∣ χ(1)`, (c) `2χ(1)χ₁(1) < ∑ χᵢ(1)²/‖χᵢ‖²` の **3 つだけ**で、
+anchor `χ₁` の既約性も norm 1 も**要求していない**。証明は `‖χ₁‖²` を記号のまま担ぐ:
+- (5.6.1): `λᵢ = λ·aᵢ/‖χᵢ‖²` (`λ = λ₁‖χ₁‖²`)、`(Y, χ₁^τ₁) = (a − λ/‖χ₁‖²)‖χ₁‖² = a‖χ₁‖² − λ ∈ ℤ`
+  ⟹ `λ ∈ ℤ` (`a‖χ₁‖² ∈ ℤ` を使う)。
+- (5.6.2): `(λ/‖χ₁‖² − a)²‖χ₁‖² + λ²∑_{i≥2}(aᵢ²/‖χᵢ‖⁴)‖χᵢ‖² + ‖Z‖² ≤ a²‖χ₁‖²`
+  ⟹ `λ²∑aᵢ²/‖χᵢ‖² − 2λa + ‖Z‖² ≤ 0` — `‖χ₁‖²` は完全に相殺される。
+
+⟹ repo 側の `hanchorNorm : mc i₁ = 1` は**特殊化債務**であって教科書要件ではなかった。
+
+**実施した一般化** (`mc i₁` を記号のまま担ぐ):
+| 宣言 | 変更 |
+|---|---|
+| `inner_Y_extension_member_eq` (S08_CoherenceCorePart1/CoherentAdjoin.lean) | `hchi1chi1 : ⟨χ₁,χ₁⟩ = m₁`、結論を `a·⟨χ₁,cⱼ⟩ − (a·m₁ + μ)·aⱼ` へ (λ = `a·m₁ + μ`)。 |
+| `crux1_of_memberFamilyW` (S08_CoherenceWeighted.lean) | `hanchorNorm` 廃止、結論 `μ = −a·mc i₁`。**λ の整数性は `mc i₁ = ⟨νχ₁,νχ₁⟩` が `ν χ₁ ∈ ℤ[Irr G]` ゆえ整数**という事実で供給 (`inner_mem_ZIrr_int`) — これが `mc i₁ = 1` の norm-general な代替。 |
+| `retarget_isCoherent_of_extensionImage` / `_k` | `m₁` 化。`huu = 1 + a²·m₁`、`hvv = m₁`、`hvu = −a·m₁` のみ変化し、`‖X‖² = 1`・`‖X̄‖² = 1`・`⟨X,X̄⟩ = 0` は `a²·m₁` が相殺して不変。 |
+| `lambda_eq_zero_and_Z_eq_zero` (S07) | **変更不要** — 元から norm-general (`hψ : ‖ψ‖² = a²·mc i₁`, `hr₁ : rc i₁·mc i₁ = 1` は `deg i₁ = 1` から従う)。 |
+| `xAdjoinStepW` / `_k`、`XAdjoinStepInputW`、`coherentDegreeSqNormBound_of_not_coherentW` / `_k` | `hanchorNorm` フィールド・仮説を全廃。 |
+| `inducedKernelFamily_SA_sum_le_two_psi_k` 系 (S08_SixTwoGeneral) | `hχ₁irr : IsIrreducibleCharacter χ₁` を**削除**。 |
+| `exists_source_index_le_two_psi_of_break` | `hanchor` を教科書形 `∃ χ₁ ∈ S(A'), χ₁ 1 = |L:K|` へ弱化。 |
+| `S13_SixTwoBridge.exists_anchor` | `hG`/`hyp`/(8.4.d) `inertia_eq_derived_of_linear` 依存を**除去**し、既存の `exists_inducedKernelFamily_member_degree_index` (S08_SixTwoGeneral.lean:143) 一本で discharge。 |
+
+**帰結**: (6.2) の `hanchor` は**閉じた**。教科書の "K solvable ⟹ K/A は非自明 1 次指標を持つ
+⟹ S(A) は次数 |L:K| の character を含む" がそのまま Lean 側の discharge になる
+(`commutator (K ⧸ X.subgroupOf K) ≠ ⊤` が入力)。⚠ **副次的に `caseB` 側の `hanchorNorm` 導出
+(S08_CaseBEnumeration の 2 箇所、`η` の既約性経由) も dead code になり削除**。
+残る (6.3) の未充足仮説は **`hdatum` のみ** ((5.6) 適用側の grid decomposition)。
+
+## ⚠ 「(6.3) 無条件化」の再定義 — `hdatum` は債務でなく教科書の standing hypothesis
+
+`hanchor` を閉じた後、(6.3) に残る `hdatum` を調べた結果、**「一般に供給する」は
+そもそも達成すべき目標ではない**ことが判明した (PDF p.25 実測)。
+
+- `hdatum` = **Peterfalvi (5.2.d) + (5.2.e)**:
+  (d) `χ ∈ S` に対し `(χ − χ̄)^τ = ∑_{α ∈ R(χ)} α` (`R(χ)` は `ℤ[Irr G]` の正規直交部分集合)、
+  (e) `φ` が `{χ, χ̄}` に直交するなら `R(φ) ⊥ R(χ)`。
+- これらは **Hypothesis (5.2) の仮説そのもの**で、教科書も導出していない。Theorem (5.6) は
+  Hypothesis (5.2) の下で証明される。
+- 教科書が (5.2) を**供給する**のは **(5.3) の 2 経路だけ**:
+  - **(5.3.a)** (5.2.a)+(5.2.b)+`S ⊆ Irr L` ⟹ (5.2)。(`‖(χ−χ̄)^τ‖² = 2` ゆえ `|R(χ)| = 2`、
+    (5.2.e) は (4.1) から)
+  - **(5.3.b)** Hypothesis (4.6)+(5.2.a)+`S ⊆ {Ind_K^L θ | H ⊄ Ker θ}` ⟹ (5.2)。可約 member は
+    `μ_j` (0 < j < w₂) で、(4.9) より `R(μ_j) = {δ_j ω^σ_{ij}, −δ_j ω^σ_{ik} | 0 ≤ i < w₁}`。
+- ⟹ repo が `six_two_general` / `six_three_of_six_two_oracle` / `exists_source_index_le_two_psi_of_break`
+  で `hdatum` (と `h56`) を**パラメータとして担いでいるのは教科書に忠実**であって特殊化債務でない。
+  「(6.3) standalone 無条件化」は `hanchor` の分で**完了**とみなす。
+
+### ⚠ 「(5.3) が未形式化」は誤り — 自己訂正 (同日、着手前に実測して撤回)
+
+上記から「次の上流仕事は (5.3.a)/(5.3.b) の一般 producer を書くこと」と一旦書いたが、
+**着手前の実測で誤りと判明した**。`S07.Hypothesis` の producer を `ofIrreducible` /
+`Hypothesis.of` 等の名前で grep して 0 件だったための false negative
+([[verify-port-state-by-number-not-coq-name]] そのもの)。実際は:
+
+- **(5.3.a) は実在** = `OddOrder.Peterfalvi.S07.irrSubcoherent`
+  (`S07_Subcoherent.lean:151`)。`τ`/`A`/per-member `Rdatum`/(5.2.a,c) 述語/差の台条件/
+  格子 isometry から `S07.Hypothesis` を組む**抽象一般形**。(5.2.e) は
+  `orthogonal_of_signedDifference_inner_eq_zero` + isometry + `inner_conjugateDifference_eq_zero`
+  で導出済。consumer 実在 (例 `sSetIrrDegT_subcoherent`, S15_TSetMemberRFamily.lean:799)。
+- **(5.3.b) = Coq `prDade_subcoherent` は「作らない」が既定裁定** (`S07_Subcoherent.lean:280-300`,
+  2026-07-06 CORRECTED 注記)。理由 2 点: (i) `S07.Hypothesis.difference_image` は
+  **2 元の `CharacterDifferenceImage` を固定**するが Coq `subcoherent` の `R` は可変長
+  (既約 2 / 可約 `μ_j` は `2w₁`) ゆえ `prDade` 形の `S07.Hypothesis` は**構成不能**、
+  (ii) **consumer ゼロ** — 可約列の coherence は `S07.IsCoherent` として直接
+  (`certainType_isCoherent`, S06:505) 消費される。可約 R-datum の中身自体は
+  `S06.certainTypeR` / `columnImageFamilyCohFree` / `sixTwoDecompositionData` として
+  **既に sorry-free で存在**。
+
+⟹ **§5 (5.2)/(5.3) 層に未形式化は無い**。同 note の「Multi-session build outline」
+(`S07_Subcoherent.lean:278-345`) が §5→§9 の live な残作業の正本で、そこが指す残りは
+**(9.11) の pair-adjoining induction の `hstep` データ** (S15 に局在) であって §5 ではない。
 
 ## 推奨着手順 (上流優先 + 文書順)
 
 1. ~~(6.5)(a) chief factor 節~~ **✅ 2026-07-19 完了**。
 2. ~~(9.10) の `caseB` 除去~~ **✅ 2026-07-19 完了**。
 3. ~~(7.9) `hdelta_even` の一般化~~ **✅ 2026-07-19 完了**。
-4. **(6.3) standalone 無条件化 → (11.8) ∀ 化 → (6.6) の Z-generic 化** (次の frontier)。
-5. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
-6. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
+4. ~~(6.2) `hanchor` の一般供給~~ **✅ 2026-07-19 完了** ((5.6) エンジンの norm 一般化)。
+   `hdatum` 側は上記のとおり教科書 (5.2) の仮説ゆえ「無条件化」対象外。
+5. ~~(5.3.a)/(5.3.b) の一般 producer~~ **着手不要** — (5.3.a) は `irrSubcoherent` で実在、
+   (5.3.b) は構成不能かつ consumer ゼロで「作らない」が既定裁定 (上記自己訂正節)。
+6. ~~(11.8) ∀ 化~~ **✅ 2026-07-19 完了**。→ **(6.6) の Z-generic 化** (次の frontier)。
+7. **(13.8) S 側 mirror は上記より後**。上表のとおり 5 段構成で、`eta01` の定義から始める必要がある。
+8. (8.15)/(8.18)/(9.7)/(9.11)/(10.11) は前提の作り直しを伴うので最後 (特に (8.15) は
    `typePA` の添字修正 = issue 9008 が先)。
 
 ## Lean 側の stale docstring (2026-07-19 に修正済)

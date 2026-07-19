@@ -63,14 +63,14 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
     (hχbarχbarne : ClassFunction.inner chibar chibar ≠ 0)
     (hχχbar : ClassFunction.inner χ chibar = 0)
     (hχbarχ : ClassFunction.inner chibar χ = 0)
-    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
+    {m₁ : ℝ} (hchi1chi1 : ClassFunction.inner chi1 chi1 = (m₁ : ℂ))
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner chibar x = 0)
     (hchi1 : chi1 ∈ S₁)
     (hτaχ1Z : τ (χ - a • chi1) ∈ ZIrr G)
     (hτdiffZ : τ (χ - chibar) ∈ ZIrr G)
     (hcrux1 : ClassFunction.inner
-      (τ (χ - a • chi1)) (hS₁.extension chi1) = -(a : ℂ))
+      (τ (χ - a • chi1)) (hS₁.extension chi1) = -((a : ℂ) * (m₁ : ℂ)))
     (hcrux2 : ClassFunction.inner
       (τ (χ - chibar)) (hS₁.extension chi1) = 0)
     (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
@@ -119,7 +119,7 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
       hSdiff hφ hψ
   -- Dade-image inner products (Dade isometry + source orthonormality), now symbolic in `⟨χ,χ⟩`.
   have huu : ClassFunction.inner (τ (χ - a • chi1))
-      (τ (χ - a • chi1)) = ClassFunction.inner χ χ + (a : ℂ) ^ 2 := by
+      (τ (χ - a • chi1)) = ClassFunction.inner χ χ + (a : ℂ) ^ 2 * (m₁ : ℂ) := by
     rw [hdade _ _ hmemu hmemu, ← Nat.cast_smul_eq_nsmul ℂ a chi1]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
@@ -146,11 +146,11 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
       hχchi1, hχbarχ, hχbarchi1, star_natCast]
     ring
   -- `hS₁.extension χ₁` norm and the conjugates of the two crux inner products.
-  have hvv : ClassFunction.inner (hS₁.extension chi1) (hS₁.extension chi1) = 1 := by
+  have hvv : ClassFunction.inner (hS₁.extension chi1) (hS₁.extension chi1) = (m₁ : ℂ) := by
     rw [hS₁.extension_inner_eq chi1 chi1 (Submodule.subset_span hchi1)
       (Submodule.subset_span hchi1), hchi1chi1]
   have hvu : ClassFunction.inner (hS₁.extension chi1)
-      (τ (χ - a • chi1)) = -(a : ℂ) := by
+      (τ (χ - a • chi1)) = -((a : ℂ) * (m₁ : ℂ)) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hcrux1]; simp
   have hvd : ClassFunction.inner (hS₁.extension chi1)
       (τ (χ - chibar)) = 0 := by
@@ -222,7 +222,7 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
           simp only [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
             hyχ, star_natCast]
           ring
-        · rw [Set.mem_singleton_iff.mp hy1, hvu, hchi1chi1, mul_one]
+        · rw [Set.mem_singleton_iff.mp hy1, hvu, hchi1chi1]; ring
     | zero => simp
     | add y z _ _ ihy ihz =>
         rw [map_add, ClassFunction.inner_add_left, ihy, ihz, ClassFunction.inner_add_left]; ring

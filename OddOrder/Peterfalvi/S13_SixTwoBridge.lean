@@ -117,21 +117,18 @@ theorem coprime_card_W1_derived [Finite G]
 proper-commutator quotient — automatic for `A' ⊊ M'` by solvability), `S(A')` contains an
 *irreducible* member of degree `|M : M'|`.  A nontrivial linear source `θ` trivial on `A'`
 exists by `exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top`; its
-inertia group is exactly `M'` (`inertia_eq_derived_of_linear`, Peterfalvi (8.4.d)), so
-`Ind_{M'}^M θ` is irreducible of degree `|M:M'|` ([Is] 6.34,
-`exists_anchor_of_linear_of_inertia_eq`). -/
-theorem exists_anchor [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+`Ind_{M'}^M θ` then has degree `|M:M'|` — which is all Peterfalvi (6.2) asks for ("Since `K` is
+solvable, `K/A` has a non-trivial irreducible character of degree 1, whence `S(A)` contains a
+character of degree `|L:K|`", p. 30).  **No irreducibility, hence no inertia condition**: the (5.6)
+engine carries the anchor norm `‖χ₁‖²` symbolically (`S08.crux1_of_memberFamilyW`), so the
+`inertia θ = M'` route via (8.4.d) that the earlier formalization needed is not required. -/
+theorem exists_anchor [Finite G]
     {A' : Subgroup ↥M} [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
     (hA'comm : commutator (↥((derivedInG M).subgroupOf M)
       ⧸ A'.subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤) :
     ∃ χ₁ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A',
-      IsIrreducibleCharacter χ₁ ∧
-      χ₁ 1 = ((((derivedInG M).subgroupOf M)).index : ℂ) := by
-  obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
-    S08.exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
-      (A'.subgroupOf ((derivedInG M).subgroupOf M)) hA'comm
-  exact OddOrder.Peterfalvi.S08.exists_anchor_of_linear_of_inertia_eq θ hθne hθker hθdeg
-    (hyp.inertia_eq_derived_of_linear hG hθne hθdeg)
+      χ₁ 1 = ((((derivedInG M).subgroupOf M)).index : ℂ) :=
+  S08.exists_inducedKernelFamily_member_degree_index hA'comm
 
 /-- **Solvable-quotient commutator pin**: for a proper trace `X ⊓ M' ≠ M'`, the quotient
 `M'/(X ⊓ M')` is a nontrivial solvable group, so its commutator subgroup is proper.  This is the
@@ -200,7 +197,7 @@ theorem exists_source_index_le_two_psi
     {A' B : Subgroup ↥M} [A'.Normal]
     (hanchor : ∃ χ₁ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
         ((derivedInG M).subgroupOf M) A',
-      IsIrreducibleCharacter χ₁ ∧ χ₁ 1 = (((derivedInG M).subgroupOf M).index : ℂ))
+      χ₁ 1 = (((derivedInG M).subgroupOf M).index : ℂ))
     (hSBne : (OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) B).Nonempty)
     (hdatum : ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
@@ -317,7 +314,7 @@ theorem exists_source_index_le_two_psi_of_ne_top
             ↥((derivedInG M).subgroupOf M) ℂ) 1).re := by
   haveI := hyp.finiteG
   refine hyp.exists_source_index_le_two_psi hG
-    (hyp.exists_anchor hG (hyp.commutator_quotient_ne_top hG hA'ne)) ?_ hdatum hAcoh hBncoh
+    (exists_anchor (hyp.commutator_quotient_ne_top hG hA'ne)) ?_ hdatum hAcoh hBncoh
   exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
     (hyp.commutator_quotient_ne_top hG hBne)
 

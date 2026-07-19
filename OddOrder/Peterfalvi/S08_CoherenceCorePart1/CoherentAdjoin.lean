@@ -19,17 +19,22 @@ variable {L G : Type*} [Group L] [Group G]
 
 /-- **(5.6.1) member coefficient `⟨Da.Y, ν χⱼ⟩` — the heart of the λ-form.**
 
-The (5.6.1) projection coefficient (mmd 04.7 L79): for a member `χⱼ` with degree-matched difference
-`χⱼ − aⱼ·χ₁` (the value enters via `hfound`, `inner_dade_extension_of_supported` applied to the
-supported `δ = χⱼ − aⱼ·χ₁`),
+The (5.6.1) projection coefficient (Peterfalvi p. 27): for a member `χⱼ` with degree-matched
+difference `χⱼ − aⱼ·χ₁` (the value enters via `hfound`, `inner_dade_extension_of_supported` applied
+to the supported `δ = χⱼ − aⱼ·χ₁`),
 
-`⟨Y, ν χⱼ⟩ = a·⟨χ₁, χⱼ⟩ − (a + μ)·aⱼ`,    where `Y = X − τ(χ − a·χ₁)`, `μ = ⟨τ(χ − a·χ₁), ν χ₁⟩`.
+`⟨Y, ν χⱼ⟩ = a·⟨χ₁, χⱼ⟩ − (a·‖χ₁‖² + μ)·aⱼ`,   where `Y = X − τ(χ − a·χ₁)`,
+`μ = ⟨τ(χ − a·χ₁), ν χ₁⟩`.
 
 The computation: `⟨Y, νχⱼ⟩ = −⟨τ(χ−a·χ₁), νχⱼ⟩` (since `⟨X, νχⱼ⟩ = 0`, the member R-orthogonality);
 split `νχⱼ = ν(χⱼ − aⱼ·χ₁) + aⱼ·νχ₁` (ν is `ℤ`-linear); the first part is `⟨χ − a·χ₁, χⱼ − aⱼ·χ₁⟩`
-(`hfound`), which expands via `χ ⊥ χⱼ, χ₁` and `‖χ₁‖² = 1` to `−a·⟨χ₁, χⱼ⟩ + a·aⱼ`; the second is
-`aⱼ·μ`.  With `λ := a + μ` this is `a·⟨χ₁,χⱼ⟩ − λ·aⱼ`, the `lambda_eq_zero_and_Z_eq_zero`
-coefficient (`χ₁,χⱼ` orthonormal ⟹ `⟨χ₁,χⱼ⟩ = δ`, giving `a·[j=1] − λ·aⱼ`). -/
+(`hfound`), which expands via `χ ⊥ χⱼ, χ₁` to `−a·⟨χ₁, χⱼ⟩ + a·aⱼ·‖χ₁‖²`; the second is `aⱼ·μ`.
+With `λ := a·‖χ₁‖² + μ` this is `a·⟨χ₁,χⱼ⟩ − λ·aⱼ`, the `lambda_eq_zero_and_Z_eq_zero` coefficient.
+
+**The anchor norm `‖χ₁‖² = m₁` is carried symbolically**, exactly as Peterfalvi (5.6.1) does
+(`(Y, χ₁^τ₁) = (a − λ/‖χ₁‖²)‖χ₁‖² = a‖χ₁‖² − λ`): Theorem (5.6) never assumes the anchor is
+irreducible, and the (6.2) anchor `Ind_K^L θ` (θ linear) is reducible unless `θ` has inertia `K`.
+The orthonormal consumers instantiate `m₁ = 1`. -/
 theorem inner_Y_extension_member_eq
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
@@ -48,19 +53,19 @@ theorem inner_Y_extension_member_eq
       ClassFunction.inner ((χ : ClassFunction ↥L ℂ) - a • chi1) (cj - aj • chi1))
     (hχcj : ClassFunction.inner (χ : ClassFunction ↥L ℂ) cj = 0)
     (hχchi1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ) chi1 = 0)
-    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1) :
+    {m₁ : ℂ} (hchi1chi1 : ClassFunction.inner chi1 chi1 = m₁) :
     ClassFunction.inner Y (hS₁.extension cj) =
       (a : ℂ) * ClassFunction.inner chi1 cj -
-        ((a : ℂ) + ClassFunction.inner
+        ((a : ℂ) * m₁ + ClassFunction.inner
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
             ((χ : ClassFunction ↥L ℂ) - a • chi1)) (hS₁.extension chi1)) * (aj : ℂ) := by
   -- `ν cj = ν(cj − aⱼ·χ₁) + aⱼ·ν χ₁` (ν is ℤ-linear).
   have hνcj : hS₁.extension cj
       = hS₁.extension (cj - aj • chi1) + aj • hS₁.extension chi1 := by
     rw [map_sub, map_nsmul]; abel
-  -- The source-side expansion `⟨χ − a·χ₁, χⱼ − aⱼ·χ₁⟩ = −a·⟨χ₁, χⱼ⟩ + a·aⱼ`.
+  -- The source-side expansion `⟨χ − a·χ₁, χⱼ − aⱼ·χ₁⟩ = −a·⟨χ₁, χⱼ⟩ + a·aⱼ·‖χ₁‖²`.
   have hsrc : ClassFunction.inner ((χ : ClassFunction ↥L ℂ) - a • chi1) (cj - aj • chi1)
-      = -(a : ℂ) * ClassFunction.inner chi1 cj + (a : ℂ) * (aj : ℂ) := by
+      = -(a : ℂ) * ClassFunction.inner chi1 cj + (a : ℂ) * (aj : ℂ) * m₁ := by
     rw [← Nat.cast_smul_eq_nsmul ℂ a chi1, ← Nat.cast_smul_eq_nsmul ℂ aj chi1]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
@@ -226,11 +231,16 @@ definitional, **bypassing** the `htau1_chi1` requirement `τχ₁ = νχ₁` tha
 `χ₁`.
 
 Every remaining obligation of `retarget_isCoherent` is discharged from the source/Dade/ν isometries
-plus the two crux inner products `hcrux1 : ⟨τ(χ−a·χ₁), νχ₁⟩ = −a` and `hcrux2 : ⟨τ(χ−χ̄), νχ₁⟩ = 0`
-(the genuine (5.6) Feit–Sibley content, to be discharged separately via the degree inequality).  The
-lattice orthogonality `hX_ortho`/`hXbar_ortho` is a span induction over
+plus the two crux inner products `hcrux1 : ⟨τ(χ−a·χ₁), νχ₁⟩ = −a·‖χ₁‖²` and
+`hcrux2 : ⟨τ(χ−χ̄), νχ₁⟩ = 0` (the genuine (5.6) Feit–Sibley content, to be discharged separately via
+the degree inequality).  The lattice orthogonality `hX_ortho`/`hXbar_ortho` is a span induction over
 `ℤ[S₁] ⊆ span(ℤ[S₁,A] ∪ {χ₁})` (`hSgen`): clean on a supported `ξ` (`νξ = τξ` + Dade isometry) and
-on `χ₁` via `hcrux1`/`hcrux2`. -/
+on `χ₁` via `hcrux1`/`hcrux2`.
+
+**The anchor norm `m₁ = ‖χ₁‖²` is arbitrary** (Peterfalvi (5.6) never assumes the anchor is
+irreducible; see `inner_Y_extension_member_eq`).  It shows up only in `huu = 1 + a²·m₁`, `hvv = m₁`
+and `hvu = −a·m₁`; the corrected image `X = τ(χ−a·χ₁) + a·νχ₁` still has `‖X‖² = 1`, `‖X̄‖² = 1`,
+`⟨X, X̄⟩ = 0`, because the `a²·m₁` contributions cancel. -/
 noncomputable def retarget_isCoherent_of_extensionImage
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
@@ -251,7 +261,7 @@ noncomputable def retarget_isCoherent_of_extensionImage
       (χ : ClassFunction ↥L ℂ).conj = 1)
     (hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0)
     (hχbarχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0)
-    (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
+    {m₁ : ℝ} (hchi1chi1 : ClassFunction.inner chi1 chi1 = (m₁ : ℂ))
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ) x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj x = 0)
     (hchi1 : chi1 ∈ S₁)
@@ -259,7 +269,7 @@ noncomputable def retarget_isCoherent_of_extensionImage
     (hτdiffZ : τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) ∈ ZIrr G)
     (hcrux1 : ClassFunction.inner
       (τ
-        ((χ : ClassFunction ↥L ℂ) - a • chi1)) (hS₁.extension chi1) = -(a : ℂ))
+        ((χ : ClassFunction ↥L ℂ) - a • chi1)) (hS₁.extension chi1) = -((a : ℂ) * (m₁ : ℂ)))
     (hcrux2 : ClassFunction.inner
       (τ
         ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)) (hS₁.extension chi1) = 0)
@@ -317,7 +327,7 @@ noncomputable def retarget_isCoherent_of_extensionImage
       hSdiff hφ hψ
   -- Dade-image inner products (Dade isometry + source orthonormality).
   have huu : ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • chi1))
-      (τ ((χ : ClassFunction ↥L ℂ) - a • chi1)) = 1 + (a : ℂ) ^ 2 := by
+      (τ ((χ : ClassFunction ↥L ℂ) - a • chi1)) = 1 + (a : ℂ) ^ 2 * (m₁ : ℂ) := by
     rw [hdade _ _ hmemu hmemu, ← Nat.cast_smul_eq_nsmul ℂ a chi1]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
@@ -344,11 +354,11 @@ noncomputable def retarget_isCoherent_of_extensionImage
       hχχ, hχchi1, hχbarχ, hχbarchi1, star_natCast]
     ring
   -- `hS₁.extension χ₁` norm and the conjugates of the two crux inner products.
-  have hvv : ClassFunction.inner (hS₁.extension chi1) (hS₁.extension chi1) = 1 := by
+  have hvv : ClassFunction.inner (hS₁.extension chi1) (hS₁.extension chi1) = (m₁ : ℂ) := by
     rw [hS₁.extension_inner_eq chi1 chi1 (Submodule.subset_span hchi1)
       (Submodule.subset_span hchi1), hchi1chi1]
   have hvu : ClassFunction.inner (hS₁.extension chi1)
-      (τ ((χ : ClassFunction ↥L ℂ) - a • chi1)) = -(a : ℂ) := by
+      (τ ((χ : ClassFunction ↥L ℂ) - a • chi1)) = -((a : ℂ) * (m₁ : ℂ)) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hcrux1]; simp
   have hvd : ClassFunction.inner (hS₁.extension chi1)
       (τ ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)) = 0 := by
@@ -422,7 +432,7 @@ noncomputable def retarget_isCoherent_of_extensionImage
           simp only [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
             hyχ, star_natCast]
           ring
-        · rw [Set.mem_singleton_iff.mp hy1, hvu, hchi1chi1, mul_one]
+        · rw [Set.mem_singleton_iff.mp hy1, hvu, hchi1chi1]; ring
     | zero => simp
     | add y z _ _ ihy ihz =>
         rw [map_add, ClassFunction.inner_add_left, ihy, ihz, ClassFunction.inner_add_left]; ring
@@ -664,7 +674,7 @@ noncomputable def xAdjoinStep
     rw [key]
     rcases eq_or_ne i i₁ with h | h
     · subst h; simp
-    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]
+    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
   -- crux1 via the λ-form collapse.
   have hcrux1 : ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
@@ -694,8 +704,9 @@ noncomputable def xAdjoinStep
   -- Adjoin via the (T8.11 option A) bridge.
   exact retarget_isCoherent_of_extensionImage hyp hconj
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
-    hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
-    (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
+    hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ
+    (m₁ := 1) (by rw [hchi1chi1]; norm_num) hχ_S1 hχbar_S1
+    (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ (by rw [hcrux1]; norm_num) hcrux2 hSgen hgen
 
 open scoped Classical in
 /-- **Peterfalvi (5.6)** — quantitative coherence, contrapositive form ("B1").

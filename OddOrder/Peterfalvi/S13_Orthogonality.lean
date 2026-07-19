@@ -1033,7 +1033,7 @@ into the `s13hyp.base`-world, so the S12 machinery and the narrow endpoint share
 `isCoherent_of_subset ν` restriction keeps `coh.extension = ν.extension` definitionally (feeding
 `hcol`
 into the capstone with no cast). -/
-theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
+theorem zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M)
@@ -1042,9 +1042,9 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
     (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1)
     (hrefute : ∀ s13hyp : Hypothesis M,
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-        s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0)) :
-    ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
-      IsIrreducibleCharacter ζ ∧ ζ 1 = (hyp.w1 : ℂ) ∧
+        s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζdeg : ζ 1 = (hyp.w1 : ℂ)) :
       ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
         ClassFunction.inner
           ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
@@ -1053,11 +1053,12 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
   -- Move the whole goal into the §13 `s13hyp.base`-world so the S12 residual machinery and the
   -- narrow (11.3) endpoint share one world (`s13hyp.base = hyp` only propositionally).
   obtain ⟨s13hyp, hbase⟩ := OddOrder.Peterfalvi.S13.exists_hypothesis_of_isTypeIIIorIV hG hyp htype
-  rw [← hbase] at hM2 hHcard ⊢
-  -- (10.2)/(10.3) character parameters (now on `s13hyp.base`).
-  obtain ⟨params, hmu, -, hzS, hz1, -, hδpm, hδindep⟩ := s13hyp.base.exists_charParameters_full hG
-  refine ⟨params.zeta, hzS, params.zeta_irreducible, hz1, ?_⟩
+  rw [← hbase] at hM2 hHcard hζdeg ⊢
+  -- (10.2)/(10.3) character parameters built around the **given** `ζ` (the `∀ ζ` book form).
+  obtain ⟨params, hzeq, hmu, -, hzS, hz1, -, hδpm, hδindep⟩ :=
+    s13hyp.base.exists_charParameters_full_of_zeta hG hζS hζirr hζdeg
   intro h_orth
+  rw [← hzeq] at h_orth
   -- (11.8.1) `δ = 1`; (11.8.4) the coherent extension `ν` and `h114` from orthogonality.
   have hδ1 : params.delta = 1 := s13hyp.base.charParam_delta_eq_one hG htype params hmu hδpm
   obtain ⟨ν, hνconj, h114⟩ :=
@@ -1205,5 +1206,38 @@ theorem coherent_sOf_H0Cprime [Finite G]
   coherent_sOf_H0Cprime_of_sevenEightRefutation hG hyp
     (fun caseA => nineElevenSevenEightRefutation hG hyp caseA hnc htype)
     hnc htype
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.8), witness form.**  The `∃ ζ` shape consumed by (11.9.b)
+(`w2_lt_w1_of_residual_not_orthogonal`): instantiate the `∀ ζ` core
+`zeta_residual_not_orthogonal_H0C_of_refuter` at the `ζ` supplied by
+`exists_zeta_in_inducedFamily_degree_w1`.
+
+The book statement is the `∀` one — (11.8)'s proof fixes an arbitrary `ζ ∈ S(HC)` and derives a
+contradiction with (11.3) — so the core carries the mathematics and this is only the existential
+packaging its downstream happens to want. -/
+theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    (hM2 : secondDerivedInAmbient M
+      = hyp.typeP.H ⊔ (hyp.typeP.U ⊓ Subgroup.centralizer (hyp.typeP.H : Set G)))
+    (hHcard : Nat.card ↥hyp.typeP.H = hyp.w2 ^ hyp.w1)
+    (hrefute : ∀ s13hyp : Hypothesis M,
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        s13hyp.base.tau (s13hyp.SOf s13hyp.H0C) s13hyp.base.A0)) :
+    ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
+      IsIrreducibleCharacter ζ ∧ ζ 1 = (hyp.w1 : ℂ) ∧
+      ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+        ClassFunction.inner
+          ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
+            - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
+          (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 := by
+  haveI := hyp.finiteG
+  obtain ⟨ζ, hζS, hζirr, hζdeg⟩ :=
+    OddOrder.Peterfalvi.S12.exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd
+      (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+  exact ⟨ζ, hζS, hζirr, hζdeg,
+    zeta_residual_not_orthogonal_H0C_of_refuter hG hyp htype hM2 hHcard hrefute hζS hζirr hζdeg⟩
 
 end OddOrder.Peterfalvi.S13
