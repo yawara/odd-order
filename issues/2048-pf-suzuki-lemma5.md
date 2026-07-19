@@ -50,7 +50,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           `[C,A²] ≤ A⁴` を ambient subgroup として証明する
     - [x] homocyclic `ZMod` 座標の基底上で平方値 endomorphism を半分にし、
           線形延長して `α ≡ 1 mod A²` から honest に `α = 1 - 2ν` を構成する
-    - [ ] `4(ν² - ν) = 0` から `A/A²` 上の commuting idempotents を作り、
+    - [x] 実際の共役自己同型を `α = 1 - 2ν` と `α² = 1` に接続し、
+          `4(ν² - ν) = 0` を導く
+    - [x] homocyclic `ZMod` 座標で `ν mod 2` の冪等性を証明し、有限可換
+          idempotent 族の common `0`/`1` eigenvector と推移作用の一般帰結を証明する
+    - [ ] 実際の `A/A²` 上で `u ↦ ν̄(u)` の可換性・`X`-共役性を証明し、
           common-eigenvector 論と Lemma 2 を接続して `exp(A) ≤ 4` を結論する
   - [ ] Higman Lemmas 4--9 を形式化し、Lemma 12 冒頭で用いる
         maximal abelian / Frattini chain と `Φ(Q) = Q₀` を構成する
