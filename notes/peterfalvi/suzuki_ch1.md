@@ -384,15 +384,16 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Higman source frontier (issue 2048):** Lemmas 4--7 は完了。
-      Lemma 7 では actual square map から `L₁(C) ≃ A/A²` を構成し、actual
-      `L₂(C)` の Agemo factor model、involution 推移性、actor の忠実性を
-      `LemmaSevenSpectralCertificate.false` へ接続した。公開 endpoint
-      `higmanLemmaSeven_isMulCommutative` は原文 p. 86 の
-      `A = Φ(C), C' ≤ A² ⟹ C is abelian` を同型仮定なしで与える。
-      次の source frontier は Higman Lemma 8 (p. 87):
-      `C' = A ⟹ exp(A) ≤ 2`。actual `L₂ = A/A²`, `L₃ = A²/A⁴` の power-map
-      同型を構成し、Lemma 6 で排除する。
+    - **Higman source frontier (issue 2048):** Lemmas 4--8 は完了。
+      Lemma 8 では `C² = C'` と exact lower-central chain
+      `C₂ = A`, `C₃ = A²`, `C₄ = A⁴` を証明し、actual
+      `L₂(C) ≃ A/A²`, `L₃(C) ≃ A²/A⁴` と actor-equivariant power map
+      `L₂(C) ≃ L₃(C)` を構成した。公開 endpoint
+      `higmanLemmaEight_pow_two_eq_one` はこの同型を Lemma 6 の triple-bracket
+      obstruction に接続し、原文 p. 87 の `C' = A ⟹ exp(A) ≤ 2` を与える。
+      次の source frontier は Higman Lemma 9: Lemmas 3, 7, 8 の三分岐から
+      maximal abelian normal invariant subgroup `A` に対する
+      `exp(A) ≤ 4` と `Φ(G) ≤ A` を証明する。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
