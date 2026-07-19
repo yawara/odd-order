@@ -30,6 +30,15 @@ the iterated differences of `n ↦ aⁿ bⁿ` (`mulFwdDiffList_cons_pow_mul_pow`
 That formula is short, and it is the only part of Hall's theorem that is about
 `aⁿ bⁿ` rather than about polynomial sequences in general.
 
+⚠ **Not on the critical path.**  Hall's formula itself is proved in
+`OddOrder/GroupTheory/HallPetresco.lean` by Mann's collecting argument, which
+does not use polynomial sequences at all; the route through Lazard–Leibman
+(closure of polynomial sequences under products, then a binomial expansion) was
+considered and dropped in favour of it.  What is below is kept because it is a
+genuine, self-contained theorem — the sharp closed form for the iterated
+differences of `n ↦ aⁿ bⁿ` — and because it is the whole `aⁿ bⁿ`-specific input
+that any polynomial-sequence treatment of Hall's formula would need.
+
 ## Main definitions
 
 * `OddOrder.GroupTheory.mulFwdDiff h f` — the multiplicative forward difference
