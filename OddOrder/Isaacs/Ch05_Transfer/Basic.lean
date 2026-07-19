@@ -1360,6 +1360,50 @@ theorem APrime_eq_subgroupOf_APrime_of_controlsFusionIn [Finite G]
       (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) hmul
   exact le_antisymm hB_le_AH (Subgroup.relIndex_eq_one.mp hrel_eq_one)
 
+/-- **Isaacs Cor. 5.22, second conclusion**: `H ⧸ A^p(H) ≃* G ⧸ A^p(G)`.
+
+Isaacs states 5.22 as「`H` controls `p`-transfer, and hence `A^p(H) = H ∩ A^p(G)` **and**
+`G/A^p(G) ≅ H/A^p(H)`」.  `APrime_eq_subgroupOf_APrime_of_controlsFusionIn` (above) gives the
+first conclusion; this gives the second — the "controls `p`-transfer" content proper.
+
+⚠ The isomorphism is **not** derivable from the first conclusion alone: it additionally needs
+`H · A^p(G) = G`, supplied here by coprimality of `|G : P|` with the `p`-power `|G : A^p(G)|`
+together with `P ≤ H`.  Given that, the second isomorphism theorem
+(`QuotientGroup.quotientInfEquivProdNormalQuotient`) reads
+`H ⧸ A^p(G).subgroupOf H ≃* (H ⊔ A^p(G)) ⧸ … `, and `H ⊔ A^p(G) = ⊤` turns the right side into
+`G ⧸ A^p(G)`. -/
+theorem quotient_aPrime_mulEquiv_of_controlsFusionIn [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) {H : Subgroup G}
+    (hP_le_H : (P : Subgroup G) ≤ H)
+    (hFusion : H.ControlsFusionIn (P : Subgroup G)) :
+    Nonempty ((↥H ⧸ APrime p H) ≃* (G ⧸ APrime p G)) := by
+  classical
+  have hHA_top : H ⊔ APrime p G = ⊤ := by
+    obtain ⟨k, hk⟩ : ∃ k : ℕ, (APrime p G).index = p ^ k := by
+      simpa using APrime_index_isPGroup p G
+    have hPA_top : (P : Subgroup G) ⊔ APrime p G = ⊤ := by
+      have hcop : Nat.Coprime (P : Subgroup G).index (APrime p G).index := by
+        rw [hk]
+        exact Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out P.not_dvd_index
+      exact OddOrder.Isaacs.Ch03.sup_eq_top_of_coprime_index hcop
+    rw [eq_top_iff, ← hPA_top]
+    exact sup_le_sup hP_le_H le_rfl
+  have hAPH : APrime p H = (APrime p G).subgroupOf H :=
+    APrime_eq_subgroupOf_APrime_of_controlsFusionIn P hP_le_H hFusion
+  refine ⟨((QuotientGroup.congr (APrime p H) ((APrime p G).subgroupOf H)
+      (MulEquiv.refl ↥H) (by simpa using hAPH)).trans
+    (QuotientGroup.quotientInfEquivProdNormalQuotient H (APrime p G))).trans ?_⟩
+  refine QuotientGroup.congr ((APrime p G).subgroupOf (H ⊔ APrime p G)) (APrime p G)
+    ((MulEquiv.subgroupCongr hHA_top).trans Subgroup.topEquiv) ?_
+  ext x
+  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf, MulEquiv.coe_toMonoidHom,
+    MulEquiv.trans_apply]
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    exact hy
+  · intro hx
+    exact ⟨⟨x, hHA_top ▸ Subgroup.mem_top x⟩, hx, rfl⟩
+
 /-- **Isaacs Cor. 5.23 (`A^p` equality form)**:
 if the Sylow `p`-subgroup `P` is abelian, then `N_G(P)` controls `p`-transfer,
 expressed as `A^p(N_G(P)) = N_G(P) ∩ A^p(G)`.

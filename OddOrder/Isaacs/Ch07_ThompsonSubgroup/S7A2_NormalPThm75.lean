@@ -1364,5 +1364,34 @@ theorem sylow_normal_of_elementary_normal_P_theorem
     exact hQP (Sylow.ext hPQsubgroup_eq.symm)
 
 
+/-- **Isaacs Thm 7.5** (書籍どおりの単一 `P` 形).  `P ∈ Syl_p(G)` で (1) `G` は `p`-可解,
+(2) `p ≠ 2`, (3) Sylow 2-部分群は可換, (4) `G` は `p`-群 `V` に忠実に作用,
+(5) **その `P` について** `|V : C_V(P)| ≤ p` ⇒ `P ⊴ G`.
+
+⚠ `sylow_normal_of_elementary_normal_P_theorem` (上) は条件 (5) を**全ての** Sylow
+`p`-部分群について要求する。これは `⟨P,Q⟩` 降下の帰納法が部分群の Sylow についても
+条件を要るためで、Isaacs は証明中で Sylow 共役性から補っている。本定理は書籍の
+statement どおり単一 `P` だけを仮定し、その補完を明示的に行う: 任意の `P'` は
+`P` の共役で (`MulAction.exists_smul_eq`)、共役部分群の action-centralizer は index が
+等しい (`actionCentralizer_map_conj_index`)。両形は同値なので、どちらを使ってもよい。 -/
+theorem sylow_normal_of_elementary_normal_P_theorem_single
+    {G V : Type*} [Group G] [Finite G] [Group V] [Finite V]
+    {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp2 : p ≠ 2)
+    (h2abelian : ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x)
+    {φ : G →* MulAut V} (hφ : Function.Injective φ)
+    (hV : IsPGroup p V)
+    (P : Sylow p G)
+    (h_centralizer_index : (actionCentralizer φ (P : Subgroup G)).index ≤ p) :
+    (P : Subgroup G).Normal := by
+  refine sylow_normal_of_elementary_normal_P_theorem hp2 h2abelian hφ hV ?_ P
+  intro P'
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G P P'
+  have hconj : (P' : Subgroup G) = (P : Subgroup G).map (MulAut.conj g).toMonoidHom := by
+    rw [← hg]
+    exact Sylow.coe_subgroup_smul
+  rw [hconj, actionCentralizer_map_conj_index]
+  exact h_centralizer_index
 
 end OddOrder.Isaacs.Ch07

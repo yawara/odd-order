@@ -173,15 +173,20 @@ Lean 技術的 instance、repo の方が一般な場合、他ファイルに一�
 
 | 番号 | 内容 | 対応 |
 |---|---|---|
+| **7.7** | `hP_neBot : P ≠ ⊥` 追加。書籍は「If `P` is a `p`-subgroup of `G`」のみ | 計 **6 宣言**から削除 (Ch02 の `normalizer_map_of_coprime_kernel` + Ch07 の 4 宣言 + 外部 caller 2 箇所)。仮説は死んでいた (Ch02 側が既に `_hP_neBot` と未使用束縛)。⚠ **同ファイルの別補題 `map_ne_bot_of_coprime_kernel` (Ch02_Subnormality/Main.lean:455) は本当に使う** (:474 で `apply hP_neBot`) ので手を付けていない |
+| **7.5** | 条件 (5) `\|V : C_V(P)\| ≤ p` を**全ての** Sylow `p` 部分群に量化。書籍は結論に現れる単一の `P` のみ (⟨P,Q⟩ 降下の帰納法の都合で ∀ 形が必要になり、Isaacs は証明中で Sylow 共役性から補っている) | `sylow_normal_of_elementary_normal_P_theorem_single` を新設 (書籍どおり単一 `P`)。任意の `P'` は `P` の共役 (`MulAction.exists_smul_eq` + `Sylow.coe_subgroup_smul`) で、共役部分群の action-centralizer は index が等しい (`actionCentralizer_map_conj_index`) ので ∀ 形へ補完できる。両形は同値 |
+| **5.22** | **結論の欠落** (仮説の狭さでない): 書籍の第 2 結論 `G/A^p(G) ≅ H/A^p(H)` (= 「H が p-transfer を制御する」本体) が無かった | `quotient_aPrime_mulEquiv_of_controlsFusionIn` (Ch05_Transfer/Basic.lean、第 1 結論の直後) を新設。`H ⊔ A^p(G) = ⊤` (Sylow index と `p`-冪 index の互いに素性 + `P ≤ H`) を出し、第 2 同型定理 `QuotientGroup.quotientInfEquivProdNormalQuotient` + `QuotientGroup.congr` 2 回で `↥H ⧸ A^p(H) ≃* G ⧸ A^p(G)`。⚠ `rw` で部分群を書き換えると商の `Normal` instance 依存で motive が壊れるので、**全て `QuotientGroup.congr` による transport で組んだ** |
 | **7.8** (Burnside `p^a q^b`) | `hpq : p ≠ q` 追加。書籍は「Let `G` be a finite group of order `p^a q^b`, where `p` and `q` are primes」だけで相異性を課さない | 削除し `p = q` 分岐を追加 (`\|G\| = p^(a+b)` の `p`-群 ⇒ 冪零 ⇒ 可解)。**下流の実害も解消**: `Ch07/ForwardFromCh03.lean` は素因子が 1 個のとき `hpq` を満たすためだけに**偽の第 2 素数** (`if p = 2 then 3 else 2`) を捏造していた |
 
-### ⬜ 未解消 (実装方針つき)
+### ⬜ 未解消 — **なし**
 
+**Ch.1–Ch.10 + Appendix の特殊化債務は全て解消済 (検出 11 件 → 実装 11 件)。**
+
+<!-- 旧・未解消表 (全件解消済につき空)
 | 番号 | Lean | 狭さ | 一般化方針 |
 |---|---|---|---|
-| **7.7** | `normalizer_and_centralizer_map_of_coprime_kernel` / `centralizer_map_of_coprime_kernel` (S7B2_NormalJ_PComplement.lean:1575/1492) ほか計 4-5 宣言 | `hP_neBot : P ≠ ⊥` 追加。書籍は「If `P` is a `p`-subgroup of `G`」のみ | **仮説は死んでいる**: 委譲先の `Ch02.normalizer_map_of_coprime_kernel` (Ch02_Subnormality/Main.lean:491) が既に `_hP_neBot` (アンダースコア = 未使用) で束縛している。⚠ ただし同ファイル :455 の**別**補題 `map_ne_bot_of_coprime_kernel` は本当に使う (:474 で `apply hP_neBot`) ので、そちらは残すこと。binder 削除 + caller (Main.lean:788 系) の追随のみ |
-| **7.5** | `sylow_normal_of_elementary_normal_P_theorem` (S7A2_NormalPThm75.lean:1217) | 条件 (5) `\|V : C_V(P)\| ≤ p` を**全ての** Sylow `p` 部分群について要求。書籍は結論に現れる 1 つの `P` についてのみ | 帰納法の都合 (⟨P,Q⟩ descent) だが、repo に橋渡し補題が既にある: `actionCentralizer_map_conj_index` (同ファイル:478、共役部分群の action-centralizer は index 等しい) + Sylow 共役性で単一 `P` 形から ∀ 形を導ける。**interface 債務** (両形は同値) ゆえ低優先 |
-| **5.22** | `APrime_eq_subgroupOf_APrime_of_controlsFusionIn` (Ch05_Transfer/Basic.lean:1283) | **結論**が書籍の 2 つのうち 1 つだけ。書籍は `A^p(H) = H ∩ A^p(G)` に加えて `G/A^p(G) ≅ H/A^p(H)` (= 「H が p-transfer を制御する」本体) も主張。repo に `ControlsPTransfer` 述語は無い | ⚠ 仮説の狭さでなく**結論の欠落**。材料は同じ証明内に既にある (`hHA_top : H ⊔ A = ⊤`, Basic.lean:1322-1331)。これと既述の `A^p(H) = H ⊓ A^p(G)` に第 2 同型定理を当てれば `H/A^p(H) ≅ H A^p(G)/A^p(G) = G/A^p(G)`。数行 |
+
+-->
 
 ### 債務なしと判定した章 (Ch.5–10)
 
@@ -226,14 +231,21 @@ Lean 技術的 instance、repo の方が一般な場合、他ファイルに一�
 - 1.37/1.39/1.40: repo は `hAbel` を全 Sylow `p` 部分群に量化、書籍は「a Sylow p-subgroup … is
   abelian」。Sylow 共役性で同値 (docstring もそう書いている)。
 
-## 次に何をやるか
+## 次に何をやるか — **レーン a の Isaacs 側は完済**
 
-被覆は完了しているので、Isaacs 側で「未形式化を埋める」作業は**無い**。残る軸は:
+2 軸とも実測完了:
 
-- **特殊化債務** (`formalized_specialized`) — repo の仮説が教科書より狭い箇所。
-  これは番号被覆では検出できないので、章ごとに statement を突き合わせる別 pass が要る。
-  Pf 本文では frontier note の表がこれを担っている。Isaacs 側は**未整備**。
-- 上記「軽微な債務」2 (6.18 の命名)。
+| 軸 | 状態 |
+|---|---|
+| 実 sorry | **0** |
+| 番号被覆 (Ch.1–10) | **未形式化 0 件** (mathlib 被覆 37 / repo 5 / 欠落 0) |
+| 特殊化債務 (Ch.1–10 + App) | **検出 11 件 → 実装 11 件** |
 
-⚠ 本 note は**被覆 (番号) の実測**であって、statement の忠実性 (特殊化債務) の実測ではない。
-両者を混同しない。
+⟹ Isaacs 側に「次に埋めるもの」は無い。Pf 本文も同様に完済で、残りは全て
+**hub issue 9163** (typePA / A(M) 設計裁定) に gated。次の割当は hub issue で照会済
+(下記「参照」)。
+
+将来 Isaacs 側で作業が発生しうる箇所 (現時点では債務でない):
+- 書籍が文献引用のみで証明を置かない結果 / 演習問題 (Problems) — 本 note の被覆測定は
+  **番号付き結果のみ**を対象にしており、演習は含まない。
+- mathlib 側の API 変更で cross-reference が stale 化したとき (本 note の測り方 §3 の手順で再測)。

@@ -1491,7 +1491,7 @@ This is exactly Isaacs Lemma 2.17 in the quotient form needed in Ch.7. Consumers
    (X ≤ N_G(P) なので). 従って `⁅P, X⁆ ≤ P ⊓ N = ⊥` (coprime), 即ち `X ≤ C_G(P)`. -/
 theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ}
     [Fact p.Prime] (hp_coprime : ¬ p ∣ Nat.card N)
-    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    {P : Subgroup G} (hP_pgroup : IsPGroup p P) :
     Subgroup.centralizer ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
       = (Subgroup.centralizer (P : Set G)).map (QuotientGroup.mk' N) := by
   classical
@@ -1515,7 +1515,7 @@ theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal]
     -- Nbar = (N_G(P)).map f by Lem 2.17 (a)
     have hN_eq : Subgroup.normalizer Pbar = (Subgroup.normalizer P).map f := by
       rw [hPbar_def, hf_def]
-      exact OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
+      exact OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel hp_coprime hP_pgroup
     -- X := N_G(P) ⊓ (Cbar.comap f).  X.map f = Cbar (correspondence).
     set X : Subgroup G := Subgroup.normalizer P ⊓ Cbar.comap f with hX_def
     have hX_map_eq : X.map f = Cbar := by
@@ -1575,7 +1575,7 @@ normalizer and centralizer of `P` commute with passage to `G/N`. -/
 theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
     {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
     (hp_coprime : ¬ p ∣ Nat.card N)
-    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    {P : Subgroup G} (hP_pgroup : IsPGroup p P) :
     (Subgroup.normalizer
         ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
       = (Subgroup.normalizer P).map (QuotientGroup.mk' N)) ∧
@@ -1583,8 +1583,8 @@ theorem normalizer_and_centralizer_map_of_coprime_kernel [Finite G]
         ((P.map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))
       = (Subgroup.centralizer (P : Set G)).map (QuotientGroup.mk' N)) :=
   ⟨OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel
-      hp_coprime hP_neBot hP_pgroup,
-    centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup⟩
+      hp_coprime hP_pgroup,
+    centralizer_map_of_coprime_kernel hp_coprime hP_pgroup⟩
 
 /-- Transport `OddOrder.Isaacs.Ch05.HasNormalPComplement` across a `MulEquiv`.
 
@@ -1711,7 +1711,7 @@ This combines subgroup-image inheritance with Isaacs Lemma 7.7(a). -/
 theorem hasNormalPComplement_normalizer_map_of_coprime_kernel
     [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
     (hp_coprime : ¬ p ∣ Nat.card N)
-    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P)
+    {P : Subgroup G} (hP_pgroup : IsPGroup p P)
     (hNP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
       ↥(Subgroup.normalizer (P : Set G))) :
     OddOrder.Isaacs.Ch05.HasNormalPComplement p
@@ -1727,7 +1727,7 @@ theorem hasNormalPComplement_normalizer_map_of_coprime_kernel
         (Subgroup.normalizer P).map f := by
     simpa [f] using
       OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel
-        hp_coprime hP_neBot hP_pgroup
+        hp_coprime hP_pgroup
   exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hEq.symm) hImage
 
 /-- If `N ⊴ G` is a normal `p'`-subgroup, then a normal `p`-complement in
@@ -1737,7 +1737,7 @@ This combines subgroup-image inheritance with Isaacs Lemma 7.7(b). -/
 theorem hasNormalPComplement_centralizer_map_of_coprime_kernel
     [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [Fact p.Prime]
     (hp_coprime : ¬ p ∣ Nat.card N)
-    {P : Subgroup G} (hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P)
+    {P : Subgroup G} (hP_pgroup : IsPGroup p P)
     (hCP : OddOrder.Isaacs.Ch05.HasNormalPComplement p
       ↥(Subgroup.centralizer (P : Set G))) :
     OddOrder.Isaacs.Ch05.HasNormalPComplement p
@@ -1751,7 +1751,7 @@ theorem hasNormalPComplement_centralizer_map_of_coprime_kernel
   have hEq :
       Subgroup.centralizer ((P.map f : Subgroup (G ⧸ N)) : Set (G ⧸ N)) =
         (Subgroup.centralizer (P : Set G)).map f := by
-    simpa [f] using centralizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
+    simpa [f] using centralizer_map_of_coprime_kernel hp_coprime hP_pgroup
   exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hEq.symm) hImage
 
 /-- Thompson's `J` commutes with quotient by a normal `p'`-kernel on `p`-subgroups.

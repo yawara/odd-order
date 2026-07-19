@@ -488,7 +488,7 @@ set_option maxHeartbeats 1200000 in
 書籍 p.61 の Frattini 議論 (`Sylow.normalizer_sup_eq_top` を `(P ⊔ N).subgroupOf M ⊴ ↥M` に適用). -/
 theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ}
     [Fact p.Prime] (hp_coprime : ¬ p ∣ Nat.card N)
-    {P : Subgroup G} (_hP_neBot : P ≠ ⊥) (hP_pgroup : IsPGroup p P) :
+    {P : Subgroup G} (hP_pgroup : IsPGroup p P) :
     Subgroup.normalizer ((P.map (QuotientGroup.mk' N)) : Subgroup (G ⧸ N))
       = (Subgroup.normalizer P).map (QuotientGroup.mk' N) := by
   classical
@@ -785,7 +785,7 @@ theorem isPLocal_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] {p
   · exact map_ne_bot_of_coprime_kernel hp_coprime hP_neBot hP_pgroup
   · exact hP_pgroup.map _
   · rw [hL_eq]
-    exact (normalizer_map_of_coprime_kernel hp_coprime hP_neBot hP_pgroup).symm
+    exact (normalizer_map_of_coprime_kernel hp_coprime hP_pgroup).symm
 
 end -- 2C
 
