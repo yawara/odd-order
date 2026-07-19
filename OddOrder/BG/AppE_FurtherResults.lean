@@ -8,6 +8,7 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.HallPetresco
+import OddOrder.GroupTheory.RegularPGroup
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.SubgroupInAmbient
 
@@ -32,14 +33,14 @@ packaging.  Per-result status:
 
 | Result | Status |
 |---|---|
-| E.1 general (`hallCollection`) | honest statement, `sorry` (needs Hall's collecting process) |
+| E.1 general (`hallCollection`) | **proved, sorry-free** (Mann's collecting process; `OddOrder/GroupTheory/HallPetresco.lean`) |
 | E.1 class `≤ 3` (`hallCollection_of_class_le_three`) | **proved, sorry-free** (all `n`) |
 | E.1 class `≤ 2` (`hallCollection_of_class_le_two`) | **proved, sorry-free** (subsumed by the above) |
 | E.1 general framework | `OddOrder/GroupTheory/HallCollection.lean`, **sorry-free** |
-| E.2 Step 1 (`pow_mul_of_commutator_pow_eq_one`) | **proved**, but cites the sorried E.1 |
-| E.2(a) (`omega_pow_eq_one_of_lowerCentralSeries_eq_bot`) | honest statement, `sorry` |
+| E.2 Step 1 (`GroupTheory.pow_mul_pow_eq_pow_of_commutator_exponent`) | **proved, sorry-free** (general form, outside this file) |
+| E.2(a) (`omega_pow_eq_one_of_lowerCentralSeries_eq_bot`) | **proved, sorry-free** (`IsPGroup` hypothesis dropped) |
 | E.2(a) class `≤ 2` | already in repo: `GroupTheory.Omega.pow_eq_one_of_class_le_two` |
-| E.2(b) (`pow_mul_of_commutator_le_omega`) | **proved** from E.2(a) + Step 1 |
+| E.2(b) (`pow_mul_of_commutator_le_omega`) | **proved, sorry-free** from E.2(a) + Step 1 (`IsPGroup` dropped) |
 | E.2(b) class `≤ 2` (`pow_mul_of_class_le_two`) | **proved, sorry-free** |
 | E.3(a) (`card_A_dvd_half_p_sub_one`) | **proved, sorry-free** |
 | E.3(b)(c)(d), E.4, E.5 | honest statements, `sorry` |
@@ -285,74 +286,49 @@ section RegularPGroup
 
 variable {R : Type*} [Group R]
 
-/-- **BG Proposition E.2, Step 1.**  If `R` has nilpotence class at most `p - 1`
-(equivalently `γ_p(R) = 1`, i.e. `lowerCentralSeries R (p-1) = ⊥` in mathlib's
-indexing) and `R'` has exponent dividing `p`, then `x ↦ x ^ p` is a
-homomorphism.
+/-! ### Step 1 lives in `OddOrder/GroupTheory/RegularPGroup.lean`
 
-Proof (BG's Step 1): apply E.1 with `n = p`.  The last collected term `c_p` lies
-in `γ_p(R) = 1`; each earlier `c_r` (`2 ≤ r ≤ p-1`) lies in `γ_{r-1}(R) ≤ R'`,
-so `c_r ^ p = 1`, and `p ∣ C(p, r)` for `0 < r < p`, whence `c_r ^ {C(p,r)} = 1`.
+BG's Step 1 — "class `< p` and `R'` of exponent `p` imply that `x ↦ x^p` is a
+homomorphism" — is not one of the book's numbered results but an internal step,
+and it is a statement about arbitrary groups.  It is therefore proved once, in
+general form, as
+`OddOrder.GroupTheory.pow_mul_pow_eq_pow_of_commutator_exponent`, directly from
+Hall's formula; the results below cite it rather than restating it.
+-/
 
-**Status: proved**, but the proof cites the still-sorried `hallCollection`, so it
-is not yet axiom-clean.  For class `≤ 2` see `pow_mul_of_class_le_two`, which is
-sorry-free. -/
-theorem pow_mul_of_commutator_pow_eq_one {p : ℕ} (hp : p.Prime)
+/-- **BG Proposition E.2(a)** (proved).  If `R` has nilpotence class at most
+`p - 1` then `Ω₁(R)` has exponent `1` or `p`.
+
+Proof: by `OddOrder.GroupTheory.pow_mul_eq_one_of_class_lt` the elements of order
+dividing `p` are closed under multiplication (BG's Step 2, an induction on `|R|`
+using a maximal subgroup containing `⟨y⟩`), so they already form a subgroup and
+`Ω₁(R)` — the subgroup they generate — consists of exactly those elements.
+
+⚠ **Generalised**: BG state this for `p`-groups, but the hypothesis is never
+used — finiteness together with `γ_p(R) = 1` suffices — so the `IsPGroup`
+assumption has been dropped. -/
+theorem omega_pow_eq_one_of_lowerCentralSeries_eq_bot [Finite R] {p : ℕ} [hp : Fact p.Prime]
     (hgamma : (⊤ : Subgroup R).lowerCentralSeries (p - 1) = ⊥)
-    (hexp : ∀ g ∈ _root_.commutator R, g ^ p = 1) (x y : R) :
-    x ^ p * y ^ p = (x * y) ^ p := by
-  obtain ⟨c, hc, hform⟩ := hallCollection x y p
-  have htail : collectionTail c p = 1 := by
-    rw [collectionTail, hallTail]
-    refine List.prod_eq_one ?_
-    intro z hz
-    simp only [List.mem_map] at hz
-    obtain ⟨r, hr, rfl⟩ := hz
-    obtain ⟨hr2, hrlt⟩ := List.mem_range'_1.mp hr
-    have hp2 := hp.two_le
-    have hrle : r ≤ p := by omega
-    have hmem := hc r hr2 hrle
-    rcases eq_or_lt_of_le hrle with rfl | hlt
-    · -- `c_p ∈ γ_p(R) = 1`.
-      rw [hgamma, Subgroup.mem_bot] at hmem
-      rw [hmem, one_pow]
-    · -- `2 ≤ r < p`: `c_r ∈ R'` and `p ∣ C(p, r)`.
-      have hle : (⊤ : Subgroup R).lowerCentralSeries (r - 1) ≤
-          (⊤ : Subgroup R).lowerCentralSeries 1 :=
-        Subgroup.lowerCentralSeries_antitone ⊤ (by omega)
-      rw [Subgroup.top_lowerCentralSeries_one] at hle
-      obtain ⟨k, hk⟩ := hp.dvd_choose_self (by omega) hlt
-      rw [hk, pow_mul, hexp _ (hle hmem), one_pow]
-  rw [hform, htail, mul_one]
-
-/-- **BG Proposition E.2(a).**  If `R` is a `p`-group of nilpotence class at most
-`p - 1`, then `Ω₁(R)` has exponent `1` or `p`.
-
-**Status: honestly stated, not proved.**  BG's Step 2 is an induction on `|R|`:
-reduce to `R = ⟨x, y⟩` with `x, y` of order dividing `p`, take a maximal (hence
-normal, index `p`) subgroup `M ⊇ ⟨y⟩`, apply the inductive hypothesis to get
-`Ω₁(M)` of exponent `p`, note `R / Ω₁(M)` is cyclic so `R' ≤ Ω₁(M)`, and finish
-with Step 1 (`pow_mul_of_commutator_pow_eq_one`).  That induction, plus Step 1's
-dependence on `hallCollection`, is what remains.
-
-For nilpotence class `≤ 2` and odd `p` this is already available sorry-free in
-the repo as `OddOrder.GroupTheory.Omega.pow_eq_one_of_class_le_two`. -/
-theorem omega_pow_eq_one_of_lowerCentralSeries_eq_bot [Finite R] {p : ℕ} [Fact p.Prime]
-    (hR : IsPGroup p R) (hgamma : (⊤ : Subgroup R).lowerCentralSeries (p - 1) = ⊥)
-    {g : R} (hg : g ∈ Omega R p 1) : g ^ p = 1 := by
-  sorry
+    {g : R} (hg : g ∈ Omega R p 1) : g ^ p = 1 :=
+  OddOrder.GroupTheory.Omega.pow_eq_one_of_mul_closed
+    (fun x y hx hy =>
+      OddOrder.GroupTheory.pow_mul_eq_one_of_class_lt hp.out (Nat.card R + 1) R
+        (by omega) hgamma x y hx hy) hg
 
 /-- **BG Proposition E.2(b).**  If `R` is a `p`-group of nilpotence class at most
 `p - 1` and `R' ≤ Ω₁(R)`, then `x ↦ x ^ p` is a homomorphism.
 
-**Status: proved** from E.2(a) and Step 1 — exactly BG's derivation
-("(b) will follow from (a) and Step 1").  It therefore inherits their sorries. -/
+**Status: proved, sorry-free** — exactly BG's derivation ("(b) will follow from
+(a) and Step 1").
+
+⚠ **Generalised**: as for (a), the `IsPGroup` hypothesis is unused and has been
+dropped. -/
 theorem pow_mul_of_commutator_le_omega [Finite R] {p : ℕ} [hp : Fact p.Prime]
-    (hR : IsPGroup p R) (hgamma : (⊤ : Subgroup R).lowerCentralSeries (p - 1) = ⊥)
+    (hgamma : (⊤ : Subgroup R).lowerCentralSeries (p - 1) = ⊥)
     (hR' : _root_.commutator R ≤ Omega R p 1) (x y : R) :
     (x * y) ^ p = x ^ p * y ^ p :=
-  (pow_mul_of_commutator_pow_eq_one hp.out hgamma
-    (fun _ hg => omega_pow_eq_one_of_lowerCentralSeries_eq_bot hR hgamma (hR' hg)) x y).symm
+  (OddOrder.GroupTheory.pow_mul_pow_eq_pow_of_commutator_exponent hp.out hgamma
+    (fun _ hg => omega_pow_eq_one_of_lowerCentralSeries_eq_bot hgamma (hR' hg)) x y).symm
 
 /-- **BG Proposition E.2(b), class-`≤ 2` case** (proved, sorry-free).  For odd `p`
 and `R` of nilpotence class at most `2` with `R' ≤ Ω₁(R)`, the `p`-power map is a
