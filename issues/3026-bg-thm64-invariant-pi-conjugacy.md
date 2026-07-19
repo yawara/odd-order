@@ -287,3 +287,50 @@ c の訂正 `H ∩ N = 1` は正当: `N ≤ O_p(F(G))` は `p`-群、`H` は `HN
 いずれも `.mmd` の `⊲⊲`→`⊲` 潰れによる**私たちの誤読**だった。今回は
 mmd・pdftotext・**ページ画像の 3 つとも同一の印字**であることを確認しており、
 性質が異なる。
+
+---
+
+## 進捗 (2026-07-19 第4波): `G = LH` reduction 完了 — 残りは 2 つの場合の本体のみ
+
+`S06_Thm64.lean` 477 → 599 行。3 定理、すべて sorry-free・axiom-clean・AxiomsCheck 登録済。
+
+- **`thm64_of_le_proper_subgroup`** (`:524`) — 本体。`J₁, J₂, H` を含む**任意の真部分群 `S`**
+  について、帰納法の仮定を `↥S` の中で使えば結論が出る。8 仮説すべてが transport し、
+  結論 2 つが `S.subtype` に沿って押し戻る。
+  ⚠ BG は `S = L ⊔ H` で述べるが、**証明は `S` の形を一切使わない**ので一般の `S` で述べた。
+- **`thm64_of_sup_ne_top`** (`:592`) — BG の形 (`J₁ ⊔ J₂ ⊔ H ≠ ⊤`)。上の 1 行特殊化。
+- **`subgroupOf_le_normalizer_subgroupOf`** (`:496`) — normalizer の subtype への transport。
+  `S` に仮説を一切要求しない (`H ≤ S` すら不要)。mathlib の
+  `normal_subgroupOf_iff_le_normalizer` 族は `H.subgroupOf K` の**正規性**の特徴付けで別物。
+
+使った道具はすべて既存: `isPiGroup_subgroupOf` ×3 / `normal_coprime_card_index_subgroupOf` /
+`isNilpotent_quotient_fitting_of_le` / **`isNilpotent_quotient_fitting_quotient_subgroupOf`**
+(第3波の mathlib 単射性補題が設計どおりここで効いた) / `card_subgroup_add_card_subgroupOf_lt`。
+
+### 見積はまた 2-3 倍高かった
+
+「reduction の実施 200-350 行」と見積もっていたが、docstring 込みで **~105 行**。
+第2波の transport 行と同じパターン (実装してみると見積もりの 1/2〜1/3)。
+
+### 残り = 2 つの場合の本体のみ (どちらも `G = LH` を仮定してよくなった)
+
+| 残作業 | 行 |
+|---|---|
+| Case 1 `π(F(G)) ⊄ π(H)` | 300-450 |
+| Case 2 `π(F(G)) ⊆ π(H)` | 500-800 |
+
+Case 1 が第2波の商側 transport (`normal_coprime_card_index_map_mk'` /
+`isNilpotent_quotient_fitting_quotient`) の消費者。まだ誰も使っていない。
+
+### ⚠ 新たに発見した重複 (issue 9159 に分離)
+
+`Subgroup.IsPiGroup` (`Ch03_SplitExtensions/Theorem315.lean:298`) と
+`Subgroup.IsPiSubgroup` (`GroupTheory/OpResidual.lean:39`) が **byte-identical な別定義**で、
+どちらも `Subgroup` 名前空間に在る。`thm64_of_le_proper_subgroup` は現に両者の defeq に
+依存して 3 箇所を通している (compile は通るが、片方が `@[irreducible]` になれば壊れる)。
+
+### mathlib gap (今回は回避、記録のみ)
+
+`MonoidHom.subgroupComap` (`Mathlib/Algebra/Group/Subgroup/Map.lean:496`) に
+`subgroupComap_surjective_of_surjective` はあるが**単射版が無い**。今回は
+`MulEquiv.subgroupCongr` + `Subgroup.subgroupOfEquivOfLe` で迂回したので新規 infra は不要だった。
