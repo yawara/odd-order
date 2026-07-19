@@ -150,9 +150,11 @@ call site repoint・全 leaf build green):
 可解 CN 群は「冪零 ∨ 核 `F(G)` の Frobenius ∨ ある素数に関する 3-step」。**step 2 / step 3 は済**。
 残りは:
 
-0. **step 1 (setup) の組み立て** — `G = F(G)` なら冪零 (case i)、さもなくば `C_G(F) ≤ F` (移設済) +
-   Hall `π'`-部分群 `A` (`Ch03.hall_exists_of_piSeparable`) を取り、**step 2 で `F A` が Frobenius**。
-   ⟹ **repo の道具だけで書ける。次の着手はここ** (中間結果「冪零 ∨ `F(G)A` が Frobenius」)。
+0. ~~**step 1 (setup) の組み立て**~~ — **2026-07-19 完了** (3 件とも axiom-clean):
+   `isNilpotent_of_fitting_eq_top` (case i) / `conj_ne_of_isHallSubgroup_fitting_pPrime`
+   (Hall `π(F)'`-部分群が `F(G)` 上に固定点なしで作用 = step 2 を `conj_frobenius` の形に包む) /
+   `isFrobeniusGroup_fitting_of_isComplement` (case ii への橋渡し)。
+   ⟹ **repo の道具だけで書ける部分は step 1/2/3 で出揃った**。
 1. **`A` の冪零性** — Gorenstein Thm 10.3.1(iv)(v) (位数 `qr` の部分群は巡回 / metacyclic 補群)
    が **不在** (`IsMetacyclic` はあるが Frobenius 理論と未接続)。ここが load-bearing。
    ⚠ 奇数位数なら `Ch06.isZGroup_of_isFrobeniusAction_of_odd` が使えるので、**BG App.D が要求する
@@ -166,6 +168,18 @@ call site repoint・全 leaf build green):
    ⚠ **Cor 1.6 には不要** — 下記「book-strength 債務」を解消するときだけ要る。
 
 **D.1 は未着地ゆえ `AppD_CNGroups.lean` は無変更**。
+
+### 次の着手 (2026-07-19 時点)
+
+残る 2 件は**どちらも repo に無い前提の新規形式化**なので、次は上流優先で **1 (`A` の冪零性)**
+から入る。原文の論法は「`A` は Frobenius 補群 ⟹ Sylow 巡回 (Thm 10.3.1(iv)) ⟹ metacyclic
+(Thm 7.6.2) ⟹ ある Sylow `Q` で `Ω₁(Q) ⊴ A` ⟹ 位数 `qr` の部分群は巡回 (Thm 10.3.1(v)) ⟹
+`Ω₁(Q)` が `Ω₁(R)` を中心化 ⟹ **Lemma 1.2** で `Q` が `R` を中心化 ⟹ `Q ≤ Z(A)` ⟹
+`A ≤ C_G(Q)` 冪零」。
+⚠ **着手前に必ず実測**: `Ch06.isZGroup_of_isFrobeniusAction_of_odd` /
+`sylow_isCyclic_or_two_quaternion_of_frobeniusAction` / `IsFrobeniusAction.unique_involution` /
+`GroupTheory.IsMetacyclic` が実際にどこまで使えるかを grep で確認してから欠落分を書く
+([[verify-port-state-by-number-not-coq-name]])。
 
 ### ⚠ 旧ブロッカーリストの訂正 (2026-07-19、実測)
 
