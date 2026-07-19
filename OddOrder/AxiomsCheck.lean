@@ -8243,6 +8243,19 @@ pairwise formula after scalar extension. -/
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.exists_lowerCentralSquareMap_eq_frobeniusSum
 
+/-! **Mixed bilinear scalar extension**: a bilinear map with two different
+source modules extends in both inputs and its output; equivariance and a
+full spanning range survive the extension. -/
+
+#assert_only_allowed_axioms
+  LinearMap.baseChange₂_tmul
+
+#assert_only_allowed_axioms
+  LinearMap.baseChange₂_equivariant
+
+#assert_only_allowed_axioms
+  LinearMap.baseChange₂_span_eq_top
+
 /-! **Higman Lemma 6, degree-three group-theoretic layer**: the actual mixed
 commutator descends to `L₂ × L₁ → L₃`, spans `L₃`, and is equivariant.  Its
 composition with the degree-two bracket is the actual trilinear commutator
@@ -8259,6 +8272,18 @@ composition with the degree-two bracket is the actual trilinear commutator
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_equivariant_representation
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_tmul
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_equivariant
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_span_eq_top
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_eigenweight
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutatorTrilinear_span_eq_top
@@ -8331,6 +8356,12 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_squareMapAdditive_self
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_sum_eq_zero_of_square_formula
 
 /-! **Higman Lemma 6, distinct triple-weight exclusion**: three distinct
 Frobenius exponents cannot be congruent modulo `2^n - 1` to a pair weight.

@@ -21,8 +21,9 @@ image is zero or all of `L₁`; the latter would make the full-span bracket
 zero and hence force `L₃ = 0`.
 
 The later sections establish Higman's odd-dimension reduction through the
-order-three fixed-point-free theorem.  The remaining frontier is the
-pair/triple Frobenius-weight argument from the rest of Higman's proof.
+order-three fixed-point-free theorem and connect `[u²,u] = 1` to the
+triple-commutator sum from p. 86.  The remaining frontier is the
+repeated-index pair-weight separation and final contradiction.
 -/
 
 set_option autoImplicit false
@@ -32,9 +33,9 @@ namespace OddOrder.Higman.Suzuki2Groups
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
 open OddOrder.Isaacs.Ch03
-open scoped commutatorElement IsMulCommutative
+open scoped BigOperators commutatorElement IsMulCommutative TensorProduct
 
-universe uH uC uMain
+universe uK uH uC uMain uV uW uX
 
 local instance instLemmaSixLowerCentralLayerIsMulCommutative
     (H : Type uH) [Group H] (i : ℕ) :
@@ -724,5 +725,113 @@ theorem lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
       phi a horder hAgemo hfreeZero hfreeOne hfreeTwo
   exact (classThreeQuotientAction_orderOf_ne_three
     phi a hAgemo hfreeZero hfreeOne hfreeTwo) hquotOrder
+
+/-! ## The square identity and the triple-bracket sum -/
+
+/-- **Higman Lemma 6 (p. 86), the layer identity `[u^(2),u] = 0`.**
+
+The actual square of a first-layer vector has zero degree-three bracket
+with that vector. On representatives this follows from `[x²,x] = 1` before
+passing to the lower-central quotients. -/
+theorem lowerCentralDegreeThreeCommutatorBilinear_squareMapAdditive_self
+    (H : Type uH) [Group H]
+    (hSq : LowerCentralSquaresLieInSecond H)
+    (u : Additive (lowerCentralLayer H 0)) :
+    lowerCentralDegreeThreeCommutatorBilinear H
+        (lowerCentralSquareMapAdditive H hSq u) u = 0 := by
+  obtain ⟨x, hx⟩ :=
+    QuotientGroup.mk'_surjective (lowerCentralLayerKernel H 0) u.toMul
+  have hu : u = Additive.ofMul
+      (QuotientGroup.mk' (lowerCentralLayerKernel H 0) x) := by
+    apply Additive.toMul.injective
+    simpa only [toMul_ofMul] using hx.symm
+  rw [hu, lowerCentralSquareMapAdditive_mk]
+  change lowerCentralDegreeThreeCommutatorBilinear H
+      (Additive.ofMul (lowerCentralSquareValue H hSq x))
+      (Additive.ofMul
+        (QuotientGroup.mk' (lowerCentralLayerKernel H 0) x)) = 0
+  rw [lowerCentralSquareValue,
+    lowerCentralDegreeThreeCommutatorBilinear_mk]
+  apply Additive.toMul.injective
+  change lowerCentralDegreeThreeCommutatorValue H
+      (lowerCentralSquareRepresentative H hSq x) x = 1
+  apply (QuotientGroup.eq_one_iff _).mpr
+  have hcomm : ⁅((x : H) ^ 2), (x : H)⁆ = 1 := by
+    simp only [commutatorElement_def, pow_two]
+    group
+  rw [show lowerCentralDegreeThreeCommutator H
+      (lowerCentralSquareRepresentative H hSq x) x = 1 from
+    Subtype.ext hcomm]
+  exact Subgroup.one_mem _
+
+/-- Expanding both arguments of a bilinear map turns a vanishing value into
+the triple sum used in Higman's eigenweight argument. -/
+private theorem tripleSum_eq_zero_of_bilinear_expansions
+    {K : Type uK} [Field K]
+    {V : Type uV} {W : Type uW} {X : Type uX}
+    [AddCommGroup V] [Module K V]
+    [AddCommGroup W] [Module K W]
+    [AddCommGroup X] [Module K X]
+    {m : ℕ}
+    (b : Fin m → V)
+    (beta : V →ₗ[K] V →ₗ[K] W)
+    (gamma : W →ₗ[K] V →ₗ[K] X)
+    (q : W) (u : V)
+    (hq : q = ∑ i : Fin m, ∑ j : Fin m with i < j,
+      beta (b i) (b j))
+    (hu : u = ∑ i : Fin m, b i)
+    (hself : gamma q u = 0) :
+    ∑ i : Fin m, ∑ j : Fin m with i < j,
+      ∑ k : Fin m, gamma (beta (b i) (b j)) (b k) = 0 := by
+  rw [hq, hu] at hself
+  simp only [map_sum, LinearMap.sum_apply] at hself
+  calc
+    ∑ i : Fin m, ∑ j : Fin m with i < j,
+          ∑ k : Fin m, gamma (beta (b i) (b j)) (b k) =
+        ∑ i : Fin m, ∑ k : Fin m, ∑ j : Fin m with i < j,
+          gamma (beta (b i) (b j)) (b k) := by
+      apply Finset.sum_congr rfl
+      intro i _
+      rw [Finset.sum_comm]
+    _ = ∑ k : Fin m, ∑ i : Fin m, ∑ j : Fin m with i < j,
+          gamma (beta (b i) (b j)) (b k) := Finset.sum_comm
+    _ = 0 := hself
+
+/-- **Higman Lemma 6 (p. 86), triple-sum identity.**
+
+If a scalar-extended first-layer vector and its square have the Frobenius
+basis expansions occurring in Lemma 5, then the sum of the corresponding
+scalar-extended actual lower-central triple-bracket terms is zero. -/
+theorem lowerCentralTripleCommutator_sum_eq_zero_of_square_formula
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    (H : Type uH) [Group H]
+    (hSq : LowerCentralSquaresLieInSecond H)
+    {m : ℕ}
+    (b : Fin m →
+      K ⊗[ZMod 2] Additive (lowerCentralLayer H 0))
+    (x : Additive (lowerCentralLayer H 0))
+    (hx : (1 : K) ⊗ₜ[ZMod 2] x = ∑ k : Fin m, b k)
+    (hq : lowerCentralSquareMapBaseChange K H hSq x =
+      ∑ i : Fin m, ∑ j : Fin m with i < j,
+        lowerCentralCommutatorBilinearBaseChange K H (b i) (b j)) :
+    ∑ i : Fin m, ∑ j : Fin m with i < j, ∑ k : Fin m,
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H (b i) (b j))
+        (b k) = 0 := by
+  have hself :
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralSquareMapBaseChange K H hSq x)
+        ((1 : K) ⊗ₜ[ZMod 2] x) = 0 := by
+    change lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+      ((1 : K) ⊗ₜ[ZMod 2] lowerCentralSquareMapAdditive H hSq x)
+      ((1 : K) ⊗ₜ[ZMod 2] x) = 0
+    rw [lowerCentralDegreeThreeCommutatorBilinearBaseChange_tmul,
+      lowerCentralDegreeThreeCommutatorBilinear_squareMapAdditive_self]
+    simp
+  exact tripleSum_eq_zero_of_bilinear_expansions b
+    (lowerCentralCommutatorBilinearBaseChange K H)
+    (lowerCentralDegreeThreeCommutatorBilinearBaseChange K H)
+    (lowerCentralSquareMapBaseChange K H hSq x)
+    ((1 : K) ⊗ₜ[ZMod 2] x) hq hx hself
 
 end OddOrder.Higman.Suzuki2Groups

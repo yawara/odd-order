@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 
 /-!
 # Higman's degree-three lower-central bracket
@@ -29,9 +30,9 @@ set_option autoImplicit false
 namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
-open scoped commutatorElement IsMulCommutative
+open scoped commutatorElement IsMulCommutative TensorProduct
 
-universe uH uX uA uB uC
+universe uK uH uX uA uB uC
 
 local instance instLowerCentralLayerKernelTwoInAmbientNormal
     (H : Type uH) [Group H] :
@@ -690,6 +691,89 @@ theorem lowerCentralDegreeThreeCommutatorBilinear_equivariant_representation
     simpa only [ofMul_toMul] using hv
   rw [hu', hv']
   exact lowerCentralDegreeThreeCommutatorBilinear_equivariant phi g u v
+
+/-! ## Scalar extension of the degree-three bracket -/
+
+/-- The degree-three lower-central commutator after extending scalars from
+`F₂` to `K`. The two input layers are different, so this uses
+`LinearMap.baseChange₂`. -/
+noncomputable def lowerCentralDegreeThreeCommutatorBilinearBaseChange
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    (H : Type uH) [Group H] :
+    (K ⊗[ZMod 2] Additive (lowerCentralLayer H 1)) →ₗ[K]
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) →ₗ[K]
+        (K ⊗[ZMod 2] Additive (lowerCentralLayer H 2)) :=
+  (lowerCentralDegreeThreeCommutatorBilinear H).baseChange₂ K
+
+/-- Evaluation of the scalar-extended degree-three commutator on pure
+tensors. -/
+@[simp]
+theorem lowerCentralDegreeThreeCommutatorBilinearBaseChange_tmul
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    (H : Type uH) [Group H]
+    (a c : K)
+    (x : Additive (lowerCentralLayer H 1))
+    (y : Additive (lowerCentralLayer H 0)) :
+    lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (a ⊗ₜ[ZMod 2] x) (c ⊗ₜ[ZMod 2] y) =
+      (a * c) ⊗ₜ[ZMod 2]
+        lowerCentralDegreeThreeCommutatorBilinear H x y := by
+  simp [lowerCentralDegreeThreeCommutatorBilinearBaseChange]
+
+/-- The scalar-extended degree-three commutator intertwines the
+scalar-extended actor actions on `L₂`, `L₁`, and `L₃`. -/
+theorem lowerCentralDegreeThreeCommutatorBilinearBaseChange_equivariant
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    {H : Type uH} {X : Type uX} [Group H] [Group X]
+    (phi : X →* MulAut H) (g : X)
+    (u : K ⊗[ZMod 2] Additive (lowerCentralLayer H 1))
+    (v : K ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) :
+    (lowerCentralLayerRepresentation phi 2 g).baseChange K
+        (lowerCentralDegreeThreeCommutatorBilinearBaseChange K H u v) =
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        ((lowerCentralLayerRepresentation phi 1 g).baseChange K u)
+        ((lowerCentralLayerRepresentation phi 0 g).baseChange K v) := by
+  exact LinearMap.baseChange₂_equivariant
+    (lowerCentralDegreeThreeCommutatorBilinear H)
+    (lowerCentralLayerRepresentation phi 1 g)
+    (lowerCentralLayerRepresentation phi 0 g)
+    (lowerCentralLayerRepresentation phi 2 g)
+    (lowerCentralDegreeThreeCommutatorBilinear_equivariant_representation phi g)
+    u v
+
+/-- The full spanning range of the degree-three commutator survives scalar
+extension. -/
+theorem lowerCentralDegreeThreeCommutatorBilinearBaseChange_span_eq_top
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    (H : Type uH) [Group H] :
+    Submodule.span K
+      (Set.range fun z :
+          (K ⊗[ZMod 2] Additive (lowerCentralLayer H 1)) ×
+            (K ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) =>
+        lowerCentralDegreeThreeCommutatorBilinearBaseChange K H z.1 z.2) =
+      ⊤ := by
+  exact LinearMap.baseChange₂_span_eq_top
+    (lowerCentralDegreeThreeCommutatorBilinear H)
+    (lowerCentralDegreeThreeCommutatorBilinear_span_eq_top H)
+
+/-- The degree-three commutator of scalar-extended eigenvectors has the
+product eigenvalue. The value may vanish, so this is an eigenvector equation. -/
+theorem lowerCentralDegreeThreeCommutatorBilinearBaseChange_eigenweight
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    {H : Type uH} {X : Type uX} [Group H] [Group X]
+    (phi : X →* MulAut H) (g : X)
+    (a c : K)
+    (u : K ⊗[ZMod 2] Additive (lowerCentralLayer H 1))
+    (v : K ⊗[ZMod 2] Additive (lowerCentralLayer H 0))
+    (hu : (lowerCentralLayerRepresentation phi 1 g).baseChange K u = a • u)
+    (hv : (lowerCentralLayerRepresentation phi 0 g).baseChange K v = c • v) :
+    (lowerCentralLayerRepresentation phi 2 g).baseChange K
+        (lowerCentralDegreeThreeCommutatorBilinearBaseChange K H u v) =
+      (a * c) •
+        lowerCentralDegreeThreeCommutatorBilinearBaseChange K H u v := by
+  rw [lowerCentralDegreeThreeCommutatorBilinearBaseChange_equivariant,
+    hu, hv]
+  simp [smul_smul, mul_comm]
 
 /-! ## The actual triple commutator -/
 
