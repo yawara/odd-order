@@ -246,4 +246,173 @@ theorem exists_hallCollection_of_residue {x y : G} {n : ℕ} (hn : 2 ≤ n) (c :
 
 end Absorption
 
+/-! ## One-variable collection
+
+The first genuinely *collecting* step: expanding `⁅a, bⁿ⁆` along the descending
+chain of left-normed commutators `⁅a, b⁆, ⁅b, ⁅a, b⁆⁆, …` produces exactly the
+binomial exponents `C(n, i)`.  This is the mechanism that makes binomial
+coefficients appear in Hall's formula at all, and it is self-contained: no free
+group, no basic commutators, only the fact that the iterated commutators
+commute with one another (which in applications holds because they all lie in a
+single abelian section `γ_k / γ_{k+1}`).
+-/
+
+section OneVariable
+
+/-- The left-normed iterated commutator chain of `a` against `b`:
+`hallIter a b 0 = a`, `hallIter a b 1 = ⁅a, b⁆`, and
+`hallIter a b (i + 1) = ⁅b, hallIter a b i⁆` for `i ≥ 1`.
+
+The `b`-on-the-left shape of the recursion is forced by mathlib's convention
+`⁅g, h⁆ = g h g⁻¹ h⁻¹`: it is exactly the one for which
+`b * z * b⁻¹ = ⁅b, z⁆ * z` (see `conj_eq_commutatorElement_mul`), which is the
+rewriting the collection performs. -/
+def hallIter (a b : G) : ℕ → G
+  | 0 => a
+  | 1 => ⁅a, b⁆
+  | (i + 2) => ⁅b, hallIter a b (i + 1)⁆
+
+@[simp] theorem hallIter_zero (a b : G) : hallIter a b 0 = a := rfl
+
+@[simp] theorem hallIter_one (a b : G) : hallIter a b 1 = ⁅a, b⁆ := rfl
+
+theorem hallIter_succ (a b : G) {i : ℕ} (hi : 1 ≤ i) :
+    hallIter a b (i + 1) = ⁅b, hallIter a b i⁆ := by
+  obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (by omega : i ≠ 0)
+  rfl
+
+/-- The chain descends the lower central series: `hallIter a b i ∈ γ_{i+1}` in the
+book's indexing, i.e. `lowerCentralSeries i` in mathlib's. -/
+theorem hallIter_mem_lowerCentralSeries (a b : G) (i : ℕ) :
+    hallIter a b i ∈ (⊤ : Subgroup G).lowerCentralSeries i := by
+  induction i with
+  | zero => exact Subgroup.mem_top _
+  | succ i ih =>
+      rcases Nat.eq_zero_or_pos i with rfl | hi
+      · rw [hallIter_one, Subgroup.top_lowerCentralSeries_one]
+        exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+      · rw [hallIter_succ a b hi, Subgroup.lowerCentralSeries, Subgroup.commutator_comm]
+        exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) ih
+
+/-- `⁅a, b c⁆ = ⁅a, b⁆ · (⁅a, c⁆ conjugated by `b⁻¹`)`. -/
+private theorem commutatorElement_mul_right' (a b c : G) :
+    ⁅a, b * c⁆ = ⁅a, b⁆ * (b * ⁅a, c⁆ * b⁻¹) := by
+  simp only [commutatorElement_def]; group
+
+/-- The rewriting the collection runs on: conjugating by `b` costs exactly one
+step down the chain, `b z b⁻¹ = ⁅b, z⁆ z`. -/
+theorem conj_eq_commutatorElement_mul (b z : G) : b * z * b⁻¹ = ⁅b, z⁆ * z := by
+  simp only [commutatorElement_def]; group
+
+/-- Conjugation distributes over an ordered product. -/
+private theorem conj_list_prod (b : G) (l : List G) :
+    b * l.prod * b⁻¹ = (l.map fun z => b * z * b⁻¹).prod := by
+  induction l with
+  | nil => simp
+  | cons z t ih => rw [List.prod_cons, List.map_cons, List.prod_cons, ← ih]; group
+
+/-- An ordered product of pointwise products splits, provided every left factor
+commutes with every right factor. -/
+private theorem prod_map_mul_of_commute {l : List ℕ} {f g : ℕ → G}
+    (h : ∀ i ∈ l, ∀ j ∈ l, Commute (g i) (f j)) :
+    (l.map fun i => f i * g i).prod = (l.map f).prod * (l.map g).prod := by
+  induction l with
+  | nil => simp
+  | cons i t ih =>
+      have hgi : Commute (g i) (t.map f).prod := by
+        refine Commute.list_prod_right _ _ ?_
+        intro z hz
+        obtain ⟨j, hj, rfl⟩ := List.mem_map.mp hz
+        exact h i (by simp) j (List.mem_cons_of_mem _ hj)
+      have ih' := ih fun p hp q hq =>
+        h p (List.mem_cons_of_mem _ hp) q (List.mem_cons_of_mem _ hq)
+      simp only [List.map_cons, List.prod_cons, ih']
+      calc f i * g i * ((t.map f).prod * (t.map g).prod)
+          = f i * (g i * (t.map f).prod * (t.map g).prod) := by group
+        _ = f i * ((t.map f).prod * g i * (t.map g).prod) := by rw [hgi.eq]
+        _ = f i * (t.map f).prod * (g i * (t.map g).prod) := by group
+
+/-- Re-indexing an ordered product along `i ↦ i + 1`. -/
+private theorem prod_map_range'_shift (f : ℕ → G) (s n : ℕ) :
+    ((List.range' s n).map fun i => f (i + 1)).prod
+      = ((List.range' (s + 1) n).map f).prod := by
+  induction n generalizing s with
+  | zero => simp
+  | succ k ih => simp [List.range'_succ, ih]
+
+/-- **One-variable collection.**  Let `d` run down the left-normed commutator
+chain of `a` against `b` (`d 1 = ⁅a, b⁆` and `d (i+1) = ⁅b, d i⁆`), and suppose
+the `d i` with `i ≥ 1` commute with one another.  Then
+
+`⁅a, bⁿ⁆ = d₁^{C(n,1)} · d₂^{C(n,2)} ⋯ dₙ^{C(n,n)}`.
+
+This is the one-variable case of Hall's collecting process, and the source of
+the binomial exponents: passing one more `b` across the chain turns `d i` into
+`d (i+1) · d i`, and Pascal's rule `C(n,i) + C(n,i-1) = C(n+1,i)` reassembles
+the product.
+
+In applications the commuting hypothesis is supplied by working modulo a term
+of the lower central series, so that all the `d i` in play lie in one abelian
+section; see `commutatorElement_pow_right_eq_prod_pow_choose_of_abelian`. -/
+theorem commutatorElement_pow_right_eq_prod_pow_choose {a b : G} {d : ℕ → G}
+    (hd1 : d 1 = ⁅a, b⁆) (hds : ∀ i, 1 ≤ i → d (i + 1) = ⁅b, d i⁆)
+    (hc : ∀ i j, 1 ≤ i → 1 ≤ j → Commute (d i) (d j)) (n : ℕ) :
+    ⁅a, b ^ n⁆ = ((List.range' 1 n).map fun i => d i ^ n.choose i).prod := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+      set A := ((List.range' 1 n).map fun i => d i ^ n.choose i).prod with hA
+      set B := ((List.range' 1 n).map fun i => d (i + 1) ^ n.choose i).prod with hB
+      -- One more `b` crosses the whole tail: `⁅a, b^(n+1)⁆ = d 1 * (b * A * b⁻¹)`.
+      have hstep : ⁅a, b ^ (n + 1)⁆ = d 1 * (b * A * b⁻¹) := by
+        rw [pow_succ' b n, commutatorElement_mul_right' a b (b ^ n), ih, hd1]
+      -- Crossing turns `d i` into `d (i+1) * d i`, so the tail becomes `B * A`.
+      have hconj : b * A * b⁻¹ = B * A := by
+        rw [hA, conj_list_prod, List.map_map]
+        have hpt : ((List.range' 1 n).map
+              ((fun z => b * z * b⁻¹) ∘ fun i => d i ^ n.choose i))
+            = (List.range' 1 n).map fun i => d (i + 1) ^ n.choose i * d i ^ n.choose i := by
+          refine List.map_congr_left ?_
+          intro i hi
+          have hi1 : 1 ≤ i := (List.mem_range'_1.mp hi).1
+          have hcj : b * d i * b⁻¹ = d (i + 1) * d i := by
+            rw [conj_eq_commutatorElement_mul, hds i hi1]
+          have : b * d i ^ n.choose i * b⁻¹ = (b * d i * b⁻¹) ^ n.choose i := by
+            simp [conj_pow]
+          simp only [Function.comp_apply, this, hcj]
+          exact (hc (i + 1) i (by omega) hi1).mul_pow _
+        rw [hpt]
+        refine prod_map_mul_of_commute ?_
+        intro i hi j hj
+        have hi1 : 1 ≤ i := (List.mem_range'_1.mp hi).1
+        have hj1 : 1 ≤ j := (List.mem_range'_1.mp hj).1
+        exact (hc i (j + 1) hi1 (by omega)).pow_pow _ _
+      -- Pascal's rule reassembles `(d 1 * B) * A` on the other side.
+      have hpascal : ((List.range' 1 (n + 1)).map fun i => d i ^ (n + 1).choose i).prod
+          = (d 1 * B) * A := by
+        rw [← prod_map_range'_shift (fun i => d i ^ (n + 1).choose i) 0 (n + 1)]
+        have hsplit : ((List.range' 0 (n + 1)).map fun j => d (j + 1) ^ (n + 1).choose (j + 1))
+            = (List.range' 0 (n + 1)).map
+                fun j => d (j + 1) ^ n.choose j * d (j + 1) ^ n.choose (j + 1) := by
+          refine List.map_congr_left ?_
+          intro j _
+          rw [← pow_add, Nat.choose_succ_succ]
+        rw [hsplit, prod_map_mul_of_commute (fun i _ j _ => (hc (i + 1) (j + 1)
+          (by omega) (by omega)).pow_pow _ _)]
+        congr 1
+        · -- `∏_{j=0}^{n} d(j+1)^{C(n,j)} = d 1 * B`
+          rw [List.range'_succ, List.map_cons, List.prod_cons, hB, Nat.choose_zero_right, pow_one]
+        · -- `∏_{j=0}^{n} d(j+1)^{C(n,j+1)} = A`, the top slot being `C(n,n+1) = 0`
+          have hcat : List.range' 0 (n + 1) = List.range' 0 n ++ [n] := by
+            have h := @List.range'_append 0 n 1 1
+            rw [show 0 + 1 * n = n by omega] at h
+            rw [← h]; simp
+          rw [hcat, List.map_append, List.prod_append]
+          simp only [List.map_cons, List.map_nil, List.prod_cons, List.prod_nil,
+            Nat.choose_succ_self, pow_zero, mul_one]
+          rw [prod_map_range'_shift (fun i => d i ^ n.choose i) 0 n, hA]
+      rw [hstep, hconj, hpascal, mul_assoc]
+
+end OneVariable
+
 end OddOrder.GroupTheory
