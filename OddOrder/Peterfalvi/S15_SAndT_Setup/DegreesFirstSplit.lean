@@ -981,6 +981,14 @@ theorem Hypothesis.eta10_mem_ZIrr [Finite G] (hyp : Hypothesis (G := G)) :
   rw [Hypothesis.eta10, hyp.eta_eq_tau_omega]
   exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr _ _)
 
+open scoped FiniteInduce in
+/-- **`η₀₁` is a virtual character of `G`** (mirror of `eta10_mem_ZIrr` for the (13.8)
+transposed entry, issue 1041). -/
+theorem Hypothesis.eta01_mem_ZIrr [Finite G] (hyp : Hypothesis (G := G)) :
+    hyp.eta01 ∈ ZIrr G := by
+  rw [Hypothesis.eta01, hyp.eta_eq_tau_omega]
+  exact hyp.tau3_mem_ZIrr _ (hyp.omega_mem_ZIrr _ _)
+
 /-- **Regularity of mixed products**: for `x ∈ W₁ ∖ {1}` and `y ∈ W₂ ∖ {1}` the product `x·y`
 avoids `W₁ ∪ W₂` — otherwise one factor would lie in `W₁ ⊓ W₂ = ⊥`.  The membership feed of
 `tau3_apply_of_regular` in the (1.10) congruence computations. -/
