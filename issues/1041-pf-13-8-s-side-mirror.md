@@ -72,3 +72,81 @@ repo 形式化済みの `eta10_Qsharp_norm_lower_core` (Eta10Correction.lean:361
 - frontier note: `notes/peterfalvi/frontier_measured_2026_07_19.md` §13 (13.8) 行
   (2026-07-19 に本 issue の実測で訂正済み)
 - T 側実装: `S15_CaseBEndgameSupply/Eta10Correction.lean` (全体が手本)
+
+## 実装設計 (2026-07-19 iteration 2 実測 — CharacterDegreeCore ベースで書く)
+
+**方針転換**: T 側 (`Q_sharp_*` 直呼び) でなく **S 側の既存 abstraction 層
+`CharacterDegreeCore` (Machinery135.lean:95) + `H_sharp_hypothesis76_base`** の上に書く。
+(13.7) 用の既存実装がこの層で完結しており、必要 field は全て揃っている:
+`tau1S_apply_induce_sub` / `tau1S_inner_induce` / `tau1S_induce_mem_ZIrr` /
+`tau1S_induce_inner_eta` (既約 induction は全 η 直交) /
+`tau1S_induce_inner_eta_col_zero` / **`mu_col_tau1_eta_col_one`** ((13.3.c) 蒸留済:
+j≠0, δ=±1, θ linear P-nonkernel, μ_j = Ind θ, τ₁ μ_j = δ•∑_i η_{i1}) /
+`mu_j_linear_induced` / `mu_tau1_formula` (clean/p=3-flip 両分岐)。
+
+**手本 3 点セット** (すべて実在・sorry-free):
+- base 選択: `CharacterDegreeCore.exists_hSharpBase` (HSharpChosenBase.lean:36)
+- family index: `LambdaClusterData.exists_hSharpFamilyIndex_base` (同:110) —
+  `zeta_family_cover` で index、`H_sharp_hypothesis76_base_zeta_zero` で正値性
+- cCoeff 計算: `lambda_tau1_cCoeff_base` (CharacterDegreeEnginesSSide.lean:663、λ で
+  coefficient=1) と `eta10_cCoeff_base_eq_zero` (同:866、全係数 0)。
+  cCoeff χ i = ⟨Ind_S^G(psiSupp i), χ⟩, psiSupp i = zeta i − d_i•zeta 0, d_i = 1
+  (K ≅ H abelian, `hd1` パターン)。
+
+**書くもの (S15_CaseBEndgameSupply/ に新 leaf `Eta01Correction.lean` を推奨)**:
+
+1. `CharacterDegreeCore.exists_hSharpBase_orthogonal_eta01`:
+   ∃ φ₀ P-nonkernel with `Ind φ₀ ≠ μ_j` (distinguished) かつ
+   `⟨τ₁S(Ind φ₀), η₀₁⟩ = 0`。
+   構成: mu_col_tau1_eta_col_one の j に対し**別の非零列 j''** を取る
+   (T 側 `exists_qSharpBase_orthogonal_eta10_core` の mirror):
+   clean 分岐 → τ₁ μ_{j''} = ∑η_{i,j''}, j''≠1 → η₀₁ と直交 (eta_orthonormal)。
+   p=3 flip 分岐 → columns {1,2}: j=2 が distinguished、j''=1 → −∑η_{i,2} → 直交。
+   ⚠ clean 分岐で p=3 のとき j=1, j''=2 (η-col 2 → 直交 OK)。
+   μ_{j''} ≠ μ_j: mu_orthonormal (⟨μ_j,μ_j⟩=q≠0, ⟨μ_j,μ_{j''}⟩=0)。
+   φ₀ = mu_j_linear_induced (j'') の θ。
+2. `exists_eta01_muColumn_index_base` (mirror of exists_hSharpFamilyIndex_base):
+   mu_col の θ_j を zeta_family_cover → i₁, zeta i₁ = μ_j, 0 < i₁
+   (Ind φ₀ = μ_{j''} ≠ μ_j), P-nonkernel descent (pointwise witness は
+   hθP の Set.not_subset から)。
+3. `eta01_cCoeff_base` (mirror of lambda_tau1_cCoeff_base):
+   cCoeff η₀₁ i₁ = δ / P-nonkernel i ≠ i₁ → cCoeff η₀₁ i = 0。
+   dispatch (i ≠ i₁, θ_i := zeta_induced i):
+   (a) Ind θ_i 既約 → `tau1S_induce_inner_eta` (0,1) → 0。
+   (b) Ind θ_i 可約 → **要調査**: S 側「P-nonkernel 可約 induced = μ-column」
+       分類 brick が存在するか。T 側は 2 段 constituent 展開で処理
+       (CharacterDegreeEngines.lean:353-)。候補:
+       `tau1S_ofHonest_zSpanIrr_inner_eta` (EnginesSSide:268) /
+       `induce_H_mem_zSpan_sSet_irr` (同:61) を先に読む。
+       μ-column なら mu_tau1_formula → η-col ≠ 1 → 0 (j' = j なら zeta i = μ_j =
+       zeta i₁ → family injectivity? i = i₁ 矛盾 — zeta の単射性 brick 要確認)。
+4. `exists_caseB_data_eta01_S_core` (mirror of exists_caseB_data_eta10_T_core,
+   Eta10Correction.lean:207): ζ := q⁻¹ • (zeta i₁) = q⁻¹ μ_j, α := hypothesis76AlphaFun。
+   - hvanish: zeta_eq_zero_of_not_mem_H (H-vanishing — ⚠ T 側は Q^# 台; S 側は H^# 台)
+   - hinner: hypothesis76_zeta_inner_alphaFun_eq_zero
+   - hχ point formula: hypothesis76_point_formula (i₁, cCoeff=δ, 他 0)
+   - hfirstTerm: ∑_S ‖q⁻¹μ_j‖² − ‖q⁻¹μ_j(1)‖² = |S|·q/q² − (qu/q)² = |S|/q − u²
+     = |S′| − u²。zetaNormSq i₁ = q (`muColumn_inner_self` 経由; T 側 hnormP mirror)。
+     μ_j(1) = qu: mu_col θ 1 = 1 → μ_j(1) = |S:H| = ? **|S:H| = qu を供給する
+     carrier 補題を要確認** (T 側 `card_T_eq_deriv_mul_p` + hdeg mirror;
+     候補 grep: `index_H`, `card_S`, `u_eq`, S = HW₁ 分解)。
+   - hcross: α(1) ∈ ℤ (mirror of exists_etaT_alphaFun_one_int_core —
+     S 側候補 `H_sharp_cCoeff_int` (Canonicalization.lean:126) から組む)
+   - hinfl: hypothesis76AlphaFun_inflation, 係数 (|H|−1)…
+     ⚠ T 側は (q^p−1) = |Q|−1 を使った (台 = Q^#)。S 側の台は H^# だが教科書
+     (13.5.c) は (|P|−1)α(1)²。**(13.7) 実装 `exists_caseB_data_eta10_H_core` は
+     (p^q−1) = |P|−1 を使用** (行 96: `(hyp.p ^ hyp.q - 1) * d ^ 2 ≤ s`) —
+     inflation の台が P^# に絞られる仕組みをそこから読む
+     (`H_sharp_alphaFun_inflation_finset` Canonicalization.lean:229)。
+5. `eta01_Hsharp_norm_lower_core` (mirror of eta10_Qsharp_norm_lower_core:361):
+   `(|S′| : ℝ) − u² ≤ ∑_{x ∈ sharpSubgroup hyp.H} ‖hyp.eta01 x‖²`
+   via `caseB_eta01_norm_bound` + hu: 2u ≤ |P|−1 = p^q − 1
+   (T 側 `two_mul_v_le hv` mirror; u = (p^q−1)/(p−1) 型の carrier 恒等式を確認 —
+   (13.2.c) は u ≤ (|P|−1)/2)。
+
+**次 iteration の開始点**: 3(b) の可約 dispatch brick と 4 の |S:H| = qu 供給を
+grep で確定してから `Eta01Correction.lean` を書き始める。
+
+## 完了済み
+
+- [x] stage (i): `Hypothesis.eta01` 定義 (DegreesFirstSplit.lean, commit 25689c81d)
