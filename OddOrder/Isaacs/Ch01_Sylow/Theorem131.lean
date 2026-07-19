@@ -451,22 +451,37 @@ theorem sylow_normal_of_card_eq_sq_mul_prime_gt
       -- Now p = 2, q = 3.  We have hn3_eq : Nat.card (Sylow 3 G) = 4.
       exact sylow_two_normal_of_card_twelve_of_four_sylow_three hcard12 hn3_eq
 
-/-- **Isaacs Thm 1.31** (一般形).  `|G| = p² · q` (p, q 異なる素数) ⇒ Sylow `p` または
-Sylow `q` が正規.  特殊な場合分け (`q < p` または `p < q`) を統合した形.
+/-- **Isaacs Thm 1.31** (一般形).  `|G| = p² · q` (`p`, `q` 素数) ⇒ Sylow `p` または
+Sylow `q` が正規.
 
-`q < p` の場合: `sylow_normal_of_card_eq_sq_mul_prime_lt` で Sylow `p` 正規.
-`p < q` の場合: `sylow_normal_of_card_eq_sq_mul_prime_gt` で適切な側が正規. -/
+⚠ **書籍どおり `p ≠ q` を仮定しない** (2026-07-19 に一般化)。Isaacs の statement は
+「Let `|G| = p²q`, where `p` and `q` are primes」だけで相異性を課さず、証明の中で
+`n_p > 1` かつ `n_q > 1` と背理法的に仮定した局面で初めて `p ≠ q` に注意する。
+`p = q` は `|G| = p³` すなわち `G` 自身が `p`-群の場合で、Sylow `p` 部分群は
+極大性から `⊤` ゆえ正規 — 下の第 1 分岐がそれ。
+
+`p ≠ q` のときは従来どおり `q < p` / `p < q` に分けて
+`sylow_normal_of_card_eq_sq_mul_prime_lt` / `_gt` に流す。 -/
 theorem sylow_normal_of_card_eq_sq_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 2 * q) :
+    (hcard : Nat.card G = p ^ 2 * q) :
     (∃ P : Sylow p G, (P : Subgroup G).Normal) ∨
     (∃ Q : Sylow q G, (Q : Subgroup G).Normal) := by
-  rcases lt_or_gt_of_ne hpq with hpq_lt | hqp_lt
-  · -- p < q
-    exact sylow_normal_of_card_eq_sq_mul_prime_gt hpq_lt hcard
-  · -- q < p
+  rcases eq_or_ne p q with rfl | hpq
+  · -- `p = q`: `|G| = p³`, so `G` is a `p`-group and its Sylow `p`-subgroup is `⊤`.
     left
-    exact sylow_normal_of_card_eq_sq_mul_prime_lt hqp_lt hcard
+    refine ⟨default, ?_⟩
+    have hGp : IsPGroup p G := IsPGroup.of_card (n := 3) (by rw [hcard]; ring)
+    have htop : ((default : Sylow p G) : Subgroup G) = ⊤ :=
+      ((default : Sylow p G).is_maximal' (hGp.to_subgroup ⊤) le_top).symm
+    rw [htop]
+    infer_instance
+  · rcases lt_or_gt_of_ne hpq with hpq_lt | hqp_lt
+    · -- p < q
+      exact sylow_normal_of_card_eq_sq_mul_prime_gt hpq_lt hcard
+    · -- q < p
+      left
+      exact sylow_normal_of_card_eq_sq_mul_prime_lt hqp_lt hcard
 
 /-! ### Thm 1.32 — `|G| = p³q` helpers and main theorem. -/
 
@@ -737,8 +752,12 @@ private lemma sylow_p_normal_of_card_eq_cube_mul_prime_of_nq_eq_pcube
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
   exact ⟨P, Sylow.normal_of_subsingleton P⟩
 
-/-- **Isaacs Thm 1.32**.  `|G| = p^3 · q` (p, q 異素数) ⇒ Sylow `p` または Sylow `q` 部分群が
+/-- **Isaacs Thm 1.32**.  `|G| = p^3 · q` (`p`, `q` 素数) ⇒ Sylow `p` または Sylow `q` 部分群が
 正規, または `|G| = 24` (Thm 1.33 で扱う例外).
+
+⚠ **書籍どおり `p ≠ q` を仮定しない** (2026-07-19 に一般化)。`p = q` は `|G| = p⁴`、
+すなわち `G` 自身が `p`-群の場合で、Sylow `p` 部分群は極大性から `⊤` ゆえ正規
+(例外 `|G| = 24` にも該当しない)。以下の証明本体は `p ≠ q` の分岐。
 
 Isaacs p.31 の証明: `n_p` の場合分け (∈ {1, q}). `n_p = 1` なら直ちに Sylow `p` 正規.
 `n_p = q` なら `p < q`, 次に `n_q ∈ {1, p, p², p³}` で場合分け.
@@ -749,10 +768,19 @@ Isaacs p.31 の証明: `n_p` の場合分け (∈ {1, q}). `n_p = 1` なら直�
 * `n_q = p³`: 各 Sylow `q` が prime 位数 `q` で互いに自明交差, 元素勘定で Sylow `p` 一意 ⇒ 正規. -/
 theorem sylow_normal_of_card_eq_cube_mul_prime
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q) :
+    (hcard : Nat.card G = p ^ 3 * q) :
     (∃ P : Sylow p G, (P : Subgroup G).Normal) ∨
     (∃ Q : Sylow q G, (Q : Subgroup G).Normal) ∨
     Nat.card G = 24 := by
+  rcases eq_or_ne p q with rfl | hpq
+  · -- `p = q`: `|G| = p⁴`, so `G` is a `p`-group and its Sylow `p`-subgroup is `⊤`.
+    left
+    refine ⟨default, ?_⟩
+    have hGp : IsPGroup p G := IsPGroup.of_card (n := 4) (by rw [hcard]; ring)
+    have htop : ((default : Sylow p G) : Subgroup G) = ⊤ :=
+      ((default : Sylow p G).is_maximal' (hGp.to_subgroup ⊤) le_top).symm
+    rw [htop]
+    infer_instance
   classical
   haveI : Finite (Sylow p G) := inferInstance
   haveI : Finite (Sylow q G) := inferInstance
@@ -1057,8 +1085,7 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
           K.card_eq_card_quotient_mul_card_subgroup
         rw [hcard, hKK] at h1; omega
       have h12_eq : Nat.card (G ⧸ K) = 2 ^ 2 * 3 := by rw [hquot_card]; norm_num
-      have hpq : (2 : ℕ) ≠ 3 := by norm_num
-      rcases sylow_normal_of_card_eq_sq_mul_prime (G := G ⧸ K) hpq h12_eq with
+      rcases sylow_normal_of_card_eq_sq_mul_prime (G := G ⧸ K) h12_eq with
         ⟨S2_quot, hS2_quot_normal⟩ | ⟨S3_quot, hS3_quot_normal⟩
       · set S2 : Subgroup G := Subgroup.comap (QuotientGroup.mk' K) (S2_quot : Subgroup (G ⧸ K))
           with hS2_def
