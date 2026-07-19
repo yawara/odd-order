@@ -965,9 +965,12 @@ Given the general induced families `S(A')` (coherent) and `S(B)` (not coherent) 
 `K ≤ L` — **no inclusion between `A'` and `B` is assumed** (Peterfalvi (11.4) needs
 `(A', B) = (H₁, H₀C)` incomparable) — together with
 
-* an **anchor**: an irreducible `χ₁ ∈ S(A')` of the minimal degree `|L:K|` (in the Sibley case
-  supplied by the Frobenius action; for §11 by the `W₁`-action on the linear characters of
-  `K/A'`), and
+* an **anchor**: a member `χ₁ ∈ S(A')` of the minimal degree `|L:K|` — **no irreducibility**, exactly
+  as Peterfalvi (6.2) states it ("Since `K` is solvable, `K/A` has a non-trivial irreducible
+  character of degree 1, whence `S(A)` contains a character of degree `|L:K|`", p. 30).  Discharged
+  in general by `exists_inducedKernelFamily_member_degree_index` from
+  `commutator (K ⧸ A'.subgroupOf K) ≠ ⊤`; the (5.6) engine carries `‖χ₁‖²` symbolically
+  (`crux1_of_memberFamilyW`), so no inertia condition on the linear source is needed, and
 * the **(5.2.d) decomposition data** `hdatum` for any intermediate coherent set and break pair —
   the genuinely grid-backed obligation (§10–§12 muGrid/columnSum, issue 2022): the break's
   decomposition `Da` over the Dade map and, per member `χ` of the coherent set, an
