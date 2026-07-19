@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Algebra.Group.Subgroup.Map
 import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 
 /-!
 # Omega Subgroups
@@ -366,5 +367,40 @@ theorem pow_dvd_card_omega1OfAbelian_of_pos_le_pRank [Finite G]
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK_le).toEquiv
     rwa [hsub_card, hK_card] at hsub
   exact hpow_dvd_E.trans hE_dvd_omega
+
+
+/-- For a **cyclic** subgroup `H` whose order is divisible by the prime `p`, the subgroup
+`Ω₁(H) = {g ∈ H | g ^ p = 1}` has order exactly `p`.
+
+Cauchy's theorem inside `H` supplies a subgroup `Y ≤ H` of order `p`, which lies in `Ω₁(H)`.
+Conversely each `z ∈ Ω₁(H)` generates a subgroup of order dividing `p`, hence trivial or equal
+to `Y` by uniqueness of subgroups of a given order in a cyclic group
+(`cyclic_subgroup_eq_of_card_eq`).  So `Ω₁(H) = Y`. -/
+theorem card_omega1OfAbelian_eq_of_isCyclic [Finite G]
+    {H : Subgroup G} {p : ℕ} (hp : p.Prime) [IsCyclic ↥H]
+    {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} (hdvd : p ∣ Nat.card ↥H) :
+    Nat.card ↥(omega1OfAbelian G H p hH) = p := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card' (G := ↥H) p hdvd
+  have hYcard : Nat.card ↥(Subgroup.zpowers y) = p := by rw [Nat.card_zpowers, hy]
+  have hkey : (omega1OfAbelian G H p hH).subgroupOf H = Subgroup.zpowers y := by
+    refine le_antisymm (fun z hz => ?_) (fun w hw => ?_)
+    · have hzp : z ^ p = 1 := Subtype.ext (by simpa using hz.2)
+      have hord : Nat.card ↥(Subgroup.zpowers z) ∣ p := by
+        rw [Nat.card_zpowers]; exact orderOf_dvd_of_pow_eq_one hzp
+      rcases hp.eq_one_or_self_of_dvd _ hord with h1 | hpz
+      · have : z = 1 := orderOf_eq_one_iff.mp (by rw [← Nat.card_zpowers z, h1])
+        simp [this]
+      · rw [← cyclic_subgroup_eq_of_card_eq (C := ↥H)
+          (H₁ := Subgroup.zpowers z) (H₂ := Subgroup.zpowers y) (by rw [hpz, hYcard])]
+        exact Subgroup.mem_zpowers z
+    · refine ⟨w.2, ?_⟩
+      have : w ^ p = 1 := by
+        obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hw
+        rw [← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, ← hy,
+          pow_orderOf_eq_one, one_zpow]
+      simpa using congrArg (Subtype.val (p := fun g => g ∈ H)) this
+  rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+    (omega1OfAbelian_le (G := G) (H := H) (p := p) (hH := hH))).toEquiv, hkey, hYcard]
 
 end OddOrder.GroupTheory
