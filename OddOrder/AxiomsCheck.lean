@@ -8272,6 +8272,18 @@ composition with the degree-two bracket is the actual trilinear commutator
   OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_equivariant_representation
 
 #assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_tmul
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_equivariant
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_span_eq_top
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinearBaseChange_eigenweight
+
+#assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutatorTrilinear_span_eq_top
 
 /-! **Neumann's order-three fixed-point-free theorem**, used by the parity
@@ -8342,6 +8354,12 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_squareMapAdditive_self
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_sum_eq_zero_of_square_formula
 
 /-! **Higman Lemma 6, distinct triple-weight exclusion**: three distinct
 Frobenius exponents cannot be congruent modulo `2^n - 1` to a pair weight.
