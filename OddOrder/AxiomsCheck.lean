@@ -8396,6 +8396,9 @@ Frobenius period is odd. -/
   OddOrder.Higman.Suzuki2Groups.repeated_frobeniusWeight_pairWeight_candidates
 
 #assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_pairWeight_injective
+
+#assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.not_both_adjacent_pairGaps_of_odd
 
 #assert_only_allowed_axioms

@@ -1067,6 +1067,27 @@ theorem repeated_frobeniusWeight_pairWeight_candidates
     · apply zmodSucc_eq_finPred
       rw [hcastSucc, h.2]
 
+/-- Pair weights attached to distinct increasing Frobenius-index pairs are
+distinct for a primitive Singer root. -/
+theorem primitiveRoot_pairWeight_injective
+    {F : Type*} [Field F] {n : ℕ} (hn : 2 ≤ n)
+    (lambda : F) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1)) :
+    Function.Injective (fun p : HigmanExponentPair n =>
+      lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) := by
+  intro p q hpq
+  have hfinite : IsOfFinOrder lambda :=
+    hprim.isOfFinOrder (Nat.sub_ne_zero_of_lt
+      (Nat.one_lt_pow (by omega : n ≠ 0) (by omega)))
+  have hmod : Nat.ModEq (2 ^ n - 1)
+      (2 ^ p.1.1.val + 2 ^ p.1.2.val)
+      (2 ^ q.1.1.val + 2 ^ q.1.2.val) := by
+    have h := hfinite.pow_eq_pow_iff_modEq.mp hpq
+    rwa [← hprim.eq_orderOf] at h
+  rcases normalizedTwoPower_modEq_pairWeight_candidates
+      hn p.1.1 p.1.2 q hmod with h | h
+  · exact Subtype.ext (Prod.ext h.1 h.2)
+  · exact (by omega : False).elim
+
 /-- In an odd cyclic index group, a nonzero gap `d` cannot have both of its
 adjacent gaps `d-1` and `d+1` in the same unordered class `±r`. -/
 theorem not_both_adjacent_pairGaps_of_odd
