@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Higman.Suzuki2Groups.HigmanAbelian
+import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 
 /-!
@@ -107,56 +107,5 @@ theorem square_mem_agemo_one_of_frattini_map_eq
     Agemo.mem_of_eq_pow (⟨u, hu⟩ : C)
   have hm := hpow (Subgroup.mem_map_of_mem C.subtype huAg)
   simpa using hm
-
-/-- Power-layer propagation: if conjugation by `C` is trivial on `A/A²`,
-then it is trivial on `A²/A⁴`. -/
-theorem commutator_agemo_one_map_le_agemo_two_map
-    {P : Type*} [Group P] {A C : Subgroup P}
-    (hAcomm : IsMulCommutative A)
-    (hCA : ⁅C, A⁆ ≤ (Agemo A 2 1).map A.subtype) :
-    ⁅C, (Agemo A 2 1).map A.subtype⁆ ≤
-      (Agemo A 2 2).map A.subtype := by
-  letI : CommGroup A :=
-    { (inferInstance : Group A) with
-      mul_comm := hAcomm.is_comm.comm }
-  rw [Subgroup.commutator_le]
-  rintro c hc _ ⟨b, hb, rfl⟩
-  obtain ⟨a, rfl⟩ := mem_agemo_iff_of_comm.mp hb
-  have hdP : ⁅c, (a : P)⁆ ∈ (Agemo A 2 1).map A.subtype :=
-    hCA (Subgroup.commutator_mem_commutator hc a.2)
-  obtain ⟨d, hd, hdval⟩ := Subgroup.mem_map.mp hdP
-  have hda : (d : P) * (a : P) = (a : P) * (d : P) := by
-    exact congrArg A.subtype (mul_comm d a)
-  change (d : P) = ⁅c, (a : P)⁆ at hdval
-  have hconj : c * (a : P) * c⁻¹ = (d : P) * (a : P) := by
-    calc
-      c * (a : P) * c⁻¹ = ⁅c, (a : P)⁆ * (a : P) := by
-        rw [commutatorElement_def]
-        group
-      _ = (d : P) * (a : P) := by rw [← hdval]
-  have heq : ⁅c, ((a : P) ^ 2)⁆ = (d : P) ^ 2 := by
-    rw [commutatorElement_def]
-    calc
-      c * (a : P) ^ 2 * c⁻¹ * ((a : P) ^ 2)⁻¹ =
-          (c * (a : P) * c⁻¹) ^ 2 * ((a : P) ^ 2)⁻¹ := by
-            simp only [pow_two]
-            group
-      _ = ((d : P) * (a : P)) ^ 2 * ((a : P) ^ 2)⁻¹ := by rw [hconj]
-      _ = (d : P) ^ 2 := by
-        rw [pow_two, pow_two, pow_two]
-        calc
-          (d : P) * (a : P) * ((d : P) * (a : P)) *
-              ((a : P) * (a : P))⁻¹ =
-              (d : P) * ((a : P) * (d : P)) * (a : P) *
-                ((a : P) * (a : P))⁻¹ := by group
-          _ = (d : P) * ((d : P) * (a : P)) * (a : P) *
-                ((a : P) * (a : P))⁻¹ := by rw [hda.symm]
-          _ = (d : P) * (d : P) := by group
-  have hd2 : d ^ 2 ∈ Agemo A 2 2 :=
-    mem_agemo_succ_iff.mpr ⟨d, hd, rfl⟩
-  have heq' : ⁅c, A.subtype (a ^ (2 ^ 1))⁆ = (d : P) ^ 2 := by
-    simpa using heq
-  rw [heq']
-  simpa using Subgroup.mem_map_of_mem A.subtype hd2
 
 end OddOrder.Higman.Suzuki2Groups
