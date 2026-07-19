@@ -8369,6 +8369,9 @@ for triple commutators; the action congruence gives `3 ∤ |G|`; hence
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_sum_eq_zero_of_square_formula
 
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutator_weightFiber_sum_eq_zero
+
 /-! **Higman Lemma 6, distinct triple-weight exclusion**: three distinct
 Frobenius exponents cannot be congruent modulo `2^n - 1` to a pair weight.
 For a primitive Singer root, the corresponding eigenspace is therefore zero
@@ -8401,10 +8404,19 @@ Frobenius period is odd. -/
   OddOrder.Higman.Suzuki2Groups.primitiveRoot_pairWeight_injective
 
 #assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_pairWeight_eq_pairWeight_candidates
+
+#assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.not_both_adjacent_pairGaps_of_odd
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.HigmanExponentPair.not_both_predecessor_pairGaps_of_odd
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.primitiveRoot_pairWeight_eq_frobeniusShift_imp_pairGap
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_lowerCentralPairGapSupport_of_frobeniusEigenbases
 
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
