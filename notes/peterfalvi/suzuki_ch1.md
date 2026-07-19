@@ -384,15 +384,16 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Higman source frontier (issue 2048):** Lemmas 4--9 は完了。
-      Lemma 9 では `[P,A] ≤ A²` を Agemo の square-commutator propagation に接続し、
-      `A ⊔ Φ(P)` 内の cover と Lemma 2 witness から `Φ(C)=A` を導いた。
-      Lemma 7 branch は maximality と矛盾し、Lemma 8 branch は `exp(A) ≤ 2` を与える。
-      そこから `A = Z(P)`、nilpotency class `≤ 2`、`Φ(P) ≤ A` を実証明し、公開 endpoint
-      `higmanLemmaNine` は原文 p. 87 の両結論 `exp(A) ≤ 4` と `Φ(P) ≤ A` をまとめる。
-      次の source frontier は Higman Lemma 10 (pp. 87--88): characteristic `2` の
-      proper odd-degree finite field extensionに対し、任意の `r : ℤ`, `ε` から
-      非零 `α` と `Tr(α · Frob^r(α) · ε) = 0` を構成する有限体補題である。
+    - **Higman source frontier (issue 2048):** Lemmas 4--10 は完了。
+      Lemma 10 は原文冒頭の power-map gcd 二分法を `higmanPowerMapGcd` として保持し、
+      full endpoint は trace 式を underlying `𝔽₂`-空間上の twisted quadratic map とみなして
+      Chevalley--Warning を適用した。公開 endpoint `higmanLemmaTen` は proper odd-degree
+      finite field extension、任意の `r : ℤ`, `ε` に対し、負の Frobenius 反復も含めて
+      非零 `α` と `Tr(α · Frob^r(α) · ε) = 0` を exact に結論する。
+      source-neutral な次元論は `OddOrder/Algebra/ChevalleyWarning.lean`、Higman 固有の
+      算術・特殊化は `HigmanFiniteFieldTrace.lean` に分離した。
+      次の source frontier は Higman Lemma 11 (p. 88 ff.): `K`-length `2` の Suzuki
+      `2`-group を原文の有限体座標群 `A(n, θ)` と同型にする分類段階である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
