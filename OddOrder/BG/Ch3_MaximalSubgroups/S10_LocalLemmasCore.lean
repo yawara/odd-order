@@ -8,6 +8,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+import OddOrder.GroupTheory.NilpotentCoprimeCommute
 
 /-!
 # BG §10 局所補題 — Core (Prop 10.11, Lemma 10.12)
@@ -669,61 +670,6 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
   have h2 := congrArg (Subgroup.map Z.subtype) h1
   rwa [Subgroup.map_subgroupOf_eq_of_le hle, Subgroup.map_subgroupOf_eq_of_le hX_le_Z] at h2
 
-/-! ## Helpers for Proposition 10.11(d) -/
-
-/-- In a finite nilpotent group, two elements of coprime order commute.
-
-A finite nilpotent group is the internal direct product of its Sylow subgroups
-(`Sylow.directProductOfNormal`); two coprime-order elements have disjoint sets of relevant
-primes, so in every Sylow factor at least one of their components is trivial. -/
-theorem commute_of_coprime_orderOf_of_isNilpotent {L : Type*} [Group L] [Finite L]
-    [Group.IsNilpotent L] {x y : L} (hxy : Nat.Coprime (orderOf x) (orderOf y)) :
-    Commute x y := by
-  classical
-  haveI := Fintype.ofFinite L
-  have hn : ∀ {q : ℕ} [Fact q.Prime] (Q : Sylow q L), Q.Normal := fun Q =>
-    Ch01.Sylow.normal_of_isNilpotent Q
-  set e := Sylow.directProductOfNormal hn with he
-  -- Componentwise: the `(p, P)`-components of `e.symm x` and `e.symm y` commute in the
-  -- `p`-group `↥P`, since at least one of them is trivial.
-  have hcomp : ∀ (p : (Nat.card L).primeFactors) (P : Sylow (p : ℕ) L),
-      Commute (e.symm x p P) (e.symm y p P) := by
-    intro p P
-    haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
-    -- The order of a component divides the order of the original element.
-    have hdvd : ∀ z : L, orderOf (e.symm z p P) ∣ orderOf z := by
-      intro z
-      apply orderOf_dvd_of_pow_eq_one
-      have h1 : (e.symm z) ^ orderOf z = 1 := by rw [← map_pow, pow_orderOf_eq_one, map_one]
-      have h2 := congrFun (congrFun h1 p) P
-      simpa [Pi.pow_apply, Pi.one_apply] using h2
-    -- Each component has prime-power order (it lies in the `p`-group `↥P`).
-    have hppow : ∀ z : L, ∃ k, orderOf (e.symm z p P) = (p : ℕ) ^ k := fun z =>
-      (IsPGroup.iff_orderOf.mp P.isPGroup') (e.symm z p P)
-    by_cases hpx : (p : ℕ) ∣ orderOf x
-    · -- Then `p ∤ orderOf y`, so the `y`-component is trivial.
-      have hpy : ¬ (p : ℕ) ∣ orderOf y := fun hpy =>
-        (Nat.prime_of_mem_primeFactors p.2).ne_one (Nat.dvd_one.mp (hxy ▸ Nat.dvd_gcd hpx hpy))
-      obtain ⟨k, hk⟩ := hppow y
-      have hk0 : k = 0 := by
-        by_contra hkne
-        exact hpy ((hk ▸ dvd_pow_self (p : ℕ) hkne).trans (hdvd y))
-      have hy1 : e.symm y p P = 1 := orderOf_eq_one_iff.mp (by rw [hk, hk0, pow_zero])
-      rw [hy1]; exact Commute.one_right _
-    · -- `p ∤ orderOf x`, so the `x`-component is trivial.
-      obtain ⟨k, hk⟩ := hppow x
-      have hk0 : k = 0 := by
-        by_contra hkne
-        exact hpx ((hk ▸ dvd_pow_self (p : ℕ) hkne).trans (hdvd x))
-      have hx1 : e.symm x p P = 1 := orderOf_eq_one_iff.mp (by rw [hk, hk0, pow_zero])
-      rw [hx1]; exact Commute.one_left _
-  -- Assemble componentwise commutation, then transport along the isomorphism `e`.
-  have hkey : e.symm x * e.symm y = e.symm y * e.symm x := by
-    funext p P
-    simpa [Pi.mul_apply, commute_iff_eq] using hcomp p P
-  have hcong := congrArg e hkey
-  rwa [map_mul, map_mul, MulEquiv.apply_symm_apply, MulEquiv.apply_symm_apply] at hcong
-
 
 /-- **BG Lemma 10.5** (mmd MISSING_PAGE, PDF p.87): `p ∈ σ(M)'`, `X ∈ ℰ_p¹(G)`,
 `N_G(X) ⊆ M` なら `r_p(M) = 2`、`p` は ideal でなく、`X ⊆ A` となる `A ∈ ℰ_p²(G)` が存在する。 -/
@@ -1074,7 +1020,7 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
       rw [Subgroup.orderOf_mk, Subgroup.orderOf_mk]
       exact (hcop_K₀Mσ.coprime_dvd_left (Subgroup.orderOf_dvd_natCard K₀ hk)).coprime_dvd_right
         (Subgroup.orderOf_dvd_natCard (Msigma M) hm)
-    have hcomm := commute_of_coprime_orderOf_of_isNilpotent (L := ↥(K₀ ⊔ Msigma M))
+    have hcomm := OddOrder.GroupTheory.commute_of_coprime_orderOf_of_isNilpotent (L := ↥(K₀ ⊔ Msigma M))
       (x := ⟨k, hkL⟩) (y := ⟨m, hmL⟩) hcop_km
     exact (congrArg Subtype.val hcomm).symm
   -- Step 6: cite Proposition 10.11(c) and place `K₀` inside the cyclic normal `Z`.

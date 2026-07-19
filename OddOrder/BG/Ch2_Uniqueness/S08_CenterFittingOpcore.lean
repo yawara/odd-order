@@ -117,7 +117,7 @@ theorem mem_fittingInG_of_mem_centralizer_fittingInG [Finite G] {M : Subgroup G}
       exact Subgroup.mem_subgroupOf.mp hySub
     exact Subgroup.mem_centralizer_iff.mp hxC (y : G) hyF
   have hxF_M : (⟨x, hxM⟩ : ↥M) ∈ Ch01.fitting ↥M :=
-    OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting hxC_M
+    OddOrder.GroupTheory.centralizer_fitting_le_fitting hxC_M
   have hxSub : (⟨x, hxM⟩ : ↥M) ∈ (fittingInG M).subgroupOf M := by
     rwa [fittingInG_subgroupOf_eq M]
   exact Subgroup.mem_subgroupOf.mp hxSub

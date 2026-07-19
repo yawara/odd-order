@@ -104,22 +104,68 @@ BG App.D D.1 の証明 (mmd:5155-5178) は Cor 1.6 で M を 3-step と判定し
 ゆえ `N` で characteristic、`N ⊴ G` ゆえ `G` で正規、正規 `p`-部分群として `O_p(G)` に入り、
 `O_p(G)` 自身が `p`-群なので Sylow の極大性で一致。)
 
+## 進捗 (2026-07-19 続き): **Thm 1.5 step 2 を sorry-free で証明** + 階層移設 2 件
+
+### 階層移設 (commit `1adb7cc60`) — 旧ブロッカー 1 を解消
+
+汎用有限群論 2 件が BG 配下に埋まって shared infra から使えなかったので移設 (alias 無し・全
+call site repoint・全 leaf build green):
+
+- `centralizer_fitting_le_fitting` (P. Hall) → 新 `OddOrder/GroupTheory/FittingSelfCentralizing.lean`
+- `commute_of_coprime_orderOf_of_isNilpotent` → 新 `OddOrder/GroupTheory/NilpotentCoprimeCommute.lean`
+
+### Thm 1.5 step 2 (`not_commute_of_coprime_orderOf_card_fitting`) — **axiom-clean**
+
+> 可解 CN 群で、位数が `|F(G)|` と互いに素な元は `F(G)` の非単位元を一切中心化しない。
+
+= 原文の「`A` は `F` に regular に作用し `FA` は Frobenius 群」。**CN 仮説 (Lemma 1.2) が実際に
+効く箇所**。証明は原文の 4 手:
+
+1. Lemma 1.2 で `y'` が Sylow `p` 全体、したがって `O_p(G)` を中心化。
+2. `C_G(x')` は CN 仮説で冪零、かつ `F` の位数 `p`-prime な元を全て含む (`F` 冪零)。
+3. その冪零中心化群の中で位数互いに素 ⟹ 可換。
+4. `F` は Sylow 部分群で生成される (`iSup_default_sylow_eq_top_of_nilpotent`) ので `y'` は `F`
+   全体を中心化 ⟹ `C_G(F) ≤ F` で `y' ∈ F` ⟹ `q ∣ |F|` で矛盾。
+
+⚠ **原文より一般形**: Gorenstein は Hall `π(F)'`-部分群 `A` の元について述べるが、証明が使うのは
+「位数が `|F|` と互いに素」だけなので**単一の元について**述べた (弱化でなく一般化。`A` 版は各元に
+適用すれば従う)。
+
+付随して axiom-clean で証明: `sylow_fitting_map_le_oPiCore` (`F(G)` の Sylow `p` は `O_p(G)` 内) /
+`commute_of_mem_fitting_of_coprime_orderOf` / `orderOf_mk_eq`。
+
+### Thm 1.5 step 3 (`exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting`) — **axiom-clean**
+
+> CN 群で `O_p(G) ≠ 1` かつ `F(G)` が位数 `p`-prime な非自明正規部分群 `N` を含むなら、
+> `O_p(G)` は既に Sylow `p`。
+
+= 原文が「`G ⊋ FA` なら `π(F)` は単一素数」を示す論法 (`N = O_{p'}(F)` で適用)。
+1. `O_p(G)` が `N` を中心化 (両者冪零 `F(G)` 内・位数互いに素) → 2. Lemma 1.2 で Sylow `p` 全体に
+格上げ → 3. `C = C_G(N)` は正規かつ冪零 → 4. `P` は冪零 `C` の Sylow ゆえ char → `G` で正規 →
+5. 正規 `p`-部分群は `O_p(G)` 内ゆえ `P = O_p(G)`。
+⚠ **原文より一般形**: 書籍の可解性仮定は論法が使わないので落とした。
+
 ### 残 sorry は 1 件 = **Thm 1.5** (`solvableCN_nilpotent_or_frobenius_or_threeStep`)
 
-可解 CN 群は「冪零 ∨ 核 `F(G)` の Frobenius ∨ ある素数に関する 3-step」。ブロッカー
-(⚠ **旧リストを実測で訂正**、下記):
+可解 CN 群は「冪零 ∨ 核 `F(G)` の Frobenius ∨ ある素数に関する 3-step」。**step 2 / step 3 は済**。
+残りは:
 
-1. `C_G(F(G)) ≤ F(G)` — **repo に在る** (`OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting`) が
-   **`OddOrder.BG` 配下**。`GroupTheory` leaf が `BG` を import するのは階層衛生上まずいので、
-   まず `Isaacs`/`GroupTheory` へ移設したい。⚠ **数学的障害でなく配置の問題**。
-2. Gorenstein Thm 10.3.1(iv)(v) (位数 `qr` の部分群は巡回 / metacyclic 補群) — **不在**
-   (`IsMetacyclic` はあるが Frobenius 理論と未接続)。`A` の冪零性の証明で load-bearing。
-3. Gorenstein Thm 1.3.1(ii) (全 Sylow が巡回 or 四元数 ⟹ 構造) — **不在**。
+0. **step 1 (setup) の組み立て** — `G = F(G)` なら冪零 (case i)、さもなくば `C_G(F) ≤ F` (移設済) +
+   Hall `π'`-部分群 `A` (`Ch03.hall_exists_of_piSeparable`) を取り、**step 2 で `F A` が Frobenius**。
+   ⟹ **repo の道具だけで書ける。次の着手はここ** (中間結果「冪零 ∨ `F(G)A` が Frobenius」)。
+1. **`A` の冪零性** — Gorenstein Thm 10.3.1(iv)(v) (位数 `qr` の部分群は巡回 / metacyclic 補群)
+   が **不在** (`IsMetacyclic` はあるが Frobenius 理論と未接続)。ここが load-bearing。
+   ⚠ 奇数位数なら `Ch06.isZGroup_of_isFrobeniusAction_of_odd` が使えるので、**BG App.D が要求する
+   のは奇数位数の場合だけ**である点を着手時に再評価する価値あり (原文の偶数位数分岐 =
+   `unique_involution` は repo に在る)。
+2. ~~**`π(F)` が単一素数**~~ — **step 3 として 2026-07-19 完了**
+   (`exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting`)。
+3. **最終ステップ** (`P` が `Ā` に regular に作用 ⟹ `PA` Frobenius) — Gorenstein Lemma 10.1.3
+   (fpf 自己同型が `K/F` に降りる) が **不在**。
+4. Gorenstein Thm 1.3.1(ii) (全 Sylow が巡回 or 四元数 ⟹ 構造) — **不在**。
    ⚠ **Cor 1.6 には不要** — 下記「book-strength 債務」を解消するときだけ要る。
-4. Gorenstein Lemma 10.1.3 (fpf 自己同型が `K/F` に降りる) — **不在**。最終ステップ
-   (`P` が `Ā` に regular に作用 ⟹ `PA` Frobenius) で load-bearing。
 
-⟹ **Cor 1.6 到達に効くのは 2 と 4**。3 は債務解消用。**D.1 は未着地ゆえ `AppD_CNGroups.lean` は無変更**。
+**D.1 は未着地ゆえ `AppD_CNGroups.lean` は無変更**。
 
 ### ⚠ 旧ブロッカーリストの訂正 (2026-07-19、実測)
 
