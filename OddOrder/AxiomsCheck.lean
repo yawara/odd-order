@@ -8241,6 +8241,19 @@ pairwise formula after scalar extension. -/
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.exists_lowerCentralSquareMap_eq_frobeniusSum
 
+/-! **Mixed bilinear scalar extension**: a bilinear map with two different
+source modules extends in both inputs and its output; equivariance and a
+full spanning range survive the extension. -/
+
+#assert_only_allowed_axioms
+  LinearMap.baseChange₂_tmul
+
+#assert_only_allowed_axioms
+  LinearMap.baseChange₂_equivariant
+
+#assert_only_allowed_axioms
+  LinearMap.baseChange₂_span_eq_top
+
 /-! **Higman Lemma 6, degree-three group-theoretic layer**: the actual mixed
 commutator descends to `L₂ × L₁ → L₃`, spans `L₃`, and is equivariant.  Its
 composition with the degree-two bracket is the actual trilinear commutator
