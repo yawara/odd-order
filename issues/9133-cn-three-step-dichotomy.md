@@ -328,3 +328,35 @@ N̄ := O_{p'}(Ḡ) 巡回 ⟹ Aut(N̄) 可換 ⟹ Ḡ' ≤ C_Ḡ(N̄) ≤ N̄ �
 - `OddOrder/BG/AppD_CNGroups.lean` (de-opacify 済、`IsCNGroup` は既存)、BG mmd:5132-5199。
 - issue 3020 (Isaacs 代替不可の検証結果 — Isaacs に CN 群も 3-step 群も無し)。
 - ⚠ shared infra (`OddOrder/GroupTheory/**`) ゆえ他レーンは着手前に本 claim を確認のこと。
+
+## 進捗 (2026-07-19 その5): **Thm 1.5 完全証明 — leaf 全体が sorry-free (tier 1 の Cor 1.6 まで完了)**
+
+`solvableCN_nilpotent_or_frobenius_or_threeStep` (Gorenstein Ch.12 §1 Theorem 1.5) を「その4」の
+確定経路どおりに実証明した。`CNGroupStructure.lean` は **sorry 0**、主要宣言は全て axiom-clean
+(`#print axioms` 実測: propext / Classical.choice / Quot.sound のみ)。AxiomsCheck に
+Thm 1.5 / Cor 1.6 / fpf toolbox / (†)(‡) / 巡回性 / endgame helpers の 17 エントリを追加登録。
+
+### 実装で経路から乖離した点 (記録)
+
+1. **「Ā ⊴ Ḡ」の Aut-可換ステップ**は `IsCyclic.mulAutMulEquiv` (mathlib) 経由で
+   `commutatorElement_mem_centralizer_of_isCyclic_normal` として一般補題化 (生成元の zpow 計算不要)。
+2. **quotient 型を跨ぐ rewrite は motive 崩壊で不可能** (`G ⧸ M` の group instance に埋まる
+   `Normal` instance 項が subgroup を部分項に持たないため)。`O_p(G) = F(G)` を通す転送は
+   **変数部分群 + `subst` + proof irrelevance** の congruence lemma 2 件
+   (`comap_oPiCore_quotient_congr` / `exists_isFrobeniusGroup_map_quotient_congr`) で実施。
+   同型パターンの再利用可能な技法 (メモリの instance-trap 系列に該当)。
+3. 新規汎用 helpers: `mulEquivMapOfInfKerEqBot` (ker と交わらない部分群は像と同型) /
+   `isFrobeniusGroup_subgroupOf_sup` (fpf 作用 ⟹ `A ⊔ F` 上の Frobenius 構造)。
+
+### 残債務 (いずれも本 issue 記載済みの follow-up、Cor 1.6 の消費はブロックしない)
+
+- **book-strength 債務**: Thm 1.5 clause (ii) の補群精緻化 (巡回 ∨ 奇巡回×一般四元数) —
+  `IsGeneralizedQuaternion` 不在のため見送り (Gorenstein Thm 1.3.1(ii) が必要)。
+- **非空性監査の穴**: 3-step 群の Lean witness (`F_{3⁶} ⋊ (C₇ ⋊ C₃)`) 未構成。
+
+### 次の着手 = tier 1 残り: BG App.D で Cor 1.6 を消費して D.1 → D.2 を閉じる
+
+⚠ 申し送りどおり、AppD が Cor 1.6 を消費すると `GroupTheory` leaf ← `AppD` の循環になるため、
+**着手時に `IsCNGroup` を `CNGroupStructure.lean` へ移設**すること (Lemma 1.2 の展開形仮説と
+定義的に同一)。また `CNGroupStructure.lean` は 1865 行 (>1500 trigger) — 凍結 prefix
+(cores + `IsThreeStepGroup` + BG 消費帰結) を `ThreeStepGroup.lean` へ分割予定。
