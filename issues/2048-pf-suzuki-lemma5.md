@@ -69,10 +69,18 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
     - [x] 原文の `Lᵢ = Hᵢ / (Hᵢ² Hᵢ₊₁)` を actual lower-central quotient として
           構成し、ambient denominator、elementary-abelian 性、標準 `F₂`-module、
           誘導作用・表現を `HigmanLowerCentralGraded` に実装する
-    - [ ] commutator から alternating・作用同変な `L₁ × L₁ → L₂` を構成し、
+    - [x] commutator から alternating・作用同変な `L₁ × L₁ → L₂` を構成し、
           その値が `L₂` を span することを証明する
+      - [x] 二重の `QuotientGroup.lift` で代表元公式を持つ commutator pairing を構成する
+      - [x] `ZMod 2`-双線形化と degree-2 alternating linearization を構成する
+      - [x] commutator closure から pairing の値の span が `L₂` に等しいことを証明する
+      - [x] 誘導自己同型作用に関する commutator pairing の equivariance を証明する
     - [ ] 非零 `L₂` 上の推移性から Higman Lemma 4 と直後の scalar-extension
           corollary を証明する
+      - [ ] Singer finite field への base change と Frobenius eigenbasis
+            `λ^(2^i)` を構成する
+      - [ ] bracket weights `λ^(2^i+2^j)` と full span を接続し、
+            `L₁ ≃ L₂` から primitive-root contradiction を導く
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
@@ -105,6 +113,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/higman/p84_85_lemmas_3_6.layout.txt`
 - `references/higman/p85_lemmas_4_6.raw.txt`
 - `references/higman/pages/suzuki-2-groups-p085.png`
+- `references/higman/p86_87_lemmas_6_10.layout.txt`
+- `references/higman/p86_87_lemmas_6_10.raw.txt`
+- `references/higman/pages/suzuki-2-groups-p086.png`
+- `references/higman/pages/suzuki-2-groups-p087.png`
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
