@@ -38,29 +38,22 @@ noncomputable local instance instTripleBracketConclusionLayerZModTwoModule
 
 /-! ## Faithfulness of the effective odd-order actor -/
 
-/-- At `p = 2`, Higman's first agemo subgroup is the closure of the
-squares, in the form used by the Frattini formula. -/
-private theorem agemo_two_one_eq_squareClosure
-    (H : Type uH) [Group H] :
-    Agemo H 2 1 = Subgroup.closure (Set.range fun x : H => x ^ 2) := by
-  simp only [Agemo, pow_one]
-  congr 1
-  ext x
-  simp [eq_comm]
-
-/-- For a finite `2`-group satisfying `H² = H₂`, the second lower-central
-term is the Frattini subgroup. -/
-private theorem frattini_eq_lowerCentralTerm_one_of_agemo_eq
-    (H : Type uH) [Group H] [Finite H]
-    (hH : IsPGroup 2 H)
-    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1) :
-    _root_.frattini H = lowerCentralTerm H 1 := by
-  have hFormula :=
-    OddOrder.BG.Ch1.S01.commutator_sup_pow_closure_eq_frattini hH
-  rw [← hFormula, ← Subgroup.top_lowerCentralSeries_one,
-    ← agemo_two_one_eq_squareClosure H]
-  change lowerCentralTerm H 1 ⊔ Agemo H 2 1 = lowerCentralTerm H 1
-  rw [hAgemo, sup_idem]
+/-- For every finite `2`-group, the ambient denominator of Higman's first
+lower-central layer is exactly the Frattini subgroup. -/
+theorem lowerCentralLayerKernelInAmbient_zero_eq_frattini
+    (H : Type uH) [Group H] [Finite H] (hH : IsPGroup 2 H) :
+    lowerCentralLayerKernelInAmbient H 0 = frattini H := by
+  have hAgemo :
+      Agemo H 2 1 = Subgroup.closure (Set.range fun x : H => x ^ 2) := by
+    simp only [Agemo, pow_one]
+    congr 1
+    ext x
+    simp [eq_comm]
+  have hLower : lowerCentralTerm H 1 = _root_.commutator H := by
+    rw [lowerCentralTerm, Subgroup.top_lowerCentralSeries_one]
+  rw [lowerCentralLayerKernelInAmbient_eq,
+    agemo_lowerCentralTerm_zero_map_eq, hLower, hAgemo, sup_comm]
+  exact OddOrder.BG.Ch1.S01.commutator_sup_pow_closure_eq_frattini hH
 
 /-- Triviality on the first lower-central representation gives pointwise
 triviality modulo the Frattini subgroup. -/
@@ -68,7 +61,6 @@ private theorem layerZero_action_trivial_gives_frattini_coset
     {H : Type uH} {C : Type uC} [Group H] [Finite H] [Group C]
     (phi : C →* MulAut H)
     (hH : IsPGroup 2 H)
-    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1)
     (c : C)
     (hc : lowerCentralLayerRepresentation phi 0 c = 1) :
     ∀ g : H, ∃ x ∈ _root_.frattini H, (phi c) g = g * x := by
@@ -94,27 +86,23 @@ private theorem layerZero_action_trivial_gives_frattini_coset
     (QuotientGroup.mk'_eq_mk'
       (N := lowerCentralLayerKernel H 0)).mp hq'
   refine ⟨(x₀ : H), ?_, ?_⟩
-  · rw [frattini_eq_lowerCentralTerm_one_of_agemo_eq H hH hAgemo]
-    rw [← lowerCentralLayerKernelInAmbient_zero_eq_of_squares_le H
-      (lowerCentralSquaresLieInSecond_of_agemo_eq H hAgemo)]
+  · rw [← lowerCentralLayerKernelInAmbient_zero_eq_frattini H hH]
     exact ⟨x₀, hx₀, rfl⟩
   · exact (congrArg Subtype.val hgx).symm
 
 /-- A faithful odd-order automorphism group of a finite `2`-group acts
-faithfully on Higman's first lower-central layer when `H² = H₂`.
+faithfully on Higman's first lower-central layer.
 
-Indeed that equality identifies the layer denominator with `H₂`.  An actor
-in the kernel therefore acts trivially on `H / H₂`, hence on the Frattini
-quotient.  Burnside's operator theorem makes the corresponding coprime
-automorphism of `H` trivial, and faithfulness of the ambient action then
-makes the actor itself trivial. -/
+The layer denominator is the Frattini subgroup.  An actor in the kernel
+therefore acts trivially on the Frattini quotient.  Burnside's operator
+theorem makes the corresponding coprime automorphism of `H` trivial, and
+faithfulness of the ambient action then makes the actor itself trivial. -/
 theorem lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
     {H C : Type uH} [Group H] [Finite H] [CommGroup C] [Finite C]
     (hH : IsPGroup 2 H)
     (phi : C →* MulAut H)
     (hphi : Function.Injective phi)
-    (hCodd : Odd (Nat.card C))
-    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1) :
+    (hCodd : Odd (Nat.card C)) :
     Function.Injective (lowerCentralLayerRepresentation phi 0) := by
   rw [← MonoidHom.ker_eq_bot_iff, Subgroup.eq_bot_iff_forall]
   intro c hc
@@ -131,7 +119,7 @@ theorem lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
           exact (lowerCentralLayerRepresentation phi 0).ker.zpow_mem hcKer z
         simpa only [map_zpow] using
           layerZero_action_trivial_gives_frattini_coset
-            phi hH hAgemo (c ^ z) hcz g)
+            phi hH (c ^ z) hcz g)
   apply hphi
   simpa only [map_one] using hphiOne
 
@@ -438,7 +426,7 @@ theorem not_exists_equivariant_linearEquiv_of_higman_tripleBracket
     not_exists_equivariant_linearEquiv_of_higman_tripleBracket_of_faithful_firstLayer
       phi hAgemo n hn hfin₂ hirr₁
       (lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
-        hH phi hphi hCodd hAgemo)
+        hH phi hphi hCodd)
       htrans₂
 
 end OddOrder.Higman.Suzuki2Groups

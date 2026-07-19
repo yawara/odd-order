@@ -23,6 +23,8 @@ import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
 import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverAbelian
+import OddOrder.Higman.Suzuki2Groups.HigmanCoverPowerOverlap
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
 
