@@ -158,4 +158,447 @@ theorem CharacterDegreeCore.exists_eta01_column_data [Finite G]
 
 end
 
+section /- (13.5)/(13.8): the `S`-side distinguished family index (p. 79) -/
+
+set_option maxHeartbeats 1600000 in
+-- The (7.6)-family bookkeeping (constituent expansion + per-index coefficient computation)
+-- elaborates as a single large proof term, as in the `T`-side twin.
+open OddOrder.Peterfalvi.S11 in
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **The `S`-side (13.3.c) distinguished index over the chosen base** (Peterfalvi (13.8),
+issue 1041; the `S`-side mirror of `exists_muT_index_core_of_base_condition`): with the
+(7.6) family `H_sharp_hypothesis76_base` based at `ζ₀ = Ind_{PC}^S φ₀` — `φ₀` the linear
+`P`-nonkernel character inducing the *other* nonzero `μ`-column, so
+`⟨τ₁(Ind φ₀), η₀₁⟩ = 0` — there is a family index `i₁` carrying the distinguished
+`μ`-column (`ζ_{i₁} = μ_{j₀} = ∑_i μ_{i j₀}`) with `⟨τψ_{i₁}, η₀₁⟩ = δ = ±1`, and every
+other `P`-nonkernel coefficient vanishes; `‖ζ_{i₁}‖² = q` and `ζ_{i₁}(1) = uq`.
+
+This is the book's "By (13.3.c) … the hypothesis of (13.5) has thus been checked with
+`ζ₁ = μ_j`, `χ = η₀₁` and `a = δ`" (p. 79).  The per-constituent dispatch mirrors the
+`T`-side: an irreducible constituent of an `Ind_{PC}^S`-member is grid-orthogonal by the
+(5.3.b) crux (`coherentIndS_image_inner_eta_eq_zero`); a reducible constituent is a
+`μ`-column (`sSet_reducible_eq_muColumnSum`), equal to `μ_{j₀}` only when forced by the
+`ℕ`-coefficient orthogonality count. -/
+theorem Hypothesis.exists_muS_index_eta01_core [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
+    (hyp : Hypothesis (G := G))
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetupS hG)) :
+    ∃ (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter
+        ↥(hyp.H.subgroupOf hyp.S))
+      (i₁ : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1)) (δ : ℤ),
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
+          Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (φ₀ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)) ∧
+      0 < i₁ ∧
+      ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          ((H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁)) ∧
+      δ ^ 2 = 1 ∧
+      (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff hyp.eta01 i₁ = (δ : ℂ) ∧
+      (∀ i : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1), 0 < i → i ≠ i₁ →
+        ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            ((H_sharp_hypothesis76_base hG hyp φ₀).zeta i)) →
+        (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff hyp.eta01 i = 0) ∧
+      (H_sharp_hypothesis76_base hG hyp φ₀).zetaNormSq i₁ = (hyp.q : ℂ) ∧
+      (H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁ 1 = ((hyp.u * hyp.q : ℕ) : ℂ) := by
+  classical
+  haveI := hyp.finiteG
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  set data := hyp.toTypesIIIIIIVSetupS hG with hdata
+  set HU : Subgroup ↥hyp.S := huSub data with hHU
+  have hHUeq : HU = (derivedInG hyp.S).subgroupOf hyp.S :=
+    huSub_eq_derivedInG_subgroupOf data
+  letI : Fintype ↥HU := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥HU : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- `PC = H.subgroupOf S ≤ S' = HU`
+  have hHderiv : hyp.H ≤ derivedInG hyp.S := by
+    change hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
+    rw [hyp.S_deriv_eq_PU]
+    exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
+  have hKle : hyp.H.subgroupOf hyp.S ≤ HU := by
+    rw [hHUeq]; exact Subgroup.subgroupOf_mono hyp.S hHderiv
+  letI : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  set K : Subgroup ↥hyp.S := hyp.H.subgroupOf hyp.S with hKdef
+  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  set core := hyp.characterDegreeCore hG hnoV chief with hcore
+  set τ₁ := hyp.tau1S_ofHonest hG hnoV chief with hτ₁
+  -- the (13.5)-for-`η₀₁` input data: distinguished column, sign, chosen base
+  obtain ⟨j₀, c₀, δ, φ₀, hj₀0, hc₀0, hc₀j₀, hδpm, hφ₀P, hφ₀eq, hφ₀ne, hkeyr, hkey⟩ :=
+    core.exists_eta01_column_data
+  have hkeyr' : ClassFunction.inner (τ₁ (∑ i : Fin hyp.q, hyp.mu i j₀)) hyp.eta01
+      = (δ : ℂ) := hkeyr
+  have hkey' : ∀ c : Fin hyp.p, c ≠ ⟨0, hyp.p_prime.pos⟩ → c ≠ j₀ →
+      ClassFunction.inner (τ₁ (∑ i : Fin hyp.q, hyp.mu i c)) hyp.eta01 = 0 := hkey
+  -- (13.3.a): the distinguished column source `θr` (`μ_{j₀} = Ind_{PC}^S θr`)
+  obtain ⟨θr, hθrirr, hθr1, hμeq, hθrP⟩ := hyp.mu_j_isIndPC_not_ker hG j₀ hj₀0
+  -- degree-one values on `Irr K` (`K ≅ H = PC` abelian)
+  haveI hKcomm : IsMulCommutative ↥K := by
+    have hH := hyp.H_mulCommutative hG
+    have e := Subgroup.subgroupOfEquivOfLe (show hyp.H ≤ hyp.S from hyp.H_le_S)
+    exact ⟨⟨fun a b => e.injective (by
+      rw [map_mul, map_mul]
+      exact hH.is_comm.comm (e a) (e b))⟩⟩
+  have hdeg1 : ∀ θ : ClassFunction ↥K ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ → θ 1 = 1 := fun _ hθ =>
+    OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative hθ
+  -- `μ_{j₀} ∈ 𝒮` (13.3.a membership)
+  have hμmem : (∑ i : Fin hyp.q, hyp.mu i j₀) ∈ sSet data :=
+    sOf_subset_sSet data chief.H0 (hyp.mu_colSum_mem_sOf_H0 hG chief j₀ hj₀0)
+  -- distinct `K`-inductions are orthogonal
+  have hInd0 : ∀ θ ψ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
+      ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+          ≠ ClassFunction.induce K (ψ : ClassFunction ↥K ℂ) →
+      ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
+        (ClassFunction.induce K (ψ : ClassFunction ↥K ℂ)) = 0 := by
+    intro θ ψ hne
+    refine OddOrder.RepresentationTheory.inner_induce_eq_zero_of_not_conj θ ψ
+      (fun g heq => hne ?_)
+    have h1 : ClassFunction.induce K
+        ((OddOrder.RepresentationTheory.IrreducibleCharacter.conjBy g θ :
+          OddOrder.RepresentationTheory.IrreducibleCharacter ↥K) : ClassFunction ↥K ℂ)
+        = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) := by
+      rw [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_conjBy]
+      exact OddOrder.RepresentationTheory.ClassFunction.induce_conjBy_eq
+        (G := ↥hyp.S) (H := K) g _
+    rw [← h1, heq]
+  -- `⟨τ₁(Ind φ₀), η₀₁⟩ = 0`: the base is the other `μ`-column
+  have hφ₀eta : ClassFunction.inner
+      (τ₁ (ClassFunction.induce K (φ₀ : ClassFunction ↥K ℂ))) hyp.eta01 = 0 := by
+    rw [show ClassFunction.induce K (φ₀ : ClassFunction ↥K ℂ)
+        = ∑ i : Fin hyp.q, hyp.mu i c₀ from hφ₀eq]
+    exact hkey' c₀ hc₀0 hc₀j₀
+  -- ⟨τ₁(Ind_K θ), η₀₁⟩ = 0 for every `P`-nonkernel irreducible source with `Ind θ ≠ μ_{j₀}`:
+  -- two-stage constituent expansion over `HU`, per-constituent (5.3.b)/(13.3.c) dispatch
+  have hTau1IndEta : ∀ θ : ClassFunction ↥K ℂ,
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter θ →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf K : Set ↥K) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ) →
+      ClassFunction.induce K θ ≠ ∑ i : Fin hyp.q, hyp.mu i j₀ →
+      ClassFunction.inner (τ₁ (ClassFunction.induce K θ)) hyp.eta01 = 0 := by
+    intro θ hθirr hθP hθne
+    -- transport onto `PC-in-HU`
+    have hθ'irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ) :=
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter.compHom_of_surjective
+        (Subgroup.subgroupOfEquivOfLe hKle).surjective hθirr
+    have hθ'P : ¬ ((((hyp.P.subgroupOf hyp.S).subgroupOf HU).subgroupOf
+          (K.subgroupOf HU) :
+        Set ↥(K.subgroupOf HU)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)) := by
+      rw [OddOrder.RepresentationTheory.subset_characterKernel_compHom_iff]
+      have himg : ((((hyp.P.subgroupOf hyp.S).subgroupOf HU).subgroupOf
+            (K.subgroupOf HU)).map
+            (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom)
+          = (hyp.P.subgroupOf hyp.S).subgroupOf K := by
+        ext y
+        rw [Subgroup.mem_map_equiv, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf,
+          Subgroup.mem_subgroupOf]
+        rfl
+      rw [himg]
+      exact hθP
+    -- two-stage constituent expansion with `ℕ`-coefficients
+    have hzeta : ClassFunction.induce K θ
+        = ∑ s : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU,
+            ClassFunction.inner
+              (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+              (ClassFunction.restrict (K.subgroupOf HU)
+                (s : ClassFunction ↥HU ℂ))
+              • ClassFunction.induce HU (s : ClassFunction ↥HU ℂ) := by
+      rw [← OddOrder.RepresentationTheory.induce_induce_subgroupOf hKle θ,
+        OddOrder.RepresentationTheory.induce_eq_sum_inner_restrict_smul
+          (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ),
+        ClassFunction.induce_sum]
+      exact Finset.sum_congr rfl fun s _ => ClassFunction.induce_smul _ _ _
+    have hcoefNat : ∀ s : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU, ∃ n : ℕ,
+        ClassFunction.inner
+          (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+          (ClassFunction.restrict (K.subgroupOf HU)
+            (s : ClassFunction ↥HU ℂ)) = (n : ℂ) := by
+      intro s
+      have hResChar : IsCharacter (ClassFunction.restrict
+          (K.subgroupOf HU) (s : ClassFunction ↥HU ℂ)) :=
+        OddOrder.Peterfalvi.S08.isCharacter_restrict s.isIrreducible.isCharacter _
+      obtain ⟨n, hn⟩ := hResChar.exists_natCast_inner_irreducible hθ'irr
+      exact ⟨n, by rw [OddOrder.RepresentationTheory.inner_conj_symm, hn, star_natCast]⟩
+    choose k hk using hcoefNat
+    have hmem : ∀ s : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU, k s ≠ 0 →
+        ClassFunction.induce HU (s : ClassFunction ↥HU ℂ) ∈ sSet data := by
+      intro s hks
+      rw [mem_sSet]
+      refine ⟨s, ?_, rfl⟩
+      change ¬ ((hInHu data : Set ↥HU) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥HU ℂ))
+      have hHInHu : (hInHu data : Set ↥HU)
+          = ((hyp.P.subgroupOf hyp.S).subgroupOf HU : Set ↥HU) := by
+        congr 1
+        change (data.H.subgroupOf hyp.S).subgroupOf HU
+          = (hyp.P.subgroupOf hyp.S).subgroupOf HU
+        have hPeq : data.H = hyp.P := by
+          change hyp.Sdata.H = hyp.P; rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+        rw [hPeq]
+      rw [hHInHu]
+      have hs : ClassFunction.inner
+          (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+          (ClassFunction.restrict (K.subgroupOf HU)
+            (s : ClassFunction ↥HU ℂ)) ≠ 0 := by
+        rw [hk s]
+        exact_mod_cast hks
+      exact constituent_P_not_subset_characterKernel
+        ((hyp.P.subgroupOf hyp.S).subgroupOf HU) (K.subgroupOf HU)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKle).toMonoidHom θ)
+        hθ'irr hθ'P s hs
+    -- expand the τ₁-image and dispatch per constituent
+    have hzetaN : ClassFunction.induce K θ
+        = ∑ s : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU,
+            k s • ClassFunction.induce HU (s : ClassFunction ↥HU ℂ) := by
+      rw [hzeta]
+      exact Finset.sum_congr rfl fun s _ => by rw [hk s, Nat.cast_smul_eq_nsmul]
+    rw [hzetaN, map_sum, OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_eq_zero fun s _ => ?_
+    rcases Nat.eq_zero_or_pos (k s) with hk0 | hkpos
+    · rw [hk0, zero_smul, map_zero, ClassFunction.inner_zero_left]
+    · rw [map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ (k s), ClassFunction.inner_smul_left]
+      suffices hterm0 : ClassFunction.inner
+          (τ₁ (ClassFunction.induce HU (s : ClassFunction ↥HU ℂ))) hyp.eta01 = 0 by
+        rw [hterm0, mul_zero]
+      by_cases hsirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
+          (ClassFunction.induce HU (s : ClassFunction ↥HU ℂ))
+      · -- irreducible constituent: (5.3.b) grid orthogonality at the `(0,1)` entry
+        rw [show hyp.eta01 = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, hyp.p_prime.one_lt⟩ from rfl]
+        exact coherentIndS_image_inner_eta_eq_zero hG hnoV hyp
+          (sSet_closedUnderConjugate data)
+          (sSet_hasNoRealCharacters data (hyp.oddCardS hG))
+          (fun ζ' hζ' => by
+            rw [show ζ' - (ζ' : ClassFunction ↥hyp.S ℂ).conj
+                = -((ζ' : ClassFunction ↥hyp.S ℂ).conj - ζ') from (neg_sub _ _).symm,
+              ClassFunction.support_neg]
+            exact hyp.sSet_member_conjDiff_supported hG hζ')
+          (hyp.coherent_H0Cprime_S hG hnoV chief) (hmem s hkpos.ne') hsirr
+          ⟨0, hyp.q_prime.pos⟩ ⟨1, hyp.p_prime.one_lt⟩
+      · -- reducible constituent: a nonzero `μ`-column `μ_c` with `c ≠ j₀`
+        obtain ⟨c, hc0, heqcol⟩ :=
+          hyp.sSet_reducible_eq_muColumnSum hG (hmem s hkpos.ne') hsirr
+        by_cases hcj : c = j₀
+        · -- `c = j₀` would make `μ_{j₀}` a constituent of `Ind_K θ`, contradicting
+          -- `⟨Ind_K θ, μ_{j₀}⟩ = 0` (distinct-source `K`-inductions are orthogonal)
+          exfalso
+          subst hcj
+          have hzmu : ClassFunction.inner (ClassFunction.induce K θ)
+              (∑ i : Fin hyp.q, hyp.mu i c) = 0 := by
+            rw [hμeq]
+            exact hInd0 ⟨θ, hθirr⟩ ⟨θr, hθrirr⟩ fun h => hθne (h.trans hμeq.symm)
+          have hexp : ClassFunction.inner (ClassFunction.induce K θ)
+              (∑ i : Fin hyp.q, hyp.mu i c)
+              = ∑ s' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU, (k s' : ℂ) *
+                  ClassFunction.inner (ClassFunction.induce HU (s' : ClassFunction ↥HU ℂ))
+                    (∑ i : Fin hyp.q, hyp.mu i c) := by
+            rw [hzeta, OddOrder.RepresentationTheory.inner_sum_left]
+            refine Finset.sum_congr rfl fun s' _ => ?_
+            rw [hk s', ClassFunction.inner_smul_left]
+          have hterm : ∀ s' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU,
+              ∃ n : ℕ,
+              (k s' : ℂ) * ClassFunction.inner
+                (ClassFunction.induce HU (s' : ClassFunction ↥HU ℂ))
+                (∑ i : Fin hyp.q, hyp.mu i c) = (n : ℂ) := by
+            intro s'
+            rcases Nat.eq_zero_or_pos (k s') with h0 | hpos
+            · exact ⟨0, by rw [h0]; simp⟩
+            · by_cases heq : ClassFunction.induce HU (s' : ClassFunction ↥HU ℂ)
+                  = ∑ i : Fin hyp.q, hyp.mu i c
+              · refine ⟨k s' * hyp.q, ?_⟩
+                rw [heq, hyp.muColumn_inner_self c]
+                push_cast
+                ring
+              · exact ⟨0, by rw [sSet_pairwiseOrthogonal data (hmem s' hpos.ne') hμmem heq,
+                  mul_zero, Nat.cast_zero]⟩
+          choose n hn using hterm
+          have hsumC : ∑ s' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU,
+              ((n s' : ℕ) : ℂ) = 0 := by
+            rw [Finset.sum_congr rfl fun s' _ => (hn s').symm, ← hexp, hzmu]
+          have hsumN : ∑ s' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥HU,
+              n s' = 0 := by
+            rw [← Nat.cast_sum] at hsumC
+            exact_mod_cast hsumC
+          have hn0 : n s = 0 := (Finset.sum_eq_zero_iff.mp hsumN) s (Finset.mem_univ s)
+          have hcontra : ((n s : ℕ) : ℂ) ≠ 0 := by
+            rw [← hn s, heqcol, hyp.muColumn_inner_self c]
+            exact mul_ne_zero (Nat.cast_ne_zero.mpr hkpos.ne')
+              (Nat.cast_ne_zero.mpr hyp.q_prime.pos.ne')
+          exact hcontra (by rw [hn0, Nat.cast_zero])
+        · -- `c ≠ j₀`: the (13.3.c) column orthogonality
+          rw [heqcol]
+          exact hkey' c hc0 hcj
+  -- the distinguished family index: the family cover at the `μ_{j₀}`-source
+  obtain ⟨i₁, hi₁0⟩ :=
+    (H_sharp_hypothesis76_base hG hyp φ₀).zeta_family_cover ⟨θr, hθrirr⟩
+  have hζi₁ : (H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁
+      = ∑ i : Fin hyp.q, hyp.mu i j₀ := by
+    rw [hi₁0, hμeq]
+    congr!
+  have hζ0 : (H_sharp_hypothesis76_base hG hyp φ₀).zeta 0
+      = ClassFunction.induce K (φ₀ : ClassFunction ↥K ℂ) :=
+    H_sharp_hypothesis76_base_zeta_zero hG hyp φ₀
+  have hi₁pos : 0 < i₁ := by
+    rw [Fin.pos_iff_ne_zero]
+    intro h0
+    apply hφ₀ne
+    rw [← hζ0, ← h0, hζi₁]
+  -- `P ⊄ Ker ζ_{i₁}` at the `S`-level
+  have hζi₁P : ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        ((H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁)) := by
+    obtain ⟨x₀, hx₀mem, hx₀ker⟩ := Set.not_subset.mp hθrP
+    intro hsub
+    refine hx₀ker ?_
+    have hx₀S : ((x₀ : ↥hyp.S)) ∈ hyp.P.subgroupOf hyp.S :=
+      Subgroup.mem_subgroupOf.mp hx₀mem
+    have hmem1 : ((x₀ : ↥hyp.S)) ∈ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.induce K θr) := by
+      have h1 := hsub hx₀S
+      rw [hζi₁, hμeq] at h1
+      exact h1
+    have hbridge := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
+      (L := ↥hyp.S) (H := K) hθrirr x₀.2 hmem1
+    rwa [show (⟨((x₀ : ↥hyp.S)), x₀.2⟩ : ↥K) = x₀ from rfl] at hbridge
+  -- family degrees are constant (`K` abelian) ⟹ `d ≡ 1`
+  have hzeta_one : ∀ j : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1),
+      (H_sharp_hypothesis76_base hG hyp φ₀).zeta j 1 = (K.index : ℂ) := by
+    intro j
+    obtain ⟨θ0, hθ0⟩ := (H_sharp_hypothesis76_base hG hyp φ₀).zeta_induced j
+    obtain ⟨θQ, hθQirr, hθQeq⟩ : ∃ θQ : ClassFunction ↥K ℂ,
+        OddOrder.RepresentationTheory.IsIrreducibleCharacter θQ ∧
+        (H_sharp_hypothesis76_base hG hyp φ₀).zeta j = ClassFunction.induce K θQ :=
+      ⟨θ0.val, θ0.2, by rw [hθ0]; congr!⟩
+    rw [hθQeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one,
+      hdeg1 θQ hθQirr, mul_one]
+  have hidx0 : (K.index : ℂ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite (H := K)
+  have hd1 : ∀ j : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1),
+      (H_sharp_hypothesis76_base hG hyp φ₀).d j = 1 := by
+    intro j
+    have h := (H_sharp_hypothesis76_base hG hyp φ₀).zeta_one_eq_d_mul j
+    rw [hzeta_one j, hzeta_one 0] at h
+    field_simp at h
+    exact h.symm
+  -- the guarded τ₁ ↔ `Ind_S^G` bridge on `𝒮₁`-differences
+  have hbridge : ∀ θ θ' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf K : Set ↥K) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ)) →
+      ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf K : Set ↥K) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ' : ClassFunction ↥K ℂ)) →
+      τ₁ (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+          - ClassFunction.induce K (θ' : ClassFunction ↥K ℂ))
+        = ClassFunction.induce hyp.S
+            (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+              - ClassFunction.induce K (θ' : ClassFunction ↥K ℂ)) := by
+    intro θ θ' hθP hθ'P
+    exact hyp.tau1S_ofHonest_apply_induce_sub hG hnoV chief _ _ θ.2 θ'.2 hθP hθ'P
+  -- conjunct: the distinguished coefficient is `δ`
+  have hθrP' : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf K : Set ↥K) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        ((⟨θr, hθrirr⟩ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K) :
+          ClassFunction ↥K ℂ)) := hθrP
+  have hc1 : (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff hyp.eta01 i₁ = (δ : ℂ) := by
+    rw [show (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff hyp.eta01 i₁
+        = ClassFunction.inner
+            ((H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
+              ((H_sharp_hypothesis76_base hG hyp φ₀).psiSupp i₁)) hyp.eta01 from rfl,
+      show (H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
+        = (H_sharp_hypothesis71 hG hyp).τ from rfl,
+      H_sharp_tau_eq_induce hG hyp]
+    have hψ : (((H_sharp_hypothesis76_base hG hyp φ₀).psiSupp i₁) :
+        ClassFunction ↥hyp.S ℂ)
+        = ClassFunction.induce K (θr : ClassFunction ↥K ℂ)
+          - ClassFunction.induce K (φ₀ : ClassFunction ↥K ℂ) := by
+      rw [OddOrder.Peterfalvi.S09.Hypothesis76.psiSupp_coe, hd1 i₁, one_smul, hζi₁, hζ0,
+        hμeq]
+    rw [hψ, ← hbridge ⟨θr, hθrirr⟩ φ₀ hθrP' hφ₀P,
+      map_sub, ClassFunction.inner_sub_left]
+    have h1 : ClassFunction.inner (τ₁ (ClassFunction.induce K θr)) hyp.eta01 = (δ : ℂ) := by
+      rw [← hμeq]
+      exact hkeyr'
+    rw [show ClassFunction.inner
+        (τ₁ (ClassFunction.induce K (θr : ClassFunction ↥K ℂ))) hyp.eta01
+        = ClassFunction.inner (τ₁ (ClassFunction.induce K θr)) hyp.eta01 from rfl,
+      h1, hφ₀eta, sub_zero]
+  -- conjunct: all other `P`-nonkernel coefficients vanish
+  have hmid : ∀ i : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1), 0 < i → i ≠ i₁ →
+      ¬ ((hyp.P.subgroupOf hyp.S : Set ↥hyp.S) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          ((H_sharp_hypothesis76_base hG hyp φ₀).zeta i)) →
+      (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff hyp.eta01 i = 0 := by
+    intro i _hipos hine hiP
+    obtain ⟨θi0, hθi0⟩ := (H_sharp_hypothesis76_base hG hyp φ₀).zeta_induced i
+    obtain ⟨θiQ, hθiQirr, hθiQeq⟩ : ∃ θiQ : ClassFunction ↥K ℂ,
+        OddOrder.RepresentationTheory.IsIrreducibleCharacter θiQ ∧
+        (H_sharp_hypothesis76_base hG hyp φ₀).zeta i = ClassFunction.induce K θiQ :=
+      ⟨θi0.val, θi0.2, by rw [hθi0]; congr!⟩
+    -- `P`-nonkernel witness at the `K`-level
+    haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+      have hPle' : hyp.P ≤ hyp.S := by
+        rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+      refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle').mpr ?_
+      rw [hyp.P_eq_SF]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+    have hPle : hyp.P.subgroupOf hyp.S ≤ K := by
+      rw [hKdef]
+      exact Subgroup.subgroupOf_mono hyp.S (show hyp.P ≤ hyp.H from le_sup_left)
+    have hθiP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf K : Set ↥K) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θiQ) := by
+      intro hker
+      apply hiP
+      have hfwd := OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+        (A := hyp.P.subgroupOf hyp.S) (H := K) hPle θiQ hker
+      rw [hθiQeq]
+      exact hfwd
+    have hne : ClassFunction.induce K θiQ
+        ≠ ∑ i' : Fin hyp.q, hyp.mu i' j₀ := by
+      intro heq
+      refine hine ((H_sharp_hypothesis76_base hG hyp φ₀).zeta_injective ?_)
+      rw [hθiQeq, heq, hζi₁]
+    rw [show (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff hyp.eta01 i
+        = ClassFunction.inner
+            ((H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
+              ((H_sharp_hypothesis76_base hG hyp φ₀).psiSupp i)) hyp.eta01 from rfl,
+      show (H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
+        = (H_sharp_hypothesis71 hG hyp).τ from rfl,
+      H_sharp_tau_eq_induce hG hyp]
+    have hψi : (((H_sharp_hypothesis76_base hG hyp φ₀).psiSupp i) :
+        ClassFunction ↥hyp.S ℂ)
+        = ClassFunction.induce K θiQ
+          - ClassFunction.induce K (φ₀ : ClassFunction ↥K ℂ) := by
+      rw [OddOrder.Peterfalvi.S09.Hypothesis76.psiSupp_coe, hd1 i, one_smul, hθiQeq, hζ0]
+    rw [hψi, ← hbridge ⟨θiQ, hθiQirr⟩ φ₀ hθiP hφ₀P,
+      map_sub, ClassFunction.inner_sub_left,
+      hTau1IndEta θiQ hθiQirr hθiP hne,
+      hφ₀eta, sub_zero]
+  -- conjuncts: norm square `q`, degree `uq`, sign square
+  have hnormSq : (H_sharp_hypothesis76_base hG hyp φ₀).zetaNormSq i₁ = (hyp.q : ℂ) := by
+    rw [show (H_sharp_hypothesis76_base hG hyp φ₀).zetaNormSq i₁
+        = ClassFunction.inner ((H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁)
+            ((H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁) from rfl,
+      hζi₁, hyp.muColumn_inner_self j₀]
+  have hdegVal : (H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁ 1
+      = ((hyp.u * hyp.q : ℕ) : ℂ) := by
+    rw [hζi₁]
+    exact hyp.mu_j_degree hG j₀ hj₀0
+  have hδ2 : δ ^ 2 = 1 := by
+    rcases hδpm with h | h <;> rw [h] <;> norm_num
+  exact ⟨φ₀, i₁, δ, hφ₀P, hi₁pos, hζi₁P, hδ2, hc1, hmid, hnormSq, hdegVal⟩
+
+end
+
 end OddOrder.Peterfalvi.S15
