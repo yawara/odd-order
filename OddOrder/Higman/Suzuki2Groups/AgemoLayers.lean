@@ -342,4 +342,172 @@ theorem agemoSuccQuotientAction_transitive_on_nonidentity
   apply Subtype.ext
   exact hg
 
+/-! ## Noncyclicity and transported layer data -/
+
+private theorem cyclic_finite_unique_order_two
+    {P : Type*} [Group P] [Finite P] [IsCyclic P] {s t : P}
+    (hs_ord : orderOf s = 2) (ht_ord : orderOf t = 2) : s = t := by
+  letI : Fintype P := Fintype.ofFinite P
+  have h2_dvd : (2 : ℕ) ∣ Fintype.card P := by
+    rw [← hs_ord]
+    exact orderOf_dvd_card
+  have h_card : Fintype.card {x : P // orderOf x = 2} = 1 := by
+    rw [Fintype.card_subtype, IsCyclic.card_orderOf_eq_totient h2_dvd,
+      Nat.totient_two]
+  haveI : Subsingleton {x : P // orderOf x = 2} :=
+    Fintype.card_le_one_iff_subsingleton.mp h_card.le
+  exact congrArg Subtype.val
+    (Subsingleton.elim
+      (⟨s, hs_ord⟩ : {x : P // orderOf x = 2})
+      ⟨t, ht_ord⟩)
+
+/-- The last nontrivial Agemo layer is not cyclic when the ambient
+homocyclic group has two distinct involutions. -/
+theorem not_isCyclic_lastAgemoLayer_of_two_involutions
+    {A ι : Type*} [CommGroup A] [Finite A] {e : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e)))) (he : 0 < e)
+    {x y : A} (hx : x ∈ involutions A) (hy : y ∈ involutions A)
+    (hxy : x ≠ y) :
+    ¬ IsCyclic ↑(Agemo A 2 (e - 1)) := by
+  intro hcyc
+  letI : IsCyclic ↑(Agemo A 2 (e - 1)) := hcyc
+  let x' : ↑(Agemo A 2 (e - 1)) :=
+    ⟨x, (sq_eq_one_iff_mem_lastAgemoLayer ε he).mp hx.1⟩
+  let y' : ↑(Agemo A 2 (e - 1)) :=
+    ⟨y, (sq_eq_one_iff_mem_lastAgemoLayer ε he).mp hy.1⟩
+  have hxord : orderOf x' = 2 := by
+    exact orderOf_eq_prime (p := 2) (Subtype.ext hx.1) (by
+      intro hx1
+      apply hx.2
+      exact congrArg Subtype.val hx1)
+  have hyord : orderOf y' = 2 := by
+    exact orderOf_eq_prime (p := 2) (Subtype.ext hy.1) (by
+      intro hy1
+      apply hy.2
+      exact congrArg Subtype.val hy1)
+  apply hxy
+  exact congrArg Subtype.val
+    (cyclic_finite_unique_order_two hxord hyord)
+
+/-- No quotient of two distinct Agemo layers is cyclic when the
+homocyclic group has two distinct involutions. -/
+theorem not_isCyclic_agemoQuotient_of_two_involutions
+    {A ι : Type*} [CommGroup A] [Finite A] {e s t : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e))))
+    (hst : s < t) (hte : t ≤ e)
+    {x y : A} (hx : x ∈ involutions A) (hy : y ∈ involutions A)
+    (hxy : x ≠ y) :
+    ¬ IsCyclic
+      (↑(Agemo A 2 s) ⧸
+        (Agemo A 2 t).subgroupOf (Agemo A 2 s)) := by
+  intro hcyc
+  have hs : s < e := lt_of_lt_of_le hst hte
+  let M := Agemo A 2 s
+  let D := (Agemo A 2 t).subgroupOf M
+  let N := (Agemo A 2 (s + 1)).subgroupOf M
+  have hDt : Agemo A 2 t ≤ Agemo A 2 (s + 1) :=
+    Agemo.anti (by omega)
+  have hDN : D ≤ N := by
+    intro a ha
+    exact hDt ha
+  let q : (M ⧸ D) →* (M ⧸ N) :=
+    QuotientGroup.map D N (MonoidHom.id M) (by
+      simpa [Subgroup.comap_id] using hDN)
+  have hqsurj : Function.Surjective q := by
+    intro z
+    refine QuotientGroup.induction_on z ?_
+    intro a
+    refine ⟨QuotientGroup.mk a, ?_⟩
+    rfl
+  letI : IsCyclic (M ⧸ D) := hcyc
+  have hnextCyc : IsCyclic (M ⧸ N) :=
+    isCyclic_of_surjective q hqsurj
+  letI : IsCyclic (M ⧸ N) := hnextCyc
+  have hlastCyc : IsCyclic ↑(Agemo A 2 (e - 1)) :=
+    isCyclic_of_surjective
+      (agemoSuccQuotientEquivLast ε hs).toMonoidHom
+      (agemoSuccQuotientEquivLast ε hs).surjective
+  exact not_isCyclic_lastAgemoLayer_of_two_involutions ε (by omega)
+    hx hy hxy hlastCyc
+
+/-- An equivariant linear equivalence with a successive Agemo factor
+transports transitivity on its nonzero elements. -/
+theorem transitive_nonzero_of_equivariant_agemoSucc
+    {A X ι V : Type*} [CommGroup A] [Group X]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (rho : Representation (ZMod 2) X V)
+    (phi : X →* MulAut A) {e s : ℕ}
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ e))))
+    (htrans : ∀ x ∈ involutions A, ∀ y ∈ involutions A,
+      ∃ g : X, (phi g) x = y)
+    (hs : s < e)
+    (E : V ≃ₗ[ZMod 2] Additive (AgemoSuccQuotient A s))
+    (hE : ∀ g v, E (rho g v) =
+      agemoSuccQuotientRepresentation phi s g (E v)) :
+    ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ g : X, rho g v = w := by
+  intro v w hv hw
+  have hEv : E v ≠ 0 := by
+    intro h
+    apply hv
+    exact E.injective (h.trans E.map_zero.symm)
+  have hEw : E w ≠ 0 := by
+    intro h
+    apply hw
+    exact E.injective (h.trans E.map_zero.symm)
+  have hq : (E v).toMul ≠ 1 := by simpa using hEv
+  have hr : (E w).toMul ≠ 1 := by simpa using hEw
+  obtain ⟨g, hg⟩ :=
+    agemoSuccQuotientAction_transitive_on_nonidentity
+      phi ε htrans hs (E v).toMul (E w).toMul hq hr
+  refine ⟨g, E.injective ?_⟩
+  rw [hE]
+  apply Additive.toMul.injective
+  change (agemoSuccQuotientAction phi s g) (E v).toMul =
+    (E w).toMul
+  exact hg
+
+/-- A noncyclic successive Agemo factor has dimension at least two over
+`F₂`. -/
+theorem agemoSucc_finrank_ge_two_of_not_isCyclic
+    {A : Type*} [CommGroup A] [Finite A] (s : ℕ)
+    (hncyc : ¬ IsCyclic (AgemoSuccQuotient A s)) :
+    2 ≤ Module.finrank (ZMod 2)
+      (Additive (AgemoSuccQuotient A s)) := by
+  by_contra hnot
+  have hle : Module.finrank (ZMod 2)
+      (Additive (AgemoSuccQuotient A s)) ≤ 1 := by omega
+  let Q := AgemoSuccQuotient A s
+  have hleQ : Module.finrank (ZMod 2) (Additive Q) ≤ 1 := by
+    simpa [Q] using hle
+  haveI : Finite (Additive Q) := inferInstanceAs (Finite Q)
+  have hcard : Nat.card Q =
+      2 ^ Module.finrank (ZMod 2) (Additive Q) := by
+    calc
+      Nat.card Q = Nat.card (Additive Q) :=
+        (Nat.card_congr (Additive.toMul (α := Q))).symm
+      _ = 2 ^ Module.finrank (ZMod 2) (Additive Q) :=
+        (FiniteField.pow_finrank_eq_natCard 2 (Additive Q)).symm
+  have hcardDvd : Nat.card Q ∣ 2 := by
+    rw [hcard]
+    rcases Nat.eq_zero_or_pos
+        (Module.finrank (ZMod 2) (Additive Q)) with hzero | hpos
+    · rw [hzero]
+      norm_num
+    · have hone : Module.finrank (ZMod 2) (Additive Q) = 1 := by omega
+      rw [hone]
+      norm_num
+  exact hncyc (isCyclic_of_card_dvd_prime hcardDvd)
+
+/-- A linear equivalence with a noncyclic successive Agemo factor
+transports its dimension lower bound. -/
+theorem finrank_ge_two_of_linearEquiv_agemoSucc
+    {A V : Type*} [CommGroup A] [Finite A]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (s : ℕ)
+    (E : V ≃ₗ[ZMod 2] Additive (AgemoSuccQuotient A s))
+    (hncyc : ¬ IsCyclic (AgemoSuccQuotient A s)) :
+    2 ≤ Module.finrank (ZMod 2) V := by
+  rw [E.finrank_eq]
+  exact agemoSucc_finrank_ge_two_of_not_isCyclic s hncyc
+
 end OddOrder.Higman.Suzuki2Groups

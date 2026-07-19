@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
 
 /-!
@@ -92,6 +93,25 @@ theorem lowerCentralLayerKernelInAmbient_eq
   rw [lowerCentralLayerKernelInAmbient, lowerCentralLayerKernel,
     Subgroup.map_sup,
     Subgroup.map_subgroupOf_eq_of_le (lowerCentralTerm_succ_le H i)]
+
+/-- Passing the square subgroup of the zeroth lower-central term back to the
+ambient group recovers the ambient square subgroup. -/
+theorem agemo_lowerCentralTerm_zero_map_eq
+    (H : Type uH) [Group H] :
+    (Agemo (↥(lowerCentralTerm H 0)) 2 1).map
+        (lowerCentralTerm H 0).subtype = Agemo H 2 1 := by
+  apply le_antisymm
+  · rw [Subgroup.map_le_iff_le_comap, Agemo, Subgroup.closure_le]
+    rintro x ⟨y, rfl⟩
+    change (y : H) ^ (2 ^ 1) ∈ Agemo H 2 1
+    exact Agemo.mem_of_eq_pow (y : H)
+  · rw [Agemo, Subgroup.closure_le]
+    rintro x ⟨y, rfl⟩
+    apply Subgroup.mem_map.mpr
+    let y₀ : ↥(lowerCentralTerm H 0) :=
+      ⟨y, by simp [lowerCentralTerm]⟩
+    refine ⟨y₀ ^ (2 ^ 1), Agemo.mem_of_eq_pow y₀, ?_⟩
+    rfl
 
 /-- The ambient denominator lies in `Hᵢ`, as required for the quotient. -/
 theorem lowerCentralLayerKernelInAmbient_le
@@ -298,6 +318,90 @@ theorem lowerCentralLayer_card_eq_pow_finrank
   letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact (lowerCentralLayer_isElementaryAbelian H i).card_eq_pow_finrank
 
+/-- A finite nonabelian `2`-group has a nontrivial second Higman
+lower-central layer.
+
+If the layer `C' / (C'^2 C₃)` were trivial, its kernel would be all of `C'`.
+Since `C'^2 ≤ Φ(C')`, the Frattini nongenerating theorem would then force
+`C₃ = C'`. The lower central series would stabilize at `C'`; nilpotency of
+the finite `2`-group forces this stable term to be trivial, making `C`
+abelian, a contradiction. -/
+theorem lowerCentralLayer_one_nontrivial_of_not_isMulCommutative
+    {C : Type uH} [Group C] [Finite C]
+    (hC : IsPGroup 2 C) (hncomm : ¬ IsMulCommutative C) :
+    Nontrivial (lowerCentralLayer C 1) := by
+  apply not_subsingleton_iff_nontrivial.mp
+  intro hL2
+  have hkernelTop : lowerCentralLayerKernel C 1 = ⊤ :=
+    QuotientGroup.subgroup_eq_top_of_subsingleton
+      (lowerCentralLayerKernel C 1) hL2
+  rw [lowerCentralLayerKernel] at hkernelTop
+  have hD : IsPGroup 2 ↥(lowerCentralTerm C 1) :=
+    hC.to_subgroup (lowerCentralTerm C 1)
+  have hagemo : Agemo ↥(lowerCentralTerm C 1) 2 1 ≤
+      frattini ↥(lowerCentralTerm C 1) := by
+    rw [Agemo, Subgroup.closure_le]
+    rintro _ ⟨x, rfl⟩
+    simpa using IsPGroup.pow_mem_frattini hD x
+  have hsup :
+      (lowerCentralTerm C 2).subgroupOf (lowerCentralTerm C 1) ⊔
+          frattini ↥(lowerCentralTerm C 1) = ⊤ := by
+    apply top_unique
+    rw [← hkernelTop]
+    exact sup_le (hagemo.trans le_sup_right) le_sup_left
+  have hnextTop :
+      (lowerCentralTerm C 2).subgroupOf (lowerCentralTerm C 1) = ⊤ :=
+    frattini_nongenerating hsup
+  have hstabilizes : lowerCentralTerm C 2 = lowerCentralTerm C 1 := by
+    apply le_antisymm
+    · exact lowerCentralTerm_succ_le C 1
+    · intro x hx
+      let xD : ↥(lowerCentralTerm C 1) := ⟨x, hx⟩
+      have hxnext : xD ∈
+          (lowerCentralTerm C 2).subgroupOf (lowerCentralTerm C 1) := by
+        rw [hnextTop]
+        exact Subgroup.mem_top xD
+      exact hxnext
+  letI : Group.IsNilpotent C := hC.isNilpotent
+  have hreverse : ∀ n, 1 ≤ n →
+      lowerCentralTerm C 1 ≤ lowerCentralTerm C n := by
+    intro n hn
+    induction n with
+    | zero => omega
+    | succ m ih =>
+      rcases Nat.lt_or_ge 0 m with hm | hm
+      · calc
+          lowerCentralTerm C 1 = lowerCentralTerm C 2 := hstabilizes.symm
+          _ = ⁅lowerCentralTerm C 1, (⊤ : Subgroup C)⁆ := by
+            simp only [lowerCentralTerm,
+              Subgroup.lowerCentralSeries_succ]
+          _ ≤ ⁅lowerCentralTerm C m, (⊤ : Subgroup C)⁆ :=
+            Subgroup.commutator_mono (ih hm) le_rfl
+          _ = lowerCentralTerm C (m + 1) := by
+            change ⁅(⊤ : Subgroup C).lowerCentralSeries m, ⊤⁆ =
+              (⊤ : Subgroup C).lowerCentralSeries (m + 1)
+            rw [Subgroup.lowerCentralSeries_succ]
+      · have hm0 : m = 0 := by omega
+        subst hm0
+        exact le_rfl
+  obtain ⟨n, hn⟩ :=
+    Subgroup.nilpotent_iff_lowerCentralSeries.mp
+      (inferInstance : Group.IsNilpotent C)
+  have hgammaOneBot : lowerCentralTerm C 1 = ⊥ := by
+    rw [eq_bot_iff]
+    rcases Nat.eq_zero_or_pos n with rfl | hpos
+    · rw [Subgroup.lowerCentralSeries_zero] at hn
+      rw [← hn]
+      exact le_top
+    · have hle := hreverse n hpos
+      change lowerCentralTerm C 1 ≤
+        (⊤ : Subgroup C).lowerCentralSeries n at hle
+      rw [hn] at hle
+      exact hle
+  have hcommBot : _root_.commutator C = ⊥ := by
+    rw [← Subgroup.top_lowerCentralSeries_one]
+    exact hgammaOneBot
+  exact hncomm ((commutator_eq_bot_iff C).mp hcommBot)
 
 local instance instLowerCentralLayerKernelInAmbientNormal
     (H : Type uH) [Group H] (i : ℕ) :

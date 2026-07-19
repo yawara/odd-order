@@ -46,25 +46,6 @@ def LowerCentralSquaresLieInSecond
   (Agemo (↥(lowerCentralTerm H 0)) 2 1).map
       (lowerCentralTerm H 0).subtype ≤ lowerCentralTerm H 1
 
-/-- Passing the square subgroup of the zeroth lower-central term back to the
-ambient group recovers the ambient square subgroup. -/
-theorem agemo_lowerCentralTerm_zero_map_eq
-    (H : Type uH) [Group H] :
-    (Agemo (↥(lowerCentralTerm H 0)) 2 1).map
-        (lowerCentralTerm H 0).subtype = Agemo H 2 1 := by
-  apply le_antisymm
-  · rw [Subgroup.map_le_iff_le_comap, Agemo, Subgroup.closure_le]
-    rintro x ⟨y, rfl⟩
-    change (y : H) ^ (2 ^ 1) ∈ Agemo H 2 1
-    exact Agemo.mem_of_eq_pow (y : H)
-  · rw [Agemo, Subgroup.closure_le]
-    rintro x ⟨y, rfl⟩
-    apply Subgroup.mem_map.mpr
-    let y₀ : ↥(lowerCentralTerm H 0) :=
-      ⟨y, by simp [lowerCentralTerm]⟩
-    refine ⟨y₀ ^ (2 ^ 1), Agemo.mem_of_eq_pow y₀, ?_⟩
-    rfl
-
 /-- Higman's source hypothesis `H² = H₂` implies the square-inclusion
 hypothesis used by the construction below. -/
 theorem lowerCentralSquaresLieInSecond_of_agemo_eq
