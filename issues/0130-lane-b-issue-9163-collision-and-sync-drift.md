@@ -42,6 +42,19 @@ Claude 側の起動時同期規律が効いていない可能性がある (要�
       新規 Lean docstring 内の "9163" 参照を 9164 に置換 → `SEQUENCE.9000` を 9164 に
 - [ ] lane b の次回起動/再開時に `git merge main` を必ず通す (23 → 0)
 
+## 追記 (2026-07-19 20:08) — lane b が自己検出、hub 介入不要
+
+codex ログ (`~/.codex/sessions/.../rollout-2026-07-18T01-16-26-*.jsonl`, 20:08) で
+lane b 自身が衝突を検出済み:
+
+> main 側の新しい commit に issue 9163 への言及があり、こちらの stale checkout で採番した
+> claim と衝突している可能性を検出しました。…こちらの claim を未使用番号へ移してから続けます。
+> 今は merge 自体は行いません。
+
+⟹ **hub は稼働中 worktree に手を入れない**。次の合流 tick で
+「9163 が 1 件のみ・b 側が未使用番号へ移動済み」を検証するだけでよい。
+20:10 時点では未実施 (b の WIP 継続中)。
+
 ## 完了条件
 
 - `ls issues/**/9163-*` が 1 件のみ (main の typepa 側)
