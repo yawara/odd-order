@@ -31,8 +31,12 @@ FT 経路では優先度低 (Peterfalvi で散発使用).
 可能性が高い. -/
 
 /-- **Isaacs Thm 3.35 (cyclic lift; generator)**: `H ⊴ G`, `G/H` cyclic ⇒ ある `g ∈ G` が
-`G/H` の生成元の lift で, `⟨g⟩ ⊔ H = G`. (Thm 3.35 強版の uniqueness の前提.) -/
-theorem cyclic_quotient_lift [Finite G] {H : Subgroup G} [H.Normal]
+`G/H` の生成元の lift で, `⟨g⟩ ⊔ H = G`. (Thm 3.35 強版の uniqueness の前提.)
+
+`G` の有限性は不要 (書籍 3.35 も `G` 任意で商だけ巡回を要求する). 同 cluster の
+`cyclic_quotient_extension_unique` / `cyclic_quotient_extension_iso_exists` も `G` 任意なので
+本補題だけが `[Finite G]` を担いでいた — 2026-07-19 に削除 (証明本体は未使用だった). -/
+theorem cyclic_quotient_lift {H : Subgroup G} [H.Normal]
     (hCyclic : IsCyclic (G ⧸ H)) :
     ∃ g : G, Subgroup.zpowers g ⊔ H = ⊤ := by
   obtain ⟨gbar, hgbar⟩ := hCyclic.exists_generator
