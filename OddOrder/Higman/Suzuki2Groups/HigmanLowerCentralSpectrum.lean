@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
 import Mathlib.Algebra.Module.Submodule.Bilinear
 import Mathlib.Algebra.Module.ZMod
+import Mathlib.Combinatorics.Colex
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.LinearAlgebra.Basis.Basic
@@ -41,7 +42,7 @@ set_option autoImplicit false
 
 open Module Polynomial
 open OddOrder.RepresentationTheory
-open scoped TensorProduct IsMulCommutative
+open scoped BigOperators TensorProduct IsMulCommutative
 
 namespace OddOrder.Higman.Suzuki2Groups
 
@@ -688,6 +689,145 @@ universe uSpectrumF uSpectrumV
 
 /-- Unordered pairs of distinct Frobenius exponents. -/
 abbrev HigmanExponentPair (n : ℕ) := {p : Fin n × Fin n // p.1.1 < p.2.1}
+
+/-! ## Three-versus-two binary weights -/
+
+/-- A sum of three distinct binary digits cannot equal a sum of two
+distinct binary digits. -/
+theorem three_distinct_twoPowers_ne_two_distinct_twoPowers
+    {i j k a b : ℕ}
+    (hij : i ≠ j) (hik : i ≠ k) (hjk : j ≠ k) (hab : a ≠ b) :
+    2 ^ i + 2 ^ j + 2 ^ k ≠ 2 ^ a + 2 ^ b := by
+  intro h
+  let S : Finset ℕ := {i, j, k}
+  let T : Finset ℕ := {a, b}
+  have hSsum : (∑ x ∈ S, 2 ^ x) = 2 ^ i + 2 ^ j + 2 ^ k := by
+    simp [S, hij, hik, hjk, add_assoc]
+  have hTsum : (∑ x ∈ T, 2 ^ x) = 2 ^ a + 2 ^ b := by
+    simp [T, hab]
+  have hST : S = T := by
+    apply Finset.geomSum_injective (n := 2) (by omega)
+    change (∑ x ∈ S, 2 ^ x) = ∑ x ∈ T, 2 ^ x
+    rw [hSsum, hTsum, h]
+  have hcard := congrArg Finset.card hST
+  have hScard : S.card = 3 := by
+    simp [S, hij, hik, hjk]
+  have hTcard : T.card = 2 := by
+    simp [T, hab]
+  omega
+
+/-- Three distinct Frobenius exponents never give a pair weight modulo
+`2^n - 1`.  This is the binary-weight exclusion used after the odd-dimension
+reduction in Higman's Lemma 6. -/
+theorem three_distinct_frobeniusWeight_not_modEq_pairWeight
+    {n : ℕ}
+    (i j k : Fin n) (hij : i ≠ j) (hik : i ≠ k) (hjk : j ≠ k)
+    (p : HigmanExponentPair n) :
+    ¬ Nat.ModEq (2 ^ n - 1)
+      (2 ^ i.val + 2 ^ j.val + 2 ^ k.val)
+      (2 ^ p.1.1.val + 2 ^ p.1.2.val) := by
+  let S : Finset ℕ := {i.val, j.val, k.val}
+  let R : Finset ℕ := Finset.range n
+  have hSsub : S ⊆ R := by
+    intro x hx
+    simp only [S, Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with rfl | rfl | rfl
+    · exact Finset.mem_range.mpr i.isLt
+    · exact Finset.mem_range.mpr j.isLt
+    · exact Finset.mem_range.mpr k.isLt
+  have hSsum : (∑ x ∈ S, 2 ^ x) =
+      2 ^ i.val + 2 ^ j.val + 2 ^ k.val := by
+    have hijv : i.val ≠ j.val := fun h => hij (Fin.ext h)
+    have hikv : i.val ≠ k.val := fun h => hik (Fin.ext h)
+    have hjkv : j.val ≠ k.val := fun h => hjk (Fin.ext h)
+    simp [S, hijv, hikv, hjkv, add_assoc]
+  have hthree_le :
+      2 ^ i.val + 2 ^ j.val + 2 ^ k.val ≤ 2 ^ n - 1 := by
+    rw [← hSsum]
+    calc
+      (∑ x ∈ S, 2 ^ x) ≤ ∑ x ∈ R, 2 ^ x :=
+        Finset.sum_le_sum_of_subset_of_nonneg hSsub (fun _ _ _ => by positivity)
+      _ = 2 ^ n - 1 := by
+        simpa [R] using (Nat.geomSum_eq (m := 2) (by omega) n)
+  have hpair_le :
+      2 ^ p.1.1.val + 2 ^ p.1.2.val ≤ 2 ^ n - 1 := by
+    let T : Finset ℕ := {p.1.1.val, p.1.2.val}
+    have hTsub : T ⊆ R := by
+      intro x hx
+      simp only [T, Finset.mem_insert, Finset.mem_singleton] at hx
+      rcases hx with rfl | rfl
+      · exact Finset.mem_range.mpr p.1.1.isLt
+      · exact Finset.mem_range.mpr p.1.2.isLt
+    have hpne : p.1.1.val ≠ p.1.2.val := by omega
+    have hTsum : (∑ x ∈ T, 2 ^ x) =
+        2 ^ p.1.1.val + 2 ^ p.1.2.val := by
+      simp [T, hpne]
+    rw [← hTsum]
+    calc
+      (∑ x ∈ T, 2 ^ x) ≤ ∑ x ∈ R, 2 ^ x :=
+        Finset.sum_le_sum_of_subset_of_nonneg hTsub (fun _ _ _ => by positivity)
+      _ = 2 ^ n - 1 := by
+        simpa [R] using (Nat.geomSum_eq (m := 2) (by omega) n)
+  have hthree_pos : 0 < 2 ^ i.val + 2 ^ j.val + 2 ^ k.val := by positivity
+  have hpair_pos : 0 < 2 ^ p.1.1.val + 2 ^ p.1.2.val := by positivity
+  intro hmod
+  have hle : 2 ^ i.val + 2 ^ j.val + 2 ^ k.val ≤
+      2 ^ p.1.1.val + 2 ^ p.1.2.val := by
+    apply hmod.le_of_lt_add
+    omega
+  have hge : 2 ^ p.1.1.val + 2 ^ p.1.2.val ≤
+      2 ^ i.val + 2 ^ j.val + 2 ^ k.val := by
+    apply hmod.symm.le_of_lt_add
+    omega
+  have heq : 2 ^ i.val + 2 ^ j.val + 2 ^ k.val =
+      2 ^ p.1.1.val + 2 ^ p.1.2.val := Nat.le_antisymm hle hge
+  exact three_distinct_twoPowers_ne_two_distinct_twoPowers
+    (fun h => hij (Fin.ext h))
+    (fun h => hik (Fin.ext h))
+    (fun h => hjk (Fin.ext h))
+    (by omega) heq
+
+/-- Primitive-root form of the three-versus-two binary-weight exclusion:
+an eigenvalue attached to three distinct Frobenius exponents cannot be an
+eigenvalue attached to an unordered pair. -/
+theorem primitiveRoot_threeDistinctWeight_ne_pairWeight
+    {F : Type*} [Field F] {n : ℕ} (hn : 3 ≤ n)
+    (lambda : F) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (i j k : Fin n) (hij : i ≠ j) (hik : i ≠ k) (hjk : j ≠ k)
+    (p : HigmanExponentPair n) :
+    lambda ^ (2 ^ i.val + 2 ^ j.val + 2 ^ k.val) ≠
+      lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val) := by
+  intro heq
+  have hmod : Nat.ModEq (2 ^ n - 1)
+      (2 ^ i.val + 2 ^ j.val + 2 ^ k.val)
+      (2 ^ p.1.1.val + 2 ^ p.1.2.val) := by
+    have hfinite : IsOfFinOrder lambda :=
+      hprim.isOfFinOrder (Nat.sub_ne_zero_of_lt
+        (Nat.one_lt_pow (by omega : n ≠ 0) (by omega)))
+    have h := hfinite.pow_eq_pow_iff_modEq.mp heq
+    rwa [← hprim.eq_orderOf] at h
+  exact three_distinct_frobeniusWeight_not_modEq_pairWeight
+    i j k hij hik hjk p hmod
+
+/-- If an operator is spanned by Higman's pair-weight eigenspaces, then the
+eigenspace of a three-distinct-exponent weight is zero. -/
+theorem primitiveRoot_threeDistinctWeight_eigenspace_eq_bot
+    {F : Type*} {V : Type*} [Field F] [AddCommGroup V] [Module F V]
+    {n : ℕ} (hn : 3 ≤ n)
+    (lambda : F) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (T : Module.End F V)
+    (hspan : ⨆ mu ∈ Set.range (fun p : HigmanExponentPair n ↦
+        lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)), T.eigenspace mu = ⊤)
+    (i j k : Fin n) (hij : i ≠ j) (hik : i ≠ k) (hjk : j ≠ k) :
+    T.eigenspace (lambda ^ (2 ^ i.val + 2 ^ j.val + 2 ^ k.val)) = ⊥ := by
+  have hnot : lambda ^ (2 ^ i.val + 2 ^ j.val + 2 ^ k.val) ∉
+      Set.range (fun p : HigmanExponentPair n ↦
+        lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) := by
+    rintro ⟨p, hp⟩
+    exact primitiveRoot_threeDistinctWeight_ne_pairWeight
+      hn lambda hprim i j k hij hik hjk p hp.symm
+  have hd := (Module.End.eigenspaces_iSupIndep T).disjoint_biSup hnot
+  rwa [hspan, disjoint_top] at hd
 
 /-! ## Pair-weight eigenspace spanning -/
 
