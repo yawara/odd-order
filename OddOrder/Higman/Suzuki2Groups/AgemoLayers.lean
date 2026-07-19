@@ -49,6 +49,83 @@ noncomputable def agemoSuccQuotientAction
     IsAInvariant.of_characteristic φ
   exact (hHs.subgroupOf hHnext).quotientMulAutHom
 
+/-! ## Power maps from the zeroth factor -/
+
+/-- The `2 ^ s`-power map from the zeroth Agemo term to the `s`-th term.
+
+This is the representative-level map underlying Higman's comparison of
+successive `ξ`-composition factors. -/
+def agemoZeroToLayerPowHom
+    {A : Type*} [CommGroup A] (s : ℕ) :
+    ↥(Agemo A 2 0) →* ↥(Agemo A 2 s) where
+  toFun x := ⟨x.1 ^ (2 ^ s), Agemo.mem_of_eq_pow x.1⟩
+  map_one' := by ext; simp
+  map_mul' x y := by ext; simp [mul_pow]
+
+/-- The actual power map from `A / A²` onto the `s`-th successive Agemo
+factor.  No homocyclicity assumption is needed for surjectivity; injectivity
+will only be used later when irreducibility or a homocyclic model supplies it. -/
+def agemoZeroQuotientToSuccPowHom
+    {A : Type*} [CommGroup A] (s : ℕ) :
+    (↥(Agemo A 2 0) ⧸
+        (Agemo A 2 1).subgroupOf (Agemo A 2 0)) →*
+      (↥(Agemo A 2 s) ⧸
+        (Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)) := by
+  apply QuotientGroup.map
+    ((Agemo A 2 1).subgroupOf (Agemo A 2 0))
+    ((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s))
+    (agemoZeroToLayerPowHom s)
+  intro x hx
+  change x.1 ^ (2 ^ s) ∈ Agemo A 2 (s + 1)
+  obtain ⟨y, hy⟩ := mem_agemo_iff_of_comm.mp hx
+  have hy' : (x : A) = y ^ 2 := by simpa using hy
+  apply mem_agemo_iff_of_comm.mpr
+  refine ⟨y, ?_⟩
+  rw [hy', ← pow_mul]
+  congr 1
+  simp [pow_succ, mul_comm]
+
+@[simp] theorem agemoZeroQuotientToSuccPowHom_mk
+    {A : Type*} [CommGroup A] (s : ℕ) (x : ↥(Agemo A 2 0)) :
+    agemoZeroQuotientToSuccPowHom s (QuotientGroup.mk' _ x) =
+      QuotientGroup.mk' _ (agemoZeroToLayerPowHom s x) :=
+  rfl
+
+/-- Every successive Agemo factor is an actual quotient of the zeroth factor
+under the corresponding power map. -/
+theorem agemoZeroQuotientToSuccPowHom_surjective
+    {A : Type*} [CommGroup A] (s : ℕ) :
+    Function.Surjective (agemoZeroQuotientToSuccPowHom (A := A) s) := by
+  intro q
+  obtain ⟨z, rfl⟩ := QuotientGroup.mk'_surjective
+    ((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)) q
+  obtain ⟨x, hx⟩ := mem_agemo_iff_of_comm.mp z.2
+  let x₀ : ↥(Agemo A 2 0) :=
+    ⟨x, by rw [agemo_zero_eq_top]; exact Subgroup.mem_top x⟩
+  refine ⟨QuotientGroup.mk' _ x₀, ?_⟩
+  rw [agemoZeroQuotientToSuccPowHom_mk]
+  apply congrArg (QuotientGroup.mk'
+    ((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)))
+  apply Subtype.ext
+  exact hx.symm
+
+/-- The quotient power map intertwines every ambient automorphism action. -/
+theorem agemoZeroQuotientToSuccPowHom_equivariant
+    {A X : Type*} [CommGroup A] [Group X]
+    (φ : X →* MulAut A) (s : ℕ) (g : X)
+    (q : ↥(Agemo A 2 0) ⧸
+      (Agemo A 2 1).subgroupOf (Agemo A 2 0)) :
+    agemoZeroQuotientToSuccPowHom s
+        (agemoSuccQuotientAction φ 0 g q) =
+      agemoSuccQuotientAction φ s g
+        (agemoZeroQuotientToSuccPowHom s q) := by
+  refine QuotientGroup.induction_on q ?_
+  intro x
+  apply congrArg (QuotientGroup.mk'
+    ((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)))
+  apply Subtype.ext
+  simp [agemoZeroToLayerPowHom, map_pow]
+
 /-- The power-map equivalence from a successive Agemo quotient to the last
 nontrivial layer intertwines the induced and restricted actions. -/
 theorem agemoSuccQuotientEquivLast_equivariant
