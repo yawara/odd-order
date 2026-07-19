@@ -426,28 +426,67 @@ theorem split_levels (label : X → L) :
         have := hres₂ c hc
         omega
 
-/-- **The collecting process.**  Every formal word is equal, as a group element,
-to the concatenation of one block per nonempty support, ordered by cardinality,
-the block for `S` consisting of factors whose support is exactly `S`.
+theorem nodup_levelList (k : ℕ) : (levelList L k).Nodup := Finset.nodup_toList _
 
-There is no residue: a surviving factor would need a support larger than `L`. -/
+theorem nodup_supportList (k K : ℕ) : (supportList L k K).Nodup := by
+  rw [supportList, List.nodup_flatMap]
+  refine ⟨fun i _ => nodup_levelList i, (List.nodup_range' (s := k) (n := K)).imp ?_⟩
+  intro i j hij T hTi hTj
+  exact hij (by rw [← card_of_mem_levelList hTi, ← card_of_mem_levelList hTj])
+
+set_option linter.unusedDecidableInType false in
+/-- A `Forall₂` over a duplicate-free index list is the graph of a function. -/
+theorem exists_fun_of_forall₂ {R : Finset L → List (FormalCommutator X) → Prop}
+    {supports : List (Finset L)} {blocks : List (List (FormalCommutator X))}
+    (h : List.Forall₂ R supports blocks) (hnd : supports.Nodup) :
+    ∃ blk : Finset L → List (FormalCommutator X),
+      blocks = supports.map blk ∧ ∀ S ∈ supports, R S (blk S) := by
+  classical
+  revert hnd
+  induction h with
+  | nil => exact fun _ => ⟨fun _ => [], rfl, by simp⟩
+  | @cons T q ss bs hhead _ ih =>
+      intro hnd
+      obtain ⟨blk', hmap, hR⟩ := ih (List.Nodup.of_cons hnd)
+      have hTss : T ∉ ss := (List.nodup_cons.mp hnd).1
+      refine ⟨Function.update blk' T q, ?_, ?_⟩
+      · rw [List.map_cons, Function.update_self, hmap]
+        refine congrArg (q :: ·) (List.map_congr_left fun S hS => ?_)
+        have hne : S ≠ T := fun h => hTss (h ▸ hS)
+        exact (Function.update_of_ne hne q blk').symm
+      · intro S hS
+        rcases List.mem_cons.mp hS with rfl | hS'
+        · rw [Function.update_self]; exact hhead
+        · have hne : S ≠ T := fun h => hTss (h ▸ hS')
+          rw [Function.update_of_ne hne]
+          exact hR S hS'
+
+/-- **The collecting process.**  Every formal word is equal, as a group element,
+to the ordered product over all nonempty supports — in increasing order of
+cardinality — of a block attached to that support, the block for `S` consisting
+of factors whose support is exactly `S`.
+
+The blocks are combinatorial data: they do not depend on the assignment, which
+is what lets Hall's argument substitute many different assignments into one
+collected word.  There is no residue: a surviving factor would need a support
+larger than `L`. -/
 theorem exists_split_supports (label : X → L) (l : List (FormalCommutator X)) :
-    ∃ blocks : List (List (FormalCommutator X)),
-      List.Forall₂ (fun T q => ∀ c ∈ q, support label c = T)
-        (supportList L 1 (Fintype.card L)) blocks ∧
-      ∀ f : X → G, evalWord f l = evalWord f blocks.flatten := by
+    ∃ blk : Finset L → List (FormalCommutator X),
+      (∀ S ∈ supportList L 1 (Fintype.card L), ∀ c ∈ blk S, support label c = S) ∧
+      ∀ f : X → G, evalWord f l
+        = ((supportList L 1 (Fintype.card L)).map fun S => evalWord f (blk S)).prod := by
   obtain ⟨blocks, res, hforall, hval, hres⟩ :=
     split_levels (G := G) label (Fintype.card L) 1 l
       (fun c _ => Finset.card_pos.mpr (support_nonempty label c))
-  refine ⟨blocks, hforall, ?_⟩
+  obtain ⟨blk, hmap, hR⟩ := exists_fun_of_forall₂ hforall (nodup_supportList 1 _)
   have hnil : res = [] := by
     rcases res with _ | ⟨c, t⟩
     · rfl
     · have hcard : (support label c).card ≤ Fintype.card L := by
         simpa [Finset.card_univ] using Finset.card_le_univ (support label c)
       exact absurd (hres c (by simp)) (by omega)
-  intro f
-  rw [hval f, hnil, List.append_nil]
+  refine ⟨blk, hR, fun f => ?_⟩
+  rw [hval f, hnil, List.append_nil, hmap, ← List.flatMap_def, evalWord_flatMap]
 
 end Level
 
