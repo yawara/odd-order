@@ -461,6 +461,15 @@ theorem exists_fun_of_forall₂ {R : Finset L → List (FormalCommutator X) → 
           rw [Function.update_of_ne hne]
           exact hR S hS'
 
+/-- Every nonempty support occurs in the support list. -/
+theorem mem_supportList_of_nonempty {S : Finset L} (hSne : S.Nonempty) :
+    S ∈ supportList L 1 (Fintype.card L) := by
+  have hle : S.card ≤ Fintype.card L := by
+    simpa [Finset.card_univ] using Finset.card_le_univ S
+  have hpos : 0 < S.card := Finset.card_pos.mpr hSne
+  rw [supportList, List.mem_flatMap]
+  exact ⟨S.card, List.mem_range'_1.mpr ⟨hpos, by omega⟩, mem_levelList rfl⟩
+
 /-- **The collecting process.**  Every formal word is equal, as a group element,
 to the ordered product over all nonempty supports — in increasing order of
 cardinality — of a block attached to that support, the block for `S` consisting

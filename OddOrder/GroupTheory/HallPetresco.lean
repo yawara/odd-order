@@ -242,12 +242,12 @@ section BlockValue
 variable {xs : List G} {blk : Finset L → List (FormalCommutator (G × L))}
 
 /-- The level-`k` factor of the collection formula for the slot set `B`. -/
-private noncomputable def levelFactor (blk : Finset L → List (FormalCommutator (G × L)))
+noncomputable def levelFactor (blk : Finset L → List (FormalCommutator (G × L)))
     (B : Finset L) (k : ℕ) : G :=
   ((levelList L k).map fun S => if S ⊆ B then blockValue blk S else 1).prod
 
 /-- **The collection formula, split at the top level.** -/
-private theorem prod_pow_eq_levels_mul
+theorem prod_pow_eq_levels_mul
     (hblk : ∀ S ∈ supportList L 1 (Fintype.card L), ∀ c ∈ blk S, support slot c = S)
     (hval : ∀ f : G × L → G, evalWord f (expandedWord L xs)
       = ((supportList L 1 (Fintype.card L)).map fun S => evalWord f (blk S)).prod)
@@ -312,7 +312,116 @@ theorem blockValue_eq_of_card_eq
       rw [hAeq, hprefix] at hA'eq
       exact mul_left_cancel hA'eq
 
+/-! ## The collected values
+
+Reading the previous section backwards: there is a single sequence `v 1, v 2, …`
+of group elements such that for **every** slot set `A`
+
+`x₁^{|A|} ⋯ x_m^{|A|} = v 1^{C(|A|,1)} · v 2^{C(|A|,2)} ⋯ v_{|A|}^{C(|A|,|A|)}`,
+
+and `v k` lies in `γ_k` because the block it comes from consists of commutators
+of `k` distinct slots, hence of weight at least `k`.  This is the Hall–Petresco
+formula.
+-/
+
+/-- The common value of all collected blocks whose support has `k` slots. -/
+noncomputable def hallValue (blk : Finset L → List (FormalCommutator (G × L))) (k : ℕ) : G :=
+  if h : ∃ S : Finset L, S.card = k ∧ S.Nonempty then blockValue blk h.choose else 1
+
+variable (hblk : ∀ S ∈ supportList L 1 (Fintype.card L), ∀ c ∈ blk S, support slot c = S)
+  (hval : ∀ f : G × L → G, evalWord f (expandedWord L xs)
+    = ((supportList L 1 (Fintype.card L)).map fun S => evalWord f (blk S)).prod)
+
+include hblk hval in
+/-- `hallValue` is the value of any block of the given support size. -/
+theorem hallValue_eq {S : Finset L} (hSne : S.Nonempty) :
+    hallValue blk S.card = blockValue blk S := by
+  have hex : ∃ T : Finset L, T.card = S.card ∧ T.Nonempty := ⟨S, rfl, hSne⟩
+  rw [hallValue, dif_pos hex]
+  exact blockValue_eq_of_card_eq hblk hval S.card _ S hex.choose_spec.1 rfl
+    hex.choose_spec.2 hSne
+
+include hblk hval in
+/-- Each level of the collection formula is a binomial power of `hallValue`. -/
+theorem levelFactor_eq_pow {A : Finset L} {k : ℕ} (hk : 1 ≤ k) :
+    levelFactor blk A k = hallValue blk k ^ A.card.choose k := by
+  rw [levelFactor]
+  refine prod_level_eq_pow fun S hS _ => ?_
+  have hScard : S.card = k := card_of_mem_levelList hS
+  have hSne : S.Nonempty := Finset.card_pos.mp (by omega)
+  rw [← hScard, hallValue_eq hblk hval hSne]
+
+include hblk hval in
+/-- ⭐ **The Hall–Petresco formula, slot form.**  For every nonempty slot set `A`,
+
+`x₁^{|A|} ⋯ x_m^{|A|} = ∏_{k=1}^{|A|} (hallValue k) ^ C(|A|, k)`. -/
+theorem prod_pow_card_eq_prod_hallValue {A : Finset L} (hAne : A.Nonempty) :
+    (xs.map fun g => g ^ A.card).prod
+      = ((List.range' 1 A.card).map fun k => hallValue blk k ^ A.card.choose k).prod := by
+  have hn1 : 1 ≤ A.card := Finset.card_pos.mpr hAne
+  have hcat : List.range' 1 A.card = List.range' 1 (A.card - 1) ++ [A.card] := by
+    have h := @List.range'_append 1 (A.card - 1) 1 1
+    rw [show 1 + 1 * (A.card - 1) = A.card by omega,
+      show A.card - 1 + 1 = A.card by omega] at h
+    rw [← h]; simp
+  rw [hcat, List.map_append, List.prod_append,
+    prod_pow_eq_levels_mul hblk hval (rfl : A.card = A.card) hAne]
+  congr 1
+  · refine congrArg List.prod (List.map_congr_left fun k hk => ?_)
+    exact levelFactor_eq_pow hblk hval (List.mem_range'_1.mp hk).1
+  · simp [Nat.choose_self, hallValue_eq hblk hval hAne]
+
+include hblk hval in
+/-- ⭐ **The depth of the collected values.**  `hallValue k` lies in the book's
+`γ_k`: its block consists of commutators involving `k` distinct slots, hence of
+weight at least `k`. -/
+theorem hallValue_mem_lowerCentralSeries {k : ℕ} (hk : 1 ≤ k) (hkN : k ≤ Fintype.card L) :
+    hallValue blk k ∈ (⊤ : Subgroup G).lowerCentralSeries (k - 1) := by
+  obtain ⟨S, -, hS⟩ := Finset.exists_subset_card_eq (s := (Finset.univ : Finset L)) (n := k)
+    (by simpa [Finset.card_univ] using hkN)
+  have hSne : S.Nonempty := Finset.card_pos.mp (by omega)
+  rw [← hS, hallValue_eq hblk hval hSne, blockValue]
+  refine evalWord_mem_lowerCentralSeries _ fun c hc => ?_
+  rw [← hblk S (mem_supportList_of_nonempty hSne) c hc]
+  exact card_support_le_weight slot c
+
 end BlockValue
+
+/-! ## The Hall–Petresco formula -/
+
+/-- ⭐ **The Hall–Petresco formula** (P. Hall's collection formula; BG Theorem
+E.1 in the `m`-generator form).  For any generators `x₁, …, x_m` of any group and
+any `n ≥ 1` there are elements `τ_k ∈ γ_k` with `τ_1 = x₁ ⋯ x_m` and
+
+`x₁ⁿ ⋯ x_mⁿ = τ_1^{C(n,1)} · τ_2^{C(n,2)} ⋯ τ_n^{C(n,n)}`.
+
+No nilpotency, no bound on the class, no restriction on `G`.  The proof is
+Mann's (Dixon–du Sautoy–Mann–Segal, *Analytic Pro-p Groups*, 2nd ed., App. A):
+collect the *expanded* word, in which each of the `n` copies of a generator has
+its own slot, once and for all; substituting the slot sets `A` shows that a
+collected block depends only on `|A|`, and the binomial coefficients appear as
+the number of `k`-element subsets of an `n`-element set. -/
+theorem exists_hallPetresco (xs : List G) {n : ℕ} (hn : 1 ≤ n) :
+    ∃ τ : ℕ → G,
+      (∀ k, 1 ≤ k → k ≤ n → τ k ∈ (⊤ : Subgroup G).lowerCentralSeries (k - 1)) ∧
+      τ 1 = xs.prod ∧
+      (xs.map fun g => g ^ n).prod
+        = ((List.range' 1 n).map fun k => τ k ^ n.choose k).prod := by
+  classical
+  obtain ⟨j⟩ : Nonempty (Fin n) := Fin.pos_iff_nonempty.mp hn
+  obtain ⟨blk, hblk, hval⟩ :=
+    FormalCommutator.exists_split_supports (G := G) (slot : G × Fin n → Fin n)
+      (expandedWord (Fin n) xs)
+  have hcardL : Fintype.card (Fin n) = n := Fintype.card_fin n
+  refine ⟨hallValue blk, fun k hk1 hkn => ?_, ?_, ?_⟩
+  · exact hallValue_mem_lowerCentralSeries hblk hval hk1 (by rw [hcardL]; exact hkn)
+  · have h := prod_pow_card_eq_prod_hallValue hblk hval (A := ({j} : Finset (Fin n)))
+      ⟨j, by simp⟩
+    rw [Finset.card_singleton] at h
+    simpa using h.symm
+  · have h := prod_pow_card_eq_prod_hallValue hblk hval
+      (A := (Finset.univ : Finset (Fin n))) ⟨j, Finset.mem_univ j⟩
+    rwa [Finset.card_univ, hcardL] at h
 
 end HallPetresco
 
