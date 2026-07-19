@@ -605,7 +605,7 @@ theorem exists_singerFrobeniusEigenbasis_of_faithful_irreducible
 
 /-! ## Primitive-root contradiction -/
 
-universe uSpectrum
+universe uSpectrumF uSpectrumV
 
 /-- Unordered pairs of distinct Frobenius exponents. -/
 abbrev HigmanExponentPair (n : ℕ) := {p : Fin n × Fin n // p.1.1 < p.2.1}
@@ -698,7 +698,8 @@ The substantial representation-theoretic input is isolated in `hspan`: after sca
 the second layer is spanned by eigenspaces whose eigenvalues are pairwise products of distinct
 Frobenius conjugates of `lambda`. -/
 theorem higman_spectral_contradiction
-    {F V : Type uSpectrum} [Field F] [AddCommGroup V] [Module F V]
+    {F : Type uSpectrumF} {V : Type uSpectrumV}
+    [Field F] [AddCommGroup V] [Module F V]
     (T : Module.End F V) (n : ℕ) (_hn : 2 ≤ n) (lambda : F)
     (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
     (hspan : ⨆ mu ∈ Set.range (fun p : HigmanExponentPair n ↦
@@ -735,5 +736,194 @@ theorem higman_spectral_contradiction
     exact hp
   exact hprim.pow_ne_one_of_pos_of_lt (by omega) hk_lt hk_one
 
+
+
+/-! ## Higman's Lemma 4 -/
+
+universe uHelperF uHelperK uHelperC uHelperV uHelperW
+universe uGenerator
+
+/-- A faithful action of an abelian group which is transitive on the nonzero
+vectors is regular there, so the actor has one fewer element than the space. -/
+theorem natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [CommGroup C] [Finite C]
+    [AddCommGroup V] [Module F V] [Finite V] [Nontrivial V]
+    (rho : Representation F C V)
+    (hfaith : Function.Injective rho)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w) :
+    Nat.card C = Nat.card V - 1 := by
+  classical
+  letI : Fintype C := Fintype.ofFinite C
+  letI : Fintype V := Fintype.ofFinite V
+  obtain ⟨v, hv⟩ : ∃ v : V, v ≠ 0 := exists_ne 0
+  let orbit : C → {w : V // w ≠ 0} := fun c ↦
+    ⟨rho c v, fun hzero ↦ hv (by
+      have h := congrArg (rho c⁻¹) hzero
+      simpa [← map_mul] using h)⟩
+  have horbit_injective : Function.Injective orbit := by
+    intro c d hcd
+    apply hfaith
+    ext w
+    by_cases hw : w = 0
+    · subst w
+      simp
+    · obtain ⟨g, hg⟩ := htrans v w hv hw
+      have hcv : rho c v = rho d v := Subtype.ext_iff.mp hcd
+      calc
+        rho c w = rho c (rho g v) := by rw [hg]
+        _ = rho (c * g) v := by rw [map_mul]; rfl
+        _ = rho (g * c) v := by rw [mul_comm]
+        _ = rho g (rho c v) := by rw [map_mul]; rfl
+        _ = rho g (rho d v) := by rw [hcv]
+        _ = rho (g * d) v := by rw [map_mul]; rfl
+        _ = rho (d * g) v := by rw [mul_comm]
+        _ = rho d (rho g v) := by rw [map_mul]; rfl
+        _ = rho d w := by rw [hg]
+  have horbit_surjective : Function.Surjective orbit := by
+    intro w
+    obtain ⟨c, hc⟩ := htrans v w.1 hv w.2
+    exact ⟨c, Subtype.ext hc⟩
+  have hcard : Fintype.card C = Fintype.card {w : V // w ≠ 0} :=
+    Fintype.card_congr (Equiv.ofBijective orbit ⟨horbit_injective, horbit_surjective⟩)
+  rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq] at hcard
+  simpa [Nat.card_eq_fintype_card] using hcard
+
+/-- Cyclic specialization: a generator of the faithful transitive actor has
+full Singer order. -/
+theorem exists_generator_orderOf_eq_pow_sub_one_of_faithful_transitive_nonzero
+    {C V : Type uGenerator} [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V] [Module (ZMod 2) V] [Finite V] [Nontrivial V]
+    (rho : Representation (ZMod 2) C V)
+    (n : ℕ) (hfin : Module.finrank (ZMod 2) V = n)
+    (hfaith : Function.Injective rho)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w) :
+    ∃ c : C, orderOf c = 2 ^ n - 1 := by
+  have hcardV : Nat.card V = 2 ^ n := by
+    rw [Module.natCard_eq_pow_finrank (K := ZMod 2), hfin]
+    norm_num [Nat.card_eq_fintype_card]
+  obtain ⟨c, hc⟩ := IsCyclic.exists_generator (α := C)
+  refine ⟨c, (orderOf_eq_card_of_forall_mem_zpowers hc).trans ?_⟩
+  rw [natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
+      (F := ZMod 2) (C := C) (V := V) rho hfaith htrans,
+    hcardV]
+
+/-- Faithfulness transfers across an equivariant linear equivalence. -/
+theorem representation_faithful_of_equivariant_linearEquiv
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV} {W : Type uHelperW}
+    [Field F] [Group C]
+    [AddCommGroup V] [Module F V] [AddCommGroup W] [Module F W]
+    (rhoV : Representation F C V) (rhoW : Representation F C W)
+    (e : V ≃ₗ[F] W)
+    (he : ∀ c v, e (rhoV c v) = rhoW c (e v))
+    (hfaithV : Function.Injective rhoV) : Function.Injective rhoW := by
+  intro c d hcd
+  apply hfaithV
+  ext v
+  apply e.injective
+  rw [he, he, hcd]
+
+/-- A C-equivariant linear equivalence transfers a base-changed eigenvector
+equation from one representation to the other. -/
+theorem baseChange_eigenvector_equation_of_equivariant_linearEquiv
+    {F : Type uHelperF} {K : Type uHelperK} {C : Type uHelperC}
+    {V : Type uHelperV} {W : Type uHelperW}
+    [Field F] [Field K] [Algebra F K] [Group C]
+    [AddCommGroup V] [Module F V] [AddCommGroup W] [Module F W]
+    (rhoV : Representation F C V) (rhoW : Representation F C W)
+    (e : V ≃ₗ[F] W)
+    (he : ∀ c v, e (rhoV c v) = rhoW c (e v))
+    (c : C) (lambda : K) (x : K ⊗[F] V)
+    (hx : (rhoV c).baseChange K x = lambda • x) :
+    (rhoW c).baseChange K (e.baseChange F K V W x) =
+      lambda • (e.baseChange F K V W x) := by
+  have hinter : ∀ y : K ⊗[F] V,
+      e.baseChange F K V W ((rhoV c).baseChange K y) =
+        (rhoW c).baseChange K (e.baseChange F K V W y) := by
+    intro y
+    induction y using TensorProduct.induction_on with
+    | zero => simp
+    | tmul a v => simp [he]
+    | add y z hy hz => simp [hy, hz]
+  rw [← hinter x, hx, map_smul]
+
+universe uMain
+
+/-- **Higman Lemma 4**. A faithful irreducible
+cyclic action on V₁, a transitive action on the nonzero vectors of V₂, and a
+full-span equivariant alternating bracket rule out an equivariant isomorphism. -/
+theorem not_exists_equivariant_linearEquiv_of_higman_bracket
+    {C V₁ V₂ : Type uMain}
+    [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V₁] [Module (ZMod 2) V₁] [Finite V₁]
+    [AddCommGroup V₂] [Module (ZMod 2) V₂] [Finite V₂]
+    (rho₁ : Representation (ZMod 2) C V₁)
+    (rho₂ : Representation (ZMod 2) C V₂)
+    (n : ℕ) (hn : 2 ≤ n)
+    (hfin₂ : Module.finrank (ZMod 2) V₂ = n)
+    (hirr₁ : Representation.IsIrreducible rho₁)
+    (hfaith₁ : Function.Injective rho₁)
+    (beta : LinearMap.BilinMap (ZMod 2) V₁ V₂)
+    (hbetaEquiv : ∀ c x y,
+      rho₂ c (beta x y) = beta (rho₁ c x) (rho₁ c y))
+    (hbetaAlt : ∀ x, beta x x = 0)
+    (hbetaSpan : Submodule.span (ZMod 2)
+      (Set.range fun z : V₁ × V₁ => beta z.1 z.2) = ⊤)
+    (htrans₂ : ∀ v w : V₂, v ≠ 0 → w ≠ 0 →
+      ∃ c : C, rho₂ c v = w) :
+    ¬ ∃ e : V₁ ≃ₗ[ZMod 2] V₂,
+      ∀ c v, e (rho₁ c v) = rho₂ c (e v) := by
+  rintro ⟨e, he⟩
+  have hfin₁ : Module.finrank (ZMod 2) V₁ = n :=
+    e.finrank_eq.trans hfin₂
+  letI : Nontrivial V₂ :=
+    Module.nontrivial_of_finrank_pos (by rw [hfin₂]; omega)
+  have hfaith₂ : Function.Injective rho₂ :=
+    representation_faithful_of_equivariant_linearEquiv
+      rho₁ rho₂ e he hfaith₁
+  obtain ⟨c, hc⟩ :=
+    exists_generator_orderOf_eq_pow_sub_one_of_faithful_transitive_nonzero
+      rho₂ n hfin₂ hfaith₂ htrans₂
+  let K := GaloisField 2 n
+  obtain ⟨_efield, lambda, b, hprim, _hconj, _hgen, hb⟩ :=
+    exists_singerFrobeniusEigenbasis_of_faithful_irreducible
+      rho₁ n hn hfin₁ hirr₁ hfaith₁ c hc
+  let betaK : LinearMap.BilinMap K
+      (K ⊗[ZMod 2] V₁) (K ⊗[ZMod 2] V₂) :=
+    beta.baseChange K
+  let T₁ : Module.End K (K ⊗[ZMod 2] V₁) := (rho₁ c).baseChange K
+  let T₂ : Module.End K (K ⊗[ZMod 2] V₂) := (rho₂ c).baseChange K
+  have hbetaEquivK : ∀ x y,
+      T₂ (betaK x y) = betaK (T₁ x) (T₁ y) := by
+    intro x y
+    exact LinearMap.BilinMap.baseChange_equivariant
+      beta (rho₁ c) (rho₂ c) (hbetaEquiv c) x y
+  have hbetaAltK : ∀ x, betaK x x = 0 := by
+    intro x
+    exact LinearMap.BilinMap.zmodTwo_baseChange_self_eq_zero beta hbetaAlt x
+  have hbetaSpanK : Submodule.span K
+      (Set.range fun z : (K ⊗[ZMod 2] V₁) × (K ⊗[ZMod 2] V₁) =>
+        betaK z.1 z.2) = ⊤ :=
+    LinearMap.BilinMap.baseChange_span_eq_top beta hbetaSpan
+  have hpairSpan : ⨆ mu ∈ Set.range (fun p : HigmanExponentPair n ↦
+      lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)),
+      T₂.eigenspace mu = ⊤ :=
+    iSup_frobeniusPairWeight_eigenspace_eq_top_of_bilinear
+      n lambda T₁ T₂
+      b hb betaK hbetaEquivK hbetaAltK hbetaSpanK
+  let i₀ : Fin n := ⟨0, by omega⟩
+  have hfirst : T₁ (b i₀) = lambda • b i₀ := by
+    simpa [i₀] using hb i₀
+  have hsecond : T₂
+      (e.baseChange (ZMod 2) K V₁ V₂ (b i₀)) =
+      lambda • (e.baseChange (ZMod 2) K V₁ V₂ (b i₀)) :=
+    baseChange_eigenvector_equation_of_equivariant_linearEquiv
+      rho₁ rho₂ e he c lambda (b i₀) hfirst
+  have hsecondNe : e.baseChange (ZMod 2) K V₁ V₂ (b i₀) ≠ 0 :=
+    (e.baseChange (ZMod 2) K V₁ V₂).map_ne_zero_iff.mpr (b.ne_zero i₀)
+  have hlambda : T₂.HasEigenvalue lambda :=
+    Module.End.hasEigenvalue_of_hasEigenvector
+      ⟨Module.End.mem_eigenspace_iff.mpr hsecond, hsecondNe⟩
+  exact higman_spectral_contradiction T₂ n hn lambda hprim hpairSpan hlambda
 
 end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
