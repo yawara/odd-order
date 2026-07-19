@@ -127,3 +127,62 @@ repo の `exists_hallCollection_of_residue` により、E.1 は「weight `k` ご
 なお `⁅a, bⁿ⁆ ≡ ∏_i ⁅a,b;i⁆^{C(n,i)}` (左正規化交換子の 1 変数収集) は `n` の帰納で
 独立に証明でき、weight 2 の係数が `C(n,1)=n` → Pascal で `C(n+1,2)` を出す仕組みそのもの。
 **次段の最初の一歩はこれ** (自由群不要・自己完結)。
+
+## ⭐ 進捗 (2026-07-19 夜〜): 骨格が全部そろい、組み立ての式が閉じた
+
+`HallCollection.lean` 249 → 578 行 (sorry 0、全 axiom-clean)。3 commit:
+
+1. **1 変数収集** `commutatorElement_pow_right_eq_prod_pow_choose`
+   `d 1 = ⁅a,b⁆`, `d(i+1) = ⁅b, d i⁆`, `d i` が互いに可換 ⟹
+   `⁅a, bⁿ⁆ = d₁^C(n,1) ⋯ dₙ^C(n,n)`。n の帰納 + Pascal。
+   **自由群も basic commutator も不要**。`hallIter` (鎖の具体構成) と
+   `hallIter_mem_lowerCentralSeries` (γ を降りる) つき。
+   逆スロット版 `conj_pow_eq_prod_pow_choose`:
+   `(y^i)⁻¹ z y^i = (e₁^C(i,1)⋯e_i^C(i,i))⁻¹ z`。
+2. **展開 (仮説ゼロ)** `pow_mul_pow_eq_pow_mul_prod_collectionCommutator`
+   `xⁿyⁿ = (xy)ⁿ · ∏_{i=1}^{n-1} (y^i)⁻¹ · w_{n-i} · y^i`,
+   `w_m = collectionCommutator x y m = ⁅x⁻¹, ((xy)^m)⁻¹⁆`。
+   `collectionCommutator_eq_commutatorElement_pow` により **w は固定文字
+   `b = (xy)⁻¹` に対する単一族 `⁅x⁻¹, b^m⁆`** なので、1 変数収集が
+   **m に依らない因子 `d_j = hallIter x⁻¹ (xy)⁻¹ j`** で全ステップを一括展開。
+3. **二項畳み込み** `Nat.sum_range_choose_mul_choose`:
+   `∑_{i≤n} C(i,l)C(n−i,j) = C(n+1,l+j+1)` (+ hockey stick の range 版)。
+
+### 組み立ての計算 (紙の上で完了、γ₂ アーベルの場合)
+
+`A := γ₂` がアーベルなら全因子が A に入り自由に並べ替えられる。A 上で y による
+共役を作用素 `Y`、`N := Y − 1` (加法的自己準同型) と書くと `Y^i = ∑_l C(i,l)N^l`
+(binomial、N の冪零性は不要 — C(i,l)=0 for l>i)。加法記法で
+
+  T_n = ∑_{i=1}^{n-1} Y^i(w_{n-i}),  w_m = ∑_{j≥1} C(m,j) d_j
+      = ∑_{l,j} (∑_{i=1}^{n-1} C(i,l)C(n−i,j)) N^l d_j.
+
+畳み込みで内側の和は **l=0 のとき `C(n,j+1)`** (hockey stick)、
+**l≥1 のとき `C(n+1,l+j+1)` = `C(n,l+j+1) + C(n,l+j)`** (Pascal)。⟹
+
+  T_n = ∑_{j≥1} C(n,j+1)·d_j + ∑_{j,l≥1} [C(n,l+j+1)+C(n,l+j)]·N^l d_j
+      = ∑_{r≥2} C(n,r)·c_r,
+  c_r = d_{r−1} + ∑_{l+j=r−1, l,j≥1} N^l d_j + ∑_{l+j=r, l,j≥1} N^l d_j.
+
+**weight が合う**: `d_j ∈ γ_{j+1}`, `N^l d_j ∈ γ_{j+l+1}` なので
+`l+j=r−1 ⟹ γ_r`、`l+j=r ⟹ γ_{r+1} ⊆ γ_r`、`d_{r−1} ∈ γ_r`。全部 `c_r ∈ γ_r` ✓。
+`r > n` の項は `C(n,r)=0` で消えるので尾部は `r = 2..n` に収まる ✓。
+**`c_r` は n に依らない** (有限和)。⟹ **E.1 が metabelian で完全に出る**。
+
+### これは当初評価 ((i) 自由冪零群 + (ii) Hall 多項式が要る) の更新
+
+metabelian (= `γ₂` アーベル) は **class ≤ 3 を真に含み、どの class 上界にも
+含まれない**大きなクラス。ここまでは自由群も basic commutator も Hall 多項式も
+**一切要らない**ことが上の計算で確定した (要るのは畳み込み恒等式だけ)。
+一般 class ≤ p−1 は metabelian に含まれないので E.1 一般形にはまだ届かないが、
+一般形も **同じ計算を `γ_k/γ_{k+1}` の各アーベル切断で class について帰納**する
+形になる見込み。次段はまず metabelian 版を Lean 化する。
+
+### 次段の TODO (順に)
+
+- [ ] `A = γ₂` アーベルのとき `↥A` に `CommGroup` を立て、`Additive ↥A` 上で
+      y-共役を `AddEquiv` として取り出す (A は normal ゆえ well-defined)。
+- [ ] `Y^i = ∑_l C(i,l) N^l` (`Commute.add_pow`; 有限和は `Finset.range (i+1)`)。
+- [ ] 1 変数収集 (List.prod) を `Finset.sum` へ渡す橋。
+- [ ] 展開式 → 二重和 → `Finset.sum_comm` → 畳み込み → Pascal → `c_r` の定義。
+- [ ] `AppE.hallCollection` の metabelian 特殊化を接続 (一般形の sorry は残す)。

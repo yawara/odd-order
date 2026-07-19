@@ -67,6 +67,69 @@ namespace OddOrder.GroupTheory
 
 open scoped commutatorElement
 
+/-! ## Binomial bookkeeping
+
+Two `Nat.choose` identities drive the collecting process.  The hockey-stick
+identity turns "sum over the steps of the process" into a binomial coefficient
+one degree higher; its convolution refinement does the same when the steps are
+*also* weighted by a binomial coefficient, which is what happens once the
+conjugations occurring in the process are expanded as well.
+-/
+
+section Binomial
+
+open Finset
+
+/-- Hockey stick over `range`: `∑_{m < n+1} C(m, j) = C(n+1, j+1)`.
+(mathlib's `Nat.sum_Icc_choose` with the vanishing terms `m < j` put back in.) -/
+theorem Nat.sum_range_choose_right (n j : ℕ) :
+    ∑ m ∈ range (n + 1), m.choose j = (n + 1).choose (j + 1) := by
+  rw [← Nat.sum_Icc_choose n j]
+  refine (Finset.sum_subset ?_ ?_).symm
+  · intro m hm
+    rw [Finset.mem_Icc] at hm
+    exact Finset.mem_range.mpr (by omega)
+  · intro m hm hnm
+    rw [Finset.mem_range] at hm
+    rw [Finset.mem_Icc, not_and, not_le] at hnm
+    exact Nat.choose_eq_zero_of_lt (by omega)
+
+/-- **Binomial convolution.**  `∑_{i ≤ n} C(i, l) · C(n - i, j) = C(n+1, l+j+1)`.
+
+Equivalently `z^l/(1-z)^{l+1} · z^j/(1-z)^{j+1} = z^{l+j}/(1-z)^{l+j+2}`; the
+proof below is the corresponding double induction, on `l` (Pascal on the left
+factor) and then on `n`. -/
+theorem Nat.sum_range_choose_mul_choose (l : ℕ) :
+    ∀ n j : ℕ, ∑ i ∈ range (n + 1), i.choose l * (n - i).choose j
+      = (n + 1).choose (l + j + 1) := by
+  induction l with
+  | zero =>
+      intro n j
+      simp only [Nat.choose_zero_right, one_mul, Nat.zero_add]
+      have hrefl := Finset.sum_range_reflect (fun i => i.choose j) (n + 1)
+      simp only [Nat.add_sub_cancel] at hrefl
+      rw [hrefl]
+      exact Nat.sum_range_choose_right n j
+  | succ l ih =>
+      intro n j
+      induction n with
+      | zero =>
+          have h1 : Nat.choose 1 (l + 1 + j + 1) = 0 := Nat.choose_eq_zero_of_lt (by omega)
+          simp [h1]
+      | succ n ihn =>
+          rw [Finset.sum_range_succ' (fun i => i.choose (l + 1) * (n + 1 - i).choose j) (n + 1)]
+          have hzero : (0 : ℕ).choose (l + 1) * (n + 1 - 0).choose j = 0 := by simp
+          have hbody : ∀ i ∈ range (n + 1),
+              (i + 1).choose (l + 1) * (n + 1 - (i + 1)).choose j
+                = i.choose l * (n - i).choose j + i.choose (l + 1) * (n - i).choose j := by
+            intro i _
+            rw [show n + 1 - (i + 1) = n - i by omega, Nat.choose_succ_succ, Nat.add_mul]
+          rw [Finset.sum_congr rfl hbody, Finset.sum_add_distrib, hzero, Nat.add_zero,
+            ih n j, ihn, show l + 1 + j + 1 = l + j + 1 + 1 by omega,
+            Nat.choose_succ_succ (n + 1) (l + j + 1)]
+
+end Binomial
+
 variable {G : Type*} [Group G]
 
 /-! ## The ordered collection tail -/
