@@ -326,3 +326,51 @@ Lazard–Leibman」という前節の判断根拠が消えたので、評価を�
 - `PolynomialSequences.lean` (184 行、sorry 0、axiom-clean) は**残す** —
   「`n ↦ aⁿbⁿ` は多項式列」は独立した本物の結果。ただし Mann ルートでは critical path 外に
   なるので docstring にその旨を明記する。
+
+## ✅ 2026-07-20: 完了 — Mann ルートで Thm E.1 を証明 (sorry-free / axiom-clean)
+
+`AppE.hallCollection` の sorry が消えた。AppE sorry 9 → 8。**App.E 依存グラフの唯一の根が閉じた**。
+
+### 成果物 (全て sorry 0、公理は propext / Classical.choice / Quot.sound のみ)
+
+| leaf | 行数 | 内容 |
+|---|---|---|
+| `GroupTheory/FormalCommutator.lean` | 269 | 形式的交換子 (`FreeMagma X`)、weight/support、評価 (古典規約 `[a,b]=a⁻¹b⁻¹ab`)、交換恒等式 `E u·E v = E v·E u·E (u*v)`、`card_support_le_weight`、代入補題 |
+| `GroupTheory/FormalCollection.lean` | 470 | 収集エンジン: fuel 付き `extract` → `collect_split` (1 パス) → `split_level` (濃度 k) → `split_levels` → `exists_split_supports` |
+| `GroupTheory/HallPetresco.lean` | 400 | 展開語、スロット代入、レベルごとの数え上げ、`blockValue_eq_of_card_eq`、`prod_pow_card_eq_prod_hallValue`、`hallValue_mem_lowerCentralSeries`、`exists_hallPetresco` |
+
+⟹ 合計 ~1,140 行。**当初見積り 800–1,000 行とほぼ一致**。
+
+### 主定理 (m 生成元の一般形)
+
+`OddOrder.GroupTheory.HallPetresco.exists_hallPetresco (xs : List G) (hn : 1 ≤ n)`:
+
+    ∃ τ : ℕ → G, (∀ k, 1 ≤ k → k ≤ n → τ k ∈ γ_k) ∧ τ 1 = x₁⋯x_m ∧
+      x₁ⁿ⋯x_mⁿ = τ₁^C(n,1)·τ₂^C(n,2)⋯τₙ^C(n,n)
+
+**冪零性の仮定なし・class の上界なし・群に制限なし**。BG の 2 生成元形
+(`AppE.hallCollection`) はこの系。CLAUDE.md の「特殊化債務は一般化する」に沿って
+最初から m 生成元で作った。
+
+### 証明の要 (Mann / DDMS App.A)
+
+`xⁿyⁿ` を直に収集すると各交換子の出現回数を数える必要が生じ、そこで
+「収集係数が `C(n,k)` で割れる ℤ-多項式」= Hall 多項式が要る。代わりに
+**n 個のコピーそれぞれに固有のスロットを与えた展開語を 1 回だけ収集**し、各因子が
+触れるスロット集合でブロック分けする。スロット集合 A の代入 (A の外の文字を 1 に潰す)
+で **support ⊄ A のブロックが消え、残りは A を知らない** ので、
+`x₁^{|A|}⋯x_m^{|A|} = ∏_{∅≠S⊆A} blockValue S`。左辺は |A| にしか依らないので
+|A| の強帰納で **blockValue は |S| にしか依らない**。二項係数は
+**n 元集合の k 元部分集合の個数**として現れる。
+⟹ **自由冪零群も basic commutator も Hall 多項式も不要**。
+
+技術的な要点 2 つ:
+- 収集の停止性は **fuel 付き反復 + 数え上げ補題**に落ちる (整礎再帰を書かない)。
+  交換で生じるブラケットは support が真に大きくなるので、濃度順に処理すれば
+  「そのパスで選ばれる因子」が 1 回ごとにちょうど 1 個減る。
+- 分解の出力は **support → ブロックの関数**でなければならない (`Forall₂` の対リスト
+  では blocks が assignment に依存しうる)。1 つの分解を全ての A で使うのが Mann の肝。
+
+### 本 claim は close 相当
+
+残るのは E.2 以降 (AppE の 8 sorry) で、これは本 issue のスコープ外 (issue 3021)。
