@@ -456,6 +456,56 @@ theorem caseB_etaHom_mul_scalars
 
 end CaseBTwist
 
+/-- **Peterfalvi (9.7.b), the `W₁ ≅ Aut F` clause.**  In Clifford case (b) there is a field `F`
+of order `p^q` and a subgroup `U* ≤ F*` such that `H̄ ↔ F` additively, `Ū ↔ U*` by multiplication,
+and `W₁ ↔ Aut F` acting naturally.
+
+This assembles the whole of (9.7.b):
+
+* the Singer field model normalized at a base point `s ∈ W̄₂^#` (`…_basePoint`);
+* `U*` generates `F` additively (`…_scalarRange_eq_top`), the `hgen` of the abstract upgrade;
+* the twist identity (`caseB_etaHom_mul_scalars`), its `hmul`;
+* hence `η` lands in the **ring** automorphisms (`ringAutHomOfAddAutHom`);
+* `η` is injective (`caseB_etaHom_injective`) and `|W₁| = q = |Aut F|`
+  (`natCard_ringAut_galoisField`), so `η` is onto `Aut F`. -/
+theorem caseB_exists_galoisField_repr_withAut [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+    ∃ (e : Additive (↥data.H ⧸ chief.N) ≃+ GaloisField chief.p data.q)
+      (μ : ↥(MonoidHom.range (uActionHom data chief)) →*
+        (GaloisField chief.p data.q)ˣ)
+      (η : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) →*
+        RingAut (GaloisField chief.p data.q)),
+      Function.Injective μ ∧
+      (∀ (u : ↥(MonoidHom.range (uActionHom data chief)))
+        (x : ↥data.H ⧸ chief.N),
+        e (Additive.ofMul ((MonoidHom.range (uActionHom data chief)).subtype u x)) =
+          ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
+            e (Additive.ofMul x)) ∧
+      Function.Bijective η ∧
+      (∀ (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+        (h : ↥data.H ⧸ chief.N),
+        η w (e (Additive.ofMul h)) = e (Additive.ofMul (w1ActionHom data chief w h))) := by
+  letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  obtain ⟨s, hsfix, hs1⟩ := chiefFactor_exists_fixedByE_ne_one chief
+  obtain ⟨e, μ, hμinj, hcompat, hnorm⟩ :=
+    caseB_exists_galoisField_repr_basePoint chars caseB hs1
+  have hfix : ∀ w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)),
+      w1ActionHom data chief w s = s := fun w => (mem_fixedSubgroup.mp hsfix) _ w.2
+  have hgen := caseB_addSubgroup_closure_scalarRange_eq_top caseB e μ hcompat
+  refine ⟨e, μ, ringAutHomOfAddAutHom (caseB_etaHom (chief := chief) e) hgen
+      (fun w σ hσ t => caseB_etaHom_mul_scalars hcompat hnorm hfix w σ hσ t),
+    hμinj, hcompat, ?_, fun w h => by simp⟩
+  have hcardAut : Nat.card (RingAut (GaloisField chief.p data.q)) = data.q :=
+    natCard_ringAut_galoisField chief.p data.q data.nontrivial.2.1.ne_zero
+  haveI : Finite (RingAut (GaloisField chief.p data.q)) :=
+    Nat.finite_of_card_ne_zero (by rw [hcardAut]; exact data.nontrivial.2.1.ne_zero)
+  refine (Nat.bijective_iff_injective_and_card _).mpr
+    ⟨ringAutHomOfAddAutHom_injective _ hgen _ (caseB_etaHom_injective e), ?_⟩
+  rw [hcardAut]
+  exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : data.typeP.W1 ≤ _)).toEquiv
+
 /-- The realized subgroup `C = C_U(H̄)` being trivial makes `uActionHom` injective. -/
 theorem uActionHom_injective_of_cSub_eq_bot [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
