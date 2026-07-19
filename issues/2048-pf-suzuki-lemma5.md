@@ -85,8 +85,39 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
     - [x] Lemma 4 直後の scalar-extension corollary: 任意の拡大体上で
           `L₁` と同型な `F₂`-linear invariant subspace が `L₂` に存在しないことを
           `not_exists_injective_intertwiner_to_baseChange_of_higman_bracket` として示す
-    - [ ] Higman Lemma 5: `H² = H₂` の下で平方写像 `L₁ → L₂` の
+    - [x] Higman Lemma 5: `H² = H₂` の下で平方写像 `L₁ → L₂` の
           scalar-extension 公式と一意性を構成する
+      - [x] source仮定 `Agemo H 2 1 = H₂` を構成用包含へ接続し、代表元の平方を
+            actual quotient map `L₁ → L₂` に降ろす
+      - [x] quadratic add law、`QuadraticMap (ZMod 2)` bundle、polar = actual
+            commutator bracket を証明する
+      - [x] ambient automorphism作用に関する equivariance と、余域だけを拡大した
+            `L₁ → K ⊗ L₂` の add law / equivariance を証明する
+      - [x] ordered basis上の upper-triangular quadratic candidate、そのpolar、
+            Frobenius-power座標の pairwise-exponent 公式を証明する
+      - [x] Lemma 4 Corollaryから uniqueness principleを導き、actual
+            `lowerCentralSquareMapBaseChange` に source-facing に instantiate する
+      - [x] 一般の faithful irreducible cyclic `L₁` actionから、full Singer-orderを
+            仮定せず normalized Frobenius-conjugate eigenbasisを構成する
+            (`FrobeniusCoordinates.lean`, issue 9300)
+      - [x] candidateの actor-equivarianceを証明してactual uniquenessを適用し、
+            `exists_lowerCentralSquareMap_eq_frobeniusSum` として actual square mapの
+            表示公式を結論する
+    - [ ] Higman Lemma 6: `H² = H₂` の下で `L₃` が `L₂` と
+          `ξ`-同型でないことを actual lower-central layers 上で証明する
+      - [x] 代表元 `[x,y]` から actual `L₂ × L₁ → L₃` を二重 quotient descent で
+            構成し、`F₂`-双線形性、full span、ambient automorphism equivariance を証明する
+      - [x] `L₁ × L₁ → L₂` と合成した actual triple commutator
+            `[[x,y],z]` を三重線形化し、その値が `L₃` を span することを証明する
+            (`HigmanLowerCentralDegreeThree.lean`)
+      - [ ] `L₂ ≃ξ L₃` から各 layer 上の actor kernel/order の一致と
+            `finrank L₁ = finrank L₂` を原文 p. 85 の議論どおり導く
+      - [ ] Neumann の位数 3 fixed-point-free automorphism theorem を形式化し、
+            `finrank L₂` が奇数であることを導く
+      - [ ] pair/triple Frobenius weight の指数算術と
+            `[u²,u] = 1` の actual square-map 接続から triple bracket を消去する
+      - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
+            Lemma 6 の否定定理を組み立てる
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
@@ -125,5 +156,6 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/higman/pages/suzuki-2-groups-p087.png`
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
+- `OddOrder/Higman/Suzuki2Groups/HigmanSquareMap.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/QuadraticExtensions.lean`

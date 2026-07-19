@@ -71,9 +71,40 @@ Option A のみなので、hub の裁定対象は「A を再検討するか、B�
 hub 裁定が本 issue に記録され、lane a が type-II 側 (8.15) instance の実装方針を
 一意に決められる状態になること。
 
+## 2026-07-19 追記 (lane a 実測): gate の範囲は (8.15)/(8.18) より広い — (9.11) M 側も同 gate
+
+Pf 本文 frontier の次項目として **(9.11) の type-II 一般化**に着手しようとして実測したところ、
+**これも本 issue に gated** と判明した。frontier note を再分類済
+(`notes/peterfalvi/frontier_measured_2026_07_19.md` §9 (9.11) 行)。
+
+実測内容 (htype を leaf まで trace):
+
+- `coherent_sOf_H0Cprime` (S13_Orthogonality.lean:1197) の `htype : IsTypeIII ∨ IsTypeIV` は
+  **(9.11) の数学に使われていない**。全て `C_eq_cSub_of_noncoherent` (S13_CoreStructure.lean:511)
+  へ流れ込む**辞書同一視** (packaging の `H₀C′` ↔ generic `cprimeSub` 層) の artifact。
+  そこから (11.7) `H₀ = 1` → `ChiefFactorData.typeIII_IV_p_eq_W2` (`|W₂| = p`) に落ちる。
+  この `|W₂| = p` は **type II では偽** (`chiefFactor_basic` docstring に明記:
+  `|W₂|^q = |H| = p^q·|H₀|` ゆえ `|W₂| = p` は `H₀ = 1` のときのみ)。
+- 生の §9 装置 (`S11_NineEleven*`) は `TypesIIIIIIVSetup` (type_alt は type II 込みの 3 分岐)
+  上に書かれており **既に type-agnostic**。
+- **type-II を含む honest な (9.11) は既に存在する**:
+  `Hypothesis.sSet_coherent_indS_A` (S15_CaseACoherence.lean:713) は**型仮説を一切取らず**、
+  support に **本 issue の Option B′ = `honestTypeP2ASet`** を使う。
+  `nineElevenEqualityRefutationS` の docstring が明言: 「M 側の `htype`/`hncH0C` は
+  packaging を generic 層と同一視するためだけに在り、S-instance では辞書が定義的なので消える」。
+
+⟹ **M 側 (9.11) を type-II へ広げる = §12 hypothesis 層の作り直し**:
+1. `S12.Hypothesis.type_alt : IsTypeIII ∨ IsTypeIV ∨ IsTypeV` (S12_MaximalIII_IV_V_Core/
+   Hypothesis.lean:353) ゆえ **type-II では文が立たない**。
+2. `base.A0 = supportInSubgroup (typePA0 M typeP) M` が誤った `typePA = (M')^#` 上に建つ
+   = **まさに本 issue の争点**。
+⟹ **裁定 (Option A vs B′) の波及先に (9.11) M 側も加えて評価されたい**。
+なお §15 が既に B′ を実装して回っている事実は、B′ 側の実現可能性の証拠になる。
+
 ## 参照
 
 - issues/closed/9008 (Option B 裁定と re-open 条件)
+- issues/closed/1043-pf-9-7-full-fidelity.md ((9.7) 完了; 次項目調査で本追記に至った)
 - issues/1042-pf-8-15-dade-hypothesis-instances.md (着手順 3 の gate 注記)
 - OddOrder/GroupTheory/MaximalSubgroupType.lean:436 (`typePA_eq_sharpSubgroup_derivedInG` の
   caveat docstring = 9008 の要約)

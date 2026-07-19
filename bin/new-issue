@@ -7,9 +7,14 @@
 #     base 0    → main/trunk セッション (0000-0999, SEQUENCE)
 #     base 1000 → 並行セッション #1      (1000-1999, SEQUENCE.1000)
 #     base 2000 → 並行セッション #2      (2000-2999, SEQUENCE.2000) ...
-#   base は 1000 の倍数. レンジごとに別 SEQUENCE ファイルを使うので,
-#   ブランチ越しでも採番もマージも衝突しない. レンジ幅 1000 を使い切ったら
-#   エラーで知らせる (= 再分割を検討するタイミング, notes/meta/issue_management.md).
+#   base は 100 の倍数. 1000 の倍数ならレンジ幅 1000, それ以外は幅 100.
+#   レンジごとに別 SEQUENCE ファイルを使うので, ブランチ越しでも採番もマージも
+#   衝突しない. レンジを使い切ったらエラーで知らせる (= 再分割を検討する
+#   タイミング, notes/meta/issue_management.md).
+# - ⚠ shared-infra claim (9000 番台) は **レーン別サブバンド**を使う
+#   (hub 裁定 2026-07-19, issue 0130): 9200=a / 9300=b / 9400=c / 9500=hub.
+#   共有カウンタ SEQUENCE.9000 は未マージのレーン同士が同じ番号を引くため
+#   1 日に 2 度衝突した (9163, 9164). 9000-9199 は既存分の歴史的レンジ.
 # - SEQUENCE ファイルは mkdir 原子ロックで保護 (macOS に flock(1) が無いため)
 # - slug は ASCII (小文字英数字 + ハイフン) 必須, ファイル名で使う
 # - title は自由 (日本語可), frontmatter と H1 に入る
@@ -20,14 +25,17 @@ usage() {
   cat >&2 <<'EOF'
 Usage: bin/new-issue [--base N] <slug> <title>
 
-  --base N  採番レンジの基点 (省略時 $ODD_ISSUE_BASE, 既定 0). 1000 の倍数.
-            0=main, 1000=並行セッション#1, 2000=#2, ...
+  --base N  採番レンジの基点 (省略時 $ODD_ISSUE_BASE, 既定 0). 100 の倍数.
+            1000 の倍数 → 幅 1000 (0=main, 1000=lane a, 2000=b, 3000=c),
+            それ以外    → 幅 100  (9200=a / 9300=b / 9400=c / 9500=hub の
+                                   shared-infra claim サブバンド)
   slug      ASCII 小文字英数字 + ハイフン (例: bg-s1-lem-1-7b-sorry)
   title     自由形式 (日本語可, 例: "BG §1 Lem 1.7(b) sorry を埋める")
 
 例:
   bin/new-issue bg-s1-lem-1-7b-sorry "BG §1 Lem 1.7(b) sorry を埋める"
   bin/new-issue --base 1000 pf-s10-thm-x "Peterfalvi §10 Thm X を形式化"
+  bin/new-issue --base 9200 dedup-foo-bar "shared infra の重複を解消" # lane a の claim
 EOF
   exit 1
 }
@@ -48,10 +56,14 @@ if ! [[ "$base" =~ ^[0-9]+$ ]]; then
   echo "Error: --base は非負整数 (got: '$base')" >&2
   exit 1
 fi
-if (( base % 1000 != 0 )); then
-  echo "Error: --base は 1000 の倍数 (got: '$base'). レンジ重複を防ぐため" >&2
+if (( base % 100 != 0 )); then
+  echo "Error: --base は 100 の倍数 (got: '$base'). レンジ重複を防ぐため" >&2
   exit 1
 fi
+# レンジ幅: 1000 の倍数 → 1000 (レーン本体), それ以外の 100 の倍数 → 100
+# (= 9000 番台 shared-infra claim をレーン別サブバンドに割るための細分割.
+#  9200=a / 9300=b / 9400=c / 9500=hub, 9600 以降は将来レーン・枯渇時の再割当用)
+if (( base % 1000 == 0 )); then range_width=1000; else range_width=100; fi
 
 if [[ ! "$slug" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
   echo "Error: slug は小文字英数字 + ハイフンのみ (got: '$slug')" >&2
@@ -72,7 +84,7 @@ else
   SEQ_FILE="$ISSUES_DIR/SEQUENCE.$base"
 fi
 LOCK_DIR="$ISSUES_DIR/.lock"
-RANGE_END=$((base + 1000))   # レンジ幅 1000 (排他上限)
+RANGE_END=$((base + range_width))   # 排他上限 (幅は上の range_width)
 
 [[ -d "$ISSUES_DIR" ]] || { echo "Error: $ISSUES_DIR が無い" >&2; exit 1; }
 

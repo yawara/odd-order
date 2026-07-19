@@ -81,13 +81,20 @@ issues/
 | **2000** | **2000-2999** | **lane b** (Suzuki チェーン) | `issues/SEQUENCE.2000` |
 | **3000** | **3000-3999** | **lane c** (BG 残 + Pf Appendices 非 Suzuki 系) | `issues/SEQUENCE.3000` |
 | 4000+ | (1000 ごと) | 追加の ad-hoc 並行セッション | `issues/SEQUENCE.N` |
-| **9000** | **9000-9999** | **shared-infra claim (未所有 leaf 着手宣言, 確定 2026-07-01)** | `issues/SEQUENCE.9000` |
+| ~~9000~~ | 9000-9199 | shared-infra claim の**歴史的レンジ** (共有カウンタ、2026-07-19 に凍結) | `issues/SEQUENCE.9000` |
+| **9200** | **9200-9299** | **shared-infra claim — lane a** | `issues/SEQUENCE.9200` |
+| **9300** | **9300-9399** | **shared-infra claim — lane b** | `issues/SEQUENCE.9300` |
+| **9400** | **9400-9499** | **shared-infra claim — lane c** | `issues/SEQUENCE.9400` |
+| **9500** | **9500-9599** | **shared-infra claim — hub/main** | `issues/SEQUENCE.9500` |
+| 9600+ | (100 ごと) | 将来レーン / サブバンド枯渇時の再割当 | `issues/SEQUENCE.N` |
 
 **Peterfalvi の並行作業は base 1000 に固定**(`ODD_ISSUE_BASE=1000`)。これは予約済みなので
 他の並行セッションには使わない。Peterfalvi 以外の ad-hoc な並行作業は 2000 以降を割り当てる。
 
 - base は **`--base N` 引数** または **環境変数 `ODD_ISSUE_BASE`** で渡す (既定 0).
-  base は **1000 の倍数のみ** (レンジ重複防止のため `new-issue` が検証).
+  base は **100 の倍数のみ** (レンジ重複防止のため `new-issue` が検証).
+  **1000 の倍数ならレンジ幅 1000** (レーン本体)、**それ以外は幅 100** (9000 番台の
+  shared-infra claim サブバンド).
 - **レンジごとに別 SEQUENCE ファイル** (`SEQUENCE.N`) を使うので, 採番もマージも
   衝突しない (異なるファイル = git は両方そのまま残す). `SEQUENCE.N` は初回
   `new-issue --base N` 時に遅延作成 (初期値 N-1, 最初の issue = N).
@@ -98,7 +105,17 @@ issues/
 - レンジ幅 1000 を使い切ると `new-issue` がエラーで知らせる = **採番レンジを
   再分割 / 幅を見直すタイミング** (issue が増えてきたら再考).
 
-### shared-infra claim (9000 番台, 確定 2026-07-01)
+### shared-infra claim (9000 番台, 確定 2026-07-01 / レーン別サブバンド化 2026-07-19)
+
+> **🔢 2026-07-19 hub 裁定 (issue 0130): 9000 は共有カウンタをやめ、レーン別サブバンドにする。**
+> `SEQUENCE.9000` は「1 レンジ = 1 書き手」の前提を唯一破っており、2026-07-18 の
+> 「max(SEQUENCE, 実在ファイル最大) + 1」補強でも**未マージのレーン同士の同時採番は防げない**
+> (実害: 同日 2 度 — 9163 = b が 23 commits 遅れの stale checkout で二重採番 / 9164 = a と b が
+> main 取り込み直後にそれぞれ次番号を引いて衝突)。
+> ⟹ **claim も自レーン専用バンドから採る**: **9200=a / 9300=b / 9400=c / 9500=hub**
+> (`--base 9200` 等、幅 100)。SEQUENCE ファイルが別なので**構造的に衝突しない**。
+> 9000-9199 は既存 claim の歴史的レンジ (改番しない)。**「9xxx = shared claim」の grep 規約は不変**
+> (`ls issues/9*.md` で全レーンの open claim を走査できる)。
 
 **未所有 leaf**（`OddOrder/Algebra|GroupTheory/**` 等、どのレーンも所有しない共有 infra）を
 新設して genuine FT math を積むとき（`ft_path_policy.md` §0 policy 5(A)(B) の「gated → 上流 ungated
@@ -108,8 +125,9 @@ infra に降りる」で発生）、**複数レーンが同じ上流 infra を�
 1. **検索**（着手前・必須）: repo を「教科書番号 + descriptive 名 2 案以上 + import grep」で検索し、
    既存を確認（[[verify-port-state-by-number-not-coq-name]] [[s09-is-section7-chirho-complete]]）。
    既に在れば cite（再構築しない）。
-2. **claim**: 不在確認後、`bin/new-issue --base 9000 <slug> "claim: <leaf> — <補題名/教科書 ref> (lane X)"`
-   で 9000 番台 issue を 1 件切り、**着手の最初のコミットで main に乗せる**（`export ODD_ISSUE_BASE=9000`）。
+2. **claim**: 不在確認後、`bin/new-issue --base <自レーンの claim バンド> <slug> "claim: <leaf> —
+   <補題名/教科書 ref> (lane X)"` で 9xxx issue を 1 件切り、**着手の最初のコミットで main に乗せる**
+   （バンド = a:9200 / b:9300 / c:9400 / hub:9500。`export ODD_ISSUE_BASE=9300` 等）。
    本文に target leaf・提供する補題（署名）・consumer・lane を書く。
 3. **scan**（着手前・必須）: 全レーンは shared infra 着手前に `issues/` の **open 9000 番台**を読む
    （定期 main 同期にフック）。同一 ref の claim が在れば重複回避（cite する / その lane に委ねる）。

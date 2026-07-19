@@ -238,6 +238,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
@@ -8196,6 +8198,59 @@ an arbitrary scalar extension of the second layer. -/
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.not_exists_injective_intertwiner_to_baseChange_of_higman_bracket
 
+/-! **Higman Lemma 5**: the source square-subgroup hypothesis feeds the actual
+quadratic square map.  A normalized Frobenius-conjugate simultaneous
+eigenbasis makes the upper-triangular candidate equivariant; Lemma 4's
+Corollary then identifies it with the actual map and yields Higman's displayed
+pairwise formula after scalar extension. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquaresLieInSecond_of_agemo_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareQuadraticMap_polarBilin
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.upperQuadraticMap_apply_frobenius_sum
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.polarBilin_upperQuadraticMap
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareMapBaseChange_eq_of_add_law_and_equivariant
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.includeRight_eq_sum_conjugateTensorBasis
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_singerConjugateBasis_of_faithful_irreducible
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.upperQuadraticMap_equivariant_of_eigenbasis
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralSquareMapBaseChange_eq_upperQuadraticCandidate
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_lowerCentralSquareMap_eq_frobeniusSum
+
+/-! **Higman Lemma 6, degree-three group-theoretic layer**: the actual mixed
+commutator descends to `L₂ × L₁ → L₃`, spans `L₃`, and is equivariant.  Its
+composition with the degree-two bracket is the actual trilinear commutator
+`[[x,y],z]`, whose values also span `L₃`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.quotient_layerKernel_two_lowerCentralSeries_two_le_center
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_span_eq_top
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralDegreeThreeCommutatorBilinear_equivariant
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutatorTrilinear_span_eq_top
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
@@ -9136,6 +9191,30 @@ model transports along `U.subgroupOf (U ⊔ W₁) ≃ U`; no legacy opaque `fiel
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.uActionHom_injective_of_cSub_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_of_cSub_eq_bot
+
+/-! **Peterfalvi (9.7.b) `W₁ ≅ Aut F` clause, axiom-clean** (lane a, issue 1043 (b)).
+The book upgrades `η(w)` from an additive to a *field* automorphism, then counts.  Chain:
+base point `s ∈ W̄₂^#` (`chiefFactor_exists_fixedByE_ne_one`, from `|C_{H̄}(W₁)| = p`) normalizes
+the Singer model to `φ(s) = 1` (`…_basePoint`); `U*` generates `F` additively
+(`…_scalarRange_eq_top`); the twist identity `η(w)(μ u) = μ(w u w⁻¹)` — where `φ(s) = 1` and
+`s^w = s` collapse the displayed identity — gives multiplicativity against every scalar
+(`caseB_etaHom_mul_scalars`); the shared abstract layer `ringAutHomOfAddAutHom` then lands `η` in
+`RingAut F`; and injectivity (`w1ActionHom_injective`, via `|W₁| = q` prime and `p ≠ p^q`) plus
+`|Aut F| = q` (`natCard_ringAut_galoisField`) makes it onto. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_card_fixedByE
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_exists_fixedByE_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_basePoint
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.caseB_addSubgroup_closure_scalarRange_eq_top
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_etaHom_twist
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_etaHom_mul_scalars
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.w1ActionHom_injective
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_exists_galoisField_repr_withAut
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ringAutHomOfAddAutHom_injective
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.natCard_ringAut_galoisField
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.addSubgroup_closure_eq_top_of_irreducible
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_normalized_of_scalar_model
 
 -- Peterfalvi §13 (= repo `S13_MaximalIII_IV`, types III/IV) structural cluster.  After de-opacifying
 -- the `Hypothesis` scaffold (the `C = C_U(H)` field and the deleted opaque conclusion-Props), the

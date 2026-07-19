@@ -103,6 +103,7 @@ import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
 import OddOrder.GroupTheory.RepresentationTheory.BlockScalarSylow
