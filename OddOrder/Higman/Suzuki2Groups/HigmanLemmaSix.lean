@@ -1316,4 +1316,92 @@ theorem lowerCentralTripleCommutator_pairWeightFiber_terms_eq_zero
     exact hwz (atMostOne w z hw hzmem hwne hzne)
   exact hzne (Finset.eq_zero_of_sum_eq_zero hsum hothers z hzmem)
 
+set_option maxHeartbeats 800000 in
+-- The proof combines nested eigenweight and repeated-candidate classifications.
+/-- **Higman Lemma 6 (p. 86), elimination of all basis triple terms.**
+
+When the third-layer spectrum consists of pair weights, every nonzero actual
+triple term lies in one of their weight fibers. The three-distinct terms
+vanish by binary-weight separation, and the remaining terms vanish by the
+odd-gap fiber argument and the square-map zero sum. -/
+theorem lowerCentralTripleCommutator_all_terms_eq_zero
+    (K : Type uK) [Field K] [Algebra (ZMod 2) K]
+    {H : Type uH} {X : Type uX} [Group H] [Group X]
+    (phi : X →* MulAut H) (g : X)
+    {n : ℕ} [NeZero n] (hn : 3 ≤ n) (hnodd : Odd n)
+    (lambda : K) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (b : Fin n → K ⊗[ZMod 2] Additive (lowerCentralLayer H 0))
+    (hb : ∀ i,
+      (lowerCentralLayerRepresentation phi 0 g).baseChange K (b i) =
+        lambda ^ (2 ^ i.val) • b i)
+    (hspan : ⨆ mu ∈ Set.range (fun p : HigmanExponentPair n ↦
+        lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)),
+      Module.End.eigenspace
+        ((lowerCentralLayerRepresentation phi 2 g).baseChange K :
+          Module.End K (K ⊗[ZMod 2] Additive (lowerCentralLayer H 2))) mu = ⊤)
+    (r : ZMod n)
+    (hsupport : ∀ i j : Fin n,
+      lowerCentralCommutatorBilinearBaseChange K H (b i) (b j) ≠ 0 →
+        HasHigmanPairGap r i j)
+    (hsum : ∑ i : Fin n, ∑ j : Fin n with i < j, ∑ k : Fin n,
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H (b i) (b j))
+        (b k) = 0) :
+    ∀ q : HigmanExponentPair n, ∀ k : Fin n,
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H
+          (b q.1.1) (b q.1.2)) (b k) = 0 := by
+  classical
+  have hdistinct : ∀ (q : HigmanExponentPair n) (k : Fin n),
+      k ≠ q.1.1 → k ≠ q.1.2 →
+      lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+        (lowerCentralCommutatorBilinearBaseChange K H
+          (b q.1.1) (b q.1.2)) (b k) = 0 := by
+    intro q k hk₁ hk₂
+    exact lowerCentralTripleCommutator_eq_zero_of_threeDistinct
+      K phi g hn lambda hprim b hb hspan
+      q.1.1 q.1.2 k (ne_of_lt q.2) hk₁.symm hk₂.symm
+  intro q k
+  let T₃ : Module.End K
+      (K ⊗[ZMod 2] Additive (lowerCentralLayer H 2)) :=
+    (lowerCentralLayerRepresentation phi 2 g).baseChange K
+  let mu : K :=
+    lambda ^ (2 ^ q.1.1.val + 2 ^ q.1.2.val + 2 ^ k.val)
+  let term : K ⊗[ZMod 2] Additive (lowerCentralLayer H 2) :=
+    lowerCentralDegreeThreeCommutatorBilinearBaseChange K H
+      (lowerCentralCommutatorBilinearBaseChange K H
+        (b q.1.1) (b q.1.2)) (b k)
+  change term = 0
+  by_cases hterm : term = 0
+  · exact hterm
+  have hbeta := lowerCentralCommutatorBilinearBaseChange_eigenweight
+    K phi g
+    (lambda ^ (2 ^ q.1.1.val)) (lambda ^ (2 ^ q.1.2.val))
+    (b q.1.1) (b q.1.2) (hb q.1.1) (hb q.1.2)
+  have hgamma := lowerCentralDegreeThreeCommutatorBilinearBaseChange_eigenweight
+    K phi g
+    (lambda ^ (2 ^ q.1.1.val) * lambda ^ (2 ^ q.1.2.val))
+    (lambda ^ (2 ^ k.val))
+    (lowerCentralCommutatorBilinearBaseChange K H (b q.1.1) (b q.1.2))
+    (b k) hbeta (hb k)
+  have heigen : T₃ term = mu • term := by
+    simpa only [T₃, term, mu, pow_add, mul_assoc] using hgamma
+  have hhas : T₃.HasEigenvalue mu :=
+    Module.End.hasEigenvalue_of_hasEigenvector
+      ⟨Module.End.mem_eigenspace_iff.mpr heigen, hterm⟩
+  obtain ⟨p, hp⟩ :=
+    hasEigenvalue_mem_range_of_eigenspaces_iSup_eq_top
+      T₃ (fun p : HigmanExponentPair n ↦
+        lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)) hspan hhas
+  have hfiber := lowerCentralTripleCommutator_weightFiber_sum_eq_zero
+    K phi g n lambda b hb hsum
+      (lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val))
+  have hall := lowerCentralTripleCommutator_pairWeightFiber_terms_eq_zero
+    K H (by omega : 2 ≤ n) hnodd lambda hprim b r hsupport hdistinct p hfiber
+  have hweight :
+      lambda ^ (2 ^ q.1.1.val + 2 ^ q.1.2.val + 2 ^ k.val) =
+        lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val) := by
+    simpa only [mu] using hp.symm
+  simpa only [term] using hall (q, k) hweight
+
 end OddOrder.Higman.Suzuki2Groups
