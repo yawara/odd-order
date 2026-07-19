@@ -11,13 +11,30 @@
 > **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
-> # ⚠ 暫定 (issue 9158、a 停止中。a 復帰で下段の 9154 配分へ戻す)
-> a_re='^OddOrder/Isaacs/'
+> a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S'   # 2026-07-19 11:29 恒久復帰 (issue 9154)
 > b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
-> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
-> # 恒久 (issue 9154、a 復帰時): a='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S' / c は Pf S* を持たない
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
+> **▶ 2026-07-19 11:29 lane a 復帰 → 暫定裁定 9158 失効、9154 の恒久配分へ復帰**。
+> a は 05:36〜11:27 の 5h51m 停止 (60 秒後 wakeup が発火せずセッション終了) から復帰し、
+> 自ら 9158 を close した。hub が境界の衝突を確認: **衝突なし** —
+> a は Isaacs (Ch06/Ch07 + GroupTheory/ThompsonSubgroup、= 9154 が residue として挙げた
+> **Thm 6.23 standalone 化**に着手)、c は BG 側 (`CNGroupStructure` = App.D 系) で、
+> **どちらも Pf 本文に手を置いていない**。
+> ⟹ **Pf 本文 `OddOrder/Peterfalvi/S*` は a へ戻す** (9154 どおり)。
+> c が停止中に完了させた **Pf §3 (10/10) は合流済で保全**され、以後の Pf §4 以降は a が担当。
+> c の queue は BG に十分残る: issue 0126 (Thm A(6))、9132 (Hall collecting process =
+> App.E 全体の unlock)、9133 (CN 3-step = App.D の unlock)、App.D/E の実 sorry 11 件。
+
+> **📏 2026-07-19 hub 指摘 (issue 9160、lane b 宛、優先度 低)**: b の新設 leaf 32 本の
+> **中央値 177 行・平均 246 行** (c は 497/647) で、23 本が CLAUDE.md の目安 300 行を下回る。
+> 特に `Higman*` 系 9-10 本は issue 2048 (Suzuki Lemma 5) という**単一の目標への部品**で、
+> 「1 ファイル = 1 トピック」に照らすと 1〜3 ファイルに収まるべき塊。
+> ⚠ **即時是正は不要** — 作業中 frontier を小 leaf に置くのは CLAUDE.md の推奨形でもあり、
+> 現時点でビルド時間に悪影響も無い。**問題は「Lemma 5 が締まった後もこの粒度で凍結すること」**。
+> ⟹ 2048 を締めた区切りで topic 単位に統合する。詳細と落とし穴は issue 9160。
+
 > **⏸ 2026-07-19 暫定裁定 (issue 9158): lane a が停止 → Pf 本文を c へ暫定移管**。
 > a は 05:36 以降停止 (60 秒後の wakeup が発火せずセッション終了、`ahead 0/dirty 0` ゆえ成果損失ゼロ)。
 > 9154 で a に移した Pf 本文 (63-65 件、3 冊で最大) が無主状態になり凍結するため、**c へ暫定的に戻す**。

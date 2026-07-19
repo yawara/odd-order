@@ -4,7 +4,7 @@ slug: interim-realloc-a-down
 title: "暫定: lane a 停止中の Pf 本文の扱い — c へ暫定移管 (a 復帰で自動失効)"
 created: 2026-07-19
 owner: hub
-status: INTERIM (a 復帰で自動失効)
+status: CLOSED (a 復帰により失効, 2026-07-19)
 ---
 
 # 暫定: lane a 停止中の Pf 本文の扱い — c へ暫定移管
@@ -50,8 +50,8 @@ c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(Near
 
 ## やること
 
-- [ ] hub: 監視 cron のプロンプトを暫定 regex に更新
-- [ ] **a が復帰したら本 issue を close し、9154 の配分 (Pf 本文 = a) へ戻す**
+- [x] hub: 監視 cron のプロンプトを暫定 regex に更新
+- [x] **a が復帰したら本 issue を close し、9154 の配分 (Pf 本文 = a) へ戻す**
       — a は起動時の `git merge main` で本 issue を読むこと
 
 ## 完了条件
@@ -62,3 +62,28 @@ lane a が復帰し、9154 の配分に戻ったとき。
 
 - issue 9154 (恒久裁定。本 issue はその暫定的な上書き)
 - a の最終 commit: `6275a76fd docs(survey): Isaacs 特殊化債務 4.6 / 4.16 / 9.8 も stale だった`
+
+## 失効 (2026-07-19, lane a 復帰)
+
+lane a が復帰し `git merge main` で本 issue を読んだ。**9154 の恒久配分へ戻す**:
+
+```
+a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S'
+b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
+c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
+```
+
+### 暫定期間中の c の Pf 本文作業 — 境界は clean
+
+c は暫定裁定下で Pf §3 に着手し、`e5a223ce7 feat(pf §3): Clifford 対応 (1.7)(a) の
+distinctness を形式化 — Pf §3 完了 (10/10)` で**節を完了させて commit 済**。
+未コミットの引き継ぎ対象は無く、a は §3 を避けた最上流から入ればよい
+(9154 の「c が着手済みの未コミット作業は破棄せず a へ引き継ぐ」条項は発動不要)。
+
+⚠ c がこの後さらに Pf 本文へ commit していた場合は、本 issue でなく通常の
+territory 調整として hub が裁定する (a は merge 時に検出して申告する)。
+
+### a の着手順 (9154 準拠)
+
+1. **residue: Isaacs Thm 6.23 の standalone 化** (hub 裁定 §0、S サイズ、Pf 着手の前)
+2. Pf 本文を上流優先 + 文書順で自律進行 (§3 は c が完了済ゆえスキップ)
