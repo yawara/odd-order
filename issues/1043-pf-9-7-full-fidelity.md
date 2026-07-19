@@ -33,6 +33,20 @@ frontier_measured_2026_07_19.md §9 行の狭さ 2 点の解消。書籍 stateme
   (OddOrder/GroupTheory/RepresentationTheory/TypePGaloisUBound.lean)。
   hpow (全 block scalar char が a-torsion) から `∀ u i, (ψ u i)^a = 1` 付き埋め込み。
 
+## 進捗
+
+- **✅ 2026-07-19 (a) 完了** (S11_ImprimitiveUBound.lean、全宣言 axiom-clean):
+  - step 1: `lineScalarChar_aInvariantSubrep_ker_eq` + `card_range_lineScalarChar_aInvariantSubrep`
+    (kernel 一致 → 第一同型定理で像位数一致)
+  - step 2: `caseA_card_range_restrictAut_Hpart` (書籍「|U/C_U(H_i)| = a for all i」;
+    MulAut.conjNormal 共役で kernel cardinality 不変)
+  - step 3: `caseA_pow_a_eq_one` (**exp(Ū) ∣ a** — 各 block scalar が a-torsion → u^a が
+    全 summand 固定 → span + 忠実性で u^a = 1) +
+    `caseA_exists_blockScalarRatioEmbedding_orderA` (order-a 埋め込み本体; 既存 crux を
+    複製せず exponent 経由で導出)
+  - 残る (a) の小片: 「U/C_U(H_i) は **cyclic** of order a」の cyclic 側の明示
+    (MulAut(位数 p 巡回群) が巡回 ⟹ 部分群巡回; 位数 = a は step 2 で済)。
+
 ## (a) 残り: concrete bridge (S11 側)
 
 1. **S0-block の scalar char 像の位数 = a**: `a_eq_card_restrictAut_range` (a = |range

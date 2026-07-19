@@ -720,4 +720,108 @@ theorem caseA_card_range_restrictAut_Hpart (caseA : CliffordCaseAData chars) (j 
 
 end OrbitTransport
 
+/-! ### The (9.7.a) order-`a` embedding (issue 1043 step 3)
+
+Assembly: the block image orders pin `exp(Ū) ∣ a` (each block scalar has order dividing `a`, the
+blocks span `H̄`, and `Ū` acts faithfully), and then **any** hom out of `Ū` — in particular the
+ratio embedding of `caseA_exists_blockScalarRatioEmbedding` — automatically has `a`-torsion
+values.  This realizes the book's "`Ū` is isomorphic to a subgroup of the direct product of
+`q − 1` cyclic groups of order `a`" (p. 51) without re-running the `psi` injectivity crux. -/
+
+section OrderAEmbedding
+
+variable [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+  {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+
+/-- Values of a homomorphism out of a finite group are killed by the image order:
+`(f g) ^ |range f| = 1`. -/
+theorem pow_card_range_eq_one {G' H' : Type*} [Group G'] [Group H'] [Finite H']
+    (f : G' →* H') (g : G') : f g ^ Nat.card f.range = 1 := by
+  have h := pow_card_eq_one' (G := f.range) (x := ⟨f g, ⟨g, rfl⟩⟩)
+  have hval := congrArg Subtype.val h
+  simpa using hval
+
+/-- **Range invariance under the range-subtype re-basing**: restricting the action of the image
+group `Ū = range φ` (through the inclusion) to an invariant block has the same automorphism range
+as restricting the `φ`-action itself — `aInvariantRestrictAut` over `(range φ).subtype` at
+`⟨φ a, _⟩` *is* `aInvariantRestrictAut` over `φ` at `a`. -/
+theorem aInvariantRestrictAut_range_subtype_range_eq {A K : Type*} [Group A] [Group K]
+    {φ : A →* MulAut K} {J : Subgroup K} (hJ : IsAInvariant φ J) :
+    (aInvariantRestrictAut (isAInvariant_range_subtype hJ)).range
+      = (aInvariantRestrictAut hJ).range := by
+  have happ : ∀ a : A,
+      aInvariantRestrictAut (isAInvariant_range_subtype hJ) ⟨φ a, ⟨a, rfl⟩⟩
+        = aInvariantRestrictAut hJ a := by
+    intro a
+    refine MulEquiv.ext fun y => Subtype.ext ?_
+    rw [aInvariantRestrictAut_coe, aInvariantRestrictAut_coe]
+    rfl
+  ext f
+  constructor
+  · rintro ⟨⟨_, a, rfl⟩, rfl⟩
+    exact ⟨a, (happ a).symm⟩
+  · rintro ⟨a, rfl⟩
+    exact ⟨⟨φ a, ⟨a, rfl⟩⟩, happ a⟩
+
+/-- **The Clifford integer kills `Ū`** (Peterfalvi (9.7.a)): `u ^ a = 1` for every
+`u ∈ Ū = range (uActionHom)`.  Each block scalar has order dividing `a`
+(`caseA_card_range_restrictAut_Hpart` + Lagrange), so `u ^ a` fixes every Clifford summand
+pointwise; the summands span `H̄` (`Hpart_iSup`), and `Ū` acts faithfully (it *is* a subgroup of
+`MulAut H̄`).  This is the exponent form of the book's embedding into `q − 1` cyclic groups of
+order `a`. -/
+theorem caseA_pow_a_eq_one (caseA : CliffordCaseAData chars)
+    (u : ↥(MonoidHom.range (uActionHom data chief))) : u ^ caseA.a = 1 := by
+  classical
+  -- `u ^ a` fixes each summand pointwise
+  have hblock : ∀ i : Fin data.q, ∀ x ∈ caseA.Hpart i,
+      ((MonoidHom.range (uActionHom data chief)).subtype (u ^ caseA.a)) x = x := by
+    intro i
+    have hcard : Nat.card (aInvariantRestrictAut
+        (isAInvariant_range_subtype (caseA.Hpart_aInvariant i))).range = caseA.a := by
+      rw [aInvariantRestrictAut_range_subtype_range_eq (caseA.Hpart_aInvariant i),
+        caseA_card_range_restrictAut_Hpart]
+    have hone : aInvariantRestrictAut (isAInvariant_range_subtype (caseA.Hpart_aInvariant i))
+        (u ^ caseA.a) = 1 := by
+      rw [map_pow, ← hcard]
+      exact pow_card_range_eq_one _ u
+    exact (aInvariantRestrictAut_eq_one_iff _ _).mp hone
+  -- the fixed locus is a subgroup; it contains every summand, hence `⊤`
+  have htop : ∀ x : ↥data.H ⧸ chief.N,
+      ((MonoidHom.range (uActionHom data chief)).subtype (u ^ caseA.a)) x = x := by
+    have hle : (⊤ : Subgroup (↥data.H ⧸ chief.N)) ≤ MonoidHom.eqLocus
+        ((MonoidHom.range (uActionHom data chief)).subtype
+          (u ^ caseA.a) : MulAut (↥data.H ⧸ chief.N)).toMonoidHom
+        (MonoidHom.id (↥data.H ⧸ chief.N)) := by
+      rw [← caseA.Hpart_iSup]
+      refine iSup_le fun i x hx => ?_
+      exact hblock i x hx
+    intro x
+    exact hle (Subgroup.mem_top x)
+  -- faithfulness: the subgroup inclusion into `MulAut H̄` is injective
+  refine Subtype.ext ?_
+  refine MulEquiv.ext fun x => ?_
+  exact htop x
+
+/-- **Peterfalvi (9.7.a), the order-`a` block-scalar ratio embedding** (issue 1043): `Ū` embeds
+into `q − 1` copies of `(ZMod p)ˣ` with all component values killed by `a` — i.e. into the direct
+product of `q − 1` copies of the unique **cyclic subgroup of order `a`** of `(ZMod p)ˣ`
+(`a ∣ p − 1`, `caseA.a_dvd_p_sub_one`).  Refines `caseA_exists_blockScalarRatioEmbedding` with
+the order information that Peterfalvi (14.6) consumes; immediate from the exponent fact
+`caseA_pow_a_eq_one` (`(ψ u i) ^ a = ψ (u ^ a) i = 1`). -/
+theorem caseA_exists_blockScalarRatioEmbedding_orderA (caseA : CliffordCaseAData chars) :
+    ∃ ψ : ↥(MonoidHom.range (uActionHom data chief)) →*
+        (Fin (data.q - 1) → (ZMod chief.p)ˣ),
+      Function.Injective ψ ∧
+        ∀ (u : ↥(MonoidHom.range (uActionHom data chief))) (i : Fin (data.q - 1)),
+          (ψ u i) ^ caseA.a = 1 := by
+  obtain ⟨ψ, hinj⟩ := caseA_exists_blockScalarRatioEmbedding chars caseA
+  refine ⟨ψ, hinj, fun u i => ?_⟩
+  have hpow : (ψ u i) ^ caseA.a = ψ (u ^ caseA.a) i := by
+    rw [map_pow]
+    rfl
+  rw [hpow, caseA_pow_a_eq_one caseA u, map_one]
+  rfl
+
+end OrderAEmbedding
+
 end OddOrder.Peterfalvi.S11
