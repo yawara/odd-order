@@ -139,7 +139,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [x] actual `L₂` の Frobenius eigenbasis と bracket の full span を接続し、
               全ての非零 basis bracket が一つの cyclic gap `±r` に支えられることを示す
         - [x] actual triple-bracket の零和を固有値 fiber ごとに分離する
-        - [ ] 各 pair-weight fiber を二つの repeated 候補へ縮約し、odd-gap 排他から消去する
+        - [x] distinct-index 項の消滅を仮定した各 pair-weight fiber を二つの
+              repeated 候補へ縮約し、odd-gap 排他と零和から全項を消去する
+        - [ ] `L₃` の pair-weight eigenspace span を使い、distinct-index の actual
+              triple-bracket 項をゼロにする
       - [ ] triple full span と `L₂ ≃ξ L₃` の非自明性を接続し、source-facing な
             Lemma 6 の否定定理を組み立てる
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から

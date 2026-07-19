@@ -27,6 +27,7 @@ import OddOrder.GroupTheory.FormalCommutator
 import OddOrder.GroupTheory.FormalCollection
 import OddOrder.GroupTheory.PolynomialSequences
 import OddOrder.GroupTheory.HallPetresco
+import OddOrder.GroupTheory.RegularPGroup
 import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.IsExtraspecial
