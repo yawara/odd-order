@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
 import OddOrder.Higman.Suzuki2Groups.HigmanNormalCover
 
 /-!
@@ -22,6 +23,7 @@ set_option autoImplicit false
 namespace OddOrder.Higman.Suzuki2Groups
 
 open OddOrder.GroupTheory
+open OddOrder.Isaacs.Ch03
 
 namespace NormalInvariantCover
 
@@ -83,6 +85,220 @@ theorem agemo_one_eq_commutator_of_derived_map_eq_left
       apply frattini_nongenerating
       simp [hfrattiniTop]
     exact (bot_ne_top : (⊥ : Subgroup C) ≠ ⊤) hbotTop
+
+/-! ## The first terms of the lower-central series -/
+
+/-- A lower-central term of `C`, transported into an ambient subgroup `A`.
+This is used only inside the proof that Higman's lower-central series agrees
+with the Agemo series of `A`. -/
+private def lowerCentralTermIn
+    {P : Type*} [Group P] (A C : Subgroup P) (i : ℕ) : Subgroup A :=
+  ((lowerCentralTerm C i).map C.subtype).subgroupOf A
+
+/-- A stationary term in the lower-central series of a nilpotent group is
+trivial. -/
+private theorem lowerCentralTerm_eq_bot_of_eq_succ
+    {C : Type*} [Group C] [Group.IsNilpotent C] (i : ℕ)
+    (hstable : lowerCentralTerm C (i + 1) = lowerCentralTerm C i) :
+    lowerCentralTerm C i = ⊥ := by
+  have hall : ∀ k : ℕ,
+      lowerCentralTerm C (i + k) = lowerCentralTerm C i := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ k ih =>
+      calc
+        lowerCentralTerm C (i + (k + 1)) =
+            ⁅lowerCentralTerm C (i + k), (⊤ : Subgroup C)⁆ := by
+          rw [show i + (k + 1) = (i + k) + 1 by omega]
+          exact Subgroup.lowerCentralSeries_succ _ _
+        _ = ⁅lowerCentralTerm C i, (⊤ : Subgroup C)⁆ := by rw [ih]
+        _ = lowerCentralTerm C (i + 1) := by
+          simp only [lowerCentralTerm, Subgroup.lowerCentralSeries_succ]
+        _ = lowerCentralTerm C i := hstable
+  obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp
+    (inferInstance : Group.IsNilpotent C)
+  have hle : lowerCentralTerm C (i + n) ≤ lowerCentralTerm C n :=
+    (⊤ : Subgroup C).lowerCentralSeries_antitone (by omega)
+  change lowerCentralTerm C n = ⊥ at hn
+  rw [← hall n]
+  rw [hn] at hle
+  exact le_bot_iff.mp hle
+
+/-- Between two consecutive Agemo terms, an invariant subgroup classified by
+the Agemo series is one of the endpoints. -/
+private theorem eq_agemo_or_succ_of_classification_of_between
+    {A X : Type*} [CommGroup A] [Group X]
+    (φ : X →* MulAut A)
+    (classify : ∀ U : Subgroup A, IsAInvariant φ U →
+      ∃ t : ℕ, U = Agemo A 2 t)
+    {U : Subgroup A} (hUinv : IsAInvariant φ U) (s : ℕ)
+    (hlower : Agemo A 2 (s + 1) ≤ U)
+    (hupper : U ≤ Agemo A 2 s) :
+    U = Agemo A 2 s ∨ U = Agemo A 2 (s + 1) := by
+  obtain ⟨t, rfl⟩ := classify U hUinv
+  by_cases hts : t ≤ s
+  · left
+    exact le_antisymm hupper (Agemo.anti hts)
+  · right
+    exact le_antisymm (Agemo.anti (by omega)) hlower
+
+/-- If one lower-central term is an Agemo term and its squares lie in the
+next lower-central term, then the next Agemo term lies there as well. -/
+private theorem agemo_succ_le_lowerCentralTermIn
+    {P : Type*} [Group P] {A C : Subgroup P}
+    (hAcomm : IsMulCommutative A) (i s : ℕ)
+    (hmap : (lowerCentralTerm C i).map C.subtype =
+      (Agemo A 2 s).map A.subtype)
+    (hsquares : (Agemo (lowerCentralTerm C i) 2 1).map
+      (lowerCentralTerm C i).subtype ≤ lowerCentralTerm C (i + 1)) :
+    letI : CommGroup A :=
+      { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+    Agemo A 2 (s + 1) ≤ lowerCentralTermIn A C (i + 1) := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  intro x hx
+  change ((x : A) : P) ∈ (lowerCentralTerm C (i + 1)).map C.subtype
+  obtain ⟨y, hy, hxy⟩ := mem_agemo_succ_iff.mp hx
+  have hyP : ((y : A) : P) ∈ (Agemo A 2 s).map A.subtype :=
+    ⟨y, hy, rfl⟩
+  rw [← hmap] at hyP
+  obtain ⟨z, hz, hzP⟩ := Subgroup.mem_map.mp hyP
+  let zi : lowerCentralTerm C i := ⟨z, hz⟩
+  have hziAgemo : zi ^ 2 ∈ Agemo (lowerCentralTerm C i) 2 1 := by
+    simpa using (Agemo.mem_of_eq_pow
+      (G := lowerCentralTerm C i) (p := 2) (n := 1) zi)
+  have hzsq : z ^ 2 ∈ lowerCentralTerm C (i + 1) := by
+    apply hsquares
+    exact ⟨zi ^ 2, hziAgemo, rfl⟩
+  refine ⟨z ^ 2, hzsq, ?_⟩
+  rw [hxy]
+  exact congrArg (fun w : P => w ^ 2) hzP
+
+/-- One step of Higman's identification of the lower-central series with the
+Agemo series of its abelian derived subgroup. -/
+private theorem lowerCentralTerm_map_eq_agemo_succ
+    {P X : Type*} [Group P] [Group X]
+    {act : X →* MulAut P} {A C : Subgroup P}
+    [Group.IsNilpotent C]
+    (hAinv : IsAInvariant act A) (hCinv : IsAInvariant act C)
+    (hAcomm : IsMulCommutative A)
+    (classify :
+      letI : CommGroup A :=
+        { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+      ∀ U : Subgroup A, IsAInvariant hAinv.restrict U →
+        ∃ t : ℕ, U = Agemo A 2 t)
+    (i s : ℕ)
+    (hmap : (lowerCentralTerm C i).map C.subtype =
+      (Agemo A 2 s).map A.subtype)
+    (hsquares : (Agemo (lowerCentralTerm C i) 2 1).map
+      (lowerCentralTerm C i).subtype ≤ lowerCentralTerm C (i + 1)) :
+    (lowerCentralTerm C (i + 1)).map C.subtype =
+      (Agemo A 2 (s + 1)).map A.subtype := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  let U : Subgroup A := lowerCentralTermIn A C (i + 1)
+  have hnextLeA : (lowerCentralTerm C (i + 1)).map C.subtype ≤ A := by
+    calc
+      (lowerCentralTerm C (i + 1)).map C.subtype ≤
+          (lowerCentralTerm C i).map C.subtype :=
+        Subgroup.map_mono (lowerCentralTerm_succ_le C i)
+      _ = (Agemo A 2 s).map A.subtype := hmap
+      _ ≤ A := Subgroup.map_subtype_le _
+  have hUmap : U.map A.subtype =
+      (lowerCentralTerm C (i + 1)).map C.subtype :=
+    Subgroup.map_subgroupOf_eq_of_le hnextLeA
+  have hUinv : IsAInvariant hAinv.restrict U := by
+    apply hAinv.subgroupOf
+    exact aInvariant_map_subtype_of_restrict hCinv
+      (IsAInvariant.lowerCentralSeries hCinv.restrict (i + 1))
+  have hlower : Agemo A 2 (s + 1) ≤ U :=
+    agemo_succ_le_lowerCentralTermIn hAcomm i s hmap hsquares
+  have hupper : U ≤ Agemo A 2 s := by
+    rw [← Subgroup.map_le_map_iff_of_injective A.subtype_injective,
+      hUmap, ← hmap]
+    exact Subgroup.map_mono (lowerCentralTerm_succ_le C i)
+  rcases eq_agemo_or_succ_of_classification_of_between
+      hAinv.restrict classify hUinv s hlower hupper with hsame | hsucc
+  · have hterms : lowerCentralTerm C (i + 1) = lowerCentralTerm C i := by
+      apply Subgroup.map_injective C.subtype_injective
+      calc
+        (lowerCentralTerm C (i + 1)).map C.subtype = U.map A.subtype :=
+          hUmap.symm
+        _ = (Agemo A 2 s).map A.subtype := by rw [hsame]
+        _ = (lowerCentralTerm C i).map C.subtype := hmap.symm
+    have hbot : lowerCentralTerm C i = ⊥ :=
+      lowerCentralTerm_eq_bot_of_eq_succ i hterms
+    have hnextBot : lowerCentralTerm C (i + 1) = ⊥ := by rw [hterms, hbot]
+    have hagemoBot : Agemo A 2 s = ⊥ := by
+      apply Subgroup.map_injective A.subtype_injective
+      rw [Subgroup.map_bot, ← hmap, hbot, Subgroup.map_bot]
+    have hsuccBot : Agemo A 2 (s + 1) = ⊥ :=
+      eq_bot_iff.mpr ((Agemo.anti (Nat.le_succ s)).trans
+        (eq_bot_iff.mp hagemoBot))
+    rw [hnextBot, Subgroup.map_bot, hsuccBot, Subgroup.map_bot]
+  · calc
+      (lowerCentralTerm C (i + 1)).map C.subtype = U.map A.subtype :=
+        hUmap.symm
+      _ = (Agemo A 2 (s + 1)).map A.subtype := by rw [hsucc]
+
+/-- **Higman, Suzuki 2-groups, Lemma 8 (p. 87), lower-central chain.**
+
+Under Higman's Lemma 1 classification, a normal invariant cover with
+`C' = A` has the first lower-central terms
+`C₂ = A`, `C₃ = A²`, and `C₄ = A⁴` (all equalities are expressed after
+mapping the subgroup terms into the common ambient group).
+
+The proof constructs the source's assertion that all lower-central factors
+have exponent two: `C² = C'` starts the square containment, and the
+lower-central commutator identity propagates it to each following term. -/
+theorem lowerCentralTerm_maps_eq_first_agemo_terms_of_derived_map_eq_left
+    {P X : Type*} [Group P] [Group X]
+    {act : X →* MulAut P} {A C : Subgroup P}
+    [Finite C] (h : NormalInvariantCover act A C)
+    (hC : IsPGroup 2 C) (hAcomm : IsMulCommutative A)
+    (classify :
+      letI : CommGroup A :=
+        { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+      ∀ U : Subgroup A, IsAInvariant h.left.2.restrict U →
+        ∃ s : ℕ, U = Agemo A 2 s)
+    (hderived : (_root_.commutator C).map C.subtype = A) :
+    (lowerCentralTerm C 1).map C.subtype = A ∧
+      (lowerCentralTerm C 2).map C.subtype =
+        (Agemo A 2 1).map A.subtype ∧
+      (lowerCentralTerm C 3).map C.subtype =
+        (Agemo A 2 2).map A.subtype := by
+  letI : Group.IsNilpotent C := hC.isNilpotent
+  have htermOne : lowerCentralTerm C 1 = _root_.commutator C := by
+    rw [lowerCentralTerm, Subgroup.top_lowerCentralSeries_one]
+  have hmapOne : (lowerCentralTerm C 1).map C.subtype = A := by
+    rw [htermOne]
+    exact hderived
+  have hagemoTermOne : Agemo C 2 1 = lowerCentralTerm C 1 :=
+    (h.agemo_one_eq_commutator_of_derived_map_eq_left hC hderived).trans
+      htermOne.symm
+  have hsquaresZero : LowerCentralSquaresLieInSecond C :=
+    lowerCentralSquaresLieInSecond_of_agemo_eq C hagemoTermOne
+  have hsquaresOne : (Agemo (lowerCentralTerm C 1) 2 1).map
+      (lowerCentralTerm C 1).subtype ≤ lowerCentralTerm C 2 := by
+    simpa using lowerCentralTerm_succ_squares_le_of_squares_le C 0 hsquaresZero
+  have hmapTwo : (lowerCentralTerm C 2).map C.subtype =
+      (Agemo A 2 1).map A.subtype := by
+    have hmapZero : (lowerCentralTerm C 1).map C.subtype =
+        (Agemo A 2 0).map A.subtype := by
+      rw [agemo_zero_eq_top, ← MonoidHom.range_eq_map,
+        Subgroup.range_subtype]
+      exact hmapOne
+    simpa using lowerCentralTerm_map_eq_agemo_succ
+      h.left.2 h.right.2 hAcomm classify 1 0 hmapZero hsquaresOne
+  have hsquaresTwo : (Agemo (lowerCentralTerm C 2) 2 1).map
+      (lowerCentralTerm C 2).subtype ≤ lowerCentralTerm C 3 := by
+    simpa using lowerCentralTerm_succ_squares_le_of_squares_le C 1 hsquaresOne
+  have hmapThree : (lowerCentralTerm C 3).map C.subtype =
+      (Agemo A 2 2).map A.subtype := by
+    simpa using lowerCentralTerm_map_eq_agemo_succ
+      h.left.2 h.right.2 hAcomm classify 2 1 hmapTwo hsquaresTwo
+  exact ⟨hmapOne, hmapTwo, hmapThree⟩
 
 end NormalInvariantCover
 
