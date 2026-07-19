@@ -10459,9 +10459,19 @@ its blockers (Gorenstein Thm 10.3.1(iv)(v), Thm 1.3.1(ii), Lemma 10.1.3) are rec
 * `IsThreeStepGroup.isSolvable` — the solvability half of Lemma 1.4.
 * `exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index` — the step shared by the two
   non-3-step cases of Cor 1.6: a nilpotent normal subgroup of index prime to `p` forces `O_p(G)`
-  to be Sylow. -/
+  to be Sylow.
+* `not_commute_of_coprime_orderOf_card_fitting` — **Theorem 1.5, step 2**: in a solvable
+  CN-group an element of order prime to `|F(G)|` centralizes no nonidentity element of `F(G)`,
+  i.e. `F(G) A` is Frobenius for a Hall `π(F)'`-subgroup `A`.  This is where the CN hypothesis
+  does its work (via Lemma 1.2).  Stated for a single element rather than for `A`, since
+  coprimality of the order is all the argument uses — a generalization, not a weakening.
+* `sylow_fitting_map_le_oPiCore` / `commute_of_mem_fitting_of_coprime_orderOf` — its two
+  `F(G)`-side inputs. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
+#assert_only_allowed_axioms OddOrder.GroupTheory.not_commute_of_coprime_orderOf_card_fitting
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylow_fitting_map_le_oPiCore
+#assert_only_allowed_axioms OddOrder.GroupTheory.commute_of_mem_fitting_of_coprime_orderOf
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.oPiCore_pPrime_eq_bot
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.isPGroup_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.IsThreeStepGroup.nontrivial_quotient
