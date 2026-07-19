@@ -289,6 +289,128 @@ theorem caseB_etaHom_apply' {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   rw [caseB_etaHom_apply', e.symm_apply_apply]
   rfl
 
+/-! ## The twist identity of Peterfalvi (9.7.b)
+
+The book (p. 52) derives, from `h^{xw} = (h^w)^{w⁻¹xw}`,
+
+```
+(φ(h)ψ(x))η(w) = (φ(h)η(w))ψ(w⁻¹xw),
+```
+
+then substitutes `h = s`.  Since `φ(s) = 1` and `s^w = s`, this collapses to
+`ψ(x)η(w) = ψ(w⁻¹xw)`, and feeding that back gives multiplicativity of `η(w)` against every
+scalar.  We work with the repo's *left* action, so the conjugation reads
+`w · (u · h) = (w u w⁻¹) · (w · h)` and the twist comes out as `η(w)(μ u) = μ (w u w⁻¹)`.
+-/
+
+/-- **The `W₁`-action normalizes `Ū = range (uActionHom)`**, because `U ◁ U W₁`.  Both actions are
+restrictions of the single hom `quotientMulAutHom chief.N_aInvariant` on `↥(U ⊔ W₁)`, so the
+conjugate is the image of a conjugate group element, which stays in `U` by normality. -/
+theorem w1_conj_mem_uActionHom_range {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data)
+    (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    {B : MulAut (↥data.H ⧸ chief.N)} (hB : B ∈ MonoidHom.range (uActionHom data chief)) :
+    w1ActionHom data chief w * B * (w1ActionHom data chief w)⁻¹
+      ∈ MonoidHom.range (uActionHom data chief) := by
+  haveI : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+    (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
+  obtain ⟨x, rfl⟩ := hB
+  refine ⟨⟨(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype w *
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype x *
+      ((data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype w)⁻¹,
+    Subgroup.Normal.conj_mem ‹_› _ x.2 _⟩, ?_⟩
+  simp [uActionHom, w1ActionHom]
+
+/-- The `W₁`-conjugate of a scalar index, as an element of `Ū` again. -/
+noncomputable def caseB_conjIdx {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data)
+    (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    (u : ↥(MonoidHom.range (uActionHom data chief))) :
+    ↥(MonoidHom.range (uActionHom data chief)) :=
+  ⟨w1ActionHom data chief w * (MonoidHom.range (uActionHom data chief)).subtype u *
+      (w1ActionHom data chief w)⁻¹,
+    w1_conj_mem_uActionHom_range data chief w u.2⟩
+
+section CaseBTwist
+
+variable {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+  [Fact chief.p.Prime]
+  {e : Additive (↥data.H ⧸ chief.N) ≃+ GaloisField chief.p data.q}
+  {μ : ↥(MonoidHom.range (uActionHom data chief)) →* (GaloisField chief.p data.q)ˣ}
+
+/-- **Re-indexing step**: applying `η(w)` to a scalar multiple conjugates the scalar index.  This
+is the left-action form of the book's `(φ(h)ψ(x))η(w) = (φ(h)η(w))ψ(w⁻¹xw)`, and it is pure
+transport — no property of the base point is used yet. -/
+theorem caseB_etaHom_scalar_mul
+    (hcompat : ∀ (u : ↥(MonoidHom.range (uActionHom data chief))) (x : ↥data.H ⧸ chief.N),
+      e (Additive.ofMul ((MonoidHom.range (uActionHom data chief)).subtype u x)) =
+        ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
+          e (Additive.ofMul x))
+    (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    (u : ↥(MonoidHom.range (uActionHom data chief))) (h : ↥data.H ⧸ chief.N) :
+    Multiplicative.toAdd (caseB_etaHom (chief := chief) e w)
+        (((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
+          e (Additive.ofMul h))
+      = ((μ (caseB_conjIdx data chief w u) : (GaloisField chief.p data.q)ˣ) :
+          GaloisField chief.p data.q) *
+        Multiplicative.toAdd (caseB_etaHom (chief := chief) e w) (e (Additive.ofMul h)) := by
+  rw [← hcompat u h, caseB_etaHom_apply, caseB_etaHom_apply,
+    ← hcompat (caseB_conjIdx data chief w u) (w1ActionHom data chief w h)]
+  congr 2
+  simp [caseB_conjIdx]
+
+/-- **The twist identity** (Peterfalvi (9.7.b)): `ψ(x)η(w) = ψ(w⁻¹xw)`, here in left-action form
+`η(w)(μ u) = μ (w u w⁻¹)`.
+
+This is exactly where the base point does its work: substituting `h = s` into the re-indexing
+step, `φ(s) = 1` (`hnorm`) makes the left side `η(w)(μ u)`, and `s^w = s` (`hfix`, i.e. `s` is
+`W₁`-fixed — it lives in `W̄₂ = C_{H̄}(W₁)`) makes `η(w)(1) = 1`, killing the right-hand factor. -/
+theorem caseB_etaHom_twist
+    (hcompat : ∀ (u : ↥(MonoidHom.range (uActionHom data chief))) (x : ↥data.H ⧸ chief.N),
+      e (Additive.ofMul ((MonoidHom.range (uActionHom data chief)).subtype u x)) =
+        ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
+          e (Additive.ofMul x))
+    {s : ↥data.H ⧸ chief.N} (hnorm : e (Additive.ofMul s) = 1)
+    (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    (hfix : w1ActionHom data chief w s = s)
+    (u : ↥(MonoidHom.range (uActionHom data chief))) :
+    Multiplicative.toAdd (caseB_etaHom (chief := chief) e w)
+        ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q)
+      = ((μ (caseB_conjIdx data chief w u) : (GaloisField chief.p data.q)ˣ) :
+          GaloisField chief.p data.q) := by
+  have hone : Multiplicative.toAdd (caseB_etaHom (chief := chief) e w) 1 = 1 := by
+    rw [← hnorm, caseB_etaHom_apply, hfix, hnorm]
+  have hkey := caseB_etaHom_scalar_mul hcompat w u s
+  rw [hnorm, mul_one, hone, mul_one] at hkey
+  exact hkey
+
+/-- **Multiplicativity of `η(w)` against every scalar** — the `hmul` input of the abstract
+upgrade `ringAutHomOfAddAutHom`.  Combining the re-indexing step with the twist identity:
+`η(w)(t·μu) = μ(w u w⁻¹)·η(w)(t) = η(w)(μu)·η(w)(t)`. -/
+theorem caseB_etaHom_mul_scalars
+    (hcompat : ∀ (u : ↥(MonoidHom.range (uActionHom data chief))) (x : ↥data.H ⧸ chief.N),
+      e (Additive.ofMul ((MonoidHom.range (uActionHom data chief)).subtype u x)) =
+        ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
+          e (Additive.ofMul x))
+    {s : ↥data.H ⧸ chief.N} (hnorm : e (Additive.ofMul s) = 1)
+    (hfix : ∀ w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)),
+      w1ActionHom data chief w s = s)
+    (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+    (σ : GaloisField chief.p data.q)
+    (hσ : σ ∈ Set.range fun u : ↥(MonoidHom.range (uActionHom data chief)) =>
+      ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q))
+    (t : GaloisField chief.p data.q) :
+    Multiplicative.toAdd (caseB_etaHom (chief := chief) e w) (t * σ)
+      = Multiplicative.toAdd (caseB_etaHom (chief := chief) e w) t *
+        Multiplicative.toAdd (caseB_etaHom (chief := chief) e w) σ := by
+  obtain ⟨u, rfl⟩ := hσ
+  obtain ⟨z, rfl⟩ := e.surjective t
+  have hkey := caseB_etaHom_scalar_mul hcompat w u (Additive.toMul z)
+  rw [show Additive.ofMul (Additive.toMul z) = z from rfl] at hkey
+  rw [mul_comm, hkey, caseB_etaHom_twist hcompat hnorm w (hfix w) u, mul_comm]
+
+end CaseBTwist
+
 /-- The realized subgroup `C = C_U(H̄)` being trivial makes `uActionHom` injective. -/
 theorem uActionHom_injective_of_cSub_eq_bot [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
