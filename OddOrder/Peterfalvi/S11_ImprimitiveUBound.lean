@@ -822,6 +822,22 @@ theorem caseA_exists_blockScalarRatioEmbedding_orderA (caseA : CliffordCaseAData
   rw [hpow, caseA_pow_a_eq_one caseA u, map_one]
   rfl
 
+/-- **Peterfalvi (9.7.a), "`U/C_U(H_i)` is cyclic"**: the `U`-action image on each Clifford
+summand is a cyclic group (of order `a`, `caseA_card_range_restrictAut_Hpart`) — it is a subgroup
+of `MulAut` of the order-`p` (hence cyclic) summand, and `MulAut(C_p) ≅ (ZMod p)ˣ` is cyclic
+(`IsCyclic.mulAutMulEquiv` + units of the prime field). -/
+theorem caseA_isCyclic_range_restrictAut_Hpart (caseA : CliffordCaseAData chars)
+    (i : Fin data.q) :
+    IsCyclic ↥(aInvariantRestrictAut (caseA.Hpart_aInvariant i)).range := by
+  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  haveI : chief.N.Normal := chief.N_normal
+  haveI hcyc : IsCyclic ↥(caseA.Hpart i) := isCyclic_of_prime_card (caseA.Hpart_order i)
+  haveI : Fact (Nat.card ↥(caseA.Hpart i)).Prime := ⟨(caseA.Hpart_order i).symm ▸ chief.p_prime⟩
+  haveI : IsCyclic (MulAut ↥(caseA.Hpart i)) := by
+    have e := IsCyclic.mulAutMulEquiv (↥(caseA.Hpart i))
+    exact isCyclic_of_injective e.toMonoidHom e.injective
+  exact Subgroup.isCyclic _
+
 end OrderAEmbedding
 
 end OddOrder.Peterfalvi.S11
