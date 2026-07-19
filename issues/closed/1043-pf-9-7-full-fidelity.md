@@ -7,6 +7,21 @@ created: 2026-07-19
 
 # (9.7) の完全形式化: (a) order-a 巡回埋め込み / (b) W₁ ≅ Aut F 節
 
+## ✅ 完了 (2026-07-19)
+
+(a) (b) とも完了。**(b) の headline = `caseB_exists_galoisField_repr_withAut`**
+(`OddOrder/Peterfalvi/S11_GaloisFieldModel.lean`): Clifford case (b) で体 F (位数 p^q) と
+U* ≤ F* が存在し、H̄ ↔ F (加法)・Ū ↔ U* (乗法)・**W₁ ↔ Aut F (全単射 η、自然作用)**。
+全宣言 axiom-clean、`AxiomsCheck.lean` に登録済。
+
+共有抽象層 = `OddOrder/GroupTheory/RepresentationTheory/SemilinearFieldAut.lean` (新設)。
+
+⚠ **本節の pdftotext 抽出は文字単位でバラけていて使用不能** (`( 9 . 1 )` の形)。
+原文確認は **PDF ページ画像を Read** すること (章 PDF は pp.50-57 ゆえ 書籍 p.52 = PDF p.3)。
+
+⚠ **書籍は右作用・repo は左作用**。twist は書籍 `ψ(x)η(w) = ψ(w⁻¹xw)` に対し
+repo では `η(w)(μ u) = μ(w u w⁻¹)` の形になる。
+
 frontier_measured_2026_07_19.md §9 行の狭さ 2 点の解消。書籍 statement は PDF p.51-52 で
 確定済 (2026-07-19):
 
@@ -133,10 +148,18 @@ frontier_measured_2026_07_19.md §9 行の狭さ 2 点の解消。書籍 stateme
    - `caseB_etaHom_injective` → `ringAutHomOfAddAutHom_injective` +
      `natCard_ringAut_galoisField` (|Aut F| = q) → `Nat.bijective_iff_injective_and_card`。
    - `Finite (RingAut F)` は既証の位数 = q ≠ 0 から `Nat.finite_of_card_ne_zero`。
-5. **系**: u ⊥ (p−1) / u ∣ (p^q−1)/(p−1)。
-   ⚠ **これは `CliffordCaseBData` の既存フィールド `u_coprime_p_sub_one` /
-   `u_dvd_norm_quotient` として既に仮定されている** — (9.7.b) を実証明したら
-   これらを carrier の仮説から**導出**に格下げできるかを別途検討 (特殊化債務の解消)。
+5. **✅ 系 (本セッション着手前から完了済だった)**: u ⊥ (p−1) / u ∣ (p^q−1)/(p−1)。
+   ⚠ **前回の本 issue の記述 (「CliffordCaseBData のフィールドとして*仮定*されている」) は
+   誤りだった** — 構造体の定義だけを見て構成サイトを確認しなかったのが原因
+   ([[verify-port-state-by-number-not-coq-name]] の典型的な失敗)。実測結果:
+   - `chiefFactor_caseB_image_coprime` (`InertiaLift.lean:680`): 仮説は `chief` と
+     case (b) 既約性 `hcaseB` のみ。書籍の「As W₁ acts fixed-point-freely on Ū,
+     U* ∩ 𝔽_p = 1」に対応し、共有 SingerField の
+     `coprime_card_sub_one_of_faithful_irreducible_comm_fpf` を使って証明済。
+   - `chiefFactor_caseB_image_dvd_norm` (`InertiaLift.lean:874`): 上記 + 巡回性から。
+   - carrier 構成 `clifford_caseB_data` (`CuS0.lean:1256`) がこの 2 つを field に流し込む。
+   - 3 つとも `AxiomsCheck.lean:9145-9156` で `#assert_only_allowed_axioms` 済。
+   よって carrier は**構成可能**で、これらは仮定でなく導出。追加作業なし。
 - **抽象層の置き場**: SingerField.lean の `exists_galoisField_repr_of_faithful_irreducible` の
   拡張として「semilinear extension lemma」(加法自己同型 + scalar-orbit 乗法性 + scalar が
   加法生成 ⟹ ring 自己同型) を `OddOrder/GroupTheory/RepresentationTheory/` の新 leaf に。
