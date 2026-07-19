@@ -835,10 +835,13 @@ section FrattiniAction
 
 variable {A : Type*} [Group A] [Finite A] [Finite G]
 
-/-- **Isaacs Cor 3.29**: A が `G/Φ(G)` に自明作用 ⇒ A が G に自明作用.
+/-- **Isaacs Cor 3.29 (可解性仮定つき補助形)**: A が `G/Φ(G)` に自明作用 ⇒ A が G に自明作用.
 
-`G = C·Φ(G)` ⇒ `C ⊔ Φ = ⊤` ⇒ `C = ⊤` (Frattini non-generating). -/
-theorem aFixed_quotient_frattini
+`G = C·Φ(G)` ⇒ `C ⊔ Φ = ⊤` ⇒ `C = ⊤` (Frattini non-generating).
+
+⚠ 書籍 3.29 自身は可解性を仮定しない — 本補助形の `hSolv` を巡回還元で外したものが
+`aFixed_quotient_frattini` (下)。 -/
+theorem aFixed_quotient_frattini_of_solvable
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     (hSolv : IsSolvable A ∨ IsSolvable G)
     (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
@@ -867,19 +870,43 @@ theorem aFixed_quotient_frattini
   have hg_in_C : g ∈ C := by rw [hC_top]; exact Subgroup.mem_top g
   exact hg_in_C a
 
+/-- **Isaacs Cor 3.29** (書籍どおり、可解性仮定なし): 互いに素な作用で A が `G/Φ(G)` に
+自明作用するなら A は G に自明作用する.
+
+⚠ **書籍 3.29 は 3.23/3.25/3.26/3.27/3.28 と違って「A または G が可解」を仮定しない**。
+Isaacs の証明がその仮説を巡回還元で外すからである — 「it is no loss to assume that
+`A = ⟨a⟩`. Since `A` is cyclic, it is certainly solvable, and thus Corollary 3.28 applies」。
+ここでも同じことをする: `a : A` を固定して `φ` を `⟨a⟩` に制限すると、`⟨a⟩` は巡回ゆえ
+可解で、位数は `|A|` を割るので互いに素性も保たれ、補助形が適用できる。 -/
+theorem aFixed_quotient_frattini
+    {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
+    ∀ a : A, ∀ g : G, (φ a) g = g := by
+  intro a g
+  haveI : IsSolvable ↥(Subgroup.zpowers a) := by
+    letI : CommGroup ↥(Subgroup.zpowers a) := IsCyclic.commGroup
+    infer_instance
+  have hcop' : Nat.Coprime (Nat.card ↥(Subgroup.zpowers a)) (Nat.card G) :=
+    Nat.Coprime.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _) hCop
+  have hres := aFixed_quotient_frattini_of_solvable
+    (φ := φ.comp (Subgroup.zpowers a).subtype) hcop' (Or.inl inferInstance)
+    (fun b g' => h_triv_quot (b : A) g')
+  exact hres ⟨a, Subgroup.mem_zpowers a⟩ g
+
 /-- **Isaacs Cor 3.30 (実用形)**: A が G に faithful + A が G/Φ(G) に自明作用 ⇒ A 自明.
 
 書籍版 (A faithful on G ⇒ A faithful on G/Φ(G)) と対偶: A が G/Φ に自明 ⇒ A が G に自明
-(Cor 3.29) であり, faithful なら核 = 1 から A = 1. -/
+(Cor 3.29) であり, faithful なら核 = 1 から A = 1.
+
+⚠ 3.29 と同じく可解性は不要 (3.29 の一般形をそのまま使う)。 -/
 theorem aFaithful_quotient_frattini
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
     (h_faithful : Function.Injective φ)
     (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
     ∀ a : A, a = 1 := by
   intro a
   -- By 3.29: ∀ a g, (φ a) g = g, i.e., φ a = 1.
-  have h_triv_G : ∀ g : G, (φ a) g = g := aFixed_quotient_frattini hCop hSolv h_triv_quot a
+  have h_triv_G : ∀ g : G, (φ a) g = g := aFixed_quotient_frattini hCop h_triv_quot a
   -- So φ a = 1 (as MulAut G).
   have h_phi_one : φ a = 1 := by
     apply MulEquiv.ext

@@ -126,24 +126,24 @@ theorem commutator_sup_pow_closure_eq_frattini
 `R` を p-群とする. `(|A|, |R|) = 1` かつ `A` が `R/Φ(R)` に自明に作用するとき,
 `A` は `R` に自明に作用する.
 
-**証明**: `R` p-群 + `[Finite R]` + `[Fact p.Prime]` ⇒ `IsNilpotent R` (`IsPGroup.isNilpotent`)
-⇒ `IsSolvable R` (`IsNilpotent.to_isSolvable` instance). よって Isaacs Cor 3.29
-(`OddOrder.Isaacs.Ch04.aFixed_quotient_frattini`: Prop 1.5(d) + Lem 1.7(a) 合成形) を
-`G ↦ R`, `Or.inr` で適用するだけ.
+**証明**: Isaacs Cor 3.29 (`OddOrder.Isaacs.Ch04.aFixed_quotient_frattini`:
+Prop 1.5(d) + Lem 1.7(a) 合成形) を `G ↦ R` で適用するだけ.
+
+⚠ 2026-07-19 以前は Cor 3.29 が `IsSolvable A ∨ IsSolvable G` を要求していたので、
+ここで `R` p-群 ⇒ `IsNilpotent R` ⇒ `IsSolvable R` を経由して `Or.inr` を渡していた。
+Cor 3.29 が**書籍どおり可解性なしに一般化された**ため、その経由は不要になった。
 
 **Isaacs 対応**: Isaacs FGT Thm 1.8 (完全一致). Phase 1 Ch.1 §1B 側の Thm 1.8 は未実装
 だが, 本実装は Ch.4 forward §3E coprime action machinery 経由で独立に成立.
 
-**no-wrapper policy 例外**: 仮定特殊化 (p-群仮定から solvable を導出して
-`aFixed_quotient_frattini` の `IsSolvable A ∨ IsSolvable G` 引数を埋める). -/
+**no-wrapper policy 例外**: 仮定特殊化 (`p`-群という文脈固有の仮定で述べ直す). -/
 theorem burnside_operator {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
     {A : Type*} [Group A] [Finite A]
     (hP : IsPGroup p R) {φ : A →* MulAut R}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card R))
     (h_triv_quot : ∀ a : A, ∀ r : R, ∃ x ∈ _root_.frattini R, (φ a) r = r * x) :
     ∀ a : A, ∀ r : R, (φ a) r = r := by
-  haveI : Group.IsNilpotent R := hP.isNilpotent
-  exact OddOrder.Isaacs.Ch04.aFixed_quotient_frattini hCop (Or.inr inferInstance) h_triv_quot
+  exact OddOrder.Isaacs.Ch04.aFixed_quotient_frattini hCop h_triv_quot
 
 /-- **Element form of BG Theorem 1.8 (Burnside)**: a `p'`-order automorphism `f` of a finite
 `p`-group `H` all of whose powers act trivially modulo `Φ(H)` is the identity.

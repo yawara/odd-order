@@ -127,7 +127,7 @@ repo 側の方針明記: `Ch08_PermutationGroups/RegularNormal.lean:38-42`。
    「原版への一般化は…extensible」と**未実装であるかのように**書いていたが、一般形は
    `not_isSimpleGroup_of_sylow_two_cyclic_strict_max_factor`
    (`Ch05_Transfer/SylowTwoDirectFactor.lean:73`) として**実装済**だった。相互参照を張って訂正。
-3. **mathlib 版が Isaacs と逐語一致しない 4 件** (いずれも下流で困らないことを確認済):
+4. **mathlib 版が Isaacs と逐語一致しない 4 件** (いずれも下流で困らないことを確認済):
    - 8.21: mathlib は Jordan 集合 2 つでなく「集合とその平行移動 `s ∩ g • s`」版のみ。Isaacs が
      8.22/8.18 の証明で使うのはこの場合だけなので実害なし。
    - 8.28: mathlib は主要半分 (非自明正規部分群 ⇒ `A_n ≤ N`) を述べ、`{1, A_n, S_n}` の逐語形は
@@ -154,12 +154,28 @@ Lean 技術的 instance、repo の方が一般な場合、他ファイルに一�
 | **1.36** | `hpq : p ≠ q` 追加。書籍は「`\|G\| = p^a q`, where `p` and `q` are primes and `a > 0`」のみで、証明が "We can certainly assume that `p ≠ q`" と**導出**する | 強形 `exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime` と弱形 `not_isSimpleGroup_of_card_eq_pow_mul_prime` の両方から削除。`p = q` なら `\|G\| = p^(a+1)` (指数 ≥ 2) の `p`-群 → 中心で分岐: 中心 = ⊤ なら可換ゆえ位数 `p` の部分群が正規・真・非自明 (`Subgroup.center_le_normalizer` + `normalizer_eq_top_iff`)、中心 ≠ ⊤ なら中心自身が該当 (`IsPGroup.center_nontrivial`) |
 | **1.38** | `hmin` が「位数**最小**」を要求。書籍は「包含**極小**」で、**Isaacs 自身が p.61 (Thm 2.18 の注) で両者を区別**し「minimal order ⇒ minimal だが逆は成り立たない」と明記。⟹ 包含極小だが位数最小でない対を渡せなかった | 仮説を `∀ S' T', ↑S' ⊓ ↑T' ≤ ↑S ⊓ ↑T → ↑S' ⊓ ↑T' = ↑S ⊓ ↑T` に置換。`hmin` は Step 8 の 1 箇所でしか使われず `Subgroup.eq_of_le_of_card_ge` で等号を出していただけなので**直接適用**になり、証明は 3 行短くなった。唯一の caller (Thm 1.37) は位数最小の対を作るので、そこで弱形へ落として渡す |
 
-### ⬜ 未解消 (次の着手対象、実装方針つき)
+### ✅ 解消済 (続き) — 3.29 / 3.30
 
+| 番号 | 内容 | 対応 |
+|---|---|---|
+| **3.29** | `IsSolvable A ∨ IsSolvable G` を引きずっていた。**書籍 3.29 は 3.23/3.25/3.26/3.27/3.28 と違ってこの仮説を置かない** — 証明が「it is no loss to assume that `A = ⟨a⟩`. Since `A` is cyclic, it is certainly solvable, and thus Corollary 3.28 applies」と巡回還元で外すため | 現行証明を `aFixed_quotient_frattini_of_solvable` に改名し、その上に書籍どおりの `aFixed_quotient_frattini` を新設。`a : A` を固定して `φ` を `⟨a⟩` に制限 — `⟨a⟩` は巡回ゆえ可解、位数は `\|A\|` を割るので互いに素性も保存 (`Nat.Coprime.coprime_dvd_left`) |
+| **3.30** | 同上 (3.29 の 1 行系) | 3.29 の一般形をそのまま使うだけで解消 |
+
+⚠ **下流 1 箇所を追随修正**: `BG/Ch1_Preliminary/S01_Solvable.lean` の `burnside_operator` が
+`R` p-群 ⇒ nilpotent ⇒ solvable を経由して `Or.inr` を渡していたが、その経由ごと不要になった
+(BG はレーン c 所管だが、上流の一般化に伴う 1 行の call-site 追随ゆえ本 commit に含める)。
+
+### ⬜ 未解消
+
+**Ch.1–Ch.4 の特殊化債務は全て解消済** (7 件検出 → 7 件実装)。次は Ch.5→Ch.10 の同様の照合。
+
+<!-- 旧・未解消表 (全件解消済につき空)
 | 番号 | Lean | 狭さ | 一般化方針 |
 |---|---|---|---|
 | **3.29** | `aFixed_quotient_frattini` (Ch04_Commutators/ForwardFromCh03.lean:841) | `IsSolvable A ∨ IsSolvable G` 追加。**書籍 3.29 は意図的にこれを落としている** — 3.23/3.25/3.26/3.27/3.28 は「at least one of A or G is solvable」を担ぐが、3.29 の証明は "it is no loss to assume that `A = ⟨a⟩`. Since `A` is cyclic, it is certainly solvable, and thus Corollary 3.28 applies" と巡回還元で解消する | `a : A` を固定し `(Subgroup.zpowers a).subtype` に沿って `φ` を制限。`⟨a⟩` は巡回ゆえ可解、位数は `\|A\|` を割るので互いに素性も保たれ、現行補題を `Or.inl` で適用。**repo に同じ trick の実例あり**: `iterCommutator_inl_inr_two_eq_one_of_coprime` (Lem 4.29 一般形, ThreeSubgroupsCoprime.lean:509) が `SemidirectProduct.map` 転送込みで同型の還元をやっている |
 | **3.30** | `aFaithful_quotient_frattini` (同 :874) | 同上 (3.29 の 1 行系なので同じ余分仮説) | 3.29 の一般化から自動的に従う |
+
+-->
 
 ### 債務なしと判定した章
 
