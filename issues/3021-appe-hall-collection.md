@@ -193,3 +193,39 @@ GroupTheory 版を cite する形に書き換えるのは import 的には可能
 × 「`|S| ≤ p³` の場合分けを潰す」
 ○ **`card_le_prime_cube_of_pRank_le_two_of_exponent_prime` の対偶で
    `|S| > p³` ⟹ `r(S) ≥ 3` を直接得る** (BG の (E.1)-(E.3) 相当をまとめて飛ばせる)。
+
+## E.3(b) 入口の証明筋 (2026-07-20 に BG の 1 行を展開)
+
+`RegularOperatorSetup` の実フィールド (実測): `R₀_card : Nat.card ↥R₀ = p` /
+`R₁_cyclic : IsCyclic ↥R₁` / `centralizer_eq : Subgroup.centralizer (R₀ : Set R) = R₀ ⊔ R₁` /
+`R₀_disjoint_R₁ : Disjoint R₀ R₁` / `A_fixes_R₀` / `A_regular` ほか。
+
+### BG の「Since `C_R(R₀) = R₀ × R₁`, we have `R₀ ∩ Z = 1`」の中身
+
+`Z = Ω₁(Z(S))` (`S ≤ R`, `R₀ ≤ S`)。`R₀` は位数 p なので `R₀ ⊓ Z` は `⊥` か `R₀`。
+後者なら `R₀ ≤ Z ≤ Z(S)` ⟹ **`S ≤ C_R(R₀) = R₀ ⊔ R₁`** ⟹ `r(S) ≤ r(R₀ ⊔ R₁) ≤ 2`、
+これは Step 2 で先に出した `r(S) ≥ 3` に矛盾。⟹ `R₀ ⊓ Z = ⊥` ✓
+
+つまり本当に要るのは次の 2 本 (どちらも BG は明示しない):
+
+1. **`C_R(R₀) = R₀ ⊔ R₁` はアーベル** — `R₀` は centralizer の定義からその中で中心的、
+   `R₁` は cyclic。中心的部分群と cyclic 部分群で生成される群はアーベル
+   (`Subgroup.mul_normal` で join = 積集合にしてから成分ごとに可換)。
+2. **`pRank ↥(R₀ ⊔ R₁) p ≤ 2`** — 上のアーベル性 + `|R₀| = p` (cyclic) + `R₁` cyclic。
+   2 つの巡回部分群で生成されるアーベル群の p-rank は ≤ 2。
+   ⚠ repo に該当補題があるか要実測 (`pRank_mono_of_le` は S04_SmallRankBasic にある)。
+
+そこから `r(S) ≥ 3` は `card_le_prime_cube_of_pRank_le_two_of_exponent_prime`
+(S04_PGroupsSmallRank.lean:508, `hexp : ∀ x : S, x ^ p = 1` = 型全体の指数) の**対偶**を
+`↥S` に適用して得る (`|S| > p³ ⟹ r(S) ≥ 3`)。⟹ 手順 1-2 が閉じる。
+
+### 次に書く Lean (この順)
+
+- [ ] `RegularOperatorSetup.isMulCommutative_centralizer_R₀` — 上の 1。
+- [ ] `RegularOperatorSetup.pRank_centralizer_R₀_le_two` — 上の 2。
+- [ ] `three_le_pRank_of_prime_cube_lt_card` (対偶、2 行) を `↥S` に適用。
+- [ ] `R₀ ⊓ Ω₁(Z(S)) = ⊥` と `|Ω₁(Z(S))| = p`、`C_S(R₀) = R₀ × Ω₁(Z(S))` (E.4)。
+- [ ] narrow 性 (Cor 5.4) → `lemma52` → `narrow_centralizer_decomp` → Thm 5.5 の鎖。
+
+⚠ `Subgroup R` と `Subgroup ↥S` (`subgroupOf`) の往復が多くなるので、可能な限り
+**ambient (`Subgroup R`) の言明**で書き、`↥S` に降りるのは pRank / 指数の評価だけにする。
