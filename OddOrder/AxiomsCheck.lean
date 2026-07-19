@@ -240,6 +240,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
+import OddOrder.GroupTheory.FixedPointFreeOrderThree
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
@@ -8259,6 +8260,24 @@ composition with the degree-two bracket is the actual trilinear commutator
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralTripleCommutatorTrilinear_span_eq_top
+
+/-! **Neumann's order-three fixed-point-free theorem**, used by the parity
+step of Higman Lemma 6.  Burnside's holomorph argument gives the right
+2-Engel law; the Hopkins--Levi/Hall--Witt calculation gives exponent three
+for triple commutators; the action congruence gives `3 ∤ |G|`; hence
+`γ₃(G) = 1`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.commute_conjugate_self_of_fixedPointFree_orderOf_eq_three
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.tripleCommutator_cube_of_commute_conjugate_self
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.three_not_dvd_natCard_of_fixedPointFree_orderOf_eq_three
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three
 
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.lowerCentralLayerZero_action_eq_one_of_second_third_action_eq_one
