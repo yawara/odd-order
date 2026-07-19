@@ -413,6 +413,101 @@ theorem commutatorElement_pow_right_eq_prod_pow_choose {a b : G} {d : ℕ → G}
           rw [prod_map_range'_shift (fun i => d i ^ n.choose i) 0 n, hA]
       rw [hstep, hconj, hpascal, mul_assoc]
 
+/-- **Conjugation by a power, expanded.**  The cost of conjugating `z` by `y^i` is
+a product of binomial powers of the iterated commutators of `z` against `y⁻¹`:
+
+`(y^i)⁻¹ z y^i = (e₁^{C(i,1)} ⋯ e_i^{C(i,i)})⁻¹ · z`.
+
+This is the same one-variable collection read in the other slot (via
+`⁅g, h⁆⁻¹ = ⁅h, g⁆`), and it is what turns the conjugations appearing in the
+unrolled collecting process into binomial powers of fixed elements. -/
+theorem conj_pow_eq_prod_pow_choose {y z : G} {e : ℕ → G}
+    (he1 : e 1 = ⁅z, y⁻¹⁆) (hes : ∀ j, 1 ≤ j → e (j + 1) = ⁅y⁻¹, e j⁆)
+    (hc : ∀ j l, 1 ≤ j → 1 ≤ l → Commute (e j) (e l)) (i : ℕ) :
+    (y ^ i)⁻¹ * z * y ^ i
+      = (((List.range' 1 i).map fun j => e j ^ i.choose j).prod)⁻¹ * z := by
+  have h : ⁅z, (y⁻¹) ^ i⁆ = ((List.range' 1 i).map fun j => e j ^ i.choose j).prod :=
+    commutatorElement_pow_right_eq_prod_pow_choose he1 hes hc i
+  rw [← h, commutatorElement_inv, ← conj_eq_commutatorElement_mul, inv_pow, inv_inv]
+
 end OneVariable
+
+/-! ## Unrolling the collecting process
+
+`pow_succ_collect` is a one-step recursion; iterating it expresses the whole
+collection tail as an explicit ordered product of conjugated commutators, with
+no hypotheses at all.  Together with the one-variable collection above (which
+expands each individual factor into binomial powers) and the hockey-stick
+identity (which sums the binomial coefficients over the steps) this is the
+skeleton of Hall's formula.
+-/
+
+section Unroll
+
+/-- The fresh commutator produced at step `m` of the collecting process:
+pushing one more `x` to the left past `(x y)^m` costs exactly this. -/
+def collectionCommutator (x y : G) (m : ℕ) : G := ⁅x⁻¹, ((x * y) ^ m)⁻¹⁆
+
+@[simp] theorem collectionCommutator_zero (x y : G) : collectionCommutator x y 0 = 1 := by
+  simp [collectionCommutator]
+
+theorem collectionCommutator_mem (x y : G) (m : ℕ) :
+    collectionCommutator x y m ∈ (⊤ : Subgroup G).lowerCentralSeries 1 :=
+  pow_succ_collect_mem x y m
+
+/-- The bridge to the one-variable collection: the step commutators of the
+process are the single family `⁅x⁻¹, b^m⁆` for the *fixed* letter
+`b = (x y)⁻¹`.  So `commutatorElement_pow_right_eq_prod_pow_choose` expands all
+of them at once, with `m`-independent factors `hallIter x⁻¹ (x y)⁻¹ i`. -/
+theorem collectionCommutator_eq_commutatorElement_pow (x y : G) (m : ℕ) :
+    collectionCommutator x y m = ⁅x⁻¹, ((x * y)⁻¹) ^ m⁆ := by
+  rw [collectionCommutator, inv_pow]
+
+/-- **The collecting process, unrolled.**  For every `x, y` and every `n`,
+
+`xⁿ yⁿ = (x y)ⁿ · ∏_{i=1}^{n-1} (y^i)⁻¹ · collectionCommutator x y (n - i) · y^i`,
+
+the product taken in increasing order of `i`.  This is `pow_succ_collect`
+iterated: step `m` contributes the commutator `collectionCommutator x y m`, and
+each subsequent step conjugates the accumulated tail by `y` once more, so the
+contribution of step `m = n - i` ends up conjugated by `y^i`.
+
+The identity is unconditional — no nilpotency, no commutation.  All of the
+remaining content of Theorem E.1 is in *sorting* this product by weight. -/
+theorem pow_mul_pow_eq_pow_mul_prod_collectionCommutator (x y : G) (n : ℕ) :
+    x ^ n * y ^ n = (x * y) ^ n *
+      ((List.range' 1 (n - 1)).map fun i =>
+        (y ^ i)⁻¹ * collectionCommutator x y (n - i) * y ^ i).prod := by
+  induction n with
+  | zero => simp
+  | succ m ih =>
+      rcases Nat.eq_zero_or_pos m with rfl | hm
+      · simp
+      obtain ⟨k, rfl⟩ : ∃ k, m = k + 1 := ⟨m - 1, by omega⟩
+      simp only [Nat.add_sub_cancel] at ih ⊢
+      set f : ℕ → G := fun i => (y ^ i)⁻¹ * collectionCommutator x y (k + 1 - i) * y ^ i
+        with hf
+      set g : ℕ → G := fun i => (y ^ i)⁻¹ * collectionCommutator x y (k + 1 + 1 - i) * y ^ i
+        with hg
+      -- the whole old tail simply gets conjugated by `y` once more …
+      have hconj := conj_list_prod (y⁻¹) ((List.range' 1 k).map f)
+      simp only [inv_inv, List.map_map] at hconj
+      -- … which is exactly the shift `i ↦ i + 1` of the index.
+      have hshift : ((List.range' (1 + 1) k).map g).prod
+          = ((List.range' 1 k).map ((fun z => y⁻¹ * z * y) ∘ f)).prod := by
+        rw [← prod_map_range'_shift g 1 k]
+        refine congrArg List.prod (List.map_congr_left ?_)
+        intro i _
+        have hsub : k + 1 + 1 - (i + 1) = k + 1 - i := by omega
+        simp only [hf, hg, Function.comp_apply, hsub, pow_succ, mul_inv_rev]
+        group
+      -- the fresh factor is the step-`k+1` commutator, conjugated once.
+      have hhead : g 1 = y⁻¹ * ⁅x⁻¹, ((x * y) ^ (k + 1))⁻¹⁆ * y := by
+        simp [hg, collectionCommutator]
+      rw [pow_succ_collect ih, List.range'_succ, List.map_cons, List.prod_cons, hshift,
+        ← hconj, hhead]
+      group
+
+end Unroll
 
 end OddOrder.GroupTheory
