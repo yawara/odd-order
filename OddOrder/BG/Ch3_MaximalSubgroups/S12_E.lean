@@ -891,7 +891,7 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       obtain ⟨a, ha⟩ := hoxq; obtain ⟨b, hb⟩ := hoyr
       rw [ha, hb]
       exact (((Nat.coprime_primes Fact.out Fact.out).mpr hqr).pow_left a).pow_right b
-    have hcomm := S10.commute_of_coprime_orderOf_of_isNilpotent hcop
+    have hcomm := OddOrder.GroupTheory.commute_of_coprime_orderOf_of_isNilpotent hcop
     have hxy : x * y = y * x := by simpa using congrArg Subtype.val hcomm
     exact hxy.symm
   -- `C_{R₁}(P) ≠ 1` (else Theorem 3.7 makes `QR₁` nilpotent).

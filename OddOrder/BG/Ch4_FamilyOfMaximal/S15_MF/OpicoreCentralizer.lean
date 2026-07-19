@@ -160,7 +160,7 @@ theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
     have hcop : Nat.Coprime (orderOf (⟨a, haF⟩ : ↥(fittingInAmbient M)))
         (orderOf (⟨y, hyF⟩ : ↥(fittingInAmbient M))) := by
       rw [e1, e2]; exact Nat.Coprime.pow _ _ ((Nat.coprime_primes hrp hp).mpr hrnep)
-    have hcomm := OddOrder.BG.Ch3.S10.commute_of_coprime_orderOf_of_isNilpotent
+    have hcomm := OddOrder.GroupTheory.commute_of_coprime_orderOf_of_isNilpotent
       (x := (⟨a, haF⟩ : ↥(fittingInAmbient M))) (y := ⟨y, hyF⟩) hcop
     have := congrArg (Subtype.val) hcomm.eq
     simpa using this.symm

@@ -58,8 +58,12 @@ issues/
 ## 採番
 
 - **SEQUENCE ファイル**に整数を持ち, 新規発行ごとに +1.
-- `bin/new-issue [--base N] <slug> "<title>"` がロックを取って SEQUENCE 読み出し → +1 →
-  書き戻し → scaffold 作成 → `git add` までを 1 ステップで行う.
+- `bin/new-issue [--base N] <slug> "<title>"` がロックを取って採番 → scaffold 作成 → `git add`
+  までを 1 ステップで行う.
+- ⚠ **採番は SEQUENCE 単独ではない** (2026-07-18 hub 裁定 9150 以降):
+  `max(SEQUENCE, 当該 range に実在する issue ファイルの最大番号) + 1` を採る。
+  `issues/` + `issues/pending/` + `issues/closed/` を走査するので、SEQUENCE が巻き戻っても
+  既存ファイルと衝突しない.
 - ロックは **`mkdir` 原子操作**で実装. macOS は `flock(1)` を持たないので
   POSIX 標準で済む方式を選んだ. 5 秒 (50 × 100ms) 取れなければエラー終了.
 
@@ -73,9 +77,10 @@ issues/
 | base | レンジ | 用途 (確定割当) | SEQUENCE ファイル |
 |---|---|---|---|
 | 0 | 0000-0999 | main / trunk セッション | `issues/SEQUENCE` |
-| **1000** | **1000-1999** | **Peterfalvi 系並行セッション (確定)** | `issues/SEQUENCE.1000` |
-| 2000 | 2000-2999 | その他の ad-hoc 並行セッション #1 | `issues/SEQUENCE.2000` |
-| 3000+ | (1000 ごと) | その他の ad-hoc 並行セッション #2… | `issues/SEQUENCE.N` |
+| **1000** | **1000-1999** | **lane a** (Isaacs 本文 + Pf 本文) | `issues/SEQUENCE.1000` |
+| **2000** | **2000-2999** | **lane b** (Suzuki チェーン) | `issues/SEQUENCE.2000` |
+| **3000** | **3000-3999** | **lane c** (BG 残 + Pf Appendices 非 Suzuki 系) | `issues/SEQUENCE.3000` |
+| 4000+ | (1000 ごと) | 追加の ad-hoc 並行セッション | `issues/SEQUENCE.N` |
 | **9000** | **9000-9999** | **shared-infra claim (未所有 leaf 着手宣言, 確定 2026-07-01)** | `issues/SEQUENCE.9000` |
 
 **Peterfalvi の並行作業は base 1000 に固定**(`ODD_ISSUE_BASE=1000`)。これは予約済みなので

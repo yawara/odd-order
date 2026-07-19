@@ -195,7 +195,7 @@ theorem oPiCore_compl_quotient_frattini_fitting_eq_bot
       rw [MulAut.conjNormal_apply] at h1
       exact (mul_inv_eq_iff_eq_mul.mp h1).symm
     have hgV : g ∈ V := by
-      have := OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (G := Hb)
+      have := OddOrder.GroupTheory.centralizer_fitting_le_fitting (G := Hb)
       rw [← hVdef] at this
       exact this hg_cent
     obtain ⟨m, hm⟩ := hVp ⟨g, hgV⟩

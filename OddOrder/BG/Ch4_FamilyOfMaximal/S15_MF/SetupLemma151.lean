@@ -404,7 +404,7 @@ theorem fittingInAmbient_cyclic_imp_derivedDerived_eq_bot [Finite G] {M : Subgro
   have hcomm_le : commutator ↥M ≤ OddOrder.Isaacs.Ch01.fitting ↥M :=
     (commutator_le_centralizer_of_normal_isCyclic
       (inferInstance : (OddOrder.Isaacs.Ch01.fitting ↥M).Normal)).trans
-      OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting
+      OddOrder.GroupTheory.centralizer_fitting_le_fitting
   -- push to the ambient group: `M' = ⁅M, M⁆ ≤ F(M)`
   have hderiv_le : derivedInG M ≤ fittingInAmbient M := Subgroup.map_mono hcomm_le
   -- `F(M)` cyclic ⟹ abelian ⟹ `F(M) ≤ C_G(F(M))`

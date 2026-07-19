@@ -32,8 +32,8 @@
 | Phase | 内容 | 状態 |
 |---|---|---|
 | 0 | Lean プロジェクト初期化 (Lean 4.29.1 + mathlib v4.29.1) | ✅ 2026-05-21 |
-| 1 | **Isaacs** Ch.1–10 + Appendix の Lean 化 | 🔄 Ch.1–7 sorry-free 完成 (FT 経路完了; Thm 7.6/7.8 含む 168 flagship axiom-clean)。Ch.8–10 は FT 経路外で保留 |
-| 2a | **BG** Ch.I–IV + 補助 Appendices の Lean 化 | ✅ **FROZEN-COMPLETE (2026-07-02)**: §1–§16 spine + App.A/B/C とも FT が必要とする部分は sorry-free・axiom-clean (spine 消費 = Prop 16.1 のみ)。forward axiom **0 本**。残 15 sorry (S14 2 / S15 2 / S16 3 / AppD 3 / AppE 5) は**全て off-spine 凍結** (overstatement do-not-prove / docstring 消費のみ / 経路外 — [[ft-settled-findings]])。**BG に active frontier は無い** |
+| 1 | **Isaacs** Ch.1–10 + Appendix の Lean 化 | 🔄 Ch.1–7 sorry-free 完成 (Thm 7.6/7.8 含む 168 flagship axiom-clean)。**Ch.8–10 も 2026-07-17 に実装済・実 sorry 0** (Ch08_PermutationGroups 14 leaf / Ch09_MoreSubnormality 18 leaf / Ch10_MoreTransfer 6 leaf)。旧「FT 経路外で保留」は 2026-07-16 のフェーズ移行で失効 |
+| 2a | **BG** Ch.I–IV + 補助 Appendices の Lean 化 | 🔄 **FT が必要とする部分は sorry-free・axiom-clean** (§1–§16 spine + App.A/B/C、spine 消費 = Prop 16.1 のみ)。forward axiom **0 本**。⚠ 旧「FROZEN-COMPLETE (2026-07-02) / BG に active frontier は無い」は**失効** — 2026-07-03 以降 BG に 169 commit が入り、2026-07-19 現在も lane c の active frontier (Thm 6.4 系、issue 0126/9132/9133)。**残 sorry は 11 で内訳も旧記載と異なる**: S14/S15/S16 は 0、AppD_CNGroups 2 / AppE_FurtherResults 9 (2026-07-19 comment-strip census) |
 | 2b | **Peterfalvi** 主章 + 補章 の Lean 化 | 🔄 **FT 経路 §§3–§16 完成 (2026-07-15)** — §13 character-degree Core、§14 structure、§15–§16 endgame を実供給へ接続し、FT consumer まで axiom-clean。経路外の補章・historical mis-encoding は長期の全文形式化フェーズに残る。 |
 | 3 | 最終矛盾の結合 (BG App.C ≅ Peterfalvi の対応物) | ✅ **App.C 完全形式化** — `theoremC` / `final_contradiction` は sorry-free かつ標準3公理のみ。Pf §16 の `nonexistence_of_G` から実配線済み。 |
 | 4 | `FeitThompson` メイン定理ステートメント & 完全結合 | ✅ **2026-07-15 完成** — `nonexistence_of_G` → `BG.AppC.final_contradiction` → `noMinimalSimpleOdd` → `feitThompson_of_noMinimalSimpleOdd` → `feitThompson` の全段を authoritative trace + permanent `AxiomsCheck` で検証。依存は標準3公理のみ。 |
@@ -66,8 +66,9 @@ Phase 2a と 2b は Phase 1 が概ね終わった後、独立に並行進行可�
 
 ## Lean モジュール構成 (提案 — 2026-05 初期案の記録)
 
-> ⚠ 実レイアウトは大きく成長済 (Peterfalvi 67 files、BG appendices 10 files 等、hub/leaf 分割規則で
-> 増殖)。**現況はディスク (`OddOrder/`) と merge_monitor の 🔒 所有マップが正**。以下は当初提案の温存。
+> ⚠ 実レイアウトは大きく成長済 (2026-07-19 実測: `OddOrder/Peterfalvi/` 339 files、BG appendices 11 files。
+> hub/leaf 分割規則で増殖)。**現況はディスク (`OddOrder/`) と merge_monitor 冒頭の所有 regex が正**
+> (本文中の 🔒 所有マップは FT endgame の履歴)。以下は当初提案の温存。
 
 ```
 OddOrder.lean                            # entry module — 章 Main を順次 import
@@ -393,8 +394,8 @@ awk -v s=START -v e=END 'NR>=s && NR<e' "$mmd" \
 > ⚠ **このチェックリストは「節ごとの初期調査メモ + 実装見積り index」であり live な進捗トラッカではない。**
 > 各 `[ ]` は「節を一次調査した」時点のスナップショットで、その後の部分形式化 (§1–§13 spine の sorry-free
 > 化、§14–§16・Pf §10–§16 の進行) は反映していない。**節ごとの live 状況の正本 (2026-07-02 更新)**:
-> git log + `issues/` (一次情報) + [`notes/meta/ft_lane_reallocation_2026_06_28.md`](notes/meta/ft_lane_reallocation_2026_06_28.md)
-> (レーン配分 + 最深 body) + [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md) (合流手順 + 現状メモ)
+> git log + `issues/` (一次情報) + [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)
+> (レーン配分の正本。旧 `ft_lane_reallocation_2026_06_28.md` は 2026-07-16 に SUPERSEDED) + [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md) (合流手順 + 現状メモ)
 > + memory `MEMORY.md`/`ft-four-fronts-w1-w4`。〔旧 pointer (memory `ft-master-roadmap`/`ft-endgame-two-poles`、
 > `ft_master_roadmap_2026_05_29.md` ヘッダ) は consolidate/凍結済で無効〕。チェックボックスは敢えて触らず、
 > 調査メモ link 集として温存する。
@@ -505,6 +506,6 @@ notes/
 
 ## 補足ドキュメント
 
-- **全 3 冊完全形式化フェーズ (2026-07-16 開始) のギャップ調査正本**: [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) — feitThompson axiom-clean 達成 (2026-07-15) 後の全 815 結果インベントリ (実作業ギャップ 214 件) + 推奨順序
+- **全 3 冊完全形式化フェーズ (2026-07-16 開始) のギャップ調査**: [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) — feitThompson axiom-clean 達成 (2026-07-15) 後の全 815 結果インベントリ (実作業ギャップ 214 件) + 推奨順序。⚠ **2026-07-19 の hub 裁定 9154 で「正本」から降格** — 未/部分ラベルが実体と食い違う実績があるため、**scope の一次情報にしない** (正本 = git log + `issues/` + 実測 grep)。着手前に必ず実測で再確認する
 - mathlib カバレッジ詳細 (どの mathlib 資産が使えるか、何が欠けているか): [`notes/meta/mathlib_coverage.md`](notes/meta/mathlib_coverage.md)
 - プロジェクトセットアップ状態: メモリ `project_setup_state.md` 参照

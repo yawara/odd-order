@@ -11,13 +11,30 @@
 > **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
-> # ⚠ 暫定 (issue 9158、a 停止中。a 復帰で下段の 9154 配分へ戻す)
-> a_re='^OddOrder/Isaacs/'
+> a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S'   # 2026-07-19 11:29 恒久復帰 (issue 9154)
 > b_re='^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'
-> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
-> # 恒久 (issue 9154、a 復帰時): a='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S' / c は Pf S* を持たない
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)'
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
+> **▶ 2026-07-19 11:29 lane a 復帰 → 暫定裁定 9158 失効、9154 の恒久配分へ復帰**。
+> a は 05:36〜11:27 の 5h51m 停止 (60 秒後 wakeup が発火せずセッション終了) から復帰し、
+> 自ら 9158 を close した。hub が境界の衝突を確認: **衝突なし** —
+> a は Isaacs (Ch06/Ch07 + GroupTheory/ThompsonSubgroup、= 9154 が residue として挙げた
+> **Thm 6.23 standalone 化**に着手)、c は BG 側 (`CNGroupStructure` = App.D 系) で、
+> **どちらも Pf 本文に手を置いていない**。
+> ⟹ **Pf 本文 `OddOrder/Peterfalvi/S*` は a へ戻す** (9154 どおり)。
+> c が停止中に完了させた **Pf §3 (10/10) は合流済で保全**され、以後の Pf §4 以降は a が担当。
+> c の queue は BG に十分残る: issue 0126 (Thm A(6))、9132 (Hall collecting process =
+> App.E 全体の unlock)、9133 (CN 3-step = App.D の unlock)、App.D/E の実 sorry 11 件。
+
+> **📏 2026-07-19 hub 指摘 (issue 9160、lane b 宛、優先度 低)**: b の新設 leaf 32 本の
+> **中央値 177 行・平均 246 行** (c は 497/647) で、23 本が CLAUDE.md の目安 300 行を下回る。
+> 特に `Higman*` 系 9-10 本は issue 2048 (Suzuki Lemma 5) という**単一の目標への部品**で、
+> 「1 ファイル = 1 トピック」に照らすと 1〜3 ファイルに収まるべき塊。
+> ⚠ **即時是正は不要** — 作業中 frontier を小 leaf に置くのは CLAUDE.md の推奨形でもあり、
+> 現時点でビルド時間に悪影響も無い。**問題は「Lemma 5 が締まった後もこの粒度で凍結すること」**。
+> ⟹ 2048 を締めた区切りで topic 単位に統合する。詳細と落とし穴は issue 9160。
+
 > **⏸ 2026-07-19 暫定裁定 (issue 9158): lane a が停止 → Pf 本文を c へ暫定移管**。
 > a は 05:36 以降停止 (60 秒後の wakeup が発火せずセッション終了、`ahead 0/dirty 0` ゆえ成果損失ゼロ)。
 > 9154 で a に移した Pf 本文 (63-65 件、3 冊で最大) が無主状態になり凍結するため、**c へ暫定的に戻す**。
@@ -86,12 +103,14 @@
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
 >
-> **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**。
-> 現行は issue 0121 の **A単独**。本ファイルは hub 側の合流手順 + gotcha 集。
+> **レーン配分の正本 = [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md)**
+> (旧 `ft_lane_reallocation_2026_06_28.md` は FT endgame 期の履歴)。
+> 現行 = **3 レーン a/b/c** (2026-07-17 再作成、2026-07-19 11:29 に issue 9154 の恒久配分へ復帰。
+> 暫定裁定 9158 は失効)。本ファイルは hub 側の合流手順 + gotcha 集。
 >
-> **同期方向の区別 (ユーザー指示 2026-07-15)**: A worktree からの `git merge main` は
-> **ユーザーが明示したときだけ**行う。hub が A の completed commit を green gate 後に main へ
-> `--no-ff` 合流する運用とは別方向であり、後者は監視が有効な間は従来どおり自動。
+> **同期方向の区別 (ユーザー指示 2026-07-15)**: 各レーン worktree からの `git merge main` は
+> レーン側の規律 (CLAUDE.md「🔄 起動時 + 定期の main 同期」) に従う。hub がレーンの completed commit を
+> green gate 後に main へ `--no-ff` 合流する運用とは別方向であり、後者は監視が有効な間は従来どおり自動。
 
 > **🔀 一時 cross-lane carve-out (issue 8022) — ❌ 失効 (2026-07-02 lane d 退役)**: lane d への
 > S09/S14_MaximalI 一時編集権、および a/b/c への「S09 FrobeniusFamily/FamilyHypothesis71・
@@ -108,17 +127,22 @@
 > S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
 > 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
-## レーン (2026-07-15 current: A単独 — issue 0121)
+## レーン (2026-07-17〜 current: a/b/c の 3 レーン)
 
-| lane | branch | worktree | 現行役割 | 所有 | issue base |
+正本 = [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md) + 本ファイル冒頭
+(2026-07-17 / 07-19 更新) の `a_re` / `b_re` / `c_re` / `shared_re`。
+
+| lane | branch | worktree | 現行役割 | 所有 (step 1.5 range-check の正) | issue base |
 |---|---|---|---|---|---|
-| **A** | `a` | `/home/ywr/odd-order-a` | Ultra 単独作業レーン。FT endgame は `cfe33c3e` まで完了 | 全 active FT territory。旧 b/c territory と carve-out は A へ統合 | 1000 |
-| ~~**b**~~ | — | — | ⚰ 退役 (2026-07-15) | — | — |
-| ~~**c**~~ | — | — | ⚰ 退役 (2026-07-15) | — | — |
-| ~~**d**~~ | — | — | ⚰ 退役 (2026-07-07) | — | — |
+| **a** | `a` | `/home/ywr/odd-order-a` | Isaacs 本文 + Peterfalvi 本文 (2026-07-19 11:29 復帰、9154 の恒久配分) | `^OddOrder/Isaacs/\|^OddOrder/Peterfalvi/S` | 1000 |
+| **b** | `b` | `/home/ywr/odd-order-b` | Pf Appendices の Suzuki 系 (現 frontier = issue 2048 Suzuki Lemma 5) | `^OddOrder/Peterfalvi/Appendices/(Suzuki\|Suzuki2Groups)` | 2000 |
+| **c** | `c` | `/home/ywr/odd-order-c` | BG 残 + Pf Appendices の非 Suzuki 系 (issue 0126 / 9132 / 9133) | `^OddOrder/BG/\|^OddOrder/Peterfalvi/Appendices/(NearFields\|Huppert\|SemilinearField\|FeitSibley)` | 3000 |
+| ~~**d**~~ | — | — | ⚰ 退役 (2026-07-07) | — | (4000) |
 
-branch/worktree audit は `a` と `main` のみ。FT endgame の旧 3-workstream と全 carve-out は完了・失効。
-以下の a/b/c/d 記述は裁定履歴としてのみ保存し、現行 ownership/range-check には使わない。
+branch/worktree audit は `a` / `b` / `c` と `main` の **4 本**。
+⚠ 2026-07-15 の「A単独 / audit は a と main のみ」体制は**失効** (2026-07-16 レーン再作成)。
+以下の旧 a/b/c/d 記述と 🔒 所有マップは FT endgame の裁定履歴としてのみ保存し、
+現行 ownership/range-check には使わない。
 
 > 旧クラスタ記述 (2026-07-04/07-07 再々編) は git 履歴参照。**再設計の正本 = `issues/closed/0118`** +
 > `ft_lane_reallocation_2026_06_28.md`「3 レーン再設計 (2026-07-15)」節。
@@ -285,7 +309,7 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 > | **b 追加所有 (2026-07-04)** | β §16 char cascade | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT}.lean`（c→b 移管、(13.9)-(13.19) on-path parity/構造/norm を b が担当; off-path S-side cascade 13.5-13.10 は退役）|
 > | **d** | δ codex shared-infra hygiene — **2026-07-06 夕: DORMANT** | **2026-07-06 復活 → 同日夕 dormant 化 (分担監査 + ユーザー裁可)**。9006 Hall relocation / 9007 induced-conjugation hoist は完了済み。BG §15/§16 node は **b が owner を追認**したため d の rescue frontier にならず、他に unclaimed shared leaf も監査で発見されず (9014/1017-arith は build 済)。⟹ d は charter どおり **停止 (stop+報告)、checklist/notes の busywork を作らない** (直近 `chore: refresh issue checklist` 連発は CLAUDE.md 禁止の busywork ゆえ即停止)。新しい genuine shared claim が立てば再起動。worktree は保持 (idle 継続なら retire 検討、可逆)。`OddOrder/GroupTheory/**` 等 shared leaf は claim 後のみ。**Peterfalvi/BG S-file は fresh issue/carve-out なしに編集しない**。 |
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / **`OddOrder/Isaacs/**`**（全 lane 加算可）/ `OddOrder/BG/**`（**大部分は完了・共有凍結。⚠ 例外 = BG §15/§16 node = lane b 所有** (issue 9017, 2026-07-06 追認): `S15_MF.lean` §15.8/15.9 部 + `S16_MainResults.lean` の残 4 bare sorry は共有凍結でなく b active。それ以外の BG/** は従来どおり凍結）/ `notes/**` / `issues/**`。**⚠ Isaacs 追加 (2026-07-04 hub 裁定)**: `OddOrder/Isaacs/**` は基盤 finite-group-theory ライブラリで**どのレーンの active territory でもない**ゆえ shared foundation として扱う (consumer が proven 補題を additive に加算可、GroupTheory/Algebra 同格)。precedent = c の Isaacs 6.11 使用 / a の (7.8.b) 用 `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` 追加 (commit 9f41b6f7)。既存 Isaacs 宣言の statement 改変は要 hub flag (additive のみ非逸脱)。|
-> | **凍結 scaffold** | — | `OddOrder/Peterfalvi/Appendices/**`（off-path・consumer 0、2026-07-02 census 検証済: Huppert 1 / NearFields 2 / Suzuki 5 / Suzuki2Groups 4 / FeitSibley 3 sorry。**どのレーンも編集しない**。σ-theory near-field 等が App B/C を cite する必要が生じたら、その時点で hub が owner 割当 — 自然候補 = a の σ-theory tail 系）|
+> | **凍結 scaffold — ❌ 2026-07-19 失効** | — | `OddOrder/Peterfalvi/Appendices/**` は**もはや凍結でない** (失効の正本 = 本ファイル行 61-62)。新フェーズの所有: **b = Suzuki / Suzuki2Groups 系**、**c = NearFields / Huppert / SemilinearField / FeitSibley**。<br>**2026-07-19 実測 (comment-strip)**: Huppert 0 / NearFields 2 / SemilinearField 0 / Suzuki 0 / Suzuki2Groups 4 / FeitSibley 5。<br>*(履歴: 2026-07-02 census の Huppert 1 / NearFields 2 / Suzuki 5 / Suzuki2Groups 4 / FeitSibley 3 は当時の実測として正しい。以後 Suzuki 系の leaf 化と実証明で分布が変化した。)* |
 >
 > ⚠ `FeitThompson.lean` は**共有ではなく lane a 所有** (d 退役で carrier 宣言群ごと fold)。他レーンが
 > carrier 宣言 (`Section16Inputs` 等) に field を追加する必要があるときは hub/issue 経由で承認合流
@@ -606,7 +630,9 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
    未マージがあれば `bin/count-sorry` を記録し、直ちに
    `git merge --no-ff --no-commit <branch>` → `tip=$(git rev-parse MERGE_HEAD)` とする。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
-   **visit-time trial merge 直後**に**そのレーンが実際に変更したファイル**を取得し、上記 🔒 所有マップに照らす。
+   **visit-time trial merge 直後**に**そのレーンが実際に変更したファイル**を取得し、
+   **本ファイル冒頭 (2026-07-17 / 07-19 更新) の `a_re` / `b_re` / `c_re` / `shared_re`** に照らす
+   (本文中の 🔒 所有マップは FT endgame の履歴であり、range-check には使わない)。
    **⚠ 必ず 3-dot `main...MERGE_HEAD`（merge-base からの取り込み側差分）を使う** — 2-dot `main..MERGE_HEAD`
    は端点差分で「レーンが main に遅れている分（他レーンの merge で main 側だけ進んだ S05/S06/S11 等）」を
    **誤検出**する（line 192 の罠と同根; 2026-06-22 実害 = lane-f/b が 2-dot で false-positive 逸脱判定）。
@@ -614,9 +640,10 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
    `git merge --abort` し、⛔ に従いループ停止（`CronDelete` + 報告 + 以降の tick を行わない）。
    報告には逸脱ファイル名 + lane + 所有者を明記。例:
    ```
-   owned_re='^OddOrder/Peterfalvi/S(0[3-9]|1[0-6])|^OddOrder/BG/|^OddOrder/FeitThompson'  # 全 Pf S03-16 + BG を許容; per-lane 厳密判定は 🔒 マップ (a=S03-13+FeitThompson+S07 ν-constructor carve-out 9016 / b=S14_MaximalI+coherence+carve-out 0090/0096+BG §15/§16 node 9017 / c=S15-16; BG は大部分共有凍結だが §15/§16 node = b active 9017)
-   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/Isaacs/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra/Isaacs=汎用/基盤 infra (全 lane 加算可; Isaacs は 2026-07-04 hub 裁定で shared foundation、additive のみ)。FeitThompson は regex 互換で残すが実際は lane a 所有 — a 以外の FT 編集は 🔒 マップ注記どおり hub flag
-   git diff --name-only main...MERGE_HEAD -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
+   # 正本 = 本ファイル冒頭 (2026-07-19 11:29 / issue 9154) の a_re / b_re / c_re / shared_re。
+   # ⚠ ここに regex を再掲しない — 二重管理が 2026-07-19 に FT-endgame 版の取り残しを生んだ。
+   lane_re="$a_re"   # 訪問中のレーンに応じて a_re / b_re / c_re を選ぶ
+   git diff --name-only main...MERGE_HEAD -- '*.lean' | grep -vE "$lane_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
    逸脱なし（空）→ step 1.6 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
 1.6. **shared-infra 重複検出（claim-before-build 運用、ユーザー裁定 2026-07-01）**:
