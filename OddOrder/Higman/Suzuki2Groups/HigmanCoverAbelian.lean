@@ -720,6 +720,201 @@ private noncomputable def subgroupQuotientEquivOfInjectiveAmbientMaps
         (subgroupEquivOfInjectiveAmbientMaps f g hf hg B E hBE x) := by
   exact QuotientGroup.congr_mk _ _ _ _ x
 
+/-! ### Index-parametric lower-central layer transport -/
+
+/-- Internal numerator transport for an arbitrary lower-central index. -/
+private noncomputable def lowerCentralTermEquivAgemoAt
+    {P : Type uP} [Group P] (A C : Subgroup P)
+    (i s : ℕ)
+    (hB : (lowerCentralTerm C i).map C.subtype =
+      (Agemo A 2 s).map A.subtype) :
+    lowerCentralTerm C i ≃* Agemo A 2 s :=
+  subgroupEquivOfInjectiveAmbientMaps
+    C.subtype A.subtype C.subtype_injective A.subtype_injective
+    (lowerCentralTerm C i) (Agemo A 2 s) hB
+
+private theorem lowerCentralTermEquivAgemoAt_equivariant
+    {P : Type uP} {X : Type uX} [Group P] [Group X]
+    (act : X →* MulAut P) (A C : Subgroup P)
+    (hAcomm : IsMulCommutative A)
+    (hAinv : IsAInvariant act A) (hCinv : IsAInvariant act C)
+    :
+    letI : CommGroup A :=
+      { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+    ∀ (i s : ℕ)
+      (hB : (lowerCentralTerm C i).map C.subtype =
+        (Agemo A 2 s).map A.subtype)
+      (g : X) (x : lowerCentralTerm C i),
+      lowerCentralTermEquivAgemoAt A C i s hB
+          (lowerCentralTermAction hCinv.restrict i g x) =
+        agemoRestrictAction hAinv.restrict s g
+          (lowerCentralTermEquivAgemoAt A C i s hB x) := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  intro i s hB g x
+  apply Subtype.ext
+  apply Subtype.ext
+  calc
+    A.subtype
+        ((lowerCentralTermEquivAgemoAt A C i s hB
+          (lowerCentralTermAction hCinv.restrict i g x) : Agemo A 2 s) : A) =
+      C.subtype
+        ((lowerCentralTermAction hCinv.restrict i g x :
+          lowerCentralTerm C i) : C) :=
+      subgroupEquivOfInjectiveAmbientMaps_apply_val
+        C.subtype A.subtype C.subtype_injective A.subtype_injective
+        (lowerCentralTerm C i) (Agemo A 2 s) hB _
+    _ = act g (C.subtype x) := rfl
+    _ = act g (A.subtype
+        ((lowerCentralTermEquivAgemoAt A C i s hB x : Agemo A 2 s) : A)) :=
+      congrArg (act g)
+        (subgroupEquivOfInjectiveAmbientMaps_apply_val
+          C.subtype A.subtype C.subtype_injective A.subtype_injective
+          (lowerCentralTerm C i) (Agemo A 2 s) hB x).symm
+    _ = A.subtype
+        ((agemoRestrictAction hAinv.restrict s g
+          (lowerCentralTermEquivAgemoAt A C i s hB x) : Agemo A 2 s) : A) := rfl
+
+private theorem lowerCentralLayerKernel_agemo_kernel_ambient
+    {P : Type uP} [Group P] (A C : Subgroup P)
+    (i s : ℕ)
+    (hD : (lowerCentralLayerKernelInAmbient C i).map C.subtype =
+      (Agemo A 2 (s + 1)).map A.subtype) :
+    ((lowerCentralLayerKernel C i).map (lowerCentralTerm C i).subtype).map
+        C.subtype =
+      (((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s)).map
+        (Agemo A 2 s).subtype).map A.subtype := by
+  change (lowerCentralLayerKernelInAmbient C i).map C.subtype = _
+  rw [Subgroup.map_subgroupOf_eq_of_le (Agemo.anti (Nat.le_succ s))]
+  exact hD
+
+/-- Internal group equivalence underlying the indexed linear transport. -/
+private noncomputable def lowerCentralLayerEquivAgemoSuccAt
+    {P : Type uP} [Group P] (A C : Subgroup P)
+    (hAcomm : IsMulCommutative A) :
+    letI : CommGroup A :=
+      { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+    ∀ (i s : ℕ)
+      (_hB : (lowerCentralTerm C i).map C.subtype =
+        (Agemo A 2 s).map A.subtype)
+      (_hD : (lowerCentralLayerKernelInAmbient C i).map C.subtype =
+        (Agemo A 2 (s + 1)).map A.subtype),
+      lowerCentralLayer C i ≃* AgemoSuccQuotient A s := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  intro i s hB hD
+  exact subgroupQuotientEquivOfInjectiveAmbientMaps
+    C.subtype A.subtype C.subtype_injective A.subtype_injective
+    (lowerCentralTerm C i) (Agemo A 2 s) hB
+    (lowerCentralLayerKernel C i)
+    ((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s))
+    (lowerCentralLayerKernel_agemo_kernel_ambient A C i s hD)
+
+private theorem lowerCentralLayerEquivAgemoSuccAt_equivariant
+    {P : Type uP} {X : Type uX} [Group P] [Group X]
+    (act : X →* MulAut P) (A C : Subgroup P)
+    (hAcomm : IsMulCommutative A)
+    (hAinv : IsAInvariant act A) (hCinv : IsAInvariant act C) :
+    letI : CommGroup A :=
+      { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+    ∀ (i s : ℕ)
+      (hB : (lowerCentralTerm C i).map C.subtype =
+        (Agemo A 2 s).map A.subtype)
+      (hD : (lowerCentralLayerKernelInAmbient C i).map C.subtype =
+        (Agemo A 2 (s + 1)).map A.subtype)
+      (g : X) (q : lowerCentralLayer C i),
+      lowerCentralLayerEquivAgemoSuccAt A C hAcomm i s hB hD
+          (lowerCentralLayerAction hCinv.restrict i g q) =
+        agemoSuccQuotientAction hAinv.restrict s g
+          (lowerCentralLayerEquivAgemoSuccAt A C hAcomm i s hB hD q) := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  intro i s hB hD g q
+  refine QuotientGroup.induction_on q ?_
+  intro x
+  change lowerCentralLayerEquivAgemoSuccAt A C hAcomm i s hB hD
+      (lowerCentralLayerAction hCinv.restrict i g
+        (QuotientGroup.mk' (lowerCentralLayerKernel C i) x)) =
+    agemoSuccQuotientAction hAinv.restrict s g
+      (lowerCentralLayerEquivAgemoSuccAt A C hAcomm i s hB hD
+        (QuotientGroup.mk' (lowerCentralLayerKernel C i) x))
+  rw [lowerCentralLayerAction_apply_mk]
+  change QuotientGroup.mk' _
+      (lowerCentralTermEquivAgemoAt A C i s hB
+        (lowerCentralTermAction hCinv.restrict i g x)) =
+    QuotientGroup.mk' _
+      (agemoRestrictAction hAinv.restrict s g
+        (lowerCentralTermEquivAgemoAt A C i s hB x))
+  rw [lowerCentralTermEquivAgemoAt_equivariant
+    act A C hAcomm hAinv hCinv i s hB]
+
+/-- Transport the actual `i`-th lower-central layer to a successive Agemo
+quotient when numerator and denominator agree in a common ambient group. -/
+noncomputable def lowerCentralLayerLinearEquivAgemoSuccAt
+    {P : Type uP} [Group P] (A C : Subgroup P)
+    (hAcomm : IsMulCommutative A) :
+    letI : CommGroup A :=
+      { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+    ∀ (i s : ℕ)
+      (_hB : (lowerCentralTerm C i).map C.subtype =
+        (Agemo A 2 s).map A.subtype)
+      (_hD : (lowerCentralLayerKernelInAmbient C i).map C.subtype =
+        (Agemo A 2 (s + 1)).map A.subtype),
+      letI : IsMulCommutative (lowerCentralLayer C i) :=
+        lowerCentralLayerIsMulCommutative C i
+      letI : Module (ZMod 2) (Additive (lowerCentralLayer C i)) :=
+        lowerCentralLayerZmodModule C i
+      Additive (lowerCentralLayer C i) ≃ₗ[ZMod 2]
+        Additive (AgemoSuccQuotient A s) := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  intro i s hB hD
+  letI : IsMulCommutative (lowerCentralLayer C i) :=
+    lowerCentralLayerIsMulCommutative C i
+  letI : Module (ZMod 2) (Additive (lowerCentralLayer C i)) :=
+    lowerCentralLayerZmodModule C i
+  let e := lowerCentralLayerEquivAgemoSuccAt A C hAcomm i s hB hD
+  exact
+    { e.toAdditive with
+      map_smul' := ZMod.map_smul e.toAdditive.toAddMonoidHom }
+
+/-- The indexed lower-central/Agemo linear equivalence intertwines the
+actions induced from the common ambient actor. -/
+theorem lowerCentralLayerLinearEquivAgemoSuccAt_equivariant
+    {P : Type uP} {X : Type uX} [Group P] [Group X]
+    (act : X →* MulAut P) (A C : Subgroup P)
+    (hAcomm : IsMulCommutative A)
+    (hAinv : IsAInvariant act A) (hCinv : IsAInvariant act C) :
+    letI : CommGroup A :=
+      { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+    ∀ (i s : ℕ)
+      (hB : (lowerCentralTerm C i).map C.subtype =
+        (Agemo A 2 s).map A.subtype)
+      (hD : (lowerCentralLayerKernelInAmbient C i).map C.subtype =
+        (Agemo A 2 (s + 1)).map A.subtype),
+      letI : IsMulCommutative (lowerCentralLayer C i) :=
+        lowerCentralLayerIsMulCommutative C i
+      letI : Module (ZMod 2) (Additive (lowerCentralLayer C i)) :=
+        lowerCentralLayerZmodModule C i
+      ∀ (g : X) (q : Additive (lowerCentralLayer C i)),
+      lowerCentralLayerLinearEquivAgemoSuccAt
+          A C hAcomm i s hB hD
+          (lowerCentralLayerRepresentation hCinv.restrict i g q) =
+        agemoSuccQuotientRepresentation hAinv.restrict s g
+          (lowerCentralLayerLinearEquivAgemoSuccAt
+            A C hAcomm i s hB hD q) := by
+  letI : CommGroup A :=
+    { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
+  intro i s hB hD
+  letI : IsMulCommutative (lowerCentralLayer C i) :=
+    lowerCentralLayerIsMulCommutative C i
+  letI : Module (ZMod 2) (Additive (lowerCentralLayer C i)) :=
+    lowerCentralLayerZmodModule C i
+  intro g q
+  apply Additive.toMul.injective
+  exact lowerCentralLayerEquivAgemoSuccAt_equivariant
+    act A C hAcomm hAinv hCinv i s hB hD g q.toMul
+
 /-- The numerator identification `C' ≃ Agemo A 2 s`, determined by equality
 of their images in the ambient group. -/
 noncomputable def lowerCentralTermOneEquivAgemo
