@@ -200,6 +200,7 @@ import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.Peterfalvi.S13_NonGaloisExclusion
 import OddOrder.Peterfalvi.S15_Tau1T
 import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum

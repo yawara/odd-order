@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.LambdaCorrection
 import OddOrder.Peterfalvi.S15_CaseBEndgameSupply.HSharpChosenBase
 import OddOrder.Peterfalvi.S15_CharacterDegreeEngines
 import OddOrder.Peterfalvi.S15_SSetMemberRFamily
@@ -603,70 +604,6 @@ theorem Hypothesis.exists_muS_index_eta01_core [Finite G]
 end
 
 section /- (13.5.a): integrality of the `η₀₁` correction at `1` -/
-
-open scoped Classical in
-open scoped FiniteInduce in
-/-- **The `(S, H^#)` chosen-base (7.7.a) coefficients of a virtual character are integers**
-(mirror of `Q_sharp_hypothesis76_base_cCoeff_int`): `c_i = ⟨τψ_i, χ⟩` with both arguments
-virtual characters — `ψ_i = ζ_i − d_i ζ_0` has `d_i = 1` (all family degrees are `[S : H]`
-since `H = PC` is abelian, (13.2.a)) and `τ = Ind_S^G` on the `(S, H^#)` TI-datum
-(`H_sharp_tau_eq_induce`) preserves virtual characters. -/
-theorem H_sharp_hypothesis76_base_cCoeff_int [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (φ₀ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(hyp.H.subgroupOf hyp.S))
-    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G) :
-    ∀ i : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1),
-      ∃ z : ℤ, (H_sharp_hypothesis76_base hG hyp φ₀).cCoeff χ i = (z : ℂ) := by
-  classical
-  haveI := hyp.finiteG
-  intro i
-  set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76_base hG hyp φ₀).H.subgroupOf hyp.S
-    with hKdef
-  -- `K ≅ H = PC` is abelian, so every `θ_j` is linear and all `ζ_j` have degree `[S:K]`.
-  have hHS : hyp.H ≤ hyp.S := hyp.H_le_S
-  haveI hKcomm : IsMulCommutative ↥K := by
-    have hH := hyp.H_mulCommutative hG
-    have e := Subgroup.subgroupOfEquivOfLe
-      (show (H_sharp_hypothesis76_base hG hyp φ₀).H ≤ hyp.S from hHS)
-    exact ⟨⟨fun a b => e.injective (by
-      rw [map_mul, map_mul]
-      exact hH.is_comm.comm (e a) (e b))⟩⟩
-  -- Degrees: `ζ_j(1) = [S:K]` for every `j`, so the degree ratio is `1`.
-  have hzeta_one : ∀ j : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1),
-      (H_sharp_hypothesis76_base hG hyp φ₀).zeta j 1 = (K.index : ℂ) := by
-    intro j
-    obtain ⟨θ, hθ⟩ := (H_sharp_hypothesis76_base hG hyp φ₀).zeta_induced j
-    have hθ1 : (θ : ClassFunction ↥K ℂ) 1 = 1 :=
-      OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative
-        θ.2
-    rw [hθ, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, mul_one]
-  have hidx0 : (K.index : ℂ) ≠ 0 := by
-    exact_mod_cast Subgroup.index_ne_zero_of_finite (H := K)
-  have hd1 : (H_sharp_hypothesis76_base hG hyp φ₀).d i = 1 := by
-    have h := (H_sharp_hypothesis76_base hG hyp φ₀).zeta_one_eq_d_mul i
-    rw [hzeta_one i, hzeta_one 0] at h
-    field_simp at h
-    exact h.symm
-  -- `ψ_i = ζ_i − ζ_0 ∈ ℤ[Irr S]`.
-  have hzetaZ : ∀ j : Fin ((H_sharp_hypothesis76_base hG hyp φ₀).n + 1),
-      (H_sharp_hypothesis76_base hG hyp φ₀).zeta j ∈ ZIrr ↥hyp.S := by
-    intro j
-    obtain ⟨θ, hθ⟩ := (H_sharp_hypothesis76_base hG hyp φ₀).zeta_induced j
-    rw [hθ]
-    exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr K (θ.2.mem_ZIrr)
-  have hψZ : (((H_sharp_hypothesis76_base hG hyp φ₀).psiSupp i) :
-      ClassFunction ↥hyp.S ℂ) ∈ ZIrr ↥hyp.S := by
-    rw [OddOrder.Peterfalvi.S09.Hypothesis76.psiSupp_coe, hd1, one_smul]
-    exact Submodule.sub_mem _ (hzetaZ i) (hzetaZ 0)
-  -- The `τ`-image is a virtual character: `τ = Ind_S^G` preserves `ℤ[Irr]`.
-  have hpres : (H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
-      ((H_sharp_hypothesis76_base hG hyp φ₀).psiSupp i) ∈ ZIrr G := by
-    rw [show (H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
-        = (H_sharp_hypothesis71 hG hyp).τ from rfl,
-      H_sharp_tau_eq_induce hG hyp]
-    exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr hyp.S hψZ
-  rw [OddOrder.Peterfalvi.S09.Hypothesis76.cCoeff]
-  exact ClassFunction.inner_mem_ZIrr_int hpres hχ
 
 open scoped Classical in
 open scoped FiniteInduce in
