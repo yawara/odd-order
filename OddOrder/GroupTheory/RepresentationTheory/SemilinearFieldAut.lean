@@ -7,6 +7,7 @@ import Mathlib.Algebra.Ring.Equiv
 import Mathlib.Algebra.Ring.Aut
 import Mathlib.Algebra.Group.End
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.FieldTheory.Finite.GaloisField
 
 /-!
 # Semilinear extension: additive automorphisms multiplicative on a generating scalar set
@@ -26,6 +27,12 @@ multiplicative against every element of an additively-generating set `S` is full
 additive subgroup containing `S`), hence a ring automorphism (`ringEquivOfAddEquivOfMulScalars`;
 `map_one` is automatic for a `RingEquiv`).  A pointwise family version packages a group's worth
 of such automorphisms into `W →* RingAut F` (`ringAutHomOfAddAutHom`), preserving injectivity.
+
+The second half supplies the **counting** half of (9.7.b): the book concludes `W₁ ≅ Aut F` from
+injectivity plus `|Aut F| = q = |W₁|`.  A ring automorphism of a field fixes the prime subfield
+automatically, so `RingAut F` *is* the Galois group over `𝔽_p` (`ringAutMulEquivAlgAut`), and for
+a finite field its order is the degree (`natCard_ringAut_eq_finrank`), i.e. `q` for `GF(p^q)`
+(`natCard_ringAut_galoisField`).
 
 The concrete (9.7.b) wiring — the base-point normalization of the Galois-field model
 `caseB_exists_galoisField_repr`, the twist identity from `W̄₂ = C_{H̄}(W₁)`, and the additive
@@ -112,5 +119,51 @@ theorem ringAutHomOfAddAutHom_injective {W : Type*} [Group W]
   refine Multiplicative.toAdd.injective (AddEquiv.ext fun x => ?_)
   have := congrArg (fun f : RingAut F => f x) h
   simpa using this
+
+/-! ## The order of `Aut F` for a finite field
+
+Peterfalvi (9.7.b) finishes by counting: `η : W₁ →* Aut F` is injective and `|W₁| = q = |Aut F|`,
+hence `η` is onto.  This section supplies the `|Aut F| = q` half.
+-/
+
+section FiniteFieldAut
+
+variable (F : Type*) [Field F] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) F]
+
+/-- **A ring automorphism of a field fixes the prime subfield**, so `RingAut F` *is* the
+`𝔽_p`-algebra automorphism group — the Galois group of `F/𝔽_p` — with the same underlying
+functions.  (Every element of `ZMod p` is an integer cast, and ring homs preserve integer casts;
+both group laws are composition, so all four structure fields are `rfl`.)
+
+This is the reusable form of the bridge currently inlined as a `let` inside the proof of
+`ringAut_isCyclic_of_finite` in `OddOrder/Peterfalvi/Appendices/Suzuki/SemilinearModel.lean`. -/
+def ringAutMulEquivAlgAut : RingAut F ≃* (F ≃ₐ[ZMod p] F) where
+  toFun f := AlgEquiv.ofRingEquiv (f := f) fun x => by
+    obtain ⟨n, rfl⟩ := ZMod.intCast_surjective x
+    simp
+  invFun g := g.toRingEquiv
+  left_inv _ := rfl
+  right_inv _ := rfl
+  map_mul' _ _ := rfl
+
+@[simp] theorem ringAutMulEquivAlgAut_apply (f : RingAut F) (x : F) :
+    ringAutMulEquivAlgAut F p f x = f x := rfl
+
+/-- **`|Aut F| = [F : 𝔽_p]` for a finite field.**  A finite extension of a finite field is
+automatically Galois, so the Galois group has order the degree; `ringAutMulEquivAlgAut`
+identifies it with `RingAut F`. -/
+theorem natCard_ringAut_eq_finrank [Finite F] :
+    Nat.card (RingAut F) = Module.finrank (ZMod p) F := by
+  rw [Nat.card_congr (ringAutMulEquivAlgAut F p).toEquiv]
+  exact IsGalois.card_aut_eq_finrank (ZMod p) F
+
+/-- **`|Aut GF(p^q)| = q`** — the counting input to Peterfalvi (9.7.b)'s `W₁ ≅ Aut F`.  Together
+with injectivity of `η` and `|W₁| = q`, this forces `η : W₁ →* RingAut F` to be an isomorphism
+onto `Aut F`. -/
+theorem natCard_ringAut_galoisField (q : ℕ) (hq : q ≠ 0) :
+    Nat.card (RingAut (GaloisField p q)) = q := by
+  rw [natCard_ringAut_eq_finrank (GaloisField p q) p, GaloisField.finrank p hq]
+
+end FiniteFieldAut
 
 end OddOrder.RepresentationTheory
