@@ -772,3 +772,34 @@ comm 分岐だけ eQuotLin を明示 param 化する refactor を assembly 着�
    `exists_mixedFrobeniusWeightEquation_of_xiLengthThree` の weight 方程式 + case 別算術で確定。
 3. 各 case で `Q(α,β)=A+B+M = typeB/C/D quadratic map` → `TypeB/C/DData.ofExtension`
    → `higmanLemmaTwelve` endpoint。
+
+### 2026-07-21 lane b: Stage 4 assembly 大幅前進 — dispatch + e + Q 分解 完成
+
+`CaseSplitBCD.lean` (653 行)。上記 step 1 (dispatch/e) + Q 分解を実装、全 sorry-free・
+axiom-clean。commit a80c714b8 (comm A=q_X) → 8be6821ca (dispatch) → 5680c9789 (e) →
+bed408915 (Q 分解)。
+
+- **`FactorInclusionData`** 構造体 (Type フィールド H で comm/noncomm を統一、4-way
+  case 爆発を回避): f/N/eQuot/hf/hfexact/range_eq/theta/ambientSquare を bundle。
+  `commFactorInclusionData` (H=↥S, θ=1) / `noncommFactorInclusionData`
+  (H=↥L₀(S), θ=data.theta) / `FactorCoordinateData.toInclusionData` (inductive dispatch)。
+- **`ambientProductEquivOfFactors`** (2 package → e): range_eq で complementarity
+  (Sₗ⊓Sᵣ=Φ(P) 等) を translate。
+- **`FactorInclusionData.incl`** (clean 型の factor inclusion) + **`ambientProductSquare_eq`**:
+  `ambientCenterCoordinate(sq(e(α,β))) = α·θ_L(α)+β·θ_R(β)+ambientCenterCoordinate(bilinear(incl_L α, incl_R β))`。
+  = Higman p.90 の Q=q_X+q_Y+M (B/C/D case split 直前 state)。
+
+**⚠ instance 教訓 (assembly 全体で再発)**: `ambientProductEquiv`/`factorInclusion`
+の `[Group HL]`/`[Module (Additive (HL⧸NL))]` が `fL`/`eQuot` より前に synthesize
+され、`HL`/`NL` が package の opaque projection (`left.H`/`left.N`) だと metavar の
+まま誤 instance を拾う → **`@` で全 instance を明示 pin** して解決 (incl も同様)。
+
+**残り (次 session)**:
+1. **mixed 項 M の case 別値**: `M = ambientCenterCoordinate(bilinear(left.incl α, right.incl β))`
+   を `exists_mixedFrobeniusWeightEquation_of_xiLengthThree` (MixedEigenweights:634) の
+   weight 方程式 `λ^(2^i)μ^(2^j)=ν^(2^k)` + `ν=λθλ=μφμ` から case 別に確定。
+   ⚠ bilinear の値を weight equation の左辺 (mixed commutator) に接続する橋渡しが要。
+2. **case assembly**: 各 case で `Q(α,β) = q_typeB/C/D(α,β)` を示し
+   `ambientProductExtension hK0 (ambientProductEquivOfFactors …) ePhi` を
+   `TypeB/C/DData.ofExtension` の hsq に渡す → `higmanLemmaTwelve`。
+   hsq ⟺ `ePhi(⟨x²⟩)=q_BCD(coord)`、LHS=Q は `ambientCenterCoordinate_squareMap` 系。
