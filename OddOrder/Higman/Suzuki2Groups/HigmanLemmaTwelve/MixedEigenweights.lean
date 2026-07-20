@@ -622,6 +622,127 @@ theorem exists_factorFamily [Finite P]
 
 end EigenFamily
 
+set_option maxHeartbeats 800000 in
+/-- **Higman Lemma 12 (p. 90), the mixed weight equation.**
+
+Over the common ambient Singer datum on `Φ(P)`, the actual complementary
+factors `X ≅ A(n, θ)`, `Y ≅ A(n, φ)` have a nonzero mixed commutator, and its
+Frobenius weight satisfies Higman's displayed relation
+`λ^(2^i) μ^(2^j) = ν^(2^k)`.  Together with the two source equations
+`ν = λ θ(λ) = μ φ(μ)` this is exactly the state immediately preceding the
+B/C/D case split; no case is opened here. -/
+theorem exists_mixedFrobeniusWeightEquation_of_xiLengthThree
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+    ∃ (factors : XiLengthThreeTypeAFactorData P Y)
+      (c : Y)
+      (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n)
+      (left : FactorCoordinateData
+        factors.left_invariant factors.frattini_lt_left.le c ePhi nu)
+      (right : FactorCoordinateData
+        factors.right_invariant factors.frattini_lt_right.le c ePhi nu)
+      (i j k : Fin (Module.finrank (ZMod 2) (GaloisField 2 n))),
+      2 ≤ n ∧
+      IsPrimitiveRoot nu (2 ^ n - 1) ∧
+      nu = left.lambda * left.theta left.lambda ∧
+      nu = right.lambda * right.theta right.lambda ∧
+      left.lambda ^ (2 ^ i.val) * right.lambda ^ (2 ^ j.val) =
+        nu ^ (2 ^ k.val) := by
+  classical
+  dsimp only
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  set n := Module.finrank (ZMod 2) (Additive ↑(frattini P)) with hn
+  obtain ⟨factors, c, ePhi, nu, left, right,
+      hnTwo, _hcgen, hnuPrim, hconj, hleft, hright⟩ :=
+    exists_complementaryFactorCoordinates_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hK0 :=
+    lowerCentralLayerKernel_zero_eq_frattini_subgroupOf_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hK1 :=
+    lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hterm :=
+    lowerCentralTerm_one_eq_frattini_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  obtain ⟨famL, hLeigen, hLcov⟩ := exists_factorFamily c hK0 left
+  obtain ⟨famR, hReigen, hRcov⟩ := exists_factorFamily c hK0 right
+  -- Centre eigenbasis with weights `ν^(2^k)`.
+  set eCenter := ambientCenterCoordinate hEA hK1 hterm ePhi with heC
+  have hCenterEigen : ∀ k,
+      (lowerCentralLayerRepresentation Y.subtype 1 c).baseChange
+          (GaloisField 2 n)
+          (conjugateTensorBasisOfLinearEquiv (GaloisField 2 n) eCenter k) =
+        nu ^ (2 ^ k.val) •
+          conjugateTensorBasisOfLinearEquiv (GaloisField 2 n) eCenter k := by
+    intro k
+    exact baseChange_eigen_conjugateTensorBasisOfLinearEquiv
+      (GaloisField 2 n) eCenter
+      (lowerCentralLayerRepresentation Y.subtype 1 c) nu
+      (ambientCenterCoordinate_compat hEA hK1 hterm ePhi c nu hconj) k
+  -- Nonzero mixed commutator witness.
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hPhiBot
+    have hcommBot : _root_.commutator P = ⊥ :=
+      le_bot_iff.mp
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          (le_of_eq hPhiBot))
+    exact hncomm ((commutator_eq_bot_iff P).mp hcommBot)
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive
+      (IsAInvariant.of_characteristic Y.subtype) hPhiNeBot
+  obtain ⟨x0, y0, hx0L, hy0R, hbne⟩ :=
+    factors.exists_mixed_lowerCentralCommutatorBilinear_ne_zero
+      hxi hinvPhi hEA hK1
+  -- The witness lies in each factor span; the base-changed bracket is nonzero.
+  have hbeta_ne :
+      lowerCentralCommutatorBilinearBaseChange (GaloisField 2 n) P
+          ((1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x0)
+          ((1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass y0) ≠ 0 :=
+    lowerCentralCommutatorBilinearBaseChange_one_tmul_ne_zero
+      (layerZeroClass x0) (layerZeroClass y0) eCenter hbne
+  obtain ⟨i, j, k, _, hweight⟩ :=
+    exists_pair_ne_zero_and_weight_eq
+      ((lowerCentralLayerRepresentation Y.subtype 0 c).baseChange (GaloisField 2 n))
+      ((lowerCentralLayerRepresentation Y.subtype 0 c).baseChange (GaloisField 2 n))
+      ((lowerCentralLayerRepresentation Y.subtype 1 c).baseChange (GaloisField 2 n))
+      (lowerCentralCommutatorBilinearBaseChange (GaloisField 2 n) P)
+      famL famR (conjugateTensorBasisOfLinearEquiv (GaloisField 2 n) eCenter)
+      (fun i => left.lambda ^ (2 ^ i.val))
+      (fun j => right.lambda ^ (2 ^ j.val))
+      (fun k => nu ^ (2 ^ k.val))
+      hLeigen hReigen hCenterEigen
+      (fun u v =>
+        lowerCentralCommutatorBilinearBaseChange_equivariant
+          (GaloisField 2 n) Y.subtype c u v)
+      (hLcov x0 hx0L) (hRcov y0 hy0R) hbeta_ne
+  exact ⟨factors, c, ePhi, nu, left, right, i, j, k,
+    hnTwo, hnuPrim, hleft, hright, hweight⟩
+
 end
 
 end OddOrder.Higman.Suzuki2Groups

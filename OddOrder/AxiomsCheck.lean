@@ -8445,6 +8445,14 @@ Frobenius period is odd. -/
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.exists_lowerCentralPairGapSupport_of_frobeniusEigenbases
 
+/-! **Higman Lemma 12 (p. 90), the mixed weight equation**: over the common
+Singer datum on `Φ(P)`, the complementary factors have a nonzero mixed
+commutator whose Frobenius weight satisfies `λ^(2^i) μ^(2^j) = ν^(2^k)`.  With
+`ν = λ θ(λ) = μ φ(μ)` this is exactly Higman's state preceding the B/C/D split. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_mixedFrobeniusWeightEquation_of_xiLengthThree
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the

@@ -342,9 +342,20 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                 quotient coordinate と `ν = λ·θ(λ) = μ·φ(μ)` を一つの endpoint で返す
           - [x] commutative `A(n,1)` と noncommutative factor の座標 data を共通の
                 inclusive bundle に包み、実際の complementary pair の全組合せを返す
-          - [ ] actual mixed commutator pairing の actor covariance を左右の tagged
-                coordinates で表示し、`θ = 1` / `φ = 1` / 両方非自明の固有値制約を
-                原典の B/C/D case split へ接続する
+          - [x] actual mixed commutator pairing の actor covariance を左右の tagged
+                coordinates で表示し、原典 p. 90 の固有値制約
+                `λ^(2^i) μ^(2^j) = ν^(2^k)` を導いて B/C/D case split の直前まで到達する
+                (`exists_mixedFrobeniusWeightEquation_of_xiLengthThree`,
+                新 leaf `HigmanLemmaTwelve/MixedEigenweights.lean`, 2026-07-21)
+            - [x] shared `BilinearEigenweight.lean`: 等変双線形写像の非零値から
+                  target eigenbasis の weight 一致を導く (Lemma 11 の private 版 dedup、issue 9317)
+            - [x] ambient `L₁ ≃ Φ(P)` 同定 + Singer 中心座標 + factor quotient を
+                  `P/Φ(P)` へ落とす actor-equivariant な inclusion を構成
+            - [x] 両 branch (Agemo 商 / lower-central layer) から共通 `F ⊗ P/Φ(P)` 内の
+                  Frobenius eigenvector 族を抽出 (`exists_factorFamily`)
+            - [x] 非零 mixed bracket を base change して weight equation を読み取る
+          - [ ] `θ = 1` / `φ = 1` / 両方非自明の固有値制約から原典 pp. 90--92 の
+                B/C/D case split を実行し、`B(n,θ,ε)` / `C(n,ε)` / `D(n,θ,ε)` を確定する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
