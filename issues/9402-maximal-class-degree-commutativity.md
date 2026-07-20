@@ -78,3 +78,15 @@ soft な commutator calculus は `⁅R₀,T⁆ = H_1` の off-by-one で全ル�
 
 `⁅H_a,H_b⁆≤H_{a+b+2}` (a,b≥1、maximal class + class<p) が sorry-free / axiom-clean。
 下流 3021 の E.4 abelian clause が解錠。本 claim を close。
+
+## ✅ hub 重複検査 (2026-07-21 02:41 tick) — claim 承認
+
+claim-before-build 協定に基づき hub が重複を検査:
+- **grep 実測**: `degreeCommutativity|degree_of_commutativity|degreeOfCommutativity` は repo に 0 件 → 既存実装なし (再構築でない)。
+- **subband**: 9400 = lane c (正)。
+- **近接 claim との非重複**: 9400 (BG Prop E.2 induction, leaf `RegularPGroup.lean`) とはドメイン (class<p) が隣接するが結果が別 (E.2 帰納 vs degree of commutativity)。9402 は新 sibling `MaximalClassPGroup.lean`。9401 (pRank) は無関係。
+- **consumer 実在**: `AppE_FurtherResults.lean:1657` の E.4 abelian clause sorry (issue 3021)。
+
+⟹ **claim 承認**。lane c は `OddOrder/GroupTheory/MaximalClassPGroup.lean` を新設してよい
+(新 leaf は同 commit で `OddOrder.lean` に配線すること)。degree of commutativity は
+maximal-class p 群論の標準結果 (Blackburn/Leedham-Green) で、E.4 β-supply の正当な reduction target。
