@@ -1000,4 +1000,24 @@ theorem frattini_eq_commutator_of_exponent_prime {G : Type*} [Group G] [Finite G
     rw [← map_pow, hexp a, map_one]
 
 
+/-- **BG's `x⁻¹vx ≡ v (mod S')`**: the conjugacy class of any `v` is contained in the coset
+`v·G'`.
+
+`v⁻¹ · (t v t⁻¹)` *is* the commutator `⁅v⁻¹, t⁆`, so it lies in `G'` on the nose.  In Step 4
+this containment is upgraded to an equality by comparing sizes — `(E.15)` gives the class
+`|S|/p²` elements and `(E.17)` gives the coset `|S'| = |S|/p²`. -/
+theorem orbit_conjAct_subset_coset {G : Type*} [Group G] (v : G) :
+    MulAction.orbit (ConjAct G) v ⊆ v • ((_root_.commutator G : Subgroup G) : Set G) := by
+  rintro _ ⟨t, rfl⟩
+  refine ⟨v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹), ?_, ?_⟩
+  · show _ ∈ (_root_.commutator G : Subgroup G)
+    have hrw : v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹)
+        = ⁅v⁻¹, ConjAct.ofConjAct t⁆ := by group
+    rw [hrw, commutator_def]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+  · show v * (v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹)) = t • v
+    rw [ConjAct.smul_def]
+    group
+
+
 end OddOrder.BG.AppE
