@@ -66,7 +66,33 @@ Lemma 1(a) はこれを一般 `S07.Hypothesis` τ に**一般化**する task ([
   - `hcrux2` ← `inner_extension_member_orthogonal_imageSet` (CoherenceUnion:630, S07 一般) を R(χ) 上で sum
   - 最終 ← `retarget_isCoherent_of_extensionImage_general` (helper 4)
   結論: `IsCoherent τ (S₁ ∪ {χ, χ̄}) A`。
-### ⚠ 特殊化債務 (2026-07-21 発見): engine は integer-ratio 版
+### ✅ 配線 feasibility 確定 (2026-07-21 continuation)
+
+**(1) integer-ratio engine が FeitSibley に十分** — 𝒮={Ind_Q^H φ} は deg=d·φ(1)。reduction 後
+Q₁ は非自明 p-群ゆえ**非完全** ⟹ 非自明 linear θ∈Irr(Q₁) を持ち、φ=1·θ (linear, deg 1, Q₁⊄Ker)
+で **𝒮 は必ず degree-d member を含む**。これを anchor χ₀ (χ₀(1)=d) にとれば比 χ(1)/χ₀(1)=φ(1)∈ℕ
+で **integer ratio**、かつ χ₀(1)=d | d·φ(1)=ψ(1) (Lemma 1(a) の χ₀(1)|ψ(1) も満たす)。
+
+**(2) hSgen/hgen 討伐可** — Dade chain (`XAdjoinStepInput.adjoin`, CoherentAdjoin:940) の pattern:
+`hgen` は一般 lemma `zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration` (S07) で `hSgen` +
+degree 事実から従う。`hSgen : ℤ[S₀] ≤ ℤ[supported S₀ ∪ {χ₀}]` は χ = (χ−deg·χ₀)+deg·χ₀
+(integer deg で χ−deg·χ₀ は degree 0 = supported) から。⟹ engine 一般版でも同 pattern で discharge。
+
+**⟹ 次 iteration の target = FeitSibley を integer engine へ配線** (rational 不要)。plumbing:
+member family = S₀ (or 代表), R-family = `hyp.difference_image`, hisom = `hyp.tau_isometry_diff`
+(ℤ[T]⊆zSupportedSpan S A の closure plumbing), hSgen/hgen = 上記 pattern, degree 整数性 =
+degree-d anchor。statement は engine 準拠の pair-adjoin/member-family 形へ改訂。
+
+### ⚠ 特殊化債務 (2026-07-21): abstract Lemma 1(a) は rational — engine は integer 版 (consumer 無し)
+
+engine は integer ratio 版。Peterfalvi 抽象 Lemma 1(a) は rational 比を許す (χ₀(1)|ψ(1) のみ要求)。
+**FeitSibley Theorem の実用法は integer 比** (上記 (1)) ゆえ rational 版に consumer は無い。
+rational faithful 版の構成は判明済 (**scaled difference trick**): member 差を `χᵢ−rcᵢ·χ₁` (rc rational,
+非整数 ⟹ ℤ[S₁] 外) でなく **`d1·χᵢ − dⱼ·χ₁` (d1=χ₁(1), dⱼ=χᵢ(1), 整数係数, degree 0 で supported)**
+に取れば ν-isometry (ℤ[S₁]) が使え、⟨Y,νχᵢ⟩ = a·⟨χ₁,χᵢ⟩ − (a·m₁+μ)·(dⱼ/d1) が出る。
+`lambda_eq_zero_and_Z_eq_zero` (real rc/mc) がそのまま consume。度数 bound は 2a<∑(dⱼ/d1)² =
+Peterfalvi の 2·ψ(1)·χ₁(1)<∑χ(1)²。低優先で inner_Y/crux1/adjoinPair を rc real へ再導出すれば
+abstract 版も閉じる (integer engine を subsume)。
 
 `adjoinPairCoherent_general` / `crux1_of_memberFamily_general` は `deg : ι → ℕ` (**integer** 度数比)
 + unit norm (`mc = 1`) の特殊化 (repo 既存 `crux1_of_memberFamily` に倣った)。だが Peterfalvi
