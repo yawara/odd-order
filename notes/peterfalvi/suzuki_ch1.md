@@ -884,3 +884,28 @@ F×F→F を Σc_ij α^(2^i)β^(2^j) で表し、equivariance で c_ij(λ^(2^i)�
 - **piece 3**: `mixedTerm_lambda_equivariance` + monomial 独立 → c_ij(λ^(2^i)μ^(2^j)-ν)=0。
 - **piece 4**: congruence (Higman p.91) で unique (i,j) → M=c·frob^i(α)frob^j(β)。
 - **piece 5**: c=ε → endpoint engine の hM に接続 → higmanLemmaTwelve。
+
+### 2026-07-21 lane b (autonomous ticks): functional-equation machinery 完成
+
+MixedTermValue.lean で「equivariance → 係数制約」の全機構が完成 (全 axiom-clean、
+7 commit)。M-value 導出の残りは congruence + ε + assembly のみ。
+
+**完成 (MixedTermValue.lean)**:
+- `frobenius_powers_linearIndependent` (Artin) → `galoisField_linearMap_finrank`=n →
+  `frobeniusBasis` (frobLin 手動 LinearMap) → `frobLin_repr` (1変数 Frobenius poly) →
+  `bilinear_frobenius_repr` (piece 2: M=Σc_ij α^(2^i)β^(2^j)、dj を AddMonoidHom+
+  ZMod.map_smul で scalar friction 回避) → `frob_bilinear_coeff_zero` (piece 3a: 2変数
+  monomial 独立=uniqueness) → `frobeniusEquiv_pow_apply` + `bilinear_equivariance_coeff`
+  (piece 3b: M(λα,μβ)=ν·M(α,β) → c_ij·λ^(2^i)μ^(2^j)=ν·c_ij)。
+
+**残り (次 session、intricate)**:
+1. **piece 4 (congruence、最難)**: 制約 c_ij(λ^(2^i)μ^(2^j)-ν)=0 + weight 方程式
+   (∃(i0,j0): λ^(2^i0)μ^(2^j0)=ν、exists_mixedFrobeniusWeightEquation) + case 関係
+   (ν=λθλ=μφμ、θ/φ は Frobenius 冪) で **(i0,j0) が unique** を示す (Higman p.91 の
+   2^a+2^b≡2^c mod 2^n-1 解析: 6 解、2 矛盾、2 が r≡0、残 s=r∓2)。⟹ c_ij=0 for
+   (i,j)≠(i0,j0)、M=c_{i0j0}·frob^{i0}(α)frob^{j0}(β)。case (B/C/D) で (i0,j0) と θ_L/θ_R が決まる。
+2. **piece 5 (ε)**: c_{i0j0}=ε (nonzero、anisotropy 条件と接続)。
+3. **assembly**: 実 mixed 項 M(α,β)=ambientCenterCoordinate(bilinear(left.incl α,right.incl β))
+   を bilinear_equivariance_coeff に食わせ (equivariance は mixedTerm_lambda_equivariance)、
+   piece 4/5 で M=ε·(case 別 frob-twist) → endpoint engine (isTypeB/C/D_of_mixedTerm) の hM
+   → higmanLemmaTwelve (exists_mixedFrobeniusWeightEquation → dispatch → engine → IsTypeB∨C∨D)。
