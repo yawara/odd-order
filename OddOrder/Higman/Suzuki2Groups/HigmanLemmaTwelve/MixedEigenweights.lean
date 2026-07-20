@@ -40,7 +40,7 @@ open OddOrder.Isaacs.Ch03
 open Module
 open scoped IsMulCommutative TensorProduct BigOperators
 
-universe uP uG
+universe uP uG uF uQ
 
 noncomputable section
 
@@ -336,6 +336,82 @@ theorem quotientToAmbientLayerZeroLinear_equivariant
   apply Subtype.ext
   change f (sigma g) = (Y.subtype a : MulAut P) (f g)
   exact hf_int g
+
+/-! ## The base-changed eigenvector family of one factor -/
+
+section EigenFamily
+
+variable {F : Type uF} [Field F] [Finite F] [Algebra (ZMod 2) F]
+variable {Q : Type uQ} [AddCommGroup Q] [Module (ZMod 2) Q]
+variable {Y : Subgroup (MulAut P)}
+
+/-- The base-changed eigenvector family of one invariant factor, living in the
+common ambient module `F ⊗ (P/Φ(P))`.  Each conjugate basis vector of the
+factor's quotient coordinate `eQuot` is transported by the equivariant
+inclusion `iota` into `P/Φ(P)`. -/
+noncomputable def factorAmbientEigenFamily
+    (eQuot : Q ≃ₗ[ZMod 2] F)
+    (iota : Q →ₗ[ZMod 2] Additive (lowerCentralLayer P 0)) :
+    Fin (Module.finrank (ZMod 2) F) →
+      F ⊗[ZMod 2] Additive (lowerCentralLayer P 0) :=
+  fun i => iota.baseChange F (conjugateTensorBasisOfLinearEquiv F eQuot i)
+
+/-- Each family member is an eigenvector of the base-changed ambient actor with
+the Frobenius-power eigenvalue `λ^(2^i)`. -/
+theorem factorAmbientEigenFamily_eigen
+    (c : Y) (eQuot : Q ≃ₗ[ZMod 2] F)
+    (Aq : Module.End (ZMod 2) Q) (lambda : F)
+    (hAq : ∀ v, eQuot (Aq v) = lambda * eQuot v)
+    (iota : Q →ₗ[ZMod 2] Additive (lowerCentralLayer P 0))
+    (hiota : ∀ v, iota (Aq v) =
+      lowerCentralLayerRepresentation Y.subtype 0 c (iota v))
+    (i : Fin (Module.finrank (ZMod 2) F)) :
+    (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
+        (factorAmbientEigenFamily eQuot iota i) =
+      lambda ^ (2 ^ i.val) • factorAmbientEigenFamily eQuot iota i := by
+  have hcomp : (lowerCentralLayerRepresentation Y.subtype 0 c) ∘ₗ iota =
+      iota ∘ₗ Aq :=
+    LinearMap.ext fun v => (hiota v).symm
+  have hbc : (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F ∘ₗ
+        iota.baseChange F =
+      iota.baseChange F ∘ₗ Aq.baseChange F := by
+    rw [← LinearMap.baseChange_comp, ← LinearMap.baseChange_comp, hcomp]
+  show (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
+      (iota.baseChange F (conjugateTensorBasisOfLinearEquiv F eQuot i)) = _
+  rw [show (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
+        (iota.baseChange F (conjugateTensorBasisOfLinearEquiv F eQuot i)) =
+      iota.baseChange F (Aq.baseChange F
+        (conjugateTensorBasisOfLinearEquiv F eQuot i)) from
+    congrFun (congrArg DFunLike.coe hbc)
+      (conjugateTensorBasisOfLinearEquiv F eQuot i),
+    baseChange_eigen_conjugateTensorBasisOfLinearEquiv F eQuot Aq lambda hAq i,
+    map_smul]
+  rfl
+
+/-- The span of the family contains every ground vector coming from the factor
+image, i.e. `1 ⊗ iota v` for any `v`. -/
+theorem one_tmul_mem_span_factorAmbientEigenFamily
+    (eQuot : Q ≃ₗ[ZMod 2] F)
+    (iota : Q →ₗ[ZMod 2] Additive (lowerCentralLayer P 0))
+    (v : Q) :
+    (1 : F) ⊗ₜ[ZMod 2] iota v ∈
+      Submodule.span F (Set.range (factorAmbientEigenFamily eQuot iota)) := by
+  have hrange : Set.range (factorAmbientEigenFamily eQuot iota) =
+      iota.baseChange F ''
+        Set.range (conjugateTensorBasisOfLinearEquiv F eQuot) :=
+    Set.range_comp (iota.baseChange F)
+      (conjugateTensorBasisOfLinearEquiv F eQuot)
+  rw [hrange]
+  have hmem : (1 : F) ⊗ₜ[ZMod 2] v ∈
+      Submodule.span F
+        (Set.range (conjugateTensorBasisOfLinearEquiv F eQuot)) := by
+    rw [(conjugateTensorBasisOfLinearEquiv F eQuot).span_eq]
+    exact Submodule.mem_top
+  have := Submodule.apply_mem_span_image_of_mem_span
+    (iota.baseChange F) hmem
+  rwa [LinearMap.baseChange_tmul] at this
+
+end EigenFamily
 
 end
 
