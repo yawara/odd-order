@@ -148,6 +148,39 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 
 `hKeq ▸ hbase` の transport はレシピどおり素直に通った。
 
+### ⛏ 次の一手: §9 レベルの degree-subfamily coherence
+
+橋渡しが landed したので、`sOf_degreeSubfamily_isCoherent` の §10 依存を外す組み立てに入れる。
+
+**⚠ 重要な制約 (実測)**: `S10.typePACore_subcoherent` は
+`hirr : ∀ χ ∈ S, IsIrreducibleCharacter χ` を要求する = **族全体が既約**でないと使えない。
+§9 の `sOf data Y` は可約メンバー (μ-列) を含むので**そのままでは渡せない**
+(`S10_SubcoherentTypeP` の module docstring「Irreducible members only」の scope note どおり)。
+⟹ `S := {φ ∈ sOf data Y | IsIrreducibleCharacter φ ∧ φ 1 = d}` (= degree-`d` 既約 cut)
+を渡すのが正しい。この cut は
+- `⊆ sOf data Y` かつ橋渡しで `⊆ inducedNonKernelFamily M′ M_σ`
+- 共役閉 = `S11.irrCut_conjClosed` (本 session で §9 化済)
+- 有限 = `S11.sOf_finite` の subset
+
+**`S07.coherent_subset_of_constant_degree` (S07_Subcoherent.lean:259) の義務一覧**
+(`S' := S` と取れば `hsub` は `subset_refl`):
+
+| 引数 | 供給元 |
+|---|---|
+| `hyp : S07.Hypothesis S A` | `S10.typePACore_subcoherent` (橋渡し + irrCut_conjClosed) |
+| `hconj'` | `S11.irrCut_conjClosed` |
+| `hSfin` | `(S11.sOf_finite data Y).subset` |
+| **`hcard : 2 ≤ S'.ncard`** | ⚠ §11 版は `hex` (1 元存在) しか取らない。奇数位数ゆえ `χ ≠ χ̄` (実指標なし) なので `{χ, χ̄} ⊆ S'` から出る — **この議論を明示的に書く必要がある** |
+| `hirr : ∀ ζ ∈ S', inner ζ ζ = 1` | `IsIrreducibleCharacter.inner_self_eq_one` |
+| **`hZIrr : ∀ a b ∈ S', tau (a − b) ∈ ZIrr G`** | Dade 写像の整数性。⚠ 一番重い義務 |
+| `hconst` | cut の定義から自明 |
+| `hdeg0 : deg ≠ 0` | `d ≠ 0` (既約指標の次数は正) |
+| `h1A : (1 : ↥M) ∉ A` | `S10.typePACore_one_not_mem` |
+| `hsuppdiff` | `S10.inducedNonKernelFamily_conjDiff_support` の一般化 (今は `φ − φ̄` 専用、任意の 2 元差へ広げるか、Hypothesis の `tau_isometry_diff` 経由) |
+
+⟹ 重いのは **`hcard`** と **`hZIrr`** と **`hsuppdiff` の 2 元差版**の 3 つ。
+残り 7 つは既存部品でそのまま埋まる。
+
 ### (参考) 実装レシピ
 
 ```
