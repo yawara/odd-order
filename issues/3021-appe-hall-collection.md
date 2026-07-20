@@ -1223,3 +1223,869 @@ coprime 固定点 (`|A| = q` vs p 冪の剰余類)。
 
 フルビルド 4562 jobs green / sorry 14 (セッション開始時 15) / AxiomsCheck 3540 件 OK。
 AppE の残 sorry 3 = E.3(d) (本項) / E.4 / E.5。
+
+## 2026-07-20 (25): ⭐ **Theorem E.3(d) 完了** — Step 4 全体が sorry-free
+
+新 leaf **`OddOrder/BG/AppE_SemidirectFrattini.lean`** (Step 4 の群論半分)。
+counting 半分は `(E.15)` を消費するので `AppE_ExponentP.lean` に残置。
+
+| 宣言 | 内容 |
+|---|---|
+| `map_subtype_sup_commutator` / `mem_sup_derivedInG_iff` | ambient `H ⊔ K'` ↔ subtype `H.subgroupOf K ⊔ commutator ↥K` |
+| `seed_le_omega` / `omega_pow_eq_one'` / `card_inf_omega_centralizer` | `S = Ω₁(R)` 版 (E.14) `\|C_S(R₀)\| = p²` |
+| `smul_omega` / `smul_derivedInG_omega` | `Ω₁(R)`, `(Ω₁(R))'` の `B`-不変性 |
+| `smul_conj_smul` | `f • (W^s) = (f • W)^{f s}` (= `f·conj s·f⁻¹ = conj (f s)`) |
+| ⭐ `exists_conj_smul_R₀` | **`R₀^β = R₀^x` (∃x ∈ S)** |
+| ⭐ `exists_smul_R₀_invariant` | **`B`-不変な `R₀` の `S`-共役が在る** |
+| ⭐ `B_fixes_R₀_of_fixes_frattini` | **BG Theorem E.3(d)** |
+
+### ⭐ 最大の収穫: 半直積を組み直さずに済んだ
+
+BG の Step 4 後半 *"By a variation of the Frattini argument, `SB = S·N_G(R₀)`.
+By the Schur–Zassenhaus Theorem, `N_G(R₀)` contains a complement `B*` to
+`N_G(R₀) ∩ S`, and `B* = B^y` for some `y ∈ S`."* は、**Isaacs Lemma 3.24(a)
+(Glauberman fixed-point lemma) の証明そのもの** (`Γ = G ⋊ A` → Frattini →
+SZ 存在 → SZ 共役)。repo に `Isaacs.Ch04.glauberman_fixed_point_exists` として
+既に形式化済みだったので、**`S ⋊ B` を新規に組む必要はまったく無かった**。
+
+同様に締めの *"A fixes at least one element z of y·N_S(R₀) … z = 1"* は
+**Isaacs Thm 3.27** (`aInvariant_coset_mem_centralizer_of_coprime_subgroup`)。
+
+⟹ 前回セッションの「⬜ 必要な新規インフラ」リスト (半直積の配線 / Frattini
+変形 / Schur–Zassenhaus / coprime 固定点) は **4 件とも不要**だった。適用形は:
+
+- `Ω := { W : Subgroup R // ∃ s : ↥Ω₁(R), W = MulAut.conj ↑s • R₀ }`
+- `↥Ω₁(R)` は共役で `Ω` に推移的、`B` は `exists_conj_smul_R₀` で `Ω` を保つ
+- compatibility は `smul_conj_smul` 一発、coprime は `p ∤ |B|`、可解性は p 群
+
+📌 **教訓**: BG が「Frattini + Schur–Zassenhaus」と手で書き下している箇所は、
+**Isaacs Ch.3/Ch.4 の既存定理 1 本に畳めることがある**。着手前に `grep -rn`
+で Isaacs 側の該当番号 (今回は 3.24 / 3.27) を確認する。
+[[bg-gorenstein-reread-as-isaacs]] と同じ読み替えが Gorenstein 引用以外にも効く。
+
+### リポジトリ状態
+
+`AppE` の残 sorry は **E.4 と E.5 の 2 件** (前 3 件)。
+`#print axioms` = propext / Classical.choice / Quot.sound のみ。
+`AppE_FurtherResults.lean` の E.3(d) sorried statement は削除し、
+E.3(b)/(c) と同型の「下流 leaf に在る」注記コメントに置換 (consumer 0)。
+
+### 次の一手 = **BG Proposition E.4**
+
+`|S| ≥ p⁴`・`B` が `R` に regular・`B` が `R₀` を固定しない ⟹ `C_S(Z₂(S))` は
+指数 `p` のアーベル部分群。BG の議論は 2 次元 `𝔽_p`-空間 `S/S'` の中で走り、
+`α` の固有値 `r, r₀` (on `R₀S'/S'`) と `β` の `t, t₀` (on `T/S'`) を比較して
+`j + 2 = k − i` から `t₀ = t` の矛盾を出す。E.3 を全部消費する。
+
+## 2026-07-20 (26): BG Proposition E.4 に着手 — 指数 clause と (E.18)/(E.20) 済
+
+新 leaf **`OddOrder/BG/AppE_AbelianCentralizer.lean`** (同 commit で `OddOrder.lean` 配線)。
+
+| 宣言 | 内容 |
+|---|---|
+| `omega1UpperCentralTwo_eq_upperCentralSeries` | 指数 p の群で `Ω₁(Z₂(S)) = Z₂(S)` |
+| `centralizer_upperCentralSeries_eq_centralizer_omega1` | 同、centralizer 形 |
+| ⭐ `not_fixes_sup_frattini_of_not_fixes_R₀` | **(E.18)** = E.3(d) の対偶 |
+| `three_le_pRank_omega` | `\|S\| ≥ p⁴` ⟹ `3 ≤ r(S)` (Step 2 の前提) |
+| ⭐ `index_centralizer_upperCentralSeries` | **E.4 の指数 clause** `\|S : C_S(Z₂(S))\| = p` |
+| `mulAut_mul_comm_of_isCyclic` / `commutator_le_ker_of_isCyclic` | 巡回群の `MulAut` はアーベル |
+| ⭐ `commutator_eq_bot` | **(E.20)** `B` はアーベル |
+
+⚠ **綴りの橋が要る**: Step 2 は Lemma 5.2 の都合で `T = C_S(Ω₁(Z₂(S)))` と綴るが、
+BG の E.4 は `C_S(Z₂(S))`。`S = Ω₁(R)` が指数 p ゆえ同一 (第 1 行の補題)。
+これが無いと E.4 を BG の綴りで**述べられない**。
+
+📌 再び **BG の longhand = 既存 Isaacs 定理**: (E.20) の "By Proposition 1.5(d)" は
+**Isaacs Cor 3.28** = `Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`。
+Step 4 の 3.24(a)/3.27 と合わせて 3 度目 ([[bg-longhand-arguments-may-be-existing-isaacs-lemmas]])。
+
+### ⬜ 次の一手 = `S/S'` 上の 2 次元固有値解析
+
+BG の残りは全部これ (`S/S'` は `\|S/S'\| = p²` = E.3(b) 第 3 clause より 2 次元 `𝔽_p`-空間)。
+
+1. ⬜ **`S' ≤ T`** — `\|S:T\| = p` ⟹ `S/T` 巡回 ⟹ アーベル ⟹ `S' ≤ T`。
+2. ⬜ **`B`-不変な補空間 `Q/S'`** — `T/S'` は `B`-不変な 1 次元部分空間。
+   ✅ **道具は在る**: `BG/Ch1_Preliminary/OperatorMaschke.lean` の
+   `exists_aInvariant_complement_of_isElementaryAbelian`
+   (`E` elementary abelian + coprime `MulAut` 作用 ⟹ `A`-不変補空間)。
+   `E := ↥S ⧸ commutator ↥S`、`φ := quotientMulAutHom`、`U := T.map (mk' S')`。
+3. ⬜ **`r = r₀`** — `α` の固有値 `r` (on `R₀S'/S'`) と `r₀` (on `T/S'`)。
+   `β` は `α` と可換 ((E.20)) なので `r ≠ r₀` なら `β` は両固有空間を固定 →
+   `R₀S'` を固定 → (E.18) に矛盾。
+4. ⬜ **`t ≠ t₀`** ((E.21)) — `t = t₀` なら `β` は `S/S'` の全 1 次元部分空間を固定、
+   特に `R₀S'/S'` → (E.18) に矛盾。
+5. ⬜ **(E.23)** = (E.22) の `β` 版 `wᵢ^β ≡ wᵢ^{tᵢ} (mod Hᵢ₊₁)`, `tᵢ = t₀ tⁱ`。
+   ✅ (E.22) 側は `exists_eigenvalue_pow` (`AppE_RegularOperator.lean:640`) に在る。
+   ⚠ ただし `exists_eigenvalue_pow` は `a ∈ hyp.A` を要求する形なので、
+   **`β ∈ B` 一般に効く形への一般化**が要る (`A_regular` を使っていないか要確認)。
+6. ⬜ **`k, i, j` の組合せ** — `k` 極小で `T/H_k` 非アーベル、`i`/`j` 極大。
+   Lemma 4.2 (= `commutatorElement_zpow_zpow_of_central`, 既存) で
+   `rᵢrⱼ ≡ r_{k-1}`、(E.26) `r₀r^{i+j} = r^{k-1}`、(E.27) `t₀t^{i+j} = t^{k-1}`。
+7. ⬜ **最終算術** — `p^k ≤ p^{q-1}` (E.3(c)) ⟹ `k ≤ q-1`、`r₀ = r` と
+   `r` の位数 `q` から `j+2 ≡ k-i (mod q)`、範囲から `j+2 = k-i`、
+   (E.27) で `t₀ = t` ⟹ (E.21) に矛盾。
+
+## 2026-07-20 (27): セッション終了時点 — E.4 の 7 ステップ計画のうち 1・2 完了
+
+`AppE_AbelianCentralizer.lean` に追加:
+
+| 宣言 | 計画の項 |
+|---|---|
+| `commutator_le_of_isCyclic_quotient` / `commutator_le_centralizer` | **1 ✅ `S' ≤ T`** |
+| `isElementaryAbelian_quotient_commutator` | (2 の前提) `S/S'` は elementary abelian |
+| `exists_aInvariant_complement_of_centralizer` | **2 ✅ `B`-不変補空間 `Q/S'`** |
+| ⭐ `exists_zpow_of_map_eq_of_isCyclic` | (3-5 の土台) **固有値抽出** |
+| `card_map_R₀_subgroupOf` | `\|R₀S'/S'\| = p` (BG の第 1 直線) |
+| `card_map_centralizer` | `\|T/S'\| = p` (BG の第 2 直線) |
+
+### ⬜ 次の一手 = 計画の項 3 (`r = r₀`)
+
+道具は揃った。`α ∈ A^#` を取り、
+
+- `R₀S'/S'` = `card_map_R₀_subgroupOf` の直線 (位数 p ⟹ 巡回) に
+  `exists_zpow_of_map_eq_of_isCyclic` を当てて固有値 `r`
+- `T/S'` = `card_map_centralizer` の直線に同じく当てて `r₀`
+
+`r ≠ r₀` を仮定すると、`β` は `α` と可換 ((E.20) `commutator_eq_bot`) なので
+`α` の相異なる固有値の固有空間を保つ ⟹ `β` は `R₀S'/S'` を固定 ⟹
+`β` は `R₀S'` を固定 ⟹ (E.18) (`not_fixes_sup_frattini_of_not_fixes_R₀`) に矛盾。
+
+⚠ 「可換な作用素は相異なる固有値の固有空間を保つ」は 2 次元なので初等的だが、
+**部分群の言葉で書く必要がある**: `V₁ = ker(α - r)`, `V₂ = ker(α - r₀)` を
+`Subgroup (S/S')` として定義し (`{x | α x = x^r}` は部分群)、
+`β` がそれらを保つことを `α β = β α` から出す。
+
+### リポジトリ状態
+
+`AppE` の残 sorry = **E.4 と E.5 の 2 件** (セッション開始時 3 件 = E.3(d)/E.4/E.5)。
+全体 sorry 13 (開始時 14)。フルビルドは hub の合流 gate に委ねる (leaf build green)。
+
+## 2026-07-20 (28): E.4 計画の項 3 — 一般補題は全て揃った (残りは組み立て)
+
+`AppE_AbelianCentralizer.lean` に追加 (すべて一般形、leaf build green):
+
+| 宣言 | 内容 |
+|---|---|
+| `eigenSubgroup` / `mem_eigenSubgroup` | アーベル群の自己同型の `r`-固有空間 (部分群) |
+| ⭐ `map_eigenSubgroup_of_commute` | 可換な自己同型は各固有空間を onto で保つ |
+| `eigenSubgroup_inf_eq_bot` | 指数 p・`p ∤ r-r₀` ⟹ 2 固有空間の交わりは 1 |
+| ⭐ `eigenSubgroup_eq_of_card_prime_sq` | `\|E\| = p²` + 2 直線が位数 p ⟹ **固有空間 = 直線** |
+
+### ⬜ 次 = 項 3 の**組み立て**のみ
+
+一般補題は出揃ったので、残りは `E := ↥S ⧸ commutator ↥S` への具体化と剰余群からの引き戻し:
+
+1. `hcomm` / `hexp` / `hcard = p²` は `isElementaryAbelian_quotient_commutator` +
+   `card_omega_abelianization` から。
+2. `f := hS'inv.quotientMulAutHom α`、`g := hS'inv.quotientMulAutHom β`。
+   可換性は **(E.20) `commutator_eq_bot`** から (`B` アーベル ⟹ 像も可換)。
+3. 2 直線 `L₁ := (R₀.subgroupOf S).map (mk' N)`、`L₂ := T.map (mk' N)`。
+   位数 p は `card_map_R₀_subgroupOf` / `card_map_centralizer`。
+   固有値 `r`, `r₀` は `exists_zpow_of_map_eq_of_isCyclic`
+   (両直線は位数 p ⟹ 巡回、`α`-不変)。
+4. `p ∤ r - r₀` を仮定 ⟹ `eigenSubgroup_eq_of_card_prime_sq` で `eigen (f α) r = L₁`
+   ⟹ `map_eigenSubgroup_of_commute` で `β` が `L₁` を保つ。
+5. **引き戻し**: `Subgroup.comap_map_eq : (H.map f).comap f = H ⊔ f.ker` と
+   `QuotientGroup.ker_mk'` で `comap (mk' N) L₁ = R₀.subgroupOf S ⊔ commutator ↥S`。
+   `β` が `L₁` を保つ ⟹ `β` がこれを保つ。
+6. **ambient へ**: `map_subtype_sup_commutator` (Step 4 leaf) で
+   `(R₀.subgroupOf S ⊔ commutator ↥S).map S.subtype = R₀ ⊔ derivedInG S`
+   ⟹ `act β • (R₀ ⊔ derivedInG S) = R₀ ⊔ derivedInG S` ⟹
+   `frattiniInG_omega_eq_derivedInG` で `frattiniInG` 形にして
+   **(E.18) `not_fixes_sup_frattini_of_not_fixes_R₀` に矛盾**。
+
+⟹ `p ∣ r - r₀`、すなわち **`r ≡ r₀ (mod p)`** = BG の *"Therefore r = r₀"*。
+
+その後は項 4 (`t ≠ t₀`)、項 5 ((E.23))、項 6-7 (組合せ + 最終算術)。
+
+## 2026-07-20 (29): ⭐ E.4 計画の項 3 (`r = r₀`) 完了
+
+`RegularOperatorSetup.dvd_sub_eigenvalues` — `(p : ℤ) ∣ r - r₀`。
+(28) に書いた 6 手順どおりに組み上がった (引き戻しは `Subgroup.comap_map_eq` +
+`QuotientGroup.ker_mk'`、ambient 化は `map_subtype_sup_commutator`、
+最後は `frattiniInG_omega_eq_derivedInG` 経由で E.3(d) に食わせて (E.18) と衝突)。
+
+⚠ 実装メモ: `((act b) : R →* R).comp S.subtype = S.subtype.comp ((φ b) : ↥S →* ↥S)`
+は `rfl` で通る (`MonoidHom.ext fun _ => rfl`) が、`Subgroup.map_map` の後に
+明示的に `rw` しないと残る。
+
+### ⬜ 次 = 項 4 (`t ≠ t₀`) — (E.21)
+
+BG: *"Since `B` fixes `T/S'` and `p` does not divide `|B|`, `B` fixes some complement
+`Q/S'` of `T/S'` in `S/S'`.  Let `β` have eigenvalues `t` and `t₀` on `Q/S'` and `T/S'`,
+respectively.  If `t = t₀`, then `β` fixes every 1-dimensional subspace of `S/S'`,
+including `R₀S'/S'`.  Thus `t ≠ t₀`."*
+
+道具:
+- `Q/S'` = `exists_aInvariant_complement_of_centralizer` (項 2、済)。
+- `t`, `t₀` = `exists_zpow_of_map_eq_of_isCyclic` を `Q/S'`・`T/S'` に (どちらも位数 p)。
+- ⬜ **要新規**: 「`t = t₀` なら `β` は全ての部分群を保つ」。
+  `S/S' = Q/S' ⊕ T/S'` の直和分解の上で `β x = x^t` が**全体**で成り立つ
+  ことを示す (両成分で同じ冪) ⟹ 任意の部分群 `V` で `β • V = V`。
+  ⟹ 特に `R₀S'/S'` を保つ ⟹ 項 3 と同じ引き戻し (手順 3-5) で (E.18) に矛盾。
+  📌 手順 3-5 は項 3 の証明内にインラインで書いた。項 4 でも使うので
+  **「`B` が `R₀S'/S'` を保つ ⟹ 矛盾」を補題として切り出す**のが得策。
+
+## 2026-07-20 (30): ⭐ E.4 計画の項 4 (`t ≠ t₀` = (E.21)) 完了
+
+| 宣言 | 内容 |
+|---|---|
+| `smul_sup_derived_of_preserves_line` | (refactor) 単一 `b` が `R₀S'/S'` を保つ ⟹ `R₀Φ(S)` を固定 |
+| `B_fixes_R₀_of_preserves_line` | その `∀ b` 版 (E.3(d) で締める) |
+| `forall_zpow_of_sup_eq_top` | 補い合う 2 部分群で固有値が合同 ⟹ 全体で単一の冪写像 |
+| `map_eq_self_of_forall_zpow` | 単一の冪写像は**あらゆる**部分群を保つ |
+| ⭐ `not_dvd_sub_eigenvalues_of_not_fixes` | **(E.21) `t ≠ t₀`** |
+
+進捗: 7 ステップ計画の **1・2・3・4 完了**。
+
+### ⬜ 次 = 項 5 ((E.23) = (E.22) の `β` 版)
+
+BG: *"By (E.16) and (E.19) in Step 2, `wᵢ^α ≡ wᵢ^{rᵢ} (mod Hᵢ₊₁)` (E.22) for `rᵢ = r₀rⁱ`.
+Similarly one can show that `wᵢ^β ≡ wᵢ^{tᵢ} (mod Hᵢ₊₁)` (E.23) for `tᵢ = t₀tⁱ`."*
+
+✅ `α` 側 = `RegularOperatorSetup.exists_eigenvalue_pow`
+(`AppE_RegularOperator.lean:640`) に既に在る。
+
+⚠ **要調査**: `exists_eigenvalue_pow` は `{a : B} (ha : a ∈ hyp.A)` を要求する。
+BG の "Similarly" が効くのは `β ∈ B` 一般。まず **`ha` が本当に使われているか**を
+実測すること (`eigenvalue_step` / `exists_zpow_of_chain` の依存を辿る)。
+- 使っていない ⟹ 仮説を `a ∈ hyp.A` から外して一般化 (1 箇所の signature 変更)。
+- 使っている ⟹ 何に使っているかを見て、`β` 版に必要な条件を切り出す
+  (`A_regular` は `A` 固有だが、chain の `A`-不変性は `B`-不変性でも足りるはず —
+  `H_i = iterCommutator (C_S(Ω₁Z₂S)) ⊤ i` は characteristic なので `B` 不変)。
+
+📌 これは **項 6-7 の前提**なので、次イテレーションの最初に片付ける。
+
+### ファイルサイズ
+
+`AppE_AbelianCentralizer.lean` は現在 700 行台。E.4 の残り (項 5-7) は
+組合せ論と算術で嵩むので、**1500 行を超えたら新 leaf に分ける**
+(項 6-7 = `AppE_EigenvalueArithmetic.lean` 相当が自然な切れ目)。
+
+## 2026-07-20 (31): 項 5 ((E.23)) の障害を特定 — BG の "Similarly" は自明でない
+
+### 実測 1: `exists_eigenvalue_pow` の `ha : a ∈ hyp.A` 依存
+
+`eigenvalue_step` の本体は `A_regular` / `A_card` / `A_fixes_R₀` を**一切使っていない**
+(grep で 0 hit)。`ha` は `hSinv.restrict ⟨a, ha⟩` を作るためだけ。
+⟹ **作用素の一般化自体は signature 変更だけで済む** (`hSinv` を
+`IsAInvariant (hyp.act.comp hyp.A.subtype) S` から `IsAInvariant hyp.act S` に、
+`a ∈ A` を落とす)。
+
+⚠ ただし `exists_zpow_eq_mod_chain` が返す `(r : ZMod p)^q = 1` は `A` 固有
+(`exists_zpow_eq_act_of_mem_A` が `A_card = q` を使う)。(E.23) はこの clause を
+必要としないので、`β` 版では落とせばよい。
+
+### 実測 2 (原文): **(E.22) の根拠は (E.12) であって (E.16) ではない**
+
+BG p.163 の *"By (E.16) and (E.19) in Step 2"* の "(E.16)" は
+**pdftotext の誤読で、正しくは (E.12)**。根拠:
+- Step 2 の (E.16) は `|T : T₁|·|S|/p² < |S|` かつ `|T : T₁| < p²` (p.160) で、
+  固有値とは無関係。
+- (E.12) は `rᵢ ≡ r₀ rⁱ (mod p)` (p.160) で (E.22) の主張そのもの。
+⟹ **(E.22) = repo の `exists_eigenvalue_pow` で既に在る**。
+
+### ⚠ 実測 3: 本当の障害 — `β` は `R₀` を正規化しない
+
+Step 2 の帰納は `v^α = v^r` (`α` が `R₀` を保つ) を**literal に**使う
+(`eigenvalue_step` の仮説 `hr : σ v = v ^ r`)。ところが `β` は
+(E.18) により `R₀Φ(S)` を固定**しない**ので `v^β` は `v` の冪でない。
+
+`S/T ≅ Q/S'` 上では `v^β ≡ v^t (mod T)` なので `v^β = v^t · z`, `z ∈ T = H₀`。
+すると帰納の計算に誤差項 `⁅wᵢ, z⁆` が出る。これが `H_{i+2}` に入れば閉じるが、
+一般には `⁅Hᵢ, T⁆ ≤ ⁅Hᵢ, S⁆ = H_{i+1}` しか言えず、**1 段足りない**。
+
+しかも BG 自身が (E.25) で *"take `i` maximal such that `[Hᵢ, T] ⊄ H_k`"* と書くので、
+`⁅Hᵢ, T⁆` は自明に潰れる対象ではない。
+
+⟹ **BG の "Similarly one can show that (E.23)" は行間**。次の 3 択を調べる:
+1. `⁅wᵢ, T⁆ ≤ H_{i+2}` が (E.19) の `|Hᵢ : H_{i+1}| = p` と
+   `H_{i+1} = ⟨w_{i+1}, H_{i+2}⟩` から実は従う (最有力 — `Hᵢ = ⟨wᵢ⟩H_{i+1}` と
+   `⁅H_{i+1}, T⁆ ≤ H_{i+2}` は言えるので、残るのは `⁅wᵢ, T⁆` のみ)。
+2. `β` 版の chain は `v` でなく `S/T` の生成元の別の代表で回す。
+3. 誤差を `t₀` 側に吸収する形の別の帰納。
+
+📌 **次イテレーションの手順**: (a) `coq/theories/BGappendixC.v` 等に App.E 相当が
+あるか確認 (無い可能性が高い — Coq 版は FT 本体のみ)、(b) 無ければ
+[[feedback-ask-chatgpt-for-elided-gaps]] に従い自己完結プロンプトで ChatGPT (最強モデル) に
+`⁅Hᵢ, T⁆ ≤ H_{i+2}` の成否を問う、(c) 並行して選択肢 1 を Lean で直接試す。
+
+⚠ この間、**項 6-7 (組合せ + 最終算術) は (E.22)/(E.23) を仮説パラメータに取る形で
+先に組める** ([[feedback-gated-endpoint-skeleton-pattern]])。項 5 で止まらないこと。
+
+## 2026-07-20 (32): 項 5 の障害を精密化 — 二者択一に絞れた
+
+(31) の分析を進めて、(E.23) が成り立つ条件を**正確な二者択一**まで詰めた。
+
+### 枠組み
+
+各段の交換子写像は**双線形で `β`-同変**:
+
+```
+H_i/H_{i+1}  ⊗  S/S'  ⟶  H_{i+1}/H_{i+2}      (全射; H_{i+1} = ⁅H_i, S⁆)
+```
+
+- `H_{i+1}/H_{i+2}` は位数 p の 1 次元、`β` はスカラー `t_{i+1}` で作用。
+- `S/S' = Q/S' ⊕ T/S'`、`β` の固有値は `t`, `t₀` で **`t ≠ t₀`** (項 4 = (E.21))。
+- ⟹ 2 成分の寄与は固有値 `t_i·t` と `t_i·t₀` で**相異なる**。
+  標的が単一固有値なので、**高々一方しか非零**。全射性より**ちょうど一方が非零**。
+
+### ⟹ 二者択一
+
+| | 消える側 | 得られる漸化式 | (E.23) |
+|---|---|---|---|
+| **Case A** | `⁅H_i, T⁆ ≤ H_{i+2}` | `t_{i+1} = t_i·t` | ✅ BG の主張 |
+| **Case B** | `⁅H_i, Q⁆ ≤ H_{i+2}` | `t_{i+1} = t_i·t₀` | ❌ |
+
+⚠ **Case B は今のところ排除できていない**。`w_{i+1} = ⁅w_i, v⁆ ∉ H_{i+2}` は
+`⁅H_i, R₀⁆H_{i+2} = H_{i+1}` を与えるが、`R₀S'/S'` は `Q/S'` と `T/S'` の
+**どちらとも異なる第 3 の直線**なので、その非零性は Case B とも両立する
+(`R₀` の像 = `Q` 成分の像 + `T` 成分の像 = 0 + 非零)。
+
+⚠ `α` 側からは絞れない: 項 3 で **`r = r₀`** を示したので `α` は `S/S'` 全体に
+スカラーで作用し、どちらの成分が消えるかの情報を持たない。
+
+### ⟹ 次イテレーションの選択肢
+
+1. **Case B を排除する追加の議論**を見つける (BG が省いた行間)。
+   候補: `k` の極小性 (`T/H_k` 非アーベル) や (E.24) `T'H_k = H_{k-1}` を使う。
+   `⁅H_i, T⁆ ≤ H_{i+2}` が全 `i` で成り立つなら `⁅T, T⁆ ≤ H_2` 系の帰結が出るはずで、
+   これが (E.24) と噛み合うか要確認。
+2. **Case A/B の両方を扱う**形に (E.26)/(E.27) を一般化する
+   (Case B なら `t_i = t₀^{i+1}`、最終算術がどうなるか計算する)。
+3. [[feedback-ask-chatgpt-for-elided-gaps]] — 自己完結プロンプトで ChatGPT (最強モデル) に
+   「BG App.E Prop E.4 の (E.23) で `⁅H_i, T⁆ ≤ H_{i+2}` はなぜ言えるか」を問う。
+
+📌 **並行して項 6-7 は (E.22)/(E.23) を仮説パラメータに取る形で先に組む**
+([[feedback-gated-endpoint-skeleton-pattern]])。項 6-7 は組合せ論と `(ZMod p)ˣ` の
+算術で、(E.23) の成否と独立に完結する。**項 5 で手を止めない**。
+
+## 2026-07-20 (33): ⭐ E.4 計画の項 7 (最終算術) 完了 — 項 5 と独立に確定
+
+`eq_of_eigenvalue_relations` — `(ZMod p)ˣ` の純粋算術。BG p.164 の締めそのもの。
+
+```
+orderOf r = q,  j ≤ i,  i + 1 ≤ m,  m + 2 ≤ q,
+r^(i+j+1) = r^m,  t₀ · t^(i+j) = t^m       ⟹   t₀ = t
+```
+
+(`m = k - 1` と置いて ℕ の切り捨て減算を回避。)
+
+要点は **合同から等号への格上げ**: `pow_eq_pow_iff_modEq` で
+`i+j+1 ≡ m (mod q)` を得たあと、範囲条件 (`j ≤ i < m`, `m+2 ≤ q`) から
+`|m - (i+j+1)| < q` を omega で出し、`Int.eq_zero_of_abs_lt_dvd` で `= 0` に。
+
+⚠ (E.22)/(E.23) の導出とは**独立**。項 5 の Case A/B が未決でも確定。
+
+### 進捗まとめ
+
+| 項 | 内容 | 状態 |
+|---|---|---|
+| 1 | `S' ≤ T` | ✅ |
+| 2 | `B`-不変補空間 `Q/S'` | ✅ |
+| 3 | `r = r₀` | ✅ |
+| 4 | `t ≠ t₀` = (E.21) | ✅ |
+| 5 | (E.23) = (E.22) の `β` 版 | ⚠ **Case A/B 未決** ((32)) |
+| 6 | `k,i,j` の組合せ + Lemma 4.2 ⟹ (E.26)/(E.27) | ⬜ |
+| 7 | 最終算術 | ✅ |
+
+### ⬜ 次 = 項 6
+
+BG: *"Take `k` minimal such that `T/H_k` is not abelian.  Then `[H₀,H₀]H_k = T'H_k = H_{k-1}`
+(E.24).  Now take `i` maximal such that `[H_i,T] ⊄ H_k` and `j` maximal such that
+`[H_i,H_j] ⊄ H_k`.  Then `0 ≤ j ≤ i ≤ k-2` and `[w_i,w_j] ∈ H_{k-1} - H_k` (E.25).
+By (E.22), ∃ `x ∈ H_{i+1}`, `x' ∈ H_{j+1}` with `w_i^α = w_i^{r_i}x`, `w_j^α = w_j^{r_j}x'`,
+and `[w_i,w_j]^α ≡ [w_i,w_j]^{r_{k-1}} (mod H_k)`.  By Lemma 4.2,
+`[w_i,w_j]^α ≡ [w_i,w_j]^{r_i r_j} (mod H_k)`.  Therefore by (E.25), `r_i r_j = r_{k-1}`."*
+
+必要な部品:
+- `k` の極小性から (E.24) `T'H_k = H_{k-1}`。
+- `i`, `j` の極大性から誤差項 `⁅H_{i+1}, H_j⁆ ≤ H_k`・`⁅H_i, H_{j+1}⁆ ≤ H_k`
+  (これが Lemma 4.2 の適用条件)。
+- Lemma 4.2(a) = `commutatorElement_zpow_zpow_of_central`
+  (`AppE_RegularOperator.lean:390`, 既存) の section 版。
+- `⁅w_i,w_j⁆ ∈ H_{k-1} - H_k` と `|H_{k-1}:H_k| = p` で**冪の合同を指数の合同に**落とす。
+  📌 項 3 で作った `exists_zpow_of_map_eq_of_isCyclic` と同じ発想が使える。
+
+⚠ 項 6 は `α` 版 ((E.26)) と `β` 版 ((E.27)) が同型なので、
+**作用素を仮説パラメータに取る 1 本の補題**で両方を賄うべき
+(項 5 の Case A/B が決まる前でも `β` 版の形は書ける)。
+
+### ファイルサイズ
+
+`AppE_AbelianCentralizer.lean` = 現在 724 行。項 6 で嵩むので、
+1500 行に近づいたら項 6-7 を `AppE_EigenvalueArithmetic.lean` に分ける。
+
+## 2026-07-20 (34): 項 6 の部品 1 — 冪の合同 → 指数の合同
+
+`dvd_sub_of_zpow_mul_inv_zpow_mem` — `|G : K| = p`・`y ∉ K`・`y^a(y^b)⁻¹ ∈ K`
+⟹ `(p : ℤ) ∣ a - b`。BG の (E.26) 導出の締め (*"Therefore, by (E.25), rᵢrⱼ = r_{k-1}"*)。
+
+### ⬜ 項 6 の残り部品
+
+**(i) Lemma 4.2(a) の「K を法とする」版** — 最も重い。BG の
+
+`⁅wᵢ^{rᵢ}x, wⱼ^{rⱼ}x'⁆ ≡ ⁅wᵢ,wⱼ⁆^{rᵢrⱼ} (mod H_k)`  (`x ∈ H_{i+1}`, `x' ∈ H_{j+1}`)
+
+方針: **商 `G/K` に落として既存の `commutatorElement_zpow_zpow_of_central`
+(`AppE_RegularOperator.lean:390`) を使う**。`Ḡ` では
+`⁅ū,ȳ⁆ = ⁅x̄,v̄⁆ = ⁅ū,v̄⁆ = 1` (i,j の極大性から `⁅H_{i+1},Hⱼ⁆ ≤ H_k` 等) なので
+`⁅x̄^m ū, ȳ^n v̄⁆ = ⁅x̄^m, ȳ^n⁆ = ⁅x̄,ȳ⁆^{mn}`。
+
+⚠ 第 1 等号 (`⁅ab,cd⁆ = ⁅a,c⁆` when `b` が `c,d` と可換・`d` が `a` と可換) は
+素朴には成り立たないので、**必要な可換条件を正確に洗い出してから**書くこと。
+`u, v` は `K` の元ではない (交換子だけが `K` に入る) ので、
+`ū, v̄` は `Ḡ` で非自明なまま。
+
+**(ii) `k` の極小性 ⟹ (E.24) `T'H_k = H_{k-1}`**
+
+**(iii) `i`, `j` の極大性 ⟹ (E.25) の範囲 `0 ≤ j ≤ i ≤ k-2` と
+`⁅wᵢ,wⱼ⁆ ∈ H_{k-1} − H_k`**
+
+📌 (i) を先にやる (α/β 両版が共有する核)。(ii)(iii) は chain の性質で、
+Step 2 の `iterCommutator` API (`AppE_RegularOperator.lean` の
+`iterCommutator_le_of_le` / `iterCommutator_ne_bot_of_le` 等) が土台になる。
+
+## 2026-07-20 (35): ⭐ 項 6 の核 — 両スロット誤差付き Lemma 4.2
+
+`commutatorElement_zpow_mul_zpow_mul` — `Commute u y`, `Commute u v`, `Commute v x`,
+`⁅x,y⁆ ∈ center` ⟹ `⁅x^m·u, y^n·v⁆ = ⁅x,y⁆^{m·n}`。
+
+⚠ Step 2 の `commutator_zpow_mul_congr` との違い: あちらは誤差項が**片側だけ**
+(第 2 スロットが `R₀` の生成元 `v` で `α` がぴったり冪倍するから)。
+E.4 は `⁅wᵢ, wⱼ⁆` で**両側**に誤差が出るので、この一般形が新たに要る。
+
+📌 (34) の懸念「`⁅ab,cd⁆ = ⁅a,c⁆` は素朴には成り立たない」は、必要十分な
+可換条件を **`Commute u y` / `Commute u v` / `Commute v x` の 3 つ**に特定して解決。
+(`b` が `c,d` と可換 + `d` が `a` と可換。`b` と `a`、`d` と `c` の可換性は不要。)
+
+### 項 6 の残り
+
+| 部品 | 状態 |
+|---|---|
+| 冪の合同 → 指数の合同 (`dvd_sub_of_zpow_mul_inv_zpow_mem`) | ✅ (34) |
+| Lemma 4.2 両スロット版 (`commutatorElement_zpow_mul_zpow_mul`) | ✅ 本項 |
+| (ii) `k` の極小性 ⟹ (E.24) `T'H_k = H_{k-1}` | ⬜ |
+| (iii) `i`,`j` の極大性 ⟹ (E.25) の範囲 + `⁅wᵢ,wⱼ⁆ ∈ H_{k-1} − H_k` | ⬜ |
+| (iv) 上を束ねて (E.26)/(E.27) | ⬜ |
+
+⚠ (ii)(iii) は `iterCommutator` chain の性質で、Step 2 の API
+(`AppE_RegularOperator.lean`: `iterCommutator_le_of_le` / `iterCommutator_ne_bot_of_le` /
+`index_subgroupOf_chain`) が土台。**`k`/`i`/`j` の存在は「有限降下列の極小/極大元」**
+なので `Nat.find` 系で取る。
+
+## 2026-07-20 (36): ⭐ (E.26)/(E.27) を作用素非依存の 1 補題に統合
+
+BG は (E.26) と (E.27) を *"By using β instead of α, we obtain similarly"* で済ませる。
+形式化でも **1 本**にした: `dvd_sub_mul_of_commutator_eigen`。
+
+```
+Commute u y, Commute u v, Commute v x, ⁅x,y⁆ ∈ center, ⁅x,y⁆^p = 1, ⁅x,y⁆ ≠ 1,
+⁅x^m·u, y^n·v⁆ = ⁅x,y⁆^c                                    ⟹  (p:ℤ) ∣ m*n - c
+```
+
+`σ = α` で (E.26)、`σ = β` で (E.27)。支持補題 `dvd_sub_of_zpow_eq_zpow` /
+`orderOf_eq_of_pow_eq_one` も追加。
+
+### ⟹ 項 6 の**代数的な核は完成**
+
+残るのは chain の組合せ論だけ:
+
+- (ii) `k` = `T/H_k` が非アーベルになる極小の添字 ⟹ (E.24) `T'H_k = H_{k-1}`
+- (iii) `i` = `⁅H_i,T⁆ ⊄ H_k` なる極大、`j` = `⁅H_i,H_j⁆ ⊄ H_k` なる極大
+       ⟹ (E.25) `0 ≤ j ≤ i ≤ k-2` かつ `⁅w_i,w_j⁆ ∈ H_{k-1} − H_k`
+- (iv) `k ≤ q-1` (E.3(c) `|S| ≤ p^q` と `|T| = p^n = |S|/p` から)
+
+⟹ これらが揃えば `eq_of_eigenvalue_relations` (項 7) に流し込んで E.4 の
+abelian clause が閉じる (**項 5 の Case A/B を除いて**)。
+
+### 現状の全体像 (E.4)
+
+| 項 | 状態 |
+|---|---|
+| 1 `S' ≤ T` | ✅ |
+| 2 `B`-不変補空間 | ✅ |
+| 3 `r = r₀` | ✅ |
+| 4 `t ≠ t₀` (E.21) | ✅ |
+| 5 (E.23) の `β` 版 | ⚠ Case A/B 未決 ((32)) |
+| 6 代数的な核 (Lemma 4.2 + 指数取り出し + (E.26)/(E.27)) | ✅ |
+| 6' chain の組合せ ((E.24)/(E.25)/`k ≤ q-1`) | ⬜ |
+| 7 最終算術 | ✅ |
+
+## 2026-07-20 (37): (E.24) の核 — 指数 p の section には余地が無い
+
+`eq_of_lt_of_le_of_card_eq_prime_mul` — `|L| = p·|K|`・`K < X ≤ L` ⟹ `X = L`。
+BG の *"Then `T'H_k = H_{k-1}`"* はこれ + `k` の極小性 (`T' ≤ H_{k-1}`, `T' ⊄ H_k`)。
+
+⚠ **Lean 実装メモ**: `p * b = p` から `b = 1` を出すのに `omega` は使えない
+(`p`・`b` とも変数なので非線形)。`Nat.eq_of_mul_eq_mul_left hp.pos` を使う。
+同型の失敗を繰り返さないこと。
+
+### 項 6' の残り (chain の組合せ)
+
+| | 状態 |
+|---|---|
+| 「指数 p の間に余地なし」(E.24 の核) | ✅ 本項 |
+| `k` の存在 (`T/H_k` 非アーベルな極小添字) — `Nat.find` | ⬜ |
+| `i`,`j` の存在 (極大添字) + (E.25) の範囲 `0 ≤ j ≤ i ≤ k-2` | ⬜ |
+| `⁅w_i,w_j⁆ ∈ H_{k-1} − H_k` | ⬜ |
+| `k ≤ q-1` (E.3(c) `\|S\| ≤ p^q` + `\|T\| = \|S\|/p` から) | ⬜ |
+
+⚠ これらは `RegularOperatorSetup` の chain (`iterCommutator (C_S(Ω₁Z₂S)) ⊤ i`) に
+**強く依存する具体作業**で、一般補題として切り出せる部分は概ね出し尽くした。
+次イテレーションからは setup 内での組み立てになる。
+
+📌 ファイルは 862 行。項 6' の具体作業で嵩むので、**1500 行に近づいたら
+`AppE_EigenvalueCombinatorics.lean` に分割**する (CLAUDE.md ファイル粒度)。
+
+## 2026-07-20 (38): BG の `k`・`i`・`j` の取り出しを一般形で
+
+- `exists_min_index_commutator_not_le` — 極小 `k` (`T' ⊄ H_k`)。`k ≥ 1` と
+  `T' ≤ H_{k-1}` (= (E.24) が使う極小性) を同時に返す。
+- `exists_max_of_holds_at_zero` — 極大 `i`/`j` (`Nat.findGreatest` の包み直し)。
+
+⟹ 項 6' の「添字の存在」部分は完了。残りは **これらを `RegularOperatorSetup` の
+chain に当てて (E.25) の範囲 `0 ≤ j ≤ i ≤ k-2` と
+`⁅w_i,w_j⁆ ∈ H_{k-1} − H_k` を出す**具体作業。
+
+### (E.25) の範囲を出す筋 (次イテレーション)
+
+- `i ≤ k-2`: `i` は `⁅H_i,T⁆ ⊄ H_k` なる極大。もし `i ≥ k-1` なら
+  `⁅H_i,T⁆ ≤ ⁅H_{k-1},T⁆ ≤ ⁅H_{k-1},S⁆ = H_k` で矛盾。
+  ⟹ **`⁅H_{k-1}, T⁆ ≤ H_k` が要る** (chain の定義 `H_{k} = ⁅H_{k-1}, S⁆` と `T ≤ S`)。
+- `j ≤ i`: `j` は `⁅H_i,H_j⁆ ⊄ H_k` なる極大。`H_j ≤ H_0 = T` なので
+  `⁅H_i,H_j⁆ ≤ ⁅H_i,T⁆`。`j > i` だと `⁅H_i,H_j⁆ ≤ ⁅H_i,H_{i+1}⁆` で… (要確認)
+- `⁅w_i,w_j⁆ ∈ H_{k-1} − H_k`: `⊄ H_k` から `∃` 元が外に出る。`H_{k-1}` に入るのは
+  (E.24) + `i`,`j` の極大性から。
+
+⚠ **`j ≤ i` は BG が (E.25) で主張するが、根拠は書かれていない**。
+`j` の極大性の定義に `H_j` が `H_i` と組むことが入っているので、
+`j > i` のとき `⁅H_i, H_j⁆ ⊆ ⁅H_i, H_{i+1}⁆` となり、これが `H_k` に入るかは
+`i` の極大性 (`⁅H_{i+1}, T⁆ ≤ H_k`) と `H_{i+1} ≤ T` から出る:
+`⁅H_i, H_{i+1}⁆ = ⁅H_{i+1}, H_i⁆ ≤ ⁅H_{i+1}, T⁆ ≤ H_k` ✅ (`H_i ≤ H_0 = T`)。
+⟹ `j ≤ i` は従う。**この行間は埋まった**。
+
+## 2026-07-20 (39): ⭐ (E.25) の範囲 `j ≤ i ≤ k-2` — BG の行間を明示
+
+`range_of_max_commutator_indices`。⚠ BG は `j ≤ i` を根拠なしに書くが、
+`i` の極大性を**添字 `i+1` で**使うのが鍵 (`⁅H i, H j⁆ ≤ ⁅H(i+1), H i⁆ ≤ ⁅H(i+1), T⁆ ≤ H k`)。
+
+### 項 6' の残り
+
+| | 状態 |
+|---|---|
+| 添字の取り出し (`k`,`i`,`j`) | ✅ (38) |
+| (E.25) の範囲 `j ≤ i ≤ k-2` | ✅ 本項 |
+| `⁅w_i,w_j⁆ ∈ H_{k-1} − H_k` | ⬜ |
+| `k ≤ q-1` | ⬜ |
+| `RegularOperatorSetup` への当てはめ | ⬜ |
+
+### `⁅w_i,w_j⁆ ∈ H_{k-1} − H_k` の筋 (解決済み)
+
+- **`∈ H_{k-1}`**: `⁅w_i,w_j⁆ ∈ ⁅T,T⁆ = T'` (`w_i ∈ H_i ≤ T`, `w_j ∈ H_j ≤ T`) で、
+  `k` の極小性から `T' ≤ H_{k-1}` ✅ (`exists_min_index_commutator_not_le` が返す)。
+- **`∉ H_k`**: `⁅H_i, H_j⁆ ⊄ H_k` かつ `i`,`j` の極大性で
+  `⁅H_{i+1}, H_j⁆ ≤ H_k`・`⁅H_i, H_{j+1}⁆ ≤ H_k`。
+  `H_i = ⟨w_i⟩H_{i+1}`・`H_j = ⟨w_j⟩H_{j+1}` ((E.19)) なので
+  `⁅H_i,H_j⁆` は `H_k` を法として `⁅w_i,w_j⁆` で生成される ⟹ `⁅w_i,w_j⁆ ∉ H_k`。
+  ⚠ 最後の「生成される」は交換子の双線形性 (mod `H_k`) が要る。
+
+### `k ≤ q-1` の筋
+
+`|T/H_k| = p^k` (各段の指数が p) ≤ `|T| = p^n = |S|/p` ≤ `p^{q-1}` (E.3(c))。
+⟹ `k ≤ q-1`。Step 2 の `index_subgroupOf_chain` と `card_omega_le` が土台。
+
+## 2026-07-20 (40): セッション総括 — E.3(d) 完了、E.4 は 7 項中 6 項
+
+### ✅ 完了: BG Theorem E.3(d)
+
+`OddOrder/BG/AppE_SemidirectFrattini.lean` (368 行, sorry-free, axiom-clean)。
+`AppE_FurtherResults.lean` の sorried statement は削除し注記コメントに置換。
+**App.E の残 sorry は E.4 と E.5 の 2 件** (セッション開始時 3 件)。
+
+📌 最大の教訓: BG の *"By a variation of the Frattini argument … Schur–Zassenhaus …"*
+は **Isaacs Lemma 3.24(a) (Glauberman) の証明そのもの**で、repo に既存だった。
+半直積の新規構築は**不要**だった ([[bg-longhand-arguments-may-be-existing-isaacs-lemmas]])。
+同じパターンが (E.20) の Prop 1.5(d) = Isaacs Cor 3.28 でも効いた。
+
+### Prop E.4 の進捗 (`AppE_AbelianCentralizer.lean` 926 行)
+
+| 項 | 内容 | 状態 |
+|---|---|---|
+| 1 | `S' ≤ T` | ✅ |
+| 2 | `B`-不変補空間 `Q/S'` (operator Maschke) | ✅ |
+| 3 | `r = r₀` | ✅ |
+| 4 | `t ≠ t₀` = (E.21) | ✅ |
+| 5 | (E.23) = (E.22) の `β` 版 | ⚠ **Case A/B 未決** |
+| 6 | Lemma 4.2 両スロット版 + 指数取り出し + (E.26)/(E.27) 統合 | ✅ |
+| 6' | `k`,`i`,`j` の取り出し + (E.25) の範囲 `j ≤ i ≤ k-2` | ✅ |
+| 7 | 最終算術 ⟹ `t₀ = t` | ✅ |
+
+**指数 clause `|S : C_S(Z₂(S))| = p` は完全に証明済み** (`|S| ≥ p⁴` のみ使用)。
+残るのは abelian clause。
+
+### ⬜ 残作業 (2 件)
+
+**(A) `⁅w_i,w_j⁆ ∉ H_k`** — `⁅H_i,H_j⁆ ⊄ H_k` と `i`,`j` の極大性から。
+必要な補題の形:
+
+```
+K ⊴ G,  A ≤ ⟨a⟩ ⊔ A',  B ≤ ⟨b⟩ ⊔ B',  ⁅A',B⁆ ≤ K,  ⁅A,B'⁆ ≤ K,  ⁅a,b⁆ ∈ K
+⟹  ⁅A,B⁆ ≤ K
+```
+
+(対偶が欲しい形。) 商 `G/K` で「`ā` が `b̄` と可換・`Ā'` が `B̄` と可換・
+`B̄'` が `Ā` と可換 ⟹ `Ā` と `B̄` が可換」に落ちる。
+⚠ 元の分解 `x = a^m·a'` に `Subgroup.mem_sup` (片方の正規性が要る) を使う。
+`A' = H_{i+1}` は `S` で正規なので条件は満たす。
+
+**(B) 項 5 の Case A/B** ((32) 参照)。`⁅H_i, T⁆ ≤ H_{i+2}` (Case A) か
+`⁅H_i, Q⁆ ≤ H_{i+2}` (Case B) かの判定。BG の行間。
+
+その後、(A)(B) が揃えば `RegularOperatorSetup` 上で全部を繋いで E.4 が閉じる。
+
+### リポジトリ状態
+
+sorry 13 (セッション開始 14)。leaf build green。AxiomsCheck に Step 3/4 の 10 件追加済み
+(フルビルド 4518 jobs green で検証)。フルビルドは hub の合流 gate に委ねる。
+
+## 2026-07-20 (41): ⭐ (E.25) の witness — 残作業 (A) 完了
+
+`commutator_le_of_generators` (対偶形):
+```
+A ≤ ⟨a⟩ ⊔ A',  B ≤ ⟨b⟩ ⊔ B',  ⁅A',B⁆ ≤ K,  ⁅A,B'⁆ ≤ K,  ⁅a,b⁆ ∈ K  ⟹  ⁅A,B⁆ ≤ K
+```
+`A=Hᵢ, B=Hⱼ, A'=Hᵢ₊₁, B'=Hⱼ₊₁, K=H_k` で「`⁅Hᵢ,Hⱼ⁆ ⊄ H_k` ⟹ `⁅wᵢ,wⱼ⁆ ∉ H_k`」。
+
+商 `G/K` で `x = a^m·a'` に分解 (`Subgroup.mul_normal`) → 3 つの `Commute` →
+`commutatorElement_zpow_mul_zpow_mul` で潰す。**前に作った補題がそのまま効いた**。
+
+⚠ 実装メモ: `refine (QuotientGroup.eq_one_iff _).mp ?_` の後だと goal が
+`↑⁅…⁆ = 1` (mk の coercion) になり `map_commutatorElement` が発火しない。
+`(QuotientGroup.mk' K) ⁅…⁆ = 1` の形で `have` してから
+`rw [QuotientGroup.mk'_apply]` で落とす。
+
+### E.4 の残り (2 件)
+
+1. ⬜ **`k ≤ q-1`** — `|T/H_k| = p^k ≤ |T| = |S|/p ≤ p^{q-1}` (E.3(c))。
+   Step 2 の `index_subgroupOf_chain` + `card_omega_le`。
+2. ⬜ **`RegularOperatorSetup` への当てはめ** — ここまでの一般補題を全部繋ぐ。
+3. ⚠ **項 5 の Case A/B** ((32)) — これだけが数学的に未決。
+
+ファイル 975 行 (上限 2000 / 分割目安 1500)。当てはめで嵩むなら
+`AppE_EigenvalueCombinatorics.lean` に分ける。
+
+## 2026-07-20 (42): ⚠ 項 5 の Case B は「未証明」でなく「証明を壊す」— 排除が必須
+
+(32) の二者択一を、最終矛盾まで通して計算した結果:
+
+### Case B だと BG の矛盾が消える
+
+Case B の漸化式は `t_{i+1} = t_i · t₀`、初項 `t_0` = `H_0/H_1 = T/S'` 上の固有値 `= t₀`。
+⟹ **`t_i = t₀^{i+1}`**。
+
+一方 `α` 側は項 3 の `r = r₀` により `α` が `S/S'` 全体にスカラー `r` で作用するので、
+どちらの Case でも `r_i = r₀ r^i = r^{i+1}`。
+
+(E.26)/(E.27) は `⁅w_i,w_j⁆` の固有値を 2 通りに計算するので:
+
+| | (E.26) `α` | (E.27) `β` (Case B) |
+|---|---|---|
+| Lemma 4.2 側 | `r_i r_j = r^{i+j+2}` | `t_i t_j = t₀^{i+j+2}` |
+| section 側 | `r_{k-1} = r^k` | `t_{k-1} = t₀^k` |
+| 従う関係 | `i+j+2 ≡ k (mod q)` | `i+j+2 ≡ k (mod ord t₀)` |
+
+⟹ `α` 側から `i+j+2 = k` が出た瞬間、`β` 側の関係も**自動的に満たされる**。
+**矛盾が出ない。** BG の締め `t₀ = t^{k-1-i-j} = t` は Case A 固有。
+
+⟹ **Case B は「まだ排除できていない選択肢」ではなく「排除しないと定理が証明できない」**。
+BG が (E.23) を "Similarly one can show" で済ませた背後には、Case B を排除する
+議論があるはず (または Case B が起こり得ないことが Step 2 の構成から従う)。
+
+### Case B 排除の手がかり (次イテレーション)
+
+Case B (`⁅H_i, Q'⁆ ≤ H_{i+2}` かつ `⁅H_i,T⁆H_{i+2} = H_{i+1}`) を仮定すると:
+
+- `i` (極大 with `⁅H_i,T⁆ ⊄ H_k`) は **`k-2` ちょうど**になる
+  (`i+1 ≤ k-1` なら `H_{i+1} ⊋ H_{i+2}` より `⁅H_i,T⁆ ⊄ H_k`; `i = k-1` では `≤ H_k`)。
+- `i = 0` で `⁅T, Q'⁆ ≤ H_2` ⟹ `H_1 = ⁅T,S⁆ = T'H_2` (T' が `H_1/H_2` を覆う)。
+
+📌 **調べる筋**:
+1. 上の `H_1 = T'H_2` が `k` の極小性 ((E.24) `T'H_k = H_{k-1}`) と衝突しないか。
+   特に `k = 2` のとき `H_1 = T'H_2` と `T'H_2 = H_1` は同じで無情報。`k ≥ 3` では?
+2. `Q'` は `B`-不変だが `A`-不変とは限らない。`A` 側 (`R₀` を保つ) の情報を
+   Case B に当てて矛盾が出ないか。`R₀S'/S'` は第 3 の直線なので
+   `⁅H_i, R₀⁆H_{i+2} = H_{i+1}` (これは `w_{i+1} ∉ H_{i+2}` から**確定**) と
+   `⁅H_i,Q'⁆ ≤ H_{i+2}` を併せると、`R₀` の `T`-成分が効いていることになる。
+3. [[feedback-ask-chatgpt-for-elided-gaps]] — 自己完結プロンプトで最強モデルに問う。
+
+⚠ 実装作業 (`k ≤ q-1`・setup 当てはめ) は Case A を仮説に取れば進められるので、
+**Case B の解決を待たずに並行して進めること**。
+
+## 2026-07-20 (43): ⭐⭐ **項 5 の Case B を排除できた** — BG の行間が埋まった
+
+(42) で「Case B は排除必須」と判明した件。**排除できた**。2 段構成:
+
+### 段 1: `k ≥ 3` は無条件で従う
+
+`i = 0` かつ `j = 0` は**不可能**:
+- `i = 0` (極大) ⟹ `⁅H₁, T⁆ ≤ H_k`
+- `j = 0` (極大) ⟹ `⁅H₀, H₁⁆ ≤ H_k`
+- `⁅w₀, w₀⁆ = 1 ∈ H_k` (自明)
+- ⟹ `commutator_le_of_generators` ((41) で証明済、`A=B=H₀=T`, `a=b=w₀`,
+  `A'=B'=H₁`, `K=H_k`) で **`⁅H₀,H₀⁆ = T' ≤ H_k`**
+- ⟹ `k` の極小性 (`T' ⊄ H_k`) に矛盾 ∎
+
+`j ≤ i` ((39)) なので `i = 0` なら `j = 0`。よって **`i ≥ 1`**、
+`i + 2 ≤ k` ((39)) より **`k ≥ 3`**。
+
+### 段 2: Case B は `k ≤ 2` を強制する
+
+Case B (`⁅H_i, Q'⁆ ≤ H_{i+2}`) を `i = 0` で使う: `⁅T, Q'⁆ ≤ H₂`。
+
+- `H₁ = ⁅T, S⁆ = S'` (Step 2 (E.7); `|S:T| = p` より `⁅T,S⁆ = ⁅S,S⁆`)
+- `S = Q'T` (`S/S' = Q/S' ⊕ T/S'`)
+- 交換子は `H₂` を法として**双線形**なので `H₁/H₂` は `⁅T,Q'⁆` と `⁅T,T⁆ = T'` の
+  像で生成される。Case B で前者が自明 ⟹ **`H₁ = T'·H₂`**
+- `k` の極小性より `T' ≤ H_{k-1}`。`k ≥ 3` なら `H_{k-1} ≤ H₂` なので
+  `H₁ ≤ H₂` ⟹ `|H₁ : H₂| = p > 1` に矛盾
+- ⟹ **Case B なら `k ≤ 2`** ∎
+
+### 段 1 + 段 2 ⟹ Case B は起こり得ない ⟹ **Case A、すなわち (E.23) が成立**
+
+⚠ 段 2 の「交換子が `H₂` を法として双線形」は
+[[lean-subgroup-commutator-api-traps]] の「`⁅H,K⊔L⁆` の分配は偽」と抵触しないこと。
+分配が成り立つのは**商 `S/H₂` に落としてから**であり、そこでは
+`⁅H₁, S⁆ = H₂` ゆえ `x ↦ ⁅t, x⁆` が準同型になる。Lean では
+`H₂` で割ってから扱うこと (Lemma 4.2 の mod-K 版と同じ流儀)。
+
+### ⟹ E.4 の未決事項は解消。残るは実装のみ
+
+| | 状態 |
+|---|---|
+| 項 1-4, 6, 6', 7 | ✅ 証明済 |
+| 項 5 (E.23) | ✅ **数学的に解決** (本項) — Lean 実装は未 |
+| `k ≥ 3` / `i ≥ 1` | ✅ 数学的に解決 — Lean 実装は未 |
+| `k ≤ q-1` | ⬜ 実装のみ (筋確定) |
+| `RegularOperatorSetup` への当てはめ | ⬜ 実装のみ |
+
+📌 次イテレーションは **段 1 (`k ≥ 3`) の Lean 実装**から。
+`commutator_le_of_generators` を `A=B=H₀`, `a=b=w₀` で当てるだけなので短い。
+
+## 2026-07-20 (44): (E.24) 完成 — E.4 の named results が出揃った
+
+`sup_commutator_eq_of_min_index` = **BG (E.24)** `T'·H_k = H_{k-1}`。
+
+### E.4 の一般補題は完備 (1014 行)
+
+| BG の式 | Lean |
+|---|---|
+| (E.18) | `not_fixes_sup_frattini_of_not_fixes_R₀` |
+| (E.20) | `commutator_eq_bot` |
+| `r = r₀` | `dvd_sub_eigenvalues` |
+| (E.21) `t ≠ t₀` | `not_dvd_sub_eigenvalues_of_not_fixes` |
+| (E.24) | `sup_commutator_eq_of_min_index` |
+| (E.25) 範囲 | `range_of_max_commutator_indices` |
+| (E.25) witness | `commutator_le_of_generators` |
+| `i ≥ 1` (⟹ `k ≥ 3`) | `commutator_self_le_of_generator` |
+| Lemma 4.2 両スロット | `commutatorElement_zpow_mul_zpow_mul` |
+| (E.26)/(E.27) | `dvd_sub_mul_of_commutator_eigen` |
+| 最終算術 | `eq_of_eigenvalue_relations` |
+| 指数 clause | `index_centralizer_upperCentralSeries` |
+
+### ⬜ 残り = `RegularOperatorSetup` への当てはめのみ
+
+1. `k ≤ q-1` — `|T/H_k| = p^k ≤ |T| = |S|/p ≤ p^{q-1}` (E.3(c))。
+   `Nat.pow_le_pow_iff_right` の一行。
+2. Case B 排除の段 2 — `H₁ ≤ T' ⊔ H₂`・`T' ≤ H_{k-1}`・`H_{k-1} ≤ H₂` (k≥3) ⟹
+   `H₁ ≤ H₂` で `H₂ < H₁` に矛盾。`sup_le` + `le_trans` の数行 (補題化不要)。
+3. **本体の組み立て** — Step 2 の chain API
+   (`iterCommutator`・`index_subgroupOf_chain`・`commutatorIterate_not_mem`・
+   `exists_eigenvalue_pow`) を使って上の一般補題群に仮説を供給する。
+   ⚠ ここが最大の残作業。`AppE_RegularOperator.lean` の chain API を
+   一通り読んでから着手すること。
+
+📌 ファイルは 1014 行。当てはめ本体は
+**`AppE_EigenvalueCombinatorics.lean` を新設**して書くのが良い
+(CLAUDE.md ファイル粒度: 1500 行手前で分割、新主結果は新 leaf)。
+
+## 2026-07-20 (45): chain の橋 + AxiomsCheck 登録 — 当てはめ準備完了
+
+- AxiomsCheck に E.4 の 13 件を登録、**フルビルド 4520 jobs green**。
+- `iterCommutator_commutator_le_succ` / `iterCommutator_le_base` —
+  `range_of_max_commutator_indices` が要る 3 事実のうち Step 2 に無かった 2 つ。
+
+### 実測した chain API (当てはめに使う)
+
+| 必要なもの | 所在 |
+|---|---|
+| chain 本体 | `Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i`、`T = C_S(Ω₁Z₂S)` |
+| antitone | `iterCommutator_le_of_le` (`AppE_RegularOperator.lean:561`) |
+| `Hₐ ≤ T` | `iterCommutator_le_base` (本 leaf) |
+| `⁅Hₐ,T⁆ ≤ H_{a+1}` | `iterCommutator_commutator_le_succ` (本 leaf) |
+| `\|Hₐ : H_{a+1}\| = p` | `index_subgroupOf_chain` (`AppE_FurtherResults.lean:1407`) |
+| `wₐ = commutatorIterate w v a` | `AppE_FurtherResults.lean:893` |
+| `wₐ ∈ Hₐ` | `commutatorIterate_mem_chain` (`:909`) |
+| `wₐ ∉ H_{a+1}` | `commutatorIterate_not_mem` (`AppE_RegularOperator.lean:612`) |
+| 固有値 `rᵢ = r₀rⁱ` | `exists_eigenvalue_pow` (`AppE_RegularOperator.lean:640`) |
+
+⚠ **`Hₐ = ⟨wₐ⟩ ⊔ H_{a+1}` がまだ無い** — `commutator_le_of_generators` の
+`hgen` に要る。`|Hₐ : H_{a+1}| = p` と `wₐ ∈ Hₐ − H_{a+1}` から出る
+(位数 p の section を 1 元が生成する)。**次イテレーションの最初の一手**。
+
+### 残り
+
+1. ⬜ `Hₐ = ⟨wₐ⟩ ⊔ H_{a+1}` (上記)
+2. ⬜ `k ≤ q-1` (`Nat.pow_le_pow_iff_right` 一行)
+3. ⬜ Case B 排除の段 2 の Lean 化 (`sup_le` + `le_trans` 数行)
+4. ⬜ **本体の組み立て** — `AppE_EigenvalueCombinatorics.lean` を新設して書く
+
+## 2026-07-20 (46): ⭐ `AppE_EigenvalueCombinatorics.lean` 新設 — chain 当てはめの大半が landing
+
+新 leaf `OddOrder/BG/AppE_EigenvalueCombinatorics.lean` を作成、`OddOrder.lean` に import 追加。
+**sorry-free、AxiomsCheck 3 公理のみ (propext/Classical.choice/Quot.sound)、leaf build green**。
+(45) の残り 4 件のうち 1・2・(E.25) 当てはめ・α 側 (E.26) を実装:
+
+### landing した定理 (すべて axiom-clean)
+
+| 内容 | Lean |
+|---|---|
+| (E.19) chain 版 `Hₐ = ⟨wₐ⟩ ⊔ H_{a+1}` | `RegularOperatorSetup.sup_zpowers_commutatorIterate` |
+| `k ≤ q-1` (chain 版 `H_k ≠ ⊥ ⟹ k+2 ≤ q`) | `RegularOperatorSetup.add_two_le_of_iterCommutator_ne_bot` |
+| (E.25) 抽出 (chain 抽象、`3≤k`・`1≤i`・`j≤i`・`i+2≤k`・両 cross 項・witness) | `exists_commutator_indices` |
+| (E.25) chain 事実を全部 discharge した版 | `RegularOperatorSetup.exists_commutator_indices_chain` |
+| (E.26)/(E.27) 作用素非依存の生成ステップ (σ の scaling data を `(y^s)⁻¹σy∈H_{a+1}` 形で受ける) | `dvd_sub_mul_of_chain_eigenvalues` |
+| **α 側 (E.26) 本体組み立て** (`exists_eigenvalue_pow` を実呼び出し) | `RegularOperatorSetup.dvd_sub_mul_eigenvalues_chain` |
+| 最終算術 chain-eigenvalue 形 (`rₐ=r·rᵃ`, `tₐ=t₀·tᵃ` から余因子を剥がして `eq_of_eigenvalue_relations` へ) | `eq_of_chain_eigenvalue_relations` |
+
+- `(45)` 段 1 (`i≥1 ⟹ k≥3`) は `exists_commutator_indices` の内部で
+  `commutator_self_le_of_generator` を `i=0` に当てて処理済 (段 2 Case B 排除は下記参照)。
+- `dvd_sub_mul_eigenvalues_chain` の出力は `((r₀:ZMod p)·rⁱ)·((r₀)·rʲ) = (r₀)·r^{k-1}`
+  (ZMod p の **環**の等式)。`chain_map_le_center`・両 cross 項・`hexp`・`exists_eigenvalue_pow`
+  を全部 discharge しており hoist 無し (α 側は本物に閉じた)。
+
+### ⬜ 残り (次イテレーション) — ここが真の frontier
+
+1. **β 側 (E.23) = `tᵢ = t₀tⁱ` の chain 供給がまだ「補題」になっていない**。
+   これが最大の未解決点。(43) の Case A/B 排除は**紙上**で解決済だが、
+   Lean 補題化されていない。`exists_eigenvalue_pow` は `α` が `R₀` を固定する
+   ((31) 実測 3) ことに依存するので `β` にそのまま使えない。Case B 排除
+   ((43) 段 2: `H₁ = T'·H₂` ⟹ `k≤2` 矛盾) を Lean 化して初めて
+   `dvd_sub_mul_of_chain_eigenvalues` を `σ=β` に当てられる。
+   → 段 2 は `H₁ ≤ T'⊔H₂`・`T' ≤ H_{k-1}`・`H_{k-1} ≤ H₂` (k≥3) から
+   `H₁ ≤ H₂` で `|H₁:H₂|=p>1` に矛盾。`sup_le`+`le_trans` 数行だが、
+   その前段 (交換子が `S/H₂` で双線形 ⟹ `t≠t₀` から一方が消える) の Lean 化が要る。
+2. **整数指数 `r,r₀ : ℤ` ↔ `(ZMod p)ˣ` の単位 `r̄` (`orderOf r̄ = q`)** の橋。
+   `eq_of_chain_eigenvalue_relations` は `(ZMod p)ˣ` で `orderOf r = q` を要求するが、
+   `dvd_sub_mul_eigenvalues_chain` は ℤ 指数の ZMod p 環等式を返す。
+   `α` の位数 = `q` (`A_card`) から `r̄` の位数 = `q` を出す補題が要る
+   (`exists_zpow_eq_act_of_mem_A` 系が `A_card=q` を使う — (31) 実測 1 参照)。
+3. **最終組み立て** = 背理法本体: `⁅T,T⁆ ≠ ⊥` を仮定 → `exists_commutator_indices_chain`
+   で `k,i,j` を 1 度だけ取り出し → 同じ `k,i,j` で α 側 (`dvd_sub_mul_eigenvalues_chain`)
+   と β 側 (要 1) の両方を供給 → 単位に持ち上げ (要 2) → `eq_of_chain_eigenvalue_relations`
+   で `t₀=t` → (E.21) `not_dvd_sub_eigenvalues_of_not_fixes` と矛盾 → `⁅T,T⁆ = ⊥`。
+   最後に `T` アーベル + index p を `Subgroup` の言葉で束ね、`Z₂` 版に戻して Prop E.4。
+
+📌 α 側が本物に閉じたので、残るブロッカーは **β 側 (E.23) の Lean 化** (要 1) が本丸。
+これは紙上解決済の Case A/B 排除の形式化で、`AppE_EigenvalueCombinatorics.lean` に
+追記する形で進めるのがよい (1500 行にはまだ余裕、現在 ~430 行)。
