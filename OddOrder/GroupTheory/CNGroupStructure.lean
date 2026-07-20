@@ -630,7 +630,7 @@ theorem not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [IsSolv
     rw [map_mul, map_mul, map_inv]
     obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hfK
     rw [← hn, (hcomm.zpow_right n).eq]
-    simpa [mul_assoc] using Subgroup.zpow_mem _ (Subgroup.mem_zpowers u) n
+    simp [mul_assoc, Subgroup.zpow_mem _ (Subgroup.mem_zpowers u) n]
   -- `a` acts fixed-point-freely on `K`, by (†).
   have hfpf : ∀ f ∈ K, a * f * a⁻¹ = f → f = 1 := by
     intro f hfK hfix

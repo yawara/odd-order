@@ -818,6 +818,7 @@ theorem chiRestrict_isFixedPt [NeZero (Nat.card h.W1)]
     coe_chiRestrict]
   exact ClassFunction.conjBy_restrict g ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **The `χ_j` are distinct** (injective in the column `χ₂`): if `χ_j = χ_{j'}` then their
 inductions `μ_j = ∑_i μ_{ij}` and `μ_{j'} = ∑_i μ_{ij'}` coincide
 (`induce_restrict_certainType_eq`),

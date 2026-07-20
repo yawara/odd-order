@@ -653,6 +653,7 @@ section OrbitTransport
 variable [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
 
+omit [Finite G] in
 /-- **All Clifford summands have image order `a`** (Peterfalvi (9.7.a), "`U/C_U(H_i)` is ... of
 order `a` for all `i`"): the `U`-action image on every block `Hpart j` has the cardinality of the
 image on the orbit generator `S₀` — the Clifford integer `caseA.a`. -/
@@ -822,6 +823,7 @@ theorem caseA_exists_blockScalarRatioEmbedding_orderA (caseA : CliffordCaseAData
   rw [hpow, caseA_pow_a_eq_one caseA u, map_one]
   rfl
 
+omit [Finite G] in
 /-- **Peterfalvi (9.7.a), "`U/C_U(H_i)` is cyclic"**: the `U`-action image on each Clifford
 summand is a cyclic group (of order `a`, `caseA_card_range_restrictAut_Hpart`) — it is a subgroup
 of `MulAut` of the order-`p` (hence cyclic) summand, and `MulAut(C_p) ≅ (ZMod p)ˣ` is cyclic

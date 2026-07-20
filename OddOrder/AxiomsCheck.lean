@@ -193,6 +193,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
 import OddOrder.Peterfalvi.S10_SubcoherentTypeP
+import OddOrder.Peterfalvi.S11_NineElevenSubcoherentBridge
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_GaloisFieldModel
@@ -11266,6 +11267,7 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_apply_one_eq_natCast
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_apply_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_conjDiff_support
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_diff_support
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent
 -- **(8.15), claim 3 at `A = A(M)`, every type `𝒫`** — the instantiation of the above at
 -- `A = typePACore M`, `H = M_σ`, whose two Dade inputs (`dadeSupportHypothesisData_typePACore0`
@@ -11273,3 +11275,22 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `dadeSupportHypothesisData_typePACore` for the isometry `τ`) are both Peterfalvi (8.15) claim 1
 -- and carry no type hypothesis beyond `IsTypeP`.  Types II and V included.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subcoherent
+-- **(5.7) on the (8.15.3) family** — a uniform-degree subfamily is coherent, at the same
+-- generality as (5.3.b).  This is the book's route to the (9.11) base coherence, replacing the
+-- §10 μ-grid engine (`inducedFamily_degreeSubfamily_isCoherent`) that tied it to types III/IV.
+-- `2 ≤ ncard` is exposed as a parameter, matching `S15.Hypothesis.sSetIrrDeg_coherent`: the
+-- (9.8.d) count gives an existence statement, not two distinct members.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.inducedNonKernelFamily_degreeSubfamily_coherent
+-- **The §9 family sits inside the (8.15.3) family** (issue 1045): `𝒮(Y) ⊆ 𝒮_{(8.15.3)}`.  Both
+-- families induce from `M'` (`huSub_eq_derivedInG_subgroupOf`, Peterfalvi (9.2)), and §9's filter
+-- `M_F ⊄ Ker χ` is the stronger one because `M_F ≤ M_σ`.  This is the link that lets the book's
+-- own route to the (9.11) base coherence — (8.15.3) then (5.7) — replace the §10 μ-grid engine,
+-- and with it the type-III/IV restriction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.hInHu_le_Msigma_subgroupOf
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_subset_inducedNonKernelFamily
+-- **(9.11) base coherence at §9 level**: the degree-`d` irreducible cut of `𝒮(Y)` is coherent,
+-- assembled as (8.15.3) then (5.7) — the book's own route — instead of the §10 μ-grid engine
+-- `S12.Hypothesis.inducedFamily_degreeSubfamily_isCoherent`, which needs a `S13.Hypothesis` and
+-- hence types III/IV.  No type hypothesis anywhere in this route.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent

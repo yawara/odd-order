@@ -117,7 +117,7 @@ theorem countP_eq_zero_of_extract_eq_none (sel : FormalCommutator X → Bool)
       · rw [if_pos hu] at h; exact absurd h (by simp)
       · rw [if_neg hu] at h
         cases hext : extract sel t with
-        | none => simp [List.countP_cons, hu, ih hext]
+        | none => simp [hu, ih hext]
         | some z => rw [hext] at h; exact absurd h (by simp)
 
 /-- **The counting lemma** behind termination.  Under an invariant `P` that is
@@ -435,6 +435,7 @@ theorem nodup_supportList (k K : ℕ) : (supportList L k K).Nodup := by
   exact hij (by rw [← card_of_mem_levelList hTi, ← card_of_mem_levelList hTj])
 
 set_option linter.unusedDecidableInType false in
+omit [Fintype L] in
 /-- A `Forall₂` over a duplicate-free index list is the graph of a function. -/
 theorem exists_fun_of_forall₂ {R : Finset L → List (FormalCommutator X) → Prop}
     {supports : List (Finset L)} {blocks : List (List (FormalCommutator X))}

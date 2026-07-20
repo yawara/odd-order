@@ -131,7 +131,142 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 後者は §8 の file が §9 を import することになるので、**新 leaf が素直**
 (例 `S11_NineElevenSubcoherentBridge.lean`)。
 
-### 橋渡し補題の実装レシピ (2026-07-20 に全部品を実測、次 session はそのまま書ける)
+### ✅ 橋渡し補題 実装完了 (2026-07-20): `S11_NineElevenSubcoherentBridge.lean` 新設
+
+- `S11.hInHu_le_Msigma_subgroupOf` — `M_F ≤ M_σ` を `subgroupOf` で 2 段持ち上げ。
+- `S11.sOf_subset_inducedNonKernelFamily` — `𝒮(Y) ⊆ S10.inducedNonKernelFamily M′ M_σ`。
+  両方 axiom-clean、AxiomsCheck 登録済。
+
+⚠ **instance で 2 度直した** (レシピに書いていなかった分):
+1. `inducedNonKernelFamily` は `[Fintype ↥M]` binder を持つので `[Finite G]` だけでは
+   合成できない ⟹ `open scoped OddOrder.Peterfalvi.S12.FiniteInduce in` を付けて
+   `Fintype ↥M` / `Invertible` を `Finite G` から一様に供給させる。
+   (`huSub data` 側と `(derivedInG M).subgroupOf M` 側で `Invertible` が 2 つ要るが、
+   scoped 経由なら同一 source なので `▸` transport が通る。)
+2. `open scoped … in` は **docstring の前**に置く (docstring と宣言の間に入れると
+   `unexpected token 'open'; expected 'lemma'`)。
+
+`hKeq ▸ hbase` の transport はレシピどおり素直に通った。
+
+### ⛏ 次の一手: §9 レベルの degree-subfamily coherence
+
+橋渡しが landed したので、`sOf_degreeSubfamily_isCoherent` の §10 依存を外す組み立てに入れる。
+
+**⚠ 重要な制約 (実測)**: `S10.typePACore_subcoherent` は
+`hirr : ∀ χ ∈ S, IsIrreducibleCharacter χ` を要求する = **族全体が既約**でないと使えない。
+§9 の `sOf data Y` は可約メンバー (μ-列) を含むので**そのままでは渡せない**
+(`S10_SubcoherentTypeP` の module docstring「Irreducible members only」の scope note どおり)。
+⟹ `S := {φ ∈ sOf data Y | IsIrreducibleCharacter φ ∧ φ 1 = d}` (= degree-`d` 既約 cut)
+を渡すのが正しい。この cut は
+- `⊆ sOf data Y` かつ橋渡しで `⊆ inducedNonKernelFamily M′ M_σ`
+- 共役閉 = `S11.irrCut_conjClosed` (本 session で §9 化済)
+- 有限 = `S11.sOf_finite` の subset
+
+**`S07.coherent_subset_of_constant_degree` (S07_Subcoherent.lean:259) の義務一覧**
+(`S' := S` と取れば `hsub` は `subset_refl`):
+
+| 引数 | 供給元 |
+|---|---|
+| `hyp : S07.Hypothesis S A` | `S10.typePACore_subcoherent` (橋渡し + irrCut_conjClosed) |
+| `hconj'` | `S11.irrCut_conjClosed` |
+| `hSfin` | `(S11.sOf_finite data Y).subset` |
+| **`hcard : 2 ≤ S'.ncard`** | ⚠ **パラメータとして露出する** (下記 S15 先例) |
+| `hirr : ∀ ζ ∈ S', inner ζ ζ = 1` | `IsIrreducibleCharacter.inner_self_eq_one` |
+| **`hZIrr : ∀ a b ∈ S', tau (a − b) ∈ ZIrr G`** | Dade 写像の整数性。⚠ 一番重い義務 |
+| `hconst` | cut の定義から自明 |
+| `hdeg0 : deg ≠ 0` | `d ≠ 0` (既約指標の次数は正) |
+| `h1A : (1 : ↥M) ∉ A` | `S10.typePACore_one_not_mem` |
+| `hsuppdiff` | `S10.inducedNonKernelFamily_conjDiff_support` の一般化 (今は `φ − φ̄` 専用、任意の 2 元差へ広げるか、Hypothesis の `tau_isometry_diff` 経由) |
+
+### ✅ S 側に完全な先例がある — `S15.Hypothesis.sSetIrrDeg_coherent`
+
+`HypothesisBasics.lean:390` が **同じ (5.7) 組み立てを S-instance で既に完遂している**。
+10 引数の discharge をそのまま雛形にできる:
+
+- **`hcard` は パラメータ `h2` として露出する** — 同 docstring が明言:
+  「repo に `2 ≤ ncard` の事実は無い ((9.8.d) の数え上げは *存在* `∃ ζ` しか与えない)。
+  露出すれば def は sorry-free に保て、真の上流 count は caller に委ねられる —
+  **the honest pattern**」。
+  ⟹ ⚠ 当初メモの「`χ ≠ χ̄` から導く」は**採らない**。S15 先例に合わせて露出する。
+- **`hZIrr`** = `S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported` に
+  `hsuppdiff` + `Submodule.sub_mem _ ha.mem_ZIrr hb.mem_ZIrr` を渡すだけ。
+- **`hsuppdiff`** = 「等次数 ⟹ `1` で消える」+「`A ∪ {1}` の外で両方消える」。
+  ✅ **`S10.inducedNonKernelFamily_diff_support` として実装済** (2026-07-20)。
+  conj 版はその特殊化。S 側の対応物は `sSetIrrDeg_member_diff_supported`。
+
+⟹ 3 つの「重い」義務のうち **`hcard` は露出、`hsuppdiff` は実装済、`hZIrr` は既存補題 1 本**。
+残り 7 つと合わせて、組み立ては S15 の雛形をなぞるだけになった。
+
+### 設計判断: (5.7) の companion は **§8 レベル**に置く
+
+`inducedNonKernelFamily_subcoherent` (= (5.3.b)) と**同じ一般性**で書く:
+
+```
+noncomputable def inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
+    (hodd) (h46 : S06.Hypothesis46Core A M) [Invertible (Nat.card ↥h46.K : ℂ)]
+    (dd : DadeSupportHypothesisData M A)
+    {S} (hsub : S ⊆ inducedNonKernelFamily h46.K h46.subH)
+    (hirrS) (hconjS) (d : ℂ) (hconst) (hd0) (hSfin) (h2) (h1A) :
+    Nonempty (S07.IsCoherent (…).tau S (S04.supportInSubgroup A M))
+```
+
+理由:
+- `hsuppdiff` = `inducedNonKernelFamily_diff_support` は `h46` を要るので、`h46` を
+  パラメータに持つ形が自然 (`typePACore_subcoherent` のように内部で組むと、
+  同じ `h46` を 2 度組んで defeq 不一致を招きやすい)。
+- §8 に置けば §9 への依存が要らない — 橋渡し leaf を経由するのは §9 側の instantiation だけ。
+- ⚠ instance 規律: `typePACore_subcoherent` と同じく `[Finite G]` +
+  `open scoped S12.FiniteInduce in` で統一する。
+
+⟹ 順序: (a) §8 に上記 companion、(b) §9 で `sOf` の degree cut に instantiate
+(橋渡し + `irrCut_conjClosed` + `sOf_finite`)、(c) それで
+`sOf_degreeSubfamily_isCoherent` の §10 依存を置換、(d) (9.11) statement 本体。
+
+### ✅ (a) 完了 (2026-07-20): `S10.inducedNonKernelFamily_degreeSubfamily_coherent`
+
+(5.7)∘(5.3.b) の companion を §8 レベルで landed。axiom-clean、AxiomsCheck 登録済。
+一発で通った (S15 雛形どおり)。`h2 : 2 ≤ S.ncard` は先例どおりパラメータ露出。
+
+⚠ `noncomputable def` で書いたら `linter.defProp` に叱られた — `Nonempty _` は `Prop` なので
+`theorem` が正しい。(`inducedNonKernelFamily_subcoherent` は `S07.Hypothesis` = データを返すので
+`noncomputable def` のままでよい。返り値が `Prop` かどうかで使い分ける。)
+
+### ✅ (b) 完了 (2026-07-20): `S11.sOf_degreeSubfamily_coherent`
+
+`𝒮(Y)` の degree-`d` 既約 cut の coherence を **(8.15.3) → (5.7)** で組んだ
+(`S11_NineElevenSubcoherentBridge.lean`)。axiom-clean、AxiomsCheck 登録済。
+**これで (9.11) base case が §10 μ-grid engine から独立した** — 経路上に型仮定は一つも無い。
+
+⚠ `h46.K` / `h46.subH` を `M′` / `M_σ` にピンする `hKeq` / `hHeq` は**仮説として取る**。
+定義的に一致すると仮定して `Hypothesis46Core` をこの場で組み直すと、
+`typePACore_toHypothesis46_core` が作る copy と defeq にならない (本日 1 度踏んだ失敗)。
+⟹ 呼び出し側が `typePACore_toHypothesis46_core` の `h46` をそのまま渡し、
+`hKeq`/`hHeq` は `rfl` 相当で埋める想定。
+
+### ⚠ (c) は「差し替え」にならない — 実測して方針変更 (2026-07-20)
+
+当初 (c) を「`sOf_degreeSubfamily_isCoherent` (S13_Lemmas113To115.lean:588) の §10 依存を
+(b) で置換」と書いていたが、**τ と A₀ が一致しないので drop-in にはできない**:
+
+- §13 版の結論は `S07.IsCoherent hyp.base.tau {cut} hyp.base.A0` で、
+  `hyp.base.A0 = supportInSubgroup (typePA0 M typeP) M` (= **A₀(M)**, しかも P₁ 域の `typePA0`)、
+  `hyp.base.tau = dadeIntegralCharacterMap hyp.dadeData.dade …`
+  (`hyp.dadeData : DadeSupportHypothesisData M (typePA0 M typeP)`)。
+- (b) の結論は `A` について一様だが、`h46 : Hypothesis46Core A M` と
+  `dd : DadeSupportHypothesisData M A` が**同じ `A`** を共有する形。書籍の (4.6) は
+  `A = A(M)` で立つ (`typePACore_toHypothesis46_core` の結論も `Hypothesis46 (typePACore M) M`)
+  ので、(b) が自然に落ちるのは **A(M) 上**であって A₀(M) 上ではない。
+- `A(M) ⊆ A₀(M)` だが `IsCoherent τ S A` の `A` は単純な単調性を持たないので、
+  「小さい台での coherence」から §13 の文が出るわけではない。
+
+⟹ **(c) は削除**。§13 版は §11 packaging 自身の文として現状のまま残し、
+**§9 レベルの (9.11) は (b) の τ/A の上で述べる** (= (d) を直接やる) のが正しい。
+§13 版との接続が要るなら、それは packaging 層の辞書 (9163 §3 項目 4) の話であって
+base coherence の差し替えではない。
+
+**残り**: (d) §9 レベルの (9.11) statement 本体 — (b) の τ/A の上で。
+
+### (参考) 実装レシピ
 
 ```
 theorem sOf_subset_inducedNonKernelFamily [Finite G]

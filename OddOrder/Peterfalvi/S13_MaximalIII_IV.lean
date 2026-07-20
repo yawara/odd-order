@@ -328,7 +328,7 @@ noncomputable def caseB_adjoinOneColumnPair [Finite G]
       IsIrreducibleCharacter x := fun x hx => ((hmemiff x).mp hx).2.1
   have hconjS : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
       x.conj ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset := fun x hx =>
-    (hmemiff _).mpr (OddOrder.Peterfalvi.S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime d ((hmemiff x).mp hx))
+    (hmemiff _).mpr (S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime d ((hmemiff x).mp hx))
   have hχ₁s : χ₁ ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset :=
     (hmemiff χ₁).mpr ⟨hχ₁mem, hχ₁irr, hχ₁deg⟩
   have hdegmem : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
@@ -798,7 +798,7 @@ noncomputable def caseB_chainStep [Finite G]
       IsIrreducibleCharacter x := fun x hx => ((hmemiff x).mp hx).2.1
   have hconjS : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
       x.conj ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset := fun x hx =>
-    (hmemiff _).mpr (OddOrder.Peterfalvi.S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime d ((hmemiff x).mp hx))
+    (hmemiff _).mpr (S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime d ((hmemiff x).mp hx))
   have hχ₁s : χ₁ ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset :=
     (hmemiff χ₁).mpr ⟨hχ₁mem, hχ₁irr, hχ₁deg⟩
   have hdegmem : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,

@@ -344,7 +344,7 @@ lemma tau_mk_eq_iff_mem_V (d : ↥hyp.D) :
       rw [← hcomm.eq, mul_assoc, hyp.t_mul_t, mul_one]
     have htauD : hyp.tauD d = d := Subtype.ext (by rw [hyp.tauD_apply_coe, htdt])
     rw [htauD, inv_mul_cancel]
-    simpa using hyp.W.one_mem
+    simp
 
 /-! ## `C_Ā(τ) = 1` (p. 103) -/
 
