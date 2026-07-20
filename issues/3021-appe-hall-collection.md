@@ -2008,3 +2008,34 @@ Case B (`⁅H_i, Q'⁆ ≤ H_{i+2}`) を `i = 0` で使う: `⁅T, Q'⁆ ≤ H�
 📌 ファイルは 1014 行。当てはめ本体は
 **`AppE_EigenvalueCombinatorics.lean` を新設**して書くのが良い
 (CLAUDE.md ファイル粒度: 1500 行手前で分割、新主結果は新 leaf)。
+
+## 2026-07-20 (45): chain の橋 + AxiomsCheck 登録 — 当てはめ準備完了
+
+- AxiomsCheck に E.4 の 13 件を登録、**フルビルド 4520 jobs green**。
+- `iterCommutator_commutator_le_succ` / `iterCommutator_le_base` —
+  `range_of_max_commutator_indices` が要る 3 事実のうち Step 2 に無かった 2 つ。
+
+### 実測した chain API (当てはめに使う)
+
+| 必要なもの | 所在 |
+|---|---|
+| chain 本体 | `Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i`、`T = C_S(Ω₁Z₂S)` |
+| antitone | `iterCommutator_le_of_le` (`AppE_RegularOperator.lean:561`) |
+| `Hₐ ≤ T` | `iterCommutator_le_base` (本 leaf) |
+| `⁅Hₐ,T⁆ ≤ H_{a+1}` | `iterCommutator_commutator_le_succ` (本 leaf) |
+| `\|Hₐ : H_{a+1}\| = p` | `index_subgroupOf_chain` (`AppE_FurtherResults.lean:1407`) |
+| `wₐ = commutatorIterate w v a` | `AppE_FurtherResults.lean:893` |
+| `wₐ ∈ Hₐ` | `commutatorIterate_mem_chain` (`:909`) |
+| `wₐ ∉ H_{a+1}` | `commutatorIterate_not_mem` (`AppE_RegularOperator.lean:612`) |
+| 固有値 `rᵢ = r₀rⁱ` | `exists_eigenvalue_pow` (`AppE_RegularOperator.lean:640`) |
+
+⚠ **`Hₐ = ⟨wₐ⟩ ⊔ H_{a+1}` がまだ無い** — `commutator_le_of_generators` の
+`hgen` に要る。`|Hₐ : H_{a+1}| = p` と `wₐ ∈ Hₐ − H_{a+1}` から出る
+(位数 p の section を 1 元が生成する)。**次イテレーションの最初の一手**。
+
+### 残り
+
+1. ⬜ `Hₐ = ⟨wₐ⟩ ⊔ H_{a+1}` (上記)
+2. ⬜ `k ≤ q-1` (`Nat.pow_le_pow_iff_right` 一行)
+3. ⬜ Case B 排除の段 2 の Lean 化 (`sup_le` + `le_trans` 数行)
+4. ⬜ **本体の組み立て** — `AppE_EigenvalueCombinatorics.lean` を新設して書く
