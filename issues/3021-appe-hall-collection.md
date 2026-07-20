@@ -660,3 +660,46 @@ BG は Step 2 を「`S` を `R` の **A-不変**・指数 p・`R₀` を真に�
 
 ⟹ (E.9)-(E.12) は**新しい基盤の構築ではなく、固有値の帳簿付け** (mod p の乗法群での
 位数計算 + 上記 2 補題の適用)。ただし A-作用を `↥S` の鎖に降ろす配線が要るので分量は大きい。
+
+## ⭐ 2026-07-20 (9): **(E.12) 完了** — 固有値の漸化式
+
+`RegularOperatorSetup.eigenvalue_step`: `r_{i+1} ≡ r_i · r (mod p)`。BG の 1 行
+
+```
+w_{i+1}^{r_{i+1}} ≡ w_{i+1}^a = ⁅w_i,v⁆^a = ⁅w_i^{r_i} u, v^r⁆ ≡ ⁅w_i,v⁆^{r_i r}  (mod H_{i+2})
+```
+
+を完全に形式化。cancel は前回の `w_i ∉ H_{i+1}` (BG の 5 語) が効く。
+
+| 新規宣言 | 内容 |
+|---|---|
+| `commutatorElement_mul_central_left` | `⁅a·c,b⁆ = ⁅a,b⁆` (c 中心) |
+| `commutatorElement_zpow_zpow_of_central` | Lemma 4.2(a) 双線形形の**整数冪版** |
+| `commutator_zpow_mul_congr` | **(E.12) 1 歩** `⁅x^m·u, v^k⁆ ≡ ⁅x,v⁆^{mk} (mod H_{i+2})` |
+| `RegularOperatorSetup.exists_zpow_eq_mod_chain` | (E.9) を BG と同じ**元の合同式**の形に |
+| `RegularOperatorSetup.eigenvalue_step` | **(E.12)** |
+
+要点: `chain_map_le_center` を 2 回使う — 剰余 `u ∈ H_{i+1}` は `G/H_{i+2}` で
+中心的ゆえ左スロットから落ち、`⁅x,v⁆ ∈ H_{i+1}` も中心的ゆえ Lemma 4.2(a) が
+両スロットで効く。⚠ `v` は無制約 (鎖が `S` 全体と bracket するため)。
+
+支持変更: `S04f_Blackburn` の `commutatorElement_zpow_{left,right}_of_central` と
+`zmod_eq_of_zpow_eq_of_order_prime` を public 化 (ファイル跨ぎ `private` は規約違反)。
+
+### 残り (E.3(c) までの道)
+
+1. ⬜ **帰納 `r_i ≡ r₀ rⁱ`** — `eigenvalue_step` を `i` について回す。⚠ 同じ `a` を
+   全段で使うので、`r`・`w`・`v` を固定して `r_i` を選択関数として取る形が要る。
+2. ⬜ **(E.10) を合同式の形に** — `quotient_action_ne_one` (誘導自己同型 ≠ 1) と
+   `exists_zpow_eq_mod_chain` の `r_i` を突き合わせて `(r_i : ZMod p) ≠ 1`。
+3. ⬜ **算術的終点** — `le_pred_of_forall_mul_pow_ne_one` を `(ZMod p)ˣ` に適用 ⟹
+   `n ≤ q-1`。⚠ `ZMod p` の**単位群が巡回**であることを供給する必要
+   (`ZMod.instIsCyclicUnits` 等、要実測)。`r₀ rⁱ ≠ 1` が `u₀ uⁱ ≠ 1` に対応。
+4. ⬜ **`|S| = p·pⁿ ≤ p^q`** = `card_start_eq_pow_mul` + `sup_centralizer_eq_top` ⟹
+   **E.3(c) `card_omega_le`**。
+
+### ファイル分割 (issue 0134)
+
+`AppE_FurtherResults` が 2020 行になったので prefix-split。
+現在の 3 層: `AppE_CollectionFormula` (E.1-E.2, 337 行) →
+`AppE_FurtherResults` (E.3-E.5, 1719 行) → `AppE_RegularOperator` ((E.9)-(E.12), 552 行)。

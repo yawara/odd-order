@@ -35,7 +35,7 @@ improvement to that lemma, but is not needed here.)
 
 namespace OddOrder.BG.AppE
 
-open OddOrder.GroupTheory
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch03
 open scoped commutatorElement
 
 /-! ### `x ↦ ⁅v, x⁆` is multiplicative modulo the next chain term -/
@@ -331,7 +331,7 @@ theorem commutator_pow_left_congr {G : Type*} [Group G] {T : Subgroup G} [T.Char
     exact chain_map_le_center T (i + 1) (Subgroup.mem_map.mpr ⟨⁅v, x⁆, hvx, rfl⟩)
   have h3 := OddOrder.BG.Ch1.S04.commutatorElement_pow_left_of_central hcent k
   refine QuotientGroup.eq.mp ?_
-  show (QuotientGroup.mk' N) (⁅v, x⁆ ^ k) = (QuotientGroup.mk' N) ⁅v ^ k, x⁆
+  change (QuotientGroup.mk' N) (⁅v, x⁆ ^ k) = (QuotientGroup.mk' N) ⁅v ^ k, x⁆
   rw [map_pow, map_commutatorElement, map_commutatorElement, map_pow]
   exact h3.symm
 
@@ -356,5 +356,197 @@ theorem commutator_mul_congr {G : Type*} [Group G] {T : Subgroup G} [T.Character
       ⁅v, u⁆ * ((⁅v, x⁆ * ⁅v, u⁆)⁻¹ * ⁅v, x * u⁆) := by group
   rw [hrw]
   exact Subgroup.mul_mem _ hvu hrest
+
+/-! ### (E.12): the eigenvalue recursion `rᵢ ≡ rᵢ₋₁ r (mod p)`
+
+BG's chain `T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1` carries, on each section `Hᵢ/Hᵢ₊₁` (which has order
+`p`), an eigenvalue `rᵢ` for the action of `a ∈ A`.  BG relates consecutive eigenvalues by
+the single computation
+
+`wᵢ^{rᵢ} ≡ wᵢᵃ = ⁅wᵢ₋₁, v⁆ᵃ = ⁅wᵢ₋₁^{rᵢ₋₁} u, vʳ⁆ ≡ ⁅wᵢ₋₁, v⁆^{rᵢ₋₁ r} = wᵢ^{rᵢ₋₁ r}`,
+
+all `mod Hᵢ₊₁`, and then cancels `wᵢ` — which is legitimate exactly because `w̄ᵢ` generates
+the order-`p` section, i.e. because `wᵢ ∉ Hᵢ₊₁` (the fact recovered above). -/
+
+/-- A central factor in the left slot of a commutator drops out: `⁅a * c, b⁆ = ⁅a, b⁆`.
+
+This is what lets BG's remainder `u` disappear once one passes to `G/Hᵢ₊₂`, where `ū` is
+central by `chain_map_le_center`. -/
+theorem commutatorElement_mul_central_left {K : Type*} [Group K] {a b c : K}
+    (hc : c ∈ Subgroup.center K) : ⁅a * c, b⁆ = ⁅a, b⁆ := by
+  have hcb : c * b = b * c := (Subgroup.mem_center_iff.mp hc b).symm
+  rw [commutatorElement_def, commutatorElement_def]
+  calc a * c * b * (a * c)⁻¹ * b⁻¹
+      = a * (c * b) * (a * c)⁻¹ * b⁻¹ := by group
+    _ = a * (b * c) * (a * c)⁻¹ * b⁻¹ := by rw [hcb]
+    _ = a * b * a⁻¹ * b⁻¹ := by group
+
+/-- **BG Lemma 4.2(a), both slots, integer exponents**: if `⁅x, y⁆` is central then
+`⁅x ^ m, y ^ n⁆ = ⁅x, y⁆ ^ (m * n)` for `m n : ℤ`.
+
+The natural-exponent form is `commutatorElement_pow_pow_of_central`; `(E.12)` needs this
+one, because the eigenvalues `rᵢ` are integers (they are exponents of an automorphism of a
+group of order `p`, so only their class mod `p` matters, but they arrive as `ℤ`). -/
+theorem commutatorElement_zpow_zpow_of_central {K : Type*} [Group K] {x y : K}
+    (hz : ⁅x, y⁆ ∈ Subgroup.center K) (m n : ℤ) :
+    ⁅x ^ m, y ^ n⁆ = ⁅x, y⁆ ^ (m * n) := by
+  have h1 : ⁅x ^ m, y⁆ = ⁅x, y⁆ ^ m :=
+    OddOrder.BG.Ch1.S04.commutatorElement_zpow_left_of_central hz m
+  have hc : ⁅x ^ m, y⁆ ∈ Subgroup.center K := by
+    rw [h1]; exact Subgroup.zpow_mem _ hz m
+  rw [OddOrder.BG.Ch1.S04.commutatorElement_zpow_right_of_central hc n, h1, ← zpow_mul]
+
+/-- **(E.12) in one step**: for `x ∈ Hᵢ` and `u ∈ Hᵢ₊₁`,
+`⁅x^m · u, v^k⁆ ≡ ⁅x, v⁆^(m·k) (mod Hᵢ₊₂)`.
+
+This is BG's one-line `[wᵢ₋₁^{rᵢ₋₁} u, vʳ] = wᵢ^{rᵢ₋₁ r}`.  Two facts make it work in
+`G/Hᵢ₊₂`, and both come from `chain_map_le_center`: the remainder `u ∈ Hᵢ₊₁` becomes
+**central**, so it drops out of the left slot (`commutatorElement_mul_central_left`); and
+`⁅x, v⁆ ∈ Hᵢ₊₁` is central, so Lemma 4.2(a) applies in both slots at once.
+
+⚠ `v` is unconstrained — the chain brackets against all of `S`, so no hypothesis relating
+`v` to `R₀` is needed here.  That enters only when the eigenvalue `r` of `v` is produced. -/
+theorem commutator_zpow_mul_congr {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {i : ℕ} {x u v : G}
+    (hx : x ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i)
+    (hu : u ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1)) (m k : ℤ) :
+    (⁅x, v⁆ ^ (m * k))⁻¹ * ⁅x ^ m * u, v ^ k⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) := by
+  set N := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) with hN
+  have hucent : (QuotientGroup.mk' N) u ∈ Subgroup.center (G ⧸ N) :=
+    chain_map_le_center T (i + 1) (Subgroup.mem_map.mpr ⟨u, hu, rfl⟩)
+  have hxv : ⁅x, v⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ]
+    exact Subgroup.commutator_mem_commutator hx (Subgroup.mem_top v)
+  have hcent : ⁅(QuotientGroup.mk' N) x, (QuotientGroup.mk' N) v⁆ ∈ Subgroup.center (G ⧸ N) := by
+    rw [← map_commutatorElement]
+    exact chain_map_le_center T (i + 1) (Subgroup.mem_map.mpr ⟨⁅x, v⁆, hxv, rfl⟩)
+  refine QuotientGroup.eq.mp ?_
+  change (QuotientGroup.mk' N) (⁅x, v⁆ ^ (m * k)) = (QuotientGroup.mk' N) ⁅x ^ m * u, v ^ k⁆
+  rw [map_zpow, map_commutatorElement, map_commutatorElement, map_mul, map_zpow, map_zpow,
+    commutatorElement_mul_central_left hucent]
+  exact (commutatorElement_zpow_zpow_of_central hcent m k).symm
+
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **(E.9) as a congruence between elements**: `yᵃ ≡ y^{rᵢ} (mod Hᵢ₊₁)` for every `y ∈ Hᵢ`.
+
+`exists_zpow_eq_on_chain_section` produces the eigenvalue inside the quotient `Hᵢ/Hᵢ₊₁`; BG
+writes it as `wᵢᵃ ≡ wᵢ^{rᵢ} (mod Hᵢ₊₁)`.  That is the form `(E.12)` consumes, because there
+the remainder `u = (y^{rᵢ})⁻¹ yᵃ ∈ Hᵢ₊₁` is carried explicitly into a commutator rather than
+being discarded. -/
+theorem RegularOperatorSetup.exists_zpow_eq_mod_chain {R B : Type*} [Group R] [Group B]
+    [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hR₀S : hyp.R₀ ≤ S) (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥)
+    {a : B} (ha : a ∈ hyp.A) :
+    ∃ r : ℤ, ((r : ZMod p) ^ q = 1) ∧
+      ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i,
+        (y ^ r)⁻¹ * (hSinv.restrict ⟨a, ha⟩) y ∈
+          OddOrder.Isaacs.Ch04.iterCommutator
+            (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+            (i + 1) := by
+  obtain ⟨r, hr, hrq⟩ := hyp.exists_zpow_eq_on_chain_section hR₀S hexp hS hSinv hne ha
+  refine ⟨r, hrq, fun y hy => ?_⟩
+  have h := hr (QuotientGroup.mk' _ (⟨y, hy⟩ : ↥(OddOrder.Isaacs.Ch04.iterCommutator
+    (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i)))
+  rw [quotientMulAutHom_apply_mk', ← map_zpow] at h
+  have h2 := Subgroup.mem_subgroupOf.mp (QuotientGroup.eq.mp h.symm)
+  simpa using h2
+
+/-- **BG Theorem E.3(b), Step 2, (E.12)**: `rᵢ₊₁ ≡ rᵢ · r (mod p)`.
+
+BG's computation, in full:
+`wᵢ₊₁^{rᵢ₊₁} ≡ wᵢ₊₁ᵃ = ⁅wᵢ, v⁆ᵃ = ⁅wᵢᵃ, vᵃ⁆ = ⁅wᵢ^{rᵢ} u, vʳ⁆ ≡ ⁅wᵢ, v⁆^{rᵢ r} = wᵢ₊₁^{rᵢ r}`,
+all modulo `Hᵢ₊₂`.  Cancelling `wᵢ₊₁` is legitimate because `w̄ᵢ₊₁` generates the order-`p`
+section `Hᵢ₊₁/Hᵢ₊₂` — BG's five-word *"So `⟨w̄ᵢ⟩ = H̄ᵢ`"*, supplied here as the hypothesis
+`wᵢ₊₁ ∉ Hᵢ₊₂` (which `commutatorIterate_not_mem_succ` propagates from `w ∉ H₁`).
+
+The eigenvalues enter as hypotheses in the shape `exists_zpow_eq_mod_chain` and
+`exists_zpow_eq_act_of_mem_A` deliver them, so that the caller chooses `a` once and reuses
+the same `r` down the whole chain — which is what makes `rᵢ ≡ r₀ rⁱ` an induction. -/
+theorem RegularOperatorSetup.eigenvalue_step {R B : Type*} [Group R] [Group B] [Finite R]
+    {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+      (i + 1) ≠ ⊥)
+    (hidx : ((OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          (i + 2)).subgroupOf
+        (OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          (i + 1))).index = p)
+    {a : B} (ha : a ∈ hyp.A) {v w : ↥S}
+    (hw : w ∈ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+    (hwi : commutatorIterate w v (i + 1) ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 2))
+    {r r₀ r₁ : ℤ} (hr : (hSinv.restrict ⟨a, ha⟩) v = v ^ r)
+    (hr₀ : ((commutatorIterate w v i) ^ r₀)⁻¹ *
+        (hSinv.restrict ⟨a, ha⟩) (commutatorIterate w v i) ∈
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1))
+    (hr₁ : ((commutatorIterate w v (i + 1)) ^ r₁)⁻¹ *
+        (hSinv.restrict ⟨a, ha⟩) (commutatorIterate w v (i + 1)) ∈
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 2)) :
+    (r₁ : ZMod p) = (r₀ : ZMod p) * (r : ZMod p) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  set σ := hSinv.restrict (⟨a, ha⟩ : ↥hyp.A) with hσ
+  set x := commutatorIterate w v i with hx
+  set y := commutatorIterate w v (i + 1) with hy
+  set u := (x ^ r₀)⁻¹ * σ x with hu
+  -- `wᵢ ∈ Hᵢ` and `wᵢ₊₁ = ⁅wᵢ, v⁆ ∈ Hᵢ₊₁`
+  have hxmem : x ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i :=
+    commutatorIterate_mem_chain hw i
+  have hymem : y ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1) :=
+    commutatorIterate_mem_chain hw (i + 1)
+  -- `wᵢ₊₁ᵃ = ⁅wᵢ^{rᵢ} u, vʳ⁆`
+  have hσy : σ y = ⁅x ^ r₀ * u, v ^ r⁆ := by
+    have hxu : x ^ r₀ * u = σ x := by rw [hu]; group
+    rw [hy, commutatorIterate_succ, ← hx, hxu, ← hr]
+    exact map_commutatorElement σ x v
+  -- BG's `⁅wᵢ^{rᵢ} u, vʳ⁆ ≡ wᵢ₊₁^{rᵢ r} (mod Hᵢ₊₂)`
+  have hbil : (y ^ (r₀ * r))⁻¹ * σ y ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 2) := by
+    rw [hσy, hy, commutatorIterate_succ, ← hx]
+    exact commutator_zpow_mul_congr hxmem hr₀ r₀ r
+  -- so `wᵢ₊₁^{rᵢ₊₁} ≡ wᵢ₊₁^{rᵢ r}`
+  have hcomb : (y ^ r₁)⁻¹ * y ^ (r₀ * r) ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 2) := by
+    have h := Subgroup.mul_mem _ hr₁ (Subgroup.inv_mem _ hbil)
+    have hrw : ((y ^ r₁)⁻¹ * σ y) * ((y ^ (r₀ * r))⁻¹ * σ y)⁻¹ =
+        (y ^ r₁)⁻¹ * y ^ (r₀ * r) := by group
+    rwa [hrw] at h
+  -- pass to the order-`p` section `Hᵢ₊₁/Hᵢ₊₂` and cancel `w̄ᵢ₊₁`
+  set N := (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 2)).subgroupOf
+    (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1)) with hN
+  set z := QuotientGroup.mk' N (⟨y, hymem⟩ :
+    ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1))) with hz
+  have hzne : z ≠ 1 := by
+    rw [hz]
+    intro hcon
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, hN, Subgroup.mem_subgroupOf] at hcon
+    exact hwi hcon
+  have hzord : orderOf z = p := by
+    have hdvd : orderOf z ∣ p := by
+      have h := orderOf_dvd_natCard z
+      rwa [← Subgroup.index_eq_card, hidx] at h
+    rcases (Nat.dvd_prime hyp.p_prime).mp hdvd with h1 | hp'
+    · exact absurd (orderOf_eq_one_iff.mp h1) hzne
+    · exact hp'
+  have hzpow : z ^ r₁ = z ^ (r₀ * r) := by
+    rw [hz, ← map_zpow, ← map_zpow]
+    refine QuotientGroup.eq.mpr ?_
+    rw [hN, Subgroup.mem_subgroupOf]
+    push_cast
+    exact hcomb
+  have := OddOrder.BG.Ch1.S04.zmod_eq_of_zpow_eq_of_order_prime hzord hzpow
+  push_cast at this
+  exact this
 
 end OddOrder.BG.AppE
