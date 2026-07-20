@@ -227,8 +227,10 @@ theorem commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal
   set W : Subgroup G := (Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} ↥Gstar).map Gstar.subtype
     with hW
   set T : Subgroup G := (Ch03.oPiPrimePiCore {p} ↥Gstar).map Gstar.subtype with hT
-  haveI hW_normal : W.Normal := by rw [hW]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hWsub_char
-  haveI hT_normal : T.Normal := by rw [hT]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hTsub_char
+  haveI hW_normal : W.Normal := by
+    rw [hW]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hWsub_char
+  haveI hT_normal : T.Normal := by
+    rw [hT]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hTsub_char
   have hW_le_T : W ≤ T := by
     rw [hW, hT]; exact Subgroup.map_mono (Ch03.oPiCore_compl_le_oPiPrimePiCore _ _)
   have hT_le : T ≤ Gstar := by rw [hT]; exact Subgroup.map_subtype_le _

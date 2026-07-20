@@ -148,7 +148,8 @@ theorem crux1_of_memberFamily
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
     (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
-    (_hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (_hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj))
     {S₁ : Set (ClassFunction ↥L ℂ)}
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent τ S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
@@ -232,7 +233,8 @@ definitional, **bypassing** the `htau1_chi1` requirement `τχ₁ = νχ₁` tha
 
 Every remaining obligation of `retarget_isCoherent` is discharged from the source/Dade/ν isometries
 plus the two crux inner products `hcrux1 : ⟨τ(χ−a·χ₁), νχ₁⟩ = −a·‖χ₁‖²` and
-`hcrux2 : ⟨τ(χ−χ̄), νχ₁⟩ = 0` (the genuine (5.6) Feit–Sibley content, to be discharged separately via
+`hcrux2 : ⟨τ(χ−χ̄), νχ₁⟩ = 0` (the genuine (5.6) Feit–Sibley content,
+to be discharged separately via
 the degree inequality).  The lattice orthogonality `hX_ortho`/`hXbar_ortho` is a span induction over
 `ℤ[S₁] ⊆ span(ℤ[S₁,A] ∪ {χ₁})` (`hSgen`): clean on a supported `ξ` (`νξ = τξ` + Dade isometry) and
 on `χ₁` via `hcrux1`/`hcrux2`.

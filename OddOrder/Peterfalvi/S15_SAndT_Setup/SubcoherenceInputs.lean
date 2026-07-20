@@ -600,7 +600,8 @@ def Hypothesis.Cprime (hyp : Hypothesis (G := G)) : Subgroup G := derivedInG hyp
 /-! ### (13.2.e) The book-literal type-`𝒫` Dade support `A(S)` and its (2.2) hypothesis
 
 Peterfalvi (8.10) defines the type-`𝒫` support as `A(M) = ⋃_{x∈M_s^#} C_{M'}(x)^#`, indexed over
-the **core** `M_s = M_σ`.  For the type-`P₂` maximal `S` this is `A(S) = centralizerSupport (S_σ^#) S'`
+the **core** `M_s = M_σ`.  For the type-`P₂` maximal `S` this is
+`A(S) = centralizerSupport (S_σ^#) S'`
 — the nonidentity elements of `S' = [S,S]` centralizing some nonidentity element of `S_σ = S_F`.
 The set itself and its elementary API now live upstream as
 `OddOrder.Peterfalvi.S10.typePACore` (`S10_StructureSetup.lean`, hub ruling 9163 Option B′; it was

@@ -73,7 +73,8 @@ theorem oPiCore_quotient_eq_of_isPiGroup {G : Type*} [Group G] [Finite G] (π : 
   haveI hNnormal : N.Normal := by rw [hN]; infer_instance
   have hKbar_pi : Ch03.Subgroup.IsPiGroup π Kbar := by rw [hKbar]; exact Ch03.oPiCore.isPiGroup _
   -- `|N| = |H| · |Kbar|` (the restriction `q : N → Kbar` is onto with kernel `H`).
-  have hidx : N.index = Kbar.index := by rw [hN]; exact Subgroup.index_comap_of_surjective Kbar hsurj
+  have hidx : N.index = Kbar.index := by
+    rw [hN]; exact Subgroup.index_comap_of_surjective Kbar hsurj
   have hKpos : 0 < Kbar.index := Nat.card_pos
   have hcardN : Nat.card N = Nat.card H * Nat.card Kbar := by
     have key : Nat.card N * Kbar.index = (Nat.card H * Nat.card Kbar) * Kbar.index :=

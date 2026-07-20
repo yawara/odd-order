@@ -890,10 +890,11 @@ noncomputable def
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   letI : H.Normal := hyp.H_normal
   haveI := hyp.centralCommutator_normal
-  exact hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
-    (Z := hyp.centralCommutator) hyp.centralCommutator_le
-    (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
-    (hyp.Xset_centralCommutator_nonempty hF hHnonab) hstepData
+  exact
+    hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+      (Z := hyp.centralCommutator) hyp.centralCommutator_le
+      (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (hyp.Xset_centralCommutator_nonempty hF hHnonab) hstepData
 
 /-- **Base-anchor index existence** (the StepData `i₁`/`hanchor` data).  If `χmem` enumerates the
 running prefix `pairUnion (xBaseBlock Z) pair i` and the minimal-degree base block `xBaseBlock Z`
@@ -1084,8 +1085,9 @@ noncomputable def Xset_isCoherent_of_irreducible_X
     exists_primePow_card_quotient_of_isPGroup hp hHp (Z.subgroupOf H)
   have hZqle : Nat.card (↥H ⧸ Z.subgroupOf H) ≤ Nat.card ↥H :=
     Nat.le_of_dvd Nat.card_pos (Subgroup.card_quotient_dvd_card _)
-  refine hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
-    (Z := Z) hZle hX hXne ?_
+  refine
+    hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+      (Z := Z) hZle hX hXne ?_
   intro pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi
   -- `χs i ∈ X(Zc)`
   have hχiX : (χs i : ClassFunction ↥L ℂ) ∈ hyp.Xset Z := by

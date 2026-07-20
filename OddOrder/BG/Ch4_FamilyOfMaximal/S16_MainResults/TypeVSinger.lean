@@ -72,7 +72,8 @@ theorem exists_prime_cyclic_opiCore_compl_of_isTypeV [Finite G]
   exact ⟨p, hp, hpπ, hcyc⟩
 
 /-- **`O_p(M_F)` is narrow once its `p`-rank reaches 3** (BG Theorem 15.7(e), the narrow input for
-the `r(P) ≤ 2` step of the type-V Singer case).  For `P = O_p(M_F)` with `pRank P ≥ 3`, the order-`p`
+the `r(P) ≤ 2` step of the type-V Singer case).  For `P = O_p(M_F)` with
+`pRank P ≥ 3`, the order-`p`
 non-TI witness `X₁ ≤ M_F` whose `M_F`-centralizer has rank `< 3` (the `E1X_facts` rank bound from
 `exists_inf_conj_fitting_orderP_witness`) realizes the narrow characterization
 `narrow_iff_exists_card_prime_centralizer_pRank_le_two`: `X₁ ≤ P`

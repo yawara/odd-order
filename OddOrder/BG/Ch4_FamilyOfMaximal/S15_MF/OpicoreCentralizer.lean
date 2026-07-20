@@ -48,7 +48,8 @@ and `rank_lt_three_of_le_two_maximals` (step 7 core: a subgroup in two distinct 
   `conj g⁻¹ • X₁ ≤ M`.
 * **(step 7, `rank C_{M_F}(X₁) < 3`)** `C_G(X₁) < ⊤` (else `X₁ ≤ Z(G) = ⊥`, simple), so a coatom
   `N ⊇ C_G(X₁)` exists with `N ≠ M`; `C_{M_F}(X₁) ≤ M ⊓ N` ⟹ `rank_lt_three_of_le_two_maximals`.
-* **(step 8, bridge)** `O_r(M_F) ≤ C_{M_F}(X₁)` (`commute_of_coprime_orderOf_of_isNilpotent`, `r ≠ p`,
+* **(step 8, bridge)** `O_r(M_F) ≤ C_{M_F}(X₁)`
+  (`commute_of_coprime_orderOf_of_isNilpotent`, `r ≠ p`,
   both in nilpotent `F(M)`), so `r_r(M_F) = r_r(O_r(M_F)) ≤ rank C_{M_F}(X₁) < 3`.
 
 Combined with `mf_eq_msigma_of_piSet_inf_beta_disjoint` this yields the `M_F = M_σ` conclusion of
@@ -254,7 +255,8 @@ theorem derivedInG_le_fittingInAmbient_of_not_fittingIsTI [Finite G]
   haveI hM'norm : ((derivedInG M).subgroupOf M).Normal := by rw [hid]; infer_instance
   exact le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent (Subgroup.map_subtype_le _) hM'norm
 
-/-- **BG Theorem 15.7(d), `E₃ = 1`** (Coq `nonTI_Fitting_structure` `E3_1`): the `τ₃(M)`-Hall factor of
+/-- **BG Theorem 15.7(d), `E₃ = 1`** (Coq `nonTI_Fitting_structure` `E3_1`):
+the `τ₃(M)`-Hall factor of
 any `σ(M)'`-complement `E`-setup is trivial when `F(M)` is not `TI`.  Composes the three parts:
 `M' ≤ F(M)` (`derivedInG_le_fittingInAmbient_of_not_fittingIsTI`, part (c)) → `τ₃(M) = ∅`
 (`tau3_eq_empty_of_derivedInG_le_fittingInAmbient`) → `E₃ = ⊥` (`E3_eq_bot_of_tau3_eq_empty`).  With
@@ -469,8 +471,8 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     intro g hgM
     exact ⟨(inf_conj_fitting_le_Msigma hG hM hgM).trans (le_of_eq hMFeq.symm),
       inf_conj_fitting_isCyclic hG hM hgM⟩
-  · -- **`M' ≤ F(M)`** (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)` is an
-    -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`). The argument is
+  · -- **`M' ≤ F(M)`** (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)`
+    -- is an overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`). The argument is
     -- *type-independent*
     -- (covers both type `F` and type `P₁`): take a §12 `E`-setup `M = M_σ ⋊ E`, so
     -- `M' = M_σ ⊔ E'` (`derivedInG_eq_Msigma_sup_derivedInG_complement`). Lemma 12.19 supplies a

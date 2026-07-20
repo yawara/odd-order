@@ -1343,7 +1343,8 @@ noncomputable def coherentUnion_of_glued_withDiagonal
     intro φ ψ hφ hψ
     exact inner_eq_on_zSpan_union_of_orthogonal hagreeX hagreeY
       hX.extension_inner_eq hY.extension_inner_eq hsrc_ortho himg_ortho hφ hψ
-  · -- `extends_on_supported`: `ν = τ` on the generator `Z[X,A] ∪ Z[Y,A] ∪ D`, then `span_induction`.
+  · -- `extends_on_supported`: `ν = τ` on the generator `Z[X,A] ∪ Z[Y,A] ∪ D`, then
+    -- `span_induction`.
     intro φ hφ
     have hagree_T : ∀ y ∈ zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A ∪ D,
         ν y = τ y := by

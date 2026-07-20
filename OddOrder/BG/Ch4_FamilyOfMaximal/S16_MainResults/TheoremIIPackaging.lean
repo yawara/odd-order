@@ -162,7 +162,8 @@ theorem coe_eq_mul_of_isComplement' {C A B : Subgroup G} (hAC : A ≤ C) (hBC : 
 
 /-! ## Data attached to a neighbour maximal `N(x)` -/
 
-/-- **The maximality, Type I/II classification, and Theorem D(4) complement of a neighbour maximal.**
+/--
+**The maximality, Type I/II classification, and Theorem D(4) complement of a neighbour maximal.**
 If `Mi = N(x)` is the unique maximal over `C_G(x)` for some escaping `x ∈ D = escapingSharpSet M X`,
 then `Mi` is maximal, of Peterfalvi Type I or II, and `M ∩ Mi` complements `M_{iσ}` in `Mi`
 (BG Theorem D(4) plus Proposition 16.1). -/
@@ -209,7 +210,8 @@ theorem mem_Msigma_of_commute_frobenius [Finite G] {M : Subgroup G} {A : Subgrou
   have hzsub : (⟨z, hzM⟩ : ↥M) ∈ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M :=
     Subgroup.mem_subgroupOf.mpr hzMσ
   have hz1' : (⟨z, hzM⟩ : ↥M) ≠ 1 := fun h => hz1 (by simpa using congrArg Subtype.val h)
-  have hker := OddOrder.Isaacs.Ch06.IsFrobeniusGroup.centralizer_kernel_le h_frob ⟨z, hzM⟩ hzsub hz1'
+  have hker :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup.centralizer_kernel_le h_frob ⟨z, hzM⟩ hzsub hz1'
   have hacomm : (⟨a, haM⟩ : ↥M) ∈ Subgroup.centralizer ({(⟨z, hzM⟩ : ↥M)} : Set ↥M) := by
     rw [Subgroup.mem_centralizer_singleton_iff]
     exact Subtype.ext hcomm.symm
@@ -258,7 +260,8 @@ theorem coprime_centralizer_of_neighbour [Finite G] (hG : OddOrder.BG.IsMinimalS
     exact huniqMi _ hbr.2.choose_spec
   -- `q ∈ π(M)` and Lemma 14.13(a)
   have hqπM : q ∈ S14.piSet M :=
-    Nat.mem_primeFactors.mpr ⟨hq, hqCM.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩
+    Nat.mem_primeFactors.mpr
+      ⟨hq, hqCM.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩
   have hnd : (OddOrder.BG.Ch3.S10.sigma (FT_signalizerBase xi) ∩ S14.piSet M).Nonempty :=
     ⟨q, by rw [hbase]; exact hqσMi, hqπM⟩
   obtain ⟨_hFM, _ht2M, U', _hUcompl, hfrob⟩ :=
@@ -600,7 +603,8 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
   haveI : Finite (Subgroup G) := Finite.of_injective _ SetLike.coe_injective
   -- Theorem A(3): `U ⊔ M_σ ◁ M`.
   have hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
-    (Subgroup.normal_subgroupOf_iff_le_normalizer (sup_le hUM (OddOrder.BG.Ch3.S10.Msigma_le M))).mpr
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+        (sup_le hUM (OddOrder.BG.Ch3.S10.Msigma_le M))).mpr
       (theoremA_ungated_conjuncts hG hM hKM hUM hK rfl hU).2.2.1
   -- The neighbour set `𝓐` and its conjugacy transversal.
   let 𝓐 : Set (Subgroup G) :=
@@ -771,7 +775,8 @@ minimal simple group `G` of odd order, `A(M) = ASet M U` is a *tamely imbedded s
 Both remaining §16 residuals are discharged internally: clause `(c)` via
 `coprime_centralizer_of_neighbour` (Lemma 14.13(a)) and clause `(d)` via `clause_d_of_neighbour`
 (Theorem B(5) for Type-I, and B(5) + C(9) + the order-determined cross-piece exclusion for Type-II).
-Theorem II is therefore **unconditional** — no hypothesis beyond the maximal `M` and its Hall data. -/
+Theorem II is therefore **unconditional** — no hypothesis beyond the maximal `M` and its Hall data.
+-/
 theorem theoremII_tamelyImbedded [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))

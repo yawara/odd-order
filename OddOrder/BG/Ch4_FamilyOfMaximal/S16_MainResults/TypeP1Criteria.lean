@@ -98,7 +98,8 @@ private theorem conj_smul_centralizerGeneratedBySigma {M U : Subgroup G} {u : G}
 maximal subgroup `M` of a minimal simple group is self-normalizing in `G`: `N_G(H) = M`.  `H ⊴ M`
 gives `M ≤ N_G(H)`; if the inclusion were proper, maximality forces `N_G(H) = G`, so `H ⊴ G`, and
 simplicity gives `H ∈ {⊥, ⊤}` — both excluded (`H ≠ ⊥` by hypothesis, `H ≤ M ⊊ G` rules out `⊤`).
-Generalizes `normalizer_Msigma_eq_self` (the `H = M_σ` instance) to any nontrivial `M`-normal `H`. -/
+Generalizes `normalizer_Msigma_eq_self` (the `H = M_σ` instance) to any nontrivial `M`-normal `H`.
+-/
 theorem normalizer_eq_self_of_subgroupOf_normal_of_ne_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hHle : H ≤ M)
@@ -138,8 +139,8 @@ theorem normalizer_fittingInAmbient_eq_self [Finite G]
 
 /-- **Prop 16.1(a) `alternative` disjunct (i), TI case** (Peterfalvi (8.3)(a)): if the Fitting
 subgroup `F(M)` of a maximal `M` is `TI` (`FittingIsTI M`), then its nilpotent normal Hall core
-`M_F#` is a `TI`-subset with normalizer `N_G(M_F)`.  Since `M_F ≤ F(M)`, an overlap `a, gag⁻¹ ∈ M_F#`
-is an overlap in `F(M)#`, so `FittingIsTI` forces `g ∈ N_G(F(M)) = M`
+`M_F#` is a `TI`-subset with normalizer `N_G(M_F)`.  Since `M_F ≤ F(M)`, an overlap
+`a, gag⁻¹ ∈ M_F#` is an overlap in `F(M)#`, so `FittingIsTI` forces `g ∈ N_G(F(M)) = M`
 (`normalizer_fittingInAmbient_eq_self`);
 and `M_F ⊴ M` gives `M ≤ N_G(M_F)`, whence `g ∈ N_G(M_F)`.  This supplies the first disjunct of the
 `TypeIData.alternative` field in the `F(M)`-TI case of the `hFI` bridge of
@@ -315,7 +316,8 @@ Theorem 15.2 (`mf_ne_msigma_typeP1_structure`) supplies `Q ⋊ D = M_σ` with `Q
 nilpotent; hence `M_σ = M_F · D`, so `M_σ/M_F` is the image of the nilpotent `D` under the
 quotient map (`Group.nilpotent_of_surjective`), hence nilpotent.  The complement `U` (`U ⊓ M_F = ⊥`,
 `U ⊔ M_F = M_σ`) is isomorphic to `M_σ/M_F` (the restricted quotient map is bijective), so `U` is
-nilpotent.  Discharges the `hUnilp` field of the type-`P₁` `TypePData` for the `hP1neIIIIV` bridge. -/
+nilpotent.  Discharges the `hUnilp` field of the type-`P₁` `TypePData` for the `hP1neIIIIV` bridge.
+-/
 theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hP1 : S14.IsTypeP1 M) (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
@@ -405,8 +407,8 @@ theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
     Group.nilpotent_of_mulEquiv (MulEquiv.ofBijective g ⟨hginj, hgsurj⟩).symm
   exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hUMσ)
 
-/-- **Type-`P₁` `M_F`-complement is a genuine complement in `M'`** (the `hDcompl` `TypePData` field):
-any `U` with `M_F ⊔ U = M'` and `M_F ⊓ U = ⊥` gives
+/-- **Type-`P₁` `M_F`-complement is a genuine complement in `M'`** (the `hDcompl` `TypePData`
+field): any `U` with `M_F ⊔ U = M'` and `M_F ⊓ U = ⊥` gives
 `IsComplement' (M_F.subgroupOf M') (U.subgroupOf M')`.
 
 `M_F ◁ M ⊇ M'`, so `M_F.subgroupOf M'` is normal in `↥M'`; with `M_F ⊓ U = ⊥` (disjoint) and
@@ -414,7 +416,8 @@ any `U` with `M_F ⊔ U = M'` and `M_F ⊓ U = ⊥` gives
 route: `[M':M_F] = M_F.relIndex M' = M_F.relIndex U = |U|` (second isomorphism theorem
 `relIndex_sup_right`, then `M_F ⊓ U = ⊥`), so `|M_F.subgroupOf M'|·|U.subgroupOf M'| = |M'|`, and
 `isComplement'_of_card_mul_and_disjoint` concludes.  Purely from `hsup`/`hinf` (no type-`P₁`
-hypothesis); discharges the deepest *non*-Fitting `U`-field gated by `exists_typeP1_mf_complement`. -/
+hypothesis); discharges the deepest *non*-Fitting `U`-field gated by `exists_typeP1_mf_complement`.
+-/
 theorem isComplement'_mf_complement_of_sup_inf [Finite G] {M U : Subgroup G}
     (hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M)
     (hinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
@@ -837,7 +840,8 @@ the `TypeIData.alternative` trichotomy splits on whether `F(M)` is `TI`:
   The abelian branch now **cites** `S15`'s BG (e1) rank half
   (`rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI`); the argument used to be inlined here.
   The non-abelian branch still derives its two conjuncts directly from the non-TI witness
-  (`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` + `typeF_exponent_dvd_sub_one_of_invariant_card`
+  (`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` +
+  `typeF_exponent_dvd_sub_one_of_invariant_card`
   for the exponent condition, `typeF_nonabelian_cyclic_opiCore_compl` for cyclic `O_{p'}`), because
   BG's (e2)/(e3) refinement by type is not yet separated in `S15.fitting_not_ti_trichotomy`
   (issue 3022: `p = |X|` and the type-`P₁` case `|O_p(H)| = p³`, `|M/H| ∣ p+1` remain).
@@ -1085,8 +1089,8 @@ a nontrivial `κ(M)`-Hall `K`, discharging *twelve* of the eighteen `typePData_o
 the proven §14/§15 structure and gating only on the genuinely-deep **`M_F`-internal Fitting core**
 (BG Corollary 15.5 / Lemma 15.1):
 
-* discharged (`typeP_duality` = Theorem 14.7: `hMcompl`/`hWcyc`/`hTI`; `typeP_kstar_in_mf` = Corollary
-  15.6: `hW2ne`/`hW2le`/`hHncyc`; the `W₂ = C_{M'}(W₁#)` centralizer law `hCentW1`
+* discharged (`typeP_duality` = Theorem 14.7: `hMcompl`/`hWcyc`/`hTI`; `typeP_kstar_in_mf` =
+  Corollary 15.6: `hW2ne`/`hW2le`/`hHncyc`; the `W₂ = C_{M'}(W₁#)` centralizer law `hCentW1`
   (`typeP_derivedInG_inf_centralizer_kappaElement_eq` = Theorem A(5) + Dedekind); plus
   `hHeq`/`hHle`/`hW1le`/`hW1ne`), with `W₁ = K`, `W₂ = K*`, `W = K ⊔ K*`, `H = M_F`;
 * gated (named residuals): the `M_F`-internal complement `U` (`M' = M_F ⊔ U`, `U` nilpotent and
@@ -1179,7 +1183,8 @@ collapse, Coq `BGsection16` `typePfacts` `U = 1` branch).  Corollary 15.5(d)
 (`fitting_decomposition`) gives `F(M) ≤ M'` since `M` is type `P` (not type `F`); `M' = M_σ`
 (`isTypeP1_derivedInG_eq_Msigma`) `= M_F` (hypothesis), and `M_F ≤ F(M)` always
 (`maxNilpotentNormalHall_le_fittingInG`), so `F(M) = M_F`.  This discharges the deepest field
-(`fitting_eq`) of the type-V `TypePData`, where `U = ⊥` makes `F(M) = M_F ⊔ (⊥ ⊓ C_M(M_F)) = M_F`. -/
+(`fitting_eq`) of the type-V `TypePData`, where `U = ⊥` makes `F(M) = M_F ⊔ (⊥ ⊓ C_M(M_F)) = M_F`.
+-/
 theorem fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
@@ -1400,7 +1405,8 @@ the
 `M_σ ⋊ U` complement (`typeP2_mf_internal_fitting_decomposition`), the abelian inertia `U₁` and the
 Frobenius factor `M_σ ⋊ U₀` (Lemma 15.1(d)(e), `typeP_auxiliary_structure`), and the crucial
 `F`-core
-identity `(M')_F = M_σ = M_F` (`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`).  This last
+identity `(M')_F = M_σ = M_F`
+(`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`).  This last
 identity is the Coq `defM'F` step (`Fcore_max` + Hall transitivity): it needs **no** `τ₂(M) = ∅`
 hypothesis (which is in fact false for some type-`P₂` `M`, cf. Corollary 15.9). -/
 theorem isTypeF_derivedInG_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1494,9 +1500,9 @@ theorem isTypeII_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ^#` with more than one
 `σ`-maximal), the proven signalizer structure `signalizer_structure_of_mem_sigmaSharp` supplies a
 maximal subgroup `N` over `C_G(x)` whose BG type-`F`/`P₂` dichotomy converts
-(`isTypeI_of_isTypeF`/`isTypeII_of_isTypeP2`) to the Peterfalvi type `I`/`II`.  This is the existence
-half of (8.13)'s `∃! L, C_G(x) ≤ L ∧ (IsTypeI ∨ IsTypeII)` conclusion; the uniqueness half is the
-containing-maximal uniqueness `ℳ(C_G(x)) = {N[x]}` (Theorem D). -/
+(`isTypeI_of_isTypeF`/`isTypeII_of_isTypeP2`) to the Peterfalvi type `I`/`II`.  This is the
+existence half of (8.13)'s `∃! L, C_G(x) ≤ L ∧ (IsTypeI ∨ IsTypeII)` conclusion; the uniqueness
+half is the containing-maximal uniqueness `ℳ(C_G(x)) = {N[x]}` (Theorem D). -/
 theorem exists_maximal_centralizer_le_typeI_or_typeII [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {x : G} (hxM : x ∈ S14.sigmaSharp M)

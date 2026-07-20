@@ -195,7 +195,8 @@ theorem typeP_exists_hall_derived_eq [Finite G]
     (S14.isTypeF_iff_not_isTypeP.mp (isTypeF_of_isHall_kappa_eq_bot hKM hK h)) hP
   exact ⟨U, hU, (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1⟩
 
-/-- **Type-`F` Frobenius FPF against a `U₀`-element** (mmd L4486, the engine of `isTypeF_of_isTypeI`,
+/--
+**Type-`F` Frobenius FPF against a `U₀`-element** (mmd L4486, the engine of `isTypeF_of_isTypeI`,
 following the Coq `BGsection16` argument): a nontrivial `X ≤ U₀` of the Frobenius complement has
 trivial `M_F`-centralizer, `M_F ⊓ C_G(X) = ⊥`. Any `M_F`-element `y` centralizing some
 `x ∈ X# ⊆ U₀#`
@@ -1406,8 +1407,8 @@ theorem maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
 /-- **The signalizer maximal is the unique type-`I`/`II` overgroup of `C_G(x)`** (full per-element
 half of Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ#`, `C_G(x) ⊄ M`) there
 is
-a *unique* maximal subgroup `L` over `C_G(x)` of Peterfalvi type `I`/`II`.  Existence is the previous
-`exists_maximal_centralizer_le_typeI_or_typeII` (the type-`F`/`P₂` neighbour of
+a *unique* maximal subgroup `L` over `C_G(x)` of Peterfalvi type `I`/`II`.  Existence is the
+previous `exists_maximal_centralizer_le_typeI_or_typeII` (the type-`F`/`P₂` neighbour of
 `signalizer_structure_of_mem_sigmaSharp`, converted to type `I`/`II`); uniqueness is the Theorem-D
 singleton `ℳ(C_G(x)) = {N[x]}`
 (`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`), which collapses
