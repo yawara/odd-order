@@ -648,6 +648,35 @@ theorem ambientProductSquare_eq
       (left.incl α) (right.incl β),
     left.ambientSquare_incl α, right.ambientSquare_incl β]
 
+/-! ## Coordinates of the ambient central extension -/
+
+section ExtensionCoordinates
+
+variable {F : Type*} [AddCommGroup F] [Module (ZMod 2) F]
+variable [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+variable
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (e : (F × F) ≃ₗ[ZMod 2] Additive (lowerCentralLayer P 0))
+    (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] F)
+
+/-- The `F × F` coordinate of `x` under the ambient central extension: the layer
+kernel projection followed by `e⁻¹`. -/
+theorem ambientProductExtension_rightHom_toAdd (x : P) :
+    ((ambientProductExtension hK0 e ePhi).rightHom x).toAdd =
+      e.symm (Additive.ofMul
+        (frattiniQuotientEquivLayerZero hK0 (QuotientGroup.mk x))) :=
+  rfl
+
+/-- The Singer embedding of a coordinate `f : F` back into `P` under the ambient
+central extension. -/
+theorem ambientProductExtension_inl_ofAdd (f : F) :
+    (ambientProductExtension hK0 e ePhi).inl (Multiplicative.ofAdd f) =
+      (frattini P).subtype (Additive.toMul (ePhi.symm f)) :=
+  rfl
+
+end ExtensionCoordinates
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
