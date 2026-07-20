@@ -680,3 +680,33 @@ bridge の underlying 抽出と合成。fI_left の代表元 = `f_left(g)` (quot
 
 **Stage 4 全体の commit 済**: C/D モデル・F×F 座標・extension・全 ofExtension・polarization。
 残: 4a-ii (factor-id) → branch dispatch (e 構築) → mixed 項/case → endpoint。多 session。
+
+### 2026-07-21 lane b: Stage 4a 完了 (square-extraction 3 本、全て defeq-clean)
+
+**重要な発見**: 座標互換性の square-extraction lemma が全て `Subtype.ext; rfl` /
+`rw+show+rfl` で閉じる (座標インフラが defeq で美しく還元)。`AmbientProductCoordinate.lean`:
+- `ambientCenterCoordinate_squareMap`: `ambientCenterCoordinate(sq_ambient[x]) = ePhi(⟨(x:P)²⟩)`
+- `factorLayerOneEquivAmbientFrattini_squareValue` (noncomm): factor bridge∘sq = ⟨(f g)²⟩
+- `homocyclicFourSquareSubgroupEquivFrattini_squareEquiv` (comm): homocyclic bridge∘sq = ⟨(S.subtype g)²⟩
+  (鍵: `lowerCentralSquareRepresentative=⟨underlying²⟩`, `homocyclicFourSquareEquiv_mk=x² は rfl`,
+   bridge = underlying 抽出)。
+⟹ 両 branch で `A(α)=ePhi(⟨(f g)²⟩)=q_X(α)` (ambient lemma + square_normal + eKernel_eq)。
+
+**残り Stage 4 (assembly、次 session)**:
+1. **A=q_X 統合**: 各 branch の FactorCoordinateData から `square_normal` (β·θ(β)/β²) と
+   `eKernel_eq` (= ePhi∘bridge) を取り、上記 extraction lemma と ambient lemma を合成して
+   `ambientCenterCoordinate(sq_ambient(fI_left α)) = α·θ(α)` (noncomm) / `α²` (comm) を得る。
+   要: fI_left α の rep = ambientTermZeroHom f g、その (f g) = square_normal の g と一致確認。
+2. **branch dispatch で e 構築**: FactorCoordinateData (comm/noncomm) から
+   (f, N, eQuot, hf, hfexact) を抽出 (exists_factorFamily_of_* と同 dispatch) →
+   `ambientProductEquiv`。hRnormal/hinf/hsup/hΦR は XiLengthThreeTypeAFactorData から
+   (left_normal, inf_eq_frattini, sup_eq_top, frattini_lt_left.le)。fL.range=left は
+   quotientToAmbientLayerZero の range 特性 (noncomm: range f=S ← lowerCentralTerm S 0=⊤)。
+3. **mixed 項 M(α,β)**: `M=ambientCenterCoordinate(bilinear(fI_left α, fI_right β))`。
+   endpoint `exists_mixedFrobeniusWeightEquation_of_xiLengthThree` の weight equation
+   `λ^(2^i)μ^(2^j)=ν^(2^k)` + 既存3項算術 (case 3) / 新4項算術 (case 4) で確定。
+4. **case assembly**: 各 case で `Q(α,β)=A+B+M = typeB/C/D quadratic map` を示し
+   `TypeB/C/DData.ofExtension` (S=ambientProductExtension, hsq=上記) → `higmanLemmaTwelve`。
+
+hsq の枠組み: `hsq ⟺ ePhi(⟨x²⟩)=q_BCD(coord)`。ambient lemma で LHS=Q、polarization で
+Q=A+B+M、A=q_X/B=q_Y (上記)、M=case 別。
