@@ -527,6 +527,28 @@ S06.Hypothesis.induce_not_isIrreducible_iff (h : S06.Hypothesis ↥M) [NeZero (N
 
 ⟹ ⚠ **`∃ χ₂, φ = induce h.K (chiRestrict χ₂)` の形で書かないこと** (依存型が statement に漏れる)。
 
+#### ⚠ §6 には**似た名前の 2 層**がある — 取り違え注意 (2026-07-20 実測)
+
+| 構造 | 引数 | 定義場所 | そこに在るもの |
+|---|---|---|---|
+| **`S06.Hypothesis (L : Type*)`** | `L` は**型** | `S06_CertainTypeClifford.lean:365` の `variable (h : Hypothesis L)` | `chiRestrict` (:795) / `coe_chiRestrict` (:802) / `induce_restrict_certainType_eq` (:761) / `induce_not_isIrreducible_iff` (:1095) |
+| **`S06.Hypothesis46 (A : Set G) (L : Subgroup G)`** | `L` は**部分群** | `S06_CertainHypothesis46.lean:82` (`extends CertainTypeHypothesis`) | **`columnSum` (S06_CertainTypeCoherence.lean:57)** / `certainTypeR` |
+
+⟹ **`columnSum` は `Hypothesis46` を直接取る** (当初 `Hypothesis` だと想定していたが誤り)。
+`typePACore_toHypothesis46_core` の返り値をそのまま渡せるので好都合。
+一方 Clifford 側の変換補題群は `Hypothesis L` (型引数) の上に在るので、
+`Hypothesis46 A L` の内側の `Hypothesis ↥L` を経由する必要がある。
+
+**組み立ての鎖** (両層をまたぐ):
+```
+φ = induce (huSub data) χ                   -- sOf 所属 + induceHU_eq_induce
+  = induce h.K χ'                            -- ⚠ huSub data ↔ h.K の transport
+  = induce h.K (h.chiRestrict χ₂)            -- induce_not_isIrreducible_iff  [Hypothesis 層]
+  = ∑ i, (h.columnFamily χ₂).mu i            -- coe_chiRestrict + induce_restrict_certainType_eq
+  = S06.columnSum h46₉ χ₂                    -- columnSum の定義        [Hypothesis46 層]
+```
+最後の等式で 2 層が噛み合うことを確認するのが実装の要点。
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
