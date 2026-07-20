@@ -1041,4 +1041,116 @@ theorem RegularOperatorSetup.card_seed [Finite R] (hyp : RegularOperatorSetup R 
   exact Nat.pow_le_pow_right hyp.p_prime.pos h2
 
 
+/-- **BG Step 4**: the `S`-conjugacy class of `v ∈ R₀^#` **equals** the coset `v·S'`.
+
+Containment is `orbit_conjAct_subset_coset`.  The sizes then match: `(E.15)` makes the class
+`|S|/p²` (`card_conjClass_generator`) and `(E.17)` makes `|S'| = |S|/p²`
+(`card_quotient_commutator`), while left translation does not change the size of `S'`.
+
+This is what BG needs to say *"every element of `R₀S' − S'` is conjugate to an element of
+`R₀^#`"* — and it is the only place in Appendix E where `(E.15)` is used. -/
+theorem RegularOperatorSetup.orbit_eq_coset [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
+    (hexp : ∀ x : ↥S, x ^ p = 1)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
+    {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
+    MulAction.orbit (ConjAct ↥S) v = v • ((_root_.commutator ↥S : Subgroup ↥S) : Set ↥S) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hcls : p ^ 2 * Nat.card (MulAction.orbit (ConjAct ↥S) v) = Nat.card ↥S :=
+    hyp.card_conjClass_generator hR₀S.le hp2 hv
+  have hquot : Nat.card ↥S = p ^ 2 * Nat.card ↥(_root_.commutator ↥S) := by
+    have h := Subgroup.card_eq_card_quotient_mul_card_subgroup (_root_.commutator ↥S)
+    rwa [hyp.card_quotient_commutator hR₀S hexp] at h
+  have hsame : Nat.card ↥(_root_.commutator ↥S) = Nat.card (MulAction.orbit (ConjAct ↥S) v) := by
+    refine (Nat.eq_of_mul_eq_mul_left (pow_pos hyp.p_prime.pos 2) ?_).symm
+    rw [hcls, hquot]
+  refine Set.eq_of_subset_of_ncard_le (orbit_conjAct_subset_coset v) ?_ (Set.toFinite _)
+  rw [Set.ncard_smul_set, ← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq]
+  exact le_of_eq hsame
+
+
+/-- **BG Step 4**: *"every element of the set `R₀S' − S'` is conjugate to an element of
+`R₀^#`."*
+
+Write `y = u·z` with `u ∈ R₀`, `z ∈ S'` (legitimate because `S' ⊴ S`).  Then `u ≠ 1`,
+so `u` generates the order-`p` group `R₀`, and `orbit_eq_coset` identifies the class of `u`
+with the coset `u·S'`, which contains `y`. -/
+theorem RegularOperatorSetup.exists_conj_mem_R₀ [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
+    (hexp : ∀ x : ↥S, x ^ p = 1)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
+    {y : ↥S} (hy : y ∈ hyp.R₀.subgroupOf S ⊔ _root_.commutator ↥S)
+    (hyS' : y ∉ _root_.commutator ↥S) :
+    ∃ u ∈ hyp.R₀.subgroupOf S, u ≠ 1 ∧ y ∈ MulAction.orbit (ConjAct ↥S) u := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
+  have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S.le
+  -- `y = u * z` with `u ∈ R₀`, `z ∈ S'`
+  have hcoe : (↑(R₀' ⊔ _root_.commutator ↥S) : Set ↥S) = (R₀' : Set ↥S) * (_root_.commutator ↥S) :=
+    Subgroup.mul_normal R₀' (_root_.commutator ↥S)
+  have hy' : (y : ↥S) ∈ (R₀' : Set ↥S) * ((_root_.commutator ↥S : Subgroup ↥S) : Set ↥S) := by
+    rw [← hcoe]; exact hy
+  obtain ⟨u, hu, z, hz, rfl⟩ := hy'
+  have hune : u ≠ 1 := by
+    rintro rfl
+    exact hyS' (by simpa using hz)
+  -- `u` generates `R₀`
+  have hord : orderOf u = p := by
+    have h1 : orderOf u ∣ Nat.card ↥R₀' := by
+      have h := orderOf_dvd_natCard (⟨u, hu⟩ : ↥R₀')
+      rwa [← Subgroup.orderOf_coe (⟨u, hu⟩ : ↥R₀')] at h
+    rw [hR₀'card] at h1
+    rcases (Nat.dvd_prime hyp.p_prime).mp h1 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hune
+    · exact h
+  have hgen : Subgroup.zpowers u = R₀' :=
+    Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hu)
+      (by rw [hR₀'card, Nat.card_zpowers, hord])
+  refine ⟨u, hu, hune, ?_⟩
+  rw [hyp.orbit_eq_coset hR₀S hexp hp2 hgen]
+  exact ⟨z, hz, rfl⟩
+
+
+/-- **`R₀ ∩ (Ω₁(R))' = 1`**.
+
+`R₀` has prime order `p`, so `R₀ ∩ (Ω₁(R))'` is either trivial or all of `R₀`; the latter
+is excluded by E.3(b)'s second clause `R₀_not_le_derived_omega`.
+
+Step 4 needs this to know that `v ∈ R₀^#` stays outside `S'`, hence that its image under
+any `β ∈ B` lands in `R₀S' − S'`. -/
+theorem RegularOperatorSetup.inf_derived_omega_eq_bot [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    hyp.R₀ ⊓ derivedInG (Omega R p 1) = ⊥ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  by_contra hne
+  refine hyp.R₀_not_le_derived_omega ?_
+  have hle : hyp.R₀ ⊓ derivedInG (Omega R p 1) ≤ hyp.R₀ := inf_le_left
+  have hdvd : Nat.card ↥(hyp.R₀ ⊓ derivedInG (Omega R p 1)) ∣ Nat.card ↥hyp.R₀ :=
+    Subgroup.card_dvd_of_le hle
+  rw [hyp.R₀_card] at hdvd
+  rcases (Nat.dvd_prime hyp.p_prime).mp hdvd with h1 | hp'
+  · exact absurd (Subgroup.card_eq_one.mp h1) hne
+  · have heq : hyp.R₀ ⊓ derivedInG (Omega R p 1) = hyp.R₀ :=
+      Subgroup.eq_of_le_of_card_ge hle (by rw [hyp.R₀_card, hp'])
+    exact heq ▸ inf_le_right
+
+
+/-- **`Φ(Ω₁(R)) = (Ω₁(R))'`** in ambient form — BG's *"Note that `Φ(S) = S'`, because `S`
+has exponent `p`"*, with `S = Ω₁(R)`.
+
+`frattini_eq_commutator_of_exponent_prime` inside the group `↥Ω₁(R)` (whose exponent is `p`
+by E.3(b)'s first clause), transported along `Subgroup.subtype`.
+
+This is the bridge the statement of E.3(d) needs: it is phrased with `frattiniInG`, while
+Step 4's counting runs on the derived subgroup. -/
+theorem RegularOperatorSetup.frattiniInG_omega_eq_derivedInG [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    frattiniInG (Omega R p 1) = derivedInG (Omega R p 1) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  unfold frattiniInG derivedInG
+  congr 1
+  exact frattini_eq_commutator_of_exponent_prime (hyp.R_pGroup.to_subgroup _)
+    (fun x => Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2))
+
+
 end OddOrder.BG.AppE
