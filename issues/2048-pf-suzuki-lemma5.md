@@ -269,9 +269,16 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               preimage が normal / invariant、`X ∩ Y = Φ(P)`、`X ⊔ Y = P` を証明する
         - [x] `Φ(P) < S < P` である各 preimage `S` の restricted actor range が
               `HasXiLengthTwo` を満たすことを証明する
-      - [ ] 可換な ξ-length-two summand `A(n,1) = C₄ⁿ` も含む honest data carrier を
+      - [x] 可換な ξ-length-two summand `A(n,1) = C₄ⁿ` も含む honest data carrier を
             構成し、二つの summand を共通 parameter `n ≥ 2` の `A(n,θ)`,
             `A(n,φ)` と同定する
+        - [x] `XiLengthTwoTypeAData` を構成し、非可換 branch は Lemma 11、
+              可換 branch は homocyclic exponent-four 分類と actual
+              `A/A² ≃ A²` square coordinates から `A(n,1)` へ接続する
+        - [x] 任意の proper invariant preimage `S` を、可換性の分岐を残さず
+              `IsXiLengthTwoTypeA S` と同定する
+        - [x] complementary preimages `X, Y` の二つの model parameter が一致し、
+              共通値が `2 ≤ n` を満たすことを証明する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

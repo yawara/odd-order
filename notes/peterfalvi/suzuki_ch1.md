@@ -402,10 +402,19 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       同定し、`P / Φ(P)` の induced actor を ξ-length `2` に落とした。Maschke で得た
       complementary invariant summands の preimage `X, Y` は normal / invariant で、
       `X ∩ Y = Φ(P)`, `X ⊔ Y = P`; 両 restricted actor range も ξ-length `2` である。
-      次の source frontier は、可換 branch `A(n,1) = C₄ⁿ` も含む inclusive な
-      length-two type-A data を構成し、両 summand を共通 parameter `n ≥ 2` の
-      `A(n,θ)`, `A(n,φ)` と同定する段階である。既存 `IsTypeA` は
-      `φ ≠ 1` を要求するため、可換 branch へ流用しない。
+      `LengthTwoModels.lean` は可換 branch `A(n,1) = C₄ⁿ` も含む inclusive な
+      `XiLengthTwoTypeAData` を構成した。非可換 factor は Lemma 11、可換 factor は
+      homocyclic exponent-four 分類、actual `A/A² ≃ A²` square equivalence、
+      inverse Frobenius finite-field coordinates から honest model を得る。したがって
+      各 proper invariant preimage は可換性の分岐を残さず `A(n,φ)` と同定済みである。
+      `TypeAModel` の involution を有限体の非零元と同定して
+      `|Inv(A(n,φ))| = 2^n - 1` を証明した。両 preimage は ambient の全 involution
+      を含むため、その個数から二つの parameter が一致し、複数 involution から
+      共通値 `n ≥ 2` も従う。この source step は
+      `XiLengthThreeTypeAFactorData` にまとめた。等しいのは parameter `n` であり、
+      原典どおり二つの automorphism `θ, φ` の一致は主張しない。次の source frontier は
+      この二つの actual model と共通 central layer を使う type B/C/D の gluing case
+      analysis である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
