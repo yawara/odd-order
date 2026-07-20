@@ -683,7 +683,35 @@ H0supC_le_derived, W1_inf_H0supC_subgroupOf_eq_bot, W2_not_le_H0supC, card_W2bar
 `caseB_coherent_sOf_cprime` → `sOf_caseB_coherent_restrict` で供給し**入力ゼロのまま**。
 新パラメータは `hHeq` (`h46.subH = M_σ`) と `hAnorm` (A の M-共役不変性) のみ。
 
-#### ⛏ 次の一手: `hAbase` を `sOf_degreeSubfamily_coherent` から供給する
+#### ✅ 済 (2026-07-20): `hAbase` を供給した
+
+`S11.sOf_degreeSubfamily_coherent_restrict` (commit b7a28937f)。読み通りに一発で通った。
+`(inducedNonKernelFamily_subcoherent …).tau` は `irrSubcoherent` が `tau := τ` と置くので
+`rfl` で `dadeICM dd.dade (…)` に落ちる。pin は `hdd : dd.dade = h46.dade0.restrict …` だけで、
+`FullDadeIsometryData` 同士の一致は**不要**だった (下記の鍵のとおり)。
+
+⟹ **(9.11) の case A 残作業は `hArefute` + count `h2 : 2 ≤ ncard` のみ**
+(`h2` は S15 先例どおり露出したまま = the honest pattern)。
+
+#### ⛏ 次の一手: `hArefute` の §9 化 (= 本 issue 最後の項目)
+
+`hArefute` は §13 では `S11.caseA_refuter_of_equality_refutation`
+(`S11_NineElevenCaseA.lean:254`) が供給していて、そこで**2 つの carrier に落ちている**:
+
+- `NineElevenPairBound hyp caseA` — (5.6) の pair-bound 束
+- `NineElevenEqualityRefutation hyp caseA` — (9.11.2)–(9.11.8) の等号配置の否定
+
+本体の議論は (9.11.1) の squeeze で、使っているのは
+`hyp.base.tau` / `hyp.base.A0` (**パラメータ化可能**) と
+`hyp.s11Setup` → `data` / `hyp.chief` → `chief` / `hyp.C` → `cSub data chief` /
+`hyp.H0Cprime` → `chief.H0 ⊔ cprimeSub data chief` という**packaging の別名だけ**。
+⟹ case A の降ろしと同型の機械作業になる見込み。
+
+⚠ ただし **2 つの carrier 自体が `S13.Hypothesis` で添字づけられている**ので、
+先に carrier の §9 版 (`data`/`chief`/`chars` 上) を作る必要がある。
+そこが本 issue に残る最後の実質作業。
+
+#### (旧) 次の一手: `hAbase` を `sOf_degreeSubfamily_coherent` から供給する
 
 両者は**同じ台 (`supportInSubgroup A M`)** になったので、残る差は τ だけ:
 
