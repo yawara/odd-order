@@ -867,6 +867,7 @@ theorem card_charGroup_W2 [Finite L] :
   haveI : Fintype L := Fintype.ofFinite L
   exact h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Counting collapse** (mmd 04.6, (4.5.b) proof): for `g ∈ W₁^#`, every `g`-fixed irreducible
 character of `K` is one of the `χ_j`.  The `w₂` distinct `χ_j` (`chiRestrict_injective`,
 `card_charGroup_W2`) all lie in the `g`-fixed set (`chiRestrict_isFixedPt`), whose size is at most
@@ -923,6 +924,7 @@ theorem chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
     ClassFunction.restrict_apply, ClassFunction.restrict_apply]
   exact ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ).conj_eq (x : L) g
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **`induce` is injective on the reducible-inducing columns** (issue 1012, (9.9.b) source↔image):
 distinct `W₂`-duals `χ₂` give distinct induced characters `Ind_K^L(chiRestrict χ₂)`.  Each column is
 `L`-inertia-stable (`chiRestrict_conjBy_eq`), so `induce_injective_of_inertia_stable` forces

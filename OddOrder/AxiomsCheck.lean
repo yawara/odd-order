@@ -291,7 +291,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 11300
+set_option linter.style.longFile 11500
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -11335,3 +11335,8 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- inessential, the one genuinely §10-bound input (the degree-`qa` base coherence) becoming the
 -- `hbase` parameter that `sOf_degreeSubfamily_coherent` supplies.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_coherent_sOf_cprime_of_refuter
+-- **`𝒮(Y) ⊆ S(⊥)` at §9 level** — the §9 replacement for the "world-bridge" the §11 chain does
+-- through `hyp.SOf_eq`/`hyp.sOf_subset_SOf` (i.e. through `S13.Hypothesis`).  The §11 caseB pivot
+-- lemmas use that bridge only to borrow the `S08.inducedKernelFamily_*` suite; with this they can
+-- borrow it without any `S13.Hypothesis`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_subset_inducedKernelFamily_bot
