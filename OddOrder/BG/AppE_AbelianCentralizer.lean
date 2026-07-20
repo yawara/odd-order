@@ -1023,4 +1023,21 @@ theorem iterCommutator_le_base {G : Type*} [Group G] {T : Subgroup G} [T.Normal]
     OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a ≤ T :=
   iterCommutator_le_of_le (Nat.zero_le a)
 
+/-- **BG `(E.19)`'s `H_{a} = ⟨w_a, H_{a+1}⟩`**: an index-`p` section is generated over the
+smaller group by *any* element outside it.
+
+`⟨w⟩ ⊔ K` sits strictly above `K` (it contains `w`) and inside `H`, and there is no room
+(`eq_of_lt_of_le_of_card_eq_prime_mul`).  This is the `hgen` hypothesis of
+`commutator_le_of_generators`, supplied from Step 2's `|Hₐ : H_{a+1}| = p` together with
+`wₐ ∉ H_{a+1}` (`commutatorIterate_not_mem`). -/
+theorem sup_zpowers_eq_of_card_eq_prime_mul {G : Type*} [Group G] [Finite G] {p : ℕ}
+    (hp : p.Prime) {K H : Subgroup G} (hKH : K ≤ H)
+    (hcard : Nat.card ↥H = p * Nat.card ↥K) {w : G} (hw : w ∈ H) (hwK : w ∉ K) :
+    Subgroup.zpowers w ⊔ K = H := by
+  refine eq_of_lt_of_le_of_card_eq_prime_mul hp hcard ?_
+    (sup_le (Subgroup.zpowers_le.mpr hw) hKH)
+  refine lt_of_le_of_ne le_sup_right fun h => hwK ?_
+  rw [h]
+  exact Subgroup.mem_sup_left (Subgroup.mem_zpowers w)
+
 end OddOrder.BG.AppE
