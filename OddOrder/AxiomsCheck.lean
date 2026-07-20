@@ -11052,9 +11052,23 @@ type II), the `typePData_*` ones the `P₁` specialisation.  On `typePACore` the
 the defining property of the support; on `typePA` it is free because `A = K^#`.
 
 **(8.15), claim 3**: `inducedKernelFamily_subcoherent` (consumer shape `A = A₀(M)`) and
-`inducedKernelFamily_subcoherent_sharp` (the book's literal `A = M^#`).
+`inducedKernelFamily_subcoherent_sharp` (the book's literal `A = M^#`) are the `P₁`-regime
+producers: they filter the induced family by `θ ≠ 1` and get the (5.2) support estimate from
+`(M')^# ⊆ A`.
 
-Hub ruling 9163 (Option B′) / issues 1042, 9008. -/
+**(8.15), claim 3 — type-uniform**: `inducedNonKernelFamily_subcoherent`, on the book's own family
+`{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` (`inducedNonKernelFamily`) and an arbitrary ambient support
+`A`.  For `θ ∈ Irr M'` the two filters agree exactly when `M_s = M'` — the `P₁` regime — which is
+why the older producers read faithfully only there.  The book filters by `H ⊄ Ker θ` because that
+is what makes the support estimate work without `(M')^# ⊆ A`, which is **false** once
+`A = A(M) = ⋃_{x ∈ M_s^#} C_{M'}(x)^#` is strictly smaller than `(M')^#` (types II/V): (5.3.b)'s
+proof gets `Z[𝒮, L^#] = Z[𝒮, A]` from **(4.7)** instead
+(`inducedNonKernelFamily_conjDiff_support`, via
+`S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`).  Non-reality and
+pairwise orthogonality are inherited from the coarser `S08` family along
+`inducedNonKernelFamily_subset_inducedKernelFamily_bot`.
+
+Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.centralizerSupport_sharpSubgroup_of_le
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_eq_typePA_of_isTypeP1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore0_eq_typePA0_of_isTypeP1
@@ -11095,3 +11109,9 @@ Hub ruling 9163 (Option B′) / issues 1042, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedKernelFamily_member_support_subset_derivedInG
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedKernelFamily_subcoherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedKernelFamily_subcoherent_sharp
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subset_inducedKernelFamily_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_apply_one_eq_natCast
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_apply_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_conjDiff_support
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent
