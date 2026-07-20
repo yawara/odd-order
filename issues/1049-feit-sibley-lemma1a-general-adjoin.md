@@ -45,14 +45,32 @@ Lemma 1(a) はこれを一般 `S07.Hypothesis` τ に**一般化**する task ([
 - [x] **helper 4**: 一般 bridge `retarget_isCoherent_of_extensionImage_general` — Dade の 3 箇所の
   `dadeIntegralCharacterMap_inner_eq_on_supported_span` を set-based `hisom` 仮説 1 つで置換。
   初回 build green (Dade body の mechanical transcribe が通った)。
-- [ ] **crux producer**: 一般 member-family → crux1/crux2 (xAdjoinStep の crux 部の一般化)。
-  helper 2 (`(hyp.difference_image hχ).toOrthonormalImage` で R(χ) 構成 — 一般 constructor 既存),
-  helper 3 (`toOrthonormalImage_orthogonal` + `hyp.difference_images_orthogonal`),
-  `crux1_of_memberFamily` (Dade 未使用の一般 core), `inner_decomposition_X_extension_member_eq_zero`
-  (一般), `decompositionPair` (一般) を組んで crux1/crux2 を出す。
-- [ ] 一般 `adjoinPairCoherent` = crux producer + `retarget_isCoherent_of_extensionImage_general`
-- [ ] FeitSibley `coherent_adjoin_of_degree_bound` を一般定理へ配線 (statement を Peterfalvi/engine
-  準拠へ調整: pair {ψ,ψ̄} adjoin + normalized degree bound; hisom は `hyp.tau_isometry_diff` から供給)
+- [x] **crux1** `crux1_of_memberFamily_general` (degree bound → crux1) — build green (commit 4f77ecd83)
+- [x] **hcoeffval producer** `inner_Y_extension_member_eq_general` — build green
+- [x] **member decomp** `memberExtensionDecomposition_general` (tau1=ν) — build green
+- [x] **χ decomp** `decompositionDaFromDiff_general` (tau1=τ, 差 lattice isometry) — build green
+
+**⇒ Isaacs 7.14 adjoin の hard math の general leaf は全て landed (6 lemma, 全 build green)。**
+残りは統合と配線のみ:
+
+- [ ] **統合 `adjoinPairCoherent_general`** = `xAdjoinStep` (CoherentAdjoin:530) の一般版 (~140 行)。
+  各 xAdjoinStep hypothesis を対応する general leaf で discharge:
+  - `Da` ← `decompositionDaFromDiff_general` (imageFamily = `(diff_image χ).toOrthonormalImage`)
+  - `Dmem i` ← `memberExtensionDecomposition_general` (imageFamily = `(diff_image (χmem i)).toOrthonormalImage`)
+  - `hortho_mem` ← `CharacterDifferenceImage.toOrthonormalImage_orthogonal` +
+    R(χmem i)⊥R(χ) の Orthogonal (差 image の直交性; FeitSibley では `hyp.difference_images_orthogonal`)
+  - `hXortho` ← `inner_decomposition_X_extension_member_eq_zero` (完全一般, htau1 は memberExtensionDecomposition_general の tau1=ν ゆえ rfl)
+  - `hfound` ← `inner_tau_extension_of_supported` (helper 1)
+  - `hcoeffval` ← `inner_Y_extension_member_eq_general`
+  - `hcrux1` ← `crux1_of_memberFamily_general`
+  - `hcrux2` ← `inner_extension_member_orthogonal_imageSet` (CoherenceUnion:630, S07 一般) を R(χ) 上で sum
+  - 最終 ← `retarget_isCoherent_of_extensionImage_general` (helper 4)
+  結論: `IsCoherent τ (S₁ ∪ {χ, χ̄}) A`。
+- [ ] **FeitSibley 配線**: `coherent_adjoin_of_degree_bound` を `adjoinPairCoherent_general` へ。
+  ⚠ statement 調整が要る: 現状 `S = S₀ ∪ {ψ}` 単一 adjoin + degree bound `2·deg χ0·deg ψ < ∑ deg²`。
+  engine は pair `{ψ,ψ̄}` adjoin + normalized `2a < ∑ (deg)²` (a = deg ψ/deg χ₀, unit norm)。
+  Peterfalvi の実 statement (S conj-closed, ψ̄∈S₀) と engine の pair-adjoin をどう繋ぐか設計。
+  `hisom` は `hyp.tau_isometry_diff` から (member-diff が A-supported を示す); m₁=1 (irreducible)。
 
 ## 完了条件
 
