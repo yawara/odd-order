@@ -79,6 +79,7 @@ PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private �
     ⚠ 禁止しても破るエージェントが実在したので、**タスク指示の冒頭に明示**すること。
 - **分割の owner と trigger (2026-06-11 メカニズム化)**: 上記原則は 2026-06-05〜06-11 の 6 日間に ~170 commits / +13k 行すり抜けられた (S08 5.5k→11.8k、S05 は制定後誕生で 4k 化)。文言でなく以下のメカニズムが正:
   - **lane (書き手) の trigger**: 教科書の**次の主結果番号**に着手するときは**新 leaf を切るのがデフォルト**。同一ファイル追記は「現に証明中の定理の helper」のみ。frontier ファイルが **1,500 行超**になったら停止して分割 (または hub に委任)。
+  - **⚠ 新 leaf を作ったら同じ commit で [`OddOrder.lean`](OddOrder.lean) に import を足す (2026-07-20 明文化、issue 0135)**。`OddOrder.lean` は全レーンが触ってよい共有ファイル。配線を忘れると leaf が `lake build OddOrder` の import closure 外に落ち、**hub の合流フルビルドが jobs 数不変・数秒で green を返す** — 新規コードが一度も elaborate されないまま gate を通る (実害 2 件、うち 1 件は 289 行が 1 tick 素通り)。上位 leaf 経由で到達する中間 leaf は配線不要だが、**到達性が自明でないなら足す**。
   - **hub (合流側) の gate**: 合流 tick で 1,500 行超ファイルへの追記を検出 → ⚠ flag 報告 + 分割 issue 起票。**分割の実施 owner は hub** (lane の frontier と衝突しない凍結境界で prefix-split: 先頭 K 宣言を上流ファイルへ、残りが import する。前方参照は構文上不可能ゆえ任意の宣言境界で安全)。手順詳細 = [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md)。
 
 ### トレーサビリティ (3 層)

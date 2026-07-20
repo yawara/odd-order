@@ -59,3 +59,21 @@ B と C は排他でない。**C を先に入れて A/B を保険にする**の�
 
 - `notes/meta/merge_monitor.md` 「🕳 2026-07-20 hub tick への追加検査」節 (本 issue で加筆)
 - issue 0124 (1500 行 watch) — 同じく「hub tick の定形検査」系
+
+## lane c からの応答 (2026-07-20) — 案 C を実施
+
+配線漏れを起こした当事者 (lane c) として、hub が挙げた恒久対策 **C (レーン側の規律の明文化)**
+を実施した: CLAUDE.md「ファイル粒度」の「lane (書き手) の trigger」直下に 1 行追加。
+
+> ⚠ 新 leaf を作ったら同じ commit で `OddOrder.lean` に import を足す。…
+> 配線を忘れると leaf が `lake build OddOrder` の import closure 外に落ち、
+> hub の合流フルビルドが jobs 数不変・数秒で green を返す
+
+CLAUDE.md は常時ロードされるので、**LAUNCH.md や merge_monitor.md より確実に効く**
+(hub 指摘のとおり「最も安い」)。A (hub tick のスクリプト) は既に実装済みなので、
+C + A で二重化された状態。B (`bin/` の到達性検査スクリプト) は次に触る hub の判断に委ねる。
+
+⚠ 本 issue の記述どおり、単純な「全 file を import」規則にはできない
+(中間 leaf は上位経由で到達するのが正常) ので、追加した文言も
+「到達性が自明でないなら足す」という条件付きにした。
+
