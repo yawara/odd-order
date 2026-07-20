@@ -555,3 +555,42 @@ kernel 側 `left : Mult F ≃* Φ(P)` は `exists_ambientFrattiniSingerCoordinat
 
 **Unit C 以降**: 各 case の固有値算術で mixed 項を確定 → typeB/C/D quadratic map に一致 → ofExtension。
 case 3 の 3項=2項算術は既存、case 4 の 4項算術は Unit で新規。
+
+### 2026-07-21 lane b: Unit B Stage 1+2 完了 (F×F 加法座標)
+
+**完了** (`c8ca0a851`): `HigmanLemmaTwelve/AmbientProductCoordinate.lean` に
+`ambientProductEquiv : F × F ≃ₗ[ZMod 2] Additive (lowerCentralLayer P 0)` を構築
+(surjective = `mul_normal` 分解、injective = ⊓=Φ group argument + fI 単射)。sorry 0。
+- 罠: `open OddOrder.RepresentationTheory` 等が **`GL` を notation 予約**するので型変数
+  `GL`/`GR` は使えない (→ `HL`/`HR` に改名)。
+- `Additive (lowerCentralLayer P 0)` の module instance は `local instance` 3 本
+  (`CommGroup`/`Module`/`IsMulCommutative`) を自ファイルで宣言する必要がある
+  (MixedEigenweights の同名は `local` で export されない)。
+
+**次 = Stage 3: Multiplicative 版 + GroupExtension** (`ofNormalSubgroupCoordinates` へ)。
+必要な bridge は特定済:
+1. `right : P ⧸ frattini P ≃* Multiplicative (F × F)`:
+   - `P ⧸ frattini P ≃* lowerCentralLayer P 0` を `QuotientGroup.congr (frattini P)
+     (lowerCentralLayerKernel P 0) (termZeroEquivAmbient P).symm he` で作る。
+     `termZeroEquivAmbient P : lowerCentralTerm P 0 ≃* P` =
+     `(MulEquiv.subgroupCongr (by simp [lowerCentralTerm])).trans Subgroup.topEquiv`
+     (TypeAConclusion:422 `lowerCentralTermZeroEquivAmbient` が private ⟹ de-privatize
+     するか自ファイルで再定義)。`he : (frattini P).map (termZeroEquivAmbient P).symm =
+     lowerCentralLayerKernel P 0` は hK0 (frattini 形) を使い TypeAConclusion:430 の
+     `lowerCentralTerm_one_map_zeroEquiv_symm` と同型に証明。
+   - `.trans (AddEquiv.toMultiplicativeRight ambientProductEquiv.symm.toAddEquiv)`
+     (`AddEquiv.toMultiplicativeRight : (Additive G ≃+ H) → (G ≃* Multiplicative H)`,
+     mathlib `Algebra/Group/Equiv/TypeTags.lean:59`)。
+2. `left : Multiplicative F ≃* frattini P` (F = GaloisField 2 n):
+   - Singer 座標 `ePhi : Additive (frattini P) ≃ₗ GaloisField 2 n`
+     (`exists_ambientFrattiniSingerCoordinates_of_xiLengthThree`, AmbientCentralExtension:424)
+     から `AddEquiv.toMultiplicativeLeft (ePhi.symm.toAddEquiv) : Multiplicative F ≃* frattini P`
+     (`AddEquiv.toMultiplicativeLeft : (G ≃+ Additive H) → (Multiplicative G ≃* H)`)。
+3. `GroupExtension.ofNormalSubgroupCoordinates (frattini P) left right :
+    GroupExtension (Multiplicative F) P (Multiplicative (F × F))` +
+   centrality (`hcentral` from `frattini P ≤ Z(P)` = `commutator_eq_frattini_and_frattini_le_center`)。
+
+**Stage 4 (square map 分解)** = `q_P(α,β) = q_X(α)+q_Y(β)+mixed`。`lowerCentralSquareMapAdditive_add`
+(sq(u+v)=sq(u)+sq(v)+`lowerCentralCommutatorBilinear`) を F×F 座標に落とし、factor の
+`square_normal` (β·θ(β)/β²) と mixed bilinear を接続。これが各 case で typeB/C/D quadratic
+map に一致することを示し `ofExtension` へ。
