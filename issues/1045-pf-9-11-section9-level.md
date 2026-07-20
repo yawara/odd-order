@@ -302,6 +302,109 @@ finiteness → `sOf_finite`、`sOf_degreeSubfamily_isCoherent` → `hbase` パ�
 ⚠ 置き場: `caseA_character_count_exact` が `S11_SingleFactorCentralizer` に在るので、
 そこか、それを import する S11 系 leaf。(b) をパラメータで受けるなら橋渡し leaf は不要。
 
+### ✅ (d) 前半 完了 (2026-07-20): `S11.caseA_coherent_sOf_cprime_of_refuter`
+
+(9.11) case (9.7.a) の §9 レベル版を landed (`S11_NineElevenSubcoherentBridge.lean`、
+`S11_SingleFactorCentralizer` を import 追加)。axiom-clean、AxiomsCheck 登録済。
+`data`/`chief`/`chars` の上で `tau`/`A0` をパラメータに取り、**型仮定はゼロ**。
+
+置換は記録した対応表どおり機械的に通った。⚠ ただし `open scoped S12.FiniteInduce in` を
+付け忘れて `Fintype ↥M` が合成できず 1 度落ちた — このファイルの他 2 定理は付けてあった。
+**§9 の `sOf` 系を触る宣言には一律で付ける**と覚えるのが早い。
+
+### ⚠ case B は case A のように機械的には降ろせない (2026-07-20 実測)
+
+`caseB_coherent_sOf_H0Cprime` (S13_CoreStructure.lean:760) を読んだ結果、
+**case A と違って §10 依存が本質的**:
+
+- **pivot が μ-column**: 証明は `μ₁ = columnSum (hyp.base.toHypothesis46 …)
+  (hyp.base.muColumnChar … ⟨1, hw2⟩)` を anchor に取る。μ-grid は §10 (S12) の装置で、
+  §9 の carrier には無い。
+- **`htype` が本質的に効く 2 箇所**:
+  - `caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB hncH0C htype` (一様次数 `qu`)
+  - `columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp ⟨1,hw2⟩ hk1 hncH0C htype` (pivot の所属)
+  後者は以前 trace したとおり「`𝒮(⊥)` へ緩めて **H₀ = ⊥** を使う」= (11.7)、型 III/IV 専用。
+- 他に `hyp.params.w2_prime`、`hyp.base.tau_inner_eq_of_supported`、
+  `hyp.base.one_notMem_A0`、`caseB_sOf_memberRFamily` など §10/§11 の部品を多用。
+
+### ✅ 書籍を読んだ (2026-07-20, PDF p.53-54) — case B は書籍では **2 行**
+
+**(9.11) の証明冒頭**: 「By (8.15), Hypothesis (5.2) holds for `L = M`.
+**By (9.9.a) and (5.7), `𝒮(H₀C′)` is coherent in case (9.7.b).**
+Suppose that case (9.7.a) holds. …」
+
+⟹ case (9.7.b) は **(9.9.a) + (5.7) の 2 引用だけ**。case (9.7.a) の方が長い議論。
+
+**(9.9.a)** (p.54): 「If `χ ∈ 𝒳(H₀)`, then `χ(1)` is divisible by `u`.
+**If `χ ∈ 𝒳(H₀C′)`, then `χ(1) = u`** and χ is induced to `HU` from a linear character of `HC`.」
+⟹ case (b) では `𝒮(H₀C′)` の**全メンバーが次数 `qu` の一様**。だから (5.7) が直接効く。
+**μ-column pivot は書籍の議論に出てこない** — 予想どおり repo の anchor は packaging 由来。
+
+⚠ ただし単純に §8 companion (`inducedNonKernelFamily_degreeSubfamily_coherent`) は使えない:
+**(9.9.b)** が「`𝒮(H₀)` は**可約**指標 `μ_j` (1 ≤ j < p) をちょうど p−1 個含み、
+`μ_j ∈ 𝒮(H₀C)`」と言う。`H₀C′ ≤ H₀C` ゆえ `𝒮(H₀C) ⊆ 𝒮(H₀C′)` なので
+**`𝒮(H₀C′)` は全既約ではない**。⟹ 既約性を要求する
+`S07.coherent_subset_of_constant_degree` ではなく、**norm-general な (5.7) engine**
+`S07.uniform_degree_coherence_of_families` (repo に既存、§11 caseB が使っている) が要る。
+その pivot は**書籍の `μ_j` そのもの**。
+
+⟹ **前 iteration の「μ-column anchor は packaging 由来」は半分だけ正しかった**:
+pivot が要ること自体は書籍どおり (可約メンバーがあるため)。誤っていたのは pivot の**出所**で、
+書籍は `μ_j` を **(9.9.b) が (4.7) + Theorem (4.5) から** 構成する — どちらも §6 (S06) の結果で
+**§9 レベルで手に入る**。repo が §10 の μ-grid (`muColumnChar`) を使っているのが packaging。
+
+### case B の設計 (書籍準拠)
+
+1. **(9.9.a)** を §9 で: `χ ∈ 𝒳(H₀C′) ⟹ χ(1) = u` ⟹ `𝒮(H₀C′)` の一様次数 `qu`。
+2. **(9.9.b)** を §9 で: `𝒮(H₀)` の可約メンバー `μ_j` (p−1 個) を (4.7)+(4.5) から構成し、
+   `μ_j ∈ 𝒮(H₀C) ⊆ 𝒮(H₀C′)` を pivot にする。
+3. `S07.uniform_degree_coherence_of_families` に流す (§11 caseB と同じ engine、
+   ただし pivot と一様次数を §9 由来のものに差し替える)。
+
+### ✅ (9.9) の repo 在庫を実測 (2026-07-20) — **(9.9.a) は既に §9 で型仮定ゼロ**
+
+| 書籍 | repo | 層 |
+|---|---|---|
+| **(9.9.a)** 一様次数 `qu` | **`S11.caseB_degree_qu`** (CharacterCounts.lean:981) | **§9 ✅ 型仮定ゼロ** |
+| (9.9.b) 可約 `μ_j` が p−1 個 | `S06_CertainTypeClifford` :1046/:1108, `S06_CertainTypeSupport`:311 | §6 ✅ |
+| (9.9.c) 両半分 | `S11_.../CaseBXi`:803, `S11_.../InnerCompHom`:983 | §9 ✅ |
+| (5.7) norm-general engine | `S07.uniform_degree_coherence_of_families` (S07_PivotCoherence) | 上流 ✅ |
+
+⚠ **`caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu` (S13) の `htype`/`hncH0C` は飾り**:
+本体は `S11.caseB_degree_qu hG _ caseB φ` の 1 行で、`htype`/`hncH0C` は
+`cprimeSub = derivedInG hyp.C` を `C_eq_cSub_of_noncoherent` で書き換えるためだけに在る
+= **本 session 冒頭から繰り返し見ている「`hyp.C = cSub` の辞書同一視」と同じ artifact**。
+`caseB_degree_qu` は `chars.SOf (chief.H0 ⊔ chars.Cprime)` の上で直接述べられている。
+
+### ⛏ case B の残り = pivot 周り 3 件を §9 へ
+
+まだ §13 に在るのは以下 3 件だけ (いずれも `S13_MaximalIII_IV.lean`):
+
+- `caseB_sOf_memberRFamily` — メンバーごとの `R`-data 分配 (既約 = signed Dade /
+  可約 μ-column = `certainTypeR`)
+- `caseB_sOf_memberRFamily_orthogonal` — (5.2.e) の cross-orthogonality
+- `sOf_anchor_diff_support` — pivot に対する差の台
+
+⟹ この 3 件を §9 (`data`/`chief`/`chars`) 上へ降ろし、pivot を §10 μ-grid の
+`muColumnChar` でなく **(9.9.b) の可約メンバー** (§6 の count 由来) から取れば、
+case B も型仮定ゼロで組める見込み。**(9.9.a) と engine は既に揃っている**。
+
+### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
+書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
+から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
+書籍の必然ではない可能性が高い — **(9.7)(b) と (9.9) を PDF で読んでから設計する**こと
+(推測で転記しない)。
+
+**現状の (9.11) §9 化の到達点**:
+
+| 部分 | 状態 |
+|---|---|
+| `clifford_dichotomy` (9.7) 分岐 | ✅ 既に `chars` 上・型仮定なし |
+| base subfamily coherence | ✅ (b) `sOf_degreeSubfamily_coherent` ((8.15.3)→(5.7)) |
+| case (9.7.a) | ✅ `caseA_coherent_sOf_cprime_of_refuter` (型仮定ゼロ) |
+| case (9.7.b) | ⛏ **要設計** (上記) |
+| (9.11) 本体 (両 case の合成) | ⛏ case B 待ち |
+
 ### (参考) 実装レシピ
 
 ```
