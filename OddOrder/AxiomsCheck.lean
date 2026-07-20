@@ -10206,7 +10206,7 @@ axiom-clean and are pinned below. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.nineElevenSTwoExtraction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sTwo_subset_degreeQaCut
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S13.card_le_inner_self_re_of_orthonormal_inner_int_ne
+  OddOrder.Peterfalvi.S07.card_le_inner_self_re_of_orthonormal_inner_int_ne
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.sOf_H0Cprime_memberRFamily_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sThree_coherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_nineElevenTwo_tiWitness
@@ -11664,6 +11664,11 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- dichotomy.  Structurally identical to `sOf_caseB_coherent` (same norm-general engine, same §9
 -- `R`-family dispatch); only the family (`𝒮(H₀C′) ∖ 𝒮₂`) and the degree (`qu`) differ.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_sThree_coherent
+-- **(9.11.4)–(9.11.8) norm bound, at §9 level** — discharged up to the (9.11.7)–(9.11.8) residual.
+-- `⟨α^τ, λ^{τ₃}⟩` is constant over `𝒮₃`; nonzero gives the Bessel count `|𝒮₄| ≤ ‖α‖² = N`, zero is
+-- the book's (9.11.6) branch which `h78` refutes.  Every `nineElevenGamma_*` input was already
+-- §9-level; §13's `hncH0C`/`htype` served the `H₀C′ ≤ H₀C` step, definitional here.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_normBound_of_sevenEightRefutation
 -- **(9.11.2)–(9.11.5) equality refutation, at §9 level** — assembles `CaseAEqualityRefutation`
 -- from the `𝒮₂ = 𝒮₁` extraction and the norm bound, with Phases B/C as the §9 lemmas above and
 -- the arithmetic spine `nineElevenCaseA_equality_refutation` (already §9 and type-free).

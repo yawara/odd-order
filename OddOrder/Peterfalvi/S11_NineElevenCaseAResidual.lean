@@ -148,5 +148,259 @@ theorem caseA_sThree_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hconjS χ₀ hχ₀)
     (fun h => hnr χ₀ hχ₀ h.symm)
 
+set_option maxHeartbeats 1600000 in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.4)–(9.11.8): the norm bound, at §9 level** — the §9 form of
+`S13.nineElevenNormBound_of_sevenEightRefutation`, discharged up to the (9.11.7)–(9.11.8)
+residual.
+
+The (9.11.4) context `α = γ − ψ₁` is rebuilt with `γ = Ind_{HU₁}^M 1` from the TI-witness, and
+`τ₃` is `caseA_sThree_coherent`.  `⟨α^τ, λ^{τ₃}⟩` is **constant** over `λ ∈ 𝒮₃`: `τ₃` agrees with
+`τ` on the `A₀`-supported equal-degree differences, the Dade isometry moves the pairing to the
+source, and `⟨α, λ⟩ = 0` there.  Nonzero constant ⇒ each `𝒮₄`-member's `τ₃`-image is a unit
+constituent of `α^τ`, so Bessel gives `|𝒮₄| ≤ ‖α‖² = N`.  Zero constant is the book's (9.11.6)
+branch, refuted by `h78`.
+
+All the `nineElevenGamma_*` inputs were already §9-level; the only §13 pieces were the TI-witness
+and `τ₃`, both descended above.  **No type hypothesis remains** — §13's `hncH0C`/`htype` served
+the `H₀C′ ≤ H₀C` step for `𝒮₄ ⊆ 𝒮₃`, definitional here. -/
+theorem caseA_normBound_of_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data) (hconj46 : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj46)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
+    (h78 : CaseASevenEightRefutation caseA
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :
+    CaseANormBound caseA
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) := by
+  classical
+  haveI := derivedInG_subgroupOf_normal M
+  intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg hcount hFbound hS2deg
+  set A0 : Set ↥M := OddOrder.Peterfalvi.S04.supportInSubgroup
+    (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M with hA0def
+  obtain ⟨c₃⟩ := caseA_sThree_coherent hG hM chars h46 hKeq hconj46 htau hKsupp hVsub
+    hS₂conj hS₃ne hS3deg
+  obtain ⟨U₁, hCU₁, hU₁U, hU₁a, hTI⟩ := caseA_nineElevenTwo_tiWitness caseA hS3deg hS2deg
+  have hUpU₁ : uprimeSub data ≤ U₁ := by
+    have h : cSub data chief = uprimeSub data := hCUprime
+    rw [← h]; exact hCU₁
+  have hrelne : (uprimeSub data).relIndex data.U ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hcne : {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+      χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard ≠ 0 := by
+    intro h0
+    rw [h0, zero_mul] at hcount
+    have hp1 : 1 < chief.p := chief.p_prime.one_lt
+    have h1 := Nat.pos_of_ne_zero hrelne
+    have h2 : 0 < (chief.p - 1) * ((uprimeSub data).relIndex data.U) := Nat.mul_pos (by omega) h1
+    omega
+  obtain ⟨ψ₁, hψ₁sOf, hψ₁irr, hψ₁deg⟩ := Set.nonempty_of_ncard_ne_zero hcne
+  have hle : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ uprimeSub data := by
+    refine sup_le_sup_left ?_ chief.H0
+    change derivedInG (cSub data chief) ≤ derivedInG data.U
+    rw [derivedInG_eq_commutator (cSub data chief), derivedInG_eq_commutator data.U]
+    exact Subgroup.commutator_mono (cSub_le_U data chief) (cSub_le_U data chief)
+  have hψ₁sOfC' : ψ₁ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) := sOf_antitone data hle hψ₁sOf
+  have hψ₁S₂ : ψ₁ ∈ S₂ := hS₁sub ⟨hψ₁sOfC', hψ₁irr, hψ₁deg⟩
+  obtain ⟨ζ, hζmem, hψ₁eq⟩ := hψ₁sOf
+  have hindEqζ : induceHU data (ζ : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce (huSub data) (ζ : ClassFunction ↥(huSub data) ℂ) := rfl
+  set K : Subgroup ↥M := data.H.subgroupOf M ⊔ U₁.subgroupOf M with hKdef
+  set γ : ClassFunction ↥M ℂ := ClassFunction.induce K (trivialClassFunction ↥K) with hγdef
+  have hγsupp : γ.support ⊆ (huSub data : Set ↥M) := nineElevenGamma_support data hU₁U
+  have hγZIrr : γ ∈ OddOrder.RepresentationTheory.ZIrr ↥M := nineElevenGamma_mem_ZIrr data U₁
+  have hγ1 : γ (1 : ↥M) = ((data.q * caseA.a : ℕ) : ℂ) :=
+    nineElevenGamma_apply_one data hU₁U hU₁a
+  have hγγu : ClassFunction.inner γ γ * (chars.u : ℂ)
+      = ((caseA.a * chars.u + (data.q - 1) * caseA.a ^ 2 : ℕ) : ℂ) :=
+    nineElevenGamma_inner_self_mul_u chars hU₁U hUpU₁ hU₁a hTI
+  have hγorth : ∀ φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief),
+      ClassFunction.inner γ φ = 0 := by
+    intro φ hφ
+    obtain ⟨ξ, hξ, rfl⟩ := hφ
+    have hξxi : ξ ∈ xiSet data := xiOf_subset_xiSet data _ hξ
+    have hindEqξ : induceHU data (ξ : ClassFunction ↥(huSub data) ℂ)
+        = ClassFunction.induce (huSub data) (ξ : ClassFunction ↥(huSub data) ℂ) := rfl
+    rw [hindEqξ]
+    exact nineElevenGamma_inner_induceHU data hU₁U hξxi
+  have hγψ : ClassFunction.inner γ ψ₁ = 0 := hγorth ψ₁ hψ₁sOfC'
+  have hαα : ClassFunction.inner (γ - ψ₁) (γ - ψ₁) = ClassFunction.inner γ γ + 1 :=
+    cfnorm_sub_irreducible_orthogonal hψ₁irr hγψ
+  have hαZIrr : γ - ψ₁ ∈ OddOrder.RepresentationTheory.ZIrr ↥M := by
+    refine Submodule.sub_mem _ hγZIrr ?_
+    rw [hψ₁eq]
+    exact induceHU_mem_ZIrr data ζ
+  obtain ⟨c, -, -, hcsum⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_self_eq_sum_sq hαZIrr
+  have hm0 : 0 ≤ ∑ x ∈ c.support, (c x) ^ 2 := Finset.sum_nonneg fun _ _ => sq_nonneg _
+  have hmval : ClassFunction.inner (γ - ψ₁) (γ - ψ₁)
+      = ((∑ x ∈ c.support, (c x) ^ 2 : ℤ) : ℂ) := by
+    rw [hcsum]; push_cast; rfl
+  set N : ℕ := (∑ x ∈ c.support, (c x) ^ 2).toNat with hNdef
+  have hNval : ((N : ℕ) : ℂ) = ClassFunction.inner (γ - ψ₁) (γ - ψ₁) := by
+    rw [hmval, hNdef]
+    exact_mod_cast congrArg (fun z : ℤ => (z : ℂ)) (Int.toNat_of_nonneg hm0)
+  have hNu : N * chars.u = (caseA.a + 1) * chars.u + (data.q - 1) * caseA.a ^ 2 := by
+    have h2 : ClassFunction.inner (γ - ψ₁) (γ - ψ₁) * (chars.u : ℂ)
+        = ((caseA.a * chars.u + (data.q - 1) * caseA.a ^ 2 : ℕ) : ℂ) + (chars.u : ℂ) := by
+      rw [hαα, add_mul, one_mul, hγγu]
+    have h3 : ((N * chars.u : ℕ) : ℂ)
+        = (((caseA.a + 1) * chars.u + (data.q - 1) * caseA.a ^ 2 : ℕ) : ℂ) := by
+      push_cast at h2 ⊢
+      rw [hNval]
+      linear_combination h2
+    exact Nat.cast_injective h3
+  have hαsupp : ((γ - ψ₁ : ClassFunction ↥M ℂ)).support ⊆ A0 := by
+    intro x hx
+    have hxmem : x ∈ γ.support ∪ ψ₁.support := ClassFunction.support_sub_subset γ ψ₁ hx
+    have hxHU : x ∈ huSub data := by
+      rcases hxmem with h | h
+      · exact hγsupp h
+      · have hψsupp : ψ₁.support ⊆ (huSub data : Set ↥M) := by
+          rw [hψ₁eq, hindEqζ]
+          exact ClassFunction.support_induce_subset_of_normal _ _
+        exact hψsupp h
+    have hx1 : x ≠ 1 := by
+      intro h1
+      rw [ClassFunction.mem_support, h1] at hx
+      apply hx
+      rw [ClassFunction.sub_apply, hγ1, hψ₁deg, sub_self]
+    have hxM' : x ∈ (derivedInG M).subgroupOf M := by
+      rwa [← huSub_eq_derivedInG_subgroupOf]
+    exact hKsupp x hxM' hx1
+  have hταZIrr : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁)
+      ∈ OddOrder.RepresentationTheory.ZIrr G := by
+    rw [htau]
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      h46.dade0 hconj46 hαsupp hαZIrr
+  have htauiso : ∀ {φ ψ : ClassFunction ↥M ℂ}, φ.support ⊆ A0 → ψ.support ⊆ A0 →
+      ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau φ)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau ψ)
+        = ClassFunction.inner φ ψ := by
+    intro φ ψ hφ hψ
+    rw [htau]
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0
+      hconj46 hφ hψ
+  have hταnorm := htauiso hαsupp hαsupp
+  have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+      x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
+        ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun {_} hx =>
+    sOf_subset_inducedKernelFamily_bot hG hM data _ hx
+  have hαorthS₃ : ∀ lam ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      ClassFunction.inner (γ - ψ₁) lam = 0 := by
+    intro lam hlam
+    have hψlam : ClassFunction.inner ψ₁ lam = 0 :=
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+        (hIKF hψ₁sOfC') (hIKF hlam.1) (fun h => hlam.2 (h ▸ hψ₁S₂))
+    rw [ClassFunction.inner_sub_left, hγorth lam hlam.1, hψlam, sub_zero]
+  have hdiffsupp3 : ∀ lam ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      ∀ lam' ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      ((lam - lam' : ClassFunction ↥M ℂ)).support ⊆ A0 := by
+    intro lam hlam lam' hlam'
+    have h := OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support hKsupp
+      (hIKF hlam.1) (hIKF hlam'.1) (d := 1)
+      (by rw [Nat.cast_one, one_mul, hS3deg lam hlam, hS3deg lam' hlam'])
+    rwa [one_smul] at h
+  have hconst : ∀ lam ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      ∀ lam' ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+          (c₃.extension lam)
+        = ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+          (c₃.extension lam') := by
+    intro lam hlam lam' hlam'
+    have hdiffsupp := hdiffsupp3 lam hlam lam' hlam'
+    have hzss : (lam - lam' : ClassFunction ↥M ℂ)
+        ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+          (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂) A0 :=
+      OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+        ⟨Submodule.sub_mem _ (Submodule.subset_span hlam) (Submodule.subset_span hlam'),
+          hdiffsupp⟩
+    have hagree := c₃.extends_on_supported _ hzss
+    have hiso := htauiso hαsupp hdiffsupp
+    have hz : ClassFunction.inner (γ - ψ₁) (lam - lam') = 0 := by
+      rw [ClassFunction.inner_sub_right, hαorthS₃ lam hlam, hαorthS₃ lam' hlam', sub_zero]
+    have hsub : ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+          (c₃.extension lam)
+        - ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+          (c₃.extension lam') = 0 := by
+      rw [← ClassFunction.inner_sub_right, ← map_sub, hagree, hiso, hz]
+    exact sub_eq_zero.mp hsub
+  by_cases hc : ∀ lam ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+        (c₃.extension lam) = 0
+  · exact (h78 S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg
+      hcount hFbound hS2deg c₃ γ ψ₁ hψ₁S₂ hψ₁irr hψ₁deg hγZIrr hγ1 hγorth hαsupp hc).elim
+  · push Not at hc
+    obtain ⟨lam₀, hlam₀, hlam₀ne⟩ := hc
+    have hleC : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ cSub data chief :=
+      sup_le_sup_left (cprimeSub_le_C data chief) chief.H0
+    have hS4sub : caseASFour data chief S₂
+        ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂ := fun ξ hξ =>
+      ⟨sOf_antitone data hleC hξ.1, hξ.2.2⟩
+    have hS4fin : (caseASFour data chief S₂).Finite :=
+      (sOf_finite data (chief.H0 ⊔ cprimeSub data chief)).subset (fun ξ hξ => (hS4sub hξ).1)
+    refine ⟨N, hNu, ?_⟩
+    have hON1 : ∀ ξ ∈ hS4fin.toFinset,
+        ClassFunction.inner (c₃.extension ξ) (c₃.extension ξ) = 1 := by
+      intro ξ hξT
+      have hξ := hS4fin.mem_toFinset.mp hξT
+      have hξ3 := hS4sub hξ
+      rw [c₃.extension_inner_eq ξ ξ (Submodule.subset_span hξ3) (Submodule.subset_span hξ3)]
+      have h := irreducibleCharacter_inner_eq_ite
+        (⟨ξ, hξ.2.1⟩ : IrreducibleCharacter ↥M) ⟨ξ, hξ.2.1⟩
+      rwa [if_pos rfl] at h
+    have hON2 : ∀ ξ ∈ hS4fin.toFinset, ∀ ξ' ∈ hS4fin.toFinset, ξ ≠ ξ' →
+        ClassFunction.inner (c₃.extension ξ) (c₃.extension ξ') = 0 := by
+      intro ξ hξT ξ' hξ'T hne
+      have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
+      have hξ'3 := hS4sub (hS4fin.mem_toFinset.mp hξ'T)
+      rw [c₃.extension_inner_eq ξ ξ' (Submodule.subset_span hξ3) (Submodule.subset_span hξ'3)]
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+        (hIKF hξ3.1) (hIKF hξ'3.1) hne
+    have hint : ∀ ξ ∈ hS4fin.toFinset, ∃ m : ℤ,
+        ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+          (c₃.extension ξ) = (m : ℂ) := by
+      intro ξ hξT
+      have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
+      exact ClassFunction.inner_mem_ZIrr_int hταZIrr
+        (c₃.extension_mem_ZIrr ξ (Submodule.subset_span hξ3))
+    have hnec : ∀ ξ ∈ hS4fin.toFinset,
+        ClassFunction.inner
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+          (c₃.extension ξ) ≠ 0 := by
+      intro ξ hξT
+      have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
+      rw [hconst ξ hξ3 lam₀ hlam₀]
+      exact hlam₀ne
+    have hcount4 := OddOrder.Peterfalvi.S07.card_le_inner_self_re_of_orthonormal_inner_int_ne
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+      hS4fin.toFinset (fun ξ => c₃.extension ξ) hON1 hON2 hint hnec
+    have hNre : (ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (γ - ψ₁))).re
+        = (N : ℝ) := by
+      rw [hταnorm, ← hNval, Complex.natCast_re]
+    rw [hNre] at hcount4
+    have hcard : ((caseASFour data chief S₂).ncard : ℝ) ≤ (N : ℝ) := by
+      rw [Set.ncard_eq_toFinset_card _ hS4fin]
+      exact hcount4
+    exact_mod_cast hcard
+
 
 end OddOrder.Peterfalvi.S11

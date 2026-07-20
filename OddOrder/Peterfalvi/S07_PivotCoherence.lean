@@ -895,4 +895,111 @@ noncomputable def isCoherent_of_supportedSpan_le {G : Type*} [Group G] {L : Type
   extends_on_supported := fun a ha => h.extends_on_supported a (hle ha)
   extension_mem_ZIrr := h.extension_mem_ZIrr
 
+/-! ### The Bessel count `|T| ≤ ‖A‖²`
+
+A general inner-product fact with no §9/§11 content; it lived in `S11_NineElevenAlphaBound`
+(namespace `S13`) purely because that is where it was first needed, which made it unreachable
+from the §9 leaves upstream of `S13`. -/
+
+section BesselCount
+
+variable {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]
+
+/-- **Bessel's inequality, integer-constituent count**: if `(θ i)_{i ∈ T}` is a finite
+orthonormal family and every `⟨A, θ i⟩` is a *nonzero integer*, then `|T| ≤ ‖A‖²`.
+Pythagoras against `S = ∑ᵢ ⟨A, θᵢ⟩ • θᵢ`: `0 ≤ ‖A − S‖² = ‖A‖² − ∑ᵢ ‖⟨A, θᵢ⟩‖²`, and each
+`‖⟨A, θᵢ⟩‖² = mᵢ² ≥ 1`.  Coq `PFsection9.v:2036-2047` (the `cnorm_dconstt` count) in
+Fourier-free form. -/
+theorem card_le_inner_self_re_of_orthonormal_inner_int_ne {ι : Type*}
+    (A : ClassFunction Γ ℂ) (T : Finset ι)
+    (θ : ι → ClassFunction Γ ℂ)
+    (hON1 : ∀ i ∈ T, ClassFunction.inner (θ i) (θ i) = 1)
+    (hON2 : ∀ i ∈ T, ∀ j ∈ T, i ≠ j → ClassFunction.inner (θ i) (θ j) = 0)
+    (hint : ∀ i ∈ T, ∃ m : ℤ, ClassFunction.inner A (θ i) = (m : ℂ))
+    (hne : ∀ i ∈ T, ClassFunction.inner A (θ i) ≠ 0) :
+    (T.card : ℝ) ≤ (ClassFunction.inner A A).re := by
+  classical
+  set c : ι → ℂ := fun i => ClassFunction.inner A (θ i) with hc
+  set S : ClassFunction Γ ℂ := ∑ i ∈ T, c i • θ i with hS
+  -- sum expansions of the sesquilinear inner product
+  have hsum_left : ∀ (s : Finset ι) (ψ : ClassFunction Γ ℂ),
+      ClassFunction.inner (∑ i ∈ s, c i • θ i) ψ
+        = ∑ i ∈ s, c i * ClassFunction.inner (θ i) ψ := by
+    intro s ψ
+    induction s using Finset.cons_induction with
+    | empty => simp
+    | cons a s ha ih =>
+        rw [Finset.sum_cons, Finset.sum_cons, ClassFunction.inner_add_left,
+          ClassFunction.inner_smul_left, ih]
+  have hsum_right : ∀ (s : Finset ι) (ψ : ClassFunction Γ ℂ),
+      ClassFunction.inner ψ (∑ i ∈ s, c i • θ i)
+        = ∑ i ∈ s, star (c i) * ClassFunction.inner ψ (θ i) := by
+    intro s ψ
+    induction s using Finset.cons_induction with
+    | empty => simp
+    | cons a s ha ih =>
+        rw [Finset.sum_cons, Finset.sum_cons, ClassFunction.inner_add_right,
+          OddOrder.RepresentationTheory.inner_smul_right, ih]
+  -- the three cross terms all equal `∑ᵢ cᵢ·conj cᵢ`
+  have hSA : ClassFunction.inner S A = ∑ i ∈ T, c i * star (c i) := by
+    rw [hS, hsum_left T A]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [show ClassFunction.inner (θ i) A = star (c i) from
+      OddOrder.RepresentationTheory.inner_conj_symm A (θ i)]
+  have hAS : ClassFunction.inner A S = ∑ i ∈ T, c i * star (c i) := by
+    rw [hS, hsum_right T A]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    have hci : ClassFunction.inner A (θ i) = c i := rfl
+    rw [hci, mul_comm]
+  have hθS : ∀ i ∈ T, ClassFunction.inner (θ i) S = star (c i) := by
+    intro i hi
+    rw [hS, hsum_right T (θ i)]
+    rw [Finset.sum_eq_single i
+      (fun j hj hji => by rw [hON2 i hi j hj (fun h => hji h.symm), mul_zero])
+      (fun hnotin => absurd hi hnotin)]
+    rw [hON1 i hi, mul_one]
+  have hSS : ClassFunction.inner S S = ∑ i ∈ T, c i * star (c i) := by
+    rw [hS, hsum_left T S]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [show ClassFunction.inner (θ i) (∑ i ∈ T, c i • θ i) = star (c i) from by
+      rw [← hS]; exact hθS i hi]
+  -- Pythagoras: `0 ≤ ‖A − S‖² = ‖A‖² − ∑ᵢ ‖cᵢ‖²`
+  have hkey : ClassFunction.inner (A - S) (A - S)
+      = ClassFunction.inner A A - ∑ i ∈ T, c i * star (c i) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hSA, hAS, hSS]
+    ring
+  have hnorm : (∑ i ∈ T, c i * star (c i))
+      = ((∑ i ∈ T, Complex.normSq (c i) : ℝ) : ℂ) := by
+    rw [Complex.ofReal_sum]
+    exact Finset.sum_congr rfl fun i _ => Complex.mul_conj (c i)
+  have h0 := OddOrder.RepresentationTheory.inner_self_re_nonneg (A - S)
+  rw [hkey, hnorm, Complex.sub_re, Complex.ofReal_re] at h0
+  -- each `‖cᵢ‖² = mᵢ² ≥ 1`
+  have hone : ∀ i ∈ T, (1 : ℝ) ≤ Complex.normSq (c i) := by
+    intro i hi
+    obtain ⟨m, hm⟩ := hint i hi
+    have hmne : m ≠ 0 := by
+      intro h0'
+      apply hne i hi
+      rw [hm, h0', Int.cast_zero]
+    have hm1 : (1 : ℤ) ≤ m * m := by
+      rcases lt_or_gt_of_ne hmne with h | h
+      · nlinarith
+      · nlinarith
+    have hm' : c i = ((m : ℝ) : ℂ) := by
+      have h : ClassFunction.inner A (θ i) = ((m : ℝ) : ℂ) := by
+        rw [hm]
+        push_cast
+        ring
+      exact h
+    rw [hm', Complex.normSq_ofReal]
+    exact_mod_cast hm1
+  calc (T.card : ℝ) = ∑ _i ∈ T, (1 : ℝ) := by
+        rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+    _ ≤ ∑ i ∈ T, Complex.normSq (c i) := Finset.sum_le_sum hone
+    _ ≤ (ClassFunction.inner A A).re := by linarith
+
+end BesselCount
+
 end OddOrder.Peterfalvi.S07
