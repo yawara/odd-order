@@ -493,8 +493,35 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
      **BG はこれを 2 回使う** — `R₀` に対してと、各切断 `H_i/H_{i+1}` に対して
      ((E.6) よりこれも位数 p) — ので 2 度証明せず切り出した。
      `exists_zpow_eq_act_of_mem_A` はその `R₀` への適用に書き換え済。
-   - ⬜ 残 (これが (E.9)-(E.12) の本体): `w_i = [w_{i-1}, v]` の鎖上の固有値 `r_i` (E.9)、
-     (E.10) `r_i ≢ 1` (Prop 1.5(d) 経由)、(E.12) `r_i ≡ r₀ r^i` (Lemma 4.2(a) 経由)。
+   - ⬜ 残: **(E.10)** `r_i ≢ 1` (Prop 1.5(d) 経由)、**(E.12)** `r_i ≡ r₀ r^i` (Lemma 4.2(a) 経由)。
+
+### (E.10) の道具は特定済 — 要素レベル形が public (2026-07-20 実測)
+
+BG は「`r_i ≡ 1` なら Prop 1.5(d) で `A` が `H_i/H_{i+1}` を中心化し、`A` の regular 作用に
+矛盾」と書く。repo に**要素レベル**の形がある (部分群レベルの
+`GroupTheory/CoprimeFixedPoints.map_fixedSubgroup_eq_fixedSubgroup_quotient` より軽い):
+
+```lean
+-- OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean:800
+theorem coprime_fixedPoints_quotient_of_coprime_normal
+    {φ : A →* MulAut G} {N : Subgroup G} [N.Normal]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card ↥N))
+    (hSolv : IsSolvable A ∨ IsSolvable ↥N)
+    (hN_inv : IsAInvariant φ N) {g : G}
+    (hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
+    ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (∃ n ∈ N, c = g * n)
+```
+
+**組み立て方**: `G := ↥H_i`, `N := H_{i+1}.subgroupOf H_i`,
+`φ := (isAInvariant_iterCommutator …).restrict` を
+`A := ↥(Subgroup.zpowers (⟨a,ha⟩ : ↥hyp.A))` に制限して適用する
+(仮説が特定の `a` についてなので `A` 全体でなく `⟨a⟩` を取るのがポイント)。
+- `r ≡ 1 (mod p)` + 切断が位数 p ⟹ `x^r = x` ⟹ `a` は切断上自明 ⟹ `hg_fix` が成立。
+- 結論の `c` は `a` に固定され、`g ∉ N` を取れば `c ∉ N` ゆえ `c ≠ 1`。
+- `act a (c : R) = c` かつ `c ≠ 1` は `A_regular` に矛盾。
+- 係数条件: `|⟨a⟩| ∣ q`、`|N|` は p 冪 ⟹ Coprime。`IsSolvable ↥N` は p 群ゆえ成立。
+- 切断が位数 p は `index_subgroupOf_chain`、`H_{i+1} < H_i` は
+  `card_eq_prime_mul_card_commutator` の証明中と同じ冪零性論法から。
 
 ### (E.9) 本体に要る配線
 
