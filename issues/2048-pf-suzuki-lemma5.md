@@ -215,6 +215,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               canonical basis を保ったまま `ι(ν) = λ^(1+2^r)` を構成する
       - [ ] gap-supported bracket を正規化し、Lemma 5 の平方和を
             `Tr[L/K](α^(1+2^r) ε)` に再添字化する
+        - [x] normalized seed bracket が第二層 canonical basis の 0 番固有線上にあることを
+              示し、`[b₀,b_r] = ε • v₀` (`ε ≠ 0`) を構成する
+              (`exists_ne_zero_smul_secondConjugateBasis_zero_of_bracket`)
+        - [ ] Frobenius orbit で全 cyclic edge の係数を復元し、upper-triangular sum を
+              relative trace に畳み込む
       - [ ] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する
       - [x] actual central extension を平方写像で分類し、Peterfalvi の honest
             `TypeAData` へ接続する shared adapter を構成する (issue 9309)

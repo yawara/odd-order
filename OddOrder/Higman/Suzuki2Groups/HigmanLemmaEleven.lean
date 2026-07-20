@@ -649,4 +649,110 @@ theorem lowerCentralPairGapSupport_of_commonConjugateBases
     hn lambda (iota nu) rfl hgen r i j s hnu
     (hprimNu.map_of_injective iota.injective) hweight
 
+/-- **Higman Lemma 11 (p. 89), normalized bracket axis.**
+
+Once the selected first-layer bracket has normalized weight
+`iota nu = lambda^(1 + 2^r)`, it lies on the zeroth second-layer Frobenius
+eigenline.  Thus it is a nonzero scalar multiple of the zeroth canonical
+second-layer basis vector. -/
+theorem exists_ne_zero_smul_secondConjugateBasis_zero_of_bracket
+    {K L H C : Type uCommonField}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [Algebra (ZMod 2) L]
+    [Group H] [Group C]
+    [NeZero (finrank (ZMod 2) K)]
+    [NeZero (finrank (ZMod 2) L)]
+    (phi : C →* MulAut H) (c : C)
+    (eOne : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
+    (lambda : L)
+    (hcompatOne : ∀ v,
+      eOne (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda * eOne v)
+    (eTwo : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] K)
+    (nu : K) (iota : K →ₐ[ZMod 2] L)
+    (hcompatTwo : ∀ v,
+      eTwo (lowerCentralLayerRepresentation phi 1 c v) = nu * eTwo v)
+    (hn : 2 ≤ finrank (ZMod 2) K)
+    (hprimNu : IsPrimitiveRoot nu
+      (2 ^ finrank (ZMod 2) K - 1))
+    (r : Fin (finrank (ZMod 2) L))
+    (hnu : iota nu = lambda ^ (1 + 2 ^ r.val))
+    (hbracket :
+      let bOne := conjugateTensorBasisOfLinearEquiv L eOne
+      lowerCentralCommutatorBilinearBaseChange L H
+        (bOne 0) (bOne r) ≠ 0) :
+    let bOne := conjugateTensorBasisOfLinearEquiv L eOne
+    let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+    ∃ epsilon : L, epsilon ≠ 0 ∧
+      lowerCentralCommutatorBilinearBaseChange L H
+        (bOne 0) (bOne r) = epsilon • bTwo 0 := by
+  classical
+  let bOne := conjugateTensorBasisOfLinearEquiv L eOne
+  let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+  let TOne : Module.End L
+      (L ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) :=
+    (lowerCentralLayerRepresentation phi 0 c).baseChange L
+  let TTwo : Module.End L
+      (L ⊗[ZMod 2] Additive (lowerCentralLayer H 1)) :=
+    (lowerCentralLayerRepresentation phi 1 c).baseChange L
+  let z := lowerCentralCommutatorBilinearBaseChange L H
+    (bOne 0) (bOne r)
+  have hbOne (i : Fin (finrank (ZMod 2) L)) :
+      TOne (bOne i) = lambda ^ (2 ^ i.val) • bOne i := by
+    exact baseChange_eigen_conjugateTensorBasisOfLinearEquiv
+      L eOne (lowerCentralLayerRepresentation phi 0 c)
+      lambda hcompatOne i
+  have hbTwo (s : Fin (finrank (ZMod 2) K)) :
+      TTwo (bTwo s) = (iota nu) ^ (2 ^ s.val) • bTwo s := by
+    simpa only [map_pow] using
+      (baseChange_eigen_conjugateTensorBasisAlongOfLinearEquiv
+        K L iota eTwo (lowerCentralLayerRepresentation phi 1 c)
+        nu hcompatTwo s)
+  have hz : z ≠ 0 := by simpa only [z, bOne] using hbracket
+  have hzEigen : TTwo z = (iota nu) • z := by
+    have hraw := lowerCentralCommutatorBilinearBaseChange_eigenweight
+      L phi c lambda (lambda ^ (2 ^ r.val))
+      (bOne 0) (bOne r) (by simpa using hbOne 0) (hbOne r)
+    have hweight : lambda * lambda ^ (2 ^ r.val) = iota nu := by
+      calc
+        lambda * lambda ^ (2 ^ r.val) =
+            lambda ^ (1 + 2 ^ r.val) := by rw [pow_add, pow_one]
+        _ = iota nu := hnu.symm
+    simpa only [TTwo, z, hweight] using hraw
+  have hweightInj : Function.Injective
+      (fun s : Fin (finrank (ZMod 2) K) =>
+        (iota nu) ^ (2 ^ s.val)) :=
+    primitiveRoot_singleWeight_injective hn (iota nu)
+      (hprimNu.map_of_injective iota.injective)
+  have hcoordZero (s : Fin (finrank (ZMod 2) K)) (hs : s ≠ 0) :
+      bTwo.repr z s = 0 := by
+    by_contra hscoord
+    have hweight := eigenvalue_eq_of_basis_repr_ne_zero
+      TTwo bTwo (fun t => (iota nu) ^ (2 ^ t.val)) hbTwo
+      hzEigen s hscoord
+    have hsZero : (0 : Fin (finrank (ZMod 2) K)) = s := by
+      apply hweightInj
+      simpa using hweight
+    exact hs hsZero.symm
+  let epsilon : L := bTwo.repr z 0
+  have hepsilon : epsilon ≠ 0 := by
+    intro hepsilonZero
+    apply hz
+    apply bTwo.repr.injective
+    ext s
+    simp only [map_zero, Finsupp.zero_apply]
+    by_cases hs : s = 0
+    · subst s
+      exact hepsilonZero
+    · exact hcoordZero s hs
+  refine ⟨epsilon, hepsilon, ?_⟩
+  change z = epsilon • bTwo 0
+  apply bTwo.repr.injective
+  ext s
+  by_cases hs : s = 0
+  · subst s
+    simp [epsilon]
+  · rw [hcoordZero s hs]
+    simp [hs]
+
 end OddOrder.Higman.Suzuki2Groups
