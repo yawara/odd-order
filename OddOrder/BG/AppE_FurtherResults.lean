@@ -996,6 +996,37 @@ theorem RegularOperatorSetup.commutator_R₀_eq_commutator_top [Finite R]
   rw [hyp.card_eq_prime_mul_card_commutator hR₀S hexp hS hHne hHT] at hge
   exact Nat.le_of_mul_le_mul_left hge hyp.p_prime.pos
 
+/-- **BG Theorem E.3(b), Step 2, (E.5)**: `S = R₀T`.
+
+BG records `T char S`, `|S : T| = p` and `R₀ ∩ T = 1`, then writes `S = R₀T`.  The last step
+is a cardinality count: `T` is normal (indeed `T char S` is already an instance in the repo,
+`GroupTheory.centralizer_omega1UpperCentralTwo_characteristic`), so `|R₀T| = |R₀| · |T| =
+p · |T| = |S|`.
+
+Note `hexp` is not needed: narrowness alone drives Theorem 5.3(d). -/
+theorem RegularOperatorSetup.sup_centralizer_eq_top [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    hyp.R₀.subgroupOf S ⊔
+      Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) = ⊤ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
+  set T : Subgroup ↥S :=
+    Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hTdef
+  obtain ⟨-, -, hR₀T, -⟩ := OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS (hyp.isNarrow_of_three_le_pRank hR₀S hS)
+    R₀' (hyp.card_R₀_subgroupOf hR₀S) (hyp.pRank_centralizer_subgroupOf_le_two hR₀S)
+  -- `|R₀ T| = |R₀| · |T| = p · |T|`
+  have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card R₀' T
+  rw [hR₀T, Subgroup.card_bot, mul_one, hyp.card_R₀_subgroupOf hR₀S] at hprod
+  have hcong : Nat.card ↥(R₀' ⊔ T) = Nat.card ↥((R₀' : Set ↥S) * (T : Set ↥S)) :=
+    Nat.card_congr (Equiv.setCongr (Subgroup.mul_normal R₀' T))
+  -- `|S| = |T| · [S : T] = |T| · p`
+  have hSc : Nat.card ↥T * T.index = Nat.card ↥S := T.card_mul_index
+  rw [(hyp.card_omega1Center_and_index_centralizer hR₀S hS).2] at hSc
+  refine Subgroup.eq_of_le_of_card_ge le_top ?_
+  rw [Subgroup.card_top, hcong, hprod, ← hSc, mul_comm]
+
 /-! ### (E.6): BG's descending series
 
 BG's chain `T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1` with `Hᵢ = [R, Hᵢ₋₁]` is the repo's

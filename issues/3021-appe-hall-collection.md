@@ -434,10 +434,14 @@ private helper: `normal_iterCommutator` / `iterCommutator_antitone` /
 
 ### 残り (Step 2 の後半)
 
-1. **(E.7)(E.8)**: `H₁ = S₂` かつ `|S/S'| = p²`、帰納で `H_i = S_{i+1}`。
-   `S = R₀T` と `H₁ = ⁅R₀,T⁆` から。⟹ **E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²`** の出所。
-   ⚠ `S = R₀T` (= `S = R₀ ⊔ T`) はまだ形式化していない。`|S:T| = p` と `R₀ ⊓ T = ⊥`、
-   `|R₀| = p` から出るはず (位数計算)。**次に着手するのはここ**。
+1. ✅ **`S = R₀T` 完了** (`sup_centralizer_eq_top`)。BG の `T char S` は repo に
+   **instance として既存** (`GroupTheory.centralizer_omega1UpperCentralTwo_characteristic`)
+   なので、`↑(R₀ ⊔ T) = ↑R₀ * ↑T` の正規性は推論で見つかる。⚠ 指数 p 仮説は不要だった。
+   ⟹ **(E.5) が完全にそろった**。
+2. **(E.7)(E.8)**: `H₁ = S₂` かつ `|S/S'| = p²`、帰納で `H_i = S_{i+1}`。
+   `S = R₀T` と `H₁ = ⁅R₀,T⁆` から: `|S/H₁| = p²` (`|S/T| = p`, `|T/H₁| = p`) と
+   `S₂ = ⁅S,S⁆ ≤ H₁ = ⁅R₀,T⁆ ≤ S₂`。⟹ **E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²`**。
+   **次に着手するのはここ**。
 2. **(E.9)-(E.12)**: 固有値 `r_i ≡ r₀ r^i (mod p)`、`A` regular + Prop 1.5(d) ⟹
    `r_i ≢ 1`、`r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| = p·pⁿ ≤ p^q`。⟹ **E.3(c)**。
    ⚠ ここは鎖の **A-不変性**が要る (今の鎖は A-不変性を主張していない —
