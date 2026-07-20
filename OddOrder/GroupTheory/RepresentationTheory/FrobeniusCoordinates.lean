@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import Mathlib.Algebra.Module.ZMod
+import Mathlib.FieldTheory.Finite.Trace
 import Mathlib.LinearAlgebra.Basis.Defs
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dual.Lemmas
@@ -307,6 +308,78 @@ theorem baseChange_eigen_conjugateTensorBasisOfLinearEquiv
 end TransportedBasis
 
 end FrobeniusCoordinates
+
+/-! ## Relative trace in Frobenius coordinates -/
+
+universe uTraceK uTraceL uTraceW
+
+/-- Grouping Frobenius coordinates by their residue modulo the base-field
+degree turns each coefficient into the corresponding relative trace
+coordinate. -/
+theorem trace_frobenius_coordinate_sum
+    {K : Type uTraceK} {L : Type uTraceL} {W : Type uTraceW}
+    [Field K] [Field L] [Finite L]
+    [CharP K 2] [CharP L 2] [Algebra K L]
+    [AddCommMonoid W] [Module L W]
+    (n d : ℕ) (hn : 0 < n)
+    (hcardK : Nat.card K = 2 ^ n)
+    (hfin : Module.finrank K L = d)
+    (z : L) (v : Fin n → W) :
+    (∑ i : Fin (d * n),
+      z ^ (2 ^ i.val) • v ⟨i.val % n, Nat.mod_lt _ hn⟩) =
+      ∑ s : Fin n,
+        (algebraMap K L (Algebra.trace K L z)) ^ (2 ^ s.val) • v s := by
+  letI : Algebra (ZMod 2) L := ZMod.algebra L 2
+  have htrace :
+      algebraMap K L (Algebra.trace K L z) =
+        ∑ t : Fin d, z ^ (2 ^ (n * t.val)) := by
+    rw [FiniteField.algebraMap_trace_eq_sum_pow, hfin,
+      ← Fin.sum_univ_eq_sum_range]
+    apply Finset.sum_congr rfl
+    intro t _
+    rw [hcardK, pow_mul]
+  have hfrob (s : Fin n) :
+      (∑ t : Fin d, z ^ (2 ^ (n * t.val))) ^ (2 ^ s.val) =
+        ∑ t : Fin d, z ^ (2 ^ (n * t.val + s.val)) := by
+    let sigma := FiniteField.frobeniusAlgHom (ZMod 2) L ^ s.val
+    have hsigma (x : L) : sigma x = x ^ (2 ^ s.val) := by
+      simp [sigma, AlgHom.coe_pow, FiniteField.coe_frobeniusAlgHom,
+        pow_iterate]
+    rw [← hsigma, map_sum]
+    apply Finset.sum_congr rfl
+    intro t _
+    rw [hsigma, ← pow_mul, ← pow_add]
+  have hreindex :
+      (∑ i : Fin (d * n),
+        z ^ (2 ^ i.val) • v ⟨i.val % n, Nat.mod_lt _ hn⟩) =
+        ∑ t : Fin d, ∑ s : Fin n,
+          z ^ (2 ^ (n * t.val + s.val)) • v s := by
+    calc
+      (∑ i : Fin (d * n),
+          z ^ (2 ^ i.val) • v ⟨i.val % n, Nat.mod_lt _ hn⟩) =
+        ∑ p : Fin d × Fin n,
+          z ^ (2 ^ (finProdFinEquiv p).val) •
+            v ⟨(finProdFinEquiv p).val % n,
+              Nat.mod_lt _ hn⟩ := by
+              symm
+              apply Fintype.sum_equiv finProdFinEquiv
+              intro p
+              rfl
+      _ = ∑ t : Fin d, ∑ s : Fin n,
+          z ^ (2 ^ (n * t.val + s.val)) • v s := by
+            rw [Fintype.sum_prod_type]
+            apply Finset.sum_congr rfl
+            intro t _
+            apply Finset.sum_congr rfl
+            intro s _
+            congr 2
+            · simp [finProdFinEquiv, add_comm]
+            · apply Fin.ext
+              change (s.val + n * t.val) % n = s.val
+              rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt s.isLt]
+  rw [hreindex, htrace]
+  simp_rw [hfrob, Finset.sum_smul]
+  rw [Finset.sum_comm]
 
 universe uSinger
 

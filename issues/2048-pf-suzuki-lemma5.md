@@ -198,6 +198,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             splitting field `L` 上に `Fin n` の Singer--Frobenius eigenbasis を構成する
       - [ ] `m` と `n` を同一視せず、非零 bracket が単一 gap `±r (mod m)` に
             支えられることを証明する
+        - [x] `λ` は第一層体を生成するだけ、第二層固有値 `ν` は位数 `2^n-1` の
+              primitive root という原文の unequal-degree 条件のまま、pair-weight equality
+              から `±r (mod m)` を導く指数算術を証明する
+              (`higmanLemmaEleven_pairGap_of_pairWeight_eq_frobeniusShift`)
+        - [ ] canonical common-field 共役基底上で actual bracket の非零係数を actor の
+              pair-weight equality に接続する
       - [ ] gap-supported bracket を正規化し、Lemma 5 の平方和を
             `Tr[L/K](α^(1+2^r) ε)` に再添字化する
       - [ ] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する
