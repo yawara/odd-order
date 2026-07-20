@@ -1645,3 +1645,31 @@ and `[w_i,w_j]^α ≡ [w_i,w_j]^{r_{k-1}} (mod H_k)`.  By Lemma 4.2,
 📌 (i) を先にやる (α/β 両版が共有する核)。(ii)(iii) は chain の性質で、
 Step 2 の `iterCommutator` API (`AppE_RegularOperator.lean` の
 `iterCommutator_le_of_le` / `iterCommutator_ne_bot_of_le` 等) が土台になる。
+
+## 2026-07-20 (35): ⭐ 項 6 の核 — 両スロット誤差付き Lemma 4.2
+
+`commutatorElement_zpow_mul_zpow_mul` — `Commute u y`, `Commute u v`, `Commute v x`,
+`⁅x,y⁆ ∈ center` ⟹ `⁅x^m·u, y^n·v⁆ = ⁅x,y⁆^{m·n}`。
+
+⚠ Step 2 の `commutator_zpow_mul_congr` との違い: あちらは誤差項が**片側だけ**
+(第 2 スロットが `R₀` の生成元 `v` で `α` がぴったり冪倍するから)。
+E.4 は `⁅wᵢ, wⱼ⁆` で**両側**に誤差が出るので、この一般形が新たに要る。
+
+📌 (34) の懸念「`⁅ab,cd⁆ = ⁅a,c⁆` は素朴には成り立たない」は、必要十分な
+可換条件を **`Commute u y` / `Commute u v` / `Commute v x` の 3 つ**に特定して解決。
+(`b` が `c,d` と可換 + `d` が `a` と可換。`b` と `a`、`d` と `c` の可換性は不要。)
+
+### 項 6 の残り
+
+| 部品 | 状態 |
+|---|---|
+| 冪の合同 → 指数の合同 (`dvd_sub_of_zpow_mul_inv_zpow_mem`) | ✅ (34) |
+| Lemma 4.2 両スロット版 (`commutatorElement_zpow_mul_zpow_mul`) | ✅ 本項 |
+| (ii) `k` の極小性 ⟹ (E.24) `T'H_k = H_{k-1}` | ⬜ |
+| (iii) `i`,`j` の極大性 ⟹ (E.25) の範囲 + `⁅wᵢ,wⱼ⁆ ∈ H_{k-1} − H_k` | ⬜ |
+| (iv) 上を束ねて (E.26)/(E.27) | ⬜ |
+
+⚠ (ii)(iii) は `iterCommutator` chain の性質で、Step 2 の API
+(`AppE_RegularOperator.lean`: `iterCommutator_le_of_le` / `iterCommutator_ne_bot_of_le` /
+`index_subgroupOf_chain`) が土台。**`k`/`i`/`j` の存在は「有限降下列の極小/極大元」**
+なので `Nat.find` 系で取る。
