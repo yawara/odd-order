@@ -977,7 +977,55 @@ structure DadeSupportHypothesisData [Fintype G] (M : Subgroup G) (A : Set G) whe
   by the uniqueness of the supporting maximal `N[x^m] = N[x]^m`, BG Theorem D). -/
   hconj : dade.HConjInvariant
 
+/-- **The (8.14) faithful kernel only sees the point, not the ambient support**: for `x` in a
+subset `A₁ ⊆ A`, `R(x)` is computed the same way from either.
+
+`ftSupportKernel M A x` branches on `x ∈ escapingCentralizerSet M A = {x ∈ A | C_G(x) ⊄ M}`, and
+for `x ∈ A₁` the membership clause holds on both sides, so only the escaping condition — which
+does not mention the support — decides. -/
+theorem ftSupportKernel_congr_of_subset {M : Subgroup G} {A A₁ : Set G} (hA₁A : A₁ ⊆ A) {x : G}
+    (hx : x ∈ A₁) : ftSupportKernel M A x = ftSupportKernel M A₁ x := by
+  classical
+  by_cases hc : Subgroup.centralizer ({x} : Set G) ≤ M
+  · rw [ftSupportKernel, ftSupportKernel,
+      if_neg (fun h : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A => h.2 hc),
+      if_neg (fun h : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A₁ => h.2 hc)]
+  · rw [ftSupportKernel, ftSupportKernel,
+      if_pos (show x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A from ⟨hA₁A hx, hc⟩),
+      if_pos (show x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A₁ from ⟨hx, hc⟩)]
+
 namespace DadeSupportHypothesisData
+
+/-- **Restrict an (8.15) Dade support datum to a smaller `M`-stable support** — Peterfalvi (2.11)
+at the level of the whole (8.15) package.
+
+`S04.Hypothesis.restrict` restricts the Dade hypothesis, `S04.HConjInvariant.restrict` its
+`M`-equivariance, and the faithful-kernel pin transports by `ftSupportKernel_congr_of_subset`.
+Only `N_G(A₁) = M` has to be supplied afresh, since (8.16) is a statement about the particular
+support.
+
+The intended instance is `A = A₀(M) = A(M) ∪ V^M ↝ A₁ = A(M)` (issue 1045 着手順 3): the §10
+`Hypothesis` carries its (8.15) datum on `A₀(M)`, while the §9 (9.11) chain consumes one on
+`A(M)`. -/
+noncomputable def restrict [Fintype G] {M : Subgroup G} {A A₁ : Set G}
+    (d : DadeSupportHypothesisData M A) (hA₁A : A₁ ⊆ A)
+    (hA₁norm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (hnormalizer : Subgroup.normalizer A₁ = M) :
+    DadeSupportHypothesisData M A₁ where
+  normalizer_eq := hnormalizer
+  dade := d.dade.restrict hA₁A hA₁norm
+  H_eq_ftSupportKernel := fun a => by
+    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, d.H_eq_ftSupportKernel,
+      ftSupportKernel_congr_of_subset hA₁A a.2]
+  hconj := d.hconj.restrict hA₁A hA₁norm
+
+/-- The restricted datum's Dade hypothesis is the restriction — the pin `hdd` that the §9 (9.11)
+chain asks for, definitionally. -/
+@[simp] theorem restrict_dade [Fintype G] {M : Subgroup G} {A A₁ : Set G}
+    (d : DadeSupportHypothesisData M A) (hA₁A : A₁ ⊆ A)
+    (hA₁norm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (hnormalizer : Subgroup.normalizer A₁ = M) :
+    (d.restrict hA₁A hA₁norm hnormalizer).dade = d.dade.restrict hA₁A hA₁norm := rfl
 
 /-- The §4 Dade support of a faithful (8.15) datum is the faithful thickened support
 `Ã(M,A) = ⋃_{x∈A}(x·R(x))^G` of (8.14). -/

@@ -26,9 +26,9 @@
 
 | lane | worktree | クラスタ | 主所有 | ODD_ISSUE_BASE |
 |---|---|---|---|---|
-| **a** | `/home/ywr/odd-order-a` | Isaacs 完全仕上げ + Peterfalvi 本文 | `OddOrder/Isaacs/**` (**2026-07-19 裁定 9154 で Ch08/Ch10 込みの全域**) + **`OddOrder/Peterfalvi/S*.lean` (Pf 本文全域、同 9154 で c から移管)**。⚠ 旧記載の frontier (Ch.2–6 gaps → Ch.9 → 付録) は**消化済** — `Ch09_MoreSubnormality/` は 2026-07-17 に新設され 18 leaf が存在 | 1000 |
+| **a** | `/home/ywr/odd-order-a` | Isaacs 完全仕上げ + Peterfalvi 本文 + **Pf 付録 FeitSibley/NearFields** | `OddOrder/Isaacs/**` (**2026-07-19 裁定 9154 で Ch08/Ch10 込みの全域**) + **`OddOrder/Peterfalvi/S*.lean` (Pf 本文全域、同 9154 で c から移管)** + **`Appendices/{FeitSibley,NearFields}.lean` (2026-07-21 裁定 9204 で c から carve-out — a の本文完済 + これらが c で 2 日 dormant のため)**。⚠ 旧記載の frontier (Ch.2–6 gaps → Ch.9 → 付録) は**消化済** — `Ch09_MoreSubnormality/` は 2026-07-17 に新設され 18 leaf が存在 | 1000 |
 | **b** | `/home/ywr/odd-order-b` | Suzuki チェーン (Ch.8 は 2026-07-19 に a へ返還) | `OddOrder/Peterfalvi/Appendices/{Suzuki,Suzuki2Groups}*.lean` | 2000 |
-| **c** | `/home/ywr/odd-order-c` | BG 残 + Pf Appendices の非 Suzuki 系 (Ch.10 は 2026-07-19 に a へ返還) | `OddOrder/BG/**` + `Appendices/{NearFields,Huppert,SemilinearField,FeitSibley}.lean`。⚠ **Pf 本文 `OddOrder/Peterfalvi/S*.lean` は 2026-07-19 裁定 9154 で a へ移管** (9158 で一時 c へ暫定移管したが a 復帰により失効) | 3000 |
+| **c** | `/home/ywr/odd-order-c` | BG 残 + Pf Appendices の非 Suzuki 系のうち **Huppert/SemilinearField** | `OddOrder/BG/**` + `Appendices/{Huppert,SemilinearField}.lean`。⚠ **NearFields/FeitSibley は 2026-07-21 裁定 9204 で a へ carve-out** (c は App.E 3021 に専念・2 日 dormant だった)。**Pf 本文 `OddOrder/Peterfalvi/S*.lean` は 2026-07-19 裁定 9154 で a へ移管** (9158 で一時 c へ暫定移管したが a 復帰により失効) | 3000 |
 
 - shared infra (`OddOrder/GroupTheory/**`, `OddOrder/Algebra/**`, `OddOrder/Mathlib/**`, root `OddOrder/*.lean`) =
   所有なし、**claim-before-build (9000 番台 issue)** 継続。hub/main = base 0。
@@ -46,10 +46,12 @@
 - **b**: **Ch.8 全域** (25 件: 多重推移性・primitivity・Jordan 定理群; mathlib MulAction 資産併用) →
   **Pf App Suzuki** (32 件: Thm A → Ch.I General Properties → Ch.II First Case → Ch.III Structure of H →
   Ch.IV PSU3 特性化; 既存 `Suzuki.lean` scaffold は実 statement へ置換) → **Suzuki2Groups** (8 件: Higman 分類)
-- **c**: **Ch.10 全域** (27 件) → **BG §2** (Fong-Swan 等 3 件) → **§4** (4 件) → **§6** (2 件) → **§16** (4 件)
-  → **App.C** Rem (II) SL(2,2^q) 具体例 + Rem (V) wlog → **App.D** (3 件: CN 群) → **App.E** (5 件: scaffold 置換
-  から) → **Pf 本文 partial** (§3×2, §4×1, §9×2, §10×1 ほか計 12 件) → **NearFields** (4 件) → **Huppert 残**
-  (2 件) → **FeitSibley** (13 件) + BG/Pf specialized 46 件
+- **c**: (Ch.10 / BG §2–§16 / Pf 本文 partial は消化済) → **App.E** (issue 3021 active: Prop E.4/E.5 +
+  9132 Hall collecting process gated) → **Huppert 残** (2 件) → BG/Pf specialized 残。
+  ⚠ **NearFields (2 件) / FeitSibley (5 件) は 2026-07-21 に a へ carve-out** (9204) — 旧記載の
+  「NearFields 4 / FeitSibley 13」は de-opacify 後の実測 2/5 に更新済で、担当も a。
+- **a (付録 carve-out, 2026-07-21〜)**: **FeitSibley.lean** (5 件: Feit–Sibley coherence = Pf §5–7 指標理論) +
+  **NearFields.lean** (2 件: near-field 分類)。上流優先 + 文書順で a が frontier 自律決定。
 - 低優先繰延 (レーン割当なし): BG App.C Rem (IV) Norton–Glauberman / Prob 1 — いずれやる (ユーザー 2026-07-16)。
 
 結果 id ごとの内容・現状・メモ = 調査 note の per-unit 表が正本。

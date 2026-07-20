@@ -34,7 +34,7 @@ open scoped TensorProduct BigOperators
 
 namespace OddOrder.Higman.Suzuki2Groups
 
-universe u uK uL uW
+universe u uC uK uL uW
 
 local instance properExtensionLayerIsMulCommutative
     (P : Type u) [Group P] (i : Nat) :
@@ -1065,6 +1065,112 @@ theorem trace_eq_finrankOneRingEquiv_symm
         algebraMap K L (Algebra.trace K L x) := rfl
     _ = x := algebraMap_trace_eq_self_of_finrank_eq_one K L hfin x
     _ = e (e.symm x) := (e.apply_symm_apply x).symm
+
+/-- Generator-compatible degree-one form of Higman's anchored-trace
+coordinate change.  It exposes the quotient coordinate itself, so descending
+from `L` to the prescribed kernel field `K` does not lose the actor
+eigenvalue.  The kernel coordinate is left literally unchanged. -/
+theorem
+    exists_lowerCentralQuotientCoordinate_typeANormalForm_of_anchoredTrace_finrankOne_generator
+    {P : Type u} [Group P]
+    {C : Type uC} [Group C]
+    {K : Type uK} {L : Type uL}
+    [Field K] [Field L] [Finite K] [Finite L]
+    [CharP K 2] [CharP L 2]
+    [Algebra (ZMod 2) K] [Algebra (ZMod 2) L] [Algebra K L]
+    (actor : C →* MulAut P) (c : C)
+    (hfin : Module.finrank K L = 1)
+    (hSq : LowerCentralSquaresLieInSecond P)
+    (eZero : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2] L)
+    (lambda : L)
+    (hcompat : ∀ v,
+      eZero (lowerCentralLayerRepresentation actor 0 c v) =
+        lambda * eZero v)
+    (eKernel : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] K)
+    (a r : Nat) (epsilon : L)
+    (hformula : ∀ alpha : L,
+      lowerCentralSquareMapAdditive P hSq (eZero.symm alpha) =
+        eKernel.symm
+          (Algebra.trace K L
+            (alpha ^ (2 ^ a) *
+              (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon))) :
+    let anchor : RingAut L := (frobeniusEquiv L 2) ^ a
+    let fieldEquiv : K ≃+* L := finrankOneRingEquiv K L hfin
+    ∃ (eZeroK : Additive (lowerCentralLayer P 0) ≃+ K)
+      (lambdaK epsilonK : K),
+      eZeroK =
+        (eZero.toAddEquiv.trans anchor.toAddEquiv).trans
+          fieldEquiv.symm.toAddEquiv ∧
+      lambdaK = fieldEquiv.symm (anchor lambda) ∧
+      epsilonK = fieldEquiv.symm epsilon ∧
+      (∀ v,
+        eZeroK (lowerCentralLayerRepresentation actor 0 c v) =
+          lambdaK * eZeroK v) ∧
+      ∀ beta : K,
+        eKernel
+            (lowerCentralSquareMapAdditive P hSq
+              (eZeroK.symm beta)) =
+          epsilonK * (beta * ((frobeniusEquiv K 2) ^ r) beta) := by
+  dsimp only
+  let anchor : RingAut L := (frobeniusEquiv L 2) ^ a
+  let fieldEquiv : K ≃+* L := finrankOneRingEquiv K L hfin
+  let eZeroK : Additive (lowerCentralLayer P 0) ≃+ K :=
+    (eZero.toAddEquiv.trans anchor.toAddEquiv).trans
+      fieldEquiv.symm.toAddEquiv
+  let lambdaK : K := fieldEquiv.symm (anchor lambda)
+  let epsilonK : K := fieldEquiv.symm epsilon
+  have hcompatK : ∀ v,
+      eZeroK (lowerCentralLayerRepresentation actor 0 c v) =
+        lambdaK * eZeroK v := by
+    intro v
+    change fieldEquiv.symm
+        (anchor
+          (eZero (lowerCentralLayerRepresentation actor 0 c v))) =
+      fieldEquiv.symm (anchor lambda) *
+        fieldEquiv.symm (anchor (eZero v))
+    rw [hcompat, map_mul, map_mul]
+  have hnormalK : ∀ beta : K,
+      eKernel
+          (lowerCentralSquareMapAdditive P hSq
+            (eZeroK.symm beta)) =
+        epsilonK * (beta * ((frobeniusEquiv K 2) ^ r) beta) := by
+    intro beta
+    let alpha : L := anchor.symm (fieldEquiv beta)
+    have hfrobeniusL (x : L) (t : Nat) :
+        x ^ (2 ^ t) = ((frobeniusEquiv L 2) ^ t) x := by
+      rw [← iterateFrobeniusEquiv_eq_pow]
+      exact (iterateFrobeniusEquiv_def L 2 t x).symm
+    have hfrobeniusK (x : K) (t : Nat) :
+        x ^ (2 ^ t) = ((frobeniusEquiv K 2) ^ t) x := by
+      rw [← iterateFrobeniusEquiv_eq_pow]
+      exact (iterateFrobeniusEquiv_def K 2 t x).symm
+    have hanchor : alpha ^ (2 ^ a) = fieldEquiv beta := by
+      rw [hfrobeniusL]
+      exact anchor.apply_symm_apply (fieldEquiv beta)
+    calc
+      eKernel
+            (lowerCentralSquareMapAdditive P hSq
+              (eZeroK.symm beta)) =
+          Algebra.trace K L
+            (alpha ^ (2 ^ a) *
+              (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon) := by
+        change eKernel
+            (lowerCentralSquareMapAdditive P hSq
+              (eZero.symm (anchor.symm (fieldEquiv beta)))) = _
+        rw [hformula alpha]
+        simp only [LinearEquiv.apply_symm_apply]
+      _ = fieldEquiv.symm
+            (alpha ^ (2 ^ a) *
+              (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon) :=
+        trace_eq_finrankOneRingEquiv_symm K L hfin _
+      _ = epsilonK *
+            (beta * ((frobeniusEquiv K 2) ^ r) beta) := by
+        rw [hanchor, map_mul, map_mul, map_pow,
+          fieldEquiv.symm_apply_apply, hfrobeniusK]
+        dsimp only [epsilonK]
+        ac_rfl
+  exact ⟨eZeroK, lambdaK, epsilonK, rfl, rfl, rfl,
+    hcompatK, hnormalK⟩
 
 /-- Higman's absolute finite-field degrees agree when the relative degree is
 one.  This is the equality `m = n` on p. 89. -/

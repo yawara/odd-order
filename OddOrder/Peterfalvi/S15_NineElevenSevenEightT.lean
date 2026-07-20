@@ -17,9 +17,9 @@ The `T`-side mirror of `S15_NineElevenSevenEight.lean` (issue 2035 refuter-`T` c
   images (Coq `coherent_ortho`).
 * `nineElevenSevenEightRefutationT` — the (9.11.7)–(9.11.8) budget refutation: in the
   orthogonal branch `α^τ ⊥ 𝒮₃^{τ₃}` of the (9.11.6) dichotomy the arithmetic spine forces
-  `𝒮₄ ≠ ∅`; the projection budget (`S13.exists_bridge_target_of_budget`) over `𝒮₂^{τ₁}` and
+  `𝒮₄ ≠ ∅`; the projection budget (`S07.exists_bridge_target_of_budget`) over `𝒮₂^{τ₁}` and
   `𝒮₄^{τ₃}` produces a norm-`1` bridge target `Γ`, and the union-pair extension
-  (`S13.isCoherent_union_pair_of_bridge`) adjoins `{λ₁, λ̄₁}` coherently to `𝒮₂`,
+  (`S07.isCoherent_union_pair_of_bridge`) adjoins `{λ₁, λ̄₁}` coherently to `𝒮₂`,
   contradicting the no-pair clause.  Consumed by the (9.11.6) norm bound
   `nineElevenNormBoundT` (next brick).
 -/
@@ -152,10 +152,10 @@ open scoped FiniteInduce in
 M-side by `nineElevenSevenEightRefutation`, Coq `PFsection9.v:2048-2227`).  In the orthogonal
 branch `α^τ ⊥ 𝒮₃^{τ₃}` of the (9.11.6) dichotomy: `𝒮₄ ≠ ∅` (else the (9.11.2)–(9.11.5)
 arithmetic spine already refutes), pick `λ₁ ∈ 𝒮₄`, put `e = u/a` and `β = λ₁ − e·ψ₁`; the
-projection budget (`S13.exists_bridge_target_of_budget`) over the orthonormal families
+projection budget (`S07.exists_bridge_target_of_budget`) over the orthonormal families
 `𝒮₂^{τ₁}` and `𝒮₄^{τ₃}` — cross-orthogonal via the case-agnostic `sSet_memberRFamily` —
 produces `Γ ∈ ℤ[Irr G]` with `‖Γ‖² = 1` and the bridge `β^τ = Γ − e·τ₁ψ₁`; the union-pair
-extension (`S13.isCoherent_union_pair_of_bridge`) then adjoins `{λ₁, λ̄₁}` coherently to `𝒮₂`,
+extension (`S07.isCoherent_union_pair_of_bridge`) then adjoins `{λ₁, λ̄₁}` coherently to `𝒮₂`,
 contradicting the pair clause `hnopairD`.  All coherence clauses on the honest `'A`-Dade
 (`dadeHypT`/`A(T)`), converted from `indT` by the caller. -/
 theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
@@ -554,7 +554,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
     linear_combination hiso
   -- ── run the projection budget
   obtain ⟨Γ0, hΓZ, hΓ1, hθ₁Γ, hΓD, hTBeq⟩ :=
-    OddOrder.Peterfalvi.S13.exists_bridge_target_of_budget (Γ' := G)
+    OddOrder.Peterfalvi.S07.exists_bridge_target_of_budget (Γ' := G)
       (SF := hS₂fin.toFinset) (S4F := hS4fin.toFinset)
       (fun φ => c₁.extension φ) (fun ξ => c₃.extension ξ)
       (TB := (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
@@ -641,7 +641,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
       ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) (S₂ ∪ {lam₁,
           lam₁.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) := by
-    refine OddOrder.Peterfalvi.S13.isCoherent_union_pair_of_bridge (E := ((e : ℕ) : ℤ))
+    refine OddOrder.Peterfalvi.S07.isCoherent_union_pair_of_bridge (E := ((e : ℕ) : ℤ))
       hS₂fin hON1 hON2
       (fun φ hφ ξ hξ => c₁.extension_inner_eq φ ξ (Submodule.subset_span hφ)
         (Submodule.subset_span hξ))

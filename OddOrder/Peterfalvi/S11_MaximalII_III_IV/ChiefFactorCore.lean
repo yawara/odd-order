@@ -169,6 +169,27 @@ theorem sOf_subset_sSet [Finite G] (data : TypesIIIIIIVSetup M) (Y : Subgroup G)
     sOf data Y ⊆ sSet data := fun _ ⟨χ, hχ, hφ⟩ =>
   ⟨χ, xiOf_subset_xiSet data Y hχ, hφ⟩
 
+open OddOrder.Peterfalvi.S11 in
+/-- **`𝒮(⊥) = 𝒮`** (issue 1017; relocated from S15 to §11 for the (10.11) type-II consumer, issue 1048): the `⊥`-kernel demand of `𝒮(Y)` is vacuous — only
+the identity lies in `⊥`, and `1 ∈ Ker χ` always — so every `Ind_{HU}^M ξ ∈ 𝒮` already lies in
+`𝒮(⊥)`.  Generic in `data` (the collapse core extracted from the linchpin `sSet_eq_sOf_H0Cprime`);
+it identifies the degenerate `S`-instance kernel strata (`H₀ = C′ = U′ = ⊥`) with the full
+family. -/
+theorem sOf_bot_eq_sSet {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    sOf data (⊥ : Subgroup G) = sSet data := by
+  apply Set.Subset.antisymm (sOf_subset_sSet _ _)
+  rintro φ ⟨χ, hχ, rfl⟩
+  refine ⟨χ, ?_, rfl⟩
+  rw [mem_xiOf]
+  refine ⟨hχ, ?_⟩
+  intro x hx
+  have hx1 : x = 1 := by
+    have h2 := Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp (SetLike.mem_coe.mp hx))
+    rw [Subgroup.mem_bot] at h2
+    exact Subtype.ext (Subtype.ext h2)
+  rw [hx1, OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def]
+
 /-- `𝒮(Y)` is antitone in `Y` (inherited from `xiOf_antitone`). -/
 theorem sOf_antitone [Finite G] (data : TypesIIIIIIVSetup M) {Y Y' : Subgroup G} (hY : Y ≤ Y') :
     sOf data Y' ⊆ sOf data Y := fun _ ⟨χ, hχ, hφ⟩ =>
@@ -637,6 +658,27 @@ structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
   H0CprimeSupport : Set ↥M
   tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
   quotientSemidirectFrobenius : Prop
+
+/-- **Peterfalvi Hypothesis (9.5), constructed at §9 level** — the character datum of a
+`TypesIIIIIIVSetup` + `ChiefFactorData`, with no §10/§13 packaging in sight.
+
+Every field carrying mathematics is derived: `u = |Ū|` is pinned to the `U`-action image on the
+chief factor (`rfl`), and `C`, `U'`, `C'`, `𝒳`, `𝒮`, `𝒳(Y)`, `𝒮(Y)` are definitions on
+`data`/`chief`.  What is left free is the Dade map `tau` — which the caller supplies, since (9.5)
+names the isometry of `(A(M), M, G)` — plus the two placeholders `H0CprimeSupport` and
+`quotientSemidirectFrobenius` that the (9.11) statement takes as explicit parameters anyway.
+
+The only route to this datum used to be `S12.Hypothesis.mkSection11CharacterData`, which requires
+the §10 `Hypothesis` and hence types III/IV; nothing in the datum itself needs that (issue 1045). -/
+noncomputable def mkSection11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) :
+    Section11CharacterData data chief where
+  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
+  u_eq_card_quotient := rfl
+  H0CprimeSupport := ∅
+  tau := tau
+  quotientSemidirectFrobenius := True
 
 namespace Section11CharacterData
 

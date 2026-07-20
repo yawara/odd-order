@@ -348,6 +348,29 @@ theorem typePNontrivialCore_of_isTypeIIIorIV [Finite G] {M : Subgroup G}
   · exact d.common.transfer data
   · exact d.common.transfer data
 
+/-- **Type II carries the (8.6) nontrivial core for every type-`P` witness.**  Same statement as
+`typePNontrivialCore_of_isTypeIIIorIV` for the third type of Peterfalvi Hypothesis (9.2):
+`TypeIIData` bundles `common : TypePNontrivialCore M typeP` exactly like `TypeIIIData` and
+`TypeIVData`, and `TypePNontrivialCore.transfer` moves it to any `TypePData` on the same `M`. -/
+theorem typePNontrivialCore_of_isTypeII [Finite G] {M : Subgroup G}
+    (htype : IsTypeII M) (data : TypePData M) :
+    TypePNontrivialCore M data :=
+  htype.some.common.transfer data
+
+/-- **Types II, III and IV carry the (8.6) nontrivial core** — the `hnt` input of the §9
+`TypesIIIIIIVSetup` at the full span of Peterfalvi Hypothesis (9.2).
+
+The repo previously had only the III/IV half (`typePNontrivialCore_of_isTypeIIIorIV`), which is
+what confined the §9 setup — and with it (9.4), (9.5) and (9.11) — to those two types even though
+the book states §9 for II as well (the section is titled *"On the Maximal Subgroups of `G` of
+Types II, III and IV"*). -/
+theorem typePNontrivialCore_of_isTypeIIorIIIorIV [Finite G] {M : Subgroup G}
+    (htype : IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M) (data : TypePData M) :
+    TypePNontrivialCore M data := by
+  rcases htype with h | h
+  · exact typePNontrivialCore_of_isTypeII h data
+  · exact typePNontrivialCore_of_isTypeIIIorIV h data
+
 /-- Every non-Type-I maximal subgroup carries type-`P` data: all four of `TypeII`–`TypeV` bundle a
 `TypePData` (the type-`P` structure `M = M' ⋊ W₁`, `M' = M_F ⋊ U`, `W = W₁ × W₂`).  This is the
 entry point that lets the §16 producer extract the structure of `S` and `T` from

@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
 
 /-!
@@ -25,7 +26,7 @@ open scoped TensorProduct BigOperators Fin.NatCast IsMulCommutative
 
 namespace OddOrder.Higman.Suzuki2Groups
 
-universe uCommonField uGroup
+universe uCommonField uK uL uGroup
 
 /-! ## The second-layer Singer basis in a common splitting field -/
 
@@ -431,26 +432,6 @@ theorem higmanLemmaEleven_pairGap_of_pairWeight_eq_frobeniusShift
     simp only [higmanCyclicGap, hj, map_add]
     ring
 
-private theorem eigenvalue_eq_of_basis_repr_ne_zero
-    {F W I : Type*} [Field F] [AddCommGroup W] [Module F W]
-    [Finite I]
-    (T : Module.End F W) (b : Basis I F W) (weight : I → F)
-    (hb : ∀ i, T (b i) = weight i • b i)
-    {x : W} {a : F} (hx : T x = a • x)
-    (i : I) (hi : b.repr x i ≠ 0) :
-    a = weight i := by
-  classical
-  letI : Fintype I := Fintype.ofFinite I
-  have hcoord : b.repr (T x) i = weight i * b.repr x i := by
-    rw [← b.sum_repr x, map_sum]
-    simp [hb, smul_smul, mul_comm]
-    simp only [Finsupp.single_apply]
-    simp
-  have hcoord' := congrArg (fun y : W => b.repr y i) hx
-  rw [hcoord] at hcoord'
-  simp only [map_smul, Finsupp.smul_apply, smul_eq_mul] at hcoord'
-  exact (mul_right_cancel₀ hi hcoord').symm
-
 local instance higmanLemmaElevenLayerIsMulCommutative
     (H : Type uGroup) [Group H] (i : ℕ) :
     IsMulCommutative (lowerCentralLayer H i) :=
@@ -469,7 +450,7 @@ nonzero coordinate in the canonical second-layer basis then identifies its
 exact actor weight.  No gap, primitive-root, or equal-degree assumption is
 used at this selection step. -/
 theorem exists_lowerCentralConjugateBasisBracketCoordinate
-    {K L : Type uCommonField} {H C : Type uGroup}
+    {K : Type uK} {L : Type uL} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C]
@@ -572,7 +553,7 @@ Every nonzero value of the actual first lower-central commutator pairing on
 the canonical first-layer conjugate basis has Higman's single cyclic gap.
 The first- and second-layer field degrees remain distinct. -/
 theorem lowerCentralPairGapSupport_of_commonConjugateBases
-    {K L : Type uCommonField} {H C : Type uGroup}
+    {K : Type uK} {L : Type uL} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C] [NeZero (finrank (ZMod 2) L)]
@@ -656,7 +637,7 @@ Once the selected first-layer bracket has normalized weight
 eigenline.  Thus it is a nonzero scalar multiple of the zeroth canonical
 second-layer basis vector. -/
 theorem exists_ne_zero_smul_secondConjugateBasis_zero_of_bracket
-    {K L : Type uCommonField} {H C : Type uGroup}
+    {K : Type uK} {L : Type uL} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C]
@@ -956,7 +937,7 @@ private theorem conjugateTensorBasisOf_frobeniusShift
   rw [frobeniusBaseChange_symm_conjugateTensorBasis]
 
 private theorem conjugateTensorBasisAlong_repr_frobeniusBaseChange
-    {K L : Type uCommonField}
+    {K : Type uK} {L : Type uL}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Algebra (ZMod 2) L]
     [NeZero (finrank (ZMod 2) K)]
@@ -990,7 +971,7 @@ private theorem conjugateTensorBasisAlong_repr_frobeniusBaseChange
       rw [hsigma, ← pow_mul, ← pow_add, hcycle]
 
 private theorem conjugateTensorBasisAlongOf_frobeniusShift_repr
-    {K L : Type uCommonField} {V : Type uGroup}
+    {K : Type uK} {L : Type uL} {V : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Algebra (ZMod 2) L]
     [NeZero (finrank (ZMod 2) K)]
@@ -1021,7 +1002,7 @@ primitive-root properties, satisfy `iota nu' = lambda'^(1+2^r)`, and give the
 single-gap law for every nonzero actual basis bracket.  This strong form also
 records the exact second-layer Frobenius shift. -/
 theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate_with_secondShift
-    {K L : Type uCommonField} {H C : Type uGroup}
+    {K : Type uK} {L : Type uL} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C]
@@ -1158,7 +1139,7 @@ theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate_with_second
 This preserves the original public signature while forgetting the explicit
 second-layer Frobenius shift. -/
 theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate
-    {K L : Type uCommonField} {H C : Type uGroup}
+    {K : Type uK} {L : Type uL} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C]
