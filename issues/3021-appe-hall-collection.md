@@ -488,9 +488,24 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
      `u₀ uⁱ = u^{j+i}` が 1 を避ける ⟹ 区間 `[j, j+n-1]` が `q` を外す。
      ⚠ **鎖上の固有値の帳簿付けより先に終点を証明した**ので現時点で consumer 無し。
      E.3(c) の `|S| ≤ p^q` はこれで閉じる。
+   - ✅ **エンジンを抽象化** = `exists_zpow_eq_of_card_eq_prime`:
+     位数 p (素数) の群の自己同型は冪写像 `x ↦ xʳ`、`φ^q = 1` なら `r^q ≡ 1`。
+     **BG はこれを 2 回使う** — `R₀` に対してと、各切断 `H_i/H_{i+1}` に対して
+     ((E.6) よりこれも位数 p) — ので 2 度証明せず切り出した。
+     `exists_zpow_eq_act_of_mem_A` はその `R₀` への適用に書き換え済。
    - ⬜ 残 (これが (E.9)-(E.12) の本体): `w_i = [w_{i-1}, v]` の鎖上の固有値 `r_i` (E.9)、
      (E.10) `r_i ≢ 1` (Prop 1.5(d) 経由)、(E.12) `r_i ≡ r₀ r^i` (Lemma 4.2(a) 経由)。
-     ⚠ ここから先は **`S` の A-不変性**を仮説に足す必要がある (上記「仮説が弱いまま」節)。
+
+### (E.9) 本体に要る配線 (次イテレーションの単位)
+
+1. **`S` の A-不変性を仮説に足す**。setup は `act : B →* MulAut R` を持つので、
+   `IsAInvariant (hyp.act.comp hyp.A.subtype) S` が自然な形 (`isAInvariant_R₀` と同型)。
+2. A-作用を `↥S` に降ろす (`IsAInvariant` から `↥A →* MulAut ↥S`)。
+   `Isaacs.Ch03.IsAInvariant.toMulAutHom` がまさにこれ。
+3. 鎖 `H_i = iterCommutator T ⊤ i` の A-不変性。`H_i` は `↥S` で characteristic
+   (T が characteristic + `⁅·,⊤⁆` が保存) なので従うはず。
+4. 切断 `H_i/H_{i+1}` (位数 p、`card_iterCommutator_eq`) への誘導作用に
+   `exists_zpow_eq_of_card_eq_prime` を適用 ⟹ `r_i`。
 4. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
 
 ## ⚠ 2026-07-20 (8): Step 2 の**仮説が BG より弱いまま来ている**
