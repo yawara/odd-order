@@ -21,13 +21,13 @@ consumer は issue 2048 の Higman Lemma 11。
 
 ## やること
 
-- [ ] Frobenius 埋め込み族 `ι ∘ Frob^i` から
+- [x] Frobenius 埋め込み族 `ι ∘ Frob^i` から
       `L ⊗[F₂] K ≃ₗ[L] (Fin [K:F₂] → L)` を構成する
-- [ ] その双対基底で exact ground expansion
+- [x] その双対基底で exact ground expansion
       `1 ⊗ x = ∑ ι(x^(2^i)) • b_i` を証明する
-- [ ] ground-field multiplication と transported actor を同じ基底で対角化する
-- [ ] scalar Frobenius が基底添字を cyclic successor へ送ることを証明する
-- [ ] Higman Lemma 11 leaf から正規化済み共役基底を直接利用できることを確認する
+- [x] ground-field multiplication と transported actor を同じ基底で対角化する
+- [x] scalar Frobenius が基底添字を cyclic successor へ送ることを証明する
+- [x] Higman Lemma 11 leaf から正規化済み共役基底を直接利用できることを確認する
 
 ## 完了条件
 
