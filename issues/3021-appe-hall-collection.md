@@ -996,3 +996,42 @@ BG (E.14): 「Clearly `S ⊇ Ω₁(Z(R))` and `C_S(R₀) = S ∩ (R₀ × R₁) 
 2. ⬜ `card_sup_centralizer` / `index_sup_centralizer_lt` の仮説を
    `(hexp, hS3)` → `hp2 : |S ⊓ C_R(R₀)| ≤ p²` にパラメータ化 (Step 2 の呼び出し側も更新)。
 3. ⬜ Step 3 最終組み立て (`Ω₁(T) ∈ ExpPFamily` → 極大性 → `omega_pow_eq_one`)。
+
+## 2026-07-20 (18): rank≥3 依存の解消**完了** — Step 3 は最終組み立て 1 手のみ
+
+| 宣言 | 内容 |
+|---|---|
+| `GroupTheory.card_le_prime_sq_of_isCyclic_of_index_le_prime` | pRank 補題から**位数評価を切り出し** |
+| `RegularOperatorSetup.card_seed_le` | **`\|seed\| ≤ p²`** |
+| (refactor) `card_sup_centralizer` | `p²` → `\|S ⊓ C_R(R₀)\|`; **仮説 3 つが不要に** |
+| (refactor) `index_sup_centralizer_lt` / `exists_zpowers_index_lt` | 仮説を `hp2 : \|S ⊓ C_R(R₀)\| ≤ p²` に |
+
+検証: フルビルド 4558 jobs green / AxiomsCheck 3540 件 OK / sorry 15 (非退行)。
+
+### 残り = Step 3 最終組み立て 1 手
+
+`RegularOperatorSetup.eq_omega_of_maximal (hS : ExpPFamily S) (hmax : …) : S = Omega R p 1`:
+
+```
+P := Omega R p 1;  T := N_R(S) ⊓ P
+hSP  := expPFamily_le_omega hS            -- S ≤ P
+hST  := le_inf Subgroup.le_normalizer hSP -- S ≤ T
+hTN  := inf_le_left                       -- T ≤ N_R(S)
+hn   := (normal_subgroupOf_iff_le_normalizer hST).mpr hTN
+hSW  : S ≤ omegaInG T p 1                 -- S は指数 p
+refine eq_omega_of_omegaInG_normalizer_eq (hmax _ ⟨?_, ?_, ?_⟩ hSW)
+  (a) A-不変: isAInvariant_omegaInG (hS.1.normalizer.inf (.of_characteristic _)) p 1
+  (b) 指数 p: pow_eq_one_of_card_omegaInG_le で、hcard を
+      card_omegaInG_le_mul hST (hS.2.1)                       -- |Ω₁(T)| ≤ |Ω₁(T/S)|·|S|
+      × card_omega_le_prime_sq_of_index_lt (IsPGroup の商) hyp.p_odd
+          (exists_zpowers_index_lt … の x)                    -- |Ω₁(T/S)| ≤ p²
+      × hyp.card_le_pow (R₀_lt_of_expPFamily hS).le (expPFamily_pow_eq_one hS) hS.1
+                                                              -- |S| ≤ p^q
+      から `≤ p²·p^q = p^{q+2}` として組む
+  (c) seed ≤ Ω₁(T): hS.2.2.trans hSW
+```
+`exists_zpowers_index_lt` の `hp2` は `inf_centralizer_eq_seed hS.2.2 hS.2.1 ▸ card_seed_le`、
+`v` は `exists_zpowers_eq_R₀` から (`hvS` は `hR₀S (hv ▸ mem_zpowers v)`)。
+
+⟹ これが通れば `omega_pow_eq_one` (= E.3(b) 第 1 節) が閉じ、
+**E.3(b) 第 1〜3 節 + E.3(c) が丸ごと axiom-clean**。AppE sorry 4 → 3。
