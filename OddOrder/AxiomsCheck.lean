@@ -11569,3 +11569,17 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- witness `η̄ − η` is `A`-supported by the (4.7) estimate — *not* merely `A₀`-supported — which is
 -- what makes the descent possible.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent_restrict
+-- **The (8.15.3) base coherence retargeted to the (9.5) isometry** — the `hAbase` supplier of
+-- `sOf_nineEleven_coherent`.  `sOf_degreeSubfamily_coherent` already lands on the support `A(M)`;
+-- only the map differs, and `dadeIntegralCharacterMap_apply_of_support` collapses *any*
+-- `dadeIntegralCharacterMap` over a fixed `S04.Hypothesis` to that hypothesis's own `dadeMap` on
+-- supported arguments.  So the pin `dd.dade = h46.dade0.restrict …` suffices — no agreement
+-- between the two `FullDadeIsometryData` is needed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent_restrict
+-- **(9.11.1) at §9 level**: the two honest carriers of case (9.7.a) and the maximality refuter they
+-- feed.  The §13 forms (`S13.NineElevenPairBound` / `_EqualityRefutation` /
+-- `S13.caseA_refuter_of_equality_refutation`) are stated over `S13.Hypothesis`, but their only
+-- dependence on it is packaging aliases (`hyp.s11Setup`, `hyp.chief`, `mkSection11CharacterData`,
+-- `hyp.H0Cprime`, `hyp.C`) plus `tau`/`A0`, which are parameters here — so the descent is a rename,
+-- not new mathematics, and the (9.11.1) squeeze argument is unchanged.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_refuter_of_equality_refutation

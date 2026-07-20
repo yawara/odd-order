@@ -683,7 +683,90 @@ H0supC_le_derived, W1_inf_H0supC_subgroupOf_eq_bot, W2_not_le_H0supC, card_W2bar
 `caseB_coherent_sOf_cprime` → `sOf_caseB_coherent_restrict` で供給し**入力ゼロのまま**。
 新パラメータは `hHeq` (`h46.subH = M_σ`) と `hAnorm` (A の M-共役不変性) のみ。
 
-#### ⛏ 次の一手: `hAbase` を `sOf_degreeSubfamily_coherent` から供給する
+#### ✅ 済 (2026-07-20): `hAbase` を供給した
+
+`S11.sOf_degreeSubfamily_coherent_restrict` (commit b7a28937f)。読み通りに一発で通った。
+`(inducedNonKernelFamily_subcoherent …).tau` は `irrSubcoherent` が `tau := τ` と置くので
+`rfl` で `dadeICM dd.dade (…)` に落ちる。pin は `hdd : dd.dade = h46.dade0.restrict …` だけで、
+`FullDadeIsometryData` 同士の一致は**不要**だった (下記の鍵のとおり)。
+
+⟹ **(9.11) の case A 残作業は `hArefute` + count `h2 : 2 ≤ ncard` のみ**
+(`h2` は S15 先例どおり露出したまま = the honest pattern)。
+
+#### ✅ 済 (2026-07-20): `hArefute` を §9 へ降ろした
+
+`S11.CaseAPairBound` / `S11.CaseAEqualityRefutation` / `S11.caseA_refuter_of_equality_refutation`
+(commit 2d27db2ec)。予測どおり **rename で済んだ** — §13 版の `S13.Hypothesis` 依存は
+packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` をこの 2 carrier に置換。
+
+⚠ 2 つの `def` に `open scoped S12.FiniteInduce in` を付け忘れて 1 度落ちた
+(`sumnS`/`IsCoherent` が `Fintype ↥M` を要る)。**§9 の `sOf` 系を触る宣言には一律で付ける**。
+
+⟹ **(9.11) の残り = `hbound` / `hrefuteEq` / `hAbase` の count `h2` の 3 つだけ**。
+経路上に型仮定は一つも無い。
+
+#### ⚠ `CaseAPairBound` producer の実測 (2026-07-20) — rename では済まない
+
+`S13.nineElevenPairBound` の本体 (270 行) の `hyp.*` 使用を数えた:
+`s11Setup` 65 / `base` 22 / `chief` 19 / `H0Cprime` 14 / `C` 8 — ここまでは別名。
+残りが本質:
+
+| 使用 | 判定 |
+|---|---|
+| `hyp.type_alt` (1) → `typePNontrivialCore_of_isTypeIIIorIV` で `hnt` を作る | ✅ **§9 では不要**。`TypesIIIIIIVSetup.nontrivial : TypePNontrivialCore M typeP` が**carrier field そのもの**。§13 が型から再導出しているだけ |
+| `hncH0C` + `htype` (1 行) → `C_eq_cSub_of_noncoherent` | ✅ **§9 では消える** (`chars.C` は `cSub data chief` と定義的に等しい) |
+| `hyp.base.sixTwoDecompositionData` + `hyp.params_*` (5) | ⛏ **本物の §10 依存** |
+
+⟹ **真の作業は `S13.sixTwoDecompositionData` の §9 化**。実測すると、その μ-grid `params`
+(`hmu`/`hδpm`/`hδj`/`hzS`/`hz1`) が効くのは **可約メンバー分岐**
+(`sixTwoMemberDatum_of_reducible_member` / `sixTwoDecompositionData_of_reducible_break`) だけで、
+これは **本 session で作った `S11.sOf_memberRFamily` (可約 = §6 `certainTypeR`) が果たす役割と同じ**。
+⟹ case B の `hRorth` でやった置換を (5.6) engine に対して繰り返す作業になる。規模は大きい。
+
+#### (旧) 次の一手: `CaseAPairBound` の producer を §9 へ (型仮定が消える)
+
+`S13.nineElevenPairBound` (`S11_NineElevenCaseA.lean:436`) が §13 版 producer。
+`hncH0C` と `htype : IsTypeIII ∨ IsTypeIV` を取るが、**実測すると使用箇所は 1 行だけ**:
+
+```
+rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]
+```
+
+= 本 issue で繰り返し見ている **`hyp.C = cSub` の辞書同一視**そのもの。
+§9 では `chars.C` が `cSub data chief` **定義的に等しい**ので、この rw ごと消える。
+⟹ **`CaseAPairBound` の producer は型仮定ゼロで降りる**見込み。
+
+#### ⚠ `CaseAEqualityRefutation` は repo のどこにも producer が無い (= 本物の未完部分)
+
+grep 実測: `NineElevenEqualityRefutation` は `caseA_refuter_of_equality_refutation` の
+**引数としてしか現れない**。issue 9083 の Phase B–E ((9.11.2) の `u ≤ a²` /
+(9.11.3) の class 方程式 / (9.11.4) の Mackey norm / (9.11.5)–(9.11.8)) が残っている。
+
+ただし**算術の鎖は既に landed かつ §9 レベル**:
+`S11.nineElevenCaseA_equality_refutation` (`S11_NineElevenCoherence.lean:1004`) は
+`data`/`chief`/`chars` の上で述べられており**型仮定ゼロ**。
+残るのは「等号配置 → その定理の入力 (`hclass`/`hn`/`hnorm`/`hK₁`/`hK₂`/`hCinf`/`hle`)」の
+配線であって、算術そのものではない。
+
+#### (旧) 次の一手: `hArefute` の §9 化
+
+`hArefute` は §13 では `S11.caseA_refuter_of_equality_refutation`
+(`S11_NineElevenCaseA.lean:254`) が供給していて、そこで**2 つの carrier に落ちている**:
+
+- `NineElevenPairBound hyp caseA` — (5.6) の pair-bound 束
+- `NineElevenEqualityRefutation hyp caseA` — (9.11.2)–(9.11.8) の等号配置の否定
+
+本体の議論は (9.11.1) の squeeze で、使っているのは
+`hyp.base.tau` / `hyp.base.A0` (**パラメータ化可能**) と
+`hyp.s11Setup` → `data` / `hyp.chief` → `chief` / `hyp.C` → `cSub data chief` /
+`hyp.H0Cprime` → `chief.H0 ⊔ cprimeSub data chief` という**packaging の別名だけ**。
+⟹ case A の降ろしと同型の機械作業になる見込み。
+
+⚠ ただし **2 つの carrier 自体が `S13.Hypothesis` で添字づけられている**ので、
+先に carrier の §9 版 (`data`/`chief`/`chars` 上) を作る必要がある。
+そこが本 issue に残る最後の実質作業。
+
+#### (旧) 次の一手: `hAbase` を `sOf_degreeSubfamily_coherent` から供給する
 
 両者は**同じ台 (`supportInSubgroup A M`)** になったので、残る差は τ だけ:
 

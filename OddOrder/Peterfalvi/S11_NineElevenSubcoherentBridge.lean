@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S07_PivotCoherence
 import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_NineElevenCoherence
 import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
@@ -890,20 +891,206 @@ theorem sOf_cprime_nonempty [Finite G] {M : Subgroup G}
   exact ⟨φ, sOf_antitone data (sup_le_sup_left (cprimeSub_le_C data chief) chief.H0) hφ⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (8.15.3) base coherence, retargeted to the (9.5) isometry** — the `hAbase` supplier of
+`sOf_nineEleven_coherent`.
+
+`sOf_degreeSubfamily_coherent` already lands on the right *support* `A(M)`; what differs is the
+map.  It carries the isometry of the `(8.15)` Dade datum `dd`, while (9.5) names the restriction of
+the `(4.6.e)` datum.  Given the pin `hdd` — that `dd`'s Dade hypothesis **is** that restriction, as
+it is for the intended producer — the two maps agree wherever it matters, because
+`dadeIntegralCharacterMap_apply_of_support` collapses *any* `dadeIntegralCharacterMap` over a fixed
+`S04.Hypothesis` to that hypothesis's own `dadeMap` on supported arguments.  The isometry data play
+no role there, so no agreement between `dd.dade.fullDadeIsometryData dd.hconj` and
+`h46.tau.restrict …` is needed — only between the underlying hypotheses. -/
+theorem sOf_degreeSubfamily_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
+    (hodd : Odd (Nat.card ↥M)) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
+    (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
+    (hKeq : h46.toCore.K = (derivedInG M).subgroupOf M)
+    (hHeq : h46.toCore.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hd0 : ((d : ℂ)) ≠ 0)
+    (h2 : 2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard)
+    (h1A : (1 : ↥M) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (h46.dade0.restrict Set.subset_union_left hAnorm)
+        (h46.tau.restrict Set.subset_union_left hAnorm))
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
+  (sOf_degreeSubfamily_coherent hodd h46.toCore dd hG hM data Y d hKeq hHeq hd0 h2 h1A).map
+    fun c => c.congrMap fun φ hφ => by
+      rw [show (OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent hodd h46.toCore dd
+            (hKeq ▸ hHeq ▸ (fun _ hx => sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
+            (fun _ hx => hx.2.1) (fun _ hx => irrCut_conjClosed data Y d hx)).tau
+          = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dd.dade
+            (dd.dade.fullDadeIsometryData dd.hconj) from rfl,
+        OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support dd.dade _ hφ.2,
+        OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+          (h46.dade0.restrict Set.subset_union_left hAnorm) _ hφ.2, hdd]
+
+/-! ### (9.11.1): the case (9.7.a) maximality refuter, at §9 level
+
+The §13 forms (`S13.NineElevenPairBound`, `S13.NineElevenEqualityRefutation`,
+`S13.caseA_refuter_of_equality_refutation`) are stated over `S13.Hypothesis`, but inspection shows
+the only dependence is on packaging aliases — `hyp.s11Setup`, `hyp.chief`,
+`hyp.base.mkSection11CharacterData …`, `hyp.H0Cprime`, `hyp.C` — plus `hyp.base.tau`/`.A0`, which
+are parameters here.  So the descent is a rename, not new mathematics. -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.1), the (5.6) pair-bound bundle, at §9 level** — the §9 form of
+`S13.NineElevenPairBound`. -/
+def CaseAPairBound [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M) : Prop :=
+  ∀ S₂ : Set (ClassFunction ↥M ℂ),
+    {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+      S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau S₂ A0) →
+      ∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+        ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau (S₂ ∪ {χ, χ.conj}) A0) →
+        ∃ d : ℕ, ((χ : ↥M → ℂ) 1 = ((data.q * d : ℕ) : ℂ)) ∧ d ≤ chars.u ∧
+          ∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+            OddOrder.Peterfalvi.S07.sumnS F
+              ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.2)–(9.11.8), the equality-configuration refutation, at §9 level** — the §9
+form of `S13.NineElevenEqualityRefutation`. -/
+def CaseAEqualityRefutation [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M) : Prop :=
+  ∀ S₂ : Set (ClassFunction ↥M ℂ),
+    {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+      S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau S₂ A0) →
+      (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂).Nonempty →
+      (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+        ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau (S₂ ∪ {χ, χ.conj}) A0)) →
+      2 * caseA.a = chief.p - 1 →
+      chars.C = chars.Uprime →
+      (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+        (χ : ↥M → ℂ) 1 = ((data.q * chars.u : ℕ) : ℂ)) →
+      {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+          χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+        = (chief.p - 1) * ((uprimeSub data).relIndex data.U) →
+      (∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+        OddOrder.Peterfalvi.S07.sumnS F
+          ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ)) →
+      False
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.1): the case (9.7.a) maximality refuter, at §9 level** — the `hArefute`
+input of `sOf_nineEleven_coherent`, reduced to the two honest (9.11) carriers.
+
+The §9 form of `S13.caseA_refuter_of_equality_refutation`, with `tau`/`A0` as parameters and every
+`S13.Hypothesis` alias replaced by its §9 original.  The argument is unchanged — the (9.11.1)
+squeeze: per non-adjoinable `χ ∈ 𝒮₃`, `hbound` gives source degree `d ≤ u` and the upper bound
+`sumnS 𝒮₁′ ≤ 2q²a·d` on the degree-`qa` subfamily transported from `𝒮(H₀U′)` along `H₀C′ ≤ H₀U′`;
+`sumnS_irreducible_constant_degree` gives the matching lower bound; `nineElevenOne_configuration`
+closes the circle, and `hrefuteEq` refutes the resulting equality configuration. -/
+theorem caseA_refuter_of_equality_refutation [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M)
+    (hbound : CaseAPairBound caseA tau A0)
+    (hrefuteEq : CaseAEqualityRefutation caseA tau A0) :
+    ∀ S₂ : Set (ClassFunction ↥M ℂ),
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+          IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+        S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+        OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+        Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau S₂ A0) →
+        (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂).Nonempty →
+        (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+          ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau (S₂ ∪ {χ, χ.conj}) A0)) → False := by
+  classical
+  intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs
+  have hq : 0 < data.q := data.nontrivial.2.1.pos
+  have hu : 0 < chars.u := (u_odd hG chars).pos
+  have hp1 : 0 < chief.p - 1 := Nat.sub_pos_of_lt chief.p_prime.one_lt
+  -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′`)
+  have hle : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ uprimeSub data := by
+    refine sup_le_sup_left ?_ chief.H0
+    change derivedInG (cSub data chief) ≤ derivedInG data.U
+    rw [derivedInG_eq_commutator (cSub data chief), derivedInG_eq_commutator data.U]
+    exact Subgroup.commutator_mono (cSub_le_U data chief) (cSub_le_U data chief)
+  -- the uniform degree-`qa` subfamily `𝒮₁′ ⊆ 𝒮(H₀U′)`
+  have hS1'sub : {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+      χ 1 = ((data.q * caseA.a : ℕ) : ℂ)} ⊆ S₂ := fun χ hχ =>
+    hS₁sub ⟨sOf_antitone data hle hχ.1, hχ.2.1, hχ.2.2⟩
+  have hS1'fin : ({χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+      χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}).Finite :=
+    (sOf_finite data _).subset fun _ hχ => hχ.1
+  -- (9.11.5) left endpoint: `sumnS 𝒮₁′ = |𝒮₁′|·(qa)²`
+  have hsum1' : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
+      = (hS1'fin.toFinset.card : ℝ) * ((data.q * caseA.a : ℕ) : ℝ) ^ 2 :=
+    sumnS_irreducible_constant_degree hS1'fin.toFinset
+      (fun ψ hψ => (hS1'fin.mem_toFinset.mp hψ).2.1)
+      (fun ψ hψ => (hS1'fin.mem_toFinset.mp hψ).2.2)
+  have hs1' : (({χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+        χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard : ℝ)) * ((data.q * caseA.a : ℕ) : ℝ) ^ 2
+      ≤ OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset :=
+    le_of_eq (by rw [Set.ncard_eq_toFinset_card _ hS1'fin, hsum1'])
+  -- per-`χ` (9.11.1) squeeze
+  have hconfig : ∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      ∃ d : ℕ, ((χ : ↥M → ℂ) 1 = ((data.q * d : ℕ) : ℂ)) ∧
+        (2 * caseA.a = chief.p - 1 ∧ chars.C = chars.Uprime ∧ d = chars.u ∧
+          {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+              χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+            = (chief.p - 1) * ((uprimeSub data).relIndex data.U)) ∧
+        (∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+          OddOrder.Peterfalvi.S07.sumnS F
+            ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ)) := by
+    intro χ hχ
+    obtain ⟨d, hχdeg, hdu, hFbound⟩ :=
+      hbound S₂ hS₁sub hS₂sub hS₂conj hS₂coh χ hχ (hpairs χ hχ)
+    have hpair : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
+        ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ) :=
+      hFbound hS1'fin.toFinset (by rw [Set.Finite.coe_toFinset]; exact hS1'sub)
+    exact ⟨d, hχdeg, nineElevenOne_configuration hG caseA hq hu hp1 hdu hs1' hpair, hFbound⟩
+  obtain ⟨χ₀, hχ₀⟩ := hS₃ne
+  obtain ⟨d₀, -, ⟨h2a, hCUprime, hd₀u, hcount⟩, hFbound₀⟩ := hconfig χ₀ hχ₀
+  have hS3deg : ∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      (χ : ↥M → ℂ) 1 = ((data.q * chars.u : ℕ) : ℂ) := by
+    intro χ hχ
+    obtain ⟨d, hχdeg, ⟨-, -, hdu, -⟩, -⟩ := hconfig χ hχ
+    rwa [hdu] at hχdeg
+  have hFboundU : ∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+      OddOrder.Peterfalvi.S07.sumnS F
+        ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ) := by
+    intro F hF
+    have h := hFbound₀ F hF
+    rwa [hd₀u] at h
+  exact hrefuteEq S₂ hS₁sub hS₂sub hS₂conj hS₂coh ⟨χ₀, hχ₀⟩ hpairs
+    h2a hCUprime hS3deg hcount hFboundU
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` is coherent for `τ`, under Hypothesis (9.5) alone.
 
 The (9.7) Clifford dichotomy (`clifford_dichotomy`, already type-free on `chars`) splits into the
 two branches proved above:
 
-* case (9.7.a) — `caseA_coherent_sOf_cprime_of_refuter`, still needing the degree-`qa` base
-  coherence `hAbase` and the maximality refuter `hArefute` (the §9 chain
-  `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin`, whose descent from `S13.Hypothesis` is the
-  remaining item of issue 1045);
+* case (9.7.a) — `caseA_coherent_sOf_cprime_of_refuter`, whose maximality refuter is
+  `caseA_refuter_of_equality_refutation`; what remains open is the degree-`qa` base coherence
+  `hAbase` (supplied by `sOf_degreeSubfamily_coherent_restrict` up to its `2 ≤ ncard` count) and
+  the two honest (9.11) carriers `hbound` / `hrefuteEq`;
 * case (9.7.b) — **fully discharged**: uniform degree from (9.9.a), pivot from (9.9.b)
   (`sOf_cprime_nonempty`), and the descent to this `τ` from `sOf_caseB_coherent_restrict`.
 
-⚠ The two residual inputs are quantified over `CliffordCaseAData`, so case (b) — which is complete
-— does not pay for them.
+⚠ The residual inputs are quantified over `CliffordCaseAData`, so case (b) — which is complete —
+does not pay for them.
 
 The `τ` is the one Hypothesis (9.5) names: the Dade isometry of `(A(M), M, G)`, i.e. the
 **restriction** of the (4.6.e) datum on `A₀ = A ∪ V^M`.  Stating it here rather than on `A₀` is what
@@ -936,24 +1123,16 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
         {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
           IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))}
         (OddOrder.Peterfalvi.S04.supportInSubgroup A M))
-    (hArefute : ∀ caseA : CliffordCaseAData chars, ∀ S₂ : Set (ClassFunction ↥M ℂ),
-      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
-          IsIrreducibleCharacter φ ∧
-          ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
-        S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
-        OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
-        Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
-            (h46.dade0.restrict Set.subset_union_left hAnorm)
-            (h46.tau.restrict Set.subset_union_left hAnorm)) S₂
-          (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) →
-        (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂).Nonempty →
-        (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
-          ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
-              (h46.dade0.restrict Set.subset_union_left hAnorm)
-              (h46.tau.restrict Set.subset_union_left hAnorm)) (S₂ ∪ {χ, χ.conj})
-            (OddOrder.Peterfalvi.S04.supportInSubgroup A M))) → False) :
+    (hbound : ∀ caseA : CliffordCaseAData chars, CaseAPairBound caseA
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (h46.dade0.restrict Set.subset_union_left hAnorm)
+        (h46.tau.restrict Set.subset_union_left hAnorm))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M))
+    (hrefuteEq : ∀ caseA : CliffordCaseAData chars, CaseAEqualityRefutation caseA
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (h46.dade0.restrict Set.subset_union_left hAnorm)
+        (h46.tau.restrict Set.subset_union_left hAnorm))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         (h46.dade0.restrict Set.subset_union_left hAnorm)
@@ -962,7 +1141,7 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) := by
   rcases clifford_dichotomy hG chars with hA | hB
   · exact caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some (hAbase hA.some)
-      (hArefute hA.some)
+      (caseA_refuter_of_equality_refutation hG hA.some _ _ (hbound hA.some) (hrefuteEq hA.some))
   · obtain ⟨η₁, hη₁⟩ := sOf_cprime_nonempty hG (chief := chief)
     exact ⟨sOf_caseB_coherent_restrict hG hM data h46 h46.toCore hAnorm (data.q * chars.u)
       (caseB_degree_qu hG chars hB.some)
