@@ -864,6 +864,49 @@ theorem mixedTerm_rep_equivariance
   rw [← lowerCentralCommutatorBilinear_equivariant Y.subtype c u v]
   exact ambientCenterCoordinate_compat hEA hK1 hterm ePhi c nu hconj _
 
+/-- **Higman's mixed-term eigenvalue relation `M(λα, μβ) = ν · M(α, β)`.**
+For two factor inclusions `fL`, `fR` whose ambient actor images are the scalars
+`λ`, `μ` on their coordinate fields (`hL`, `hR`), the ambient mixed term scales
+by `ν` under `(α, β) ↦ (λα, μβ)`.  This is the eigenvalue functional equation
+that, together with `ν = λ θ(λ) = μ φ(μ)` and the Frobenius weight equation,
+pins the mixed term to its type-B/C/D form. -/
+theorem mixedTerm_lambda_equivariance
+    {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1 : lowerCentralLayerKernel P 1 = ⊥)
+    (hterm : lowerCentralTerm P 1 = frattini P)
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (c : Y) (nu : GaloisField 2 n)
+    (hconj :
+      let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+        IsAInvariant.of_characteristic Y.subtype
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu)
+    (fL fR : GaloisField 2 n →ₗ[ZMod 2] Additive (lowerCentralLayer P 0))
+    (lam mu : GaloisField 2 n)
+    (hL : ∀ α, lowerCentralLayerRepresentation Y.subtype 0 c (fL α) = fL (lam • α))
+    (hR : ∀ β, lowerCentralLayerRepresentation Y.subtype 0 c (fR β) = fR (mu • β))
+    (α β : GaloisField 2 n) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralCommutatorBilinear P (fL (lam • α)) (fR (mu • β))) =
+      nu * ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralCommutatorBilinear P (fL α) (fR β)) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  rw [← hL α, ← hR β]
+  exact mixedTerm_rep_equivariance hEA hK1 hterm ePhi c nu hconj (fL α) (fR β)
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
