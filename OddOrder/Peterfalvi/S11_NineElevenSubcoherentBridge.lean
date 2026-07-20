@@ -505,6 +505,52 @@ theorem caseA_sTwo_subset_degreeQaCut [Finite G] {M : Subgroup G}
   linarith [sOf_mem_Snorm_pos hG hM data (hS₂sub hχS₂)]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.1), the `𝒮₂ = 𝒮₁` extraction, at §9 level** — the §9 form of
+`S13.NineElevenSTwoExtraction`: at the equality configuration every `𝒮₂`-member has degree `qa`.
+
+This is the `hS2deg` consumed by the (9.11.2) TI-witness and the (9.11.3) count. -/
+def CaseASTwoExtraction [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M) : Prop :=
+  ∀ S₂ : Set (ClassFunction ↥M ℂ),
+    {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+      S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau S₂ A0) →
+      (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂).Nonempty →
+      (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+        ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau (S₂ ∪ {χ, χ.conj}) A0)) →
+      2 * caseA.a = chief.p - 1 →
+      chars.C = chars.Uprime →
+      (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+        (χ : ↥M → ℂ) 1 = ((data.q * chars.u : ℕ) : ℂ)) →
+      {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+          χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+        = (chief.p - 1) * ((uprimeSub data).relIndex data.U) →
+      (∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+        OddOrder.Peterfalvi.S07.sumnS F
+          ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ)) →
+      ∀ χ ∈ S₂, (χ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The `𝒮₂ = 𝒮₁` extraction, discharged at §9 level** — the degree form of
+`caseA_sTwo_subset_degreeQaCut`, i.e. the §9 form of `S13.nineElevenSTwoExtraction`.
+
+Like the §13 original this is a one-liner over the subset form; unlike it, no type hypothesis is
+in play anywhere on the route. -/
+theorem caseA_sTwoExtraction [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M) :
+    CaseASTwoExtraction caseA tau A0 := by
+  intro S₂ hS₁sub hS₂sub _hS₂conj _hS₂coh _hS₃ne _hpairs h2a hCUprime _hS3deg hcount hFbound χ hχ
+  exact (caseA_sTwo_subset_degreeQaCut hG hM caseA hS₁sub hS₂sub h2a hCUprime hcount
+    hFbound hχ).2.2
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.7)–(9.11.8), the coherent-pair refutation, at §9 level** — the §9 form of
 `S13.NineElevenSevenEightRefutation`.
 

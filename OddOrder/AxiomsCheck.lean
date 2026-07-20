@@ -11643,3 +11643,7 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- its packaging; here it is `sOf_finite` plus the `⊥`-kernel bridge, and no type hypothesis
 -- appears.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_sTwo_subset_degreeQaCut
+-- **(9.11.1) `𝒮₂ = 𝒮₁`, degree form, at §9 level** — the `hS2deg` consumed by the (9.11.2)
+-- TI-witness and the (9.11.3) count.  A one-liner over the subset form, as in §13, but with no
+-- type hypothesis anywhere on the route.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_sTwoExtraction
