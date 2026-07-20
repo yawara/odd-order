@@ -1261,5 +1261,22 @@ theorem sOf_closedUnderConjugate [Finite G] {M : Subgroup G}
     exact ClassFunction.induce_conj (OddOrder.Peterfalvi.S11.huSub data)
       (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ)
 
+/-- **The degree-`d` irreducible cut of `𝒮(Y)` is conjugate-closed** (the `hconjS` input of the
+(9.11) column-pair adjunction): conjugation preserves `𝒮(Y)`-membership
+(`sOf_closedUnderConjugate`), irreducibility, and the natural degree (`star_natCast`).
+
+Stated over Hypothesis (9.2) alone.  It previously took the §11 `S13.Hypothesis` bundle, but the
+proof only ever used its `s11Setup` field (and a `Finite G` already present as a binder), so the
+§11 packaging was decoration — issue 1045. -/
+theorem irrCut_conjClosed [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (Y : Subgroup G) (d : ℕ) {x : ClassFunction ↥M ℂ}
+    (hx : x ∈ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}) :
+    x.conj ∈ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} := by
+  obtain ⟨hmem, hirr, hdeg⟩ := hx
+  refine ⟨sOf_closedUnderConjugate data Y hmem, hirr.conj, ?_⟩
+  rw [ClassFunction.conj_apply, hdeg, star_natCast]
+
 end OddOrder.Peterfalvi.S11
 

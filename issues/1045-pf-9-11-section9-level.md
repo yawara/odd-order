@@ -93,12 +93,99 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
   Coherence911 → CaseBXi → InnerCompHom → SummandComplementKernel → ThetaCountAssembly`
   なので最下流の `ThetaCountAssembly` が正しい home。
 
-### ⛏ 残り
+- `irrCut_conjClosed` : `S13_MaximalIII_IV` (ns `S13`) → `S11_.../ThetaCountAssembly` (ns `S11`)。
+  `hyp : S13.Hypothesis M` を `data : TypesIIIIIIVSetup M` へ引数化 (実使用は `s11Setup` のみ、
+  `hyp.base.finiteG` も `[Finite G]` binder があるので不要だった)。consumer 2 ファイル。
 
-- `irrCut_conjClosed` (`S13_MaximalIII_IV.lean:92`) の一般化 — `hyp : S13.Hypothesis M` を
-  取るが実際に使うのは `hyp.s11Setup` と `hyp.base.finiteG` だけ。`data : TypesIIIIIIVSetup M`
-  へ引数化する。
-- その後に §9 レベルの (9.11) statement 本体 (着手順 1)。
+⟹ **着手順 2 の再配置は完了**。§9 の生の装置はこれで全て §9 に在る。
+
+### ✅ 実測 (2026-07-20): §10 依存を (8.15.3) で外す経路が確定
+
+`sOf_degreeSubfamily_isCoherent` の §10 依存 (`inducedFamily_degreeSubfamily_isCoherent`) は
+**(8.15.3) + (5.7) で置換できる**。書籍もその順序:
+
+1. `S10.typePACore_subcoherent` (本 session landed, 型仮定 `IsTypeP` のみ) が
+   `S07.Hypothesis S (supportInSubgroup (typePACore M) M)` = **(5.2)** を与える。
+2. `S07.coherent_subset_of_constant_degree` (`S07_Subcoherent.lean:259`) が
+   (5.2) + 定次数・共役閉・有限・`2 ≤ ncard` などから
+   `Nonempty (IsCoherent hyp.tau S' A)` を出す。
+
+**接続に要る 2 つの事実は両方 repo に在る** (実測):
+
+- **`huSub data = (derivedInG M).subgroupOf M`** — `huSub_eq_derivedInG_subgroupOf`。
+  ⟹ §9 の族 `sOf` は `M′` から誘導している = (8.15.3) の族と同じ誘導元。
+- **`M_F ≤ M_σ`** — `BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma`。
+  ⟹ §9 の絞り `H = M_F ⊄ Ker χ` は (8.15.3) の絞り `M_σ ⊄ Ker θ` を**含意する**
+  (対偶: `M_σ ⊆ Ker θ` かつ `M_F ≤ M_σ` なら `M_F ⊆ Ker θ`)。
+
+⟹ **`sOf data Y ⊆ S10.inducedNonKernelFamily ((derivedInG M).subgroupOf M) ((Msigma M).subgroupOf M)`**
+が成り立つ。これが橋渡し補題。
+
+⚠ 型 III/IV では `M_s = M′` なので (8.15.3) の絞りは `θ ≠ 1` に退化し、§9 の族の方が真に狭い
+— それでも `⊆` の向きなので問題ない。
+
+⚠ **置き場**: `inducedNonKernelFamily` は `S10_SubcoherentTypeP.lean`、`sOf` は
+`S11_.../ChiefFactorCore.lean` にあり、両者は**兄弟** (どちらも他方を import しない;
+`S10_SubcoherentTypeP` を import するのは `AxiomsCheck` のみ)。⟹ 橋渡し補題は
+両方を import する新 leaf か、`S10_SubcoherentTypeP` に S11 への import を足すか。
+後者は §8 の file が §9 を import することになるので、**新 leaf が素直**
+(例 `S11_NineElevenSubcoherentBridge.lean`)。
+
+### 橋渡し補題の実装レシピ (2026-07-20 に全部品を実測、次 session はそのまま書ける)
+
+```
+theorem sOf_subset_inducedNonKernelFamily [Finite G]
+    (hG : IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    sOf data Y ⊆ S10.inducedNonKernelFamily ((derivedInG M).subgroupOf M)
+                   ((BG.Ch3.S10.Msigma M).subgroupOf M)
+```
+
+定義 (実測):
+- `huSub data = (data.H ⊔ data.U).subgroupOf M` (ChiefFactorCore:45)
+- `hInHu data = (data.H.subgroupOf M).subgroupOf (huSub data)` (同:72)
+- `xiSet data = {χ | ¬ (hInHu data ⊆ Ker χ)}` (同:77)
+- `xiOf data Y = {χ ∈ xiSet data | ((Y.subgroupOf M).subgroupOf (huSub data)) ⊆ Ker χ}` (同:83)
+- `S10.inducedNonKernelFamily K H' = {φ | ∃ θ : Irr ↥K, ¬(H'.subgroupOf K ⊆ Ker θ) ∧ φ = induce K θ}`
+
+手順:
+1. `intro φ ⟨χ, hχ, rfl⟩`。
+2. **まず `huSub data` の上で示す**:
+   `induceHU data χ ∈ S10.inducedNonKernelFamily (huSub data) ((Msigma M).subgroupOf M)`
+   - witness は `χ` 自身、等式は `induceHU_eq_induce data _`。
+   - 絞りの含意: 示すのは `¬ (((Msigma M).subgroupOf M).subgroupOf (huSub data) ⊆ Ker χ)`。
+     `hχ.1 : ¬ (hInHu data ⊆ Ker χ)` と
+     **`hInHu data ≤ ((Msigma M).subgroupOf M).subgroupOf (huSub data)`** から対偶で出る。
+     後者は `data.H ≤ Msigma M` (= `M_F ≤ M_σ`,
+     `BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM` + `data.typeP.H_eq`) を
+     `Subgroup.subgroupOf` の単調性で 2 段持ち上げる。
+3. **型の transport**: `huSub data` と `(derivedInG M).subgroupOf M` は
+   **命題的に等しいだけ** (`huSub_eq_derivedInG_subgroupOf`) なので、
+   `↥(huSub data)` と `↥((derivedInG M).subgroupOf M)` は別の型。
+   ⟹ repo 既存の流儀どおり **`hKeq ▸ h`** で運ぶ
+   (`S15_SSetMemberRFamily.lean:80-85` が `inducedKernelFamily` で同じことをしている実例)。
+   `inducedNonKernelFamily` も `K` が explicit 引数なので同じ形で通るはず。
+
+⚠ 置き場は前述のとおり新 leaf (S10_SubcoherentTypeP と S11_.../ChiefFactorCore は兄弟)。
+
+### ⛏ 残り = 着手順 1 (§9 レベルの (9.11) statement 本体)
+
+形: `(data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)`
+`(chars : Section11CharacterData data chief)` の上で
+`Nonempty (S07.IsCoherent chars.tau (sOf data (chief.H0 ⊔ chars.Cprime)) A0)`。
+
+⚠ `chars.H0CprimeSupport` は producer によっては `∅` の placeholder
+(`S12.Hypothesis.mkSection11CharacterData` / `S15` の counting 用) なので、
+support は**明示パラメータ**で取るのが素直 (S15 の honest 版は `A(S) = typePACore` を渡している)。
+
+⚠ chain 本体 (`S11_NineElevenCaseA` 16 / `_AlphaBound` 15 / `_PairAdjoin` 5 の
+`S13.Hypothesis` 引数) は `hyp.base`/`hyp.params` を各 130/196/72 箇所使うので、
+**どこまでが §10 の μ-grid に真に依存し、どこからが packaging か**の切り分けが先。
+`caseA_coherent_sOf_H0Cprime_of_refuter` (S11_NineElevenCaseA.lean:70) を読んだ限りでは
+`hyp.base.tau` / `hyp.base.A0` (= パラメータ化可能) と finiteness 橋渡しが主で、
+`sOf_degreeSubfamily_isCoherent` だけが §10 engine
+(`inducedFamily_degreeSubfamily_isCoherent`) に実依存する。
+書籍ではそこが (8.15.3) 経由 ⟹ `S10.typePACore_subcoherent` で置換できる見込み。
 
 ## 着手順 (残り)
 

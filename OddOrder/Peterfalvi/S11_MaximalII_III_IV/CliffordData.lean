@@ -325,6 +325,16 @@ theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
   rintro φ ⟨χ, -, rfl⟩
   exact ⟨χ, rfl⟩
 
+/-- **`𝒮(Y) = sOf data Y` is finite** — the `hSfin` input of the (9.11) maximal-subfamily
+refutation, at §9 level.
+
+`𝒮(Y) ⊆ 𝒮` (`sOf_subset_sSet`) and `𝒮` is finite.  The §11 packaging derives the same fact by
+routing through the §10 kernel-filtered family (`S08.inducedKernelFamily_finite` composed with
+`sOf_subset_SOf`), which needs a `S13.Hypothesis`; nothing about the statement does.  Issue 1045. -/
+theorem sOf_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    (sOf data Y).Finite :=
+  (sSet_finite data).subset (sOf_subset_sSet data Y)
+
 /-- **Peterfalvi (9.6), clause `U ≠ C`**: the chief-factor centralizer `C = C_U(H̄)` (`cSub`) is a
 *proper* subgroup of `U`.
 
