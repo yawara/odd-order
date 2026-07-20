@@ -30,7 +30,6 @@ feeds the norm-weighted (5.6) bound `xSum_le_two_psi_caseB`, a column break feed
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
