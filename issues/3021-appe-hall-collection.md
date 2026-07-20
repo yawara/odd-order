@@ -800,3 +800,34 @@ BG の字面 `R₀ × Ω₁(R₁)` では族が空でないことが言えない
 
 ⟹ 必要な新規は主に **(E.15)(E.16) の共役類計数**と **Frattini 変形**。
 Lemma 4.5 と Prop E.2 と Step 1 は repo に既にある。
+
+## 2026-07-20 (12): Step 3 難しい分岐 — (E.15) と Frattini 変形
+
+| 新規宣言 | BG 対応 |
+|---|---|
+| `centralizer_singleton_eq_of_zpowers_eq` | `C(v) = C(⟨v⟩)` |
+| `card_centralizer_generator` | `\|C_S(v)\| = \|C_S(R₀)\| = p²` |
+| `card_conjClass_generator` | **(E.15)** `p²·\|K\| = \|S\|` |
+| `sup_centralizer_eq_sup_inf_R₁` | **Frattini 変形** `S ⊔ C_T(v) = S ⊔ (T ⊓ R₁)` |
+
+### ⭐ 設計上の発見: `T₁ = N_T(K)` は定義に据え替えられる
+
+BG は `T₁` を「`K` の `T` における正規化群」として導入するが、**下流が使うのは
+(a) `S ≤ T₁`、(b) `|T:T₁| < p²`、(c) `T₁/S` 巡回 の 3 つだけ**。
+Frattini 論法の結論 `T₁ = S·C_{T₁}(v) = S·C_T(v)` を**定義に据える**と:
+
+- Frattini 論法そのものが不要
+- 「部分集合の集合への T-作用」(軌道が S-共役類を並べる) を組む必要も消える
+- (b) は `|T:C_T(v)| = |T:T₁|·|T₁:C_T(v)|` と `|T₁:C_T(v)| = |S:C_S(v)| = |S|/p²`、
+  および `T`-共役類 ⊆ `S \ {1}` から出る
+
+### 残り (この順)
+
+1. ⬜ **`T₁/S` 巡回**: `T ⊓ R₁` は巡回 `R₁` の部分群 ⟹ その `T/S` での像が巡回
+   (`isCyclic_of_surjective`)。`S ⊴ T` は `T = N_R(S) ⊓ P` の定義から。
+   ⟹ `T₁/S = ((T ⊓ R₁).subgroupOf T).map (mk' (S.subgroupOf T))` として綴るのが軽い
+   (第二同型定理の `subgroupOf` 往復を回避)。
+2. ⬜ **`|T:T₁| < p²`** = 上の積公式 + `T`-共役類 ⊆ `S \ {1}`。
+3. ⬜ **Lemma 4.5** で `|Ω₁(T/S)| ≤ p²` ⟹ `|Ω₁(T)| ≤ p²|S| ≤ p^{q+2}`。
+4. ⬜ `cl(Ω₁(T)) ≤ q+1 ≤ p−1` (Step 1 `card_A_dvd_half_p_sub_one` + `p ≥ 7`)
+   ⟹ **Prop E.2(a)** で `Ω₁(T)` が指数 p ⟹ 極大性に矛盾 ⟹ **Step 3 完了**。
