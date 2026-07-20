@@ -859,6 +859,29 @@ issue 9083 の Phase B–E は**既に完了している**。
 ⚠ 規模: 4 定理 + carrier 1 個。`caseA_refuter_of_equality_refutation` の降ろしと同型の
 機械作業だが、`_PairAdjoin` / `_AlphaBound` の本体は長い。
 
+#### 📋 残チェーンの実測マップ (2026-07-20) — 次 session はここから
+
+`hrefuteEq` を discharge するために §9 へ降ろす必要がある producer と規模:
+
+| 降ろす対象 | 現在地 | 規模 | 備考 |
+|---|---|---|---|
+| `nineElevenSTwoExtraction` | `S11_NineElevenCaseA:1292` | 8 行 | 下の `caseA_sTwo_subset_degreeQaCut` へ委譲するだけ |
+| `caseA_sTwo_subset_degreeQaCut` | `S11_NineElevenCaseA:1190` | ~102 行 | 実体 |
+| `nineElevenEqualityRefutation_of_sTwoExtraction_normBound` | `S11_NineElevenCaseA:937` | ~40 行 | |
+| `nineElevenNormBound_of_sevenEightRefutation` | `S11_NineElevenAlphaBound:848` | ~270 行 | (9.11.4)–(9.11.6) |
+| `nineElevenSevenEightRefutation` | `S11_NineElevenPairAdjoin:893` | ~420 行 | (9.11.7)–(9.11.8) |
+
+合計 ~840 行 + carrier 数個 (`NineElevenSTwoExtraction` / `NineElevenNormBound` の §9 形)。
+3 ファイル計 3,795 行のうち該当部分。
+
+⚠ **降ろし方は確立済**: `htype`/`hncH0C` は全て `C_eq_cSub_of_noncoherent` の 1 行に消え、
+`hyp.base.tau`/`.A0` はパラメータ化、`hyp.s11Setup`/`chief`/`mkSection11CharacterData …` は
+`data`/`chief`/`chars` に置換 — `caseA_refuter_of_equality_refutation` と
+`CaseASevenEightRefutation` で 2 度実施した手順そのもの。
+
+⚠ **leaf 分割の見込み**: 現在 3 ファイル (261 / 704 / 937 行)。~840 行を足すので
+さらに 1〜2 枚切ることになる (1500 trigger)。
+
 #### ⛏ 残り — 本 issue の本体は完了、あとは issue 9083
 
 `hrefuteEq` = `CaseAEqualityRefutation` は **issue 9083 Phase B–E** の内容で、
