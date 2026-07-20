@@ -10,6 +10,7 @@ import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
 import OddOrder.Peterfalvi.S11_NineElevenCoherence
 import OddOrder.Peterfalvi.S11_NineElevenTwoSummand
+import OddOrder.Peterfalvi.S11_NineElevenTIWitness
 import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
@@ -711,6 +712,32 @@ theorem caseA_equalityRefutation_of_sTwoExtraction_normBound [Finite G] {M : Sub
   have hpeq : chief.p = 2 * caseA.a + 1 := by omega
   exact nineElevenCaseA_equality_refutation caseA hq3 hu hpeq hK₁ hK₂ hCinf hclass rfl
     hnorm hleN
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.2), the TI-witness, at §9 level** — the §9 form of
+`S13.caseA_nineElevenTwo_tiWitness`: at the equality configuration there is `U₁` with
+`C ≤ U₁ ≤ U`, `[U:U₁] = a`, and the TI property.
+
+Same shape as `caseA_two_summand_inertia_inputs`: the `𝒮(H₀C)` degree dichotomy (`qu` on `𝒮₃`,
+`qa` on `𝒮₂`) feeds `nineElevenTwoTIWitness_of_degree_dichotomy`, and the `H₀C′ ≤ H₀C`
+containment that §13 obtains by rewriting `C = cSub` is definitional here — so `hncH0C`/`htype`
+are again absent. -/
+theorem caseA_nineElevenTwo_tiWitness [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {S₂ : Set (ClassFunction ↥M ℂ)}
+    (hS3deg : ∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      (χ : ↥M → ℂ) 1 = ((data.q * chars.u : ℕ) : ℂ))
+    (hS2deg : ∀ χ ∈ S₂, (χ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ)) :
+    NineElevenTwoTIWitness caseA := by
+  refine nineElevenTwoTIWitness_of_degree_dichotomy caseA ?_
+  intro φ hφ
+  have hle : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ cSub data chief :=
+    sup_le_sup_left (cprimeSub_le_C data chief) chief.H0
+  have hφ' : φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) := sOf_antitone data hle hφ
+  by_cases hφS₂ : φ ∈ S₂
+  · exact Or.inr (hS2deg φ hφS₂)
+  · exact Or.inl (hS3deg φ ⟨hφ', hφS₂⟩)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.7)–(9.11.8), the coherent-pair refutation, at §9 level** — the §9 form of

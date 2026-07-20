@@ -11655,6 +11655,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- split into `W₁`-orbits.  Same story as (9.11.2): §13's `hncH0C`/`htype` serve one `C = cSub`
 -- rewrite, definitional here.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_nineElevenThree_count_inputs
+-- **(9.11.2) TI-witness, at §9 level** — `U₁` with `C ≤ U₁ ≤ U`, `[U:U₁] = a` and the TI property.
+-- Same shape as the two-summand inertia inputs; the `H₀C′ ≤ H₀C` step that §13 reaches by
+-- rewriting `C = cSub` is definitional here, so `hncH0C`/`htype` are again absent.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_nineElevenTwo_tiWitness
 -- **(9.11.2)–(9.11.5) equality refutation, at §9 level** — assembles `CaseAEqualityRefutation`
 -- from the `𝒮₂ = 𝒮₁` extraction and the norm bound, with Phases B/C as the §9 lemmas above and
 -- the arithmetic spine `nineElevenCaseA_equality_refutation` (already §9 and type-free).
