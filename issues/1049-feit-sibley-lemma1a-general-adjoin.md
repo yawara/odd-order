@@ -125,7 +125,23 @@ mathcomp `extend_coherent` の degree bound も `∑ χ(1)²/‖χ‖²` (ration
 整合は subtle (integer 版は自明)。着手前に FeitSibley の実度数構造 (Ind_Q^H φ, deg = d·φ(1)) を精査し、
 rational 要否を確定すること。
 
-- [ ] **FeitSibley 配線**: `coherent_adjoin_of_degree_bound` を engine へ (rational 版が要るなら先に engine 拡張)。
+- [x] **option B hisom 修正**: engine 3 defs を `zSupportedSpan Samb A`-based hisom へ (commit 6c064fcc2)。
+- [x] **hisom 供給 helper** `Hypothesis.adjoin_hisom` — S07.Hypothesis が engine の hisom を供給 (commit cab5be9f2)。
+- [x] **FeitSibley docstring 更新** — engine が内容を形式化済と反映 (commit 5be33aca4)。
+
+**⟹ integer-ratio engine は完成・FeitSibley-satisfiable。abstract `coherent_adjoin_of_degree_bound`
+(anchor|ψ のみ ⟹ rational 比許容) を faithful に閉じるには rational engine が必須。**
+
+- [ ] **rational engine** (次の主タスク): inner_Y_extension_member_eq / crux1_of_memberFamily /
+  adjoinPairCoherent を **scaled-difference** `d₁·χᵢ − dⱼ·χ₁` (整数係数, ∈ℤ[S₁], degree 0) +
+  `rc = dⱼ/d₁ : ℝ` へ再導出。⟨Y,νχᵢ⟩ = a·⟨χ₁,χᵢ⟩ − (a·m₁+μ)·(dⱼ/d₁)。核心
+  `lambda_eq_zero_and_Z_eq_zero` (real rc/mc) はそのまま。bridge/decompositionDaFromDiff は不変
+  (度数比を含まない)。degree bound = Peterfalvi の 2·ψ(1)·χ₁(1)<∑χ(1)²。
+- [ ] **FeitSibley 配線**: `coherent_adjoin_of_degree_bound` を rational engine へ。member family=S₀
+  (index=S₀ 元, 直交正規性は 𝒮⊆Irr + pairwise_orthogonal), R-family=`hyp.difference_image`,
+  hisom=`hyp.adjoin_hisom`, hSgen=`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`,
+  hgen=`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`。⚠ FeitSibley に S08_GeneralAdjoin
+  の import を追加。S₀/S₁ (ψ̄∈S₀) reconciliation に注意。
   ⚠ statement 調整が要る: 現状 `S = S₀ ∪ {ψ}` 単一 adjoin + degree bound `2·deg χ0·deg ψ < ∑ deg²`。
   engine は pair `{ψ,ψ̄}` adjoin + normalized `2a < ∑ (deg)²` (a = deg ψ/deg χ₀, unit norm)。
   `hisom` は `hyp.tau_isometry_diff` から (member-diff が A-supported を示す); m₁=1 (irreducible)。
