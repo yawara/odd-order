@@ -705,7 +705,25 @@ packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` を�
 ⟹ **(9.11) の残り = `hbound` / `hrefuteEq` / `hAbase` の count `h2` の 3 つだけ**。
 経路上に型仮定は一つも無い。
 
-#### ⛏ 次の一手: `CaseAPairBound` の producer を §9 へ (型仮定が消える)
+#### ⚠ `CaseAPairBound` producer の実測 (2026-07-20) — rename では済まない
+
+`S13.nineElevenPairBound` の本体 (270 行) の `hyp.*` 使用を数えた:
+`s11Setup` 65 / `base` 22 / `chief` 19 / `H0Cprime` 14 / `C` 8 — ここまでは別名。
+残りが本質:
+
+| 使用 | 判定 |
+|---|---|
+| `hyp.type_alt` (1) → `typePNontrivialCore_of_isTypeIIIorIV` で `hnt` を作る | ✅ **§9 では不要**。`TypesIIIIIIVSetup.nontrivial : TypePNontrivialCore M typeP` が**carrier field そのもの**。§13 が型から再導出しているだけ |
+| `hncH0C` + `htype` (1 行) → `C_eq_cSub_of_noncoherent` | ✅ **§9 では消える** (`chars.C` は `cSub data chief` と定義的に等しい) |
+| `hyp.base.sixTwoDecompositionData` + `hyp.params_*` (5) | ⛏ **本物の §10 依存** |
+
+⟹ **真の作業は `S13.sixTwoDecompositionData` の §9 化**。実測すると、その μ-grid `params`
+(`hmu`/`hδpm`/`hδj`/`hzS`/`hz1`) が効くのは **可約メンバー分岐**
+(`sixTwoMemberDatum_of_reducible_member` / `sixTwoDecompositionData_of_reducible_break`) だけで、
+これは **本 session で作った `S11.sOf_memberRFamily` (可約 = §6 `certainTypeR`) が果たす役割と同じ**。
+⟹ case B の `hRorth` でやった置換を (5.6) engine に対して繰り返す作業になる。規模は大きい。
+
+#### (旧) 次の一手: `CaseAPairBound` の producer を §9 へ (型仮定が消える)
 
 `S13.nineElevenPairBound` (`S11_NineElevenCaseA.lean:436`) が §13 版 producer。
 `hncH0C` と `htype : IsTypeIII ∨ IsTypeIV` を取るが、**実測すると使用箇所は 1 行だけ**:
