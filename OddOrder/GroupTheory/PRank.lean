@@ -663,6 +663,57 @@ theorem pRank_eq_of_le_of_not_dvd_index [Finite G] {r : ℕ}
   exact le_antisymm (pRank_le_of_injective (f := eR.toMonoidHom) eR.injective)
     (pRank_le_of_injective (f := eR.symm.toMonoidHom) eR.symm.injective)
 
+open scoped Pointwise in
+/-- **`p`-rank bound from a cyclic subgroup of index at most `p`** (`[Finite G]`).
+
+If `K ≤ G` is cyclic and `[G : K] ≤ p`, then `pRank G p ≤ 2`.
+
+Let `E ≤ G` be elementary abelian.  The intersection `E ⊓ K` is cyclic (being a subgroup of
+the cyclic group `K`) and has exponent dividing `p` (being a subgroup of `E`), so a generator
+has order dividing `p` and `|E ⊓ K| ≤ p`.  The product formula
+`|EK| · |E ⊓ K| = |E| · |K|` together with `|EK| ≤ |G| = [G : K] · |K| ≤ p · |K|` then gives
+`|E| · |K| ≤ p² · |K|`, i.e. `|E| ≤ p²`.
+
+Note the hypothesis is only that `K` is *cyclic of small index* — no normality is needed,
+since `card_HK_mul_card_inf_eq_card_mul_card` is stated for the **set** product `↑E * ↑K`.
+
+Typical use (BG Theorem E.3(b)): a centralizer `C_R(R₀) = R₀ × R₁` with `|R₀| = p` and `R₁`
+cyclic has `p`-rank at most `2`. -/
+theorem pRank_le_two_of_isCyclic_of_index_le_prime [Finite G] [Fact p.Prime]
+    {K : Subgroup G} (hK : IsCyclic ↥K) (hidx : K.index ≤ p) :
+    pRank G p ≤ 2 := by
+  haveI := hK
+  rw [pRank_le_iff]
+  intro E hE
+  -- `E ⊓ K` is cyclic of exponent dividing `p`, hence of order at most `p`.
+  have hinf : Nat.card ↥(E ⊓ K) ≤ p := by
+    haveI : IsCyclic ↥(E ⊓ K) :=
+      (Subgroup.subgroupOfEquivOfLe (inf_le_right : E ⊓ K ≤ K)).isCyclic.mp inferInstance
+    obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := ↥(E ⊓ K))
+    have hgp : g ^ p = 1 := by
+      have h1 := hE.pow_eq_one ⟨(g : G), (Subgroup.mem_inf.mp g.2).1⟩
+      have h2 : (g : G) ^ p = 1 := congrArg (fun y : ↥E => (y : G)) h1
+      exact Subtype.ext (by simpa using h2)
+    exact hg ▸ Nat.le_of_dvd (Fact.out : p.Prime).pos (orderOf_dvd_of_pow_eq_one hgp)
+  -- `|E| · |K| = |EK| · |E ⊓ K| ≤ |G| · p ≤ (p · |K|) · p`.
+  have hcard : Nat.card ↥E ≤ p ^ 2 := by
+    set S : Set G := (E : Set G) * (K : Set G) with hS
+    have hprod : Nat.card S * Nat.card ↥(E ⊓ K) = Nat.card ↥E * Nat.card ↥K :=
+      Subgroup.card_HK_mul_card_inf_eq_card_mul_card E K
+    have hEK : Nat.card S ≤ Nat.card G :=
+      Nat.card_le_card_of_injective (fun x : S => (x : G)) Subtype.val_injective
+    have hG : Nat.card G ≤ p * Nat.card ↥K := by
+      rw [← K.index_mul_card]
+      exact Nat.mul_le_mul_right _ hidx
+    have hmul : Nat.card ↥E * Nat.card ↥K ≤ p ^ 2 * Nat.card ↥K := by
+      calc Nat.card ↥E * Nat.card ↥K
+          = Nat.card S * Nat.card ↥(E ⊓ K) := hprod.symm
+        _ ≤ (p * Nat.card ↥K) * p := Nat.mul_le_mul (hEK.trans hG) hinf
+        _ = p ^ 2 * Nat.card ↥K := by ring
+    exact Nat.le_of_mul_le_mul_right hmul Nat.card_pos
+  calc Nat.log p (Nat.card ↥E) ≤ Nat.log p (p ^ 2) := Nat.log_mono_right hcard
+    _ = 2 := Nat.log_pow (Fact.out : p.Prime).one_lt 2
+
 end Properties
 
 section Rank

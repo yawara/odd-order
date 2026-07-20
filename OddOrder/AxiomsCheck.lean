@@ -10738,10 +10738,7 @@ process for general class `≤ p−1` (issue 3021).
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_A_dvd_half_p_sub_one
 
 /-! **Hall's collecting process — framework + class ≤ 3** (`GroupTheory.HallCollection`,
-`BG.AppE_FurtherResults`, issue 9132).  The general BG E.1 (`AppE.hallCollection`) remains honestly
-sorried; its single obstruction is the basic-commutator basis of `γ_k/γ_{k+1}` for free nilpotent
-groups plus polynomiality of the collection coefficients (Hall polynomials/Lazard) — absent from
-mathlib.  Proved sorry-free here:
+`BG.AppE_FurtherResults`, issue 9132).  Proved sorry-free here:
 
 * `pow_succ_collect` — the one-step collection recursion
   `x^n y^n = (xy)^n T ⟹ x^(n+1) y^(n+1) = (xy)^(n+1) * (⁅x⁻¹,((xy)^n)⁻¹⁆ * T)^y` (the engine).
@@ -10753,6 +10750,58 @@ mathlib.  Proved sorry-free here:
 #assert_only_allowed_axioms OddOrder.GroupTheory.pow_succ_collect
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_hallCollection_of_residue
 #assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection_of_class_le_three
+
+/-! **BG Theorem E.1 in general, and Proposition E.2** (`GroupTheory.HallPetresco`,
+`GroupTheory.RegularPGroup`, `BG.AppE_FurtherResults`; issues 9132 / 9400 / 3021, 2026-07-20).
+The root of Appendix E's dependency graph is now closed: E.1 holds for **arbitrary** nilpotency
+class, with no `IsPGroup` or class hypothesis at all, via Mann's route through the
+Hall--Petresco word.  The earlier note that "the general E.1 remains sorried" is superseded.
+
+* `HallPetresco.exists_hallPetresco` — the general Hall--Petresco identity for a list of `m`
+  generators; the slot `k` value lands in `γ_k`, which is exactly what E.1 needs.
+* `AppE.hallCollection` — **BG Theorem E.1 in full** (`(xy)^n = x^n y^n c₂^C(n,2) ⋯`).
+* `pow_mul_pow_eq_pow_of_commutator_exponent` — E.2 Step 1, stated generally (the specialised
+  copy that used to live in `AppE_FurtherResults` was deleted rather than kept as a wrapper).
+* `pow_mul_eq_one_of_class_lt` — the class-`< p` engine behind E.2(a)/(b).
+* `AppE.omega_pow_eq_one_of_lowerCentralSeries_eq_bot` (E.2(a)) and
+  `AppE.pow_mul_of_commutator_le_omega` (E.2(b)).  ⚠ Both were stated with an `IsPGroup`
+  hypothesis that the proofs never used; it is **dropped** (specialisation debt repaid). -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.HallPetresco.exists_hallPetresco
+#assert_only_allowed_axioms OddOrder.BG.AppE.hallCollection
+#assert_only_allowed_axioms OddOrder.GroupTheory.pow_mul_pow_eq_pow_of_commutator_exponent
+#assert_only_allowed_axioms OddOrder.GroupTheory.pow_mul_eq_one_of_class_lt
+#assert_only_allowed_axioms OddOrder.BG.AppE.omega_pow_eq_one_of_lowerCentralSeries_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.AppE.pow_mul_of_commutator_le_omega
+
+/-! **BG Theorem E.3(b): the structure of `C_R(R₀) = R₀ × R₁`** (`GroupTheory.PRank`,
+`BG.AppE_FurtherResults`; issues 9401 / 3021, 2026-07-20).  BG's Step 2 opens with the single
+sentence *"Since `C_R(R₀) = R₀ × R₁` we have `R₀ ∩ Z = 1`"*.  Unpacked, that sentence needs a
+rank bound on the centralizer, which is what these supply.
+
+* `pRank_le_two_of_isCyclic_of_index_le_prime` — new general `pRank` API: a finite group with a
+  **cyclic subgroup of index `≤ p`** has `p`-rank `≤ 2`.  No normality is assumed — the classical
+  product formula is stated for the *set* product `↑E * ↑K`, so `|E| · |K| = |EK| · |E ⊓ K|`
+  with `|E ⊓ K| ≤ p` and `|EK| ≤ |G| ≤ p · |K|` already gives `|E| ≤ p²`.
+* `RegularOperatorSetup.R₀_le_centralizer_R₁` — the symmetric half of the setup datum.
+* `RegularOperatorSetup.isMulCommutative_centralizer_R₀` — `C_R(R₀)` is abelian.
+* `RegularOperatorSetup.card_centralizer_R₀` — `|C_R(R₀)| = p · |R₁|`.
+* `RegularOperatorSetup.pRank_centralizer_R₀_le_two` — `r(C_R(R₀)) ≤ 2`, BG's elided step.
+* `three_le_pRank_of_prime_cube_lt_card` — BG's (E.1)--(E.3): an exponent-`p` group of order
+  `> p³` has `p`-rank `≥ 3`.  This is exactly the contrapositive of the existing
+  `Ch1.S04.card_le_prime_cube_of_pRank_le_two_of_exponent_prime`, so BG's `SCN(S)`/`Aut(V)`
+  argument is not re-run here.
+* `RegularOperatorSetup.not_le_centralizer_R₀_of_three_le_pRank` and
+  `RegularOperatorSetup.inf_eq_bot_of_three_le_pRank` — the elided sentence itself:
+  `R₀ ∩ Z = 1` for any `Z` central in an `S` of rank `≥ 3`. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.pRank_le_two_of_isCyclic_of_index_le_prime
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_le_centralizer_R₁
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.isMulCommutative_centralizer_R₀
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_centralizer_R₀
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.pRank_centralizer_R₀_le_two
+#assert_only_allowed_axioms OddOrder.BG.AppE.three_le_pRank_of_prime_cube_lt_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.not_le_centralizer_R₀_of_three_le_pRank
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.inf_eq_bot_of_three_le_pRank
 
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
