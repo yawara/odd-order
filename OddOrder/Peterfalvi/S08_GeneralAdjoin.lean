@@ -71,6 +71,20 @@ theorem zSpan_subset_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
       apply ht
       rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hx0, mul_zero]
 
+/-- **A §7 coherence `Hypothesis` supplies the general adjoin's `hisom`** (with `Samb = S`).  The
+`(5.2)(b)` lattice isometry `tau_isometry_diff` preserves `⟨·,·⟩` on all of `ℤ[S, A]`; combined with
+`zSpan_subset_zSupportedSpan`, this discharges the `hisom` argument of `adjoinPairCoherent_general`
+(and the two sub-engines) whenever the difference sets it is applied to have their endpoints in `S`.
+This is what makes the general adjoin usable from the abstract Feit–Sibley hypothesis (issue 1049);
+the Dade application supplies the same `hisom` from the supported-span inner-preservation lemma. -/
+theorem Hypothesis.adjoin_hisom {S : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis (L := L) (G := G) S A)
+    (T : Set (ClassFunction L ℂ)) (hT : ∀ s ∈ T, s ∈ zSupportedSpan (L := L) S A)
+    (φ ζ : ClassFunction L ℂ) (hφ : φ ∈ Submodule.span ℤ T) (hζ : ζ ∈ Submodule.span ℤ T) :
+    ClassFunction.inner (hyp.tau φ) (hyp.tau ζ) = ClassFunction.inner φ ζ :=
+  hyp.tau_isometry_diff (zSpan_subset_zSupportedSpan hT hφ) (zSpan_subset_zSupportedSpan hT hζ)
+
 /-! ### The general cross-term (helper 1) -/
 
 /-- **General cross-term `⟨τ u, ν δ⟩ = ⟨u, δ⟩`** (generalizes `inner_dade_extension_of_supported`,
