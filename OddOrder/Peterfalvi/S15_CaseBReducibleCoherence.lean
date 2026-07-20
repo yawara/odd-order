@@ -522,7 +522,7 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
     have h := (Complex.le_def.mp hduC).1
     rw [Complex.natCast_re, Complex.natCast_re] at h
     exact_mod_cast h
-  obtain ⟨e, he⟩ := OddOrder.Peterfalvi.S13.caseA_sOf_source_degree_ratio caseA
+  obtain ⟨e, he⟩ := OddOrder.Peterfalvi.S11.caseA_sOf_source_degree_ratio caseA
     (OddOrder.Peterfalvi.S11.mem_sOf.mpr ⟨ξ, hξ, rfl⟩)
   have hde : d = caseA.a * e := by
     have h1 : (hyp.toTypesIIIIIIVSetupS hG).q * d
@@ -551,7 +551,7 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
       (chief.H0 ⊔ chars.Cprime) := fun j => by
     rw [← hyp.sSet_eq_sOf_H0Cprime hG chars]; exact hmemsSet j
   choose deg hdeg using fun j : Fin k =>
-    OddOrder.Peterfalvi.S13.caseA_sOf_source_degree_ratio caseA (hmemsOf j)
+    OddOrder.Peterfalvi.S11.caseA_sOf_source_degree_ratio caseA (hmemsOf j)
   have hdeg_anchor : ∀ j, (χmem j : ↥hyp.S → ℂ) 1
       = (deg j : ℂ) * (χmem i₁ : ↥hyp.S → ℂ) 1 := by
     intro j; rw [hdeg j, hχ₁deg]; push_cast; ring

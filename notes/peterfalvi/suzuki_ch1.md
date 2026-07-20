@@ -402,10 +402,40 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       同定し、`P / Φ(P)` の induced actor を ξ-length `2` に落とした。Maschke で得た
       complementary invariant summands の preimage `X, Y` は normal / invariant で、
       `X ∩ Y = Φ(P)`, `X ⊔ Y = P`; 両 restricted actor range も ξ-length `2` である。
-      次の source frontier は、可換 branch `A(n,1) = C₄ⁿ` も含む inclusive な
-      length-two type-A data を構成し、両 summand を共通 parameter `n ≥ 2` の
-      `A(n,θ)`, `A(n,φ)` と同定する段階である。既存 `IsTypeA` は
-      `φ ≠ 1` を要求するため、可換 branch へ流用しない。
+      `LengthTwoModels.lean` は可換 branch `A(n,1) = C₄ⁿ` も含む inclusive な
+      `XiLengthTwoTypeAData` を構成した。非可換 factor は Lemma 11、可換 factor は
+      homocyclic exponent-four 分類、actual `A/A² ≃ A²` square equivalence、
+      inverse Frobenius finite-field coordinates から honest model を得る。したがって
+      各 proper invariant preimage は可換性の分岐を残さず `A(n,φ)` と同定済みである。
+      `TypeAModel` の involution を有限体の非零元と同定して
+      `|Inv(A(n,φ))| = 2^n - 1` を証明した。両 preimage は ambient の全 involution
+      を含むため、その個数から二つの parameter が一致し、複数 involution から
+      共通値 `n ≥ 2` も従う。この source step は
+      `XiLengthThreeTypeAFactorData` にまとめた。等しいのは parameter `n` であり、
+      原典どおり二つの automorphism `θ, φ` の一致は主張しない。次の source frontier は
+      `MixedCommutators.lean` へ進んだ。各 actual `A(n,θ)` model 内の canonical な
+      非自明 involution とその平方根を構成し、actor transitivity によって任意の ambient
+      involution の平方根を各 invariant factor 内に輸送する。これを左右因子へ適用し、
+      `X ∩ Y = Φ(P)` と elementary-abelian `Φ(P)` を使って、Higman p. 90 の
+      nonzero mixed-commutator step を actual witness `⁅x,y⁆ ≠ 1` として閉じた。
+      続く `AmbientCentralExtension.lean` では、非自明 actor-invariant derived subgroup が
+      全 involution を含むことから `[P,P] = Φ(P)` を証明し、同じ involution argument で
+      `Φ(P) ≤ Z(P)` を得た。従って `γ₂(P)=Φ(P)`, `γ₃(P)=1` であり、
+      elementary-abelian kernel の square subgroupも消えるため
+      `lowerCentralLayerKernel P 1 = ⊥` まで actual に同定済みである。
+      同 leaf で各 inclusive type-A model の concrete quadratic extension 全体を
+      factor へ輸送し、short exact sequence の quotient projection の核を
+      `(Φ(P)).subgroupOf S` と同定した。実際の左右 factor はともに `Φ(P)` を含むため、
+      両 kernel field を同じ ambient `Φ(P)` へ移す group equivalence と、そこから得る
+      左右 kernel 間 transition も構成済みである。これは honest な additive/group-level
+      共通中心座標だが、field multiplication や actor action との整合性はまだ主張しない。
+      原典 p. 81 の B/C/D 定義表と pp. 90--92 の case proof も再監査し、p. 91 の
+      type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
+      p. 81 の表と直前の commutator formula から確認した。抽出画像は
+      `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
+      次の source frontier は、この group-level 共通 `Φ(P)` 座標を actor-compatible な
+      semilinear/Frobenius 座標へ強化し、mixed commutator pairing の固有値制約から
+      type B/C/D の四場合を分岐する gluing case analysis である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。

@@ -303,32 +303,6 @@ noncomputable def isCoherent_of_subset {L : Type*} [Group L] [Fintype L] [Fintyp
   extension_mem_ZIrr := fun a ha =>
     h.extension_mem_ZIrr a (Submodule.span_mono hsub ha)
 
-/-- **Coherence transports along a support change that shrinks the supported lattice**
-(the support-side companion of `isCoherent_of_subset`: same family `S`, different support set).
-If `S` is coherent on `A₁` and every `A₂`-supported lattice element is already `A₁`-supported
-(`ℤ[S, A₂] ⊆ ℤ[S, A₁]`), then `S` is coherent on `A₂` with the *same* extension — only the
-`nonzero` witness must be re-supplied on `A₂`.
-
-The (9.11)/(6.8) use: the certain-type coherence (4.9)(b) lives on `A(M)`
-(`supportInSubgroup (typePA M) M`) while the §10–§13 coherence interface uses
-`A₀(M) ⊇ A(M)`; the column characters `μ_j` vanish off `A ∪ {1}` and `1 ∉ A₀`, so an
-`A₀`-supported `ℤ[𝒯]`-combination is automatically `A`-supported and the lattices agree. -/
-noncomputable def isCoherent_of_supportedSpan_le {L : Type*} [Group L] [Fintype L] [Fintype G]
-    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
-    {S : Set (ClassFunction L ℂ)} {A₁ A₂ : Set L}
-    (h : OddOrder.Peterfalvi.S07.IsCoherent τ S A₁)
-    (hle : OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ⊆
-      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₁)
-    (hwit : ∃ φ : ClassFunction L ℂ,
-      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ∧ φ ≠ 0) :
-    OddOrder.Peterfalvi.S07.IsCoherent τ S A₂ where
-  nonzero := hwit
-  extension := h.extension
-  extension_inner_eq := h.extension_inner_eq
-  extends_on_supported := fun a ha => h.extends_on_supported a (hle ha)
-  extension_mem_ZIrr := h.extension_mem_ZIrr
-
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(4.9)(b) certain-type coherence, §10 interface form**: the certain-type column set
 `𝒯 = certainTypeSet (hyp.toHypothesis46 …) k` is coherent for the §10 Dade map `hyp.tau` on the
@@ -340,7 +314,7 @@ No `congrMap` seam is needed: under `toHypothesis46` the certain-type Dade map
 `dadeIntegralCharacterMap h46.dade0 h46.tau` is *definitionally* `hyp.tau`
 (`dade0 := hyp.dadeData.dade` and `tau := ….fullDadeIsometryData hyp.hconj` are the very
 components of `S12.Hypothesis.tau`).  The support moves from `A(M)` to `A₀(M) = A(M) ∪ V^M` by
-`isCoherent_of_supportedSpan_le`: every column `μ_j` vanishes off `A(M) ∪ {1}`
+`S07.isCoherent_of_supportedSpan_le`: every column `μ_j` vanishes off `A(M) ∪ {1}`
 (`columnSum_support_subset`), so an `A₀`-supported `ℤ[𝒯]`-combination is automatically
 `A(M)`-supported (`1 ∉ A₀`, `one_notMem_A0`); the `A₀`-witness is the `A(M)`-supported
 `μ_{k⁻¹} − μ_k` of `certainType_nonzero`, enlarged along `A(M) ⊆ A₀(M)`. -/
@@ -361,7 +335,7 @@ noncomputable def certainTypeSet_isCoherent_A0 [Finite G]
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.GroupTheory.typePA M hyp.typeP) M) :=
     OddOrder.Peterfalvi.S06.certainType_isCoherent (hyp.toHypothesis46 hG hodd) hk
-  refine isCoherent_of_supportedSpan_le hbase ?_ ?_
+  refine OddOrder.Peterfalvi.S07.isCoherent_of_supportedSpan_le hbase ?_ ?_
   · -- `ℤ[𝒯, A₀] ⊆ ℤ[𝒯, A(M)]`: members vanish off `A(M) ∪ {1}` and `1 ∉ A₀`
     rintro φ ⟨hφspan, hφsupp⟩
     refine ⟨hφspan, ?_⟩
@@ -1137,7 +1111,7 @@ Assembly: the sorry-free (6.8) capstone `sibleySetup_is_coherent` applied to the
 Sibley datum `typeVSibleyDadeHypothesis` gives coherence for the Sibley–Dade map on the
 `(M')^#`-support (its `S`-field is definitionally `inducedFamily M = hyp.Sset`);
 `IsCoherent.congrMap` re-targets it to `hyp.tau` along the (2.11)+(2.5) agreement
-`typeVSibleyDadeHypothesis_tau_agree`; `isCoherent_of_supportedSpan_le` enlarges the support
+`typeVSibleyDadeHypothesis_tau_agree`; `S07.isCoherent_of_supportedSpan_le` enlarges the support
 to `A₀(M)` — members `Ind_{M'}^M θ` vanish off `M'` and `1 ∉ A₀`, so an `A₀`-supported
 `ℤ[S]`-combination is already `(M')^#`-supported — with the `A₀`-witness `ζ̄ − ζ` (a member
 exists by (10.2), and odd order admits no real characters). -/
@@ -1159,7 +1133,7 @@ noncomputable def typeV_caseA_coherence [Finite G]
         (OddOrder.Peterfalvi.S08.sharpImage ((derivedInG M).subgroupOf M)) M) :=
     c0.congrMap (fun φ hφ =>
       OddOrder.Peterfalvi.S12.typeVSibleyDadeHypothesis_tau_agree hG hyp dV hTI hφ.2)
-  refine isCoherent_of_supportedSpan_le c1 ?_ ?_
+  refine OddOrder.Peterfalvi.S07.isCoherent_of_supportedSpan_le c1 ?_ ?_
   · -- `ℤ[S, A₀] ⊆ ℤ[S, (M')^#]`: members vanish off `M'`, and `1 ∉ A₀`
     haveI hHnorm : ((derivedInG M).subgroupOf M).Normal := by
       rw [show (derivedInG M).subgroupOf M = commutator ↥M by

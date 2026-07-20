@@ -11540,3 +11540,74 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- (types III/IV only); here the pivot is an explicit parameter, as the book's (9.9.b) count is
 -- genuine upstream content.  **No type hypothesis on this route.**
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent
+-- **(9.11) case (9.7.b) with (9.9.a) plugged in** — the uniform degree `qu` comes from the
+-- type-free `S11.caseB_degree_qu`, leaving only the (9.9.b) pivot exposed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_coherent_sOf_cprime
+-- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` coherent under Hypothesis (9.5) alone, by the (9.7)
+-- Clifford dichotomy over the two branches.  Residual inputs are quantified over the branch datum
+-- they belong to: case (a) still needs the degree-`qa` base coherence and the maximality refuter
+-- (the `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin` descent from `S13.Hypothesis`, the
+-- remaining item of issue 1045); case (b) needs only the (9.9.b) pivot.  **No type hypothesis
+-- anywhere on this route** — `S13.coherent_sOf_H0Cprime` carries `IsTypeIII ∨ IsTypeIV` only
+-- because its carrier does.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent
+-- **(9.9.b) for `𝒮(H₀C)`** — the second carrier of the book's "both `𝒮(H₀)` and `𝒮(H₀C)` contain
+-- exactly `p − 1` reducible characters" (p. 54).  All five inputs of the shared count
+-- `reducible_count_sOf_K` are already on hand at `K = H₀C`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.reducible_count_sOf_H0supC
+-- **`𝒮(H₀C′) ≠ ∅`** — the (9.11) case (9.7.b) pivot: the `p − 1` reducibles of `𝒮(H₀C)` lie in the
+-- larger `𝒮(H₀C′)` since `C′ ≤ C`.  Taking the count at `H₀C` rather than `H₀` is essential — the
+-- reducibles of `𝒮(H₀)` need not lie in the smaller family — and is why the book states (9.9.b)
+-- for both carriers.  The §13 route reaches the pivot through the μ-grid and (11.7) `H₀ = 1`,
+-- hence only in types III/IV.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_cprime_nonempty
+-- **Case (9.7.b) coherence moved down to the `A(M)`-isometry** — the form Hypothesis (9.5) asks
+-- for.  `certainTypeR` produces its families for the enlarged (4.6.e) isometry on `A₀ = A ∪ V^M`;
+-- the book does not distinguish the two because the `A`-datum *is* the restriction of the `A₀` one,
+-- and this crossing makes that explicit (`S07.isCoherent_of_supportedSpan_le` for the support,
+-- `IsCoherent.congrMap` + `S08.dadeIntegralCharacterMap_restrict_eq_of_support` for the map).  The
+-- witness `η̄ − η` is `A`-supported by the (4.7) estimate — *not* merely `A₀`-supported — which is
+-- what makes the descent possible.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent_restrict
+-- **The (8.15.3) base coherence retargeted to the (9.5) isometry** — the `hAbase` supplier of
+-- `sOf_nineEleven_coherent`.  `sOf_degreeSubfamily_coherent` already lands on the support `A(M)`;
+-- only the map differs, and `dadeIntegralCharacterMap_apply_of_support` collapses *any*
+-- `dadeIntegralCharacterMap` over a fixed `S04.Hypothesis` to that hypothesis's own `dadeMap` on
+-- supported arguments.  So the pin `dd.dade = h46.dade0.restrict …` suffices — no agreement
+-- between the two `FullDadeIsometryData` is needed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent_restrict
+-- **(9.11.1) at §9 level**: the two honest carriers of case (9.7.a) and the maximality refuter they
+-- feed.  The §13 forms (`S13.NineElevenPairBound` / `_EqualityRefutation` /
+-- `S13.caseA_refuter_of_equality_refutation`) are stated over `S13.Hypothesis`, but their only
+-- dependence on it is packaging aliases (`hyp.s11Setup`, `hyp.chief`, `mkSection11CharacterData`,
+-- `hyp.H0Cprime`, `hyp.C`) plus `tau`/`A0`, which are parameters here — so the descent is a rename,
+-- not new mathematics, and the (9.11.1) squeeze argument is unchanged.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_refuter_of_equality_refutation
+-- **The `Dmem` input of the (5.6) engine, at §9 level** — `CharacterPsiDecomposition` at `ψ = 0`
+-- built by `ofProjection` from the §9 `R`-family.  The map is the *coherent extension*, not `τ`:
+-- at `ψ = 0` the `ofProjection` obligation `tau1 χ ∈ ℤ[Irr G]` is false for the Dade map (an
+-- isometry only on the supported lattice) but is exactly `IsCoherent.extension_mem_ZIrr`.
+-- This is what lets `S08.coherentDegreeSqNormBound_of_not_coherentW_k` be fed **without**
+-- `S13.sixTwoDecompositionData`, whose μ-grid `params` exist only to manufacture these data from
+-- the §10 packaging (issue 1045).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberPsiDecomposition
+-- **The `Da` input of the (5.6) engine, at §9 level** — the break member `ψ` decomposed against the
+-- scaled anchor `a • χ₁`.  Here `tau1` *is* `τ`: the obligation is `τ (ψ − a·χ₁) ∈ ℤ[Irr G]`, and
+-- the degree match makes that difference `A₀`-supported, so
+-- `dadeIntegralCharacterMap_mem_ZIrr_of_supported` applies — the asymmetry with the `ψ = 0` member
+-- data, where the Dade map cannot serve and the coherent extension must.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_breakPsiDecomposition
+-- **The (5.2.d)/(5.2.e) decomposition supply of the (5.6) engine, at §9 level** — the §9
+-- replacement for `S13.sixTwoDecompositionData`.  All three components are immediate from the two
+-- `ofProjection` lemmas above: the two `tau1` equations hold by `rfl` (ofProjection stores the map
+-- it is given), and the family orthogonality is `sOf_memberRFamily_orthogonal`, likewise by `rfl`
+-- on the `imageFamily` fields.  The §13 version reaches the same data through the §10 μ-grid,
+-- which is what tied the (5.6) route to the packaging; here only the §9 R-family dispatch is used,
+-- so no type hypothesis appears.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_sixTwoDecompositionData
+-- **(9.11.1) preamble at §9 level**: every `𝒮(H₀C′)`-member has degree `q·d` with source degree
+-- `d ≤ u` — the `∃ d, χ(1) = q·d ∧ d ≤ u` half of `CaseAPairBound`'s conclusion.  Both ingredients
+-- (`induceHU_apply_one_eq_q_mul`, `xiOf_H0Cprime_source_apply_one_le_u`) were already type-free;
+-- §13 needs `hncH0C`/`htype` here only to rewrite `cprimeSub … = derivedInG hyp.C`, and at §9
+-- `chars.Cprime` *is* `cprimeSub data chief`, so that step disappears.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_break_source_degree
