@@ -910,6 +910,54 @@ theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
           (Subgroup.inclusion_injective hsub)
     _ = p := hyp.card_centralizer_inf_centralizer_eq hR₀S hexp hS
 
+/-- **BG Theorem E.3(b), Step 2, (E.6)**: one chain step has index exactly `p` —
+`|H| = p · |⁅R₀, H⁆|` for a nontrivial normal `H ≤ T`.
+
+Two bounds meet.  `≤`: the counting step `card_le_card_commutator_mul_prime`.  `≥`:
+`⁅R₀, H⁆ = ⁅H, R₀⁆ < H` because `S` is nilpotent and `H` is normal and nontrivial
+(`Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient`), and a *proper* subgroup of a
+`p`-group has index divisible by `p`.
+
+This is the inductive step of BG's series `T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1`, whose factors BG
+records as `|Hᵢ₋₁ : Hᵢ| = p`. -/
+theorem RegularOperatorSetup.card_eq_prime_mul_card_commutator [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {H : Subgroup ↥S} [H.Normal]
+    (hHne : H ≠ ⊥)
+    (hHT : H ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :
+    Nat.card ↥H = p * Nat.card ↥⁅hyp.R₀.subgroupOf S, H⁆ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
+  set K : Subgroup ↥S := ⁅R₀', H⁆ with hKdef
+  -- `⁅R₀, H⁆ = ⁅H, R₀⁆ < H` by nilpotency.
+  have hlt : K < H := by
+    rw [hKdef, Subgroup.commutator_comm]
+    exact OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient hHne
+  -- a proper subgroup of the `p`-group `H` has index divisible by `p`
+  have hidx_ne : (K.subgroupOf H).index ≠ 1 := fun h1 =>
+    hlt.ne (le_antisymm hlt.le
+      (Subgroup.subgroupOf_eq_top.mp (Subgroup.index_eq_one.mp h1)))
+  have hdvd : (K.subgroupOf H).index ∣ Nat.card ↥H := Subgroup.index_dvd_card _
+  obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup S).to_subgroup H |>.exists_card_eq
+  rw [hk] at hdvd
+  obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow hyp.p_prime).mp hdvd
+  have hple : p ≤ (K.subgroupOf H).index := by
+    rcases Nat.eq_zero_or_pos j with rfl | hjpos
+    · exact absurd (by simpa using hj) hidx_ne
+    · rw [hj]
+      calc p = p ^ 1 := (pow_one p).symm
+        _ ≤ p ^ j := Nat.pow_le_pow_right hyp.p_prime.pos hjpos
+  -- `|H| = |K| · [H : K] ≥ |K| · p`, and `|H| ≤ |K| · p` from the counting step.
+  have hmul : Nat.card ↥K * (K.subgroupOf H).index = Nat.card ↥H := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hlt.le).toEquiv]
+    exact Subgroup.card_mul_index _
+  have hge : Nat.card ↥K * p ≤ Nat.card ↥H := hmul ▸ Nat.mul_le_mul_left _ hple
+  have hle : Nat.card ↥H ≤ Nat.card ↥K * p :=
+    hyp.card_le_card_commutator_mul_prime hR₀S hexp hS hHT
+  rw [mul_comm p]
+  exact le_antisymm hle hge
+
 /-- **BG Theorem E.3(b), Step 2, the elided small case**: if `S' ≤ Z(S)` then `R₀ ⊄ S'`.
 
 BG dispatches `|S| ≤ p³` by *"an examination of the `p`-groups of order at most `p³`"*.  No

@@ -393,12 +393,22 @@ BG が「a short argument using the mapping `H → [R,H]` given by `x ↦ [v,x]`
 - **`RegularOperatorSetup.card_le_card_commutator_mul_prime`**: App.E 版
   `|H| ≤ |⁅R₀,H⁆| · p` (`H ≤ T`)。`R₀` の生成元 `v` と `|C_H(v)| ≤ |C_T(R₀)| = p` (E.5) を渡す。
 
+### ⭐ 同日: (E.6) の 1 段分も完了 — `card_eq_prime_mul_card_commutator`
+
+非自明正規 `H ≤ T` について **`|H| = p · |⁅R₀,H⁆|`**。2 つの評価が一致:
+- `≤` は上の計数ステップ。
+- `≥` は `⁅R₀,H⁆ = ⁅H,R₀⁆ < H` (冪零性、既存
+  `Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient` がそのまま使えた) +
+  「p 群の真部分群の指数は p で割れる」。
+
+⟹ BG の `|H_{i-1} : H_i| = p` の**帰納段が完成**。
+
 ### (E.6) の残り — 次のイテレーションの単位
 
-鎖 `H₀ = T`, `H_i = ⁅R₀, H_{i-1}⁆` を定義し、各段で `|H_{i-1} : H_i| = p` を出す:
-- `⁅R₀, H⁆ ≤ H` — `H ⊴ ↥S` から (`Subgroup.commutator_le_right` 系)。
-- `⁅R₀, H⁆ ≠ H` (`H ≠ ⊥`) — `↥S` の冪零性。mathlib に「冪零群の非自明正規部分群 `H` は
-  `⁅⊤,H⁆ < H`」の直接形があるか要実測 (無ければ `H ⊓ Z(S) ≠ ⊥` 経由)。
-- 上の 2 つ + `|H| ≤ |⁅R₀,H⁆|·p` ⟹ 指数はちょうど `p`。
-- `H_i` の A-不変性と `H_i char S` は BG が `[R,H_{i-1}]` 形で保証している点に注意
-  (`[R₀,H_{i-1}]` との一致は BG が (E.6) で主張しており、これも要形式化)。
+1. 鎖 `H₀ = T`, `H_i = ⁅R₀, H_{i-1}⁆` を **def として定義**し、各 `H_i` が
+   ⊴ `↥S` かつ `≤ T` であること (帰納の前提) を維持する。
+   ⚠ `H_i ⊴ ↥S` は `R₀'` が正規でないので自明でない — BG が `H_i = [R, H_{i-1}]` 形で
+   定義して `H_i char R` を確保しているのはそのため。**BG の主張
+   `[S, H_{i-1}] = [R₀, H_{i-1}]` を先に形式化する**のが正しい順序。
+2. 上の 1 段補題を回して `|T| = pⁿ` と鎖の存在。
+3. `H_i ≤ T` の維持: `H_1 = ⁅R₀,T⁆ ≤ T` は 1 から、以降は単調。

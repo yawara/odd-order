@@ -10907,6 +10907,18 @@ on cosets of `C_H(v)`, so `|H : C_H(v)| ≤ |⁅R₀,H⁆|`.
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.card_le_card_commutator_mul_prime
 
+/-! **BG Theorem E.3(b), Step 2, (E.6) — one chain step has index exactly `p`**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).
+`RegularOperatorSetup.card_eq_prime_mul_card_commutator`: `|H| = p · |⁅R₀, H⁆|` for a
+nontrivial normal `H ≤ T`.  Two bounds meet — `≤` from the counting step above, and `≥`
+because `⁅R₀,H⁆ = ⁅H,R₀⁆ < H` by nilpotency
+(`Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient`) and a proper subgroup of a
+`p`-group has index divisible by `p`.  This is the inductive step of BG's series
+`T = H₀ ⊃ ⋯ ⊃ Hₙ = 1` with `|Hᵢ₋₁ : Hᵢ| = p`; what (E.6) still owes is the series itself
+(and BG's identification `⁅S, Hᵢ₋₁⁆ = ⁅R₀, Hᵢ₋₁⁆`, which carries the characteristicity). -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_eq_prime_mul_card_commutator
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
