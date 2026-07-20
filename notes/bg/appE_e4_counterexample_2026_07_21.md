@@ -83,3 +83,29 @@ GPT が与えた**clean な equivalence** (親検算済、Jacobi のみ、three-
 - 計算検証スクリプト: `scratchpad/verify_q6.py` (全 pass)。Vergne classification (Numdam) 引用は
   未検証だが、反例自体は F_197 上で自己完結に検証済ゆえ classification 定理は不要。
 - ⚠ GPT 回答は鵜呑みにせず全 step を親が独立検証した (Jacobi 手計算 + Python 全数)。
+
+## ✅ 2026-07-21: PDF ページ画像で確認 (pdftotext でなく原典画像、ユーザー要請)
+
+`references/bg/local-analysis.pdf` の PDF page 171-172 (book p.158-159 = Thm E.3) と
+PDF page 175-176 (book p.162-163 = Prop E.4) を**画像で精読**。pdftotext は忠実で、
+**落ちた仮説は無い**ことを確認。反例は E.3/E.4 の印刷仮説を**全て**満たす:
+
+**Thm E.3 (p.158) の印刷仮説** (画像で確認): 「p,q distinct odd primes, R a p-group,
+R₀,R₁ nonidentity subgroups of R, B an operator group on R, A a subgroup of B. Assume
+p ∤ |B| and **|A|=q, |R₀|=p, R₁ is cyclic, C_R(R₀)=R₀×R₁**, and A fixes R₀ and acts
+regularly on R.」— 追加仮説なし。
+- 反例照合: p=197,q=7 (distinct odd ✓); R=S=Q₆群 (exp p ⟹ Ω₁(R)=R); R₀=⟨v⟩(|R₀|=p✓),
+  R₁=⟨e₅⟩(cyclic✓); B=C₄₉, A=⟨β⁷⟩(|A|=7=q✓, p∤49✓); **C_R(R₀)=R₀×R₁✓**(計算検証済);
+  A が R₀ 固定(α(v)=rv)+ fpf✓。⟹ **E.3 の全仮説成立**。
+
+**Prop E.4 (p.162) の印刷文** (画像で確認): 「Assume the situation of Theorem E.3 and let
+S=Ω₁(R). Suppose **|S|≥p⁴** (⚠ pdftotext は ">p⁴" だが原典は "≥p⁴"; 反例 p⁶≥p⁴ で無影響),
+B acts regularly on R, and B does not fix R₀. Then C_S(Z₂(S)) is abelian and has index p
+in S.」— 追加仮説なし。反例は |S|=p⁶≥p⁴, B regular, B が R₀ 非固定 を全て満たす。
+
+**(E.23) (p.163) の画像**: 「Similarly one can show that (E.23) wᵢ^β ≡ wᵢ^{tᵢ} (mod H_{i+1})
+for tᵢ=t₀tⁱ」— **証明なし**、"Similarly one can show" のみ。(E.22) (α側) は (E.16)+(E.19) から
+導出と明記されるが、(E.23) は類推だけ。
+
+⟹ **PDF 画像レベルで確定**: BG Prop E.4 は印刷どおりでは偽。gap は未証明の (E.23)。
+pdftotext に依存した誤読ではない (ユーザーの懐疑に対する直接確認)。
