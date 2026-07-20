@@ -1035,3 +1035,48 @@ refine eq_omega_of_omegaInG_normalizer_eq (hmax _ ⟨?_, ?_, ?_⟩ hSW)
 
 ⟹ これが通れば `omega_pow_eq_one` (= E.3(b) 第 1 節) が閉じ、
 **E.3(b) 第 1〜3 節 + E.3(c) が丸ごと axiom-clean**。AppE sorry 4 → 3。
+
+## ⭐⭐⭐ 2026-07-20 (19): **Step 3 完了 — BG Thm E.3 (a)(b)(c) が全て axiom-clean**
+
+`eq_omega_of_maximal` → `omega_pow_eq_one` (E.3(b) 第 1 節)。
+乗っていた E.3(b) 第 2・3 節と E.3(c) も sorried-cite が外れて完全証明に。
+**AppE sorry 4 → 3、リポジトリ全体 15 → 14。**
+
+### ⭐ 発見: BG の「矛盾」は矛盾ではなく**閉包性**だった
+
+BG は Step 3 後半を「`S ≠ Ω₁(T)` と仮定 → (E.14)-(E.16) → `Ω₁(T)` は指数 p
+→ 極大性に矛盾」と書くが、形式化すると (E.14)-(E.16) が実際に示しているのは
+
+> 族 `ExpPFamily` が写像 `S ↦ Ω₁(N_P(S))` で**閉じている**
+
+こと。極大性から直ちに `Ω₁(N_P(S)) = S` が出るので**背理法の仮定は要らず**、
+易しい分岐 (`eq_omega_of_omegaInG_normalizer_eq`) にそのまま渡せる。
+
+### 配置
+
+E.3(b) 全 3 節 + E.3(c) の宣言を `AppE_ExponentP.lean` に集約
+(証明が Step 3 に依存するため)。上流 2 leaf にはポインタコメント。名前・namespace 不変。
+
+### 検証
+
+5 宣言すべて axiom-clean (sorryAx なし) / フルビルド 4558 jobs green /
+AxiomsCheck 3540 件 OK / sorry 15 → 14。
+
+## 残り 3 sorry (AppE)
+
+| 宣言 | 書籍 | 次の着手対象 |
+|---|---|---|
+| `B_fixes_R₀_of_fixes_frattini` | **E.3(d) = BG Step 4** | ★ 次。Step 2/3 の結論を全部使える |
+| `centralizer_upperCentralSeries_abelian_index_p` | E.4 | E.3 を全部消費 |
+| `maximalSubgroups_isTypeI_or_isTypeII` | E.5 | §14 counting + Cor 15.9 |
+
+### Step 4 (E.3(d)) の筋 — BG 原文 (pdftotext L8112-8140)
+
+`S = Ω₁(R)`、`G = S ⋊ B`。(b) より `|S/S'| = p²`, `|S'| = |S|/p²`。
+`Φ(S) = S'` (S は指数 p)。`B` が `R₀S'` を固定すると仮定:
+1. `v ∈ R₀^#` の `S`-共役類は `vS'` に含まれ、(E.15) より `|S|/p²` 個
+   ⟹ **`= vS'` ちょうど**。`v², …, v^{p−1}` も同様。
+   ⟹ `R₀S' − S'` の任意の元は `R₀^#` の元に共役。
+2. ⟹ 各 `β ∈ B` で `R₀^β = R₀^x` (∃x ∈ S) ⟹ Frattini 変形で `SB = S·N_G(R₀)`。
+3. Schur–Zassenhaus で `N_G(R₀)` は `N_G(R₀) ∩ S` の補群 `B*` を含み `B* = B^y` (y ∈ S)。
+⟹ (E.15) が**ここで効く** (Step 2 では積公式に置き換えられて未使用だった)。
