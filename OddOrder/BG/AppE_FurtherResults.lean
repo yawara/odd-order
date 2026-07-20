@@ -910,6 +910,31 @@ theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
           (Subgroup.inclusion_injective hsub)
     _ = p := hyp.card_centralizer_inf_centralizer_eq hR₀S hexp hS
 
+/-- In a finite `p`-group a *proper* subgroup has index divisible by `p`, so `K < H` gives
+`p · |K| ≤ |H|`.  Used twice below, for the two ends of BG's (E.6) chain step. -/
+private theorem prime_mul_card_le_card_of_lt {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hG : IsPGroup p G) {K H : Subgroup G} (hlt : K < H) :
+    p * Nat.card ↥K ≤ Nat.card ↥H := by
+  have hidx_ne : (K.subgroupOf H).index ≠ 1 := fun h1 =>
+    hlt.ne (le_antisymm hlt.le
+      (Subgroup.subgroupOf_eq_top.mp (Subgroup.index_eq_one.mp h1)))
+  have hdvd : (K.subgroupOf H).index ∣ Nat.card ↥H := Subgroup.index_dvd_card _
+  obtain ⟨k, hk⟩ := (hG.to_subgroup H).exists_card_eq
+  rw [hk] at hdvd
+  obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hdvd
+  have hple : p ≤ (K.subgroupOf H).index := by
+    rcases Nat.eq_zero_or_pos j with rfl | hjpos
+    · exact absurd (by simpa using hj) hidx_ne
+    · rw [hj]
+      calc p = p ^ 1 := (pow_one p).symm
+        _ ≤ p ^ j := Nat.pow_le_pow_right (Fact.out : p.Prime).pos hjpos
+  have hmul : Nat.card ↥K * (K.subgroupOf H).index = Nat.card ↥H := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hlt.le).toEquiv]
+    exact Subgroup.card_mul_index _
+  calc p * Nat.card ↥K = Nat.card ↥K * p := mul_comm _ _
+    _ ≤ Nat.card ↥K * (K.subgroupOf H).index := Nat.mul_le_mul_left _ hple
+    _ = Nat.card ↥H := hmul
+
 /-- **BG Theorem E.3(b), Step 2, (E.6)**: one chain step has index exactly `p` —
 `|H| = p · |⁅R₀, H⁆|` for a nontrivial normal `H ≤ T`.
 
@@ -934,29 +959,42 @@ theorem RegularOperatorSetup.card_eq_prime_mul_card_commutator [Finite R]
   have hlt : K < H := by
     rw [hKdef, Subgroup.commutator_comm]
     exact OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient hHne
-  -- a proper subgroup of the `p`-group `H` has index divisible by `p`
-  have hidx_ne : (K.subgroupOf H).index ≠ 1 := fun h1 =>
-    hlt.ne (le_antisymm hlt.le
-      (Subgroup.subgroupOf_eq_top.mp (Subgroup.index_eq_one.mp h1)))
-  have hdvd : (K.subgroupOf H).index ∣ Nat.card ↥H := Subgroup.index_dvd_card _
-  obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup S).to_subgroup H |>.exists_card_eq
-  rw [hk] at hdvd
-  obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow hyp.p_prime).mp hdvd
-  have hple : p ≤ (K.subgroupOf H).index := by
-    rcases Nat.eq_zero_or_pos j with rfl | hjpos
-    · exact absurd (by simpa using hj) hidx_ne
-    · rw [hj]
-      calc p = p ^ 1 := (pow_one p).symm
-        _ ≤ p ^ j := Nat.pow_le_pow_right hyp.p_prime.pos hjpos
-  -- `|H| = |K| · [H : K] ≥ |K| · p`, and `|H| ≤ |K| · p` from the counting step.
-  have hmul : Nat.card ↥K * (K.subgroupOf H).index = Nat.card ↥H := by
-    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hlt.le).toEquiv]
-    exact Subgroup.card_mul_index _
-  have hge : Nat.card ↥K * p ≤ Nat.card ↥H := hmul ▸ Nat.mul_le_mul_left _ hple
+  have hge : p * Nat.card ↥K ≤ Nat.card ↥H :=
+    prime_mul_card_le_card_of_lt (hyp.R_pGroup.to_subgroup S) hlt
   have hle : Nat.card ↥H ≤ Nat.card ↥K * p :=
     hyp.card_le_card_commutator_mul_prime hR₀S hexp hS hHT
-  rw [mul_comm p]
+  rw [mul_comm p] at hge ⊢
   exact le_antisymm hle hge
+
+/-- **BG Theorem E.3(b), Step 2, (E.6)**: `⁅R₀, H⁆ = ⁅S, H⁆` for nontrivial normal `H ≤ T`.
+
+BG *asserts* the identification `Hᵢ = [R, Hᵢ₋₁] = [R₀, Hᵢ₋₁]`.  It is a **consequence** of
+the counting, not an input to it: `⁅R₀,H⁆ ≤ ⁅S,H⁆` is monotonicity, and conversely `⁅S,H⁆`
+is a proper subgroup of the `p`-group `H` (nilpotency), so
+`|⁅S,H⁆| ≤ |H|/p = |⁅R₀,H⁆|` by `card_eq_prime_mul_card_commutator`.
+
+The identification is what makes BG's chain *characteristic*: `⁅S, ·⁆` preserves normality
+in `S`, whereas `⁅R₀, ·⁆` need not, `R₀` being non-normal in `S`.  So the chain should be
+**defined** by the `⁅S, ·⁆` form and only then recognised as the `⁅R₀, ·⁆` form. -/
+theorem RegularOperatorSetup.commutator_R₀_eq_commutator_top [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {H : Subgroup ↥S} [H.Normal]
+    (hHne : H ≠ ⊥)
+    (hHT : H ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :
+    ⁅hyp.R₀.subgroupOf S, H⁆ = ⁅(⊤ : Subgroup ↥S), H⁆ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
+  have hmono : ⁅hyp.R₀.subgroupOf S, H⁆ ≤ ⁅(⊤ : Subgroup ↥S), H⁆ :=
+    Subgroup.commutator_mono le_top le_rfl
+  refine Subgroup.eq_of_le_of_card_ge hmono ?_
+  -- `⁅S,H⁆ = ⁅H,S⁆ < H`, so `p · |⁅S,H⁆| ≤ |H| = p · |⁅R₀,H⁆|`.
+  have hlt : ⁅(⊤ : Subgroup ↥S), H⁆ < H := by
+    rw [Subgroup.commutator_comm]
+    exact OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient hHne
+  have hge : p * Nat.card ↥⁅(⊤ : Subgroup ↥S), H⁆ ≤ Nat.card ↥H :=
+    prime_mul_card_le_card_of_lt (hyp.R_pGroup.to_subgroup S) hlt
+  rw [hyp.card_eq_prime_mul_card_commutator hR₀S hexp hS hHne hHT] at hge
+  exact Nat.le_of_mul_le_mul_left hge hyp.p_prime.pos
 
 /-- **BG Theorem E.3(b), Step 2, the elided small case**: if `S' ≤ Z(S)` then `R₀ ⊄ S'`.
 

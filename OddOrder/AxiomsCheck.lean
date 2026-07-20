@@ -10919,6 +10919,20 @@ because `⁅R₀,H⁆ = ⁅H,R₀⁆ < H` by nilpotency
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.card_eq_prime_mul_card_commutator
 
+/-! **BG Theorem E.3(b), Step 2, (E.6) — `⁅R₀,H⁆ = ⁅S,H⁆`** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20): `RegularOperatorSetup.commutator_R₀_eq_commutator_top`.
+
+BG *asserts* `Hᵢ = [R, Hᵢ₋₁] = [R₀, Hᵢ₋₁]` as part of (E.6).  The identification turns out to
+be a **consequence** of the counting rather than an input to it: `⊆` is monotonicity, and
+`⊇` because `⁅S,H⁆` is a proper subgroup of the `p`-group `H`, so
+`|⁅S,H⁆| ≤ |H|/p = |⁅R₀,H⁆|`.
+
+This matters structurally, not just cosmetically: `⁅S, ·⁆` preserves normality in `S` while
+`⁅R₀, ·⁆` need not (`R₀` is **not** normal in `S`), so BG's chain has to be *defined* by the
+`⁅S, ·⁆` form — which is what keeps `Hᵢ char R` — and only then recognised as `⁅R₀, ·⁆`. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.commutator_R₀_eq_commutator_top
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
