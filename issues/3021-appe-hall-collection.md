@@ -862,3 +862,28 @@ Frattini 論法の結論 `T₁ = S·C_{T₁}(v) = S·C_T(v)` を**定義に据�
    ⟹ **極大性に矛盾** ⟹ Step 3 完了 ⟹ `omega_pow_eq_one` ⟹ **E.3(b) 全体が axiom-clean**。
 
 現状 AppE の sorry = 4 (`omega_pow_eq_one` / E.3(d) / E.4 / E.5)。
+
+## 2026-07-20 (14): (E.16) の準備 — 位数公式と `C_T(v)` の同定
+
+| 宣言 | 内容 |
+|---|---|
+| `card_sup_centralizer` | **`\|T₁\|·p² = \|S\|·\|C_T(v)\|`** (T₁ = S ⊔ C_T(v)) |
+| `centralizer_singleton_subgroupOf` | `C_{↥T}(v) = (T ⊓ C_R(v)).subgroupOf T` |
+
+### (E.16) `|T:T₁| < p²` の証明筋 (次セッションはここから — 部品は全部そろっている)
+
+BG は「`v` の `T`-共役類は `|T:T₁|` 個の `S`-共役類の合併」と言うが、**S-類の融合を
+形式化する必要はない**。`T` で軌道-固定化群を 1 回使うだけでよい:
+
+1. `|T-class of v| · |C_T(v)| = |T|` — `MulAction.orbit (ConjAct ↥T) v'` と
+   `ConjAct.stabilizer_eq_centralizer` + `centralizer_singleton_subgroupOf` (今回)。
+2. `|T| = |T:T₁| · |T₁|` — `Subgroup.card_mul_index` (`T₁.subgroupOf T`)。
+3. `|T₁|·p² = |S|·|C_T(v)|` — `card_sup_centralizer` (今回)。
+4. 1,2,3 から `p² · |T-class| = |T:T₁| · |S|` (両辺 `|C_T(v)|` で約分)。
+5. `T-class ⊆ S \ {1}`: `S ⊴ T` (T ≤ N_R(S)) と `v ∈ S`, `v ≠ 1`。
+   ⟹ `|T-class| ≤ |S| − 1`。
+6. ⟹ `|T:T₁| · |S| ≤ p²·(|S|−1) < p²·|S|` ⟹ **`|T:T₁| < p²`**。
+   p 群なので `|T:T₁| ∈ {1, p}`。
+
+⚠ 5 の Lean 化で少し手間: `ConjAct.smul_def` で `t • v' = t * v' * t⁻¹` に開き、
+`Subgroup.mem_normalizer_iff` で `S` 内に留まることを言う。`≠ 1` は共役が単射だから。
