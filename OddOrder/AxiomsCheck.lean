@@ -11060,6 +11060,22 @@ book strength and is what E.3(c)'s `|S| ≤ p^q` will be closed with. -/
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.isAInvariant_iterCommutator
 
+/-! **BG Theorem E.3(b), Step 2, (E.9): the chain sections** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20).  The two inputs the induced action on `Hᵢ/Hᵢ₊₁` needs.
+
+* `RegularOperatorSetup.index_subgroupOf_chain` — the section has **order `p`**: (E.6)'s
+  factor bound `|Hᵢ| = p·|Hᵢ₊₁|` restated as the index of `Hᵢ₊₁` *inside* `Hᵢ`, which is the
+  form the quotient machinery consumes.
+* `RegularOperatorSetup.isAInvariant_subgroupOf_chain` — `Hᵢ₊₁` is `A`-invariant inside `Hᵢ`,
+  transporting `isAInvariant_iterCommutator` to the restricted action on `↥Hᵢ`.
+
+Together these feed `Isaacs.Ch03.IsAInvariant.quotientMulAutHom` (giving the action on the
+section) and then `AppE.exists_zpow_eq_of_card_eq_prime` (giving BG's eigenvalue `rᵢ`). -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.index_subgroupOf_chain
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.isAInvariant_subgroupOf_chain
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
