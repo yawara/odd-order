@@ -85,7 +85,37 @@ repo はこれを `hKsupp : (M′)^# ⊆ supportInSubgroup A₀ M` 経由の粗�
 ⟹ 型一様な (8.15.3) に必要なのは `typePA0` → `typePACore0` の置換だけでなく、
 **族を `M_s ⊄ Ker θ` 側へ絞り、その族のメンバー差が `A(M)` に台を持つことを直接証明する**こと
 (§9 の `xiSet data = {χ ∈ Irr(HU) | H ⊄ Ker χ}` と同型の絞り)。
-⚠ この支持補題は書籍の (8.15.3)/(5.3.b) の証明を読んで詰める必要がある — 推測で書かない。
+
+### ✅ 経路確定 (2026-07-20、書籍 PDF で確認) — 支持補題は既に repo に在る
+
+(8.15) の証明は「the third follows from (1.5.e) and **(5.3.b)**」(PDF 04.10 p.5 = 書籍 p.48)。
+**(5.3.b)** (PDF 04.7 p.1 = 書籍 p.25) は Hypothesis (4.6) + (5.2.a) +
+`𝒮 ⊂ {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` を仮定し、その証明の**第 1 文がまさに支持補題**:
+
+> **By (4.7), `Z[𝒮, L^#] = Z[𝒮, A]`**, and so τ is defined on `Z[𝒮, L^#]`.
+
+つまり「`H ⊄ Ker θ` で絞った族については `L^#`-supported な ℤ-結合が自動的に `A`-supported」。
+`(M′)^# ⊆ A` は**要らない** — repo が使っていた粗い経路の代わりがこれ。
+
+**repo に既にある部品** (実測):
+
+1. **(4.6) at `A = typePACore M`, `H = M_s = M_σ`** — `S10.typePACore_toHypothesis46_core`
+   (2026-07-20、本 issue 着手順 3 で landed。Coq `FT_prDade_hyp` 相当)。
+2. **(4.7) 誘導台形** — `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`
+   (`S06_CertainTypeSupport.lean:138`): `h : Hypothesis46Core A L` と
+   `χ : Irr ↥h.K` で `h.subH ⊄ Ker χ` なら `Ind_{h.K}^L χ` は `A ∪ {1}` の外で消える。
+   **`A` について引数化済**なので `A = typePACore M` でそのまま使える。
+3. 組み立て engine — `S07.irrSubcoherent` (既存 `inducedKernelFamily_subcoherent` と同じ)。
+
+**実装手順**:
+
+- (a) `M_s`-絞り族を定義: `{Ind_{M′}^M θ | θ ∈ Irr M′, M_σ ⊄ Ker θ}`
+  (§9 の `xiSet` と同型。`S08.inducedKernelFamily … ⊥` の `θ ≠ 1` 絞りとは別物)。
+- (b) 支持補題: 上記 (4.7) から「メンバーの台 ⊆ A(M) ∪ {1}」→ 差 `χ − χ̄` は
+  `1` で消える (次数が等しい) ので **台 ⊆ A(M)**。これが `hconjsupp` / `Rdatum` の入力。
+- (c) `inducedKernelFamily_subcoherent` を `hKsupp` 引数化した一般形に組み替え、
+  (b) を渡して型一様な (8.15.3) を得る (`typePACore0` 版)。
+- ⚠ P₁ 版 (`typePA0`) は既存の粗い経路のまま残してよい (signature 不変 ⟹ 下流無変更)。
 
 なお `inducedKernelFamily_subcoherent` 自体は `hKsupp` を引数化すれば `A₀` について一般化できる
 (item 1 の `typePData_toHypothesis46_ofSupport` と同じ形) ので、**族の絞りと支持補題が本体**。
