@@ -131,6 +131,43 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 後者は §8 の file が §9 を import することになるので、**新 leaf が素直**
 (例 `S11_NineElevenSubcoherentBridge.lean`)。
 
+### 橋渡し補題の実装レシピ (2026-07-20 に全部品を実測、次 session はそのまま書ける)
+
+```
+theorem sOf_subset_inducedNonKernelFamily [Finite G]
+    (hG : IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    sOf data Y ⊆ S10.inducedNonKernelFamily ((derivedInG M).subgroupOf M)
+                   ((BG.Ch3.S10.Msigma M).subgroupOf M)
+```
+
+定義 (実測):
+- `huSub data = (data.H ⊔ data.U).subgroupOf M` (ChiefFactorCore:45)
+- `hInHu data = (data.H.subgroupOf M).subgroupOf (huSub data)` (同:72)
+- `xiSet data = {χ | ¬ (hInHu data ⊆ Ker χ)}` (同:77)
+- `xiOf data Y = {χ ∈ xiSet data | ((Y.subgroupOf M).subgroupOf (huSub data)) ⊆ Ker χ}` (同:83)
+- `S10.inducedNonKernelFamily K H' = {φ | ∃ θ : Irr ↥K, ¬(H'.subgroupOf K ⊆ Ker θ) ∧ φ = induce K θ}`
+
+手順:
+1. `intro φ ⟨χ, hχ, rfl⟩`。
+2. **まず `huSub data` の上で示す**:
+   `induceHU data χ ∈ S10.inducedNonKernelFamily (huSub data) ((Msigma M).subgroupOf M)`
+   - witness は `χ` 自身、等式は `induceHU_eq_induce data _`。
+   - 絞りの含意: 示すのは `¬ (((Msigma M).subgroupOf M).subgroupOf (huSub data) ⊆ Ker χ)`。
+     `hχ.1 : ¬ (hInHu data ⊆ Ker χ)` と
+     **`hInHu data ≤ ((Msigma M).subgroupOf M).subgroupOf (huSub data)`** から対偶で出る。
+     後者は `data.H ≤ Msigma M` (= `M_F ≤ M_σ`,
+     `BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM` + `data.typeP.H_eq`) を
+     `Subgroup.subgroupOf` の単調性で 2 段持ち上げる。
+3. **型の transport**: `huSub data` と `(derivedInG M).subgroupOf M` は
+   **命題的に等しいだけ** (`huSub_eq_derivedInG_subgroupOf`) なので、
+   `↥(huSub data)` と `↥((derivedInG M).subgroupOf M)` は別の型。
+   ⟹ repo 既存の流儀どおり **`hKeq ▸ h`** で運ぶ
+   (`S15_SSetMemberRFamily.lean:80-85` が `inducedKernelFamily` で同じことをしている実例)。
+   `inducedNonKernelFamily` も `K` が explicit 引数なので同じ形で通るはず。
+
+⚠ 置き場は前述のとおり新 leaf (S10_SubcoherentTypeP と S11_.../ChiefFactorCore は兄弟)。
+
 ### ⛏ 残り = 着手順 1 (§9 レベルの (9.11) statement 本体)
 
 形: `(data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)`
