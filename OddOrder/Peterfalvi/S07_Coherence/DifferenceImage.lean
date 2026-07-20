@@ -797,6 +797,30 @@ open OddOrder.RepresentationTheory
 variable {τ : IntegralCharacterMap L G} {χ ψ : ClassFunction L ℂ}
 variable [Fintype G] [Invertible (Nat.card G : ℂ)]
 
+/-- **Transport an image family along an equality of integral character maps.**
+
+Only `image_eq` mentions `τ`, so `imageSet`/`mem_ZIrr`/`orthonormal` carry over verbatim and
+`(R.congrTau h).imageSet` is *definitionally* `R.imageSet`.  That matters because `Orthogonal` is
+stated purely in terms of `imageSet`, so orthogonality proved for the source family applies to the
+transported one without further work.
+
+The use is the (5.6)/(6.2) plumbing: the certain-type `R`-families are produced for a Hypothesis
+(4.6)'s stored isometry `h.tau`, while the norm-weighted engines hardcode
+`hyp.fullDadeIsometryData hconj`.  Those are equal but not syntactically so, and rewriting the
+*hypotheses* instead breaks the dependent occurrences (`IsCoherent.extension` in the per-member
+clauses); transporting the family is the seam that stays local. -/
+def congrTau {τ₁ τ₂ : IntegralCharacterMap L G} (h : τ₁ = τ₂)
+    (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ₁ χ) :
+    OrthonormalCharacterImageFamily (L := L) (G := G) τ₂ χ where
+  imageSet := R.imageSet
+  mem_ZIrr := R.mem_ZIrr
+  orthonormal := R.orthonormal
+  image_eq := by rw [← h]; exact R.image_eq
+
+@[simp] theorem congrTau_imageSet {τ₁ τ₂ : IntegralCharacterMap L G} (h : τ₁ = τ₂)
+    (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ₁ χ) :
+    (R.congrTau h).imageSet = R.imageSet := rfl
+
 /-- The squared norm of an element of `R(χ)` is `1`. -/
 theorem inner_self_of_mem (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     {α : ClassFunction G ℂ} (hα : α ∈ R.imageSet) :
