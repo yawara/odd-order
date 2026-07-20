@@ -461,6 +461,111 @@ noncomputable local instance higmanLemmaElevenLayerZModTwoModule
     Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
   lowerCentralLayerZmodModule H i
 
+/-- **Higman Lemma 11 (p. 88), nonzero bracket seed.**
+
+The full span of the actual lower-central commutator supplies a nonzero
+bracket of two vectors in the canonical first-layer conjugate basis.  A
+nonzero coordinate in the canonical second-layer basis then identifies its
+exact actor weight.  No gap, primitive-root, or equal-degree assumption is
+used at this selection step. -/
+theorem exists_lowerCentralConjugateBasisBracketCoordinate
+    {K L H C : Type uCommonField}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [Algebra (ZMod 2) L]
+    [Group H] [Group C]
+    (phi : C →* MulAut H) (c : C)
+    (eOne : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
+    (lambda : L)
+    (hcompatOne : ∀ v,
+      eOne (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda * eOne v)
+    (eTwo : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] K)
+    (nu : K) (iota : K →ₐ[ZMod 2] L)
+    (hcompatTwo : ∀ v,
+      eTwo (lowerCentralLayerRepresentation phi 1 c v) = nu * eTwo v) :
+    let bOne := conjugateTensorBasisOfLinearEquiv L eOne
+    let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+    ∃ i j s,
+      lowerCentralCommutatorBilinearBaseChange L H
+          (bOne i) (bOne j) ≠ 0 ∧
+      bTwo.repr
+          (lowerCentralCommutatorBilinearBaseChange L H
+            (bOne i) (bOne j)) s ≠ 0 ∧
+      lambda ^ (2 ^ i.val + 2 ^ j.val) =
+        (iota nu) ^ (2 ^ s.val) := by
+  classical
+  let bOne := conjugateTensorBasisOfLinearEquiv L eOne
+  let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+  let TOne : Module.End L
+      (L ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) :=
+    (lowerCentralLayerRepresentation phi 0 c).baseChange L
+  let TTwo : Module.End L
+      (L ⊗[ZMod 2] Additive (lowerCentralLayer H 1)) :=
+    (lowerCentralLayerRepresentation phi 1 c).baseChange L
+  let beta := lowerCentralCommutatorBilinearBaseChange L H
+  have hbOne (i : Fin (finrank (ZMod 2) L)) :
+      TOne (bOne i) = lambda ^ (2 ^ i.val) • bOne i := by
+    exact baseChange_eigen_conjugateTensorBasisOfLinearEquiv
+      L eOne (lowerCentralLayerRepresentation phi 0 c)
+      lambda hcompatOne i
+  have hbTwo (s : Fin (finrank (ZMod 2) K)) :
+      TTwo (bTwo s) = (iota nu) ^ (2 ^ s.val) • bTwo s := by
+    simpa only [map_pow] using
+      (baseChange_eigen_conjugateTensorBasisAlongOfLinearEquiv
+        K L iota eTwo (lowerCentralLayerRepresentation phi 1 c)
+        nu hcompatTwo s)
+  have hbracket : ∃ i j : Fin (finrank (ZMod 2) L),
+      beta (bOne i) (bOne j) ≠ 0 := by
+    by_contra hnone
+    push Not at hnone
+    have hnone' : ∀ i j : Fin (finrank (ZMod 2) L),
+        beta (bOne i) (bOne j) = 0 := hnone
+    have hmap2 : Submodule.map₂ beta ⊤ ⊤ ≤ ⊥ := by
+      rw [← bOne.span_eq, Submodule.map₂_span_span]
+      apply Submodule.span_le.mpr
+      rintro _ ⟨_, ⟨i, rfl⟩, _, ⟨j, rfl⟩, rfl⟩
+      change beta (bOne i) (bOne j) = 0
+      exact hnone' i j
+    have hspan := lowerCentralCommutatorBilinearBaseChange_span_eq_top L H
+    have htopBot : (⊤ : Submodule L
+        (L ⊗[ZMod 2] Additive (lowerCentralLayer H 1))) = ⊥ := by
+      rw [← hspan]
+      apply le_antisymm
+      · apply Submodule.span_le.mpr
+        rintro _ ⟨z, rfl⟩
+        exact hmap2
+          (Submodule.apply_mem_map₂ beta Submodule.mem_top Submodule.mem_top)
+      · exact bot_le
+    let s0 : Fin (finrank (ZMod 2) K) := ⟨0, Module.finrank_pos⟩
+    have hbmem : bTwo s0 ∈ (⊥ : Submodule L
+        (L ⊗[ZMod 2] Additive (lowerCentralLayer H 1))) := by
+      rw [← htopBot]
+      exact Submodule.mem_top
+    have hbzero : bTwo s0 = 0 := by simpa using hbmem
+    exact bTwo.ne_zero s0 hbzero
+  obtain ⟨i, j, hij⟩ := hbracket
+  let z := beta (bOne i) (bOne j)
+  have hz : z ≠ 0 := by simpa only [z] using hij
+  have hzrepr : bTwo.repr z ≠ 0 := by
+    intro hzero
+    apply hz
+    apply bTwo.repr.injective
+    simpa only [map_zero] using hzero
+  obtain ⟨s, hs⟩ := Finsupp.ne_iff.mp hzrepr
+  simp only [Finsupp.zero_apply] at hs
+  have hzEigen :
+      TTwo z = lambda ^ (2 ^ i.val + 2 ^ j.val) • z := by
+    simpa only [TOne, TTwo, beta, z, ← pow_add] using
+      (lowerCentralCommutatorBilinearBaseChange_eigenweight
+        L phi c
+        (lambda ^ (2 ^ i.val)) (lambda ^ (2 ^ j.val))
+        (bOne i) (bOne j) (hbOne i) (hbOne j))
+  refine ⟨i, j, s, hij, ?_, ?_⟩
+  · simpa only [beta, z] using hs
+  · exact eigenvalue_eq_of_basis_repr_ne_zero
+      TTwo bTwo (fun t => (iota nu) ^ (2 ^ t.val)) hbTwo
+      hzEigen s hs
+
 /-- **Higman Lemma 11 (pp. 88--89), actual bracket-support step.**
 
 Every nonzero value of the actual first lower-central commutator pairing on
