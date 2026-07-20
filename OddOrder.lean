@@ -416,6 +416,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_FurtherResults
+import OddOrder.BG.AppE_RegularOperator
 import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField

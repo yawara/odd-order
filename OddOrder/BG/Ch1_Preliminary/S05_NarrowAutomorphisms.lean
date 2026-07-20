@@ -328,19 +328,23 @@ private theorem card_inf_critical_centralizer_eq_prime
   · exact absurd h hcard_ne1
   · exact h
 
-/-- **Chain factor counting (BG (5.6) step)**: if every `⁅v,·⁆`-commutator of `M` lands
-in `N` and the `v`-centralizer inside `M` has order at most `m`, then `|M| ≤ |N| · m`:
-the map `x ↦ ⁅v, x⁆` is constant exactly on left cosets of `C_M(v)`, hence induces an
-injection `M ⧸ C_M(v) ↪ N`. mmd L1907-1913.
+/-- **Chain factor counting, injection form (BG (5.6) step)**: if every `⁅v,·⁆`-commutator
+of `M` lands in `N`, then `|M : C_M(v)| ≤ |N|`.
 
-Pure counting: no `p`-group, oddness or narrowness hypothesis. Besides Theorem 5.5's own
-`H_i` chain it is also what drives App.E's (E.6) chain `H_i = ⁅R₀, H_{i-1}⁆`, so it is
-public rather than `private` (cross-file `private` is against the repo's conventions). -/
-theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
-    [Finite R] {M N : Subgroup R} {v : R} {m : ℕ}
-    (hcomm : ∀ x ∈ M, ⁅v, x⁆ ∈ N)
-    (hcent : Nat.card ↥(Subgroup.centralizer ({v} : Set R) ⊓ M) ≤ m) :
-    Nat.card ↥M ≤ Nat.card ↥N * m := by
+The map `x ↦ ⁅v, x⁆` is constant exactly on left cosets of `C_M(v)`, hence induces an
+**injection** `M ⧸ C_M(v) ↪ N`. mmd L1907-1913.
+
+Pure counting: no `p`-group, oddness or narrowness hypothesis, and no bound on the
+centralizer.  This is the sharp form; `card_le_card_mul_of_commutator_mem_of_card_centralizer_le`
+is the immediate corollary once `|C_M(v)|` is bounded.
+
+⚠ The index bound is what App.E's (E.12) needs: there the counting is *tight*, so the
+injection is a bijection, and that is what forces `⁅v, x⁆ ∈ H_{i+1} ↔ x ∈ H_i` — a step BG
+asserts without proof when it writes "`⟨w̄ᵢ⟩ = H̄ᵢ`". -/
+theorem index_centralizer_le_card_of_commutator_mem
+    [Finite R] {M N : Subgroup R} {v : R}
+    (hcomm : ∀ x ∈ M, ⁅v, x⁆ ∈ N) :
+    ((Subgroup.centralizer ({v} : Set R) ⊓ M).subgroupOf M).index ≤ Nat.card ↥N := by
   classical
   set C' : Subgroup ↥M :=
     (Subgroup.centralizer ({v} : Set R) ⊓ M).subgroupOf M with hC'_def
@@ -406,9 +410,21 @@ theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
     intro x y h
     have hxy : ⁅v, (x : R)⁆ = ⁅v, (y : R)⁆ := congrArg Subtype.val h
     exact Quotient.sound ((QuotientGroup.leftRel_apply).mpr ((key x y).mp hxy))
-  have hindex_le : C'.index ≤ Nat.card ↥N := by
-    have : Nat.card (↥M ⧸ C') ≤ Nat.card ↥N := Nat.card_le_card_of_injective F hF_inj
-    simpa [Subgroup.index] using this
+  have : Nat.card (↥M ⧸ C') ≤ Nat.card ↥N := Nat.card_le_card_of_injective F hF_inj
+  simpa [hC'_def, Subgroup.index] using this
+
+/-- **Chain factor counting (BG (5.6) step)**: if every `⁅v,·⁆`-commutator of `M` lands
+in `N` and the `v`-centralizer inside `M` has order at most `m`, then `|M| ≤ |N| · m`.
+
+Immediate from the sharp `index_centralizer_le_card_of_commutator_mem` together with the
+bound on `|C_M(v)|`. -/
+theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
+    [Finite R] {M N : Subgroup R} {v : R} {m : ℕ}
+    (hcomm : ∀ x ∈ M, ⁅v, x⁆ ∈ N)
+    (hcent : Nat.card ↥(Subgroup.centralizer ({v} : Set R) ⊓ M) ≤ m) :
+    Nat.card ↥M ≤ Nat.card ↥N * m := by
+  set C' : Subgroup ↥M :=
+    (Subgroup.centralizer ({v} : Set R) ⊓ M).subgroupOf M with hC'_def
   have hC'_card : Nat.card C' ≤ m := by
     rw [hC'_def]
     calc Nat.card ↥((Subgroup.centralizer ({v} : Set R) ⊓ M).subgroupOf M)
@@ -416,7 +432,8 @@ theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
           Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_right).toEquiv
       _ ≤ m := hcent
   calc Nat.card ↥M = C'.index * Nat.card C' := (C'.index_mul_card).symm
-    _ ≤ Nat.card ↥N * m := Nat.mul_le_mul hindex_le hC'_card
+    _ ≤ Nat.card ↥N * m :=
+        Nat.mul_le_mul (index_centralizer_le_card_of_commutator_mem hcomm) hC'_card
 
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **BG Theorem 5.5, `r(R) ≥ 3` chain machinery** (mmd L1905-1917): for a narrow

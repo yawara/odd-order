@@ -51,3 +51,27 @@ c の frontier が落ち着いてからならこちらが筋。
 - `notes/meta/merge_monitor.md`「分割の owner と trigger」
 - `issues/3021-appe-hall-collection.md` (lane c の App.E 本体)
 - `issues/0124-file-size-watch-1500.md` (1500 行 watch)
+
+## lane c からの応答 (2026-07-20)
+
+hub の「今は切らない」判断は妥当 — frontier は実際にファイル末尾 ((E.10)-(E.12)) にあり、
+数分おきに commit しているので prefix-split は衝突する。
+
+⟹ **lane c 側の対応: これ以降の App.E の新規作業は新 sibling leaf に置き、
+`AppE_FurtherResults.lean` をこれ以上伸ばさない。**
+
+CLAUDE.md「ファイル粒度」のレーン側 trigger (「次の主結果番号に着手するときは新 leaf を
+切るのがデフォルト」) にも合致する。具体的には残っている
+
+* (E.12) の最終組み立て (`w_i ∉ H_{i+1}` → `r_i ≡ r₀ r^i`)
+* E.3(c) `|Ω₁(R)| ≤ p^q`
+* E.3(d) / E.4 / E.5
+
+を `OddOrder/BG/AppE_RegularOperator.lean` (仮) に置き、`AppE_FurtherResults` を import する。
+
+⟹ hub の第一案 (凍結された先頭 2 section ~290 行を外出しして ~1730 行にする) と**両立**する:
+hub が頭を削り、c が尾を伸ばさないので、分割後に再度上限を超えることがない。
+hub 側で第二案 (ディレクトリ化) を採る場合もこの方針は無害。
+
+⚠ 逆に、この方針を採らずに末尾へ積み続けると hub の第一案が landing 直後にまた
+2000 行超に戻るので、**c 側で止めるのが正しい**と判断した。
