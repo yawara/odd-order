@@ -940,6 +940,7 @@ theorem induce_chiRestrict_injective [NeZero (Nat.card h.W1)] [Finite ↥h.K] :
   exact (h.chiRestrict_injective
     (induce_injective_of_inertia_stable (h.chiRestrict_conjBy_eq χ₂) heq)).symm
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.b), inertia computation**: a `χ ∈ Irr(K)` that is none of the `χ_j` has full
 inertia group `I_L(χ) = K`.  Write `ℓ ∈ I_L(χ)` as `ℓ = k·w` (`k ∈ K`, `w ∈ W₁`) via the complement
 `L = K ⋊ W₁`; then `w = k⁻¹ℓ ∈ I_L(χ)`.  If `w ≠ 1` then `w ∈ W₁^#` fixes `χ`
@@ -965,6 +966,7 @@ theorem inertia_eq_K_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
         ((h.mem_inertia_iff_isFixedPt_conjByPerm u χ).mp huI))
       (not_exists.mpr hχ)
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.b), first sentence**: for `χ ∈ Irr(K)` not among the `χ_j`, the induced
 character `Ind^L_K χ` is irreducible.  Immediate from `I_L(χ) = K`
 (`inertia_eq_K_of_forall_chiRestrict_ne`) and [Is] Theorem 6.34
@@ -999,6 +1001,7 @@ theorem induce_ne_certainType_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
   rw [heq, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hinner
   exact one_ne_zero hinner
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.b), exhaustion**: every irreducible character `μ` of `L` is either a
 certain-type character `μ_{ij}` or `Ind^L_K χ` for some `χ ∈ Irr(K)` not among the `χ_j`.
 
@@ -1088,6 +1091,7 @@ theorem induce_chiRestrict_not_isIrreducible [NeZero (Nat.card h.W1)]
     ((heq ⟨0, by omega⟩).symm.trans (heq ⟨1, h1⟩))
   simp [Fin.ext_iff] at hcontra
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.b), reducibility criterion**: for `χ ∈ Irr(K)`, the induced character
 `Ind^L_K χ` is reducible iff `χ` is one of the `χ_j`.  Forward is the contrapositive of
 `induce_isIrreducible_of_forall_chiRestrict_ne`; the reverse is
@@ -1104,7 +1108,7 @@ theorem induce_not_isIrreducible_iff [NeZero (Nat.card h.W1)]
   · rintro ⟨χ₂, rfl⟩
     exact h.induce_chiRestrict_not_isIrreducible χ₂
 
-set_option linter.unusedFintypeInType false in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.5.b), reducible-induction count**: exactly `w₂ = |W₂|` of the irreducible
 characters `χ ∈ Irr(K)` induce a *reducible* character of `L` — namely the `w₂` distinct `χ_j`.
 This is the count behind Peterfalvi (9.9.b)/(9.8.b): under the (8.4.d) realization of `𝒮(H₀)` as
@@ -1124,6 +1128,7 @@ theorem card_reducible_induce_eq_W2 [NeZero (Nat.card h.W1)] :
   obtain ⟨χ₂, hχ₂⟩ := (h.induce_not_isIrreducible_iff χ).mp hχ
   exact ⟨χ₂, Subtype.ext hχ₂⟩
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 set_option linter.unusedFintypeInType false in
 /-- **`induce` is injective on the reducible-inducing irreducibles** (issue 1012, (9.9.b)
 source↔image, general form): if `χ, χ' ∈ Irr(K)` both induce *reducible* characters of `L` and

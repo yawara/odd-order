@@ -572,7 +572,7 @@ variable {L : Type*} [Group L] [Fintype L] (h : Hypothesis L)
   [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)]
   [NeZero (Nat.card h.W1)] [NeZero (Nat.card h.W2)]
 
-omit [NeZero (Nat.card ↥h.W2)] in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] [NeZero (Nat.card ↥h.W2)] in
 /-- **Peterfalvi (4.5.b) `prTIres_irr_cases`, assembled.**  Every `χ ∈ Irr(K)` is either a residue
 `χ_j` (`= chiRestrict χ₂` for some `W₂`-column `χ₂`) or induces to a *fresh* irreducible of `L`
 distinct from every certain-type character `μ_{ij}`.  The residue case is by definition; the
