@@ -68,6 +68,43 @@ theorem galoisField_linearMap_finrank (n : ℕ) (hn : n ≠ 0) :
     Module.finrank_self, mul_one]
   exact GaloisField.finrank 2 hn
 
+/-- `x ↦ x^{2^i}` as a `ZMod 2`-linear endomorphism of `GaloisField 2 n`.  Built
+from the additive homomorphism of the Frobenius power; the `ZMod 2`-linearity is
+automatic (`ZMod.map_smul`). -/
+def frobLin (n : ℕ) (i : ℕ) : GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n :=
+  { (frobeniusEquiv (GaloisField 2 n) 2 ^ i).toRingHom.toAddMonoidHom with
+    map_smul' :=
+      ZMod.map_smul (frobeniusEquiv (GaloisField 2 n) 2 ^ i).toRingHom.toAddMonoidHom }
+
+@[simp] theorem frobLin_apply (n i : ℕ) (x : GaloisField 2 n) :
+    frobLin n i x = (frobeniusEquiv (GaloisField 2 n) 2 ^ i) x := rfl
+
+/-- The `n` Frobenius endomorphisms are `GaloisField 2 n`-linearly independent
+(transported from `frobenius_powers_linearIndependent` through the injective
+coefficient map). -/
+theorem frobLin_linearIndependent (n : ℕ) (hn : n ≠ 0) :
+    LinearIndependent (GaloisField 2 n) (fun i : Fin n => frobLin n i) := by
+  have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
+    simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn
+  have h1a := frobenius_powers_linearIndependent (F := GaloisField 2 n) n hcard
+  let φ : (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) →ₗ[GaloisField 2 n]
+      (GaloisField 2 n → GaloisField 2 n) :=
+    { toFun := fun f => (f : GaloisField 2 n → GaloisField 2 n)
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl }
+  exact LinearIndependent.of_comp φ h1a
+
+/-- **The Frobenius basis.**  The `n` powers `frobLin n i` form a
+`GaloisField 2 n`-basis of the `ZMod 2`-linear endomorphisms of
+`GaloisField 2 n`.  Hence every `ZMod 2`-linear map is a unique Frobenius
+polynomial `Σᵢ cᵢ · x^{2^i}` — the normal form powering the mixed-term
+functional-equation argument. -/
+noncomputable def frobeniusBasis (n : ℕ) (hn : n ≠ 0) :
+    Basis (Fin n) (GaloisField 2 n) (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
+  haveI : NeZero n := ⟨hn⟩
+  basisOfLinearIndependentOfCardEqFinrank (frobLin_linearIndependent n hn)
+    (by rw [Fintype.card_fin, galoisField_linearMap_finrank n hn])
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
