@@ -940,6 +940,38 @@ theorem sOf_sixTwoDecompositionData [Finite G] {M : Subgroup G} {A : Set G}
     (OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hχbot hψcbot
       (fun h => hψcnotS₁ (h ▸ hχS₁)))
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.1) preamble, the break-member degree dictionary at §9 level**: every member
+of `𝒮(H₀C′)` has degree `q·d` for a source degree `d ≤ u`.
+
+This is the `∃ d, χ(1) = q·d ∧ d ≤ u` half of `CaseAPairBound`'s conclusion — book (9.11.1)'s
+`χ(1) ≤ 2q²aχ(1) ≤ 2q²au` step reading `χ(1) = q·d` with `d = ζ(1) ≤ [HU:HC] = u` (Coq `lb01`'s
+degree dictionary: `ζ|_{HC}` has a linear constituent since `(HC)′ ≤ H₀C′`).
+
+Both ingredients are already type-free: `induceHU_apply_one_eq_q_mul` for the index factor and
+`xiOf_H0Cprime_source_apply_one_le_u` for the source bound.  The §13 form
+(inside `S13.nineElevenPairBound`) additionally rewrites `cprimeSub … = derivedInG hyp.C` through
+`C_eq_cSub_of_noncoherent`, which is where its `hncH0C`/`htype` hypotheses enter; at §9
+`chars.Cprime` *is* `cprimeSub data chief`, so that step — and with it the type hypothesis —
+disappears. -/
+theorem caseA_break_source_degree [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    {ψ : ClassFunction ↥M ℂ} (hψ : ψ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief)) :
+    ∃ d : ℕ, ((ψ : ↥M → ℂ) 1 = ((data.q * d : ℕ) : ℂ)) ∧ d ≤ chars.u := by
+  classical
+  obtain ⟨ζ, hζ, rfl⟩ := hψ
+  obtain ⟨d, -, hdζ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ζ
+  refine ⟨d, ?_, ?_⟩
+  · rw [induceHU_apply_one_eq_q_mul, hdζ]
+    push_cast
+    ring
+  · have hduC := xiOf_H0Cprime_source_apply_one_le_u chars hζ
+    rw [hdζ] at hduC
+    have h := (Complex.le_def.mp hduC).1
+    rw [Complex.natCast_re, Complex.natCast_re] at h
+    exact_mod_cast h
+
 /-! ### (9.11.1): the case (9.7.a) maximality refuter, at §9 level
 
 The §13 forms (`S13.NineElevenPairBound`, `S13.NineElevenEqualityRefutation`,
