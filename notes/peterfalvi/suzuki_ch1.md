@@ -448,8 +448,10 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       既存 normalization chain が shift を隠さないよう、`PairGap` の正規化については
       第2層 coordinate が original coordinate の何乗 Frobenius shift かを exact equality
       付きで返す strong sibling theorem を追加し、従来 API はその projection とした。
-      次は `ProperExtension` の anchored-trace construction 内で加わる第2の shift を同様に
-      公開し、二つの shift を合成して prescribed kernel coordinate へ戻す。
+      `ProperExtension` の anchored-trace construction 内で加わる第2の shift も exact
+      equality 付き strong sibling で公開し、従来 API は projection とした。従って次は
+      この二つの shift を合成し、上記 counter-shift 補題で prescribed kernel coordinate
+      へ戻した source-facing factor coordinate endpoint を組み立てる段階である。
       Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
       caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
       invariant factor への restricted action の faithful range でも generator のまま

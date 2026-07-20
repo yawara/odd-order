@@ -598,7 +598,140 @@ square map.
 The first-layer square formula and the two cyclic conjugate bases are the
 outputs of the Singer-coordinate and bracket-support arguments.  The
 second-layer ground coordinate is shifted internally to the selected bracket
-anchor; it is not postulated as an additional coordinate system. -/
+anchor; it is not postulated as an additional coordinate system.  This strong
+form records that shift exactly. -/
+theorem exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData_with_secondShift
+    {P : Type u} [Group P] [Finite P]
+    (hAgemo : Agemo P 2 1 = lowerCentralTerm P 1)
+    {K : Type uK} {L : Type uL}
+    [Field K] [Finite K] [CharP K 2] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [CharP L 2] [Algebra (ZMod 2) L]
+    [Algebra K L]
+    (iota : K →ₐ[ZMod 2] L)
+    (hiota : ∀ z : K, iota z = algebraMap K L z)
+    (d : Nat)
+    [NeZero (finrank (ZMod 2) K)]
+    [NeZero (d * finrank (ZMod 2) K)]
+    (hn : 0 < finrank (ZMod 2) K) (hd : 0 < d)
+    (hcardK : Nat.card K = 2 ^ finrank (ZMod 2) K)
+    (hfinKL : finrank K L = d)
+    (hfinL : finrank (ZMod 2) L = d * finrank (ZMod 2) K)
+    (eOne : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2] L)
+    (bOne : Basis (Fin (d * finrank (ZMod 2) K)) L
+      (L ⊗[ZMod 2] Additive (lowerCentralLayer P 0)))
+    (hq : ∀ x,
+      lowerCentralSquareMapBaseChange L P
+          (lowerCentralSquaresLieInSecond_of_agemo_eq P hAgemo) x =
+        ∑ i : Fin (d * finrank (ZMod 2) K),
+          ∑ j : Fin (d * finrank (ZMod 2) K) with i < j,
+            (eOne x) ^ (2 ^ i.val + 2 ^ j.val) •
+              lowerCentralCommutatorBilinearBaseChange L P
+                (bOne i) (bOne j))
+    (hcycleOne : ∀ i,
+      frobeniusScalarBaseChange L (bOne i) =
+        bOne (higmanCyclicSucc (Nat.mul_pos hd hn) i))
+    (eTwo : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] K)
+    (bTwo : Basis (Fin (finrank (ZMod 2) K)) L
+      (L ⊗[ZMod 2] Additive (lowerCentralLayer P 1)))
+    (hbTwo : bTwo =
+      conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo)
+    (hcycleTwo : ∀ s,
+      frobeniusScalarBaseChange L (bTwo s) =
+        bTwo (higmanCyclicSucc hn s))
+    (a : Fin (d * finrank (ZMod 2) K))
+    (s₀ : Fin (finrank (ZMod 2) K))
+    (r : Fin (d * finrank (ZMod 2) K))
+    (hr0 : r ≠ 0) (hrtwo : r + r ≠ 0)
+    (epsilon : L)
+    (hseed : lowerCentralCommutatorBilinearBaseChange L P
+        (bOne a) (bOne (a + r)) = epsilon • bTwo s₀)
+    (hsymm : ∀ i j,
+      lowerCentralCommutatorBilinearBaseChange L P
+          (bOne i) (bOne j) =
+        lowerCentralCommutatorBilinearBaseChange L P
+          (bOne j) (bOne i))
+    (hsupport : ∀ i j,
+      j ≠ i + r → i ≠ j + r →
+        lowerCentralCommutatorBilinearBaseChange L P
+          (bOne i) (bOne j) = 0) :
+    ∃ eTwoShift : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] K,
+      eTwoShift = eTwo.trans
+        (((FiniteField.frobeniusAlgEquivOfAlgebraic
+          (ZMod 2) K) ^ s₀.val).toLinearEquiv) ∧
+      ∀ alpha : L,
+        lowerCentralSquareMapAdditive P
+            (lowerCentralSquaresLieInSecond_of_agemo_eq P hAgemo)
+            (eOne.symm alpha) =
+          eTwoShift.symm
+            (Algebra.trace K L
+              (alpha ^ (2 ^ a.val) *
+                (alpha ^ (2 ^ a.val)) ^ (2 ^ r.val) * epsilon)) := by
+  obtain ⟨eTwoShift, heTwoShift, hTwoExpansionShiftCanonical⟩ :=
+    exists_shiftedSecondLinearEquiv_expansion_with_shift iota eTwo s₀
+  have hTwoExpansionShiftCanonical' : ∀ z : K,
+      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
+        ∑ s : Fin (finrank (ZMod 2) K),
+          (iota z) ^ (2 ^ s.val) •
+            (conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo)
+              (s₀ + s) := by
+    intro z
+    simpa only [RingHom.algebraMap_toAlgebra, AlgHom.toRingHom_eq_coe,
+      AlgHom.coe_toRingHom] using hTwoExpansionShiftCanonical z
+  have hTwoExpansionShift : ∀ z : K,
+      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
+        ∑ s : Fin (finrank (ZMod 2) K),
+          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
+    intro z
+    calc
+      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
+          ∑ s : Fin (finrank (ZMod 2) K),
+            (iota z) ^ (2 ^ s.val) •
+              (conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo)
+                (s₀ + s) := hTwoExpansionShiftCanonical' z
+      _ = ∑ s : Fin (finrank (ZMod 2) K),
+          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
+        simp only [hiota, hbTwo]
+  refine ⟨eTwoShift, heTwoShift, ?_⟩
+  let hSq := lowerCentralSquaresLieInSecond_of_agemo_eq P hAgemo
+  let q : L → Additive (lowerCentralLayer P 1) := fun alpha ↦
+    lowerCentralSquareMapAdditive P hSq (eOne.symm alpha)
+  let iotaAdd : K →+ Additive (lowerCentralLayer P 1) :=
+    eTwoShift.symm.toLinearMap.toAddMonoidHom
+  intro alpha
+  have hqAlpha :
+      (1 : L) ⊗ₜ[ZMod 2] q alpha =
+        ∑ i : Fin (d * finrank (ZMod 2) K),
+          ∑ j : Fin (d * finrank (ZMod 2) K) with i < j,
+            alpha ^ (2 ^ i.val + 2 ^ j.val) •
+              lowerCentralCommutatorBilinearBaseChange L P
+                (bOne i) (bOne j) := by
+    change lowerCentralSquareMapBaseChange L P hSq (eOne.symm alpha) = _
+    simpa only [eOne.apply_symm_apply] using hq (eOne.symm alpha)
+  have htrace := squareMap_eq_trace_of_anchored_singleGap
+    (lowerCentralCommutatorBilinear P)
+    (finrank (ZMod 2) K) d hn hd hcardK hfinKL hfinL
+    bOne bTwo hcycleOne hcycleTwo
+    a s₀ r hr0 hrtwo epsilon
+    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hseed)
+    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hsymm)
+    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hsupport)
+    q iotaAdd
+    (by
+      intro z
+      change (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z = _
+      exact hTwoExpansionShift z)
+    alpha
+    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hqAlpha)
+  change lowerCentralSquareMapAdditive P hSq (eOne.symm alpha) =
+    eTwoShift.symm
+      (Algebra.trace K L
+        (alpha ^ (2 ^ a.val) *
+          (alpha ^ (2 ^ a.val)) ^ (2 ^ r.val) * epsilon)) at htrace
+  simpa only [q, hSq] using htrace
+
+/-- Compatibility projection of the shift-tracking anchored-trace theorem.
+The original API is retained for downstream users which do not need the
+exact second-layer Frobenius shift. -/
 theorem exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData
     {P : Type u} [Group P] [Finite P]
     (hAgemo : Agemo P 2 1 = lowerCentralTerm P 1)
@@ -662,68 +795,12 @@ theorem exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData
             (Algebra.trace K L
               (alpha ^ (2 ^ a.val) *
                 (alpha ^ (2 ^ a.val)) ^ (2 ^ r.val) * epsilon)) := by
-  obtain ⟨eTwoShift, hTwoExpansionShiftCanonical⟩ :=
-    exists_shiftedSecondLinearEquiv_expansion iota eTwo s₀
-  have hTwoExpansionShiftCanonical' : ∀ z : K,
-      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
-        ∑ s : Fin (finrank (ZMod 2) K),
-          (iota z) ^ (2 ^ s.val) •
-            (conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo)
-              (s₀ + s) := by
-    intro z
-    simpa only [RingHom.algebraMap_toAlgebra, AlgHom.toRingHom_eq_coe,
-      AlgHom.coe_toRingHom] using hTwoExpansionShiftCanonical z
-  have hTwoExpansionShift : ∀ z : K,
-      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
-        ∑ s : Fin (finrank (ZMod 2) K),
-          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
-    intro z
-    calc
-      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
-          ∑ s : Fin (finrank (ZMod 2) K),
-            (iota z) ^ (2 ^ s.val) •
-              (conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo)
-                (s₀ + s) := hTwoExpansionShiftCanonical' z
-      _ = ∑ s : Fin (finrank (ZMod 2) K),
-          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
-        simp only [hiota, hbTwo]
-  refine ⟨eTwoShift, ?_⟩
-  let hSq := lowerCentralSquaresLieInSecond_of_agemo_eq P hAgemo
-  let q : L → Additive (lowerCentralLayer P 1) := fun alpha ↦
-    lowerCentralSquareMapAdditive P hSq (eOne.symm alpha)
-  let iotaAdd : K →+ Additive (lowerCentralLayer P 1) :=
-    eTwoShift.symm.toLinearMap.toAddMonoidHom
-  intro alpha
-  have hqAlpha :
-      (1 : L) ⊗ₜ[ZMod 2] q alpha =
-        ∑ i : Fin (d * finrank (ZMod 2) K),
-          ∑ j : Fin (d * finrank (ZMod 2) K) with i < j,
-            alpha ^ (2 ^ i.val + 2 ^ j.val) •
-              lowerCentralCommutatorBilinearBaseChange L P
-                (bOne i) (bOne j) := by
-    change lowerCentralSquareMapBaseChange L P hSq (eOne.symm alpha) = _
-    simpa only [eOne.apply_symm_apply] using hq (eOne.symm alpha)
-  have htrace := squareMap_eq_trace_of_anchored_singleGap
-    (lowerCentralCommutatorBilinear P)
-    (finrank (ZMod 2) K) d hn hd hcardK hfinKL hfinL
-    bOne bTwo hcycleOne hcycleTwo
-    a s₀ r hr0 hrtwo epsilon
-    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hseed)
-    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hsymm)
-    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hsupport)
-    q iotaAdd
-    (by
-      intro z
-      change (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z = _
-      exact hTwoExpansionShift z)
-    alpha
-    (by simpa only [lowerCentralCommutatorBilinearBaseChange] using hqAlpha)
-  change lowerCentralSquareMapAdditive P hSq (eOne.symm alpha) =
-    eTwoShift.symm
-      (Algebra.trace K L
-        (alpha ^ (2 ^ a.val) *
-          (alpha ^ (2 ^ a.val)) ^ (2 ^ r.val) * epsilon)) at htrace
-  simpa only [q, hSq] using htrace
+  obtain ⟨eTwoShift, _, htrace⟩ :=
+    exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData_with_secondShift
+      hAgemo iota hiota d hn hd hcardK hfinKL hfinL
+      eOne bOne hq hcycleOne eTwo bTwo hbTwo hcycleTwo
+      a s₀ r hr0 hrtwo epsilon hseed hsymm hsupport
+  exact ⟨eTwoShift, htrace⟩
 
 /-! ## Nonvanishing of the actual square map -/
 
