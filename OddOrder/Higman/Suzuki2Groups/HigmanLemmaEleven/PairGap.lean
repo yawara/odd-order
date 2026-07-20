@@ -25,7 +25,7 @@ open scoped TensorProduct BigOperators Fin.NatCast IsMulCommutative
 
 namespace OddOrder.Higman.Suzuki2Groups
 
-universe uCommonField
+universe uCommonField uGroup
 
 /-! ## The second-layer Singer basis in a common splitting field -/
 
@@ -452,12 +452,12 @@ private theorem eigenvalue_eq_of_basis_repr_ne_zero
   exact (mul_right_cancel₀ hi hcoord').symm
 
 local instance higmanLemmaElevenLayerIsMulCommutative
-    (H : Type uCommonField) [Group H] (i : ℕ) :
+    (H : Type uGroup) [Group H] (i : ℕ) :
     IsMulCommutative (lowerCentralLayer H i) :=
   lowerCentralLayerIsMulCommutative H i
 
 noncomputable local instance higmanLemmaElevenLayerZModTwoModule
-    (H : Type uCommonField) [Group H] (i : ℕ) :
+    (H : Type uGroup) [Group H] (i : ℕ) :
     Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
   lowerCentralLayerZmodModule H i
 
@@ -469,7 +469,7 @@ nonzero coordinate in the canonical second-layer basis then identifies its
 exact actor weight.  No gap, primitive-root, or equal-degree assumption is
 used at this selection step. -/
 theorem exists_lowerCentralConjugateBasisBracketCoordinate
-    {K L H C : Type uCommonField}
+    {K L : Type uCommonField} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C]
@@ -572,7 +572,7 @@ Every nonzero value of the actual first lower-central commutator pairing on
 the canonical first-layer conjugate basis has Higman's single cyclic gap.
 The first- and second-layer field degrees remain distinct. -/
 theorem lowerCentralPairGapSupport_of_commonConjugateBases
-    {K L H C : Type uCommonField}
+    {K L : Type uCommonField} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C] [NeZero (finrank (ZMod 2) L)]
@@ -656,7 +656,7 @@ Once the selected first-layer bracket has normalized weight
 eigenline.  Thus it is a nonzero scalar multiple of the zeroth canonical
 second-layer basis vector. -/
 theorem exists_ne_zero_smul_secondConjugateBasis_zero_of_bracket
-    {K L H C : Type uCommonField}
+    {K L : Type uCommonField} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C]
@@ -763,13 +763,15 @@ private noncomputable def frobeniusLinearEquivForNormalization
   ((FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K) ^ s).toLinearEquiv
 
 private noncomputable def frobeniusShiftLinearEquivForNormalization
-    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    {K : Type uCommonField} {V : Type uGroup}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
     [AddCommGroup V] [Module (ZMod 2) V]
     (e : V ≃ₗ[ZMod 2] K) (s : ℕ) : V ≃ₗ[ZMod 2] K :=
   e.trans (frobeniusLinearEquivForNormalization K s)
 
 @[simp] private theorem frobeniusShiftLinearEquivForNormalization_apply
-    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    {K : Type uCommonField} {V : Type uGroup}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
     [AddCommGroup V] [Module (ZMod 2) V]
     (e : V ≃ₗ[ZMod 2] K) (s : ℕ) (v : V) :
     frobeniusShiftLinearEquivForNormalization e s v =
@@ -779,7 +781,8 @@ private noncomputable def frobeniusShiftLinearEquivForNormalization
     FiniteField.coe_frobeniusAlgEquivOfAlgebraic, pow_iterate]
 
 private theorem frobeniusShiftLinearEquivForNormalization_mul_compat
-    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    {K : Type uCommonField} {V : Type uGroup}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
     [AddCommGroup V] [Module (ZMod 2) V]
     (T : Module.End (ZMod 2) V)
     (e : V ≃ₗ[ZMod 2] K) (lambda : K)
@@ -937,7 +940,8 @@ private theorem frobeniusBaseChange_symm_conjugateTensorBasis
     frobeniusBaseChange_conjugateTensorBasis_add]
 
 private theorem conjugateTensorBasisOf_frobeniusShift
-    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    {K : Type uCommonField} {V : Type uGroup}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
     [NeZero (finrank (ZMod 2) K)]
     [AddCommGroup V] [Module (ZMod 2) V]
     (e : V ≃ₗ[ZMod 2] K)
@@ -986,7 +990,7 @@ private theorem conjugateTensorBasisAlong_repr_frobeniusBaseChange
       rw [hsigma, ← pow_mul, ← pow_add, hcycle]
 
 private theorem conjugateTensorBasisAlongOf_frobeniusShift_repr
-    {K L V : Type uCommonField}
+    {K L : Type uCommonField} {V : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Algebra (ZMod 2) L]
     [NeZero (finrank (ZMod 2) K)]
@@ -1016,7 +1020,7 @@ in the second.  The shifted generators retain all field-generation and
 primitive-root properties, satisfy `iota nu' = lambda'^(1+2^r)`, and give the
 single-gap law for every nonzero actual basis bracket. -/
 theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate
-    {K L H C : Type uCommonField}
+    {K L : Type uCommonField} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
     [Group H] [Group C]
