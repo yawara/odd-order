@@ -409,6 +409,40 @@ theorem inducedNonKernelFamily_conjDiff_support {A : Set G}
     have h0 : φ z = 0 := inducedNonKernelFamily_apply_eq_zero h hφ hmem
     rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_self]
 
+/-- **Member differences of the (8.15.3) family are `A`-supported — the pair version**:
+for `φ, ψ` in the family of the *same degree*, `Supp (φ − ψ) ⊆ A`.
+
+Same (4.7) argument as `inducedNonKernelFamily_conjDiff_support`: off `A ∪ {1}` both members
+vanish outright, and at the identity the equal degrees cancel.  The conjugate version is the
+special case `ψ = φ̄` (where the degrees agree automatically, being the same natural number).
+
+This is the `hsuppdiff` input of the (5.7) uniform-degree coherence producer
+`S07.coherent_subset_of_constant_degree`, and hence of the §9-level route to the (9.11) base
+coherence (issue 1045).  Compare the `S`-side analogue
+`S15.Hypothesis.sSetIrrDeg_member_diff_supported`. -/
+theorem inducedNonKernelFamily_diff_support {A : Set G}
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46Core A M) [Invertible (Nat.card ↥h.K : ℂ)]
+    {φ ψ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ inducedNonKernelFamily h.K h.subH)
+    (hψ : ψ ∈ inducedNonKernelFamily h.K h.subH)
+    (hdeg : φ 1 = ψ 1) :
+    ((φ - ψ : ClassFunction ↥M ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A M := by
+  intro z hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  by_contra hzA
+  refine hz ?_
+  rcases eq_or_ne ((z : G)) 1 with hz1 | hz1
+  · -- at the identity the equal degrees cancel
+    have hzone : z = 1 := Subtype.ext hz1
+    rw [ClassFunction.sub_apply, hzone, hdeg, sub_self]
+  · -- off `A ∪ {1}` both members vanish
+    have hmem : (z : G) ∉ A ∪ ({1} : Set G) := by
+      rw [Set.mem_union, Set.mem_singleton_iff, not_or]
+      exact ⟨hzA, hz1⟩
+    rw [ClassFunction.sub_apply, inducedNonKernelFamily_apply_eq_zero h hφ hmem,
+      inducedNonKernelFamily_apply_eq_zero h hψ hmem, sub_self]
+
 /-- **Peterfalvi (8.15), claim 3 — type-uniform**, on the book's own family
 `𝒮 ⊆ {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` and an arbitrary ambient Dade support `A`.
 

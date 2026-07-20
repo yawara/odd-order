@@ -11201,6 +11201,7 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_apply_one_eq_natCast
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_apply_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_conjDiff_support
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_diff_support
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent
 -- **(8.15), claim 3 at `A = A(M)`, every type `𝒫`** — the instantiation of the above at
 -- `A = typePACore M`, `H = M_σ`, whose two Dade inputs (`dadeSupportHypothesisData_typePACore0`

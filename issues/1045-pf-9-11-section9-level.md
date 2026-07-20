@@ -170,7 +170,7 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 | `hyp : S07.Hypothesis S A` | `S10.typePACore_subcoherent` (橋渡し + irrCut_conjClosed) |
 | `hconj'` | `S11.irrCut_conjClosed` |
 | `hSfin` | `(S11.sOf_finite data Y).subset` |
-| **`hcard : 2 ≤ S'.ncard`** | ⚠ §11 版は `hex` (1 元存在) しか取らない。奇数位数ゆえ `χ ≠ χ̄` (実指標なし) なので `{χ, χ̄} ⊆ S'` から出る — **この議論を明示的に書く必要がある** |
+| **`hcard : 2 ≤ S'.ncard`** | ⚠ **パラメータとして露出する** (下記 S15 先例) |
 | `hirr : ∀ ζ ∈ S', inner ζ ζ = 1` | `IsIrreducibleCharacter.inner_self_eq_one` |
 | **`hZIrr : ∀ a b ∈ S', tau (a − b) ∈ ZIrr G`** | Dade 写像の整数性。⚠ 一番重い義務 |
 | `hconst` | cut の定義から自明 |
@@ -178,8 +178,49 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 | `h1A : (1 : ↥M) ∉ A` | `S10.typePACore_one_not_mem` |
 | `hsuppdiff` | `S10.inducedNonKernelFamily_conjDiff_support` の一般化 (今は `φ − φ̄` 専用、任意の 2 元差へ広げるか、Hypothesis の `tau_isometry_diff` 経由) |
 
-⟹ 重いのは **`hcard`** と **`hZIrr`** と **`hsuppdiff` の 2 元差版**の 3 つ。
-残り 7 つは既存部品でそのまま埋まる。
+### ✅ S 側に完全な先例がある — `S15.Hypothesis.sSetIrrDeg_coherent`
+
+`HypothesisBasics.lean:390` が **同じ (5.7) 組み立てを S-instance で既に完遂している**。
+10 引数の discharge をそのまま雛形にできる:
+
+- **`hcard` は パラメータ `h2` として露出する** — 同 docstring が明言:
+  「repo に `2 ≤ ncard` の事実は無い ((9.8.d) の数え上げは *存在* `∃ ζ` しか与えない)。
+  露出すれば def は sorry-free に保て、真の上流 count は caller に委ねられる —
+  **the honest pattern**」。
+  ⟹ ⚠ 当初メモの「`χ ≠ χ̄` から導く」は**採らない**。S15 先例に合わせて露出する。
+- **`hZIrr`** = `S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported` に
+  `hsuppdiff` + `Submodule.sub_mem _ ha.mem_ZIrr hb.mem_ZIrr` を渡すだけ。
+- **`hsuppdiff`** = 「等次数 ⟹ `1` で消える」+「`A ∪ {1}` の外で両方消える」。
+  ✅ **`S10.inducedNonKernelFamily_diff_support` として実装済** (2026-07-20)。
+  conj 版はその特殊化。S 側の対応物は `sSetIrrDeg_member_diff_supported`。
+
+⟹ 3 つの「重い」義務のうち **`hcard` は露出、`hsuppdiff` は実装済、`hZIrr` は既存補題 1 本**。
+残り 7 つと合わせて、組み立ては S15 の雛形をなぞるだけになった。
+
+### 設計判断: (5.7) の companion は **§8 レベル**に置く
+
+`inducedNonKernelFamily_subcoherent` (= (5.3.b)) と**同じ一般性**で書く:
+
+```
+noncomputable def inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
+    (hodd) (h46 : S06.Hypothesis46Core A M) [Invertible (Nat.card ↥h46.K : ℂ)]
+    (dd : DadeSupportHypothesisData M A)
+    {S} (hsub : S ⊆ inducedNonKernelFamily h46.K h46.subH)
+    (hirrS) (hconjS) (d : ℂ) (hconst) (hd0) (hSfin) (h2) (h1A) :
+    Nonempty (S07.IsCoherent (…).tau S (S04.supportInSubgroup A M))
+```
+
+理由:
+- `hsuppdiff` = `inducedNonKernelFamily_diff_support` は `h46` を要るので、`h46` を
+  パラメータに持つ形が自然 (`typePACore_subcoherent` のように内部で組むと、
+  同じ `h46` を 2 度組んで defeq 不一致を招きやすい)。
+- §8 に置けば §9 への依存が要らない — 橋渡し leaf を経由するのは §9 側の instantiation だけ。
+- ⚠ instance 規律: `typePACore_subcoherent` と同じく `[Finite G]` +
+  `open scoped S12.FiniteInduce in` で統一する。
+
+⟹ 順序: (a) §8 に上記 companion、(b) §9 で `sOf` の degree cut に instantiate
+(橋渡し + `irrCut_conjClosed` + `sOf_finite`)、(c) それで
+`sOf_degreeSubfamily_isCoherent` の §10 依存を置換、(d) (9.11) statement 本体。
 
 ### (参考) 実装レシピ
 
