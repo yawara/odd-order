@@ -710,3 +710,28 @@ bridge の underlying 抽出と合成。fI_left の代表元 = `f_left(g)` (quot
 
 hsq の枠組み: `hsq ⟺ ePhi(⟨x²⟩)=q_BCD(coord)`。ambient lemma で LHS=Q、polarization で
 Q=A+B+M、A=q_X/B=q_Y (上記)、M=case 別。
+
+### 2026-07-21 lane b: Stage 4 assembly 開始 — noncomm A=q_X 完成
+
+新 leaf `CaseSplitBCD.lean`。`noncomm_ambientSquare_eq`:
+`ambientCenterCoordinate(sq_ambient(noncommFactorInclusion α)) = α·θ(α)` (非可換 branch)。
+証明: 両辺=`ePhi(⟨(f g)²⟩)` (f=S.subtype∘lctS0.subtype)。ambient 側=factorInclusion_eQuot_mk
++ ambientCenterCoordinate_squareMap、factor 側=square_normal + eKernel_eq +
+factorLayerOneEquivAmbientFrattini_squareValue。
+
+**確立した instance plumbing pattern (assembly 全体で必須)**:
+`ambientCenterCoordinate` が `hEA.zmodModule` を bake するので、ePhi/data を
+**letI-in-signature** で hEA.zmodModule 型付けする (hEA を先頭 param に、その後
+`letI : IsMulCommutative := IsMulCommutative.of_comm hEA.comm; letI : Module := hEA.zmodModule`
+を ePhi/data/conclusion の型に入れる)。`[Module]` を free variable にすると mismatch。
+また `heq : eQuot.symm α = ofMul(mk' g)` は `rw [hg]; rfl` (ofMul(toMul)=defeq)。
+
+**次 (comm A=q_X、noncomm の analog)**: comm branch は
+- f=S.subtype, N=Agemo S 2 1, eQuot は `≃+` (AddEquiv) → LinearEquiv 変換要
+  (exists_factorFamily_of_commutative @ MixedEigenweights:543 の eQuotLin 参照)
+- square map は `commutativeFactorSquareEquiv.toAdditive` (lowerCentralSquareMapAdditive でない)
+- factor 側 lemma = `homocyclicFourSquareSubgroupEquivFrattini_squareEquiv` (θ=1, q_X=α²)
+- eKernel_eq (comm) は `homocyclicFourSquareSubgroupEquivFrattini` bridge
+
+**その後**: branch dispatch (comm/noncomm factorInclusion → ambientProductEquiv の e) →
+mixed 項 M を case 別固有値算術で確定 → case assembly で higmanLemmaTwelve endpoint。
