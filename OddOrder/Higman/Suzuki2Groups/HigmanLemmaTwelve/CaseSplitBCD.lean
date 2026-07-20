@@ -261,6 +261,241 @@ theorem comm_ambientSquare_eq
     exact hsn.symm
   rw [hA, hfactor]
 
+/-! ## Uniform factor-inclusion package for the ambient product -/
+
+/-- One side of the ambient `F × F` coordinate for Higman Lemma 12, packaged
+uniformly across the commutative and noncommutative branches.
+
+The branch-specific abstract group `H` maps into `P` by `f`, with normal kernel
+`N` cutting out the Frattini classes, and `eQuot` is the branch quotient
+coordinate.  The exactness data `hf`/`hfexact` and the identification
+`range_eq : f.range = S` feed the ambient product isomorphism; `theta` together
+with `ambientSquare` records the factor square law `A(α) = α · θ(α)` (with
+`θ = 1` in the commutative branch).  Bundling the branch group `H` lets the four
+commutative/noncommutative combinations of the two factors collapse to a single
+assembly. -/
+structure FactorInclusionData
+    {P : Type uP} [Group P] [Finite P]
+    (S : Subgroup P) {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)) where
+  /-- The branch abstract group (`↥S` in the commutative branch, `↥L₀(S)` in the
+  noncommutative branch). -/
+  H : Type uP
+  [group : Group H]
+  /-- The factor map into the ambient group. -/
+  f : H →* P
+  /-- The normal kernel cutting out the Frattini classes. -/
+  N : Subgroup H
+  [normal : N.Normal]
+  [quotComm : IsMulCommutative (H ⧸ N)]
+  [quotModule : Module (ZMod 2) (Additive (H ⧸ N))]
+  /-- The branch quotient coordinate. -/
+  eQuot : Additive (H ⧸ N) ≃ₗ[ZMod 2] GaloisField 2 n
+  hf : ∀ g ∈ N, f g ∈ frattini P
+  hfexact : ∀ g, f g ∈ frattini P → g ∈ N
+  range_eq : f.range = S
+  /-- The factor square automorphism; the identity in the commutative branch. -/
+  theta : RingAut (GaloisField 2 n)
+  ambientSquare : ∀ α,
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralSquareMapAdditive P hSqamb
+          (factorInclusion f hK0 hf eQuot α)) =
+      α * theta α
+
+/-- The commutative branch packages into a `FactorInclusionData` with
+`H = ↥S`, `f = S.subtype`, `N = ℧₁(S)`, `θ = 1`, and the factor square law
+`A(α) = α²` from `comm_ambientSquare_eq`. -/
+noncomputable def commFactorInclusionData
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    {c : Y} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    {nu : GaloisField 2 n}
+    (data :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      CommutativeFactorCoordinateData hSinv hPhiS c ePhi nu)
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)) :
+    FactorInclusionData S hEA ePhi hK1amb htermamb hSqamb hK0 :=
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  letI : CommGroup ↥S :=
+    { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
+  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) := IsMulCommutative.of_comm mul_comm
+  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+    AddCommGroup.zmodModule (fun q => by
+      apply Additive.toMul.injective
+      change (Additive.toMul q) ^ 2 = 1
+      obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (Additive.toMul q)
+      rw [← hx, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+      simpa using Agemo.mem_of_eq_pow (G := ↥S) (p := 2) (n := 1) x)
+  { H := ↥S
+    f := S.subtype
+    N := Agemo (↥S) 2 1
+    eQuot := { data.eQuot with map_smul' := ZMod.map_smul data.eQuot.toAddMonoidHom }
+    hf := fun g hg => by
+      rw [data.hN, Subgroup.mem_subgroupOf] at hg; exact hg
+    hfexact := fun g hg => by
+      rw [data.hN, Subgroup.mem_subgroupOf]; exact hg
+    range_eq := Subgroup.range_subtype S
+    theta := 1
+    ambientSquare := fun α => by
+      rw [RingAut.one_apply]
+      exact comm_ambientSquare_eq (Y := Y) hEA ePhi data hK1amb htermamb hSqamb
+        hAgemoamb hK0 α }
+
+/-- The noncommutative branch packages into a `FactorInclusionData` with
+`H = ↥L₀(S)`, `f = S.subtype ∘ L₀(S).subtype`, `N = ℧₁L₀(S) L₁(S)`,
+`θ = data.theta`, and the factor square law `A(α) = α · θ(α)` from
+`noncomm_ambientSquare_eq`. -/
+noncomputable def noncommFactorInclusionData
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    {c : Y} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    {nu : GaloisField 2 n}
+    (data :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      NoncommutativeFactorCoordinateData hSinv hPhiS c ePhi nu)
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)) :
+    FactorInclusionData S hEA ePhi hK1amb htermamb hSqamb hK0 :=
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  { H := ↥(lowerCentralTerm (↥S) 0)
+    f := S.subtype.comp (lowerCentralTerm (↥S) 0).subtype
+    N := lowerCentralLayerKernel (↥S) 0
+    eQuot := data.eQuot
+    hf := fun g hg => by
+      rw [lowerCentralLayerKernel_zero_eq_of_squares_le (↥S) data.hSq,
+        Subgroup.mem_subgroupOf, data.hterm, Subgroup.mem_subgroupOf] at hg
+      exact hg
+    hfexact := fun g hg => by
+      rw [lowerCentralLayerKernel_zero_eq_of_squares_le (↥S) data.hSq,
+        Subgroup.mem_subgroupOf, data.hterm, Subgroup.mem_subgroupOf]
+      exact hg
+    range_eq := by
+      ext p
+      simp only [MonoidHom.mem_range, MonoidHom.coe_comp, Function.comp_apply]
+      constructor
+      · rintro ⟨g, rfl⟩
+        exact ((lowerCentralTerm (↥S) 0).subtype g).2
+      · intro hp
+        have hT : lowerCentralTerm (↥S) 0 = ⊤ := Subgroup.lowerCentralSeries_zero ⊤
+        refine ⟨⟨⟨p, hp⟩, ?_⟩, rfl⟩
+        rw [hT]; exact Subgroup.mem_top _
+    theta := data.theta
+    ambientSquare := fun α =>
+      noncomm_ambientSquare_eq (Y := Y) hEA ePhi data hK1amb htermamb hSqamb
+        hAgemoamb hK0 α }
+
+/-- **Branch dispatch.**  Either factor branch packages uniformly into a
+`FactorInclusionData`; the resulting `theta` is `1` in the commutative branch and
+`data.theta` in the noncommutative branch, matching `FactorCoordinateData.theta`. -/
+noncomputable def FactorCoordinateData.toInclusionData
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    {c : Y} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    {nu : GaloisField 2 n}
+    (data :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      FactorCoordinateData hSinv hPhiS c ePhi nu)
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)) :
+    FactorInclusionData S hEA ePhi hK1amb htermamb hSqamb hK0 :=
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  match data with
+  | .commutative d =>
+      commFactorInclusionData hEA ePhi d hK1amb htermamb hSqamb hAgemoamb hK0
+  | .noncommutative _ d =>
+      noncommFactorInclusionData hEA ePhi d hK1amb htermamb hSqamb hAgemoamb hK0
+
+/-- The packaged branch automorphism agrees with `FactorCoordinateData.theta`. -/
+theorem FactorCoordinateData.toInclusionData_theta
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    {c : Y} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    {nu : GaloisField 2 n}
+    (data :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      FactorCoordinateData hSinv hPhiS c ePhi nu)
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    (data.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0).theta =
+      data.theta := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  cases data with
+  | commutative d => rfl
+  | noncommutative _ d => rfl
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
