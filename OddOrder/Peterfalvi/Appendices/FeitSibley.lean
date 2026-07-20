@@ -286,6 +286,7 @@ variable [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
 variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
 
+omit [Fintype G] in
 /-- **Peterfalvi Appendix IV, Lemma 2(a)** (p. 145).  `𝒮` is exactly the set of
 characters `Ind_Q^H φ` induced from those `φ ∈ Irr(Q)` with `Q₁ ⊄ Ker φ`.
 
@@ -334,6 +335,7 @@ theorem induction_isometry_on_degree_zero
   refine ⟨?_, hyp.tau_mem_ZIrr hφ, hyp.tau_apply_one hφ1⟩
   sorry
 
+omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **Peterfalvi Appendix IV, Lemma 2(c)** (p. 145).  If `d = |D|` is odd then no
 `χ ∈ 𝒮` is real: `χ̄ ≠ χ`.
 

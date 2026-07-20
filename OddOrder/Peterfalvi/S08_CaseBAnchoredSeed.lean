@@ -1198,6 +1198,7 @@ theorem caseBXsetExtension_eq
   · rw [← hcol, caseBXsetExtension_columnSum hyp h46 hW1 Ximg χ₂]
   · exact caseBXsetExtension_irr hyp h46 Ximg hirr hmem
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **(6.8.2) supported generation by scaled differences** (the varying-degree analogue of
 `mem_span_columnDiff_of_mem_zSupportedSpan`).  Given an anchor `χ₁ ∈ S₁` (with `χ₁(1) ≠ 0`) such
 that

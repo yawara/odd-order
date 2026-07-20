@@ -1,4 +1,11 @@
 /-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
+
+/-!
 # Peterfalvi §7 — discharging the `(7.7.a)`/`(7.8.c)` certificates of `S09`
 
 `S09_NonexistenceCertain.lean` carries Peterfalvi's `(7.7.a)` (`Hypothesis76.chiRho_decomp`) and
@@ -10,7 +17,6 @@ This file lives outside `S09` (which is concurrently edited for the `(7.11)` ass
 conflicts; it imports the `S09` machinery and supplies standalone lemmas toward the certificate
 discharge (issue 1013).
 -/
-import OddOrder.Peterfalvi.S09_BetaDecompOrthogonality
 
 /-!
 # TAIL
