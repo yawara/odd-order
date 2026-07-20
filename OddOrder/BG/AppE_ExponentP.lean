@@ -1020,4 +1020,25 @@ theorem orbit_conjAct_subset_coset {G : Type*} [Group G] (v : G) :
     group
 
 
+/-- **`|seed| = p²`**, BG's `|R₀ × Ω₁(R₁)| = p²` on the nose.
+
+The upper bound is `card_seed_le`.  For the lower one, `R₀ < seed` properly
+(`R₀_lt_seed`) and both are `p`-groups, so `p = |R₀| < |seed| = p^k` forces `k ≥ 2`.
+
+Step 4 needs the *equality* (Step 3 only needed `≤`): there the conjugacy class of `v` has
+to have exactly `|S|/p²` elements, to be matched against `|vS'|`. -/
+theorem RegularOperatorSetup.card_seed [Finite R] (hyp : RegularOperatorSetup R B p q) :
+    Nat.card ↥hyp.seed = p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  refine le_antisymm hyp.card_seed_le ?_
+  obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup hyp.seed).exists_card_eq
+  have hlt : Nat.card ↥hyp.R₀ < Nat.card ↥hyp.seed :=
+    Set.Finite.card_lt_card (Set.toFinite _) (SetLike.coe_ssubset_coe.mpr hyp.R₀_lt_seed)
+  rw [hyp.R₀_card, hk] at hlt
+  have h1 : p ^ 1 < p ^ k := by rwa [pow_one]
+  have h2 : 2 ≤ k := (Nat.pow_lt_pow_iff_right hyp.p_prime.one_lt).mp h1
+  rw [hk]
+  exact Nat.pow_le_pow_right hyp.p_prime.pos h2
+
+
 end OddOrder.BG.AppE
