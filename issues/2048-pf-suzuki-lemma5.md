@@ -308,6 +308,9 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [ ] 上記の共通 `Φ(P)` 座標を prescribed kernel coordinate として、左右各
               factor の quotient 座標を actor-compatible に構成し、
               `ν = λ·θ(λ) = μ·φ(μ)` を導く
+          - [x] Lemma 11 の field model を caller-prescribed actor generator 版へ
+                強化し、同じ ambient generator が invariant factor の faithful range
+                でも generator のまま残ることを証明する
           - [x] odd-order `θ` に対する unit twisted norm
                 `u ↦ u·θ(u)` の全単射性を証明し、任意の非零 kernel scaling を
                 quotient-basis scaling で実現する

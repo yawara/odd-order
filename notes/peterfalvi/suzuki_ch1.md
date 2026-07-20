@@ -440,6 +440,10 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       `orderOf θ` が odd なら全単射であることを証明した。従って可換 branch
       `θ = 1` も含め、prescribed common kernel basis の任意の非零 scaling を
       quotient basis 側で吸収できる。
+      Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
+      caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
+      invariant factor への restricted action の faithful range でも generator のまま
+      なので、左右 factor と共通 centre で `c` を一貫して固定できる。
       さらに上記の noncommuting mixed-factor witness を actual ambient
       `lowerCentralCommutatorBilinear` の非零値へ接続し、左右 factor に属する代表元の
       provenance も保持した。したがって原典 p. 90 の固有値比較へ入る非零 pairing は
