@@ -410,6 +410,40 @@ case B も型仮定ゼロで組める見込み。**(9.9.a) と engine は既に�
 
 ⟹ case B の残作業は **3 件の機械的な引数一般化**に落ちた (case A と同型)。
 
+### ✅ 1/3 完了 + ⚠ 残り 2 件のうち 1 件は機械的でない (2026-07-20 実測)
+
+- ✅ **`S11.sOf_anchor_diff_support`** (§9 版) landed。world-bridge + `hKsupp` パラメータ化で
+  そのまま通った。⚠ `((derivedInG M).subgroupOf M).Normal` instance は §13 では import 閉包
+  から推移的に来ていたので新 leaf では `haveI` 導出が要る。
+- ⚠ **`caseB_sOf_memberRFamily` (:452) は機械転記できない**。2 分岐のうち:
+  - **既約分岐**は降ろせる (signed Dade family; `dadeData.dade`/`hconj` をパラメータ化 +
+    `inducedKernelFamily_conjDiff_support`)。
+  - **column 分岐**が §10 μ-grid そのもの: `S06.certainTypeR` を
+    **`hyp.base.toHypothesis46 hG hG.odd`** の上で組み、メンバーを
+    `hyp.base.muColumnChar hG hG.odd k` の `columnSum` として同定している。
+  - 駆動する **`caseB_sOf_member_dichotomy` (:407) は結論自体が §10 表記**:
+    `∃ k : Fin hyp.base.w2, … φ = S06.columnSum (hyp.base.toHypothesis46 …)
+    (hyp.base.muColumnChar … k)`。証明でなく **statement が μ-grid に依存**している。
+
+⟹ **ここが case B の真の残り**: 書籍 (9.9.b) は可約メンバー `μ_j` を **(4.7) + Thm (4.5)**
+= §6 の結果から作る。§9 で同じことをするには **§9 で使える Hypothesis (4.6)** の上で
+`S06.columnSum` / `S06.certainTypeR` を組めばよく、それは
+**`S10.typePACore_toHypothesis46_core data.typeP …`** で手に入る
+(`data : TypesIIIIIIVSetup M` は `data.typeP : TypePData M` を持つ)。
+⟹ 作業 = **(9.9.b) の dichotomy を §9 の Hypothesis (4.6) 上で述べ直す**
+(`hHall`/`hW2σ`/`hσK` を入力に取る)。これは引数一般化でなく**述べ直し**。
+
+**case B の到達点**:
+
+| 部品 | 状態 |
+|---|---|
+| (9.9.a) 一様次数 `qu` | ✅ `S11.caseB_degree_qu` (元から §9・型仮定ゼロ) |
+| world-bridge | ✅ `S11.sOf_subset_inducedKernelFamily_bot` |
+| `hsuppdiff` | ✅ `S11.sOf_anchor_diff_support` |
+| (5.7) engine | ✅ `S07.uniform_degree_coherence_of_families` (上流) |
+| `R`-family 既約分岐 | ⛏ 降ろせる (機械的) |
+| **`R`-family column 分岐 + dichotomy** | ⛏ **§9 の Hyp (4.6) 上で述べ直しが要る** |
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
