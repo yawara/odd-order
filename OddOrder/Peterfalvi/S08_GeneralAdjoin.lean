@@ -342,7 +342,7 @@ theorem crux1_of_memberFamily_general
     {S₁ : Set (ClassFunction L ℂ)}
     (hS₁ : IsCoherent τ S₁ A)
     (χ : ClassFunction L ℂ) {a : ℕ}
-    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (rc : ι → ℝ) (i₁ : ι)
     (hi₁ : i₁ ∈ s)
     (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • χmem i₁))
     (hDaY_ZIrr : Da.Y ∈ ZIrr G)
@@ -352,10 +352,10 @@ theorem crux1_of_memberFamily_general
     (hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y (hS₁.extension (χmem i)) =
       (a : ℂ) * (if i = i₁ then 1 else 0) -
         ((a : ℂ) + ClassFunction.inner (τ (χ - a • χmem i₁))
-          (hS₁.extension (χmem i₁))) * (deg i : ℂ))
+          (hS₁.extension (χmem i₁))) * (rc i : ℂ))
     (hμZ : τ (χ - a • χmem i₁) ∈ ZIrr G)
-    (ha1 : deg i₁ = 1)
-    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2) :
+    (ha1 : rc i₁ = 1)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, (rc i) ^ 2) :
     ClassFunction.inner (τ (χ - a • χmem i₁)) (hS₁.extension (χmem i₁)) = -(a : ℂ) := by
   classical
   have hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G :=
@@ -377,14 +377,14 @@ theorem crux1_of_memberFamily_general
     OddOrder.Peterfalvi.S08.exists_indexed_intProjection_of_orthonormal_ZIrr hDaY_ZIrr s
       (fun i => hS₁.extension (χmem i)) hνZ hvcinj horth
   have hcoeff_eq : ∀ i ∈ s, (c i : ℂ) =
-      (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (deg i : ℝ) : ℝ) : ℂ) := by
+      (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (rc i) : ℝ) : ℂ) := by
     intro i hi
     rw [← hc_coeff i hi, hcoeffval i hi, hμeq]
     by_cases h : i = i₁
     · simp only [if_pos h]; push_cast; ring
     · simp only [if_neg h]; push_cast; ring
   have hY : Da.Y =
-      (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (deg i : ℝ) : ℝ) : ℂ)
+      (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (rc i) : ℝ) : ℂ)
         • hS₁.extension (χmem i)) + Z := by
     rw [hYsum]; congr 1
     exact Finset.sum_congr rfl fun i hi => by rw [hcoeff_eq i hi]
@@ -395,55 +395,73 @@ theorem crux1_of_memberFamily_general
       star_natCast, mul_one,
       show (a : ℂ) * (a : ℂ) = (((a : ℝ) ^ 2 * 1 : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re]
   obtain ⟨hlam0, -⟩ := Da.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) ((a : ℤ) + μ) Z
-    (fun i => hS₁.extension (χmem i)) (fun _ => 1) (fun i => (deg i : ℝ))
+    (fun i => hS₁.extension (χmem i)) (fun _ => 1) rc
     hY horth hZortho hψ (by simp [ha1]) (by positivity)
     (by simp only [mul_one]; exact hDeg)
   have hμval : μ = -(a : ℤ) := by omega
   rw [hμeq, hμval]; push_cast; ring
 
-/-- **General `inner_Y_extension_member_eq`** (generalizes `inner_Y_extension_member_eq`,
-`S08_CoherenceCorePart1/CoherentAdjoin.lean`; the Dade map appears only as an opaque
-`IntegralCharacterMap` in the proof, so `hyp`/`hconj` are dropped and it is stated for a general
-`τ`).
+/-- **General `inner_Y_extension_member_eq`, rational-degree (scaled-difference) form**
+(generalizes `inner_Y_extension_member_eq`, `S08_CoherenceCorePart1/CoherentAdjoin.lean`, to
+**arbitrary member degrees** — Isaacs 7.14 / Peterfalvi Lemma 1(a) needs only the anchor
+divisibility `χ₀(1) ∣ ψ(1)`, not `χ₀(1) ∣ χ(1)` for every member, so the ratio `χⱼ(1)/χ₁(1)` is
+generally
+rational).
 
-The per-member (5.6.1) coefficient `⟨Y, ν χⱼ⟩` for the χ-decomposition residual `Y = Xχ − τ(χ −
-a·χ₁)` with `Xχ ⊥ ν χⱼ` (the (5.2.e) `R(χ)`-orthogonality) and the cross-term
-`⟨τ(χ − a·χ₁), ν(χⱼ − aⱼ·χ₁)⟩ = ⟨χ − a·χ₁, χⱼ − aⱼ·χ₁⟩` (`hfound`; supplied by
-`inner_tau_extension_of_supported`).  Expands via `ν`-linearity and the source expansion to the
-`crux1_of_memberFamily_general` `hcoeffval` shape. -/
+The integer version used the degree-matched difference `χⱼ − aⱼ·χ₁` (needs `aⱼ = χⱼ(1)/χ₁(1) ∈ ℕ`);
+here the **scaled difference `d₁·χⱼ − dⱼ·χ₁`** (`d₁ = χ₁(1)`, `dⱼ = χⱼ(1)`, integer coefficients,
+degree `d₁·dⱼ − dⱼ·d₁ = 0`, hence in `ℤ[S₁, A]`) is used instead, so the `ν`-isometry on `ℤ[S₁]`
+still applies (`hfound`).  The conclusion is stated in the **division-free scaled form**
+`d₁·⟨Y, νχⱼ⟩ = a·d₁·⟨χ₁,χⱼ⟩ − dⱼ·(a·m₁ + μ)` (`μ = ⟨τ(χ−a·χ₁), νχ₁⟩`); the caller
+(`crux1_of_memberFamily_general`) divides by `d₁ ≠ 0` to obtain `⟨Y,νχⱼ⟩ = a·[j=1] − λ·(dⱼ/d₁)`. -/
 theorem inner_Y_extension_member_eq_general
     {τ : IntegralCharacterMap L G} {A : Set L}
     [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     {S₁ : Set (ClassFunction L ℂ)}
     (hS₁ : IsCoherent τ S₁ A)
-    (χ : ClassFunction L ℂ) {chi1 cj : ClassFunction L ℂ} {a aj : ℕ} {Xχ Y : ClassFunction G ℂ}
+    (χ : ClassFunction L ℂ) {chi1 cj : ClassFunction L ℂ} {a : ℕ} (d1 dj : ℕ)
+    {Xχ Y : ClassFunction G ℂ}
     (hYeq : Y = Xχ - τ (χ - a • chi1))
     (hXortho : ClassFunction.inner Xχ (hS₁.extension cj) = 0)
-    (hfound : ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension (cj - aj • chi1)) =
-      ClassFunction.inner (χ - a • chi1) (cj - aj • chi1))
+    (hfound : ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension (d1 • cj - dj • chi1)) =
+      ClassFunction.inner (χ - a • chi1) (d1 • cj - dj • chi1))
     (hχcj : ClassFunction.inner χ cj = 0)
     (hχchi1 : ClassFunction.inner χ chi1 = 0)
     {m₁ : ℂ} (hchi1chi1 : ClassFunction.inner chi1 chi1 = m₁) :
-    ClassFunction.inner Y (hS₁.extension cj) =
-      (a : ℂ) * ClassFunction.inner chi1 cj -
-        ((a : ℂ) * m₁ + ClassFunction.inner (τ (χ - a • chi1))
-          (hS₁.extension chi1)) * (aj : ℂ) := by
-  have hνcj : hS₁.extension cj = hS₁.extension (cj - aj • chi1) + aj • hS₁.extension chi1 := by
-    rw [map_sub, map_nsmul]; abel
-  have hsrc : ClassFunction.inner (χ - a • chi1) (cj - aj • chi1)
-      = -(a : ℂ) * ClassFunction.inner chi1 cj + (a : ℂ) * (aj : ℂ) * m₁ := by
-    rw [← Nat.cast_smul_eq_nsmul ℂ a chi1, ← Nat.cast_smul_eq_nsmul ℂ aj chi1]
+    (d1 : ℂ) * ClassFunction.inner Y (hS₁.extension cj) =
+      (a : ℂ) * (d1 : ℂ) * ClassFunction.inner chi1 cj -
+        (dj : ℂ) * ((a : ℂ) * m₁ + ClassFunction.inner (τ (χ - a • chi1))
+          (hS₁.extension chi1)) := by
+  -- `⟨Y, νχⱼ⟩ = −⟨τ(χ−a·χ₁), νχⱼ⟩` (`Xχ ⊥ νχⱼ`).
+  have hY0 : ClassFunction.inner Y (hS₁.extension cj) =
+      -ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension cj) := by
+    rw [hYeq, ClassFunction.inner_sub_left, hXortho, zero_sub]
+  -- LHS of `hfound`: `⟨τ(χ−a·χ₁), ν(d₁·χⱼ − dⱼ·χ₁)⟩ = d₁·⟨·,νχⱼ⟩ − dⱼ·⟨·,νχ₁⟩`.
+  have hνexp : hS₁.extension (d1 • cj - dj • chi1) =
+      (d1 : ℂ) • hS₁.extension cj - (dj : ℂ) • hS₁.extension chi1 := by
+    rw [map_sub, map_nsmul, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ d1 (hS₁.extension cj),
+      ← Nat.cast_smul_eq_nsmul ℂ dj (hS₁.extension chi1)]
+  have hlhs : ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension (d1 • cj - dj • chi1)) =
+      (d1 : ℂ) * ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension cj) -
+        (dj : ℂ) * ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension chi1) := by
+    rw [hνexp, ClassFunction.inner_sub_right,
+      OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, star_natCast, star_natCast]
+  -- RHS of `hfound`: the source expansion.
+  have hrhs : ClassFunction.inner (χ - a • chi1) (d1 • cj - dj • chi1) =
+      -((a : ℂ) * (d1 : ℂ)) * ClassFunction.inner chi1 cj + (a : ℂ) * (dj : ℂ) * m₁ := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a chi1, ← Nat.cast_smul_eq_nsmul ℂ d1 cj,
+      ← Nat.cast_smul_eq_nsmul ℂ dj chi1]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
       hχcj, hχchi1, hchi1chi1, star_natCast]
     ring
-  have hsmul : ClassFunction.inner (τ (χ - a • chi1)) (aj • hS₁.extension chi1) =
-      (aj : ℂ) * ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension chi1) := by
-    rw [← Nat.cast_smul_eq_nsmul ℂ aj (hS₁.extension chi1),
-      OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
-  rw [hYeq, ClassFunction.inner_sub_left, hXortho, zero_sub, hνcj,
-    ClassFunction.inner_add_right, hfound, hsrc, hsmul]
-  ring
+  rw [hlhs, hrhs] at hfound
+  -- `d₁·⟨τ(χ−a·χ₁),νχⱼ⟩ = dⱼ·μ − a·d₁·⟨χ₁,χⱼ⟩ + a·dⱼ·m₁`; multiply `hY0` by `d₁`.
+  rw [hY0]
+  ring_nf
+  ring_nf at hfound
+  linear_combination -hfound
 
 /-! ### The member and χ decompositions (helpers 2/general) -/
 
@@ -524,12 +542,17 @@ open scoped Classical in
 `S08_CoherenceCorePart1/CoherentAdjoin.lean`, from the Feit–Thompson Dade map to any isometry `τ`).
 
 This is **Peterfalvi (5.6) / Isaacs, *Character Theory*, Theorem 7.14** — the mixed-degree coherence
-adjoin.  Adjoins a new non-real irreducible pair `{χ, χ̄}` (`‖χ‖² = 1`, `χ ⊥ S₁`) to a coherent
-`(S₁, τ)`, given a finite orthonormal unit-norm member family `{χmem i}ᵢ∈ₛ ⊆ S₁` with degree ratios
-`deg i` (`deg i₁ = 1`), the signed-difference families `R(χ)`, `R(χmem i)`
+adjoin, in the **faithful arbitrary-degree** form (only the anchor divisibility `χ₁(1) ∣ χ(1)` is
+needed, giving `a = χ(1)/χ₁(1) ∈ ℕ`; the member ratios `χⱼ(1)/χ₁(1)` may be **rational**).  Adjoins
+a new non-real irreducible pair `{χ, χ̄}` (`‖χ‖² = 1`, `χ ⊥ S₁`) to a coherent `(S₁, τ)`, given a
+finite orthonormal unit-norm member family `{χmem i}ᵢ∈ₛ ⊆ S₁` with absolute degrees `degMem i`
+(`= χmem i (1)`, `degMem i₁ > 0`), the signed-difference families `R(χ)`, `R(χmem i)`
 (`CharacterDifferenceImage`s w.r.t. `τ`, from `Hypothesis.difference_image` in the application) with
 their `(5.2.e)` cross-orthogonalities `R(χmem i) ⊥ R(χ)`, and the **degree inequality**
-`2a < ∑ᵢ (deg i)²` (`a = χ(1)/χ₁(1)`).  Concludes `IsCoherent τ (S₁ ∪ {χ, χ̄}) A`.
+`2a < ∑ᵢ (degMem i / degMem i₁)²` (Peterfalvi's `2·ψ(1)·χ₁(1) < ∑ χ(1)²` after clearing `χ₁(1)²`).
+Concludes `IsCoherent τ (S₁ ∪ {χ, χ̄}) A`.  The rational ratios are handled by the **scaled
+differences** `degMem i₁ · χⱼ − degMem i · χ₁` (integer-coefficient, supported) in the
+`Y`-coefficient computation (`inner_Y_extension_member_eq_general`).
 
 The lattice isometry `hisom` (in the Dade version drawn from
 `dadeIntegralCharacterMap_inner_eq_on_supported_span`, here supplied from
@@ -551,11 +574,13 @@ noncomputable def adjoinPairCoherent_general
     (hχχbar : ClassFunction.inner χ χ.conj = 0) (hχbarχ : ClassFunction.inner χ.conj χ = 0)
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0)
-    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (degMem : ι → ℕ) (i₁ : ι)
     (hi₁ : i₁ ∈ s)
     (Rmem : ∀ i, i ∈ s → CharacterDifferenceImage (L := L) (G := G) τ (χmem i))
+    (hdegpos : 0 < degMem i₁)
     (hmemdiffsupp : ∀ i ∈ s, ((χmem i).conj - χmem i).support ⊆ A)
-    (hmemdegdiffsupp : ∀ i ∈ s, (χmem i - deg i • χmem i₁).support ⊆ A)
+    (hmemscaleddiffsupp : ∀ i ∈ s,
+      (degMem i₁ • χmem i - degMem i • χmem i₁).support ⊆ A)
     (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁) (hmembarS1 : ∀ i ∈ s, (χmem i).conj ∈ S₁)
     (hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i) (χmem i).conj = 0)
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
@@ -564,8 +589,7 @@ noncomputable def adjoinPairCoherent_general
     {a : ℕ}
     (hdiffasuppχ : (χ - a • χmem i₁).support ⊆ A)
     (htau1_memaχ : τ (χ - a • χmem i₁) ∈ ZIrr G)
-    (ha1 : deg i₁ = 1)
-    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((degMem i : ℝ) / (degMem i₁ : ℝ)) ^ 2)
     (hSgen : Submodule.span ℤ S₁ ≤
       Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χmem i₁}))
     (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, χ.conj}) A ⊆
@@ -615,38 +639,47 @@ noncomputable def adjoinPairCoherent_general
   have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i)) = 0 :=
     fun i hi => OddOrder.Peterfalvi.S08.inner_decomposition_X_extension_member_eq_zero hS₁ Da
       (Dmem i hi) (hortho_mem i hi) rfl
-  -- The (5.6.1) cross-term `hfound` (inline: `ext δ = τ δ` for supported `δ`, then `hisom`).
+  have hd1ne : (degMem i₁ : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hdegpos.ne'
+  have hd1ne' : (degMem i₁ : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hdegpos.ne'
+  -- The (5.6.1) cross-term `hfound` on the **scaled** difference `d₁·χᵢ − dᵢ·χ₁` (integer
+  -- coefficients, supported): `ν δ = τ δ` for supported `δ`, then `hisom`.
   have hfound : ∀ i ∈ s, ClassFunction.inner (τ (χ - a • χmem i₁))
-      (hS₁.extension (χmem i - deg i • χmem i₁)) =
-      ClassFunction.inner (χ - a • χmem i₁) (χmem i - deg i • χmem i₁) := fun i hi => by
-    have hδℤ : χmem i - deg i • χmem i₁ ∈ Submodule.span ℤ S₁ := by
-      refine Submodule.sub_mem _ (Submodule.subset_span (hmemS1 i hi)) ?_
-      rw [← Nat.cast_smul_eq_nsmul ℤ (deg i) (χmem i₁)]
-      exact Submodule.smul_mem _ _ (Submodule.subset_span (hmemS1 i₁ hi₁))
-    have hδmem : χmem i - deg i • χmem i₁ ∈ zSupportedSpan (L := L) S₁ A :=
-      mem_zSupportedSpan_iff.mpr ⟨hδℤ, hmemdegdiffsupp i hi⟩
+      (hS₁.extension (degMem i₁ • χmem i - degMem i • χmem i₁)) =
+      ClassFunction.inner (χ - a • χmem i₁) (degMem i₁ • χmem i - degMem i • χmem i₁) :=
+      fun i hi => by
+    have hδℤ : degMem i₁ • χmem i - degMem i • χmem i₁ ∈ Submodule.span ℤ S₁ := by
+      refine Submodule.sub_mem _ ?_ ?_
+      · rw [← Nat.cast_smul_eq_nsmul ℤ (degMem i₁) (χmem i)]
+        exact Submodule.smul_mem _ _ (Submodule.subset_span (hmemS1 i hi))
+      · rw [← Nat.cast_smul_eq_nsmul ℤ (degMem i) (χmem i₁)]
+        exact Submodule.smul_mem _ _ (Submodule.subset_span (hmemS1 i₁ hi₁))
+    have hδmem : degMem i₁ • χmem i - degMem i • χmem i₁ ∈ zSupportedSpan (L := L) S₁ A :=
+      mem_zSupportedSpan_iff.mpr ⟨hδℤ, hmemscaleddiffsupp i hi⟩
     rw [hS₁.extends_on_supported _ hδmem]
-    refine hisom {χ - a • χmem i₁, χmem i - deg i • χmem i₁} ?_ _ _
+    refine hisom {χ - a • χmem i₁, degMem i₁ • χmem i - degMem i • χmem i₁} ?_ _ _
       (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
     intro t ht; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ht
     rcases ht with rfl | rfl
     · exact hadiffmem
     · exact zSupportedSpan_mono_left hS₁Samb hδmem
+  -- `⟨Y, νχᵢ⟩ = a·[i=i₁] − (a+μ)·(dᵢ/d₁)`, by dividing the scaled `inner_Y` output by `d₁ ≠ 0`.
   have hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y (hS₁.extension (χmem i)) =
       (a : ℂ) * (if i = i₁ then 1 else 0) -
         ((a : ℂ) + ClassFunction.inner (τ (χ - a • χmem i₁))
-          (hS₁.extension (χmem i₁))) * (deg i : ℂ) := by
+          (hS₁.extension (χmem i₁))) * (((degMem i : ℝ) / (degMem i₁ : ℝ) : ℝ) : ℂ) := by
     intro i hi
-    have key := inner_Y_extension_member_eq_general hS₁ χ hYeq (hXortho i hi) (hfound i hi)
-      (hχ_S1 _ (hmemS1 i hi)) (hχ_S1 _ (hmemS1 i₁ hi₁)) hchi1chi1
+    have key := inner_Y_extension_member_eq_general hS₁ χ (degMem i₁) (degMem i) hYeq
+      (hXortho i hi) (hfound i hi) (hχ_S1 _ (hmemS1 i hi)) (hχ_S1 _ (hmemS1 i₁ hi₁)) hchi1chi1
     rw [hmemortho i₁ hi₁ i hi] at key
-    rw [key]
+    apply mul_left_cancel₀ hd1ne
+    rw [key, show (((degMem i : ℝ) / (degMem i₁ : ℝ) : ℝ) : ℂ) = (degMem i : ℂ) / (degMem i₁ : ℂ)
+      from by push_cast; ring]
     rcases eq_or_ne i i₁ with h | h
-    · subst h; simp
-    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
+    · subst h; field_simp
+    · rw [if_neg (fun hh : i₁ = i => h hh.symm), if_neg h]; field_simp
   have hcrux1 : ClassFunction.inner (τ (χ - a • χmem i₁)) (hS₁.extension (χmem i₁)) = -(a : ℂ) :=
-    crux1_of_memberFamily_general hS₁ χ s χmem deg i₁ hi₁ Da hDaY_ZIrr hmemS1 hmemortho hcoeffval
-      htau1_memaχ ha1 hDeg
+    crux1_of_memberFamily_general hS₁ χ s χmem (fun i => (degMem i : ℝ) / (degMem i₁ : ℝ)) i₁ hi₁
+      Da hDaY_ZIrr hmemS1 hmemortho hcoeffval htau1_memaχ (div_self hd1ne') hDeg
   have hcrux2 : ClassFunction.inner (τ (χ - χ.conj)) (hS₁.extension (χmem i₁)) = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, Da.imageFamily.image_eq,
       OddOrder.RepresentationTheory.inner_sum_right,
