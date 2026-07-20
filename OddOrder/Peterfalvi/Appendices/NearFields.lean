@@ -831,10 +831,302 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
         Nat.card K = r ^ 2 ∧
         (∃ e : F ≃+ Twisted d, ∀ x y : F, e (x * y) = e x * e y) ∧
         Nat.card ↥(Subgroup.center Fˣ) = r - 1 := by
-  -- The proved first half: `A` acts irreducibly, so `F` carries a field structure of the same size.
-  obtain ⟨_K, _hK, _hMod, _hKfin, _hrank, _hcard⟩ :=
-    exists_field_structure_of_cyclic_index_two A hcyc hidx
-  sorry
+  classical
+  -- `A` is commutative (cyclic) and acts irreducibly on `(F,+) = Multiplicative F` by right mult.
+  have hcomm : ∀ u v : ↥A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ) := by
+    letI : CommGroup ↥A := hcyc.commGroup
+    intro u v
+    simpa using congrArg Subtype.val (mul_comm u v)
+  letI : CommGroup ↥A := hcyc.commGroup
+  have hirr := rightMulAction_irreducible_of_index_two A hcomm hidx
+  obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
+  haveI : Fact f.Prime := ⟨hf⟩
+  haveI : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
+  -- the semilinear field `K` with the scalar realization `μ` of the `A`-action
+  obtain ⟨K, hKfield, hKmod, hKfin, hrank, hcardKE, ⟨μ, hμ⟩, hσfam⟩ :=
+    OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear_with_scalar
+      (E := Multiplicative F) hE (rightMulAction A hcomm) hirr
+  letI : Module K F := hKmod
+  -- scalar clause in near-field terms: `(μ a) • x = x * (a : F)` for `a ∈ A`, `x ∈ F`
+  have hμ' : ∀ (a : ↥A) (x : F), (μ a : K) • x = x * ((a : Fˣ) : F) := fun a x => hμ a x
+  -- the `K`-linear iso `Θ : K ≃ₗ[K] F`, `a ↦ a • 1`; `Θ 1 = 1` normalizes the unit.
+  have hrankF : Module.finrank K F = 1 := hrank
+  have h1ne : (1 : F) ≠ 0 := one_ne_zero
+  set L : K →ₗ[K] F := LinearMap.toSpanSingleton K F (1 : F) with hL
+  have hLinj : Function.Injective L :=
+    LinearMap.ker_eq_bot.mp (LinearMap.ker_toSpanSingleton (R := K) h1ne)
+  have hLsurj : Function.Surjective L := by
+    intro w
+    obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' (1 : F) h1ne).mp hrankF w
+    exact ⟨c, hc⟩
+  set Θ : K ≃ₗ[K] F := LinearEquiv.ofBijective L ⟨hLinj, hLsurj⟩ with hΘdef
+  have hΘ : ∀ a : K, Θ a = a • (1 : F) := fun a => rfl
+  have hΘ1 : Θ 1 = 1 := by rw [hΘ, one_smul]
+  -- `μ` is injective and `μ a` is the `K`-coordinate of `a : A`, i.e. `Θ (μ a) = (a : F)`.
+  have hμcoord : ∀ a : ↥A, Θ (μ a) = ((a : Fˣ) : F) := by
+    intro a; rw [hΘ, hμ' a 1, one_mul]
+  have hμinj : Function.Injective μ := by
+    intro a b hab
+    have : ((a : Fˣ) : F) = ((b : Fˣ) : F) := by rw [← hμcoord a, ← hμcoord b, hab]
+    exact Subtype.ext (Units.ext (by exact_mod_cast this))
+  -- right-multiplication as an automorphism, and its value on `F`.
+  have hR : ∀ (u : ↥A) (x : F), (rightMulAction A hcomm u) x = x * ((u : Fˣ) : F) :=
+    fun _ _ => rfl
+  -- `A` is normal (index 2); choose `y₀ ∉ A` and the right-multiplication automorphism `g₀`.
+  haveI hAnormal : A.Normal := Subgroup.normal_of_index_eq_two hidx
+  have hAne : A ≠ ⊤ := fun h => by rw [h, Subgroup.index_top] at hidx; exact absurd hidx (by norm_num)
+  obtain ⟨y₀, hy₀⟩ : ∃ y₀ : Fˣ, y₀ ∉ A := by
+    by_contra h; push_neg at h; exact hAne (eq_top_iff.mpr fun x _ => h x)
+  set g₀ : MulAut (Multiplicative F) :=
+    (rightMul ((y₀ : Fˣ) : F) (Units.ne_zero y₀)).toMultiplicative with hg₀def
+  have hg₀toAdd : ∀ x : Multiplicative F,
+      Multiplicative.toAdd (g₀ x) = Multiplicative.toAdd x * ((y₀ : Fˣ) : F) := fun _ => rfl
+  set c₀ : ↥A ≃* ↥A := OddOrder.RepresentationTheory.conjNormalMulAut A y₀⁻¹ with hc₀def
+  have hc₀coe : ∀ t : ↥A, ((c₀ t : Fˣ) : F) = ((y₀⁻¹ * (t : Fˣ) * y₀ : Fˣ) : F) := by
+    intro t
+    have h : (c₀ t : Fˣ) = y₀⁻¹ * (t : Fˣ) * y₀ := by
+      rw [hc₀def, OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe, inv_inv]
+    rw [h]
+  -- the normalization hypothesis `ψ (c₀ t) = g₀ ψ t g₀⁻¹`, via near-field associativity.
+  have hconj : ∀ t : ↥A, g₀ * rightMulAction A hcomm t = rightMulAction A hcomm (c₀ t) * g₀ := by
+    intro t
+    refine MulEquiv.ext (fun x => Multiplicative.toAdd.injective ?_)
+    simp only [MulAut.mul_apply, hg₀toAdd, rightMulAction_toAdd, hc₀coe]
+    push_cast
+    simp only [mul_assoc]
+    congr 1
+    rw [← mul_assoc, mul_inv_cancel₀ (Units.ne_zero y₀), one_mul]
+  have hcond : ∀ t : ↥A, rightMulAction A hcomm (c₀ t) = g₀ * rightMulAction A hcomm t * g₀⁻¹ :=
+    fun t => by rw [hconj t]; group
+  -- extract the field automorphism `σ` realizing right multiplication by `y₀`.
+  obtain ⟨σ, hσ⟩ := hσfam g₀ c₀ hcond
+  have htoAddg₀ : ∀ x : F, (MulEquiv.toAdditive g₀) x = x * ((y₀ : Fˣ) : F) := fun _ => rfl
+  -- semilinearity in near-field terms: `(a • x) * y₀ = σ(a) • (x * y₀)`.
+  have hσNF : ∀ (a : K) (x : F), (a • x) * ((y₀ : Fˣ) : F) = σ a • (x * ((y₀ : Fˣ) : F)) := by
+    intro a x
+    have := hσ a x
+    rw [htoAddg₀, htoAddg₀] at this
+    exact this
+  -- scaling by a nonzero vector is injective (finrank-1 ⟹ no zero divisors).
+  have hsmul_inj : ∀ (w : F), w ≠ 0 → ∀ a b : K, a • w = b • w → a = b := by
+    intro w hw a b hab
+    have h0 : (a - b) • w = 0 := by rw [sub_smul, hab, sub_self]
+    rcases smul_eq_zero.mp h0 with h | h
+    · exact sub_eq_zero.mp h
+    · exact absurd h hw
+  -- `y₀² ∈ A` (index 2), so right multiplication by `y₀²` is a scalar.
+  have hy₀sq : (y₀ * y₀ : Fˣ) ∈ A := by
+    haveI : Fintype (Fˣ ⧸ A) := Fintype.ofFinite _
+    have hcard : Fintype.card (Fˣ ⧸ A) = 2 := by rw [← Nat.card_eq_fintype_card]; exact hidx
+    have hmk : (QuotientGroup.mk (y₀ * y₀) : Fˣ ⧸ A) = 1 := by
+      rw [QuotientGroup.mk_mul, ← sq, ← hcard]; exact pow_card_eq_one
+    exact (QuotientGroup.eq_one_iff _).mp hmk
+  -- `σ² = 1`: applying `hσNF` twice equals the scalar action of `y₀²`.
+  have hdouble : ∀ (s : K) (x : F),
+      (s • x) * ((y₀ : Fˣ) : F) * ((y₀ : Fˣ) : F)
+        = σ (σ s) • (x * ((y₀ : Fˣ) : F) * ((y₀ : Fˣ) : F)) := by
+    intro s x
+    rw [hσNF s x, hσNF (σ s) (x * ((y₀ : Fˣ) : F))]
+  have hσσ : ∀ s : K, σ (σ s) = s := by
+    intro s
+    have hwne : ((y₀ : Fˣ) : F) * ((y₀ : Fˣ) : F) ≠ 0 :=
+      mul_ne_zero (Units.ne_zero _) (Units.ne_zero _)
+    have hzw : ∀ z : F,
+        z * (((y₀ : Fˣ) : F) * ((y₀ : Fˣ) : F)) = (μ ⟨y₀ * y₀, hy₀sq⟩ : K) • z := by
+      intro z
+      have h := hμ' ⟨y₀ * y₀, hy₀sq⟩ z
+      have hcoe : (((⟨y₀ * y₀, hy₀sq⟩ : ↥A) : Fˣ) : F) = ((y₀ : Fˣ) : F) * ((y₀ : Fˣ) : F) :=
+        Units.val_mul y₀ y₀
+      rw [hcoe] at h; exact h.symm
+    have hLHS : (s • (1 : F)) * ((y₀ : Fˣ) : F) * ((y₀ : Fˣ) : F)
+        = s • (((y₀ : Fˣ) : F) * ((y₀ : Fˣ) : F)) := by
+      rw [mul_assoc, hzw (s • 1), ← mul_smul, mul_comm _ s, mul_smul, ← hzw (1 : F), one_mul]
+    have hd := hdouble s 1
+    rw [one_mul, hLHS] at hd
+    exact (hsmul_inj _ hwne _ _ hd).symm
+  have hσ2 : σ ^ 2 = 1 := by
+    ext s; rw [pow_two]; exact hσσ s
+  -- right multiplication by a unit is `id`-semilinear for `y ∈ A`, `σ`-semilinear for `y ∉ A`.
+  have hUmulA : ∀ (s : K) (x : F) (a : ↥A),
+      (s • x) * ((a : Fˣ) : F) = s • (x * ((a : Fˣ) : F)) := by
+    intro s x a
+    rw [← hμ' a (s • x), ← mul_smul, mul_comm _ s, mul_smul, hμ' a x]
+  have hUmulNA : ∀ (s : K) (x : F) (y : Fˣ), y ∉ A →
+      (s • x) * ((y : Fˣ) : F) = σ s • (x * ((y : Fˣ) : F)) := by
+    intro s x y hy
+    have ha : y₀⁻¹ * y ∈ A :=
+      (Subgroup.mul_mem_iff_of_index_two hidx).mpr
+        (iff_of_false (fun h => hy₀ (by simpa using inv_mem h)) hy)
+    have hyval : ((y : Fˣ) : F) = ((y₀ : Fˣ) : F) * (((⟨y₀⁻¹ * y, ha⟩ : ↥A) : Fˣ) : F) := by
+      show ((y : Fˣ) : F) = ((y₀ : Fˣ) : F) * ((y₀⁻¹ * y : Fˣ) : F)
+      rw [← Units.val_mul]; congr 1; group
+    rw [hyval, ← mul_assoc, hσNF s x, hUmulA (σ s) (x * ((y₀ : Fˣ) : F)) ⟨y₀⁻¹ * y, ha⟩, mul_assoc]
+  -- dichotomy on whether `σ` is trivial.
+  rcases eq_or_ne σ 1 with hσeq | hσne
+  · -- **Field case** (`σ = 1`): every right multiplication is `K`-linear, so `F` is commutative.
+    left
+    have hlin : ∀ (s : K) (x : F) (y : Fˣ),
+        (s • x) * ((y : Fˣ) : F) = s • (x * ((y : Fˣ) : F)) := by
+      intro s x y
+      by_cases hy : y ∈ A
+      · exact hUmulA s x ⟨y, hy⟩
+      · rw [hUmulNA s x y hy, hσeq]; rfl
+    have hΘmul : ∀ (a : K) (y : F), y ≠ 0 → Θ a * y = a • y := by
+      intro a y hy
+      have h := hlin a 1 (Units.mk0 y hy)
+      simp only [Units.val_mk0, one_mul] at h
+      rw [hΘ a]; exact h
+    have hxy : ∀ x y : F, y ≠ 0 → x * y = Θ (Θ.symm x * Θ.symm y) := by
+      intro x y hy
+      rw [hΘ (Θ.symm x * Θ.symm y), mul_smul, ← hΘ (Θ.symm y), Θ.apply_symm_apply,
+        ← hΘmul (Θ.symm x) y hy, Θ.apply_symm_apply]
+    intro x y
+    rcases eq_or_ne y 0 with rfl | hy
+    · rw [mul_zero, zero_mul]
+    rcases eq_or_ne x 0 with rfl | hx
+    · rw [zero_mul, mul_zero]
+    rw [hxy x y hy, hxy y x hx, mul_comm (Θ.symm x) (Θ.symm y)]
+  · -- **Twisted case** (`σ ≠ 1`): `F ≅ F_{r²,2}`.
+    right
+    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    obtain ⟨r, p, n, hp, hn, hrpn, hcardKr⟩ := card_eq_sq_of_orderTwo_ringAut σ hσ2 hσne
+    have hKF : Nat.card K = Nat.card F := hcardKE
+    have hFodd : Odd (Nat.card F) := by
+      rw [card_eq_of_index_two A hidx]; exact ⟨Nat.card ↥A, by ring⟩
+    have hpodd : Odd p := by
+      rcases hp.eq_two_or_odd' with h2 | hodd
+      · exfalso
+        have he : Even (Nat.card K) := by
+          rw [hcardKr, hrpn, h2, ← pow_mul]; exact Nat.even_pow.mpr ⟨even_two, by omega⟩
+        rw [hKF] at he
+        obtain ⟨m, hm⟩ := he; obtain ⟨k, hk⟩ := hFodd; omega
+      · exact hodd
+    -- `B := range μ` is an index-2 subgroup of `Kˣ`.
+    set B : Subgroup Kˣ := MonoidHom.range μ with hBdef
+    have hBcard : Nat.card ↥B = Nat.card ↥A :=
+      (Nat.card_congr (MonoidHom.ofInjective hμinj).toEquiv).symm
+    have hKxcard : Nat.card Kˣ = 2 * Nat.card ↥A := by
+      rw [Nat.card_units, hKF, card_eq_of_index_two A hidx]; omega
+    have hBindex : B.index = 2 := by
+      have h := Subgroup.card_mul_index B
+      rw [hBcard, hKxcard, mul_comm 2 (Nat.card ↥A)] at h
+      exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h
+    haveI : B.Normal := Subgroup.normal_of_index_eq_two hBindex
+    -- `χ : Kˣ →* Multiplicative (ZMod 2)` via the order-2 quotient `Kˣ ⧸ B`.
+    have hQcard : Nat.card (Kˣ ⧸ B) = 2 := hBindex
+    have hM2card : Nat.card (Multiplicative (ZMod 2)) = 2 := by
+      rw [Nat.card_eq_fintype_card]; rfl
+    set φ : Kˣ ⧸ B ≃* Multiplicative (ZMod 2) :=
+      mulEquivOfPrimeCardEq (p := 2) hQcard hM2card with hφdef
+    set χ : Kˣ →* Multiplicative (ZMod 2) := φ.toMonoidHom.comp (QuotientGroup.mk' B) with hχdef
+    have hχone : ∀ u : Kˣ, χ u = 1 ↔ u ∈ B := by
+      intro u
+      rw [hχdef]
+      simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, QuotientGroup.coe_mk']
+      rw [map_eq_one_iff φ (EquivLike.injective φ), QuotientGroup.eq_one_iff]
+    -- `mk0 c ∈ B` iff `Θ c`'s `F`-unit lies in `A`.
+    have hBA : ∀ (c : K) (hc : c ≠ 0),
+        Units.mk0 c hc ∈ B ↔ ∃ a : ↥A, ((a : Fˣ) : F) = Θ c := by
+      intro c hc
+      constructor
+      · rintro ⟨a, ha⟩
+        refine ⟨a, ?_⟩
+        have hac : (μ a : K) = c := by rw [ha]; rfl
+        rw [← hμcoord a, hac]
+      · rintro ⟨a, ha⟩
+        refine ⟨a, ?_⟩
+        have hΘeq : Θ ((μ a : K)) = Θ c := by rw [hμcoord a, ha]
+        exact Units.ext (Θ.injective hΘeq)
+    -- `σ` preserves `B = range μ` via `σ(μ a) = μ(y₀⁻¹ a y₀)`, giving `χ_σ`.
+    have hZ2 : ∀ z : ZMod 2, z ≠ 0 → z = 1 := fun z hz => by
+      fin_cases z
+      · exact absurd rfl hz
+      · rfl
+    have hσμ : ∀ a : ↥A, ∃ a' : ↥A, σ (μ a : K) = (μ a' : K) := by
+      intro a
+      have hca : y₀⁻¹ * (a : Fˣ) * y₀ ∈ A := by
+        have := hAnormal.conj_mem (a : Fˣ) a.2 y₀⁻¹; rwa [inv_inv] at this
+      refine ⟨⟨y₀⁻¹ * (a : Fˣ) * y₀, hca⟩, ?_⟩
+      apply hsmul_inj ((1 : F) * ((y₀ : Fˣ) : F)) (by rw [one_mul]; exact Units.ne_zero _)
+      rw [← hσNF (μ a) 1, hμ' a 1, hμ' ⟨y₀⁻¹ * (a : Fˣ) * y₀, hca⟩ ((1 : F) * ((y₀ : Fˣ) : F)),
+        one_mul, one_mul]
+      have hbcoe : ((⟨y₀⁻¹ * (a : Fˣ) * y₀, hca⟩ : ↥A) : Fˣ) = y₀⁻¹ * (a : Fˣ) * y₀ := rfl
+      rw [hbcoe, ← Units.val_mul, ← Units.val_mul]
+      congr 1
+      group
+    have hmemB : ∀ y : Kˣ, y ∈ B → Units.map (σ : K →* K) y ∈ B := by
+      intro y hy
+      obtain ⟨a, ha⟩ := hy
+      obtain ⟨a', ha'⟩ := hσμ a
+      refine ⟨a', ?_⟩
+      apply Units.ext
+      show (μ a' : K) = σ (y : K)
+      rw [← ha', ha]
+    have hσU2 : ∀ y : Kˣ, Units.map (σ : K →* K) (Units.map (σ : K →* K) y) = y := by
+      intro y; apply Units.ext
+      show σ (σ (y : K)) = (y : K)
+      exact hσσ (y : K)
+    have hpres : ∀ y : Kˣ, Units.map (σ : K →* K) y ∈ B ↔ y ∈ B := by
+      intro y
+      refine ⟨fun h => ?_, hmemB y⟩
+      have := hmemB _ h; rwa [hσU2 y] at this
+    have hkey2 : ∀ a b : Multiplicative (ZMod 2), a ≠ 1 → b ≠ 1 → a = b := by
+      intro a b ha hb
+      apply Multiplicative.toAdd.injective
+      rw [hZ2 _ (fun h => ha (Multiplicative.toAdd.injective (h.trans toAdd_one.symm))),
+        hZ2 _ (fun h => hb (Multiplicative.toAdd.injective (h.trans toAdd_one.symm)))]
+    have hχσ : ∀ y : Kˣ, χ (Units.map (σ : K →* K) y) = χ y := by
+      intro y
+      by_cases hy : y ∈ B
+      · rw [(hχone _).mpr ((hpres y).mpr hy), (hχone _).mpr hy]
+      · exact hkey2 _ _ (fun h => hy ((hpres y).mp ((hχone _).mp h)))
+          (fun h => hy ((hχone _).mp h))
+    -- the twisting data and the near-field isomorphism.
+    let d : TwistData K := ⟨σ, hσ2, χ, hχσ⟩
+    have hΘc_ne : ∀ c : K, c ≠ 0 → Θ c ≠ 0 := fun c hc h => hc (Θ.injective (by rw [h, map_zero]))
+    have hZ2 : ∀ z : ZMod 2, z ≠ 0 → z = 1 := fun z hz => by
+      fin_cases z
+      · exact absurd rfl hz
+      · rfl
+    have hmulΘ : ∀ a c : K, Θ a * Θ c = Θ (d.twMul a c) := by
+      intro a c
+      rcases eq_or_ne c 0 with rfl | hc
+      · rw [map_zero, mul_zero, TwistData.twMul_zero, map_zero]
+      · have hexp : d.twExp c = Multiplicative.toAdd (χ (Units.mk0 c hc)) := by
+          unfold TwistData.twExp; rw [dif_neg hc]
+        by_cases hmem : ∃ a' : ↥A, ((a' : Fˣ) : F) = Θ c
+        · obtain ⟨a', ha'⟩ := hmem
+          have hχ1 : χ (Units.mk0 c hc) = 1 := (hχone _).mpr ((hBA c hc).mpr ⟨a', ha'⟩)
+          have hlhs : Θ a * Θ c = Θ (a * c) := by
+            rw [hΘ a, ← ha', hUmulA a 1 a', one_mul, ha', hΘ c, ← mul_smul, hΘ]
+          have htw : d.twMul a c = a * c := by
+            show d.twAut (d.twExp c) a * c = a * c
+            rw [hexp, hχ1, toAdd_one, TwistData.twAut_zero]; rfl
+          rw [hlhs, htw]
+        · have hΘc := hΘc_ne c hc
+          have hyNA : (Units.mk0 (Θ c) hΘc) ∉ A := fun hA => hmem ⟨⟨_, hA⟩, rfl⟩
+          have hχn1 : χ (Units.mk0 c hc) ≠ 1 :=
+            fun h => hmem ((hBA c hc).mp ((hχone _).mp h))
+          have hexp1 : d.twExp c = 1 := by
+            rw [hexp]
+            exact hZ2 _ (fun h => hχn1 (Multiplicative.toAdd.injective (h.trans toAdd_one.symm)))
+          have hlhs : Θ a * Θ c = Θ (σ a * c) := by
+            have hu := hUmulNA a 1 (Units.mk0 (Θ c) hΘc) hyNA
+            simp only [Units.val_mk0, one_mul] at hu
+            rw [hΘ a, hu, hΘ c, ← mul_smul, hΘ]
+          have htw : d.twMul a c = σ a * c := by
+            show d.twAut (d.twExp c) a * c = σ a * c
+            rw [hexp1, TwistData.twAut_one]
+          rw [hlhs, htw]
+    have hiso : ∀ x y : F, Θ.symm (x * y) = d.twMul (Θ.symm x) (Θ.symm y) := by
+      intro x y
+      have h := hmulΘ (Θ.symm x) (Θ.symm y)
+      rw [Θ.apply_symm_apply, Θ.apply_symm_apply] at h
+      rw [h, Θ.symm_apply_apply]
+    refine ⟨r, K, hKfield, hKfin, d, ⟨p, n, hp, hpodd, hn, hrpn⟩, hcardKr,
+      ⟨(Θ.symm.toAddEquiv : F ≃+ Twisted d), fun x y => hiso x y⟩, ?_⟩
+    -- `|Z(Fˣ)| = r - 1`.
+    sorry
 
 end PropositionTwo
 

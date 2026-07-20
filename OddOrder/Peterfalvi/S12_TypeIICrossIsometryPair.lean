@@ -735,7 +735,8 @@ theorem typeP_core_order_coprime [Finite G]
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce Pointwise in
 /-- **Peterfalvi (8.13.b/c4) at the canonical pair, escape-landing exclusion**: an
-`(M′)^#`-point of the type-`P₁` `M` whose centralizer **escapes `M`** cannot land in a conjugate of any type-II maximal `S`.
+`(M′)^#`-point of the type-`P₁` `M` whose centralizer **escapes `M`** cannot land in a
+conjugate of any type-II maximal `S`.
 
 Coq `FTsupport_facts` (b)+(c4) + the (10.7) consumer's `notFrobM`: the escaping `A₀`-point
 has a *unique* supporting maximal `N[a]` (8.13.b), here `= S^g` by `C_G(a) ≤ S^g`; and
@@ -811,10 +812,10 @@ type-generic (8.12)) pins `ℳ(C_G(b)) = {S}`.  If `C_G(a) ≤ M`, then
 theorem typeP_pair_base_bare_not_isConj [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
-    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
+    (hT : mp.T = M) (_hKstar : mp.Kstar = hyp.typeP.W1)
     {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
-    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
-    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP)
+    (_hSW1 : data.typeP.W1 = mp.K) (_hSW2 : data.typeP.W2 = mp.Kstar)
+    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (_ha0 : a ∈ typePA0 M hyp.typeP)
     {b : G} (hbS : b ∈ centralizerSupport
       (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma mp.S)) (derivedInG mp.S)) :
     ¬ IsConj a b := by
