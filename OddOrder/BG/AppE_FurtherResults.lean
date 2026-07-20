@@ -1402,6 +1402,28 @@ theorem RegularOperatorSetup.R₀_le_omega [Finite R]
   rw [hyp.R₀_card] at h
   simpa using congrArg (fun z : ↥hyp.R₀ => (z : R)) h
 
+/-- **BG Theorem E.3(b), Step 2, (E.8)**: `Hᵢ = S_{i+1}` — BG's chain out of `T` *is* the
+lower central series of `S`, from its second term on.
+
+BG derives this "similarly, by induction" after (E.7).  The induction is immediate once
+(E.7) has identified `H₁ = S'`: both `Hᵢ₊₁ = ⁅Hᵢ, S⁆` and `γᵢ₊₁(S) = ⁅γᵢ(S), S⁆` are the
+*same* recursion, so they agree forever after agreeing once.
+
+(Indices: BG writes `S = S₁ ⊃ S₂ ⊃ ⋯`, so BG's `S_{i+1}` is mathlib's
+`lowerCentralSeries ⊤ i`.) -/
+theorem RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) :
+    ∀ i : ℕ, OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1)
+      = Subgroup.lowerCentralSeries (⊤ : Subgroup ↥S) (i + 1)
+  | 0 => by
+      rw [Subgroup.top_lowerCentralSeries_one]
+      exact (hyp.commutator_eq_and_card_quotient hR₀S hexp hS).1
+  | i + 1 => by
+      rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.lowerCentralSeries_succ,
+        hyp.iterCommutator_eq_lowerCentralSeries hR₀S hexp hS i]
+
 /-- **BG Theorem E.3(b), Step 2, (E.7) — unconditionally**: `|S/S'| = p²` for every
 exponent-`p` subgroup `S` properly containing `R₀`.
 

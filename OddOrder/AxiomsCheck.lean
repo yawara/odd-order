@@ -10998,6 +10998,19 @@ hypothesis, so — like the second clause — it is deliberately **not** asserte
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_quotient_commutator
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_lt_omega
 
+/-! **BG Theorem E.3(b), Step 2, (E.8)** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries` — BG's chain out of `T` *is* the
+lower central series of `S` from its second term on.  Immediate once (E.7) has identified
+`H₁ = S'`, since `Hᵢ₊₁ = ⁅Hᵢ, S⁆` and `γᵢ₊₁(S) = ⁅γᵢ(S), S⁆` are the same recursion.
+
+⚠ Worth recording about the hypothesis set: **two of Step 2's three conclusions — `R₀ ⊄ S'`
+and `|S/S'| = p²` — have been proved without using `A`-invariance of `S`, or the `A`-action
+at all.**  BG opens Step 2 with *"Let `S` be any `A`-invariant subgroup of `R` of exponent
+`p` that properly contains `R₀`"*, but the `A`-action only enters for the third conclusion
+`|S| ≤ p^q` (E.9)--(E.12), where regularity of `A` is what forbids the eigenvalue `1`. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
