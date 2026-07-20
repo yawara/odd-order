@@ -403,4 +403,75 @@ theorem inner_Y_extension_member_eq_general
     ClassFunction.inner_add_right, hfound, hsrc, hsmul]
   ring
 
+/-! ### The member and χ decompositions (helpers 2/general) -/
+
+/-- **General member `ψ = 0` decomposition** (generalizes `memberExtensionDecomposition`,
+`S08_YsetInner`).  For a member `χ ∈ S₁` (with `χ̄ ∈ S₁`) and its `R(χ)` family, the (5.5)
+decomposition of `χ` uses the **running extension `ν = hS₁.extension` as the auxiliary isometry**
+(not `τ`): `ν χ ∈ ℤ[Irr G]` (`hνZ`, since `χ ∈ S₁`) whereas `τ χ` need not be integral, and `ν`
+agrees with `τ` on the supported difference `χ − χ̄`.  The `R(χ)` family is w.r.t. `τ`
+(supplied from `Hypothesis.difference_image`). -/
+noncomputable def memberExtensionDecomposition_general
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {S₁ : Set (ClassFunction L ℂ)}
+    (hS₁ : IsCoherent τ S₁ A) {χ : ClassFunction L ℂ}
+    (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (hdiffsupp : (χ.conj - χ).support ⊆ A)
+    (hχ_S1 : χ ∈ S₁) (hχbar_S1 : χ.conj ∈ S₁)
+    (hνZ : hS₁.extension χ ∈ ZIrr G)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0) :
+    CharacterPsiDecomposition (L := L) (G := G) τ χ 0 := by
+  classical
+  have hχmem : χ ∈ Submodule.span ℤ S₁ := Submodule.subset_span hχ_S1
+  have hχbarmem : χ.conj ∈ Submodule.span ℤ S₁ := Submodule.subset_span hχbar_S1
+  have hle : Submodule.span ℤ ({χ - χ.conj, χ - 0} : Set (ClassFunction L ℂ)) ≤
+      Submodule.span ℤ S₁ := by
+    rw [Submodule.span_le]
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · exact Submodule.sub_mem _ hχmem hχbarmem
+    · rw [sub_zero]; exact hχmem
+  have hdiffsupported : χ - χ.conj ∈ zSupportedSpan (L := L) S₁ A :=
+    mem_zSupportedSpan_iff.mpr ⟨Submodule.sub_mem _ hχmem hχbarmem, by
+      rw [show χ - χ.conj = -(χ.conj - χ) from by abel, ClassFunction.support_neg]
+      exact hdiffsupp⟩
+  exact CharacterPsiDecomposition.ofProjection imageFamily hS₁.extension
+    (fun φ ζ hφ hζ => hS₁.extension_inner_eq φ ζ (hle hφ) (hle hζ))
+    (hS₁.extends_on_supported _ hdiffsupported)
+    (by rw [sub_zero]; exact hνZ)
+    (by simp) (by simp) hχχbar
+
+/-- **General χ decomposition for `χ − a·χ₁`** (generalizes `decompositionDaFromDadeOfDiff`,
+`S07_Coherence/FamilyBundleDade`).  Uses `ofProjection` with the auxiliary isometry `τ` itself,
+whose inner-preservation is needed only on the supported **difference** lattice `{χ − χ̄, χ − a·χ₁}`
+(`hisom`), and the `ZIrr`-membership only on `χ − a·χ₁` (`hτaχ1Z`).  Works for an unsupported `χ`
+(e.g. `χ = Ind θ`). -/
+noncomputable def decompositionDaFromDiff_general
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {χ chi1 : ClassFunction L ℂ} {a : ℕ}
+    (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s.support ⊆ A) →
+      ∀ φ ζ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
+        ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (hdiffsupp : (χ.conj - χ).support ⊆ A)
+    (hdiffasupp : (χ - a • chi1).support ⊆ A)
+    (hτaχ1Z : τ (χ - a • chi1) ∈ ZIrr G)
+    (hχaχ1 : ClassFunction.inner χ (a • chi1 : ClassFunction L ℂ) = 0)
+    (hχbaraχ1 : ClassFunction.inner χ.conj (a • chi1 : ClassFunction L ℂ) = 0)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0) :
+    CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1) := by
+  classical
+  have hSdiff : ∀ s ∈ ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)), s.support ⊆ A := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [show χ - χ.conj = -(χ.conj - χ) from by abel, ClassFunction.support_neg]; exact hdiffsupp
+    · exact hdiffasupp
+  exact CharacterPsiDecomposition.ofProjection imageFamily τ
+    (fun φ ζ hφ hζ => hisom _ hSdiff φ ζ hφ hζ)
+    rfl hτaχ1Z hχaχ1 hχbaraχ1 hχχbar
+
 end OddOrder.Peterfalvi.S07
