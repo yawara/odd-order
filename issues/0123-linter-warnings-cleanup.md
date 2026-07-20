@@ -266,3 +266,41 @@ elaborate した時点**の行番号を保持するため (レーンがその後
 | 4+3 | `show` / `change` | 中 (goal を変える show は要確認) |
 | ~7 | unused `Decidable`/`Fintype` in type | ⚠ 高 — 下流 cascade 実績あり、1 件ずつ full build |
 | 4 | Overlapping instance parameters | ⚠ 高 — signature 接触 |
+
+## ⛔ 2026-07-20 夕: `Mathlib.Tactic` 丸ごと import の解消で **main を壊した** (revert 済)
+
+`linter.style.nativeDecide` 系と並ぶ mathlib 標準 linter の一つ
+「Files in mathlib cannot import the whole `Mathlib.Tactic` folder」に従って
+`S05_GridTrichotomy.lean` の `import Mathlib.Tactic` を、実使用タクティク 6 種
+(LinearCombination / Linarith / NormNum.Basic / GCongr / Bound) + `Finset.sum_le_sum` 用の
+`Algebra.Order.BigOperators.Group.Finset` に置き換えた。
+
+- **編集ファイルの leaf build は green**、依存 job 数も 1073 まで落ちて一見成功に見えた。
+- しかし full build で `S15_SAndT_Setup/OrderDetermination.lean` が **多数の unsolved goals**
+  (`⊢ ¬Nat.Prime 4` / `hq5 : ¬5 ≤ 4 ⊢ False` / `⊢ ¬Nat.Prime 6` 等) で失敗。
+  原因 = 下流が `Mathlib.Tactic` 経由で推移的に来ていた `NormNum.Prime` 等の拡張に**暗黙依存**。
+
+### 教訓 (以後の lint wave の前提にする)
+
+1. **import を「減らす/置き換える」変更は、編集したファイルでは原理的に検証できない**。
+   壊れるのは常に下流。leaf build は「そのファイルは通る」という**正しい**答えを返すので、
+   §「leaf の stale-green」とは別の失敗モード。⟹ **必ず `lake build OddOrder` (full) まで回す**。
+2. **mathlib の import linter に機械的に従うのは危険**。CLAUDE.md の
+   「`lake exe shake` は本リポジトリで誤判定が多い」「minimal-import の速度益はほぼ無い」は
+   まさにこの構造を指している。直すなら **先に下流の必要 import を補ってから**。
+3. **build の exit code を読む行と `git push` を同じ bash 呼び出しに書かない**。
+   今回ログに `EXIT=1` と出ていたのに同じ呼び出しの push が走り、**壊れた main が origin に出た**
+   (lane a / c が取り込んだ)。以後 push は `grep -q 'EXIT=0' <log> && git push` の機械ガード付きで、
+   かつ**別の呼び出し**で打つ。
+
+### 残キュー更新 (2026-07-20 夕、warning 総数 50)
+
+| 件数 | linter | 状態 |
+|---|---|---|
+| 16 | `declaration uses sorry` | 対象外 (本物の frontier) |
+| 11 | `open scoped Classical` | **issue 0133** (statement 依存、owner 判断) |
+| ~14 | unused `Decidable`/`Fintype` in type + Overlapping instance | ⚠ 未着手。`S06_CertainTypeClifford` は cascade 実績のあるファイル |
+| 4 | Variable name 未参照 | named-arg / 本体使用ゆえ対応不可 (実測済) |
+| 2 | `style.longLine` | **issue 0132** (宣言名の rename、owner 判断) |
+| 2 | `show` (AppE_FurtherResults) | lane c の frontier 移動待ち |
+| 1 | `Mathlib.Tactic` 丸ごと import | **意図的に残置** (上記の理由。直すなら下流の import 補完とセット) |
