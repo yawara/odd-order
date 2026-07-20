@@ -355,10 +355,71 @@ BG が「位数 p³ 以下の p 群を検査せよ」と省略する分岐は、
 ### 残る Step 2 の穴 (次に着手する順)
 
 1. ~~`|S| ≤ p³` の分岐~~ ✅ 完了 (上記)。
+### ⭐ 2026-07-20 (5): (E.4) と (E.5) を証明
+
+| 新規宣言 | BG 対応 |
+|---|---|
+| `centralizer_inf_eq_sup_omega1Center` | **(E.4) `C_S(R₀) = R₀ × Ω₁(Z(S))`, 位数 p²** |
+| `centralizer_subgroupOf_eq` | `C_{↥S}(R₀) = (S ⊓ C_R(R₀)).subgroupOf S` の橋 |
+| `card_centralizer_inf_centralizer_eq` | **(E.5) `\|C_T(R₀)\| = p`** |
+
+**(E.4) の上界は BG より安く取れた**: BG は `C_S(R₀) ⊆ R₀ × Ω₁(R₁)` (位数 p²) で押さえるが、
+`C_S(R₀)` は elementary abelian (アーベル ⟸ `C_R(R₀)` がアーベル、指数 p ⟸ `S`) で
+`r(C_R(R₀)) ≤ 2` の中に居るので `\|C_S(R₀)\| ≤ p²` が直接出る。
+⟹ **`Ω₁(R₁)` の位数計算は結局一度も要らなかった**。下界は `R₀ × Z` (位数 p²、
+`\|Z\| = p` は lemma52、`R₀ ∩ Z = 1` は既出) で、両者が一致。
+
+(E.5) は Thm 5.3(d) の内部直積分解 `C_S(R₀) = R₀ × C_T(R₀)` + (E.4) から。
+⟹ BG の `\|S : T\| = \|C_T(R₀)\| = p` が両半分そろった。
+
+### 残る Step 2 の穴 (更新)
+
 2. **(E.6) Thm 5.5 の A-不変列** `T = H₀ ⊃ … ⊃ Hₙ = 1`, `H_i = [R₀,H_{i-1}]`,
-   `|H_{i-1}:H_i| = p` — `S05_NarrowAutomorphisms.lean:418` 以降。
+   `|H_{i-1}:H_i| = p` — **計数の核は完了 (下記)**、残るのは鎖の構成と厳密降下。
 3. **(E.7)(E.8)** `H₁ = S₂`, `|S/S'| = p²`, 帰納で `H_i = S_{i+1}`。
    ⟹ E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²` の出所。
 4. **(E.9)-(E.12)** 固有値 `r_i ≡ r₀ r^i`、`A` regular + Prop 1.5(d) ⟹ `r_i ≢ 1`、
    `r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| ≤ p^q`。⟹ **E.3(c)** の出所。
 5. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
+
+## ⭐ 2026-07-20 (6): (E.6) の計数の核が完了
+
+BG が「a short argument using the mapping `H → [R,H]` given by `x ↦ [v,x]`」で済ませる部分:
+
+- **`Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le` を public 化**。
+  これは Thm 5.5 自身の `H_i` 鎖の計数エンジンで、**App.E が要るのは全く同じ補題**
+  (だから BG は「Thm 5.5 の (5.5) 以降の証明をなぞれ」と書ける)。仮定は純粋な計数のみ
+  (p 群性・奇数性・narrow 性なし)。ファイル跨ぎ `private` は規約違反なので public 化が正。
+- **`RegularOperatorSetup.card_le_card_commutator_mul_prime`**: App.E 版
+  `|H| ≤ |⁅R₀,H⁆| · p` (`H ≤ T`)。`R₀` の生成元 `v` と `|C_H(v)| ≤ |C_T(R₀)| = p` (E.5) を渡す。
+
+### ⭐ 同日: (E.6) の 1 段分も完了 — `card_eq_prime_mul_card_commutator`
+
+非自明正規 `H ≤ T` について **`|H| = p · |⁅R₀,H⁆|`**。2 つの評価が一致:
+- `≤` は上の計数ステップ。
+- `≥` は `⁅R₀,H⁆ = ⁅H,R₀⁆ < H` (冪零性、既存
+  `Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient` がそのまま使えた) +
+  「p 群の真部分群の指数は p で割れる」。
+
+⟹ BG の `|H_{i-1} : H_i| = p` の**帰納段が完成**。
+
+### ⭐ 同日: BG の `[R,H] = [R₀,H]` を証明 — `commutator_R₀_eq_commutator_top`
+
+**この同一視は計数の *帰結* であって前提ではない**と判明した:
+`⁅R₀,H⁆ ⊆ ⁅S,H⁆` は単調性、逆は `⁅S,H⁆` が p 群 `H` の真部分群 (冪零性) ゆえ
+`|⁅S,H⁆| ≤ |H|/p = |⁅R₀,H⁆|`。⟹ 上の 1 段補題からそのまま出る。
+
+構造上の意味: **`⁅S,·⁆` は `S` 内の正規性を保つが `⁅R₀,·⁆` は保たない**
+(`R₀` は `S` で正規でない)。だから BG は鎖を `[R,H_{i-1}]` 形で定義して `H_i char R`
+を確保し、その上で `[R₀,H_{i-1}]` と同一視している。形式化も同じ順序で行う。
+
+副産物: `prime_mul_card_le_card_of_lt` (p 群の真部分群は指数が p で割れる) を private
+helper に切り出した。2 箇所で使用。3 消費者目が出たら `OddOrder/GroupTheory/` へ promote。
+
+### (E.6) の残り — 次のイテレーションの単位
+
+1. 鎖 `H₀ = T`, `H_{i+1} = ⁅⊤, H_i⁆` (= `⁅S, H_i⁆`) を **def として定義**。
+   `H_i ⊴ ↥S` は `⊤` と `H_i` の正規性から自動 (mathlib の commutator_normal instance)。
+   `H_i ≤ T` は降下の単調性から自動。⟹ 上の 1 段補題の前提がすべて揃う。
+2. 帰納で `|H_i| = |T| / p^i`、`H_n = ⊥` となる `n` で `|T| = pⁿ`。
+3. その後 (E.7)(E.8): `H₁ = S₂`, `|S/S'| = p²`, `H_i = S_{i+1}`。

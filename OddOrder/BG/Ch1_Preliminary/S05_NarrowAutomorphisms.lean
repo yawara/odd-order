@@ -331,8 +331,12 @@ private theorem card_inf_critical_centralizer_eq_prime
 /-- **Chain factor counting (BG (5.6) step)**: if every `⁅v,·⁆`-commutator of `M` lands
 in `N` and the `v`-centralizer inside `M` has order at most `m`, then `|M| ≤ |N| · m`:
 the map `x ↦ ⁅v, x⁆` is constant exactly on left cosets of `C_M(v)`, hence induces an
-injection `M ⧸ C_M(v) ↪ N`. mmd L1907-1913. -/
-private theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
+injection `M ⧸ C_M(v) ↪ N`. mmd L1907-1913.
+
+Pure counting: no `p`-group, oddness or narrowness hypothesis. Besides Theorem 5.5's own
+`H_i` chain it is also what drives App.E's (E.6) chain `H_i = ⁅R₀, H_{i-1}⁆`, so it is
+public rather than `private` (cross-file `private` is against the repo's conventions). -/
+theorem card_le_card_mul_of_commutator_mem_of_card_centralizer_le
     [Finite R] {M N : Subgroup R} {v : R} {m : ℕ}
     (hcomm : ∀ x ∈ M, ⁅v, x⁆ ∈ N)
     (hcent : Nat.card ↥(Subgroup.centralizer ({v} : Set R) ⊓ M) ≤ m) :

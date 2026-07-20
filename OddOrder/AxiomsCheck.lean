@@ -10864,6 +10864,75 @@ Step 3) for the exponent hypothesis, so it is deliberately **not** asserted here
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.not_le_derivedInG
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_le_omega
 
+/-! **BG Theorem E.3(b), Step 2, (E.4)** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`C_S(R₀) = R₀ × Ω₁(Z(S))`, of order `p²` — `RegularOperatorSetup.…_sup_omega1Center`.
+
+BG sandwiches `R₀ × Z ⊆ C_S(R₀) ⊆ R₀ × Ω₁(R₁)`.  Both ends are reached differently here:
+`|Z| = p` is already out of Lemma 5.2, and the upper bound is cheaper than BG's — `C_S(R₀)`
+is elementary abelian (abelian because it lies in the abelian `C_R(R₀)`, exponent `p` from
+`S`) inside a group of `p`-rank `≤ 2`, so `|C_S(R₀)| ≤ p²` directly.  **`Ω₁(R₁)` never
+enters**, so the appendix still owes no `Ω₁` computation for the cyclic factor. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.centralizer_inf_eq_sup_omega1Center
+
+/-! **BG Theorem E.3(b), Step 2, (E.5)** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+BG's `|S : T| = |C_T(R₀)| = p` is now complete.  The index half came from Lemma 5.2; the
+centralizer half is here.
+
+* `RegularOperatorSetup.centralizer_subgroupOf_eq` — the bridge `C_{↥S}(R₀) =
+  (S ⊓ C_R(R₀)).subgroupOf S`, letting the ambient (E.4) computation feed §5's machinery,
+  which works inside `↥S`.
+* `RegularOperatorSetup.card_centralizer_inf_centralizer_eq` — **`|C_T(R₀)| = p`**, from
+  Theorem 5.3(d)'s internal direct decomposition `C_S(R₀) = R₀ × C_T(R₀)` together with
+  `|C_S(R₀)| = p²` (E.4) and `|R₀| = p`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.centralizer_subgroupOf_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_centralizer_inf_centralizer_eq
+
+/-! **BG Theorem E.3(b), Step 2, the (E.6) counting step** (`BG.Ch1.S05_NarrowAutomorphisms`,
+`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).  BG says only *"a short argument using the
+mapping `H → [R,H]` given by `x ↦ [v,x]`"*; the argument is that the map is constant exactly
+on cosets of `C_H(v)`, so `|H : C_H(v)| ≤ |⁅R₀,H⁆|`.
+
+* `Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le` — that counting, pure
+  and hypothesis-free (no `p`-group, oddness or narrowness).  It already existed as the
+  engine of Theorem 5.5's own `H_i` chain but was `private`; **it is now public**, since
+  App.E needs the identical lemma and cross-file `private` is against repo convention.
+  This is exactly why BG can write "follow the part of the proof of Theorem 5.5 after (5.5)".
+* `AppE.RegularOperatorSetup.card_le_card_commutator_mul_prime` — the App.E instance:
+  `|H| ≤ |⁅R₀,H⁆| · p` for `H ≤ T`, feeding it a generator `v` of `R₀` and the bound
+  `|C_H(v)| ≤ |C_T(R₀)| = p` from (E.5). -/
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_le_card_commutator_mul_prime
+
+/-! **BG Theorem E.3(b), Step 2, (E.6) — one chain step has index exactly `p`**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).
+`RegularOperatorSetup.card_eq_prime_mul_card_commutator`: `|H| = p · |⁅R₀, H⁆|` for a
+nontrivial normal `H ≤ T`.  Two bounds meet — `≤` from the counting step above, and `≥`
+because `⁅R₀,H⁆ = ⁅H,R₀⁆ < H` by nilpotency
+(`Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient`) and a proper subgroup of a
+`p`-group has index divisible by `p`.  This is the inductive step of BG's series
+`T = H₀ ⊃ ⋯ ⊃ Hₙ = 1` with `|Hᵢ₋₁ : Hᵢ| = p`; what (E.6) still owes is the series itself
+(and BG's identification `⁅S, Hᵢ₋₁⁆ = ⁅R₀, Hᵢ₋₁⁆`, which carries the characteristicity). -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_eq_prime_mul_card_commutator
+
+/-! **BG Theorem E.3(b), Step 2, (E.6) — `⁅R₀,H⁆ = ⁅S,H⁆`** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20): `RegularOperatorSetup.commutator_R₀_eq_commutator_top`.
+
+BG *asserts* `Hᵢ = [R, Hᵢ₋₁] = [R₀, Hᵢ₋₁]` as part of (E.6).  The identification turns out to
+be a **consequence** of the counting rather than an input to it: `⊆` is monotonicity, and
+`⊇` because `⁅S,H⁆` is a proper subgroup of the `p`-group `H`, so
+`|⁅S,H⁆| ≤ |H|/p = |⁅R₀,H⁆|`.
+
+This matters structurally, not just cosmetically: `⁅S, ·⁆` preserves normality in `S` while
+`⁅R₀, ·⁆` need not (`R₀` is **not** normal in `S`), so BG's chain has to be *defined* by the
+`⁅S, ·⁆` form — which is what keeps `Hᵢ char R` — and only then recognised as `⁅R₀, ·⁆`. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.commutator_R₀_eq_commutator_top
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
