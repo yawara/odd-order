@@ -740,4 +740,38 @@ theorem pow_eq_one_of_omegaInG {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact 
   simpa using congrArg (Subtype.val (p := fun z => z ∈ omegaInG T p 1)) this
 
 
+/-- **BG's class bound**: `|Ω₁(T)| ≤ p^{q+2}` forces `Ω₁(T)` to have exponent `p`.
+
+BG: *"Since `p ≥ 7` and `q ≤ (p−1)/2`, by Step 1 … therefore `Ω₁(T)` has nilpotence class
+at most `p − 1`.  By Proposition E.2, `Ω₁(Ω₁(T))` has exponent `p`."*
+
+The chain: a `p`-group of order `≤ p^{q+2}` has class `≤ q+1`
+(`Ch1.S04.nilpotencyClass_le_of_card_le_pow`); Step 1 (`card_A_dvd_half_p_sub_one`) gives
+`q ≤ (p−1)/2`, and `q` odd prime forces `p ≥ 7`, so `q + 1 ≤ p − 1`; then
+`pow_eq_one_of_omegaInG` applies Proposition E.2(a). -/
+theorem RegularOperatorSetup.pow_eq_one_of_card_omegaInG_le [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) {T : Subgroup R}
+    (hcard : Nat.card ↥(omegaInG T p 1) ≤ p ^ (q + 2))
+    {x : R} (hx : x ∈ omegaInG T p 1) : x ^ p = 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hpg : IsPGroup p ↥(omegaInG T p 1) := hyp.R_pGroup.to_subgroup _
+  haveI : Group.IsNilpotent ↥(omegaInG T p 1) := hpg.isNilpotent
+  have hcl : Group.nilpotencyClass ↥(omegaInG T p 1) ≤ q + 1 :=
+    OddOrder.BG.Ch1.S04.nilpotencyClass_le_of_card_le_pow hpg (by omega) hcard
+  -- `q + 1 ≤ p − 1`, from Step 1 and the oddness of `p`, `q`
+  have hq3 : 3 ≤ q := by
+    obtain ⟨k, hk⟩ := hyp.q_odd
+    have := hyp.q_prime.two_le
+    omega
+  have hp3 : 3 ≤ p := by
+    obtain ⟨k, hk⟩ := hyp.p_odd
+    have := hyp.p_prime.two_le
+    omega
+  have hqle : q ≤ (p - 1) / 2 :=
+    Nat.le_of_dvd (by omega) hyp.card_A_dvd_half_p_sub_one
+  have hqp : q + 1 ≤ p - 1 := by omega
+  exact pow_eq_one_of_omegaInG
+    (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (hcl.trans hqp)) hx
+
+
 end OddOrder.BG.AppE
