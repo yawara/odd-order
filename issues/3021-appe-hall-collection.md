@@ -416,10 +416,30 @@ BG が「a short argument using the mapping `H → [R,H]` given by `x ↦ [v,x]`
 副産物: `prime_mul_card_le_card_of_lt` (p 群の真部分群は指数が p で割れる) を private
 helper に切り出した。2 箇所で使用。3 消費者目が出たら `OddOrder/GroupTheory/` へ promote。
 
-### (E.6) の残り — 次のイテレーションの単位
+### ⭐ 同日: **(E.6) 完了** — 鎖と `|T| = pⁿ`
 
-1. 鎖 `H₀ = T`, `H_{i+1} = ⁅⊤, H_i⁆` (= `⁅S, H_i⁆`) を **def として定義**。
-   `H_i ⊴ ↥S` は `⊤` と `H_i` の正規性から自動 (mathlib の commutator_normal instance)。
-   `H_i ≤ T` は降下の単調性から自動。⟹ 上の 1 段補題の前提がすべて揃う。
-2. 帰納で `|H_i| = |T| / p^i`、`H_n = ⊥` となる `n` で `|T| = pⁿ`。
-3. その後 (E.7)(E.8): `H₁ = S₂`, `|S/S'| = p²`, `H_i = S_{i+1}`。
+**新しい def は不要だった**: BG の鎖は repo 既存の
+`Isaacs.Ch04.iterCommutator T ⊤` (全体群との反復右交換子) そのもので、
+`iterCommutator_eq_bot_of_isNilpotent_ambient` (鎖が ⊥ に到達) まで既にある。
+
+| 新規宣言 | BG 対応 |
+|---|---|
+| `card_iterCommutator_eq` | **`\|H_i\| = p · \|H_{i+1}\|`** (`H_i ≠ ⊥` の間) |
+| `card_start_eq_pow_mul` | **`\|T\| = p^i · \|H_i\|`** ⟹ 最後の非自明添字で `\|T\| = pⁿ` |
+
+private helper: `normal_iterCommutator` / `iterCommutator_antitone` /
+`iterCommutator_le_start` (鎖の正規性・降下・`≤ T`)。
+
+⟹ **Step 2 の (E.1)-(E.6) が全部そろった**。
+
+### 残り (Step 2 の後半)
+
+1. **(E.7)(E.8)**: `H₁ = S₂` かつ `|S/S'| = p²`、帰納で `H_i = S_{i+1}`。
+   `S = R₀T` と `H₁ = ⁅R₀,T⁆` から。⟹ **E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²`** の出所。
+   ⚠ `S = R₀T` (= `S = R₀ ⊔ T`) はまだ形式化していない。`|S:T| = p` と `R₀ ⊓ T = ⊥`、
+   `|R₀| = p` から出るはず (位数計算)。**次に着手するのはここ**。
+2. **(E.9)-(E.12)**: 固有値 `r_i ≡ r₀ r^i (mod p)`、`A` regular + Prop 1.5(d) ⟹
+   `r_i ≢ 1`、`r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| = p·pⁿ ≤ p^q`。⟹ **E.3(c)**。
+   ⚠ ここは鎖の **A-不変性**が要る (今の鎖は A-不変性を主張していない —
+   `iterCommutator T ⊤` は characteristic なので A-不変のはずだが、要形式化)。
+3. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
