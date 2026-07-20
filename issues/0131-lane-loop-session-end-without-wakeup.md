@@ -134,3 +134,20 @@ issue 3021 に完全な状態を残している。⟹ **これは是正対象で
 - `stop:true` 無し + 達成報告で終了 → 本 issue の障害 (第 1 類型)
 - `stop:true` 有り + 理由が「区切りがついた/裁定待ち」 → 第 2 類型 (規約と食い違う、要是正)
 - `stop:true` 有り + 理由が **context 枯渇** + handoff 完備 → **規約準拠** (是正不要、再開のみ)
+
+## 発生 2026-07-21 00:55 (lane c)
+
+hub tick で c の 3-point 停止シグネチャを検出:
+- 最終 commit **30 分前** (`71619a35e` E.4 β supply 還元の docs)。
+- transcript mtime **28 分前** (標準 project dir、VS Code ext 経由でない = 偽陽性でない)。
+- working tree **clean**・lake build **無し**・claude proc (2641997) の child proc **無し** (idle)。
+- transcript 末尾が `last-prompt` マーカー = ScheduleWakeup を呼ばず turn 終了、入力待ちで idle。
+
+a/b は健全 (transcript とも 1 分前、active)。c のみ停止。成果損失ゼロ (直近 commit は合流済) だが
+App.E frontier が凍結。⚠ **hub から c へメッセージは送れない** (独立 unsupervised session、
+3h37m 稼働) ため**ユーザーに報告して再開を委ねる**。
+
+⚠ 併せて frontier 認識のズレの可能性: c の直前作業は E.4 を「hβsupply 1 本に還元」と記録したが、
+hub 監査 (issue 3021 追記) では残件は hβsupply + index-p 半分 + T 同一視 + 配線の 4 要素。
+c が「あと 1 本の深い gated work」と誤認して停止した可能性がある — だとすれば CLAUDE.md
+「deep char で多反復は停止理由でない」に反する誤停止。再開時は 3021 の frontier 正確化を先に読むこと。

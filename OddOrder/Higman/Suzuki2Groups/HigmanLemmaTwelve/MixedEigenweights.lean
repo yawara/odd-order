@@ -55,6 +55,11 @@ local instance mixedEigenweightLayerModule
     Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
   lowerCentralLayerZmodModule H i
 
+local instance mixedEigenweightLayerIsMulComm
+    (H : Type uP) [Group H] (i : ℕ) :
+    IsMulCommutative (lowerCentralLayer H i) :=
+  lowerCentralLayerIsMulCommutative H i
+
 /-! ## The ambient centre as the second lower-central layer -/
 
 variable {P : Type uP} [Group P]
@@ -411,7 +416,332 @@ theorem one_tmul_mem_span_factorAmbientEigenFamily
     (iota.baseChange F) hmem
   rwa [LinearMap.baseChange_tmul] at this
 
+/-- A ground tensor `1 ⊗ w` is nonzero whenever `w` is, read off the nonzero
+Frobenius coordinate in the conjugate basis. -/
+theorem one_tmul_ne_zero_of_ne_zero
+    (e : Q ≃ₗ[ZMod 2] F) {w : Q} (hw : w ≠ 0) :
+    (1 : F) ⊗ₜ[ZMod 2] w ≠ 0 := by
+  intro h0
+  have hsum :
+      ∑ i : Fin (Module.finrank (ZMod 2) F),
+          (e w) ^ (2 ^ i.val) • conjugateTensorBasisOfLinearEquiv F e i = 0 := by
+    rw [← one_tmul_eq_sum_conjugateTensorBasisOfLinearEquiv F e w]; exact h0
+  have hcoeff := Fintype.linearIndependent_iff.mp
+    (conjugateTensorBasisOfLinearEquiv F e).linearIndependent
+    (fun i => (e w) ^ (2 ^ i.val)) hsum
+  have hpos : 0 < Module.finrank (ZMod 2) F := Module.finrank_pos
+  have hi := hcoeff ⟨0, hpos⟩
+  simp only [Fin.val_mk, pow_zero, pow_one] at hi
+  exact hw (e.injective (by rw [hi, map_zero]))
+
+/-- The base-changed ambient bracket is nonzero on `1 ⊗ a`, `1 ⊗ b` whenever
+the actual bracket of `a`, `b` is nonzero. -/
+theorem lowerCentralCommutatorBilinearBaseChange_one_tmul_ne_zero
+    (a b : Additive (lowerCentralLayer P 0))
+    (e : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] F)
+    (hab : lowerCentralCommutatorBilinear P a b ≠ 0) :
+    lowerCentralCommutatorBilinearBaseChange F P
+        ((1 : F) ⊗ₜ[ZMod 2] a) ((1 : F) ⊗ₜ[ZMod 2] b) ≠ 0 := by
+  have hval : lowerCentralCommutatorBilinearBaseChange F P
+        ((1 : F) ⊗ₜ[ZMod 2] a) ((1 : F) ⊗ₜ[ZMod 2] b) =
+      (1 : F) ⊗ₜ[ZMod 2] lowerCentralCommutatorBilinear P a b := by
+    unfold lowerCentralCommutatorBilinearBaseChange
+    rw [LinearMap.BilinMap.baseChange_tmul, one_mul]
+  rw [hval]
+  exact one_tmul_ne_zero_of_ne_zero e hab
+
+/-- Assemble one factor's base-changed eigenvector family from the uniform data
+shared by both branches: an equivariant inclusion `iota` built from a group map
+`f : G → P` whose denominator `N` lands in `Φ(P)`, a factor quotient coordinate
+`eQuot`, and its actor `Aq`.  The family lies in the common ambient module and
+its span covers every ground vector of the factor. -/
+theorem factorFamily_of_iota_data
+    {G : Type uG} [Group G] (f : G →* P) {N : Subgroup G} [N.Normal]
+    [IsMulCommutative (G ⧸ N)] [Module (ZMod 2) (Additive (G ⧸ N))]
+    (c : Y)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (hf : ∀ g ∈ N, f g ∈ frattini P)
+    (eQuot : Additive (G ⧸ N) ≃ₗ[ZMod 2] F)
+    (Aq : Module.End (ZMod 2) (Additive (G ⧸ N))) (lambda : F)
+    (hAq : ∀ v, eQuot (Aq v) = lambda * eQuot v)
+    (sigma : G → G)
+    (hfRep : ∀ g, Aq (Additive.ofMul (QuotientGroup.mk' N g)) =
+      Additive.ofMul (QuotientGroup.mk' N (sigma g)))
+    (hf_int : ∀ g, f (sigma g) = (Y.subtype c : MulAut P) (f g))
+    {S : Subgroup P} (hSrange : ∀ x : P, x ∈ S → ∃ g : G, f g = x) :
+    ∃ family : Fin (Module.finrank (ZMod 2) F) →
+        F ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
+          (family i) = lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : F) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span F (Set.range family)) := by
+  set iota := quotientToAmbientLayerZeroLinear f hK0 hf with hiotaDef
+  have hiota : ∀ v, iota (Aq v) =
+      lowerCentralLayerRepresentation Y.subtype 0 c (iota v) :=
+    quotientToAmbientLayerZeroLinear_equivariant f c hK0 hf Aq sigma hfRep hf_int
+  refine ⟨factorAmbientEigenFamily eQuot iota, ?_, ?_⟩
+  · intro i
+    exact factorAmbientEigenFamily_eigen c eQuot Aq lambda hAq iota hiota i
+  · intro x hx
+    obtain ⟨g, hg⟩ := hSrange (x : P) hx
+    have hv : iota (Additive.ofMul (QuotientGroup.mk' N g)) = layerZeroClass x := by
+      rw [hiotaDef, quotientToAmbientLayerZeroLinear_mk]
+      exact congrArg layerZeroClass (Subtype.ext hg)
+    rw [← hv]
+    exact one_tmul_mem_span_factorAmbientEigenFamily eQuot iota _
+
+/-- The noncommutative factor branch supplies its base-changed eigenvector
+family in the common ambient module. -/
+theorem exists_factorFamily_of_noncommutative
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    (c : Y) {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (data : NoncommutativeFactorCoordinateData hSinv hPhiS c ePhi nu) :
+    ∃ family : Fin (Module.finrank (ZMod 2) (GaloisField 2 n)) →
+        GaloisField 2 n ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange
+          (GaloisField 2 n) (family i) =
+          data.lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span (GaloisField 2 n) (Set.range family)) := by
+  let f : ↥(lowerCentralTerm (↥S) 0) →* P :=
+    S.subtype.comp (lowerCentralTerm (↥S) 0).subtype
+  have hf : ∀ g ∈ lowerCentralLayerKernel (↥S) 0, f g ∈ frattini P := by
+    intro g hg
+    rw [lowerCentralLayerKernel_zero_eq_of_squares_le (↥S) data.hSq,
+      Subgroup.mem_subgroupOf, data.hterm, Subgroup.mem_subgroupOf] at hg
+    exact hg
+  refine factorFamily_of_iota_data f c hK0 hf data.eQuot
+    (lowerCentralLayerRepresentation hSinv.restrict 0 c) data.lambda
+    data.quotient_compatible
+    (fun g => lowerCentralTermAction hSinv.restrict 0 c g) ?_ ?_ ?_
+  · intro g
+    rw [lowerCentralLayerRepresentation_apply, lowerCentralLayerAction_apply_mk]
+  · intro g
+    show S.subtype ((lowerCentralTerm (↥S) 0).subtype
+        (lowerCentralTermAction hSinv.restrict 0 c g)) =
+      (Y.subtype c : MulAut P) (S.subtype ((lowerCentralTerm (↥S) 0).subtype g))
+    rw [show (lowerCentralTerm (↥S) 0).subtype
+        (lowerCentralTermAction hSinv.restrict 0 c g) =
+        (hSinv.restrict c) ((lowerCentralTerm (↥S) 0).subtype g) from
+      IsAInvariant.restrict_apply_val
+        (IsAInvariant.lowerCentralSeries hSinv.restrict 0) c g]
+    exact IsAInvariant.restrict_apply_val hSinv c _
+  · intro x hx
+    exact ⟨⟨⟨x, hx⟩, by simp [lowerCentralTerm]⟩, rfl⟩
+
+/-- The commutative factor branch supplies its base-changed eigenvector family
+in the common ambient module.  The Agemo quotient carries the canonical
+`F₂`-module structure and its actor is the induced quotient automorphism. -/
+theorem exists_factorFamily_of_commutative [Finite P]
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    (c : Y) {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (data : CommutativeFactorCoordinateData hSinv hPhiS c ePhi nu) :
+    ∃ family : Fin (Module.finrank (ZMod 2) (GaloisField 2 n)) →
+        GaloisField 2 n ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange
+          (GaloisField 2 n) (family i) =
+          data.lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span (GaloisField 2 n) (Set.range family)) := by
+  letI : CommGroup ↥S :=
+    { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
+  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) :=
+    IsMulCommutative.of_comm mul_comm
+  have h2 : ∀ q : Additive (↥S ⧸ Agemo (↥S) 2 1), 2 • q = 0 := by
+    intro q
+    apply Additive.toMul.injective
+    change (Additive.toMul q) ^ 2 = 1
+    obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (Additive.toMul q)
+    rw [← hx, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    simpa using Agemo.mem_of_eq_pow (G := ↥S) (p := 2) (n := 1) x
+  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+    AddCommGroup.zmodModule h2
+  let eQuotLin : Additive (↥S ⧸ Agemo (↥S) 2 1) ≃ₗ[ZMod 2] GaloisField 2 n :=
+    { data.eQuot with
+      map_smul' := ZMod.map_smul data.eQuot.toAddMonoidHom }
+  let Aqmul : ↥S ⧸ Agemo (↥S) 2 1 ≃* ↥S ⧸ Agemo (↥S) 2 1 :=
+    (IsAInvariant.of_characteristic hSinv.restrict).quotientMulAutHom c
+  let Aq : Additive (↥S ⧸ Agemo (↥S) 2 1) →ₗ[ZMod 2]
+      Additive (↥S ⧸ Agemo (↥S) 2 1) :=
+    { (MulEquiv.toAdditive Aqmul).toAddMonoidHom with
+      map_smul' := fun z x => ZMod.map_smul (MulEquiv.toAdditive Aqmul).toAddMonoidHom z x }
+  refine factorFamily_of_iota_data S.subtype c hK0 ?_ eQuotLin Aq data.lambda ?_
+    (fun g => (hSinv.restrict c) g) ?_ ?_ ?_
+  · intro g hg
+    rw [data.hN, Subgroup.mem_subgroupOf] at hg
+    exact hg
+  · intro v
+    exact data.quotient_compatible v
+  · intro g
+    exact congrArg Additive.ofMul
+      ((IsAInvariant.of_characteristic hSinv.restrict).quotientMulAutHom_apply_mk' c g)
+  · intro g
+    exact IsAInvariant.restrict_apply_val hSinv c g
+  · intro x hx
+    exact ⟨⟨x, hx⟩, rfl⟩
+
+/-- Either factor branch supplies its base-changed eigenvector family. -/
+theorem exists_factorFamily [Finite P]
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    (c : Y) {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (data : FactorCoordinateData hSinv hPhiS c ePhi nu) :
+    ∃ family : Fin (Module.finrank (ZMod 2) (GaloisField 2 n)) →
+        GaloisField 2 n ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange
+          (GaloisField 2 n) (family i) =
+          data.lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span (GaloisField 2 n) (Set.range family)) := by
+  cases data with
+  | commutative d =>
+      simpa [FactorCoordinateData.lambda] using
+        exists_factorFamily_of_commutative c hK0 d
+  | noncommutative _ d =>
+      simpa [FactorCoordinateData.lambda] using
+        exists_factorFamily_of_noncommutative c hK0 d
+
 end EigenFamily
+
+set_option maxHeartbeats 800000 in
+/-- **Higman Lemma 12 (p. 90), the mixed weight equation.**
+
+Over the common ambient Singer datum on `Φ(P)`, the actual complementary
+factors `X ≅ A(n, θ)`, `Y ≅ A(n, φ)` have a nonzero mixed commutator, and its
+Frobenius weight satisfies Higman's displayed relation
+`λ^(2^i) μ^(2^j) = ν^(2^k)`.  Together with the two source equations
+`ν = λ θ(λ) = μ φ(μ)` this is exactly the state immediately preceding the
+B/C/D case split; no case is opened here. -/
+theorem exists_mixedFrobeniusWeightEquation_of_xiLengthThree
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+    ∃ (factors : XiLengthThreeTypeAFactorData P Y)
+      (c : Y)
+      (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n)
+      (left : FactorCoordinateData
+        factors.left_invariant factors.frattini_lt_left.le c ePhi nu)
+      (right : FactorCoordinateData
+        factors.right_invariant factors.frattini_lt_right.le c ePhi nu)
+      (i j k : Fin (Module.finrank (ZMod 2) (GaloisField 2 n))),
+      2 ≤ n ∧
+      IsPrimitiveRoot nu (2 ^ n - 1) ∧
+      nu = left.lambda * left.theta left.lambda ∧
+      nu = right.lambda * right.theta right.lambda ∧
+      left.lambda ^ (2 ^ i.val) * right.lambda ^ (2 ^ j.val) =
+        nu ^ (2 ^ k.val) := by
+  classical
+  dsimp only
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  set n := Module.finrank (ZMod 2) (Additive ↑(frattini P)) with hn
+  obtain ⟨factors, c, ePhi, nu, left, right,
+      hnTwo, _hcgen, hnuPrim, hconj, hleft, hright⟩ :=
+    exists_complementaryFactorCoordinates_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hK0 :=
+    lowerCentralLayerKernel_zero_eq_frattini_subgroupOf_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hK1 :=
+    lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hterm :=
+    lowerCentralTerm_one_eq_frattini_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  obtain ⟨famL, hLeigen, hLcov⟩ := exists_factorFamily c hK0 left
+  obtain ⟨famR, hReigen, hRcov⟩ := exists_factorFamily c hK0 right
+  -- Centre eigenbasis with weights `ν^(2^k)`.
+  set eCenter := ambientCenterCoordinate hEA hK1 hterm ePhi with heC
+  have hCenterEigen : ∀ k,
+      (lowerCentralLayerRepresentation Y.subtype 1 c).baseChange
+          (GaloisField 2 n)
+          (conjugateTensorBasisOfLinearEquiv (GaloisField 2 n) eCenter k) =
+        nu ^ (2 ^ k.val) •
+          conjugateTensorBasisOfLinearEquiv (GaloisField 2 n) eCenter k := by
+    intro k
+    exact baseChange_eigen_conjugateTensorBasisOfLinearEquiv
+      (GaloisField 2 n) eCenter
+      (lowerCentralLayerRepresentation Y.subtype 1 c) nu
+      (ambientCenterCoordinate_compat hEA hK1 hterm ePhi c nu hconj) k
+  -- Nonzero mixed commutator witness.
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hPhiBot
+    have hcommBot : _root_.commutator P = ⊥ :=
+      le_bot_iff.mp
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          (le_of_eq hPhiBot))
+    exact hncomm ((commutator_eq_bot_iff P).mp hcommBot)
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive
+      (IsAInvariant.of_characteristic Y.subtype) hPhiNeBot
+  obtain ⟨x0, y0, hx0L, hy0R, hbne⟩ :=
+    factors.exists_mixed_lowerCentralCommutatorBilinear_ne_zero
+      hxi hinvPhi hEA hK1
+  -- The witness lies in each factor span; the base-changed bracket is nonzero.
+  have hbeta_ne :
+      lowerCentralCommutatorBilinearBaseChange (GaloisField 2 n) P
+          ((1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x0)
+          ((1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass y0) ≠ 0 :=
+    lowerCentralCommutatorBilinearBaseChange_one_tmul_ne_zero
+      (layerZeroClass x0) (layerZeroClass y0) eCenter hbne
+  obtain ⟨i, j, k, _, hweight⟩ :=
+    exists_pair_ne_zero_and_weight_eq
+      ((lowerCentralLayerRepresentation Y.subtype 0 c).baseChange (GaloisField 2 n))
+      ((lowerCentralLayerRepresentation Y.subtype 0 c).baseChange (GaloisField 2 n))
+      ((lowerCentralLayerRepresentation Y.subtype 1 c).baseChange (GaloisField 2 n))
+      (lowerCentralCommutatorBilinearBaseChange (GaloisField 2 n) P)
+      famL famR (conjugateTensorBasisOfLinearEquiv (GaloisField 2 n) eCenter)
+      (fun i => left.lambda ^ (2 ^ i.val))
+      (fun j => right.lambda ^ (2 ^ j.val))
+      (fun k => nu ^ (2 ^ k.val))
+      hLeigen hReigen hCenterEigen
+      (fun u v =>
+        lowerCentralCommutatorBilinearBaseChange_equivariant
+          (GaloisField 2 n) Y.subtype c u v)
+      (hLcov x0 hx0L) (hRcov y0 hy0R) hbeta_ne
+  exact ⟨factors, c, ePhi, nu, left, right, i, j, k,
+    hnTwo, hnuPrim, hleft, hright, hweight⟩
 
 end
 
