@@ -11092,6 +11092,62 @@ BG's "`≡ mod Hᵢ₊₁`" is this statement read in the quotient.
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.exists_zpow_eq_on_chain_section
 
+/-! **BG Theorem E.3(b), Step 2, (E.10)** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20): `RegularOperatorSetup.quotient_action_ne_one` — `A` does **not** centralize a
+nontrivial chain section.
+
+BG: *"if `rᵢ ≡ 1 (mod p)` for some `i`, then `A` centralizes `Hᵢ/Hᵢ₊₁` by Proposition
+1.5(d) … contrary to the regular action of `A` on `R`."*  Stated as the induced automorphism
+being `≠ 1`, which is the content.
+
+Proposition 1.5(d) is used in its **element** form
+(`Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`), which is lighter than the
+subgroup form `GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient`: it lifts a coset
+representative `g ∉ Hᵢ₊₁` to a fixed `c` in the same coset, and `c ∉ Hᵢ₊₁` makes `c ≠ 1`, so
+`a` fixing it contradicts `C_R(α) = 1`.
+
+⚠ The coprime lemma is applied with acting group **`⟨a⟩`, not all of `A`** — the hypothesis
+concerns one specific `a`, so restricting to its cyclic subgroup is what makes the
+fixed-point lifting applicable. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.quotient_action_ne_one
+
+/-! **BG Lemma 4.2(a), bilinear form** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`AppE.commutatorElement_pow_pow_of_central` — `⁅x^m, y^n⁆ = ⁅x,y⁆^(m·n)` for central
+`⁅x, y⁆`.
+
+The repo already had the two single-slot forms
+(`Ch1.S04.commutatorElement_pow_{left,right}_of_central`); this is their bilinear
+combination, which is what BG's (E.12) actually applies.  The right slot is applied to
+`⁅x^m, y⁆`, central precisely because it *equals* `⁅x,y⁆^m`.
+
+BG uses it inside `S/Hᵢ₊₁` — where `H̄ᵢ` is central, so commutators landing in `H̄ᵢ` are
+central — to compute `[wᵢ₋₁^{rᵢ₋₁} u, vʳ] = wᵢ^{rᵢ₋₁ r}` and conclude
+`rᵢ ≡ rᵢ₋₁ r (mod p)`.  ⚠ Topically this belongs beside the two slots in
+`S04_SmallRankBasic`; it is kept here while it has a single consumer. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutatorElement_pow_pow_of_central
+
+/-! **BG Theorem E.3(b), Step 2, (E.12) setup** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20): `AppE.chain_map_le_center` — `H̄ᵢ ≤ Z(S̄)` in `S̄ = S/Hᵢ₊₁`.
+
+BG: *"Let `S̄ = S/Hᵢ₊₁` … then `|H̄ᵢ| = p` and `H̄ᵢ ≤ Z(S̄)`."*  Immediate from the chain's own
+definition — `Hᵢ₊₁ = ⁅Hᵢ, S⁆`, so every commutator of an element of `Hᵢ` with anything dies
+in the quotient.  This centrality is exactly the hypothesis
+`commutatorElement_pow_pow_of_central` needs, so it is what lets Lemma 4.2(a) be applied
+there. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.chain_map_le_center
+
+/-! **BG Theorem E.3(b), Step 2, (E.9): the `wᵢ` sequence** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20).
+
+* `AppE.commutatorIterate` — `w₀ = w`, `wᵢ = ⁅wᵢ₋₁, v⁆`: the **element-level** counterpart of
+  `Isaacs.Ch04.iterCommutator`, which iterates on subgroups.  No such element-level version
+  existed in the repo.
+* `AppE.commutatorIterate_mem_chain` — `wᵢ ∈ Hᵢ`, by the immediate induction
+  `wᵢ = ⁅wᵢ₋₁, v⁆ ∈ ⁅Hᵢ₋₁, S⁆ = Hᵢ`.  ⚠ Only `w ∈ T` is needed: `v` is unconstrained,
+  because the chain brackets against all of `S` rather than against `R₀`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutatorIterate_mem_chain
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
