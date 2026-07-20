@@ -1,6 +1,6 @@
 ---
 id: 1048
-slug: pf-10-11-typeII-second-assertion
+slug: pf-10-11-typeii-second-assertion
 title: "(10.11) 第 2 主張 (型 II の H 構造 + 𝒮 coherent) を形式化"
 created: 2026-07-20
 ---
