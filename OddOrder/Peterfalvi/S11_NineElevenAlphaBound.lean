@@ -700,7 +700,7 @@ theorem caseA_sThree_coherent
   have hconj : ∀ a ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
       a.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂ := by
     intro a ha
-    refine ⟨Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime ha.1, ?_⟩
+    refine ⟨OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime ha.1, ?_⟩
     intro hc
     have h := hS₂conj hc
     rw [ClassFunction.conj_conj] at h

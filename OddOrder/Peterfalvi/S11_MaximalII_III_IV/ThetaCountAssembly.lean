@@ -1218,5 +1218,65 @@ theorem caseA_a_dvd_u [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   exact Subgroup.index_dvd_of_le (fun x hx =>
     Subgroup.mem_subgroupOf.mpr (cInHu_le_cuInHu caseA (Subgroup.mem_subgroupOf.mp hx)))
 
+/-! ### `𝒮(Y)` conjugation-closure (relocated from §11, issue 1045)
+
+Stated over Hypothesis (9.2) alone, so it is §9 content; it previously sat in
+`S13_MaximalIII_IVBasic` (namespace `S13`), downstream of the §9 users that need it. -/
+
+/-- **`𝒮(Y) = sOf data Y` is closed under complex conjugation** (parallel to
+`inducedKernelFamily_closedUnderConjugate`): conjugating the source `χ` preserves membership in
+`𝒳(Y)` — the kernel is conjugation-invariant (`characterKernel_conj`), so both `H ⊄ Ker χ`
+(`xiSet`) and `Y ⊆ Ker χ` are preserved — and `induceHU` commutes with conjugation
+(`induceHU_eq_induce` + `ClassFunction.induce_conj`).  The conjugate-closure input of the (11.8.6)
+`𝒮(H₀C)` witness (`hwit`). -/
+theorem sOf_closedUnderConjugate [Finite G] {M : Subgroup G}
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (OddOrder.Peterfalvi.S11.sOf data Y) := by
+  classical
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  intro φ hφ
+  obtain ⟨χ, hχ, rfl⟩ := hφ
+  set χc : IrreducibleCharacter ↥(OddOrder.Peterfalvi.S11.huSub data) :=
+    ⟨(χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ).conj, χ.isIrreducible.conj⟩
+    with hχcdef
+  have hk : OddOrder.Peterfalvi.S03.characterKernel
+      (χc : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ)
+      = OddOrder.Peterfalvi.S03.characterKernel
+        (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ) :=
+    OddOrder.Peterfalvi.S03.characterKernel_conj _
+  refine ⟨χc, ⟨?_, ?_⟩, ?_⟩
+  · -- `χc ∈ xiSet`: `H ⊄ Ker χc = Ker χ`
+    have h1 := hχ.1
+    simp only [OddOrder.Peterfalvi.S11.xiSet, Set.mem_setOf_eq] at h1 ⊢
+    rwa [hk]
+  · -- `Y ⊆ Ker χc = Ker χ`
+    rw [hk]; exact hχ.2
+  · -- `(induceHU χ).conj = induceHU χc`
+    rw [OddOrder.Peterfalvi.S11.induceHU_eq_induce data
+        (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ),
+      OddOrder.Peterfalvi.S11.induceHU_eq_induce data
+        (χc : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ)]
+    exact ClassFunction.induce_conj (OddOrder.Peterfalvi.S11.huSub data)
+      (χ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ)
+
+/-- **The degree-`d` irreducible cut of `𝒮(Y)` is conjugate-closed** (the `hconjS` input of the
+(9.11) column-pair adjunction): conjugation preserves `𝒮(Y)`-membership
+(`sOf_closedUnderConjugate`), irreducibility, and the natural degree (`star_natCast`).
+
+Stated over Hypothesis (9.2) alone.  It previously took the §11 `S13.Hypothesis` bundle, but the
+proof only ever used its `s11Setup` field (and a `Finite G` already present as a binder), so the
+§11 packaging was decoration — issue 1045. -/
+theorem irrCut_conjClosed [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (Y : Subgroup G) (d : ℕ) {x : ClassFunction ↥M ℂ}
+    (hx : x ∈ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}) :
+    x.conj ∈ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} := by
+  obtain ⟨hmem, hirr, hdeg⟩ := hx
+  refine ⟨sOf_closedUnderConjugate data Y hmem, hirr.conj, ?_⟩
+  rw [ClassFunction.conj_apply, hdeg, star_natCast]
+
 end OddOrder.Peterfalvi.S11
 

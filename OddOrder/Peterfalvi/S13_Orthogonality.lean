@@ -134,7 +134,7 @@ theorem coherent_sOf_H0C [Finite G]
       OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le
         (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
     have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+      OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
     -- the refuter is discharged through the (9.11.1) squeeze + the Phase-B/C/D/E layers;
     -- the (9.11.7)–(9.11.8) coherent-pair construction is `nineElevenSevenEightRefutation`
     -- (issue 9083 Phase E-final, `S11_NineElevenPairAdjoin`)
@@ -329,9 +329,9 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
     rw [hμdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩]
     exact columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1 hncH0C htype
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+    OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
   have hξc : ξ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hξ
+    OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hξ
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
       x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
       x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -956,7 +956,7 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
     intro x hx y hy
     rw [hagreeSof x hx, hagreeSHC y hy]
     have hxc : x.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hx
+      OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hx
     have hyc : y.conj ∈ hyp.SOf hyp.HC := by
       rw [hyp.SOf_eq] at hy ⊢
       exact OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hy

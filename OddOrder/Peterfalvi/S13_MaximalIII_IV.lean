@@ -86,20 +86,6 @@ theorem irrCut_finite [Finite G] {M : Subgroup G} (hyp : Hypothesis M) (Y : Subg
   have h := hyp.sOf_subset_SOf Y hφ.1
   rwa [hyp.SOf_eq] at h
 
-/-- **The degree-`d` irreducible cut of `𝒮(Y)` is conjugate-closed** (the `hconjS` input of the
-(9.11) column-pair adjunction): conjugation preserves `𝒮(Y)`-membership
-(`sOf_closedUnderConjugate`), irreducibility, and the natural degree (`star_natCast`). -/
-theorem irrCut_conjClosed [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
-    (Y : Subgroup G) (d : ℕ) {x : ClassFunction ↥M ℂ}
-    (hx : x ∈ {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
-      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}) :
-    x.conj ∈ {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
-      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} := by
-  haveI := hyp.base.finiteG
-  obtain ⟨hmem, hirr, hdeg⟩ := hx
-  refine ⟨Hypothesis.sOf_closedUnderConjugate hyp.s11Setup Y hmem, hirr.conj, ?_⟩
-  rw [ClassFunction.conj_apply, hdeg, star_natCast]
-
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The §12 Dade image of an `A(M)`-supported function vanishes on the exceptional set `V`**
 (the §12 analogue of `tau_apply_eq_zero_of_mem_ticVdiffV`, by a *different* route — issue 1019
@@ -342,7 +328,7 @@ noncomputable def caseB_adjoinOneColumnPair [Finite G]
       IsIrreducibleCharacter x := fun x hx => ((hmemiff x).mp hx).2.1
   have hconjS : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
       x.conj ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset := fun x hx =>
-    (hmemiff _).mpr (irrCut_conjClosed hyp hyp.H0Cprime d ((hmemiff x).mp hx))
+    (hmemiff _).mpr (OddOrder.Peterfalvi.S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime d ((hmemiff x).mp hx))
   have hχ₁s : χ₁ ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset :=
     (hmemiff χ₁).mpr ⟨hχ₁mem, hχ₁irr, hχ₁deg⟩
   have hdegmem : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
@@ -812,7 +798,7 @@ noncomputable def caseB_chainStep [Finite G]
       IsIrreducibleCharacter x := fun x hx => ((hmemiff x).mp hx).2.1
   have hconjS : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
       x.conj ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset := fun x hx =>
-    (hmemiff _).mpr (irrCut_conjClosed hyp hyp.H0Cprime d ((hmemiff x).mp hx))
+    (hmemiff _).mpr (OddOrder.Peterfalvi.S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime d ((hmemiff x).mp hx))
   have hχ₁s : χ₁ ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset :=
     (hmemiff χ₁).mpr ⟨hχ₁mem, hχ₁irr, hχ₁deg⟩
   have hdegmem : ∀ x ∈ (irrCut_finite hyp hyp.H0Cprime d).toFinset,
@@ -998,7 +984,7 @@ noncomputable def caseB_coherent_sOf_H0Cprime_of_mixed [Finite G]
     · exact hμmem _ (hfin hlt)
     · rw [Set.mem_singleton_iff] at hx
       subst hx
-      exact Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime
+      exact OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime
         (hμmem _ (hfin hlt))
   -- the cover: every member is in the cut or in an enumerated pair (member dichotomy)
   have hcover : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
@@ -1073,7 +1059,7 @@ noncomputable def caseB_coherent_sOf_H0Cprime_of_mixed [Finite G]
       intro x hx
       rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hb | ⟨j, hji, hj⟩
       · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl (Finset.mem_coe.mpr
-          ((hmemiff _).mpr (irrCut_conjClosed hyp hyp.H0Cprime d
+          ((hmemiff _).mpr (OddOrder.Peterfalvi.S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime d
             ((hmemiff x).mp (Finset.mem_coe.mp hb))))))
       · have hltj : j + 1 < hyp.base.w2 := by omega
         rw [caseBPairSet_of_lt hG hyp hltj] at hj

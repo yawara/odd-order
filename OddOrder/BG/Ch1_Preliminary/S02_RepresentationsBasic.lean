@@ -71,17 +71,34 @@ Theorem 2.6).
 
 ## 結果別 mathlib カバレッジ / shared module 依存
 
-| BG §2 | mathlib v4.29.1 | 新規 shared module |
-|---|---|---|
-| Prop 2.1(a) | `Representation.IsIrreducible` ✓ | `AbsolutelyIrreducible.lean` |
-| Prop 2.1(b) | Jacobson Density (mathlib) ✓ | `EnvelopingAlgebra.lean` |
-| Prop 2.1(c) | `LittleWedderburn` ✓ + Schur ✓ | (上記流用) |
-| Prop 2.2(a) | ✅ `CliffordMultiplicityOne.restriction_isIrreducible` (char-free) | `CliffordAlgClosed.lean` |
-| Prop 2.2(b) | ✅ `CyclicExtension.exists_extension_of_nonempty_equiv_conjRep` (任意標数) | `CyclicExtension.lean` |
-| Lem 2.3 | (上記 abs.irred. 経由) | — |
-| Prop 2.4 (a-k) | `Module.End.eigenspace` 基本 | `EigenspaceUnderCyclicAction.lean` |
-| Thm 2.5 | `IsExtraspecial` ✓ (本 repo) | `AutElementaryAbelian.lean` + Prop 2.4 |
-| Thm 2.6(a)(b) | `Representation` + `Sylow` + GL(2,F) | `PGroupFixedVector.lean` |
+- Prop 2.1(a)
+  - mathlib v4.29.1: `Representation.IsIrreducible` ✓
+  - 新規 shared module: `AbsolutelyIrreducible.lean`
+- Prop 2.1(b)
+  - mathlib v4.29.1: Jacobson Density (mathlib) ✓
+  - 新規 shared module: `EnvelopingAlgebra.lean`
+- Prop 2.1(c)
+  - mathlib v4.29.1: `LittleWedderburn` ✓ + Schur ✓
+  - 新規 shared module: (上記流用)
+- Prop 2.2(a)
+  - mathlib v4.29.1: ✅ `CliffordMultiplicityOne.restriction_isIrreducible` (char-free)
+  - 新規 shared module: `CliffordAlgClosed.lean`
+- Prop 2.2(b)
+  - mathlib v4.29.1: ✅ `CyclicExtension.exists_extension_of_nonempty_equiv_conjRep`
+    (任意標数)
+  - 新規 shared module: `CyclicExtension.lean`
+- Lem 2.3
+  - mathlib v4.29.1: (上記 abs.irred. 経由)
+  - 新規 shared module: —
+- Prop 2.4 (a-k)
+  - mathlib v4.29.1: `Module.End.eigenspace` 基本
+  - 新規 shared module: `EigenspaceUnderCyclicAction.lean`
+- Thm 2.5
+  - mathlib v4.29.1: `IsExtraspecial` ✓ (本 repo)
+  - 新規 shared module: `AutElementaryAbelian.lean` + Prop 2.4
+- Thm 2.6(a)(b)
+  - mathlib v4.29.1: `Representation` + `Sylow` + GL(2,F)
+  - 新規 shared module: `PGroupFixedVector.lean`
 
 主要 cite: Prop 2.1 ← §3 Thm 3.16; Prop 2.2 ← §3 Thm 3.4 ×2;
 Thm 2.5 ← §3 Thm 3.4, §15 Thm 15.7;
@@ -92,13 +109,21 @@ mathlib `Module.Finite.toModuleEnd_moduleEnd_surjective`
 
 ## 先行章依存 (BG §1, Isaacs Phase 1)
 
-| BG §2 | 依存 | 状態 (2026-07-18 更新) |
-|---|---|---|
-| Prop 2.2 | 表現論的 Clifford (BG 仮説 `M ≅ M^x` から直接) | ✅ 済 (Isaacs Ch.6 §6F 非依存) |
-| Thm 2.5 | Isaacs Thm 5.5.4-5 (extraspecial repr) | 対応 Ch.6 §6E? 未 |
-| Thm 2.6 | G Lem 2.6.3 (Isaacs FGT 不在) | `PGroupFixedVector.lean` 新規 + `Maschke` |
-| Prop 2.1 (a)(b) | Jacobson Density | ✅ mathlib 既存 |
-| Prop 2.1 (c) | Wedderburn (`LittleWedderburn`) | ✅ mathlib 既存 |
+- Prop 2.2
+  - 依存: 表現論的 Clifford (BG 仮説 `M ≅ M^x` から直接)
+  - 状態 (2026-07-18 更新): ✅ 済 (Isaacs Ch.6 §6F 非依存)
+- Thm 2.5
+  - 依存: Isaacs Thm 5.5.4-5 (extraspecial repr)
+  - 状態 (2026-07-18 更新): 対応 Ch.6 §6E? 未
+- Thm 2.6
+  - 依存: G Lem 2.6.3 (Isaacs FGT 不在)
+  - 状態 (2026-07-18 更新): `PGroupFixedVector.lean` 新規 + `Maschke`
+- Prop 2.1 (a)(b)
+  - 依存: Jacobson Density
+  - 状態 (2026-07-18 更新): ✅ mathlib 既存
+- Prop 2.1 (c)
+  - 依存: Wedderburn (`LittleWedderburn`)
+  - 状態 (2026-07-18 更新): ✅ mathlib 既存
 
 ## 実装 status (2026-05-24)
 

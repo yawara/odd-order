@@ -436,7 +436,7 @@ noncomputable def coherent_sOf_H0Cprime_of_allReducible [Finite G]
         (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0 ∧ φ ≠ 0 := by
     obtain ⟨ζ, hζ⟩ := hne
     have hζc : ζ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime :=
-      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hζ
+      OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hζ
     have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
         ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
       have h := hyp.sOf_subset_SOf hyp.H0Cprime hζ
@@ -614,7 +614,7 @@ noncomputable def sOf_degreeSubfamily_isCoherent [Finite G]
           IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} hyp.base.A0 ∧ φ ≠ 0 := by
     obtain ⟨ζ, hζ, hζirr, hζ1⟩ := hex
     have hζc : ζ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y :=
-      Hypothesis.sOf_closedUnderConjugate hyp.s11Setup Y hζ
+      OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup Y hζ
     have hζc1 : ((ζ.conj : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ) := by
       rw [ClassFunction.conj_apply, hζ1, star_natCast]
     have hζSK : ζ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily

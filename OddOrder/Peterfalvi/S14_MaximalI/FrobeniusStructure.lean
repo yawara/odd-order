@@ -505,7 +505,7 @@ theorem SsubFiltration_commutator_apply_one_eq_index [Finite G] {L : Subgroup G}
         commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
       inferInstanceAs (IsMulCommutative (Abelianization ↥((hyp.typeI.typeF.H).subgroupOf L)))
     refine
-      OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+      apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
       (N := commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) θ ?_
     rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self ((hyp.typeI.typeF.H).subgroupOf L)]
     exact hker
