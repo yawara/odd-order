@@ -375,4 +375,48 @@ theorem RegularOperatorSetup.card_map_centralizer [Finite R] [Finite B]
   refine Nat.eq_of_mul_eq_mul_right hyp.p_prime.pos ?_
   rw [hmul]; ring
 
+/-! ## Eigenspaces, and why commuting operators preserve them
+
+BG: *"Since `β` centralizes `α`, `β` fixes both subspaces if `r ≠ r₀`."*  The eigenspaces are
+genuine subgroups of the abelian `S/S'`, and a commuting automorphism preserves each of
+them; when the two eigenvalues differ the eigenspaces are the two *lines* `R₀S'/S'` and
+`T/S'` themselves, which is how BG turns "β preserves eigenspaces" into "β fixes `R₀S'`". -/
+
+/-- The `r`-eigenspace `{x | f x = x ^ r}` of an automorphism of an abelian group. -/
+def eigenSubgroup {E : Type*} [Group E] (hcomm : ∀ x y : E, x * y = y * x) (f : MulAut E)
+    (r : ℤ) : Subgroup E where
+  carrier := {x : E | f x = x ^ r}
+  one_mem' := by simp
+  mul_mem' := fun {a b} ha hb => by
+    have hz : (a * b) ^ r = a ^ r * b ^ r := by
+      letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
+      exact mul_zpow a b r
+    change f (a * b) = (a * b) ^ r
+    rw [map_mul, ha, hb, hz]
+  inv_mem' := fun {a} ha => by
+    change f a⁻¹ = a⁻¹ ^ r
+    rw [map_inv, ha, inv_zpow]
+
+@[simp] theorem mem_eigenSubgroup {E : Type*} [Group E] (hcomm : ∀ x y : E, x * y = y * x)
+    (f : MulAut E) (r : ℤ) {x : E} : x ∈ eigenSubgroup hcomm f r ↔ f x = x ^ r := Iff.rfl
+
+/-- **BG's *"`β` centralizes `α`, so `β` fixes the eigenspaces"***: an automorphism commuting
+with `f` maps each `f`-eigenspace onto itself.
+
+`f (g x) = g (f x) = g (x ^ r) = (g x) ^ r`, and the reverse inclusion is the same argument
+for `g⁻¹`, which commutes with `f` too. -/
+theorem map_eigenSubgroup_of_commute {E : Type*} [Group E]
+    (hcomm : ∀ x y : E, x * y = y * x) {f g : MulAut E} (hfg : f * g = g * f) (r : ℤ) :
+    (eigenSubgroup hcomm f r).map ((g : MulAut E) : E →* E) = eigenSubgroup hcomm f r := by
+  -- The one-sided statement, applied to `g` and to `g⁻¹`.
+  have key : ∀ h : MulAut E, f * h = h * f → ∀ x : E, f x = x ^ r → f (h x) = (h x) ^ r := by
+    intro h hfh x hx
+    have hcomm' : f (h x) = h (f x) := congrArg (fun k : MulAut E => k x) hfh
+    rw [hcomm', hx, map_zpow]
+  have hfg' : f * g⁻¹ = g⁻¹ * f := (show Commute f g from hfg).inv_right
+  refine le_antisymm (fun y hy => ?_) (fun y hy => ?_)
+  · obtain ⟨x, hx, rfl⟩ := hy
+    exact key g hfg x hx
+  · exact ⟨g⁻¹ y, key g⁻¹ hfg' y hy, MulAut.apply_inv_self E g y⟩
+
 end OddOrder.BG.AppE
