@@ -379,3 +379,49 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `OddOrder/Algebra/ChevalleyWarning.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/QuadraticExtensions.lean`
+
+## 🔍 hub 内容監査 (2026-07-20 21:40 tick, merge 9a2d27ec1) — **健全。STOP なし**
+
+合流時に merge 9a2d27ec1 (`d5a1c543a`/`d5145a9af`/`2fa607a0f`) の内容を独立監査した
+(sorry 数でなく「hard content が実証明されたか / 構成不能な仮説へ hoist されていないか」で判定)。
+
+**判定: genuine・sorry 0・axiom 0・unsound carrier 無し・既存 API の暗黙の弱化なし。**
+
+### 確認できた事実
+
+- **`_with_secondShift` 3 本は真に strong**。旧版と**仮説リストが byte-identical** で、
+  結論に conjunct が増えているだけ (`∃ s, eTwo' = eTwo.trans (Frob^s).toLinearEquiv ∧ …`)。
+  互換射影 3 本の statement も旧版と **byte-identical** — 下流を黙って弱めていない。
+- ⚠ ただし**新しい数学ではない**。追加された結論は `rfl` で閉じており (PairGap:1206,
+  TraceFormula:844)、witness は元々この Frobenius shift だった。**`∃` に隠れていた witness を
+  露出させた de-opacification** であって、hub はこの 3 commit を「新定理」と読まないこと。
+  (プロジェクト方針上これは正当な作業 — 下流の counter-shift に必要。)
+- **`LengthTwoModels` の 7 宣言はすべて実証明**。`homocyclicFourSquareEquiv` は抽象的な
+  濃度同型でなく `((… (mk x) : ℧₁(A)) : A) = x^2` が `rfl` で成立する二乗写像なので、
+  `Frob⁻¹` 正規化は**強制されている** (等式を成り立たせるために選んだのではない)。
+- **導入された仮説はすべて in-repo の producer に辿れた** — `ε` ← `exists_homocyclic_four_of_
+  commutative_xiLengthTwo` / `hinvPhi` ← `involutions_subset_of_nontrivial_invariant` /
+  `hEA` ← `frattini_isElementaryAbelian_of_xiLengthThree` / `he` ← `exists_ambientFrattini
+  SingerCoordinates_of_xiLengthThree`。**構成不能な posited data は無い**。
+  (`he` のみ `conj` 形 → pointwise `≃+` 形の glue が未記述。機械的、`PairGap.lean:106` に前例。)
+- `XiLengthTwoTypeAData` は `TypeAData` から `phi_ne_one` を 1 つ落としたもので、
+  `equivModel` は具体的な `QuadraticExtension` に着地し、可換/非可換の両分岐から実際に inhabited。
+  `HasXiLengthTwo/Three` も「長さ n の狭義鎖の存在 **+ より長い鎖の非存在**」で honest。
+
+### 残課題 (STOP でない・b の判断で)
+
+1. ~~新規 7 宣言に consumer が無く、可換分岐の endpoint は依然 actor-blind な
+   `LinearEquiv.ofFinrankEq` (LengthTwoModels:345) 経由~~ → **`55c15a749`
+   「restore prescribed kernels after normalization」で解消中と見られる** (TypeAConclusion +
+   LengthTwoModels に +248 行)。次 tick で再確認する。
+2. **重複**: `xiLengthTwoTypeAData_of_homocyclic_four_prescribedKernel` (399-401) が
+   `squareEquiv.toAdditive.trans kernelCoord |>.trans (frobeniusEquiv F 2).symm.toAddEquiv` を
+   inline しているが、これは 90 行上で自ら追加した `homocyclicFourQuotientCoordinate` そのもの。
+   後者に差し替えるのが素直。
+3. **API が二重化**: strong/projection のペアで statement が 3 組。うち
+   `exists_shiftedSecondLinearEquiv_expansion` (TraceFormula:883) は**既に consumer 0 の dead shim**。
+   移行期としては妥当だが、shift が消費され切った時点で畳むこと (放置すると溜まる)。
+4. **第 1 層の shift は未露出**: PairGap の強化は第 2 層座標 `eTwo'` のみを pin する。
+   `eOne'` も証明中は `frobeniusShiftLinearEquivForNormalization eOne i.val` (PairGap:1077) だが
+   export されていない。prescribed-coordinate が商/第 1 層の counter-shift も要求するなら
+   3 本目の sibling が要る。
