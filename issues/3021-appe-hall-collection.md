@@ -925,3 +925,44 @@ p 群では index ∈ {1, p}。分岐:
 4. **Prop E.2(a)** `omega_pow_eq_one_of_lowerCentralSeries_eq_bot` (済) ⟹ `Ω₁(Ω₁(T))` 指数 p、
    `omegaInG_omega` で `= Ω₁(T)`、`Ω₁(T)` は A-不変 (T = N_P(S) が A-不変) かつ `⊋ S`
    ⟹ **極大性に矛盾** ⟹ Step 3 完了。
+
+## ⚠⚠ 2026-07-20 (16): 最終組み立てで**設計の食い違いを発見** — `3 ≤ pRank ↥S p` が Step 3 では手に入らない
+
+Step 3 の最終組み立てに入ったところで、次の依存が問題になった:
+
+`index_sup_centralizer_lt` (E.16) → `card_sup_centralizer` → **Step 2 の (E.4)
+`centralizer_inf_eq_sup_omega1Center`** → **`3 ≤ pRank ↥S p` を要求**。
+
+しかし Step 3 の `S` (極大な A-不変指数 p 部分群) について `r(S) ≥ 3` は**与えられていない**。
+
+### BG は別ルートで `|C_S(R₀)| = p²` を出している
+
+BG (E.14): 「Clearly `S ⊇ Ω₁(Z(R))` and `C_S(R₀) = S ∩ (R₀ × R₁) = R₀ × Ω₁(R₁)`」。
+つまり **rank でなく「種を含むこと」から**出している:
+
+- `S ⊓ C_R(R₀) ⊇ seed = Ω₁(C_R(R₀))` — 種が `S` に入っているから
+- `S ⊓ C_R(R₀) ⊆ seed` — `S` は指数 p なので `S ⊓ C_R(R₀)` の元は `C_R(R₀)` 内で `x^p = 1`
+- ⟹ **`S ⊓ C_R(R₀) = seed` (ちょうど)**
+- `|seed| = |Ω₁(R₀ × R₁)| = |R₀| · |Ω₁(R₁)| = p · p = p²`
+  (`R₁` は非自明巡回 p 群なので `|Ω₁(R₁)| = p`)
+
+### 対応方針 (次セッション)
+
+**`card_sup_centralizer` と `index_sup_centralizer_lt` の仮説を
+`(hexp, hS3 : 3 ≤ pRank ↥S p)` から
+`hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2` に置き換える**
+(パラメータ化)。供給元は 2 つ:
+
+- Step 2 の文脈: (E.4) `centralizer_inf_eq_sup_omega1Center` (rank ≥ 3 あり)
+- Step 3 の文脈: 新補題 `inf_centralizer_eq_seed` + `card_seed = p²` (rank 不要)
+
+⟹ 書くべき新規:
+1. `RegularOperatorSetup.inf_centralizer_eq_seed`:
+   `hyp.seed ≤ S` かつ `S` 指数 p ⟹ `S ⊓ C_R(R₀) = hyp.seed`。
+2. `RegularOperatorSetup.card_seed`: `|seed| = p²`。
+   ⟸ `seed = Ω₁(C_R(R₀))`、`C_R(R₀) = R₀ ⊔ R₁` アーベル、`|Ω₁(R₁)| = p`
+   (`GroupTheory.card_omega1OfAbelian_eq_of_isCyclic` = `OmegaSubgroup.lean:526` を実測確認)。
+3. 上記 2 定理の仮説パラメータ化 (呼び出し側 = Step 2 の消費点も更新)。
+
+⭐ **これは特殊化債務の返済でもある** — 現状の (E.16) は BG より強い仮説
+(`rank ≥ 3`) を要求しており、パラメータ化すれば BG どおりの一般性になる。
