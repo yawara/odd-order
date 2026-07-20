@@ -286,4 +286,83 @@ theorem RegularOperatorSetup.exists_smul_R₀_invariant [Finite R] [Finite B]
   rw [← hy]
   exact h'
 
+/-! ## The `A`-fixed point on the coset `y·N_S(R₀)`
+
+BG's closing move: *"Then `A` normalizes `R₀` and `R₀^y`.  Therefore `y^α N_S(R₀) =
+y N_S(R₀)`, and `α` (and `A`) fix the coset `y N_S(R₀)`.  Now `|A| = q`, while
+`|y N_S(R₀)| = |N_S(R₀)|`, which is a power of `p` and hence not divisible by `q`.
+Therefore `A` fixes at least one element `z` of `y N_S(R₀)`.  Since `A` acts regularly on
+`R`, `z = 1`.  Therefore `y ∈ N_S(R₀)` and `R₀^β = R₀`."*
+
+The coprime coset fixed-point statement is **Isaacs Theorem 3.27**
+(`OddOrder.Isaacs.Ch04.aInvariant_coset_mem_centralizer_of_coprime_subgroup`). -/
+
+/-- **BG Theorem E.3(d)**: if `B` fixes `R₀Φ(Ω₁(R))` then `B` fixes `R₀`.
+
+`Φ(Ω₁(R)) = (Ω₁(R))'` because `Ω₁(R)` has exponent `p` (E.3(b)), so the hypothesis is the
+one `exists_smul_R₀_invariant` consumes: it produces `y ∈ S` with `R₀^y` `B`-invariant.
+Since `A ≤ B` also normalizes `R₀` itself, `A` fixes the coset `y·N_S(R₀)` setwise; that
+coset has `p`-power size while `|A| = q`, so Isaacs Thm 3.27 puts an `A`-fixed point in it,
+which regularity forces to be `1`.  Hence `y ∈ N_S(R₀)`, i.e. `R₀^y = R₀`. -/
+theorem RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q)
+    (hB : ∀ b : B, (hyp.act b) • (hyp.R₀ ⊔ frattiniInG (Omega R p 1)) =
+      hyp.R₀ ⊔ frattiniInG (Omega R p 1)) :
+    ∀ b : B, (hyp.act b) • hyp.R₀ = hyp.R₀ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  rw [hyp.frattiniInG_omega_eq_derivedInG] at hB
+  obtain ⟨y, hyS, hyinv⟩ := hyp.exists_smul_R₀_invariant hB
+  set φA : ↥hyp.A →* MulAut R := hyp.act.comp hyp.A.subtype with hφA
+  set N : Subgroup R := Omega R p 1 ⊓ Subgroup.normalizer hyp.R₀ with hNdef
+  have hSinvA : IsAInvariant φA (Omega R p 1) := by
+    haveI : (Omega R p 1).Characteristic := Omega.characteristic
+    exact IsAInvariant.of_characteristic φA
+  have hNinv : IsAInvariant φA N := hSinvA.inf hyp.isAInvariant_R₀.normalizer
+  -- The coset `y·N_S(R₀)` is `A`-invariant.
+  have hcoset : ∀ a : ↥hyp.A, ∃ n ∈ N, φA a y = y * n := by
+    intro a
+    -- `A` normalizes both `R₀` and `R₀^y`, so `conj (y^α) • R₀ = conj y • R₀`.
+    have hfix : (MulAut.conj (φA a y)) • hyp.R₀ = (MulAut.conj y) • hyp.R₀ := by
+      have h1 := hyinv (a : B)
+      rw [smul_conj_smul, hyp.A_fixes_R₀ a.val a.property] at h1
+      exact h1
+    refine ⟨y⁻¹ * φA a y, Subgroup.mem_inf.mpr ⟨?_, ?_⟩, by group⟩
+    · exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hyS) (hSinvA.smul_mem a hyS)
+    · rw [Subgroup.mem_normalizer_iff_map_conj_eq, ← pointwise_mulAut_smul_eq_map, map_mul,
+        mul_smul, hfix, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  -- `|A| = q` is prime to `|N_S(R₀)|`, a power of `p`.
+  have hCop : Nat.Coprime (Nat.card ↥hyp.A) (Nat.card ↥N) := by
+    obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup N).exists_card_eq
+    rw [hyp.A_card, hk]
+    exact Nat.Coprime.pow_right k
+      ((Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr (Ne.symm hyp.p_ne_q))
+  haveI hNsolv : IsSolvable ↥N := by
+    haveI : Group.IsNilpotent ↥N := IsPGroup.isNilpotent (hyp.R_pGroup.to_subgroup N)
+    infer_instance
+  obtain ⟨c, ⟨n, hn, hcn⟩, hcfix⟩ :=
+    OddOrder.Isaacs.Ch04.aInvariant_coset_mem_centralizer_of_coprime_subgroup
+      (φ := φA) (N := N) hCop (Or.inr hNsolv) hNinv hcoset
+  -- Regularity of `A` pins the fixed point down to `1`.
+  have hAne : hyp.A ≠ ⊥ := by
+    intro h
+    have hc := hyp.A_card
+    rw [h, Subgroup.card_bot] at hc
+    exact hyp.q_prime.one_lt.ne hc
+  haveI : Nontrivial ↥hyp.A := (Subgroup.nontrivial_iff_ne_bot _).mpr hAne
+  obtain ⟨a, ha⟩ := exists_ne (1 : ↥hyp.A)
+  have hc1 : c = 1 :=
+    hyp.A_regular a.val a.property (fun h => ha (Subtype.ext h)) c (hcfix a)
+  -- Hence `y ∈ N_S(R₀)`, i.e. `R₀^y = R₀`.
+  have hyN : y ∈ N := by
+    have hyn : y = n⁻¹ := by
+      rw [eq_inv_iff_mul_eq_one, ← hcn, hc1]
+    rw [hyn]
+    exact Subgroup.inv_mem _ hn
+  have hyR₀ : (MulAut.conj y) • hyp.R₀ = hyp.R₀ := by
+    rw [pointwise_mulAut_smul_eq_map]
+    exact Subgroup.mem_normalizer_iff_map_conj_eq.mp (Subgroup.mem_inf.mp hyN).2
+  intro b
+  have h := hyinv b
+  rwa [hyR₀] at h
+
 end OddOrder.BG.AppE

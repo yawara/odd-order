@@ -56,7 +56,8 @@ packaging.  Per-result status:
 | E.3(b) Step 2, (E.4)--(E.7) | **proved, sorry-free** (chain, `\|T\| = pⁿ`, `\|S/S'\| = p²`) |
 | E.3(b) second + third clause | **proved** from Step 2 + first clause |
 | E.3(c) (`card_omega_le`) | **proved** — in `AppE_RegularOperator.lean` (Step 2's count) |
-| E.3(b) first clause, E.3(d), E.4, E.5 | honest statements, `sorry` |
+| E.3(d) (`B_fixes_R₀_of_fixes_frattini`) | **proved** — in `AppE_SemidirectFrattini.lean` (Step 4) |
+| E.3(b) first clause, E.4, E.5 | honest statements, `sorry` |
 -/
 
 namespace OddOrder.BG.AppE
@@ -1627,18 +1628,11 @@ is what that leaf carries. -/
 its proof is BG's `(E.9)`--`(E.12)` eigenvalue count, and that machinery is what the
 downstream leaf carries. -/
 
-/-- **BG Theorem E.3(d)**: if `B` fixes `R₀ Φ(Ω₁(R))` then `B` fixes `R₀`.
-
-**Status: honestly stated, not proved.**  BG's Step 4: every element of
-`R₀ Φ(S) - Φ(S)` is `S`-conjugate into `R₀^#`, so `SB = S N_{SB}(R₀)`; a
-Schur--Zassenhaus complement plus regularity of `A` pins the conjugating element
-down to `1`. -/
-theorem RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini [Finite R] [Finite B]
-    (hyp : RegularOperatorSetup R B p q)
-    (hB : ∀ b : B, (hyp.act b) • (hyp.R₀ ⊔ frattiniInG (Omega R p 1)) =
-      hyp.R₀ ⊔ frattiniInG (Omega R p 1)) :
-    ∀ b : B, (hyp.act b) • hyp.R₀ = hyp.R₀ := by
-  sorry
+/- **BG Theorem E.3(d)** (`B` fixes `R₀Φ(Ω₁(R))` ⇒ `B` fixes `R₀`) is **proved** two leaves
+downstream, as `RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini` in
+`OddOrder/BG/AppE_SemidirectFrattini.lean`.  It has to live there: BG's Step 4 consumes the
+class/coset count of `AppE_ExponentP.lean` (itself built on Step 2's `(E.15)`), and then
+Glauberman's fixed-point lemma and Isaacs Thm 3.27. -/
 
 /-- **BG Proposition E.4**: in the situation of Theorem E.3, with
 `S = Ω₁(R)`, if `|S| ≥ p⁴`, `B` acts regularly on `R`, and `B` does not fix `R₀`,
