@@ -11752,3 +11752,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- Hypothesis (4.6) whose (4.6.c) `H` is larger than `M_σ` — notably the §10/§13 packaging, which
 -- instantiates `H = K = M'` — so its `hHeq` pin relaxes to the containment `hHle`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_mono
+-- **Restricting an (8.15) Dade support datum to a smaller `M`-stable support** (issue 1045
+-- 着手順 3): Peterfalvi (2.11) at the level of the whole (8.15) package.  The intended instance is
+-- `A₀(M) = A(M) ∪ V^M ↝ A(M)` — the §10 `Hypothesis` carries its datum on `A₀(M)` while the §9
+-- (9.11) chain consumes one on `A(M)`.  The faithful-kernel pin transports because
+-- `ftSupportKernel` branches only on `C_G(x) ⊄ M` once `x` is known to lie in the support.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftSupportKernel_congr_of_subset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.DadeSupportHypothesisData.restrict
