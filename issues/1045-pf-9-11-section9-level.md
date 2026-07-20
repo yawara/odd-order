@@ -693,7 +693,44 @@ H0supC_le_derived, W1_inf_H0supC_subgroupOf_eq_bot, W2_not_le_H0supC, card_W2bar
 ⟹ **(9.11) の case A 残作業は `hArefute` + count `h2 : 2 ≤ ncard` のみ**
 (`h2` は S15 先例どおり露出したまま = the honest pattern)。
 
-#### ⛏ 次の一手: `hArefute` の §9 化 (= 本 issue 最後の項目)
+#### ✅ 済 (2026-07-20): `hArefute` を §9 へ降ろした
+
+`S11.CaseAPairBound` / `S11.CaseAEqualityRefutation` / `S11.caseA_refuter_of_equality_refutation`
+(commit 2d27db2ec)。予測どおり **rename で済んだ** — §13 版の `S13.Hypothesis` 依存は
+packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` をこの 2 carrier に置換。
+
+⚠ 2 つの `def` に `open scoped S12.FiniteInduce in` を付け忘れて 1 度落ちた
+(`sumnS`/`IsCoherent` が `Fintype ↥M` を要る)。**§9 の `sOf` 系を触る宣言には一律で付ける**。
+
+⟹ **(9.11) の残り = `hbound` / `hrefuteEq` / `hAbase` の count `h2` の 3 つだけ**。
+経路上に型仮定は一つも無い。
+
+#### ⛏ 次の一手: `CaseAPairBound` の producer を §9 へ (型仮定が消える)
+
+`S13.nineElevenPairBound` (`S11_NineElevenCaseA.lean:436`) が §13 版 producer。
+`hncH0C` と `htype : IsTypeIII ∨ IsTypeIV` を取るが、**実測すると使用箇所は 1 行だけ**:
+
+```
+rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]
+```
+
+= 本 issue で繰り返し見ている **`hyp.C = cSub` の辞書同一視**そのもの。
+§9 では `chars.C` が `cSub data chief` **定義的に等しい**ので、この rw ごと消える。
+⟹ **`CaseAPairBound` の producer は型仮定ゼロで降りる**見込み。
+
+#### ⚠ `CaseAEqualityRefutation` は repo のどこにも producer が無い (= 本物の未完部分)
+
+grep 実測: `NineElevenEqualityRefutation` は `caseA_refuter_of_equality_refutation` の
+**引数としてしか現れない**。issue 9083 の Phase B–E ((9.11.2) の `u ≤ a²` /
+(9.11.3) の class 方程式 / (9.11.4) の Mackey norm / (9.11.5)–(9.11.8)) が残っている。
+
+ただし**算術の鎖は既に landed かつ §9 レベル**:
+`S11.nineElevenCaseA_equality_refutation` (`S11_NineElevenCoherence.lean:1004`) は
+`data`/`chief`/`chars` の上で述べられており**型仮定ゼロ**。
+残るのは「等号配置 → その定理の入力 (`hclass`/`hn`/`hnorm`/`hK₁`/`hK₂`/`hCinf`/`hle`)」の
+配線であって、算術そのものではない。
+
+#### (旧) 次の一手: `hArefute` の §9 化
 
 `hArefute` は §13 では `S11.caseA_refuter_of_equality_refutation`
 (`S11_NineElevenCaseA.lean:254`) が供給していて、そこで**2 つの carrier に落ちている**:
