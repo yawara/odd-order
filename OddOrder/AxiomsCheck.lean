@@ -11182,6 +11182,7 @@ kernel argument needs no counting at all.
 (issue 0134); the hub deferred splitting it while lane c's frontier sits at its tail, so
 lane c stops growing it instead. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.commutator_mul_mem_chain
+#assert_only_allowed_axioms OddOrder.BG.AppE.chainStepHom_ker_ge
 
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our

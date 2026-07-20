@@ -70,4 +70,42 @@ theorem commutator_mul_mem_chain {G : Type*} [Group G] {T : Subgroup G} [T.Chara
   rw [hrw]
   exact Subgroup.Normal.conj_mem' inferInstance _ hc _
 
+/-- **The homomorphism behind (E.12)**: `x ↦ ⁅v, x⁆ mod Hᵢ₊₂`, as a map `Hᵢ →* G/Hᵢ₊₂`.
+
+Multiplicativity is `commutator_mul_mem_chain`.  Taking the *ambient* quotient `G/Hᵢ₊₂` as
+codomain (rather than `Hᵢ₊₁/Hᵢ₊₂`) keeps the construction light — the image automatically
+lands in the image of `Hᵢ₊₁`, but nothing here needs to say so.
+
+Its kernel is `{x ∈ Hᵢ | ⁅v,x⁆ ∈ Hᵢ₊₂}`, the set BG needs to identify with `Hᵢ₊₁`. -/
+def chainStepHom {G : Type*} [Group G] (T : Subgroup G) [T.Characteristic] (v : G) (i : ℕ) :
+    ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i) →*
+      (G ⧸ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2)) where
+  toFun x := QuotientGroup.mk ⁅v, (x : G)⁆
+  map_one' := by simp; rfl
+  map_mul' x y := by
+    rw [← QuotientGroup.mk_mul]
+    refine QuotientGroup.eq.mpr ?_
+    rw [Subgroup.coe_mul]
+    have h := Subgroup.inv_mem _ (commutator_mul_mem_chain (v := v) (x := (x : G)) y.2)
+    simpa [mul_inv_rev] using h
+
+@[simp]
+theorem chainStepHom_apply {G : Type*} [Group G] (T : Subgroup G) [T.Characteristic] (v : G)
+    (i : ℕ) (x : ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i)) :
+    chainStepHom T v i x = QuotientGroup.mk ⁅v, (x : G)⁆ := rfl
+
+/-- `Hᵢ₊₁` lies in the kernel: `⁅v, x⁆ ∈ ⁅S, Hᵢ₊₁⁆ = Hᵢ₊₂` already for `x ∈ Hᵢ₊₁`.
+
+This is the easy half of BG's identification; the hard half is that the kernel is no
+*bigger* than `Hᵢ₊₁`, which follows because it is a proper subgroup of `Hᵢ` and
+`|Hᵢ : Hᵢ₊₁| = p` is prime. -/
+theorem chainStepHom_ker_ge {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {v : G} {i : ℕ}
+    {x : ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i)}
+    (hx : (x : G) ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1)) :
+    chainStepHom T v i x = 1 := by
+  rw [chainStepHom_apply, QuotientGroup.eq_one_iff,
+    OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
+  exact Subgroup.commutator_mem_commutator (Subgroup.mem_top v) hx
+
 end OddOrder.BG.AppE
