@@ -299,14 +299,14 @@ BG writes `|S : C_S(v)| = |S : C_S(R₀)|`; the two centralizers are literally e
 (`centralizer_singleton_eq_of_zpowers_eq`), and the order `p²` is Step 2's `(E.4)`. -/
 theorem RegularOperatorSetup.card_centralizer_generator [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
-    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
     {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
     Nat.card ↥(Subgroup.centralizer ({v} : Set ↥S)) = p ^ 2 := by
   rw [centralizer_singleton_eq_of_zpowers_eq hv, hyp.centralizer_subgroupOf_eq hR₀S,
     Nat.card_congr
       (Subgroup.subgroupOfEquivOfLe
         (inf_le_left : S ⊓ Subgroup.centralizer (hyp.R₀ : Set R) ≤ S)).toEquiv]
-  exact (hyp.centralizer_inf_eq_sup_omega1Center hR₀S hexp hS).2
+  exact hp2
 
 /-- **BG (E.15)**: the `S`-conjugacy class of `v ∈ R₀^#` has `|S|/p²` elements.
 
@@ -316,7 +316,7 @@ action of `S` on itself, with the stabilizer identified as `C_S(v)` by
 `card_centralizer_generator`. -/
 theorem RegularOperatorSetup.card_conjClass_generator [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
-    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
     {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
     p ^ 2 * Nat.card (MulAction.orbit (ConjAct ↥S) v) = Nat.card ↥S := by
   have horb : Nat.card (MulAction.orbit (ConjAct ↥S) v) =
@@ -325,7 +325,7 @@ theorem RegularOperatorSetup.card_conjClass_generator [Finite R]
     exact Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (ConjAct ↥S) v)
   have hstab : Nat.card ↥(MulAction.stabilizer (ConjAct ↥S) v) = p ^ 2 := by
     rw [ConjAct.stabilizer_eq_centralizer]
-    exact hyp.card_centralizer_generator hR₀S hexp hS hv
+    exact hyp.card_centralizer_generator hR₀S hp2 hv
   rw [horb, ← hstab]
   exact (MulAction.stabilizer (ConjAct ↥S) v).card_mul_index
 
@@ -972,6 +972,73 @@ theorem RegularOperatorSetup.card_omega_le [Finite R] [Finite B]
   hyp.card_le_pow hyp.R₀_le_omega
     (fun x => Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2))
     (IsAInvariant.of_characteristic _)
+
+
+/-! ### BG Step 4 (E.3(d)): first pieces -/
+
+/-- **`Φ(S) = S'` for a `p`-group of exponent `p`** — BG's *"Note that `Φ(S) = S'`, because
+`S` has exponent `p`."*
+
+`S' ≤ Φ(S)` holds in any finite `p`-group
+(`IsPGroup.commutator_sup_pow_closure_le_frattini`).  Conversely `S/S'` is abelian, and of
+exponent `p` because `S` is, hence elementary abelian; so Isaacs Lemma 4.5
+(`Isaacs.Ch04.frattini_le_iff_isElementaryAbelian_quotient_of_pgroup`) gives `Φ(S) ≤ S'`. -/
+theorem frattini_eq_commutator_of_exponent_prime {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hG : IsPGroup p G) (hexp : ∀ x : G, x ^ p = 1) :
+    frattini G = _root_.commutator G := by
+  refine le_antisymm ?_ (le_sup_left.trans (hG.commutator_sup_pow_closure_le_frattini))
+  rw [OddOrder.Isaacs.Ch04.frattini_le_iff_isElementaryAbelian_quotient_of_pgroup hG]
+  refine ⟨fun x y => ?_, fun x => ?_⟩
+  · obtain ⟨a, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator G) x
+    obtain ⟨b, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator G) y
+    rw [← map_mul, ← map_mul, QuotientGroup.mk'_apply, QuotientGroup.mk'_apply]
+    refine QuotientGroup.eq.mpr ?_
+    have hrw : (a * b)⁻¹ * (b * a) = ⁅b⁻¹, a⁻¹⁆ := by group
+    rw [hrw, commutator_def]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+  · obtain ⟨a, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator G) x
+    rw [← map_pow, hexp a, map_one]
+
+
+/-- **BG's `x⁻¹vx ≡ v (mod S')`**: the conjugacy class of any `v` is contained in the coset
+`v·G'`.
+
+`v⁻¹ · (t v t⁻¹)` *is* the commutator `⁅v⁻¹, t⁆`, so it lies in `G'` on the nose.  In Step 4
+this containment is upgraded to an equality by comparing sizes — `(E.15)` gives the class
+`|S|/p²` elements and `(E.17)` gives the coset `|S'| = |S|/p²`. -/
+theorem orbit_conjAct_subset_coset {G : Type*} [Group G] (v : G) :
+    MulAction.orbit (ConjAct G) v ⊆ v • ((_root_.commutator G : Subgroup G) : Set G) := by
+  rintro _ ⟨t, rfl⟩
+  refine ⟨v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹), ?_, ?_⟩
+  · show _ ∈ (_root_.commutator G : Subgroup G)
+    have hrw : v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹)
+        = ⁅v⁻¹, ConjAct.ofConjAct t⁆ := by group
+    rw [hrw, commutator_def]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+  · show v * (v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹)) = t • v
+    rw [ConjAct.smul_def]
+    group
+
+
+/-- **`|seed| = p²`**, BG's `|R₀ × Ω₁(R₁)| = p²` on the nose.
+
+The upper bound is `card_seed_le`.  For the lower one, `R₀ < seed` properly
+(`R₀_lt_seed`) and both are `p`-groups, so `p = |R₀| < |seed| = p^k` forces `k ≥ 2`.
+
+Step 4 needs the *equality* (Step 3 only needed `≤`): there the conjugacy class of `v` has
+to have exactly `|S|/p²` elements, to be matched against `|vS'|`. -/
+theorem RegularOperatorSetup.card_seed [Finite R] (hyp : RegularOperatorSetup R B p q) :
+    Nat.card ↥hyp.seed = p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  refine le_antisymm hyp.card_seed_le ?_
+  obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup hyp.seed).exists_card_eq
+  have hlt : Nat.card ↥hyp.R₀ < Nat.card ↥hyp.seed :=
+    Set.Finite.card_lt_card (Set.toFinite _) (SetLike.coe_ssubset_coe.mpr hyp.R₀_lt_seed)
+  rw [hyp.R₀_card, hk] at hlt
+  have h1 : p ^ 1 < p ^ k := by rwa [pow_one]
+  have h2 : 2 ≤ k := (Nat.pow_lt_pow_iff_right hyp.p_prime.one_lt).mp h1
+  rw [hk]
+  exact Nat.pow_le_pow_right hyp.p_prime.pos h2
 
 
 end OddOrder.BG.AppE
