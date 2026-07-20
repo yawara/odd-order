@@ -786,7 +786,32 @@ engine を触らずに済んだ:
 潰せない (`Or.casesOn` は Prop へしか eliminate できない)。`Nonempty` の中で分岐して
 `.some` を渡す。
 
-#### ⛏ 残り 2 つ
+#### ⭐ 完了 (2026-07-20): `hAbase` も discharge — 未完の数学は carrier 1 つだけ
+
+`S11.sOf_degreeSubfamily_coherent_A0` を配線 (commit a1c10b6ed、一発で通った)。
+⟹ **`sOf_nineEleven_coherent` が依存する未完の数学は `hrefuteEq` ただ 1 つ**。
+
+他のパラメータは未完の数学ではない:
+- `dd` / `hdd` — (8.15) の Dade datum と「それが (4.6) の制限である」という pin
+- `h2` — `2 ≤ ncard`。(9.8.d) は**存在しか与えない**ので露出が honest
+  (`S15.Hypothesis.sSetIrrDeg_coherent` と同じ流儀)
+
+前提として landed した de-specialization:
+`S08.mem_span_scaledDiff_of_mem_zSupportedSpan` の `SibleyDadeHypothesis` 引数は
+**元から未使用** (`_hyp`)、台も固定されていたが、証明が使うのは `1 ∉ A₀` だけ。
+任意の `A0` に一般化した (呼び出し 1 箇所修正)。
+
+#### ⛏ 残り — 本 issue の本体は完了、あとは issue 9083
+
+`hrefuteEq` = `CaseAEqualityRefutation` は **issue 9083 Phase B–E** の内容で、
+repo のどこにも producer が無い (本 session の実測)。算術の鎖
+`S11.nineElevenCaseA_equality_refutation` は既に §9・型仮定ゼロで landed 済なので、
+残るのは「等号配置 → その入力 (`hclass`/`hn`/`hnorm`/`hK₁`/`hK₂`/`hCinf`/`hle`)」の配線。
+
+⟹ **issue 1045 の目的 ((9.11) を §9 レベルで型仮定なしに述べ、型 III/IV 版をその系にする)
+のうち、前半は達成**。§13 版を系にする配線 (着手順 3) と型 II instance (着手順 4) が残る。
+
+#### (旧) 残り 2 つ
 
 | param | 状態 |
 |---|---|
