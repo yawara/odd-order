@@ -1126,4 +1126,33 @@ theorem caseA_centralizes_two_summands_compHom_eq {data : TypesIIIIIIVSetup M}
     caseA_centralizes_two_summands_fixes_char caseA χ hsupp g hgi hgj y]
 
 end NineElevenTwoInertia
+/-- **Peterfalvi (9.8.a), member-degree dictionary for `𝒮(H₀ ⊔ Y)`** (Coq `a_dv_XH0` in member
+form): in Clifford case (a), every member `Ind_{HU}^M ξ` of a §9 family whose source kernel
+contains `H₀` has degree `q·a·e` for some `e : ℕ` — the source degree `ξ(1)` is divisible by the
+Clifford integer `a` (`caseA_source_degree_dvd_a`).  This is the per-member degree-ratio supply
+of the (5.6) pair-bound assembly `nineElevenPairBound`: ratios are taken against the degree-`qa`
+anchor, so each member's ratio is the natural `e = ξ(1)/a`. -/
+theorem caseA_sOf_source_degree_ratio [Finite G] {M : Subgroup G}
+    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M}
+    {chief : OddOrder.Peterfalvi.S11.ChiefFactorData data}
+    {chars : OddOrder.Peterfalvi.S11.Section11CharacterData data chief}
+    (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData chars)
+    {Y : Subgroup G} {ψ : ClassFunction ↥M ℂ}
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S11.sOf data (chief.H0 ⊔ Y)) :
+    ∃ e : ℕ, (ψ : ↥M → ℂ) 1 = ((data.q * caseA.a * e : ℕ) : ℂ) := by
+  classical
+  obtain ⟨ξ, hξ, rfl⟩ := hψ
+  obtain ⟨dξ, -, hdξ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ξ
+  have hker : ((chief.H0.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub data) :
+      Set ↥(OddOrder.Peterfalvi.S11.huSub data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel
+        (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub data) ℂ) :=
+    subset_trans (SetLike.coe_subset_coe.mpr (Subgroup.subgroupOf_mono _
+      (Subgroup.subgroupOf_mono _ le_sup_left))) hξ.2
+  obtain ⟨e, he⟩ := OddOrder.Peterfalvi.S11.caseA_source_degree_dvd_a caseA hξ.1 hker hdξ
+  refine ⟨e, ?_⟩
+  rw [OddOrder.Peterfalvi.S11.induceHU_apply_one_eq_q_mul, hdξ, he]
+  push_cast
+  ring
+
 end OddOrder.Peterfalvi.S11

@@ -753,7 +753,33 @@ packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` を�
 ⚠ **leaf を 1500 行手前で分割済** (commit 08b3bace4): base 層を
 `S11_NineElevenBridgeBase.lean` (261 行) へ。module 名・namespace・宣言名は不変。
 
-#### ⛏ 次の一手: engine 呼び出し本体 = `CaseAPairBound` producer
+#### ⚠ engine 呼び出しは τ の形が 2 つあって噛み合わない (2026-07-20 実測、着手して撤退)
+
+`caseA_pairBound` を一通り書いて build したところ、**τ の表記が 2 系統ある**ことが問題になった:
+
+| | τ |
+|---|---|
+| 本 issue の §9 部品群 (`sOf_memberRFamily` 以下) | `dadeICM h46.dade0 **h46.tau**` (`certainTypeR` が決める) |
+| (5.6) engine `coherentDegreeSqNormBound_of_not_coherentW_k` | `dadeICM hyp (hyp.**fullDadeIsometryData hconj**)` (ハードコード) |
+
+`htau` で両者は等しいが**構文的には別**。素朴に `rw [htau] at cohS₂` すると
+`cohS₂` が新しい仮説になり、それ以前に作った `hDtau : … = cohS₂.extension …` が
+古い方を指して型が合わなくなる (`IsCoherent.extension` は τ に依存しないのに、
+transport がそれを見せない)。`hS₁coh` を書き換える版も、結論が `hS₁coh.extension` を
+含むので依存 rewrite になって同じ壁。
+
+⟹ **設計として決める必要がある** (次 iteration の最初の仕事):
+- (a) `sOf_memberRFamily` 以下を engine 形 (`fullDadeIsometryData hconj`) で建て直す
+  — `certainTypeR` の出力を一度だけ `htau ▸` で運ぶ。`imageSet` の `rfl` 還元
+  (`_imageSet_of_irr`/`_of_col`) が壊れないかが焦点。
+- (b) engine 側に τ をパラメータ化した variant を用意する
+  (`hyp.fullDadeIsometryData hconj` を任意の `FullDadeIsometryData` に緩める)。
+  §5 の `dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data` が
+  「isometry data に依らない」ことを既に示しているので、engine の証明も通る見込み。
+
+⚠ (b) の方が筋が良さそう (下流全部に効く) が、engine 本体に触るので影響範囲を先に測ること。
+
+#### (旧) 次の一手: engine 呼び出し本体 = `CaseAPairBound` producer
 
 `S08.coherentDegreeSqNormBound_of_not_coherentW_k` の結論は `∑ (deg i)²/mc i ≤ 2a` なので、
 `CaseAPairBound` の `sumnS F ≤ 2q²a·d` へは §13 と同じ rescale
