@@ -361,7 +361,33 @@ pivot が要ること自体は書籍どおり (可約メンバーがあるため
 3. `S07.uniform_degree_coherence_of_families` に流す (§11 caseB と同じ engine、
    ただし pivot と一様次数を §9 由来のものに差し替える)。
 
-⟹ **(9.9) の §9 レベル形式化が case B の前提**。repo に (9.9) 相当があるか要実測。
+### ✅ (9.9) の repo 在庫を実測 (2026-07-20) — **(9.9.a) は既に §9 で型仮定ゼロ**
+
+| 書籍 | repo | 層 |
+|---|---|---|
+| **(9.9.a)** 一様次数 `qu` | **`S11.caseB_degree_qu`** (CharacterCounts.lean:981) | **§9 ✅ 型仮定ゼロ** |
+| (9.9.b) 可約 `μ_j` が p−1 個 | `S06_CertainTypeClifford` :1046/:1108, `S06_CertainTypeSupport`:311 | §6 ✅ |
+| (9.9.c) 両半分 | `S11_.../CaseBXi`:803, `S11_.../InnerCompHom`:983 | §9 ✅ |
+| (5.7) norm-general engine | `S07.uniform_degree_coherence_of_families` (S07_PivotCoherence) | 上流 ✅ |
+
+⚠ **`caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu` (S13) の `htype`/`hncH0C` は飾り**:
+本体は `S11.caseB_degree_qu hG _ caseB φ` の 1 行で、`htype`/`hncH0C` は
+`cprimeSub = derivedInG hyp.C` を `C_eq_cSub_of_noncoherent` で書き換えるためだけに在る
+= **本 session 冒頭から繰り返し見ている「`hyp.C = cSub` の辞書同一視」と同じ artifact**。
+`caseB_degree_qu` は `chars.SOf (chief.H0 ⊔ chars.Cprime)` の上で直接述べられている。
+
+### ⛏ case B の残り = pivot 周り 3 件を §9 へ
+
+まだ §13 に在るのは以下 3 件だけ (いずれも `S13_MaximalIII_IV.lean`):
+
+- `caseB_sOf_memberRFamily` — メンバーごとの `R`-data 分配 (既約 = signed Dade /
+  可約 μ-column = `certainTypeR`)
+- `caseB_sOf_memberRFamily_orthogonal` — (5.2.e) の cross-orthogonality
+- `sOf_anchor_diff_support` — pivot に対する差の台
+
+⟹ この 3 件を §9 (`data`/`chief`/`chars`) 上へ降ろし、pivot を §10 μ-grid の
+`muColumnChar` でなく **(9.9.b) の可約メンバー** (§6 の count 由来) から取れば、
+case B も型仮定ゼロで組める見込み。**(9.9.a) と engine は既に揃っている**。
 
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
