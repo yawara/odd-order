@@ -1111,4 +1111,28 @@ theorem RegularOperatorSetup.exists_conj_mem_R₀ [Finite R]
   exact ⟨z, hz, rfl⟩
 
 
+/-- **`R₀ ∩ (Ω₁(R))' = 1`**.
+
+`R₀` has prime order `p`, so `R₀ ∩ (Ω₁(R))'` is either trivial or all of `R₀`; the latter
+is excluded by E.3(b)'s second clause `R₀_not_le_derived_omega`.
+
+Step 4 needs this to know that `v ∈ R₀^#` stays outside `S'`, hence that its image under
+any `β ∈ B` lands in `R₀S' − S'`. -/
+theorem RegularOperatorSetup.inf_derived_omega_eq_bot [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    hyp.R₀ ⊓ derivedInG (Omega R p 1) = ⊥ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  by_contra hne
+  refine hyp.R₀_not_le_derived_omega ?_
+  have hle : hyp.R₀ ⊓ derivedInG (Omega R p 1) ≤ hyp.R₀ := inf_le_left
+  have hdvd : Nat.card ↥(hyp.R₀ ⊓ derivedInG (Omega R p 1)) ∣ Nat.card ↥hyp.R₀ :=
+    Subgroup.card_dvd_of_le hle
+  rw [hyp.R₀_card] at hdvd
+  rcases (Nat.dvd_prime hyp.p_prime).mp hdvd with h1 | hp'
+  · exact absurd (Subgroup.card_eq_one.mp h1) hne
+  · have heq : hyp.R₀ ⊓ derivedInG (Omega R p 1) = hyp.R₀ :=
+      Subgroup.eq_of_le_of_card_ge hle (by rw [hyp.R₀_card, hp'])
+    exact heq ▸ inf_le_right
+
+
 end OddOrder.BG.AppE
