@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Invariants
 import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
 import Mathlib.LinearAlgebra.TensorProduct.Basis
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.LinearAlgebra.TensorProduct.Pi
@@ -149,6 +151,51 @@ theorem baseChange₂_span_eq_top
 end LinearMap
 
 namespace OddOrder.RepresentationTheory
+
+/-! ## Frobenius on the scalar factor -/
+
+universe uFrobeniusL uFrobeniusV uFrobeniusW
+
+/-- Absolute Frobenius on the scalar factor of an `F₂` base change. -/
+noncomputable def frobeniusScalarBaseChange
+    (L : Type uFrobeniusL) [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} [AddCommMonoid V] [Module (ZMod 2) V] :
+    (L ⊗[ZMod 2] V) →ₗ[ZMod 2] (L ⊗[ZMod 2] V) := by
+  letI : Fintype L := Fintype.ofFinite L
+  exact TensorProduct.map
+    (FiniteField.frobeniusAlgHom (ZMod 2) L).toLinearMap
+    (LinearMap.id : V →ₗ[ZMod 2] V)
+
+@[simp]
+theorem frobeniusScalarBaseChange_tmul
+    (L : Type uFrobeniusL) [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} [AddCommMonoid V] [Module (ZMod 2) V]
+    (a : L) (v : V) :
+    frobeniusScalarBaseChange L (a ⊗ₜ[ZMod 2] v) =
+      (a ^ 2) ⊗ₜ[ZMod 2] v := by
+  simp [frobeniusScalarBaseChange]
+
+/-- Frobenius on the scalar factor commutes with extension of a ground-field
+bilinear map. -/
+theorem frobeniusScalarBaseChange_bilin
+    (L : Type uFrobeniusL) [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} {W : Type uFrobeniusW}
+    [AddCommMonoid V] [Module (ZMod 2) V]
+    [AddCommMonoid W] [Module (ZMod 2) W]
+    (B : LinearMap.BilinMap (ZMod 2) V W)
+    (x y : L ⊗[ZMod 2] V) :
+    frobeniusScalarBaseChange L (B.baseChange L x y) =
+      B.baseChange L
+        (frobeniusScalarBaseChange L x)
+        (frobeniusScalarBaseChange L y) := by
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a u =>
+      induction y using TensorProduct.induction_on with
+      | zero => simp
+      | tmul b v => simp [mul_pow]
+      | add y z hy hz => simp [hy, hz]
+  | add x z hx hz => simp [hx, hz]
 
 /-- Scalar extension of a representation along a field extension.
 
