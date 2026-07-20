@@ -407,9 +407,14 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       homocyclic exponent-four 分類、actual `A/A² ≃ A²` square equivalence、
       inverse Frobenius finite-field coordinates から honest model を得る。したがって
       各 proper invariant preimage は可換性の分岐を残さず `A(n,φ)` と同定済みである。
-      次の source frontier は complementary preimages の二つの parameter の一致と
-      共通値 `n ≥ 2` である。既存 `IsTypeA` は `φ ≠ 1` を要求するため、
-      可換 branch には引き続き流用しない。
+      `TypeAModel` の involution を有限体の非零元と同定して
+      `|Inv(A(n,φ))| = 2^n - 1` を証明した。両 preimage は ambient の全 involution
+      を含むため、その個数から二つの parameter が一致し、複数 involution から
+      共通値 `n ≥ 2` も従う。この source step は
+      `XiLengthThreeTypeAFactorData` にまとめた。等しいのは parameter `n` であり、
+      原典どおり二つの automorphism `θ, φ` の一致は主張しない。次の source frontier は
+      この二つの actual model と共通 central layer を使う type B/C/D の gluing case
+      analysis である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。

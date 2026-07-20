@@ -34,7 +34,7 @@ open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.Isaacs.Ch03
 open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 
-universe uP uF
+universe uP uF uQ uE
 
 /-- Honest model data for a ξ-length-two Higman factor `A(n, φ)`.
 
@@ -601,5 +601,259 @@ theorem isXiLengthTwoTypeA_invariant_subgroup_of_xiLengthThree
   · exact
       isXiLengthTwoTypeA_invariant_subgroup_of_xiLengthThree_of_noncommutative
         hP hncomm hmulti hxi hlen hprime hSinv hPhiS hStop hcommS
+
+/-- A group equivalence restricts to an equivalence between the sets of
+nonidentity involutions. -/
+def mulEquivInvolutions
+    {P : Type uP} {Q : Type uQ} [Group P] [Group Q]
+    (e : P ≃* Q) : ↑(involutions P) ≃ ↑(involutions Q) where
+  toFun x :=
+    ⟨e x.1, by
+      refine ⟨?_, ?_⟩
+      · simpa only [map_pow, map_one] using congrArg e x.2.1
+      · intro hx
+        apply x.2.2
+        exact e.injective (by simpa using hx)⟩
+  invFun x :=
+    ⟨e.symm x.1, by
+      refine ⟨?_, ?_⟩
+      · simpa only [map_pow, map_one] using congrArg e.symm x.2.1
+      · intro hx
+        apply x.2.2
+        exact e.symm.injective (by simpa using hx)⟩
+  left_inv x := by simp
+  right_inv x := by simp
+
+section TypeAModelInvolutions
+
+variable {F : Type uF} [Field F] [Finite F] [CharP F 2]
+
+local instance : Algebra (ZMod 2) F := ZMod.algebra F 2
+
+/-- In the concrete model A(n, phi), the nonidentity involutions are exactly
+the elements with zero quotient coordinate and nonzero central coordinate. -/
+theorem typeAModel_mem_involutions_iff
+    (phi : RingAut F) (x : TypeAModel phi) :
+    x ∈ involutions (TypeAModel phi) ↔
+      x.quotient = 0 ∧ x.central ≠ 0 := by
+  constructor
+  · intro hx
+    have hinl :
+        (QuadraticExtension.extension
+          (typeAQuadraticMap phi)
+          (Module.finBasis (ZMod 2) F)).inl
+            (Multiplicative.ofAdd (x.quotient * phi x.quotient)) = 1 :=
+      (TypeAModel.sq_eq_inl_quadraticMap phi x).symm.trans hx.1
+    have hmul :
+        Multiplicative.ofAdd (x.quotient * phi x.quotient) = 1 := by
+      apply (QuadraticExtension.extension
+        (typeAQuadraticMap phi)
+        (Module.finBasis (ZMod 2) F)).inl_injective
+      simpa using hinl
+    have hprod : x.quotient * phi x.quotient = 0 := by
+      simpa using congrArg Multiplicative.toAdd hmul
+    have hquot : x.quotient = 0 := by
+      rcases mul_eq_zero.mp hprod with h | h
+      · exact h
+      · exact phi.injective (by simpa using h)
+    refine ⟨hquot, ?_⟩
+    intro hcentral
+    apply hx.2
+    apply BilinearTwistedProduct.ext
+    · simpa using hquot
+    · simpa using hcentral
+  · rintro ⟨hquot, hcentral⟩
+    refine ⟨?_, ?_⟩
+    · rw [TypeAModel.sq_eq_inl_quadraticMap]
+      simp [hquot]
+    · intro hx
+      apply hcentral
+      simpa using congrArg BilinearTwistedProduct.central hx
+
+/-- The involutions of A(n, phi) are equivalent to the nonzero elements of
+its defining field. -/
+noncomputable def typeAModelInvolutionsEquivNonzero
+    (phi : RingAut F) :
+    ↑(involutions (TypeAModel phi)) ≃ {a : F // a ≠ 0} where
+  toFun x :=
+    ⟨x.1.central, (typeAModel_mem_involutions_iff phi x.1).mp x.2 |>.2⟩
+  invFun a :=
+    ⟨⟨0, a.1⟩, (typeAModel_mem_involutions_iff phi ⟨0, a.1⟩).mpr
+      ⟨rfl, a.2⟩⟩
+  left_inv x := by
+    apply Subtype.ext
+    apply BilinearTwistedProduct.ext
+    · exact ((typeAModel_mem_involutions_iff phi x.1).mp x.2 |>.1).symm
+    · rfl
+  right_inv a := rfl
+
+/-- The concrete model A(n, phi) has one nonidentity involution for each
+nonzero element of its defining field. -/
+theorem typeAModel_involutions_ncard_eq
+    (phi : RingAut F) :
+    (involutions (TypeAModel phi)).ncard = Nat.card F - 1 := by
+  classical
+  letI := Fintype.ofFinite F
+  calc
+    (involutions (TypeAModel phi)).ncard =
+        Nat.card ↑(involutions (TypeAModel phi)) :=
+      (Nat.card_coe_set_eq _).symm
+    _ = Nat.card {a : F // a ≠ 0} :=
+      Nat.card_congr (typeAModelInvolutionsEquivNonzero phi)
+    _ = Nat.card F - 1 := by
+      simp only [Nat.card_eq_fintype_card]
+      rw [Fintype.card_subtype_compl (fun a : F => a = 0)]
+      simp
+
+end TypeAModelInvolutions
+
+namespace XiLengthTwoTypeAData
+
+/-- The number of involutions in an inclusive Higman A(n, phi) model is
+2^n - 1. -/
+theorem involutions_ncard_eq
+    {P : Type uP} [Group P]
+    (data : XiLengthTwoTypeAData.{uP, uF} P) :
+    (involutions P).ncard = 2 ^ data.parameter - 1 := by
+  letI : Field data.F := data.fieldF
+  letI : Finite data.F := data.finiteF
+  letI : CharP data.F 2 := data.charTwoF
+  calc
+    (involutions P).ncard = Nat.card ↑(involutions P) :=
+      (Nat.card_coe_set_eq _).symm
+    _ = Nat.card ↑(involutions (TypeAModel data.phi)) :=
+      Nat.card_congr (mulEquivInvolutions data.equivModel)
+    _ = (involutions (TypeAModel data.phi)).ncard :=
+      Nat.card_coe_set_eq _
+    _ = Nat.card data.F - 1 :=
+      typeAModel_involutions_ncard_eq data.phi
+    _ = 2 ^ data.parameter - 1 := by rw [data.card_field]
+
+/-- The number of involutions uniquely determines the field parameter of an
+inclusive Higman type-A model. -/
+theorem parameter_eq_of_involutions_ncard_eq
+    {P : Type uP} {Q : Type uQ} [Group P] [Group Q]
+    (dataP : XiLengthTwoTypeAData.{uP, uF} P)
+    (dataQ : XiLengthTwoTypeAData.{uQ, uE} Q)
+    (hcard : (involutions P).ncard = (involutions Q).ncard) :
+    dataP.parameter = dataQ.parameter := by
+  apply Nat.pow_right_injective le_rfl
+  apply Nat.sub_one_cancel (pow_pos (by omega) dataP.parameter)
+    (pow_pos (by omega) dataQ.parameter)
+  exact dataP.involutions_ncard_eq.symm.trans
+    (hcard.trans dataQ.involutions_ncard_eq)
+
+/-- More than one involution forces Higman's field parameter to be at least
+two. -/
+theorem parameter_two_le_of_exists_distinct_involutions
+    {P : Type uP} [Group P] [Finite P]
+    (data : XiLengthTwoTypeAData.{uP, uF} P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y) :
+    2 ≤ data.parameter := by
+  obtain ⟨x, y, hx, hy, hxy⟩ := hmulti
+  have hinvTwo : 2 ≤ (involutions P).ncard := by
+    calc
+      2 = ({x, y} : Set P).ncard := (Set.ncard_pair hxy).symm
+      _ ≤ (involutions P).ncard := by
+        apply Set.ncard_mono
+        intro z hz
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+        rcases hz with rfl | rfl
+        · exact hx
+        · exact hy
+  rw [data.involutions_ncard_eq] at hinvTwo
+  by_contra h
+  have hpos := data.parameter_pos
+  have hparam : data.parameter = 1 := by omega
+  rw [hparam] at hinvTwo
+  norm_num at hinvTwo
+
+end XiLengthTwoTypeAData
+
+/-- Honest data for the two complementary A(n, phi) factors in Higman's
+Lemma 12, including their common parameter and its lower bound. The two field
+automorphisms are not asserted to be equal. -/
+structure XiLengthThreeTypeAFactorData
+    (P : Type uP) [Group P] (Y : Subgroup (MulAut P)) where
+  left : Subgroup P
+  right : Subgroup P
+  left_normal : left.Normal
+  left_invariant : IsAInvariant Y.subtype left
+  right_normal : right.Normal
+  right_invariant : IsAInvariant Y.subtype right
+  frattini_lt_left : frattini P < left
+  left_lt_top : left < ⊤
+  frattini_lt_right : frattini P < right
+  right_lt_top : right < ⊤
+  inf_eq_frattini : left ⊓ right = frattini P
+  sup_eq_top : left ⊔ right = ⊤
+  left_model : XiLengthTwoTypeAData.{uP, 0} left
+  right_model : XiLengthTwoTypeAData.{uP, 0} right
+  parameter_eq : left_model.parameter = right_model.parameter
+  parameter_two_le : 2 ≤ left_model.parameter
+
+/-- **Higman Lemma 12 (p. 90), common-parameter factor step.**
+
+The complementary Frattini preimages are actual A(n, theta) and A(n, phi)
+models with one common parameter n at least two. -/
+theorem xiLengthThreeTypeAFactorData_exists
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    Nonempty (XiLengthThreeTypeAFactorData P Y) := by
+  obtain ⟨X, Z, hXnormal, hXinv, hZnormal, hZinv,
+      hPhiX, hXtop, hPhiZ, hZtop, hXbot, hZbot, hXZinf, hXZsup⟩ :=
+    exists_complementary_invariant_frattini_preimages_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  obtain ⟨dataX⟩ :=
+    isXiLengthTwoTypeA_invariant_subgroup_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime hXinv hPhiX hXtop
+  obtain ⟨dataZ⟩ :=
+    isXiLengthTwoTypeA_invariant_subgroup_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime hZinv hPhiZ hZtop
+  have hinvX : involutions P ⊆ X :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hXinv hXbot
+  have hinvZ : involutions P ⊆ Z :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hZinv hZbot
+  have hcardXZ :
+      (involutions X).ncard = (involutions Z).ncard :=
+    (involutions_ncard_subgroup_eq_of_subset X hinvX).trans
+      (involutions_ncard_subgroup_eq_of_subset Z hinvZ).symm
+  have hparam : dataX.parameter = dataZ.parameter :=
+    XiLengthTwoTypeAData.parameter_eq_of_involutions_ncard_eq
+      dataX dataZ hcardXZ
+  have hmultiX : ∃ x y : X,
+      x ∈ involutions X ∧ y ∈ involutions X ∧ x ≠ y :=
+    exists_distinct_involutions_subgroup_of_subset hinvX hmulti
+  have htwo : 2 ≤ dataX.parameter :=
+    XiLengthTwoTypeAData.parameter_two_le_of_exists_distinct_involutions
+      dataX hmultiX
+  exact ⟨
+    { left := X
+      right := Z
+      left_normal := hXnormal
+      left_invariant := hXinv
+      right_normal := hZnormal
+      right_invariant := hZinv
+      frattini_lt_left := hPhiX
+      left_lt_top := hXtop
+      frattini_lt_right := hPhiZ
+      right_lt_top := hZtop
+      inf_eq_frattini := hXZinf
+      sup_eq_top := hXZsup
+      left_model := dataX
+      right_model := dataZ
+      parameter_eq := hparam
+      parameter_two_le := htwo }⟩
 
 end OddOrder.Higman.Suzuki2Groups
