@@ -2132,3 +2132,40 @@ setup から discharge 可能な真の事実。**⟹ 空 scaffold でなく正�
 `AppE` の sorry = **E.4 (1645) と E.5 (1686) の 2 件** (E.4 の中身は上記還元で骨格完成、
 残るのは β supply 実体化と機械的 discharge)。全体 sorry 13。leaf build green。
 AxiomsCheck に Step 3/4 + E.4 一般補題を登録済 (フルビルド 4520 jobs green)。
+
+## 🔍 hub 内容監査 (2026-07-21 00:54 tick) — E.4 abelian clause 還元は genuine だが "frontier 単一化" は完成度を過大表示
+
+merge 015768c0a の (47) abelian-clause 還元 (`4c68275ec` / `71619a35e`) を doneness 基準で独立監査
+(sorry 数でなく「hard content を実証明したか / 構成不能な仮説へ hoist していないか」)。
+
+**判定: 還元は本物 (axiom-clean な reductio、単一の gating 仮説は正しく分離されている)。
+ただし issue の「frontier 単一化 / single input」表現は E.4 が実際より完成に近く読める。**
+
+### 本物である点 (確認済)
+
+- `RegularOperatorSetup.commutator_centralizer_eq_bot_of_beta_supply`
+  (`AppE_EigenvalueCombinatorics.lean:632`) は `⁅T,T⁆ = ⊥` を BG の逐語的 contradiction で証明。
+  **依存閉包を全 trace した結果 axiom-clean** — α 側 `dvd_sub_mul_eigenvalues_chain` →
+  `exists_eigenvalue_pow` (`AppE_RegularOperator.lean:640`, 0-sorry)、index 抽出・(E.27) engine
+  すべて sorry-free。**relabeling ではない** (α 半分と reductio 足場は genuine に証明済)。
+- 残る単一入力 `hβsupply` (:651-660) は**正当な (E.23)**: 各 live chain 項 `Hₐ` に対し
+  `s ≡ t₀·tᵃ (mod p)` で `σβ` が `y↦yˢ` を法 `Hₐ₊₁` で与える。証明済 α supply `hr₀` の β 版で、
+  vacuous でも False でもない (contradiction は reductio 仮定 `hnonab` から来る)。
+
+### ⚠ "単一化" が過小表示している 3 点 (hβsupply を閉じても E.4 は終わらない)
+
+1. **abelian clause の半分だけ**。新定理の結論は `⁅T,T⁆ = ⊥` のみ。E.4 の **index-p 半分**
+   (`|S : C_S(Z₂(S))| = p`) は手つかず。full field
+   `centralizer_upperCentralSeries_abelian_index_p` (`AppE_FurtherResults.lean:1650-1657`) は
+   両方を主張し、**依然 raw sorry (:1657、実測確認)**。
+2. **未配線**。還元定理は **consumer 0・AxiomsCheck 未登録** (grep 実測)、既存 E.4 sorry を
+   触っていない。⟹ この定理の axiom-cleanliness は現状 gate で継続検証されていない
+   (監査で trace した限りは clean だが、AxiomsCheck に足すべき)。
+3. **T の不一致**。新定理は `Ω₁(Z₂(S))` (= `omega1UpperCentralTwo`) を centralize するが、
+   旧 E.4 field は `Z₂(S)` (= `upperCentralSeries 2`) を centralize する。`hβsupply` を discharge
+   しても、この 2 つの `T` の同一視 + index-p clause 追加 + `...abelian_index_p` への実配線が残る。
+
+⟹ **frontier は「hβsupply 1 本」ではなく「hβsupply + index-p 半分 + T 同一視 + 配線」**。
+`hβsupply` 自体も commit body が正直に書くとおり「深い多補題作業」(Case A/B 論法 +
+`S/S' = Q/S' ⊕ T/S'` 分解 + β-equivariant bilinear map) で、well-scoped だが substantial。
+これは STOP でなく **frontier の正確化** — c は E.4 を「あと 1 本」と誤認せず上記 4 要素を残件として扱うこと。
