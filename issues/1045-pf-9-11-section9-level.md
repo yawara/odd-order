@@ -99,6 +99,38 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 
 ⟹ **着手順 2 の再配置は完了**。§9 の生の装置はこれで全て §9 に在る。
 
+### ✅ 実測 (2026-07-20): §10 依存を (8.15.3) で外す経路が確定
+
+`sOf_degreeSubfamily_isCoherent` の §10 依存 (`inducedFamily_degreeSubfamily_isCoherent`) は
+**(8.15.3) + (5.7) で置換できる**。書籍もその順序:
+
+1. `S10.typePACore_subcoherent` (本 session landed, 型仮定 `IsTypeP` のみ) が
+   `S07.Hypothesis S (supportInSubgroup (typePACore M) M)` = **(5.2)** を与える。
+2. `S07.coherent_subset_of_constant_degree` (`S07_Subcoherent.lean:259`) が
+   (5.2) + 定次数・共役閉・有限・`2 ≤ ncard` などから
+   `Nonempty (IsCoherent hyp.tau S' A)` を出す。
+
+**接続に要る 2 つの事実は両方 repo に在る** (実測):
+
+- **`huSub data = (derivedInG M).subgroupOf M`** — `huSub_eq_derivedInG_subgroupOf`。
+  ⟹ §9 の族 `sOf` は `M′` から誘導している = (8.15.3) の族と同じ誘導元。
+- **`M_F ≤ M_σ`** — `BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma`。
+  ⟹ §9 の絞り `H = M_F ⊄ Ker χ` は (8.15.3) の絞り `M_σ ⊄ Ker θ` を**含意する**
+  (対偶: `M_σ ⊆ Ker θ` かつ `M_F ≤ M_σ` なら `M_F ⊆ Ker θ`)。
+
+⟹ **`sOf data Y ⊆ S10.inducedNonKernelFamily ((derivedInG M).subgroupOf M) ((Msigma M).subgroupOf M)`**
+が成り立つ。これが橋渡し補題。
+
+⚠ 型 III/IV では `M_s = M′` なので (8.15.3) の絞りは `θ ≠ 1` に退化し、§9 の族の方が真に狭い
+— それでも `⊆` の向きなので問題ない。
+
+⚠ **置き場**: `inducedNonKernelFamily` は `S10_SubcoherentTypeP.lean`、`sOf` は
+`S11_.../ChiefFactorCore.lean` にあり、両者は**兄弟** (どちらも他方を import しない;
+`S10_SubcoherentTypeP` を import するのは `AxiomsCheck` のみ)。⟹ 橋渡し補題は
+両方を import する新 leaf か、`S10_SubcoherentTypeP` に S11 への import を足すか。
+後者は §8 の file が §9 を import することになるので、**新 leaf が素直**
+(例 `S11_NineElevenSubcoherentBridge.lean`)。
+
 ### ⛏ 残り = 着手順 1 (§9 レベルの (9.11) statement 本体)
 
 形: `(data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)`
