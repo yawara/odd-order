@@ -511,12 +511,41 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
      repo に**要素レベル**の反復交換子が無かったので新設 (`Isaacs.Ch04.iterCommutator` は
      部分群レベル)。⚠ `w ∈ T` だけでよく `v` は無制約 — 鎖が `R₀` でなく `S` 全体と
      bracket しているため。
-   - ⬜ 残 (E.12 の最終組み立て): `w_i ∉ H_{i+1}` (⟹ `⟨w̄_i⟩ = H̄_i`) を出し、
-     `chain_map_le_center` + `commutatorElement_pow_pow_of_central` で
-     `r_i ≡ r_{i-1} r`、帰納で `r_i ≡ r₀ r^i`。そこから
-     `le_pred_of_forall_mul_pow_ne_one` に流して `n ≤ q-1` ⟹ **E.3(c)**。
-     ⚠ `w_i ∉ H_{i+1}` が次の難所 — 計数 ((E.6) の `|H_i| = p·|H_{i+1}|`) と
-     `w ∉ H₁` の選び方に依存する。
+   - ⬜ 残 (E.12 の最終組み立て)。**次の難所を 2026-07-20 に解析したので記録する**。
+
+## ⚠ BG が完全に省略している鍵: `⁅v, x⁆ ∈ H_{i+1} ⟺ x ∈ H_i`
+
+BG は `w ∈ H₀ − H₁` と置いて `w_i = [w_{i-1}, v]` を作り、後で **「So `⟨w̄ᵢ⟩ = H̄ᵢ`」**
+と一言で済ませる。これは `w_i ∉ H_{i+1}` を要求するが、BG はその理由を書いていない。
+実際には**計数が tight であること**から出る。以下、導出:
+
+`M := H_{i-1}`, `N := ⁅R₀, H_{i-1}⁆ = H_i`, `C := C_M(v)` (`v ∈ R₀^#` は `R₀` の生成元) とする。
+
+1. 既存 `Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le` の証明中の
+   単射 `M/C ↪ N` (写像 `x ↦ ⁅v,x⁆` は `C` の左剰余類上でちょうど定数) から
+   `|M : C| ≤ |N|`。
+2. 一方 `card_eq_prime_mul_card_commutator` は **等式** `|M| = p·|N|` を与える。
+   また `|C| ≤ p` (= `card_le_card_commutator_mul_prime` の中で使った評価)。
+3. `p·|N| = |M| = |C|·|M:C| ≤ |C|·|N|` ⟹ `p ≤ |C|` ⟹ **`|C| = p`** かつ
+   **`|M:C| = |N|`** ⟹ 上の単射は**全単射** `M/C ≅ N`。
+4. `⁅v,·⁆` による `H_{i+1}` の逆像は、全単射なので `M` の中でサイズ
+   `|C|·|H_{i+1}| = p·(|H_i|/p) = |H_i|`。
+5. 他方 `x ∈ H_i ⟹ ⁅v,x⁆ ∈ ⁅H_i, S⁆ = H_{i+1}` なので `H_i ⊆` 逆像。両者サイズ `|H_i|`
+   ⟹ **逆像 = `H_i` ちょうど**。
+   ⟹ **`⁅v, x⁆ ∈ H_{i+1} ⟺ x ∈ H_i`** (`x ∈ H_{i-1}` の下で)。
+6. ⟹ `w_{i-1} ∉ H_i` なら `⁅v, w_{i-1}⁆ ∉ H_{i+1}`。`⁅w_{i-1}, v⁆ = ⁅v, w_{i-1}⁆⁻¹` も同様。
+   `w ∉ H₁` から帰納して **`w_i ∉ H_{i+1}`** ⟹ `⟨w̄_i⟩ = H̄_i` (位数 p)。
+
+✅ **形式化の障害は解消済 (同日)**: 手順 1 の単射は既存補題の*証明の中*にあったが結論が
+不等式だけだったので、**`Ch1.S05.index_centralizer_le_card_of_commutator_mem`
+(`|M : C_M(v)| ≤ |N|`) として切り出した**。予想どおり証明本体は既に単射を構成していたので
+分離はコストゼロで、旧
+`card_le_card_mul_of_commutator_mem_of_card_centralizer_le` は 3 行の系になった
+(呼び出し側は無変更、S05 leaf + AppE + full AxiomsCheck で確認)。
+
+### そこが出た後の残り
+`chain_map_le_center` + `commutatorElement_pow_pow_of_central` で `r_i ≡ r_{i-1} r`、
+帰納で `r_i ≡ r₀ r^i`、`le_pred_of_forall_mul_pow_ne_one` で `n ≤ q-1` ⟹ **E.3(c)**。
 
 ### (E.10) の道具は特定済 — 要素レベル形が public (2026-07-20 実測)
 
