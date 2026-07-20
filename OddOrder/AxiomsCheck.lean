@@ -157,6 +157,7 @@ import OddOrder.BG.AppE_FurtherResults
 import OddOrder.BG.AppE_RegularOperator
 import OddOrder.BG.AppE_ExponentP
 import OddOrder.BG.AppE_SemidirectFrattini
+import OddOrder.BG.AppE_AbelianCentralizer
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -11726,3 +11727,54 @@ Step 2's `(E.15)`; its group-theoretic half is the new leaf `AppE_SemidirectFrat
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.exists_smul_R₀_invariant
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini
+
+/-! **BG Appendix E, Proposition E.4 — the index clause and the machinery of the abelian
+clause** (`BG.AppE_AbelianCentralizer`; issue 3021, 2026-07-20).
+
+E.4 says `C_S(Z₂(S))` is abelian of index `p` in `S = Ω₁(R)`.  The **index clause is
+complete**; the abelian clause is BG's contradiction inside the two-dimensional `𝔽_p`-space
+`S/S'`, and every named step of it is proved here — what is left is threading Step 2's chain
+API into them.
+
+* `omega1UpperCentralTwo_eq_upperCentralSeries` — `Ω₁(Z₂(S)) = Z₂(S)` for exponent-`p` `S`.
+  ⚠ Without this the proposition cannot even be *stated* with BG's `Z₂(S)`: Step 2 spells the
+  same subgroup as `C_S(Ω₁(Z₂(S)))`, because Lemma 5.2 is phrased for narrow `p`-groups.
+* `RegularOperatorSetup.index_centralizer_upperCentralSeries` — **E.4's index clause**,
+  `|S : C_S(Z₂(S))| = p`.  ⚠ Only `|S| ≥ p⁴` is used; neither `B`-regularity nor `B ⊄ N(R₀)`
+  enters, though BG lists all three for the proposition as a whole.
+* `RegularOperatorSetup.not_fixes_sup_frattini_of_not_fixes_R₀` — `(E.18)`, the contrapositive
+  of Theorem E.3(d); the only place E.4 consumes Step 4.
+* `RegularOperatorSetup.commutator_eq_bot` — `(E.20)`, `B` abelian.  BG's *"By Proposition
+  1.5(d)"* is **Isaacs Cor 3.28** (`coprime_fixedPoints_quotient_of_coprime_normal`).
+* `RegularOperatorSetup.dvd_sub_eigenvalues` — BG's `r = r₀`.
+* `RegularOperatorSetup.not_dvd_sub_eigenvalues_of_not_fixes` — `(E.21)`, `t ≠ t₀`.
+* `sup_commutator_eq_of_min_index` — `(E.24)`, `T'H_k = H_{k-1}`.
+* `range_of_max_commutator_indices` — `(E.25)`'s range `j ≤ i ≤ k − 2`.  ⚠ BG states `j ≤ i`
+  without argument; it comes from using the maximality of `i` **at the index `i + 1`**.
+* `commutator_le_of_generators` — `(E.25)`'s witness `⁅wᵢ,wⱼ⁆ ∉ H_k` (contrapositive form).
+* `commutator_self_le_of_generator` — its diagonal case, giving `i ≥ 1` and hence **`k ≥ 3`**.
+  ⭐ This is what closes BG's *"Similarly one can show that `(E.23)`"*: the alternative
+  recursion `t_{i+1} = tᵢ·t₀` forces `H₁ = T'·H₂`, hence `H₁ ≤ H₂` once `k ≥ 3` — impossible
+  since `|H₁ : H₂| = p`.
+* `commutatorElement_zpow_mul_zpow_mul` — Lemma 4.2(a) with errors in **both** slots (Step 2
+  only ever needed one, its second slot being the generator of `R₀`).
+* `dvd_sub_mul_of_commutator_eigen` — `(E.26)` and `(E.27)` in one operator-agnostic step;
+  BG gets the second from the first by *"using `β` instead of `α`"*, and so do we.
+* `eq_of_eigenvalue_relations` — the closing arithmetic, `t₀ = t`.  The range bounds are used
+  to upgrade a congruence mod `q` to an **equality** `i + j + 1 = k − 1`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.omega1UpperCentralTwo_eq_upperCentralSeries
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.index_centralizer_upperCentralSeries
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.not_fixes_sup_frattini_of_not_fixes_R₀
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.commutator_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.dvd_sub_eigenvalues
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.not_dvd_sub_eigenvalues_of_not_fixes
+#assert_only_allowed_axioms OddOrder.BG.AppE.sup_commutator_eq_of_min_index
+#assert_only_allowed_axioms OddOrder.BG.AppE.range_of_max_commutator_indices
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutator_le_of_generators
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutator_self_le_of_generator
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutatorElement_zpow_mul_zpow_mul
+#assert_only_allowed_axioms OddOrder.BG.AppE.dvd_sub_mul_of_commutator_eigen
+#assert_only_allowed_axioms OddOrder.BG.AppE.eq_of_eigenvalue_relations
