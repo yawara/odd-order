@@ -105,7 +105,7 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (S10.typePACore0 hyp.S hyp.Sdata) hyp.S :=
     hdiffSupp.trans
-      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (typePACore_subset_A0Set hyp.Sdata))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (S10.typePACore_subset_A0Set hyp.Sdata))
   -- (13.2.e) `τ = Ind_S^G` equals the `A₀(S)`-Dade image on the `A₀(S)`-supported difference.
   have hmaps : hyp.indS (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)

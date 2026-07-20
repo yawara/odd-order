@@ -202,7 +202,7 @@ theorem fullTypeP1Dade_H_eq_bot_of_typePA_centralizer_le [Finite G]
         (OddOrder.GroupTheory.typePV hyp.base.T dataT) at hx
     rcases hx with hxA | hxV
     · exact hA x hxA
-    · exact OddOrder.Peterfalvi.S15.conjClassSetIn_typePV_centralizer_le_M dataT hxV
+    · exact OddOrder.Peterfalvi.S10.conjClassSetIn_typePV_centralizer_le_M dataT hxV
   intro a
   change full.dade.H a = ⊥
   rw [full.H_eq_ftSupportKernel]
@@ -427,7 +427,7 @@ theorem p_dvd_orderOf_of_mem_sharpP_union_typePV [Finite G]
     rwa [← Subgroup.orderOf_coe] at hdiv
   · obtain ⟨v, hv, m, hmS, hmv⟩ := hyV
     obtain ⟨r, hrord, _hrσ, hrW2⟩ :=
-      OddOrder.Peterfalvi.S15.exists_sigma_prime_dvd_orderOf_typePV
+      OddOrder.Peterfalvi.S10.exists_sigma_prime_dvd_orderOf_typePV
         hG hyp.base.S_maximal hyp.base.Sdata hv
     rw [hyp.base.Sdata_W2_eq, ← hyp.base.p_eq_card_W2] at hrW2
     have hrp : r = hyp.base.p :=

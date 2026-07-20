@@ -192,7 +192,8 @@ Since `A(M) = typePA M = (M')#` (`typePA_eq_sharpSubgroup_derivedInG`), `|A(M)| 
 `Subgroup.index_mul_card`). Hence `|A(M)|/|M| = (|M'|−1)/(w₁·|M'|) < 1/w₁` (as `|M'| ≥ 1`,
 `w₁ ≥ 1`).
 This is the strict inequality Peterfalvi (10.8) uses at line 87 to turn `w₁/|M'| ≥ 1 − |G₁|/|G| −
-|A(M)|/|M|` into `> 1 − |G₁|/|G| − 1/w₁` (the `hA` consumed by `typeII_coherence_estimate_chain`). -/
+|A(M)|/|M|` into `> 1 − |G₁|/|G| − 1/w₁` (the `hA` consumed by `typeII_coherence_estimate_chain`).
+-/
 theorem Hypothesis.card_typePA_div_card_lt_inv_w1 [Finite G]
     {M : Subgroup G} (hyp : Hypothesis M) :
     (Nat.card ↥(typePA M hyp.typeP) : ℚ) / (Nat.card ↥M : ℚ) < 1 / (hyp.w1 : ℚ) := by

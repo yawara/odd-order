@@ -63,7 +63,8 @@ with cyclic Frobenius complement, and `M_F` is not a `TI`-subset of `G`.
 
 The Frobenius kernel is `M_F = maxNilpotentNormalHall M` (for a Type-I maximal `M_F = M_σ`);
 `E` is the cyclic Frobenius complement.  "`M_F` is not a `TI`-subset in `G`" is encoded by the
-repository's standard `¬ FittingIsTI M` predicate: `FittingIsTI M` is `IsTISubset (F(M)^#) N_G(F(M))`
+repository's standard `¬ FittingIsTI M` predicate: `FittingIsTI M` is
+`IsTISubset (F(M)^#) N_G(F(M))`
 for the ambient Fitting subgroup `F(M) = fittingInAmbient M`, which the §15/§16 structure theorems
 (Theorem A(8), 15.7, Theorem D(4)) all use for "the Fitting subgroup is/​is not a TI-subset".  For
 the Type-I Frobenius `M` produced here, `F(M) = M_σ = M_F`, so `¬ FittingIsTI M` is exactly

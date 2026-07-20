@@ -303,4 +303,58 @@ theorem typeP_exists_kappa_hall_pair [Finite G]
           obtain ⟨hpp, hpM, -⟩ := Nat.mem_primeFactors.mp hp
           exact Nat.mem_primeFactors.mpr ⟨hpp, by simpa using hpM, hMne⟩
 
+
+/-! ### (8.15) claim 1 at the book-literal support `A(M)` (relocated from §13, issue 1046)
+
+`dadeSupportHypothesisData_typePACore` is Peterfalvi (8.15) claim 1 — a §8 statement, carrying no
+type hypothesis beyond `IsTypeP` — but it used to live in `S15_SAndT_Setup/SubcoherenceInputs`
+(namespace `S15`), i.e. *downstream* of the §8/§10 layer that needs it.  Same layering inversion as
+`sSet_finite` (fixed in the same pass).  Every dependency of the proof is already in this file or
+its imports, so the move is purely positional. -/
+
+/-- **Peterfalvi (8.15) for the type-`P₂` support `A(S)`: the Dade (2.2) support hypotheses hold.**
+The honest (13.2.e) foundation.  Assembles the `σ`-decomposition-generic engine
+(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₂` pins obtained from
+the
+matched κ-Hall / `(κ∪σ)'`-Hall pair (`typeP2_exists_matched_kappa_hall_pair`): escaping points are
+`σ`-sharp (`escaping_typePACore_mem_sigmaSharp`, (8.13.b)), `G`-conjugacy is `M`-conjugacy
+(`typePACore_isConj_conj_in_M`, (8.13.a)), and the coprimality
+(`coprime_FT_signalizer_centralizerIn_typePACore`, (8.13.c2)), plus the set-facts (`A(S) ⊆ M`,
+non-identity, nonempty, `M`-conjugation-invariant).
+
+This is the honest type-`P₂` Dade support (issue 9008 Option A / issue 1017 update #9): its `.dade`
+field is the `S04.Hypothesis G (A(S)) M` (the `τ = Ind_M^G` Dade isometry lives on `A(S)`),
+replacing
+the likely-unsound `sibleyTarget_H0C` route for the (13.3) `S`-instance coherence. -/
+theorem dadeSupportHypothesisData_typePACore [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP M) :
+    Nonempty (DadeSupportHypothesisData M (typePACore M)) := by
+  classical
+  obtain ⟨K₀, U₀, hKM, hUM, hKne, hK, hU⟩ :=
+    typeP_exists_kappa_hall_pair hG hM hTP
+  refine dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
+    typePACore_subset (fun x hx => hx.2.1)
+    (fun a ha => escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha)
+    (fun a ha b hb hab => typePACore_isConj_conj_in_M hG hM hKM hUM hKne hK hU ha hb hab)
+    (fun a ha b hb => coprime_FT_signalizer_centralizerIn_typePACore hG hM
+      (escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha) ha.2 hb)
+    ?_ ?_
+  · -- `A(S)` nonempty: `M_σ^# ⊆ A(S)` (a nonidentity `M_σ`-element centralizes itself).
+    obtain ⟨a, ha1⟩ :=
+      Subgroup.ne_bot_iff_exists_ne_one.mp (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
+    have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
+    refine ⟨a.1, haM', ha1', a.1, ?_, ?_⟩
+    · exact (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp
+        h)⟩
+    · exact Subgroup.mem_centralizer_singleton_iff.mpr rfl
+  · -- `M`-conjugation invariance.
+    intro m x hm
+    exact ⟨fun h => by
+      have := typePACore_conj_mem (inv_mem hm) h
+      rwa [show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x from by group] at this,
+      fun h => typePACore_conj_mem hm h⟩
+
 end OddOrder.Peterfalvi.S10

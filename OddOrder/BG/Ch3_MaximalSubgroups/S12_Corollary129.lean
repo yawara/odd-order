@@ -49,7 +49,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
 - `Isaacs.Ch05.fitting_coprime_abelian_decomp` (coprime 作用の分解)。
 - Hall 移送 = `Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall` (trivial 作用) +
   `Ch1.S06.exists_conj_eq_of_isHall_subgroupOf`。
-- cyclic 一意性 = `OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq` + `S10.isCyclic_of_pRank_le_one`。
+- cyclic 一意性 = `OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq` +
+  `S10.isCyclic_of_pRank_le_one`。
 -/
 
 namespace OddOrder.BG.Ch3.S12

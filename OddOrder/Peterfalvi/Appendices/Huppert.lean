@@ -1192,7 +1192,8 @@ theorem opCore_fitting_map_subtype_eq [Finite D] (p : ℕ) [Fact p.Prime] :
     (opCore p ↥(fitting D)).map (fitting D).subtype = opCore p D := by
   apply le_antisymm
   · haveI : ((opCore p ↥(fitting D)).map (fitting D).subtype).Normal :=
-      OddOrder.GroupTheory.normal_map_subtype_of_characteristic (opCore.characteristic p ↥(fitting D))
+      OddOrder.GroupTheory.normal_map_subtype_of_characteristic
+        (opCore.characteristic p ↥(fitting D))
     exact normal_pgroup_le_opCore ((opCore_isPGroup p ↥(fitting D)).map (fitting D).subtype)
   · have hofit : opCore p D ≤ fitting D := opCore_le_fitting ⟨p, Fact.out⟩ D
     haveI : ((opCore p D).subgroupOf (fitting D)).Normal := Subgroup.normal_subgroupOf

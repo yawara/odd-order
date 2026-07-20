@@ -85,7 +85,8 @@ non-TI witness data and a non-abelian `M_F`, every prime `q ∈ π(M_F)` has an 
 of `M_F` that is normal in `M` (hence `td.U0`-invariant), feeding
 `typeF_exponent_dvd_sub_one_of_invariant_card`.
 
-* `q ≠ p`: `O_q(M_F) ≤ O_{p'}(M_F)` is cyclic (`typeF_nonabelian_cyclic_opiCore_compl`), so its unique
+* `q ≠ p`: `O_q(M_F) ≤ O_{p'}(M_F)` is cyclic (`typeF_nonabelian_cyclic_opiCore_compl`),
+  so its unique
   order-`q` subgroup `Ω₁(O_q(M_F))` is characteristic (`characteristic_of_subgroup_of_isCyclic`) in
   `O_q(M_F)`, characteristic in `M_F`, hence normal in `M`.
 * `q = p`: `Z = Ω₁(Z(O_p(M_F)))`; `|Z| = p` because `B = X₁ ⊔ Z` is elementary abelian of `p`-rank

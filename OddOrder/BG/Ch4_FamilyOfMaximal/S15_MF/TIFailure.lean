@@ -1150,7 +1150,8 @@ theorem not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le [Finite G]
 mmd L4213): when a nonidentity Hall subgroup `H ≤ M_σ` is **not** normal in `M`, the Frattini
 factorization `M = N_M(H)·Q` holds for the normal `q`-subgroup `Q = O_q(M)`.
 
-Proof (BG L4213).  `H ⋬ M` forces `M_σ` non-nilpotent (`hall_subgroupOf_normal_of_msigma_nilpotent`),
+Proof (BG L4213).  `H ⋬ M` forces `M_σ` non-nilpotent
+(`hall_subgroupOf_normal_of_msigma_nilpotent`),
 i.e. `M_F ≠ M_σ`, so `M` is type `P₁` (`isTypeP1_of_mf_ne_msigma`) and Theorem 15.2's machinery
 supplies the normal `q`-subgroup `Q = O_q(M) ≤ M_σ` with `M_σ/Q` nilpotent
 (`msigma_quotient_isNilpotent_of_inputs`).  Since `Q = O_q(M_σ)` (`opiCoreInG_eq_of_normal_le`),

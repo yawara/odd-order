@@ -189,8 +189,10 @@ theorem peterfalvi_67 [Finite G] (ρ : Representation ℂ G V) [IsIrreducible ρ
     simpa [C₁, q] using coprime_card_class_card_sylow P hPz
   have hψz : IsIntegral ℤ (ρ.character z) := character_isIntegral ρ z
   have hψ1 : IsIntegral ℤ (ρ.character 1) := character_isIntegral ρ 1
-  have ha₁₁ : IsIntegral ℤ a₁₁ := by simpa [a₁₁, C₁] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₁
-  have ha₁₂ : IsIntegral ℤ a₁₂ := by simpa [a₁₂, C₁, C₂] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₂
+  have ha₁₁ : IsIntegral ℤ a₁₁ := by
+    simpa [a₁₁, C₁] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₁
+  have ha₁₂ : IsIntegral ℤ a₁₂ := by
+    simpa [a₁₂, C₁, C₂] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₂
   have hone' : a₁₁ ≡ 1 + a₁₂ [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
     simpa [a₁₁, a₁₂, C₁, C₂] using hone
   exact peterfalvi_673 hcop hψz hψ1 ha₁₁ ha₁₂ h11 h12 hsubst hone'

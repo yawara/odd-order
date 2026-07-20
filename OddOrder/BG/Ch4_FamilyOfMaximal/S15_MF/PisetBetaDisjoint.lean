@@ -201,7 +201,8 @@ theorem E3_eq_bot_of_tau3_eq_empty [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
   rw [htau3] at hmem
   exact hmem
 
-/-- **`E₂ = ⊥` from `τ₂(M) = ∅`**: the `τ₂(M)`-Hall factor `E₂` of any `σ(M)'`-complement `E`-setup is
+/-- **`E₂ = ⊥` from `τ₂(M) = ∅`**: the `τ₂(M)`-Hall factor `E₂` of any
+`σ(M)'`-complement `E`-setup is
 trivial when `M` has no `τ₂`-*primes* (Theorem 15.8's `τ₂(M) = ∅` for the Corollary 15.9 escape, in
 the `∀ p, p.Prime → p ∉ τ₂(M)` form output by `tau2_transfer_constraint`).  `τ₂`-analogue of
 `E3_eq_bot_of_tau3_eq_empty`. -/
@@ -412,7 +413,8 @@ theorem le_normalizer_of_le_isCyclic_normalized [Finite G] {C X K : Subgroup G} 
   rwa [hXeq] at hiff
 
 /-- **Setup for BG Theorem 15.7(a)**: `¬FittingIsTI M` produces an element `g ∉ M` and a nontrivial
-intersection `F(M) ⊓ F(M)^g`.  Unfolding `¬IsTISubset (F(M)^#) (N_G(F(M)))`: there is `g ∉ N_G(F(M))`
+intersection `F(M) ⊓ F(M)^g`.  Unfolding `¬IsTISubset (F(M)^#) (N_G(F(M)))`:
+there is `g ∉ N_G(F(M))`
 and `a ∈ F(M)^#` with `gag⁻¹ ∈ F(M)^#`; then `gag⁻¹ ∈ F(M) ⊓ (conj g • F(M))` is nontrivial, and
 `g ∉ M` because `F(M) ⊴ M` forces `M ≤ N_G(F(M))`. -/
 theorem exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI {M : Subgroup G}
@@ -699,10 +701,12 @@ theorem exists_inf_conj_fitting_orderP_witness [Finite G]
   obtain ⟨p, X₁, h⟩ := exists_orderP_witness_of_inf_conj_fitting_ne_bot hG hM hgM hXne
   exact ⟨g, p, X₁, hgM, h⟩
 
-/-- **`O_p(M_F)` is noncyclic at a non-TI witness prime** (Coq `nonTI_Fitting_structure`, `not_cycMp`):
+/-- **`O_p(M_F)` is noncyclic at a non-TI witness prime**
+(Coq `nonTI_Fitting_structure`, `not_cycMp`):
 if `M_F` contains an order-`p` subgroup `X₁` that is also contained in the conjugate `M_F^g` for
 some
-`g ∉ M`, then `O_p(M_F)` is not cyclic.  Were it cyclic, `X₁` would be its unique order-`p` subgroup,
+`g ∉ M`, then `O_p(M_F)` is not cyclic.  Were it cyclic, `X₁` would be its unique
+order-`p` subgroup,
 hence characteristic in `O_p(M_F) ⊴ M`, giving `N_G(X₁) = M`; applied to `g⁻¹·X₁·g ≤ O_p(M_F)` it
 gives
 `N_G(g⁻¹·X₁·g) = g⁻¹·M·g`, so `M = g⁻¹·M·g`, forcing `g ∈ M` — contradiction.  Both `X₁` and its
@@ -917,7 +921,8 @@ nonidentity element of `A` fixing a nonidentity element of `N` (`IsFrobeniusActi
 
 This is the divisibility crux of the exponent condition (conjunct A) of BG Theorem 15.7(e2):
 applied to `N = Z_q = Ω₁(Z(O_q(M_σ)))` (order `q`) with `A = U₀` the Frobenius complement acting
-fixed-point-freely on the kernel `M_σ`, it gives `|U₀| ∣ q - 1`, hence `exp(U) = exp(U₀) ∣ q - 1`. -/
+fixed-point-freely on the kernel `M_σ`, it gives `|U₀| ∣ q - 1`, hence
+`exp(U) = exp(U₀) ∣ q - 1`. -/
 theorem card_dvd_sub_one_of_isFrobeniusAction {A N : Type*} [Group A] [Finite A] [Group N]
     [Finite N] [MulDistribMulAction A N] (h : OddOrder.Isaacs.Ch06.IsFrobeniusAction A N) :
     Nat.card A ∣ Nat.card N - 1 := by

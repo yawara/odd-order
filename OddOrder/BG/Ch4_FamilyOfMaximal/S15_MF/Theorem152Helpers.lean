@@ -27,7 +27,8 @@ up here as **sorry-free conditional helpers** that take the §14-gated facts (ty
 action on `M_σ`, `q = |K*|` prime — Lemma 14.1 / Theorem 14.7(f) / Proposition 14.2(a)) as explicit
 hypotheses.  Once Lane H lands those §14 results the wrapper `mf_ne_msigma_typeP1_structure`
 discharges each hypothesis by a single citation and assembles these helpers (net `-1` sorry then).
-The proof's first §3 gate, BG **Theorem 3.8** (`S03h.thm38`), is now formalized, unblocking step 2. -/
+The proof's first §3 gate, BG **Theorem 3.8** (`S03h.thm38`), is now formalized, unblocking
+step 2. -/
 
 /-- **Theorem 15.2, step 2 entry** (mmd L4192, "By Lemma 6.3(a), `M_σ = [M_σ, K]`"): in a
 type-`P1` factorization `M = K M_σ` (so `M_σ` is a complement of `K` in `M`), the σ-core is its
@@ -330,8 +331,8 @@ if `M_F ≠ M_σ` (i.e. `M_σ` is *not* nilpotent), then `M` is of type `P₁`.
 Two halves, both via BG Lemma 14.1 (`msigma_structure_of_notMem_sigma_kappa`):
 
 * `¬ IsTypeP2 M`: were `M` type-`P₂`, `msigma_isNilpotent_of_isTypeP2` would make `M_σ` nilpotent.
-* `IsTypeP M`: the `σ`-complement `E` of `M` is nontrivial (`SubgroupESetup.E_ne_bot`), so some prime
-  `p ∣ |E|` lies in `π(M) ∖ σ(M)`.  Building a maximal-rank elementary abelian `A ≤ M` (as in
+* `IsTypeP M`: the `σ`-complement `E` of `M` is nontrivial (`SubgroupESetup.E_ne_bot`), so some
+  prime `p ∣ |E|` lies in `π(M) ∖ σ(M)`.  Building a maximal-rank elementary abelian `A ≤ M` (as in
   `msigma_isNilpotent_of_isTypeP2`), if `p ∉ κ(M)` then Lemma 14.1 forces `M_σ` nilpotent — a
   contradiction; hence `p ∈ κ(M)`, so `κ(M) ≠ ∅`, i.e. `M` is type-`P`.
 
@@ -395,7 +396,8 @@ Route (BG Theorem 14.7(f) via the `Z`-family duality):
 * `typeP_duality` provides the unique non-conjugate partner `M*` with `Kstar ≤ M*`, `Kstar` a Hall
   `κ(M*)`-subgroup of `M*`, the symmetric relation `K = M*_σ ⊓ C_G(Kstar)`, and the disjunction
   `IsTypeP2 M ∨ IsTypeP2 M*`.
-* Since `M` is type-`P₁`, it is not type-`P₂` (`not_isTypeP1_and_isTypeP2`); hence `M*` is type-`P₂`.
+* Since `M` is type-`P₁`, it is not type-`P₂` (`not_isTypeP1_and_isTypeP2`); hence `M*` is
+  type-`P₂`.
 * `typeP_structure` applied to `M*` (with `Kstar` in the `K`-role) has the `IsTypeP2 M* →`
   conjunct `∃ q, q.Prime ∧ Nat.card ↥Kstar = q`, giving `|Kstar|` prime.
 

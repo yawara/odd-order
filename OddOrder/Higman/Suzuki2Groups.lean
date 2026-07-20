@@ -29,6 +29,7 @@ import OddOrder.Higman.Suzuki2Groups.HigmanCoverDerivedSeries
 import OddOrder.Higman.Suzuki2Groups.HigmanMaximalNormalAbelian
 import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
 import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
 

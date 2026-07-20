@@ -1298,7 +1298,8 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   }, ?_⟩
   -- The (8.8) covering dichotomy (BG Cor 14.9) splits on whether a type-`P` maximal exists.
   by_cases hP : (OddOrder.BG.Ch4.S14.maximalTypePFamily G).Nonempty
-  · -- `𝓜_P ≠ ∅`: the non-Type-I covering, exceptional `Ẑ` of a reference type-`P` maximal (fix-`W`).
+  · -- `𝓜_P ≠ ∅`: the non-Type-I covering, exceptional `Ẑ` of a reference type-`P`
+    -- maximal (fix-`W`).
     obtain ⟨Mref, hMrefmax, hMrefP⟩ := hP
     obtain ⟨Kref, Kstarref, Uref, hKMref, hKref, hKstarref, hUref⟩ :=
       OddOrder.BG.Ch4.S14.exists_typeP_data hG hMrefmax

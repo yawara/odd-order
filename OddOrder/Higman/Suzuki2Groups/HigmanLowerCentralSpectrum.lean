@@ -682,6 +682,39 @@ theorem exists_singerFrobeniusEigenbasis_of_faithful_irreducible
     (rho c) n hn lambda hfin hchar hprim
   exact ⟨e, lambda, b, hprim, hconj, hgen, hb⟩
 
+/-- Singer coordinates for a transitive cyclic action via its faithful effective image. -/
+theorem exists_singerFrobeniusEigenbasis_of_transitive_generator
+    {C V : Type uSinger} [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V] [Module (ZMod 2) V] [Finite V]
+    (rho : Representation (ZMod 2) C V) (n : ℕ) (hn : 2 ≤ n)
+    (hfin : Module.finrank (ZMod 2) V = n)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w)
+    (c : C) (hcgen : ∀ x : C, x ∈ Subgroup.zpowers c) :
+    ∃ (e : V ≃ₗ[ZMod 2] GaloisField 2 n) (nu : GaloisField 2 n)
+      (b : Basis (Fin n) (GaloisField 2 n)
+        (GaloisField 2 n ⊗[ZMod 2] V)),
+      IsPrimitiveRoot nu (2 ^ n - 1) ∧
+      e.conj (rho c) = Algebra.lmul (ZMod 2) (GaloisField 2 n) nu ∧
+      Algebra.adjoin (ZMod 2) ({nu} : Set (GaloisField 2 n)) = ⊤ ∧
+      ∀ i, (rho c).baseChange (GaloisField 2 n) (b i) =
+        nu ^ (2 ^ i.val) • b i := by
+  letI : Nontrivial V := Module.nontrivial_of_finrank_pos (by rw [hfin]; omega)
+  let D := representationImageActor rho
+  let rhoD : Representation (ZMod 2) D V := representationImage rho
+  let d : D := ⟨rho.asGroupHom c, ⟨c, rfl⟩⟩
+  letI : Finite D := Finite.of_surjective rho.asGroupHom.rangeRestrict
+    rho.asGroupHom.rangeRestrict_surjective
+  letI : CommGroup D :=
+    { (inferInstance : Group D) with mul_comm := representationImage_mul_comm rho }
+  have hirrD : Representation.IsIrreducible rhoD :=
+    representation_isIrreducible_of_transitive_nonzero rhoD
+      (representationImage_transitive rho htrans)
+  obtain ⟨e, nu, b, hprim, hconj, hgen, hb⟩ :=
+    exists_singerFrobeniusEigenbasis_of_faithful_irreducible
+      rhoD n hn hfin hirrD (representationImage_injective rho) d
+      (representationImage_generator_orderOf_eq_pow_sub_one
+        rho n hfin htrans c hcgen)
+  exact ⟨e, nu, b, hprim, hconj, hgen, hb⟩
 
 /-! ## Primitive-root contradiction -/
 

@@ -88,7 +88,8 @@ maximal conjugates that contain `x`.
 conjunct 1 was `IsHallSubgroup (σ M) (C_M(x))`, which is **false** for type-`P` `M`: at
 `x ∈ Kstar^#`
 the `κ`-Hall `K` (with `κ(M) ⊆ σ(M)ᶜ`) centralizes `x`, so `K ≤ C_M(x)`, making `C_M(x)` carry
-`σ(M)′`-primes — not a `σ(M)`-group.  Coq Theorem 14.4(b)/(e) has `C_M(x)` a `σ(N)′`-Hall of `C_G(x)`
+`σ(M)′`-primes — not a `σ(M)`-group.  Coq Theorem 14.4(b)/(e) has `C_M(x)` a `σ(N)′`-Hall
+of `C_G(x)`
 (`N` = the signalizer maximal), i.e. *intrinsically* a Hall subgroup of `C_G(x)` (its order coprime
 to
 its index). We encode "`C_M(x)` is a Hall subgroup of `C_G(x)`" `σ`-agnostically as this
@@ -125,12 +126,14 @@ def piStar (G : Type*) [Group G] : Set ℕ :=
 The concrete FT signalizer `R(x) = FT_signalizer x` (Coq `FT_signalizer`, BGsection14:90), built
 from
 `FT_signalizer_base x = N[x]`: when `x` has more than one `σ`-maximal, `N[x]` is a maximal subgroup
-over `C_G(x)` (the unique one — Theorem D, via Corollary 12.14); `R(x) = (N[x])_σ ⊓ C_G(x)`.  This is
+over `C_G(x)` (the unique one — Theorem D, via Corollary 12.14); `R(x) = (N[x])_σ ⊓ C_G(x)`.
+This is
 the genuine object the Theorem D(3)/(4) data `RData M x R` is built on; the deep
 `FT_signalizer_context` (transitive action / Hall / uniqueness) is the remaining content. -/
 
 open Classical in
-/-- BG `FT_signalizer_base x` (`N[x]`, Coq BGsection14:87): a maximal subgroup over `C_G(x)` when `x`
+/-- BG `FT_signalizer_base x` (`N[x]`, Coq BGsection14:87): a maximal subgroup over `C_G(x)`
+when `x`
 has more than one `σ`-maximal (Coq picks one; Theorem D proves it unique), else `⊥`. -/
 noncomputable def FT_signalizerBase (x : G) : Subgroup G :=
   if h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
@@ -415,8 +418,8 @@ theorem RData_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
         (Subgroup.centralizer ({x} : Set G)))) :
     RData M x (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) := by
   refine ⟨?_, ?_, hconj3, ?_⟩
-  · -- conjunct 1 (`C_M(x)` a Hall subgroup of `C_G(x)`): from `R` Hall + the complement, the order of
-    -- `C_M(x)` (= the index of `R`) is coprime to its index (= the order of `R`).
+  · -- conjunct 1 (`C_M(x)` a Hall subgroup of `C_G(x)`): from `R` Hall + the complement,
+    -- the order of `C_M(x)` (= the index of `R`) is coprime to its index (= the order of `R`).
     have hcop := hRhall.coprime_index
     rwa [hconj3.index_eq_card, Nat.coprime_comm, ← hconj3.symm.index_eq_card] at hcop
   · exact (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr
@@ -455,7 +458,8 @@ theorem signalizer_centralizer_isComplement {M N : Subgroup G} {x : G}
       rw [inf_assoc, inf_eq_right.mpr hCN]] at hgen
   exact hgen.symm
 
-/-- **BG Theorem D(3) for the `|𝓜_σ(x)| > 1` branch** (`∃ R, RData M x R`): when `x ∈ M_σ^#` has more
+/-- **BG Theorem D(3) for the `|𝓜_σ(x)| > 1` branch** (`∃ R, RData M x R`): when `x ∈ M_σ^#`
+has more
 than one `σ`-maximal, the proven `signalizer_structure_of_mem_sigmaSharp` supplies the unique
 maximal
 `N ≥ C_G(x)`, the Hall property of `R = (N)_σ ⊓ C_G(x)` and the sharp transitivity from `M`; the
@@ -517,14 +521,16 @@ theorem card_signalizer_eq_card_maximalSigma [Finite G] (hG : OddOrder.BG.IsMini
       exact ⟨⟨r, hrR⟩, Subtype.ext hrB.symm⟩
   rw [Nat.card_congr (Equiv.ofBijective f hbij), Nat.card_coe_set_eq, hSeq]
 
-/-- **BG Lemma 14.5(a), `σ`-cover disjointness** (Coq `sigma_cover_disjoint`, `_of_inputs` form): for
+/-- **BG Lemma 14.5(a), `σ`-cover disjointness** (Coq `sigma_cover_disjoint`, `_of_inputs`
+form): for
 two distinct `σ`-length-one elements `x, y` with signalizer data, the cosets `x·R(x)` and `y·R(y)`
 (`R(·) = (N_·)_σ ⊓ C_G(·)`) are disjoint.  If `g = x·r = y·s` were common, the `σ`-decomposition
 `{x} ∪ {r}^# = σ(g) = {y} ∪ {s}^#` (`sigma_cover_decomposition_signalizer`) forces `y = r` (as
 `y ≠ x`)
 and `s = x`; so `y ∈ (N_x)_σ` puts `N_x ∈ 𝓜_σ(y)`, and `x ∈ R(y) ∩ (N_x ⊓ C_G(y))` lands in the
 trivial intersection of the `y`-complement (`signalizer_centralizer_isComplement` at `M' = N_x`),
-forcing `x = 1` — contradiction.  The deep core of the `R(x)`-cover trivIset behind Lemma 14.5(c). -/
+forcing `x = 1` — contradiction.  The deep core of the `R(x)`-cover trivIset behind
+Lemma 14.5(c). -/
 theorem sigma_cover_disjoint_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {Mx Nx My Ny : Subgroup G} (hMx : Mx ∈ maximalSubgroups G) (hNx : Nx ∈ maximalSubgroups G)
     (hMy : My ∈ maximalSubgroups G) (hNy : Ny ∈ maximalSubgroups G) {x y : G}

@@ -117,8 +117,8 @@ theorem coherent_sOf_H0C [Finite G]
   classical
   rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) with hA | hB
-  · -- **caseA**: (9.11) case-a coherence via the refuter (lane-b (9.11.2) active work, sorried-cite),
-    -- then the (11.7) `H₀C′ ≤ H₀C` transfer with the reducible-μ-column witness.
+  · -- **caseA**: (9.11) case-a coherence via the refuter (lane-b (9.11.2) active work,
+    -- sorried-cite), then the (11.7) `H₀C′ ≤ H₀C` transfer with the reducible-μ-column witness.
     have caseA := hA.some
     have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
     have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by

@@ -31,7 +31,8 @@ The `F(M) = F(M_σ) × O_{σ'}(F(M))` decomposition splits into two case-indepen
 the nilpotent Hall splitting of `F(M)` (`opiCoreInG_sup_compl_eq_of_isNilpotent` applied to the
 nilpotent `F(M)`), and the identification `O_σ(F(M)) = F(M_σ)`
 (`opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma`, BG Corollary 15.5's "Lemma 1").
-The `τ₂`/cyclic content of the `σ'`-part is then supplied case by case in `fitting_decomposition`. -/
+The `τ₂`/cyclic content of the `σ'`-part is then supplied case by case in
+`fitting_decomposition`. -/
 
 /-- **Ambient nilpotent Hall splitting**: for a finite nilpotent subgroup `H`, the ambient
 realizations of `O_π(H)` and `O_{π'}(H)` join to all of `H`.  (Image under `H.subtype` of the

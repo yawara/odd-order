@@ -10483,7 +10483,7 @@ assembled Section 16 inputs depend only on Lean/mathlib's standard three axioms.
 (lane a, 2026-07-14, issues 2038/9081).  The honest `A₀(S)` Dade data now constructs the full
 `Hypothesis46`; its Dade-free core remains separately guarded as the exact prerequisite of the
 (4.7)/(4.8)-(1) support engine. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.hyp46Smp
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.hyp46SmpCore
 

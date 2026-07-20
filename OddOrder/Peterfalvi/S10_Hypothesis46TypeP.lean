@@ -37,8 +37,9 @@ Here the (4.6.d) covering `⋃_{h∈H^#} C_K(h)^# ⊆ A` is **trivial for every 
 `A = K^#` (`typePA_eq_sharpSubgroup_derivedInG`) already contains every nonidentity element of
 `K`.
 
-**(b) `A = typePACore M = ⋃_{x∈M_s^#} C_{M'}(x)^#`, the book-literal support** (`S10_StructureSetup`;
-faithful for every type, in particular type `P₂` = type II where `M_s = M_F ⊊ M'`):
+**(b) `A = typePACore M = ⋃_{x∈M_s^#} C_{M'}(x)^#`, the book-literal support**
+(`S10_StructureSetup`; faithful for every type, in particular type `P₂` = type II where
+`M_s = M_F ⊊ M'`):
 
 * `typePACore_toHypothesis46` — `H` a parameter (normal, `W₂ ≤ H ≤ M_s`);
 * `typePACore_toHypothesis46_core` — the book's `H = M_s = M_σ` choice (Coq `FT_prDade_hyp`);
@@ -130,11 +131,12 @@ book-literal support, valid for every type, where the covering is exactly its de
 Field sources (all bare): the (4.2) structural part is `typePData_toS06Hypothesis` (with the
 (8.4.a) Hall coprimality `hHall` an explicit input, matching the book, which cites (8.4.a) here
 rather than re-deriving it; the §10 discharge is `typePData_W1_hall_coprime`, which needs
-`hG`/`hM`/`IsTypeP` that (8.15.2) itself does not); the `A`-side Dade datum restricts the `A₀`-Dade `dade0` along `A ⊆ A₀` with the
-`M`-stability `hAnorm`; the (4.6.b) TI-cyclic data is `typePData_toTICyclicHypothesis` (whose `V`
-is definitionally `typePV M data`, so the (4.6.d) `A₀ = A ∪ V^M` datum is **definitionally**
-`dade0` — the payoff of stating (8.10) `typePA0`/`typePACore0` with `conjClassSetIn`); the (4.6.e)
-isometry is `fullDadeIsometryData hconj`.
+`hG`/`hM`/`IsTypeP` that (8.15.2) itself does not); the `A`-side Dade datum restricts the `A₀`-Dade
+`dade0` along `A ⊆ A₀` with the `M`-stability `hAnorm`; the (4.6.b) TI-cyclic data is
+`typePData_toTICyclicHypothesis` (whose `V` is definitionally `typePV M data`, so the (4.6.d)
+`A₀ = A ∪ V^M` datum is **definitionally** `dade0` — the payoff of stating (8.10)
+`typePA0`/`typePACore0` with `conjClassSetIn`); the (4.6.e) isometry is
+`fullDadeIsometryData hconj`.
 
 `dade0`/`hconj` are taken raw rather than bundled as a `DadeSupportHypothesisData`: the extra
 field of the bundle (`H_eq_ftSupportKernel`, the (8.14) faithfulness of the stabilizers) is not

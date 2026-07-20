@@ -434,7 +434,8 @@ theorem conjActionOfMemNormalizer_apply {N : Subgroup G} {x : G}
     (a : ↥(Subgroup.zpowers x)) (n : ↥N) :
     ((conjActionOfMemNormalizer hx a) n : G) = (a : G) * (n : G) * (a : G)⁻¹ := rfl
 
-/-- Fixed points of the cyclic conjugation action on `N` are the elements of `N` centralizing `x`. -/
+/-- Fixed points of the cyclic conjugation action on `N` are the elements of `N` centralizing `x`.
+-/
 theorem fixedPoints_conjActionOfMemNormalizer_eq {N : Subgroup G} {x : G}
     (hx : x ∈ Subgroup.normalizer (N : Set G)) :
     Subgroup.fixedPointsOfMulAut (conjActionOfMemNormalizer hx) =
@@ -539,7 +540,8 @@ theorem typePData_not_dvd_card_W2_of_card_W1_prime [Finite G] {M : Subgroup G}
 
 /-- **Prop 16.1 reverse, type II–IV ⟹ type `P`** (mmd L4478): a type-`P` datum whose cyclic
 factor `W₁` has *prime* order `q = |W₁|` (the `TypePNontrivialCore` of types II/III/IV) is BG type
-`P`.  `q ∤ |M'|`: else the `q`-element `x ∈ W₁#` normalizing `M'` would give `q ∣ |C_{M'}(x)| = |W₂|`
+`P`.  `q ∤ |M'|`: else the `q`-element `x ∈ W₁#` normalizing `M'` would give
+`q ∣ |C_{M'}(x)| = |W₂|`
 (`prime_dvd_card_inf_centralizer_of_mem_normalizer`, `centralizer_W1`), contradicting `q ∤ |W₂|`
 (`typePData_not_dvd_card_W2_of_card_W1_prime`).  Then `r_q(M) = 1`
 (`typePData_pRank_eq_one_of_not_dvd_card_derived`) and `κ(M) ≠ ∅`
@@ -652,7 +654,8 @@ theorem theoremA8_structure [Finite G]
     theoremA8_complement_eq_bot_and_kappa_prime hG hM hKM hK hKstar hU hne
   exact ⟨hUbot, S15.fitting_isTI_of_mf_ne_msigma hG hM hne, hKp⟩
 
-/-- **Type-`P₁` (`M_F ≠ M_σ`) `TypePNontrivialCore`** (the common type II--IV hypotheses of Peterfalvi
+/-- **Type-`P₁` (`M_F ≠ M_σ`) `TypePNontrivialCore`**
+(the common type II--IV hypotheses of Peterfalvi
 (8.6), for the type III/IV case): a `TypePData` of a type-`P₁` maximal subgroup with `M_F ≠ M_σ` and
 nontrivial complement `U` satisfies `U ≠ ⊥`, `|W₁|` prime, and `M_F#` is a `TI`-subset.
 
@@ -698,7 +701,8 @@ theorem typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma [Finite G]
 /-- **Normalizer of a finite nilpotent subgroup is contained in the normalizer of each of its Sylow
 subgroups** (the `char_norms (pcore_char p U)` step of Coq `BGsection16` `typePfacts`): for a finite
 nilpotent `U ≤ G` and a Sylow `p`-subgroup `P` of `↥U`, the `G`-normalizer of `U` lies in the
-`G`-normalizer of `P̄ = P.map U.subtype`.  Since `U` is nilpotent, `P` is normal — hence the *unique*
+`G`-normalizer of `P̄ = P.map U.subtype`.
+Since `U` is nilpotent, `P` is normal — hence the *unique*
 Sylow `p`-subgroup of `↥U` (`Sylow.unique_of_normal`) — so conjugation by any `g ∈ N_G(U)` (which
 permutes `U`'s Sylow `p`-subgroups) fixes `P̄`.  Reusable. -/
 theorem normalizer_le_normalizer_map_sylow_of_isNilpotent [Finite G] {U : Subgroup G}

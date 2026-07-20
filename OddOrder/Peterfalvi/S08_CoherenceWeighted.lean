@@ -50,7 +50,8 @@ family `χmem : ι → ClassFunction ↥L ℂ` is a family of (possibly reducibl
 
 * orthogonality `⟨χmem i, χmem j⟩ = if i = j then ⟨χmem i, χmem i⟩ else 0` (the diagonal is the
   squared norm `‖χmem i‖²`, not forced to `1`);
-* anchor `χmem i₁` of degree-ratio `1` (`ha1 : deg i₁ = 1`) — its **norm is unconstrained**, matching
+* anchor `χmem i₁` of degree-ratio `1` (`ha1 : deg i₁ = 1`)
+  — its **norm is unconstrained**, matching
   Peterfalvi (5.6), whose only anchor hypothesis is `χ₁(1) ∣ χ(1)` (see `crux1_of_memberFamilyW`);
 * the **weighted** degree bound `2a < ∑_{i∈s} deg(i)² / ‖χmem i‖²`.
 
@@ -174,9 +175,11 @@ The proof is the orthonormal `crux1` with `1 ↦ mc i`: the orthogonal projectio
 *rational* expansion `Da.Y = ∑ (cZ i/mc i)·ν χᵢ + Z`; with `cZ i = a·mc i₁·[i=i₁] − λ·deg i` this is
 the `λ`-form `∑ (a·[i=i₁] − λ·rc i)·ν χᵢ` with `λ = a·mc i₁ + μ`, `rc i = deg i/mc i` (the anchor
 coefficient `cZ i₁/mc i₁ = a − λ/mc i₁` is where the norm must be divided back out).  `λ` is an
-*integer* because `mc i₁ = ⟨ν χ₁, ν χ₁⟩` is one — `ν χ₁ ∈ ℤ[Irr G]` and `ν` is an isometry — which is
+*integer* because `mc i₁ = ⟨ν χ₁, ν χ₁⟩` is one
+— `ν χ₁ ∈ ℤ[Irr G]` and `ν` is an isometry — which is
 the norm-general replacement for `mc i₁ = 1`.  The (5.6.2) engine `lambda_eq_zero_and_Z_eq_zero` is
-already norm-general (`hψ : ‖ψ‖² = a²·mc i₁`, `hr₁ : rc i₁ · mc i₁ = 1` from `deg i₁ = 1`); it forces
+already norm-general
+(`hψ : ‖ψ‖² = a²·mc i₁`, `hr₁ : rc i₁ · mc i₁ = 1` from `deg i₁ = 1`); it forces
 `λ = 0`, i.e. `μ = −a·mc i₁`.  Here `∑ rc² · mc = ∑ deg²/mc` is the weighted bound. -/
 theorem crux1_of_memberFamilyW {A : Set G}
     (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)

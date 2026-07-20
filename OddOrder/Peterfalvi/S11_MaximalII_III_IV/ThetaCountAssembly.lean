@@ -733,7 +733,8 @@ of degree `qa`.  The assembly (in `caseA_character_counts`'s (d) branch):
 
 * **family** `T := (Dθ ×ˢ Dλ).image ψ_{·,·} ⊆ Irr(H·C_U(S₀))`, where `Dθ = {θ | W ≤ Ker θ ∧
   θ|_{S₀} ≠ 1}` (`W = caseA_wComplement`) and `Dλ = {λ | U'-realized ≤ Ker λ}`.  `|T| = |Dθ|·|Dλ| =
-  (p-1)·[C_U(S₀):U']` — injectivity `hcuPsiPair_injective_pair`, numerators `card_theta_triv_W_nontriv_S0`
+  (p-1)·[C_U(S₀):U']` — injectivity `hcuPsiPair_injective_pair`,
+  numerators `card_theta_triv_W_nontriv_S0`
   (`= p-1`) and `card_lambda_triv_uprime` (`= [C_U(S₀):U']`).
 * **first induction (`/a`)** — the *hypothesis-light* orbit count `card_image_induce_ge_div`
   (`OrbitOnIrr`) gives `|image₁| ≥ |T|/[HU:H·C_U(S₀)] = |T|/a` from *only* the per-member inertia
@@ -751,7 +752,8 @@ of degree `qa`.  The assembly (in `caseA_character_counts`'s (d) branch):
   irreducible (`caseA_member_induceHU_irreducible`, the `W₁`-orbit non-regularity), of degree `qa`
   (`hcuZetaPair_induceHU_apply_one`).
 * **assembly** — `ncard ≥ |induceHU '' image₁| = |image₁| ≥ |T|/a = (p-1)·[C_U(S₀):U']/a ≥
-  ((p-1)/a)·[C_U(S₀):U']` (`Set.ncard_le_ncard` + `Set.ncard_coe_finset` + `Finset.card_image_of_injOn`;
+  ((p-1)/a)·[C_U(S₀):U']` (`Set.ncard_le_ncard` + `Set.ncard_coe_finset`
+  + `Finset.card_image_of_injOn`;
   floor step `Nat.le_div_iff_mul_le` + `Nat.div_mul_le_self`), and `((p-1)/a)·(|U|/(a|U'|)) =
   ((p-1)/a)·[C_U(S₀):U']` by `card_U_div_a_mul_card_Uprime_eq_relIndex`.  Mirrors the Coq
   `typeP_nonGalois_characters` (9.8.d) `Mtheta`/`Xtheta`/`injXtheta` (`PFsection9.v` L1112-1254). -/
@@ -1163,7 +1165,9 @@ theorem exceptional_case_frobenius_realization_of_trigger [Finite G]
     obtain ⟨caseA⟩ := hA
     obtain ⟨-, -, ⟨lam, hlam_mem, hlam_irr, hlam_deg⟩, -⟩ :=
       caseA_character_counts hG chars caseA
-    exact hno ⟨lam, sOf_antitone data (sup_le_sup_left (Section11CharacterData.Cprime_le_C chars) chief.H0) hlam_mem,
+    exact hno ⟨lam,
+      sOf_antitone data
+        (sup_le_sup_left (Section11CharacterData.Cprime_le_C chars) chief.H0) hlam_mem,
       hlam_irr, hlam_deg⟩
   · obtain ⟨caseB⟩ := hB
     exact exceptional_case_frobenius_realization hG chars caseB hno

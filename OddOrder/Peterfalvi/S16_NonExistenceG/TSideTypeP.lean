@@ -1099,7 +1099,8 @@ theorem tSideDadeMap_isometry_diff (hyp : Hypothesis (G := G)) [Fintype G] [Fint
 /-- **The T-side Dade support `A₁(T) = T_σ^#` is exactly `(T')^# = QV^#`** (issue 9072, step 3
 support identity).  For type-III `T`, the Peterfalvi "main subgroup" `T_s = T'` (`mainSubgroup .III
 =
-derivedInG`), and the support bridge `A1_eq_sigmaSharp` (Peterfalvi (8.10) + `mainSubgroup_eq_Msigma`,
+derivedInG`), and the support bridge `A1_eq_sigmaSharp`
+(Peterfalvi (8.10) + `mainSubgroup_eq_Msigma`,
 here `T' = M_σ(T)` for the type-`P₁` regime that type-III inhabits) gives
 `sigmaSharp T = A₁(T) = (T_s)^# = (T')^#`.  Concretely
 `sigmaSharp T = (derivedInG T : Set G) \ {1}`.
