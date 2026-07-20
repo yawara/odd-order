@@ -628,6 +628,91 @@ theorem caseA_two_summand_inertia_inputs [Finite G] {M : Subgroup G}
   · exact Or.inl (hS3deg φ ⟨hφ', hφS₂⟩)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.3), the count inputs, at §9 level** — the §9 form of
+`S13.caseA_nineElevenThree_count_inputs`: the `𝒳(H₀C)` class equation with its degree-`u`
+character count already split into `W₁`-orbits,
+`u + (|𝒮₄|·q + (p−1))·u² + q(p−1)·u = p^q·u`.
+
+Two containments feed `nineElevenThree_orbit_split`: `H₀C′ ≤ H₀U′` (from `C′ = [C,C] ≤ [U,U] = U′`)
+and `H₀C′ ≤ H₀C` (from `C′ ≤ C`).  §13 needs `hncH0C`/`htype` for the second — it rewrites
+`C = cSub` first — and at §9 that rewrite is definitional, so neither hypothesis appears. -/
+theorem caseA_nineElevenThree_count_inputs [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {S₂ : Set (ClassFunction ↥M ℂ)}
+    (hS₁sub : {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂)
+    (hS3deg : ∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+      (χ : ↥M → ℂ) 1 = ((data.q * chars.u : ℕ) : ℂ))
+    (hS2deg : ∀ χ ∈ S₂, (χ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))
+    (hCUprime : chars.C = chars.Uprime)
+    (hcount : {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+        χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+      = (chief.p - 1) * ((uprimeSub data).relIndex data.U)) :
+    chars.u + ((caseASFour data chief S₂).ncard * data.q + (chief.p - 1)) * chars.u ^ 2
+        + data.q * (chief.p - 1) * chars.u
+      = chief.p ^ data.q * chars.u := by
+  classical
+  have hleU' : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ uprimeSub data := by
+    refine sup_le_sup_left ?_ chief.H0
+    change derivedInG (cSub data chief) ≤ derivedInG data.U
+    rw [derivedInG_eq_commutator (cSub data chief), derivedInG_eq_commutator data.U]
+    exact Subgroup.commutator_mono (cSub_le_U data chief) (cSub_le_U data chief)
+  have hleC : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ cSub data chief :=
+    sup_le_sup_left (cprimeSub_le_C data chief) chief.H0
+  have hS₁'sub : {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+      χ 1 = ((data.q * caseA.a : ℕ) : ℂ)} ⊆ S₂ := fun χ hχ =>
+    hS₁sub ⟨sOf_antitone data hleU' hχ.1, hχ.2.1, hχ.2.2⟩
+  have hS3deg' : ∀ χ ∈ sOf data (chief.H0 ⊔ cSub data chief), χ ∉ S₂ →
+      χ 1 = ((data.q * chars.u : ℕ) : ℂ) :=
+    fun χ hχ hnot => hS3deg χ ⟨sOf_antitone data hleC hχ, hnot⟩
+  exact nineElevenThree_orbit_split hG caseA hS₁'sub hS3deg' hS2deg hCUprime hcount
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.2)–(9.11.5): the equality refutation, at §9 level** — the §9 form of
+`S13.nineElevenEqualityRefutation_of_sTwoExtraction_normBound`.
+
+Assembles `CaseAEqualityRefutation` from the two Phase-D/E carriers: the `𝒮₂ = 𝒮₁` degree
+extraction and the `|𝒮₄| ≤ ‖α‖²` norm bound.  Phases B and C are the §9 lemmas above
+(`caseA_two_summand_inertia_inputs`, `caseA_nineElevenThree_count_inputs`), and the arithmetic
+spine `nineElevenCaseA_equality_refutation` was already §9-level and type-free.  `hn` is
+definitional here (`n = |𝒮₄|·q + (p−1)` by construction), with `3 ≤ q`, `1 ≤ u` and `p = 2a+1`
+supplied on the spot.
+
+**No `hncH0C`/`htype`**: §13 threads them only into Phases B and C, and both shed them at §9. -/
+theorem caseA_equalityRefutation_of_sTwoExtraction_normBound [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M)
+    (hext : CaseASTwoExtraction caseA tau A0)
+    (hnb : CaseANormBound caseA tau A0) :
+    CaseAEqualityRefutation caseA tau A0 := by
+  classical
+  intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg hcount hFbound
+  have hS2deg := hext S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg
+    hcount hFbound
+  obtain ⟨N, hnorm, hleN⟩ := hnb S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime
+    hS3deg hcount hFbound hS2deg
+  obtain ⟨K₁, K₂, hK₁, hK₂, hCinf⟩ :=
+    caseA_two_summand_inertia_inputs caseA hS3deg hS2deg
+  have hclass := caseA_nineElevenThree_count_inputs hG caseA hS₁sub hS3deg hS2deg
+    hCUprime hcount
+  have hqp : (data.q).Prime := data.nontrivial.2.1
+  have hqodd : Odd data.q :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card data.typeP.W1)
+  have hq3 : 3 ≤ data.q := by
+    obtain ⟨k, hk⟩ := hqodd
+    have h2 := hqp.two_le
+    omega
+  have hu : 1 ≤ chars.u := (u_odd hG chars).pos
+  have hp1 : 1 < chief.p := chief.p_prime.one_lt
+  have hpeq : chief.p = 2 * caseA.a + 1 := by omega
+  exact nineElevenCaseA_equality_refutation caseA hq3 hu hpeq hK₁ hK₂ hCinf hclass rfl
+    hnorm hleN
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.7)–(9.11.8), the coherent-pair refutation, at §9 level** — the §9 form of
 `S13.NineElevenSevenEightRefutation`.
 

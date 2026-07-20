@@ -11651,3 +11651,13 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- with `C = K₁ ⊓ K₂`.  §13 needs `hncH0C`/`htype` here only to rewrite `C = cSub` before seeing
 -- `C′ ≤ C`; at §9 `chars.C` *is* `cSub data chief`, so both hypotheses disappear.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_two_summand_inertia_inputs
+-- **(9.11.3) count inputs, at §9 level** — the `𝒳(H₀C)` class equation with the degree-`u` count
+-- split into `W₁`-orbits.  Same story as (9.11.2): §13's `hncH0C`/`htype` serve one `C = cSub`
+-- rewrite, definitional here.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_nineElevenThree_count_inputs
+-- **(9.11.2)–(9.11.5) equality refutation, at §9 level** — assembles `CaseAEqualityRefutation`
+-- from the `𝒮₂ = 𝒮₁` extraction and the norm bound, with Phases B/C as the §9 lemmas above and
+-- the arithmetic spine `nineElevenCaseA_equality_refutation` (already §9 and type-free).
+-- **No `hncH0C`/`htype`** — §13 threads them only into Phases B and C, and both shed them here.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.caseA_equalityRefutation_of_sTwoExtraction_normBound
