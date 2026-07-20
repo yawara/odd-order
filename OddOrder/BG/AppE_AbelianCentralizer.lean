@@ -686,4 +686,39 @@ theorem RegularOperatorSetup.not_dvd_sub_eigenvalues_of_not_fixes [Finite R] [Fi
   exact hbfix (hyp.smul_sup_derived_of_preserves_line hSinv hNinv b
     (map_eq_self_of_forall_zpow hglobal _))
 
+/-! ## `(E.26)`–`(E.27)`: the closing arithmetic
+
+BG: *"Now `p^k = |T/H_k| ≤ |T| = p^n = |S|/p < p^{q-1}` by Theorem E.3(c), so `k ≤ q − 1`.
+Recalling that `r₀ = r`, we obtain from `(E.26)` `r^{1+i+j} = r^{k-1}`, `r^{j+2} = r^{k-i}`,
+and `j + 2 ≡ k − i (mod q)`.  Since `0 ≤ j ≤ i ≤ k − 2 ≤ q − 3`, we have `0 < j + 2 ≤ q − 1`
+and `0 < k − i ≤ k ≤ q − 1`, so `j + 2 = k − i`.  Now, by `(E.27)`, `t₀ = t^{k-1-i-j} = t`,
+a contradiction."*
+
+Written with `m = k − 1` so that no truncated subtraction appears.  This is the whole ending
+of the proposition, and it is independent of *how* `(E.22)`/`(E.23)` are obtained. -/
+
+/-- **BG Proposition E.4, the ending**: `(E.26)` and `(E.27)` together with the range bounds
+force `t₀ = t` — which `(E.21)` forbids.
+
+`(E.26)` says `r^{i+j+1} = r^m`, and `r` has order exactly `q`, so `i + j + 1 ≡ m (mod q)`;
+the bounds `j ≤ i < m` and `m + 2 ≤ q` pin the difference strictly inside one period, so
+`i + j + 1 = m` on the nose.  `(E.27)` then reads `t₀ · t^{i+j} = t^{i+j+1}`. -/
+theorem eq_of_eigenvalue_relations {p q : ℕ} {r t t₀ : (ZMod p)ˣ} (hord : orderOf r = q)
+    {i j m : ℕ} (hji : j ≤ i) (him : i + 1 ≤ m) (hmq : m + 2 ≤ q)
+    (hE26 : r ^ (i + j + 1) = r ^ m) (hE27 : t₀ * t ^ (i + j) = t ^ m) :
+    t₀ = t := by
+  -- `(E.26)` pins `i + j + 1 = m`.
+  have hmod : (i + j + 1) ≡ m [MOD q] := by
+    rw [← hord]; exact pow_eq_pow_iff_modEq.mp hE26
+  have heq : i + j + 1 = m := by
+    have hdvd : (q : ℤ) ∣ (m : ℤ) - (i + j + 1 : ℕ) := hmod.dvd
+    have hlt : |(m : ℤ) - (i + j + 1 : ℕ)| < (q : ℤ) := by
+      rw [abs_lt]; constructor <;> push_cast <;> omega
+    have hzero := Int.eq_zero_of_abs_lt_dvd hdvd hlt
+    have : (m : ℤ) = (i + j + 1 : ℕ) := by omega
+    exact_mod_cast this.symm
+  -- `(E.27)` then reads `t₀ · t^{i+j} = t · t^{i+j}`.
+  rw [← heq, pow_succ, mul_comm (t ^ (i + j)) t] at hE27
+  exact mul_right_cancel hE27
+
 end OddOrder.BG.AppE
