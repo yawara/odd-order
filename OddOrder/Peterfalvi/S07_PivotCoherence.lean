@@ -868,4 +868,31 @@ theorem uniform_degree_coherence_of_subcoherent
 
 end UniformDegreeCoherence
 
+/-- **Coherence transports along a support change that shrinks the supported lattice**
+(the support-side companion of `isCoherent_of_subset`: same family `S`, different support set).
+If `S` is coherent on `A₁` and every `A₂`-supported lattice element is already `A₁`-supported
+(`ℤ[S, A₂] ⊆ ℤ[S, A₁]`), then `S` is coherent on `A₂` with the *same* extension — only the
+`nonzero` witness must be re-supplied on `A₂`.
+
+The (9.11)/(6.8) use: the certain-type coherence (4.9)(b) lives on `A(M)`
+(`supportInSubgroup (typePA M) M`) while the §10–§13 coherence interface uses
+`A₀(M) ⊇ A(M)`; the column characters `μ_j` vanish off `A ∪ {1}` and `1 ∉ A₀`, so an
+`A₀`-supported `ℤ[𝒯]`-combination is automatically `A`-supported and the lattices agree. -/
+noncomputable def isCoherent_of_supportedSpan_le {G : Type*} [Group G] {L : Type*} [Group L]
+    [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S : Set (ClassFunction L ℂ)} {A₁ A₂ : Set L}
+    (h : OddOrder.Peterfalvi.S07.IsCoherent τ S A₁)
+    (hle : OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ⊆
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₁)
+    (hwit : ∃ φ : ClassFunction L ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A₂ ∧ φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ S A₂ where
+  nonzero := hwit
+  extension := h.extension
+  extension_inner_eq := h.extension_inner_eq
+  extends_on_supported := fun a ha => h.extends_on_supported a (hle ha)
+  extension_mem_ZIrr := h.extension_mem_ZIrr
+
 end OddOrder.Peterfalvi.S07

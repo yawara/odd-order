@@ -800,6 +800,72 @@ theorem caseB_coherent_sOf_cprime [Finite G] {M : Subgroup G} {A : Set G}
     (mul_ne_zero Nat.card_pos.ne' (u_odd hG chars).pos.ne') hη₁
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Case (9.7.b) coherence, moved down to the `A(M)`-isometry** — the form (9.5) actually asks
+for.
+
+Hypothesis (9.5) says "τ the Dade isometry with respect to `(A(M), M, G)`", while `certainTypeR`
+— hence `sOf_caseB_coherent` — produces its families for the *enlarged* `(4.6.e)` isometry on
+`A₀ = A ∪ V^M`.  The book does not distinguish them because the `A`-Dade datum **is** the
+restriction of the `A₀` one; in Lean that restriction has to be crossed explicitly, and this is the
+crossing:
+
+* `isCoherent_of_supportedSpan_le` shrinks the support `A₀ ⇝ A` (the containment is plain
+  monotonicity, `A ⊆ A₀`), needing a nonzero `A`-supported witness in `ℤ[𝒮(Y)]`;
+* `IsCoherent.congrMap` retargets the map, the two agreeing on `A`-supported functions by
+  `S08.dadeIntegralCharacterMap_restrict_eq_of_support`.
+
+The witness is `η̄ − η` for any member `η`: nonzero because a group of odd order has no real
+characters, and `A`-supported by the (4.7) estimate `S10.inducedNonKernelFamily_diff_support`
+through the (8.15.3) bridge — *not* merely `A₀`-supported.  That (4.7) sharpening is exactly what
+makes the descent possible.
+
+⚠ Note this runs the *opposite* way to the §13 use of `isCoherent_of_supportedSpan_le`
+(`S13.certainTypeSet_isCoherent_A0`, which enlarges `A ⇝ A₀`); there the family is the certain-type
+column set, here it is `𝒮(Y)`, and the target is the book's `A(M)`. -/
+noncomputable def sOf_caseB_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    (h46c : OddOrder.Peterfalvi.S06.Hypothesis46Core A M)
+    (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    {Y : Subgroup G} (d : ℕ)
+    (hunif : ∀ φ ∈ sOf data Y, ((φ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ))
+    (hKeq : h46c.K = (derivedInG M).subgroupOf M)
+    (hHeq : h46c.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    {η : ClassFunction ↥M ℂ} (hη : η ∈ sOf data Y)
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) (sOf data Y)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :
+    OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (h46.dade0.restrict Set.subset_union_left hAnorm)
+        (h46.tau.restrict Set.subset_union_left hAnorm))
+      (sOf data Y) (OddOrder.Peterfalvi.S04.supportInSubgroup A M) := by
+  classical
+  haveI := derivedInG_subgroupOf_normal M
+  -- the conjugate difference of a member: `A`-supported by (4.7), nonzero by odd order
+  have hmemNK : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ sOf data Y →
+      x ∈ OddOrder.Peterfalvi.S10.inducedNonKernelFamily h46c.K h46c.subH := fun {_} hx =>
+    hKeq ▸ hHeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx
+  have hηc : (η : ClassFunction ↥M ℂ).conj ∈ sOf data Y :=
+    sOf_closedUnderConjugate data Y hη
+  have hwitsupp : ((η : ClassFunction ↥M ℂ).conj - η).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A M :=
+    OddOrder.Peterfalvi.S10.inducedNonKernelFamily_diff_support h46c (hmemNK hηc) (hmemNK hη)
+      (by rw [hunif _ hηc, hunif _ hη])
+  have hwitne : ((η : ClassFunction ↥M ℂ).conj - η) ≠ 0 := fun h =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+      (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M)
+      (sOf_subset_inducedKernelFamily_bot hG hM data Y hη) (sub_eq_zero.mp h)
+  refine (OddOrder.Peterfalvi.S07.isCoherent_of_supportedSpan_le hcoh
+    (fun _ hφ => OddOrder.Peterfalvi.S07.zSupportedSpan_mono_right
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left) hφ)
+    ⟨_, ⟨Submodule.sub_mem _ (Submodule.subset_span hηc) (Submodule.subset_span hη),
+      hwitsupp⟩, hwitne⟩).congrMap (fun φ hφ => ?_)
+  exact (OddOrder.Peterfalvi.S08.dadeIntegralCharacterMap_restrict_eq_of_support
+    h46.dade0 h46.tau Set.subset_union_left hAnorm hφ.2).symm
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`𝒮(H₀C′) ≠ ∅`** — the pivot of the (9.11) case (9.7.b) engine, from **(9.9.b)**.
 
 The book's (9.9.b) says `𝒮(H₀)` *and* `𝒮(H₀C)` each contain exactly `p − 1` reducible characters
