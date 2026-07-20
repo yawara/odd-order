@@ -677,7 +677,29 @@ H0supC_le_derived, W1_inf_H0supC_subgroupOf_eq_bot, W2_not_le_H0supC, card_W2bar
 `S13_Lemmas113To115` に在り、§9 の leaf (S13 の上流) から import できなかった。
 `S07_PivotCoherence` へ移設し S13 の 2 呼び出しを修飾し直した。
 
-#### ⛏ 次の一手: `sOf_nineEleven_coherent` を A-level に述べ直す
+#### ✅ 済 (2026-07-20): `sOf_nineEleven_coherent` を A-level に述べ直した
+
+τ / 台を A₀ → **A(M)** へ移した (commit 645805460)。case (9.7.b) は
+`caseB_coherent_sOf_cprime` → `sOf_caseB_coherent_restrict` で供給し**入力ゼロのまま**。
+新パラメータは `hHeq` (`h46.subH = M_σ`) と `hAnorm` (A の M-共役不変性) のみ。
+
+#### ⛏ 次の一手: `hAbase` を `sOf_degreeSubfamily_coherent` から供給する
+
+両者は**同じ台 (`supportInSubgroup A M`)** になったので、残る差は τ だけ:
+
+- `sOf_degreeSubfamily_coherent` の τ = `dadeICM dd.dade (dd.dade.fullDadeIsometryData dd.hconj)`
+- (9.11) の τ = `dadeICM (h46.dade0.restrict …) (h46.tau.restrict …)`
+
+⚠ **鍵**: `dadeIntegralCharacterMap_apply_of_support` は supported な引数上で
+`hyp.dadeMap` に落ち、**isometry data に依らない**
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data` の証明がその実演)。
+⟹ `dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm` の pin さえ取れば、
+2 つの τ は A-supported 上で一致し `IsCoherent.congrMap` で閉じる。
+`fullDadeIsometryData` 同士の一致は**要らない**。
+
+⟹ 作業: (a) 上記 τ-agreement 補題、(b) `hAbase` supplier、(c) 残りは `hArefute` のみ。
+
+#### (旧) 次の一手: `sOf_nineEleven_coherent` を A-level に述べ直す
 
 現状の `sOf_nineEleven_coherent` は A₀ 上で述べてあり、case A の `hAbase` を A₀ 側で要求している。
 A-level に直せば **`hAbase` は `sOf_degreeSubfamily_coherent` の drop-in になる** (両方 A 上)。
