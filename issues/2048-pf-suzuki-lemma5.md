@@ -314,7 +314,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           - [x] noncommutative factor について `Φ(S) = Φ(P).subgroupOf S` を証明し、
                 factor の第2 lower-central layer と ambient `Φ(P)` の canonical な
                 `ZMod 2` 線形同値が restricted actor action と可換することを証明する
-          - [ ] commutative `A(n,1)` factor について square equivalence から
+          - [x] commutative `A(n,1)` factor について square equivalence から
                 prescribed ambient kernel coordinate に従属する quotient coordinate
                 と actor compatibility を構成する
           - [x] odd-order `θ` に対する unit twisted norm

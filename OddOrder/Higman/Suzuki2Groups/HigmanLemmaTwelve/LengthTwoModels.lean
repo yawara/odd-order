@@ -269,6 +269,65 @@ noncomputable def homocyclicFourSquareEquiv
       x ^ 2 := by
   rfl
 
+/-- For a homocyclic commutative group of exponent four, the canonical square
+equivalence intertwines every automorphism action. -/
+theorem homocyclicFourSquareEquiv_equivariant
+    {A X ι : Type*} [CommGroup A] [Group X] [Finite A]
+    (phi : X →* MulAut A)
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ 2))))
+    (g : X) (q : A ⧸ Agemo A 2 1) :
+    homocyclicFourSquareEquiv ε
+        ((IsAInvariant.of_characteristic phi).quotientMulAutHom g q) =
+      agemoRestrictAction phi 1 g (homocyclicFourSquareEquiv ε q) := by
+  refine QuotientGroup.induction_on q ?_
+  intro a
+  apply Subtype.ext
+  change (phi g a) ^ 2 = phi g (a ^ 2)
+  exact (map_pow (phi g) a 2).symm
+
+/-- The quotient coordinate forced by a prescribed additive coordinate on
+the square subgroup.  Frobenius inverse is the normalization for which the
+square formula is `beta ↦ beta^2`. -/
+noncomputable def homocyclicFourQuotientCoordinate
+    {A ι : Type*} [CommGroup A] [Finite A]
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ 2))))
+    (kernelCoord : Additive (Agemo A 2 1) ≃+ F) :
+    Additive (A ⧸ Agemo A 2 1) ≃+ F :=
+  (homocyclicFourSquareEquiv ε).toAdditive.trans kernelCoord |>.trans
+    (frobeniusEquiv F 2).symm.toAddEquiv
+
+/-- If an actor element is scalar `nu` in the prescribed kernel coordinate,
+it is scalar `Frob⁻¹(nu)` in the forced quotient coordinate. -/
+theorem homocyclicFourQuotientCoordinate_generator_compatible
+    {A X ι : Type*} [CommGroup A] [Group X] [Finite A]
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    (phi : X →* MulAut A)
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ 2))))
+    (kernelCoord : Additive (Agemo A 2 1) ≃+ F)
+    (g : X) (nu : F)
+    (hkernel : ∀ z : Additive (Agemo A 2 1),
+      kernelCoord (Additive.ofMul (agemoRestrictAction phi 1 g z.toMul)) =
+        nu * kernelCoord z)
+    (q : Additive (A ⧸ Agemo A 2 1)) :
+    homocyclicFourQuotientCoordinate ε kernelCoord
+        (Additive.ofMul
+          ((IsAInvariant.of_characteristic phi).quotientMulAutHom g q.toMul)) =
+      (frobeniusEquiv F 2).symm nu *
+        homocyclicFourQuotientCoordinate ε kernelCoord q := by
+  change (frobeniusEquiv F 2).symm
+      (kernelCoord (Additive.ofMul
+        (homocyclicFourSquareEquiv ε
+          ((IsAInvariant.of_characteristic phi).quotientMulAutHom g q.toMul)))) = _
+  rw [homocyclicFourSquareEquiv_equivariant]
+  have hk := hkernel
+    (Additive.ofMul (homocyclicFourSquareEquiv ε q.toMul))
+  simp only [toMul_ofMul] at hk
+  rw [hk]
+  exact map_mul (frobeniusEquiv F 2).symm nu
+    (kernelCoord
+      (Additive.ofMul (homocyclicFourSquareEquiv ε q.toMul)))
+
 /-- A homocyclic commutative group of exponent four is Higman's inclusive
 model A(n, 1), with actual finite-field square coordinates. -/
 noncomputable def xiLengthTwoTypeAData_of_homocyclic_four
@@ -319,6 +378,158 @@ noncomputable def xiLengthTwoTypeAData_of_homocyclic_four
           (coord (Additive.ofMul (QuotientGroup.mk' N a)))
     rw [squareEquiv.toAdditive.symm_apply_apply]
     rw [← pow_two, frobeniusEquiv_symm_pow_p]
+
+/-- Build the abelian `A(n,1)` model from a prescribed coordinate on its
+square subgroup, instead of an actor-blind `LinearEquiv.ofFinrankEq`. -/
+noncomputable def xiLengthTwoTypeAData_of_homocyclic_four_prescribedKernel
+    {A : Type uP} {ι : Type*} [CommGroup A] [Finite A]
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    (ε : A ≃* (ι → Multiplicative (ZMod (2 ^ 2))))
+    (_hNtop : Agemo A 2 1 ≠ ⊤)
+    (parameter : ℕ) (parameter_pos : 0 < parameter)
+    (card_field : Nat.card F = 2 ^ parameter)
+    (kernelCoord : Additive (Agemo A 2 1) ≃+ F) :
+    XiLengthTwoTypeAData.{uP, uF} A := by
+  let N : Subgroup A := Agemo A 2 1
+  letI : N.Normal := inferInstance
+  letI : Nontrivial (A ⧸ N) :=
+    QuotientGroup.nontrivial_iff.mpr (by simpa [N] using _hNtop)
+  let squareEquiv : (A ⧸ N) ≃* N := by
+    simpa [N] using homocyclicFourSquareEquiv ε
+  let quotientAdd : Additive (A ⧸ N) ≃+ F :=
+    squareEquiv.toAdditive.trans kernelCoord |>.trans
+      (frobeniusEquiv F 2).symm.toAddEquiv
+  let kernelMul : N ≃* Multiplicative F :=
+    AddEquiv.toMultiplicativeRight kernelCoord
+  let left : Multiplicative F ≃* N := kernelMul.symm
+  let right : (A ⧸ N) ≃* Multiplicative F :=
+    AddEquiv.toMultiplicativeRight quotientAdd
+  refine XiLengthTwoTypeAData.ofScaledSquareCoordinates
+    parameter parameter_pos card_field (1 : RingAut F) (by simp)
+    N left right ?_ (1 : F) one_ne_zero ?_
+  · rw [CommGroup.center_eq_top]
+    exact le_top
+  · intro a
+    simp only [one_mul]
+    rw [← homocyclicFourSquareEquiv_mk ε a]
+    apply congrArg Subtype.val
+    apply kernelMul.injective
+    simp only [kernelMul, left, MulEquiv.apply_symm_apply]
+    apply Multiplicative.ofAdd.injective
+    change kernelCoord
+        (squareEquiv.toAdditive
+          (Additive.ofMul (QuotientGroup.mk' N a))) =
+      (frobeniusEquiv F 2).symm
+          (kernelCoord (squareEquiv.toAdditive
+            (Additive.ofMul (QuotientGroup.mk' N a)))) *
+        (frobeniusEquiv F 2).symm
+          (kernelCoord (squareEquiv.toAdditive
+            (Additive.ofMul (QuotientGroup.mk' N a))))
+    rw [← pow_two, frobeniusEquiv_symm_pow_p]
+
+/-- In an abelian exponent-four factor, the square subgroup is exactly the
+intersection with the ambient Frattini subgroup. -/
+theorem agemo_one_eq_frattini_subgroupOf_of_homocyclic_four
+    {P : Type uP} [Group P]
+    {S : Subgroup P} {ι : Type*} [Finite P]
+    (hcommS : IsMulCommutative S)
+    (ε : S ≃* (ι → Multiplicative (ZMod (2 ^ 2))))
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P)) :
+    Agemo S 2 1 = (frattini P).subgroupOf S := by
+  letI : CommGroup S :=
+    { (inferInstance : Group S) with mul_comm := hcommS.is_comm.comm }
+  ext z
+  change z ∈ Agemo S 2 1 ↔ (z : P) ∈ frattini P
+  have hsq : z ^ 2 = 1 ↔ z ∈ Agemo S 2 1 := by
+    simpa only [Nat.reduceSub] using
+      (sq_eq_one_iff_mem_lastAgemoLayer (A := S) (ι := ι) (e := 2)
+        ε (by omega) (x := z))
+  rw [← hsq]
+  constructor
+  · intro hz
+    by_cases hzOne : (z : P) = 1
+    · simp [hzOne]
+    · apply hinvPhi
+      exact ⟨by simpa using congrArg Subtype.val hz, hzOne⟩
+  · intro hz
+    apply Subtype.ext
+    simpa using congrArg Subtype.val (hEA.pow_eq_one ⟨(z : P), hz⟩)
+
+/-- Identity-on-underlying-values equivalence between the square subgroup of
+the factor and the ambient Frattini group. -/
+def homocyclicFourSquareSubgroupEquivFrattini
+    {P : Type uP} [Group P] {S : Subgroup P}
+    (hPhiS : frattini P ≤ S)
+    (hN : Agemo S 2 1 = (frattini P).subgroupOf S) :
+    Agemo S 2 1 ≃* frattini P where
+  toFun z := ⟨((z : S) : P), by
+    have hz : (z : S) ∈ (frattini P).subgroupOf S := by
+      rw [← hN]
+      exact z.2
+    exact hz⟩
+  invFun z := ⟨⟨z.1, hPhiS z.2⟩, by
+    rw [hN]
+    exact z.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+  map_mul' _ _ := rfl
+
+/-- The identity-on-values equivalence intertwines the restricted factor
+action and the ambient action on `Φ(P)`. -/
+theorem homocyclicFourSquareSubgroupEquivFrattini_equivariant
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)} {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P ≤ S)
+    (hN : Agemo S 2 1 = (frattini P).subgroupOf S)
+    (c : Y) (z : Agemo S 2 1) :
+    homocyclicFourSquareSubgroupEquivFrattini hPhiS hN
+        ((IsAInvariant.of_characteristic hSinv.restrict).restrict c z) =
+      (IsAInvariant.of_characteristic Y.subtype).restrict c
+        (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN z) := by
+  rfl
+
+/-- Transport an ambient Frattini additive coordinate to the factor's square
+subgroup. -/
+noncomputable def homocyclicFourPrescribedKernelCoordinate
+    {P : Type uP} [Group P] {S : Subgroup P}
+    {F : Type uF} [AddCommGroup F]
+    (hPhiS : frattini P ≤ S)
+    (hN : Agemo S 2 1 = (frattini P).subgroupOf S)
+    (e : Additive (frattini P) ≃+ F) :
+    Additive (Agemo S 2 1) ≃+ F :=
+  (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN).toAdditive.trans e
+
+/-- Generator compatibility of the kernel coordinate transported from the
+ambient Frattini Singer coordinate. -/
+theorem homocyclicFourPrescribedKernelCoordinate_generator_compatible
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)} {S : Subgroup P}
+    {F : Type uF} [Field F]
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P ≤ S)
+    (hN : Agemo S 2 1 = (frattini P).subgroupOf S)
+    (e : Additive (frattini P) ≃+ F)
+    (c : Y) (nu : F)
+    (he : ∀ v : Additive (frattini P),
+      e (Additive.ofMul
+        ((IsAInvariant.of_characteristic Y.subtype).restrict c v.toMul)) =
+          nu * e v)
+    (z : Additive (Agemo S 2 1)) :
+    homocyclicFourPrescribedKernelCoordinate hPhiS hN e
+        (Additive.ofMul
+          ((IsAInvariant.of_characteristic hSinv.restrict).restrict c z.toMul)) =
+      nu * homocyclicFourPrescribedKernelCoordinate hPhiS hN e z := by
+  change e (Additive.ofMul
+      (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN
+        ((IsAInvariant.of_characteristic hSinv.restrict).restrict c z.toMul))) =
+    nu * e (Additive.ofMul
+      (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN z.toMul))
+  rw [homocyclicFourSquareSubgroupEquivFrattini_equivariant]
+  have h := he (Additive.ofMul
+    (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN z.toMul))
+  simpa only [toMul_ofMul] using h
 
 /-- The faithful range of an invariant subgroup restriction is again a
 cyclic actor transitive on that subgroup's involutions. -/
