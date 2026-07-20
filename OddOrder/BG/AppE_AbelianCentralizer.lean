@@ -477,6 +477,48 @@ theorem eigenSubgroup_eq_of_card_prime_sq {E : Type*} [Group E] [Finite E] {p : 
     · exact absurd hVk hVne
   exact (Subgroup.eq_of_le_of_card_ge hL₁ (by rw [hVcard, hL₁card])).symm
 
+/-- **BG's *"If `t = t₀`, then `β` fixes every 1-dimensional subspace of `S/S'`"***, first
+half: congruent eigenvalues on two complementary subgroups make the operator a *single*
+power map on the whole group.
+
+Write `x = u·v` with `u ∈ U`, `v ∈ V`.  Then `f x = u^t · v^{t₀} = u^t · v^t = x^t`, the
+middle equality because `v^{t−t₀} = 1` (exponent `p` and `p ∣ t − t₀`). -/
+theorem forall_zpow_of_sup_eq_top {E : Type*} [Group E] {p : ℕ}
+    (hcomm : ∀ x y : E, x * y = y * x) (hexp : ∀ x : E, x ^ p = 1) (f : MulAut E)
+    {t t₀ : ℤ} (hdvd : (p : ℤ) ∣ t - t₀) {U V : Subgroup E}
+    (hU : ∀ x ∈ U, f x = x ^ t) (hV : ∀ x ∈ V, f x = x ^ t₀) (hsup : U ⊔ V = ⊤) :
+    ∀ x : E, f x = x ^ t := by
+  haveI hVnormal : V.Normal :=
+    ⟨fun n hn g => by rw [hcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
+  intro x
+  have hx : x ∈ (U : Set E) * (V : Set E) := by
+    rw [← Subgroup.mul_normal U V, hsup]
+    exact Subgroup.mem_top x
+  obtain ⟨u, hu, v, hv, rfl⟩ := hx
+  obtain ⟨k, hk⟩ := hdvd
+  have hvt : v ^ t₀ = v ^ t := by
+    have hv1 : v ^ (t - t₀) = 1 := by
+      have hvp : v ^ (p : ℤ) = 1 := by rw [zpow_natCast]; exact hexp v
+      rw [hk, zpow_mul, hvp, one_zpow]
+    rw [zpow_sub] at hv1
+    exact (mul_inv_eq_one.mp hv1).symm
+  rw [map_mul, hU u hu, hV v hv, hvt]
+  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
+  exact (mul_zpow u v t).symm
+
+/-- **BG's *"…fixes every 1-dimensional subspace"***, second half: an automorphism that is a
+single power map preserves *every* subgroup. -/
+theorem map_eq_self_of_forall_zpow {E : Type*} [Group E] [Finite E] {f : MulAut E} {t : ℤ}
+    (hf : ∀ x : E, f x = x ^ t) (V : Subgroup E) :
+    V.map ((f : MulAut E) : E →* E) = V := by
+  refine Subgroup.eq_of_le_of_card_ge ?_ (le_of_eq ?_)
+  · rintro _ ⟨x, hx, rfl⟩
+    change ((f : MulAut E) : E →* E) x ∈ V
+    rw [show ((f : MulAut E) : E →* E) x = f x from rfl, hf x]
+    exact V.zpow_mem hx t
+  · exact Nat.card_congr
+      (Subgroup.equivMapOfInjective V ((f : MulAut E) : E →* E) f.injective).toEquiv
+
 /-! ## `(E.21)` first half: `r = r₀`
 
 BG: *"By `(E.18)`, there exists `β ∈ B` such that `β` does not fix `R₀Φ`.  Let us regard
@@ -606,5 +648,42 @@ theorem RegularOperatorSetup.dvd_sub_eigenvalues [Finite R] [Finite B]
     exact map_eigenSubgroup_of_commute hEA.comm
       (by rw [← map_mul, ← map_mul, habel]) r
   exact hBfix (hyp.B_fixes_R₀_of_preserves_line hSinv hNinv hpres)
+
+/-! ## `(E.21)` second half: `t ≠ t₀` -/
+
+/-- **BG `(E.21)`**: `t ≠ t₀`.
+
+BG: *"Since `B` fixes `T/S'` and `p` does not divide `|B|`, `B` fixes some complement `Q/S'`
+of `T/S'` in `S/S'`.  Let `β` have eigenvalues `t` and `t₀` on `Q/S'` and `T/S'`,
+respectively.  If `t = t₀`, then `β` fixes every 1-dimensional subspace of `S/S'`, including
+`R₀S'/S'`.  Thus `t ≠ t₀`."*
+
+`t ≡ t₀` would make `β` a single power map on all of `S/S'`
+(`forall_zpow_of_sup_eq_top`), hence preserve every subgroup
+(`map_eq_self_of_forall_zpow`) — in particular the line `R₀S'/S'`, which by
+`smul_sup_derived_of_preserves_line` makes `β` fix `R₀Φ(S)`, against its choice. -/
+theorem RegularOperatorSetup.not_dvd_sub_eigenvalues_of_not_fixes [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q)
+    (hSinv : IsAInvariant hyp.act (Omega R p 1))
+    (hNinv : IsAInvariant hSinv.restrict (_root_.commutator ↥(Omega R p 1)))
+    {b : B}
+    (hbfix : (hyp.act b) • (hyp.R₀ ⊔ derivedInG (Omega R p 1)) ≠
+      hyp.R₀ ⊔ derivedInG (Omega R p 1))
+    {Q : Subgroup (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1))} {t t₀ : ℤ}
+    (hQsup : Q ⊔ (Subgroup.centralizer
+        (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))).map
+          (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1))) = ⊤)
+    (ht : ∀ x ∈ Q, hNinv.quotientMulAutHom b x = x ^ t)
+    (ht₀ : ∀ x ∈ (Subgroup.centralizer
+              (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))).map
+            (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1))),
+          hNinv.quotientMulAutHom b x = x ^ t₀) :
+    ¬ ((p : ℤ) ∣ t - t₀) := by
+  intro hdvd
+  have hEA := hyp.isElementaryAbelian_quotient_commutator
+  have hglobal := forall_zpow_of_sup_eq_top (p := p) hEA.comm hEA.pow_eq_one
+    (hNinv.quotientMulAutHom b) hdvd ht ht₀ hQsup
+  exact hbfix (hyp.smul_sup_derived_of_preserves_line hSinv hNinv b
+    (map_eq_self_of_forall_zpow hglobal _))
 
 end OddOrder.BG.AppE
