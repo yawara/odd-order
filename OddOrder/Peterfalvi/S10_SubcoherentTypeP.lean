@@ -382,6 +382,7 @@ theorem inducedNonKernelFamily_apply_eq_zero {A : Set G}
   exact OddOrder.Peterfalvi.S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
     h θ hker hz
 
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥M : ℂ)] in
 /-- **The `hconjsupp` input of (5.2) for the (8.15.3) family**: `Supp (φ − φ̄) ⊆ A`.
 
 This is the type-uniform replacement for `S08.inducedKernelFamily_conjDiff_support`, which needs
@@ -409,6 +410,7 @@ theorem inducedNonKernelFamily_conjDiff_support {A : Set G}
     have h0 : φ z = 0 := inducedNonKernelFamily_apply_eq_zero h hφ hmem
     rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_self]
 
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥M : ℂ)] in
 /-- **Member differences of the (8.15.3) family are `A`-supported — the pair version**:
 for `φ, ψ` in the family of the *same degree*, `Supp (φ − ψ) ⊆ A`.
 
