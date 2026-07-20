@@ -27,11 +27,28 @@ variable {P : Type*} [Group P]
 def involutions (P : Type*) [Group P] : Set P :=
   {x | x ^ 2 = 1 ∧ x ≠ 1}
 
+/-- A subgroup of the automorphism group acts transitively on the involutions
+when every ordered pair of involutions is connected by an automorphism.
+
+This is the action hypothesis in Higman's original definition of a Suzuki
+`2`-group.  Regularity is a later conclusion of the classification. -/
+def ActsTransitivelyOnInvolutions (A : Subgroup (MulAut P)) : Prop :=
+  ∀ x ∈ involutions P, ∀ y ∈ involutions P,
+    ∃ a : ↥A, (a : MulAut P) x = y
+
 /-- A subgroup of the automorphism group acts regularly on the involutions
 when every ordered pair of involutions is connected by a unique automorphism. -/
 def ActsRegularlyOnInvolutions (A : Subgroup (MulAut P)) : Prop :=
   ∀ x ∈ involutions P, ∀ y ∈ involutions P,
     ∃! a : ↥A, (a : MulAut P) x = y
+
+/-- Every regular action on the involutions is transitive. -/
+theorem ActsRegularlyOnInvolutions.transitive
+    {A : Subgroup (MulAut P)} (hreg : ActsRegularlyOnInvolutions A) :
+    ActsTransitivelyOnInvolutions A := by
+  intro x hx y hy
+  obtain ⟨a, ha, _⟩ := hreg x hx y hy
+  exact ⟨a, ha⟩
 
 /-- A group acting regularly on the involutions of a finite `2`-group has
 odd order.
