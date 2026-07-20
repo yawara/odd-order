@@ -10976,6 +10976,57 @@ appear to be needed, and `R₀ < S` *properly* starts to matter. -/
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.commutator_eq_and_card_quotient
 
+/-! **BG Theorem E.3(b) third clause — PROVED** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20).  `|S/S'| = p²` now holds for **every** exponent-`p` `S` properly containing
+`R₀`, so E.3(b)'s `|Ω₁(R)/(Ω₁(R))'| = p²` follows.
+
+* `RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube` — BG's `|S| ≤ p³`
+  branch.  Here the *"examination of the `p`-groups of order at most `p³`"* really is needed
+  (unlike for `R₀ ⊄ S'`): `S` abelian gives `|S| = p²` and `S' = 1` via `pRank ≤ 2` plus
+  properness; `S` nonabelian gives `|S| = p³`, `|Z(S)| = p` (else `S/Z(S)` is cyclic) and
+  `S' = Z(S)`.
+* `RegularOperatorSetup.card_quotient_commutator` — the two branches joined.
+* `RegularOperatorSetup.R₀_lt_omega` — `R₀ < Ω₁(R)` **properly**.  ⚠ This is the first and
+  only place where the setup's cyclic factor `R₁` is used in Step 2: the third clause is
+  *false* for `S = R₀` (giving `p`, not `p²`), so properness must come from somewhere, and
+  it comes from an order-`p` element of `R₁ ≠ 1`, disjoint from `R₀`.
+
+⚠ `RegularOperatorSetup.card_omega_abelianization` (the clause itself) is genuinely proved
+from these but cites the still-sorried first clause `omega_pow_eq_one` for the exponent
+hypothesis, so — like the second clause — it is deliberately **not** asserted here. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_quotient_commutator
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_lt_omega
+
+/-! **BG Theorem E.3(b), Step 2, (E.8)** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries` — BG's chain out of `T` *is* the
+lower central series of `S` from its second term on.  Immediate once (E.7) has identified
+`H₁ = S'`, since `Hᵢ₊₁ = ⁅Hᵢ, S⁆` and `γᵢ₊₁(S) = ⁅γᵢ(S), S⁆` are the same recursion.
+
+⚠ Worth recording about the hypothesis set: **two of Step 2's three conclusions — `R₀ ⊄ S'`
+and `|S/S'| = p²` — have been proved without using `A`-invariance of `S`, or the `A`-action
+at all.**  BG opens Step 2 with *"Let `S` be any `A`-invariant subgroup of `R` of exponent
+`p` that properly contains `R₀`"*, but the `A`-action only enters for the third conclusion
+`|S| ≤ p^q` (E.9)--(E.12), where regularity of `A` is what forbids the eigenvalue `1`. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries
+
+/-! **BG Theorem E.3(b), Step 2, (E.9) opening and (E.11)** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20) — the `A`-action finally enters Step 2.
+
+* `RegularOperatorSetup.exists_zpow_eq_act_of_mem_A` — BG's *"then `vᵃ = vʳ` for some integer
+  `r` such that `r^q ≡ 1 (mod p)`"*.  `A` fixes the cyclic order-`p` group `R₀`, so it acts
+  by power maps; `|A| = q` gives `a^q = 1`, hence `r^q ≡ 1`.  Stated with an **integer**
+  exponent as BG does, the congruence being `(r : ZMod p)^q = 1`.
+* `RegularOperatorSetup.zpow_exponent_ne_one` — **(E.11) `r ≢ 1 (mod p)`**.  Were `r ≡ 1`,
+  `a` would fix `R₀ ≠ 1` pointwise, against `C_R(α) = 1` for `α ∈ A^#`.  ⚠ This is the
+  **first** use of the setup's regularity hypothesis anywhere in Step 2 — everything up to
+  (E.8) needed only `|R₀| = p`, `R₁` cyclic and the centralizer decomposition. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.exists_zpow_eq_act_of_mem_A
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.zpow_exponent_ne_one
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

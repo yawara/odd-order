@@ -451,9 +451,61 @@ private helper: `normal_iterCommutator` / `iterCommutator_antitone` /
    - `S` 非アーベル (⟹ `|S| = p³`): `cl(S) ≤ 2` ⟹ `S' ≤ Z(S)`、`S' ≠ 1`;
      `S/Z(S)` 非巡回 (mathlib `isMulCommutative_of_isCyclic_quotient_center_self` の対偶)
      ⟹ `|Z(S)| = p` ⟹ `S' = Z(S)`、`|S/S'| = p²` ✓
-   ⟹ **ここで初めて BG の「`R₀ < S` 真部分群」仮説が効く**。**次に着手するのはここ**。
-2. **(E.9)-(E.12)**: 固有値 `r_i ≡ r₀ r^i (mod p)`、`A` regular + Prop 1.5(d) ⟹
+   ⟹ **ここで初めて BG の「`R₀ < S` 真部分群」仮説が効く**。
+
+### ⭐ 2026-07-20 (7): **E.3(b) 第 3 節を証明** — AppE sorry 6 → 5
+
+| 新規宣言 | 内容 |
+|---|---|
+| `commutator_le_center_of_card_le_prime_cube` (private) | `\|G\| ≤ p³ ⟹ G' ≤ Z(G)` (既存の cl≤2 論法を抽出) |
+| `card_quotient_commutator_of_card_le_prime_cube` | **`\|S\| ≤ p³` 分岐** (上記の筋どおり) |
+| `card_quotient_commutator` | 2 分岐を接合 ⟹ 指数 p の任意の `S ⊋ R₀` で `\|S/S'\| = p²` |
+| `R₀_lt_omega` | **`R₀ < Ω₁(R)` (真)** |
+| `card_omega_abelianization` | **E.3(b) 第 3 節** (sorry → 実証明) |
+
+⚠ **`R₁` が Step 2 で初めて効いたのがここ**。第 3 節は `S = R₀` では**偽** (`p` になる) なので
+真部分群性が要り、それを `R₁ ≠ 1` の位数 p 元 (R₀ と disjoint) から取る。
+それ以前のステップは全部 `R₁` 無しで通っていた。
+
+⚠ `|S| ≤ p³` 分岐は `R₀ ⊄ S'` のときと違って**本当に位数の場合分けが要った** —
+BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇所。
+2. ✅ **(E.8) 完了** (`iterCommutator_eq_lowerCentralSeries`): `H_i = S_{i+1}`。
+   (E.7) で `H₁ = S'` が付いた後は、`H_{i+1} = ⁅H_i,S⁆` と `γ_{i+1}(S) = ⁅γ_i(S),S⁆` が
+   **同じ漸化式**なので帰納は即座。
+3. **(E.9)-(E.12)**: 固有値 `r_i ≡ r₀ r^i (mod p)`、`A` regular + Prop 1.5(d) ⟹
    `r_i ≢ 1`、`r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| = p·pⁿ ≤ p^q`。⟹ **E.3(c)**。
-   ⚠ ここは鎖の **A-不変性**が要る (今の鎖は A-不変性を主張していない —
-   `iterCommutator T ⊤` は characteristic なので A-不変のはずだが、要形式化)。
-3. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
+   - ✅ **(E.9) 冒頭 `vᵃ = vʳ`, `r^q ≡ 1`** = `exists_zpow_eq_act_of_mem_A`。
+     `R₀` は位数 p の巡回群で `A` 不変 ⟹ 冪写像; `|A| = q` ⟹ `a^q = 1` ⟹ `r^q ≡ 1`。
+     BG どおり**整数**冪で述べ、合同は `(r : ZMod p)^q = 1`。
+   - ✅ **(E.11) `r ≢ 1 (mod p)`** = `zpow_exponent_ne_one`。`r ≡ 1` なら `a` が
+     `R₀ ≠ 1` を点ごとに固定 ⟹ regular 性に矛盾。
+     ⚠ **Step 2 で regular 性を使う最初の箇所** ((E.8) までは `|R₀| = p`・`R₁` cyclic・
+     centralizer 分解だけで通っていた)。
+   - ⬜ 残: `w_i = [w_{i-1}, v]` の鎖上の固有値 `r_i` (E.9)、(E.10) `r_i ≢ 1`
+     (Prop 1.5(d) 経由)、(E.12) `r_i ≡ r₀ r^i` (Lemma 4.2(a) 経由)、
+     最後に mod p 乗法群の位数計算で `n ≤ q-1`。
+     ⚠ ここから先は **`S` の A-不変性**を仮説に足す必要がある (上記「仮説が弱いまま」節)。
+4. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
+
+## ⚠ 2026-07-20 (8): Step 2 の**仮説が BG より弱いまま来ている**
+
+BG は Step 2 を「`S` を `R` の **A-不変**・指数 p・`R₀` を真に含む部分群とする」で始めるが、
+
+- **`R₀ ⊄ S'` (E.13 第 1 節) と `|S/S'| = p²` (E.7) は、A-不変性も A-作用も一切使わずに
+  証明できた**。使ったのは指数 p と `R₀ < S` (第 3 節のみ真部分群性) だけ。
+- **A-作用が要るのは第 3 の結論 `|S| ≤ p^q` (E.9)-(E.12) だけ** — `A` の regular 性が
+  固有値 1 を禁じるところが本体だから。
+
+⟹ 現状の 2 定理は BG より広く使える。(E.9) 以降を書くときに初めて `S` の A-不変性を
+仮説に足す (setup に既にある `act`/`A_regular` と繋ぐ)。
+
+### (E.9)-(E.12) の前提は repo に在る (2026-07-20 実測)
+
+| BG の引用 | repo の所在 |
+|---|---|
+| **Prop 1.5(d)** (`C_{M/N}(B) = C_M(B)·N/N`, coprime) | `S03g_Thm310Nilpotent.lean:87` |
+| **Lemma 4.2(a)** (交換子が中心なら `(xy)^n` 展開) | `S04_SmallRankBasic.lean:180, 193`; 整数冪版は `S04f_Blackburn.lean:997, 1010` |
+| 鎖の A-不変性 | `iterCommutator T ⊤ i` は `↥S` で characteristic ⟹ `S` が A-不変なら従う (要形式化) |
+
+⟹ (E.9)-(E.12) は**新しい基盤の構築ではなく、固有値の帳簿付け** (mod p の乗法群での
+位数計算 + 上記 2 補題の適用)。ただし A-作用を `↥S` の鎖に降ろす配線が要るので分量は大きい。

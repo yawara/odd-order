@@ -46,8 +46,9 @@ packaging.  Per-result status:
 | E.3(b) `C_R(R₀) = R₀ × R₁` structure | **proved** (abelian, order `p·|R₁|`, rank `≤ 2`) |
 | E.3(b) Step 2, `R₀ ⊄ S'` (`not_le_derivedInG`) | **proved, sorry-free**, both branches |
 | E.3(b) Step 2, `S` narrow / `\|Ω₁(Z(S))\| = p` / `\|S:T\| = p` | **proved, sorry-free** |
-| E.3(b) second clause (`R₀_not_le_derived_omega`) | **proved** from Step 2 + first clause |
-| E.3(b) first + third clause, E.3(c)(d), E.4, E.5 | honest statements, `sorry` |
+| E.3(b) Step 2, (E.4)--(E.7) | **proved, sorry-free** (chain, `\|T\| = pⁿ`, `\|S/S'\| = p²`) |
+| E.3(b) second + third clause | **proved** from Step 2 + first clause |
+| E.3(b) first clause, E.3(c)(d), E.4, E.5 | honest statements, `sorry` |
 -/
 
 namespace OddOrder.BG.AppE
@@ -910,6 +911,25 @@ theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
           (Subgroup.inclusion_injective hsub)
     _ = p := hyp.card_centralizer_inf_centralizer_eq hR₀S hexp hS
 
+/-- A finite `p`-group of order at most `p³` has nilpotency class `≤ 2`, i.e. `G' ≤ Z(G)`.
+
+This is what BG's elided *"examination of the `p`-groups of order at most `p³`"* actually
+needs; the classification of those groups is not required. -/
+private theorem commutator_le_center_of_card_le_prime_cube {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) (hcard : Nat.card G ≤ p ^ 3) :
+    _root_.commutator G ≤ Subgroup.center G := by
+  haveI : Group.IsNilpotent G := hG.isNilpotent
+  have hcl : Group.nilpotencyClass G ≤ 2 :=
+    OddOrder.BG.Ch1.S04.nilpotencyClass_le_of_card_le_pow hG (by norm_num)
+      (by simpa using hcard)
+  have hlcs : ⁅_root_.commutator G, (⊤ : Subgroup G)⁆ = ⊥ :=
+    Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr hcl
+  have hce := Subgroup.commutator_eq_bot_iff_le_centralizer.mp hlcs
+  intro g hg
+  rw [Subgroup.mem_center_iff]
+  intro h
+  exact Subgroup.mem_centralizer_iff.mp (hce hg) h (Subgroup.mem_top h)
+
 /-- In a finite `p`-group a *proper* subgroup has index divisible by `p`, so `K < H` gives
 `p · |K| ≤ |H|`.  Used twice below, for the two ends of BG's (E.6) chain step. -/
 private theorem prime_mul_card_le_card_of_lt {G : Type*} [Group G] [Finite G] {p : ℕ}
@@ -1168,6 +1188,138 @@ theorem RegularOperatorSetup.commutator_eq_and_card_quotient [Finite R]
   have heq : H₁ = _root_.commutator ↥S := le_antisymm hH₁le hSle
   exact ⟨heq, by rw [← heq]; exact hquot⟩
 
+/-- **BG Theorem E.3(b), Step 2, the elided small case for (E.7)**: `|S/S'| = p²` when
+`|S| ≤ p³`.
+
+This is where BG's *"an examination of the `p`-groups of order at most `p³`"* is genuinely
+needed — unlike the clause `R₀ ⊄ S'`, which `S' ≤ Z(S)` alone already settles
+(`not_le_derivedInG_of_derived_central`).  It is also the first point at which BG's
+hypothesis that `S` contains `R₀` **properly** does any work.
+
+* `S` abelian: exponent `p` makes it elementary abelian, and `R₀ ≤ S` puts `S` inside
+  `C_R(R₀)`, of `p`-rank `≤ 2`; so `|S| ≤ p²`, while `R₀ < S` forces `|S| ≥ p²`.  Then
+  `S' = 1` and `|S/S'| = |S| = p²`.
+* `S` nonabelian: then `|S| = p³`; `S/Z(S)` is non-cyclic, so `|Z(S)| = p`, and `cl(S) ≤ 2`
+  with `S' ≠ 1` gives `S' = Z(S)` of order `p`, whence `|S/S'| = p³/p = p²`. -/
+theorem RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hcard : Nat.card ↥S ≤ p ^ 3) :
+    Nat.card (↥S ⧸ _root_.commutator ↥S) = p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hSpg : IsPGroup p ↥S := hyp.R_pGroup.to_subgroup S
+  -- `R₀ < S` gives `p² ≤ |S|`.
+  have hR₀lt : hyp.R₀.subgroupOf S < (⊤ : Subgroup ↥S) :=
+    lt_of_le_of_ne le_top fun h => absurd (Subgroup.subgroupOf_eq_top.mp h) hR₀S.not_ge
+  have hp2 : p ^ 2 ≤ Nat.card ↥S := by
+    have := prime_mul_card_le_card_of_lt hSpg hR₀lt
+    rw [hyp.card_R₀_subgroupOf hR₀S.le, Subgroup.card_top] at this
+    calc p ^ 2 = p * p := sq p
+      _ ≤ Nat.card ↥S := this
+  by_cases habel : IsMulCommutative ↥S
+  · -- `S` elementary abelian of rank `≤ 2`, so `|S| = p²` and `S' = 1`.
+    have hSC : S ≤ Subgroup.centralizer (hyp.R₀ : Set R) := by
+      intro x hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro g hg
+      exact congrArg (fun z : ↥S => (z : R))
+        (habel.is_comm.comm (⟨g, hR₀S.le hg⟩ : ↥S) ⟨x, hx⟩)
+    have hEA : IsElementaryAbelian p ↥S := ⟨fun x y => habel.is_comm.comm x y, hexp⟩
+    have hrank : pRank ↥S p ≤ 2 :=
+      (pRank_le_of_injective (f := Subgroup.inclusion hSC)
+        (Subgroup.inclusion_injective hSC)).trans hyp.pRank_centralizer_R₀_le_two
+    have hle : Nat.card ↥S ≤ p ^ 2 := by
+      obtain ⟨k, hk⟩ := hSpg.exists_card_eq
+      have hlog := hEA.log_card_le_pRank
+      rw [hk, Nat.log_pow hyp.p_prime.one_lt] at hlog
+      rw [hk]
+      exact Nat.pow_le_pow_right hyp.p_prime.pos (hlog.trans hrank)
+    haveI := habel
+    have hcomm : _root_.commutator ↥S = ⊥ := commutator_eq_bot ↥S
+    rw [hcomm]
+    show (⊥ : Subgroup ↥S).index = p ^ 2
+    rw [Subgroup.index_bot]
+    omega
+  · -- `S` nonabelian: `|S| = p³`, `|Z(S)| = p`, `S' = Z(S)`.
+    have hcentre := commutator_le_center_of_card_le_prime_cube hSpg hcard
+    have hcommne : _root_.commutator ↥S ≠ ⊥ := by
+      intro h
+      refine habel (IsMulCommutative.of_comm fun a b => ?_)
+      have hmem : ⁅a, b⁆ ∈ (⊥ : Subgroup ↥S) := h ▸ Subgroup.commutator_mem_commutator
+        (Subgroup.mem_top a) (Subgroup.mem_top b)
+      exact commutatorElement_eq_one_iff_commute.mp (Subgroup.mem_bot.mp hmem)
+    -- `|Z(S)| ≤ p`: otherwise `|S : Z(S)| ≤ p`, so `S/Z(S)` is cyclic and `S` abelian.
+    have hZle : Nat.card ↥(Subgroup.center ↥S) ≤ p := by
+      by_contra hgt
+      push Not at hgt
+      obtain ⟨j, hj⟩ := (hSpg.to_subgroup (Subgroup.center ↥S)).exists_card_eq
+      have hZp2 : p ^ 2 ≤ Nat.card ↥(Subgroup.center ↥S) := by
+        rw [hj]
+        refine Nat.pow_le_pow_right hyp.p_prime.pos ?_
+        by_contra hj2
+        push Not at hj2
+        rw [hj] at hgt
+        have hjle : p ^ j ≤ p ^ 1 := Nat.pow_le_pow_right hyp.p_prime.pos (by omega)
+        rw [pow_one] at hjle
+        omega
+      have hidx : (Subgroup.center ↥S).index * Nat.card ↥(Subgroup.center ↥S) =
+          Nat.card ↥S := (Subgroup.center ↥S).index_mul_card
+      have hidxle : (Subgroup.center ↥S).index ≤ p := by
+        nlinarith [hidx, hcard, hZp2, hyp.p_prime.pos, sq_nonneg p]
+      haveI : IsCyclic (↥S ⧸ Subgroup.center ↥S) := by
+        refine isCyclic_of_card_dvd_prime (p := p) ?_
+        obtain ⟨m, hm⟩ := (hSpg.to_quotient (Subgroup.center ↥S)).exists_card_eq
+        have hqidx : Nat.card (↥S ⧸ Subgroup.center ↥S) = (Subgroup.center ↥S).index := rfl
+        have hm1 : m ≤ 1 := by
+          by_contra hm2
+          push Not at hm2
+          have : p ^ 2 ≤ Nat.card (↥S ⧸ Subgroup.center ↥S) := by
+            rw [hm]; exact Nat.pow_le_pow_right hyp.p_prime.pos hm2
+          rw [hqidx] at this
+          nlinarith [hidxle, hyp.p_prime.one_lt]
+        rw [hm]
+        interval_cases m
+        · exact one_dvd p
+        · rw [pow_one]
+      exact habel (isMulCommutative_of_isCyclic_quotient_center_self ↥S)
+    -- `S' ≤ Z(S)` with `S' ≠ 1` and `|Z(S)| ≤ p` forces `|S'| = |Z(S)| = p`.
+    have hScomm : Nat.card ↥(_root_.commutator ↥S) = p := by
+      obtain ⟨j, hj⟩ := (hSpg.to_subgroup (_root_.commutator ↥S)).exists_card_eq
+      have hjpos : 0 < j := by
+        rcases Nat.eq_zero_or_pos j with rfl | h
+        · exact absurd (Subgroup.card_eq_one.mp (by simpa using hj)) hcommne
+        · exact h
+      have hlecent : Nat.card ↥(_root_.commutator ↥S) ≤ p :=
+        le_trans (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hcentre)) hZle
+      have hge : p ≤ Nat.card ↥(_root_.commutator ↥S) := by
+        rw [hj]
+        calc p = p ^ 1 := (pow_one p).symm
+          _ ≤ p ^ j := Nat.pow_le_pow_right hyp.p_prime.pos hjpos
+      omega
+    -- `|S| = p³`, so the quotient has order `p²`.
+    have hScube : Nat.card ↥S = p ^ 3 := by
+      obtain ⟨k, hk⟩ := hSpg.exists_card_eq
+      rcases Nat.lt_or_ge k 3 with hk2 | hk3
+      · exfalso
+        have hup : Nat.card ↥S ≤ p ^ 2 := by
+          rw [hk]; exact Nat.pow_le_pow_right hyp.p_prime.pos (by omega)
+        exact habel (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p)
+          (le_antisymm hup hp2))
+      · have hk3' : k = 3 := by
+          by_contra h
+          have h4 : 4 ≤ k := by omega
+          rw [hk] at hcard
+          have : p ^ 4 ≤ p ^ k := Nat.pow_le_pow_right hyp.p_prime.pos h4
+          have hlt : p ^ 3 < p ^ 4 :=
+            Nat.pow_lt_pow_right hyp.p_prime.one_lt (by norm_num)
+          omega
+        rw [hk, hk3']
+    show (_root_.commutator ↥S).index = p ^ 2
+    have hmul : Nat.card ↥(_root_.commutator ↥S) * (_root_.commutator ↥S).index =
+        Nat.card ↥S := (_root_.commutator ↥S).card_mul_index
+    rw [hScomm, hScube] at hmul
+    refine Nat.eq_of_mul_eq_mul_left hyp.p_prime.pos ?_
+    rw [hmul]; ring
+
 /-- **BG Theorem E.3(b), Step 2, the elided small case**: if `S' ≤ Z(S)` then `R₀ ⊄ S'`.
 
 BG dispatches `|S| ≤ p³` by *"an examination of the `p`-groups of order at most `p³`"*.  No
@@ -1208,20 +1360,8 @@ theorem RegularOperatorSetup.derived_central_of_card_le_prime_cube [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hcard : Nat.card ↥S ≤ p ^ 3) :
     S ≤ Subgroup.centralizer (derivedInG S : Set R) := by
   haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  -- `cl(S) ≤ 2`, i.e. `γ₂(S) = ⊥` in mathlib's indexing.
-  have hcl : Group.nilpotencyClass ↥S ≤ 2 :=
-    OddOrder.BG.Ch1.S04.nilpotencyClass_le_of_card_le_pow
-      (hyp.R_pGroup.to_subgroup S) (by norm_num) (by simpa using hcard)
-  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
-  -- `γ₂(S) = ⁅S', S⁆ = ⊥`, i.e. `S' ≤ Z(S)`.
-  have hlcs : ⁅_root_.commutator ↥S, (⊤ : Subgroup ↥S)⁆ = ⊥ :=
-    Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr hcl
-  have hcentre : _root_.commutator ↥S ≤ Subgroup.center ↥S := by
-    have hce := Subgroup.commutator_eq_bot_iff_le_centralizer.mp hlcs
-    intro g hg
-    rw [Subgroup.mem_center_iff]
-    intro h
-    exact Subgroup.mem_centralizer_iff.mp (hce hg) h (Subgroup.mem_top h)
+  have hcentre := commutator_le_center_of_card_le_prime_cube
+    (hyp.R_pGroup.to_subgroup S) hcard
   -- transport to the ambient group
   intro x hx
   rw [Subgroup.mem_centralizer_iff] at *
@@ -1262,6 +1402,165 @@ theorem RegularOperatorSetup.R₀_le_omega [Finite R]
   rw [hyp.R₀_card] at h
   simpa using congrArg (fun z : ↥hyp.R₀ => (z : R)) h
 
+/-- **BG Theorem E.3(b), Step 2, (E.9), opening sentence**: *"Then `vᵃ = vʳ` for some integer
+`r` such that `r^q ≡ 1 (mod p)`."*
+
+`A` fixes `R₀`, which is cyclic of prime order `p`, so each `a ∈ A` acts on it as a power
+map; and `a^q = 1` because `|A| = q`, so the exponent satisfies `r^q ≡ 1 (mod p)`.
+
+Stated with an **integer** exponent, as BG does; the congruence is `(r : ZMod p)^q = 1`. -/
+theorem RegularOperatorSetup.exists_zpow_eq_act_of_mem_A [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) :
+    ∃ r : ℤ, (∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) ∧ ((r : ZMod p) ^ q = 1) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+  set ψ : ↥hyp.A →* MulAut ↥hyp.R₀ :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hyp.isAInvariant_R₀ with hψ
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥hyp.R₀)
+  obtain ⟨k, hk⟩ := hg (ψ ⟨a, ha⟩ g)
+  have hord : orderOf g = p := by
+    have htop : Subgroup.zpowers g = ⊤ := by ext x; simpa using hg x
+    have hc := Nat.card_zpowers g
+    rw [htop, Subgroup.card_top, hyp.R₀_card] at hc
+    exact hc.symm
+  refine ⟨k, ?_, ?_⟩
+  · -- `a` acts as the `k`-th power map on all of `R₀`
+    intro v hv
+    obtain ⟨m, hm⟩ := hg ⟨v, hv⟩
+    have h1 : ψ ⟨a, ha⟩ ⟨v, hv⟩ = (⟨v, hv⟩ : ↥hyp.R₀) ^ k := by
+      rw [← hm, map_zpow, ← hk, ← zpow_mul, ← zpow_mul, mul_comm]
+    have h2 := congrArg (fun z : ↥hyp.R₀ => (z : R)) h1
+    simpa [hψ, OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val] using h2
+  · -- `a^q = 1` forces `k^q ≡ 1 (mod p)`
+    have haq : (⟨a, ha⟩ : ↥hyp.A) ^ q = 1 := by
+      have h := pow_card_eq_one' (G := ↥hyp.A) (x := ⟨a, ha⟩)
+      rwa [hyp.A_card] at h
+    have hψq : ψ ⟨a, ha⟩ ^ q = 1 := by rw [← map_pow, haq, map_one]
+    have hiter : ∀ n : ℕ, (ψ ⟨a, ha⟩ ^ n) g = g ^ (k ^ n) := by
+      intro n
+      induction n with
+      | zero => simp
+      | succ n ih =>
+        have hstep : (ψ ⟨a, ha⟩ ^ (n + 1)) g = (ψ ⟨a, ha⟩ ^ n) (ψ ⟨a, ha⟩ g) := by
+          rw [pow_succ]; rfl
+        rw [hstep, ← hk, map_zpow, ih, ← zpow_mul, ← pow_succ]
+    have hgq : g ^ (k ^ q) = g := by rw [← hiter q, hψq]; rfl
+    have hz : g ^ (k ^ q - 1) = 1 := by
+      rw [zpow_sub, hgq, zpow_one, mul_inv_cancel]
+    have hdvd : (p : ℤ) ∣ k ^ q - 1 := by
+      rw [← hord]
+      exact orderOf_dvd_iff_zpow_eq_one.mpr hz
+    have hzero : ((k ^ q - 1 : ℤ) : ZMod p) = 0 :=
+      (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).mpr hdvd
+    push_cast at hzero
+    exact sub_eq_zero.mp hzero
+
+/-- **BG Theorem E.3(b), Step 2, (E.11)**: `r ≢ 1 (mod p)` for `a ∈ A^#`.
+
+If `a` acted on `R₀` as the *identity* power map it would fix `R₀ ≠ 1` pointwise, and `A`
+acts regularly — `C_R(α) = 1` for `α ∈ A^#`.  This is the first point in Step 2 where the
+setup's regularity hypothesis does any work. -/
+theorem RegularOperatorSetup.zpow_exponent_ne_one [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) (hane : a ≠ 1)
+    {r : ℤ} (hr : ∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) :
+    (r : ZMod p) ≠ 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  intro h1
+  -- `p ∣ r - 1`, so the `r`-th power map is the identity on `R₀`.
+  have hdvd : (p : ℤ) ∣ r - 1 := by
+    refine (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).mp ?_
+    push_cast
+    rw [h1, sub_self]
+  obtain ⟨c, hc⟩ := hdvd
+  have hfix : ∀ v ∈ hyp.R₀, hyp.act a v = v := by
+    intro v hv
+    have hvp : v ^ p = 1 := by
+      have h := pow_card_eq_one' (G := ↥hyp.R₀) (x := ⟨v, hv⟩)
+      rw [hyp.R₀_card] at h
+      simpa using congrArg (fun z : ↥hyp.R₀ => (z : R)) h
+    have hsub : v ^ (r - 1) = 1 := by
+      rw [hc, zpow_mul, zpow_natCast, hvp, one_zpow]
+    calc hyp.act a v = v ^ r := hr v hv
+      _ = v ^ ((r - 1) + 1) := by congr 1; ring
+      _ = v ^ (r - 1) * v ^ (1 : ℤ) := zpow_add v _ _
+      _ = v := by rw [hsub, zpow_one, one_mul]
+  -- regularity then kills `R₀`
+  have hbot : hyp.R₀ = ⊥ := by
+    refine le_bot_iff.mp fun v hv => ?_
+    exact Subgroup.mem_bot.mpr (hyp.A_regular a ha hane v (hfix v hv))
+  have hc' := hyp.R₀_card
+  rw [hbot, Subgroup.card_bot] at hc'
+  exact hyp.p_prime.one_lt.ne hc'
+
+/-- **BG Theorem E.3(b), Step 2, (E.8)**: `Hᵢ = S_{i+1}` — BG's chain out of `T` *is* the
+lower central series of `S`, from its second term on.
+
+BG derives this "similarly, by induction" after (E.7).  The induction is immediate once
+(E.7) has identified `H₁ = S'`: both `Hᵢ₊₁ = ⁅Hᵢ, S⁆` and `γᵢ₊₁(S) = ⁅γᵢ(S), S⁆` are the
+*same* recursion, so they agree forever after agreeing once.
+
+(Indices: BG writes `S = S₁ ⊃ S₂ ⊃ ⋯`, so BG's `S_{i+1}` is mathlib's
+`lowerCentralSeries ⊤ i`.) -/
+theorem RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) :
+    ∀ i : ℕ, OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1)
+      = Subgroup.lowerCentralSeries (⊤ : Subgroup ↥S) (i + 1)
+  | 0 => by
+      rw [Subgroup.top_lowerCentralSeries_one]
+      exact (hyp.commutator_eq_and_card_quotient hR₀S hexp hS).1
+  | i + 1 => by
+      rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.lowerCentralSeries_succ,
+        hyp.iterCommutator_eq_lowerCentralSeries hR₀S hexp hS i]
+
+/-- **BG Theorem E.3(b), Step 2, (E.7) — unconditionally**: `|S/S'| = p²` for every
+exponent-`p` subgroup `S` properly containing `R₀`.
+
+Both of BG's branches joined at `three_le_pRank_of_prime_cube_lt_card`, exactly as for
+`not_le_derivedInG`. -/
+theorem RegularOperatorSetup.card_quotient_commutator [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) :
+    Nat.card (↥S ⧸ _root_.commutator ↥S) = p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  rcases le_or_gt (Nat.card ↥S) (p ^ 3) with hle | hgt
+  · exact hyp.card_quotient_commutator_of_card_le_prime_cube hR₀S hexp hle
+  · exact (hyp.commutator_eq_and_card_quotient hR₀S.le hexp
+      (three_le_pRank_of_prime_cube_lt_card (hyp.R_pGroup.to_subgroup S) hexp hgt)).2
+
+/-- `R₀ < Ω₁(R)` **properly**: `R₁ ≠ 1` is a `p`-group, so it contains an element of order
+`p`, which lies in `Ω₁(R)` but not in `R₀` (the two are disjoint).
+
+This is where the setup's cyclic factor `R₁` finally earns its keep: every earlier step of
+Step 2 went through without it, but E.3(b)'s third clause is *false* for `S = R₀` (then
+`|S/S'| = p`), so properness has to come from somewhere. -/
+theorem RegularOperatorSetup.R₀_lt_omega [Finite R]
+    (hyp : RegularOperatorSetup R B p q) : hyp.R₀ < Omega R p 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  refine lt_of_le_of_ne hyp.R₀_le_omega ?_
+  intro heq
+  -- an element of order `p` in `R₁`
+  obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup hyp.R₁).exists_card_eq
+  have hkpos : 0 < k := by
+    rcases Nat.eq_zero_or_pos k with rfl | h
+    · exact absurd (Subgroup.card_eq_one.mp (by simpa using hk)) hyp.R₁_ne_bot
+    · exact h
+  have hdvd : p ∣ Nat.card ↥hyp.R₁ := by
+    rw [hk]; exact dvd_pow_self p hkpos.ne'
+  obtain ⟨z, hz⟩ := exists_prime_orderOf_dvd_card' (G := ↥hyp.R₁) p hdvd
+  have hzp : ((z : R)) ^ p = 1 := by
+    have := pow_orderOf_eq_one z
+    rw [hz] at this
+    simpa using congrArg (fun w : ↥hyp.R₁ => (w : R)) this
+  have hzmem : (z : R) ∈ Omega R p 1 := Omega.mem_of_pow_eq_one (by simpa using hzp)
+  have hzR₀ : (z : R) ∈ hyp.R₀ := heq ▸ hzmem
+  have hzbot : (z : R) ∈ (⊥ : Subgroup R) :=
+    (disjoint_iff.mp hyp.R₀_disjoint_R₁) ▸ Subgroup.mem_inf.mpr ⟨hzR₀, z.2⟩
+  have hz1 : z = 1 := Subtype.ext (Subgroup.mem_bot.mp hzbot)
+  rw [hz1, orderOf_one] at hz
+  exact hyp.p_prime.one_lt.ne hz
+
 /-- **BG Theorem E.3(b), first clause**: `Ω₁(R)` has exponent `p`.
 
 **Status: honestly stated, not proved.**  BG's Steps 2--3: pick an `A`-invariant
@@ -1290,11 +1589,15 @@ theorem RegularOperatorSetup.R₀_not_le_derived_omega [Finite R] [Finite B]
 
 /-- **BG Theorem E.3(b), third clause**: `|Ω₁(R) / (Ω₁(R))'| = p²`.
 
-**Status: honestly stated, not proved** (BG (E.7): `H₁ = S²` and `|S/S²| = p²`). -/
+**Status: proved**, from Step 2's (E.7) (`card_quotient_commutator`) applied to
+`S = Ω₁(R)`, with `R₀ < Ω₁(R)` from `R₀_lt_omega`.  As for the second clause, the only
+input still owed is the exponent statement `omega_pow_eq_one` — the first clause, BG's
+Step 3, which remains `sorry`. -/
 theorem RegularOperatorSetup.card_omega_abelianization [Finite R] [Finite B]
     (hyp : RegularOperatorSetup R B p q) :
-    Nat.card (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) = p ^ 2 := by
-  sorry
+    Nat.card (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) = p ^ 2 :=
+  hyp.card_quotient_commutator hyp.R₀_lt_omega fun x =>
+    Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2)
 
 /-- **BG Theorem E.3(c)**: `|Ω₁(R)| ≤ p^q`.
 
