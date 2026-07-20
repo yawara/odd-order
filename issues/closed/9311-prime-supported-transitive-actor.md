@@ -20,17 +20,31 @@ Lemma 11 冒頭では巡回生成元を取り、その `q - 1` の素因子に�
 
 ## やること
 
-- [ ] involution set 上の automorphism permutation hom を構成する
-- [ ] cyclic-transitive actor の generator が full cycle になることを証明する
-- [ ] `PiElementDecomposition` で generator の π-part を抽出する
-- [ ] 抽出した cyclic subgroup が transitivity と prime support を保つことを証明する
-- [ ] actor order が奇数であることを系として供給する
+- [x] involution set 上の automorphism permutation hom を構成する
+- [x] cyclic-transitive actor の generator が full cycle になることを証明する
+- [x] `PiElementDecomposition` で generator の π-part を抽出する
+- [x] 抽出した cyclic subgroup が transitivity と prime support を保つことを証明する
+- [x] actor order が奇数であることを系として供給する
 
 ## 完了条件
 
 - `OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic` の対象ビルドが通る
 - 新規 `sorry` / `axiom` / opaque carrier がない
 - Higman Lemma 11 が regularity を仮定せず、抽出 actor を直接利用できる
+
+## 完了記録
+
+`involutionPermHom`, `exists_primeSupported_cyclic_actor`,
+`involutions_ncard_odd_of_isPGroup`,
+`exists_odd_primeSupported_cyclic_actor` を追加した。後者は有限 `2`-群と
+cyclic-transitive actor から、involution 数を位数が割り、かつ同じ素因子だけを
+持つ奇数位数の cyclic-transitive subgroup を構成する。regularity は仮定しない。
+
+対象ビルド:
+
+```text
+Build completed successfully (1309 jobs).
+```
 
 ## 参照
 
