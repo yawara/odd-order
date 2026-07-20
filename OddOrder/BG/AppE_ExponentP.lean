@@ -156,4 +156,124 @@ theorem RegularOperatorSetup.expPFamily_pow_eq_one [Finite R]
     (x : ↥S) : x ^ p = 1 :=
   Subtype.ext (by simpa using hS.2.1 (x : R) x.2)
 
+/-! ### `Ω_n(H)` for a subgroup `H`, viewed in the ambient group
+
+BG's `Ω₁(T)` for `T = N_P(S)` is `Ω₁` of the *group* `T`.  Stating it ambiently — as the
+closure of `{x ∈ T | x^p = 1}` inside `R` — keeps BG's `N_P(T) ⊆ N_P(Ω₁(T))` free of
+`subgroupOf` round trips.  Compare `frattiniInG`, which plays the same role for `Φ`. -/
+
+/-- `Ω_n(H)` transported back into the ambient group.
+
+Equal to `(Omega ↥H p n).map H.subtype` (`omegaInG_eq_map`); the closure form is the
+definition because `Ω_n` *is* a closure and `MonoidHom.map_closure` turns the image of the
+closure into the closure of the image.
+
+⚠ Kept here rather than in `OddOrder/GroupTheory/OmegaSubgroup.lean` for the same reason as
+`frattiniInG`: Appendix E is so far the only consumer.  Promote on a second one. -/
+def omegaInG {G : Type*} [Group G] (H : Subgroup G) (p n : ℕ) : Subgroup G :=
+  Subgroup.closure {x : G | x ∈ H ∧ x ^ (p ^ n) = 1}
+
+theorem omegaInG_eq_map {G : Type*} [Group G] (H : Subgroup G) (p n : ℕ) :
+    omegaInG H p n = (Omega ↥H p n).map H.subtype := by
+  rw [omegaInG, Omega, MonoidHom.map_closure]
+  congr 1
+  ext x
+  simp only [Set.mem_image, Set.mem_setOf_eq, Subgroup.coe_subtype]
+  constructor
+  · rintro ⟨hxH, hxp⟩
+    exact ⟨⟨x, hxH⟩, Subtype.ext (by simpa using hxp), rfl⟩
+  · rintro ⟨y, hy, rfl⟩
+    exact ⟨y.2, by simpa using congrArg Subtype.val hy⟩
+
+theorem omegaInG_le {G : Type*} [Group G] {H : Subgroup G} {p n : ℕ} :
+    omegaInG H p n ≤ H :=
+  (Subgroup.closure_le _).mpr fun _ hx => hx.1
+
+theorem mem_omegaInG {G : Type*} [Group G] {H : Subgroup G} {p n : ℕ} {x : G}
+    (hxH : x ∈ H) (hxp : x ^ (p ^ n) = 1) : x ∈ omegaInG H p n :=
+  Subgroup.subset_closure ⟨hxH, hxp⟩
+
+/-- **`Ω₁(Ω₁(G)) = Ω₁(G)`**, BG's last step in the easy branch.
+
+The two generating sets coincide: an element with `x^{pⁿ} = 1` lies in `Ω_n(G)` already, so
+the side condition `x ∈ Ω_n(G)` is vacuous. -/
+theorem omegaInG_omega {G : Type*} [Group G] (p n : ℕ) :
+    omegaInG (Omega G p n) p n = Omega G p n := by
+  rw [omegaInG, Omega]
+  congr 1
+  ext x
+  exact ⟨fun hx => hx.2, fun hx => ⟨Subgroup.subset_closure hx, hx⟩⟩
+
+/-- **`N_G(H) ≤ N_G(Ω_n(H))`**, BG's *"`N_P(T) ⊆ N_P(Ω₁(T))`"*.
+
+Conjugation by an element normalizing `H` preserves both defining conditions of the
+generating set, hence its closure. -/
+theorem normalizer_le_normalizer_omegaInG {G : Type*} [Group G] (H : Subgroup G) (p n : ℕ) :
+    Subgroup.normalizer (H : Set G) ≤
+      Subgroup.normalizer ((omegaInG H p n : Subgroup G) : Set G) := by
+  -- conjugation by `g ∈ N_G(H)` maps the generating set into itself
+  have hsub : ∀ g ∈ Subgroup.normalizer (H : Set G), ∀ h ∈ omegaInG H p n,
+      g * h * g⁻¹ ∈ omegaInG H p n := by
+    intro g hg h hh
+    have hle : omegaInG H p n ≤ (omegaInG H p n).comap (MulAut.conj g).toMonoidHom := by
+      show Subgroup.closure {x : G | x ∈ H ∧ x ^ (p ^ n) = 1} ≤ _
+      refine (Subgroup.closure_le _).mpr ?_
+      rintro x ⟨hxH, hxp⟩
+      refine Subgroup.mem_comap.mpr (mem_omegaInG ?_ ?_)
+      · exact (Subgroup.mem_normalizer_iff.mp hg x).mp hxH
+      · show (g * x * g⁻¹) ^ (p ^ n) = 1
+        have : ((MulAut.conj g) x) ^ (p ^ n) = 1 := by rw [← map_pow, hxp, map_one]
+        simpa using this
+    exact hle hh
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff]
+  refine fun h => ⟨hsub g hg h, fun hh => ?_⟩
+  have h2 := hsub g⁻¹ (Subgroup.inv_mem _ hg) _ hh
+  have heq : g⁻¹ * (g * h * g⁻¹) * g⁻¹⁻¹ = h := by group
+  rwa [heq] at h2
+
+/-! ### BG's easy branch -/
+
+/-- **BG's easy branch of Step 3**: if `S = Ω₁(N_P(S))` for `P = Ω₁(R)`, then `S = Ω₁(R)`.
+
+BG: *"Let `P = Ω₁(R)` and `T = N_P(S)`.  If `S = Ω₁(T)`, then
+`N_P(T) ⊆ N_P(Ω₁(T)) = N_P(S) = T`, whence `T = P` and
+`S = Ω₁(P) = Ω₁(Ω₁(R)) = Ω₁(R)`."*
+
+Three ingredients: `N_G(T) ≤ N_G(Ω₁(T))` (`normalizer_le_normalizer_omegaInG`), the
+normalizer condition in the `p`-group `P` (Isaacs Thm 1.22 — a proper subgroup of a
+nilpotent group is properly contained in its normalizer), and the idempotence
+`Ω₁(Ω₁(R)) = Ω₁(R)` (`omegaInG_omega`).
+
+⚠ Nothing about `A` or the setup's `R₀`, `R₁` enters — only that `R` is a `p`-group.  BG's
+hypotheses are used in the *other* branch. -/
+theorem RegularOperatorSetup.eq_omega_of_omegaInG_normalizer_eq [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (h : omegaInG (Subgroup.normalizer (S : Set R) ⊓ Omega R p 1) p 1 = S) :
+    S = Omega R p 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set P := Omega R p 1 with hP
+  set T := Subgroup.normalizer (S : Set R) ⊓ P with hT
+  have hTP : T ≤ P := inf_le_right
+  -- `N_P(T) ≤ T`, i.e. `T` is self-normalizing in `P`
+  have hself : ∀ g ∈ P, g ∈ Subgroup.normalizer (T : Set R) → g ∈ T := by
+    intro g hgP hgN
+    have h1 : g ∈ Subgroup.normalizer ((omegaInG T p 1 : Subgroup R) : Set R) :=
+      normalizer_le_normalizer_omegaInG T p 1 hgN
+    rw [h] at h1
+    exact ⟨h1, hgP⟩
+  -- so `T = P`, by the normalizer condition in the `p`-group `P`
+  haveI hPp : IsPGroup p ↥P := hyp.R_pGroup.to_subgroup P
+  haveI : Group.IsNilpotent ↥P := hPp.isNilpotent
+  have hTtop : T.subgroupOf P = ⊤ := by
+    by_contra hne
+    obtain ⟨x, hxN, hxT⟩ := SetLike.exists_of_lt
+      (OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top
+        (H := T.subgroupOf P) (lt_of_le_of_ne le_top hne))
+    rw [← Subgroup.subgroupOf_normalizer_eq hTP] at hxN
+    exact hxT (Subgroup.mem_subgroupOf.mpr
+      (hself (x : R) x.2 (Subgroup.mem_subgroupOf.mp hxN)))
+  have hTeq : T = P := le_antisymm hTP (Subgroup.subgroupOf_eq_top.mp hTtop)
+  rw [← h, hTeq, hP, omegaInG_omega]
+
 end OddOrder.BG.AppE
