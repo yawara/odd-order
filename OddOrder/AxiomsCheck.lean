@@ -11490,3 +11490,23 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- The §13 analogue `S13.caseB_sOf_member_dichotomy` phrases its conclusion in the §10 μ-grid; the
 -- book builds these members from (4.7) + Thm (4.5), both §6, so the `columnSum` form is faithful.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.induce_columnSum_of_not_irreducible
+-- **Induction-source transport across `K = K'`** — the `subst`-able generalization that lets the
+-- previous lemma (stated inside `h46.K`) be applied to the §9 family (stated over `huSub data`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_induce_eq_of_subgroup_eq
+-- **(9.9.b) at §9 level**: a reducible `𝒮(Y)`-member is a nontrivial certain-type column sum.
+-- This is what removes the §10 μ-grid (hence the type III/IV restriction) from the caseB `R`-family
+-- dispatch: `S13.caseB_sOf_member_dichotomy` returns a `muColumnChar` column, but `certainTypeR`
+-- consumes the §6 `columnSum` form, so the §11 packaging converts back and forth; §9 just stays in
+-- the §6 form.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_columnSum_of_not_irreducible
+-- **`certainTypeR` restated at a member equal to its column** — the reducible half of the §9
+-- `R`-family dispatch.  `χ₂` stays a parameter so that the `η`-rewrite in `image_eq` is
+-- type-correct; `.imageSet` is definitionally `certainTypeR`'s, as (5.2.e) needs.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.columnRFamily
+-- **Per-member `R`-family over `𝒮(Y)` at §9 level** (the (5.2.d) datum of the (9.11) caseB engine).
+-- The §9 replacement for `S13.caseB_sOf_memberRFamily`: same two branches (signed Dade family /
+-- certain-type column family), but the column comes from (9.9.b) in its §6 form instead of a §10
+-- μ-grid index, so **no type hypothesis appears**.  `τ` is pinned to
+-- `dadeIntegralCharacterMap h46.dade0 h46.tau` by `certainTypeR`; `htau` matches the irreducible
+-- branch to it (`rfl` for the `S10.typePACore_toHypothesis46_core` producer).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberRFamily
