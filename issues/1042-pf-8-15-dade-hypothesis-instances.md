@@ -107,15 +107,31 @@ repo はこれを `hKsupp : (M′)^# ⊆ supportInSubgroup A₀ M` 経由の粗�
    **`A` について引数化済**なので `A = typePACore M` でそのまま使える。
 3. 組み立て engine — `S07.irrSubcoherent` (既存 `inducedKernelFamily_subcoherent` と同じ)。
 
-**実装手順**:
+### ✅ 実装完了 (2026-07-20) — `S10_SubcoherentTypeP.lean` §8E
 
-- (a) `M_s`-絞り族を定義: `{Ind_{M′}^M θ | θ ∈ Irr M′, M_σ ⊄ Ker θ}`
-  (§9 の `xiSet` と同型。`S08.inducedKernelFamily … ⊥` の `θ ≠ 1` 絞りとは別物)。
-- (b) 支持補題: 上記 (4.7) から「メンバーの台 ⊆ A(M) ∪ {1}」→ 差 `χ − χ̄` は
-  `1` で消える (次数が等しい) ので **台 ⊆ A(M)**。これが `hconjsupp` / `Rdatum` の入力。
-- (c) `inducedKernelFamily_subcoherent` を `hKsupp` 引数化した一般形に組み替え、
-  (b) を渡して型一様な (8.15.3) を得る (`typePACore0` 版)。
-- ⚠ P₁ 版 (`typePA0`) は既存の粗い経路のまま残してよい (signature 不変 ⟹ 下流無変更)。
+- (a) **族**: `inducedNonKernelFamily K H = {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`
+  (書籍 (5.3.b)/(8.15.3) の族そのもの)。
+- (b) **粗い族への包含**: `inducedNonKernelFamily_subset_inducedKernelFamily_bot` —
+  `H ⊄ Ker θ ⟹ θ ≠ 1` (自明指標は全てを核に持つ) かつ `⊥` 核条件は空虚。
+  ⟹ **非実性・対直交性・有限性・共役閉性は `S08.inducedKernelFamily_*` からそのまま継承**。
+  作り直しが要るのは**台の評価だけ**。
+- (c) **台の評価** (本体): `inducedNonKernelFamily_apply_eq_zero` ((4.7) の直適用) +
+  `inducedNonKernelFamily_apply_one_eq_natCast` (次数 = `|L:K|·θ(1)` は自然数 ⟹ 実)
+  ⟹ `inducedNonKernelFamily_conjDiff_support` : `Supp (φ − φ̄) ⊆ supportInSubgroup A M`。
+  **`(M′)^# ⊆ A` を一切使わない** = 型一様。
+- (d) **producer**: `inducedNonKernelFamily_subcoherent` — 任意の ambient support `A`、
+  `h46 : S06.Hypothesis46Core A M`、`d : DadeSupportHypothesisData M A` から
+  `S07.Hypothesis S (supportInSubgroup A M)`。これが書籍 (5.3.b) 逐語。
+
+5 宣言とも axiom-clean (propext/Classical.choice/Quot.sound)、AxiomsCheck 登録済。
+`lake build OddOrder.Peterfalvi.S10_SubcoherentTypeP` green (4032 jobs)。
+
+⚠ P₁ 版 (`inducedKernelFamily_subcoherent` / `_sharp`) は signature 不変で残す
+(下流無変更)。docstring で「§8D は P₁ regime、§8E が型一様」と対比を明示。
+
+**残り**: `A = typePACore M` / `H = M_σ` での**具体化**。部品は
+`typePACore_toHypothesis46_core` (→ `.toCore` で `Hypothesis46Core`) と
+`DadeSupportHypothesisData M (typePACore0 M data)` の producer。後者が既存かは要実測。
 
 なお `inducedKernelFamily_subcoherent` 自体は `hKsupp` を引数化すれば `A₀` について一般化できる
 (item 1 の `typePData_toHypothesis46_ofSupport` と同じ形) ので、**族の絞りと支持補題が本体**。
