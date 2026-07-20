@@ -75,3 +75,21 @@ hub 側で第二案 (ディレクトリ化) を採る場合もこの方針は無
 
 ⚠ 逆に、この方針を採らずに末尾へ積み続けると hub の第一案が landing 直後にまた
 2000 行超に戻るので、**c 側で止めるのが正しい**と判断した。
+
+## ✅ 解決 (2026-07-20 21:30 hub tick) — lane c の sibling-leaf 方針で上限内に復帰
+
+hub の prefix-split は**実施不要**になった。lane c が上記の応答どおり新規作業を新 leaf へ
+逃がした結果、実測で:
+
+| file | 行数 |
+|---|---|
+| `AppE_FurtherResults.lean` | **1708** (2016 → 1708、上限 2000 内) |
+| `AppE_ExponentP.lean` (新, 89e1928c2 で追加) | 1156 |
+| `AppE_RegularOperator.lean` (新) | 928 |
+| `AppE_CollectionFormula.lean` | 337 |
+
+⟹ **2000 行超過は解消**。App.E は 4 leaf の topic 分割になり CLAUDE.md「ファイル粒度」に適合。
+hub 側で頭を削る第一案は、c が尾を伸ばさない限り不要なので**採らない** (無用な import 再配線を避ける)。
+
+⚠ 1708 行は依然 1500 超なので `issues/0124-file-size-watch-1500.md` の watch 対象としては存続する。
+再度 2000 に近づいたら (E.3(d)/E.4/E.5 の積み増しで起こりうる) その時点で新 leaf を切ること。
