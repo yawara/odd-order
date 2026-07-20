@@ -55,6 +55,11 @@ local instance mixedEigenweightLayerModule
     Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
   lowerCentralLayerZmodModule H i
 
+local instance mixedEigenweightLayerIsMulComm
+    (H : Type uP) [Group H] (i : ℕ) :
+    IsMulCommutative (lowerCentralLayer H i) :=
+  lowerCentralLayerIsMulCommutative H i
+
 /-! ## The ambient centre as the second lower-central layer -/
 
 variable {P : Type uP} [Group P]
@@ -444,6 +449,176 @@ theorem lowerCentralCommutatorBilinearBaseChange_one_tmul_ne_zero
     rw [LinearMap.BilinMap.baseChange_tmul, one_mul]
   rw [hval]
   exact one_tmul_ne_zero_of_ne_zero e hab
+
+/-- Assemble one factor's base-changed eigenvector family from the uniform data
+shared by both branches: an equivariant inclusion `iota` built from a group map
+`f : G → P` whose denominator `N` lands in `Φ(P)`, a factor quotient coordinate
+`eQuot`, and its actor `Aq`.  The family lies in the common ambient module and
+its span covers every ground vector of the factor. -/
+theorem factorFamily_of_iota_data
+    {G : Type uG} [Group G] (f : G →* P) {N : Subgroup G} [N.Normal]
+    [IsMulCommutative (G ⧸ N)] [Module (ZMod 2) (Additive (G ⧸ N))]
+    (c : Y)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (hf : ∀ g ∈ N, f g ∈ frattini P)
+    (eQuot : Additive (G ⧸ N) ≃ₗ[ZMod 2] F)
+    (Aq : Module.End (ZMod 2) (Additive (G ⧸ N))) (lambda : F)
+    (hAq : ∀ v, eQuot (Aq v) = lambda * eQuot v)
+    (sigma : G → G)
+    (hfRep : ∀ g, Aq (Additive.ofMul (QuotientGroup.mk' N g)) =
+      Additive.ofMul (QuotientGroup.mk' N (sigma g)))
+    (hf_int : ∀ g, f (sigma g) = (Y.subtype c : MulAut P) (f g))
+    {S : Subgroup P} (hSrange : ∀ x : P, x ∈ S → ∃ g : G, f g = x) :
+    ∃ family : Fin (Module.finrank (ZMod 2) F) →
+        F ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
+          (family i) = lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : F) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span F (Set.range family)) := by
+  set iota := quotientToAmbientLayerZeroLinear f hK0 hf with hiotaDef
+  have hiota : ∀ v, iota (Aq v) =
+      lowerCentralLayerRepresentation Y.subtype 0 c (iota v) :=
+    quotientToAmbientLayerZeroLinear_equivariant f c hK0 hf Aq sigma hfRep hf_int
+  refine ⟨factorAmbientEigenFamily eQuot iota, ?_, ?_⟩
+  · intro i
+    exact factorAmbientEigenFamily_eigen c eQuot Aq lambda hAq iota hiota i
+  · intro x hx
+    obtain ⟨g, hg⟩ := hSrange (x : P) hx
+    have hv : iota (Additive.ofMul (QuotientGroup.mk' N g)) = layerZeroClass x := by
+      rw [hiotaDef, quotientToAmbientLayerZeroLinear_mk]
+      exact congrArg layerZeroClass (Subtype.ext hg)
+    rw [← hv]
+    exact one_tmul_mem_span_factorAmbientEigenFamily eQuot iota _
+
+/-- The noncommutative factor branch supplies its base-changed eigenvector
+family in the common ambient module. -/
+theorem exists_factorFamily_of_noncommutative
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    (c : Y) {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (data : NoncommutativeFactorCoordinateData hSinv hPhiS c ePhi nu) :
+    ∃ family : Fin (Module.finrank (ZMod 2) (GaloisField 2 n)) →
+        GaloisField 2 n ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange
+          (GaloisField 2 n) (family i) =
+          data.lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span (GaloisField 2 n) (Set.range family)) := by
+  let f : ↥(lowerCentralTerm (↥S) 0) →* P :=
+    S.subtype.comp (lowerCentralTerm (↥S) 0).subtype
+  have hf : ∀ g ∈ lowerCentralLayerKernel (↥S) 0, f g ∈ frattini P := by
+    intro g hg
+    rw [lowerCentralLayerKernel_zero_eq_of_squares_le (↥S) data.hSq,
+      Subgroup.mem_subgroupOf, data.hterm, Subgroup.mem_subgroupOf] at hg
+    exact hg
+  refine factorFamily_of_iota_data f c hK0 hf data.eQuot
+    (lowerCentralLayerRepresentation hSinv.restrict 0 c) data.lambda
+    data.quotient_compatible
+    (fun g => lowerCentralTermAction hSinv.restrict 0 c g) ?_ ?_ ?_
+  · intro g
+    rw [lowerCentralLayerRepresentation_apply, lowerCentralLayerAction_apply_mk]
+  · intro g
+    show S.subtype ((lowerCentralTerm (↥S) 0).subtype
+        (lowerCentralTermAction hSinv.restrict 0 c g)) =
+      (Y.subtype c : MulAut P) (S.subtype ((lowerCentralTerm (↥S) 0).subtype g))
+    rw [show (lowerCentralTerm (↥S) 0).subtype
+        (lowerCentralTermAction hSinv.restrict 0 c g) =
+        (hSinv.restrict c) ((lowerCentralTerm (↥S) 0).subtype g) from
+      IsAInvariant.restrict_apply_val
+        (IsAInvariant.lowerCentralSeries hSinv.restrict 0) c g]
+    exact IsAInvariant.restrict_apply_val hSinv c _
+  · intro x hx
+    exact ⟨⟨⟨x, hx⟩, by simp [lowerCentralTerm]⟩, rfl⟩
+
+/-- The commutative factor branch supplies its base-changed eigenvector family
+in the common ambient module.  The Agemo quotient carries the canonical
+`F₂`-module structure and its actor is the induced quotient automorphism. -/
+theorem exists_factorFamily_of_commutative [Finite P]
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    (c : Y) {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (data : CommutativeFactorCoordinateData hSinv hPhiS c ePhi nu) :
+    ∃ family : Fin (Module.finrank (ZMod 2) (GaloisField 2 n)) →
+        GaloisField 2 n ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange
+          (GaloisField 2 n) (family i) =
+          data.lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span (GaloisField 2 n) (Set.range family)) := by
+  letI : CommGroup ↥S :=
+    { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
+  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) :=
+    IsMulCommutative.of_comm mul_comm
+  have h2 : ∀ q : Additive (↥S ⧸ Agemo (↥S) 2 1), 2 • q = 0 := by
+    intro q
+    apply Additive.toMul.injective
+    change (Additive.toMul q) ^ 2 = 1
+    obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (Additive.toMul q)
+    rw [← hx, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    simpa using Agemo.mem_of_eq_pow (G := ↥S) (p := 2) (n := 1) x
+  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+    AddCommGroup.zmodModule h2
+  let eQuotLin : Additive (↥S ⧸ Agemo (↥S) 2 1) ≃ₗ[ZMod 2] GaloisField 2 n :=
+    { data.eQuot with
+      map_smul' := ZMod.map_smul data.eQuot.toAddMonoidHom }
+  let Aqmul : ↥S ⧸ Agemo (↥S) 2 1 ≃* ↥S ⧸ Agemo (↥S) 2 1 :=
+    (IsAInvariant.of_characteristic hSinv.restrict).quotientMulAutHom c
+  let Aq : Additive (↥S ⧸ Agemo (↥S) 2 1) →ₗ[ZMod 2]
+      Additive (↥S ⧸ Agemo (↥S) 2 1) :=
+    { (MulEquiv.toAdditive Aqmul).toAddMonoidHom with
+      map_smul' := fun z x => ZMod.map_smul (MulEquiv.toAdditive Aqmul).toAddMonoidHom z x }
+  refine factorFamily_of_iota_data S.subtype c hK0 ?_ eQuotLin Aq data.lambda ?_
+    (fun g => (hSinv.restrict c) g) ?_ ?_ ?_
+  · intro g hg
+    rw [data.hN, Subgroup.mem_subgroupOf] at hg
+    exact hg
+  · intro v
+    exact data.quotient_compatible v
+  · intro g
+    exact congrArg Additive.ofMul
+      ((IsAInvariant.of_characteristic hSinv.restrict).quotientMulAutHom_apply_mk' c g)
+  · intro g
+    exact IsAInvariant.restrict_apply_val hSinv c g
+  · intro x hx
+    exact ⟨⟨x, hx⟩, rfl⟩
+
+/-- Either factor branch supplies its base-changed eigenvector family. -/
+theorem exists_factorFamily [Finite P]
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    (c : Y) {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (data : FactorCoordinateData hSinv hPhiS c ePhi nu) :
+    ∃ family : Fin (Module.finrank (ZMod 2) (GaloisField 2 n)) →
+        GaloisField 2 n ⊗[ZMod 2] Additive (lowerCentralLayer P 0),
+      (∀ i, (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange
+          (GaloisField 2 n) (family i) =
+          data.lambda ^ (2 ^ i.val) • family i) ∧
+      (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
+        (1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x ∈
+          Submodule.span (GaloisField 2 n) (Set.range family)) := by
+  cases data with
+  | commutative d =>
+      simpa [FactorCoordinateData.lambda] using
+        exists_factorFamily_of_commutative c hK0 d
+  | noncommutative _ d =>
+      simpa [FactorCoordinateData.lambda] using
+        exists_factorFamily_of_noncommutative c hK0 d
 
 end EigenFamily
 
