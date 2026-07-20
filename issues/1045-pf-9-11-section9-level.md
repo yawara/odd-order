@@ -480,6 +480,30 @@ h46.toCertainTypeHypothesis.toHypothesis   -- : S06.Hypothesis ↥M
 
 **⟹ case B は全体として「新規の数学ゼロ、§6 形に留まる述べ直し」に落ちた。**
 
+### (2) dichotomy の実装レシピ (2026-07-20 に signature 実測)
+
+```
+S06.Hypothesis.induce_not_isIrreducible_iff (h : S06.Hypothesis ↥M) [NeZero (Nat.card h.W1)]
+    (χ : IrreducibleCharacter ↥h.K) :
+    ¬ IsIrreducibleCharacter (ClassFunction.induce h.K χ) ↔ ∃ χ₂, h.chiRestrict χ₂ = χ
+```
+
+§9 での使い方:
+1. `φ ∈ sOf data Y` を分解して `φ = induceHU data χ`、`χ ∈ xiOf data Y`。
+2. `induceHU_eq_induce data χ` で `φ = ClassFunction.induce (huSub data) χ`。
+3. ⚠ **transport**: `h46₉.K` と `huSub data` はどちらも `(derivedInG M).subgroupOf M` に
+   等しいが**命題的に**なので、`↥` を取ると別の型。橋渡し補題と同じ `hKeq ▸ …` の流儀で運ぶ
+   (`huSub_eq_derivedInG_subgroupOf` + `h46₉.K` 側の等式)。
+4. `induce_not_isIrreducible_iff` を適用 → `∃ χ₂, h.chiRestrict χ₂ = χ`。
+5. `h.coe_chiRestrict` + `h.induce_restrict_certainType_eq` で
+   `φ = S06.columnSum h46₉' χ₂` に変換 (§10 版 S12_HcBound.lean:611-620 が同じ変換をしている
+   ので、そこを雛形にする)。
+6. `[NeZero (Nat.card h.W1)]` は `h.one_lt_card_W1` から `⟨by omega⟩` で作る
+   (§10 版 :598 と同じ)。
+
+⚠ §10 版はこの後さらに `muGrid` 形へ移すが、**§9 ではその変換を行わない** — `certainTypeR` が
+消費するのは `columnSum h χ₂` の形なので、そこで止めるのが正しい。
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
