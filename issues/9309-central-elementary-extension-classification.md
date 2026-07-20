@@ -23,13 +23,27 @@ Peterfalvi の `TypeAModel` 側は adapter とする。
 
 ## やること
 
-- [ ] 既存の `GroupExtension` / section / cocycle API を調査し、重複実装を避ける
-- [ ] elementary-abelian 中心核と商、および ordered quotient basis から actual group の
+- [x] 既存の `GroupExtension` / section / cocycle API を調査し、重複実装を避ける
+- [x] elementary-abelian 中心核と商、および ordered quotient basis から actual group の
       一意な normal form を構成する
-- [ ] 平方写像の polarization が commutator pairing を決定することを証明する
+- [x] 平方写像の polarization が commutator pairing を決定することを証明する
 - [ ] 同じ平方 quadratic map を持つ actual extension と concrete twisted product の
       `MulEquiv` を構成する
 - [ ] Peterfalvi `QuadraticExtension` / `TypeAModel` への adapter を接続する
+
+## 進捗 (2026-07-20)
+
+shared generic 層を `OddOrder/GroupTheory/CentralElementaryExtension.lean` に実装した。
+公開 API `GroupExtension.equivOfCommonSquareMap` は、共通の平方座標を持つ二つの
+actual central elementary extension から `S.Equiv T` を構成する。順序付き基底の
+collected word、kernel coordinate、一意な multiplication law は実構成であり、
+factor set や multiplication law を仮定として受け取らない。
+
+- `lake build OddOrder.GroupTheory.CentralElementaryExtension`
+  - `Build completed successfully (1777 jobs).`
+- 800 行、警告なし、新規 `sorry` / `axiom` なし
+- 残りは `QuadraticExtension` の canonical `GroupExtension` 表現を取り出す adapter と、
+  Higman Lemma 11 で得る square-map formula の接続
 
 ## 完了条件
 
