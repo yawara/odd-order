@@ -532,6 +532,98 @@ theorem natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
   rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq] at hcard
   simpa [Nat.card_eq_fintype_card] using hcard
 
+/-! ## Effective image of a representation -/
+
+/-- The acting group after quotienting away the kernel of a representation. -/
+abbrev representationImageActor
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [Group C] [AddCommGroup V] [Module F V]
+    (rho : Representation F C V) :=
+  MonoidHom.range rho.asGroupHom
+
+/-- A representation regarded as a faithful action of its effective image. -/
+def representationImage
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [Group C] [AddCommGroup V] [Module F V]
+    (rho : Representation F C V) :
+    Representation F (representationImageActor rho) V :=
+  (Units.coeHom (Module.End F V)).comp
+    (MonoidHom.range rho.asGroupHom).subtype
+
+/-- The effective-image representation is faithful. -/
+theorem representationImage_injective
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [Group C] [AddCommGroup V] [Module F V]
+    (rho : Representation F C V) :
+    Function.Injective (representationImage rho) := by
+  intro a b hab
+  apply Subtype.ext
+  apply Units.ext
+  exact hab
+
+/-- Transitivity on nonzero vectors descends to the effective image. -/
+theorem representationImage_transitive
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [Group C] [AddCommGroup V] [Module F V]
+    (rho : Representation F C V)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w) :
+    ∀ v w : V, v ≠ 0 → w ≠ 0 →
+      ∃ c : representationImageActor rho, representationImage rho c v = w := by
+  intro v w hv hw
+  obtain ⟨c, hc⟩ := htrans v w hv hw
+  exact ⟨⟨rho.asGroupHom c, ⟨c, rfl⟩⟩, hc⟩
+
+/-- The effective image of a representation of a commutative group is
+commutative. -/
+theorem representationImage_mul_comm
+    {F : Type uHelperF} {C : Type uHelperC} {V : Type uHelperV}
+    [Field F] [CommGroup C] [AddCommGroup V] [Module F V]
+    (rho : Representation F C V)
+    (a b : representationImageActor rho) : a * b = b * a := by
+  rcases a.2 with ⟨x, hx⟩
+  rcases b.2 with ⟨y, hy⟩
+  apply Subtype.ext
+  change (a : Units (Module.End F V)) * b = b * a
+  rw [← hx, ← hy, ← map_mul, mul_comm, map_mul]
+
+/-- The image of a generator in a cyclic transitive action has full Singer
+order, even when the original representation is not faithful. -/
+theorem representationImage_generator_orderOf_eq_pow_sub_one
+    {C V : Type uGenerator} [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V] [Module (ZMod 2) V] [Finite V] [Nontrivial V]
+    (rho : Representation (ZMod 2) C V)
+    (n : ℕ) (hfin : Module.finrank (ZMod 2) V = n)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w)
+    (c : C) (hcgen : ∀ x : C, x ∈ Subgroup.zpowers c) :
+    let d : representationImageActor rho :=
+      ⟨rho.asGroupHom c, ⟨c, rfl⟩⟩
+    orderOf d = 2 ^ n - 1 := by
+  let D := representationImageActor rho
+  let rhoD : Representation (ZMod 2) D V := representationImage rho
+  let d : D := ⟨rho.asGroupHom c, ⟨c, rfl⟩⟩
+  letI : Finite D := Finite.of_surjective rho.asGroupHom.rangeRestrict
+    rho.asGroupHom.rangeRestrict_surjective
+  letI : CommGroup D :=
+    { (inferInstance : Group D) with
+      mul_comm := representationImage_mul_comm rho }
+  have hdgen : ∀ z : D, z ∈ Subgroup.zpowers d := by
+    intro z
+    rcases z.2 with ⟨x, hx⟩
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (hcgen x)
+    apply Subgroup.mem_zpowers_iff.mpr
+    refine ⟨k, ?_⟩
+    apply Subtype.ext
+    change (rho.asGroupHom c) ^ k = z.1
+    rw [← map_zpow, hk, hx]
+  have hcardV : Nat.card V = 2 ^ n := by
+    rw [Module.natCard_eq_pow_finrank (K := ZMod 2), hfin]
+    norm_num [Nat.card_eq_fintype_card]
+  have hcardD : Nat.card D = 2 ^ n - 1 := by
+    rw [natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
+      rhoD (representationImage_injective rho)
+      (representationImage_transitive rho htrans), hcardV]
+  exact (orderOf_eq_card_of_forall_mem_zpowers hdgen).trans hcardD
+
 private theorem three_dvd_two_pow_sub_one_of_even
     {n : ℕ} (hn : Even n) : 3 ∣ 2 ^ n - 1 := by
   have h := Nat.pow_sub_one_dvd_pow_sub_one (x := 2) hn.two_dvd
