@@ -291,4 +291,88 @@ theorem RegularOperatorSetup.exists_aInvariant_complement_of_centralizer [Finite
   · exact OddOrder.BG.Ch1_Preliminary.isAInvariant_map_mk' hS'inv
       (IsAInvariant.of_characteristic hSinv.restrict)
 
+/-! ## Eigenvalues on the lines of `S/S'`
+
+BG speaks of *"the eigenvalues `r` and `r₀` of `α` on `R₀S'/S'` and `T/S'`"*.  A line of
+`S/S'` is a cyclic group of order `p`, and any automorphism preserving it is a power map on
+it; `exists_zpow_of_map_eq_of_isCyclic` is that extraction, and the two lemmas after it
+identify BG's two lines. -/
+
+/-- **Eigenvalue extraction**: an automorphism preserving a cyclic subgroup acts on it as a
+power map.
+
+`f` sends a generator `g` of `V` to some `g ^ r`, and then `f (g ^ k) = (g ^ r) ^ k =
+(g ^ k) ^ r` for every element of `V`.  This is what makes BG's talk of "eigenvalues" on the
+lines of `S/S'` literal. -/
+theorem exists_zpow_of_map_eq_of_isCyclic {G : Type*} [Group G] {V : Subgroup G}
+    [IsCyclic ↥V] (f : MulAut G) (hf : V.map ((f : MulAut G) : G →* G) = V) :
+    ∃ r : ℤ, ∀ x ∈ V, f x = x ^ r := by
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥V)
+  have hgV : (g : G) ∈ V := g.2
+  have hfg : f (g : G) ∈ V := by
+    have hmem : f (g : G) ∈ V.map ((f : MulAut G) : G →* G) := ⟨(g : G), hgV, rfl⟩
+    rwa [hf] at hmem
+  obtain ⟨r, hr⟩ := hg ⟨f (g : G), hfg⟩
+  refine ⟨r, fun x hx => ?_⟩
+  obtain ⟨k, hk⟩ := hg ⟨x, hx⟩
+  have hkx : (g : G) ^ k = x := congrArg Subtype.val hk
+  have hrg : (g : G) ^ r = f (g : G) := congrArg Subtype.val hr
+  rw [← hkx, map_zpow, ← hrg, ← zpow_mul, ← zpow_mul, Int.mul_comm]
+
+/-- BG's first line: `|R₀S'/S'| = p`.
+
+`R₀` has order `p` and meets `S'` trivially (`inf_derived_omega_eq_bot`), so it injects into
+`S/S'`. -/
+theorem RegularOperatorSetup.card_map_R₀_subgroupOf [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    Nat.card ↥((hyp.R₀.subgroupOf (Omega R p 1)).map
+      (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1)))) = p := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set S : Subgroup R := Omega R p 1 with hSdef
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
+  set N : Subgroup ↥S := _root_.commutator ↥S with hNdef
+  set ψ : ↥R₀' →* (↥S ⧸ N) := (QuotientGroup.mk' N).comp R₀'.subtype with hψ
+  -- The map `R₀' → S/S'` is injective, because `R₀ ⊓ S' = 1`.
+  have hinj : Function.Injective ψ := by
+    rw [injective_iff_map_eq_one]
+    intro x hx
+    have hxS' : (x : ↥S) ∈ N := by
+      simpa using (QuotientGroup.eq_one_iff (N := N) _).mp hx
+    have hxR₀ : ((x : ↥S) : R) ∈ hyp.R₀ := Subgroup.mem_subgroupOf.mp x.2
+    have hxd : ((x : ↥S) : R) ∈ derivedInG S := ⟨(x : ↥S), hxS', rfl⟩
+    have hbot := hyp.inf_derived_omega_eq_bot ▸ Subgroup.mem_inf.mpr ⟨hxR₀, hxd⟩
+    exact Subtype.ext (Subtype.ext (Subgroup.mem_bot.mp hbot))
+  have hrange : ψ.range = R₀'.map (QuotientGroup.mk' N) := by
+    rw [hψ, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hcard : Nat.card ↥ψ.range = Nat.card ↥R₀' :=
+    (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
+  rw [← hrange, hcard, hR₀']
+  exact hyp.card_R₀_subgroupOf hyp.R₀_le_omega
+
+/-- BG's second line: `|T/S'| = p`.
+
+`|S/S'| = p²` (E.3(b), third clause) and `|S : T| = p`, and `S' ≤ T`, so the image of `T` in
+`S/S'` has order `p²/p = p`. -/
+theorem RegularOperatorSetup.card_map_centralizer [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) (hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1)) :
+    Nat.card ↥((Subgroup.centralizer
+        (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))).map
+      (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1)))) = p := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set S : Subgroup R := Omega R p 1 with hSdef
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hTdef
+  set N : Subgroup ↥S := _root_.commutator ↥S with hNdef
+  -- `|T/S'| · |S : T| = |S/S'|`, since `S' ≤ T`.
+  have hidx : T.index = p := (hyp.card_omega1Center_and_index_centralizer hyp.R₀_le_omega
+    (hyp.three_le_pRank_omega hcard)).2
+  have hle : N ≤ T := hyp.commutator_le_centralizer hcard
+  have hmapidx : (T.map (QuotientGroup.mk' N)).index = T.index := by
+    rw [Subgroup.index_map, QuotientGroup.ker_mk', sup_of_le_left hle,
+      QuotientGroup.range_mk', Subgroup.index_top, mul_one]
+  have hquot : Nat.card (↥S ⧸ N) = p ^ 2 := hyp.card_omega_abelianization
+  have hmul := Subgroup.card_mul_index (T.map (QuotientGroup.mk' N))
+  rw [hmapidx, hidx, hquot] at hmul
+  refine Nat.eq_of_mul_eq_mul_right hyp.p_prime.pos ?_
+  rw [hmul]; ring
+
 end OddOrder.BG.AppE
