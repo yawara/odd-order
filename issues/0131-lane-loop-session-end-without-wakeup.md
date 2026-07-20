@@ -91,3 +91,23 @@ a は 02:38 の `ScheduleWakeup(60s)` を最後に、02:54 の「**(8.18) 全体
 - `notes/meta/merge_monitor.md` (a の 05:36 停止と暫定裁定 9158 の記録)
 - `CLAUDE.md`「レーンの `/loop` self-pacing wakeup = 60s (最短固定、ユーザー 2026-07-06)」
 - `issues/closed/9158-*` (a 停止時の Pf 本文暫定移管 → 復帰で失効)
+
+## 追記 (2026-07-20 16:08 JST): 4 例目 — a が**マイルストーン報告の turn で**再び黙って停止
+
+| 項目 | 実測 |
+|---|---|
+| 最後の `ScheduleWakeup` | 06:42:38Z (`delaySeconds: 60`)。セッション通算 **48 回**は正しく予約できていた |
+| 最終アクティビティ | 06:45:33Z (= 15:45 JST) |
+| 停止時の状態 | `unmerged 0 / dirty 0 / behind 8` (成果損失ゼロ) |
+| 検出 | hub tick 16:08 (**23 分**の空転で検出) |
+| 最後の turn の内容 | 「**Forty commits, all build-green, tree clean and synced with main.** Checked the τ seam before writing the dispatch…」= (9.9.b) dichotomy 完了 + τ-seam 確認の**達成報告** |
+
+⟹ **3 例目 (02:54「(8.18) 全体が書籍の文に到達しました」) と完全に同型**。48 回連続で 60s 予約
+できていたのに、「区切りのついた報告を書いた turn」でだけ予約が抜ける。本 issue が
+2026-07-20 03:10 に立てた仮説 —「トリガーは *達成感のある turn の終わり*」— を 4 例目が追認した。
+
+**⟹ 再開プロンプトの文言は *停止条件の列挙* でなく *順序の規則* にする**という前掲の結論を維持:
+「**report を書いたら、その同じ turn 内で必ず `ScheduleWakeup(60s)` を呼ぶ**」。
+「issue を閉じた」「main と同期した」「定理が landing した」はすべて**継続の合図**。
+
+なお lane b (codex) / c は同時刻に稼働継続中で、停止は a のみ。
