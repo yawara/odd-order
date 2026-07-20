@@ -1615,3 +1615,33 @@ and `[w_i,w_j]^α ≡ [w_i,w_j]^{r_{k-1}} (mod H_k)`.  By Lemma 4.2,
 
 `AppE_AbelianCentralizer.lean` = 現在 724 行。項 6 で嵩むので、
 1500 行に近づいたら項 6-7 を `AppE_EigenvalueArithmetic.lean` に分ける。
+
+## 2026-07-20 (34): 項 6 の部品 1 — 冪の合同 → 指数の合同
+
+`dvd_sub_of_zpow_mul_inv_zpow_mem` — `|G : K| = p`・`y ∉ K`・`y^a(y^b)⁻¹ ∈ K`
+⟹ `(p : ℤ) ∣ a - b`。BG の (E.26) 導出の締め (*"Therefore, by (E.25), rᵢrⱼ = r_{k-1}"*)。
+
+### ⬜ 項 6 の残り部品
+
+**(i) Lemma 4.2(a) の「K を法とする」版** — 最も重い。BG の
+
+`⁅wᵢ^{rᵢ}x, wⱼ^{rⱼ}x'⁆ ≡ ⁅wᵢ,wⱼ⁆^{rᵢrⱼ} (mod H_k)`  (`x ∈ H_{i+1}`, `x' ∈ H_{j+1}`)
+
+方針: **商 `G/K` に落として既存の `commutatorElement_zpow_zpow_of_central`
+(`AppE_RegularOperator.lean:390`) を使う**。`Ḡ` では
+`⁅ū,ȳ⁆ = ⁅x̄,v̄⁆ = ⁅ū,v̄⁆ = 1` (i,j の極大性から `⁅H_{i+1},Hⱼ⁆ ≤ H_k` 等) なので
+`⁅x̄^m ū, ȳ^n v̄⁆ = ⁅x̄^m, ȳ^n⁆ = ⁅x̄,ȳ⁆^{mn}`。
+
+⚠ 第 1 等号 (`⁅ab,cd⁆ = ⁅a,c⁆` when `b` が `c,d` と可換・`d` が `a` と可換) は
+素朴には成り立たないので、**必要な可換条件を正確に洗い出してから**書くこと。
+`u, v` は `K` の元ではない (交換子だけが `K` に入る) ので、
+`ū, v̄` は `Ḡ` で非自明なまま。
+
+**(ii) `k` の極小性 ⟹ (E.24) `T'H_k = H_{k-1}`**
+
+**(iii) `i`, `j` の極大性 ⟹ (E.25) の範囲 `0 ≤ j ≤ i ≤ k-2` と
+`⁅wᵢ,wⱼ⁆ ∈ H_{k-1} − H_k`**
+
+📌 (i) を先にやる (α/β 両版が共有する核)。(ii)(iii) は chain の性質で、
+Step 2 の `iterCommutator` API (`AppE_RegularOperator.lean` の
+`iterCommutator_le_of_le` / `iterCommutator_ne_bot_of_le` 等) が土台になる。
