@@ -441,6 +441,26 @@ theorem factorLayerOneEquivAmbientFrattini_squareValue
   apply Subtype.ext
   rfl
 
+/-- The commutative sibling of the factor square identity: the homocyclic
+`C₄`-square bridge of a factor square is the genuine square, pushed into
+`Φ(P)`.  Together with `CommutativeFactorCoordinateData.square_normal`
+(= `β²`) this identifies `A(α) = q_X(α) = α²`. -/
+theorem homocyclicFourSquareSubgroupEquivFrattini_squareEquiv
+    {S : Subgroup P} [Finite ↥S]
+    (hcomm : IsMulCommutative ↥S)
+    {index : Type} [Fintype index]
+    (equivPi : ↥S ≃* (index → Multiplicative (ZMod 4)))
+    (hPhiS : frattini P ≤ S)
+    (hN : Agemo (↥S) 2 1 = (frattini P).subgroupOf S)
+    (g : ↥S)
+    (hmem : (S.subtype g) ^ 2 ∈ frattini P) :
+    (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN
+        (commutativeFactorSquareEquiv hcomm equivPi
+          (QuotientGroup.mk g)) : ↥(frattini P)) =
+      ⟨(S.subtype g) ^ 2, hmem⟩ := by
+  apply Subtype.ext
+  rfl
+
 end SquareDecomposition
 
 end
