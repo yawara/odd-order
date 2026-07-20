@@ -478,18 +478,23 @@ noncomputable local instance lemmaEightLayerModTwo
     Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
   lowerCentralLayerZmodModule H i
 
-/-- **Higman, Suzuki 2-groups, Lemma 8 (p. 87).**
+/-- **Higman, Suzuki 2-groups, Lemma 8 (p. 87), source-strength form.**
 
 Let `A` be an abelian normal actor-invariant subgroup and `C` a normal
 actor-invariant subgroup covering `A`. If `C' = A`, then `A` has exponent
 at most two. The actual `L₂(C) ≃ L₃(C)` used in the contradiction is
-constructed from the square map and the exact lower-central chain above. -/
-theorem higmanLemmaEight_pow_two_eq_one
+constructed from the square map and the exact lower-central chain above.
+
+The actor is only required to be transitive on ambient involutions and to
+have odd order.  Its restriction to `C` need not be injective: Lemma 6 is
+applied to the faithful range of that restriction. -/
+theorem higmanLemmaEight_pow_two_eq_one_of_transitive
     {P : Type*} [Group P] [Finite P]
     (hP : IsPGroup 2 P)
     (X : Subgroup (MulAut P))
     (hXcyc : IsCyclic X)
-    (hreg : ActsRegularlyOnInvolutions X)
+    (htransP : ActsTransitivelyOnInvolutions X)
+    (hXodd : Odd (Nat.card X))
     (hmulti : ∃ x y : P,
       x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
     (A C : Subgroup P)
@@ -516,11 +521,6 @@ theorem higmanLemmaEight_pow_two_eq_one
     simp
   letI : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
   obtain ⟨x, y, hx, hy, hxy⟩ := hmulti
-  have htransP : ∀ a ∈ involutions P, ∀ b ∈ involutions P,
-      ∃ g : X, (g : MulAut P) a = b := by
-    intro a ha b hb
-    obtain ⟨g, hg, _⟩ := hreg a ha b hb
-    exact ⟨g, hg⟩
   have hinvA : involutions P ⊆ A :=
     involutions_subset_of_nontrivial_invariant
       hP X htransP hcover.left.2 hAne
@@ -639,14 +639,33 @@ theorem higmanLemmaEight_pow_two_eq_one
     (hcover.agemo_one_eq_commutator_of_derived_map_eq_left
       hCtwo hderived).trans (by
         rw [lowerCentralTerm, Subgroup.top_lowerCentralSeries_one])
-  have hXodd : Odd (Nat.card X) :=
-    actor_card_odd_of_regular_on_involutions hP X hreg ⟨x, hx⟩
-  have hrestrict : Function.Injective hcover.right.2.restrict :=
-    NormalInvariantCover.restrict_injective_of_regular_on_involutions
-      hP X hreg hcover
-  exact (not_exists_equivariant_linearEquiv_of_higman_tripleBracket
-    hCtwo hcover.right.2.restrict hrestrict hXodd hAgemo
+  exact
+    (not_exists_equivariant_linearEquiv_of_higman_tripleBracket_of_odd_action
+    hCtwo hcover.right.2.restrict hXodd hAgemo
     (Module.finrank (ZMod 2) (Additive (lowerCentralLayer C 1)))
     hfinrank rfl hirrZero htransTwo) ⟨E, hE⟩
+
+/-- Compatibility form of Higman Lemma 8 for an actor already known to act
+regularly on the involutions. -/
+theorem higmanLemmaEight_pow_two_eq_one
+    {P : Type*} [Group P] [Finite P]
+    (hP : IsPGroup 2 P)
+    (X : Subgroup (MulAut P))
+    (hXcyc : IsCyclic X)
+    (hreg : ActsRegularlyOnInvolutions X)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (A C : Subgroup P)
+    (hcover : NormalInvariantCover X.subtype A C)
+    (hAcomm : IsMulCommutative A)
+    (hderived : (_root_.commutator C).map C.subtype = A) :
+    ∀ a : A, a ^ 2 = 1 := by
+  have hinv : (involutions P).Nonempty := by
+    obtain ⟨x, _, hx, _, _⟩ := hmulti
+    exact ⟨x, hx⟩
+  exact higmanLemmaEight_pow_two_eq_one_of_transitive
+    hP X hXcyc hreg.transitive
+      (actor_card_odd_of_regular_on_involutions hP X hreg hinv)
+      hmulti A C hcover hAcomm hderived
 
 end OddOrder.Higman.Suzuki2Groups

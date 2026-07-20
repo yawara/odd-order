@@ -253,6 +253,25 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               (`typeADataOfLowerCentralSquareNormalForm`)
         - [x] actor から得た元の Singer basis 上で actual anchored trace 式を構成し、
               上記 endgame と合成して source-facing theorem `higmanLemmaEleven` を閉じる
+    - [ ] Higman Lemma 12 (pp. 89--92): ξ-length `3` の Suzuki `2`-group を
+          `B(n, θ, ε)`, `C(n, ε)`, `D(n, θ, ε)` のいずれかに分類する
+      - [x] ξ-length `3` を `HasXiLengthThree` (3 strict steps が存在し、4 steps は不存在)
+            として normal actor-invariant poset 上に定義し、任意の 3-step chain が
+            actual covers になることを導出する
+      - [x] Lemma 9 と cover dichotomy / Lemmas 7--8 を接続し、公開 endpoint
+            `frattini_isElementaryAbelian_of_xiLengthThree` で `Φ(P)` が elementary abelian
+            であることを証明する
+      - [x] `P / Φ(P)` の二つの ξ-composition steps を actual invariant summands に持ち上げ、
+            ξ-length `2` の部分群 `X, Y` と `P = XY` を構成する
+        - [x] `Φ(P)` を三段組成列の第一項と同定し、商の induced actor が
+              `HasXiLengthTwo` を満たすことを証明する
+        - [x] Maschke により商の complementary invariant summands を構成し、
+              preimage が normal / invariant、`X ∩ Y = Φ(P)`、`X ⊔ Y = P` を証明する
+        - [x] `Φ(P) < S < P` である各 preimage `S` の restricted actor range が
+              `HasXiLengthTwo` を満たすことを証明する
+      - [ ] 可換な ξ-length-two summand `A(n,1) = C₄ⁿ` も含む honest data carrier を
+            構成し、二つの summand を共通 parameter `n ≥ 2` の `A(n,θ)`,
+            `A(n,φ)` と同定する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
@@ -284,9 +303,15 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `references/higman/pages/suzuki-2-groups-p085.png`
 - `references/higman/p86_87_lemmas_6_10.layout.txt`
 - `references/higman/p86_87_lemmas_6_10.raw.txt`
+- `references/higman/p88_92_lemmas_10_12.layout.txt`
+- `references/higman/p88_92_lemmas_10_12.raw.txt`
 - `references/higman/pages/suzuki-2-groups-p086.png`
 - `references/higman/pages/suzuki-2-groups-p087.png`
 - `references/higman/pages/suzuki-2-groups-p088.png`
+- `references/higman/pages/suzuki-2-groups-p089.png`
+- `references/higman/pages/suzuki-2-groups-p090.png`
+- `references/higman/pages/suzuki-2-groups-p091.png`
+- `references/higman/pages/suzuki-2-groups-p092.png`
 - `references/higman/suzuki-2-groups.pdf`
 - `references/higman/SOURCE.md`
 - `OddOrder/Higman/Suzuki2Groups/HigmanSquareMap.lean`
@@ -295,6 +320,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - `OddOrder/Higman/Suzuki2Groups/HigmanCoverAbelian.lean`
 - `OddOrder/Higman/Suzuki2Groups/HigmanCoverPowerOverlap.lean`
 - `OddOrder/Higman/Suzuki2Groups/HigmanFiniteFieldTrace.lean`
+- `OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/LengthThreeReduction.lean`
 - `OddOrder/Algebra/ChevalleyWarning.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki/OrderThreeSuzukiCentralizer.lean`
 - `OddOrder/Peterfalvi/Appendices/Suzuki2Groups/QuadraticExtensions.lean`

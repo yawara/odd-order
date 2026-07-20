@@ -735,7 +735,7 @@ private theorem higmanLemmaSeven_isMulCommutative_of_overlap
     (hP : IsPGroup 2 P)
     (X : Subgroup (MulAut P))
     (hXcyc : IsCyclic X)
-    (hreg : ActsRegularlyOnInvolutions X)
+    (htransP : ActsTransitivelyOnInvolutions X)
     (hmulti : ∃ x y : P,
       x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
     (A C : Subgroup P)
@@ -769,11 +769,6 @@ private theorem higmanLemmaSeven_isMulCommutative_of_overlap
   letI : Nontrivial (AgemoSuccQuotient A 0) :=
     E0.symm.toEquiv.nontrivial
   obtain ⟨x, y, hx, hy, hxy⟩ := hmulti
-  have htransP : ∀ a ∈ involutions P, ∀ b ∈ involutions P,
-      ∃ g : X, (g : MulAut P) a = b := by
-    intro a ha b hb
-    obtain ⟨g, hg, _⟩ := hreg a ha b hb
-    exact ⟨g, hg⟩
   have hAne : A ≠ ⊥ := by
     intro hAbot
     have hmap_le : (_root_.commutator C).map C.subtype ≤ A :=
@@ -838,15 +833,6 @@ private theorem higmanLemmaSeven_isMulCommutative_of_overlap
     transitive_nonzero_of_equivariant_agemoSucc
       (lowerCentralLayerRepresentation hcover.right.2.restrict 1)
       hcover.left.2.restrict ε htransA hse E2 hE2
-  have hXodd : Odd (Nat.card X) :=
-    actor_card_odd_of_regular_on_involutions hP X hreg ⟨x, hx⟩
-  have hrestrict : Function.Injective hcover.right.2.restrict :=
-    NormalInvariantCover.restrict_injective_of_regular_on_involutions
-      hP X hreg hcover
-  have hfaithful : Function.Injective
-      (lowerCentralLayerRepresentation hcover.right.2.restrict 0) :=
-    lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
-      hCtwo hcover.right.2.restrict hrestrict hXodd
   have htransA0 : ∀ v w : Additive (AgemoSuccQuotient A 0),
       v ≠ 0 → w ≠ 0 →
         ∃ g : X,
@@ -886,26 +872,31 @@ private theorem higmanLemmaSeven_isMulCommutative_of_overlap
         lowerCentralLayerRepresentation hcover.right.2.restrict 1 g
           (E2.symm (EA (E0 v)))
     rw [hE0, hEA, hE2symm]
-  let d : LemmaSevenSpectralCertificate hcover.right.2.restrict :=
-    { finrank_second_ge_two := hfinrank
-      faithful_first := hfaithful
-      transitive_second := htrans2
-      layerEquiv := E
-      layerEquiv_equivariant := hE }
-  exact d.false hcover.right.2.restrict
+  exact (not_exists_equivariant_linearEquiv_of_higman_bracket_of_transitive
+    (lowerCentralLayerRepresentation hcover.right.2.restrict 0)
+    (lowerCentralLayerRepresentation hcover.right.2.restrict 1)
+    (Module.finrank (ZMod 2) (Additive (lowerCentralLayer C 1)))
+    hfinrank rfl (lowerCentralCommutatorBilinear C)
+    (fun g a b => by
+      simpa only [← lowerCentralLayerRepresentation_apply, ofMul_toMul] using
+        lowerCentralCommutatorBilinear_equivariant
+          hcover.right.2.restrict g a b)
+    (lowerCentralCommutatorBilinear_self C)
+    (lowerCentralCommutatorBilinear_span_eq_top C)
+    htrans2) ⟨E, hE⟩
 
-/-- Higman, Suzuki 2-groups, Lemma 7 (p. 86).
+/-- **Higman, Suzuki 2-groups, Lemma 7 (p. 86), source-strength form.**
 
-For a normal invariant cover whose lower member is abelian and equals the
-Frattini subgroup of the upper member, the hypothesis C' ≤ A² forces C to
-be abelian.  The equivariant overlap used in Higman's spectral argument is
-constructed internally by the square map above. -/
-theorem higmanLemmaSeven_isMulCommutative
+The cyclic actor is assumed only transitive on the involutions, as in
+Higman's definition.  Faithfulness of its restriction to `C` is not needed:
+the spectral contradiction passes to the effective image of the induced
+first-layer representation. -/
+theorem higmanLemmaSeven_isMulCommutative_of_transitive
     {P : Type u} [Group P] [Finite P]
     (hP : IsPGroup 2 P)
     (X : Subgroup (MulAut P))
     (hXcyc : IsCyclic X)
-    (hreg : ActsRegularlyOnInvolutions X)
+    (htrans : ActsTransitivelyOnInvolutions X)
     (hmulti : ∃ x y : P,
       x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
     (A C : Subgroup P)
@@ -932,8 +923,32 @@ theorem higmanLemmaSeven_isMulCommutative
       lowerCentralLayerZeroToAgemoZeroLinearEquiv
         hP hcover hAcomm hAne hPhi hderived
     exact higmanLemmaSeven_isMulCommutative_of_overlap
-      hP X hXcyc hreg hmulti A C hcover hAcomm hPhi hderived E0
+      hP X hXcyc htrans hmulti A C hcover hAcomm hPhi hderived E0
       (lowerCentralLayerZeroToAgemoZeroLinearEquiv_equivariant
         hP hcover hAcomm hAne hPhi hderived)
+
+/-- Higman, Suzuki 2-groups, Lemma 7 (p. 86).
+
+For a normal invariant cover whose lower member is abelian and equals the
+Frattini subgroup of the upper member, the hypothesis C' ≤ A² forces C to
+be abelian.  The equivariant overlap used in Higman's spectral argument is
+constructed internally by the square map above. -/
+theorem higmanLemmaSeven_isMulCommutative
+    {P : Type u} [Group P] [Finite P]
+    (hP : IsPGroup 2 P)
+    (X : Subgroup (MulAut P))
+    (hXcyc : IsCyclic X)
+    (hreg : ActsRegularlyOnInvolutions X)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (A C : Subgroup P)
+    (hcover : NormalInvariantCover X.subtype A C)
+    (hAcomm : IsMulCommutative A)
+    (hPhi : NormalInvariantCover.ambientFrattini C = A)
+    (hderived : (_root_.commutator C).map C.subtype ≤
+      (Agemo A 2 1).map A.subtype) :
+    IsMulCommutative C :=
+  higmanLemmaSeven_isMulCommutative_of_transitive
+    hP X hXcyc hreg.transitive hmulti A C hcover hAcomm hPhi hderived
 
 end OddOrder.Higman.Suzuki2Groups
