@@ -290,7 +290,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 11100
+set_option linter.style.longFile 11300
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -11201,3 +11201,9 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_apply_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_conjDiff_support
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent
+-- **(8.15), claim 3 at `A = A(M)`, every type `𝒫`** — the instantiation of the above at
+-- `A = typePACore M`, `H = M_σ`, whose two Dade inputs (`dadeSupportHypothesisData_typePACore0`
+-- for Hypothesis (4.6) via `typePACore_toHypothesis46_core`, and
+-- `dadeSupportHypothesisData_typePACore` for the isometry `τ`) are both Peterfalvi (8.15) claim 1
+-- and carry no type hypothesis beyond `IsTypeP`.  Types II and V included.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subcoherent

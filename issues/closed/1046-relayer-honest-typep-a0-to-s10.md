@@ -145,7 +145,13 @@ import は `S10_MinimalSimpleStructure` で足りる (subagent が推移閉包 4
       出ず build でのみ露見)。spine file を触るので subagent に丸投げしない。
 - [ ] 最後にフルビルド + AxiomsCheck + sorry 非退行を確認。
 
-## 完了条件
+## ✅ 完了 (2026-07-20)
+
+- 段階 1 (commit 20ef484cc) / 段階 2 (commit dc51c1cb6) とも landed、`lake build OddOrder` green。
+- **完了条件を満たした**: `S10.typePACore_subcoherent` (commit 26cb99374) が
+  `S10_SubcoherentTypeP.lean` (§10 の file) 内で書けるようになり、issue 1042 の残件が解けた。
+
+## 完了条件 (達成済)
 
 - `S10.inducedNonKernelFamily_subcoherent` に `A = typePACore M` / `H = M_σ` を渡す具体化が
   §10 の file 内で書けること (issue 1042 の残件が解ける)。

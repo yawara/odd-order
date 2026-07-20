@@ -208,3 +208,61 @@ active frontier ファイル分はレーン合流後に追补で解消。
 - census log: hub session scratchpad `warnings_unique.txt` (2026-07-17 full build replay)
 - lakefile.toml `[leanOptions]` / issues/closed/0120 (leanOptions parity)
 - CLAUDE.md「ファイル粒度」(longFile 2000 上限は別トラック = 分割 issue)
+
+## 2026-07-20 昼 (Opus hub, commit `44b9b2a93`): longLine wave — **133 → 42**
+
+再 census (main `c58168265` の green full build replay) は **warning 総数 233** で、
+2026-07-19 の 192 から**増えていた** (レーンが新コードを積む速度 > hub の解消速度)。
+うち longLine 133 件を **8 並列エージェント / 59 files** で処理し **42 件**まで削減
+(warning 総数 233 → 142)。
+
+### 今回の設計 (過去の失敗を全て潰した)
+
+- **エージェントにビルドを一切させない**。2026-07-19 wave の教訓「full build を禁止しても
+  守られない / 同一 worktree の並行ビルドで olean が churn」を、**leaf build も含めて全面禁止**
+  に強化。検証は hub が最後に 1 回のフルビルドで行う。実際に破られず、churn も起きなかった。
+- **ファイル単位で排他分割** (前回「JSON の前半/後半」で割って同一ファイル衝突)。8 バケットに
+  件数バランスで配分。衝突ゼロ。
+- **git の mutating 操作を全面禁止** ([[concurrent-subagents-share-git-state]])。
+- skip ルールを事前に明文化 (markdown 表 / 同一行 `by` / 分割点なし)。
+
+### 検証手順 (今後の書式 wave の標準にする)
+
+「空白のみの変更か」の素朴な検査は **誤検出する** — `--` 行コメントを折り返すと新しい `--`
+マーカーが増えるため。正しい検査は **2 段**:
+
+1. **実コードのトークン列**: `/- -/` と `--` を除去 → 空白除去 → HEAD と比較。
+   **これが 0 件差分であることが本質的な安全条件** (今回 39/39 file で一致)。
+2. docstring の `/--` `-/` 開閉数が不変であること。
+
+⚠ 「コメント本文の比較」を `--[^\n]*` で作ると **`type II--IV` のような本文中の `--` を
+コメント開始と誤認**して偽陽性を出す。本文の同一性は上記 1+2 で十分。
+
+### 残 42 件 = 実質的な下限 (機械的には直せない)
+
+| 型 | 例 | なぜ直せないか |
+|---|---|---|
+| docstring 内の markdown 表の行 | `S01_FrattiniBurnside` 16 件、`S02_RepresentationsBasic`、`Isaacs Ch03/Ch04/Ch06` | 折ると表が壊れる |
+| 100 桁を超える単一識別子 | `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient` (101 文字) が 4 箇所、`Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius` (106 文字) | 列 0 に置いても超過。識別子短縮はトークン変更 |
+| 同一行に `by` を含むタクティク行 | `S05_GridTrichotomy` 2 件 (`rw [show … by linear_combination …]`) | wave 4b で 2 件の構文破壊実績 |
+
+⟹ **longLine トラックはここで実質完了**とし、以後は「新規に増えた分を tick で拾う」運用に切り替える。
+
+### ⚠ census の line number は編集時点でずれる
+
+複数エージェントが「割り当て行番号が現ファイルの長行でない」と報告した (例
+`OpicoreCentralizer` 割当 246/545/943 に対し実際は 51/257/472、`S08_CoherenceWeighted` は
+割当 1027 がファイル末尾を超過)。原因は build log の replay が**その module を最後に
+elaborate した時点**の行番号を保持するため (レーンがその後ファイルを編集していると乖離する)。
+⟹ **行番号は当たりを付ける用途に留め、エージェント側で `awk 'length>100'` を取り直させる**
+(今回はその指示があったので全エージェントが自力で正しい行を見つけて処理できた)。
+
+### 次の候補 (未着手)
+
+| 件数 | linter | 難度 |
+|---|---|---|
+| 14 | `open scoped Classical` 回避 | 中 (decidability 明示 or classical tactic、個別判断) |
+| 4 | 未使用 simp 引数 | 低 (機械的) |
+| 4+3 | `show` / `change` | 中 (goal を変える show は要確認) |
+| ~7 | unused `Decidable`/`Fintype` in type | ⚠ 高 — 下流 cascade 実績あり、1 件ずつ full build |
+| 4 | Overlapping instance parameters | ⚠ 高 — signature 接触 |
