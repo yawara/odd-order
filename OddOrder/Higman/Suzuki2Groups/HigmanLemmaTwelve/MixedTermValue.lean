@@ -150,6 +150,42 @@ theorem bilinear_frobenius_repr (n : ℕ) (hn : n ≠ 0)
   refine Finset.sum_congr rfl (fun i _ => ?_)
   simp only [smul_eq_mul]; ring
 
+/-- **Uniqueness of the Frobenius-polynomial coefficients (bilinear).**  The
+`n²` monomials `(α, β) ↦ α^{2^i} · β^{2^j}` are linearly independent, so a
+Frobenius polynomial that vanishes identically has all coefficients zero.  This
+is the extraction principle behind the mixed-term functional equation. -/
+theorem frob_bilinear_coeff_zero (n : ℕ) (hn : n ≠ 0)
+    (c : Fin n → Fin n → GaloisField 2 n)
+    (h : ∀ α β : GaloisField 2 n, ∑ i : Fin n, ∑ j : Fin n,
+      c i j • ((frobeniusEquiv (GaloisField 2 n) 2 ^ (i : ℕ)) α *
+        (frobeniusEquiv (GaloisField 2 n) 2 ^ (j : ℕ)) β) = 0) :
+    ∀ i j, c i j = 0 := by
+  have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
+    simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn
+  have hcoe : ∀ (k : ℕ) (x : GaloisField 2 n),
+      ((frobeniusEquiv (GaloisField 2 n) 2 ^ k).toMonoidHom) x =
+        (frobeniusEquiv (GaloisField 2 n) 2 ^ k) x := fun _ _ => rfl
+  have hli := frobenius_powers_linearIndependent (F := GaloisField 2 n) n hcard
+  rw [Fintype.linearIndependent_iff] at hli
+  have step1 : ∀ α : GaloisField 2 n, ∀ j : Fin n,
+      ∑ i : Fin n, c i j • (frobeniusEquiv (GaloisField 2 n) 2 ^ (i : ℕ)) α = 0 := by
+    intro α
+    apply hli
+    funext β
+    simp only [Finset.sum_apply, Pi.smul_apply, hcoe, smul_eq_mul, Finset.sum_mul,
+      Pi.zero_apply]
+    rw [Finset.sum_comm]
+    have := h α β
+    simp only [smul_eq_mul] at this
+    simp only [mul_assoc]
+    exact this
+  intro i j
+  refine hli (fun i => c i j) ?_ i
+  funext α
+  simp only [Finset.sum_apply, Pi.smul_apply, hcoe, smul_eq_mul, Pi.zero_apply]
+  have := step1 α j
+  simpa [smul_eq_mul] using this
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
