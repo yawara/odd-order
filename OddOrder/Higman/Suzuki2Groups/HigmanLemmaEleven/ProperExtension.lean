@@ -7,6 +7,8 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
 import OddOrder.Higman.Suzuki2Groups.HigmanFiniteFieldTrace
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanXiLengthTwo
+import OddOrder.Higman.Suzuki2Groups.HigmanTripleBracketContradiction
+import OddOrder.GroupTheory.RepresentationTheory.AInvariantSubrep
 
 /-!
 # Higman's Lemma 11: excluding a proper field extension
@@ -24,7 +26,9 @@ set_option autoImplicit false
 
 open scoped IsMulCommutative
 open OddOrder.GroupTheory
+open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.RepresentationTheory
+open OddOrder.Isaacs.Ch03
 open Module
 open scoped TensorProduct BigOperators
 
@@ -37,10 +41,513 @@ local instance properExtensionLayerIsMulCommutative
     IsMulCommutative (lowerCentralLayer P i) :=
   lowerCentralLayerIsMulCommutative P i
 
+local instance properExtensionLayerCommGroup
+    (P : Type u) [Group P] (i : Nat) :
+    CommGroup (lowerCentralLayer P i) :=
+  { (inferInstance : Group (lowerCentralLayer P i)) with
+    mul_comm := (lowerCentralLayer_isElementaryAbelian P i).comm }
+
 noncomputable local instance properExtensionLayerZModTwoModule
     (P : Type u) [Group P] (i : Nat) :
     Module (ZMod 2) (Additive (lowerCentralLayer P i)) :=
   lowerCentralLayerZmodModule P i
+
+/-! ## The original actor on the lower-central layers
+
+Higman first replaces the cyclic actor, if necessary, so that its prime
+divisors are precisely among those of the number of involutions (p. 87).
+After that replacement the actor itself, rather than a further subgroup, acts
+irreducibly on the first layer.  The results in this section keep that actor
+fixed; in particular, no irreducibility claim is made after restriction to a
+proper subgroup. -/
+
+private def layerZeroQuotientHom (P : Type u) [Group P] :
+    P →* lowerCentralLayer P 0 :=
+  (QuotientGroup.mk' (lowerCentralLayerKernel P 0)).comp
+    { toFun := fun x => ⟨x, by simp [lowerCentralTerm]⟩
+      map_one' := rfl
+      map_mul' := fun _ _ => rfl }
+
+private theorem layerZeroQuotientHom_surjective
+    (P : Type u) [Group P] :
+    Function.Surjective (layerZeroQuotientHom P) := by
+  intro q
+  obtain ⟨x, rfl⟩ :=
+    QuotientGroup.mk'_surjective (lowerCentralLayerKernel P 0) q
+  exact ⟨x, rfl⟩
+
+private theorem layerZeroQuotientHom_ker_eq_frattini
+    {P : Type u} [Group P] [Finite P]
+    (hP : IsPGroup 2 P) :
+    (layerZeroQuotientHom P).ker = frattini P := by
+  ext x
+  rw [MonoidHom.mem_ker]
+  let x0 : lowerCentralTerm P 0 := ⟨x, by simp [lowerCentralTerm]⟩
+  change QuotientGroup.mk' (lowerCentralLayerKernel P 0) x0 = 1 ↔ _
+  constructor
+  · intro hx
+    have hx0 : x0 ∈ lowerCentralLayerKernel P 0 :=
+      (QuotientGroup.eq_one_iff _).mp hx
+    rw [← lowerCentralLayerKernelInAmbient_subgroupOf P 0] at hx0
+    change x ∈ lowerCentralLayerKernelInAmbient P 0 at hx0
+    rwa [lowerCentralLayerKernelInAmbient_zero_eq_frattini P hP] at hx0
+  · intro hx
+    apply (QuotientGroup.eq_one_iff _).mpr
+    rw [← lowerCentralLayerKernelInAmbient_subgroupOf P 0]
+    change x ∈ lowerCentralLayerKernelInAmbient P 0
+    rwa [lowerCentralLayerKernelInAmbient_zero_eq_frattini P hP]
+
+private theorem frattini_ne_top_of_nontrivial
+    {P : Type u} [Group P] [Finite P] [Nontrivial P] :
+    frattini P ≠ ⊤ := by
+  obtain ⟨M, hM, _⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subgroup P)).resolve_left
+      bot_lt_top.ne
+  exact fun htop => hM.1
+    (le_antisymm le_top (htop ▸ frattini_le_coatom hM))
+
+/-- Under Higman's xi-length-two hypotheses, the original cyclic actor acts
+irreducibly on the first lower-central layer.  This is the source-facing
+irreducibility assertion used in Lemma 11 (pp. 87–88). -/
+theorem lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype) :
+    Representation.IsIrreducible
+      (lowerCentralLayerRepresentation Y.subtype 0) := by
+  classical
+  have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
+    fun h => hncomm ((commutator_eq_bot_iff P).mp h)
+  letI : Nontrivial (_root_.commutator P) :=
+    (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
+  letI : Nontrivial P :=
+    (_root_.commutator P).subtype_injective.nontrivial
+  have hPhi_ne_bot : frattini P ≠ (⊥ : Subgroup P) := by
+    rw [← (commutator_eq_frattini_and_frattini_eq_center
+      hP hncomm hxi hlen).1]
+    exact hcomm_ne
+  have hPhi_ne_top : frattini P ≠ (⊤ : Subgroup P) :=
+    frattini_ne_top_of_nontrivial
+  have hPhi_lt_top : frattini P < (⊤ : Subgroup P) :=
+    lt_of_le_of_ne le_top hPhi_ne_top
+  obtain ⟨x0, -, hx0Phi⟩ := SetLike.exists_of_lt hPhi_lt_top
+  let q0 : P →* lowerCentralLayer P 0 := layerZeroQuotientHom P
+  have hqx0 : q0 x0 ≠ 1 := by
+    intro hx
+    apply hx0Phi
+    have hxker : x0 ∈ q0.ker := MonoidHom.mem_ker.mpr hx
+    rw [show q0.ker = frattini P from
+      layerZeroQuotientHom_ker_eq_frattini hP] at hxker
+    exact hxker
+  letI : Nontrivial (lowerCentralLayer P 0) := ⟨q0 x0, 1, hqx0⟩
+  have hPhi_bot :
+      frattiniNormalInvariant Y.subtype ≠ normalInvariantBot Y.subtype := by
+    intro h
+    exact hPhi_ne_bot (congrArg Subtype.val h)
+  have hPhi_top :
+      frattiniNormalInvariant Y.subtype ≠ normalInvariantTop Y.subtype := by
+    intro h
+    exact hPhi_ne_top (congrArg Subtype.val h)
+  have hcover := hlen.covBy_top_of_ne_bot_of_ne_top hPhi_bot hPhi_top
+  let rho := lowerCentralLayerRepresentation Y.subtype 0
+  have hbot_ne_top : (⊥ : Subrepresentation rho) ≠ ⊤ := by
+    exact fun hEq => bot_ne_top
+      (congrArg Subrepresentation.toSubmodule hEq)
+  letI : Nontrivial (Subrepresentation rho) :=
+    ⟨⊥, ⊤, hbot_ne_top⟩
+  refine IsSimpleOrder.of_forall_eq_top fun S hSne => ?_
+  let Phi : Submodule (ZMod 2) (Additive (lowerCentralLayer P 0)) ≃o
+      Subgroup (lowerCentralLayer P 0) :=
+    elabSubmoduleSubgroupEquiv 2
+  let J : Subgroup (lowerCentralLayer P 0) := Phi S.toSubmodule
+  let q : P →* lowerCentralLayer P 0 := layerZeroQuotientHom P
+  let A : Subgroup P := J.comap q
+  have hJinv : IsAInvariant (lowerCentralLayerAction Y.subtype 0) J := by
+    rw [isAInvariant_iff_smul_mem]
+    intro y z hz
+    have hz' : Additive.ofMul z ∈ S.toSubmodule :=
+      (mem_elabSubmoduleSubgroupEquiv S.toSubmodule z).mp hz
+    have hs := S.apply_mem_toSubmodule y hz'
+    apply (mem_elabSubmoduleSubgroupEquiv S.toSubmodule _).mpr
+    change rho y (Additive.ofMul z) ∈ S.toSubmodule at hs
+    simpa [rho, lowerCentralLayerRepresentation_apply] using hs
+  have hAinv : IsAInvariant Y.subtype A := by
+    rw [isAInvariant_iff_smul_mem]
+    intro y x hx
+    change q ((y : MulAut P) x) ∈ J
+    have hxJ : q x ∈ J := hx
+    have hacted := hJinv.smul_mem y hxJ
+    have heq : q ((y : MulAut P) x) =
+        lowerCentralLayerAction Y.subtype 0 y (q x) := by
+      change QuotientGroup.mk' (lowerCentralLayerKernel P 0)
+          (⟨(y : MulAut P) x, _⟩ : lowerCentralTerm P 0) =
+        QuotientGroup.mk' (lowerCentralLayerKernel P 0)
+          (lowerCentralTermAction Y.subtype 0 y
+            (⟨x, _⟩ : lowerCentralTerm P 0))
+      apply congrArg (QuotientGroup.mk' (lowerCentralLayerKernel P 0))
+      apply Subtype.ext
+      rfl
+    rw [heq]
+    exact hacted
+  haveI : J.Normal := inferInstance
+  haveI : A.Normal := Subgroup.Normal.comap inferInstance q
+  let Ani : NormalInvariantSubgroup Y.subtype := ⟨A, inferInstance, hAinv⟩
+  have hPhi_le_A : frattiniNormalInvariant Y.subtype ≤ Ani := by
+    intro x hx
+    change q x ∈ J
+    have hxker : x ∈ q.ker := by
+      rw [show q.ker = frattini P from
+        layerZeroQuotientHom_ker_eq_frattini hP]
+      exact hx
+    rw [MonoidHom.mem_ker.mp hxker]
+    exact J.one_mem
+  have hA_le_top : Ani ≤ normalInvariantTop Y.subtype := by
+    change A ≤ (⊤ : Subgroup P)
+    exact le_top
+  rcases hcover.eq_or_eq hPhi_le_A hA_le_top with hAeqPhi | hAeqTop
+  · exfalso
+    apply hSne
+    apply Subrepresentation.toSubmodule_injective
+    change S.toSubmodule = ⊥
+    apply Phi.injective
+    change J = Phi ⊥
+    rw [Phi.map_bot]
+    have hAker : A = q.ker := by
+      calc
+        A = frattini P := congrArg Subtype.val hAeqPhi
+        _ = q.ker := (layerZeroQuotientHom_ker_eq_frattini hP).symm
+    apply le_antisymm
+    · intro z hz
+      obtain ⟨x, rfl⟩ := layerZeroQuotientHom_surjective P z
+      have hxA : x ∈ A := hz
+      have hxker : x ∈ q.ker := by rwa [← hAker]
+      exact MonoidHom.mem_ker.mp hxker
+    · exact bot_le
+  · apply Subrepresentation.toSubmodule_injective
+    change S.toSubmodule = ⊤
+    apply Phi.injective
+    change J = Phi ⊤
+    rw [Phi.map_top]
+    apply le_antisymm le_top
+    intro z _
+    obtain ⟨x, rfl⟩ := layerZeroQuotientHom_surjective P z
+    have hxA : x ∈ A := by
+      rw [show A = ⊤ from congrArg Subtype.val hAeqTop]
+      exact Subgroup.mem_top x
+    exact hxA
+
+/-- The denominator of the second lower-central layer is trivial under the
+xi-length-two hypotheses. -/
+theorem lowerCentralLayerKernel_one_eq_bot_of_xiLengthTwo
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype) :
+    lowerCentralLayerKernel P 1 = ⊥ := by
+  have hAmbientK1 : lowerCentralLayerKernelInAmbient P 1 = ⊥ := by
+    rw [lowerCentralLayerKernelInAmbient_eq,
+      show 1 + 1 = 2 by omega,
+      lowerCentralTerm_two_eq_bot hP hncomm hxi hlen, sup_bot_eq,
+      lowerCentralTerm_one_eq_frattini hP hncomm hxi hlen,
+      frattini_agemo_one_map_eq_bot hP hncomm hxi hlen]
+  rw [← lowerCentralLayerKernelInAmbient_subgroupOf P 1, hAmbientK1]
+  simp
+
+/-- The original xi-actor is transitive on the nonzero vectors of the actual
+second lower-central layer. -/
+theorem lowerCentralLayerOneRepresentation_transitive_of_xiLengthTwo
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype) :
+    ∀ v w : Additive (lowerCentralLayer P 1),
+      v ≠ 0 → w ≠ 0 →
+        ∃ y : Y, lowerCentralLayerRepresentation Y.subtype 1 y v = w := by
+  intro v w hv hw
+  obtain ⟨z, hz⟩ :=
+    QuotientGroup.mk'_surjective (lowerCentralLayerKernel P 1) v.toMul
+  obtain ⟨t, ht⟩ :=
+    QuotientGroup.mk'_surjective (lowerCentralLayerKernel P 1) w.toMul
+  have hzPhi : (z : P) ∈ frattini P := by
+    rw [← lowerCentralTerm_one_eq_frattini hP hncomm hxi hlen]
+    exact z.2
+  have htPhi : (t : P) ∈ frattini P := by
+    rw [← lowerCentralTerm_one_eq_frattini hP hncomm hxi hlen]
+    exact t.2
+  have hzsq : (z : P) ^ 2 = 1 := congrArg Subtype.val
+    (frattini_sq_eq_one hP hncomm hxi hlen ⟨z, hzPhi⟩)
+  have htsq : (t : P) ^ 2 = 1 := congrArg Subtype.val
+    (frattini_sq_eq_one hP hncomm hxi hlen ⟨t, htPhi⟩)
+  have hzne : (z : P) ≠ 1 := by
+    intro hz1
+    apply hv
+    apply Additive.toMul.injective
+    calc
+      v.toMul = QuotientGroup.mk' (lowerCentralLayerKernel P 1) z := hz.symm
+      _ = 1 := by
+        have : z = 1 := Subtype.ext hz1
+        rw [this]
+        exact map_one _
+  have htne : (t : P) ≠ 1 := by
+    intro ht1
+    apply hw
+    apply Additive.toMul.injective
+    calc
+      w.toMul = QuotientGroup.mk' (lowerCentralLayerKernel P 1) t := ht.symm
+      _ = 1 := by
+        have : t = 1 := Subtype.ext ht1
+        rw [this]
+        exact map_one _
+  obtain ⟨y, hyt⟩ := hxi.transitive (z : P) ⟨hzsq, hzne⟩
+    (t : P) ⟨htsq, htne⟩
+  refine ⟨y, ?_⟩
+  apply Additive.toMul.injective
+  change lowerCentralLayerAction Y.subtype 1 y v.toMul = w.toMul
+  rw [← hz, ← ht, lowerCentralLayerAction_apply_mk]
+  apply congrArg (QuotientGroup.mk' (lowerCentralLayerKernel P 1))
+  apply Subtype.ext
+  exact hyt
+
+/-- Higman's parameter (q-1), the number of involutions, is the number of
+nonzero vectors in the second lower-central layer. -/
+theorem involutions_ncard_eq_pow_finrank_lowerCentralLayer_one_sub_one
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype) :
+    (involutions P).ncard =
+      2 ^ Module.finrank (ZMod 2) (Additive (lowerCentralLayer P 1)) - 1 := by
+  classical
+  have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
+    fun h => hncomm ((commutator_eq_bot_iff P).mp h)
+  letI : Nontrivial (_root_.commutator P) :=
+    (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
+  letI : Nontrivial P :=
+    (_root_.commutator P).subtype_injective.nontrivial
+  have heq := commutator_eq_frattini_and_frattini_eq_center
+    hP hncomm hxi hlen
+  have hset : (frattini P : Set P) = insert 1 (involutions P) := by
+    ext x
+    constructor
+    · intro hx
+      by_cases hx1 : x = 1
+      · exact Set.mem_insert_iff.mpr (Or.inl hx1)
+      · exact Set.mem_insert_iff.mpr (Or.inr
+          ⟨congrArg Subtype.val
+            (frattini_sq_eq_one hP hncomm hxi hlen ⟨x, hx⟩), hx1⟩)
+    · intro hx
+      rcases Set.mem_insert_iff.mp hx with hx1 | hxinv
+      · subst x
+        exact (frattini P).one_mem
+      · rw [heq.2]
+        exact involutions_subset_center_of_transitive
+          hP Y hxi.transitive hxinv
+  have hcardPhi :
+      Nat.card ↥(frattini P) = (involutions P).ncard + 1 := by
+    calc
+      Nat.card ↥(frattini P) = (frattini P : Set P).ncard :=
+        Nat.card_coe_set_eq _
+      _ = (insert 1 (involutions P)).ncard := by rw [hset]
+      _ = (involutions P).ncard + 1 := by
+        rw [Set.ncard_insert_of_notMem]
+        simp [involutions]
+  have hK1 : lowerCentralLayerKernel P 1 = ⊥ :=
+    lowerCentralLayerKernel_one_eq_bot_of_xiLengthTwo
+      hP hncomm hxi hlen
+  have hcardLayer :
+      Nat.card (lowerCentralLayer P 1) = Nat.card ↥(frattini P) := by
+    change Nat.card
+      (↥(lowerCentralTerm P 1) ⧸ lowerCentralLayerKernel P 1) =
+        Nat.card ↥(frattini P)
+    rw [hK1]
+    calc
+      Nat.card
+          (↥(lowerCentralTerm P 1) ⧸
+            (⊥ : Subgroup ↥(lowerCentralTerm P 1))) =
+          Nat.card ↥(lowerCentralTerm P 1) :=
+        Nat.card_congr QuotientGroup.quotientBot.toEquiv
+      _ = Nat.card ↥(frattini P) :=
+        Nat.card_congr
+          (MulEquiv.subgroupCongr
+            (lowerCentralTerm_one_eq_frattini hP hncomm hxi hlen)).toEquiv
+  have hpow := lowerCentralLayer_card_eq_pow_finrank P 1
+  rw [hcardLayer, hcardPhi] at hpow
+  omega
+
+/-- If every prime divisor of the original actor order divides Higman's
+(q-1), then that actor has odd order. -/
+theorem actor_card_odd_of_primeSupport_xiLengthTwo
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype)
+    (hsupp : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    Odd (Nat.card Y) := by
+  letI : Nontrivial (lowerCentralLayer P 1) :=
+    lowerCentralLayer_one_nontrivial_of_not_isMulCommutative hP hncomm
+  letI : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
+  have hnpos : 0 < Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer P 1)) := Module.finrank_pos
+  have hcard :=
+    involutions_ncard_eq_pow_finrank_lowerCentralLayer_one_sub_one
+      hP hncomm hxi hlen
+  have hinvpos : 0 < (involutions P).ncard := by
+    rw [hcard]
+    exact Nat.sub_pos_of_lt (Nat.one_lt_pow hnpos.ne' (by omega))
+  have hinv : (involutions P).Nonempty :=
+    (Set.ncard_pos (s := involutions P)).mp hinvpos
+  have hinvodd := involutions_ncard_odd_of_isPGroup hP hinv
+  exact Nat.not_even_iff_odd.mp fun hYeven =>
+    hinvodd.not_two_dvd_nat
+      (hsupp 2 Nat.prime_two (Even.two_dvd hYeven))
+
+/-- The first lower-central layer of a noncommutative finite 2-group is
+nontrivial.  This supplies the nonzero carrier needed by the field model. -/
+theorem lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (_hxi : IsXiActor Y)
+    (_hlen : HasXiLengthTwo Y.subtype) :
+    Nontrivial (lowerCentralLayer P 0) := by
+  have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
+    fun h => hncomm ((commutator_eq_bot_iff P).mp h)
+  letI : Nontrivial (_root_.commutator P) :=
+    (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
+  letI : Nontrivial P :=
+    (_root_.commutator P).subtype_injective.nontrivial
+  have hPhi_ne_top : frattini P ≠ (⊤ : Subgroup P) :=
+    frattini_ne_top_of_nontrivial
+  have hPhi_lt_top : frattini P < (⊤ : Subgroup P) :=
+    lt_of_le_of_ne le_top hPhi_ne_top
+  obtain ⟨x, -, hxPhi⟩ := SetLike.exists_of_lt hPhi_lt_top
+  let q : P →* lowerCentralLayer P 0 := layerZeroQuotientHom P
+  have hqx : q x ≠ 1 := by
+    intro hx
+    apply hxPhi
+    have hxker : x ∈ q.ker := MonoidHom.mem_ker.mpr hx
+    rwa [show q.ker = frattini P from
+      layerZeroQuotientHom_ker_eq_frattini hP] at hxker
+  exact ⟨q x, 1, hqx⟩
+
+/-- **Higman Lemma 11 (pp. 87–89), field model for the original actor.**
+
+Assume, as Higman does after the reduction in Section 6, that every prime
+divisor of the original cyclic actor order divides the number of involutions.
+Then a generator of that same actor acts on the first lower-central layer as
+multiplication by an element which generates the full field.  If the first
+and second layer dimensions are `m` and `n`, respectively, then
+`n ∣ m` and `m / n` is odd.
+
+The auxiliary prime-supported subgroup is used only to prove
+`2 ^ n - 1 ∣ Nat.card Y`; the irreducible representation is never
+restricted from `Y` to that subgroup. -/
+theorem exists_originalXiActor_degree_dvd_and_odd_quotient
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype)
+    (hsupp : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    let m := Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer P 0))
+    let n := Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer P 1))
+    ∃ (c : Y)
+      (e : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2]
+        GaloisField 2 m)
+      (mu : Y →* (GaloisField 2 m)ˣ),
+      (∀ g : Y, g ∈ Subgroup.zpowers c) ∧
+      Function.Injective mu ∧
+      (∀ (g : Y) (v : Additive (lowerCentralLayer P 0)),
+        e (lowerCentralLayerRepresentation Y.subtype 0 g v) =
+          (mu g : GaloisField 2 m) * e v) ∧
+      orderOf (mu c : GaloisField 2 m) = Nat.card Y ∧
+      Algebra.adjoin (ZMod 2)
+        ({(mu c : GaloisField 2 m)} : Set (GaloisField 2 m)) = ⊤ ∧
+      n ∣ m ∧ Odd (m / n) := by
+  dsimp only
+  let m := Module.finrank (ZMod 2)
+    (Additive (lowerCentralLayer P 0))
+  let n := Module.finrank (ZMod 2)
+    (Additive (lowerCentralLayer P 1))
+  letI : IsCyclic Y := hxi.cyclic
+  letI : CommGroup Y := IsCyclic.commGroup
+  letI : Nontrivial (lowerCentralLayer P 0) :=
+    lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
+      hP hncomm hxi hlen
+  letI : Nontrivial (Additive (lowerCentralLayer P 0)) := inferInstance
+  letI : Nontrivial (lowerCentralLayer P 1) :=
+    lowerCentralLayer_one_nontrivial_of_not_isMulCommutative hP hncomm
+  letI : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
+  have hm : 0 < m := Module.finrank_pos
+  have hn : 0 < n := Module.finrank_pos
+  have hcard : (involutions P).ncard = 2 ^ n - 1 :=
+    involutions_ncard_eq_pow_finrank_lowerCentralLayer_one_sub_one
+      hP hncomm hxi hlen
+  have hinvpos : 0 < (involutions P).ncard := by
+    rw [hcard]
+    exact Nat.sub_pos_of_lt (Nat.one_lt_pow hn.ne' (by omega))
+  have hinv : (involutions P).Nonempty :=
+    (Set.ncard_pos (s := involutions P)).mp hinvpos
+  obtain ⟨B, hBY, -, -, hInvDvdB, -⟩ :=
+    exists_primeSupported_cyclic_actor
+      Y hxi.cyclic hxi.transitive hinv
+  have hbase : 2 ^ n - 1 ∣ Nat.card Y := by
+    rw [← hcard]
+    exact hInvDvdB.trans (Subgroup.card_dvd_of_le hBY)
+  have hsupp' : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ 2 ^ n - 1 := by
+    intro p hp hpY
+    rw [← hcard]
+    exact hsupp p hp hpY
+  have hirr : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation Y.subtype 0) :=
+    lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
+      hP hncomm hxi hlen
+  have hYodd : Odd (Nat.card Y) :=
+    actor_card_odd_of_primeSupport_xiLengthTwo
+      hP hncomm hxi hlen hsupp
+  have hfaith : Function.Injective
+      (lowerCentralLayerRepresentation Y.subtype 0) :=
+    lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
+      hP Y.subtype Y.subtype_injective hYodd
+  obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
+  obtain ⟨e, mu, hmu, hcompat⟩ :=
+    OddOrder.RepresentationTheory.exists_galoisFieldLinearModel_of_faithful_irreducible
+      (lowerCentralLayerRepresentation Y.subtype 0)
+      m hm.ne' rfl hirr hfaith
+  have hcorder : orderOf c = Nat.card Y :=
+    orderOf_eq_card_of_forall_mem_zpowers hcgen
+  have hlambdaOrder :
+      orderOf (mu c : GaloisField 2 m) = Nat.card Y :=
+    orderOf_units.trans ((orderOf_injective mu hmu c).trans hcorder)
+  have hgen : Algebra.adjoin (ZMod 2)
+      ({(mu c : GaloisField 2 m)} : Set (GaloisField 2 m)) = ⊤ :=
+    OddOrder.RepresentationTheory.adjoin_generator_eq_top_of_irreducible_linearModel
+      (lowerCentralLayerRepresentation Y.subtype 0)
+      hirr e mu hcompat c hcgen
+  have hdegree :=
+    OddOrder.RepresentationTheory.galoisField_degree_dvd_and_odd_quotient_of_primeFactors_dvd
+      hn hm Nat.card_pos (mu c : GaloisField 2 m)
+      hgen hlambdaOrder hbase hsupp'
+  exact ⟨c, e, mu, hcgen, hmu, hcompat, hlambdaOrder, hgen,
+    hdegree.1, hdegree.2⟩
 
 /-! ## Assembling the actual anchored trace formula -/
 

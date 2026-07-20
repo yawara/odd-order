@@ -794,6 +794,56 @@ theorem exists_galoisFieldLinearModel_of_faithful_irreducible
   rw [← hsmul c v]
   exact hcompat c v
 
+/-- In an irreducible finite-field linear model, the image of a cyclic actor
+generator generates the whole Singer field over the ground field. -/
+theorem adjoin_generator_eq_top_of_irreducible_linearModel
+    {C V : Type uSinger} [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V] [Module (ZMod 2) V] [Finite V] [Nontrivial V]
+    (rho : Representation (ZMod 2) C V)
+    (hirr : Representation.IsIrreducible rho) {m : Nat}
+    (e : V ≃ₗ[ZMod 2] GaloisField 2 m)
+    (mu : C →* (GaloisField 2 m)ˣ)
+    (hcompat : ∀ g v, e (rho g v) = (mu g : GaloisField 2 m) * e v)
+    (c : C) (hcgen : ∀ g : C, g ∈ Subgroup.zpowers c) :
+    Algebra.adjoin (ZMod 2)
+      ({(mu c : GaloisField 2 m)} : Set (GaloisField 2 m)) = ⊤ := by
+  let lambda : GaloisField 2 m := mu c
+  let A : Subalgebra (ZMod 2) (GaloisField 2 m) :=
+    Algebra.adjoin (ZMod 2) ({lambda} : Set (GaloisField 2 m))
+  let W : Subrepresentation rho :=
+    { toSubmodule := A.toSubmodule.comap e.toLinearMap
+      apply_mem_toSubmodule := by
+        intro g v hv
+        change e (rho g v) ∈ A
+        rw [hcompat]
+        apply A.mul_mem
+        · have hgpow : g ∈ Submonoid.powers c :=
+            (isOfFinOrder_of_finite c).mem_powers_iff_mem_zpowers.mpr (hcgen g)
+          obtain ⟨k, rfl⟩ := hgpow
+          change (mu (c ^ k) : GaloisField 2 m) ∈ A
+          rw [map_pow]
+          exact A.pow_mem
+            (Algebra.self_mem_adjoin_singleton (ZMod 2) lambda) k
+        · exact hv }
+  have hWne : W ≠ ⊥ := by
+    intro hW
+    have hone : e.symm (1 : GaloisField 2 m) ∈ W := by
+      change e (e.symm (1 : GaloisField 2 m)) ∈ A
+      rw [e.apply_symm_apply]
+      exact A.one_mem
+    rw [hW] at hone
+    have hzero : e.symm (1 : GaloisField 2 m) = 0 := hone
+    have : (1 : GaloisField 2 m) = 0 := by
+      rw [← e.apply_symm_apply (1 : GaloisField 2 m), hzero, map_zero]
+    exact one_ne_zero this
+  letI : Representation.IsIrreducible rho := hirr
+  have hWtop : W = ⊤ := (eq_bot_or_eq_top W).resolve_left hWne
+  rw [eq_top_iff]
+  intro x _
+  have hx : e.symm x ∈ W := by rw [hWtop]; exact Submodule.mem_top
+  change e (e.symm x) ∈ A at hx
+  simpa [A, lambda] using hx
+
 /-- A faithful irreducible abelian representation admits a simultaneous
 Frobenius-conjugate eigenbasis over its Singer field model. Every ground
 vector has the normalized Frobenius-power coordinates in that same basis. -/
