@@ -243,8 +243,28 @@ noncomputable def inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
 ⟹ 呼び出し側が `typePACore_toHypothesis46_core` の `h46` をそのまま渡し、
 `hKeq`/`hHeq` は `rfl` 相当で埋める想定。
 
-**残り**: (c) `sOf_degreeSubfamily_isCoherent` (S13_Lemmas113To115.lean:588) の
-§10 依存を (b) で置換 → (d) (9.11) statement 本体。
+### ⚠ (c) は「差し替え」にならない — 実測して方針変更 (2026-07-20)
+
+当初 (c) を「`sOf_degreeSubfamily_isCoherent` (S13_Lemmas113To115.lean:588) の §10 依存を
+(b) で置換」と書いていたが、**τ と A₀ が一致しないので drop-in にはできない**:
+
+- §13 版の結論は `S07.IsCoherent hyp.base.tau {cut} hyp.base.A0` で、
+  `hyp.base.A0 = supportInSubgroup (typePA0 M typeP) M` (= **A₀(M)**, しかも P₁ 域の `typePA0`)、
+  `hyp.base.tau = dadeIntegralCharacterMap hyp.dadeData.dade …`
+  (`hyp.dadeData : DadeSupportHypothesisData M (typePA0 M typeP)`)。
+- (b) の結論は `A` について一様だが、`h46 : Hypothesis46Core A M` と
+  `dd : DadeSupportHypothesisData M A` が**同じ `A`** を共有する形。書籍の (4.6) は
+  `A = A(M)` で立つ (`typePACore_toHypothesis46_core` の結論も `Hypothesis46 (typePACore M) M`)
+  ので、(b) が自然に落ちるのは **A(M) 上**であって A₀(M) 上ではない。
+- `A(M) ⊆ A₀(M)` だが `IsCoherent τ S A` の `A` は単純な単調性を持たないので、
+  「小さい台での coherence」から §13 の文が出るわけではない。
+
+⟹ **(c) は削除**。§13 版は §11 packaging 自身の文として現状のまま残し、
+**§9 レベルの (9.11) は (b) の τ/A の上で述べる** (= (d) を直接やる) のが正しい。
+§13 版との接続が要るなら、それは packaging 層の辞書 (9163 §3 項目 4) の話であって
+base coherence の差し替えではない。
+
+**残り**: (d) §9 レベルの (9.11) statement 本体 — (b) の τ/A の上で。
 
 ### (参考) 実装レシピ
 
