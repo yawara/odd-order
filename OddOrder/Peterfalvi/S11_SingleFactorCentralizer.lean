@@ -115,7 +115,7 @@ theorem xiOf_H0Cprime_source_apply_one_le_u {data : TypesIIIIIIVSetup M}
     haveI : IsMulCommutative (↥(hInHu data ⊔ cInHu data chief) ⧸
         commutator ↥(hInHu data ⊔ cInHu data chief)) :=
       inferInstanceAs (IsMulCommutative (Abelianization ↥(hInHu data ⊔ cInHu data chief)))
-    refine OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+    refine apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
       (N := commutator ↥(hInHu data ⊔ cInHu data chief)) ψ ?_
     intro g hg
     refine liesOver_mem_characterKernel hψover ?_

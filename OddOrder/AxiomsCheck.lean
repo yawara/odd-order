@@ -10960,6 +10960,21 @@ the normality that makes `↑(R₀ ⊔ T) = ↑R₀ * ↑T` is found by inferenc
 hypothesis on `S` is *not* used: narrowness alone drives Theorem 5.3(d) here. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.sup_centralizer_eq_top
 
+/-! **BG Theorem E.3(b), Step 2, (E.7)** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`RegularOperatorSetup.commutator_eq_and_card_quotient` — `H₁ = S'` and `|S/S'| = p²`.
+
+`|S : H₁| = p²` from `|S : T| = p` (E.5) and `|T : H₁| = p` (E.6); then `S/H₁` has order `p²`
+hence is abelian, giving `S' ≤ H₁`, while `H₁ = ⁅T,S⁆ ≤ ⁅S,S⁆ = S'` is immediate.  BG routes
+the second inclusion through `[R₀,T]`; going through `⁅T,S⁆` is shorter and uses the chain's
+own definition.
+
+⚠ This carries `3 ≤ pRank S`, so with `S = Ω₁(R)` it does **not** yet discharge E.3(b)'s third
+clause `|Ω₁(R)/(Ω₁(R))'| = p²`: that still needs BG's `|S| ≤ p³` branch, where (unlike the
+`R₀ ⊄ S'` clause, which fell out of `S' ≤ Z(S)` alone) the order-`p²`/`p³` case analysis does
+appear to be needed, and `R₀ < S` *properly* starts to matter. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.commutator_eq_and_card_quotient
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

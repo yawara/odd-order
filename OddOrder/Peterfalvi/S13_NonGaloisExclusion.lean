@@ -199,7 +199,7 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     exact columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent hG hyp ⟨1, hw2⟩ hk1
       (S_H0C_not_coherent_unconditional hG hyp) hyp.type_alt
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+    OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
       x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C →
       x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -234,7 +234,7 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     rw [hCU]
     exact hlamU'
   have hlamc : lam.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hlammem
+    OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hlammem
   -- `u ≠ 0` (else `μ(1) = 0`), hence `m ≥ 2`
   have humpos : (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u ≠ 0 := by
     intro h0

@@ -305,12 +305,16 @@ theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Finite κ]
         exact ⟨fun hrP => hPj (congrArg Prod.snd hrP).symm, fun hrQ => hr (congrArg Prod.fst hrQ)⟩
     obtain ⟨r₁, r₂, hr12, hr1d, hr2d⟩ := exists_two_ne_ne h3 d
     have hG1 : G (r₁, j₀) ≠ 0 := by
-      have := hcol r₁; rw [ha, if_neg (Ne.symm (hnonδ r₁ hr1d).1),
-        if_neg (Ne.symm (hnonδ r₁ hr1d).2)] at this; rw [show G (r₁, j₀) = c by linear_combination this]
+      have := hcol r₁
+      rw [ha, if_neg (Ne.symm (hnonδ r₁ hr1d).1),
+        if_neg (Ne.symm (hnonδ r₁ hr1d).2)] at this
+      rw [show G (r₁, j₀) = c by linear_combination this]
       exact hc
     have hG2' : G (r₂, j₀) ≠ 0 := by
-      have := hcol r₂; rw [ha, if_neg (Ne.symm (hnonδ r₂ hr2d).1),
-        if_neg (Ne.symm (hnonδ r₂ hr2d).2)] at this; rw [show G (r₂, j₀) = c by linear_combination this]
+      have := hcol r₂
+      rw [ha, if_neg (Ne.symm (hnonδ r₂ hr2d).1),
+        if_neg (Ne.symm (hnonδ r₂ hr2d).2)] at this
+      rw [show G (r₂, j₀) = c by linear_combination this]
       exact hc
     have hsub : ({(r₁, j₀), (r₂, j₀), Off} : Set (ι × κ)) ⊆ {x | G x ≠ 0} := by
       intro x hx; rcases hx with rfl | rfl | rfl

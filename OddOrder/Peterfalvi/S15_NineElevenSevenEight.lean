@@ -197,7 +197,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
   have hlam₁c_S₄ : lam₁.conj ∈ {φ ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetupS hG)
       (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) |
       IsIrreducibleCharacter φ ∧ φ ∉ S₂} := by
-    refine ⟨OddOrder.Peterfalvi.S13.Hypothesis.sOf_closedUnderConjugate
+    refine ⟨OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate
       (hyp.toTypesIIIIIIVSetupS hG) _ hlam₁sOfC, hlam₁irr.conj, ?_⟩
     intro hmem
     apply hlam₁nS₂

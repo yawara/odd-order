@@ -83,7 +83,8 @@ private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : 
       intro G _ _ _ V _ _ ρ _ _ hcard
       by_cases hntG : Nontrivial G
       · -- `G` nontrivial: reduce to a prime-index normal subgroup `H`.
-        obtain ⟨H, hHnorm, hHprime⟩ := OddOrder.GroupTheory.exists_normal_index_prime_of_solvable (Q := G) hntG
+        obtain ⟨H, hHnorm, hHprime⟩ :=
+          GroupTheory.exists_normal_index_prime_of_solvable (Q := G) hntG
         haveI := hHnorm
         -- `|H| · [G:H] = |G|`, `[G:H]` prime, so `|H| < |G| ≤ n+1`, giving `|H| ≤ n`.
         have hcardH : Nat.card ↥H * H.index = Nat.card G := Subgroup.card_mul_index H

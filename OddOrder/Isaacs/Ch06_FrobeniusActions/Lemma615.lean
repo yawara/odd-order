@@ -201,7 +201,7 @@ private lemma card_commutator_eq_prime_of_lem_6_15
       Nat.card (_root_.commutator T) * Nat.card (C ⊓ Subgroup.center T : Subgroup T)
         = Nat.card C := by
     refine
-      OddOrder.Isaacs.Ch04.card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+      Ch04.card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
       (A := C) ?_ ?_
     · -- C abelian (cyclic)
       intro a ha b hb

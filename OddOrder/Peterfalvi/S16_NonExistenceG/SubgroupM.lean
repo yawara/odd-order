@@ -295,7 +295,7 @@ theorem t_side_caseB_fieldModel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
         (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
       rw [hyp.base.card_V_eq_vd, hd1, mul_one, hv]
     obtain ⟨e, μ, hμinj, hμrange, hcompat₀⟩ :=
-      OddOrder.RepresentationTheory.ConjugationFieldModel.exists_normOne_galoisField_conjugation_repr
+      ConjugationFieldModel.exists_normOne_galoisField_conjugation_repr
         hyp.base.q_prime hyp.base.p_prime hyp.base.p_odd hQ_elemAb hVcomm hVN hcardQ hcardV hfaith
     refine ⟨e, μ, hμinj, hμrange, fun v x => ?_⟩
     have h := hcompat₀ v x

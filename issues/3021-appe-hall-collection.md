@@ -438,10 +438,20 @@ private helper: `normal_iterCommutator` / `iterCommutator_antitone` /
    **instance として既存** (`GroupTheory.centralizer_omega1UpperCentralTwo_characteristic`)
    なので、`↑(R₀ ⊔ T) = ↑R₀ * ↑T` の正規性は推論で見つかる。⚠ 指数 p 仮説は不要だった。
    ⟹ **(E.5) が完全にそろった**。
-2. **(E.7)(E.8)**: `H₁ = S₂` かつ `|S/S'| = p²`、帰納で `H_i = S_{i+1}`。
-   `S = R₀T` と `H₁ = ⁅R₀,T⁆` から: `|S/H₁| = p²` (`|S/T| = p`, `|T/H₁| = p`) と
-   `S₂ = ⁅S,S⁆ ≤ H₁ = ⁅R₀,T⁆ ≤ S₂`。⟹ **E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²`**。
-   **次に着手するのはここ**。
+2. ✅ **(E.7) 完了** (`commutator_eq_and_card_quotient`): `H₁ = S'` かつ `|S/S'| = p²`。
+   `|S:H₁| = p²` は `|S:T| = p` (E.5) + `|T:H₁| = p` (E.6) から。`S/H₁` は位数 p² ゆえ
+   アーベル ⟹ `S' ≤ H₁`。逆は `H₁ = ⁅T,S⁆ ≤ ⁅S,S⁆ = S'` (BG は `[R₀,T]` 経由だが
+   鎖の定義そのものを使う方が短い)。
+
+   ⚠ **これは `3 ≤ pRank S` を仮定するので、`S = Ω₁(R)` に入れても E.3(b) 第 3 節は
+   まだ閉じない**。`|S| ≤ p³` 分岐が要る。⚠ `R₀ ⊄ S'` の分岐 (`S' ≤ Z(S)` だけで済んだ)
+   と違い、こちらは**位数 p²/p³ の場合分けが実際に要りそう**:
+   - `S` アーベル: `S ≤ C_R(R₀)` ⟹ `pRank ≤ 2` + 指数 p ⟹ `|S| ≤ p²`。
+     `R₀ < S` (真) ⟹ `|S| ≥ p²` ⟹ `|S| = p²`、`S' = ⊥`、`|S/S'| = p²` ✓
+   - `S` 非アーベル (⟹ `|S| = p³`): `cl(S) ≤ 2` ⟹ `S' ≤ Z(S)`、`S' ≠ 1`;
+     `S/Z(S)` 非巡回 (mathlib `isMulCommutative_of_isCyclic_quotient_center_self` の対偶)
+     ⟹ `|Z(S)| = p` ⟹ `S' = Z(S)`、`|S/S'| = p²` ✓
+   ⟹ **ここで初めて BG の「`R₀ < S` 真部分群」仮説が効く**。**次に着手するのはここ**。
 2. **(E.9)-(E.12)**: 固有値 `r_i ≡ r₀ r^i (mod p)`、`A` regular + Prop 1.5(d) ⟹
    `r_i ≢ 1`、`r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| = p·pⁿ ≤ p^q`。⟹ **E.3(c)**。
    ⚠ ここは鎖の **A-不変性**が要る (今の鎖は A-不変性を主張していない —

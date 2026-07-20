@@ -70,6 +70,36 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 - 4 宣言とも axiom-clean、AxiomsCheck 登録済。型限定の `|W₂| = p` は carrier field
   `ChiefFactorData.typeIII_IV_p_eq_W2` として残る (そこが本来の居場所)。
 
+## 進捗 (2026-07-20)
+
+### ✅ 上流 prerequisite: (8.15) が全 3 主張とも型一様になった (issue 1042/1046, close 済)
+
+書籍では (9.11) の base subfamily coherence が **(8.15.3) 経由**なので、
+`S10.typePACore_subcoherent` (型仮定 `IsTypeP` のみ) が揃ったことで素材ができた。
+現状の repo は代わりに §10 engine (`inducedFamily_degreeSubfamily_isCoherent`) を経由している。
+
+### ✅ 着手順 2 の再配置 (§9 の事実を §9 へ戻す)
+
+- `sSet_finite` : `S15_SAndT_Setup/HypothesisBasics` (ns `S15`) → `S11_.../CliffordData` (ns `S11`)
+  — commit 998d28af5。
+- `sOf_closedUnderConjugate` : `S13_MaximalIII_IVBasic` (ns **`S13.Hypothesis`**) →
+  `S11_.../ThetaCountAssembly` (ns `S11`)。
+  ⚠ `namespace Hypothesis` の内側に居たので実名は `S13.Hypothesis.sOf_closedUnderConjugate`
+  で、consumer は `Hypothesis.sOf_closedUnderConjugate` と書いていた — **§9 の事実が §11 の
+  packaging 名を着ていた**。10 ファイルを修飾し直し (残余 0 を grep 確認)。
+  ⚠ 置き場は `CliffordData` では**不可**: 証明が `induceHU_eq_induce`
+  (`SummandComplementKernel`) を使う。S11 ディレクトリの import 鎖は
+  `WielandtSetup → ChiefFactorCore → CliffordData → InertiaLift → CuS0 → CharacterCounts →
+  Coherence911 → CaseBXi → InnerCompHom → SummandComplementKernel → ThetaCountAssembly`
+  なので最下流の `ThetaCountAssembly` が正しい home。
+
+### ⛏ 残り
+
+- `irrCut_conjClosed` (`S13_MaximalIII_IV.lean:92`) の一般化 — `hyp : S13.Hypothesis M` を
+  取るが実際に使うのは `hyp.s11Setup` と `hyp.base.finiteG` だけ。`data : TypesIIIIIIVSetup M`
+  へ引数化する。
+- その後に §9 レベルの (9.11) statement 本体 (着手順 1)。
+
 ## 着手順 (残り)
 
 1. **§9 レベルの (9.11) statement を立てる** — `(data : TypesIIIIIIVSetup M)`
