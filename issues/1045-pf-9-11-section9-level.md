@@ -657,7 +657,37 @@ H0supC_le_derived, W1_inf_H0supC_subgroupOf_eq_bot, W2_not_le_H0supC, card_W2bar
 | `hAbase` | degree-`qa` 既約 cut の coherence | ⚠ **τ/A の seam あり (下記)** |
 | `hArefute` | maximality refuter = §9 chain 本体 | ⛏ `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin` の `S13.Hypothesis` 降ろし |
 
-#### ⚠ 実測した τ/A の seam — `hAbase` は `sOf_degreeSubfamily_coherent` の drop-in にならない
+#### ✅ τ/A の seam は解消した (2026-07-20) — 正しい合流点は **A(M) 側**
+
+書籍 (9.5) は「τ = (A(M), M, G) に関する Dade isometry」なので、**(9.11) は A-level で述べる**のが
+正しい (T 側の先例 `S15.Hypothesis.sSet_coherent_indT_A` も台が `supportInSubgroup (typePACore T) T`)。
+⟹ 動かすべきは case B の方 (A₀ ⇝ A) で、これは**易しい向き**:
+
+- `S11.sOf_caseB_coherent_restrict` を landed。
+  - 台の縮小は `S07.isCoherent_of_supportedSpan_le` (含意は `A ⊆ A₀` の単調性のみ)。
+  - 写像の載せ替えは `IsCoherent.congrMap` +
+    `S08.dadeIntegralCharacterMap_restrict_eq_of_support`
+    (A-Dade = A₀-Dade の制限。`typePData_toHypothesis46_ofSupport` が
+    `dade := dade0.restrict Set.subset_union_left hAnorm` と置いているので構成上そう)。
+  - witness は `η̄ − η`: 奇数位数ゆえ非零、かつ **(4.7) 評価
+    (`S10.inducedNonKernelFamily_diff_support`) で A-supported**。
+    ⚠ `sOf_anchor_diff_support` が与える A₀-supported では足りない。この (4.7) の鋭さが要。
+
+⚠ **再層化を 1 件実施**: `isCoherent_of_supportedSpan_le` は `IsCoherent` だけの一般事実なのに
+`S13_Lemmas113To115` に在り、§9 の leaf (S13 の上流) から import できなかった。
+`S07_PivotCoherence` へ移設し S13 の 2 呼び出しを修飾し直した。
+
+#### ⛏ 次の一手: `sOf_nineEleven_coherent` を A-level に述べ直す
+
+現状の `sOf_nineEleven_coherent` は A₀ 上で述べてあり、case A の `hAbase` を A₀ 側で要求している。
+A-level に直せば **`hAbase` は `sOf_degreeSubfamily_coherent` の drop-in になる** (両方 A 上)。
+必要な追加入力は `dd : DadeSupportHypothesisData M A` と
+`hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm` の pin
+(`typePACore_toHypothesis46_core` 側では `rfl` 相当のはず — 未確認)。
+
+⟹ 残るのは `hArefute` (= §9 chain 本体の `S13.Hypothesis` 降ろし) だけになる見込み。
+
+#### (解決済の記録) 当初の見立て — `hAbase` は `sOf_degreeSubfamily_coherent` の drop-in にならない
 
 - `sOf_degreeSubfamily_coherent` (本 issue で landed) の結論は
   `IsCoherent (inducedNonKernelFamily_subcoherent …).tau {cut} (supportInSubgroup **A** M)`。
