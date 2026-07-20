@@ -1135,4 +1135,22 @@ theorem RegularOperatorSetup.inf_derived_omega_eq_bot [Finite R] [Finite B]
     exact heq ▸ inf_le_right
 
 
+/-- **`Φ(Ω₁(R)) = (Ω₁(R))'`** in ambient form — BG's *"Note that `Φ(S) = S'`, because `S`
+has exponent `p`"*, with `S = Ω₁(R)`.
+
+`frattini_eq_commutator_of_exponent_prime` inside the group `↥Ω₁(R)` (whose exponent is `p`
+by E.3(b)'s first clause), transported along `Subgroup.subtype`.
+
+This is the bridge the statement of E.3(d) needs: it is phrased with `frattiniInG`, while
+Step 4's counting runs on the derived subgroup. -/
+theorem RegularOperatorSetup.frattiniInG_omega_eq_derivedInG [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    frattiniInG (Omega R p 1) = derivedInG (Omega R p 1) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  unfold frattiniInG derivedInG
+  congr 1
+  exact frattini_eq_commutator_of_exponent_prime (hyp.R_pGroup.to_subgroup _)
+    (fun x => Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2))
+
+
 end OddOrder.BG.AppE
