@@ -466,9 +466,17 @@ obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
 の `toCertainTypeHypothesis`/`toHypothesis` 相当) の形で述べ、
 `S06.induce_not_isIrreducible_iff` から直接出せばよい。`certainTypeR` もその形で組める。
 
-⚠ 要確認: `S10.typePACore_toHypothesis46_core` は `S06.Hypothesis46` を返す。そこから
-`S06.Hypothesis` (= `toCertainTypeHypothesis.toHypothesis` 相当) をどう取り出すかを実測すること
-(§10 側は `hyp.toCertainTypeHypothesis hG hG.odd` 経由)。
+✅ **実測 (2026-07-20)**: `structure Hypothesis46 A L extends CertainTypeHypothesis A L`
+(S06_CertainHypothesis46.lean:82) なので、`S06.Hypothesis` の取り出しは
+
+```
+h46.toCertainTypeHypothesis.toHypothesis   -- : S06.Hypothesis ↥M
+```
+
+(`Hypothesis46.toCore` が実際にこの形で `toHypothesis` を作っている)。
+⟹ `h46₉ := S10.typePACore_toHypothesis46_core data.typeP hG.odd hHall dade0 hconj hW2σ hσK` から
+`h46₉.toCertainTypeHypothesis.toHypothesis` で §6 `Hypothesis` が取れる。
+これで `S06.induce_not_isIrreducible_iff` / `S06.columnSum` / `S06.certainTypeR` が §9 で使える。
 
 **⟹ case B は全体として「新規の数学ゼロ、§6 形に留まる述べ直し」に落ちた。**
 
