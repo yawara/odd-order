@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+import OddOrder.Peterfalvi.S08_GeneralAdjoin
 
 /-!
 # Peterfalvi Appendix E: The Feit-Sibley Theorem
@@ -243,43 +244,118 @@ variable {L : Type*} [Group L] [Fintype L] [Fintype G]
 variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
 variable {S : Set (ClassFunction L ℂ)} {A : Set L}
 
+open scoped Classical in
 /-- **Peterfalvi Appendix IV, Lemma 1(a)** (p. 144; Isaacs, *Character Theory of
-Finite Groups*, Theorem 7.14).  Let `𝒮 = 𝒮₀ ∪ {ψ}` with `(𝒮₀, τ)` coherent, and
-suppose some `χ₀ ∈ 𝒮₀` satisfies
+Finite Groups*, Theorem 7.14) — the degree-bound coherence adjoin, in **pair-adjoin
+form**, wired to the general engine.
 
-`χ₀(1) ∣ ψ(1)`  and  `2 χ₀(1) ψ(1) < ∑_{χ ∈ 𝒮₀} χ(1)²`.
+Adjoin a non-real irreducible conjugate pair `{χ, χ̄} ⊆ 𝒮` to a coherent subfamily
+`(𝒮₁, τ)` (`𝒮₁ ⊆ 𝒮`, `χ, χ̄ ⊥ 𝒮₁`, orthonormal), given
 
-Then `(𝒮, τ)` is coherent.
+* an orthonormal, conjugate-closed member family `{χmem i}ᵢ∈ₛ` enumerating `𝒮₁`
+  (`hcover`/`hmemS1`; unit norm and conjugate-closedness come from `𝒮 ⊆ Irr(H)` at the
+  call site), with absolute degrees `degMem i = χmem i (1)` (`hdegMem`);
+* a distinguished anchor `χmem i₁ ∈ 𝒮₁` (`degMem i₁ > 0`) whose degree **divides every
+  member degree** (`hdvd`, so the ratios `χmem i (1)/χmem i₁(1)` are integers) and
+  divides `χ(1)` (`χ(1) = a · χmem i₁(1)`, `hχdeg`);
+* the `A`-support of the conjugate differences and of the degree-matched scaled
+  differences `χmem i₁(1)·χmem i − χmem i(1)·χmem i₁` (`hmemdiffsupp`/`hdegdiffsupp`; the
+  Lemma 2(a) content that `𝒮` vanishes off `Q`), and the integrality
+  `τ(χ − a·χmem i₁) ∈ ℤ[Irr G]`;
+* Peterfalvi's degree inequality `2·χ(1)·χmem i₁(1) < ∑ χmem i (1)²`, in the normalized
+  form `2a < ∑ (degMem i / degMem i₁)²` (`hDeg`).
 
-Degrees are carried by an explicit `deg : ClassFunction L ℂ → ℕ` with
-`χ 1 = deg χ`, so the divisibility and the inequality are honest statements
-about natural numbers (character degrees are positive integers).
+Then `(𝒮₁ ∪ {χ, χ̄}, τ)` is coherent.
 
-**Status: honestly stated, `sorry`; the content is proved in the general adjoin
-engine.**  This is Isaacs' "adjoin one character to a coherent set" theorem.  Its
-content is fully formalized in `OddOrder.Peterfalvi.S07.adjoinPairCoherent_general`
-(`S08_GeneralAdjoin.lean`, issue 1049) — the general degree-bound coherence adjoin,
-generalized from the Feit–Thompson `xAdjoinStep` to any `S07.Hypothesis`-supplied
-isometry (`hisom` from `Hypothesis.adjoin_hisom`, `R`-families from
-`Hypothesis.difference_image`), in the **faithful arbitrary-degree form** (only the
-anchor divisibility `χ₀(1) ∣ ψ(1)` is assumed; member ratios `χ(1)/χ₀(1)` may be
-rational, handled by the scaled differences `χ₀(1)·χ − χ(1)·χ₀`).  The remaining work
-is purely the *wiring*: instantiate that engine with the member family `𝒮₀`, the
-`R`-families from `hyp.difference_image`, `hisom` from `hyp.adjoin_hisom`, the lattice
-generation `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` /
-`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`, and the pair-adjoin
-`𝒮 = 𝒮₁ ∪ {ψ, ψ̄}` reconciliation.  Tracked in issue 1049. -/
+**Design note (issue 1049).**  Peterfalvi phrases this as single-`ψ` adjoin
+`𝒮 = 𝒮₀ ∪ {ψ}`, but `𝒮` is conjugate-closed so `ψ̄ ∈ 𝒮₀`; the honest content is the
+conjugate-*pair* adjoin (Isaacs 7.14, and the Theorem's step (1) uses pair-successive
+adjoins `𝒮(S'Q₂) ⊆ 𝒮(S'Q₃)`).  The proof is a direct instantiation of the general
+engine `OddOrder.Peterfalvi.S07.adjoinPairCoherent_general` (`S08_GeneralAdjoin.lean`):
+`hisom` from `Hypothesis.adjoin_hisom`, the `R`-families from `Hypothesis.difference_image`
+with their cross-orthogonality from `Hypothesis.difference_images_orthogonal`, the anchor
+generation `hSgen` from `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`
+(integer ratios via `hdvd`), and `hgen` from
+`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`.  The abstract-rational form
+(anchor divides only `χ(1)`, member ratios rational) needs a bridge refit and is a
+deferred follow-up; the Feit–Sibley Theorem uses only this integer-ratio case (degree-`d`
+anchor `χ₀(1) = d`, `χ(1) = d·φ(1)`). -/
 theorem coherent_adjoin_of_degree_bound
     (hyp : OddOrder.Peterfalvi.S07.Hypothesis (L := L) (G := G) S A)
-    (S0 : Set (ClassFunction L ℂ)) (hS0fin : S0.Finite)
-    (ψ χ0 : ClassFunction L ℂ) (hS : S = S0 ∪ {ψ}) (hψ : ψ ∉ S0) (hχ0 : χ0 ∈ S0)
-    (hcoh : Nonempty (IsCoherent hyp.tau S0 A))
-    (deg : ClassFunction L ℂ → ℕ)
-    (hdeg : ∀ χ ∈ S, ((χ : ClassFunction L ℂ) : L → ℂ) 1 = (deg χ : ℂ))
-    (hdvd : deg χ0 ∣ deg ψ)
-    (hlt : 2 * deg χ0 * deg ψ < ∑ χ ∈ hS0fin.toFinset, (deg χ) ^ 2) :
-    Nonempty (IsCoherent hyp.tau S A) := by
-  sorry
+    (h1A : (1 : L) ∉ A)
+    {S₁ : Set (ClassFunction L ℂ)} (hS₁S : S₁ ⊆ S)
+    (hcoh : Nonempty (IsCoherent hyp.tau S₁ A))
+    {χ : ClassFunction L ℂ} (hχS : χ ∈ S)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0)
+    (hdiffsuppχ : (χ.conj - χ).support ⊆ A)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (degMem : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (hcover : ∀ x ∈ S₁, ∃ i, i ∈ s ∧ χmem i = x)
+    (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁) (hmembarS1 : ∀ i ∈ s, (χmem i).conj ∈ S₁)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i) (χmem j) = if i = j then (1 : ℂ) else 0)
+    (hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i) (χmem i).conj = 0)
+    (hdegpos : 0 < degMem i₁)
+    (hdegMem : ∀ i ∈ s, ((χmem i : ClassFunction L ℂ) : L → ℂ) 1 = (degMem i : ℂ))
+    (hmemdiffsupp : ∀ i ∈ s, ((χmem i).conj - χmem i).support ⊆ A)
+    (hdvd : ∀ i ∈ s, degMem i₁ ∣ degMem i)
+    (hdegdiffsupp : ∀ i ∈ s, (degMem i₁ • χmem i - degMem i • χmem i₁).support ⊆ A)
+    {a : ℕ} (hχdeg : ((χ : ClassFunction L ℂ) : L → ℂ) 1 = (a : ℂ) * (degMem i₁ : ℂ))
+    (hdiffasuppχ : (χ - a • χmem i₁).support ⊆ A)
+    (htau1_memaχ : hyp.tau (χ - a • χmem i₁) ∈ ZIrr G)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((degMem i : ℝ) / (degMem i₁ : ℝ)) ^ 2) :
+    Nonempty (IsCoherent hyp.tau (S₁ ∪ {χ, χ.conj}) A) := by
+  classical
+  obtain ⟨hc⟩ := hcoh
+  have hχbarS : χ.conj ∈ S := hyp.conjugate_mem hχS
+  have hχχbar : ClassFunction.inner χ χ.conj = 0 :=
+    hyp.pairwise_orthogonal hχS hχbarS (hyp.ne_conj hχS)
+  have hχbarχ : ClassFunction.inner χ.conj χ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hχχbar, star_zero]
+  have hd1ne : (degMem i₁ : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hdegpos.ne'
+  -- Scaling by a nonzero `ℕ` does not shrink the support: `g.support ⊆ (n • g).support`.
+  have hsupp_nsmul : ∀ (n : ℕ) (g : ClassFunction L ℂ), n ≠ 0 →
+      g.support ⊆ (n • g).support := by
+    intro n g hn x hx
+    rw [ClassFunction.mem_support] at hx ⊢
+    rw [← Nat.cast_smul_eq_nsmul ℂ n g, ClassFunction.smul_apply]
+    exact mul_ne_zero (Nat.cast_ne_zero.mpr hn) hx
+  -- `χmem i₁(1) ≠ 0`, `χ(1) = a·χmem i₁(1)`, `χ̄(1) = χ(1)`.
+  have hchi1_ne : (χmem i₁ : ClassFunction L ℂ) (1 : L) ≠ 0 := by rw [hdegMem i₁ hi₁]; exact hd1ne
+  have hχ1 : (χ : ClassFunction L ℂ) (1 : L) = (a : ℂ) * (χmem i₁ : ClassFunction L ℂ) (1 : L) := by
+    rw [hχdeg, hdegMem i₁ hi₁]
+  have hbar1 : (χ.conj : ClassFunction L ℂ) (1 : L) = (χ : ClassFunction L ℂ) (1 : L) := by
+    rw [ClassFunction.conj_apply, hχdeg, star_mul', star_natCast, star_natCast]
+  -- `hSgen`: `ℤ[𝒮₁]` is generated by `ℤ[𝒮₁,A]` and the anchor, from the degree-matched
+  -- differences `χmem i − (degMem i / degMem i₁)·χmem i₁` (supported, by `hdvd` + `hdegdiffsupp`).
+  have hSgen : Submodule.span ℤ S₁ ≤
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χmem i₁}) := by
+    refine span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+      (deg := fun i => degMem i / degMem i₁) hcover hi₁ hmemS1 (fun i hi => ?_)
+    have hfactor : degMem i₁ • χmem i - degMem i • χmem i₁
+        = degMem i₁ • (χmem i - (degMem i / degMem i₁) • χmem i₁) := by
+      rw [smul_sub, smul_smul, Nat.mul_div_cancel' (hdvd i hi)]
+    have hsupp := hdegdiffsupp i hi
+    rw [hfactor] at hsupp
+    exact (hsupp_nsmul (degMem i₁) _ hdegpos.ne').trans hsupp
+  -- `hgen`: the supported part of `ℤ[𝒮₁ ∪ {χ,χ̄}]` is generated by `ℤ[𝒮₁,A]`, `χ−χ̄`, `χ−a·χmem i₁`.
+  have hgen := zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (chibar := χ.conj) hSgen hχ1 hbar1 hchi1_ne h1A
+  -- `R(χmem i) ⊥ R(χ)` for each member, from `χmem i ⊥ χ, χ̄`.
+  have hmemOrtho : ∀ i (hi : i ∈ s),
+      (hyp.difference_image (hS₁S (hmemS1 i hi))).Orthogonal (hyp.difference_image hχS) :=
+    fun i hi => hyp.difference_images_orthogonal (hS₁S (hmemS1 i hi)) hχS
+      (by rw [OddOrder.RepresentationTheory.inner_conj_symm, hχ_S1 (χmem i) (hmemS1 i hi),
+        star_zero])
+      (by rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbar_S1 (χmem i) (hmemS1 i hi),
+        star_zero])
+  exact ⟨adjoinPairCoherent_general (Samb := S) hc hS₁S hyp.adjoin_hisom
+    (hyp.difference_image hχS) hχS hχbarS hdiffsuppχ hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1
+    s χmem degMem i₁ hi₁ (fun i hi => hyp.difference_image (hS₁S (hmemS1 i hi)))
+    hdegpos hmemdiffsupp hdegdiffsupp hmemS1 hmembarS1 hmemconjortho hmemortho
+    hmemOrtho hdiffasuppχ htau1_memaχ hDeg hSgen hgen⟩
 
 end LemmaOne
 

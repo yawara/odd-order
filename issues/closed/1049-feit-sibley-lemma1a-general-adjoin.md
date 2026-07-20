@@ -152,15 +152,31 @@ scaled で供給、~40-60 行)。
 `coherent_adjoin_of_degree_bound` を **divisor-anchor 形** (χ₀(1)∣χ(1) for all χ∈S₀) へ改訂すれば
 engine (integer hSgen 経由) で閉じられる。abstract-rational (bridge 改修) は deferred follow-up。
 
-- [ ] **FeitSibley 配線** (integer-ratio 形で sorry close): `coherent_adjoin_of_degree_bound` を
-  pair-adjoin + divisor-anchor 形へ改訂し engine へ。member family=S₁
-  (index=S₀ 元, 直交正規性は 𝒮⊆Irr + pairwise_orthogonal), R-family=`hyp.difference_image`,
-  hisom=`hyp.adjoin_hisom`, hSgen=`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`,
-  hgen=`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`。⚠ FeitSibley に S08_GeneralAdjoin
-  の import を追加。S₀/S₁ (ψ̄∈S₀) reconciliation に注意。
-  ⚠ statement 調整が要る: 現状 `S = S₀ ∪ {ψ}` 単一 adjoin + degree bound `2·deg χ0·deg ψ < ∑ deg²`。
-  engine は pair `{ψ,ψ̄}` adjoin + normalized `2a < ∑ (deg)²` (a = deg ψ/deg χ₀, unit norm)。
-  `hisom` は `hyp.tau_isometry_diff` から (member-diff が A-supported を示す); m₁=1 (irreducible)。
+- [x] **FeitSibley 配線** ⭐ 完成 (integer-ratio 形で sorry close, build green +
+  #print axioms = [propext, Classical.choice, Quot.sound] のみ = axiom-clean, sorryAx なし)。
+  `coherent_adjoin_of_degree_bound` を **pair-adjoin + divisor-anchor 形**へ改訂し
+  `adjoinPairCoherent_general` (Samb=S) の薄い instantiation に。配線:
+  - member family = `{χmem i}ᵢ∈ₛ` (S₁ を enumerate する `hcover`/`hmemS1`, 直交正規は explicit
+    hyp `hmemortho`/`hmemconjortho` = 𝒮⊆Irr で consumer 供給), R-family = `hyp.difference_image`,
+    R⊥ = `hyp.difference_images_orthogonal` (χmem i ⊥ χ,χ̄ から).
+  - hisom = `hyp.adjoin_hisom` (型完全一致で直接渡せた), χ⊥χ̄ = `hyp.pairwise_orthogonal`+`ne_conj`.
+  - hSgen = `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` (deg=degMem i/degMem i₁,
+    `hdvd` (χ₀(1)∣χᵢ(1)) + `hdegdiffsupp` で degree-matched diff が supported; scale factor は
+    `hsupp_nsmul` (n≠0 で support 不変) で外す)。
+  - hgen = `zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration` (hSgen + χ(1)=a·χ₀(1) +
+    χ̄(1)=χ(1) (conj_apply+star_natCast) + χ₀(1)≠0 + 1∉A)。
+  - engine の `if i=j` decidability に `open scoped Classical in` (署名内ゆえ classical tactic 不可)。
+  - import `OddOrder.Peterfalvi.S08_GeneralAdjoin` 追加済。**caller は docstring 参照のみで code
+    caller 無し**ゆえ statement 改訂は自由だった。
+  ⇒ `FeitSibley.coherent_adjoin_of_degree_bound` の sorry 消滅 (FeitSibley 残 sorry: 5→4 =
+  Lemma 2(a)/2(b)-isometry/2(c)/Theorem)。**issue 1049 完了条件を満たす。**
+
+## ✅ 完了 (2026-07-21)
+
+完了条件 (`coherent_adjoin_of_degree_bound` の sorry 消滅 + build green + axiom-clean) を満たした。
+残る abstract-rational faithful 版 (anchor|χ(1) のみ ⟹ member 比 rational) の bridge 改修は
+**別 issue へ deferred** (低優先 follow-up, 現 consumer 無し。rational engine coeff 部は既に完成 =
+commit cb7429704、残りは bridge の hSgen を per-member scaled+crux1 へ再導出する ~40-60 行のみ)。
 
 ## ⚠ statement 設計判断 (2026-07-21 調査)
 
