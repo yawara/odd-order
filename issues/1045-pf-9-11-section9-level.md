@@ -1160,6 +1160,23 @@ full build green (4566 jobs)、AxiomsCheck OK、sorry 14 (非退行 — 全て�
 ⟹ 着手順の 1・2 は完了。残りは **3 (§13 側 `coherent_sOf_H0Cprime` を §9 版の系にする)** と
 **4 (型 II instance)**。
 
+#### ⭐ 完了 (2026-07-20): 着手順 4 (**型 II instance**) — (9.11) が型 II で使えるようになった
+
+`S11.typeII_sOf_nineEleven_coherent`。実測すると **§9 側に足りなかったのは carrier の producer
+だけ**で、(9.11) の中身は既に型仮定ゼロだった:
+
+| 書籍 | repo の状態 | 追加したもの |
+|---|---|---|
+| (9.2) Hypothesis | `TypesIIIIIIVSetup` は `type_alt : IsTypeII ∨ III ∨ IV` で**既に型一様**。だが producer が `S12.Hypothesis.toTypesIIIIIIVSetup` (htype = III ∨ IV) しか無かった | `GroupTheory.typePNontrivialCore_of_isTypeII` / `_of_isTypeIIorIIIorIV` (`TypeIIData.common` を transfer するだけ) + `S11.typesIIIIIIVSetup_of_type_alt` / `_of_isTypeII` |
+| (9.4) chief factor | `exists_chiefFactorData` は**元から型仮定ゼロ** (`ChiefFactorData.typeIII_IV_p_eq_W2` は条件付き field なので型 II で無害) | — |
+| (9.5) character data | `S12.Hypothesis.mkSection11CharacterData` のみ = §10 packaging 経由 | `S11.mkSection11CharacterData` (§9 版。`u = |Ū|` は pin 済、`C`/`U'`/`C'`/`𝒳`/`𝒮` は genuine、自由なのは caller が渡す Dade map と (9.11) が明示パラメータで取る 2 placeholder のみ) |
+| (9.11) | `sOf_nineEleven_coherent_of_count` (本 session) | — (そのまま instantiate) |
+
+⟹ 型 II の (9.11) は上 3 つを繋ぐだけで立った。残りの入力は型 III/IV 経路と**完全に同じ**
+((8.15)/(4.6) の Dade データ `h46`/`dd`/`hdd` とその pin + `h2`)。
+
+⟹ **issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) は完了**。
+
 ## 着手順 (残り)
 
 1. **§9 レベルの (9.11) statement を立てる** — `(data : TypesIIIIIIVSetup M)`

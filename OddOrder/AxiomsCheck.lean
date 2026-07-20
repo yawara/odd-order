@@ -11714,3 +11714,19 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- parametric is not open mathematics: `dd`/`hdd` are the (8.15) Dade datum and its pin to the
 -- (4.6) restriction, and `h2` is the `2 ≤ ncard` count that (9.8.d) supplies only as existence.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent_of_count
+-- **Hypothesis (9.2) at the full II/III/IV span** (issue 1045).  The (8.6) nontrivial core for
+-- type II (`TypeIIData.common`, transferred) was missing, which is why the §9 setup — and with it
+-- (9.4), (9.5) and (9.11) — was reachable only through the §10 packaging's `IsTypeIII ∨ IsTypeIV`.
+#assert_only_allowed_axioms OddOrder.GroupTheory.typePNontrivialCore_of_isTypeII
+#assert_only_allowed_axioms OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIorIIIorIV
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typesIIIIIIVSetup_of_type_alt
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typesIIIIIIVSetup_of_isTypeII
+-- **Hypothesis (9.5) constructed at §9 level** — `u = |Ū|` pinned, `C`/`U'`/`C'`/`𝒳`/`𝒮` genuine,
+-- only the caller-supplied Dade map and the two (9.11)-parameter placeholders left free.  The
+-- previous route `S12.Hypothesis.mkSection11CharacterData` needed the §10 `Hypothesis`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.mkSection11CharacterData
+-- ⭐ **Peterfalvi (9.11) for a maximal subgroup of type II** — the instance hub issue 9163 §3
+-- item 3 asked for.  Hypothesis (9.2) from `TypeIIData`, (9.4) from `exists_chiefFactorData`
+-- (type-free), (9.5) from `mkSection11CharacterData`; the coherence is then the type-free
+-- `sOf_nineEleven_coherent_of_count`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeII_sOf_nineEleven_coherent

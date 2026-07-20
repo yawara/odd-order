@@ -638,6 +638,27 @@ structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
   tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
   quotientSemidirectFrobenius : Prop
 
+/-- **Peterfalvi Hypothesis (9.5), constructed at §9 level** — the character datum of a
+`TypesIIIIIIVSetup` + `ChiefFactorData`, with no §10/§13 packaging in sight.
+
+Every field carrying mathematics is derived: `u = |Ū|` is pinned to the `U`-action image on the
+chief factor (`rfl`), and `C`, `U'`, `C'`, `𝒳`, `𝒮`, `𝒳(Y)`, `𝒮(Y)` are definitions on
+`data`/`chief`.  What is left free is the Dade map `tau` — which the caller supplies, since (9.5)
+names the isometry of `(A(M), M, G)` — plus the two placeholders `H0CprimeSupport` and
+`quotientSemidirectFrobenius` that the (9.11) statement takes as explicit parameters anyway.
+
+The only route to this datum used to be `S12.Hypothesis.mkSection11CharacterData`, which requires
+the §10 `Hypothesis` and hence types III/IV; nothing in the datum itself needs that (issue 1045). -/
+noncomputable def mkSection11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) :
+    Section11CharacterData data chief where
+  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
+  u_eq_card_quotient := rfl
+  H0CprimeSupport := ∅
+  tau := tau
+  quotientSemidirectFrobenius := True
+
 namespace Section11CharacterData
 
 variable {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
