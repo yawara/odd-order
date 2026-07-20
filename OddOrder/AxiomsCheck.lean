@@ -11329,3 +11329,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `sOf_subset_inducedKernelFamily_bot`, and the (8.10) containment `(M')^# ⊆ A₀` is the explicit
 -- parameter `hKsupp` instead of `hyp.base.mderivSharp_subset_A0`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_anchor_diff_support
+-- **(9.9.b), member form** — a reducible induced character from `h46.K` is a certain-type column
+-- sum.  Stated entirely inside `h46.K` so that no coercion between `↥h46.K` and `↥(huSub data)`
+-- appears: those subgroups are only propositionally equal, and rewriting across them is not
+-- type-correct here (the motive mentions `IrreducibleCharacter ↥_a` *and* `chiRestrict χ₂ = χ`).
+-- The §13 analogue `S13.caseB_sOf_member_dichotomy` phrases its conclusion in the §10 μ-grid; the
+-- book builds these members from (4.7) + Thm (4.5), both §6, so the `columnSum` form is faithful.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.induce_columnSum_of_not_irreducible
