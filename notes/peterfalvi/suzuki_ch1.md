@@ -826,3 +826,30 @@ CaseSplitBCD 741 行、全 axiom-clean。
 機構 + weight 方程式の i,j,k case split) で最深部。次 tick はここに fresh に当たる。
 接続先: `M(α,β)=ambientCenterCoordinate(lowerCentralCommutatorBilinear P (left.incl α)(right.incl β))`
 と `lowerCentralCommutatorBilinearBaseChange`/`BilinearEigenweight.lean:150` の weight 抽出。
+
+### 2026-07-21 lane b (autonomous ticks): hsq_actual + endpoint engine 3 種 完成
+
+全 wiring/インフラ完成。残る未形式化は mixed 項 M の実導出 + case dispatch のみ。
+
+- **`ambientProductExtension_hsq_actual`** (CaseSplitBCD): glue に ambientProductSquare_eq を
+  食わせ「実際の Q 形で hsq 成立」に集約。
+- **新 leaf `Classification.lean`** (247 行、hub 配線済): B/C/D の endpoint engine を
+  M-parametrized で実装、各 `IsTypeB/C/D` まで到達検証。全 axiom-clean。
+  - `isTypeB_of_mixedTerm`: θ_L=θ_R=φ, `M=ε·α·φ(β)` → TypeBData.ofExtension
+  - `isTypeC_of_mixedTerm`: θ_L=θ (2θ²=1), θ_R=1, `M=ε·(frob⁻¹α·(frob·θ)β)` → TypeCData
+  - `isTypeD_of_mixedTerm`: θ_L=θ (θ⁵=1≠θ), θ_R=θ², `M=ε·(θ³α·θβ)` → TypeDData
+  - 各証明 = hsq_of_coordinate に typeX QuadraticMap を渡し、hQ を ambientProductSquare_eq
+    + quadratic map apply + hthetaL/R + hM + ring で供給 (C は RingAut.one_apply)。
+  - hypothesis: theta 関係 (hthetaL/R)、theta 条件 (2θ²=1 / θ⁵=1)、epsilon+anisotropy、
+    card_field、hcentral (frattini≤center は commutator_eq_frattini_and_frattini_le_center_of_
+    xiLengthThree)、**hM (mixed 項の値)**。
+
+**⟹ endpoint engine が各 case の M 形を固定**。M 導出は「M=ε·α·φ(β) 等を証明」に
+帰着 (compiler+固定 signature が制約 → 誤 statement は閉じない)。残り:
+1. **mixed 項 M の case 別値**: `M(α,β)=ambientCenterCoordinate(bilinear(left.incl α, right.incl β))`
+   を eigenweight 展開 (left.incl α を famL で展開 → bilinear の weight 構造 → 体構造で
+   Frobenius twist 確定)。接続 = `exists_factorFamily` の famL/famR/covering +
+   `lowerCentralCommutatorBilinearBaseChange_equivariant` + weight 方程式 (i,j,k)。
+2. **case dispatch**: weight 方程式 `λ^2^i μ^2^j=ν^2^k` + `ν=λθλ=μφμ` の合同解析
+   (Higman p.91: 2^a+2^b≡2^c mod 2^n-1 の解) で (θ_L,θ_R) 関係を決定 → B/C/D 振り分け。
+3. **higmanLemmaTwelve**: exists_mixedFrobeniusWeightEquation → dispatch → engine → `IsTypeB∨C∨D`。
