@@ -402,10 +402,14 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       同定し、`P / Φ(P)` の induced actor を ξ-length `2` に落とした。Maschke で得た
       complementary invariant summands の preimage `X, Y` は normal / invariant で、
       `X ∩ Y = Φ(P)`, `X ⊔ Y = P`; 両 restricted actor range も ξ-length `2` である。
-      次の source frontier は、可換 branch `A(n,1) = C₄ⁿ` も含む inclusive な
-      length-two type-A data を構成し、両 summand を共通 parameter `n ≥ 2` の
-      `A(n,θ)`, `A(n,φ)` と同定する段階である。既存 `IsTypeA` は
-      `φ ≠ 1` を要求するため、可換 branch へ流用しない。
+      `LengthTwoModels.lean` は可換 branch `A(n,1) = C₄ⁿ` も含む inclusive な
+      `XiLengthTwoTypeAData` を構成した。非可換 factor は Lemma 11、可換 factor は
+      homocyclic exponent-four 分類、actual `A/A² ≃ A²` square equivalence、
+      inverse Frobenius finite-field coordinates から honest model を得る。したがって
+      各 proper invariant preimage は可換性の分岐を残さず `A(n,φ)` と同定済みである。
+      次の source frontier は complementary preimages の二つの parameter の一致と
+      共通値 `n ≥ 2` である。既存 `IsTypeA` は `φ ≠ 1` を要求するため、
+      可換 branch には引き続き流用しない。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
