@@ -736,6 +736,60 @@ theorem ambientProductExtension_hsq_of_coordinate
   rw [hq, ambientProductExtension_inl_ofAdd, ePhi.symm_apply_apply]
   rfl
 
+/-- **Higman Lemma 12, the ambient extension square obligation for the actual
+form.**  The ambient central extension built from the two factor packages
+satisfies `ofExtension`'s `hsq` with the *actual* square form
+`Q(α, β) = α · θ_L(α) + β · θ_R(β) + M(α, β)`.  The B/C/D case assembly then only
+has to rewrite this `Q` into the case's `typeB/C/D` quadratic map (via the
+case-specific value of the mixed term `M`) before invoking the corresponding
+`ofExtension`. -/
+theorem ambientProductExtension_hsq_actual
+    {Sl Sr : Subgroup P} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (x : P) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    x ^ 2 = (ambientProductExtension hK0
+        (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR) ePhi).inl
+      (Multiplicative.ofAdd
+        ((fun w : GaloisField 2 n × GaloisField 2 n =>
+            w.1 * left.theta w.1 + w.2 * right.theta w.2 +
+              ambientCenterCoordinate hEA hK1amb htermamb ePhi
+                (lowerCentralCommutatorBilinear P
+                  (left.incl w.1) (right.incl w.2)))
+          ((ambientProductExtension hK0
+              (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR)
+              ePhi).rightHom x).toAdd)) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  refine ambientProductExtension_hsq_of_coordinate hEA hK1amb htermamb hSqamb
+    hAgemoamb hK0 ePhi
+    (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR)
+    (fun w : GaloisField 2 n × GaloisField 2 n =>
+      w.1 * left.theta w.1 + w.2 * right.theta w.2 +
+        ambientCenterCoordinate hEA hK1amb htermamb ePhi
+          (lowerCentralCommutatorBilinear P (left.incl w.1) (right.incl w.2)))
+    ?_ x
+  intro w
+  exact ambientProductSquare_eq left right hRnormal hinf hsup hΦR w.1 w.2
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
