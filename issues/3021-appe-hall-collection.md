@@ -2532,3 +2532,34 @@ dc≥1 (= u_Q uniserial) が立てば、chain 生成を BG の `v∈R₀` (第 3
   だが単独では E.4 を閉じない。⟹ E.4 を dc-gated として据え置き、lane c の他 frontier で
   sorry-free 進捗を作る (impasse からの逃避でなく、genuine な別 upstream work)。
   E.4 再開時は③の authoritative proof 確定が先。issue 9402 に同旨。
+
+## 🧭 hub 裁定 (2026-07-21 03:12 tick) — (52) impasse は legitimate、c の処置は模範的。E.4-dc は user 同席案件
+
+hub が (52) の research impasse 宣言を独立レビューし、**c の判断に全面的に concur**:
+
+- **impasse は genuine (回避でない)**: c は (49)→(50)→(51)→(52) と 4 段で深く engage し、
+  自分の (51) 還元を独立検算で**自己否定** (「class<p だから easy」は誤り)、dc=0 構成が
+  Jacobi 違反する具体例 (n=6, dim7: γ_{2,4} が 0 と −1 に過剰決定) まで作った上で
+  「distinct-eigenvalue B 作用 + Jacobi ⟹ dc≥1 らしいが clean proof 未確立」と結論。
+  これは [[feedback-no-avoiding-hard-parts]] の「難所回避せず root-cause」を満たす —
+  難しいから止めたのでなく、**深く掘って genuine な research gap に到達**した。
+- **doneness 原則を厳守**: (a) E.4-dc gate を fabricate せず honest sorry に留めた、
+  (b) 誤った premise (class<p) の上に `MaximalClassPGroup.lean` を**建てなかった** (実測: 未作成)、
+  (c) 9402 の旧見立てを strike-through で訂正 (withdraw でなく authoritative-input-pending 化)。
+- **正しく pivot**: E.4 を据え置き、lane c の他 frontier で sorry-free 進捗へ (transcript active
+  で確認 = idle でない)。上流優先+文書順の下で 1 sub-gap が真に blocked なら他 genuine work に
+  移るのは正当 (STOP でない)。
+
+### ⚠ BG 原文の潜在 gap の疑い (hub も同意)
+
+BG p.163 "Similarly one can show (E.23)" は **dc≥1 を暗黙前提**にしており、その dc≥1 が
+regular B 作用から従うことの証明を BG は書いていない (Blackburn 既知として省略の疑い)。
+形式化には③ (no-switch ⟹ dc≥1) の証明が要り、**BG より踏み込む必要がある**。
+
+### 次段 = authoritative input (user 同席案件)
+
+[[feedback-ask-chatgpt-for-elided-gaps]] どおり、③の clean proof は最強モデル (ChatGPT Pro 拡張、
+Chrome MCP) or Blackburn 1958 分類 or Feit–Thompson 1991 原論文の authoritative input を要する。
+**Chrome MCP は user 同席が要る**ため autonomous lane では次段に置けない。⟹ **user がE.4 を
+進めたいときの案件**として flag (halt でなく report — c は他 frontier で進行中)。
+hub 単独では escalation しない (c が productively 他 work 中ゆえ blocking でない)。
