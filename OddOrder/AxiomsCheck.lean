@@ -11591,3 +11591,9 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `S13.sixTwoDecompositionData`, whose μ-grid `params` exist only to manufacture these data from
 -- the §10 packaging (issue 1045).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberPsiDecomposition
+-- **The `Da` input of the (5.6) engine, at §9 level** — the break member `ψ` decomposed against the
+-- scaled anchor `a • χ₁`.  Here `tau1` *is* `τ`: the obligation is `τ (ψ − a·χ₁) ∈ ℤ[Irr G]`, and
+-- the degree match makes that difference `A₀`-supported, so
+-- `dadeIntegralCharacterMap_mem_ZIrr_of_supported` applies — the asymmetry with the `ψ = 0` member
+-- data, where the Dade map cannot serve and the coherent extension must.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_breakPsiDecomposition

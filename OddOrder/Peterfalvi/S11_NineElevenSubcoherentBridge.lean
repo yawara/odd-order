@@ -993,6 +993,92 @@ noncomputable def sOf_memberPsiDecomposition [Finite G] {M : Subgroup G} {A : Se
       (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M)
       (sOf_subset_inducedKernelFamily_bot hG hM data Y hχ) h.symm
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The break-member decomposition datum, at §9 level** — the `Da` input of the norm-weighted
+(5.6) engine `S08.coherentDegreeSqNormBound_of_not_coherentW_k`.
+
+The counterpart of `sOf_memberPsiDecomposition` at the *break* member `ψ ∈ 𝒮(Y) ∖ S₁`, decomposed
+against the scaled anchor `a • χ₁`.  Here `tau1` **is** `τ`: unlike the `ψ = 0` case, the
+`ofProjection` obligation is `τ (ψ − a·χ₁) ∈ ℤ[Irr G]`, and the degree match makes that difference
+`A₀`-supported, so `dadeIntegralCharacterMap_mem_ZIrr_of_supported` applies.  That is exactly the
+asymmetry `FamilyBundleDade` records: the Dade map is a virtual-character map on the *supported*
+lattice only, which covers the break datum but not the member data.
+
+The support hypothesis `hsuppa` is the parameter carrying the degree relation `ψ(1) = a·χ₁(1)`
+(via `S08.inducedKernelFamily_scaledDiff_support`); the orthogonalities come from the `⊥`-kernel
+family being pairwise orthogonal, with `ψ ≠ χ₁`, `ψ̄ ≠ χ₁` supplied by the caller (`ψ ∉ S₁`,
+`ψ̄ ∉ S₁`) and `ψ ≠ ψ̄` from odd order. -/
+noncomputable def sOf_breakPsiDecomposition [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    {Y : Subgroup G} {ψ χ₁ : ClassFunction ↥M ℂ} (a : ℕ)
+    (hψ : ψ ∈ sOf data Y) (hχ₁ : χ₁ ∈ sOf data Y)
+    (hψχ₁ne : ψ ≠ χ₁) (hψcχ₁ne : (ψ : ClassFunction ↥M ℂ).conj ≠ χ₁)
+    (hsuppa : ((ψ : ClassFunction ↥M ℂ) - a • χ₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) ψ (a • χ₁) := by
+  classical
+  haveI := derivedInG_subgroupOf_normal M
+  have hψbot := sOf_subset_inducedKernelFamily_bot hG hM data Y hψ
+  have hχ₁bot := sOf_subset_inducedKernelFamily_bot hG hM data Y hχ₁
+  have hψcbot := sOf_subset_inducedKernelFamily_bot hG hM data Y
+    (sOf_closedUnderConjugate data Y hψ)
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  -- the conjugate difference of `ψ` is `A₀`-supported
+  have hsuppc : ((ψ : ClassFunction ↥M ℂ).conj - ψ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M :=
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support hKsupp hψbot
+  have hsuppc' : ((ψ : ClassFunction ↥M ℂ) - (ψ : ClassFunction ↥M ℂ).conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M := by
+    rw [show (ψ : ClassFunction ↥M ℂ) - (ψ : ClassFunction ↥M ℂ).conj
+        = -((ψ : ClassFunction ↥M ℂ).conj - ψ) by abel, ClassFunction.support_neg]
+    exact hsuppc
+  -- every element of the relevant lattice is `A₀`-supported
+  have hspan : ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
+      {(ψ : ClassFunction ↥M ℂ) - (ψ : ClassFunction ↥M ℂ).conj,
+        (ψ : ClassFunction ↥M ℂ) - a • χ₁},
+      φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M := by
+    intro φ hφ
+    refine OddOrder.Peterfalvi.S07.support_subset_of_mem_zSpan_of_supported ?_ hφ
+    rintro s (rfl | rfl)
+    · exact hsuppc'
+    · exact hsuppa
+  have hsmulcast : (a • χ₁ : ClassFunction ↥M ℂ) = (a : ℂ) • χ₁ :=
+    (Nat.cast_smul_eq_nsmul ℂ a χ₁).symm
+  refine OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+    (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hψ) _
+    (fun φ ζ hφ hζ => ?_) rfl ?_ ?_ ?_ ?_
+  · rw [htau]
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0 hconj
+      (hspan φ hφ) (hspan ζ hζ)
+  · -- `τ (ψ − a·χ₁) ∈ ℤ[Irr G]`
+    rw [htau]
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported h46.dade0 hconj
+      hsuppa (Submodule.sub_mem _
+        (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hψbot)
+        (nsmul_mem (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hχ₁bot) a))
+  · rw [hsmulcast, ClassFunction.inner_smul_right,
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hψbot hχ₁bot hψχ₁ne,
+      mul_zero]
+  · rw [hsmulcast, ClassFunction.inner_smul_right,
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hψcbot hχ₁bot hψcχ₁ne,
+      mul_zero]
+  · exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hψbot hψcbot
+      (fun h => OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd
+        (⊥ : Subgroup ↥M) hψbot h.symm)
+
 /-! ### (9.11.1): the case (9.7.a) maximality refuter, at §9 level
 
 The §13 forms (`S13.NineElevenPairBound`, `S13.NineElevenEqualityRefutation`,
