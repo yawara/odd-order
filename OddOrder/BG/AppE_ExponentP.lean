@@ -621,4 +621,34 @@ theorem card_omega_le_of_isCyclic {G : Type*} [Group G] [Finite G] [IsCyclic G] 
   exact IsCyclic.card_pow_eq_one_le hp
 
 
+/-- **BG's "Hence, by Lemma 4.5, `|Ω₁(T/S)| ≤ p²`"**: for a finite `p`-group with a cyclic
+subgroup of index `< p²`, `|Ω₁| ≤ p²`.
+
+In a `p`-group every index is a power of `p`, so `< p²` means index `1` or `p`.  Index `p`
+is BG Lemma 4.5(b) (`Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime`); index `1`
+means the group is itself cyclic, and then `card_omega_le_of_isCyclic` gives the sharper
+`≤ p`. -/
+theorem card_omega_le_prime_sq_of_index_lt {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hG : IsPGroup p G) (hp_odd : Odd p) {x : G}
+    (hidx : (Subgroup.zpowers x).index < p ^ 2) :
+    Nat.card ↥(Omega G p 1) ≤ p ^ 2 := by
+  have hp : p.Prime := Fact.out
+  obtain ⟨k, hk⟩ := hG.exists_card_eq
+  have hdvd : (Subgroup.zpowers x).index ∣ Nat.card G := Subgroup.index_dvd_card _
+  rw [hk] at hdvd
+  obtain ⟨j, -, hjeq⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+  have hjlt : j < 2 := (Nat.pow_lt_pow_iff_right hp.one_lt).mp (hjeq ▸ hidx)
+  interval_cases j
+  · -- index `1`: the group is cyclic
+    rw [pow_zero] at hjeq
+    have htop : Subgroup.zpowers x = ⊤ := Subgroup.index_eq_one.mp hjeq
+    haveI : IsCyclic G := ⟨⟨x, fun y => by
+      have hy : y ∈ (⊤ : Subgroup G) := Subgroup.mem_top y
+      rwa [← htop] at hy⟩⟩
+    exact (card_omega_le_of_isCyclic hp.pos).trans (Nat.le_self_pow two_ne_zero p)
+  · -- index `p`: BG Lemma 4.5(b)
+    rw [pow_one] at hjeq
+    exact OddOrder.BG.Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime hG hp_odd hjeq
+
+
 end OddOrder.BG.AppE
