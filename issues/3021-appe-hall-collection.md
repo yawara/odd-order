@@ -1673,3 +1673,41 @@ E.4 は `⁅wᵢ, wⱼ⁆` で**両側**に誤差が出るので、この一般�
 (`AppE_RegularOperator.lean`: `iterCommutator_le_of_le` / `iterCommutator_ne_bot_of_le` /
 `index_subgroupOf_chain`) が土台。**`k`/`i`/`j` の存在は「有限降下列の極小/極大元」**
 なので `Nat.find` 系で取る。
+
+## 2026-07-20 (36): ⭐ (E.26)/(E.27) を作用素非依存の 1 補題に統合
+
+BG は (E.26) と (E.27) を *"By using β instead of α, we obtain similarly"* で済ませる。
+形式化でも **1 本**にした: `dvd_sub_mul_of_commutator_eigen`。
+
+```
+Commute u y, Commute u v, Commute v x, ⁅x,y⁆ ∈ center, ⁅x,y⁆^p = 1, ⁅x,y⁆ ≠ 1,
+⁅x^m·u, y^n·v⁆ = ⁅x,y⁆^c                                    ⟹  (p:ℤ) ∣ m*n - c
+```
+
+`σ = α` で (E.26)、`σ = β` で (E.27)。支持補題 `dvd_sub_of_zpow_eq_zpow` /
+`orderOf_eq_of_pow_eq_one` も追加。
+
+### ⟹ 項 6 の**代数的な核は完成**
+
+残るのは chain の組合せ論だけ:
+
+- (ii) `k` = `T/H_k` が非アーベルになる極小の添字 ⟹ (E.24) `T'H_k = H_{k-1}`
+- (iii) `i` = `⁅H_i,T⁆ ⊄ H_k` なる極大、`j` = `⁅H_i,H_j⁆ ⊄ H_k` なる極大
+       ⟹ (E.25) `0 ≤ j ≤ i ≤ k-2` かつ `⁅w_i,w_j⁆ ∈ H_{k-1} − H_k`
+- (iv) `k ≤ q-1` (E.3(c) `|S| ≤ p^q` と `|T| = p^n = |S|/p` から)
+
+⟹ これらが揃えば `eq_of_eigenvalue_relations` (項 7) に流し込んで E.4 の
+abelian clause が閉じる (**項 5 の Case A/B を除いて**)。
+
+### 現状の全体像 (E.4)
+
+| 項 | 状態 |
+|---|---|
+| 1 `S' ≤ T` | ✅ |
+| 2 `B`-不変補空間 | ✅ |
+| 3 `r = r₀` | ✅ |
+| 4 `t ≠ t₀` (E.21) | ✅ |
+| 5 (E.23) の `β` 版 | ⚠ Case A/B 未決 ((32)) |
+| 6 代数的な核 (Lemma 4.2 + 指数取り出し + (E.26)/(E.27)) | ✅ |
+| 6' chain の組合せ ((E.24)/(E.25)/`k ≤ q-1`) | ⬜ |
+| 7 最終算術 | ✅ |
