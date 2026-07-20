@@ -1069,4 +1069,46 @@ theorem RegularOperatorSetup.orbit_eq_coset [Finite R]
   exact le_of_eq hsame
 
 
+/-- **BG Step 4**: *"every element of the set `R₀S' − S'` is conjugate to an element of
+`R₀^#`."*
+
+Write `y = u·z` with `u ∈ R₀`, `z ∈ S'` (legitimate because `S' ⊴ S`).  Then `u ≠ 1`,
+so `u` generates the order-`p` group `R₀`, and `orbit_eq_coset` identifies the class of `u`
+with the coset `u·S'`, which contains `y`. -/
+theorem RegularOperatorSetup.exists_conj_mem_R₀ [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
+    (hexp : ∀ x : ↥S, x ^ p = 1)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
+    {y : ↥S} (hy : y ∈ hyp.R₀.subgroupOf S ⊔ _root_.commutator ↥S)
+    (hyS' : y ∉ _root_.commutator ↥S) :
+    ∃ u ∈ hyp.R₀.subgroupOf S, u ≠ 1 ∧ y ∈ MulAction.orbit (ConjAct ↥S) u := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
+  have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S.le
+  -- `y = u * z` with `u ∈ R₀`, `z ∈ S'`
+  have hcoe : (↑(R₀' ⊔ _root_.commutator ↥S) : Set ↥S) = (R₀' : Set ↥S) * (_root_.commutator ↥S) :=
+    Subgroup.mul_normal R₀' (_root_.commutator ↥S)
+  have hy' : (y : ↥S) ∈ (R₀' : Set ↥S) * ((_root_.commutator ↥S : Subgroup ↥S) : Set ↥S) := by
+    rw [← hcoe]; exact hy
+  obtain ⟨u, hu, z, hz, rfl⟩ := hy'
+  have hune : u ≠ 1 := by
+    rintro rfl
+    exact hyS' (by simpa using hz)
+  -- `u` generates `R₀`
+  have hord : orderOf u = p := by
+    have h1 : orderOf u ∣ Nat.card ↥R₀' := by
+      have h := orderOf_dvd_natCard (⟨u, hu⟩ : ↥R₀')
+      rwa [← Subgroup.orderOf_coe (⟨u, hu⟩ : ↥R₀')] at h
+    rw [hR₀'card] at h1
+    rcases (Nat.dvd_prime hyp.p_prime).mp h1 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hune
+    · exact h
+  have hgen : Subgroup.zpowers u = R₀' :=
+    Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hu)
+      (by rw [hR₀'card, Nat.card_zpowers, hord])
+  refine ⟨u, hu, hune, ?_⟩
+  rw [hyp.orbit_eq_coset hR₀S hexp hp2 hgen]
+  exact ⟨z, hz, rfl⟩
+
+
 end OddOrder.BG.AppE
