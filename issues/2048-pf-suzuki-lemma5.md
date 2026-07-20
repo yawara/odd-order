@@ -327,6 +327,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                 original kernel coordinate との exact equality を strong sibling API で返す
           - [x] `ProperExtension` の anchored-trace construction が第2層へ加える次の
                 Frobenius shift も同様に返し、上記 counter-shift 補題へ接続する
+          - [x] 二つの shift を一つの Frobenius automorphism に合成し、type-A
+                automorphism との可換性を証明して original kernel coordinate へ戻す
+          - [x] relative degree 1 の anchored trace normal form を kernel field 側へ戻し、
+                prescribed kernel coordinate を変えず quotient coordinate だけを構成する
+          - [x] nonzero coefficient を twisted-norm surjectivity で quotient coordinate
+                だけに吸収し、prescribed kernel coordinate のまま係数 1 にする
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

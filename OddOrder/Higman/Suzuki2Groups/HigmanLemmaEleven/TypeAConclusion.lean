@@ -730,6 +730,75 @@ theorem exists_lowerCentralCoordinates_typeANormalForm_of_anchoredTrace_finrankO
       rw [hanchor, hfrobenius]
       ac_rfl
 
+/-- A degree-one anchored trace formula can instead be normalized over the
+kernel field while leaving a prescribed kernel coordinate unchanged.  Only
+the quotient coordinate is transported: first by the anchor Frobenius on
+`L`, then back along the degree-one field equivalence `K ≃+* L`. -/
+theorem exists_lowerCentralQuotientCoordinate_typeANormalForm_of_anchoredTrace_finrankOne
+    {P : Type uP} [Group P]
+    {K : Type uK} {L : Type uL}
+    [Field K] [Field L] [Finite K] [Finite L]
+    [CharP K 2] [CharP L 2] [Algebra K L]
+    (hfin : Module.finrank K L = 1)
+    (hSq : LowerCentralSquaresLieInSecond P)
+    (eZero : Additive (lowerCentralLayer P 0) ≃+ L)
+    (eKernel : Additive (lowerCentralLayer P 1) ≃+ K)
+    (a r : Nat) (epsilon : L)
+    (hformula : ∀ alpha : L,
+      lowerCentralSquareMapAdditive P hSq (eZero.symm alpha) =
+        eKernel.symm
+          (Algebra.trace K L
+            (alpha ^ (2 ^ a) *
+              (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon))) :
+    ∃ eZeroK : Additive (lowerCentralLayer P 0) ≃+ K,
+      ∀ beta : K,
+        eKernel
+            (lowerCentralSquareMapAdditive P hSq
+              (eZeroK.symm beta)) =
+          (finrankOneRingEquiv K L hfin).symm epsilon *
+            (beta * ((frobeniusEquiv K 2) ^ r) beta) := by
+  let anchor : RingAut L := (frobeniusEquiv L 2) ^ a
+  let fieldEquiv : K ≃+* L := finrankOneRingEquiv K L hfin
+  let eZeroK : Additive (lowerCentralLayer P 0) ≃+ K :=
+    (eZero.trans anchor.toAddEquiv).trans fieldEquiv.symm.toAddEquiv
+  refine ⟨eZeroK, ?_⟩
+  intro beta
+  let alpha : L := anchor.symm (fieldEquiv beta)
+  have hfrobeniusL (x : L) (t : Nat) :
+      x ^ (2 ^ t) = ((frobeniusEquiv L 2) ^ t) x := by
+    rw [← iterateFrobeniusEquiv_eq_pow]
+    exact (iterateFrobeniusEquiv_def L 2 t x).symm
+  have hfrobeniusK (x : K) (t : Nat) :
+      x ^ (2 ^ t) = ((frobeniusEquiv K 2) ^ t) x := by
+    rw [← iterateFrobeniusEquiv_eq_pow]
+    exact (iterateFrobeniusEquiv_def K 2 t x).symm
+  have hanchor : alpha ^ (2 ^ a) = fieldEquiv beta := by
+    rw [hfrobeniusL]
+    exact anchor.apply_symm_apply (fieldEquiv beta)
+  calc
+    eKernel
+          (lowerCentralSquareMapAdditive P hSq
+            (eZeroK.symm beta)) =
+        Algebra.trace K L
+          (alpha ^ (2 ^ a) *
+            (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon) := by
+      change eKernel
+          (lowerCentralSquareMapAdditive P hSq
+            (eZero.symm (anchor.symm (fieldEquiv beta)))) = _
+      rw [hformula alpha]
+      simp only [AddEquiv.apply_symm_apply]
+    _ = fieldEquiv.symm
+          (alpha ^ (2 ^ a) *
+            (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon) :=
+      trace_eq_finrankOneRingEquiv_symm K L hfin _
+    _ = (finrankOneRingEquiv K L hfin).symm epsilon *
+          (beta * ((frobeniusEquiv K 2) ^ r) beta) := by
+      rw [hanchor]
+      rw [map_mul, map_mul, map_pow,
+        fieldEquiv.symm_apply_apply, hfrobeniusK]
+      dsimp only [fieldEquiv]
+      ac_rfl
+
 /-- Frobenius-renormalizing a kernel coordinate can instead be undone on the
 quotient coordinate, leaving the prescribed kernel coordinate fixed. -/
 theorem exists_typeANormalForm_preserving_kernel_coordinate

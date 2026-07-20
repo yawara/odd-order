@@ -450,8 +450,12 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       付きで返す strong sibling theorem を追加し、従来 API はその projection とした。
       `ProperExtension` の anchored-trace construction 内で加わる第2の shift も exact
       equality 付き strong sibling で公開し、従来 API は projection とした。従って次は
-      この二つの shift を合成し、上記 counter-shift 補題で prescribed kernel coordinate
-      へ戻した source-facing factor coordinate endpoint を組み立てる段階である。
+      二つの shift を一つの Frobenius automorphism に合成し、type-A Frobenius power と
+      可換することも証明した。relative degree 1 の trace formula は quotient coordinate
+      だけを kernel field 側へ移して prescribed kernel coordinate を固定した normal form
+      に変換でき、残る nonzero coefficient も twisted norm の全射性により quotient
+      coordinate の rescaling だけで 1 にできる。次はこれらを source-facing factor
+      coordinate endpoint として一括する。
       Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
       caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
       invariant factor への restricted action の faithful range でも generator のまま
