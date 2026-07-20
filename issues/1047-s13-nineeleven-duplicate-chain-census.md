@@ -44,6 +44,46 @@ CLAUDE.md「ラッパー方針」の同じ原則: 同じ事実の証明が 2 本
 ⚠ ただし**これは genuine な形式化の削除ではなく重複の解消**である点を混同しないこと。
 迷ったら残す (削除は可逆だが、誤って live な chain を切ると下流が壊れる)。
 
+## ✅ 実施 1 (2026-07-20): 死んだ 2 本を削除
+
+`coherent_sOf_H0Cprime_of_sevenEightRefutation` と `coherent_sOf_H0Cprime_of_equality_refutation`
+(S13_Orthogonality) を削除。`coherent_sOf_H0Cprime` が §9 経由になった時点で前者は参照ゼロ、
+後者は前者からの 1 参照だけだった。AxiomsCheck の該当 2 エントリも撤去。
+
+## ⚠⚠ 実測でわかった 2 つの落とし穴 — 次に触る人は先にこれを読むこと
+
+### 落とし穴 1: 名前ベースの census は namespace を区別できない
+
+`caseA_refuter_of_equality_refutation` は **`S11` (§9 版) と `S13` (§13 版) の両方に存在する**。
+`grep -rn <name>` も、コメントを除去した参照カウントも、この 2 つを混同する。
+⟹ 「outside から参照されている」= live と判定すると、実は §9 版が参照されているだけ、
+という誤判定が起きる。**削除の可否は最終的に「消してビルドが通るか」で決める** (コンパイラが
+唯一の権威)。
+
+### 落とし穴 2: **旧チェーンは死んでいない — `coherent_sOf_H0C` が直接インライン展開している**
+
+これが本命の発見。`coherent_sOf_H0C` (S13_Orthogonality:109) は **live**
+(`S13_NonGaloisExclusion` が使用) だが、その caseA 分岐は `coherent_sOf_H0Cprime` を**呼ばず**、
+旧チェーンを丸ごと展開している:
+
+```
+coherent_sOf_H0C          -- caseA 分岐
+ ← caseA_coherent_sOf_H0Cprime_of_refuter
+ ← S13.caseA_refuter_of_equality_refutation
+ ← nineElevenPairBound
+ ← nineElevenEqualityRefutation_of_sevenEightRefutation
+ ← nineElevenSevenEightRefutation
+```
+
+⟹ **正しい次の一手は削除でなく再配線**: `coherent_sOf_H0C` の caseA 分岐を
+`coherent_sOf_H0Cprime hG hyp hncH0C htype` の呼び出しに置換する。そうすれば旧チェーンが
+初めて本当に dead になり、そこで削除できる。副次的に `coherent_sOf_H0C` が
+`coherent_sOf_H0Cprime` の再導出をやめるので重複自体が減る。
+
+⚠ **障害**: `coherent_sOf_H0Cprime` はファイル内で `coherent_sOf_H0C` より**後**に宣言されている
+(1256 行 vs 109 行) ので、そのままでは呼べない。(9.11) ブロックを前に移すか
+`coherent_sOf_H0C` を後ろに移す必要があり、ファイル内の他の consumer の順序も要確認。
+
 ## 完了条件
 
 実引用ゼロと確認された宣言が削除され、full build green + AxiomsCheck OK + sorry 非退行。

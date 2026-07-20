@@ -10195,8 +10195,7 @@ the (9.11.1) `𝒮₂ = 𝒮₁` extraction (the saturated-bound subset form and
 `nineElevenSTwoExtraction`), the Bessel constituent count, the `hunif`-free member
 `R`-dispatch cross-orthogonality, and the `τ₃`-coherence of `𝒮₃` (Peterfalvi (5.7) at the
 uniform degree `qu`).  The `Hypothesis`-level corollaries (`caseA_nineElevenTwo_tiWitness`,
-`nineElevenNormBound_of_sevenEightRefutation`, `coherent_sOf_H0Cprime_of_sevenEightRefutation`)
-were long annotated here as carrying a "pre-existing upstream `C_eq_cSub` sorryAx debt".
+`nineElevenNormBound_of_sevenEightRefutation`) were long annotated here as carrying a "pre-existing upstream `C_eq_cSub` sorryAx debt".
 **That note was stale** (2026-07-19 lane a, verified by `#print axioms`): `C_eq_cSub_of_noncoherent`
 (`S13_CoreStructure.lean:511`) and the whole chain are sorry-free, so the corollaries are
 axiom-clean and are pinned below. -/
@@ -10212,8 +10211,6 @@ axiom-clean and are pinned below. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_nineElevenTwo_tiWitness
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S13.nineElevenNormBound_of_sevenEightRefutation
-#assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_sevenEightRefutation
 
 /-! **Peterfalvi (9.11.7)–(9.11.8) coherent-pair adjunction, axiom-clean** (issue 9083 Phase
 E-final, lane a).  The union-pair coherent extension (Coq `extend_coherent_with` +
@@ -10230,8 +10227,6 @@ verified by `#print axioms`): all three depend only on `propext` / `Classical.ch
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_eq_sum_memberRFamily
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_cross_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.nineElevenSevenEightRefutation
-#assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_equality_refutation
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0C
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.exists_bridge_target_of_budget
