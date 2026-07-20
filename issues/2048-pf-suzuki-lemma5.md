@@ -305,7 +305,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [x] 左右 factor の座標より先に、ambient actor の実際の `Φ(P)` 制限作用を
               primitive scalar multiplication へ共役する共通 Singer 座標と Frobenius
               eigenbasis を構成し、その次数が factor parameter に等しいことを証明する
-        - [ ] 上記の共通 `Φ(P)` 座標を prescribed kernel coordinate として、左右各
+        - [x] 上記の共通 `Φ(P)` 座標を prescribed kernel coordinate として、左右各
               factor の quotient 座標を actor-compatible に構成し、
               `ν = λ·θ(λ) = μ·φ(μ)` を導く
           - [x] Lemma 11 の field model を caller-prescribed actor generator 版へ
@@ -333,6 +333,18 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                 prescribed kernel coordinate を変えず quotient coordinate だけを構成する
           - [x] nonzero coefficient を twisted-norm surjectivity で quotient coordinate
                 だけに吸収し、prescribed kernel coordinate のまま係数 1 にする
+          - [x] shift 復元と係数 1 化を一つの公開 endpoint に束ね、quotient actor
+                compatibility と `ν = λ·θ(λ)` を同時に保持する
+          - [x] caller-prescribed generator 版 Lemma 11 の actual field model と二つの
+                tracked shift を上記 endpoint へ接続し、noncommutative factor の
+                quotient coordinate を共通 `Φ(P)` 座標から構成する
+          - [x] 同じ ambient Singer datum を左右の非可換因子へ一度ずつ適用し、両方の
+                quotient coordinate と `ν = λ·θ(λ) = μ·φ(μ)` を一つの endpoint で返す
+          - [x] commutative `A(n,1)` と noncommutative factor の座標 data を共通の
+                inclusive bundle に包み、実際の complementary pair の全組合せを返す
+          - [ ] actual mixed commutator pairing の actor covariance を左右の tagged
+                coordinates で表示し、`θ = 1` / `φ = 1` / 両方非自明の固有値制約を
+                原典の B/C/D case split へ接続する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

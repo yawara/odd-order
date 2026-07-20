@@ -595,7 +595,7 @@ noncomputable def typeADataOfScaledSquareCoordinates
 
 /-- Index-flexible form of the actual anchored-trace connector. -/
 private theorem
-    exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData_indexed
+    exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData_indexed_with_secondShift
     {P : Type uP} [Group P] [Finite P]
     (hAgemo : Agemo P 2 1 = lowerCentralTerm P 1)
     {K : Type uK} {L : Type uL}
@@ -650,6 +650,9 @@ private theorem
         lowerCentralCommutatorBilinearBaseChange L P
           (bOne i) (bOne j) = 0) :
     ∃ eTwoShift : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] K,
+      eTwoShift = eTwo.trans
+        (((FiniteField.frobeniusAlgEquivOfAlgebraic
+          (ZMod 2) K) ^ s₀.val).toLinearEquiv) ∧
       ∀ alpha : L,
         lowerCentralSquareMapAdditive P
             (lowerCentralSquaresLieInSecond_of_agemo_eq P hAgemo)
@@ -659,7 +662,7 @@ private theorem
               (alpha ^ (2 ^ a.val) *
                 (alpha ^ (2 ^ a.val)) ^ (2 ^ r.val) * epsilon)) := by
   subst m
-  exact exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData
+  exact exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData_with_secondShift
     hAgemo iota hiota d hn hd hcardK hfinKL hfinL
     eOne bOne hq hcycleOne eTwo bTwo hbTwo hcycleTwo
     a s₀ r hr0 hrtwo epsilon hseed hsymm hsupport
@@ -983,16 +986,18 @@ noncomputable def typeADataOfLowerCentralSquareNormalForm
 
 set_option maxHeartbeats 800000 in
 -- This assembly elaborates the two large actual Singer-basis expressions.
-/-- Assemble Higman's Lemma 11 from the two finite-field eigenmodels of the
-actual lower-central layers. -/
-private theorem typeAData_of_higmanLemmaElevenFieldData
+/-- Assemble the coordinate content of Higman's Lemma 11 from the two actual
+finite-field eigenmodels.  The returned algebra automorphism records every
+second-layer Frobenius normalization, so the caller's prescribed kernel
+coordinate is retained as `eTwo.trans sigma.toLinearEquiv`. -/
+theorem exists_higmanLemmaElevenFieldCoordinates_with_trackedKernel
     {P : Type uP} [Group P] [Finite P]
     {Y : Subgroup (MulAut P)}
     (hP : IsPGroup 2 P)
     (hncomm : ¬ IsMulCommutative P)
     (hxi : IsXiActor Y)
     (hlen : HasXiLengthTwo Y.subtype)
-    {K L : Type uF}
+    {K : Type uK} {L : Type uL}
     [Field K] [Finite K] [CharP K 2] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [CharP L 2] [Algebra (ZMod 2) L]
     (m n d : Nat)
@@ -1017,7 +1022,25 @@ private theorem typeAData_of_higmanLemmaElevenFieldData
       eTwo (lowerCentralLayerRepresentation Y.subtype 1 c v) =
         nu * eTwo v)
     (hactorOdd : Odd (Nat.card Y)) :
-    Nonempty (TypeAData.{uP, uF} P) := by
+    ∃ (r : Fin (finrank (ZMod 2) K))
+      (eQuot : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2] K)
+      (lambdaK : K) (sigma : K ≃ₐ[ZMod 2] K) (epsilonK : K),
+      epsilonK ≠ 0 ∧
+      (∀ v,
+        eQuot (lowerCentralLayerRepresentation Y.subtype 0 c v) =
+          lambdaK * eQuot v) ∧
+      let theta : RingAut K := (frobeniusEquiv K 2) ^ r.val
+      theta ≠ 1 ∧
+      Odd (orderOf theta) ∧
+      (∀ x : K, sigma (theta x) = theta (sigma x)) ∧
+      ∀ beta : K,
+        (eTwo.trans sigma.toLinearEquiv)
+            (lowerCentralSquareMapAdditive P
+              (lowerCentralSquaresLieInSecond_of_agemo_eq P
+                (agemo_one_eq_lowerCentralTerm_one
+                  hP hncomm hxi hlen))
+              (eQuot.symm beta)) =
+          epsilonK * (beta * theta beta) := by
   classical
   have hnpos : 0 < n := by omega
   have hdpos : 0 < d := hdegreeOdd.pos
@@ -1081,10 +1104,10 @@ private theorem typeAData_of_higmanLemmaElevenFieldData
   have hprimNuK :
       IsPrimitiveRoot nu (2 ^ finrank (ZMod 2) K - 1) := by
     simpa only [hfinK] using hnuPrimitive
-  obtain ⟨eOne', eTwo', lambda', nu', r,
+  obtain ⟨s, eOne', eTwo', lambda', nu', r, heTwo',
       hcompatOne', hlambdaGen', hcompatTwo', hnuPrimitive',
       hnu, hr, hbracket, _hcoordinate, hpairGap⟩ :=
-    exists_normalizedLowerCentralConjugateBasisBracketCoordinate
+    exists_normalizedLowerCentralConjugateBasisBracketCoordinate_with_secondShift
       Y.subtype c eOne lambda hlambdaGen hcompatOne
       eTwo nu iota hcompatTwo hnKTwo hprimNuK
   let bTwo :=
@@ -1173,8 +1196,8 @@ private theorem typeAData_of_higmanLemmaElevenFieldData
       N = m := hfinL
       _ = d * n := hdegree
       _ = d * finrank (ZMod 2) K := by rw [hfinK]
-  obtain ⟨eTwoShift, htrace⟩ :=
-    exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData_indexed
+  obtain ⟨eTwoShift, heTwoShift, htrace⟩ :=
+    exists_lowerCentralSquareMap_eq_anchoredTrace_of_actualSingerData_indexed_with_secondShift
       (agemo_one_eq_lowerCentralTerm_one hP hncomm hxi hlen)
       iota hiota N d hNdegree hnK hdpos hcardK hfinKL rfl
       eOne' bOne hq hcycleOne
@@ -1210,19 +1233,145 @@ private theorem typeAData_of_higmanLemmaElevenFieldData
       (2 ^ finrank (ZMod 2) L - 1)
     simpa only [hfieldDegrees] using
       (hnuPrimitive'.map_of_injective iota.injective)
-  obtain ⟨hphiNe, hphiOdd⟩ :=
+  let fieldEquiv : K ≃+* L := finrankOneRingEquiv K L hfinOne
+  let rK : Fin (finrank (ZMod 2) K) :=
+    ⟨r.val, by
+      rw [← hfieldDegrees]
+      exact r.isLt⟩
+  have hrK : rK ≠ 0 := by
+    intro hrKZero
+    apply hr
+    apply Fin.ext
+    simpa [rK] using congrArg Fin.val hrKZero
+  obtain ⟨eQuotAdd, lambdaK, epsilonK, _, hlambdaK, hepsilonK,
+      hcompatQuotAdd, hnormalAdd⟩ :=
+    exists_lowerCentralQuotientCoordinate_typeANormalForm_of_anchoredTrace_finrankOne_generator
+      Y.subtype c hfinOne hSq eOne' lambda' hcompatOne'
+      eTwoShift 0 r.val epsilon htrace
+  have hlambdaK' : lambdaK = fieldEquiv.symm lambda' := by
+    simpa using hlambdaK
+  have hshiftPrimitiveK :
+      IsPrimitiveRoot
+        (lambdaK ^ (1 + 2 ^ rK.val))
+        (2 ^ finrank (ZMod 2) K - 1) := by
+    have hmapped :=
+      hshiftPrimitive.map_of_injective fieldEquiv.symm.injective
+    rw [hlambdaK']
+    simpa only [fieldEquiv, pow_zero, one_apply, map_pow,
+      hfieldDegrees, rK]
+      using hmapped
+  obtain ⟨hphiNeK, hphiOddK⟩ :=
     frobeniusPower_ne_one_and_orderOf_odd_of_primitive_shift
-      hcardL lambda' r hr hshiftPrimitive
-  obtain ⟨eZero', eOneL, hnormal⟩ :=
-    exists_lowerCentralCoordinates_typeANormalForm_of_anchoredTrace_finrankOne
-      hfinOne hSq eOne'.toAddEquiv eTwoShift.toAddEquiv
-      0 r.val epsilon htrace
+      hcardK lambdaK rK hrK hshiftPrimitiveK
+  let eQuot : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2] K :=
+    eQuotAdd.toLinearEquiv
+      (fun z x => ZMod.map_smul eQuotAdd.toAddMonoidHom z x)
+  have hepsilonKNe : epsilonK ≠ 0 := by
+    intro hzero
+    apply hepsilon
+    apply fieldEquiv.symm.injective
+    rw [← hepsilonK]
+    simpa only [map_zero] using hzero
+  have hcompatQuot : ∀ v,
+      eQuot (lowerCentralLayerRepresentation Y.subtype 0 c v) =
+        lambdaK * eQuot v := by
+    intro v
+    change eQuotAdd
+        (lowerCentralLayerRepresentation Y.subtype 0 c v) =
+      lambdaK * eQuotAdd v
+    exact hcompatQuotAdd v
+  have hnormal : ∀ beta : K,
+      eTwoShift
+          (lowerCentralSquareMapAdditive P hSq (eQuot.symm beta)) =
+        epsilonK *
+          (beta * ((frobeniusEquiv K 2) ^ rK.val) beta) := by
+    intro beta
+    change eTwoShift
+        (lowerCentralSquareMapAdditive P hSq
+          (eQuotAdd.symm beta)) = _
+    simpa only [rK] using hnormalAdd beta
+  let sigma : K ≃ₐ[ZMod 2] K :=
+    ((FiniteField.frobeniusAlgEquivOfAlgebraic
+      (ZMod 2) K) ^ s.val).trans
+      ((FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) K) ^ (0 : Nat))
+  have hTwoCombined :
+      eTwoShift = eTwo.trans sigma.toLinearEquiv := by
+    rw [heTwoShift, heTwo']
+    rfl
+  have hsigmaTheta : ∀ x : K,
+      sigma (((frobeniusEquiv K 2) ^ rK.val) x) =
+        ((frobeniusEquiv K 2) ^ rK.val) (sigma x) := by
+    intro x
+    rw [← iterateFrobeniusEquiv_eq_pow]
+    simp only [iterateFrobeniusEquiv_def, map_pow]
+  have hnormalCombined : ∀ beta : K,
+      (eTwo.trans sigma.toLinearEquiv)
+          (lowerCentralSquareMapAdditive P hSq (eQuot.symm beta)) =
+        epsilonK *
+          (beta * ((frobeniusEquiv K 2) ^ rK.val) beta) := by
+    intro beta
+    rw [← hTwoCombined]
+    exact hnormal beta
+  refine ⟨rK, eQuot, lambdaK, sigma, epsilonK,
+    hepsilonKNe, hcompatQuot, ?_⟩
+  dsimp only
+  exact ⟨hphiNeK, hphiOddK, hsigmaTheta, hnormalCombined⟩
+
+set_option maxHeartbeats 800000 in
+-- The compatibility projection re-elaborates the tracked field assembly.
+/-- Compatibility projection of the tracked field-coordinate assembly to the
+original nonempty type-A data endpoint. -/
+private theorem typeAData_of_higmanLemmaElevenFieldData
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype)
+    {K L : Type uF}
+    [Field K] [Finite K] [CharP K 2] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [CharP L 2] [Algebra (ZMod 2) L]
+    (m n d : Nat)
+    (hfinL : finrank (ZMod 2) L = m)
+    (hfinK : finrank (ZMod 2) K = n)
+    (hfinLayerTwo : finrank (ZMod 2)
+      (Additive (lowerCentralLayer P 1)) = n)
+    (hnTwo : 2 ≤ n)
+    (hdegree : m = d * n)
+    (hdegreeOdd : Odd d)
+    (iota : K →ₐ[ZMod 2] L)
+    (eOne : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2] L)
+    (eTwo : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] K)
+    (c : Y) (hcgen : ∀ y : Y, y ∈ Subgroup.zpowers c)
+    (lambda : L) (nu : K)
+    (hlambdaGen : Algebra.adjoin (ZMod 2) ({lambda} : Set L) = ⊤)
+    (hcompatOne : ∀ v,
+      eOne (lowerCentralLayerRepresentation Y.subtype 0 c v) =
+        lambda * eOne v)
+    (hnuPrimitive : IsPrimitiveRoot nu (2 ^ n - 1))
+    (hcompatTwo : ∀ v,
+      eTwo (lowerCentralLayerRepresentation Y.subtype 1 c v) =
+        nu * eTwo v)
+    (hactorOdd : Odd (Nat.card Y)) :
+    Nonempty (TypeAData.{uP, uF} P) := by
+  classical
+  obtain ⟨r, eQuot, _, sigma, epsilonK,
+      hepsilonK, _, hphiNe, hphiOdd, _, hnormal⟩ :=
+    exists_higmanLemmaElevenFieldCoordinates_with_trackedKernel
+      hP hncomm hxi hlen m n d hfinL hfinK hfinLayerTwo hnTwo
+      hdegree hdegreeOdd iota eOne eTwo c hcgen lambda nu
+      hlambdaGen hcompatOne hnuPrimitive hcompatTwo hactorOdd
+  have hcardK : Nat.card K = 2 ^ finrank (ZMod 2) K := by
+    simpa only [Nat.card_zmod] using
+      (Module.natCard_eq_pow_finrank (K := ZMod 2) (V := K))
   exact ⟨typeADataOfLowerCentralSquareNormalForm.{uP, uF}
-    (P := P) (Y := Y) (F := L)
+    (P := P) (Y := Y) (F := K)
     hP hncomm hxi hlen
-    (finrank (ZMod 2) L) finrank_pos hcardL
-    ((frobeniusEquiv L 2) ^ r.val) hphiNe hphiOdd
-    epsilon hepsilon eZero' eOneL hnormal⟩
+    (finrank (ZMod 2) K) finrank_pos hcardK
+    ((frobeniusEquiv K 2) ^ r.val) hphiNe hphiOdd
+    epsilonK hepsilonK eQuot.toAddEquiv
+      (eTwo.trans sigma.toLinearEquiv).toAddEquiv hnormal⟩
 
 set_option maxHeartbeats 800000 in
 -- The source endpoint elaborates the complete field-model assembly above.
