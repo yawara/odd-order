@@ -9278,11 +9278,21 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
   OddOrder.Peterfalvi.S11.exists_characteristic_complement_to_sylow_of_nilpotent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_seed
 -- The chief-factor kernel and its elementary-abelian + `U W₁`-irreducible + `U`-noncentral
--- structure of `H̄ = H/N` is axiom-clean.  (`exists_chiefFactorData` / `chiefFactor_basic` assemble
--- it but additionally carry `typeIII_IV_p_eq_W2`, which cites the still-`sorry`'d §12 prime-order
--- result `theorem88_caseB_prime_orders`, so they are not yet axiom-clean.)
+-- structure of `H̄ = H/N` is axiom-clean.  (`exists_chiefFactorData` additionally has to *produce*
+-- `typeIII_IV_p_eq_W2`, which cites the still-`sorry`'d §12 prime-order result
+-- `theorem88_caseB_prime_orders`, so the producer is not yet axiom-clean.)
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_kernel
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_quotient_card
+-- **(9.6) type-uniform** (all of types II, III, IV — the book's own scope): `U ≠ C` for the
+-- chief-factor centralizer `C = C_U(H̄)` (`cSub`), `|W̄₂| = p` for the *image* `W̄₂ = C_{H̄}(W₁)`,
+-- and `|H̄| = p^q`.  Stating the image `W̄₂` and the chief-factor centralizer — the objects that
+-- Hypothesis (9.5) actually fixes — removes the former type-III/IV restriction, which was an
+-- artifact of substituting `W₂` for `W̄₂` and `C_U(H)` for `C_U(H̄)` (these coincide only when
+-- `H₀ = 1`).  Given the carrier, all three clauses are axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.cSub_subgroupOf_U_eq_ker_map
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_cSub_ne_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_U_not_centralizes_H
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_basic
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.iSup_smul_eq_top_of_irreducible
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_eq_pow_of_iSup_aInvariant_irreducible
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.isAInvariant_comp_subtype_pointwise_smul
