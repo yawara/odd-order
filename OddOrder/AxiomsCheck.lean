@@ -155,6 +155,8 @@ import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.BG.AppE_FurtherResults
 import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.AppE_ExponentP
+import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -10856,9 +10858,9 @@ needed for this clause:
   ⚠ BG also assumes `S` is `A`-invariant and `R₀ < S` properly; neither is used.
 * `RegularOperatorSetup.R₀_le_omega` — `R₀ ≤ Ω₁(R)`.
 
-⚠ `RegularOperatorSetup.R₀_not_le_derived_omega` (E.3(b)'s **second clause**) is now genuinely
-proved *from* these, but it cites the still-sorried first clause `omega_pow_eq_one` (BG's
-Step 3) for the exponent hypothesis, so it is deliberately **not** asserted here. -/
+⚠ `RegularOperatorSetup.R₀_not_le_derived_omega` (E.3(b)'s **second clause**) is proved *from*
+these plus the first clause `omega_pow_eq_one` (BG's Step 3); it is asserted with the rest of
+Step 3, at the end of this file. -/
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.derived_central_of_card_le_prime_cube
 #assert_only_allowed_axioms
@@ -10992,9 +10994,9 @@ appear to be needed, and `R₀ < S` *properly* starts to matter. -/
   *false* for `S = R₀` (giving `p`, not `p²`), so properness must come from somewhere, and
   it comes from an order-`p` element of `R₁ ≠ 1`, disjoint from `R₀`.
 
-⚠ `RegularOperatorSetup.card_omega_abelianization` (the clause itself) is genuinely proved
-from these but cites the still-sorried first clause `omega_pow_eq_one` for the exponent
-hypothesis, so — like the second clause — it is deliberately **not** asserted here. -/
+⚠ `RegularOperatorSetup.card_omega_abelianization` (the clause itself) is proved from these
+plus the first clause `omega_pow_eq_one`; like the second clause it is asserted with the rest
+of Step 3, at the end of this file. -/
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_quotient_commutator
@@ -11665,3 +11667,52 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- **No `hncH0C`/`htype`** — §13 threads them only into Phases B and C, and both shed them here.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.caseA_equalityRefutation_of_sTwoExtraction_normBound
+
+/-! **BG Theorem E.3(b) Step 3, (c), and (d) — Steps 3 and 4 complete**
+(`BG.AppE_ExponentP`, `BG.AppE_SemidirectFrattini`; issue 3021, 2026-07-20).
+
+**Step 3** takes an `A`-invariant exponent-`p` subgroup `S` maximal subject to containing the
+seed `Ω₁(C_R(R₀))` and identifies it with `Ω₁(R)`; the three clauses of (b) and the bound (c)
+then fall out of Step 2 applied to `S = Ω₁(R)`:
+
+* `RegularOperatorSetup.eq_omega_of_maximal` — BG's maximal choice **is** `Ω₁(R)`.  The
+  `S ≠ Ω₁(N_{Ω₁(R)}(S))` branch is BG's `(E.14)`–`(E.16)` count, closed by contradicting
+  maximality through E.2 applied to `Ω₁(T)`.
+* `RegularOperatorSetup.omega_pow_eq_one` — **(b) first clause**, `Ω₁(R)` has exponent `p`.
+* `RegularOperatorSetup.R₀_not_le_derived_omega` — **(b) second clause**, `R₀ ⊄ (Ω₁(R))'`.
+* `RegularOperatorSetup.card_omega_abelianization` — **(b) third clause**, `|Ω₁(R)/(Ω₁(R))'|
+  = p²`.
+* `RegularOperatorSetup.card_omega_le` — **(c)**, `|Ω₁(R)| ≤ p^q`.
+
+**Step 4** is part (d).  Its counting half lives in `AppE_ExponentP` because it consumes
+Step 2's `(E.15)`; its group-theoretic half is the new leaf `AppE_SemidirectFrattini`:
+
+* `RegularOperatorSetup.orbit_eq_coset` — the `S`-class of `v ∈ R₀^#` **equals** `vS'`.  ⭐ the
+  only place in Appendix E where `(E.15)` is used; Step 2 gets the same information from the
+  product formula more directly.
+* `RegularOperatorSetup.exists_conj_mem_R₀` — *"every element of `R₀S' − S'` is conjugate to
+  an element of `R₀^#`"*.
+* `RegularOperatorSetup.exists_conj_smul_R₀` — *"for each `β ∈ B`, `R₀^β = R₀^x` for some
+  `x ∈ S`"*.
+* `RegularOperatorSetup.exists_smul_R₀_invariant` — a `B`-invariant `S`-conjugate of `R₀`.
+  ⭐ BG's *"variation of the Frattini argument … Schur–Zassenhaus … `B* = B^y`"* is verbatim
+  the proof of **Isaacs Lemma 3.24(a)** (`Isaacs.Ch04.glauberman_fixed_point_exists`,
+  already in the repo, `Γ = S ⋊ B` acting on `Ω`), so it is *applied* rather than rebuilt —
+  no second semidirect-product construction was added.
+* `RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini` — **(d)**.  The closing coset
+  fixed-point step is likewise **Isaacs Thm 3.27**
+  (`aInvariant_coset_mem_centralizer_of_coprime_subgroup`) applied to `y·N_S(R₀)`, with
+  `A`-regularity forcing the fixed point to be `1`.
+
+⚠ The `sorry`s left in Appendix E are exactly **E.4** and **E.5**. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.eq_omega_of_maximal
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.omega_pow_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_not_le_derived_omega
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_omega_abelianization
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_omega_le
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.orbit_eq_coset
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.exists_conj_mem_R₀
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.exists_conj_smul_R₀
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.exists_smul_R₀_invariant
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini

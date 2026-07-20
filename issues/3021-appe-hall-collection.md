@@ -1223,3 +1223,56 @@ coprime 固定点 (`|A| = q` vs p 冪の剰余類)。
 
 フルビルド 4562 jobs green / sorry 14 (セッション開始時 15) / AxiomsCheck 3540 件 OK。
 AppE の残 sorry 3 = E.3(d) (本項) / E.4 / E.5。
+
+## 2026-07-20 (25): ⭐ **Theorem E.3(d) 完了** — Step 4 全体が sorry-free
+
+新 leaf **`OddOrder/BG/AppE_SemidirectFrattini.lean`** (Step 4 の群論半分)。
+counting 半分は `(E.15)` を消費するので `AppE_ExponentP.lean` に残置。
+
+| 宣言 | 内容 |
+|---|---|
+| `map_subtype_sup_commutator` / `mem_sup_derivedInG_iff` | ambient `H ⊔ K'` ↔ subtype `H.subgroupOf K ⊔ commutator ↥K` |
+| `seed_le_omega` / `omega_pow_eq_one'` / `card_inf_omega_centralizer` | `S = Ω₁(R)` 版 (E.14) `\|C_S(R₀)\| = p²` |
+| `smul_omega` / `smul_derivedInG_omega` | `Ω₁(R)`, `(Ω₁(R))'` の `B`-不変性 |
+| `smul_conj_smul` | `f • (W^s) = (f • W)^{f s}` (= `f·conj s·f⁻¹ = conj (f s)`) |
+| ⭐ `exists_conj_smul_R₀` | **`R₀^β = R₀^x` (∃x ∈ S)** |
+| ⭐ `exists_smul_R₀_invariant` | **`B`-不変な `R₀` の `S`-共役が在る** |
+| ⭐ `B_fixes_R₀_of_fixes_frattini` | **BG Theorem E.3(d)** |
+
+### ⭐ 最大の収穫: 半直積を組み直さずに済んだ
+
+BG の Step 4 後半 *"By a variation of the Frattini argument, `SB = S·N_G(R₀)`.
+By the Schur–Zassenhaus Theorem, `N_G(R₀)` contains a complement `B*` to
+`N_G(R₀) ∩ S`, and `B* = B^y` for some `y ∈ S`."* は、**Isaacs Lemma 3.24(a)
+(Glauberman fixed-point lemma) の証明そのもの** (`Γ = G ⋊ A` → Frattini →
+SZ 存在 → SZ 共役)。repo に `Isaacs.Ch04.glauberman_fixed_point_exists` として
+既に形式化済みだったので、**`S ⋊ B` を新規に組む必要はまったく無かった**。
+
+同様に締めの *"A fixes at least one element z of y·N_S(R₀) … z = 1"* は
+**Isaacs Thm 3.27** (`aInvariant_coset_mem_centralizer_of_coprime_subgroup`)。
+
+⟹ 前回セッションの「⬜ 必要な新規インフラ」リスト (半直積の配線 / Frattini
+変形 / Schur–Zassenhaus / coprime 固定点) は **4 件とも不要**だった。適用形は:
+
+- `Ω := { W : Subgroup R // ∃ s : ↥Ω₁(R), W = MulAut.conj ↑s • R₀ }`
+- `↥Ω₁(R)` は共役で `Ω` に推移的、`B` は `exists_conj_smul_R₀` で `Ω` を保つ
+- compatibility は `smul_conj_smul` 一発、coprime は `p ∤ |B|`、可解性は p 群
+
+📌 **教訓**: BG が「Frattini + Schur–Zassenhaus」と手で書き下している箇所は、
+**Isaacs Ch.3/Ch.4 の既存定理 1 本に畳めることがある**。着手前に `grep -rn`
+で Isaacs 側の該当番号 (今回は 3.24 / 3.27) を確認する。
+[[bg-gorenstein-reread-as-isaacs]] と同じ読み替えが Gorenstein 引用以外にも効く。
+
+### リポジトリ状態
+
+`AppE` の残 sorry は **E.4 と E.5 の 2 件** (前 3 件)。
+`#print axioms` = propext / Classical.choice / Quot.sound のみ。
+`AppE_FurtherResults.lean` の E.3(d) sorried statement は削除し、
+E.3(b)/(c) と同型の「下流 leaf に在る」注記コメントに置換 (consumer 0)。
+
+### 次の一手 = **BG Proposition E.4**
+
+`|S| ≥ p⁴`・`B` が `R` に regular・`B` が `R₀` を固定しない ⟹ `C_S(Z₂(S))` は
+指数 `p` のアーベル部分群。BG の議論は 2 次元 `𝔽_p`-空間 `S/S'` の中で走り、
+`α` の固有値 `r, r₀` (on `R₀S'/S'`) と `β` の `t, t₀` (on `T/S'`) を比較して
+`j + 2 = k − i` から `t₀ = t` の矛盾を出す。E.3 を全部消費する。
