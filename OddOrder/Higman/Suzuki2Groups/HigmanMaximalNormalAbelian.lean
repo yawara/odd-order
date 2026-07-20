@@ -56,6 +56,24 @@ structure IsMaximalNormalInvariantAbelian
   maximal : ∀ B : Subgroup P, IsNormalInvariant act B →
     IsMulCommutative B → A ≤ B → B = A
 
+/-- Every finite group with an actor has a maximal abelian subgroup among
+the ambient-normal actor-invariant subgroups. -/
+theorem exists_maximalNormalInvariantAbelian
+    {P X : Type*} [Group P] [Finite P] [Group X]
+    (act : X →* MulAut P) :
+    ∃ A : Subgroup P, IsMaximalNormalInvariantAbelian act A := by
+  obtain ⟨A, _hbotA, hAmax⟩ :=
+    exists_maximal_ge_of_wellFoundedGT
+      (fun B : Subgroup P =>
+        IsNormalInvariant act B ∧ IsMulCommutative B)
+      (⊥ : Subgroup P) ⟨⟨inferInstance, IsAInvariant.bot act⟩, inferInstance⟩
+  refine ⟨A,
+    { isNormalInvariant := hAmax.1.1
+      isMulCommutative := hAmax.1.2
+      maximal := ?_ }⟩
+  intro B hB hBcomm hAB
+  exact le_antisymm (hAmax.2 ⟨hB, hBcomm⟩ hAB) hAB
+
 namespace IsMaximalNormalInvariantAbelian
 
 variable {P X : Type*} [Group P] [Finite P] [Group X]
@@ -313,17 +331,19 @@ private theorem exists_special_cover_ambientFrattini_eq_left
           (hP.to_subgroup A)] using hb2PhiA
   exact ⟨C, b, hcover, hCle, hbC, hbPhi, hbA, hb2not, hPhiC⟩
 
-/-- **Higman, Suzuki 2-groups, Lemma 9 (p. 87), exponent conclusion.**
+/-- **Higman, Suzuki 2-groups, Lemma 9 (p. 87), exponent conclusion at
+source strength.**
 
 If `A` is maximal among the abelian normal actor-invariant subgroups of a
-nonabelian finite `2`-group whose cyclic actor acts regularly on the
-involutions, then every element of `A` has fourth power one. -/
-theorem higmanLemmaNine_pow_four_eq_one
+nonabelian finite `2`-group whose cyclic odd-order actor acts transitively on
+the involutions, then every element of `A` has fourth power one. -/
+theorem higmanLemmaNine_pow_four_eq_one_of_transitive
     {P : Type*} [Group P] [Finite P]
     (hP : IsPGroup 2 P)
     (X : Subgroup (MulAut P))
     (hXcyc : IsCyclic X)
-    (hreg : ActsRegularlyOnInvolutions X)
+    (htrans : ActsTransitivelyOnInvolutions X)
+    (hXodd : Odd (Nat.card X))
     (hmulti : ∃ x y : P,
       x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
     (hncomm : ¬ IsMulCommutative P)
@@ -331,15 +351,13 @@ theorem higmanLemmaNine_pow_four_eq_one
     (hAmax : IsMaximalNormalInvariantAbelian X.subtype A) :
     ∀ a : A, a ^ 4 = 1 := by
   letI : A.Normal := hAmax.isNormalInvariant.1
-  have htrans : ∀ x ∈ involutions P, ∀ y ∈ involutions P,
-      ∃ g : X, (g : MulAut P) x = y := by
-    intro x hx y hy
-    obtain ⟨g, hg, _⟩ := hreg x hx y hy
-    exact ⟨g, hg⟩
   have htransA : ∀ x ∈ involutions A, ∀ y ∈ involutions A,
       ∃ g : X, hAmax.isNormalInvariant.2.restrict g x = y :=
     restricted_involutions_transitive X.subtype
-      hAmax.isNormalInvariant.2 (by simpa using htrans)
+      hAmax.isNormalInvariant.2 (by
+        intro x hx y hy
+        obtain ⟨g, hg⟩ := htrans x hx y hy
+        exact ⟨g, hg⟩)
   letI : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAmax.isMulCommutative.is_comm.comm }
@@ -359,15 +377,15 @@ theorem higmanLemmaNine_pow_four_eq_one
   · rcases hcover.commutator_map_eq_left_or_le_agemo_one
         hP classify hPhi with hderived | hderived
     · intro a
-      have htwo := higmanLemmaEight_pow_two_eq_one
-        hP X hXcyc hreg hmulti A C hcover
+      have htwo := higmanLemmaEight_pow_two_eq_one_of_transitive
+        hP X hXcyc htrans hXodd hmulti A C hcover
           hAmax.isMulCommutative hderived a
       calc
         a ^ 4 = (a ^ 2) ^ 2 := by group
         _ = 1 := by rw [htwo]; simp
     · have hCcomm : IsMulCommutative C :=
-        higmanLemmaSeven_isMulCommutative
-          hP X hXcyc hreg hmulti A C hcover
+        higmanLemmaSeven_isMulCommutative_of_transitive
+          hP X hXcyc htrans hmulti A C hcover
             hAmax.isMulCommutative hPhi hderived
       have hCA : C = A :=
         hAmax.maximal C hcover.right hCcomm hcover.le
@@ -375,6 +393,28 @@ theorem higmanLemmaNine_pow_four_eq_one
   · exact hcover.pow_four_eq_one_of_frattini_map_eq
       hP X htrans hmulti hAmax.isMulCommutative (by
         simpa [NormalInvariantCover.ambientFrattini] using hPhi)
+
+/-- Compatibility form of the exponent conclusion for an actor already
+known to act regularly on the involutions. -/
+theorem higmanLemmaNine_pow_four_eq_one
+    {P : Type*} [Group P] [Finite P]
+    (hP : IsPGroup 2 P)
+    (X : Subgroup (MulAut P))
+    (hXcyc : IsCyclic X)
+    (hreg : ActsRegularlyOnInvolutions X)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hncomm : ¬ IsMulCommutative P)
+    (A : Subgroup P)
+    (hAmax : IsMaximalNormalInvariantAbelian X.subtype A) :
+    ∀ a : A, a ^ 4 = 1 := by
+  have hinv : (involutions P).Nonempty := by
+    obtain ⟨x, _, hx, _, _⟩ := hmulti
+    exact ⟨x, hx⟩
+  exact higmanLemmaNine_pow_four_eq_one_of_transitive
+    hP X hXcyc hreg.transitive
+      (actor_card_odd_of_regular_on_involutions hP X hreg hinv)
+      hmulti hncomm A hAmax
 
 /-- The join of two abelian subgroups is abelian when the left subgroup
 centralizes the right one. This local form avoids importing the later BG
@@ -403,24 +443,25 @@ private theorem IsMaximalNormalInvariantAbelian.frattini_le_of_pow_two_eq_one
     {P : Type*} [Group P] [Finite P]
     (hP : IsPGroup 2 P)
     (X : Subgroup (MulAut P))
-    (hXcyc : IsCyclic X)
-    (hreg : ActsRegularlyOnInvolutions X)
+    (_hXcyc : IsCyclic X)
+    (htrans : ActsTransitivelyOnInvolutions X)
     (hmulti : ∃ x y : P,
       x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
-    (hncomm : ¬ IsMulCommutative P)
+    (_hncomm : ¬ IsMulCommutative P)
     {A : Subgroup P}
     (hAmax : IsMaximalNormalInvariantAbelian X.subtype A)
     (hAexp : ∀ a : A, a ^ 2 = 1) :
     frattini P ≤ A := by
   letI : A.Normal := hAmax.isNormalInvariant.1
-  have hSuzuki : IsSuzuki2Group P :=
-    ⟨hP, hncomm, hmulti, ⟨X, hXcyc, hreg⟩⟩
+  letI : Nontrivial P := by
+    obtain ⟨x, y, _, _, hxy⟩ := hmulti
+    exact ⟨⟨x, y, hxy⟩⟩
   have hAcenter : A ≤ Subgroup.center P := by
     intro a ha
     by_cases ha1 : a = 1
     · subst a
       exact Subgroup.one_mem _
-    · apply involutions_subset_center hSuzuki
+    · apply involutions_subset_center_of_transitive hP X htrans
       refine ⟨?_, ha1⟩
       simpa using congrArg Subtype.val (hAexp ⟨a, ha⟩)
   have hcenterEq : Subgroup.center P = A :=
@@ -509,37 +550,36 @@ private theorem IsMaximalNormalInvariantAbelian.frattini_le_of_pow_two_eq_one
       hP hcommCenter hcommExp
   rwa [hcenterEq] at hPhiCenter
 
-/-- **Higman, Suzuki 2-groups, Lemma 9 (p. 87).**
+/-- **Higman, Suzuki 2-groups, Lemma 9 (p. 87), source-strength form.**
 
 If `A` is maximal among the abelian normal actor-invariant subgroups of a
-nonabelian finite `2`-group whose cyclic actor acts regularly on the
-involutions, then `A` has exponent at most four and contains the Frattini
-subgroup of the ambient group. -/
-theorem higmanLemmaNine
+nonabelian finite `2`-group whose cyclic odd-order actor acts transitively on
+the involutions, then `A` has exponent at most four and contains the
+Frattini subgroup of the ambient group. -/
+theorem higmanLemmaNine_of_transitive
     {P : Type*} [Group P] [Finite P]
     (hP : IsPGroup 2 P)
     (X : Subgroup (MulAut P))
     (hXcyc : IsCyclic X)
-    (hreg : ActsRegularlyOnInvolutions X)
+    (htrans : ActsTransitivelyOnInvolutions X)
+    (hXodd : Odd (Nat.card X))
     (hmulti : ∃ x y : P,
       x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
     (hncomm : ¬ IsMulCommutative P)
     (A : Subgroup P)
     (hAmax : IsMaximalNormalInvariantAbelian X.subtype A) :
     (∀ a : A, a ^ 4 = 1) ∧ frattini P ≤ A := by
-  refine ⟨higmanLemmaNine_pow_four_eq_one
-    hP X hXcyc hreg hmulti hncomm A hAmax, ?_⟩
+  refine ⟨higmanLemmaNine_pow_four_eq_one_of_transitive
+    hP X hXcyc htrans hXodd hmulti hncomm A hAmax, ?_⟩
   by_contra hnot
   letI : A.Normal := hAmax.isNormalInvariant.1
-  have htrans : ∀ x ∈ involutions P, ∀ y ∈ involutions P,
-      ∃ g : X, (g : MulAut P) x = y := by
-    intro x hx y hy
-    obtain ⟨g, hg, _⟩ := hreg x hx y hy
-    exact ⟨g, hg⟩
   have htransA : ∀ x ∈ involutions A, ∀ y ∈ involutions A,
       ∃ g : X, hAmax.isNormalInvariant.2.restrict g x = y :=
     restricted_involutions_transitive X.subtype
-      hAmax.isNormalInvariant.2 (by simpa using htrans)
+      hAmax.isNormalInvariant.2 (by
+        intro x hx y hy
+        obtain ⟨g, hg⟩ := htrans x hx y hy
+        exact ⟨g, hg⟩)
   letI : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAmax.isMulCommutative.is_comm.comm }
@@ -601,18 +641,64 @@ theorem higmanLemmaNine
         hP classify hPhi with hEq | hle
     · exact hEq
     · have hCcomm : IsMulCommutative C :=
-        higmanLemmaSeven_isMulCommutative
-          hP X hXcyc hreg hmulti A C hcover
+        higmanLemmaSeven_isMulCommutative_of_transitive
+          hP X hXcyc htrans hmulti A C hcover
             hAmax.isMulCommutative hPhi hle
       have hCA : C = A :=
         hAmax.maximal C hcover.right hCcomm hcover.le
       exact False.elim (hcover.lt.ne hCA.symm)
   have hAexp : ∀ a : A, a ^ 2 = 1 :=
-    higmanLemmaEight_pow_two_eq_one
-      hP X hXcyc hreg hmulti A C hcover
+    higmanLemmaEight_pow_two_eq_one_of_transitive
+      hP X hXcyc htrans hXodd hmulti A C hcover
         hAmax.isMulCommutative hderived
   exact hnot
     (IsMaximalNormalInvariantAbelian.frattini_le_of_pow_two_eq_one
-      hP X hXcyc hreg hmulti hncomm hAmax hAexp)
+      hP X hXcyc htrans hmulti hncomm hAmax hAexp)
+
+/-- Compatibility form of Higman Lemma 9 for an actor already known to act
+regularly on the involutions. -/
+theorem higmanLemmaNine
+    {P : Type*} [Group P] [Finite P]
+    (hP : IsPGroup 2 P)
+    (X : Subgroup (MulAut P))
+    (hXcyc : IsCyclic X)
+    (hreg : ActsRegularlyOnInvolutions X)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hncomm : ¬ IsMulCommutative P)
+    (A : Subgroup P)
+    (hAmax : IsMaximalNormalInvariantAbelian X.subtype A) :
+    (∀ a : A, a ^ 4 = 1) ∧ frattini P ≤ A := by
+  have hinv : (involutions P).Nonempty := by
+    obtain ⟨x, _, hx, _, _⟩ := hmulti
+    exact ⟨x, hx⟩
+  exact higmanLemmaNine_of_transitive
+    hP X hXcyc hreg.transitive
+      (actor_card_odd_of_regular_on_involutions hP X hreg hinv)
+      hmulti hncomm A hAmax
+
+/-- Higman Lemma 9 makes the Frattini subgroup abelian under the original
+transitive actor hypothesis (with the odd-order reduction used in §6). -/
+theorem frattini_isMulCommutative_of_transitive
+    {P : Type*} [Group P] [Finite P]
+    (hP : IsPGroup 2 P)
+    (X : Subgroup (MulAut P))
+    (hXcyc : IsCyclic X)
+    (htrans : ActsTransitivelyOnInvolutions X)
+    (hXodd : Odd (Nat.card X))
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hncomm : ¬ IsMulCommutative P) :
+    IsMulCommutative (frattini P) := by
+  obtain ⟨A, hAmax⟩ := exists_maximalNormalInvariantAbelian X.subtype
+  have hPhiA : frattini P ≤ A :=
+    (higmanLemmaNine_of_transitive
+      hP X hXcyc htrans hXodd hmulti hncomm A hAmax).2
+  refine IsMulCommutative.of_comm fun x y => ?_
+  apply Subtype.ext
+  change (x : P) * (y : P) = (y : P) * (x : P)
+  exact congrArg (fun a : A => (a : P))
+    (hAmax.isMulCommutative.is_comm.comm
+      (⟨x, hPhiA x.property⟩ : A) ⟨y, hPhiA y.property⟩)
 
 end OddOrder.Higman.Suzuki2Groups

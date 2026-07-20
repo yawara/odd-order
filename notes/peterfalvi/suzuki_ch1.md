@@ -384,7 +384,7 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       over 4453 jobs: `OrderThreePSL`, `OrderThreePSLInduction`, the Suzuki
       hub, `OddOrder.AxiomsCheck`, and `OddOrder` all build, and the axiom
       checks pass.
-    - **Higman source frontier (issue 2048):** Lemmas 4--11 は完了。
+    - **Higman source frontier (issue 2048):** Lemmas 4--11 と Lemma 12 冒頭 reduction は完了。
       Lemma 10 は原文冒頭の power-map gcd 二分法を `higmanPowerMapGcd` として保持し、
       full endpoint は trace 式を underlying `𝔽₂`-空間上の twisted quadratic map とみなして
       Chevalley--Warning を適用した。公開 endpoint `higmanLemmaTen` は proper odd-degree
@@ -396,7 +396,11 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       basis、anchored trace、proper-extension 排除を接続し、honest な `IsTypeA P`
       を証明する。複数 involution は明示仮定から第二層次数 `n ≥ 2` を導き、
       type-A automorphism の奇数位数は degree-one 後の primitive shift から導出する。
-      次の source frontier は Higman Lemma 12 (pp. 89--92) の length-three 分類である。
+      Lemma 12 は `HasXiLengthThree` を actual normal actor-invariant poset 上に置き、
+      `frattini_isElementaryAbelian_of_xiLengthThree` で `Φ(P)` の
+      elementary-abelian reduction を閉じた。次の source frontier は Higman Lemma 12
+      (p. 90) の quotient two-step decomposition: `P / Φ(P)` の二つの
+      ξ-composition steps から ξ-length `2` の `X, Y` と `P = XY` を構成する段階である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
