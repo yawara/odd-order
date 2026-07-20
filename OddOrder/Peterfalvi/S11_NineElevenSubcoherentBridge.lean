@@ -385,8 +385,7 @@ theorem sOf_memberRFamily_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
   -- the anchor of the mixed stratum: `(ζ − ζ̄)^τ` vanishes on the exceptional `V`
   have hanchor : ∀ {ζ : ClassFunction ↥M ℂ}, ζ ∈ sOf data Y →
       ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V,
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0
-        (h46.dade0.fullDadeIsometryData hconj) (ζ - ζ.conj) v = 0 := by
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau (ζ - ζ.conj) v = 0 := by
     intro ζ hζ v hv
     have hflip : (ζ - ζ.conj : ClassFunction ↥M ℂ) = -(ζ.conj - ζ) := by abel
     refine dadeICM_apply_eq_zero_of_avoidV h46 _ ?_ ?_ hv (hVsub v hv)
