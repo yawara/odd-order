@@ -703,4 +703,41 @@ theorem card_omegaInG_le_mul {G : Type*} [Group G] [Finite G] {p : ℕ} {S T : S
 
 
 
+/-- **`Ω₁(Ω₁(T)) = Ω₁(T)`** for a subgroup `T` — BG's *"Since `Ω₁(Ω₁(T)) = Ω₁(T)`"*.
+
+The two generating sets literally coincide: `x ∈ T` with `x^{pⁿ} = 1` already lies in
+`Ω_n(T)`, and conversely `Ω_n(T) ≤ T`. -/
+theorem omegaInG_idem {G : Type*} [Group G] (T : Subgroup G) (p n : ℕ) :
+    omegaInG (omegaInG T p n) p n = omegaInG T p n := by
+  rw [omegaInG, omegaInG]
+  congr 1
+  ext x
+  exact ⟨fun h => ⟨omegaInG_le h.1, h.2⟩, fun h => ⟨mem_omegaInG h.1 h.2, h.2⟩⟩
+
+/-- `Ω₁` of the *group* `Ω₁(T)` is everything.
+
+The subtype form of `omegaInG_idem`, which is what BG Proposition E.2(a) — stated for a
+whole group — consumes. -/
+theorem omega_eq_top_of_omegaInG {G : Type*} [Group G] (T : Subgroup G) (p n : ℕ) :
+    Omega ↥(omegaInG T p n) p n = ⊤ := by
+  refine Subgroup.map_injective (omegaInG T p n).subtype_injective ?_
+  rw [← omegaInG_eq_map, omegaInG_idem, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+
+/-- **BG Proposition E.2(a) applied to `Ω₁(T)`**: if `Ω₁(T)` has nilpotence class at most
+`p − 1`, then it has exponent `p`.
+
+BG: *"Therefore `Ω₁(T)` has nilpotence class at most `p − 1`.  By Proposition E.2,
+`Ω₁(Ω₁(T))` has exponent `p`.  Since `Ω₁(Ω₁(T)) = Ω₁(T)`, this contradicts the maximal
+choice of `S`."* -/
+theorem pow_eq_one_of_omegaInG {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {T : Subgroup G}
+    (hgamma : (⊤ : Subgroup ↥(omegaInG T p 1)).lowerCentralSeries (p - 1) = ⊥)
+    {x : G} (hx : x ∈ omegaInG T p 1) : x ^ p = 1 := by
+  have hy : (⟨x, hx⟩ : ↥(omegaInG T p 1)) ∈ Omega ↥(omegaInG T p 1) p 1 := by
+    rw [omega_eq_top_of_omegaInG]
+    trivial
+  have := omega_pow_eq_one_of_lowerCentralSeries_eq_bot hgamma hy
+  simpa using congrArg (Subtype.val (p := fun z => z ∈ omegaInG T p 1)) this
+
+
 end OddOrder.BG.AppE
