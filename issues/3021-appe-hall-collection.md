@@ -1118,3 +1118,19 @@ Step 4 では **`vS'` と個数が一致することを言うため**に必要 (
 
 ⟹ Step 4 は E.3(a)(b)(c) と違い **`G = S ⋊ B` という新しい舞台**を組む必要がある。
 着手時はまず 2 (semidirect product の配線) を単独で通すのが安全。
+
+## 2026-07-20 (21): Step 4 の前提を repo 内で実測 — **最難関の Schur–Zassenhaus は在る**
+
+| 必要なもの | repo での所在 (実測) |
+|---|---|
+| **Schur–Zassenhaus 存在** | mathlib `Subgroup.exists_right_complement'_of_coprime` |
+| **Schur–Zassenhaus 共役** | **`OddOrder/Mathlib/SchurZassenhausConj.lean:1292`** `Subgroup.IsComplement'.exists_conj_of_coprime` (mathlib に無いので repo が補完済) |
+| `S' ≤ Φ(S)` | `GroupTheory.IsPGroup.commutator_sup_pow_closure_le_frattini` (FrattiniPGroup.lean:212) |
+| `Φ(S) ≤ S'` (指数 p) | 直接の補題は無い。`S/S'` は指数 p のアーベル ⟹ elementary abelian ⟹ `frattini_eq_bot_iff_isElementaryAbelian` (S01_Solvable.lean:55) で `Φ(S/S') = ⊥` ⟹ 「`Φ(G/N) = 1 ⟹ Φ(G) ≤ N`」で結論 (この橋は要新規、数行) |
+| `R/Φ(R)` elementary abelian | `GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian` (:162) |
+| 半直積 | mathlib `SemidirectProduct` (本 leaf で初出) |
+| coprime 固定点 | `Isaacs.Ch03` に coprime 作用群 (3.23/3.24) あり。剰余類版は要確認 |
+
+⟹ **Step 4 の最難関 (SZ 共役) が既に repo にある**ので、残りは
+(i) `Φ(S) = S'`、(ii) 半直積の配線、(iii) Frattini 変形、(iv) coprime 固定点、の 4 件。
+(i) が最も軽いので着手はそこから。
