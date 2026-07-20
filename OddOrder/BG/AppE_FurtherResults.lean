@@ -44,7 +44,10 @@ packaging.  Per-result status:
 | E.2(b) class `≤ 2` (`pow_mul_of_class_le_two`) | **proved, sorry-free** |
 | E.3(a) (`card_A_dvd_half_p_sub_one`) | **proved, sorry-free** |
 | E.3(b) `C_R(R₀) = R₀ × R₁` structure | **proved** (abelian, order `p·|R₁|`, rank `≤ 2`) |
-| E.3(b)(c)(d), E.4, E.5 main clauses | honest statements, `sorry` |
+| E.3(b) Step 2, `R₀ ⊄ S'` (`not_le_derivedInG`) | **proved, sorry-free**, both branches |
+| E.3(b) Step 2, `S` narrow / `\|Ω₁(Z(S))\| = p` / `\|S:T\| = p` | **proved, sorry-free** |
+| E.3(b) second clause (`R₀_not_le_derived_omega`) | **proved** from Step 2 + first clause |
+| E.3(b) first + third clause, E.3(c)(d), E.4, E.5 | honest statements, `sorry` |
 -/
 
 namespace OddOrder.BG.AppE
@@ -715,6 +718,100 @@ theorem RegularOperatorSetup.card_omega1Center_and_index_centralizer [Finite R]
     hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS E hEcard hEstar
   exact ⟨h.2.1.1, h.2.2⟩
 
+/-- **BG Theorem E.3(b), Step 2, the elided small case**: if `S' ≤ Z(S)` then `R₀ ⊄ S'`.
+
+BG dispatches `|S| ≤ p³` by *"an examination of the `p`-groups of order at most `p³`"*.  No
+examination is needed for the clause `R₀ ⊄ S'`: all that matters is that such an `S` has
+nilpotency class `≤ 2`, i.e. `S' ≤ Z(S)`.  For if `R₀ ≤ S'`, then `S` centralizes `S'` hence
+centralizes `R₀`, so `S ≤ C_R(R₀)`, which is **abelian**
+(`isMulCommutative_centralizer_R₀`); then `S' = 1`, forcing `R₀ = 1` and contradicting
+`|R₀| = p`.
+
+Note this needs no `R₀ ≤ S` hypothesis: `R₀ ≤ S'` already puts `R₀` inside `S`. -/
+theorem RegularOperatorSetup.not_le_derivedInG_of_derived_central [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hcent : S ≤ Subgroup.centralizer (derivedInG S : Set R)) :
+    ¬ hyp.R₀ ≤ derivedInG S := by
+  intro hle
+  have hSC : S ≤ Subgroup.centralizer (hyp.R₀ : Set R) :=
+    hcent.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hle))
+  haveI : IsMulCommutative ↥S := IsMulCommutative.of_comm fun x y => by
+    have hxy := hyp.isMulCommutative_centralizer_R₀.is_comm.comm
+      (⟨(x : R), hSC x.2⟩ : ↥(Subgroup.centralizer (hyp.R₀ : Set R)))
+      ⟨(y : R), hSC y.2⟩
+    exact Subtype.ext
+      (congrArg (fun z : ↥(Subgroup.centralizer (hyp.R₀ : Set R)) => (z : R)) hxy)
+  have hbot : derivedInG S = ⊥ := by
+    rw [derivedInG, commutator_eq_bot, Subgroup.map_bot]
+  rw [hbot, le_bot_iff] at hle
+  have hc := hyp.R₀_card
+  rw [hle, Subgroup.card_bot] at hc
+  exact hyp.p_prime.one_lt.ne hc
+
+/-- `|S| ≤ p³` forces `S' ≤ Z(S)`, the hypothesis of
+`not_le_derivedInG_of_derived_central`.
+
+`Ch1.S04.nilpotencyClass_le_of_card_le_pow` gives `cl(S) ≤ 2`, i.e. `γ₃(S) = ⁅S', S⁆ = 1`;
+that is exactly `S' ≤ Z(S)`, which transported to the ambient group reads
+`S ≤ C_R(S')`. -/
+theorem RegularOperatorSetup.derived_central_of_card_le_prime_cube [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hcard : Nat.card ↥S ≤ p ^ 3) :
+    S ≤ Subgroup.centralizer (derivedInG S : Set R) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  -- `cl(S) ≤ 2`, i.e. `γ₂(S) = ⊥` in mathlib's indexing.
+  have hcl : Group.nilpotencyClass ↥S ≤ 2 :=
+    OddOrder.BG.Ch1.S04.nilpotencyClass_le_of_card_le_pow
+      (hyp.R_pGroup.to_subgroup S) (by norm_num) (by simpa using hcard)
+  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
+  -- `γ₂(S) = ⁅S', S⁆ = ⊥`, i.e. `S' ≤ Z(S)`.
+  have hlcs : ⁅_root_.commutator ↥S, (⊤ : Subgroup ↥S)⁆ = ⊥ :=
+    Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr hcl
+  have hcentre : _root_.commutator ↥S ≤ Subgroup.center ↥S := by
+    have hce := Subgroup.commutator_eq_bot_iff_le_centralizer.mp hlcs
+    intro g hg
+    rw [Subgroup.mem_center_iff]
+    intro h
+    exact Subgroup.mem_centralizer_iff.mp (hce hg) h (Subgroup.mem_top h)
+  -- transport to the ambient group
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff] at *
+  intro g hg
+  obtain ⟨g', hg', rfl⟩ := Subgroup.mem_map.mp hg
+  have hcomm := congrArg (fun z : ↥S => (z : R))
+    (Subgroup.mem_center_iff.mp (hcentre hg') ⟨x, hx⟩)
+  simpa using hcomm.symm
+
+/-- **BG Theorem E.3(b), Step 2, first conclusion of (E.13) — unconditionally**: for *any*
+subgroup `S ≤ R` of exponent `p` containing `R₀`, `R₀ ⊄ S'`.
+
+This is Step 2's `R₀ ⊄ S'` with both of BG's branches discharged: `|S| ≤ p³` by
+`not_le_derivedInG_of_derived_central` (BG's elided *"examination of the `p`-groups of order
+at most `p³`"*) and `|S| > p³` by the narrow route
+(`not_le_derivedInG_of_three_le_pRank`), the two meeting at
+`three_le_pRank_of_prime_cube_lt_card`.
+
+⚠ BG additionally assumes `S` is `A`-invariant and `R₀ < S` *properly*; neither is used for
+this clause. -/
+theorem RegularOperatorSetup.not_le_derivedInG [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) :
+    ¬ hyp.R₀ ≤ derivedInG S := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  rcases le_or_gt (Nat.card ↥S) (p ^ 3) with hle | hgt
+  · exact hyp.not_le_derivedInG_of_derived_central
+      (hyp.derived_central_of_card_le_prime_cube hle)
+  · exact hyp.not_le_derivedInG_of_three_le_pRank hR₀S
+      (three_le_pRank_of_prime_cube_lt_card (hyp.R_pGroup.to_subgroup S) hexp hgt)
+
+/-- `R₀ ≤ Ω₁(R)`: every element of `R₀` has order dividing `|R₀| = p`. -/
+theorem RegularOperatorSetup.R₀_le_omega [Finite R]
+    (hyp : RegularOperatorSetup R B p q) : hyp.R₀ ≤ Omega R p 1 := by
+  intro x hx
+  refine Omega.mem_of_pow_eq_one ?_
+  have h := pow_card_eq_one' (G := ↥hyp.R₀) (x := ⟨x, hx⟩)
+  rw [hyp.R₀_card] at h
+  simpa using congrArg (fun z : ↥hyp.R₀ => (z : R)) h
+
 /-- **BG Theorem E.3(b), first clause**: `Ω₁(R)` has exponent `p`.
 
 **Status: honestly stated, not proved.**  BG's Steps 2--3: pick an `A`-invariant
@@ -730,12 +827,16 @@ theorem RegularOperatorSetup.omega_pow_eq_one [Finite R] [Finite B]
 
 /-- **BG Theorem E.3(b), second clause**: `R₀ ⊄ (Ω₁(R))'`.
 
-**Status: honestly stated, not proved** (BG Step 2, via `S = R₀T` with
-`R₀ ∩ T = 1` and `S' ≤ T`). -/
+**Status: proved**, from Step 2's `R₀ ⊄ S'` (`not_le_derivedInG`) applied to `S = Ω₁(R)`.
+The only input still owed is that `Ω₁(R)` has exponent `p` — the *first* clause,
+`omega_pow_eq_one`, which is BG's Step 3 and remains `sorry`.  Citing it here is exactly
+the intended dependency direction: BG proves (b) as one statement, Step 2 first and Step 3
+on top of it. -/
 theorem RegularOperatorSetup.R₀_not_le_derived_omega [Finite R] [Finite B]
     (hyp : RegularOperatorSetup R B p q) :
-    ¬ hyp.R₀ ≤ derivedInG (Omega R p 1) := by
-  sorry
+    ¬ hyp.R₀ ≤ derivedInG (Omega R p 1) :=
+  hyp.not_le_derivedInG hyp.R₀_le_omega fun x =>
+    Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2)
 
 /-- **BG Theorem E.3(b), third clause**: `|Ω₁(R) / (Ω₁(R))'| = p²`.
 

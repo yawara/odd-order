@@ -335,11 +335,26 @@ BG の witness `E = C_S(R₀)` と `\|C_S(R₀)\| = p²` の計算は**丸ごと
 **Step 2 の経路上では不要**と判明。`Ω₁(R₁)` の位数 p 計算も現時点では不要
 (必要になるのは Step 3 の極大性議論で `R₀ × Ω₁(R₁)` を種にするとき)。
 
+### ⭐ 2026-07-20 (4): `|S| ≤ p³` 分岐も閉じた ⟹ **`R₀ ⊄ S'` が無条件で成立**、AppE sorry 7 → 6
+
+BG が「位数 p³ 以下の p 群を検査せよ」と省略する分岐は、**検査不要**と判明:
+
+- `derived_central_of_card_le_prime_cube`: `|S| ≤ p³ ⟹ cl(S) ≤ 2` (既存
+  `S04.nilpotencyClass_le_of_card_le_pow`) ⟹ `S' ≤ Z(S)`。
+- `not_le_derivedInG_of_derived_central`: **`S' ≤ Z(S)` だけで `R₀ ⊄ S'` が出る** —
+  `R₀ ≤ S'` なら `S` は `S'` を中心化 ⟹ `R₀` を中心化 ⟹ `S ≤ C_R(R₀)` は**アーベル**
+  ⟹ `S' = 1` ⟹ `R₀ = 1`、`|R₀| = p` に矛盾。⚠ `R₀ ≤ S` 仮説すら不要。
+- `not_le_derivedInG`: 2 分岐を `three_le_pRank_of_prime_cube_lt_card` で接合 ⟹
+  **指数 p の任意の `S ⊇ R₀` について `R₀ ⊄ S'`** (BG の A-不変性・真部分群性は未使用)。
+- `R₀_le_omega`: `R₀ ≤ Ω₁(R)`。
+
+⟹ **E.3(b) 第 2 節 `R₀_not_le_derived_omega` を実証明**した (`S = Ω₁(R)` に適用)。
+指数 p の入力だけ第 1 節 `omega_pow_eq_one` (Step 3、まだ sorry) から cite している
+= 規約の sorried-cite パターン。**AppE の sorry は 7 → 6**。
+
 ### 残る Step 2 の穴 (次に着手する順)
 
-1. **`|S| ≤ p³` の分岐** — BG「位数 p³ 以下の p 群を検査せよ」。上の結果は全部
-   `r(S) ≥ 3` (⟸ `|S| > p³` + 指数 p) 下でのみ効くので、Step 2 を無条件の定理にするには
-   この小位数分岐が要る。`S04_PGroupsSmallRank.lean` に使える形があるか要実測。
+1. ~~`|S| ≤ p³` の分岐~~ ✅ 完了 (上記)。
 2. **(E.6) Thm 5.5 の A-不変列** `T = H₀ ⊃ … ⊃ Hₙ = 1`, `H_i = [R₀,H_{i-1}]`,
    `|H_{i-1}:H_i| = p` — `S05_NarrowAutomorphisms.lean:418` 以降。
 3. **(E.7)(E.8)** `H₁ = S₂`, `|S/S'| = p²`, 帰納で `H_i = S_{i+1}`。
