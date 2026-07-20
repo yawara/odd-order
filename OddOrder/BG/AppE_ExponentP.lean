@@ -774,4 +774,46 @@ theorem RegularOperatorSetup.pow_eq_one_of_card_omegaInG_le [Finite R] [Finite B
     (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (hcl.trans hqp)) hx
 
 
+/-- `Ω_n` of an `A`-invariant subgroup is `A`-invariant.
+
+Via the generating set: an automorphism preserves both `x ∈ H` and `x^{pⁿ} = 1`. -/
+theorem isAInvariant_omegaInG {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {H : Subgroup G} (hH : IsAInvariant φ H) (p n : ℕ) :
+    IsAInvariant φ (omegaInG H p n) := fun a => by
+  change (omegaInG H p n).map (φ a).toMonoidHom = omegaInG H p n
+  rw [omegaInG, MonoidHom.map_closure]
+  congr 1
+  ext x
+  simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+  constructor
+  · rintro ⟨y, ⟨hyH, hyp⟩, rfl⟩
+    exact ⟨hH.smul_mem a hyH, by rw [← map_pow, hyp, map_one]⟩
+  · rintro ⟨hxH, hxp⟩
+    exact ⟨(φ a)⁻¹ x, ⟨hH.inv_smul_mem a hxH, by rw [← map_pow, hxp, map_one]⟩,
+      MulAut.apply_inv_self G (φ a) x⟩
+
+/-- BG's `v ∈ R₀^#` in the ambient group: a generator of `R₀`, which is nontrivial. -/
+theorem RegularOperatorSetup.exists_zpowers_eq_R₀ [Finite R]
+    (hyp : RegularOperatorSetup R B p q) :
+    ∃ v : R, Subgroup.zpowers v = hyp.R₀ ∧ v ≠ 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hcard := hyp.R₀_card
+  haveI : Nontrivial ↥hyp.R₀ := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro h
+    rw [h, Subgroup.card_bot] at hcard
+    exact hyp.p_prime.one_lt.ne hcard
+  obtain ⟨v, hv⟩ := exists_ne (1 : ↥hyp.R₀)
+  have hord : orderOf (v : R) = p := by
+    have h1 : orderOf v ∣ Nat.card ↥hyp.R₀ := orderOf_dvd_natCard v
+    rw [hyp.R₀_card] at h1
+    have h2 : orderOf (v : R) = orderOf v := Subgroup.orderOf_coe v
+    rcases (Nat.dvd_prime hyp.p_prime).mp h1 with h | h
+    · exact absurd (Subtype.ext (orderOf_eq_one_iff.mp (h2.trans h))) hv
+    · exact h2.trans h
+  refine ⟨(v : R), Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr v.2)
+    (by rw [hyp.R₀_card, Nat.card_zpowers, hord]), fun h1 => hv (Subtype.ext ?_)⟩
+  simpa using h1
+
+
 end OddOrder.BG.AppE
