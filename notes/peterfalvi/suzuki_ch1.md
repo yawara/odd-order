@@ -517,3 +517,166 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       接続する。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
+
+## 2026-07-21 lane b: Lemma 12 B/C/D case split の frontier 設計 (Unit A 完了後)
+
+**Unit A 完了** (`3866a67da`): 型 C/D の quadratic-extension モデル + honest carrier
+(`OddOrder/Higman/Suzuki2Groups/HigmanTypesCD.lean`)。原典 p.81 定義表の C/D 行を実体化。
+`typeCQuadraticMap θ ε = α·θ(α) + ε·(α^{1/2}·(2θ)(β)) + β²` (2θ²=1)、
+`typeDQuadraticMap θ ε = α·θ(α) + ε·(θ³(α)·θ(β)) + β·θ²(β)` (θ⁵=1,θ≠1)。
+`TypeCData`/`TypeDData`/`IsTypeC`/`IsTypeD` + `ofExtension` (kernel=F, quotient=F×F の
+GroupExtension から carrier を組む) + `map_sq`/`quadraticMap_anisotropic` 等の標準 API。
+4 型すべて原典 ζ と一致検算済 (case 1: B(n,1,ε), case 2: B(n,θ,ε), case 3: C(n,ε), case 4: D(n,θ,ε))。
+
+**残 gap (Explore agent 2026-07-21 の inventory)**:
+1. **F×F 座標** `Additive(lowerCentralLayer P 0) ≃ₗ[ZMod 2] F × F` — 未構築。現状は
+   `quotientToAmbientLayerZero` で各 factor を別々に L₀ へ落とす map + span 被覆のみ。
+2. **P の F×F 上 GroupExtension** — 未構築。`TypeC/DData.ofExtension` が要求する形。
+   道具 = `GroupExtension.ofNormalSubgroupCoordinates Φ(P) (left:Mult F ≃* Φ(P)) (right:P/Φ ≃* Mult(F×F))`。
+3. **組立て済 square 恒等式** `q_P(α,β)=q_X(α)+q_Y(β)+mixed` — 部品 `lowerCentralSquareMapAdditive_add`
+   (sq(u+v)=sq(u)+sq(v)+`lowerCentralCommutatorBilinear`) + factor の `square_normal` (noncomm β·θ(β)/comm β²) は存在。
+4. `TypeBData.ofExtension` — C/D にはあるが B には無い (case 1/2 用に追加要)。
+5. **case 4 の 4項算術** `2^{a₁}+…+2^{a₄}≡2^{b₁}+…+2^{b₄} (mod 2ⁿ-1)` — 未。3項=2項
+   (`three_distinct_frobeniusWeight_not_modEq_pairWeight` @ HigmanLowerCentralSpectrum) は完備、
+   4項は同じ `Finset.geomSum_injective` スタイルで新規。
+
+**Unit B (次) = F×F 座標 + GroupExtension**。設計 = **群レベル surjective+injective ルート**
+(finrank 回避): 各 factor から `factorInclusion : F →ₗ[ZMod 2] Additive L₀`
+(= `quotientToAmbientLayerZeroLinear f hK0 hf ∘ eQuot.symm`) を作り、
+`combined = coprod fI_left fI_right : F×F →ₗ Additive L₀` を
+- **surjective**: x∈left⊔right を `Subgroup.mul_normal` で x=a·b 分解 → layerZeroClass 加法性 →
+  range(fI_left)+range(fI_right)。`sup_eq_top` 使用。
+- **injective**: `fI_left a = fI_right b` → 共通値 w∈mk(left)⊓mk(right)、Φ≤left,right から
+  `mk(left)⊓mk(right)=⊥` (group argument、`inf_eq_frattini` 使用) → w=0 → a=b=0 (fI injective)。
+- fI 単射は各 branch の exactness `f g∈Φ(P)→g∈N` から (comm: `data.hN`, noncomm: `data.hterm`+`hSq`)。
+branch dispatch は FactorCoordinateData の comm/noncomm を `exists_factorFamily_of_*` と同様に処理。
+`LinearEquiv.ofBijective` → Multiplicative 変換 → `right : P/Φ ≃* Mult(F×F)`。
+kernel 側 `left : Mult F ≃* Φ(P)` は `exists_ambientFrattiniSingerCoordinates`(:424) の ePhi から。
+
+**Unit C 以降**: 各 case の固有値算術で mixed 項を確定 → typeB/C/D quadratic map に一致 → ofExtension。
+case 3 の 3項=2項算術は既存、case 4 の 4項算術は Unit で新規。
+
+### 2026-07-21 lane b: Unit B Stage 1+2 完了 (F×F 加法座標)
+
+**完了** (`c8ca0a851`): `HigmanLemmaTwelve/AmbientProductCoordinate.lean` に
+`ambientProductEquiv : F × F ≃ₗ[ZMod 2] Additive (lowerCentralLayer P 0)` を構築
+(surjective = `mul_normal` 分解、injective = ⊓=Φ group argument + fI 単射)。sorry 0。
+- 罠: `open OddOrder.RepresentationTheory` 等が **`GL` を notation 予約**するので型変数
+  `GL`/`GR` は使えない (→ `HL`/`HR` に改名)。
+- `Additive (lowerCentralLayer P 0)` の module instance は `local instance` 3 本
+  (`CommGroup`/`Module`/`IsMulCommutative`) を自ファイルで宣言する必要がある
+  (MixedEigenweights の同名は `local` で export されない)。
+
+**次 = Stage 3: Multiplicative 版 + GroupExtension** (`ofNormalSubgroupCoordinates` へ)。
+必要な bridge は特定済:
+1. `right : P ⧸ frattini P ≃* Multiplicative (F × F)`:
+   - `P ⧸ frattini P ≃* lowerCentralLayer P 0` を `QuotientGroup.congr (frattini P)
+     (lowerCentralLayerKernel P 0) (termZeroEquivAmbient P).symm he` で作る。
+     `termZeroEquivAmbient P : lowerCentralTerm P 0 ≃* P` =
+     `(MulEquiv.subgroupCongr (by simp [lowerCentralTerm])).trans Subgroup.topEquiv`
+     (TypeAConclusion:422 `lowerCentralTermZeroEquivAmbient` が private ⟹ de-privatize
+     するか自ファイルで再定義)。`he : (frattini P).map (termZeroEquivAmbient P).symm =
+     lowerCentralLayerKernel P 0` は hK0 (frattini 形) を使い TypeAConclusion:430 の
+     `lowerCentralTerm_one_map_zeroEquiv_symm` と同型に証明。
+   - `.trans (AddEquiv.toMultiplicativeRight ambientProductEquiv.symm.toAddEquiv)`
+     (`AddEquiv.toMultiplicativeRight : (Additive G ≃+ H) → (G ≃* Multiplicative H)`,
+     mathlib `Algebra/Group/Equiv/TypeTags.lean:59`)。
+2. `left : Multiplicative F ≃* frattini P` (F = GaloisField 2 n):
+   - Singer 座標 `ePhi : Additive (frattini P) ≃ₗ GaloisField 2 n`
+     (`exists_ambientFrattiniSingerCoordinates_of_xiLengthThree`, AmbientCentralExtension:424)
+     から `AddEquiv.toMultiplicativeLeft (ePhi.symm.toAddEquiv) : Multiplicative F ≃* frattini P`
+     (`AddEquiv.toMultiplicativeLeft : (G ≃+ Additive H) → (Multiplicative G ≃* H)`)。
+3. `GroupExtension.ofNormalSubgroupCoordinates (frattini P) left right :
+    GroupExtension (Multiplicative F) P (Multiplicative (F × F))` +
+   centrality (`hcentral` from `frattini P ≤ Z(P)` = `commutator_eq_frattini_and_frattini_le_center`)。
+
+**Stage 4 (square map 分解)** = `q_P(α,β) = q_X(α)+q_Y(β)+mixed`。`lowerCentralSquareMapAdditive_add`
+(sq(u+v)=sq(u)+sq(v)+`lowerCentralCommutatorBilinear`) を F×F 座標に落とし、factor の
+`square_normal` (β·θ(β)/β²) と mixed bilinear を接続。これが各 case で typeB/C/D quadratic
+map に一致することを示し `ofExtension` へ。
+
+### 2026-07-21 lane b: Unit B Stage 3 完了 (ambient central extension)
+
+**完了** (`c42459818`): `AmbientProductCoordinate.lean` に
+`ambientProductExtension hK0 e ePhi : GroupExtension (Mult F) P (Mult (F×F))`
++ 支える座標 (`frattiniQuotientEquivLayerZero` / `layerZeroProductMulCoordinate` /
+`frattiniSingerKernelCoordinate`) + `_inl_range`。sorry 0。TypeAConclusion の
+`lowerCentralTermZeroEquivAmbient` を de-privatize して再利用。**Unit B 完了**
+(F×F 加法座標 → 乗法 extension)。これで `TypeC/DData.ofExtension` の `S` 引数が揃った。
+
+**次 = Stage 4: square map 分解 (case 依存の核心)**。`ofExtension` の
+`hsq : ∀ x, x² = S.inl (ofAdd (q_BCD θ ε (S.rightHom x).toAdd))` を埋める。
+`(S.rightHom x).toAdd = (α,β)` は F×F 座標、`S.inl (ofAdd v)` は Singer 座標 v の Φ(P) 元。
+⟹ `hsq ⟺ (x² の ePhi-座標) = q_BCD(α,β)`。LHS = ambient square map を F×F/F 座標に
+落とした `q_P(α,β)`。
+
+- **4a (case 共有)**: `q_P(α,β) = q_X(α) + q_Y(β) + mixed(α,β)`。道具 =
+  `HigmanSquareMap.lean:307 lowerCentralSquareMapAdditive_add`
+  (sq(u+v)=sq(u)+sq(v)+`lowerCentralCommutatorBilinear`), u=fI_left(α), v=fI_right(β)。
+  `q_X(α) = q_P(fI_left α)` を factor の `square_normal` (noncomm β·θ(β)/comm β²) に接続
+  するのが要 (ambient square map の factor 制限 = factor 自身の square map)。
+  mixed = `lowerCentralCommutatorBilinear (fI_left α) (fI_right β)` を ePhi-座標で読む。
+- **4b–4e (各 case の mixed 項)**: eigenvalue 制約
+  `λ^(2^i)μ^(2^j)=ν^(2^k)` (endpoint `exists_mixedFrobeniusWeightEquation_of_xiLengthThree`
+  が供給) + `ν=λθ(λ)=μφ(μ)` から mixed を確定:
+  - case 1 (θ=φ=1): i≠jで[xᵢ,yⱼ]=0、mixed=εαβ ⟹ typeB θ=1
+  - case 2 (θ=φ≠1): base-change正規化、mixed=εαβ^{2^r} ⟹ typeB
+  - case 3 (θ≠1,φ=1): 3項=2項算術(既存
+    `three_distinct_frobeniusWeight_not_modEq_pairWeight`)⟹2r+1≡0,n奇、
+    mixed=εα^{1/2}β^{2^{r+1}} ⟹ typeC
+  - case 4 (両≠1非同型): **4項=4項算術 (新規、gap 5)** ⟹5r=0,s=2r、
+    mixed=εα^{2^{3r}}β^{2^r} ⟹ typeD
+  各 case で `q_P` を typeB/C/D quadratic map に一致させ `TypeB/C/DData.ofExtension`
+  (B は ofExtension 未実装 = 追加要) → `IsTypeB ∨ IsTypeC ∨ IsTypeD`。
+- **`TypeBData.ofExtension` を追加** (C/D と同型、`Types.lean`、case 1/2 用)。
+
+**endpoint 目標**: `higmanLemmaTwelve (hP hncomm hmulti hxi hlen hprime) :
+IsTypeB.{uP,0} P ∨ IsTypeC.{uP,0} P ∨ IsTypeD.{uP,0} P`。
+
+### 2026-07-21 lane b: Stage 4a-i (polarization) 完了 + 4a-ii 分解
+
+`AmbientProductCoordinate.lean` に `centerSquareMap_add` (polarization):
+`center(sq(u+v)) = center(sq u) + center(sq v) + center(bilinear u v)`
+(`lowerCentralSquareMapAdditive_add` + `map_add`)。case 共有。u=fI_left α, v=fI_right β,
+center=`ambientCenterCoordinate` を入れると `Q(α,β)=A(α)+B(β)+M(α,β)`。
+
+**次 = 4a-ii (factor identification `A(α)=q_X(α)`)**。これが Stage 4 の要で、
+新規 compat lemma 2 本が要る (既存無し、実測確認済):
+- **(a) square map の inclusion 互換**: `sq_ambient(fI_left α) = incl_L1(sq_factor(eQuot.symm α))`。
+  `sq` は `[·²]` ゆえ inclusion (`quotientToAmbientLayerZero` L₀ 側 / factor L₁→ambient 側) を
+  intertwine する (underlying element 保存)。要: L₀ inclusion と L₁ inclusion の定義精査。
+- **(b) L₁ bridge 互換**: `ambientLayerOneLinearEquivFrattini ∘ incl_L1 = factorLayerOneEquivAmbientFrattini`
+  (両者とも [x²] を x²∈Φ(P) に送る)。⟹ `ambientCenterCoordinate ∘ incl_L1 = eKernel_left`
+  (eKernel_eq より eKernel=ePhi∘factor_bridge、ambientCenterCoordinate=ambient_bridge∘ePhi... 実は
+  ambientCenterCoordinate=ambientLayerOneLinearEquivFrattini.trans ePhi)。
+  ⟹ (a)+(b)+square_normal で `A(α)=eKernel(sq_factor(eQuot.symm α))=α·θ(α)=q_X(α)`。
+定義: `factorLayerOneEquivAmbientFrattini` @ AmbientCentralExtension:317、
+`ambientLayerOneLinearEquivFrattini` @ MixedEigenweights:81。
+
+**4a-ii 以降の未着手 (Stage 4 の残り、多 session)**:
+- branch dispatch: FactorCoordinateData (comm/noncomm) から (f,N,eQuot,hf,hfexact) を抽出し
+  `ambientProductEquiv` の `e` を組む (exists_factorFamily_of_* と同じ dispatch)。
+  hRnormal/hinf/hsup/hΦR は XiLengthThreeTypeAFactorData から。
+- mixed 項 M(α,β) を各 case の固有値算術で確定 (endpoint の weight equation 使用)。
+- case assembly → `higmanLemmaTwelve : IsTypeB ∨ IsTypeC ∨ IsTypeD`。
+
+### 2026-07-21 lane b: 4a-ii の bridge 構造確定 (次 session 用)
+
+両 L₁ bridge を精査 (MixedEigenweights:73 / AmbientCentralExtension:317):
+- `ambientLayerOneEquivFrattini = quotientMulEquivOfEq hK1 ∘ quotientBot ∘ subgroupCongr hterm`
+  ⟹ `[x]_L₁ ↦ x ∈ frattini P` (underlying element 抽出)
+- `factorLayerOneEquivAmbientFrattini = 同上 ∘ subgroupOfEquivOfLe hPhiS`
+  ⟹ `[y]_{L₁(S)} ↦ (y の underlying, frattini P) ` (同、subgroupOf 補正付き)
+両者 linear 版は `MulEquiv.toAdditive |>.toLinearEquiv`。
+
+**factor-id `A(α)=q_X(α)` の証明筋 (次 session)**: 両辺 = `ePhi(a²)` (a=左因子代表元)。
+- `A(α)=ambientCenterCoordinate(sq_ambient(fI_left α))=ePhi(ambient_bridge([a²]_L₁))=ePhi(a²)`
+- `q_X(α)=eKernel(sq_factor(eQuot.symm α))=ePhi(factor_bridge([g²]_{L₁(S)}))=ePhi(f_left(g²))=ePhi(a²)`
+  (`f_left(g)=a`, `f_left(g²)=a²`)。
+要 unfold: `lowerCentralSquareValue = mk'(lowerCentralLayerKernel _ 1)(lowerCentralSquareRepresentative)`
+(HigmanSquareMap:112)。`lowerCentralSquareRepresentative` が underlying x² を持つことを示し、
+bridge の underlying 抽出と合成。fI_left の代表元 = `f_left(g)` (quotientToAmbientLayerZero_mk)。
+この 2 本 (ambient/factor の「bridge∘sq = underlying square」) が 4a-ii の中身。
+
+**Stage 4 全体の commit 済**: C/D モデル・F×F 座標・extension・全 ofExtension・polarization。
+残: 4a-ii (factor-id) → branch dispatch (e 構築) → mixed 項/case → endpoint。多 session。
