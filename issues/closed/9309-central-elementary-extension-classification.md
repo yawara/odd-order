@@ -27,9 +27,9 @@ Peterfalvi の `TypeAModel` 側は adapter とする。
 - [x] elementary-abelian 中心核と商、および ordered quotient basis から actual group の
       一意な normal form を構成する
 - [x] 平方写像の polarization が commutator pairing を決定することを証明する
-- [ ] 同じ平方 quadratic map を持つ actual extension と concrete twisted product の
+- [x] 同じ平方 quadratic map を持つ actual extension と concrete twisted product の
       `MulEquiv` を構成する
-- [ ] Peterfalvi `QuadraticExtension` / `TypeAModel` への adapter を接続する
+- [x] Peterfalvi `QuadraticExtension` / `TypeAModel` への adapter を接続する
 
 ## 進捗 (2026-07-20)
 
@@ -42,8 +42,19 @@ factor set や multiplication law を仮定として受け取らない。
 - `lake build OddOrder.GroupTheory.CentralElementaryExtension`
   - `Build completed successfully (1777 jobs).`
 - 800 行、警告なし、新規 `sorry` / `axiom` なし
-- 残りは `QuadraticExtension` の canonical `GroupExtension` 表現を取り出す adapter と、
-  Higman Lemma 11 で得る square-map formula の接続
+
+続いて `GroupExtension.ofNormalSubgroupCoordinates` を追加し、normal subgroup と
+kernel/quotient の実同値から actual extension を構成できるようにした。
+`TypeAData.ofExtension` はその actual extension の平方座標が
+`a ↦ a * phi(a)` であるとき、`equivOfCommonSquareMap` と
+`QuadraticExtension.extension` を直接比較して honest な `TypeAData` を返す。
+
+- 2 leaf の対象ビルド: 1781 jobs、成功
+- 変更後: `CentralElementaryExtension.lean` 849 行、`Types.lean` 337 行
+- 新規 API の公理依存: `propext`, `Classical.choice`, `Quot.sound` のみ
+
+Higman の lower-central layers からこの extension と平方式を組み立てる部分は
+paper-specific なので、shared issue から分離して issue 2048 の Lemma 11 leaf で行う。
 
 ## 完了条件
 

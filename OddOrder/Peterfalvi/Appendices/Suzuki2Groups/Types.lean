@@ -7,6 +7,7 @@ import Mathlib.Algebra.Algebra.ZMod
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.LinearAlgebra.Prod
+import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 
 /-!
@@ -194,6 +195,44 @@ def IsTypeA (P : Type uP) [Group P] : Prop :=
   Nonempty (TypeAData.{uP, uF} P)
 
 namespace TypeAData
+
+/-- Build honest type-A data from an actual central extension whose square
+coordinate is Peterfalvi's map `a ↦ a * phi(a)`. -/
+noncomputable def ofExtension
+    {P : Type uP} [Group P]
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    (parameter : ℕ) (parameter_pos : 0 < parameter)
+    (card_field : Nat.card F = 2 ^ parameter)
+    (phi : RingAut F) (phi_ne_one : phi ≠ 1)
+    (phi_orderOf_odd : Odd (orderOf phi))
+    (S : GroupExtension (Multiplicative F) P (Multiplicative F))
+    (hcentral : S.inl.range ≤ Subgroup.center P)
+    (hsq : ∀ x : P, x ^ 2 =
+      S.inl (Multiplicative.ofAdd
+        (typeAQuadraticMap phi (S.rightHom x).toAdd))) :
+    TypeAData P := by
+  letI : Algebra (ZMod 2) F := ZMod.algebra F 2
+  let q := typeAQuadraticMap phi
+  let basis := Module.finBasis (ZMod 2) F
+  let extEquiv : S.Equiv (QuadraticExtension.extension q basis) := by
+    apply GroupExtension.equivOfCommonSquareMap S
+      (QuadraticExtension.extension q basis) hcentral
+      (QuadraticExtension.range_inl_le_center q basis) q basis
+    · exact hsq
+    · intro x
+      change x ^ 2 =
+        (QuadraticExtension.extension q basis).inl
+          (Multiplicative.ofAdd (q x.quotient))
+      exact QuadraticExtension.sq_eq_inl_q q basis x
+  exact
+    { F := F
+      parameter := parameter
+      parameter_pos := parameter_pos
+      card_field := card_field
+      phi := phi
+      phi_ne_one := phi_ne_one
+      phi_orderOf_odd := phi_orderOf_odd
+      equivModel := extEquiv.toMulEquiv }
 
 variable {P : Type uP} [Group P] (data : TypeAData P)
 
