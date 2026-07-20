@@ -309,6 +309,102 @@ theorem chiefFactor_card_W2bar_H0supC [Finite G] {M : Subgroup G}
     ((chief.H0 ⊔ cSub data chief).subgroupOf M) (chief.H0.subgroupOf M) hinf]
   exact chiefFactor_card_W2bar chief
 
+/-- **`𝒮 = sSet` is finite** (issue 1017, the `hSfin` input of the caseB (5.7) coherence engine and
+the (9.11) non-Galois maximal-subfamily refutation): the family injects into
+`IrreducibleCharacter ↥(huSub data)` (a `Finite` type) via the induction map, so it is a subset of a
+finite range.
+
+Stated over Hypothesis (9.2) alone, so it belongs in §9; it previously sat in
+`S15_SAndT_Setup/HypothesisBasics` (namespace `S15`), which put a §9 fact downstream of its own
+users (issue 1045). -/
+theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    (sSet data).Finite := by
+  apply Set.Finite.subset (Set.finite_range
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data) =>
+      induceHU data (χ : ClassFunction ↥(huSub data) ℂ)))
+  rintro φ ⟨χ, -, rfl⟩
+  exact ⟨χ, rfl⟩
+
+/-- **Peterfalvi (9.6), clause `U ≠ C`**: the chief-factor centralizer `C = C_U(H̄)` (`cSub`) is a
+*proper* subgroup of `U`.
+
+This is exactly the carrier's non-centrality field `U_noncentral_on_quotient` read through the
+realization of `C`: by `cSub_subgroupOf_U_eq_ker_map` the subgroup `C.subgroupOf U` is the image of
+`ker (uActionHom)` under the isomorphism `subgroupOfEquivOfLe`, so `C = U` would force
+`ker (uActionHom) = ⊤`, i.e. every element of `U` acts trivially on `H̄`, i.e.
+`fixedSubgroup … (U.subgroupOf (U ⊔ W₁)) = ⊤`.
+
+Note this is *stronger* than "`U` does not centralize `H`" (`chiefFactor_U_not_centralizes_H`),
+since `C_U(H) ≤ C_U(H̄) = C`; the book states the `H̄`-version because `C`, not `C_U(H)`, is the
+subgroup fixed by Hypothesis (9.5).  The two coincide exactly when `H₀ = 1`
+(`S13.C_eq_cSub_of_noncoherent`, types III/IV under (11.3) non-coherence). -/
+theorem chiefFactor_cSub_ne_U [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    (chief : ChiefFactorData data) : cSub data chief ≠ data.U := by
+  intro hCU
+  -- `C = U` ⟹ `|ker (uActionHom)| = |U|` ⟹ `ker (uActionHom) = ⊤`.
+  have hcard : Nat.card ↥(uActionHom data chief).ker
+      = Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    rw [← card_cSub_eq_card_ker, hCU]
+    exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toEquiv).symm
+  have htop : (uActionHom data chief).ker = ⊤ := Subgroup.eq_top_of_card_eq _ hcard
+  -- Trivial kernel-complement ⟹ every element of `U` fixes `H̄` pointwise.
+  refine chief.U_noncentral_on_quotient (eq_top_iff.mpr fun xbar _ => ?_)
+  rw [mem_fixedSubgroup]
+  intro l hl
+  have hlker : (⟨l, hl⟩ : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+      ∈ (uActionHom data chief).ker := htop ▸ Subgroup.mem_top _
+  rw [MonoidHom.mem_ker] at hlker
+  have : quotientMulAutHom (N := chief.N) chief.N_aInvariant l = 1 := hlker
+  rw [this, MulAut.one_apply]
+
+/-- **Peterfalvi (9.6), corollary `U` does not centralize `H`**: `C_U(H) ≠ U`.
+
+Immediate from `chiefFactor_cSub_ne_U` and `C_U(H) ≤ C_U(H̄) = C`
+(`mem_cSub_of_mem_U_of_centralizes`): if `U` centralized `H` it would act trivially on the chief
+factor, forcing `C = U`.  (The earlier proof went the long way round, through the (9.3) order
+relations `typeII_III_IV_order_relations` and a type split; the chief-factor carrier already
+records the sharper non-centrality, so neither `hG` nor the type split is needed.) -/
+theorem chiefFactor_U_not_centralizes_H [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    data.U ⊓ Subgroup.centralizer (data.H : Set G) ≠ data.U := by
+  intro hcentr
+  refine chiefFactor_cSub_ne_U chief (le_antisymm (cSub_le_U data chief) fun x hx => ?_)
+  have hxH : x ∈ Subgroup.centralizer (data.H : Set G) := (inf_eq_left.mp hcentr) hx
+  exact mem_cSub_of_mem_U_of_centralizes data chief hx hxH
+
+/-- **Peterfalvi (9.6)**: `U ≠ C`, `H̄` is a chief factor of `M`, `|W̄₂| = p` and `|H̄| = p^q`.
+
+All four clauses hold for **every** type in Hypothesis (9.2) — II, III *and* IV — exactly as the
+book states them; the printed proof splits on the type only to get the type-II half, and both halves
+are already discharged inside the carrier `ChiefFactorData` and its producer
+`exists_chiefFactorData`.
+
+Two clauses are carrier fields and are therefore not repeated in the conclusion:
+`H̄` is a chief factor of `M` is `ChiefFactorData.quotient_chiefFactor` (`U W₁`-irreducibility of
+`H̄`), and the elementary-abelian structure is `quotient_elementaryAbelian`.  The two clauses with
+content are stated here:
+
+* `U ≠ C` for the book's `C = C_U(H̄)` (`cSub`, Hypothesis (9.5)) — `chiefFactor_cSub_ne_U`;
+* `|W̄₂| = p` for the **image** `W̄₂ = C_{H̄}(W₁)` of `W₂` in `↥M ⧸ H₀` — `chiefFactor_card_W2bar`;
+* `|H̄| = p^q` — `chiefFactor_quotient_card`.
+
+*History.* An earlier formalization asserted the unconditional `|W₂| = p`, which is **false** for
+type II (`|W₂|^q = |H| = p^q·|H₀|` gives `|W₂| = p` only when `H₀ = 1`); it was then weakened to
+`IsTypeIII M ∨ IsTypeIV M → |W₂| = p`, and the `U`-clause to the weaker `C_U(H) ≠ U`.  Both
+retreats are now unnecessary: stating the *image* `W̄₂` and the *chief-factor* centralizer
+`C = C_U(H̄)` — the objects (9.5) actually fixes — recovers the book's own statement.  The
+type-restricted
+`|W₂| = p` survives as the carrier field `ChiefFactorData.typeIII_IV_p_eq_W2`, where it belongs. -/
+theorem chiefFactor_basic [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] :
+    cSub data chief ≠ data.U ∧
+      Nat.card ↥((data.W2.subgroupOf M).map
+          (QuotientGroup.mk' (chief.H0.subgroupOf M))) = chief.p ∧
+      Nat.card (↥data.typeP.H ⧸ chief.N) = chief.p ^ data.q :=
+  ⟨chiefFactor_cSub_ne_U chief, chiefFactor_card_W2bar chief, chiefFactor_quotient_card chief⟩
+
 /-- **Induction-inflation commute, term level** (general): for `f : Γ →* Q` with `ker f ≤ H`, the
 induced-character term of the inflated `compHom (f.subgroupMap H) χ̄` at `(x, g)` equals the
 induced-character term of `χ̄` on `H.map f` at `(f x, f g)`.  The conjugate `x⁻¹gx ∈ H` iff

@@ -33,18 +33,16 @@ open OddOrder.GroupTheory
 
 variable {P : Type*} [Group P]
 
-/-- **Peterfalvi Appendix III, Higman theorem (a), easy inclusion** (p. 141):
-every involution of a finite Suzuki `2`-group lies in its center.
-
-This is Higman's “evidently” observation on p. 79: start from one central
-involution and use transitivity of the defining actor on all involutions. -/
-theorem involutions_subset_center [Finite P] (hP : IsSuzuki2Group P) :
+/-- Higman's p. 79 observation in its original generality: if an automorphism
+group is transitive on the involutions of a nontrivial finite `2`-group, then
+every involution is central. -/
+theorem involutions_subset_center_of_transitive [Finite P] [Nontrivial P]
+    (hP : IsPGroup 2 P) (X : Subgroup (MulAut P))
+    (htrans : ActsTransitivelyOnInvolutions X) :
     involutions P ⊆ (Subgroup.center P : Set P) := by
-  rcases hP with ⟨hP2, _, ⟨u, v, hu, hv, huv⟩, A, _, hreg⟩
-  letI : Nontrivial P := ⟨⟨u, v, huv⟩⟩
-  letI : Nontrivial ↥(Subgroup.center P) := hP2.center_nontrivial
+  letI : Nontrivial ↥(Subgroup.center P) := hP.center_nontrivial
   have hZ2 : IsPGroup 2 ↥(Subgroup.center P) :=
-    hP2.to_subgroup (Subgroup.center P)
+    hP.to_subgroup (Subgroup.center P)
   have hZcard_ne : Nat.card ↥(Subgroup.center P) ≠ 1 :=
     ne_of_gt (Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
   have htwo_dvd : 2 ∣ Nat.card ↥(Subgroup.center P) :=
@@ -56,9 +54,20 @@ theorem involutions_subset_center [Finite P] (hP : IsSuzuki2Group P) :
   have hzne : (z : P) ≠ 1 := fun h => hz.2 (Subtype.ext h)
   have hzInv : (z : P) ∈ involutions P := ⟨hzpow, hzne⟩
   intro x hx
-  obtain ⟨a, ha, _⟩ := hreg (z : P) hzInv x hx
+  obtain ⟨a, ha⟩ := htrans (z : P) hzInv x hx
   rw [← ha]
   exact MulEquivClass.apply_mem_center (a : MulAut P) z.2
+
+/-- **Peterfalvi Appendix III, Higman theorem (a), easy inclusion** (p. 141):
+every involution of a finite Suzuki `2`-group lies in its center.
+
+This is Higman's “evidently” observation on p. 79: start from one central
+involution and use transitivity of the defining actor on all involutions. -/
+theorem involutions_subset_center [Finite P] (hP : IsSuzuki2Group P) :
+    involutions P ⊆ (Subgroup.center P : Set P) := by
+  rcases hP with ⟨hP2, _, ⟨u, v, _hu, _hv, huv⟩, A, _, hreg⟩
+  letI : Nontrivial P := ⟨⟨u, v, huv⟩⟩
+  exact involutions_subset_center_of_transitive hP2 A hreg.transitive
 
 /-- The central exponent-`2` subgroup: the identity together with all central
 involutions. -/

@@ -41,6 +41,30 @@
 | §11 | (11.8) | **✅ 2026-07-19 解消 (∀ 化)** | 教科書形は ∀ ζ (PDF p.65-67: 任意の `ζ ∈ S(HC)` に対し直交性を仮定して (11.8.4)-(11.8.6) で (11.3) と矛盾)。`zeta_residual_not_orthogonal_H0C_of_refuter` (S13_Orthogonality.lean) として ∀ 形を主定理化し、旧 `exists_zeta_...` は witness packaging の系に降格 (consumer 3 箇所は無変更)。鍵は新規 `S12.Hypothesis.exists_charParameters_full_of_zeta` — parameters を**与えられた ζ の周りで**組む。⚠ 次数 `ζ(1) = w₁` は**特殊化でない**: `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` の台条件 (`alpha_support`) がまさにそれを要求する (`n·w₁ = d − δ` + `μ_{i0}(1) = 1` ⟹ `α_{ij}(1) = 0`)。残る狭さは `S12.inducedFamily M` 固定 + `IsTypeIII ∨ IsTypeIV` のみ。S16 側の同文重複 (`member_residual_not_orthogonal_H0C_of_refuter` + member-pinned producer 2 件) は issue 1040 で削除済 (consumer 2 件は S13 版 cite に置換)。 |
 | §13 | (13.8) | **✅ 2026-07-19 解消 (S 側 mirror 完成, issue 1041)** | 書籍 (13.8) 本体 = S 側 `∑_{H^#}|η₀₁|² ≥ |S′|−u²` を `eta01_Hsharp_norm_lower_core` (S15_CaseBEndgameSupply/Eta01Correction.lean) として実証明 (仮定 hG のみ、sorry 0、axiom-clean 実測済)。distinguished index (`exists_muS_index_eta01_core`) は T 側 550 行の完全 mirror (2 段 constituent 展開 + ℕ-係数直交カウント)。「applied to T」instance (`eta10_Qsharp_norm_lower_core`) と両輪が揃った。 |
 
+## ⚠ 訂正 (2026-07-20, lane a): §9 行の結論は誤り — gate は 9163 ではなかった
+
+上表 §9 行は「(9.11) M 側の type-II 化 = §12 hypothesis 層の作り直し (`base.A0` が誤った
+`typePA = (M')^#` 上に建つ) → **9163 に gated**」と結論していたが、**書籍 p.50-51 を読んで実測した
+結果、gate はそこではない**。正しい診断は issue **1045** (詳細) に記録。要点:
+
+- **書籍 (9.5) の `C` は `C_U(H̄)`** (chief factor の中心化群) であって `C_U(H)` **ではない**。
+  repo の §9 carrier `S11.Section11CharacterData` は既にこれ (`C = cSub = C_U(H̄)`) を持ち、
+  `TypesIIIIIIVSetup` (= Hyp (9.2)) は `IsTypeII ∨ IsTypeIII ∨ IsTypeIV` で**既に型一様**。
+- gate の実体は「repo の (9.11) が §9 carrier でなく **§11 packaging** (`S13.Hypothesis`,
+  `type_alt : III ∨ IV` + `base : S12.Hypothesis` = §10) の上に建っている」こと。
+  §11 が `hyp.C = C_U(H)` と書籍の `C_U(H̄)` を同一視するのに (11.7) `H₀ = 1` を使うので、
+  `H₀ ≠ 1` の型 II では**この経路が閉じる**。`typePA`/`typePACore` は (9.11) の gate ではない。
+- ⟹ 正しい作業 = **(9.11) を §9 レベル (`TypesIIIIIIVSetup` + `ChiefFactorData` +
+  `Section11CharacterData`) で述べ直す**。`sOf_closedUnderConjugate` は既に §9 レベル、
+  `sSet_finite` も §9 レベル (置き場が S15) で、大半は**再配置と引数一般化**であり新規の数学は薄い。
+
+**副産物 (同日実装済)**: (9.6) の型一様化。`chiefFactor_basic` の docstring が自認していた
+「書籍は `|W̄₂| = p` だが repo は型 III/IV 限定の `|W₂| = p` に退避」という特殊化債務は、
+**`W̄₂` と `C_U(H̄)` で述べ直せば消える** (書籍の (9.6) 自体が型 II を証明している)。
+`chiefFactor_cSub_ne_U` / `chiefFactor_U_not_centralizes_H` / `chiefFactor_basic` /
+`cSub_subgroupOf_U_eq_ker_map`、いずれも axiom-clean。型限定の `|W₂| = p` は carrier field
+`ChiefFactorData.typeIII_IV_p_eq_W2` に残る (本来の居場所)。
+
 ## (5.6) エンジンの norm 一般化 (2026-07-19, lane a)
 
 **発端**: (6.3) の frontier 調査で「repo の `hanchor` が anchor の既約性を要求するが、教科書 p.30 は

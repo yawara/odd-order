@@ -551,19 +551,6 @@ theorem Hypothesis.sSetIrrDeg_qa_coherent_indS_caseA [Finite G]
     (Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hqpos.ne' caseA.a_pos.ne'))
     (hyp.sSetIrrDeg_qa_two_le_ncard hG chars caseA)
 
-open OddOrder.Peterfalvi.S11 in
-/-- **`𝒮 = sSet` is finite** (issue 1017, the `hSfin` input of the caseB (5.7) coherence engine and
-the (9.11) non-Galois maximal-subfamily refutation): the family injects into
-`IrreducibleCharacter ↥(huSub data)` (a `Finite` type) via the induction map, so it is a subset of a
-finite range. -/
-theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
-    (sSet data).Finite := by
-  apply Set.Finite.subset (Set.finite_range
-    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data) =>
-      induceHU data (χ : ClassFunction ↥(huSub data) ℂ)))
-  rintro φ ⟨χ, -, rfl⟩
-  exact ⟨χ, rfl⟩
-
 /-- **Peterfalvi (13.2.a), ordered refinement**: if `q < p`, then `S` is of Type II.
 
 Use the intrinsic κ-Hall factor `Sdata.W1`.  The generic type-`P` bridge identifies the order of
