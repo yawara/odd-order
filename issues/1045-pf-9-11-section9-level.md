@@ -626,13 +626,34 @@ S06.Hypothesis.induce_not_isIrreducible_iff (h : S06.Hypothesis ↥M) [NeZero (N
    `S13.tau_apply_eq_zero_of_mem_typePV` は台を `A(M) = (M')^#` に固定しているが、
    **型一様な `A(M)` (= `typePACore`) は `(M')^#` より真に小さい**のでそのままでは移らない。
 
-### ⛏ 残り = case (9.7.a) の 2 パラメータ + 消費側の配線
+### ✅ case (9.7.b) は入力ゼロで完全に閉じた (2026-07-20)
 
-`sOf_nineEleven_coherent` が露出している 3 パラメータ:
+**書籍 p.54 を PDF ページ画像で確認** (⚠ この章の `pdftotext` は文字がバラバラで使えない):
+
+> **(9.9.b)** By (4.7) and Theorem (4.5), **both** `𝒮(H₀)` **and `𝒮(H₀C)`** contain exactly
+> `p − 1` reducible characters `μ_j` (1 ≤ j < p). By (a), `μ_j(1) = qu`.
+
+⟹ `𝒮(H₀C)` の分は `𝒮(H₀)` からの移送ではなく **同じ (4.7)+(4.5) を K = H₀C で回している**。
+repo の `reducible_count_sOf_K` がその共通議論そのもので (docstring も両 instantiation に言及)、
+**5 入力すべてが K = H₀C で既に揃っていた** (`chiefFactor_{H0supC_subgroupOf_normal,
+H0supC_le_derived, W1_inf_H0supC_subgroupOf_eq_bot, W2_not_le_H0supC, card_W2bar_H0supC}`)。
+
+- `S11.reducible_count_sOf_H0supC` — 5 行の instantiation。
+- `S11.sOf_cprime_nonempty` — `𝒮(H₀C′) ≠ ∅`。`C′ = [C,C] ≤ C` ⟹ `𝒮(H₀C) ⊆ 𝒮(H₀C′)`
+  (`sOf_antitone`)、`p` 素数ゆえ `p − 1 > 0`。
+  ⚠ **count を H₀ でなく H₀C で取るのが本質**: `𝒮(H₀)` の可約メンバーがより小さい `𝒮(H₀C′)`
+  に入る保証は無い。書籍が (9.9.b) を 2 つの carrier で述べている理由がこれ。
+
+⚠ engine の pivot 要求は「メンバーが 1 つ在る」だけ (`hη₂ := η₁.conj` は共役閉+no-real で自動)
+なので、可約性そのものは要らなかった。
+
+### ⛏ 残り = case (9.7.a) の 2 パラメータ
+
+`sOf_nineEleven_coherent` が露出しているのは **case A の 2 つだけ** (どちらも
+`CliffordCaseAData` で量化してあるので case B は代償を払わない):
 
 | param | 由来 | 状態 |
 |---|---|---|
-| `hBpivot` | (9.9.b) の可約メンバー p−1 個の数え上げ | ⛏ §6 count から作れるはず (`S06_CertainTypeClifford`:1046/:1108) |
 | `hAbase` | degree-`qa` 既約 cut の coherence | ⚠ **τ/A の seam あり (下記)** |
 | `hArefute` | maximality refuter = §9 chain 本体 | ⛏ `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin` の `S13.Hypothesis` 降ろし |
 
