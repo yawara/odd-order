@@ -765,5 +765,105 @@ theorem sOf_caseB_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (Submodule.sub_mem _ (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF ha))
         (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF hb)))
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11) in case (9.7.b)**: `𝒮(H₀C′)` is coherent, with the uniform degree supplied
+by **(9.9.a)** — the book's "By (9.9.a) and (5.7)" verbatim.
+
+Specializes `sOf_caseB_coherent` to the caseB Clifford datum: (9.9.a)
+(`S11.caseB_degree_qu`, itself type-free) gives every member degree `qu`, and `qu ≠ 0` since `q` is
+a subgroup order and `u` is odd.
+
+Only the pivot `η₁` remains as a parameter.  The book takes it from **(9.9.b)** — `𝒮(H₀)` contains
+exactly `p−1` reducible members `μ_j`, all lying in `𝒮(H₀C) ⊆ 𝒮(H₀C′)` — which is genuine upstream
+content, not something to reconstruct from packaging (the §13 route reaches it only through (11.7)
+`H₀ = 1`, i.e. types III/IV). -/
+theorem caseB_coherent_sOf_cprime [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
+    {η₁ : ClassFunction ↥M ℂ} (hη₁ : η₁ ∈ sOf data (chief.H0 ⊔ chars.Cprime)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (sOf data (chief.H0 ⊔ chars.Cprime))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :=
+  sOf_caseB_coherent hG hM data h46 hKeq hconj htau hKsupp hVsub (data.q * chars.u)
+    (caseB_degree_qu hG chars caseB)
+    (mul_ne_zero Nat.card_pos.ne' (u_odd hG chars).pos.ne') hη₁
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` is coherent, under Hypothesis (9.5) alone.
+
+The (9.7) Clifford dichotomy (`clifford_dichotomy`, already type-free on `chars`) splits into the
+two branches proved above:
+
+* case (9.7.a) — `caseA_coherent_sOf_cprime_of_refuter`, still needing the degree-`qa` base
+  coherence `hAbase` and the maximality refuter `hArefute` (the §9 chain
+  `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin`, whose descent from `S13.Hypothesis` is the
+  remaining item of issue 1045);
+* case (9.7.b) — `caseB_coherent_sOf_cprime`, needing only the (9.9.b) pivot `hBpivot`.
+
+⚠ The three residual inputs are quantified over the *branch datum* they belong to, so neither
+branch pays for the other's obligations.
+
+**No type hypothesis appears anywhere on this route** — which is the point of issue 1045: the §13
+statement `S13.coherent_sOf_H0Cprime` carries `IsTypeIII ∨ IsTypeIV` purely because its carrier
+(`S13.Hypothesis`) does, and the underlying §9 argument never uses it. -/
+theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
+    (hAbase : ∀ caseA : CliffordCaseAData chars,
+      OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+        {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+          IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))}
+        (OddOrder.Peterfalvi.S04.supportInSubgroup
+          (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M))
+    (hArefute : ∀ caseA : CliffordCaseAData chars, ∀ S₂ : Set (ClassFunction ↥M ℂ),
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+          IsIrreducibleCharacter φ ∧
+          ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+        S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+        OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+        Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) S₂
+          (OddOrder.Peterfalvi.S04.supportInSubgroup
+            (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) →
+        (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂).Nonempty →
+        (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+          ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) (S₂ ∪ {χ, χ.conj})
+            (OddOrder.Peterfalvi.S04.supportInSubgroup
+              (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M))) → False)
+    (hBpivot : ∀ _ : CliffordCaseBData chars,
+      (sOf data (chief.H0 ⊔ chars.Cprime)).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (sOf data (chief.H0 ⊔ chars.Cprime))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) := by
+  rcases clifford_dichotomy hG chars with hA | hB
+  · exact caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some (hAbase hA.some)
+      (hArefute hA.some)
+  · obtain ⟨η₁, hη₁⟩ := hBpivot hB.some
+    exact caseB_coherent_sOf_cprime hG hM chars hB.some h46 hKeq hconj htau hKsupp hVsub hη₁
+
 
 end OddOrder.Peterfalvi.S11
