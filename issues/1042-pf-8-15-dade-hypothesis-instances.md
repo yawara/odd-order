@@ -107,15 +107,63 @@ repo はこれを `hKsupp : (M′)^# ⊆ supportInSubgroup A₀ M` 経由の粗�
    **`A` について引数化済**なので `A = typePACore M` でそのまま使える。
 3. 組み立て engine — `S07.irrSubcoherent` (既存 `inducedKernelFamily_subcoherent` と同じ)。
 
-**実装手順**:
+### ✅ 実装完了 (2026-07-20) — `S10_SubcoherentTypeP.lean` §8E
 
-- (a) `M_s`-絞り族を定義: `{Ind_{M′}^M θ | θ ∈ Irr M′, M_σ ⊄ Ker θ}`
-  (§9 の `xiSet` と同型。`S08.inducedKernelFamily … ⊥` の `θ ≠ 1` 絞りとは別物)。
-- (b) 支持補題: 上記 (4.7) から「メンバーの台 ⊆ A(M) ∪ {1}」→ 差 `χ − χ̄` は
-  `1` で消える (次数が等しい) ので **台 ⊆ A(M)**。これが `hconjsupp` / `Rdatum` の入力。
-- (c) `inducedKernelFamily_subcoherent` を `hKsupp` 引数化した一般形に組み替え、
-  (b) を渡して型一様な (8.15.3) を得る (`typePACore0` 版)。
-- ⚠ P₁ 版 (`typePA0`) は既存の粗い経路のまま残してよい (signature 不変 ⟹ 下流無変更)。
+- (a) **族**: `inducedNonKernelFamily K H = {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`
+  (書籍 (5.3.b)/(8.15.3) の族そのもの)。
+- (b) **粗い族への包含**: `inducedNonKernelFamily_subset_inducedKernelFamily_bot` —
+  `H ⊄ Ker θ ⟹ θ ≠ 1` (自明指標は全てを核に持つ) かつ `⊥` 核条件は空虚。
+  ⟹ **非実性・対直交性・有限性・共役閉性は `S08.inducedKernelFamily_*` からそのまま継承**。
+  作り直しが要るのは**台の評価だけ**。
+- (c) **台の評価** (本体): `inducedNonKernelFamily_apply_eq_zero` ((4.7) の直適用) +
+  `inducedNonKernelFamily_apply_one_eq_natCast` (次数 = `|L:K|·θ(1)` は自然数 ⟹ 実)
+  ⟹ `inducedNonKernelFamily_conjDiff_support` : `Supp (φ − φ̄) ⊆ supportInSubgroup A M`。
+  **`(M′)^# ⊆ A` を一切使わない** = 型一様。
+- (d) **producer**: `inducedNonKernelFamily_subcoherent` — 任意の ambient support `A`、
+  `h46 : S06.Hypothesis46Core A M`、`d : DadeSupportHypothesisData M A` から
+  `S07.Hypothesis S (supportInSubgroup A M)`。これが書籍 (5.3.b) 逐語。
+
+5 宣言とも axiom-clean (propext/Classical.choice/Quot.sound)、AxiomsCheck 登録済。
+`lake build OddOrder.Peterfalvi.S10_SubcoherentTypeP` green (4032 jobs)。
+
+⚠ P₁ 版 (`inducedKernelFamily_subcoherent` / `_sharp`) は signature 不変で残す
+(下流無変更)。docstring で「§8D は P₁ regime、§8E が型一様」と対比を明示。
+
+### ⛏ 残り: `A = typePACore M` / `H = M_σ` での具体化 — **層の逆転が gate**
+
+必要な部品は 2 つとも既に在るが、**どちらも S15 に置かれている** (実測 2026-07-20):
+
+| 部品 | 場所 | 型仮定 |
+|---|---|---|
+| `S15.dadeSupportHypothesisData_typePACore` | `S15_SAndT_Setup/SubcoherenceInputs.lean:706` | `IsTypeP` のみ = **型一様** |
+| `S15.dadeSupportHypothesisData_typePACore0` | `S15_HonestTypeP2A0.lean:538` | `IsTypeP` のみ = **型一様** |
+
+これらは書籍 **(8.15) claim 1** そのもの (§8 の内容) なのに §13 の file / namespace `S15` に居る。
+`sSet_finite` (§9 の事実が §15 に居た、commit 998d28af5 で是正) と**同型の層の逆転**。
+
+⚠ 移設の規模: `dadeSupportHypothesisData_typePACore0` は `S15_HonestTypeP2A0.lean`
+(**1266 行**、namespace `S15`、importer 6 — うち `FeitThompsonNuGrid` /
+`FeitThompsonCharacterData` は spine) のローカル補題群 (`typePACore0_subset` /
+`_ne_one` / `_conj_mem` / `escaping_typePACore0_mem_typePACore` /
+`not_isConj_typePACore_typePV`) に依存するので、**ファイル単位の移設**になる。
+実体は §8 の A₀(M) 論なので `S10_TypePSupportA0.lean` 相当が正しい置き場。
+⚠ spine file を触るので [[relayer-verify-with-build-not-bfs]] に従い edge ごとに build 検証する。
+
+⟹ 次の一手 = この移設 (別 issue 化して段階実施)。移設後に
+`inducedNonKernelFamily_subcoherent` へ `h46 := typePACore_toHypothesis46_core …` と
+`d := dadeSupportHypothesisData_typePACore …` を渡すだけで型一様な (8.15.3) の具体化が終わる。
+
+⚠ **薄いラッパーは書かない**: 一般 producer に `A := typePACore M` を渡すだけの specialization は
+CLAUDE.md のラッパー方針で不可。具体化として価値があるのは「族が書籍の
+`{Ind_{M′}^M θ | M_σ ⊄ Ker θ}` に一致する」ことの明示 (= `h46.toCore.K` /
+`.subH` の同定) と、下流 consumer への接続。
+
+### 未証明のまま残した docstring 主張 (要 formalize)
+
+§8E の docstring は「`H = K` のとき 2 つの絞りは一致する (= P₁ の符合)」と書いているが、
+`⊇` 方向 (`θ ≠ 1 ⟹ K ⊄ Ker θ`) は**未証明**。要るのは「既約指標の核が全体 ⟹ 自明指標」で、
+経路は `inner_self_eq_one` (`CharacterProduct.lean:195`) + 次数が正の自然数 ⟹ 次数 1。
+`⊆` 方向は `inducedNonKernelFamily_subset_inducedKernelFamily_bot` で証明済。
 
 なお `inducedKernelFamily_subcoherent` 自体は `hKsupp` を引数化すれば `A₀` について一般化できる
 (item 1 の `typePData_toHypothesis46_ofSupport` と同じ形) ので、**族の絞りと支持補題が本体**。

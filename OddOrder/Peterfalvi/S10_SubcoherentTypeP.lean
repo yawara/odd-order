@@ -271,4 +271,180 @@ noncomputable def inducedKernelFamily_subcoherent_sharp
 
 end SubcoherentTypeP
 
+/-! ### 8E: the book-literal (8.15.3) family `{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` (issue 1042)
+
+The producers of §8D above filter the induced family by `θ ≠ 1` (`S08.inducedKernelFamily … ⊥`),
+whereas the book's (8.15.3) filters by **`M_s ⊄ Ker θ`**.  For `θ ∈ Irr M'` the two agree exactly
+when `M_s = M'` — the type-`P₁` regime, which is why §8D reads faithfully only there.
+
+The book filters this way for a reason: Hypothesis (5.2) needs the member differences to be
+`A`-supported, and (5.3.b)'s proof gets that from **(4.7)** — *"`Z[𝒮, L^#] = Z[𝒮, A]`"* — rather
+than from the crude `(M')^# ⊆ A`, which is **false** once `A = A(M) = ⋃_{x ∈ M_s^#} C_{M'}(x)^#`
+is strictly smaller than `(M')^#` (types II/V).  So the `H`-nontrivial filter is what makes the
+support estimate type-uniform.  This section supplies that filter and its (4.7)-based support
+lemma; the `A`-general subcoherence producer then takes them as inputs. -/
+
+section CoreNontrivialFamily
+
+variable {M : Subgroup G} [Fintype ↥M]
+variable (K : Subgroup ↥M) [Invertible (Nat.card ↥K : ℂ)]
+
+/-- **Peterfalvi (5.3.b)/(8.15.3)'s family** `{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`.
+
+The `H`-nontrivial analogue of `S08.inducedKernelFamily` (which filters by `θ ≠ 1` together with a
+*positive* kernel condition `X ⊆ Ker θ`).  At `H = K` the two conditions coincide — an irreducible
+`θ ∈ Irr K` has `K ⊆ Ker θ` iff `θ = 1` — which is exactly the type-`P₁` coincidence `M_s = M'`. -/
+def inducedNonKernelFamily (H : Subgroup ↥M) : Set (ClassFunction ↥M ℂ) :=
+  {φ | ∃ θ : IrreducibleCharacter ↥K,
+    ¬ ((H.subgroupOf K : Set ↥K) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ)) ∧
+    φ = ClassFunction.induce K (θ : ClassFunction ↥K ℂ)}
+
+variable {K}
+
+theorem mem_inducedNonKernelFamily {H : Subgroup ↥M} {φ : ClassFunction ↥M ℂ} :
+    φ ∈ inducedNonKernelFamily K H ↔ ∃ θ : IrreducibleCharacter ↥K,
+      ¬ ((H.subgroupOf K : Set ↥K) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ)) ∧
+      φ = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) := Iff.rfl
+
+/-- **The book's filter is finer than the repo's**: `{θ | H ⊄ Ker θ} ⊆ {θ | θ ≠ 1}`, so the
+(8.15.3) family sits inside `S08.inducedKernelFamily K ⊥`.
+
+The trivial character has every element in its kernel, so `H ⊄ Ker θ` forces `θ ≠ 1`; and the
+`⊥`-kernel condition of `inducedKernelFamily` is vacuous.  This inclusion is what lets the whole
+`S08.inducedKernelFamily_*` suite (non-reality, pairwise orthogonality, finiteness, conjugation
+closure) apply verbatim to the finer family — only the *support* estimate has to be redone, and
+that is `inducedNonKernelFamily_conjDiff_support`. -/
+theorem inducedNonKernelFamily_subset_inducedKernelFamily_bot {H : Subgroup ↥M} :
+    inducedNonKernelFamily K H ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily K ⊥ := by
+  rintro φ ⟨θ, hker, rfl⟩
+  refine ⟨θ, ?_, ?_, rfl⟩
+  · rintro rfl
+    exact hker fun x _ => by
+      simp [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+  · intro x hx
+    rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_bot] at hx
+    rw [show x = 1 from Subtype.ext hx]
+    rfl
+
+/-- **Member degrees of the (8.15.3) family are natural numbers** (hence real): `φ(1) = |L:K|·θ(1)`
+with `θ(1)` a positive natural.  This is what kills the `{1}` left over by (4.7) when passing from
+`Supp φ ⊆ A ∪ {1}` to `Supp (φ − φ̄) ⊆ A`. -/
+theorem inducedNonKernelFamily_apply_one_eq_natCast {H : Subgroup ↥M}
+    {φ : ClassFunction ↥M ℂ} (hφ : φ ∈ inducedNonKernelFamily K H) :
+    ∃ n : ℕ, φ 1 = (n : ℂ) := by
+  obtain ⟨θ, -, rfl⟩ := hφ
+  obtain ⟨d, -, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  exact ⟨K.index * d, by rw [ClassFunction.induce_apply_one, hd]; push_cast; ring⟩
+
+end CoreNontrivialFamily
+
+section CoreNontrivialSupport
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable {M : Subgroup G} [Fintype ↥M] [Invertible (Nat.card ↥M : ℂ)]
+
+/-- **Peterfalvi (4.7) on the (8.15.3) family**: every member vanishes outside `A ∪ {1}`.
+
+Direct application of `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`,
+whose ambient set `A` is already a parameter — so it applies verbatim at `A = typePACore M`
+(the book-literal `A(M)`), not only at the `P₁`-regime `typePA M`. -/
+theorem inducedNonKernelFamily_apply_eq_zero {A : Set G}
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46Core A M) [Invertible (Nat.card ↥h.K : ℂ)]
+    {φ : ClassFunction ↥M ℂ} (hφ : φ ∈ inducedNonKernelFamily h.K h.subH)
+    {z : ↥M} (hz : (z : G) ∉ A ∪ ({1} : Set G)) :
+    φ z = 0 := by
+  obtain ⟨θ, hker, rfl⟩ := hφ
+  exact OddOrder.Peterfalvi.S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
+    h θ hker hz
+
+/-- **The `hconjsupp` input of (5.2) for the (8.15.3) family**: `Supp (φ − φ̄) ⊆ A`.
+
+This is the type-uniform replacement for `S08.inducedKernelFamily_conjDiff_support`, which needs
+`(M')^# ⊆ A` and therefore only reads correctly in the `P₁` regime.  Here (4.7) gives
+`Supp φ ⊆ A ∪ {1}` outright, and the identity is removed by the degree being a natural number
+(`φ(1) = φ̄(1)`), so no containment `(M')^# ⊆ A` is required. -/
+theorem inducedNonKernelFamily_conjDiff_support {A : Set G}
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46Core A M) [Invertible (Nat.card ↥h.K : ℂ)]
+    {φ : ClassFunction ↥M ℂ} (hφ : φ ∈ inducedNonKernelFamily h.K h.subH) :
+    ((φ - φ.conj : ClassFunction ↥M ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A M := by
+  intro z hz
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  by_contra hzA
+  refine hz ?_
+  rcases eq_or_ne ((z : G)) 1 with hz1 | hz1
+  · -- at the identity the two degrees agree (both the same natural number)
+    have hzone : z = 1 := Subtype.ext hz1
+    obtain ⟨n, hn⟩ := inducedNonKernelFamily_apply_one_eq_natCast (K := h.K) (H := h.subH) hφ
+    rw [ClassFunction.sub_apply, hzone, ClassFunction.conj_apply, hn, star_natCast, sub_self]
+  · -- off `A ∪ {1}` the member itself vanishes, hence so does its conjugate
+    have hmem : (z : G) ∉ A ∪ ({1} : Set G) := by
+      rw [Set.mem_union, Set.mem_singleton_iff, not_or]
+      exact ⟨hzA, hz1⟩
+    have h0 : φ z = 0 := inducedNonKernelFamily_apply_eq_zero h hφ hmem
+    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_self]
+
+/-- **Peterfalvi (8.15), claim 3 — type-uniform**, on the book's own family
+`𝒮 ⊆ {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` and an arbitrary ambient Dade support `A`.
+
+This is (5.3.b) verbatim: assume Hypothesis (4.6) (here its Dade-free core `h46` together with the
+`A`-Dade datum `d`), (5.2.a) (`hconjS`), and that `𝒮` sits inside the `H`-nontrivial induced
+family; then Hypothesis (5.2) holds for `L = M`.
+
+Unlike `inducedKernelFamily_subcoherent` (§8D) this needs **no containment `(M')^# ⊆ A`**, so it is
+not confined to the type-`P₁` regime: the book's `H ⊄ Ker θ` filter buys the support estimate
+through (4.7) instead (`inducedNonKernelFamily_conjDiff_support`).  Instantiating
+`A = typePACore M` with `H = M_s = M_σ` (`typePACore_toHypothesis46_core`) gives the book-literal
+(8.15.3) for **every** type `𝒫`, types II and V included.
+
+Everything except the support estimate is inherited from the coarser `S08` family along
+`inducedNonKernelFamily_subset_inducedKernelFamily_bot`. -/
+noncomputable def inducedNonKernelFamily_subcoherent {A : Set G}
+    (hodd : Odd (Nat.card ↥M))
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46Core A M) [Invertible (Nat.card ↥h46.K : ℂ)]
+    (d : DadeSupportHypothesisData M A)
+    {S : Set (ClassFunction ↥M ℂ)}
+    (hsub : S ⊆ inducedNonKernelFamily h46.K h46.subH)
+    (hirr : ∀ χ ∈ S, IsIrreducibleCharacter χ)
+    (hconjS : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S) :
+    OddOrder.Peterfalvi.S07.Hypothesis (L := ↥M) (G := G) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M) := by
+  classical
+  -- the coarser `S08` family, for the non-support inputs
+  have hbot : ∀ ⦃χ : ClassFunction ↥M ℂ⦄, χ ∈ S →
+      χ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily h46.K ⊥ := fun _ hχ =>
+    inducedNonKernelFamily_subset_inducedKernelFamily_bot (hsub hχ)
+  refine OddOrder.Peterfalvi.S07.irrSubcoherent
+    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap d.dade
+      (d.dade.fullDadeIsometryData d.hconj))
+    (OddOrder.Peterfalvi.S04.supportInSubgroup A M)
+    (fun χ hχ => ?_) hconjS ?_ ?_ ?_ ?_
+  · -- `Rdatum`: the (5.2.d) datum, with the **(4.7)** support estimate in place of `(M')^# ⊆ A`
+    exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff d.dade d.hconj
+      ⟨χ, hirr χ hχ⟩
+      (OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hodd ⊥ (hbot hχ))
+      (by
+        have h := inducedNonKernelFamily_conjDiff_support h46 (hsub hχ)
+        intro x hx
+        refine h ?_
+        rw [ClassFunction.mem_support] at hx ⊢
+        intro h0
+        refine hx ?_
+        rw [ClassFunction.sub_apply] at h0 ⊢
+        rw [sub_eq_zero] at h0 ⊢
+        exact h0.symm)
+  · exact fun χ hχ =>
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hodd ⊥ (hbot hχ)
+  · exact fun χ ψ hχ hψ hne =>
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal (hbot hχ) (hbot hψ) hne
+  · exact fun χ hχ => inducedNonKernelFamily_conjDiff_support h46 (hsub hχ)
+  · exact fun φ ψ hφ hψ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
+        d.dade d.hconj hφ.2 hψ.2
+
+end CoreNontrivialSupport
+
 end OddOrder.Peterfalvi.S10
