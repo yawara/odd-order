@@ -308,6 +308,9 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [ ] 上記の共通 `Φ(P)` 座標を prescribed kernel coordinate として、左右各
               factor の quotient 座標を actor-compatible に構成し、
               `ν = λ·θ(λ) = μ·φ(μ)` を導く
+          - [x] odd-order `θ` に対する unit twisted norm
+                `u ↦ u·θ(u)` の全単射性を証明し、任意の非零 kernel scaling を
+                quotient-basis scaling で実現する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

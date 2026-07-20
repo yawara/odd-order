@@ -436,6 +436,10 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       適用した。共通 generator `c`、primitive scalar `ν`、`Φ(P) ≃ₗ GF(2,n)`、
       Frobenius eigenbasis を一括して構成し、複数 involution から `n ≥ 2`、左右
       type-A factor の既存 parameter との一致も証明した。
+      また p. 89 の基底調整を支える twisted norm `u ↦ u·θ(u)` が、有限体上で
+      `orderOf θ` が odd なら全単射であることを証明した。従って可換 branch
+      `θ = 1` も含め、prescribed common kernel basis の任意の非零 scaling を
+      quotient basis 側で吸収できる。
       さらに上記の noncommuting mixed-factor witness を actual ambient
       `lowerCentralCommutatorBilinear` の非零値へ接続し、左右 factor に属する代表元の
       provenance も保持した。したがって原典 p. 90 の固有値比較へ入る非零 pairing は

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven
 import OddOrder.Higman.Suzuki2Groups.HigmanIdempotentAction
+import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 
 /-!
 # Higman's Lemma 12: models for the ξ-length-two factors
@@ -35,6 +36,90 @@ open OddOrder.Isaacs.Ch03
 open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 
 universe uP uF uQ uE
+
+private theorem mulAutTwistedNorm_injective_of_odd_order
+    {G : Type*} [CommGroup G]
+    (sigma : MulAut G) (hsigma : Odd (orderOf sigma))
+    (hsq : Function.Injective fun x : G => x ^ 2) :
+    Function.Injective fun x : G => x * sigma x := by
+  intro x y hxy
+  let z : G := x * y⁻¹
+  have hz : z * sigma z = 1 := by
+    calc
+      z * sigma z = (x * sigma x) * (y * sigma y)⁻¹ := by
+        simp only [z, map_mul, map_inv, mul_inv_rev]
+        simp only [mul_assoc, mul_comm, mul_left_comm]
+      _ = 1 := by
+        change x * sigma x = y * sigma y at hxy
+        rw [hxy, mul_inv_cancel]
+  have hsigmaZ : sigma z = z⁻¹ := eq_inv_of_mul_eq_one_right hz
+  have hsigmaSqZ : (sigma ^ 2) z = z := by
+    simp only [pow_two, MulAut.mul_apply, hsigmaZ, map_inv, inv_inv]
+  have hiterate (j : ℕ) : ((sigma ^ 2) ^ j) z = z := by
+    induction j with
+    | zero => simp
+    | succ j ih =>
+        rw [pow_succ', MulAut.mul_apply, ih, hsigmaSqZ]
+  obtain ⟨k, hk⟩ := hsigma
+  have hevenFix : (sigma ^ (2 * k)) z = z := by
+    simpa only [pow_mul] using hiterate k
+  have horderFix : (sigma ^ orderOf sigma) z = z := by
+    rw [pow_orderOf_eq_one]
+    rfl
+  have hsigmaFix : sigma z = z := by
+    rw [hk, show 2 * k + 1 = (2 * k) + 1 by rfl,
+      pow_succ', MulAut.mul_apply, hevenFix] at horderFix
+    exact horderFix
+  have hzsq : z ^ 2 = 1 := by
+    simpa [pow_two, hsigmaFix] using hz
+  have hzOne : z = 1 := hsq (by simpa using hzsq)
+  simpa [z, mul_inv_eq_one] using hzOne
+
+private theorem mulAutTwistedNorm_bijective_of_odd_order
+    {G : Type*} [CommGroup G] [Finite G]
+    (sigma : MulAut G) (hsigma : Odd (orderOf sigma))
+    (hsq : Function.Injective fun x : G => x ^ 2) :
+    Function.Bijective fun x : G => x * sigma x :=
+  (mulAutTwistedNorm_injective_of_odd_order sigma hsigma hsq).bijective_of_finite
+
+/-- **Higman Lemma 12 (p. 89), type-A basis rescaling.**
+
+If `phi` has odd order, the twisted norm `u ↦ u * phi(u)` is a
+permutation of the nonzero elements of a finite field of characteristic two.
+This is the precise reason that the central conjugate basis can be prescribed
+first and the quotient basis rescaled afterwards.  The case `phi = 1`, used
+for the abelian group `A(n, 1)`, is included. -/
+theorem typeAUnitNorm_bijective
+    {F : Type*} [Field F] [Finite F] [CharP F 2]
+    (phi : RingAut F) (hphi : Odd (orderOf phi)) :
+    Function.Bijective fun u : Fˣ => u *
+      OddOrder.Peterfalvi.Appendices.Suzuki.fieldRingAutOnUnits F phi u := by
+  let sigma : MulAut Fˣ :=
+    OddOrder.Peterfalvi.Appendices.Suzuki.fieldRingAutOnUnits F phi
+  have hsigmaDvd : orderOf sigma ∣ orderOf phi :=
+    orderOf_map_dvd
+      (OddOrder.Peterfalvi.Appendices.Suzuki.fieldRingAutOnUnits F) phi
+  have hsigma : Odd (orderOf sigma) := hphi.of_dvd_nat hsigmaDvd
+  apply mulAutTwistedNorm_bijective_of_odd_order sigma hsigma
+  intro u v huv
+  apply Units.ext
+  have huv' : (u : F) ^ 2 = (v : F) ^ 2 := congrArg Units.val huv
+  exact CharTwo.sq_injective huv'
+
+/-- Every prescribed nonzero central scaling is `u * phi(u)` for a nonzero
+quotient-basis scaling `u`. -/
+theorem exists_ne_zero_mul_apply_eq_of_typeA
+    {F : Type*} [Field F] [Finite F] [CharP F 2]
+    (phi : RingAut F) (hphi : Odd (orderOf phi))
+    (v : F) (hv : v ≠ 0) :
+    ∃ u : F, u ≠ 0 ∧ u * phi u = v := by
+  let vUnit : Fˣ := Units.mk0 v hv
+  obtain ⟨u, hu⟩ := (typeAUnitNorm_bijective phi hphi).2 vUnit
+  refine ⟨(u : F), Units.ne_zero u, ?_⟩
+  have huval := congrArg Units.val hu
+  simpa [vUnit,
+    OddOrder.Peterfalvi.Appendices.Suzuki.fieldRingAutOnUnits_apply_val]
+    using huval
 
 /-- Honest model data for a ξ-length-two Higman factor `A(n, φ)`.
 
