@@ -11184,6 +11184,7 @@ lane c stops growing it instead. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.commutator_mul_mem_chain
 #assert_only_allowed_axioms OddOrder.BG.AppE.chainStepHom_ker_ge
 #assert_only_allowed_axioms OddOrder.BG.AppE.commutator_pow_mem_of_commutator_mem
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutator_zpowers_le_of_forall
 
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
