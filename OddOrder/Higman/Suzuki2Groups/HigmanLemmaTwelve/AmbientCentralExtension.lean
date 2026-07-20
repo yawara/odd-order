@@ -264,6 +264,155 @@ theorem lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
 
 noncomputable section
 
+local instance ambientFactorLayerCommGroup
+    (H : Type uP) [Group H] (i : ℕ) :
+    CommGroup (lowerCentralLayer H i) :=
+  { (inferInstance : Group (lowerCentralLayer H i)) with
+    mul_comm := (lowerCentralLayer_isElementaryAbelian H i).comm }
+
+noncomputable local instance ambientFactorLayerModule
+    (H : Type uP) [Group H] (i : ℕ) :
+    Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
+  lowerCentralLayerZmodModule H i
+
+/-- The Frattini subgroup of a noncommutative invariant length-two factor is
+the ambient Frattini subgroup, viewed inside the factor. -/
+theorem factor_frattini_eq_ambientFrattini_subgroupOf
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPS : IsPGroup 2 S)
+    (hncommS : ¬ IsMulCommutative S)
+    (hxiS : IsXiActor hSinv.restrict.range)
+    (hlenS : HasXiLengthTwo hSinv.restrict.range.subtype)
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hPhiCenter : frattini P ≤ Subgroup.center P) :
+    frattini S = (frattini P).subgroupOf S := by
+  rw [frattini_eq_involutionSubgroup hPS hncommS hxiS hlenS]
+  ext z
+  rw [Subgroup.mem_subgroupOf]
+  constructor
+  · intro hz
+    have hzsqS : z ^ 2 = 1 :=
+      (mem_omega1OfAbelian.mp hz).2
+    have hzsqP : (z : P) ^ 2 = 1 :=
+      congrArg Subtype.val hzsqS
+    by_cases hzOne : (z : P) = 1
+    · simp [hzOne]
+    · exact hinvPhi ⟨hzsqP, hzOne⟩
+  · intro hz
+    rw [involutionSubgroup, mem_omega1OfAbelian]
+    refine ⟨?_, ?_⟩
+    · rw [Subgroup.mem_center_iff]
+      intro s
+      apply Subtype.ext
+      exact Subgroup.mem_center_iff.mp (hPhiCenter hz) (s : P)
+    · apply Subtype.ext
+      simpa using congrArg Subtype.val (hEA.pow_eq_one ⟨(z : P), hz⟩)
+
+/-- Group-level identification of a factor's second lower-central layer with
+the ambient Frattini subgroup. -/
+noncomputable def factorLayerOneEquivAmbientFrattini
+    {P : Type uP} [Group P]
+    {S : Subgroup P}
+    (hPhiS : frattini P ≤ S)
+    (hK1 : lowerCentralLayerKernel S 1 = ⊥)
+    (hterm : lowerCentralTerm S 1 =
+      (frattini P).subgroupOf S) :
+    lowerCentralLayer S 1 ≃* frattini P :=
+  (QuotientGroup.quotientMulEquivOfEq hK1).trans
+    (QuotientGroup.quotientBot.trans
+      ((MulEquiv.subgroupCongr hterm).trans
+        (Subgroup.subgroupOfEquivOfLe hPhiS)))
+
+/-- Linear form of the factor-to-ambient Frattini identification. -/
+noncomputable def factorLayerOneLinearEquivAmbientFrattini
+    {P : Type uP} [Group P]
+    {S : Subgroup P}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hPhiS : frattini P ≤ S)
+    (hK1 : lowerCentralLayerKernel S 1 = ⊥)
+    (hterm : lowerCentralTerm S 1 =
+      (frattini P).subgroupOf S) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    Additive (lowerCentralLayer S 1) ≃ₗ[ZMod 2]
+      Additive ↑(frattini P) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  letI : IsMulCommutative (lowerCentralLayer S 1) :=
+    lowerCentralLayerIsMulCommutative S 1
+  letI : Module (ZMod 2) (Additive (lowerCentralLayer S 1)) :=
+    lowerCentralLayerZmodModule S 1
+  exact (MulEquiv.toAdditive
+      (factorLayerOneEquivAmbientFrattini hPhiS hK1 hterm)).toLinearEquiv
+    (fun c x => ZMod.map_smul
+      (MulEquiv.toAdditive
+        (factorLayerOneEquivAmbientFrattini hPhiS hK1 hterm)).toAddMonoidHom c x)
+
+/-- The factor-to-ambient layer identification intertwines the restricted
+factor action with the actual ambient Frattini action. -/
+theorem factorLayerOneLinearEquivAmbientFrattini_equivariant
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hPhiS : frattini P ≤ S)
+    (hK1 : lowerCentralLayerKernel S 1 = ⊥)
+    (hterm : lowerCentralTerm S 1 =
+      (frattini P).subgroupOf S) :
+    let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+      IsAInvariant.of_characteristic Y.subtype
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    ∀ (g : Y) (v : Additive (lowerCentralLayer S 1)),
+      factorLayerOneLinearEquivAmbientFrattini
+          hEA hPhiS hK1 hterm
+          (lowerCentralLayerRepresentation hSinv.restrict 1 g v) =
+        elabRepresentation 2 hPhiInv.restrict g
+          (factorLayerOneLinearEquivAmbientFrattini
+            hEA hPhiS hK1 hterm v) := by
+  dsimp only
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  intro g v
+  change factorLayerOneLinearEquivAmbientFrattini
+        hEA hPhiS hK1 hterm
+        (lowerCentralLayerRepresentation hSinv.restrict 1 g
+          (Additive.ofMul v.toMul)) =
+      elabRepresentation 2 hPhiInv.restrict g
+        (factorLayerOneLinearEquivAmbientFrattini
+          hEA hPhiS hK1 hterm (Additive.ofMul v.toMul))
+  rw [lowerCentralLayerRepresentation_apply]
+  change Additive.ofMul
+        (factorLayerOneEquivAmbientFrattini hPhiS hK1 hterm
+          (lowerCentralLayerAction hSinv.restrict 1 g v.toMul)) =
+      elabRepresentation 2 hPhiInv.restrict g
+        (Additive.ofMul
+          (factorLayerOneEquivAmbientFrattini hPhiS hK1 hterm v.toMul))
+  rw [elabRepresentation_apply]
+  apply Additive.ofMul.injective
+  obtain ⟨x, hx⟩ :=
+    QuotientGroup.mk'_surjective (lowerCentralLayerKernel S 1) v.toMul
+  rw [← hx, lowerCentralLayerAction_apply_mk]
+  apply Subtype.ext
+  exact IsAInvariant.restrict_apply_val hSinv g x
+
 /-- **Higman Lemma 12 (p. 89), common-center Singer coordinates.**
 
 The ambient actor admits one common finite-field coordinate on `Φ(P)`, chosen

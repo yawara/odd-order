@@ -44,6 +44,12 @@ local instance sourceSquareLayerIsMulCommutative
     IsMulCommutative (lowerCentralLayer H i) :=
   lowerCentralLayerIsMulCommutative H i
 
+local instance sourceSquareLayerCommGroup
+    (H : Type uP) [Group H] (i : Nat) :
+    CommGroup (lowerCentralLayer H i) :=
+  { (inferInstance : Group (lowerCentralLayer H i)) with
+    mul_comm := (lowerCentralLayer_isElementaryAbelian H i).comm }
+
 noncomputable local instance sourceSquareLayerZModTwoModule
     (H : Type uP) [Group H] (i : Nat) :
     Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
@@ -724,6 +730,88 @@ theorem exists_lowerCentralCoordinates_typeANormalForm_of_anchoredTrace_finrankO
       rw [hanchor, hfrobenius]
       ac_rfl
 
+/-- Frobenius-renormalizing a kernel coordinate can instead be undone on the
+quotient coordinate, leaving the prescribed kernel coordinate fixed. -/
+theorem exists_typeANormalForm_preserving_kernel_coordinate
+    {H : Type uP} [Group H]
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    [Algebra (ZMod 2) F]
+    (hSq : LowerCentralSquaresLieInSecond H)
+    (eZero : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] F)
+    (eKernel : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] F)
+    (sigma : F ≃ₐ[ZMod 2] F)
+    (theta : RingAut F)
+    (hcomm : ∀ x : F, sigma (theta x) = theta (sigma x))
+    (epsilon : F)
+    (hformula : ∀ alpha : F,
+      (eKernel.trans sigma.toLinearEquiv)
+          (lowerCentralSquareMapAdditive H hSq (eZero.symm alpha)) =
+        epsilon * (alpha * theta alpha)) :
+    ∃ eZero' : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] F,
+      ∃ epsilon' : F,
+        ∀ beta : F,
+          eKernel
+              (lowerCentralSquareMapAdditive H hSq (eZero'.symm beta)) =
+            epsilon' * (beta * theta beta) := by
+  let eZero' : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] F :=
+    eZero.trans sigma.toLinearEquiv.symm
+  refine ⟨eZero', sigma.symm epsilon, ?_⟩
+  intro beta
+  have h := congrArg sigma.symm (hformula (sigma beta))
+  have htheta : sigma.symm (theta (sigma beta)) = theta beta := by
+    rw [← hcomm beta, sigma.symm_apply_apply]
+  have h' : eKernel
+        (lowerCentralSquareMapAdditive H hSq (eZero.symm (sigma beta))) =
+      sigma.symm epsilon * (beta * theta beta) := by
+    simpa only [LinearEquiv.trans_apply, LinearEquiv.coe_coe,
+      AlgEquiv.toLinearEquiv_apply, map_mul, htheta,
+      sigma.symm_apply_apply] using h
+  have heZero : eZero'.symm beta = eZero.symm (sigma beta) := by
+    apply eZero'.injective
+    simp only [eZero', LinearEquiv.trans_apply,
+      LinearEquiv.apply_symm_apply]
+    exact (sigma.symm_apply_apply beta).symm
+  rw [heZero]
+  exact h'
+
+/-- Actor equivariance forces the kernel eigenvalue to be the type-A norm of
+the quotient eigenvalue once the kernel coordinate is prescribed. -/
+theorem kernel_eigenvalue_eq_typeANorm_of_normalForm
+    {H : Type uP} [Group H]
+    {C : Type uC} [Group C]
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    [Algebra (ZMod 2) F]
+    (phi : C →* MulAut H) (c : C)
+    (hSq : LowerCentralSquaresLieInSecond H)
+    (eZero : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] F)
+    (eKernel : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] F)
+    (lambda nu : F) (theta : RingAut F)
+    (epsilon : F) (hepsilon : epsilon ≠ 0)
+    (hcompatZero : ∀ v,
+      eZero (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda * eZero v)
+    (hcompatKernel : ∀ v,
+      eKernel (lowerCentralLayerRepresentation phi 1 c v) =
+        nu * eKernel v)
+    (hnormal : ∀ alpha : F,
+      eKernel
+          (lowerCentralSquareMapAdditive H hSq (eZero.symm alpha)) =
+        epsilon * (alpha * theta alpha)) :
+    nu = lambda * theta lambda := by
+  let v : Additive (lowerCentralLayer H 0) := eZero.symm 1
+  have hv : lowerCentralLayerRepresentation phi 0 c v =
+      eZero.symm lambda := by
+    apply eZero.injective
+    simp only [hcompatZero, v, LinearEquiv.apply_symm_apply, mul_one]
+  have hequiv :=
+    lowerCentralSquareMapAdditive_equivariant phi hSq c v
+  have hcoords := congrArg eKernel hequiv
+  rw [hv, hnormal lambda, hcompatKernel, hnormal 1] at hcoords
+  simp only [map_one, mul_one] at hcoords
+  apply Eq.symm
+  apply mul_left_cancel₀ hepsilon
+  simpa only [mul_assoc, mul_comm, mul_left_comm] using hcoords
+
 /-! ## The actual square normal form gives type A -/
 
 /-- **Higman Lemma 11 (p. 89), lower-central extension endgame.**
@@ -823,12 +911,6 @@ noncomputable def typeADataOfLowerCentralSquareNormalForm
     hsquareCoordinates
 
 /-! ## Higman's source-facing type-A conclusion -/
-
-local instance higmanLemmaElevenLayerCommGroup
-    (H : Type uP) [Group H] (i : Nat) :
-    CommGroup (lowerCentralLayer H i) :=
-  { (inferInstance : Group (lowerCentralLayer H i)) with
-    mul_comm := (lowerCentralLayer_isElementaryAbelian H i).comm }
 
 set_option maxHeartbeats 800000 in
 -- This assembly elaborates the two large actual Singer-basis expressions.
