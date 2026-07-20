@@ -55,7 +55,8 @@ packaging.  Per-result status:
 | E.3(b) Step 2, `S` narrow / `\|Ω₁(Z(S))\| = p` / `\|S:T\| = p` | **proved, sorry-free** |
 | E.3(b) Step 2, (E.4)--(E.7) | **proved, sorry-free** (chain, `\|T\| = pⁿ`, `\|S/S'\| = p²`) |
 | E.3(b) second + third clause | **proved** from Step 2 + first clause |
-| E.3(b) first clause, E.3(c)(d), E.4, E.5 | honest statements, `sorry` |
+| E.3(c) (`card_omega_le`) | **proved** — in `AppE_RegularOperator.lean` (Step 2's count) |
+| E.3(b) first clause, E.3(d), E.4, E.5 | honest statements, `sorry` |
 -/
 
 namespace OddOrder.BG.AppE
@@ -330,6 +331,33 @@ theorem RegularOperatorSetup.card_R₀_subgroupOf [Finite R]
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₀S).toEquiv]
   exact hyp.R₀_card
 
+/-- **BG's `v ∈ R₀^#`**: a generator of `R₀`, viewed inside `S`.
+
+`R₀` has prime order `p`, so any nonidentity element generates it.  BG picks such a `v` at
+the start of `(E.9)` and keeps it for the whole of Step 2; several results below take
+`Subgroup.zpowers v = R₀.subgroupOf S` as a hypothesis, and this is what supplies it. -/
+theorem RegularOperatorSetup.exists_zpowers_eq_R₀_subgroupOf [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
+    ∃ v : ↥S, Subgroup.zpowers v = hyp.R₀.subgroupOf S := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
+  have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S
+  haveI : Nontrivial ↥R₀' := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro h
+    rw [h, Subgroup.card_bot] at hR₀'card
+    exact hyp.p_prime.one_lt.ne hR₀'card
+  obtain ⟨v, hv⟩ := exists_ne (1 : ↥R₀')
+  have hord : orderOf (v : ↥S) = p := by
+    have h1 : orderOf v ∣ Nat.card ↥R₀' := orderOf_dvd_natCard v
+    rw [hR₀'card] at h1
+    have h2 : orderOf (v : ↥S) = orderOf v := Subgroup.orderOf_coe v
+    rcases (Nat.dvd_prime hyp.p_prime).mp h1 with h | h
+    · exact absurd (Subtype.ext (orderOf_eq_one_iff.mp (h2.trans h))) hv
+    · exact h2.trans h
+  exact ⟨(v : ↥S), Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr v.2)
+    (by rw [hR₀'card, Nat.card_zpowers, hord])⟩
+
 /-- `r(C_S(R₀)) ≤ 2` for any `S` containing `R₀`: the centralizer taken inside `S` embeds in
 `C_R(R₀)` along `S.subtype`, and that has rank `≤ 2` (`pRank_centralizer_R₀_le_two`).
 
@@ -579,23 +607,9 @@ theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
   set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
   have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S
   -- pick a generator `v` of the order-`p` group `R₀`
-  haveI : Nontrivial ↥R₀' := by
-    rw [Subgroup.nontrivial_iff_ne_bot]
-    intro h
-    rw [h, Subgroup.card_bot] at hR₀'card
-    exact hyp.p_prime.one_lt.ne hR₀'card
-  obtain ⟨w, hw⟩ := exists_ne (1 : ↥R₀')
-  have hvR₀ : (w : ↥S) ∈ R₀' := w.2
-  have hord : orderOf (w : ↥S) = p := by
-    have h1 : orderOf w ∣ Nat.card ↥R₀' := orderOf_dvd_natCard w
-    rw [hR₀'card] at h1
-    have h2 : orderOf (w : ↥S) = orderOf w := Subgroup.orderOf_coe w
-    rcases (Nat.dvd_prime hyp.p_prime).mp h1 with h | h
-    · exact absurd (Subtype.ext (orderOf_eq_one_iff.mp (h2.trans h))) hw
-    · exact h2.trans h
-  have hzp : Subgroup.zpowers (w : ↥S) = R₀' :=
-    Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hvR₀)
-      (by rw [hR₀'card, Nat.card_zpowers, hord])
+  obtain ⟨w, hzp⟩ := hyp.exists_zpowers_eq_R₀_subgroupOf hR₀S
+  rw [← hR₀'def] at hzp
+  have hvR₀ : (w : ↥S) ∈ R₀' := by rw [← hzp]; exact Subgroup.mem_zpowers w
   refine OddOrder.BG.Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le
     (v := (w : ↥S)) (fun x hx => Subgroup.commutator_mem_commutator hvR₀ hx) ?_
   -- `C_H(v) ≤ C_T(R₀)`, which has order `p`.
@@ -1633,16 +1647,10 @@ theorem RegularOperatorSetup.card_omega_abelianization [Finite R] [Finite B]
   hyp.card_quotient_commutator hyp.R₀_lt_omega fun x =>
     Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2)
 
-/-- **BG Theorem E.3(c)**: `|Ω₁(R)| ≤ p^q`.
-
-**Status: honestly stated, not proved.**  BG's Step 2 counting argument: the
-eigenvalues `rᵢ ≡ r₀ rⁱ (mod p)` of `α` on the `A`-invariant series
-`T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1` are all `≢ 1`, and `r` has order dividing `q` in
-`(ℤ/p)ˣ`, forcing `n ≤ q - 1` and `|S| = p^{n+1} ≤ p^q`. -/
-theorem RegularOperatorSetup.card_omega_le [Finite R] [Finite B]
-    (hyp : RegularOperatorSetup R B p q) :
-    Nat.card ↥(Omega R p 1) ≤ p ^ q := by
-  sorry
+/- **BG Theorem E.3(c)** (`|Ω₁(R)| ≤ p^q`) is **proved**, but lives one leaf downstream, as
+`RegularOperatorSetup.card_omega_le` in `OddOrder/BG/AppE_RegularOperator.lean`.  It has to:
+its proof is BG's `(E.9)`--`(E.12)` eigenvalue count, and that machinery is what the
+downstream leaf carries. -/
 
 /-- **BG Theorem E.3(d)**: if `B` fixes `R₀ Φ(Ω₁(R))` then `B` fixes `R₀`.
 

@@ -466,13 +466,13 @@ section `Hᵢ₊₁/Hᵢ₊₂` — BG's five-word *"So `⟨w̄ᵢ⟩ = H̄ᵢ`"
 
 The eigenvalues enter as hypotheses in the shape `exists_zpow_eq_mod_chain` and
 `exists_zpow_eq_act_of_mem_A` deliver them, so that the caller chooses `a` once and reuses
-the same `r` down the whole chain — which is what makes `rᵢ ≡ r₀ rⁱ` an induction. -/
+the same `r` down the whole chain — which is what makes `rᵢ ≡ r₀ rⁱ` an induction.
+
+⚠ The chain's liveness `Hᵢ₊₁ ≠ 1` is *not* needed here: the index hypothesis `hidx` and the
+non-membership `hwi` already carry everything the computation uses. -/
 theorem RegularOperatorSetup.eigenvalue_step {R B : Type*} [Group R] [Group B] [Finite R]
     {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
     (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) {i : ℕ}
-    (hne : OddOrder.Isaacs.Ch04.iterCommutator
-      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
-      (i + 1) ≠ ⊥)
     (hidx : ((OddOrder.Isaacs.Ch04.iterCommutator
           (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
           (i + 2)).subgroupOf
@@ -667,7 +667,7 @@ theorem RegularOperatorSetup.exists_eigenvalue_pow {R B : Type*} [Group R] [Grou
       obtain ⟨s, hs, hsmem⟩ := ih hprev
       obtain ⟨s', _, hs'mem⟩ := hyp.exists_zpow_eq_mod_chain hR₀S hexp hS hSinv hne ha
       refine ⟨s', ?_, hs'mem⟩
-      have hstep := hyp.eigenvalue_step hSinv hne
+      have hstep := hyp.eigenvalue_step hSinv
         (hyp.index_subgroupOf_chain hR₀S hexp hS hne) ha hw
         (hyp.commutatorIterate_not_mem hR₀S hexp hS hv hw hw1 (i + 1) hne) hr
         (hsmem _ (commutatorIterate_mem_chain hw i))
@@ -753,5 +753,185 @@ theorem RegularOperatorSetup.eigenvalue_ne_one {R B : Type*} [Group R] [Group B]
   hyp.quotient_action_ne_one hSinv (hyp.iterCommutator_lt hR₀S hexp hS hne) ha hane
     (hyp.quotient_action_eq_one_of_eigenvalue_one hSinv
       (hyp.index_subgroupOf_chain hR₀S hexp hS hne) ha hs h1)
+
+/-! ### The closing count: `n ≤ q − 1` and `|S| ≤ p^q` -/
+
+/-- **BG's `n`**: the chain `T = H₀ ⊃ H₁ ⊃ ⋯` reaches `1`, and `|T| = pⁿ` for the first
+index `n` at which it does.
+
+BG's `T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1` with `|Hᵢ₋₁ : Hᵢ| = p`.  The chain terminates because `S`
+is a `p`-group, hence nilpotent; `|T| = pⁿ` is `card_start_eq_pow_mul` at `n − 1` combined
+with the final step `|Hₙ₋₁| = p·|Hₙ| = p`. -/
+theorem RegularOperatorSetup.exists_chain_length {R B : Type*} [Group R] [Group B] [Finite R]
+    {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) :
+    ∃ n : ℕ,
+      (∀ i < n, OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥) ∧
+      Nat.card ↥(Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) = p ^ n := by
+  classical
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
+  have hex : ∃ m, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) m = ⊥ :=
+    OddOrder.Isaacs.Ch04.iterCommutator_eq_bot_of_isNilpotent_ambient T (⊤ : Subgroup ↥S)
+  set n := Nat.find hex with hn
+  have hbot : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) n = ⊥ := Nat.find_spec hex
+  have hlive : ∀ i < n, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i ≠ ⊥ :=
+    fun i hi => Nat.find_min hex hi
+  refine ⟨n, hlive, ?_⟩
+  rcases Nat.eq_zero_or_pos n with h0 | hpos
+  · have hTbot : T = ⊥ := by
+      have h := hbot
+      rw [h0, OddOrder.Isaacs.Ch04.iterCommutator_zero] at h
+      exact h
+    rw [hTbot, h0, Subgroup.card_bot, pow_zero]
+  · have hmlive : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (n - 1) ≠ ⊥ :=
+      hlive (n - 1) (by omega)
+    have h1 := hyp.card_start_eq_pow_mul hR₀S hexp hS (le_refl T) (n - 1) hmlive
+    have h2 := hyp.card_iterCommutator_eq hR₀S hexp hS (le_refl T) hmlive
+    rw [show n - 1 + 1 = n by omega, hbot, Subgroup.card_bot, mul_one] at h2
+    rw [h1, h2, ← pow_succ]
+    congr 1
+    omega
+
+/-- **BG Theorem E.3(b), Step 2, the closing count**, transported to `(ZMod p)ˣ`.
+
+BG: *"the nonzero integers `(mod p)` form a cyclic group of order `p − 1` and `rᵠ ≡ 1`;
+therefore by `(E.10)` and `(E.11)` there exists `j` with `1 ≤ j ≤ q − 1` and `rʲ ≡ r₀`;
+by `(E.12)` none of `r₀, r₀r, …, r₀rⁿ⁻¹` is `≡ 1`; therefore `q − 1 ≥ j + n − 1 ≥ n`."*
+
+`le_pred_of_forall_mul_pow_ne_one` is that argument for an abstract cyclic group; this
+wrapper supplies the group — `(ZMod p)ˣ`, cyclic because `ZMod p` is a finite field — and
+promotes the residues `r`, `r₀` to units (they are, since they satisfy `x^q = 1`). -/
+theorem le_pred_of_forall_zmod_mul_pow_ne_one {p q n : ℕ} [Fact p.Prime] (hq : q.Prime)
+    {r r₀ : ℤ} (hrq : (r : ZMod p) ^ q = 1) (hrne : (r : ZMod p) ≠ 1)
+    (hr₀q : (r₀ : ZMod p) ^ q = 1)
+    (hne : ∀ i < n, (r₀ : ZMod p) * (r : ZMod p) ^ i ≠ 1) : n ≤ q - 1 := by
+  have hqpos : 0 < q := hq.pos
+  have hsplit : q - 1 + 1 = q := Nat.succ_pred_eq_of_pos hqpos
+  have hunit : ∀ x : ZMod p, x ^ q = 1 → IsUnit x := by
+    intro x hx
+    rw [isUnit_iff_ne_zero]
+    intro h0
+    rw [h0, zero_pow hqpos.ne'] at hx
+    exact zero_ne_one hx
+  set u : (ZMod p)ˣ := (hunit _ hrq).unit with hu
+  set u₀ : (ZMod p)ˣ := (hunit _ hr₀q).unit with hu₀
+  have huval : (u : ZMod p) = (r : ZMod p) := IsUnit.unit_spec _
+  have hu₀val : (u₀ : ZMod p) = (r₀ : ZMod p) := IsUnit.unit_spec _
+  refine le_pred_of_forall_mul_pow_ne_one hq (u := u) (u₀ := u₀) ?_ ?_ ?_ ?_
+  · exact Units.ext (by rw [Units.val_pow_eq_pow_val, huval, hrq, Units.val_one])
+  · exact fun h => hrne (by rw [← huval, h, Units.val_one])
+  · exact Units.ext (by rw [Units.val_pow_eq_pow_val, hu₀val, hr₀q, Units.val_one])
+  · intro i hi h
+    refine hne i hi ?_
+    have := congrArg (Units.val) h
+    rwa [Units.val_mul, Units.val_pow_eq_pow_val, huval, hu₀val, Units.val_one] at this
+
+/-- **BG Theorem E.3(b), Step 2, third clause**: `|S| ≤ p^q`.
+
+BG: *"Recall that the nonzero integers `(mod p)` form a cyclic group of order `p − 1` and
+`rᵠ ≡ 1 (mod p)`.  Therefore, by `(E.10)` and `(E.11)`, there exists an integer `j` such
+that `1 ≤ j ≤ q − 1` and `rʲ ≡ r₀ (mod p)`.  By `(E.12)`, none of the integers
+`r₀, r₀r, …, r₀rⁿ⁻¹` is congruent to `1 (mod p)`.  Therefore `q − 1 ≥ j + n − 1 ≥ n` and
+`|S| = |R₀T| = p·pⁿ ≤ p^q`.  This completes the proof of Step 2."*
+
+The size is read off from `(E.5)` rather than from BG's `|R₀T|`: `|S| = |T|·|S : T| = pⁿ·p`
+uses only the index `|S : T| = p`, which Lemma 5.2 already delivers.
+
+⚠ Unlike the first two clauses of Step 2, this one genuinely needs the `A`-action: the
+regularity of `A` is what forbids the eigenvalue `1` and so bounds the chain length. -/
+theorem RegularOperatorSetup.card_le_pow_card_A {R B : Type*} [Group R] [Group B] [Finite R]
+    {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) :
+    Nat.card ↥S ≤ p ^ q := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  obtain ⟨n, hlive, hTcard⟩ := hyp.exists_chain_length hR₀S hexp hS
+  -- `|S| = |T| · |S : T| = pⁿ · p`
+  have hScard : Nat.card ↥S = p ^ (n + 1) := by
+    have h := Subgroup.card_mul_index T
+    rw [hTcard, (hyp.card_omega1Center_and_index_centralizer hR₀S hS).2] at h
+    rw [← h, pow_succ]
+  suffices hn : n ≤ q - 1 by
+    rw [hScard]
+    exact Nat.pow_le_pow_right hyp.p_prime.pos (by have := hyp.q_prime.pos; omega)
+  rcases Nat.eq_zero_or_pos n with rfl | hnpos
+  · omega
+  -- the chain is alive at `0`, i.e. `T ≠ 1`
+  have h0live : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) 0 ≠ ⊥ := hlive 0 hnpos
+  -- BG's `a ∈ A^#`
+  obtain ⟨a, ha, hane⟩ : ∃ a, ∃ h : a ∈ hyp.A, (⟨a, h⟩ : ↥hyp.A) ≠ 1 := by
+    haveI : Nontrivial ↥hyp.A := by
+      have hcard := hyp.A_card
+      rw [Subgroup.nontrivial_iff_ne_bot]
+      intro h
+      rw [h, Subgroup.card_bot] at hcard
+      exact hyp.q_prime.one_lt.ne hcard
+    obtain ⟨x, hx⟩ := exists_ne (1 : ↥hyp.A)
+    exact ⟨x.1, x.2, by simpa using hx⟩
+  have hane' : a ≠ 1 := fun h => hane (Subtype.ext (by simpa using h))
+  -- BG's `v ∈ R₀^#`
+  obtain ⟨v, hv⟩ := hyp.exists_zpowers_eq_R₀_subgroupOf hR₀S
+  have hvR₀ : (v : R) ∈ hyp.R₀ := by
+    have : v ∈ hyp.R₀.subgroupOf S := by rw [← hv]; exact Subgroup.mem_zpowers v
+    exact Subgroup.mem_subgroupOf.mp this
+  -- `(E.9)`: `vᵃ = vʳ`, and `(E.11)`: `r ≢ 1`
+  obtain ⟨r, hrall, hrq⟩ := hyp.exists_zpow_eq_act_of_mem_A ha
+  have hrne : (r : ZMod p) ≠ 1 := hyp.zpow_exponent_ne_one ha hane' hrall
+  have hr : (hSinv.restrict ⟨a, ha⟩) v = v ^ r := by
+    refine Subtype.ext ?_
+    rw [IsAInvariant.restrict_apply_val]
+    push_cast
+    exact hrall _ hvR₀
+  -- BG's `w ∈ H₀ − H₁`
+  obtain ⟨w, hwmem, hw1⟩ := SetLike.exists_of_lt (hyp.iterCommutator_lt hR₀S hexp hS h0live)
+  rw [OddOrder.Isaacs.Ch04.iterCommutator_zero] at hwmem
+  -- `r₀`, the eigenvalue on the top section
+  obtain ⟨r₀, hr₀q, hr₀⟩ := hyp.exists_zpow_eq_mod_chain hR₀S hexp hS hSinv h0live ha
+  -- `(E.12)` + `(E.10)`: none of `r₀ rⁱ` is `≡ 1`, for `i < n`
+  refine le_pred_of_forall_zmod_mul_pow_ne_one hyp.q_prime hrq hrne hr₀q ?_
+  intro i hi
+  obtain ⟨s, hs, hsmem⟩ :=
+    hyp.exists_eigenvalue_pow hR₀S hexp hS hSinv ha hv hwmem hw1 hr hr₀ i (hlive i hi)
+  rw [← hs]
+  exact hyp.eigenvalue_ne_one hR₀S hexp hS hSinv (hlive i hi) ha hane' hsmem
+
+/-- **BG Theorem E.3(b), Step 2, third clause, with no rank hypothesis**: `|S| ≤ p^q`.
+
+The rank-`≥ 3` case is `card_le_pow_card_A`.  In the remaining case `|S| ≤ p³`, and `p³ ≤ p^q`
+because `q` is an **odd** prime, hence `≥ 3` — so BG's "check the `p`-groups of order at most
+`p³`" is again not needed (cf. `not_le_derivedInG`, where the same branch collapsed).
+
+⚠ Unlike `card_quotient_commutator`, the small case here needs nothing about `S` beyond its
+order: the bound is `p³` on the nose. -/
+theorem RegularOperatorSetup.card_le_pow {R B : Type*} [Group R] [Group B] [Finite R]
+    {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1)
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) :
+    Nat.card ↥S ≤ p ^ q := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  rcases le_or_gt (Nat.card ↥S) (p ^ 3) with hle | hgt
+  · refine hle.trans (Nat.pow_le_pow_right hyp.p_prime.pos ?_)
+    obtain ⟨k, hk⟩ := hyp.q_odd
+    have := hyp.q_prime.two_le
+    omega
+  · exact hyp.card_le_pow_card_A hR₀S hexp
+      (three_le_pRank_of_prime_cube_lt_card (hyp.R_pGroup.to_subgroup S) hexp hgt) hSinv
+
+/-- **BG Theorem E.3(c)**: `|Ω₁(R)| ≤ p^q`.
+
+**Status: proved.**  Step 2's third clause (`card_le_pow`) applied to `S = Ω₁(R)`, which is
+characteristic in `R` and hence `A`-invariant.  As for the second and third clauses of
+E.3(b), the only input still owed is the exponent statement `omega_pow_eq_one` — BG's Step 3,
+which remains `sorry`; citing it here is the repo's standard sorried-cite pattern. -/
+theorem RegularOperatorSetup.card_omega_le {R B : Type*} [Group R] [Group B] [Finite R]
+    [Finite B] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) :
+    Nat.card ↥(Omega R p 1) ≤ p ^ q :=
+  hyp.card_le_pow hyp.R₀_le_omega
+    (fun x => Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2))
+    (IsAInvariant.of_characteristic _)
 
 end OddOrder.BG.AppE
