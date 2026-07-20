@@ -737,7 +737,23 @@ packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` を�
 
 ⟹ **engine の `Dmem` / `Da` は両方 §9 で揃った**。
 
-#### ⛏ 次の一手: (5.6) engine への組み立て = `CaseAPairBound` の producer
+#### ✅ 部品が出揃った (2026-07-20) — `CaseAPairBound` producer の残りは組み立てのみ
+
+| 部品 | 宣言 |
+|---|---|
+| `Dmem` (ψ = 0、map = coherent extension) | `S11.sOf_memberPsiDecomposition` |
+| `Da` (break vs anchor、map = τ) | `S11.sOf_breakPsiDecomposition` |
+| engine が要求する形への packaging | `S11.sOf_sixTwoDecompositionData` (= `S13.sixTwoDecompositionData` の代替) |
+| 結論の `∃ d, χ(1) = q·d ∧ d ≤ u` | `S11.caseA_break_source_degree` |
+
+⚠ **`caseA_break_source_degree` が型仮定ゼロで通ったことが、前 iteration の実測の裏付け**:
+`xiOf_H0Cprime_source_apply_one_le_u chars hζ` が書き換え無しで適用できる
+(= §13 の `C_eq_cSub_of_noncoherent` 経由が不要)。
+
+⚠ **leaf を 1500 行手前で分割済** (commit 08b3bace4): base 層を
+`S11_NineElevenBridgeBase.lean` (261 行) へ。module 名・namespace・宣言名は不変。
+
+#### ⛏ 次の一手: engine 呼び出し本体 = `CaseAPairBound` producer
 
 `S08.coherentDegreeSqNormBound_of_not_coherentW_k` の結論は `∑ (deg i)²/mc i ≤ 2a` なので、
 `CaseAPairBound` の `sumnS F ≤ 2q²a·d` へは §13 と同じ rescale
