@@ -33,17 +33,18 @@ packaging.  Per-result status:
 
 | Result | Status |
 |---|---|
-| E.1 general (`hallCollection`) | **proved, sorry-free** (Mann's collecting process; `OddOrder/GroupTheory/HallPetresco.lean`) |
+| E.1 general (`hallCollection`) | **proved** (Mann; `GroupTheory/HallPetresco.lean`) |
 | E.1 class `≤ 3` (`hallCollection_of_class_le_three`) | **proved, sorry-free** (all `n`) |
-| E.1 class `≤ 2` (`hallCollection_of_class_le_two`) | **proved, sorry-free** (subsumed by the above) |
+| E.1 class `≤ 2` (`hallCollection_of_class_le_two`) | **proved** (subsumed by the above) |
 | E.1 general framework | `OddOrder/GroupTheory/HallCollection.lean`, **sorry-free** |
-| E.2 Step 1 (`GroupTheory.pow_mul_pow_eq_pow_of_commutator_exponent`) | **proved, sorry-free** (general form, outside this file) |
-| E.2(a) (`omega_pow_eq_one_of_lowerCentralSeries_eq_bot`) | **proved, sorry-free** (`IsPGroup` hypothesis dropped) |
+| E.2 Step 1 (`GroupTheory.pow_mul_pow_eq_pow_of_commutator_exponent`) | **proved** (general) |
+| E.2(a) (`omega_pow_eq_one_of_lowerCentralSeries_eq_bot`) | **proved** (`IsPGroup` dropped) |
 | E.2(a) class `≤ 2` | already in repo: `GroupTheory.Omega.pow_eq_one_of_class_le_two` |
-| E.2(b) (`pow_mul_of_commutator_le_omega`) | **proved, sorry-free** from E.2(a) + Step 1 (`IsPGroup` dropped) |
+| E.2(b) (`pow_mul_of_commutator_le_omega`) | **proved** from E.2(a) + Step 1 |
 | E.2(b) class `≤ 2` (`pow_mul_of_class_le_two`) | **proved, sorry-free** |
 | E.3(a) (`card_A_dvd_half_p_sub_one`) | **proved, sorry-free** |
-| E.3(b)(c)(d), E.4, E.5 | honest statements, `sorry` |
+| E.3(b) `C_R(R₀) = R₀ × R₁` structure | **proved** (abelian, order `p·|R₁|`, rank `≤ 2`) |
+| E.3(b)(c)(d), E.4, E.5 main clauses | honest statements, `sorry` |
 -/
 
 namespace OddOrder.BG.AppE
@@ -469,6 +470,250 @@ theorem RegularOperatorSetup.card_A_dvd_half_p_sub_one [Finite R] [Finite B]
   have hcop : Nat.Coprime q 2 := hyp.q_odd.coprime_two_right
   have : q ∣ m := hcop.dvd_of_dvd_mul_left (by rwa [hhalf] at hdvd)
   simpa [hhalf] using this
+
+/-! ### The structure of `C_R(R₀) = R₀ × R₁`
+
+BG's Step 2 opens with the single sentence *"Since `C_R(R₀) = R₀ × R₁` we have
+`R₀ ∩ Z = 1`"* (`Z = Ω₁(Z(S))` for the maximal `A`-invariant subgroup `S` of exponent
+`p`).  Unpacked, the argument is: `|R₀| = p` forces `R₀ ⊓ Z ∈ {1, R₀}`, and `R₀ ≤ Z`
+would put `S` inside `C_R(R₀)`, whose `p`-rank is at most `2` — contradicting the
+`r(S) ≥ 3` obtained just before.  The three lemmas below supply the rank bound. -/
+
+/-- `R₀` centralizes `R₁`.
+
+This is the symmetric half of the setup datum `C_R(R₀) = R₀ R₁`: every `y ∈ R₁` lies
+in `R₀ ⊔ R₁ = C_R(R₀)`, hence commutes with every `x ∈ R₀`. -/
+theorem RegularOperatorSetup.R₀_le_centralizer_R₁ (hyp : RegularOperatorSetup R B p q) :
+    hyp.R₀ ≤ Subgroup.centralizer (hyp.R₁ : Set R) := by
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  have hyC : y ∈ Subgroup.centralizer (hyp.R₀ : Set R) := by
+    rw [hyp.centralizer_eq]
+    exact (le_sup_right : hyp.R₁ ≤ hyp.R₀ ⊔ hyp.R₁) hy
+  exact (Subgroup.mem_centralizer_iff.mp hyC x hx).symm
+
+/-- **`C_R(R₀) = R₀ × R₁` is abelian.**
+
+`R₀` has order `p`, hence is cyclic, and `R₁` is cyclic by hypothesis; the two
+centralize each other, so their join is abelian
+(`Ch4.S15.isMulCommutative_sup_of_le_centralizer`). -/
+theorem RegularOperatorSetup.isMulCommutative_centralizer_R₀
+    (hyp : RegularOperatorSetup R B p q) :
+    IsMulCommutative ↥(Subgroup.centralizer (hyp.R₀ : Set R)) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+  haveI : IsCyclic ↥hyp.R₁ := hyp.R₁_cyclic
+  rw [hyp.centralizer_eq]
+  exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
+    IsCyclic.isMulCommutative IsCyclic.isMulCommutative hyp.R₀_le_centralizer_R₁
+
+/-- **`|C_R(R₀)| = p · |R₁|`**, the cardinality form of the direct decomposition
+`C_R(R₀) = R₀ × R₁`.
+
+`R₀` normalizes `R₁` (it centralizes it), so the join is the set product
+`↑R₀ * ↑R₁` (`Subgroup.coe_mul_of_left_le_normalizer_right`); the classical product
+formula and `R₀ ∩ R₁ = 1` then give `|R₀ R₁| = |R₀| · |R₁| = p · |R₁|`. -/
+theorem RegularOperatorSetup.card_centralizer_R₀ [Finite R]
+    (hyp : RegularOperatorSetup R B p q) :
+    Nat.card ↥(Subgroup.centralizer (hyp.R₀ : Set R)) = p * Nat.card ↥hyp.R₁ := by
+  have hnorm : hyp.R₀ ≤ Subgroup.normalizer (hyp.R₁ : Set R) :=
+    hyp.R₀_le_centralizer_R₁.trans (Subgroup.centralizer_le_normalizer _)
+  have hcoe : (↑(hyp.R₀ ⊔ hyp.R₁) : Set R) = (hyp.R₀ : Set R) * (hyp.R₁ : Set R) :=
+    Subgroup.coe_mul_of_left_le_normalizer_right hyp.R₀ hyp.R₁ hnorm
+  have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card hyp.R₀ hyp.R₁
+  have hinf : Nat.card ↥(hyp.R₀ ⊓ hyp.R₁) = 1 := by
+    rw [disjoint_iff.mp hyp.R₀_disjoint_R₁]
+    exact Subgroup.card_bot
+  rw [hinf, mul_one, hyp.R₀_card] at hprod
+  rw [hyp.centralizer_eq]
+  exact (Nat.card_congr (Equiv.setCongr hcoe)).trans hprod
+
+/-- **`r(C_R(R₀)) ≤ 2`.**
+
+`C_R(R₀) = R₀ × R₁` contains the cyclic subgroup `R₁` with index `p`
+(`card_centralizer_R₀`), so `pRank_le_two_of_isCyclic_of_index_le_prime` applies.
+
+This is the rank bound behind BG's elided *"Since `C_R(R₀) = R₀ × R₁` we have
+`R₀ ∩ Z = 1`"* in the proof of Theorem E.3(b). -/
+theorem RegularOperatorSetup.pRank_centralizer_R₀_le_two [Finite R]
+    (hyp : RegularOperatorSetup R B p q) :
+    pRank ↥(Subgroup.centralizer (hyp.R₀ : Set R)) p ≤ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hR₁le : hyp.R₁ ≤ Subgroup.centralizer (hyp.R₀ : Set R) := by
+    rw [hyp.centralizer_eq]
+    exact le_sup_right
+  set K : Subgroup ↥(Subgroup.centralizer (hyp.R₀ : Set R)) :=
+    hyp.R₁.subgroupOf (Subgroup.centralizer (hyp.R₀ : Set R)) with hKdef
+  have hKcyc : IsCyclic ↥K :=
+    (Subgroup.subgroupOfEquivOfLe hR₁le).isCyclic.mpr hyp.R₁_cyclic
+  have hKcard : Nat.card ↥K = Nat.card ↥hyp.R₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₁le).toEquiv
+  have hidx : K.index ≤ p := by
+    have hmul := K.card_mul_index
+    rw [hKcard, hyp.card_centralizer_R₀, mul_comm p] at hmul
+    exact le_of_eq (Nat.eq_of_mul_eq_mul_left Nat.card_pos hmul)
+  exact pRank_le_two_of_isCyclic_of_index_le_prime hKcyc hidx
+
+/-- **BG Theorem E.3(b), Step 2, (E.1)--(E.3)**: an exponent-`p` subgroup `S ≤ R` with
+`p³ < |S|` has `r(S) ≥ 3`.
+
+BG argues via `V ∈ SCN(S)`: `|S/V|` divides `|Aut V|` and `V` is elementary abelian
+(as `exp S = p`), so `|V| ≤ p²` would force `|S/V| ≤ p` and `|S| ≤ p³`.  The repo already
+records the conclusion of that argument as
+`Ch1.S04.card_le_prime_cube_of_pRank_le_two_of_exponent_prime` (`r ≤ 2` and `exp = p` imply
+`|·| ≤ p³`), so BG's (E.1)--(E.3) is exactly its contrapositive. -/
+theorem three_le_pRank_of_prime_cube_lt_card {S : Type*} [Group S] [Finite S] {p : ℕ}
+    [Fact p.Prime] (hS : IsPGroup p S) (hexp : ∀ x : S, x ^ p = 1)
+    (hcard : p ^ 3 < Nat.card S) :
+    3 ≤ pRank S p := by
+  by_contra h
+  exact absurd (OddOrder.BG.Ch1.S04.card_le_prime_cube_of_pRank_le_two_of_exponent_prime
+    hS (by omega) hexp) (by omega)
+
+/-- **BG Theorem E.3(b), Step 2**: a subgroup `S ≤ R` of `p`-rank at least `3` cannot
+centralize `R₀`.
+
+Otherwise `S ≤ C_R(R₀)`, whose `p`-rank is at most `2` (`pRank_centralizer_R₀_le_two`). -/
+theorem RegularOperatorSetup.not_le_centralizer_R₀_of_three_le_pRank [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hS : 3 ≤ pRank ↥S p) :
+    ¬ S ≤ Subgroup.centralizer (hyp.R₀ : Set R) := by
+  intro hle
+  have hmono : pRank ↥S p ≤ pRank ↥(Subgroup.centralizer (hyp.R₀ : Set R)) p :=
+    pRank_le_of_injective (f := Subgroup.inclusion hle) (Subgroup.inclusion_injective hle)
+  have := hyp.pRank_centralizer_R₀_le_two
+  omega
+
+/-- **BG Theorem E.3(b), Step 2**: *"Since `C_R(R₀) = R₀ × R₁` we have `R₀ ∩ Z = 1`."*
+
+BG states this in one line.  Unpacked: `Z` is central in `S` and `|R₀| = p` is prime, so
+`R₀ ⊓ Z` is either `1` or all of `R₀`; in the latter case `R₀` would be central in `S`,
+putting `S` inside `C_R(R₀)` and contradicting `r(S) ≥ 3`
+(`not_le_centralizer_R₀_of_three_le_pRank`).
+
+The hypothesis `hcent : S ≤ C_R(Z)` is the ambient spelling of `Z ≤ Z(S)`, which is how
+BG's `Z = Ω₁(Z(S))` enters. -/
+theorem RegularOperatorSetup.inf_eq_bot_of_three_le_pRank [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S Z : Subgroup R}
+    (hcent : S ≤ Subgroup.centralizer (Z : Set R)) (hS : 3 ≤ pRank ↥S p) :
+    hyp.R₀ ⊓ Z = ⊥ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  -- `|R₀ ⊓ Z|` divides `|R₀| = p`, so it is `1` or `p`.
+  have hdvd : Nat.card ↥(hyp.R₀ ⊓ Z) ∣ p := by
+    have h := Subgroup.card_dvd_of_le (inf_le_left : hyp.R₀ ⊓ Z ≤ hyp.R₀)
+    rwa [hyp.R₀_card] at h
+  rcases (Nat.dvd_prime hyp.p_prime).mp hdvd with h1 | hp
+  · exact Subgroup.card_eq_one.mp h1
+  · -- `R₀ ⊓ Z = R₀`, i.e. `R₀ ≤ Z`; then `S ≤ C_R(Z) ≤ C_R(R₀)`.
+    exfalso
+    have heq : hyp.R₀ ⊓ Z = hyp.R₀ :=
+      Subgroup.eq_of_le_of_card_ge (inf_le_left : hyp.R₀ ⊓ Z ≤ hyp.R₀)
+        (le_of_eq (hyp.R₀_card.trans hp.symm))
+    have hR₀Z : hyp.R₀ ≤ Z := le_trans (le_of_eq heq.symm) inf_le_right
+    exact hyp.not_le_centralizer_R₀_of_three_le_pRank hS
+      (hcent.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR₀Z)))
+
+/-- `R₀` viewed inside a subgroup `S` containing it still has order `p`. -/
+theorem RegularOperatorSetup.card_R₀_subgroupOf [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
+    Nat.card ↥(hyp.R₀.subgroupOf S) = p := by
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₀S).toEquiv]
+  exact hyp.R₀_card
+
+/-- `r(C_S(R₀)) ≤ 2` for any `S` containing `R₀`: the centralizer taken inside `S` embeds in
+`C_R(R₀)` along `S.subtype`, and that has rank `≤ 2` (`pRank_centralizer_R₀_le_two`).
+
+BG obtains this from the sharper `|C_S(R₀)| = p²` of (E.4); the rank bound alone is what
+Corollary 5.4 and Theorem 5.3(d) actually consume, and it needs no exponent hypothesis. -/
+theorem RegularOperatorSetup.pRank_centralizer_subgroupOf_le_two [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
+    pRank ↥(Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S)) p ≤ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set C : Subgroup ↥S :=
+    Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S) with hCdef
+  have hmem : ∀ x : ↥C, ((x : ↥S) : R) ∈ Subgroup.centralizer (hyp.R₀ : Set R) := by
+    intro x
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    have hcomm := Subgroup.mem_centralizer_iff.mp x.2 ⟨h, hR₀S hh⟩
+      (by simpa [Subgroup.mem_subgroupOf] using hh)
+    exact congrArg (fun y : ↥S => (y : R)) hcomm
+  have hcomp : Function.Injective ((S.subtype).comp C.subtype) :=
+    S.subtype_injective.comp C.subtype_injective
+  have hfinj : Function.Injective
+      (((S.subtype).comp C.subtype).codRestrict _ hmem) := fun a b hab =>
+    hcomp (congrArg (fun y : ↥(Subgroup.centralizer (hyp.R₀ : Set R)) => (y : R)) hab)
+  exact (pRank_le_of_injective hfinj).trans hyp.pRank_centralizer_R₀_le_two
+
+/-- **BG Theorem E.3(b), Step 2**: *"Note that `S` is narrow."*
+
+`R₀`, of order `p`, is a witness for Corollary 5.4
+(`Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two`). -/
+theorem RegularOperatorSetup.isNarrow_of_three_le_pRank [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    IsNarrow p ↥S := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  exact (OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS).mpr
+    ⟨hyp.R₀.subgroupOf S, hyp.card_R₀_subgroupOf hR₀S,
+      hyp.pRank_centralizer_subgroupOf_le_two hR₀S⟩
+
+/-- **BG Theorem E.3(b), Step 2, first conclusion of (E.13)**: `R₀ ⊄ S'`.
+
+BG derives this from `S = R₀T` with `S' ≤ T` and `R₀ ∩ T = 1` (E.5); in the repo the same
+content is packaged as Theorem 5.3(d) (`Ch1.S05.narrow_centralizer_decomp`), whose second
+clause is exactly `R₀ ∩ S' = 1` for a narrow `S`.  Since `|R₀| = p ≠ 1`, that forces
+`R₀ ⊄ S'`. -/
+theorem RegularOperatorSetup.not_le_derivedInG_of_three_le_pRank [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    ¬ hyp.R₀ ≤ derivedInG S := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  intro hle
+  -- Theorem 5.3(d) applied inside `↥S` with the order-`p` subgroup `R₀`.
+  have hdecomp := OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS (hyp.isNarrow_of_three_le_pRank hR₀S hS)
+    (hyp.R₀.subgroupOf S) (hyp.card_R₀_subgroupOf hR₀S)
+    (hyp.pRank_centralizer_subgroupOf_le_two hR₀S)
+  -- `R₀ ≤ S'` transports to `R₀.subgroupOf S ≤ commutator ↥S`, contradicting `⊓ = ⊥`.
+  have hsub : hyp.R₀.subgroupOf S ≤ _root_.commutator ↥S := by
+    intro x hx
+    have hxR₀ : (x : R) ∈ hyp.R₀ := hx
+    obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp (hle hxR₀)
+    exact (Subtype.ext hyx.symm : x = y) ▸ hy
+  have hbot : hyp.R₀.subgroupOf S = ⊥ :=
+    le_bot_iff.mp (hdecomp.2.1 ▸ le_inf le_rfl hsub)
+  have hcard := hyp.card_R₀_subgroupOf hR₀S
+  rw [hbot, Subgroup.card_bot] at hcard
+  exact hyp.p_prime.one_lt.ne hcard
+
+/-- **BG Theorem E.3(b), Step 2, (E.4) and the first half of (E.5)**.
+
+Applying Lemma 5.2 (`Ch1.S05.lemma52`) inside the narrow group `S`, with `Z = Ω₁(Z(S))`
+and `T = C_S(Ω₁(Z₂(S)))`:
+
+* `|Z| = p` — BG's (E.4) (BG gets it from `R₀ × Z ⊆ C_S(R₀) ⊆ R₀ × Ω₁(R₁)`);
+* `|S : T| = p` — the index clause of BG's (E.5).
+
+The maximal elementary abelian subgroup of order `p²` that Lemma 5.2 consumes is supplied by
+narrowness itself (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`), so BG's
+explicit witness `E = C_S(R₀)` — and with it the computation `|C_S(R₀)| = p²` — is not
+needed on this route. -/
+theorem RegularOperatorSetup.card_omega1Center_and_index_centralizer [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    Nat.card ↥(OddOrder.BG.Ch1.S05.omega1Center ↥S p) = p ∧
+      (Subgroup.centralizer
+        (omega1UpperCentralTwo ↥S p : Set ↥S)).index = p := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  obtain ⟨E, hEcard, hEstar⟩ :=
+    (OddOrder.BG.Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
+      hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS).mp
+      (hyp.isNarrow_of_three_le_pRank hR₀S hS)
+  have h := OddOrder.BG.Ch1.S05.lemma52
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS E hEcard hEstar
+  exact ⟨h.2.1.1, h.2.2⟩
 
 /-- **BG Theorem E.3(b), first clause**: `Ω₁(R)` has exponent `p`.
 
