@@ -816,4 +816,21 @@ theorem RegularOperatorSetup.exists_zpowers_eq_R₀ [Finite R]
   simpa using h1
 
 
+/-- **BG (E.14)**: `C_S(R₀) = S ∩ (R₀ × R₁) = R₀ × Ω₁(R₁)`, i.e. `S ⊓ C_R(R₀) = seed`.
+
+⚠ This is the route by which BG gets `|C_S(R₀)| = p²` in Step 3 — from `S` **containing the
+seed**, not from `r(S) ≥ 3` (which Step 3 never establishes).  Step 2's `(E.4)`
+(`centralizer_inf_eq_sup_omega1Center`) reaches the same conclusion under the rank
+hypothesis; the two are alternative suppliers.
+
+Both inclusions are immediate: `seed ≤ S` is the family condition and `seed ≤ C_R(R₀)` is
+`omega1OfAbelian_le`; conversely an element of `S ⊓ C_R(R₀)` centralizes `R₀` and is killed
+by `p` (exponent of `S`), which is exactly membership in the seed. -/
+theorem RegularOperatorSetup.inf_centralizer_eq_seed [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hseed : hyp.seed ≤ S)
+    (hexp : ∀ x ∈ S, x ^ p = 1) :
+    S ⊓ Subgroup.centralizer (hyp.R₀ : Set R) = hyp.seed := by
+  refine le_antisymm (fun x hx => ⟨hx.2, hexp x hx.1⟩) (le_inf hseed fun x hx => hx.1)
+
+
 end OddOrder.BG.AppE
