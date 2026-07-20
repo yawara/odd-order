@@ -853,3 +853,34 @@ CaseSplitBCD 741 行、全 axiom-clean。
 2. **case dispatch**: weight 方程式 `λ^2^i μ^2^j=ν^2^k` + `ν=λθλ=μφμ` の合同解析
    (Higman p.91: 2^a+2^b≡2^c mod 2^n-1 の解) で (θ_L,θ_R) 関係を決定 → B/C/D 振り分け。
 3. **higmanLemmaTwelve**: exists_mixedFrobeniusWeightEquation → dispatch → engine → `IsTypeB∨C∨D`。
+
+### 2026-07-21 lane b (autonomous ticks): functional-equation 核心の進捗 handoff
+
+M-value 導出の approach = **Frobenius-monomial** (eigenbasis でなく; M ZMod2-bilinear
+F×F→F を Σc_ij α^(2^i)β^(2^j) で表し、equivariance で c_ij(λ^(2^i)μ^(2^j)-ν)=0)。
+
+**完成 (全 axiom-clean、~19 commit)**:
+- **actor-equivariance 層** (CaseSplitBCD): `factorInclusion_representation_equivariant`
+  (incl が rep を intertwine、`quotientToAmbientLayerZeroLinear_equivariant` の座標
+  transport) → `mixedTerm_rep_equivariance` (bilinear_equivariant + ambientCenter
+  Coordinate_compat の合成) → `mixedTerm_lambda_equivariance` (M(λα,μβ)=ν·M(α,β))。
+- **MixedTermValue.lean** (新 leaf): `frobenius_powers_linearIndependent`
+  (n 個の Frobenius 冪が F-独立、`linearIndependent_monoidHom`=Artin を制限) +
+  `galoisField_linearMap_finrank` (`finrank F (F→ₗ[ZMod2]F)=n`、`Module.finrank_
+  linearMap`+`GaloisField.finrank`)。
+
+**⚠ 一般 F でなく GaloisField 2 n で作業する** (一般 F は `Module (ZMod 2) F`/
+`Module F (F→ₗ[ZMod2]F)` が letI `ZMod.algebra` 無しに解決しない; GaloisField 2 n は
+解決する — noncomputable なだけ)。前 tick の「machinery not in mathlib」は一般 F での誤診。
+
+**残り (次 session、fiddly だが道筋確定)**:
+- **basis (piece 1b)**: `frobLin (n)(i) : GaloisField 2 n →ₗ[ZMod2] GaloisField 2 n :=
+  {(frobeniusEquiv (GaloisField 2 n) 2 ^ i).toRingHom.toAddMonoidHom with map_smul' :=
+  ZMod.map_smul …}` (手動 LinearMap、`frobLin_apply`=rfl で piece 1a と関数 defeq) →
+  `frobLin_linearIndependent` (piece 1a を evaluation で Hom 空間へ transfer;
+  `LinearMap.congr_fun hg x`) → `basisOfLinearIndependentOfCardEqFinrank` (独立 + card=
+  finrank)。⚠ frobLin は **GaloisField 2 n 特定**にすること (一般 F は instance 不可)。
+- **piece 2**: basis で M(α,·)/d_j を Frobenius polynomial に展開 → M(α,β)=Σc_ij frob^i(α)frob^j(β)。
+- **piece 3**: `mixedTerm_lambda_equivariance` + monomial 独立 → c_ij(λ^(2^i)μ^(2^j)-ν)=0。
+- **piece 4**: congruence (Higman p.91) で unique (i,j) → M=c·frob^i(α)frob^j(β)。
+- **piece 5**: c=ε → endpoint engine の hM に接続 → higmanLemmaTwelve。
