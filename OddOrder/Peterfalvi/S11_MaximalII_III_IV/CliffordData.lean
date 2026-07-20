@@ -1236,5 +1236,6 @@ Here `S₀ = caseA.S0` plays the role of `H₁`; the `U`-action on it is `uActio
 `Finite`-free chief-factor action restricted to `U`, definitionally `act.φ.comp act.U.subtype`), and
 its restriction to `S₀` is `aInvariantRestrictAut caseA.S0_aInvariant`. -/
 
+
 end OddOrder.Peterfalvi.S11
 

@@ -97,7 +97,7 @@ theorem irrCut_conjClosed [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
       IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} := by
   haveI := hyp.base.finiteG
   obtain ⟨hmem, hirr, hdeg⟩ := hx
-  refine ⟨Hypothesis.sOf_closedUnderConjugate hyp.s11Setup Y hmem, hirr.conj, ?_⟩
+  refine ⟨OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup Y hmem, hirr.conj, ?_⟩
   rw [ClassFunction.conj_apply, hdeg, star_natCast]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -998,7 +998,7 @@ noncomputable def caseB_coherent_sOf_H0Cprime_of_mixed [Finite G]
     · exact hμmem _ (hfin hlt)
     · rw [Set.mem_singleton_iff] at hx
       subst hx
-      exact Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime
+      exact OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime
         (hμmem _ (hfin hlt))
   -- the cover: every member is in the cut or in an enumerated pair (member dichotomy)
   have hcover : ∀ φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
