@@ -302,6 +302,20 @@ finiteness → `sOf_finite`、`sOf_degreeSubfamily_isCoherent` → `hbase` パ�
 ⚠ 置き場: `caseA_character_count_exact` が `S11_SingleFactorCentralizer` に在るので、
 そこか、それを import する S11 系 leaf。(b) をパラメータで受けるなら橋渡し leaf は不要。
 
+### ✅ (d) 前半 完了 (2026-07-20): `S11.caseA_coherent_sOf_cprime_of_refuter`
+
+(9.11) case (9.7.a) の §9 レベル版を landed (`S11_NineElevenSubcoherentBridge.lean`、
+`S11_SingleFactorCentralizer` を import 追加)。axiom-clean、AxiomsCheck 登録済。
+`data`/`chief`/`chars` の上で `tau`/`A0` をパラメータに取り、**型仮定はゼロ**。
+
+置換は記録した対応表どおり機械的に通った。⚠ ただし `open scoped S12.FiniteInduce in` を
+付け忘れて `Fintype ↥M` が合成できず 1 度落ちた — このファイルの他 2 定理は付けてあった。
+**§9 の `sOf` 系を触る宣言には一律で付ける**と覚えるのが早い。
+
+**残り**: (9.11) 本体 = `S13.coherent_sOf_H0Cprime` の §9 版。
+case A は本 commit、case B は `caseB_coherent_sOf_H0Cprime` の §9 化が要る。
+`clifford_dichotomy` は既に `chars` の上で述べられている (型仮定なし) ので分岐自体は使える。
+
 ### (参考) 実装レシピ
 
 ```

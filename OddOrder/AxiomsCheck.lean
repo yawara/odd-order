@@ -11279,3 +11279,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `S12.Hypothesis.inducedFamily_degreeSubfamily_isCoherent`, which needs a `S13.Hypothesis` and
 -- hence types III/IV.  No type hypothesis anywhere in this route.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent
+-- **(9.11) case (9.7.a) at §9 level**: the reduction to the maximality refuter, stated over
+-- Hypotheses (9.2)/(9.4)/(9.5) with `tau`/`A0` as parameters — **no type hypothesis**.  The §11
+-- form (`S13.caseA_coherent_sOf_H0Cprime_of_refuter`) reaches the same conclusion through
+-- `S13.Hypothesis`, whose `type_alt` pins types III/IV; that packaging turns out to be
+-- inessential, the one genuinely §10-bound input (the degree-`qa` base coherence) becoming the
+-- `hbase` parameter that `sOf_degreeSubfamily_coherent` supplies.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_coherent_sOf_cprime_of_refuter
