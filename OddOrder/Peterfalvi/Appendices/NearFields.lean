@@ -747,6 +747,39 @@ end PropositionOne
 
 section PropositionTwo
 
+/-- **An order-`2` field automorphism forces square cardinality** (the twisted branch of Peterfalvi
+Appendix C, Proposition 2).  If `σ : RingAut K` on a finite field `K` satisfies `σ² = 1` and
+`σ ≠ 1`, then `|K|` is a perfect square `r²`, where `r = |K^σ|` is a prime power `p^n` (`n ≥ 1`).
+
+By Artin's theorem (`FixedPoints.finrank_eq_card`) the fixed field `K^{⟨σ⟩}` satisfies
+`[K : K^{⟨σ⟩}] = |⟨σ⟩| = orderOf σ = 2`, whence `|K| = |K^{⟨σ⟩}|²`; a finite field has prime-power
+order.  In the classification `K = 𝔽_{r²}` and `σ : x ↦ x^r`. -/
+theorem card_eq_sq_of_orderTwo_ringAut {K : Type*} [Field K] [Finite K]
+    (σ : RingAut K) (hσ2 : σ ^ 2 = 1) (hσ1 : σ ≠ 1) :
+    ∃ (r p n : ℕ), p.Prime ∧ 0 < n ∧ r = p ^ n ∧ Nat.card K = r ^ 2 := by
+  classical
+  haveI : Fintype K := Fintype.ofFinite K
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Finite (RingAut K) :=
+    Finite.of_injective (DFunLike.coe : RingAut K → (K → K)) DFunLike.coe_injective
+  -- `⟨σ⟩ ≤ RingAut K` acts on `K`, has order `2`, and acts faithfully.
+  set G := Subgroup.zpowers σ with hG
+  haveI : Fintype G := Fintype.ofFinite G
+  have hcardG : Fintype.card G = 2 := by
+    rw [← Nat.card_eq_fintype_card, Nat.card_zpowers, orderOf_eq_prime hσ2 hσ1]
+  haveI : FaithfulSMul G K :=
+    ⟨fun {a b} h => Subtype.ext (RingEquiv.ext fun x => h x)⟩
+  -- Artin: `[K : K^G] = |G| = 2`, hence `|K| = |K^G|²`.
+  have hfr : Module.finrank (FixedPoints.subfield G K) K = 2 := by
+    rw [FixedPoints.finrank_eq_card G K, hcardG]
+  haveI : Fintype (FixedPoints.subfield G K) := Fintype.ofFinite _
+  have hcardK : Fintype.card K = Fintype.card (FixedPoints.subfield G K) ^ 2 := by
+    rw [← hfr]; exact Module.card_eq_pow_finrank
+  -- `|K^G| = p^n` is a prime power with `n ≥ 1`.
+  obtain ⟨p, _, n, hp, hcardFix⟩ := FiniteField.card' (FixedPoints.subfield G K)
+  exact ⟨Fintype.card (FixedPoints.subfield G K), p, (n : ℕ), hp, n.pos, hcardFix, by
+    rw [Nat.card_eq_fintype_card, hcardK]⟩
+
 /-- **Peterfalvi Appendix C, Proposition 2, first half** (proved, sorry-free), stated with the
 book's hypothesis: if the multiplicative group `F^*` of a finite near-field has a **cyclic**
 subgroup `A` of index `2`, then `(F, +)` is a `1`-dimensional vector space over a finite field `K`
