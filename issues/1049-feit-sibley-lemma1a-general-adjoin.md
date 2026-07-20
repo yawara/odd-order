@@ -132,12 +132,28 @@ rational 要否を確定すること。
 **⟹ integer-ratio engine は完成・FeitSibley-satisfiable。abstract `coherent_adjoin_of_degree_bound`
 (anchor|ψ のみ ⟹ rational 比許容) を faithful に閉じるには rational engine が必須。**
 
-- [ ] **rational engine** (次の主タスク): inner_Y_extension_member_eq / crux1_of_memberFamily /
-  adjoinPairCoherent を **scaled-difference** `d₁·χᵢ − dⱼ·χ₁` (整数係数, ∈ℤ[S₁], degree 0) +
-  `rc = dⱼ/d₁ : ℝ` へ再導出。⟨Y,νχᵢ⟩ = a·⟨χ₁,χᵢ⟩ − (a·m₁+μ)·(dⱼ/d₁)。核心
-  `lambda_eq_zero_and_Z_eq_zero` (real rc/mc) はそのまま。bridge/decompositionDaFromDiff は不変
-  (度数比を含まない)。degree bound = Peterfalvi の 2·ψ(1)·χ₁(1)<∑χ(1)²。
-- [ ] **FeitSibley 配線**: `coherent_adjoin_of_degree_bound` を rational engine へ。member family=S₀
+- [x] **rational engine** ⭐ 完成 (commit cb7429704, build green)。inner_Y (scaled diff `d₁·χᵢ−dⱼ·χ₁`,
+  division-free scaled 形) / crux1 (rc:ι→ℝ) / adjoinPair (degMem:ι→ℕ 絶対度数, rc=degMem i/degMem i₁,
+  hcoeffval を scaled inner_Y ÷ d₁ で導出, bound 2a<∑(degMem i/degMem i₁)²)。**faithful な任意度数
+  Isaacs 7.14 = integer case を subsume**。bridge/decompositionDaFromDiff/cross-term は不変。
+### 🔴 発見 (2026-07-21 turn 7): bridge の hSgen は integer 比専用 — rational engine は不完全
+
+rational inner_Y/crux1/adjoinPair は完成したが、**bridge (`retarget_isCoherent_of_extensionImage_general`)
+の `hSgen : ℤ[S₁] ≤ ℤ[zSupportedSpan S₁ A ∪ {χ₁}]` は rational 比では偽** — member χᵢ (比 χᵢ(1)/χ₁(1)
+が非整数) は `(χᵢ − rc·χ₁)` が supported でも rc∉ℤ ゆえ ℤ[supported∪{χ₁}] に入らない (χ₁(1)·χᵢ −
+χᵢ(1)·χ₁ = scaled diff は入るが χᵢ 自体は入らない)。既存 hSgen lemma
+`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` (DifferenceImage:173) も名前に反し
+`deg:ι→ℕ` (integer) を要求。⟹ **abstract-rational statement を閉じるには bridge の hX_ortho を
+per-member scaled+crux1 で再導出する追加改修が要る** (hSgen を hkey/hkeyd hypothesis に置換 + caller が
+scaled で供給、~40-60 行)。
+
+**⟹ 現状の engine (rational coeff + integer bridge) が閉じられるのは integer-ratio case のみ。**
+幸い **FeitSibley は integer 比** (degree-d anchor χ₀(1)=d, χ(1)=d·φ(1), 比=φ(1)∈ℕ) なので、
+`coherent_adjoin_of_degree_bound` を **divisor-anchor 形** (χ₀(1)∣χ(1) for all χ∈S₀) へ改訂すれば
+engine (integer hSgen 経由) で閉じられる。abstract-rational (bridge 改修) は deferred follow-up。
+
+- [ ] **FeitSibley 配線** (integer-ratio 形で sorry close): `coherent_adjoin_of_degree_bound` を
+  pair-adjoin + divisor-anchor 形へ改訂し engine へ。member family=S₁
   (index=S₀ 元, 直交正規性は 𝒮⊆Irr + pairwise_orthogonal), R-family=`hyp.difference_image`,
   hisom=`hyp.adjoin_hisom`, hSgen=`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`,
   hgen=`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`。⚠ FeitSibley に S08_GeneralAdjoin

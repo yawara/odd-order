@@ -257,18 +257,18 @@ about natural numbers (character degrees are positive integers).
 
 **Status: honestly stated, `sorry`; the content is proved in the general adjoin
 engine.**  This is Isaacs' "adjoin one character to a coherent set" theorem.  Its
-content is now formalized in `OddOrder.Peterfalvi.S07.adjoinPairCoherent_general`
+content is fully formalized in `OddOrder.Peterfalvi.S07.adjoinPairCoherent_general`
 (`S08_GeneralAdjoin.lean`, issue 1049) — the general degree-bound coherence adjoin,
 generalized from the Feit–Thompson `xAdjoinStep` to any `S07.Hypothesis`-supplied
 isometry (`hisom` from `Hypothesis.adjoin_hisom`, `R`-families from
-`Hypothesis.difference_image`).  That engine is the **unit-norm / integer-degree-ratio**
-case (`deg : ι → ℕ` with `2a < ∑ (deg i)²`): it closes this statement once the anchor
-`χ₀` is a divisor-anchor (`χ₀(1) ∣ χ(1)` for all `χ ∈ 𝒮₀`), which holds in the
-Feit–Sibley application (take `χ₀` of degree `d = |D|`, always present since `Q₁` is a
-non-perfect `p`-group).  The **abstract** statement here (Peterfalvi's bare `χ₀(1) ∣ ψ(1)`,
-allowing rational ratios) needs the rational-ratio engine (scaled differences
-`d₁·χᵢ − dⱼ·χ₁`, `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`); that
-generalization is tracked in issue 1049 and is the only remaining piece. -/
+`Hypothesis.difference_image`), in the **faithful arbitrary-degree form** (only the
+anchor divisibility `χ₀(1) ∣ ψ(1)` is assumed; member ratios `χ(1)/χ₀(1)` may be
+rational, handled by the scaled differences `χ₀(1)·χ − χ(1)·χ₀`).  The remaining work
+is purely the *wiring*: instantiate that engine with the member family `𝒮₀`, the
+`R`-families from `hyp.difference_image`, `hisom` from `hyp.adjoin_hisom`, the lattice
+generation `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` /
+`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`, and the pair-adjoin
+`𝒮 = 𝒮₁ ∪ {ψ, ψ̄}` reconciliation.  Tracked in issue 1049. -/
 theorem coherent_adjoin_of_degree_bound
     (hyp : OddOrder.Peterfalvi.S07.Hypothesis (L := L) (G := G) S A)
     (S0 : Set (ClassFunction L ℂ)) (hS0fin : S0.Finite)
