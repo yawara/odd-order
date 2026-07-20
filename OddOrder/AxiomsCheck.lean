@@ -11184,6 +11184,31 @@ lane c stops growing it instead. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.commutator_mul_mem_chain
 #assert_only_allowed_axioms OddOrder.BG.AppE.chainStepHom_ker_ge
 #assert_only_allowed_axioms OddOrder.BG.AppE.commutator_pow_mem_of_commutator_mem
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutator_zpowers_le_of_forall
+
+/-! **BG Theorem E.3(b), Step 2: `⟨w̄ᵢ⟩ = H̄ᵢ` — BG's five-word claim, fully recovered**
+(`BG.AppE_RegularOperator`, issue 3021, 2026-07-20):
+`AppE.RegularOperatorSetup.exists_commutator_not_mem`.
+
+BG writes only *"So `⟨w̄ᵢ⟩ = H̄ᵢ`"*.  That silently requires `wᵢ ∉ Hᵢ₊₁`, and recovering it
+took five sorry-free lemmas:
+
+1. `commutator_mul_mem_chain` — `x ↦ ⁅v,x⁆` is multiplicative mod `Hᵢ₊₂`;
+2. `chainStepHom` — hence a homomorphism `Hᵢ →* G/Hᵢ₊₂`;
+3. `chainStepHom_ker_ge` — its kernel contains `Hᵢ₊₁` (easy half);
+4. `commutator_pow_mem_of_commutator_mem` + `commutator_zpowers_le_of_forall` — a *full*
+   kernel would give `⁅R₀, Hᵢ⁆ ≤ Hᵢ₊₂`;
+5. this lemma — which with `⁅R₀, Hᵢ⁆ = ⁅S, Hᵢ⁆ = Hᵢ₊₁` collapses `Hᵢ₊₁ ≤ Hᵢ₊₂`,
+   impossible while the chain descends.
+
+So the kernel is a proper subgroup containing `Hᵢ₊₁`, and `|Hᵢ : Hᵢ₊₁| = p` prime pins it to
+exactly `Hᵢ₊₁` — giving `⁅v,x⁆ ∈ Hᵢ₊₂ ↔ x ∈ Hᵢ₊₁` and `wᵢ ∉ Hᵢ₊₁` by induction from
+`w ∉ H₁`. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.exists_commutator_not_mem
+#assert_only_allowed_axioms OddOrder.BG.AppE.eq_or_top_of_index_prime
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.commutator_mem_iff_mem
 
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
