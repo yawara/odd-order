@@ -594,3 +594,41 @@ case 3 の 3項=2項算術は既存、case 4 の 4項算術は Unit で新規。
 (sq(u+v)=sq(u)+sq(v)+`lowerCentralCommutatorBilinear`) を F×F 座標に落とし、factor の
 `square_normal` (β·θ(β)/β²) と mixed bilinear を接続。これが各 case で typeB/C/D quadratic
 map に一致することを示し `ofExtension` へ。
+
+### 2026-07-21 lane b: Unit B Stage 3 完了 (ambient central extension)
+
+**完了** (`c42459818`): `AmbientProductCoordinate.lean` に
+`ambientProductExtension hK0 e ePhi : GroupExtension (Mult F) P (Mult (F×F))`
++ 支える座標 (`frattiniQuotientEquivLayerZero` / `layerZeroProductMulCoordinate` /
+`frattiniSingerKernelCoordinate`) + `_inl_range`。sorry 0。TypeAConclusion の
+`lowerCentralTermZeroEquivAmbient` を de-privatize して再利用。**Unit B 完了**
+(F×F 加法座標 → 乗法 extension)。これで `TypeC/DData.ofExtension` の `S` 引数が揃った。
+
+**次 = Stage 4: square map 分解 (case 依存の核心)**。`ofExtension` の
+`hsq : ∀ x, x² = S.inl (ofAdd (q_BCD θ ε (S.rightHom x).toAdd))` を埋める。
+`(S.rightHom x).toAdd = (α,β)` は F×F 座標、`S.inl (ofAdd v)` は Singer 座標 v の Φ(P) 元。
+⟹ `hsq ⟺ (x² の ePhi-座標) = q_BCD(α,β)`。LHS = ambient square map を F×F/F 座標に
+落とした `q_P(α,β)`。
+
+- **4a (case 共有)**: `q_P(α,β) = q_X(α) + q_Y(β) + mixed(α,β)`。道具 =
+  `HigmanSquareMap.lean:307 lowerCentralSquareMapAdditive_add`
+  (sq(u+v)=sq(u)+sq(v)+`lowerCentralCommutatorBilinear`), u=fI_left(α), v=fI_right(β)。
+  `q_X(α) = q_P(fI_left α)` を factor の `square_normal` (noncomm β·θ(β)/comm β²) に接続
+  するのが要 (ambient square map の factor 制限 = factor 自身の square map)。
+  mixed = `lowerCentralCommutatorBilinear (fI_left α) (fI_right β)` を ePhi-座標で読む。
+- **4b–4e (各 case の mixed 項)**: eigenvalue 制約
+  `λ^(2^i)μ^(2^j)=ν^(2^k)` (endpoint `exists_mixedFrobeniusWeightEquation_of_xiLengthThree`
+  が供給) + `ν=λθ(λ)=μφ(μ)` から mixed を確定:
+  - case 1 (θ=φ=1): i≠jで[xᵢ,yⱼ]=0、mixed=εαβ ⟹ typeB θ=1
+  - case 2 (θ=φ≠1): base-change正規化、mixed=εαβ^{2^r} ⟹ typeB
+  - case 3 (θ≠1,φ=1): 3項=2項算術(既存
+    `three_distinct_frobeniusWeight_not_modEq_pairWeight`)⟹2r+1≡0,n奇、
+    mixed=εα^{1/2}β^{2^{r+1}} ⟹ typeC
+  - case 4 (両≠1非同型): **4項=4項算術 (新規、gap 5)** ⟹5r=0,s=2r、
+    mixed=εα^{2^{3r}}β^{2^r} ⟹ typeD
+  各 case で `q_P` を typeB/C/D quadratic map に一致させ `TypeB/C/DData.ofExtension`
+  (B は ofExtension 未実装 = 追加要) → `IsTypeB ∨ IsTypeC ∨ IsTypeD`。
+- **`TypeBData.ofExtension` を追加** (C/D と同型、`Types.lean`、case 1/2 用)。
+
+**endpoint 目標**: `higmanLemmaTwelve (hP hncomm hmulti hxi hlen hprime) :
+IsTypeB.{uP,0} P ∨ IsTypeC.{uP,0} P ∨ IsTypeD.{uP,0} P`。
