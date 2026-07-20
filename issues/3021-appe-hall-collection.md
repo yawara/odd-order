@@ -996,3 +996,141 @@ BG (E.14): 「Clearly `S ⊇ Ω₁(Z(R))` and `C_S(R₀) = S ∩ (R₀ × R₁) 
 2. ⬜ `card_sup_centralizer` / `index_sup_centralizer_lt` の仮説を
    `(hexp, hS3)` → `hp2 : |S ⊓ C_R(R₀)| ≤ p²` にパラメータ化 (Step 2 の呼び出し側も更新)。
 3. ⬜ Step 3 最終組み立て (`Ω₁(T) ∈ ExpPFamily` → 極大性 → `omega_pow_eq_one`)。
+
+## 2026-07-20 (18): rank≥3 依存の解消**完了** — Step 3 は最終組み立て 1 手のみ
+
+| 宣言 | 内容 |
+|---|---|
+| `GroupTheory.card_le_prime_sq_of_isCyclic_of_index_le_prime` | pRank 補題から**位数評価を切り出し** |
+| `RegularOperatorSetup.card_seed_le` | **`\|seed\| ≤ p²`** |
+| (refactor) `card_sup_centralizer` | `p²` → `\|S ⊓ C_R(R₀)\|`; **仮説 3 つが不要に** |
+| (refactor) `index_sup_centralizer_lt` / `exists_zpowers_index_lt` | 仮説を `hp2 : \|S ⊓ C_R(R₀)\| ≤ p²` に |
+
+検証: フルビルド 4558 jobs green / AxiomsCheck 3540 件 OK / sorry 15 (非退行)。
+
+### 残り = Step 3 最終組み立て 1 手
+
+`RegularOperatorSetup.eq_omega_of_maximal (hS : ExpPFamily S) (hmax : …) : S = Omega R p 1`:
+
+```
+P := Omega R p 1;  T := N_R(S) ⊓ P
+hSP  := expPFamily_le_omega hS            -- S ≤ P
+hST  := le_inf Subgroup.le_normalizer hSP -- S ≤ T
+hTN  := inf_le_left                       -- T ≤ N_R(S)
+hn   := (normal_subgroupOf_iff_le_normalizer hST).mpr hTN
+hSW  : S ≤ omegaInG T p 1                 -- S は指数 p
+refine eq_omega_of_omegaInG_normalizer_eq (hmax _ ⟨?_, ?_, ?_⟩ hSW)
+  (a) A-不変: isAInvariant_omegaInG (hS.1.normalizer.inf (.of_characteristic _)) p 1
+  (b) 指数 p: pow_eq_one_of_card_omegaInG_le で、hcard を
+      card_omegaInG_le_mul hST (hS.2.1)                       -- |Ω₁(T)| ≤ |Ω₁(T/S)|·|S|
+      × card_omega_le_prime_sq_of_index_lt (IsPGroup の商) hyp.p_odd
+          (exists_zpowers_index_lt … の x)                    -- |Ω₁(T/S)| ≤ p²
+      × hyp.card_le_pow (R₀_lt_of_expPFamily hS).le (expPFamily_pow_eq_one hS) hS.1
+                                                              -- |S| ≤ p^q
+      から `≤ p²·p^q = p^{q+2}` として組む
+  (c) seed ≤ Ω₁(T): hS.2.2.trans hSW
+```
+`exists_zpowers_index_lt` の `hp2` は `inf_centralizer_eq_seed hS.2.2 hS.2.1 ▸ card_seed_le`、
+`v` は `exists_zpowers_eq_R₀` から (`hvS` は `hR₀S (hv ▸ mem_zpowers v)`)。
+
+⟹ これが通れば `omega_pow_eq_one` (= E.3(b) 第 1 節) が閉じ、
+**E.3(b) 第 1〜3 節 + E.3(c) が丸ごと axiom-clean**。AppE sorry 4 → 3。
+
+## ⭐⭐⭐ 2026-07-20 (19): **Step 3 完了 — BG Thm E.3 (a)(b)(c) が全て axiom-clean**
+
+`eq_omega_of_maximal` → `omega_pow_eq_one` (E.3(b) 第 1 節)。
+乗っていた E.3(b) 第 2・3 節と E.3(c) も sorried-cite が外れて完全証明に。
+**AppE sorry 4 → 3、リポジトリ全体 15 → 14。**
+
+### ⭐ 発見: BG の「矛盾」は矛盾ではなく**閉包性**だった
+
+BG は Step 3 後半を「`S ≠ Ω₁(T)` と仮定 → (E.14)-(E.16) → `Ω₁(T)` は指数 p
+→ 極大性に矛盾」と書くが、形式化すると (E.14)-(E.16) が実際に示しているのは
+
+> 族 `ExpPFamily` が写像 `S ↦ Ω₁(N_P(S))` で**閉じている**
+
+こと。極大性から直ちに `Ω₁(N_P(S)) = S` が出るので**背理法の仮定は要らず**、
+易しい分岐 (`eq_omega_of_omegaInG_normalizer_eq`) にそのまま渡せる。
+
+### 配置
+
+E.3(b) 全 3 節 + E.3(c) の宣言を `AppE_ExponentP.lean` に集約
+(証明が Step 3 に依存するため)。上流 2 leaf にはポインタコメント。名前・namespace 不変。
+
+### 検証
+
+5 宣言すべて axiom-clean (sorryAx なし) / フルビルド 4558 jobs green /
+AxiomsCheck 3540 件 OK / sorry 15 → 14。
+
+## 残り 3 sorry (AppE)
+
+| 宣言 | 書籍 | 次の着手対象 |
+|---|---|---|
+| `B_fixes_R₀_of_fixes_frattini` | **E.3(d) = BG Step 4** | ★ 次。Step 2/3 の結論を全部使える |
+| `centralizer_upperCentralSeries_abelian_index_p` | E.4 | E.3 を全部消費 |
+| `maximalSubgroups_isTypeI_or_isTypeII` | E.5 | §14 counting + Cor 15.9 |
+
+### Step 4 (E.3(d)) の筋 — BG 原文 (pdftotext L8112-8140)
+
+`S = Ω₁(R)`、`G = S ⋊ B`。(b) より `|S/S'| = p²`, `|S'| = |S|/p²`。
+`Φ(S) = S'` (S は指数 p)。`B` が `R₀S'` を固定すると仮定:
+1. `v ∈ R₀^#` の `S`-共役類は `vS'` に含まれ、(E.15) より `|S|/p²` 個
+   ⟹ **`= vS'` ちょうど**。`v², …, v^{p−1}` も同様。
+   ⟹ `R₀S' − S'` の任意の元は `R₀^#` の元に共役。
+2. ⟹ 各 `β ∈ B` で `R₀^β = R₀^x` (∃x ∈ S) ⟹ Frattini 変形で `SB = S·N_G(R₀)`。
+3. Schur–Zassenhaus で `N_G(R₀)` は `N_G(R₀) ∩ S` の補群 `B*` を含み `B* = B^y` (y ∈ S)。
+⟹ (E.15) が**ここで効く** (Step 2 では積公式に置き換えられて未使用だった)。
+
+## 2026-07-20 (20): Step 4 (E.3(d)) の BG 原文を完全に起こした (pdftotext L8112-8150)
+
+> **Step 4.** Part (d) is valid.
+> `S = Ω₁(R)`、`G = S ⋊ B`。(b) より **(E.17)** `|S/S'| = p²`, `|S'| = |S|/p²`。
+> `S` は指数 p なので `Φ(S) = S'`。`B` が `R₀S'` を固定すると仮定する。
+> `v ∈ R₀^#` とすると各 `x ∈ S` で `x⁻¹vx ≡ v (mod S')` なので、`v` の `S`-共役類は
+> `vS'` に含まれる。**(E.15)** よりそれは `|S|/p²` 個、(E.17) より `|vS'| = |S'| = |S|/p²`
+> ⟹ **共役類 = `vS'` ちょうど**。`v², …, v^{p−1}` も同様。
+> ⟹ **`R₀S' − S'` の任意の元は `R₀^#` の元に共役**。
+> `B` が `R₀S'` を固定するので、各 `β ∈ B` で `R₀^β = R₀^x` (∃`x ∈ S`)。
+> Frattini 変形で **`SB = S·N_G(R₀)`**。Schur–Zassenhaus で `N_G(R₀)` は
+> `N_G(R₀) ∩ S` の補群 `B*` を含み、`B* = B^y` (∃`y ∈ S`)。⟹ `B` は `R₀^{y⁻¹}` を正規化。
+> すると `A` は `R₀` と `R₀^y` を正規化するので、`a ∈ A` で `(y^a)⁻¹y ∈ N_S(R₀)`、
+> つまり `y^a N_S(R₀) = y N_S(R₀)` — `A` は剰余類 `y N_S(R₀)` を固定する。
+> `|A| = q` に対し `|y N_S(R₀)| = |N_S(R₀)|` は p 冪ゆえ `q` で割れない
+> ⟹ **`A` は `y N_S(R₀)` の元 `z` を固定**。`A` は `R` に regular に作用するので `z = 1`
+> ⟹ `1 ∈ y N_S(R₀)` ⟹ `y ∈ N_S(R₀)` ⟹ `R₀^y = R₀`。∎
+
+### ⭐ ここで (E.15) が初めて効く
+
+Step 2 では (E.15)「`v` の `S`-共役類は `|S|/p²` 個」を積公式で迂回したが、
+Step 4 では **`vS'` と個数が一致することを言うため**に必要 (包含 + 同数 ⟹ 一致)。
+
+### 必要な新規インフラ
+
+1. ⬜ `Φ(S) = S'` (S 指数 p) — `frattiniInG` と `Agemo`。repo の
+   `GroupTheory/OmegaSubgroup.lean` に `Agemo` があるので `Φ = S'·℧₁(S)` 経由。
+2. ⬜ **`G = S ⋊ B`** の構成 — setup は `act : B →* MulAut R` なので
+   `SemidirectProduct` が使える (mathlib)。⚠ 本 leaf で初出。
+3. ⬜ Frattini 変形 (Step 3 の `sup_centralizer_eq_sup_inf_R₁` と同型の論法だが、
+   今度は `G` の中で `N_G(R₀)` について)。
+4. ⬜ **Schur–Zassenhaus** — mathlib `SchurZassenhaus` / repo に既存か要実測。
+5. ⬜ 剰余類上の coprime 固定点 (`|A| = q` と p 冪の剰余類 ⟹ 固定点あり) —
+   repo の `Isaacs.Ch03`/`Ch04` の coprime 作用補題に該当があるか要実測。
+
+⟹ Step 4 は E.3(a)(b)(c) と違い **`G = S ⋊ B` という新しい舞台**を組む必要がある。
+着手時はまず 2 (semidirect product の配線) を単独で通すのが安全。
+
+## 2026-07-20 (21): Step 4 の前提を repo 内で実測 — **最難関の Schur–Zassenhaus は在る**
+
+| 必要なもの | repo での所在 (実測) |
+|---|---|
+| **Schur–Zassenhaus 存在** | mathlib `Subgroup.exists_right_complement'_of_coprime` |
+| **Schur–Zassenhaus 共役** | **`OddOrder/Mathlib/SchurZassenhausConj.lean:1292`** `Subgroup.IsComplement'.exists_conj_of_coprime` (mathlib に無いので repo が補完済) |
+| `S' ≤ Φ(S)` | `GroupTheory.IsPGroup.commutator_sup_pow_closure_le_frattini` (FrattiniPGroup.lean:212) |
+| `Φ(S) ≤ S'` (指数 p) | 直接の補題は無い。`S/S'` は指数 p のアーベル ⟹ elementary abelian ⟹ `frattini_eq_bot_iff_isElementaryAbelian` (S01_Solvable.lean:55) で `Φ(S/S') = ⊥` ⟹ 「`Φ(G/N) = 1 ⟹ Φ(G) ≤ N`」で結論 (この橋は要新規、数行) |
+| `R/Φ(R)` elementary abelian | `GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian` (:162) |
+| 半直積 | mathlib `SemidirectProduct` (本 leaf で初出) |
+| coprime 固定点 | `Isaacs.Ch03` に coprime 作用群 (3.23/3.24) あり。剰余類版は要確認 |
+
+⟹ **Step 4 の最難関 (SZ 共役) が既に repo にある**ので、残りは
+(i) `Φ(S) = S'`、(ii) 半直積の配線、(iii) Frattini 変形、(iv) coprime 固定点、の 4 件。
+(i) が最も軽いので着手はそこから。

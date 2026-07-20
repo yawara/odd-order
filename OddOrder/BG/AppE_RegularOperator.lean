@@ -921,17 +921,8 @@ theorem RegularOperatorSetup.card_le_pow {R B : Type*} [Group R] [Group B] [Fini
   · exact hyp.card_le_pow_card_A hR₀S hexp
       (three_le_pRank_of_prime_cube_lt_card (hyp.R_pGroup.to_subgroup S) hexp hgt) hSinv
 
-/-- **BG Theorem E.3(c)**: `|Ω₁(R)| ≤ p^q`.
-
-**Status: proved.**  Step 2's third clause (`card_le_pow`) applied to `S = Ω₁(R)`, which is
-characteristic in `R` and hence `A`-invariant.  As for the second and third clauses of
-E.3(b), the only input still owed is the exponent statement `omega_pow_eq_one` — BG's Step 3,
-which remains `sorry`; citing it here is the repo's standard sorried-cite pattern. -/
-theorem RegularOperatorSetup.card_omega_le {R B : Type*} [Group R] [Group B] [Finite R]
-    [Finite B] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) :
-    Nat.card ↥(Omega R p 1) ≤ p ^ q :=
-  hyp.card_le_pow hyp.R₀_le_omega
-    (fun x => Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2))
-    (IsAInvariant.of_characteristic _)
+/- **BG Theorem E.3(c)** (`|Ω₁(R)| ≤ p^q`) is `card_omega_le` in
+`OddOrder/BG/AppE_ExponentP.lean`: its proof is `card_le_pow` above applied to `S = Ω₁(R)`,
+which needs Step 3's exponent statement, and that is what the downstream leaf carries. -/
 
 end OddOrder.BG.AppE
