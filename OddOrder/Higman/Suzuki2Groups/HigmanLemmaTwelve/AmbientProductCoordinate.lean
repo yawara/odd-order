@@ -388,6 +388,79 @@ theorem centerSquareMap_add
         center (lowerCentralCommutatorBilinear P u v) := by
   rw [lowerCentralSquareMapAdditive_add, map_add, map_add]
 
+/-- **Higman Lemma 12, the ambient square map extracts the underlying square.**
+The centre coordinate of `sq_ambient [x]` is the Singer coordinate of the
+genuine square `x²` in `Φ(P)`.  This is the identity that turns the type-B/C/D
+`hsq` obligation `x² = S.inl (ofAdd (q (S.rightHom x)))` into the transported
+square-map equation. -/
+theorem ambientCenterCoordinate_squareMap
+    {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1 : lowerCentralLayerKernel P 1 = ⊥)
+    (hterm : lowerCentralTerm P 1 = frattini P)
+    (hSq : LowerCentralSquaresLieInSecond P)
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (x : ↥(lowerCentralTerm P 0))
+    (hx2 : (x : P) ^ 2 ∈ frattini P) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralSquareMapAdditive P hSq (layerZeroClass x)) =
+      ePhi (Additive.ofMul ⟨(x : P) ^ 2, hx2⟩) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  rw [show layerZeroClass x =
+      Additive.ofMul (QuotientGroup.mk' (lowerCentralLayerKernel P 0) x) from rfl,
+    lowerCentralSquareMapAdditive_mk]
+  show ePhi (ambientLayerOneLinearEquivFrattini hEA hK1 hterm
+      (Additive.ofMul (lowerCentralSquareValue P hSq x))) =
+    ePhi (Additive.ofMul ⟨(x : P) ^ 2, hx2⟩)
+  rfl
+
+/-- The factor sibling of `ambientCenterCoordinate_squareMap`: the factor-to-
+ambient Frattini bridge of a factor square value is the genuine square, pushed
+into `Φ(P)`.  Together with `NoncommutativeFactorCoordinateData.square_normal`
+(and `eKernel_eq`) this identifies `A(α) = q_X(α)`. -/
+theorem factorLayerOneEquivAmbientFrattini_squareValue
+    {S : Subgroup P}
+    (hPhiS : frattini P ≤ S)
+    (hK1 : lowerCentralLayerKernel S 1 = ⊥)
+    (hterm : lowerCentralTerm S 1 = (frattini P).subgroupOf S)
+    (hSq : LowerCentralSquaresLieInSecond S)
+    (g : ↥(lowerCentralTerm S 0))
+    (hmem : (S.subtype ((lowerCentralTerm S 0).subtype g)) ^ 2 ∈ frattini P) :
+    (factorLayerOneEquivAmbientFrattini hPhiS hK1 hterm
+        (lowerCentralSquareValue S hSq g) : ↥(frattini P)) =
+      ⟨(S.subtype ((lowerCentralTerm S 0).subtype g)) ^ 2, hmem⟩ := by
+  apply Subtype.ext
+  rfl
+
+/-- The commutative sibling of the factor square identity: the homocyclic
+`C₄`-square bridge of a factor square is the genuine square, pushed into
+`Φ(P)`.  Together with `CommutativeFactorCoordinateData.square_normal`
+(= `β²`) this identifies `A(α) = q_X(α) = α²`. -/
+theorem homocyclicFourSquareSubgroupEquivFrattini_squareEquiv
+    {S : Subgroup P} [Finite ↥S]
+    (hcomm : IsMulCommutative ↥S)
+    {index : Type} [Fintype index]
+    (equivPi : ↥S ≃* (index → Multiplicative (ZMod 4)))
+    (hPhiS : frattini P ≤ S)
+    (hN : Agemo (↥S) 2 1 = (frattini P).subgroupOf S)
+    (g : ↥S)
+    (hmem : (S.subtype g) ^ 2 ∈ frattini P) :
+    (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN
+        (commutativeFactorSquareEquiv hcomm equivPi
+          (QuotientGroup.mk g)) : ↥(frattini P)) =
+      ⟨(S.subtype g) ^ 2, hmem⟩ := by
+  apply Subtype.ext
+  rfl
+
 end SquareDecomposition
 
 end
