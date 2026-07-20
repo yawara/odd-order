@@ -756,7 +756,8 @@ By Artin's theorem (`FixedPoints.finrank_eq_card`) the fixed field `K^{⟨σ⟩}
 order.  In the classification `K = 𝔽_{r²}` and `σ : x ↦ x^r`. -/
 theorem card_eq_sq_of_orderTwo_ringAut {K : Type*} [Field K] [Finite K]
     (σ : RingAut K) (hσ2 : σ ^ 2 = 1) (hσ1 : σ ≠ 1) :
-    ∃ (r p n : ℕ), p.Prime ∧ 0 < n ∧ r = p ^ n ∧ Nat.card K = r ^ 2 := by
+    ∃ (r p n : ℕ), p.Prime ∧ 0 < n ∧ r = p ^ n ∧ Nat.card K = r ^ 2 ∧
+      r = Nat.card (FixedPoints.subfield (Subgroup.zpowers σ) K) := by
   classical
   haveI : Fintype K := Fintype.ofFinite K
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
@@ -777,8 +778,8 @@ theorem card_eq_sq_of_orderTwo_ringAut {K : Type*} [Field K] [Finite K]
     rw [← hfr]; exact Module.card_eq_pow_finrank
   -- `|K^G| = p^n` is a prime power with `n ≥ 1`.
   obtain ⟨p, _, n, hp, hcardFix⟩ := FiniteField.card' (FixedPoints.subfield G K)
-  exact ⟨Fintype.card (FixedPoints.subfield G K), p, (n : ℕ), hp, n.pos, hcardFix, by
-    rw [Nat.card_eq_fintype_card, hcardK]⟩
+  exact ⟨Fintype.card (FixedPoints.subfield G K), p, (n : ℕ), hp, n.pos, hcardFix,
+    by rw [Nat.card_eq_fintype_card, hcardK], by rw [Nat.card_eq_fintype_card]⟩
 
 /-- **Peterfalvi Appendix C, Proposition 2, first half** (proved, sorry-free), stated with the
 book's hypothesis: if the multiplicative group `F^*` of a finite near-field has a **cyclic**
@@ -797,6 +798,99 @@ theorem exists_field_structure_of_cyclic_index_two.{u} {F : Type u} [NearField F
     intro u v
     simpa using congrArg Subtype.val (mul_comm u v)
   exact nearField_field_structure_of_index_two A hcomm hidx
+
+/-- **Centre of a twisted near-field's multiplicative group** (Peterfalvi Appendix C, Proposition 2,
+last clause).  For the twisted near-field structure `d` on a finite field `K`, whose multiplication
+is `a ∘ c = a·c` for `c` in an index-`2` subgroup `B ≤ Kˣ` and `a ∘ c = σ(a)·c` otherwise, an
+element `a ≠ 0` is central for `∘` iff it is `σ`-fixed.  Extracted as a standalone lemma so the
+centrality case analysis (which needs `B = 𝔽_{|B|}`-roots via `rootsOfUnity` and the cardinality
+comparison `|B| > r-1`) runs in a small context.  The `σ`-fixed units number `r-1` (`hFuCount`). -/
+theorem twMul_central_iff {K : Type*} [Field K] [Finite K]
+    (σ : RingAut K) (d : TwistData K) (B : Subgroup Kˣ) (hBindex : B.index = 2)
+    (htwB : ∀ (a c : K) (hc : c ≠ 0), Units.mk0 c hc ∈ B → d.twMul a c = a * c)
+    (htwNB : ∀ (a c : K) (hc : c ≠ 0), Units.mk0 c hc ∉ B → d.twMul a c = σ a * c)
+    (r : ℕ) (hcardKr : Nat.card K = r ^ 2) (hr_odd : Odd r) (hr3 : 3 ≤ r)
+    (hFuCount : Nat.card {u : Kˣ // σ (u : K) = u} = r - 1)
+    (a : K) (ha : a ≠ 0) :
+    (∀ c : K, d.twMul a c = d.twMul c a) ↔ σ a = a := by
+  set d2 := Nat.card ↥B with hd2def
+  have h2d2 : d2 * 2 + 1 = r ^ 2 := by
+    have hm := Subgroup.card_mul_index B
+    rw [hBindex, Nat.card_units, hcardKr] at hm
+    have : 0 < r ^ 2 := by rw [← hcardKr]; exact Nat.card_pos
+    omega
+  haveI : NeZero d2 := ⟨Nat.card_pos.ne'⟩
+  have hBpow : ∀ u : Kˣ, u ∈ B → u ^ d2 = 1 := fun u hu => by
+    have h : (⟨u, hu⟩ : ↥B) ^ d2 = 1 := by rw [hd2def]; exact pow_card_eq_one'
+    simpa using congrArg (fun x : ↥B => (x : Kˣ)) h
+  have hBroots : B = rootsOfUnity d2 K := by
+    refine Subgroup.eq_of_le_of_card_ge (fun u hu => ?_) ?_
+    · rw [mem_rootsOfUnity]; exact hBpow u hu
+    · rw [Nat.card_eq_fintype_card]; exact card_rootsOfUnity K d2
+  let Fu : Subgroup Kˣ :=
+    { carrier := {u | σ (u : K) = u}
+      one_mem' := by simp
+      mul_mem' := fun {x y} hx hy => by
+        show σ ((x * y : Kˣ) : K) = ((x * y : Kˣ) : K)
+        rw [Units.val_mul, map_mul, hx, hy]
+      inv_mem' := fun {x} hx => by
+        show σ ((x⁻¹ : Kˣ) : K) = ((x⁻¹ : Kˣ) : K)
+        rw [Units.val_inv_eq_inv_val, map_inv₀, hx] }
+  have hFuMem : ∀ u : Kˣ, u ∈ Fu ↔ σ (u : K) = u := fun _ => Iff.rfl
+  have hFuCard : Nat.card ↥Fu = r - 1 := hFuCount
+  have hFupow : ∀ u : Kˣ, u ∈ Fu → u ^ (r - 1) = 1 := fun u hu => by
+    have h : (⟨u, hu⟩ : ↥Fu) ^ (r - 1) = 1 := by rw [← hFuCard]; exact pow_card_eq_one'
+    simpa using congrArg (fun x : ↥Fu => (x : Kˣ)) h
+  obtain ⟨s, hs⟩ : ∃ s, r = s + 1 := ⟨r - 1, by omega⟩
+  have hd2gt : r - 1 < d2 := by
+    have hexp : (s + 1) ^ 2 = s ^ 2 + 2 * s + 1 := by ring
+    rw [hs, hexp] at h2d2
+    have hs0 : 0 < s := by omega
+    have hspos : 0 < s ^ 2 := by positivity
+    omega
+  have h_dvd : (r - 1) ∣ d2 := by
+    obtain ⟨m, hm⟩ := hr_odd
+    refine ⟨m + 1, ?_⟩
+    have hexp : (2 * m + 1) ^ 2 = 4 * m ^ 2 + 4 * m + 1 := by ring
+    rw [hm, hexp] at h2d2
+    have hr1 : r - 1 = 2 * m := by omega
+    have hrhs : 2 * m * (m + 1) = 2 * m ^ 2 + 2 * m := by ring
+    rw [hr1, hrhs]; omega
+  have hFix_B : ∀ u : Kˣ, σ (u : K) = u → u ∈ B := fun u hu => by
+    rw [hBroots, mem_rootsOfUnity]
+    obtain ⟨k, hk⟩ := h_dvd
+    rw [hk, pow_mul, hFupow u hu, one_pow]
+  obtain ⟨u₁, hu₁⟩ : ∃ u₁ : Kˣ, u₁ ∉ B := by
+    by_contra hcon; push_neg at hcon
+    have hBtop : B = ⊤ := eq_top_iff.mpr fun u _ => hcon u
+    rw [hBtop, Subgroup.index_top] at hBindex; exact absurd hBindex (by norm_num)
+  constructor
+  · intro h
+    have haB : Units.mk0 a ha ∈ B := by
+      by_contra haNB
+      have hBFu : ∀ u : Kˣ, u ∈ B → u ∈ Fu := by
+        intro u hu
+        have hmk : Units.mk0 (u : K) u.ne_zero ∈ B := by
+          rw [show Units.mk0 (u : K) u.ne_zero = u from Units.ext rfl]; exact hu
+        have e := h (u : K)
+        rw [htwB a (u : K) u.ne_zero hmk, htwNB (u : K) a ha haNB] at e
+        rw [hFuMem]
+        exact (mul_right_cancel₀ ha ((mul_comm (u : K) a).trans e)).symm
+      have hle : d2 ≤ r - 1 := by
+        rw [hd2def, ← hFuCard]; exact Subgroup.card_le_of_le hBFu
+      exact absurd hle (not_le.mpr hd2gt)
+    have hc₁NB : Units.mk0 (u₁ : K) u₁.ne_zero ∉ B := by
+      rw [show Units.mk0 (u₁ : K) u₁.ne_zero = u₁ from Units.ext rfl]; exact hu₁
+    have e := h (u₁ : K)
+    rw [htwNB a (u₁ : K) u₁.ne_zero hc₁NB, htwB (u₁ : K) a ha haB, mul_comm (u₁ : K) a] at e
+    exact mul_right_cancel₀ u₁.ne_zero e
+  · intro hσa c
+    rcases eq_or_ne c 0 with rfl | hc
+    · rw [TwistData.twMul_zero, TwistData.zero_twMul]
+    · have haB : Units.mk0 a ha ∈ B := hFix_B _ hσa
+      by_cases hcB : Units.mk0 c hc ∈ B
+      · rw [htwB a c hc hcB, htwB c a ha haB]; exact mul_comm a c
+      · rw [htwNB a c hc hcB, htwB c a ha haB, hσa]; exact mul_comm a c
 
 /-- **Peterfalvi Appendix C, Proposition 2** (pp. 137--138).  Let `F` be a finite near-field whose
 multiplicative group `F^*` has a **cyclic** subgroup `A` of index `2`.  Then either `F` is a field
@@ -989,7 +1083,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
   · -- **Twisted case** (`σ ≠ 1`): `F ≅ F_{r²,2}`.
     right
     haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-    obtain ⟨r, p, n, hp, hn, hrpn, hcardKr⟩ := card_eq_sq_of_orderTwo_ringAut σ hσ2 hσne
+    obtain ⟨r, p, n, hp, hn, hrpn, hcardKr, hrFix⟩ := card_eq_sq_of_orderTwo_ringAut σ hσ2 hσne
     have hKF : Nat.card K = Nat.card F := hcardKE
     have hFodd : Odd (Nat.card F) := by
       rw [card_eq_of_index_two A hidx]; exact ⟨Nat.card ↥A, by ring⟩
@@ -1125,8 +1219,86 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
       rw [h, Θ.symm_apply_apply]
     refine ⟨r, K, hKfield, hKfin, d, ⟨p, n, hp, hpodd, hn, hrpn⟩, hcardKr,
       ⟨(Θ.symm.toAddEquiv : F ≃+ Twisted d), fun x y => hiso x y⟩, ?_⟩
-    -- `|Z(Fˣ)| = r - 1`.
-    sorry
+    -- `|Z(Fˣ)| = r - 1`: `Z(Fˣ) ≅` the `σ`-fixed units of `K` `= 𝔽_r*`.
+    have hmemFix : ∀ x : K,
+        x ∈ FixedPoints.subfield (Subgroup.zpowers σ) K ↔ σ x = x := by
+      intro x
+      constructor
+      · intro h
+        have hg := (MulAction.mem_fixedPoints.mp h) ⟨σ, Subgroup.mem_zpowers σ⟩
+        simpa [RingAut.smul_def] using hg
+      · intro hσx
+        show x ∈ MulAction.fixedPoints _ K
+        rw [MulAction.mem_fixedPoints]
+        rintro ⟨g, hg⟩
+        have hst : g ∈ MulAction.stabilizer (RingAut K) x :=
+          Subgroup.zpowers_le.mpr
+            (MulAction.mem_stabilizer_iff.mpr (by rw [RingAut.smul_def]; exact hσx)) hg
+        simpa [RingAut.smul_def] using hst
+    have htwB : ∀ (a c : K) (hc : c ≠ 0), Units.mk0 c hc ∈ B → d.twMul a c = a * c := by
+      intro a c hc hcB
+      have hexp : d.twExp c = 0 := by
+        unfold TwistData.twExp; rw [dif_neg hc, (hχone _).mpr hcB, toAdd_one]
+      show d.twAut (d.twExp c) a * c = a * c
+      rw [hexp, TwistData.twAut_zero]; rfl
+    have htwNB : ∀ (a c : K) (hc : c ≠ 0), Units.mk0 c hc ∉ B → d.twMul a c = σ a * c := by
+      intro a c hc hcB
+      have hexp : d.twExp c = 1 := by
+        unfold TwistData.twExp; rw [dif_neg hc]
+        exact hZ2 _ (fun h => hcB ((hχone _).mp (Multiplicative.toAdd.injective
+          (h.trans toAdd_one.symm))))
+      show d.twAut (d.twExp c) a * c = σ a * c
+      rw [hexp, TwistData.twAut_one]
+    have hFixCard : Nat.card {a : Kˣ // σ (a : K) = (a : K)} = r - 1 := by
+      have e1 : {a : Kˣ // σ (a : K) = (a : K)}
+          ≃ {x : FixedPoints.subfield (Subgroup.zpowers σ) K // x ≠ 0} :=
+        { toFun := fun a => ⟨⟨(a.1 : K), (hmemFix _).mpr a.2⟩,
+            fun h => a.1.ne_zero (by simpa using Subtype.ext_iff.mp h)⟩
+          invFun := fun v => ⟨Units.mk0 (v.1 : K) (fun h => v.2 (Subtype.ext h)),
+            (hmemFix _).mp v.1.2⟩
+          left_inv := fun a => Subtype.ext (Units.ext rfl)
+          right_inv := fun v => Subtype.ext (Subtype.ext rfl) }
+      rw [Nat.card_congr e1, Nat.card_congr unitsEquivNeZero.symm, Nat.card_units, ← hrFix]
+    have hr_odd : Odd r := by rw [hrpn]; exact hpodd.pow
+    have hp3 : 3 ≤ p := by
+      have h1 := hp.two_le; have h2 := Nat.odd_iff.mp hpodd; omega
+    have hr3 : 3 ≤ r := by rw [hrpn]; exact le_trans hp3 (Nat.le_self_pow hn.ne' p)
+    have hcentral : ∀ a : K, a ≠ 0 →
+        ((∀ c : K, d.twMul a c = d.twMul c a) ↔ σ a = a) := fun a ha =>
+      twMul_central_iff σ d B hBindex htwB htwNB r hcardKr hr_odd hr3 hFixCard a ha
+    have hZequiv :
+        Nat.card ↥(Subgroup.center Fˣ) = Nat.card {a : Kˣ // σ (a : K) = (a : K)} := by
+      have hΘsymm_ne : ∀ x : Fˣ, Θ.symm ((x : F)) ≠ 0 := fun x h =>
+        x.ne_zero (Θ.symm.injective (h.trans (map_zero Θ.symm).symm))
+      have hmulF : ∀ x y : Fˣ,
+          (x : F) * (y : F) = Θ (d.twMul (Θ.symm (x : F)) (Θ.symm (y : F))) := fun x y => by
+        rw [← hmulΘ, Θ.apply_symm_apply, Θ.apply_symm_apply]
+      have hbridgeEq : ∀ x y : Fˣ, y * x = x * y ↔
+          d.twMul (Θ.symm (y : F)) (Θ.symm (x : F))
+            = d.twMul (Θ.symm (x : F)) (Θ.symm (y : F)) := fun x y => by
+        rw [Units.ext_iff, Units.val_mul, Units.val_mul, hmulF y x, hmulF x y, Θ.injective.eq_iff]
+      have hbridge : ∀ x : Fˣ, x ∈ Subgroup.center Fˣ ↔ σ (Θ.symm (x : F)) = Θ.symm (x : F) := by
+        intro x
+        rw [Subgroup.mem_center_iff, ← hcentral _ (hΘsymm_ne x)]
+        constructor
+        · intro h c
+          rcases eq_or_ne c 0 with rfl | hc
+          · rw [TwistData.twMul_zero, TwistData.zero_twMul]
+          · have hh := (hbridgeEq x (Units.mk0 (Θ c) (hΘc_ne c hc))).mp (h _)
+            rw [show Θ.symm ((Units.mk0 (Θ c) (hΘc_ne c hc) : Fˣ) : F) = c from by
+              rw [Units.val_mk0, Θ.symm_apply_apply]] at hh
+            exact hh.symm
+        · intro h y
+          rw [hbridgeEq x y]; exact (h (Θ.symm (y : F))).symm
+      refine Nat.card_congr
+        { toFun := fun x => ⟨Units.mk0 (Θ.symm (x.1 : F)) (hΘsymm_ne x.1), (hbridge x.1).mp x.2⟩
+          invFun := fun a => ⟨Units.mk0 (Θ (a.1 : K)) (hΘc_ne _ a.1.ne_zero),
+            (hbridge _).mpr (by rw [Units.val_mk0, Θ.symm_apply_apply]; exact a.2)⟩
+          left_inv := fun x => Subtype.ext (Units.ext (by
+            simp only [Units.val_mk0, Θ.apply_symm_apply]))
+          right_inv := fun a => Subtype.ext (Units.ext (by
+            simp only [Units.val_mk0, Θ.symm_apply_apply])) }
+    rw [hZequiv, hFixCard]
 
 end PropositionTwo
 
