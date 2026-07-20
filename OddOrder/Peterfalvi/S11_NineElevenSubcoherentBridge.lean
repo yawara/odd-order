@@ -1455,9 +1455,15 @@ The (9.7) Clifford dichotomy (`clifford_dichotomy`, already type-free on `chars`
 two branches proved above:
 
 * case (9.7.a) — `caseA_coherent_sOf_cprime_of_refuter`, with the maximality refuter
-  `caseA_refuter_of_equality_refutation` and its (5.6) pair bound **discharged** by
-  `caseA_pairBound`; what remains open is the degree-`qa` base coherence `hAbase` and the single
-  honest (9.11) carrier `hrefuteEq` (the (9.11.2)–(9.11.8) equality-configuration refutation);
+  `caseA_refuter_of_equality_refutation`, its (5.6) pair bound **discharged** by `caseA_pairBound`,
+  and its degree-`qa` base coherence **discharged** by `sOf_degreeSubfamily_coherent_A0`.
+
+⚠ What remains is a single honest carrier: `hrefuteEq`, the (9.11.2)–(9.11.8)
+equality-configuration refutation (issue 9083 Phase B–E — no producer exists anywhere in the repo,
+though its arithmetic chain `nineElevenCaseA_equality_refutation` is already landed and type-free).
+The other parameters are not open mathematics: `dd`/`hdd` are the (8.15) Dade datum and its pin to
+the (4.6) restriction, and `h2` is the `2 ≤ ncard` count that `S15.Hypothesis.sSetIrrDeg_coherent`
+also exposes — the honest pattern, since (9.8.d) supplies existence rather than a second member.
 * case (9.7.b) — **fully discharged**: uniform degree from (9.9.a), pivot from (9.9.b)
   (`sOf_cprime_nonempty`), and the descent to this `τ` from `sOf_caseB_coherent_restrict`.
 
@@ -1492,13 +1498,12 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
     (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
-    (hAbase : ∀ caseA : CliffordCaseAData chars,
-      OddOrder.Peterfalvi.S07.IsCoherent
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
-        {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
-          IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))}
-        (OddOrder.Peterfalvi.S04.supportInSubgroup
-        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M))
+    (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
+    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm)
+    (h2 : ∀ caseA : CliffordCaseAData chars,
+      2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))}.ncard)
     (hrefuteEq : ∀ caseA : CliffordCaseAData chars, CaseAEqualityRefutation caseA
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
       (OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -1517,7 +1522,17 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) := by
     rcases clifford_dichotomy hG chars with hA | hB
-    · exact caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some (hAbase hA.some)
+    · refine caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some
+        (sOf_degreeSubfamily_coherent_A0
+          (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) h46 dd hAnorm hdd hconj htau
+          hG hM data (chief.H0 ⊔ cprimeSub data chief) (data.q * hA.some.a)
+          (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHeq
+          (Nat.cast_ne_zero.mpr
+            (Nat.mul_pos data.nontrivial.2.1.pos hA.some.a_pos).ne')
+          (h2 hA.some)
+          (fun h => (OddOrder.Peterfalvi.S04.mem_sharp.mp
+            (h46.dade.subset_sharp
+              (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp h))).2 rfl)).some
         (caseA_refuter_of_equality_refutation hG hA.some _ _
           (caseA_pairBound hG hM hA.some h46 hKeq hconj htau hKsupp hVsub)
           (hrefuteEq hA.some))
