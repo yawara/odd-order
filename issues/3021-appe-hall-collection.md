@@ -1324,3 +1324,38 @@ BG の残りは全部これ (`S/S'` は `\|S/S'\| = p²` = E.3(b) 第 3 clause �
 7. ⬜ **最終算術** — `p^k ≤ p^{q-1}` (E.3(c)) ⟹ `k ≤ q-1`、`r₀ = r` と
    `r` の位数 `q` から `j+2 ≡ k-i (mod q)`、範囲から `j+2 = k-i`、
    (E.27) で `t₀ = t` ⟹ (E.21) に矛盾。
+
+## 2026-07-20 (27): セッション終了時点 — E.4 の 7 ステップ計画のうち 1・2 完了
+
+`AppE_AbelianCentralizer.lean` に追加:
+
+| 宣言 | 計画の項 |
+|---|---|
+| `commutator_le_of_isCyclic_quotient` / `commutator_le_centralizer` | **1 ✅ `S' ≤ T`** |
+| `isElementaryAbelian_quotient_commutator` | (2 の前提) `S/S'` は elementary abelian |
+| `exists_aInvariant_complement_of_centralizer` | **2 ✅ `B`-不変補空間 `Q/S'`** |
+| ⭐ `exists_zpow_of_map_eq_of_isCyclic` | (3-5 の土台) **固有値抽出** |
+| `card_map_R₀_subgroupOf` | `\|R₀S'/S'\| = p` (BG の第 1 直線) |
+| `card_map_centralizer` | `\|T/S'\| = p` (BG の第 2 直線) |
+
+### ⬜ 次の一手 = 計画の項 3 (`r = r₀`)
+
+道具は揃った。`α ∈ A^#` を取り、
+
+- `R₀S'/S'` = `card_map_R₀_subgroupOf` の直線 (位数 p ⟹ 巡回) に
+  `exists_zpow_of_map_eq_of_isCyclic` を当てて固有値 `r`
+- `T/S'` = `card_map_centralizer` の直線に同じく当てて `r₀`
+
+`r ≠ r₀` を仮定すると、`β` は `α` と可換 ((E.20) `commutator_eq_bot`) なので
+`α` の相異なる固有値の固有空間を保つ ⟹ `β` は `R₀S'/S'` を固定 ⟹
+`β` は `R₀S'` を固定 ⟹ (E.18) (`not_fixes_sup_frattini_of_not_fixes_R₀`) に矛盾。
+
+⚠ 「可換な作用素は相異なる固有値の固有空間を保つ」は 2 次元なので初等的だが、
+**部分群の言葉で書く必要がある**: `V₁ = ker(α - r)`, `V₂ = ker(α - r₀)` を
+`Subgroup (S/S')` として定義し (`{x | α x = x^r}` は部分群)、
+`β` がそれらを保つことを `α β = β α` から出す。
+
+### リポジトリ状態
+
+`AppE` の残 sorry = **E.4 と E.5 の 2 件** (セッション開始時 3 件 = E.3(d)/E.4/E.5)。
+全体 sorry 13 (開始時 14)。フルビルドは hub の合流 gate に委ねる (leaf build green)。
