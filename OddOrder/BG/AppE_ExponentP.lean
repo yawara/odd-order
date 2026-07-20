@@ -299,14 +299,14 @@ BG writes `|S : C_S(v)| = |S : C_S(R₀)|`; the two centralizers are literally e
 (`centralizer_singleton_eq_of_zpowers_eq`), and the order `p²` is Step 2's `(E.4)`. -/
 theorem RegularOperatorSetup.card_centralizer_generator [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
-    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
     {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
     Nat.card ↥(Subgroup.centralizer ({v} : Set ↥S)) = p ^ 2 := by
   rw [centralizer_singleton_eq_of_zpowers_eq hv, hyp.centralizer_subgroupOf_eq hR₀S,
     Nat.card_congr
       (Subgroup.subgroupOfEquivOfLe
         (inf_le_left : S ⊓ Subgroup.centralizer (hyp.R₀ : Set R) ≤ S)).toEquiv]
-  exact (hyp.centralizer_inf_eq_sup_omega1Center hR₀S hexp hS).2
+  exact hp2
 
 /-- **BG (E.15)**: the `S`-conjugacy class of `v ∈ R₀^#` has `|S|/p²` elements.
 
@@ -316,7 +316,7 @@ action of `S` on itself, with the stabilizer identified as `C_S(v)` by
 `card_centralizer_generator`. -/
 theorem RegularOperatorSetup.card_conjClass_generator [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
-    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
     {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
     p ^ 2 * Nat.card (MulAction.orbit (ConjAct ↥S) v) = Nat.card ↥S := by
   have horb : Nat.card (MulAction.orbit (ConjAct ↥S) v) =
@@ -325,7 +325,7 @@ theorem RegularOperatorSetup.card_conjClass_generator [Finite R]
     exact Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (ConjAct ↥S) v)
   have hstab : Nat.card ↥(MulAction.stabilizer (ConjAct ↥S) v) = p ^ 2 := by
     rw [ConjAct.stabilizer_eq_centralizer]
-    exact hyp.card_centralizer_generator hR₀S hexp hS hv
+    exact hyp.card_centralizer_generator hR₀S hp2 hv
   rw [horb, ← hstab]
   exact (MulAction.stabilizer (ConjAct ↥S) v).card_mul_index
 
