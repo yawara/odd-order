@@ -261,8 +261,17 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
       - [x] Lemma 9 と cover dichotomy / Lemmas 7--8 を接続し、公開 endpoint
             `frattini_isElementaryAbelian_of_xiLengthThree` で `Φ(P)` が elementary abelian
             であることを証明する
-      - [ ] `P / Φ(P)` の二つの ξ-composition steps を actual invariant summands に持ち上げ、
+      - [x] `P / Φ(P)` の二つの ξ-composition steps を actual invariant summands に持ち上げ、
             ξ-length `2` の部分群 `X, Y` と `P = XY` を構成する
+        - [x] `Φ(P)` を三段組成列の第一項と同定し、商の induced actor が
+              `HasXiLengthTwo` を満たすことを証明する
+        - [x] Maschke により商の complementary invariant summands を構成し、
+              preimage が normal / invariant、`X ∩ Y = Φ(P)`、`X ⊔ Y = P` を証明する
+        - [x] `Φ(P) < S < P` である各 preimage `S` の restricted actor range が
+              `HasXiLengthTwo` を満たすことを証明する
+      - [ ] 可換な ξ-length-two summand `A(n,1) = C₄ⁿ` も含む honest data carrier を
+            構成し、二つの summand を共通 parameter `n ≥ 2` の `A(n,θ)`,
+            `A(n,φ)` と同定する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

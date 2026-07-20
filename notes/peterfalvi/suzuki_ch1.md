@@ -398,9 +398,14 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       type-A automorphism の奇数位数は degree-one 後の primitive shift から導出する。
       Lemma 12 は `HasXiLengthThree` を actual normal actor-invariant poset 上に置き、
       `frattini_isElementaryAbelian_of_xiLengthThree` で `Φ(P)` の
-      elementary-abelian reduction を閉じた。次の source frontier は Higman Lemma 12
-      (p. 90) の quotient two-step decomposition: `P / Φ(P)` の二つの
-      ξ-composition steps から ξ-length `2` の `X, Y` と `P = XY` を構成する段階である。
+      elementary-abelian reduction を閉じた。さらに `Φ(P)` を三段組成列の第一項と
+      同定し、`P / Φ(P)` の induced actor を ξ-length `2` に落とした。Maschke で得た
+      complementary invariant summands の preimage `X, Y` は normal / invariant で、
+      `X ∩ Y = Φ(P)`, `X ⊔ Y = P`; 両 restricted actor range も ξ-length `2` である。
+      次の source frontier は、可換 branch `A(n,1) = C₄ⁿ` も含む inclusive な
+      length-two type-A data を構成し、両 summand を共通 parameter `n ≥ 2` の
+      `A(n,θ)`, `A(n,φ)` と同定する段階である。既存 `IsTypeA` は
+      `φ ≠ 1` を要求するため、可換 branch へ流用しない。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
