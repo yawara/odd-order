@@ -11526,3 +11526,17 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- the only ambient input is `hVsub` (the exceptional `V` avoids `M'`), and no type hypothesis
 -- appears.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberRFamily_orthogonal
+-- **`M' ⊴ M` inside `↥M`** — the instance the §9 leaves need explicitly (the §11/§13 chain gets it
+-- transitively from its packaging's import closure).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.derivedInG_subgroupOf_normal
+-- **Natural-number self-norms** (`hN` of the (5.7) engine): `1` for an irreducible member, `w₁` for
+-- a (9.9.b) column.  This is where being *norm-general* rather than all-irreducible shows up.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_member_inner_self_natCast
+-- **Peterfalvi (9.11), case (9.7.b), at §9 level** — a uniform-degree `𝒮(Y)` is coherent on `A₀`.
+-- The book's case (b) is the two citations "(9.9.a) and (5.7)"; that is exactly this assembly, with
+-- (9.9.a) entering as the uniform degree `hunif` (type-free `S11.caseB_degree_qu`) and the
+-- norm-general engine `S07.uniform_degree_coherence_of_families` doing the rest.  The §13 analogue
+-- `S13.caseB_coherent_sOf_H0Cprime` anchors on a §10 μ-grid column reached through (11.7) `H₀ = 1`
+-- (types III/IV only); here the pivot is an explicit parameter, as the book's (9.9.b) count is
+-- genuine upstream content.  **No type hypothesis on this route.**
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent
