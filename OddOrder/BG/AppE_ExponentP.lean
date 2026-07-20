@@ -429,4 +429,33 @@ theorem RegularOperatorSetup.exists_zpowers_eq_map_sup_inf_R₁ [Finite R]
   rw [Subgroup.subgroupOf_sup hST (inf_le_left : T ⊓ hyp.R₁ ≤ T), Subgroup.map_sup,
     hbot, bot_sup_eq]
 
+/-- **The order of BG's `T₁ = S · C_T(v)`**: `|T₁| · p² = |S| · |C_T(v)|`.
+
+The product formula `|HK| · |H ∩ K| = |H| · |K|` for `H = C_T(v)` and `K = S`.  It computes
+a *subgroup* order because `C_T(v) ≤ T ≤ N_R(S)`, so the product set is the subgroup `T₁`;
+and the intersection is `C_S(v)`, of order `p²` by `(E.4)`.
+
+This is the arithmetic behind BG's `(E.16)`: dividing `|T : C_T(v)| = |T : T₁|·|T₁ : C_T(v)|`
+by it turns the `T`-class bound into the bound `|T : T₁| < p²`. -/
+theorem RegularOperatorSetup.card_sup_centralizer [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀) :
+    Nat.card ↥(S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R))) * p ^ 2 =
+      Nat.card ↥S * Nat.card ↥(T ⊓ Subgroup.centralizer ({v} : Set R)) := by
+  set C : Subgroup R := T ⊓ Subgroup.centralizer ({v} : Set R) with hC
+  have hCN : C ≤ Subgroup.normalizer (S : Set R) := inf_le_left.trans hTN
+  have hcoe : (↑(C ⊔ S) : Set R) = (C : Set R) * (S : Set R) :=
+    Subgroup.coe_mul_of_left_le_normalizer_right C S hCN
+  have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card C S
+  -- `C ⊓ S = C_S(v)`, of order `p²`
+  have hinf : C ⊓ S = S ⊓ Subgroup.centralizer (hyp.R₀ : Set R) := by
+    rw [hC, centralizer_singleton_eq_of_zpowers_eq hv]
+    exact le_antisymm (le_inf inf_le_right (inf_le_left.trans inf_le_right))
+      (le_inf (le_inf (inf_le_left.trans hST) inf_le_right) inf_le_left)
+  rw [hinf, (hyp.centralizer_inf_eq_sup_omega1Center hR₀S hexp hS).2] at hprod
+  have hcard : Nat.card ↥(C ⊔ S) = Nat.card ↑((C : Set R) * (S : Set R)) :=
+    Nat.card_congr (Equiv.setCongr hcoe)
+  rw [sup_comm, hcard, hprod, mul_comm]
+
 end OddOrder.BG.AppE
