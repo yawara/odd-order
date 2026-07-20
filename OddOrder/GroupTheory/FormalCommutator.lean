@@ -206,8 +206,6 @@ assignment attached to a set `A` of labels kills every variable labelled outside
 
 section Substitution
 
-variable [DecidableEq L]
-
 /-- **Killing labels outside `A` kills every factor whose support escapes `A`.** -/
 theorem eval_eq_one_of_not_subset (label : X → L) {A : Finset L} {f : X → G}
     (hf : ∀ x : X, label x ∉ A → f x = 1) {c : FormalCommutator X}

@@ -304,3 +304,76 @@ elaborate した時点**の行番号を保持するため (レーンがその後
 | 2 | `style.longLine` | **issue 0132** (宣言名の rename、owner 判断) |
 | 2 | `show` (AppE_FurtherResults) | lane c の frontier 移動待ち |
 | 1 | `Mathlib.Tactic` 丸ごと import | **意図的に残置** (上記の理由。直すなら下流の import 補完とセット) |
+
+## 2026-07-20 夜 wave (Opus hub, 5 fix + 5 adversarial verify) — 非 sorry **58 → 27**
+
+commit `35b2750d1`。フルビルド green 4565 jobs / 10:29 (実 elaboration)。
+対象は凍結ゾーンのみ (レーン active = c:`AppE_*` / a:`S11_NineEleven*`,`S07_PivotCoherence` /
+b:`Higman/**` は不可触)。各 fix エージェントの成果を**別エージェントが敵対的に再検証**する
+2 段構成にしたところ、**3 件の誤りを検出して revert した** (下記 ⚠)。
+
+### ⚠⚠ census の取り方 — **`awk 'length>100'` は使ってはいけない (バイト数を数える)**
+
+上の「### census の取り方 (罠あり)」に追加する重大な訂正。
+
+mathlib の longLine linter (`.lake/packages/mathlib/Mathlib/Tactic/Linter/Style.lean:472`) は
+`(fm.toPosition line.stopPos).column` = **Unicode 列**で判定し、さらに
+**`http` を含む行**と **`import` 行**を除外する。本リポジトリは `⁅⁆ ↥ ℂ ⊔` 等が
+1 文字 3 バイトなので、バイトで測ると桁違いに過大になる:
+
+| 測り方 | 件数 |
+|---|---|
+| `awk 'length>100'` (**バイト**、誤り) | **18,655** |
+| Unicode 列 + linter の除外規則 (正) | **528** |
+| うち file-disable 済 (`AxiomsCheck` 516 / `S09_*` 7) を除く (= 真の残) | **10** |
+
+正しい数え方:
+```bash
+python3 - <<'PY'
+import pathlib, re
+tot=0
+for p in pathlib.Path('OddOrder').rglob('*.lean'):
+    txt=p.read_text(encoding='utf-8')
+    if re.search(r'^set_option linter\.style\.longLine false', txt, re.M): continue  # file-disabled
+    for line in txt.split('\n'):
+        if len(line)<=100 or 'http' in line: continue
+        if re.match(r'^(public |meta |public meta )?import (all )?', line): continue
+        tot+=1
+print(tot)
+PY
+```
+⟹ 過去の表にある「longLine 608 / 121 / 130」等の数字は**バイト由来で過大**の可能性が高い。
+以後 longLine を語るときは必ず上のスクリプトで測り直すこと。
+
+### ⚠ 敵対的検証が捕まえた 3 件 (いずれも fix エージェントは「FIXED」と報告していた)
+
+1. **`S05_GridTrichotomy` の `import Mathlib.Tactic` 絞り込み → revert**。
+   `import Mathlib.Tactic` は**リポジトリ全体でこの 1 箇所のみ**。外すと下流
+   **265 module** (`OddOrder.FeitThompson`・`AxiomsCheck`・Pf S08–S16 全部を含む) の
+   import 閉包から 1,908 module が消え、`Mathlib.Tactic.NormNum.Prime` が到達不能になって
+   `OddOrder/Peterfalvi/S15_SAndT_Setup/{OrderDetermination.lean:614,CaseBOrder.lean:86}` の
+   `(by norm_num : ¬ Nat.Prime 4)` が落ちる。
+   ⚠ **教訓**: 直接 importer の leaf build では**構造的に検出不可能** (leaf build は
+   その先 262 module を elaborate しない)。import 絞り込みは leaf build で検証したことに
+   ならない — **フルビルドでしか担保できない**。→ 別 issue 0136 へ。
+2. **`AppD/MaximalSylowIntersection` の `include` から `hne : P ⊓ Q ≠ ⊥` 除去 → revert**。
+   ビルドは通り唯一の caller も更新済で、**一般化としては妥当**。だが数学的仮説の削除 =
+   statement 変更であり lint commit に混ぜるべきでない。→ 別 issue 0136 へ (破棄しない)。
+3. **`FeitThompsonNuGrid` の `simp` → `simp only` → revert**。**実際にコンパイルしない**
+   (line 99 で hard error)。fix エージェントは "FIXED / high confidence" と報告し、
+   根拠として挙げた「`omegaProdChar` は未使用だったので落とした」も事実と異なった。
+   ⟹ **エージェントの「build green」自己申告は信用しない**。検証側は HEAD 版と作業版を
+   自分で再 elaborate すること。
+
+### 残 27 件 (非 sorry) の扱い
+
+| 件数 | linter | 扱い |
+|---|---|---|
+| 11 | `open scoped Classical` | **次 wave の主対象**。decidability 明示への書換で機械的でない (個別判断) |
+| 6 | `style.show` (AppE_ExponentP 4 / AppE_FurtherResults 2) | **lane c active** — c の frontier 通過後 |
+| 3 | Variable name 未参照 | 1 = `S03g_Thm310General:163` は **named-arg で実使用ゆえ対応不可** (`caseB_transfer (K := K)` at :427)、1 = `S11_NineElevenSubcoherentBridge` (lane a active)、1 = `S13_SixTwoBridge:625` |
+| 2 | 未使用 section var | 1 = AppD (上記 revert 分)、1 = FormalCommutator 残 |
+| 1+1 | unused instance in type / longLine | AppE (lane c active) |
+| 1 | maxHeartbeats コメント | `S11_NineElevenCaseAResidual:151` — **lane a の新規 file**、a が付ける |
+| 1 | `simp` flexible | `FeitThompsonNuGrid:97` (上記 revert 分) |
+| 1 | `Mathlib.Tactic` 全体 import | 上記 revert 分 → issue 0136 |

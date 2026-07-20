@@ -194,14 +194,14 @@ example `M = (C₇⋊C₃)×(C₃₁⋊C₅)`), then `C_M(Q) ⊆ F(M)`.  `C_M(Q)
 subgroup of `M` lands in `F(M)` (`nilpotent_normal_le_fitting`).  Discharges the `hcent` input of
 `fittingInAmbient_eq_sup_centralizer_inf_of_inputs`. -/
 theorem centralizer_inf_le_fittingInAmbient_of_le_Msigma [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Q : Subgroup G} (_hM : M ∈ maximalSubgroups G)
     (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
     [(Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal]
     [Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
       Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))]
     (hCle : Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M) :
     Subgroup.centralizer (Q : Set G) ⊓ M ≤ fittingInAmbient M := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : IsSolvable ↥M := _hG.solvable_of_mem_maximalSubgroups _hM
   -- `C_M(Q)` is nilpotent (central extension over the nilpotent `M_σ/Q`).
   haveI : Group.IsNilpotent ↥(Subgroup.centralizer (Q : Set G) ⊓ M) :=
     isNilpotent_of_centralizes_normal_of_quotient_isNilpotent hCle inf_le_left

@@ -405,6 +405,8 @@ end IndChainDecomposition
 
 namespace SibleyDadeHypothesis
 
+-- The declaration name alone is 101 characters, so the `def` line cannot fit in 100 columns.
+set_option linter.style.longLine false in
 /-- **(6.8.1) → (7.10), Frobenius case:** an `IndChainDecomposition` from the
 base-anchor common-index p-power X-chain data and generator-level `τ₃` glue.
 
