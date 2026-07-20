@@ -281,4 +281,82 @@ noncomputable def retarget_isCoherent_of_extensionImage_general
   exact retarget_isCoherent hS₁ hχχ hχbarχbar hχχbar hχbarχ
     hXX hXbarXbar hXXbar hXbarX hXZ hXbarZ hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
 
+/-! ### The degree-bound crux (general `crux1_of_memberFamily`) -/
+
+open scoped Classical in
+/-- **General `crux1_of_memberFamily`** (generalizes `crux1_of_memberFamily`,
+`S08_CoherenceCorePart1/CoherentAdjoin.lean`; the Dade version's `hyp`/`hconj`/`_hτ` arguments are
+unused in its proof — this drops them and the `L : Subgroup G` restriction).
+
+**Peterfalvi (5.6.1)/(5.6.2) crux1: `⟨τ(χ − a·χ₁), ν χ₁⟩ = −a`** for a unit-norm member family
+`{χᵢ}` (all in `S₁`, `‖χᵢ‖² = 1`), the per-member (5.6.1) coefficient values `hcoeffval`, `a₁ = 1`,
+and the degree inequality `2a < ∑ aᵢ²` (`hDeg`).  The indexed integral projection writes
+`Da.Y = ∑ᵢ cᵢ·νχᵢ + Z` with `cᵢ = ⟨Da.Y, νχᵢ⟩`; `hcoeffval` identifies `cᵢ = a·[i=i₁] − λ·aᵢ` with
+integer `λ = a + μ`, `μ = ⟨τ(χ−a·χ₁), νχ₁⟩`; the (5.6.2) integer-forcing
+`lambda_eq_zero_and_Z_eq_zero` forces `λ = 0`, i.e. `μ = −a`. -/
+theorem crux1_of_memberFamily_general
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {S₁ : Set (ClassFunction L ℂ)}
+    (hS₁ : IsCoherent τ S₁ A)
+    (χ : ClassFunction L ℂ) {a : ℕ}
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (Da : CharacterPsiDecomposition (L := L) (G := G) τ χ (a • χmem i₁))
+    (hDaY_ZIrr : Da.Y ∈ ZIrr G)
+    (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i) (χmem j) = if i = j then (1 : ℂ) else 0)
+    (hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y (hS₁.extension (χmem i)) =
+      (a : ℂ) * (if i = i₁ then 1 else 0) -
+        ((a : ℂ) + ClassFunction.inner (τ (χ - a • χmem i₁))
+          (hS₁.extension (χmem i₁))) * (deg i : ℂ))
+    (hμZ : τ (χ - a • χmem i₁) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2) :
+    ClassFunction.inner (τ (χ - a • χmem i₁)) (hS₁.extension (χmem i₁)) = -(a : ℂ) := by
+  classical
+  have hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G :=
+    fun i hi => hS₁.extension_mem_ZIrr (χmem i) (Submodule.subset_span (hmemS1 i hi))
+  obtain ⟨μ, hμeq⟩ := ClassFunction.inner_mem_ZIrr_int hμZ (hνZ i₁ hi₁)
+  have horth : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (hS₁.extension (χmem i)) (hS₁.extension (χmem j)) =
+        if i = j then (1 : ℂ) else 0 := by
+    intro i hi j hj
+    rw [hS₁.extension_inner_eq (χmem i) (χmem j) (Submodule.subset_span (hmemS1 i hi))
+      (Submodule.subset_span (hmemS1 j hj)), hmemortho i hi j hj]
+  have hvcinj : ∀ i ∈ s, ∀ j ∈ s, hS₁.extension (χmem i) = hS₁.extension (χmem j) → i = j := by
+    intro i hi j hj hij
+    by_contra hne
+    have h0 := horth i hi j hj
+    rw [if_neg hne, hij, horth j hj j hj, if_pos rfl] at h0
+    exact one_ne_zero h0
+  obtain ⟨c, Z, hc_coeff, hYsum, hZortho⟩ :=
+    OddOrder.Peterfalvi.S08.exists_indexed_intProjection_of_orthonormal_ZIrr hDaY_ZIrr s
+      (fun i => hS₁.extension (χmem i)) hνZ hvcinj horth
+  have hcoeff_eq : ∀ i ∈ s, (c i : ℂ) =
+      (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (deg i : ℝ) : ℝ) : ℂ) := by
+    intro i hi
+    rw [← hc_coeff i hi, hcoeffval i hi, hμeq]
+    by_cases h : i = i₁
+    · simp only [if_pos h]; push_cast; ring
+    · simp only [if_neg h]; push_cast; ring
+  have hY : Da.Y =
+      (∑ i ∈ s, (((a : ℝ) * (if i = i₁ then 1 else 0) - ((a : ℤ) + μ : ℤ) * (deg i : ℝ) : ℝ) : ℂ)
+        • hS₁.extension (χmem i)) + Z := by
+    rw [hYsum]; congr 1
+    exact Finset.sum_congr rfl fun i hi => by rw [hcoeff_eq i hi]
+  have hψ : (ClassFunction.inner (a • χmem i₁ : ClassFunction L ℂ) (a • χmem i₁)).re
+      = (a : ℝ) ^ 2 * 1 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁), ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl,
+      star_natCast, mul_one,
+      show (a : ℂ) * (a : ℂ) = (((a : ℝ) ^ 2 * 1 : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re]
+  obtain ⟨hlam0, -⟩ := Da.lambda_eq_zero_and_Z_eq_zero s i₁ hi₁ (a : ℝ) ((a : ℤ) + μ) Z
+    (fun i => hS₁.extension (χmem i)) (fun _ => 1) (fun i => (deg i : ℝ))
+    hY horth hZortho hψ (by simp [ha1]) (by positivity)
+    (by simp only [mul_one]; exact hDeg)
+  have hμval : μ = -(a : ℤ) := by omega
+  rw [hμeq, hμval]; push_cast; ring
+
 end OddOrder.Peterfalvi.S07
