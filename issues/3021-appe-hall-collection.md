@@ -703,3 +703,50 @@ w_{i+1}^{r_{i+1}} ≡ w_{i+1}^a = ⁅w_i,v⁆^a = ⁅w_i^{r_i} u, v^r⁆ ≡ ⁅
 `AppE_FurtherResults` が 2020 行になったので prefix-split。
 現在の 3 層: `AppE_CollectionFormula` (E.1-E.2, 337 行) →
 `AppE_FurtherResults` (E.3-E.5, 1719 行) → `AppE_RegularOperator` ((E.9)-(E.12), 552 行)。
+
+## ⭐⭐ 2026-07-20 (10): **E.3(c) 完了 — BG Step 2 が全部閉じた**。AppE sorry 5 → 4
+
+| 新規宣言 | BG 対応 |
+|---|---|
+| `exists_chain_length` | 鎖 `T = H₀ ⊃ … ⊃ Hₙ = 1` の存在と `|T| = pⁿ` |
+| `le_pred_of_forall_zmod_mul_pow_ne_one` | 締めの計数を `(ZMod p)ˣ` に移送 (`n ≤ q−1`) |
+| `card_le_pow_card_A` / `card_le_pow` | **Step 2 第 3 節** `|S| ≤ p^q` (rank≥3 / 無条件) |
+| `card_omega_le` | **E.3(c)** |
+| `exists_zpowers_eq_R₀_subgroupOf` | BG の `v ∈ R₀^#` |
+
+### 発見 3 つ
+
+- **サイズは (E.5) から読む方が安い**: BG の `|S| = |R₀T|` でなく
+  `|S| = |T|·|S:T| = pⁿ·p`。指数 `p` は Lemma 5.2 が既に与えている。
+- **`|S| ≤ p³` 分岐はまた不要**: `q` は奇素数ゆえ `q ≥ 3`、よって `p³ ≤ p^q`。
+  BG の「位数 p³ 以下の p 群の検査」が Step 2 で実際に要ったのは
+  `card_quotient_commutator` の 1 箇所だけだった。
+- **A-作用が本当に効くのは第 3 節だけ**: 第 1・2 節は A 不変性なしで通っていた
+  (2026-07-20 (8) の観察の確定)。
+
+### 配置
+
+E.3(c) の結論は (E.9)-(E.12) 機構に依存するので、宣言を `AppE_FurtherResults` から
+`AppE_RegularOperator` へ移設 (名前・namespace 不変、消費者ゼロ)。
+
+### 検証
+
+`card_omega_le` 以外は axiom-clean。`card_omega_le` の `sorryAx` は
+`omega_pow_eq_one` (Step 3) の sorried-cite 1 本のみ。
+フルビルド 4554 jobs green / AxiomsCheck OK / sorry 総数 15 (非退行)。
+
+## 残り 4 sorry と次の frontier
+
+| 宣言 | 書籍 | 状況 |
+|---|---|---|
+| `omega_pow_eq_one` | **E.3(b) 第 1 節 = BG Step 3** | ★ 次の根。E.3(b)(c) 3 節すべてがこれを cite |
+| `B_fixes_R₀_of_fixes_frattini` | E.3(d) = Step 4 | Schur–Zassenhaus + regular |
+| `centralizer_upperCentralSeries_abelian_index_p` | E.4 | E.3 を全部消費 |
+| `maximalSubgroups_isTypeI_or_isTypeII` | E.5 | §14 counting + Cor 15.9 |
+
+**次は Step 3** (`omega_pow_eq_one`)。BG 原文 (pdftotext L8062-8110):
+「`R₀ × Ω₁(R₁)` を含む A-不変・指数 p の**極大**部分群 `S` を取る ⟹ `S ⊆ Ω₁(R)`。
+Step 2 より (E.13) `R₀ ⊄ S'`, `|S| ≤ p^q`, `|S/S'| = p²`。`P = Ω₁(R)`, `T = N_P(S)` と置き、
+`S = Ω₁(T)` なら … (E.14)-(E.16) で `T = P` かつ `S = Ω₁(P) = Ω₁(Ω₁(R)) = Ω₁(R)`」。
+⟹ Step 2 の 3 結論が**そのまま入力になる**ので、機構はもう揃っている。
+要る新規は「極大な A-不変指数 p 部分群の存在」と `Ω₁(N_P(S))` の議論 (Lemma 4.5 を使う)。
