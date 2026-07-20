@@ -11510,3 +11510,33 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `dadeIntegralCharacterMap h46.dade0 h46.tau` by `certainTypeR`; `htau` matches the irreducible
 -- branch to it (`rfl` for the `S10.typePACore_toHypothesis46_core` producer).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberRFamily
+-- **Dispatch reductions** — which constructor `sOf_memberRFamily` used, in `imageSet` form (the
+-- form the (5.2.e) lemmas consume).  The column version also exposes `η = μ_{χ₂}`, which is what
+-- supplies the `χ₂ ≠ χ₂'` / `χ₂ ≠ χ₂'⁻¹` side conditions of the μ×μ stratum.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberRFamily_imageSet_of_irr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberRFamily_imageSet_of_col
+-- **The (4.6)-level V-vanishing anchor**: `V ⊆ A₀` are Dade base points, so the (2.5) evaluation
+-- reduces `α^τ(v)` to `α(v)`, zero whenever `α` is supported on a set `V` avoids.  Generalizes
+-- `S13.tau_apply_eq_zero_of_mem_typePV`, which fixes that set to `A(M) = (M')^#`; the support set
+-- must stay separate from the (4.6) ambient `A`, since a type-uniform `A(M)` (`typePACore`) is
+-- *strictly smaller* than `(M')^#`, where the member differences actually live.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.dadeICM_apply_eq_zero_of_avoidV
+-- **(5.2.e) cross-orthogonality at §9 level** (the `hRorth` input of the (5.7) engine): the `2×2`
+-- irreducible/column case split.  The §9 replacement for `S13.caseB_sOf_memberRFamily_orthogonal`;
+-- the only ambient input is `hVsub` (the exceptional `V` avoids `M'`), and no type hypothesis
+-- appears.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberRFamily_orthogonal
+-- **`M' ⊴ M` inside `↥M`** — the instance the §9 leaves need explicitly (the §11/§13 chain gets it
+-- transitively from its packaging's import closure).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.derivedInG_subgroupOf_normal
+-- **Natural-number self-norms** (`hN` of the (5.7) engine): `1` for an irreducible member, `w₁` for
+-- a (9.9.b) column.  This is where being *norm-general* rather than all-irreducible shows up.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_member_inner_self_natCast
+-- **Peterfalvi (9.11), case (9.7.b), at §9 level** — a uniform-degree `𝒮(Y)` is coherent on `A₀`.
+-- The book's case (b) is the two citations "(9.9.a) and (5.7)"; that is exactly this assembly, with
+-- (9.9.a) entering as the uniform degree `hunif` (type-free `S11.caseB_degree_qu`) and the
+-- norm-general engine `S07.uniform_degree_coherence_of_families` doing the rest.  The §13 analogue
+-- `S13.caseB_coherent_sOf_H0Cprime` anchors on a §10 μ-grid column reached through (11.7) `H₀ = 1`
+-- (types III/IV only); here the pivot is an explicit parameter, as the book's (9.9.b) count is
+-- genuine upstream content.  **No type hypothesis on this route.**
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent
