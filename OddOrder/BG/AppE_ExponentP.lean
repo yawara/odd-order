@@ -34,7 +34,7 @@ one that is visibly `A`-invariant (`R₀` is `A`-invariant, hence so is its cent
 namespace OddOrder.BG.AppE
 
 open OddOrder.GroupTheory OddOrder.Isaacs.Ch03
-open scoped commutatorElement
+open scoped commutatorElement Pointwise
 
 variable {R B : Type*} [Group R] [Group B] {p q : ℕ}
 
@@ -328,5 +328,47 @@ theorem RegularOperatorSetup.card_conjClass_generator [Finite R]
     exact hyp.card_centralizer_generator hR₀S hexp hS hv
   rw [horb, ← hstab]
   exact (MulAction.stabilizer (ConjAct ↥S) v).card_mul_index
+
+/-! ### BG's Frattini variation
+
+BG introduces `T₁` as the normalizer in `T` of the `S`-class `K` of `v`, then computes
+`T₁ = S(T₁ ∩ R₀R₁) = S R₀ (T₁ ∩ R₁) = S(T₁ ∩ R₁)`.
+
+The first equality is a Frattini argument (`S ⊴ T₁` is transitive on `K`, so
+`T₁ = S · Stab_{T₁}(v) = S · C_{T₁}(v)`), and its outcome `T₁ = S · C_T(v)` can be taken as
+the *definition* of `T₁` — nothing downstream uses "normalizer of `K`" directly.  That is
+what is done here: it removes the need for an action on sets of subsets entirely. -/
+
+/-- **BG's Frattini variation**: `S ⊔ C_T(v) = S ⊔ (T ⊓ R₁)` for `R₀ ≤ S ≤ T` and a
+generator `v` of `R₀`.
+
+`C_R(v) = C_R(R₀) = R₀ × R₁` by the setup, and `R₀ ≤ S`; so the `R₀`-component of an element
+of `C_T(v)` is absorbed into `S`, and the `R₁`-component is left inside `T`.  This is the
+step that makes `T₁/S` a section of the **cyclic** `R₁`. -/
+theorem RegularOperatorSetup.sup_centralizer_eq_sup_inf_R₁ [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
+    {v : R} (hv : Subgroup.zpowers v = hyp.R₀) :
+    S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R)) = S ⊔ (T ⊓ hyp.R₁) := by
+  have hcv : Subgroup.centralizer ({v} : Set R) = hyp.R₀ ⊔ hyp.R₁ := by
+    rw [centralizer_singleton_eq_of_zpowers_eq hv, hyp.centralizer_eq]
+  refine le_antisymm (sup_le le_sup_left fun x hx => ?_) ?_
+  · obtain ⟨hxT, hxC⟩ := hx
+    rw [hcv] at hxC
+    -- `x = r₀ r₁` with `r₀ ∈ R₀`, `r₁ ∈ R₁`
+    have hnorm : hyp.R₀ ≤ Subgroup.normalizer (hyp.R₁ : Set R) :=
+      hyp.R₀_le_centralizer_R₁.trans (Subgroup.centralizer_le_normalizer _)
+    have hcoe : (↑(hyp.R₀ ⊔ hyp.R₁) : Set R) = (hyp.R₀ : Set R) * (hyp.R₁ : Set R) :=
+      Subgroup.coe_mul_of_left_le_normalizer_right hyp.R₀ hyp.R₁ hnorm
+    have hxmem : x ∈ (hyp.R₀ : Set R) * (hyp.R₁ : Set R) := by rw [← hcoe]; exact hxC
+    obtain ⟨r₀, hr₀, r₁, hr₁, rfl⟩ := hxmem
+    have hr₀T : r₀ ∈ T := hST (hR₀S hr₀)
+    have hr₁T : r₁ ∈ T := by
+      have hrw : r₁ = r₀⁻¹ * (r₀ * r₁) := by group
+      rw [hrw]
+      exact T.mul_mem (T.inv_mem hr₀T) hxT
+    exact Subgroup.mul_mem_sup (hR₀S hr₀) ⟨hr₁T, hr₁⟩
+  · refine sup_le le_sup_left ((inf_le_inf_left T ?_).trans le_sup_right)
+    rw [hcv]
+    exact le_sup_right
 
 end OddOrder.BG.AppE
