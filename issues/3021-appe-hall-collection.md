@@ -1187,3 +1187,39 @@ mathlib の `frattini_le_comap_frattini_of_surjective` 経由で組む必要は�
 - Frattini 変形 `SB = S·N_G(R₀)`
 - Schur–Zassenhaus (`OddOrder/Mathlib/SchurZassenhausConj.lean` に既存)
 - coprime 固定点 (`|A| = q` vs p 冪の剰余類)
+
+## 2026-07-20 (24): セッション終了時点の状態 (context 枯渇のため停止)
+
+### Step 4 の済み
+
+| 宣言 | 内容 |
+|---|---|
+| `frattini_eq_commutator_of_exponent_prime` | `Φ(S) = S'` (群レベル) |
+| `RegularOperatorSetup.frattiniInG_omega_eq_derivedInG` | 同、ambient 形 (`Ω₁(R)` 版) |
+| `orbit_conjAct_subset_coset` | 共役類 ⊆ `vG'` |
+| `RegularOperatorSetup.card_seed` | `\|seed\| = p²` (等式) |
+| `RegularOperatorSetup.orbit_eq_coset` | **共役類 = `vS'`** ((E.15) の唯一の消費点) |
+| `RegularOperatorSetup.exists_conj_mem_R₀` | **`R₀S' − S'` の元は `R₀^#` に共役** |
+| `RegularOperatorSetup.inf_derived_omega_eq_bot` | `R₀ ∩ (Ω₁(R))' = 1` |
+| (refactor) `card_centralizer_generator`/`card_conjClass_generator` | 仮説を `\|C_S(R₀)\| = p²` に |
+
+### ⬜ 次の一手 = `R₀^β = R₀^x` (∃x ∈ S)
+
+issue (23) の 5 ステップ。**着手時にまず必要なのは ambient ↔ subtype の橋**:
+
+```
+hB : act b • (R₀ ⊔ frattiniInG (Ω₁ R)) = R₀ ⊔ frattiniInG (Ω₁ R)     -- 仮説 (ambient)
+  ↓ frattiniInG_omega_eq_derivedInG
+     act b • (R₀ ⊔ derivedInG (Ω₁ R)) = …
+  ↓ ⬜ 要新規: (R₀ ⊔ derivedInG S) = ((R₀.subgroupOf S) ⊔ commutator ↥S).map S.subtype
+exists_conj_mem_R₀ (↥S の形)
+```
+
+その後の残り: 半直積 `G = S ⋊ B` の配線 / Frattini 変形 `SB = S·N_G(R₀)` /
+Schur–Zassenhaus (`OddOrder/Mathlib/SchurZassenhausConj.lean` に既存) /
+coprime 固定点 (`|A| = q` vs p 冪の剰余類)。
+
+### リポジトリ状態 (実測)
+
+フルビルド 4562 jobs green / sorry 14 (セッション開始時 15) / AxiomsCheck 3540 件 OK。
+AppE の残 sorry 3 = E.3(d) (本項) / E.4 / E.5。
