@@ -735,3 +735,26 @@ factorLayerOneEquivAmbientFrattini_squareValue。
 
 **その後**: branch dispatch (comm/noncomm factorInclusion → ambientProductEquiv の e) →
 mixed 項 M を case 別固有値算術で確定 → case assembly で higmanLemmaTwelve endpoint。
+
+### 2026-07-21 lane b: comm A=q_X の instance plumbing 課題 (次 session)
+
+noncomm A=q_X (`noncomm_ambientSquare_eq`) は committed。comm A=q_X を試作したが
+**quotient module instance の synthesis 課題**で保留 (WIP =
+scratchpad/CaseSplitBCD_comm_wip.lean)。課題:
+- comm factor の L₀ = `S ⧸ Agemo S 2 1`、その module は
+  `AddCommGroup.zmodModule h2` (h2 : ∀q, 2•q=0 の proof から) で構築。
+  `commFactorInclusion` の def 内 letI と proof 内 letI で別インスタンスになり、
+  `rw [commFactorInclusion]` unfold 時に「failed to synthesize」。
+- `set eQuotLin` の rfl / hαrep も再考要 (`eQuotLin = {data.eQuot with map_smul'}`)。
+
+**fix 方針 (次 session)**:
+- (a) `commFactorInclusion` を quotient module + CommGroup + IsMulComm を **instance
+  param** で受ける形にし、caller が 1 度だけ構築して共有 (内部 letI 廃止)。または
+- (b) `Module (ZMod 2) M` は scalar action 一意 (proof-irrelevant) ゆえ全 instance が
+  defeq のはず — `AddCommGroup.zmodModule h2` 同士が defeq-match しない理由を精査し、
+  canonical instance (例: S⧸Agemo の elementary-abelian からの標準 module) を使う。
+- exists_factorFamily_of_commutative (MixedEigenweights:543-595) が同じ setup を
+  していて通っているので、その instance 構築を厳密に踏襲する (letI の順序・値を一致)。
+
+noncomm は defeq clean だったが (lowerCentralLayer S 0 の module が canonical)、
+comm は S⧸Agemo の module が proof-derived で friction。branch dispatch でも同課題。
