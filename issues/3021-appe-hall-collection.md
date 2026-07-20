@@ -1397,3 +1397,31 @@ BG の残りは全部これ (`S/S'` は `\|S/S'\| = p²` = E.3(b) 第 3 clause �
 ⟹ `p ∣ r - r₀`、すなわち **`r ≡ r₀ (mod p)`** = BG の *"Therefore r = r₀"*。
 
 その後は項 4 (`t ≠ t₀`)、項 5 ((E.23))、項 6-7 (組合せ + 最終算術)。
+
+## 2026-07-20 (29): ⭐ E.4 計画の項 3 (`r = r₀`) 完了
+
+`RegularOperatorSetup.dvd_sub_eigenvalues` — `(p : ℤ) ∣ r - r₀`。
+(28) に書いた 6 手順どおりに組み上がった (引き戻しは `Subgroup.comap_map_eq` +
+`QuotientGroup.ker_mk'`、ambient 化は `map_subtype_sup_commutator`、
+最後は `frattiniInG_omega_eq_derivedInG` 経由で E.3(d) に食わせて (E.18) と衝突)。
+
+⚠ 実装メモ: `((act b) : R →* R).comp S.subtype = S.subtype.comp ((φ b) : ↥S →* ↥S)`
+は `rfl` で通る (`MonoidHom.ext fun _ => rfl`) が、`Subgroup.map_map` の後に
+明示的に `rw` しないと残る。
+
+### ⬜ 次 = 項 4 (`t ≠ t₀`) — (E.21)
+
+BG: *"Since `B` fixes `T/S'` and `p` does not divide `|B|`, `B` fixes some complement
+`Q/S'` of `T/S'` in `S/S'`.  Let `β` have eigenvalues `t` and `t₀` on `Q/S'` and `T/S'`,
+respectively.  If `t = t₀`, then `β` fixes every 1-dimensional subspace of `S/S'`,
+including `R₀S'/S'`.  Thus `t ≠ t₀`."*
+
+道具:
+- `Q/S'` = `exists_aInvariant_complement_of_centralizer` (項 2、済)。
+- `t`, `t₀` = `exists_zpow_of_map_eq_of_isCyclic` を `Q/S'`・`T/S'` に (どちらも位数 p)。
+- ⬜ **要新規**: 「`t = t₀` なら `β` は全ての部分群を保つ」。
+  `S/S' = Q/S' ⊕ T/S'` の直和分解の上で `β x = x^t` が**全体**で成り立つ
+  ことを示す (両成分で同じ冪) ⟹ 任意の部分群 `V` で `β • V = V`。
+  ⟹ 特に `R₀S'/S'` を保つ ⟹ 項 3 と同じ引き戻し (手順 3-5) で (E.18) に矛盾。
+  📌 手順 3-5 は項 3 の証明内にインラインで書いた。項 4 でも使うので
+  **「`B` が `R₀S'/S'` を保つ ⟹ 矛盾」を補題として切り出す**のが得策。
