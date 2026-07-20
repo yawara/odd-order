@@ -974,4 +974,30 @@ theorem RegularOperatorSetup.card_omega_le [Finite R] [Finite B]
     (IsAInvariant.of_characteristic _)
 
 
+/-! ### BG Step 4 (E.3(d)): first pieces -/
+
+/-- **`Φ(S) = S'` for a `p`-group of exponent `p`** — BG's *"Note that `Φ(S) = S'`, because
+`S` has exponent `p`."*
+
+`S' ≤ Φ(S)` holds in any finite `p`-group
+(`IsPGroup.commutator_sup_pow_closure_le_frattini`).  Conversely `S/S'` is abelian, and of
+exponent `p` because `S` is, hence elementary abelian; so Isaacs Lemma 4.5
+(`Isaacs.Ch04.frattini_le_iff_isElementaryAbelian_quotient_of_pgroup`) gives `Φ(S) ≤ S'`. -/
+theorem frattini_eq_commutator_of_exponent_prime {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hG : IsPGroup p G) (hexp : ∀ x : G, x ^ p = 1) :
+    frattini G = _root_.commutator G := by
+  refine le_antisymm ?_ (le_sup_left.trans (hG.commutator_sup_pow_closure_le_frattini))
+  rw [OddOrder.Isaacs.Ch04.frattini_le_iff_isElementaryAbelian_quotient_of_pgroup hG]
+  refine ⟨fun x y => ?_, fun x => ?_⟩
+  · obtain ⟨a, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator G) x
+    obtain ⟨b, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator G) y
+    rw [← map_mul, ← map_mul, QuotientGroup.mk'_apply, QuotientGroup.mk'_apply]
+    refine QuotientGroup.eq.mpr ?_
+    have hrw : (a * b)⁻¹ * (b * a) = ⁅b⁻¹, a⁻¹⁆ := by group
+    rw [hrw, commutator_def]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+  · obtain ⟨a, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator G) x
+    rw [← map_pow, hexp a, map_one]
+
+
 end OddOrder.BG.AppE
