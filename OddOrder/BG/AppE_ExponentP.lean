@@ -458,4 +458,24 @@ theorem RegularOperatorSetup.card_sup_centralizer [Finite R]
     Nat.card_congr (Equiv.setCongr hcoe)
   rw [sup_comm, hcard, hprod, mul_comm]
 
+/-- `C_T(v)` computed inside `↥T`: it is `(T ⊓ C_R(v)).subgroupOf T`. -/
+theorem centralizer_singleton_subgroupOf {G : Type*} [Group G] (T : Subgroup G) {v : G}
+    (hvT : v ∈ T) :
+    Subgroup.centralizer ({(⟨v, hvT⟩ : ↥T)} : Set ↥T)
+      = (T ⊓ Subgroup.centralizer ({v} : Set G)).subgroupOf T := by
+  ext y
+  rw [Subgroup.mem_centralizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_inf,
+    Subgroup.mem_centralizer_iff]
+  constructor
+  · intro h
+    refine ⟨y.2, fun g hg => ?_⟩
+    rw [Set.mem_singleton_iff] at hg
+    subst hg
+    exact congrArg Subtype.val (h _ rfl)
+  · rintro ⟨-, h⟩ g hg
+    rw [Set.mem_singleton_iff] at hg
+    subst hg
+    exact Subtype.ext (h v rfl)
+
+
 end OddOrder.BG.AppE
