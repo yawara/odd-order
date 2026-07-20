@@ -506,9 +506,17 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
      鎖の定義そのものから即座 — `H_{i+1} = ⁅H_i, S⁆` ゆえ `H_i` の元との交換子は商で死ぬ。
      これが `commutatorElement_pow_pow_of_central` の中心性仮説そのものなので、
      Lemma 4.2(a) が商で使えるようになる。
-   - ⬜ 残 (E.12 の最終組み立て): `w_i = [w_{i-1}, v]` 列を定義し、上の 2 つを使って
+   - ✅ **`w_i` 列** = `commutatorIterate` (`w₀ = w`, `w_i = ⁅w_{i-1}, v⁆`) +
+     `commutatorIterate_mem_chain` (`w_i ∈ H_i`)。
+     repo に**要素レベル**の反復交換子が無かったので新設 (`Isaacs.Ch04.iterCommutator` は
+     部分群レベル)。⚠ `w ∈ T` だけでよく `v` は無制約 — 鎖が `R₀` でなく `S` 全体と
+     bracket しているため。
+   - ⬜ 残 (E.12 の最終組み立て): `w_i ∉ H_{i+1}` (⟹ `⟨w̄_i⟩ = H̄_i`) を出し、
+     `chain_map_le_center` + `commutatorElement_pow_pow_of_central` で
      `r_i ≡ r_{i-1} r`、帰納で `r_i ≡ r₀ r^i`。そこから
      `le_pred_of_forall_mul_pow_ne_one` に流して `n ≤ q-1` ⟹ **E.3(c)**。
+     ⚠ `w_i ∉ H_{i+1}` が次の難所 — 計数 ((E.6) の `|H_i| = p·|H_{i+1}|`) と
+     `w ∉ H₁` の選び方に依存する。
 
 ### (E.10) の道具は特定済 — 要素レベル形が public (2026-07-20 実測)
 

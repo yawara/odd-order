@@ -1161,6 +1161,34 @@ instance characteristic_iterCommutator {G : Type*} [Group G] (T : Subgroup G)
         (⊤ : Subgroup G)⁆).Characteristic
       infer_instance
 
+/-- **BG's sequence from (E.9)**: `w₀ = w` and `wᵢ = ⁅wᵢ₋₁, v⁆`.
+
+The element-level counterpart of `Isaacs.Ch04.iterCommutator` (which iterates on
+*subgroups*); BG walks the chain `T = H₀ ⊃ H₁ ⊃ ⋯` with this sequence, taking `v ∈ R₀^#`
+and `w ∈ H₀ − H₁`. -/
+def commutatorIterate {G : Type*} [Group G] (w v : G) : ℕ → G
+  | 0 => w
+  | n + 1 => ⁅commutatorIterate w v n, v⁆
+
+@[simp]
+theorem commutatorIterate_zero {G : Type*} [Group G] (w v : G) :
+    commutatorIterate w v 0 = w := rfl
+
+@[simp]
+theorem commutatorIterate_succ {G : Type*} [Group G] (w v : G) (n : ℕ) :
+    commutatorIterate w v (n + 1) = ⁅commutatorIterate w v n, v⁆ := rfl
+
+/-- **BG (E.9)**: `wᵢ` walks down the chain — `wᵢ ∈ Hᵢ`.
+
+Immediate induction: `wᵢ = ⁅wᵢ₋₁, v⁆ ∈ ⁅Hᵢ₋₁, S⁆ = Hᵢ`.  Note only `w ∈ T` is needed; the
+element `v` is unconstrained, since the chain brackets against all of `S`. -/
+theorem commutatorIterate_mem_chain {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {w v : G} (hw : w ∈ T) :
+    ∀ n, commutatorIterate w v n ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n
+  | 0 => hw
+  | n + 1 =>
+      Subgroup.commutator_mem_commutator (commutatorIterate_mem_chain hw n) (Subgroup.mem_top v)
+
 /-- **BG Theorem E.3(b), Step 2, (E.12) setup**: `H̄ᵢ ≤ Z(S̄)` in `S̄ = S/Hᵢ₊₁`.
 
 BG: *"Let `S̄ = S/Hᵢ₊₁` and apply the bar convention.  Then `|H̄ᵢ| = p` and `H̄ᵢ ≤ Z(S̄)`."*

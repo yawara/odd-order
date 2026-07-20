@@ -11137,6 +11137,17 @@ in the quotient.  This centrality is exactly the hypothesis
 there. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.chain_map_le_center
 
+/-! **BG Theorem E.3(b), Step 2, (E.9): the `wᵢ` sequence** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20).
+
+* `AppE.commutatorIterate` — `w₀ = w`, `wᵢ = ⁅wᵢ₋₁, v⁆`: the **element-level** counterpart of
+  `Isaacs.Ch04.iterCommutator`, which iterates on subgroups.  No such element-level version
+  existed in the repo.
+* `AppE.commutatorIterate_mem_chain` — `wᵢ ∈ Hᵢ`, by the immediate induction
+  `wᵢ = ⁅wᵢ₋₁, v⁆ ∈ ⁅Hᵢ₋₁, S⁆ = Hᵢ`.  ⚠ Only `w ∈ T` is needed: `v` is unconstrained,
+  because the chain brackets against all of `S` rather than against `R₀`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutatorIterate_mem_chain
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
