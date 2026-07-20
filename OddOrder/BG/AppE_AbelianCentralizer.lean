@@ -477,4 +477,90 @@ theorem eigenSubgroup_eq_of_card_prime_sq {E : Type*} [Group E] [Finite E] {p : 
     · exact absurd hVk hVne
   exact (Subgroup.eq_of_le_of_card_ge hL₁ (by rw [hVcard, hL₁card])).symm
 
+/-! ## `(E.21)` first half: `r = r₀`
+
+BG: *"By `(E.18)`, there exists `β ∈ B` such that `β` does not fix `R₀Φ`.  Let us regard
+`S/S'` as a 2-dimensional vector space over `𝔽_p`.  Then `α` has eigenvalues `r` and `r₀` on
+`R₀S'/S'` and `T/S'`, respectively.  Since `β` centralizes `α`, `β` fixes both subspaces if
+`r ≠ r₀`.  Therefore `r = r₀`."* -/
+
+/-- **BG's `r = r₀`**: the eigenvalue of `α ∈ A` on `R₀S'/S'` agrees mod `p` with its
+eigenvalue on `T/S'`.
+
+If they differed, `eigenSubgroup_eq_of_card_prime_sq` would identify `R₀S'/S'` with the
+whole `r`-eigenspace, which `map_eigenSubgroup_of_commute` shows is preserved by every
+`β ∈ B` (they commute with `α` since `B` is abelian by `(E.20)`).  Pulling that back through
+`S/S' → S → R` makes `B` fix `R₀S'  = R₀Φ(S)`, contradicting `(E.18)`. -/
+theorem RegularOperatorSetup.dvd_sub_eigenvalues [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) (hcard4 : p ^ 4 ≤ Nat.card ↥(Omega R p 1))
+    (hBfix : ¬ ∀ b : B, (hyp.act b) • hyp.R₀ = hyp.R₀)
+    (habel : ∀ b b' : B, b * b' = b' * b)
+    (hSinv : IsAInvariant hyp.act (Omega R p 1))
+    (hNinv : IsAInvariant hSinv.restrict (_root_.commutator ↥(Omega R p 1)))
+    {a : B} {r r₀ : ℤ}
+    (hr : ∀ x ∈ (hyp.R₀.subgroupOf (Omega R p 1)).map
+            (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1))),
+          hNinv.quotientMulAutHom a x = x ^ r)
+    (hr₀ : ∀ x ∈ (Subgroup.centralizer
+              (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))).map
+            (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1))),
+          hNinv.quotientMulAutHom a x = x ^ r₀) :
+    (p : ℤ) ∣ r - r₀ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set S : Subgroup R := Omega R p 1 with hSdef
+  set N : Subgroup ↥S := _root_.commutator ↥S with hNdef
+  set φ : B →* MulAut ↥S := hSinv.restrict with hφdef
+  set ψ : B →* MulAut (↥S ⧸ N) := hNinv.quotientMulAutHom with hψdef
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
+  set L₁ : Subgroup (↥S ⧸ N) := R₀'.map (QuotientGroup.mk' N) with hL₁
+  have hEA := hyp.isElementaryAbelian_quotient_commutator
+  by_contra hne
+  -- The `r`-eigenspace of `ψ a` is exactly the line `R₀S'/S'`.
+  have hEq : eigenSubgroup hEA.comm (ψ a) r = L₁ :=
+    eigenSubgroup_eq_of_card_prime_sq hyp.p_prime hEA.comm hEA.pow_eq_one
+      hyp.card_omega_abelianization (ψ a) hne (fun x hx => hr x hx) (fun x hx => hr₀ x hx)
+      hyp.card_map_R₀_subgroupOf (hyp.card_map_centralizer hcard4)
+  -- Every `β ∈ B` commutes with `α` and hence preserves that eigenspace.
+  have hpres : ∀ b : B,
+      L₁.map ((ψ b : MulAut (↥S ⧸ N)) : (↥S ⧸ N) →* (↥S ⧸ N)) = L₁ := by
+    intro b
+    rw [← hEq]
+    exact map_eigenSubgroup_of_commute hEA.comm
+      (by rw [← map_mul, ← map_mul, habel]) r
+  -- Pull back to `↥S`: `R₀' ⊔ S'` is `φ b`-invariant.
+  have hcomapL₁ : (L₁.comap (QuotientGroup.mk' N)) = R₀' ⊔ N := by
+    rw [hL₁, Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+  have hpresS : ∀ b : B,
+      (R₀' ⊔ N).map ((φ b : MulAut ↥S) : ↥S →* ↥S) = R₀' ⊔ N := by
+    intro b
+    refine Subgroup.eq_of_le_of_card_ge ?_ (le_of_eq ?_)
+    · rintro _ ⟨x, hx, rfl⟩
+      rw [← hcomapL₁] at hx ⊢
+      have hmk : (QuotientGroup.mk' N) (((φ b : MulAut ↥S) : ↥S →* ↥S) x) =
+          (ψ b) ((QuotientGroup.mk' N) x) := rfl
+      rw [Subgroup.mem_comap, hmk]
+      rw [← hpres b]
+      exact ⟨_, hx, rfl⟩
+    · exact Nat.card_congr (Subgroup.equivMapOfInjective (R₀' ⊔ N)
+        ((φ b : MulAut ↥S) : ↥S →* ↥S) (φ b).injective).toEquiv
+  -- Push forward to `R`: `B` fixes `R₀ ⊔ (Ω₁ R)'`, i.e. `R₀Φ(S)`.
+  have hambient : ∀ b : B, (hyp.act b) • (hyp.R₀ ⊔ derivedInG S) = hyp.R₀ ⊔ derivedInG S := by
+    intro b
+    have hbridge := map_subtype_sup_commutator (H := hyp.R₀) (K := S) hyp.R₀_le_omega
+    calc (hyp.act b) • (hyp.R₀ ⊔ derivedInG S)
+        = (hyp.R₀ ⊔ derivedInG S).map ((hyp.act b : MulAut R) : R →* R) :=
+          pointwise_mulAut_smul_eq_map _ _
+      _ = ((R₀' ⊔ N).map S.subtype).map ((hyp.act b : MulAut R) : R →* R) := by rw [hbridge]
+      _ = ((R₀' ⊔ N).map ((φ b : MulAut ↥S) : ↥S →* ↥S)).map S.subtype := by
+          have hcomp : ((hyp.act b : MulAut R) : R →* R).comp S.subtype
+              = S.subtype.comp ((φ b : MulAut ↥S) : ↥S →* ↥S) := MonoidHom.ext fun _ => rfl
+          rw [Subgroup.map_map, Subgroup.map_map, hcomp]
+      _ = (R₀' ⊔ N).map S.subtype := by rw [hpresS b]
+      _ = hyp.R₀ ⊔ derivedInG S := hbridge
+  -- That is `(E.18)`'s negation.
+  refine hBfix (hyp.B_fixes_R₀_of_fixes_frattini ?_)
+  intro b
+  rw [hyp.frattiniInG_omega_eq_derivedInG]
+  exact hambient b
+
 end OddOrder.BG.AppE
