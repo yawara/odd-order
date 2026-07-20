@@ -1155,3 +1155,35 @@ mathlib の `frattini_le_comap_frattini_of_surjective` 経由で組む必要は�
 ⟹ `\|orbit\| = \|S'\| = \|vS'\|` ⟹ `Set.eq_of_subset_of_ncard_le`。
 ⚠ 剰余類のサイズ `\|v • K\| = \|K\|` は左移動が全単射だから (mathlib の
 `Set.ncard_image_of_injective` + `Set.smul_set_eq_image` あたり、名前は要実測)。
+
+## 2026-07-20 (23): Step 4 — 共役類 = `vS'` と `R₀S'−S'` の共役性
+
+| 宣言 | 内容 |
+|---|---|
+| `RegularOperatorSetup.orbit_eq_coset` | **共役類 = `vS'`** (包含 + サイズ一致) |
+| `RegularOperatorSetup.exists_conj_mem_R₀` | **`R₀S' − S'` の元は `R₀^#` に共役** |
+
+⭐ `orbit_eq_coset` が **Appendix E で (E.15) が使われる唯一の箇所**。Step 2 では
+積公式が同じ情報をより直接与えるので (E.15) は迂回されていた。
+
+### 次: `R₀^β = R₀^x` (∃x ∈ S)
+
+`v ∈ R₀^#` を取る。
+
+1. `act b • R₀ = zpowers (act b v)` (自己同型による `zpowers` の像)。
+2. `act b v ∈ R₀S'`: 仮定 `B` が `R₀S'` を固定。
+3. `act b v ∉ S'`: `S' = derivedInG (Ω₁(R))` は characteristic (⟹ B-不変) で、
+   `v ∉ S'` (`R₀ ⊄ S'` = **`R₀_not_le_derived_omega`** と `|R₀| = p` 素数から
+   `R₀ ⊓ S' = ⊥`)。`act b` は単射で `S'` を保つので像も外に出る。
+4. ⟹ `exists_conj_mem_R₀` で `act b v = x u x⁻¹` (∃`x ∈ S`, `u ∈ R₀^#`)。
+5. ⟹ `act b • R₀ = zpowers (x u x⁻¹) = x · zpowers u · x⁻¹ = x R₀ x⁻¹`。
+
+⚠ 3 の `R₀ ⊓ S' = ⊥` を小補題として先に切り出すのが安全
+(`R₀_not_le_derived_omega` + 位数 p の素数性)。
+
+### その後 (Step 4 の残り)
+
+- 半直積 `G = S ⋊ B` の配線 (mathlib `SemidirectProduct`)
+- Frattini 変形 `SB = S·N_G(R₀)`
+- Schur–Zassenhaus (`OddOrder/Mathlib/SchurZassenhausConj.lean` に既存)
+- coprime 固定点 (`|A| = q` vs p 冪の剰余類)
