@@ -11076,6 +11076,22 @@ section) and then `AppE.exists_zpow_eq_of_card_eq_prime` (giving BG's eigenvalue
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.isAInvariant_subgroupOf_chain
 
+/-! **BG Theorem E.3(b), Step 2, (E.9) COMPLETE — the section eigenvalue `rᵢ`**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`RegularOperatorSetup.exists_zpow_eq_on_chain_section`.
+
+BG: *"by (E.6), for `i = 0,…,n−1`, `wᵢᵃ ≡ wᵢ^{rᵢ} (mod Hᵢ₊₁)` for some integers `rᵢ` such
+that `rᵢ^q ≡ 1 (mod p)`."*  Assembled from parts that all already existed: the section has
+order `p` (`index_subgroupOf_chain`), it carries the induced `A`-action
+(`isAInvariant_subgroupOf_chain` fed to `Isaacs.Ch03.IsAInvariant.quotientMulAutHom`), and
+`AppE.exists_zpow_eq_of_card_eq_prime` turns that into the power map plus the congruence.
+BG's "`≡ mod Hᵢ₊₁`" is this statement read in the quotient.
+
+`AppE.characteristic_iterCommutator` became an **instance** here, so that the normality of
+`Hᵢ₊₁.subgroupOf Hᵢ` needed to even state the quotient action is found by inference. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.exists_zpow_eq_on_chain_section
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

@@ -511,7 +511,13 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
      「`H_i` の中での `H_{i+1}` の指数」の形に言い換え = quotient 機構が要求する形)。
    - `isAInvariant_subgroupOf_chain`: `H_{i+1}` は `↥H_i` の中で A-不変
      (`isAInvariant_iterCommutator` を `↥H_i` 上の制限作用に移送)。
-5. ⬜ **切断 `H_i/H_{i+1}` への誘導作用の組み立て**。道具は repo にある:
+5. ✅ **(E.9) 完了** = `exists_zpow_eq_on_chain_section`:
+   `a ∈ A` に対し切断 `H_i/H_{i+1}` (位数 p) 上の誘導自己同型は冪写像 `x ↦ xʳ` で
+   `r^q ≡ 1 (mod p)`。BG の `wᵢᵃ ≡ wᵢ^{rᵢ} (mod H_{i+1})` はこれを商で読んだもの。
+   すべて既存部品の組み立てで、証明は 8 行。
+   ⚠ `characteristic_iterCommutator` を **instance 化**した — 商作用を*述べる*のに要る
+   `H_{i+1}.subgroupOf H_i` の正規性が推論で見つかるようにするため。
+   (旧メモ) 道具は repo にある:
    **`Isaacs.Ch03.IsAInvariant.quotientMulAutHom`** (+ `_apply_mk'`) が
    `IsAInvariant φ N` (N 正規) から `A →* MulAut (G ⧸ N)` を作る。多数の file で使用実績あり。
    ⚠ ただし要るのは `↥S ⧸ ...` でなく **`↥H_i ⧸ (H_{i+1}.subgroupOf H_i)`** なので、
