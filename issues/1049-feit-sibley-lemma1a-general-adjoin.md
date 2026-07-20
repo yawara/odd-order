@@ -132,12 +132,11 @@ rational 要否を確定すること。
 **⟹ integer-ratio engine は完成・FeitSibley-satisfiable。abstract `coherent_adjoin_of_degree_bound`
 (anchor|ψ のみ ⟹ rational 比許容) を faithful に閉じるには rational engine が必須。**
 
-- [ ] **rational engine** (次の主タスク): inner_Y_extension_member_eq / crux1_of_memberFamily /
-  adjoinPairCoherent を **scaled-difference** `d₁·χᵢ − dⱼ·χ₁` (整数係数, ∈ℤ[S₁], degree 0) +
-  `rc = dⱼ/d₁ : ℝ` へ再導出。⟨Y,νχᵢ⟩ = a·⟨χ₁,χᵢ⟩ − (a·m₁+μ)·(dⱼ/d₁)。核心
-  `lambda_eq_zero_and_Z_eq_zero` (real rc/mc) はそのまま。bridge/decompositionDaFromDiff は不変
-  (度数比を含まない)。degree bound = Peterfalvi の 2·ψ(1)·χ₁(1)<∑χ(1)²。
-- [ ] **FeitSibley 配線**: `coherent_adjoin_of_degree_bound` を rational engine へ。member family=S₀
+- [x] **rational engine** ⭐ 完成 (commit cb7429704, build green)。inner_Y (scaled diff `d₁·χᵢ−dⱼ·χ₁`,
+  division-free scaled 形) / crux1 (rc:ι→ℝ) / adjoinPair (degMem:ι→ℕ 絶対度数, rc=degMem i/degMem i₁,
+  hcoeffval を scaled inner_Y ÷ d₁ で導出, bound 2a<∑(degMem i/degMem i₁)²)。**faithful な任意度数
+  Isaacs 7.14 = integer case を subsume**。bridge/decompositionDaFromDiff/cross-term は不変。
+- [ ] **FeitSibley 配線** (残り唯一): `coherent_adjoin_of_degree_bound` を rational engine へ。member family=S₀
   (index=S₀ 元, 直交正規性は 𝒮⊆Irr + pairwise_orthogonal), R-family=`hyp.difference_image`,
   hisom=`hyp.adjoin_hisom`, hSgen=`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`,
   hgen=`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`。⚠ FeitSibley に S08_GeneralAdjoin
