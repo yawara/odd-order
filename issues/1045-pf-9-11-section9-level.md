@@ -231,7 +231,20 @@ noncomputable def inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
 `theorem` が正しい。(`inducedNonKernelFamily_subcoherent` は `S07.Hypothesis` = データを返すので
 `noncomputable def` のままでよい。返り値が `Prop` かどうかで使い分ける。)
 
-**残り**: (b) §9 instantiation → (c) `sOf_degreeSubfamily_isCoherent` の置換 → (d) (9.11) 本体。
+### ✅ (b) 完了 (2026-07-20): `S11.sOf_degreeSubfamily_coherent`
+
+`𝒮(Y)` の degree-`d` 既約 cut の coherence を **(8.15.3) → (5.7)** で組んだ
+(`S11_NineElevenSubcoherentBridge.lean`)。axiom-clean、AxiomsCheck 登録済。
+**これで (9.11) base case が §10 μ-grid engine から独立した** — 経路上に型仮定は一つも無い。
+
+⚠ `h46.K` / `h46.subH` を `M′` / `M_σ` にピンする `hKeq` / `hHeq` は**仮説として取る**。
+定義的に一致すると仮定して `Hypothesis46Core` をこの場で組み直すと、
+`typePACore_toHypothesis46_core` が作る copy と defeq にならない (本日 1 度踏んだ失敗)。
+⟹ 呼び出し側が `typePACore_toHypothesis46_core` の `h46` をそのまま渡し、
+`hKeq`/`hHeq` は `rfl` 相当で埋める想定。
+
+**残り**: (c) `sOf_degreeSubfamily_isCoherent` (S13_Lemmas113To115.lean:588) の
+§10 依存を (b) で置換 → (d) (9.11) statement 本体。
 
 ### (参考) 実装レシピ
 

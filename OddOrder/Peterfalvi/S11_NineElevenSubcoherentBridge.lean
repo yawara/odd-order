@@ -87,4 +87,47 @@ theorem sOf_subset_inducedNonKernelFamily [Finite G] {M : Subgroup G}
     exact hχ.1 fun x hx => hsub (SetLike.mem_coe.mpr (hle (SetLike.mem_coe.mp hx)))
   exact hKeq ▸ hbase
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(9.11) base coherence at §9 level**: the degree-`d` irreducible cut of `𝒮(Y)` is coherent.
+
+This is the step that takes the (9.11) base case off the §10 μ-grid engine.  The repo obtained it
+from `S12.Hypothesis.inducedFamily_degreeSubfamily_isCoherent`, which needs a `S13.Hypothesis` and
+hence types III/IV; Peterfalvi instead routes it through **(8.15.3) then (5.7)**, neither of which
+carries a type hypothesis.  Here that route is assembled:
+
+* the cut sits inside the (8.15.3) family — `sOf_subset_inducedNonKernelFamily`;
+* it is conjugation-closed — `irrCut_conjClosed` (§9-level since issue 1045);
+* it is finite — `sOf_finite` (§9-level since issue 1045);
+* (5.3.b) + (5.7) — `S10.inducedNonKernelFamily_degreeSubfamily_coherent`.
+
+⚠ `h2 : 2 ≤ ncard` stays exposed, as in the §8 companion and in
+`S15.Hypothesis.sSetIrrDeg_coherent`: the (9.8.d) count gives `∃ ζ`, not two members.
+
+`hKeq`/`hHeq` pin Hypothesis (4.6)'s `K` and `H` to `M'` and `M_σ` — the book's choice, supplied by
+`S10.typePACore_toHypothesis46_core`.  They are taken as hypotheses rather than assumed
+definitionally so that no `Hypothesis46Core` has to be rebuilt here (rebuilding it is what makes
+the two copies fail to be definitionally equal). -/
+theorem sOf_degreeSubfamily_coherent [Finite G] {M : Subgroup G} {A : Set G}
+    (hodd : Odd (Nat.card ↥M))
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46Core A M)
+    (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
+    (hKeq : h46.K = (derivedInG M).subgroupOf M)
+    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hd0 : ((d : ℂ)) ≠ 0)
+    (h2 : 2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard)
+    (h1A : (1 : ↥M) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent hodd h46 dd
+        (hKeq ▸ hHeq ▸ (fun _ hx => sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
+        (fun _ hx => hx.2.1)
+        (fun _ hx => irrCut_conjClosed data Y d hx)).tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
+  OddOrder.Peterfalvi.S10.inducedNonKernelFamily_degreeSubfamily_coherent hodd h46 dd _ _ _
+    ((sOf_finite data Y).subset fun _ hx => hx.1) h2 (d : ℂ) (fun _ hx => hx.2.2) hd0 h1A
+
 end OddOrder.Peterfalvi.S11

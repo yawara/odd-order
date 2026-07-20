@@ -11223,3 +11223,8 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- and with it the type-III/IV restriction.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.hInHu_le_Msigma_subgroupOf
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_subset_inducedNonKernelFamily
+-- **(9.11) base coherence at §9 level**: the degree-`d` irreducible cut of `𝒮(Y)` is coherent,
+-- assembled as (8.15.3) then (5.7) — the book's own route — instead of the §10 μ-grid engine
+-- `S12.Hypothesis.inducedFamily_degreeSubfamily_isCoherent`, which needs a `S13.Hypothesis` and
+-- hence types III/IV.  No type hypothesis anywhere in this route.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent
