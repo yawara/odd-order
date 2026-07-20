@@ -423,12 +423,18 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       `Φ(P) ≤ Z(P)` を得た。従って `γ₂(P)=Φ(P)`, `γ₃(P)=1` であり、
       elementary-abelian kernel の square subgroupも消えるため
       `lowerCentralLayerKernel P 1 = ⊥` まで actual に同定済みである。
+      同 leaf で各 inclusive type-A model の concrete quadratic extension 全体を
+      factor へ輸送し、short exact sequence の quotient projection の核を
+      `(Φ(P)).subgroupOf S` と同定した。実際の左右 factor はともに `Φ(P)` を含むため、
+      両 kernel field を同じ ambient `Φ(P)` へ移す group equivalence と、そこから得る
+      左右 kernel 間 transition も構成済みである。これは honest な additive/group-level
+      共通中心座標だが、field multiplication や actor action との整合性はまだ主張しない。
       原典 p. 81 の B/C/D 定義表と pp. 90--92 の case proof も再監査し、p. 91 の
       type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
       p. 81 の表と直前の commutator formula から確認した。抽出画像は
       `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
-      次の source frontier は、二つの独立な model equivalence を共通 `Φ(P)` 座標と
-      actor-compatible quotient 座標へ揃え、mixed commutator pairing の固有値制約から
+      次の source frontier は、この group-level 共通 `Φ(P)` 座標を actor-compatible な
+      semilinear/Frobenius 座標へ強化し、mixed commutator pairing の固有値制約から
       type B/C/D の四場合を分岐する gluing case analysis である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に

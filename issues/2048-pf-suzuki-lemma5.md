@@ -292,6 +292,14 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               `[P,P] = Φ(P) ≤ Z(P)` を証明する
         - [x] `lowerCentralTerm P 1 = Φ(P)`, `lowerCentralTerm P 2 = ⊥` と
               `lowerCentralLayerKernel P 1 = ⊥` を証明する
+      - [x] 二つの type-A factor の group-level central-extension 座標を
+            ambient `Φ(P)` に接続する
+        - [x] concrete type-A model の short exact sequence を factor へ輸送し、
+              quotient projection の核が `(Φ(P)).subgroupOf S` であることを証明する
+        - [x] `Φ(P) ≤ X,Y` を使い、左右 kernel field を同一の ambient
+              `Φ(P)` へ移す additive group equivalence とその transition を構成する
+        - [ ] kernel transition が有限体の積および actor action と両立する
+              semilinear/Frobenius 座標であることを証明する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
