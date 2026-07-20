@@ -10839,6 +10839,31 @@ narrow machinery, so the appendix only has to feed it.
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.card_omega1Center_and_index_centralizer
 
+/-! **BG Theorem E.3(b), Step 2 — `R₀ ⊄ S'` unconditionally** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20).  BG splits Step 2 at `|S| ≤ p³`, dispatching the small side by
+*"an examination of the `p`-groups of order at most `p³`"* — an elision.  No examination is
+needed for this clause:
+
+* `RegularOperatorSetup.derived_central_of_card_le_prime_cube` — `|S| ≤ p³` gives `cl(S) ≤ 2`
+  (`Ch1.S04.nilpotencyClass_le_of_card_le_pow`), i.e. `S' ≤ Z(S)`.
+* `RegularOperatorSetup.not_le_derivedInG_of_derived_central` — and *that* already kills
+  `R₀ ≤ S'`: it would make `S` centralize `R₀`, hence lie in the **abelian** `C_R(R₀)`,
+  forcing `S' = 1` and `R₀ = 1` against `|R₀| = p`.  (No `R₀ ≤ S` hypothesis needed.)
+* `RegularOperatorSetup.not_le_derivedInG` — the two branches joined at
+  `three_le_pRank_of_prime_cube_lt_card`: **BG's `R₀ ⊄ S'` for every exponent-`p` `S ≥ R₀`**.
+  ⚠ BG also assumes `S` is `A`-invariant and `R₀ < S` properly; neither is used.
+* `RegularOperatorSetup.R₀_le_omega` — `R₀ ≤ Ω₁(R)`.
+
+⚠ `RegularOperatorSetup.R₀_not_le_derived_omega` (E.3(b)'s **second clause**) is now genuinely
+proved *from* these, but it cites the still-sorried first clause `omega_pow_eq_one` (BG's
+Step 3) for the exponent hypothesis, so it is deliberately **not** asserted here. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.derived_central_of_card_le_prime_cube
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.not_le_derivedInG_of_derived_central
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.not_le_derivedInG
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_le_omega
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
