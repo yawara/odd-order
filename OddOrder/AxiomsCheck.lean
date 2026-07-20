@@ -11583,3 +11583,11 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `hyp.H0Cprime`, `hyp.C`) plus `tau`/`A0`, which are parameters here — so the descent is a rename,
 -- not new mathematics, and the (9.11.1) squeeze argument is unchanged.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_refuter_of_equality_refutation
+-- **The `Dmem` input of the (5.6) engine, at §9 level** — `CharacterPsiDecomposition` at `ψ = 0`
+-- built by `ofProjection` from the §9 `R`-family.  The map is the *coherent extension*, not `τ`:
+-- at `ψ = 0` the `ofProjection` obligation `tau1 χ ∈ ℤ[Irr G]` is false for the Dade map (an
+-- isometry only on the supported lattice) but is exactly `IsCoherent.extension_mem_ZIrr`.
+-- This is what lets `S08.coherentDegreeSqNormBound_of_not_coherentW_k` be fed **without**
+-- `S13.sixTwoDecompositionData`, whose μ-grid `params` exist only to manufacture these data from
+-- the §10 packaging (issue 1045).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_memberPsiDecomposition

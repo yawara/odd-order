@@ -933,6 +933,66 @@ theorem sOf_degreeSubfamily_coherent_restrict [Finite G] {M : Subgroup G} {A : S
         OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
           (h46.dade0.restrict Set.subset_union_left hAnorm) _ hφ.2, hdd]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The per-member `ψ = 0` decomposition datum, at §9 level** — the `Dmem` input of the
+norm-weighted (5.6) engine `S08.coherentDegreeSqNormBound_of_not_coherentW_k`.
+
+For a member `χ` of a coherent conjugation-closed `S₁ ⊆ 𝒮(Y)`,
+`CharacterPsiDecomposition.ofProjection` turns the §9 `R`-family `sOf_memberRFamily` into the
+decomposition datum at `ψ = 0`.  The map is the
+**coherent extension**, not `τ`: at `ψ = 0` the `ofProjection` obligation `tau1 (χ − ψ) ∈ ℤ[Irr G]`
+reads `tau1 χ ∈ ℤ[Irr G]`, which is false for `τ` (the Dade map is an isometry only on the
+*supported* lattice) but is exactly `IsCoherent.extension_mem_ZIrr`.
+
+This is what lets the (5.6) engine be fed **without** `S13.sixTwoDecompositionData`, whose μ-grid
+`params` exist only to manufacture these data from the §10 packaging (issue 1045). -/
+noncomputable def sOf_memberPsiDecomposition [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    {Y : Subgroup G} {S₁ : Set (ClassFunction ↥M ℂ)} {A0 : Set ↥M}
+    (hS₁sub : S₁ ⊆ sOf data Y)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) S₁ A0)
+    {χ : ClassFunction ↥M ℂ} (hχS₁ : χ ∈ S₁)
+    (hsuppχ : ((χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj).support ⊆ A0) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) χ 0 := by
+  classical
+  haveI := derivedInG_subgroupOf_normal M
+  have hχ : χ ∈ sOf data Y := hS₁sub hχS₁
+  have hχc : (χ : ClassFunction ↥M ℂ).conj ∈ S₁ := hS₁conj hχS₁
+  -- the two generators of the relevant lattice lie in `ℤ[S₁]`
+  have hspan : ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
+      {(χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj, (χ : ClassFunction ↥M ℂ) - 0},
+      φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) S₁ := by
+    intro φ hφ
+    refine Submodule.span_le.mpr ?_ hφ
+    rintro s (rfl | rfl)
+    · exact Submodule.sub_mem _ (Submodule.subset_span hχS₁) (Submodule.subset_span hχc)
+    · rw [sub_zero]; exact Submodule.subset_span hχS₁
+  refine OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+    (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hχ) hS₁coh.extension
+    (fun φ ζ hφ hζ => hS₁coh.extension_inner_eq φ ζ (hspan φ hφ) (hspan ζ hζ))
+    (hS₁coh.extends_on_supported _ ⟨?_, hsuppχ⟩) ?_ (by simp) (by simp) ?_
+  · exact Submodule.sub_mem _ (Submodule.subset_span hχS₁) (Submodule.subset_span hχc)
+  · rw [sub_zero]
+    exact hS₁coh.extension_mem_ZIrr _ (Submodule.subset_span hχS₁)
+  · -- `⟨χ, χ̄⟩ = 0`: distinct members of the `⊥`-kernel family are orthogonal, and `χ ≠ χ̄`
+    refine OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
+      (sOf_subset_inducedKernelFamily_bot hG hM data Y hχ)
+      (sOf_subset_inducedKernelFamily_bot hG hM data Y (hS₁sub hχc)) ?_
+    exact fun h => OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+      (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M)
+      (sOf_subset_inducedKernelFamily_bot hG hM data Y hχ) h.symm
+
 /-! ### (9.11.1): the case (9.7.a) maximality refuter, at §9 level
 
 The §13 forms (`S13.NineElevenPairBound`, `S13.NineElevenEqualityRefutation`,
