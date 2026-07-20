@@ -431,6 +431,11 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       両 kernel field を同じ ambient `Φ(P)` へ移す group equivalence と、そこから得る
       左右 kernel 間 transition も構成済みである。これは honest な additive/group-level
       共通中心座標だが、field multiplication や actor action との整合性はまだ主張しない。
+      これを任意な field transition へ昇格するのではなく、原典 p. 89 の順序どおり
+      ambient `Φ(P)` の実際の restricted actor representation に Singer theorem を直接
+      適用した。共通 generator `c`、primitive scalar `ν`、`Φ(P) ≃ₗ GF(2,n)`、
+      Frobenius eigenbasis を一括して構成し、複数 involution から `n ≥ 2`、左右
+      type-A factor の既存 parameter との一致も証明した。
       さらに上記の noncommuting mixed-factor witness を actual ambient
       `lowerCentralCommutatorBilinear` の非零値へ接続し、左右 factor に属する代表元の
       provenance も保持した。したがって原典 p. 90 の固有値比較へ入る非零 pairing は
@@ -439,9 +444,10 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
       p. 81 の表と直前の commutator formula から確認した。抽出画像は
       `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
-      次の source frontier は、すでに equivariant なこの mixed pairing を、左右因子と
-      共通 `Φ(P)` の actor-compatible な semilinear/Frobenius 座標へ制限・表示し、
-      固有値制約から type B/C/D の四場合を分岐する gluing case analysis である。
+      次の source frontier は、この prescribed common `Φ(P)` 座標に合わせて左右 factor
+      の quotient 座標を構成し、`ν = λ·θ(λ) = μ·φ(μ)` と mixed pairing の
+      actor covariance を座標表示することである。その後、固有値制約から type B/C/D
+      の四場合を分岐する gluing case analysis へ進む。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。

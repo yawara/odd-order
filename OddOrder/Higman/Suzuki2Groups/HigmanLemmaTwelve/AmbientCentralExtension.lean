@@ -34,8 +34,11 @@ namespace OddOrder.Higman.Suzuki2Groups
 open scoped commutatorElement
 open OddOrder.GroupTheory
 open OddOrder.GroupTheory.Suzuki2Group
+open OddOrder.RepresentationTheory
 open OddOrder.Isaacs.Ch03
 open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
+open Module
+open scoped IsMulCommutative
 
 universe uP uF
 
@@ -259,6 +262,143 @@ theorem lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
   rw [← lowerCentralLayerKernelInAmbient_subgroupOf P 1, hAmbient]
   simp
 
+noncomputable section
+
+/-- **Higman Lemma 12 (p. 89), common-center Singer coordinates.**
+
+The ambient actor admits one common finite-field coordinate on `Φ(P)`, chosen
+before coordinates on either type-A factor.  The returned generator acts as
+multiplication by the primitive scalar `nu`; `b` is the corresponding
+Frobenius eigenbasis after scalar extension.  In particular, these are
+coordinates for the actual restricted ambient action, not a field structure
+promoted from an arbitrary additive transition between the two factors. -/
+theorem exists_ambientFrattiniSingerCoordinates_of_xiLengthThree
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+      IsAInvariant.of_characteristic Y.subtype
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+    ∃ (c : Y)
+      (e : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n)
+      (b : Basis (Fin n) (GaloisField 2 n)
+        (TensorProduct (ZMod 2) (GaloisField 2 n)
+          (Additive ↑(frattini P)))),
+      2 ≤ n ∧
+      (∀ g : Y, g ∈ Subgroup.zpowers c) ∧
+      IsPrimitiveRoot nu (2 ^ n - 1) ∧
+      e.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu ∧
+      Algebra.adjoin (ZMod 2) ({nu} : Set (GaloisField 2 n)) = ⊤ ∧
+      ∀ i, (elabRepresentation 2 hPhiInv.restrict c).baseChange
+          (GaloisField 2 n) (b i) =
+        nu ^ (2 ^ i.val) • b i := by
+  classical
+  dsimp only
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+  let rho : Representation (ZMod 2) Y (Additive ↑(frattini P)) :=
+    elabRepresentation 2 hPhiInv.restrict
+  have htransInv : ∀ x ∈ involutions ↑(frattini P),
+      ∀ y ∈ involutions ↑(frattini P),
+        ∃ g : Y, hPhiInv.restrict g x = y :=
+    restricted_involutions_transitive Y.subtype hPhiInv hxi.transitive
+  have htrans : ∀ v w : Additive ↑(frattini P),
+      v ≠ 0 → w ≠ 0 → ∃ g : Y, rho g v = w := by
+    intro v w hv hw
+    have hvInv : v.toMul ∈ involutions ↑(frattini P) := by
+      refine ⟨hEA.pow_eq_one v.toMul, ?_⟩
+      intro hvOne
+      apply hv
+      apply Additive.toMul.injective
+      simpa using hvOne
+    have hwInv : w.toMul ∈ involutions ↑(frattini P) := by
+      refine ⟨hEA.pow_eq_one w.toMul, ?_⟩
+      intro hwOne
+      apply hw
+      apply Additive.toMul.injective
+      simpa using hwOne
+    obtain ⟨g, hg⟩ := htransInv v.toMul hvInv w.toMul hwInv
+    refine ⟨g, ?_⟩
+    change Additive.ofMul (hPhiInv.restrict g v.toMul) = w
+    simpa using congrArg Additive.ofMul hg
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hbot
+    have hcommBot : _root_.commutator P = ⊥ :=
+      le_bot_iff.mp
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          (le_of_eq hbot))
+    exact hncomm ((commutator_eq_bot_iff P).mp hcommBot)
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hPhiInv hPhiNeBot
+  obtain ⟨x, y, hxInv, hyInv, hxy⟩ := hmulti
+  let xPhi : ↑(frattini P) := ⟨x, hinvPhi hxInv⟩
+  let yPhi : ↑(frattini P) := ⟨y, hinvPhi hyInv⟩
+  have hxPhiOne : xPhi ≠ 1 := by
+    intro hx
+    exact hxInv.2 (congrArg Subtype.val hx)
+  have hyPhiOne : yPhi ≠ 1 := by
+    intro hy
+    exact hyInv.2 (congrArg Subtype.val hy)
+  have hxyPhi : xPhi ≠ yPhi := by
+    intro h
+    exact hxy (congrArg Subtype.val h)
+  have hOneNot : 1 ∉ ({xPhi, yPhi} : Set ↑(frattini P)) := by
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff, not_or]
+    exact ⟨hxPhiOne.symm, hyPhiOne.symm⟩
+  have hxNot : xPhi ∉ ({yPhi} : Set ↑(frattini P)) := by
+    simpa only [Set.mem_singleton_iff] using hxyPhi
+  have hsetCard : ({1, xPhi, yPhi} : Set ↑(frattini P)).ncard = 3 := by
+    rw [Set.ncard_insert_of_notMem hOneNot,
+      Set.ncard_insert_of_notMem hxNot]
+    simp
+  have hthree : 3 ≤ Nat.card ↑(frattini P) := by
+    have hle := Set.ncard_mono
+      (Set.subset_univ ({1, xPhi, yPhi} : Set ↑(frattini P)))
+    rw [hsetCard, Set.ncard_univ] at hle
+    exact hle
+  have hcard : Nat.card ↑(frattini P) = 2 ^ n := by
+    simpa [n] using hEA.card_eq_pow_finrank
+  have hnTwo : 2 ≤ n := by
+    by_contra hn
+    have hnle : n ≤ 1 := by omega
+    interval_cases n <;>
+      norm_num only [pow_zero, pow_one] at hcard <;> omega
+  letI : IsCyclic Y := hxi.cyclic
+  letI : CommGroup Y := IsCyclic.commGroup
+  obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
+  obtain ⟨e, nu, b, hprim, hconj, hgen, hb⟩ :=
+    exists_singerFrobeniusEigenbasis_of_transitive_generator
+      rho n hnTwo rfl htrans c hcgen
+  exact ⟨c, e, nu, b, hnTwo, hcgen, hprim, hconj, hgen, hb⟩
+
+end
+
 end
 
 namespace XiLengthTwoTypeAData
@@ -431,6 +571,37 @@ local instance : Finite data.right_model.F := data.right_model.finiteF
 local instance : CharP data.right_model.F 2 := data.right_model.charTwoF
 local instance : Algebra (ZMod 2) data.right_model.F :=
   ZMod.algebra data.right_model.F 2
+
+/-- The common ambient Frattini field and either type-A factor have the same
+degree over `𝔽₂`.
+
+This connects the Singer coordinate constructed directly on `Φ(P)` to the
+common parameter already obtained from the two factor models. -/
+theorem frattini_finrank_eq_parameter [Finite P]
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P)) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    Module.finrank (ZMod 2) (Additive ↑(frattini P)) =
+      data.left_model.parameter := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  apply Nat.pow_right_injective le_rfl
+  calc
+    2 ^ Module.finrank (ZMod 2) (Additive ↑(frattini P)) =
+        Nat.card ↑(frattini P) := hEA.card_eq_pow_finrank.symm
+    _ = Nat.card (Multiplicative data.left_model.F) :=
+      (Nat.card_congr
+        (data.left_model.modelKernelEquivFrattini hinvPhi hEA
+          data.frattini_lt_left.le).toEquiv).symm
+    _ = Nat.card data.left_model.F :=
+      Nat.card_congr Multiplicative.toAdd
+    _ = 2 ^ data.left_model.parameter := data.left_model.card_field
 
 /-- The actual additive transition between the two type-A kernel fields,
 obtained by identifying both kernels with the same ambient `Φ(P)`.
