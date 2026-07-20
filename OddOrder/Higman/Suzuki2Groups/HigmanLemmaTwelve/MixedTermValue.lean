@@ -186,6 +186,52 @@ theorem frob_bilinear_coeff_zero (n : ℕ) (hn : n ≠ 0)
   have := step1 α j
   simpa [smul_eq_mul] using this
 
+/-- The `i`-th Frobenius power is the `2^i` power map. -/
+theorem frobeniusEquiv_pow_apply {F : Type*} [Field F] [Finite F] [CharP F 2]
+    (i : ℕ) (x : F) : (frobeniusEquiv F 2 ^ i) x = x ^ (2 ^ i) := by
+  rw [← iterateFrobeniusEquiv_eq_pow]
+  exact (iterateFrobeniusEquiv_def F 2 i x).symm
+
+/-- **Extraction from the mixed-term functional equation.**  A `ZMod 2`-bilinear
+`M` obeying `M(λα, μβ) = ν · M(α, β)` is a Frobenius polynomial whose coefficient
+`c_{ij}` satisfies `c_{ij} · λ^{2^i} μ^{2^j} = ν · c_{ij}` — so `c_{ij}` vanishes
+unless `λ^{2^i} μ^{2^j} = ν`.  This is exactly Higman's mixed-term constraint. -/
+theorem bilinear_equivariance_coeff (n : ℕ) (hn : n ≠ 0)
+    (M : GaloisField 2 n →ₗ[ZMod 2]
+      (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n))
+    (lam mu nu : GaloisField 2 n)
+    (hequiv : ∀ α β : GaloisField 2 n, M (lam * α) (mu * β) = nu * M α β) :
+    ∃ c : Fin n → Fin n → GaloisField 2 n,
+      (∀ α β : GaloisField 2 n, M α β = ∑ i : Fin n, ∑ j : Fin n,
+        c i j • ((frobeniusEquiv (GaloisField 2 n) 2 ^ (i : ℕ)) α *
+          (frobeniusEquiv (GaloisField 2 n) 2 ^ (j : ℕ)) β)) ∧
+      (∀ i j : Fin n,
+        c i j * (lam ^ (2 ^ (i : ℕ)) * mu ^ (2 ^ (j : ℕ))) = nu * c i j) := by
+  obtain ⟨c, hc⟩ := bilinear_frobenius_repr n hn M
+  refine ⟨c, hc, ?_⟩
+  have hkey : ∀ α β : GaloisField 2 n,
+      ∑ i : Fin n, ∑ j : Fin n,
+        (c i j * (lam ^ (2 ^ (i:ℕ)) * mu ^ (2 ^ (j:ℕ))) - nu * c i j) •
+          ((frobeniusEquiv (GaloisField 2 n) 2 ^ (i:ℕ)) α *
+            (frobeniusEquiv (GaloisField 2 n) 2 ^ (j:ℕ)) β) = 0 := by
+    intro α β
+    have heq : ∑ i : Fin n, ∑ j : Fin n,
+        (c i j * (lam ^ (2 ^ (i:ℕ)) * mu ^ (2 ^ (j:ℕ))) - nu * c i j) •
+          ((frobeniusEquiv (GaloisField 2 n) 2 ^ (i:ℕ)) α *
+            (frobeniusEquiv (GaloisField 2 n) 2 ^ (j:ℕ)) β)
+        = M (lam * α) (mu * β) - nu * M α β := by
+      rw [hc (lam * α) (mu * β), hc α β, Finset.mul_sum, ← Finset.sum_sub_distrib]
+      refine Finset.sum_congr rfl (fun i _ => ?_)
+      rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+      refine Finset.sum_congr rfl (fun j _ => ?_)
+      simp only [map_mul, frobeniusEquiv_pow_apply, smul_eq_mul]
+      ring
+    rw [heq, hequiv, sub_self]
+  have hzero := frob_bilinear_coeff_zero n hn
+    (fun i j => c i j * (lam ^ (2 ^ (i:ℕ)) * mu ^ (2 ^ (j:ℕ))) - nu * c i j) hkey
+  intro i j
+  exact sub_eq_zero.mp (hzero i j)
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
