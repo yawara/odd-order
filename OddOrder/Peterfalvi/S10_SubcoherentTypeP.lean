@@ -501,6 +501,60 @@ noncomputable def inducedNonKernelFamily_subcoherent {A : Set G}
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
         d.dade d.hconj hφ.2 hψ.2
 
+/-- **Peterfalvi (5.7) on the (8.15.3) family**: a uniform-degree subfamily is coherent.
+
+The (5.7)∘(5.3.b) companion of `inducedNonKernelFamily_subcoherent`, stated at the same
+generality — arbitrary ambient support `A`, with Hypothesis (4.6)'s core `h46` and the `A`-Dade
+datum `d` as parameters.  Given a conjugation-closed set `S` of *irreducible* members of the
+family, all of the same nonzero degree, `S` is coherent for the Dade map.
+
+This is the book's route to the (9.11) base coherence: (8.15.3) supplies Hypothesis (5.2) and
+(5.7) turns a constant-degree subfamily into a coherent one.  The repo previously obtained the
+same conclusion from the §10 μ-grid engine
+(`S12.Hypothesis.inducedFamily_degreeSubfamily_isCoherent`), which is what tied it to types
+III/IV; nothing here carries a type hypothesis.
+
+⚠ `h2 : 2 ≤ S.ncard` is **exposed as a parameter** rather than derived.  This follows the
+`S`-side precedent `S15.Hypothesis.sSetIrrDeg_coherent`: the §9 degree count
+((9.8.d), `caseA_character_count_exact`) yields an *existence* statement `∃ ζ`, not two distinct
+members, so deriving `2 ≤ ncard` here would need genuine upstream counting content.  Exposing it
+keeps this producer sorry-free and leaves the count to the caller.
+
+Obligation sources: `hirr` = `IsIrreducibleCharacter.inner_self_eq_one`;
+`hZIrr` = `S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported` fed by `hsuppdiff`;
+`hsuppdiff` = `inducedNonKernelFamily_diff_support`. -/
+theorem inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
+    (hodd : Odd (Nat.card ↥M))
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46Core A M) [Invertible (Nat.card ↥h46.K : ℂ)]
+    (d : DadeSupportHypothesisData M A)
+    {S : Set (ClassFunction ↥M ℂ)}
+    (hsub : S ⊆ inducedNonKernelFamily h46.K h46.subH)
+    (hirrS : ∀ χ ∈ S, IsIrreducibleCharacter χ)
+    (hconjS : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S)
+    (hSfin : S.Finite) (h2 : 2 ≤ S.ncard)
+    (deg : ℂ) (hconst : ∀ χ ∈ S, ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = deg) (hdeg0 : deg ≠ 0)
+    (h1A : (1 : ↥M) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (inducedNonKernelFamily_subcoherent hodd h46 d hsub hirrS hconjS).tau S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) := by
+  classical
+  set hyp := inducedNonKernelFamily_subcoherent hodd h46 d hsub hirrS hconjS with hhyp
+  -- `hsuppdiff`: equal degrees, so the (4.7) estimate applies to every member difference.
+  have hsuppdiff : ∀ a ∈ S, ∀ b ∈ S,
+      ((a - b : ClassFunction ↥M ℂ)).support
+        ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A M := fun a ha b hb =>
+    inducedNonKernelFamily_diff_support h46 (hsub ha) (hsub hb)
+      (by rw [hconst a ha, hconst b hb])
+  refine OddOrder.Peterfalvi.S07.coherent_subset_of_constant_degree hyp (subset_refl _)
+    hconjS hSfin h2 (fun ζ hζ => (hirrS ζ hζ).inner_self_eq_one) ?_
+    (fun a ha b hb => by rw [hconst a ha, hconst b hb]) (fun a ha => by rw [hconst a ha]; exact
+      hdeg0) h1A hsuppdiff
+  -- `hZIrr`: the Dade map carries `A`-supported virtual characters into `ℤ[Irr G]`.
+  intro a ha b hb
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported d.dade d.hconj
+    (hsuppdiff a ha b hb)
+    (Submodule.sub_mem _ (hirrS a ha).mem_ZIrr (hirrS b hb).mem_ZIrr)
+
 end CoreNontrivialSupport
 
 /-! ### 8F: (8.15.3) at the book-literal support `A(M)`, for every type `𝒫` (issue 1042)

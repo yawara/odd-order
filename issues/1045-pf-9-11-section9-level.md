@@ -222,6 +222,17 @@ noncomputable def inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
 (橋渡し + `irrCut_conjClosed` + `sOf_finite`)、(c) それで
 `sOf_degreeSubfamily_isCoherent` の §10 依存を置換、(d) (9.11) statement 本体。
 
+### ✅ (a) 完了 (2026-07-20): `S10.inducedNonKernelFamily_degreeSubfamily_coherent`
+
+(5.7)∘(5.3.b) の companion を §8 レベルで landed。axiom-clean、AxiomsCheck 登録済。
+一発で通った (S15 雛形どおり)。`h2 : 2 ≤ S.ncard` は先例どおりパラメータ露出。
+
+⚠ `noncomputable def` で書いたら `linter.defProp` に叱られた — `Nonempty _` は `Prop` なので
+`theorem` が正しい。(`inducedNonKernelFamily_subcoherent` は `S07.Hypothesis` = データを返すので
+`noncomputable def` のままでよい。返り値が `Prop` かどうかで使い分ける。)
+
+**残り**: (b) §9 instantiation → (c) `sOf_degreeSubfamily_isCoherent` の置換 → (d) (9.11) 本体。
+
 ### (参考) 実装レシピ
 
 ```

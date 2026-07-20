@@ -11209,6 +11209,13 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `dadeSupportHypothesisData_typePACore` for the isometry `τ`) are both Peterfalvi (8.15) claim 1
 -- and carry no type hypothesis beyond `IsTypeP`.  Types II and V included.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subcoherent
+-- **(5.7) on the (8.15.3) family** — a uniform-degree subfamily is coherent, at the same
+-- generality as (5.3.b).  This is the book's route to the (9.11) base coherence, replacing the
+-- §10 μ-grid engine (`inducedFamily_degreeSubfamily_isCoherent`) that tied it to types III/IV.
+-- `2 ≤ ncard` is exposed as a parameter, matching `S15.Hypothesis.sSetIrrDeg_coherent`: the
+-- (9.8.d) count gives an existence statement, not two distinct members.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.inducedNonKernelFamily_degreeSubfamily_coherent
 -- **The §9 family sits inside the (8.15.3) family** (issue 1045): `𝒮(Y) ⊆ 𝒮_{(8.15.3)}`.  Both
 -- families induce from `M'` (`huSub_eq_derivedInG_subgroupOf`, Peterfalvi (9.2)), and §9's filter
 -- `M_F ⊄ Ker χ` is the stronger one because `M_F ≤ M_σ`.  This is the link that lets the book's
