@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppE_SemidirectFrattini
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # BG Appendix E, Proposition E.4: `C_S(Z₂(S))` is abelian of index `p`
@@ -206,5 +207,88 @@ theorem RegularOperatorSetup.commutator_eq_bot [Finite R] [Finite B]
   rw [Subgroup.mem_bot]
   by_contra hbne
   exact hcne (hB_regular b hbne (c : R) (congrArg Subtype.val (hcfix ⟨b, hb⟩)))
+
+/-! ## `S/S'` as a two-dimensional `𝔽_p`-space
+
+By E.3(b)'s third clause `|S/S'| = p²`, and `S` has exponent `p`, so `S/S'` is elementary
+abelian of order `p²` — BG's *"Let us regard `S/S'` as a 2-dimensional vector space over
+`𝔽_p`"*.  The two distinguished lines are `R₀S'/S'` and `T/S'`. -/
+
+/-- A subgroup of prime index — more precisely, one with cyclic quotient — contains the
+derived subgroup.  This puts BG's `T` above `S'`, so that `T/S'` is a *subspace* of `S/S'`. -/
+theorem commutator_le_of_isCyclic_quotient {G : Type*} [Group G] {T : Subgroup G} [T.Normal]
+    [IsCyclic (G ⧸ T)] : _root_.commutator G ≤ T := by
+  rw [_root_.commutator_def, Subgroup.commutator_le]
+  intro x _ y _
+  have hcomm : ∀ a b : G ⧸ T, a * b = b * a := fun a b => by
+    letI := IsCyclic.commGroup (α := G ⧸ T)
+    exact mul_comm a b
+  have h1 : (QuotientGroup.mk' T) ⁅x, y⁆ = 1 := by
+    rw [map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+    exact hcomm _ _
+  simpa using (QuotientGroup.eq_one_iff _).mp h1
+
+/-- `S' ≤ T = C_S(Ω₁(Z₂(S)))`: the index of `T` is the prime `p`, so `S/T` is cyclic. -/
+theorem RegularOperatorSetup.commutator_le_centralizer [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) (hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1)) :
+    _root_.commutator ↥(Omega R p 1) ≤
+      Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hidx : (Subgroup.centralizer
+      (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))).index = p :=
+    (hyp.card_omega1Center_and_index_centralizer hyp.R₀_le_omega
+      (hyp.three_le_pRank_omega hcard)).2
+  have hq : Nat.card (↥(Omega R p 1) ⧸ Subgroup.centralizer
+      (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))) = p := by
+    rw [← Subgroup.index_eq_card]; exact hidx
+  haveI : IsCyclic (↥(Omega R p 1) ⧸ Subgroup.centralizer
+      (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))) :=
+    isCyclic_of_prime_card (p := p) hq
+  exact commutator_le_of_isCyclic_quotient
+
+/-- **BG's two-dimensional space**: `S/S'` is elementary abelian of order `p²`.
+
+Abelian because it is an abelianization, of exponent `p` because `S` is (E.3(b), first
+clause), and of order `p²` by E.3(b)'s third clause. -/
+theorem RegularOperatorSetup.isElementaryAbelian_quotient_commutator [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    IsElementaryAbelian p (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) := by
+  refine ⟨fun x y => ?_, fun x => ?_⟩
+  · obtain ⟨a, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator ↥(Omega R p 1)) x
+    obtain ⟨b, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator ↥(Omega R p 1)) y
+    rw [← map_mul, ← map_mul]
+    refine QuotientGroup.eq.mpr ?_
+    have hrw : (a * b)⁻¹ * (b * a) = ⁅b⁻¹, a⁻¹⁆ := by group
+    rw [hrw, commutator_def]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+  · obtain ⟨a, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator ↥(Omega R p 1)) x
+    rw [← map_pow, hyp.omega_pow_eq_one' a, map_one]
+
+/-- **BG's `B` fixes some complement `Q/S'` of `T/S'` in `S/S'`**.
+
+Operator Maschke (`OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_of_isElementaryAbelian`) applied
+to the elementary abelian `S/S'` with the coprime `B`-action: `p ∤ |B|` while `|S/S'| = p²`,
+so the `B`-invariant subspace `T/S'` splits off. -/
+theorem RegularOperatorSetup.exists_aInvariant_complement_of_centralizer [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) (hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1))
+    (hSinv : IsAInvariant hyp.act (Omega R p 1))
+    (hS'inv : IsAInvariant hSinv.restrict (_root_.commutator ↥(Omega R p 1))) :
+    ∃ W : Subgroup (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)),
+      IsAInvariant hS'inv.quotientMulAutHom W ∧
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))).map
+          (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1))) ⊓ W = ⊥ ∧
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))).map
+          (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1))) ⊔ W = ⊤ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hcard2 : Nat.card (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) = p ^ 2 :=
+    hyp.card_omega_abelianization
+  refine OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_of_isElementaryAbelian
+    (p := p) (hcard2 ▸ dvd_pow_self p two_ne_zero) ?_
+    hyp.isElementaryAbelian_quotient_commutator ?_
+  · rw [hcard2]
+    exact Nat.Coprime.pow_right 2
+      (((Nat.Prime.coprime_iff_not_dvd hyp.p_prime).mpr hyp.p_not_dvd_card_B).symm)
+  · exact OddOrder.BG.Ch1_Preliminary.isAInvariant_map_mk' hS'inv
+      (IsAInvariant.of_characteristic hSinv.restrict)
 
 end OddOrder.BG.AppE
