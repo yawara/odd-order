@@ -1848,3 +1848,29 @@ K ⊴ G,  A ≤ ⟨a⟩ ⊔ A',  B ≤ ⟨b⟩ ⊔ B',  ⁅A',B⁆ ≤ K,  ⁅A,
 
 sorry 13 (セッション開始 14)。leaf build green。AxiomsCheck に Step 3/4 の 10 件追加済み
 (フルビルド 4518 jobs green で検証)。フルビルドは hub の合流 gate に委ねる。
+
+## 2026-07-20 (41): ⭐ (E.25) の witness — 残作業 (A) 完了
+
+`commutator_le_of_generators` (対偶形):
+```
+A ≤ ⟨a⟩ ⊔ A',  B ≤ ⟨b⟩ ⊔ B',  ⁅A',B⁆ ≤ K,  ⁅A,B'⁆ ≤ K,  ⁅a,b⁆ ∈ K  ⟹  ⁅A,B⁆ ≤ K
+```
+`A=Hᵢ, B=Hⱼ, A'=Hᵢ₊₁, B'=Hⱼ₊₁, K=H_k` で「`⁅Hᵢ,Hⱼ⁆ ⊄ H_k` ⟹ `⁅wᵢ,wⱼ⁆ ∉ H_k`」。
+
+商 `G/K` で `x = a^m·a'` に分解 (`Subgroup.mul_normal`) → 3 つの `Commute` →
+`commutatorElement_zpow_mul_zpow_mul` で潰す。**前に作った補題がそのまま効いた**。
+
+⚠ 実装メモ: `refine (QuotientGroup.eq_one_iff _).mp ?_` の後だと goal が
+`↑⁅…⁆ = 1` (mk の coercion) になり `map_commutatorElement` が発火しない。
+`(QuotientGroup.mk' K) ⁅…⁆ = 1` の形で `have` してから
+`rw [QuotientGroup.mk'_apply]` で落とす。
+
+### E.4 の残り (2 件)
+
+1. ⬜ **`k ≤ q-1`** — `|T/H_k| = p^k ≤ |T| = |S|/p ≤ p^{q-1}` (E.3(c))。
+   Step 2 の `index_subgroupOf_chain` + `card_omega_le`。
+2. ⬜ **`RegularOperatorSetup` への当てはめ** — ここまでの一般補題を全部繋ぐ。
+3. ⚠ **項 5 の Case A/B** ((32)) — これだけが数学的に未決。
+
+ファイル 975 行 (上限 2000 / 分割目安 1500)。当てはめで嵩むなら
+`AppE_EigenvalueCombinatorics.lean` に分ける。
