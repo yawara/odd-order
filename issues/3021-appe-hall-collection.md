@@ -831,3 +831,34 @@ Frattini 論法の結論 `T₁ = S·C_{T₁}(v) = S·C_T(v)` を**定義に据�
 3. ⬜ **Lemma 4.5** で `|Ω₁(T/S)| ≤ p²` ⟹ `|Ω₁(T)| ≤ p²|S| ≤ p^{q+2}`。
 4. ⬜ `cl(Ω₁(T)) ≤ q+1 ≤ p−1` (Step 1 `card_A_dvd_half_p_sub_one` + `p ≥ 7`)
    ⟹ **Prop E.2(a)** で `Ω₁(T)` が指数 p ⟹ 極大性に矛盾 ⟹ **Step 3 完了**。
+
+## 2026-07-20 (13): `T₁/S` 巡回性 — 生成元形で
+
+| 宣言 | 内容 |
+|---|---|
+| `exists_zpowers_eq_map_of_isCyclic` | 巡回部分群の像は生成元の `zpowers` |
+| `isCyclic_inf_R₁` | `T ⊓ R₁` は巡回 |
+| `exists_zpowers_eq_map_sup_inf_R₁` | **`T₁/S = ⟨x⟩`** (x は `T ⊓ R₁` の生成元の像) |
+
+⭐ **生成元形にした理由 = 下流の要求**。BG Lemma 4.5(b) は repo に
+**`Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime`** として既にあり、
+署名は `(hR : IsPGroup p R) (hp_odd : Odd p) {x : R} (hHidx : (Subgroup.zpowers x).index = p)
+: Nat.card (Omega R p 1) ≤ p ^ 2` — **生成元とその zpowers の指数**を消費する。
+
+### Step 3 の残り (この順、次セッションはここから)
+
+1. ⬜ **`|T : T₁| ≤ p`**: `|T:C_T(v)| = |T:T₁|·|T₁:C_T(v)|`、`|T₁:C_T(v)| = |S:C_S(v)| = |S|/p²`
+   (積公式)、`T`-共役類 ⊆ `S \ {1}` ⟹ `|T:T₁|·|S|/p² ≤ |S|−1` ⟹ `|T:T₁| < p²` ⟹ (p 群ゆえ) ≤ p。
+   ⟹ `(zpowers x).index ≤ p` in `T/S`。
+2. ⬜ **Lemma 4.5(b) 適用**: `|Ω₁(T/S)| ≤ p²`。⚠ 指数 = 1 の場合 (`T/S` 巡回) は
+   `card_omega1_le_prime_sq_of_cyclic_index_prime` が使えない (index = p 固定) ので
+   別途「巡回 p 群の `Ω₁` は位数 ≤ p」が要る。
+3. ⬜ **`|Ω₁(T)| ≤ p²|S|`**: `S ≤ Ω₁(T)` (S は指数 p) と `Ω₁(T)` の像 ⊆ `Ω₁(T/S)`。
+4. ⬜ **`cl(Ω₁(T)) ≤ q+1 ≤ p−1`**: `|Ω₁(T)| ≤ p²·p^q = p^{q+2}` +
+   `S04.nilpotencyClass_le_of_card_le_pow` + Step 1 (`card_A_dvd_half_p_sub_one`) で `q ≤ (p−1)/2`、
+   `p ≥ 7` (E.3(a) の帰結)。
+5. ⬜ **Prop E.2(a)** (`omega_pow_eq_one_of_lowerCentralSeries_eq_bot`、済) ⟹ `Ω₁(Ω₁(T))` 指数 p、
+   `omegaInG_omega` で `= Ω₁(T)`、`Ω₁(T)` は A-不変 (T が A-不変ゆえ) で `⊋ S`
+   ⟹ **極大性に矛盾** ⟹ Step 3 完了 ⟹ `omega_pow_eq_one` ⟹ **E.3(b) 全体が axiom-clean**。
+
+現状 AppE の sorry = 4 (`omega_pow_eq_one` / E.3(d) / E.4 / E.5)。
