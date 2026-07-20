@@ -210,7 +210,8 @@ theorem coherent_sOf_H0C [Finite G]
         (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
     have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
       OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
-    -- (9.11) itself, via the §9 argument (`coherent_sOf_H0Cprime` → `coherent_sOf_H0Cprime_of_section9`
+    -- (9.11) itself, via the §9 argument
+    -- (`coherent_sOf_H0Cprime` → `coherent_sOf_H0Cprime_of_section9`
     -- → `S11.nineEleven_coherent_A0`); this used to re-derive the whole §13 chain inline
     refine ⟨coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
       (coherent_sOf_H0Cprime hG hyp hncH0C htype).some

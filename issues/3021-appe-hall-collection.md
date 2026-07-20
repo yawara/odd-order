@@ -2089,3 +2089,184 @@ Case B (`⁅H_i, Q'⁆ ≤ H_{i+2}`) を `i = 0` で使う: `⁅T, Q'⁆ ≤ H�
 📌 α 側が本物に閉じたので、残るブロッカーは **β 側 (E.23) の Lean 化** (要 1) が本丸。
 これは紙上解決済の Case A/B 排除の形式化で、`AppE_EigenvalueCombinatorics.lean` に
 追記する形で進めるのがよい (1500 行にはまだ余裕、現在 ~430 行)。
+
+## 2026-07-21 (47): E.4 abelian clause を (E.23) β supply 1 本に還元 — 残る frontier が単一化
+
+2 本目の subagent が `AppE_EigenvalueCombinatorics.lean` に 3 定理追加 (461→691 行, sorry-free,
+親が実測検証: leaf build green 3312 jobs・全定理 axiom-clean):
+
+| 定理 | 役割 |
+|---|---|
+| `dvd_sub_mul_of_chain_supply` | 作用素非依存の (E.26)/(E.27) (α から σ・supply を抽象化) |
+| `eq_of_chain_eigenvalue_relations_intCast` | ZMod p 環等式 → 位数 q 単位 → `t₀ = t` |
+| ⭐ `commutator_centralizer_eq_bot_of_beta_supply` | **E.4 背理法本体** → `⁅T,T⁆ = ⊥` (β supply gated) |
+
+### ⟹ E.4 abelian clause の残りは **β supply (E.23) 実体化ただ 1 本**
+
+`commutator_centralizer_eq_bot_of_beta_supply` の `hβsupply` は **本物の (E.23)**
+(α 側 `exists_eigenvalue_pow` の β 版と同 signature)。他の gating 仮説
+(`hr0r`=E.20 / `hrq`=E.9 / `hr1`=E.11 / `htu`/`ht₀u` / `htne`=E.21) は
+setup から discharge 可能な真の事実。**⟹ 空 scaffold でなく正当な還元**。
+
+### ⬜ 真の frontier = β supply の実体化 (次イテレーション、subagent 委譲)
+
+紙上議論 ((43)) の Lean 化。2 本目 subagent の 4 段プラン:
+1. `w_a`(chain 元) の像を `Q/S'`・`T/S'` 成分に分解。
+2. `H_a/H_{a+1} ⊗ S/S' → H_{a+1}/H_{a+2}` の β-同変双線形写像 (商 `S/H_{a+2}` に落とす)。
+3. Case A step `t_{a+1} = t_a·t`。
+4. Case B 排除 (`i=0` で `⁅T,Q'⁆ ≤ H₂` → `H₁ = T'H₂` → `k ≤ 2`、既存
+   `commutator_self_le_of_generator` の `k ≥ 3` と矛盾)。
+
+⚠ これは深い多補題作業で **1 セッションで green landing できない規模**
+(2 本目 subagent の判断)。gated-endpoint を更に分割して段階 landing する。
+
+### その後 (機械的)
+
+- `commutator_centralizer_eq_bot_of_beta_supply` の α 系仮説と β eigenvalue を
+  setup から discharge (chain 固有値 ↔ S/S' 固有値の同定)。
+- `AppE_FurtherResults:1645` の sorry (`centralizer_upperCentralSeries_abelian_index_p`)
+  を閉じる: `⁅T,T⁆ = ⊥` → `IsMulCommutative ↥T` + `Ω₁(Z₂)↔Z₂` 橋 (既存) + index p (既存)。
+
+### リポジトリ状態 (2026-07-21)
+
+`AppE` の sorry = **E.4 (1645) と E.5 (1686) の 2 件** (E.4 の中身は上記還元で骨格完成、
+残るのは β supply 実体化と機械的 discharge)。全体 sorry 13。leaf build green。
+AxiomsCheck に Step 3/4 + E.4 一般補題を登録済 (フルビルド 4520 jobs green)。
+
+## 🔍 hub 内容監査 (2026-07-21 00:54 tick) — E.4 abelian clause 還元は genuine だが "frontier 単一化" は完成度を過大表示
+
+merge 015768c0a の (47) abelian-clause 還元 (`4c68275ec` / `71619a35e`) を doneness 基準で独立監査
+(sorry 数でなく「hard content を実証明したか / 構成不能な仮説へ hoist していないか」)。
+
+**判定: 還元は本物 (axiom-clean な reductio、単一の gating 仮説は正しく分離されている)。
+ただし issue の「frontier 単一化 / single input」表現は E.4 が実際より完成に近く読める。**
+
+### 本物である点 (確認済)
+
+- `RegularOperatorSetup.commutator_centralizer_eq_bot_of_beta_supply`
+  (`AppE_EigenvalueCombinatorics.lean:632`) は `⁅T,T⁆ = ⊥` を BG の逐語的 contradiction で証明。
+  **依存閉包を全 trace した結果 axiom-clean** — α 側 `dvd_sub_mul_eigenvalues_chain` →
+  `exists_eigenvalue_pow` (`AppE_RegularOperator.lean:640`, 0-sorry)、index 抽出・(E.27) engine
+  すべて sorry-free。**relabeling ではない** (α 半分と reductio 足場は genuine に証明済)。
+- 残る単一入力 `hβsupply` (:651-660) は**正当な (E.23)**: 各 live chain 項 `Hₐ` に対し
+  `s ≡ t₀·tᵃ (mod p)` で `σβ` が `y↦yˢ` を法 `Hₐ₊₁` で与える。証明済 α supply `hr₀` の β 版で、
+  vacuous でも False でもない (contradiction は reductio 仮定 `hnonab` から来る)。
+
+### ⚠ "単一化" が過小表示している 3 点 (hβsupply を閉じても E.4 は終わらない)
+
+1. **abelian clause の半分だけ**。新定理の結論は `⁅T,T⁆ = ⊥` のみ。E.4 の **index-p 半分**
+   (`|S : C_S(Z₂(S))| = p`) は手つかず。full field
+   `centralizer_upperCentralSeries_abelian_index_p` (`AppE_FurtherResults.lean:1650-1657`) は
+   両方を主張し、**依然 raw sorry (:1657、実測確認)**。
+2. **未配線**。還元定理は **consumer 0・AxiomsCheck 未登録** (grep 実測)、既存 E.4 sorry を
+   触っていない。⟹ この定理の axiom-cleanliness は現状 gate で継続検証されていない
+   (監査で trace した限りは clean だが、AxiomsCheck に足すべき)。
+3. **T の不一致**。新定理は `Ω₁(Z₂(S))` (= `omega1UpperCentralTwo`) を centralize するが、
+   旧 E.4 field は `Z₂(S)` (= `upperCentralSeries 2`) を centralize する。`hβsupply` を discharge
+   しても、この 2 つの `T` の同一視 + index-p clause 追加 + `...abelian_index_p` への実配線が残る。
+
+⟹ **frontier は「hβsupply 1 本」ではなく「hβsupply + index-p 半分 + T 同一視 + 配線」**。
+`hβsupply` 自体も commit body が正直に書くとおり「深い多補題作業」(Case A/B 論法 +
+`S/S' = Q/S' ⊕ T/S'` 分解 + β-equivariant bilinear map) で、well-scoped だが substantial。
+これは STOP でなく **frontier の正確化** — c は E.4 を「あと 1 本」と誤認せず上記 4 要素を残件として扱うこと。
+
+## 2026-07-21 (48): β supply 基盤補題群 landing — ただし ⚠ 深い設計点 (c-4) を発見
+
+3 本目 subagent が `AppE_EigenvalueCombinatorics.lean` に 7 補題追加 (691→919 行, sorry-free,
+親が実測検証: leaf build green・全 axiom-clean)。双線形 mod K・three-subgroups 重み
+(`⁅H_a,H_b⁆ ≤ H_{a+b+1}`)・Case B 排除 (a=0)・Case A 漸化式生成元版 (`caseA_eigenvalue_step`)。
+
+### ⚠⚠ 発見: (E.23) の Case A per-level 保証は未解決 (真の math frontier)
+
+`caseB_excluded` は **a=0 の Case B** (`⁅T,Q'⁆ ≤ H₂`) のみ排除できる:
+`⁅T,Q'⁆ ≤ H₂ ⟹ H₁ = T'·H₂`、`T' ≤ H_{k-1} ≤ H₂` (k≥3) ⟹ `H₁ ≤ H₂` 矛盾。
+
+**a>0 では同じ論法が効かない**: Case B (`⁅H_a,Q'⁆ ≤ H_{a+2}`) ⟹
+`H_{a+1} = ⁅H_a,T⁆·H_{a+2}` にしかならず、矛盾に至らない。
+
+⟹ `commutator_centralizer_eq_bot_of_beta_supply` の `hβsupply` は
+**全 live level で `t_a = t₀·t^a`** (= 全 level Case A) を要求するが、
+これを保証する議論が (43) の紙上解析でも a=0 しか埋まっていない。
+
+### 本質: `βv` の分解が未解析
+
+α 側 (E.22) が per-level 問題を持たないのは、**α が R₀ を固定する**ので
+`w_{a+1} = ⁅w_a, v⁆` の `v ∈ R₀` を α が固定線上でスカラー倍するから。
+β は R₀ を固定しないので `βv` が `S/S' = Q ⊕ T` の**両成分**に広がる
+(`R₀S'/S'` は Q・T と異なる第 3 の線)。この `βv` の分解を解析しないと
+per-level の固有値挙動が決まらない。**これが BG の "Similarly one can show" の
+本当の中身**で、(43) の私の解析は「per-level 二者択一」までで止まっていた。
+
+### ⬜ 次の frontier (要・慎重な BG 再読)
+
+1. `βv` (v = R₀ 生成元) の `Q/S' ⊕ T/S'` 分解を書き下す。
+   `R₀S'/S'` = 第 3 の線 = ある 1 次元部分空間。β の像は?
+2. それを使って各 level の Case A/B を決定 (全 level Case A が出るか、
+   出るとして何故か)。
+3. 出れば `caseA_eigenvalue_step` を per-level に流して帰納で `hβsupply` 構成。
+
+⚠ これは [[feedback-ask-chatgpt-for-elided-gaps]] 相当の深い行間。BG p.163-164 の
+(E.22)/(E.23) 前後と、可能なら Feit-Thompson 1963 原論文 §26 の対応箇所を精読。
+Coq odd-order は FT 本体のみで App.E 相当を持たない可能性が高い (要確認)。
+
+### 現状の到達点 (2026-07-21)
+
+E.4: **指数 clause 完全証明済**。abelian clause = `⁅T,T⁆ = ⊥` は
+`commutator_centralizer_eq_bot_of_beta_supply` で **β supply 1 本に還元済**、
+その supply の基盤補題 (双線形・Case A step・Case B 排除 a=0) も landing 済。
+**残る唯一の math gap = 全 level Case A の保証 (`βv` 分解)**。
+これが埋まれば機械的組み立てで E.4 abelian clause が閉じる。
+
+sorry: AppE は E.4(1645)/E.5(1686) の 2、全体 13。leaf build green。
+
+## 2026-07-21 (49): ⚠ 訂正 — Case A/B は「clean な per-level 二者択一」でない (β 側の gap の精密化)
+
+(48) を受けて `βv` の分解を実際に書き下したところ、(32)/(43) の
+「per-level に Case A か Case B のちょうど一方」は**過度の単純化**だった。精密には:
+
+`v = R₀ 生成元`、`S/S'` で `v̄ = v_Q + v_T` (β の Q/T 固有空間成分)。β が R₀ を
+固定しない ⟹ `v_Q ≠ 0` かつ `v_T ≠ 0` (どちらか 0 なら v̄ が固有ベクトル= β が
+R₀ を保つ)。`w_{a+1} = ⁅w_a, v⁆`、写像 `φ_a : S/S' → H_{a+1}/H_{a+2}`, `s̄ ↦ ⁅w_a,s⁆`
+は準同型 (2 スロット目に加法的、`⁅H_a,S'⁆ ≤ H_{a+2}` = 既証
+`iterCommutator_commutator_iterCommutator_le` b=1 による)。
+
+`⁅w_a, v_Q⁆ = g^{c_Q}`, `⁅w_a, v_T⁆ = g^{c_T}` (g = `H_{a+1}/H_{a+2}` 生成元) と置くと:
+
+```
+β(w_{a+1}) ≡ g^{ t_a·(t·c_Q + t₀·c_T) },   w_{a+1} = g^{c_Q + c_T}
+⟹  t_{a+1} = t_a · (t·c_Q + t₀·c_T)/(c_Q + c_T)     (H_{a+1}/H_{a+2} は 1 次元ゆえ well-def)
+```
+
+⟹ **`t_{a+1}` は一般に `t` でも `t₀` でもない「混合」値**。純 Case A (`t_{a+1} = t_a·t`)
+は `c_T = 0` (⟺ `⁅w_a, v_T⁆ ∈ H_{a+2}`) のとき。`c_Q, c_T` は `a` ごとに変わる
+(v は固定だが w_a が変わる) ので、BG の `t_a = t₀t^a` (全 a で純 Case A) が成り立つ
+根拠は**まだ不明**。
+
+⟹ **`caseB_excluded` (a=0) だけでは BG の (E.23) は出ない**。真の gap は
+「なぜ全 level で `c_T = 0` (= `⁅w_a, T⁆ ≤ H_{a+2}`) か」。
+
+### これは BG の "Similarly one can show" の実体で、行間が深い
+
+α 側 ((E.22)) が問題ないのは v̄ が **α-固有ベクトル** (α が R₀ 固定, 固有値 r) だから
+`r_{a+1} = r_a·r` が自動。β では v̄ が固有ベクトルでないのでこの自動性が消える。
+
+### ⬜ 次にやるべき調査 (このセッションでは着手しない — context 枯渇)
+
+1. BG p.163-164 の (E.22)/(E.23) 導出を**精読**し、BG が 2 スロット目の分解を
+   どう扱っているか (そもそも per-level なのか、別の帰納構造か) を確定。
+2. 必要なら Feit-Thompson 1963 原論文の対応箇所、および
+   [[feedback-ask-chatgpt-for-elided-gaps]] (最強モデルに `c_T = 0` の根拠を問う)。
+3. `coq/` は FT 本体のみで App.E を持たない可能性大 (要 grep 確認)。
+
+⚠ この精密化された gap は (43) の楽観的な "Case B 排除で済む" を**上書き**する。
+next session はここ (49) を出発点にすること。
+
+### セッション到達点 (確定・検証済)
+
+- ⭐ **BG Theorem E.3(d) 完全証明** (App.E sorry 3→2、AxiomsCheck 監査済)。
+- **BG Prop E.4 指数 clause 完全証明**。
+- **abelian clause = `⁅T,T⁆=⊥` を β supply (E.23) 1 本に還元** + その基盤補題
+  (双線形・Case A step・Case B 排除 a=0) landing。全 axiom-clean。
+- **残る唯一の gap = 上記 `c_T=0` の全 level 保証** (β 側 (E.23) の真の中身)。
+
+全成果 leaf build green、AxiomsCheck フルビルド 4520 jobs green、sorry 13 (開始 14)。

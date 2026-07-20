@@ -342,9 +342,20 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                 quotient coordinate と `ν = λ·θ(λ) = μ·φ(μ)` を一つの endpoint で返す
           - [x] commutative `A(n,1)` と noncommutative factor の座標 data を共通の
                 inclusive bundle に包み、実際の complementary pair の全組合せを返す
-          - [ ] actual mixed commutator pairing の actor covariance を左右の tagged
-                coordinates で表示し、`θ = 1` / `φ = 1` / 両方非自明の固有値制約を
-                原典の B/C/D case split へ接続する
+          - [x] actual mixed commutator pairing の actor covariance を左右の tagged
+                coordinates で表示し、原典 p. 90 の固有値制約
+                `λ^(2^i) μ^(2^j) = ν^(2^k)` を導いて B/C/D case split の直前まで到達する
+                (`exists_mixedFrobeniusWeightEquation_of_xiLengthThree`,
+                新 leaf `HigmanLemmaTwelve/MixedEigenweights.lean`, 2026-07-21)
+            - [x] shared `BilinearEigenweight.lean`: 等変双線形写像の非零値から
+                  target eigenbasis の weight 一致を導く (Lemma 11 の private 版 dedup、issue 9317)
+            - [x] ambient `L₁ ≃ Φ(P)` 同定 + Singer 中心座標 + factor quotient を
+                  `P/Φ(P)` へ落とす actor-equivariant な inclusion を構成
+            - [x] 両 branch (Agemo 商 / lower-central layer) から共通 `F ⊗ P/Φ(P)` 内の
+                  Frobenius eigenvector 族を抽出 (`exists_factorFamily`)
+            - [x] 非零 mixed bracket を base change して weight equation を読み取る
+          - [ ] `θ = 1` / `φ = 1` / 両方非自明の固有値制約から原典 pp. 90--92 の
+                B/C/D case split を実行し、`B(n,θ,ε)` / `C(n,ε)` / `D(n,θ,ε)` を確定する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
@@ -443,3 +454,19 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
    `eOne'` も証明中は `frobeniusShiftLinearEquivForNormalization eOne i.val` (PairGap:1077) だが
    export されていない。prescribed-coordinate が商/第 1 層の counter-shift も要求するなら
    3 本目の sibling が要る。
+
+## 🔍 hub 内容監査 (2026-07-21 00:54 tick) — Lemma 12 mixed weight equation は genuine ✅
+
+merge 015768c0a の ⭐ `d8b97df76` (+ feeders `ecf55f86a`/`3dc3f4c37`) を独立監査。
+**判定: genuine・sorry 0・axiom-clean、book 強度の進捗。**
+
+- `exists_mixedFrobeniusWeightEquation_of_xiLengthThree`
+  (`HigmanLemmaTwelve/MixedEigenweights.lean:634`) は実証明 (0-sorry、AxiomsCheck:8452 登録)。
+  honest な Lemma 12 仮説 (`IsPGroup 2 P`・`¬IsMulCommutative P`・2 involutions・`IsXiActor`・
+  `HasXiLengthThree`・prime 条件) から `λ^(2^i)·λ'^(2^j) = ν^(2^k)` + `ν = λθ(λ) = μφ(μ)` を導出
+  = Higman p.90 の pre-case-split state ちょうど。
+- 存在量化の data は**構成済** (free field でない): factors ← `xiLengthThreeTypeAFactorData_exists`
+  (`LengthTwoModels.lean:1278`、実 subgroup 分解 `left⊓right=Φ(P)`/`left⊔right=⊤`)、
+  nonzero mixed commutator ← `exists_mixed_lowerCentralCommutatorBilinear_ne_zero`
+  (`AmbientCentralExtension.lean:777`)、weight 抽出 ← `BilinearEigenweight.lean:150` (honest 線形代数)。
+- red flag 無し (vacuous/矛盾仮説/unsound carrier いずれも無し)。次は B/C/D の case split。
