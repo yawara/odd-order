@@ -686,54 +686,10 @@ theorem escaping_typePACore_eq_empty [Finite G]
     obtain ⟨hFM, -⟩ := hP2imp hNP2
     exact OddOrder.BG.Ch4.S14.not_isTypeP_and_isTypeF ⟨hTP, hFM⟩
 
-/-- **Peterfalvi (8.15) for the type-`P₂` support `A(S)`: the Dade (2.2) support hypotheses hold.**
-The honest (13.2.e) foundation.  Assembles the `σ`-decomposition-generic engine
-(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₂` pins obtained from
-the
-matched κ-Hall / `(κ∪σ)'`-Hall pair (`typeP2_exists_matched_kappa_hall_pair`): escaping points are
-`σ`-sharp (`S10.escaping_typePACore_mem_sigmaSharp`, (8.13.b)), `G`-conjugacy is `M`-conjugacy
-(`S10.typePACore_isConj_conj_in_M`, (8.13.a)), and the coprimality
-(`S10.coprime_FT_signalizer_centralizerIn_typePACore`, (8.13.c2)), plus the set-facts (`A(S) ⊆ M`,
-non-identity, nonempty, `M`-conjugation-invariant).
-
-This is the honest type-`P₂` Dade support (issue 9008 Option A / issue 1017 update #9): its `.dade`
-field is the `S04.Hypothesis G (A(S)) M` (the `τ = Ind_M^G` Dade isometry lives on `A(S)`),
-replacing
-the likely-unsound `sibleyTarget_H0C` route for the (13.3) `S`-instance coherence. -/
-theorem dadeSupportHypothesisData_typePACore [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hTP : OddOrder.BG.Ch4.S14.IsTypeP M) :
-    Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (S10.typePACore M)) := by
-  classical
-  obtain ⟨K₀, U₀, hKM, hUM, hKne, hK, hU⟩ :=
-    S10.typeP_exists_kappa_hall_pair hG hM hTP
-  refine OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM
-    S10.typePACore_subset (fun x hx => hx.2.1)
-    (fun a ha => S10.escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha)
-    (fun a ha b hb hab => S10.typePACore_isConj_conj_in_M hG hM hKM hUM hKne hK hU ha hb hab)
-    (fun a ha b hb => S10.coprime_FT_signalizer_centralizerIn_typePACore hG hM
-      (S10.escaping_typePACore_mem_sigmaSharp hG hM hKM hUM hKne hK hU ha) ha.2 hb)
-    ?_ ?_
-  · -- `A(S)` nonempty: `M_σ^# ⊆ A(S)` (a nonidentity `M_σ`-element centralizes itself).
-    obtain ⟨a, ha1⟩ :=
-      Subgroup.ne_bot_iff_exists_ne_one.mp (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
-    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
-    have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := a.2
-    have haM' : (a : G) ∈ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM haMσ
-    refine ⟨a.1, haM', ha1', a.1, ?_, ?_⟩
-    · exact (Set.mem_sdiff _).mpr ⟨SetLike.mem_coe.mpr haMσ, fun h => ha1' (Set.mem_singleton_iff.mp
-        h)⟩
-    · exact Subgroup.mem_centralizer_singleton_iff.mpr rfl
-  · -- `M`-conjugation invariance.
-    intro m x hm
-    exact ⟨fun h => by
-      have := S10.typePACore_conj_mem (inv_mem hm) h
-      rwa [show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x from by group] at this,
-      fun h => S10.typePACore_conj_mem hm h⟩
 
 /-- **(13.2.e) `S`-instance Dade hypothesis** (issue 1017 update #10, step 1): the
 `Hypothesis`-level
-instantiation of `dadeSupportHypothesisData_typePACore` at the type-`P` maximal `S`
+instantiation of `S10.dadeSupportHypothesisData_typePACore` at the type-`P` maximal `S`
 (via `hyp.S_maximal`/`hyp.S_isTypeP`), packaging the honest §16 support
 `A(S) = ⋃_{x∈S_σ#} C_{S'}(x)#` (`S10.typePACore hyp.S`) as an `S04.Hypothesis`. This is the
 concrete
@@ -742,13 +698,13 @@ its
 `.fullDadeIsometryData` (given the support's `HConjInvariant`) materialises the Dade isometry
 `τ = Ind_S^G` on the `ℤ`-lattice of virtual characters — the (13.2.e) foundation the §9 subcoherence
 assembly (`S07.irrSubcoherent`) consumes to re-ground `coherent_H0Cprime_S` off the unsound
-`sibleyTarget_H0C`.  (Sorry-provenance parity with `dadeSupportHypothesisData_typePACore`: the
+`sibleyTarget_H0C`.  (Sorry-provenance parity with `S10.dadeSupportHypothesisData_typePACore`: the
 inherited shared BG §16 Theorem-II pins, at exact parity with the accepted on-path
 `dadeSupportHypotheses_typeI`; no lane-`b` sorry introduced.) -/
 noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S04.Hypothesis G (S10.typePACore hyp.S) hyp.S :=
-  (dadeSupportHypothesisData_typePACore hG hyp.S_maximal (hyp.S_isTypeP hG)).some.dade
+  (S10.dadeSupportHypothesisData_typePACore hG hyp.S_maximal (hyp.S_isTypeP hG)).some.dade
 
 /-- **(13.2.e) `S`-instance Dade `H`-conjugation invariance** (issue 1017): the `HConjInvariant` of
 `dadeHypS`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15), the
@@ -759,7 +715,7 @@ so the isometry `dadeHypS.fullDadeIsometryData dadeHypS_hconj` is well-defined. 
 theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     (hyp.dadeHypS hG).HConjInvariant :=
-  (dadeSupportHypothesisData_typePACore hG hyp.S_maximal (hyp.S_isTypeP hG)).some.hconj
+  (S10.dadeSupportHypothesisData_typePACore hG hyp.S_maximal (hyp.S_isTypeP hG)).some.hconj
 
 open scoped FiniteInduce in
 /-- **(13.2.e) `S`-instance `dade = Ind` bridge** (issue 1017): for the honest type-`P₂` maximal
@@ -811,7 +767,7 @@ theorem Hypothesis.dadeHypS_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (a : {a : G // a ∈ S10.typePACore hyp.S}) :
     (hyp.dadeHypS hG).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.S (S10.typePACore hyp.S) a.1 :=
-  (dadeSupportHypothesisData_typePACore hG hyp.S_maximal
+  (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore hG hyp.S_maximal
     (hyp.S_isTypeP hG)).some.H_eq_ftSupportKernel a
 
 /-- **(Rung B, reduction) No escaping `A(S)`-points ⟹ all `S`-instance Dade stabilizers vanish.**

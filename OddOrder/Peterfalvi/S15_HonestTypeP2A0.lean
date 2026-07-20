@@ -1184,7 +1184,7 @@ theorem Hypothesis.dadeHypT_H_eq_ftSupportKernel [Fintype G] [Finite G]
     (a : {a : G // a ∈ S10.typePACore hyp.T}) :
     (hyp.dadeHypT hG hTP).H a =
       OddOrder.Peterfalvi.S10.ftSupportKernel hyp.T (S10.typePACore hyp.T) a.1 :=
-  (dadeSupportHypothesisData_typePACore hG hyp.T_maximal hTP).some.H_eq_ftSupportKernel a
+  (S10.dadeSupportHypothesisData_typePACore hG hyp.T_maximal hTP).some.H_eq_ftSupportKernel a
 
 /-- **No `A(T)`-point escapes `T`** (mirror of `no_escaping_typePACore`, at the
 (14.9)-parametric `hTP`). -/
