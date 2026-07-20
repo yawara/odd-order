@@ -421,21 +421,27 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       続く `AmbientCentralExtension.lean` では、非自明 actor-invariant derived subgroup が
       全 involution を含むことから `[P,P] = Φ(P)` を証明し、同じ involution argument で
       `Φ(P) ≤ Z(P)` を得た。従って `γ₂(P)=Φ(P)`, `γ₃(P)=1` であり、
-      elementary-abelian kernel の square subgroupも消えるため
-      `lowerCentralLayerKernel P 1 = ⊥` まで actual に同定済みである。
+      ambient squares の生成部分群も `Agemo P 2 1 = Φ(P)` と同定した。
+      elementary-abelian kernel の square subgroupも消えるため、二つの actual
+      lower-central layers は `L₀ = P/Φ(P)`, `L₁ = Φ(P)` であり、
+      `lowerCentralLayerKernel P 1 = ⊥` まで同定済みである。
       同 leaf で各 inclusive type-A model の concrete quadratic extension 全体を
       factor へ輸送し、short exact sequence の quotient projection の核を
       `(Φ(P)).subgroupOf S` と同定した。実際の左右 factor はともに `Φ(P)` を含むため、
       両 kernel field を同じ ambient `Φ(P)` へ移す group equivalence と、そこから得る
       左右 kernel 間 transition も構成済みである。これは honest な additive/group-level
       共通中心座標だが、field multiplication や actor action との整合性はまだ主張しない。
+      さらに上記の noncommuting mixed-factor witness を actual ambient
+      `lowerCentralCommutatorBilinear` の非零値へ接続し、左右 factor に属する代表元の
+      provenance も保持した。したがって原典 p. 90 の固有値比較へ入る非零 pairing は
+      coordinate-free な形ですでに確立している。
       原典 p. 81 の B/C/D 定義表と pp. 90--92 の case proof も再監査し、p. 91 の
       type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
       p. 81 の表と直前の commutator formula から確認した。抽出画像は
       `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
-      次の source frontier は、この group-level 共通 `Φ(P)` 座標を actor-compatible な
-      semilinear/Frobenius 座標へ強化し、mixed commutator pairing の固有値制約から
-      type B/C/D の四場合を分岐する gluing case analysis である。
+      次の source frontier は、すでに equivariant なこの mixed pairing を、左右因子と
+      共通 `Φ(P)` の actor-compatible な semilinear/Frobenius 座標へ制限・表示し、
+      固有値制約から type B/C/D の四場合を分岐する gluing case analysis である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
