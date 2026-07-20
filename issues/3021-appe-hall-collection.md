@@ -1276,3 +1276,51 @@ E.3(b)/(c) と同型の「下流 leaf に在る」注記コメントに置換 (c
 指数 `p` のアーベル部分群。BG の議論は 2 次元 `𝔽_p`-空間 `S/S'` の中で走り、
 `α` の固有値 `r, r₀` (on `R₀S'/S'`) と `β` の `t, t₀` (on `T/S'`) を比較して
 `j + 2 = k − i` から `t₀ = t` の矛盾を出す。E.3 を全部消費する。
+
+## 2026-07-20 (26): BG Proposition E.4 に着手 — 指数 clause と (E.18)/(E.20) 済
+
+新 leaf **`OddOrder/BG/AppE_AbelianCentralizer.lean`** (同 commit で `OddOrder.lean` 配線)。
+
+| 宣言 | 内容 |
+|---|---|
+| `omega1UpperCentralTwo_eq_upperCentralSeries` | 指数 p の群で `Ω₁(Z₂(S)) = Z₂(S)` |
+| `centralizer_upperCentralSeries_eq_centralizer_omega1` | 同、centralizer 形 |
+| ⭐ `not_fixes_sup_frattini_of_not_fixes_R₀` | **(E.18)** = E.3(d) の対偶 |
+| `three_le_pRank_omega` | `\|S\| ≥ p⁴` ⟹ `3 ≤ r(S)` (Step 2 の前提) |
+| ⭐ `index_centralizer_upperCentralSeries` | **E.4 の指数 clause** `\|S : C_S(Z₂(S))\| = p` |
+| `mulAut_mul_comm_of_isCyclic` / `commutator_le_ker_of_isCyclic` | 巡回群の `MulAut` はアーベル |
+| ⭐ `commutator_eq_bot` | **(E.20)** `B` はアーベル |
+
+⚠ **綴りの橋が要る**: Step 2 は Lemma 5.2 の都合で `T = C_S(Ω₁(Z₂(S)))` と綴るが、
+BG の E.4 は `C_S(Z₂(S))`。`S = Ω₁(R)` が指数 p ゆえ同一 (第 1 行の補題)。
+これが無いと E.4 を BG の綴りで**述べられない**。
+
+📌 再び **BG の longhand = 既存 Isaacs 定理**: (E.20) の "By Proposition 1.5(d)" は
+**Isaacs Cor 3.28** = `Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`。
+Step 4 の 3.24(a)/3.27 と合わせて 3 度目 ([[bg-longhand-arguments-may-be-existing-isaacs-lemmas]])。
+
+### ⬜ 次の一手 = `S/S'` 上の 2 次元固有値解析
+
+BG の残りは全部これ (`S/S'` は `\|S/S'\| = p²` = E.3(b) 第 3 clause より 2 次元 `𝔽_p`-空間)。
+
+1. ⬜ **`S' ≤ T`** — `\|S:T\| = p` ⟹ `S/T` 巡回 ⟹ アーベル ⟹ `S' ≤ T`。
+2. ⬜ **`B`-不変な補空間 `Q/S'`** — `T/S'` は `B`-不変な 1 次元部分空間。
+   ✅ **道具は在る**: `BG/Ch1_Preliminary/OperatorMaschke.lean` の
+   `exists_aInvariant_complement_of_isElementaryAbelian`
+   (`E` elementary abelian + coprime `MulAut` 作用 ⟹ `A`-不変補空間)。
+   `E := ↥S ⧸ commutator ↥S`、`φ := quotientMulAutHom`、`U := T.map (mk' S')`。
+3. ⬜ **`r = r₀`** — `α` の固有値 `r` (on `R₀S'/S'`) と `r₀` (on `T/S'`)。
+   `β` は `α` と可換 ((E.20)) なので `r ≠ r₀` なら `β` は両固有空間を固定 →
+   `R₀S'` を固定 → (E.18) に矛盾。
+4. ⬜ **`t ≠ t₀`** ((E.21)) — `t = t₀` なら `β` は `S/S'` の全 1 次元部分空間を固定、
+   特に `R₀S'/S'` → (E.18) に矛盾。
+5. ⬜ **(E.23)** = (E.22) の `β` 版 `wᵢ^β ≡ wᵢ^{tᵢ} (mod Hᵢ₊₁)`, `tᵢ = t₀ tⁱ`。
+   ✅ (E.22) 側は `exists_eigenvalue_pow` (`AppE_RegularOperator.lean:640`) に在る。
+   ⚠ ただし `exists_eigenvalue_pow` は `a ∈ hyp.A` を要求する形なので、
+   **`β ∈ B` 一般に効く形への一般化**が要る (`A_regular` を使っていないか要確認)。
+6. ⬜ **`k, i, j` の組合せ** — `k` 極小で `T/H_k` 非アーベル、`i`/`j` 極大。
+   Lemma 4.2 (= `commutatorElement_zpow_zpow_of_central`, 既存) で
+   `rᵢrⱼ ≡ r_{k-1}`、(E.26) `r₀r^{i+j} = r^{k-1}`、(E.27) `t₀t^{i+j} = t^{k-1}`。
+7. ⬜ **最終算術** — `p^k ≤ p^{q-1}` (E.3(c)) ⟹ `k ≤ q-1`、`r₀ = r` と
+   `r` の位数 `q` から `j+2 ≡ k-i (mod q)`、範囲から `j+2 = k-i`、
+   (E.27) で `t₀ = t` ⟹ (E.21) に矛盾。
