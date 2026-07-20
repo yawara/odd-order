@@ -11605,3 +11605,9 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- which is what tied the (5.6) route to the packaging; here only the §9 R-family dispatch is used,
 -- so no type hypothesis appears.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_sixTwoDecompositionData
+-- **(9.11.1) preamble at §9 level**: every `𝒮(H₀C′)`-member has degree `q·d` with source degree
+-- `d ≤ u` — the `∃ d, χ(1) = q·d ∧ d ≤ u` half of `CaseAPairBound`'s conclusion.  Both ingredients
+-- (`induceHU_apply_one_eq_q_mul`, `xiOf_H0Cprime_source_apply_one_le_u`) were already type-free;
+-- §13 needs `hncH0C`/`htype` here only to rewrite `cprimeSub … = derivedInG hyp.C`, and at §9
+-- `chars.Cprime` *is* `cprimeSub data chief`, so that step disappears.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_break_source_degree
