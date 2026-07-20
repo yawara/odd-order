@@ -604,6 +604,234 @@ theorem eq_of_chain_eigenvalue_relations_intCast {p q : ℕ} [Fact p.Prime] (hq 
   have := eq_of_chain_eigenvalue_relations hord hji him hmq hE26u hE27u
   rw [← ht₀us, ← htus, this]
 
+/-! ## `(E.23)` the `β`-side supply: the bilinear-commutator foundation
+
+BG's `(E.23)` `wₐ^β ≡ wₐ^{t₀tᵃ} (mod Hₐ₊₁)` is the `β` analogue of `(E.22)`.  Unlike `α`, `β`
+does **not** normalise `R₀` (`(E.18)`), so the `α` route `exists_eigenvalue_pow` — whose
+induction consumes `β v = v^r` — does not transfer.  BG's recursion instead comes from the
+`β`-equivariant bilinear commutator map `Hₐ/Hₐ₊₁ ⊗ S/S' → Hₐ₊₁/Hₐ₊₂` together with the
+eigenvalue split `t ≠ t₀` on `S/S' = Q/S' ⊕ T/S'`, in two cases (issue 3021, session (43)):
+
+* **Case A** `⁅Hₐ, T⁆ ≤ Hₐ₊₂`, giving BG's recursion `tₐ₊₁ = tₐ·t`;
+* **Case B** `⁅Hₐ, Q'⁆ ≤ Hₐ₊₂`, giving the fatal `tₐ₊₁ = tₐ·t₀`, which **must be excluded**.
+
+This section supplies the operator-agnostic foundations for that argument, all sorry-free:
+
+* `commutator_sup_le_of_le` — "bilinearity modulo `K`": `⁅A, B ⊔ C⁆ ≤ K` from `⁅A, B⁆ ≤ K`,
+  `⁅A, C⁆ ≤ K` (the naïve distribution `⁅A, B ⊔ C⁆ = ⁅A, B⁆ ⊔ ⁅A, C⁆` is *false*, but holds
+  modulo a normal `K`);
+* `commutator_right_mul_mem_chain`, `iterCommutator_commutator_iterCommutator_le` — the
+  chain's second-slot multiplicativity and the weight bound `⁅Hₐ, H_b⁆ ≤ H_{a+b+1}` (so the
+  `S' = H₁` error in `sᵦ ≡ s^t (mod S')` is invisible modulo `Hₐ₊₂`);
+* `caseB_excluded` — BG's **Case B exclusion**: it forces `H₁ ≤ H₂`, against strict descent;
+* `caseA_eigenvalue_step` — BG's **Case A** recursion at the generator level: `σ` scales
+  `⁅x, q·c⁆` by `sₐ·t` modulo `Hₐ₊₂`.
+
+Assembling these into the full `hβsupply` (extending from the generators `⁅x, s⁆` to all of
+`Hₐ₊₁`, splitting each `s ∈ S` along `S = Q'·T`, and running the induction against the
+`RegularOperatorSetup` eigenvalue data) is the remaining `β`-side work. -/
+
+/-- **Bilinearity modulo a normal subgroup**: if `⁅A, B⁆ ≤ K` and `⁅A, C⁆ ≤ K` with `K ⊴ G`,
+then `⁅A, B ⊔ C⁆ ≤ K`.
+
+The naïve `⁅A, B ⊔ C⁆ = ⁅A, B⁆ ⊔ ⁅A, C⁆` is **false**, but modulo a normal `K` the
+distribution holds: in `G/K`, `A` centralises the images of `B` and of `C`, hence of `B ⊔ C`.
+This is the "bilinearity modulo `Hₐ₊₂`" on which BG's `(E.23)` argument runs. -/
+theorem commutator_sup_le_of_le {G : Type*} [Group G] {A B C K : Subgroup G} [K.Normal]
+    (hB : ⁅A, B⁆ ≤ K) (hC : ⁅A, C⁆ ≤ K) : ⁅A, B ⊔ C⁆ ≤ K := by
+  rw [Subgroup.commutator_le]
+  intro a ha x hx
+  have hle : (B ⊔ C).map (QuotientGroup.mk' K) ≤
+      Subgroup.centralizer ({(QuotientGroup.mk' K) a} : Set (G ⧸ K)) := by
+    rw [Subgroup.map_sup]
+    refine sup_le ?_ ?_ <;>
+    · rintro _ ⟨y, hy, rfl⟩
+      rw [Subgroup.mem_centralizer_iff]
+      rintro g hg
+      rw [Set.mem_singleton_iff] at hg
+      subst hg
+      change Commute ((QuotientGroup.mk' K) a) ((QuotientGroup.mk' K) y)
+      rw [← commutatorElement_eq_one_iff_commute, ← map_commutatorElement,
+        QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      first
+        | exact hB (Subgroup.commutator_mem_commutator ha hy)
+        | exact hC (Subgroup.commutator_mem_commutator ha hy)
+  have hcomm : Commute ((QuotientGroup.mk' K) a) ((QuotientGroup.mk' K) x) := by
+    have hmem := hle (Subgroup.mem_map_of_mem _ hx)
+    rw [Subgroup.mem_centralizer_iff] at hmem
+    exact hmem ((QuotientGroup.mk' K) a) rfl
+  rw [← QuotientGroup.eq_one_iff,
+    show ((⁅a, x⁆ : G) : G ⧸ K) = (QuotientGroup.mk' K) ⁅a, x⁆ from rfl,
+    map_commutatorElement, commutatorElement_eq_one_iff_commute]
+  exact hcomm
+
+/-- If `a` commutes with `c`, the right factor drops out: `⁅a, b * c⁆ = ⁅a, b⁆`.
+
+The `Commute`-hypothesis specialisation of `commutatorElement_mul_right_eq_mul_conj`; it is
+what removes the `T`-part (Case A) and the `S'`-error from the right slot of a chain
+commutator once those factors centralise `x` in `G/Hₐ₊₂`. -/
+theorem commutatorElement_mul_right_of_commute {K : Type*} [Group K] {a b c : K}
+    (h : Commute a c) : ⁅a, b * c⁆ = ⁅a, b⁆ := by
+  rw [commutatorElement_mul_right_eq_mul_conj, commutatorElement_eq_one_iff_commute.mpr h,
+    mul_one, mul_inv_cancel_right]
+
+/-- **Second-slot multiplicativity of the chain commutator**: for `x ∈ Hₐ`,
+`(⁅x, s⁆ * ⁅x, s'⁆)⁻¹ * ⁅x, s * s'⁆ ∈ Hₐ₊₂`.
+
+The right-slot companion of `commutator_mul_mem_chain`: `s ↦ ⁅x, s⁆` is a homomorphism
+`S → Hₐ₊₁/Hₐ₊₂` for `x ∈ Hₐ`.  The difference is exactly `⁅⁅x, s'⁆⁻¹, s⁆ ∈ ⁅Hₐ₊₁, ⊤⁆ = Hₐ₊₂`
+(`⁅x, s'⁆ ∈ Hₐ₊₁`).  No hypothesis relating `s, s'` to the chain is needed. -/
+theorem commutator_right_mul_mem_chain {G : Type*} [Group G] {T : Subgroup G} {a : ℕ}
+    {x s s' : G} (hx : x ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a) :
+    (⁅x, s⁆ * ⁅x, s'⁆)⁻¹ * ⁅x, s * s'⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 2) := by
+  have hxs' : ⁅x, s'⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 1) := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ]
+    exact Subgroup.commutator_mem_commutator hx (Subgroup.mem_top s')
+  have hrw : (⁅x, s⁆ * ⁅x, s'⁆)⁻¹ * ⁅x, s * s'⁆ = ⁅⁅x, s'⁆⁻¹, s⁆ := by
+    simp only [commutatorElement_def]
+    group
+  rw [hrw, OddOrder.Isaacs.Ch04.iterCommutator_succ]
+  exact Subgroup.commutator_mem_commutator (Subgroup.inv_mem _ hxs') (Subgroup.mem_top s)
+
+/-- **Weight bound for the chain**: `⁅Hₐ, H_b⁆ ≤ H_{a+b+1}` for `Hₙ = iterCommutator T ⊤ n`.
+
+The analogue of `⁅γᵢ, γⱼ⁆ ≤ γᵢ₊ⱼ` for the right-`⊤`-commutator chain, by the Three Subgroups
+Lemma exactly as for the lower central series.  Its `b = 1` case `⁅Hₐ, H₁⁆ ≤ Hₐ₊₂` makes the
+`S' = H₁` error in `sᵦ ≡ s^t (mod S')` invisible modulo `Hₐ₊₂`. -/
+theorem iterCommutator_commutator_iterCommutator_le {G : Type*} [Group G] {T : Subgroup G}
+    [T.Normal] (a b : ℕ) :
+    ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a,
+        OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) b⁆ ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + b + 1) := by
+  induction b generalizing a with
+  | zero =>
+    have hrhs : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 0 + 1) =
+        ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a, (⊤ : Subgroup G)⁆ := by
+      rw [show a + 0 + 1 = a + 1 by omega]; exact OddOrder.Isaacs.Ch04.iterCommutator_succ T ⊤ a
+    rw [hrhs, OddOrder.Isaacs.Ch04.iterCommutator_zero]
+    exact Subgroup.commutator_mono le_rfl le_top
+  | succ b ih =>
+    haveI : (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + b + 2)).Normal :=
+      OddOrder.Isaacs.Ch04.iterCommutator_normal _
+    have key : ⁅⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) b, (⊤ : Subgroup G)⁆,
+        OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a⁆ ≤
+        OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + b + 2) := by
+      refine OddOrder.Isaacs.Ch04.commutator_commutator_le_of_rotate ?_ ?_
+      · have htop : (⁅(⊤ : Subgroup G),
+            OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a⁆ : Subgroup G) =
+            OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 1) := by
+          rw [Subgroup.commutator_comm]; exact (OddOrder.Isaacs.Ch04.iterCommutator_succ T ⊤ a).symm
+        rw [htop]
+        have hIH := ih (a + 1)
+        rwa [show a + 1 + b + 1 = a + b + 2 by omega] at hIH
+      · calc ⁅⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a,
+              OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) b⁆, (⊤ : Subgroup G)⁆
+            ≤ ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + b + 1),
+              (⊤ : Subgroup G)⁆ := Subgroup.commutator_mono (ih a) le_rfl
+          _ = OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + b + 2) := by
+              rw [← OddOrder.Isaacs.Ch04.iterCommutator_succ,
+                show a + b + 1 + 1 = a + b + 2 by omega]
+    have hgoal : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (b + 1) =
+        ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) b, (⊤ : Subgroup G)⁆ :=
+      OddOrder.Isaacs.Ch04.iterCommutator_succ T ⊤ b
+    rw [show a + (b + 1) + 1 = a + b + 2 by omega, hgoal, Subgroup.commutator_comm]
+    exact key
+
+/-- **Case B core**: `⁅T, Q⁆ ≤ H₂`, `⁅T, T⁆ ≤ H₂` and `⊤ = Q ⊔ T` force `H₁ ≤ H₂`.
+
+`H₁ = ⁅H₀, ⊤⁆ = ⁅T, Q ⊔ T⁆`, so `commutator_sup_le_of_le` collapses it into `H₂` once both
+`⁅T, Q⁆` (Case B) and `⁅T, T⁆ = T'` land there. -/
+theorem iterCommutator_one_le_two_of_caseB {G : Type*} [Group G] {T Q : Subgroup G} [T.Normal]
+    (hQT : (⊤ : Subgroup G) = Q ⊔ T)
+    (hB : ⁅T, Q⁆ ≤ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2)
+    (hT'2 : ⁅T, T⁆ ≤ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2) :
+    OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 1 ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2 := by
+  haveI : (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2).Normal :=
+    OddOrder.Isaacs.Ch04.iterCommutator_normal 2
+  have hH1 : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 1 = ⁅T, ⊤⁆ := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, OddOrder.Isaacs.Ch04.iterCommutator_zero]
+  rw [hH1]
+  conv_lhs => rw [hQT]
+  exact commutator_sup_le_of_le hB hT'2
+
+/-- **BG's Case B exclusion** (issue 3021, (43) 段 2): Case B `⁅T, Q⁆ ≤ H₂` at index `0` is
+impossible.
+
+With `k ≥ 3` (so `H_{k-1} ≤ H₂`) and the minimality `T' ≤ H_{k-1}`,
+`iterCommutator_one_le_two_of_caseB` forces `H₁ ≤ H₂`, contradicting the strict descent
+`H₂ < H₁`.  This is what rules out the
+fatal recursion `tₐ₊₁ = tₐ·t₀`, leaving BG's Case A `tₐ₊₁ = tₐ·t` of `(E.23)`. -/
+theorem caseB_excluded {G : Type*} [Group G] {T Q : Subgroup G} [T.Normal] {k : ℕ}
+    (hQT : (⊤ : Subgroup G) = Q ⊔ T)
+    (hB : ⁅T, Q⁆ ≤ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2) (hk : 3 ≤ k)
+    (hT' : ⁅T, T⁆ ≤ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (k - 1))
+    (hlt : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2 <
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 1) : False := by
+  have hle := iterCommutator_one_le_two_of_caseB hQT hB
+    (hT'.trans (iterCommutator_le_of_le (by omega)))
+  exact absurd (lt_of_lt_of_le hlt hle) (lt_irrefl _)
+
+/-- **BG `(E.23)`, Case A, at the generator level**: for `x ∈ Hₐ`, if `σ` scales `x` by `sₐ`
+(mod `Hₐ₊₁`) and `q` by `t` (mod `H₁ = S'`), and the second-slot base part `c` satisfies
+`c, σc ∈ T` with Case A `⁅Hₐ, T⁆ ≤ Hₐ₊₂`, then `σ` scales the generator `⁅x, q·c⁆` of `Hₐ₊₁`
+by `sₐ·t` modulo `Hₐ₊₂`.
+
+Operator-agnostic (`σ = β` is the intended use).  The computation is in `G/Hₐ₊₂`: the `Hₐ₊₁`
+error on `x` is central and drops (`commutatorElement_mul_central_left`); the `T`-part `σc`
+and the `S'`-error on `q` centralise `x` (Case A and `iterCommutator_commutator_iterCommutator_le`)
+so drop from the right slot (`commutatorElement_mul_right_of_commute`); and BG Lemma 4.2(a)
+(`commutatorElement_zpow_zpow_of_central`) turns the surviving `⁅x^{sₐ}, q^t⁆` into
+`⁅x, q⁆^{sₐt} = ⁅x, q·c⁆^{sₐt}`. -/
+theorem caseA_eigenvalue_step {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {a : ℕ} (σ : G →* G) {x q c : G} {sₐ t : ℤ}
+    (hx : x ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a)
+    (hσx : (x ^ sₐ)⁻¹ * σ x ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 1))
+    (hσq : (q ^ t)⁻¹ * σ q ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 1)
+    (hc : c ∈ T) (hσc : σ c ∈ T)
+    (hCaseA : ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a, T⁆ ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 2)) :
+    (⁅x, q * c⁆ ^ (sₐ * t))⁻¹ * σ ⁅x, q * c⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 2) := by
+  set N := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 2) with hN
+  set π := QuotientGroup.mk' N with hπ
+  set u := (x ^ sₐ)⁻¹ * σ x with hu
+  set v := (q ^ t)⁻¹ * σ q with hv
+  have hσxeq : σ x = x ^ sₐ * u := by rw [hu]; group
+  have hσqeq : σ q = q ^ t * v := by rw [hv]; group
+  have hUc : π u ∈ Subgroup.center (G ⧸ N) :=
+    chain_map_le_center T (a + 1) (Subgroup.mem_map.mpr ⟨u, hσx, rfl⟩)
+  have hxq1 : ⁅x, q⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 1) := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ]
+    exact Subgroup.commutator_mem_commutator hx (Subgroup.mem_top q)
+  have hXQc : ⁅π x, π q⁆ ∈ Subgroup.center (G ⧸ N) := by
+    rw [← map_commutatorElement]
+    exact chain_map_le_center T (a + 1) (Subgroup.mem_map.mpr ⟨⁅x, q⁆, hxq1, rfl⟩)
+  have hcomm_c : Commute (π x) (π c) := by
+    rw [← commutatorElement_eq_one_iff_commute, ← map_commutatorElement, hπ,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact hCaseA (Subgroup.commutator_mem_commutator hx hc)
+  have hcomm_sc : Commute (π x) (π (σ c)) := by
+    rw [← commutatorElement_eq_one_iff_commute, ← map_commutatorElement, hπ,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact hCaseA (Subgroup.commutator_mem_commutator hx hσc)
+  have hcomm_v : Commute (π x) (π v) := by
+    rw [← commutatorElement_eq_one_iff_commute, ← map_commutatorElement, hπ,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    have h := iterCommutator_commutator_iterCommutator_le (T := T) a 1
+      (Subgroup.commutator_mem_commutator hx hσq)
+    rwa [show a + 1 + 1 = a + 2 by omega] at h
+  refine QuotientGroup.eq.mp ?_
+  change π (⁅x, q * c⁆ ^ (sₐ * t)) = π (σ ⁅x, q * c⁆)
+  rw [map_commutatorElement σ x (q * c), map_mul σ q c, hσxeq, hσqeq]
+  simp only [map_zpow, map_commutatorElement, map_mul]
+  rw [commutatorElement_mul_central_left hUc,
+    commutatorElement_mul_right_of_commute (hcomm_sc.zpow_left sₐ),
+    commutatorElement_mul_right_of_commute (hcomm_v.zpow_left sₐ),
+    commutatorElement_zpow_zpow_of_central hXQc sₐ t,
+    commutatorElement_mul_right_of_commute hcomm_c]
+
 /-! ## `(E.28)`: `T = C_S(Z₂(S))` is abelian, gated on the `β` supply
 
 BG closes Proposition E.4 by contradiction: were `T` non-abelian, the minimal `k` with
