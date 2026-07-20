@@ -151,3 +151,21 @@ App.E frontier が凍結。⚠ **hub から c へメッセージは送れない*
 hub 監査 (issue 3021 追記) では残件は hβsupply + index-p 半分 + T 同一視 + 配線の 4 要素。
 c が「あと 1 本の深い gated work」と誤認して停止した可能性がある — だとすれば CLAUDE.md
 「deep char で多反復は停止理由でない」に反する誤停止。再開時は 3021 の frontier 正確化を先に読むこと。
+
+## 発生 2026-07-21 04:40 (lane c) — 反例 finding 完了直後に停止
+
+3-point 停止シグネチャ:
+- 最終 commit **32 分前** (`15d61d75e` (53) BG E.4 反例 Q₆、= 前 tick 04:09 に hub が合流済)。
+- transcript mtime **30 分前**、末尾 = `last-prompt` (ScheduleWakeup 未呼び出し、入力待ち idle)。
+- working tree **clean**、live proc の child なし (idle)。
+
+c は (53) の大きな counterexample finding を commit した直後に停止。**明確な次作業がある**のに
+止まった: 自分の notes (`appE_e4_counterexample_2026_07_21.md` + issue 9402) に
+(i) 9402 clean Lemma を `MaximalClassPGroup.lean` に形式化、(ii) E.4 を `hdc` 追加版で証明、
+(iii) E.5 の dc 供給調査、と次段を書いているが、いずれも未着手。成果損失ゼロ (finding は合流済) だが
+frontier が凍結。⚠ hub からメッセージ送れず **ユーザー再開待ち**。
+
+a/b は健全 (a: transcript 14min で FeitSibley 配線中 / b: 0min active)。c のみ停止。
+
+⚠ 大きな認知負荷の commit (研究レベルの finding) の後に停止する pattern が観測される
+(前回 00:55 も β-gap 解決系の直後)。ScheduleWakeup を最後に呼ばずに turn を終える癖。
