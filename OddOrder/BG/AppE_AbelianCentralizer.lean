@@ -721,4 +721,33 @@ theorem eq_of_eigenvalue_relations {p q : ℕ} {r t t₀ : (ZMod p)ˣ} (hord : o
   rw [← heq, pow_succ, mul_comm (t ^ (i + j)) t] at hE27
   exact mul_right_cancel hE27
 
+/-! ## `(E.25)`: cancelling a generator of an order-`p` section
+
+BG closes `(E.26)` with *"Therefore, by `(E.25)`, `rᵢrⱼ = r_{k-1}`"* — the step from a
+congruence of **powers** of `⁅wᵢ, wⱼ⁆` modulo `H_k` to a congruence of **exponents** mod `p`.
+It is legitimate exactly because `⁅wᵢ, wⱼ⁆ ∈ H_{k-1} − H_k` generates the order-`p` section
+`H_{k-1}/H_k`; the same move appears in Step 2 (BG's *"So `⟨w̄ᵢ⟩ = H̄ᵢ`"*). -/
+
+/-- **Cancelling a generator of an order-`p` section**: if `y ∉ K` and `|G : K| = p`, then
+`y^a ≡ y^b (mod K)` forces `a ≡ b (mod p)`.
+
+`ȳ ≠ 1` in the order-`p` group `G/K`, so `ȳ` has order exactly `p`, and `ȳ^{a-b} = 1`. -/
+theorem dvd_sub_of_zpow_mul_inv_zpow_mem {G : Type*} [Group G] {K : Subgroup G} [K.Normal]
+    {p : ℕ} (hp : p.Prime) (hidx : K.index = p) {y : G} (hy : y ∉ K) {a b : ℤ}
+    (h : y ^ a * (y ^ b)⁻¹ ∈ K) : (p : ℤ) ∣ a - b := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hcard : Nat.card (G ⧸ K) = p := by rw [← Subgroup.index_eq_card]; exact hidx
+  set ybar : G ⧸ K := QuotientGroup.mk' K y with hybar
+  have hne : ybar ≠ 1 := fun h1 => hy (by simpa using (QuotientGroup.eq_one_iff y).mp h1)
+  have hord : orderOf ybar = p := by
+    have hdvd : orderOf ybar ∣ p := hcard ▸ orderOf_dvd_natCard ybar
+    rcases (Nat.dvd_prime hp).mp hdvd with h1 | hpx
+    · exact absurd (orderOf_eq_one_iff.mp h1) hne
+    · exact hpx
+  have hone : ybar ^ (a - b) = 1 := by
+    rw [zpow_sub, hybar, ← map_zpow, ← map_zpow, ← map_inv, ← map_mul]
+    exact (QuotientGroup.eq_one_iff _).mpr h
+  have := orderOf_dvd_iff_zpow_eq_one.mpr hone
+  rwa [hord] at this
+
 end OddOrder.BG.AppE
