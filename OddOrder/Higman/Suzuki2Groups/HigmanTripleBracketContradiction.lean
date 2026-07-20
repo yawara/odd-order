@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaSix
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.GroupTheory.RepresentationTheory.CyclicExtension
 
 /-!
 # Higman's Lemma 6: the triple-bracket contradiction
@@ -122,6 +123,92 @@ theorem lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
             phi hH (c ^ z) hcz g)
   apply hphi
   simpa only [map_one] using hphiOne
+
+/-! ## The Lemma 4 contradiction for a nonfaithful actor -/
+
+/-- Higman's Lemma 4 does not require the displayed cyclic actor to act
+faithfully on either layer.  If an equivariant equivalence existed, then
+transitivity on the second layer would transport to the first.  Singer
+coordinates may therefore be constructed through the faithful effective
+image of the first-layer representation.
+
+This is the source-strength form needed later in Lemma 7, where restriction
+of the ambient actor to a normal invariant cover need not be injective. -/
+theorem not_exists_equivariant_linearEquiv_of_higman_bracket_of_transitive
+    {C V₁ V₂ : Type uH}
+    [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V₁] [Module (ZMod 2) V₁] [Finite V₁]
+    [AddCommGroup V₂] [Module (ZMod 2) V₂] [Finite V₂]
+    (rho₁ : Representation (ZMod 2) C V₁)
+    (rho₂ : Representation (ZMod 2) C V₂)
+    (n : ℕ) (hn : 2 ≤ n)
+    (hfin₂ : Module.finrank (ZMod 2) V₂ = n)
+    (beta : LinearMap.BilinMap (ZMod 2) V₁ V₂)
+    (hbetaEquiv : ∀ c x y,
+      rho₂ c (beta x y) = beta (rho₁ c x) (rho₁ c y))
+    (hbetaAlt : ∀ x, beta x x = 0)
+    (hbetaSpan : Submodule.span (ZMod 2)
+      (Set.range fun z : V₁ × V₁ => beta z.1 z.2) = ⊤)
+    (htrans₂ : ∀ v w : V₂, v ≠ 0 → w ≠ 0 →
+      ∃ c : C, rho₂ c v = w) :
+    ¬ ∃ e : V₁ ≃ₗ[ZMod 2] V₂,
+      ∀ c v, e (rho₁ c v) = rho₂ c (e v) := by
+  classical
+  rintro ⟨e, he⟩
+  have hfin₁ : Module.finrank (ZMod 2) V₁ = n :=
+    e.finrank_eq.trans hfin₂
+  letI : Nontrivial V₂ :=
+    Module.nontrivial_of_finrank_pos (by rw [hfin₂]; omega)
+  letI : Nontrivial V₁ := e.toEquiv.nontrivial
+  have htrans₁ : ∀ v w : V₁, v ≠ 0 → w ≠ 0 →
+      ∃ c : C, rho₁ c v = w := by
+    intro v w hv hw
+    obtain ⟨c, hc⟩ := htrans₂ (e v) (e w)
+      (e.map_ne_zero_iff.mpr hv) (e.map_ne_zero_iff.mpr hw)
+    refine ⟨c, e.injective ?_⟩
+    rw [he]
+    exact hc
+  obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := C)
+  let K := GaloisField 2 n
+  obtain ⟨_efield, lambda, b, hprim, _hconj, _hgen, hb⟩ :=
+    exists_singerFrobeniusEigenbasis_of_transitive_generator
+      rho₁ n hn hfin₁ htrans₁ c hcgen
+  let betaK : LinearMap.BilinMap K
+      (K ⊗[ZMod 2] V₁) (K ⊗[ZMod 2] V₂) :=
+    beta.baseChange K
+  let T₁ : Module.End K (K ⊗[ZMod 2] V₁) := (rho₁ c).baseChange K
+  let T₂ : Module.End K (K ⊗[ZMod 2] V₂) := (rho₂ c).baseChange K
+  have hbetaEquivK : ∀ x y,
+      T₂ (betaK x y) = betaK (T₁ x) (T₁ y) := by
+    intro x y
+    exact LinearMap.BilinMap.baseChange_equivariant
+      beta (rho₁ c) (rho₂ c) (hbetaEquiv c) x y
+  have hbetaAltK : ∀ x, betaK x x = 0 := by
+    intro x
+    exact LinearMap.BilinMap.zmodTwo_baseChange_self_eq_zero beta hbetaAlt x
+  have hbetaSpanK : Submodule.span K
+      (Set.range fun z : (K ⊗[ZMod 2] V₁) × (K ⊗[ZMod 2] V₁) =>
+        betaK z.1 z.2) = ⊤ :=
+    LinearMap.BilinMap.baseChange_span_eq_top beta hbetaSpan
+  have hpairSpan : ⨆ mu ∈ Set.range (fun p : HigmanExponentPair n ↦
+      lambda ^ (2 ^ p.1.1.val + 2 ^ p.1.2.val)),
+      T₂.eigenspace mu = ⊤ :=
+    iSup_frobeniusPairWeight_eigenspace_eq_top_of_bilinear
+      n lambda T₁ T₂ b hb betaK hbetaEquivK hbetaAltK hbetaSpanK
+  let i₀ : Fin n := ⟨0, by omega⟩
+  have hfirst : T₁ (b i₀) = lambda • b i₀ := by
+    simpa [i₀] using hb i₀
+  have hsecond : T₂
+      (e.baseChange (ZMod 2) K V₁ V₂ (b i₀)) =
+      lambda • (e.baseChange (ZMod 2) K V₁ V₂ (b i₀)) :=
+    baseChange_eigenvector_equation_of_equivariant_linearEquiv
+      rho₁ rho₂ e he c lambda (b i₀) hfirst
+  have hsecondNe : e.baseChange (ZMod 2) K V₁ V₂ (b i₀) ≠ 0 :=
+    (e.baseChange (ZMod 2) K V₁ V₂).map_ne_zero_iff.mpr (b.ne_zero i₀)
+  have hlambda : T₂.HasEigenvalue lambda :=
+    Module.End.hasEigenvalue_of_hasEigenvector
+      ⟨Module.End.mem_eigenspace_iff.mpr hsecond, hsecondNe⟩
+  exact higman_spectral_contradiction T₂ n hn lambda hprim hpairSpan hlambda
 
 /-- An equivariant linear equivalence transports a displayed family of
 eigenspaces which spans after scalar extension. -/
@@ -428,5 +515,80 @@ theorem not_exists_equivariant_linearEquiv_of_higman_tripleBracket
       (lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
         hH phi hphi hCodd)
       htrans₂
+
+/-- **Higman Lemma 6 for a possibly nonfaithful displayed actor.**
+
+The action `phi` need not be injective.  Passing to its range gives a
+faithful cyclic actor on `H`; its order remains odd because the range order
+divides the order of `C`.  Irreducibility, transitivity, and the proposed
+equivariant equivalence all descend along the surjection onto that range.
+
+This is the form needed when an ambient automorphism subgroup is restricted
+to a normal invariant cover. -/
+theorem
+    not_exists_equivariant_linearEquiv_of_higman_tripleBracket_of_odd_action
+    {H C : Type uH} [Group H] [Finite H]
+    [CommGroup C] [IsCyclic C] [Finite C]
+    (hH : IsPGroup 2 H)
+    (phi : C →* MulAut H)
+    (hCodd : Odd (Nat.card C))
+    (hAgemo : Agemo H 2 1 = lowerCentralTerm H 1)
+    (n : ℕ) (hn : 2 ≤ n)
+    (hfin₂ : Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer H 1)) = n)
+    (hirr₁ : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation phi 0))
+    (htrans₂ : ∀ v w : Additive (lowerCentralLayer H 1),
+      v ≠ 0 → w ≠ 0 → ∃ c : C,
+        lowerCentralLayerRepresentation phi 1 c v = w) :
+    ¬ ∃ e : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2]
+        Additive (lowerCentralLayer H 2),
+      ∀ c v,
+        e (lowerCentralLayerRepresentation phi 1 c v) =
+          lowerCentralLayerRepresentation phi 2 c (e v) := by
+  classical
+  let D := MonoidHom.range phi
+  let psi : D →* MulAut H := D.subtype
+  letI : Finite D := Finite.of_surjective phi.rangeRestrict
+    phi.rangeRestrict_surjective
+  letI : CommGroup D :=
+    { (inferInstance : Group D) with
+      mul_comm := by
+        intro a b
+        rcases a.2 with ⟨x, hx⟩
+        rcases b.2 with ⟨y, hy⟩
+        apply Subtype.ext
+        change (a : MulAut H) * b = b * a
+        rw [← hx, ← hy, ← map_mul, mul_comm, map_mul] }
+  letI : IsCyclic D :=
+    isCyclic_of_surjective phi.rangeRestrict
+      phi.rangeRestrict_surjective
+  have hcomp (i : ℕ) :
+      (lowerCentralLayerRepresentation psi i).comp phi.rangeRestrict =
+        lowerCentralLayerRepresentation phi i := by
+    ext c q
+    rfl
+  have hirrD : Representation.IsIrreducible
+      (lowerCentralLayerRepresentation psi 0) := by
+    apply Representation.isIrreducible_of_isIrreducible_comp
+      (f := phi.rangeRestrict) (lowerCentralLayerRepresentation psi 0)
+    rw [hcomp]
+    exact hirr₁
+  have htransD : ∀ v w : Additive (lowerCentralLayer H 1),
+      v ≠ 0 → w ≠ 0 → ∃ d : D,
+        lowerCentralLayerRepresentation psi 1 d v = w := by
+    intro v w hv hw
+    obtain ⟨c, hc⟩ := htrans₂ v w hv hw
+    exact ⟨phi.rangeRestrict c, hc⟩
+  have hDodd : Odd (Nat.card D) :=
+    hCodd.of_dvd_nat (Subgroup.card_range_dvd phi)
+  rintro ⟨e, he⟩
+  apply not_exists_equivariant_linearEquiv_of_higman_tripleBracket
+    hH psi (Subgroup.subtype_injective D) hDodd hAgemo n hn hfin₂
+    hirrD htransD
+  refine ⟨e, ?_⟩
+  intro d v
+  obtain ⟨c, rfl⟩ := phi.rangeRestrict_surjective d
+  exact he c v
 
 end OddOrder.Higman.Suzuki2Groups
