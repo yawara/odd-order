@@ -216,12 +216,15 @@ CLAUDE.md のラッパー方針で不可。具体化として価値があるの�
 `{Ind_{M′}^M θ | M_σ ⊄ Ker θ}` に一致する」ことの明示 (= `h46.toCore.K` /
 `.subH` の同定) と、下流 consumer への接続。
 
-### 未証明のまま残した docstring 主張 (要 formalize)
+### docstring の精度 (2026-07-20 に是正済)
 
 §8E の docstring は「`H = K` のとき 2 つの絞りは一致する (= P₁ の符合)」と書いているが、
-`⊇` 方向 (`θ ≠ 1 ⟹ K ⊄ Ker θ`) は**未証明**。要るのは「既約指標の核が全体 ⟹ 自明指標」で、
-経路は `inner_self_eq_one` (`CharacterProduct.lean:195`) + 次数が正の自然数 ⟹ 次数 1。
-`⊆` 方向は `inducedNonKernelFamily_subset_inducedKernelFamily_bot` で証明済。
+形式化されているのは**下流で実際に使う `⊆` 方向のみ**
+(`inducedNonKernelFamily_subset_inducedKernelFamily_bot` = `H ⊄ Ker θ ⟹ θ ≠ 1`)。
+逆 `θ ≠ 1 ⟹ K ⊄ Ker θ` (= 既約指標の核が全体なら自明指標; 経路は
+`IsIrreducibleCharacter.inner_self_eq_one` で次数 1 を強制) は標準事実だが**未形式化**。
+⟹ docstring 側に「motivation であって formalized lemma ではない」と明記した
+(検証済のように読ませない)。必要になったら形式化する。
 
 なお `inducedKernelFamily_subcoherent` 自体は `hKsupp` を引数化すれば `A₀` について一般化できる
 (item 1 の `typePData_toHypothesis46_ofSupport` と同じ形) ので、**族の絞りと支持補題が本体**。

@@ -308,8 +308,14 @@ variable (K : Subgroup ↥M) [Invertible (Nat.card ↥K : ℂ)]
 /-- **Peterfalvi (5.3.b)/(8.15.3)'s family** `{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`.
 
 The `H`-nontrivial analogue of `S08.inducedKernelFamily` (which filters by `θ ≠ 1` together with a
-*positive* kernel condition `X ⊆ Ker θ`).  At `H = K` the two conditions coincide — an irreducible
-`θ ∈ Irr K` has `K ⊆ Ker θ` iff `θ = 1` — which is exactly the type-`P₁` coincidence `M_s = M'`. -/
+*positive* kernel condition `X ⊆ Ker θ`).
+
+At `H = K` the two filters coincide — for irreducible `θ ∈ Irr K`, `K ⊆ Ker θ` iff `θ = 1` — which
+is exactly the type-`P₁` coincidence `M_s = M'`.  ⚠ Only the direction used downstream is
+formalized: `inducedNonKernelFamily_subset_inducedKernelFamily_bot` proves `H ⊄ Ker θ ⟹ θ ≠ 1`
+(hence `⊆`).  The converse `θ ≠ 1 ⟹ K ⊄ Ker θ` — an irreducible character with full kernel is
+trivial, via `IsIrreducibleCharacter.inner_self_eq_one` forcing degree 1 — is standard, and is
+stated here as motivation, **not** as a formalized lemma. -/
 def inducedNonKernelFamily (H : Subgroup ↥M) : Set (ClassFunction ↥M ℂ) :=
   {φ | ∃ θ : IrreducibleCharacter ↥K,
     ¬ ((H.subgroupOf K : Set ↥K) ⊆
