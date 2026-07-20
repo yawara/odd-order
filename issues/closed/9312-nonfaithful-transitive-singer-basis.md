@@ -22,11 +22,11 @@ transitivity を保つ。元の cyclic generator の像が位数 `2^n - 1` の S
 
 ## やること
 
-- [ ] representation image actor と faithful image representation の汎用 API
-- [ ] commutative actor の像が commutative で transitivity を保つこと
-- [ ] cyclic generator の像の位数が `2^n - 1` であること
-- [ ] 元の generator operator に対する Singer--Frobenius eigenbasis
-- [ ] Higman Lemma 11 の第二層で faithfulness を仮定せず利用できる signature
+- [x] representation image actor と faithful image representation の汎用 API
+- [x] commutative actor の像が commutative で transitivity を保つこと
+- [x] cyclic generator の像の位数が `2^n - 1` であること
+- [x] 元の generator operator に対する Singer--Frobenius eigenbasis
+- [x] Higman Lemma 11 の第二層で faithfulness を仮定せず利用できる signature
 
 ## 完了条件
 
@@ -43,3 +43,18 @@ transitivity を保つ。元の cyclic generator の像が位数 `2^n - 1` の S
 - `OddOrder/Higman/Suzuki2Groups/HigmanLowerCentralSpectrum.lean`
 - `/tmp/HigmanImageRepresentation5.lean` (green prototype)
 - issues 9310, 9311
+
+## 完了記録
+
+汎用側に `representationImageActor`, `representationImage`,
+`representationImage_injective`, `representationImage_transitive`,
+`representationImage_mul_comm`,
+`representationImage_generator_orderOf_eq_pow_sub_one` を追加した。Higman の
+spectral leaf には `exists_singerFrobeniusEigenbasis_of_transitive_generator`
+だけを追加し、元の作用の faithfulness を仮定せず、有効像上の faithful
+Singer action から元の generator operator の固有基底を返す。
+
+対象ビルドは 2 leaf 合計 2499 jobs で成功。変更後の行数は
+`FrobeniusCoordinates.lean` 1011 行、`HigmanLowerCentralSpectrum.lean`
+1499 行。新規 theorem の公理依存は `propext`, `Classical.choice`,
+`Quot.sound` のみ。

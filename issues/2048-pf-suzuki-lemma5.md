@@ -190,6 +190,21 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             (`42e744a4f`)
     - [ ] Higman Lemma 11 (current source frontier): `K`-length `2` の Suzuki `2`-group を
           原文の有限体座標群 `A(n, θ)` と同型にする
+      - [x] 原典 p. 79 の actor 仮定を regular でなく cyclic-transitive として分離し、
+            `P' = Φ(P) = Z(P) = Ω₁(P)` と lower-central length two を構成する
+      - [x] actor の prime-supported reduction と、第一層体次数 `m` が第二層次数 `n` の
+            odd multiple になる有限体 bridge を構成する (issues 9310--9311)
+      - [x] 非忠実でもよい第二層作用を effective image 上で faithful にし、任意の共通
+            splitting field `L` 上に `Fin n` の Singer--Frobenius eigenbasis を構成する
+      - [ ] `m` と `n` を同一視せず、非零 bracket が単一 gap `±r (mod m)` に
+            支えられることを証明する
+      - [ ] gap-supported bracket を正規化し、Lemma 5 の平方和を
+            `Tr[L/K](α^(1+2^r) ε)` に再添字化する
+      - [ ] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する
+      - [x] actual central extension を平方写像で分類し、Peterfalvi の honest
+            `TypeAData` へ接続する shared adapter を構成する (issue 9309)
+      - [ ] `m = n` 後の平方写像 `a ↦ a * θ(a)` と lower-central 座標を接続し、
+            source-facing `higmanLemmaEleven` を組み立てる
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
