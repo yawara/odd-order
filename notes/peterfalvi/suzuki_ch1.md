@@ -736,25 +736,39 @@ factorLayerOneEquivAmbientFrattini_squareValue。
 **その後**: branch dispatch (comm/noncomm factorInclusion → ambientProductEquiv の e) →
 mixed 項 M を case 別固有値算術で確定 → case assembly で higmanLemmaTwelve endpoint。
 
-### 2026-07-21 lane b: comm A=q_X の instance plumbing 課題 (次 session)
+### 2026-07-21 lane b: comm A=q_X 完成 (commit a80c714b8)
 
-noncomm A=q_X (`noncomm_ambientSquare_eq`) は committed。comm A=q_X を試作したが
-**quotient module instance の synthesis 課題**で保留 (WIP =
-scratchpad/CaseSplitBCD_comm_wip.lean)。課題:
-- comm factor の L₀ = `S ⧸ Agemo S 2 1`、その module は
-  `AddCommGroup.zmodModule h2` (h2 : ∀q, 2•q=0 の proof から) で構築。
-  `commFactorInclusion` の def 内 letI と proof 内 letI で別インスタンスになり、
-  `rw [commFactorInclusion]` unfold 時に「failed to synthesize」。
-- `set eQuotLin` の rfl / hαrep も再考要 (`eQuotLin = {data.eQuot with map_smul'}`)。
+noncomm・comm 両分岐の factor square identity が committed・sorry-free・axiom-clean。
+前 session の「instance synthesis 課題」という診断は**誤り**だった。真の詰まりは
+`rw [factorInclusion_eQuot_mk]` の**パターン不一致**:
+- proof 側の `set eQuotLin`(opaque fvar)と `commFactorInclusion` 内部の inline
+  `{data.eQuot with …}`(bundled LinearEquiv)が構文的に別物 → rw が eQuot を照合できない。
+- `QuotientGroup.mk`(mk_surjective 由来)vs 補題が使う `mk'` のずれ。
 
-**fix 方針 (次 session)**:
-- (a) `commFactorInclusion` を quotient module + CommGroup + IsMulComm を **instance
-  param** で受ける形にし、caller が 1 度だけ構築して共有 (内部 letI 廃止)。または
-- (b) `Module (ZMod 2) M` は scalar action 一意 (proof-irrelevant) ゆえ全 instance が
-  defeq のはず — `AddCommGroup.zmodModule h2` 同士が defeq-match しない理由を精査し、
-  canonical instance (例: S⧸Agemo の elementary-abelian からの標準 module) を使う。
-- exists_factorFamily_of_commutative (MixedEigenweights:543-595) が同じ setup を
-  していて通っているので、その instance 構築を厳密に踏襲する (letI の順序・値を一致)。
+**解決 (approach = bridge lemma)**: `commFactorInclusion` は self-contained
+(内部 letI: CommGroup ↥S → IsMulComm quot → `AddCommGroup.zmodModule`)のまま保ち、
+橋渡し補題 `commFactorInclusion_eQuot_mk` を追加。この補題は **`data.eQuot`(AddEquiv)
+だけで statement を書く**ので ambient `↥S ⧸ ℧₁`-module instance が型に漏れず、
+`comm_ambientSquare_eq` は `rw [hαrep, commFactorInclusion_eQuot_mk data hK0 g]` で
+clean に畳める。`mk' N g ≡ mk g` の defeq は `exact factorInclusion_eQuot_mk` の
+isDefEq が吸収。補題 statement は `mk` 版で書く(mk' の rw ずれ回避)。
+- 落とし穴 2 点: (1) `heq` の `rw [hg]` 後に `_ = Additive.ofMul (Additive.toMul _)`
+  が残る → `simp`(`Additive.ofMul_toMul`)で閉じる。(2) factor 側で
+  `homocyclicFourSquareSubgroupEquivFrattini_squareEquiv` が `Fintype data.index` を
+  要求 → `haveI := data.fintypeIndex`。
 
-noncomm は defeq clean だったが (lowerCentralLayer S 0 の module が canonical)、
-comm は S⧸Agemo の module が proof-derived で friction。branch dispatch でも同課題。
+**留意 (assembly での再利用時)**: downstream `ambientProductEquiv`/`combinedFactorMap`
+(AmbientProductCoordinate:170-178)は `eQuotL : Additive (HL⧸NL) ≃ₗ F` と quot-module
+instance を**明示引数**で取る。self-contained な `commFactorInclusion` の内部 letI
+instance と assembly 側 letI が defeq でも `rw` で照合し切れない懸念があれば、
+comm 分岐だけ eQuotLin を明示 param 化する refactor を assembly 着手時に判断
+(現状は committed noncomm と対称構造を優先)。
+
+**次 (branch dispatch → mixed 項 → case assembly)**:
+1. comm/noncomm の factorInclusion を `ambientProductEquiv` の `fL`/`eQuotL` に接続
+   (fL: comm=`S.subtype`/NL=`Agemo ↥S 2 1`、noncomm=`S.subtype∘lctS0.subtype`/
+   NL=`lowerCentralLayerKernel ↥S 0`)。hinf/hsup/hΦR は XiLengthThreeTypeAFactorData から。
+2. mixed 項 M(α,β)=`ambientCenterCoordinate(bilinear(fI_left α, fI_right β))` を
+   `exists_mixedFrobeniusWeightEquation_of_xiLengthThree` の weight 方程式 + case 別算術で確定。
+3. 各 case で `Q(α,β)=A+B+M = typeB/C/D quadratic map` → `TypeB/C/DData.ofExtension`
+   → `higmanLemmaTwelve` endpoint。
