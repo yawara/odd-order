@@ -445,6 +445,11 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       自体を固定する normal-form 補題を証明した。さらに square map の実際の
       actor-equivariance から、固定した kernel eigenvalue と quotient eigenvalue が
       `ν = λ·θ(λ)` を満たすことを直接導いた。
+      既存 normalization chain が shift を隠さないよう、`PairGap` の正規化については
+      第2層 coordinate が original coordinate の何乗 Frobenius shift かを exact equality
+      付きで返す strong sibling theorem を追加し、従来 API はその projection とした。
+      次は `ProperExtension` の anchored-trace construction 内で加わる第2の shift を同様に
+      公開し、二つの shift を合成して prescribed kernel coordinate へ戻す。
       Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
       caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
       invariant factor への restricted action の faithful range でも generator のまま

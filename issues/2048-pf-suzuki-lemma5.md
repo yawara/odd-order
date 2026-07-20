@@ -323,6 +323,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           - [x] normal-form の Frobenius renormalization を quotient coordinate 側へ
                 counter-shift して prescribed kernel coordinate を固定し、square map の
                 actor-equivariance から `ν = λ·θ(λ)` を導く一般補題を証明する
+          - [x] `PairGap` normalization が第2層へ加える最初の Frobenius shift と
+                original kernel coordinate との exact equality を strong sibling API で返す
+          - [ ] `ProperExtension` の anchored-trace construction が第2層へ加える次の
+                Frobenius shift も同様に返し、上記 counter-shift 補題へ接続する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
