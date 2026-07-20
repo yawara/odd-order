@@ -1794,3 +1794,57 @@ chain に当てて (E.25) の範囲 `0 ≤ j ≤ i ≤ k-2` と
 
 `|T/H_k| = p^k` (各段の指数が p) ≤ `|T| = p^n = |S|/p` ≤ `p^{q-1}` (E.3(c))。
 ⟹ `k ≤ q-1`。Step 2 の `index_subgroupOf_chain` と `card_omega_le` が土台。
+
+## 2026-07-20 (40): セッション総括 — E.3(d) 完了、E.4 は 7 項中 6 項
+
+### ✅ 完了: BG Theorem E.3(d)
+
+`OddOrder/BG/AppE_SemidirectFrattini.lean` (368 行, sorry-free, axiom-clean)。
+`AppE_FurtherResults.lean` の sorried statement は削除し注記コメントに置換。
+**App.E の残 sorry は E.4 と E.5 の 2 件** (セッション開始時 3 件)。
+
+📌 最大の教訓: BG の *"By a variation of the Frattini argument … Schur–Zassenhaus …"*
+は **Isaacs Lemma 3.24(a) (Glauberman) の証明そのもの**で、repo に既存だった。
+半直積の新規構築は**不要**だった ([[bg-longhand-arguments-may-be-existing-isaacs-lemmas]])。
+同じパターンが (E.20) の Prop 1.5(d) = Isaacs Cor 3.28 でも効いた。
+
+### Prop E.4 の進捗 (`AppE_AbelianCentralizer.lean` 926 行)
+
+| 項 | 内容 | 状態 |
+|---|---|---|
+| 1 | `S' ≤ T` | ✅ |
+| 2 | `B`-不変補空間 `Q/S'` (operator Maschke) | ✅ |
+| 3 | `r = r₀` | ✅ |
+| 4 | `t ≠ t₀` = (E.21) | ✅ |
+| 5 | (E.23) = (E.22) の `β` 版 | ⚠ **Case A/B 未決** |
+| 6 | Lemma 4.2 両スロット版 + 指数取り出し + (E.26)/(E.27) 統合 | ✅ |
+| 6' | `k`,`i`,`j` の取り出し + (E.25) の範囲 `j ≤ i ≤ k-2` | ✅ |
+| 7 | 最終算術 ⟹ `t₀ = t` | ✅ |
+
+**指数 clause `|S : C_S(Z₂(S))| = p` は完全に証明済み** (`|S| ≥ p⁴` のみ使用)。
+残るのは abelian clause。
+
+### ⬜ 残作業 (2 件)
+
+**(A) `⁅w_i,w_j⁆ ∉ H_k`** — `⁅H_i,H_j⁆ ⊄ H_k` と `i`,`j` の極大性から。
+必要な補題の形:
+
+```
+K ⊴ G,  A ≤ ⟨a⟩ ⊔ A',  B ≤ ⟨b⟩ ⊔ B',  ⁅A',B⁆ ≤ K,  ⁅A,B'⁆ ≤ K,  ⁅a,b⁆ ∈ K
+⟹  ⁅A,B⁆ ≤ K
+```
+
+(対偶が欲しい形。) 商 `G/K` で「`ā` が `b̄` と可換・`Ā'` が `B̄` と可換・
+`B̄'` が `Ā` と可換 ⟹ `Ā` と `B̄` が可換」に落ちる。
+⚠ 元の分解 `x = a^m·a'` に `Subgroup.mem_sup` (片方の正規性が要る) を使う。
+`A' = H_{i+1}` は `S` で正規なので条件は満たす。
+
+**(B) 項 5 の Case A/B** ((32) 参照)。`⁅H_i, T⁆ ≤ H_{i+2}` (Case A) か
+`⁅H_i, Q⁆ ≤ H_{i+2}` (Case B) かの判定。BG の行間。
+
+その後、(A)(B) が揃えば `RegularOperatorSetup` 上で全部を繋いで E.4 が閉じる。
+
+### リポジトリ状態
+
+sorry 13 (セッション開始 14)。leaf build green。AxiomsCheck に Step 3/4 の 10 件追加済み
+(フルビルド 4518 jobs green で検証)。フルビルドは hub の合流 gate に委ねる。
