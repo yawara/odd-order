@@ -1157,9 +1157,36 @@ instance characteristic_iterCommutator {G : Type*} [Group G] (T : Subgroup G)
   | zero => exact ‹T.Characteristic›
   | succ n ih =>
       haveI := ih
-      show (⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n,
+      change (⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n,
         (⊤ : Subgroup G)⁆).Characteristic
       infer_instance
+
+/-- **BG Theorem E.3(b), Step 2, (E.12) setup**: `H̄ᵢ ≤ Z(S̄)` in `S̄ = S/Hᵢ₊₁`.
+
+BG: *"Let `S̄ = S/Hᵢ₊₁` and apply the bar convention.  Then `|H̄ᵢ| = p` and `H̄ᵢ ≤ Z(S̄)`."*
+
+Immediate from the chain's own definition: `Hᵢ₊₁ = ⁅Hᵢ, S⁆`, so every commutator of an
+element of `Hᵢ` with anything dies in the quotient.  This centrality is precisely what makes
+Lemma 4.2(a) — and hence `commutatorElement_pow_pow_of_central` — applicable there. -/
+theorem chain_map_le_center {G : Type*} [Group G] (T : Subgroup G) [T.Characteristic]
+    (i : ℕ) :
+    (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i).map
+        (QuotientGroup.mk' (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1)))
+      ≤ Subgroup.center
+        (G ⧸ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1)) := by
+  rintro _ ⟨x, hx, rfl⟩
+  rw [Subgroup.mem_center_iff]
+  intro z
+  obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective _ z
+  have hmem : (y * x)⁻¹ * (x * y) ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+    have hrw : (y * x)⁻¹ * (x * y) = ⁅x⁻¹, y⁻¹⁆ := by group
+    rw [hrw, OddOrder.Isaacs.Ch04.iterCommutator_succ]
+    exact Subgroup.commutator_mem_commutator
+      ((OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i).inv_mem hx)
+      (Subgroup.mem_top _)
+  rw [← map_mul, ← map_mul]
+  exact QuotientGroup.eq.mpr hmem
 
 /-- **BG Theorem E.3(b), Step 2, (E.9)**: the chain is `A`-invariant.
 

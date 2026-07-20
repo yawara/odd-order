@@ -11127,6 +11127,16 @@ central — to compute `[wᵢ₋₁^{rᵢ₋₁} u, vʳ] = wᵢ^{rᵢ₋₁ r}` 
 `S04_SmallRankBasic`; it is kept here while it has a single consumer. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.commutatorElement_pow_pow_of_central
 
+/-! **BG Theorem E.3(b), Step 2, (E.12) setup** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20): `AppE.chain_map_le_center` — `H̄ᵢ ≤ Z(S̄)` in `S̄ = S/Hᵢ₊₁`.
+
+BG: *"Let `S̄ = S/Hᵢ₊₁` … then `|H̄ᵢ| = p` and `H̄ᵢ ≤ Z(S̄)`."*  Immediate from the chain's own
+definition — `Hᵢ₊₁ = ⁅Hᵢ, S⁆`, so every commutator of an element of `Hᵢ` with anything dies
+in the quotient.  This centrality is exactly the hypothesis
+`commutatorElement_pow_pow_of_central` needs, so it is what lets Lemma 4.2(a) be applied
+there. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.chain_map_le_center
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

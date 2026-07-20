@@ -502,12 +502,13 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
      **双線形形**を組んだ (BG が (E.12) で実際に使うのはこちら)。
      右スロットは `⁅x^m, y⁆` に当てる — これが中心的なのは `⁅x,y⁆^m` に**等しい**から。
      ⚠ topical には S04_SmallRankBasic の 2 スロットの隣が home。消費者が 1 つの間は AppE に置く。
-   - ⬜ 残 (E.12 の組み立て): `w_i = [w_{i-1}, v]` 列を定義し、`S/H_{i+1}` で
-     `H̄_i ≤ Z(S̄)` を使って上の双線形形を適用 ⟹ `r_i ≡ r_{i-1} r`、帰納で `r_i ≡ r₀ r^i`。
-     そこから `le_pred_of_forall_mul_pow_ne_one` に流して `n ≤ q-1` ⟹ **E.3(c)**。
-     ⚠ `H̄_i ≤ Z(S̄)` (BG「`⟨w̄ᵢ⟩ = H̄ᵢ ≤ Z(S̄)`」) が次に要る補題。
-     `H_{i+1} = ⁅H_i, ⊤⁆` なので商で `⁅H̄_i, S̄⁆ = 1`、すなわち `H̄_i` は中心的 — これは
-     `Subgroup.commutator_eq_bot_iff_le_centralizer` の商版で出るはず。
+   - ✅ **`H̄_i ≤ Z(S̄)`** = `chain_map_le_center` (BG「`⟨w̄ᵢ⟩ = H̄ᵢ ≤ Z(S̄)`」)。
+     鎖の定義そのものから即座 — `H_{i+1} = ⁅H_i, S⁆` ゆえ `H_i` の元との交換子は商で死ぬ。
+     これが `commutatorElement_pow_pow_of_central` の中心性仮説そのものなので、
+     Lemma 4.2(a) が商で使えるようになる。
+   - ⬜ 残 (E.12 の最終組み立て): `w_i = [w_{i-1}, v]` 列を定義し、上の 2 つを使って
+     `r_i ≡ r_{i-1} r`、帰納で `r_i ≡ r₀ r^i`。そこから
+     `le_pred_of_forall_mul_pow_ne_one` に流して `n ≤ q-1` ⟹ **E.3(c)**。
 
 ### (E.10) の道具は特定済 — 要素レベル形が public (2026-07-20 実測)
 
