@@ -154,7 +154,8 @@ private theorem bgThm310_nilpotent_aux
       haveI : Fact p.Prime := ⟨hp⟩
       have hMea : IsElementaryAbelian p M :=
         IsElementaryAbelian.of_mulEquiv Subgroup.topEquiv (hNtop ▸ hNea)
-      letI cg : CommGroup M := { (inferInstance : Group M) with mul_comm := fun a b => hMea.comm a b }
+      letI cg : CommGroup M :=
+        { (inferInstance : Group M) with mul_comm := fun a b => hMea.comm a b }
       have hnsmul : ∀ x : Additive M, (p : ℕ) • x = 0 := by
         intro x
         apply Additive.toMul.injective

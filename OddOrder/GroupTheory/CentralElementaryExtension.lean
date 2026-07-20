@@ -40,6 +40,55 @@ open Module
 
 universe uV uW uE uE'
 
+section CoordinateExtension
+
+variable {K : Type uW} [Group K]
+variable {Q : Type uV} [Group Q]
+variable {E : Type uE} [Group E]
+
+/-- Package a normal subgroup and chosen kernel/quotient coordinates as a
+short exact group extension.  Both coordinates are actual multiplicative
+equivalences; no section or factor set is posited. -/
+noncomputable def _root_.GroupExtension.ofNormalSubgroupCoordinates
+    (N : Subgroup E) [N.Normal]
+    (left : K ≃* N) (right : E ⧸ N ≃* Q) :
+    GroupExtension K E Q where
+  inl := N.subtype.comp left.toMonoidHom
+  rightHom := right.toMonoidHom.comp (QuotientGroup.mk' N)
+  inl_injective := N.subtype_injective.comp left.injective
+  range_inl_eq_ker_rightHom := by
+    ext e
+    constructor
+    · rintro ⟨k, rfl⟩
+      simp
+    · intro he
+      rw [MonoidHom.mem_ker] at he
+      have heq : QuotientGroup.mk' N e = 1 :=
+        right.injective (by simpa using he)
+      have heN : e ∈ N := (QuotientGroup.eq_one_iff e).mp heq
+      refine ⟨left.symm ⟨e, heN⟩, ?_⟩
+      simp
+  rightHom_surjective :=
+    right.surjective.comp (QuotientGroup.mk'_surjective N)
+
+/-- The embedded kernel of `ofNormalSubgroupCoordinates` is the supplied
+normal subgroup. -/
+@[simp]
+theorem _root_.GroupExtension.ofNormalSubgroupCoordinates_range_inl
+    (N : Subgroup E) [N.Normal]
+    (left : K ≃* N) (right : E ⧸ N ≃* Q) :
+    (GroupExtension.ofNormalSubgroupCoordinates N left right).inl.range = N := by
+  ext e
+  constructor
+  · rintro ⟨k, rfl⟩
+    exact (left k).property
+  · intro he
+    obtain ⟨k, hk⟩ := left.surjective ⟨e, he⟩
+    refine ⟨k, ?_⟩
+    exact congrArg Subtype.val hk
+
+end CoordinateExtension
+
 section CollectedWords
 
 variable {W : Type uW} [AddCommGroup W] [Module (ZMod 2) W]

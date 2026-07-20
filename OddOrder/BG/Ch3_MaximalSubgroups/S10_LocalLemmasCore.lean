@@ -995,8 +995,8 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
       rw [Subgroup.orderOf_mk, Subgroup.orderOf_mk]
       exact (hcop_K₀Mσ.coprime_dvd_left (Subgroup.orderOf_dvd_natCard K₀ hk)).coprime_dvd_right
         (Subgroup.orderOf_dvd_natCard (Msigma M) hm)
-    have hcomm := OddOrder.GroupTheory.commute_of_coprime_orderOf_of_isNilpotent (L := ↥(K₀ ⊔ Msigma M))
-      (x := ⟨k, hkL⟩) (y := ⟨m, hmL⟩) hcop_km
+    have hcomm := OddOrder.GroupTheory.commute_of_coprime_orderOf_of_isNilpotent
+      (L := ↥(K₀ ⊔ Msigma M)) (x := ⟨k, hkL⟩) (y := ⟨m, hmL⟩) hcop_km
     exact (congrArg Subtype.val hcomm).symm
   -- Step 6: cite Proposition 10.11(c) and place `K₀` inside the cyclic normal `Z`.
   obtain ⟨-, -, hZcyc, hM_NZ⟩ := sigma_complement_rank_le_one hG hM hKM hKpi

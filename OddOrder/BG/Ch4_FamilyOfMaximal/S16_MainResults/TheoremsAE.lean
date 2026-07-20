@@ -58,7 +58,8 @@ transitively
 
 * A(1) `M_σ` is a `σ(M)`-Hall subgroup (`Msigma_isHall`);
 * A(2) `K` cyclic (`typeP_auxiliary_structure`, Lemma 15.1(a)/Theorem 14.7(h));
-* A(3) `M ≤ N_G(U M_σ)` (`typeP_auxiliary_structure`: `U M_σ = M` for type-F, `= M' ⊴ M` for type-P);
+* A(3) `M ≤ N_G(U M_σ)` (`typeP_auxiliary_structure`: `U M_σ = M` for type-F, `= M' ⊴ M`
+  for type-P);
 * A(4) `C_U(k) = 1` for `k ∈ K#` (`typeP_hall_inf_centralizer_kappaElement_eq_bot`);
 * A(5) `Kstar ≠ ⊥` (`S14.typeP_structure`, with `K = ⊥` collapsing `Kstar = M_σ ≠ ⊥`) and the
   element form `C_M(k) = K ⊔ K*` for `K ≠ ⊥`, `k ∈ K#` (`typeP_centralizer_kappaElement_eq`);
@@ -70,7 +71,8 @@ The remaining faithful-monolith conjuncts are supplied separately: `M = K U M_σ
 `theoremA8_structure`.
 
 As with the Theorem B(1) precedent the explicit `hKM : K ≤ M`, `hUM : U ≤ M` are added (part of the
-BG setup `M = K U M_σ` but not forced by the Hall conditions on `K.subgroupOf M`/`U.subgroupOf M`). -/
+BG setup `M = K U M_σ` but not forced by the Hall conditions on
+`K.subgroupOf M`/`U.subgroupOf M`). -/
 theorem theoremA_ungated_conjuncts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
@@ -404,7 +406,8 @@ theorem theoremB_A_minus_Msigma_isTISubset [Finite G]
   rw [normalizer_eq_self_of_maximal_B5 hG hM] at hg1norm
   simpa using inv_mem hg1norm
 
-/-- **BG Theorem B** (mmd L4295; schematic proof Lemma 12.1(d), Theorem 12.5(b), Lemma 15.1(c)(d)(e)):
+/-- **BG Theorem B** (mmd L4295; schematic proof Lemma 12.1(d), Theorem 12.5(b),
+Lemma 15.1(c)(d)(e)):
 restrictions on `U` and the tameness of `A(M) − M_σ`.  Faithful, fully assembled form; each of the
 five conjuncts is cited from its standalone `sorry`-free lemma:
 
@@ -960,7 +963,8 @@ theorem a0_minus_a_eq_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     a0_minus_a_subset_conj_zTilde hG hM hP hKM hUM hK hKstar hU a ha
   exact ⟨t, htz, m, hmM, hamt.symm⟩
 
-/-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P₂` maximal subgroup** (BG `kappa_complement`;
+/-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P₂` maximal subgroup**
+(BG `kappa_complement`;
 the Frobenius complement `E = K ⋉ U` of Proposition 14.2(a), with `U = E₂E₃` the `M_σ`-complement's
 derived subgroup).  There is a `κ(M)`-Hall `K₀` and a nontrivial abelian `(κ(M)∪σ(M))'`-Hall `U₀`,
 both `≤ M`, with `K₀ ≤ N_G(U₀)` — since `U₀ = E₂E₃ ◁ E` (`E23_normal`) and `K₀ = E₁ ≤ E`.
@@ -1106,7 +1110,8 @@ theorem typeP2_matched_kappa_hall_pair_of_esetup [Finite G]
     hsetup.E₁_le.trans (hsetup.E23_normal hG)
   exact ⟨hsetup.E1_le_M, hU₀leE, hU₀ne, hK₀, hU₀, hU₀ab, hK₀NU₀⟩
 
-/-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P₂` maximal subgroup** (BG `kappa_complement`;
+/-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P₂` maximal subgroup**
+(BG `kappa_complement`;
 existential form).  Obtains an arbitrary `E`-setup (`exists_subgroupESetup`) and reads off the pair
 via `typeP2_matched_kappa_hall_pair_of_esetup`.  Consumers needing the pair inside a *prescribed*
 `σ(M)'`-complement `E` (e.g. `E = M ⊓ N` in Corollary 15.9, so a Sylow of `U₀` lands in `M`) call
@@ -1261,7 +1266,8 @@ theorem theoremC_paired_structure [Finite G]
       sup_le hKM (hKstarMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
     exact hZti.of_subset_conj_of_isTISubset hZM
       (a0_minus_a_subset_conj_zTilde hG hM hP hKM hUM hK hKstar hU)
-  · -- Conjunct 11 (BG Theorem C(10) = Prop 14.2(g) + Theorem 15.7(a)): `U ≠ ⊥ → |K|` prime ∧ `F(M)` TI.
+  · -- Conjunct 11 (BG Theorem C(10) = Prop 14.2(g) + Theorem 15.7(a)):
+    -- `U ≠ ⊥ → |K|` prime ∧ `F(M)` TI.
     -- `U ≠ ⊥` makes `M` type-`P₂`; `|K| = q` prime is Prop 14.2's type-`P₂` clause.  The
     -- `FittingIsTI M` conjunct (BG Theorem C(10), via Theorem 15.7(a)) is the residual.
     intro hUne
@@ -1376,7 +1382,8 @@ theorem msigma_fusion_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-- **Dichotomy `|𝓜_σ(x)| ≤ 1 ⟹ C_G(x) ≤ M`** (the converse of
 `maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`, Coq Theorem 14.4's `not_sCX_M`
-direction): for `x ∈ M_σ^#` with at most one `σ`-maximal, `C_G(x) ≤ M`.  If some `c ∈ C_G(x)` escaped
+direction): for `x ∈ M_σ^#` with at most one `σ`-maximal, `C_G(x) ≤ M`.  If some
+`c ∈ C_G(x)` escaped
 `M`, then `Mᶜ` would be a second `σ`-maximal of `x` — `x ∈ Mᶜ` (as `c⁻¹xc = x ∈ M`), so `Mᶜ` is a
 maximal conjugate containing `x`, hence in `𝓜_σ(x)` (`maximalConjugatesContaining_eq_maximalSigma`),
 and `Mᶜ ≠ M` (else `c ∈ N_G(M) = M`) — contradicting `|𝓜_σ(x)| ≤ 1`.  Much shallower than the Coq
@@ -1536,13 +1543,15 @@ theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       (Nat.dvd_of_mem_primeFactors hpMiPF).trans (Subgroup.card_subgroup_dvd_card Mi),
       (Nat.card_pos).ne'⟩
 
-/-- **`π(M_σ) = σ(M)`** (the prime-factor content of `M_σ` being the `σ(M)`-Hall subgroup, BG (8.11) /
+/-- **`π(M_σ) = σ(M)`** (the prime-factor content of `M_σ` being the `σ(M)`-Hall subgroup,
+BG (8.11) /
 `Msigma_isHall`): a prime divides `|M_σ|` iff it is a `σ`-prime of `M`.  Forward is the `π`-part of
 the Hall property (`Msigma_isHall.1`); backward, a `σ`-prime `p` divides `|M|` (`mem_sigma_iff`)
 hence
 `|G|`, but not the `σ′`-index `[G : M_σ]` (`Msigma_isHall.2`), so by `|G| = |M_σ|·[G : M_σ]` it
 divides `|M_σ|`.  Bridges the `σ`-stated partition (`sigma_reps_prime_cover`) to the
-`π(mainSubgroup ·)` form of `BGTheoremECoverData` via Peterfalvi (8.10) (`M_s = M_σ`, issue 8020). -/
+`π(mainSubgroup ·)` form of `BGTheoremECoverData` via Peterfalvi (8.10)
+(`M_s = M_σ`, issue 8020). -/
 theorem primeFactors_Msigma_eq_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (p : ℕ) :
     p ∈ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).primeFactors ↔
@@ -1731,7 +1740,8 @@ have the TI and support properties used by the downstream character-theory inter
 This is a separate Peterfalvi-facing slice, not a replacement for BG Theorem E; the
 full local counting/partition statement is `theoremE_sigma_partition_and_counting`.
 
-**Faithfully restated (2026-07-07, issue 0098 b-task, post Cor 15.9).**  The prior form omitted `U ≤ M`
+**Faithfully restated (2026-07-07, issue 0098 b-task, post Cor 15.9).**
+The prior form omitted `U ≤ M`
 and the `(κ∪σ)′`-Hall hypothesis on `U`, so conjuncts 2–3 were not forced (a free `U` lets `A(M)`
 contain `κ`-elements) and it stood as a `sorry` placeholder.  This type-`P` (`K ≠ ⊥`) version adds
 `hKM`/`hUM`/`hU`, and all three are proved: conjuncts 1 (`zTilde` TI) and 2 (`A_0(M)−A(M)` TI) are

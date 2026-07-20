@@ -627,7 +627,8 @@ theorem restrict_certainType_eq [NeZero (Nat.card h.W1)]
     SignedIrreducibleDifferenceFamily.classFunction_apply] at hdiff
 
 omit [Fintype L] in
-omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] in
+omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+  [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] in
 /-- **`[L : K] = w₁`** (mmd 04.6, (4.5) proof): the index of the normal subgroup `K` equals
 `|W₁|`, since `K` is a complement to `W₁` in `L` (`L/K ≅ W₁` via
 `isComplement.QuotientMulEquiv`). -/
@@ -776,7 +777,8 @@ already
 exhaust them), and the complement `L = K ⋊ W₁` then forces the inertia group down to `K`. -/
 
 omit [Fintype L] in
-omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)] in
+omit [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+  [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)] in
 /-- **Bridge: inertia ↔ conjugation-permutation fixed point.**  For `g : L` and `θ ∈ Irr(K)`, `g`
 lies in the inertia group of `θ` iff `θ` is fixed by the conjugation permutation
 `IrreducibleCharacter.conjByPerm g` (whose fixed-point count is bounded by
@@ -853,7 +855,8 @@ theorem chiRestrict_injective [NeZero (Nat.card h.W1)] :
   exact one_ne_zero key
 
 omit [Invertible (Nat.card L : ℂ)] in
-omit [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] [Invertible (Nat.card ↥h.K : ℂ)] in
+omit [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+  [Invertible (Nat.card ↥h.K : ℂ)] in
 omit [Fintype L] in
 /-- **The number of columns is `w₂`** (`|Ŵ₂| = |W₂|`, Pontryagin self-duality
 `card_charGroup_subgroupOf`).  Together with `chiRestrict_injective` this gives `w₂` distinct

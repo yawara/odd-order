@@ -72,7 +72,8 @@ theorem certainTypeSet_closedUnderConjugate
   refine ⟨χ₂⁻¹, ?_, ?_, ?_⟩
   · exact
       ((@inv_ne_one ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) _ χ₂).mpr hχ₂)
-  · -- the inverse column has the original column's degree (`columnSum_inv_apply_one`), so still `= k`.
+  · -- the inverse column has the original column's degree (`columnSum_inv_apply_one`), so still
+    -- `= k`.
     rw [OddOrder.Peterfalvi.S06.columnSum_inv_apply_one, hdeg]
   · exact OddOrder.Peterfalvi.S06.columnSum_conj_eq h46 χ₂
 

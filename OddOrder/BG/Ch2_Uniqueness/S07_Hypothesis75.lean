@@ -61,7 +61,8 @@ private theorem tp_reduction [Finite G] (hG : IsMinimalSimpleOdd G) {A P : Subgr
   haveI hnt : Nontrivial (↥P ⧸ Bbar) := by
     obtain ⟨x, _, hx⟩ := SetLike.exists_of_lt hBbarlt
     exact ⟨QuotientGroup.mk x, 1, by rw [Ne, QuotientGroup.eq_one_iff]; exact hx⟩
-  obtain ⟨Nbar, hNbarnorm, hNbarprime⟩ := OddOrder.GroupTheory.exists_normal_index_prime_of_solvable hnt
+  obtain ⟨Nbar, hNbarnorm, hNbarprime⟩ :=
+    OddOrder.GroupTheory.exists_normal_index_prime_of_solvable hnt
   set C : Subgroup ↥P := Nbar.comap (QuotientGroup.mk' Bbar) with hC
   haveI : C.Normal := hNbarnorm.comap _
   have hBbarC : Bbar ≤ C := by

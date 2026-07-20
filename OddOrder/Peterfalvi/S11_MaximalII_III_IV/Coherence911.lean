@@ -486,7 +486,9 @@ theorem hcPsiPair_inertia_le [Finite G] {M : Subgroup G}
   have key : (ClassFunction.conjBy g (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔
       ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ))
       (Subgroup.inclusion le_sup_left h)
-      = (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) (Subgroup.inclusion le_sup_left h) := by rw [hg]
+      = (hcPsiPair chief θ lam : ClassFunction ↥(hInHu data ⊔
+        ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+        (Subgroup.inclusion le_sup_left h) := by rw [hg]
   rw [ClassFunction.conjBy_apply] at key ⊢
   rw [← hcPsiPair_apply_inclusion, ← hcPsiPair_apply_inclusion, ← key]
   congr 1
