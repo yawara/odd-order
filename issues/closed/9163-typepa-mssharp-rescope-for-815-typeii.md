@@ -242,3 +242,41 @@ covering は任意の `H ≤ K` で自明だが support が P₂ で過大主張
 - (8.17.a) 型一様: `S10.BGTheoremECoverData.primeFactors_cover` / `_disjoint`
   (S10_MinimalSimpleStructure.lean:655/660)、producer `S10.bgTheoremE_cover_data` (同 :886)
   は型仮定ゼロ (`hG` のみ)。
+
+---
+
+## ✅ 2026-07-20 lane a: §3 の 4 項目すべて完了
+
+| 項目 | 結果 |
+|---|---|
+| 1. (8.15) type-II instance | ✅ commit 106bbe509 (上記) |
+| 2. (8.18) の一般化 + `cross_zero` の導出化 | ⚠ `cross_zero` は**既に導出済**と実測 (上記)。(8.18) 一般化の本体は issue 1044 |
+| 3. (9.11) M 側の type-II 拡張 | ✅ **完了** — issue 1045 (close 済) |
+| 4. packaging 層の辞書同一視 (`htype`/`hncH0C`) の整理 | ✅ **完了** — 下記 |
+
+### 項目 3 の結果 (issue 1045)
+
+- **(9.11) が Hypothesis (9.2)+(9.4)+(9.5) の上で型仮定なしに完全証明された**
+  (`S11.nineEleven_coherent` / `_A0`)。case (9.7.a) の最後の producer
+  `S13.nineElevenSevenEightRefutation` (~420 行) を §9 へ降ろして `hrefuteEq` を discharge。
+- **型 II instance が立った** (`S11.typeII_nineEleven_coherent`)。足りなかったのは carrier の
+  producer だけ (`typePNontrivialCore_of_isTypeII` / `typesIIIIIIVSetup_of_isTypeII` /
+  `S11.mkSection11CharacterData`); (9.4) `exists_chiefFactorData` は元から型仮定ゼロだった。
+- 本裁定の前提「§12 `type_alt` を広げ `base.A0` を `typePACore` 上に建て直す」は**実測で外れ**、
+  真の gate は「(9.11) を §9 レベルで述べ直すこと」だった (issue 1045 冒頭に記録)。
+
+### 項目 4 の結果 — 辞書は 1 箇所に収束した
+
+`S13.coherent_sOf_H0Cprime` を `S11.nineEleven_coherent_A0` の系にした
+(`coherent_sOf_H0Cprime_of_section9`、signature 不変)。その結果、
+**`htype`/`hncH0C` の用途は `hyp.C = cSub s11Setup chief` (`C_eq_cSub_of_noncoherent`) ただ 1 つ**に
+なった。§9 の議論自体は型を一度も見ない。
+
+副産物 (いずれも shared infra):
+- `S10.inducedNonKernelFamily_mono` — (4.6.c) の `H` の pin を等式から包含へ緩和
+- `S10.DadeSupportHypothesisData.restrict` + `ftSupportKernel_congr_of_subset` — (8.15) datum を
+  `A₀(M)` から `A(M)` へ制限 (Peterfalvi (2.11) の package 版)
+- `S07_UnionPairBridge.lean` (新 leaf) — union-pair coherent extension (5.6.3) と projection budget を
+  §13 closure から §5 レベルへ再層化
+
+⟹ 本 issue は close 可。残るのは重複チェーンの棚卸し (issue 1047) で、これは裁定でなく作業。
