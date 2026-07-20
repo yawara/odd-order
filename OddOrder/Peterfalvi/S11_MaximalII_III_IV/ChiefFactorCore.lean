@@ -233,6 +233,34 @@ theorem cprimeSub_le_C (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData dat
   Subgroup.map_subtype_le _
 
 open Subgroup in
+/-- **`C = C_U(H̄)` realised inside `↥U`**: `C.subgroupOf U` is the image of `ker (uActionHom)`
+under the realization isomorphism `subgroupOfEquivOfLe : ↥(U.subgroupOf (U ⊔ W₁)) ≃* ↥U`.
+
+Extracted from `cSub_subgroupOf_U_normal` so that the (9.6) clause `U ≠ C`
+(`chiefFactor_cSub_ne_U`) can read the kernel off the same identification. -/
+theorem cSub_subgroupOf_U_eq_ker_map (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    (cSub data chief).subgroupOf data.U
+      = (uActionHom data chief).ker.map
+          (subgroupOfEquivOfLe
+            (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toMonoidHom := by
+  set e := subgroupOfEquivOfLe (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1) with he
+  ext x
+  simp only [Subgroup.mem_subgroupOf]
+  constructor
+  · intro hx
+    simp only [cSub, Subgroup.mem_map] at hx
+    obtain ⟨z, ⟨y, hy, hyz⟩, hzx⟩ := hx
+    refine ⟨y, hy, ?_⟩
+    apply Subtype.ext
+    rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe, ← hzx, ← hyz]
+    rfl
+  · rintro ⟨y, hy, rfl⟩
+    simp only [cSub, Subgroup.mem_map]
+    refine ⟨_, ⟨y, hy, rfl⟩, ?_⟩
+    rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe]
+    rfl
+
+open Subgroup in
 /-- **`C = C_U(H̄) ◁ U`** (Peterfalvi (9.5)): the kernel of the `U`-action on the chief factor is
 normal in `U`.  `cSub` is the `G`-image of `(uActionHom).ker`, which corresponds (via the
 realization iso `subgroupOfEquivOfLe : ↥(U.subgroupOf (U ⊔ W₁)) ≃* ↥U`) to a kernel of a
@@ -241,24 +269,7 @@ normality `HC ◁ HU` (`sup_normal_of_normal_left_of_normal_subgroupOf`). -/
 theorem cSub_subgroupOf_U_normal (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
     ((cSub data chief).subgroupOf data.U).Normal := by
   set e := subgroupOfEquivOfLe (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1) with he
-  have heq : (cSub data chief).subgroupOf data.U
-      = (uActionHom data chief).ker.map e.toMonoidHom := by
-    ext x
-    simp only [Subgroup.mem_subgroupOf]
-    constructor
-    · intro hx
-      simp only [cSub, Subgroup.mem_map] at hx
-      obtain ⟨z, ⟨y, hy, hyz⟩, hzx⟩ := hx
-      refine ⟨y, hy, ?_⟩
-      apply Subtype.ext
-      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe, ← hzx, ← hyz]
-      rfl
-    · rintro ⟨y, hy, rfl⟩
-      simp only [cSub, Subgroup.mem_map]
-      refine ⟨_, ⟨y, hy, rfl⟩, ?_⟩
-      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe]
-      rfl
-  rw [heq]
+  rw [cSub_subgroupOf_U_eq_ker_map]
   exact (MonoidHom.normal_ker _).map e.toMonoidHom e.surjective
 
 /-- **`U W₁ ≤ N_G(C)`** (the `W₁`-half of the `H₀C ◁ M` normality, issue 1012): the `U W₁`-action on
@@ -1311,49 +1322,6 @@ structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   nontrivial chief-factor character). -/
   actsIrreducibly : ∀ J : Subgroup (↥data.H ⧸ chief.N),
       IsAInvariant (uActionHom data chief) J → J = ⊥ ∨ J = ⊤
-
-/-- **Peterfalvi (9.6)**: after choosing `H_0`, the induced `U`-action is non-trivial (`U` does not
-centralize `H`), `H̄ = H/H_0` is a chief factor of `M`, `|H̄| = p^q`, and (types III/IV)
-`|W_2| = p`.
-
-*Faithfulness note.* The printed (9.6) asserts `|W̄_2| = p` for the **image** `W̄_2 = C_{H̄}(W_1)`,
-which for type II is strictly smaller than the full `W_2 = C_H(W_1)` (the carrier never pins
-`|W_2|`,
-only `|W_1|` is prime).  The earlier formalization stated the **unconditional** `|W_2| = p`, which
-is
-*false* for type II: `|W_2|^q = |H| = p^q·|H_0|` (by (9.3) + `quotient_order`) gives `|W_2| = p`
-only when `H_0 = 1`.  We therefore state the faithful, carrier-provable form: `|W_2| = p` only in
-the types III/IV branch (where `|W_2| = p` directly, `typeIII_IV_p_eq_W2`), together with the
-genuine
-order conclusion `|H̄| = p^q` (`quotient_order`).  The image fact `|W̄_2| = p` needs the
-(non-opaque)
-chief-factor structure and is delivered by `typeP_chiefFactor_card`. -/
-theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
-    data.U ⊓ Subgroup.centralizer (data.H : Set G) ≠ data.U ∧
-      (IsTypeIII M ∨ IsTypeIV M → Nat.card ↥data.W2 = chief.p) ∧
-      Nat.card ↥data.H = chief.p ^ data.q * Nat.card ↥chief.H0 := by
-  obtain ⟨hII_case, hIIIIV_case⟩ := typeII_III_IV_order_relations hG data
-  have hH_ne : data.typeP.H ≠ ⊥ := fun heq => data.typeP.H_noncyclic (heq ▸ inferInstance)
-  refine ⟨?_, chief.typeIII_IV_p_eq_W2, chief.quotient_order⟩
-  -- `U` does not centralize `H`: else `C_H(U) = H`, contradicting (9.3).
-  intro hcentr
-  have hUle : data.U ≤ Subgroup.centralizer (data.H : Set G) := inf_eq_left.mp hcentr
-  have hHle : data.H ≤ Subgroup.centralizer (data.U : Set G) := Subgroup.le_centralizer_iff.mp hUle
-  have hHinf : data.H ⊓ Subgroup.centralizer (data.U : Set G) = data.H := inf_eq_left.mpr hHle
-  rcases data.type_alt with hII | hIIIIV
-  · -- Type II: (9.3) gives `C_H(U) = ⊥`, but `C_H(U) = H ≠ ⊥`.
-    exact hH_ne (hHinf.symm.trans (hII_case hII).1)
-  · -- Types III/IV: (9.3) gives `|H| = p^q·|C_H(U)| = p^q·|H|`, forcing `p^q = 1`.
-    obtain ⟨p, hp, _hpW2, _hCUW, hHcard⟩ := hIIIIV_case hIIIIV
-    rw [hHinf] at hHcard
-    have hpq1 : p ^ data.q = 1 := by
-      rcases Nat.eq_zero_or_pos (Nat.card ↥data.H) with h0 | hpos
-      · exact absurd h0 Nat.card_pos.ne'
-      · exact Nat.eq_of_mul_eq_mul_right hpos (by rw [one_mul]; exact hHcard.symm)
-    have hq_ne : data.q ≠ 0 := Nat.card_pos.ne'
-    have h2 : 2 ≤ p ^ data.q := le_trans hp.two_le (Nat.le_self_pow hq_ne p)
-    omega
 
 /-- **Centralizer commutes with a coprime cyclic quotient** (general group theory): for `x : Γ` and
 `N ◁ Γ` with `gcd(|⟨x⟩|, |N|) = 1`, the centralizer of `x̄ = x N` in `Γ/N` is the image of the
