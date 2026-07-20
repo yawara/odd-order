@@ -717,7 +717,23 @@ packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` を�
 | `hncH0C` + `htype` (1 行) → `C_eq_cSub_of_noncoherent` | ✅ **§9 では消える** (`chars.C` は `cSub data chief` と定義的に等しい) |
 | `hyp.base.sixTwoDecompositionData` + `hyp.params_*` (5) | ⛏ **本物の §10 依存** |
 
-⟹ **真の作業は `S13.sixTwoDecompositionData` の §9 化**。実測すると、その μ-grid `params`
+#### ✅ 訂正 (2026-07-20): `sixTwoDecompositionData` の §9 化は**不要** — engine を直接叩ける
+
+(5.6) engine `S08.coherentDegreeSqNormBound_of_not_coherentW_k` の signature を実測したところ、
+`hyp : S04.Hypothesis G A L` と `Dmem` / `Da` (= `CharacterPsiDecomposition`) を
+**すべてパラメータで取る完全に generic な形**だった。μ-grid も `S13.Hypothesis` も出てこない。
+⟹ `S13.sixTwoDecompositionData` を §9 で作り直す必要は無く、
+本 session の §9 R-family から `CharacterPsiDecomposition.ofProjection` で直接供給すればよい。
+
+- ✅ `S11.sOf_memberPsiDecomposition` — `Dmem` 側 (`ψ = 0`) landed。
+  ⚠ **map は `τ` でなく coherent extension**。`ψ = 0` では `ofProjection` の義務
+  `tau1 (χ − ψ) ∈ ℤ[Irr G]` が `tau1 χ ∈ ℤ[Irr G]` になり、Dade map では**偽**
+  (supported lattice 上でしか isometry でない) が、`IsCoherent.extension_mem_ZIrr` そのもの。
+  `FamilyBundleDade` の docstring が `decompositionPair` を避ける理由と同じ。
+- ⛏ 残り: `Da` 側 (break `ψ` と anchor `a • χ₁`、`tau1 = τ`) + (5.6) engine への組み立て。
+  `Da` の義務は `τ(ψ − a•χ₁) ∈ ZIrr` (等次数差ゆえ supported) と `ψ`/`ψ̄` の `a•χ₁` 直交性。
+
+#### (旧・撤回) 真の作業は `S13.sixTwoDecompositionData` の §9 化。実測すると、その μ-grid `params`
 (`hmu`/`hδpm`/`hδj`/`hzS`/`hz1`) が効くのは **可約メンバー分岐**
 (`sixTwoMemberDatum_of_reducible_member` / `sixTwoDecompositionData_of_reducible_break`) だけで、
 これは **本 session で作った `S11.sOf_memberRFamily` (可約 = §6 `certainTypeR`) が果たす役割と同じ**。
