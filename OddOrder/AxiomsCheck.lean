@@ -11027,6 +11027,21 @@ issue 3021, 2026-07-20) — the `A`-action finally enters Step 2.
   OddOrder.BG.AppE.RegularOperatorSetup.exists_zpow_eq_act_of_mem_A
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.zpow_exponent_ne_one
 
+/-! **BG Theorem E.3(b), Step 2: the arithmetic core of (E.10)--(E.12)**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20): `AppE.le_pred_of_forall_mul_pow_ne_one`.
+
+BG's closing count — *"the nonzero integers (mod p) form a cyclic group of order `p−1` and
+`r^q ≡ 1`… therefore `q − 1 ≥ j + n − 1 ≥ n`"* — isolated as a statement about an abstract
+finite **cyclic** group: `u ≠ 1` with `u^q = 1` (`q` prime), `u₀^q = 1`, and `u₀ uⁱ ≠ 1` for
+all `i < n`, imply `n ≤ q − 1`.  Cyclicity is exactly what puts `u₀` inside `⟨u⟩`, giving
+`u₀ = uʲ` with `1 ≤ j ≤ q−1`; then `u₀ uⁱ = u^{j+i}` avoiding `1` forces `[j, j+n−1]` to
+miss `q`.
+
+⚠ This is the **endpoint** of (E.9)--(E.12), proved ahead of the chain-level eigenvalue
+bookkeeping that will feed it, so it currently has no consumer in the repo.  It is stated at
+book strength and is what E.3(c)'s `|S| ≤ p^q` will be closed with. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.le_pred_of_forall_mul_pow_ne_one
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

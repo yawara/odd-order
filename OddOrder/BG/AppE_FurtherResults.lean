@@ -911,6 +911,56 @@ theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
           (Subgroup.inclusion_injective hsub)
     _ = p := hyp.card_centralizer_inf_centralizer_eq hR₀S hexp hS
 
+/-- **BG Theorem E.3(b), Step 2: the arithmetic core of (E.10)--(E.12)**.
+
+In a finite **cyclic** group: if `u ≠ 1` satisfies `u^q = 1` for a prime `q`, if `u₀`
+satisfies `u₀^q = 1`, and if `u₀ uⁱ ≠ 1` for every `i < n`, then `n ≤ q − 1`.
+
+This is BG's closing count — *"the nonzero integers (mod p) form a cyclic group of order
+`p−1` and `r^q ≡ 1`… therefore `q − 1 ≥ j + n − 1 ≥ n`"*.  `u` has order exactly `q`;
+cyclicity is what puts `u₀` inside `⟨u⟩`, so `u₀ = uʲ` with `1 ≤ j ≤ q−1`; then
+`u₀ uⁱ = u^{j+i}` avoiding `1` forces the interval `[j, j+n−1]` to miss `q`.
+
+Stated for an abstract cyclic group rather than `(ZMod p)ˣ`: nothing here is about `ZMod`,
+and the consumer supplies cyclicity of the unit group. -/
+theorem le_pred_of_forall_mul_pow_ne_one {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {q n : ℕ} (hq : q.Prime) {u u₀ : C} (hu : u ^ q = 1) (hune : u ≠ 1) (hu₀ : u₀ ^ q = 1)
+    (hne : ∀ i < n, u₀ * u ^ i ≠ 1) : n ≤ q - 1 := by
+  rcases Nat.eq_zero_or_pos n with rfl | hnpos
+  · omega
+  -- `u` has order exactly `q`
+  have hordu : orderOf u = q := by
+    rcases (Nat.dvd_prime hq).mp (orderOf_dvd_of_pow_eq_one hu) with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hune
+    · exact h
+  -- cyclicity puts `u₀` in `⟨u⟩`
+  have hmem : u₀ ∈ Subgroup.zpowers u := by
+    rcases (Nat.dvd_prime hq).mp (orderOf_dvd_of_pow_eq_one hu₀) with h | h
+    · rw [orderOf_eq_one_iff.mp h]; exact Subgroup.one_mem _
+    · have hcard : Nat.card ↥(Subgroup.zpowers u₀) = Nat.card ↥(Subgroup.zpowers u) := by
+        rw [Nat.card_zpowers, Nat.card_zpowers, h, hordu]
+      exact OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq hcard ▸
+        Subgroup.mem_zpowers u₀
+  obtain ⟨j, hj⟩ : ∃ j : ℕ, u ^ j = u₀ :=
+    (Submonoid.mem_powers_iff u₀ u).mp (mem_powers_iff_mem_zpowers.mpr hmem)
+  -- reduce the exponent below `q`
+  set j' := j % q with hj'def
+  have hj'lt : j' < q := Nat.mod_lt _ hq.pos
+  have hj' : u ^ j' = u₀ := by rw [hj'def, ← hordu, pow_mod_orderOf, hj]
+  have hj'pos : 0 < j' := by
+    rcases Nat.eq_zero_or_pos j' with h | h
+    · exact absurd (by simpa [h] using hj'.symm) (by simpa using hne 0 hnpos)
+    · exact h
+  -- `u₀ uⁱ = u^{j'+i} ≠ 1` says `q ∤ j' + i`
+  by_contra hlt
+  push Not at hlt
+  have hqn : q ≤ n := by omega
+  have hi : q - j' < n := by omega
+  refine hne (q - j') hi ?_
+  rw [← hj', ← pow_add]
+  have : j' + (q - j') = q := by omega
+  rw [this, hu]
+
 /-- A finite `p`-group of order at most `p³` has nilpotency class `≤ 2`, i.e. `G' ≤ Z(G)`.
 
 This is what BG's elided *"examination of the `p`-groups of order at most `p³`"* actually

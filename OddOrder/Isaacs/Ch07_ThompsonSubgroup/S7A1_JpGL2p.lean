@@ -1122,8 +1122,6 @@ private theorem lem73_aux
             have hsy_eq_neg : sy = -1 :=
               sl2_unique_involution hzmod_two_ne_zero hsy_sq hsy_ne_one
             apply Subtype.ext
-            change (x : Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) =
-              (y : Matrix.GeneralLinearGroup (Fin 2) (ZMod p))
             rw [← hsx, ← hsy, hsx_eq_neg, hsy_eq_neg]
           haveI hL_cyclic : IsCyclic ↥L :=
             isCyclic_of_comm_two_group_unique_order_two hL_2group hL_unique_order_two
