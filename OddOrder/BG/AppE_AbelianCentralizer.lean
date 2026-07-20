@@ -1040,4 +1040,27 @@ theorem sup_zpowers_eq_of_card_eq_prime_mul {G : Type*} [Group G] [Finite G] {p 
   rw [h]
   exact Subgroup.mem_sup_left (Subgroup.mem_zpowers w)
 
+/-! ## `k ≤ q − 1`
+
+BG: *"Now `p^k = |T/H_k| ≤ |T| = pⁿ = |S|/p < p^{q-1}` by Theorem E.3(c), so `k ≤ q − 1`."*
+The size input is `|T|·p = |S| ≤ p^q`, which is E.3(c) together with `|S : T| = p`. -/
+
+/-- `|T| · p = |S| ≤ p^q` — the input to BG's `k ≤ q − 1`.
+
+`|T| · |S : T| = |S|` with `|S : T| = p` (Step 2 through Lemma 5.2), and `|S| ≤ p^q` is
+E.3(c) (`card_omega_le`). -/
+theorem RegularOperatorSetup.card_centralizer_mul_prime_le [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) (hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1)) :
+    Nat.card ↥(Subgroup.centralizer
+        (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))) * p ≤ p ^ q := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥(Omega R p 1) :=
+    Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)) with hT
+  have hidx : T.index = p := (hyp.card_omega1Center_and_index_centralizer hyp.R₀_le_omega
+    (hyp.three_le_pRank_omega hcard)).2
+  have hmul : Nat.card ↥T * T.index = Nat.card ↥(Omega R p 1) := T.card_mul_index
+  rw [hidx] at hmul
+  rw [hmul]
+  exact hyp.card_omega_le
+
 end OddOrder.BG.AppE
