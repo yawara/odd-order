@@ -444,6 +444,34 @@ case B も型仮定ゼロで組める見込み。**(9.9.a) と engine は既に�
 | `R`-family 既約分岐 | ⛏ 降ろせる (機械的) |
 | **`R`-family column 分岐 + dichotomy** | ⛏ **§9 の Hyp (4.6) 上で述べ直しが要る** |
 
+### ✅ column 分岐に新規の数学は要らない — §10 は往復しているだけ (2026-07-20 実測)
+
+`S12.Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (S12_HcBound.lean:587)
+の証明を読んだ。核心は **1 行**:
+
+```
+obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
+    -- h = (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis : S06.Hypothesis
+```
+
+⟹ **可約メンバーの分類は `S06.Hypothesis.induce_not_isIrreducible_iff` = §6 の事実**。
+残りの ~30 行は §6 の `columnFamily`/`chiRestrict` 形を §10 の `muGrid` 形へ変換する bookkeeping。
+
+しかも **`S06.certainTypeR` が消費するのは §6 形の方** (`columnSum h46 χ₂`)。
+⟹ §13 chain は「§6 column → §10 muGrid → §6 certainTypeR」と**往復している**だけで、
+§9 では **§6 形に留まればよい**。
+
+⟹ **column 分岐に新規の数学は不要**。dichotomy を
+`∃ χ₂ ≠ 1, φ = S06.columnSum h46₉ χ₂` (h46₉ = `typePACore_toHypothesis46_core data.typeP …`
+の `toCertainTypeHypothesis`/`toHypothesis` 相当) の形で述べ、
+`S06.induce_not_isIrreducible_iff` から直接出せばよい。`certainTypeR` もその形で組める。
+
+⚠ 要確認: `S10.typePACore_toHypothesis46_core` は `S06.Hypothesis46` を返す。そこから
+`S06.Hypothesis` (= `toCertainTypeHypothesis.toHypothesis` 相当) をどう取り出すかを実測すること
+(§10 側は `hyp.toCertainTypeHypothesis hG hG.odd` 経由)。
+
+**⟹ case B は全体として「新規の数学ゼロ、§6 形に留まる述べ直し」に落ちた。**
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
