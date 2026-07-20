@@ -484,6 +484,84 @@ BG: *"By `(E.18)`, there exists `β ∈ B` such that `β` does not fix `R₀Φ`.
 `R₀S'/S'` and `T/S'`, respectively.  Since `β` centralizes `α`, `β` fixes both subspaces if
 `r ≠ r₀`.  Therefore `r = r₀`."* -/
 
+/-- **The line `R₀S'/S'` determines `R₀`**: if every `β ∈ B` preserves that line inside
+`S/S'`, then `B` fixes `R₀`.
+
+The route is `S/S' → S → R`: the preimage of the line is `R₀' ⊔ S'`
+(`Subgroup.comap_map_eq` with `ker (mk' S') = S'`), which is therefore `β`-invariant; the
+bridge `map_subtype_sup_commutator` carries that to `R₀Φ(Ω₁(R))` in the ambient group; and
+Theorem E.3(d) turns "`B` fixes `R₀Φ(S)`" into "`B` fixes `R₀`".
+
+Both `(E.21)`'s halves — `r = r₀` and `t ≠ t₀` — end here, so it is factored out; the
+per-element form `smul_sup_derived_of_preserves_line` is what the `t ≠ t₀` half uses, since
+there BG contradicts the choice of one particular `β`. -/
+theorem RegularOperatorSetup.smul_sup_derived_of_preserves_line [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q)
+    (hSinv : IsAInvariant hyp.act (Omega R p 1))
+    (hNinv : IsAInvariant hSinv.restrict (_root_.commutator ↥(Omega R p 1))) (b : B)
+    (hpres :
+      ((hyp.R₀.subgroupOf (Omega R p 1)).map
+          (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1)))).map
+        ((hNinv.quotientMulAutHom b :
+            MulAut (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1))) :
+          (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) →*
+            (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1))) =
+      (hyp.R₀.subgroupOf (Omega R p 1)).map
+        (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1)))) :
+    (hyp.act b) • (hyp.R₀ ⊔ derivedInG (Omega R p 1)) =
+      hyp.R₀ ⊔ derivedInG (Omega R p 1) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set S : Subgroup R := Omega R p 1 with hSdef
+  set N : Subgroup ↥S := _root_.commutator ↥S with hNdef
+  set φ : B →* MulAut ↥S := hSinv.restrict with hφdef
+  set ψ : B →* MulAut (↥S ⧸ N) := hNinv.quotientMulAutHom with hψdef
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
+  set L₁ : Subgroup (↥S ⧸ N) := R₀'.map (QuotientGroup.mk' N) with hL₁
+  -- Pull back to `↥S`: `R₀' ⊔ S'` is `φ b`-invariant.
+  have hcomapL₁ : (L₁.comap (QuotientGroup.mk' N)) = R₀' ⊔ N := by
+    rw [hL₁, Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+  have hpresS : (R₀' ⊔ N).map ((φ b : MulAut ↥S) : ↥S →* ↥S) = R₀' ⊔ N := by
+    refine Subgroup.eq_of_le_of_card_ge ?_ (le_of_eq ?_)
+    · rintro _ ⟨x, hx, rfl⟩
+      rw [← hcomapL₁] at hx ⊢
+      have hmk : (QuotientGroup.mk' N) (((φ b : MulAut ↥S) : ↥S →* ↥S) x) =
+          (ψ b) ((QuotientGroup.mk' N) x) := rfl
+      rw [Subgroup.mem_comap, hmk, ← hpres]
+      exact ⟨_, hx, rfl⟩
+    · exact Nat.card_congr (Subgroup.equivMapOfInjective (R₀' ⊔ N)
+        ((φ b : MulAut ↥S) : ↥S →* ↥S) (φ b).injective).toEquiv
+  -- Push forward to `R`: `b` fixes `R₀ ⊔ (Ω₁ R)'`, i.e. `R₀Φ(S)`.
+  have hbridge := map_subtype_sup_commutator (H := hyp.R₀) (K := S) hyp.R₀_le_omega
+  calc (hyp.act b) • (hyp.R₀ ⊔ derivedInG S)
+      = (hyp.R₀ ⊔ derivedInG S).map ((hyp.act b : MulAut R) : R →* R) :=
+        pointwise_mulAut_smul_eq_map _ _
+    _ = ((R₀' ⊔ N).map S.subtype).map ((hyp.act b : MulAut R) : R →* R) := by rw [hbridge]
+    _ = ((R₀' ⊔ N).map ((φ b : MulAut ↥S) : ↥S →* ↥S)).map S.subtype := by
+        have hcomp : ((hyp.act b : MulAut R) : R →* R).comp S.subtype
+            = S.subtype.comp ((φ b : MulAut ↥S) : ↥S →* ↥S) := MonoidHom.ext fun _ => rfl
+        rw [Subgroup.map_map, Subgroup.map_map, hcomp]
+    _ = (R₀' ⊔ N).map S.subtype := by rw [hpresS]
+    _ = hyp.R₀ ⊔ derivedInG S := hbridge
+
+/-- The `∀ b`-form of `smul_sup_derived_of_preserves_line`, closed with Theorem E.3(d). -/
+theorem RegularOperatorSetup.B_fixes_R₀_of_preserves_line [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q)
+    (hSinv : IsAInvariant hyp.act (Omega R p 1))
+    (hNinv : IsAInvariant hSinv.restrict (_root_.commutator ↥(Omega R p 1)))
+    (hpres : ∀ b : B,
+      ((hyp.R₀.subgroupOf (Omega R p 1)).map
+          (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1)))).map
+        ((hNinv.quotientMulAutHom b :
+            MulAut (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1))) :
+          (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) →*
+            (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1))) =
+      (hyp.R₀.subgroupOf (Omega R p 1)).map
+        (QuotientGroup.mk' (_root_.commutator ↥(Omega R p 1)))) :
+    ∀ b : B, (hyp.act b) • hyp.R₀ = hyp.R₀ := by
+  refine hyp.B_fixes_R₀_of_fixes_frattini fun b => ?_
+  rw [hyp.frattiniInG_omega_eq_derivedInG]
+  exact hyp.smul_sup_derived_of_preserves_line hSinv hNinv b (hpres b)
+
 /-- **BG's `r = r₀`**: the eigenvalue of `α ∈ A` on `R₀S'/S'` agrees mod `p` with its
 eigenvalue on `T/S'`.
 
@@ -527,40 +605,6 @@ theorem RegularOperatorSetup.dvd_sub_eigenvalues [Finite R] [Finite B]
     rw [← hEq]
     exact map_eigenSubgroup_of_commute hEA.comm
       (by rw [← map_mul, ← map_mul, habel]) r
-  -- Pull back to `↥S`: `R₀' ⊔ S'` is `φ b`-invariant.
-  have hcomapL₁ : (L₁.comap (QuotientGroup.mk' N)) = R₀' ⊔ N := by
-    rw [hL₁, Subgroup.comap_map_eq, QuotientGroup.ker_mk']
-  have hpresS : ∀ b : B,
-      (R₀' ⊔ N).map ((φ b : MulAut ↥S) : ↥S →* ↥S) = R₀' ⊔ N := by
-    intro b
-    refine Subgroup.eq_of_le_of_card_ge ?_ (le_of_eq ?_)
-    · rintro _ ⟨x, hx, rfl⟩
-      rw [← hcomapL₁] at hx ⊢
-      have hmk : (QuotientGroup.mk' N) (((φ b : MulAut ↥S) : ↥S →* ↥S) x) =
-          (ψ b) ((QuotientGroup.mk' N) x) := rfl
-      rw [Subgroup.mem_comap, hmk]
-      rw [← hpres b]
-      exact ⟨_, hx, rfl⟩
-    · exact Nat.card_congr (Subgroup.equivMapOfInjective (R₀' ⊔ N)
-        ((φ b : MulAut ↥S) : ↥S →* ↥S) (φ b).injective).toEquiv
-  -- Push forward to `R`: `B` fixes `R₀ ⊔ (Ω₁ R)'`, i.e. `R₀Φ(S)`.
-  have hambient : ∀ b : B, (hyp.act b) • (hyp.R₀ ⊔ derivedInG S) = hyp.R₀ ⊔ derivedInG S := by
-    intro b
-    have hbridge := map_subtype_sup_commutator (H := hyp.R₀) (K := S) hyp.R₀_le_omega
-    calc (hyp.act b) • (hyp.R₀ ⊔ derivedInG S)
-        = (hyp.R₀ ⊔ derivedInG S).map ((hyp.act b : MulAut R) : R →* R) :=
-          pointwise_mulAut_smul_eq_map _ _
-      _ = ((R₀' ⊔ N).map S.subtype).map ((hyp.act b : MulAut R) : R →* R) := by rw [hbridge]
-      _ = ((R₀' ⊔ N).map ((φ b : MulAut ↥S) : ↥S →* ↥S)).map S.subtype := by
-          have hcomp : ((hyp.act b : MulAut R) : R →* R).comp S.subtype
-              = S.subtype.comp ((φ b : MulAut ↥S) : ↥S →* ↥S) := MonoidHom.ext fun _ => rfl
-          rw [Subgroup.map_map, Subgroup.map_map, hcomp]
-      _ = (R₀' ⊔ N).map S.subtype := by rw [hpresS b]
-      _ = hyp.R₀ ⊔ derivedInG S := hbridge
-  -- That is `(E.18)`'s negation.
-  refine hBfix (hyp.B_fixes_R₀_of_fixes_frattini ?_)
-  intro b
-  rw [hyp.frattiniInG_omega_eq_derivedInG]
-  exact hambient b
+  exact hBfix (hyp.B_fixes_R₀_of_preserves_line hSinv hNinv hpres)
 
 end OddOrder.BG.AppE
