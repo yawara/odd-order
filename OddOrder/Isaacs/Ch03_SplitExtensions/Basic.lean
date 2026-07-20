@@ -440,16 +440,23 @@ variable {G : Type*} [Group G]
 CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かない. 呼び出し側で
 直接 mathlib 名を使う:
 
-| Isaacs | mathlib |
-|---|---|
-| Thm 3.5 (Schur-Zassenhaus, abelian normal) | `Subgroup.exists_right_complement'_of_coprime` |
-| Thm 3.6 (crossed homom) | `OneCocycle` / `OneCocycles` (`GroupCohomology.LowDegree`) |
-| Thm 3.7 (transversal differ) | mathlib `MonoidHom.crossed*` 周辺 |
-| Thm 3.8 (Schur-Zassenhaus 一般) | `Subgroup.exists_right_complement'_of_coprime` |
-| Thm 3.9 (G solvable ⇔ G^(m) = 1) | `isSolvable_def` (`@[mk_iff]` on `class IsSolvable`, `Mathlib/GroupTheory/Solvable.lean:106`) |
-| Thm 3.10 (solvable 基本) | `IsSolvable` instance による subgroup/quotient/extension 各種 |
-| Thm 3.11 (solvable min normal は elem abelian p-group) | **新規**? — mathlib にあるか要確認 (TODO) |
-| Thm 3.12 (complement conjugacy in solvable) | `IsConj` 系 + `SchurZassenhaus` |
+- Thm 3.5 (Schur-Zassenhaus, abelian normal)
+  - mathlib: `Subgroup.exists_right_complement'_of_coprime`
+- Thm 3.6 (crossed homom)
+  - mathlib: `OneCocycle` / `OneCocycles` (`GroupCohomology.LowDegree`)
+- Thm 3.7 (transversal differ)
+  - mathlib: mathlib `MonoidHom.crossed*` 周辺
+- Thm 3.8 (Schur-Zassenhaus 一般)
+  - mathlib: `Subgroup.exists_right_complement'_of_coprime`
+- Thm 3.9 (G solvable ⇔ G^(m) = 1)
+  - mathlib: `isSolvable_def` (`@[mk_iff]` on `class IsSolvable`,
+    `Mathlib/GroupTheory/Solvable.lean:106`)
+- Thm 3.10 (solvable 基本)
+  - mathlib: `IsSolvable` instance による subgroup/quotient/extension 各種
+- Thm 3.11 (solvable min normal は elem abelian p-group)
+  - mathlib: **新規**? — mathlib にあるか要確認 (TODO)
+- Thm 3.12 (complement conjugacy in solvable)
+  - mathlib: `IsConj` 系 + `SchurZassenhaus`
 
 新規実装候補:
 - **Thm 3.11**: solvable group の minimal normal subgroup は elementary abelian p-group.
