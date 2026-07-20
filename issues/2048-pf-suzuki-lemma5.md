@@ -302,8 +302,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               `Φ(P)` へ移す additive group equivalence とその transition を構成する
         - [x] noncommuting mixed-factor witness を、左右因子の provenance を保つ
               actual lower-central bilinear pairing の非零値へ接続する
-        - [ ] kernel transition が有限体の積および actor action と両立する
-              semilinear/Frobenius 座標であることを証明する
+        - [x] 左右 factor の座標より先に、ambient actor の実際の `Φ(P)` 制限作用を
+              primitive scalar multiplication へ共役する共通 Singer 座標と Frobenius
+              eigenbasis を構成し、その次数が factor parameter に等しいことを証明する
+        - [ ] 上記の共通 `Φ(P)` 座標を prescribed kernel coordinate として、左右各
+              factor の quotient 座標を actor-compatible に構成し、
+              `ν = λ·θ(λ) = μ·φ(μ)` を導く
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
