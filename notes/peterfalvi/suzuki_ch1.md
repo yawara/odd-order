@@ -418,6 +418,11 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       involution の平方根を各 invariant factor 内に輸送する。これを左右因子へ適用し、
       `X ∩ Y = Φ(P)` と elementary-abelian `Φ(P)` を使って、Higman p. 90 の
       nonzero mixed-commutator step を actual witness `⁅x,y⁆ ≠ 1` として閉じた。
+      続く `AmbientCentralExtension.lean` では、非自明 actor-invariant derived subgroup が
+      全 involution を含むことから `[P,P] = Φ(P)` を証明し、同じ involution argument で
+      `Φ(P) ≤ Z(P)` を得た。従って `γ₂(P)=Φ(P)`, `γ₃(P)=1` であり、
+      elementary-abelian kernel の square subgroupも消えるため
+      `lowerCentralLayerKernel P 1 = ⊥` まで actual に同定済みである。
       原典 p. 81 の B/C/D 定義表と pp. 90--92 の case proof も再監査し、p. 91 の
       type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
       p. 81 の表と直前の commutator formula から確認した。抽出画像は

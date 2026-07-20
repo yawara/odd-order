@@ -287,6 +287,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             矛盾を導き、公開 endpoint
             `xiLengthThreeTypeAFactorData_exists_with_nontrivial_mixed_commutator`
             で actual `⁅x,y⁆ ≠ 1` witness を得る
+      - [x] ambient group を class-two central extension と同定する
+        - [x] involution transitivity と elementary-abelian `Φ(P)` から
+              `[P,P] = Φ(P) ≤ Z(P)` を証明する
+        - [x] `lowerCentralTerm P 1 = Φ(P)`, `lowerCentralTerm P 2 = ⊥` と
+              `lowerCentralLayerKernel P 1 = ⊥` を証明する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
