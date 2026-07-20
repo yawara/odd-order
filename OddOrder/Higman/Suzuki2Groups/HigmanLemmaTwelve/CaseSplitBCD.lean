@@ -677,6 +677,65 @@ theorem ambientProductExtension_inl_ofAdd (f : F) :
 
 end ExtensionCoordinates
 
+/-- **Higman Lemma 12, the case-assembly glue.**  If the ambient centre
+coordinate of every square agrees with a quadratic map `q` on the `F × F`
+coordinate, then the ambient central extension `ambientProductExtension`
+satisfies the type-B/C/D `ofExtension` square obligation `hsq`.  The hypothesis
+`hQ` is exactly the case conclusion `Q(α, β) = q(α, β)`; combining it with the
+`Q = q_X + q_Y + M` decomposition and the case-specific value of `M` closes each
+of the B/C/D cases. -/
+theorem ambientProductExtension_hsq_of_coordinate
+    {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (e : (GaloisField 2 n × GaloisField 2 n) ≃ₗ[ZMod 2]
+      Additive (lowerCentralLayer P 0))
+    (q : GaloisField 2 n × GaloisField 2 n → GaloisField 2 n)
+    (hQ :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∀ w, ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralSquareMapAdditive P hSqamb (e w)) = q w)
+    (x : P) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    x ^ 2 = (ambientProductExtension hK0 e ePhi).inl
+      (Multiplicative.ofAdd
+        (q ((ambientProductExtension hK0 e ePhi).rightHom x).toAdd)) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  have hxrepP : (((lowerCentralTermZeroEquivAmbient P).symm x :
+      lowerCentralTerm P 0) : P) = x := rfl
+  have hmem : (((lowerCentralTermZeroEquivAmbient P).symm x :
+      lowerCentralTerm P 0) : P) ^ 2 ∈ frattini P := by
+    rw [hxrepP, ← hAgemoamb]
+    simpa using Agemo.mem_of_eq_pow (G := P) (p := 2) (n := 1) x
+  have hw : ((ambientProductExtension hK0 e ePhi).rightHom x).toAdd =
+      e.symm (layerZeroClass ((lowerCentralTermZeroEquivAmbient P).symm x)) := by
+    rw [ambientProductExtension_rightHom_toAdd]
+    congr 1
+  have hq : q ((ambientProductExtension hK0 e ePhi).rightHom x).toAdd =
+      ePhi (Additive.ofMul ⟨(((lowerCentralTermZeroEquivAmbient P).symm x :
+        lowerCentralTerm P 0) : P) ^ 2, hmem⟩) := by
+    rw [hw, ← hQ, e.apply_symm_apply]
+    exact ambientCenterCoordinate_squareMap hEA hK1amb htermamb hSqamb ePhi
+      ((lowerCentralTermZeroEquivAmbient P).symm x) hmem
+  rw [hq, ambientProductExtension_inl_ofAdd, ePhi.symm_apply_apply]
+  rfl
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
