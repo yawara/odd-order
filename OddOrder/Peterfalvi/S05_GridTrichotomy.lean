@@ -5,12 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Set.Card
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Tactic.LinearCombination
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum.Basic
-import Mathlib.Tactic.GCongr
-import Mathlib.Tactic.Bound
+import Mathlib.Tactic
 
 /-!
 # Peterfalvi (3.8): the additive-grid trichotomy
