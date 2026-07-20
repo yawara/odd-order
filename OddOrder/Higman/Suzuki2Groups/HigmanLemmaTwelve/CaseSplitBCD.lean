@@ -790,6 +790,38 @@ theorem ambientProductExtension_hsq_actual
   intro w
   exact ambientProductSquare_eq left right hRnormal hinf hsup hΦR w.1 w.2
 
+/-! ## Actor-equivariance of the factor inclusion (mixed-term prerequisite) -/
+
+/-- **Actor-equivariance of the factor inclusion.**  When the factor
+representation `fRep` covers the ambient actor `a` (through `sigma`, with
+`hf_int` recording that `f ∘ sigma = a ∘ f`), the factor inclusion intertwines
+`fRep` with the ambient zeroth-layer representation.  This transports
+`quotientToAmbientLayerZeroLinear_equivariant` through the coordinate `eQuot`,
+and it is the actor half of Higman's mixed-term analysis: the mixed commutator
+`M(α, β)` inherits the eigenvalue `ν = λ · θ(λ)` from the factor eigenvalues. -/
+theorem factorInclusion_representation_equivariant
+    {G : Type uP} [Group G] (f : G →* P) {N : Subgroup G} [N.Normal]
+    [IsMulCommutative (G ⧸ N)] [Module (ZMod 2) (Additive (G ⧸ N))]
+    {F : Type*} [AddCommGroup F] [Module (ZMod 2) F]
+    (a : Y)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (hf : ∀ g ∈ N, f g ∈ frattini P)
+    (eQuot : Additive (G ⧸ N) ≃ₗ[ZMod 2] F)
+    (fRep : Additive (G ⧸ N) →ₗ[ZMod 2] Additive (G ⧸ N))
+    (sigma : G → G)
+    (hfRep : ∀ g, fRep (Additive.ofMul (QuotientGroup.mk' N g)) =
+      Additive.ofMul (QuotientGroup.mk' N (sigma g)))
+    (hf_int : ∀ g, f (sigma g) = (Y.subtype a : MulAut P) (f g))
+    (v : Additive (G ⧸ N)) :
+    factorInclusion f hK0 hf eQuot (eQuot (fRep v)) =
+      lowerCentralLayerRepresentation Y.subtype 0 a
+        (factorInclusion f hK0 hf eQuot (eQuot v)) := by
+  simp only [factorInclusion, LinearMap.comp_apply, LinearEquiv.coe_coe,
+    LinearEquiv.symm_apply_apply]
+  exact quotientToAmbientLayerZeroLinear_equivariant f a hK0 hf fRep sigma hfRep
+    hf_int v
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
