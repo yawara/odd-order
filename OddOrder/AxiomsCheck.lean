@@ -11597,3 +11597,11 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `dadeIntegralCharacterMap_mem_ZIrr_of_supported` applies — the asymmetry with the `ψ = 0` member
 -- data, where the Dade map cannot serve and the coherent extension must.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_breakPsiDecomposition
+-- **The (5.2.d)/(5.2.e) decomposition supply of the (5.6) engine, at §9 level** — the §9
+-- replacement for `S13.sixTwoDecompositionData`.  All three components are immediate from the two
+-- `ofProjection` lemmas above: the two `tau1` equations hold by `rfl` (ofProjection stores the map
+-- it is given), and the family orthogonality is `sOf_memberRFamily_orthogonal`, likewise by `rfl`
+-- on the `imageFamily` fields.  The §13 version reaches the same data through the §10 μ-grid,
+-- which is what tied the (5.6) route to the packaging; here only the §9 R-family dispatch is used,
+-- so no type hypothesis appears.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_sixTwoDecompositionData
