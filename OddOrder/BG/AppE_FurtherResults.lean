@@ -1131,13 +1131,15 @@ This is the point of BG defining the chain by `[R, Hᵢ₋₁]` rather than `[R�
 (`commutator_R₀_eq_commutator_top` shows they coincide): `⁅·, ⊤⁆` preserves
 characteristicity, and characteristic subgroups are automatically `A`-invariant, which is
 what (E.9) onwards needs. -/
-theorem characteristic_iterCommutator {G : Type*} [Group G] (T : Subgroup G)
-    [T.Characteristic] :
-    ∀ n, (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n).Characteristic
-  | 0 => ‹T.Characteristic›
-  | n + 1 => by
-      haveI := characteristic_iterCommutator T n
-      rw [OddOrder.Isaacs.Ch04.iterCommutator_succ]
+instance characteristic_iterCommutator {G : Type*} [Group G] (T : Subgroup G)
+    [T.Characteristic] (n : ℕ) :
+    (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n).Characteristic := by
+  induction n with
+  | zero => exact ‹T.Characteristic›
+  | succ n ih =>
+      haveI := ih
+      show (⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n,
+        (⊤ : Subgroup G)⁆).Characteristic
       infer_instance
 
 /-- **BG Theorem E.3(b), Step 2, (E.9)**: the chain is `A`-invariant.
@@ -1645,6 +1647,35 @@ theorem RegularOperatorSetup.isAInvariant_subgroupOf_chain
   intro a x hx
   rw [Subgroup.mem_subgroupOf] at hx ⊢
   exact (hyp.isAInvariant_iterCommutator hSinv (i + 1)).smul_mem a hx
+
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **BG Theorem E.3(b), Step 2, (E.9)**: the eigenvalue `rᵢ` on the chain section.
+
+BG: *"by (E.6), for `i = 0,…,n−1`, `wᵢᵃ ≡ wᵢ^{rᵢ} (mod Hᵢ₊₁)` for some integers `rᵢ` such
+that `rᵢ^q ≡ 1 (mod p)`."*
+
+Everything needed is now in place: the section `Hᵢ/Hᵢ₊₁` has order `p`
+(`index_subgroupOf_chain`) and carries the induced `A`-action
+(`isAInvariant_subgroupOf_chain` fed to `quotientMulAutHom`), so
+`exists_zpow_eq_of_card_eq_prime` produces the power map and the congruence.  BG's
+"`≡ mod Hᵢ₊₁`" is exactly this statement read in the quotient. -/
+theorem RegularOperatorSetup.exists_zpow_eq_on_chain_section [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥)
+    {a : B} (ha : a ∈ hyp.A) :
+    ∃ r : ℤ,
+      (∀ x, (quotientMulAutHom (hyp.isAInvariant_subgroupOf_chain hSinv i)) ⟨a, ha⟩ x = x ^ r) ∧
+      ((r : ZMod p) ^ q = 1) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have haq : (⟨a, ha⟩ : ↥hyp.A) ^ q = 1 := by
+    have h := pow_card_eq_one' (G := ↥hyp.A) (x := ⟨a, ha⟩)
+    rwa [hyp.A_card] at h
+  refine exists_zpow_eq_of_card_eq_prime hyp.p_prime ?_ _ ?_
+  · exact hyp.index_subgroupOf_chain hR₀S hexp hS hne
+  · rw [← map_pow, haq, map_one]
 
 /-- **BG Theorem E.3(b), Step 2, (E.7) — unconditionally**: `|S/S'| = p²` for every
 exponent-`p` subgroup `S` properly containing `R₀`.
