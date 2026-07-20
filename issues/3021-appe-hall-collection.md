@@ -375,9 +375,30 @@ BG が「位数 p³ 以下の p 群を検査せよ」と省略する分岐は、
 ### 残る Step 2 の穴 (更新)
 
 2. **(E.6) Thm 5.5 の A-不変列** `T = H₀ ⊃ … ⊃ Hₙ = 1`, `H_i = [R₀,H_{i-1}]`,
-   `|H_{i-1}:H_i| = p` — `S05_NarrowAutomorphisms.lean:418` 以降。
+   `|H_{i-1}:H_i| = p` — **計数の核は完了 (下記)**、残るのは鎖の構成と厳密降下。
 3. **(E.7)(E.8)** `H₁ = S₂`, `|S/S'| = p²`, 帰納で `H_i = S_{i+1}`。
    ⟹ E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²` の出所。
 4. **(E.9)-(E.12)** 固有値 `r_i ≡ r₀ r^i`、`A` regular + Prop 1.5(d) ⟹ `r_i ≢ 1`、
    `r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| ≤ p^q`。⟹ **E.3(c)** の出所。
 5. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
+
+## ⭐ 2026-07-20 (6): (E.6) の計数の核が完了
+
+BG が「a short argument using the mapping `H → [R,H]` given by `x ↦ [v,x]`」で済ませる部分:
+
+- **`Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le` を public 化**。
+  これは Thm 5.5 自身の `H_i` 鎖の計数エンジンで、**App.E が要るのは全く同じ補題**
+  (だから BG は「Thm 5.5 の (5.5) 以降の証明をなぞれ」と書ける)。仮定は純粋な計数のみ
+  (p 群性・奇数性・narrow 性なし)。ファイル跨ぎ `private` は規約違反なので public 化が正。
+- **`RegularOperatorSetup.card_le_card_commutator_mul_prime`**: App.E 版
+  `|H| ≤ |⁅R₀,H⁆| · p` (`H ≤ T`)。`R₀` の生成元 `v` と `|C_H(v)| ≤ |C_T(R₀)| = p` (E.5) を渡す。
+
+### (E.6) の残り — 次のイテレーションの単位
+
+鎖 `H₀ = T`, `H_i = ⁅R₀, H_{i-1}⁆` を定義し、各段で `|H_{i-1} : H_i| = p` を出す:
+- `⁅R₀, H⁆ ≤ H` — `H ⊴ ↥S` から (`Subgroup.commutator_le_right` 系)。
+- `⁅R₀, H⁆ ≠ H` (`H ≠ ⊥`) — `↥S` の冪零性。mathlib に「冪零群の非自明正規部分群 `H` は
+  `⁅⊤,H⁆ < H`」の直接形があるか要実測 (無ければ `H ⊓ Z(S) ≠ ⊥` 経由)。
+- 上の 2 つ + `|H| ≤ |⁅R₀,H⁆|·p` ⟹ 指数はちょうど `p`。
+- `H_i` の A-不変性と `H_i char S` は BG が `[R,H_{i-1}]` 形で保証している点に注意
+  (`[R₀,H_{i-1}]` との一致は BG が (E.6) で主張しており、これも要形式化)。

@@ -853,6 +853,63 @@ theorem RegularOperatorSetup.card_centralizer_inf_centralizer_eq [Finite R]
   have hmul : p * p = p * Nat.card ↥(CS ⊓ T) := by rw [← sq]; exact hcong
   exact (Nat.eq_of_mul_eq_mul_left hyp.p_prime.pos hmul).symm
 
+/-- **BG Theorem E.3(b), Step 2, the (E.6) counting step**: `|H| ≤ |⁅R₀, H⁆| · p` for any
+`H ≤ T`.
+
+This is BG's *"a short argument using the mapping `H → [R, H]` given by `x ↦ [v,x]`"*: for a
+generator `v` of `R₀` that map is constant exactly on the cosets of `C_H(v)`, so
+`|H : C_H(v)| ≤ |⁅R₀, H⁆|`; and `C_H(v) ≤ C_T(R₀)`, of order `p` by (E.5).
+
+The counting itself is `Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le`
+— the same lemma that drives Theorem 5.5's own `H_i` chain, which is why BG can say
+"follow the part of the proof of Theorem 5.5 that comes after (5.5)". -/
+theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {H : Subgroup ↥S}
+    (hHT : H ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :
+    Nat.card ↥H ≤ Nat.card ↥⁅hyp.R₀.subgroupOf S, H⁆ * p := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
+  have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S
+  -- pick a generator `v` of the order-`p` group `R₀`
+  haveI : Nontrivial ↥R₀' := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro h
+    rw [h, Subgroup.card_bot] at hR₀'card
+    exact hyp.p_prime.one_lt.ne hR₀'card
+  obtain ⟨w, hw⟩ := exists_ne (1 : ↥R₀')
+  have hvR₀ : (w : ↥S) ∈ R₀' := w.2
+  have hord : orderOf (w : ↥S) = p := by
+    have h1 : orderOf w ∣ Nat.card ↥R₀' := orderOf_dvd_natCard w
+    rw [hR₀'card] at h1
+    have h2 : orderOf (w : ↥S) = orderOf w := Subgroup.orderOf_coe w
+    rcases (Nat.dvd_prime hyp.p_prime).mp h1 with h | h
+    · exact absurd (Subtype.ext (orderOf_eq_one_iff.mp (h2.trans h))) hw
+    · exact h2.trans h
+  have hzp : Subgroup.zpowers (w : ↥S) = R₀' :=
+    Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hvR₀)
+      (by rw [hR₀'card, Nat.card_zpowers, hord])
+  refine OddOrder.BG.Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le
+    (v := (w : ↥S)) (fun x hx => Subgroup.commutator_mem_commutator hvR₀ hx) ?_
+  -- `C_H(v) ≤ C_T(R₀)`, which has order `p`.
+  have hsub : Subgroup.centralizer ({(w : ↥S)} : Set ↥S) ⊓ H ≤
+      Subgroup.centralizer ((R₀' : Subgroup ↥S) : Set ↥S) ⊓
+        Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) := by
+    refine inf_le_inf ?_ hHT
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro g hg
+    rw [← hzp] at hg
+    obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hg
+    have hc : Commute (w : ↥S) x := Subgroup.mem_centralizer_iff.mp hx (w : ↥S) rfl
+    exact hc.zpow_left k
+  calc Nat.card ↥(Subgroup.centralizer ({(w : ↥S)} : Set ↥S) ⊓ H)
+      ≤ Nat.card ↥(Subgroup.centralizer ((R₀' : Subgroup ↥S) : Set ↥S) ⊓
+          Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :=
+        Nat.card_le_card_of_injective (Subgroup.inclusion hsub)
+          (Subgroup.inclusion_injective hsub)
+    _ = p := hyp.card_centralizer_inf_centralizer_eq hR₀S hexp hS
+
 /-- **BG Theorem E.3(b), Step 2, the elided small case**: if `S' ≤ Z(S)` then `R₀ ⊄ S'`.
 
 BG dispatches `|S| ≤ p³` by *"an examination of the `p`-groups of order at most `p³`"*.  No

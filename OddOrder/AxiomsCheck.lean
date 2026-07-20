@@ -10889,6 +10889,24 @@ centralizer half is here.
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.card_centralizer_inf_centralizer_eq
 
+/-! **BG Theorem E.3(b), Step 2, the (E.6) counting step** (`BG.Ch1.S05_NarrowAutomorphisms`,
+`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).  BG says only *"a short argument using the
+mapping `H → [R,H]` given by `x ↦ [v,x]`"*; the argument is that the map is constant exactly
+on cosets of `C_H(v)`, so `|H : C_H(v)| ≤ |⁅R₀,H⁆|`.
+
+* `Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le` — that counting, pure
+  and hypothesis-free (no `p`-group, oddness or narrowness).  It already existed as the
+  engine of Theorem 5.5's own `H_i` chain but was `private`; **it is now public**, since
+  App.E needs the identical lemma and cross-file `private` is against repo convention.
+  This is exactly why BG can write "follow the part of the proof of Theorem 5.5 after (5.5)".
+* `AppE.RegularOperatorSetup.card_le_card_commutator_mul_prime` — the App.E instance:
+  `|H| ≤ |⁅R₀,H⁆| · p` for `H ≤ T`, feeding it a generator `v` of `R₀` and the bound
+  `|C_H(v)| ≤ |C_T(R₀)| = p` from (E.5). -/
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch1.S05.card_le_card_mul_of_commutator_mem_of_card_centralizer_le
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_le_card_commutator_mul_prime
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
