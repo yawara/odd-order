@@ -275,4 +275,38 @@ theorem RegularOperatorSetup.commutator_mem_iff_mem {R B : Type*} [Group R] [Gro
     rw [chainStepHom_apply] at h
     exact (QuotientGroup.eq_one_iff _).mp h
 
+/-- **The inductive step for `wᵢ ∉ Hᵢ₊₁`**: if `wᵢ ∉ Hᵢ₊₁` then `wᵢ₊₁ ∉ Hᵢ₊₂`.
+
+`wᵢ₊₁ = ⁅wᵢ, v⁆ = ⁅v, wᵢ⁆⁻¹`, and `commutator_mem_iff_mem` says `⁅v, wᵢ⁆ ∈ Hᵢ₊₂` exactly
+when `wᵢ ∈ Hᵢ₊₁`.  Chained from `w ∉ H₁`, this is BG's `⟨w̄ᵢ⟩ = H̄ᵢ` for every `i`. -/
+theorem RegularOperatorSetup.commutatorIterate_not_mem_succ {R B : Type*} [Group R] [Group B]
+    [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hR₀S : hyp.R₀ ≤ S) (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥)
+    (hlt : ¬ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 1) ≤
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 2))
+    (hidx : ((OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          (i + 1)).subgroupOf
+        (OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          i)).index = p)
+    {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) {w : ↥S}
+    (hw : w ∈ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+    (hwi : commutatorIterate w v i ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1)) :
+    commutatorIterate w v (i + 1) ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+      (i + 2) := by
+  have hmem := commutatorIterate_mem_chain
+    (T := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (v := v) hw i
+  intro hcon
+  refine hwi ((hyp.commutator_mem_iff_mem hR₀S hexp hS hne hlt hidx hv hmem).mp ?_)
+  rw [← commutatorElement_inv]
+  exact Subgroup.inv_mem _ hcon
+
 end OddOrder.BG.AppE
