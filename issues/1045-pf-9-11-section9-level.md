@@ -825,6 +825,40 @@ engine を触らずに済んだ:
 ⟹ `caseA_refuter_of_equality_refutation` と同じく**機械的な rename で降りる**見込み
 (`hyp.base.tau`/`.A0` はパラメータ化、`mkSection11CharacterData …` → `chars`)。
 
+#### ⚠⚠ 訂正 (2026-07-20): `CaseAEqualityRefutation` に producer は**在る** — 前回の報告は誤り
+
+本 session で「`NineElevenEqualityRefutation` は repo のどこにも producer が無い」と記録したが、
+**誤り**。grep パターンを `: NineElevenEqualityRefutation` にしたため、返り型が行頭に来る
+`    NineElevenEqualityRefutation hyp caseA :=` を取りこぼしていた。
+
+実際の §13 の鎖は**完結している**:
+
+```
+S13.coherent_sOf_H0Cprime                                  (hnc, htype のみ)
+ ← coherent_sOf_H0Cprime_of_sevenEightRefutation
+     ← nineElevenSevenEightRefutation            (S11_NineElevenPairAdjoin:893)
+     ← nineElevenEqualityRefutation_of_sevenEightRefutation (S11_NineElevenAlphaBound:1124)
+         ← nineElevenSTwoExtraction / nineElevenNormBound_of_sevenEightRefutation
+     ← nineElevenPairBound                       (S11_NineElevenCaseA:436)
+```
+
+⟹ §13 の (9.11) は `hnc`/`htype` 以外に**未完の carrier を持たない**。
+issue 9083 の Phase B–E は**既に完了している**。
+
+#### ⭐ ⟹ §9 版も完全証明まで行ける — 残る `htype` は全部あの 1 行
+
+3 ファイル (`_AlphaBound` / `_PairAdjoin` / `_CaseA`) の `htype`/`hncH0C` の実質的使用を
+実測したところ、**すべて `rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]` の 1 パターン**
+= 本 issue で繰り返し見ている `hyp.C = cSub` の辞書同一視。§9 では**定義的に等しい**。
+
+⟹ 残チェーン (`nineElevenSTwoExtraction` / `nineElevenNormBound_of_sevenEightRefutation` /
+`nineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation`) を
+§9 へ降ろせば、**`hrefuteEq` も discharge され (9.11) の §9 版が完全証明になる**
+(`hnc` は §13 でもパラメータのまま)。
+
+⚠ 規模: 4 定理 + carrier 1 個。`caseA_refuter_of_equality_refutation` の降ろしと同型の
+機械作業だが、`_PairAdjoin` / `_AlphaBound` の本体は長い。
+
 #### ⛏ 残り — 本 issue の本体は完了、あとは issue 9083
 
 `hrefuteEq` = `CaseAEqualityRefutation` は **issue 9083 Phase B–E** の内容で、
