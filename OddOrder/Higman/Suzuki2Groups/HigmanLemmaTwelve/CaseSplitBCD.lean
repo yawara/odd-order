@@ -822,6 +822,48 @@ theorem factorInclusion_representation_equivariant
   exact quotientToAmbientLayerZeroLinear_equivariant f a hK0 hf fRep sigma hfRep
     hf_int v
 
+/-- **Actor-equivariance of the ambient mixed term.**  In the ambient centre
+coordinate the mixed commutator pairing scales by the central eigenvalue `ν`
+when both arguments are moved by the actor `c`.  This is the composition of the
+bilinear equivariance with `ambientCenterCoordinate_compat`; instantiated at
+`u = left.incl α`, `v = right.incl β` (with the factor incl-equivariance) it
+gives Higman's `M(λα, μβ) = ν · M(α, β)`. -/
+theorem mixedTerm_rep_equivariance
+    {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1 : lowerCentralLayerKernel P 1 = ⊥)
+    (hterm : lowerCentralTerm P 1 = frattini P)
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (c : Y) (nu : GaloisField 2 n)
+    (hconj :
+      let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+        IsAInvariant.of_characteristic Y.subtype
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu)
+    (u v : Additive (lowerCentralLayer P 0)) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralCommutatorBilinear P
+          (Additive.ofMul (lowerCentralLayerAction Y.subtype 0 c (Additive.toMul u)))
+          (Additive.ofMul
+            (lowerCentralLayerAction Y.subtype 0 c (Additive.toMul v)))) =
+      nu * ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralCommutatorBilinear P u v) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  rw [← lowerCentralCommutatorBilinear_equivariant Y.subtype c u v]
+  exact ambientCenterCoordinate_compat hEA hK1 hterm ePhi c nu hconj _
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
