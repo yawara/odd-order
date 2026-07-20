@@ -201,4 +201,24 @@ theorem caseA_coherent_sOf_cprime_of_refuter [Finite G] {M : Subgroup G}
     hrefute
 
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The §9 family sits inside the `⊥`-kernel induced family**: `𝒮(Y) ⊆ S(⊥)`.
+
+Composite of `sOf_subset_inducedNonKernelFamily` with
+`S10.inducedNonKernelFamily_subset_inducedKernelFamily_bot`.
+
+This is the §9-level replacement for the "world-bridge" step that the §11 chain performs with
+`hyp.SOf_eq`/`hyp.sOf_subset_SOf` — the route through the `S13.Hypothesis` packaging.  The §11
+pivot lemmas (`caseB_sOf_memberRFamily`, `sOf_anchor_diff_support`, …) use that bridge only to
+borrow the `S08.inducedKernelFamily_*` suite (support, no-real-characters, pairwise orthogonality,
+`ZIrr` membership); with this lemma they can borrow the same suite without a `S13.Hypothesis`. -/
+theorem sOf_subset_inducedKernelFamily_bot [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    sOf data Y ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily
+      ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := fun _ hx =>
+  OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subset_inducedKernelFamily_bot
+    (sOf_subset_inducedNonKernelFamily hG hM data Y hx)
+
+
 end OddOrder.Peterfalvi.S11

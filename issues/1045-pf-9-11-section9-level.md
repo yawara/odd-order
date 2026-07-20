@@ -389,6 +389,27 @@ pivot が要ること自体は書籍どおり (可約メンバーがあるため
 `muColumnChar` でなく **(9.9.b) の可約メンバー** (§6 の count 由来) から取れば、
 case B も型仮定ゼロで組める見込み。**(9.9.a) と engine は既に揃っている**。
 
+### ✅ 3 件を読んだ (2026-07-20) — **どれも `htype` を取らない**
+
+`caseB_sOf_memberRFamily` (:452) / `caseB_sOf_memberRFamily_orthogonal` (:616) /
+`sOf_anchor_diff_support` (:723) の signature を確認: **3 件とも型仮説を取らない**。
+§13 に縛られているのは次の 3 点だけ:
+
+1. `hyp.base.tau` / `hyp.base.A0` — **パラメータ化すれば済む** (case A と同じ)
+2. `[NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]` — §10 経由の instance。
+   §9 では `data.q ≠ 0` 相当 (`Nat.card_pos`) で足りるはず
+3. **IKF 橋渡し** `sOf … → S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥`
+   を `hyp.SOf_eq` / `hyp.sOf_subset_SOf` (= `S13.Hypothesis` 経由) で出している
+
+**3 は本 session の橋渡しで既に §9 で出せる**:
+`sOf_subset_inducedNonKernelFamily` (橋渡し) と
+`S10.inducedNonKernelFamily_subset_inducedKernelFamily_bot` を合成すればよい。
+⟹ `S11.sOf_subset_inducedKernelFamily_bot` として実装した。
+これで 3 件が `S08.inducedKernelFamily_*` の suite (支持・非実性・対直交性・`ZIrr` 所属) を
+`S13.Hypothesis` 無しで借りられる。
+
+⟹ case B の残作業は **3 件の機械的な引数一般化**に落ちた (case A と同型)。
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
