@@ -61,6 +61,22 @@ so `Z(F*) ≅ (Fix σ)ˣ = 𝔽_r*`, card `r-1`.
 `r = Nat.card (FixedPoints.subfield (zpowers σ) K)`, so the center clause can use `Z(Fˣ)≅Fixσˣ`
 and `|Fixσ|=r` directly. Then `Nat.card (Fixσ)ˣ = |Fixσ|-1 = r-1` (`Nat.card_units`).
 
+⚠ **Center needs `B = squares` (cyclic uniqueness), which `hχσ` avoided.** Both directions
+of `a∈Z ⟺ σ(a)=a` use B's order structure in cyclic `Kˣ`:
+- (⟸) a∈Fixσ*⟹central needs `χ(a)=0` i.e. `a∈B`; requires `Fixσ*⊆B`, i.e. `(r-1)∣(r²-1)/2`
+  (true, r odd) + `B = {order ∣ (r²-1)/2}` = squares (the unique index-2 subgroup of cyclic Kˣ).
+- (⟹) central⟹σ(a)=a needs `B⊄Fixσ`, i.e. `|B|=(r²-1)/2 > r=|Fixσ|` (true for r≥3, i.e. odd
+  prime power).
+So the center clause DOES need the cyclic-uniqueness fact `∀ H:Subgroup Kˣ, H.index=2 → H=B`
+(= squares). Prove via field-roots: `{x:Kˣ | (x:K)^d=1}` has ≤d elements (X^d−1 in field K),
+any order-d subgroup ⊆ it with card d ⟹ =it. Then B = squares subgroup, `Fixσ*⊆B` by order.
+This is the main missing infra for the center; ~30 lines for uniqueness + ~50 for the transport
++ centrality + count.
+
+**Transport**: `φ : Fˣ ≃ Kˣ` (set bijection via `Θ.symm` on nonzero, `Θ.symm 0=0`); NOT a hom
+(twMul≠·). `x∈Z(Fˣ) ⟺ φ x ∈ Z_tw` where `Z_tw={a:∀c,twMul a c=twMul c a}` (φ y ranges over Kˣ).
+`Z(Fˣ) ≃ Z_tw` via φ ⟹ `Nat.card_congr`. `Z_tw = σ-fixed units`, card = |Fixσ|−1 = r−1.
+
 ## Next session
 Finish (1) then (2) in `NearFields.lean`, rebuild leaf, then the theorem is sorry-free (file
 2→1 sorry, only Prop 1 `rankOne_affine_nearField` remains — deferred, Brauer-Suzuki gated).
