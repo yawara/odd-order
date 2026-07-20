@@ -2218,3 +2218,55 @@ E.4: **指数 clause 完全証明済**。abelian clause = `⁅T,T⁆ = ⊥` は
 これが埋まれば機械的組み立てで E.4 abelian clause が閉じる。
 
 sorry: AppE は E.4(1645)/E.5(1686) の 2、全体 13。leaf build green。
+
+## 2026-07-21 (49): ⚠ 訂正 — Case A/B は「clean な per-level 二者択一」でない (β 側の gap の精密化)
+
+(48) を受けて `βv` の分解を実際に書き下したところ、(32)/(43) の
+「per-level に Case A か Case B のちょうど一方」は**過度の単純化**だった。精密には:
+
+`v = R₀ 生成元`、`S/S'` で `v̄ = v_Q + v_T` (β の Q/T 固有空間成分)。β が R₀ を
+固定しない ⟹ `v_Q ≠ 0` かつ `v_T ≠ 0` (どちらか 0 なら v̄ が固有ベクトル= β が
+R₀ を保つ)。`w_{a+1} = ⁅w_a, v⁆`、写像 `φ_a : S/S' → H_{a+1}/H_{a+2}`, `s̄ ↦ ⁅w_a,s⁆`
+は準同型 (2 スロット目に加法的、`⁅H_a,S'⁆ ≤ H_{a+2}` = 既証
+`iterCommutator_commutator_iterCommutator_le` b=1 による)。
+
+`⁅w_a, v_Q⁆ = g^{c_Q}`, `⁅w_a, v_T⁆ = g^{c_T}` (g = `H_{a+1}/H_{a+2}` 生成元) と置くと:
+
+```
+β(w_{a+1}) ≡ g^{ t_a·(t·c_Q + t₀·c_T) },   w_{a+1} = g^{c_Q + c_T}
+⟹  t_{a+1} = t_a · (t·c_Q + t₀·c_T)/(c_Q + c_T)     (H_{a+1}/H_{a+2} は 1 次元ゆえ well-def)
+```
+
+⟹ **`t_{a+1}` は一般に `t` でも `t₀` でもない「混合」値**。純 Case A (`t_{a+1} = t_a·t`)
+は `c_T = 0` (⟺ `⁅w_a, v_T⁆ ∈ H_{a+2}`) のとき。`c_Q, c_T` は `a` ごとに変わる
+(v は固定だが w_a が変わる) ので、BG の `t_a = t₀t^a` (全 a で純 Case A) が成り立つ
+根拠は**まだ不明**。
+
+⟹ **`caseB_excluded` (a=0) だけでは BG の (E.23) は出ない**。真の gap は
+「なぜ全 level で `c_T = 0` (= `⁅w_a, T⁆ ≤ H_{a+2}`) か」。
+
+### これは BG の "Similarly one can show" の実体で、行間が深い
+
+α 側 ((E.22)) が問題ないのは v̄ が **α-固有ベクトル** (α が R₀ 固定, 固有値 r) だから
+`r_{a+1} = r_a·r` が自動。β では v̄ が固有ベクトルでないのでこの自動性が消える。
+
+### ⬜ 次にやるべき調査 (このセッションでは着手しない — context 枯渇)
+
+1. BG p.163-164 の (E.22)/(E.23) 導出を**精読**し、BG が 2 スロット目の分解を
+   どう扱っているか (そもそも per-level なのか、別の帰納構造か) を確定。
+2. 必要なら Feit-Thompson 1963 原論文の対応箇所、および
+   [[feedback-ask-chatgpt-for-elided-gaps]] (最強モデルに `c_T = 0` の根拠を問う)。
+3. `coq/` は FT 本体のみで App.E を持たない可能性大 (要 grep 確認)。
+
+⚠ この精密化された gap は (43) の楽観的な "Case B 排除で済む" を**上書き**する。
+next session はここ (49) を出発点にすること。
+
+### セッション到達点 (確定・検証済)
+
+- ⭐ **BG Theorem E.3(d) 完全証明** (App.E sorry 3→2、AxiomsCheck 監査済)。
+- **BG Prop E.4 指数 clause 完全証明**。
+- **abelian clause = `⁅T,T⁆=⊥` を β supply (E.23) 1 本に還元** + その基盤補題
+  (双線形・Case A step・Case B 排除 a=0) landing。全 axiom-clean。
+- **残る唯一の gap = 上記 `c_T=0` の全 level 保証** (β 側 (E.23) の真の中身)。
+
+全成果 leaf build green、AxiomsCheck フルビルド 4520 jobs green、sorry 13 (開始 14)。
