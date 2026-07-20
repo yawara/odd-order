@@ -2089,3 +2089,46 @@ Case B (`⁅H_i, Q'⁆ ≤ H_{i+2}`) を `i = 0` で使う: `⁅T, Q'⁆ ≤ H�
 📌 α 側が本物に閉じたので、残るブロッカーは **β 側 (E.23) の Lean 化** (要 1) が本丸。
 これは紙上解決済の Case A/B 排除の形式化で、`AppE_EigenvalueCombinatorics.lean` に
 追記する形で進めるのがよい (1500 行にはまだ余裕、現在 ~430 行)。
+
+## 2026-07-21 (47): E.4 abelian clause を (E.23) β supply 1 本に還元 — 残る frontier が単一化
+
+2 本目の subagent が `AppE_EigenvalueCombinatorics.lean` に 3 定理追加 (461→691 行, sorry-free,
+親が実測検証: leaf build green 3312 jobs・全定理 axiom-clean):
+
+| 定理 | 役割 |
+|---|---|
+| `dvd_sub_mul_of_chain_supply` | 作用素非依存の (E.26)/(E.27) (α から σ・supply を抽象化) |
+| `eq_of_chain_eigenvalue_relations_intCast` | ZMod p 環等式 → 位数 q 単位 → `t₀ = t` |
+| ⭐ `commutator_centralizer_eq_bot_of_beta_supply` | **E.4 背理法本体** → `⁅T,T⁆ = ⊥` (β supply gated) |
+
+### ⟹ E.4 abelian clause の残りは **β supply (E.23) 実体化ただ 1 本**
+
+`commutator_centralizer_eq_bot_of_beta_supply` の `hβsupply` は **本物の (E.23)**
+(α 側 `exists_eigenvalue_pow` の β 版と同 signature)。他の gating 仮説
+(`hr0r`=E.20 / `hrq`=E.9 / `hr1`=E.11 / `htu`/`ht₀u` / `htne`=E.21) は
+setup から discharge 可能な真の事実。**⟹ 空 scaffold でなく正当な還元**。
+
+### ⬜ 真の frontier = β supply の実体化 (次イテレーション、subagent 委譲)
+
+紙上議論 ((43)) の Lean 化。2 本目 subagent の 4 段プラン:
+1. `w_a`(chain 元) の像を `Q/S'`・`T/S'` 成分に分解。
+2. `H_a/H_{a+1} ⊗ S/S' → H_{a+1}/H_{a+2}` の β-同変双線形写像 (商 `S/H_{a+2}` に落とす)。
+3. Case A step `t_{a+1} = t_a·t`。
+4. Case B 排除 (`i=0` で `⁅T,Q'⁆ ≤ H₂` → `H₁ = T'H₂` → `k ≤ 2`、既存
+   `commutator_self_le_of_generator` の `k ≥ 3` と矛盾)。
+
+⚠ これは深い多補題作業で **1 セッションで green landing できない規模**
+(2 本目 subagent の判断)。gated-endpoint を更に分割して段階 landing する。
+
+### その後 (機械的)
+
+- `commutator_centralizer_eq_bot_of_beta_supply` の α 系仮説と β eigenvalue を
+  setup から discharge (chain 固有値 ↔ S/S' 固有値の同定)。
+- `AppE_FurtherResults:1645` の sorry (`centralizer_upperCentralSeries_abelian_index_p`)
+  を閉じる: `⁅T,T⁆ = ⊥` → `IsMulCommutative ↥T` + `Ω₁(Z₂)↔Z₂` 橋 (既存) + index p (既存)。
+
+### リポジトリ状態 (2026-07-21)
+
+`AppE` の sorry = **E.4 (1645) と E.5 (1686) の 2 件** (E.4 の中身は上記還元で骨格完成、
+残るのは β supply 実体化と機械的 discharge)。全体 sorry 13。leaf build green。
+AxiomsCheck に Step 3/4 + E.4 一般補題を登録済 (フルビルド 4520 jobs green)。
