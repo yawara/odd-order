@@ -895,4 +895,32 @@ theorem exists_max_of_holds_at_zero {P : ℕ → Prop} (h0 : P 0) {n : ℕ}
   · exact Nat.findGreatest_is_greatest hm hmn
   · exact hn m (by omega)
 
+/-- **BG `(E.25)`, the range**: `j ≤ i` and `i ≤ k − 2`.
+
+Both halves come from the maximality of `i`.
+
+* `i + 2 ≤ k`: otherwise `H (i+1) ≤ H k`, and `⁅H i, T⁆ ≤ H (i+1) ≤ H k` contradicts the
+  defining property of `i`.
+* `j ≤ i`: if `i < j` then `H j ≤ H (i+1)`, so
+  `⁅H i, H j⁆ ≤ ⁅H (i+1), H i⁆ ≤ ⁅H (i+1), T⁆ ≤ H k` — using `H i ≤ T` and the maximality of
+  `i` at the index `i + 1`.  BG states `j ≤ i` in `(E.25)` without argument; this is it. -/
+theorem range_of_max_commutator_indices {G : Type*} [Group G] {H : ℕ → Subgroup G}
+    {T : Subgroup G} {k i j : ℕ}
+    (hanti : ∀ a b : ℕ, a ≤ b → H b ≤ H a) (hT : ∀ a : ℕ, H a ≤ T)
+    (hstep : ∀ a : ℕ, ⁅H a, T⁆ ≤ H (a + 1))
+    (hi : ¬ (⁅H i, T⁆ ≤ H k)) (himax : ∀ m : ℕ, i < m → ⁅H m, T⁆ ≤ H k)
+    (hj : ¬ (⁅H i, H j⁆ ≤ H k)) :
+    j ≤ i ∧ i + 2 ≤ k := by
+  constructor
+  · by_contra hlt
+    push_neg at hlt
+    refine hj ?_
+    calc ⁅H i, H j⁆ ≤ ⁅H i, H (i + 1)⁆ := Subgroup.commutator_mono le_rfl (hanti _ _ hlt)
+      _ = ⁅H (i + 1), H i⁆ := Subgroup.commutator_comm _ _
+      _ ≤ ⁅H (i + 1), T⁆ := Subgroup.commutator_mono le_rfl (hT i)
+      _ ≤ H k := himax (i + 1) (Nat.lt_succ_self i)
+  · by_contra hle
+    push_neg at hle
+    exact hi ((hstep i).trans (hanti k (i + 1) (by omega)))
+
 end OddOrder.BG.AppE
