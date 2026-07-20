@@ -154,6 +154,7 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.GroupTheory.HallCollection
 import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.BG.AppE_FurtherResults
+import OddOrder.BG.AppE_RegularOperator
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -11162,6 +11163,25 @@ which in turn forces `⁅v, x⁆ ∈ Hᵢ₊₁ ↔ x ∈ Hᵢ`.  That equivalen
 `wᵢ ∉ Hᵢ₊₁` — a step BG asserts without proof when it writes *"So `⟨w̄ᵢ⟩ = H̄ᵢ`"*. -/
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S05.index_centralizer_le_card_of_commutator_mem
+
+/-! **BG Appendix E, new leaf `AppE_RegularOperator`** (issue 3021 / 0134, 2026-07-20):
+`AppE.commutator_mul_mem_chain` — `(⁅v,x⁆ * ⁅v,y⁆)⁻¹ * ⁅v, x*y⁆ ∈ Hᵢ₊₂` for `y ∈ Hᵢ`.
+
+That is, **`x ↦ ⁅v, x⁆` is a homomorphism `Hᵢ → Hᵢ₊₁/Hᵢ₊₂`**.  Expansion
+`⁅v, xy⁆ = ⁅v,x⁆ · (x ⁅v,y⁆ x⁻¹)` plus
+`x ⁅v,y⁆ x⁻¹ ⁅v,y⁆⁻¹ = ⁅x, ⁅v,y⁆⁆ ∈ ⁅S, Hᵢ₊₁⁆ = Hᵢ₊₂`.  ⚠ Only `y ∈ Hᵢ` is needed; `v`
+and `x` are unconstrained, since the chain brackets against all of `S`.
+
+This is the key to BG's unargued *"So `⟨w̄ᵢ⟩ = H̄ᵢ`"*: the set `{x ∈ Hᵢ | ⁅v,x⁆ ∈ Hᵢ₊₂}` is
+the **kernel** of that homomorphism, contains `Hᵢ₊₁`, and cannot be all of `Hᵢ` (that would
+give `Hᵢ₊₁ ≤ Hᵢ₊₂`), so `|Hᵢ : Hᵢ₊₁| = p` forces it to *be* `Hᵢ₊₁`.  ⚠ This supersedes the
+bijection/fibre route recorded earlier, which went through tightness of the counting — the
+kernel argument needs no counting at all.
+
+⚠ The leaf is new because `AppE_FurtherResults.lean` hit the 2000-line hard limit
+(issue 0134); the hub deferred splitting it while lane c's frontier sits at its tail, so
+lane c stops growing it instead. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutator_mul_mem_chain
 
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our

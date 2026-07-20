@@ -513,7 +513,24 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
      bracket しているため。
    - ⬜ 残 (E.12 の最終組み立て)。**次の難所を 2026-07-20 に解析したので記録する**。
 
-## ⚠ BG が完全に省略している鍵: `⁅v, x⁆ ∈ H_{i+1} ⟺ x ∈ H_i`
+## ⭐ 2026-07-20: 新 leaf `AppE_RegularOperator.lean` を開始 (issue 0134 への対応)
+
+`AppE_FurtherResults.lean` が 2000 行上限に達したので、以降の App.E 作業は新 sibling leaf
+`OddOrder/BG/AppE_RegularOperator.lean` に置く。第一弾 = `commutator_mul_mem_chain`。
+
+### ⚠ 下の「単射/ファイバー」経路は**より良い経路に置き換わった**
+
+`commutator_mul_mem_chain`: `y ∈ H_i` に対し `(⁅v,x⁆*⁅v,y⁆)⁻¹ * ⁅v,x*y⁆ ∈ H_{i+2}`。
+すなわち **`x ↦ ⁅v,x⁆` は準同型 `H_i → H_{i+1}/H_{i+2}`**。
+⟹ `{x ∈ H_i | ⁅v,x⁆ ∈ H_{i+2}}` はその**核**で、`H_{i+1}` を含み、`H_i` 全体ではありえない
+(そうなると `H_{i+1} ≤ H_{i+2}`)。`|H_i : H_{i+1}| = p` (素数) なのでちょうど `H_{i+1}`。
+⟹ `⁅v,x⁆ ∈ H_{i+2} ⟺ x ∈ H_{i+1}` ⟹ `w ∉ H₁` から帰納で `w_i ∉ H_{i+1}`。
+
+**この核論法は計数を一切使わない**ので、下記の tightness 経由の議論より簡単。
+(切り出した `index_centralizer_le_card_of_commutator_mem` 自体は補題の改善として有効だが、
+ここでは不要になった。)
+
+## (旧) BG が完全に省略している鍵: `⁅v, x⁆ ∈ H_{i+1} ⟺ x ∈ H_i` — tightness 経路
 
 BG は `w ∈ H₀ − H₁` と置いて `w_i = [w_{i-1}, v]` を作り、後で **「So `⟨w̄ᵢ⟩ = H̄ᵢ`」**
 と一言で済ませる。これは `w_i ∉ H_{i+1}` を要求するが、BG はその理由を書いていない。
