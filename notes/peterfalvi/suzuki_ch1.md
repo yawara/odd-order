@@ -440,6 +440,11 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       `orderOf θ` が odd なら全単射であることを証明した。従って可換 branch
       `θ = 1` も含め、prescribed common kernel basis の任意の非零 scaling を
       quotient basis 側で吸収できる。
+      anchored-trace から得る kernel coordinate が Frobenius shift される場合も、その
+      shift を quotient coordinate の counter-shift に移して prescribed kernel coordinate
+      自体を固定する normal-form 補題を証明した。さらに square map の実際の
+      actor-equivariance から、固定した kernel eigenvalue と quotient eigenvalue が
+      `ν = λ·θ(λ)` を満たすことを直接導いた。
       Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
       caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
       invariant factor への restricted action の faithful range でも generator のまま

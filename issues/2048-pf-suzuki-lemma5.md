@@ -320,6 +320,9 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           - [x] odd-order `θ` に対する unit twisted norm
                 `u ↦ u·θ(u)` の全単射性を証明し、任意の非零 kernel scaling を
                 quotient-basis scaling で実現する
+          - [x] normal-form の Frobenius renormalization を quotient coordinate 側へ
+                counter-shift して prescribed kernel coordinate を固定し、square map の
+                actor-equivariance から `ν = λ·θ(λ)` を導く一般補題を証明する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
