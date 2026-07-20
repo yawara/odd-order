@@ -750,4 +750,42 @@ theorem dvd_sub_of_zpow_mul_inv_zpow_mem {G : Type*} [Group G] {K : Subgroup G} 
   have := orderOf_dvd_iff_zpow_eq_one.mpr hone
   rwa [hord] at this
 
+/-! ## `(E.26)`: BG's Lemma 4.2 step with both error terms
+
+BG: *"By `(E.22)`, there exist `x ∈ Hᵢ₊₁` and `x' ∈ Hⱼ₊₁` such that `wᵢᵅ = wᵢ^{rᵢ}x` and
+`wⱼᵅ = wⱼ^{rⱼ}x'`, … By Lemma 4.2, `⁅wᵢ,wⱼ⁆ᵅ ≡ ⁅wᵢ,wⱼ⁆^{rᵢrⱼ} (mod H_k)`."*
+
+Step 2's version (`commutator_zpow_mul_congr`) carries only *one* error term, because there
+the second slot is the generator `v` of `R₀`, which `α` scales exactly.  Here **both** slots
+carry an error, and the errors are killed by the maximality of `i` and `j` in `(E.25)`:
+`⁅Hᵢ₊₁, Hⱼ⁆ ≤ H_k` and `⁅Hᵢ, Hⱼ₊₁⁆ ≤ H_k`.  The statement below is the group-level identity
+that results; the caller applies it inside `G/H_k`, where those inclusions read as the three
+`Commute` hypotheses. -/
+
+/-- **BG Lemma 4.2(a) with error terms in both slots**: if `u` commutes with `y` and `v`,
+and `v` commutes with `x`, and `⁅x, y⁆` is central, then
+`⁅x^m·u, y^n·v⁆ = ⁅x,y⁆^{m·n}`.
+
+The errors cancel by a four-step rewrite — `bc = cb`, then `bdb⁻¹ = d`, then `da⁻¹ = a⁻¹d` —
+leaving `⁅x^m, y^n⁆`, which is `commutatorElement_zpow_zpow_of_central`. -/
+theorem commutatorElement_zpow_mul_zpow_mul {G : Type*} [Group G] {x y u v : G}
+    (hu : Commute u y) (huv : Commute u v) (hv : Commute v x)
+    (hz : ⁅x, y⁆ ∈ Subgroup.center G) (m n : ℤ) :
+    ⁅x ^ m * u, y ^ n * v⁆ = ⁅x, y⁆ ^ (m * n) := by
+  have hun : Commute u (y ^ n) := hu.zpow_right n
+  have hvm : Commute v (x ^ m) := hv.zpow_right m
+  have hstrip : ⁅x ^ m * u, y ^ n * v⁆ = ⁅x ^ m, y ^ n⁆ := by
+    simp only [commutatorElement_def, mul_inv_rev]
+    calc x ^ m * u * (y ^ n * v) * (u⁻¹ * (x ^ m)⁻¹) * (v⁻¹ * (y ^ n)⁻¹)
+        = x ^ m * (u * y ^ n) * v * u⁻¹ * (x ^ m)⁻¹ * v⁻¹ * (y ^ n)⁻¹ := by group
+      _ = x ^ m * (y ^ n * u) * v * u⁻¹ * (x ^ m)⁻¹ * v⁻¹ * (y ^ n)⁻¹ := by rw [hun.eq]
+      _ = x ^ m * y ^ n * (u * v * u⁻¹) * (x ^ m)⁻¹ * v⁻¹ * (y ^ n)⁻¹ := by group
+      _ = x ^ m * y ^ n * v * (x ^ m)⁻¹ * v⁻¹ * (y ^ n)⁻¹ := by
+          rw [huv.eq]; group
+      _ = x ^ m * y ^ n * (v * (x ^ m)⁻¹) * v⁻¹ * (y ^ n)⁻¹ := by group
+      _ = x ^ m * y ^ n * ((x ^ m)⁻¹ * v) * v⁻¹ * (y ^ n)⁻¹ := by rw [hvm.inv_right.eq]
+      _ = x ^ m * y ^ n * (x ^ m)⁻¹ * (y ^ n)⁻¹ := by group
+  rw [hstrip]
+  exact commutatorElement_zpow_zpow_of_central hz m n
+
 end OddOrder.BG.AppE
