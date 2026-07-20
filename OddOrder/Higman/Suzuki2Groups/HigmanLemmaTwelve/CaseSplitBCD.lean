@@ -496,6 +496,44 @@ theorem FactorCoordinateData.toInclusionData_theta
   | commutative d => rfl
   | noncommutative _ d => rfl
 
+/-! ## Ambient `F × F` coordinate from two factor packages -/
+
+/-- Assemble the ambient `F × F ≃ₗ Additive L₀` isomorphism from the two factor
+inclusion packages, translating the complementarity data of the invariant
+factors (`Sₗ ⊓ Sᵣ = Φ(P)`, `Sₗ ⊔ Sᵣ = ⊤`, `Sᵣ` normal, `Φ(P) ≤ Sᵣ`) through
+each package's `range_eq`. -/
+noncomputable def ambientProductEquivOfFactors
+    {P : Type uP} [Group P] [Finite P]
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal)
+    (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤)
+    (hΦR : frattini P ≤ Sr) :
+    (GaloisField 2 n × GaloisField 2 n) ≃ₗ[ZMod 2]
+      Additive (lowerCentralLayer P 0) :=
+  @ambientProductEquiv P _ (GaloisField 2 n) _ _
+    left.H left.group left.f left.N left.normal left.quotComm left.quotModule
+    right.H right.group right.f right.N right.normal right.quotComm right.quotModule
+    hK0 left.hf left.eQuot right.hf right.eQuot
+    left.hfexact right.hfexact
+    (by rw [right.range_eq]; exact hRnormal)
+    (by rw [left.range_eq, right.range_eq]; exact hinf)
+    (by rw [left.range_eq, right.range_eq]; exact hsup)
+    (by rw [right.range_eq]; exact hΦR)
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
