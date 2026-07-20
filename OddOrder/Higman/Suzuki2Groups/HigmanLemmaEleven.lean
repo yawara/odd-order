@@ -755,4 +755,393 @@ theorem exists_ne_zero_smul_secondConjugateBasis_zero_of_bracket
   · rw [hcoordZero s hs]
     simp [hs]
 
+/-! ## Frobenius normalization of the selected bracket seed -/
+
+private noncomputable def frobeniusLinearEquivForNormalization
+    (K : Type uCommonField) [Field K] [Finite K] [Algebra (ZMod 2) K]
+    (s : ℕ) : K ≃ₗ[ZMod 2] K :=
+  ((FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K) ^ s).toLinearEquiv
+
+private noncomputable def frobeniusShiftLinearEquivForNormalization
+    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (e : V ≃ₗ[ZMod 2] K) (s : ℕ) : V ≃ₗ[ZMod 2] K :=
+  e.trans (frobeniusLinearEquivForNormalization K s)
+
+@[simp] private theorem frobeniusShiftLinearEquivForNormalization_apply
+    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (e : V ≃ₗ[ZMod 2] K) (s : ℕ) (v : V) :
+    frobeniusShiftLinearEquivForNormalization e s v =
+      (e v) ^ (2 ^ s) := by
+  simp [frobeniusShiftLinearEquivForNormalization,
+    frobeniusLinearEquivForNormalization, AlgEquiv.coe_pow,
+    FiniteField.coe_frobeniusAlgEquivOfAlgebraic, pow_iterate]
+
+private theorem frobeniusShiftLinearEquivForNormalization_mul_compat
+    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (T : Module.End (ZMod 2) V)
+    (e : V ≃ₗ[ZMod 2] K) (lambda : K)
+    (hcompat : ∀ v, e (T v) = lambda * e v) (s : ℕ) :
+    ∀ v, frobeniusShiftLinearEquivForNormalization e s (T v) =
+      lambda ^ (2 ^ s) *
+        frobeniusShiftLinearEquivForNormalization e s v := by
+  intro v
+  simp only [frobeniusShiftLinearEquivForNormalization_apply,
+    hcompat, mul_pow]
+
+private theorem adjoin_frobeniusShiftForNormalization_eq_top
+    {K : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    (lambda : K)
+    (hgen : Algebra.adjoin (ZMod 2) ({lambda} : Set K) = ⊤)
+    (s : ℕ) :
+    Algebra.adjoin (ZMod 2) ({lambda ^ (2 ^ s)} : Set K) = ⊤ := by
+  let sigma : K ≃ₐ[ZMod 2] K :=
+    (FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K) ^ s
+  have hsigma : sigma lambda = lambda ^ (2 ^ s) := by
+    simp [sigma, AlgEquiv.coe_pow,
+      FiniteField.coe_frobeniusAlgEquivOfAlgebraic, pow_iterate]
+  calc
+    Algebra.adjoin (ZMod 2) ({lambda ^ (2 ^ s)} : Set K) =
+        Algebra.adjoin (ZMod 2) ({sigma lambda} : Set K) := by rw [hsigma]
+    _ = (Algebra.adjoin (ZMod 2) ({lambda} : Set K)).map
+          sigma.toAlgHom :=
+      (AlgHom.map_adjoin_singleton sigma.toAlgHom lambda).symm
+    _ = ⊤ := by
+      rw [hgen, Algebra.map_top,
+        (AlgHom.range_eq_top _).mpr sigma.surjective]
+
+private theorem primitiveRoot_frobeniusShiftForNormalization
+    {K : Type uCommonField} [CommMonoid K] {lambda : K} {n : ℕ}
+    (hn : 0 < n) (hprim : IsPrimitiveRoot lambda (2 ^ n - 1))
+    (s : ℕ) :
+    IsPrimitiveRoot (lambda ^ (2 ^ s)) (2 ^ n - 1) := by
+  have hodd : Odd (2 ^ n - 1) := by
+    rw [Nat.odd_iff]
+    simpa using hn
+  exact hprim.pow_of_coprime (2 ^ s)
+    ((Nat.coprime_two_left.mpr hodd).pow_left s)
+
+private theorem frobeniusPower_eq_of_fin_add_eq
+    {K : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [NeZero (finrank (ZMod 2) K)]
+    (x : K)
+    (i r j : Fin (finrank (ZMod 2) K)) (hij : i + r = j) :
+    x ^ (2 ^ (i.val + r.val)) = x ^ (2 ^ j.val) := by
+  let sigma := FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K
+  have hmod : Nat.ModEq (finrank (ZMod 2) K)
+      (i.val + r.val) j.val := by
+    change (i.val + r.val) % finrank (ZMod 2) K =
+      j.val % finrank (ZMod 2) K
+    rw [Nat.mod_eq_of_lt j.isLt]
+    simpa only [Fin.val_add] using congrArg Fin.val hij
+  have hsigma : sigma ^ (i.val + r.val) = sigma ^ j.val := by
+    rw [pow_eq_pow_iff_modEq,
+      FiniteField.orderOf_frobeniusAlgEquivOfAlgebraic]
+    exact hmod
+  have happly := DFunLike.congr_fun hsigma x
+  simpa only [sigma, AlgEquiv.coe_pow,
+    FiniteField.coe_frobeniusAlgEquivOfAlgebraic,
+    pow_iterate, ZMod.card] using happly
+
+private theorem pairWeight_eq_shiftedGapWeight
+    {K : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [NeZero (finrank (ZMod 2) K)]
+    (lambda : K) (i j : Fin (finrank (ZMod 2) K)) :
+    let r := j - i
+    (lambda ^ (2 ^ i.val)) ^ (1 + 2 ^ r.val) =
+      lambda ^ (2 ^ i.val + 2 ^ j.val) := by
+  let r := j - i
+  have hir : i + r = j := by
+    dsimp [r]
+    rw [add_comm]
+    exact sub_add_cancel j i
+  have hcycle := frobeniusPower_eq_of_fin_add_eq lambda i r j hir
+  dsimp [r] at hcycle ⊢
+  calc
+    (lambda ^ (2 ^ i.val)) ^ (1 + 2 ^ (j - i).val) =
+        lambda ^ (2 ^ i.val * (1 + 2 ^ (j - i).val)) := by
+          rw [pow_mul]
+    _ = lambda ^ (2 ^ i.val + 2 ^ (i.val + (j - i).val)) := by
+      congr 1
+      rw [Nat.mul_add, mul_one, ← pow_add]
+    _ = lambda ^ (2 ^ i.val + 2 ^ j.val) := by
+      calc
+        lambda ^ (2 ^ i.val + 2 ^ (i.val + (j - i).val)) =
+            lambda ^ (2 ^ i.val) *
+              lambda ^ (2 ^ (i.val + (j - i).val)) := pow_add _ _ _
+        _ = lambda ^ (2 ^ i.val) * lambda ^ (2 ^ j.val) := by
+          rw [hcycle]
+        _ = lambda ^ (2 ^ i.val + 2 ^ j.val) := (pow_add _ _ _).symm
+
+private theorem conjugateTensorBasis_repr_frobeniusBaseChange
+    {K : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [NeZero (finrank (ZMod 2) K)]
+    (i q : Fin (finrank (ZMod 2) K)) (z : K ⊗[ZMod 2] K) :
+    (conjugateTensorBasis K).repr
+        ((frobeniusLinearEquivForNormalization K i.val).baseChange
+          (ZMod 2) K K K z) q =
+      (conjugateTensorBasis K).repr z (q + i) := by
+  let sigma : K ≃ₐ[ZMod 2] K :=
+    (FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K) ^ i.val
+  change (conjugateTensorBasis K).repr
+      (sigma.toLinearEquiv.baseChange (ZMod 2) K K K z) q =
+    (conjugateTensorBasis K).repr z (q + i)
+  induction z using TensorProduct.induction_on with
+  | zero => simp
+  | add x y hx hy =>
+      simp only [map_add, Finsupp.add_apply, hx, hy]
+  | tmul a x =>
+      have hsigma : sigma x = x ^ (2 ^ i.val) := by
+        simp [sigma, AlgEquiv.coe_pow,
+          FiniteField.coe_frobeniusAlgEquivOfAlgebraic, pow_iterate]
+      have hcycle : x ^ (2 ^ (i.val + q.val)) =
+          x ^ (2 ^ (q + i).val) :=
+        frobeniusPower_eq_of_fin_add_eq x i q (q + i) (by
+          simp [add_comm])
+      simp only [LinearEquiv.baseChange_tmul,
+        conjugateTensorBasis_repr_apply,
+        frobeniusTensorCoordinates_tmul]
+      change a * (sigma x) ^ (2 ^ q.val) =
+        a * x ^ (2 ^ (q + i).val)
+      rw [hsigma, ← pow_mul, ← pow_add, hcycle]
+
+private theorem frobeniusBaseChange_conjugateTensorBasis_add
+    {K : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [NeZero (finrank (ZMod 2) K)]
+    (i k : Fin (finrank (ZMod 2) K)) :
+    (frobeniusLinearEquivForNormalization K i.val).baseChange
+        (ZMod 2) K K K (conjugateTensorBasis K (i + k)) =
+      conjugateTensorBasis K k := by
+  apply (conjugateTensorBasis K).repr.injective
+  ext q
+  rw [conjugateTensorBasis_repr_frobeniusBaseChange]
+  simp only [Basis.repr_self_apply]
+  by_cases hkq : k = q
+  · subst q
+    simp [add_comm]
+  · have hne : i + k ≠ i + q := fun h => hkq (add_left_cancel h)
+    simp [hkq, hne, add_comm]
+
+private theorem frobeniusBaseChange_symm_conjugateTensorBasis
+    {K : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [NeZero (finrank (ZMod 2) K)]
+    (i k : Fin (finrank (ZMod 2) K)) :
+    ((frobeniusLinearEquivForNormalization K i.val).baseChange
+        (ZMod 2) K K K).symm (conjugateTensorBasis K k) =
+      conjugateTensorBasis K (i + k) := by
+  apply ((frobeniusLinearEquivForNormalization K i.val).baseChange
+    (ZMod 2) K K K).injective
+  rw [LinearEquiv.apply_symm_apply,
+    frobeniusBaseChange_conjugateTensorBasis_add]
+
+private theorem conjugateTensorBasisOf_frobeniusShift
+    {K V : Type uCommonField} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [NeZero (finrank (ZMod 2) K)]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (e : V ≃ₗ[ZMod 2] K)
+    (i k : Fin (finrank (ZMod 2) K)) :
+    conjugateTensorBasisOfLinearEquiv K
+        (frobeniusShiftLinearEquivForNormalization e i.val) k =
+      conjugateTensorBasisOfLinearEquiv K e (i + k) := by
+  simp only [conjugateTensorBasisOfLinearEquiv, Basis.map_apply]
+  rw [frobeniusShiftLinearEquivForNormalization,
+    LinearEquiv.baseChange_trans]
+  simp only [LinearEquiv.trans_symm, LinearEquiv.trans_apply]
+  rw [frobeniusBaseChange_symm_conjugateTensorBasis]
+
+private theorem conjugateTensorBasisAlong_repr_frobeniusBaseChange
+    {K L : Type uCommonField}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Algebra (ZMod 2) L]
+    [NeZero (finrank (ZMod 2) K)]
+    (iota : K →ₐ[ZMod 2] L)
+    (i q : Fin (finrank (ZMod 2) K)) (z : L ⊗[ZMod 2] K) :
+    (conjugateTensorBasisAlong K L iota).repr
+        ((frobeniusLinearEquivForNormalization K i.val).baseChange
+          (ZMod 2) L K K z) q =
+      (conjugateTensorBasisAlong K L iota).repr z (q + i) := by
+  let sigma : K ≃ₐ[ZMod 2] K :=
+    (FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K) ^ i.val
+  change frobeniusTensorCoordinatesAlong K L iota
+      (sigma.toLinearEquiv.baseChange (ZMod 2) L K K z) q =
+    frobeniusTensorCoordinatesAlong K L iota z (q + i)
+  induction z using TensorProduct.induction_on with
+  | zero => simp
+  | add x y hx hy =>
+      simp only [map_add, Pi.add_apply, hx, hy]
+  | tmul a x =>
+      have hsigma : sigma x = x ^ (2 ^ i.val) := by
+        simp [sigma, AlgEquiv.coe_pow,
+          FiniteField.coe_frobeniusAlgEquivOfAlgebraic, pow_iterate]
+      have hcycle : x ^ (2 ^ (i.val + q.val)) =
+          x ^ (2 ^ (q + i).val) :=
+        frobeniusPower_eq_of_fin_add_eq x i q (q + i) (by
+          simp [add_comm])
+      simp only [LinearEquiv.baseChange_tmul,
+        frobeniusTensorCoordinatesAlong_tmul]
+      change a * iota ((sigma x) ^ (2 ^ q.val)) =
+        a * iota (x ^ (2 ^ (q + i).val))
+      rw [hsigma, ← pow_mul, ← pow_add, hcycle]
+
+private theorem conjugateTensorBasisAlongOf_frobeniusShift_repr
+    {K L V : Type uCommonField}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Algebra (ZMod 2) L]
+    [NeZero (finrank (ZMod 2) K)]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (iota : K →ₐ[ZMod 2] L) (e : V ≃ₗ[ZMod 2] K)
+    (i k : Fin (finrank (ZMod 2) K)) (z : L ⊗[ZMod 2] V) :
+    (conjugateTensorBasisAlongOfLinearEquiv K L iota
+        (frobeniusShiftLinearEquivForNormalization e i.val)).repr z k =
+      (conjugateTensorBasisAlongOfLinearEquiv K L iota e).repr
+        z (k + i) := by
+  change (conjugateTensorBasisAlong K L iota).repr
+      ((frobeniusShiftLinearEquivForNormalization e i.val).baseChange
+        (ZMod 2) L V K z) k =
+    (conjugateTensorBasisAlong K L iota).repr
+      (e.baseChange (ZMod 2) L V K z) (k + i)
+  rw [frobeniusShiftLinearEquivForNormalization,
+    LinearEquiv.baseChange_trans]
+  exact conjugateTensorBasisAlong_repr_frobeniusBaseChange
+    iota i k (e.baseChange (ZMod 2) L V K z)
+
+/-- **Higman Lemma 11 (pp. 88--89), normalized actual bracket data.**
+
+Starting from the actual full-span lower-central bracket, rotate the two
+finite-field models by Frobenius so that the selected nonzero bracket has
+indices `(0, r)` in the first canonical basis and a nonzero zeroth coordinate
+in the second.  The shifted generators retain all field-generation and
+primitive-root properties, satisfy `iota nu' = lambda'^(1+2^r)`, and give the
+single-gap law for every nonzero actual basis bracket. -/
+theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate
+    {K L H C : Type uCommonField}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [Algebra (ZMod 2) L]
+    [Group H] [Group C]
+    [NeZero (finrank (ZMod 2) K)]
+    [NeZero (finrank (ZMod 2) L)]
+    (phi : C →* MulAut H) (c : C)
+    (eOne : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
+    (lambda : L)
+    (hgen : Algebra.adjoin (ZMod 2) ({lambda} : Set L) = ⊤)
+    (hcompatOne : ∀ v,
+      eOne (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda * eOne v)
+    (eTwo : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] K)
+    (nu : K) (iota : K →ₐ[ZMod 2] L)
+    (hcompatTwo : ∀ v,
+      eTwo (lowerCentralLayerRepresentation phi 1 c v) = nu * eTwo v)
+    (hn : 2 ≤ finrank (ZMod 2) K)
+    (hprimNu : IsPrimitiveRoot nu
+      (2 ^ finrank (ZMod 2) K - 1)) :
+    ∃ (eOne' : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
+      (eTwo' : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] K)
+      (lambda' : L) (nu' : K)
+      (r : Fin (finrank (ZMod 2) L)),
+      (∀ v, eOne' (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda' * eOne' v) ∧
+      Algebra.adjoin (ZMod 2) ({lambda'} : Set L) = ⊤ ∧
+      (∀ v, eTwo' (lowerCentralLayerRepresentation phi 1 c v) =
+        nu' * eTwo' v) ∧
+      IsPrimitiveRoot nu' (2 ^ finrank (ZMod 2) K - 1) ∧
+      iota nu' = lambda' ^ (1 + 2 ^ r.val) ∧
+      r ≠ 0 ∧
+      let bOne' := conjugateTensorBasisOfLinearEquiv L eOne'
+      let bTwo' := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo'
+      lowerCentralCommutatorBilinearBaseChange L H
+          (bOne' 0) (bOne' r) ≠ 0 ∧
+      bTwo'.repr
+          (lowerCentralCommutatorBilinearBaseChange L H
+            (bOne' 0) (bOne' r)) 0 ≠ 0 ∧
+      ∀ a b : Fin (finrank (ZMod 2) L),
+        lowerCentralCommutatorBilinearBaseChange L H
+            (bOne' a) (bOne' b) ≠ 0 →
+          HasHigmanPairGap
+            (ZMod.finEquiv (finrank (ZMod 2) L) r) a b := by
+  classical
+  let bOne := conjugateTensorBasisOfLinearEquiv L eOne
+  let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+  let beta := lowerCentralCommutatorBilinearBaseChange L H
+  obtain ⟨i, j, s, hbracket, hcoordinate, hweight⟩ :=
+    exists_lowerCentralConjugateBasisBracketCoordinate
+      phi c eOne lambda hcompatOne eTwo nu iota hcompatTwo
+  let r := j - i
+  let eOne' := frobeniusShiftLinearEquivForNormalization eOne i.val
+  let eTwo' := frobeniusShiftLinearEquivForNormalization eTwo s.val
+  let lambda' := lambda ^ (2 ^ i.val)
+  let nu' := nu ^ (2 ^ s.val)
+  have hcompatOne' : ∀ v,
+      eOne' (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda' * eOne' v := by
+    exact frobeniusShiftLinearEquivForNormalization_mul_compat
+      (lowerCentralLayerRepresentation phi 0 c)
+      eOne lambda hcompatOne i.val
+  have hcompatTwo' : ∀ v,
+      eTwo' (lowerCentralLayerRepresentation phi 1 c v) =
+        nu' * eTwo' v := by
+    exact frobeniusShiftLinearEquivForNormalization_mul_compat
+      (lowerCentralLayerRepresentation phi 1 c)
+      eTwo nu hcompatTwo s.val
+  have hgen' : Algebra.adjoin (ZMod 2) ({lambda'} : Set L) = ⊤ :=
+    adjoin_frobeniusShiftForNormalization_eq_top lambda hgen i.val
+  have hprimNu' : IsPrimitiveRoot nu'
+      (2 ^ finrank (ZMod 2) K - 1) :=
+    primitiveRoot_frobeniusShiftForNormalization (by omega) hprimNu s.val
+  have hweight' : lambda ^ (2 ^ i.val + 2 ^ j.val) =
+      iota (nu ^ (2 ^ s.val)) := by
+    rw [map_pow]
+    exact hweight
+  have hnormal : lambda' ^ (1 + 2 ^ r.val) = iota nu' := by
+    exact (pairWeight_eq_shiftedGapWeight lambda i j).trans hweight'
+  have hnu : iota nu' = lambda' ^ (1 + 2 ^ r.val) := hnormal.symm
+  have hij : i ≠ j := by
+    intro hij
+    subst j
+    exact hbracket
+      (lowerCentralCommutatorBilinearBaseChange_self L H (bOne i))
+  have hr : r ≠ 0 := by
+    intro hr
+    dsimp [r] at hr
+    exact hij (sub_eq_zero.mp hr).symm
+  have hir : i + r = j := by
+    dsimp [r]
+    rw [add_comm]
+    exact sub_add_cancel j i
+  let bOne' := conjugateTensorBasisOfLinearEquiv L eOne'
+  let bTwo' := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo'
+  have hbOneZero : bOne' 0 = bOne i := by
+    simpa [bOne', bOne, eOne'] using
+      (conjugateTensorBasisOf_frobeniusShift eOne i 0)
+  have hbOneR : bOne' r = bOne j := by
+    calc
+      bOne' r = bOne (i + r) := by
+        simpa [bOne', bOne, eOne'] using
+          (conjugateTensorBasisOf_frobeniusShift eOne i r)
+      _ = bOne j := congrArg bOne hir
+  have hbracket' : beta (bOne' 0) (bOne' r) ≠ 0 := by
+    simpa only [hbOneZero, hbOneR] using hbracket
+  let z := beta (bOne i) (bOne j)
+  have hrepr : bTwo'.repr z 0 = bTwo.repr z s := by
+    simpa [bTwo', bTwo, eTwo', z] using
+      (conjugateTensorBasisAlongOf_frobeniusShift_repr
+        iota eTwo s 0 z)
+  have hcoordinate' :
+      bTwo'.repr (beta (bOne' 0) (bOne' r)) 0 ≠ 0 := by
+    rw [hbOneZero, hbOneR]
+    change bTwo'.repr z 0 ≠ 0
+    rw [hrepr]
+    exact hcoordinate
+  have hgap : ∀ a b : Fin (finrank (ZMod 2) L),
+      beta (bOne' a) (bOne' b) ≠ 0 →
+        HasHigmanPairGap
+          (ZMod.finEquiv (finrank (ZMod 2) L) r) a b := by
+    exact lowerCentralPairGapSupport_of_commonConjugateBases
+      phi c eOne' lambda' hgen' hcompatOne'
+      eTwo' nu' iota hcompatTwo' hn hprimNu' r hnu
+  refine ⟨eOne', eTwo', lambda', nu', r,
+    hcompatOne', hgen', hcompatTwo', hprimNu', hnu, hr, ?_⟩
+  exact ⟨hbracket', hcoordinate', hgap⟩
+
 end OddOrder.Higman.Suzuki2Groups
