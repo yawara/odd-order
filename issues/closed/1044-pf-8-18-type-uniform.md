@@ -114,11 +114,30 @@ type 𝒫 では A(T) ⊆ T′ という (8.10) の host がそのまま効く�
    - `escaping_sigma_disjoint_centralizer_typeA` / `supported_sigma_coprime_typeA` を新設。
    旧 Type-I 版はすべて一般版からの数行の導出に置換 (signature 不変)。
 
-### ⛏ 残り 5
+### ✅ 5 完了 (2026-07-20) — ただし「一般版で置換」ではなかった
 
-5. `S12.Hypothesis.cross_dade_inner_eq_zero_at_pair` (canonical pair 固定の
-   (8.18.b) 適用、`Section16MaximalPairCore` 依存) を一般版で置換できるか検討。
-   ⚠ これは §12 (lane b territory 寄り) なので、着手前に所有を確認すること。
+**所有の確認**: `OddOrder/Peterfalvi/S*.lean` は **lane a territory** (2026-07-19 裁定 9154 で
+c から移管、正本 = `lane_reallocation_2026_07_16.md` の表)。「lane b 寄り」という旧注記は誤り。
+
+**実測した結論: `cross_dade_inner_eq_zero_at_pair` を型一様 (8.18.c) で置換するのは不可**。
+(8.18.c) が与えるのは **選言** `Ã₁(S) ∩ Ã(T) = ∅ ∨ Ã₁(T) ∩ Ã(S) = ∅` だが、§12 が要るのは
+**特定の向き** (`Ã₁(M) ∩ Ã(S) = ∅`、M = type P₁ / S = type II)。どちらの選言肢かを決めるのは
+(8.18.c) の外の情報なので、§12 の証明は (8.18.c) より真に強いことを示している。
+⟹ `Section16MaximalPairCore` 添字は**特殊化債務ではなく application の形**。
+
+**代わりに実施した de-specialization** (これは本物の債務だった):
+
+| 旧 | 新 | 落とした死荷重 |
+|---|---|---|
+| `typeP_pair_core_order_coprime` | **`typeP_core_order_coprime`** | `mp`/`data`/`hSW1`/`hSW2`/`hKstar`/`ha0` — **本体で 1 つも使われていなかった**。要るのは「S が M と非共役な maximal」だけ |
+| `typeP_pair_escaping_centralizer_not_le_conj_partner` | **`typeP_escaping_centralizer_not_le_typeII`** | 同上。要るのは「S が type II」だけ |
+
+canonical pair 側の呼び出しは各 1〜5 行の適用に縮んだ。⚠ 残る `mp` 添字の宣言
+(`typeP_pair_base_bare_not_isConj` ほか 10 本、計 ~900 行) は `mp.S_typeP2` /
+`mp.S_T_not_conj` / `mp.K`/`mp.Kstar` の整合を**実際に**使っているので、同様の棚卸しは
+効果が小さい (次に触るときに再測すること)。
+
+⟹ **issue 1044 は完了**。
 
 ## 参照
 

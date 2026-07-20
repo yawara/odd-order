@@ -60,6 +60,29 @@ structure TypesIIIIIIVSetup (M : Subgroup G) where
   nontrivial : TypePNontrivialCore M typeP
   type_alt : IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M
 
+/-- **Peterfalvi Hypothesis (9.2), constructed** — a maximal subgroup of type II, III or IV
+together with type-`P` data is exactly a `TypesIIIIIIVSetup`.
+
+The (8.6) core is supplied by `typePNontrivialCore_of_isTypeIIorIIIorIV`, so **all three types of
+the book's hypothesis are covered**.  §10/§13 reach the setup only through
+`S12.Hypothesis.toTypesIIIIIIVSetup`, whose `htype : IsTypeIII M ∨ IsTypeIV M` comes from the §10
+packaging; that restriction is packaging, not §9 mathematics (issue 1045). -/
+def typesIIIIIIVSetup_of_type_alt [Finite G] {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (typeP : TypePData M) (htype : IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M) :
+    TypesIIIIIIVSetup M where
+  maximal := hM
+  typeP := typeP
+  nontrivial := typePNontrivialCore_of_isTypeIIorIIIorIV htype typeP
+  type_alt := htype
+
+/-- **Hypothesis (9.2) for a type II maximal subgroup** — the instance the §9 chain lacked.
+Peterfalvi's `M` of type II carries its own type-`P` data (`TypeIIData.typeP`), so no extra input
+is needed beyond maximality. -/
+noncomputable def typesIIIIIIVSetup_of_isTypeII [Finite G] {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (htype : IsTypeII M) :
+    TypesIIIIIIVSetup M :=
+  typesIIIIIIVSetup_of_type_alt hM htype.some.typeP (Or.inl htype)
+
 namespace TypesIIIIIIVSetup
 
 /-- Peterfalvi's `H` in (9.2).  Reducible so that the chief-factor carrier `↥data.H ⧸ N` is

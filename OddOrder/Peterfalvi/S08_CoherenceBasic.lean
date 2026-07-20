@@ -855,6 +855,8 @@ noncomputable def
     data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 
+-- The declaration name alone is 106 characters, so the `def` line cannot fit in 100 columns.
+set_option linter.style.longLine false in
 /-- **(6.6)/(6.8.1), central-`Zc`, completeness-exposing form (redesign L2 outer shell,
 withCover).**
 Same as

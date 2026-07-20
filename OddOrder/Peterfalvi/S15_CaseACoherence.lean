@@ -49,8 +49,8 @@ virtual character with the cleared Mackey norm `N·u = (a+1)·u + (q−1)·a²` 
 double-coset count `S11.nineElevenGamma_inner_self_mul_u`, and `‖α‖² = ‖γ‖² + 1` via
 `S11.cfnorm_sub_irreducible_orthogonal`).  **(9.11.5)–(9.11.8)**: `|𝒮₄| ≤ N = ‖α^τ‖²` — in the
 orthogonal branch of the (9.11.6) dichotomy the projection budget
-(`S13.exists_bridge_target_of_budget`) plus the union-pair extension
-(`S13.isCoherent_union_pair_of_bridge`, suppliable via the case-agnostic `sSet_memberRFamily`)
+(`S07.exists_bridge_target_of_budget`) plus the union-pair extension
+(`S07.isCoherent_union_pair_of_bridge`, suppliable via the case-agnostic `sSet_memberRFamily`)
 would coherently adjoin a conjugate pair from `𝒮₄`, contradicting `hnopair`; in the
 non-orthogonal branch distinct `𝒮₄`-members consume orthogonal integral slices of `α^τ` (Bessel,
 `card_le_inner_self_re_of_orthonormal_inner_int_ne`).  Here `𝒮₄` is the irreducible part of the
@@ -513,8 +513,8 @@ toTypesIIIIIIVSetupS hG` — applies:
   (TI-witness), `S11.nineElevenTwo_two_summand_inertia` (inertia `C = K₁ ⊓ K₂`),
   `S11.nineElevenGamma_inner_self_mul_u` (Mackey norm), `S11.nineElevenThree_orbit_split` (class
   eq);
-* the abstract projection budget `S13.exists_bridge_target_of_budget` and the (5.6.3) union-pair
-  extension `S13.isCoherent_union_pair_of_bridge` for the (9.11.7)–(9.11.8) coherent-pair
+* the abstract projection budget `S07.exists_bridge_target_of_budget` and the (5.6.3) union-pair
+  extension `S07.isCoherent_union_pair_of_bridge` for the (9.11.7)–(9.11.8) coherent-pair
   adjunction.
 The genuinely `S`-specific pieces still to build are the caseA per-member Dade `R`-family (the
 analogue of the M-side `sOf_H0Cprime_memberRFamily`, feeding `𝒮₃`-coherence and the coherent-image

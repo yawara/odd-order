@@ -383,6 +383,71 @@ theorem chiefFactor_U_not_centralizes_H [Finite G] {M : Subgroup G}
   have hxH : x ∈ Subgroup.centralizer (data.H : Set G) := (inf_eq_left.mp hcentr) hx
   exact mem_cSub_of_mem_U_of_centralizes data chief hx hxH
 
+/-- **Peterfalvi (10.11), the type-II collapse `H₀ = 1` and `p = |W₂|**.
+
+Book (10.11): *"By (9.3), `|H| = p^q`, where `p = |W₂|`.  As `p` is prime, (9.4) and (9.6) then
+show that `H₀ = 1` and that `H` is elementary abelian."*
+
+The two order relations are already in the repo and say
+`|W₂|^q = |H| = p^q · |H₀|` — (9.3) for type II (`typeII_III_IV_order_relations`, whose type-II
+branch has `C_H(U) = 1`) and (9.4) (`ChiefFactorData.quotient_order`).  With both `p` and `|W₂|`
+prime and `q ≥ 2`, unique factorisation forces `p = |W₂|` and then `|H₀| = 1`.
+
+`hW2prime` is the book's own standing hypothesis: (10.11) is stated under "case (b) of Theorem
+(8.8) holds", whose first assertion (`S12.theorem88_caseB_prime_orders`) is exactly the primality
+of `|W₁|` and `|W₂|`.  (For types III/IV the same fact is `typeIIIorIV_W2_prime`; type II is the
+case the book supplies from (8.8) instead.) -/
+theorem typeII_chiefFactor_H0_trivial [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hII : IsTypeII M) (hW2prime : (Nat.card ↥data.W2).Prime) :
+    chief.p = Nat.card ↥data.W2 ∧ Nat.card ↥chief.H0 = 1 := by
+  have hq2 : 2 ≤ data.q := data.nontrivial.2.1.two_le
+  -- (9.3) type II: `|H| = |W₂|^q`
+  have h93 : Nat.card ↥data.H = Nat.card ↥data.W2 ^ data.q :=
+    ((typeII_III_IV_order_relations hG data).1 hII).2
+  -- (9.4): `|H| = p^q · |H₀|`
+  have h94 : Nat.card ↥data.H = chief.p ^ data.q * Nat.card ↥chief.H0 := chief.quotient_order
+  have hkey : Nat.card ↥data.W2 ^ data.q = chief.p ^ data.q * Nat.card ↥chief.H0 := by
+    rw [← h93, h94]
+  -- `p ∣ |W₂|^q`, so `p ∣ |W₂|`, and both being prime forces equality
+  have hpdvd : chief.p ∣ Nat.card ↥data.W2 ^ data.q := by
+    refine hkey ▸ Dvd.dvd.mul_right ?_ _
+    exact dvd_pow_self chief.p (by omega)
+  have hpW2 : chief.p = Nat.card ↥data.W2 :=
+    ((hW2prime.eq_one_or_self_of_dvd chief.p
+      (Nat.Prime.dvd_of_dvd_pow chief.p_prime hpdvd)).resolve_left
+      chief.p_prime.one_lt.ne')
+  refine ⟨hpW2, ?_⟩
+  rw [hpW2] at hkey
+  have hpos : 0 < Nat.card ↥data.W2 ^ data.q := pow_pos hW2prime.pos _
+  nlinarith [hkey, hpos, Nat.one_le_iff_ne_zero.mpr (Nat.card_pos (α := ↥chief.H0)).ne']
+
+/-- **Peterfalvi (10.11): `C′ = 1` for type II.**
+
+Book: *"Since `M` is of Type II, `U` is abelian and so `C′ = 1`."*  `C = C_U(H̄)` is a subgroup of
+`U` (`cSub_le_U`), so an abelian `U` makes `C` abelian and `C′ = [C, C]` vanishes.
+
+`hUab` is the book's "`U` is abelian": for the canonical type-II setup
+`typesIIIIIIVSetup_of_isTypeII` it is `TypeIIData.U_commutative` definitionally.  It is taken as a
+hypothesis because `TypePData` witnesses for the same `M` are not identified in the repo, so
+abelianness cannot be transferred between them the way `TypePNontrivialCore.transfer` moves the
+(8.6) core. -/
+theorem typeII_cprimeSub_eq_bot [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    (chief : ChiefFactorData data) (hUab : IsMulCommutative ↥data.U) :
+    cprimeSub data chief = ⊥ := by
+  have hCU : cSub data chief ≤ data.U := cSub_le_U data chief
+  have hCab : IsMulCommutative ↥(cSub data chief) :=
+    ⟨⟨fun a b => Subtype.ext (by
+      have h := hUab.is_comm.comm (⟨(a : G), hCU a.2⟩ : ↥data.U) ⟨(b : G), hCU b.2⟩
+      simpa using congrArg Subtype.val h)⟩⟩
+  have hcomm : commutator ↥(cSub data chief) = ⊥ := by
+    rw [eq_bot_iff]
+    refine (Subgroup.commutator_le (H₁ := ⊤) (H₂ := ⊤) (H₃ := ⊥)).mpr (fun a _ b _ => ?_)
+    rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
+    exact hCab.is_comm.comm a b
+  change derivedInG (cSub data chief) = ⊥
+  rw [derivedInG, hcomm, Subgroup.map_bot]
+
 /-- **Peterfalvi (9.6)**: `U ≠ C`, `H̄` is a chief factor of `M`, `|W̄₂| = p` and `|H̄| = p^q`.
 
 All four clauses hold for **every** type in Hypothesis (9.2) — II, III *and* IV — exactly as the

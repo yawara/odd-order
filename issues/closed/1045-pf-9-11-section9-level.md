@@ -1113,6 +1113,148 @@ support は**明示パラメータ**で取るのが素直 (S15 の honest 版は
 (`inducedFamily_degreeSubfamily_isCoherent`) に実依存する。
 書籍ではそこが (8.15.3) 経由 ⟹ `S10.typePACore_subcoherent` で置換できる見込み。
 
+#### ⭐⭐ 完了 (2026-07-20): (9.11) の §9 版が **case (9.7.a) 込みで完全証明**になった
+
+残っていた最後の producer `S13.nineElevenSevenEightRefutation` (~420 行) を §9 へ降ろし、
+`S11.caseA_sevenEightRefutation` として landed。これで `hrefuteEq` が discharge され、
+新しい endpoint **`S11.sOf_nineEleven_coherent_of_count`** が立った:
+
+```
+sOf_nineEleven_coherent_of_count          ⭐ (9.11) §9 版・型仮定ゼロ
+ ← caseA_equalityRefutation                (= hrefuteEq、issue 9083 Phase B–E)
+     ← caseA_sTwoExtraction                 (既存)
+     ← caseA_normBound                      (新)
+         ← caseA_normBound_of_sevenEightRefutation  (前 commit)
+         ← caseA_sevenEightRefutation                (本 commit ⭐)
+```
+
+残パラメータは `dd`/`hdd` ((8.15) Dade datum の pin) と `h2` (`2 ≤ ncard`) のみ。
+どちらも未完の数学ではない ((9.8.d) は存在しか与えないので `h2` の露出は honest で、
+`S15.Hypothesis.sSetIrrDeg_coherent` と同じ流儀)。全宣言 axiom-clean、AxiomsCheck 登録済。
+
+**降ろし方は予告どおり**: `htype`/`hncH0C` の実質的使用は `𝒮₄ ⊆ 𝒮₃` のための
+`H₀C′ ≤ H₀C` 1 箇所だけで、§9 では `chars.C` が `cSub data chief` と定義的に等しいので消えた。
+
+新規に要した §9 部品 2 本 (`S11_NineElevenRFamily` へ):
+- `sOf_coherent_extension_eq_sum_memberRFamily` — (5.5) の coherent extension 版 (stratum-generic)
+- `sOf_coherent_extension_cross_orthogonal` — Coq `coherent_ortho`
+
+**設計変更 1 件**: `CaseASevenEightRefutation` に (9.11.4) の norm 値 `N` とその Mackey 等式を
+パラメータで追加した。§13 は `𝒮₄ ≠ ∅` を出すためだけに `γ = Ind_{HU₁}^M 1` の文脈を
+**2 度目に丸ごと組み直している** (`caseA_nineElevenFour_norm_inputs` ~130 行) が、§9 では唯一の
+consumer `caseA_normBound_of_sevenEightRefutation` が呼び出し地点で既に `N`/`hNu` を持っている。
+書籍でも (9.11.7) は (9.11.4)–(9.11.6) の文脈の内側の議論なので、渡す方が忠実。
+
+**再層化 1 件 (新 leaf)**: `S11_NineElevenPairAdjoin.lean` (namespace S13) の
+`UnionPair` 節 (Pf (5.6.3) の union-pair coherent extension) と `ProjectionBudget` 節
+((9.11.7)–(9.11.8) の射影予算) は **群論的構造を一切参照しない** (`{L Γ'}` の直交族と
+`IntegralCharacterMap` と整数性だけ) のに §13 の closure に在り、§9 から使えなかった。
+新 leaf `OddOrder/Peterfalvi/S07_UnionPairBridge.lean` (namespace S07、640 行) へ移設。
+呼び出し 4 箇所 (§13 の Discharge + §15 の S/T ミラー 2 本) と AxiomsCheck 3 件を修飾し直した。
+`S11_NineElevenPairAdjoin.lean` は 1314 → 719 行。
+
+⚠ 新 leaf 2 本 (`S07_UnionPairBridge` / 前 commit の `S11_NineElevenCaseAResidual`) を
+`OddOrder.lean` に配線した (issue 0135 の規律)。到達性 851/851、orphan ゼロ。
+full build green (4566 jobs)、AxiomsCheck OK、sorry 14 (非退行 — 全て他レーン所管の Appendices/BG)。
+
+⟹ 着手順の 1・2 は完了。残りは **3 (§13 側 `coherent_sOf_H0Cprime` を §9 版の系にする)** と
+**4 (型 II instance)**。
+
+#### ⭐ 完了 (2026-07-20): 着手順 4 (**型 II instance**) — (9.11) が型 II で使えるようになった
+
+`S11.typeII_sOf_nineEleven_coherent`。実測すると **§9 側に足りなかったのは carrier の producer
+だけ**で、(9.11) の中身は既に型仮定ゼロだった:
+
+| 書籍 | repo の状態 | 追加したもの |
+|---|---|---|
+| (9.2) Hypothesis | `TypesIIIIIIVSetup` は `type_alt : IsTypeII ∨ III ∨ IV` で**既に型一様**。だが producer が `S12.Hypothesis.toTypesIIIIIIVSetup` (htype = III ∨ IV) しか無かった | `GroupTheory.typePNontrivialCore_of_isTypeII` / `_of_isTypeIIorIIIorIV` (`TypeIIData.common` を transfer するだけ) + `S11.typesIIIIIIVSetup_of_type_alt` / `_of_isTypeII` |
+| (9.4) chief factor | `exists_chiefFactorData` は**元から型仮定ゼロ** (`ChiefFactorData.typeIII_IV_p_eq_W2` は条件付き field なので型 II で無害) | — |
+| (9.5) character data | `S12.Hypothesis.mkSection11CharacterData` のみ = §10 packaging 経由 | `S11.mkSection11CharacterData` (§9 版。`u = |Ū|` は pin 済、`C`/`U'`/`C'`/`𝒳`/`𝒮` は genuine、自由なのは caller が渡す Dade map と (9.11) が明示パラメータで取る 2 placeholder のみ) |
+| (9.11) | `sOf_nineEleven_coherent_of_count` (本 session) | — (そのまま instantiate) |
+
+⟹ 型 II の (9.11) は上 3 つを繋ぐだけで立った。残りの入力は型 III/IV 経路と**完全に同じ**
+((8.15)/(4.6) の Dade データ `h46`/`dd`/`hdd` とその pin + `h2`)。
+
+⟹ **issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) は完了**。
+
+#### ⭐ 完了 (2026-07-20): `h2` (`2 ≤ ncard`) も discharge — 残パラメータは (8.15) の Dade データだけ
+
+`S11.irrCut_two_le_ncard` + `S11.caseA_irrCut_two_le_ncard`。⚠ **本 issue が繰り返し
+「honest な露出」と記録してきた `h2` は、実は露出不要だった**:
+
+- 次数 cut は共役閉 (`irrCut_conjClosed`) で、奇数位数ゆえ実指標が無い
+  (`S08.inducedKernelFamily_hasNoRealCharacters`) ⟹ `φ ≠ φ̄` が常に成り立つ。
+  **共役閉族では「非空」と「2 元以上」は同値**。
+- しかも非空自体が (9.8.d) の厳密 count から出る: 下界 `(p−1)·[U:U′]` が正
+  (`caseA_character_count_exact`、§9 level)、`sOf_antitone` で `H₀U′ → H₀C′` に降ろす。
+
+これは **§13 が `caseA_coherent_sOf_H0Cprime_of_refuter` の中でやっているのと同じ経路**で、
+全ステップ §9 level。§13 が存在 witness だけで base coherence を得るのに §9 の (8.15.3)+(5.7)
+経路が `2 ≤ ncard` を要求する、という差は見かけだけだった。
+
+⟹ endpoint を改名・整理: `sOf_nineEleven_coherent_of_count` → **`S11.nineEleven_coherent`**、
+`typeII_sOf_nineEleven_coherent` → **`S11.typeII_nineEleven_coherent`**。
+**残るパラメータは Hypothesis (8.15) そのものだけ** — Dade datum `dd` と pin `hdd`、
+および `h46` と書籍の `K = M′` / `H = M_σ` / `τ` を名指しする pin (`hKeq`/`hHeq`/`hconj`/`htau`)。
+未完の数学はゼロ。
+
+#### 📋 着手順 3 (§13 を §9 の系にする) の seam 実測 (2026-07-20) — 次 session はここから
+
+`h2` が消えたので「§13 を §9 の系にすると残件が後退する」という 2026-07-20 前半の判断は**失効**。
+改めて seam を実測した結果、**τ と A₀ は定義的に一致する**:
+
+| §13 | §9 | 判定 |
+|---|---|---|
+| `hyp.base.tau` = `dadeICM hyp.dadeData.dade (…fullDadeIsometryData hyp.hconj)` (S12/Hypothesis.lean:405) | `dadeICM h46.dade0 h46.tau` with `h46 = hyp.base.toHypothesis46 hG hG.odd` (同 :1367-1368 が `dade0 := hyp.dadeData.dade`, `tau := …fullDadeIsometryData hyp.hconj`) | ✅ **rfl** (`htau` も rfl) |
+| `hyp.base.A0` = `supportInSubgroup (typePA0 M typeP) M` (同 :390) | `supportInSubgroup (A ∪ conjClassSetIn M h46.tic.V) M`、`A = typePA M typeP`、`tic_V := rfl` | ✅ ほぼ rfl (`typePA0 = typePA ∪ V^M` の展開のみ) |
+| `hKsupp` | `hyp.base.mderivSharp_subset_A0` | ✅ 既存 |
+| `hVsub` | `typePData_typePV_not_mem_derived` | ✅ 既存 |
+| `hKeq` / `hHeq` | `h46.K` / `h46.subH` は `toCertainTypeHypothesis` 由来。型 III/IV では `M_σ = M′` ゆえ両方 `M′` に落ちるはず | ⛏ 要確認 |
+| `dd` / `hdd` | ⚠ **本物の残件**。`hyp.base.dadeData : DadeSupportHypothesisData M (typePA0 …)` だが §9 が要るのは **`A = typePA` 上の制限版**。`normalizer_eq` と `H_eq_ftSupportKernel` を制限先で立て直す必要がある | ⛏ |
+
+⟹ 手順:
+1. **Stage 1 (無リスク)**: `sOf_nineEleven_coherent` の内部 `hA0` ブロック (A₀ level の結論) を
+   独立定理 `sOf_nineEleven_coherent_A0` として切り出す。§13 の結論は A₀ level なので、系にするには
+   A₀ 版が要る (`nineEleven_coherent` は A level)。
+2. **Stage 2**: `hKeq`/`hHeq` を実測して埋める。
+3. **Stage 3**: `A = typePA` 上の `DadeSupportHypothesisData` を (8.15) から構成 (制限版)。
+4. **Stage 4**: `S13.coherent_sOf_H0Cprime` を系に置換。`hnc`/`htype` は**未使用パラメータとして残す**
+   (signature 不変 ⟹ §13/§15 の下流は無変更)。その後 §13 の重複チェーン
+   (`S11_NineElevenCaseA` / `_AlphaBound` / `_PairAdjoin` の (9.11) 部分、計 ~3.8k 行) が dead code
+   になるので削除。
+
+#### ⭐⭐ 完了 (2026-07-20): 着手順 3 — **§13 の (9.11) が §9 の系になった**
+
+`S13.coherent_sOf_H0Cprime_of_section9` を新設し、`S13.coherent_sOf_H0Cprime` の証明を
+**`S11.nineEleven_coherent_A0` への 1 行の委譲**に置換 (signature 不変 ⟹ 下流無変更)。
+
+4 stage すべて landed:
+
+| Stage | 内容 |
+|---|---|
+| 1 | `S11.sOf_nineEleven_coherent_A0` / `S11.nineEleven_coherent_A0` — §13 の結論は A₀ level なので A₀ 版の endpoint を切り出した |
+| 2 | `S10.inducedNonKernelFamily_mono` — `hHeq` (等式) → `hHle` (包含) へ緩和。§13 の `h46.subH` は `M_σ` でなく `M′` ((4.6.c) を `H := K` で立てている) なので等式は成り立たない |
+| 3 | `S10.DadeSupportHypothesisData.restrict` + `ftSupportKernel_congr_of_subset` — §10 は datum を `A₀(M)` 上に持ち、§9 は `A(M)` 上のものを要求する |
+| 4 | 配線。`τ`/`A₀` は **rfl**、`hKeq` は `huSub_eq_derivedInG_subgroupOf`、`hHle` は `Msigma_le_derived`、`hdd` は `rfl` |
+
+⚠ **`hnc`/`htype` の唯一の用途は packaging の辞書 `hyp.C = cSub s11Setup chief`**
+(`C_eq_cSub_of_noncoherent`)。本 issue が §13 の producer を降ろすたびに底で見つけていた
+「1 行の辞書」がそのまま最後に残った形で、§9 の議論自体は型を一度も見ない。
+
+⟹ **issue 1045 の完了条件を満たした**: (9.11) は `TypesIIIIIIVSetup` + `ChiefFactorData` +
+`Section11CharacterData` の上で型仮定なしに述べられ、型 III/IV 版 (§13 packaging) はその系。
+型 II 版も同様 (`S11.typeII_nineEleven_coherent`)。
+
+### ⛏ 残: §13 の重複チェーンの棚卸し
+
+`coherent_sOf_H0Cprime` が §9 経由になったので、旧 §13 チェーン
+(`coherent_sOf_H0Cprime_of_sevenEightRefutation` / `_of_equality_refutation` /
+`nineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation` /
+`nineElevenPairBound` と `S11_NineElevenCaseA` / `_AlphaBound` / `_PairAdjoin` の該当部分、
+計 ~3.8k 行) は **同じ命題の 2 本目の証明**になった。削除の可否は
+**宣言ごとに外部 consumer を grep してから**判断する (§15 の S/T ミラーが実体を cite している
+可能性あり — docstring 参照だけなら削除可)。⚠ 本 session では実施しない。
+
 ## 着手順 (残り)
 
 1. **§9 レベルの (9.11) statement を立てる** — `(data : TypesIIIIIIVSetup M)`
