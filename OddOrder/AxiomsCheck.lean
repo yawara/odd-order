@@ -11540,3 +11540,14 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- (types III/IV only); here the pivot is an explicit parameter, as the book's (9.9.b) count is
 -- genuine upstream content.  **No type hypothesis on this route.**
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent
+-- **(9.11) case (9.7.b) with (9.9.a) plugged in** — the uniform degree `qu` comes from the
+-- type-free `S11.caseB_degree_qu`, leaving only the (9.9.b) pivot exposed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_coherent_sOf_cprime
+-- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` coherent under Hypothesis (9.5) alone, by the (9.7)
+-- Clifford dichotomy over the two branches.  Residual inputs are quantified over the branch datum
+-- they belong to: case (a) still needs the degree-`qa` base coherence and the maximality refuter
+-- (the `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin` descent from `S13.Hypothesis`, the
+-- remaining item of issue 1045); case (b) needs only the (9.9.b) pivot.  **No type hypothesis
+-- anywhere on this route** — `S13.coherent_sOf_H0Cprime` carries `IsTypeIII ∨ IsTypeIV` only
+-- because its carrier does.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent

@@ -593,6 +593,67 @@ S06.Hypothesis.induce_not_isIrreducible_iff (h : S06.Hypothesis ↥M) [NeZero (N
 ```
 最後の等式で 2 層が噛み合うことを確認するのが実装の要点。
 
+### ✅ case B 完了 + (9.11) 本体 landed (2026-07-20)
+
+**case B は §9 レベルで閉じた**。landed 分 (すべて axiom-clean / AxiomsCheck 登録済、
+`S11_NineElevenSubcoherentBridge.lean` 869 行):
+
+| 宣言 | 内容 |
+|---|---|
+| `exists_induce_eq_of_subgroup_eq` | `K = K'` を跨ぐ誘導元 transport (両辺変数ゆえ `subst` 可の一般形) |
+| `sOf_columnSum_of_not_irreducible` | **(9.9.b) の §9 版** — 可約メンバー = 非自明 §6 column |
+| `columnRFamily` | `certainTypeR` を `η = μ_{χ₂}` 上に述べ直し |
+| `sOf_memberRFamily` | **(5.2.d) datum** — 既約 = signed Dade / 可約 = column の 2 分岐 |
+| `sOf_memberRFamily_imageSet_of_irr` / `_of_col` | dispatch の reduction |
+| `dadeICM_apply_eq_zero_of_avoidV` | **(4.6) レベルの V-vanishing anchor** |
+| `sOf_memberRFamily_orthogonal` | **(5.2.e)** cross-orthogonality (2×2 場合分け) |
+| `sOf_member_inner_self_natCast` | (5.7) engine の `hN` (既約 1 / column w₁) |
+| `sOf_caseB_coherent` | **case (9.7.b) の coherence** — (5.7) engine の 15 義務を discharge |
+| `caseB_coherent_sOf_cprime` | 上を (9.9.a) `caseB_degree_qu` で特殊化 (残る param = pivot のみ) |
+| `sOf_nineEleven_coherent` | **(9.11) 本体** — (9.7) dichotomy で 2 分岐を合成 |
+| `derivedInG_subgroupOf_normal` | 5 箇所で使う instance の切り出し |
+
+⚠ **実装上の要点 3 つ** (次に同型の作業をするとき効く):
+
+1. **`certainTypeR` が τ を決める** ので case B の τ は自由パラメータにできない
+   (case A は自由に取れた)。既約分岐を
+   `htau : h46.tau = h46.dade0.fullDadeIsometryData hconj` で合わせる。
+   想定 producer `S10.typePACore_toHypothesis46_core` では `rfl`。
+2. **`columnRFamily` は `χ₂` をパラメータに残す**。`Classical.choose` で内部確定させると
+   `imageSet` が `η` に依存し `image_eq` の rewrite が motive 不整合になる
+   (`Exists.elim` は Type 値の goal に効かないので `obtain` も使えない)。
+3. **V-vanishing anchor の台の集合は ambient `A` と分離する**。
+   `S13.tau_apply_eq_zero_of_mem_typePV` は台を `A(M) = (M')^#` に固定しているが、
+   **型一様な `A(M)` (= `typePACore`) は `(M')^#` より真に小さい**のでそのままでは移らない。
+
+### ⛏ 残り = case (9.7.a) の 2 パラメータ + 消費側の配線
+
+`sOf_nineEleven_coherent` が露出している 3 パラメータ:
+
+| param | 由来 | 状態 |
+|---|---|---|
+| `hBpivot` | (9.9.b) の可約メンバー p−1 個の数え上げ | ⛏ §6 count から作れるはず (`S06_CertainTypeClifford`:1046/:1108) |
+| `hAbase` | degree-`qa` 既約 cut の coherence | ⚠ **τ/A の seam あり (下記)** |
+| `hArefute` | maximality refuter = §9 chain 本体 | ⛏ `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin` の `S13.Hypothesis` 降ろし |
+
+#### ⚠ 実測した τ/A の seam — `hAbase` は `sOf_degreeSubfamily_coherent` の drop-in にならない
+
+- `sOf_degreeSubfamily_coherent` (本 issue で landed) の結論は
+  `IsCoherent (inducedNonKernelFamily_subcoherent …).tau {cut} (supportInSubgroup **A** M)`。
+  その τ は `dadeIntegralCharacterMap d.dade (d.dade.fullDadeIsometryData d.hconj)` で
+  **`d : DadeSupportHypothesisData M A`** = **A 上の Dade**。
+- 一方 case B は `certainTypeR` 由来で `dadeIntegralCharacterMap h46.dade0 h46.tau` =
+  **A₀ = A ∪ V^M 上の Dade** に固定される。
+- (4.6) の構成では `dade := dade0.restrict Set.subset_union_left hAnorm` なので
+  **A-Dade は A₀-Dade の制限**。A-supported な関数の上では一致するが、
+  `IntegralCharacterMap` としては別物。
+- ⟹ 2 分岐を同じ (τ, A₀) で合成するために、`hAbase` は **A₀ 側**で要求してある。
+  A 側の `sOf_degreeSubfamily_coherent` から A₀ 側へ移す補題 (restrict と
+  `IsCoherent` の台拡大) が次の一手。
+
+書籍側の対応: (9.5) は「τ = (A(M), M, G) に関する Dade isometry」と書き、(4.6.e) は
+「A₀ に関する τ」と書く。制限関係ゆえ書籍は区別していないが、形式化では明示的な橋が要る。
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
