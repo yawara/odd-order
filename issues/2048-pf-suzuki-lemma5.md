@@ -205,8 +205,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               primitive root という原文の unequal-degree 条件のまま、pair-weight equality
               から `±r (mod m)` を導く指数算術を証明する
               (`higmanLemmaEleven_pairGap_of_pairWeight_eq_frobeniusShift`)
-        - [ ] canonical common-field 共役基底上で actual bracket の非零係数を actor の
-              pair-weight equality に接続する
+        - [x] canonical common-field 共役基底上で actual bracket の非零係数を actor の
+              pair-weight equality に接続し、全 nonzero bracket の `±r` support を得る
+              (`lowerCentralPairGapSupport_of_commonConjugateBases`)
+        - [ ] bracket span から最初の非零 seed と `r` を選び、第二層 generator / basis を
+              循環再添字化して `ι(ν) = λ^(1+2^r)` を actual data から構成する
       - [ ] gap-supported bracket を正規化し、Lemma 5 の平方和を
             `Tr[L/K](α^(1+2^r) ε)` に再添字化する
       - [ ] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する
