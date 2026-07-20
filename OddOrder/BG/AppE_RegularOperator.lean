@@ -549,4 +549,209 @@ theorem RegularOperatorSetup.eigenvalue_step {R B : Type*} [Group R] [Group B] [
   push_cast at this
   exact this
 
+/-! ### How far down the chain BG's bookkeeping runs
+
+BG's sequences are indexed `i = 0, 1, …, n − 1`, where `n` is the first index with
+`Hₙ = 1`.  In Lean the cleanest single hypothesis for "index `i` is still in range" is
+`Hᵢ ≠ ⊥`: the chain descends **strictly** while it is alive (each step has index `p`), so
+`Hᵢ ≠ ⊥` both bounds `i` and supplies the strictness `Hᵢ₊₁ < Hᵢ` that the `(E.12)`
+machinery consumes. -/
+
+/-- The chain is antitone across arbitrary index gaps, not just single steps. -/
+theorem iterCommutator_le_of_le {G : Type*} [Group G] {T : Subgroup G} [T.Normal] {i j : ℕ}
+    (hij : j ≤ i) :
+    OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) j := by
+  induction i with
+  | zero => rw [Nat.le_zero.mp hij]
+  | succ n ih =>
+      rcases Nat.eq_or_lt_of_le hij with h | h
+      · rw [h]
+      · exact (iterCommutator_antitone n).trans (ih (Nat.lt_succ_iff.mp h))
+
+/-- If the chain is still alive at `i`, it is alive at every earlier index. -/
+theorem iterCommutator_ne_bot_of_le {G : Type*} [Group G] {T : Subgroup G} [T.Normal] {i j : ℕ}
+    (hij : j ≤ i)
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i ≠ ⊥) :
+    OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) j ≠ ⊥ := fun h =>
+  hne (le_bot_iff.mp ((iterCommutator_le_of_le hij).trans (le_of_eq h)))
+
+/-- **The chain descends strictly while alive**: `Hᵢ₊₁ < Hᵢ` whenever `Hᵢ ≠ 1`.
+
+Immediate from the index-`p` step `|Hᵢ| = p·|Hᵢ₊₁|` of `(E.6)`.  This is the form the
+`(E.12)` machinery consumes — both as `¬ Hᵢ₊₁ ≤ Hᵢ₊₂` and as the nontriviality of the
+section that `quotient_action_ne_one` needs. -/
+theorem RegularOperatorSetup.iterCommutator_lt {R B : Type*} [Group R] [Group B] [Finite R]
+    {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥) :
+    OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 1) <
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i := by
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  refine lt_of_le_of_ne (iterCommutator_antitone i) fun heq => ?_
+  have hcard := hyp.card_iterCommutator_eq hR₀S hexp hS (le_refl T) hne
+  rw [heq] at hcard
+  have hpos : 0 < Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) :=
+    Nat.card_pos
+  have hone : Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) * 1 =
+      Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) * p := by
+    rw [mul_one, mul_comm]; exact hcard
+  have h2 := hyp.p_prime.two_le
+  have := Nat.eq_of_mul_eq_mul_left hpos hone
+  omega
+
+/-- **BG's `wᵢ ∉ Hᵢ₊₁`, for the whole range `i = 0, …, n − 1`**.
+
+The induction whose step is `commutatorIterate_not_mem_succ`, started from BG's choice
+`w ∈ H₀ − H₁`.  This is what makes `⟨w̄ᵢ⟩ = H̄ᵢ` true at every level, and hence what
+licenses cancelling `wᵢ` in `(E.12)`. -/
+theorem RegularOperatorSetup.commutatorIterate_not_mem {R B : Type*} [Group R] [Group B]
+    [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hR₀S : hyp.R₀ ≤ S) (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S)
+    {w : ↥S} (hw : w ∈ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+    (hw1 : w ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) 1) :
+    ∀ i : ℕ, OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥ →
+      commutatorIterate w v i ∉ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1)
+  | 0, _ => hw1
+  | i + 1, hne => by
+      have hprev := iterCommutator_ne_bot_of_le (Nat.le_succ i) hne
+      exact hyp.commutatorIterate_not_mem_succ hR₀S hexp hS hprev
+        (not_le_of_gt (hyp.iterCommutator_lt hR₀S hexp hS hne))
+        (hyp.index_subgroupOf_chain hR₀S hexp hS hprev) hv hw
+        (hyp.commutatorIterate_not_mem hR₀S hexp hS hv hw hw1 i hprev)
+
+/-- **BG Theorem E.3(b), Step 2, (E.12)**: `rᵢ ≡ r₀ rⁱ (mod p)`.
+
+BG: *"We now see by induction that, for `i = 0, 1, …, n − 1`, `rᵢ ≡ r₀ rⁱ (mod p)`."*  The
+step is `eigenvalue_step`, the base is the choice of `r₀`.
+
+The eigenvalue is carried in the shape `exists_zpow_eq_mod_chain` delivers — a statement
+about **every** `y ∈ Hᵢ`, not just about `wᵢ`.  That is deliberate: `(E.10)` needs to
+conclude that `A` centralizes the *whole* section `Hᵢ/Hᵢ₊₁`, which the single element `wᵢ`
+would only give after re-deriving that `w̄ᵢ` generates it. -/
+theorem RegularOperatorSetup.exists_eigenvalue_pow {R B : Type*} [Group R] [Group B]
+    [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hR₀S : hyp.R₀ ≤ S) (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S)
+    {a : B} (ha : a ∈ hyp.A) {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S)
+    {w : ↥S} (hw : w ∈ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+    (hw1 : w ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) 1)
+    {r : ℤ} (hr : (hSinv.restrict ⟨a, ha⟩) v = v ^ r)
+    {r₀ : ℤ} (hr₀ : ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) 0,
+      (y ^ r₀)⁻¹ * (hSinv.restrict ⟨a, ha⟩) y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) 1) :
+    ∀ i : ℕ, OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥ →
+      ∃ s : ℤ, (s : ZMod p) = (r₀ : ZMod p) * (r : ZMod p) ^ i ∧
+        ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+            (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i,
+          (y ^ s)⁻¹ * (hSinv.restrict ⟨a, ha⟩) y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+            (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+            (i + 1) := by
+  intro i
+  induction i with
+  | zero => exact fun _ => ⟨r₀, by simp, hr₀⟩
+  | succ i ih =>
+      intro hne
+      have hprev := iterCommutator_ne_bot_of_le (Nat.le_succ i) hne
+      obtain ⟨s, hs, hsmem⟩ := ih hprev
+      obtain ⟨s', _, hs'mem⟩ := hyp.exists_zpow_eq_mod_chain hR₀S hexp hS hSinv hne ha
+      refine ⟨s', ?_, hs'mem⟩
+      have hstep := hyp.eigenvalue_step hSinv hne
+        (hyp.index_subgroupOf_chain hR₀S hexp hS hne) ha hw
+        (hyp.commutatorIterate_not_mem hR₀S hexp hS hv hw hw1 (i + 1) hne) hr
+        (hsmem _ (commutatorIterate_mem_chain hw i))
+        (hs'mem _ (commutatorIterate_mem_chain hw (i + 1)))
+      rw [hstep, hs, pow_succ]
+      ring
+
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply) in
+/-- If the eigenvalue on the section `Hᵢ/Hᵢ₊₁` is `≡ 1 (mod p)`, the induced automorphism of
+that section is the identity.
+
+The section has order `p`, so `z^{s} = z` as soon as `p ∣ s − 1`; and `yᵃ ≡ y^{s}` for every
+`y ∈ Hᵢ` is exactly the eigenvalue hypothesis.  This is the direction `(E.10)` needs: BG
+argues that `rᵢ ≡ 1` would make `A` centralize `Hᵢ/Hᵢ₊₁`. -/
+theorem RegularOperatorSetup.quotient_action_eq_one_of_eigenvalue_one {R B : Type*} [Group R]
+    [Group B] [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) {i : ℕ}
+    (hidx : ((OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          (i + 1)).subgroupOf
+        (OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          i)).index = p)
+    {a : B} (ha : a ∈ hyp.A) {s : ℤ}
+    (hs : ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i,
+      (y ^ s)⁻¹ * (hSinv.restrict ⟨a, ha⟩) y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1))
+    (h1 : (s : ZMod p) = 1) :
+    (quotientMulAutHom (hyp.isAInvariant_subgroupOf_chain hSinv i)) ⟨a, ha⟩ = 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  set N := (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1)).subgroupOf
+    (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) with hN
+  -- `p ∣ s − 1`
+  obtain ⟨k, hk⟩ : (p : ℤ) ∣ s - 1 := by
+    have : ((s - 1 : ℤ) : ZMod p) = 0 := by push_cast [h1]; ring
+    exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp this
+  refine MulEquiv.ext fun x => ?_
+  rw [MulAut.one_apply]
+  refine QuotientGroup.induction_on x fun y => ?_
+  -- the section has order `p`, so `zˢ = z`
+  have hcard : Nat.card (↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) ⧸ N) = p := by
+    rw [← Subgroup.index_eq_card]; exact hidx
+  have hzp : ((y : ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i)) : _ ⧸ N) ^ (p : ℤ)
+      = 1 := by
+    have h := pow_card_eq_one' (G := ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i)
+      ⧸ N) (x := (y : _ ⧸ N))
+    rw [hcard] at h
+    rw [zpow_natCast]
+    exact h
+  have hzs : ((y : ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i)) : _ ⧸ N) ^ s =
+      ((y : ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i)) : _ ⧸ N) := by
+    have hsplit : s = 1 + (p : ℤ) * k := by omega
+    rw [hsplit, zpow_add, zpow_one, zpow_mul, hzp, one_zpow, mul_one]
+  -- the eigenvalue hypothesis, read in the section
+  rw [quotientMulAutHom_apply]
+  have hmem : (y ^ s)⁻¹ * ((hyp.isAInvariant_iterCommutator hSinv i).restrict ⟨a, ha⟩) y ∈ N := by
+    rw [hN, Subgroup.mem_subgroupOf]
+    simpa using hs _ y.2
+  rw [((QuotientGroup.eq (s := N)).mpr hmem).symm, ← hzs]
+  exact map_zpow (QuotientGroup.mk' N) y s
+
+/-- **BG Theorem E.3(b), Step 2, (E.10)**, in congruence form: `rᵢ ≢ 1 (mod p)`.
+
+BG: *"if `rᵢ ≡ 1 (mod p)` for some `i`, then `A` centralizes `Hᵢ/Hᵢ₊₁` by Proposition
+1.5(d), … contrary to the regular action of `A` on `R`."*  The two halves are
+`quotient_action_eq_one_of_eigenvalue_one` (the congruence trivialises the action) and
+`quotient_action_ne_one` (regularity forbids that). -/
+theorem RegularOperatorSetup.eigenvalue_ne_one {R B : Type*} [Group R] [Group B] [Finite R]
+    {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥)
+    {a : B} (ha : a ∈ hyp.A) (hane : a ≠ 1) {s : ℤ}
+    (hs : ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i,
+      (y ^ s)⁻¹ * (hSinv.restrict ⟨a, ha⟩) y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 1)) :
+    (s : ZMod p) ≠ 1 := fun h1 =>
+  hyp.quotient_action_ne_one hSinv (hyp.iterCommutator_lt hR₀S hexp hS hne) ha hane
+    (hyp.quotient_action_eq_one_of_eigenvalue_one hSinv
+      (hyp.index_subgroupOf_chain hR₀S hexp hS hne) ha hs h1)
+
 end OddOrder.BG.AppE
