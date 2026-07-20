@@ -11092,6 +11092,26 @@ BG's "`≡ mod Hᵢ₊₁`" is this statement read in the quotient.
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.exists_zpow_eq_on_chain_section
 
+/-! **BG Theorem E.3(b), Step 2, (E.10)** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20): `RegularOperatorSetup.quotient_action_ne_one` — `A` does **not** centralize a
+nontrivial chain section.
+
+BG: *"if `rᵢ ≡ 1 (mod p)` for some `i`, then `A` centralizes `Hᵢ/Hᵢ₊₁` by Proposition
+1.5(d) … contrary to the regular action of `A` on `R`."*  Stated as the induced automorphism
+being `≠ 1`, which is the content.
+
+Proposition 1.5(d) is used in its **element** form
+(`Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`), which is lighter than the
+subgroup form `GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient`: it lifts a coset
+representative `g ∉ Hᵢ₊₁` to a fixed `c` in the same coset, and `c ∉ Hᵢ₊₁` makes `c ≠ 1`, so
+`a` fixing it contradicts `C_R(α) = 1`.
+
+⚠ The coprime lemma is applied with acting group **`⟨a⟩`, not all of `A`** — the hypothesis
+concerns one specific `a`, so restricting to its cyclic subgroup is what makes the
+fixed-point lifting applicable. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.quotient_action_ne_one
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

@@ -1677,6 +1677,94 @@ theorem RegularOperatorSetup.exists_zpow_eq_on_chain_section [Finite R]
   · exact hyp.index_subgroupOf_chain hR₀S hexp hS hne
   · rw [← map_pow, haq, map_one]
 
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **BG Theorem E.3(b), Step 2, (E.10)**: `A` does **not** centralize a nontrivial chain
+section.
+
+BG: *"if `rᵢ ≡ 1 (mod p)` for some `i`, then `A` centralizes `Hᵢ/Hᵢ₊₁` by Proposition
+1.5(d) … contrary to the regular action of `A` on `R`."*
+
+Stated as the induced automorphism being `≠ 1`, which is the content; the congruence form
+`rᵢ ≢ 1` follows by combining with `exists_zpow_eq_on_chain_section`.
+
+If `a` acted trivially on `Hᵢ/Hᵢ₊₁`, then Proposition 1.5(d) in its **element** form
+(`Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`) lifts a coset representative
+`g ∉ Hᵢ₊₁` to an `⟨a⟩`-fixed `c` in the same coset; `c ∉ Hᵢ₊₁` so `c ≠ 1`, and `a` fixes it
+— contradicting `C_R(α) = 1` for `α ∈ A^#`.
+
+⚠ The coprime lemma is applied with the acting group `⟨a⟩`, **not** all of `A`: the
+hypothesis is about one specific `a`. -/
+theorem RegularOperatorSetup.quotient_action_ne_one [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) {i : ℕ}
+    (hlt : OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1) <
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i)
+    {a : B} (ha : a ∈ hyp.A) (hane : a ≠ 1) :
+    (quotientMulAutHom (hyp.isAInvariant_subgroupOf_chain hSinv i)) ⟨a, ha⟩ ≠ 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  set Hi := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i with hHi
+  set Hj := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1) with hHj
+  set N : Subgroup ↥Hi := Hj.subgroupOf Hi with hN
+  set φ : ↥hyp.A →* MulAut ↥Hi := (hyp.isAInvariant_iterCommutator hSinv i).restrict with hφ
+  set hNinv := hyp.isAInvariant_subgroupOf_chain hSinv i with hNinvdef
+  intro htriv
+  -- a representative `g ∈ Hᵢ` outside `Hᵢ₊₁`
+  obtain ⟨g0, hg0Hi, hg0Hj⟩ : ∃ x, x ∈ Hi ∧ x ∉ Hj := by
+    by_contra hcon
+    push Not at hcon
+    exact hlt.ne (le_antisymm hlt.le fun x hx => hcon x hx)
+  set g : ↥Hi := ⟨g0, hg0Hi⟩ with hg
+  have hgN : g ∉ N := by rw [hN, Subgroup.mem_subgroupOf]; exact hg0Hj
+  -- every element of `⟨a⟩` acts trivially on the section
+  set Z : Subgroup ↥hyp.A := Subgroup.zpowers (⟨a, ha⟩ : ↥hyp.A) with hZ
+  have hZtriv : ∀ b : ↥Z, quotientMulAutHom hNinv (b : ↥hyp.A) = 1 := by
+    rintro ⟨b, hb⟩
+    obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hb
+    rw [map_zpow, htriv, one_zpow]
+  have hgfix : ∀ b : ↥Z, ∃ n ∈ N, (φ.comp Z.subtype) b g = g * n := by
+    intro b
+    refine ⟨g⁻¹ * (φ (b : ↥hyp.A)) g, ?_, (mul_inv_cancel_left _ _).symm⟩
+    have h1 : quotientMulAutHom hNinv (b : ↥hyp.A) (QuotientGroup.mk' N g) =
+        QuotientGroup.mk' N ((φ (b : ↥hyp.A)) g) := quotientMulAutHom_apply_mk' hNinv _ _
+    rw [hZtriv b, MulAut.one_apply] at h1
+    exact (QuotientGroup.eq (s := N)).mp h1
+  -- Prop 1.5(d), element form
+  haveI hNpg : IsPGroup p ↥N :=
+    ((hyp.R_pGroup.to_subgroup S).to_subgroup Hi).to_subgroup N
+  haveI : Group.IsNilpotent ↥N := hNpg.isNilpotent
+  haveI : IsSolvable ↥N := inferInstance
+  haveI : Finite ↥hyp.A :=
+    Nat.finite_of_card_ne_zero (by rw [hyp.A_card]; exact hyp.q_prime.pos.ne')
+  have hCop : Nat.Coprime (Nat.card ↥Z) (Nat.card ↥N) := by
+    obtain ⟨k, hk⟩ := hNpg.exists_card_eq
+    have hZle : Nat.card ↥Z ∣ Nat.card ↥hyp.A := Subgroup.card_subgroup_dvd_card Z
+    rw [hyp.A_card] at hZle
+    rw [hk]
+    exact Nat.Coprime.pow_right _
+      (Nat.Coprime.coprime_dvd_left hZle
+        ((Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr (Ne.symm hyp.p_ne_q)))
+  have hNinv' : IsAInvariant (φ.comp Z.subtype) N := fun b => hNinv (Z.subtype b)
+  obtain ⟨c, hcfix, n, hnN, hcn⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
+      (φ := φ.comp Z.subtype) hCop (Or.inr ‹IsSolvable ↥N›) hNinv' hgfix
+  -- `c` is `a`-fixed and nontrivial: contradiction with regularity
+  have hcN : c ∉ N := by
+    rw [hcn]
+    intro hmem
+    exact hgN (by simpa using N.mul_mem hmem (N.inv_mem hnN))
+  have hcne : (c : ↥S) ≠ 1 := by
+    intro h
+    have hc1 : c = 1 := Subtype.ext h
+    exact hcN (hc1 ▸ N.one_mem)
+  have hafix := hcfix ⟨(⟨a, ha⟩ : ↥hyp.A), Subgroup.mem_zpowers _⟩
+  have hact : hyp.act a ((c : ↥S) : R) = ((c : ↥S) : R) :=
+    congrArg (fun z : ↥S => (z : R)) (congrArg (fun z : ↥Hi => (z : ↥S)) hafix)
+  have hone : ((c : ↥S) : R) = 1 := hyp.A_regular a ha hane _ hact
+  exact hcne (Subtype.ext hone)
+
 /-- **BG Theorem E.3(b), Step 2, (E.7) — unconditionally**: `|S/S'| = p²` for every
 exponent-`p` subgroup `S` properly containing `R₀`.
 
