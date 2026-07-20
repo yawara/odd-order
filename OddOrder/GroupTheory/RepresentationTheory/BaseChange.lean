@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Invariants
 import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
 import Mathlib.LinearAlgebra.TensorProduct.Basis
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.LinearAlgebra.TensorProduct.Pi
@@ -149,6 +151,109 @@ theorem baseChange₂_span_eq_top
 end LinearMap
 
 namespace OddOrder.RepresentationTheory
+
+/-! ## Frobenius on the scalar factor -/
+
+universe uFrobeniusL uFrobeniusV uFrobeniusW
+
+/-- Absolute Frobenius on the scalar factor of an `F₂` base change. -/
+noncomputable def frobeniusScalarBaseChange
+    (L : Type uFrobeniusL) [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} [AddCommMonoid V] [Module (ZMod 2) V] :
+    (L ⊗[ZMod 2] V) →ₗ[ZMod 2] (L ⊗[ZMod 2] V) := by
+  letI : Fintype L := Fintype.ofFinite L
+  exact TensorProduct.map
+    (FiniteField.frobeniusAlgHom (ZMod 2) L).toLinearMap
+    (LinearMap.id : V →ₗ[ZMod 2] V)
+
+@[simp]
+theorem frobeniusScalarBaseChange_tmul
+    (L : Type uFrobeniusL) [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} [AddCommMonoid V] [Module (ZMod 2) V]
+    (a : L) (v : V) :
+    frobeniusScalarBaseChange L (a ⊗ₜ[ZMod 2] v) =
+      (a ^ 2) ⊗ₜ[ZMod 2] v := by
+  simp [frobeniusScalarBaseChange]
+
+/-- Frobenius on the scalar factor is semilinear for the squaring
+endomorphism, expressed without introducing a second bundled map. -/
+theorem frobeniusScalarBaseChange_smul
+    (L : Type uFrobeniusL) [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} [AddCommMonoid V] [Module (ZMod 2) V]
+    (c : L) (z : L ⊗[ZMod 2] V) :
+    frobeniusScalarBaseChange L (c • z) =
+      c ^ 2 • frobeniusScalarBaseChange L z := by
+  induction z using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a v => simp [TensorProduct.smul_tmul', smul_eq_mul, mul_pow]
+  | add x y hx hy => simp [smul_add, hx, hy]
+
+/-- Frobenius on the scalar factor commutes with extension of a ground-field
+bilinear map. -/
+theorem frobeniusScalarBaseChange_bilin
+    (L : Type uFrobeniusL) [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} {W : Type uFrobeniusW}
+    [AddCommMonoid V] [Module (ZMod 2) V]
+    [AddCommMonoid W] [Module (ZMod 2) W]
+    (B : LinearMap.BilinMap (ZMod 2) V W)
+    (x y : L ⊗[ZMod 2] V) :
+    frobeniusScalarBaseChange L (B.baseChange L x y) =
+      B.baseChange L
+        (frobeniusScalarBaseChange L x)
+        (frobeniusScalarBaseChange L y) := by
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a u =>
+      induction y using TensorProduct.induction_on with
+      | zero => simp
+      | tmul b v => simp [mul_pow]
+      | add y z hy hz => simp [hy, hz]
+  | add x z hx hz => simp [hx, hz]
+
+/-- One normalized coefficient of a base-changed bilinear map propagates
+along any two sequences cycled by scalar Frobenius. -/
+theorem frobeniusScalarBaseChange_bilinear_orbit_formula
+    {L : Type uFrobeniusL} [Field L] [Finite L] [Algebra (ZMod 2) L]
+    {V : Type uFrobeniusV} {W : Type uFrobeniusW}
+    [AddCommMonoid V] [Module (ZMod 2) V]
+    [AddCommMonoid W] [Module (ZMod 2) W]
+    (B : LinearMap.BilinMap (ZMod 2) V W)
+    (u : ℕ → L ⊗[ZMod 2] V) (v : ℕ → L ⊗[ZMod 2] W)
+    (hu : ∀ i, frobeniusScalarBaseChange L (u i) = u (i + 1))
+    (hv : ∀ i, frobeniusScalarBaseChange L (v i) = v (i + 1))
+    (r : ℕ) (epsilon : L)
+    (hseed : B.baseChange L (u 0) (u r) = epsilon • v 0) :
+    ∀ i : ℕ, B.baseChange L (u i) (u (i + r)) =
+      epsilon ^ (2 ^ i) • v i := by
+  intro i
+  induction i with
+  | zero => simpa using hseed
+  | succ i ih =>
+      calc
+        B.baseChange L (u (i + 1)) (u (i + 1 + r)) =
+            B.baseChange L
+              (frobeniusScalarBaseChange L (u i))
+              (frobeniusScalarBaseChange L (u (i + r))) := by
+                rw [hu i, hu (i + r)]
+                congr 2
+                omega
+        _ = frobeniusScalarBaseChange L
+              (B.baseChange L (u i) (u (i + r))) :=
+          (frobeniusScalarBaseChange_bilin L B _ _).symm
+        _ = frobeniusScalarBaseChange L
+              (epsilon ^ (2 ^ i) • v i) := by rw [ih]
+        _ = (epsilon ^ (2 ^ i)) ^ 2 •
+              frobeniusScalarBaseChange L (v i) :=
+          frobeniusScalarBaseChange_smul L _ _
+        _ = (epsilon ^ (2 ^ i)) ^ 2 • v (i + 1) := by rw [hv]
+        _ = epsilon ^ (2 ^ (i + 1)) • v (i + 1) := by
+          have hpow : (epsilon ^ (2 ^ i)) ^ 2 =
+              epsilon ^ (2 ^ (i + 1)) := by
+            calc
+              (epsilon ^ (2 ^ i)) ^ 2 = epsilon ^ (2 ^ i * 2) :=
+                (pow_mul epsilon _ _).symm
+              _ = epsilon ^ (2 ^ (i + 1)) := by rw [pow_succ]
+          rw [hpow]
 
 /-- Scalar extension of a representation along a field extension.
 

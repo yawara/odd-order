@@ -290,7 +290,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 11100
+set_option linter.style.longFile 11300
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -10932,6 +10932,48 @@ This matters structurally, not just cosmetically: `⁅S, ·⁆` preserves normal
 `⁅S, ·⁆` form — which is what keeps `Hᵢ char R` — and only then recognised as `⁅R₀, ·⁆`. -/
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.commutator_R₀_eq_commutator_top
+
+/-! **BG Theorem E.3(b), Step 2, (E.6) COMPLETE — the descending series**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).  BG's chain
+`T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1` with `|Hᵢ₋₁ : Hᵢ| = p` and "thus `|T| = pⁿ`".
+
+**No new definition was needed**: the chain is the repo's existing
+`Isaacs.Ch04.iterCommutator T ⊤` (iterated right commutator with the whole group), which
+already carries `iterCommutator_eq_bot_of_isNilpotent_ambient` — i.e. the chain does reach
+`1`.  BG's alternative description `Hᵢ = [R₀, Hᵢ₋₁]` is supplied by
+`commutator_R₀_eq_commutator_top`; the two descriptions play different roles, `⁅·, S⁆`
+keeping the terms normal and `⁅R₀, ·⁆` carrying the counting.
+
+* `RegularOperatorSetup.card_iterCommutator_eq` — `|Hᵢ| = p · |Hᵢ₊₁|` while `Hᵢ ≠ 1`.
+* `RegularOperatorSetup.card_start_eq_pow_mul` — `|T| = pⁱ · |Hᵢ|`, which at the last
+  nontrivial index is BG's `|T| = pⁿ`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_iterCommutator_eq
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_start_eq_pow_mul
+
+/-! **BG Theorem E.3(b), Step 2, (E.5) `S = R₀T`** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20): `RegularOperatorSetup.sup_centralizer_eq_top`.
+
+BG lists `T char S`, `|S : T| = p`, `R₀ ∩ T = 1` and then writes `S = R₀T`; the last step is
+a cardinality count, `|R₀T| = |R₀|·|T| = p·|T| = |S|`.  BG's `T char S` needed nothing new —
+`GroupTheory.centralizer_omega1UpperCentralTwo_characteristic` is already an **instance**, so
+the normality that makes `↑(R₀ ⊔ T) = ↑R₀ * ↑T` is found by inference.  ⚠ The exponent
+hypothesis on `S` is *not* used: narrowness alone drives Theorem 5.3(d) here. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.sup_centralizer_eq_top
+
+/-! **BG Theorem E.3(b), Step 2, (E.7)** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`RegularOperatorSetup.commutator_eq_and_card_quotient` — `H₁ = S'` and `|S/S'| = p²`.
+
+`|S : H₁| = p²` from `|S : T| = p` (E.5) and `|T : H₁| = p` (E.6); then `S/H₁` has order `p²`
+hence is abelian, giving `S' ≤ H₁`, while `H₁ = ⁅T,S⁆ ≤ ⁅S,S⁆ = S'` is immediate.  BG routes
+the second inclusion through `[R₀,T]`; going through `⁅T,S⁆` is shorter and uses the chain's
+own definition.
+
+⚠ This carries `3 ≤ pRank S`, so with `S = Ω₁(R)` it does **not** yet discharge E.3(b)'s third
+clause `|Ω₁(R)/(Ω₁(R))'| = p²`: that still needs BG's `|S| ≤ p³` branch, where (unlike the
+`R₀ ⊄ S'` clause, which fell out of `S' ≤ Z(S)` alone) the order-`p²`/`p³` case analysis does
+appear to be needed, and `R₀ < S` *properly* starts to matter. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.commutator_eq_and_card_quotient
 
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our

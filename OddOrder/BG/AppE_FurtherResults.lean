@@ -996,6 +996,178 @@ theorem RegularOperatorSetup.commutator_R₀_eq_commutator_top [Finite R]
   rw [hyp.card_eq_prime_mul_card_commutator hR₀S hexp hS hHne hHT] at hge
   exact Nat.le_of_mul_le_mul_left hge hyp.p_prime.pos
 
+/-- **BG Theorem E.3(b), Step 2, (E.5)**: `S = R₀T`.
+
+BG records `T char S`, `|S : T| = p` and `R₀ ∩ T = 1`, then writes `S = R₀T`.  The last step
+is a cardinality count: `T` is normal (indeed `T char S` is already an instance in the repo,
+`GroupTheory.centralizer_omega1UpperCentralTwo_characteristic`), so `|R₀T| = |R₀| · |T| =
+p · |T| = |S|`.
+
+Note `hexp` is not needed: narrowness alone drives Theorem 5.3(d). -/
+theorem RegularOperatorSetup.sup_centralizer_eq_top [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    hyp.R₀.subgroupOf S ⊔
+      Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) = ⊤ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
+  set T : Subgroup ↥S :=
+    Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hTdef
+  obtain ⟨-, -, hR₀T, -⟩ := OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS (hyp.isNarrow_of_three_le_pRank hR₀S hS)
+    R₀' (hyp.card_R₀_subgroupOf hR₀S) (hyp.pRank_centralizer_subgroupOf_le_two hR₀S)
+  -- `|R₀ T| = |R₀| · |T| = p · |T|`
+  have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card R₀' T
+  rw [hR₀T, Subgroup.card_bot, mul_one, hyp.card_R₀_subgroupOf hR₀S] at hprod
+  have hcong : Nat.card ↥(R₀' ⊔ T) = Nat.card ↥((R₀' : Set ↥S) * (T : Set ↥S)) :=
+    Nat.card_congr (Equiv.setCongr (Subgroup.mul_normal R₀' T))
+  -- `|S| = |T| · [S : T] = |T| · p`
+  have hSc : Nat.card ↥T * T.index = Nat.card ↥S := T.card_mul_index
+  rw [(hyp.card_omega1Center_and_index_centralizer hR₀S hS).2] at hSc
+  refine Subgroup.eq_of_le_of_card_ge le_top ?_
+  rw [Subgroup.card_top, hcong, hprod, ← hSc, mul_comm]
+
+/-! ### (E.6): BG's descending series
+
+BG's chain `T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1` with `Hᵢ = [R, Hᵢ₋₁]` is the repo's
+`Isaacs.Ch04.iterCommutator T ⊤` (iterated *right* commutator with the whole group), so no
+new definition is introduced.  BG's other description `Hᵢ = [R₀, Hᵢ₋₁]` is recovered from
+`commutator_R₀_eq_commutator_top`. -/
+
+/-- Every term of `iterCommutator T ⊤` is normal when `T` is. -/
+private theorem normal_iterCommutator {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
+    ∀ n, (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n).Normal
+  | 0 => ‹T.Normal›
+  | n + 1 => by
+      haveI := normal_iterCommutator (T := T) n
+      exact Subgroup.commutator_normal _ _
+
+/-- `iterCommutator T ⊤` descends: `⁅H, ⊤⁆ ≤ H` for normal `H`. -/
+private theorem iterCommutator_antitone {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
+    ∀ n, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (n + 1) ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n := fun n => by
+  haveI := normal_iterCommutator (T := T) n
+  exact Subgroup.commutator_le_left _ _
+
+/-- `iterCommutator T ⊤ n ≤ T` for every `n`. -/
+private theorem iterCommutator_le_start {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
+    ∀ n, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n ≤ T
+  | 0 => le_rfl
+  | n + 1 => (iterCommutator_antitone n).trans (iterCommutator_le_start n)
+
+/-- **BG Theorem E.3(b), Step 2, (E.6)**: every factor of the chain has order `p`.
+
+For BG's series `Hᵢ = iterCommutator T ⊤ i`, as long as `Hᵢ ≠ 1` we have
+`|Hᵢ| = p · |Hᵢ₊₁|` — BG's `|Hᵢ₋₁ : Hᵢ| = p`.
+
+The two descriptions of the chain meet here: the *definition* uses `⁅Hᵢ, S⁆`, which keeps
+each term normal in `S`, while the *counting* (`card_eq_prime_mul_card_commutator`) is about
+`⁅R₀, Hᵢ⁆`; `commutator_R₀_eq_commutator_top` identifies them. -/
+theorem RegularOperatorSetup.card_iterCommutator_eq [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {T : Subgroup ↥S} [T.Normal]
+    (hT : T ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i ≠ ⊥) :
+    Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) =
+      p * Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1)) := by
+  haveI := normal_iterCommutator (T := T) i
+  have hHT : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i ≤
+      Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) :=
+    (iterCommutator_le_start i).trans hT
+  have hstep := hyp.card_eq_prime_mul_card_commutator hR₀S hexp hS hne hHT
+  rw [hyp.commutator_R₀_eq_commutator_top hR₀S hexp hS hne hHT] at hstep
+  rw [hstep, OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
+
+/-- **BG Theorem E.3(b), Step 2, (E.6)**: `|T| = pⁱ · |Hᵢ|` for as long as `Hᵢ ≠ 1`.
+
+Iterating `card_iterCommutator_eq`.  Since `iterCommutator T ⊤` reaches `⊥`
+(`Isaacs.Ch04.iterCommutator_eq_bot_of_isNilpotent_ambient`), at the last nontrivial index
+this reads `|T| = pⁿ` — BG's "Thus `|T| = pⁿ`". -/
+theorem RegularOperatorSetup.card_start_eq_pow_mul [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {T : Subgroup ↥S} [T.Normal]
+    (hT : T ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :
+    ∀ i : ℕ, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i ≠ ⊥ →
+      Nat.card ↥T =
+        p ^ i * Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i)
+  | 0, _ => by simp [OddOrder.Isaacs.Ch04.iterCommutator_zero]
+  | i + 1, hne => by
+      have hprev : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i ≠ ⊥ := by
+        intro h
+        exact hne (le_bot_iff.mp ((iterCommutator_antitone i).trans (le_of_eq h)))
+      rw [hyp.card_start_eq_pow_mul hR₀S hexp hS hT i hprev,
+        hyp.card_iterCommutator_eq hR₀S hexp hS hT hprev, pow_succ]
+      ring
+
+/-- **BG Theorem E.3(b), Step 2, (E.7)**: `H₁ = S'` and `|S / S'| = p²`.
+
+BG: *"Since `|H₀/H₁| = p` and `H₁ = [R₀,H₀] = [R₀,T] ≤ R₀T = S`, we have `|S/H₁| = p²` and
+`S₂ = [S,S] ⊆ H₁ = [R₀,T] ⊆ S₂`."*
+
+`|S : H₁| = p²` because `|S : T| = p` (E.5) and `|T : H₁| = p` (E.6).  Then `S/H₁` has order
+`p²`, hence is abelian, giving `S' ≤ H₁`; and `H₁ = ⁅T, S⁆ ≤ ⁅S, S⁆ = S'` directly.  So the
+two coincide and `|S/S'| = p²`.
+
+With `S = Ω₁(R)` this is exactly E.3(b)'s third clause. -/
+theorem RegularOperatorSetup.commutator_eq_and_card_quotient [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) :
+    OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) 1
+      = _root_.commutator ↥S ∧
+    Nat.card (↥S ⧸ _root_.commutator ↥S) = p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥S :=
+    Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hTdef
+  set H₁ : Subgroup ↥S := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) 1 with hH₁def
+  haveI : H₁.Normal := normal_iterCommutator (T := T) 1
+  have hTindex : T.index = p := (hyp.card_omega1Center_and_index_centralizer hR₀S hS).2
+  have hScard : Nat.card ↥T * p = Nat.card ↥S := by
+    rw [← hTindex]; exact T.card_mul_index
+  -- `p³ ≤ |S|` from `r(S) ≥ 3`, so `T ≠ ⊥`.
+  have hp3 : p ^ 3 ≤ Nat.card ↥S := by
+    obtain ⟨A, hA, hAlog⟩ :=
+      exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (G := ↥S) (by norm_num) hS
+    calc p ^ 3 ≤ p ^ Nat.log p (Nat.card ↥A) :=
+          Nat.pow_le_pow_right hyp.p_prime.pos hAlog
+      _ ≤ Nat.card ↥A := Nat.pow_log_le_self p (Nat.card_pos (α := ↥A)).ne'
+      _ ≤ Nat.card ↥S :=
+        Nat.card_le_card_of_injective (fun x : ↥A => (x : ↥S)) Subtype.val_injective
+  have hTne : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) 0 ≠ ⊥ := by
+    intro h
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_zero] at h
+    rw [h, Subgroup.card_bot, one_mul] at hScard
+    rw [← hScard] at hp3
+    have hlt : p < p ^ 3 := by
+      calc p = p ^ 1 := (pow_one p).symm
+        _ < p ^ 3 := Nat.pow_lt_pow_right hyp.p_prime.one_lt (by norm_num)
+    omega
+  -- `|S| = p² · |H₁|`, so `[S : H₁] = p²`.
+  have hstep := hyp.card_iterCommutator_eq hR₀S hexp hS (le_refl T) hTne
+  rw [OddOrder.Isaacs.Ch04.iterCommutator_zero, ← hH₁def] at hstep
+  have hH₁index : H₁.index = p ^ 2 := by
+    have hmul : Nat.card ↥H₁ * H₁.index = Nat.card ↥S := H₁.card_mul_index
+    have hSp2 : Nat.card ↥S = Nat.card ↥H₁ * p ^ 2 := by rw [← hScard, hstep]; ring
+    rw [hSp2] at hmul
+    exact Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥H₁)) hmul
+  -- `S/H₁` has order `p²`, hence is abelian, so `S' ≤ H₁`; and `H₁ = ⁅T,S⁆ ≤ S'`.
+  have hquot : Nat.card (↥S ⧸ H₁) = p ^ 2 := hH₁index
+  haveI : IsMulCommutative (↥S ⧸ H₁) :=
+    IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hquot
+  have hSle : _root_.commutator ↥S ≤ H₁ := by
+    rw [commutator_def, Subgroup.commutator_le]
+    intro a _ b _
+    have hone : (QuotientGroup.mk' H₁) ⁅a, b⁆ = 1 := by
+      rw [map_commutatorElement, commutatorElement_eq_one_iff_commute]
+      exact ‹IsMulCommutative (↥S ⧸ H₁)›.is_comm.comm _ _
+    exact (QuotientGroup.eq_one_iff _).mp hone
+  have hH₁le : H₁ ≤ _root_.commutator ↥S := by
+    rw [hH₁def, OddOrder.Isaacs.Ch04.iterCommutator_succ,
+      OddOrder.Isaacs.Ch04.iterCommutator_zero, commutator_def]
+    exact Subgroup.commutator_mono le_top le_rfl
+  have heq : H₁ = _root_.commutator ↥S := le_antisymm hH₁le hSle
+  exact ⟨heq, by rw [← heq]; exact hquot⟩
+
 /-- **BG Theorem E.3(b), Step 2, the elided small case**: if `S' ≤ Z(S)` then `R₀ ⊄ S'`.
 
 BG dispatches `|S| ≤ p³` by *"an examination of the `p`-groups of order at most `p³`"*.  No

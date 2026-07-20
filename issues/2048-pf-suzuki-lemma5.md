@@ -196,8 +196,17 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             odd multiple になる有限体 bridge を構成する (issues 9310--9311)
       - [x] 非忠実でもよい第二層作用を effective image 上で faithful にし、任意の共通
             splitting field `L` 上に `Fin n` の Singer--Frobenius eigenbasis を構成する
+      - [x] common overfield の canonical 共役基底を構成し、ground-vector の exact
+            Frobenius 展開、actor 対角化、scalar Frobenius による cyclic successor を
+            同一基底上で証明する (issue 9314)
       - [ ] `m` と `n` を同一視せず、非零 bracket が単一 gap `±r (mod m)` に
             支えられることを証明する
+        - [x] `λ` は第一層体を生成するだけ、第二層固有値 `ν` は位数 `2^n-1` の
+              primitive root という原文の unequal-degree 条件のまま、pair-weight equality
+              から `±r (mod m)` を導く指数算術を証明する
+              (`higmanLemmaEleven_pairGap_of_pairWeight_eq_frobeniusShift`)
+        - [ ] canonical common-field 共役基底上で actual bracket の非零係数を actor の
+              pair-weight equality に接続する
       - [ ] gap-supported bracket を正規化し、Lemma 5 の平方和を
             `Tr[L/K](α^(1+2^r) ε)` に再添字化する
       - [ ] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する

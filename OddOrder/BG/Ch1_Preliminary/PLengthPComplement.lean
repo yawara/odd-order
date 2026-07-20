@@ -254,8 +254,8 @@ theorem pElementsSubgroup_le_iff_hasNormalPComplement :
         ≤ (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf (pElementsSubgroup p G) :=
       Subgroup.map_le_iff_le_comap.mp hWG_le
     -- `[↥U : N] ∣ [↥U : W] ∣ [↥U : K] = p^m`.
-    have hN_idx_pow :
-        ∃ j, ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf (pElementsSubgroup p G)).index = p ^ j := by
+    have hN_idx_pow : ∃ j,
+        ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf (pElementsSubgroup p G)).index = p ^ j := by
       obtain ⟨m, hm⟩ := hK_idx_pow
       have hdvd :
           ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf (pElementsSubgroup p G)).index ∣ p ^ m :=

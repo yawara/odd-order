@@ -20,10 +20,10 @@ relative trace に再添字化することを reusable representation/finite-fie
 
 ## やること
 
-- [ ] `L ⊗[F₂] V` の scalar factor Frobenius linear map と pure tensor 公式
-- [ ] ground-field bilinear map の base change に対する Frobenius covariance
-- [ ] `m = d*n` の Frobenius coordinate sum を residue modulo `n` で再添字化
-- [ ] 再添字化した係数を `FiniteField.algebraMap_trace_eq_sum_pow` で trace に同定
+- [x] `L ⊗[F₂] V` の scalar factor Frobenius linear map と pure tensor 公式
+- [x] ground-field bilinear map の base change に対する Frobenius covariance
+- [x] `m = d*n` の Frobenius coordinate sum を residue modulo `n` で再添字化
+- [x] 再添字化した係数を `FiniteField.algebraMap_trace_eq_sum_pow` で trace に同定
 
 ## 完了条件
 
@@ -40,3 +40,15 @@ relative trace に再添字化することを reusable representation/finite-fie
 - `/tmp/HigmanFrobeniusDescentGreen.lean`
 - `/tmp/HigmanTraceReindexGreen.lean`
 - issue 2048
+
+## 完了記録
+
+`BaseChange.lean` に `frobeniusScalarBaseChange` と pure-tensor 公式、
+`frobeniusScalarBaseChange_bilin` を追加した。`FrobeniusCoordinates.lean` の
+`trace_frobenius_coordinate_sum` は `Fin (d*n)` の和を `Fin d × Fin n` に
+再添字化し、各 residue の係数を relative trace の Frobenius conjugate と同定する。
+
+- 2 leaf の対象ビルド: 2375 jobs、成功
+- 変更後: `BaseChange.lean` 474 行、`FrobeniusCoordinates.lean` 1084 行
+- 新規 theorem の公理依存: `propext`, `Classical.choice`, `Quot.sound` のみ
+- 新規 `sorry` / `axiom` / opaque carrier なし
