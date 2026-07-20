@@ -11634,3 +11634,12 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- the §10 μ-grid.  ⚠ This lives at the `A₀` level (the engine's Dade hypothesis is `h46.dade0`),
 -- so feeding it to the `A`-level (9.11) needs the same descent case (b) uses.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_pairBound
+-- **Positive `Snorm` for every `𝒮(Y)`-member** — the §9 form of `S13.sOf_mem_Snorm_pos`, via the
+-- `⊥`-kernel bridge instead of `S13.Hypothesis`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_mem_Snorm_pos
+-- **(9.11.1) `𝒮₂ = 𝒮₁`, subset form, at §9 level** — at the equality configuration the degree-`qa`
+-- cut already saturates the `2q²au` bound exactly, so any `𝒮₂`-member outside it would add
+-- positive `Snorm` beyond `hFbound`.  §13 carries an unused `_hG` and reaches finiteness through
+-- its packaging; here it is `sOf_finite` plus the `⊥`-kernel bridge, and no type hypothesis
+-- appears.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_sTwo_subset_degreeQaCut

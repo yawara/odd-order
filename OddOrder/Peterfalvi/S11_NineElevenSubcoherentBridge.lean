@@ -403,6 +403,108 @@ def CaseAEqualityRefutation [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetu
       False
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Every `𝒮(Y)`-member has positive `Snorm`**, at §9 level — the §9 form of
+`S13.sOf_mem_Snorm_pos`.  The degree is `q·dζ > 0` and the squared norm is positive
+(`inducedKernelFamily_inner_self_real_pos`), reached through the `⊥`-kernel world-bridge instead
+of `S13.Hypothesis`. -/
+theorem sOf_mem_Snorm_pos [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) {Y : Subgroup G} {χ : ClassFunction ↥M ℂ}
+    (hχ : χ ∈ sOf data Y) : 0 < OddOrder.Peterfalvi.S07.Snorm χ := by
+  classical
+  haveI := derivedInG_subgroupOf_normal M
+  have hpos := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
+    (sOf_subset_inducedKernelFamily_bot hG hM data Y hχ)
+  obtain ⟨ζ, hζ, rfl⟩ := hχ
+  obtain ⟨dζ, hdpos, hdζ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ζ
+  have hq : 0 < data.q := data.nontrivial.2.1.pos
+  have hdeg : (induceHU data (ζ : ClassFunction ↥(huSub data) ℂ) : ↥M → ℂ) 1
+      = ((data.q * dζ : ℕ) : ℂ) := by
+    rw [induceHU_apply_one_eq_q_mul, hdζ]
+    push_cast
+    ring
+  unfold OddOrder.Peterfalvi.S07.Snorm
+  apply div_pos
+  · rw [hdeg, Complex.natCast_re]
+    exact pow_pos (Nat.cast_pos.mpr (Nat.mul_pos hq hdpos)) 2
+  · exact hpos.2
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.1), `𝒮₂ = 𝒮₁` — the saturated-bound subset form, at §9 level** (the §9 form
+of `S13.caseA_sTwo_subset_degreeQaCut`).
+
+At the equality configuration the maximal coherent `𝒮₂` is *contained in* the degree-`qa`
+irreducible cut `𝒮₁′` of `𝒮(H₀U′)`.  The cut already sits inside `𝒮₂` (`hS₁sub` + `sOf_antitone`
+along `H₀C′ ≤ H₀U′`) and **saturates** the bound `2q²au` exactly — by
+`sumnS_irreducible_constant_degree` together with the (9.8.d) count equality at `C = U′` and
+`2a = p−1` — so any member outside it would add its positive `Snorm` beyond `hFbound`.
+
+No type hypothesis: §13 carries `_hG` unused and reaches finiteness through `S13.Hypothesis`;
+here that is `sOf_finite` and the `⊥`-kernel bridge. -/
+theorem caseA_sTwo_subset_degreeQaCut [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {S₂ : Set (ClassFunction ↥M ℂ)}
+    (hS₁sub : {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂)
+    (hS₂sub : S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief))
+    (h2a : 2 * caseA.a = chief.p - 1)
+    (hCUprime : chars.C = chars.Uprime)
+    (hcount : {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+        χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+      = (chief.p - 1) * ((uprimeSub data).relIndex data.U))
+    (hFbound : ∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+      OddOrder.Peterfalvi.S07.sumnS F
+        ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ)) :
+    S₂ ⊆ {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+      χ 1 = ((data.q * caseA.a : ℕ) : ℂ)} := by
+  classical
+  intro χ hχS₂
+  by_contra hnot
+  set S1' : Set (ClassFunction ↥M ℂ) := {φ ∈ sOf data (chief.H0 ⊔ uprimeSub data) |
+      IsIrreducibleCharacter φ ∧ φ 1 = ((data.q * caseA.a : ℕ) : ℂ)} with hS1'def
+  have hle : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ uprimeSub data := by
+    refine sup_le_sup_left ?_ chief.H0
+    change derivedInG (cSub data chief) ≤ derivedInG data.U
+    rw [derivedInG_eq_commutator (cSub data chief), derivedInG_eq_commutator data.U]
+    exact Subgroup.commutator_mono (cSub_le_U data chief) (cSub_le_U data chief)
+  have hS1'sub : S1' ⊆ S₂ := fun φ hφ =>
+    hS₁sub ⟨sOf_antitone data hle hφ.1, hφ.2.1, hφ.2.2⟩
+  have hS1'fin : S1'.Finite :=
+    (sOf_finite data (chief.H0 ⊔ uprimeSub data)).subset fun _ hφ => hφ.1
+  have hsum1' : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
+      = (hS1'fin.toFinset.card : ℝ) * ((data.q * caseA.a : ℕ) : ℝ) ^ 2 :=
+    sumnS_irreducible_constant_degree hS1'fin.toFinset
+      (fun ψ hψ => (hS1'fin.mem_toFinset.mp hψ).2.1)
+      (fun ψ hψ => (hS1'fin.mem_toFinset.mp hψ).2.2)
+  have hrelu : (uprimeSub data).relIndex data.U = chars.u := by
+    have hUpC : cSub data chief = uprimeSub data := hCUprime
+    rw [← hUpC]
+    exact relIndex_cSub_U_eq_u _
+  have hcount' : S1'.ncard * (caseA.a * caseA.a) = 2 * caseA.a * chars.u := by
+    rw [hcount, hrelu, ← h2a]
+  have hsatur : OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset
+      = 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ) := by
+    have hcast : ((S1'.ncard : ℝ)) * ((caseA.a : ℝ) * (caseA.a : ℝ))
+        = 2 * (caseA.a : ℝ) * ((chars.u : ℕ) : ℝ) := by
+      exact_mod_cast congrArg (fun n : ℕ => (n : ℝ)) hcount'
+    rw [hsum1', ← Set.ncard_eq_toFinset_card _ hS1'fin, Nat.cast_mul]
+    linear_combination ((data.q : ℝ) ^ 2) * hcast
+  have hχnot : χ ∉ hS1'fin.toFinset := fun hmem => hnot (hS1'fin.mem_toFinset.mp hmem)
+  have hFsub : ↑(insert χ hS1'fin.toFinset) ⊆ S₂ := by
+    rw [Finset.coe_insert]
+    exact Set.insert_subset hχS₂ (by rw [Set.Finite.coe_toFinset]; exact hS1'sub)
+  have hbound := hFbound _ hFsub
+  have hsplit : OddOrder.Peterfalvi.S07.sumnS (insert χ hS1'fin.toFinset)
+      = OddOrder.Peterfalvi.S07.Snorm χ
+        + OddOrder.Peterfalvi.S07.sumnS hS1'fin.toFinset := by
+    unfold OddOrder.Peterfalvi.S07.sumnS
+    exact Finset.sum_insert hχnot
+  rw [hsplit, hsatur] at hbound
+  linarith [sOf_mem_Snorm_pos hG hM data (hS₂sub hχS₂)]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.7)–(9.11.8), the coherent-pair refutation, at §9 level** — the §9 form of
 `S13.NineElevenSevenEightRefutation`.
 
