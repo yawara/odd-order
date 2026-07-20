@@ -11211,6 +11211,7 @@ exactly `Hᵢ₊₁` — giving `⁅v,x⁆ ∈ Hᵢ₊₂ ↔ x ∈ Hᵢ₊₁` 
   OddOrder.BG.AppE.RegularOperatorSetup.commutator_mem_iff_mem
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.commutatorIterate_not_mem_succ
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutator_pow_left_congr
 
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our

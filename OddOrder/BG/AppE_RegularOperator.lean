@@ -309,4 +309,30 @@ theorem RegularOperatorSetup.commutatorIterate_not_mem_succ {R B : Type*} [Group
   rw [← commutatorElement_inv]
   exact Subgroup.inv_mem _ hcon
 
+/-- **(E.12) bilinearity in the quotient**: for `x ∈ Hᵢ`,
+`⁅vᵏ, x⁆ ≡ ⁅v, x⁆ᵏ (mod Hᵢ₊₂)`.
+
+This is the *equality* form that BG's `[wᵢ₋₁^{rᵢ₋₁} u, vʳ] = wᵢ^{rᵢ₋₁ r}` needs, as opposed
+to the membership form `commutator_pow_mem_of_commutator_mem`.  It is the first consumer of
+`chain_map_le_center`: `⁅v,x⁆ ∈ Hᵢ₊₁` becomes **central** in `G/Hᵢ₊₂`, so BG Lemma 4.2(a)
+applies there. -/
+theorem commutator_pow_left_congr {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {i : ℕ} {v x : G}
+    (hx : x ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i) (k : ℕ) :
+    (⁅v, x⁆ ^ k)⁻¹ * ⁅v ^ k, x⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) := by
+  set N := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) with hN
+  have hvx : ⁅v, x⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top v) hx
+  have hcent : ⁅(QuotientGroup.mk' N) v, (QuotientGroup.mk' N) x⁆ ∈
+      Subgroup.center (G ⧸ N) := by
+    rw [← map_commutatorElement]
+    exact chain_map_le_center T (i + 1) (Subgroup.mem_map.mpr ⟨⁅v, x⁆, hvx, rfl⟩)
+  have h3 := OddOrder.BG.Ch1.S04.commutatorElement_pow_left_of_central hcent k
+  refine QuotientGroup.eq.mp ?_
+  show (QuotientGroup.mk' N) (⁅v, x⁆ ^ k) = (QuotientGroup.mk' N) ⁅v ^ k, x⁆
+  rw [map_pow, map_commutatorElement, map_commutatorElement, map_pow]
+  exact h3.symm
+
 end OddOrder.BG.AppE
