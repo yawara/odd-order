@@ -29,13 +29,26 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 5
 
 ## 章のセクション分割
 
-| § | 内容 | Isaacs 番号 | 状態 |
-|---|---|---|---|
-| 5A | Transfer 定義・welldefinedness・準同型性 | 5.1 – 5.4 | mathlib + ✅ Thm 5.3 + Cor 5.4 |
-| 5B | 中心への transfer = n 乗, Schur, Dietzmann | 5.5 – 5.10 | ✅ 5.8 + 5.9, mathlib + 5.10 保留 |
-| 5C | Hall transfer, Burnside, cyclic / abelian Sylow | 5.11 – 5.19 | ✅ 完備 (Cor 5.19 の書籍一般形 = `SylowTwoDirectFactor.lean`) |
-| 5D | Focal subgroup theorem + p-transfer control | 5.20 – 5.24 | ✅ 完備 (5.24 = `NilpotentMaximal.lean`) |
-| 5E | Frobenius normal p-complement + 系 | 5.25 – 5.30 | ✅ 5.25-5.30 |
+- § 5A
+  - 内容: Transfer 定義・welldefinedness・準同型性
+  - Isaacs 番号: 5.1 – 5.4
+  - 状態: mathlib + ✅ Thm 5.3 + Cor 5.4
+- § 5B
+  - 内容: 中心への transfer = n 乗, Schur, Dietzmann
+  - Isaacs 番号: 5.5 – 5.10
+  - 状態: ✅ 5.8 + 5.9, mathlib + 5.10 保留
+- § 5C
+  - 内容: Hall transfer, Burnside, cyclic / abelian Sylow
+  - Isaacs 番号: 5.11 – 5.19
+  - 状態: ✅ 完備 (Cor 5.19 の書籍一般形 = `SylowTwoDirectFactor.lean`)
+- § 5D
+  - 内容: Focal subgroup theorem + p-transfer control
+  - Isaacs 番号: 5.20 – 5.24
+  - 状態: ✅ 完備 (5.24 = `NilpotentMaximal.lean`)
+- § 5E
+  - 内容: Frobenius normal p-complement + 系
+  - Isaacs 番号: 5.25 – 5.30
+  - 状態: ✅ 5.25-5.30
 
 ## 方針
 

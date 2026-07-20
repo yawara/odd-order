@@ -36,15 +36,21 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 4
 
 ## Mathlib direct correspondence (no wrapper)
 
-| Isaacs | mathlib |
-|---|---|
-| `[g₁, g₂] = 1 ↔ g₁ g₂ = g₂ g₁` | `commutatorElement_eq_one_iff_mul_comm` |
-| `⁅H, K⁆ = ⁅K, H⁆` | `Subgroup.commutator_comm` |
-| **Lemma 4.2** quotient `f(⁅H,K⁆) = ⁅fH, fK⁆` | `Subgroup.map_commutator` |
-| `⁅H,K⁆ = ⊥ ↔ H ⊆ Z_G(K)` | `Subgroup.commutator_eq_bot_iff_le_centralizer` |
-| `⁅H₁, H₂⁆ ≤ H₂` (H₂ normal 仮定) | `Subgroup.commutator_le_right` |
-| **Lemma 4.9 Three-subgroups** | `Subgroup.commutator_commutator_eq_bot_of_rotate` |
-| 下降中心列 `G^k` | `Subgroup.lowerCentralSeries` (`(⊤ : Subgroup G).lowerCentralSeries`), `Subgroup.lowerCentralSeries_succ` |
+- `[g₁, g₂] = 1 ↔ g₁ g₂ = g₂ g₁`
+  - mathlib: `commutatorElement_eq_one_iff_mul_comm`
+- `⁅H, K⁆ = ⁅K, H⁆`
+  - mathlib: `Subgroup.commutator_comm`
+- **Lemma 4.2** quotient `f(⁅H,K⁆) = ⁅fH, fK⁆`
+  - mathlib: `Subgroup.map_commutator`
+- `⁅H,K⁆ = ⊥ ↔ H ⊆ Z_G(K)`
+  - mathlib: `Subgroup.commutator_eq_bot_iff_le_centralizer`
+- `⁅H₁, H₂⁆ ≤ H₂` (H₂ normal 仮定)
+  - mathlib: `Subgroup.commutator_le_right`
+- **Lemma 4.9 Three-subgroups**
+  - mathlib: `Subgroup.commutator_commutator_eq_bot_of_rotate`
+- 下降中心列 `G^k`
+  - mathlib: `Subgroup.lowerCentralSeries`
+    (`(⊤ : Subgroup G).lowerCentralSeries`), `Subgroup.lowerCentralSeries_succ`
 
 注: mathlib `(⊤ : Subgroup G).lowerCentralSeries` の index 規約は Isaacs `G^k` と
 **オフセット 1 ずれ** — mathlib `lcs 0 = ⊤ = G^1`, `lcs 1 = G' = G^2`, `lcs n = G^{n+1}`.

@@ -436,10 +436,9 @@ noncomputable def
         PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
           (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
     (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
-    (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
-      ν x =
-        (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
-          hF hXne hstepData).extension x)
+    (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆, ν x =
+      (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+        hF hXne hstepData).extension x)
     (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
     (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
       ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)

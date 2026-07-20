@@ -47,26 +47,79 @@ Proposition/Theorem/Corollary 1.1-1.22).
 CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F の 4 結果は
 **section docstring 記載のみで個別 theorem を書かない**.
 
-| BG | Isaacs FGT | mathlib | 本ファイル |
-|---|---|---|---|
-| **Lem 1.1** | Ch.3 Thm 3.11 + Ch.1 Fitting + Ch.4 Z(F(G)) | — | ✅ **sorry-free** |
-| **Prop 1.2 forward** | chief factors + Fitting quotient image | — | ✅ **sorry-free partial** |
-| **Prop 1.3** | Ch.1 Fitting maximality + solvable commutator descent | — | ✅ **sorry-free** |
-| Thm 1.8 | Thm 1.8 | (Ch.1 §1B TODO) | Phase 1 待ち |
-| **Lem 1.7(a)** | — | `frattini_nongenerating` ✅ | ✅ **sorry-free finite 特殊化** |
-| **Lem 1.7(b)(c⇒)(d⊇)** | — | `OddOrder.GroupTheory.FrattiniPGroup` ✅ | ✅ **sorry-free shared module** |
-| **Lem 1.7(c⇐)** | Isaacs Lem 4.5 | `frattini_le_iff_isElementaryAbelian_quotient_of_pgroup` ✅ | ✅ **sorry-free** |
-| **Lem 1.7(d⇐)** | Isaacs Lem 4.5 | `R/K` elementary abelian | ✅ **sorry-free** |
-| Thm 1.11 | Thm 4.36 | Phase 1 Ch.4 §4D | Phase 1 待ち |
-| **Thm 1.13** | (Thompson critical) | `GroupTheory.CriticalSubgroup` ✅ | ✅ **sorry-free** `thompson_critical_omega` |
-| **Lem 1.14** main | — | Sylow II in T·M + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj` | ✅ **sorry-free 完成** |
-| **Lem 1.14** 易方向 | — | `Subgroup.normalizer_le_normalizer_sup_normal` + `le_normalizer` | ✅ **sorry-free 5 行** |
-| **Prop 1.15(a)** | Thm 3.21 | `hall_higman_1_2_3` ✅ | ✅ **sorry-free thin wrap** (π = {p} 特殊化) |
-| Thm 1.17 | Thm 5.21 | `OddOrder.Isaacs.Ch05.focalSubgroupTheorem` ✅ | Ch05 public entrypoint |
-| Thm 1.18 | Thm 5.13 | `OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer` ✅ | Ch05 public entrypoint |
-| Cor 1.19(b) | — | `IsZGroup.coprime_commutator_index` ✅ | no-wrapper, audit 発見 |
-| Thm 1.20 | — | `Maschke` ✅ | no-wrapper |
-| **Lem 1.22** | (Ch.1 系) | `IsPGroup.normal_inf_center_nontrivial` + Cauchy + 帰納 | ✅ **proof 完成** |
+- **Lem 1.1**
+  - Isaacs FGT: Ch.3 Thm 3.11 + Ch.1 Fitting + Ch.4 Z(F(G))
+  - mathlib: —
+  - 本ファイル: ✅ **sorry-free**
+- **Prop 1.2 forward**
+  - Isaacs FGT: chief factors + Fitting quotient image
+  - mathlib: —
+  - 本ファイル: ✅ **sorry-free partial**
+- **Prop 1.3**
+  - Isaacs FGT: Ch.1 Fitting maximality + solvable commutator descent
+  - mathlib: —
+  - 本ファイル: ✅ **sorry-free**
+- Thm 1.8
+  - Isaacs FGT: Thm 1.8
+  - mathlib: (Ch.1 §1B TODO)
+  - 本ファイル: Phase 1 待ち
+- **Lem 1.7(a)**
+  - Isaacs FGT: —
+  - mathlib: `frattini_nongenerating` ✅
+  - 本ファイル: ✅ **sorry-free finite 特殊化**
+- **Lem 1.7(b)(c⇒)(d⊇)**
+  - Isaacs FGT: —
+  - mathlib: `OddOrder.GroupTheory.FrattiniPGroup` ✅
+  - 本ファイル: ✅ **sorry-free shared module**
+- **Lem 1.7(c⇐)**
+  - Isaacs FGT: Isaacs Lem 4.5
+  - mathlib: `frattini_le_iff_isElementaryAbelian_quotient_of_pgroup` ✅
+  - 本ファイル: ✅ **sorry-free**
+- **Lem 1.7(d⇐)**
+  - Isaacs FGT: Isaacs Lem 4.5
+  - mathlib: `R/K` elementary abelian
+  - 本ファイル: ✅ **sorry-free**
+- Thm 1.11
+  - Isaacs FGT: Thm 4.36
+  - mathlib: Phase 1 Ch.4 §4D
+  - 本ファイル: Phase 1 待ち
+- **Thm 1.13**
+  - Isaacs FGT: (Thompson critical)
+  - mathlib: `GroupTheory.CriticalSubgroup` ✅
+  - 本ファイル: ✅ **sorry-free** `thompson_critical_omega`
+- **Lem 1.14** main
+  - Isaacs FGT: —
+  - mathlib: Sylow II in T·M + `Subgroup.conj_smul_subgroupOf` + `subgroupOf_inj`
+  - 本ファイル: ✅ **sorry-free 完成**
+- **Lem 1.14** 易方向
+  - Isaacs FGT: —
+  - mathlib: `Subgroup.normalizer_le_normalizer_sup_normal` + `le_normalizer`
+  - 本ファイル: ✅ **sorry-free 5 行**
+- **Prop 1.15(a)**
+  - Isaacs FGT: Thm 3.21
+  - mathlib: `hall_higman_1_2_3` ✅
+  - 本ファイル: ✅ **sorry-free thin wrap** (π = {p} 特殊化)
+- Thm 1.17
+  - Isaacs FGT: Thm 5.21
+  - mathlib: `OddOrder.Isaacs.Ch05.focalSubgroupTheorem` ✅
+  - 本ファイル: Ch05 public entrypoint
+- Thm 1.18
+  - Isaacs FGT: Thm 5.13
+  - mathlib:
+    `OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer` ✅
+  - 本ファイル: Ch05 public entrypoint
+- Cor 1.19(b)
+  - Isaacs FGT: —
+  - mathlib: `IsZGroup.coprime_commutator_index` ✅
+  - 本ファイル: no-wrapper, audit 発見
+- Thm 1.20
+  - Isaacs FGT: —
+  - mathlib: `Maschke` ✅
+  - 本ファイル: no-wrapper
+- **Lem 1.22**
+  - Isaacs FGT: (Ch.1 系)
+  - mathlib: `IsPGroup.normal_inf_center_nontrivial` + Cauchy + 帰納
+  - 本ファイル: ✅ **proof 完成**
 
 ## Audit context
 
@@ -485,18 +538,47 @@ lemma to the transitive `G`-set of Hall `π`-subgroups. This is not a pure wrapp
 the abstract coprime-action fixed-point machinery to Hall subgroups and exposes the BG-facing
 Hall statements. Prop. 1.5(d) remains a no-wrapper direct use of Isaacs Cor. 3.28.
 
-| BG | Isaacs §3E / §4D | Lean (本リポ) | 備考 |
-|---|---|---|---|
-| **Prop 1.5(a)** A-inv Hall 存在 | Hall-E + Hall-C + Lem 3.24(a) | `exists_aInvariant_hall` ✅ | Hall `π` 一般版 |
-| **Prop 1.5(b)** A-inv π-sub ⊆ A-inv Hall | Hall induction + Glauberman conjugacy | `aInvariant_piSubgroup_le_aInvariant_hall` ✅ | minimal normal quotient induction + `H = G` complement branch |
-| **Prop 1.5(c)** A-inv Hall 共役 | Hall-C + Lem 3.24(b) | `aInvariant_hall_conj` ✅ | 共役元は `C_G(A)` |
-| **Prop 1.5(d) C_{G/N}(A) = image C_G(A)** | **Cor 3.28 (商の固定点)** | **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅ | §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び** |
-| **Prop 1.5(e)** C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π | Hall product + action commutator | `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement` ✅ | BG L412-L414 を `IsComplement' K H` + `[G,A] ≤ H` で実装 |
-| **Prop 1.6(a) G = C_G(A)[G,A]** | **Lem 4.28** | **`OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`** ✅ | **無 wrapper**: Subgroup.fixedPointsOfMulAut ⊔ actionCommutator = ⊤ |
-| **Prop 1.6(b) [G,A,A]=[G,A]** | **Lem 4.29** | **`OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one`** ✅ | **無 wrapper**: SemidirectProduct Γ-form |
-| **Prop 1.6(c)** [G,A,A]=1 ⇒ trivial | Lem 4.29 | `iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot` ✅ | BG-facing consequence of Ch04 Γ-form equality |
-| **Prop 1.6(d)** abelian 直積分解 | **Thm 4.34 Fitting** | `fixedPoints_isComplement_actionCommutator_of_abelian` ✅ | complement form of `G = C_G(A) × [G,A]` |
-| **Prop 1.6(e) abelian p-群 + p'-A** | **Cor 4.35** | **`OddOrder.Isaacs.Ch04.*` (Ch.4 §4D 3422 行)** ✅ | **無 wrapper**: G abelian p-群 + A p'-群 fixes order-p elements |
+- **Prop 1.5(a)** A-inv Hall 存在
+  - Isaacs §3E / §4D: Hall-E + Hall-C + Lem 3.24(a)
+  - Lean (本リポ): `exists_aInvariant_hall` ✅
+  - 備考: Hall `π` 一般版
+- **Prop 1.5(b)** A-inv π-sub ⊆ A-inv Hall
+  - Isaacs §3E / §4D: Hall induction + Glauberman conjugacy
+  - Lean (本リポ): `aInvariant_piSubgroup_le_aInvariant_hall` ✅
+  - 備考: minimal normal quotient induction + `H = G` complement branch
+- **Prop 1.5(c)** A-inv Hall 共役
+  - Isaacs §3E / §4D: Hall-C + Lem 3.24(b)
+  - Lean (本リポ): `aInvariant_hall_conj` ✅
+  - 備考: 共役元は `C_G(A)`
+- **Prop 1.5(d) C_{G/N}(A) = image C_G(A)**
+  - Isaacs §3E / §4D: **Cor 3.28 (商の固定点)**
+  - Lean (本リポ): **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`** ✅
+  - 備考: §1 hub. 6 §1 proofs で使用. **無 wrapper, 直接呼び**
+- **Prop 1.5(e)** C_G(A) ⊇ Hall π' ⇒ [G,A] ⊆ O_π
+  - Isaacs §3E / §4D: Hall product + action commutator
+  - Lean (本リポ):
+    `actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement` ✅
+  - 備考: BG L412-L414 を `IsComplement' K H` + `[G,A] ≤ H` で実装
+- **Prop 1.6(a) G = C_G(A)[G,A]**
+  - Isaacs §3E / §4D: **Lem 4.28**
+  - Lean (本リポ): **`OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`** ✅
+  - 備考: **無 wrapper**: Subgroup.fixedPointsOfMulAut ⊔ actionCommutator = ⊤
+- **Prop 1.6(b) [G,A,A]=[G,A]**
+  - Isaacs §3E / §4D: **Lem 4.29**
+  - Lean (本リポ): **`OddOrder.Isaacs.Ch04.iterCommutator_inl_inr_two_eq_one`** ✅
+  - 備考: **無 wrapper**: SemidirectProduct Γ-form
+- **Prop 1.6(c)** [G,A,A]=1 ⇒ trivial
+  - Isaacs §3E / §4D: Lem 4.29
+  - Lean (本リポ): `iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot` ✅
+  - 備考: BG-facing consequence of Ch04 Γ-form equality
+- **Prop 1.6(d)** abelian 直積分解
+  - Isaacs §3E / §4D: **Thm 4.34 Fitting**
+  - Lean (本リポ): `fixedPoints_isComplement_actionCommutator_of_abelian` ✅
+  - 備考: complement form of `G = C_G(A) × [G,A]`
+- **Prop 1.6(e) abelian p-群 + p'-A**
+  - Isaacs §3E / §4D: **Cor 4.35**
+  - Lean (本リポ): **`OddOrder.Isaacs.Ch04.*` (Ch.4 §4D 3422 行)** ✅
+  - 備考: **無 wrapper**: G abelian p-群 + A p'-群 fixes order-p elements
 
 **使用例**: 本ファイル §1C Thm 1.8 (`burnside_operator`) は `aFixed_quotient_frattini`
 (= Prop 1.5(d) + Lem 1.7(a) 合成 = Isaacs Cor 3.29) を直接呼び出す.
