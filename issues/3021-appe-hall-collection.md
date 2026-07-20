@@ -966,3 +966,33 @@ BG (E.14): 「Clearly `S ⊇ Ω₁(Z(R))` and `C_S(R₀) = S ∩ (R₀ × R₁) 
 
 ⭐ **これは特殊化債務の返済でもある** — 現状の (E.16) は BG より強い仮説
 (`rank ≥ 3`) を要求しており、パラメータ化すれば BG どおりの一般性になる。
+
+## 2026-07-20 (17): (E.14) 完了 + ⭐ パラメータ化は `≤ p²` で足りる
+
+`inf_centralizer_eq_seed`: `S ⊓ C_R(R₀) = hyp.seed` (種を含む指数 p の `S` について)。
+⟹ `|C_S(R₀)| = |seed|` なので、rank≥3 を経由せずに済む。
+
+### ⭐ 発見: 等式でなく **`|C_S(R₀)| ≤ p²` で十分**
+
+`index_sup_centralizer_lt` の算術を追うと、`|C_S(v)| = c` を一般の `c` にしても
+
+- `|T₁|·c = |S|·|C_T(v)|` (積公式)
+- `c·|K_T| = |T:T₁|·|S|` (約分後)
+- `|K_T| < |S|` ⟹ `|T:T₁| < c`
+
+⟹ **`c ≤ p²` なら `|T:T₁| < p²` が出る**。等式は要らない。
+⟹ パラメータは `hp2 : Nat.card ↥(S ⊓ C_R(R₀)) ≤ p ^ 2` でよい (供給が楽になる)。
+
+### 残タスク (次セッション)
+
+1. ⬜ **`card_seed_le : |seed| ≤ p²`**。候補ルート 2 つ:
+   - (a) `seed` は elementary abelian で `C_R(R₀)` 内、`pRank_centralizer_R₀_le_two` を使う。
+     要: 「pRank ≤ n の群の elementary abelian 部分群は位数 ≤ p^n」の橋
+     (`pRank` の定義は `⨆ A, Nat.log p |A|` = `GroupTheory/PRank.lean:423`)。
+   - (b) `seed ⊓ R₁ ≤ Ω₁(R₁)` (位数 ≤ p、cyclic) と `|C_R(R₀) : R₁| = p`
+     (`card_centralizer_R₀`) から積公式で `|seed| ≤ p·p`。
+     ⚠ `GroupTheory.pRank_le_two_of_isCyclic_of_index_le_prime` (issue 9401 で書いた)
+     の証明が同型なので、そこから部品を切り出せる可能性が高い — 先に実測すること。
+2. ⬜ `card_sup_centralizer` / `index_sup_centralizer_lt` の仮説を
+   `(hexp, hS3)` → `hp2 : |S ⊓ C_R(R₀)| ≤ p²` にパラメータ化 (Step 2 の呼び出し側も更新)。
+3. ⬜ Step 3 最終組み立て (`Ω₁(T) ∈ ExpPFamily` → 極大性 → `omega_pow_eq_one`)。
