@@ -418,8 +418,10 @@ private theorem frobeniusPower_ne_one_and_orderOf_odd_of_primitive_shift
 
 /-! ## Actual lower-central extension coordinates -/
 
-/-- The zeroth lower-central term is the ambient group. -/
-private noncomputable def lowerCentralTermZeroEquivAmbient
+/-- The zeroth lower-central term is the ambient group.  Public because
+Lemma 12's ambient `F × F` coordinate reuses this generic bridge
+(`AmbientProductCoordinate`). -/
+noncomputable def lowerCentralTermZeroEquivAmbient
     (P : Type uP) [Group P] :
     lowerCentralTerm P 0 ≃* P :=
   (MulEquiv.subgroupCongr (by simp [lowerCentralTerm])).trans

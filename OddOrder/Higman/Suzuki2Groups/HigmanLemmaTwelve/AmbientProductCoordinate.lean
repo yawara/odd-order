@@ -299,6 +299,74 @@ theorem ambientProductEquiv_apply
 
 end AmbientProduct
 
+/-! ## The ambient central extension over `F × F` -/
+
+section AmbientExtension
+
+/-- Bridge `P / Φ(P) ≃* L₀`: the zeroth lower-central layer is the Frattini
+quotient once the layer kernel is identified with `Φ(P)`. -/
+def frattiniQuotientEquivLayerZero
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)) :
+    P ⧸ frattini P ≃* lowerCentralLayer P 0 :=
+  QuotientGroup.congr _ _ (lowerCentralTermZeroEquivAmbient P).symm (by
+    rw [hK0]
+    ext x
+    constructor
+    · rintro ⟨y, hy, rfl⟩
+      simpa [lowerCentralTermZeroEquivAmbient, Subgroup.mem_subgroupOf] using hy
+    · intro hx
+      rw [Subgroup.mem_subgroupOf] at hx
+      refine ⟨(x : P), hx, ?_⟩
+      apply Subtype.ext
+      rfl)
+
+variable {F : Type uF} [AddCommGroup F] [Module (ZMod 2) F]
+
+/-- The multiplicative Frattini-quotient coordinate `P / Φ(P) ≃* 𝔽 × 𝔽`, built
+from any additive `F × F` layer coordinate. -/
+def layerZeroProductMulCoordinate
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (e : (F × F) ≃ₗ[ZMod 2] Additive (lowerCentralLayer P 0)) :
+    P ⧸ frattini P ≃* Multiplicative (F × F) :=
+  (frattiniQuotientEquivLayerZero hK0).trans
+    (AddEquiv.toMultiplicativeRight e.symm.toAddEquiv)
+
+variable [IsMulCommutative ↑(frattini P)]
+variable [Module (ZMod 2) (Additive ↑(frattini P))]
+
+/-- The multiplicative Singer kernel coordinate `𝔽 ≃* Φ(P)` from the additive
+Singer coordinate on the Frattini subgroup. -/
+def frattiniSingerKernelCoordinate
+    (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] F) :
+    Multiplicative F ≃* ↥(frattini P) :=
+  AddEquiv.toMultiplicativeLeft ePhi.symm.toAddEquiv
+
+/-- **Higman Lemma 12 (p. 90), the ambient central extension.**  `P` as a
+central extension of `𝔽 × 𝔽` (= `P / Φ(P)`) by `𝔽` (= `Φ(P)`, Singer), the
+input consumed by the type-B/C/D `ofExtension` constructors. -/
+def ambientProductExtension
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (e : (F × F) ≃ₗ[ZMod 2] Additive (lowerCentralLayer P 0))
+    (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] F) :
+    GroupExtension (Multiplicative F) P (Multiplicative (F × F)) :=
+  GroupExtension.ofNormalSubgroupCoordinates (frattini P)
+    (frattiniSingerKernelCoordinate ePhi)
+    (layerZeroProductMulCoordinate hK0 e)
+
+@[simp]
+theorem ambientProductExtension_inl_range
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (e : (F × F) ≃ₗ[ZMod 2] Additive (lowerCentralLayer P 0))
+    (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] F) :
+    (ambientProductExtension hK0 e ePhi).inl.range = frattini P :=
+  GroupExtension.ofNormalSubgroupCoordinates_range_inl _ _ _
+
+end AmbientExtension
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
