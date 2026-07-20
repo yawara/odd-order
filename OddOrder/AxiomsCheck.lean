@@ -11046,6 +11046,20 @@ bookkeeping that will feed it, so it currently has no consumer in the repo.  It 
 book strength and is what E.3(c)'s `|S| ≤ p^q` will be closed with. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.le_pred_of_forall_mul_pow_ne_one
 
+/-! **BG Theorem E.3(b), Step 2, (E.9): the chain is `A`-invariant**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).
+
+* `AppE.characteristic_iterCommutator` — every term of `iterCommutator T ⊤` is characteristic
+  when `T` is.  **This is what BG's choice of the `[R, Hᵢ₋₁]` form buys**: `⁅·, ⊤⁆` preserves
+  characteristicity, whereas `⁅R₀, ·⁆` would not (`R₀` is not normal in `S`), even though
+  `commutator_R₀_eq_commutator_top` shows the two forms coincide.
+* `RegularOperatorSetup.isAInvariant_iterCommutator` — hence the chain is `A`-invariant, via
+  the existing `Isaacs.Ch03.IsAInvariant.of_characteristic` applied to the restricted action
+  on `↥S`.  BG asserts the series is `A`-invariant without comment; this is the reason. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.characteristic_iterCommutator
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.isAInvariant_iterCommutator
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
