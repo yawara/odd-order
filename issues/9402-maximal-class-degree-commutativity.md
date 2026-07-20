@@ -44,13 +44,23 @@ soft な commutator calculus は `⁅R₀,T⁆ = H_1` の off-by-one で全ル�
 
 ⟹ 未構築の genuine shared infra。
 
-## 数学的背景 (3021 (51) ③④)
+## 数学的背景 (⚠ 3021 (52) で精密化 — 下記は (51) の旧見立て)
 
 - 一般の positive dc は **Blackburn 1958** の hard 定理 (associated graded Lie 環の構造定数
   γ_{i,j} が最上反対角 i+j=n で自由、消すのに p odd を使う非線形関係が要る)。**soft でない**。
-- ⭐ ただし本 setup は **class n < p** (E.3(a) `q∣(p-1)/2` + E.3(c) `|S|≤p^q` ⟹
-  `n ≤ q-1 ≤ (p-3)/2`、実際 `p ≥ 2n+3`)。Blackburn の dc=0 exceptional 群は全て class ≥ p
-  なので、**class < p (大 p) ⟹ dc ≥ 1** がクリーンに従うはず。一般 Blackburn は不要。
+- ~~class < p ⟹ dc≥1 がクリーン~~ ← **(52) で否定**。class の大小でなく機構が違う。
+
+## ⚠⚠ 2026-07-21 (3021 (52) 由来): gap の真の機構 = **regular B 作用 + Jacobi**
+
+- dc は **H_0=T 込みの `⁅H_a,H_b⁆≤H_{a+b+2}` (∀a,b≥0) が丸ごと本体** (soft な小 core 還元なし)。
+- ⭐ **B 作用 (abelian regular, 相異なる固有指標 χ_Q≠χ_T on S/S')** が各 level の
+  **clean な二者択一** (Case A `t·` / Case B `t₀·`) を eigenvalue 論だけで与える (Jacobi 不要、
+  形式化可能)。
+- ⚠ 但し「全 level Case A (dc≥1)」の解決 = 「no switch」は **Jacobi と絡む hard core**。
+  distinct-eigenvalue + Jacobi ⟹ dc≥1 が成り立つ**らしい** (dc=0 構成が全て Jacobi 違反、
+  3021 (52) ③で実例確認) が clean proof 未確立。Blackburn の dc=0 群が regular B 作用を
+  許さないのが真相と思われる。
+- ⟹ **class<p は理由でない**。authoritative input (Blackburn 分類 / FT1991 原論文 / 最強モデル) 待ち。
 
 ## 構造定数 setup (Lie 環、形式化の設計候補)
 
