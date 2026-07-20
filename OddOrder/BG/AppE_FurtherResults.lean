@@ -911,6 +911,25 @@ theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
           (Subgroup.inclusion_injective hsub)
     _ = p := hyp.card_centralizer_inf_centralizer_eq hR₀S hexp hS
 
+/-- **BG Lemma 4.2(a), both slots at once**: if `⁅x, y⁆` is central then
+`⁅x ^ m, y ^ n⁆ = ⁅x, y⁆ ^ (m * n)`.
+
+The repo has the two single-slot forms
+(`Ch1.S04.commutatorElement_pow_{left,right}_of_central`); this is the bilinear
+combination, which is what BG's (E.12) actually applies.  Note the right slot is applied to
+`⁅x^m, y⁆`, central because it *equals* `⁅x,y⁆^m`.
+
+BG uses it inside `S/Hᵢ₊₁` — where `H̄ᵢ` is central, so commutators into `H̄ᵢ` are central —
+to compute `[wᵢ₋₁^{rᵢ₋₁} u, vʳ] = wᵢ^{rᵢ₋₁ r}`, giving `rᵢ ≡ rᵢ₋₁ r (mod p)`. -/
+theorem commutatorElement_pow_pow_of_central {K : Type*} [Group K] {x y : K}
+    (hz : ⁅x, y⁆ ∈ Subgroup.center K) (m n : ℕ) :
+    ⁅x ^ m, y ^ n⁆ = ⁅x, y⁆ ^ (m * n) := by
+  have h1 : ⁅x ^ m, y⁆ = ⁅x, y⁆ ^ m :=
+    OddOrder.BG.Ch1.S04.commutatorElement_pow_left_of_central hz m
+  have hc : ⁅x ^ m, y⁆ ∈ Subgroup.center K := by
+    rw [h1]; exact Subgroup.pow_mem _ hz m
+  rw [OddOrder.BG.Ch1.S04.commutatorElement_pow_right_of_central hc n, h1, ← pow_mul]
+
 /-- **BG Theorem E.3(b), Step 2: the arithmetic core of (E.10)--(E.12)**.
 
 In a finite **cyclic** group: if `u ≠ 1` satisfies `u^q = 1` for a prime `q`, if `u₀`

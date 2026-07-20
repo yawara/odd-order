@@ -11112,6 +11112,21 @@ fixed-point lifting applicable. -/
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.quotient_action_ne_one
 
+/-! **BG Lemma 4.2(a), bilinear form** (`BG.AppE_FurtherResults`, issue 3021, 2026-07-20):
+`AppE.commutatorElement_pow_pow_of_central` — `⁅x^m, y^n⁆ = ⁅x,y⁆^(m·n)` for central
+`⁅x, y⁆`.
+
+The repo already had the two single-slot forms
+(`Ch1.S04.commutatorElement_pow_{left,right}_of_central`); this is their bilinear
+combination, which is what BG's (E.12) actually applies.  The right slot is applied to
+`⁅x^m, y⁆`, central precisely because it *equals* `⁅x,y⁆^m`.
+
+BG uses it inside `S/Hᵢ₊₁` — where `H̄ᵢ` is central, so commutators landing in `H̄ᵢ` are
+central — to compute `[wᵢ₋₁^{rᵢ₋₁} u, vʳ] = wᵢ^{rᵢ₋₁ r}` and conclude
+`rᵢ ≡ rᵢ₋₁ r (mod p)`.  ⚠ Topically this belongs beside the two slots in
+`S04_SmallRankBasic`; it is kept here while it has a single consumer. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.commutatorElement_pow_pow_of_central
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

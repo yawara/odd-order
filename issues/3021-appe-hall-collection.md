@@ -496,8 +496,18 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
    - ✅ **(E.10) 完了** = `quotient_action_ne_one`: `a ∈ A^#` は非自明な切断
      `H_i/H_{i+1}` を中心化しない。誘導自己同型が `≠ 1` の形で述べた (これが内容)。
      ⚠ 記録どおり **`⟨a⟩` を作用群として** 要素形 Prop 1.5(d) を適用 (`A` 全体でなく)。
-   - ⬜ 残: **(E.12)** `r_i ≡ r₀ r^i` (Lemma 4.2(a) 経由) → `le_pred_of_forall_mul_pow_ne_one`
-     に流して `n ≤ q-1` ⟹ **E.3(c)**。
+   - ✅ **(E.12) の数学的核** = `commutatorElement_pow_pow_of_central`:
+     `⁅x,y⁆` が中心的なら `⁅x^m, y^n⁆ = ⁅x,y⁆^(m·n)`。repo には片スロットずつの形
+     (`Ch1.S04.commutatorElement_pow_{left,right}_of_central`) しか無かったので、
+     **双線形形**を組んだ (BG が (E.12) で実際に使うのはこちら)。
+     右スロットは `⁅x^m, y⁆` に当てる — これが中心的なのは `⁅x,y⁆^m` に**等しい**から。
+     ⚠ topical には S04_SmallRankBasic の 2 スロットの隣が home。消費者が 1 つの間は AppE に置く。
+   - ⬜ 残 (E.12 の組み立て): `w_i = [w_{i-1}, v]` 列を定義し、`S/H_{i+1}` で
+     `H̄_i ≤ Z(S̄)` を使って上の双線形形を適用 ⟹ `r_i ≡ r_{i-1} r`、帰納で `r_i ≡ r₀ r^i`。
+     そこから `le_pred_of_forall_mul_pow_ne_one` に流して `n ≤ q-1` ⟹ **E.3(c)**。
+     ⚠ `H̄_i ≤ Z(S̄)` (BG「`⟨w̄ᵢ⟩ = H̄ᵢ ≤ Z(S̄)`」) が次に要る補題。
+     `H_{i+1} = ⁅H_i, ⊤⁆` なので商で `⁅H̄_i, S̄⁆ = 1`、すなわち `H̄_i` は中心的 — これは
+     `Subgroup.commutator_eq_bot_iff_le_centralizer` の商版で出るはず。
 
 ### (E.10) の道具は特定済 — 要素レベル形が public (2026-07-20 実測)
 
