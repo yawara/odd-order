@@ -991,4 +991,19 @@ theorem commutator_self_le_of_generator {G : Type*} [Group G] {A A' K : Subgroup
     (h1 : ⁅A', A⁆ ≤ K) (h2 : ⁅A, A'⁆ ≤ K) : ⁅A, A⁆ ≤ K :=
   commutator_le_of_generators hw hw hA'A hgen hgen h1 h2 (by simp)
 
+/-- **BG `(E.24)`**: `T'·H_k = H_{k-1}`.
+
+The minimality of `k` gives both halves: `T' ≤ H_{k-1}` (because `T/H_{k-1}` is abelian) and
+`T' ⊄ H_k`.  So `T'·H_k` sits strictly above `H_k` inside `H_{k-1}`, and the section has
+order `p` — no room (`eq_of_lt_of_le_of_card_eq_prime_mul`). -/
+theorem sup_commutator_eq_of_min_index {G : Type*} [Group G] [Finite G] {p : ℕ}
+    (hp : p.Prime) {T Hk Hk1 : Subgroup G}
+    (hcard : Nat.card ↥Hk1 = p * Nat.card ↥Hk) (hkk1 : Hk ≤ Hk1)
+    (hle : ⁅T, T⁆ ≤ Hk1) (hnot : ¬ (⁅T, T⁆ ≤ Hk)) :
+    ⁅T, T⁆ ⊔ Hk = Hk1 := by
+  refine eq_of_lt_of_le_of_card_eq_prime_mul hp hcard ?_ (sup_le hle hkk1)
+  refine lt_of_le_of_ne le_sup_right fun h => hnot ?_
+  rw [h]
+  exact le_sup_left
+
 end OddOrder.BG.AppE
