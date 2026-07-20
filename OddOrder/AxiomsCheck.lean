@@ -11611,3 +11611,15 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- §13 needs `hncH0C`/`htype` here only to rewrite `cprimeSub … = derivedInG hyp.C`, and at §9
 -- `chars.Cprime` *is* `cprimeSub data chief`, so that step disappears.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_break_source_degree
+-- **τ-transport for image families** — only `image_eq` mentions `τ`, so `.imageSet` is preserved
+-- definitionally and `Orthogonal` (stated purely on `imageSet`) transfers for free.  This is the
+-- seam between the certain-type families (produced for a Hypothesis (4.6)'s stored `h.tau`) and
+-- the norm-weighted engines (which hardcode `hyp.fullDadeIsometryData hconj`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily.congrTau
+-- **(9.11.1) pair bound, discharged at §9 level** — the §13 producer `S13.nineElevenPairBound`
+-- without its `hncH0C`/`htype`: those serve one `cprimeSub … = derivedInG hyp.C` rewrite that is
+-- definitional here, and the (5.2.d)/(5.2.e) data come from the §9 R-family dispatch rather than
+-- the §10 μ-grid.  ⚠ This lives at the `A₀` level (the engine's Dade hypothesis is `h46.dade0`),
+-- so feeding it to the `A`-level (9.11) needs the same descent case (b) uses.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_pairBound

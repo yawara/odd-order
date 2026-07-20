@@ -753,7 +753,37 @@ packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` を�
 ⚠ **leaf を 1500 行手前で分割済** (commit 08b3bace4): base 層を
 `S11_NineElevenBridgeBase.lean` (261 行) へ。module 名・namespace・宣言名は不変。
 
-#### ⚠ engine 呼び出しは τ の形が 2 つあって噛み合わない (2026-07-20 実測、着手して撤退)
+#### ✅ 解決 (2026-07-20): τ 2 系統の seam は `congrTau` + `congrMap` で解ける
+
+engine を触らずに済んだ:
+
+- **`S07.OrthonormalCharacterImageFamily.congrTau`** (新設) — image family の τ 輸送。
+  τ に触れるのは `image_eq` だけなので **`imageSet` は定義的に不変**、
+  `Orthogonal` (imageSet のみで述べられる) はそのまま移る。
+  ⟹ `sOf_{member,break}PsiDecomposition` / `sOf_sixTwoDecompositionData` を
+  **engine 形で産出**するように変更。
+- coherence 側は **`IsCoherent.congrMap` が `.extension` を定義的に保つ**ので、
+  `hDtau : … = cohS₂.extension …` の節がそのまま通る。
+
+⚠ **`have` でなく inline で渡す**こと: `IsCoherent` は data なので
+`have cohS₂E := cohS₂.congrMap …` にすると `.extension` が opaque になり
+`hDtau` が孤立する (1 度踏んだ)。[[lean-instance-defeq-traps]] の let-vs-have と同型。
+
+✅ **`S11.caseA_pairBound` landed** — §13 `nineElevenPairBound` から `hncH0C`/`htype` が
+消えた形。
+
+#### ⚠ ただし A vs A₀ のレベル差が残る — case A も case B と同じく descent が要る
+
+`caseA_pairBound` は **A₀ レベル** (engine の `hyp` が `h46.dade0` なので、
+`inducedKernelFamily_*` の台の事実が `hKsupp` = `(M')^# ⊆ A₀` 経由になる)。
+A レベルで engine を回すには `(M')^# ⊆ A` が要るが、**型一様な `A(M)` = `typePACore`
+では偽**。⟹ case A も A₀ で回して結果を降ろすのが正しい (case B と同じ形)。
+
+⟹ 次の一手: `sOf_nineEleven_coherent` を「両分岐とも A₀ で回して最後に降ろす」形に
+組み替える。`caseA_coherent_sOf_cprime_of_refuter` は `tau`/`A0` が自由なので
+A₀ で呼べる。降下は `sOf_caseB_coherent_restrict` を分岐非依存に一般化すればよい。
+
+#### (旧・解決済) engine 呼び出しは τ の形が 2 つあって噛み合わない
 
 `caseA_pairBound` を一通り書いて build したところ、**τ の表記が 2 系統ある**ことが問題になった:
 
