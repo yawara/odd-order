@@ -651,4 +651,56 @@ theorem card_omega_le_prime_sq_of_index_lt {G : Type*} [Group G] [Finite G] {p :
     exact OddOrder.BG.Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime hG hp_odd hjeq
 
 
+/-- **BG's `|Ω₁(T)/S| ≤ |Ω₁(T/S)|`**, in the division-free form
+`|Ω₁(T)| ≤ |Ω₁(T/S)| · |S|`.
+
+`S` has exponent `p`, so `S ≤ Ω₁(T)`; and `Ω₁` is a *closure*, so the image of `Ω₁(T)` in
+`T/S` is the closure of the images of the generators — each killed by `p` — hence lies in
+`Ω₁(T/S)`.  The first isomorphism theorem turns the index of `S` inside `Ω₁(T)` into the
+order of that image. -/
+theorem card_omegaInG_le_mul {G : Type*} [Group G] [Finite G] {p : ℕ} {S T : Subgroup G}
+    (hST : S ≤ T) (hexp : ∀ x ∈ S, x ^ p = 1) [hn : (S.subgroupOf T).Normal] :
+    Nat.card ↥(omegaInG T p 1) ≤
+      Nat.card ↥(Omega (↥T ⧸ S.subgroupOf T) p 1) * Nat.card ↥S := by
+  set N : Subgroup ↥T := S.subgroupOf T with hN
+  set W : Subgroup ↥T := Omega (↥T) p 1 with hW
+  set g : ↥T →* (↥T ⧸ N) := QuotientGroup.mk' N with hg
+  set f : ↥W →* (↥T ⧸ N) := g.comp W.subtype with hf
+  have hcardW : Nat.card ↥(omegaInG T p 1) = Nat.card ↥W := by
+    rw [omegaInG_eq_map]
+    exact Subgroup.card_map_of_injective T.subtype_injective
+  have hNW : N ≤ W := by
+    intro x hx
+    refine Omega.mem_of_pow_eq_one ?_
+    have h : ((x : G)) ^ p = 1 := hexp (x : G) (Subgroup.mem_subgroupOf.mp hx)
+    have hx1 : (x : ↥T) ^ p = 1 := by
+      refine Subtype.ext ?_
+      push_cast
+      simpa using h
+    simpa using hx1
+  have hcardN : Nat.card ↥N = Nat.card ↥S :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hST).toEquiv
+  have hker : f.ker = N.subgroupOf W := by
+    ext x
+    simp [hf, hg, MonoidHom.mem_ker, Subgroup.mem_subgroupOf, QuotientGroup.eq_one_iff]
+  have hrangeW : f.range = W.map g := by
+    rw [hf, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hidx : (N.subgroupOf W).index = Nat.card ↥(W.map g) := by
+    rw [Subgroup.index, ← hker, ← hrangeW]
+    exact Nat.card_congr (QuotientGroup.quotientKerEquivRange f).toEquiv
+  have hcardNW : Nat.card ↥(N.subgroupOf W) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNW).toEquiv
+  -- the image lands in `Ω₁(T/S)`, via the generators
+  have hle : W.map g ≤ Omega (↥T ⧸ N) p 1 := by
+    rw [hW, Omega, MonoidHom.map_closure]
+    refine (Subgroup.closure_le _).mpr ?_
+    rintro _ ⟨y, hy, rfl⟩
+    exact Omega.mem_of_pow_eq_one (by rw [← map_pow, hy, map_one])
+  have hsplit : Nat.card ↥(N.subgroupOf W) * (N.subgroupOf W).index = Nat.card ↥W :=
+    (N.subgroupOf W).card_mul_index
+  rw [hcardW, ← hsplit, hcardNW, hcardN, hidx, mul_comm]
+  exact Nat.mul_le_mul_right _ (Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hle))
+
+
+
 end OddOrder.BG.AppE
