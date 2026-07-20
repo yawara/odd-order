@@ -2563,3 +2563,24 @@ Chrome MCP) or Blackburn 1958 分類 or Feit–Thompson 1991 原論文の author
 **Chrome MCP は user 同席が要る**ため autonomous lane では次段に置けない。⟹ **user がE.4 を
 進めたいときの案件**として flag (halt でなく report — c は他 frontier で進行中)。
 hub 単独では escalation しない (c が productively 他 work 中ゆえ blocking でない)。
+
+## 🔄 hub 訂正 (2026-07-21 03:26 tick) — E.4-dc は user 同席案件で**なかった**。c が GPT-5.6 Pro に自律送信成功
+
+前 tick (03:12) の hub 裁定で「Chrome MCP は user 同席が要る = autonomous では次段」と書いたが、**これは誤り**。
+c が `notes/meta/chatgpt_consult_via_chrome.md` のレシピを再現し、**自分で Chrome を操作して
+GPT-5.6 Sol Pro (ユーザー account 石田和 Pro、ログイン済) に E.4-dc の問題を送信成功**した
+(記録 = `notes/bg/appE_e4_dc_chatgpt_prompt.md`)。browser が connected + ChatGPT session ログイン済なら
+lane は authoritative input を**自律取得できる** (user のリアルタイム同席は不要)。
+
+c の prompt は模範的: 自己完結 (backtick/${/バックスラッシュ 無)、maximal-class setup と E.22/E.23 の
+非対称性・dc 定義を厳密に記述、自分の n=6 Jacobi 反例まで添えて Q1(dc≥1 か)・no-switch proof・
+BG "Similarly" が gap か、を問うている。GPT は推論中 (~12-19 分)、c は `isGenerating===false` を
+ScheduleWakeup ~900s で polling して回収予定。
+
+### ⚠ 次 tick の watch-item (hub)
+
+c が GPT の回答を基に E.4-dc を形式化してきたら、**hub は unsound carrier / 新仮説 / 新 axiom を厳重監査**する
+([[scaffold-sorry-free-not-done]] [[feedback-ask-chatgpt-for-elided-gaps]] の「回答厳密検証」)。
+Lean compiler が proof を検証するので誤 proof は compile しないが、**GPT の gap を埋めるために
+c が unsound な仮説/axiom を導入するリスク**が残る。c 自身も prompt header で「厳密検証してから形式化」と
+明言しているが、hub 側でも landing 時に statement の健全性 (carrier 構成可能性) を確認する。
