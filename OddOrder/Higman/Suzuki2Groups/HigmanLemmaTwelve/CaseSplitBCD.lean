@@ -496,6 +496,52 @@ theorem FactorCoordinateData.toInclusionData_theta
   | commutative d => rfl
   | noncommutative _ d => rfl
 
+/-- The factor inclusion linear map of a package: its branch `factorInclusion`
+with the bundled instances resolved.  Exposing it as a map with a clean type
+lets downstream statements avoid threading the branch quotient instances. -/
+noncomputable def FactorInclusionData.incl
+    {P : Type uP} [Group P] [Finite P] {S : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (data : FactorInclusionData S hEA ePhi hK1amb htermamb hSqamb hK0) :
+    GaloisField 2 n →ₗ[ZMod 2] Additive (lowerCentralLayer P 0) :=
+  @factorInclusion P _ (GaloisField 2 n) _ _
+    data.H data.group data.f data.N data.normal data.quotComm data.quotModule
+    hK0 data.hf data.eQuot
+
+/-- The package square law, phrased through `incl`. -/
+theorem FactorInclusionData.ambientSquare_incl
+    {P : Type uP} [Group P] [Finite P] {S : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (data : FactorInclusionData S hEA ePhi hK1amb htermamb hSqamb hK0)
+    (α : GaloisField 2 n) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralSquareMapAdditive P hSqamb (data.incl α)) =
+      α * data.theta α :=
+  data.ambientSquare α
+
 /-! ## Ambient `F × F` coordinate from two factor packages -/
 
 /-- Assemble the ambient `F × F ≃ₗ Additive L₀` isomorphism from the two factor
@@ -533,6 +579,74 @@ noncomputable def ambientProductEquivOfFactors
     (by rw [left.range_eq, right.range_eq]; exact hinf)
     (by rw [left.range_eq, right.range_eq]; exact hsup)
     (by rw [right.range_eq]; exact hΦR)
+
+/-- The assembled coordinate sends `(α, β)` to the sum of the two factor
+inclusions. -/
+@[simp]
+theorem ambientProductEquivOfFactors_apply
+    {P : Type uP} [Group P] [Finite P]
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (α β : GaloisField 2 n) :
+    ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR (α, β) =
+      left.incl α + right.incl β :=
+  rfl
+
+/-- **Higman Lemma 12 (p. 90), the ambient square in the `F × F` coordinate.**
+The ambient centre coordinate of the square of `(α, β)` decomposes as the two
+factor squares `q_X(α) = α · θ_L(α)`, `q_Y(β) = β · θ_R(β)` plus the mixed
+commutator term.  This is the `Q(α, β) = q_X(α) + q_Y(β) + M(α, β)` state feeding
+the B/C/D case split; the mixed term's case-specific value follows from the
+Frobenius weight equation. -/
+theorem ambientProductSquare_eq
+    {P : Type uP} [Group P] [Finite P]
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (α β : GaloisField 2 n) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralSquareMapAdditive P hSqamb
+          (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR (α, β))) =
+      α * left.theta α + β * right.theta β +
+        ambientCenterCoordinate hEA hK1amb htermamb ePhi
+          (lowerCentralCommutatorBilinear P (left.incl α) (right.incl β)) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  rw [ambientProductEquivOfFactors_apply,
+    centerSquareMap_add hSqamb (ambientCenterCoordinate hEA hK1amb htermamb ePhi)
+      (left.incl α) (right.incl β),
+    left.ambientSquare_incl α, right.ambientSquare_incl β]
 
 end
 
