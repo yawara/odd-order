@@ -1461,3 +1461,54 @@ BG の "Similarly" が効くのは `β ∈ B` 一般。まず **`ha` が本当�
 `AppE_AbelianCentralizer.lean` は現在 700 行台。E.4 の残り (項 5-7) は
 組合せ論と算術で嵩むので、**1500 行を超えたら新 leaf に分ける**
 (項 6-7 = `AppE_EigenvalueArithmetic.lean` 相当が自然な切れ目)。
+
+## 2026-07-20 (31): 項 5 ((E.23)) の障害を特定 — BG の "Similarly" は自明でない
+
+### 実測 1: `exists_eigenvalue_pow` の `ha : a ∈ hyp.A` 依存
+
+`eigenvalue_step` の本体は `A_regular` / `A_card` / `A_fixes_R₀` を**一切使っていない**
+(grep で 0 hit)。`ha` は `hSinv.restrict ⟨a, ha⟩` を作るためだけ。
+⟹ **作用素の一般化自体は signature 変更だけで済む** (`hSinv` を
+`IsAInvariant (hyp.act.comp hyp.A.subtype) S` から `IsAInvariant hyp.act S` に、
+`a ∈ A` を落とす)。
+
+⚠ ただし `exists_zpow_eq_mod_chain` が返す `(r : ZMod p)^q = 1` は `A` 固有
+(`exists_zpow_eq_act_of_mem_A` が `A_card = q` を使う)。(E.23) はこの clause を
+必要としないので、`β` 版では落とせばよい。
+
+### 実測 2 (原文): **(E.22) の根拠は (E.12) であって (E.16) ではない**
+
+BG p.163 の *"By (E.16) and (E.19) in Step 2"* の "(E.16)" は
+**pdftotext の誤読で、正しくは (E.12)**。根拠:
+- Step 2 の (E.16) は `|T : T₁|·|S|/p² < |S|` かつ `|T : T₁| < p²` (p.160) で、
+  固有値とは無関係。
+- (E.12) は `rᵢ ≡ r₀ rⁱ (mod p)` (p.160) で (E.22) の主張そのもの。
+⟹ **(E.22) = repo の `exists_eigenvalue_pow` で既に在る**。
+
+### ⚠ 実測 3: 本当の障害 — `β` は `R₀` を正規化しない
+
+Step 2 の帰納は `v^α = v^r` (`α` が `R₀` を保つ) を**literal に**使う
+(`eigenvalue_step` の仮説 `hr : σ v = v ^ r`)。ところが `β` は
+(E.18) により `R₀Φ(S)` を固定**しない**ので `v^β` は `v` の冪でない。
+
+`S/T ≅ Q/S'` 上では `v^β ≡ v^t (mod T)` なので `v^β = v^t · z`, `z ∈ T = H₀`。
+すると帰納の計算に誤差項 `⁅wᵢ, z⁆` が出る。これが `H_{i+2}` に入れば閉じるが、
+一般には `⁅Hᵢ, T⁆ ≤ ⁅Hᵢ, S⁆ = H_{i+1}` しか言えず、**1 段足りない**。
+
+しかも BG 自身が (E.25) で *"take `i` maximal such that `[Hᵢ, T] ⊄ H_k`"* と書くので、
+`⁅Hᵢ, T⁆` は自明に潰れる対象ではない。
+
+⟹ **BG の "Similarly one can show that (E.23)" は行間**。次の 3 択を調べる:
+1. `⁅wᵢ, T⁆ ≤ H_{i+2}` が (E.19) の `|Hᵢ : H_{i+1}| = p` と
+   `H_{i+1} = ⟨w_{i+1}, H_{i+2}⟩` から実は従う (最有力 — `Hᵢ = ⟨wᵢ⟩H_{i+1}` と
+   `⁅H_{i+1}, T⁆ ≤ H_{i+2}` は言えるので、残るのは `⁅wᵢ, T⁆` のみ)。
+2. `β` 版の chain は `v` でなく `S/T` の生成元の別の代表で回す。
+3. 誤差を `t₀` 側に吸収する形の別の帰納。
+
+📌 **次イテレーションの手順**: (a) `coq/theories/BGappendixC.v` 等に App.E 相当が
+あるか確認 (無い可能性が高い — Coq 版は FT 本体のみ)、(b) 無ければ
+[[feedback-ask-chatgpt-for-elided-gaps]] に従い自己完結プロンプトで ChatGPT (最強モデル) に
+`⁅Hᵢ, T⁆ ≤ H_{i+2}` の成否を問う、(c) 並行して選択肢 1 を Lean で直接試す。
+
+⚠ この間、**項 6-7 (組合せ + 最終算術) は (E.22)/(E.23) を仮説パラメータに取る形で
+先に組める** ([[feedback-gated-endpoint-skeleton-pattern]])。項 5 で止まらないこと。
