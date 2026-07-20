@@ -169,6 +169,27 @@ theorem sOf_subset_sSet [Finite G] (data : TypesIIIIIIVSetup M) (Y : Subgroup G)
     sOf data Y ⊆ sSet data := fun _ ⟨χ, hχ, hφ⟩ =>
   ⟨χ, xiOf_subset_xiSet data Y hχ, hφ⟩
 
+open OddOrder.Peterfalvi.S11 in
+/-- **`𝒮(⊥) = 𝒮`** (issue 1017; relocated from S15 to §11 for the (10.11) type-II consumer, issue 1048): the `⊥`-kernel demand of `𝒮(Y)` is vacuous — only
+the identity lies in `⊥`, and `1 ∈ Ker χ` always — so every `Ind_{HU}^M ξ ∈ 𝒮` already lies in
+`𝒮(⊥)`.  Generic in `data` (the collapse core extracted from the linchpin `sSet_eq_sOf_H0Cprime`);
+it identifies the degenerate `S`-instance kernel strata (`H₀ = C′ = U′ = ⊥`) with the full
+family. -/
+theorem sOf_bot_eq_sSet {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    sOf data (⊥ : Subgroup G) = sSet data := by
+  apply Set.Subset.antisymm (sOf_subset_sSet _ _)
+  rintro φ ⟨χ, hχ, rfl⟩
+  refine ⟨χ, ?_, rfl⟩
+  rw [mem_xiOf]
+  refine ⟨hχ, ?_⟩
+  intro x hx
+  have hx1 : x = 1 := by
+    have h2 := Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp (SetLike.mem_coe.mp hx))
+    rw [Subgroup.mem_bot] at h2
+    exact Subtype.ext (Subtype.ext h2)
+  rw [hx1, OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def]
+
 /-- `𝒮(Y)` is antitone in `Y` (inherited from `xiOf_antitone`). -/
 theorem sOf_antitone [Finite G] (data : TypesIIIIIIVSetup M) {Y Y' : Subgroup G} (hY : Y ≤ Y') :
     sOf data Y' ⊆ sOf data Y := fun _ ⟨χ, hχ, hφ⟩ =>

@@ -11762,3 +11762,14 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `S`, matching the book's (8.18), with the canonical-pair uses becoming one-line applications.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeP_core_order_coprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeP_escaping_centralizer_not_le_typeII
+-- **Peterfalvi (10.11) type-II collapse lemmas** (issue 1048): `H₀ = 1` + `p = |W₂|` from the two
+-- order relations `|W₂|^q = |H| = p^q·|H₀|` with both primes (`typeII_chiefFactor_H0_trivial`),
+-- and `C′ = 1` from the type-II abelian `U` (`typeII_cprimeSub_eq_bot`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeII_chiefFactor_H0_trivial
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeII_cprimeSub_eq_bot
+-- ⭐ **Peterfalvi (10.11), the type-II second assertion** (issue 1048): for a type-II maximal `M`,
+-- in the notation of Hypotheses (9.2)/(9.5), `H` is elementary abelian of order `p^q` (`p = |W₂|`)
+-- and the set `𝒮` of Hypothesis (9.5) is coherent.  The book's "…and so `C′ = 1` and
+-- `𝒮(H₀C′) = 𝒮`. Thus, by (9.11), `𝒮` is coherent" — the (9.11) step is the type-II instance
+-- `typeII_nineEleven_coherent` built in issue 1045, with the support collapsed by `sOf_bot_eq_sSet`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeII_sSet_coherent

@@ -983,4 +983,82 @@ theorem nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     (fun caseA => caseA_irrCut_two_le_ncard hG hM caseA)
     (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq hconj htau hKsupp hVsub)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (10.11), the type-II second assertion** (issue 1048): for a maximal subgroup `M`
+of type II, in the notation of Hypotheses (9.2)/(9.5), `H` is elementary abelian of order `p^q`
+with `p = |W₂|`, and the set `𝒮` of Hypothesis (9.5) is coherent.
+
+Book (p. 63): *"Suppose that `M` is of Type II.  By (9.3), `|H| = p^q`, where `p = |W₂|`.  As `p`
+is prime, (9.4) and (9.6) then show that `H₀ = 1` and that `H` is elementary abelian.  Since `M`
+is of Type II, `U` is abelian and so `C′ = 1` and `𝒮(H₀C′) = 𝒮`.  Thus, by (9.11), `𝒮` is
+coherent."*
+
+The three collapses are the §11 lemmas `typeII_chiefFactor_H0_trivial` (`H₀ = 1`, `p = |W₂|`),
+`chief.quotient_elementaryAbelian` transported along `H ≅ H/H₀` (elementary abelian), and
+`typeII_cprimeSub_eq_bot` (`C′ = 1`); the coherence is `typeII_nineEleven_coherent` (the §9-level
+(9.11), issue 1045) with its support `𝒮(H₀C′)` rewritten to `𝒮 = sSet` via `sOf_bot_eq_sSet`.
+
+`hW2prime` is the (10.11) first assertion (`S12.theorem88_caseB_prime_orders`, "case (b) of (8.8)
+holds"); `hUab` is "`U` is abelian" (`TypeIIData.U_commutative` for the canonical setup); the Dade
+inputs `h46`/`dd`/`hdd` and pins are Hypothesis (9.5)'s standing (8.15)/(4.6) data, as on the type
+III/IV route. -/
+theorem typeII_sSet_coherent [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (htypeII : OddOrder.GroupTheory.IsTypeII M)
+    (chief : ChiefFactorData (typesIIIIIIVSetup_of_isTypeII hM htypeII))
+    (hW2prime : (Nat.card ↥(typesIIIIIIVSetup_of_isTypeII hM htypeII).W2).Prime)
+    (hUab : IsMulCommutative ↥(typesIIIIIIVSetup_of_isTypeII hM htypeII).U)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub (typesIIIIIIVSetup_of_isTypeII hM htypeII))
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
+    (hconj : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
+    (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
+    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm) :
+    -- (a) `H` is elementary abelian of order `p^q` with `p = |W₂|`
+    (chief.p = Nat.card ↥(typesIIIIIIVSetup_of_isTypeII hM htypeII).W2 ∧
+      Nat.card ↥(typesIIIIIIVSetup_of_isTypeII hM htypeII).H = chief.p ^
+        (typesIIIIIIVSetup_of_isTypeII hM htypeII).q ∧
+      IsElementaryAbelian chief.p ↥(typesIIIIIIVSetup_of_isTypeII hM htypeII).H) ∧
+    -- (b) `𝒮` of Hypothesis (9.5) is coherent
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (h46.dade0.restrict Set.subset_union_left hAnorm)
+        (h46.tau.restrict Set.subset_union_left hAnorm))
+      (sSet (typesIIIIIIVSetup_of_isTypeII hM htypeII))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) := by
+  -- (1) `H₀ = 1`, `p = |W₂|`
+  obtain ⟨hpW2, hH0card⟩ := typeII_chiefFactor_H0_trivial hG chief htypeII hW2prime
+  have hH0bot : chief.H0 = ⊥ := Subgroup.card_eq_one.mp hH0card
+  -- (2) `H` elementary abelian of order `p^q`
+  have hHpq : Nat.card ↥(typesIIIIIIVSetup_of_isTypeII hM htypeII).H = chief.p ^
+      (typesIIIIIIVSetup_of_isTypeII hM htypeII).q := by
+    rw [chief.quotient_order, hH0card, mul_one]
+  have hNbot : chief.N = ⊥ := by
+    have h := chief.H0_eq
+    rw [hH0bot] at h
+    exact (Subgroup.map_eq_bot_iff_of_injective _
+      (typesIIIIIIVSetup_of_isTypeII hM htypeII).H.subtype_injective).mp h.symm
+  have hmkinj : Function.Injective (QuotientGroup.mk' chief.N) :=
+    (MonoidHom.ker_eq_bot_iff _).mp (by rw [QuotientGroup.ker_mk']; exact hNbot)
+  have hEA := chief.quotient_elementaryAbelian
+  have hHEA : IsElementaryAbelian chief.p
+      ↥(typesIIIIIIVSetup_of_isTypeII hM htypeII).H := by
+    refine ⟨fun x y => hmkinj ?_, fun x => hmkinj ?_⟩
+    · rw [map_mul, map_mul, hEA.1 (QuotientGroup.mk' chief.N x) (QuotientGroup.mk' chief.N y)]
+    · rw [map_pow, map_one, hEA.2 (QuotientGroup.mk' chief.N x)]
+  -- (3) `C′ = 1`, hence the support collapses to `𝒮`
+  have hCp : cprimeSub (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief = ⊥ :=
+    typeII_cprimeSub_eq_bot chief hUab
+  refine ⟨⟨hpW2, hHpq, hHEA⟩, ?_⟩
+  have hcoh := typeII_nineEleven_coherent hG hM htypeII chief h46 hKeq hHle hconj htau
+    hAnorm hKsupp hVsub dd hdd
+  rwa [hH0bot, hCp, sup_bot_eq, sOf_bot_eq_sSet] at hcoh
+
 end OddOrder.Peterfalvi.S11
