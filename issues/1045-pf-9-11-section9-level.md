@@ -772,7 +772,28 @@ engine を触らずに済んだ:
 ✅ **`S11.caseA_pairBound` landed** — §13 `nineElevenPairBound` から `hncH0C`/`htype` が
 消えた形。
 
-#### ⚠ ただし A vs A₀ のレベル差が残る — case A も case B と同じく descent が要る
+#### ✅ 完了 (2026-07-20): 両分岐を A₀ で回して一度だけ降ろす形に組み替えた
+
+⭐ **`sOf_nineEleven_coherent` の残パラメータは `hAbase` と `hrefuteEq` の 2 つだけ**になった
+(`hbound` は `caseA_pairBound` が内部供給、commit 65720e3e4)。
+
+- `S11.sOf_conj_apply_one` — メンバーと共役の次数は等しい (誘導指標ゆえ次数は自然数)。
+- ⟹ 降下を `sOf_caseB_coherent_restrict` → **`sOf_coherent_restrict`** に一般化
+  (`d`/`hunif` 削除)。(4.7) 評価は 2 次数の一致だけを要求し `η̄ − η` では全メンバーで
+  成り立つので、**一様次数の仮説は不要だった**。
+
+⚠ `refine ⟨sOf_coherent_restrict … ?_⟩` にすると残 goal が Type になり `rcases` が Or を
+潰せない (`Or.casesOn` は Prop へしか eliminate できない)。`Nonempty` の中で分岐して
+`.some` を渡す。
+
+#### ⛏ 残り 2 つ
+
+| param | 状態 |
+|---|---|
+| `hAbase` (degree-`qa` cut の coherence、**A₀ レベル**) | `sOf_degreeSubfamily_coherent(_restrict)` は A レベル。cut は一様次数 (`qa`) なので `S07.isCoherent_of_supportedSpan_le` で **A → A₀ に持ち上げられる** (§13 `certainTypeSet_isCoherent_A0` と同じ向き)。加えて `2 ≤ ncard` の count は露出のまま |
+| `hrefuteEq` (`CaseAEqualityRefutation`) | **本物の未完部分** (issue 9083 Phase B–E)。repo に producer 無し。算術の鎖 `S11.nineElevenCaseA_equality_refutation` は既に §9・型仮定ゼロ |
+
+#### (旧・解決済) A vs A₀ のレベル差 — case A も case B と同じく descent が要る
 
 `caseA_pairBound` は **A₀ レベル** (engine の `hyp` が `h46.dade0` なので、
 `inducedKernelFamily_*` の台の事実が `hKsupp` = `(M')^# ⊆ A₀` 経由になる)。
