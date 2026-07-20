@@ -105,6 +105,23 @@ noncomputable def frobeniusBasis (n : ℕ) (hn : n ≠ 0) :
   basisOfLinearIndependentOfCardEqFinrank (frobLin_linearIndependent n hn)
     (by rw [Fintype.card_fin, galoisField_linearMap_finrank n hn])
 
+@[simp] theorem frobeniusBasis_apply (n : ℕ) (hn : n ≠ 0) (i : Fin n) :
+    frobeniusBasis n hn i = frobLin n i := by
+  haveI : NeZero n := ⟨hn⟩
+  rw [frobeniusBasis, coe_basisOfLinearIndependentOfCardEqFinrank]
+
+/-- **The Frobenius-polynomial normal form (one variable).**  Every `ZMod 2`-
+linear endomorphism `g` of `GaloisField 2 n` is `g β = Σᵢ cᵢ · β^{2^i}`, with the
+coefficients `cᵢ` read off from the Frobenius basis. -/
+theorem frobLin_repr (n : ℕ) (hn : n ≠ 0)
+    (g : GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) (β : GaloisField 2 n) :
+    g β = ∑ i : Fin n, (frobeniusBasis n hn).repr g i •
+      (frobeniusEquiv (GaloisField 2 n) 2 ^ (i : ℕ)) β := by
+  conv_lhs => rw [← (frobeniusBasis n hn).sum_repr g]
+  rw [LinearMap.sum_apply]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [LinearMap.smul_apply, frobeniusBasis_apply, frobLin_apply]
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
