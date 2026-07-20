@@ -2270,3 +2270,135 @@ next session はここ (49) を出発点にすること。
 - **残る唯一の gap = 上記 `c_T=0` の全 level 保証** (β 側 (E.23) の真の中身)。
 
 全成果 leaf build green、AxiomsCheck フルビルド 4520 jobs green、sorry 13 (開始 14)。
+
+## 2026-07-21 (50): ⭐⭐ gap 解決 — (49) の "mixture" は誤り (clean dichotomy)、真の入力 = maximal-class 2-step centralizer relation
+
+BG 原文 (pdftotext L8158-8262, 書籍 p.162-164) と Thm 5.5 (L2934-2990, p.47)・Thm 5.3(d)
+(L2896-2915, p.46) を精読し、`AppE_EigenvalueCombinatorics.lean` の formal state
+(`caseA_eigenvalue_step` / `caseB_excluded` / `iterCommutator_commutator_iterCommutator_le`)
+と突き合わせた結果、(49) の gap は**完全に解決した**。以下 2 つの finding。
+
+### ⭐ Finding 1: (49) の「mixture」は起こり得ない — **clean な per-level 二者択一が正しい**
+
+(49) は `t_{a+1} = t_a·(t·c_Q + t₀·c_T)/(c_Q + c_T)` を「一般に混合値」と書いたが、
+**`c_Q, c_T` が両方非零になることはない**ので、混合は起こらない。厳密には:
+
+- `H_{a+1}/H_{a+2}` は位数 p (1 次元 F_p 空間) で `H` char S ゆえ β 不変 ⟹ β は**単一スカラー**
+  `t_{a+1}` として作用。
+- `⁅w_a, v_Q⁆` は β 固有値 `t_a·t` を持つ (双線形性 mod `H_{a+2}`: `w_a^β ≡ w_a^{t_a} (mod H_{a+1})`、
+  `v_Q^β ≡ v_Q^t (mod S')`、補正項は `⁅H_{a+1},S⁆·⁅H_a,S'⁆ ≤ H_{a+2}`)。同様に `⁅w_a, v_T⁆` は
+  `t_a·t₀`。
+- 両者は 1 次元 `H_{a+1}/H_{a+2}` (固有値 `t_{a+1}`) の元。**両方非零なら** `t_a·t = t_{a+1} = t_a·t₀`
+  ⟹ `t = t₀`、これは (E.21) `t ≠ t₀` に矛盾。⟹ **`c_Q, c_T` の高々一方が非零**。
+- `w_{a+1} = ⁅w_a,v⁆ ≡ g^{c_Q+c_T} ≠ 0` ゆえ両方 0 でもない ⟹ **ちょうど一方が非零**。
+
+⟹ **各 level は Case A (`c_T=0`, `t_{a+1}=t_a·t`) か Case B (`c_Q=0`, `t_{a+1}=t_a·t₀`) の
+clean な二者択一**。(48)/(43) の「per-level 二者択一」が正しく、**(49) の "mixture" 精密化は
+それ自体が誤り** (固有値の 1 次元性を見落としていた)。⟹ 既存 `caseA_eigenvalue_step` の gate
+`hCaseA : ⁅H_a,T⁆ ≤ H_{a+2}` は**正しい形**であり、mixture を心配する必要はない。埋めるべきは
+「全 level で Case A」= `hCaseA` を全 a で discharge、ただ 1 点。
+
+### ⭐ Finding 2: 真の gap = `⁅H_a, T⁆ ≤ H_{a+2}` (全 a≥1) = **candidate (C)**、その根拠 = **maximal-class の 2-step centralizer relation**
+
+BG の (E.23) `t_a = t₀·t^a` (全 a で純 Case A) ⟺ **`⁅H_a, T⁆ ≤ H_{a+2}` が全 a≥1 で成立**
+(a=0 は `⁅T,T⁆ = T' ≤ H_{k-1} ≤ H_2`、`caseB_excluded` で処理済)。これは task の candidate **(C)**
+そのもの。Case A の判定を追うと:
+
+- Case A at level a+1 ⟺ `⁅w_a, v_T⁆ ∈ H_{a+2}`。`v_T ∈ T/S' = ⟨w̄₀⟩` ゆえ `v_T ≡ w₀^c (mod S')`
+  (`c≠0`)、`⁅w_a, S'⁆ = ⁅H_a, H_1⁆ ≤ H_{a+2}` (weight bound = `iterCommutator_commutator_iterCommutator_le` の b=1)
+  なので `⁅w_a, v_T⁆ ≡ ⁅w_a, w₀⁆^c (mod H_{a+2})`。
+  ⟹ **Case A at a+1 ⟺ `⁅w_a, w₀⁆ ∈ H_{a+2}` ⟺ `⁅H_a, T⁆ ≤ H_{a+2}`** (w₀ は T/S' を張る)。
+
+**なぜ全 a≥1 で成立するか (BG が省く行間の中身)**:
+
+`S = Ω₁(R)` は E.3(b)(c) より **maximal class の p 群** (`|S/S'| = p²` = (E.7)、
+`|γ_i/γ_{i+1}| = p` for i≥2 = (E.8) `H_i = γ_{i+1}`、`|S| > p⁴` ゆえ class n≥4)。
+maximal class の上下中心列双対性 `Z_i(S) = γ_{n+1-i}(S)` より **`Z₂(S) = γ_{n-1}(S)`** (位数 p²)。
+ゆえに BG の `T = C_S(Ω₁(Z₂(S))) = C_S(γ_{n-1}(S))`。
+
+⟹ **`T` は maximal class の 2-step centralizer `S₁ = C_S(γ_2/γ_4)` に一致する**:
+`|S:T| = |S:S₁| = p` (両者 index p)、かつ `T ⊆ S₁` — なぜなら uniform 元 `x ∉ S₁` は
+`ad(x): γ_i/γ_{i+1} → γ_{i+1}/γ_{i+2}` を全 i で同型に写す (uniserial) ので
+`⁅x, γ_{n-1}⁆ = γ_n ≠ 1` ⟹ `x ∉ C_S(γ_{n-1}) = T`。⟹ `T = S₁`。
+
+maximal class の**基本関係 `⁅S₁, γ_i(S)⁆ ≤ γ_{i+2}(S)` (i≥2)** が
+`⁅T, H_a⁆ = ⁅T, γ_{a+1}⁆ ≤ γ_{a+3} = H_{a+2}` (a≥1) を与える。**これが全 level Case A の根拠**。
+BG はこれを §5 narrow 構造 (Thm 5.5 = "narrow p-group") の既知事実として省略している
+("Similarly one can show" の実体)。
+
+**soft な議論では出ない (確認済)**:
+- `⁅T, Z₂(S)⁆ = ⁅T, γ_{n-1}⁆ = 1` を基点にした three-subgroups の下降帰納は、
+  `⁅⁅T,γ_i⁆,S⁆ ≤ ⁅γ_{i+1},T⁆·⁅⁅S,T⁆,γ_i⁆` で `⁅S,T⁆ = H_1 = γ_2` ゆえ
+  `⁅γ_2,γ_i⁆ ≤ γ_{i+2}` 止まり (shift 論法に要る `γ_{i+3}` に 1 段足りない)。⟹ **閉じない**。
+- Jacobi/Hall-Witt は `⁅w_a,w₀⁆ ≡ -⁅w_{a-1},w_1⁆` 等の**恒等式 (tautology)** しか出さず、
+  値を決めない ⟹ `⁅H_a,T⁆ ≤ H_{a+2}` は S の**具体的構造定数**であって形式的帰結でない。
+- `caseB_excluded` (a=0) は `⁅T,T⁆ = T' ≤ H_{k-1} ≤ H_2` (k≥3) を使うが、a≥1 版
+  `⁅H_a,T⁆` にはこの「小ささ」の対応物が無い (issue (48) の観察は正しい)。
+
+### candidate 判定 (A-D)
+
+- **(C) が正解**: 必要十分な入力は `⁅w_a, T⁆ ≤ H_{a+2}` (= `c_T=0`) を**全 level**で、であり、
+  かつ**これは成立する** (maximal-class の 2-step centralizer relation)。BG の chain の soft な
+  性質からは出ず、S の maximal-class 構造から出る。
+- **(D) は部分的に正しい**: (49) の設定 (mixture) は BG と食い違っていた — 実際は clean dichotomy。
+  ただし修正は Finding 1 であって、量そのもの (`t_a`) の取り違えではない。
+- **(A) は不正解**: BG は 2 スロット目に確かに `v ∈ R₀` を使う (別の元ではない)。
+- **(B) は部分的**: 全 Case A の**帰結として** chain は実質 `v_Q` で駆動される
+  (`w_a ≡ ad(v_Q)^a(w₀)`) が、これは仕組まれた前提でなく 2-step relation からの**導出結果**。
+
+### Lean 化 — 次に書くべき補題 (このセッションでは landing しない)
+
+既存 scaffold は正しい形 (Finding 1)。閉じるのに要るのは:
+
+```lean
+-- (I) ★ 核心の未形式化定理: narrow (maximal-class) S の 2-step centralizer relation。
+--     T = C_S(Ω₁(Z₂(S))) = omega1UpperCentralTwo の centralizer。
+theorem RegularOperatorSetup.commutator_iterCommutator_centralizer_le
+    (hyp) {S} (…narrow/exp-p/pRank≥3 hyps…) (a : ℕ) (ha : 1 ≤ a) :
+    ⁅Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S),
+      OddOrder.Isaacs.Ch04.iterCommutator (…T…) (⊤) a⁆ ≤
+    OddOrder.Isaacs.Ch04.iterCommutator (…T…) (⊤) (a + 2)
+-- (II) それを使い、caseA_eigenvalue_step を base a=0 (⁅T,T⁆≤H_2, caseB_excluded 由来) +
+--      step (I) で帰納 → hβsupply (∀ a, ∃ s, s ≡ t₀tᵃ ∧ …) を構成。
+--      ⚠ caseA_eigenvalue_step は generator ⁅x, q·c⁆ level ゆえ、H_{a+1} 全体への拡張
+--      (S = Q'·T の分解 + commutator_sup_le_of_le/commutator_right_mul_mem_chain) が要る。
+-- (III) hβsupply を commutator_centralizer_eq_bot_of_beta_supply に渡す → E.4 abelian clause。
+```
+
+**(I) が本当の重量物**で、maximal-class 構造理論 (`T = S₁`, `⁅S₁,γ_i⁆≤γ_{i+2}`, uniserial 作用)
+の形式化を要する。repo の narrow §5 (`S05_Narrow*`) に該当補題は**無い** (grep 確認: 2-step
+centralizer / `⁅S₁,γ_i⁆≤γ_{i+2}` / uniform 元 いずれも未形式化)。⟹ (I) は
+`OddOrder/BG/Ch1_Preliminary/S05_*` への新規 infra (narrow p 群の commutator 構造) として
+数 leaf 規模。**1 セッションでは sorry-free landing 不可**ゆえ本セッションでは Lean を触らず
+(50) に補題形を残す (task 指示どおり)。
+
+⟹ 数学的 gap は**解決済** (省略されていた入力 = 標準的 maximal-class 定理と判明)。
+残るのは (I) の形式化労力であって、未解決の数学ではない。
+
+### 参照 (BG 原文 line / 書籍 page)
+
+- Prop E.4 statement: pdftotext L8158-8163, 書籍 p.162-163。`T = C_S(Z₂(S))` = L8175。
+- (E.22)/(E.23): L8204-8207, p.163。final contradiction `t₀ = t`: L8290-8296。
+- Thm 5.5 (narrow chain `H_i=[R,H_{i-1}]`, (5.4) `[R,H]⊆Z(H)`): L2934-2990, p.47。
+- Thm 5.3 (narrow の定義・`T = C_R(Ω₁(Z₂(R)))` char index p): L2896-2933, p.46。
+- Coq odd-order は BGsection1-16 + App A/B/C のみ、**App.E 相当は持たない** (grep 確認) ⟹ 参照不可。
+
+### 親 (lane c) の検証注記 (2026-07-21)
+
+- **Finding 1 は親が独立検算して正しいと確認**: 1 次元 `H_{a+1}/H_{a+2}` 上で β は単一
+  スカラー ⟹ `⁅w_a,v_Q⁆` (固有値 `t_a·t`) と `⁅w_a,v_T⁆` (`t_a·t₀`) が両方非零なら
+  `t = t₀` で (E.21) 矛盾 ⟹ 一方が 0。(49) の "mixture" は、β が各非零元に同一スカラーで
+  作用する制約を課し忘れた私 (親) の誤り。**(49) は撤回、(48)/(43) の clean 二者択一が正**。
+- **Finding 2 (maximal-class 2-step centralizer relation) は subagent の原文調査に基づく
+  finding で、親は内部整合性のみ確認 (maximal-class 構造理論 `T = S₁` / `⁅S₁,γ_i⁆≤γ_{i+2}` を
+  独立に再導出してはいない)**。次 session はこの構造定理を形式化する前に、まず
+  `references/bg/*.pdf` p.46-47 (Thm 5.3(d)/5.5) と Blackburn maximal-class 理論を
+  自分で確認すること ([[verify-subagent-effort-estimates-by-grepping-feeders.md]] の姿勢)。
+
+### ⟹ 次 session の唯一の frontier = 補題 (I) の形式化 (既知定理・未形式化)
+
+`⁅C_S(Ω₁(Z₂(S))), H_a⁆ ≤ H_{a+2}` (全 a≥1)。maximal-class p 群の 2-step centralizer
+relation。repo の `S05_Narrow*` に未形式化 (subagent grep 済) ゆえ新規 infra 数 leaf 規模。
+これが入れば `caseA_eigenvalue_step` を base+step で帰納 → `hβsupply` 構成 →
+`commutator_centralizer_eq_bot_of_beta_supply` に投入 → E.4 abelian clause が閉じ、
+`AppE_FurtherResults:1645` の sorry が消える。**開いた数学は無し**、形式化労力のみ。
