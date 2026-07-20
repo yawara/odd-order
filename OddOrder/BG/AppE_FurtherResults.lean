@@ -613,6 +613,108 @@ theorem RegularOperatorSetup.inf_eq_bot_of_three_le_pRank [Finite R]
     exact hyp.not_le_centralizer_R₀_of_three_le_pRank hS
       (hcent.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR₀Z)))
 
+/-- `R₀` viewed inside a subgroup `S` containing it still has order `p`. -/
+theorem RegularOperatorSetup.card_R₀_subgroupOf [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
+    Nat.card ↥(hyp.R₀.subgroupOf S) = p := by
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₀S).toEquiv]
+  exact hyp.R₀_card
+
+/-- `r(C_S(R₀)) ≤ 2` for any `S` containing `R₀`: the centralizer taken inside `S` embeds in
+`C_R(R₀)` along `S.subtype`, and that has rank `≤ 2` (`pRank_centralizer_R₀_le_two`).
+
+BG obtains this from the sharper `|C_S(R₀)| = p²` of (E.4); the rank bound alone is what
+Corollary 5.4 and Theorem 5.3(d) actually consume, and it needs no exponent hypothesis. -/
+theorem RegularOperatorSetup.pRank_centralizer_subgroupOf_le_two [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
+    pRank ↥(Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S)) p ≤ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set C : Subgroup ↥S :=
+    Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S) with hCdef
+  have hmem : ∀ x : ↥C, ((x : ↥S) : R) ∈ Subgroup.centralizer (hyp.R₀ : Set R) := by
+    intro x
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    have hcomm := Subgroup.mem_centralizer_iff.mp x.2 ⟨h, hR₀S hh⟩
+      (by simpa [Subgroup.mem_subgroupOf] using hh)
+    exact congrArg (fun y : ↥S => (y : R)) hcomm
+  have hcomp : Function.Injective ((S.subtype).comp C.subtype) :=
+    S.subtype_injective.comp C.subtype_injective
+  have hfinj : Function.Injective
+      (((S.subtype).comp C.subtype).codRestrict _ hmem) := fun a b hab =>
+    hcomp (congrArg (fun y : ↥(Subgroup.centralizer (hyp.R₀ : Set R)) => (y : R)) hab)
+  exact (pRank_le_of_injective hfinj).trans hyp.pRank_centralizer_R₀_le_two
+
+/-- **BG Theorem E.3(b), Step 2**: *"Note that `S` is narrow."*
+
+`R₀`, of order `p`, is a witness for Corollary 5.4
+(`Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two`). -/
+theorem RegularOperatorSetup.isNarrow_of_three_le_pRank [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    IsNarrow p ↥S := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  exact (OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS).mpr
+    ⟨hyp.R₀.subgroupOf S, hyp.card_R₀_subgroupOf hR₀S,
+      hyp.pRank_centralizer_subgroupOf_le_two hR₀S⟩
+
+/-- **BG Theorem E.3(b), Step 2, first conclusion of (E.13)**: `R₀ ⊄ S'`.
+
+BG derives this from `S = R₀T` with `S' ≤ T` and `R₀ ∩ T = 1` (E.5); in the repo the same
+content is packaged as Theorem 5.3(d) (`Ch1.S05.narrow_centralizer_decomp`), whose second
+clause is exactly `R₀ ∩ S' = 1` for a narrow `S`.  Since `|R₀| = p ≠ 1`, that forces
+`R₀ ⊄ S'`. -/
+theorem RegularOperatorSetup.not_le_derivedInG_of_three_le_pRank [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    ¬ hyp.R₀ ≤ derivedInG S := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  intro hle
+  -- Theorem 5.3(d) applied inside `↥S` with the order-`p` subgroup `R₀`.
+  have hdecomp := OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS (hyp.isNarrow_of_three_le_pRank hR₀S hS)
+    (hyp.R₀.subgroupOf S) (hyp.card_R₀_subgroupOf hR₀S)
+    (hyp.pRank_centralizer_subgroupOf_le_two hR₀S)
+  -- `R₀ ≤ S'` transports to `R₀.subgroupOf S ≤ commutator ↥S`, contradicting `⊓ = ⊥`.
+  have hsub : hyp.R₀.subgroupOf S ≤ _root_.commutator ↥S := by
+    intro x hx
+    have hxR₀ : (x : R) ∈ hyp.R₀ := hx
+    obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp (hle hxR₀)
+    exact (Subtype.ext hyx.symm : x = y) ▸ hy
+  have hbot : hyp.R₀.subgroupOf S = ⊥ :=
+    le_bot_iff.mp (hdecomp.2.1 ▸ le_inf le_rfl hsub)
+  have hcard := hyp.card_R₀_subgroupOf hR₀S
+  rw [hbot, Subgroup.card_bot] at hcard
+  exact hyp.p_prime.one_lt.ne hcard
+
+/-- **BG Theorem E.3(b), Step 2, (E.4) and the first half of (E.5)**.
+
+Applying Lemma 5.2 (`Ch1.S05.lemma52`) inside the narrow group `S`, with `Z = Ω₁(Z(S))`
+and `T = C_S(Ω₁(Z₂(S)))`:
+
+* `|Z| = p` — BG's (E.4) (BG gets it from `R₀ × Z ⊆ C_S(R₀) ⊆ R₀ × Ω₁(R₁)`);
+* `|S : T| = p` — the index clause of BG's (E.5).
+
+The maximal elementary abelian subgroup of order `p²` that Lemma 5.2 consumes is supplied by
+narrowness itself (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`), so BG's
+explicit witness `E = C_S(R₀)` — and with it the computation `|C_S(R₀)| = p²` — is not
+needed on this route. -/
+theorem RegularOperatorSetup.card_omega1Center_and_index_centralizer [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hS : 3 ≤ pRank ↥S p) :
+    Nat.card ↥(OddOrder.BG.Ch1.S05.omega1Center ↥S p) = p ∧
+      (Subgroup.centralizer
+        (omega1UpperCentralTwo ↥S p : Set ↥S)).index = p := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  obtain ⟨E, hEcard, hEstar⟩ :=
+    (OddOrder.BG.Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
+      hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS).mp
+      (hyp.isNarrow_of_three_le_pRank hR₀S hS)
+  have h := OddOrder.BG.Ch1.S05.lemma52
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS E hEcard hEstar
+  exact ⟨h.2.1.1, h.2.2⟩
+
 /-- **BG Theorem E.3(b), first clause**: `Ω₁(R)` has exponent `p`.
 
 **Status: honestly stated, not proved.**  BG's Steps 2--3: pick an `A`-invariant

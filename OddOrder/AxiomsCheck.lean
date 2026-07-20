@@ -10803,6 +10803,32 @@ rank bound on the centralizer, which is what these supply.
   OddOrder.BG.AppE.RegularOperatorSetup.not_le_centralizer_R₀_of_three_le_pRank
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.inf_eq_bot_of_three_le_pRank
 
+/-! **BG Theorem E.3(b), Step 2 — narrowness of `S` and its first conclusion `R₀ ⊄ S'`**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).  BG's Step 2 runs `SCN(S)` → `r(S) ≥ 3`
+→ *"`S` is narrow"* → Lemma 5.2 / Theorem 5.3(d) → (E.5)--(E.8).  The repo already owns §5's
+narrow machinery, so the appendix only has to feed it.
+
+* `RegularOperatorSetup.card_R₀_subgroupOf` / `…pRank_centralizer_subgroupOf_le_two` — the two
+  inputs Corollary 5.4 wants, taken inside `↥S`.  ⚠ BG gets the rank bound from the sharper
+  `|C_S(R₀)| = p²` of (E.4); we get it by monotonicity from `C_S(R₀) ≤ C_R(R₀)`, which needs
+  **no exponent hypothesis on `S`** — a genuine weakening of BG's route, not a specialisation.
+* `RegularOperatorSetup.isNarrow_of_three_le_pRank` — *"Note that `S` is narrow."*
+* `RegularOperatorSetup.not_le_derivedInG_of_three_le_pRank` — **the first conclusion of BG's
+  (E.13), `R₀ ⊄ S'`**, via clause 2 of `Ch1.S05.narrow_centralizer_decomp` (Theorem 5.3(d)),
+  which the repo had already flagged as "cited downstream by App.E E.3".
+* `RegularOperatorSetup.card_omega1Center_and_index_centralizer` — `|Ω₁(Z(S))| = p` (BG's
+  (E.4)) and `|S : C_S(Ω₁(Z₂(S)))| = p` (BG's (E.5)), from `Ch1.S05.lemma52`.  The maximal
+  elementary abelian `E` of order `p²` that Lemma 5.2 needs comes from narrowness itself, so
+  BG's witness `E = C_S(R₀)` and the computation `|C_S(R₀)| = p²` are bypassed. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_R₀_subgroupOf
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.pRank_centralizer_subgroupOf_le_two
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.isNarrow_of_three_le_pRank
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.not_le_derivedInG_of_three_le_pRank
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_omega1Center_and_index_centralizer
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

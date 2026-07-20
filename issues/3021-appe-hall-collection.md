@@ -310,3 +310,40 @@ Step 2 の**主張**: 「`S` を `R` の A-不変・指数 p・`R₀` を真に�
 Step 2 の言明が無く、E.3(b) の 3 clause が直接 sorry になっている)。Step 3 は
 「`R₀ × Ω₁(R₁)` を含む極大な A-不変指数 p 部分群 `S`」を取って Step 2 を適用し、
 `Ω₁(N_P(S))` の議論 (E.15)-(E.16) で `S = Ω₁(R)` を出す。
+
+## ⭐ 2026-07-20 (3): Step 2 の narrow 経路が通った — **`R₀ ⊄ S'` を証明**
+
+`r(S) ≥ 3` かつ `R₀ ≤ S` なる**任意の** `S ≤ R` について:
+
+| 新規宣言 | BG 対応 |
+|---|---|
+| `RegularOperatorSetup.card_R₀_subgroupOf` | `\|R₀\| = p` を `↥S` 内で |
+| `RegularOperatorSetup.pRank_centralizer_subgroupOf_le_two` | `r(C_S(R₀)) ≤ 2` |
+| `RegularOperatorSetup.isNarrow_of_three_le_pRank` | **"Note that S is narrow."** |
+| `RegularOperatorSetup.not_le_derivedInG_of_three_le_pRank` | **(E.13) 第 1 節 `R₀ ⊄ S'`** |
+| `RegularOperatorSetup.card_omega1Center_and_index_centralizer` | **(E.4) `\|Z\| = p` + (E.5) `\|S:T\| = p`** |
+
+### ⚠ BG より弱い仮説で通った (特殊化債務でなく一般化)
+
+BG は `r(C_S(R₀)) ≤ 2` を **(E.4) の `\|C_S(R₀)\| = p²`** から出すが、こちらは
+`C_S(R₀) ≤ C_R(R₀)` の**単調性**だけで出る。⟹ **`S` の指数 p 仮説が要らない**。
+同じ理由で Lemma 5.2 が要求する「位数 p² の極大 elementary abelian `E`」は
+narrow 性から直接取れる (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`) ので、
+BG の witness `E = C_S(R₀)` と `\|C_S(R₀)\| = p²` の計算は**丸ごと迂回できる**。
+
+⟹ 当初の計画にあった「(E.4) の `R₀ × Z ⊆ C_S(R₀) ⊆ R₀ × Ω₁(R₁)` を形式化する」は
+**Step 2 の経路上では不要**と判明。`Ω₁(R₁)` の位数 p 計算も現時点では不要
+(必要になるのは Step 3 の極大性議論で `R₀ × Ω₁(R₁)` を種にするとき)。
+
+### 残る Step 2 の穴 (次に着手する順)
+
+1. **`|S| ≤ p³` の分岐** — BG「位数 p³ 以下の p 群を検査せよ」。上の結果は全部
+   `r(S) ≥ 3` (⟸ `|S| > p³` + 指数 p) 下でのみ効くので、Step 2 を無条件の定理にするには
+   この小位数分岐が要る。`S04_PGroupsSmallRank.lean` に使える形があるか要実測。
+2. **(E.6) Thm 5.5 の A-不変列** `T = H₀ ⊃ … ⊃ Hₙ = 1`, `H_i = [R₀,H_{i-1}]`,
+   `|H_{i-1}:H_i| = p` — `S05_NarrowAutomorphisms.lean:418` 以降。
+3. **(E.7)(E.8)** `H₁ = S₂`, `|S/S'| = p²`, 帰納で `H_i = S_{i+1}`。
+   ⟹ E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²` の出所。
+4. **(E.9)-(E.12)** 固有値 `r_i ≡ r₀ r^i`、`A` regular + Prop 1.5(d) ⟹ `r_i ≢ 1`、
+   `r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| ≤ p^q`。⟹ **E.3(c)** の出所。
+5. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
