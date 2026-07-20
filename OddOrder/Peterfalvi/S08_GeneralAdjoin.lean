@@ -71,6 +71,20 @@ theorem zSpan_subset_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
       apply ht
       rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hx0, mul_zero]
 
+/-- **A §7 coherence `Hypothesis` supplies the general adjoin's `hisom`** (with `Samb = S`).  The
+`(5.2)(b)` lattice isometry `tau_isometry_diff` preserves `⟨·,·⟩` on all of `ℤ[S, A]`; combined with
+`zSpan_subset_zSupportedSpan`, this discharges the `hisom` argument of `adjoinPairCoherent_general`
+(and the two sub-engines) whenever the difference sets it is applied to have their endpoints in `S`.
+This is what makes the general adjoin usable from the abstract Feit–Sibley hypothesis (issue 1049);
+the Dade application supplies the same `hisom` from the supported-span inner-preservation lemma. -/
+theorem Hypothesis.adjoin_hisom {S : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis (L := L) (G := G) S A)
+    (T : Set (ClassFunction L ℂ)) (hT : ∀ s ∈ T, s ∈ zSupportedSpan (L := L) S A)
+    (φ ζ : ClassFunction L ℂ) (hφ : φ ∈ Submodule.span ℤ T) (hζ : ζ ∈ Submodule.span ℤ T) :
+    ClassFunction.inner (hyp.tau φ) (hyp.tau ζ) = ClassFunction.inner φ ζ :=
+  hyp.tau_isometry_diff (zSpan_subset_zSupportedSpan hT hφ) (zSpan_subset_zSupportedSpan hT hζ)
+
 /-! ### The general cross-term (helper 1) -/
 
 /-- **General cross-term `⟨τ u, ν δ⟩ = ⟨u, δ⟩`** (generalizes `inner_dade_extension_of_supported`,
@@ -116,14 +130,15 @@ In the abstract application (Feit–Sibley, Isaacs 7.14) it is supplied from
 the honest replacement for the four Dade-specific helpers of `xAdjoinStep` (issue 1049). -/
 noncomputable def retarget_isCoherent_of_extensionImage_general
     {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    {Samb : Set (ClassFunction L ℂ)}
     [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
-    (hS₁ : IsCoherent τ S₁ A)
+    (hS₁ : IsCoherent τ S₁ A) (hS₁Samb : S₁ ⊆ Samb)
     {χ chi1 : ClassFunction L ℂ} {a : ℕ}
-    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s.support ⊆ A) →
+    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s ∈ zSupportedSpan (L := L) Samb A) →
       ∀ φ ζ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
         ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
-    (hdiffsupp : (χ.conj - χ).support ⊆ A)
-    (hdiffasupp : (χ - a • chi1).support ⊆ A)
+    (hdiffmem : χ - χ.conj ∈ zSupportedSpan (L := L) Samb A)
+    (hadiffmem : χ - a • chi1 ∈ zSupportedSpan (L := L) Samb A)
     (hχχ : ClassFunction.inner χ χ = 1)
     (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)
     (hχχbar : ClassFunction.inner χ χ.conj = 0)
@@ -149,12 +164,13 @@ noncomputable def retarget_isCoherent_of_extensionImage_general
   have hchi1χbar : ClassFunction.inner chi1 χ.conj = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbarchi1, star_zero]
   -- The supported difference set `{χ−χ̄, χ−a·χ₁}` and the isometry of `τ` on it.
-  have hSdiff : ∀ s ∈ ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)), s.support ⊆ A := by
+  have hSdiff : ∀ s ∈ ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)),
+      s ∈ zSupportedSpan (L := L) Samb A := by
     intro s hs
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
     rcases hs with rfl | rfl
-    · rw [show χ - χ.conj = -(χ.conj - χ) from by abel, ClassFunction.support_neg]; exact hdiffsupp
-    · exact hdiffasupp
+    · exact hdiffmem
+    · exact hadiffmem
   have hmemu : χ - a • chi1 ∈
       Submodule.span ℤ ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)) :=
     Submodule.subset_span (by simp)
@@ -244,11 +260,12 @@ noncomputable def retarget_isCoherent_of_extensionImage_general
             IntegralCharacterMap.inner_eq_zero_of_mem_zSpan hχ_S1 hmem.1
           have hyχ : ClassFunction.inner y χ = 0 := by
             rw [OddOrder.RepresentationTheory.inner_conj_symm, hχy, star_zero]
-          have hySdiff : ∀ s ∈ ({y, χ - a • chi1} : Set (ClassFunction L ℂ)), s.support ⊆ A := by
+          have hySdiff : ∀ s ∈ ({y, χ - a • chi1} : Set (ClassFunction L ℂ)),
+              s ∈ zSupportedSpan (L := L) Samb A := by
             intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
             rcases hs with rfl | rfl
-            · exact hmem.2
-            · exact hdiffasupp
+            · exact zSupportedSpan_mono_left hS₁Samb hsupp
+            · exact hadiffmem
           rw [hνy, hisom _ hySdiff y (χ - a • chi1) (Submodule.subset_span (by simp))
             (Submodule.subset_span (by simp)), ← Nat.cast_smul_eq_nsmul ℂ a chi1]
           simp only [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
@@ -284,12 +301,12 @@ noncomputable def retarget_isCoherent_of_extensionImage_general
             rw [OddOrder.RepresentationTheory.inner_conj_symm, hχy, star_zero]
           have hyχbar : ClassFunction.inner y χ.conj = 0 := by
             rw [OddOrder.RepresentationTheory.inner_conj_symm, hχbary, star_zero]
-          have hySdiff : ∀ s ∈ ({y, χ - χ.conj} : Set (ClassFunction L ℂ)), s.support ⊆ A := by
+          have hySdiff : ∀ s ∈ ({y, χ - χ.conj} : Set (ClassFunction L ℂ)),
+              s ∈ zSupportedSpan (L := L) Samb A := by
             intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
             rcases hs with rfl | rfl
-            · exact hmem.2
-            · rw [show χ - χ.conj = -(χ.conj - χ) from by abel, ClassFunction.support_neg]
-              exact hdiffsupp
+            · exact zSupportedSpan_mono_left hS₁Samb hsupp
+            · exact hdiffmem
           rw [hνy, hisom _ hySdiff y (χ - χ.conj) (Submodule.subset_span (by simp))
             (Submodule.subset_span (by simp))]
           simp only [ClassFunction.inner_sub_right, hyχ, hyχbar, sub_zero]
@@ -474,27 +491,28 @@ whose inner-preservation is needed only on the supported **difference** lattice 
 (`hisom`), and the `ZIrr`-membership only on `χ − a·χ₁` (`hτaχ1Z`).  Works for an unsupported `χ`
 (e.g. `χ = Ind θ`). -/
 noncomputable def decompositionDaFromDiff_general
-    {τ : IntegralCharacterMap L G} {A : Set L}
+    {τ : IntegralCharacterMap L G} {A : Set L} {Samb : Set (ClassFunction L ℂ)}
     [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     {χ chi1 : ClassFunction L ℂ} {a : ℕ}
     (imageFamily : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
-    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s.support ⊆ A) →
+    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s ∈ zSupportedSpan (L := L) Samb A) →
       ∀ φ ζ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
         ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
-    (hdiffsupp : (χ.conj - χ).support ⊆ A)
-    (hdiffasupp : (χ - a • chi1).support ⊆ A)
+    (hdiffmem : χ - χ.conj ∈ zSupportedSpan (L := L) Samb A)
+    (hadiffmem : χ - a • chi1 ∈ zSupportedSpan (L := L) Samb A)
     (hτaχ1Z : τ (χ - a • chi1) ∈ ZIrr G)
     (hχaχ1 : ClassFunction.inner χ (a • chi1 : ClassFunction L ℂ) = 0)
     (hχbaraχ1 : ClassFunction.inner χ.conj (a • chi1 : ClassFunction L ℂ) = 0)
     (hχχbar : ClassFunction.inner χ χ.conj = 0) :
     CharacterPsiDecomposition (L := L) (G := G) τ χ (a • chi1) := by
   classical
-  have hSdiff : ∀ s ∈ ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)), s.support ⊆ A := by
+  have hSdiff : ∀ s ∈ ({χ - χ.conj, χ - a • chi1} : Set (ClassFunction L ℂ)),
+      s ∈ zSupportedSpan (L := L) Samb A := by
     intro s hs
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
     rcases hs with rfl | rfl
-    · rw [show χ - χ.conj = -(χ.conj - χ) from by abel, ClassFunction.support_neg]; exact hdiffsupp
-    · exact hdiffasupp
+    · exact hdiffmem
+    · exact hadiffmem
   exact CharacterPsiDecomposition.ofProjection imageFamily τ
     (fun φ ζ hφ hζ => hisom _ hSdiff φ ζ hφ hζ)
     rfl hτaχ1Z hχaχ1 hχbaraχ1 hχχbar
@@ -518,15 +536,16 @@ The lattice isometry `hisom` (in the Dade version drawn from
 `Hypothesis.tau_isometry_diff`) is the sole "isometry" input.  Everything else reduces to the
 general leaf lemmas above and in §5/§6.  See issue 1049. -/
 noncomputable def adjoinPairCoherent_general
-    {τ : IntegralCharacterMap L G} {A : Set L}
+    {τ : IntegralCharacterMap L G} {A : Set L} {Samb : Set (ClassFunction L ℂ)}
     [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     {S₁ : Set (ClassFunction L ℂ)}
-    (hS₁ : IsCoherent τ S₁ A)
-    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s.support ⊆ A) →
+    (hS₁ : IsCoherent τ S₁ A) (hS₁Samb : S₁ ⊆ Samb)
+    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s ∈ zSupportedSpan (L := L) Samb A) →
       ∀ φ ζ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
         ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
     {χ : ClassFunction L ℂ}
     (Rχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hχSamb : χ ∈ Samb) (hχbarSamb : χ.conj ∈ Samb)
     (hdiffsuppχ : (χ.conj - χ).support ⊆ A)
     (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)
     (hχχbar : ClassFunction.inner χ χ.conj = 0) (hχbarχ : ClassFunction.inner χ.conj χ = 0)
@@ -561,9 +580,21 @@ noncomputable def adjoinPairCoherent_general
   have hχbaraχ1 : ClassFunction.inner χ.conj (a • χmem i₁ : ClassFunction L ℂ) = 0 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁),
       OddOrder.RepresentationTheory.inner_smul_right, hχbar_S1 _ (hmemS1 i₁ hi₁), mul_zero]
+  -- The two adjoined differences land in `ℤ[Samb, A]` (from the containments + supports).
+  have hdiffmem : χ - χ.conj ∈ zSupportedSpan (L := L) Samb A :=
+    mem_zSupportedSpan_iff.mpr
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hχSamb) (Submodule.subset_span hχbarSamb), by
+        rw [show χ - χ.conj = -(χ.conj - χ) from by abel, ClassFunction.support_neg]
+        exact hdiffsuppχ⟩
+  have hadiffmem : χ - a • χmem i₁ ∈ zSupportedSpan (L := L) Samb A :=
+    mem_zSupportedSpan_iff.mpr
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hχSamb) (by
+        rw [← Nat.cast_smul_eq_nsmul ℤ a (χmem i₁)]
+        exact Submodule.smul_mem _ _ (Submodule.subset_span (hS₁Samb (hmemS1 i₁ hi₁)))),
+        hdiffasuppχ⟩
   -- The χ-decomposition `Da` for `χ − a·χ₁` (`let`, so `Da.imageFamily`/`Da.tau1` reduce).
-  let Da := decompositionDaFromDiff_general (τ := τ) Rχ.toOrthonormalImage hisom hdiffsuppχ
-    hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar
+  let Da := decompositionDaFromDiff_general (τ := τ) (Samb := Samb) Rχ.toOrthonormalImage hisom
+    hdiffmem hadiffmem htau1_memaχ hχaχ1 hχbaraχ1 hχχbar
   have hDaX_ZIrr : Da.X ∈ ZIrr G := by
     rw [Da.X_eq]
     refine Submodule.sum_mem _ (fun α hα => ?_)
@@ -599,8 +630,8 @@ noncomputable def adjoinPairCoherent_general
       (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
     intro t ht; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ht
     rcases ht with rfl | rfl
-    · exact hdiffasuppχ
-    · exact hmemdegdiffsupp i hi
+    · exact hadiffmem
+    · exact zSupportedSpan_mono_left hS₁Samb hδmem
   have hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y (hS₁.extension (χmem i)) =
       (a : ℂ) * (if i = i₁ then 1 else 0) -
         ((a : ℂ) + ClassFunction.inner (τ (χ - a • χmem i₁))
@@ -625,7 +656,7 @@ noncomputable def adjoinPairCoherent_general
   have hτdiffZ : τ (χ - χ.conj) ∈ ZIrr G := by
     rw [Da.imageFamily.image_eq]
     exact Submodule.sum_mem _ (fun α hα => Da.imageFamily.mem_ZIrr α hα)
-  exact retarget_isCoherent_of_extensionImage_general hS₁ hisom hdiffsuppχ hdiffasuppχ
+  exact retarget_isCoherent_of_extensionImage_general hS₁ hS₁Samb hisom hdiffmem hadiffmem
     hχχ hχbarχbar hχχbar hχbarχ (m₁ := 1) (by rw [hchi1chi1]; norm_num) hχ_S1 hχbar_S1
     (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ (by rw [hcrux1]; norm_num) hcrux2 hSgen hgen
 
