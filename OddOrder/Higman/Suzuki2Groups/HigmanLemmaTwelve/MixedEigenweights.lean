@@ -411,6 +411,40 @@ theorem one_tmul_mem_span_factorAmbientEigenFamily
     (iota.baseChange F) hmem
   rwa [LinearMap.baseChange_tmul] at this
 
+/-- A ground tensor `1 ⊗ w` is nonzero whenever `w` is, read off the nonzero
+Frobenius coordinate in the conjugate basis. -/
+theorem one_tmul_ne_zero_of_ne_zero
+    (e : Q ≃ₗ[ZMod 2] F) {w : Q} (hw : w ≠ 0) :
+    (1 : F) ⊗ₜ[ZMod 2] w ≠ 0 := by
+  intro h0
+  have hsum :
+      ∑ i : Fin (Module.finrank (ZMod 2) F),
+          (e w) ^ (2 ^ i.val) • conjugateTensorBasisOfLinearEquiv F e i = 0 := by
+    rw [← one_tmul_eq_sum_conjugateTensorBasisOfLinearEquiv F e w]; exact h0
+  have hcoeff := Fintype.linearIndependent_iff.mp
+    (conjugateTensorBasisOfLinearEquiv F e).linearIndependent
+    (fun i => (e w) ^ (2 ^ i.val)) hsum
+  have hpos : 0 < Module.finrank (ZMod 2) F := Module.finrank_pos
+  have hi := hcoeff ⟨0, hpos⟩
+  simp only [Fin.val_mk, pow_zero, pow_one] at hi
+  exact hw (e.injective (by rw [hi, map_zero]))
+
+/-- The base-changed ambient bracket is nonzero on `1 ⊗ a`, `1 ⊗ b` whenever
+the actual bracket of `a`, `b` is nonzero. -/
+theorem lowerCentralCommutatorBilinearBaseChange_one_tmul_ne_zero
+    (a b : Additive (lowerCentralLayer P 0))
+    (e : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] F)
+    (hab : lowerCentralCommutatorBilinear P a b ≠ 0) :
+    lowerCentralCommutatorBilinearBaseChange F P
+        ((1 : F) ⊗ₜ[ZMod 2] a) ((1 : F) ⊗ₜ[ZMod 2] b) ≠ 0 := by
+  have hval : lowerCentralCommutatorBilinearBaseChange F P
+        ((1 : F) ⊗ₜ[ZMod 2] a) ((1 : F) ⊗ₜ[ZMod 2] b) =
+      (1 : F) ⊗ₜ[ZMod 2] lowerCentralCommutatorBilinear P a b := by
+    unfold lowerCentralCommutatorBilinearBaseChange
+    rw [LinearMap.BilinMap.baseChange_tmul, one_mul]
+  rw [hval]
+  exact one_tmul_ne_zero_of_ne_zero e hab
+
 end EigenFamily
 
 end
