@@ -57,6 +57,17 @@ theorem frobenius_powers_linearIndependent
       (pow_injOn_Iio_orderOf (Set.mem_Iio.mpr hlt_i) (Set.mem_Iio.mpr hlt_j) hpow)
   exact hli.comp _ hinj
 
+/-- The `GaloisField 2 n`-dimension of the `ZMod 2`-linear endomorphisms of
+`GaloisField 2 n` is `n`.  Combined with `frobenius_powers_linearIndependent`
+(the `n` Frobenius powers are independent) this shows the Frobenius powers form a
+basis, hence every `ZMod 2`-linear map is a unique Frobenius polynomial. -/
+theorem galoisField_linearMap_finrank (n : ℕ) (hn : n ≠ 0) :
+    Module.finrank (GaloisField 2 n) (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) = n := by
+  rw [Module.finrank_linearMap (ZMod 2) (GaloisField 2 n) (GaloisField 2 n)
+      (GaloisField 2 n),
+    Module.finrank_self, mul_one]
+  exact GaloisField.finrank 2 hn
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
