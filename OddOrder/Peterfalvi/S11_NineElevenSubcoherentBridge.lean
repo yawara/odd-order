@@ -744,10 +744,14 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `S13.NineElevenSevenEightRefutation`.
 
 This is the residual to which §13 reduces the whole case (9.7.a) equality configuration: in the
-(9.11.6) dichotomy's *zero* branch, `α^τ ⊥ 𝒮₃^{τ₃}`, and this carrier is what refutes it.  §13
-discharges it (`S13.nineElevenSevenEightRefutation`), so the §9 chain can be closed the same way
-once the producers are descended — the type hypothesis there is the usual one-line
-`hyp.C = cSub` dictionary, definitional here. -/
+(9.11.6) dichotomy's *zero* branch, `α^τ ⊥ 𝒮₃^{τ₃}`, and this carrier is what refutes it.
+
+⚠ Unlike `S13.NineElevenSevenEightRefutation`, the norm value `N = ‖α‖²` of (9.11.4) is taken as a
+parameter (`hnorm`).  The §13 producer rebuilds the whole `γ = Ind_{HU₁}^M 1` context a second time
+just to recover it for the `𝒮₄ ≠ ∅` step; here the only consumer
+(`caseA_normBound_of_sevenEightRefutation`) already has `N` and its Mackey identity in scope at the
+point of use, so passing it removes the duplication.  This matches the book, where (9.11.7) is
+argued inside the (9.11.4)–(9.11.6) context. -/
 def CaseASevenEightRefutation [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
     (caseA : CliffordCaseAData chars)
@@ -772,6 +776,8 @@ def CaseASevenEightRefutation [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSe
         OddOrder.Peterfalvi.S07.sumnS F
           ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ)) →
       (∀ χ ∈ S₂, (χ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ)) →
+      ∀ N : ℕ,
+        N * chars.u = (caseA.a + 1) * chars.u + (data.q - 1) * caseA.a ^ 2 →
       ∀ c₃ : OddOrder.Peterfalvi.S07.IsCoherent tau
         (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂) A0,
       ∀ γ ψ₁ : ClassFunction ↥M ℂ,

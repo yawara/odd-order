@@ -1113,6 +1113,53 @@ support は**明示パラメータ**で取るのが素直 (S15 の honest 版は
 (`inducedFamily_degreeSubfamily_isCoherent`) に実依存する。
 書籍ではそこが (8.15.3) 経由 ⟹ `S10.typePACore_subcoherent` で置換できる見込み。
 
+#### ⭐⭐ 完了 (2026-07-20): (9.11) の §9 版が **case (9.7.a) 込みで完全証明**になった
+
+残っていた最後の producer `S13.nineElevenSevenEightRefutation` (~420 行) を §9 へ降ろし、
+`S11.caseA_sevenEightRefutation` として landed。これで `hrefuteEq` が discharge され、
+新しい endpoint **`S11.sOf_nineEleven_coherent_of_count`** が立った:
+
+```
+sOf_nineEleven_coherent_of_count          ⭐ (9.11) §9 版・型仮定ゼロ
+ ← caseA_equalityRefutation                (= hrefuteEq、issue 9083 Phase B–E)
+     ← caseA_sTwoExtraction                 (既存)
+     ← caseA_normBound                      (新)
+         ← caseA_normBound_of_sevenEightRefutation  (前 commit)
+         ← caseA_sevenEightRefutation                (本 commit ⭐)
+```
+
+残パラメータは `dd`/`hdd` ((8.15) Dade datum の pin) と `h2` (`2 ≤ ncard`) のみ。
+どちらも未完の数学ではない ((9.8.d) は存在しか与えないので `h2` の露出は honest で、
+`S15.Hypothesis.sSetIrrDeg_coherent` と同じ流儀)。全宣言 axiom-clean、AxiomsCheck 登録済。
+
+**降ろし方は予告どおり**: `htype`/`hncH0C` の実質的使用は `𝒮₄ ⊆ 𝒮₃` のための
+`H₀C′ ≤ H₀C` 1 箇所だけで、§9 では `chars.C` が `cSub data chief` と定義的に等しいので消えた。
+
+新規に要した §9 部品 2 本 (`S11_NineElevenRFamily` へ):
+- `sOf_coherent_extension_eq_sum_memberRFamily` — (5.5) の coherent extension 版 (stratum-generic)
+- `sOf_coherent_extension_cross_orthogonal` — Coq `coherent_ortho`
+
+**設計変更 1 件**: `CaseASevenEightRefutation` に (9.11.4) の norm 値 `N` とその Mackey 等式を
+パラメータで追加した。§13 は `𝒮₄ ≠ ∅` を出すためだけに `γ = Ind_{HU₁}^M 1` の文脈を
+**2 度目に丸ごと組み直している** (`caseA_nineElevenFour_norm_inputs` ~130 行) が、§9 では唯一の
+consumer `caseA_normBound_of_sevenEightRefutation` が呼び出し地点で既に `N`/`hNu` を持っている。
+書籍でも (9.11.7) は (9.11.4)–(9.11.6) の文脈の内側の議論なので、渡す方が忠実。
+
+**再層化 1 件 (新 leaf)**: `S11_NineElevenPairAdjoin.lean` (namespace S13) の
+`UnionPair` 節 (Pf (5.6.3) の union-pair coherent extension) と `ProjectionBudget` 節
+((9.11.7)–(9.11.8) の射影予算) は **群論的構造を一切参照しない** (`{L Γ'}` の直交族と
+`IntegralCharacterMap` と整数性だけ) のに §13 の closure に在り、§9 から使えなかった。
+新 leaf `OddOrder/Peterfalvi/S07_UnionPairBridge.lean` (namespace S07、640 行) へ移設。
+呼び出し 4 箇所 (§13 の Discharge + §15 の S/T ミラー 2 本) と AxiomsCheck 3 件を修飾し直した。
+`S11_NineElevenPairAdjoin.lean` は 1314 → 719 行。
+
+⚠ 新 leaf 2 本 (`S07_UnionPairBridge` / 前 commit の `S11_NineElevenCaseAResidual`) を
+`OddOrder.lean` に配線した (issue 0135 の規律)。到達性 851/851、orphan ゼロ。
+full build green (4566 jobs)、AxiomsCheck OK、sorry 14 (非退行 — 全て他レーン所管の Appendices/BG)。
+
+⟹ 着手順の 1・2 は完了。残りは **3 (§13 側 `coherent_sOf_H0Cprime` を §9 版の系にする)** と
+**4 (型 II instance)**。
+
 ## 着手順 (残り)
 
 1. **§9 レベルの (9.11) statement を立てる** — `(data : TypesIIIIIIVSetup M)`

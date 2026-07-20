@@ -10225,8 +10225,8 @@ capstones `coherent_sOf_H0Cprime` / `coherent_sOf_H0C` were long annotated here 
 "pre-existing upstream `C_eq_cSub` sorryAx debt".  **That note was stale** (2026-07-19 lane a,
 verified by `#print axioms`): all three depend only on `propext` / `Classical.choice` /
 `Quot.sound`, so they are pinned below together with the (9.11) capstones. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.unionPairExtension
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.isCoherent_union_pair_of_bridge
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.unionPairExtension
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.isCoherent_union_pair_of_bridge
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_eq_sum_memberRFamily
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_cross_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.nineElevenSevenEightRefutation
@@ -10234,7 +10234,7 @@ verified by `#print axioms`): all three depend only on `propext` / `Classical.ch
   OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_equality_refutation
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0C
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.exists_bridge_target_of_budget
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.exists_bridge_target_of_budget
 
 /-! **Peterfalvi (8.13), axiom-clean** (lane a, 2026-07-12).  The escaping-centralizer control:
 for `X = A₁(M)` (any Peterfalvi type) or the type-`P₁` `A₀(M)` (`typePA0`; the `P₁` restriction
@@ -11675,3 +11675,42 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- **No `hncH0C`/`htype`** — §13 threads them only into Phases B and C, and both shed them here.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.caseA_equalityRefutation_of_sTwoExtraction_normBound
+-- **(5.5) for coherent extensions, at §9 level** — a coherent extension evaluates a member as a
+-- partial `R`-family sum.  The §9 form of `S13.coherent_extension_eq_sum_memberRFamily`: `ψ ≠ ψ̄`
+-- and the supportedness of `ψ − ψ̄` come from `hKsupp` and odd order rather than the packaging's
+-- `mderivSharp_subset_A0`, so no type hypothesis appears.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.sOf_coherent_extension_eq_sum_memberRFamily
+-- **`coherent_ortho` cross-orthogonality, at §9 level** — images of members of two coherent
+-- subfamilies of `𝒮(Y)` with `⟨ψ, λ⟩ = ⟨ψ, λ̄⟩ = 0` are orthogonal, via (5.5) on both sides plus
+-- the (5.2.e) dispatch `sOf_memberRFamily_orthogonal`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.sOf_coherent_extension_cross_orthogonal
+-- **The union-pair coherent extension** (Peterfalvi (5.6.3); Coq `extend_coherent_with` +
+-- `bridge_coherent`) and **the (9.11.7)–(9.11.8) projection budget** — moved out of
+-- `S11_NineElevenPairAdjoin` (namespace `S13`) to `S07_UnionPairBridge` (issue 1045): neither
+-- statement mentions §9 or §13 data, and the §9-level (9.11) chain needs them without importing
+-- the §11/§13 packaging closure.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.unionPairExtension
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.isCoherent_union_pair_of_bridge
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.exists_bridge_target_of_budget
+-- **(9.11.7)–(9.11.8) discharged at §9 level** — the last §13 producer of the case (9.7.a) chain,
+-- descended.  In the (9.11.6) zero branch pick `λ₁ ∈ 𝒮₄` (nonempty, else the arithmetic spine
+-- already refutes), set `e = u/a ≥ 2` and `β = λ₁ − e·ψ₁`; the projection budget over `𝒮₂^{τ₁}`
+-- and `𝒮₄^{τ₃}` yields the bridge target `Γ`, and the union-pair extension adjoins `{λ₁, λ̄₁}`
+-- coherently to `𝒮₂`, contradicting `hpairs`.  §13's `hncH0C`/`htype` served the single
+-- `hyp.C = cSub` rewrite inside `𝒮₄ ⊆ 𝒮₃`, definitional here; the (9.11.4) norm value arrives as
+-- the carrier's `hnorm` instead of being rebuilt from `γ`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_sevenEightRefutation
+-- **(9.11.4)–(9.11.8) norm bound, discharged at §9 level** — the residual `h78` supplied.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_normBound
+-- **(9.11.2)–(9.11.8) equality refutation, discharged at §9 level** — issue 9083 Phases B–E, at
+-- §9.  This is the `hrefuteEq` that `sOf_nineEleven_coherent` exposed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_equalityRefutation
+-- ⭐ **Peterfalvi (9.11) at §9 level with the case (9.7.a) residual discharged** (issue 1045):
+-- `𝒮(H₀C′)` is coherent for the Hypothesis-(9.5) Dade isometry `τ = (A(M), M, G)`, stated on
+-- `TypesIIIIIIVSetup` + `ChiefFactorData` + `Section11CharacterData` — Hypotheses (9.2), (9.4),
+-- (9.5) — hence **valid for types II, III and IV alike**, as the book states it.  What stays
+-- parametric is not open mathematics: `dd`/`hdd` are the (8.15) Dade datum and its pin to the
+-- (4.6) restriction, and `h2` is the `2 ≤ ncard` count that (9.8.d) supplies only as existence.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent_of_count

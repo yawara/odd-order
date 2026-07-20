@@ -311,6 +311,7 @@ import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S07_PivotCoherence
+import OddOrder.Peterfalvi.S07_UnionPairBridge
 import OddOrder.Peterfalvi.S07_RetargetScaled
 import OddOrder.Peterfalvi.S07_Subcoherent
 import OddOrder.Peterfalvi.S08_CoherenceCore
@@ -370,6 +371,7 @@ import OddOrder.Peterfalvi.S11_NineElevenMackeyNorm
 import OddOrder.Peterfalvi.S11_NineElevenTIWitness
 import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
 import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
+import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S12_Noncoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
