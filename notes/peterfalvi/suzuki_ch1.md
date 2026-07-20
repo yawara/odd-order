@@ -803,3 +803,26 @@ bed408915 (Q 分解)。
    `ambientProductExtension hK0 (ambientProductEquivOfFactors …) ePhi` を
    `TypeB/C/DData.ofExtension` の hsq に渡す → `higmanLemmaTwelve`。
    hsq ⟺ `ePhi(⟨x²⟩)=q_BCD(coord)`、LHS=Q は `ambientCenterCoordinate_squareMap` 系。
+
+### 2026-07-21 lane b (autonomous tick): coordinate→hsq bridge 全通 (glue 完成)
+
+上記 step 2 の「hsq への glue」を case-independent に完成
+(`ambientProductExtension_rightHom_toAdd`/`_inl_ofAdd` 座標補題 →
+`ambientProductExtension_hsq_of_coordinate`、commit c8b767909 + 前置の座標補題 commit)。
+CaseSplitBCD 741 行、全 axiom-clean。
+
+- **座標補題** (rfl): `(rightHom x).toAdd = e⁻¹(ofMul(fqe(mk x)))` /
+  `inl(ofAdd f) = subtype(toMul(ePhi⁻¹ f))`。wrapper `toMultiplicativeRight/Left`
+  の apply は全 defeq。
+- **glue** `ambientProductExtension_hsq_of_coordinate`: 仮説
+  `hQ : ∀ w, ambientCenterCoordinate(sq(e w)) = q w` (= 各 case の結論 Q=q_target) から
+  `hsq : x² = inl(ofAdd(q(rightHom x)))` を導く。座標 chase の鍵 =
+  `Additive.ofMul(fqe(mk x)) = layerZeroClass(lctzea⁻¹ x)` (congr で defeq) +
+  `ambientCenterCoordinate_squareMap` + `(lctzea⁻¹ x : P)=x` (rfl)。
+
+**⟹ 残るは step 1 (mixed 項 M の case 別値) のみが実質未着手**。M を確定すれば
+各 case で Q=q_X+q_Y+M=q_target を示し、`hQ` に食わせて glue → ofExtension →
+`higmanLemmaTwelve`。M の確定は Higman pp.90-92 の core (BilinearEigenweight
+機構 + weight 方程式の i,j,k case split) で最深部。次 tick はここに fresh に当たる。
+接続先: `M(α,β)=ambientCenterCoordinate(lowerCentralCommutatorBilinear P (left.incl α)(right.incl β))`
+と `lowerCentralCommutatorBilinearBaseChange`/`BilinearEigenweight.lean:150` の weight 抽出。
