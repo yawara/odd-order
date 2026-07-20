@@ -11324,3 +11324,8 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- lemmas use that bridge only to borrow the `S08.inducedKernelFamily_*` suite; with this they can
 -- borrow it without any `S13.Hypothesis`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_subset_inducedKernelFamily_bot
+-- **`hsuppdiff` at §9 level**: uniform-degree member differences are `A₀`-supported.  The §13 form
+-- (`S13.sOf_anchor_diff_support`) reaches the `⊥`-kernel family through `hyp.SOf_eq`; here that is
+-- `sOf_subset_inducedKernelFamily_bot`, and the (8.10) containment `(M')^# ⊆ A₀` is the explicit
+-- parameter `hKsupp` instead of `hyp.base.mderivSharp_subset_A0`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_anchor_diff_support

@@ -410,6 +410,145 @@ case B も型仮定ゼロで組める見込み。**(9.9.a) と engine は既に�
 
 ⟹ case B の残作業は **3 件の機械的な引数一般化**に落ちた (case A と同型)。
 
+### ✅ 1/3 完了 + ⚠ 残り 2 件のうち 1 件は機械的でない (2026-07-20 実測)
+
+- ✅ **`S11.sOf_anchor_diff_support`** (§9 版) landed。world-bridge + `hKsupp` パラメータ化で
+  そのまま通った。⚠ `((derivedInG M).subgroupOf M).Normal` instance は §13 では import 閉包
+  から推移的に来ていたので新 leaf では `haveI` 導出が要る。
+- ⚠ **`caseB_sOf_memberRFamily` (:452) は機械転記できない**。2 分岐のうち:
+  - **既約分岐**は降ろせる (signed Dade family; `dadeData.dade`/`hconj` をパラメータ化 +
+    `inducedKernelFamily_conjDiff_support`)。
+  - **column 分岐**が §10 μ-grid そのもの: `S06.certainTypeR` を
+    **`hyp.base.toHypothesis46 hG hG.odd`** の上で組み、メンバーを
+    `hyp.base.muColumnChar hG hG.odd k` の `columnSum` として同定している。
+  - 駆動する **`caseB_sOf_member_dichotomy` (:407) は結論自体が §10 表記**:
+    `∃ k : Fin hyp.base.w2, … φ = S06.columnSum (hyp.base.toHypothesis46 …)
+    (hyp.base.muColumnChar … k)`。証明でなく **statement が μ-grid に依存**している。
+
+⟹ **ここが case B の真の残り**: 書籍 (9.9.b) は可約メンバー `μ_j` を **(4.7) + Thm (4.5)**
+= §6 の結果から作る。§9 で同じことをするには **§9 で使える Hypothesis (4.6)** の上で
+`S06.columnSum` / `S06.certainTypeR` を組めばよく、それは
+**`S10.typePACore_toHypothesis46_core data.typeP …`** で手に入る
+(`data : TypesIIIIIIVSetup M` は `data.typeP : TypePData M` を持つ)。
+⟹ 作業 = **(9.9.b) の dichotomy を §9 の Hypothesis (4.6) 上で述べ直す**
+(`hHall`/`hW2σ`/`hσK` を入力に取る)。これは引数一般化でなく**述べ直し**。
+
+**case B の到達点**:
+
+| 部品 | 状態 |
+|---|---|
+| (9.9.a) 一様次数 `qu` | ✅ `S11.caseB_degree_qu` (元から §9・型仮定ゼロ) |
+| world-bridge | ✅ `S11.sOf_subset_inducedKernelFamily_bot` |
+| `hsuppdiff` | ✅ `S11.sOf_anchor_diff_support` |
+| (5.7) engine | ✅ `S07.uniform_degree_coherence_of_families` (上流) |
+| `R`-family 既約分岐 | ⛏ 降ろせる (機械的) |
+| **`R`-family column 分岐 + dichotomy** | ⛏ **§9 の Hyp (4.6) 上で述べ直しが要る** |
+
+### ✅ column 分岐に新規の数学は要らない — §10 は往復しているだけ (2026-07-20 実測)
+
+`S12.Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (S12_HcBound.lean:587)
+の証明を読んだ。核心は **1 行**:
+
+```
+obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
+    -- h = (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis : S06.Hypothesis
+```
+
+⟹ **可約メンバーの分類は `S06.Hypothesis.induce_not_isIrreducible_iff` = §6 の事実**。
+残りの ~30 行は §6 の `columnFamily`/`chiRestrict` 形を §10 の `muGrid` 形へ変換する bookkeeping。
+
+しかも **`S06.certainTypeR` が消費するのは §6 形の方** (`columnSum h46 χ₂`)。
+⟹ §13 chain は「§6 column → §10 muGrid → §6 certainTypeR」と**往復している**だけで、
+§9 では **§6 形に留まればよい**。
+
+⟹ **column 分岐に新規の数学は不要**。dichotomy を
+`∃ χ₂ ≠ 1, φ = S06.columnSum h46₉ χ₂` (h46₉ = `typePACore_toHypothesis46_core data.typeP …`
+の `toCertainTypeHypothesis`/`toHypothesis` 相当) の形で述べ、
+`S06.induce_not_isIrreducible_iff` から直接出せばよい。`certainTypeR` もその形で組める。
+
+✅ **実測 (2026-07-20)**: `structure Hypothesis46 A L extends CertainTypeHypothesis A L`
+(S06_CertainHypothesis46.lean:82) なので、`S06.Hypothesis` の取り出しは
+
+```
+h46.toCertainTypeHypothesis.toHypothesis   -- : S06.Hypothesis ↥M
+```
+
+(`Hypothesis46.toCore` が実際にこの形で `toHypothesis` を作っている)。
+⟹ `h46₉ := S10.typePACore_toHypothesis46_core data.typeP hG.odd hHall dade0 hconj hW2σ hσK` から
+`h46₉.toCertainTypeHypothesis.toHypothesis` で §6 `Hypothesis` が取れる。
+これで `S06.induce_not_isIrreducible_iff` / `S06.columnSum` / `S06.certainTypeR` が §9 で使える。
+
+**⟹ case B は全体として「新規の数学ゼロ、§6 形に留まる述べ直し」に落ちた。**
+
+### (2) dichotomy の実装レシピ (2026-07-20 に signature 実測)
+
+```
+S06.Hypothesis.induce_not_isIrreducible_iff (h : S06.Hypothesis ↥M) [NeZero (Nat.card h.W1)]
+    (χ : IrreducibleCharacter ↥h.K) :
+    ¬ IsIrreducibleCharacter (ClassFunction.induce h.K χ) ↔ ∃ χ₂, h.chiRestrict χ₂ = χ
+```
+
+§9 での使い方:
+1. `φ ∈ sOf data Y` を分解して `φ = induceHU data χ`、`χ ∈ xiOf data Y`。
+2. `induceHU_eq_induce data χ` で `φ = ClassFunction.induce (huSub data) χ`。
+3. ⚠ **transport**: `h46₉.K` と `huSub data` はどちらも `(derivedInG M).subgroupOf M` に
+   等しいが**命題的に**なので、`↥` を取ると別の型。橋渡し補題と同じ `hKeq ▸ …` の流儀で運ぶ
+   (`huSub_eq_derivedInG_subgroupOf` + `h46₉.K` 側の等式)。
+4. `induce_not_isIrreducible_iff` を適用 → `∃ χ₂, h.chiRestrict χ₂ = χ`。
+5. `h.coe_chiRestrict` + `h.induce_restrict_certainType_eq` で
+   `φ = S06.columnSum h46₉' χ₂` に変換 (§10 版 S12_HcBound.lean:611-620 が同じ変換をしている
+   ので、そこを雛形にする)。
+6. `[NeZero (Nat.card h.W1)]` は `h.one_lt_card_W1` から `⟨by omega⟩` で作る
+   (§10 版 :598 と同じ)。
+
+⚠ §10 版はこの後さらに `muGrid` 形へ移すが、**§9 ではその変換を行わない** — `certainTypeR` が
+消費するのは `columnSum h χ₂` の形なので、そこで止めるのが正しい。
+
+#### ⚠ 依存型 transport の回避 — statement の書き方が肝
+
+素朴に書くと `induce_not_isIrreducible_iff` は `χ : IrreducibleCharacter ↥h.K` を要求する一方、
+§9 側の `χ` は `IrreducibleCharacter ↥(huSub data)` で、`h.K` と `huSub data` は
+**命題的にしか等しくない** (`huSub data = (data.H ⊔ data.U).subgroupOf M` は定義的、
+`h.K = (derivedInG M).subgroupOf M` は `typePData_toS06Hypothesis` の literal)。
+⟹ `χ` の運搬は **`↥` を跨ぐ依存型の書き換え**になり、橋渡し補題で使った
+「Set 値関数の explicit 引数を `▸` で書き換える」形では済まない (motive 破綻の危険)。
+
+**回避策 (採用すべき形)**: 結論を
+
+```
+∃ χ₂, φ = OddOrder.Peterfalvi.S06.columnSum h χ₂
+```
+
+と書く。`S06.columnSum h χ₂` の**終域は `ClassFunction ↥M ℂ`** なので、
+**statement には依存型 transport が一切現れない**。transport は証明の内部だけに閉じ込められ、
+しかも §10 版 (S12_HcBound.lean:611-620 の `hFk`) が
+`muGrid` 和 = `induce h.K (chiRestrict …)` を示す形で**同じ変換を既に実演している**ので、
+そこを雛形にできる。
+
+⟹ ⚠ **`∃ χ₂, φ = induce h.K (chiRestrict χ₂)` の形で書かないこと** (依存型が statement に漏れる)。
+
+#### ⚠ §6 には**似た名前の 2 層**がある — 取り違え注意 (2026-07-20 実測)
+
+| 構造 | 引数 | 定義場所 | そこに在るもの |
+|---|---|---|---|
+| **`S06.Hypothesis (L : Type*)`** | `L` は**型** | `S06_CertainTypeClifford.lean:365` の `variable (h : Hypothesis L)` | `chiRestrict` (:795) / `coe_chiRestrict` (:802) / `induce_restrict_certainType_eq` (:761) / `induce_not_isIrreducible_iff` (:1095) |
+| **`S06.Hypothesis46 (A : Set G) (L : Subgroup G)`** | `L` は**部分群** | `S06_CertainHypothesis46.lean:82` (`extends CertainTypeHypothesis`) | **`columnSum` (S06_CertainTypeCoherence.lean:57)** / `certainTypeR` |
+
+⟹ **`columnSum` は `Hypothesis46` を直接取る** (当初 `Hypothesis` だと想定していたが誤り)。
+`typePACore_toHypothesis46_core` の返り値をそのまま渡せるので好都合。
+一方 Clifford 側の変換補題群は `Hypothesis L` (型引数) の上に在るので、
+`Hypothesis46 A L` の内側の `Hypothesis ↥L` を経由する必要がある。
+
+**組み立ての鎖** (両層をまたぐ):
+```
+φ = induce (huSub data) χ                   -- sOf 所属 + induceHU_eq_induce
+  = induce h.K χ'                            -- ⚠ huSub data ↔ h.K の transport
+  = induce h.K (h.chiRestrict χ₂)            -- induce_not_isIrreducible_iff  [Hypothesis 層]
+  = ∑ i, (h.columnFamily χ₂).mu i            -- coe_chiRestrict + induce_restrict_certainType_eq
+  = S06.columnSum h46₉ χ₂                    -- columnSum の定義        [Hypothesis46 層]
+```
+最後の等式で 2 層が噛み合うことを確認するのが実装の要点。
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
