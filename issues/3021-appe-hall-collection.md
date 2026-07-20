@@ -1080,3 +1080,41 @@ AxiomsCheck 3540 件 OK / sorry 15 → 14。
 2. ⟹ 各 `β ∈ B` で `R₀^β = R₀^x` (∃x ∈ S) ⟹ Frattini 変形で `SB = S·N_G(R₀)`。
 3. Schur–Zassenhaus で `N_G(R₀)` は `N_G(R₀) ∩ S` の補群 `B*` を含み `B* = B^y` (y ∈ S)。
 ⟹ (E.15) が**ここで効く** (Step 2 では積公式に置き換えられて未使用だった)。
+
+## 2026-07-20 (20): Step 4 (E.3(d)) の BG 原文を完全に起こした (pdftotext L8112-8150)
+
+> **Step 4.** Part (d) is valid.
+> `S = Ω₁(R)`、`G = S ⋊ B`。(b) より **(E.17)** `|S/S'| = p²`, `|S'| = |S|/p²`。
+> `S` は指数 p なので `Φ(S) = S'`。`B` が `R₀S'` を固定すると仮定する。
+> `v ∈ R₀^#` とすると各 `x ∈ S` で `x⁻¹vx ≡ v (mod S')` なので、`v` の `S`-共役類は
+> `vS'` に含まれる。**(E.15)** よりそれは `|S|/p²` 個、(E.17) より `|vS'| = |S'| = |S|/p²`
+> ⟹ **共役類 = `vS'` ちょうど**。`v², …, v^{p−1}` も同様。
+> ⟹ **`R₀S' − S'` の任意の元は `R₀^#` の元に共役**。
+> `B` が `R₀S'` を固定するので、各 `β ∈ B` で `R₀^β = R₀^x` (∃`x ∈ S`)。
+> Frattini 変形で **`SB = S·N_G(R₀)`**。Schur–Zassenhaus で `N_G(R₀)` は
+> `N_G(R₀) ∩ S` の補群 `B*` を含み、`B* = B^y` (∃`y ∈ S`)。⟹ `B` は `R₀^{y⁻¹}` を正規化。
+> すると `A` は `R₀` と `R₀^y` を正規化するので、`a ∈ A` で `(y^a)⁻¹y ∈ N_S(R₀)`、
+> つまり `y^a N_S(R₀) = y N_S(R₀)` — `A` は剰余類 `y N_S(R₀)` を固定する。
+> `|A| = q` に対し `|y N_S(R₀)| = |N_S(R₀)|` は p 冪ゆえ `q` で割れない
+> ⟹ **`A` は `y N_S(R₀)` の元 `z` を固定**。`A` は `R` に regular に作用するので `z = 1`
+> ⟹ `1 ∈ y N_S(R₀)` ⟹ `y ∈ N_S(R₀)` ⟹ `R₀^y = R₀`。∎
+
+### ⭐ ここで (E.15) が初めて効く
+
+Step 2 では (E.15)「`v` の `S`-共役類は `|S|/p²` 個」を積公式で迂回したが、
+Step 4 では **`vS'` と個数が一致することを言うため**に必要 (包含 + 同数 ⟹ 一致)。
+
+### 必要な新規インフラ
+
+1. ⬜ `Φ(S) = S'` (S 指数 p) — `frattiniInG` と `Agemo`。repo の
+   `GroupTheory/OmegaSubgroup.lean` に `Agemo` があるので `Φ = S'·℧₁(S)` 経由。
+2. ⬜ **`G = S ⋊ B`** の構成 — setup は `act : B →* MulAut R` なので
+   `SemidirectProduct` が使える (mathlib)。⚠ 本 leaf で初出。
+3. ⬜ Frattini 変形 (Step 3 の `sup_centralizer_eq_sup_inf_R₁` と同型の論法だが、
+   今度は `G` の中で `N_G(R₀)` について)。
+4. ⬜ **Schur–Zassenhaus** — mathlib `SchurZassenhaus` / repo に既存か要実測。
+5. ⬜ 剰余類上の coprime 固定点 (`|A| = q` と p 冪の剰余類 ⟹ 固定点あり) —
+   repo の `Isaacs.Ch03`/`Ch04` の coprime 作用補題に該当があるか要実測。
+
+⟹ Step 4 は E.3(a)(b)(c) と違い **`G = S ⋊ B` という新しい舞台**を組む必要がある。
+着手時はまず 2 (semidirect product の配線) を単独で通すのが安全。
