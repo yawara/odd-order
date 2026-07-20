@@ -261,3 +261,89 @@ AppE は `S16_MainResults` を import しており S15 はその上流なので*
 `S04_SmallRankBasic.lean` (:1080 に `not_le_pRank_of_pRank_le_two` がある = topical な home)
 に置くのが筋。ただし同 leaf は上流でリビルドが重いので、**2 消費者目が出るまでは
 AppE の private helper で可**。その場合は本 issue に promotion フラグを残すこと。
+
+## ⭐ 2026-07-20 (2): BG の 1 行 `R₀ ∩ Z = 1` を完全に展開 — 8 定理を sorry-free 化
+
+上の「残る唯一の新規補題 (2)」は **`GroupTheory/PRank.lean` に一般形で置いた** (private helper
+にせず promotion 済 — pRank API の topical home ゆえ; shared-infra claim = **issue 9401**)。
+`normal` 仮説は不要と判明したので落とした (集合積のまま積公式を使うため)。
+
+| 新規宣言 | 内容 | 場所 |
+|---|---|---|
+| `GroupTheory.pRank_le_two_of_isCyclic_of_index_le_prime` | cyclic 部分群の指数 ≤ p ⟹ `pRank ≤ 2` | `PRank.lean:666` |
+| `RegularOperatorSetup.R₀_le_centralizer_R₁` | `centralizer_eq` の対称半分 | AppE |
+| `RegularOperatorSetup.isMulCommutative_centralizer_R₀` | `C_R(R₀)` はアーベル | AppE |
+| `RegularOperatorSetup.card_centralizer_R₀` | `\|C_R(R₀)\| = p·\|R₁\|` | AppE |
+| `RegularOperatorSetup.pRank_centralizer_R₀_le_two` | `r(C_R(R₀)) ≤ 2` | AppE |
+| `three_le_pRank_of_prime_cube_lt_card` | BG (E.1)-(E.3) = 既存 S04 補題の対偶 | AppE |
+| `RegularOperatorSetup.not_le_centralizer_R₀_of_three_le_pRank` | `r(S) ≥ 3 ⟹ S ⊄ C_R(R₀)` | AppE |
+| `RegularOperatorSetup.inf_eq_bot_of_three_le_pRank` | **BG の 1 行 `R₀ ∩ Z = 1`** | AppE |
+
+全て sorry-free / AxiomsCheck OK (4497 jobs green)。AppE の sorry は 7 のまま
+(新規は全部 sorry-free な下ごしらえ)。
+
+⚠ `inf_eq_bot_of_three_le_pRank` は `Z ≤ Z(S)` を **ambient で `S ≤ C_R(Z)` と綴った**
+(`subgroupOf` 往復を避けるため)。BG の `Z = Ω₁(Z(S))` を渡すときはこの形で供給する。
+
+## BG 原文 Step 2 の実測 (pdftotext L7955-8060) と、次に要るもの
+
+Step 2 の**主張**: 「`S` を `R` の A-不変・指数 p・`R₀` を真に含む部分群とすると
+`R₀ ⊄ S'`、`|S| ≤ p^q`、`|S/S'| = p²`」。証明の骨格 (実測):
+
+1. `|S| ≤ p³` は「位数 p³ 以下の p 群の検査」で片付く (BG が省略) → **迂回済**:
+   `three_le_pRank_of_prime_cube_lt_card` で `|S| > p³ ⟹ r(S) ≥ 3` を直接得る。
+2. `Z = Ω₁(Z(S))`、**`R₀ ∩ Z = 1`** ← ✅ 今回 (`inf_eq_bot_of_three_le_pRank`)。
+3. (E.4) `R₀ × Z ⊆ C_S(R₀) ⊆ R₀ × Ω₁(R₁)` ⟹ `|Z| = p` かつ `C_S(R₀) = R₀ × Z`。
+   ⟹ **次に書くのはこれ**。`S` は指数 p なので `S ⊓ R₁ ≤ Ω₁(R₁)` (位数 p、R₁ cyclic)、
+   よって `C_S(R₀) = S ⊓ (R₀ ⊔ R₁) ≤ R₀ ⊔ Ω₁(R₁)` は位数 ≤ p²。
+   `Z ≠ 1` は `Z(S) ≠ 1` (非自明 p 群) から。
+4. `S` は narrow (Cor 5.4: 位数 p の `R₀` で `r(C_S(R₀)) ≤ 2`、`|C_S(R₀)| = p²` より)。
+5. (E.5) `lemma52` + `narrow_centralizer_decomp` で `T char S`, `|S:T| = |C_T(R₀)| = p`,
+   `R₀ ⊓ T = 1`、`S = R₀T`。
+6. (E.6) Thm 5.5 の (5.5) 以降で A-不変列 `T = H₀ ⊃ … ⊃ Hₙ = 1`,
+   `H_i = [R₀, H_{i-1}]`, `|H_{i-1}:H_i| = p`。
+7. (E.7) `H₁ = S₂` かつ `|S/S'| = p²`、(E.8) 帰納で `H_i = S_{i+1}`。
+8. (E.9)-(E.12) 固有値 `r_i ≡ r₀ r^i (mod p)` の計算 + `A` の regular 性 (Prop 1.5(d)) で
+   `r_i ≢ 1`、`r^q ≡ 1` ⟹ `q - 1 ≥ n` ⟹ `|S| = p·pⁿ ≤ p^q`。← **(c) の出所**。
+
+⟹ **Step 2 を明示の定理として AppE に立てる**のが次の構造上の一手 (現状 AppE には
+Step 2 の言明が無く、E.3(b) の 3 clause が直接 sorry になっている)。Step 3 は
+「`R₀ × Ω₁(R₁)` を含む極大な A-不変指数 p 部分群 `S`」を取って Step 2 を適用し、
+`Ω₁(N_P(S))` の議論 (E.15)-(E.16) で `S = Ω₁(R)` を出す。
+
+## ⭐ 2026-07-20 (3): Step 2 の narrow 経路が通った — **`R₀ ⊄ S'` を証明**
+
+`r(S) ≥ 3` かつ `R₀ ≤ S` なる**任意の** `S ≤ R` について:
+
+| 新規宣言 | BG 対応 |
+|---|---|
+| `RegularOperatorSetup.card_R₀_subgroupOf` | `\|R₀\| = p` を `↥S` 内で |
+| `RegularOperatorSetup.pRank_centralizer_subgroupOf_le_two` | `r(C_S(R₀)) ≤ 2` |
+| `RegularOperatorSetup.isNarrow_of_three_le_pRank` | **"Note that S is narrow."** |
+| `RegularOperatorSetup.not_le_derivedInG_of_three_le_pRank` | **(E.13) 第 1 節 `R₀ ⊄ S'`** |
+| `RegularOperatorSetup.card_omega1Center_and_index_centralizer` | **(E.4) `\|Z\| = p` + (E.5) `\|S:T\| = p`** |
+
+### ⚠ BG より弱い仮説で通った (特殊化債務でなく一般化)
+
+BG は `r(C_S(R₀)) ≤ 2` を **(E.4) の `\|C_S(R₀)\| = p²`** から出すが、こちらは
+`C_S(R₀) ≤ C_R(R₀)` の**単調性**だけで出る。⟹ **`S` の指数 p 仮説が要らない**。
+同じ理由で Lemma 5.2 が要求する「位数 p² の極大 elementary abelian `E`」は
+narrow 性から直接取れる (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`) ので、
+BG の witness `E = C_S(R₀)` と `\|C_S(R₀)\| = p²` の計算は**丸ごと迂回できる**。
+
+⟹ 当初の計画にあった「(E.4) の `R₀ × Z ⊆ C_S(R₀) ⊆ R₀ × Ω₁(R₁)` を形式化する」は
+**Step 2 の経路上では不要**と判明。`Ω₁(R₁)` の位数 p 計算も現時点では不要
+(必要になるのは Step 3 の極大性議論で `R₀ × Ω₁(R₁)` を種にするとき)。
+
+### 残る Step 2 の穴 (次に着手する順)
+
+1. **`|S| ≤ p³` の分岐** — BG「位数 p³ 以下の p 群を検査せよ」。上の結果は全部
+   `r(S) ≥ 3` (⟸ `|S| > p³` + 指数 p) 下でのみ効くので、Step 2 を無条件の定理にするには
+   この小位数分岐が要る。`S04_PGroupsSmallRank.lean` に使える形があるか要実測。
+2. **(E.6) Thm 5.5 の A-不変列** `T = H₀ ⊃ … ⊃ Hₙ = 1`, `H_i = [R₀,H_{i-1}]`,
+   `|H_{i-1}:H_i| = p` — `S05_NarrowAutomorphisms.lean:418` 以降。
+3. **(E.7)(E.8)** `H₁ = S₂`, `|S/S'| = p²`, 帰納で `H_i = S_{i+1}`。
+   ⟹ E.3(b) 第 3 節 `|Ω₁(R)/(Ω₁(R))'| = p²` の出所。
+4. **(E.9)-(E.12)** 固有値 `r_i ≡ r₀ r^i`、`A` regular + Prop 1.5(d) ⟹ `r_i ≢ 1`、
+   `r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| ≤ p^q`。⟹ **E.3(c)** の出所。
+5. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。

@@ -9,6 +9,7 @@ import Mathlib.LinearAlgebra.Basis.Defs
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dual.Lemmas
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.NumberTheory.Multiplicity
 import Mathlib.RingTheory.TensorProduct.Basic
 import Mathlib.RingTheory.TensorProduct.Finite
 import Mathlib.RepresentationTheory.Irreducible
@@ -613,6 +614,185 @@ private theorem exponent_dvd_of_pow_sub_one_dvd_pow_sub_one
     omega
   have : Nat.gcd a b = a := Nat.pow_right_injective hp hpow
   exact (Nat.gcd_eq_left_iff_dvd).mp this
+
+/-! ## Prime-supported Singer orders -/
+
+/-- Suppose the odd positive modulus `a` divides `N`, and every prime divisor
+of `N` already divides `a`. Then raising `a + 1` to the odd-order enlargement
+factor `N / a` is congruent to one modulo `N`.
+
+For each prime divisor `p` of `N`, lifting the exponent gives
+`v_p ((a + 1) ^ (N / a) - 1) = v_p(a) + v_p(N / a) = v_p(N)`. -/
+theorem dvd_add_one_pow_div_sub_one_of_primeFactors_dvd
+    {a N : ℕ} (ha : 0 < a) (hN : 0 < N) (hdiv : a ∣ N)
+    (haodd : Odd a)
+    (hsupp : ∀ p : ℕ, p.Prime → p ∣ N → p ∣ a) :
+    N ∣ (a + 1) ^ (N / a) - 1 := by
+  have hak : a * (N / a) = N := Nat.mul_div_cancel' hdiv
+  have hapos : a ≤ N := Nat.le_of_dvd hN hdiv
+  have hkpos : 0 < N / a := Nat.div_pos hapos ha
+  have htargetpos : 0 < (a + 1) ^ (N / a) - 1 := by
+    have hbase : 1 < a + 1 := by omega
+    have hpow : 1 < (a + 1) ^ (N / a) :=
+      one_lt_pow₀ hbase hkpos.ne'
+    omega
+  rw [← Nat.factorization_le_iff_dvd hN.ne' htargetpos.ne', Finsupp.le_def]
+  intro p
+  by_cases hp : p.Prime
+  · by_cases hpN : p ∣ N
+    · have hpa : p ∣ a := hsupp p hp hpN
+      have hp2 : p ≠ 2 := by
+        intro h
+        subst p
+        exact haodd.not_two_dvd_nat hpa
+      have hpodd : Odd p := hp.odd_of_ne_two hp2
+      have hpnext : ¬ p ∣ a + 1 := by
+        intro h
+        have : p ∣ 1 :=
+          (Nat.dvd_add_iff_left hpa).mpr (by simpa [Nat.add_comm] using h)
+        exact hp.not_dvd_one this
+      have hLTE := Nat.emultiplicity_pow_sub_pow hp hpodd
+        (x := a + 1) (y := 1) (by simpa using hpa) hpnext (N / a)
+      have hfa : a.factorization p = multiplicity p a :=
+        (Nat.multiplicity_eq_factorization hp ha.ne').symm
+      have hfk : (N / a).factorization p = multiplicity p (N / a) :=
+        (Nat.multiplicity_eq_factorization hp hkpos.ne').symm
+      have hft : ((a + 1) ^ (N / a) - 1).factorization p =
+          multiplicity p ((a + 1) ^ (N / a) - 1) :=
+        (Nat.multiplicity_eq_factorization hp htargetpos.ne').symm
+      have hfN : N.factorization p =
+          a.factorization p + (N / a).factorization p := by
+        calc
+          N.factorization p = (a * (N / a)).factorization p :=
+            congrArg (fun t : ℕ => t.factorization p) hak.symm
+          _ = a.factorization p + (N / a).factorization p := by
+            rw [Nat.factorization_mul ha.ne' hkpos.ne', Finsupp.add_apply]
+      have hfinA : FiniteMultiplicity p a :=
+        Nat.finiteMultiplicity_iff.mpr ⟨hp.ne_one, ha⟩
+      have hfinK : FiniteMultiplicity p (N / a) :=
+        Nat.finiteMultiplicity_iff.mpr ⟨hp.ne_one, hkpos⟩
+      have hfinT : FiniteMultiplicity p ((a + 1) ^ (N / a) - 1) :=
+        Nat.finiteMultiplicity_iff.mpr ⟨hp.ne_one, htargetpos⟩
+      have hLTE' : emultiplicity p ((a + 1) ^ (N / a) - 1) =
+          emultiplicity p a + emultiplicity p (N / a) := by
+        simpa using hLTE
+      rw [hfinT.emultiplicity_eq_multiplicity,
+        hfinA.emultiplicity_eq_multiplicity,
+        hfinK.emultiplicity_eq_multiplicity] at hLTE'
+      have hmul : multiplicity p ((a + 1) ^ (N / a) - 1) =
+          multiplicity p a + multiplicity p (N / a) := by
+        exact_mod_cast hLTE'
+      rw [hfN, hfa, hfk, hft, hmul]
+    · rw [Nat.factorization_eq_zero_of_not_dvd hpN]
+      exact Nat.zero_le _
+  · rw [Nat.factorization_eq_zero_of_not_prime N hp,
+      Nat.factorization_eq_zero_of_not_prime _ hp]
+
+/-- If `N` is a period modulus for powers of two, is divisible by
+`2 ^ n - 1`, and has no new prime divisors beyond `2 ^ n - 1`, then any
+minimal exponent `m` for that period contains `n` with odd quotient.
+
+The odd comparison period is `n * (N / (2 ^ n - 1))`. -/
+theorem mersenne_exponent_dvd_and_odd_quotient_of_primeFactors_dvd
+    {n m N : ℕ} (hn : 0 < n) (hm : 0 < m) (hN : 0 < N)
+    (hbase : 2 ^ n - 1 ∣ N)
+    (hsupp : ∀ p : ℕ, p.Prime → p ∣ N → p ∣ 2 ^ n - 1)
+    (hperiod : N ∣ 2 ^ m - 1)
+    (hminimal : ∀ k : ℕ, N ∣ 2 ^ k - 1 → m ∣ k) :
+    n ∣ m ∧ Odd (m / n) := by
+  have hnm : n ∣ m :=
+    exponent_dvd_of_pow_sub_one_dvd_pow_sub_one (p := 2) (by omega)
+      (hbase.trans hperiod)
+  let a := 2 ^ n - 1
+  let k := N / a
+  have ha : 0 < a := by
+    dsimp [a]
+    exact Nat.sub_pos_of_lt (Nat.one_lt_pow hn.ne' (by omega))
+  have haodd : Odd a := by
+    rw [Nat.odd_iff]
+    simpa [a] using hn
+  have hNodd : Odd N := by
+    rw [← Nat.not_even_iff_odd, even_iff_two_dvd]
+    intro htwo
+    exact haodd.not_two_dvd_nat (hsupp 2 Nat.prime_two htwo)
+  have hkodd : Odd k := Odd.of_dvd_nat hNodd (by
+    dsimp [k]
+    refine ⟨a, ?_⟩
+    rw [Nat.div_mul_cancel hbase])
+  have hsupported : N ∣ (a + 1) ^ k - 1 :=
+    dvd_add_one_pow_div_sub_one_of_primeFactors_dvd ha hN hbase haodd (by
+      intro p hp hpN
+      exact hsupp p hp hpN)
+  have hpow : N ∣ 2 ^ (n * k) - 1 := by
+    have ha1 : a + 1 = 2 ^ n := by
+      dsimp [a]
+      omega
+    rw [ha1] at hsupported
+    simpa only [pow_mul] using hsupported
+  have hm_nk : m ∣ n * k := hminimal (n * k) hpow
+  have hdvd : m / n ∣ k := by
+    obtain ⟨d, hd⟩ := hnm
+    subst m
+    have hdk : d ∣ k := (Nat.mul_dvd_mul_iff_left hn).mp hm_nk
+    rw [Nat.mul_comm n d, Nat.mul_div_left d hn]
+    exact hdk
+  exact ⟨hnm, Odd.of_dvd_nat hkodd hdvd⟩
+
+/-- Let `lambda` generate `GF(2 ^ m)` over `𝔽₂`. If its multiplicative
+order `N` is divisible by `2 ^ n - 1` and every prime divisor of `N` divides
+`2 ^ n - 1`, then `n` divides `m` with odd quotient.
+
+The generation hypothesis identifies `m` as the minimal Frobenius period of
+`lambda`; this is the finite-field form used in Higman's Lemma 11. -/
+theorem galoisField_degree_dvd_and_odd_quotient_of_primeFactors_dvd
+    {n m N : ℕ} (hn : 0 < n) (hm : 0 < m) (hN : 0 < N)
+    (lambda : GaloisField 2 m)
+    (hgen : Algebra.adjoin (ZMod 2) ({lambda} : Set (GaloisField 2 m)) = ⊤)
+    (horder : orderOf lambda = N)
+    (hbase : 2 ^ n - 1 ∣ N)
+    (hsupp : ∀ p : ℕ, p.Prime → p ∣ N → p ∣ 2 ^ n - 1) :
+    n ∣ m ∧ Odd (m / n) := by
+  let L := GaloisField 2 m
+  have hlambdaNe : lambda ≠ 0 := by
+    intro hzero
+    subst lambda
+    simp at horder
+    omega
+  have hperiod : N ∣ 2 ^ m - 1 := by
+    haveI : Fintype L := Fintype.ofFinite L
+    have hcard : Fintype.card L = 2 ^ m := by
+      rw [← Nat.card_eq_fintype_card, GaloisField.card 2 m hm.ne']
+    have hpow : lambda ^ (2 ^ m - 1) = 1 := by
+      rw [← hcard]
+      exact FiniteField.pow_card_sub_one_eq_one lambda hlambdaNe
+    rw [← horder]
+    exact orderOf_dvd_of_pow_eq_one hpow
+  have hminimal : ∀ k : ℕ, N ∣ 2 ^ k - 1 → m ∣ k := by
+    intro k hk
+    have hlambdaPow : lambda ^ (2 ^ k) = lambda := by
+      have hq : lambda ^ (2 ^ k - 1) = 1 := by
+        rw [← horder] at hk
+        exact orderOf_dvd_iff_pow_eq_one.mp hk
+      calc
+        lambda ^ (2 ^ k) = lambda ^ ((2 ^ k - 1) + 1) := by
+          rw [Nat.sub_add_cancel (Nat.one_le_pow k 2 (by omega))]
+        _ = lambda ^ (2 ^ k - 1) * lambda := by rw [pow_succ]
+        _ = lambda := by rw [hq, one_mul]
+    let sigma := FiniteField.frobeniusAlgHom (ZMod 2) L
+    have hsigma : sigma ^ k = 1 := by
+      apply AlgHom.ext_of_adjoin_eq_top hgen
+      intro x hx
+      rw [Set.mem_singleton_iff] at hx
+      subst x
+      dsimp [sigma, L]
+      simpa only [AlgHom.coe_pow, FiniteField.coe_frobeniusAlgHom,
+        pow_iterate, ZMod.card, AlgHom.one_apply] using hlambdaPow
+    have h := orderOf_dvd_of_pow_eq_one hsigma
+    rw [FiniteField.orderOf_frobeniusAlgHom (ZMod 2) L,
+      show Module.finrank (ZMod 2) L = m from GaloisField.finrank 2 hm.ne'] at h
+    exact h
+  exact mersenne_exponent_dvd_and_odd_quotient_of_primeFactors_dvd
+    hn hm hN hbase hsupp hperiod hminimal
 
 /-- A faithful irreducible cyclic `𝔽₂`-action and a faithful action of the
 same actor which is transitive on the nonzero vectors have equal dimensions.
