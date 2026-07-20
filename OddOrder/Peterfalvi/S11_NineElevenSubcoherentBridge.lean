@@ -273,14 +273,19 @@ theorem induce_columnSum_of_not_irreducible {M : Subgroup G} {A : Set G} [Finite
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] [Invertible (Nat.card ↥h46.K : ℂ)]
     (χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥h46.K)
+    (hχne : χ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥h46.K)
     (hred : ¬ IsIrreducibleCharacter
       (ClassFunction.induce h46.K (χ : ClassFunction ↥h46.K ℂ))) :
-    ∃ χ₂, ClassFunction.induce h46.K (χ : ClassFunction ↥h46.K ℂ)
+    ∃ χ₂ ≠ 1, ClassFunction.induce h46.K (χ : ClassFunction ↥h46.K ℂ)
       = OddOrder.Peterfalvi.S06.columnSum h46 χ₂ := by
   obtain ⟨χ₂, hχ₂⟩ := (h46.induce_not_isIrreducible_iff χ).mp hred
-  refine ⟨χ₂, ?_⟩
-  rw [← hχ₂, OddOrder.Peterfalvi.S06.columnSum_def]
-  exact h46.induce_restrict_certainType_eq χ₂
+  refine ⟨χ₂, ?_, ?_⟩
+  · -- `χ₂ = 1` would make the source trivial (`chiRestrict_one_eq_trivial`)
+    rintro rfl
+    rw [h46.chiRestrict_one_eq_trivial] at hχ₂
+    exact hχne hχ₂.symm
+  · rw [← hχ₂, OddOrder.Peterfalvi.S06.columnSum_def]
+    exact h46.induce_restrict_certainType_eq χ₂
 
 
 end OddOrder.Peterfalvi.S11
