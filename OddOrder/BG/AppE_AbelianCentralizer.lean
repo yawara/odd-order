@@ -419,4 +419,62 @@ theorem map_eigenSubgroup_of_commute {E : Type*} [Group E]
     exact key g hfg x hx
   · exact ⟨g⁻¹ y, key g⁻¹ hfg' y hy, MulAut.apply_inv_self E g y⟩
 
+/-- Distinct eigenvalues have trivially intersecting eigenspaces, in a group of exponent `p`.
+
+`x` in both eigenspaces satisfies `x ^ (r - r₀) = 1`; combined with `x ^ p = 1` and
+`p ∤ r - r₀`, the order of `x` divides `p` but is not `p`, so `x = 1`. -/
+theorem eigenSubgroup_inf_eq_bot {E : Type*} [Group E] {p : ℕ} (hp : p.Prime)
+    (hcomm : ∀ x y : E, x * y = y * x) (hexp : ∀ x : E, x ^ p = 1) (f : MulAut E) {r r₀ : ℤ}
+    (hne : ¬ ((p : ℤ) ∣ r - r₀)) :
+    eigenSubgroup hcomm f r ⊓ eigenSubgroup hcomm f r₀ = ⊥ := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨hx1, hx2⟩ := Subgroup.mem_inf.mp hx
+  rw [mem_eigenSubgroup] at hx1 hx2
+  have hzero : x ^ (r - r₀) = 1 := by
+    rw [zpow_sub, hx1.symm, hx2.symm, mul_inv_cancel]
+  have hdvd : (orderOf x : ℤ) ∣ r - r₀ := orderOf_dvd_iff_zpow_eq_one.mpr hzero
+  have hordp : orderOf x ∣ p := orderOf_dvd_of_pow_eq_one (hexp x)
+  rcases (Nat.dvd_prime hp).mp hordp with h1 | hpx
+  · exact Subgroup.mem_bot.mpr (orderOf_eq_one_iff.mp h1)
+  · exact absurd (by rwa [hpx] at hdvd) hne
+
+/-- **BG's *"`α` has eigenvalues `r` and `r₀` on `R₀S'/S'` and `T/S'`"*, sharpened**: when the
+two eigenvalues differ, each eigenspace *is* the corresponding line.
+
+`E` has order `p²`, so a subgroup containing a line either is that line's size or is all of
+`E`; the latter is excluded because the two eigenspaces meet trivially while the other line
+is nontrivial.  This is what upgrades "β preserves eigenspaces" to "β fixes `R₀S'/S'`". -/
+theorem eigenSubgroup_eq_of_card_prime_sq {E : Type*} [Group E] [Finite E] {p : ℕ}
+    (hp : p.Prime) (hcomm : ∀ x y : E, x * y = y * x) (hexp : ∀ x : E, x ^ p = 1)
+    (hcard : Nat.card E = p ^ 2) (f : MulAut E) {r r₀ : ℤ} (hne : ¬ ((p : ℤ) ∣ r - r₀))
+    {L₁ L₂ : Subgroup E} (hL₁ : L₁ ≤ eigenSubgroup hcomm f r)
+    (hL₂ : L₂ ≤ eigenSubgroup hcomm f r₀) (hL₁card : Nat.card ↥L₁ = p)
+    (hL₂card : Nat.card ↥L₂ = p) :
+    eigenSubgroup hcomm f r = L₁ := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  set V : Subgroup E := eigenSubgroup hcomm f r with hV
+  -- `|V|` divides `p²` and is divisible by `p`.
+  have hdvd : Nat.card ↥V ∣ p ^ 2 := hcard ▸ Subgroup.card_subgroup_dvd_card V
+  have hpdvd : p ∣ Nat.card ↥V := hL₁card ▸ Subgroup.card_dvd_of_le hL₁
+  -- `V ≠ ⊤`, because `V ⊓ L₂ = ⊥` while `L₂ ≠ ⊥`.
+  have hVL₂ : V ⊓ L₂ = ⊥ := by
+    refine eq_bot_iff.mpr ((inf_le_inf_left V hL₂).trans ?_)
+    exact le_of_eq (eigenSubgroup_inf_eq_bot hp hcomm hexp f hne)
+  have hVne : Nat.card ↥V ≠ p ^ 2 := by
+    intro h
+    have hVtop : V = ⊤ := Subgroup.eq_top_of_card_eq V (by rw [h, hcard])
+    have : L₂ = ⊥ := by rw [← hVL₂, hVtop, top_inf_eq]
+    rw [this, Subgroup.card_bot] at hL₂card
+    exact hp.one_lt.ne hL₂card
+  -- Hence `|V| = p = |L₁|`, and `L₁ ≤ V`.
+  have hVcard : Nat.card ↥V = p := by
+    rcases (Nat.dvd_prime_pow hp).mp hdvd with ⟨k, hk, hVk⟩
+    interval_cases k
+    · rw [pow_zero] at hVk; rw [hVk] at hpdvd; exact absurd (Nat.dvd_one.mp hpdvd) hp.one_lt.ne'
+    · rwa [pow_one] at hVk
+    · exact absurd hVk hVne
+  exact (Subgroup.eq_of_le_of_card_ge hL₁ (by rw [hVcard, hL₁card])).symm
+
 end OddOrder.BG.AppE
