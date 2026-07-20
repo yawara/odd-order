@@ -84,6 +84,31 @@ coherent_sOf_H0C          -- caseA 分岐
 (1256 行 vs 109 行) ので、そのままでは呼べない。(9.11) ブロックを前に移すか
 `coherent_sOf_H0C` を後ろに移す必要があり、ファイル内の他の consumer の順序も要確認。
 
+## ✅ 実施 2 (2026-07-20): 再配線 → 12 宣言 / 1,586 行を削除
+
+**再配線が鍵だった**。`coherent_sOf_H0C` の caseA 分岐を
+`coherent_sOf_H0Cprime hG hyp hncH0C htype` の呼び出しに置換したところ、旧チェーンが初めて
+本当に dead になった。宣言順の障害は **(9.11) ブロック (`coherent_sOf_H0Cprime_of_section9` +
+`coherent_sOf_H0Cprime`) をファイル内で `coherent_sOf_H0C` の直前へ移動**して解消 (ブロックは
+file-local な依存ゼロと実測してから移した)。
+
+削除した 12 宣言:
+
+| file | 宣言 |
+|---|---|
+| `S11_NineElevenCaseA` | `NineElevenNormBound` / `NineElevenSTwoExtraction` / `caseA_coherent_sOf_H0Cprime_of_refuter` / `caseA_nineElevenFour_norm_inputs` / `nineElevenEqualityRefutation_of_sTwoExtraction_normBound` / `nineElevenPairBound` / `nineElevenSTwoExtraction` |
+| `S11_NineElevenAlphaBound` | `NineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation` / `nineElevenNormBound_of_sevenEightRefutation` |
+| `S11_NineElevenPairAdjoin` | `coherent_extension_cross_orthogonal` / `nineElevenSevenEightRefutation` |
+
+行数: CaseA 1343→619、AlphaBound 1036→664、PairAdjoin 719→224 (計 **−1,586 行**)。
+AxiomsCheck の該当 5 エントリも撤去。再 census で残りの dead はゼロ。
+
+⚠ **削除スクリプトの罠**: 「宣言の直前の空行まで遡る」ヒューリスティックは、**docstring 内に
+空行がある宣言**で docstring を途中から切ってしまい `unterminated comment` になる
+(2 件踏んだ)。Lean の宣言境界を空行で推定しない — 削除後は必ず leaf build する。
+
+⟹ **issue 1047 完了**。
+
 ## 完了条件
 
 実引用ゼロと確認された宣言が削除され、full build green + AxiomsCheck OK + sorry 非退行。

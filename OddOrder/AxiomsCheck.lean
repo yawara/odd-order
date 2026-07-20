@@ -10186,7 +10186,6 @@ the `γ = Ind_{HU₁}^M 1` context facts (support in `HU = M′`, degree `qa`, o
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sum_card_inf_conjSMul_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenGamma_inner_self_mul_u
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenGamma_inner_induceHU
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_nineElevenFour_norm_inputs
 
 /-! **Peterfalvi (9.11.1)/(9.11.2)/(9.11.6) Phase-E layers, axiom-clean** (issue 9083 Phase E,
 lane a).  The (9.11.2) TI-witness discharge (`U₁ ∩ U₁^w = C` for `w ∈ W₁^#`, via the
@@ -10202,15 +10201,12 @@ axiom-clean and are pinned below. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineElevenTwoTIWitness_of_degree_dichotomy
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.conj_smul_cuSubOf_of_Hpart_smul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.forall_w1_exists_Hpart_smul
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.nineElevenSTwoExtraction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sTwo_subset_degreeQaCut
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.card_le_inner_self_re_of_orthonormal_inner_int_ne
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.sOf_H0Cprime_memberRFamily_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_sThree_coherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.caseA_nineElevenTwo_tiWitness
-#assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S13.nineElevenNormBound_of_sevenEightRefutation
 
 /-! **Peterfalvi (9.11.7)–(9.11.8) coherent-pair adjunction, axiom-clean** (issue 9083 Phase
 E-final, lane a).  The union-pair coherent extension (Coq `extend_coherent_with` +
@@ -10225,8 +10221,6 @@ verified by `#print axioms`): all three depend only on `propext` / `Classical.ch
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.unionPairExtension
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.isCoherent_union_pair_of_bridge
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_eq_sum_memberRFamily
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_extension_cross_orthogonal
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.nineElevenSevenEightRefutation
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0C
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.exists_bridge_target_of_budget
