@@ -121,6 +121,173 @@ theorem exists_ne_zero_mul_apply_eq_of_typeA
     OddOrder.Peterfalvi.Appendices.Suzuki.fieldRingAutOnUnits_apply_val]
     using huval
 
+/-- Absorb a nonzero type-A coefficient by rescaling only the quotient
+coordinate, leaving a prescribed kernel coordinate unchanged. -/
+theorem exists_typeANormalForm_coefficient_one
+    {V : Type*} {W : Type*}
+    [AddCommGroup V] [AddCommGroup W]
+    {F : Type*} [Field F] [Finite F] [CharP F 2]
+    (eZero : V ≃+ F) (eKernel : W ≃+ F)
+    (q : V → W) (theta : RingAut F)
+    (htheta : Odd (orderOf theta))
+    (epsilon : F) (hepsilon : epsilon ≠ 0)
+    (hformula : ∀ alpha : F,
+      eKernel (q (eZero.symm alpha)) =
+        epsilon * (alpha * theta alpha)) :
+    ∃ eZero' : V ≃+ F, ∀ beta : F,
+      eKernel (q (eZero'.symm beta)) = beta * theta beta := by
+  obtain ⟨u, hu, hunorm⟩ :=
+    exists_ne_zero_mul_apply_eq_of_typeA theta htheta epsilon hepsilon
+  let uUnit : Fˣ := Units.mk0 u hu
+  let scale : F ≃+ F :=
+    (uUnit.mulLeftLinearEquiv F F).toAddEquiv
+  let eZero' : V ≃+ F := eZero.trans scale
+  refine ⟨eZero', ?_⟩
+  intro beta
+  let alpha : F := scale.symm beta
+  have hscale : u * alpha = beta := by
+    have h := scale.apply_symm_apply beta
+    change u * alpha = beta at h
+    exact h
+  calc
+    eKernel (q (eZero'.symm beta)) =
+        epsilon * (alpha * theta alpha) := by
+      change eKernel (q (eZero.symm (scale.symm beta))) = _
+      exact hformula alpha
+    _ = beta * theta beta := by
+      rw [← hunorm, ← hscale, map_mul]
+      ring
+
+/-- The composite of the bracket-normalization Frobenius shift and the
+anchored-trace Frobenius shift, in their actual order of application. -/
+noncomputable def combinedKernelFrobeniusShift
+    (F : Type uF) [Field F] [Finite F] [Algebra (ZMod 2) F]
+    (s s₀ : Nat) : F ≃ₐ[ZMod 2] F :=
+  ((FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) F) ^ s).trans
+    ((FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) F) ^ s₀)
+
+/-- The composite is the single Frobenius power with the summed exponent. -/
+theorem combinedKernelFrobeniusShift_eq_pow_add
+    (F : Type uF) [Field F] [Finite F] [Algebra (ZMod 2) F]
+    (s s₀ : Nat) :
+    combinedKernelFrobeniusShift F s s₀ =
+      (FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) F) ^ (s + s₀) := by
+  let frob := FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) F
+  rw [combinedKernelFrobeniusShift]
+  change frob ^ s₀ * frob ^ s = frob ^ (s + s₀)
+  rw [← pow_add, add_comm]
+
+/-- Two successive equality-tracked kernel-coordinate shifts compose to the
+single algebra automorphism used when restoring the prescribed coordinate. -/
+theorem secondLayerCoordinate_eq_trans_combinedKernelFrobeniusShift
+    {F : Type uF} {V : Type uE}
+    [Field F] [Finite F] [Algebra (ZMod 2) F]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (eKernel eNormalized eShifted : V ≃ₗ[ZMod 2] F)
+    (s s₀ : Nat)
+    (hNormalized : eNormalized = eKernel.trans
+      (((FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) F) ^ s).toLinearEquiv))
+    (hShifted : eShifted = eNormalized.trans
+      (((FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) F) ^ s₀).toLinearEquiv)) :
+    eShifted = eKernel.trans
+      (combinedKernelFrobeniusShift F s s₀).toLinearEquiv := by
+  subst eNormalized
+  subst eShifted
+  rfl
+
+/-- The combined kernel Frobenius shift commutes with every Frobenius power
+appearing as the type-A automorphism. -/
+theorem combinedKernelFrobeniusShift_commutes_frobeniusPower
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    [Algebra (ZMod 2) F]
+    (s s₀ r : Nat) (x : F) :
+    combinedKernelFrobeniusShift F s s₀
+        (((frobeniusEquiv F 2) ^ r) x) =
+      ((frobeniusEquiv F 2) ^ r)
+        (combinedKernelFrobeniusShift F s s₀ x) := by
+  rw [← iterateFrobeniusEquiv_eq_pow]
+  simp only [iterateFrobeniusEquiv_def, map_pow]
+
+/-- Package the exact automorphism and commutation proof produced by the two
+shift-tracking APIs. -/
+theorem exists_combinedKernelFrobeniusShift
+    {F : Type uF} {V : Type uE}
+    [Field F] [Finite F] [CharP F 2] [Algebra (ZMod 2) F]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (eKernel eNormalized eShifted : V ≃ₗ[ZMod 2] F)
+    (s s₀ : Fin (Module.finrank (ZMod 2) F))
+    (r : Nat)
+    (hNormalized : eNormalized = eKernel.trans
+      (((FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) F) ^ s.val).toLinearEquiv))
+    (hShifted : eShifted = eNormalized.trans
+      (((FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) F) ^ s₀.val).toLinearEquiv)) :
+    ∃ sigma : F ≃ₐ[ZMod 2] F,
+      eShifted = eKernel.trans sigma.toLinearEquiv ∧
+      ∀ x : F,
+        sigma (((frobeniusEquiv F 2) ^ r) x) =
+          ((frobeniusEquiv F 2) ^ r) (sigma x) := by
+  refine ⟨combinedKernelFrobeniusShift F s.val s₀.val, ?_, ?_⟩
+  · exact secondLayerCoordinate_eq_trans_combinedKernelFrobeniusShift
+      eKernel eNormalized eShifted s.val s₀.val hNormalized hShifted
+  · exact combinedKernelFrobeniusShift_commutes_frobeniusPower
+      s.val s₀.val r
+
+local instance combinedShiftLayerCommGroup
+    (H : Type uP) [Group H] (i : Nat) :
+    CommGroup (lowerCentralLayer H i) :=
+  { (inferInstance : Group (lowerCentralLayer H i)) with
+    mul_comm := (lowerCentralLayer_isElementaryAbelian H i).comm }
+
+noncomputable local instance combinedShiftLayerModule
+    (H : Type uP) [Group H] (i : Nat) :
+    Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
+  lowerCentralLayerZmodModule H i
+
+/-- The two tracked shifts provide exactly the automorphism and commutation
+hypothesis needed to restore the original prescribed kernel coordinate in the
+type-A normal form. -/
+theorem exists_typeANormalForm_preserving_original_kernel_of_two_shifts
+    {H : Type uP} [Group H]
+    {F : Type uF} [Field F] [Finite F] [CharP F 2]
+    [Algebra (ZMod 2) F]
+    (hSq : LowerCentralSquaresLieInSecond H)
+    (eZero : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] F)
+    (eKernel eNormalized eShifted :
+      Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] F)
+    (s s₀ : Fin (Module.finrank (ZMod 2) F))
+    (r : Nat)
+    (hNormalized : eNormalized = eKernel.trans
+      (((FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) F) ^ s.val).toLinearEquiv))
+    (hShifted : eShifted = eNormalized.trans
+      (((FiniteField.frobeniusAlgEquivOfAlgebraic
+        (ZMod 2) F) ^ s₀.val).toLinearEquiv))
+    (epsilon : F)
+    (hformula : ∀ alpha : F,
+      eShifted
+          (lowerCentralSquareMapAdditive H hSq (eZero.symm alpha)) =
+        epsilon * (alpha * ((frobeniusEquiv F 2) ^ r) alpha)) :
+    ∃ eZero' : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] F,
+      ∃ epsilon' : F,
+        ∀ beta : F,
+          eKernel
+              (lowerCentralSquareMapAdditive H hSq (eZero'.symm beta)) =
+            epsilon' * (beta * ((frobeniusEquiv F 2) ^ r) beta) := by
+  obtain ⟨sigma, hcoordinate, hcomm⟩ :=
+    exists_combinedKernelFrobeniusShift
+      eKernel eNormalized eShifted s s₀ r hNormalized hShifted
+  apply exists_typeANormalForm_preserving_kernel_coordinate
+    hSq eZero eKernel sigma ((frobeniusEquiv F 2) ^ r)
+    hcomm epsilon
+  intro alpha
+  rw [← hcoordinate]
+  exact hformula alpha
+
 /-- Honest model data for a ξ-length-two Higman factor `A(n, φ)`.
 
 Unlike Peterfalvi's noncommutative `TypeAData`, this source-facing carrier
