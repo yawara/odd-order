@@ -543,7 +543,7 @@ theorem typePACore_eq_A1_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     _ = OddOrder.GroupTheory.sharpSubgroup (derivedInG M) :=
         OddOrder.GroupTheory.centralizerSupport_sharpSubgroup_of_le (le_refl _)
     _ = A1 M tau := by
-        show _ = OddOrder.GroupTheory.sharpSubgroup (OddOrder.GroupTheory.mainSubgroup M tau)
+        change _ = OddOrder.GroupTheory.sharpSubgroup (OddOrder.GroupTheory.mainSubgroup M tau)
         rw [hms]
 
 /-- **(8.10) on the types of class `𝒫`**: the type-uniform support `A(M) = typeA M tau` is the
@@ -577,7 +577,7 @@ theorem A1_eq_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
     A1 M tau = OddOrder.BG.Ch4.S14.sigmaSharp M := by
-  show OddOrder.GroupTheory.sharpSubgroup (OddOrder.GroupTheory.mainSubgroup M tau) = _
+  change OddOrder.GroupTheory.sharpSubgroup (OddOrder.GroupTheory.mainSubgroup M tau) = _
   rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
   rfl
 

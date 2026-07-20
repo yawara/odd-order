@@ -311,14 +311,10 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
     have h_eq_inv : (SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ))
         : CyclicExtPreG N σ)⁻¹ * SemidirectProduct.inl a = (cyclicExtK m a σ)⁻¹ := by
       apply SemidirectProduct.ext
-      · change ((SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)))⁻¹ *
-            SemidirectProduct.inl a : CyclicExtPreG N σ).left = (cyclicExtK m a σ)⁻¹.left
-        unfold cyclicExtK
+      · unfold cyclicExtK
         simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left,
           SemidirectProduct.inv_right, cyclicExtPhi_apply]
-      · change ((SemidirectProduct.inr (Multiplicative.ofAdd (m : ℤ)))⁻¹ *
-            SemidirectProduct.inl a : CyclicExtPreG N σ).right = (cyclicExtK m a σ)⁻¹.right
-        unfold cyclicExtK
+      · unfold cyclicExtK
         simp only [SemidirectProduct.mul_right, SemidirectProduct.inv_right,
           SemidirectProduct.right_inl, SemidirectProduct.right_inr, one_mul, mul_one]
     rw [h_eq_inv]
