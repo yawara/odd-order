@@ -10975,6 +10975,29 @@ appear to be needed, and `R₀ < S` *properly* starts to matter. -/
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.commutator_eq_and_card_quotient
 
+/-! **BG Theorem E.3(b) third clause — PROVED** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20).  `|S/S'| = p²` now holds for **every** exponent-`p` `S` properly containing
+`R₀`, so E.3(b)'s `|Ω₁(R)/(Ω₁(R))'| = p²` follows.
+
+* `RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube` — BG's `|S| ≤ p³`
+  branch.  Here the *"examination of the `p`-groups of order at most `p³`"* really is needed
+  (unlike for `R₀ ⊄ S'`): `S` abelian gives `|S| = p²` and `S' = 1` via `pRank ≤ 2` plus
+  properness; `S` nonabelian gives `|S| = p³`, `|Z(S)| = p` (else `S/Z(S)` is cyclic) and
+  `S' = Z(S)`.
+* `RegularOperatorSetup.card_quotient_commutator` — the two branches joined.
+* `RegularOperatorSetup.R₀_lt_omega` — `R₀ < Ω₁(R)` **properly**.  ⚠ This is the first and
+  only place where the setup's cyclic factor `R₁` is used in Step 2: the third clause is
+  *false* for `S = R₀` (giving `p`, not `p²`), so properness must come from somewhere, and
+  it comes from an order-`p` element of `R₁ ≠ 1`, disjoint from `R₀`.
+
+⚠ `RegularOperatorSetup.card_omega_abelianization` (the clause itself) is genuinely proved
+from these but cites the still-sorried first clause `omega_pow_eq_one` for the exponent
+hypothesis, so — like the second clause — it is deliberately **not** asserted here. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_quotient_commutator
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_lt_omega
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

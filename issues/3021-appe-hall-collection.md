@@ -451,7 +451,24 @@ private helper: `normal_iterCommutator` / `iterCommutator_antitone` /
    - `S` 非アーベル (⟹ `|S| = p³`): `cl(S) ≤ 2` ⟹ `S' ≤ Z(S)`、`S' ≠ 1`;
      `S/Z(S)` 非巡回 (mathlib `isMulCommutative_of_isCyclic_quotient_center_self` の対偶)
      ⟹ `|Z(S)| = p` ⟹ `S' = Z(S)`、`|S/S'| = p²` ✓
-   ⟹ **ここで初めて BG の「`R₀ < S` 真部分群」仮説が効く**。**次に着手するのはここ**。
+   ⟹ **ここで初めて BG の「`R₀ < S` 真部分群」仮説が効く**。
+
+### ⭐ 2026-07-20 (7): **E.3(b) 第 3 節を証明** — AppE sorry 6 → 5
+
+| 新規宣言 | 内容 |
+|---|---|
+| `commutator_le_center_of_card_le_prime_cube` (private) | `\|G\| ≤ p³ ⟹ G' ≤ Z(G)` (既存の cl≤2 論法を抽出) |
+| `card_quotient_commutator_of_card_le_prime_cube` | **`\|S\| ≤ p³` 分岐** (上記の筋どおり) |
+| `card_quotient_commutator` | 2 分岐を接合 ⟹ 指数 p の任意の `S ⊋ R₀` で `\|S/S'\| = p²` |
+| `R₀_lt_omega` | **`R₀ < Ω₁(R)` (真)** |
+| `card_omega_abelianization` | **E.3(b) 第 3 節** (sorry → 実証明) |
+
+⚠ **`R₁` が Step 2 で初めて効いたのがここ**。第 3 節は `S = R₀` では**偽** (`p` になる) なので
+真部分群性が要り、それを `R₁ ≠ 1` の位数 p 元 (R₀ と disjoint) から取る。
+それ以前のステップは全部 `R₁` 無しで通っていた。
+
+⚠ `|S| ≤ p³` 分岐は `R₀ ⊄ S'` のときと違って**本当に位数の場合分けが要った** —
+BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇所。
 2. **(E.9)-(E.12)**: 固有値 `r_i ≡ r₀ r^i (mod p)`、`A` regular + Prop 1.5(d) ⟹
    `r_i ≢ 1`、`r^q ≡ 1` ⟹ `n ≤ q-1` ⟹ `|S| = p·pⁿ ≤ p^q`。⟹ **E.3(c)**。
    ⚠ ここは鎖の **A-不変性**が要る (今の鎖は A-不変性を主張していない —
