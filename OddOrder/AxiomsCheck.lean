@@ -11580,6 +11580,13 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- supported arguments.  So the pin `dd.dade = h46.dade0.restrict …` suffices — no agreement
 -- between the two `FullDadeIsometryData` is needed.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent_restrict
+-- **The (8.15.3) base coherence lifted to the `A₀`-support** — the `hAbase` supplier.  Enlarging
+-- the support is `S07.isCoherent_of_supportedSpan_le`; its containment `ℤ[S, A₀] ⊆ ℤ[S, A]` holds
+-- because the cut has uniform degree, so `1 ∉ A₀` forces an `A₀`-supported lattice element to
+-- vanish at `1`, hence to be a combination of member differences, each `A`-supported by (4.7).
+-- Moving the map is `IsCoherent.congrMap` through the restriction identity that the case (b)
+-- descent uses in the opposite direction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent_A0
 -- **(9.11.1) at §9 level**: the two honest carriers of case (9.7.a) and the maximality refuter they
 -- feed.  The §13 forms (`S13.NineElevenPairBound` / `_EqualityRefutation` /
 -- `S13.caseA_refuter_of_equality_refutation`) are stated over `S13.Hypothesis`, but their only
