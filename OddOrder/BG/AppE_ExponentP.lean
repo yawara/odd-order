@@ -438,10 +438,10 @@ and the intersection is `C_S(v)`, of order `p²` by `(E.4)`.
 This is the arithmetic behind BG's `(E.16)`: dividing `|T : C_T(v)| = |T : T₁|·|T₁ : C_T(v)|`
 by it turns the `T`-class bound into the bound `|T : T₁| < p²`. -/
 theorem RegularOperatorSetup.card_sup_centralizer [Finite R]
-    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
-    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hST : S ≤ T)
     (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀) :
-    Nat.card ↥(S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R))) * p ^ 2 =
+    Nat.card ↥(S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R))) *
+        Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) =
       Nat.card ↥S * Nat.card ↥(T ⊓ Subgroup.centralizer ({v} : Set R)) := by
   set C : Subgroup R := T ⊓ Subgroup.centralizer ({v} : Set R) with hC
   have hCN : C ≤ Subgroup.normalizer (S : Set R) := inf_le_left.trans hTN
@@ -453,7 +453,7 @@ theorem RegularOperatorSetup.card_sup_centralizer [Finite R]
     rw [hC, centralizer_singleton_eq_of_zpowers_eq hv]
     exact le_antisymm (le_inf inf_le_right (inf_le_left.trans inf_le_right))
       (le_inf (le_inf (inf_le_left.trans hST) inf_le_right) inf_le_left)
-  rw [hinf, (hyp.centralizer_inf_eq_sup_omega1Center hR₀S hexp hS).2] at hprod
+  rw [hinf] at hprod
   have hcard : Nat.card ↥(C ⊔ S) = Nat.card ↑((C : Set R) * (S : Set R)) :=
     Nat.card_congr (Equiv.setCongr hcoe)
   rw [sup_comm, hcard, hprod, mul_comm]
@@ -490,8 +490,8 @@ orbit--stabilizer in `T` suffices: `|K_T|·|C_T(v)| = |T|`, `|T| = |T:T₁|·|T�
 `p²·|K_T| = |T:T₁|·|S|`.  The `T`-class `K_T` is a *proper* subset of `S` — inside it
 because `S ⊴ T`, proper because it misses `1`. -/
 theorem RegularOperatorSetup.index_sup_centralizer_lt [Finite R]
-    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
-    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hST : S ≤ T)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) ≤ p ^ 2)
     (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀)
     (hvS : v ∈ S) (hv1 : v ≠ 1) :
     ((S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R))).subgroupOf T).index < p ^ 2 := by
@@ -521,7 +521,7 @@ theorem RegularOperatorSetup.index_sup_centralizer_lt [Finite R]
   rw [hcT₁] at h2
   rw [hcC] at h1
   -- (3) the product formula
-  have h3 := hyp.card_sup_centralizer hR₀S hST hexp hS hTN hv
+  have h3 := hyp.card_sup_centralizer hST hTN hv
   -- (5) the `T`-class is a proper subset of `S`
   have hOsub : O ⊆ ((S.subgroupOf T : Subgroup ↥T) : Set ↥T) := by
     rintro y ⟨t, rfl⟩
@@ -548,18 +548,22 @@ theorem RegularOperatorSetup.index_sup_centralizer_lt [Finite R]
   -- (4)+(6): `p²·|K_T| = |T:T₁|·|S|`, then compare with `p²·|S|`
   have hCpos : 0 < Nat.card ↥C := Nat.card_pos
   have hSpos : 0 < Nat.card ↥S := Nat.card_pos
-  have hkey : Nat.card O * p ^ 2 = (T₁.subgroupOf T).index * Nat.card ↥S := by
+  set c : ℕ := Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) with hc
+  have hkey : Nat.card O * c = (T₁.subgroupOf T).index * Nat.card ↥S := by
     refine Nat.eq_of_mul_eq_mul_right hCpos ?_
-    calc Nat.card O * p ^ 2 * Nat.card ↥C
-        = (Nat.card O * Nat.card ↥C) * p ^ 2 := by ring
-      _ = (Nat.card ↥T₁ * (T₁.subgroupOf T).index) * p ^ 2 := by rw [h1, h2]
-      _ = (Nat.card ↥T₁ * p ^ 2) * (T₁.subgroupOf T).index := by ring
+    calc Nat.card O * c * Nat.card ↥C
+        = (Nat.card O * Nat.card ↥C) * c := by ring
+      _ = (Nat.card ↥T₁ * (T₁.subgroupOf T).index) * c := by rw [h1, h2]
+      _ = (Nat.card ↥T₁ * c) * (T₁.subgroupOf T).index := by ring
       _ = (Nat.card ↥S * Nat.card ↥C) * (T₁.subgroupOf T).index := by rw [h3]
       _ = (T₁.subgroupOf T).index * Nat.card ↥S * Nat.card ↥C := by ring
-  have : (T₁.subgroupOf T).index * Nat.card ↥S < p ^ 2 * Nat.card ↥S := by
-    rw [← hkey, mul_comm (Nat.card O) (p ^ 2)]
-    exact mul_lt_mul_of_pos_left hOlt (pow_pos hyp.p_prime.pos 2)
-  exact Nat.lt_of_mul_lt_mul_right this
+  have hlt : (T₁.subgroupOf T).index * Nat.card ↥S < p ^ 2 * Nat.card ↥S := by
+    rw [← hkey]
+    calc Nat.card O * c ≤ Nat.card O * p ^ 2 := Nat.mul_le_mul_left _ hp2
+      _ < Nat.card ↥S * p ^ 2 :=
+        (Nat.mul_lt_mul_right (pow_pos hyp.p_prime.pos 2)).mpr hOlt
+      _ = p ^ 2 * Nat.card ↥S := by ring
+  exact Nat.lt_of_mul_lt_mul_right hlt
 
 
 /-- `(H/N).index` in `G/N` equals `H.index` in `G`, for `N ≤ H` normal.
@@ -580,7 +584,7 @@ has index `< p²`.
 change the index. -/
 theorem RegularOperatorSetup.exists_zpowers_index_lt [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
-    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) ≤ p ^ 2)
     (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀)
     (hvS : v ∈ S) (hv1 : v ≠ 1) [hn : (S.subgroupOf T).Normal] :
     ∃ x : ↥T ⧸ S.subgroupOf T, (Subgroup.zpowers x).index < p ^ 2 := by
@@ -588,7 +592,7 @@ theorem RegularOperatorSetup.exists_zpowers_index_lt [Finite R]
   refine ⟨x, ?_⟩
   rw [hx, index_map_mk' _ (Subgroup.subgroupOf_mono T le_sup_left),
     ← hyp.sup_centralizer_eq_sup_inf_R₁ hR₀S hST hv]
-  exact hyp.index_sup_centralizer_lt hR₀S hST hexp hS hTN hv hvS hv1
+  exact hyp.index_sup_centralizer_lt hST hp2 hTN hv hvS hv1
 
 
 /-- **In a finite cyclic group, `|Ω₁(G)| ≤ p`.**
@@ -831,6 +835,43 @@ theorem RegularOperatorSetup.inf_centralizer_eq_seed [Finite R]
     (hexp : ∀ x ∈ S, x ^ p = 1) :
     S ⊓ Subgroup.centralizer (hyp.R₀ : Set R) = hyp.seed := by
   refine le_antisymm (fun x hx => ⟨hx.2, hexp x hx.1⟩) (le_inf hseed fun x hx => hx.1)
+
+
+/-- **`|seed| ≤ p²`**, i.e. BG's `|R₀ × Ω₁(R₁)| = p²` as an upper bound.
+
+The seed is elementary abelian (`omega1OfAbelian_isElementaryAbelian`) inside `C_R(R₀)`,
+which has the cyclic `R₁` as a subgroup of index `p` (`card_centralizer_R₀`); so
+`GroupTheory.card_le_prime_sq_of_isCyclic_of_index_le_prime` applies.
+
+Together with `(E.14)` (`inf_centralizer_eq_seed`) this bounds `|C_S(R₀)|` for every `S` in
+the family — with no rank hypothesis, which is what Step 3 needs. -/
+theorem RegularOperatorSetup.card_seed_le [Finite R] (hyp : RegularOperatorSetup R B p q) :
+    Nat.card ↥hyp.seed ≤ p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set C : Subgroup R := Subgroup.centralizer (hyp.R₀ : Set R) with hC
+  have hR₁C : hyp.R₁ ≤ C := by rw [hC, hyp.centralizer_eq]; exact le_sup_right
+  have hseedC : hyp.seed ≤ C := fun x hx => hx.1
+  haveI : IsCyclic ↥(hyp.R₁.subgroupOf C) := by
+    haveI := hyp.R₁_cyclic
+    exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hR₁C).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hR₁C).symm.surjective
+  have hidx : (hyp.R₁.subgroupOf C).index = p := by
+    have h := (hyp.R₁.subgroupOf C).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₁C).toEquiv, hyp.card_centralizer_R₀] at h
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥hyp.R₁)) ?_
+    rw [h]; ring
+  have hEA : (hyp.seed.subgroupOf C).IsElementaryAbelian p := by
+    constructor
+    · intro x y
+      refine Subtype.ext (Subtype.ext ?_)
+      exact hyp.centralizer_R₀_mul_comm _ (hseedC (Subgroup.mem_subgroupOf.mp x.2)) _
+        (hseedC (Subgroup.mem_subgroupOf.mp y.2))
+    · intro x
+      refine Subtype.ext (Subtype.ext ?_)
+      simpa using hyp.seed_pow_eq_one (Subgroup.mem_subgroupOf.mp x.2)
+  have hbound := GroupTheory.card_le_prime_sq_of_isCyclic_of_index_le_prime
+    (K := hyp.R₁.subgroupOf C) inferInstance (le_of_eq hidx) hEA
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hseedC).toEquiv] at hbound
 
 
 end OddOrder.BG.AppE
