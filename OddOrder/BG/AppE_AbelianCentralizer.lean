@@ -859,4 +859,40 @@ theorem eq_of_lt_of_le_of_card_eq_prime_mul {G : Type*} [Group G] [Finite G] {p 
   refine Subgroup.eq_of_le_of_card_ge hXL (le_of_eq ?_)
   rw [hb, hb1, mul_one]
 
+/-! ## `(E.24)`/`(E.25)`: extracting BG's `k`, `i` and `j`
+
+BG: *"Take `k` minimal such that `T/H_k` is not abelian. … Now take `i` maximal such that
+`[Hᵢ,T] ⊄ H_k` and `j` maximal such that `[Hᵢ,Hⱼ] ⊄ H_k`."*  Both extractions are the same
+two shapes: a least index at which a chain condition first fails, and a greatest index at
+which it still holds.  The chain reaching `1` is what bounds them. -/
+
+/-- **BG's minimal `k`**: the first index with `T' ⊄ H_k`, i.e. with `T/H_k` non-abelian.
+
+It exists because the chain reaches `1` while `T' ≠ 1`, and it is `≥ 1` because `H₀ = T`
+contains `T'`.  Minimality is delivered in the form `(E.24)` consumes: `T' ≤ H_{k-1}`. -/
+theorem exists_min_index_commutator_not_le {G : Type*} [Group G] {H : ℕ → Subgroup G}
+    {T : Subgroup G} (h0 : H 0 = T) {n : ℕ} (hn : H n = ⊥) (hne : ⁅T, T⁆ ≠ ⊥) :
+    ∃ k, 1 ≤ k ∧ ⁅T, T⁆ ≤ H (k - 1) ∧ ¬ (⁅T, T⁆ ≤ H k) := by
+  classical
+  have hex : ∃ k, ¬ (⁅T, T⁆ ≤ H k) := ⟨n, by rw [hn]; exact fun h => hne (le_bot_iff.mp h)⟩
+  have hkspec : ¬ (⁅T, T⁆ ≤ H (Nat.find hex)) := Nat.find_spec hex
+  have hk0 : Nat.find hex ≠ 0 := by
+    intro h
+    rw [h] at hkspec
+    exact hkspec (by rw [h0]; exact Subgroup.commutator_le_self T)
+  refine ⟨Nat.find hex, Nat.one_le_iff_ne_zero.mpr hk0, ?_, hkspec⟩
+  exact not_not.mp (Nat.find_min hex (m := Nat.find hex - 1) (by omega))
+
+/-- **BG's maximal `i` and `j`**: a greatest index at which a property still holds, given
+that it holds at `0` and fails past a bound.
+
+`Nat.findGreatest` packaged with both halves of what `(E.25)` needs. -/
+theorem exists_max_of_holds_at_zero {P : ℕ → Prop} (h0 : P 0) {n : ℕ}
+    (hn : ∀ m, n < m → ¬ P m) : ∃ i, P i ∧ ∀ m, i < m → ¬ P m := by
+  classical
+  refine ⟨Nat.findGreatest P n, Nat.findGreatest_spec (Nat.zero_le n) h0, fun m hm => ?_⟩
+  by_cases hmn : m ≤ n
+  · exact Nat.findGreatest_is_greatest hm hmn
+  · exact hn m (by omega)
+
 end OddOrder.BG.AppE
