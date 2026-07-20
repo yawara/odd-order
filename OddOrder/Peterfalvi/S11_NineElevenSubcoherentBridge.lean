@@ -588,6 +588,31 @@ theorem caseB_coherent_sOf_cprime [Finite G] {M : Subgroup G} {A : Set G}
     (mul_ne_zero Nat.card_pos.ne' (u_odd hG chars).pos.ne') hη₁
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **A `𝒮(Y)`-member and its conjugate have the same degree.**
+
+Members are inductions of irreducible characters, so `φ(1) = [M:M']·θ(1)` is a natural number
+(`inducedKernelFamily_apply_one` + `exists_natDegree_charValue_one_dvd_card`) and conjugation fixes
+it (`star` of a natural cast).
+
+This is what makes the `A(M)`-descent below **branch-independent**: the (4.7) estimate
+`inducedNonKernelFamily_diff_support` only needs the two degrees to agree, and `φ̄(1) = φ(1)` holds
+for *every* member — no uniform-degree hypothesis required. -/
+theorem sOf_conj_apply_one [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G)
+    {η : ClassFunction ↥M ℂ} (hη : η ∈ sOf data Y) :
+    ((η : ClassFunction ↥M ℂ).conj : ↥M → ℂ) 1 = (η : ↥M → ℂ) 1 := by
+  classical
+  haveI := derivedInG_subgroupOf_normal M
+  obtain ⟨θ, -, -, hη1⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_apply_one
+    (sOf_subset_inducedKernelFamily_bot hG hM data Y hη)
+  obtain ⟨n, -, hn, -⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  have hnat : (η : ↥M → ℂ) 1 = ((((derivedInG M).subgroupOf M).index * n : ℕ) : ℂ) := by
+    rw [hη1, hn]; push_cast; ring
+  rw [ClassFunction.conj_apply, hnat]
+  exact star_natCast _
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Case (9.7.b) coherence, moved down to the `A(M)`-isometry** — the form (9.5) actually asks
 for.
 
@@ -610,13 +635,12 @@ makes the descent possible.
 ⚠ Note this runs the *opposite* way to the §13 use of `isCoherent_of_supportedSpan_le`
 (`S13.certainTypeSet_isCoherent_A0`, which enlarges `A ⇝ A₀`); there the family is the certain-type
 column set, here it is `𝒮(Y)`, and the target is the book's `A(M)`. -/
-noncomputable def sOf_caseB_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
+noncomputable def sOf_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     (h46c : OddOrder.Peterfalvi.S06.Hypothesis46Core A M)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
-    {Y : Subgroup G} (d : ℕ)
-    (hunif : ∀ φ ∈ sOf data Y, ((φ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ))
+    {Y : Subgroup G}
     (hKeq : h46c.K = (derivedInG M).subgroupOf M)
     (hHeq : h46c.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
     {η : ClassFunction ↥M ℂ} (hη : η ∈ sOf data Y)
@@ -640,7 +664,7 @@ noncomputable def sOf_caseB_coherent_restrict [Finite G] {M : Subgroup G} {A : S
   have hwitsupp : ((η : ClassFunction ↥M ℂ).conj - η).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup A M :=
     OddOrder.Peterfalvi.S10.inducedNonKernelFamily_diff_support h46c (hmemNK hηc) (hmemNK hη)
-      (by rw [hunif _ hηc, hunif _ hη])
+      (sOf_conj_apply_one hG hM data Y hη)
   have hwitne : ((η : ClassFunction ↥M ℂ).conj - η) ≠ 0 := fun h =>
     OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
       (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M)
@@ -1334,10 +1358,10 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 The (9.7) Clifford dichotomy (`clifford_dichotomy`, already type-free on `chars`) splits into the
 two branches proved above:
 
-* case (9.7.a) — `caseA_coherent_sOf_cprime_of_refuter`, whose maximality refuter is
-  `caseA_refuter_of_equality_refutation`; what remains open is the degree-`qa` base coherence
-  `hAbase` (supplied by `sOf_degreeSubfamily_coherent_restrict` up to its `2 ≤ ncard` count) and
-  the two honest (9.11) carriers `hbound` / `hrefuteEq`;
+* case (9.7.a) — `caseA_coherent_sOf_cprime_of_refuter`, with the maximality refuter
+  `caseA_refuter_of_equality_refutation` and its (5.6) pair bound **discharged** by
+  `caseA_pairBound`; what remains open is the degree-`qa` base coherence `hAbase` and the single
+  honest (9.11) carrier `hrefuteEq` (the (9.11.2)–(9.11.8) equality-configuration refutation);
 * case (9.7.b) — **fully discharged**: uniform degree from (9.9.a), pivot from (9.9.b)
   (`sOf_cprime_nonempty`), and the descent to this `τ` from `sOf_caseB_coherent_restrict`.
 
@@ -1345,9 +1369,14 @@ two branches proved above:
 does not pay for them.
 
 The `τ` is the one Hypothesis (9.5) names: the Dade isometry of `(A(M), M, G)`, i.e. the
-**restriction** of the (4.6.e) datum on `A₀ = A ∪ V^M`.  Stating it here rather than on `A₀` is what
-makes `hAbase` line up with `sOf_degreeSubfamily_coherent`, which is also an `A(M)` statement (it
-comes from (8.15.3), where the (4.7) estimate gives the sharper `A`-support).
+**restriction** of the (4.6.e) datum on `A₀ = A ∪ V^M`.
+
+⚠ Both branches are run on `A₀` and descended **once**, by `sOf_coherent_restrict`.  Case (a) has
+no choice in the matter: its (5.6) engine takes the Dade hypothesis `h46.dade0`, so its support
+facts route through `(M')^# ⊆ A₀`, and the `A`-analogue `(M')^# ⊆ A` is *false* for the
+type-uniform `A(M) = typePACore`.  The descent is branch-independent because the witness it needs
+is `η̄ − η`, whose degrees agree for every member (`sOf_conj_apply_one`) — no uniform-degree
+hypothesis.
 
 **No type hypothesis appears anywhere on this route** — which is the point of issue 1045: the §13
 statement `S13.coherent_sOf_H0Cprime` carries `IsTypeIII ∨ IsTypeIV` purely because its carrier
@@ -1369,35 +1398,35 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
     (hAbase : ∀ caseA : CliffordCaseAData chars,
       OddOrder.Peterfalvi.S07.IsCoherent
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
-          (h46.dade0.restrict Set.subset_union_left hAnorm)
-          (h46.tau.restrict Set.subset_union_left hAnorm))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
         {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
           IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))}
-        (OddOrder.Peterfalvi.S04.supportInSubgroup A M))
-    (hbound : ∀ caseA : CliffordCaseAData chars, CaseAPairBound caseA
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
-        (h46.dade0.restrict Set.subset_union_left hAnorm)
-        (h46.tau.restrict Set.subset_union_left hAnorm))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup A M))
+        (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M))
     (hrefuteEq : ∀ caseA : CliffordCaseAData chars, CaseAEqualityRefutation caseA
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
-        (h46.dade0.restrict Set.subset_union_left hAnorm)
-        (h46.tau.restrict Set.subset_union_left hAnorm))
-      (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         (h46.dade0.restrict Set.subset_union_left hAnorm)
         (h46.tau.restrict Set.subset_union_left hAnorm))
       (sOf data (chief.H0 ⊔ chars.Cprime))
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) := by
-  rcases clifford_dichotomy hG chars with hA | hB
-  · exact caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some (hAbase hA.some)
-      (caseA_refuter_of_equality_refutation hG hA.some _ _ (hbound hA.some) (hrefuteEq hA.some))
-  · obtain ⟨η₁, hη₁⟩ := sOf_cprime_nonempty hG (chief := chief)
-    exact ⟨sOf_caseB_coherent_restrict hG hM data h46 h46.toCore hAnorm (data.q * chars.u)
-      (caseB_degree_qu hG chars hB.some)
-      (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHeq hη₁
-      (caseB_coherent_sOf_cprime hG hM chars hB.some h46 hKeq hconj htau hKsupp hVsub hη₁).some⟩
+  obtain ⟨η₁, hη₁⟩ := sOf_cprime_nonempty hG (chief := chief)
+  -- both branches deliver the coherence on `A₀`; the descent to `A(M)` is shared
+  have hA0 : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (sOf data (chief.H0 ⊔ chars.Cprime))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) := by
+    rcases clifford_dichotomy hG chars with hA | hB
+    · exact caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some (hAbase hA.some)
+        (caseA_refuter_of_equality_refutation hG hA.some _ _
+          (caseA_pairBound hG hM hA.some h46 hKeq hconj htau hKsupp hVsub)
+          (hrefuteEq hA.some))
+    · exact caseB_coherent_sOf_cprime hG hM chars hB.some h46 hKeq hconj htau hKsupp hVsub hη₁
+  exact ⟨sOf_coherent_restrict hG hM data h46 h46.toCore hAnorm
+    (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHeq hη₁ hA0.some⟩
 
 end OddOrder.Peterfalvi.S11
