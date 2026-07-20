@@ -474,4 +474,134 @@ noncomputable def decompositionDaFromDiff_general
     (fun φ ζ hφ hζ => hisom _ hSdiff φ ζ hφ hζ)
     rfl hτaχ1Z hχaχ1 hχbaraχ1 hχχbar
 
+/-! ### The general degree-bound adjoining step (`adjoinPairCoherent`) -/
+
+open scoped Classical in
+/-- **General degree-bound coherence adjoin** (generalizes `xAdjoinStep`,
+`S08_CoherenceCorePart1/CoherentAdjoin.lean`, from the Feit–Thompson Dade map to any isometry `τ`).
+
+This is **Peterfalvi (5.6) / Isaacs, *Character Theory*, Theorem 7.14** — the mixed-degree coherence
+adjoin.  Adjoins a new non-real irreducible pair `{χ, χ̄}` (`‖χ‖² = 1`, `χ ⊥ S₁`) to a coherent
+`(S₁, τ)`, given a finite orthonormal unit-norm member family `{χmem i}ᵢ∈ₛ ⊆ S₁` with degree ratios
+`deg i` (`deg i₁ = 1`), the signed-difference families `R(χ)`, `R(χmem i)`
+(`CharacterDifferenceImage`s w.r.t. `τ`, from `Hypothesis.difference_image` in the application) with
+their `(5.2.e)` cross-orthogonalities `R(χmem i) ⊥ R(χ)`, and the **degree inequality**
+`2a < ∑ᵢ (deg i)²` (`a = χ(1)/χ₁(1)`).  Concludes `IsCoherent τ (S₁ ∪ {χ, χ̄}) A`.
+
+The lattice isometry `hisom` (in the Dade version drawn from
+`dadeIntegralCharacterMap_inner_eq_on_supported_span`, here supplied from
+`Hypothesis.tau_isometry_diff`) is the sole "isometry" input.  Everything else reduces to the
+general leaf lemmas above and in §5/§6.  See issue 1049. -/
+noncomputable def adjoinPairCoherent_general
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {S₁ : Set (ClassFunction L ℂ)}
+    (hS₁ : IsCoherent τ S₁ A)
+    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s.support ⊆ A) →
+      ∀ φ ζ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
+        ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    {χ : ClassFunction L ℂ}
+    (Rχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hdiffsuppχ : (χ.conj - χ).support ⊆ A)
+    (hχχ : ClassFunction.inner χ χ = 1) (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0) (hχbarχ : ClassFunction.inner χ.conj χ = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (Rmem : ∀ i, i ∈ s → CharacterDifferenceImage (L := L) (G := G) τ (χmem i))
+    (hmemdiffsupp : ∀ i ∈ s, ((χmem i).conj - χmem i).support ⊆ A)
+    (hmemdegdiffsupp : ∀ i ∈ s, (χmem i - deg i • χmem i₁).support ⊆ A)
+    (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁) (hmembarS1 : ∀ i ∈ s, (χmem i).conj ∈ S₁)
+    (hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i) (χmem i).conj = 0)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i) (χmem j) = if i = j then (1 : ℂ) else 0)
+    (hmemOrtho : ∀ i (hi : i ∈ s), (Rmem i hi).Orthogonal Rχ)
+    {a : ℕ}
+    (hdiffasuppχ : (χ - a • χmem i₁).support ⊆ A)
+    (htau1_memaχ : τ (χ - a • χmem i₁) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2)
+    (hSgen : Submodule.span ℤ S₁ ≤
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χmem i₁}))
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, χ.conj}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - χ.conj, χ - a • χmem i₁})) :
+    IsCoherent τ (S₁ ∪ {χ, χ.conj}) A := by
+  classical
+  have hmemνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G :=
+    fun i hi => hS₁.extension_mem_ZIrr _ (Submodule.subset_span (hmemS1 i hi))
+  have hχaχ1 : ClassFunction.inner χ (a • χmem i₁ : ClassFunction L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁),
+      OddOrder.RepresentationTheory.inner_smul_right, hχ_S1 _ (hmemS1 i₁ hi₁), mul_zero]
+  have hχbaraχ1 : ClassFunction.inner χ.conj (a • χmem i₁ : ClassFunction L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁),
+      OddOrder.RepresentationTheory.inner_smul_right, hχbar_S1 _ (hmemS1 i₁ hi₁), mul_zero]
+  -- The χ-decomposition `Da` for `χ − a·χ₁` (`let`, so `Da.imageFamily`/`Da.tau1` reduce).
+  let Da := decompositionDaFromDiff_general (τ := τ) Rχ.toOrthonormalImage hisom hdiffsuppχ
+    hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar
+  have hDaX_ZIrr : Da.X ∈ ZIrr G := by
+    rw [Da.X_eq]
+    refine Submodule.sum_mem _ (fun α hα => ?_)
+    rw [Int.cast_smul_eq_zsmul ℂ (Da.coeff α) α]
+    exact Submodule.smul_mem _ (Da.coeff α) (Da.imageFamily.mem_ZIrr α hα)
+  have hYeq : Da.Y = Da.X - τ (χ - a • χmem i₁) := by
+    have h : τ (χ - a • χmem i₁) = Da.X - Da.Y := Da.tau1_image
+    rw [h]; abel
+  have hDaY_ZIrr : Da.Y ∈ ZIrr G := by rw [hYeq]; exact Submodule.sub_mem _ hDaX_ZIrr htau1_memaχ
+  have hchi1chi1 : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
+    rw [hmemortho i₁ hi₁ i₁ hi₁]; simp
+  -- Per-member `ψ = 0` decomposition `Dmem` (`let`, so `.imageFamily`/`.tau1` reduce).
+  let Dmem : ∀ i, i ∈ s → CharacterPsiDecomposition (L := L) (G := G) τ (χmem i) 0 := fun i hi =>
+    memberExtensionDecomposition_general hS₁ (Rmem i hi).toOrthonormalImage (hmemdiffsupp i hi)
+      (hmemS1 i hi) (hmembarS1 i hi) (hmemνZ i hi) (hmemconjortho i hi)
+  have hortho_mem : ∀ i (hi : i ∈ s), (Dmem i hi).imageFamily.Orthogonal Da.imageFamily :=
+    fun i hi => (Rmem i hi).toOrthonormalImage_orthogonal Rχ (hmemOrtho i hi)
+  have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i)) = 0 :=
+    fun i hi => OddOrder.Peterfalvi.S08.inner_decomposition_X_extension_member_eq_zero hS₁ Da
+      (Dmem i hi) (hortho_mem i hi) rfl
+  -- The (5.6.1) cross-term `hfound` (inline: `ext δ = τ δ` for supported `δ`, then `hisom`).
+  have hfound : ∀ i ∈ s, ClassFunction.inner (τ (χ - a • χmem i₁))
+      (hS₁.extension (χmem i - deg i • χmem i₁)) =
+      ClassFunction.inner (χ - a • χmem i₁) (χmem i - deg i • χmem i₁) := fun i hi => by
+    have hδℤ : χmem i - deg i • χmem i₁ ∈ Submodule.span ℤ S₁ := by
+      refine Submodule.sub_mem _ (Submodule.subset_span (hmemS1 i hi)) ?_
+      rw [← Nat.cast_smul_eq_nsmul ℤ (deg i) (χmem i₁)]
+      exact Submodule.smul_mem _ _ (Submodule.subset_span (hmemS1 i₁ hi₁))
+    have hδmem : χmem i - deg i • χmem i₁ ∈ zSupportedSpan (L := L) S₁ A :=
+      mem_zSupportedSpan_iff.mpr ⟨hδℤ, hmemdegdiffsupp i hi⟩
+    rw [hS₁.extends_on_supported _ hδmem]
+    refine hisom {χ - a • χmem i₁, χmem i - deg i • χmem i₁} ?_ _ _
+      (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
+    intro t ht; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ht
+    rcases ht with rfl | rfl
+    · exact hdiffasuppχ
+    · exact hmemdegdiffsupp i hi
+  have hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y (hS₁.extension (χmem i)) =
+      (a : ℂ) * (if i = i₁ then 1 else 0) -
+        ((a : ℂ) + ClassFunction.inner (τ (χ - a • χmem i₁))
+          (hS₁.extension (χmem i₁))) * (deg i : ℂ) := by
+    intro i hi
+    have key := inner_Y_extension_member_eq_general hS₁ χ hYeq (hXortho i hi) (hfound i hi)
+      (hχ_S1 _ (hmemS1 i hi)) (hχ_S1 _ (hmemS1 i₁ hi₁)) hchi1chi1
+    rw [hmemortho i₁ hi₁ i hi] at key
+    rw [key]
+    rcases eq_or_ne i i₁ with h | h
+    · subst h; simp
+    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
+  have hcrux1 : ClassFunction.inner (τ (χ - a • χmem i₁)) (hS₁.extension (χmem i₁)) = -(a : ℂ) :=
+    crux1_of_memberFamily_general hS₁ χ s χmem deg i₁ hi₁ Da hDaY_ZIrr hmemS1 hmemortho hcoeffval
+      htau1_memaχ ha1 hDeg
+  have hcrux2 : ClassFunction.inner (τ (χ - χ.conj)) (hS₁.extension (χmem i₁)) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, Da.imageFamily.image_eq,
+      OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_eq_zero (fun α hα =>
+        inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily (Dmem i₁ hi₁)
+          (hortho_mem i₁ hi₁) rfl hα), star_zero]
+  have hτdiffZ : τ (χ - χ.conj) ∈ ZIrr G := by
+    rw [Da.imageFamily.image_eq]
+    exact Submodule.sum_mem _ (fun α hα => Da.imageFamily.mem_ZIrr α hα)
+  exact retarget_isCoherent_of_extensionImage_general hS₁ hisom hdiffsuppχ hdiffasuppχ
+    hχχ hχbarχbar hχχbar hχbarχ (m₁ := 1) (by rw [hchi1chi1]; norm_num) hχ_S1 hχbar_S1
+    (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ (by rw [hcrux1]; norm_num) hcrux2 hSgen hgen
+
 end OddOrder.Peterfalvi.S07
