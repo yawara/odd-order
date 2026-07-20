@@ -110,4 +110,101 @@ theorem RegularOperatorSetup.index_centralizer_upperCentralSeries [Finite R] [Fi
   exact (hyp.card_omega1Center_and_index_centralizer hyp.R₀_le_omega
     (hyp.three_le_pRank_omega hcard)).2
 
+/-! ## `(E.20)`: `B` is abelian
+
+BG: *"Now `Aut(S/T)` is abelian because `|S/T| = p`.  So `B'` centralizes `S/T`.  By
+Proposition 1.5(d), `B'` centralizes an element of `S − T`.  Since `B` acts regularly on
+`R`, we have `B' = 1`."*
+
+BG's Proposition 1.5(d) — *"`C_{G/H}(A)` is the image of `C_G(A)` in `G/H`"* — is
+**Isaacs Corollary 3.28**, formalized as
+`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`. -/
+
+/-- The automorphism group of a cyclic group is abelian: `MulAut G ≃* (ZMod |G|)ˣ`.
+
+BG's *"`Aut(S/T)` is abelian because `|S/T| = p`"*, with the primality repackaged as
+cyclicity. -/
+theorem mulAut_mul_comm_of_isCyclic {G : Type*} [Group G] [IsCyclic G] (f g : MulAut G) :
+    f * g = g * f :=
+  (IsCyclic.mulAutMulEquiv G).injective (by rw [map_mul, map_mul, mul_comm])
+
+/-- A homomorphism into `MulAut` of a cyclic group kills the derived subgroup. -/
+theorem commutator_le_ker_of_isCyclic {A G : Type*} [Group A] [Group G] [IsCyclic G]
+    (ρ : A →* MulAut G) : _root_.commutator A ≤ ρ.ker := by
+  rw [_root_.commutator_def, Subgroup.commutator_le]
+  intro x _ y _
+  rw [MonoidHom.mem_ker, map_commutatorElement, commutatorElement_def,
+    mulAut_mul_comm_of_isCyclic (ρ x) (ρ y)]
+  group
+
+/-- **BG `(E.20)`**: under Proposition E.4's hypotheses `B` is abelian.
+
+`T = C_S(Ω₁(Z₂(S)))` is characteristic in `S` of index `p`, so `S/T` is cyclic of order `p`
+and the induced map `B → Aut(S/T)` kills `B'`; that is, `B'` acts trivially on `S/T`.
+Isaacs Cor 3.28 (BG Prop 1.5(d)) then lifts a `B'`-fixed point out of any coset of `T`, in
+particular out of a coset ≠ `T`, giving a **nontrivial** element of `S` centralized by `B'`.
+Regularity of `B` on `R` forces `B' = 1`. -/
+theorem RegularOperatorSetup.commutator_eq_bot [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) (hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1))
+    (hB_regular : ∀ b : B, b ≠ 1 → ∀ x : R, hyp.act b x = x → x = 1) :
+    _root_.commutator B = ⊥ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set S : Subgroup R := Omega R p 1 with hSdef
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hTdef
+  have hSinv : IsAInvariant hyp.act S := by
+    haveI : S.Characteristic := Omega.characteristic
+    exact IsAInvariant.of_characteristic hyp.act
+  set φ : B →* MulAut ↥S := hSinv.restrict with hφdef
+  have hTinv : IsAInvariant φ T := IsAInvariant.of_characteristic φ
+  -- `|S : T| = p`, so `S/T` is cyclic of order `p`.
+  have hidx : T.index = p := (hyp.card_omega1Center_and_index_centralizer hyp.R₀_le_omega
+    (hyp.three_le_pRank_omega hcard)).2
+  have hcardq : Nat.card (↥S ⧸ T) = p := by rw [← Subgroup.index_eq_card]; exact hidx
+  haveI : IsCyclic (↥S ⧸ T) := isCyclic_of_prime_card hcardq
+  -- `B'` acts trivially on `S/T`.
+  have hker := commutator_le_ker_of_isCyclic (A := B) (G := ↥S ⧸ T) hTinv.quotientMulAutHom
+  have htriv : ∀ b ∈ _root_.commutator B, ∀ x : ↥S, ∃ n ∈ T, φ b x = x * n := by
+    intro b hb x
+    have h1 : hTinv.quotientMulAutHom b = 1 := MonoidHom.mem_ker.mp (hker hb)
+    have h2 : (QuotientGroup.mk' T) ((φ b) x) = (QuotientGroup.mk' T) x := by
+      rw [← IsAInvariant.quotientMulAutHom_apply_mk' hTinv, h1]; rfl
+    refine ⟨x⁻¹ * (φ b) x, ?_, by group⟩
+    simpa using (QuotientGroup.eq (s := T)).mp h2.symm
+  -- A coset ≠ `T` exists, since `|S : T| = p > 1`.
+  have hTne : T ≠ ⊤ := by
+    intro h
+    rw [h, Subgroup.index_top] at hidx
+    exact hyp.p_prime.one_lt.ne hidx
+  obtain ⟨x, hx⟩ : ∃ x : ↥S, x ∉ T := by
+    by_contra h
+    exact hTne (eq_top_iff.mpr fun x _ => not_not.mp fun hxT => h ⟨x, hxT⟩)
+  -- Isaacs Cor 3.28 lifts a `B'`-fixed point out of `x·T`.
+  set B' : Subgroup B := _root_.commutator B with hB'def
+  have hCop : Nat.Coprime (Nat.card ↥B') (Nat.card ↥T) := by
+    obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup S).to_subgroup T |>.exists_card_eq
+    rw [hk]
+    refine Nat.Coprime.pow_right k (Nat.Coprime.symm ?_)
+    refine ((Nat.Prime.coprime_iff_not_dvd hyp.p_prime).mpr fun hdvd => ?_)
+    exact hyp.p_not_dvd_card_B (hdvd.trans (Subgroup.card_subgroup_dvd_card B'))
+  haveI hTsolv : IsSolvable ↥T := by
+    haveI : Group.IsNilpotent ↥T :=
+      IsPGroup.isNilpotent ((hyp.R_pGroup.to_subgroup S).to_subgroup T)
+    infer_instance
+  obtain ⟨c, hcfix, n, hn, hcn⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
+      (φ := φ.comp B'.subtype) (N := T) hCop (Or.inr hTsolv)
+      (fun a => hTinv a.val) (g := x) (fun a => htriv a.val a.property x)
+  -- `c ∉ T`, hence `c ≠ 1`; regularity of `B` then kills `B'`.
+  have hcT : c ∉ T := by
+    rw [hcn]
+    exact fun hmem => hx (by simpa using T.mul_mem hmem (T.inv_mem hn))
+  have hcne : (c : R) ≠ 1 := fun h => hcT (by
+    have : c = 1 := Subtype.ext h
+    rw [this]; exact T.one_mem)
+  rw [eq_bot_iff]
+  intro b hb
+  rw [Subgroup.mem_bot]
+  by_contra hbne
+  exact hcne (hB_regular b hbne (c : R) (congrArg Subtype.val (hcfix ⟨b, hb⟩)))
+
 end OddOrder.BG.AppE
