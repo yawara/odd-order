@@ -134,7 +134,7 @@ theorem orbit_distinguishedInvolution_eq
     obtain ⟨k, hkK, hkw⟩ := hw
     refine ⟨⟨k⁻¹, hyp.D.inv_mem hkK.1⟩, ?_⟩
     rw [hsmul]
-    show (k⁻¹ : G) * s * (k⁻¹)⁻¹ = w
+    change (k⁻¹ : G) * s * (k⁻¹)⁻¹ = w
     rw [inv_inv]; exact hkw
 
 /-- **Peterfalvi Part II, Ch. I Prop 5** (p. 101) — `V = C_D(s)`.  Combining

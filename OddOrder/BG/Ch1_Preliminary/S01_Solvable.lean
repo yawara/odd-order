@@ -139,7 +139,7 @@ Cor 3.29 が**書籍どおり可解性なしに一般化された**ため、そ�
 **no-wrapper policy 例外**: 仮定特殊化 (`p`-群という文脈固有の仮定で述べ直す). -/
 theorem burnside_operator {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]
     {A : Type*} [Group A] [Finite A]
-    (hP : IsPGroup p R) {φ : A →* MulAut R}
+    (_hP : IsPGroup p R) {φ : A →* MulAut R}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card R))
     (h_triv_quot : ∀ a : A, ∀ r : R, ∃ x ∈ _root_.frattini R, (φ a) r = r * x) :
     ∀ a : A, ∀ r : R, (φ a) r = r := by

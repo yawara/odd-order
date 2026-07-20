@@ -264,7 +264,43 @@ noncomputable def inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
 §13 版との接続が要るなら、それは packaging 層の辞書 (9163 §3 項目 4) の話であって
 base coherence の差し替えではない。
 
-**残り**: (d) §9 レベルの (9.11) statement 本体 — (b) の τ/A の上で。
+### ✅ (d) の部品在庫を実測 (2026-07-20) — **全部 §9 以下に在る**
+
+`caseA_coherent_sOf_H0Cprime_of_refuter` (S11_NineElevenCaseA.lean:70) を §9 へ降ろすのに
+要る部品の所在を全部確認した:
+
+| 部品 | 所在 | 判定 |
+|---|---|---|
+| `caseA_character_count_exact` | `S11_SingleFactorCentralizer` | §9 ✅ |
+| `u_odd` / `uprimeSub` | `S11_.../CharacterCounts` | §9 ✅ |
+| `u_le_relIndex_uprimeSub_U` | `S11_SingleFactorCentralizer` | §9 ✅ |
+| `sOf_antitone` / `cprimeSub` / `cSub_le_U` | `S11_.../ChiefFactorCore` | §9 ✅ |
+| `sOf_finite` | `S11_.../CliffordData` | §9 ✅ (本 session 新設) |
+| `sOf_closedUnderConjugate` / `irrCut_conjClosed` | `S11_.../ThetaCountAssembly` | §9 ✅ (本 session 移設) |
+| `derivedInG_eq_commutator` | `BG/Ch3_.../S10_BetaRadicalCore` | 上流 ✅ |
+| `coherent_of_maximal_coherent_pair_refuted` | `S07_Subcoherent` | 上流 ✅ |
+| `sOf_degreeSubfamily_isCoherent` | `S13_Lemmas113To115` | ⚠ **これだけ §13** — (b) で置換してパラメータ化する |
+
+⟹ **(d) は unblocked**。§13 に残る唯一の依存 `sOf_degreeSubfamily_isCoherent` は
+(b) `S11.sOf_degreeSubfamily_coherent` を**パラメータとして受け取る**形にすれば消える。
+
+**(d) の形**:
+```
+theorem caseA_coherent_sOf_cprime_of_refuter [Finite G]
+    (hG) {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (tau : S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M)
+    (caseA : CliffordCaseAData chars)
+    (hbase : Nonempty (IsCoherent tau {degree-qa 既約 cut of sOf data (chief.H0 ⊔ chars.Cprime)} A0))
+    (hrefute : …) :
+    Nonempty (IsCoherent tau (sOf data (chief.H0 ⊔ chars.Cprime)) A0)
+```
+§11 版からの置換対応: `hyp.C` → `chars.C` (= `cSub data chief`)、
+`hyp.H0Cprime` → `chief.H0 ⊔ chars.Cprime`、`hyp.base.tau`/`.A0` → パラメータ `tau`/`A0`、
+finiteness → `sOf_finite`、`sOf_degreeSubfamily_isCoherent` → `hbase` パラメータ。
+
+⚠ 置き場: `caseA_character_count_exact` が `S11_SingleFactorCentralizer` に在るので、
+そこか、それを import する S11 系 leaf。(b) をパラメータで受けるなら橋渡し leaf は不要。
 
 ### (参考) 実装レシピ
 

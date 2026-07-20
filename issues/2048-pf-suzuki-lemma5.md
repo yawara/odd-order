@@ -231,7 +231,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               (`square_frobeniusSum_eq_trace_of_normalized_singleGap`,
               `squareMap_eq_trace_of_normalized_singleGap`,
               `square_frobeniusSum_eq_trace_of_anchored_singleGap`)
-      - [ ] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する
+      - [x] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する。
+            length-two 群の actual square map が非零入力上で非零であることを quotient
+            kernel から証明し、anchored trace formula と結合して `finrank K L = 1`
+            を得る
+            (`lowerCentralSquareMapAdditive_ne_zero_of_xiLengthTwo`,
+            `finrank_eq_one_of_anchoredTrace_lowerCentralSquareMap_of_xiLengthTwo`)
       - [x] actual central extension を平方写像で分類し、Peterfalvi の honest
             `TypeAData` へ接続する shared adapter を構成する (issue 9309)
       - [ ] `m = n` 後の平方写像 `a ↦ a * θ(a)` と lower-central 座標を接続し、

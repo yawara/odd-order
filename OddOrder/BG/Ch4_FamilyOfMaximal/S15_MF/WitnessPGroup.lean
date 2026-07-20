@@ -568,7 +568,7 @@ theorem isMaximalElementaryAbelian_sup_omega1Center_of_witness [Finite G]
     have hzx₁ : z * x₁ = x₁ * z :=
       (Subgroup.mem_centralizer_iff.mp (hACX₁ hzA) x₁ hx₁X).symm
     have hcomm : Commute y x₁ := by
-      show y * x₁ = x₁ * y
+      change y * x₁ = x₁ * y
       calc y * x₁ = c * z * c⁻¹ * (c * x₁ * c⁻¹) := by rw [← hyz, hcx₁]
         _ = c * (z * x₁) * c⁻¹ := by group
         _ = c * (x₁ * z) * c⁻¹ := by rw [hzx₁]
