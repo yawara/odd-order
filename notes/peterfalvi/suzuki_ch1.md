@@ -659,3 +659,24 @@ center=`ambientCenterCoordinate` を入れると `Q(α,β)=A(α)+B(β)+M(α,β)`
   hRnormal/hinf/hsup/hΦR は XiLengthThreeTypeAFactorData から。
 - mixed 項 M(α,β) を各 case の固有値算術で確定 (endpoint の weight equation 使用)。
 - case assembly → `higmanLemmaTwelve : IsTypeB ∨ IsTypeC ∨ IsTypeD`。
+
+### 2026-07-21 lane b: 4a-ii の bridge 構造確定 (次 session 用)
+
+両 L₁ bridge を精査 (MixedEigenweights:73 / AmbientCentralExtension:317):
+- `ambientLayerOneEquivFrattini = quotientMulEquivOfEq hK1 ∘ quotientBot ∘ subgroupCongr hterm`
+  ⟹ `[x]_L₁ ↦ x ∈ frattini P` (underlying element 抽出)
+- `factorLayerOneEquivAmbientFrattini = 同上 ∘ subgroupOfEquivOfLe hPhiS`
+  ⟹ `[y]_{L₁(S)} ↦ (y の underlying, frattini P) ` (同、subgroupOf 補正付き)
+両者 linear 版は `MulEquiv.toAdditive |>.toLinearEquiv`。
+
+**factor-id `A(α)=q_X(α)` の証明筋 (次 session)**: 両辺 = `ePhi(a²)` (a=左因子代表元)。
+- `A(α)=ambientCenterCoordinate(sq_ambient(fI_left α))=ePhi(ambient_bridge([a²]_L₁))=ePhi(a²)`
+- `q_X(α)=eKernel(sq_factor(eQuot.symm α))=ePhi(factor_bridge([g²]_{L₁(S)}))=ePhi(f_left(g²))=ePhi(a²)`
+  (`f_left(g)=a`, `f_left(g²)=a²`)。
+要 unfold: `lowerCentralSquareValue = mk'(lowerCentralLayerKernel _ 1)(lowerCentralSquareRepresentative)`
+(HigmanSquareMap:112)。`lowerCentralSquareRepresentative` が underlying x² を持つことを示し、
+bridge の underlying 抽出と合成。fI_left の代表元 = `f_left(g)` (quotientToAmbientLayerZero_mk)。
+この 2 本 (ambient/factor の「bridge∘sq = underlying square」) が 4a-ii の中身。
+
+**Stage 4 全体の commit 済**: C/D モデル・F×F 座標・extension・全 ofExtension・polarization。
+残: 4a-ii (factor-id) → branch dispatch (e 構築) → mixed 項/case → endpoint。多 session。
