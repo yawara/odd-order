@@ -338,8 +338,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           - [x] caller-prescribed generator 版 Lemma 11 の actual field model と二つの
                 tracked shift を上記 endpoint へ接続し、noncommutative factor の
                 quotient coordinate を共通 `Φ(P)` 座標から構成する
-          - [ ] 同じ ambient Singer datum を左右因子へ一度ずつ適用し、両方の
+          - [x] 同じ ambient Singer datum を左右の非可換因子へ一度ずつ適用し、両方の
                 quotient coordinate と `ν = λ·θ(λ) = μ·φ(μ)` を一つの endpoint で返す
+          - [ ] commutative `A(n,1)` と noncommutative factor の座標 data を共通の
+                inclusive bundle に包み、実際の complementary pair の全組合せを返す
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

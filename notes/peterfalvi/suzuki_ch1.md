@@ -486,9 +486,14 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
       p. 81 の表と直前の commutator formula から確認した。抽出画像は
       `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
-      次の source frontier は、同じ ambient Singer datum を左右 factor の上記 endpoint
-      へ一度ずつ適用し、`ν = λ·θ(λ) = μ·φ(μ)` を単一の paired result として束ね、
-      mixed pairing の actor covariance を座標表示することである。その後、固有値制約から type B/C/D
+      同じ ambient Singer datum を二つの非可換 factor に一度ずつ適用する lossless
+      bundle `NoncommutativeFactorCoordinateData` と paired endpoint も構成した。ここでは
+      両 kernel coordinate の ambient provenance、square normal form、actor equationsを
+      保持したまま `ν = λ·θ(λ) = μ·φ(μ)` を一つの結論で返す。
+      次の source frontier は、これと既存の commutative `A(n,1)` prescribed-coordinate
+      endpoint を inclusive bundle にまとめ、実際の complementary pair の全組合せを
+      case split 付きで返した後、mixed pairing の actor covariance を座標表示することである。
+      その後、固有値制約から type B/C/D
       の四場合を分岐する gluing case analysis へ進む。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
