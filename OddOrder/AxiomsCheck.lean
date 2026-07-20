@@ -11647,3 +11647,7 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- TI-witness and the (9.11.3) count.  A one-liner over the subset form, as in §13, but with no
 -- type hypothesis anywhere on the route.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_sTwoExtraction
+-- **(9.11.2) two-summand inertia inputs, at §9 level** — `K₁, K₂` of relative index `a` in `U`
+-- with `C = K₁ ⊓ K₂`.  §13 needs `hncH0C`/`htype` here only to rewrite `C = cSub` before seeing
+-- `C′ ≤ C`; at §9 `chars.C` *is* `cSub data chief`, so both hypotheses disappear.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_two_summand_inertia_inputs
