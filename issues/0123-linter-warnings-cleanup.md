@@ -377,3 +377,25 @@ PY
 | 1 | maxHeartbeats コメント | `S11_NineElevenCaseAResidual:151` — **lane a の新規 file**、a が付ける |
 | 1 | `simp` flexible | `FeitThompsonNuGrid:97` (上記 revert 分) |
 | 1 | `Mathlib.Tactic` 全体 import | 上記 revert 分 → issue 0136 |
+
+## 2026-07-21 01:10 hub tick — frozen Pf 本文 6 件 (commit 4b811b73a)
+
+3 レーン合流で新規 lint 債務が増えたため再 census (非 sorry 46 件)。うち **frozen zone の
+mechanical 6 件のみ**を hub が解消 (S12/S13 = a が本文完済で frontier が離れた領域):
+- S12_TypeIICrossIsometryPair: 未使用教科書仮説 4 本 `_`-prefix + docstring 長行 1
+- S13_Orthogonality: コメント長行 1
+
+leaf build 2 本で検証 (term-preserving ゆえ full 不要)。→ 非 sorry 46 → **40**。
+
+### 残 40 件の内訳と「今は触れない」理由
+
+| 件数 | 分類 | 理由 |
+|---|---|---|
+| ~13 | active-lane file (a: S11_NineEleven*, b: Higman/MixedEigenweights, c: AppE_*) | 所有レーンが frontier 移動時に解消。hub は触らない |
+| 11 | `open scoped Classical` | **非 mechanical** — decidability 明示への書換は個別判断。別 wave |
+| 2 | named-arg 罠 (S03g:163 `K` / S13_SixTwoBridge:625 `A'`) | `(K := )`/`(A' := )` で実使用 = rename 不可 (**恒久 skip**) |
+| 2 | issue 0136 (S05 `Mathlib.Tactic` import / FeitThompsonNuGrid `simp`) | import 絞りは full build 必須・simp は要注意 (前回 revert) |
+| ~12 | PrimeTIResidue (88分前) / ChiefFactorCore (62分前) 等の準 active | 直近 touch = レーン citation 圏内、様子見 |
+
+⟹ **今この瞬間に安全に mechanical 解消できるものは尽きた** (6 件で打ち止め)。残りは
+(a) レーンの frontier 移動待ち、(b) `open scoped Classical` の非 mechanical wave、(c) 恒久 skip。
