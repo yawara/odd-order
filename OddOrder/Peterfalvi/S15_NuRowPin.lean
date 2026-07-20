@@ -168,7 +168,7 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
         (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief s hs))),
       hAsupp⟩
   have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-    (typePACore_subset_A0Set Tdata))
+    (S10.typePACore_subset_A0Set Tdata))
   rw [← map_sub, c.extends_on_supported _ hmemSpan, hyp.indT_apply,
     ← hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp,
     show ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j))
@@ -221,7 +221,7 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
   have hA0Supp : (ζ - ζ.conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hdiffSupp.trans
-      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (typePACore_subset_A0Set Tdata))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono (S10.typePACore_subset_A0Set Tdata))
   -- `τ = Ind_T^G` equals the `A₀(T)`-Dade image on the `A₀(T)`-supported difference.
   have hmaps : hyp.indT (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
@@ -382,7 +382,7 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
   have hγA0supp : γ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hγsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (typePACore_subset_A0Set Tdata))
+      (S10.typePACore_subset_A0Set Tdata))
   -- `c(γ)` is the honest `A₀(T)`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
@@ -883,7 +883,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
     · subst hr1; rw [sub_self, map_zero, sub_self]
     · have hAsupp := hyp.nuRow_diff_supported hG pins hvd chief hr0 hi1_0
       have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-        (typePACore_subset_A0Set Tdata))
+        (S10.typePACore_subset_A0Set Tdata))
       rw [hyp.indT_apply, ← hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp,
         show ((∑ j : Fin hyp.p, hyp.nu r j)
             - (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j))

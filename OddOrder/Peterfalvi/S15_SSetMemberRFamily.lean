@@ -186,7 +186,7 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
   have hA0supp : (η - (η : ClassFunction ↥hyp.S ℂ).conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S hyp.Sdata) hyp.S :=
     hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (typePACore_subset_A0Set hyp.Sdata))
+      (S10.typePACore_subset_A0Set hyp.Sdata))
   -- the honest `'A`-Dade agrees with the `'A0`-Dade on the `A(S)`-supported column difference.
   have hτeq : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
@@ -301,7 +301,7 @@ theorem Hypothesis.dadeHypS_muColumn_diff [Finite G]
   letI : Fintype ↥hyp.S := Fintype.ofFinite _
   have hAsupp := hyp.muColumn_diff_supported hG chief hj hk
   have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-    (typePACore_subset_A0Set hyp.Sdata))
+    (S10.typePACore_subset_A0Set hyp.Sdata))
   have hτeq : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
         ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG))
         ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k))
@@ -550,7 +550,7 @@ theorem Hypothesis.dadeS0_apply_eq_zero_of_regular [Finite G] (hG : OddOrder.BG.
   have hA0supp : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S hyp.Sdata) hyp.S :=
     hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (typePACore_subset_A0Set hyp.Sdata))
+      (S10.typePACore_subset_A0Set hyp.Sdata))
   obtain ⟨w, hw, g, hg⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hx
   rw [← (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
     ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) f).of_isConj
@@ -702,7 +702,7 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner [Finite G]
   have hA0supp' : ((φ : ClassFunction ↥hyp.S ℂ) - (φ : ClassFunction ↥hyp.S ℂ).conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S hyp.Sdata) hyp.S :=
     hdiffsupp'.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (typePACore_subset_A0Set hyp.Sdata))
+      (S10.typePACore_subset_A0Set hyp.Sdata))
   -- the signed difference `ε·μ − ε·ν = τ_S(φ − φ̄) = τ_S⁰(φ − φ̄)` (the `'A→'A0`-Dade bridge).
   have hcdimg : (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)

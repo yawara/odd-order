@@ -129,7 +129,50 @@ repo はこれを `hKsupp : (M′)^# ⊆ supportInSubgroup A₀ M` 経由の粗�
 ⚠ P₁ 版 (`inducedKernelFamily_subcoherent` / `_sharp`) は signature 不変で残す
 (下流無変更)。docstring で「§8D は P₁ regime、§8E が型一様」と対比を明示。
 
-### ⛏ 残り: `A = typePACore M` / `H = M_σ` での具体化 — **層の逆転が gate**
+### ⛏ 残り: `A = typePACore M` / `H = M_σ` での具体化 — 部品は全て揃った
+
+**2026-07-20: 層の逆転は issue 1046 で解消済** (`dadeSupportHypothesisData_typePACore` →
+`S10_TypePSupport`, `..._typePACore0` + 閉包 → 新 leaf `S10_TypePSupportA0`、いずれも
+namespace `S10`)。⟹ §10 から両 producer を呼べる。
+
+具体化は 1 度試して **instance 規律**で落ちたので、次回はこの 2 点を先に直すこと:
+
+1. **`Invertible (Nat.card ↥((derivedInG M).subgroupOf M) : ℂ)` が要る** —
+   §8D の `section SubcoherentTypeP` は `variable` でこれを宣言している
+   (`S10_SubcoherentTypeP.lean:111`)。§8E の `CoreNontrivialSupport` 節にも同じ
+   `variable` を足す。
+2. ⚠ **scoped `FiniteInduce` と `[Fintype G]` binder を混ぜない** — 実エラー:
+   ```
+   ⋯.some.dade : @S04.Hypothesis G inst✝⁵ inst✝⁴ (typePACore0 M data) M
+   but expected : @S04.Hypothesis G inst✝⁵ S12.FiniteInduce.finiteGFintype (typePACore0 M data) M
+   ```
+   `typePACore_toHypothesis46_core` は `open scoped S12.FiniteInduce` の下で宣言されており
+   `Fintype G` を **`S12.FiniteInduce.finiteGFintype` (= `Finite G` 由来)** で取る。
+   §8E 節は `variable [Fintype G]` binder なので defeq にならない。
+   ⟹ 具体化の def は **`[Finite G]` だけを取り、`open scoped OddOrder.Peterfalvi.S12.FiniteInduce in`
+   の下で宣言する** (`S10_Hypothesis46TypeP` と同じ規律)。
+   正本 = [[lean-instance-defeq-traps]]「scoped FiniteInduce vs binder 混在不可」。
+   本 issue 着手順 2 の作業でも同じ罠を一度踏んでいる (上記「着手順 2 完了」の注記)。
+
+書く内容 (試作は revert 済、build green を維持):
+```
+noncomputable def typePACore_subcoherent [Finite G]
+    (hG : IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G) (hTP : IsTypeP M)
+    (hodd : Odd (Nat.card ↥M)) (data : TypePData M) (hHall : …) (hW2σ : …) (hσK : …)
+    (hsub : S ⊆ inducedNonKernelFamily ((derivedInG M).subgroupOf M) ((Msigma M).subgroupOf M))
+    (hirr) (hconjS) :
+    S07.Hypothesis S (S04.supportInSubgroup (typePACore M) M) :=
+  inducedNonKernelFamily_subcoherent hodd
+    (typePACore_toHypothesis46_core data hG.odd hHall
+      (dadeSupportHypothesisData_typePACore0 hG hM hTP data).some.dade
+      (…).some.hconj hW2σ hσK).toCore
+    (dadeSupportHypothesisData_typePACore hG hM hTP).some hsub hirr hconjS
+```
+⚠ `h46.toCore.K` / `.subH` が `(derivedInG M).subgroupOf M` / `(Msigma M).subgroupOf M` と
+defeq であること (`typePData_toS06Hypothesis` の `K := (derivedInG M).subgroupOf M`,
+`typePACore_toHypothesis46` の `subH := H`) に依存する。合わなければ橋渡し補題を足す。
+
+### (参考) 解消済だった層の逆転
 
 必要な部品は 2 つとも既に在るが、**どちらも S15 に置かれている** (実測 2026-07-20):
 

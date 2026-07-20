@@ -193,7 +193,7 @@ theorem Hypothesis.dadeT0_apply_eq_zero_of_regular [Fintype G] [Finite G]
   have hA0supp : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (typePACore_subset_A0Set Tdata))
+      (S10.typePACore_subset_A0Set Tdata))
   have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.T Tdata := by
     refine ⟨?_, ?_⟩
     · have hWeq : (Tdata.W : Set G) = (hyp.W : Set G) := by
@@ -403,7 +403,7 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
       - (φ : ClassFunction ↥hyp.T ℂ).conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T :=
     hdiffsupp'.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (typePACore_subset_A0Set Tdata))
+      (S10.typePACore_subset_A0Set Tdata))
   have hcdimg : (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
           ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
