@@ -309,6 +309,22 @@ theorem chiefFactor_card_W2bar_H0supC [Finite G] {M : Subgroup G}
     ((chief.H0 ⊔ cSub data chief).subgroupOf M) (chief.H0.subgroupOf M) hinf]
   exact chiefFactor_card_W2bar chief
 
+/-- **`𝒮 = sSet` is finite** (issue 1017, the `hSfin` input of the caseB (5.7) coherence engine and
+the (9.11) non-Galois maximal-subfamily refutation): the family injects into
+`IrreducibleCharacter ↥(huSub data)` (a `Finite` type) via the induction map, so it is a subset of a
+finite range.
+
+Stated over Hypothesis (9.2) alone, so it belongs in §9; it previously sat in
+`S15_SAndT_Setup/HypothesisBasics` (namespace `S15`), which put a §9 fact downstream of its own
+users (issue 1045). -/
+theorem sSet_finite {M : Subgroup G} [Finite G] (data : TypesIIIIIIVSetup M) :
+    (sSet data).Finite := by
+  apply Set.Finite.subset (Set.finite_range
+    (fun χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥(huSub data) =>
+      induceHU data (χ : ClassFunction ↥(huSub data) ℂ)))
+  rintro φ ⟨χ, -, rfl⟩
+  exact ⟨χ, rfl⟩
+
 /-- **Peterfalvi (9.6), clause `U ≠ C`**: the chief-factor centralizer `C = C_U(H̄)` (`cSub`) is a
 *proper* subgroup of `U`.
 

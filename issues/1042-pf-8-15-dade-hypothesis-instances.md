@@ -65,6 +65,35 @@ created: 2026-07-19
   (typePA の M_s^# 添字化 Option A vs 新 def 並置 Option B′; 9008 re-open trigger)。
   hub 裁定待ちの間、lane a は次 frontier へ進む。
 
+## 2026-07-20 実測: 主張 3 の P₁ scoping の**原因**が判明 — 族の絞りが違う
+
+`S10_SubcoherentTypeP` の「型 `P₁` regime」注記は、単に「`typePA` が A(M) と一致するのは P₁ だけ」
+という一般論ではなく、**族の定義そのものの食い違い**が原因だった:
+
+- 書籍 (8.15.3) の族は `𝒮 ⊆ {Ind_{M′}^M θ | θ ∈ Irr M′, **M_s ⊄ Ker θ**}`。
+- repo の族は `S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥` = 「θ ≠ 1」だけ。
+- **P₁ では M_s = M′ なので θ ∈ Irr M′ に対し `M_s ⊄ Ker θ ⟺ θ ≠ 1`** で両者は一致する。
+  P₂ (type II/V) では `M_s = M_F ⊊ M′` なので repo の族の方が真に広い。
+
+なぜこの差が効くか: `S07.Hypothesis` ((5.2)) は「メンバー差 χ − χ̄ が A₀-supported」を要求し、
+repo はこれを `hKsupp : (M′)^# ⊆ supportInSubgroup A₀ M` 経由の粗い評価
+(`inducedKernelFamily_conjDiff_support`) で出している。ところが書籍の
+`A(M) = ⋃_{x ∈ M_s^#} C_{M′}(x)^#` に対しては **`(M′)^# ⊆ A(M)` が P₂ で偽**なので、
+この経路は P₁ でしか動かない。**書籍が族を `M_s ⊄ Ker θ` で絞るのは、まさにこの支持条件を
+細かく出すため**。
+
+⟹ 型一様な (8.15.3) に必要なのは `typePA0` → `typePACore0` の置換だけでなく、
+**族を `M_s ⊄ Ker θ` 側へ絞り、その族のメンバー差が `A(M)` に台を持つことを直接証明する**こと
+(§9 の `xiSet data = {χ ∈ Irr(HU) | H ⊄ Ker χ}` と同型の絞り)。
+⚠ この支持補題は書籍の (8.15.3)/(5.3.b) の証明を読んで詰める必要がある — 推測で書かない。
+
+なお `inducedKernelFamily_subcoherent` 自体は `hKsupp` を引数化すれば `A₀` について一般化できる
+(item 1 の `typePData_toHypothesis46_ofSupport` と同じ形) ので、**族の絞りと支持補題が本体**。
+
+関連: issue 1045 ((9.11) の §9 レベル化) — (9.11) の base subfamily coherence は
+現状 §10 engine (`inducedFamily_degreeSubfamily_isCoherent`) 経由だが、書籍では (8.15.3) 経由。
+⟹ 本項が (9.11) 型 II 化の上流 prerequisite。文書順でも §8 < §9。
+
 ## 着手順 (ungated → gated)
 
 1. ~~**主張 3 の type III/IV 形**~~ ✅ 上記 (2026-07-19)。旧計画:
