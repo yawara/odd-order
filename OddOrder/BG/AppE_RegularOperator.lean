@@ -213,4 +213,66 @@ theorem RegularOperatorSetup.exists_commutator_not_mem {R B : Type*} [Group R] [
   rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
   exact h1
 
+/-- **BG's `⟨w̄ᵢ⟩ = H̄ᵢ`, in usable form**: for `x ∈ Hᵢ`,
+`⁅v, x⁆ ∈ Hᵢ₊₂ ↔ x ∈ Hᵢ₊₁`.
+
+The three inputs meet here: the kernel of `chainStepHom` contains `Hᵢ₊₁`
+(`chainStepHom_ker_ge`), is not all of `Hᵢ` (`exists_commutator_not_mem`), and
+`|Hᵢ : Hᵢ₊₁| = p` is prime — so `eq_or_top_of_index_prime` pins it to exactly `Hᵢ₊₁`.
+
+This is the statement BG replaces with five words, and it is what propagates
+`w ∉ H₁` to `wᵢ ∉ Hᵢ₊₁` along the sequence `wᵢ = ⁅wᵢ₋₁, v⁆`. -/
+theorem RegularOperatorSetup.commutator_mem_iff_mem {R B : Type*} [Group R] [Group B]
+    [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hR₀S : hyp.R₀ ≤ S) (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥)
+    (hlt : ¬ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 1) ≤
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 2))
+    (hidx : ((OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          (i + 1)).subgroupOf
+        (OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          i)).index = p)
+    {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) {x : ↥S}
+    (hxi : x ∈ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i) :
+    ⁅v, x⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 2) ↔
+      x ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 1) := by
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  constructor
+  · intro hmem
+    have hxK : (⟨x, hxi⟩ : ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i)) ∈
+        (chainStepHom T v i).ker := by
+      rw [MonoidHom.mem_ker, chainStepHom_apply]
+      exact (QuotientGroup.eq_one_iff _).mpr hmem
+    have hge : (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1)).subgroupOf
+        (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) ≤
+        (chainStepHom T v i).ker := by
+      intro y hy
+      rw [MonoidHom.mem_ker]
+      exact chainStepHom_ker_ge (Subgroup.mem_subgroupOf.mp hy)
+    rcases eq_or_top_of_index_prime hge hyp.p_prime hidx with h | h
+    · rw [h] at hxK
+      exact Subgroup.mem_subgroupOf.mp hxK
+    · exfalso
+      obtain ⟨y, hy, hyn⟩ := hyp.exists_commutator_not_mem hR₀S hexp hS hne hlt hv
+      refine hyn ?_
+      have hyK : (⟨y, hy⟩ : ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i)) ∈
+          (chainStepHom T v i).ker := h ▸ Subgroup.mem_top _
+      rw [MonoidHom.mem_ker, chainStepHom_apply] at hyK
+      exact (QuotientGroup.eq_one_iff _).mp hyK
+  · intro hmem
+    have h := chainStepHom_ker_ge (T := T) (v := v) (x := ⟨x, hxi⟩) hmem
+    rw [chainStepHom_apply] at h
+    exact (QuotientGroup.eq_one_iff _).mp h
+
 end OddOrder.BG.AppE
