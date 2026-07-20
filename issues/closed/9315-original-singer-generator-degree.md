@@ -24,9 +24,9 @@ Higman, *Suzuki 2-groups*, Section 6 (p. 87) は、元の cyclic actor
 
 - [x] faithful irreducible cyclic representation の field model で、actor 生成元の像が
       base field 上に全 Galois field を生成することを公開定理にする
-- [ ] `2^n - 1 ∣ |Y|` と同じ prime support から、元生成元の固有値の位数が `|Y|`、
+- [x] `2^n - 1 ∣ |Y|` と同じ prime support から、元生成元の固有値の位数が `|Y|`、
       `n ∣ m`、`Odd (m / n)` を返す Higman source endpoint を構成する
-- [ ] Higman Lemma 11 の source assembly から元 actor `Y` のまま呼び出す
+- [x] Higman Lemma 11 の source assembly から元 actor `Y` のまま呼び出す
 
 ## 完了条件
 

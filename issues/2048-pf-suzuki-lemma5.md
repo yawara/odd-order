@@ -188,7 +188,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             source-neutral bridge を `OddOrder.Algebra` に構成する (issue 9308)
       - [x] 負の整数 Frobenius 反復も含む exact endpoint `higmanLemmaTen` を証明する
             (`42e744a4f`)
-    - [ ] Higman Lemma 11 (current source frontier): `K`-length `2` の Suzuki `2`-group を
+    - [x] Higman Lemma 11: `K`-length `2` の Suzuki `2`-group を
           原文の有限体座標群 `A(n, θ)` と同型にする
       - [x] 原典 p. 79 の actor 仮定を regular でなく cyclic-transitive として分離し、
             `P' = Φ(P) = Z(P) = Ω₁(P)` と lower-central length two を構成する
@@ -243,7 +243,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             relative trace を同定して原典 p. 89 の “the trace is superfluous” を証明する
             (`absoluteDegrees_eq_of_relativeFinrank_eq_one`,
             `anchoredTraceFormula_trace_superfluous`)
-      - [ ] trace-free 平方写像を `a ↦ a * θ(a)` と lower-central extension 座標へ
+      - [x] trace-free 平方写像を `a ↦ a * θ(a)` と lower-central extension 座標へ
             接続し、source-facing `higmanLemmaEleven` を組み立てる
         - [x] degree-one anchored trace 式の anchor を Frobenius 座標変更へ吸収し、
               `ε * (a * θ(a))` の actual lower-central square normal formを得る
@@ -251,8 +251,8 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [x] 二つの actual lower-central layer から kernel/quotient `MulEquiv` を構成し、
               `ε` を kernel 座標へ吸収して honest `TypeAData` を得る
               (`typeADataOfLowerCentralSquareNormalForm`)
-        - [ ] actor から得た元の Singer basis 上で actual anchored trace 式を構成し、
-              上記 endgame と合成して source-facing theorem を閉じる
+        - [x] actor から得た元の Singer basis 上で actual anchored trace 式を構成し、
+              上記 endgame と合成して source-facing theorem `higmanLemmaEleven` を閉じる
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
