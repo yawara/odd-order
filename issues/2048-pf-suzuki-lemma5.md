@@ -454,3 +454,19 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
    `eOne'` も証明中は `frobeniusShiftLinearEquivForNormalization eOne i.val` (PairGap:1077) だが
    export されていない。prescribed-coordinate が商/第 1 層の counter-shift も要求するなら
    3 本目の sibling が要る。
+
+## 🔍 hub 内容監査 (2026-07-21 00:54 tick) — Lemma 12 mixed weight equation は genuine ✅
+
+merge 015768c0a の ⭐ `d8b97df76` (+ feeders `ecf55f86a`/`3dc3f4c37`) を独立監査。
+**判定: genuine・sorry 0・axiom-clean、book 強度の進捗。**
+
+- `exists_mixedFrobeniusWeightEquation_of_xiLengthThree`
+  (`HigmanLemmaTwelve/MixedEigenweights.lean:634`) は実証明 (0-sorry、AxiomsCheck:8452 登録)。
+  honest な Lemma 12 仮説 (`IsPGroup 2 P`・`¬IsMulCommutative P`・2 involutions・`IsXiActor`・
+  `HasXiLengthThree`・prime 条件) から `λ^(2^i)·λ'^(2^j) = ν^(2^k)` + `ν = λθ(λ) = μφ(μ)` を導出
+  = Higman p.90 の pre-case-split state ちょうど。
+- 存在量化の data は**構成済** (free field でない): factors ← `xiLengthThreeTypeAFactorData_exists`
+  (`LengthTwoModels.lean:1278`、実 subgroup 分解 `left⊓right=Φ(P)`/`left⊔right=⊤`)、
+  nonzero mixed commutator ← `exists_mixed_lowerCentralCommutatorBilinear_ne_zero`
+  (`AmbientCentralExtension.lean:777`)、weight 抽出 ← `BilinearEigenweight.lean:150` (honest 線形代数)。
+- red flag 無し (vacuous/矛盾仮説/unsound carrier いずれも無し)。次は B/C/D の case split。
