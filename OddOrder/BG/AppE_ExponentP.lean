@@ -1041,4 +1041,32 @@ theorem RegularOperatorSetup.card_seed [Finite R] (hyp : RegularOperatorSetup R 
   exact Nat.pow_le_pow_right hyp.p_prime.pos h2
 
 
+/-- **BG Step 4**: the `S`-conjugacy class of `v ∈ R₀^#` **equals** the coset `v·S'`.
+
+Containment is `orbit_conjAct_subset_coset`.  The sizes then match: `(E.15)` makes the class
+`|S|/p²` (`card_conjClass_generator`) and `(E.17)` makes `|S'| = |S|/p²`
+(`card_quotient_commutator`), while left translation does not change the size of `S'`.
+
+This is what BG needs to say *"every element of `R₀S' − S'` is conjugate to an element of
+`R₀^#`"* — and it is the only place in Appendix E where `(E.15)` is used. -/
+theorem RegularOperatorSetup.orbit_eq_coset [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
+    (hexp : ∀ x : ↥S, x ^ p = 1)
+    (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
+    {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
+    MulAction.orbit (ConjAct ↥S) v = v • ((_root_.commutator ↥S : Subgroup ↥S) : Set ↥S) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hcls : p ^ 2 * Nat.card (MulAction.orbit (ConjAct ↥S) v) = Nat.card ↥S :=
+    hyp.card_conjClass_generator hR₀S.le hp2 hv
+  have hquot : Nat.card ↥S = p ^ 2 * Nat.card ↥(_root_.commutator ↥S) := by
+    have h := Subgroup.card_eq_card_quotient_mul_card_subgroup (_root_.commutator ↥S)
+    rwa [hyp.card_quotient_commutator hR₀S hexp] at h
+  have hsame : Nat.card ↥(_root_.commutator ↥S) = Nat.card (MulAction.orbit (ConjAct ↥S) v) := by
+    refine (Nat.eq_of_mul_eq_mul_left (pow_pos hyp.p_prime.pos 2) ?_).symm
+    rw [hcls, hquot]
+  refine Set.eq_of_subset_of_ncard_le (orbit_conjAct_subset_coset v) ?_ (Set.toFinite _)
+  rw [Set.ncard_smul_set, ← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq]
+  exact le_of_eq hsame
+
+
 end OddOrder.BG.AppE
