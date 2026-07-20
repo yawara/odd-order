@@ -1425,3 +1425,39 @@ including `R₀S'/S'`.  Thus `t ≠ t₀`."*
   ⟹ 特に `R₀S'/S'` を保つ ⟹ 項 3 と同じ引き戻し (手順 3-5) で (E.18) に矛盾。
   📌 手順 3-5 は項 3 の証明内にインラインで書いた。項 4 でも使うので
   **「`B` が `R₀S'/S'` を保つ ⟹ 矛盾」を補題として切り出す**のが得策。
+
+## 2026-07-20 (30): ⭐ E.4 計画の項 4 (`t ≠ t₀` = (E.21)) 完了
+
+| 宣言 | 内容 |
+|---|---|
+| `smul_sup_derived_of_preserves_line` | (refactor) 単一 `b` が `R₀S'/S'` を保つ ⟹ `R₀Φ(S)` を固定 |
+| `B_fixes_R₀_of_preserves_line` | その `∀ b` 版 (E.3(d) で締める) |
+| `forall_zpow_of_sup_eq_top` | 補い合う 2 部分群で固有値が合同 ⟹ 全体で単一の冪写像 |
+| `map_eq_self_of_forall_zpow` | 単一の冪写像は**あらゆる**部分群を保つ |
+| ⭐ `not_dvd_sub_eigenvalues_of_not_fixes` | **(E.21) `t ≠ t₀`** |
+
+進捗: 7 ステップ計画の **1・2・3・4 完了**。
+
+### ⬜ 次 = 項 5 ((E.23) = (E.22) の `β` 版)
+
+BG: *"By (E.16) and (E.19) in Step 2, `wᵢ^α ≡ wᵢ^{rᵢ} (mod Hᵢ₊₁)` (E.22) for `rᵢ = r₀rⁱ`.
+Similarly one can show that `wᵢ^β ≡ wᵢ^{tᵢ} (mod Hᵢ₊₁)` (E.23) for `tᵢ = t₀tⁱ`."*
+
+✅ `α` 側 = `RegularOperatorSetup.exists_eigenvalue_pow`
+(`AppE_RegularOperator.lean:640`) に既に在る。
+
+⚠ **要調査**: `exists_eigenvalue_pow` は `{a : B} (ha : a ∈ hyp.A)` を要求する。
+BG の "Similarly" が効くのは `β ∈ B` 一般。まず **`ha` が本当に使われているか**を
+実測すること (`eigenvalue_step` / `exists_zpow_of_chain` の依存を辿る)。
+- 使っていない ⟹ 仮説を `a ∈ hyp.A` から外して一般化 (1 箇所の signature 変更)。
+- 使っている ⟹ 何に使っているかを見て、`β` 版に必要な条件を切り出す
+  (`A_regular` は `A` 固有だが、chain の `A`-不変性は `B`-不変性でも足りるはず —
+  `H_i = iterCommutator (C_S(Ω₁Z₂S)) ⊤ i` は characteristic なので `B` 不変)。
+
+📌 これは **項 6-7 の前提**なので、次イテレーションの最初に片付ける。
+
+### ファイルサイズ
+
+`AppE_AbelianCentralizer.lean` は現在 700 行台。E.4 の残り (項 5-7) は
+組合せ論と算術で嵩むので、**1500 行を超えたら新 leaf に分ける**
+(項 6-7 = `AppE_EigenvalueArithmetic.lean` 相当が自然な切れ目)。
