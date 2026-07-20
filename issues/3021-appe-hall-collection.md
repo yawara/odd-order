@@ -2039,3 +2039,53 @@ Case B (`⁅H_i, Q'⁆ ≤ H_{i+2}`) を `i = 0` で使う: `⁅T, Q'⁆ ≤ H�
 2. ⬜ `k ≤ q-1` (`Nat.pow_le_pow_iff_right` 一行)
 3. ⬜ Case B 排除の段 2 の Lean 化 (`sup_le` + `le_trans` 数行)
 4. ⬜ **本体の組み立て** — `AppE_EigenvalueCombinatorics.lean` を新設して書く
+
+## 2026-07-20 (46): ⭐ `AppE_EigenvalueCombinatorics.lean` 新設 — chain 当てはめの大半が landing
+
+新 leaf `OddOrder/BG/AppE_EigenvalueCombinatorics.lean` を作成、`OddOrder.lean` に import 追加。
+**sorry-free、AxiomsCheck 3 公理のみ (propext/Classical.choice/Quot.sound)、leaf build green**。
+(45) の残り 4 件のうち 1・2・(E.25) 当てはめ・α 側 (E.26) を実装:
+
+### landing した定理 (すべて axiom-clean)
+
+| 内容 | Lean |
+|---|---|
+| (E.19) chain 版 `Hₐ = ⟨wₐ⟩ ⊔ H_{a+1}` | `RegularOperatorSetup.sup_zpowers_commutatorIterate` |
+| `k ≤ q-1` (chain 版 `H_k ≠ ⊥ ⟹ k+2 ≤ q`) | `RegularOperatorSetup.add_two_le_of_iterCommutator_ne_bot` |
+| (E.25) 抽出 (chain 抽象、`3≤k`・`1≤i`・`j≤i`・`i+2≤k`・両 cross 項・witness) | `exists_commutator_indices` |
+| (E.25) chain 事実を全部 discharge した版 | `RegularOperatorSetup.exists_commutator_indices_chain` |
+| (E.26)/(E.27) 作用素非依存の生成ステップ (σ の scaling data を `(y^s)⁻¹σy∈H_{a+1}` 形で受ける) | `dvd_sub_mul_of_chain_eigenvalues` |
+| **α 側 (E.26) 本体組み立て** (`exists_eigenvalue_pow` を実呼び出し) | `RegularOperatorSetup.dvd_sub_mul_eigenvalues_chain` |
+| 最終算術 chain-eigenvalue 形 (`rₐ=r·rᵃ`, `tₐ=t₀·tᵃ` から余因子を剥がして `eq_of_eigenvalue_relations` へ) | `eq_of_chain_eigenvalue_relations` |
+
+- `(45)` 段 1 (`i≥1 ⟹ k≥3`) は `exists_commutator_indices` の内部で
+  `commutator_self_le_of_generator` を `i=0` に当てて処理済 (段 2 Case B 排除は下記参照)。
+- `dvd_sub_mul_eigenvalues_chain` の出力は `((r₀:ZMod p)·rⁱ)·((r₀)·rʲ) = (r₀)·r^{k-1}`
+  (ZMod p の **環**の等式)。`chain_map_le_center`・両 cross 項・`hexp`・`exists_eigenvalue_pow`
+  を全部 discharge しており hoist 無し (α 側は本物に閉じた)。
+
+### ⬜ 残り (次イテレーション) — ここが真の frontier
+
+1. **β 側 (E.23) = `tᵢ = t₀tⁱ` の chain 供給がまだ「補題」になっていない**。
+   これが最大の未解決点。(43) の Case A/B 排除は**紙上**で解決済だが、
+   Lean 補題化されていない。`exists_eigenvalue_pow` は `α` が `R₀` を固定する
+   ((31) 実測 3) ことに依存するので `β` にそのまま使えない。Case B 排除
+   ((43) 段 2: `H₁ = T'·H₂` ⟹ `k≤2` 矛盾) を Lean 化して初めて
+   `dvd_sub_mul_of_chain_eigenvalues` を `σ=β` に当てられる。
+   → 段 2 は `H₁ ≤ T'⊔H₂`・`T' ≤ H_{k-1}`・`H_{k-1} ≤ H₂` (k≥3) から
+   `H₁ ≤ H₂` で `|H₁:H₂|=p>1` に矛盾。`sup_le`+`le_trans` 数行だが、
+   その前段 (交換子が `S/H₂` で双線形 ⟹ `t≠t₀` から一方が消える) の Lean 化が要る。
+2. **整数指数 `r,r₀ : ℤ` ↔ `(ZMod p)ˣ` の単位 `r̄` (`orderOf r̄ = q`)** の橋。
+   `eq_of_chain_eigenvalue_relations` は `(ZMod p)ˣ` で `orderOf r = q` を要求するが、
+   `dvd_sub_mul_eigenvalues_chain` は ℤ 指数の ZMod p 環等式を返す。
+   `α` の位数 = `q` (`A_card`) から `r̄` の位数 = `q` を出す補題が要る
+   (`exists_zpow_eq_act_of_mem_A` 系が `A_card=q` を使う — (31) 実測 1 参照)。
+3. **最終組み立て** = 背理法本体: `⁅T,T⁆ ≠ ⊥` を仮定 → `exists_commutator_indices_chain`
+   で `k,i,j` を 1 度だけ取り出し → 同じ `k,i,j` で α 側 (`dvd_sub_mul_eigenvalues_chain`)
+   と β 側 (要 1) の両方を供給 → 単位に持ち上げ (要 2) → `eq_of_chain_eigenvalue_relations`
+   で `t₀=t` → (E.21) `not_dvd_sub_eigenvalues_of_not_fixes` と矛盾 → `⁅T,T⁆ = ⊥`。
+   最後に `T` アーベル + index p を `Subgroup` の言葉で束ね、`Z₂` 版に戻して Prop E.4。
+
+📌 α 側が本物に閉じたので、残るブロッカーは **β 側 (E.23) の Lean 化** (要 1) が本丸。
+これは紙上解決済の Case A/B 排除の形式化で、`AppE_EigenvalueCombinatorics.lean` に
+追記する形で進めるのがよい (1500 行にはまだ余裕、現在 ~430 行)。
