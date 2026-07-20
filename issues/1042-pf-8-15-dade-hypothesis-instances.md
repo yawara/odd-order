@@ -129,7 +129,22 @@ repo はこれを `hKsupp : (M′)^# ⊆ supportInSubgroup A₀ M` 経由の粗�
 ⚠ P₁ 版 (`inducedKernelFamily_subcoherent` / `_sharp`) は signature 不変で残す
 (下流無変更)。docstring で「§8D は P₁ regime、§8E が型一様」と対比を明示。
 
-### ⛏ 残り: `A = typePACore M` / `H = M_σ` での具体化 — 部品は全て揃った
+### ✅ 具体化 完了 (2026-07-20): `S10.typePACore_subcoherent` (§8F)
+
+`A = A(M) = typePACore M` / `H = M_σ` / `K = M′` / `L = M` での書籍逐語の (8.15.3)。
+**型仮定は `IsTypeP` のみ** — 型 I–V すべてで成立 (型 II/V を含む)。axiom-clean。
+
+Dade 入力 2 つはいずれも (8.15) claim 1 で型一様:
+`dadeSupportHypothesisData_typePACore0` → (4.6) (`typePACore_toHypothesis46_core` 経由)、
+`dadeSupportHypothesisData_typePACore` → 等長 `τ`。
+
+⚠ **instance 規律**: 独立 section に置き `[Finite G]` のみを取り
+`open scoped OddOrder.Peterfalvi.S12.FiniteInduce in` の下で宣言した。scoped 側が
+`Fintype G` / `Fintype ↥H` / `Invertible (Nat.card G)` / `Invertible (Nat.card ↥H)` を
+`Finite G` から一様に供給するので、§8D/§8E の `[Fintype G]` binder と混ざらない。
+(下記の失敗記録どおり、混ぜると `S04.Hypothesis` の引数が defeq にならない。)
+
+### (参考) 一度失敗した記録 — instance 規律
 
 **2026-07-20: 層の逆転は issue 1046 で解消済** (`dadeSupportHypothesisData_typePACore` →
 `S10_TypePSupport`, `..._typePACore0` + 閉包 → 新 leaf `S10_TypePSupportA0`、いずれも
