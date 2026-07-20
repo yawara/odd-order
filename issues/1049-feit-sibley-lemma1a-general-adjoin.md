@@ -69,8 +69,25 @@ Lemma 1(a) はこれを一般 `S07.Hypothesis` τ に**一般化**する task ([
 - [ ] **FeitSibley 配線**: `coherent_adjoin_of_degree_bound` を `adjoinPairCoherent_general` へ。
   ⚠ statement 調整が要る: 現状 `S = S₀ ∪ {ψ}` 単一 adjoin + degree bound `2·deg χ0·deg ψ < ∑ deg²`。
   engine は pair `{ψ,ψ̄}` adjoin + normalized `2a < ∑ (deg)²` (a = deg ψ/deg χ₀, unit norm)。
-  Peterfalvi の実 statement (S conj-closed, ψ̄∈S₀) と engine の pair-adjoin をどう繋ぐか設計。
   `hisom` は `hyp.tau_isometry_diff` から (member-diff が A-supported を示す); m₁=1 (irreducible)。
+
+## ⚠ statement 設計判断 (2026-07-21 調査)
+
+FeitSibley 現行 `coherent_adjoin_of_degree_bound` は Peterfalvi の phrasing 通り
+**single-ψ** (`S = S₀ ∪ {ψ}`, `(S₀,τ) coherent`)。だが engine (`adjoinPairCoherent_general` =
+xAdjoinStep 一般版) は **pair-adjoin** (`(S₁,τ) coherent → IsCoherent τ (S₁∪{ψ,ψ̄}) A`)。
+`hyp : Hypothesis S A` は S conj-closed ゆえ ψ̄≠ψ なら **ψ̄∈S₀**。すると engine が要る
+「S₁ = S₀\{ψ̄} が coherent」と FeitSibley が与える「S₀ (=S₁∪{ψ̄}) が coherent」が食い違う
+(coherence は単調でない)。
+
+**裁定 (a への territory 内判断)**: FeitSibley `coherent_adjoin_of_degree_bound` を
+**pair-adjoin 形へ改める** — `(S₁,τ) coherent` + `χ` (=ψ, 非実既約, ‖χ‖²=1, S₁⊥) + unit-norm
+member family + degree bound `2a<∑(deg)²` ⟹ `IsCoherent τ (S₁∪{χ,χ̄}) A`。
+理由: (i) Isaacs 7.14 / Peterfalvi (5.6) の実内容は共役 orbit の adjoin。
+(ii) FeitSibley Theorem step (1) の用法は S(S'Q₂)⊆S(S'Q₃) の pair 逐次 adjoin (単一 ψ でない)。
+(iii) Peterfalvi の "S=S₀∪{ψ}" は conj-closed 文脈での shorthand。
+現行 single-ψ statement は sorried ゆえ改訂は territory 内で自由 (a 所有)。docstring に Peterfalvi
+番号 (Appendix IV Lemma 1(a) / Isaacs 7.14) は保持。
 
 ## 完了条件
 
