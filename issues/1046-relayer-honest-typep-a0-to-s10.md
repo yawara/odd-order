@@ -68,7 +68,35 @@ packaging に埋まっている」ことが gate なので、本件はその先�
 `OddOrder.Peterfalvi.dade…` まで潰した。[[lean-systematic-refactor-script]] の
 「一括置換は黙って壊す」の実例。**修飾の一括除去は名前空間境界を見ずにやらない**。
 
-### ⛏ 段階 2 (次): `dadeSupportHypothesisData_typePACore0` + 19 補題 (~512 行)
+### ✅ 段階 2 完了 (2026-07-20): `dadeSupportHypothesisData_typePACore0` + 閉包 19 補題
+
+新 leaf **`OddOrder/Peterfalvi/S10_TypePSupportA0.lean`** (548 行, namespace `S10`,
+import は `S10_MinimalSimpleStructure` の 1 本のみ) を作り、下表の 2 ブロックを移設。
+`S15_HonestTypeP2A0.lean` は 1266 → 753 行に縮小し、新 leaf を import する。
+
+**verbatim で移せた**: 移設するコードは `S10.foo` 形の修飾を使っており、名前空間 `S10` の
+**内側**でも `S10.foo` は解決する (Lean は現名前空間の各接頭辞に対し `<ns>.S10.foo` を試すので
+`OddOrder.Peterfalvi.S10.foo` に当たる)。⟹ 段階 1 で踏んだ「修飾の一括除去」を**やらずに済んだ**。
+
+**修飾した参照 = 計 36 箇所 / 11 ファイル**:
+`S15_HonestTypeP2A0` 13 / `S15_SSetMemberRFamily` 4 / `S15_NuRowPin` 4 /
+`S15_BridgeCharacter` 3 / `S15_TSetMemberRFamily` 2 / `FeitThompsonCharacterData` 5 /
+`S16_NonExistenceG/TGapCross` 2 / `S15_SAndT_Setup/{CoherenceEtaOrthogonality,MuColumnPin}` 各 1 /
+`AxiomsCheck` 1。
+⚠ 完全修飾形 (`OddOrder.Peterfalvi.S15.foo`) は語境界正規表現の `(?<![.\w])` に弾かれて
+**最初のパスで漏れた** ので、`S15\.` 明示のパスを別に流して回収した (残余 0 を grep で確認)。
+
+### ⚠ 段階 2 で露見した罠: 推移的 instance は import 名に現れない
+
+`not_isConj_typePACore_typePV` が `((derivedInG M).subgroupOf M).Normal` の instance を
+使っていたが、これは元ファイルの **§13 import 閉包から推移的に来ていた**もので、
+新 leaf (import 1 本) では合成できずビルドが落ちた。
+⟹ その場で導出する `haveI` を追加 (`M'.subgroupOf M` は injective な `M.subtype` に沿った
+`map` の comap なので `comap_map_eq_self_of_injective` + `infer_instance`)。
+
+**これが [[relayer-verify-with-build-not-bfs]] の実例**: import グラフ上は §13 に依存が無いと
+subagent の閉包照合でも確認できていたが、**instance 合成は import 名に出ない**ので
+build でしか露見しない。再層化は必ず build で検証すること。
 
 **行境界を実測で確定済 (2026-07-20)** — `S15_HonestTypeP2A0.lean` 現状の行番号:
 

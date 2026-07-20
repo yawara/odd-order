@@ -184,13 +184,13 @@ that avoids the two-instance grid identification): a §6 `Hypothesis46 (A(S)) S`
 (`certainType_diff_supp_subset_A0`, `certainType_diff_dade_apply_eq_of_mem_V`) apply to `muS`
 directly.  The `tic` reconciliations are the `W₁/W₂/K`-equalities of the two §6 instances
 (`sdataS06_*`/`certainTypeS_*_eq`); the Dade data is the honest `'A0(S)`-Dade of
-`dadeSupportHypothesisData_typePACore0`; the kernel-family subgroup is `M_σ(S)` with the
+`S10.dadeSupportHypothesisData_typePACore0`; the kernel-family subgroup is `M_σ(S)` with the
 `A(S)`-covering of `mem_typePACore` (mirroring `S15.Hypothesis.hyp46S`). -/
 noncomputable def hyp46Smp :
     OddOrder.Peterfalvi.S06.Hypothesis46
       (OddOrder.Peterfalvi.S10.typePACore mp.S) mp.S :=
   { toHypothesis := mp.certainTypeS hG
-    dade := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
+    dade := ((OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0 hG
           mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).restrict Set.subset_union_left
         (fun l _ ha => OddOrder.Peterfalvi.S10.typePACore_conj_mem l.2 ha)
     tic := OddOrder.Peterfalvi.S12.typePData_toTICyclicHypothesis tp.Sdata hG.odd
@@ -233,11 +233,11 @@ noncomputable def hyp46Smp :
         have hcomm := hxC (hh : ↥mp.S) rfl
         have := congrArg (mp.S.subtype) hcomm
         simpa using this
-    dade0 := (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
+    dade0 := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0 hG
         mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade
-    tau := ((OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
+    tau := ((OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0 hG
           mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).fullDadeIsometryData
-      (OddOrder.Peterfalvi.S15.dadeSupportHypothesisData_typePACore0 hG
+      (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0 hG
         mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.hconj }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in

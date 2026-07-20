@@ -203,7 +203,7 @@ theorem Hypothesis.coherentIndS_muColumn_vanish_regular [Finite G]
   have hγA0supp : γ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S hyp.Sdata) hyp.S :=
     hγsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
-      (typePACore_subset_A0Set hyp.Sdata))
+      (S10.typePACore_subset_A0Set hyp.Sdata))
   -- `c(γ)` is the honest `A₀`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
