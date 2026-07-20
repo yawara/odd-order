@@ -890,6 +890,49 @@ theorem sOf_cprime_nonempty [Finite G] {M : Subgroup G}
   exact ⟨φ, sOf_antitone data (sup_le_sup_left (cprimeSub_le_C data chief) chief.H0) hφ⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The (8.15.3) base coherence, retargeted to the (9.5) isometry** — the `hAbase` supplier of
+`sOf_nineEleven_coherent`.
+
+`sOf_degreeSubfamily_coherent` already lands on the right *support* `A(M)`; what differs is the
+map.  It carries the isometry of the `(8.15)` Dade datum `dd`, while (9.5) names the restriction of
+the `(4.6.e)` datum.  Given the pin `hdd` — that `dd`'s Dade hypothesis **is** that restriction, as
+it is for the intended producer — the two maps agree wherever it matters, because
+`dadeIntegralCharacterMap_apply_of_support` collapses *any* `dadeIntegralCharacterMap` over a fixed
+`S04.Hypothesis` to that hypothesis's own `dadeMap` on supported arguments.  The isometry data play
+no role there, so no agreement between `dd.dade.fullDadeIsometryData dd.hconj` and
+`h46.tau.restrict …` is needed — only between the underlying hypotheses. -/
+theorem sOf_degreeSubfamily_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
+    (hodd : Odd (Nat.card ↥M)) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
+    (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
+    (hKeq : h46.toCore.K = (derivedInG M).subgroupOf M)
+    (hHeq : h46.toCore.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hd0 : ((d : ℂ)) ≠ 0)
+    (h2 : 2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard)
+    (h1A : (1 : ↥M) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
+        (h46.dade0.restrict Set.subset_union_left hAnorm)
+        (h46.tau.restrict Set.subset_union_left hAnorm))
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
+  (sOf_degreeSubfamily_coherent hodd h46.toCore dd hG hM data Y d hKeq hHeq hd0 h2 h1A).map
+    fun c => c.congrMap fun φ hφ => by
+      rw [show (OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent hodd h46.toCore dd
+            (hKeq ▸ hHeq ▸ (fun _ hx => sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
+            (fun _ hx => hx.2.1) (fun _ hx => irrCut_conjClosed data Y d hx)).tau
+          = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dd.dade
+            (dd.dade.fullDadeIsometryData dd.hconj) from rfl,
+        OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support dd.dade _ hφ.2,
+        OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+          (h46.dade0.restrict Set.subset_union_left hAnorm) _ hφ.2, hdd]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` is coherent for `τ`, under Hypothesis (9.5) alone.
 
 The (9.7) Clifford dichotomy (`clifford_dichotomy`, already type-free on `chars`) splits into the

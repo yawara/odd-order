@@ -11569,3 +11569,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- witness `η̄ − η` is `A`-supported by the (4.7) estimate — *not* merely `A₀`-supported — which is
 -- what makes the descent possible.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent_restrict
+-- **The (8.15.3) base coherence retargeted to the (9.5) isometry** — the `hAbase` supplier of
+-- `sOf_nineEleven_coherent`.  `sOf_degreeSubfamily_coherent` already lands on the support `A(M)`;
+-- only the map differs, and `dadeIntegralCharacterMap_apply_of_support` collapses *any*
+-- `dadeIntegralCharacterMap` over a fixed `S04.Hypothesis` to that hypothesis's own `dadeMap` on
+-- supported arguments.  So the pin `dd.dade = h46.dade0.restrict …` suffices — no agreement
+-- between the two `FullDadeIsometryData` is needed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_degreeSubfamily_coherent_restrict
