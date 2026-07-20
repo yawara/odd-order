@@ -781,4 +781,96 @@ theorem squareMap_eq_trace_of_anchored_singleGap
             rw [TensorProduct.tmul_sub]
     _ = 0 := sub_eq_zero.mpr htensor
 
+/-! ### Shifted ground coordinates for the second layer -/
+
+/-- Frobenius exponents respect cyclic addition modulo the absolute degree
+of a finite characteristic-two field. -/
+private theorem pow_two_cyclicAdd_for_shiftedExpansion
+    {K : Type uK} [Field K] [Finite K] [Algebra (ZMod 2) K]
+    {n : Nat} (hfinK : Module.finrank (ZMod 2) K = n)
+    (x : K) (i r : Fin n) :
+    x ^ (2 ^ (i + r).val) =
+      (x ^ (2 ^ r.val)) ^ (2 ^ i.val) := by
+  let sigma := FiniteField.frobeniusAlgHom (ZMod 2) K
+  have horder : orderOf sigma = n :=
+    (FiniteField.orderOf_frobeniusAlgHom (ZMod 2) K).trans hfinK
+  have hsigmaPow : sigma ^ n = 1 := by
+    rw [← horder]
+    exact pow_orderOf_eq_one sigma
+  have hmod : Nat.ModEq n (i + r).val (r.val + i.val) := by
+    change Nat.ModEq n ((i.val + r.val) % n) (r.val + i.val)
+    simpa [add_comm] using Nat.mod_modEq (i.val + r.val) n
+  have happ := DFunLike.congr_fun
+    (pow_eq_pow_of_modEq hmod hsigmaPow) x
+  have hraw : x ^ (2 ^ (i + r).val) =
+      x ^ (2 ^ (r.val + i.val)) := by
+    simpa only [sigma, AlgHom.coe_pow,
+      FiniteField.coe_frobeniusAlgHom, pow_iterate, ZMod.card,
+      AlgHom.one_apply] using happ
+  calc
+    x ^ (2 ^ (i + r).val) = x ^ (2 ^ (r.val + i.val)) := hraw
+    _ = x ^ (2 ^ r.val * 2 ^ i.val) := by rw [pow_add]
+    _ = (x ^ (2 ^ r.val)) ^ (2 ^ i.val) := pow_mul x _ _
+
+/-- Shift a second-layer field model by the anchor Frobenius.  The inverse of
+the shifted linear equivalence has the conjugate-basis expansion indexed from
+that anchor. -/
+theorem exists_shiftedSecondLinearEquiv_expansion
+    {K : Type uK} {L : Type uL} {V : Type uV}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [Algebra (ZMod 2) L]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    [NeZero (finrank (ZMod 2) K)]
+    (iota : K →ₐ[ZMod 2] L) (eTwo : V ≃ₗ[ZMod 2] K)
+    (s₀ : Fin (finrank (ZMod 2) K)) :
+    letI : Algebra K L := iota.toRingHom.toAlgebra
+    let n := finrank (ZMod 2) K
+    let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+    ∃ eTwoShift : V ≃ₗ[ZMod 2] K, ∀ z : K,
+      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
+        ∑ s : Fin n,
+          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
+  letI : Algebra K L := iota.toRingHom.toAlgebra
+  let n := finrank (ZMod 2) K
+  let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+  let sigma : K ≃ₐ[ZMod 2] K :=
+    (FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K) ^ s₀.val
+  let eTwoShift : V ≃ₗ[ZMod 2] K :=
+    eTwo.trans sigma.toLinearEquiv
+  refine ⟨eTwoShift, ?_⟩
+  intro z
+  let w : K := sigma.symm z
+  have hsigma_apply (x : K) : sigma x = x ^ (2 ^ s₀.val) := by
+    simp [sigma, AlgEquiv.coe_pow,
+      FiniteField.coe_frobeniusAlgEquivOfAlgebraic, pow_iterate]
+  have hw : w ^ (2 ^ s₀.val) = z := by
+    calc
+      w ^ (2 ^ s₀.val) = sigma w := (hsigma_apply w).symm
+      _ = z := by simpa only [w] using sigma.apply_symm_apply z
+  have hpow (s : Fin n) :
+      w ^ (2 ^ (s₀ + s).val) = z ^ (2 ^ s.val) := by
+    rw [add_comm]
+    rw [pow_two_cyclicAdd_for_shiftedExpansion
+      (K := K) (n := n) rfl w s s₀, hw]
+  have hexpand :=
+    one_tmul_eq_sum_conjugateTensorBasisAlongOfLinearEquiv
+      K L iota eTwo (eTwo.symm w)
+  change (1 : L) ⊗ₜ[ZMod 2] eTwo.symm w = _
+  calc
+    (1 : L) ⊗ₜ[ZMod 2] eTwo.symm w =
+        ∑ t : Fin n, iota (w ^ (2 ^ t.val)) • bTwo t := by
+      simpa only [n, bTwo, eTwo.apply_symm_apply] using hexpand
+    _ = ∑ s : Fin n,
+        iota (w ^ (2 ^ (s₀ + s).val)) • bTwo (s₀ + s) := by
+      simpa only [Equiv.coe_addLeft] using
+        (Equiv.sum_comp (Equiv.addLeft s₀)
+          (fun t : Fin n ↦
+            iota (w ^ (2 ^ t.val)) • bTwo t)).symm
+    _ = ∑ s : Fin n,
+        (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
+      apply Finset.sum_congr rfl
+      intro s _hs
+      rw [hpow, map_pow]
+      rfl
+
 end OddOrder.Higman.Suzuki2Groups

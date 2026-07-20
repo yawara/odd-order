@@ -1599,6 +1599,53 @@ theorem RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries [Finite R]
       rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.lowerCentralSeries_succ,
         hyp.iterCommutator_eq_lowerCentralSeries hR₀S hexp hS i]
 
+/-- **BG Theorem E.3(b), Step 2, (E.9)**: the chain section `Hᵢ/Hᵢ₊₁` has order `p`.
+
+The `(E.6)` factor bound `|Hᵢ| = p·|Hᵢ₊₁|` restated as the index of `Hᵢ₊₁` *inside* `Hᵢ`,
+which is the form `IsAInvariant.quotientMulAutHom` and
+`exists_zpow_eq_of_card_eq_prime` consume. -/
+theorem RegularOperatorSetup.index_subgroupOf_chain [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥) :
+    ((OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+        (⊤ : Subgroup ↥S) (i + 1)).subgroupOf
+      (OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+        (⊤ : Subgroup ↥S) i)).index = p := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  set Hi := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i with hHi
+  set Hj := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1) with hHj
+  have hle : Hj ≤ Hi := iterCommutator_antitone i
+  have hmul := (Hj.subgroupOf Hi).card_mul_index
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+    hyp.card_iterCommutator_eq hR₀S hexp hS (le_refl T) hne] at hmul
+  refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥Hj)) ?_
+  rw [hmul, mul_comm]
+
+/-- **BG Theorem E.3(b), Step 2, (E.9)**: `Hᵢ₊₁` is `A`-invariant *inside* `Hᵢ`.
+
+Both chain terms are `A`-invariant in `S` (`isAInvariant_iterCommutator`); this transports
+that to the restricted action on `↥Hᵢ`, which is what lets the action descend to the
+section `Hᵢ/Hᵢ₊₁` via `Isaacs.Ch03.IsAInvariant.quotientMulAutHom`. -/
+theorem RegularOperatorSetup.isAInvariant_subgroupOf_chain
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) (i : ℕ) :
+    IsAInvariant (hyp.isAInvariant_iterCommutator hSinv i).restrict
+      ((OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+          (⊤ : Subgroup ↥S) (i + 1)).subgroupOf
+        (OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+          (⊤ : Subgroup ↥S) i)) := by
+  rw [isAInvariant_iff_smul_mem]
+  intro a x hx
+  rw [Subgroup.mem_subgroupOf] at hx ⊢
+  exact (hyp.isAInvariant_iterCommutator hSinv (i + 1)).smul_mem a hx
+
 /-- **BG Theorem E.3(b), Step 2, (E.7) — unconditionally**: `|S/S'| = p²` for every
 exponent-`p` subgroup `S` properly containing `R₀`.
 

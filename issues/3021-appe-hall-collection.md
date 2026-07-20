@@ -506,7 +506,12 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
    `commutator_R₀_eq_commutator_top` で示してあるのに、である。
 3. ✅ **鎖の A-不変性** = `isAInvariant_iterCommutator`
    (既存の `IsAInvariant.of_characteristic` に流すだけ)。
-4. ⬜ **切断 `H_i/H_{i+1}` への誘導作用**。道具は repo にある:
+4. ✅ **切断の 2 入力がそろった**:
+   - `index_subgroupOf_chain`: 切断は**位数 p** ((E.6) の `|H_i| = p·|H_{i+1}|` を
+     「`H_i` の中での `H_{i+1}` の指数」の形に言い換え = quotient 機構が要求する形)。
+   - `isAInvariant_subgroupOf_chain`: `H_{i+1}` は `↥H_i` の中で A-不変
+     (`isAInvariant_iterCommutator` を `↥H_i` 上の制限作用に移送)。
+5. ⬜ **切断 `H_i/H_{i+1}` への誘導作用の組み立て**。道具は repo にある:
    **`Isaacs.Ch03.IsAInvariant.quotientMulAutHom`** (+ `_apply_mk'`) が
    `IsAInvariant φ N` (N 正規) から `A →* MulAut (G ⧸ N)` を作る。多数の file で使用実績あり。
    ⚠ ただし要るのは `↥S ⧸ ...` でなく **`↥H_i ⧸ (H_{i+1}.subgroupOf H_i)`** なので、
