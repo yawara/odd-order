@@ -551,6 +551,51 @@ theorem caseA_sTwoExtraction [Finite G] {M : Subgroup G}
     hFbound hχ).2.2
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi's `𝒮₄`, at §9 level** — the §9 form of `S13.nineElevenSFour`: the irreducible
+members of `𝒮(H₀C)` outside `𝒮₂`, whose cardinality the (9.11.5)–(9.11.8) argument bounds by
+`‖α‖²`. -/
+noncomputable def caseASFour [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) (S₂ : Set (ClassFunction ↥M ℂ)) :
+    Set (ClassFunction ↥M ℂ) :=
+  {φ ∈ sOf data (chief.H0 ⊔ cSub data chief) | IsIrreducibleCharacter φ ∧ φ ∉ S₂}
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11.4)–(9.11.8), the norm bound, at §9 level** — the §9 form of
+`S13.NineElevenNormBound`.
+
+Book (9.11.4): `α = Ind_{HU₁}^M 1 − ψ₁` has `‖α‖² = a + 1 + (q−1)a²/u`, in cleared form
+`N·u = (a+1)·u + (q−1)·a²`; and (9.11.5)–(9.11.8) give `|𝒮₄| ≤ ‖α‖² = N`, since distinct
+`𝒮₄`-members would otherwise consume overlapping unit slices of `α^τ` and let a pair be
+coherently adjoined. -/
+def CaseANormBound [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M) : Prop :=
+  ∀ S₂ : Set (ClassFunction ↥M ℂ),
+    {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+      S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau S₂ A0) →
+      (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂).Nonempty →
+      (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+        ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau (S₂ ∪ {χ, χ.conj}) A0)) →
+      2 * caseA.a = chief.p - 1 →
+      chars.C = chars.Uprime →
+      (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+        (χ : ↥M → ℂ) 1 = ((data.q * chars.u : ℕ) : ℂ)) →
+      {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+          χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard * (caseA.a * caseA.a)
+        = (chief.p - 1) * ((uprimeSub data).relIndex data.U) →
+      (∀ F : Finset (ClassFunction ↥M ℂ), ↑F ⊆ S₂ →
+        OddOrder.Peterfalvi.S07.sumnS F
+          ≤ 2 * (data.q : ℝ) ^ 2 * (caseA.a : ℝ) * (chars.u : ℝ)) →
+      (∀ χ ∈ S₂, (χ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ)) →
+      ∃ N : ℕ,
+        N * chars.u = (caseA.a + 1) * chars.u + (data.q - 1) * caseA.a ^ 2 ∧
+        (caseASFour data chief S₂).ncard ≤ N
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.7)–(9.11.8), the coherent-pair refutation, at §9 level** — the §9 form of
 `S13.NineElevenSevenEightRefutation`.
 
