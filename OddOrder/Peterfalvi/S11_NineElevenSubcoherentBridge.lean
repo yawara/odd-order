@@ -287,5 +287,169 @@ theorem induce_columnSum_of_not_irreducible {M : Subgroup G} {A : Set G} [Finite
   · rw [← hχ₂, OddOrder.Peterfalvi.S06.columnSum_def]
     exact h46.induce_restrict_certainType_eq χ₂
 
+/-- **Transporting an induction source across an equality of induction subgroups.**  For `K = K'`
+an irreducible `K'`-character has an irreducible `K`-counterpart with the *same* induction, and the
+two are trivial together.
+
+The equality is discharged by `subst` (both subgroups are variables here), which is exactly why the
+lemma is stated in this generality rather than at `h46.K = huSub data`: there `h46.K` is a
+projection, so `subst` does not apply and a direct `▸` on the dependent character type breaks the
+motive (cf. the docstring of `induce_columnSum_of_not_irreducible`).  The residual `Invertible`
+mismatch after `subst` is propositional (`Subsingleton`), the same wrinkle
+`induceHU_eq_induce` handles. -/
+theorem exists_induce_eq_of_subgroup_eq {L : Type*} [Group L] [Fintype L] {K K' : Subgroup L}
+    (hKK' : K = K') [Invertible (Nat.card ↥K : ℂ)] [Invertible (Nat.card ↥K' : ℂ)]
+    (χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K') :
+    ∃ χ' : OddOrder.RepresentationTheory.IrreducibleCharacter ↥K,
+      ClassFunction.induce K (χ' : ClassFunction ↥K ℂ)
+          = ClassFunction.induce K' (χ : ClassFunction ↥K' ℂ) ∧
+        (χ' = OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥K ↔
+          χ = OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥K') := by
+  subst hKK'
+  refine ⟨χ, ?_, Iff.rfl⟩
+  convert rfl using 2
+  exact Subsingleton.elim (α := Invertible (Nat.card ↥K : ℂ)) _ _
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.9.b) at §9 level**: a *reducible* member of `𝒮(Y)` is a nontrivial certain-type
+column sum `μ_{χ₂}` of Hypothesis (4.6).
+
+This is the §9 replacement for `S13.caseB_sOf_member_dichotomy`, whose conclusion is stated in the
+§10 μ-grid (`hyp.base.muColumnChar`) and therefore drags the whole §10/§11 packaging — and with it
+the type III/IV restriction — into the caseB `R`-family dispatch.  The book has no such detour: it
+builds the reducible members from (4.7) and Theorem (4.5), both §6 results, which is exactly the
+`S06.columnSum` form produced here.  (§10 converts §6-columns to μ-grid columns and `certainTypeR`
+converts them back, so the packaging route is a round trip; issue 1045.)
+
+The `𝒮`-side source is nontrivial because `𝒳` demands `H ⊄ Ker χ` while the trivial character has
+kernel everything, and `hKeq` moves it into the (4.6) world where
+`induce_columnSum_of_not_irreducible` applies.  Callers get `hKeq` from
+`huSub_eq_derivedInG_subgroupOf` together with the `K`-field of the (4.6) producer
+(`S10.typePACore_toHypothesis46_core`). -/
+theorem sOf_columnSum_of_not_irreducible [Finite G] {M : Subgroup G} {A : Set G}
+    (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data) {Y : Subgroup G} {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ sOf data Y) (hred : ¬ IsIrreducibleCharacter φ) :
+    ∃ χ₂ ≠ 1, φ = OddOrder.Peterfalvi.S06.columnSum h46 χ₂ := by
+  obtain ⟨χ, hχ, rfl⟩ := hφ
+  -- `χ ≠ 1`: the trivial character's kernel is everything, contradicting `H ⊄ Ker χ` (`𝒳`).
+  have hχne : χ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥(huSub data) := by
+    intro htriv
+    apply hχ.1
+    rw [htriv]
+    simp only [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+    exact Set.subset_univ _
+  obtain ⟨χ', hind, htriviff⟩ := exists_induce_eq_of_subgroup_eq hKeq χ
+  have hred' : ¬ IsIrreducibleCharacter
+      (ClassFunction.induce h46.K (χ' : ClassFunction ↥h46.K ℂ)) := by
+    rw [hind, ← induceHU_eq_induce data (χ : ClassFunction ↥(huSub data) ℂ)]
+    exact hred
+  obtain ⟨χ₂, hχ₂ne, heq⟩ :=
+    induce_columnSum_of_not_irreducible h46 χ' (fun h => hχne (htriviff.mp h)) hred'
+  exact ⟨χ₂, hχ₂ne,
+    (induceHU_eq_induce data (χ : ClassFunction ↥(huSub data) ℂ)).trans (hind.symm.trans heq)⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The certain-type `R`-family transported to a member equal to its column.**  For `η = μ_{χ₂}`
+with `χ₂ ≠ 1`, this is `S06.certainTypeR` restated at `η`.
+
+Only the `image_eq` field mentions the member, so `imageSet`/`mem_ZIrr`/`orthonormal` are reused
+verbatim and `.imageSet` is *definitionally* `certainTypeR`'s — the form the (5.2.e)
+cross-orthogonality lemmas consume.  Keeping `χ₂` and `hηeq` as parameters (rather than choosing
+them inside) is what makes the `η`-rewrite in `image_eq` type-correct: were `χ₂` obtained by
+`Classical.choose` from an existential over `η`, the `imageSet` in the motive would itself depend on
+`η`. -/
+noncomputable def columnRFamily {M : Subgroup G} {A : Set G} [Finite G]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    {η : ClassFunction ↥M ℂ} (hηeq : η = OddOrder.Peterfalvi.S06.columnSum h46 χ₂) :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) η where
+  imageSet := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
+    (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).imageSet
+  mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
+    (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).mem_ZIrr
+  orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
+    (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).orthonormal
+  image_eq := by
+    rw [hηeq]
+    exact (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).image_eq
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Per-member orthonormal `R`-family over `𝒮(Y)`, at §9 level** — the raw (5.2.d) datum feeding
+the norm-general (5.7) engine `S07.uniform_degree_coherence_of_families` in case (9.7.b) of (9.11).
+
+Every member of `𝒮(Y)` is either irreducible or, by (9.9.b)
+(`sOf_columnSum_of_not_irreducible`), a nontrivial certain-type column `μ_{χ₂}`; the `R`-family is
+dispatched accordingly:
+
+* **irreducible `η`** — the 2-element signed Dade family
+  `S07.dadeOrthonormalCharacterImageFamilyOfDiff` (`τ(η − η̄) = ε·(μ − ν)`), whose no-realness and
+  `A₀`-supported difference come from the `⊥`-kernel world-bridge
+  (`sOf_subset_inducedKernelFamily_bot`) rather than from a `S13.Hypothesis`;
+* **column `η = μ_{χ₂}`** — the `2q`-element certain-type family `S06.certainTypeR`.
+
+This is the §9 replacement for `S13.caseB_sOf_memberRFamily`.  The two differ only in where the
+reducible branch gets its column: the §13 version reads a μ-grid index `k : Fin hyp.base.w2` off the
+§10 packaging (which is what confined it to types III/IV), while here it is the §6 column `χ₂` that
+`certainTypeR` consumes anyway.  **No type hypothesis appears on this route.**
+
+⚠ `τ` is *not* a free parameter here (unlike case (9.7.a)'s `caseA_coherent_sOf_cprime_of_refuter`):
+`certainTypeR` produces its family over `dadeIntegralCharacterMap h46.dade0 h46.tau`, so the
+conclusion is pinned to it, and the irreducible branch — which lands on
+`h46.dade0.fullDadeIsometryData hconj` — is matched to it by `htau`.  For the intended producer
+`S10.typePACore_toHypothesis46_core`, which stores `tau := dade0.fullDadeIsometryData hconj`
+verbatim, `htau` is `rfl`.
+
+⚠ The family is assembled field-by-field rather than by transporting along `htau` / `η = μ_{χ₂}`,
+so that `.imageSet` is *definitionally* the underlying constructor's — the form in which the (5.2.e)
+cross-orthogonality lemmas consume it (same reason as in the §13 version). -/
+noncomputable def sOf_memberRFamily [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    {Y : Subgroup G} {η : ClassFunction ↥M ℂ} (hη : η ∈ sOf data Y) :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) η := by
+  classical
+  -- `M' ⊴ M`; in the §13 version this instance arrived through the packaging's import closure.
+  haveI : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  have hηIKF0 := sOf_subset_inducedKernelFamily_bot hG hM data Y hη
+  by_cases hirr : IsIrreducibleCharacter η
+  · -- irreducible member: the signed Dade image family, matched to `h46.tau` by `htau`
+    have hreal : ¬ ClassFunction.IsReal (η : ClassFunction ↥M ℂ) :=
+      OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+        (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M) hηIKF0
+    have hdiffsupp := OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support hKsupp hηIKF0
+    exact
+      { imageSet := (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+          h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).imageSet
+        mem_ZIrr := (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+          h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).mem_ZIrr
+        orthonormal := (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+          h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).orthonormal
+        image_eq := by
+          rw [htau]
+          exact (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+            h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).image_eq }
+  · -- reducible member: (9.9.b) gives the column `χ₂ ≠ 1`, and `certainTypeR` its `2q`-family
+    exact columnRFamily h46 (sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr).choose_spec.1
+      (sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr).choose_spec.2
+
 
 end OddOrder.Peterfalvi.S11
