@@ -275,4 +275,86 @@ theorem RegularOperatorSetup.commutator_mem_iff_mem {R B : Type*} [Group R] [Gro
     rw [chainStepHom_apply] at h
     exact (QuotientGroup.eq_one_iff _).mp h
 
+/-- **The inductive step for `wᵢ ∉ Hᵢ₊₁`**: if `wᵢ ∉ Hᵢ₊₁` then `wᵢ₊₁ ∉ Hᵢ₊₂`.
+
+`wᵢ₊₁ = ⁅wᵢ, v⁆ = ⁅v, wᵢ⁆⁻¹`, and `commutator_mem_iff_mem` says `⁅v, wᵢ⁆ ∈ Hᵢ₊₂` exactly
+when `wᵢ ∈ Hᵢ₊₁`.  Chained from `w ∉ H₁`, this is BG's `⟨w̄ᵢ⟩ = H̄ᵢ` for every `i`. -/
+theorem RegularOperatorSetup.commutatorIterate_not_mem_succ {R B : Type*} [Group R] [Group B]
+    [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hR₀S : hyp.R₀ ≤ S) (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥)
+    (hlt : ¬ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 1) ≤
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 2))
+    (hidx : ((OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          (i + 1)).subgroupOf
+        (OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+          i)).index = p)
+    {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) {w : ↥S}
+    (hw : w ∈ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
+    (hwi : commutatorIterate w v i ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1)) :
+    commutatorIterate w v (i + 1) ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+      (i + 2) := by
+  have hmem := commutatorIterate_mem_chain
+    (T := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (v := v) hw i
+  intro hcon
+  refine hwi ((hyp.commutator_mem_iff_mem hR₀S hexp hS hne hlt hidx hv hmem).mp ?_)
+  rw [← commutatorElement_inv]
+  exact Subgroup.inv_mem _ hcon
+
+/-- **(E.12) bilinearity in the quotient**: for `x ∈ Hᵢ`,
+`⁅vᵏ, x⁆ ≡ ⁅v, x⁆ᵏ (mod Hᵢ₊₂)`.
+
+This is the *equality* form that BG's `[wᵢ₋₁^{rᵢ₋₁} u, vʳ] = wᵢ^{rᵢ₋₁ r}` needs, as opposed
+to the membership form `commutator_pow_mem_of_commutator_mem`.  It is the first consumer of
+`chain_map_le_center`: `⁅v,x⁆ ∈ Hᵢ₊₁` becomes **central** in `G/Hᵢ₊₂`, so BG Lemma 4.2(a)
+applies there. -/
+theorem commutator_pow_left_congr {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {i : ℕ} {v x : G}
+    (hx : x ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i) (k : ℕ) :
+    (⁅v, x⁆ ^ k)⁻¹ * ⁅v ^ k, x⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) := by
+  set N := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) with hN
+  have hvx : ⁅v, x⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top v) hx
+  have hcent : ⁅(QuotientGroup.mk' N) v, (QuotientGroup.mk' N) x⁆ ∈
+      Subgroup.center (G ⧸ N) := by
+    rw [← map_commutatorElement]
+    exact chain_map_le_center T (i + 1) (Subgroup.mem_map.mpr ⟨⁅v, x⁆, hvx, rfl⟩)
+  have h3 := OddOrder.BG.Ch1.S04.commutatorElement_pow_left_of_central hcent k
+  refine QuotientGroup.eq.mp ?_
+  show (QuotientGroup.mk' N) (⁅v, x⁆ ^ k) = (QuotientGroup.mk' N) ⁅v ^ k, x⁆
+  rw [map_pow, map_commutatorElement, map_commutatorElement, map_pow]
+  exact h3.symm
+
+/-- **The `u ∈ Hᵢ` remainder is invisible mod `Hᵢ₊₁`**: `⁅v, x·u⁆ ≡ ⁅v, x⁆`.
+
+BG writes `wᵢ₋₁ᵃ = wᵢ₋₁^{rᵢ₋₁} u` for some `u ∈ Hᵢ` and then simply computes with
+`wᵢ₋₁^{rᵢ₋₁}`; this is what licenses dropping the remainder.  Both factors of
+`⁅v,x⁆⁻¹ ⁅v,x·u⁆ = ⁅v,u⁆ · ((⁅v,x⁆⁅v,u⁆)⁻¹ ⁅v,x·u⁆)` lie in `Hᵢ₊₁` — the first because
+`u ∈ Hᵢ`, the second by `commutator_mul_mem_chain` (which even lands in `Hᵢ₊₂`). -/
+theorem commutator_mul_congr {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {i : ℕ} {v x u : G}
+    (hu : u ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i) :
+    (⁅v, x⁆)⁻¹ * ⁅v, x * u⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+  have hvu : ⁅v, u⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top v) hu
+  have hrest : (⁅v, x⁆ * ⁅v, u⁆)⁻¹ * ⁅v, x * u⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) :=
+    iterCommutator_antitone (i + 1) (commutator_mul_mem_chain hu)
+  have hrw : (⁅v, x⁆)⁻¹ * ⁅v, x * u⁆ =
+      ⁅v, u⁆ * ((⁅v, x⁆ * ⁅v, u⁆)⁻¹ * ⁅v, x * u⁆) := by group
+  rw [hrw]
+  exact Subgroup.mul_mem _ hvu hrest
+
 end OddOrder.BG.AppE
