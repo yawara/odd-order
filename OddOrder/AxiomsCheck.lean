@@ -11561,14 +11561,18 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- for both carriers.  The §13 route reaches the pivot through the μ-grid and (11.7) `H₀ = 1`,
 -- hence only in types III/IV.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_cprime_nonempty
--- **Case (9.7.b) coherence moved down to the `A(M)`-isometry** — the form Hypothesis (9.5) asks
+-- **Coherence moved down to the `A(M)`-isometry** (used by both Clifford branches) — the form Hypothesis (9.5) asks
 -- for.  `certainTypeR` produces its families for the enlarged (4.6.e) isometry on `A₀ = A ∪ V^M`;
 -- the book does not distinguish the two because the `A`-datum *is* the restriction of the `A₀` one,
 -- and this crossing makes that explicit (`S07.isCoherent_of_supportedSpan_le` for the support,
 -- `IsCoherent.congrMap` + `S08.dadeIntegralCharacterMap_restrict_eq_of_support` for the map).  The
 -- witness `η̄ − η` is `A`-supported by the (4.7) estimate — *not* merely `A₀`-supported — which is
 -- what makes the descent possible.
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_caseB_coherent_restrict
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_coherent_restrict
+-- **A member and its conjugate have equal degree** — what makes the descent above
+-- branch-independent: the (4.7) estimate only needs the two degrees to agree, and that holds for
+-- every member, with no uniform-degree hypothesis.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_conj_apply_one
 -- **The (8.15.3) base coherence retargeted to the (9.5) isometry** — the `hAbase` supplier of
 -- `sOf_nineEleven_coherent`.  `sOf_degreeSubfamily_coherent` already lands on the support `A(M)`;
 -- only the map differs, and `dadeIntegralCharacterMap_apply_of_support` collapses *any*
