@@ -140,7 +140,7 @@ theorem caseA_coherent_sOf_H0Cprime_of_refuter [Finite G]
     hSfin
     (OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime)
     (fun _ hφ => hφ.1)
-    (fun _ hχ => irrCut_conjClosed hyp hyp.H0Cprime (hyp.s11Setup.q * caseA.a) hχ)
+    (fun _ hχ => OddOrder.Peterfalvi.S11.irrCut_conjClosed hyp.s11Setup hyp.H0Cprime (hyp.s11Setup.q * caseA.a) hχ)
     ⟨sOf_degreeSubfamily_isCoherent hG hyp hyp.H0Cprime (hyp.s11Setup.q * caseA.a) hex⟩
     hrefute
 

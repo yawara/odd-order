@@ -93,12 +93,30 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
   Coherence911 → CaseBXi → InnerCompHom → SummandComplementKernel → ThetaCountAssembly`
   なので最下流の `ThetaCountAssembly` が正しい home。
 
-### ⛏ 残り
+- `irrCut_conjClosed` : `S13_MaximalIII_IV` (ns `S13`) → `S11_.../ThetaCountAssembly` (ns `S11`)。
+  `hyp : S13.Hypothesis M` を `data : TypesIIIIIIVSetup M` へ引数化 (実使用は `s11Setup` のみ、
+  `hyp.base.finiteG` も `[Finite G]` binder があるので不要だった)。consumer 2 ファイル。
 
-- `irrCut_conjClosed` (`S13_MaximalIII_IV.lean:92`) の一般化 — `hyp : S13.Hypothesis M` を
-  取るが実際に使うのは `hyp.s11Setup` と `hyp.base.finiteG` だけ。`data : TypesIIIIIIVSetup M`
-  へ引数化する。
-- その後に §9 レベルの (9.11) statement 本体 (着手順 1)。
+⟹ **着手順 2 の再配置は完了**。§9 の生の装置はこれで全て §9 に在る。
+
+### ⛏ 残り = 着手順 1 (§9 レベルの (9.11) statement 本体)
+
+形: `(data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)`
+`(chars : Section11CharacterData data chief)` の上で
+`Nonempty (S07.IsCoherent chars.tau (sOf data (chief.H0 ⊔ chars.Cprime)) A0)`。
+
+⚠ `chars.H0CprimeSupport` は producer によっては `∅` の placeholder
+(`S12.Hypothesis.mkSection11CharacterData` / `S15` の counting 用) なので、
+support は**明示パラメータ**で取るのが素直 (S15 の honest 版は `A(S) = typePACore` を渡している)。
+
+⚠ chain 本体 (`S11_NineElevenCaseA` 16 / `_AlphaBound` 15 / `_PairAdjoin` 5 の
+`S13.Hypothesis` 引数) は `hyp.base`/`hyp.params` を各 130/196/72 箇所使うので、
+**どこまでが §10 の μ-grid に真に依存し、どこからが packaging か**の切り分けが先。
+`caseA_coherent_sOf_H0Cprime_of_refuter` (S11_NineElevenCaseA.lean:70) を読んだ限りでは
+`hyp.base.tau` / `hyp.base.A0` (= パラメータ化可能) と finiteness 橋渡しが主で、
+`sOf_degreeSubfamily_isCoherent` だけが §10 engine
+(`inducedFamily_degreeSubfamily_isCoherent`) に実依存する。
+書籍ではそこが (8.15.3) 経由 ⟹ `S10.typePACore_subcoherent` で置換できる見込み。
 
 ## 着手順 (残り)
 
