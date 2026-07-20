@@ -1452,58 +1452,63 @@ theorem RegularOperatorSetup.R₀_le_omega [Finite R]
   rw [hyp.R₀_card] at h
   simpa using congrArg (fun z : ↥hyp.R₀ => (z : R)) h
 
-/-- **BG Theorem E.3(b), Step 2, (E.9), opening sentence**: *"Then `vᵃ = vʳ` for some integer
-`r` such that `r^q ≡ 1 (mod p)`."*
+/-- **The engine behind BG (E.9)**: an automorphism `φ` of a group of prime order `p` is a
+power map, `φ x = xʳ`; and if `φ^q = 1` then `r^q ≡ 1 (mod p)`.
 
-`A` fixes `R₀`, which is cyclic of prime order `p`, so each `a ∈ A` acts on it as a power
-map; and `a^q = 1` because `|A| = q`, so the exponent satisfies `r^q ≡ 1 (mod p)`.
-
-Stated with an **integer** exponent, as BG does; the congruence is `(r : ZMod p)^q = 1`. -/
-theorem RegularOperatorSetup.exists_zpow_eq_act_of_mem_A [Finite R]
-    (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) :
-    ∃ r : ℤ, (∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) ∧ ((r : ZMod p) ^ q = 1) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
-  set ψ : ↥hyp.A →* MulAut ↥hyp.R₀ :=
-    OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hyp.isAInvariant_R₀ with hψ
-  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥hyp.R₀)
-  obtain ⟨k, hk⟩ := hg (ψ ⟨a, ha⟩ g)
+BG applies this twice — first to `R₀` itself (the opening of (E.9)), then to each section
+`Hᵢ/Hᵢ₊₁` of the chain, which (E.6) shows also has order `p`.  Stated abstractly so both
+uses go through the same lemma, and with an **integer** exponent, as BG does. -/
+theorem exists_zpow_eq_of_card_eq_prime {C : Type*} [Group C] {p q : ℕ} (hp : p.Prime)
+    (hC : Nat.card C = p) (φ : MulAut C) (hφ : φ ^ q = 1) :
+    ∃ r : ℤ, (∀ x : C, φ x = x ^ r) ∧ ((r : ZMod p) ^ q = 1) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Finite C := Nat.finite_of_card_ne_zero (by rw [hC]; exact hp.pos.ne')
+  haveI : IsCyclic C := isCyclic_of_prime_card hC
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := C)
+  obtain ⟨k, hk⟩ := hg (φ g)
   have hord : orderOf g = p := by
     have htop : Subgroup.zpowers g = ⊤ := by ext x; simpa using hg x
     have hc := Nat.card_zpowers g
-    rw [htop, Subgroup.card_top, hyp.R₀_card] at hc
+    rw [htop, Subgroup.card_top, hC] at hc
     exact hc.symm
-  refine ⟨k, ?_, ?_⟩
-  · -- `a` acts as the `k`-th power map on all of `R₀`
-    intro v hv
-    obtain ⟨m, hm⟩ := hg ⟨v, hv⟩
-    have h1 : ψ ⟨a, ha⟩ ⟨v, hv⟩ = (⟨v, hv⟩ : ↥hyp.R₀) ^ k := by
-      rw [← hm, map_zpow, ← hk, ← zpow_mul, ← zpow_mul, mul_comm]
-    have h2 := congrArg (fun z : ↥hyp.R₀ => (z : R)) h1
-    simpa [hψ, OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val] using h2
-  · -- `a^q = 1` forces `k^q ≡ 1 (mod p)`
-    have haq : (⟨a, ha⟩ : ↥hyp.A) ^ q = 1 := by
-      have h := pow_card_eq_one' (G := ↥hyp.A) (x := ⟨a, ha⟩)
-      rwa [hyp.A_card] at h
-    have hψq : ψ ⟨a, ha⟩ ^ q = 1 := by rw [← map_pow, haq, map_one]
-    have hiter : ∀ n : ℕ, (ψ ⟨a, ha⟩ ^ n) g = g ^ (k ^ n) := by
+  refine ⟨k, fun x => ?_, ?_⟩
+  · obtain ⟨m, hm⟩ := hg x
+    rw [← hm, map_zpow, ← hk, ← zpow_mul, ← zpow_mul, mul_comm]
+  · have hiter : ∀ n : ℕ, (φ ^ n) g = g ^ (k ^ n) := by
       intro n
       induction n with
       | zero => simp
       | succ n ih =>
-        have hstep : (ψ ⟨a, ha⟩ ^ (n + 1)) g = (ψ ⟨a, ha⟩ ^ n) (ψ ⟨a, ha⟩ g) := by
-          rw [pow_succ]; rfl
+        have hstep : (φ ^ (n + 1)) g = (φ ^ n) (φ g) := by rw [pow_succ]; rfl
         rw [hstep, ← hk, map_zpow, ih, ← zpow_mul, ← pow_succ]
-    have hgq : g ^ (k ^ q) = g := by rw [← hiter q, hψq]; rfl
-    have hz : g ^ (k ^ q - 1) = 1 := by
-      rw [zpow_sub, hgq, zpow_one, mul_inv_cancel]
+    have hgq : g ^ (k ^ q) = g := by rw [← hiter q, hφ]; rfl
+    have hz : g ^ (k ^ q - 1) = 1 := by rw [zpow_sub, hgq, zpow_one, mul_inv_cancel]
     have hdvd : (p : ℤ) ∣ k ^ q - 1 := by
-      rw [← hord]
-      exact orderOf_dvd_iff_zpow_eq_one.mpr hz
+      rw [← hord]; exact orderOf_dvd_iff_zpow_eq_one.mpr hz
     have hzero : ((k ^ q - 1 : ℤ) : ZMod p) = 0 :=
       (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).mpr hdvd
     push_cast at hzero
     exact sub_eq_zero.mp hzero
+
+/-- **BG Theorem E.3(b), Step 2, (E.9), opening sentence**: *"Then `vᵃ = vʳ` for some integer
+`r` such that `r^q ≡ 1 (mod p)`."*
+
+`A` fixes `R₀`, which has prime order `p`, and `a^q = 1` because `|A| = q`; so
+`exists_zpow_eq_of_card_eq_prime` applies to the induced automorphism. -/
+theorem RegularOperatorSetup.exists_zpow_eq_act_of_mem_A [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) :
+    ∃ r : ℤ, (∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) ∧ ((r : ZMod p) ^ q = 1) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set ψ : ↥hyp.A →* MulAut ↥hyp.R₀ :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hyp.isAInvariant_R₀ with hψ
+  have haq : (⟨a, ha⟩ : ↥hyp.A) ^ q = 1 := by
+    have h := pow_card_eq_one' (G := ↥hyp.A) (x := ⟨a, ha⟩)
+    rwa [hyp.A_card] at h
+  obtain ⟨r, hr, hrq⟩ := exists_zpow_eq_of_card_eq_prime hyp.p_prime hyp.R₀_card
+    (ψ ⟨a, ha⟩) (by rw [← map_pow, haq, map_one])
+  refine ⟨r, fun v hv => ?_, hrq⟩
+  have h2 := congrArg (fun z : ↥hyp.R₀ => (z : R)) (hr ⟨v, hv⟩)
+  simpa [hψ, OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val] using h2
 
 /-- **BG Theorem E.3(b), Step 2, (E.11)**: `r ≢ 1 (mod p)` for `a ∈ A^#`.
 

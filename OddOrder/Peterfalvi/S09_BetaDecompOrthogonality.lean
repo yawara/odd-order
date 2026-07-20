@@ -13,7 +13,6 @@ import OddOrder.Peterfalvi.S09_Building78C
 
 namespace OddOrder.Peterfalvi.S09.Cert
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {L : Type*} [Group L] [Fintype L]
 
