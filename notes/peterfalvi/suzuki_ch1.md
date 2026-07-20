@@ -497,9 +497,21 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       `XiLengthThreeTypeAFactorData` と左右の tagged coordinates を同梱するので、
       `left ⊓ right = Φ(P)`、`left ⊔ right = P`、および
       `ν = λ·θ(λ) = μ·φ(μ)` が同じ endpoint に揃った。
-      次の source frontier は、actual mixed commutator pairing の actor covariance を
-      この左右座標で表示し、`θ = 1` / `φ = 1` / 両方非自明の固有値制約から原典
-      pp. 90--92 の type B/C/D case split へ進むことである。
+      さらに新 leaf `HigmanLemmaTwelve/MixedEigenweights.lean` で、この左右座標を
+      共通 ambient `F ⊗ (P/Φ(P))` 内の Frobenius eigenvector 族に変換し、原典 p. 90 の
+      固有値制約 `λ^(2^i) μ^(2^j) = ν^(2^k)` を導いた
+      (`exists_mixedFrobeniusWeightEquation_of_xiLengthThree`, axiom-clean)。
+      両 factor branch (可換 = Agemo 商 / 非可換 = lower-central layer) は
+      actor-equivariant な inclusion `quotientToAmbientLayerZero` で `P/Φ(P)` に落とし、
+      非零 mixed bracket (`exists_mixed_lowerCentralCommutatorBilinear_ne_zero`) を
+      base change して weight equation を読み取る。中心 `Φ(P)` は
+      `ambientCenterCoordinate` で Singer 座標に同定し、固有値 `ν^(2^k)` を得る。
+      shared な線形代数核 (等変双線形写像の weight 一致) は
+      `OddOrder/GroupTheory/RepresentationTheory/BilinearEigenweight.lean` に置き、
+      Lemma 11 の private 版 `eigenvalue_eq_of_basis_repr_ne_zero` を dedup した (issue 9317)。
+      次の source frontier は、`θ = 1` / `φ = 1` / 両方非自明の分岐から原典
+      pp. 90--92 の type B/C/D case split を実行し、`B(n,θ,ε)` / `C(n,ε)` / `D(n,θ,ε)`
+      を確定することである。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
