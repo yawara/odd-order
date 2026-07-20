@@ -454,8 +454,13 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       可換することも証明した。relative degree 1 の trace formula は quotient coordinate
       だけを kernel field 側へ移して prescribed kernel coordinate を固定した normal form
       に変換でき、残る nonzero coefficient も twisted norm の全射性により quotient
-      coordinate の rescaling だけで 1 にできる。次はこれらを source-facing factor
-      coordinate endpoint として一括する。
+      coordinate の rescaling だけで 1 にできる。これら二段階は
+      `PrescribedFactorCoordinates.lean` の
+      `exists_typeAQuotientCoordinates_of_prescribedKernel` に束ね、quotient actor
+      compatibility と `ν = λ·θ(λ)` も同時に保持する公開 API とした。残る接続は、
+      caller-prescribed generator 版 Lemma 11 の actual field model と二つの tracked
+      shift からこの API の shifted-normal-form 入力を組み立てる noncommutative
+      factor 側である。
       Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
       caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
       invariant factor への restricted action の faithful range でも generator のまま

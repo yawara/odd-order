@@ -3,3 +3,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
