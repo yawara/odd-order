@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV.ThetaCountAssembly
+import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 
 /-!
 # The §9 family sits inside the (8.15.3) family — the subcoherence bridge
@@ -129,5 +130,75 @@ theorem sOf_degreeSubfamily_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
   OddOrder.Peterfalvi.S10.inducedNonKernelFamily_degreeSubfamily_coherent hodd h46 dd _ _ _
     ((sOf_finite data Y).subset fun _ hx => hx.1) h2 (d : ℂ) (fun _ hx => hx.2.2) hd0 h1A
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11), case (9.7.a), at §9 level**: reduction to the maximality refuter.
+
+The §9-level form of `S13.caseA_coherent_sOf_H0Cprime_of_refuter`.  Everything is stated over
+Hypotheses (9.2)/(9.4)/(9.5) — `data`, `chief`, `chars` — with the Dade map `tau` and support `A0`
+as explicit parameters, so **no type hypothesis appears anywhere**.
+
+The §11 version reaches the same conclusion through `S13.Hypothesis`, whose `type_alt` pins types
+III/IV.  Tracing its proof shows that packaging is inessential: `hyp.C` is `cSub data chief`,
+`hyp.H0Cprime` is `chief.H0 ⊔ cprimeSub data chief`, `hyp.base.tau`/`.A0` are parameters, the
+finiteness bridge is `sOf_finite`, and the degree-`qa` base coherence — the one genuinely §10-bound
+input, via `S12.Hypothesis.inducedFamily_degreeSubfamily_isCoherent` — becomes the parameter
+`hbase`, which `sOf_degreeSubfamily_coherent` supplies along the book's (8.15.3) → (5.7) route.
+
+Book argument (unchanged): the (9.8.d) count `caseA_character_count_exact` has positive lower
+bound `(p−1)·[U:U′]`, so a degree-`qa` irreducible exists in `𝒮(H₀U′)`; it transports to
+`𝒮(H₀C′)` along `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′`), and the maximality skeleton
+`S07.coherent_of_maximal_coherent_pair_refuted` closes it against `hrefute`. -/
+theorem caseA_coherent_sOf_cprime_of_refuter [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G) (A0 : Set ↥M)
+    (caseA : CliffordCaseAData chars)
+    (hbase : OddOrder.Peterfalvi.S07.IsCoherent tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} A0)
+    (hrefute : ∀ S₂ : Set (ClassFunction ↥M ℂ),
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+          IsIrreducibleCharacter φ ∧
+          ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))} ⊆ S₂ →
+        S₂ ⊆ sOf data (chief.H0 ⊔ cprimeSub data chief) →
+        OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₂ →
+        Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau S₂ A0) →
+        (sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂).Nonempty →
+        (∀ χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
+          ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau (S₂ ∪ {χ, χ.conj}) A0)) → False) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent tau
+      (sOf data (chief.H0 ⊔ cprimeSub data chief)) A0) := by
+  classical
+  -- positivity of the (9.8.d) count lower bound `(p−1)·[U:U′]`
+  have hp1 : 0 < chief.p - 1 := Nat.sub_pos_of_lt chief.p_prime.one_lt
+  have hrel : 0 < (uprimeSub data).relIndex data.U :=
+    lt_of_lt_of_le (u_odd hG chars).pos (u_le_relIndex_uprimeSub_U chars)
+  have hNpos := lt_of_lt_of_le (mul_pos hp1 hrel) (caseA_character_count_exact hG caseA)
+  -- the (9.8.d) count set is nonempty: a degree-`qa` irreducible in `𝒮(H₀U′)`
+  have hne : {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) |
+      IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.Nonempty := by
+    apply Set.nonempty_of_ncard_ne_zero
+    intro h0
+    rw [h0, Nat.zero_mul] at hNpos
+    exact absurd hNpos (lt_irrefl 0)
+  -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′` by derived-subgroup monotonicity)
+  have hle : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ uprimeSub data := by
+    refine sup_le_sup_left ?_ chief.H0
+    change derivedInG (cSub data chief) ≤ derivedInG data.U
+    rw [derivedInG_eq_commutator (cSub data chief), derivedInG_eq_commutator data.U]
+    exact Subgroup.commutator_mono (cSub_le_U data chief) (cSub_le_U data chief)
+  -- assemble the reduction via the maximality skeleton
+  exact OddOrder.Peterfalvi.S07.coherent_of_maximal_coherent_pair_refuted
+    (S₁ := {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))})
+    (sOf_finite data _)
+    (sOf_closedUnderConjugate data _)
+    (fun _ hφ => hφ.1)
+    (fun _ hχ => irrCut_conjClosed data _ (data.q * caseA.a) hχ)
+    ⟨hbase⟩
+    hrefute
+
 
 end OddOrder.Peterfalvi.S11

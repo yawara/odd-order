@@ -239,8 +239,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             `finrank_eq_one_of_anchoredTrace_lowerCentralSquareMap_of_xiLengthTwo`)
       - [x] actual central extension を平方写像で分類し、Peterfalvi の honest
             `TypeAData` へ接続する shared adapter を構成する (issue 9309)
-      - [ ] `m = n` 後の平方写像 `a ↦ a * θ(a)` と lower-central 座標を接続し、
-            source-facing `higmanLemmaEleven` を組み立てる
+      - [x] proper extension 排除から `m = n` を導き、degree-one algebra map と
+            relative trace を同定して原典 p. 89 の “the trace is superfluous” を証明する
+            (`absoluteDegrees_eq_of_relativeFinrank_eq_one`,
+            `anchoredTraceFormula_trace_superfluous`)
+      - [ ] trace-free 平方写像を `a ↦ a * θ(a)` と lower-central extension 座標へ
+            接続し、source-facing `higmanLemmaEleven` を組み立てる
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

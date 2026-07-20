@@ -255,4 +255,120 @@ theorem finrank_eq_one_of_anchoredTrace_lowerCentralSquareMap_of_xiLengthTwo
     apply e.symm.injective
     simpa only [map_zero] using hzero
 
+/-! ## The trace is superfluous in degree one -/
+
+/-- The algebra map is a ring equivalence when the relative degree is one. -/
+noncomputable def finrankOneRingEquiv
+    (K : Type uK) (L : Type uL)
+    [Field K] [Field L] [Algebra K L]
+    (hfin : Module.finrank K L = 1) : K ≃+* L :=
+  RingEquiv.ofBijective (algebraMap K L)
+    (Algebra.finrank_eq_one_iff_bijective_algebraMap.mp hfin)
+
+@[simp]
+theorem finrankOneRingEquiv_apply
+    (K : Type uK) (L : Type uL)
+    [Field K] [Field L] [Algebra K L]
+    (hfin : Module.finrank K L = 1) (x : K) :
+    finrankOneRingEquiv K L hfin x = algebraMap K L x :=
+  rfl
+
+/-- Over a degree-one extension of finite fields, embedding the relative trace
+back into the top field returns the original element. -/
+theorem algebraMap_trace_eq_self_of_finrank_eq_one
+    (K : Type uK) (L : Type uL)
+    [Field K] [Field L] [Finite K] [Finite L] [Algebra K L]
+    (hfin : Module.finrank K L = 1) (x : L) :
+    algebraMap K L (Algebra.trace K L x) = x := by
+  rw [FiniteField.algebraMap_trace_eq_sum_pow, hfin]
+  simp
+
+/-- Thus the relative trace itself is the inverse of the algebra-map
+equivalence. -/
+theorem trace_eq_finrankOneRingEquiv_symm
+    (K : Type uK) (L : Type uL)
+    [Field K] [Field L] [Finite K] [Finite L] [Algebra K L]
+    (hfin : Module.finrank K L = 1) (x : L) :
+    Algebra.trace K L x = (finrankOneRingEquiv K L hfin).symm x := by
+  let e := finrankOneRingEquiv K L hfin
+  apply e.injective
+  calc
+    e (Algebra.trace K L x) =
+        algebraMap K L (Algebra.trace K L x) := rfl
+    _ = x := algebraMap_trace_eq_self_of_finrank_eq_one K L hfin x
+    _ = e (e.symm x) := (e.apply_symm_apply x).symm
+
+/-- Higman's absolute finite-field degrees agree when the relative degree is
+one.  This is the equality `m = n` on p. 89. -/
+theorem absoluteFinrank_eq_of_relativeFinrank_eq_one
+    (K : Type uK) (L : Type uL)
+    [Field K] [Field L] [Finite K] [Finite L]
+    [CharP K 2] [CharP L 2] [Algebra K L]
+    [Algebra (ZMod 2) K] [Algebra (ZMod 2) L]
+    [IsScalarTower (ZMod 2) K L]
+    (hfin : Module.finrank K L = 1) :
+    Module.finrank (ZMod 2) L = Module.finrank (ZMod 2) K := by
+  rw [← Module.finrank_mul_finrank (ZMod 2) K L, hfin, mul_one]
+
+/-- Named-degree form of Higman's conclusion `m = n`. -/
+theorem absoluteDegrees_eq_of_relativeFinrank_eq_one
+    (K : Type uK) (L : Type uL)
+    [Field K] [Field L] [Finite K] [Finite L]
+    [CharP K 2] [CharP L 2] [Algebra K L]
+    [Algebra (ZMod 2) K] [Algebra (ZMod 2) L]
+    [IsScalarTower (ZMod 2) K L]
+    (m n : Nat)
+    (hfinK : Module.finrank (ZMod 2) K = n)
+    (hfinL : Module.finrank (ZMod 2) L = m)
+    (hfin : Module.finrank K L = 1) :
+    m = n := by
+  calc
+    m = Module.finrank (ZMod 2) L := hfinL.symm
+    _ = Module.finrank (ZMod 2) K :=
+      absoluteFinrank_eq_of_relativeFinrank_eq_one K L hfin
+    _ = n := hfinK
+
+/-- The exact right-hand-side rewrite in the anchored Frobenius-sum theorem:
+the relative trace disappears after the relative degree has been proved one. -/
+theorem anchoredFrobeniusSum_trace_superfluous
+    (K : Type uK) (L : Type uL)
+    [Field K] [Field L] [Finite K] [Finite L] [Algebra K L]
+    {M : Type uW} [AddCommMonoid M] [Module L M]
+    (hfin : Module.finrank K L = 1)
+    (n : Nat) (bTwo : Fin n → M) (s₀ : Fin n) (z : L) :
+    (∑ s : Fin n,
+        (algebraMap K L (Algebra.trace K L z)) ^ (2 ^ s.val) •
+          bTwo (s₀ + s)) =
+      ∑ s : Fin n, z ^ (2 ^ s.val) • bTwo (s₀ + s) := by
+  rw [algebraMap_trace_eq_self_of_finrank_eq_one K L hfin z]
+
+/-- Higman's p. 89 statement that the trace is superfluous.  A degree-one
+anchored trace normal form is the same formula with an additive coordinate
+map defined on the common field itself. -/
+theorem anchoredTraceFormula_trace_superfluous
+    {K : Type uK} {L : Type uL} {W : Type uW}
+    [Field K] [Field L] [Finite K] [Finite L] [Algebra K L]
+    [AddCommMonoid W]
+    (hfin : Module.finrank K L = 1)
+    (q : L → W) (iotaAdd : K →+ W)
+    (a r : Nat) (epsilon : L)
+    (hformula : ∀ alpha : L,
+      q alpha = iotaAdd
+        (Algebra.trace K L
+          (alpha ^ (2 ^ a) *
+            (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon))) :
+    ∃ iotaL : L →+ W, ∀ alpha : L,
+      q alpha = iotaL
+        (alpha ^ (2 ^ a) *
+          (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon) := by
+  refine ⟨iotaAdd.comp
+    (finrankOneRingEquiv K L hfin).symm.toAddMonoidHom, ?_⟩
+  intro alpha
+  change q alpha = iotaAdd
+    ((finrankOneRingEquiv K L hfin).symm
+      (alpha ^ (2 ^ a) *
+        (alpha ^ (2 ^ a)) ^ (2 ^ r) * epsilon))
+  rw [hformula alpha,
+    trace_eq_finrankOneRingEquiv_symm K L hfin]
+
 end OddOrder.Higman.Suzuki2Groups
