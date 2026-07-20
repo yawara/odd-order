@@ -1198,6 +1198,31 @@ full build green (4566 jobs)、AxiomsCheck OK、sorry 14 (非退行 — 全て�
 および `h46` と書籍の `K = M′` / `H = M_σ` / `τ` を名指しする pin (`hKeq`/`hHeq`/`hconj`/`htau`)。
 未完の数学はゼロ。
 
+#### 📋 着手順 3 (§13 を §9 の系にする) の seam 実測 (2026-07-20) — 次 session はここから
+
+`h2` が消えたので「§13 を §9 の系にすると残件が後退する」という 2026-07-20 前半の判断は**失効**。
+改めて seam を実測した結果、**τ と A₀ は定義的に一致する**:
+
+| §13 | §9 | 判定 |
+|---|---|---|
+| `hyp.base.tau` = `dadeICM hyp.dadeData.dade (…fullDadeIsometryData hyp.hconj)` (S12/Hypothesis.lean:405) | `dadeICM h46.dade0 h46.tau` with `h46 = hyp.base.toHypothesis46 hG hG.odd` (同 :1367-1368 が `dade0 := hyp.dadeData.dade`, `tau := …fullDadeIsometryData hyp.hconj`) | ✅ **rfl** (`htau` も rfl) |
+| `hyp.base.A0` = `supportInSubgroup (typePA0 M typeP) M` (同 :390) | `supportInSubgroup (A ∪ conjClassSetIn M h46.tic.V) M`、`A = typePA M typeP`、`tic_V := rfl` | ✅ ほぼ rfl (`typePA0 = typePA ∪ V^M` の展開のみ) |
+| `hKsupp` | `hyp.base.mderivSharp_subset_A0` | ✅ 既存 |
+| `hVsub` | `typePData_typePV_not_mem_derived` | ✅ 既存 |
+| `hKeq` / `hHeq` | `h46.K` / `h46.subH` は `toCertainTypeHypothesis` 由来。型 III/IV では `M_σ = M′` ゆえ両方 `M′` に落ちるはず | ⛏ 要確認 |
+| `dd` / `hdd` | ⚠ **本物の残件**。`hyp.base.dadeData : DadeSupportHypothesisData M (typePA0 …)` だが §9 が要るのは **`A = typePA` 上の制限版**。`normalizer_eq` と `H_eq_ftSupportKernel` を制限先で立て直す必要がある | ⛏ |
+
+⟹ 手順:
+1. **Stage 1 (無リスク)**: `sOf_nineEleven_coherent` の内部 `hA0` ブロック (A₀ level の結論) を
+   独立定理 `sOf_nineEleven_coherent_A0` として切り出す。§13 の結論は A₀ level なので、系にするには
+   A₀ 版が要る (`nineEleven_coherent` は A level)。
+2. **Stage 2**: `hKeq`/`hHeq` を実測して埋める。
+3. **Stage 3**: `A = typePA` 上の `DadeSupportHypothesisData` を (8.15) から構成 (制限版)。
+4. **Stage 4**: `S13.coherent_sOf_H0Cprime` を系に置換。`hnc`/`htype` は**未使用パラメータとして残す**
+   (signature 不変 ⟹ §13/§15 の下流は無変更)。その後 §13 の重複チェーン
+   (`S11_NineElevenCaseA` / `_AlphaBound` / `_PairAdjoin` の (9.11) 部分、計 ~3.8k 行) が dead code
+   になるので削除。
+
 ## 着手順 (残り)
 
 1. **§9 レベルの (9.11) statement を立てる** — `(data : TypesIIIIIIVSetup M)`
