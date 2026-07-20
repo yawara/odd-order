@@ -527,6 +527,22 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
 ⟹ `⁅v,x⁆ ∈ H_{i+2} ⟺ x ∈ H_{i+1}` ⟹ `w ∉ H₁` から帰納で `w_i ∉ H_{i+1}`。
 
 **この核論法は計数を一切使わない**ので、下記の tightness 経由の議論より簡単。
+
+### ✅ 完了 (2026-07-20): BG の 5 語「So `⟨w̄ᵢ⟩ = H̄ᵢ`」を完全に回復
+
+sorry-free の補題 5 本を要した:
+
+1. `commutator_mul_mem_chain` — `x ↦ ⁅v,x⁆` が `H_{i+2}` を法として乗法的
+2. `chainStepHom` — ゆえに準同型 `H_i →* G/H_{i+2}` (終域は周囲の商に取ると軽い)
+3. `chainStepHom_ker_ge` — 核が `H_{i+1}` を含む (**易しい半分**)
+4. `commutator_pow_mem_of_commutator_mem` + `commutator_zpowers_le_of_forall` —
+   核が全体なら `⁅R₀, H_i⁆ ≤ H_{i+2}`
+   (⚠ 4 の前半は `x` への仮説が不要だった: `⁅v,x⁆` が商で自明なら中心性は自動)
+5. `RegularOperatorSetup.exists_commutator_not_mem` — `⁅R₀,H_i⁆ = ⁅S,H_i⁆ = H_{i+1}` と
+   合わせて `H_{i+1} ≤ H_{i+2}` を強いるので矛盾 (**難しい半分**)
+
+⟹ 核は `H_{i+1}` を含む真部分群、`|H_i : H_{i+1}| = p` が素数なのでちょうど `H_{i+1}`
+⟹ `⁅v,x⁆ ∈ H_{i+2} ⟺ x ∈ H_{i+1}` ⟹ `w ∉ H₁` から帰納で `w_i ∉ H_{i+1}`。
 (切り出した `index_centralizer_le_card_of_commutator_mem` 自体は補題の改善として有効だが、
 ここでは不要になった。)
 

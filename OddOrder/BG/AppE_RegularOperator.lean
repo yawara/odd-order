@@ -154,4 +154,43 @@ theorem commutator_zpowers_le_of_forall {G : Type*} [Group G] [Finite G] {T : Su
   obtain ⟨k, rfl⟩ := (Submonoid.mem_powers_iff a v).mp (mem_powers_iff_mem_zpowers.mpr ha)
   exact commutator_pow_mem_of_commutator_mem (h b hb) k
 
+/-! ### The hard half of BG's `⟨w̄ᵢ⟩ = H̄ᵢ`, at setup level -/
+
+/-- **BG Theorem E.3(b), Step 2**: for a generator `v` of `R₀`, some `x ∈ Hᵢ` has
+`⁅v, x⁆ ∉ Hᵢ₊₂`.
+
+Equivalently: the kernel of `chainStepHom` is a *proper* subgroup of `Hᵢ`.  If it were all
+of `Hᵢ`, then `commutator_zpowers_le_of_forall` would give `⁅R₀, Hᵢ⁆ ≤ Hᵢ₊₂`, and BG's
+identification `⁅R₀, Hᵢ⁆ = ⁅S, Hᵢ⁆ = Hᵢ₊₁` (`commutator_R₀_eq_commutator_top`) would then
+collapse `Hᵢ₊₁ ≤ Hᵢ₊₂` — impossible while the chain is still descending.
+
+Together with `chainStepHom_ker_ge` and `|Hᵢ : Hᵢ₊₁| = p` prime, this pins the kernel to
+exactly `Hᵢ₊₁`, which is what BG asserts in five words. -/
+theorem RegularOperatorSetup.exists_commutator_not_mem {R B : Type*} [Group R] [Group B]
+    [Finite R] {p q : ℕ} (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hR₀S : hyp.R₀ ≤ S) (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {i : ℕ}
+    (hne : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥)
+    (hlt : ¬ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 1) ≤
+      OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 2))
+    {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
+    ∃ x ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i,
+      ⁅v, x⁆ ∉ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
+        (i + 2) := by
+  by_contra hcon
+  push Not at hcon
+  have hHT := iterCommutator_le_start
+    (T := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) i
+  have h1 := commutator_zpowers_le_of_forall
+    (T := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (v := v) hcon
+  rw [hv, hyp.commutator_R₀_eq_commutator_top hR₀S hexp hS hne hHT] at h1
+  refine hlt ?_
+  rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
+  exact h1
+
 end OddOrder.BG.AppE

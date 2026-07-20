@@ -1132,14 +1132,17 @@ private theorem normal_iterCommutator {G : Type*} [Group G] {T : Subgroup G} [T.
       exact Subgroup.commutator_normal _ _
 
 /-- `iterCommutator T ⊤` descends: `⁅H, ⊤⁆ ≤ H` for normal `H`. -/
-private theorem iterCommutator_antitone {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
+theorem iterCommutator_antitone {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
     ∀ n, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (n + 1) ≤
       OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n := fun n => by
   haveI := normal_iterCommutator (T := T) n
   exact Subgroup.commutator_le_left _ _
 
-/-- `iterCommutator T ⊤ n ≤ T` for every `n`. -/
-private theorem iterCommutator_le_start {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
+/-- `iterCommutator T ⊤ n ≤ T` for every `n`.
+
+Public because `AppE_RegularOperator` needs it to feed `commutator_R₀_eq_commutator_top`
+(cross-file `private` is against repo convention). -/
+theorem iterCommutator_le_start {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
     ∀ n, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n ≤ T
   | 0 => le_rfl
   | n + 1 => (iterCommutator_antitone n).trans (iterCommutator_le_start n)
