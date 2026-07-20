@@ -478,4 +478,177 @@ theorem centralizer_singleton_subgroupOf {G : Type*} [Group G] (T : Subgroup G) 
     exact Subtype.ext (h v rfl)
 
 
+/-- **BG (E.16)**: `|T : T₁| < p²`, where `T₁ = S ⊔ C_T(v)`.
+
+BG: *"the conjugacy class of `v` in `T` is the union of `|T : T₁|` conjugacy classes of `S`,
+each having `|S|/p²` elements.  Since none contains the identity element,
+`|T : T₁|·|S|/p² ≤ |S| − 1 < |S|` and `|T : T₁| < p²`."*
+
+⚠ **The fusion of `S`-classes never has to be formalised.**  One application of
+orbit--stabilizer in `T` suffices: `|K_T|·|C_T(v)| = |T|`, `|T| = |T:T₁|·|T₁|` and
+`|T₁|·p² = |S|·|C_T(v)|` (`card_sup_centralizer`) already combine to
+`p²·|K_T| = |T:T₁|·|S|`.  The `T`-class `K_T` is a *proper* subset of `S` — inside it
+because `S ⊴ T`, proper because it misses `1`. -/
+theorem RegularOperatorSetup.index_sup_centralizer_lt [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀)
+    (hvS : v ∈ S) (hv1 : v ≠ 1) :
+    ((S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R))).subgroupOf T).index < p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set C : Subgroup R := T ⊓ Subgroup.centralizer ({v} : Set R) with hC
+  set T₁ : Subgroup R := S ⊔ C with hT₁
+  have hT₁T : T₁ ≤ T := sup_le hST inf_le_left
+  set v' : ↥T := ⟨v, hST hvS⟩ with hv'
+  set O := MulAction.orbit (ConjAct ↥T) v' with hO
+  -- (1) orbit--stabilizer in `↥T`
+  have hstab : MulAction.stabilizer (ConjAct ↥T) v' = C.subgroupOf T := by
+    rw [ConjAct.stabilizer_eq_centralizer]
+    exact centralizer_singleton_subgroupOf T (hST hvS)
+  have h1 : Nat.card O * Nat.card ↥(C.subgroupOf T) = Nat.card ↥T := by
+    have hidx : (MulAction.stabilizer (ConjAct ↥T) v').index = Nat.card O :=
+      (Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (ConjAct ↥T) v')).symm
+    have h := (MulAction.stabilizer (ConjAct ↥T) v').card_mul_index
+    rw [hidx, hstab] at h
+    rw [mul_comm]
+    exact h
+  -- (2) `|T| = |T₁|·|T : T₁|`
+  have h2 := (T₁.subgroupOf T).card_mul_index
+  have hcT₁ : Nat.card ↥(T₁.subgroupOf T) = Nat.card ↥T₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hT₁T).toEquiv
+  have hcC : Nat.card ↥(C.subgroupOf T) = Nat.card ↥C :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : C ≤ T)).toEquiv
+  rw [hcT₁] at h2
+  rw [hcC] at h1
+  -- (3) the product formula
+  have h3 := hyp.card_sup_centralizer hR₀S hST hexp hS hTN hv
+  -- (5) the `T`-class is a proper subset of `S`
+  have hOsub : O ⊆ ((S.subgroupOf T : Subgroup ↥T) : Set ↥T) := by
+    rintro y ⟨t, rfl⟩
+    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, ConjAct.smul_def]
+    have ht := hTN (ConjAct.ofConjAct t).2
+    simpa using (Subgroup.mem_normalizer_iff.mp ht v).mp hvS
+  have hOne : (1 : ↥T) ∉ O := by
+    rintro ⟨t, ht⟩
+    have ht' : ConjAct.ofConjAct t * v' * (ConjAct.ofConjAct t)⁻¹ = 1 := by
+      rw [← ConjAct.smul_def]; exact ht
+    refine hv1 (congrArg Subtype.val (?_ : v' = 1))
+    calc v'
+        = (ConjAct.ofConjAct t)⁻¹ * (ConjAct.ofConjAct t * v' * (ConjAct.ofConjAct t)⁻¹) *
+            ConjAct.ofConjAct t := by group
+      _ = (ConjAct.ofConjAct t)⁻¹ * 1 * ConjAct.ofConjAct t := by rw [ht']
+      _ = 1 := by group
+  have hOlt : Nat.card O < Nat.card ↥S := by
+    have hssub : O ⊂ ((S.subgroupOf T : Subgroup ↥T) : Set ↥T) :=
+      ⟨hOsub, fun h => hOne (by rw [Set.eq_of_subset_of_subset hOsub h]; exact Subgroup.one_mem _)⟩
+    have hlt := Set.ncard_lt_ncard hssub (Set.toFinite _)
+    rw [← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq] at hlt
+    calc Nat.card O < Nat.card ↥(S.subgroupOf T) := hlt
+      _ = Nat.card ↥S := Nat.card_congr (Subgroup.subgroupOfEquivOfLe hST).toEquiv
+  -- (4)+(6): `p²·|K_T| = |T:T₁|·|S|`, then compare with `p²·|S|`
+  have hCpos : 0 < Nat.card ↥C := Nat.card_pos
+  have hSpos : 0 < Nat.card ↥S := Nat.card_pos
+  have hkey : Nat.card O * p ^ 2 = (T₁.subgroupOf T).index * Nat.card ↥S := by
+    refine Nat.eq_of_mul_eq_mul_right hCpos ?_
+    calc Nat.card O * p ^ 2 * Nat.card ↥C
+        = (Nat.card O * Nat.card ↥C) * p ^ 2 := by ring
+      _ = (Nat.card ↥T₁ * (T₁.subgroupOf T).index) * p ^ 2 := by rw [h1, h2]
+      _ = (Nat.card ↥T₁ * p ^ 2) * (T₁.subgroupOf T).index := by ring
+      _ = (Nat.card ↥S * Nat.card ↥C) * (T₁.subgroupOf T).index := by rw [h3]
+      _ = (T₁.subgroupOf T).index * Nat.card ↥S * Nat.card ↥C := by ring
+  have : (T₁.subgroupOf T).index * Nat.card ↥S < p ^ 2 * Nat.card ↥S := by
+    rw [← hkey, mul_comm (Nat.card O) (p ^ 2)]
+    exact mul_lt_mul_of_pos_left hOlt (pow_pos hyp.p_prime.pos 2)
+  exact Nat.lt_of_mul_lt_mul_right this
+
+
+/-- `(H/N).index` in `G/N` equals `H.index` in `G`, for `N ≤ H` normal.
+
+The bridge from `(E.16)`'s `|T : T₁|` to the index of `T₁/S` inside `T/S`, which is the
+form BG Lemma 4.5(b) consumes. -/
+theorem index_map_mk' {G : Type*} [Group G] (N : Subgroup G) [N.Normal] {H : Subgroup G}
+    (hNH : N ≤ H) : (H.map (QuotientGroup.mk' N)).index = H.index := by
+  rw [← Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective N),
+    Subgroup.comap_map_eq_self (by rwa [QuotientGroup.ker_mk'])]
+
+/-- **BG (E.16), in the form Lemma 4.5(b) consumes**: the cyclic subgroup `T₁/S` of `T/S`
+has index `< p²`.
+
+`(E.16)` bounds `|T : T₁|` for `T₁ = S ⊔ C_T(v)`; the Frattini variation rewrites that
+`T₁` as `S ⊔ (T ⊓ R₁)`, whose image in `T/S` is the cyclic `⟨x⟩` of
+`exists_zpowers_eq_map_sup_inf_R₁`; and `index_map_mk'` says passing to `T/S` does not
+change the index. -/
+theorem RegularOperatorSetup.exists_zpowers_index_lt [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀)
+    (hvS : v ∈ S) (hv1 : v ≠ 1) [hn : (S.subgroupOf T).Normal] :
+    ∃ x : ↥T ⧸ S.subgroupOf T, (Subgroup.zpowers x).index < p ^ 2 := by
+  obtain ⟨x, hx⟩ := hyp.exists_zpowers_eq_map_sup_inf_R₁ hST
+  refine ⟨x, ?_⟩
+  rw [hx, index_map_mk' _ (Subgroup.subgroupOf_mono T le_sup_left),
+    ← hyp.sup_centralizer_eq_sup_inf_R₁ hR₀S hST hv]
+  exact hyp.index_sup_centralizer_lt hR₀S hST hexp hS hTN hv hvS hv1
+
+
+/-- **In a finite cyclic group, `|Ω₁(G)| ≤ p`.**
+
+BG's Step 3 applies Lemma 4.5(b) to `T/S`, which needs a cyclic subgroup of index exactly
+`p`; `(E.16)` only gives index `< p²`, i.e. index `1` or `p` in a `p`-group.  This closes
+the index-`1` case: there `T/S` is itself cyclic, and a cyclic group has at most `p`
+solutions of `x^p = 1` (`IsCyclic.card_pow_eq_one_le`), which — the group being abelian —
+already form the subgroup `Ω₁`. -/
+theorem card_omega_le_of_isCyclic {G : Type*} [Group G] [Finite G] [IsCyclic G] {p : ℕ}
+    (hp : 0 < p) : Nat.card ↥(Omega G p 1) ≤ p := by
+  classical
+  letI := Fintype.ofFinite G
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := G)
+  have hcomm : ∀ x ∈ (⊤ : Subgroup G), ∀ y ∈ (⊤ : Subgroup G), x * y = y * x := by
+    intro x _ y _
+    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg x)
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg y)
+    rw [← zpow_add, ← zpow_add, add_comm]
+  have hOK : Omega G p 1 = omega1OfAbelian G ⊤ p hcomm := by
+    refine le_antisymm ((Subgroup.closure_le _).mpr fun x hx => ?_) fun x hx => ?_
+    · exact ⟨Subgroup.mem_top x, by simpa using hx⟩
+    · exact Omega.mem_of_pow_eq_one (by simpa using hx.2)
+  rw [hOK]
+  have hcard : Nat.card ↥(omega1OfAbelian G ⊤ p hcomm) = Fintype.card {x : G // x ^ p = 1} := by
+    rw [Nat.card_eq_fintype_card]
+    exact Fintype.card_congr
+      (Equiv.subtypeEquivRight fun x => ⟨fun h => h.2, fun h => ⟨Subgroup.mem_top x, h⟩⟩)
+  rw [hcard, Fintype.card_subtype]
+  exact IsCyclic.card_pow_eq_one_le hp
+
+
+/-- **BG's "Hence, by Lemma 4.5, `|Ω₁(T/S)| ≤ p²`"**: for a finite `p`-group with a cyclic
+subgroup of index `< p²`, `|Ω₁| ≤ p²`.
+
+In a `p`-group every index is a power of `p`, so `< p²` means index `1` or `p`.  Index `p`
+is BG Lemma 4.5(b) (`Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime`); index `1`
+means the group is itself cyclic, and then `card_omega_le_of_isCyclic` gives the sharper
+`≤ p`. -/
+theorem card_omega_le_prime_sq_of_index_lt {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hG : IsPGroup p G) (hp_odd : Odd p) {x : G}
+    (hidx : (Subgroup.zpowers x).index < p ^ 2) :
+    Nat.card ↥(Omega G p 1) ≤ p ^ 2 := by
+  have hp : p.Prime := Fact.out
+  obtain ⟨k, hk⟩ := hG.exists_card_eq
+  have hdvd : (Subgroup.zpowers x).index ∣ Nat.card G := Subgroup.index_dvd_card _
+  rw [hk] at hdvd
+  obtain ⟨j, -, hjeq⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+  have hjlt : j < 2 := (Nat.pow_lt_pow_iff_right hp.one_lt).mp (hjeq ▸ hidx)
+  interval_cases j
+  · -- index `1`: the group is cyclic
+    rw [pow_zero] at hjeq
+    have htop : Subgroup.zpowers x = ⊤ := Subgroup.index_eq_one.mp hjeq
+    haveI : IsCyclic G := ⟨⟨x, fun y => by
+      have hy : y ∈ (⊤ : Subgroup G) := Subgroup.mem_top y
+      rwa [← htop] at hy⟩⟩
+    exact (card_omega_le_of_isCyclic hp.pos).trans (Nat.le_self_pow two_ne_zero p)
+  · -- index `p`: BG Lemma 4.5(b)
+    rw [pow_one] at hjeq
+    exact OddOrder.BG.Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime hG hp_odd hjeq
+
+
 end OddOrder.BG.AppE
