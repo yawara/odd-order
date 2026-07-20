@@ -2614,3 +2614,42 @@ lane c が **F_197 上で全主張を計算検証** (`scratchpad/verify_q6.py` �
   (iii) E.4 docstring に「BG 印刷版は偽、反例 Q₆、追加仮説 dc≥1 が必要」を明記。E.5 も同様に gated。
 
 **⚠ これは BG 本の genuine gap** (稀なケース: 形式化が原典より踏み込む)。ユーザーに報告済。
+
+## 🧭 hub 裁定 (2026-07-21 04:09 tick) — (53) 反例は verified・exemplary。BG E.4 の印刷版誤りを承認、E.4 は hdc 追加版で形式化
+
+hub が (53) の counterexample を独立レビュー + **core claim を手計算で再検証**し、**c の finding を承認**:
+
+### hub の独立サニティチェック (Q₆ の T 非可換)
+
+`Z₂(L)=γ₄=⟨e₄,e₅⟩`。`C_L(e₄)`: `[a,e₄]=e₅≠0` ⟹ a∉C、`[b,e₄]=0` ⟹ b∈C、e₂e₃e₄e₅ は上位ゆえ∈C。
+`e₅` central ⟹ `C_L(e₅)=L`。⟹ **`T=C_S(Z₂)=⟨b,e₂,e₃,e₄,e₅⟩`**。`[b,e₂]=e₃≠0` ⟹ **T 非可換** ✅。
+E.4 結論「C_S(Z₂(S)) 指数 p アーベル」に反する。Jacobi triple (a,b,e₃): `[a,e₄]+[e₃,e₂]=e₅−e₅=0` ✅。
+⟹ core claim は手計算で確認。
+
+### 評価: c の処置は模範的 (doneness 原則の理想形)
+
+- **GPT を盲信せず自分で検証**: `scratchpad/verify_q6.py` で F_197 上の全主張 (Jacobi/fpf/固有値/dc=0/
+  T 非可換) を計算 pass。[[feedback-ask-chatgpt-for-elided-gaps]] の「回答厳密検証」を厳守。
+- **named object**: Vergne の例外 filiform Q₆ Lazard 群 = 文献既知 (hand-wave でない)。
+- **自己の (52) を撤回**: 「distinct-eigenvalue+Jacobi⟹dc≥1」は誤り、n=6 観察は misleading と明記。
+- **honest な形式化計画**: E.4 は印刷仮説で偽 ⟹ `hdc : dc(S)≥1` (= 全 2-step centralizer 一致 = (E.23))
+  を statement に追加して真にし証明、BG の誤りを docstring 明示。fabricate しない。
+- **clean Lemma は genuine**: `dc≥1 ⟺ Cᵢ 全一致` (Jacobi のみ、three-subgroups 不要) = 9402 で形式化。
+
+### ⚠ これは BG 印刷版の実際の誤り (significant finding)
+
+Bender–Glauberman *Local Analysis* の **Prop E.4 と (E.23) は印刷された仮説のもとで偽** — 欠けている
+仮説 = `dc(S)≥1`。形式化が実文献の誤りを検出した事例。⟹ user 報告案件 (下記)。
+
+### FT critical path への影響 = なし (App.E は "Further Results")
+
+App.E は "Further Results" で FT 本体経路外の公算大 (Coq math-comp/odd-order も App.E を持たない)。
+E.4 の hdc 追加版で形式化しても FT (完成済) を毀損しない。3 冊 full 形式化 scope 内の周辺 appendix。
+
+### 次段 (c 自律 + hub 監査)
+
+1. 9402 clean Lemma を `MaximalClassPGroup.lean` に形式化 (真・genuine infra)。
+2. E.4 を `hdc` 追加版で証明 (assembly は既存 scaffold)、docstring に BG 誤り明示。
+3. E.5 が dc≥1 を供給するか調査 (Q₆ が FT の S=Ω₁(R) として現れるか)。
+hub は landing 時に (a) `hdc` が honest な仮説か (E.23 と同値で fabricate でない)、
+(b) unsound carrier/新 axiom がないか を監査する。
