@@ -400,6 +400,27 @@ theorem chiefFactor_H0supC_subgroupOf_normal [Finite G] {M : Subgroup G}
 
 end
 
+/-- **Peterfalvi (9.9.b) for `𝒮(H₀C)`**: it too contains exactly `p − 1` reducible characters.
+
+The book proves this for `𝒮(H₀)` and `𝒮(H₀C)` in one breath — "By (4.7) and Theorem (4.5), **both**
+`𝒮(H₀)` and `𝒮(H₀C)` contain exactly `p − 1` reducible characters `μ_j`" (p. 54) — and the repo's
+`reducible_count_sOf_K` is exactly that shared argument, its docstring already noting both
+instantiations.  All five inputs are on hand at `K = H₀C`, mirroring `reducible_count_sOf_H0`.
+
+The point of the `H₀C` form is that `H₀C′ ≤ H₀C` makes `𝒮(H₀C) ⊆ 𝒮(H₀C′)` (`sOf_antitone`), so this
+is what witnesses `𝒮(H₀C′) ≠ ∅` — the pivot of the (9.11) case (9.7.b) coherence engine — without
+going through the §10/§11 packaging (issue 1045). -/
+theorem reducible_count_sOf_H0supC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    {φ ∈ sOf data (chief.H0 ⊔ cSub data chief) | ¬ IsIrreducibleCharacter φ}.ncard
+      = chief.p - 1 := by
+  haveI := chiefFactor_H0_subgroupOf_normal chief
+  haveI := chiefFactor_H0supC_subgroupOf_normal chief
+  exact reducible_count_sOf_K hG chief (chief.H0 ⊔ cSub data chief)
+    (Subgroup.comap_mono (chiefFactor_H0supC_le_derived chief))
+    (chiefFactor_W1_inf_H0supC_subgroupOf_eq_bot chief)
+    (chiefFactor_W2_not_le_H0supC chief) (chiefFactor_card_W2bar_H0supC chief)
+
 /-- `derivedInG H = ⁅H, H⁆` (general): the image of `commutator ↥H` under the inclusion is the
 commutator subgroup `⁅H,H⁆`. -/
 theorem derivedInG_eq_commutator (H : Subgroup G) : derivedInG H = ⁅H, H⁆ := by
