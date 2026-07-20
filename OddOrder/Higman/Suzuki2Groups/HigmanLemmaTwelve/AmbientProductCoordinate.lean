@@ -388,6 +388,41 @@ theorem centerSquareMap_add
         center (lowerCentralCommutatorBilinear P u v) := by
   rw [lowerCentralSquareMapAdditive_add, map_add, map_add]
 
+/-- **Higman Lemma 12, the ambient square map extracts the underlying square.**
+The centre coordinate of `sq_ambient [x]` is the Singer coordinate of the
+genuine square `x²` in `Φ(P)`.  This is the identity that turns the type-B/C/D
+`hsq` obligation `x² = S.inl (ofAdd (q (S.rightHom x)))` into the transported
+square-map equation. -/
+theorem ambientCenterCoordinate_squareMap
+    {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1 : lowerCentralLayerKernel P 1 = ⊥)
+    (hterm : lowerCentralTerm P 1 = frattini P)
+    (hSq : LowerCentralSquaresLieInSecond P)
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (x : ↥(lowerCentralTerm P 0))
+    (hx2 : (x : P) ^ 2 ∈ frattini P) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralSquareMapAdditive P hSq (layerZeroClass x)) =
+      ePhi (Additive.ofMul ⟨(x : P) ^ 2, hx2⟩) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  rw [show layerZeroClass x =
+      Additive.ofMul (QuotientGroup.mk' (lowerCentralLayerKernel P 0) x) from rfl,
+    lowerCentralSquareMapAdditive_mk]
+  show ePhi (ambientLayerOneLinearEquivFrattini hEA hK1 hterm
+      (Additive.ofMul (lowerCentralSquareValue P hSq x))) =
+    ePhi (Additive.ofMul ⟨(x : P) ^ 2, hx2⟩)
+  rfl
+
 end SquareDecomposition
 
 end
