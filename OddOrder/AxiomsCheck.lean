@@ -8263,6 +8263,17 @@ full spanning range survive the extension. -/
 #assert_only_allowed_axioms
   LinearMap.baseChange₂_span_eq_top
 
+/-! **Bilinear eigenweight (Higman Lemma 12, p. 90)**: a nonzero value of an
+equivariant bilinear map on two eigenvectors forces the product of their
+eigenvalues to occur among the target eigenbasis weights — Higman's
+`λ^(2^i) μ^(2^j) = ν^(2^k)` in coordinate-free form. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_weight_eq_of_bilinear_ne_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_pair_ne_zero_and_weight_eq
+
 /-! **Higman Lemma 6, degree-three group-theoretic layer**: the actual mixed
 commutator descends to `L₂ × L₁ → L₃`, spans `L₃`, and is equivariant.  Its
 composition with the degree-two bracket is the actual trilinear commutator
