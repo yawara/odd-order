@@ -790,6 +790,80 @@ theorem ambientProductExtension_hsq_actual
   intro w
   exact ambientProductSquare_eq left right hRnormal hinf hsup hΦR w.1 w.2
 
+/-! ## Actor-equivariance of the factor inclusion (mixed-term prerequisite) -/
+
+/-- **Actor-equivariance of the factor inclusion.**  When the factor
+representation `fRep` covers the ambient actor `a` (through `sigma`, with
+`hf_int` recording that `f ∘ sigma = a ∘ f`), the factor inclusion intertwines
+`fRep` with the ambient zeroth-layer representation.  This transports
+`quotientToAmbientLayerZeroLinear_equivariant` through the coordinate `eQuot`,
+and it is the actor half of Higman's mixed-term analysis: the mixed commutator
+`M(α, β)` inherits the eigenvalue `ν = λ · θ(λ)` from the factor eigenvalues. -/
+theorem factorInclusion_representation_equivariant
+    {G : Type uP} [Group G] (f : G →* P) {N : Subgroup G} [N.Normal]
+    [IsMulCommutative (G ⧸ N)] [Module (ZMod 2) (Additive (G ⧸ N))]
+    {F : Type*} [AddCommGroup F] [Module (ZMod 2) F]
+    (a : Y)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (hf : ∀ g ∈ N, f g ∈ frattini P)
+    (eQuot : Additive (G ⧸ N) ≃ₗ[ZMod 2] F)
+    (fRep : Additive (G ⧸ N) →ₗ[ZMod 2] Additive (G ⧸ N))
+    (sigma : G → G)
+    (hfRep : ∀ g, fRep (Additive.ofMul (QuotientGroup.mk' N g)) =
+      Additive.ofMul (QuotientGroup.mk' N (sigma g)))
+    (hf_int : ∀ g, f (sigma g) = (Y.subtype a : MulAut P) (f g))
+    (v : Additive (G ⧸ N)) :
+    factorInclusion f hK0 hf eQuot (eQuot (fRep v)) =
+      lowerCentralLayerRepresentation Y.subtype 0 a
+        (factorInclusion f hK0 hf eQuot (eQuot v)) := by
+  simp only [factorInclusion, LinearMap.comp_apply, LinearEquiv.coe_coe,
+    LinearEquiv.symm_apply_apply]
+  exact quotientToAmbientLayerZeroLinear_equivariant f a hK0 hf fRep sigma hfRep
+    hf_int v
+
+/-- **Actor-equivariance of the ambient mixed term.**  In the ambient centre
+coordinate the mixed commutator pairing scales by the central eigenvalue `ν`
+when both arguments are moved by the actor `c`.  This is the composition of the
+bilinear equivariance with `ambientCenterCoordinate_compat`; instantiated at
+`u = left.incl α`, `v = right.incl β` (with the factor incl-equivariance) it
+gives Higman's `M(λα, μβ) = ν · M(α, β)`. -/
+theorem mixedTerm_rep_equivariance
+    {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1 : lowerCentralLayerKernel P 1 = ⊥)
+    (hterm : lowerCentralTerm P 1 = frattini P)
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (c : Y) (nu : GaloisField 2 n)
+    (hconj :
+      let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+        IsAInvariant.of_characteristic Y.subtype
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu)
+    (u v : Additive (lowerCentralLayer P 0)) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralCommutatorBilinear P
+          (Additive.ofMul (lowerCentralLayerAction Y.subtype 0 c (Additive.toMul u)))
+          (Additive.ofMul
+            (lowerCentralLayerAction Y.subtype 0 c (Additive.toMul v)))) =
+      nu * ambientCenterCoordinate hEA hK1 hterm ePhi
+        (lowerCentralCommutatorBilinear P u v) := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  rw [← lowerCentralCommutatorBilinear_equivariant Y.subtype c u v]
+  exact ambientCenterCoordinate_compat hEA hK1 hterm ePhi c nu hconj _
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
