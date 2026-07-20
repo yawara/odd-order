@@ -1577,18 +1577,18 @@ theorem RegularOperatorSetup.card_quotient_commutator [Finite R]
   · exact (hyp.commutator_eq_and_card_quotient hR₀S.le hexp
       (three_le_pRank_of_prime_cube_lt_card (hyp.R_pGroup.to_subgroup S) hexp hgt)).2
 
-/-- `R₀ < Ω₁(R)` **properly**: `R₁ ≠ 1` is a `p`-group, so it contains an element of order
-`p`, which lies in `Ω₁(R)` but not in `R₀` (the two are disjoint).
+/-- **`R₁` contains an element of order `p` outside `R₀`**.
+
+`R₁ ≠ 1` is a `p`-group, so Cauchy applies; disjointness from `R₀` is a setup field.
 
 This is where the setup's cyclic factor `R₁` finally earns its keep: every earlier step of
 Step 2 went through without it, but E.3(b)'s third clause is *false* for `S = R₀` (then
-`|S/S'| = p`), so properness has to come from somewhere. -/
-theorem RegularOperatorSetup.R₀_lt_omega [Finite R]
-    (hyp : RegularOperatorSetup R B p q) : hyp.R₀ < Omega R p 1 := by
+`|S/S'| = p`), so properness has to come from somewhere.  Step 3's seed
+`Ω₁(C_R(R₀))` needs the same witness. -/
+theorem RegularOperatorSetup.exists_mem_R₁_pow_eq_one [Finite R]
+    (hyp : RegularOperatorSetup R B p q) :
+    ∃ z ∈ hyp.R₁, z ∉ hyp.R₀ ∧ z ^ p = 1 := by
   haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  refine lt_of_le_of_ne hyp.R₀_le_omega ?_
-  intro heq
-  -- an element of order `p` in `R₁`
   obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup hyp.R₁).exists_card_eq
   have hkpos : 0 < k := by
     rcases Nat.eq_zero_or_pos k with rfl | h
@@ -1601,13 +1601,21 @@ theorem RegularOperatorSetup.R₀_lt_omega [Finite R]
     have := pow_orderOf_eq_one z
     rw [hz] at this
     simpa using congrArg (fun w : ↥hyp.R₁ => (w : R)) this
-  have hzmem : (z : R) ∈ Omega R p 1 := Omega.mem_of_pow_eq_one (by simpa using hzp)
-  have hzR₀ : (z : R) ∈ hyp.R₀ := heq ▸ hzmem
+  refine ⟨(z : R), z.2, fun hzR₀ => ?_, hzp⟩
   have hzbot : (z : R) ∈ (⊥ : Subgroup R) :=
     (disjoint_iff.mp hyp.R₀_disjoint_R₁) ▸ Subgroup.mem_inf.mpr ⟨hzR₀, z.2⟩
   have hz1 : z = 1 := Subtype.ext (Subgroup.mem_bot.mp hzbot)
   rw [hz1, orderOf_one] at hz
   exact hyp.p_prime.one_lt.ne hz
+
+/-- `R₀ < Ω₁(R)` **properly** — the witness of `exists_mem_R₁_pow_eq_one` lies in `Ω₁(R)`. -/
+theorem RegularOperatorSetup.R₀_lt_omega [Finite R]
+    (hyp : RegularOperatorSetup R B p q) : hyp.R₀ < Omega R p 1 := by
+  refine lt_of_le_of_ne hyp.R₀_le_omega fun heq => ?_
+  obtain ⟨z, _, hzR₀, hzp⟩ := hyp.exists_mem_R₁_pow_eq_one
+  refine hzR₀ ?_
+  rw [heq]
+  exact Omega.mem_of_pow_eq_one (by simpa using hzp)
 
 /-- **BG Theorem E.3(b), first clause**: `Ω₁(R)` has exponent `p`.
 
