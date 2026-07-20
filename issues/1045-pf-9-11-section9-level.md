@@ -786,7 +786,90 @@ engine を触らずに済んだ:
 潰せない (`Or.casesOn` は Prop へしか eliminate できない)。`Nonempty` の中で分岐して
 `.some` を渡す。
 
-#### ⛏ 残り 2 つ
+#### ⭐ 完了 (2026-07-20): `hAbase` も discharge — 未完の数学は carrier 1 つだけ
+
+`S11.sOf_degreeSubfamily_coherent_A0` を配線 (commit a1c10b6ed、一発で通った)。
+⟹ **`sOf_nineEleven_coherent` が依存する未完の数学は `hrefuteEq` ただ 1 つ**。
+
+他のパラメータは未完の数学ではない:
+- `dd` / `hdd` — (8.15) の Dade datum と「それが (4.6) の制限である」という pin
+- `h2` — `2 ≤ ncard`。(9.8.d) は**存在しか与えない**ので露出が honest
+  (`S15.Hypothesis.sSetIrrDeg_coherent` と同じ流儀)
+
+前提として landed した de-specialization:
+`S08.mem_span_scaledDiff_of_mem_zSupportedSpan` の `SibleyDadeHypothesis` 引数は
+**元から未使用** (`_hyp`)、台も固定されていたが、証明が使うのは `1 ∉ A₀` だけ。
+任意の `A0` に一般化した (呼び出し 1 箇所修正)。
+
+#### ⚠ 着手順 3 の方針変更 — §13 を §9 の系にすると**残件が後退する** (2026-07-20 実測)
+
+当初計画は「§13 側 `coherent_sOf_H0Cprime` を §9 版の系にする」だったが、§13 側を読むと
+**§13 の方が残件の縮小が進んでいる**:
+
+| §13 | 残件 |
+|---|---|
+| `coherent_sOf_H0Cprime_of_equality_refutation` (S13_Orthogonality:1139) | `hbound` + `hrefuteEq` — **本 session の §9 版と同じ構造** |
+| `coherent_sOf_H0Cprime_of_sevenEightRefutation` (同 :1173) | **`h78 : NineElevenSevenEightRefutation` だけ** |
+
+§13 は (9.11.2) TI-witness / (9.11.3) count / (9.11.4) Mackey norm / (9.11.6) dichotomy を
+既に landing させ、`hrefuteEq` を **(9.11.7)–(9.11.8) の coherent-pair 構成**まで縮めている。
+⟹ §13 を §9 の系にすると、この縮小を捨てることになる。
+
+**正しい次の一手は逆向き**: §9 側を同じ残件まで縮める、すなわち
+`S13.nineElevenNormBound_of_sevenEightRefutation` (`S11_NineElevenAlphaBound.lean:848`) と
+その carrier `NineElevenSevenEightRefutation` (同 :786) を §9 へ降ろす。
+
+実測 (`hyp.*` の使用回数、848–1000 行):
+`s11Setup` 56 / `chief` 21 / `base` 18 / `C` 5 / `H0Cprime` 3 / `SOf` 1 / `setup_typeP_eq` 1 /
+`H0C` 1 / `C_le_U` 1 — ⚠ **`type_alt` も `params_*` も無い**。
+⟹ `caseA_refuter_of_equality_refutation` と同じく**機械的な rename で降りる**見込み
+(`hyp.base.tau`/`.A0` はパラメータ化、`mkSection11CharacterData …` → `chars`)。
+
+#### ⚠⚠ 訂正 (2026-07-20): `CaseAEqualityRefutation` に producer は**在る** — 前回の報告は誤り
+
+本 session で「`NineElevenEqualityRefutation` は repo のどこにも producer が無い」と記録したが、
+**誤り**。grep パターンを `: NineElevenEqualityRefutation` にしたため、返り型が行頭に来る
+`    NineElevenEqualityRefutation hyp caseA :=` を取りこぼしていた。
+
+実際の §13 の鎖は**完結している**:
+
+```
+S13.coherent_sOf_H0Cprime                                  (hnc, htype のみ)
+ ← coherent_sOf_H0Cprime_of_sevenEightRefutation
+     ← nineElevenSevenEightRefutation            (S11_NineElevenPairAdjoin:893)
+     ← nineElevenEqualityRefutation_of_sevenEightRefutation (S11_NineElevenAlphaBound:1124)
+         ← nineElevenSTwoExtraction / nineElevenNormBound_of_sevenEightRefutation
+     ← nineElevenPairBound                       (S11_NineElevenCaseA:436)
+```
+
+⟹ §13 の (9.11) は `hnc`/`htype` 以外に**未完の carrier を持たない**。
+issue 9083 の Phase B–E は**既に完了している**。
+
+#### ⭐ ⟹ §9 版も完全証明まで行ける — 残る `htype` は全部あの 1 行
+
+3 ファイル (`_AlphaBound` / `_PairAdjoin` / `_CaseA`) の `htype`/`hncH0C` の実質的使用を
+実測したところ、**すべて `rw [C_eq_cSub_of_noncoherent hG hyp hncH0C htype]` の 1 パターン**
+= 本 issue で繰り返し見ている `hyp.C = cSub` の辞書同一視。§9 では**定義的に等しい**。
+
+⟹ 残チェーン (`nineElevenSTwoExtraction` / `nineElevenNormBound_of_sevenEightRefutation` /
+`nineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation`) を
+§9 へ降ろせば、**`hrefuteEq` も discharge され (9.11) の §9 版が完全証明になる**
+(`hnc` は §13 でもパラメータのまま)。
+
+⚠ 規模: 4 定理 + carrier 1 個。`caseA_refuter_of_equality_refutation` の降ろしと同型の
+機械作業だが、`_PairAdjoin` / `_AlphaBound` の本体は長い。
+
+#### ⛏ 残り — 本 issue の本体は完了、あとは issue 9083
+
+`hrefuteEq` = `CaseAEqualityRefutation` は **issue 9083 Phase B–E** の内容で、
+repo のどこにも producer が無い (本 session の実測)。算術の鎖
+`S11.nineElevenCaseA_equality_refutation` は既に §9・型仮定ゼロで landed 済なので、
+残るのは「等号配置 → その入力 (`hclass`/`hn`/`hnorm`/`hK₁`/`hK₂`/`hCinf`/`hle`)」の配線。
+
+⟹ **issue 1045 の目的 ((9.11) を §9 レベルで型仮定なしに述べ、型 III/IV 版をその系にする)
+のうち、前半は達成**。§13 版を系にする配線 (着手順 3) と型 II instance (着手順 4) が残る。
+
+#### (旧) 残り 2 つ
 
 | param | 状態 |
 |---|---|

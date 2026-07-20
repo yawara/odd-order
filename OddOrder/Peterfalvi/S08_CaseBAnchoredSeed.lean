@@ -1203,22 +1203,24 @@ theorem caseBXsetExtension_eq
 that
 every `f ∈ S₁` has degree `f(1) = d·χ₁(1)` for some `d : ℕ` (the integral degree ratio, available
 for
-`X`-members since `H` is a `p`-group), every supported (degree-`0`) `φ ∈ Z[S₁, H^#]` lies in the
-span
+`X`-members since `H` is a `p`-group), every supported (degree-`0`) `φ ∈ Z[S₁, A₀]` lies in the span
 of the scaled differences `f − d·χ₁`.
+
+The support set is arbitrary subject to `1 ∉ A₀` — that is the only thing the argument uses of it
+(it forces `φ(1) = 0`).  Stating it that way lets the same lemma serve the §9 route, where `A₀` is
+`A(M) ∪ V^M` rather than `H^#`.
 
 Proof mirrors the equal-degree case: the scaled differences vanish at `1` (`f(1) − d·χ₁(1) = 0`), so
 `D = span{f − d·χ₁}` sits inside `ker(ev₁)`; `Z[S₁] ≤ D ⊔ ℤ·χ₁` (write `f = (f − d·χ₁) + d·χ₁`); and
 a
 supported `φ = y + n·χ₁` has `0 = φ(1) = n·χ₁(1)`, forcing `n = 0`, so `φ = y ∈ D`. -/
 theorem mem_span_scaledDiff_of_mem_zSupportedSpan
-    (_hyp : SibleyDadeHypothesis G L H)
+    {A0 : Set ↥L} (h1A0 : (1 : ↥L) ∉ A0)
     {S₁ : Set (ClassFunction ↥L ℂ)} {χ₁ : ClassFunction ↥L ℂ}
     (hχ₁1 : (χ₁ : ClassFunction ↥L ℂ) 1 ≠ 0)
     (hdeg : ∀ f ∈ S₁, ∃ d : ℕ, (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1)
     {φ : ClassFunction ↥L ℂ}
-    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan S₁
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan S₁ A0) :
     φ ∈ Submodule.span ℤ
       {g : ClassFunction ↥L ℂ | ∃ f ∈ S₁, ∃ d : ℕ,
         (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1 ∧ g = f - d • χ₁} := by
@@ -1253,10 +1255,7 @@ theorem mem_span_scaledDiff_of_mem_zSupportedSpan
   have hφ1 : ev1 φ = 0 := by
     change φ (1 : ↥L) = 0
     by_contra hne
-    have h1mem := hφsupp (ClassFunction.mem_support.mpr hne)
-    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h1mem
-    simp only [sharpImage, Set.mem_sdiff, Set.mem_singleton_iff] at h1mem
-    exact h1mem.2 (by simp)
+    exact h1A0 (hφsupp (ClassFunction.mem_support.mpr hne))
   rw [← hyz, map_add, hD_vanish y hy, zero_add, map_zsmul] at hφ1
   have hn : n = 0 := by
     rcases smul_eq_zero.mp hφ1 with hn | hd
@@ -1424,7 +1423,12 @@ noncomputable def caseBXset_isCoherent
   extends_on_supported := by
     intro φ hφ
     refine OddOrder.Peterfalvi.S07.IntegralCharacterMap.eq_on_zSpan_of_eq_on ?_
-      (mem_span_scaledDiff_of_mem_zSupportedSpan hyp hχ₁1 hdvd hφ)
+      (mem_span_scaledDiff_of_mem_zSupportedSpan
+        (by
+          rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+          simp only [sharpImage, Set.mem_sdiff, Set.mem_singleton_iff]
+          exact fun h => h.2 (by simp))
+        hχ₁1 hdvd hφ)
     rintro _ ⟨f, hf, d, hfd, rfl⟩
     obtain ⟨af, hafdeg, hafanc, -, -, -⟩ :=
       caseBXimg_spec hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL hc2 hFPF
