@@ -327,7 +327,43 @@ finiteness → `sOf_finite`、`sOf_degreeSubfamily_isCoherent` → `hbase` パ�
 - 他に `hyp.params.w2_prime`、`hyp.base.tau_inner_eq_of_supported`、
   `hyp.base.one_notMem_A0`、`caseB_sOf_memberRFamily` など §10/§11 の部品を多用。
 
-⟹ case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
+### ✅ 書籍を読んだ (2026-07-20, PDF p.53-54) — case B は書籍では **2 行**
+
+**(9.11) の証明冒頭**: 「By (8.15), Hypothesis (5.2) holds for `L = M`.
+**By (9.9.a) and (5.7), `𝒮(H₀C′)` is coherent in case (9.7.b).**
+Suppose that case (9.7.a) holds. …」
+
+⟹ case (9.7.b) は **(9.9.a) + (5.7) の 2 引用だけ**。case (9.7.a) の方が長い議論。
+
+**(9.9.a)** (p.54): 「If `χ ∈ 𝒳(H₀)`, then `χ(1)` is divisible by `u`.
+**If `χ ∈ 𝒳(H₀C′)`, then `χ(1) = u`** and χ is induced to `HU` from a linear character of `HC`.」
+⟹ case (b) では `𝒮(H₀C′)` の**全メンバーが次数 `qu` の一様**。だから (5.7) が直接効く。
+**μ-column pivot は書籍の議論に出てこない** — 予想どおり repo の anchor は packaging 由来。
+
+⚠ ただし単純に §8 companion (`inducedNonKernelFamily_degreeSubfamily_coherent`) は使えない:
+**(9.9.b)** が「`𝒮(H₀)` は**可約**指標 `μ_j` (1 ≤ j < p) をちょうど p−1 個含み、
+`μ_j ∈ 𝒮(H₀C)`」と言う。`H₀C′ ≤ H₀C` ゆえ `𝒮(H₀C) ⊆ 𝒮(H₀C′)` なので
+**`𝒮(H₀C′)` は全既約ではない**。⟹ 既約性を要求する
+`S07.coherent_subset_of_constant_degree` ではなく、**norm-general な (5.7) engine**
+`S07.uniform_degree_coherence_of_families` (repo に既存、§11 caseB が使っている) が要る。
+その pivot は**書籍の `μ_j` そのもの**。
+
+⟹ **前 iteration の「μ-column anchor は packaging 由来」は半分だけ正しかった**:
+pivot が要ること自体は書籍どおり (可約メンバーがあるため)。誤っていたのは pivot の**出所**で、
+書籍は `μ_j` を **(9.9.b) が (4.7) + Theorem (4.5) から** 構成する — どちらも §6 (S06) の結果で
+**§9 レベルで手に入る**。repo が §10 の μ-grid (`muColumnChar`) を使っているのが packaging。
+
+### case B の設計 (書籍準拠)
+
+1. **(9.9.a)** を §9 で: `χ ∈ 𝒳(H₀C′) ⟹ χ(1) = u` ⟹ `𝒮(H₀C′)` の一様次数 `qu`。
+2. **(9.9.b)** を §9 で: `𝒮(H₀)` の可約メンバー `μ_j` (p−1 個) を (4.7)+(4.5) から構成し、
+   `μ_j ∈ 𝒮(H₀C) ⊆ 𝒮(H₀C′)` を pivot にする。
+3. `S07.uniform_degree_coherence_of_families` に流す (§11 caseB と同じ engine、
+   ただし pivot と一様次数を §9 由来のものに差し替える)。
+
+⟹ **(9.9) の §9 レベル形式化が case B の前提**。repo に (9.9) 相当があるか要実測。
+
+### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
 書籍の必然ではない可能性が高い — **(9.7)(b) と (9.9) を PDF で読んでから設計する**こと
