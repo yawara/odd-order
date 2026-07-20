@@ -195,6 +195,7 @@ import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
 import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 import OddOrder.Peterfalvi.S11_NineElevenSubcoherentBridge
+import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_GaloisFieldModel
@@ -11659,6 +11660,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- Same shape as the two-summand inertia inputs; the `H₀C′ ≤ H₀C` step that §13 reaches by
 -- rewriting `C = cSub` is definitional here, so `hncH0C`/`htype` are again absent.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_nineElevenTwo_tiWitness
+-- **(5.7) at uniform degree `qu`: `𝒮₃` coherent, at §9 level** — the `τ₃` of the (9.11.6)
+-- dichotomy.  Structurally identical to `sOf_caseB_coherent` (same norm-general engine, same §9
+-- `R`-family dispatch); only the family (`𝒮(H₀C′) ∖ 𝒮₂`) and the degree (`qu`) differ.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_sThree_coherent
 -- **(9.11.2)–(9.11.5) equality refutation, at §9 level** — assembles `CaseAEqualityRefutation`
 -- from the `𝒮₂ = 𝒮₁` extraction and the norm bound, with Phases B/C as the §9 lemmas above and
 -- the arithmetic spine `nineElevenCaseA_equality_refutation` (already §9 and type-free).
