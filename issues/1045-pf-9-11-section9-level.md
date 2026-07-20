@@ -801,6 +801,30 @@ engine を触らずに済んだ:
 **元から未使用** (`_hyp`)、台も固定されていたが、証明が使うのは `1 ∉ A₀` だけ。
 任意の `A0` に一般化した (呼び出し 1 箇所修正)。
 
+#### ⚠ 着手順 3 の方針変更 — §13 を §9 の系にすると**残件が後退する** (2026-07-20 実測)
+
+当初計画は「§13 側 `coherent_sOf_H0Cprime` を §9 版の系にする」だったが、§13 側を読むと
+**§13 の方が残件の縮小が進んでいる**:
+
+| §13 | 残件 |
+|---|---|
+| `coherent_sOf_H0Cprime_of_equality_refutation` (S13_Orthogonality:1139) | `hbound` + `hrefuteEq` — **本 session の §9 版と同じ構造** |
+| `coherent_sOf_H0Cprime_of_sevenEightRefutation` (同 :1173) | **`h78 : NineElevenSevenEightRefutation` だけ** |
+
+§13 は (9.11.2) TI-witness / (9.11.3) count / (9.11.4) Mackey norm / (9.11.6) dichotomy を
+既に landing させ、`hrefuteEq` を **(9.11.7)–(9.11.8) の coherent-pair 構成**まで縮めている。
+⟹ §13 を §9 の系にすると、この縮小を捨てることになる。
+
+**正しい次の一手は逆向き**: §9 側を同じ残件まで縮める、すなわち
+`S13.nineElevenNormBound_of_sevenEightRefutation` (`S11_NineElevenAlphaBound.lean:848`) と
+その carrier `NineElevenSevenEightRefutation` (同 :786) を §9 へ降ろす。
+
+実測 (`hyp.*` の使用回数、848–1000 行):
+`s11Setup` 56 / `chief` 21 / `base` 18 / `C` 5 / `H0Cprime` 3 / `SOf` 1 / `setup_typeP_eq` 1 /
+`H0C` 1 / `C_le_U` 1 — ⚠ **`type_alt` も `params_*` も無い**。
+⟹ `caseA_refuter_of_equality_refutation` と同じく**機械的な rename で降りる**見込み
+(`hyp.base.tau`/`.A0` はパラメータ化、`mkSection11CharacterData …` → `chars`)。
+
 #### ⛏ 残り — 本 issue の本体は完了、あとは issue 9083
 
 `hrefuteEq` = `CaseAEqualityRefutation` は **issue 9083 Phase B–E** の内容で、
