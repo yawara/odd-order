@@ -500,6 +500,235 @@ theorem exists_noncommutativeFactorCoordinates_of_ambientFrattiniSinger
   exact ⟨hthetaNe, hthetaOdd, hcompatKernel, hcompatQuot,
     hnormal, hnorm⟩
 
+/-- **Higman Lemma 12 (p. 89), an actual commutative factor over the
+common centre.**
+
+Fix the ambient Singer generator and coordinate on `Φ(P)`.  For a
+commutative invariant factor `S`, Higman's `A(n, 1)` classification supplies
+a homocyclic exponent-four presentation.  The kernel coordinate is the
+prescribed ambient coordinate on the square subgroup, while squaring and
+inverse Frobenius force the quotient coordinate and the source relation
+`ν = λ²`. -/
+theorem exists_commutativeFactorCoordinates_of_ambientFrattiniSinger
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P < S)
+    (hStop : S < (⊤ : Subgroup P))
+    (hcommS : IsMulCommutative S) :
+    let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+      IsAInvariant.of_characteristic Y.subtype
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    letI : CommGroup S :=
+      { (inferInstance : Group S) with
+        mul_comm := hcommS.is_comm.comm }
+    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+    ∀ (c : Y)
+      (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n),
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu →
+      ∃ (ι : Type) (_ : Fintype ι)
+        (ε : S ≃* (ι → Multiplicative (ZMod 4)))
+        (hN : Agemo S 2 1 = (frattini P).subgroupOf S),
+        let eKernel :=
+          homocyclicFourPrescribedKernelCoordinate
+            hPhiS.le hN ePhi.toAddEquiv
+        let eQuot := homocyclicFourQuotientCoordinate ε eKernel
+        let lambda := (frobeniusEquiv (GaloisField 2 n) 2).symm nu
+        (∀ z : Additive (Agemo S 2 1),
+          eKernel (Additive.ofMul
+              ((IsAInvariant.of_characteristic hSinv.restrict).restrict
+                c z.toMul)) =
+            nu * eKernel z) ∧
+        (∀ q : Additive (S ⧸ Agemo S 2 1),
+          eQuot (Additive.ofMul
+              ((IsAInvariant.of_characteristic hSinv.restrict).quotientMulAutHom
+                c q.toMul)) =
+            lambda * eQuot q) ∧
+        (∀ beta : GaloisField 2 n,
+          eKernel ((homocyclicFourSquareEquiv ε).toAdditive
+            (eQuot.symm beta)) = beta * beta) ∧
+        nu = lambda * lambda := by
+  classical
+  dsimp only
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  letI : CommGroup S :=
+    { (inferInstance : Group S) with
+      mul_comm := hcommS.is_comm.comm }
+  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+  intro c ePhi nu hconj
+  have hSneBot : S ≠ (⊥ : Subgroup P) :=
+    ne_of_gt (lt_of_le_of_lt bot_le hPhiS)
+  have hinvS : involutions P ⊆ S :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hSinv hSneBot
+  have hxiS : IsXiActor hSinv.restrict.range :=
+    restricted_range_isXiActor hxi hSinv
+  have hlenS : HasXiLengthTwo hSinv.restrict.range.subtype :=
+    restricted_range_hasXiLengthTwo_of_xiLengthThree
+      hP hncomm hxi hlen hEA hSinv hPhiS hStop
+  have hmultiS : ∃ x y : S,
+      x ∈ involutions S ∧ y ∈ involutions S ∧ x ≠ y :=
+    exists_distinct_involutions_subgroup_of_subset hinvS hmulti
+  obtain ⟨ι, hι, ⟨ε⟩⟩ :=
+    exists_homocyclic_four_of_commutative_xiLengthTwo
+      (hP.to_subgroup S) hxiS hlenS hmultiS
+  letI : Fintype ι := hι
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hPhiBot
+    have hcommBot : _root_.commutator P = ⊥ :=
+      le_bot_iff.mp
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          (le_of_eq hPhiBot))
+    exact hncomm ((commutator_eq_bot_iff P).mp hcommBot)
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hPhiInv hPhiNeBot
+  have hN : Agemo S 2 1 = (frattini P).subgroupOf S :=
+    agemo_one_eq_frattini_subgroupOf_of_homocyclic_four
+      hcommS ε hinvPhi hEA
+  let eKernel : Additive (Agemo S 2 1) ≃+
+      GaloisField 2 n :=
+    homocyclicFourPrescribedKernelCoordinate
+      hPhiS.le hN ePhi.toAddEquiv
+  let eQuot : Additive (S ⧸ Agemo S 2 1) ≃+
+      GaloisField 2 n :=
+    homocyclicFourQuotientCoordinate ε eKernel
+  let lambda : GaloisField 2 n :=
+    (frobeniusEquiv (GaloisField 2 n) 2).symm nu
+  have hcompatPhi : ∀ v,
+      ePhi (elabRepresentation 2 hPhiInv.restrict c v) =
+        nu * ePhi v := by
+    intro v
+    have h := DFunLike.congr_fun hconj (ePhi v)
+    simpa [LinearEquiv.conj_apply] using h
+  have hcompatKernel : ∀ z : Additive (Agemo S 2 1),
+      eKernel (Additive.ofMul
+          ((IsAInvariant.of_characteristic hSinv.restrict).restrict
+            c z.toMul)) =
+        nu * eKernel z := by
+    intro z
+    exact homocyclicFourPrescribedKernelCoordinate_generator_compatible
+      hSinv hPhiS.le hN ePhi.toAddEquiv c nu hcompatPhi z
+  have hcompatQuot : ∀ q : Additive (S ⧸ Agemo S 2 1),
+      eQuot (Additive.ofMul
+          ((IsAInvariant.of_characteristic hSinv.restrict).quotientMulAutHom
+            c q.toMul)) =
+        lambda * eQuot q := by
+    intro q
+    exact homocyclicFourQuotientCoordinate_generator_compatible
+      hSinv.restrict ε eKernel c nu hcompatKernel q
+  have hnormal : ∀ beta : GaloisField 2 n,
+      eKernel ((homocyclicFourSquareEquiv ε).toAdditive
+        (eQuot.symm beta)) = beta * beta := by
+    intro beta
+    have hbeta := eQuot.apply_symm_apply beta
+    change (frobeniusEquiv (GaloisField 2 n) 2).symm
+        (eKernel ((homocyclicFourSquareEquiv ε).toAdditive
+          (eQuot.symm beta))) = beta at hbeta
+    calc
+      eKernel ((homocyclicFourSquareEquiv ε).toAdditive
+          (eQuot.symm beta)) = beta ^ 2 := by
+        rw [← frobeniusEquiv_symm_pow_p (GaloisField 2 n) 2
+          (eKernel ((homocyclicFourSquareEquiv ε).toAdditive
+            (eQuot.symm beta))), hbeta]
+      _ = beta * beta := pow_two beta
+  have hnorm : nu = lambda * lambda := by
+    change nu =
+      (frobeniusEquiv (GaloisField 2 n) 2).symm nu *
+        (frobeniusEquiv (GaloisField 2 n) 2).symm nu
+    rw [← pow_two, frobeniusEquiv_symm_pow_p]
+  exact ⟨ι, hι, ε, hN,
+    hcompatKernel, hcompatQuot, hnormal, hnorm⟩
+
+/-- The canonical square equivalence of a commutative exponent-four factor,
+with the temporary `CommGroup` instance confined to this definition. -/
+def commutativeFactorSquareEquiv
+    {S : Type uH} [Group S] [Finite S]
+    (hcomm : IsMulCommutative S)
+    {index : Type}
+    (equivPi : S ≃* (index → Multiplicative (ZMod 4))) :
+    (S ⧸ Agemo S 2 1) ≃* Agemo S 2 1 := by
+  letI : CommGroup S :=
+    { (inferInstance : Group S) with
+      mul_comm := hcomm.is_comm.comm }
+  exact homocyclicFourSquareEquiv equivPi
+
+/-- Coordinates on one actual commutative invariant factor, measured in a
+prescribed ambient Frattini field coordinate.
+
+The public data does not expose a chosen `CommGroup S` instance.  The helper
+`commutativeFactorSquareEquiv` reconstructs the canonical square map from
+the stored commutativity proof and homocyclic presentation.  This avoids an
+instance diamond while retaining the exact provenance of every coordinate. -/
+structure CommutativeFactorCoordinateData
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    [IsMulCommutative ↑(frattini P)]
+    [Module (ZMod 2) (Additive ↑(frattini P))]
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P ≤ S)
+    (c : Y) {n : Nat}
+    (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (nu : GaloisField 2 n) where
+  hcomm : IsMulCommutative S
+  index : Type
+  [fintypeIndex : Fintype index]
+  equivPi : S ≃* (index → Multiplicative (ZMod 4))
+  hN : Agemo S 2 1 = (frattini P).subgroupOf S
+  eKernel : Additive (Agemo S 2 1) ≃+ GaloisField 2 n
+  eKernel_eq : ∀ z, eKernel z = ePhi
+    (Additive.ofMul
+      (homocyclicFourSquareSubgroupEquivFrattini hPhiS hN z.toMul))
+  eQuot : Additive (S ⧸ Agemo S 2 1) ≃+ GaloisField 2 n
+  eQuot_eq : ∀ q, eQuot q =
+    (frobeniusEquiv (GaloisField 2 n) 2).symm
+      (eKernel
+        ((commutativeFactorSquareEquiv hcomm equivPi).toAdditive q))
+  lambda : GaloisField 2 n
+  lambda_eq : lambda =
+    (frobeniusEquiv (GaloisField 2 n) 2).symm nu
+  kernel_compatible : ∀ z,
+    eKernel (Additive.ofMul
+      ((IsAInvariant.of_characteristic hSinv.restrict).restrict c z.toMul)) =
+        nu * eKernel z
+  quotient_compatible : ∀ q,
+    eQuot (Additive.ofMul
+      ((IsAInvariant.of_characteristic hSinv.restrict).quotientMulAutHom
+        c q.toMul)) =
+      lambda * eQuot q
+  square_normal : ∀ beta : GaloisField 2 n,
+    eKernel
+      ((commutativeFactorSquareEquiv hcomm equivPi).toAdditive
+        (eQuot.symm beta)) = beta * beta
+  kernel_eigenvalue_eq : nu = lambda * lambda
+
 /-- Coordinates on one actual noncommutative invariant factor, measured in
 a prescribed ambient Frattini field coordinate.
 
@@ -542,6 +771,370 @@ structure NoncommutativeFactorCoordinateData
     eKernel (lowerCentralSquareMapAdditive S hSq (eQuot.symm beta)) =
       beta * theta beta
   kernel_eigenvalue_eq : nu = lambda * theta lambda
+
+/-- Inclusive coordinates for an actual invariant factor.  The two
+constructors deliberately retain their natural carriers: Agemo quotients
+for the commutative `A(n, 1)` branch and lower-central layers for the
+noncommutative `A(n, φ)` branch. -/
+inductive FactorCoordinateData
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    [IsMulCommutative ↑(frattini P)]
+    [Module (ZMod 2) (Additive ↑(frattini P))]
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P ≤ S)
+    (c : Y) {n : Nat}
+    (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (nu : GaloisField 2 n) where
+  | commutative
+      (data : CommutativeFactorCoordinateData
+        hSinv hPhiS c ePhi nu)
+  | noncommutative
+      (hncomm : ¬ IsMulCommutative S)
+      (data : NoncommutativeFactorCoordinateData
+        hSinv hPhiS c ePhi nu)
+
+namespace FactorCoordinateData
+
+/-- The field automorphism in the factor square law; it is the identity in
+the commutative branch. -/
+def theta
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    [IsMulCommutative ↑(frattini P)]
+    [Module (ZMod 2) (Additive ↑(frattini P))]
+    {S : Subgroup P}
+    {hSinv : IsAInvariant Y.subtype S}
+    {hPhiS : frattini P ≤ S}
+    {c : Y} {n : Nat}
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : FactorCoordinateData hSinv hPhiS c ePhi nu) :
+    RingAut (GaloisField 2 n) :=
+  match data with
+  | .commutative _ => 1
+  | .noncommutative _ d => d.theta
+
+/-- The quotient eigenvalue in either factor branch. -/
+def lambda
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    [IsMulCommutative ↑(frattini P)]
+    [Module (ZMod 2) (Additive ↑(frattini P))]
+    {S : Subgroup P}
+    {hSinv : IsAInvariant Y.subtype S}
+    {hPhiS : frattini P ≤ S}
+    {c : Y} {n : Nat}
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : FactorCoordinateData hSinv hPhiS c ePhi nu) :
+    GaloisField 2 n :=
+  match data with
+  | .commutative d => d.lambda
+  | .noncommutative _ d => d.lambda
+
+/-- Both branches satisfy Higman's common source equation
+`ν = λ θ(λ)`. -/
+theorem kernel_eigenvalue_eq
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    [IsMulCommutative ↑(frattini P)]
+    [Module (ZMod 2) (Additive ↑(frattini P))]
+    {S : Subgroup P}
+    {hSinv : IsAInvariant Y.subtype S}
+    {hPhiS : frattini P ≤ S}
+    {c : Y} {n : Nat}
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : FactorCoordinateData hSinv hPhiS c ePhi nu) :
+    nu = data.lambda * data.theta data.lambda := by
+  cases data with
+  | commutative d =>
+      simpa [lambda, theta] using d.kernel_eigenvalue_eq
+  | noncommutative _ d =>
+      simpa [lambda, theta] using d.kernel_eigenvalue_eq
+
+end FactorCoordinateData
+
+/-- **Higman Lemma 12 (p. 89), inclusive coordinates on one actual
+factor.**
+
+Over a fixed ambient Singer datum, every proper invariant factor above
+`Φ(P)` carries either the commutative `A(n, 1)` coordinates or the
+noncommutative `A(n, φ)` coordinates.  The tagged result preserves the
+natural kernel and quotient carriers in both branches. -/
+theorem exists_factorCoordinates_of_ambientFrattiniSinger
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P < S)
+    (hStop : S < (⊤ : Subgroup P)) :
+    let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+      IsAInvariant.of_characteristic Y.subtype
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+    ∀ (c : Y)
+      (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n),
+      2 ≤ n →
+      (∀ g : Y, g ∈ Subgroup.zpowers c) →
+      IsPrimitiveRoot nu (2 ^ n - 1) →
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu →
+      Nonempty (FactorCoordinateData hSinv hPhiS.le c ePhi nu) := by
+  classical
+  dsimp only
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+  intro c ePhi nu hnTwo hcgen hnuPrimitive hconj
+  by_cases hcommS : IsMulCommutative S
+  · letI : CommGroup S :=
+      { (inferInstance : Group S) with
+        mul_comm := hcommS.is_comm.comm }
+    obtain ⟨ι, hι, ε, hN, hcompatKernel, hcompatQuot,
+        hnormal, hnorm⟩ :=
+      exists_commutativeFactorCoordinates_of_ambientFrattiniSinger
+        hP hncomm hmulti hxi hlen hprime
+        hSinv hPhiS hStop hcommS c ePhi nu hconj
+    letI : Fintype ι := hι
+    let eKernel : Additive (Agemo S 2 1) ≃+
+        GaloisField 2 n :=
+      homocyclicFourPrescribedKernelCoordinate
+        hPhiS.le hN ePhi.toAddEquiv
+    let eQuot : Additive (S ⧸ Agemo S 2 1) ≃+
+        GaloisField 2 n :=
+      homocyclicFourQuotientCoordinate ε eKernel
+    let lambda : GaloisField 2 n :=
+      (frobeniusEquiv (GaloisField 2 n) 2).symm nu
+    let data : CommutativeFactorCoordinateData
+        hSinv hPhiS.le c ePhi nu := {
+      hcomm := hcommS
+      index := ι
+      equivPi := ε
+      hN := hN
+      eKernel := eKernel
+      eKernel_eq := fun _ => rfl
+      eQuot := eQuot
+      eQuot_eq := fun _ => rfl
+      lambda := lambda
+      lambda_eq := rfl
+      kernel_compatible := hcompatKernel
+      quotient_compatible := hcompatQuot
+      square_normal := hnormal
+      kernel_eigenvalue_eq := hnorm }
+    exact ⟨FactorCoordinateData.commutative data⟩
+  · obtain ⟨hK1, hterm, theta, eQuot, lambda,
+        hthetaNe, hthetaOdd, hcompatKernel, hcompatQuot,
+        hnormal, hnorm⟩ :=
+      exists_noncommutativeFactorCoordinates_of_ambientFrattiniSinger
+        hP hncomm hmulti hxi hlen hprime
+        hSinv hPhiS hStop hcommS c ePhi nu hnTwo hcgen
+        hnuPrimitive hconj
+    let hxiS : IsXiActor hSinv.restrict.range :=
+      restricted_range_isXiActor hxi hSinv
+    let hlenS : HasXiLengthTwo hSinv.restrict.range.subtype :=
+      restricted_range_hasXiLengthTwo_of_xiLengthThree
+        hP hncomm hxi hlen hEA hSinv hPhiS hStop
+    let hSq : LowerCentralSquaresLieInSecond S :=
+      lowerCentralSquaresLieInSecond_of_agemo_eq S
+        (agemo_one_eq_lowerCentralTerm_one
+          (hP.to_subgroup S) hcommS hxiS hlenS)
+    let eKernel : Additive (lowerCentralLayer S 1) ≃ₗ[ZMod 2]
+        GaloisField 2 n :=
+      (factorLayerOneLinearEquivAmbientFrattini
+        hEA hPhiS.le hK1 hterm).trans ePhi
+    let data : NoncommutativeFactorCoordinateData
+        hSinv hPhiS.le c ePhi nu := {
+      hK1 := hK1
+      hterm := hterm
+      hSq := hSq
+      eKernel := eKernel
+      eKernel_eq := fun _ => rfl
+      theta := theta
+      eQuot := eQuot
+      lambda := lambda
+      theta_ne_one := hthetaNe
+      theta_order_odd := hthetaOdd
+      kernel_compatible := hcompatKernel
+      quotient_compatible := hcompatQuot
+      square_normal := hnormal
+      kernel_eigenvalue_eq := hnorm }
+    exact ⟨FactorCoordinateData.noncommutative hcommS data⟩
+
+/-- **Higman Lemma 12 (p. 89), factor-pair coordinates over one common
+Singer datum.**
+
+The ambient generator, Frattini coordinate, and primitive scalar are chosen
+once and used for both actual invariant factors.  No commutativity
+assumption is made on either factor, so the returned tagged pair covers all
+four commutative/noncommutative combinations and satisfies the common source
+equations `ν = λ θ(λ) = μ φ(μ)`. -/
+theorem exists_factorPairCoordinates_of_xiLengthThree
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {S T : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P < S)
+    (hStop : S < (⊤ : Subgroup P))
+    (hTinv : IsAInvariant Y.subtype T)
+    (hPhiT : frattini P < T)
+    (hTtop : T < (⊤ : Subgroup P)) :
+    let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+      IsAInvariant.of_characteristic Y.subtype
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+    ∃ (c : Y)
+      (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n)
+      (left : FactorCoordinateData hSinv hPhiS.le c ePhi nu)
+      (right : FactorCoordinateData hTinv hPhiT.le c ePhi nu),
+      2 ≤ n ∧
+      (∀ g : Y, g ∈ Subgroup.zpowers c) ∧
+      IsPrimitiveRoot nu (2 ^ n - 1) ∧
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu ∧
+      nu = left.lambda * left.theta left.lambda ∧
+      nu = right.lambda * right.theta right.lambda := by
+  classical
+  dsimp only
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+  obtain ⟨c, ePhi, nu, _b, hnTwo, hcgen, hnuPrimitive,
+      hconj, _hadjoin, _hbasis⟩ :=
+    exists_ambientFrattiniSingerCoordinates_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  obtain ⟨left⟩ :=
+    exists_factorCoordinates_of_ambientFrattiniSinger
+      hP hncomm hmulti hxi hlen hprime
+      hSinv hPhiS hStop c ePhi nu hnTwo hcgen
+      hnuPrimitive hconj
+  obtain ⟨right⟩ :=
+    exists_factorCoordinates_of_ambientFrattiniSinger
+      hP hncomm hmulti hxi hlen hprime
+      hTinv hPhiT hTtop c ePhi nu hnTwo hcgen
+      hnuPrimitive hconj
+  exact ⟨c, ePhi, nu, left, right,
+    hnTwo, hcgen, hnuPrimitive, hconj,
+    left.kernel_eigenvalue_eq, right.kernel_eigenvalue_eq⟩
+
+/-- **Higman Lemma 12 (pp. 89--90), coordinates on the actual
+complementary factors.**
+
+This packages the complementary normal invariant Frattini preimages, their
+inclusive type-A models, and their coordinates over one ambient Singer
+datum.  In particular, the returned `factors` retains
+`left ⊓ right = Φ(P)` and `left ⊔ right = P`, while the tagged coordinate
+data covers every commutative/noncommutative combination. -/
+theorem exists_complementaryFactorCoordinates_of_xiLengthThree
+    {P : Type uH} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+      IsAInvariant.of_characteristic Y.subtype
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+    ∃ (factors : XiLengthThreeTypeAFactorData P Y)
+      (c : Y)
+      (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n)
+      (left : FactorCoordinateData
+        factors.left_invariant factors.frattini_lt_left.le c ePhi nu)
+      (right : FactorCoordinateData
+        factors.right_invariant factors.frattini_lt_right.le c ePhi nu),
+      2 ≤ n ∧
+      (∀ g : Y, g ∈ Subgroup.zpowers c) ∧
+      IsPrimitiveRoot nu (2 ^ n - 1) ∧
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu ∧
+      nu = left.lambda * left.theta left.lambda ∧
+      nu = right.lambda * right.theta right.lambda := by
+  classical
+  dsimp only
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : CommGroup ↑(frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+    hEA.zmodModule
+  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
+  obtain ⟨factors⟩ :=
+    xiLengthThreeTypeAFactorData_exists
+      hP hncomm hmulti hxi hlen hprime
+  obtain ⟨c, ePhi, nu, left, right,
+      hnTwo, hcgen, hnuPrimitive, hconj, hleft, hright⟩ :=
+    exists_factorPairCoordinates_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+      factors.left_invariant factors.frattini_lt_left
+      factors.left_lt_top
+      factors.right_invariant factors.frattini_lt_right
+      factors.right_lt_top
+  exact ⟨factors, c, ePhi, nu, left, right,
+    hnTwo, hcgen, hnuPrimitive, hconj, hleft, hright⟩
 
 /-- **Higman Lemma 12 (p. 89), paired noncommutative factor
 coordinates.**

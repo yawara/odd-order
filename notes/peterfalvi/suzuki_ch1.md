@@ -487,14 +487,19 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       p. 81 の表と直前の commutator formula から確認した。抽出画像は
       `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
       同じ ambient Singer datum を二つの非可換 factor に一度ずつ適用する lossless
-      bundle `NoncommutativeFactorCoordinateData` と paired endpoint も構成した。ここでは
-      両 kernel coordinate の ambient provenance、square normal form、actor equationsを
-      保持したまま `ν = λ·θ(λ) = μ·φ(μ)` を一つの結論で返す。
-      次の source frontier は、これと既存の commutative `A(n,1)` prescribed-coordinate
-      endpoint を inclusive bundle にまとめ、実際の complementary pair の全組合せを
-      case split 付きで返した後、mixed pairing の actor covariance を座標表示することである。
-      その後、固有値制約から type B/C/D
-      の四場合を分岐する gluing case analysis へ進む。
+      bundle `NoncommutativeFactorCoordinateData` と paired endpoint も構成した。さらに
+      commutative `A(n,1)` branch を `CommutativeFactorCoordinateData` に束ね、branch 固有の
+      Agemo quotient / lower-central quotient を保った tagged bundle
+      `FactorCoordinateData` を構成した。`exists_factorCoordinates_of_ambientFrattiniSinger`
+      は一因子の両 branch を、`exists_factorPairCoordinates_of_xiLengthThree` は左右の
+      全四組合せを、同じ `c`, `ePhi`, `ν` 上で返す。最後に
+      `exists_complementaryFactorCoordinates_of_xiLengthThree` が actual complementary
+      `XiLengthThreeTypeAFactorData` と左右の tagged coordinates を同梱するので、
+      `left ⊓ right = Φ(P)`、`left ⊔ right = P`、および
+      `ν = λ·θ(λ) = μ·φ(μ)` が同じ endpoint に揃った。
+      次の source frontier は、actual mixed commutator pairing の actor covariance を
+      この左右座標で表示し、`θ = 1` / `φ = 1` / 両方非自明の固有値制約から原典
+      pp. 90--92 の type B/C/D case split へ進むことである。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。
