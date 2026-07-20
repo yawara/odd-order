@@ -2169,3 +2169,52 @@ merge 015768c0a の (47) abelian-clause 還元 (`4c68275ec` / `71619a35e`) を d
 `hβsupply` 自体も commit body が正直に書くとおり「深い多補題作業」(Case A/B 論法 +
 `S/S' = Q/S' ⊕ T/S'` 分解 + β-equivariant bilinear map) で、well-scoped だが substantial。
 これは STOP でなく **frontier の正確化** — c は E.4 を「あと 1 本」と誤認せず上記 4 要素を残件として扱うこと。
+
+## 2026-07-21 (48): β supply 基盤補題群 landing — ただし ⚠ 深い設計点 (c-4) を発見
+
+3 本目 subagent が `AppE_EigenvalueCombinatorics.lean` に 7 補題追加 (691→919 行, sorry-free,
+親が実測検証: leaf build green・全 axiom-clean)。双線形 mod K・three-subgroups 重み
+(`⁅H_a,H_b⁆ ≤ H_{a+b+1}`)・Case B 排除 (a=0)・Case A 漸化式生成元版 (`caseA_eigenvalue_step`)。
+
+### ⚠⚠ 発見: (E.23) の Case A per-level 保証は未解決 (真の math frontier)
+
+`caseB_excluded` は **a=0 の Case B** (`⁅T,Q'⁆ ≤ H₂`) のみ排除できる:
+`⁅T,Q'⁆ ≤ H₂ ⟹ H₁ = T'·H₂`、`T' ≤ H_{k-1} ≤ H₂` (k≥3) ⟹ `H₁ ≤ H₂` 矛盾。
+
+**a>0 では同じ論法が効かない**: Case B (`⁅H_a,Q'⁆ ≤ H_{a+2}`) ⟹
+`H_{a+1} = ⁅H_a,T⁆·H_{a+2}` にしかならず、矛盾に至らない。
+
+⟹ `commutator_centralizer_eq_bot_of_beta_supply` の `hβsupply` は
+**全 live level で `t_a = t₀·t^a`** (= 全 level Case A) を要求するが、
+これを保証する議論が (43) の紙上解析でも a=0 しか埋まっていない。
+
+### 本質: `βv` の分解が未解析
+
+α 側 (E.22) が per-level 問題を持たないのは、**α が R₀ を固定する**ので
+`w_{a+1} = ⁅w_a, v⁆` の `v ∈ R₀` を α が固定線上でスカラー倍するから。
+β は R₀ を固定しないので `βv` が `S/S' = Q ⊕ T` の**両成分**に広がる
+(`R₀S'/S'` は Q・T と異なる第 3 の線)。この `βv` の分解を解析しないと
+per-level の固有値挙動が決まらない。**これが BG の "Similarly one can show" の
+本当の中身**で、(43) の私の解析は「per-level 二者択一」までで止まっていた。
+
+### ⬜ 次の frontier (要・慎重な BG 再読)
+
+1. `βv` (v = R₀ 生成元) の `Q/S' ⊕ T/S'` 分解を書き下す。
+   `R₀S'/S'` = 第 3 の線 = ある 1 次元部分空間。β の像は?
+2. それを使って各 level の Case A/B を決定 (全 level Case A が出るか、
+   出るとして何故か)。
+3. 出れば `caseA_eigenvalue_step` を per-level に流して帰納で `hβsupply` 構成。
+
+⚠ これは [[feedback-ask-chatgpt-for-elided-gaps]] 相当の深い行間。BG p.163-164 の
+(E.22)/(E.23) 前後と、可能なら Feit-Thompson 1963 原論文 §26 の対応箇所を精読。
+Coq odd-order は FT 本体のみで App.E 相当を持たない可能性が高い (要確認)。
+
+### 現状の到達点 (2026-07-21)
+
+E.4: **指数 clause 完全証明済**。abelian clause = `⁅T,T⁆ = ⊥` は
+`commutator_centralizer_eq_bot_of_beta_supply` で **β supply 1 本に還元済**、
+その supply の基盤補題 (双線形・Case A step・Case B 排除 a=0) も landing 済。
+**残る唯一の math gap = 全 level Case A の保証 (`βv` 分解)**。
+これが埋まれば機械的組み立てで E.4 abelian clause が閉じる。
+
+sorry: AppE は E.4(1645)/E.5(1686) の 2、全体 13。leaf build green。
