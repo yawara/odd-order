@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppE_ExponentP
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # BG Appendix E, Theorem E.3, Step 4: `B` fixes `R₀`
@@ -178,5 +179,111 @@ theorem RegularOperatorSetup.exists_conj_smul_R₀ [Finite R] [Finite B]
         exact congrArg Subgroup.zpowers hconj.symm
     _ = (MulAut.conj x) • hyp.R₀ := by
         rw [hugen, pointwise_mulAut_smul_eq_map]
+
+/-! ## Glauberman's lemma: a `B`-invariant `S`-conjugate of `R₀`
+
+BG's *"By a variation of the Frattini argument, `SB = S·N_G(R₀)`.  By the Schur–Zassenhaus
+Theorem, `N_G(R₀)` contains a complement `B*` to `N_G(R₀) ∩ S`, and `B* = B^y` for some
+`y ∈ S`.  Therefore `B^y` normalizes `R₀`."*
+
+That derivation — build `Γ = S ⋊ B`, Frattini, Schur–Zassenhaus existence, Schur–Zassenhaus
+conjugacy — is verbatim the proof of **Isaacs Lemma 3.24(a)**, Glauberman's fixed-point
+lemma, which is formalized as `OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists`.  So we
+apply it to `Ω = ` the set of `S`-conjugates of `R₀` instead of repeating the semidirect
+product construction. -/
+
+/-- Conjugation twists across an automorphism: `f • (W^s) = (f • W)^{f s}`.
+
+In `MulAut R` this is the identity `f · conj s · f⁻¹ = conj (f s)`. -/
+theorem smul_conj_smul {G : Type*} [Group G] (f : MulAut G) (s : G) (W : Subgroup G) :
+    f • ((MulAut.conj s) • W) = (MulAut.conj (f s)) • (f • W) := by
+  rw [← mul_smul, ← mul_smul]
+  congr 1
+  refine MulEquiv.ext fun w => ?_
+  change f (s * w * s⁻¹) = f s * f w * (f s)⁻¹
+  rw [map_mul, map_mul, map_inv]
+
+/-- **BG Step 4, the Glauberman half**: some `S`-conjugate of `R₀` is `B`-invariant.
+
+`S = Ω₁(R)` acts by conjugation on the set `Ω` of its conjugates of `R₀`, transitively by
+construction; `B` acts on the same set because `exists_conj_smul_R₀` says `R₀^β` is again an
+`S`-conjugate of `R₀`, and the two actions are compatible.  `p ∤ |B|` and `S` is a `p`-group
+(hence solvable), so Glauberman's lemma supplies a `B`-fixed point of `Ω`. -/
+theorem RegularOperatorSetup.exists_smul_R₀_invariant [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q)
+    (hB : ∀ b : B, (hyp.act b) • (hyp.R₀ ⊔ derivedInG (Omega R p 1)) =
+      hyp.R₀ ⊔ derivedInG (Omega R p 1)) :
+    ∃ y ∈ Omega R p 1, ∀ b : B,
+      (hyp.act b) • ((MulAut.conj y) • hyp.R₀) = (MulAut.conj y) • hyp.R₀ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hSinv : IsAInvariant hyp.act (Omega R p 1) := by
+    haveI : (Omega R p 1).Characteristic := Omega.characteristic
+    exact IsAInvariant.of_characteristic hyp.act
+  -- `Ω` = the `S`-conjugates of `R₀`.
+  let Ω := { W : Subgroup R // ∃ s : ↥(Omega R p 1), W = (MulAut.conj (s : R)) • hyp.R₀ }
+  haveI : Nonempty Ω := ⟨⟨hyp.R₀, 1, by rw [Subgroup.coe_one, map_one, one_smul]⟩⟩
+  -- `S` acts by conjugation.
+  letI mulS : MulAction ↥(Omega R p 1) Ω :=
+    { smul := fun s ω => ⟨(MulAut.conj (s : R)) • ω.val, by
+        obtain ⟨t, ht⟩ := ω.property
+        exact ⟨s * t, by rw [ht, Subgroup.coe_mul, map_mul, mul_smul]⟩⟩
+      one_smul := fun ω => Subtype.ext (by
+        change (MulAut.conj (((1 : ↥(Omega R p 1)) : R))) • ω.val = ω.val
+        rw [Subgroup.coe_one, map_one, one_smul])
+      mul_smul := fun s t ω => Subtype.ext (by
+        change (MulAut.conj (((s * t : ↥(Omega R p 1)) : R))) • ω.val =
+          (MulAut.conj (s : R)) • ((MulAut.conj (t : R)) • ω.val)
+        rw [Subgroup.coe_mul, map_mul, mul_smul]) }
+  -- `B` acts through `act`; this is where `exists_conj_smul_R₀` is consumed.
+  letI mulB : MulAction B Ω :=
+    { smul := fun b ω => ⟨(hyp.act b) • ω.val, by
+        obtain ⟨t, ht⟩ := ω.property
+        obtain ⟨x, hxS, hx⟩ := hyp.exists_conj_smul_R₀ hB b
+        refine ⟨(⟨hyp.act b (t : R), hSinv.smul_mem b t.2⟩ : ↥(Omega R p 1)) * ⟨x, hxS⟩, ?_⟩
+        rw [ht, smul_conj_smul, hx, Subgroup.coe_mul, map_mul, mul_smul]⟩
+      one_smul := fun ω => Subtype.ext (by
+        change (hyp.act 1) • ω.val = ω.val
+        rw [map_one, one_smul])
+      mul_smul := fun b b' ω => Subtype.ext (by
+        change (hyp.act (b * b')) • ω.val = (hyp.act b) • ((hyp.act b') • ω.val)
+        rw [map_mul, mul_smul]) }
+  -- Compatibility of the two actions.
+  have hcompat : OddOrder.Isaacs.Ch04.IsCompatibleMulAction hSinv.restrict Ω := by
+    intro b s ω
+    refine Subtype.ext ?_
+    change (hyp.act b) • ((MulAut.conj (s : R)) • ω.val) =
+      (MulAut.conj (((hSinv.restrict b) s : ↥(Omega R p 1)) : R)) • ((hyp.act b) • ω.val)
+    rw [smul_conj_smul]
+    rfl
+  -- `S` is transitive on `Ω` by construction.
+  have htrans : MulAction.IsPretransitive ↥(Omega R p 1) Ω := by
+    constructor
+    intro ω₁ ω₂
+    obtain ⟨s₁, h₁⟩ := ω₁.property
+    obtain ⟨s₂, h₂⟩ := ω₂.property
+    refine ⟨s₂ * s₁⁻¹, Subtype.ext ?_⟩
+    change (MulAut.conj (((s₂ * s₁⁻¹ : ↥(Omega R p 1)) : R))) • ω₁.val = ω₂.val
+    have hmul : ((s₂ * s₁⁻¹ : ↥(Omega R p 1)) : R) * ((s₁ : ↥(Omega R p 1)) : R) =
+        ((s₂ : ↥(Omega R p 1)) : R) := by
+      push_cast; group
+    rw [h₁, h₂, ← mul_smul, ← map_mul, hmul]
+  -- `|B|` is prime to `|S|`, and `S` is solvable.
+  have hcop : Nat.Coprime (Nat.card B) (Nat.card ↥(Omega R p 1)) := by
+    obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup (Omega R p 1)).exists_card_eq
+    rw [hk]
+    exact Nat.Coprime.pow_right k
+      (((Nat.Prime.coprime_iff_not_dvd hyp.p_prime).mpr hyp.p_not_dvd_card_B).symm)
+  haveI hSsolv : IsSolvable ↥(Omega R p 1) := by
+    haveI : Group.IsNilpotent ↥(Omega R p 1) :=
+      IsPGroup.isNilpotent (hyp.R_pGroup.to_subgroup (Omega R p 1))
+    infer_instance
+  obtain ⟨ω, hω⟩ := OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists
+    (G := ↥(Omega R p 1)) (A := B) (φ := hSinv.restrict) hcop (Or.inr hSsolv) (Ω := Ω)
+    hcompat htrans
+  obtain ⟨y, hy⟩ := ω.property
+  refine ⟨(y : R), y.2, fun b => ?_⟩
+  have h' : (hyp.act b) • (ω : Subgroup R) = (ω : Subgroup R) := congrArg Subtype.val (hω b)
+  rw [← hy]
+  exact h'
 
 end OddOrder.BG.AppE
