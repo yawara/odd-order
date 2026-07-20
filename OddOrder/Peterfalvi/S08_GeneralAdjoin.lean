@@ -359,4 +359,48 @@ theorem crux1_of_memberFamily_general
   have hμval : μ = -(a : ℤ) := by omega
   rw [hμeq, hμval]; push_cast; ring
 
+/-- **General `inner_Y_extension_member_eq`** (generalizes `inner_Y_extension_member_eq`,
+`S08_CoherenceCorePart1/CoherentAdjoin.lean`; the Dade map appears only as an opaque
+`IntegralCharacterMap` in the proof, so `hyp`/`hconj` are dropped and it is stated for a general
+`τ`).
+
+The per-member (5.6.1) coefficient `⟨Y, ν χⱼ⟩` for the χ-decomposition residual `Y = Xχ − τ(χ −
+a·χ₁)` with `Xχ ⊥ ν χⱼ` (the (5.2.e) `R(χ)`-orthogonality) and the cross-term
+`⟨τ(χ − a·χ₁), ν(χⱼ − aⱼ·χ₁)⟩ = ⟨χ − a·χ₁, χⱼ − aⱼ·χ₁⟩` (`hfound`; supplied by
+`inner_tau_extension_of_supported`).  Expands via `ν`-linearity and the source expansion to the
+`crux1_of_memberFamily_general` `hcoeffval` shape. -/
+theorem inner_Y_extension_member_eq_general
+    {τ : IntegralCharacterMap L G} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {S₁ : Set (ClassFunction L ℂ)}
+    (hS₁ : IsCoherent τ S₁ A)
+    (χ : ClassFunction L ℂ) {chi1 cj : ClassFunction L ℂ} {a aj : ℕ} {Xχ Y : ClassFunction G ℂ}
+    (hYeq : Y = Xχ - τ (χ - a • chi1))
+    (hXortho : ClassFunction.inner Xχ (hS₁.extension cj) = 0)
+    (hfound : ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension (cj - aj • chi1)) =
+      ClassFunction.inner (χ - a • chi1) (cj - aj • chi1))
+    (hχcj : ClassFunction.inner χ cj = 0)
+    (hχchi1 : ClassFunction.inner χ chi1 = 0)
+    {m₁ : ℂ} (hchi1chi1 : ClassFunction.inner chi1 chi1 = m₁) :
+    ClassFunction.inner Y (hS₁.extension cj) =
+      (a : ℂ) * ClassFunction.inner chi1 cj -
+        ((a : ℂ) * m₁ + ClassFunction.inner (τ (χ - a • chi1))
+          (hS₁.extension chi1)) * (aj : ℂ) := by
+  have hνcj : hS₁.extension cj = hS₁.extension (cj - aj • chi1) + aj • hS₁.extension chi1 := by
+    rw [map_sub, map_nsmul]; abel
+  have hsrc : ClassFunction.inner (χ - a • chi1) (cj - aj • chi1)
+      = -(a : ℂ) * ClassFunction.inner chi1 cj + (a : ℂ) * (aj : ℂ) * m₁ := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a chi1, ← Nat.cast_smul_eq_nsmul ℂ aj chi1]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      hχcj, hχchi1, hchi1chi1, star_natCast]
+    ring
+  have hsmul : ClassFunction.inner (τ (χ - a • chi1)) (aj • hS₁.extension chi1) =
+      (aj : ℂ) * ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension chi1) := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ aj (hS₁.extension chi1),
+      OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
+  rw [hYeq, ClassFunction.inner_sub_left, hXortho, zero_sub, hνcj,
+    ClassFunction.inner_add_right, hfound, hsrc, hsmul]
+  ring
+
 end OddOrder.Peterfalvi.S07
