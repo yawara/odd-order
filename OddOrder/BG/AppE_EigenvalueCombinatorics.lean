@@ -458,4 +458,234 @@ theorem eq_of_chain_eigenvalue_relations {pp qq : ℕ} {r t t₀ : (ZMod pp)ˣ}
       _ = (t₀ * t ^ i) * (t₀ * t ^ j) := mul_mul_mul_comm _ _ _ _
       _ = t₀ * t ^ m := hE27
 
+/-! ## `(E.27)`: the β side of the cross-term relation, gated on the eigenvalue supply
+
+The α assembly `dvd_sub_mul_eigenvalues_chain` discharges its eigenvalue supply with
+`exists_eigenvalue_pow`, whose induction uses that **`α` fixes `R₀`** (`α v = v ^ r`).  BG's
+`β` does *not* fix `R₀` — that is `(E.18)` — so its supply, BG's `(E.23)`
+`wᵢ^β ≡ wᵢ^{tᵢ} (mod Hᵢ₊₁)` with `tᵢ = t₀ tⁱ`, has to be produced by the Case A/B argument
+(issue 3021, session (43)).  *Everything downstream of that supply is operator-agnostic*:
+the lemma below is the α computation with the operator `σ` and its supply abstracted, so
+`σ = β` plugs straight in once `(E.23)` is available.  This is what "putting
+`dvd_sub_mul_of_chain_eigenvalues` in a form applicable to `σ = β`" means. -/
+
+/-- **BG `(E.26)`/`(E.27)`, assembled from an abstract eigenvalue supply**.
+
+For a characteristic subgroup `T` of any group `G`, an operator `σ`, and a *supply* scaling
+each live chain term `Hₐ = ⁅…⁅T,G⁆,…⁆` by `t₀ tᵃ` up to `Hₐ₊₁` (BG's `(E.22)`/`(E.23)`), the
+cross-term relation `(t₀ tⁱ)(t₀ tʲ) = t₀ t^{k−1}` holds in `ZMod pp`.
+
+* `σ = α`, `t₀ = r₀`, `t = r`, supply from `exists_eigenvalue_pow` ⟹ `(E.26)` — the content
+  of `dvd_sub_mul_eigenvalues_chain`;
+* `σ = β`, supply from `(E.23)` ⟹ `(E.27)`.
+
+Same proof as the α case: `dvd_sub_mul_of_chain_eigenvalues` fed at `i`, `j`, `k−1`, whose
+cross-term hypotheses are the maximality inclusions `hcl`, `hcr` of `(E.25)`, whose centrality
+is `chain_map_le_center`, and whose exponent input is `hexpT`. -/
+theorem dvd_sub_mul_of_chain_supply {G : Type*} [Group G] {pp : ℕ} (hp : pp.Prime)
+    {T : Subgroup G} [T.Characteristic] (σ : G →* G) {w v : G} (hw : w ∈ T)
+    (hexpT : ∀ y ∈ T, y ^ pp = 1) {t t₀ : ℤ}
+    (hsupply : ∀ a : ℕ, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a ≠ ⊥ →
+      ∃ s : ℤ, (s : ZMod pp) = (t₀ : ZMod pp) * (t : ZMod pp) ^ a ∧
+        ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a,
+          (y ^ s)⁻¹ * σ y ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 1))
+    (hnonab : ⁅T, T⁆ ≠ ⊥) {k i j : ℕ} (hji : j ≤ i) (hik : i + 2 ≤ k)
+    (hTle : ⁅T, T⁆ ≤ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (k - 1))
+    (hcl : ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1),
+        OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) j⁆ ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) k)
+    (hcr : ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i,
+        OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (j + 1)⁆ ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) k)
+    (hwij : ⁅commutatorIterate w v i, commutatorIterate w v j⁆ ∉
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) k) :
+    ((t₀ : ZMod pp) * (t : ZMod pp) ^ i) * ((t₀ : ZMod pp) * (t : ZMod pp) ^ j) =
+      (t₀ : ZMod pp) * (t : ZMod pp) ^ (k - 1) := by
+  haveI : Fact pp.Prime := ⟨hp⟩
+  -- Work with `k = d + 1` so that `H k` and `H (k-1) = H d` hold definitionally.
+  obtain ⟨d, rfl⟩ : ∃ d, k = d + 1 := ⟨k - 1, by omega⟩
+  -- Liveness of the relevant chain terms.
+  have hlive_d : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) d ≠ ⊥ := fun h =>
+    hnonab (le_bot_iff.mp (hTle.trans (le_of_eq h)))
+  have hlive_i : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i ≠ ⊥ :=
+    iterCommutator_ne_bot_of_le (by omega) hlive_d
+  have hlive_j : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) j ≠ ⊥ :=
+    iterCommutator_ne_bot_of_le (by omega) hlive_d
+  -- The supply at `i`, `j`, `d = k − 1`.
+  obtain ⟨si, hsi_cong, hsi_mem⟩ := hsupply i hlive_i
+  obtain ⟨sj, hsj_cong, hsj_mem⟩ := hsupply j hlive_j
+  obtain ⟨sd, hsd_cong, hsd_mem⟩ := hsupply d hlive_d
+  have hwiT : commutatorIterate w v i ∈ T :=
+    iterCommutator_le_base i (commutatorIterate_mem_chain hw i)
+  have hwjT : commutatorIterate w v j ∈ T :=
+    iterCommutator_le_base j (commutatorIterate_mem_chain hw j)
+  have hxy : ⁅commutatorIterate w v i, commutatorIterate w v j⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) d :=
+    hTle (Subgroup.commutator_mem_commutator hwiT hwjT)
+  have hexpwij : ⁅commutatorIterate w v i, commutatorIterate w v j⁆ ^ pp = 1 := by
+    refine hexpT _ ?_
+    rw [commutatorElement_def]
+    exact T.mul_mem (T.mul_mem (T.mul_mem hwiT hwjT) (T.inv_mem hwiT)) (T.inv_mem hwjT)
+  -- The Lemma 4.2 step in `G / H_k`.
+  have hdvd : (pp : ℤ) ∣ si * sj - sd := by
+    refine dvd_sub_mul_of_chain_eigenvalues hp σ (chain_map_le_center T d) hxy hwij
+      hexpwij ?_ ?_ ?_ (hsi_mem _ (commutatorIterate_mem_chain hw i))
+      (hsj_mem _ (commutatorIterate_mem_chain hw j)) (hsd_mem _ hxy)
+    · exact fun u hu =>
+        hcl (Subgroup.commutator_mem_commutator hu (commutatorIterate_mem_chain hw j))
+    · exact fun u hu u' hu' =>
+        hcl (Subgroup.commutator_mem_commutator hu ((iterCommutator_antitone j) hu'))
+    · exact fun u' hu' =>
+        hcr (Subgroup.commutator_mem_commutator (commutatorIterate_mem_chain hw i) hu')
+  -- Cast the divisibility into `ZMod pp` and substitute the eigenvalue congruences.
+  have hzmod : (si : ZMod pp) * (sj : ZMod pp) = (sd : ZMod pp) := by
+    have := (ZMod.intCast_zmod_eq_zero_iff_dvd (si * sj - sd) pp).mpr hdvd
+    push_cast at this
+    linear_combination this
+  rw [hsi_cong, hsj_cong] at hzmod
+  rw [hzmod, hsd_cong, Nat.add_sub_cancel]
+
+/-! ## From `ZMod p` eigenvalue relations to `t₀ = t`
+
+`eq_of_chain_eigenvalue_relations` lives in `(ZMod p)ˣ`, but the two chain assemblies
+(`dvd_sub_mul_eigenvalues_chain` for `α`, `dvd_sub_mul_of_chain_supply` for `β`) deliver ring
+equations in `ZMod p` among the integer eigenvalues.  The bridge lifts everything to units:
+`α`'s eigenvalue `r` is a unit of order exactly `q` (its `q`-th power is `1` — BG's `(E.9)` —
+and it is `≠ 1` — BG's `(E.11)`), and BG's `β`-eigenvalues `t, t₀` are units on the
+order-`p` lines they act on. -/
+
+/-- **BG Proposition E.4's ending, from `ZMod p` data**: the two product relations
+`(r·rⁱ)(r·rʲ) = r·r^m` and `(t₀·tⁱ)(t₀·tʲ) = t₀·t^m`, read in `ZMod p` with integer
+eigenvalues, force `t₀ ≡ t (mod p)`.
+
+The α relation already carries `r₀ = r` (BG's `(E.20)`/`r = r₀`); its eigenvalue is a unit
+of order `q` because `r^q ≡ 1` (`(E.9)`) and `r ≢ 1` (`(E.11)`), and the `β`-eigenvalues are
+units by hypothesis.  Then `eq_of_chain_eigenvalue_relations` applies verbatim, and its
+`(ZMod p)ˣ` conclusion `t₀ = t` pushes back down to `ZMod p`. -/
+theorem eq_of_chain_eigenvalue_relations_intCast {p q : ℕ} [Fact p.Prime] (hq : q.Prime)
+    {r t t₀ : ℤ} (hrq : (r : ZMod p) ^ q = 1) (hr1 : (r : ZMod p) ≠ 1)
+    (htu : IsUnit (t : ZMod p)) (ht₀u : IsUnit (t₀ : ZMod p))
+    {i j m : ℕ} (hji : j ≤ i) (him : i + 1 ≤ m) (hmq : m + 2 ≤ q)
+    (hE26 : ((r : ZMod p) * (r : ZMod p) ^ i) * ((r : ZMod p) * (r : ZMod p) ^ j) =
+      (r : ZMod p) * (r : ZMod p) ^ m)
+    (hE27 : ((t₀ : ZMod p) * (t : ZMod p) ^ i) * ((t₀ : ZMod p) * (t : ZMod p) ^ j) =
+      (t₀ : ZMod p) * (t : ZMod p) ^ m) :
+    (t₀ : ZMod p) = (t : ZMod p) := by
+  -- `r` is a unit: `ZMod p` is a field and `r ≠ 0` since `0^q = 0 ≠ 1`.
+  have hru : IsUnit (r : ZMod p) := by
+    rw [isUnit_iff_ne_zero]
+    intro h0
+    rw [h0, zero_pow hq.pos.ne'] at hrq
+    exact zero_ne_one hrq
+  set ru : (ZMod p)ˣ := hru.unit with hrudef
+  set tu : (ZMod p)ˣ := htu.unit with htudef
+  set t₀u : (ZMod p)ˣ := ht₀u.unit with ht₀udef
+  have hrus : (ru : ZMod p) = (r : ZMod p) := hru.unit_spec
+  have htus : (tu : ZMod p) = (t : ZMod p) := htu.unit_spec
+  have ht₀us : (t₀u : ZMod p) = (t₀ : ZMod p) := ht₀u.unit_spec
+  -- `orderOf ru = q`, from `ru^q = 1`, `ru ≠ 1`, `q` prime.
+  have hru_q : ru ^ q = 1 := by
+    refine Units.ext ?_
+    rw [Units.val_pow_eq_pow_val, hrus, hrq, Units.val_one]
+  have hru_ne : ru ≠ 1 := fun h => hr1 (by rw [← hrus, h, Units.val_one])
+  have hord : orderOf ru = q := by
+    rcases (Nat.dvd_prime hq).mp (orderOf_dvd_of_pow_eq_one hru_q) with h1 | hq'
+    · exact absurd (orderOf_eq_one_iff.mp h1) hru_ne
+    · exact hq'
+  -- Lift both relations to `(ZMod p)ˣ`.
+  have hE26u : (ru * ru ^ i) * (ru * ru ^ j) = ru * ru ^ m := by
+    refine Units.ext ?_
+    simp only [Units.val_mul, Units.val_pow_eq_pow_val, hrus]
+    exact hE26
+  have hE27u : (t₀u * tu ^ i) * (t₀u * tu ^ j) = t₀u * tu ^ m := by
+    refine Units.ext ?_
+    simp only [Units.val_mul, Units.val_pow_eq_pow_val, htus, ht₀us]
+    exact hE27
+  have := eq_of_chain_eigenvalue_relations hord hji him hmq hE26u hE27u
+  rw [← ht₀us, ← htus, this]
+
+/-! ## `(E.28)`: `T = C_S(Z₂(S))` is abelian, gated on the `β` supply
+
+BG closes Proposition E.4 by contradiction: were `T` non-abelian, the minimal `k` with
+`T/H_k` non-abelian and the maximal `i`, `j` of `(E.25)` produce `⁅wᵢ, wⱼ⁆ ∈ H_{k-1} − H_k`,
+whose `α`- and `β`-eigenvalues `(E.26)`/`(E.27)` are computed two ways, forcing `t₀ = t`
+against `(E.21)`.
+
+Everything below the `β` supply is now assembled: the α relation is the *proved*
+`dvd_sub_mul_eigenvalues_chain`, the index extraction is `exists_commutator_indices_chain`,
+the bound `k ≤ q − 1` is `add_two_le_of_iterCommutator_ne_bot`, and the passage to `t₀ = t`
+is `eq_of_chain_eigenvalue_relations_intCast`.  The single remaining input is BG's `(E.23)`
+`wₐ^β ≡ wₐ^{t₀tᵃ} (mod Hₐ₊₁)` — taken here as `hβsupply` — which the Case A/B argument
+(issue 3021, session (43)) establishes.  Discharging `hβsupply` closes the abelian clause of
+Proposition E.4. -/
+
+/-- **BG Proposition E.4, abelian clause, gated on `(E.23)`**: `⁅T, T⁆ = ⊥`.
+
+Given `α`'s chain data (`hr`/`hr₀`, with `(E.20)`'s `r₀ = r`, `(E.9)`'s `r^q ≡ 1`, `(E.11)`'s
+`r ≢ 1`) and, as a *hypothesis*, a `β`-side eigenvalue supply `hβsupply` scaling each live
+`Hₐ` by `t₀ tᵃ` (BG's `(E.23)`), with `t, t₀` units and `t ≢ t₀` (`(E.21)`), the centralizer
+`T = C_S(Ω₁(Z₂(S)))` is abelian.
+
+The proof is BG's contradiction verbatim: extract `k, i, j` once, run the `α` computation
+(`dvd_sub_mul_eigenvalues_chain`) and the `β` computation (`dvd_sub_mul_of_chain_supply`) at
+those indices, bound `k` by `q − 1`, and conclude `t₀ ≡ t` — impossible by `(E.21)`. -/
+theorem RegularOperatorSetup.commutator_centralizer_eq_bot_of_beta_supply [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) (hcard4 : p ^ 4 ≤ Nat.card ↥(Omega R p 1))
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) (Omega R p 1))
+    {a : B} (ha : a ∈ hyp.A)
+    {v : ↥(Omega R p 1)} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf (Omega R p 1))
+    {w : ↥(Omega R p 1)}
+    (hw : w ∈ Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+    (hw1 : w ∉ OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+      (⊤ : Subgroup ↥(Omega R p 1)) 1)
+    {r r₀ : ℤ} (hr : (hSinv.restrict ⟨a, ha⟩) v = v ^ r)
+    (hr₀ : ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+        (⊤ : Subgroup ↥(Omega R p 1)) 0,
+      (y ^ r₀)⁻¹ * (hSinv.restrict ⟨a, ha⟩) y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+        (⊤ : Subgroup ↥(Omega R p 1)) 1)
+    (hr0r : (r₀ : ZMod p) = (r : ZMod p)) (hrq : (r : ZMod p) ^ q = 1) (hr1 : (r : ZMod p) ≠ 1)
+    (σβ : ↥(Omega R p 1) →* ↥(Omega R p 1)) {t t₀ : ℤ}
+    (hβsupply : ∀ a : ℕ, OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+        (⊤ : Subgroup ↥(Omega R p 1)) a ≠ ⊥ →
+      ∃ s : ℤ, (s : ZMod p) = (t₀ : ZMod p) * (t : ZMod p) ^ a ∧
+        ∀ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+            (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+            (⊤ : Subgroup ↥(Omega R p 1)) a,
+          (y ^ s)⁻¹ * σβ y ∈ OddOrder.Isaacs.Ch04.iterCommutator
+            (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+            (⊤ : Subgroup ↥(Omega R p 1)) (a + 1))
+    (htu : IsUnit (t : ZMod p)) (ht₀u : IsUnit (t₀ : ZMod p))
+    (htne : (t₀ : ZMod p) ≠ (t : ZMod p)) :
+    ⁅Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)),
+      Subgroup.centralizer
+        (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))⁆ = ⊥ := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hR₀S : hyp.R₀ ≤ Omega R p 1 := hyp.R₀_le_omega
+  have hexp : ∀ x : ↥(Omega R p 1), x ^ p = 1 := hyp.omega_pow_eq_one'
+  have hS3 : 3 ≤ pRank ↥(Omega R p 1) p := hyp.three_le_pRank_omega hcard4
+  by_contra hnonab
+  -- BG's `k`, `i`, `j` from `(E.24)`/`(E.25)`.
+  obtain ⟨k, i, j, _hk3, hi1, hji, hik, hTle, _hknot, hcl, hcr, hwij⟩ :=
+    hyp.exists_commutator_indices_chain hR₀S hexp hS3 hv hw hw1 hnonab
+  -- `(E.26)`: the `α` relation, from the *proved* assembly.
+  have hE26α := hyp.dvd_sub_mul_eigenvalues_chain hR₀S hexp hS3 hSinv ha hv hw hw1 hr hr₀
+    hnonab hi1 hji hik hTle hcl hcr hwij
+  -- `(E.27)`: the `β` relation, from the supply `(E.23)`.
+  have hE27β := dvd_sub_mul_of_chain_supply hyp.p_prime σβ hw (fun y _ => hexp y)
+    hβsupply hnonab hji hik hTle hcl hcr hwij
+  -- `k ≤ q − 1`: `H_{k-1} ≠ 1` since it contains `⁅T, T⁆ ≠ 1`.
+  have hlivek1 : OddOrder.Isaacs.Ch04.iterCommutator
+      (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
+      (⊤ : Subgroup ↥(Omega R p 1)) (k - 1) ≠ ⊥ :=
+    fun h => hnonab (le_bot_iff.mp (hTle.trans (le_of_eq h)))
+  have hmq : (k - 1) + 2 ≤ q := hyp.add_two_le_of_iterCommutator_ne_bot hcard4 hlivek1
+  -- `(E.28)`: the two relations force `t₀ ≡ t`, against `(E.21)`.
+  rw [hr0r] at hE26α
+  exact htne (eq_of_chain_eigenvalue_relations_intCast hyp.q_prime hrq hr1 htu ht₀u
+    hji (by omega) hmq hE26α hE27β)
+
 end OddOrder.BG.AppE
