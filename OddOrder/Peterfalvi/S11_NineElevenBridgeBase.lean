@@ -232,6 +232,45 @@ theorem sOf_subset_inducedKernelFamily_bot [Finite G] {M : Subgroup G}
   OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subset_inducedKernelFamily_bot
     (sOf_subset_inducedNonKernelFamily hG hM data Y hx)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **A nonempty degree cut of `𝒮(Y)` has at least two members** — the `h2` input of
+`sOf_degreeSubfamily_coherent`, from mere nonemptiness.
+
+`G` has odd order, so no member of the `⊥`-kernel induced family is real
+(`S08.inducedKernelFamily_hasNoRealCharacters`); the cut is conjugation-closed
+(`irrCut_conjClosed`, degrees being natural numbers).  So `φ` and `φ̄` are two *distinct* members.
+
+⚠ This is what lets the §9 route match §13's: §13 obtains its base coherence from the §10 μ-grid
+engine with only an existence witness, while the (8.15.3) + (5.7) route of issue 1045 asks for
+`2 ≤ ncard`.  The gap was apparent — for a conjugation-closed family in odd order the two are the
+same condition. -/
+theorem irrCut_two_le_ncard [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
+    (hne : {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.Nonempty) :
+    2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard := by
+  classical
+  haveI := derivedInG_subgroupOf_normal M
+  obtain ⟨φ, hφ⟩ := hne
+  have hφc := irrCut_conjClosed data Y d hφ
+  have hne' : φ ≠ φ.conj := fun h =>
+    OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
+      (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M)
+      (sOf_subset_inducedKernelFamily_bot hG hM data Y hφ.1) h.symm
+  have hfin : {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+      IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.Finite :=
+    (sOf_finite data Y).subset fun _ hx => hx.1
+  have hsub : ({φ, φ.conj} : Set (ClassFunction ↥M ℂ)) ⊆
+      {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
+        IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))} := by
+    rintro x (rfl | rfl)
+    · exact hφ
+    · exact hφc
+  have hpair : ({φ, φ.conj} : Set (ClassFunction ↥M ℂ)).ncard = 2 := by
+    rw [Set.ncard_pair hne']
+  exact hpair ▸ Set.ncard_le_ncard hsub hfin
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Uniform-degree member differences are `A₀`-supported, at §9 level** (the `hsuppdiff` input of

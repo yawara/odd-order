@@ -1177,6 +1177,27 @@ full build green (4566 jobs)、AxiomsCheck OK、sorry 14 (非退行 — 全て�
 
 ⟹ **issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) は完了**。
 
+#### ⭐ 完了 (2026-07-20): `h2` (`2 ≤ ncard`) も discharge — 残パラメータは (8.15) の Dade データだけ
+
+`S11.irrCut_two_le_ncard` + `S11.caseA_irrCut_two_le_ncard`。⚠ **本 issue が繰り返し
+「honest な露出」と記録してきた `h2` は、実は露出不要だった**:
+
+- 次数 cut は共役閉 (`irrCut_conjClosed`) で、奇数位数ゆえ実指標が無い
+  (`S08.inducedKernelFamily_hasNoRealCharacters`) ⟹ `φ ≠ φ̄` が常に成り立つ。
+  **共役閉族では「非空」と「2 元以上」は同値**。
+- しかも非空自体が (9.8.d) の厳密 count から出る: 下界 `(p−1)·[U:U′]` が正
+  (`caseA_character_count_exact`、§9 level)、`sOf_antitone` で `H₀U′ → H₀C′` に降ろす。
+
+これは **§13 が `caseA_coherent_sOf_H0Cprime_of_refuter` の中でやっているのと同じ経路**で、
+全ステップ §9 level。§13 が存在 witness だけで base coherence を得るのに §9 の (8.15.3)+(5.7)
+経路が `2 ≤ ncard` を要求する、という差は見かけだけだった。
+
+⟹ endpoint を改名・整理: `sOf_nineEleven_coherent_of_count` → **`S11.nineEleven_coherent`**、
+`typeII_sOf_nineEleven_coherent` → **`S11.typeII_nineEleven_coherent`**。
+**残るパラメータは Hypothesis (8.15) そのものだけ** — Dade datum `dd` と pin `hdd`、
+および `h46` と書籍の `K = M′` / `H = M_σ` / `τ` を名指しする pin (`hKeq`/`hHeq`/`hconj`/`htau`)。
+未完の数学はゼロ。
+
 ## 着手順 (残り)
 
 1. **§9 レベルの (9.11) statement を立てる** — `(data : TypesIIIIIIVSetup M)`

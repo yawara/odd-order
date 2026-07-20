@@ -598,6 +598,46 @@ def CaseANormBound [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
         (caseASFour data chief S₂).ncard ≤ N
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The degree-`qa` base subfamily of `𝒮(H₀C′)` has at least two members** — the `h2` input of
+`sOf_nineEleven_coherent`, discharged.
+
+The (9.8.d) count is exact and its lower bound `(p−1)·[U:U′]` is positive (`p` prime,
+`0 < u ≤ [U:U′]`), so the degree-`qa` irreducible cut of `𝒮(H₀U′)` is nonempty
+(`caseA_character_count_exact`); `sOf_antitone` along `H₀C′ ≤ H₀U′` moves the witness into
+`𝒮(H₀C′)`, and `irrCut_two_le_ncard` doubles it with its conjugate.
+
+This is the same route §13 takes inside `S13.caseA_coherent_sOf_H0Cprime_of_refuter`, which is why
+the §9 chain need not expose `h2` after all — every input on it is §9-level and type-free. -/
+theorem caseA_irrCut_two_le_ncard [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
+      IsIrreducibleCharacter φ ∧
+      ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))}.ncard := by
+  classical
+  -- positivity of the (9.8.d) lower bound `(p−1)·[U:U′]`
+  have hp1 : 0 < chief.p - 1 := Nat.sub_pos_of_lt chief.p_prime.one_lt
+  have hrel : 0 < (uprimeSub data).relIndex data.U :=
+    lt_of_lt_of_le (u_odd hG chars).pos (u_le_relIndex_uprimeSub_U chars)
+  have hNpos := lt_of_lt_of_le (Nat.mul_pos hp1 hrel) (caseA_character_count_exact hG caseA)
+  have hne : {χ ∈ sOf data (chief.H0 ⊔ uprimeSub data) | IsIrreducibleCharacter χ ∧
+      χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.Nonempty := by
+    refine Set.nonempty_of_ncard_ne_zero ?_
+    intro h0
+    rw [h0, Nat.zero_mul] at hNpos
+    exact absurd hNpos (lt_irrefl 0)
+  -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′`)
+  have hle : chief.H0 ⊔ cprimeSub data chief ≤ chief.H0 ⊔ uprimeSub data := by
+    refine sup_le_sup_left ?_ chief.H0
+    change derivedInG (cSub data chief) ≤ derivedInG data.U
+    rw [derivedInG_eq_commutator (cSub data chief), derivedInG_eq_commutator data.U]
+    exact Subgroup.commutator_mono (cSub_le_U data chief) (cSub_le_U data chief)
+  obtain ⟨φ, hφ, hφirr, hφdeg⟩ := hne
+  exact irrCut_two_le_ncard hG hM data (chief.H0 ⊔ cprimeSub data chief) (data.q * caseA.a)
+    ⟨φ, sOf_antitone data hle hφ, hφirr, hφdeg⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.2), the two-summand inertia inputs, at §9 level** — the §9 form of
 `S13.caseA_two_summand_inertia_inputs`: at the equality configuration there are `K₁, K₂` of
 relative index `a` in `U` with `C = K₁ ⊓ K₂` (whence `u ≤ a²`).

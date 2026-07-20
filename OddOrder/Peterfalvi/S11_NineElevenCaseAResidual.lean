@@ -877,11 +877,11 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 (9.5) — and hence **valid for types II, III and IV alike**, exactly as the book states it.
 
 This is `sOf_nineEleven_coherent` with its last honest carrier `hrefuteEq` supplied by
-`caseA_equalityRefutation`.  What remains parametric is not open mathematics: `dd`/`hdd` are the
-(8.15) Dade datum and its pin to the (4.6) restriction, and `h2` is the `2 ≤ ncard` count that
-(9.8.d) supplies only as existence (the same honest exposure as
-`S15.Hypothesis.sSetIrrDeg_coherent`). -/
-theorem sOf_nineEleven_coherent_of_count [Finite G] {M : Subgroup G} {A : Set G}
+`caseA_equalityRefutation`, and its `2 ≤ ncard` count `h2` by `caseA_irrCut_two_le_ncard`.
+**What remains parametric is exactly Hypothesis (8.15)**: the Dade datum `dd` with its pin `hdd`
+to the (4.6) restriction, and `h46` with the pins `hKeq`/`hHeq`/`hconj`/`htau` naming the book's
+`K = M'`, `H = M_σ` and `τ`. -/
+theorem nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief)
@@ -897,18 +897,15 @@ theorem sOf_nineEleven_coherent_of_count [Finite G] {M : Subgroup G} {A : Set G}
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
     (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
     (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
-    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm)
-    (h2 : ∀ caseA : CliffordCaseAData chars,
-      2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) ∧
-        IsIrreducibleCharacter φ ∧
-        ((φ : ↥M → ℂ) 1 = ((data.q * caseA.a : ℕ) : ℂ))}.ncard) :
+    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         (h46.dade0.restrict Set.subset_union_left hAnorm)
         (h46.tau.restrict Set.subset_union_left hAnorm))
       (sOf data (chief.H0 ⊔ chars.Cprime))
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
-  sOf_nineEleven_coherent hG hM chars h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd h2
+  sOf_nineEleven_coherent hG hM chars h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd
+    (fun caseA => caseA_irrCut_two_le_ncard hG hM caseA)
     (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq hconj htau hKsupp hVsub)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -922,10 +919,9 @@ the §10 packaging; with `typesIIIIIIVSetup_of_isTypeII` building Hypothesis (9.
 is just an instantiation of the type-free `sOf_nineEleven_coherent_of_count`.
 
 The chief factor `chief` is Hypothesis (9.4) — `exists_chiefFactorData` produces one for any
-`TypesIIIIIIVSetup`, with no type hypothesis.  The remaining inputs are the (8.15)/(4.6) Dade data
-(`h46`, `dd`/`hdd` and their pins), exactly as in the type III/IV route, plus the `2 ≤ ncard` count
-that (9.8.d) supplies only as existence. -/
-theorem typeII_sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
+`TypesIIIIIIVSetup`, with no type hypothesis.  The remaining inputs are exactly the (8.15)/(4.6)
+Dade data (`h46`, `dd`/`hdd` and their pins), the same as on the type III/IV route. -/
+theorem typeII_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (htypeII : OddOrder.GroupTheory.IsTypeII M)
     (chief : ChiefFactorData (typesIIIIIIVSetup_of_isTypeII hM htypeII))
@@ -941,16 +937,7 @@ theorem typeII_sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
     (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
     (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
-    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm)
-    (h2 : ∀ caseA : CliffordCaseAData (mkSection11CharacterData
-        (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)),
-      2 ≤ {φ : ClassFunction ↥M ℂ |
-        φ ∈ sOf (typesIIIIIIVSetup_of_isTypeII hM htypeII)
-            (chief.H0 ⊔ cprimeSub (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief) ∧
-        IsIrreducibleCharacter φ ∧
-        ((φ : ↥M → ℂ) 1
-          = (((typesIIIIIIVSetup_of_isTypeII hM htypeII).q * caseA.a : ℕ) : ℂ))}.ncard) :
+    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         (h46.dade0.restrict Set.subset_union_left hAnorm)
@@ -958,9 +945,9 @@ theorem typeII_sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (sOf (typesIIIIIIVSetup_of_isTypeII hM htypeII)
         (chief.H0 ⊔ cprimeSub (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief))
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
-  sOf_nineEleven_coherent_of_count hG hM
+  nineEleven_coherent hG hM
     (mkSection11CharacterData (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau))
-    h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd h2
+    h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd
 
 end OddOrder.Peterfalvi.S11

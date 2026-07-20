@@ -11712,8 +11712,8 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `TypesIIIIIIVSetup` + `ChiefFactorData` + `Section11CharacterData` — Hypotheses (9.2), (9.4),
 -- (9.5) — hence **valid for types II, III and IV alike**, as the book states it.  What stays
 -- parametric is not open mathematics: `dd`/`hdd` are the (8.15) Dade datum and its pin to the
--- (4.6) restriction, and `h2` is the `2 ≤ ncard` count that (9.8.d) supplies only as existence.
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent_of_count
+-- (4.6) restriction — the `2 ≤ ncard` count is discharged by `caseA_irrCut_two_le_ncard`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineEleven_coherent
 -- **Hypothesis (9.2) at the full II/III/IV span** (issue 1045).  The (8.6) nontrivial core for
 -- type II (`TypeIIData.common`, transferred) was missing, which is why the §9 setup — and with it
 -- (9.4), (9.5) and (9.11) — was reachable only through the §10 packaging's `IsTypeIII ∨ IsTypeIV`.
@@ -11729,4 +11729,14 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- item 3 asked for.  Hypothesis (9.2) from `TypeIIData`, (9.4) from `exists_chiefFactorData`
 -- (type-free), (9.5) from `mkSection11CharacterData`; the coherence is then the type-free
 -- `sOf_nineEleven_coherent_of_count`.
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeII_sOf_nineEleven_coherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeII_nineEleven_coherent
+-- **A nonempty degree cut of `𝒮(Y)` has two members** — conjugation-closure (`irrCut_conjClosed`)
+-- plus odd order (no real characters).  This is what removes the `h2` exposure from the §9 (9.11):
+-- §13 reaches its base coherence with an existence witness, and for a conjugation-closed family in
+-- odd order that is the same condition.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.irrCut_two_le_ncard
+-- **The degree-`qa` base subfamily of `𝒮(H₀C′)` has two members** — the exact (9.8.d) count has a
+-- positive lower bound `(p−1)·[U:U′]`, so the cut of `𝒮(H₀U′)` is nonempty; `sOf_antitone` along
+-- `H₀C′ ≤ H₀U′` moves the witness down.  Same route as inside
+-- `S13.caseA_coherent_sOf_H0Cprime_of_refuter`, every step §9-level.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_irrCut_two_le_ncard
