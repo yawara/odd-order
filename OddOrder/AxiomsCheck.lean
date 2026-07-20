@@ -11740,3 +11740,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `H₀C′ ≤ H₀U′` moves the witness down.  Same route as inside
 -- `S13.caseA_coherent_sOf_H0Cprime_of_refuter`, every step §9-level.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_irrCut_two_le_ncard
+-- **(9.11) at the `A₀` level** (issue 1045 着手順 3) — the two Clifford branches before the descent
+-- to `A(M)`.  Both run on `A₀ = A ∪ V^M` because case (a)'s (5.6) engine takes `h46.dade0`, and
+-- `(M')^# ⊆ A` is false for the type-uniform `A(M) = typePACore`.  This is the level at which the
+-- §11/§13 packaging states (9.11): `hyp.base.A0` / `hyp.base.tau` are definitionally this support
+-- and this map.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent_A0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineEleven_coherent_A0

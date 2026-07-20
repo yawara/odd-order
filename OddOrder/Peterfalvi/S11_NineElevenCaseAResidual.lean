@@ -950,4 +950,37 @@ theorem typeII_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau))
     h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11) at the `A₀` level, with the case (9.7.a) residual discharged.**
+
+`nineEleven_coherent` is this composed with the descent `sOf_coherent_restrict` to `A(M)`.  The
+`A₀` form is what the §11/§13 packaging states (`S13.coherent_sOf_H0Cprime`, whose `hyp.base.A0`
+and `hyp.base.tau` are definitionally this support and this map), so it is the shape in which the
+type III/IV packaged version becomes a corollary of the §9 argument (issue 1045, 着手順 3). -/
+theorem nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (hKeq : h46.K = huSub data)
+    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hconj : h46.dade0.HConjInvariant)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
+    (hVsub : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V, v ∉ (derivedInG M : Set G))
+    (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
+    (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (sOf data (chief.H0 ⊔ chars.Cprime))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :=
+  sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd
+    (fun caseA => caseA_irrCut_two_le_ncard hG hM caseA)
+    (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq hconj htau hKsupp hVsub)
+
 end OddOrder.Peterfalvi.S11
