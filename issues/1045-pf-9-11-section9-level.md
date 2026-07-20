@@ -1223,6 +1223,38 @@ full build green (4566 jobs)、AxiomsCheck OK、sorry 14 (非退行 — 全て�
    (`S11_NineElevenCaseA` / `_AlphaBound` / `_PairAdjoin` の (9.11) 部分、計 ~3.8k 行) が dead code
    になるので削除。
 
+#### ⭐⭐ 完了 (2026-07-20): 着手順 3 — **§13 の (9.11) が §9 の系になった**
+
+`S13.coherent_sOf_H0Cprime_of_section9` を新設し、`S13.coherent_sOf_H0Cprime` の証明を
+**`S11.nineEleven_coherent_A0` への 1 行の委譲**に置換 (signature 不変 ⟹ 下流無変更)。
+
+4 stage すべて landed:
+
+| Stage | 内容 |
+|---|---|
+| 1 | `S11.sOf_nineEleven_coherent_A0` / `S11.nineEleven_coherent_A0` — §13 の結論は A₀ level なので A₀ 版の endpoint を切り出した |
+| 2 | `S10.inducedNonKernelFamily_mono` — `hHeq` (等式) → `hHle` (包含) へ緩和。§13 の `h46.subH` は `M_σ` でなく `M′` ((4.6.c) を `H := K` で立てている) なので等式は成り立たない |
+| 3 | `S10.DadeSupportHypothesisData.restrict` + `ftSupportKernel_congr_of_subset` — §10 は datum を `A₀(M)` 上に持ち、§9 は `A(M)` 上のものを要求する |
+| 4 | 配線。`τ`/`A₀` は **rfl**、`hKeq` は `huSub_eq_derivedInG_subgroupOf`、`hHle` は `Msigma_le_derived`、`hdd` は `rfl` |
+
+⚠ **`hnc`/`htype` の唯一の用途は packaging の辞書 `hyp.C = cSub s11Setup chief`**
+(`C_eq_cSub_of_noncoherent`)。本 issue が §13 の producer を降ろすたびに底で見つけていた
+「1 行の辞書」がそのまま最後に残った形で、§9 の議論自体は型を一度も見ない。
+
+⟹ **issue 1045 の完了条件を満たした**: (9.11) は `TypesIIIIIIVSetup` + `ChiefFactorData` +
+`Section11CharacterData` の上で型仮定なしに述べられ、型 III/IV 版 (§13 packaging) はその系。
+型 II 版も同様 (`S11.typeII_nineEleven_coherent`)。
+
+### ⛏ 残: §13 の重複チェーンの棚卸し
+
+`coherent_sOf_H0Cprime` が §9 経由になったので、旧 §13 チェーン
+(`coherent_sOf_H0Cprime_of_sevenEightRefutation` / `_of_equality_refutation` /
+`nineElevenSevenEightRefutation` / `nineElevenEqualityRefutation_of_sevenEightRefutation` /
+`nineElevenPairBound` と `S11_NineElevenCaseA` / `_AlphaBound` / `_PairAdjoin` の該当部分、
+計 ~3.8k 行) は **同じ命題の 2 本目の証明**になった。削除の可否は
+**宣言ごとに外部 consumer を grep してから**判断する (§15 の S/T ミラーが実体を cite している
+可能性あり — docstring 参照だけなら削除可)。⚠ 本 session では実施しない。
+
 ## 着手順 (残り)
 
 1. **§9 レベルの (9.11) statement を立てる** — `(data : TypesIIIIIIVSetup M)`

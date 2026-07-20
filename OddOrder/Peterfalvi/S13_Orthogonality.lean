@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_CoreStructure
+import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
 import OddOrder.Peterfalvi.S11_NineElevenAlphaBound
 import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
@@ -1189,12 +1190,69 @@ theorem coherent_sOf_H0Cprime_of_sevenEightRefutation [Finite G]
     hnc htype
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (9.11) for the §11/§13 packaging, derived from the §9 argument** (issue 1045
+着手順 3) — this is what makes `coherent_sOf_H0Cprime` a corollary of `S11.nineEleven_coherent_A0`
+rather than of the §13 chain `nineElevenPairBound` / `nineElevenSevenEightRefutation`.
+
+Every input is definitional or an existing §10/§12 lemma:
+
+* `τ` and `A₀` — `hyp.base.tau` *is* `dadeIntegralCharacterMap h46.dade0 h46.tau` and
+  `hyp.base.A0` *is* `supportInSubgroup (A(M) ∪ V^M) M`, since `toHypothesis46` stores
+  `dade0 := hyp.dadeData.dade` and `tau := …fullDadeIsometryData hyp.hconj` and `tic_V` is `rfl`;
+* `hKeq` — `h46.K` is the `typePData_toS06Hypothesis` field `(M')^{subgroupOf}`, and
+  `S11.huSub_eq_derivedInG_subgroupOf` says `HU = M'`;
+* `hHle` — `h46.subH` is *also* `M'` here ((4.6.c) is instantiated at `H = K`), and the §9 chain
+  needs only `M_σ ≤ H` (`Msigma_le_derived`; the pin was relaxed for exactly this reason);
+* `dd`/`hdd` — `hyp.base.dadeData` lives on `A₀(M)`, so it is restricted to `A(M)` by
+  `S10.DadeSupportHypothesisData.restrict` with (8.16) `normalizer_typePA_eq`;
+* `hKsupp`/`hVsub` — `mderivSharp_subset_A0` and `typePData_typePV_not_mem_derived`.
+
+⚠ The **only** use of `hnc`/`htype` is the packaging dictionary `hyp.C = cSub s11Setup chief`
+(`C_eq_cSub_of_noncoherent`), needed to see `H₀C′ = H₀ ⊔ C′` as the §9 family's index.  That is
+precisely the "one-line dictionary" this issue kept finding at the bottom of every §13 producer:
+the §9 argument itself never looks at the type. -/
+theorem coherent_sOf_H0Cprime_of_section9 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
+    (htype : IsTypeIII M ∨ IsTypeIV M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+      (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
+  haveI := hyp.base.finiteG
+  classical
+  have hCeq : hyp.C = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief :=
+    C_eq_cSub_of_noncoherent hG hyp hnc htype
+  have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.base.typeP →
+      (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.base.typeP := fun l a ha =>
+    ((Subgroup.mem_set_normalizer_iff).mp (hyp.base.le_normalizer_typePA l.2) a).mp ha
+  have := OddOrder.Peterfalvi.S11.nineEleven_coherent_A0 hG hyp.base.maximal
+    (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)
+    (hyp.base.toHypothesis46 hG hG.odd)
+    (OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf hyp.s11Setup).symm
+    (Subgroup.subgroupOf_mono M (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.base.maximal))
+    hyp.base.hconj rfl hnorm hyp.base.mderivSharp_subset_A0
+    (fun v hv => OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.base.typeP hv)
+    (hyp.base.dadeData.restrict Set.subset_union_left hnorm
+      (OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq hG hyp.base)) rfl
+  have hH0C' : hyp.H0Cprime
+      = hyp.chief.H0 ⊔ (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).Cprime := by
+    change hyp.chief.H0 ⊔ derivedInG hyp.C = _
+    rw [hCeq]
+    rfl
+  rw [hH0C']
+  exact this
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11)** (Coq `Ptype_core_coherence`, `PFsection9.v:1484`): the family
 `𝒮(H₀C′)` is coherent, **parametrized on the (11.3) non-coherence** `hnc` and the type
 disjunction `htype` (instantiate with `S_H0C_not_coherent_unconditional` / `hyp.type_alt`
 downstream; issue 9087).  The (9.11.7)–(9.11.8) coherent-pair construction
-(`nineElevenSevenEightRefutation`, issue 9083 Phase E-final) discharges the `h78`
-hypothesis of `coherent_sOf_H0Cprime_of_sevenEightRefutation`. -/
+**Proved via the §9 argument** (`coherent_sOf_H0Cprime_of_section9`, issue 1045 着手順 3): the
+underlying mathematics is `S11.nineEleven_coherent_A0`, which carries no type hypothesis at all.
+The older §13 route (`coherent_sOf_H0Cprime_of_sevenEightRefutation` +
+`nineElevenSevenEightRefutation`, issue 9083 Phase E-final) proves the same statement and is kept
+for now; the two differ only in packaging. -/
 theorem coherent_sOf_H0Cprime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]
@@ -1203,9 +1261,7 @@ theorem coherent_sOf_H0Cprime [Finite G]
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) :=
-  coherent_sOf_H0Cprime_of_sevenEightRefutation hG hyp
-    (fun caseA => nineElevenSevenEightRefutation hG hyp caseA hnc htype)
-    hnc htype
+  coherent_sOf_H0Cprime_of_section9 hG hyp hnc htype
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.8), witness form.**  The `∃ ζ` shape consumed by (11.9.b)
@@ -1239,5 +1295,6 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
       (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
   exact ⟨ζ, hζS, hζirr, hζdeg,
     zeta_residual_not_orthogonal_H0C_of_refuter hG hyp htype hM2 hHcard hrefute hζS hζirr hζdeg⟩
+
 
 end OddOrder.Peterfalvi.S13

@@ -11759,3 +11759,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `ftSupportKernel` branches only on `C_G(x) ⊄ M` once `x` is known to lie in the support.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftSupportKernel_congr_of_subset
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.DadeSupportHypothesisData.restrict
+-- ⭐ **Peterfalvi (9.11) for the §11/§13 packaging, derived from the §9 argument** (issue 1045
+-- 着手順 3).  `coherent_sOf_H0Cprime` is now this, not the §13 chain: `hyp.base.tau`/`hyp.base.A0`
+-- *are* the §9 map and support definitionally, `h46.K` and `h46.subH` are both `M'` (so the
+-- relaxed `hHle` applies via `Msigma_le_derived`), and the §10 datum on `A₀(M)` restricts to
+-- `A(M)` by `S10.DadeSupportHypothesisData.restrict` + (8.16).  The **only** use of
+-- `hnc`/`htype` left is the packaging dictionary `hyp.C = cSub s11Setup chief`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_section9
