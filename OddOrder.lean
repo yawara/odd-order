@@ -419,6 +419,7 @@ import OddOrder.BG.AppE_CollectionFormula
 import OddOrder.BG.AppE_FurtherResults
 import OddOrder.BG.AppE_ExponentP
 import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField

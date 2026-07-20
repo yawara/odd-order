@@ -34,12 +34,27 @@
 > (登録して job 数 4528 → 4532 で実測確認、幸い green だった)。
 > ⟹ **合流のたびに `git diff --name-only main...<lane>` の新規 `.lean` を拾い、
 > `OddOrder.lean` からの到達性を確認する**。未登録なら hub が import を追加してから gate を回す。
-> 全数監査は次の 1 行 (orphan 0 が正常):
-> ```
-> python3 - <<'EOF'  # OddOrder/** の全 leaf のうち誰からも import されないものを列挙
-> ... (実装は本 tick の hub 手順を参照; AxiomsCheck は例外)
+> 全数監査は次のスクリプト (orphan 0 が正常)。**⚠ 2026-07-20 21:40 tick で再発**したので
+> placeholder でなく実行可能な形で置く — 前回この欄が「実装は本 tick の手順を参照」だったため
+> 次 tick で実行されず、c の `AppE_SemidirectFrattini.lean` (289 行) が同じ経路をすり抜けた:
+> ```bash
+> python3 - <<'EOF'
+> import re, pathlib
+> imp = lambda p: re.findall(r'^import\s+(OddOrder[\w.]*)', p.read_text(), flags=re.M) if p.exists() else []
+> seen, stack = set(), imp(pathlib.Path('OddOrder.lean'))
+> while stack:
+>     m = stack.pop()
+>     if m in seen: continue
+>     seen.add(m); stack += imp(pathlib.Path(m.replace('.', '/') + '.lean'))
+> allm = {str(p)[:-5].replace('/', '.') for p in pathlib.Path('OddOrder').rglob('*.lean')}
+> orph = sorted(allm - seen)
+> print(f"reachable {len(seen)} / total {len(allm)}  ORPHANED={len(orph)}")
+> for o in orph: print("   ", o)
 > EOF
 > ```
+> **判定のコツ**: 配線漏れは *jobs 数* に出る。マージ後のフルビルドが **前 tick と同じ jobs 数**で
+> 数秒で green を返したら、新 leaf は 1 行も elaborate されていない (2026-07-20 の実測: 4564 jobs /
+> 1.3s で green → import 追加後 4565 jobs)。**「green だった」を通過根拠にしない**。
 >
 > **🛑 2026-07-19 hub tick への追加検査 (issue 0131): レーン停止の検出**。
 > レーンが「main 同期直後の clean 状態」で `ScheduleWakeup` を呼ばずに turn を終え、**黙って止まる**
@@ -48,6 +63,21 @@
 > `git log` の最終 commit 時刻だけでは「大きめのコミットを書いている最中」と区別できない
 > (c は 21:00 時点では実際に生きていた)。transcript が ~20 分以上止まっていれば停止と判定し、
 > **報告する** (unsupervised レーンへ hub からメッセージは送れない = 再開はユーザー操作)。
+>
+> **⚠ 2026-07-20 21:36 追記 — transcript mtime 単独では偽陽性が出る**。この tick で b の
+> `-home-ywr-odd-order-b/*.jsonl` は **68 時間前 (07-18 01:15)** で止まっていたが、b は 21:22 に
+> commit しており**実際には生きていた**。原因は b が **VS Code 拡張 (`.vscode-server/extensions/
+> anthropic.claude-code-*`) 経由**で走っており、transcript が標準の project dir に落ちないこと。
+> ⟹ **停止判定は 3 点を突き合わせる**。1 つでも新しければ生存:
+> ```bash
+> # (1) transcript mtime   (2) 直近 commit 時刻   (3) worktree を cwd に持つ生きたプロセス
+> for l in a b c; do git log -1 --format="$l %ci %s" $l | cut -c1-90; done
+> for pid in $(pgrep -f 'claude|codex'); do cw=$(readlink /proc/$pid/cwd 2>/dev/null)
+>   case "$cw" in *odd-order*) echo "pid=$pid cwd=$cw";; esac; done
+> ```
+> **(3) は cwd が `(deleted)` のものを除く** — 2026-07-06 起動の 14 日物のポーリング残骸
+> (pid 902588, 0% CPU, `until grep … Build completed` の待ちループ) が lane a の worktree に
+> residual として残っており、これを生存の証拠に数えると逆向きの偽陽性になる。
 >
 > **🔢 2026-07-19 hub 裁定 (issue 0130): shared-infra claim をレーン別サブバンドへ — 共有 `SEQUENCE.9000` 凍結**。
 > 2026-07-18 の補強 (`max(SEQUENCE, 実在ファイル最大)+1`) は「main 取り込み済みなら解消する」を前提に

@@ -815,7 +815,7 @@ private theorem pow_two_cyclicAdd_for_shiftedExpansion
 /-- Shift a second-layer field model by the anchor Frobenius.  The inverse of
 the shifted linear equivalence has the conjugate-basis expansion indexed from
 that anchor. -/
-theorem exists_shiftedSecondLinearEquiv_expansion
+theorem exists_shiftedSecondLinearEquiv_expansion_with_shift
     {K : Type uK} {L : Type uL} {V : Type uV}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
@@ -826,10 +826,14 @@ theorem exists_shiftedSecondLinearEquiv_expansion
     letI : Algebra K L := iota.toRingHom.toAlgebra
     let n := finrank (ZMod 2) K
     let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
-    ∃ eTwoShift : V ≃ₗ[ZMod 2] K, ∀ z : K,
-      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
-        ∑ s : Fin n,
-          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
+    ∃ eTwoShift : V ≃ₗ[ZMod 2] K,
+      eTwoShift = eTwo.trans
+        (((FiniteField.frobeniusAlgEquivOfAlgebraic
+          (ZMod 2) K) ^ s₀.val).toLinearEquiv) ∧
+      ∀ z : K,
+        (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
+          ∑ s : Fin n,
+            (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
   letI : Algebra K L := iota.toRingHom.toAlgebra
   let n := finrank (ZMod 2) K
   let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
@@ -837,7 +841,7 @@ theorem exists_shiftedSecondLinearEquiv_expansion
     (FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) K) ^ s₀.val
   let eTwoShift : V ≃ₗ[ZMod 2] K :=
     eTwo.trans sigma.toLinearEquiv
-  refine ⟨eTwoShift, ?_⟩
+  refine ⟨eTwoShift, rfl, ?_⟩
   intro z
   let w : K := sigma.symm z
   have hsigma_apply (x : K) : sigma x = x ^ (2 ^ s₀.val) := by
@@ -872,5 +876,27 @@ theorem exists_shiftedSecondLinearEquiv_expansion
       intro s _hs
       rw [hpow, map_pow]
       rfl
+
+/-- Compatibility projection of
+`exists_shiftedSecondLinearEquiv_expansion_with_shift`, retaining the original
+expansion API while forgetting the exact Frobenius-shift equality. -/
+theorem exists_shiftedSecondLinearEquiv_expansion
+    {K : Type uK} {L : Type uL} {V : Type uV}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [Algebra (ZMod 2) L]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    [NeZero (finrank (ZMod 2) K)]
+    (iota : K →ₐ[ZMod 2] L) (eTwo : V ≃ₗ[ZMod 2] K)
+    (s₀ : Fin (finrank (ZMod 2) K)) :
+    letI : Algebra K L := iota.toRingHom.toAlgebra
+    let n := finrank (ZMod 2) K
+    let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
+    ∃ eTwoShift : V ≃ₗ[ZMod 2] K, ∀ z : K,
+      (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
+        ∑ s : Fin n,
+          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
+  obtain ⟨eTwoShift, _, hexpansion⟩ :=
+    exists_shiftedSecondLinearEquiv_expansion_with_shift iota eTwo s₀
+  exact ⟨eTwoShift, hexpansion⟩
 
 end OddOrder.Higman.Suzuki2Groups

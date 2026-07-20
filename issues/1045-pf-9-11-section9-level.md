@@ -1140,3 +1140,59 @@ support は**明示パラメータ**で取るのが素直 (S15 の honest 版は
 - issue 9163 (hub 裁定 Option B′ + 実測記録)、issue 1044 ((8.18) 型一様化、同型の作業)
 - 書籍 PDF `references/peterfalvi/pdf/04.11_pp_50_57_*.pdf` p.1-3 (= 書籍 p.50-52)
 - `notes/peterfalvi/frontier_measured_2026_07_19.md` §9
+
+## 🔍 hub 内容監査 (2026-07-20 21:45 tick, merge 9b53260a3) — **健全。STOP なし**
+
+`3b98365cb` / `c28cd6ad1` の内容を doneness 基準 (sorry 数でなく「hard content を実証明したか /
+構成不能な仮説へ hoist していないか」) で独立監査した。
+
+**判定: genuine。scaffold 詐称なし・axiom 0・sorry 0・signature 退行なし。**
+
+### 実証明であることの確認
+
+- **`caseA_sThree_coherent`** (`S11_NineElevenCaseAResidual.lean:64-149`) — τ₃ の `Nonempty
+  (IsCoherent …)` を**仮定でなく生成**している。(5.7) engine `S07.uniform_degree_coherence_of_
+  families` の **14 個の義務をすべて discharge** した上で適用。pivot partner は `χ₀.conj` で、
+  `η₂ ≠ η₁` は奇数位数由来の `inducedKernelFamily_hasNoRealCharacters` から導出
+  (`2 ≤ ncard` のような仮説を密輸していない)。`IsCoherent` は等長性・τ との一致・`ZIrr` codomain・
+  非零 span を要求する**実構造**で、自明には inhabit できない。
+- **`caseA_normBound_of_sevenEightRefutation`** (`:167-403`) — **norm bound は導出**。
+  γ = `Ind_{H·U₁}^M 1` は TI-witness から**構成**、ψ₁ は (9.8.d) の count 非零から**抽出**、
+  `N·u = (a+1)u + (q−1)a²` は `‖α‖² = ‖γ‖² + 1` と Mackey norm から**算出**、
+  最後は Bessel count で `|𝒮₄| ≤ N`。posited ではない。
+- **free field に hard content は乗っていない**。`Section11CharacterData` の opaque field のうち
+  新定理が触るのは `chars.u` だけで、それは `u_eq_card_quotient` で pin 済。
+  `chars.tau` / `chars.H0CprimeSupport` は使っていない (τ は `h46.dade0`、A₀ は明示の
+  `supportInSubgroup …`)。
+- **「type 仮説なし」は検証して真**。`Section11CharacterData.C` が `cSub data chief` と
+  **定義的に等しい** (`ChiefFactorCore.lean:647`) ことに乗っている。⚠ setup は書籍 Hyp (9.2) の
+  `type_alt : IsTypeII ∨ IsTypeIII ∨ IsTypeIV` を依然担いでおり、外れたのは III∨IV の**制限**
+  — 意図した一般化そのもの。
+- **Bessel 補題の §13→§07 移設は pure**。両版を抽出して diff → **91 行 byte-identical**
+  (binder・証明スクリプトまで同一)。caller 3 箇所 + AxiomsCheck も追従、`S13.card_le` の残存 0。
+
+### 進捗の正確な言い方 (⚠ hub/レーンともここを誤読しないこと)
+
+> **§9 の (9.11) case-(a) 鎖は、開いた carrier がちょうど 1 本 — `CaseASevenEightRefutation` —
+> と §9 dictionary パラメータに還元された。§9 の閉じた定理にはまだなっておらず、
+> issue 1045 の動機である type-II 拡張には到達していない。**
+
+- `h78 : CaseASevenEightRefutation` は**構成可能性が高い**: §13 側の対応物
+  `S13.nineElevenSevenEightRefutation` (`S11_NineElevenPairAdjoin.lean:893`) が
+  **sorry-free で証明済** (~420 行、projection-budget 論法)。その証明が使う `hncH0C`/`htype` は
+  4 箇所だけで、**4 つとも type-free な §9 counterpart が既にある**
+  (`caseA_nineElevenTwo_tiWitness` / `caseA_two_summand_inertia_inputs` /
+  `caseA_nineElevenThree_count_inputs` / `C_eq_cSub_of_noncoherent` は §9 で定義的)。
+  ⟹ **descent 作業であって未解決数学ではない**。現時点で producer は無い
+  (`CaseASevenEightRefutation` の grep hit は def と本仮説の 2 件のみ)。
+- §9 dictionary 仮説 (`hKeq`/`hconj46`/`htau`/`hKsupp`/`hVsub`) は本 merge で**新設されたものではなく**、
+  既存の `sOf_memberRFamily` / `caseA_pairBound` / `sOf_nineEleven_coherent` が既に担いでいる束。
+  どの call site でも discharge されていないのは、`sOf_nineEleven_coherent` 自体の consumer が 0
+  (FT の live path は依然 §13 の `coherent_sOf_H0Cprime`) だから — 本 merge 以前からの状態。
+
+⟹ **次の自然な frontier = `CaseASevenEightRefutation` の §9 producer** (§13 の証明を
+type-free counterpart 4 本に載せ替える descent)。これを閉じると case-(a) 鎖が §9 で閉じる。
+
+### 些末
+
+- `S11_NineElevenCaseAResidual.lean:404-405` に空行が 2 つ連続 (`end` の直前)。cosmetic。

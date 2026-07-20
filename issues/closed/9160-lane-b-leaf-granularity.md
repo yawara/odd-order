@@ -99,3 +99,38 @@ issue 2048 完了時とする。
 - CLAUDE.md「開発規約 > ファイル粒度」(2026-07-09 明文化、mathlib 実測に基づく)
 - issue 2048 (Suzuki Lemma 5 = b の現 frontier)
 - issue 0124 (逆向きの watch: 1500 行超の分割)
+
+## 📊 再実測 (2026-07-20 21:40 hub tick) — **大半が自然解消。是正作業は不要**
+
+指摘から 2 日で b が中身を埋めた結果、当時の「細切れ leaf」の多くが目安帯 (300–1500 行) に
+成長した。`OddOrder/Higman/**` 全 34 leaf の現況:
+
+| 統計 | 2026-07-18 (指摘時, b の新設 32 本) | **2026-07-20 (Higman 全 34 本)** |
+|---|---|---|
+| 中央値 | 177 行 | **~500 行** |
+| 最大 | 687 行 | **1499 行** (`HigmanLowerCentralSpectrum`) |
+| 300 行未満 | 23 本 | **12 本** |
+| 1500 行超 | 0 | **0** |
+
+成長の実例 (指摘時 → 現在): `AgemoLayers` 129 → **513** / `PairGap` → **1212** /
+`ProperExtension` → **1142** / `LengthTwoModels` → **1170** / `TypeAConclusion` → **1268**。
+frontier の 4 本はいずれも健全帯のど真ん中で、**上限 1500 を超えたものは 1 本も無い**。
+
+### 残る 300 行未満 12 本の内訳 — 統合対象は実質ゼロ
+
+- `HigmanLemmaEleven.lean` (4 行) / `HigmanLemmaTwelve.lean` (5 行) — **pure re-export hub**。
+  CLAUDE.md が明示的に認めた形式 (下流 import を不変に保つ) なので行数目安の対象外。
+- `Suzuki2Groups.lean` (51 行) — 同上の束ね hub。
+- 残り 9 本 (105–284 行) — `CenterHomocyclic` / `CenterInvolutions` / `HigmanAbelian` /
+  `HigmanFrattiniConsequences` / `HigmanEndomorphismLift` / `HigmanNormalAbelian` /
+  `HigmanImageOrder` / `HigmanNormalCover` / `MixedCommutators`。
+  いずれも**トピックとして結束した完結クラスタ**で、既に成長が止まっている (= 追記されない)。
+  CLAUDE.md の粒度基準は「行数でなく**主題の結束**」なので、結束している以上
+  **機械的に併合する理由が無い**。併合は import DAG を太らせるだけで益が無い。
+
+⟹ **hub 判断: 本 issue の是正作業 (Lemma 5 締めでの統合) は不要**。b は指摘を受けて
+新 leaf の粒度を実際に改善しており (新設 `LengthTwoModels` は 1170 行)、目的は達成された。
+**close する**。今後 300 行未満の leaf が再び乱立したら新規 issue で扱う。
+
+⚠ 併せて `HigmanLowerCentralSpectrum` (1499) と `HigmanCoverAbelian` (1491) は
+**上限 1500 の直下**なので、b が次に追記するなら新 sibling leaf へ (issue 0124 の watch 対象)。
