@@ -6,3 +6,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientCentralExtension
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedEigenweights
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.AmbientProductCoordinate
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
