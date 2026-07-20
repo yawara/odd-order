@@ -154,6 +154,26 @@ theorem commutator_zpowers_le_of_forall {G : Type*} [Group G] [Finite G] {T : Su
   obtain ⟨k, rfl⟩ := (Submonoid.mem_powers_iff a v).mp (mem_powers_iff_mem_zpowers.mpr ha)
   exact commutator_pow_mem_of_commutator_mem (h b hb) k
 
+/-- A subgroup containing one of **prime** index is either that subgroup or the whole group.
+
+`H.relIndex K * K.index = H.index = p` leaves only `(1, p)` and `(p, 1)`: the first gives
+`K ≤ H` (hence `K = H`), the second `K = ⊤`.
+
+This is the lattice step that pins `chainStepHom`'s kernel: it contains `Hᵢ₊₁`, which has
+prime index `p` in `Hᵢ`, and it is not everything — so it *is* `Hᵢ₊₁`. -/
+theorem eq_or_top_of_index_prime {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    {p : ℕ} (hp : p.Prime) (hidx : H.index = p) : K = H ∨ K = ⊤ := by
+  have hmul : H.relIndex K * K.index = H.index := Subgroup.relIndex_mul_index hHK
+  rw [hidx] at hmul
+  have hdvd : K.index ∣ p := Dvd.intro_left _ hmul
+  rcases (Nat.dvd_prime hp).mp hdvd with h1 | hp'
+  · exact Or.inr (Subgroup.index_eq_one.mp h1)
+  · refine Or.inl (le_antisymm ?_ hHK)
+    refine Subgroup.relIndex_eq_one.mp ?_
+    rw [hp'] at hmul
+    have h1 : H.relIndex K * p = 1 * p := by rw [one_mul]; exact hmul
+    exact Nat.eq_of_mul_eq_mul_right hp.pos h1
+
 /-! ### The hard half of BG's `⟨w̄ᵢ⟩ = H̄ᵢ`, at setup level -/
 
 /-- **BG Theorem E.3(b), Step 2**: for a generator `v` of `R₀`, some `x ∈ Hᵢ` has
