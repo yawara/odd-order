@@ -1125,6 +1125,36 @@ private theorem iterCommutator_le_start {G : Type*} [Group G] {T : Subgroup G} [
   | 0 => le_rfl
   | n + 1 => (iterCommutator_antitone n).trans (iterCommutator_le_start n)
 
+/-- Every term of `iterCommutator T ⊤` is characteristic when `T` is.
+
+This is the point of BG defining the chain by `[R, Hᵢ₋₁]` rather than `[R₀, Hᵢ₋₁]`
+(`commutator_R₀_eq_commutator_top` shows they coincide): `⁅·, ⊤⁆` preserves
+characteristicity, and characteristic subgroups are automatically `A`-invariant, which is
+what (E.9) onwards needs. -/
+theorem characteristic_iterCommutator {G : Type*} [Group G] (T : Subgroup G)
+    [T.Characteristic] :
+    ∀ n, (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n).Characteristic
+  | 0 => ‹T.Characteristic›
+  | n + 1 => by
+      haveI := characteristic_iterCommutator T n
+      rw [OddOrder.Isaacs.Ch04.iterCommutator_succ]
+      infer_instance
+
+/-- **BG Theorem E.3(b), Step 2, (E.9)**: the chain is `A`-invariant.
+
+BG says the series is `A`-invariant without further comment; the reason is that each term is
+characteristic in `S`, and `S` itself is `A`-invariant by hypothesis, so
+`Isaacs.Ch03.IsAInvariant.of_characteristic` applies to the restricted action on `↥S`. -/
+theorem RegularOperatorSetup.isAInvariant_iterCommutator
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
+    (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) (i : ℕ) :
+    IsAInvariant hSinv.restrict
+      (OddOrder.Isaacs.Ch04.iterCommutator
+        (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i) := by
+  haveI := characteristic_iterCommutator
+    (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) i
+  exact IsAInvariant.of_characteristic _
+
 /-- **BG Theorem E.3(b), Step 2, (E.6)**: every factor of the chain has order `p`.
 
 For BG's series `Hᵢ = iterCommutator T ⊤ i`, as long as `Hᵢ ≠ 1` we have

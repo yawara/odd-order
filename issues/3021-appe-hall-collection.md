@@ -496,16 +496,23 @@ BG の「位数 p³ 以下の p 群の検査」が実際に必要な唯一の箇
    - ⬜ 残 (これが (E.9)-(E.12) の本体): `w_i = [w_{i-1}, v]` の鎖上の固有値 `r_i` (E.9)、
      (E.10) `r_i ≢ 1` (Prop 1.5(d) 経由)、(E.12) `r_i ≡ r₀ r^i` (Lemma 4.2(a) 経由)。
 
-### (E.9) 本体に要る配線 (次イテレーションの単位)
+### (E.9) 本体に要る配線
 
-1. **`S` の A-不変性を仮説に足す**。setup は `act : B →* MulAut R` を持つので、
-   `IsAInvariant (hyp.act.comp hyp.A.subtype) S` が自然な形 (`isAInvariant_R₀` と同型)。
-2. A-作用を `↥S` に降ろす (`IsAInvariant` から `↥A →* MulAut ↥S`)。
-   `Isaacs.Ch03.IsAInvariant.toMulAutHom` がまさにこれ。
-3. 鎖 `H_i = iterCommutator T ⊤ i` の A-不変性。`H_i` は `↥S` で characteristic
-   (T が characteristic + `⁅·,⊤⁆` が保存) なので従うはず。
-4. 切断 `H_i/H_{i+1}` (位数 p、`card_iterCommutator_eq`) への誘導作用に
-   `exists_zpow_eq_of_card_eq_prime` を適用 ⟹ `r_i`。
+1. ✅ **`S` の A-不変性を仮説に追加** = `IsAInvariant (hyp.act.comp hyp.A.subtype) S`
+   (`isAInvariant_R₀` と同型の形)。`IsAInvariant.restrict` で `↥A →* MulAut ↥S` に降りる。
+2. ✅ **鎖の characteristic 性** = `characteristic_iterCommutator`。
+   ⚠ **BG が鎖を `[R,H_{i-1}]` 形で定義する見返りがここ**: `⁅·,⊤⁆` は characteristic を
+   保つが `⁅R₀,·⁆` は保たない (`R₀` は `S` で正規でない) — 両形が一致すること自体は
+   `commutator_R₀_eq_commutator_top` で示してあるのに、である。
+3. ✅ **鎖の A-不変性** = `isAInvariant_iterCommutator`
+   (既存の `IsAInvariant.of_characteristic` に流すだけ)。
+4. ⬜ **切断 `H_i/H_{i+1}` への誘導作用**。道具は repo にある:
+   **`Isaacs.Ch03.IsAInvariant.quotientMulAutHom`** (+ `_apply_mk'`) が
+   `IsAInvariant φ N` (N 正規) から `A →* MulAut (G ⧸ N)` を作る。多数の file で使用実績あり。
+   ⚠ ただし要るのは `↥S ⧸ ...` でなく **`↥H_i ⧸ (H_{i+1}.subgroupOf H_i)`** なので、
+   先に `IsAInvariant.restrict` で `↥H_i` に降ろしてから適用する 2 段構え。
+   位数 p は `card_iterCommutator_eq` から。そこに
+   `exists_zpow_eq_of_card_eq_prime` を当てて `r_i` を得る。
 4. Step 3 (極大 `S` + `Ω₁(N_P(S))` の (E.15)-(E.16)) ⟹ **E.3(b) 第 1 節**。
 
 ## ⚠ 2026-07-20 (8): Step 2 の**仮説が BG より弱いまま来ている**
