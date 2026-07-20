@@ -1359,3 +1359,41 @@ BG の残りは全部これ (`S/S'` は `\|S/S'\| = p²` = E.3(b) 第 3 clause �
 
 `AppE` の残 sorry = **E.4 と E.5 の 2 件** (セッション開始時 3 件 = E.3(d)/E.4/E.5)。
 全体 sorry 13 (開始時 14)。フルビルドは hub の合流 gate に委ねる (leaf build green)。
+
+## 2026-07-20 (28): E.4 計画の項 3 — 一般補題は全て揃った (残りは組み立て)
+
+`AppE_AbelianCentralizer.lean` に追加 (すべて一般形、leaf build green):
+
+| 宣言 | 内容 |
+|---|---|
+| `eigenSubgroup` / `mem_eigenSubgroup` | アーベル群の自己同型の `r`-固有空間 (部分群) |
+| ⭐ `map_eigenSubgroup_of_commute` | 可換な自己同型は各固有空間を onto で保つ |
+| `eigenSubgroup_inf_eq_bot` | 指数 p・`p ∤ r-r₀` ⟹ 2 固有空間の交わりは 1 |
+| ⭐ `eigenSubgroup_eq_of_card_prime_sq` | `\|E\| = p²` + 2 直線が位数 p ⟹ **固有空間 = 直線** |
+
+### ⬜ 次 = 項 3 の**組み立て**のみ
+
+一般補題は出揃ったので、残りは `E := ↥S ⧸ commutator ↥S` への具体化と剰余群からの引き戻し:
+
+1. `hcomm` / `hexp` / `hcard = p²` は `isElementaryAbelian_quotient_commutator` +
+   `card_omega_abelianization` から。
+2. `f := hS'inv.quotientMulAutHom α`、`g := hS'inv.quotientMulAutHom β`。
+   可換性は **(E.20) `commutator_eq_bot`** から (`B` アーベル ⟹ 像も可換)。
+3. 2 直線 `L₁ := (R₀.subgroupOf S).map (mk' N)`、`L₂ := T.map (mk' N)`。
+   位数 p は `card_map_R₀_subgroupOf` / `card_map_centralizer`。
+   固有値 `r`, `r₀` は `exists_zpow_of_map_eq_of_isCyclic`
+   (両直線は位数 p ⟹ 巡回、`α`-不変)。
+4. `p ∤ r - r₀` を仮定 ⟹ `eigenSubgroup_eq_of_card_prime_sq` で `eigen (f α) r = L₁`
+   ⟹ `map_eigenSubgroup_of_commute` で `β` が `L₁` を保つ。
+5. **引き戻し**: `Subgroup.comap_map_eq : (H.map f).comap f = H ⊔ f.ker` と
+   `QuotientGroup.ker_mk'` で `comap (mk' N) L₁ = R₀.subgroupOf S ⊔ commutator ↥S`。
+   `β` が `L₁` を保つ ⟹ `β` がこれを保つ。
+6. **ambient へ**: `map_subtype_sup_commutator` (Step 4 leaf) で
+   `(R₀.subgroupOf S ⊔ commutator ↥S).map S.subtype = R₀ ⊔ derivedInG S`
+   ⟹ `act β • (R₀ ⊔ derivedInG S) = R₀ ⊔ derivedInG S` ⟹
+   `frattiniInG_omega_eq_derivedInG` で `frattiniInG` 形にして
+   **(E.18) `not_fixes_sup_frattini_of_not_fixes_R₀` に矛盾**。
+
+⟹ `p ∣ r - r₀`、すなわち **`r ≡ r₀ (mod p)`** = BG の *"Therefore r = r₀"*。
+
+その後は項 4 (`t ≠ t₀`)、項 5 ((E.23))、項 6-7 (組合せ + 最終算術)。
