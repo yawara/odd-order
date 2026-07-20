@@ -122,6 +122,34 @@ theorem frobLin_repr (n : ℕ) (hn : n ≠ 0)
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [LinearMap.smul_apply, frobeniusBasis_apply, frobLin_apply]
 
+/-- **The Frobenius-polynomial normal form (bilinear).**  Every `ZMod 2`-bilinear
+map `M : F × F → F` over `F = GaloisField 2 n` is a Frobenius polynomial
+`M α β = Σ_{i,j} c_{ij} · α^{2^i} · β^{2^j}`.  This is the representation on which
+the mixed-term functional equation `M(λα, μβ) = ν · M(α, β)` acts: the coefficient
+`c_{ij}` is forced to vanish unless `λ^{2^i} μ^{2^j} = ν`. -/
+theorem bilinear_frobenius_repr (n : ℕ) (hn : n ≠ 0)
+    (M : GaloisField 2 n →ₗ[ZMod 2]
+      (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n)) :
+    ∃ c : Fin n → Fin n → GaloisField 2 n, ∀ α β : GaloisField 2 n,
+      M α β = ∑ i : Fin n, ∑ j : Fin n,
+        c i j • ((frobeniusEquiv (GaloisField 2 n) 2 ^ (i : ℕ)) α *
+          (frobeniusEquiv (GaloisField 2 n) 2 ^ (j : ℕ)) β) := by
+  -- Coefficient map `dj j : α ↦ (repr (M α)) j`, `ZMod 2`-linear via `ZMod.map_smul`
+  -- (built additively to avoid the `F`-vs-`ZMod 2` scalar mismatch of `repr`).
+  let djAdd : Fin n → (GaloisField 2 n →+ GaloisField 2 n) := fun j =>
+    (Finsupp.applyAddHom j).comp
+      (((frobeniusBasis n hn).repr.toAddEquiv.toAddMonoidHom).comp M.toAddMonoidHom)
+  let dj : Fin n → (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) := fun j =>
+    { djAdd j with map_smul' := ZMod.map_smul (djAdd j) }
+  refine ⟨fun i j => (frobeniusBasis n hn).repr (dj j) i, ?_⟩
+  intro α β
+  rw [frobLin_repr n hn (M α) β, Finset.sum_comm]
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  have hdj : (frobeniusBasis n hn).repr (M α) j = dj j α := rfl
+  rw [hdj, frobLin_repr n hn (dj j) α, Finset.sum_smul]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  simp only [smul_eq_mul]; ring
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
