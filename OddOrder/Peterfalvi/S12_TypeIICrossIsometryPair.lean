@@ -682,26 +682,26 @@ theorem Hypothesis.supportInSubgroup_sharp_derived_subset_A0 [Finite G] {M : Sub
   left
   exact ⟨hzM', hz1, (z : G), ⟨z.2, hz1⟩, Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
-set_option linter.unusedVariables false in
-set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce Pointwise in
-/-- **The core-order coprimality at the canonical pair** (the `coxTs`-step of Coq
-`FT_Dade_support_disjoint` `part_a2`): the order of an `(M′)^#`-point of the type-`P₁`
-`M = mp.T` is coprime to `|S_F| = |M_σ(S)|` of the type-II member `mp.S`.
+/-- **The core-order coprimality for a nonconjugate pair** (the `coxTs`-step of Coq
+`FT_Dade_support_disjoint` `part_a2`): the order of an `(M′)^#`-point of the type-`P₁` `M` is
+coprime to `|S_F| = |M_σ(S)|` of any maximal `S` not conjugate to `M`.
 
-No (8.17.a) partition is needed at this instance: the type-`P₁` structure collapses the
-FTcore to the σ-Hall — `M′ = M_σ(M)` (Coq `typePfacts`,
-`isTypeP1_derivedInG_eq_Msigma`) — so `|a|` is a `σ(M)`-number, and `σ(M) ∩ σ(S) = ∅`
-for the nonconjugate pair (BG Theorem 13.9, `sigma_disjoint_of_nonconjugate`); both
-`M_σ`'s are Hall, so a common prime divisor would lie in the empty intersection. -/
-theorem typeP_pair_core_order_coprime [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
-    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
-    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
-    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
-    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP) :
-    Nat.Coprime (orderOf a) (Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S)) := by
+No (8.17.a) partition is needed: the type-`P₁` structure collapses the FTcore to the σ-Hall —
+`M′ = M_σ(M)` (Coq `typePfacts`, `isTypeP1_derivedInG_eq_Msigma`) — so `|a|` is a `σ(M)`-number,
+and `σ(M) ∩ σ(S) = ∅` for a nonconjugate pair (BG Theorem 13.9,
+`sigma_disjoint_of_nonconjugate`); both `M_σ`'s are Hall, so a common prime divisor would lie in
+the empty intersection.
+
+⚠ Stated for an arbitrary nonconjugate maximal `S`, not for the canonical `Section16MaximalPairCore`
+(issue 1044 着手順 5).  Neither `S`'s type nor its cyclic data enters: the old signature carried
+`data`/`hSW1`/`hSW2`/`hKstar`/`ha0` and used none of them. -/
+theorem typeP_core_order_coprime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M S : Subgroup G}
+    (hyp : Hypothesis M) (hSmax : S ∈ maximalSubgroups G)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = S)
+    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) :
+    Nat.Coprime (orderOf a) (Nat.card (OddOrder.BG.Ch3.S10.Msigma S)) := by
   classical
   -- the type-`P₁` `M` has `M′ = M_σ(M)` (BG `typePfacts`)
   have hP : OddOrder.BG.Ch4.S14.IsTypeP M :=
@@ -714,12 +714,8 @@ theorem typeP_pair_core_order_coprime [Finite G]
   have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
     OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hyp.maximal hP1
   -- `σ`-disjointness of the nonconjugate pair (BG Theorem 13.9)
-  have hnc : ¬ ∃ g : G, MulAut.conj g • M = mp.S := by
-    rintro ⟨g, hg⟩
-    exact mp.S_T_not_conj ⟨g⁻¹, by
-      rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hT]⟩
-  have hdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.sigma mp.S) :=
-    OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hyp.maximal mp.S_maximal hnc
+  have hdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.sigma S) :=
+    OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hyp.maximal hSmax hnc
   -- a common prime would lie in `σ(M) ∩ σ(S) = ∅`
   by_contra hne
   obtain ⟨q, hqp, hqdvd⟩ := Nat.exists_prime_and_dvd hne
@@ -729,18 +725,17 @@ theorem typeP_pair_core_order_coprime [Finite G]
   have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
     (OddOrder.BG.Ch3.S10.Msigma_isHall hG hyp.maximal).1 q
       (Nat.mem_primeFactors.mpr ⟨hqp, hqa, Nat.card_pos.ne'⟩)
-  have hqb : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma mp.S) :=
+  have hqb : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma S) :=
     hqdvd.trans (Nat.gcd_dvd_right _ _)
-  have hqσS : q ∈ OddOrder.BG.Ch3.S10.sigma mp.S :=
-    (OddOrder.BG.Ch3.S10.Msigma_isHall hG mp.S_maximal).1 q
+  have hqσS : q ∈ OddOrder.BG.Ch3.S10.sigma S :=
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hSmax).1 q
       (Nat.mem_primeFactors.mpr ⟨hqp, hqb, Nat.card_pos.ne'⟩)
   exact (Set.disjoint_left.mp hdisj hqσM) hqσS
 
 set_option linter.unusedVariables false in
 open scoped Classical FiniteInduce Pointwise in
 /-- **Peterfalvi (8.13.b/c4) at the canonical pair, escape-landing exclusion**: an
-`(M′)^#`-point of the type-`P₁` `M = mp.T` whose centralizer **escapes `M`** cannot land in
-a conjugate of the type-II member `mp.S`.
+`(M′)^#`-point of the type-`P₁` `M` whose centralizer **escapes `M`** cannot land in a conjugate of any type-II maximal `S`.
 
 Coq `FTsupport_facts` (b)+(c4) + the (10.7) consumer's `notFrobM`: the escaping `A₀`-point
 has a *unique* supporting maximal `N[a]` (8.13.b), here `= S^g` by `C_G(a) ≤ S^g`; and
@@ -752,17 +747,18 @@ type-`P₁` collapse `M′ = M_σ` puts `a ∈ M_σ(M)^#`, D(4) attaches to the 
 supporting maximal `N₀` with the package clause `IsTypeP2 N₀ → IsTypeF M ∧ …`; the given
 uniqueness pins `N₀ = S^g`, a conjugate of the type-II `S`, hence type `P₂` (Proposition
 16.1(b), `proposition_type_classification`); the fired clause makes `M` type `F` = type I —
-contradicting type III/IV/V (`not_isTypeI_of_isTypeNonI`). -/
-theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
-    (hT : mp.T = M) (hKstar : mp.Kstar = hyp.typeP.W1)
-    {data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup mp.S}
-    (hSW1 : data.typeP.W1 = mp.K) (hSW2 : data.typeP.W2 = mp.Kstar)
-    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M)) (ha0 : a ∈ typePA0 M hyp.typeP)
+contradicting type III/IV/V (`not_isTypeI_of_isTypeNonI`).
+
+⚠ Stated for an arbitrary type-II maximal `S`, not for the canonical `Section16MaximalPairCore`
+(issue 1044 着手順 5): the old signature carried `mp`/`data`/`hSW1`/`hSW2`/`hKstar`/`ha0` and used
+none of them beyond `S`'s type. -/
+theorem typeP_escaping_centralizer_not_le_typeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M S : Subgroup G}
+    (hyp : Hypothesis M) (hSII : IsTypeII S)
+    {a : G} (haM' : a ∈ sharpSubgroup (derivedInG M))
     (hesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
     {g : G} (huniq : ∀ N ∈ maximalSubgroupsContaining
-      (Subgroup.centralizer ({a} : Set G)), N = MulAut.conj g • mp.S) :
+      (Subgroup.centralizer ({a} : Set G)), N = MulAut.conj g • S) :
     False := by
   classical
   -- the type-`P₁` collapse puts `a` in `M_σ(M)^#`
@@ -783,12 +779,12 @@ theorem typeP_pair_escaping_centralizer_not_le_conj_partner [Finite G]
     OddOrder.BG.Ch4.S16.theoremD_msigma_conjugacy_and_centralizers hG hyp.maximal
   obtain ⟨R, -, N₀, hQ, -⟩ := hD4 a haσ hesc
   obtain ⟨hN₀mem, -, -, -, -, -, hP2clause⟩ := hQ
-  have hN₀eq : N₀ = MulAut.conj g • mp.S := huniq N₀ hN₀mem
+  have hN₀eq : N₀ = MulAut.conj g • S := huniq N₀ hN₀mem
   have hN₀max : N₀ ∈ maximalSubgroups G := (mem_maximalSubgroupsContaining.mp hN₀mem).1
   -- `N₀` is a conjugate of the type-II `S`, hence type `P₂` (Proposition 16.1(b))
   have hN₀II : IsTypeII N₀ := by
     rw [hN₀eq]
-    exact isTypeII_pointwise_smul (MulAut.conj g) (section16_S_isTypeII hG mp)
+    exact isTypeII_pointwise_smul (MulAut.conj g) hSII
   obtain ⟨-, hIIiff, -⟩ :=
     OddOrder.BG.Ch4.S16.proposition_type_classification hG hN₀max
   -- fire the (c4)-clause: `M` is type `F` = type I — contradicting type III/IV/V
@@ -804,14 +800,14 @@ landing analysis** (Coq `part_a2` of `FT_Dade_support_disjoint`): no `(M′)^#`-
 type-`P₁` `M = mp.T` is conjugate to an `A(S)`-point of the type-II member `mp.S`.
 
 Suppose `c·a·c⁻¹ = b ∈ A(S)`.  Then `b` is a `(κ(S) ∪ σ(S))′`-element of `S`: its `σ`-part
-dies by the (8.17.a) core-order coprimality (`typeP_pair_core_order_coprime`), its
+dies by the (8.17.a) core-order coprimality (`typeP_core_order_coprime`), its
 `κ`-part because `b ∈ S′` and `S′` complements the cyclic `κ(S)`-Hall `W₁`
 ((8.4)/`typeP_derivedInG_isComplement_kappaHall`).  The `A(S)`-witness `u ∈ M_σ(S)^#`
 commutes with `b`, so BG Lemma 15.1(c) (`uniqueMaximal_of_kappaSigmaCompl_element`, the
 type-generic (8.12)) pins `ℳ(C_G(b)) = {S}`.  If `C_G(a) ≤ M`, then
 `C_G(b) = C_G(a)^c ≤ M^c` forces `M^c = S` — contradicting the pair's nonconjugacy
 (`mp.S_T_not_conj`).  Otherwise `a` escapes `M` while `C_G(a) ≤ S^{c⁻¹}` — killed by the
-(8.13.c4) exclusion (`typeP_pair_escaping_centralizer_not_le_conj_partner`). -/
+(8.13.c4) exclusion (`typeP_escaping_centralizer_not_le_typeII`). -/
 theorem typeP_pair_base_bare_not_isConj [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) {mp : Section16MaximalPairCore G}
@@ -833,7 +829,12 @@ theorem typeP_pair_base_bare_not_isConj [Finite G]
     rw [← hc]
     exact orderOf_injective (MulAut.conj c).toMonoidHom (MulAut.conj c).injective a
   -- `b` is a `(κ(S) ∪ σ(S))′`-element
-  have hcopMσ := typeP_pair_core_order_coprime hG hyp hT hKstar hSW1 hSW2 haM' ha0
+  have hcopMσ := typeP_core_order_coprime hG hyp mp.S_maximal
+    (by
+      rintro ⟨g, hg⟩
+      exact mp.S_T_not_conj ⟨g⁻¹, by
+        rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hT]⟩)
+    haM'
   have hSP : OddOrder.BG.Ch4.S14.IsTypeP mp.S :=
     OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 mp.S_typeP2
   have hW1hall := typePData_W1_isHallSubgroup_kappa hG mp.S_maximal hSP data.typeP
@@ -935,8 +936,8 @@ theorem typeP_pair_base_bare_not_isConj [Finite G]
         exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hN.2
       rw [hB, Set.mem_singleton_iff] at hcN
       rw [← hcN, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
-    exact typeP_pair_escaping_centralizer_not_le_conj_partner hG hyp hT hKstar hSW1 hSW2
-      haM' ha0 hCa huniq
+    exact typeP_escaping_centralizer_not_le_typeII hG hyp (section16_S_isTypeII hG mp)
+      haM' hCa huniq
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (8.18.b), base-point disjointness at the canonical pair** (the

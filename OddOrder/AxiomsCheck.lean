@@ -11766,3 +11766,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `A(M)` by `S10.DadeSupportHypothesisData.restrict` + (8.16).  The **only** use of
 -- `hnc`/`htype` left is the packaging dictionary `hyp.C = cSub s11Setup chief`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_sOf_H0Cprime_of_section9
+-- **(8.17.a) core-order coprimality and the (8.13.c4) escape exclusion, de-specialized**
+-- (issue 1044 着手順 5): both were stated at the canonical `Section16MaximalPairCore` but used
+-- nothing of it beyond "`S` is a maximal not conjugate to `M`" resp. "`S` is of type II" — the
+-- carried `data`/`hSW1`/`hSW2`/`hKstar`/`ha0` were dead weight.  Restated for an arbitrary such
+-- `S`, matching the book's (8.18), with the canonical-pair uses becoming one-line applications.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeP_core_order_coprime
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeP_escaping_centralizer_not_le_typeII
