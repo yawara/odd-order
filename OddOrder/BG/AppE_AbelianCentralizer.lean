@@ -820,4 +820,43 @@ theorem dvd_sub_mul_of_commutator_eigen {G : Type*} [Group G] {p : ℕ} (hp : p.
   dvd_sub_of_zpow_eq_zpow (orderOf_eq_of_pow_eq_one hp hexp hne)
     ((commutatorElement_zpow_mul_zpow_mul hu huv hv hz m n).symm.trans hsigma)
 
+/-! ## `(E.24)`: nothing sits strictly between `H_k` and `H_{k-1}`
+
+BG: *"Take `k` minimal such that `T/H_k` is not abelian.  Then `⁅H₀,H₀⁆H_k = T'H_k =
+H_{k-1}`."*  Minimality gives `T' ≤ H_{k-1}` (as `T/H_{k-1}` *is* abelian) and `T' ⊄ H_k`,
+so `T'H_k` sits strictly above `H_k` inside `H_{k-1}` — and the section `H_{k-1}/H_k` has
+order `p`, so there is no room. -/
+
+/-- A subgroup strictly above `K` and inside an overgroup `L` with `|L| = p·|K|` *is* `L`.
+
+`|K| ∣ |X| ∣ |L| = p|K|` leaves only `|X| = |K|` or `|X| = |L|`, and the first is excluded
+by `K < X`. -/
+theorem eq_of_lt_of_le_of_card_eq_prime_mul {G : Type*} [Group G] [Finite G] {p : ℕ}
+    (hp : p.Prime) {K X L : Subgroup G} (hcard : Nat.card ↥L = p * Nat.card ↥K)
+    (hKX : K < X) (hXL : X ≤ L) : X = L := by
+  obtain ⟨a, ha⟩ : Nat.card ↥K ∣ Nat.card ↥X := Subgroup.card_dvd_of_le hKX.le
+  obtain ⟨b, hb⟩ : Nat.card ↥X ∣ Nat.card ↥L := Subgroup.card_dvd_of_le hXL
+  have hKpos : 0 < Nat.card ↥K := Nat.card_pos
+  have hlt : Nat.card ↥K < Nat.card ↥X :=
+    Set.Finite.card_lt_card (Set.toFinite _) (SetLike.coe_ssubset_coe.mpr hKX)
+  have hab : a * b = p := by
+    have h : Nat.card ↥K * (a * b) = Nat.card ↥K * p := by
+      calc Nat.card ↥K * (a * b) = Nat.card ↥K * a * b := by ring
+        _ = Nat.card ↥X * b := by rw [← ha]
+        _ = Nat.card ↥L := hb.symm
+        _ = p * Nat.card ↥K := hcard
+        _ = Nat.card ↥K * p := by ring
+    exact Nat.eq_of_mul_eq_mul_left hKpos h
+  have hane : a ≠ 1 := by
+    intro h1
+    rw [h1, mul_one] at ha
+    omega
+  have hb1 : b = 1 := by
+    rcases (Nat.dvd_prime hp).mp (⟨b, hab.symm⟩ : a ∣ p) with h1 | hap
+    · exact absurd h1 hane
+    · rw [hap] at hab
+      exact Nat.eq_of_mul_eq_mul_left hp.pos (by rw [hab, mul_one])
+  refine Subgroup.eq_of_le_of_card_ge hXL (le_of_eq ?_)
+  rw [hb, hb1, mul_one]
+
 end OddOrder.BG.AppE
