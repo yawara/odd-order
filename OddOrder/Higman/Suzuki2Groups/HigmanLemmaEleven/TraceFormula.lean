@@ -706,4 +706,79 @@ theorem square_frobeniusSum_eq_trace_of_anchored_singleGap
       trace_frobenius_coordinate_sum n d hn hcardK hfinKL z
         (fun s => bTwo (s₀ + s))
 
+/-- Ground-layer descent of the anchor-general trace calculation.  This lets
+the Lemma 5 basis retain its original indexing while producing the exact
+additive trace formula consumed by Higman's Lemma 10. -/
+theorem squareMap_eq_trace_of_anchored_singleGap
+    {K : Type uK} {L : Type uL} {V : Type uV} {W : Type uW}
+    [Field K] [Field L] [Finite L]
+    [CharP K 2] [CharP L 2] [Algebra K L]
+    [Algebra (ZMod 2) L]
+    [AddCommMonoid V] [Module (ZMod 2) V]
+    [AddCommGroup W] [Module (ZMod 2) W]
+    (B : LinearMap.BilinMap (ZMod 2) V W)
+    (n d : Nat) [NeZero n] [NeZero (d * n)]
+    (hn : 0 < n) (hd : 0 < d)
+    (hcardK : Nat.card K = 2 ^ n)
+    (hfinKL : Module.finrank K L = d)
+    (hfinL : Module.finrank (ZMod 2) L = d * n)
+    (bOne : Fin (d * n) → L ⊗[ZMod 2] V)
+    (bTwo : Fin n → L ⊗[ZMod 2] W)
+    (hcycleOne : ∀ i,
+      frobeniusScalarBaseChange L (bOne i) =
+        bOne (higmanCyclicSucc (Nat.mul_pos hd hn) i))
+    (hcycleTwo : ∀ i,
+      frobeniusScalarBaseChange L (bTwo i) =
+        bTwo (higmanCyclicSucc hn i))
+    (a : Fin (d * n)) (s₀ : Fin n)
+    (r : Fin (d * n)) (hr0 : r ≠ 0) (hrtwo : r + r ≠ 0)
+    (epsilon : L)
+    (hseed : B.baseChange L (bOne a) (bOne (a + r)) =
+      epsilon • bTwo s₀)
+    (hsymm : ∀ i j,
+      B.baseChange L (bOne i) (bOne j) =
+        B.baseChange L (bOne j) (bOne i))
+    (hsupport : ∀ i j,
+      j ≠ i + r → i ≠ j + r →
+        B.baseChange L (bOne i) (bOne j) = 0)
+    (q : L → W) (iotaAdd : K →+ W)
+    (hTwoExpansion : ∀ z : K,
+      (1 : L) ⊗ₜ[ZMod 2] iotaAdd z =
+        ∑ s : Fin n,
+          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s))
+    (alpha : L)
+    (hq : (1 : L) ⊗ₜ[ZMod 2] q alpha =
+      ∑ i : Fin (d * n), ∑ j : Fin (d * n) with i < j,
+        alpha ^ (2 ^ i.val + 2 ^ j.val) •
+          B.baseChange L (bOne i) (bOne j)) :
+    q alpha = iotaAdd
+      (Algebra.trace K L
+        (alpha ^ (2 ^ a.val) *
+          (alpha ^ (2 ^ a.val)) ^ (2 ^ r.val) * epsilon)) := by
+  let z := Algebra.trace K L
+    (alpha ^ (2 ^ a.val) *
+      (alpha ^ (2 ^ a.val)) ^ (2 ^ r.val) * epsilon)
+  have htrace := square_frobeniusSum_eq_trace_of_anchored_singleGap
+    B n d hn hd hcardK hfinKL hfinL bOne bTwo hcycleOne hcycleTwo
+    a s₀ r hr0 hrtwo epsilon hseed hsymm hsupport alpha
+  have htensor : (1 : L) ⊗ₜ[ZMod 2] q alpha =
+      (1 : L) ⊗ₜ[ZMod 2] iotaAdd z := by
+    calc
+      (1 : L) ⊗ₜ[ZMod 2] q alpha =
+          ∑ i : Fin (d * n), ∑ j : Fin (d * n) with i < j,
+            alpha ^ (2 ^ i.val + 2 ^ j.val) •
+              B.baseChange L (bOne i) (bOne j) := hq
+      _ = ∑ s : Fin n,
+          (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := htrace
+      _ = (1 : L) ⊗ₜ[ZMod 2] iotaAdd z := (hTwoExpansion z).symm
+  apply sub_eq_zero.mp
+  apply (Module.FaithfullyFlat.one_tmul_eq_zero_iff
+    (R := ZMod 2) (M := W) (A := L) (q alpha - iotaAdd z)).mp
+  calc
+    (1 : L) ⊗ₜ[ZMod 2] (q alpha - iotaAdd z) =
+        (1 : L) ⊗ₜ[ZMod 2] q alpha -
+          (1 : L) ⊗ₜ[ZMod 2] iotaAdd z := by
+            rw [TensorProduct.tmul_sub]
+    _ = 0 := sub_eq_zero.mpr htensor
+
 end OddOrder.Higman.Suzuki2Groups

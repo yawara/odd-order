@@ -1,3 +1,4 @@
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.PairGap
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.ProperExtension
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TypeAConclusion

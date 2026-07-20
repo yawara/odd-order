@@ -245,6 +245,14 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             `anchoredTraceFormula_trace_superfluous`)
       - [ ] trace-free 平方写像を `a ↦ a * θ(a)` と lower-central extension 座標へ
             接続し、source-facing `higmanLemmaEleven` を組み立てる
+        - [x] degree-one anchored trace 式の anchor を Frobenius 座標変更へ吸収し、
+              `ε * (a * θ(a))` の actual lower-central square normal formを得る
+              (`exists_lowerCentralCoordinates_typeANormalForm_of_anchoredTrace_finrankOne`)
+        - [x] 二つの actual lower-central layer から kernel/quotient `MulEquiv` を構成し、
+              `ε` を kernel 座標へ吸収して honest `TypeAData` を得る
+              (`typeADataOfLowerCentralSquareNormalForm`)
+        - [ ] actor から得た元の Singer basis 上で actual anchored trace 式を構成し、
+              上記 endgame と合成して source-facing theorem を閉じる
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
