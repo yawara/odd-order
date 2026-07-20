@@ -651,4 +651,169 @@ theorem card_omega_le_prime_sq_of_index_lt {G : Type*} [Group G] [Finite G] {p :
     exact OddOrder.BG.Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime hG hp_odd hjeq
 
 
+/-- **BG's `|Ω₁(T)/S| ≤ |Ω₁(T/S)|`**, in the division-free form
+`|Ω₁(T)| ≤ |Ω₁(T/S)| · |S|`.
+
+`S` has exponent `p`, so `S ≤ Ω₁(T)`; and `Ω₁` is a *closure*, so the image of `Ω₁(T)` in
+`T/S` is the closure of the images of the generators — each killed by `p` — hence lies in
+`Ω₁(T/S)`.  The first isomorphism theorem turns the index of `S` inside `Ω₁(T)` into the
+order of that image. -/
+theorem card_omegaInG_le_mul {G : Type*} [Group G] [Finite G] {p : ℕ} {S T : Subgroup G}
+    (hST : S ≤ T) (hexp : ∀ x ∈ S, x ^ p = 1) [hn : (S.subgroupOf T).Normal] :
+    Nat.card ↥(omegaInG T p 1) ≤
+      Nat.card ↥(Omega (↥T ⧸ S.subgroupOf T) p 1) * Nat.card ↥S := by
+  set N : Subgroup ↥T := S.subgroupOf T with hN
+  set W : Subgroup ↥T := Omega (↥T) p 1 with hW
+  set g : ↥T →* (↥T ⧸ N) := QuotientGroup.mk' N with hg
+  set f : ↥W →* (↥T ⧸ N) := g.comp W.subtype with hf
+  have hcardW : Nat.card ↥(omegaInG T p 1) = Nat.card ↥W := by
+    rw [omegaInG_eq_map]
+    exact Subgroup.card_map_of_injective T.subtype_injective
+  have hNW : N ≤ W := by
+    intro x hx
+    refine Omega.mem_of_pow_eq_one ?_
+    have h : ((x : G)) ^ p = 1 := hexp (x : G) (Subgroup.mem_subgroupOf.mp hx)
+    have hx1 : (x : ↥T) ^ p = 1 := by
+      refine Subtype.ext ?_
+      push_cast
+      simpa using h
+    simpa using hx1
+  have hcardN : Nat.card ↥N = Nat.card ↥S :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hST).toEquiv
+  have hker : f.ker = N.subgroupOf W := by
+    ext x
+    simp [hf, hg, MonoidHom.mem_ker, Subgroup.mem_subgroupOf, QuotientGroup.eq_one_iff]
+  have hrangeW : f.range = W.map g := by
+    rw [hf, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hidx : (N.subgroupOf W).index = Nat.card ↥(W.map g) := by
+    rw [Subgroup.index, ← hker, ← hrangeW]
+    exact Nat.card_congr (QuotientGroup.quotientKerEquivRange f).toEquiv
+  have hcardNW : Nat.card ↥(N.subgroupOf W) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNW).toEquiv
+  -- the image lands in `Ω₁(T/S)`, via the generators
+  have hle : W.map g ≤ Omega (↥T ⧸ N) p 1 := by
+    rw [hW, Omega, MonoidHom.map_closure]
+    refine (Subgroup.closure_le _).mpr ?_
+    rintro _ ⟨y, hy, rfl⟩
+    exact Omega.mem_of_pow_eq_one (by rw [← map_pow, hy, map_one])
+  have hsplit : Nat.card ↥(N.subgroupOf W) * (N.subgroupOf W).index = Nat.card ↥W :=
+    (N.subgroupOf W).card_mul_index
+  rw [hcardW, ← hsplit, hcardNW, hcardN, hidx, mul_comm]
+  exact Nat.mul_le_mul_right _ (Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hle))
+
+
+
+/-- **`Ω₁(Ω₁(T)) = Ω₁(T)`** for a subgroup `T` — BG's *"Since `Ω₁(Ω₁(T)) = Ω₁(T)`"*.
+
+The two generating sets literally coincide: `x ∈ T` with `x^{pⁿ} = 1` already lies in
+`Ω_n(T)`, and conversely `Ω_n(T) ≤ T`. -/
+theorem omegaInG_idem {G : Type*} [Group G] (T : Subgroup G) (p n : ℕ) :
+    omegaInG (omegaInG T p n) p n = omegaInG T p n := by
+  rw [omegaInG, omegaInG]
+  congr 1
+  ext x
+  exact ⟨fun h => ⟨omegaInG_le h.1, h.2⟩, fun h => ⟨mem_omegaInG h.1 h.2, h.2⟩⟩
+
+/-- `Ω₁` of the *group* `Ω₁(T)` is everything.
+
+The subtype form of `omegaInG_idem`, which is what BG Proposition E.2(a) — stated for a
+whole group — consumes. -/
+theorem omega_eq_top_of_omegaInG {G : Type*} [Group G] (T : Subgroup G) (p n : ℕ) :
+    Omega ↥(omegaInG T p n) p n = ⊤ := by
+  refine Subgroup.map_injective (omegaInG T p n).subtype_injective ?_
+  rw [← omegaInG_eq_map, omegaInG_idem, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+
+/-- **BG Proposition E.2(a) applied to `Ω₁(T)`**: if `Ω₁(T)` has nilpotence class at most
+`p − 1`, then it has exponent `p`.
+
+BG: *"Therefore `Ω₁(T)` has nilpotence class at most `p − 1`.  By Proposition E.2,
+`Ω₁(Ω₁(T))` has exponent `p`.  Since `Ω₁(Ω₁(T)) = Ω₁(T)`, this contradicts the maximal
+choice of `S`."* -/
+theorem pow_eq_one_of_omegaInG {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {T : Subgroup G}
+    (hgamma : (⊤ : Subgroup ↥(omegaInG T p 1)).lowerCentralSeries (p - 1) = ⊥)
+    {x : G} (hx : x ∈ omegaInG T p 1) : x ^ p = 1 := by
+  have hy : (⟨x, hx⟩ : ↥(omegaInG T p 1)) ∈ Omega ↥(omegaInG T p 1) p 1 := by
+    rw [omega_eq_top_of_omegaInG]
+    trivial
+  have := omega_pow_eq_one_of_lowerCentralSeries_eq_bot hgamma hy
+  simpa using congrArg (Subtype.val (p := fun z => z ∈ omegaInG T p 1)) this
+
+
+/-- **BG's class bound**: `|Ω₁(T)| ≤ p^{q+2}` forces `Ω₁(T)` to have exponent `p`.
+
+BG: *"Since `p ≥ 7` and `q ≤ (p−1)/2`, by Step 1 … therefore `Ω₁(T)` has nilpotence class
+at most `p − 1`.  By Proposition E.2, `Ω₁(Ω₁(T))` has exponent `p`."*
+
+The chain: a `p`-group of order `≤ p^{q+2}` has class `≤ q+1`
+(`Ch1.S04.nilpotencyClass_le_of_card_le_pow`); Step 1 (`card_A_dvd_half_p_sub_one`) gives
+`q ≤ (p−1)/2`, and `q` odd prime forces `p ≥ 7`, so `q + 1 ≤ p − 1`; then
+`pow_eq_one_of_omegaInG` applies Proposition E.2(a). -/
+theorem RegularOperatorSetup.pow_eq_one_of_card_omegaInG_le [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) {T : Subgroup R}
+    (hcard : Nat.card ↥(omegaInG T p 1) ≤ p ^ (q + 2))
+    {x : R} (hx : x ∈ omegaInG T p 1) : x ^ p = 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hpg : IsPGroup p ↥(omegaInG T p 1) := hyp.R_pGroup.to_subgroup _
+  haveI : Group.IsNilpotent ↥(omegaInG T p 1) := hpg.isNilpotent
+  have hcl : Group.nilpotencyClass ↥(omegaInG T p 1) ≤ q + 1 :=
+    OddOrder.BG.Ch1.S04.nilpotencyClass_le_of_card_le_pow hpg (by omega) hcard
+  -- `q + 1 ≤ p − 1`, from Step 1 and the oddness of `p`, `q`
+  have hq3 : 3 ≤ q := by
+    obtain ⟨k, hk⟩ := hyp.q_odd
+    have := hyp.q_prime.two_le
+    omega
+  have hp3 : 3 ≤ p := by
+    obtain ⟨k, hk⟩ := hyp.p_odd
+    have := hyp.p_prime.two_le
+    omega
+  have hqle : q ≤ (p - 1) / 2 :=
+    Nat.le_of_dvd (by omega) hyp.card_A_dvd_half_p_sub_one
+  have hqp : q + 1 ≤ p - 1 := by omega
+  exact pow_eq_one_of_omegaInG
+    (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (hcl.trans hqp)) hx
+
+
+/-- `Ω_n` of an `A`-invariant subgroup is `A`-invariant.
+
+Via the generating set: an automorphism preserves both `x ∈ H` and `x^{pⁿ} = 1`. -/
+theorem isAInvariant_omegaInG {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {H : Subgroup G} (hH : IsAInvariant φ H) (p n : ℕ) :
+    IsAInvariant φ (omegaInG H p n) := fun a => by
+  change (omegaInG H p n).map (φ a).toMonoidHom = omegaInG H p n
+  rw [omegaInG, MonoidHom.map_closure]
+  congr 1
+  ext x
+  simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+  constructor
+  · rintro ⟨y, ⟨hyH, hyp⟩, rfl⟩
+    exact ⟨hH.smul_mem a hyH, by rw [← map_pow, hyp, map_one]⟩
+  · rintro ⟨hxH, hxp⟩
+    exact ⟨(φ a)⁻¹ x, ⟨hH.inv_smul_mem a hxH, by rw [← map_pow, hxp, map_one]⟩,
+      MulAut.apply_inv_self G (φ a) x⟩
+
+/-- BG's `v ∈ R₀^#` in the ambient group: a generator of `R₀`, which is nontrivial. -/
+theorem RegularOperatorSetup.exists_zpowers_eq_R₀ [Finite R]
+    (hyp : RegularOperatorSetup R B p q) :
+    ∃ v : R, Subgroup.zpowers v = hyp.R₀ ∧ v ≠ 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have hcard := hyp.R₀_card
+  haveI : Nontrivial ↥hyp.R₀ := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro h
+    rw [h, Subgroup.card_bot] at hcard
+    exact hyp.p_prime.one_lt.ne hcard
+  obtain ⟨v, hv⟩ := exists_ne (1 : ↥hyp.R₀)
+  have hord : orderOf (v : R) = p := by
+    have h1 : orderOf v ∣ Nat.card ↥hyp.R₀ := orderOf_dvd_natCard v
+    rw [hyp.R₀_card] at h1
+    have h2 : orderOf (v : R) = orderOf v := Subgroup.orderOf_coe v
+    rcases (Nat.dvd_prime hyp.p_prime).mp h1 with h | h
+    · exact absurd (Subtype.ext (orderOf_eq_one_iff.mp (h2.trans h))) hv
+    · exact h2.trans h
+  refine ⟨(v : R), Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr v.2)
+    (by rw [hyp.R₀_card, Nat.card_zpowers, hord]), fun h1 => hv (Subtype.ext ?_)⟩
+  simpa using h1
+
+
 end OddOrder.BG.AppE
