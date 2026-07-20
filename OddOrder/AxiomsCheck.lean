@@ -11551,3 +11551,13 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- anywhere on this route** — `S13.coherent_sOf_H0Cprime` carries `IsTypeIII ∨ IsTypeIV` only
 -- because its carrier does.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent
+-- **(9.9.b) for `𝒮(H₀C)`** — the second carrier of the book's "both `𝒮(H₀)` and `𝒮(H₀C)` contain
+-- exactly `p − 1` reducible characters" (p. 54).  All five inputs of the shared count
+-- `reducible_count_sOf_K` are already on hand at `K = H₀C`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.reducible_count_sOf_H0supC
+-- **`𝒮(H₀C′) ≠ ∅`** — the (9.11) case (9.7.b) pivot: the `p − 1` reducibles of `𝒮(H₀C)` lie in the
+-- larger `𝒮(H₀C′)` since `C′ ≤ C`.  Taking the count at `H₀C` rather than `H₀` is essential — the
+-- reducibles of `𝒮(H₀)` need not lie in the smaller family — and is why the book states (9.9.b)
+-- for both carriers.  The §13 route reaches the pivot through the μ-grid and (11.7) `H₀ = 1`,
+-- hence only in types III/IV.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_cprime_nonempty

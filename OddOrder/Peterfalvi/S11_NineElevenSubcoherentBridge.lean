@@ -800,6 +800,30 @@ theorem caseB_coherent_sOf_cprime [Finite G] {M : Subgroup G} {A : Set G}
     (mul_ne_zero Nat.card_pos.ne' (u_odd hG chars).pos.ne') hη₁
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`𝒮(H₀C′) ≠ ∅`** — the pivot of the (9.11) case (9.7.b) engine, from **(9.9.b)**.
+
+The book's (9.9.b) says `𝒮(H₀)` *and* `𝒮(H₀C)` each contain exactly `p − 1` reducible characters
+`μ_j`; since `C′ = [C,C] ≤ C`, the family `𝒮(H₀C)` sits inside `𝒮(H₀C′)` (`sOf_antitone`), so those
+`μ_j` are members here too — and `p − 1 > 0` because `p` is prime.
+
+Note the count is taken at `H₀C`, not `H₀`: the reducibles of `𝒮(H₀)` need not lie in the *smaller*
+`𝒮(H₀C′)`, which is exactly why the book states (9.9.b) for both carriers.  The §13 route reaches
+the same pivot through the §10 μ-grid and (11.7) `H₀ = 1`, hence only in types III/IV
+(issue 1045). -/
+theorem sOf_cprime_nonempty [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data} :
+    (sOf data (chief.H0 ⊔ cprimeSub data chief)).Nonempty := by
+  have hne : {φ ∈ sOf data (chief.H0 ⊔ cSub data chief) |
+      ¬ IsIrreducibleCharacter φ}.Nonempty := by
+    refine Set.nonempty_of_ncard_ne_zero ?_
+    rw [reducible_count_sOf_H0supC hG chief]
+    have := chief.p_prime.one_lt
+    omega
+  obtain ⟨φ, hφ, -⟩ := hne
+  exact ⟨φ, sOf_antitone data (sup_le_sup_left (cprimeSub_le_C data chief) chief.H0) hφ⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` is coherent, under Hypothesis (9.5) alone.
 
 The (9.7) Clifford dichotomy (`clifford_dichotomy`, already type-free on `chars`) splits into the
@@ -809,10 +833,11 @@ two branches proved above:
   coherence `hAbase` and the maximality refuter `hArefute` (the §9 chain
   `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin`, whose descent from `S13.Hypothesis` is the
   remaining item of issue 1045);
-* case (9.7.b) — `caseB_coherent_sOf_cprime`, needing only the (9.9.b) pivot `hBpivot`.
+* case (9.7.b) — `caseB_coherent_sOf_cprime`, **fully discharged**: its uniform degree is (9.9.a)
+  and its pivot is `sOf_cprime_nonempty` (= (9.9.b)).
 
-⚠ The three residual inputs are quantified over the *branch datum* they belong to, so neither
-branch pays for the other's obligations.
+⚠ The two residual inputs are quantified over `CliffordCaseAData`, so case (b) — which is complete
+— does not pay for them.
 
 **No type hypothesis appears anywhere on this route** — which is the point of issue 1045: the §13
 statement `S13.coherent_sOf_H0Cprime` carries `IsTypeIII ∨ IsTypeIV` purely because its carrier
@@ -852,8 +877,7 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
             (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) (S₂ ∪ {χ, χ.conj})
             (OddOrder.Peterfalvi.S04.supportInSubgroup
               (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M))) → False)
-    (hBpivot : ∀ _ : CliffordCaseBData chars,
-      (sOf data (chief.H0 ⊔ chars.Cprime)).Nonempty) :
+    :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
       (sOf data (chief.H0 ⊔ chars.Cprime))
@@ -862,7 +886,7 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
   rcases clifford_dichotomy hG chars with hA | hB
   · exact caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some (hAbase hA.some)
       (hArefute hA.some)
-  · obtain ⟨η₁, hη₁⟩ := hBpivot hB.some
+  · obtain ⟨η₁, hη₁⟩ := sOf_cprime_nonempty hG (chief := chief)
     exact caseB_coherent_sOf_cprime hG hM chars hB.some h46 hKeq hconj htau hKsupp hVsub hη₁
 
 
