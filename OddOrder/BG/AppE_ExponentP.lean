@@ -591,4 +591,34 @@ theorem RegularOperatorSetup.exists_zpowers_index_lt [Finite R]
   exact hyp.index_sup_centralizer_lt hR₀S hST hexp hS hTN hv hvS hv1
 
 
+/-- **In a finite cyclic group, `|Ω₁(G)| ≤ p`.**
+
+BG's Step 3 applies Lemma 4.5(b) to `T/S`, which needs a cyclic subgroup of index exactly
+`p`; `(E.16)` only gives index `< p²`, i.e. index `1` or `p` in a `p`-group.  This closes
+the index-`1` case: there `T/S` is itself cyclic, and a cyclic group has at most `p`
+solutions of `x^p = 1` (`IsCyclic.card_pow_eq_one_le`), which — the group being abelian —
+already form the subgroup `Ω₁`. -/
+theorem card_omega_le_of_isCyclic {G : Type*} [Group G] [Finite G] [IsCyclic G] {p : ℕ}
+    (hp : 0 < p) : Nat.card ↥(Omega G p 1) ≤ p := by
+  classical
+  letI := Fintype.ofFinite G
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := G)
+  have hcomm : ∀ x ∈ (⊤ : Subgroup G), ∀ y ∈ (⊤ : Subgroup G), x * y = y * x := by
+    intro x _ y _
+    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg x)
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg y)
+    rw [← zpow_add, ← zpow_add, add_comm]
+  have hOK : Omega G p 1 = omega1OfAbelian G ⊤ p hcomm := by
+    refine le_antisymm ((Subgroup.closure_le _).mpr fun x hx => ?_) fun x hx => ?_
+    · exact ⟨Subgroup.mem_top x, by simpa using hx⟩
+    · exact Omega.mem_of_pow_eq_one (by simpa using hx.2)
+  rw [hOK]
+  have hcard : Nat.card ↥(omega1OfAbelian G ⊤ p hcomm) = Fintype.card {x : G // x ^ p = 1} := by
+    rw [Nat.card_eq_fintype_card]
+    exact Fintype.card_congr
+      (Equiv.subtypeEquivRight fun x => ⟨fun h => h.2, fun h => ⟨Subgroup.mem_top x, h⟩⟩)
+  rw [hcard, Fintype.card_subtype]
+  exact IsCyclic.card_pow_eq_one_le hp
+
+
 end OddOrder.BG.AppE
