@@ -308,9 +308,21 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [ ] 上記の共通 `Φ(P)` 座標を prescribed kernel coordinate として、左右各
               factor の quotient 座標を actor-compatible に構成し、
               `ν = λ·θ(λ) = μ·φ(μ)` を導く
+          - [x] Lemma 11 の field model を caller-prescribed actor generator 版へ
+                強化し、同じ ambient generator が invariant factor の faithful range
+                でも generator のまま残ることを証明する
+          - [x] noncommutative factor について `Φ(S) = Φ(P).subgroupOf S` を証明し、
+                factor の第2 lower-central layer と ambient `Φ(P)` の canonical な
+                `ZMod 2` 線形同値が restricted actor action と可換することを証明する
+          - [ ] commutative `A(n,1)` factor について square equivalence から
+                prescribed ambient kernel coordinate に従属する quotient coordinate
+                と actor compatibility を構成する
           - [x] odd-order `θ` に対する unit twisted norm
                 `u ↦ u·θ(u)` の全単射性を証明し、任意の非零 kernel scaling を
                 quotient-basis scaling で実現する
+          - [x] normal-form の Frobenius renormalization を quotient coordinate 側へ
+                counter-shift して prescribed kernel coordinate を固定し、square map の
+                actor-equivariance から `ν = λ·θ(λ)` を導く一般補題を証明する
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

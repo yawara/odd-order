@@ -346,6 +346,21 @@ theorem restricted_range_isXiActor
     refine ⟨hSinv.restrict.rangeRestrict a, ?_⟩
     exact Subtype.ext ha
 
+/-- A prescribed ambient generator remains a generator after passing to the
+faithful range of an invariant-subgroup restriction. -/
+theorem forall_mem_zpowers_restrictedRange_generator
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (c : Y) (hcgen : ∀ g : Y, g ∈ Subgroup.zpowers c) :
+    ∀ g : hSinv.restrict.range,
+      g ∈ Subgroup.zpowers (hSinv.restrict.rangeRestrict c) := by
+  intro g
+  obtain ⟨y, rfl⟩ := hSinv.restrict.rangeRestrict_surjective g
+  rw [← MonoidHom.map_zpowers hSinv.restrict.rangeRestrict c]
+  exact ⟨y, hcgen y, rfl⟩
+
 /-- If a subgroup contains every ambient involution, it has exactly the
 same number of involutions as the ambient group. -/
 theorem involutions_ncard_subgroup_eq_of_subset

@@ -443,19 +443,22 @@ theorem lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
       layerZeroQuotientHom_ker_eq_frattini hP] at hxker
   exact ⟨q x, 1, hqx⟩
 
-/-- **Higman Lemma 11 (pp. 87–89), field model for the original actor.**
+/-- **Higman Lemma 11 (pp. 87–89), field model for a prescribed
+original-actor generator.**
 
 Assume, as Higman does after the reduction in Section 6, that every prime
 divisor of the original cyclic actor order divides the number of involutions.
-Then a generator of that same actor acts on the first lower-central layer as
-multiplication by an element which generates the full field.  If the first
-and second layer dimensions are `m` and `n`, respectively, then
-`n ∣ m` and `m / n` is odd.
+Then the caller's chosen generator of that same actor acts on the first
+lower-central layer as multiplication by an element which generates the full
+field.  If the first and second layer dimensions are `m` and `n`, respectively,
+then `n ∣ m` and `m / n` is odd.  Prescribing the generator is what lets the
+later simultaneous-coordinate construction keep the common centre coordinate
+fixed.
 
 The auxiliary prime-supported subgroup is used only to prove
 `2 ^ n - 1 ∣ Nat.card Y`; the irreducible representation is never
 restricted from `Y` to that subgroup. -/
-theorem exists_originalXiActor_degree_dvd_and_odd_quotient
+theorem exists_originalXiActor_degree_dvd_and_odd_quotient_of_generator
     {P : Type u} [Group P] [Finite P]
     {Y : Subgroup (MulAut P)}
     (hP : IsPGroup 2 P)
@@ -463,16 +466,15 @@ theorem exists_originalXiActor_degree_dvd_and_odd_quotient
     (hxi : IsXiActor Y)
     (hlen : HasXiLengthTwo Y.subtype)
     (hsupp : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
-      p ∣ (involutions P).ncard) :
+      p ∣ (involutions P).ncard)
+    (c : Y) (hcgen : ∀ g : Y, g ∈ Subgroup.zpowers c) :
     let m := Module.finrank (ZMod 2)
       (Additive (lowerCentralLayer P 0))
     let n := Module.finrank (ZMod 2)
       (Additive (lowerCentralLayer P 1))
-    ∃ (c : Y)
-      (e : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2]
+    ∃ (e : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2]
         GaloisField 2 m)
       (mu : Y →* (GaloisField 2 m)ˣ),
-      (∀ g : Y, g ∈ Subgroup.zpowers c) ∧
       Function.Injective mu ∧
       (∀ (g : Y) (v : Additive (lowerCentralLayer P 0)),
         e (lowerCentralLayerRepresentation Y.subtype 0 g v) =
@@ -527,7 +529,6 @@ theorem exists_originalXiActor_degree_dvd_and_odd_quotient
       (lowerCentralLayerRepresentation Y.subtype 0) :=
     lowerCentralLayerZeroRepresentation_injective_of_odd_faithful_action
       hP Y.subtype Y.subtype_injective hYodd
-  obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
   obtain ⟨e, mu, hmu, hcompat⟩ :=
     OddOrder.RepresentationTheory.exists_galoisFieldLinearModel_of_faithful_irreducible
       (lowerCentralLayerRepresentation Y.subtype 0)
@@ -546,8 +547,48 @@ theorem exists_originalXiActor_degree_dvd_and_odd_quotient
     OddOrder.RepresentationTheory.galoisField_degree_dvd_and_odd_quotient_of_primeFactors_dvd
       hn hm Nat.card_pos (mu c : GaloisField 2 m)
       hgen hlambdaOrder hbase hsupp'
-  exact ⟨c, e, mu, hcgen, hmu, hcompat, hlambdaOrder, hgen,
+  exact ⟨e, mu, hmu, hcompat, hlambdaOrder, hgen,
     hdegree.1, hdegree.2⟩
+
+/-- **Higman Lemma 11 (pp. 87–89), field model for the original actor.**
+
+This existential form chooses a generator of the original cyclic actor and
+then applies
+`exists_originalXiActor_degree_dvd_and_odd_quotient_of_generator`. -/
+theorem exists_originalXiActor_degree_dvd_and_odd_quotient
+    {P : Type u} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthTwo Y.subtype)
+    (hsupp : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    let m := Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer P 0))
+    let n := Module.finrank (ZMod 2)
+      (Additive (lowerCentralLayer P 1))
+    ∃ (c : Y)
+      (e : Additive (lowerCentralLayer P 0) ≃ₗ[ZMod 2]
+        GaloisField 2 m)
+      (mu : Y →* (GaloisField 2 m)ˣ),
+      (∀ g : Y, g ∈ Subgroup.zpowers c) ∧
+      Function.Injective mu ∧
+      (∀ (g : Y) (v : Additive (lowerCentralLayer P 0)),
+        e (lowerCentralLayerRepresentation Y.subtype 0 g v) =
+          (mu g : GaloisField 2 m) * e v) ∧
+      orderOf (mu c : GaloisField 2 m) = Nat.card Y ∧
+      Algebra.adjoin (ZMod 2)
+        ({(mu c : GaloisField 2 m)} : Set (GaloisField 2 m)) = ⊤ ∧
+      n ∣ m ∧ Odd (m / n) := by
+  dsimp only
+  letI : IsCyclic Y := hxi.cyclic
+  letI : CommGroup Y := IsCyclic.commGroup
+  obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
+  obtain ⟨e, mu, hmu, hcompat, hlambdaOrder, hgen, hnm, hodd⟩ :=
+    exists_originalXiActor_degree_dvd_and_odd_quotient_of_generator
+      hP hncomm hxi hlen hsupp c hcgen
+  exact ⟨c, e, mu, hcgen, hmu, hcompat, hlambdaOrder, hgen, hnm, hodd⟩
 
 /-! ## Assembling the actual anchored trace formula -/
 
