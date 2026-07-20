@@ -108,4 +108,29 @@ theorem chainStepHom_ker_ge {G : Type*} [Group G] {T : Subgroup G} [T.Characteri
     OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
   exact Subgroup.commutator_mem_commutator (Subgroup.mem_top v) hx
 
+/-- If `⁅v, x⁆ ∈ Hᵢ₊₂` then so is `⁅vᵏ, x⁆`.
+
+In `G/Hᵢ₊₂` the element `⁅v, x⁆` becomes trivial, hence central, so BG Lemma 4.2(a)
+(`Ch1.S04.commutatorElement_pow_left_of_central`) gives `⁅vᵏ, x⁆ ≡ ⁅v,x⁆ᵏ = 1`.
+
+This is what upgrades "the kernel contains `x` for the single element `v`" to "… for the
+whole of `R₀ = ⟨v⟩`", which is what BG's `Hᵢ₊₁ = ⁅R₀, Hᵢ⁆` needs.  ⚠ No hypothesis on `x` is
+required — centrality comes from `⁅v,x⁆` being trivial in the quotient, not from
+`chain_map_le_center`. -/
+theorem commutator_pow_mem_of_commutator_mem {G : Type*} [Group G] {T : Subgroup G}
+    [T.Characteristic] {i : ℕ} {v x : G}
+    (h : ⁅v, x⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2)) (k : ℕ) :
+    ⁅v ^ k, x⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) := by
+  set N := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 2) with hN
+  have h1 : (QuotientGroup.mk' N) ⁅v, x⁆ = 1 := (QuotientGroup.eq_one_iff _).mpr h
+  have h2 : ⁅(QuotientGroup.mk' N) v, (QuotientGroup.mk' N) x⁆ = 1 := by
+    rw [← map_commutatorElement]; exact h1
+  have hcent : ⁅(QuotientGroup.mk' N) v, (QuotientGroup.mk' N) x⁆ ∈
+      Subgroup.center (G ⧸ N) := by rw [h2]; exact Subgroup.one_mem _
+  have h3 := OddOrder.BG.Ch1.S04.commutatorElement_pow_left_of_central hcent k
+  rw [h2, one_pow] at h3
+  have h4 : (QuotientGroup.mk' N) ⁅v ^ k, x⁆ = 1 := by
+    rw [map_commutatorElement, map_pow]; exact h3
+  exact (QuotientGroup.eq_one_iff _).mp h4
+
 end OddOrder.BG.AppE
