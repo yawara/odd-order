@@ -335,4 +335,26 @@ theorem commutator_pow_left_congr {G : Type*} [Group G] {T : Subgroup G} [T.Char
   rw [map_pow, map_commutatorElement, map_commutatorElement, map_pow]
   exact h3.symm
 
+/-- **The `u ∈ Hᵢ` remainder is invisible mod `Hᵢ₊₁`**: `⁅v, x·u⁆ ≡ ⁅v, x⁆`.
+
+BG writes `wᵢ₋₁ᵃ = wᵢ₋₁^{rᵢ₋₁} u` for some `u ∈ Hᵢ` and then simply computes with
+`wᵢ₋₁^{rᵢ₋₁}`; this is what licenses dropping the remainder.  Both factors of
+`⁅v,x⁆⁻¹ ⁅v,x·u⁆ = ⁅v,u⁆ · ((⁅v,x⁆⁅v,u⁆)⁻¹ ⁅v,x·u⁆)` lie in `Hᵢ₊₁` — the first because
+`u ∈ Hᵢ`, the second by `commutator_mul_mem_chain` (which even lands in `Hᵢ₊₂`). -/
+theorem commutator_mul_congr {G : Type*} [Group G] {T : Subgroup G} [T.Characteristic]
+    {i : ℕ} {v x u : G}
+    (hu : u ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) i) :
+    (⁅v, x⁆)⁻¹ * ⁅v, x * u⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+  have hvu : ⁅v, u⁆ ∈ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) := by
+    rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, Subgroup.commutator_comm]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top v) hu
+  have hrest : (⁅v, x⁆ * ⁅v, u⁆)⁻¹ * ⁅v, x * u⁆ ∈
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (i + 1) :=
+    iterCommutator_antitone (i + 1) (commutator_mul_mem_chain hu)
+  have hrw : (⁅v, x⁆)⁻¹ * ⁅v, x * u⁆ =
+      ⁅v, u⁆ * ((⁅v, x⁆ * ⁅v, u⁆)⁻¹ * ⁅v, x * u⁆) := by group
+  rw [hrw]
+  exact Subgroup.mul_mem _ hvu hrest
+
 end OddOrder.BG.AppE
