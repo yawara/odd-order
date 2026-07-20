@@ -1006,4 +1006,21 @@ theorem sup_commutator_eq_of_min_index {G : Type*} [Group G] [Finite G] {p : ℕ
   rw [h]
   exact le_sup_left
 
+/-! ## Feeding Step 2's chain into the `(E.25)` lemmas
+
+`range_of_max_commutator_indices` asks for three facts about the chain.  Two are already in
+Step 2 (`iterCommutator_le_of_le` gives both antitonicity and `Hₐ ≤ H₀ = T`); the third is
+one line, since `H_{a+1}` is the commutator with all of `S`. -/
+
+/-- `⁅Hₐ, T⁆ ≤ H_{a+1}`: the chain commutates with the whole of `S`, and `T ≤ S`. -/
+theorem iterCommutator_commutator_le_succ {G : Type*} [Group G] (T : Subgroup G) (a : ℕ) :
+    ⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a, T⁆ ≤
+      OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + 1) :=
+  Subgroup.commutator_mono le_rfl le_top
+
+/-- `Hₐ ≤ T`: every term of the chain sits inside its own starting point `H₀ = T`. -/
+theorem iterCommutator_le_base {G : Type*} [Group G] {T : Subgroup G} [T.Normal] (a : ℕ) :
+    OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a ≤ T :=
+  iterCommutator_le_of_le (Nat.zero_le a)
+
 end OddOrder.BG.AppE
