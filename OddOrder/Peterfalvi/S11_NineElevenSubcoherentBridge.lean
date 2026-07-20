@@ -221,4 +221,35 @@ theorem sOf_subset_inducedKernelFamily_bot [Finite G] {M : Subgroup G}
     (sOf_subset_inducedNonKernelFamily hG hM data Y hx)
 
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Uniform-degree member differences are `A₀`-supported, at §9 level** (the `hsuppdiff` input of
+the (9.11) caseB engine).
+
+The §9 form of `S13.sOf_anchor_diff_support`.  That version reaches the `⊥`-kernel induced family
+through `hyp.SOf_eq`/`hyp.sOf_subset_SOf`, i.e. through `S13.Hypothesis`; here the same step is
+`sOf_subset_inducedKernelFamily_bot`, and the (8.10) containment `(M')^# ⊆ A₀` — which the §13
+version reads off `hyp.base.mderivSharp_subset_A0` — becomes the explicit parameter `hKsupp`.
+
+Neither version needs a type hypothesis; the §13 binding was purely the packaging. -/
+theorem sOf_anchor_diff_support [Finite G] {M : Subgroup G} {A0 : Set ↥M}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (data : TypesIIIIIIVSetup M) (Y : Subgroup G)
+    (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 → x ∈ A0)
+    (d : ℕ) (hunif : ∀ φ ∈ sOf data Y, ((φ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (d : ℂ))
+    {χ₁ x : ClassFunction ↥M ℂ}
+    (hχ₁mem : χ₁ ∈ sOf data Y) (hx : x ∈ sOf data Y) :
+    ((x - χ₁ : ClassFunction ↥M ℂ)).support ⊆ A0 := by
+  -- `M' ⊴ M` (the comap of a `map` along the injective `M.subtype`); in the §13 version this
+  -- instance arrived transitively through the packaging's import closure.
+  haveI : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  have h := OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support hKsupp
+    (sOf_subset_inducedKernelFamily_bot hG hM data Y hx)
+    (sOf_subset_inducedKernelFamily_bot hG hM data Y hχ₁mem) (d := 1)
+    (by rw [Nat.cast_one, one_mul, hunif x hx, hunif χ₁ hχ₁mem])
+  rwa [one_smul] at h
+
+
 end OddOrder.Peterfalvi.S11
