@@ -169,3 +169,15 @@ a/b は健全 (a: transcript 14min で FeitSibley 配線中 / b: 0min active)。
 
 ⚠ 大きな認知負荷の commit (研究レベルの finding) の後に停止する pattern が観測される
 (前回 00:55 も β-gap 解決系の直後)。ScheduleWakeup を最後に呼ばずに turn を終える癖。
+
+## 発生 2026-07-21 04:55 (lane a も停止 — 2/3 レーンが停止状態)
+
+- **a**: commit 31 分前 (`cb7429704` rational engine, 前 tick 04:25 合流済)、transcript 29 分前、
+  末尾 `ai-title` (idle)、clean tree。a も rational engine + FeitSibley 配線の直後に停止。
+  次段 (FeitSibley Lemma 1(a) の実配線 = integer 比で closable と自分で確定済) 未着手。
+- **c**: 前 tick (04:40) の停止が継続、47 分前 commit で未再開。
+- **b のみ稼働** (Lemma 12 全 wiring 完成・Classification.lean 新設)。
+
+⚠ **a と c の両方**が「重い成果 commit の直後に ScheduleWakeup を呼ばず停止」パターン。
+a = rational engine 完成後、c = 反例 finding 後。b は継続的に細かく commit するため停止しにくい。
+両者とも成果損失ゼロ・次段は自分の notes/issue に明記済。ユーザー再開待ち。
