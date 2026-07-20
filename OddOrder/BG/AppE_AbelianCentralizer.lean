@@ -788,4 +788,36 @@ theorem commutatorElement_zpow_mul_zpow_mul {G : Type*} [Group G] {x y u v : G}
   rw [hstrip]
   exact commutatorElement_zpow_zpow_of_central hz m n
 
+/-- Exponents of a fixed element of order `p` agree mod `p`.  The primitive behind the
+"cancel the generator" moves; `dvd_sub_of_zpow_mul_inv_zpow_mem` is its packaging for an
+index-`p` *section*, this one for an element of order `p`. -/
+theorem dvd_sub_of_zpow_eq_zpow {G : Type*} [Group G] {p : ℕ} {z : G} (hord : orderOf z = p)
+    {a b : ℤ} (h : z ^ a = z ^ b) : (p : ℤ) ∣ a - b := by
+  have hone : z ^ (a - b) = 1 := by rw [zpow_sub, h, mul_inv_cancel]
+  have hdvd := orderOf_dvd_iff_zpow_eq_one.mpr hone
+  rwa [hord] at hdvd
+
+/-- A nonidentity element killed by a prime `p` has order exactly `p`. -/
+theorem orderOf_eq_of_pow_eq_one {G : Type*} [Group G] {p : ℕ} (hp : p.Prime) {z : G}
+    (hzp : z ^ p = 1) (hne : z ≠ 1) : orderOf z = p := by
+  rcases (Nat.dvd_prime hp).mp (orderOf_dvd_of_pow_eq_one hzp) with h1 | hpx
+  · exact absurd (orderOf_eq_one_iff.mp h1) hne
+  · exact hpx
+
+/-- **BG `(E.26)` and `(E.27)`, in one operator-agnostic step**.
+
+`σ` scales `wᵢ` and `wⱼ` up to errors (`(E.22)`/`(E.23)`), so Lemma 4.2 makes
+`⁅wᵢ,wⱼ⁆^σ = ⁅wᵢ,wⱼ⁆^{mn}`; on the other hand `(E.22)` at level `k−1` makes it
+`⁅wᵢ,wⱼ⁆^c`.  Since `⁅wᵢ,wⱼ⁆` has order `p` in the section, `mn ≡ c (mod p)`.
+
+Instantiated at `σ = α` this is `(E.26)` (`rᵢrⱼ = r_{k-1}`) and at `σ = β` it is `(E.27)`
+(`tᵢtⱼ = t_{k-1}`) — BG proves them by the identical computation, hence one lemma. -/
+theorem dvd_sub_mul_of_commutator_eigen {G : Type*} [Group G] {p : ℕ} (hp : p.Prime)
+    {x y u v : G} (hu : Commute u y) (huv : Commute u v) (hv : Commute v x)
+    (hz : ⁅x, y⁆ ∈ Subgroup.center G) (hexp : ⁅x, y⁆ ^ p = 1) (hne : ⁅x, y⁆ ≠ 1)
+    {m n c : ℤ} (hsigma : ⁅x ^ m * u, y ^ n * v⁆ = ⁅x, y⁆ ^ c) :
+    (p : ℤ) ∣ m * n - c :=
+  dvd_sub_of_zpow_eq_zpow (orderOf_eq_of_pow_eq_one hp hexp hne)
+    ((commutatorElement_zpow_mul_zpow_mul hu huv hv hz m n).symm.trans hsigma)
+
 end OddOrder.BG.AppE
