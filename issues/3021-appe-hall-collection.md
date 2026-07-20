@@ -1134,3 +1134,24 @@ Step 4 では **`vS'` と個数が一致することを言うため**に必要 (
 ⟹ **Step 4 の最難関 (SZ 共役) が既に repo にある**ので、残りは
 (i) `Φ(S) = S'`、(ii) 半直積の配線、(iii) Frattini 変形、(iv) coprime 固定点、の 4 件。
 (i) が最も軽いので着手はそこから。
+
+## 2026-07-20 (22): Step 4 の部品 4 件
+
+| 宣言 | 内容 |
+|---|---|
+| `frattini_eq_commutator_of_exponent_prime` | **`Φ(S) = S'`** (S 指数 p) |
+| `orbit_conjAct_subset_coset` | 共役類 ⊆ `vG'` (`v⁻¹(tvt⁻¹) = ⁅v⁻¹,t⁆` そのもの) |
+| `RegularOperatorSetup.card_seed` | **`\|seed\| = p²`** (等式。Step 3 は `≤` で足りたが Step 4 は等式が要る) |
+| (refactor) `card_centralizer_generator` / `card_conjClass_generator` | 仮説を `hp2 : \|S ⊓ C_R(R₀)\| = p²` に |
+
+⚠ 実測の収穫: 「`Φ(P) ≤ N ↔ P/N` elementary abelian」は **Isaacs Lemma 4.5** として
+repo に完全な同値形で在った (`Isaacs/Ch04_Commutators/Main/CommutatorIdentities.lean:591`)。
+mathlib の `frattini_le_comap_frattini_of_surjective` 経由で組む必要はなかった。
+
+### 次の一手
+
+⬜ **共役類 = `vS'`** の等号化: 包含 (`orbit_conjAct_subset_coset`) +
+`p²·\|orbit\| = \|S\|` ((E.15)) + `\|S\| = p²·\|S'\|` (`card_quotient_commutator`)
+⟹ `\|orbit\| = \|S'\| = \|vS'\|` ⟹ `Set.eq_of_subset_of_ncard_le`。
+⚠ 剰余類のサイズ `\|v • K\| = \|K\|` は左移動が全単射だから (mathlib の
+`Set.ncard_image_of_injective` + `Set.smul_set_eq_image` あたり、名前は要実測)。
