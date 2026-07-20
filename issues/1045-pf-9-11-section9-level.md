@@ -504,6 +504,29 @@ S06.Hypothesis.induce_not_isIrreducible_iff (h : S06.Hypothesis ↥M) [NeZero (N
 ⚠ §10 版はこの後さらに `muGrid` 形へ移すが、**§9 ではその変換を行わない** — `certainTypeR` が
 消費するのは `columnSum h χ₂` の形なので、そこで止めるのが正しい。
 
+#### ⚠ 依存型 transport の回避 — statement の書き方が肝
+
+素朴に書くと `induce_not_isIrreducible_iff` は `χ : IrreducibleCharacter ↥h.K` を要求する一方、
+§9 側の `χ` は `IrreducibleCharacter ↥(huSub data)` で、`h.K` と `huSub data` は
+**命題的にしか等しくない** (`huSub data = (data.H ⊔ data.U).subgroupOf M` は定義的、
+`h.K = (derivedInG M).subgroupOf M` は `typePData_toS06Hypothesis` の literal)。
+⟹ `χ` の運搬は **`↥` を跨ぐ依存型の書き換え**になり、橋渡し補題で使った
+「Set 値関数の explicit 引数を `▸` で書き換える」形では済まない (motive 破綻の危険)。
+
+**回避策 (採用すべき形)**: 結論を
+
+```
+∃ χ₂, φ = OddOrder.Peterfalvi.S06.columnSum h χ₂
+```
+
+と書く。`S06.columnSum h χ₂` の**終域は `ClassFunction ↥M ℂ`** なので、
+**statement には依存型 transport が一切現れない**。transport は証明の内部だけに閉じ込められ、
+しかも §10 版 (S12_HcBound.lean:611-620 の `hFk`) が
+`muGrid` 和 = `induce h.K (chiRestrict …)` を示す形で**同じ変換を既に実演している**ので、
+そこを雛形にできる。
+
+⟹ ⚠ **`∃ χ₂, φ = induce h.K (chiRestrict χ₂)` の形で書かないこと** (依存型が statement に漏れる)。
+
 ### (旧メモ) case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
 書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
 から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
