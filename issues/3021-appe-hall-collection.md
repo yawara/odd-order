@@ -750,3 +750,53 @@ Step 2 より (E.13) `R₀ ⊄ S'`, `|S| ≤ p^q`, `|S/S'| = p²`。`P = Ω₁(R
 `S = Ω₁(T)` なら … (E.14)-(E.16) で `T = P` かつ `S = Ω₁(P) = Ω₁(Ω₁(R)) = Ω₁(R)`」。
 ⟹ Step 2 の 3 結論が**そのまま入力になる**ので、機構はもう揃っている。
 要る新規は「極大な A-不変指数 p 部分群の存在」と `Ω₁(N_P(S))` の議論 (Lemma 4.5 を使う)。
+
+## 2026-07-20 (11): Step 3 の足場 + 易しい分岐 (新 leaf `AppE_ExponentP.lean`)
+
+### 足場
+
+| 宣言 | 内容 |
+|---|---|
+| `seed` | **BG の種 `R₀ × Ω₁(R₁)`** を `Ω₁(C_R(R₀))` として |
+| `R₀_le_seed` / `R₀_lt_seed` / `isAInvariant_seed` | 種の性質 |
+| `ExpPFamily` / `exists_maximal_expP` | **BG の極大選択** |
+| `expPFamily_le_omega` | **`S ⊆ Ω₁(R)`** |
+| `expPFamily_pow_eq_one` / `R₀_lt_of_expPFamily` | Step 2 が消費する形への橋 |
+
+⭐ **種を `Ω₁(C_R(R₀))` と綴る理由**: setup は `R₁` に A-不変性を与えていないので
+BG の字面 `R₀ × Ω₁(R₁)` では族が空でないことが言えない。`C_R(R₀)` は `R₀` が A-不変
+ゆえ A-不変で、アーベル性は Step 2 で既証明。2 つは集合として等しい。
+
+### 易しい分岐
+
+| 宣言 | 内容 |
+|---|---|
+| `omegaInG` (+ `_eq_map` / `_le` / `mem_`) | 部分群の `Ω_n` を ambient `Subgroup G` に |
+| `omegaInG_omega` | **`Ω₁(Ω₁(G)) = Ω₁(G)`** (生成集合が一致、即座) |
+| `normalizer_le_normalizer_omegaInG` | **`N_G(H) ≤ N_G(Ω_n(H))`** |
+| `eq_omega_of_omegaInG_normalizer_eq` | **`S = Ω₁(N_P(S)) ⟹ S = Ω₁(R)`** |
+
+`T = P` は `↥P` での正規化条件 (Isaacs Thm 1.22) + `Subgroup.subgroupOf_normalizer_eq`。
+⚠ この分岐は **A も `R₀`/`R₁` も使わない** — `R` が p 群であることだけ。
+
+### 残り = BG (E.14)-(E.16) の難しい分岐
+
+仮定 `S ≠ Ω₁(T)` (T = N_P(S)) から矛盾を出す。BG 原文 (pdftotext L8080-8110) の筋:
+
+1. **(E.15)** `v ∈ R₀^#` の `S`-共役類 `K` は `|K| = |S : C_S(v)| = |S : C_S(R₀)| = |S|/p²`。
+   ⟸ `C_S(R₀) = R₀ × Ω₁(Z(S))` が位数 p² (**Step 2 の (E.4) `centralizer_inf_eq_sup_omega1Center`
+   が既にある**)。⚠ ただし (E.4) は `3 ≤ pRank ↥S p` を仮定するので、`|S| ≤ p³` 分岐は
+   BG の `C_S(R₀) = S ∩ (R₀ × R₁) = R₀ × Ω₁(R₁)` 経路が要るかもしれない — 着手時に再評価。
+2. **(E.16)** `T₁ := N_T(K)` (集合 K の正規化群) とすると `S ≤ T₁` で、`v` の `T`-共役類は
+   `|T : T₁|` 個の `S`-共役類の合併。恒等元を含まないので
+   `|T:T₁|·|S|/p² ≤ |S| − 1 < |S|` ⟹ **`|T : T₁| < p²`**。
+3. **Frattini 変形**: `T₁ = S·(T₁ ∩ R₀R₁) = S·(T₁ ∩ R₁)` ⟹ `T₁/S ≅ (T₁∩R₁)/(T₁∩R₁∩S)`。
+   `R₁` cyclic ⟹ **`T₁/S` cyclic**。
+4. `T₁/S` は `T/S` の指数 1 or p の巡回部分群 ⟹ **Lemma 4.5** で `|Ω₁(T/S)| ≤ p²`。
+5. `|Ω₁(T)/S| ≤ p²` ⟹ `|Ω₁(T)| ≤ p²|S| ≤ p^{q+2}` ⟹ `cl(Ω₁(T)) ≤ q+1 ≤ p−1`
+   (Step 1 = `card_A_dvd_half_p_sub_one` で `q ≤ (p−1)/2`、`p ≥ 7`)。
+6. **Prop E.2(a)** (`omega_pow_eq_one_of_lowerCentralSeries_eq_bot`、済) ⟹ `Ω₁(Ω₁(T))` は指数 p。
+   `Ω₁(Ω₁(T)) = Ω₁(T)` (今回の `omegaInG_omega`) かつ `Ω₁(T) ⊋ S` は A-不変 ⟹ **極大性に矛盾**。
+
+⟹ 必要な新規は主に **(E.15)(E.16) の共役類計数**と **Frattini 変形**。
+Lemma 4.5 と Prop E.2 と Step 1 は repo に既にある。
