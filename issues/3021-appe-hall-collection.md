@@ -1559,3 +1559,59 @@ H_i/H_{i+1}  ⊗  S/S'  ⟶  H_{i+1}/H_{i+2}      (全射; H_{i+1} = ⁅H_i, S�
 📌 **並行して項 6-7 は (E.22)/(E.23) を仮説パラメータに取る形で先に組む**
 ([[feedback-gated-endpoint-skeleton-pattern]])。項 6-7 は組合せ論と `(ZMod p)ˣ` の
 算術で、(E.23) の成否と独立に完結する。**項 5 で手を止めない**。
+
+## 2026-07-20 (33): ⭐ E.4 計画の項 7 (最終算術) 完了 — 項 5 と独立に確定
+
+`eq_of_eigenvalue_relations` — `(ZMod p)ˣ` の純粋算術。BG p.164 の締めそのもの。
+
+```
+orderOf r = q,  j ≤ i,  i + 1 ≤ m,  m + 2 ≤ q,
+r^(i+j+1) = r^m,  t₀ · t^(i+j) = t^m       ⟹   t₀ = t
+```
+
+(`m = k - 1` と置いて ℕ の切り捨て減算を回避。)
+
+要点は **合同から等号への格上げ**: `pow_eq_pow_iff_modEq` で
+`i+j+1 ≡ m (mod q)` を得たあと、範囲条件 (`j ≤ i < m`, `m+2 ≤ q`) から
+`|m - (i+j+1)| < q` を omega で出し、`Int.eq_zero_of_abs_lt_dvd` で `= 0` に。
+
+⚠ (E.22)/(E.23) の導出とは**独立**。項 5 の Case A/B が未決でも確定。
+
+### 進捗まとめ
+
+| 項 | 内容 | 状態 |
+|---|---|---|
+| 1 | `S' ≤ T` | ✅ |
+| 2 | `B`-不変補空間 `Q/S'` | ✅ |
+| 3 | `r = r₀` | ✅ |
+| 4 | `t ≠ t₀` = (E.21) | ✅ |
+| 5 | (E.23) = (E.22) の `β` 版 | ⚠ **Case A/B 未決** ((32)) |
+| 6 | `k,i,j` の組合せ + Lemma 4.2 ⟹ (E.26)/(E.27) | ⬜ |
+| 7 | 最終算術 | ✅ |
+
+### ⬜ 次 = 項 6
+
+BG: *"Take `k` minimal such that `T/H_k` is not abelian.  Then `[H₀,H₀]H_k = T'H_k = H_{k-1}`
+(E.24).  Now take `i` maximal such that `[H_i,T] ⊄ H_k` and `j` maximal such that
+`[H_i,H_j] ⊄ H_k`.  Then `0 ≤ j ≤ i ≤ k-2` and `[w_i,w_j] ∈ H_{k-1} - H_k` (E.25).
+By (E.22), ∃ `x ∈ H_{i+1}`, `x' ∈ H_{j+1}` with `w_i^α = w_i^{r_i}x`, `w_j^α = w_j^{r_j}x'`,
+and `[w_i,w_j]^α ≡ [w_i,w_j]^{r_{k-1}} (mod H_k)`.  By Lemma 4.2,
+`[w_i,w_j]^α ≡ [w_i,w_j]^{r_i r_j} (mod H_k)`.  Therefore by (E.25), `r_i r_j = r_{k-1}`."*
+
+必要な部品:
+- `k` の極小性から (E.24) `T'H_k = H_{k-1}`。
+- `i`, `j` の極大性から誤差項 `⁅H_{i+1}, H_j⁆ ≤ H_k`・`⁅H_i, H_{j+1}⁆ ≤ H_k`
+  (これが Lemma 4.2 の適用条件)。
+- Lemma 4.2(a) = `commutatorElement_zpow_zpow_of_central`
+  (`AppE_RegularOperator.lean:390`, 既存) の section 版。
+- `⁅w_i,w_j⁆ ∈ H_{k-1} - H_k` と `|H_{k-1}:H_k| = p` で**冪の合同を指数の合同に**落とす。
+  📌 項 3 で作った `exists_zpow_of_map_eq_of_isCyclic` と同じ発想が使える。
+
+⚠ 項 6 は `α` 版 ((E.26)) と `β` 版 ((E.27)) が同型なので、
+**作用素を仮説パラメータに取る 1 本の補題**で両方を賄うべき
+(項 5 の Case A/B が決まる前でも `β` 版の形は書ける)。
+
+### ファイルサイズ
+
+`AppE_AbelianCentralizer.lean` = 現在 724 行。項 6 で嵩むので、
+1500 行に近づいたら項 6-7 を `AppE_EigenvalueArithmetic.lean` に分ける。
