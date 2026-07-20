@@ -806,7 +806,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
     (fun η hη => caseB_sOf_memberRFamily hG hyp d hunif hη)
     (fun a ha b hb hab =>
       OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal (hIKF ha) (hIKF hb) hab)
-    (Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime)
+    (OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime)
     (fun a ha h =>
       OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd _ (hIKF ha) h.symm)
     ⟨Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1, by
@@ -832,7 +832,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
           (OddOrder.Peterfalvi.S11.u_odd hG
             (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief)).pos.ne'))
     hyp.base.one_notMem_A0
-    (Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hμ₁mem)
+    (OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hμ₁mem)
     (OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd _ (hIKF hμ₁mem))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -877,7 +877,7 @@ noncomputable def caseB_coherent_sOf_H0C [Finite G]
       (by rw [← hyp.SOf_eq]; exact hyp.sOf_subset_SOf hyp.H0C hx)
   -- the conjugate `μ̄ ∈ 𝒮(H₀C)` (closed under conjugation)
   have hμc : μ.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C :=
-    Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
+    OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0C hμmem
   refine coherent_sOf_H0C_of_coherent_sOf_H0Cprime hyp
     (caseB_coherent_sOf_H0Cprime hG hyp caseB hncH0C htype).some ⟨μ.conj - μ, ⟨?_, ?_⟩, ?_⟩
   · -- `μ̄ − μ ∈ ℤ[𝒮(H₀C)]`

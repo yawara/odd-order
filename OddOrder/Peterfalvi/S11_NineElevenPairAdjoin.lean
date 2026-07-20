@@ -980,7 +980,7 @@ theorem nineElevenSevenEightRefutation
   have hlam₁S₃ : lam₁ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂ :=
     hS4sub ⟨hlam₁sOfC, hlam₁irr, hlam₁nS₂⟩
   have hlam₁c_S₄ : lam₁.conj ∈ nineElevenSFour hyp S₂ := by
-    refine ⟨Hypothesis.sOf_closedUnderConjugate hyp.s11Setup _ hlam₁sOfC,
+    refine ⟨OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup _ hlam₁sOfC,
       hlam₁irr.conj, ?_⟩
     intro hmem
     apply hlam₁nS₂
@@ -1058,7 +1058,7 @@ theorem nineElevenSevenEightRefutation
   have hS₃conj : ∀ x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
       x.conj ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂ := by
     intro x hx
-    refine ⟨Hypothesis.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hx.1, ?_⟩
+    refine ⟨OddOrder.Peterfalvi.S11.sOf_closedUnderConjugate hyp.s11Setup hyp.H0Cprime hx.1, ?_⟩
     intro hcmem
     apply hx.2
     have h := hS₂conj hcmem
