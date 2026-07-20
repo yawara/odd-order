@@ -335,9 +335,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                 だけに吸収し、prescribed kernel coordinate のまま係数 1 にする
           - [x] shift 復元と係数 1 化を一つの公開 endpoint に束ね、quotient actor
                 compatibility と `ν = λ·θ(λ)` を同時に保持する
-          - [ ] caller-prescribed generator 版 Lemma 11 の actual field model と二つの
+          - [x] caller-prescribed generator 版 Lemma 11 の actual field model と二つの
                 tracked shift を上記 endpoint へ接続し、noncommutative factor の
                 quotient coordinate を共通 `Φ(P)` 座標から構成する
+          - [ ] 同じ ambient Singer datum を左右因子へ一度ずつ適用し、両方の
+                quotient coordinate と `ν = λ·θ(λ) = μ·φ(μ)` を一つの endpoint で返す
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

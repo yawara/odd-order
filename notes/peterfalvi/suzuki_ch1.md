@@ -449,7 +449,7 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       第2層 coordinate が original coordinate の何乗 Frobenius shift かを exact equality
       付きで返す strong sibling theorem を追加し、従来 API はその projection とした。
       `ProperExtension` の anchored-trace construction 内で加わる第2の shift も exact
-      equality 付き strong sibling で公開し、従来 API は projection とした。従って次は
+      equality 付き strong sibling で公開し、従来 API は projection とした。さらに
       二つの shift を一つの Frobenius automorphism に合成し、type-A Frobenius power と
       可換することも証明した。relative degree 1 の trace formula は quotient coordinate
       だけを kernel field 側へ移して prescribed kernel coordinate を固定した normal form
@@ -457,10 +457,7 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       coordinate の rescaling だけで 1 にできる。これら二段階は
       `PrescribedFactorCoordinates.lean` の
       `exists_typeAQuotientCoordinates_of_prescribedKernel` に束ね、quotient actor
-      compatibility と `ν = λ·θ(λ)` も同時に保持する公開 API とした。残る接続は、
-      caller-prescribed generator 版 Lemma 11 の actual field model と二つの tracked
-      shift からこの API の shifted-normal-form 入力を組み立てる noncommutative
-      factor 側である。
+      compatibility と `ν = λ·θ(λ)` も同時に保持する公開 API とした。
       Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
       caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
       invariant factor への restricted action の faithful range でも generator のまま
@@ -469,7 +466,14 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       involution subgroup から証明し、第2 lower-central layer から ambient `Φ(P)` への
       canonical な `ZMod 2` 線形同値を構成した。この同値は factor の restricted action
       と ambient Frattini action を intertwine する。従ってこの branch では共通 Singer
-      座標を factor kernel へ作用同変に渡せる。commutative `A(n,1)` branch でも、
+      座標を factor kernel へ作用同変に渡せる。これを caller-prescribed generator 版
+      Lemma 11 の tracked field endpointへ接続し、二つの Frobenius shiftを quotient 側で
+      戻した後に係数を 1 へ吸収した。公開定理
+      `exists_noncommutativeFactorCoordinates_of_ambientFrattiniSinger` は、実際の invariant
+      factor `S` に対し ambient の同じ `c`, `ePhi`, `ν` を受け取り、kernel coordinate を
+      `factorLayerOneLinearEquivAmbientFrattini.trans ePhi` そのものに固定したまま quotient
+      coordinate、actor compatibility、係数 1 の square normal form、
+      `ν = λ·θ(λ)` を返す。commutative `A(n,1)` branch でも、
       square subgroup を ambient `Φ(P)` と identity-on-values で同一視し、共通 Singer
       座標を kernel へ移した。商座標は canonical square equivalence と inverse Frobenius
       から従属的に構成され、kernel eigenvalue `ν` に対する quotient eigenvalue が
@@ -482,9 +486,9 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
       p. 81 の表と直前の commutator formula から確認した。抽出画像は
       `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
-      次の source frontier は、この prescribed common `Φ(P)` 座標に合わせて左右 factor
-      の quotient 座標を構成し、`ν = λ·θ(λ) = μ·φ(μ)` と mixed pairing の
-      actor covariance を座標表示することである。その後、固有値制約から type B/C/D
+      次の source frontier は、同じ ambient Singer datum を左右 factor の上記 endpoint
+      へ一度ずつ適用し、`ν = λ·θ(λ) = μ·φ(μ)` を単一の paired result として束ね、
+      mixed pairing の actor covariance を座標表示することである。その後、固有値制約から type B/C/D
       の四場合を分岐する gluing case analysis へ進む。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
