@@ -2402,3 +2402,164 @@ relation。repo の `S05_Narrow*` に未形式化 (subagent grep 済) ゆえ新�
 これが入れば `caseA_eigenvalue_step` を base+step で帰納 → `hβsupply` 構成 →
 `commutator_centralizer_eq_bot_of_beta_supply` に投入 → E.4 abelian clause が閉じ、
 `AppE_FurtherResults:1645` の sorry が消える。**開いた数学は無し**、形式化労力のみ。
+
+## 2026-07-21 (51): ⭐⭐ gap を BG 原文で独立検証 + **degree of commutativity へ精密化** + class < p という決定的簡約
+
+親 (lane c) が (50) の subagent finding を BG 原文・Lie 環構造・repo 状態で**独立に再検証**。
+結果、gap は (50) の「standard な 2-step centralizer 定理」より**深い**が、同時に**class < p**
+という簡約が効くと判明。以下 4 点。
+
+### ① Finding 2 を BG 原文 (E.22)/(E.23) で独立確認 — β 側が本当に 2-step relation を要する
+
+- **α 側 (E.22)** `wᵢᵃ ≡ wᵢ^{rᵢ} (mod Hᵢ₊₁)` が通るのは `vᵃ = vʳ` (v = R₀ 生成元が α の**正確な**
+  固有ベクトル) ゆえ右スロットに誤差ゼロだから。`wᵢ = ⁅wᵢ₋₁, v⁆`、`[wᵢ₋₁^{rᵢ₋₁}·u, vʳ]` の
+  `u ∈ Hᵢ` 誤差は `[Hᵢ, S] = Hᵢ₊₁` に落ちる。**2-step relation 不要**。
+- **β 側 (E.23)** `wᵢ^β ≡ wᵢ^{tᵢ}` は β が R₀ を固定しない ⟹ `v̄^β = t·v_Q + t₀·v_T` (S/S' で分解、
+  `v_T ∈ T/S'`, t≠t₀)。`[wᵢ₋₁, v_T]` の項が残り、これを mod Hᵢ₊₁ で消すには `⁅Hᵢ₋₁, T⁆ ≤ Hᵢ₊₁`
+  が要る = **2-step centralizer relation**。weight bound は `⁅Hᵢ₋₁, T⁆ ≤ Hᵢ` (1 段) しか出さない。
+  ⟹ (50) の Finding 2 は原文で確認、"Similarly one can show" の実体はこれ。
+
+### ② ★ 2-step relation を **degree of commutativity ≥ 1 に還元** (clean な 3-subgroups 帰納)
+
+`⁅T, H_a⁆ ≤ H_{a+2}` (a≥1) は次の**弱い**入力から出る:
+> **degree of commutativity ≥ 1**: `⁅H_a, H_b⁆ ≤ H_{a+b+2}` (∀ a,b ≥ 1)
+> (weight bound `⁅H_a,H_b⁆ ≤ H_{a+b+1}` を 1 段改善したもの)
+
+還元 (a に関する帰納):
+- **base a=1**: `⁅T, H_1⁆ = ⁅H_0, H_1⁆ ≤ H_2` は weight bound そのもの。
+- **step a-1→a**: `H_a = ⁅H_{a-1}, ⊤⁆` ゆえ three-subgroups で
+  `⁅T, H_a⁆ = ⁅H_0, ⁅H_{a-1},⊤⁆⁆ ≤ ⁅⁅H_0,H_{a-1}⁆, ⊤⁆ · ⁅⁅⊤,H_0⁆, H_{a-1}⁆`。
+  - `⁅⁅T,H_{a-1}⁆, ⊤⁆ ≤ ⁅H_{a+1}, ⊤⁆ = H_{a+2}` (IH `⁅T,H_{a-1}⁆ ≤ H_{a+1}`)。
+  - `⁅⁅⊤,H_0⁆, H_{a-1}⁆ = ⁅H_1, H_{a-1}⁆ ≤ H_{a+2}` (`⁅⊤,T⁆ = H_1`、**degree of commutativity**)。
+  ⟹ `⁅T, H_a⁆ ≤ H_{a+2}` ✓。
+
+⟹ **本質的 gap = degree of commutativity ≥ 1**。逆に、soft な commutator calculus は
+全ルートで `⁅R₀,T⁆ = H_1` (= 丸ごと 1 段) の off-by-one に阻まれ、これ以上出ない (three-subgroups
+の 3 通りの grouping・upward/downward 帰納すべて確認済)。
+
+### ③ degree of commutativity ≥ 1 は **Blackburn の定理** (hard, p-odd 依存, soft でない)
+
+associated graded Lie 環 `L = ⊕ Lⱼ` (`L₁` 2 次元 = ⟨v̄, w̄₀⟩, `Lⱼ` 1 次元 j≥2) で、
+`γ_{i,j}` を `⁅ēᵢ, ēⱼ⁆ = γ_{i,j} ē_{i+j}` (i,j≥2) の構造定数とする。dc≥1 ⟺ 全 γ_{i,j}=0。
+- ad(v̄) が derivation ゆえ **線形漸化式 `γ_{i,j} = γ_{i+1,j} + γ_{i,j+1}`** + 反対称 `γ_{i,j}=-γ_{j,i}`。
+- しかしこれだけでは**閉じない**: 最上反対角 `i+j = n` の `γ_{i,n-i}` (∈ L_n = Z(S)) は**自由**で、
+  Jacobi では消えない。消すには **p odd** を使う追加の非線形関係 (ad(w̄₀) derivation:
+  `γ_{i,j}β_{i+j} = βᵢγ_{i+1,j}+βⱼγ_{i,j+1}`、`β_{i+1}=βᵢ-γ_{2,i}`) が要る。
+  ⟹ これが Blackburn 1958 の positive degree of commutativity の核心。**多 leaf の genuine infra**。
+
+### ④ ⭐ 決定的簡約: **class n < p** (Blackburn の exceptional case を回避)
+
+E.3(a) `card_A_dvd_half_p_sub_one` = `q ∣ (p-1)/2` ⟹ `q ≤ (p-1)/2`。
+E.3(c) `card_omega_le` = `|S| ≤ p^q`、`add_two_le_of_iterCommutator_ne_bot` = (H_m≠⊥ ⟹ m+2≤q)
+⟹ **class `n ≤ q-1 ≤ (p-3)/2 < p`**。
+Blackburn の dc=0 exceptional 群は**全て class ≥ p** (p 冪写像に絡む) なので、**class < p ⟹ dc ≥ 1**
+がクリーンに従うはず (class < p は Lazard/regular p-group 域)。⟹ 一般 Blackburn を形式化せず、
+**class < p 版の positive dc** を狙えばよい (大幅に易しい可能性)。
+
+### repo 状態 (親が Explore で確認)
+
+- **在る**: `iterCommutator_eq_lowerCentralSeries` (E.8, 鎖=lcs)、weight bound
+  (`Mann.lean:791 commutator_lowerCentralSeries_le_subgroup`)、`[S:T]=p`、`γ₂=S'≤T`
+  (`NarrowPGroup.lean:268`)、`⁅W,R⁆≤Ω₁(Z(R))` (`S05_NarrowSCN.lean:114`)、
+  coset-counting device (`S05_NarrowAutomorphisms.lean:344,421`)。
+- **無い**: maximal class / uniserial predicate、degree of commutativity、2-step relation。
+- ⚠ Explore の指摘: 2-step relation は **T-abelian を仮定せず**証明する必要 (これが T-abelian を
+  *証明する*道具ゆえ)。
+
+### ⟹ 次段の frontier (shared infra、claim = 9400 番台)
+
+1. **degree of commutativity ≥ 1 for maximal-class p-group of class < p** を形式化
+   (`OddOrder/GroupTheory/` の新 leaf、maximal class の Lie 環構造定数解析)。★重量物。
+2. ②の 3-subgroups 帰納で `⁅T, H_a⁆ ≤ H_{a+2}` を導出。
+3. `caseA_eigenvalue_step` を base+step で帰納 → `hβsupply` → E.4 abelian clause。
+
+⚠ ③の Blackburn 核心 proof は elided gap ゆえ、形式化前に最強モデルで class<p 版の clean proof を
+確認する ([[feedback-ask-chatgpt-for-elided-gaps]])。数学は未解決でなく、正しい proof strategy の確定待ち。
+
+## 2026-07-21 (52): ⚠⚠ dc の本質は「Blackburn (class 依存)」でなく「**regular B 作用 + Jacobi**」 — 精密化と impasse
+
+(51) を深掘りした結果、gap の性質が**大きく変わった**。以下 4 点。★重要度高。
+
+### ① gap は dc≥1 (H_0=T 込み) で、soft な小 core への還元は無い
+
+2-step relation `⁅H_a,T⁆≤H_{a+2}` (a≥0) は **dc の b=0 の場合そのもの**。特に a=0 の
+`⁅T,T⁆≤H_2` (= S_1 が γ_3 を法にアーベル) は dc(a,b≥1) から**導けない別 base**。
+⟹ 「dc(a,b≥1) を仮定して 2-step を出す」clean reduction は無く、**dc は H_0=T 込みで
+`⁅H_a,H_b⁆≤H_{a+b+2}` (∀a,b≥0) が丸ごと本体**。(51)② の 3-subgroups 還元は a≥2 の step
+だけで、base (a=0,1) が dc 自身に戻る。
+
+### ② ⭐ B 作用が **per-level dichotomy を clean に与える** (Blackburn 一般論は不要)
+
+(50) Finding 1 の機構が判明: `B` は abelian (E.20) かつ regular ⟹ `S/S'` (2 次元) を
+**相異なる B-固有指標** `χ_Q≠χ_T` の 2 直線 `Q/S'` (β 値 t), `T/S'` (β 値 t₀, t≠t₀) に分解
+(β が `R₀Φ` を固定しない ⟹ non-scalar ⟹ 相異なる固有値)。graded Lie 環 `L=⊕Lⱼ` で
+bracket は B-同変ゆえ **各 section `Lⱼ`(j≥2, 1 次元) の β-固有値 σⱼ は χ_Q,χ_T の積**。
+`Lₐ = [L_1, L_{a-1}]` の 2 つの生成源 `[u_Q,·]`(固有値 t·σ_{a-1}) と `[u_T,·]`(t₀·σ_{a-1}) は
+**両方非零なら t=t₀ で矛盾** ⟹ ちょうど一方。⟹ **各 level で Case A (t·) か Case B (t₀·) の
+clean 二者択一** (eigenvalue 論のみ、Jacobi 不要)。これは形式化可能な clean lemma。
+
+### ③ ⚠ 但し「全 level Case A (= dc≥1)」の**解決は Jacobi と絡む** — 独立検算で dc=0 反例を作ろうとして失敗
+
+「switch (途中で active 生成元が u_Q→u_T に移る)」= Case B 発生を組もうとすると
+**Jacobi が過剰決定して矛盾する**ことを実例で確認 (n=6, dim 7):
+`Jacobi(x,y,e_4)` は `γ_{2,4}=-1` を強制、`Jacobi(x,e_2,e_3)` は `γ_{2,4}=0` を強制 ⟹ 0=-1 矛盾。
+⟹ **相異なる B-固有値 + Jacobi ⟹ dc≥1 (no switch)** が成り立つ**らしい** (複数の dc=0 構成が
+全て Jacobi 違反)。Blackburn の dc=0 exceptional 群は**この regular B 作用を許さない**
+(distinct-eigenvalue automorphism を持てない) のが真相と思われる。
+
+⟹ **(51) の「class<p だから easy」は誤り**。class の大小でなく、**regular B 作用 (distinct
+eigenvalue) が dc=0 を Jacobi 経由で排除する**のが機構。ただし「no switch」の clean な一般証明は
+未確立 (switch を仮定した Jacobi 矛盾の一般化が詰められていない)。
+
+### ④ clean formalization path (dc≥1 確立後): u_Q を uniserial 生成元に取れば β 側が α 側の写し
+
+dc≥1 (= u_Q uniserial) が立てば、chain 生成を BG の `v∈R₀` (第 3 線、β-固有ベクトルでない)
+でなく **`u_Q` (β-固有ベクトル, 固有値 t)** で取り直せる ⟹ `v^β=v^t` が**厳密**になり、β 側
+`τ_a = t·τ_{a-1} = t₀tᵃ` (E.23) が α 側 (E.22) と**同じ weight-bound だけの gate-free 帰納**で出る。
+⟹ `caseA_eigenvalue_step` の `hCaseA` gate も不要になる。**但し u_Q uniserial ⟺ 2-step ⟺ dc**
+なので、依然 dc が唯一の gate。
+
+### ⟹ impasse の性質と次段
+
+- **数学的 impasse**: 「distinct-eigenvalue regular B 作用 + Jacobi ⟹ maximal-class dc≥1」の
+  clean proof。②(dichotomy)は形式化可、③(no switch)が hard core。Blackburn 分類 or
+  Feit-Thompson 1991 原論文 or 最強モデルの authoritative input が要る
+  ([[feedback-ask-chatgpt-for-elided-gaps]]、autonomous lane では user 同席時/次 session)。
+- ⚠ **BG 原文に潜在 gap の疑い**: BG p.163 "Similarly one can show (E.23)" は dc≥1 を暗黙前提。
+  dc≥1 が regular B 作用から従うことの証明を BG は書いていない (Blackburn 既知として省略か)。
+  形式化には③の証明が要る = BG より踏み込む必要がある。
+- **本 session の判断**: E.4 β 側は上記 research-level impasse。②の clean dichotomy は形式化候補
+  だが単独では E.4 を閉じない。⟹ E.4 を dc-gated として据え置き、lane c の他 frontier で
+  sorry-free 進捗を作る (impasse からの逃避でなく、genuine な別 upstream work)。
+  E.4 再開時は③の authoritative proof 確定が先。issue 9402 に同旨。
+
+## 🧭 hub 裁定 (2026-07-21 03:12 tick) — (52) impasse は legitimate、c の処置は模範的。E.4-dc は user 同席案件
+
+hub が (52) の research impasse 宣言を独立レビューし、**c の判断に全面的に concur**:
+
+- **impasse は genuine (回避でない)**: c は (49)→(50)→(51)→(52) と 4 段で深く engage し、
+  自分の (51) 還元を独立検算で**自己否定** (「class<p だから easy」は誤り)、dc=0 構成が
+  Jacobi 違反する具体例 (n=6, dim7: γ_{2,4} が 0 と −1 に過剰決定) まで作った上で
+  「distinct-eigenvalue B 作用 + Jacobi ⟹ dc≥1 らしいが clean proof 未確立」と結論。
+  これは [[feedback-no-avoiding-hard-parts]] の「難所回避せず root-cause」を満たす —
+  難しいから止めたのでなく、**深く掘って genuine な research gap に到達**した。
+- **doneness 原則を厳守**: (a) E.4-dc gate を fabricate せず honest sorry に留めた、
+  (b) 誤った premise (class<p) の上に `MaximalClassPGroup.lean` を**建てなかった** (実測: 未作成)、
+  (c) 9402 の旧見立てを strike-through で訂正 (withdraw でなく authoritative-input-pending 化)。
+- **正しく pivot**: E.4 を据え置き、lane c の他 frontier で sorry-free 進捗へ (transcript active
+  で確認 = idle でない)。上流優先+文書順の下で 1 sub-gap が真に blocked なら他 genuine work に
+  移るのは正当 (STOP でない)。
+
+### ⚠ BG 原文の潜在 gap の疑い (hub も同意)
+
+BG p.163 "Similarly one can show (E.23)" は **dc≥1 を暗黙前提**にしており、その dc≥1 が
+regular B 作用から従うことの証明を BG は書いていない (Blackburn 既知として省略の疑い)。
+形式化には③ (no-switch ⟹ dc≥1) の証明が要り、**BG より踏み込む必要がある**。
+
+### 次段 = authoritative input (user 同席案件)
+
+[[feedback-ask-chatgpt-for-elided-gaps]] どおり、③の clean proof は最強モデル (ChatGPT Pro 拡張、
+Chrome MCP) or Blackburn 1958 分類 or Feit–Thompson 1991 原論文の authoritative input を要する。
+**Chrome MCP は user 同席が要る**ため autonomous lane では次段に置けない。⟹ **user がE.4 を
+進めたいときの案件**として flag (halt でなく report — c は他 frontier で進行中)。
+hub 単独では escalation しない (c が productively 他 work 中ゆえ blocking でない)。

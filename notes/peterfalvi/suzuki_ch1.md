@@ -680,3 +680,81 @@ bridge の underlying 抽出と合成。fI_left の代表元 = `f_left(g)` (quot
 
 **Stage 4 全体の commit 済**: C/D モデル・F×F 座標・extension・全 ofExtension・polarization。
 残: 4a-ii (factor-id) → branch dispatch (e 構築) → mixed 項/case → endpoint。多 session。
+
+### 2026-07-21 lane b: Stage 4a 完了 (square-extraction 3 本、全て defeq-clean)
+
+**重要な発見**: 座標互換性の square-extraction lemma が全て `Subtype.ext; rfl` /
+`rw+show+rfl` で閉じる (座標インフラが defeq で美しく還元)。`AmbientProductCoordinate.lean`:
+- `ambientCenterCoordinate_squareMap`: `ambientCenterCoordinate(sq_ambient[x]) = ePhi(⟨(x:P)²⟩)`
+- `factorLayerOneEquivAmbientFrattini_squareValue` (noncomm): factor bridge∘sq = ⟨(f g)²⟩
+- `homocyclicFourSquareSubgroupEquivFrattini_squareEquiv` (comm): homocyclic bridge∘sq = ⟨(S.subtype g)²⟩
+  (鍵: `lowerCentralSquareRepresentative=⟨underlying²⟩`, `homocyclicFourSquareEquiv_mk=x² は rfl`,
+   bridge = underlying 抽出)。
+⟹ 両 branch で `A(α)=ePhi(⟨(f g)²⟩)=q_X(α)` (ambient lemma + square_normal + eKernel_eq)。
+
+**残り Stage 4 (assembly、次 session)**:
+1. **A=q_X 統合**: 各 branch の FactorCoordinateData から `square_normal` (β·θ(β)/β²) と
+   `eKernel_eq` (= ePhi∘bridge) を取り、上記 extraction lemma と ambient lemma を合成して
+   `ambientCenterCoordinate(sq_ambient(fI_left α)) = α·θ(α)` (noncomm) / `α²` (comm) を得る。
+   要: fI_left α の rep = ambientTermZeroHom f g、その (f g) = square_normal の g と一致確認。
+2. **branch dispatch で e 構築**: FactorCoordinateData (comm/noncomm) から
+   (f, N, eQuot, hf, hfexact) を抽出 (exists_factorFamily_of_* と同 dispatch) →
+   `ambientProductEquiv`。hRnormal/hinf/hsup/hΦR は XiLengthThreeTypeAFactorData から
+   (left_normal, inf_eq_frattini, sup_eq_top, frattini_lt_left.le)。fL.range=left は
+   quotientToAmbientLayerZero の range 特性 (noncomm: range f=S ← lowerCentralTerm S 0=⊤)。
+3. **mixed 項 M(α,β)**: `M=ambientCenterCoordinate(bilinear(fI_left α, fI_right β))`。
+   endpoint `exists_mixedFrobeniusWeightEquation_of_xiLengthThree` の weight equation
+   `λ^(2^i)μ^(2^j)=ν^(2^k)` + 既存3項算術 (case 3) / 新4項算術 (case 4) で確定。
+4. **case assembly**: 各 case で `Q(α,β)=A+B+M = typeB/C/D quadratic map` を示し
+   `TypeB/C/DData.ofExtension` (S=ambientProductExtension, hsq=上記) → `higmanLemmaTwelve`。
+
+hsq の枠組み: `hsq ⟺ ePhi(⟨x²⟩)=q_BCD(coord)`。ambient lemma で LHS=Q、polarization で
+Q=A+B+M、A=q_X/B=q_Y (上記)、M=case 別。
+
+### 2026-07-21 lane b: Stage 4 assembly 開始 — noncomm A=q_X 完成
+
+新 leaf `CaseSplitBCD.lean`。`noncomm_ambientSquare_eq`:
+`ambientCenterCoordinate(sq_ambient(noncommFactorInclusion α)) = α·θ(α)` (非可換 branch)。
+証明: 両辺=`ePhi(⟨(f g)²⟩)` (f=S.subtype∘lctS0.subtype)。ambient 側=factorInclusion_eQuot_mk
++ ambientCenterCoordinate_squareMap、factor 側=square_normal + eKernel_eq +
+factorLayerOneEquivAmbientFrattini_squareValue。
+
+**確立した instance plumbing pattern (assembly 全体で必須)**:
+`ambientCenterCoordinate` が `hEA.zmodModule` を bake するので、ePhi/data を
+**letI-in-signature** で hEA.zmodModule 型付けする (hEA を先頭 param に、その後
+`letI : IsMulCommutative := IsMulCommutative.of_comm hEA.comm; letI : Module := hEA.zmodModule`
+を ePhi/data/conclusion の型に入れる)。`[Module]` を free variable にすると mismatch。
+また `heq : eQuot.symm α = ofMul(mk' g)` は `rw [hg]; rfl` (ofMul(toMul)=defeq)。
+
+**次 (comm A=q_X、noncomm の analog)**: comm branch は
+- f=S.subtype, N=Agemo S 2 1, eQuot は `≃+` (AddEquiv) → LinearEquiv 変換要
+  (exists_factorFamily_of_commutative @ MixedEigenweights:543 の eQuotLin 参照)
+- square map は `commutativeFactorSquareEquiv.toAdditive` (lowerCentralSquareMapAdditive でない)
+- factor 側 lemma = `homocyclicFourSquareSubgroupEquivFrattini_squareEquiv` (θ=1, q_X=α²)
+- eKernel_eq (comm) は `homocyclicFourSquareSubgroupEquivFrattini` bridge
+
+**その後**: branch dispatch (comm/noncomm factorInclusion → ambientProductEquiv の e) →
+mixed 項 M を case 別固有値算術で確定 → case assembly で higmanLemmaTwelve endpoint。
+
+### 2026-07-21 lane b: comm A=q_X の instance plumbing 課題 (次 session)
+
+noncomm A=q_X (`noncomm_ambientSquare_eq`) は committed。comm A=q_X を試作したが
+**quotient module instance の synthesis 課題**で保留 (WIP =
+scratchpad/CaseSplitBCD_comm_wip.lean)。課題:
+- comm factor の L₀ = `S ⧸ Agemo S 2 1`、その module は
+  `AddCommGroup.zmodModule h2` (h2 : ∀q, 2•q=0 の proof から) で構築。
+  `commFactorInclusion` の def 内 letI と proof 内 letI で別インスタンスになり、
+  `rw [commFactorInclusion]` unfold 時に「failed to synthesize」。
+- `set eQuotLin` の rfl / hαrep も再考要 (`eQuotLin = {data.eQuot with map_smul'}`)。
+
+**fix 方針 (次 session)**:
+- (a) `commFactorInclusion` を quotient module + CommGroup + IsMulComm を **instance
+  param** で受ける形にし、caller が 1 度だけ構築して共有 (内部 letI 廃止)。または
+- (b) `Module (ZMod 2) M` は scalar action 一意 (proof-irrelevant) ゆえ全 instance が
+  defeq のはず — `AddCommGroup.zmodModule h2` 同士が defeq-match しない理由を精査し、
+  canonical instance (例: S⧸Agemo の elementary-abelian からの標準 module) を使う。
+- exists_factorFamily_of_commutative (MixedEigenweights:543-595) が同じ setup を
+  していて通っているので、その instance 構築を厳密に踏襲する (letI の順序・値を一致)。
+
+noncomm は defeq clean だったが (lowerCentralLayer S 0 の module が canonical)、
+comm は S⧸Agemo の module が proof-derived で friction。branch dispatch でも同課題。
