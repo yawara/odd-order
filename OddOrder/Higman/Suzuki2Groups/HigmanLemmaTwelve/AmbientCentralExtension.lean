@@ -34,8 +34,9 @@ namespace OddOrder.Higman.Suzuki2Groups
 open OddOrder.GroupTheory
 open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.Isaacs.Ch03
+open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 
-universe uP
+universe uP uF
 
 section /- Higman Lemma 12: ambient central extension (p. 90) -/
 
@@ -174,5 +175,194 @@ theorem lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
   simp
 
 end
+
+namespace XiLengthTwoTypeAData
+
+variable {S : Type uP} [Group S]
+variable (data : XiLengthTwoTypeAData.{uP, uF} S)
+
+local instance : Field data.F := data.fieldF
+local instance : Finite data.F := data.finiteF
+local instance : CharP data.F 2 := data.charTwoF
+local instance : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+
+/-- The short exact sequence carried by an inclusive type-A model.
+
+Both the central-kernel and quotient coordinates are transported from the
+concrete quadratic extension along `equivModel`. -/
+noncomputable def modelExtension :
+    GroupExtension (Multiplicative data.F) S (Multiplicative data.F) := by
+  let E := QuadraticExtension.extension
+    (typeAQuadraticMap data.phi)
+    (Module.finBasis (ZMod 2) data.F)
+  exact
+    { inl := data.equivModel.symm.toMonoidHom.comp E.inl
+      rightHom := E.rightHom.comp data.equivModel.toMonoidHom
+      inl_injective := data.equivModel.symm.injective.comp E.inl_injective
+      range_inl_eq_ker_rightHom := by
+        rw [MonoidHom.range_comp, E.range_inl_eq_ker_rightHom]
+        exact (MonoidHom.ker_comp_mulEquiv E.rightHom data.equivModel).symm
+      rightHom_surjective :=
+        E.rightHom_surjective.comp data.equivModel.surjective }
+
+/-- Projection from an inclusive type-A model to its quotient field
+coordinate. -/
+noncomputable def modelProjection : S →* Multiplicative data.F :=
+  data.modelExtension.rightHom
+
+/-- The quotient-coordinate projection of an inclusive type-A model is
+onto. -/
+theorem modelProjection_surjective :
+    Function.Surjective data.modelProjection :=
+  data.modelExtension.rightHom_surjective
+
+/-- An element is killed by the type-A model projection exactly when its
+square is one. -/
+theorem mem_modelProjection_ker_iff_sq_eq_one (x : S) :
+    x ∈ data.modelProjection.ker ↔ x ^ 2 = 1 := by
+  rw [MonoidHom.mem_ker]
+  change Multiplicative.ofAdd (data.equivModel x).quotient = 1 ↔ x ^ 2 = 1
+  constructor
+  · intro hx
+    have hquot : (data.equivModel x).quotient = 0 := by
+      simpa using congrArg Multiplicative.toAdd hx
+    apply data.equivModel.injective
+    rw [map_pow, map_one, TypeAModel.sq_eq_inl_quadraticMap]
+    simp [hquot]
+  · intro hx
+    have hmodel : (data.equivModel x) ^ 2 = 1 := by
+      simpa only [map_pow, map_one] using congrArg data.equivModel hx
+    rw [TypeAModel.sq_eq_inl_quadraticMap] at hmodel
+    have hinl : Multiplicative.ofAdd
+        ((data.equivModel x).quotient *
+          data.phi (data.equivModel x).quotient) = 1 := by
+      apply (QuadraticExtension.extension
+        (typeAQuadraticMap data.phi)
+        (Module.finBasis (ZMod 2) data.F)).inl_injective
+      simpa using hmodel
+    have hprod :
+        (data.equivModel x).quotient *
+          data.phi (data.equivModel x).quotient = 0 := by
+      simpa using congrArg Multiplicative.toAdd hinl
+    have hquot : (data.equivModel x).quotient = 0 := by
+      rcases mul_eq_zero.mp hprod with h | h
+      · exact h
+      · exact data.phi.injective (by simpa using h)
+    simp [hquot]
+
+/-- Inside an ambient group, the type-A quotient-coordinate kernel is the
+intersection with the ambient Frattini subgroup.
+
+This is a group-level coordinate identification.  It does not yet assert
+compatibility with the ambient actor action. -/
+theorem modelProjection_ker_eq_frattini_subgroupOf
+    {P : Type uP} [Group P]
+    {S : Subgroup P}
+    (data : XiLengthTwoTypeAData.{uP, uF} S)
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P)) :
+    data.modelProjection.ker = (frattini P).subgroupOf S := by
+  ext x
+  rw [data.mem_modelProjection_ker_iff_sq_eq_one]
+  change x ^ 2 = 1 ↔ (x : P) ∈ frattini P
+  constructor
+  · intro hx
+    by_cases hxOne : (x : P) = 1
+    · simp [hxOne]
+    · apply hinvPhi
+      exact ⟨by simpa using congrArg Subtype.val hx, hxOne⟩
+  · intro hx
+    apply Subtype.ext
+    simpa using congrArg Subtype.val (hEA.pow_eq_one ⟨(x : P), hx⟩)
+
+/-- The type-A central-kernel coordinate, transported onto the factor's
+intersection with the ambient Frattini subgroup.
+
+This is a group equivalence.  Compatibility with the ambient actor action is
+not asserted here. -/
+noncomputable def modelKernelEquivFrattiniSubgroupOf
+    {P : Type uP} [Group P]
+    {S : Subgroup P}
+    (data : XiLengthTwoTypeAData.{uP, uF} S)
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P)) :
+    Multiplicative data.F ≃* (frattini P).subgroupOf S :=
+  (MonoidHom.ofInjective data.modelExtension.inl_injective).trans
+    (MulEquiv.subgroupCongr
+      (data.modelExtension.range_inl_eq_ker_rightHom.trans
+        (data.modelProjection_ker_eq_frattini_subgroupOf hinvPhi hEA)))
+
+/-- If the ambient Frattini subgroup lies in the modeled factor, its type-A
+kernel coordinate is a coordinate on that ambient subgroup itself.
+
+This remains a group equivalence; no field multiplication or actor action is
+transported by this definition. -/
+noncomputable def modelKernelEquivFrattini
+    {P : Type uP} [Group P]
+    {S : Subgroup P}
+    (data : XiLengthTwoTypeAData.{uP, uF} S)
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hPhiS : frattini P ≤ S) :
+    Multiplicative data.F ≃* frattini P :=
+  (data.modelKernelEquivFrattiniSubgroupOf hinvPhi hEA).trans
+    (Subgroup.subgroupOfEquivOfLe hPhiS)
+
+/-- The quotient of a type-A factor by its intersection with the ambient
+Frattini subgroup is its defining additive field.
+
+This equivalence records the group quotient coordinate only; equivariance
+under the ambient actor remains a separate obligation. -/
+noncomputable def modelQuotientEquivFrattiniSubgroupOf
+    {P : Type uP} [Group P]
+    {S : Subgroup P}
+    (data : XiLengthTwoTypeAData.{uP, uF} S)
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P)) :
+    S ⧸ (frattini P).subgroupOf S ≃* Multiplicative data.F := by
+  letI : ((frattini P).subgroupOf S).Normal :=
+    (inferInstance : (frattini P).Normal).subgroupOf S
+  exact
+    (QuotientGroup.quotientMulEquivOfEq
+      (data.modelProjection_ker_eq_frattini_subgroupOf
+        hinvPhi hEA).symm).trans
+      data.modelExtension.quotientKerRightHomEquivRight
+
+end XiLengthTwoTypeAData
+
+namespace XiLengthThreeTypeAFactorData
+
+variable {P : Type uP} [Group P]
+variable {Y : Subgroup (MulAut P)}
+variable (data : XiLengthThreeTypeAFactorData P Y)
+
+local instance : Field data.left_model.F := data.left_model.fieldF
+local instance : Finite data.left_model.F := data.left_model.finiteF
+local instance : CharP data.left_model.F 2 := data.left_model.charTwoF
+local instance : Algebra (ZMod 2) data.left_model.F :=
+  ZMod.algebra data.left_model.F 2
+local instance : Field data.right_model.F := data.right_model.fieldF
+local instance : Finite data.right_model.F := data.right_model.finiteF
+local instance : CharP data.right_model.F 2 := data.right_model.charTwoF
+local instance : Algebra (ZMod 2) data.right_model.F :=
+  ZMod.algebra data.right_model.F 2
+
+/-- The actual additive transition between the two type-A kernel fields,
+obtained by identifying both kernels with the same ambient `Φ(P)`.
+
+This is the honest common central coordinate available at the group level.
+It is deliberately not promoted to a ring equivalence or an actor-equivariant
+map; those are further obligations in Higman's B/C/D case analysis. -/
+noncomputable def kernelCoordinateTransition
+    (hinvPhi : involutions P ⊆ frattini P)
+    (hEA : IsElementaryAbelian 2 ↑(frattini P)) :
+    Multiplicative data.left_model.F ≃*
+      Multiplicative data.right_model.F :=
+  (data.left_model.modelKernelEquivFrattini hinvPhi hEA
+      data.frattini_lt_left.le).trans
+    (data.right_model.modelKernelEquivFrattini hinvPhi hEA
+      data.frattini_lt_right.le).symm
+
+end XiLengthThreeTypeAFactorData
 
 end OddOrder.Higman.Suzuki2Groups
