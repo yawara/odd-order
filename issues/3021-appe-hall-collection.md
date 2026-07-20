@@ -1971,3 +1971,40 @@ Case B (`⁅H_i, Q'⁆ ≤ H_{i+2}`) を `i = 0` で使う: `⁅T, Q'⁆ ≤ H�
 
 📌 次イテレーションは **段 1 (`k ≥ 3`) の Lean 実装**から。
 `commutator_le_of_generators` を `A=B=H₀`, `a=b=w₀` で当てるだけなので短い。
+
+## 2026-07-20 (44): (E.24) 完成 — E.4 の named results が出揃った
+
+`sup_commutator_eq_of_min_index` = **BG (E.24)** `T'·H_k = H_{k-1}`。
+
+### E.4 の一般補題は完備 (1014 行)
+
+| BG の式 | Lean |
+|---|---|
+| (E.18) | `not_fixes_sup_frattini_of_not_fixes_R₀` |
+| (E.20) | `commutator_eq_bot` |
+| `r = r₀` | `dvd_sub_eigenvalues` |
+| (E.21) `t ≠ t₀` | `not_dvd_sub_eigenvalues_of_not_fixes` |
+| (E.24) | `sup_commutator_eq_of_min_index` |
+| (E.25) 範囲 | `range_of_max_commutator_indices` |
+| (E.25) witness | `commutator_le_of_generators` |
+| `i ≥ 1` (⟹ `k ≥ 3`) | `commutator_self_le_of_generator` |
+| Lemma 4.2 両スロット | `commutatorElement_zpow_mul_zpow_mul` |
+| (E.26)/(E.27) | `dvd_sub_mul_of_commutator_eigen` |
+| 最終算術 | `eq_of_eigenvalue_relations` |
+| 指数 clause | `index_centralizer_upperCentralSeries` |
+
+### ⬜ 残り = `RegularOperatorSetup` への当てはめのみ
+
+1. `k ≤ q-1` — `|T/H_k| = p^k ≤ |T| = |S|/p ≤ p^{q-1}` (E.3(c))。
+   `Nat.pow_le_pow_iff_right` の一行。
+2. Case B 排除の段 2 — `H₁ ≤ T' ⊔ H₂`・`T' ≤ H_{k-1}`・`H_{k-1} ≤ H₂` (k≥3) ⟹
+   `H₁ ≤ H₂` で `H₂ < H₁` に矛盾。`sup_le` + `le_trans` の数行 (補題化不要)。
+3. **本体の組み立て** — Step 2 の chain API
+   (`iterCommutator`・`index_subgroupOf_chain`・`commutatorIterate_not_mem`・
+   `exists_eigenvalue_pow`) を使って上の一般補題群に仮説を供給する。
+   ⚠ ここが最大の残作業。`AppE_RegularOperator.lean` の chain API を
+   一通り読んでから着手すること。
+
+📌 ファイルは 1014 行。当てはめ本体は
+**`AppE_EigenvalueCombinatorics.lean` を新設**して書くのが良い
+(CLAUDE.md ファイル粒度: 1500 行手前で分割、新主結果は新 leaf)。
