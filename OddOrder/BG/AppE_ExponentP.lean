@@ -833,4 +833,41 @@ theorem RegularOperatorSetup.inf_centralizer_eq_seed [Finite R]
   refine le_antisymm (fun x hx => ⟨hx.2, hexp x hx.1⟩) (le_inf hseed fun x hx => hx.1)
 
 
+/-- **`|seed| ≤ p²`**, i.e. BG's `|R₀ × Ω₁(R₁)| = p²` as an upper bound.
+
+The seed is elementary abelian (`omega1OfAbelian_isElementaryAbelian`) inside `C_R(R₀)`,
+which has the cyclic `R₁` as a subgroup of index `p` (`card_centralizer_R₀`); so
+`GroupTheory.card_le_prime_sq_of_isCyclic_of_index_le_prime` applies.
+
+Together with `(E.14)` (`inf_centralizer_eq_seed`) this bounds `|C_S(R₀)|` for every `S` in
+the family — with no rank hypothesis, which is what Step 3 needs. -/
+theorem RegularOperatorSetup.card_seed_le [Finite R] (hyp : RegularOperatorSetup R B p q) :
+    Nat.card ↥hyp.seed ≤ p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set C : Subgroup R := Subgroup.centralizer (hyp.R₀ : Set R) with hC
+  have hR₁C : hyp.R₁ ≤ C := by rw [hC, hyp.centralizer_eq]; exact le_sup_right
+  have hseedC : hyp.seed ≤ C := fun x hx => hx.1
+  haveI : IsCyclic ↥(hyp.R₁.subgroupOf C) := by
+    haveI := hyp.R₁_cyclic
+    exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hR₁C).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hR₁C).symm.surjective
+  have hidx : (hyp.R₁.subgroupOf C).index = p := by
+    have h := (hyp.R₁.subgroupOf C).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₁C).toEquiv, hyp.card_centralizer_R₀] at h
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥hyp.R₁)) ?_
+    rw [h]; ring
+  have hEA : (hyp.seed.subgroupOf C).IsElementaryAbelian p := by
+    constructor
+    · intro x y
+      refine Subtype.ext (Subtype.ext ?_)
+      exact hyp.centralizer_R₀_mul_comm _ (hseedC (Subgroup.mem_subgroupOf.mp x.2)) _
+        (hseedC (Subgroup.mem_subgroupOf.mp y.2))
+    · intro x
+      refine Subtype.ext (Subtype.ext ?_)
+      simpa using hyp.seed_pow_eq_one (Subgroup.mem_subgroupOf.mp x.2)
+  have hbound := GroupTheory.card_le_prime_sq_of_isCyclic_of_index_le_prime
+    (K := hyp.R₁.subgroupOf C) inferInstance (le_of_eq hidx) hEA
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hseedC).toEquiv] at hbound
+
+
 end OddOrder.BG.AppE
