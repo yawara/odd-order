@@ -478,4 +478,88 @@ theorem centralizer_singleton_subgroupOf {G : Type*} [Group G] (T : Subgroup G) 
     exact Subtype.ext (h v rfl)
 
 
+/-- **BG (E.16)**: `|T : T₁| < p²`, where `T₁ = S ⊔ C_T(v)`.
+
+BG: *"the conjugacy class of `v` in `T` is the union of `|T : T₁|` conjugacy classes of `S`,
+each having `|S|/p²` elements.  Since none contains the identity element,
+`|T : T₁|·|S|/p² ≤ |S| − 1 < |S|` and `|T : T₁| < p²`."*
+
+⚠ **The fusion of `S`-classes never has to be formalised.**  One application of
+orbit--stabilizer in `T` suffices: `|K_T|·|C_T(v)| = |T|`, `|T| = |T:T₁|·|T₁|` and
+`|T₁|·p² = |S|·|C_T(v)|` (`card_sup_centralizer`) already combine to
+`p²·|K_T| = |T:T₁|·|S|`.  The `T`-class `K_T` is a *proper* subset of `S` — inside it
+because `S ⊴ T`, proper because it misses `1`. -/
+theorem RegularOperatorSetup.index_sup_centralizer_lt [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀)
+    (hvS : v ∈ S) (hv1 : v ≠ 1) :
+    ((S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R))).subgroupOf T).index < p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set C : Subgroup R := T ⊓ Subgroup.centralizer ({v} : Set R) with hC
+  set T₁ : Subgroup R := S ⊔ C with hT₁
+  have hT₁T : T₁ ≤ T := sup_le hST inf_le_left
+  set v' : ↥T := ⟨v, hST hvS⟩ with hv'
+  set O := MulAction.orbit (ConjAct ↥T) v' with hO
+  -- (1) orbit--stabilizer in `↥T`
+  have hstab : MulAction.stabilizer (ConjAct ↥T) v' = C.subgroupOf T := by
+    rw [ConjAct.stabilizer_eq_centralizer]
+    exact centralizer_singleton_subgroupOf T (hST hvS)
+  have h1 : Nat.card O * Nat.card ↥(C.subgroupOf T) = Nat.card ↥T := by
+    have hidx : (MulAction.stabilizer (ConjAct ↥T) v').index = Nat.card O :=
+      (Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (ConjAct ↥T) v')).symm
+    have h := (MulAction.stabilizer (ConjAct ↥T) v').card_mul_index
+    rw [hidx, hstab] at h
+    rw [mul_comm]
+    exact h
+  -- (2) `|T| = |T₁|·|T : T₁|`
+  have h2 := (T₁.subgroupOf T).card_mul_index
+  have hcT₁ : Nat.card ↥(T₁.subgroupOf T) = Nat.card ↥T₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hT₁T).toEquiv
+  have hcC : Nat.card ↥(C.subgroupOf T) = Nat.card ↥C :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : C ≤ T)).toEquiv
+  rw [hcT₁] at h2
+  rw [hcC] at h1
+  -- (3) the product formula
+  have h3 := hyp.card_sup_centralizer hR₀S hST hexp hS hTN hv
+  -- (5) the `T`-class is a proper subset of `S`
+  have hOsub : O ⊆ ((S.subgroupOf T : Subgroup ↥T) : Set ↥T) := by
+    rintro y ⟨t, rfl⟩
+    simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, ConjAct.smul_def]
+    have ht := hTN (ConjAct.ofConjAct t).2
+    simpa using (Subgroup.mem_normalizer_iff.mp ht v).mp hvS
+  have hOne : (1 : ↥T) ∉ O := by
+    rintro ⟨t, ht⟩
+    have ht' : ConjAct.ofConjAct t * v' * (ConjAct.ofConjAct t)⁻¹ = 1 := by
+      rw [← ConjAct.smul_def]; exact ht
+    refine hv1 (congrArg Subtype.val (?_ : v' = 1))
+    calc v'
+        = (ConjAct.ofConjAct t)⁻¹ * (ConjAct.ofConjAct t * v' * (ConjAct.ofConjAct t)⁻¹) *
+            ConjAct.ofConjAct t := by group
+      _ = (ConjAct.ofConjAct t)⁻¹ * 1 * ConjAct.ofConjAct t := by rw [ht']
+      _ = 1 := by group
+  have hOlt : Nat.card O < Nat.card ↥S := by
+    have hssub : O ⊂ ((S.subgroupOf T : Subgroup ↥T) : Set ↥T) :=
+      ⟨hOsub, fun h => hOne (by rw [Set.eq_of_subset_of_subset hOsub h]; exact Subgroup.one_mem _)⟩
+    have hlt := Set.ncard_lt_ncard hssub (Set.toFinite _)
+    rw [← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq] at hlt
+    calc Nat.card O < Nat.card ↥(S.subgroupOf T) := hlt
+      _ = Nat.card ↥S := Nat.card_congr (Subgroup.subgroupOfEquivOfLe hST).toEquiv
+  -- (4)+(6): `p²·|K_T| = |T:T₁|·|S|`, then compare with `p²·|S|`
+  have hCpos : 0 < Nat.card ↥C := Nat.card_pos
+  have hSpos : 0 < Nat.card ↥S := Nat.card_pos
+  have hkey : Nat.card O * p ^ 2 = (T₁.subgroupOf T).index * Nat.card ↥S := by
+    refine Nat.eq_of_mul_eq_mul_right hCpos ?_
+    calc Nat.card O * p ^ 2 * Nat.card ↥C
+        = (Nat.card O * Nat.card ↥C) * p ^ 2 := by ring
+      _ = (Nat.card ↥T₁ * (T₁.subgroupOf T).index) * p ^ 2 := by rw [h1, h2]
+      _ = (Nat.card ↥T₁ * p ^ 2) * (T₁.subgroupOf T).index := by ring
+      _ = (Nat.card ↥S * Nat.card ↥C) * (T₁.subgroupOf T).index := by rw [h3]
+      _ = (T₁.subgroupOf T).index * Nat.card ↥S * Nat.card ↥C := by ring
+  have : (T₁.subgroupOf T).index * Nat.card ↥S < p ^ 2 * Nat.card ↥S := by
+    rw [← hkey, mul_comm (Nat.card O) (p ^ 2)]
+    exact mul_lt_mul_of_pos_left hOlt (pow_pos hyp.p_prime.pos 2)
+  exact Nat.lt_of_mul_lt_mul_right this
+
+
 end OddOrder.BG.AppE
