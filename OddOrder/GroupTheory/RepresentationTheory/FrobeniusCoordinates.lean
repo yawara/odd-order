@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.FieldTheory.Finite.Trace
@@ -308,6 +309,363 @@ theorem baseChange_eigen_conjugateTensorBasisOfLinearEquiv
 end TransportedBasis
 
 end FrobeniusCoordinates
+
+/-! ## Frobenius coordinates in a common overfield -/
+
+universe uCommonL
+
+section CommonFieldCoordinates
+
+variable (K : Type uK) (L : Type uCommonL)
+variable [Field K] [Finite K] [Algebra (ZMod 2) K]
+variable [Field L] [Algebra (ZMod 2) L]
+
+/-- The Frobenius embeddings of a finite `F₂`-field `K` into a common
+overfield `L`. -/
+noncomputable def frobeniusLinearFamilyAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    Fin (finrank (ZMod 2) K) → (K →ₗ[ZMod 2] L) :=
+  fun i ↦ (iota.comp
+    (FiniteField.frobeniusAlgHom (ZMod 2) K ^ i.val)).toLinearMap
+
+theorem linearIndependent_frobeniusLinearFamilyAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    LinearIndependent L (frobeniusLinearFamilyAlong K L iota) := by
+  change LinearIndependent L
+    (AlgHom.toLinearMap ∘ fun i : Fin (finrank (ZMod 2) K) ↦
+      iota.comp (FiniteField.frobeniusAlgHom (ZMod 2) K ^ i.val))
+  apply (linearIndependent_algHom_toLinearMap (ZMod 2) K L).comp
+  intro i j hij
+  apply (FiniteField.bijective_frobeniusAlgHom_pow (ZMod 2) K).injective
+  apply AlgHom.ext
+  intro x
+  apply iota.injective
+  exact DFunLike.congr_fun hij x
+
+/-- The tuple of Frobenius conjugates after embedding `K` in `L`. -/
+noncomputable def frobeniusTupleLinearMapAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    K →ₗ[ZMod 2] (Fin (finrank (ZMod 2) K) → L) where
+  toFun x i := iota
+    ((FiniteField.frobeniusAlgHom (ZMod 2) K ^ i.val) x)
+  map_add' x y := by
+    ext i
+    exact map_add (iota.comp
+      (FiniteField.frobeniusAlgHom (ZMod 2) K ^ i.val)) x y
+  map_smul' c x := by
+    ext i
+    exact map_smul (iota.comp
+      (FiniteField.frobeniusAlgHom (ZMod 2) K ^ i.val)) c x
+
+theorem span_range_frobeniusTupleLinearMapAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    Submodule.span L
+      (Set.range (frobeniusTupleLinearMapAlong K L iota)) = ⊤ := by
+  change Submodule.span L
+    (Set.range fun x ↦ frobeniusTupleLinearMapAlong K L iota x) = ⊤
+  have hli : LinearIndependent L
+      ((LinearMap.ltoFun (ZMod 2) K L L) ∘
+        frobeniusLinearFamilyAlong K L iota) :=
+    (linearIndependent_frobeniusLinearFamilyAlong K L iota).map'
+      (LinearMap.ltoFun (ZMod 2) K L L)
+      (LinearMap.ker_eq_bot_of_injective LinearMap.coe_injective)
+  have hfun : (fun x ↦ frobeniusTupleLinearMapAlong K L iota x) =
+      flip ((LinearMap.ltoFun (ZMod 2) K L L) ∘
+        frobeniusLinearFamilyAlong K L iota) := by
+    funext x i
+    rfl
+  rw [hfun]
+  exact span_flip_eq_top_iff_linearIndependent.mpr hli
+
+/-- Frobenius coordinates on `L ⊗[F₂] K`. -/
+noncomputable def frobeniusTensorCoordinatesAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    L ⊗[ZMod 2] K →ₗ[L] (Fin (finrank (ZMod 2) K) → L) :=
+  (frobeniusTupleLinearMapAlong K L iota).liftBaseChange L
+
+theorem bijective_frobeniusTensorCoordinatesAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    Function.Bijective (frobeniusTensorCoordinatesAlong K L iota) := by
+  have hsurj : Function.Surjective
+      (frobeniusTensorCoordinatesAlong K L iota) := by
+    rw [← LinearMap.range_eq_top, frobeniusTensorCoordinatesAlong,
+      LinearMap.range_liftBaseChange]
+    exact span_range_frobeniusTupleLinearMapAlong K L iota
+  have hdim : finrank L (L ⊗[ZMod 2] K) =
+      finrank L (Fin (finrank (ZMod 2) K) → L) := by
+    rw [finrank_baseChange]
+    simp
+  exact
+    ⟨(LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).mpr
+      hsurj, hsurj⟩
+
+/-- The common-overfield Frobenius-coordinate equivalence. -/
+noncomputable def frobeniusTensorCoordinateEquivAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    L ⊗[ZMod 2] K ≃ₗ[L] (Fin (finrank (ZMod 2) K) → L) :=
+  LinearEquiv.ofBijective (frobeniusTensorCoordinatesAlong K L iota)
+    (bijective_frobeniusTensorCoordinatesAlong K L iota)
+
+/-- The normalized common-overfield conjugate basis. -/
+noncomputable def conjugateTensorBasisAlong
+    (iota : K →ₐ[ZMod 2] L) :
+    Basis (Fin (finrank (ZMod 2) K)) L (L ⊗[ZMod 2] K) :=
+  Basis.ofEquivFun (frobeniusTensorCoordinateEquivAlong K L iota)
+
+omit [Finite K] in
+@[simp] theorem frobeniusTensorCoordinatesAlong_tmul
+    (iota : K →ₐ[ZMod 2] L) (a : L) (x : K) :
+    frobeniusTensorCoordinatesAlong K L iota (a ⊗ₜ[ZMod 2] x) =
+      fun i ↦ a * iota (x ^ (2 ^ i.val)) := by
+  ext i
+  simp [frobeniusTensorCoordinatesAlong, frobeniusTupleLinearMapAlong,
+    AlgHom.coe_pow, FiniteField.coe_frobeniusAlgHom, pow_iterate]
+
+@[simp] theorem conjugateTensorBasisAlong_repr_tmul_one
+    (iota : K →ₐ[ZMod 2] L) (x : K)
+    (i : Fin (finrank (ZMod 2) K)) :
+    (conjugateTensorBasisAlong K L iota).repr
+        ((1 : L) ⊗ₜ[ZMod 2] x) i = iota (x ^ (2 ^ i.val)) := by
+  change frobeniusTensorCoordinatesAlong K L iota
+    ((1 : L) ⊗ₜ[ZMod 2] x) i = _
+  rw [frobeniusTensorCoordinatesAlong_tmul]
+  simp
+
+theorem one_tmul_eq_sum_conjugateTensorBasisAlong
+    (iota : K →ₐ[ZMod 2] L) (x : K) :
+    (1 : L) ⊗ₜ[ZMod 2] x =
+      ∑ i : Fin (finrank (ZMod 2) K),
+        iota (x ^ (2 ^ i.val)) • conjugateTensorBasisAlong K L iota i := by
+  symm
+  simpa only [conjugateTensorBasisAlong_repr_tmul_one] using
+    (conjugateTensorBasisAlong K L iota).sum_repr
+      ((1 : L) ⊗ₜ[ZMod 2] x)
+
+section Transport
+
+variable {V : Type uV} [AddCommGroup V] [Module (ZMod 2) V]
+
+/-- Transport the common-overfield conjugate basis along an `F₂`-linear
+field model. -/
+noncomputable def conjugateTensorBasisAlongOfLinearEquiv
+    (iota : K →ₐ[ZMod 2] L) (e : V ≃ₗ[ZMod 2] K) :
+    Basis (Fin (finrank (ZMod 2) K)) L (L ⊗[ZMod 2] V) :=
+  (conjugateTensorBasisAlong K L iota).map
+    (e.baseChange (ZMod 2) L).symm
+
+theorem one_tmul_eq_sum_conjugateTensorBasisAlongOfLinearEquiv
+    (iota : K →ₐ[ZMod 2] L) (e : V ≃ₗ[ZMod 2] K) (v : V) :
+    (1 : L) ⊗ₜ[ZMod 2] v =
+      ∑ i : Fin (finrank (ZMod 2) K),
+        iota ((e v) ^ (2 ^ i.val)) •
+          conjugateTensorBasisAlongOfLinearEquiv K L iota e i := by
+  apply (e.baseChange (ZMod 2) L).injective
+  simpa [conjugateTensorBasisAlongOfLinearEquiv] using
+    one_tmul_eq_sum_conjugateTensorBasisAlong K L iota (e v)
+
+omit [Finite K] in
+theorem baseChange_intertwine_of_linearEquiv_mul_compat_along
+    (e : V ≃ₗ[ZMod 2] K) (T : Module.End (ZMod 2) V)
+    (u : K) (hcompat : ∀ v, e (T v) = u * e v)
+    (z : L ⊗[ZMod 2] V) :
+    (e.baseChange (ZMod 2) L V K) (T.baseChange L z) =
+      (Algebra.lmul (ZMod 2) K u).baseChange L
+        ((e.baseChange (ZMod 2) L V K) z) := by
+  induction z using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a v => simp [hcompat]
+  | add x y hx hy => simp only [map_add, hx, hy]
+
+end Transport
+
+omit [Finite K] in
+theorem frobeniusTensorCoordinatesAlong_baseChange_lmul_apply
+    (iota : K →ₐ[ZMod 2] L) (u : K) (z : L ⊗[ZMod 2] K)
+    (i : Fin (finrank (ZMod 2) K)) :
+    frobeniusTensorCoordinatesAlong K L iota
+        ((Algebra.lmul (ZMod 2) K u).baseChange L z) i =
+      iota (u ^ (2 ^ i.val)) *
+        frobeniusTensorCoordinatesAlong K L iota z i := by
+  induction z using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a x => simp [mul_pow, map_mul, mul_left_comm]
+  | add x y hx hy => simp only [map_add, Pi.add_apply, hx, hy, mul_add]
+
+theorem baseChange_lmul_conjugateTensorBasisAlong
+    (iota : K →ₐ[ZMod 2] L) (u : K)
+    (i : Fin (finrank (ZMod 2) K)) :
+    (Algebra.lmul (ZMod 2) K u).baseChange L
+        (conjugateTensorBasisAlong K L iota i) =
+      iota (u ^ (2 ^ i.val)) • conjugateTensorBasisAlong K L iota i := by
+  apply (frobeniusTensorCoordinateEquivAlong K L iota).injective
+  ext j
+  change frobeniusTensorCoordinatesAlong K L iota
+      ((Algebra.lmul (ZMod 2) K u).baseChange L
+        (conjugateTensorBasisAlong K L iota i)) j =
+    frobeniusTensorCoordinatesAlong K L iota
+      (iota (u ^ (2 ^ i.val)) • conjugateTensorBasisAlong K L iota i) j
+  rw [frobeniusTensorCoordinatesAlong_baseChange_lmul_apply]
+  simp only [map_smul, Pi.smul_apply, smul_eq_mul]
+  change iota (u ^ (2 ^ j.val)) *
+      ((conjugateTensorBasisAlong K L iota).repr
+        (conjugateTensorBasisAlong K L iota i)) j =
+    iota (u ^ (2 ^ i.val)) *
+      ((conjugateTensorBasisAlong K L iota).repr
+        (conjugateTensorBasisAlong K L iota i)) j
+  rw [Basis.repr_self_apply]
+  by_cases hij : i = j
+  · subst j
+    simp
+  · simp [hij]
+
+section TransportEigen
+
+variable {V : Type uV} [AddCommGroup V] [Module (ZMod 2) V]
+
+theorem baseChange_eigen_conjugateTensorBasisAlongOfLinearEquiv
+    (iota : K →ₐ[ZMod 2] L) (e : V ≃ₗ[ZMod 2] K)
+    (T : Module.End (ZMod 2) V) (u : K)
+    (hcompat : ∀ v, e (T v) = u * e v)
+    (i : Fin (finrank (ZMod 2) K)) :
+    T.baseChange L (conjugateTensorBasisAlongOfLinearEquiv K L iota e i) =
+      iota (u ^ (2 ^ i.val)) •
+        conjugateTensorBasisAlongOfLinearEquiv K L iota e i := by
+  apply (e.baseChange (ZMod 2) L).injective
+  rw [baseChange_intertwine_of_linearEquiv_mul_compat_along
+    K L e T u hcompat]
+  simpa [conjugateTensorBasisAlongOfLinearEquiv] using
+    baseChange_lmul_conjugateTensorBasisAlong K L iota u i
+
+end TransportEigen
+
+/-! ### Frobenius cycling -/
+
+/-- The cyclic successor of a Frobenius-coordinate index. -/
+noncomputable def frobeniusCoordinateSucc
+    (i : Fin (finrank (ZMod 2) K)) : Fin (finrank (ZMod 2) K) :=
+  ⟨(i.val + 1) % finrank (ZMod 2) K, Nat.mod_lt _ finrank_pos⟩
+
+private theorem pow_two_frobeniusCoordinateSucc (x : K)
+    (i : Fin (finrank (ZMod 2) K)) :
+    x ^ (2 ^ (frobeniusCoordinateSucc K i).val) =
+      (x ^ (2 ^ i.val)) ^ 2 := by
+  let n := finrank (ZMod 2) K
+  let sigma := FiniteField.frobeniusAlgHom (ZMod 2) K
+  have hsigmaOrder : orderOf sigma = n :=
+    FiniteField.orderOf_frobeniusAlgHom (ZMod 2) K
+  have hsigmaPow : sigma ^ n = 1 := by
+    rw [← hsigmaOrder]
+    exact pow_orderOf_eq_one sigma
+  have hmod : Nat.ModEq n (frobeniusCoordinateSucc K i).val (i.val + 1) :=
+    Nat.mod_modEq (i.val + 1) n
+  have happ := DFunLike.congr_fun
+    (pow_eq_pow_of_modEq hmod hsigmaPow) x
+  have hraw : x ^ (2 ^ (frobeniusCoordinateSucc K i).val) =
+      x ^ (2 ^ (i.val + 1)) := by
+    simpa only [sigma, AlgHom.coe_pow, FiniteField.coe_frobeniusAlgHom,
+      pow_iterate, ZMod.card, AlgHom.one_apply] using happ
+  calc
+    x ^ (2 ^ (frobeniusCoordinateSucc K i).val) =
+        x ^ (2 ^ (i.val + 1)) := hraw
+    _ = x ^ (2 ^ i.val * 2) := by rw [pow_succ]
+    _ = (x ^ (2 ^ i.val)) ^ 2 := pow_mul x _ _
+
+section FrobeniusCycle
+
+variable [Finite L]
+
+theorem frobeniusTensorCoordinatesAlong_frobeniusScalarBaseChange
+    (iota : K →ₐ[ZMod 2] L) (z : L ⊗[ZMod 2] K)
+    (i : Fin (finrank (ZMod 2) K)) :
+    frobeniusTensorCoordinatesAlong K L iota
+        (frobeniusScalarBaseChange L z) (frobeniusCoordinateSucc K i) =
+      (frobeniusTensorCoordinatesAlong K L iota z i) ^ 2 := by
+  letI : CharP L 2 :=
+    charP_of_injective_algebraMap (algebraMap (ZMod 2) L).injective 2
+  induction z using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a x =>
+      simp only [frobeniusScalarBaseChange_tmul,
+        frobeniusTensorCoordinatesAlong_tmul]
+      rw [pow_two_frobeniusCoordinateSucc, map_pow, mul_pow]
+  | add x y hx hy =>
+      simp only [map_add, Pi.add_apply, hx, hy]
+      exact (CharTwo.add_sq _ _).symm
+
+theorem frobeniusScalarBaseChange_conjugateTensorBasisAlong
+    (iota : K →ₐ[ZMod 2] L)
+    (i : Fin (finrank (ZMod 2) K)) :
+    frobeniusScalarBaseChange L (conjugateTensorBasisAlong K L iota i) =
+      conjugateTensorBasisAlong K L iota (frobeniusCoordinateSucc K i) := by
+  let n := finrank (ZMod 2) K
+  have hn : n ≠ 0 := finrank_pos.ne'
+  letI : NeZero n := ⟨hn⟩
+  have hsucc (j : Fin n) :
+      frobeniusCoordinateSucc K j = j + (1 : Fin n) := by
+    apply Fin.ext
+    simp [frobeniusCoordinateSucc, Fin.val_add]
+  have hsuccInj : Function.Injective
+      (frobeniusCoordinateSucc K : Fin n → Fin n) := by
+    intro a b h
+    apply (Equiv.addRight (1 : Fin n)).injective
+    simpa only [Equiv.coe_addRight, ← hsucc] using h
+  apply (frobeniusTensorCoordinateEquivAlong K L iota).injective
+  ext k
+  let j : Fin n := (Equiv.addRight (1 : Fin n)).symm k
+  have hk : frobeniusCoordinateSucc K j = k := by
+    rw [hsucc]
+    exact (Equiv.apply_symm_apply (Equiv.addRight (1 : Fin n)) k)
+  change frobeniusTensorCoordinatesAlong K L iota
+      (frobeniusScalarBaseChange L
+        (conjugateTensorBasisAlong K L iota i)) k =
+    frobeniusTensorCoordinatesAlong K L iota
+      (conjugateTensorBasisAlong K L iota
+        (frobeniusCoordinateSucc K i)) k
+  rw [← hk, frobeniusTensorCoordinatesAlong_frobeniusScalarBaseChange]
+  change (((conjugateTensorBasisAlong K L iota).repr
+      (conjugateTensorBasisAlong K L iota i)) j) ^ 2 =
+    ((conjugateTensorBasisAlong K L iota).repr
+      (conjugateTensorBasisAlong K L iota
+        (frobeniusCoordinateSucc K i))) (frobeniusCoordinateSucc K j)
+  rw [Basis.repr_self_apply, Basis.repr_self_apply]
+  by_cases hij : i = j
+  · simp [hij]
+  · have hsij : frobeniusCoordinateSucc K i ≠
+        frobeniusCoordinateSucc K j := fun h ↦ hij (hsuccInj h)
+    simp [hij, hsij]
+
+section TransportCycle
+
+variable {V : Type uV} [AddCommGroup V] [Module (ZMod 2) V]
+
+omit [Finite K] in
+theorem baseChange_intertwine_frobeniusScalarBaseChange
+    (e : V ≃ₗ[ZMod 2] K) (z : L ⊗[ZMod 2] V) :
+    (e.baseChange (ZMod 2) L V K) (frobeniusScalarBaseChange L z) =
+      frobeniusScalarBaseChange L
+        ((e.baseChange (ZMod 2) L V K) z) := by
+  induction z using TensorProduct.induction_on with
+  | zero => simp
+  | tmul a v =>
+      simp only [frobeniusScalarBaseChange_tmul,
+        LinearEquiv.baseChange_tmul]
+  | add x y hx hy => simp only [map_add, hx, hy]
+
+theorem frobeniusScalarBaseChange_conjugateTensorBasisAlongOfLinearEquiv
+    (iota : K →ₐ[ZMod 2] L) (e : V ≃ₗ[ZMod 2] K)
+    (i : Fin (finrank (ZMod 2) K)) :
+    frobeniusScalarBaseChange L
+        (conjugateTensorBasisAlongOfLinearEquiv K L iota e i) =
+      conjugateTensorBasisAlongOfLinearEquiv K L iota e
+        (frobeniusCoordinateSucc K i) := by
+  apply (e.baseChange (ZMod 2) L).injective
+  rw [baseChange_intertwine_frobeniusScalarBaseChange K L e]
+  simpa [conjugateTensorBasisAlongOfLinearEquiv] using
+    frobeniusScalarBaseChange_conjugateTensorBasisAlong K L iota i
+
+end TransportCycle
+end FrobeniusCycle
+end CommonFieldCoordinates
 
 /-! ## Relative trace in Frobenius coordinates -/
 

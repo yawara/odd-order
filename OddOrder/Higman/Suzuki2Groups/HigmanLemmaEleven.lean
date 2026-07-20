@@ -65,6 +65,60 @@ theorem exists_singerFrobeniusEigenbasis_of_transitive_generator_over
     (rho c) n hn (iota nu) hfin hcharL hprimL
   exact ⟨e, nu, b, hprim, hconj, hgen, hprimL, hb⟩
 
+/-- The transitive Singer model, transported to the canonical normalized
+Frobenius-conjugate basis in a chosen common splitting field. -/
+theorem exists_singerConjugateBasis_of_transitive_generator_over
+    {C V L : Type uCommonField} [CommGroup C] [IsCyclic C] [Finite C]
+    [AddCommGroup V] [Module (ZMod 2) V] [Finite V]
+    [Field L] [Finite L] [Algebra (ZMod 2) L]
+    (rho : Representation (ZMod 2) C V) (n : ℕ) (hn : 2 ≤ n)
+    (hfin : finrank (ZMod 2) V = n)
+    (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w)
+    (c : C) (hcgen : ∀ x : C, x ∈ Subgroup.zpowers c)
+    (iota : GaloisField 2 n →ₐ[ZMod 2] L) :
+    ∃ (e : V ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n)
+      (b : Basis (Fin (finrank (ZMod 2) (GaloisField 2 n))) L
+        (L ⊗[ZMod 2] V)),
+      IsPrimitiveRoot nu (2 ^ n - 1) ∧
+      e.conj (rho c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu ∧
+      Algebra.adjoin (ZMod 2)
+        ({nu} : Set (GaloisField 2 n)) = ⊤ ∧
+      IsPrimitiveRoot (iota nu) (2 ^ n - 1) ∧
+      b = conjugateTensorBasisAlongOfLinearEquiv
+        (GaloisField 2 n) L iota e ∧
+      (∀ v : V,
+        (1 : L) ⊗ₜ[ZMod 2] v =
+          ∑ i : Fin (finrank (ZMod 2) (GaloisField 2 n)),
+            iota ((e v) ^ (2 ^ i.val)) • b i) ∧
+      (∀ i,
+        (rho c).baseChange L (b i) =
+          iota (nu ^ (2 ^ i.val)) • b i) ∧
+      ∀ i,
+        frobeniusScalarBaseChange L (b i) =
+          b (frobeniusCoordinateSucc (GaloisField 2 n) i) := by
+  obtain ⟨e, nu, _b, hprim, hconj, hgen, _hb⟩ :=
+    exists_singerFrobeniusEigenbasis_of_transitive_generator
+      rho n hn hfin htrans c hcgen
+  let b := conjugateTensorBasisAlongOfLinearEquiv
+    (GaloisField 2 n) L iota e
+  have hcompat : ∀ v : V, e (rho c v) = nu * e v := by
+    intro v
+    have hv := DFunLike.congr_fun hconj (e v)
+    simpa using hv
+  refine ⟨e, nu, b, hprim, hconj, hgen,
+    hprim.map_of_injective iota.injective, rfl, ?_, ?_, ?_⟩
+  · intro v
+    exact one_tmul_eq_sum_conjugateTensorBasisAlongOfLinearEquiv
+      (GaloisField 2 n) L iota e v
+  · intro i
+    exact baseChange_eigen_conjugateTensorBasisAlongOfLinearEquiv
+      (GaloisField 2 n) L iota e (rho c) nu hcompat i
+  · intro i
+    exact frobeniusScalarBaseChange_conjugateTensorBasisAlongOfLinearEquiv
+      (GaloisField 2 n) L iota e i
+
 /-! ## Unequal-degree pair-gap arithmetic -/
 
 private def residueFin {n : ℕ} (hn : 0 < n) (a : ℕ) : Fin n :=
