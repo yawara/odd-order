@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S10_MinimalSimpleBasic
 import OddOrder.Peterfalvi.S07_Subcoherent
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
+import OddOrder.Peterfalvi.S10_TypePSupportA0
+import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
 
 /-!
 # Peterfalvi (8.15), claim 3: Hypothesis (5.2) for the type-`P` induced family
@@ -56,14 +58,28 @@ Everything is assembled via the (5.3.a) producer `S07.irrSubcoherent` from lande
   an irreducible-only family, and the reducible-column coherence is consumed directly as
   `S07.IsCoherent`.  So this irreducible producer is the honest `S07.Hypothesis`-form content
   of (8.15.3); nonemptiness of `S` is not needed for the structure fields.
-* **Type `P₁` regime**: the repo `typePA = (M')^#` equals Peterfalvi's `A(M)` only in the
-  type-`P₁` regime (`M_σ = M'`; issue 9008) — which is also where the claim-1 producer
-  `dadeSupportHypothesisData_typePA0_of_isTypeP1` supplies the input datum `d`.  The statements
-  below don't take `IsTypeP1` (they are proofs about the repo's `typePA0` set, valid for any
-  `TypePData`), but their reading as the book's (8.15.3) is faithful in the `P₁` regime; the
-  type-`P₂` (type II) form is gated on the 9008 `typePA` re-scoping — see issue 1042 着手順 3.
-* **Claim 2 of (8.15)** (the general Hypothesis (4.6) instance, `H = M_F` / `H = M_s`) is a
-  separate TODO — issue 1042 着手順 2.
+* **Type `P₁` regime (§8D only)**: the repo `typePA = (M')^#` equals Peterfalvi's `A(M)` only in
+  the type-`P₁` regime (`M_σ = M'`; issue 9008).  The §8D statements don't take `IsTypeP1` (they
+  are proofs about the repo's `typePA0` set, valid for any `TypePData`), but their *reading* as
+  the book's (8.15.3) is faithful only there — see §8E for why.
+* **Claim 2 of (8.15)** (the general Hypothesis (4.6) instance, `H = M_F` / `H = M_s`) is
+  `S10_Hypothesis46TypeP` (`typePACore_toHypothesis46_core` is the book's `H = M_s` choice).
+
+## §8E/§8F: the type-uniform (8.15.3) (issue 1042)
+
+§8D filters the induced family by `θ ≠ 1` and gets (5.2)'s support requirement from the crude
+`(M')^# ⊆ A`.  The book instead filters by **`M_s ⊄ Ker θ`**, and (5.3.b)'s proof gets
+`Z[𝒮, L^#] = Z[𝒮, A]` from **(4.7)**.  The distinction is invisible in the `P₁` regime — for
+`θ ∈ Irr M'` the two filters agree exactly when `M_s = M'` — but decisive elsewhere, because
+`(M')^# ⊆ A(M)` is **false** in types II/V, where `A(M) = ⋃_{x ∈ M_s^#} C_{M'}(x)^# ⊊ (M')^#`.
+
+* **§8E** supplies the book's family `inducedNonKernelFamily`, its (4.7)-based support estimate
+  `inducedNonKernelFamily_conjDiff_support`, and the `A`-general producer
+  `inducedNonKernelFamily_subcoherent` (= (5.3.b) verbatim).  Non-reality and pairwise
+  orthogonality are inherited from the coarser §8D family along
+  `inducedNonKernelFamily_subset_inducedKernelFamily_bot`.
+* **§8F** instantiates it at `A = A(M) = typePACore M`, `H = M_σ`
+  (`typePACore_subcoherent`) — valid for **every** type `𝒫`.
 -/
 
 namespace OddOrder.Peterfalvi.S10
@@ -292,8 +308,14 @@ variable (K : Subgroup ↥M) [Invertible (Nat.card ↥K : ℂ)]
 /-- **Peterfalvi (5.3.b)/(8.15.3)'s family** `{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`.
 
 The `H`-nontrivial analogue of `S08.inducedKernelFamily` (which filters by `θ ≠ 1` together with a
-*positive* kernel condition `X ⊆ Ker θ`).  At `H = K` the two conditions coincide — an irreducible
-`θ ∈ Irr K` has `K ⊆ Ker θ` iff `θ = 1` — which is exactly the type-`P₁` coincidence `M_s = M'`. -/
+*positive* kernel condition `X ⊆ Ker θ`).
+
+At `H = K` the two filters coincide — for irreducible `θ ∈ Irr K`, `K ⊆ Ker θ` iff `θ = 1` — which
+is exactly the type-`P₁` coincidence `M_s = M'`.  ⚠ Only the direction used downstream is
+formalized: `inducedNonKernelFamily_subset_inducedKernelFamily_bot` proves `H ⊄ Ker θ ⟹ θ ≠ 1`
+(hence `⊆`).  The converse `θ ≠ 1 ⟹ K ⊄ Ker θ` — an irreducible character with full kernel is
+trivial, via `IsIrreducibleCharacter.inner_self_eq_one` forcing degree 1 — is standard, and is
+stated here as motivation, **not** as a formalized lemma. -/
 def inducedNonKernelFamily (H : Subgroup ↥M) : Set (ClassFunction ↥M ℂ) :=
   {φ | ∃ θ : IrreducibleCharacter ↥K,
     ¬ ((H.subgroupOf K : Set ↥K) ⊆
@@ -446,5 +468,58 @@ noncomputable def inducedNonKernelFamily_subcoherent {A : Set G}
         d.dade d.hconj hφ.2 hψ.2
 
 end CoreNontrivialSupport
+
+/-! ### 8F: (8.15.3) at the book-literal support `A(M)`, for every type `𝒫` (issue 1042)
+
+⚠ **Instance discipline**: this section takes `[Finite G]` only and works under
+`open scoped S12.FiniteInduce`, which derives `Fintype G`, `Fintype ↥H`,
+`Invertible (Nat.card G : ℂ)` and `Invertible (Nat.card ↥H : ℂ)` uniformly from `Finite G`.
+Mixing those with explicit `[Fintype G]` / `[Invertible …]` binders (as §8D/§8E do) makes the
+`S04.Hypothesis` arguments fail to be definitionally equal — `S12.FiniteInduce.finiteGFintype`
+versus the binder — which is why the instantiation lives in its own section rather than inside
+`CoreNontrivialSupport`. -/
+
+section TypePACoreSubcoherent
+
+variable {M : Subgroup G}
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (8.15), claim 3 at the book-literal support `A(M)` — for every type `𝒫`.**
+
+The instantiation the book actually states: `L = M`, `K = M'`, `H = M_s = M_σ`,
+`A = A(M) = typePACore M`, with the family literally
+`{Ind_{M'}^M θ | θ ∈ Irr M', M_σ ⊄ Ker θ}`.
+
+Both Dade inputs are Peterfalvi (8.15) claim 1 and carry **no type hypothesis beyond `IsTypeP`**:
+`dadeSupportHypothesisData_typePACore0` supplies the `A₀(M)`-datum that Hypothesis (4.6) needs
+(through `typePACore_toHypothesis46_core`, the book's `H = M_s` choice), and
+`dadeSupportHypothesisData_typePACore` supplies the `A(M)`-datum carrying the Dade isometry `τ`.
+
+So the conclusion holds for types I–V alike — in particular for types II and V, where the
+`P₁`-regime producers of §8D (`inducedKernelFamily_subcoherent`) do *not* read as the book's
+statement, because there `A(M) ⊊ (M')^#` and the support estimate `(M')^# ⊆ A` they rely on
+is false. -/
+noncomputable def typePACore_subcoherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
+    (hTP : OddOrder.BG.Ch4.S14.IsTypeP M)
+    (hodd : Odd (Nat.card ↥M)) (data : TypePData M)
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1))
+    (hW2σ : data.W2 ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hσK : OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M)
+    {S : Set (ClassFunction ↥M ℂ)}
+    (hsub : S ⊆ inducedNonKernelFamily ((derivedInG M).subgroupOf M)
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M))
+    (hirr : ∀ χ ∈ S, IsIrreducibleCharacter χ)
+    (hconjS : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S) :
+    OddOrder.Peterfalvi.S07.Hypothesis (L := ↥M) (G := G) S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (typePACore M) M) :=
+  inducedNonKernelFamily_subcoherent hodd
+    (typePACore_toHypothesis46_core data hG.odd hHall
+      (dadeSupportHypothesisData_typePACore0 hG hM hTP data).some.dade
+      (dadeSupportHypothesisData_typePACore0 hG hM hTP data).some.hconj hW2σ hσK).toCore
+    (dadeSupportHypothesisData_typePACore hG hM hTP).some
+    hsub hirr hconjS
+
+end TypePACoreSubcoherent
 
 end OddOrder.Peterfalvi.S10

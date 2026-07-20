@@ -129,7 +129,22 @@ repo はこれを `hKsupp : (M′)^# ⊆ supportInSubgroup A₀ M` 経由の粗�
 ⚠ P₁ 版 (`inducedKernelFamily_subcoherent` / `_sharp`) は signature 不変で残す
 (下流無変更)。docstring で「§8D は P₁ regime、§8E が型一様」と対比を明示。
 
-### ⛏ 残り: `A = typePACore M` / `H = M_σ` での具体化 — 部品は全て揃った
+### ✅ 具体化 完了 (2026-07-20): `S10.typePACore_subcoherent` (§8F)
+
+`A = A(M) = typePACore M` / `H = M_σ` / `K = M′` / `L = M` での書籍逐語の (8.15.3)。
+**型仮定は `IsTypeP` のみ** — 型 I–V すべてで成立 (型 II/V を含む)。axiom-clean。
+
+Dade 入力 2 つはいずれも (8.15) claim 1 で型一様:
+`dadeSupportHypothesisData_typePACore0` → (4.6) (`typePACore_toHypothesis46_core` 経由)、
+`dadeSupportHypothesisData_typePACore` → 等長 `τ`。
+
+⚠ **instance 規律**: 独立 section に置き `[Finite G]` のみを取り
+`open scoped OddOrder.Peterfalvi.S12.FiniteInduce in` の下で宣言した。scoped 側が
+`Fintype G` / `Fintype ↥H` / `Invertible (Nat.card G)` / `Invertible (Nat.card ↥H)` を
+`Finite G` から一様に供給するので、§8D/§8E の `[Fintype G]` binder と混ざらない。
+(下記の失敗記録どおり、混ぜると `S04.Hypothesis` の引数が defeq にならない。)
+
+### (参考) 一度失敗した記録 — instance 規律
 
 **2026-07-20: 層の逆転は issue 1046 で解消済** (`dadeSupportHypothesisData_typePACore` →
 `S10_TypePSupport`, `..._typePACore0` + 閉包 → 新 leaf `S10_TypePSupportA0`、いずれも
@@ -201,12 +216,15 @@ CLAUDE.md のラッパー方針で不可。具体化として価値があるの�
 `{Ind_{M′}^M θ | M_σ ⊄ Ker θ}` に一致する」ことの明示 (= `h46.toCore.K` /
 `.subH` の同定) と、下流 consumer への接続。
 
-### 未証明のまま残した docstring 主張 (要 formalize)
+### docstring の精度 (2026-07-20 に是正済)
 
 §8E の docstring は「`H = K` のとき 2 つの絞りは一致する (= P₁ の符合)」と書いているが、
-`⊇` 方向 (`θ ≠ 1 ⟹ K ⊄ Ker θ`) は**未証明**。要るのは「既約指標の核が全体 ⟹ 自明指標」で、
-経路は `inner_self_eq_one` (`CharacterProduct.lean:195`) + 次数が正の自然数 ⟹ 次数 1。
-`⊆` 方向は `inducedNonKernelFamily_subset_inducedKernelFamily_bot` で証明済。
+形式化されているのは**下流で実際に使う `⊆` 方向のみ**
+(`inducedNonKernelFamily_subset_inducedKernelFamily_bot` = `H ⊄ Ker θ ⟹ θ ≠ 1`)。
+逆 `θ ≠ 1 ⟹ K ⊄ Ker θ` (= 既約指標の核が全体なら自明指標; 経路は
+`IsIrreducibleCharacter.inner_self_eq_one` で次数 1 を強制) は標準事実だが**未形式化**。
+⟹ docstring 側に「motivation であって formalized lemma ではない」と明記した
+(検証済のように読ませない)。必要になったら形式化する。
 
 なお `inducedKernelFamily_subcoherent` 自体は `hKsupp` を引数化すれば `A₀` について一般化できる
 (item 1 の `typePData_toHypothesis46_ofSupport` と同じ形) ので、**族の絞りと支持補題が本体**。
@@ -214,6 +232,20 @@ CLAUDE.md のラッパー方針で不可。具体化として価値があるの�
 関連: issue 1045 ((9.11) の §9 レベル化) — (9.11) の base subfamily coherence は
 現状 §10 engine (`inducedFamily_degreeSubfamily_isCoherent`) 経由だが、書籍では (8.15.3) 経由。
 ⟹ 本項が (9.11) 型 II 化の上流 prerequisite。文書順でも §8 < §9。
+
+## ✅ 完了 (2026-07-20) — (8.15) の 3 主張すべてが型一様で形式化された
+
+| 主張 | 形式化 | 型仮定 |
+|---|---|---|
+| claim 1 (Hyp (2.2) / `M = N_G(A)`) | `S10.dadeSupportHypothesisData_typePACore` / `_typePACore0` (issue 1046 で S10 へ移設) | `IsTypeP` のみ |
+| claim 2 (Hyp (4.6), H = M_F / M_s) | `S10.typePACore_toHypothesis46_core` / `_hallKernel` | 素の `TypePData` |
+| claim 3 (Hyp (5.2)) | **`S10.typePACore_subcoherent`** (§8F, commit 26cb99374) | `IsTypeP` のみ |
+
+⟹ 型 II/V を含む全型 `𝒫` で書籍の文に到達。`lake build OddOrder` green (4546 jobs)、
+全宣言 axiom-clean、AxiomsCheck 登録済。
+
+**下流**: issue 1045 ((9.11) の §9 レベル化)。(9.11) の base subfamily coherence は現状
+§10 engine 経由だが、書籍では (8.15.3) 経由 — 本 issue の完了でその素材が揃った。
 
 ## 着手順 (ungated → gated)
 
