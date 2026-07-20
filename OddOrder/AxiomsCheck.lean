@@ -11011,6 +11011,21 @@ at all.**  BG opens Step 2 with *"Let `S` be any `A`-invariant subgroup of `R` o
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.iterCommutator_eq_lowerCentralSeries
 
+/-! **BG Theorem E.3(b), Step 2, (E.9) opening and (E.11)** (`BG.AppE_FurtherResults`,
+issue 3021, 2026-07-20) — the `A`-action finally enters Step 2.
+
+* `RegularOperatorSetup.exists_zpow_eq_act_of_mem_A` — BG's *"then `vᵃ = vʳ` for some integer
+  `r` such that `r^q ≡ 1 (mod p)`"*.  `A` fixes the cyclic order-`p` group `R₀`, so it acts
+  by power maps; `|A| = q` gives `a^q = 1`, hence `r^q ≡ 1`.  Stated with an **integer**
+  exponent as BG does, the congruence being `(r : ZMod p)^q = 1`.
+* `RegularOperatorSetup.zpow_exponent_ne_one` — **(E.11) `r ≢ 1 (mod p)`**.  Were `r ≡ 1`,
+  `a` would fix `R₀ ≠ 1` pointwise, against `C_R(α) = 1` for `α ∈ A^#`.  ⚠ This is the
+  **first** use of the setup's regularity hypothesis anywhere in Step 2 — everything up to
+  (E.8) needed only `|R₀| = p`, `R₁` cyclic and the centralizer decomposition. -/
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.exists_zpow_eq_act_of_mem_A
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.zpow_exponent_ne_one
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and

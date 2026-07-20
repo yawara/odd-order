@@ -1402,6 +1402,96 @@ theorem RegularOperatorSetup.R₀_le_omega [Finite R]
   rw [hyp.R₀_card] at h
   simpa using congrArg (fun z : ↥hyp.R₀ => (z : R)) h
 
+/-- **BG Theorem E.3(b), Step 2, (E.9), opening sentence**: *"Then `vᵃ = vʳ` for some integer
+`r` such that `r^q ≡ 1 (mod p)`."*
+
+`A` fixes `R₀`, which is cyclic of prime order `p`, so each `a ∈ A` acts on it as a power
+map; and `a^q = 1` because `|A| = q`, so the exponent satisfies `r^q ≡ 1 (mod p)`.
+
+Stated with an **integer** exponent, as BG does; the congruence is `(r : ZMod p)^q = 1`. -/
+theorem RegularOperatorSetup.exists_zpow_eq_act_of_mem_A [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) :
+    ∃ r : ℤ, (∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) ∧ ((r : ZMod p) ^ q = 1) := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+  set ψ : ↥hyp.A →* MulAut ↥hyp.R₀ :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hyp.isAInvariant_R₀ with hψ
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥hyp.R₀)
+  obtain ⟨k, hk⟩ := hg (ψ ⟨a, ha⟩ g)
+  have hord : orderOf g = p := by
+    have htop : Subgroup.zpowers g = ⊤ := by ext x; simpa using hg x
+    have hc := Nat.card_zpowers g
+    rw [htop, Subgroup.card_top, hyp.R₀_card] at hc
+    exact hc.symm
+  refine ⟨k, ?_, ?_⟩
+  · -- `a` acts as the `k`-th power map on all of `R₀`
+    intro v hv
+    obtain ⟨m, hm⟩ := hg ⟨v, hv⟩
+    have h1 : ψ ⟨a, ha⟩ ⟨v, hv⟩ = (⟨v, hv⟩ : ↥hyp.R₀) ^ k := by
+      rw [← hm, map_zpow, ← hk, ← zpow_mul, ← zpow_mul, mul_comm]
+    have h2 := congrArg (fun z : ↥hyp.R₀ => (z : R)) h1
+    simpa [hψ, OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val] using h2
+  · -- `a^q = 1` forces `k^q ≡ 1 (mod p)`
+    have haq : (⟨a, ha⟩ : ↥hyp.A) ^ q = 1 := by
+      have h := pow_card_eq_one' (G := ↥hyp.A) (x := ⟨a, ha⟩)
+      rwa [hyp.A_card] at h
+    have hψq : ψ ⟨a, ha⟩ ^ q = 1 := by rw [← map_pow, haq, map_one]
+    have hiter : ∀ n : ℕ, (ψ ⟨a, ha⟩ ^ n) g = g ^ (k ^ n) := by
+      intro n
+      induction n with
+      | zero => simp
+      | succ n ih =>
+        have hstep : (ψ ⟨a, ha⟩ ^ (n + 1)) g = (ψ ⟨a, ha⟩ ^ n) (ψ ⟨a, ha⟩ g) := by
+          rw [pow_succ]; rfl
+        rw [hstep, ← hk, map_zpow, ih, ← zpow_mul, ← pow_succ]
+    have hgq : g ^ (k ^ q) = g := by rw [← hiter q, hψq]; rfl
+    have hz : g ^ (k ^ q - 1) = 1 := by
+      rw [zpow_sub, hgq, zpow_one, mul_inv_cancel]
+    have hdvd : (p : ℤ) ∣ k ^ q - 1 := by
+      rw [← hord]
+      exact orderOf_dvd_iff_zpow_eq_one.mpr hz
+    have hzero : ((k ^ q - 1 : ℤ) : ZMod p) = 0 :=
+      (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).mpr hdvd
+    push_cast at hzero
+    exact sub_eq_zero.mp hzero
+
+/-- **BG Theorem E.3(b), Step 2, (E.11)**: `r ≢ 1 (mod p)` for `a ∈ A^#`.
+
+If `a` acted on `R₀` as the *identity* power map it would fix `R₀ ≠ 1` pointwise, and `A`
+acts regularly — `C_R(α) = 1` for `α ∈ A^#`.  This is the first point in Step 2 where the
+setup's regularity hypothesis does any work. -/
+theorem RegularOperatorSetup.zpow_exponent_ne_one [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) (hane : a ≠ 1)
+    {r : ℤ} (hr : ∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) :
+    (r : ZMod p) ≠ 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  intro h1
+  -- `p ∣ r - 1`, so the `r`-th power map is the identity on `R₀`.
+  have hdvd : (p : ℤ) ∣ r - 1 := by
+    refine (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).mp ?_
+    push_cast
+    rw [h1, sub_self]
+  obtain ⟨c, hc⟩ := hdvd
+  have hfix : ∀ v ∈ hyp.R₀, hyp.act a v = v := by
+    intro v hv
+    have hvp : v ^ p = 1 := by
+      have h := pow_card_eq_one' (G := ↥hyp.R₀) (x := ⟨v, hv⟩)
+      rw [hyp.R₀_card] at h
+      simpa using congrArg (fun z : ↥hyp.R₀ => (z : R)) h
+    have hsub : v ^ (r - 1) = 1 := by
+      rw [hc, zpow_mul, zpow_natCast, hvp, one_zpow]
+    calc hyp.act a v = v ^ r := hr v hv
+      _ = v ^ ((r - 1) + 1) := by congr 1; ring
+      _ = v ^ (r - 1) * v ^ (1 : ℤ) := zpow_add v _ _
+      _ = v := by rw [hsub, zpow_one, one_mul]
+  -- regularity then kills `R₀`
+  have hbot : hyp.R₀ = ⊥ := by
+    refine le_bot_iff.mp fun v hv => ?_
+    exact Subgroup.mem_bot.mpr (hyp.A_regular a ha hane v (hfix v hv))
+  have hc' := hyp.R₀_card
+  rw [hbot, Subgroup.card_bot] at hc'
+  exact hyp.p_prime.one_lt.ne hc'
+
 /-- **BG Theorem E.3(b), Step 2, (E.8)**: `Hᵢ = S_{i+1}` — BG's chain out of `T` *is* the
 lower central series of `S`, from its second term on.
 
