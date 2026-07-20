@@ -226,7 +226,7 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
         M).subgroupOf (huSub data)) ⧸ commutator ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data
         chief).subgroupOf M).subgroupOf (huSub data))) :=
       inferInstanceAs (IsMulCommutative (Abelianization _))
-    refine OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+    refine apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
       (N := commutator ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
         (huSub data))) ψ ?_
     intro g hg

@@ -944,7 +944,8 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨p, hpprime, P, hPmem, hPE1, hPnc⟩ := hP
   haveI : Fact p.Prime := ⟨hpprime⟩
   refine ⟨?_, ?_, ?_⟩
-  · -- (a) `E₁` acts regularly on `E₃`: `E₁E₃` not prime on `M_σ` (GAP B) ⟹ Lemma 13.7 contrapositive.
+  · -- (a) `E₁` acts regularly on `E₃`: `E₁E₃` not prime on `M_σ` (GAP B) ⟹ Lemma 13.7
+    -- contrapositive.
     obtain ⟨Q, hQE3, hQne, hCMαP, hCMαPQ⟩ :=
       malpha_centralizer_facts_of_not_centralize hG h hPmem hPE1 hPnc
     have hnotprime := not_actsPrime_Msigma_of_malpha_facts hG h hPmem hPE1 hQE3 hCMαP hCMαPQ

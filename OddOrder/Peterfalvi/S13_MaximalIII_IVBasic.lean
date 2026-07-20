@@ -1079,7 +1079,7 @@ theorem charValue_one_eq_one_of_commutator_le_ker {H : Type*} [Group H] [Finite 
     (θ : ClassFunction H ℂ) 1 = 1 := by
   haveI : IsMulCommutative (H ⧸ _root_.commutator H) :=
     inferInstanceAs (IsMulCommutative (Abelianization H))
-  exact OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+  exact apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
     (N := _root_.commutator H) θ hker
 
 /-- Conversely, linear characters kill the commutator subgroup. -/
