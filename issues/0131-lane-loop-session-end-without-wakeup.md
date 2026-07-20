@@ -181,3 +181,26 @@ a/b は健全 (a: transcript 14min で FeitSibley 配線中 / b: 0min active)。
 ⚠ **a と c の両方**が「重い成果 commit の直後に ScheduleWakeup を呼ばず停止」パターン。
 a = rational engine 完成後、c = 反例 finding 後。b は継続的に細かく commit するため停止しにくい。
 両者とも成果損失ゼロ・次段は自分の notes/issue に明記済。ユーザー再開待ち。
+
+## 発生 2026-07-21 07:40 (lane b も停止 — **3/3 レーン全停止**)
+
+b も停止し、a/b/c の全レーンが停止状態になった。
+- **b**: 最終 commit 30 分前 (`521804eae` functional-equation 1変数 Frobenius 展開)、
+  transcript mtime **26 分 frozen** (07:14)、末尾 = `assistant text` (turn 完了メッセージ、
+  後続の tool_use / ScheduleWakeup なし)。⚠ tail が `ai-title` でなく `assistant` なのは
+  ai-title イベントが未発火なだけで、実体は「turn を text で締めて ScheduleWakeup を呼ばず停止」
+  = 通常の停止シグネチャ。**tail=assistant を『稼働中』と即断しない** — 最終 record が
+  tool_use 待ちでなく完了 text で mtime が frozen なら停止。
+- **a**: 3h 停止継続。**c**: 4h 停止継続。
+
+⟹ **3 レーンとも停止**。b は最も長く粘ったが (Lemma 12 functional-equation の hard proof を
+数 tick 進めた後)、やはり重い proof の区切りで turn を締めて停止。成果損失ゼロ (全て合流済)。
+main の前進が完全に止まった。⚠ ユーザー再開待ち (hub からメッセージ送れず)。
+
+### 観測パターン (3 回とも同型)
+
+3 レーンとも「重い成果 (engine 完成 / 反例 finding / hard proof の区切り) の直後に
+ScheduleWakeup を呼ばず turn 終了」。CLAUDE.md の「/loop self-pacing 60s 即再開」が
+効いていない。恒久対策候補 (次に手が空いた hub or user が判断): 各レーンの /loop 復帰を
+より確実にする仕組み (再開プロンプトの定型化 / wakeup 忘れ検出時の自動 nudge)。
+現状 hub は独立セッションへ介入できないので report のみ。
