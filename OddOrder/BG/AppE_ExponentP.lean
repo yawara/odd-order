@@ -874,4 +874,104 @@ theorem RegularOperatorSetup.card_seed_le [Finite R] (hyp : RegularOperatorSetup
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hseedC).toEquiv] at hbound
 
 
+/-! ### BG Step 3, assembled -/
+
+/-- **BG Theorem E.3(b), Step 3**: a *maximal* `A`-invariant exponent-`p` subgroup containing
+the seed **is** `Ω₁(R)`.
+
+Both branches of BG's argument meet here.  If `S = Ω₁(N_P(S))` we are done by
+`eq_omega_of_omegaInG_normalizer_eq`; and that equality is exactly what maximality delivers,
+because `Ω₁(N_P(S))` is itself a member of the family:
+
+* `A`-invariant — `N_R(S)` is (`S` is), `Ω₁(R)` is (characteristic), and `Ω₁` preserves it;
+* of exponent `p` — `|Ω₁(T)| ≤ |Ω₁(T/S)|·|S| ≤ p²·p^q = p^{q+2}` forces class `≤ p−1`, and
+  Proposition E.2(a) applies;
+* it contains the seed, since it contains `S`.
+
+So BG's `(E.14)`–`(E.16)` do not end in a contradiction to be discharged separately: they
+*are* the verification that the family is closed under `S ↦ Ω₁(N_P(S))`. -/
+theorem RegularOperatorSetup.eq_omega_of_maximal [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hS : hyp.ExpPFamily S)
+    (hmax : ∀ S', hyp.ExpPFamily S' → S ≤ S' → S' = S) :
+    S = Omega R p 1 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set P : Subgroup R := Omega R p 1 with hP
+  set T : Subgroup R := Subgroup.normalizer (S : Set R) ⊓ P with hT
+  have hSP : S ≤ P := hyp.expPFamily_le_omega hS
+  have hST : S ≤ T := le_inf Subgroup.le_normalizer hSP
+  have hTN : T ≤ Subgroup.normalizer (S : Set R) := inf_le_left
+  haveI hn : (S.subgroupOf T).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hST).mpr hTN
+  have hSW : S ≤ omegaInG T p 1 := fun x hx =>
+    mem_omegaInG (hST hx) (by simpa using hS.2.1 x hx)
+  refine hyp.eq_omega_of_omegaInG_normalizer_eq (hmax _ ⟨?_, ?_, hS.2.2.trans hSW⟩ hSW)
+  · exact isAInvariant_omegaInG
+      ((hS.1.normalizer).inf (IsAInvariant.of_characteristic _)) p 1
+  · intro x hx
+    refine hyp.pow_eq_one_of_card_omegaInG_le ?_ hx
+    have hR₀S : hyp.R₀ ≤ S := (hyp.R₀_lt_of_expPFamily hS).le
+    have hcS : Nat.card ↥S ≤ p ^ q :=
+      hyp.card_le_pow hR₀S (hyp.expPFamily_pow_eq_one hS) hS.1
+    obtain ⟨v, hv, hv1⟩ := hyp.exists_zpowers_eq_R₀
+    have hvS : v ∈ S := hR₀S (by rw [← hv]; exact Subgroup.mem_zpowers v)
+    have hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) ≤ p ^ 2 := by
+      rw [hyp.inf_centralizer_eq_seed hS.2.2 hS.2.1]
+      exact hyp.card_seed_le
+    obtain ⟨x0, hx0⟩ := hyp.exists_zpowers_index_lt hR₀S hST hp2 hTN hv hvS hv1
+    have hQ : Nat.card ↥(Omega (↥T ⧸ S.subgroupOf T) p 1) ≤ p ^ 2 :=
+      card_omega_le_prime_sq_of_index_lt
+        ((hyp.R_pGroup.to_subgroup T).to_quotient _) hyp.p_odd hx0
+    calc Nat.card ↥(omegaInG T p 1)
+        ≤ Nat.card ↥(Omega (↥T ⧸ S.subgroupOf T) p 1) * Nat.card ↥S :=
+          card_omegaInG_le_mul hST hS.2.1
+      _ ≤ p ^ 2 * p ^ q := Nat.mul_le_mul hQ hcS
+      _ = p ^ (q + 2) := by ring
+
+
+/-! ### BG Theorem E.3(b): all three clauses -/
+
+/-- **BG Theorem E.3(b), first clause**: `Ω₁(R)` has exponent `p`.
+
+**Status: proved** — BG's Step 3.  Take a maximal member `S` of the family
+(`exists_maximal_expP`); `eq_omega_of_maximal` identifies it with `Ω₁(R)`, and `S` has
+exponent `p` by membership in the family. -/
+theorem RegularOperatorSetup.omega_pow_eq_one [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) {g : R} (hg : g ∈ Omega R p 1) : g ^ p = 1 := by
+  obtain ⟨S, hS, hmax⟩ := hyp.exists_maximal_expP
+  refine hS.2.1 g ?_
+  rw [hyp.eq_omega_of_maximal hS hmax]
+  exact hg
+
+/-- **BG Theorem E.3(b), second clause**: `R₀ ⊄ (Ω₁(R))'`.
+
+**Status: proved** — Step 2's `R₀ ⊄ S'` (`not_le_derivedInG`) applied to `S = Ω₁(R)`, whose
+exponent is `p` by the first clause. -/
+theorem RegularOperatorSetup.R₀_not_le_derived_omega [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    ¬ hyp.R₀ ≤ derivedInG (Omega R p 1) :=
+  hyp.not_le_derivedInG hyp.R₀_le_omega fun x =>
+    Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2)
+
+/-- **BG Theorem E.3(b), third clause**: `|Ω₁(R) / (Ω₁(R))'| = p²`.
+
+**Status: proved** — Step 2's `(E.7)` (`card_quotient_commutator`) applied to `S = Ω₁(R)`,
+with `R₀ < Ω₁(R)` from `R₀_lt_omega` and exponent `p` from the first clause. -/
+theorem RegularOperatorSetup.card_omega_abelianization [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) :
+    Nat.card (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) = p ^ 2 :=
+  hyp.card_quotient_commutator hyp.R₀_lt_omega fun x =>
+    Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2)
+
+
+/-- **BG Theorem E.3(c)**: `|Ω₁(R)| ≤ p^q`.
+
+**Status: proved** — Step 2's third clause (`card_le_pow`) applied to `S = Ω₁(R)`, which is
+characteristic in `R` hence `A`-invariant, and has exponent `p` by E.3(b)'s first clause. -/
+theorem RegularOperatorSetup.card_omega_le [Finite R] [Finite B]
+    (hyp : RegularOperatorSetup R B p q) : Nat.card ↥(Omega R p 1) ≤ p ^ q :=
+  hyp.card_le_pow hyp.R₀_le_omega
+    (fun x => Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2))
+    (IsAInvariant.of_characteristic _)
+
+
 end OddOrder.BG.AppE
