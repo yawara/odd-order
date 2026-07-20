@@ -13,8 +13,8 @@ Lemma 11, pp. 88--89.
 
 The proof keeps the two finite-field degrees separate until Higman's trace
 argument rules out a proper odd extension.  This leaf contains the common
-splitting-field eigenbasis, unequal-degree bracket normal form, square trace
-formula, and the final comparison with the concrete type-A extension.
+splitting-field eigenbasis and unequal-degree bracket normal form.  The trace
+calculation is collected in the downstream `TraceFormula` leaf.
 -/
 
 set_option autoImplicit false

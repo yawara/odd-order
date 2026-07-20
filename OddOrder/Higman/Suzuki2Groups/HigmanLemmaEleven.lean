@@ -1,1 +1,2 @@
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.PairGap
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.TraceFormula
