@@ -887,3 +887,41 @@ BG は「`v` の `T`-共役類は `|T:T₁|` 個の `S`-共役類の合併」と
 
 ⚠ 5 の Lean 化で少し手間: `ConjAct.smul_def` で `t • v' = t * v' * t⁻¹` に開き、
 `Subgroup.mem_normalizer_iff` で `S` 内に留まることを言う。`≠ 1` は共役が単射だから。
+
+## 2026-07-20 (15): (E.16) 完了 + Lemma 4.5(b) への接続
+
+| 宣言 | 内容 |
+|---|---|
+| `index_sup_centralizer_lt` | **(E.16)** `\|T:T₁\| < p²` |
+| `index_map_mk'` | `(H/N).index in G/N = H.index in G` |
+| `exists_zpowers_index_lt` | **`∃ x : T/S, (zpowers x).index < p²`** |
+
+⚠ **(E.16) は S-類の融合なしで出た** — `T` で軌道-固定化群を 1 回使い、
+`\|K_T\|·\|C_T(v)\| = \|T\|` / `\|T\| = \|T₁\|·\|T:T₁\|` / `\|T₁\|·p² = \|S\|·\|C_T(v)\|`
+の 3 本から `\|C_T(v)\|` を約分 ⟹ `p²·\|K_T\| = \|T:T₁\|·\|S\|`。
+`K_T ⊊ S` (`S ⊴ T` で中に入り `v ≠ 1` で `1` を外す) から結論。
+BG の (E.15)「各 S-類は `\|S\|/p²` 個」はこの経路では未使用。
+
+### 次の一手 = `|Ω₁(T/S)| ≤ p²` (index=1 分岐に注意)
+
+repo の `Ch1.S04.card_omega1_le_prime_sq_of_cyclic_index_prime` は
+**index = p ちょうど**を要求する。`exists_zpowers_index_lt` は `< p²` を与えるので、
+p 群では index ∈ {1, p}。分岐:
+
+- **index = p**: そのまま 4.5(b)。
+- **index = 1**: `T/S = ⟨x⟩` 巡回。このとき `|Ω₁(T/S)| ≤ p` を別途示す。
+  ⭐ **道具**: mathlib `IsCyclic.card_pow_eq_one_le` (巡回群で `x^n = 1` の解は高々 n 個)。
+  巡回⟹アーベルなので `{g | g^p = 1}` は既に部分群で `Omega G p 1` に一致
+  (`Omega` は closure なので `Subgroup.closure_eq` 相当で潰す)。
+  ⟹ 一般補題 `card_omega_le_of_isCyclic : IsCyclic G → Nat.card ↥(Omega G p 1) ≤ p`
+  を書くのが素直 (App.E leaf でよい; 2 消費者目が出たら `GroupTheory/OmegaSubgroup.lean` へ)。
+
+### その後 (Step 3 の締め)
+
+1. `|Ω₁(T)/S| ≤ |Ω₁(T/S)| ≤ p²` — `S ≤ Ω₁(T)` (S は指数 p) と像の包含。
+2. `|Ω₁(T)| ≤ p²·|S| ≤ p²·p^q = p^{q+2}` — `card_le_pow` (Step 2 第 3 節、済)。
+3. `cl(Ω₁(T)) ≤ q+1 ≤ p−1` — `S04.nilpotencyClass_le_of_card_le_pow` +
+   Step 1 `card_A_dvd_half_p_sub_one` (`q ≤ (p−1)/2`) + `p ≥ 7`。
+4. **Prop E.2(a)** `omega_pow_eq_one_of_lowerCentralSeries_eq_bot` (済) ⟹ `Ω₁(Ω₁(T))` 指数 p、
+   `omegaInG_omega` で `= Ω₁(T)`、`Ω₁(T)` は A-不変 (T = N_P(S) が A-不変) かつ `⊋ S`
+   ⟹ **極大性に矛盾** ⟹ Step 3 完了。
