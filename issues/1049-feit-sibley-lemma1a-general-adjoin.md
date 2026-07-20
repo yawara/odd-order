@@ -66,6 +66,24 @@ Lemma 1(a) はこれを一般 `S07.Hypothesis` τ に**一般化**する task ([
   - `hcrux2` ← `inner_extension_member_orthogonal_imageSet` (CoherenceUnion:630, S07 一般) を R(χ) 上で sum
   - 最終 ← `retarget_isCoherent_of_extensionImage_general` (helper 4)
   結論: `IsCoherent τ (S₁ ∪ {χ, χ̄}) A`。
+### 🔴 要修正 (2026-07-21 continuation): engine の hisom が FeitSibley-satisfiable でない
+
+**engine の `hisom` (set-based `∀ T, (∀ s∈T, s.support⊆A) → ∀ φζ∈ℤ[T], ⟨τφ,τζ⟩=⟨φ,ζ⟩`) は Dade
+では satisfiable (`dadeIntegralCharacterMap_inner_eq_on_supported_span` は全 supported class function
+上の isometry) だが、一般 `Hypothesis.tau_isometry_diff` は `zSupportedSpan S A` (∈ℤ[S]∧supported)
+のみ保証**。任意 supported T (元が ℤ[S] 外) はカバーできない ⟹ 現行 hisom は FeitSibley で供給不能。
+engine の math は正しく完成 (build green) だが、この**仮説が一般 Hypothesis で充足不能**
+([[scaffold-sorry-free-not-done]]: build-green≠仮説充足可能。commit の「完成」は Dade-satisfiable の
+意味に留まる)。
+
+**修正案 (B, minimal)**: 3 defs (`retarget_isCoherent_of_extensionImage_general` /
+`decompositionDaFromDiff_general` / `adjoinPairCoherent_general`) に `Samb⊇S₁∪{χ,χ̄}` param 追加、
+hisom precondition を `s.support⊆A` → `s∈zSupportedSpan Samb A` に変更。use site (~6 箇所: hSdiff/
+hySdiff/hfound の set 証明) を「support⊆A」→「∈ℤ[Samb]∧supported」に拡張 (χ,χ̄,χ₁,χmem i,y は全て
+Samb ⊆ の元ゆえ ℤ[Samb] 自明)。FeitSibley 側は `hyp.tau_isometry_diff` (Samb=𝒮) + ℤ[T]⊆zSupportedSpan
+閉包で供給。関連既存インフラ: `zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration` (209),
+`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` (173, scaled-diff)。
+
 ### ✅ 配線 feasibility 確定 (2026-07-21 continuation)
 
 **(1) integer-ratio engine が FeitSibley に十分** — 𝒮={Ind_Q^H φ} は deg=d·φ(1)。reduction 後

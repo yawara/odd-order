@@ -46,6 +46,31 @@ open OddOrder.RepresentationTheory
 
 variable {L G : Type*} [Group L] [Group G]
 
+/-! ### `zSupportedSpan` closure under `ℤ`-span (for supplying `hisom` from `tau_isometry_diff`) -/
+
+/-- **`ℤ[T] ⊆ ℤ[S, A]` when `T ⊆ ℤ[S, A]`.**  The `A`-supported lattice `zSupportedSpan S A`
+(`= ℤ[S] ∩ CF(L, A)`) is closed under `ℤ`-combinations, so the span of a subset it contains stays
+inside it.  This is what lets the general adjoin's `hisom` (needed on the difference lattices
+`ℤ[{χ − χ̄, χ − a·χ₁}]` etc.) be supplied at the Feit–Sibley call site from
+`Hypothesis.tau_isometry_diff` (which preserves `⟨·,·⟩` on all of `ℤ[𝒮, A]`): every difference the
+engine feeds has its two endpoints in `𝒮`, hence in `ℤ[𝒮, A]`. -/
+theorem zSpan_subset_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
+    {T : Set (ClassFunction L ℂ)} (hT : ∀ s ∈ T, s ∈ zSupportedSpan (L := L) S A) :
+    (Submodule.span ℤ T : Set (ClassFunction L ℂ)) ⊆ zSupportedSpan (L := L) S A := by
+  intro φ hφ
+  induction hφ using Submodule.span_induction with
+  | mem s hs => exact hT s hs
+  | zero => exact zero_mem_zSupportedSpan
+  | add x y _ _ ihx ihy => exact add_mem_zSupportedSpan ihx ihy
+  | smul c x _ ih =>
+      refine ⟨Submodule.smul_mem _ c ih.1, ?_⟩
+      intro t ht
+      apply ih.2
+      rw [ClassFunction.mem_support] at ht ⊢
+      intro hx0
+      apply ht
+      rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hx0, mul_zero]
+
 /-! ### The general cross-term (helper 1) -/
 
 /-- **General cross-term `⟨τ u, ν δ⟩ = ⟨u, δ⟩`** (generalizes `inner_dade_extension_of_supported`,
