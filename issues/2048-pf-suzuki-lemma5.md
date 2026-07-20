@@ -279,6 +279,14 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
               `IsXiLengthTwoTypeA S` と同定する
         - [x] complementary preimages `X, Y` の二つの model parameter が一致し、
               共通値が `2 ≤ n` を満たすことを証明する
+      - [x] concrete `A(n,θ)` model の canonical square root を actor の
+            involution 推移性で任意の `g ∈ Inv(P)` へ輸送し、左右いずれの
+            invariant factor 内にも `x² = g` の解が存在することを証明する
+      - [x] `X ∩ Y = Φ(P)` と `Φ(P)` の exponent two を用いて、`X`, `Y` が
+            elementwise commute すれば `xy⁻¹` が `Φ(P)` 外の involution になる
+            矛盾を導き、公開 endpoint
+            `xiLengthThreeTypeAFactorData_exists_with_nontrivial_mixed_commutator`
+            で actual `⁅x,y⁆ ≠ 1` witness を得る
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

@@ -413,8 +413,18 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       共通値 `n ≥ 2` も従う。この source step は
       `XiLengthThreeTypeAFactorData` にまとめた。等しいのは parameter `n` であり、
       原典どおり二つの automorphism `θ, φ` の一致は主張しない。次の source frontier は
-      この二つの actual model と共通 central layer を使う type B/C/D の gluing case
-      analysis である。
+      `MixedCommutators.lean` へ進んだ。各 actual `A(n,θ)` model 内の canonical な
+      非自明 involution とその平方根を構成し、actor transitivity によって任意の ambient
+      involution の平方根を各 invariant factor 内に輸送する。これを左右因子へ適用し、
+      `X ∩ Y = Φ(P)` と elementary-abelian `Φ(P)` を使って、Higman p. 90 の
+      nonzero mixed-commutator step を actual witness `⁅x,y⁆ ≠ 1` として閉じた。
+      原典 p. 81 の B/C/D 定義表と pp. 90--92 の case proof も再監査し、p. 91 の
+      type-C square formula は mixed term の係数 `ε` が脱落した誤植であることを、
+      p. 81 の表と直前の commutator formula から確認した。抽出画像は
+      `references/higman/pages/suzuki-2-groups-p081.png` および p090--p092 に保持した。
+      次の source frontier は、二つの独立な model equivalence を共通 `Φ(P)` 座標と
+      actor-compatible quotient 座標へ揃え、mixed commutator pairing の固有値制約から
+      type B/C/D の四場合を分岐する gluing case analysis である。
     - **Peterfalvi frontier:** §3 Lemma 5 (p. 107) の cyclicity / `|W| ∣ q+1` /
       type-B 結論は、Higman Lemmas 8--12 と actual two-summand split の完成後に
       接続する。

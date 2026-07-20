@@ -1,3 +1,4 @@
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.QuotientTwoStep
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedCommutators
