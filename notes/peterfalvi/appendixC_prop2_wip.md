@@ -1,6 +1,18 @@
 # Peterfalvi App.C Prop 2 (`cyclic_index_two_nearField_classification`) — WIP
 
-**Status (2026-07-21, lane a, carve-out 9204).** The Zassenhaus/Dickson near-field
+**Status (2026-07-21, lane a, carve-out 9204). ✅ DONE.** Prop 2
+(`cyclic_index_two_nearField_classification`) is **fully proven, axiom-clean**
+(`#print axioms` = `[propext, Classical.choice, Quot.sound]`, no `sorryAx`). The center clause
+`|Z(Fˣ)| = r-1` is closed via the standalone lemma `twMul_central_iff` (extracted to escape the
+~600-line proof context's `isDefEq` timeouts): `B = rootsOfUnity |B|` (field roots +
+`Subgroup.eq_of_le_of_card_ge`), `Fixσ* ⊆ B` (`(r-1)∣(r²-1)/2`, r odd), `|B| > r-1`, transport
+`Z(Fˣ) ≃ Fixσˣ` via Θ. The only remaining sorry in NearFields.lean is Prop 1
+(`rankOne_affine_nearField`, Brauer-Suzuki gated, low-priority deferred). Everything below is
+historical.
+
+---
+
+**Earlier status.** The Zassenhaus/Dickson near-field
 classification is **committed with 1 remaining sorry** — the center-cardinality clause.
 `OddOrder/Peterfalvi/Appendices/NearFields.lean` builds green
 (`lake build OddOrder.Peterfalvi.Appendices.NearFields`, exit 0). Prop 2 went from a single
