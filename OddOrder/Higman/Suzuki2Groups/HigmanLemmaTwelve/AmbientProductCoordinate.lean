@@ -367,6 +367,29 @@ theorem ambientProductExtension_inl_range
 
 end AmbientExtension
 
+/-! ## Polarization of the ambient square map -/
+
+section SquareDecomposition
+
+variable {F : Type uF} [AddCommGroup F] [Module (ZMod 2) F]
+
+/-- **Higman Lemma 12 (p. 90), polarization of the ambient square map.**  In any
+`F`-valued centre coordinate, the square of a sum splits into the two summand
+squares plus the mixed commutator bilinear (Higman's `(u + v)^(2) = u^(2) +
+v^(2) + [u, v]`).  Instantiating `u = fI_left α`, `v = fI_right β` yields the
+`q_P(α, β) = q_X(α) + q_Y(β) + mixed(α, β)` decomposition. -/
+theorem centerSquareMap_add
+    (hSq : LowerCentralSquaresLieInSecond P)
+    (center : Additive (lowerCentralLayer P 1) ≃ₗ[ZMod 2] F)
+    (u v : Additive (lowerCentralLayer P 0)) :
+    center (lowerCentralSquareMapAdditive P hSq (u + v)) =
+      center (lowerCentralSquareMapAdditive P hSq u) +
+        center (lowerCentralSquareMapAdditive P hSq v) +
+        center (lowerCentralCommutatorBilinear P u v) := by
+  rw [lowerCentralSquareMapAdditive_add, map_add, map_add]
+
+end SquareDecomposition
+
 end
 
 end OddOrder.Higman.Suzuki2Groups

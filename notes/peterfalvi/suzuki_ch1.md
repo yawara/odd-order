@@ -632,3 +632,30 @@ map に一致することを示し `ofExtension` へ。
 
 **endpoint 目標**: `higmanLemmaTwelve (hP hncomm hmulti hxi hlen hprime) :
 IsTypeB.{uP,0} P ∨ IsTypeC.{uP,0} P ∨ IsTypeD.{uP,0} P`。
+
+### 2026-07-21 lane b: Stage 4a-i (polarization) 完了 + 4a-ii 分解
+
+`AmbientProductCoordinate.lean` に `centerSquareMap_add` (polarization):
+`center(sq(u+v)) = center(sq u) + center(sq v) + center(bilinear u v)`
+(`lowerCentralSquareMapAdditive_add` + `map_add`)。case 共有。u=fI_left α, v=fI_right β,
+center=`ambientCenterCoordinate` を入れると `Q(α,β)=A(α)+B(β)+M(α,β)`。
+
+**次 = 4a-ii (factor identification `A(α)=q_X(α)`)**。これが Stage 4 の要で、
+新規 compat lemma 2 本が要る (既存無し、実測確認済):
+- **(a) square map の inclusion 互換**: `sq_ambient(fI_left α) = incl_L1(sq_factor(eQuot.symm α))`。
+  `sq` は `[·²]` ゆえ inclusion (`quotientToAmbientLayerZero` L₀ 側 / factor L₁→ambient 側) を
+  intertwine する (underlying element 保存)。要: L₀ inclusion と L₁ inclusion の定義精査。
+- **(b) L₁ bridge 互換**: `ambientLayerOneLinearEquivFrattini ∘ incl_L1 = factorLayerOneEquivAmbientFrattini`
+  (両者とも [x²] を x²∈Φ(P) に送る)。⟹ `ambientCenterCoordinate ∘ incl_L1 = eKernel_left`
+  (eKernel_eq より eKernel=ePhi∘factor_bridge、ambientCenterCoordinate=ambient_bridge∘ePhi... 実は
+  ambientCenterCoordinate=ambientLayerOneLinearEquivFrattini.trans ePhi)。
+  ⟹ (a)+(b)+square_normal で `A(α)=eKernel(sq_factor(eQuot.symm α))=α·θ(α)=q_X(α)`。
+定義: `factorLayerOneEquivAmbientFrattini` @ AmbientCentralExtension:317、
+`ambientLayerOneLinearEquivFrattini` @ MixedEigenweights:81。
+
+**4a-ii 以降の未着手 (Stage 4 の残り、多 session)**:
+- branch dispatch: FactorCoordinateData (comm/noncomm) から (f,N,eQuot,hf,hfexact) を抽出し
+  `ambientProductEquiv` の `e` を組む (exists_factorFamily_of_* と同じ dispatch)。
+  hRnormal/hinf/hsup/hΦR は XiLengthThreeTypeAFactorData から。
+- mixed 項 M(α,β) を各 case の固有値算術で確定 (endpoint の weight equation 使用)。
+- case assembly → `higmanLemmaTwelve : IsTypeB ∨ IsTypeC ∨ IsTypeD`。
