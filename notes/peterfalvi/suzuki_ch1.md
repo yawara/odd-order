@@ -445,6 +445,13 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       自体を固定する normal-form 補題を証明した。さらに square map の実際の
       actor-equivariance から、固定した kernel eigenvalue と quotient eigenvalue が
       `ν = λ·θ(λ)` を満たすことを直接導いた。
+      既存 normalization chain が shift を隠さないよう、`PairGap` の正規化については
+      第2層 coordinate が original coordinate の何乗 Frobenius shift かを exact equality
+      付きで返す strong sibling theorem を追加し、従来 API はその projection とした。
+      `ProperExtension` の anchored-trace construction 内で加わる第2の shift も exact
+      equality 付き strong sibling で公開し、従来 API は projection とした。従って次は
+      この二つの shift を合成し、上記 counter-shift 補題で prescribed kernel coordinate
+      へ戻した source-facing factor coordinate endpoint を組み立てる段階である。
       Lemma 11 の finite-field model も、内部で任意の generator を選び直す形に加えて
       caller-prescribed generator を受け取る版を証明した。同じ ambient generator は
       invariant factor への restricted action の faithful range でも generator のまま
@@ -453,8 +460,11 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       involution subgroup から証明し、第2 lower-central layer から ambient `Φ(P)` への
       canonical な `ZMod 2` 線形同値を構成した。この同値は factor の restricted action
       と ambient Frattini action を intertwine する。従ってこの branch では共通 Singer
-      座標を factor kernel へ作用同変に渡せる。commutative `A(n,1)` branch は同じ結論を
-      square equivalence から構成する別経路として残っている。
+      座標を factor kernel へ作用同変に渡せる。commutative `A(n,1)` branch でも、
+      square subgroup を ambient `Φ(P)` と identity-on-values で同一視し、共通 Singer
+      座標を kernel へ移した。商座標は canonical square equivalence と inverse Frobenius
+      から従属的に構成され、kernel eigenvalue `ν` に対する quotient eigenvalue が
+      `Frob⁻¹(ν)` であることまで actor-equivariantly 証明した。
       さらに上記の noncommuting mixed-factor witness を actual ambient
       `lowerCentralCommutatorBilinear` の非零値へ接続し、左右 factor に属する代表元の
       provenance も保持した。したがって原典 p. 90 の固有値比較へ入る非零 pairing は

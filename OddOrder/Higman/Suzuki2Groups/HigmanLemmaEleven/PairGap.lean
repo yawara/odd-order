@@ -1018,8 +1018,9 @@ finite-field models by Frobenius so that the selected nonzero bracket has
 indices `(0, r)` in the first canonical basis and a nonzero zeroth coordinate
 in the second.  The shifted generators retain all field-generation and
 primitive-root properties, satisfy `iota nu' = lambda'^(1+2^r)`, and give the
-single-gap law for every nonzero actual basis bracket. -/
-theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate
+single-gap law for every nonzero actual basis bracket.  This strong form also
+records the exact second-layer Frobenius shift. -/
+theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate_with_secondShift
     {K L : Type uCommonField} {H C : Type uGroup}
     [Field K] [Finite K] [Algebra (ZMod 2) K]
     [Field L] [Finite L] [Algebra (ZMod 2) L]
@@ -1040,10 +1041,14 @@ theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate
     (hn : 2 ≤ finrank (ZMod 2) K)
     (hprimNu : IsPrimitiveRoot nu
       (2 ^ finrank (ZMod 2) K - 1)) :
-    ∃ (eOne' : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
+    ∃ (s : Fin (finrank (ZMod 2) K))
+      (eOne' : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
       (eTwo' : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] K)
       (lambda' : L) (nu' : K)
       (r : Fin (finrank (ZMod 2) L)),
+      eTwo' = eTwo.trans
+        (((FiniteField.frobeniusAlgEquivOfAlgebraic
+          (ZMod 2) K) ^ s.val).toLinearEquiv) ∧
       (∀ v, eOne' (lowerCentralLayerRepresentation phi 0 c v) =
         lambda' * eOne' v) ∧
       Algebra.adjoin (ZMod 2) ({lambda'} : Set L) = ⊤ ∧
@@ -1144,8 +1149,64 @@ theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate
     exact lowerCentralPairGapSupport_of_commonConjugateBases
       phi c eOne' lambda' hgen' hcompatOne'
       eTwo' nu' iota hcompatTwo' hn hprimNu' r hnu
-  refine ⟨eOne', eTwo', lambda', nu', r,
+  refine ⟨s, eOne', eTwo', lambda', nu', r, ?_,
     hcompatOne', hgen', hcompatTwo', hprimNu', hnu, hr, ?_⟩
-  exact ⟨hbracket', hcoordinate', hgap⟩
+  · rfl
+  · exact ⟨hbracket', hcoordinate', hgap⟩
+
+/-- Compatibility projection of the shift-tracking normalized bracket data.
+This preserves the original public signature while forgetting the explicit
+second-layer Frobenius shift. -/
+theorem exists_normalizedLowerCentralConjugateBasisBracketCoordinate
+    {K L : Type uCommonField} {H C : Type uGroup}
+    [Field K] [Finite K] [Algebra (ZMod 2) K]
+    [Field L] [Finite L] [Algebra (ZMod 2) L]
+    [Group H] [Group C]
+    [NeZero (finrank (ZMod 2) K)]
+    [NeZero (finrank (ZMod 2) L)]
+    (phi : C →* MulAut H) (c : C)
+    (eOne : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
+    (lambda : L)
+    (hgen : Algebra.adjoin (ZMod 2) ({lambda} : Set L) = ⊤)
+    (hcompatOne : ∀ v,
+      eOne (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda * eOne v)
+    (eTwo : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] K)
+    (nu : K) (iota : K →ₐ[ZMod 2] L)
+    (hcompatTwo : ∀ v,
+      eTwo (lowerCentralLayerRepresentation phi 1 c v) = nu * eTwo v)
+    (hn : 2 ≤ finrank (ZMod 2) K)
+    (hprimNu : IsPrimitiveRoot nu
+      (2 ^ finrank (ZMod 2) K - 1)) :
+    ∃ (eOne' : Additive (lowerCentralLayer H 0) ≃ₗ[ZMod 2] L)
+      (eTwo' : Additive (lowerCentralLayer H 1) ≃ₗ[ZMod 2] K)
+      (lambda' : L) (nu' : K)
+      (r : Fin (finrank (ZMod 2) L)),
+      (∀ v, eOne' (lowerCentralLayerRepresentation phi 0 c v) =
+        lambda' * eOne' v) ∧
+      Algebra.adjoin (ZMod 2) ({lambda'} : Set L) = ⊤ ∧
+      (∀ v, eTwo' (lowerCentralLayerRepresentation phi 1 c v) =
+        nu' * eTwo' v) ∧
+      IsPrimitiveRoot nu' (2 ^ finrank (ZMod 2) K - 1) ∧
+      iota nu' = lambda' ^ (1 + 2 ^ r.val) ∧
+      r ≠ 0 ∧
+      let bOne' := conjugateTensorBasisOfLinearEquiv L eOne'
+      let bTwo' := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo'
+      lowerCentralCommutatorBilinearBaseChange L H
+          (bOne' 0) (bOne' r) ≠ 0 ∧
+      bTwo'.repr
+          (lowerCentralCommutatorBilinearBaseChange L H
+            (bOne' 0) (bOne' r)) 0 ≠ 0 ∧
+      ∀ a b : Fin (finrank (ZMod 2) L),
+        lowerCentralCommutatorBilinearBaseChange L H
+            (bOne' a) (bOne' b) ≠ 0 →
+          HasHigmanPairGap
+            (ZMod.finEquiv (finrank (ZMod 2) L) r) a b := by
+  obtain ⟨_, eOne', eTwo', lambda', nu', r, _,
+      hcompatOne', hgen', hcompatTwo', hprimNu', hnu, hr, hbracket⟩ :=
+    exists_normalizedLowerCentralConjugateBasisBracketCoordinate_with_secondShift
+      phi c eOne lambda hgen hcompatOne eTwo nu iota hcompatTwo hn hprimNu
+  exact ⟨eOne', eTwo', lambda', nu', r,
+    hcompatOne', hgen', hcompatTwo', hprimNu', hnu, hr, hbracket⟩
 
 end OddOrder.Higman.Suzuki2Groups
