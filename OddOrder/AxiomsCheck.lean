@@ -10933,6 +10933,33 @@ This matters structurally, not just cosmetically: `⁅S, ·⁆` preserves normal
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.commutator_R₀_eq_commutator_top
 
+/-! **BG Theorem E.3(b), Step 2, (E.6) COMPLETE — the descending series**
+(`BG.AppE_FurtherResults`, issue 3021, 2026-07-20).  BG's chain
+`T = H₀ ⊃ H₁ ⊃ ⋯ ⊃ Hₙ = 1` with `|Hᵢ₋₁ : Hᵢ| = p` and "thus `|T| = pⁿ`".
+
+**No new definition was needed**: the chain is the repo's existing
+`Isaacs.Ch04.iterCommutator T ⊤` (iterated right commutator with the whole group), which
+already carries `iterCommutator_eq_bot_of_isNilpotent_ambient` — i.e. the chain does reach
+`1`.  BG's alternative description `Hᵢ = [R₀, Hᵢ₋₁]` is supplied by
+`commutator_R₀_eq_commutator_top`; the two descriptions play different roles, `⁅·, S⁆`
+keeping the terms normal and `⁅R₀, ·⁆` carrying the counting.
+
+* `RegularOperatorSetup.card_iterCommutator_eq` — `|Hᵢ| = p · |Hᵢ₊₁|` while `Hᵢ ≠ 1`.
+* `RegularOperatorSetup.card_start_eq_pow_mul` — `|T| = pⁱ · |Hᵢ|`, which at the last
+  nontrivial index is BG's `|T| = pⁿ`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_iterCommutator_eq
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.card_start_eq_pow_mul
+
+/-! **BG Theorem E.3(b), Step 2, (E.5) `S = R₀T`** (`BG.AppE_FurtherResults`, issue 3021,
+2026-07-20): `RegularOperatorSetup.sup_centralizer_eq_top`.
+
+BG lists `T char S`, `|S : T| = p`, `R₀ ∩ T = 1` and then writes `S = R₀T`; the last step is
+a cardinality count, `|R₀T| = |R₀|·|T| = p·|T| = |S|`.  BG's `T char S` needed nothing new —
+`GroupTheory.centralizer_omega1UpperCentralTwo_characteristic` is already an **instance**, so
+the normality that makes `↑(R₀ ⊔ T) = ↑R₀ * ↑T` is found by inference.  ⚠ The exponent
+hypothesis on `S` is *not* used: narrowness alone drives Theorem 5.3(d) here. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.sup_centralizer_eq_top
+
 /-! **CN-group structure: the 3-step dichotomy — COMPLETE** (`GroupTheory.CNGroupStructure`,
 issue 9133).  Gorenstein Ch.12 §1 (BG cites it as "**G** 14.1"; the chapter is renumbered in our
 copy).  `IsThreeStepGroup G p` transcribes Gorenstein's three conditions verbatim; `O_{p,p'}` and
