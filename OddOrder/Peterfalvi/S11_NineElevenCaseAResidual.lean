@@ -879,7 +879,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 This is `sOf_nineEleven_coherent` with its last honest carrier `hrefuteEq` supplied by
 `caseA_equalityRefutation`, and its `2 ≤ ncard` count `h2` by `caseA_irrCut_two_le_ncard`.
 **What remains parametric is exactly Hypothesis (8.15)**: the Dade datum `dd` with its pin `hdd`
-to the (4.6) restriction, and `h46` with the pins `hKeq`/`hHeq`/`hconj`/`htau` naming the book's
+to the (4.6) restriction, and `h46` with the pins `hKeq`/`hHle`/`hconj`/`htau` naming the book's
 `K = M'`, `H = M_σ` and `τ`. -/
 theorem nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
@@ -888,7 +888,7 @@ theorem nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
-    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
     (hconj : h46.dade0.HConjInvariant)
     (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
@@ -904,7 +904,7 @@ theorem nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
         (h46.tau.restrict Set.subset_union_left hAnorm))
       (sOf data (chief.H0 ⊔ chars.Cprime))
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
-  sOf_nineEleven_coherent hG hM chars h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd
+  sOf_nineEleven_coherent hG hM chars h46 hKeq hHle hconj htau hAnorm hKsupp hVsub dd hdd
     (fun caseA => caseA_irrCut_two_le_ncard hG hM caseA)
     (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq hconj htau hKsupp hVsub)
 
@@ -928,7 +928,7 @@ theorem typeII_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub (typesIIIIIIVSetup_of_isTypeII hM htypeII))
-    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
     (hconj : h46.dade0.HConjInvariant)
     (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
@@ -948,7 +948,7 @@ theorem typeII_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
   nineEleven_coherent hG hM
     (mkSection11CharacterData (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau))
-    h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd
+    h46 hKeq hHle hconj htau hAnorm hKsupp hVsub dd hdd
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) at the `A₀` level, with the case (9.7.a) residual discharged.**
@@ -964,7 +964,7 @@ theorem nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
-    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
     (hconj : h46.dade0.HConjInvariant)
     (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
@@ -979,7 +979,7 @@ theorem nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
       (sOf data (chief.H0 ⊔ chars.Cprime))
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :=
-  sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub dd hdd
+  sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHle hconj htau hAnorm hKsupp hVsub dd hdd
     (fun caseA => caseA_irrCut_two_le_ncard hG hM caseA)
     (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq hconj htau hKsupp hVsub)
 

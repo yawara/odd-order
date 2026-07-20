@@ -330,6 +330,19 @@ theorem mem_inducedNonKernelFamily {H : Subgroup ↥M} {φ : ClassFunction ↥M 
           OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ)) ∧
       φ = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) := Iff.rfl
 
+/-- **The (8.15.3) family is monotone in the kernel-test subgroup**: `H₁ ≤ H₂` makes the filter
+`H ⊄ Ker θ` easier to pass, so `inducedNonKernelFamily K H₁ ⊆ inducedNonKernelFamily K H₂`.
+
+This is what lets a Hypothesis (4.6) whose `H` is *larger* than `M_σ` — e.g. the §10/§13 packaging,
+where (4.6.c) is instantiated at `H = K = M'` — consume the `M_σ`-indexed containment
+`S11.sOf_subset_inducedNonKernelFamily`.  Note the covering (4.6.d) is a hypothesis *of* the
+ambient `h46`, so the support estimate `inducedNonKernelFamily_conjDiff_support` is unaffected by
+which `H` the family was named with (issue 1045). -/
+theorem inducedNonKernelFamily_mono {H₁ H₂ : Subgroup ↥M} (h : H₁ ≤ H₂) :
+    inducedNonKernelFamily K H₁ ⊆ inducedNonKernelFamily K H₂ := by
+  rintro φ ⟨θ, hθ, rfl⟩
+  exact ⟨θ, fun hsub => hθ (fun x hx => hsub (Subgroup.subgroupOf_mono K h hx)), rfl⟩
+
 /-- **The book's filter is finer than the repo's**: `{θ | H ⊄ Ker θ} ⊆ {θ | θ ≠ 1}`, so the
 (8.15.3) family sits inside `S08.inducedKernelFamily K ⊥`.
 

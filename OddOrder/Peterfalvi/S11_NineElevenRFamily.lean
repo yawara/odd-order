@@ -642,7 +642,7 @@ noncomputable def sOf_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     {Y : Subgroup G}
     (hKeq : h46c.K = (derivedInG M).subgroupOf M)
-    (hHeq : h46c.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46c.subH)
     {η : ClassFunction ↥M ℂ} (hη : η ∈ sOf data Y)
     (hcoh : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) (sOf data Y)
@@ -658,7 +658,8 @@ noncomputable def sOf_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
   -- the conjugate difference of a member: `A`-supported by (4.7), nonzero by odd order
   have hmemNK : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ sOf data Y →
       x ∈ OddOrder.Peterfalvi.S10.inducedNonKernelFamily h46c.K h46c.subH := fun {_} hx =>
-    hKeq ▸ hHeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx
+    OddOrder.Peterfalvi.S10.inducedNonKernelFamily_mono hHle
+      (hKeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx)
   have hηc : (η : ClassFunction ↥M ℂ).conj ∈ sOf data Y :=
     sOf_closedUnderConjugate data Y hη
   have hwitsupp : ((η : ClassFunction ↥M ℂ).conj - η).support ⊆

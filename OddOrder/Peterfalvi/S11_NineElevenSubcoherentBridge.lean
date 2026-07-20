@@ -70,7 +70,7 @@ theorem sOf_degreeSubfamily_coherent_restrict [Finite G] {M : Subgroup G} {A : S
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
     (hKeq : h46.toCore.K = (derivedInG M).subgroupOf M)
-    (hHeq : h46.toCore.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.toCore.subH)
     (hd0 : ((d : ℂ)) ≠ 0)
     (h2 : 2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
       IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard)
@@ -82,10 +82,11 @@ theorem sOf_degreeSubfamily_coherent_restrict [Finite G] {M : Subgroup G} {A : S
       {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
         IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
-  (sOf_degreeSubfamily_coherent hodd h46.toCore dd hG hM data Y d hKeq hHeq hd0 h2 h1A).map
+  (sOf_degreeSubfamily_coherent hodd h46.toCore dd hG hM data Y d hKeq hHle hd0 h2 h1A).map
     fun c => c.congrMap fun φ hφ => by
       rw [show (OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent hodd h46.toCore dd
-            (hKeq ▸ hHeq ▸ (fun _ hx => sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
+            (fun _ hx => OddOrder.Peterfalvi.S10.inducedNonKernelFamily_mono hHle
+              (hKeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
             (fun _ hx => hx.2.1) (fun _ hx => irrCut_conjClosed data Y d hx)).tau
           = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dd.dade
             (dd.dade.fullDadeIsometryData dd.hconj) from rfl,
@@ -944,7 +945,7 @@ theorem sOf_degreeSubfamily_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
     (hKeq : h46.toCore.K = (derivedInG M).subgroupOf M)
-    (hHeq : h46.toCore.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.toCore.subH)
     (hd0 : ((d : ℂ)) ≠ 0)
     (h2 : 2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
       IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard)
@@ -967,7 +968,8 @@ theorem sOf_degreeSubfamily_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
   obtain ⟨χ₁, hχ₁⟩ := hSne
   have hmemNK : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ S →
       x ∈ OddOrder.Peterfalvi.S10.inducedNonKernelFamily h46.toCore.K h46.toCore.subH :=
-    fun {_} hx => hKeq ▸ hHeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx.1
+    fun {_} hx => OddOrder.Peterfalvi.S10.inducedNonKernelFamily_mono hHle
+      (hKeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx.1)
   -- `ℤ[S, A₀] ⊆ ℤ[S, A]`: uniform degree + `1 ∉ A₀`
   have hle : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M) S
       (OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -1009,7 +1011,7 @@ theorem sOf_degreeSubfamily_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
       (hmemNK hχ₂) (hmemNK hχ₁) (by rw [hχ₂.2.2, hχ₁.2.2])).trans
       (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
   exact ((sOf_degreeSubfamily_coherent_restrict hodd h46 dd hAnorm hdd hG hM data Y d
-    hKeq hHeq hd0 h2 h1A).map fun c =>
+    hKeq hHle hd0 h2 h1A).map fun c =>
       (OddOrder.Peterfalvi.S07.isCoherent_of_supportedSpan_le c hle hwit).congrMap
         (fun φ hφ =>
           OddOrder.Peterfalvi.S08.dadeIntegralCharacterMap_restrict_eq_of_support h46.dade0
@@ -1244,7 +1246,7 @@ theorem sOf_nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
-    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
     (hconj : h46.dade0.HConjInvariant)
     (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
@@ -1273,7 +1275,7 @@ theorem sOf_nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
       (sOf_degreeSubfamily_coherent_A0
         (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) h46 dd hAnorm hdd hconj htau
         hG hM data (chief.H0 ⊔ cprimeSub data chief) (data.q * hA.some.a)
-        (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHeq
+        (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHle
         (Nat.cast_ne_zero.mpr (Nat.mul_pos data.nontrivial.2.1.pos hA.some.a_pos).ne')
         (h2 hA.some)
         (fun h => (OddOrder.Peterfalvi.S04.mem_sharp.mp
@@ -1326,7 +1328,7 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
-    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
     (hconj : h46.dade0.HConjInvariant)
     (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
@@ -1352,8 +1354,8 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) := by
   obtain ⟨η₁, hη₁⟩ := sOf_cprime_nonempty hG (chief := chief)
   exact ⟨sOf_coherent_restrict hG hM data h46 h46.toCore hAnorm
-    (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHeq hη₁
-    (sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHeq hconj htau hAnorm hKsupp hVsub
+    (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHle hη₁
+    (sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHle hconj htau hAnorm hKsupp hVsub
       dd hdd h2 hrefuteEq).some⟩
 
 end OddOrder.Peterfalvi.S11

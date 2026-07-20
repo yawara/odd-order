@@ -116,10 +116,12 @@ carries a type hypothesis.  Here that route is assembled:
 ⚠ `h2 : 2 ≤ ncard` stays exposed, as in the §8 companion and in
 `S15.Hypothesis.sSetIrrDeg_coherent`: the (9.8.d) count gives `∃ ζ`, not two members.
 
-`hKeq`/`hHeq` pin Hypothesis (4.6)'s `K` and `H` to `M'` and `M_σ` — the book's choice, supplied by
-`S10.typePACore_toHypothesis46_core`.  They are taken as hypotheses rather than assumed
-definitionally so that no `Hypothesis46Core` has to be rebuilt here (rebuilding it is what makes
-the two copies fail to be definitionally equal). -/
+`hKeq` pins Hypothesis (4.6)'s `K` to `M'`, and `hHle` asks only that its `H` *contain* `M_σ` —
+the book's choice `H = M_s = M_σ` (`S10.typePACore_toHypothesis46_core`) is the equality case, and
+the §10/§13 packaging, which instantiates (4.6.c) at the larger `H = K = M'`, also qualifies
+(`inducedNonKernelFamily_mono`; issue 1045 着手順 3).  They are hypotheses rather than definitional
+assumptions so that no `Hypothesis46Core` has to be rebuilt here (rebuilding it is what makes the
+two copies fail to be definitionally equal). -/
 theorem sOf_degreeSubfamily_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hodd : Odd (Nat.card ↥M))
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46Core A M)
@@ -127,14 +129,15 @@ theorem sOf_degreeSubfamily_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
     (hKeq : h46.K = (derivedInG M).subgroupOf M)
-    (hHeq : h46.subH = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
     (hd0 : ((d : ℂ)) ≠ 0)
     (h2 : 2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
       IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard)
     (h1A : (1 : ↥M) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S10.inducedNonKernelFamily_subcoherent hodd h46 dd
-        (hKeq ▸ hHeq ▸ (fun _ hx => sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
+        (fun _ hx => OddOrder.Peterfalvi.S10.inducedNonKernelFamily_mono hHle
+          (hKeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
         (fun _ hx => hx.2.1)
         (fun _ hx => irrCut_conjClosed data Y d hx)).tau
       {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧

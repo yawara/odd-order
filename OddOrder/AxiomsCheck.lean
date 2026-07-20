@@ -11747,3 +11747,8 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- and this map.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent_A0
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.nineEleven_coherent_A0
+-- **The (8.15.3) family is monotone in the kernel-test subgroup** (issue 1045 着手順 3): a larger
+-- `H` makes `H ⊄ Ker θ` easier to pass.  This is what lets the §9 (9.11) chain accept a
+-- Hypothesis (4.6) whose (4.6.c) `H` is larger than `M_σ` — notably the §10/§13 packaging, which
+-- instantiates `H = K = M'` — so its `hHeq` pin relaxes to the containment `hHle`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.inducedNonKernelFamily_mono
