@@ -140,6 +140,127 @@ theorem noncomm_ambientSquare_eq
     exact hsn.symm
   rw [hA, hfactor]
 
+/-- The commutative-branch factor inclusion `F →ₗ Additive L₀`. -/
+def commFactorInclusion
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    {c : Y} {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : CommutativeFactorCoordinateData hSinv hPhiS c ePhi nu)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)) :
+    GaloisField 2 n →ₗ[ZMod 2] Additive (lowerCentralLayer P 0) :=
+  letI : CommGroup ↥S :=
+    { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
+  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) := IsMulCommutative.of_comm mul_comm
+  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+    AddCommGroup.zmodModule (fun q => by
+      apply Additive.toMul.injective
+      change (Additive.toMul q) ^ 2 = 1
+      obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (Additive.toMul q)
+      rw [← hx, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+      simpa using Agemo.mem_of_eq_pow (G := ↥S) (p := 2) (n := 1) x)
+  factorInclusion S.subtype hK0
+    (fun g hg => by rw [data.hN, Subgroup.mem_subgroupOf] at hg; exact hg)
+    { data.eQuot with map_smul' := ZMod.map_smul data.eQuot.toAddMonoidHom }
+
+/-- Bridge lemma for the commutative branch: the factor inclusion sends the
+coordinate `data.eQuot [g]` (of the quotient class of `g : ↥S`) to the ambient
+class `[S.subtype g]`.  Stated purely through the additive equivalence
+`data.eQuot`, so no ambient `↥S ⧸ ℧₁`-module instance leaks into the statement;
+this lets `comm_ambientSquare_eq` rewrite through `commFactorInclusion` without
+tangling the self-contained instances baked into that definition. -/
+theorem commFactorInclusion_eQuot_mk
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    {c : Y} {n : ℕ}
+    [IsMulCommutative ↑(frattini P)] [Module (ZMod 2) (Additive ↑(frattini P))]
+    {ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : CommutativeFactorCoordinateData hSinv hPhiS c ePhi nu)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (g : ↥S) :
+    commFactorInclusion data hK0
+        (data.eQuot (Additive.ofMul (QuotientGroup.mk g))) =
+      layerZeroClass (ambientTermZeroHom S.subtype g) := by
+  letI : CommGroup ↥S :=
+    { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
+  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) := IsMulCommutative.of_comm mul_comm
+  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+    AddCommGroup.zmodModule (fun q => by
+      apply Additive.toMul.injective
+      change (Additive.toMul q) ^ 2 = 1
+      obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (Additive.toMul q)
+      rw [← hx, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+      simpa using Agemo.mem_of_eq_pow (G := ↥S) (p := 2) (n := 1) x)
+  rw [commFactorInclusion]
+  exact factorInclusion_eQuot_mk S.subtype hK0 _ _ g
+
+/-- **Factor square identity, commutative branch.**  The ambient square map of
+the factor inclusion equals `α²` (the type-A quadratic form with `θ = 1`). -/
+theorem comm_ambientSquare_eq
+    {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S} {hPhiS : frattini P ≤ S}
+    {c : Y} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    {nu : GaloisField 2 n}
+    (data :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      CommutativeFactorCoordinateData hSinv hPhiS c ePhi nu)
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (α : GaloisField 2 n) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralSquareMapAdditive P hSqamb
+          (commFactorInclusion data hK0 α)) =
+      α * α := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  obtain ⟨g, hg⟩ :=
+    QuotientGroup.mk_surjective (Additive.toMul (data.eQuot.symm α))
+  have hαrep : α = data.eQuot (Additive.ofMul (QuotientGroup.mk g)) := by
+    rw [hg]; exact (data.eQuot.apply_symm_apply α).symm
+  have hmem : (S.subtype g) ^ 2 ∈ frattini P := by
+    rw [← hAgemoamb]
+    simpa using Agemo.mem_of_eq_pow (G := P) (p := 2) (n := 1) (S.subtype g)
+  -- Ambient side: `A(α) = ePhi (⟨(S.subtype g)², _⟩)`.
+  have hA : ambientCenterCoordinate hEA hK1amb htermamb ePhi
+      (lowerCentralSquareMapAdditive P hSqamb (commFactorInclusion data hK0 α)) =
+      ePhi (Additive.ofMul ⟨(S.subtype g) ^ 2, hmem⟩) := by
+    rw [hαrep, commFactorInclusion_eQuot_mk data hK0 g]
+    exact ambientCenterCoordinate_squareMap hEA hK1amb htermamb hSqamb ePhi
+      (ambientTermZeroHom S.subtype g) hmem
+  -- Factor side: `α² = ePhi (⟨(S.subtype g)², _⟩)`.
+  have hfactor : α * α = ePhi (Additive.ofMul ⟨(S.subtype g) ^ 2, hmem⟩) := by
+    haveI := data.fintypeIndex
+    have hsn := data.square_normal α
+    have heq : data.eQuot.symm α =
+        Additive.ofMul (QuotientGroup.mk g) := by
+      rw [hg]; simp
+    rw [heq, data.eKernel_eq,
+      show ((commutativeFactorSquareEquiv data.hcomm data.equivPi).toAdditive
+          (Additive.ofMul (QuotientGroup.mk g))).toMul =
+        commutativeFactorSquareEquiv data.hcomm data.equivPi (QuotientGroup.mk g) from rfl,
+      homocyclicFourSquareSubgroupEquivFrattini_squareEquiv data.hcomm data.equivPi
+        hPhiS data.hN g hmem] at hsn
+    exact hsn.symm
+  rw [hA, hfactor]
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
