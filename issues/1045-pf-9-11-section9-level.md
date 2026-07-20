@@ -312,9 +312,36 @@ finiteness → `sOf_finite`、`sOf_degreeSubfamily_isCoherent` → `hbase` パ�
 付け忘れて `Fintype ↥M` が合成できず 1 度落ちた — このファイルの他 2 定理は付けてあった。
 **§9 の `sOf` 系を触る宣言には一律で付ける**と覚えるのが早い。
 
-**残り**: (9.11) 本体 = `S13.coherent_sOf_H0Cprime` の §9 版。
-case A は本 commit、case B は `caseB_coherent_sOf_H0Cprime` の §9 化が要る。
-`clifford_dichotomy` は既に `chars` の上で述べられている (型仮定なし) ので分岐自体は使える。
+### ⚠ case B は case A のように機械的には降ろせない (2026-07-20 実測)
+
+`caseB_coherent_sOf_H0Cprime` (S13_CoreStructure.lean:760) を読んだ結果、
+**case A と違って §10 依存が本質的**:
+
+- **pivot が μ-column**: 証明は `μ₁ = columnSum (hyp.base.toHypothesis46 …)
+  (hyp.base.muColumnChar … ⟨1, hw2⟩)` を anchor に取る。μ-grid は §10 (S12) の装置で、
+  §9 の carrier には無い。
+- **`htype` が本質的に効く 2 箇所**:
+  - `caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu hG hyp caseB hncH0C htype` (一様次数 `qu`)
+  - `columnSum_muColumnChar_mem_sOf_H0Cprime hG hyp ⟨1,hw2⟩ hk1 hncH0C htype` (pivot の所属)
+  後者は以前 trace したとおり「`𝒮(⊥)` へ緩めて **H₀ = ⊥** を使う」= (11.7)、型 III/IV 専用。
+- 他に `hyp.params.w2_prime`、`hyp.base.tau_inner_eq_of_supported`、
+  `hyp.base.one_notMem_A0`、`caseB_sOf_memberRFamily` など §10/§11 の部品を多用。
+
+⟹ case B の §9 化は**転記ではなく書籍の case (b) の議論を §9 で組み直す**作業。
+書籍の (9.7)(b) は Galois 分岐 (`Ū` が体乗法群の部分群) で、そこでの (9.11) は一様次数 `qu`
+から直接 (5.7) を回す形。repo が μ-column を anchor にしているのは §10 packaging 由来であって
+書籍の必然ではない可能性が高い — **(9.7)(b) と (9.9) を PDF で読んでから設計する**こと
+(推測で転記しない)。
+
+**現状の (9.11) §9 化の到達点**:
+
+| 部分 | 状態 |
+|---|---|
+| `clifford_dichotomy` (9.7) 分岐 | ✅ 既に `chars` 上・型仮定なし |
+| base subfamily coherence | ✅ (b) `sOf_degreeSubfamily_coherent` ((8.15.3)→(5.7)) |
+| case (9.7.a) | ✅ `caseA_coherent_sOf_cprime_of_refuter` (型仮定ゼロ) |
+| case (9.7.b) | ⛏ **要設計** (上記) |
+| (9.11) 本体 (両 case の合成) | ⛏ case B 待ち |
 
 ### (参考) 実装レシピ
 
