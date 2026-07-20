@@ -517,3 +517,41 @@ Nougat `.mmd` は使わない。Coq crib は **無い** (math-comp/odd-order は
       接続する。
 
 survey per-unit 表 = `notes/meta/three_books_full_survey_2026_07_16.md` L568–605。
+
+## 2026-07-21 lane b: Lemma 12 B/C/D case split の frontier 設計 (Unit A 完了後)
+
+**Unit A 完了** (`3866a67da`): 型 C/D の quadratic-extension モデル + honest carrier
+(`OddOrder/Higman/Suzuki2Groups/HigmanTypesCD.lean`)。原典 p.81 定義表の C/D 行を実体化。
+`typeCQuadraticMap θ ε = α·θ(α) + ε·(α^{1/2}·(2θ)(β)) + β²` (2θ²=1)、
+`typeDQuadraticMap θ ε = α·θ(α) + ε·(θ³(α)·θ(β)) + β·θ²(β)` (θ⁵=1,θ≠1)。
+`TypeCData`/`TypeDData`/`IsTypeC`/`IsTypeD` + `ofExtension` (kernel=F, quotient=F×F の
+GroupExtension から carrier を組む) + `map_sq`/`quadraticMap_anisotropic` 等の標準 API。
+4 型すべて原典 ζ と一致検算済 (case 1: B(n,1,ε), case 2: B(n,θ,ε), case 3: C(n,ε), case 4: D(n,θ,ε))。
+
+**残 gap (Explore agent 2026-07-21 の inventory)**:
+1. **F×F 座標** `Additive(lowerCentralLayer P 0) ≃ₗ[ZMod 2] F × F` — 未構築。現状は
+   `quotientToAmbientLayerZero` で各 factor を別々に L₀ へ落とす map + span 被覆のみ。
+2. **P の F×F 上 GroupExtension** — 未構築。`TypeC/DData.ofExtension` が要求する形。
+   道具 = `GroupExtension.ofNormalSubgroupCoordinates Φ(P) (left:Mult F ≃* Φ(P)) (right:P/Φ ≃* Mult(F×F))`。
+3. **組立て済 square 恒等式** `q_P(α,β)=q_X(α)+q_Y(β)+mixed` — 部品 `lowerCentralSquareMapAdditive_add`
+   (sq(u+v)=sq(u)+sq(v)+`lowerCentralCommutatorBilinear`) + factor の `square_normal` (noncomm β·θ(β)/comm β²) は存在。
+4. `TypeBData.ofExtension` — C/D にはあるが B には無い (case 1/2 用に追加要)。
+5. **case 4 の 4項算術** `2^{a₁}+…+2^{a₄}≡2^{b₁}+…+2^{b₄} (mod 2ⁿ-1)` — 未。3項=2項
+   (`three_distinct_frobeniusWeight_not_modEq_pairWeight` @ HigmanLowerCentralSpectrum) は完備、
+   4項は同じ `Finset.geomSum_injective` スタイルで新規。
+
+**Unit B (次) = F×F 座標 + GroupExtension**。設計 = **群レベル surjective+injective ルート**
+(finrank 回避): 各 factor から `factorInclusion : F →ₗ[ZMod 2] Additive L₀`
+(= `quotientToAmbientLayerZeroLinear f hK0 hf ∘ eQuot.symm`) を作り、
+`combined = coprod fI_left fI_right : F×F →ₗ Additive L₀` を
+- **surjective**: x∈left⊔right を `Subgroup.mul_normal` で x=a·b 分解 → layerZeroClass 加法性 →
+  range(fI_left)+range(fI_right)。`sup_eq_top` 使用。
+- **injective**: `fI_left a = fI_right b` → 共通値 w∈mk(left)⊓mk(right)、Φ≤left,right から
+  `mk(left)⊓mk(right)=⊥` (group argument、`inf_eq_frattini` 使用) → w=0 → a=b=0 (fI injective)。
+- fI 単射は各 branch の exactness `f g∈Φ(P)→g∈N` から (comm: `data.hN`, noncomm: `data.hterm`+`hSq`)。
+branch dispatch は FactorCoordinateData の comm/noncomm を `exists_factorFamily_of_*` と同様に処理。
+`LinearEquiv.ofBijective` → Multiplicative 変換 → `right : P/Φ ≃* Mult(F×F)`。
+kernel 側 `left : Mult F ≃* Φ(P)` は `exists_ambientFrattiniSingerCoordinates`(:424) の ePhi から。
+
+**Unit C 以降**: 各 case の固有値算術で mixed 項を確定 → typeB/C/D quadratic map に一致 → ofExtension。
+case 3 の 3項=2項算術は既存、case 4 の 4項算術は Unit で新規。
