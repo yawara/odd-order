@@ -131,7 +131,24 @@ issue 9163 §3 項目 3 ((9.11) M 側の type-II 拡張) の実体。**hub 裁�
 後者は §8 の file が §9 を import することになるので、**新 leaf が素直**
 (例 `S11_NineElevenSubcoherentBridge.lean`)。
 
-### 橋渡し補題の実装レシピ (2026-07-20 に全部品を実測、次 session はそのまま書ける)
+### ✅ 橋渡し補題 実装完了 (2026-07-20): `S11_NineElevenSubcoherentBridge.lean` 新設
+
+- `S11.hInHu_le_Msigma_subgroupOf` — `M_F ≤ M_σ` を `subgroupOf` で 2 段持ち上げ。
+- `S11.sOf_subset_inducedNonKernelFamily` — `𝒮(Y) ⊆ S10.inducedNonKernelFamily M′ M_σ`。
+  両方 axiom-clean、AxiomsCheck 登録済。
+
+⚠ **instance で 2 度直した** (レシピに書いていなかった分):
+1. `inducedNonKernelFamily` は `[Fintype ↥M]` binder を持つので `[Finite G]` だけでは
+   合成できない ⟹ `open scoped OddOrder.Peterfalvi.S12.FiniteInduce in` を付けて
+   `Fintype ↥M` / `Invertible` を `Finite G` から一様に供給させる。
+   (`huSub data` 側と `(derivedInG M).subgroupOf M` 側で `Invertible` が 2 つ要るが、
+   scoped 経由なら同一 source なので `▸` transport が通る。)
+2. `open scoped … in` は **docstring の前**に置く (docstring と宣言の間に入れると
+   `unexpected token 'open'; expected 'lemma'`)。
+
+`hKeq ▸ hbase` の transport はレシピどおり素直に通った。
+
+### (参考) 実装レシピ
 
 ```
 theorem sOf_subset_inducedNonKernelFamily [Finite G]

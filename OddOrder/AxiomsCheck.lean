@@ -193,6 +193,7 @@ import OddOrder.Peterfalvi.S09_FrobeniusParity
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
 import OddOrder.Peterfalvi.S10_SubcoherentTypeP
+import OddOrder.Peterfalvi.S11_NineElevenSubcoherentBridge
 import OddOrder.GroupTheory.RepresentationTheory.GaloisInnerTransport
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound
 import OddOrder.Peterfalvi.S11_GaloisFieldModel
@@ -11207,3 +11208,10 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `dadeSupportHypothesisData_typePACore` for the isometry `τ`) are both Peterfalvi (8.15) claim 1
 -- and carry no type hypothesis beyond `IsTypeP`.  Types II and V included.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subcoherent
+-- **The §9 family sits inside the (8.15.3) family** (issue 1045): `𝒮(Y) ⊆ 𝒮_{(8.15.3)}`.  Both
+-- families induce from `M'` (`huSub_eq_derivedInG_subgroupOf`, Peterfalvi (9.2)), and §9's filter
+-- `M_F ⊄ Ker χ` is the stronger one because `M_F ≤ M_σ`.  This is the link that lets the book's
+-- own route to the (9.11) base coherence — (8.15.3) then (5.7) — replace the §10 μ-grid engine,
+-- and with it the type-III/IV restriction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.hInHu_le_Msigma_subgroupOf
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_subset_inducedNonKernelFamily
