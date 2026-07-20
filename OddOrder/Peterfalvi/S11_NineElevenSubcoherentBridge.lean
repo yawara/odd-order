@@ -252,4 +252,35 @@ theorem sOf_anchor_diff_support [Finite G] {M : Subgroup G} {A0 : Set ↥M}
   rwa [one_smul] at h
 
 
+/-- **Peterfalvi (9.9.b), member form** (§6 level, no transport): a reducible induced character
+from `h46.K` is a certain-type column sum.
+
+This is the content the §9 caseB `R`-family dispatch needs, isolated so that **no coercion between
+`↥h46.K` and `↥(huSub data)` appears** — everything stays inside `h46.K`.  An earlier attempt stated
+it over `sOf data Y` directly and tried to move the source character across
+`h46.K = huSub data`; that rewrite is not type-correct (the motive mentions
+`IrreducibleCharacter ↥_a` *and* `chiRestrict χ₂ = χ`, both dependent on the subgroup).  Splitting
+it this way keeps the dependent step transport-free and leaves the §9 identification to the
+Set-valued level, where the `▸` idiom does work (cf. `sOf_subset_inducedNonKernelFamily`).
+
+The §13 analogue is `S13.caseB_sOf_member_dichotomy`, whose conclusion is phrased in the §10 μ-grid;
+the book builds these members from (4.7) and Theorem (4.5), both §6, so the `columnSum` form here is
+the faithful one. -/
+theorem induce_columnSum_of_not_irreducible {M : Subgroup G} {A : Set G} [Finite G] [Fintype G]
+    [Fintype ↥M]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥M : ℂ)]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    (χ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥h46.K)
+    (hred : ¬ IsIrreducibleCharacter
+      (ClassFunction.induce h46.K (χ : ClassFunction ↥h46.K ℂ))) :
+    ∃ χ₂, ClassFunction.induce h46.K (χ : ClassFunction ↥h46.K ℂ)
+      = OddOrder.Peterfalvi.S06.columnSum h46 χ₂ := by
+  obtain ⟨χ₂, hχ₂⟩ := (h46.induce_not_isIrreducible_iff χ).mp hred
+  refine ⟨χ₂, ?_⟩
+  rw [← hχ₂, OddOrder.Peterfalvi.S06.columnSum_def]
+  exact h46.induce_restrict_certainType_eq χ₂
+
+
 end OddOrder.Peterfalvi.S11

@@ -480,6 +480,31 @@ h46.toCertainTypeHypothesis.toHypothesis   -- : S06.Hypothesis ↥M
 
 **⟹ case B は全体として「新規の数学ゼロ、§6 形に留まる述べ直し」に落ちた。**
 
+### ✅ dichotomy landed + ⚠ `certainTypeR` に足りない条件を実測 (2026-07-20)
+
+**landed**: `S11.induce_columnSum_of_not_irreducible` (axiom-clean)。
+`h46.K` からの誘導が可約 ⟹ `∃ χ₂, induce h46.K χ = S06.columnSum h46 χ₂`。
+
+⚠ **教訓 (4 回試した)**: statement を `columnSum` 形にすれば statement には transport が
+出ないが、**証明側**では source character を `↥h46.K` へ運ぶ必要があり
+`rw [h46.K = huSub data]` は **motive が type-correct にならない**
+(`_a` が `IrreducibleCharacter ↥_a` と `chiRestrict χ₂ = χ` の両方に出る)。
+⟹ 回避でなく**分解**で解いた: 補題全体を `h46.K` の内側で述べ coercion を出さない。
+§9 の族との同定は **Set 値の別ステップ**に分ける (そこでは `▸` が効く)。
+**依存部分は §6 の持ち物、§9 の部分は set-level** という切り方が型的にも正しい。
+
+⚠ **次に埋める穴**: `S06.certainTypeR` (S06_CertainTypeCoherence.lean:648) は
+
+- `hχ₂ : χ₂ ≠ 1`
+- `hdeg : (∑ i, (columnFamily χ₂).mu i) 1 = (∑ i, (columnFamily χ₂⁻¹).mu i) 1`
+
+を要求する。**`χ₂ ≠ 1` を本 dichotomy は返していない**。
+§13 版はこれを `hk0 : k ≠ 0` (μ-grid の index) から得ていた。
+§9 では **`xiSet` の条件 `H ⊄ Ker χ`** から出るはず (χ₂ = 1 なら column は自明側になり
+`H ⊆ Ker χ` に落ちる) — ただし未確認。⟹ dichotomy を
+`∃ χ₂ ≠ 1, …` に強めるのが次の一手。`hdeg` は §13 版が
+`columnSum_inv_apply_one` で埋めているのでそれを使う。
+
 ### (2) dichotomy の実装レシピ (2026-07-20 に signature 実測)
 
 ```
