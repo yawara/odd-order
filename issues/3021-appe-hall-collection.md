@@ -2402,3 +2402,76 @@ relation。repo の `S05_Narrow*` に未形式化 (subagent grep 済) ゆえ新�
 これが入れば `caseA_eigenvalue_step` を base+step で帰納 → `hβsupply` 構成 →
 `commutator_centralizer_eq_bot_of_beta_supply` に投入 → E.4 abelian clause が閉じ、
 `AppE_FurtherResults:1645` の sorry が消える。**開いた数学は無し**、形式化労力のみ。
+
+## 2026-07-21 (51): ⭐⭐ gap を BG 原文で独立検証 + **degree of commutativity へ精密化** + class < p という決定的簡約
+
+親 (lane c) が (50) の subagent finding を BG 原文・Lie 環構造・repo 状態で**独立に再検証**。
+結果、gap は (50) の「standard な 2-step centralizer 定理」より**深い**が、同時に**class < p**
+という簡約が効くと判明。以下 4 点。
+
+### ① Finding 2 を BG 原文 (E.22)/(E.23) で独立確認 — β 側が本当に 2-step relation を要する
+
+- **α 側 (E.22)** `wᵢᵃ ≡ wᵢ^{rᵢ} (mod Hᵢ₊₁)` が通るのは `vᵃ = vʳ` (v = R₀ 生成元が α の**正確な**
+  固有ベクトル) ゆえ右スロットに誤差ゼロだから。`wᵢ = ⁅wᵢ₋₁, v⁆`、`[wᵢ₋₁^{rᵢ₋₁}·u, vʳ]` の
+  `u ∈ Hᵢ` 誤差は `[Hᵢ, S] = Hᵢ₊₁` に落ちる。**2-step relation 不要**。
+- **β 側 (E.23)** `wᵢ^β ≡ wᵢ^{tᵢ}` は β が R₀ を固定しない ⟹ `v̄^β = t·v_Q + t₀·v_T` (S/S' で分解、
+  `v_T ∈ T/S'`, t≠t₀)。`[wᵢ₋₁, v_T]` の項が残り、これを mod Hᵢ₊₁ で消すには `⁅Hᵢ₋₁, T⁆ ≤ Hᵢ₊₁`
+  が要る = **2-step centralizer relation**。weight bound は `⁅Hᵢ₋₁, T⁆ ≤ Hᵢ` (1 段) しか出さない。
+  ⟹ (50) の Finding 2 は原文で確認、"Similarly one can show" の実体はこれ。
+
+### ② ★ 2-step relation を **degree of commutativity ≥ 1 に還元** (clean な 3-subgroups 帰納)
+
+`⁅T, H_a⁆ ≤ H_{a+2}` (a≥1) は次の**弱い**入力から出る:
+> **degree of commutativity ≥ 1**: `⁅H_a, H_b⁆ ≤ H_{a+b+2}` (∀ a,b ≥ 1)
+> (weight bound `⁅H_a,H_b⁆ ≤ H_{a+b+1}` を 1 段改善したもの)
+
+還元 (a に関する帰納):
+- **base a=1**: `⁅T, H_1⁆ = ⁅H_0, H_1⁆ ≤ H_2` は weight bound そのもの。
+- **step a-1→a**: `H_a = ⁅H_{a-1}, ⊤⁆` ゆえ three-subgroups で
+  `⁅T, H_a⁆ = ⁅H_0, ⁅H_{a-1},⊤⁆⁆ ≤ ⁅⁅H_0,H_{a-1}⁆, ⊤⁆ · ⁅⁅⊤,H_0⁆, H_{a-1}⁆`。
+  - `⁅⁅T,H_{a-1}⁆, ⊤⁆ ≤ ⁅H_{a+1}, ⊤⁆ = H_{a+2}` (IH `⁅T,H_{a-1}⁆ ≤ H_{a+1}`)。
+  - `⁅⁅⊤,H_0⁆, H_{a-1}⁆ = ⁅H_1, H_{a-1}⁆ ≤ H_{a+2}` (`⁅⊤,T⁆ = H_1`、**degree of commutativity**)。
+  ⟹ `⁅T, H_a⁆ ≤ H_{a+2}` ✓。
+
+⟹ **本質的 gap = degree of commutativity ≥ 1**。逆に、soft な commutator calculus は
+全ルートで `⁅R₀,T⁆ = H_1` (= 丸ごと 1 段) の off-by-one に阻まれ、これ以上出ない (three-subgroups
+の 3 通りの grouping・upward/downward 帰納すべて確認済)。
+
+### ③ degree of commutativity ≥ 1 は **Blackburn の定理** (hard, p-odd 依存, soft でない)
+
+associated graded Lie 環 `L = ⊕ Lⱼ` (`L₁` 2 次元 = ⟨v̄, w̄₀⟩, `Lⱼ` 1 次元 j≥2) で、
+`γ_{i,j}` を `⁅ēᵢ, ēⱼ⁆ = γ_{i,j} ē_{i+j}` (i,j≥2) の構造定数とする。dc≥1 ⟺ 全 γ_{i,j}=0。
+- ad(v̄) が derivation ゆえ **線形漸化式 `γ_{i,j} = γ_{i+1,j} + γ_{i,j+1}`** + 反対称 `γ_{i,j}=-γ_{j,i}`。
+- しかしこれだけでは**閉じない**: 最上反対角 `i+j = n` の `γ_{i,n-i}` (∈ L_n = Z(S)) は**自由**で、
+  Jacobi では消えない。消すには **p odd** を使う追加の非線形関係 (ad(w̄₀) derivation:
+  `γ_{i,j}β_{i+j} = βᵢγ_{i+1,j}+βⱼγ_{i,j+1}`、`β_{i+1}=βᵢ-γ_{2,i}`) が要る。
+  ⟹ これが Blackburn 1958 の positive degree of commutativity の核心。**多 leaf の genuine infra**。
+
+### ④ ⭐ 決定的簡約: **class n < p** (Blackburn の exceptional case を回避)
+
+E.3(a) `card_A_dvd_half_p_sub_one` = `q ∣ (p-1)/2` ⟹ `q ≤ (p-1)/2`。
+E.3(c) `card_omega_le` = `|S| ≤ p^q`、`add_two_le_of_iterCommutator_ne_bot` = (H_m≠⊥ ⟹ m+2≤q)
+⟹ **class `n ≤ q-1 ≤ (p-3)/2 < p`**。
+Blackburn の dc=0 exceptional 群は**全て class ≥ p** (p 冪写像に絡む) なので、**class < p ⟹ dc ≥ 1**
+がクリーンに従うはず (class < p は Lazard/regular p-group 域)。⟹ 一般 Blackburn を形式化せず、
+**class < p 版の positive dc** を狙えばよい (大幅に易しい可能性)。
+
+### repo 状態 (親が Explore で確認)
+
+- **在る**: `iterCommutator_eq_lowerCentralSeries` (E.8, 鎖=lcs)、weight bound
+  (`Mann.lean:791 commutator_lowerCentralSeries_le_subgroup`)、`[S:T]=p`、`γ₂=S'≤T`
+  (`NarrowPGroup.lean:268`)、`⁅W,R⁆≤Ω₁(Z(R))` (`S05_NarrowSCN.lean:114`)、
+  coset-counting device (`S05_NarrowAutomorphisms.lean:344,421`)。
+- **無い**: maximal class / uniserial predicate、degree of commutativity、2-step relation。
+- ⚠ Explore の指摘: 2-step relation は **T-abelian を仮定せず**証明する必要 (これが T-abelian を
+  *証明する*道具ゆえ)。
+
+### ⟹ 次段の frontier (shared infra、claim = 9400 番台)
+
+1. **degree of commutativity ≥ 1 for maximal-class p-group of class < p** を形式化
+   (`OddOrder/GroupTheory/` の新 leaf、maximal class の Lie 環構造定数解析)。★重量物。
+2. ②の 3-subgroups 帰納で `⁅T, H_a⁆ ≤ H_{a+2}` を導出。
+3. `caseA_eigenvalue_step` を base+step で帰納 → `hβsupply` → E.4 abelian clause。
+
+⚠ ③の Blackburn 核心 proof は elided gap ゆえ、形式化前に最強モデルで class<p 版の clean proof を
+確認する ([[feedback-ask-chatgpt-for-elided-gaps]])。数学は未解決でなく、正しい proof strategy の確定待ち。
