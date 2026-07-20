@@ -717,7 +717,39 @@ packaging 別名だけだった。`sOf_nineEleven_coherent` の `hArefute` を�
 | `hncH0C` + `htype` (1 行) → `C_eq_cSub_of_noncoherent` | ✅ **§9 では消える** (`chars.C` は `cSub data chief` と定義的に等しい) |
 | `hyp.base.sixTwoDecompositionData` + `hyp.params_*` (5) | ⛏ **本物の §10 依存** |
 
-⟹ **真の作業は `S13.sixTwoDecompositionData` の §9 化**。実測すると、その μ-grid `params`
+#### ✅ 訂正 (2026-07-20): `sixTwoDecompositionData` の §9 化は**不要** — engine を直接叩ける
+
+(5.6) engine `S08.coherentDegreeSqNormBound_of_not_coherentW_k` の signature を実測したところ、
+`hyp : S04.Hypothesis G A L` と `Dmem` / `Da` (= `CharacterPsiDecomposition`) を
+**すべてパラメータで取る完全に generic な形**だった。μ-grid も `S13.Hypothesis` も出てこない。
+⟹ `S13.sixTwoDecompositionData` を §9 で作り直す必要は無く、
+本 session の §9 R-family から `CharacterPsiDecomposition.ofProjection` で直接供給すればよい。
+
+- ✅ `S11.sOf_memberPsiDecomposition` — `Dmem` 側 (`ψ = 0`) landed。
+  ⚠ **map は `τ` でなく coherent extension**。`ψ = 0` では `ofProjection` の義務
+  `tau1 (χ − ψ) ∈ ℤ[Irr G]` が `tau1 χ ∈ ℤ[Irr G]` になり、Dade map では**偽**
+  (supported lattice 上でしか isometry でない) が、`IsCoherent.extension_mem_ZIrr` そのもの。
+  `FamilyBundleDade` の docstring が `decompositionPair` を避ける理由と同じ。
+- ✅ `S11.sOf_breakPsiDecomposition` — `Da` 側 (break `ψ` vs anchor `a • χ₁`) landed。一発で通った。
+  ⚠ **こちらは `tau1 = τ` でよい**: 義務が `τ(ψ − a·χ₁) ∈ ℤ[Irr G]` で、次数一致ゆえ
+  A₀-supported。member 側 (`ψ = 0`、Dade map 不可 → coherent extension) との**非対称性**が
+  `FamilyBundleDade` の記述どおりに出る。
+
+⟹ **engine の `Dmem` / `Da` は両方 §9 で揃った**。
+
+#### ⛏ 次の一手: (5.6) engine への組み立て = `CaseAPairBound` の producer
+
+`S08.coherentDegreeSqNormBound_of_not_coherentW_k` の結論は `∑ (deg i)²/mc i ≤ 2a` なので、
+`CaseAPairBound` の `sumnS F ≤ 2q²a·d` へは §13 と同じ rescale
+(`sumnS_image_eq_anchorSq_mul`) を通す。残る組み立ての中身:
+
+- `s` / `χmem` / `deg` / `mc` / `i₁` を `F ⊆ S₂` から立てる (§13 と同形)
+- 格子生成の 2 仮説 `hSgen` / `hgen`
+- 源次数 `d ≤ u` の供給 (§13 は `caseA_source_degree_dvd_a` + (9.11.1) preamble)
+
+⟹ §13 `nineElevenPairBound` の本体を、`Dmem`/`Da` だけ §9 版に差し替えて写す作業。
+
+#### (旧・撤回) 真の作業は `S13.sixTwoDecompositionData` の §9 化。実測すると、その μ-grid `params`
 (`hmu`/`hδpm`/`hδj`/`hzS`/`hz1`) が効くのは **可約メンバー分岐**
 (`sixTwoMemberDatum_of_reducible_member` / `sixTwoDecompositionData_of_reducible_break`) だけで、
 これは **本 session で作った `S11.sOf_memberRFamily` (可約 = §6 `certainTypeR`) が果たす役割と同じ**。
