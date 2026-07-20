@@ -365,7 +365,7 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
       have hξ3 := hS4sub (hS4fin.mem_toFinset.mp hξT)
       rw [hconst ξ hξ3 lam₀ hlam₀]
       exact hlam₀ne
-    have hcount4 := OddOrder.Peterfalvi.S13.card_le_inner_self_re_of_orthonormal_inner_int_ne
+    have hcount4 := OddOrder.Peterfalvi.S07.card_le_inner_self_re_of_orthonormal_inner_int_ne
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
         ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) (γ - ψ₁))
       hS4fin.toFinset (fun ξ => c₃.extension ξ) hON1 hON2 hint hnec
