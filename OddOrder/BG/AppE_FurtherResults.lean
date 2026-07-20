@@ -718,6 +718,141 @@ theorem RegularOperatorSetup.card_omega1Center_and_index_centralizer [Finite R]
     hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS E hEcard hEstar
   exact ⟨h.2.1.1, h.2.2⟩
 
+/-- **BG Theorem E.3(b), Step 2, (E.4)**: `C_S(R₀) = R₀ × Ω₁(Z(S))`, of order `p²`.
+
+BG sandwiches `R₀ × Z ⊆ C_S(R₀) ⊆ R₀ × Ω₁(R₁)` and reads off both `|Z| = p` and the
+decomposition.  Here `|Z| = p` is already in hand from Lemma 5.2
+(`card_omega1Center_and_index_centralizer`), and the upper bound comes more cheaply than
+BG's: `C_S(R₀)` is elementary abelian — abelian because it sits in the abelian `C_R(R₀)`,
+of exponent `p` by hypothesis on `S` — and `r(C_R(R₀)) ≤ 2`, so `|C_S(R₀)| ≤ p²`.  The
+lower bound `R₀ × Z` already has order `p²` (`R₀ ∩ Z = 1` by
+`inf_eq_bot_of_three_le_pRank`), so the two meet.  `Ω₁(R₁)` never enters. -/
+theorem RegularOperatorSetup.centralizer_inf_eq_sup_omega1Center [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) :
+    S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)
+        = hyp.R₀ ⊔ (OddOrder.BG.Ch1.S05.omega1Center ↥S p).map S.subtype ∧
+      Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2 := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+  set C : Subgroup R := Subgroup.centralizer (hyp.R₀ : Set R) with hCdef
+  set Z : Subgroup R := (OddOrder.BG.Ch1.S05.omega1Center ↥S p).map S.subtype with hZdef
+  -- `|Z| = p` (Lemma 5.2) and `Z ≤ S`, `Z` central in `S`.
+  have hZcard : Nat.card ↥Z = p := by
+    rw [hZdef, Subgroup.card_map_of_injective S.subtype_injective]
+    exact (hyp.card_omega1Center_and_index_centralizer hR₀S hS).1
+  have hZS : Z ≤ S := by
+    rw [hZdef]
+    rintro x hx
+    obtain ⟨y, -, rfl⟩ := Subgroup.mem_map.mp hx
+    exact y.2
+  have hSZ : S ≤ Subgroup.centralizer (Z : Set R) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro g hg
+    rw [hZdef] at hg
+    obtain ⟨y, hy, rfl⟩ := Subgroup.mem_map.mp hg
+    have hc := Subgroup.mem_center_iff.mp
+      (OddOrder.BG.Ch1.S05.omega1Center_le_center hy) ⟨x, hx⟩
+    simpa using (congrArg (fun z : ↥S => (z : R)) hc).symm
+  -- `R₀ ∩ Z = 1`, so `|R₀ Z| = p²`.
+  have hinf : hyp.R₀ ⊓ Z = ⊥ := hyp.inf_eq_bot_of_three_le_pRank hSZ hS
+  have hR₀Z : hyp.R₀ ≤ Subgroup.centralizer (Z : Set R) := hR₀S.trans hSZ
+  have hsupcard : Nat.card ↥(hyp.R₀ ⊔ Z) = p ^ 2 := by
+    have hcoe : (↑(hyp.R₀ ⊔ Z) : Set R) = (hyp.R₀ : Set R) * (Z : Set R) :=
+      Subgroup.coe_mul_of_left_le_normalizer_right hyp.R₀ Z
+        (hR₀Z.trans (Subgroup.centralizer_le_normalizer _))
+    have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card hyp.R₀ Z
+    rw [hinf, Subgroup.card_bot, mul_one, hyp.R₀_card, hZcard] at hprod
+    have hcong : Nat.card ↥(hyp.R₀ ⊔ Z) = Nat.card ↥((hyp.R₀ : Set R) * (Z : Set R)) :=
+      Nat.card_congr (Equiv.setCongr hcoe)
+    rw [hcong, hprod]; ring
+  -- `R₀ Z ≤ C_S(R₀)`.
+  have hle : hyp.R₀ ⊔ Z ≤ S ⊓ C := by
+    refine sup_le (le_inf hR₀S ?_) (le_inf hZS ?_)
+    · rw [hCdef]
+      exact Subgroup.le_centralizer_iff_isMulCommutative.mpr IsCyclic.isMulCommutative
+    · rw [hCdef, ← Subgroup.le_centralizer_iff]
+      exact hR₀S.trans hSZ
+  -- `C_S(R₀)` is elementary abelian inside `C_R(R₀)`, whose `p`-rank is `≤ 2`.
+  have hEA : ((S ⊓ C).subgroupOf C).IsElementaryAbelian p := by
+    refine ⟨fun x y => Subtype.ext ?_, fun x => Subtype.ext ?_⟩
+    · exact hyp.isMulCommutative_centralizer_R₀.is_comm.comm (x : ↥C) (y : ↥C)
+    · have hxS : ((x : ↥C) : R) ∈ S := (Subgroup.mem_subgroupOf.mp x.2).1
+      have hp1 := congrArg (fun z : ↥S => (z : R)) (hexp ⟨((x : ↥C) : R), hxS⟩)
+      exact Subtype.ext (by simpa using hp1)
+  have hEcard : Nat.card ↥(S ⊓ C) ≤ p ^ 2 := by
+    obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup (S ⊓ C)).exists_card_eq
+    have hlog := le_pRank ((S ⊓ C).subgroupOf C) hEA
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : S ⊓ C ≤ C)).toEquiv,
+      hk, Nat.log_pow hyp.p_prime.one_lt] at hlog
+    have h2 : pRank ↥C p ≤ 2 := hyp.pRank_centralizer_R₀_le_two
+    rw [hk]
+    exact Nat.pow_le_pow_right hyp.p_prime.pos (by omega)
+  have heq : hyp.R₀ ⊔ Z = S ⊓ C :=
+    Subgroup.eq_of_le_of_card_ge hle (by rw [hsupcard]; exact hEcard)
+  exact ⟨heq.symm, by rw [← heq, hsupcard]⟩
+
+/-- The centralizer of `R₀` computed inside `↥S` is the `subgroupOf` of the ambient
+`S ⊓ C_R(R₀)`: an `x ∈ S` centralizes `R₀ ∩ S = R₀` iff `↑x` centralizes `R₀`. -/
+theorem RegularOperatorSetup.centralizer_subgroupOf_eq
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
+    Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S)
+      = (S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)).subgroupOf S := by
+  ext x
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_inf, Subgroup.mem_centralizer_iff,
+    Subgroup.mem_centralizer_iff]
+  constructor
+  · refine fun h => ⟨x.2, fun g hg => ?_⟩
+    exact congrArg (fun y : ↥S => (y : R))
+      (h ⟨g, hR₀S hg⟩ (by simpa [Subgroup.mem_subgroupOf] using hg))
+  · rintro ⟨-, h⟩ g hg
+    exact Subtype.ext (h (g : R) (by simpa [Subgroup.mem_subgroupOf] using hg))
+
+/-- **BG Theorem E.3(b), Step 2, (E.5)**: `|C_T(R₀)| = p`, where `T = C_S(Ω₁(Z₂(S)))`.
+
+Theorem 5.3(d) (`Ch1.S05.narrow_centralizer_decomp`) gives the internal direct
+decomposition `C_S(R₀) = R₀ × C_T(R₀)`; with `|C_S(R₀)| = p²` from (E.4) and `|R₀| = p`,
+the cyclic factor `C_T(R₀)` has order `p`.
+
+Together with `|S : T| = p` (`card_omega1Center_and_index_centralizer`) this is BG's
+`|S : T| = |C_T(R₀)| = p`. -/
+theorem RegularOperatorSetup.card_centralizer_inf_centralizer_eq [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) :
+    Nat.card ↥(Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S) ⊓
+      Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) = p := by
+  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
+  set CS : Subgroup ↥S := Subgroup.centralizer ((R₀' : Subgroup ↥S) : Set ↥S) with hCS
+  set T : Subgroup ↥S :=
+    Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
+  obtain ⟨-, -, hR₀T, hdecomp⟩ := OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+    hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS (hyp.isNarrow_of_three_le_pRank hR₀S hS)
+    R₀' (hyp.card_R₀_subgroupOf hR₀S) (hyp.pRank_centralizer_subgroupOf_le_two hR₀S)
+  -- `|C_S(R₀)| = p²` via (E.4), transported into `↥S`.
+  have hCScard : Nat.card ↥CS = p ^ 2 := by
+    rw [hCS, hR₀', hyp.centralizer_subgroupOf_eq hR₀S,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left :
+        S ⊓ Subgroup.centralizer (hyp.R₀ : Set R) ≤ S)).toEquiv]
+    exact (hyp.centralizer_inf_eq_sup_omega1Center hR₀S hexp hS).2
+  -- `C_S(R₀) = R₀ × (C_S(R₀) ⊓ T)` with `R₀ ⊓ T = ⊥`, so `p² = p · |C_T(R₀)|`.
+  have hnorm : R₀' ≤ Subgroup.normalizer ((CS ⊓ T : Subgroup ↥S) : Set ↥S) :=
+    (Subgroup.le_centralizer_iff.mpr (inf_le_left.trans (le_of_eq hCS))).trans
+      (Subgroup.centralizer_le_normalizer _)
+  have hcoe : (↑(R₀' ⊔ (CS ⊓ T)) : Set ↥S) = (R₀' : Set ↥S) * ((CS ⊓ T : Subgroup ↥S) : Set ↥S) :=
+    Subgroup.coe_mul_of_left_le_normalizer_right _ _ hnorm
+  have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card R₀' (CS ⊓ T)
+  have hinfbot : R₀' ⊓ (CS ⊓ T) = ⊥ :=
+    le_bot_iff.mp ((le_inf inf_le_left (inf_le_right.trans inf_le_right)).trans (le_of_eq hR₀T))
+  rw [hinfbot, Subgroup.card_bot, mul_one, hyp.card_R₀_subgroupOf hR₀S] at hprod
+  have hcong : Nat.card ↥(R₀' ⊔ (CS ⊓ T)) =
+      Nat.card ↥((R₀' : Set ↥S) * ((CS ⊓ T : Subgroup ↥S) : Set ↥S)) :=
+    Nat.card_congr (Equiv.setCongr hcoe)
+  rw [← hdecomp, hCScard, hprod] at hcong
+  have hmul : p * p = p * Nat.card ↥(CS ⊓ T) := by rw [← sq]; exact hcong
+  exact (Nat.eq_of_mul_eq_mul_left hyp.p_prime.pos hmul).symm
+
 /-- **BG Theorem E.3(b), Step 2, the elided small case**: if `S' ≤ Z(S)` then `R₀ ⊄ S'`.
 
 BG dispatches `|S| ≤ p³` by *"an examination of the `p`-groups of order at most `p³`"*.  No

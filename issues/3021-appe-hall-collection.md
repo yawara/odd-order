@@ -355,6 +355,25 @@ BG が「位数 p³ 以下の p 群を検査せよ」と省略する分岐は、
 ### 残る Step 2 の穴 (次に着手する順)
 
 1. ~~`|S| ≤ p³` の分岐~~ ✅ 完了 (上記)。
+### ⭐ 2026-07-20 (5): (E.4) と (E.5) を証明
+
+| 新規宣言 | BG 対応 |
+|---|---|
+| `centralizer_inf_eq_sup_omega1Center` | **(E.4) `C_S(R₀) = R₀ × Ω₁(Z(S))`, 位数 p²** |
+| `centralizer_subgroupOf_eq` | `C_{↥S}(R₀) = (S ⊓ C_R(R₀)).subgroupOf S` の橋 |
+| `card_centralizer_inf_centralizer_eq` | **(E.5) `\|C_T(R₀)\| = p`** |
+
+**(E.4) の上界は BG より安く取れた**: BG は `C_S(R₀) ⊆ R₀ × Ω₁(R₁)` (位数 p²) で押さえるが、
+`C_S(R₀)` は elementary abelian (アーベル ⟸ `C_R(R₀)` がアーベル、指数 p ⟸ `S`) で
+`r(C_R(R₀)) ≤ 2` の中に居るので `\|C_S(R₀)\| ≤ p²` が直接出る。
+⟹ **`Ω₁(R₁)` の位数計算は結局一度も要らなかった**。下界は `R₀ × Z` (位数 p²、
+`\|Z\| = p` は lemma52、`R₀ ∩ Z = 1` は既出) で、両者が一致。
+
+(E.5) は Thm 5.3(d) の内部直積分解 `C_S(R₀) = R₀ × C_T(R₀)` + (E.4) から。
+⟹ BG の `\|S : T\| = \|C_T(R₀)\| = p` が両半分そろった。
+
+### 残る Step 2 の穴 (更新)
+
 2. **(E.6) Thm 5.5 の A-不変列** `T = H₀ ⊃ … ⊃ Hₙ = 1`, `H_i = [R₀,H_{i-1}]`,
    `|H_{i-1}:H_i| = p` — `S05_NarrowAutomorphisms.lean:418` 以降。
 3. **(E.7)(E.8)** `H₁ = S₂`, `|S/S'| = p²`, 帰納で `H_i = S_{i+1}`。
