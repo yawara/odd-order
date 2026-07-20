@@ -89,7 +89,7 @@ soft な commutator calculus は `⁅R₀,T⁆ = H_1` の off-by-one で全ル�
 `⁅H_a,H_b⁆≤H_{a+b+2}` (a,b≥1、maximal class + class<p) が sorry-free / axiom-clean。
 下流 3021 の E.4 abelian clause が解錠。本 claim を close。
 
-## ✅ hub 重複検査 (2026-07-21 02:41 tick) — claim 承認
+## ✅ hub 重複検査 (2026-07-21 02:41 tick) — claim 承認 ⚠ **(53) で目標差し替え、下記参照**
 
 claim-before-build 協定に基づき hub が重複を検査:
 - **grep 実測**: `degreeCommutativity|degree_of_commutativity|degreeOfCommutativity` は repo に 0 件 → 既存実装なし (再構築でない)。
@@ -100,3 +100,18 @@ claim-before-build 協定に基づき hub が重複を検査:
 ⟹ **claim 承認**。lane c は `OddOrder/GroupTheory/MaximalClassPGroup.lean` を新設してよい
 (新 leaf は同 commit で `OddOrder.lean` に配線すること)。degree of commutativity は
 maximal-class p 群論の標準結果 (Blackburn/Leedham-Green) で、E.4 β-supply の正当な reduction target。
+
+## ⚠⚠ 2026-07-21 (53 由来): claim の目標が変わった — dc≥1 は仮説では**強制されない** (反例確定)
+
+GPT-5.6 Sol Pro + 親計算検証で **dc≥1 は E.4 の印刷仮説から従わない**ことが確定 (反例 Q₆、
+正本 `notes/bg/appE_e4_counterexample_2026_07_21.md`、issue 3021 (53))。
+⟹ 本 claim の「dc≥1 を証明する」は**不可能** (偽)。目標を差し替え:
+
+1. **clean Lemma を形式化** (真・Jacobi のみ): graded Lie 環 `dim(2,1,1,…,1)` で
+   `[Lᵢ,Lⱼ]=0 ∀i,j≥2 ⟺ 全 2-step centralizer Cᵢ 一致`。`MaximalClassPGroup.lean` に置く。
+   これは genuine 再利用 infra。
+2. **E.4 は `hdc` (dc≥1 = 2-step 一致) を追加仮説にして**真にし証明 (assembly は既存 scaffold)。
+   BG 印刷版が偽であることを docstring 明示。
+3. E.5 も同様に gated (dc≥1 供給が要る)。
+
+⚠ 「dc≥1 を maximal-class + fpf B から出す」路線 (旧 claim) は**放棄** (偽ゆえ)。

@@ -2584,3 +2584,33 @@ c が GPT の回答を基に E.4-dc を形式化してきたら、**hub は unso
 Lean compiler が proof を検証するので誤 proof は compile しないが、**GPT の gap を埋めるために
 c が unsound な仮説/axiom を導入するリスク**が残る。c 自身も prompt header で「厳密検証してから形式化」と
 明言しているが、hub 側でも landing 時に statement の健全性 (carrier 構成可能性) を確認する。
+## 2026-07-21 (53): ⚠⚠⚠ 決着 — BG Prop E.4 は**印刷どおりでは偽** (検証済み反例、GPT-5.6 Sol Pro + 親計算検証)
+
+(52) の impasse を GPT-5.6 Sol Pro (Chrome MCP、41分推論) に投げ、**明示反例**を得て
+lane c が **F_197 上で全主張を計算検証** (`scratchpad/verify_q6.py` 全 pass)。詳細正本 =
+**`notes/bg/appE_e4_counterexample_2026_07_21.md`**。要点:
+
+- **反例 = Vergne の例外 filiform Q₆ の Lazard 群** (p=197, |S|=p⁶, class 5, exponent p)。
+  非零 bracket 5 本 `[a,b]=e₂,[b,e₂]=e₃,[b,e₃]=e₄,[a,e₄]=e₅,[e₂,e₃]=e₅`。Jacobi 全成立。
+- fpf regular `B=⟨β⟩≅C₄₉` (weights (1,8,9,17,25,26) mod 49、全 unit)、`α=β⁷` は S/γ₂ 上スカラー
+  `r=104`、β は相異なる固有値 `t=16,t₀=88`。`C_R(R₀)=R₀×R₁` (E.3 narrow 仮説) も成立。
+- しかし **dc(S)=0** (`[e₂,e₃]=e₅≠0`) かつ **T=C_S(Z₂(S)) 非可換** (`[b,e₂]=e₃≠0`)。
+  ⟹ E.4 の結論「T は指数 p のアーベル」に反する。**(E.23) も i=2 で明示的に破れる** (実 ζ¹⁷ vs 予言 ζ¹⁰)。
+- ⚠ **(52) の「distinct-eigenvalue+Jacobi⟹dc≥1」は誤り**。親の n=6 switch は別理由で不整合だったが、
+  真の反例は n=5=Q₆。(52) の Finding を撤回。
+- ⭐ GPT の **clean Lemma** (親検算済、Jacobi のみ): dim(2,1,1,…) graded Lie 環で
+  `dc≥1 ⟺ 全 2-step centralizer Cᵢ が一致`。maximal class では `T/γ₂=C_{n-1}` ゆえ
+  **(E.23) 全 level 成立 ⟺ dc(S)≥1**。これが唯一の欠けた仮説。
+
+### ⟹ 形式化の帰結
+
+- **E.4 (`AppE_FurtherResults:1657`) は印刷仮説では証明不能 (偽)**。honest な道:
+  - (i) `hdc : dc(S)≥1` (= 2-step centralizer 一致 = (E.23)) を statement に**追加**して真にし証明。
+    BG が省いた仮説を docstring 明示。下流 E.5 が供給要。
+  - (ii) E.5 application が dc≥1 を満たすか調査 (Q₆ が FT の S=Ω₁(R) として現れるか)。App.E は
+    "Further Results" ゆえ FT critical path 外の公算大 (Coq odd-order も App.E なし)。
+- **clean Lemma は真・形式化可能 (issue 9402、`MaximalClassPGroup.lean`)** — genuine 再利用 infra。
+- ⟹ 次段: (i) Lemma を形式化、(ii) E.4 に `hdc` 追加版を証明 (assembly は既存 scaffold で)、
+  (iii) E.4 docstring に「BG 印刷版は偽、反例 Q₆、追加仮説 dc≥1 が必要」を明記。E.5 も同様に gated。
+
+**⚠ これは BG 本の genuine gap** (稀なケース: 形式化が原典より踏み込む)。ユーザーに報告済。
