@@ -1409,8 +1409,7 @@ theorem quotient_aPrime_mulEquiv_of_controlsFusionIn [Finite G]
   refine QuotientGroup.congr ((APrime p G).subgroupOf (H ⊔ APrime p G)) (APrime p G)
     ((MulEquiv.subgroupCongr hHA_top).trans Subgroup.topEquiv) ?_
   ext x
-  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf, MulEquiv.coe_toMonoidHom,
-    MulEquiv.trans_apply]
+  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf]
   constructor
   · rintro ⟨y, hy, rfl⟩
     exact hy

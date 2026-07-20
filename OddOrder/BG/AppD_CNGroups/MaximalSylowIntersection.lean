@@ -51,6 +51,7 @@ variable {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
 BG makes two maximal choices: a Sylow `p`-subgroup `Q ≠ P` for which `P ∩ Q` is as large as
 possible, and a subgroup `M ⊇ N_G(P ∩ Q)` with `O_p(M) ≠ 1` as large as possible. -/
 
+omit [Fact (Nat.Prime p)] in
 /-- Among the Sylow `p`-subgroups `R ≠ P` whose intersection with `P` contains a prescribed one,
 there is a `Q` for which `P ⊓ Q` is maximal — and then `P ⊓ Q` is maximal among *all* of
 `{P ⊓ R : R ≠ P}`, since any `R` beating it also satisfies the constraint. -/
@@ -112,6 +113,7 @@ theorem prime_ne_two_of_inf_ne_bot (hodd : Odd (Nat.card G)) {P Q : Sylow p G}
   obtain ⟨c, hc⟩ := hdvd
   omega
 
+omit [Finite G] [Fact (Nat.Prime p)] in
 /-- Two distinct Sylow `p`-subgroups meet in a proper subgroup of each: `P ⊓ Q < P`. -/
 theorem inf_lt_of_ne {P Q : Sylow p G} (hPQ : (P : Subgroup G) ≠ (Q : Subgroup G)) :
     (P : Subgroup G) ⊓ (Q : Subgroup G) < (P : Subgroup G) := by
@@ -119,6 +121,7 @@ theorem inf_lt_of_ne {P Q : Sylow p G} (hPQ : (P : Subgroup G) ≠ (Q : Subgroup
   have hle : (P : Subgroup G) ≤ (Q : Subgroup G) := heq ▸ inf_le_right
   exact (P.3 Q.2 hle).symm
 
+omit [Finite G] in
 /-- The ambient `π`-core of `⊤` is the `π`-core of the whole group. -/
 theorem opiCoreInG_top (π : Set ℕ) :
     opiCoreInG π (⊤ : Subgroup G) = Ch03.oPiCore π G := by
@@ -396,6 +399,7 @@ only on `P`.  Restating the configuration lemmas in those terms removes `M` and 
 interface, and that is what makes BG's endgame work: *every* maximal intersection with `P` is
 `O_p(N_G(Z(L(P))))`, one and the same subgroup. -/
 
+omit [Finite G] [Fact (Nat.Prime p)] in
 /-- `P` normalizes `Z(L(P))`, a characteristic subgroup of `P`. -/
 theorem sylow_le_normalizer_zCenterLOdd (P : Sylow p G) :
     (P : Subgroup G) ≤ Subgroup.normalizer (AppB.zCenterLOdd (P : Subgroup G) : Set G) :=

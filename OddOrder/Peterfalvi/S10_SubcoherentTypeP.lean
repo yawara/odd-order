@@ -344,8 +344,7 @@ theorem inducedNonKernelFamily_subset_inducedKernelFamily_bot {H : Subgroup ↥M
   refine ⟨θ, ?_, ?_, rfl⟩
   · rintro rfl
     exact hker fun x _ => by
-      simp [OddOrder.Peterfalvi.S03.mem_characterKernel,
-        IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+      simp [IrreducibleCharacter.coe_trivialIrreducibleCharacter]
   · intro x hx
     rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_bot] at hx
     rw [show x = 1 from Subtype.ext hx]
@@ -368,6 +367,7 @@ section CoreNontrivialSupport
 variable [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {M : Subgroup G} [Fintype ↥M] [Invertible (Nat.card ↥M : ℂ)]
 
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥M : ℂ)] in
 /-- **Peterfalvi (4.7) on the (8.15.3) family**: every member vanishes outside `A ∪ {1}`.
 
 Direct application of `S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`,

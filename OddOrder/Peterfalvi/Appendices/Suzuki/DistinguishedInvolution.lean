@@ -88,6 +88,7 @@ lemma odd_orderOf_of_mem_D {a : G} (ha : a ∈ hyp.D) : Odd (orderOf a) := by
 `k ↦ k²` is a bijection on any set of odd-order elements: for such an
 element `a`, the unique square root within `⟨a⟩` is `a^{(|a|+1)/2}`. -/
 
+omit [Finite G] in
 /-- An odd-order element is the square of `a^{(|a|+1)/2}`. -/
 theorem sq_pow_half_orderOf {a : G} (ha : Odd (orderOf a)) :
     (a ^ ((orderOf a + 1) / 2)) ^ 2 = a := by
@@ -96,6 +97,7 @@ theorem sq_pow_half_orderOf {a : G} (ha : Odd (orderOf a)) :
   rw [show (orderOf a + 1) / 2 * 2 = orderOf a + 1 from by omega, pow_succ,
     pow_orderOf_eq_one, one_mul]
 
+omit [Finite G] in
 /-- Odd-order square roots are unique: if `k₁, k₂` have odd order and
 `k₁² = k₂²`, then `k₁ = k₂`. -/
 theorem eq_of_sq_eq_of_odd_orderOf {k₁ k₂ a : G} (h1 : Odd (orderOf k₁))

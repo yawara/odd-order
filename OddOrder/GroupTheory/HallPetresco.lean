@@ -65,6 +65,7 @@ theorem countP_toList_mem (A : Finset L) :
 the value `g` when its slot lies in `A`, and `1` otherwise. -/
 def assign (A : Finset L) : G × L → G := fun p => if p.2 ∈ A then p.1 else 1
 
+omit [Fintype L] in
 @[simp] theorem assign_apply (A : Finset L) (g : G) (j : L) :
     assign A (g, j) = if j ∈ A then g else 1 := rfl
 
@@ -77,6 +78,7 @@ noncomputable def expandedWord (L : Type*) [Fintype L] [DecidableEq L] (xs : Lis
     List (FormalCommutator (G × L)) :=
   xs.flatMap fun g => (Finset.univ : Finset L).toList.map fun j => FreeMagma.of (g, j)
 
+omit [Group G] in
 /-- Every factor of the expanded word is a bare variable, so its support is a
 single slot. -/
 theorem support_of_mem_expandedWord {xs : List G} {c : FormalCommutator (G × L)}
@@ -111,6 +113,7 @@ that very support.  By `evalWord_congr` this is what any `assign A` with
 def blockValue (blk : Finset L → List (FormalCommutator (G × L))) (S : Finset L) : G :=
   evalWord (assign S) (blk S)
 
+omit [Fintype L] in
 /-- **Substituting a slot set.**  In a decomposition of a word into exact-support
 blocks, the assignment of `A` kills every block whose support is not contained in
 `A` and evaluates the remaining ones independently of `A`. -/
