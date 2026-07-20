@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.BilinearEigenweight
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
 
 /-!
@@ -430,26 +431,6 @@ theorem higmanLemmaEleven_pairGap_of_pairWeight_eq_frobeniusShift
     left
     simp only [higmanCyclicGap, hj, map_add]
     ring
-
-private theorem eigenvalue_eq_of_basis_repr_ne_zero
-    {F W I : Type*} [Field F] [AddCommGroup W] [Module F W]
-    [Finite I]
-    (T : Module.End F W) (b : Basis I F W) (weight : I → F)
-    (hb : ∀ i, T (b i) = weight i • b i)
-    {x : W} {a : F} (hx : T x = a • x)
-    (i : I) (hi : b.repr x i ≠ 0) :
-    a = weight i := by
-  classical
-  letI : Fintype I := Fintype.ofFinite I
-  have hcoord : b.repr (T x) i = weight i * b.repr x i := by
-    rw [← b.sum_repr x, map_sum]
-    simp [hb, smul_smul, mul_comm]
-    simp only [Finsupp.single_apply]
-    simp
-  have hcoord' := congrArg (fun y : W => b.repr y i) hx
-  rw [hcoord] at hcoord'
-  simp only [map_smul, Finsupp.smul_apply, smul_eq_mul] at hcoord'
-  exact (mul_right_cancel₀ hi hcoord').symm
 
 local instance higmanLemmaElevenLayerIsMulCommutative
     (H : Type uGroup) [Group H] (i : ℕ) :
