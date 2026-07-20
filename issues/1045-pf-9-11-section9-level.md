@@ -505,6 +505,25 @@ h46.toCertainTypeHypothesis.toHypothesis   -- : S06.Hypothesis ↥M
 `∃ χ₂ ≠ 1, …` に強めるのが次の一手。`hdeg` は §13 版が
 `columnSum_inv_apply_one` で埋めているのでそれを使う。
 
+### (3) R-family dispatch の τ-seam を実測 (2026-07-20) — 一致する
+
+2 分岐の τ が一致しないと dispatch が型付かないので確認した:
+
+| 分岐 | 供給元 | τ |
+|---|---|---|
+| 既約 | `S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj …` (FamilyBundleDade.lean:694) | `dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)` |
+| column | `S06.certainTypeR h46 hχ₂ hdeg` (S06_CertainTypeCoherence.lean:648) | `dadeIntegralCharacterMap h46.dade0 h46.tau` |
+
+⟹ **`hyp := h46.dade0` を取れば一致する**。`Hypothesis46 A L` は ambient `A` (= A(M)) と
+`dade0` (= **A₀(M)** の Dade hypothesis) を両方持つ ((4.6) が A と A₀ を両方持つのと同じ)。
+`typePACore_toHypothesis46_core` は渡された `dade0`/`hconj` をそのまま field に置くので、
+**構成上一致する**。§13 版の docstring が「both land *definitionally* on `hyp.base.tau`
+… so no `congrMap` seam」と言っているのと同じ状況。
+
+⚠ ⟹ **case B の τ は自由パラメータにできない** — `h46.dade0`/`h46.tau` に固定される。
+(case A の `caseA_coherent_sOf_cprime_of_refuter` は τ を自由パラメータで取れたが、
+case B は `certainTypeR` が τ を決めるので同じ形にはできない。)
+
 ### (2) dichotomy の実装レシピ (2026-07-20 に signature 実測)
 
 ```
