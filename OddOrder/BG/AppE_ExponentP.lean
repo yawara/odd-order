@@ -562,4 +562,33 @@ theorem RegularOperatorSetup.index_sup_centralizer_lt [Finite R]
   exact Nat.lt_of_mul_lt_mul_right this
 
 
+/-- `(H/N).index` in `G/N` equals `H.index` in `G`, for `N ≤ H` normal.
+
+The bridge from `(E.16)`'s `|T : T₁|` to the index of `T₁/S` inside `T/S`, which is the
+form BG Lemma 4.5(b) consumes. -/
+theorem index_map_mk' {G : Type*} [Group G] (N : Subgroup G) [N.Normal] {H : Subgroup G}
+    (hNH : N ≤ H) : (H.map (QuotientGroup.mk' N)).index = H.index := by
+  rw [← Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective N),
+    Subgroup.comap_map_eq_self (by rwa [QuotientGroup.ker_mk'])]
+
+/-- **BG (E.16), in the form Lemma 4.5(b) consumes**: the cyclic subgroup `T₁/S` of `T/S`
+has index `< p²`.
+
+`(E.16)` bounds `|T : T₁|` for `T₁ = S ⊔ C_T(v)`; the Frattini variation rewrites that
+`T₁` as `S ⊔ (T ⊓ R₁)`, whose image in `T/S` is the cyclic `⟨x⟩` of
+`exists_zpowers_eq_map_sup_inf_R₁`; and `index_map_mk'` says passing to `T/S` does not
+change the index. -/
+theorem RegularOperatorSetup.exists_zpowers_index_lt [Finite R]
+    (hyp : RegularOperatorSetup R B p q) {S T : Subgroup R} (hR₀S : hyp.R₀ ≤ S) (hST : S ≤ T)
+    (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
+    (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀)
+    (hvS : v ∈ S) (hv1 : v ≠ 1) [hn : (S.subgroupOf T).Normal] :
+    ∃ x : ↥T ⧸ S.subgroupOf T, (Subgroup.zpowers x).index < p ^ 2 := by
+  obtain ⟨x, hx⟩ := hyp.exists_zpowers_eq_map_sup_inf_R₁ hST
+  refine ⟨x, ?_⟩
+  rw [hx, index_map_mk' _ (Subgroup.subgroupOf_mono T le_sup_left),
+    ← hyp.sup_centralizer_eq_sup_inf_R₁ hR₀S hST hv]
+  exact hyp.index_sup_centralizer_lt hR₀S hST hexp hS hTN hv hvS hv1
+
+
 end OddOrder.BG.AppE
