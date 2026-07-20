@@ -1617,43 +1617,10 @@ theorem RegularOperatorSetup.R₀_lt_omega [Finite R]
   rw [heq]
   exact Omega.mem_of_pow_eq_one (by simpa using hzp)
 
-/-- **BG Theorem E.3(b), first clause**: `Ω₁(R)` has exponent `p`.
-
-**Status: honestly stated, not proved.**  BG's Steps 2--3: pick an `A`-invariant
-subgroup `S` of exponent `p` maximal subject to containing `R₀ × Ω₁(R₁)`, bound
-`|Ω₁(N_{Ω₁(R)}(S)) / S| ≤ p²` via `SCN`, narrowness (Lemma 5.2, Theorem 5.3(d))
-and Lemma 4.5, then contradict maximality with Proposition E.2 — so this needs
-`omega_pow_eq_one_of_lowerCentralSeries_eq_bot` (hence E.1) plus BG §5's narrow
-`p`-group machinery. -/
-theorem RegularOperatorSetup.omega_pow_eq_one [Finite R] [Finite B]
-    (hyp : RegularOperatorSetup R B p q) {g : R} (hg : g ∈ Omega R p 1) :
-    g ^ p = 1 := by
-  sorry
-
-/-- **BG Theorem E.3(b), second clause**: `R₀ ⊄ (Ω₁(R))'`.
-
-**Status: proved**, from Step 2's `R₀ ⊄ S'` (`not_le_derivedInG`) applied to `S = Ω₁(R)`.
-The only input still owed is that `Ω₁(R)` has exponent `p` — the *first* clause,
-`omega_pow_eq_one`, which is BG's Step 3 and remains `sorry`.  Citing it here is exactly
-the intended dependency direction: BG proves (b) as one statement, Step 2 first and Step 3
-on top of it. -/
-theorem RegularOperatorSetup.R₀_not_le_derived_omega [Finite R] [Finite B]
-    (hyp : RegularOperatorSetup R B p q) :
-    ¬ hyp.R₀ ≤ derivedInG (Omega R p 1) :=
-  hyp.not_le_derivedInG hyp.R₀_le_omega fun x =>
-    Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2)
-
-/-- **BG Theorem E.3(b), third clause**: `|Ω₁(R) / (Ω₁(R))'| = p²`.
-
-**Status: proved**, from Step 2's (E.7) (`card_quotient_commutator`) applied to
-`S = Ω₁(R)`, with `R₀ < Ω₁(R)` from `R₀_lt_omega`.  As for the second clause, the only
-input still owed is the exponent statement `omega_pow_eq_one` — the first clause, BG's
-Step 3, which remains `sorry`. -/
-theorem RegularOperatorSetup.card_omega_abelianization [Finite R] [Finite B]
-    (hyp : RegularOperatorSetup R B p q) :
-    Nat.card (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)) = p ^ 2 :=
-  hyp.card_quotient_commutator hyp.R₀_lt_omega fun x =>
-    Subtype.ext (by simpa using hyp.omega_pow_eq_one x.2)
+/- **BG Theorem E.3(b)**, all three clauses, are **proved** one leaf downstream, in
+`OddOrder/BG/AppE_ExponentP.lean`: `omega_pow_eq_one` (first clause) is BG's Step 3, and the
+other two are Step 2 applied to `S = Ω₁(R)` on top of it.  They have to live there — Step 3
+is what that leaf carries. -/
 
 /- **BG Theorem E.3(c)** (`|Ω₁(R)| ≤ p^q`) is **proved**, but lives one leaf downstream, as
 `RegularOperatorSetup.card_omega_le` in `OddOrder/BG/AppE_RegularOperator.lean`.  It has to:
