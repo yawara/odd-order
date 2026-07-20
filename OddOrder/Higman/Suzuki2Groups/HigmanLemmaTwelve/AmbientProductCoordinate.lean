@@ -423,6 +423,24 @@ theorem ambientCenterCoordinate_squareMap
     ePhi (Additive.ofMul ⟨(x : P) ^ 2, hx2⟩)
   rfl
 
+/-- The factor sibling of `ambientCenterCoordinate_squareMap`: the factor-to-
+ambient Frattini bridge of a factor square value is the genuine square, pushed
+into `Φ(P)`.  Together with `NoncommutativeFactorCoordinateData.square_normal`
+(and `eKernel_eq`) this identifies `A(α) = q_X(α)`. -/
+theorem factorLayerOneEquivAmbientFrattini_squareValue
+    {S : Subgroup P}
+    (hPhiS : frattini P ≤ S)
+    (hK1 : lowerCentralLayerKernel S 1 = ⊥)
+    (hterm : lowerCentralTerm S 1 = (frattini P).subgroupOf S)
+    (hSq : LowerCentralSquaresLieInSecond S)
+    (g : ↥(lowerCentralTerm S 0))
+    (hmem : (S.subtype ((lowerCentralTerm S 0).subtype g)) ^ 2 ∈ frattini P) :
+    (factorLayerOneEquivAmbientFrattini hPhiS hK1 hterm
+        (lowerCentralSquareValue S hSq g) : ↥(frattini P)) =
+      ⟨(S.subtype ((lowerCentralTerm S 0).subtype g)) ^ 2, hmem⟩ := by
+  apply Subtype.ext
+  rfl
+
 end SquareDecomposition
 
 end
