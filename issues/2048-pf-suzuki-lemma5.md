@@ -199,7 +199,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
       - [x] common overfield の canonical 共役基底を構成し、ground-vector の exact
             Frobenius 展開、actor 対角化、scalar Frobenius による cyclic successor を
             同一基底上で証明する (issue 9314)
-      - [ ] `m` と `n` を同一視せず、非零 bracket が単一 gap `±r (mod m)` に
+      - [x] `m` と `n` を同一視せず、非零 bracket が単一 gap `±r (mod m)` に
             支えられることを証明する
         - [x] `λ` は第一層体を生成するだけ、第二層固有値 `ν` は位数 `2^n-1` の
               primitive root という原文の unequal-degree 条件のまま、pair-weight equality
@@ -211,10 +211,26 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - [x] bracket span から canonical 第一層 basis の非零 bracket と第二層 basis の
               非零座標を選び、actual pair-weight equality を得る
               (`exists_lowerCentralConjugateBasisBracketCoordinate`)
-        - [ ] 選んだ三つの Frobenius index を循環再添字化し、field model・generator・
-              canonical basis を保ったまま `ι(ν) = λ^(1+2^r)` を構成する
-      - [ ] gap-supported bracket を正規化し、Lemma 5 の平方和を
+        - [x] 選んだ三つの Frobenius index を循環再添字化し、field model・generator・
+              canonical basis を保ったまま `ι(ν) = λ^(1+2^r)`、非零 `(0,r,0)` seed、
+              全 `±r` support を actual data から構成する
+              (`exists_normalizedLowerCentralConjugateBasisBracketCoordinate`)
+      - [x] gap-supported bracket を正規化し、Lemma 5 の平方和を
             `Tr[L/K](α^(1+2^r) ε)` に再添字化する
+        - [x] normalized seed bracket が第二層 canonical basis の 0 番固有線上にあることを
+              示し、`[b₀,b_r] = ε • v₀` (`ε ≠ 0`) を構成する
+              (`exists_ne_zero_smul_secondConjugateBasis_zero_of_bracket`)
+        - [x] alternating bracket から `r ≠ 0` を得て、primitive second-layer
+              eigenvalue と odd extension degree から原典の `m ≠ 2r`
+              (`r + r ≠ 0`) を証明する
+              (`gap_ne_zero_of_alternating`,
+              `twice_gap_ne_zero_of_odd_degree`)
+        - [x] Frobenius orbit で全 cyclic edge の係数を復元し、upper-triangular sum を
+              relative trace に畳み込む。normalized basis 版に加えて、Lemma 5 の元 basis
+              上の任意 anchor `(a, a+r, s₀)` を直接消費する版も構成する
+              (`square_frobeniusSum_eq_trace_of_normalized_singleGap`,
+              `squareMap_eq_trace_of_normalized_singleGap`,
+              `square_frobeniusSum_eq_trace_of_anchored_singleGap`)
       - [ ] Lemma 10 と xi-length-two 構造から proper `L/K` を排除する
       - [x] actual central extension を平方写像で分類し、Peterfalvi の honest
             `TypeAData` へ接続する shared adapter を構成する (issue 9309)
