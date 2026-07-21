@@ -251,7 +251,26 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   `commutator_sup_normal_pcomplement_ne_top` (K/N_p が nontrivial perfect p-群になり
   可解性と矛盾) を p と r で 1 回ずつ。Sylow 直積分解は不要だった。
   (旧 3 |Z⧸Q₂| ≥ d+1 は `d_add_one_le_card_quotient_of_le_Q1` 直用で step 補題内で解決済。)
-- [ ] **次: reduction (1) chief-factor 帰納 assembly**。設計 (2026-07-21 固定):
+- [x] **reduction (1) 完結** `ssetOf_sder_coherent_of_two_primes` (190ce7830,
+  新 leaf FeitSibleyInduction.lean 710 行, OddOrder.lean 配線済, sorry-free):
+  d odd + |Q₁| odd + Q₁ nilpotent + 2 素数 ∣ |Q₁| ⟹ 𝒮(S′) coherent。
+  部品: base 恒等式 `Qder_eq_sup_Sder_commutator` / Normal 変換 3 種 /
+  `centralLift` (Z の要素的構成) + H-不変性 / `exists_minimal_conjInvariant_between`
+  (chief 選択) / `minimal_le_centralLift` (中心交差) / `primaryLift` +
+  `not_centralLift_le_minimal` (Z ⊄ Q₂、p-primary part が chief を割る) /
+  `prime_dvd_card_quotient_of_le_commutator` + `exists_center_pow_prime_eq_one_of_dvd` /
+  S⊴H mirror 群 (`S_normal_in_H` 等) / 強帰納 skeleton
+  `ssetOf_sup_sder_coherent_of_conjInvariant`。
+- [ ] **次: reduction (2)** (𝒮(S′) coherent ⟹ 𝒮 coherent、p. 146–147)。
+  S 側の同型帰納: S₁ ⊴ H, S₁ ≤ S′, 𝒮(S₁) coherent、S₂ chief。
+  counting は d·|S⧸S₁|·(|Q₁|−1) = Σ 型 (sum_degreeSq_SsetOf の R = S₁ 版、
+  R⊔Q₁ の index)。(1.2) 対応は φ(1)² ≤ |S/Z|·|Q₁/Z(Q₁)|
+  (Z/S₂ := Z(S/S₂)、S nilpotent は構造体 field S_nilpotent ✓)。
+  **d odd + f.p.f. ⟹ |Z(Q₁)| ≥ 2d+1** (two_mul_d_add_one_le_card_of_le_Q1 系)。
+  算術: |S/S₁|·|Z(Q₁)|(|Q₁|−2) < 4d² ⟹ |S/S₁| < 2 矛盾。
+  step/帰納機構は (1) の鏡映 — centralLift の S 版 (⁅z,s⁆ ∈ S₂ 条件) が要る。
+  その後: 還元宣言 (Q₁ = p-群 non-abelian へ) → (3) → (4)–(6) → (7) → (8)。
+  設計メモ (旧、参考):
   - **目標形**: `ssetOf_sder_coherent_of_two_primes : Odd d + Odd |Q₁| + nilpotent Q₁ +
     (p ≠ r ∣ |Q₁|) ⟹ 𝒮(S') coherent`。帰納: 全 H-不変 Q₃ ≤ ⁅Q₁,Q₁⁆ について
     𝒮(S'Q₃) coherent を |⁅Q₁,Q₁⁆⧸Q₃| (または |⁅Q₁,Q₁⁆|−|Q₃|) の強帰納で。
