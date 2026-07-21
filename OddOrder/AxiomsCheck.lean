@@ -8466,6 +8466,20 @@ commutator whose Frobenius weight satisfies `λ^(2^i) μ^(2^j) = ν^(2^k)`.  Wit
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.higmanLemmaTwelve
 
+/-! **Peterfalvi Appendix III, Theorem (e), recognition half**: a summand
+isomorphism of any invariant two-summand split of `P ⧸ Z(P)` forces
+Frobenius-conjugate factor eigenvalues, which kills the type-C and type-D
+branches of the Lemma 12 dispatch — the group is of type `B`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_frobenius_conjugate_of_summandEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.isTypeB_of_isomorphicOrderQModuleSplit_of_xiLengthThree
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the

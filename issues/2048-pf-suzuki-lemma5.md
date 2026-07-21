@@ -503,12 +503,32 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         既約 F₂[K]-module 間の K-equivariant 同型は Singer 固有値の
         μ = λ^{2^j} を強制 (exists_galoisFieldLinearModel + 生成元 orderOf、
         既存 equivariant-linearEquiv 系 (HigmanLemmaSix 587 等) 参照)。
-      - **Lemma NI (C/D の非同型)**: pre-case-split state の (λ, μ, ν) で
-        C case: λ^{1+2^r} = ν = μ² と μ = λ^{2^j} → 1 + 2^r ≡ 2^{j+1}
-        (mod 2^n−1) → TwoPowerCongruence の subset-sum 衝突分析で r = 0 矛盾;
-        D case: 1 + 2^r ≡ 2^j + 2^{j+2r} → 5r ≡ 0・r ≢ 0 と衝突。
-      - **⟸ 組み立て**: split V₁ ≅ V₂ 所与; rcases 分類; C/D なら
-        Lemma U で {V₁,V₂} = 正準 factor 像、Lemma I+NI で矛盾 → B。
+      - [x] **⟸ 完成 (2026-07-21, 新 leaf TypeBRecognition.lean)**:
+        `isTypeB_of_isomorphicOrderQModuleSplit_of_xiLengthThree` /
+        `_of_card_eq_cube` — IsomorphicOrderQModuleSplit ⟹ IsTypeB。
+        設計と違い Lemma NI を独立補題にせず dispatch 再走で C/D branch を
+        直接矛盾させた:
+        - 新 leaf SummandIsomorphismBridge.lean: `layerZeroToQuotient`
+          (L₀ → P⧸Z 橋、単射+equivariant) +
+          `exists_frobenius_conjugate_of_summandEquiv` — summand の
+          K-同変群同型を FactorInclusionData 座標の線形 semiconj に変換し
+          Lemma I で μ = λ^{2^i} (AddEquiv.ofBijective 経由、engine-style
+          で hrep を仮定に取り toInclusionData_incl_representation で供給)
+        - TwoSummandSplit: 正準 split を named def
+          `xiLengthThreeFactorSplit` (+ left/right simp) に抽出して
+          witness を pin ([[lean-nonempty-some-erases-witness-pin]] 対応)。
+          exists_orderQModuleSplit は wrapper 化
+        - C case (両向き): 1+2^r ≡ 2^{i+1} (mod 2^n−1) →
+          `higman_two_pow_add_eq_two_pow` → r ≡ 0 (mod n) が 0<r≤n/2 と矛盾
+        - D case: 2^i(1+2^rR) ≡ 2^0(1+2^rL) → `higman_typeB_exponent_pm` →
+          rR ≡ ±rL が dispatch 既存制約 (rL≢rR ∧ rL+rR≢0 mod n) と両方矛盾。
+          設計時想定の新規 subset-sum 算術は不要だった (既存 2 補題で完結)
+        - cube 版は |Z(P)| = 2^m を isplit.split の濃度から導出し、
+          quotient fpf を fixedPointFree_of_actsRegularlyOnInvolutions +
+          coprime lifting で供給。AxiomsCheck 3 本登録、axiom-clean 確認済
+      - 残り: Lemma 5 側 instantiation — W ≠ 1 から summand 同型
+        (IsomorphicOrderQModuleSplit) を構成して `_of_card_eq_cube` を呼び、
+        IsTypeB を Peterfalvi 側 type-B data に接続する。
       - **⟹ (優先度低; Lemma 5 は不使用)**: TypeBModel の F×0 / 0×F summand
         + swap 同値。actor 側の座標同一視 ((e) 後半) は別項。
       - 注意: OrderQModuleSplit の actor は K.subtype (Suzuki actor)、
