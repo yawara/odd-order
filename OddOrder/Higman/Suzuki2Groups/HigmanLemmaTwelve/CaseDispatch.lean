@@ -609,6 +609,43 @@ theorem exists_typeB_shear_normalization
   rw [← hfinal a b]
   exact haniso _ _ (fun hc => mul_ne_zero ht0 hb hc.2)
 
+/-- **The shear-and-rescale change of coordinates `(α, β) ↦ (α + ρβ, tβ)`**
+as a `ZMod 2`-linear equivalence of `F × F`; in characteristic two it is its
+own shear-inverse (up to the `t`-rescale).  Composed with the ambient product
+coordinate, it realises Higman's replacement of `y₀` by a multiple of
+`ρx₀ + y₀` (p. 91). -/
+def shearRescaleLinearEquiv {n : ℕ} (ρ t : GaloisField 2 n) (ht : t ≠ 0) :
+    (GaloisField 2 n × GaloisField 2 n) ≃ₗ[ZMod 2]
+      (GaloisField 2 n × GaloisField 2 n) where
+  toFun w := (w.1 + ρ * w.2, t * w.2)
+  invFun w := (w.1 + ρ * t⁻¹ * w.2, t⁻¹ * w.2)
+  map_add' w₁ w₂ := by
+    apply Prod.ext <;> simp <;> ring
+  map_smul' σ w := by
+    apply Prod.ext <;> simp [smul_add, Algebra.mul_smul_comm]
+  left_inv w := by
+    have h2 : (2 : GaloisField 2 n) = 0 := CharTwo.two_eq_zero
+    have hti : t⁻¹ * t = 1 := inv_mul_cancel₀ ht
+    apply Prod.ext
+    · show w.1 + ρ * w.2 + ρ * t⁻¹ * (t * w.2) = w.1
+      linear_combination (ρ * w.2) * hti + (ρ * w.2) * h2
+    · show t⁻¹ * (t * w.2) = w.2
+      rw [← mul_assoc, hti, one_mul]
+  right_inv w := by
+    have h2 : (2 : GaloisField 2 n) = 0 := CharTwo.two_eq_zero
+    have hit : t * t⁻¹ = 1 := mul_inv_cancel₀ ht
+    apply Prod.ext
+    · show w.1 + ρ * t⁻¹ * w.2 + ρ * (t⁻¹ * w.2) = w.1
+      linear_combination (ρ * t⁻¹ * w.2) * h2
+    · show t * (t⁻¹ * w.2) = w.2
+      rw [← mul_assoc, hit, one_mul]
+
+@[simp]
+theorem shearRescaleLinearEquiv_apply {n : ℕ} (ρ t : GaloisField 2 n)
+    (ht : t ≠ 0) (w : GaloisField 2 n × GaloisField 2 n) :
+    shearRescaleLinearEquiv ρ t ht w = (w.1 + ρ * w.2, t * w.2) :=
+  rfl
+
 /-! ### Higman pp. 91--92: the type-C and type-D `ε` conditions -/
 
 /-- **Higman p. 91, the type-C `ε`.**  Over `GaloisField 2 n` with
