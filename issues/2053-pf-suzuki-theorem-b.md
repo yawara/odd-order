@@ -109,6 +109,18 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     (normal complement)。方針 = sorried-cite で Theorem B の下流を実証明しつつ、
     Brauer–Suzuki 形式化を独立 campaign として起票 (shared infra、9300 claim)
 - [ ] (3) 素因数の合同条件
+  - **被覆調査 (2026-07-21)**: (i) Q₁ = `hyp.Q1` (SylowDecomposition.lean:89、
+    Q1Subgroup + sylowTwoProdQ1MulEquiv で S × Q₁ 分解済) ✓。
+    (ii) [Is] 15.16 (dim M = |P|·dim C_M(P)) 相当 =
+    `finrank_eq_card_mul_finrank_invariants_kernelFPF` (WielandtKernelFPF:303)
+    ほか free/freeBlock 3 変種 — 適合形の確認要 ✓ 有望。
+    (iii) [H] V 8.15 (Frobenius complement の pq-部分群 cyclic →
+    dim C_M(P) = 1 で使用) — **無ヒット、ギャップ**。ただし使用点は
+    「C_M(P) の 1 次元性」1 箇所で、KP ≤ 近傍の cyclic 性など別供給も
+    検討余地あり。
+    (iv) App I Prop 2 = SemilinearField.lean「Proposition 2(a)」✓。
+    次: (ii) の正確な適合確認 → M (極小 EA r-部分群) の存在と KP-正規化の
+    構成 → (iii) ギャップの扱い決定
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐
