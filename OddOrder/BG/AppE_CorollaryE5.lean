@@ -40,6 +40,58 @@ open OddOrder.BG.Ch4.S16
 
 variable {G : Type*} [Group G]
 
+/-- **A `p`-element of a nilpotent normal subgroup lies in the `p`-core**: if `W ≤ M` is
+nilpotent, `W ⊴ M` (as `subgroupOf`), and `x ∈ W` has order `p`, then `x ∈ O_p(M)`.
+
+The Sylow `p`-subgroup of the nilpotent `W` is normal, hence characteristic, in `W`, so
+its image is a normal `p`-subgroup of `M` — and it absorbs `x`.  This is the `(E.30)`
+ingredient *"`O_p(M)` is a Sylow `p`-subgroup of `M_σ`"* in the form actually consumed:
+`x ∈ M_σ` of order `p` lands in `O_p(M)` (with `W = M_σ`, nilpotent as the kernel of the
+Frobenius group `M` from Corollary 15.9). -/
+theorem mem_opiCoreInG_singleton_of_nilpotent [Finite G] {p : ℕ} (hp : p.Prime)
+    {M W : Subgroup G} (hWM : W ≤ M) (hWnorm : (W.subgroupOf M).Normal)
+    (hWnil : Group.IsNilpotent ↥W) {x : G} (hxW : x ∈ W) (hord : orderOf x = p) :
+    x ∈ opiCoreInG {p} M := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  set W' : Subgroup ↥M := W.subgroupOf M with hW'def
+  haveI : W'.Normal := hWnorm
+  haveI : Group.IsNilpotent ↥W' :=
+    (Group.isNilpotent_congr (Subgroup.subgroupOfEquivOfLe hWM)).mpr hWnil
+  have hxM : x ∈ M := hWM hxW
+  set ξ : ↥W' := ⟨⟨x, hxM⟩, by rwa [Subgroup.mem_subgroupOf]⟩ with hξdef
+  have hordξ : orderOf ξ = p := by
+    have h1 := orderOf_injective W'.subtype W'.subtype_injective ξ
+    have h2 := orderOf_injective M.subtype M.subtype_injective (W'.subtype ξ)
+    rw [← hord]
+    rw [← h1, ← h2]
+    rfl
+  -- `⟨ξ⟩` is a `p`-group; put it inside a Sylow `p`-subgroup of the nilpotent `W'`.
+  have hpg : IsPGroup p ↥(Subgroup.zpowers ξ) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hordξ, pow_one])
+  obtain ⟨P, hξP⟩ := hpg.exists_le_sylow
+  have hPchar : (P : Subgroup ↥W').Characteristic :=
+    Sylow.characteristic_of_normal P inferInstance
+  -- Its image in `↥M` is a normal `p`-subgroup; push to the ambient group.
+  have hQnorm : (((P : Subgroup ↥W').map W'.subtype)).Normal :=
+    OddOrder.GroupTheory.normal_map_subtype_of_characteristic hPchar
+  obtain ⟨n, hn⟩ := P.2.exists_card_eq
+  set Qamb : Subgroup G := ((P : Subgroup ↥W').map W'.subtype).map M.subtype with hQdef
+  have hQambM : Qamb ≤ M := Subgroup.map_subtype_le _
+  have hQsub : Qamb.subgroupOf M = (P : Subgroup ↥W').map W'.subtype :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective _
+  have hQnorm' : (Qamb.subgroupOf M).Normal := hQsub ▸ hQnorm
+  have hQcard : Nat.card ↥Qamb = p ^ n := by
+    rw [hQdef, Subgroup.card_map_of_injective M.subtype_injective,
+      Subgroup.card_map_of_injective W'.subtype_injective, hn]
+  have hQpi : Subgroup.IsPiSubgroup {p} Qamb := by
+    intro r hr
+    rw [hQcard] at hr
+    have hrp : r.Prime := Nat.prime_of_mem_primeFactors hr
+    have hrdvd : r ∣ p ^ n := Nat.dvd_of_mem_primeFactors hr
+    exact (Nat.prime_dvd_prime_iff_eq hrp hp).mp (hrp.dvd_of_dvd_pow hrdvd)
+  refine le_opiCoreInG_of_normal_of_isPiSubgroup hQambM hQnorm' hQpi ?_
+  exact ⟨W'.subtype ξ, ⟨ξ, hξP (Subgroup.mem_zpowers ξ), rfl⟩, rfl⟩
+
 /-- **BG `(E.29)`** (p. 165): under Corollary E.5's hypothesis block, the unique maximal
 subgroup `N ⊇ C_G(x)` is of type P₂ with `C_{N_σ}(x) ≠ 1` and `M ∩ N` a complement to
 `N_σ` in `N`; and `M ∩ N` carries a Hall `κ(N)`-subgroup `K₁` of prime order together
@@ -71,7 +123,8 @@ theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (U₁.subgroupOf N) ∧
         (Nat.card ↥K₁).Prime ∧
         IsMulCommutative ↥U₁ ∧
-        K₁ ≤ Subgroup.normalizer ((U₁ : Subgroup G) : Set G) := by
+        K₁ ≤ Subgroup.normalizer ((U₁ : Subgroup G) : Set G) ∧
+        M ⊓ N = K₁ ⊔ U₁ := by
   classical
   have hx1 : x ≠ 1 := fun h => hp.one_lt.ne' (by rw [← hord, h, orderOf_one])
   have hxsharp : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := ⟨hxM, hx1⟩
@@ -119,7 +172,12 @@ theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨qk, hqkprime, hcardK⟩ :=
     OddOrder.BG.Ch4.S15.card_kappaHall_prime_of_isTypeP2 hG hNmax' hP2N
       (hsetup.E₁_le.trans hEleN) hK₀
+  -- `M ∩ N = K₁ ⊔ U₁`, from `E = E₁ ⊔ E₂ ⊔ E₃`.
+  have hsupMN : M ⊓ N = E₁ ⊔ (E₂ ⊔ E₃) := by
+    have h := (subgroupE_basic hG hsetup).2.2.2.2.1.1
+    rwa [sup_assoc] at h
   exact ⟨hNmax', hP2N, hCN', hRne', hcompl,
-    E₁, E₂ ⊔ E₃, hsetup.E₁_le, hU0E, hU0ne, hK₀, hU₀, hcardK ▸ hqkprime, hU₀ab, hK₀NU₀⟩
+    E₁, E₂ ⊔ E₃, hsetup.E₁_le, hU0E, hU0ne, hK₀, hU₀, hcardK ▸ hqkprime, hU₀ab, hK₀NU₀,
+    hsupMN⟩
 
 end OddOrder.BG.AppE
