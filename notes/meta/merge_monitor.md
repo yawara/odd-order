@@ -898,6 +898,29 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 15:15 (tick #8、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、census 7 不変、push 済**:
+  **a** = FeitSibley Theorem 反例抽出 3 部作の合成 `exists_counterexample_of_not_coherent` +
+  反例中核補題 (失敗 adjoin ⟹ Σm² ≤ 2a) + 共役対分解 (pairUnion 構成) + scaled-diff A-support
+  (FeitSibleyTheorem +355 行、merge 1本目、issue 1054)。**b** = ⭐ ξ-length-3 橋渡し完成 —
+  `hasXiLengthThree_of_card_eq_cube` (新 leaf `XiLengthFromCard.lean` 719 行、親 leaf 配線済) +
+  既約 middle quotient 排除 + Frobenius 固定 Singer 生成元の次数制限 (issue 2048)。**c** =
+  ⭐ E.5 **(E.31) 証明** — C_{O_p(M)}(x) = ⟨x⟩ × R₁ (R₁ cyclic) + **WP3 完了**
+  (RegularOperatorSetup 構成) + WP4(a) 小 p-群の (ii) 破り (AppE_CorollaryE5 +406 行、issue 3028)。
+  gate = build **4592 jobs green (18s, +1 = 新 leaf 実 elaborate 確認)**、AxiomsCheck OK、
+  orphan 0 (876/876)、census 7 不変、新 axiom なし、逸脱なし。レーン生存 3 点 OK。
+- **2026-07-21 14:45 (tick #7、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、census 7 不変、push 済**:
+  **a** = FeitSibley Theorem reduction (1) 部品 — 2-kernel 度数二乗和 counting / f.p.f. 下界
+  (d∣|Z|−1, |Z|≥2d+1) / d∣χ(1) 度数補題 / SsetOf 反変単調性 (FeitSibleyTheorem +284 行、
+  merge `b6eb10d49`、issue 1054)。**b** = Higman theorem (d) actual two-summand split (新 leaf
+  `TwoSummandSplit.lean` 255 行) + ξ-length 3 中心定理群 — Z(P)=Φ(P)・exponent 2 (新 leaf
+  Pf App `Suzuki2Groups/ModelCenters.lean` 391 行、いずれも親 leaf 配線済、merge `42f54ee12`、
+  issue 2048)。**c** = ⭐ E.5 **WP2.5 完了 — BG Cor 15.9(c) 初機械化** (Coq 意図的 drop 分) +
+  WP3 入力 4 補題 (K₁⊓M_σ=⊥ / K₁ の σ(M)'-性 / O_p(M) Sylow / (E.32) 核 ⟨x⟩=A₀ 同定)
+  (AppE_CorollaryE5 +391 行、merge `f6f189208`、issue 3028)。gate = build **4591 jobs green
+  (24s, +2 = 新 leaf 2 本実 elaborate 確認)**、AxiomsCheck OK、orphan 0 (875/875)、census 7 不変、
+  新 axiom なし、逸脱なし。レーン生存 3 点 OK。**2nd pass** = a の live commit を回収:
+  full-𝒮 S07.Hypothesis 完成 (Lemma 1(a) ambient 入力、+205 行 sorry-free、build 4591 jobs green)。
+  **3rd pass** = c の docs-only commit (issue 3028: (E.31) ルート 5 手確定、Lean 非接触 = build 不要)。
 - **2026-07-21 14:15 (tick #6、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、⭐ Higman Lemma 12 完成、census 7 不変、push 済**:
   **b** = ⭐ **Higman Lemma 12 完成** — endpoint `higmanLemmaTwelve` (B/C/D 分類、Assembly +357 行)
   を landing し **AxiomsCheck に登録 (axiom-clean 監査済)** (merge `5d9b680ff`、issue 2048 は

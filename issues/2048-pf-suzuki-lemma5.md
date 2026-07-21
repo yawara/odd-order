@@ -180,6 +180,48 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
+    - [x] B/C/D model の中心 exponent 2 (`ModelCenters.lean`, `37b78e57b`):
+          twisted product の mem_center_iff + polarization radical 自明性
+          (B/C は初等、D は Dedekind 自己同型独立 3 項) + equivModel transport
+    - [x] `center_sq_eq_one_of_xiLengthThree` (`08fb9d018`):
+          分類と接続し ξ-length 3 で ∀ z ∈ Z(P), z² = 1
+    - [x] `center_eq_frattini_of_xiLengthThree` / `agemo_center_eq_bot_of_
+          xiLengthThree` (`e88893f9a`): Z(P) = Φ(P)、℧₁(Z(P)) = ⊥
+    - [x] `exists_orderQModuleSplit_of_xiLengthThree`
+          (新 leaf TwoSummandSplit.lean, `a51ff24ca`): P/Z(P) の
+          two-summand split (OrderQModuleSplit) を factor 像で実構成
+          (card は A(n,θ) model count、P/Z の EA 性込み)
+    - [ ] 残り: Lemma 5 側で ξ-length-3 仮定 (IsXiActor + HasXiLengthThree)
+          を IsSuzuki2Group + |Q| = q³ から供給する橋渡し
+      - [x] 計数半分 (新 leaf XiLengthFromCard.lean, `f3cb7c6ce`):
+            regular actor は fpf / |K| ∣ |T|−1 (自由軌道計数、
+            card_dvd_of_no_nontrivial_fixed 使用) / 2^n−1∣2^k−1→n∣k /
+            不変部分群位数は q 冪 / no_four_chain_of_card_eq_cube
+      - [x] 3-chain 存在の field 側 core (`3f7d0caaa`):
+            `le_of_adjoin_frobeniusFixed_eq_top` — Singer 生成元が
+            Frob^n 固定なら次数 m ≤ n (X^{2^n}−X の根の個数制限)
+      - [x] 既約 middle quotient の排除 (`d1d113b24`):
+            `exists_proper_invariant_subgroup_of_card_sq` — EA 位数 (2^n)² +
+            cyclic 位数 2^n−1 fpf → proper 非自明不変部分群存在 (sorry 0)
+      - [x] 最終 assembly `hasXiLengthThree_of_card_eq_cube` (`9400087bd`):
+            IsSuzuki2Group + |P| = q³ + cyclic regular actor (|K| = q−1) →
+            HasXiLengthThree K.subtype (sorry 0)。**ξ-length-3 橋渡し完成** —
+            higmanLemmaTwelve / center_eq_frattini / two-summand split の
+            全 Higman payload が Lemma 5 設定から供給可能に
+      - [-] (旧計画メモ; 完了済につき参照のみ)
+            (i) 非自明不変正規部分群は involutionSubgroup を含む
+            (2 群の正規部分群は中心と交わる + 位数 2 元 + K 推移性)、
+            |involutionSubgroup| = q; (ii) P/Ω₁ (位数 q²) の
+            proper 非自明不変正規部分群の存在: Z(P/Ω₁) proper なら採用;
+            abelian なら ℧₁(P/Ω₁) proper 非自明なら採用; どちらも潰れると
+            P/Ω₁ は faithful 既約 F₂[K]-module (fpf は coprime lifting
+            quotient_fixedPointFree_of_fixedPoints_le で降ろす) →
+            exists_galoisFieldLinearModel_of_faithful_irreducible
+            (FrobeniusCoordinates.lean:747) + adjoin_generator_eq_top_of_
+            irreducible_linearModel で F₂(λ) = 全体 → 次数 = ord_2(2^n−1) = n
+            ≠ 2n 矛盾; (iii) preimage で chain ⊥ < Ω₁ < B < ⊤ を組み、
+            HasXiLengthThree を結論; (iv) IsXiActor は Def 1 の K
+            (cyclic + regular→transitive) から直接
     - [x] Higman Lemma 10: characteristic `2` の proper odd-degree
           finite field extensionで、任意の `r : ℤ`, `ε` に対する非零 `α` と
           `Tr(α · Frob^r(α) · ε) = 0` を構成する

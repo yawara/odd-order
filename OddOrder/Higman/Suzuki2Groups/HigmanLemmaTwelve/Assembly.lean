@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Higman Lemma 12: assembling the B/C/D classification
@@ -915,6 +916,80 @@ theorem higmanLemmaTwelve
             ePhi R L factors.left_normal hinfRL hsupRL
             factors.frattini_lt_left.le dR.theta hθRfrob hrRn hrRz h5s
             hθRpkg hθL2 c0 hc0ne hc0' hinv hcentral n_pos hcard
+
+/-- **The center of a ξ-length-3 Suzuki 2-group has exponent two.**  The
+classification sends `P` to one of the models `B/C/D`, whose centers have
+exponent two by the trivial radical of the model polarizations.  This is the
+source of "`Z(Q) = Q₀`" in Peterfalvi's Lemma I.3.5. -/
+theorem center_sq_eq_one_of_xiLengthThree
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {z : P} (hz : z ∈ Subgroup.center P) : z ^ 2 = 1 := by
+  rcases higmanLemmaTwelve hP hncomm hmulti hxi hlen hprime with hB | hC | hD
+  · obtain ⟨data⟩ := hB
+    exact TypeBData.sq_eq_one_of_mem_center data hz
+  · obtain ⟨data⟩ := hC
+    exact TypeCData.sq_eq_one_of_mem_center data hz
+  · obtain ⟨data⟩ := hD
+    exact TypeDData.sq_eq_one_of_mem_center data hz
+
+/-- **`Z(P) = Φ(P)` for a ξ-length-3 Suzuki 2-group**: the Frattini subgroup
+is central, and every central element is an involution or the identity, hence
+lies in `Φ(P)` with the other involutions. -/
+theorem center_eq_frattini_of_xiLengthThree
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    Subgroup.center P = frattini P := by
+  obtain ⟨-, hcentral⟩ :=
+    commutator_eq_frattini_and_frattini_le_center_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  refine le_antisymm ?_ hcentral
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hPhiBot
+    have hcommBot : _root_.commutator P = ⊥ :=
+      le_bot_iff.mp
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          (le_of_eq hPhiBot))
+    exact hncomm ((commutator_eq_bot_iff P).mp hcommBot)
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant hP Y hxi.transitive
+      (IsAInvariant.of_characteristic Y.subtype) hPhiNeBot
+  intro z hz
+  have hsq := center_sq_eq_one_of_xiLengthThree hP hncomm hmulti hxi hlen
+    hprime hz
+  by_cases hz1 : z = 1
+  · rw [hz1]
+    exact Subgroup.one_mem _
+  · exact hinvPhi ⟨hsq, hz1⟩
+
+/-- **`℧₁(Z(P)) = ⊥` for a ξ-length-3 Suzuki 2-group** — the center is
+elementary abelian.  This is the missing inclusion of Higman Lemma 1's layer
+description of the center. -/
+theorem agemo_center_eq_bot_of_xiLengthThree
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    Agemo ↥(Subgroup.center P) 2 1 = ⊥ := by
+  rw [eq_bot_iff, Agemo, Subgroup.closure_le]
+  rintro g ⟨z, rfl⟩
+  have hsq := center_sq_eq_one_of_xiLengthThree hP hncomm hmulti hxi hlen
+    hprime z.2
+  have hz : z ^ 2 = 1 := Subtype.ext (by simpa using hsq)
+  simp [hz]
 
 end
 
