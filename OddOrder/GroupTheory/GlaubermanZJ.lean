@@ -97,4 +97,104 @@ theorem inf_zCenter_thompsonJAbelian_normal [Finite G] {p : ℕ} [Fact p.Prime]
       ⊓ thompsonJAbelian (P : Subgroup G))).Normal := by
   sorry
 
+/-- conj で固定される部分群への normalizer membership. -/
+theorem mem_normalizer_of_map_conj_eq {H : Subgroup G} {g : G}
+    (h : H.map (MulAut.conj g).toMonoidHom = H) : g ∈ normalizer (H : Set G) := by
+  rw [mem_normalizer_iff]
+  intro x
+  constructor
+  · intro hx
+    have hmem : (MulAut.conj g) x ∈ H.map (MulAut.conj g).toMonoidHom :=
+      mem_map_of_mem _ hx
+    rw [h] at hmem
+    simpa [MulAut.conj_apply] using hmem
+  · intro hx
+    have hmem : g * x * g⁻¹ ∈ H.map (MulAut.conj g).toMonoidHom := h.symm ▸ hx
+    obtain ⟨y, hy, hye⟩ := mem_map.mp hmem
+    have hyx : y = x := by
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hye
+      exact mul_left_cancel (mul_right_cancel hye)
+    exact hyx ▸ hy
+
+/-- 正規化元による centralizer 元の共役は centralizer に留まる. -/
+theorem conj_mem_centralizer_of_mem_normalizer {X : Subgroup G} {g c : G}
+    (hg : g ∈ normalizer (X : Set G)) (hc : c ∈ centralizer (X : Set G)) :
+    g * c * g⁻¹ ∈ centralizer (X : Set G) := by
+  rw [mem_centralizer_iff] at hc ⊢
+  intro s hs
+  have hs' : g⁻¹ * s * g ∈ X := by
+    have h1 := mem_normalizer_iff.mp hg (g⁻¹ * s * g)
+    rw [show g * (g⁻¹ * s * g) * g⁻¹ = s by group] at h1
+    exact h1.mpr hs
+  have h2 := hc _ hs'
+  calc s * (g * c * g⁻¹) = g * ((g⁻¹ * s * g) * c) * g⁻¹ := by group
+    _ = g * (c * (g⁻¹ * s * g)) * g⁻¹ := by rw [h2]
+    _ = (g * c * g⁻¹) * s := by group
+
+/-- 正規化元は centralizer も正規化する. -/
+theorem mem_normalizer_centralizer {X : Subgroup G} {g : G}
+    (hg : g ∈ normalizer (X : Set G)) :
+    g ∈ normalizer ((centralizer (X : Set G) : Subgroup G) : Set G) := by
+  rw [mem_normalizer_iff]
+  intro c
+  constructor
+  · exact fun hc => conj_mem_centralizer_of_mem_normalizer hg hc
+  · intro hc
+    have hginv : g⁻¹ ∈ normalizer (X : Set G) := (normalizer (X : Set G)).inv_mem hg
+    have h1 := conj_mem_centralizer_of_mem_normalizer hginv hc
+    rwa [show g⁻¹ * (g * c * g⁻¹) * g⁻¹⁻¹ = c by group] at h1
+
+/-- `P₀ ≤ N(Z(J_a(P₀)))`: `J_a` は `P₀`-conj 不変 (characteristic) なので
+その中心の符号化 `C(J_a) ⊓ J_a` も `P₀` に正規化される. -/
+theorem le_normalizer_zCenter_thompsonJAbelian (P₀ : Subgroup G) :
+    P₀ ≤ normalizer ((centralizer (thompsonJAbelian P₀ : Set G)
+      ⊓ thompsonJAbelian P₀ : Subgroup G) : Set G) := by
+  intro g hg
+  have hgJ : g ∈ normalizer ((thompsonJAbelian P₀ : Subgroup G) : Set G) :=
+    mem_normalizer_of_map_conj_eq
+      (thompsonJAbelian_map_conj_eq_of_mem_normalizer (le_normalizer hg))
+  exact mem_normalizer_inf (mem_normalizer_centralizer hgJ) hgJ
+
+/-- **Thm 2.10 step (a)**: 最小反例の構造分析. `B ⊴ G`, `B ≤ P₀`,
+`B = normalClosure (Z ⊓ B)` (`Z := C(J_a(P₀)) ⊓ J_a(P₀)`), `Z ⊓ ⁅B,B⁆ ⊴ G`
+(帰納法が `⁅B,B⁆` に供給) のとき, `⁅B,B⁆ ≤ Z` (= Thm 2.7 の `B' ≤ Z(J_a)` 仮定)
+かつ `⁅B,B⁆ ≤ C(B)` (= class ≤ 2). -/
+theorem commutator_le_zCenter_and_centralizer_of_normalClosure_eq
+    {P₀ B : Subgroup G} [B.Normal] (hBP : B ≤ P₀)
+    (hBcl : B = normalClosure (((centralizer (thompsonJAbelian P₀ : Set G)
+      ⊓ thompsonJAbelian P₀) ⊓ B : Subgroup G) : Set G))
+    [hZB' : ((centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀)
+      ⊓ ⁅B, B⁆).Normal] :
+    ⁅B, B⁆ ≤ centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀
+      ∧ ⁅B, B⁆ ≤ centralizer (B : Set G) := by
+  -- (i) `⁅Z ⊓ B, B⁆ ≤ Z ⊓ B'`
+  have hi : ⁅(centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀) ⊓ B, B⁆
+      ≤ (centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀) ⊓ ⁅B, B⁆ := by
+    refine le_inf ?_ (commutator_mono inf_le_right le_rfl)
+    refine le_trans (commutator_mono inf_le_left le_rfl) ?_
+    exact le_normalizer_iff_commutator_le_left.mp
+      (hBP.trans (le_normalizer_zCenter_thompsonJAbelian P₀))
+  -- (ii) `B' ≤ Z ⊓ B'` ((2.20) 帳簿)
+  have hii : ⁅B, B⁆
+      ≤ (centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀) ⊓ ⁅B, B⁆ := by
+    have h1 := commutator_normalClosure_le hi
+    rwa [← hBcl] at h1
+  have hB'Z : ⁅B, B⁆
+      ≤ centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀ :=
+    hii.trans inf_le_left
+  refine ⟨hB'Z, ?_⟩
+  -- (iii) `B ≤ C(B')` (もう一度 (2.20), `T := ⊥`)
+  rw [le_centralizer_iff]
+  have hWB' : ⁅(centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀) ⊓ B,
+      ⁅B, B⁆⁆ ≤ (⊥ : Subgroup G) := by
+    refine le_of_eq (commutator_eq_bot_iff_le_centralizer.mpr ?_)
+    calc (centralizer (thompsonJAbelian P₀ : Set G) ⊓ thompsonJAbelian P₀) ⊓ B
+        ≤ centralizer (thompsonJAbelian P₀ : Set G) := inf_le_left.trans inf_le_left
+      _ ≤ centralizer ((⁅B, B⁆ : Subgroup G) : Set G) :=
+          centralizer_le (SetLike.coe_subset_coe.mpr (hB'Z.trans inf_le_right))
+  have h3 := commutator_normalClosure_le (T := (⊥ : Subgroup G)) hWB'
+  rw [← hBcl] at h3
+  exact commutator_eq_bot_iff_le_centralizer.mp (le_bot_iff.mp h3)
+
 end Subgroup
+
