@@ -193,6 +193,59 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     hdiffasuppχ (χ − a•anchor の support) は同度数 scaled diff の A-support
     (既存 hdegdiffsupp 論法)、htau1_memaχ は tau_mem_ZIrr、
     hDeg = 2a < Σ (degMem/d)² が counting との接続点。
+  - (b3734e2d6) **full-𝒮 S07.Hypothesis 完成** (`ssetS07Hypothesis`)。
+  - **pairUnion 機構の正確な形 (2026-07-21 精読)**: `pairSet pair j = {(pair j).1, (pair j).2}`、
+    `pairUnion_succ_eq_union_pair`、`mem_pairUnion` (base ∨ ∃ j < N)、
+    `pairUnion_eq_of_cover (hS₀ : S₀ ⊆ X) (hpairs : ∀ j < N, pairSet ⊆ X)
+    (hcover : ∀ χ ∈ X, base ∨ pair) : pairUnion S₀ pair N = X`。
+    engine 適用は `(pairUnion_eq_of_cover ...) ▸ coherentPairChain S₀ pair h0 N hstep`。
+    **残る構成タスク**: 共役対 enumeration `pair : ℕ → CF × CF` の構築 —
+    𝒮(S'Q₃) − 𝒮(S'Q₂) は共役閉 (conj_mem_Sset + LeKer の conj 不変性) かつ実指標なし
+    (2(c)) なので {χ, χ̄}-軌道の代表系を度数順に取る。CoherenceUnion の (6.6) 最終定理
+    (:1640 以降) が同じ構成をどう扱っているか (pairing を仮定に取るか構成するか) を
+    次に読むこと — 構成済みならそれを流用、仮定型なら代表系選択 (Finset 帰納 or
+    exists_monotoneDegreeEnum + 偶数個ペアリング) を新設。
+  - **(2026-07-21 確認済) (6.6) 最終定理 `peterfalvi_66_coherence_of_X` (CoherenceUnion:1711)
+    は pairing (S₀/pair/N/covers) を仮定に取る** — 構成は無い。加えて
+    `coherentOfPairChainCover` (:1641, covers+h0+hstep ⟹ IsCoherent X) と
+    `pairUnion_eq_of_enumCover` (:1665, index-level cover 版) が組み立てを担う。
+    ⟹ **新設すべきは共役対分解補題** `exists_conjPair_decomposition`:
+    Y ⊇ B (両方共役閉、Y 有限、Y 実指標なし) ⟹ ∃ N pair,
+    (∀ j < N, (pair j).2 = (pair j).1.conj ∧ pairSet ⊆ Y ∧ pairSet ∩ B = ∅) ∧
+    (∀ χ ∈ Y, χ ∈ B ∨ ∃ j < N, χ ∈ pairSet pair j) ∧ pairwise-disjoint ∧
+    度数単調 ((pair j).1 の度数が j に単調 — per-step hDeg で「累積 ⊇ それ以下の度数全部」
+    に使う)。構成 = (Y − B).ncard の強帰納: 最小度数の χ を取り (χ, χ̄) を先頭に、
+    Y − B − {χ,χ̄} で再帰 (Y−B は共役閉: Y, B 両方の共役閉性から; χ̄ ≠ χ は no-real)。
+    実装は List (CF × CF) を返す補助関数 + pair := fun j => l.getD j default が楽。
+    FeitSibleyTheorem.lean に汎用形 (Hypothesis 非依存、Set (ClassFunction L ℂ) レベル)
+    で置く — hub 判断で S07_Coherence 側へ移設可。
+
+### 反例中核補題の供給表 (2026-07-21 固定; 次 iteration で実装)
+
+`not_hDeg_of_step_incoherent` 案: S₁ ⊆ 𝒮 共役閉・有限、anchor χ₀ ∈ S₁ (χ₀(1) = d)、
+χ ∈ 𝒮, χ ∉ S₁, χ̄ ∉ S₁、hcoh : S₁ coherent、hfail : ¬(S₁ ∪ {χ,χ̄}) coherent ⟹
+Σ_{x∈S₁} (x(1)/d)² ≤ 2a (実数、χ(1) = a·d)。1(a) 対偶で、引数供給:
+- hyp := ssetS07Hypothesis hd hQ1odd / h1A := one_notMem_A
+- enumeration: ι := ClassFunction ↥H ℂ, s := hS₁fin.toFinset, χmem := id,
+  degMem := fun x => if h : x ∈ 𝒮 then (exists_apply_one_eq_d_mul h).choose * d else 0
+  … ではなく **degMem x := (χ(1) の実部を Nat 化)** は不安定なので
+  choose ベース: `degMem x := d * m_x` (m_x = choose)。hdegMem = choose_spec、
+  hdvd = ⟨m_x⟩ (d ∣ d·m_x)、hdegpos (anchor: m=1)。
+- hχχ/hχbarχbar = hself (irreducibleCharacter_inner_eq_ite if_pos)
+- hχ_S1/hχbar_S1 = Sset_pairwiseOrthogonal + freshness (χ ≠ x ∀x∈S₁ from χ∉S₁;
+  χ̄ ≠ x from χ̄∉S₁)
+- hdiffsuppχ = conj_diff_support_subset_A_of_mem_Sset
+- hmemortho/hmemconjortho = pairwise + no-real (x̄ ≠ x)
+- hmembarS1 = S₁ 共役閉 / hcover = toFinset 全射 (mem_toFinset)
+- hmemdiffsupp = conj_diff_support (member 版) / hdegdiffsupp =
+  scaled_diff_support_subset_A_of_mem_Sset (7c8775769; 度数一致 d·(d·mᵢ) = (d·mᵢ)·d)
+- hχdeg = exists_apply_one_eq_d_mul (a := m_χ) / hdiffasuppχ = scaled 版 n=1
+  (one_smul glue) / htau1_memaχ = tau_mem_ZIrr (sub_mem span + nsmul_mem)
+- 結論: hfail (coherent_adjoin_of_degree_bound … hDeg) の対偶 → ¬hDeg → push_neg
+  → Σ ≤ 2a。
+その後 (1.1): Σ_{S₁}(x(1)/d)² ≥ Σ_{𝒮(S'Q₂)}(…)² = (|H⧸…| − |H⧸…|)/d²
+(sum_degreeSq_SsetOf; base ⊆ S₁ 単調) — ℂ→ℝ 変換は度数が実 (d·m) なので
+(x(1))² の Re で。
 
 ## 完了条件
 
