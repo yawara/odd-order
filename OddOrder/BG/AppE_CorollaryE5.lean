@@ -427,6 +427,412 @@ theorem e5_zpowers_eq_canonical_line [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   rw [← hzeq] at hnorm hMσC
   exact ⟨hnorm, hMσC⟩
 
+/-- **BG `(E.31)`** (p. 165): the centralizer `R = C_{O_p(M)}(x)` splits as
+`R = ⟨x⟩ × R₁` with `R₁` **cyclic** and nontrivial.
+
+`⟨x⟩` is the canonical line `A₀` of `N` (as in `e5_zpowers_eq_canonical_line`); Theorem
+12.7(d) complements it in `M ∩ N` by some `E₀`, and Dedekind cuts `R = A₀ ⊔ (R ⊓ E₀)`.
+`R₁ := R ⊓ E₀` acts regularly on `N_σ` (12.7(c): its order-`p` elements span lines
+`≠ A₀`), so BG Proposition 3.9 makes it cyclic; it is nontrivial because `R` is not
+cyclic. -/
+theorem e5_centralizer_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N Emn E₁ E₂ E₃ : Subgroup G} (hsetup : SubgroupESetup N Emn E₁ E₂ E₃)
+    {p : ℕ} (hp : p.Prime) (hodd : Odd p) (hp2 : p ∈ tau2 N)
+    (hnonab : ∃ S : Sylow p G, ¬ IsMulCommutative (S : Subgroup G))
+    {x : G} (hx : x ∈ Emn) (hord : orderOf x = p)
+    (hCNσx : OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥)
+    {R : Subgroup G} (hRle : R ≤ Emn) (hRpg : IsPGroup p ↥R) (hxR : x ∈ R)
+    (hRnoncyc : ¬ IsCyclic ↥R)
+    (hNnorm : N ≤ Subgroup.normalizer
+      ((OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G)) :
+    ∃ R₁ : Subgroup G, R₁ ≤ R ∧ IsCyclic ↥R₁ ∧ R₁ ≠ ⊥ ∧
+      Subgroup.zpowers x ⊓ R₁ = ⊥ ∧ R = Subgroup.zpowers x ⊔ R₁ := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- Canonical-line machinery.
+  obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hp2
+  obtain ⟨A₀, hA₀eq, hA₀card, hA₀A, hMσC, hdich, habs⟩ :=
+    exists_canonical_line_of_nonabelianSylow hG hsetup hp2 hA hAE hnonab
+  have hzcard : Nat.card ↥(Subgroup.zpowers x) = p := by rw [Nat.card_zpowers, hord]
+  have hzmem : Subgroup.zpowers x ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hzcard, by rw [hzcard, pow_one]⟩
+  have hzle : Subgroup.zpowers x ≤ Emn := Subgroup.zpowers_le.mpr hx
+  have hzeq : Subgroup.zpowers x = A₀ := by
+    by_contra hne
+    have hd := (hdich _ hzmem hzle hne).1
+    rw [OddOrder.BG.Ch4.S14.centralizer_zpowers_eq_singleton'] at hd
+    exact hCNσx hd
+  have hprime_eq : ∀ q : ℕ, q.Prime → q ∈ tau2 N → q = p := fun q hq hq2 =>
+    tau2_prime_eq_of_nonabelianSylow hG hsetup hp2 hA hAE hnonab hq hq2
+  obtain ⟨hMnorm, -, -⟩ := fitting_eq_sup_of_canonical_line hG hsetup hp2 hA hAE hprime_eq
+    hA₀eq hA₀card hMσC habs
+  -- 12.7(d): the complement `E₀` of `A₀` in `M ∩ N`.
+  obtain ⟨E₀, hE₀E, hA₀E₀, hA₀supE₀⟩ := exists_complement_of_canonical_line hG hsetup hp2
+    hA hAE hnonab hprime_eq hA₀A hA₀card hMσC hMnorm
+  -- The decomposition `R = ⟨x⟩ ⊔ (R ⊓ E₀)`.
+  have hEmnN : Emn ≤ Subgroup.normalizer (A₀ : Set G) := hsetup.E_le.trans hMnorm
+  have hA₀Emn : A₀ ≤ Emn := hA₀supE₀ ▸ le_sup_left
+  haveI hA₀norm' : (A₀.subgroupOf Emn).Normal := by
+    refine ⟨fun n hn k => ?_⟩
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    have hk := Subgroup.mem_normalizer_iff.mp (hEmnN k.2) (n : G)
+    simpa using hk.mp hn
+  have hsubSup : (E₀.subgroupOf Emn) ⊔ (A₀.subgroupOf Emn) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hE₀E hA₀Emn, sup_comm E₀ A₀, hA₀supE₀,
+      Subgroup.subgroupOf_self]
+  have hzR : Subgroup.zpowers x ≤ R := Subgroup.zpowers_le.mpr hxR
+  have hRdecomp : R = Subgroup.zpowers x ⊔ (R ⊓ E₀) := by
+    apply le_antisymm
+    · intro r hr
+      have hrEmn : r ∈ Emn := hRle hr
+      have hprod : (⟨r, hrEmn⟩ : ↥Emn) ∈
+          (E₀.subgroupOf Emn : Set ↥Emn) * (A₀.subgroupOf Emn : Set ↥Emn) := by
+        rw [← Subgroup.mul_normal, hsubSup]
+        exact Subgroup.mem_top _
+      obtain ⟨e', he', a', ha', hprodeq⟩ := hprod
+      have haA₀ : ((a' : ↥Emn) : G) ∈ Subgroup.zpowers x := by
+        rw [hzeq]
+        exact Subgroup.mem_subgroupOf.mp ha'
+      have heE₀ : ((e' : ↥Emn) : G) ∈ E₀ := Subgroup.mem_subgroupOf.mp he'
+      have hre : r = ((e' : ↥Emn) : G) * ((a' : ↥Emn) : G) := by
+        have h := congrArg (fun z : ↥Emn => (z : G)) hprodeq
+        simpa using h.symm
+      have haR : ((a' : ↥Emn) : G) ∈ R := hzR haA₀
+      have heR : ((e' : ↥Emn) : G) ∈ R := by
+        have heq2 : ((e' : ↥Emn) : G) = r * ((a' : ↥Emn) : G)⁻¹ := by
+          rw [hre]; group
+        rw [heq2]
+        exact R.mul_mem hr (R.inv_mem haR)
+      rw [hre]
+      exact Subgroup.mul_mem _ (Subgroup.mem_sup_right ⟨heR, heE₀⟩)
+        (Subgroup.mem_sup_left haA₀)
+    · exact sup_le hzR inf_le_left
+  -- Disjointness.
+  have hdisj : Subgroup.zpowers x ⊓ (R ⊓ E₀) = ⊥ := by
+    rw [hzeq, ← le_bot_iff]
+    calc A₀ ⊓ (R ⊓ E₀) ≤ A₀ ⊓ E₀ := inf_le_inf_left _ inf_le_right
+      _ = ⊥ := hA₀E₀
+    
+  -- Regularity of `R ⊓ E₀` on `N_σ`.
+  have hreg : ∀ y ∈ R ⊓ E₀, y ≠ 1 →
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({y} : Set G) = ⊥ := by
+    intro y hy hy1
+    have hypg : IsPGroup p ↥(Subgroup.zpowers y) :=
+      hRpg.to_le (Subgroup.zpowers_le.mpr hy.1)
+    obtain ⟨m, hm⟩ := hypg.exists_card_eq
+    have hmpos : 0 < m := by
+      rcases Nat.eq_zero_or_pos m with rfl | h
+      · rw [pow_zero, Subgroup.card_eq_one] at hm
+        exact absurd (Subgroup.mem_bot.mp (hm ▸ Subgroup.mem_zpowers y)) hy1
+      · exact h
+    have hpdvd : p ∣ Nat.card ↥(Subgroup.zpowers y) := by
+      rw [hm]; exact dvd_pow_self p hmpos.ne'
+    obtain ⟨y'', hy''⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers y)) p hpdvd
+    have hy'zp : ((y'' : ↥(Subgroup.zpowers y)) : G) ∈ Subgroup.zpowers y := y''.2
+    have hordy' : orderOf ((y'' : ↥(Subgroup.zpowers y)) : G) = p := by
+      have h1 := orderOf_injective (Subgroup.zpowers y).subtype
+        (Subgroup.subtype_injective _) y''
+      rw [← hy'']
+      exact h1
+    have hy'1 : ((y'' : ↥(Subgroup.zpowers y)) : G) ≠ 1 := by
+      intro h
+      rw [h, orderOf_one] at hordy'
+      exact hp.one_lt.ne' hordy'.symm
+    have hy'E₀ : ((y'' : ↥(Subgroup.zpowers y)) : G) ∈ E₀ :=
+      (Subgroup.zpowers_le.mpr hy.2) hy'zp
+    have hy'card : Nat.card ↥(Subgroup.zpowers ((y'' : ↥(Subgroup.zpowers y)) : G)) = p := by
+      rw [Nat.card_zpowers, hordy']
+    have hy'mem : Subgroup.zpowers ((y'' : ↥(Subgroup.zpowers y)) : G) ∈
+        elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hy'card, by rw [hy'card, pow_one]⟩
+    have hy'le : Subgroup.zpowers ((y'' : ↥(Subgroup.zpowers y)) : G) ≤ Emn :=
+      Subgroup.zpowers_le.mpr (hE₀E hy'E₀)
+    have hy'ne : Subgroup.zpowers ((y'' : ↥(Subgroup.zpowers y)) : G) ≠ A₀ := by
+      intro heq
+      have hmem2 : ((y'' : ↥(Subgroup.zpowers y)) : G) ∈ A₀ ⊓ E₀ := by
+        refine ⟨?_, hy'E₀⟩
+        rw [← heq]
+        exact Subgroup.mem_zpowers _
+      rw [hA₀E₀] at hmem2
+      exact hy'1 (Subgroup.mem_bot.mp hmem2)
+    have hd := (hdich _ hy'mem hy'le hy'ne).1
+    rw [OddOrder.BG.Ch4.S14.centralizer_zpowers_eq_singleton'] at hd
+    rw [eq_bot_iff]
+    intro n hn
+    have hcn : Commute n y :=
+      (Subgroup.mem_centralizer_iff.mp hn.2 y (Set.mem_singleton y)).symm
+    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp hy'zp
+    have hny' : n ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓
+        Subgroup.centralizer ({((y'' : ↥(Subgroup.zpowers y)) : G)} : Set G) := by
+      refine ⟨hn.1, Subgroup.mem_centralizer_iff.mpr fun z hz => ?_⟩
+      rw [Set.mem_singleton_iff.mp hz, ← hj]
+      exact ((hcn.zpow_right j).symm).eq
+    rw [hd] at hny'
+    exact hny'
+  -- Cyclicity, via Proposition 3.9 and the conjugation action on `N_σ`.
+  have hR₁N : R ⊓ E₀ ≤ Subgroup.normalizer
+      ((OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) :=
+    (inf_le_left.trans (hRle.trans hsetup.E_le)).trans hNnorm
+  have hNσne : OddOrder.BG.Ch3.S10.Msigma N ≠ ⊥ :=
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hsetup.mem_maximal
+  haveI : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma N) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hNσne
+  letI : MulDistribMulAction ↥(R ⊓ E₀ : Subgroup G) ↥(OddOrder.BG.Ch3.S10.Msigma N) :=
+    MulDistribMulAction.compHom _ (conjActionHom hR₁N)
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction
+      ↥(R ⊓ E₀ : Subgroup G) ↥(OddOrder.BG.Ch3.S10.Msigma N) := by
+    intro a ha n hn heq
+    have hval : ((a : G)) * (n : G) * ((a : G))⁻¹ = (n : G) :=
+      congrArg Subtype.val heq
+    have hcomm : (a : G) * (n : G) = (n : G) * (a : G) := mul_inv_eq_iff_eq_mul.mp hval
+    have hane : (a : G) ≠ 1 := fun h => ha (Subtype.ext h)
+    have hmem : (n : G) ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓
+        Subgroup.centralizer ({(a : G)} : Set G) := by
+      refine ⟨n.2, Subgroup.mem_centralizer_iff.mpr fun z hz => ?_⟩
+      rw [Set.mem_singleton_iff.mp hz]
+      exact hcomm
+    rw [hreg _ a.2 hane] at hmem
+    exact hn (Subtype.ext (Subgroup.mem_bot.mp hmem))
+  have hcyc : IsCyclic ↥(R ⊓ E₀ : Subgroup G) :=
+    OddOrder.BG.Ch1.S03.isCyclic_of_isPGroup_of_isFrobeniusAction hodd
+      (hRpg.to_le inf_le_left) hfrob
+  -- Nontriviality: else `R = ⟨x⟩` would be cyclic.
+  have hne : (R ⊓ E₀ : Subgroup G) ≠ ⊥ := by
+    intro hb
+    apply hRnoncyc
+    rw [hb, sup_bot_eq] at hRdecomp
+    exact (Subgroup.isCyclic_iff_exists_zpowers_eq_top R).mpr ⟨x, hRdecomp.symm⟩
+  exact ⟨R ⊓ E₀, inf_le_left, hcyc, hne, hdisj, hRdecomp⟩
+
+/-- `(⟨x⟩ ≤ H)` transported inside `↥H`: the `subgroupOf` of an ambient `zpowers` is the
+`zpowers` of the bundled element. -/
+theorem zpowers_subgroupOf_eq {H : Subgroup G} {x : G} (hx : x ∈ H) :
+    (Subgroup.zpowers x).subgroupOf H = Subgroup.zpowers (⟨x, hx⟩ : ↥H) := by
+  ext c
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_zpowers_iff, Subgroup.mem_zpowers_iff]
+  constructor
+  · rintro ⟨n, hn⟩
+    exact ⟨n, Subtype.ext (by simpa using hn)⟩
+  · rintro ⟨n, hn⟩
+    exact ⟨n, by simpa using congrArg Subtype.val hn⟩
+
+/-- **The Theorem E.3 setup `(R, A, B) = (O_p(M), K₁, E)`** of BG's `(ii) ⟹ (i)` argument
+(p. 165): all `RegularOperatorSetup` fields discharged from the `(E.29)`–`(E.32)` lemmas.
+
+The inputs are the ambient facts landed above: `E` normalizes `O_p(M)` and acts on it
+fixed-point-freely (Frobenius complement of `M`, since `O_p(M) ≤ M_σ`); `K₁ ≤ E` (the
+suitable complement, 15.9(c)); `K₁` normalizes `⟨x⟩` (`(E.32)`); and
+`C_{O_p(M)}(x) = ⟨x⟩ × R₁` with `R₁` cyclic nontrivial (`(E.30)`/`(E.31)`). -/
+noncomputable def e5Setup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E K₁ : Subgroup G} {x : G} {p k : ℕ}
+    (hp : p.Prime) (hk : k.Prime) (hkp : k ≠ p) (hord : orderOf x = p)
+    (hxOp : x ∈ opiCoreInG {p} M)
+    (hEnorm : E ≤ Subgroup.normalizer ((opiCoreInG {p} M : Subgroup G) : Set G))
+    (hcardE : ¬ p ∣ Nat.card ↥E)
+    (hK₁E : K₁ ≤ E) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hEfrob : ∀ e ∈ E, e ≠ 1 → ∀ r ∈ opiCoreInG {p} M, r ≠ 1 → e * r * e⁻¹ ≠ r)
+    (hK₁norm : ∀ g ∈ K₁, MulAut.conj g • (Subgroup.zpowers x) = Subgroup.zpowers x)
+    {R₁amb : Subgroup G} (hR₁Op : R₁amb ≤ opiCoreInG {p} M)
+    (hR₁cyc : IsCyclic ↥R₁amb) (hR₁ne : R₁amb ≠ ⊥)
+    (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
+    (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
+      Subgroup.zpowers x ⊔ R₁amb) :
+    RegularOperatorSetup ↥(opiCoreInG {p} M) ↥E p k :=
+  { p_prime := hp
+    p_odd := by
+      have hdvd : p ∣ Nat.card G := hord ▸ orderOf_dvd_natCard x
+      refine hp.odd_of_ne_two fun h2 => ?_
+      rw [h2] at hdvd
+      have h1 := Nat.odd_iff.mp hG.odd
+      omega
+    q_prime := hk
+    q_odd := by
+      have hdvd : k ∣ Nat.card G := hcardK₁ ▸ Subgroup.card_subgroup_dvd_card K₁
+      refine hk.odd_of_ne_two fun h2 => ?_
+      rw [h2] at hdvd
+      have h1 := Nat.odd_iff.mp hG.odd
+      omega
+    p_ne_q := fun h => hkp h.symm
+    R_pGroup := haveI : Fact p.Prime := ⟨hp⟩; isPGroup_opiCoreInG_singleton M
+    act := conjActionHom hEnorm
+    p_not_dvd_card_B := hcardE
+    A := K₁.subgroupOf E
+    A_card := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK₁E).toEquiv]
+      exact hcardK₁
+    R₀ := Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))
+    R₀_card := by
+      rw [Nat.card_zpowers]
+      exact (orderOf_injective (opiCoreInG {p} M).subtype
+        (Subgroup.subtype_injective _) ⟨x, hxOp⟩).symm.trans hord
+    R₁ := R₁amb.subgroupOf (opiCoreInG {p} M)
+    R₁_ne_bot := by
+      intro hb
+      apply hR₁ne
+      rw [eq_bot_iff]
+      intro y hy
+      have hmem : (⟨y, hR₁Op hy⟩ : ↥(opiCoreInG {p} M)) ∈
+          R₁amb.subgroupOf (opiCoreInG {p} M) := by
+        rw [Subgroup.mem_subgroupOf]
+        exact hy
+      rw [hb] at hmem
+      have h1 := Subgroup.mem_bot.mp hmem
+      simpa using congrArg Subtype.val h1
+    R₁_cyclic := isCyclic_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.surjective
+    centralizer_eq := by
+      haveI : Fact p.Prime := ⟨hp⟩
+      have hzOp : Subgroup.zpowers x ≤ opiCoreInG {p} M := Subgroup.zpowers_le.mpr hxOp
+      have h1 : Subgroup.centralizer
+          ((Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) : Subgroup _) :
+            Set ↥(opiCoreInG {p} M)) =
+          Subgroup.centralizer ({(⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))} : Set _) :=
+        OddOrder.BG.Ch4.S14.centralizer_zpowers_eq_singleton' _
+      have h2 : Subgroup.centralizer ({(⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))} : Set _) =
+          (opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+            (opiCoreInG {p} M) := by
+        ext c
+        rw [Subgroup.mem_centralizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_inf]
+        constructor
+        · intro hc
+          refine ⟨c.2, Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩
+          rw [Set.mem_singleton_iff.mp hy]
+          have h := hc _ (Set.mem_singleton (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)))
+          exact congrArg Subtype.val h
+        · intro hc y hy
+          rw [Set.mem_singleton_iff.mp hy]
+          have h := Subgroup.mem_centralizer_iff.mp hc.2 x (Set.mem_singleton x)
+          exact Subtype.ext h
+      rw [h1, h2, hcent, Subgroup.subgroupOf_sup hzOp hR₁Op, zpowers_subgroupOf_eq hxOp]
+    R₀_disjoint_R₁ := by
+      rw [disjoint_iff, ← zpowers_subgroupOf_eq hxOp]
+      have hinf2 : (Subgroup.zpowers x).subgroupOf (opiCoreInG {p} M) ⊓
+          R₁amb.subgroupOf (opiCoreInG {p} M) =
+          ((Subgroup.zpowers x ⊓ R₁amb).subgroupOf (opiCoreInG {p} M)) :=
+        (Subgroup.comap_inf _ _ _).symm
+      rw [hinf2, hdisj]
+      exact Subgroup.bot_subgroupOf _
+    A_fixes_R₀ := by
+      intro a ha
+      have haK₁ : (a : G) ∈ K₁ := Subgroup.mem_subgroupOf.mp ha
+      have hset : ∀ v : G, v ∈ Subgroup.zpowers x ↔
+          (a : G) * v * (a : G)⁻¹ ∈ Subgroup.zpowers x := by
+        intro v
+        constructor
+        · intro hv
+          have h := hK₁norm _ haK₁
+          rw [← h]
+          exact ⟨v, hv, rfl⟩
+        · intro hv
+          have h := hK₁norm _ (K₁.inv_mem haK₁)
+          have h2 : (a : G)⁻¹ * ((a : G) * v * (a : G)⁻¹) * ((a : G)⁻¹)⁻¹ ∈
+              MulAut.conj (a : G)⁻¹ • Subgroup.zpowers x := ⟨_, hv, rfl⟩
+          rw [h] at h2
+          simpa [mul_assoc] using h2
+      rw [Subgroup.pointwise_smul_def]
+      apply le_antisymm
+      · rintro _ ⟨w, hw, rfl⟩
+        have hwz : (w : G) ∈ Subgroup.zpowers x := by
+          obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hw
+          exact Subgroup.mem_zpowers_iff.mpr ⟨n, by simpa using congrArg Subtype.val hn⟩
+        have hmem : (a : G) * (w : G) * (a : G)⁻¹ ∈ Subgroup.zpowers x := (hset _).mp hwz
+        obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hmem
+        refine Subgroup.mem_zpowers_iff.mpr ⟨n, Subtype.ext ?_⟩
+        rw [SubgroupClass.coe_zpow]
+        exact hn
+      · intro z hz
+        have hzz : (z : G) ∈ Subgroup.zpowers x := by
+          obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hz
+          exact Subgroup.mem_zpowers_iff.mpr ⟨n, by simpa using congrArg Subtype.val hn⟩
+        refine ⟨conjActionHom hEnorm a⁻¹ z, ?_, ?_⟩
+        · have hmem : (a : G)⁻¹ * (z : G) * ((a : G)⁻¹)⁻¹ ∈ Subgroup.zpowers x := by
+            refine (hset _).mpr ?_
+            rw [show (a : G) * ((a : G)⁻¹ * (z : G) * ((a : G)⁻¹)⁻¹) * (a : G)⁻¹ = (z : G)
+              from by group]
+            exact hzz
+          obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hmem
+          refine Subgroup.mem_zpowers_iff.mpr ⟨n, Subtype.ext ?_⟩
+          rw [SubgroupClass.coe_zpow]
+          exact hn
+        · change conjActionHom hEnorm a (conjActionHom hEnorm a⁻¹ z) = z
+          rw [← MulAut.mul_apply, ← map_mul, mul_inv_cancel, map_one, MulAut.one_apply]
+    A_regular := by
+      intro a ha hane r hr
+      by_contra hrne
+      have haE : (a : G) ∈ E := a.2
+      have hane' : (a : G) ≠ 1 := fun h => hane (Subtype.ext h)
+      have hrne' : (r : G) ≠ 1 := fun h => hrne (Subtype.ext h)
+      have hval : (a : G) * (r : G) * (a : G)⁻¹ = (r : G) := congrArg Subtype.val hr
+      exact hEfrob _ haE hane' _ r.2 hrne' hval }
+
+@[simp] theorem e5Setup_R₀ [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E K₁ : Subgroup G} {x : G} {p k : ℕ}
+    (hp : p.Prime) (hk : k.Prime) (hkp : k ≠ p) (hord : orderOf x = p)
+    (hxOp : x ∈ opiCoreInG {p} M)
+    (hEnorm : E ≤ Subgroup.normalizer ((opiCoreInG {p} M : Subgroup G) : Set G))
+    (hcardE : ¬ p ∣ Nat.card ↥E)
+    (hK₁E : K₁ ≤ E) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hEfrob : ∀ e ∈ E, e ≠ 1 → ∀ r ∈ opiCoreInG {p} M, r ≠ 1 → e * r * e⁻¹ ≠ r)
+    (hK₁norm : ∀ g ∈ K₁, MulAut.conj g • (Subgroup.zpowers x) = Subgroup.zpowers x)
+    {R₁amb : Subgroup G} (hR₁Op : R₁amb ≤ opiCoreInG {p} M)
+    (hR₁cyc : IsCyclic ↥R₁amb) (hR₁ne : R₁amb ≠ ⊥)
+    (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
+    (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
+      Subgroup.zpowers x ⊔ R₁amb) :
+    (e5Setup hG hp hk hkp hord hxOp hEnorm hcardE hK₁E hcardK₁ hEfrob hK₁norm
+        hR₁Op hR₁cyc hR₁ne hdisj hcent).R₀ =
+      Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) := rfl
+
+@[simp] theorem e5Setup_act [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E K₁ : Subgroup G} {x : G} {p k : ℕ}
+    (hp : p.Prime) (hk : k.Prime) (hkp : k ≠ p) (hord : orderOf x = p)
+    (hxOp : x ∈ opiCoreInG {p} M)
+    (hEnorm : E ≤ Subgroup.normalizer ((opiCoreInG {p} M : Subgroup G) : Set G))
+    (hcardE : ¬ p ∣ Nat.card ↥E)
+    (hK₁E : K₁ ≤ E) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hEfrob : ∀ e ∈ E, e ≠ 1 → ∀ r ∈ opiCoreInG {p} M, r ≠ 1 → e * r * e⁻¹ ≠ r)
+    (hK₁norm : ∀ g ∈ K₁, MulAut.conj g • (Subgroup.zpowers x) = Subgroup.zpowers x)
+    {R₁amb : Subgroup G} (hR₁Op : R₁amb ≤ opiCoreInG {p} M)
+    (hR₁cyc : IsCyclic ↥R₁amb) (hR₁ne : R₁amb ≠ ⊥)
+    (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
+    (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
+      Subgroup.zpowers x ⊔ R₁amb) :
+    (e5Setup hG hp hk hkp hord hxOp hEnorm hcardE hK₁E hcardK₁ hEfrob hK₁norm
+        hR₁Op hR₁cyc hR₁ne hdisj hcent).act = conjActionHom hEnorm := rfl
+
+/-- **Small `p`-groups always violate E.5's (ii)**: a group of order `p^n` with
+`1 ≤ n ≤ 3` has a normal abelian subgroup of index `p` (any subgroup of order `p^(n-1)`:
+normal because its index is the least prime factor of `|S|`, abelian because its order is
+at most `p²`).  This is BG's *"Hence, by (ii), `|S| ≥ p⁴`"*. -/
+theorem exists_normal_abelian_index_prime_of_card_le_cube {S : Type*} [Group S] [Finite S]
+    {p n : ℕ} (hp : p.Prime) (hcard : Nat.card S = p ^ n) (hn1 : 1 ≤ n) (hn3 : n ≤ 3) :
+    ∃ A : Subgroup S, A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨A, hA⟩ := Sylow.exists_subgroup_card_pow_prime p
+    (n := n - 1) (by rw [hcard]; exact pow_dvd_pow p (by omega))
+  have hidx : A.index = p := by
+    have hmul := A.card_mul_index
+    rw [hA, hcard] at hmul
+    have hpow : p ^ n = p ^ (n - 1) * p := by
+      rw [← pow_succ]
+      congr 1
+      omega
+    rw [hpow] at hmul
+    exact Nat.eq_of_mul_eq_mul_left (pow_pos hp.pos _) hmul
+  have hnorm : A.Normal := by
+    refine Subgroup.normal_of_index_eq_minFac_card ?_
+    rw [hidx, hcard, Nat.Prime.pow_minFac hp (by omega)]
+  refine ⟨A, hnorm, ?_, hidx⟩
+  interval_cases n
+  · have hA1 : A = ⊥ := Subgroup.card_eq_one.mp (by simpa using hA)
+    subst hA1
+    exact ⟨⟨fun a b => Subsingleton.elim _ _⟩⟩
+  · haveI : IsCyclic ↥A := isCyclic_of_prime_card (by simpa using hA)
+    letI : CommGroup ↥A := IsCyclic.commGroup
+    exact ⟨⟨fun a b => mul_comm a b⟩⟩
+  · exact IsPGroup.isMulCommutative_of_card_eq_prime_sq (by simpa using hA)
+
 /-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
 Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
 collapses onto `K₁`.
