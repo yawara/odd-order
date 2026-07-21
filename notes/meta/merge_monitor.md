@@ -898,6 +898,12 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 12:20 (tick #2、Fable hub cron `2d2c6f61`) — ✅ c + b 合流 (2 pass)、census 11 不変、push 済 (`66914abc8..b4c23c7e6`)**:
+  **c** = App.E E.4 Tier 2 WP3 — Q₆ Lazard 群の部分群層 (AppE_FiliformGroup 195→480 行、issue 3027)、
+  merge `e5b0c2e48`、build 4581 jobs green。**b** = tick 中の live commit (12:15) を 2nd pass で回収:
+  Higman Lemma 12 dispatch 第1層 mixed-support pinning (新 leaf SupportPinning 343 行、親 hub 配線済、
+  issue 2048)、merge `b4c23c7e6`、build **4582 jobs green (+1 = 新 module elaborate 確認)**、orphan 866/866。
+  **a** = 変化なし。両 pass とも AxiomsCheck OK / sorry 11 不変 / 新 axiom なし / 逸脱なし。レーン生存 3 点 OK。
 - **2026-07-21 12:05 (監視再開 tick #1、Fable hub — ユーザー「各レーンを監視します」) — ✅ c 合流 1 件、census 11 不変。cron 再作成 (`2d2c6f61`, 30 分 `13,43`、interval 未指定 → Fable model default)**:
   **a/b** = 未マージ 0・変化なし。**c** = 2 commits を merge `7ed1004c0`: ⭐ BG App.E E.4 Tier 2 WP1-2 —
   Q₆ Lazard 群を Lean で実構築 (新 leaf `AppE_FiliformGroup.lean` 195 行、c 自身が OddOrder.lean 配線済 =
