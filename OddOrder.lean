@@ -427,6 +427,7 @@ import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.BG.AppE_AbelianCentralizer
 import OddOrder.BG.AppE_EigenvalueCombinatorics
 import OddOrder.BG.AppE_FiliformCounterexample
+import OddOrder.BG.AppE_FiliformGroup
 import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField
