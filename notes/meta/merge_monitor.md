@@ -898,6 +898,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 15:45 (tick #9、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、census 7 不変、push 済**:
+  **a** = FeitSibley Theorem (1.1) 型 counting bound |H⧸R|−|H⧸RQ₁| ≤ d²·2a + (1.2) 型 degree
+  bound ψ(1)=d·a, a² ≤ [Q:D₀] + forall_eq_one_of_leKer の R-一般化 retrofit (issue 1054)。
+  **b** = Higman Appendix III (e) Lemma I — 同型 summand の固有値 Frobenius 共役 (新 leaf
+  `SummandIsomorphism.lean` 122 行、親 leaf 配線済) + |P|=q³ からの payload 一括供給 (issue 2048)。
+  **c** = ⭐⭐ E.5 **WP4 完了 — (ii)∧hdc ⟹ (i) を完全証明** (AppE_CorollaryE5 +155 行、
+  残 = WP5 最終組立 glue + counting; WP5 glue の hMσnil は Prop 16.1 TypeIData 経由が本命と調査済、
+  issue 3028)。gate = build **4593 jobs green (20s, +1 = 新 leaf 実 elaborate 確認)**、AxiomsCheck OK、
+  orphan 0 (877/877)、census 7 不変、新 axiom なし、逸脱なし。レーン生存 3 点 OK —
+  ⚠ 3 レーンとも 15:2x にセッション再起動 (PID 335xxxx → 351xxxx) だが transcript/process とも活発。
 - **2026-07-21 15:15 (tick #8、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、census 7 不変、push 済**:
   **a** = FeitSibley Theorem 反例抽出 3 部作の合成 `exists_counterexample_of_not_coherent` +
   反例中核補題 (失敗 adjoin ⟹ Σm² ≤ 2a) + 共役対分解 (pairUnion 構成) + scaled-diff A-support
