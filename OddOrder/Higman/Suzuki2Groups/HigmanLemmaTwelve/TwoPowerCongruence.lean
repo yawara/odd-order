@@ -789,4 +789,81 @@ theorem higman_typeC_exponent_uniqueness {n r s t : ℕ} (hr : 0 < r) (h2r : 2 *
       · exact absurd hT0 (Finset.insert_ne_empty _ _)
       · exact absurd hS0 (Finset.insert_ne_empty _ _)
 
+/-! ### Bridges from eigenvalue equations to the exponent congruences
+
+Higman's case analysis starts from equations between powers of a primitive
+`(2 ^ n - 1)`-st root of unity `ν` (an eigenvalue of the cyclic actor `ξ`) and
+converts them into congruences between the exponents mod `2 ^ n - 1` — the
+inputs of `higman_typeC_exponent_uniqueness` and
+`higman_typeD_exponent_uniqueness` above.  The conversion is
+`pow_eq_pow_iff_modEq` plus exponent algebra; no discrete logarithm is
+needed. -/
+
+/-- An element of multiplicative order `2 ^ n - 1` is fixed by the `n`-th
+Frobenius power: `ν ^ (2 ^ n) = ν`.  This renormalises Higman's eigenvalue
+equations `λ^{2^i} μ^{2^j} = ν^{2^k}` to `k = 0` by raising both sides to the
+power `2 ^ (n - k)`. -/
+theorem pow_two_pow_eq_self_of_orderOf {F : Type*} [Monoid F] {nu : F} {n : ℕ}
+    (hord : orderOf nu = 2 ^ n - 1) : nu ^ 2 ^ n = nu := by
+  have h1 : 2 ^ n = (2 ^ n - 1) + 1 := by
+    have : (1 : ℕ) ≤ 2 ^ n := Nat.one_le_two_pow
+    omega
+  rw [h1, pow_succ, ← hord, pow_orderOf_eq_one, one_mul]
+
+/-- **The type-`C` eigenvalue bridge** (Higman, *Suzuki 2-groups*, p. 91).
+From `λ^{1 + 2^s (1 + 2^r)} = λ^{2^t (1 + 2^r)}` for `λ` of order `2 ^ n - 1`
+(the matching of the eigenvalue of `[x₀, y_{s+1}] ≠ 0` with an eigenvalue on
+`Φ(G)`), the exponents agree mod `2 ^ n - 1`, in the form consumed by
+`higman_typeC_exponent_uniqueness`. -/
+theorem higman_typeC_congruence_of_pow_eq {F : Type*} [Monoid F] {lam : F}
+    {n r s t : ℕ} (hn : 0 < n) (hord : orderOf lam = 2 ^ n - 1)
+    (h : lam ^ (1 + 2 ^ s * (1 + 2 ^ r)) = lam ^ (2 ^ t * (1 + 2 ^ r))) :
+    (1 : ZMod (2 ^ n - 1)) + 2 ^ s * (1 + 2 ^ r) = 2 ^ t * (1 + 2 ^ r) := by
+  have h2n : 2 ≤ 2 ^ n := by
+    calc 2 = 2 ^ 1 := (pow_one 2).symm
+    _ ≤ 2 ^ n := Nat.pow_le_pow_right (by omega) hn
+  have hfin : IsOfFinOrder lam := orderOf_pos_iff.mp (by rw [hord]; omega)
+  have hmod : 1 + 2 ^ s * (1 + 2 ^ r) ≡ 2 ^ t * (1 + 2 ^ r) [MOD 2 ^ n - 1] := by
+    rw [← hord]
+    exact hfin.pow_eq_pow_iff_modEq.mp h
+  have hcast := (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
+  push_cast at hcast
+  exact hcast
+
+/-- **The type-`D` eigenvalue bridge** (Higman, *Suzuki 2-groups*, p. 91).
+From `λ^{2^i} μ^{2^j} = ν` with `ν = λ^{1 + 2^r} = μ^{1 + 2^s}` of order
+`2 ^ n - 1` (a nonzero product `[x_i, y_j]` on the `ν`-eigenline `v₀`), raising
+to the power `(1 + 2^r)(1 + 2^s)` gives
+`2^i (1 + 2^s) + 2^j (1 + 2^r) ≡ (1 + 2^r)(1 + 2^s) (mod 2 ^ n - 1)`, in the
+form consumed by `higman_typeD_exponent_uniqueness`. -/
+theorem higman_typeD_congruence_of_pow_eq {F : Type*} [CommMonoid F]
+    {nu lam mu : F} {n r s i j : ℕ} (hn : 0 < n) (hord : orderOf nu = 2 ^ n - 1)
+    (hlam : lam ^ (1 + 2 ^ r) = nu) (hmu : mu ^ (1 + 2 ^ s) = nu)
+    (h : lam ^ 2 ^ i * mu ^ 2 ^ j = nu) :
+    (2 : ZMod (2 ^ n - 1)) ^ i * (1 + 2 ^ s) + 2 ^ j * (1 + 2 ^ r)
+      = (1 + 2 ^ r) * (1 + 2 ^ s) := by
+  have h2n : 2 ≤ 2 ^ n := by
+    calc 2 = 2 ^ 1 := (pow_one 2).symm
+    _ ≤ 2 ^ n := Nat.pow_le_pow_right (by omega) hn
+  have hfin : IsOfFinOrder nu := orderOf_pos_iff.mp (by rw [hord]; omega)
+  have key : nu ^ (2 ^ i * (1 + 2 ^ s) + 2 ^ j * (1 + 2 ^ r))
+      = nu ^ ((1 + 2 ^ r) * (1 + 2 ^ s)) := by
+    have h' := congrArg (· ^ ((1 + 2 ^ r) * (1 + 2 ^ s))) h
+    simp only [mul_pow, ← pow_mul] at h'
+    rw [show 2 ^ i * ((1 + 2 ^ r) * (1 + 2 ^ s))
+          = (1 + 2 ^ r) * (2 ^ i * (1 + 2 ^ s)) by ring1,
+      show 2 ^ j * ((1 + 2 ^ r) * (1 + 2 ^ s))
+          = (1 + 2 ^ s) * (2 ^ j * (1 + 2 ^ r)) by ring1,
+      pow_mul lam (1 + 2 ^ r) (2 ^ i * (1 + 2 ^ s)),
+      pow_mul mu (1 + 2 ^ s) (2 ^ j * (1 + 2 ^ r)),
+      hlam, hmu, ← pow_add] at h'
+    exact h'
+  have hmod : 2 ^ i * (1 + 2 ^ s) + 2 ^ j * (1 + 2 ^ r)
+      ≡ (1 + 2 ^ r) * (1 + 2 ^ s) [MOD 2 ^ n - 1] := by
+    rw [← hord]
+    exact hfin.pow_eq_pow_iff_modEq.mp key
+  have hcast := (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
+  push_cast at hcast
+  exact hcast
+
 end OddOrder.Higman.Suzuki2Groups
