@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Peterfalvi Appendix C: On Near-Fields
@@ -676,6 +678,41 @@ structure RankOneHypothesis (G Ω : Type*) [Group G] [MulAction G Ω] [Finite G]
   This is the negation of Part II's hypothesis (A3). -/
   two_rank_one : ¬ ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1
 
+/-- **Proposition 1, prerequisite (i)** (Huppert, *Endliche Gruppen* I, Kapitel III, Satz 8.2):
+a group of 2-rank one has cyclic or generalized quaternion Sylow `2`-subgroups.
+
+Bridge from `two_rank_one` to **Isaacs Thm 6.11**
+(`isCyclic_or_two_quaternion_of_subgroups_card_prime_unique`): if a Sylow `2`-subgroup had two
+distinct subgroups of order `2`, it would contain an elementary abelian subgroup of order `4`
+(`IsPGroup.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne`), which
+`two_rank_one` forbids. -/
+theorem RankOneHypothesis.sylow_two_isCyclic_or_quaternion
+    {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) (S : Sylow 2 G) :
+    IsCyclic ↥(S : Subgroup G) ∨
+      ∃ n : ℕ, Nonempty (↥(S : Subgroup G) ≃* QuaternionGroup n) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hUnique : ∀ K L : Subgroup ↥(S : Subgroup G),
+      Nat.card K = 2 → Nat.card L = 2 → K = L := by
+    intro K L hK hL
+    by_contra hne
+    obtain ⟨E, hE_elem, hE_card⟩ :=
+      S.isPGroup'.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
+        hK hL hne
+    refine hyp.two_rank_one ⟨E.map (S : Subgroup G).subtype, ?_, ?_⟩
+    · rw [Nat.card_congr
+        (Subgroup.equivMapOfInjective E _ (S : Subgroup G).subtype_injective).symm.toEquiv,
+        hE_card]
+      norm_num
+    · rintro x ⟨y, hy, rfl⟩
+      have hy2 : (⟨y, hy⟩ : ↥E) ^ 2 = 1 := hE_elem.pow_eq_one _
+      have hyS : y ^ 2 = 1 := by simpa using congrArg Subtype.val hy2
+      simpa using congrArg ((S : Subgroup G).subtype) hyS
+  rcases OddOrder.Isaacs.Ch06.isCyclic_or_two_quaternion_of_subgroups_card_prime_unique
+      S.isPGroup' hUnique with hcyc | ⟨_, hq⟩
+  · exact Or.inl hcyc
+  · exact Or.inr hq
+
 /-- **Peterfalvi Appendix C, Proposition 1, conclusion**: the affine near-field model of `G`.
 
 The book asserts an isomorphism `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ` identifying `Q` with `F^*` and `D`
@@ -733,10 +770,8 @@ and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct invol
 state (updated 2026-07-21, issue 9404):
 
 * (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert, *Endliche Gruppen* I,
-  Kapitel III, Satz 8.2) — **essentially available** as
-  `OddOrder.Isaacs.Ch06.isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` (Isaacs
-  Thm 6.11); only the bridge from `two_rank_one` (no elementary abelian of order 4) to the unique
-  order-2 subgroup hypothesis is needed.
+  Kapitel III, Satz 8.2) — **proved** as `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
+  above (bridge from `two_rank_one` to Isaacs Thm 6.11).
 * (ii) the **Brauer–Suzuki theorem** `G = O_{2'}(G) C_G(u)` — not formalized; **issue 9318**
   (lane b claim).  This is the sole remaining gate.
 * (iii) Huppert Kapitel II, Satz 3.2, giving the elementary abelian normal subgroup regular on `Ω`
