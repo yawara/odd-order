@@ -261,7 +261,28 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   `prime_dvd_card_quotient_of_le_commutator` + `exists_center_pow_prime_eq_one_of_dvd` /
   S⊴H mirror 群 (`S_normal_in_H` 等) / 強帰納 skeleton
   `ssetOf_sup_sder_coherent_of_conjInvariant`。
+- [x] **centralLift 機構の W-一般化** (43db54a05): `centralLiftIn`/`primaryLiftIn`/
+  `minimal_le_centralLiftIn` — reduction (2) の S 側 (Z/S₂ = Z(S/S₂)) で再利用可能に。
+  薄いラッパー無し、Q₁ 消費側は直接更新。
 - [ ] **次: reduction (2)** (𝒮(S′) coherent ⟹ 𝒮 coherent、p. 146–147)。
+  **実装部品リスト (2026-07-21 精査)**:
+  1. S 側 index ブリッジ: |H⧸(A′⊔Q₁)-in| = d·|S⧸A′| (A′ ≤ S; [H:A′] の
+     2 通りの塔で cancellation) — counting 抽出「m(q₁−1) ≤ 2da、m = |S⧸S₁| を保持」用。
+     既存 card_quot_eq_card_quot_Q1_mul (hinf: Q₁⊓S₁ = ⊥ via S⊓Q₁=⊥) と合成。
+  2. 直積 index 分解: [Q-in : (A′⊔B′)-in] = |S⧸A′|·|Q₁⧸B′| (A′ ≤ S, B′ ≤ Q₁;
+     relIndex 塔 (A′⊔B′) ≤ (A′⊔Q₁) ≤ Q + 第二同型 (Q1_inf_sup_eq 流用))。
+  3. 中心対 split: x ∈ Z_S ⊔ Z_{Q₁}, q ∈ Q ⟹ ⁅x,q⁆ ∈ S₂ (⁅Z_S,S⁆ ⊆ S₂ +
+     ⁅Z_{Q₁},Q₁⁆ = 1; commutator_mem_sup_Sder_of_central の鏡映)。
+     Z_{Q₁} := centralLiftIn Q₁ ⊥ (= Z(Q₁) の引き上げ)。
+  4. |Z(Q₁)| ≥ 2d+1: two_mul_d_add_one_le_card_of_le_Q1 (既存, FeitSibleyTheorem)
+     を centralLiftIn Q₁ ⊥ に適用 (非自明性 = nilpotent center_ne_bot、D-不変 ✓)。
+  5. 算術 `false_of_reduction_two_bounds`: m(q₁−1) ≤ 2da + a² ≤ m·qz +
+     q₁ = qz·zc + zc ≥ 2d+1 + m ≥ 2 ⟹ False (m·zc(q₁−2) < 4d² vs
+     ≥ 2(4d²−1); m ≥ 2 は S₁ ≤ [S,S] ⊊ S から)。
+  6. S 側 step 補題 (ssetOf_coherent_step の鏡映; anchor は 𝒮(Q′) ⊆ 𝒮(S₁)
+     via S₁ ≤ Sder ≤ Qder) + S 側帰納 (minimal_le_centralLiftIn W:=S,
+     S_nilpotent field 使用; hZQ₂ 相当は不要 — (2) は Z の properness を使わない)。
+  7. reduction (2) 最終形: 𝒮(S′) coherent ⟹ 𝒮 = 𝒮(⊥) coherent。
   S 側の同型帰納: S₁ ⊴ H, S₁ ≤ S′, 𝒮(S₁) coherent、S₂ chief。
   counting は d·|S⧸S₁|·(|Q₁|−1) = Σ 型 (sum_degreeSq_SsetOf の R = S₁ 版、
   R⊔Q₁ の index)。(1.2) 対応は φ(1)² ≤ |S/Z|·|Q₁/Z(Q₁)|
