@@ -361,9 +361,24 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                   `s≡±r`) + C case 一意性 (`2r+1=n ∧ s≡r+1 ∧ t≡1`) + D case
                   一意性 (partition 解析、survivor + mirror) + 固有値方程式からの
                   bridge 5 本 (pow_eq_pow_iff_modEq 経由、離散対数不要)
-            - [ ] dispatch 本体: weight 方程式の k=0 正規化 → θ/φ の Frobenius 冪
-                  表示 → θ=φ / φ=1 / 独立 の分岐で上記算術に接続、(i,j)+(θ,φ) を pin
-            - [ ] M 値確定: pin した (i0,j0) で c_ij 単項化 → c=ε → engine の hM
+            - [x] support pinning 算術 (`SupportPinning.lean`, `0c5905902`):
+                  ν=λ^{1+2^r} primitive から orderOf λ / coprime 回収、θ=φ の μ=λ、
+                  B: (i,j)∈{(0,r),(r,0)} / C: 2r+1=n ∧ (n−1,r+1) / D: (3r,r)∨mirror
+            - [x] flip 正規化 (`CaseDispatch.lean`, `f17e2b279`):
+                  `NoncommutativeFactorCoordinateData.flip` (A(n,θ)≅A(n,θ⁻¹)、
+                  ePhi 不動で θ↦θ⁻¹, λ↦θλ) + `exists_flip_frobenius_le_half`
+                  (0<r≤n/2 の WLOG)
+            - [x] M 単項化 (`CaseDispatch.lean`, `0e0a86396`): 二重和 collapse +
+                  support 抽出 + case 別単項定理 — θ=φ=1: M=c₀αβ / θ=φ≠1:
+                  M=c₁αβ^{2^r}+c₂α^{2^r}β / C: 2r+1=n ∧ M=c₀α^{2^{n−1}}β^{2^{r+1}} /
+                  D: (s≡2r∧5r≡0∧M=c₀α^{2^{3r}}β^{2^r})∨mirror
+            - [ ] B case の shear 正規化: F×F 座標の (α,β)↦(α+ρβ,β) 変換で c₂ を
+                  消去し qY を再スケール (1+c₁c₂≠0 は無中心外 involution から)
+            - [ ] ε 正規化: c₀ ≠ 0 → ε (anisotropy 条件 IsType*Epsilon と接続)
+            - [ ] group-side assembly: 実際の mixed 項
+                  (ambientCenterCoordinate ∘ lowerCentralCommutatorBilinear) を
+                  mixedTerm_lambda_equivariance で equivariance に接続 → 上記単項化
+                  → engine (isTypeB/C/D_of_mixedTerm) の hM → higmanLemmaTwelve
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
