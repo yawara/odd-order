@@ -158,6 +158,7 @@ import OddOrder.BG.AppE_RegularOperator
 import OddOrder.BG.AppE_ExponentP
 import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.BG.AppE_AbelianCentralizer
+import OddOrder.BG.AppE_FiliformCounterexample
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -11895,3 +11896,9 @@ API into them.
 #assert_only_allowed_axioms OddOrder.BG.AppE.commutatorElement_zpow_mul_zpow_mul
 #assert_only_allowed_axioms OddOrder.BG.AppE.dvd_sub_mul_of_commutator_eigen
 #assert_only_allowed_axioms OddOrder.BG.AppE.eq_of_eigenvalue_relations
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.br_leibniz
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.degree_of_commutativity_zero
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.beta_iterate_fixed_eq_zero
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.T_not_abelian
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.e23_fails_at_two
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.bg_propE4_lie_counterexample
