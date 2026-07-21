@@ -967,6 +967,12 @@ c371bd7a2 / 8b7cd164d)**: piece 4 の数論 application 層が閉じた。
   離散対数不要 — D は両辺 (1+2^r)(1+2^s) 乗するだけ)、
   `pow_two_pow_eq_self_of_orderOf` (ν^{2^n}=ν、weight 方程式の k=0 正規化用)
 
+**追記 (同 session、0f19fe31e)**: B case の消去算術も landing —
+`higman_two_pow_add_eq_two_pow` (θ=φ=1: 2^a+2^b≡2^c → a≡b ∧ c≡a+1、
+[x_i,y_j]=0 (i≠j) の強制) + `higman_typeB_exponent_pm` (θ=φ≠1: s≡±r、
+[x_i,y_j]=0 (|j−i|≠r) の強制) + 対応 bridge 2 本。
+**piece 4 の純算術は B/C/D 全 case 分完備** (TwoPowerCongruence.lean 1030 行)。
+
 **残り (次 iteration、issue 2048)**:
 1. **case dispatch**: MixedEigenweights の weight 方程式 (λ^{2^i}μ^{2^j}=ν^{2^k}) を
    k=0 正規化 → θ=φ / φ=id / 独立 の 3 分岐。B は congruence 不要 (M 単項)、
