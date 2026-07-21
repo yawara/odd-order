@@ -729,15 +729,24 @@ group `Σ` of automorphisms of `F` with `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ 
 and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct involutions `u, v ∈ G`,
 `|uv|` equals the characteristic of `F`.
 
-**Status: honestly stated, not proved.**  Peterfalvi's proof consumes three results that are not
-available here: (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert,
-*Endliche Gruppen* I, Kapitel III, Satz 8.2) — 2-rank one is exactly this; (ii) the **Brauer–Suzuki
-theorem** `G = O_{2'}(G) C_G(u)`, which is not formalized in this repository; (iii) Huppert Kapitel
-II, Satz 3.2, giving the elementary abelian normal complement `G = F ⋊ H` for the solvable
-`O_{2'}(G)` (solvable by Feit–Thompson).  With those in hand, the near-field structure on `F` comes
-from the regular action of `Q` on `F^#` by the standard transport recorded on p. 137 (choose the
-`D`-fixed point of `F^#` as the multiplicative identity), which *is* elementary and would be the
-first piece to formalize once (i)–(iii) exist. -/
+**Status: honestly stated, not proved.**  Peterfalvi's proof consumes three results; their repo
+state (updated 2026-07-21, issue 9404):
+
+* (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert, *Endliche Gruppen* I,
+  Kapitel III, Satz 8.2) — **essentially available** as
+  `OddOrder.Isaacs.Ch06.isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` (Isaacs
+  Thm 6.11); only the bridge from `two_rank_one` (no elementary abelian of order 4) to the unique
+  order-2 subgroup hypothesis is needed.
+* (ii) the **Brauer–Suzuki theorem** `G = O_{2'}(G) C_G(u)` — not formalized; **issue 9318**
+  (lane b claim).  This is the sole remaining gate.
+* (iii) Huppert Kapitel II, Satz 3.2, giving the elementary abelian normal subgroup regular on `Ω`
+  (hence `G = F ⋊ H`) for the solvable `O_{2'}(G)` (solvable by Feit–Thompson) — **formalized** as
+  `OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive`
+  (`GroupTheory/SolvableTwoTransitive.lean`).
+
+With (ii) in hand, the near-field structure on `F` comes from the regular action of `Q` on `F^#`
+by the standard transport recorded on p. 137 (choose the `D`-fixed point of `F^#` as the
+multiplicative identity), which *is* elementary. -/
 theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
     (hyp : RankOneHypothesis G Ω) :
     ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by

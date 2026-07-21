@@ -35,6 +35,7 @@ import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.ThompsonSubgroupAbelian
 import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ
+import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.MackeyTransfer
