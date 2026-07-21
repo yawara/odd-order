@@ -47,12 +47,13 @@ Ch3 (§11–§13) と Ch4 全体がこの定義層に依存する。
   `F(M)` = `Ch2.S08.fittingInG M`。
 - 固定 G は `(hG : IsMinimalSimpleOdd G)` を明示 thread。
 
-## 現在の scaffold 範囲
+## ファイル構成
 
-定義層 (idealPrime/α/β/σ/M_α/M_β/M_σ/F_σ/F_σ') と、BG 10.1--10.14
-の statement skeleton を配置済み。Lemma 10.13 は `Ω₁(Z(P))` と `ℰ¹(A)` の ambient subgroup
-encoding を本ファイル内に置く。proof は別フェーズで、既存の `sorry` はこの節の interface
-を後続 §11--§16 に先に渡すためのもの。
+定義層 (idealPrime/α/β/σ/M_α/M_β/M_σ/F_σ/F_σ') と、Lemma 10.13 用の局所記法
+(`Z₀ = Ω₁(Z(P))`、`X ∈ ℰ¹(A)` の ambient subgroup encoding) を本ファイルに置く。
+BG 10.1--10.14 の証明本体は §10 の各 leaf に landing 済み (例: Lemma 10.13 =
+`nonabelian_pSubgroup_rankTwo_elemAbelian_structure` は `S10_LocalLemmas.lean`)。
+**本ファイルは sorry-free** — かつての「statement skeleton + interface `sorry`」は解消済み。
 
 ## Lane C proof-gate notes
 
