@@ -6,6 +6,23 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 01:59 監視再開 (Opus hub) — 前 Fable hub は model 切替で死亡**。
+> 前 hub の最終合流は 00:58 (4f8df7128)、以後 01:07/22/37/52 の tick で a/b/c に未マージ work が
+> 溜まっていた (01:48 時点で 3 レーンとも commit 済) のに合流していない → Fable cron が
+> `/model` 切替で消滅 ([[cron-dies-on-model-switch]] の想定どおり)。Opus hub が引き継ぎ、
+> 監視 cron を 15 分 `7,22,37,52` で再作成。**初回 tick 合流 = 64de463fc**:
+> a (1054 Pf App.IV step3 PartB) / b (2053 Pf II ChII step3 Clifford 二分岐) / c (BG §1 Lem1.1/1.9 book 強度化)。
+> フルビルド green (14:01 / 4619 jobs / orphan 0)、axiom-clean、sorry=6 非退行、push 済。
+>
+> **📌 2026-07-22 FeitSibley 所有の実態 (step 1.5 所有検査の注意)**: `c_re` は
+> `^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|FeitSibley)` を c 領域と
+> 記すが、**FeitSibley Appendix (Pf App.IV) は実務上 a が単独駆動**している (issue 1054、
+> created 07-21、`FeitSibley*.lean` 全ファイルが 1054 commit、多 tick 合流実績)。c は BG に居て
+> FeitSibley 非接触ゆえ**実衝突なし**。9154 の「FeitSibley→c」は Pf App.IV が Pf 本文寄りゆえ
+> 実運用で a に移った (Pf 本文 S* を a に移した 9154 の趣旨と整合)。⟹ **a の
+> `Peterfalvi/Appendices/FeitSibley*` は境界違反として再フラグしない** (軌道修正不要)。
+> NearFields/Huppert/SemilinearField は引き続き c。
+>
 > **▶ 2026-07-17 監視再開 (Fable hub)**: レーン a/b/c worktree 再作成済み・全て main tip `b5742b91` から
 > 開始 (未マージ 0)。監視 cron 再作成 = 15 分 `7,22,37,52` (現行明示ユーザー指定 2026-07-15 を継承)。
 > **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
