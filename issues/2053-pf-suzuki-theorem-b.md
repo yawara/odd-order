@@ -130,6 +130,29 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     MinimalInvariantNormal (exists_aInvariant_normal_isElementaryAbelian 系)。
     実装プラン: StepThree.lean で (a) M 存在、(b) dim 等式 (sorry-free 側)、
     (c) Clifford 二分岐 + App I Prop 2 + (2)(b) 消費 (sorried 継承側) の順
+  - **進捗 (2026-07-22, commit 760be19d9)**: (b) dim 等式 =
+    `card_eq_card_inf_centralizer_pow` (f8954166a)、`|C_M(P)| = r` =
+    `card_inf_centralizer_eq_prime` (9318 継承)。(c) Clifford 二分岐 =
+    `exists_prime_order_invariant_or_irreducible` (9318 継承)、**第一分岐
+    r ≡ 1 = `card_K_dvd_sub_one_of_prime_order_invariant` sorry-free 完了**
+    (AxiomsCheck 登録)。残 = **第二分岐 (M が K-既約) → r ≡ 2^i**。
+  - **第二分岐プラン (2026-07-22 精読 p.109 + infra 全確認、上流 gap 無し)**:
+    3 部品に分解 (すべて既存 infra の assembly):
+    - **Half A (Q₀ 側, M 非依存)**: `∃ i ≤ p-1, ∀ k∈K, a·k·a⁻¹ = k^(2^i)`
+      (a = P の生成元)。供給 = `FieldAction.exists_adapted_field_model`
+      (σhom : P →* RingAut F, F = 𝔽_{2^p}; μ : fitting(D̄) ≃* Fˣ; 共役律
+      `μ(fittingConjAction (toVbar g) t) = fieldRingAutOnUnits F (σhom g) (μ t)`)
+      + RingAut(𝔽_{2^p}) = ⟨Frobenius x↦x²⟩ 位数 p ⟹ σhom(a) = Frob^i
+      + K ≅ K̄ = fitting(D̄) (`SemilinearIdentification.Kbar_eq_fitting`)。
+      ⚠ fittingConjAction ↔ 実 K 上共役、K→fitting の橋が要工作。
+    - **Half B (M 側)**: `∀ k∈K, a·k·a⁻¹ = k^r`。供給 =
+      `SemilinearField.exists_field_semilinear` (F' = 𝔽_{r^p} on M,
+      K ↪ F'ˣ (M 1-dim over F', K が F'-linear), a は σ-semilinear で
+      σ = Gal 生成元 = Frobenius x↦x^r; 共役 k ↦ σ(k) = k^r)。⚠ 最重量。
+    - **Combine**: k^(2^i) = k^r ∀k∈K cyclic 位数 2^p−1 ⟹ r ≡ 2^i (mod 2^p−1)。
+    - **package (3)**: |Q₁| の素因数 r ⟹ ∃i, r≡2^i (第一分岐 i=0 + 第二分岐)。
+    (iii) の [H] V 8.15 ギャップは「dim C_M(P)=1」= 2(b) near-field 経由で
+    9318 継承、独立ギャップではない。
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐

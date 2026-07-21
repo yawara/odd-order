@@ -614,6 +614,230 @@ theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
     exact absurd htop bot_ne_top
   · rw [hcardord, h]
 
+/-- **Peterfalvi Part II, Ch. II, step (3), the Clifford dichotomy** (p. 109):
+a *minimal* nontrivial `KP`-invariant elementary abelian `r`-subgroup
+`M ≤ Q₁` either contains a `K`-invariant subgroup of order `r` (a
+`1`-dimensional `𝔽_r[K]`-submodule) or is `K`-irreducible.
+
+By the dimension identity and `|C_M(P)| = r`, `|M| = r^p`; by Clifford
+counting, a minimal nontrivial `K`-invariant subgroup `V` has `|M| = |V|^t`,
+so `|V| = r^d` with `d · t = p`; `d = 1` gives the first branch and `d = p`
+forces `V = M`, giving the second.
+
+Inherits the step (2)(b) `sorry` through `|C_M(P)| = r` (issue 9318). -/
+theorem exists_prime_order_invariant_or_irreducible {r : ℕ} (hr : r.Prime)
+    {M : Subgroup G} (hMQ1 : M ≤ fc.toHypothesis.Q1) (hMne : M ≠ ⊥)
+    (helab : IsElementaryAbelian r ↥M)
+    (hinv : ∀ g ∈ fc.toHypothesis.K ⊔ fc.P, ∀ m ∈ M, g * m * g⁻¹ ∈ M)
+    (hmin : ∀ B ≤ M,
+      (∀ g ∈ fc.toHypothesis.K ⊔ fc.P, ∀ m ∈ B, g * m * g⁻¹ ∈ B) →
+      B ≠ ⊥ → B = M) :
+    (∃ V ≤ M, V ≠ ⊥ ∧ Nat.card ↥V = r ∧
+      (∀ k ∈ fc.toHypothesis.K, ∀ v ∈ V, k * v * k⁻¹ ∈ V)) ∨
+    (∀ B ≤ M, (∀ k ∈ fc.toHypothesis.K, ∀ m ∈ B, k * m * k⁻¹ ∈ B) →
+      B ≠ ⊥ → B = M) := by
+  classical
+  haveI : Fact r.Prime := ⟨hr⟩
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have hMQ : M ≤ fc.toHypothesis.Q := hMQ1.trans fc.toHypothesis.Q1_le_Q
+  -- `|M| = r^p` from the dimension identity and `|C_M(P)| = r`.
+  have hcardM : Nat.card ↥M = r ^ fc.p := by
+    rw [fc.card_eq_card_inf_centralizer_pow hr hMQ hMne helab hinv,
+      fc.card_inf_centralizer_eq_prime hr hMQ1 hMne helab hinv]
+  -- The conjugation action of `L = KP` on `M`, as in the identity proof.
+  have hLnorm : fc.toHypothesis.K ⊔ fc.P ≤
+      Subgroup.normalizer (M : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    constructor
+    · exact fun hx => hinv g hg x hx
+    · intro hx
+      have h2 := hinv g⁻¹ (inv_mem hg) _ hx
+      simpa [mul_assoc] using h2
+  set L : Subgroup G := fc.toHypothesis.K ⊔ fc.P with hLdef
+  set φ : ↥L →* MulAut ↥M :=
+    M.normalizerMonoidHom.comp (Subgroup.inclusion hLnorm) with hφdef
+  have hφval : ∀ (a : ↥L) (m : ↥M),
+      ((φ a m : ↥M) : G) = (a : G) * (m : G) * (a : G)⁻¹ := fun _ _ => rfl
+  have hKL : fc.toHypothesis.K ≤ L := le_sup_left
+  set U : Subgroup ↥L := fc.toHypothesis.K.subgroupOf L with hUdef
+  haveI hUnormal : U.Normal := by
+    constructor
+    intro n hn g
+    have hn' : (n : G) ∈ fc.toHypothesis.K := hn
+    have hLD : L ≤ fc.toHypothesis.D :=
+      sup_le fc.toHypothesis.K_le_D
+        (fc.P_le_V.trans fc.toHypothesis.V_le_D)
+    have h := (inferInstance :
+        (fc.toHypothesis.K.subgroupOf fc.toHypothesis.D).Normal).conj_mem
+      (⟨(n : G), hLD n.2⟩ : ↥fc.toHypothesis.D)
+      (Subgroup.mem_subgroupOf.mpr hn') ⟨(g : G), hLD g.2⟩
+    exact Subgroup.mem_subgroupOf.mp h
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  letI : CommGroup ↥M := helab.subgroupCommGroup
+  -- Ambient ↔ subtype invariance bridges.
+  have hbridgeK : ∀ B' : Subgroup ↥M,
+      OddOrder.Isaacs.Ch03.IsAInvariant (φ.comp U.subtype) B' ↔
+      (∀ k ∈ fc.toHypothesis.K, ∀ m ∈ B'.map M.subtype,
+        k * m * k⁻¹ ∈ B'.map M.subtype) := by
+    intro B'
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    constructor
+    · rintro h k hk _ ⟨m, hm, rfl⟩
+      have hkL : k ∈ L := hKL hk
+      have hmem := h (⟨⟨k, hkL⟩, Subgroup.mem_subgroupOf.mpr hk⟩ : ↥U) m hm
+      exact ⟨_, hmem, hφval ⟨k, hkL⟩ m⟩
+    · intro h u m hm
+      have hu : ((u : ↥L) : G) ∈ fc.toHypothesis.K := u.2
+      obtain ⟨m', hm', hval⟩ := h _ hu _ ⟨m, hm, rfl⟩
+      have heq : φ (u : ↥L) m = m' := by
+        apply Subtype.ext
+        rw [hφval]
+        exact hval.symm
+      change φ (u : ↥L) m ∈ B'
+      rw [heq]
+      exact hm'
+  by_cases hirr : ∀ B' : Subgroup ↥M,
+      OddOrder.Isaacs.Ch03.IsAInvariant (φ.comp U.subtype) B' →
+        B' = ⊥ ∨ B' = ⊤
+  · -- second branch: `M` is `K`-irreducible
+    right
+    intro B hBM hBinv hBne
+    have hB' := hirr (B.subgroupOf M) (by
+      rw [hbridgeK, Subgroup.map_subgroupOf_eq_of_le hBM]
+      exact hBinv)
+    rcases hB' with h | h
+    · exfalso
+      apply hBne
+      rw [eq_bot_iff]
+      intro x hx
+      have hmem : (⟨x, hBM hx⟩ : ↥M) ∈ B.subgroupOf M :=
+        Subgroup.mem_subgroupOf.mpr hx
+      rw [h, Subgroup.mem_bot] at hmem
+      have hx1 : x = 1 := congrArg Subtype.val hmem
+      rw [hx1]
+      exact Subgroup.one_mem ⊥
+    · rw [Subgroup.subgroupOf_eq_top] at h
+      exact le_antisymm hBM h
+  · -- first branch: a `1`-dimensional `K`-submodule exists
+    left
+    push Not at hirr
+    obtain ⟨B', hB'inv, hB'ne, hB'top⟩ := hirr
+    obtain ⟨V', hV'le, hV'ne, hV'inv, hV'min⟩ :=
+      exists_minimal_aInvariant_le hB'ne hB'inv
+    -- the ambient minimality of `M` in subtype form
+    have hMtop : ∀ C : Subgroup ↥M,
+        OddOrder.Isaacs.Ch03.IsAInvariant φ C → C ≠ ⊥ → C = ⊤ := by
+      intro C hCinv hCne
+      have hCamb : C.map M.subtype = M := by
+        apply hmin _ (Subgroup.map_subtype_le C)
+        · intro g hg m hm
+          obtain ⟨m', hm', rfl⟩ := hm
+          have hgL : g ∈ L := hg
+          have hmem :=
+            (OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mp hCinv)
+              ⟨g, hgL⟩ m' hm'
+          exact ⟨_, hmem, hφval ⟨g, hgL⟩ m'⟩
+        · intro hbot
+          apply hCne
+          rw [eq_bot_iff]
+          intro x hx
+          have hmem : (x : G) ∈ C.map M.subtype := ⟨x, hx, rfl⟩
+          rw [hbot, Subgroup.mem_bot] at hmem
+          rw [Subgroup.mem_bot]
+          exact Subtype.ext hmem
+      rw [Subgroup.eq_top_iff']
+      intro x
+      have hmem : (x : G) ∈ C.map M.subtype := by
+        rw [hCamb]
+        exact x.2
+      obtain ⟨y, hy, hyx⟩ := hmem
+      rwa [show y = x from Subtype.ext hyx] at hy
+    -- Clifford counting: `|M| = |V'|^t`
+    obtain ⟨t, ht⟩ :=
+      exists_card_eq_pow_of_minimal_invariant hMtop hV'ne hV'inv hV'min
+    -- `|V'| = r^d` with `d * t = p`
+    have hV'dvd : Nat.card ↥V' ∣ r ^ fc.p := by
+      rw [← hcardM]
+      exact Subgroup.card_subgroup_dvd_card V'
+    obtain ⟨d, hdle, hdcard⟩ := (Nat.dvd_prime_pow hr).mp hV'dvd
+    have hdt : d * t = fc.p := by
+      apply Nat.pow_right_injective hr.two_le
+      change r ^ (d * t) = r ^ fc.p
+      rw [pow_mul, ← hdcard, ← ht, hcardM]
+    rcases fc.p_prime.eq_one_or_self_of_dvd d ⟨t, hdt.symm⟩ with hd | hd
+    · -- `d = 1`: `|V'| = r`, push down to the ambient group
+      refine ⟨V'.map M.subtype, Subgroup.map_subtype_le V', ?_, ?_, ?_⟩
+      · intro hbot
+        apply hV'ne
+        exact Subgroup.map_injective M.subtype_injective
+          (hbot.trans (Subgroup.map_bot M.subtype).symm)
+      · rw [Nat.card_congr (Subgroup.equivMapOfInjective V' M.subtype
+          M.subtype_injective).toEquiv.symm, hdcard, hd, pow_one]
+      · exact (hbridgeK V').mp hV'inv
+    · -- `d = p`: `V' = ⊤`, contradicting `B' ≠ ⊤`
+      exfalso
+      apply hB'top
+      have hV'top : V' = ⊤ := by
+        apply Subgroup.eq_top_of_card_eq
+        rw [hdcard, hd, ← hcardM]
+      exact le_antisymm le_top (hV'top ▸ hV'le)
+
+/-- **Peterfalvi Part II, Ch. II, step (3), the first Clifford branch**
+(p. 109): if a `K`-invariant subgroup `V ≤ Q` of prime order `r` exists
+(a `1`-dimensional `𝔽_r[K]`-submodule), then `|K| = 2^p − 1` divides
+`r − 1`, i.e. `r ≡ 1 (mod 2^p − 1)`: `K` acts on `V` by conjugation
+faithfully (it acts fixed-point-freely on `Q ⊇ V`), so it embeds into
+`Aut(V) ≅ (ℤ/r)^*` of order `r − 1`.  Sorry-free. -/
+theorem card_K_dvd_sub_one_of_prime_order_invariant {r : ℕ} (hr : r.Prime)
+    {V : Subgroup G} (hVQ : V ≤ fc.toHypothesis.Q) (hVne : V ≠ ⊥)
+    (hVcard : Nat.card ↥V = r)
+    (hVinv : ∀ k ∈ fc.toHypothesis.K, ∀ v ∈ V, k * v * k⁻¹ ∈ V) :
+    (2 ^ fc.p - 1) ∣ (r - 1) := by
+  classical
+  haveI : Fact r.Prime := ⟨hr⟩
+  -- `K` normalizes `V`, giving the conjugation action.
+  have hKnorm : fc.toHypothesis.K ≤ Subgroup.normalizer (V : Set G) := by
+    intro k hk
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    constructor
+    · exact fun hx => hVinv k hk x hx
+    · intro hx
+      have h2 := hVinv k⁻¹ (inv_mem hk) _ hx
+      simpa [mul_assoc] using h2
+  set φV : ↥fc.toHypothesis.K →* MulAut ↥V :=
+    V.normalizerMonoidHom.comp (Subgroup.inclusion hKnorm) with hφVdef
+  have hφVval : ∀ (k : ↥fc.toHypothesis.K) (v : ↥V),
+      ((φV k v : ↥V) : G) = (k : G) * (v : G) * (k : G)⁻¹ := fun _ _ => rfl
+  -- faithfulness: `K` acts fixed-point-freely on `Q ⊇ V` (§2 Prop 1(a)).
+  have hinj : Function.Injective φV := by
+    rw [injective_iff_map_eq_one]
+    intro k hk
+    by_contra hkne
+    haveI : Nontrivial ↥V := (Subgroup.nontrivial_iff_ne_bot V).mpr hVne
+    obtain ⟨v, hv1⟩ := exists_ne (1 : ↥V)
+    have hfix : φV k v = v := by rw [hk]; rfl
+    have hvQ : ((v : ↥V) : G) ∈ fc.toHypothesis.Q := hVQ v.2
+    have hQfix : fc.toHypothesis.conjQByK k ⟨(v : G), hvQ⟩ =
+        ⟨(v : G), hvQ⟩ := by
+      apply Subtype.ext
+      rw [fc.toHypothesis.conjQByK_apply_val]
+      exact congrArg (fun z : ↥V => (z : G)) hfix
+    have hvone := fc.toHypothesis.conjQByK_fixed_eq_one hkne hQfix
+    have hvG := congrArg
+      (fun z : ↥fc.toHypothesis.Q => (z : G)) hvone
+    exact hv1 (Subtype.ext hvG)
+  -- `|K| ∣ |Aut(V)| = r − 1`.
+  haveI : IsCyclic ↥V := isCyclic_of_prime_card hVcard
+  have hAut : Nat.card (MulAut ↥V) = r - 1 := by
+    rw [IsCyclic.card_mulAut, hVcard, Nat.totient_prime hr]
+  have hKcard : Nat.card ↥fc.toHypothesis.K = 2 ^ fc.p - 1 := by
+    rw [fc.toHypothesis.card_K_eq_card_Q0_sub_one, fc.card_Q0_eq_two_pow]
+  rw [← hKcard, ← hAut]
+  exact Subgroup.card_dvd_of_injective φV hinj
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
