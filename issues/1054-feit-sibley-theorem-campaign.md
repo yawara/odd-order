@@ -114,8 +114,12 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   - Lemma 1(a) = `coherent_adjoin_of_degree_bound` (FeitSibley.lean, issue 1049)
   - Lemma 1(b) = `coherentEqualDegree` (S07_Coherence/CoherenceUnion.lean:298)
   - [Is] Cor 2.30 = `exists_degree_sq_le_index` (SchurCenterBound.lean:194)
-  - 度数二乗和: InducedDegreeSum.lean 系 + 要新補題「Σ_{χ∈𝒮(R)} χ(1)² = |H/R| − |H/RQ₁'…|」
-    (Irr(H/R) 全体 Σχ(1)² = |H/R| の kernel フィルタ差)
+  - 度数二乗和: **InflationCharacter.lean にほぼ完備** (2026-07-21 偵察):
+    `sumInflatedDegreeSq` (:401, Σ_{N⊆Ker} χ(1)² 型) / `sumNonInflatedDegreeSq` (:480) /
+    `sumNonInflatedDegreeSq_eq_index_mul` (:507, K-相対版 — 𝒮(R) 和 = 指数差はこれで) /
+    `sumNonInflatedDegreeMulChar_of_mem` (:540, z ∈ N^# での Σχ(1)χ(z) — **step (8) の
+    ρ_H − ρ_{H/Z} 評価がこれ**) / `inflate` 全単射 (:185–295)。新設はほぼ不要の見込み、
+    次 iteration で正確な statement を読んで Remark + (1) から着手。
   - coherence base+adjoin 連鎖 = CoherenceUnion.lean:1408/1591
   - central character ω = 所在確認 (無ければ新設; mathlib の integrality と接続)
 - **作業順 (上流優先+文書順)**: ①度数二乗和 counting 補題 ((1)(2)(3)(6) 全部で使う) →
