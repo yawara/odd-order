@@ -46,6 +46,7 @@ set_option autoImplicit false
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.GroupTheory (IsElementaryAbelian fixedSubgroup elabRepresentation)
+open OddOrder.Isaacs.Ch01 (fitting)
 open Representation
 
 /-! ## Clifford counting: `|M| = |V|^t` for a minimal `K`-invariant subgroup
@@ -892,6 +893,30 @@ theorem card_K_dvd_sub_one_of_prime_order_invariant {r : ℕ} (hr : r.Prime)
     rw [fc.toHypothesis.card_K_eq_card_Q0_sub_one, fc.card_Q0_eq_two_pow]
   rw [← hKcard, ← hAut]
   exact Subgroup.card_dvd_of_injective φV hinj
+
+/-- **Step (3), second branch — Half A** (the `𝔽_{2^p}`-side, p. 109): for any
+`a ∈ P`, conjugation by `a` on the Fitting subgroup `F(D̄) ≅ 𝔽_{2^p}ˣ` (the image
+of `K`) is a power-of-two map `t ↦ t^(2^i)`.
+
+This is `Aut(𝔽_{2^p}) = ⟨Frobenius⟩` (`ringAut_card_two_pow_eq_pow`) read through
+the adapted field model (`exists_adapted_field_model`): the model intertwines
+`fittingConjAction (toVbar a)` on `F(D̄)` with the field automorphism `σhom a`
+acting on `𝔽_{2^p}ˣ` via `μ`, and `σhom a` is a power of the Frobenius. -/
+theorem exists_pow_two_fittingConjAction (a : ↥fc.P) :
+    ∃ i : ℕ, ∀ t : ↥(fitting fc.toHypothesis.Dbar),
+      fc.toHypothesis.fittingConjAction (fc.toVbar a) t = t ^ (2 ^ i) := by
+  obtain ⟨F, hFld, hFin, eQ, μ, σhom, hcardF, hσinj, hlawQ, hlawμ, hfix⟩ :=
+    fc.exists_adapted_field_model
+  letI : Field F := hFld
+  letI : Finite F := hFin
+  have hcard2 : Nat.card F = 2 ^ fc.p := hcardF.trans fc.card_Q0_eq_two_pow
+  obtain ⟨i, hi⟩ := ringAut_card_two_pow_eq_pow hcard2 (σhom a)
+  refine ⟨i, fun t => ?_⟩
+  refine μ.injective ?_
+  rw [hlawμ a t, map_pow]
+  refine Units.ext ?_
+  rw [fieldRingAutOnUnits_apply_val, Units.val_pow_eq_pow_val]
+  exact hi _
 
 end FirstCaseHypothesis
 
