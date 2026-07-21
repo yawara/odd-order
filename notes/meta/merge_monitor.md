@@ -898,6 +898,21 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 22:20 (tick #17、Fable hub cron `490dde28`) — ✅ b + c 合流、census 6→7 (+1 = 新 decl scaffold、非問題)、push 済**:
+  **b** = ⭐ Pf Suzuki **Ch.II step (1) 完了** (C_D(P) = C_W(P) × P で全 5 主張) + step (2) —
+  奇数 kernel の four-subgroup lift + `RankOneHypothesis` 構成 + App C Prop 1 sorried-cite
+  (新 leaf `FirstCase/StepTwo.lean`) + **Brauer-Suzuki 定理 campaign を 9318 で claim** (App C
+  Prop 1 の前提、自バンド採番) + step (3) kernelFPF 実装プラン確定 (issue 2053)。
+  **c** = ⭐ **Thm 2.7 subgroup-level wrapper + Thm 2.9 完全証明** + 新 leaf `GlaubermanZJ.lean`
+  (IsPStableOp def + Thm 2.10 honest statement) + Thm 2.10 steps (a)/(b)/(c) 前半 (issue 9403)。
+  **a** = 未マージ 0 だが**生存** — commit は 21:45 止まり・transcript 21:49 stale だが、
+  worktree の `FeitSibleyReductionThree.lean` (未コミット新 leaf、reduction (3)) が 22:17:30 に
+  更新中 + live プロセス (4.5% CPU) + lake 2 本稼働。**a も b 同様 transcript が標準 project dir
+  に落ちない remote セッション型**と判明 (停止判定は file mtime + プロセスで行う)。
+  gate = build **4612 jobs green (24.1s、+2 = 新 leaf 2 本実 elaborate 確認)**、AxiomsCheck OK、
+  orphan 0 (896/896)、census 6→7 (+1 = `GlaubermanZJ.lean:99` Thm 2.10 honest statement の
+  faithful scaffold sorry、新規 file の新 decl ゆえ regression でない)、新 axiom なし、逸脱なし、
+  採番 open 重複なし。push 済。
 - **2026-07-21 21:50 (tick #16、Fable hub cron `490dde28`) — ✅ a + b + c 3 レーン合流、census 6 不変、push 済**:
   **a** = ⭐ FeitSibley **reduction (2) COMPLETE** (`sset_coherent_of_ssetOf_sder_coherent`) +
   還元宣言分岐 composer (two-primes / abelian-Q₁) + (3) 前提偵察 (原文 pp.144-147 実読、
