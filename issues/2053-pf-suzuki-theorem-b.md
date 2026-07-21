@@ -74,18 +74,62 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
 - [x] Ch.II hypothesis carrier — `FirstCaseHypothesis` (FirstCase/Basic.lean,
       `4a2fede50`): (B1) は「C_G(P) 内 EA-2 部分群 ≤ 2」形。
       p_odd / P ∩ W = ⊥ / C_{Q₀}(P) ≤ 2 も同 leaf
-- [ ] (1) V = W ⋊ P ほか
+- [x] (1) **完了 (2026-07-21)** — 全 5 主張 sorry 0・axiom-clean・
+      AxiomsCheck 6 本登録
   - [x] |Q₀| = 2^p (FirstCase/FieldAction.lean `card_Q0_eq_two_pow`,
         `a39140c69`): P ↪ V̄ (toVbar) → semilinear model 消費 →
         固定体 = F₂ (B1) → Artin で [F : F₂] = p
-  - [ ] C_K(P) = 1 (μ : fitting D̄ ≃* Fˣ + hκ equivariance +
-        Kbar_eq_fitting + V ⊓ K = ⊥ 経由)
-  - [ ] V = W ⋊ P (V/W ↪ Aut(F_{2^p}) cyclic p)
-  - [ ] N_G(P) = C_G(P) (§3 Prop 1(b) =
-        normalizer_eq_centralizer_mul_normalizer_inf_V) と
-        C_D(P) = C_W(P) × P
-- [ ] (2) C_G(P) の near-field 構造 (Appendix II 接続)
+  - [x] C_K(P) = 1 (StepOne `K_inf_centralizer_eq_bot`, `42ed5777d`);
+        |C_{Q₀}(P)| = 2 (StepOne `card_Q0_inf_centralizer_eq_two`,
+        軌道計数+Fermat, `c89a19234`); FieldAction は
+        `exists_adapted_field_model` bundle (eQ/μ/σhom + 固定元 0∨1) に
+        リファクタ済
+  - [x] V = W ⋊ P (`W_join_P_eq_V` + `exists_decomp_of_mem_V`;
+        |V̄| ∣ |Aut F| = p は natCard_ringAut_eq_finrank + char-2 同定)
+  - [x] N_G(P) = C_G(P) (`normalizer_P_eq_centralizer`; Prop 1(b) +
+        W∩N(P) ≤ C(P) の commutator トリック) と
+        C_D(P) = C_W(P) × P (`D_inf_centralizer_eq_W_inf_centralizer_join_P`;
+        D̄ = fitting ⋊ V̄ の成分分離 + `fitting_eq_one_of_conjAction_fixed`)
+- [x] (2) C_G(P) の near-field 構造 — StepTwo.lean (`c022a3d01` +
+      `e4e7eb646`): `exists_four_subgroup_of_quotient` (奇数 kernel の
+      EA-4 lift)、`rankOneQuotient` (RankOneHypothesis、sorry 0)、
+      `exists_affineNearFieldModel` (App C Prop 1 sorried-cite — 9318 待ち)。
+      ⚠ NearFields → Suzuki hub の import のため StepTwo は root/AxiomsCheck
+      直接配線 (hub 経由は cycle)
+  - **設計 (2026-07-21 調査)**: (2)(a) は §3 Prop 1(a) 部品
+    (`centralizerHypothesisA1 (X := P)` : HypothesisA1 C_G(P) Ω_P、
+    CentralizerInduction.lean:246) + kernel N = C_D(C_Q(P)) ∩ C_G(P) の同定。
+    (2)(b) は faithful 商 C_G(P)/N に `RankOneHypothesis` (NearFields.lean:652;
+    (A1)+(A2)+2-rank-1、2-rank-1 は (B1) から) を構成し
+    **`rankOne_affine_nearField` (App C Prop 1) を sorried-cite** して
+    `AffineNearFieldModel` を得る。
+  - ⚠ `rankOne_affine_nearField` は honestly-stated **sorry** (NearFields:741)。
+    未形式化前提 = (i) Huppert III 8.2 (2-rank 1 → Sylow-2 cyclic/quaternion)、
+    (ii) **Brauer–Suzuki** (G = O_{2'}(G)·C_G(u))、(iii) Huppert II 3.2
+    (normal complement)。方針 = sorried-cite で Theorem B の下流を実証明しつつ、
+    Brauer–Suzuki 形式化を独立 campaign として起票 (shared infra、9300 claim)
 - [ ] (3) 素因数の合同条件
+  - **被覆調査 (2026-07-21)**: (i) Q₁ = `hyp.Q1` (SylowDecomposition.lean:89、
+    Q1Subgroup + sylowTwoProdQ1MulEquiv で S × Q₁ 分解済) ✓。
+    (ii) [Is] 15.16 (dim M = |P|·dim C_M(P)) 相当 =
+    `finrank_eq_card_mul_finrank_invariants_kernelFPF` (WielandtKernelFPF:303)
+    ほか free/freeBlock 3 変種 — 適合形の確認要 ✓ 有望。
+    (iii) [H] V 8.15 (Frobenius complement の pq-部分群 cyclic →
+    dim C_M(P) = 1 で使用) — **無ヒット、ギャップ**。ただし使用点は
+    「C_M(P) の 1 次元性」1 箇所で、KP ≤ 近傍の cyclic 性など別供給も
+    検討余地あり。
+    (iv) App I Prop 2 = SemilinearField.lean「Proposition 2(a)」✓。
+    次: (ii) の正確な適合確認 → M (極小 EA r-部分群) の存在と KP-正規化の
+    構成 → (iii) ギャップの扱い決定
+  - **適合確認済 (2026-07-21)**: kernelFPF 変種が完全適合 — L := KP、
+    U := K (normal)、E := P、k := ZMod r、W := M (additive)。
+    invariants(ρ|K) = ⊥ は conjQByK_fixed_eq_one (K fpf on Q)。
+    結論 dim M = p·dim C_M(P) で **C_M(P) ≠ 0 も dim 等式から従う**
+    (原文の Frobenius 論法不要)。dim C_M(P) = 1 は原文どおり (2)(b) の
+    near-field 構造経由 = sorried 継承側。M 存在 =
+    MinimalInvariantNormal (exists_aInvariant_normal_isElementaryAbelian 系)。
+    実装プラン: StepThree.lean で (a) M 存在、(b) dim 等式 (sorry-free 側)、
+    (c) Clifford 二分岐 + App I Prop 2 + (2)(b) 消費 (sorried 継承側) の順
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐
