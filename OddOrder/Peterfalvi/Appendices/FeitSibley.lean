@@ -283,6 +283,135 @@ theorem Q1_normal_in_H [Finite G] {h : G} (hh : h ∈ hyp.H) {x : G} (hx : x ∈
   rw [hrw]
   exact hyp.Q1_conj_mem_of_mem_Q hq hδx
 
+/-- **Coset fixed-point-freeness** (the Frobenius property of `Q₁ D`): every element `k·δ`
+with `k ∈ Q₁` and `1 ≠ δ ∈ D` acts fixed-point-freely on `Q₁`.  Conjugation by `δ` is a
+fixed-point-free automorphism `α` of `Q₁` (`D_fixedPointFree_on_Q1`), so its commutator map
+`u ↦ u · α(u)⁻¹` is surjective (`MonoidHom.FixedPointFree.commutatorMap_surjective`); solving
+`α(u)·u⁻¹ = k⁻¹` produces `y = u⁻¹ ∈ Q₁` with `y (k δ) y⁻¹ = δ`, so `k δ` is `Q₁`-conjugate to
+`δ` and inherits its fixed-point-freeness.  This is the input to the Brauer-permutation inertia
+bound: `δ` fixes no nonidentity conjugacy class of `Q₁`. -/
+theorem fixedPointFree_of_mem_Q1_mul_D [Finite G] {k : G} (hk : k ∈ hyp.Q1)
+    {δ : G} (hδ : δ ∈ hyp.D) (hδ1 : δ ≠ 1) {x : G} (hx : x ∈ hyp.Q1)
+    (hfix : k * δ * x * (k * δ)⁻¹ = x) : x = 1 := by
+  -- conjugation-by-`δ` automorphism of `Q₁`
+  let α : hyp.Q1 ≃* hyp.Q1 :=
+    { toFun := fun z => ⟨δ * (z : G) * δ⁻¹, hyp.D_normalizes_Q1 hδ z.2⟩
+      invFun := fun z => ⟨δ⁻¹ * (z : G) * δ, by
+        simpa using hyp.D_normalizes_Q1 (hyp.D.inv_mem hδ) z.2⟩
+      left_inv := fun z => Subtype.ext (by simp only [Subgroup.coe_mk]; group)
+      right_inv := fun z => Subtype.ext (by simp only [Subgroup.coe_mk]; group)
+      map_mul' := fun z w => Subtype.ext (by
+        simp only [Subgroup.coe_mk, Subgroup.coe_mul]; group) }
+  have hαcoe : ∀ z : hyp.Q1, ((α z : hyp.Q1) : G) = δ * (z : G) * δ⁻¹ := fun _ => rfl
+  have hα_fpf : MonoidHom.FixedPointFree α := by
+    intro z hz
+    have hzG : δ * (z : G) * δ⁻¹ = (z : G) := by rw [← hαcoe z]; exact congrArg Subtype.val hz
+    exact Subtype.ext (hyp.D_fixedPointFree_on_Q1 δ hδ hδ1 (z : G) z.2 hzG)
+  -- solve the commutator equation `commutatorMap α u = k`, i.e. `u δ u⁻¹ δ⁻¹ = k`
+  obtain ⟨u, hu⟩ := hα_fpf.commutatorMap_surjective (⟨k, hk⟩ : hyp.Q1)
+  have hval : (u : G) * (δ * (u : G) * δ⁻¹)⁻¹ = k := by
+    have h := congrArg (Subtype.val) hu
+    simpa only [MonoidHom.commutatorMap_apply, div_eq_mul_inv, Subgroup.coe_mul,
+      Subgroup.coe_inv, Subgroup.coe_mk, hαcoe] using h
+  -- `y = u⁻¹ ∈ Q₁` conjugates `k δ` to `δ`
+  have huQ1 : (u : G) ∈ hyp.Q1 := u.2
+  set y : G := (u : G)⁻¹ with hy
+  have hyQ1 : y ∈ hyp.Q1 := hyp.Q1.inv_mem huQ1
+  have hconj : y * (k * δ) * y⁻¹ = δ := by
+    have hk_eq : k = (u : G) * δ * (u : G)⁻¹ * δ⁻¹ := by rw [← hval]; group
+    rw [hk_eq, hy]; group
+  -- transfer fixed-point-freeness from `δ` to `k δ`
+  have hyxQ1 : y * x * y⁻¹ ∈ hyp.Q1 :=
+    hyp.Q1.mul_mem (hyp.Q1.mul_mem hyQ1 hx) (hyp.Q1.inv_mem hyQ1)
+  have hfixδ : δ * (y * x * y⁻¹) * δ⁻¹ = y * x * y⁻¹ := by
+    have h1 : y * (k * δ) * y⁻¹ * (y * x * y⁻¹) * (y * (k * δ) * y⁻¹)⁻¹
+        = y * (k * δ * x * (k * δ)⁻¹) * y⁻¹ := by group
+    rw [hconj, hfix] at h1
+    exact h1
+  have hyxone : y * x * y⁻¹ = 1 :=
+    hyp.D_fixedPointFree_on_Q1 δ hδ hδ1 (y * x * y⁻¹) hyxQ1 hfixδ
+  have : x = y⁻¹ * 1 * y := by rw [← hyxone]; group
+  simpa using this
+
+/-- `H ≤ N_G(Q₁)`: every element of `H` normalises `Q₁` (both containments of
+`Subgroup.mem_normalizer_iff` from `Q1_normal_in_H`, the backward one via `h⁻¹ ∈ H`). -/
+theorem H_le_normalizer_Q1 [Finite G] : hyp.H ≤ Subgroup.normalizer hyp.Q1 := by
+  intro h hh
+  rw [Subgroup.mem_normalizer_iff]
+  intro n
+  refine ⟨fun hn => hyp.Q1_normal_in_H hh hn, fun hn => ?_⟩
+  have hkey := hyp.Q1_normal_in_H (hyp.H.inv_mem hh) hn
+  have hrw : h⁻¹ * (h * n * h⁻¹) * (h⁻¹)⁻¹ = n := by group
+  rwa [hrw] at hkey
+
+/-- **`Q₁ ⊴ H`, as a `Subgroup.Normal` instance for the subtype form** `Q₁.subgroupOf H ⊴ ↥H`,
+from `H ≤ N_G(Q₁)`. -/
+theorem Q1_subgroupOf_H_normal [Finite G] : (hyp.Q1.subgroupOf hyp.H).Normal :=
+  Subgroup.normal_subgroupOf_of_le_normalizer hyp.H_le_normalizer_Q1
+
+/-- **`δ` fixes no nonidentity conjugacy class of `Q₁`** (viewed inside `↥H`): for `1 ≠ δ ∈ D`,
+a `δ`-fixed class of `Q₁.subgroupOf H` is the identity class.  A fixed class `⟦h⟧` gives
+`c·(δ h δ⁻¹)·c⁻¹ = h` for some `c ∈ Q₁`, i.e. `(c δ) h (c δ)⁻¹ = h`; since `c δ` acts
+fixed-point-freely on `Q₁` (`fixedPointFree_of_mem_Q1_mul_D`), `h = 1`. -/
+theorem delta_fixed_class_eq_one [Finite G] [(hyp.Q1.subgroupOf hyp.H).Normal] {δ : ↥hyp.H}
+    (hδD : (δ : G) ∈ hyp.D) (hδ1 : δ ≠ 1)
+    {C : ConjClasses ↥(hyp.Q1.subgroupOf hyp.H)}
+    (hfix : ConjClasses.conjByPerm (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ C = C) :
+    C = 1 := by
+  rcases ConjClasses.exists_rep C with ⟨h, rfl⟩
+  by_cases hh : h = 1
+  · rw [hh, ConjClasses.one_eq_mk_one]
+  exfalso
+  have hmk : ConjClasses.mk (ClassFunction.conjByMulEquiv
+      (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ h) = ConjClasses.mk h := by
+    simpa [ConjClasses.conjByPerm_mk] using hfix
+  obtain ⟨c, hc⟩ := isConj_iff.mp (ConjClasses.mk_eq_mk_iff_isConj.mp hmk)
+  -- push the conjugacy equation to `↥H` then to `G`
+  have hcH : (c : ↥hyp.H) * (δ * (h : ↥hyp.H) * δ⁻¹) * (c : ↥hyp.H)⁻¹ = (h : ↥hyp.H) := by
+    have := congrArg (fun z : ↥(hyp.Q1.subgroupOf hyp.H) => (z : ↥hyp.H)) hc
+    simpa only [Subgroup.coe_mul, Subgroup.coe_inv, ClassFunction.conjByMulEquiv_apply] using this
+  have hcG := congrArg (fun z : ↥hyp.H => (z : G)) hcH
+  simp only [Subgroup.coe_mul, Subgroup.coe_inv] at hcG
+  -- apply the coset fixed-point-freeness
+  have hcG_mem : ((c : ↥hyp.H) : G) ∈ hyp.Q1 := (Subgroup.mem_subgroupOf).mp c.2
+  have hhG_mem : ((h : ↥hyp.H) : G) ∈ hyp.Q1 := (Subgroup.mem_subgroupOf).mp h.2
+  have hfixG : ((c : ↥hyp.H) : G) * (δ : G) * ((h : ↥hyp.H) : G)
+      * (((c : ↥hyp.H) : G) * (δ : G))⁻¹ = ((h : ↥hyp.H) : G) := by
+    have e : ((c : ↥hyp.H) : G) * (δ : G) * ((h : ↥hyp.H) : G)
+        * (((c : ↥hyp.H) : G) * (δ : G))⁻¹
+        = ((c : ↥hyp.H) : G) * ((δ : G) * ((h : ↥hyp.H) : G) * (δ : G)⁻¹)
+          * ((c : ↥hyp.H) : G)⁻¹ := by group
+    rw [e, hcG]
+  have hδG1 : (δ : G) ≠ 1 := fun hc => hδ1 (Subtype.ext (by simpa using hc))
+  have hhG1 : ((h : ↥hyp.H) : G) = 1 :=
+    hyp.fixedPointFree_of_mem_Q1_mul_D hcG_mem hδD hδG1 hhG_mem hfixG
+  exact hh (Subtype.ext (Subtype.ext (by simpa using hhG1)))
+
+/-- **Brauer count**: `δ ∈ D^#` fixes exactly one conjugacy class of `Q₁.subgroupOf H` — the
+identity class (`delta_fixed_class_eq_one`). -/
+theorem card_fixedClasses_Q1_eq_one [Finite G] [(hyp.Q1.subgroupOf hyp.H).Normal] {δ : ↥hyp.H}
+    (hδD : (δ : G) ∈ hyp.D) (hδ1 : δ ≠ 1) :
+    Nat.card (Function.fixedPoints (ConjClasses.conjByPerm
+      (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ)) = 1 := by
+  have hfix_one : ∀ E : Function.fixedPoints (ConjClasses.conjByPerm
+      (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ), (E : ConjClasses _) = 1 :=
+    fun E => hyp.delta_fixed_class_eq_one hδD hδ1 E.2.eq
+  rw [Nat.card_eq_one_iff_unique]
+  exact ⟨⟨fun C D => Subtype.ext ((hfix_one C).trans (hfix_one D).symm)⟩,
+    ⟨⟨1, ConjClasses.conjByPerm_one (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ⟩⟩⟩
+
+/-- **`δ ∈ D^#` is not in the inertia group of any nontrivial `θ ∈ Irr(Q₁)`** (viewed inside
+`↥H`).  Brauer's permutation lemma (`not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one`)
+turns the single-fixed-class count `card_fixedClasses_Q1_eq_one` into inertia exclusion. -/
+theorem delta_notMem_inertia_Q1 [Finite G] [(hyp.Q1.subgroupOf hyp.H).Normal] {δ : ↥hyp.H}
+    (hδD : (δ : G) ∈ hyp.D) (hδ1 : δ ≠ 1)
+    {θ : IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)}
+    (hθ : θ ≠ trivialIrreducibleCharacter _) :
+    δ ∉ IrreducibleCharacter.inertia (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) θ := by
+  haveI : Finite ↥(hyp.Q1.subgroupOf hyp.H) := Finite.of_injective _ Subtype.val_injective
+  exact not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one δ
+    (hyp.card_fixedClasses_Q1_eq_one hδD hδ1) hθ
+
 /-- `d = |D| > 0`. -/
 theorem d_pos [Finite G] : 0 < hyp.d := Nat.card_pos
 
@@ -415,7 +544,8 @@ theorem coherent_adjoin_of_degree_bound
     have hsupp := hdegdiffsupp i hi
     rw [hfactor] at hsupp
     exact (hsupp_nsmul (degMem i₁) _ hdegpos.ne').trans hsupp
-  -- `hgen`: the supported part of `ℤ[𝒮₁ ∪ {χ,χ̄}]` is generated by `ℤ[𝒮₁,A]`, `χ−χ̄`, `χ−a·χmem i₁`.
+  -- `hgen`: the supported part of `ℤ[𝒮₁ ∪ {χ,χ̄}]` is generated by `ℤ[𝒮₁,A]`, `χ−χ̄`, and
+  -- `χ−a·χmem i₁`.
   have hgen := zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
     (chibar := χ.conj) hSgen hχ1 hbar1 hchi1_ne h1A
   -- `R(χmem i) ⊥ R(χ)` for each member, from `χmem i ⊥ χ, χ̄`.
