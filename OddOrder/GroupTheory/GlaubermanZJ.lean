@@ -819,37 +819,37 @@ theorem map_centralizer_inf_of_disjoint_ker {N : Type*} [Group N] {f : G →* N}
     rw [map_mul, map_mul]
     exact mem_centralizer_iff.mp hyC (f j) (mem_map_of_mem f hj)
 
-open OddOrder.Isaacs.Ch01 OddOrder.Isaacs.Ch03 in
-/-- **Gorenstein Theorem 2.11 (Glauberman の `Z(J)`-定理) — 一般形**:
-`G` 有限, `p` 奇素数, 商 `Ḡ := G/O_{p'}(G)` が p-stable (`IsPStableOp`) かつ
-p-constrained (`O_{p'}(Ḡ) = 1` ゆえ `C_Ḡ(O_p(Ḡ)) ≤ O_p(Ḡ)` の形),
-`P ∈ Syl_p(G)` なら `G = O_{p'}(G) · N_G(Z(J_a(P)))` (sup 形で符号化).
+open OddOrder.Isaacs.Ch03 in
+/-- `φ = mk' O_{p'}(G)` は Sylow `p`-部分群上単射 (`P ⊓ O_{p'} = ⊥`, p-群 vs p'-群). -/
+theorem disjoint_ker_mk'_oPiCorePrime [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) :
+    Disjoint (P : Subgroup G) (QuotientGroup.mk' (oPiCore {q | q ≠ p} G)).ker := by
+  rw [QuotientGroup.ker_mk', disjoint_comm, disjoint_iff]
+  exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.inf_eq_bot_of_isPGroup_not_mem
+    (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup _) P.isPGroup' (fun h => h rfl)
 
-証明 (p. 279): 商 `Ḡ` で `Z(J_a(P̄)) ⊴ Ḡ` (`O_{p'} = 1` 形の Thm 2.11);
-`φ|_P` は単射 (`P ⊓ O_{p'} = ⊥`, p-群 vs p'-群) なので
-`Z(J_a(P̄)) = φ(Z(J_a(P)))`; 逆像 `K = Z(J_a(P)) ⊔ O_{p'} ⊴ G` において
-`Z(J_a(P)) = P ⊓ K ∈ Syl_p(K)` (Thm 1.3.8), Frattini (Thm 1.3.7) で
-`G = K·N_G(Z(J_a(P))) = O_{p'}(G)·N_G(Z(J_a(P)))`. -/
-theorem oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian [Finite G] {p : ℕ}
+open OddOrder.Isaacs.Ch01 OddOrder.Isaacs.Ch03 in
+/-- **Gorenstein Theorem 2.11 の引き戻し形 (= BG Theorem 6.2 の核)**:
+商 `Ḡ = G/O_{p'}(G)` が p-stable (`IsPStableOp`) かつ p-constrained なら
+`Z(J_a(P))·O_{p'}(G) ⊴ G` (`⊔` で符号化).
+
+証明: `Z(J_a(P̄)) ⊴ Ḡ` (`O_{p'} = 1` 形の Thm 2.11) の `φ⁻¹` が
+`Z ⊔ O_{p'}` (`comap_map_eq` + `φ|_P` 単射で `Z(J_a(P̄)) = φ(Z(J_a(P)))`). -/
+theorem zCenter_thompsonJAbelian_sup_oPiCorePrime_normal [Finite G] {p : ℕ}
     [Fact p.Prime] (hp2 : p ≠ 2)
     (hstable : IsPStableOp p (G ⧸ oPiCore {q | q ≠ p} G))
     (hconstr :
       centralizer ((opCore p (G ⧸ oPiCore {q | q ≠ p} G) : Subgroup _) : Set _)
         ≤ opCore p (G ⧸ oPiCore {q | q ≠ p} G))
     (P : Sylow p G) :
-    oPiCore {q | q ≠ p} G
-      ⊔ normalizer ((centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
-          ⊓ thompsonJAbelian (P : Subgroup G) : Subgroup G) : Set G) = ⊤ := by
+    (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G)
+      ⊔ oPiCore {q | q ≠ p} G).Normal := by
   set Kp' := oPiCore {q | q ≠ p} G with hKp'def
   set φ := QuotientGroup.mk' Kp' with hφdef
   set Z := centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
       ⊓ thompsonJAbelian (P : Subgroup G) with hZdef
-  have hkerφ : φ.ker = Kp' := QuotientGroup.ker_mk' Kp'
-  -- `φ` は `P` 上単射: `P ⊓ O_{p'} = ⊥` (p-群 vs p'-群).
-  have hdisjP : Disjoint (P : Subgroup G) φ.ker := by
-    rw [hkerφ, disjoint_comm, disjoint_iff]
-    exact OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.inf_eq_bot_of_isPGroup_not_mem
-      (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup _) P.isPGroup' (fun h => h rfl)
+  have hdisjP : Disjoint (P : Subgroup G) φ.ker := disjoint_ker_mk'_oPiCorePrime P
   -- 商 `Ḡ` での `Z(J_a(P̄)) ⊴ Ḡ` (`O_{p'} = 1` 形).
   set Pbar : Sylow p (G ⧸ Kp') := P.mapSurjective (QuotientGroup.mk'_surjective Kp')
     with hPbardef
@@ -867,26 +867,63 @@ theorem oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian [Finite G] {p : ℕ
         ⊓ thompsonJAbelian (Pbar : Subgroup (G ⧸ Kp')) := by
     rw [hZdef, map_centralizer_inf_of_disjoint_ker
       (hdisjP.mono_left (thompsonJAbelian_le _)), hJmap]
-  -- 逆像 `K = Z ⊔ O_{p'} ⊴ G`.
-  set K := (Z.map φ).comap φ with hKdef
-  haveI hKnormal : K.Normal := by
-    rw [hKdef, hZmap]
+  -- 逆像 `φ⁻¹(Z(J_a(P̄))) = Z ⊔ O_{p'}` は正規.
+  have hKnormal : ((Z.map φ).comap φ).Normal := by
+    rw [hZmap]
     exact Subgroup.normal_comap φ
-  have hKeq : K = Z ⊔ Kp' := by rw [hKdef, Subgroup.comap_map_eq, hkerφ]
-  -- `P ⊓ K = Z`.
+  have hKeq : (Z.map φ).comap φ = Z ⊔ Kp' := by
+    rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+  rwa [hKeq] at hKnormal
+
+open OddOrder.Isaacs.Ch01 OddOrder.Isaacs.Ch03 in
+/-- **Gorenstein Theorem 2.11 (Glauberman の `Z(J)`-定理) — 一般形**:
+`G` 有限, `p` 奇素数, 商 `Ḡ := G/O_{p'}(G)` が p-stable (`IsPStableOp`) かつ
+p-constrained (`O_{p'}(Ḡ) = 1` ゆえ `C_Ḡ(O_p(Ḡ)) ≤ O_p(Ḡ)` の形),
+`P ∈ Syl_p(G)` なら `G = O_{p'}(G) · N_G(Z(J_a(P)))` (sup 形で符号化).
+
+証明 (p. 279): `K := Z(J_a(P)) ⊔ O_{p'} ⊴ G`
+(`zCenter_thompsonJAbelian_sup_oPiCorePrime_normal`) において
+`Z(J_a(P)) = P ⊓ K ∈ Syl_p(K)` (Thm 1.3.8), Frattini (Thm 1.3.7) で
+`G = K·N_G(Z(J_a(P))) = O_{p'}(G)·N_G(Z(J_a(P)))`. -/
+theorem oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian [Finite G] {p : ℕ}
+    [Fact p.Prime] (hp2 : p ≠ 2)
+    (hstable : IsPStableOp p (G ⧸ oPiCore {q | q ≠ p} G))
+    (hconstr :
+      centralizer ((opCore p (G ⧸ oPiCore {q | q ≠ p} G) : Subgroup _) : Set _)
+        ≤ opCore p (G ⧸ oPiCore {q | q ≠ p} G))
+    (P : Sylow p G) :
+    oPiCore {q | q ≠ p} G
+      ⊔ normalizer ((centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+          ⊓ thompsonJAbelian (P : Subgroup G) : Subgroup G) : Set G) = ⊤ := by
+  set Kp' := oPiCore {q | q ≠ p} G with hKp'def
+  set φ := QuotientGroup.mk' Kp' with hφdef
+  set Z := centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G) with hZdef
+  have hkerφ : φ.ker = Kp' := QuotientGroup.ker_mk' Kp'
+  have hdisjP : Disjoint (P : Subgroup G) φ.ker := disjoint_ker_mk'_oPiCorePrime P
+  -- `K = Z ⊔ O_{p'} ⊴ G` (BG Thm 6.2 形).
+  haveI hKnormal : (Z ⊔ Kp').Normal :=
+    zCenter_thompsonJAbelian_sup_oPiCorePrime_normal hp2 hstable hconstr P
+  set K := Z ⊔ Kp' with hKdef
+  -- `P ⊓ K = Z`: `φ(K) = φ(Z)` と `φ|_P` の単射性から.
   have hZP : Z ≤ (P : Subgroup G) := inf_le_right.trans (thompsonJAbelian_le _)
   have hPK : (P : Subgroup G) ⊓ K = Z := by
     apply le_antisymm
     · rintro x ⟨hxP, hxK⟩
-      obtain ⟨z, hz, hzx⟩ := mem_comap.mp hxK
+      have hφx : φ x ∈ Z.map φ := by
+        have hmem : φ x ∈ K.map φ := mem_map_of_mem φ hxK
+        have hbot : Kp'.map φ = ⊥ :=
+          (Subgroup.map_eq_bot_iff _).mpr hkerφ.symm.le
+        rwa [hKdef, Subgroup.map_sup, hbot, sup_bot_eq] at hmem
+      obtain ⟨z, hz, hzx⟩ := hφx
       exact (eq_of_map_eq_of_disjoint_ker hdisjP (hZP hz) hxP hzx) ▸ hz
-    · exact le_inf hZP (hKeq ▸ le_sup_left)
+    · exact le_inf hZP le_sup_left
   -- `Z ∈ Syl_p(K)` (Thm 1.3.8) + Frattini (Thm 1.3.7).
   obtain ⟨Q, hQ⟩ := exists_sylow_inf_of_normal P K
   have hQmap : (Q : Subgroup ↥K).map K.subtype = Z := by
     rw [hQ, subgroupOf_map_subtype, inf_of_le_left inf_le_right, hPK]
   have hfr := Sylow.normalizer_sup_eq_top (p := p) (N := K) Q
-  rw [hQmap, hKeq] at hfr
+  rw [hQmap, hKdef] at hfr
   -- `⊤ = N(Z) ⊔ (Z ⊔ O_{p'}) = O_{p'} ⊔ N(Z)` (`Z ≤ N(Z)`).
   rw [← hfr]
   apply le_antisymm
