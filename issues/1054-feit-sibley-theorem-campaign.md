@@ -220,6 +220,33 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     FeitSibleyTheorem.lean に汎用形 (Hypothesis 非依存、Set (ClassFunction L ℂ) レベル)
     で置く — hub 判断で S07_Coherence 側へ移設可。
 
+### 反例中核補題の供給表 (2026-07-21 固定; 次 iteration で実装)
+
+`not_hDeg_of_step_incoherent` 案: S₁ ⊆ 𝒮 共役閉・有限、anchor χ₀ ∈ S₁ (χ₀(1) = d)、
+χ ∈ 𝒮, χ ∉ S₁, χ̄ ∉ S₁、hcoh : S₁ coherent、hfail : ¬(S₁ ∪ {χ,χ̄}) coherent ⟹
+Σ_{x∈S₁} (x(1)/d)² ≤ 2a (実数、χ(1) = a·d)。1(a) 対偶で、引数供給:
+- hyp := ssetS07Hypothesis hd hQ1odd / h1A := one_notMem_A
+- enumeration: ι := ClassFunction ↥H ℂ, s := hS₁fin.toFinset, χmem := id,
+  degMem := fun x => if h : x ∈ 𝒮 then (exists_apply_one_eq_d_mul h).choose * d else 0
+  … ではなく **degMem x := (χ(1) の実部を Nat 化)** は不安定なので
+  choose ベース: `degMem x := d * m_x` (m_x = choose)。hdegMem = choose_spec、
+  hdvd = ⟨m_x⟩ (d ∣ d·m_x)、hdegpos (anchor: m=1)。
+- hχχ/hχbarχbar = hself (irreducibleCharacter_inner_eq_ite if_pos)
+- hχ_S1/hχbar_S1 = Sset_pairwiseOrthogonal + freshness (χ ≠ x ∀x∈S₁ from χ∉S₁;
+  χ̄ ≠ x from χ̄∉S₁)
+- hdiffsuppχ = conj_diff_support_subset_A_of_mem_Sset
+- hmemortho/hmemconjortho = pairwise + no-real (x̄ ≠ x)
+- hmembarS1 = S₁ 共役閉 / hcover = toFinset 全射 (mem_toFinset)
+- hmemdiffsupp = conj_diff_support (member 版) / hdegdiffsupp =
+  scaled_diff_support_subset_A_of_mem_Sset (7c8775769; 度数一致 d·(d·mᵢ) = (d·mᵢ)·d)
+- hχdeg = exists_apply_one_eq_d_mul (a := m_χ) / hdiffasuppχ = scaled 版 n=1
+  (one_smul glue) / htau1_memaχ = tau_mem_ZIrr (sub_mem span + nsmul_mem)
+- 結論: hfail (coherent_adjoin_of_degree_bound … hDeg) の対偶 → ¬hDeg → push_neg
+  → Σ ≤ 2a。
+その後 (1.1): Σ_{S₁}(x(1)/d)² ≥ Σ_{𝒮(S'Q₂)}(…)² = (|H⧸…| − |H⧸…|)/d²
+(sum_degreeSq_SsetOf; base ⊆ S₁ 単調) — ℂ→ℝ 変換は度数が実 (d·m) なので
+(x(1))² の Re で。
+
 ## 完了条件
 
 `feit_sibley_coherence` sorry-free + axiom-clean + build green。
