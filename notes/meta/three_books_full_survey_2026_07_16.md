@@ -480,8 +480,8 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Lem 1.1** solvable minimal normal subgroup lies in Z(F(G)) and is elementary abe — S01_FrattiniBurnside.lean, sorry-free. Conclusion is full (M ≤ F(G) ∧ M ≤ C_G(F(G)) ∧ elementary abelian = M ≤ Z(F(G))), but hypothesis is [IsSolvable G] where …
-- **Lem 1.9** stabilizer of a normal series of a π-group: A/C_A(G) is a π-group — S01_Solvable.lean, sorry-free. Formalized as the coprime core: a coprime operator group stabilizing a normal chain acts trivially — both the 2-step instance and…
+- **Lem 1.1** solvable minimal normal subgroup lies in Z(F(G)) and is elementary abe — S01_FrattiniBurnside.lean, sorry-free. Conclusion is full (M ≤ F(G) ∧ M ≤ C_G(F(G)) ∧ elementary abelian = M ≤ Z(F(G))), but hypothesis is [IsSolvable G] where … **[2026-07-22 lane c: 特殊化解消 — `[IsSolvable ↥M]` に一般化 (book 強度)、call site 無変更で green、axiom-clean]**
+- **Lem 1.9** stabilizer of a normal series of a π-group: A/C_A(G) is a π-group — S01_Solvable.lean, sorry-free. Formalized as the coprime core: a coprime operator group stabilizing a normal chain acts trivially — both the 2-step instance and… **[2026-07-22 lane c: 逐語 packaging 追加 — `primeFactors_card_quotient_ker_subset_of_stabilizes_chain` (S01_Solvable.lean、A/C_A(K) = A⧸ψ.ker が π-群)、axiom-clean。§1 の特殊化債務は全て解消]**
 - **Prop 1.15** (a) Hall–Higman Lemma 1.2.3: C_G(T) ≤ O_{p',p}(G) for T Sylow-p in O_{ — (b) fully formalized sorry-free at book strength (general G solvable, no O_{p'}=1 hypothesis). (a) is present as the O_{p'}(G)=1 specialization C_G(O_p(G)) ≤ O_… **[2026-07-18: (a) 一般形 CLOSED ⟹ 特殊化債務解消]** `S01_Solvable.centralizer_le_oPiPrimePiCore_of_cover` が O_{p'}(G)=1 仮定を除去した一般形 (π-separable G, 任意の π-層) を axiom-clean で証明。Sylow 仮定は covering 仮定 `O_{π',π}(G) ≤ T ⊔ O_{π'}(G)` に弱められており (book より強い)、book の literal Sylow 形への橋渡しは `sup_oPiCore_compl_eq_oPiPrimePiCore_of_isSylow` (同 file、axiom-clean)。証明は Ḡ=G/O_{π'}(G) へ落として `Isaacs.Ch03.hall_higman_1_2_3` を適用するだけ (Lem 1.14 は不要 — centralizer の push-forward は易方向で足りる)。
 
 ### BG §2 — BG §2 General Results on Representations
@@ -505,7 +505,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Thm 3.10** Solvable Frobenius G=KR acting on nonidentity nilpotent M coprimely, C — Split over S03g_Thm310{,Core,Module,General,ElemAbelian}.lean, all sorry-free. Coverage: (a)+(b)+(c) fully proved for M an ELEMENTARY ABELIAN p-group with gener… **[2026-07-18: (a) の nilpotency 仮定 CLOSED]** `prime_card_complement_of_frobenius_conj` (S03g_Thm310.lean) が担いでいた `_hMnilp : Group.IsNilpotent ↥M` は証明本体で**一度も使われていなかった** (signature に 1 回出るのみ) ため除去。U abelian 版では minimal E-invariant normal への reduction に nilpotency が不要ゆえ、(a) の群形は **book より強い** (M は nonidentity E-invariant + coprime のみ)。唯一の caller ElemAbelianNeighbor.lean:417 も追従済 (build green, axiom-clean)。**(b)(c) の M elementary abelian 制限は未解消** (nilpotent M への G-invariant normal series 帰納が残作業)。
+- **Thm 3.10** Solvable Frobenius G=KR acting on nonidentity nilpotent M coprimely, C — Split over S03g_Thm310{,Core,Module,General,ElemAbelian}.lean, all sorry-free. Coverage: (a)+(b)+(c) fully proved for M an ELEMENTARY ABELIAN p-group with gener… **[2026-07-18: (a) の nilpotency 仮定 CLOSED]** `prime_card_complement_of_frobenius_conj` (S03g_Thm310.lean) が担いでいた `_hMnilp : Group.IsNilpotent ↥M` は証明本体で**一度も使われていなかった** (signature に 1 回出るのみ) ため除去。U abelian 版では minimal E-invariant normal への reduction に nilpotency が不要ゆえ、(a) の群形は **book より強い** (M は nonidentity E-invariant + coprime のみ)。唯一の caller ElemAbelianNeighbor.lean:417 も追従済 (build green, axiom-clean)。~~**(b)(c) の M elementary abelian 制限は未解消** (nilpotent M への G-invariant normal series 帰納が残作業)。~~ **[2026-07-22 lane c 実測訂正: この注記は同日 (07-18) の `bgThm310_nilpotent` landing (unit summary 参照) より古く stale — (b)(c) は一般 nilpotent (実は solvable) M で完成済み。§3 の特殊化債務はゼロ]**
 
 ### BG §4 — BG §4 p-Groups of Small Rank
 
@@ -678,7 +678,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Pf §15 | 19 | 18 | 1 | 0 | 0 | 0 |
 | Pf §16 | 16 | 16 | 0 | 0 | 0 | 0 |
 | Pf App: Suzuki | 32 | 0 | 0 | 0 | 32 | 0 |
-| Pf App: Huppert | 3 | 1 | 0 | 2 | 0 | 0 |
+| Pf App: Huppert | 3 | 1 | 0 | 2 | 0 | 0 | ⚠ 2026-07-22 lane c 訂正: **3/3 済** — Lemma/Prop 1 は 07-19 hub 監査で済、Prop 2(b) の C_U(s)↪Aut(F) 節も `exists_injective_semilinear_companion` (SemilinearField.lean:520, commit 60314f15e, AxiomsCheck 登録済) で解消済み |
 | Pf App: NearFields | 6 | 2 | 0 | 2 | 2 | 0 |
 | Pf App: Suzuki2Groups | 8 | 2 | 0 | 2 | 4 | 0 |
 | Pf App: FeitSibley | 13 | 0 | 0 | 1 | 12 | 0 |
