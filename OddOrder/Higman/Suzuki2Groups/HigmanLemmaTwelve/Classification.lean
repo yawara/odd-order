@@ -116,6 +116,61 @@ theorem isTypeB_of_mixedTerm
     typeBQuadraticMap_apply, hthetaL, hthetaR, hM]
   ring
 
+/-- **Higman Lemma 12, type-B endpoint (parametrised by an arbitrary
+coordinate).**  The same engine as `isTypeB_of_mixedTerm`, but for any linear
+coordinate `e` of the zeroth layer whose transported square form is the type-B
+quadratic map.  The B case with `θ = φ ≠ 1` enters through the sheared
+coordinate `(shearRescaleLinearEquiv ρ t ht).trans e`, which removes the
+`θ(α)·β` monomial of the mixed term. -/
+theorem isTypeB_of_squareCoordinate
+    {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (e :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      (GaloisField 2 n × GaloisField 2 n) ≃ₗ[ZMod 2]
+        Additive (lowerCentralLayer P 0))
+    (phi : RingAut (GaloisField 2 n))
+    (phi_odd : Odd (orderOf phi))
+    (epsilon : (GaloisField 2 n)ˣ)
+    (hEpsilon : IsTypeBEpsilon phi (epsilon : GaloisField 2 n))
+    (n_pos : 0 < n)
+    (card_field : Nat.card (GaloisField 2 n) = 2 ^ n)
+    (hcentral :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      (ambientProductExtension hK0 e ePhi).inl.range ≤ Subgroup.center P)
+    (hq :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∀ w : GaloisField 2 n × GaloisField 2 n,
+        ambientCenterCoordinate hEA hK1amb htermamb ePhi
+          (lowerCentralSquareMapAdditive P hSqamb (e w)) =
+        typeBQuadraticMap phi (epsilon : GaloisField 2 n) w) :
+    IsTypeB.{uP, 0} P := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  exact ⟨TypeBData.ofExtension n n_pos card_field phi phi_odd epsilon hEpsilon
+    (ambientProductExtension hK0 e ePhi) hcentral
+    (fun x => ambientProductExtension_hsq_of_coordinate hEA hK1amb htermamb
+      hSqamb hAgemoamb hK0 ePhi e
+      (typeBQuadraticMap phi (epsilon : GaloisField 2 n)) hq x)⟩
+
 /-- **Higman Lemma 12, type-C endpoint (parametrised by the mixed term).**
 The left factor carries `θ` (with `2θ² = 1`), the right factor is commutative,
 and the mixed term is the type-C pairing `M(α, β) = ε · (α^{1/2} · (2θ)(β))`. -/
