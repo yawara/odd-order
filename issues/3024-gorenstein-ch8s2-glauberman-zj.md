@@ -96,6 +96,22 @@ elementary 版向けに議論を非自明に adapt するかの**設計判断**�
 - `coq/theories/BGappendixAB.v:16` / `BGsection1.v:35` — math-comp が ZJ を Puig `L(S)` で代替。
 - `references/gorenstein/finite-groups.mmd` L5431-5622 (Ch.8 §2)。
 
+## ✅ 2026-07-21 (lane c): 設計判断確定 — abelian 版 `J_a` 新設 (claim = issue 9403)
+
+「⚠ 最大のリスク」の設計判断を決着:
+
+- **BG の J(S) = Gorenstein 版** (abelian・最大位数) と確定 — BG は J を自前定義せず
+  (記号表 L8611 の初出 = Thm 6.2 自身、証明 = G 引用のみ)。
+- **elementary 版への adapt は不可能**: G Lem 2.1 (`A = C_P(A)`) の証明は
+  「`x ∈ C_P(A)` ⟹ `⟨A,x⟩` abelian でより大」で、全 abelian 中の最大性が本質。
+  elementary 版では `⟨A,x⟩` が elementary と限らず**偽**。
+- ⟹ **`Subgroup.thompsonJAbelian` を新設して忠実移植** (`OddOrder/GroupTheory/
+  ThompsonSubgroupAbelian.lean`、shared infra claim = **issue 9403** 承認待ちでなく
+  claim-before-build 手順済)。
+- ⚠ **副産物**: `S06_Thm62JS.lean:71` の `hZJ` が elementary `thompsonJ` で符号化されて
+  いるのは BG literal との**ミスマッチ**。J_a 完成後に hZJ・結論とも J_a 形へ言い直す
+  (reduction 証明は共変性 lemma を J_a 版へ差し替えて再利用)。3017 close の一部。
+
 ## 付随 — lane a への申し送り (Isaacs/Ch07 は lane a territory ゆえ本 lane で直さない)
 
 調査中に stale docstring 3 件を検出:
