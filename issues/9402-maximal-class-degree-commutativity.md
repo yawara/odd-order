@@ -115,3 +115,13 @@ GPT-5.6 Sol Pro + 親計算検証で **dc≥1 は E.4 の印刷仮説から従�
 3. E.5 も同様に gated (dc≥1 供給が要る)。
 
 ⚠ 「dc≥1 を maximal-class + fpf B から出す」路線 (旧 claim) は**放棄** (偽ゆえ)。
+
+## 2026-07-21 (第 2 セッション): 文献照合で概念名が確定 — **exceptional** (Leedham-Green–McKay)
+
+- 「2-step centralizer が全て一致」は maximal class 理論の標準概念 **non-exceptional** そのもの
+  (exceptional ⟺ ∃i, `C_G(γᵢ/γ_{i+2}) ≠ G₁`; **dc>0 ⟺ non-exceptional** (n≥5) は standard fact)。
+  Blackburn: `n > p+1 ⟹ dc>0`。Q₆ は n=6 の既知 exceptional クラスの実例。
+- ⟹ leaf `MaximalClassPGroup.lean` の語彙はこれに合わせる (`IsExceptional` 系 or 2-step 述語 +
+  dc 同値)。clean Lemma = この同値の形式化 (群レベル、iterCommutator + Hall–Witt; Lie ring 不要)。
+- E.4 側の hdc は **2-step centralizer 形** (`∀ a, ⁅H_a,T⁆ ≤ H_{a+2}`) で statement に足す
+  (consumer 直結)。詳細正本 = `notes/bg/appE_e4_counterexample_2026_07_21.md` §形式化方針。

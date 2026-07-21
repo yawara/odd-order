@@ -2653,3 +2653,40 @@ E.4 の hdc 追加版で形式化しても FT (完成済) を毀損しない。3
 3. E.5 が dc≥1 を供給するか調査 (Q₆ が FT の S=Ω₁(R) として現れるか)。
 hub は landing 時に (a) `hdc` が honest な仮説か (E.23 と同値で fabricate でない)、
 (b) unsound carrier/新 axiom がないか を監査する。
+
+## 2026-07-21 (54): 影響の全数調査 + 文献照合 + 形式化方針の精密化 (ユーザー要請の再検討)
+
+詳細正本 = `notes/bg/appE_e4_counterexample_2026_07_21.md` (第 2 セッション節)。要点:
+
+- **再現性**: 反例を別スクリプトで独立再検証、12/12 PASS (前セッションと独立に一致)。
+- **被引用全数**: Prop E.4 の消費点は書籍全体で **Cor E.5 の (ii)⟹(i) 段 1 箇所のみ** (対偶使用)。
+  BG 本文 §1-16 引用 0 / Peterfalvi 引用 0 / Coq odd-order に App.E なし / FT spine は Prop 16.1 のみ。
+  **E.5 の (i) 枝は無傷** ((E.33)(E.34)+§14 counting は (i) だけから走る)。Q₆ は (ii) を満たす
+  (指数 p 部分群は全て γ₂ ⊇ ⟨e₂,e₃⟩ 非可換を含む) ので (ii)⟹(i) は局所論法では修復不能。
+- **出典**: App.E = FT **未発表** 結果 (BG 序文 "unpublished work ... Appendix E")。照合できる
+  原論文は存在しない。公表エラータ・既知言及も無し (web 検索)。⟹ 新発見の erratum。
+- ⭐ **文献照合**: 欠落仮説 = maximal class 標準概念 **non-exceptional** (Leedham-Green–McKay;
+  exceptional ⟺ ∃i, C_G(γᵢ/γ_{i+2}) ≠ G₁; dc>0 ⟺ non-exceptional, n≥5; Blackburn: n>p+1 ⟹ dc>0)。
+  Q₆ は n=6 ≤ p+1 の既知 exceptional クラスの実例。
+- **形式化方針 (確定)**: (i) E.4 は hdc = 2-step centralizer 形で追加、**index-p clause は無条件の
+  まま** (反例でも成立・証明済)、abelian clause のみ gate。(ii) clean Lemma は群レベル
+  (iterCommutator + Hall–Witt)、Lie ring infra 不要。(iii) E.5 は `(i) ∨ ((ii) ∧ hdc)` に置換
+  (vacuous-truth を feitThompson cite で閉じるのは不可)。(iv) **反例自体の Lean 形式化は低優先繰延**
+  — corrected E.4 の健全性は反例の正否に依存しない (仮説追加は弱めるだけ) ので必須でない。
+  (v) エラータ報告 (Glauberman 宛等) はユーザー判断事項。
+
+## 2026-07-21 (55): ✅ 反例の Lie 環核心を Lean 形式化 (Tier 1) + Tier 2 プラン
+
+ユーザー要請「反例の存在自体を Lean で形式化して確度を上げられるか」への実装回答。
+
+- ✅ **新 leaf `OddOrder/BG/AppE_FiliformCounterexample.lean`** (~450 行、mathlib import のみの
+  自己完結、leaf build green、全定理 axiom-clean、AxiomsCheck 6 本登録、OddOrder.lean 配線済)。
+  Jacobi / lcs 次元列 (class=5) / dc=0 / β 自己同型 + β⁴⁹=1 + fpf / C_L(v)=Kv⊕Ke₅ /
+  α=β⁷ スカラー / β が Kv 非固定 / T=C_L(Z₂)={x₀=0} 非可換 / (E.23) の i=2 での破れ /
+  ヘッドライン束 `bg_propE4_lie_counterexample`。詳細表 = 反例 note の新セクション。
+- **残る散文ギャップ = Lazard 転送のみ** (class 5 < p=197 の古典定理)。誤りリスクは
+  「Lazard の適用ミス」1 点に局所化。
+- ⬜ **Tier 2 (群レベル、低優先繰延)**: S=Exp(L) を iterated SemidirectProduct で構築 →
+  `RegularOperatorSetup` を実 instantiate → repo E.4 statement の否定を Lean 証明。
+  結合法則は semidirect 構成で無料 (BCH associativity 山を回避)、群法則多項式は sympy 導出。
+  推定 3-6 sessions。hdc 追加版 E.4 の証明 (issue 9402) より優先度は下。
