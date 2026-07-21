@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.GroupTheory.FreeActionOrbitCount
+import Mathlib.FieldTheory.Finite.GaloisField
 
 /-!
 # ξ-length from the group order: the counting half
@@ -224,5 +225,83 @@ theorem no_four_chain_of_card_eq_cube
   rw [he] at hEle
   have : e ≤ 3 := (Nat.pow_le_pow_iff_right hq1).mp hEle
   omega
+
+/-! ## The field-theoretic exclusion for the middle quotient -/
+
+/-- **A Singer generator fixed by the `n`-th Frobenius power bounds the
+degree**: if `x` generates `GaloisField 2 m` over `𝔽₂` and `x^(2^n) = x`,
+then `m ≤ n`.  All of `𝔽₂(x)` is then fixed by the `n`-th Frobenius power,
+i.e. consists of roots of `X^(2^n) - X`, of which there are at most `2^n`.
+This excludes an irreducible middle quotient of order `q²` in the ξ-length
+bridge: its Singer generator has order `2^n - 1`. -/
+theorem le_of_adjoin_frobeniusFixed_eq_top
+    {m n : ℕ} (hm : m ≠ 0) (hn : n ≠ 0)
+    (x : GaloisField 2 m) (hfix : x ^ 2 ^ n = x)
+    (htop : Algebra.adjoin (ZMod 2) ({x} : Set (GaloisField 2 m)) = ⊤) :
+    m ≤ n := by
+  classical
+  have hcard : Nat.card (GaloisField 2 m) = 2 ^ m := GaloisField.card 2 m hm
+  haveI : Finite (GaloisField 2 m) :=
+    Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
+  letI : Fintype (GaloisField 2 m) := Fintype.ofFinite _
+  have h2n : (2 : ℕ) ^ n ≠ 0 := by positivity
+  -- the Frobenius-fixed subalgebra
+  let T : Subalgebra (ZMod 2) (GaloisField 2 m) :=
+    { carrier := {y | y ^ 2 ^ n = y}
+      mul_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        rw [mul_pow, ha, hb]
+      one_mem' := by simp
+      add_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        rw [add_pow_char_pow, ha, hb]
+      algebraMap_mem' := fun c => by
+        simp only [Set.mem_setOf_eq, ← map_pow]
+        congr 1
+        fin_cases c
+        · exact zero_pow h2n
+        · exact one_pow _ }
+  have hT : ∀ y : GaloisField 2 m, y ^ 2 ^ n = y := by
+    intro y
+    have htople : (⊤ : Subalgebra (ZMod 2) (GaloisField 2 m)) ≤ T := by
+      rw [← htop]
+      apply Algebra.adjoin_le
+      intro z hz
+      rw [Set.mem_singleton_iff] at hz
+      subst hz
+      exact hfix
+    exact htople (Algebra.mem_top)
+  -- every element is a root of `X^(2^n) - X`
+  let f : Polynomial (GaloisField 2 m) :=
+    Polynomial.X ^ 2 ^ n - Polynomial.X
+  have hdeg : f.natDegree = 2 ^ n := by
+    have h1 : (Polynomial.X : Polynomial (GaloisField 2 m)).natDegree <
+        (Polynomial.X ^ 2 ^ n :
+          Polynomial (GaloisField 2 m)).natDegree := by
+      rw [Polynomial.natDegree_X, Polynomial.natDegree_X_pow]
+      exact Nat.one_lt_two_pow_iff.mpr hn
+    rw [show f = Polynomial.X ^ 2 ^ n - Polynomial.X from rfl,
+      Polynomial.natDegree_sub_eq_left_of_natDegree_lt h1,
+      Polynomial.natDegree_X_pow]
+  have hfne : f ≠ 0 := by
+    intro h0
+    rw [h0, Polynomial.natDegree_zero] at hdeg
+    exact h2n hdeg.symm
+  have hroot : ∀ y : GaloisField 2 m, y ∈ f.roots.toFinset := by
+    intro y
+    rw [Multiset.mem_toFinset, Polynomial.mem_roots']
+    refine ⟨hfne, ?_⟩
+    show f.IsRoot y
+    simp [f, Polynomial.IsRoot, hT y]
+  have hcardle : Fintype.card (GaloisField 2 m) ≤ 2 ^ n := by
+    calc Fintype.card (GaloisField 2 m)
+        = Finset.univ.card := rfl
+      _ ≤ f.roots.toFinset.card :=
+          Finset.card_le_card fun y _ => hroot y
+      _ ≤ Multiset.card f.roots := Multiset.toFinset_card_le _
+      _ ≤ f.natDegree := f.card_roots'
+      _ = 2 ^ n := hdeg
+  rw [← Nat.card_eq_fintype_card, hcard] at hcardle
+  exact (Nat.pow_le_pow_iff_right (by norm_num)).mp hcardle
 
 end OddOrder.Higman.Suzuki2Groups
