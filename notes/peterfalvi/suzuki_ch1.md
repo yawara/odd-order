@@ -949,3 +949,35 @@ equal to them, in some order" の形式化)。補助 = `two_pow_zmod_eq_pow_mod`
 3. **case dispatch**: (θ,φ) の関係 (θ=φ / φ=id / φ=θ²・独立) で B/C/D を分岐、各 survivor
    から (i0,j0) を pin → M=ε·(case-twist) → endpoint engine の hM → higmanLemmaTwelve。
    ⚠ multiset の carry (C の 3冪≡2冪) は injectivity が扱わない部分ゆえ Higman 通り手で解く。
+
+### 2026-07-21 lane b (再開 session): piece 4 congruence 層 完成
+
+**landing (TwoPowerCongruence.lean 869 行、+8 定理 全 axiom-clean、2 commit
+c371bd7a2 / 8b7cd164d)**: piece 4 の数論 application 層が閉じた。
+
+- `sum_two_pow_zmod_eq_or_of_subset_range`: 冪和衝突の完全記述
+  (`S = T ∨ {S,T} = {∅, range n}`) — properness 場合分けを内蔵
+- `exists_finset_sum_two_pow_eq_of_multiset`: multiset 冪和の carry collapse
+  (重複あれば card 真減)。D の重複指数分岐を card だけで殺す
+- `higman_typeD_partition`: p.92 partition 解析 (純 ZMod n、~40 leaf 全数)
+- `higman_typeD_exponent_uniqueness`: D congruence → (s≡2r ∧ 5r≡0 ∧ i≡3r ∧ j≡r) ∨ mirror
+- `higman_typeC_exponent_uniqueness`: C congruence + 0<r,2r≤n → `2r+1 = n`(自然数等式!)
+  ∧ s≡r+1 ∧ t≡1 (s は原文 s−1 役)
+- bridges: `higman_typeC/D_congruence_of_pow_eq` (pow_eq_pow_iff_modEq 経由、
+  離散対数不要 — D は両辺 (1+2^r)(1+2^s) 乗するだけ)、
+  `pow_two_pow_eq_self_of_orderOf` (ν^{2^n}=ν、weight 方程式の k=0 正規化用)
+
+**追記 (同 session、0f19fe31e)**: B case の消去算術も landing —
+`higman_two_pow_add_eq_two_pow` (θ=φ=1: 2^a+2^b≡2^c → a≡b ∧ c≡a+1、
+[x_i,y_j]=0 (i≠j) の強制) + `higman_typeB_exponent_pm` (θ=φ≠1: s≡±r、
+[x_i,y_j]=0 (|j−i|≠r) の強制) + 対応 bridge 2 本。
+**piece 4 の純算術は B/C/D 全 case 分完備** (TwoPowerCongruence.lean 1030 行)。
+
+**残り (次 iteration、issue 2048)**:
+1. **case dispatch**: MixedEigenweights の weight 方程式 (λ^{2^i}μ^{2^j}=ν^{2^k}) を
+   k=0 正規化 → θ=φ / φ=id / 独立 の 3 分岐。B は congruence 不要 (M 単項)、
+   C は typeC 一意性、D は typeD 一意性で (i,j)+(θ,φ) 関係を pin。
+   ⚠ C の前提 0<r≤n/2 は A(n,θ)≅A(n,θ⁻¹) 正規化で作る (p.91 中段)
+2. **M 値確定 (piece 4→5)**: pin した (i0,j0) で bilinear_equivariance_coeff の
+   c_ij を単項化 → c=ε (anisotropy) → endpoint engine (isTypeB/C/D_of_mixedTerm) の hM
+3. **assembly**: higmanLemmaTwelve = weight equation → dispatch → engine → IsTypeB∨C∨D
