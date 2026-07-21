@@ -264,7 +264,23 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
 - [x] **centralLift 機構の W-一般化** (43db54a05): `centralLiftIn`/`primaryLiftIn`/
   `minimal_le_centralLiftIn` — reduction (2) の S 側 (Z/S₂ = Z(S/S₂)) で再利用可能に。
   薄いラッパー無し、Q₁ 消費側は直接更新。
-- [ ] **次: reduction (2)** (𝒮(S′) coherent ⟹ 𝒮 coherent、p. 146–147)。
+- [x] **reduction (2) 完結** `sset_coherent_of_ssetOf_sder_coherent` (debb1b3e7,
+  新 leaf FeitSibleyReductionTwo.lean 651 行, 配線済, sorry-free):
+  𝒮(S′) coherent + d odd + |Q₁| odd + Q₁ nilpotent + hlt ⟹ 𝒮 coherent。
+  部品 (全 first-shot green): S側 index ブリッジ `card_quot_sup_Q1_eq_d_mul`
+  (|H⧸A′Q₁| = d·|S⧸A′|) / counting 抽出 (|S⧸S₁| 因子保持) / 直積 index
+  `index_subgroupOf_sup_prod_eq` / `centerLiftQ1` (= centralLiftIn Q₁ ⊥) +
+  `two_mul_d_add_one_le_card_centerLiftQ1` (|Z(Q₁)| ≥ 2d+1) / 中心対 split
+  `commutator_mem_of_central_pair` / 算術 `false_of_reduction_two_bounds`
+  (m·zc(q₁−2) < 4d² vs ≥ 8d²−2) / step `ssetOf_S_coherent_step` / 帰納
+  `ssetOf_coherent_of_le_sder` (minimal_le_centralLiftIn W:=S, S_nilpotent 使用)。
+  (1)+(2) 合成で「2素数 ∣ |Q₁| ⟹ 𝒮 coherent」が閉じた。
+- [ ] **次: 還元宣言 + (3)** (p. 147)。(1)(2) より以後 Q₁ = non-abelian p-群
+  (p 奇素数) と仮定してよい: assembly 分岐は (i) |Q₁| 2素数 → (1)+(2) 済,
+  (ii) Q₁ abelian → Q′ = S′ ⟹ Remark 𝒮(Q′) = 𝒮(S′) coherent → (2) 済,
+  (iii) Q₁ non-abelian p-群 → (3)–(8) 本線。d=1 分岐 (τ=id 自明) と
+  hnil/hQ1odd の上流供給 (Thompson/KernelNilpotent + odd) も assembly 側。
+  (3) = 1 ≠ Z ⊴ H, Z ⊆ Z(Q₁) ⟹ 𝒳 = 𝒮 − 𝒮(Z) coherent (issue 冒頭 digest 参照)。
   **実装部品リスト (2026-07-21 精査)**:
   1. S 側 index ブリッジ: |H⧸(A′⊔Q₁)-in| = d·|S⧸A′| (A′ ≤ S; [H:A′] の
      2 通りの塔で cancellation) — counting 抽出「m(q₁−1) ≤ 2da、m = |S⧸S₁| を保持」用。
