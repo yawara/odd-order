@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.XiLengthFromCard
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 
 /-!
@@ -249,6 +250,43 @@ theorem exists_orderQModuleSplit_of_xiLengthThree
         (hZeq ▸ hZle_right))
     complementary := isCompl_iff.mpr
       ⟨disjoint_iff.mpr hdisj, codisjoint_iff.mpr hsup⟩ }⟩
+
+/-! ## The packaged Higman payload from `|P| = q³` -/
+
+/-- **The Higman payload for a Suzuki 2-group of order `q³`** (Peterfalvi
+Appendix III, Theorem (a)/(d) for the cube case): the center coincides with
+the Frattini subgroup and has exponent two, and `P ⧸ Z(P)` splits as two
+complementary invariant summands of cardinality `|Z(P)|` each.  All three
+conclusions are consequences of ξ-length three, which the order forces. -/
+theorem center_payload_of_card_eq_cube
+    {P : Type uP} [Group P] [Finite P]
+    (hP : IsSuzuki2Group P)
+    {K : Subgroup (MulAut P)} (hKcyc : IsCyclic ↥K)
+    (hreg : ActsRegularlyOnInvolutions K)
+    {n : ℕ} (hn : n ≠ 0)
+    (hKcard : Nat.card ↥K = 2 ^ n - 1)
+    (hcard : Nat.card P = (2 ^ n) ^ 3) :
+    Subgroup.center P = frattini P ∧
+    (∀ z ∈ Subgroup.center P, z ^ 2 = 1) ∧
+    Nonempty (OrderQModuleSplit K.subtype (Subgroup.center P)
+      (IsAInvariant.of_characteristic K.subtype)) := by
+  obtain ⟨hP2, hncomm, hmulti, -⟩ := id hP
+  have hxi : IsXiActor K := ⟨hKcyc, hreg.transitive⟩
+  have hlen : HasXiLengthThree K.subtype :=
+    hasXiLengthThree_of_card_eq_cube hP hKcyc hreg hn hKcard hcard
+  obtain ⟨u₀, -, hu₀, -, -⟩ := id hmulti
+  have hinvcard : (involutions P).ncard = Nat.card ↥K :=
+    ncard_involutions_eq_card_of_regular hreg hu₀
+  have hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card ↥K →
+      p ∣ (involutions P).ncard := by
+    intro p _ hp
+    rwa [hinvcard]
+  exact ⟨center_eq_frattini_of_xiLengthThree hP2 hncomm hmulti hxi hlen
+      hprime,
+    fun z hz => center_sq_eq_one_of_xiLengthThree hP2 hncomm hmulti hxi
+      hlen hprime hz,
+    exists_orderQModuleSplit_of_xiLengthThree hP2 hncomm hmulti hxi hlen
+      hprime⟩
 
 end
 

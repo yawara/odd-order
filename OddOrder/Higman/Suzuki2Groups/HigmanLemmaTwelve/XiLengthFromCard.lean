@@ -460,6 +460,33 @@ theorem exists_proper_invariant_subgroup_of_card_sq
     (by omega) hn _ hfix htop
   omega
 
+/-- **Regularity counts the involutions**: the orbit map at a base involution
+is a bijection from the actor onto the involutions. -/
+theorem ncard_involutions_eq_card_of_regular
+    {K : Subgroup (MulAut P)} (hreg : ActsRegularlyOnInvolutions K)
+    {u₀ : P} (hu₀ : u₀ ∈ involutions P) :
+    (involutions P).ncard = Nat.card ↥K := by
+  have hmemK : ∀ k : ↥K, (k : MulAut P) u₀ ∈ involutions P := by
+    intro k
+    constructor
+    · rw [← map_pow, hu₀.1, map_one]
+    · intro h
+      apply hu₀.2
+      apply (k : MulAut P).injective
+      rw [h, map_one]
+  have hbij : Function.Bijective (fun k : ↥K =>
+      (⟨(k : MulAut P) u₀, hmemK k⟩ : ↥(involutions P))) := by
+    constructor
+    · intro k l hkl
+      have hval : (k : MulAut P) u₀ = (l : MulAut P) u₀ :=
+        congrArg Subtype.val hkl
+      obtain ⟨a, -, huniq⟩ := hreg u₀ hu₀ ((k : MulAut P) u₀) (hmemK k)
+      rw [huniq k rfl, huniq l hval.symm]
+    · rintro ⟨y, hy⟩
+      obtain ⟨a, ha, -⟩ := hreg u₀ hu₀ y hy
+      exact ⟨a, Subtype.ext ha⟩
+  rw [Nat.card_eq_of_bijective _ hbij, Nat.card_coe_set_eq]
+
 /-! ## The bridge: order `q³` gives ξ-length three -/
 
 /-- **Higman / Peterfalvi Appendix III, Theorem (b) for order `q³`**: a

@@ -474,8 +474,39 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                     of_xiLengthThree + inl_range。anisotropy 入力は
                     ambientProductSquare_decomposed_ne_zero (hinv は
                     involutions_subset_of_nontrivial_invariant 経由)
+  - [x] Higman payload 一括供給 `center_payload_of_card_eq_cube`
+        (`f2165d373`): IsSuzuki2Group + cyclic regular actor + |P| = q³ →
+        Z(P) = Φ(P) ∧ 中心 exponent 2 ∧ OrderQModuleSplit。
+        Lemma 5 側は actualKActor (ActualKActor.lean:117, cyclic instance +
+        actsRegularly 済) + card_K_eq_card_Q0_sub_one で instantiate 可能
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
+    - **設計 (2026-07-21 確定)**: Lemma 5 の消費は ⟸ 方向
+      (IsomorphicOrderQModuleSplit → IsTypeB) が critical path。
+      経路 = higmanLemmaTwelve の分類 + C/D 排除:
+      - **Lemma U (split 一意性)**: P/Z が非同型既約 2 成分 U₁ ≇ U₂ の
+        半単純分解を持つとき、任意の complementary invariant order-q 対は
+        {U₁, U₂} に一致 (第 3 の既約部分加群は Schur 射影で U₁ ≅ U₂ を強制)。
+        Maschke は OperatorMaschke.lean の bridge 流用。
+      - [x] **Lemma I 完了** (SummandIsomorphism.lean):
+        exists_frobenius_conjugate_of_semiconj +
+        _of_equivariant_linearEquiv (μ = λ^{2^i})
+      - **Lemma I (module iso → eigenvalue Frobenius 共役)** (設計原文): 2 つの faithful
+        既約 F₂[K]-module 間の K-equivariant 同型は Singer 固有値の
+        μ = λ^{2^j} を強制 (exists_galoisFieldLinearModel + 生成元 orderOf、
+        既存 equivariant-linearEquiv 系 (HigmanLemmaSix 587 等) 参照)。
+      - **Lemma NI (C/D の非同型)**: pre-case-split state の (λ, μ, ν) で
+        C case: λ^{1+2^r} = ν = μ² と μ = λ^{2^j} → 1 + 2^r ≡ 2^{j+1}
+        (mod 2^n−1) → TwoPowerCongruence の subset-sum 衝突分析で r = 0 矛盾;
+        D case: 1 + 2^r ≡ 2^j + 2^{j+2r} → 5r ≡ 0・r ≢ 0 と衝突。
+      - **⟸ 組み立て**: split V₁ ≅ V₂ 所与; rcases 分類; C/D なら
+        Lemma U で {V₁,V₂} = 正準 factor 像、Lemma I+NI で矛盾 → B。
+      - **⟹ (優先度低; Lemma 5 は不使用)**: TypeBModel の F×0 / 0×F summand
+        + swap 同値。actor 側の座標同一視 ((e) 後半) は別項。
+      - 注意: OrderQModuleSplit の actor は K.subtype (Suzuki actor)、
+        Z = center P。分類側 factor との突き合わせは
+        exists_complementaryFactorCoordinates_of_xiLengthThree の
+        factors.left/right 像 (TwoSummandSplit の構成) を経由。
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
       自由作用と位数整除を得る一般補題を証明する
 - [ ] `K`-不変な位数 `q²` 部分群 `X` と `X^w ≠ X` を証明する
