@@ -1557,6 +1557,107 @@ theorem sq_ratio_sum_le_of_adjoin_incoherent [Finite G] (hd : Odd hyp.d)
       rw [hsum]
       exact hlt)
 
+/-- **The reductions' counterexample extraction** (Peterfalvi's "Suppose `𝒮(…)` is
+not coherent.  By Lemma 1(a), there is a character `ψ` such that
+`∑ χ(1)² ≤ 2dψ(1)`"): if a coherent, conjugation-closed base `B` (containing a
+degree-`d` anchor) sits inside a finite, conjugation-closed `Y ⊆ 𝒮` that is *not*
+coherent, then some `ψ ∈ Y` of degree `d·a` bounds the base's degree data:
+`∑_{x ∈ B} m(x)² ≤ 2a`.
+
+Assembles the three-part machinery: the conjugate-pair decomposition
+(`exists_conjPair_pairUnion_eq`), the first incoherent step
+(`exists_first_incoherent_step`), and the Lemma 1(a) contrapositive
+(`sq_ratio_sum_le_of_adjoin_incoherent`), restricting the resulting sum from the
+accumulated family to `B` (squares are nonnegative). -/
+theorem exists_counterexample_of_not_coherent [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {B Y : Set (ClassFunction ↥hyp.H ℂ)} (hBY : B ⊆ Y) (hYS : Y ⊆ hyp.Sset)
+    (hYfin : Y.Finite)
+    (hYconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate Y)
+    (hBconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate B)
+    (hcohB : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau B hyp.A))
+    {χ₀ : ClassFunction ↥hyp.H ℂ} (hχ₀B : χ₀ ∈ B)
+    (hχ₀deg : χ₀ (1 : ↥hyp.H) = (hyp.d : ℂ))
+    (hfail : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau Y hyp.A)) :
+    ∃ (ψ : ClassFunction ↥hyp.H ℂ) (a : ℕ) (m : ClassFunction ↥hyp.H ℂ → ℕ),
+      ψ ∈ Y ∧ 0 < a ∧ ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ) ∧
+      (∀ x ∈ B, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (m x : ℂ)) ∧
+      (∑ x ∈ (hYfin.subset hBY).toFinset, ((m x : ℝ)) ^ 2) ≤ 2 * (a : ℝ) := by
+  classical
+  have hnoreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters Y :=
+    (hasNoRealCharacters_Sset hyp hd hQ1odd).mono hYS
+  obtain ⟨N, pair, hUnion, hstep⟩ :=
+    exists_conjPair_pairUnion_eq hBY hYfin hYconj hBconj hnoreal
+  obtain ⟨i, hiN, hcoh_i, hfail_i⟩ :=
+    exists_first_incoherent_step (τ := hyp.tau) (A := hyp.A) hcohB (hUnion ▸ hfail)
+  obtain ⟨hconj_i, hmemY_i, hfresh1, hfresh2⟩ := hstep i hiN
+  -- the accumulated family `S₁ = pairUnion B pair i` and its closure properties
+  have hsub : ∀ j, j ≤ N →
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair j ⊆ Y := by
+    intro j hjN x hx
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hB | ⟨k, hkj, hk⟩
+    · exact hBY hB
+    · have hkN : k < N := by omega
+      obtain ⟨hc, hY1, -, -⟩ := hstep k hkN
+      rcases (by simpa [OddOrder.Peterfalvi.S07.pairSet] using hk : x = (pair k).1 ∨
+          x = (pair k).2) with rfl | rfl
+      · exact hY1
+      · rw [hc]
+        exact hYconj hY1
+  have hconj_closed : ∀ j, j ≤ N → OddOrder.Peterfalvi.S03.ClosedUnderConjugate
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair j) := by
+    intro j hjN
+    induction j with
+    | zero => simpa using hBconj
+    | succ j ihj =>
+      intro x hx
+      rw [OddOrder.Peterfalvi.S07.pairUnion_succ] at hx ⊢
+      rcases hx with hx | hx
+      · exact Or.inl (ihj (by omega) hx)
+      · obtain ⟨hcj, -, -, -⟩ := hstep j (by omega)
+        rcases (by simpa [OddOrder.Peterfalvi.S07.pairSet] using hx : x = (pair j).1 ∨
+            x = (pair j).2) with rfl | rfl
+        · exact Or.inr (by
+            rw [← hcj]
+            simp [OddOrder.Peterfalvi.S07.pairSet])
+        · exact Or.inr (by
+            rw [hcj, ClassFunction.conj_conj]
+            simp [OddOrder.Peterfalvi.S07.pairSet])
+  -- degree data of the failing pair's first member
+  have hψY : (pair i).1 ∈ Y := hmemY_i
+  obtain ⟨a, hapos, hadeg⟩ := hyp.exists_apply_one_eq_d_mul (hYS hψY)
+  -- apply the Lemma 1(a) contrapositive at the failing step
+  have hS₁S : OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i ⊆ hyp.Sset :=
+    fun x hx => hYS (hsub i (by omega) hx)
+  have hχ₀S₁ : χ₀ ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i :=
+    OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hχ₀B)
+  have hfail' : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      ((OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i)
+        ∪ {(pair i).1, ((pair i).1).conj}) hyp.A) := by
+    intro h
+    apply hfail_i
+    rw [OddOrder.Peterfalvi.S07.pairUnion_succ]
+    have hps : OddOrder.Peterfalvi.S07.pairSet (L := ↥hyp.H) pair i
+        = {(pair i).1, ((pair i).1).conj} := by
+      rw [OddOrder.Peterfalvi.S07.pairSet, hconj_i]
+    rw [hps]
+    exact h
+  have hfresh2' : ((pair i).1).conj ∉
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i := by
+    rw [← hconj_i]
+    exact hfresh2
+  obtain ⟨m, hmdeg, hmsum⟩ := hyp.sq_ratio_sum_le_of_adjoin_incoherent hd hQ1odd
+    hS₁S (hYfin.subset (hsub i (by omega))) (hconj_closed i (by omega)) hcoh_i
+    hχ₀S₁ hχ₀deg (hYS hψY) hfresh1 hfresh2' hadeg hfail'
+  refine ⟨(pair i).1, a, m, hψY, hapos, hadeg,
+    fun x hx => hmdeg x (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hx)), ?_⟩
+  refine le_trans (Finset.sum_le_sum_of_subset_of_nonneg ?_ ?_) hmsum
+  · intro x hx
+    rw [Set.Finite.mem_toFinset] at hx ⊢
+    exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hx)
+  · intro x _ _
+    positivity
+
 end FullSsetHypothesis
 
 end Hypothesis
