@@ -84,6 +84,85 @@ GPT が与えた**clean な equivalence** (親検算済、Jacobi のみ、three-
   未検証だが、反例自体は F_197 上で自己完結に検証済ゆえ classification 定理は不要。
 - ⚠ GPT 回答は鵜呑みにせず全 step を親が独立検証した (Jacobi 手計算 + Python 全数)。
 
+## 2026-07-21 (第 2 セッション): 影響の全数調査 + 文献照合 + 形式化方針の確定
+
+### 独立再検証 (再現性確認)
+
+bracket table から書き直した別スクリプト (session scratchpad `verify_q6_recheck.py`) で
+**12/12 PASS**: Jacobi 全 triple / lcs dims (6,4,3,2,1,0) = maximal class 5 / dc=0 /
+ord(16)=49 mod 197 / β 自己同型 (weight 加法性) / fpf (全 weight が mod 49 unit) /
+α=β⁷ スカラー r=104 / C_L(v)=k(a+b)⊕ke₅ / β(v)∉kv / Z₁=ke₅, Z₂=ke₄⊕ke₅,
+T=C_L(Z₂)=⟨b,e₂..e₅⟩ 指数 p 非可換 / (E.23) の破れ (実 weight 8,9,17,25,26 vs 予言 8,9,10,11,12) /
+197≡1 (mod 49)。前セッションの検証と独立に一致。
+
+### 被引用の全数調査 — E.4 は書籍全体で 1 箇所しか使われない
+
+- **BG 本文 (§1–§16)**: Prop E.4 / Cor E.5 への引用 **0 件** (pdftotext 全文 grep)。
+  App.E 自身の序文も「could lead to further reductions in the proof of the Odd Order
+  Theorem」— 将来の簡約化のための *prospective* な付録で、本文はどこも依存しない。
+- **書籍内の唯一の消費点** = Cor E.5 の証明 (p.164-165, pdftotext L8333-8337) の
+  **(ii)⟹(i) 段のみ、対偶形で**: (ii)「Ω₁(O_p(M)) に指数 p の正規アーベル部分群なし」+
+  E regular のもとで、もし E が R₀ を固定しないなら E.4 の結論 (T char S がアーベル指数 p)
+  が (ii) と矛盾 ⟹ E は R₀ を固定 ⟹ E=K₁ ⟹ (i)。**Q₆ は (ii) を満たす**
+  (指数 p 部分群は全て Φ(S)=γ₂ ⊇ ⟨e₂,e₃⟩ を含み、[e₂,e₃]=e₅≠0 ゆえ全部非可換) ので、
+  この対偶は印刷版のままでは通らない。
+- **E.5 の (i) 側は無傷**: E.3/E.4 は (ii)⟹(i) の還元にしか使われず、還元後の本体
+  ((E.33)(E.34) + §14 counting) は (i) だけから走る。**壊れているのは (ii) 枝のみ**。
+- **Peterfalvi 全章**: "Appendix E"/"E.4" 引用 0 件 (pdftotext grep)。
+- **Coq odd-order**: `BGappendixAB.v` / `BGappendixC.v` のみ。App.E は形式化されていない (ls 確認)。
+- **FT spine**: BG §16 からは Prop 16.1 のみ消費 (settled)。App.E は完全に terminal。
+
+### 出典の確定 — App.E は Feit–Thompson の未発表結果 (照合すべき原論文が無い)
+
+BG 序文 (pdftotext L537-539): "For permission to include **unpublished work**, we thank …
+especially Walter Feit and John G. Thompson (Theorem 15.8, Corollary 15.9, **Appendix E**)."
+Cambridge の紹介文も "a recent (1991) significant improvement by Feit and Thompson" と表現。
+⟹ **(E.23) を照合できる公刊原文は存在しない**。BG 印刷文が唯一の公開ソースであり、
+反例により偽と確定した以上、これは *published erratum が存在しない新発見の誤り*。
+web 検索でも本書のエラータ集・本 gap への言及は見つからず (2026-07-21)。
+
+### ⭐ 文献照合 — 欠けている仮説は標準概念 **exceptional** (Leedham-Green–McKay)
+
+maximal class p 群の標準理論に完全に対応する語彙があった:
+
+- **exceptional** の標準定義: maximal class `G` (位数 pⁿ, n≥5) が exceptional ⟺ ある
+  `3 ≤ i ≤ n-2` で **2-step centralizer** `C_G(γᵢ/γ_{i+2}) ≠ G₁` (= `C_G(γ₂/γ₄)`)。
+- **dc > 0 ⟺ non-exceptional** (n≥5; Leedham-Green–McKay の教科書、
+  "On the degree of commutativity of p-groups of maximal class" 系の文献)。
+- **Blackburn**: `n > p+1` ⟹ dc > 0 (exceptional は `n ≤ p+1` にのみ存在)。
+  Q₆ は n=6 ≤ p+1=198 の exceptional 群 — 既知クラスの実例で、病的な新奇物ではない。
+
+⟹ **erratum の正確な言明**: Prop E.4 には「`S = Ω₁(R)` が **non-exceptional**
+(同値: 全 2-step centralizer が一致 ⟺ dc(S) ≥ 1)」という仮説が欠けている。
+E.4 の固有値機構 (fpf regular B) は exceptional 群を排除しない (Q₆ が実証)。
+GPT の clean Lemma は「dc≥1 ⟺ 2-step centralizer 一致」の同値の graded Lie 環版で、
+文献の standard fact と整合する (n≥5 の maximal class に相当する次元列で)。
+
+### 形式化方針 (確定; issue 9402 の rev.53 プランを精密化)
+
+1. **E.4**: 追加仮説 `hdc` は **2-step centralizer 形** (`∀ a, ⁅H_a, T⁆ ≤ H_{a+2}`、
+   正確な添字は既存 consumer `caseA_eigenvalue_step` が固定する) で statement に加える。
+   assembly が直接消費する形であり、文献の non-exceptional と一致する。
+   - **index-p clause は無条件のまま** (反例でも `|S:T|=p` は成立、scaffold で証明済)。
+     hdc で gate するのは abelian clause のみ。
+   - docstring: 印刷版が偽であること・反例 Q₆・欠落仮説 = non-exceptional・本 note への
+     参照を明記 (トレーサビリティ 3 層の範囲内)。
+2. **clean Lemma** (dc≥1 ⟺ 2-step 一致) は `MaximalClassPGroup.lean` に**群レベル**
+   (iterCommutator + Hall–Witt/three-subgroups) で形式化。graded Lie ring infra は建てない。
+   E.4 自体には必須でない (hdc を 2-step 形で取るので) が、供給側の橋 + genuine 再利用 infra。
+3. **E.5**: 印刷版の `(i) ∨ (ii)` は維持できない。**(ii) を `(ii) ∧ hdc(Ω₁(O_p(M)))` に
+   置換**して形式化する (= (ii)⟹(i) 段が corrected E.4 で通る)。docstring に「印刷版 (ii)
+   枝の証明は E.4 gap で壊れている; statement 自体は IsMinimalSimpleOdd が空ゆえ vacuously
+   true だが、feitThompson cite で閉じるのは BG 形式化として無意味なのでやらない」を明記。
+4. **反例自体の Lean 形式化は低優先繰延** (恒久対象外にはしない):
+   - 3 冊スコープの対象は書籍の結果であり、印刷文の反証は対象外 (editorial claim)。
+   - **corrected E.4 の健全性は反例の正否に依存しない** (仮説追加は定理を弱めるだけで、
+     反例が万一誤りでも unsound にならない、という非対称性が decisive)。
+   - 実装するなら unitriangular 7×7 埋込 or truncated BCH — Lazard 対応 infra が要る
+     大規模新設で consumer 0。機械検証エラータを公表したくなった時に再評価。
+5. **エラータ報告はユーザー判断事項** (外向き action)。Glauberman (Chicago) 存命。
+   公表エラータ・既知言及は無いので、報告するなら新規。
+
 ## ✅ 2026-07-21: PDF ページ画像で確認 (pdftotext でなく原典画像、ユーザー要請)
 
 `references/bg/local-analysis.pdf` の PDF page 171-172 (book p.158-159 = Thm E.3) と
