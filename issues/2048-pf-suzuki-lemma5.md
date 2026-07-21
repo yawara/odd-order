@@ -185,9 +185,15 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           (B/C は初等、D は Dedekind 自己同型独立 3 項) + equivModel transport
     - [x] `center_sq_eq_one_of_xiLengthThree` (`08fb9d018`):
           分類と接続し ξ-length 3 で ∀ z ∈ Z(P), z² = 1
-    - [ ] 残り: CenterHomocyclic の同値 (`Agemo Z(Q) 2 1 = ⊥` 形) へ接続して
-          Z(Q) = Q₀ を Lemma 5 の設定で結論し、xiLengthThreeTypeAFactorData
-          から OrderQModuleSplit (HigmanDE.lean) を実構成する
+    - [x] `center_eq_frattini_of_xiLengthThree` / `agemo_center_eq_bot_of_
+          xiLengthThree` (`e88893f9a`): Z(P) = Φ(P)、℧₁(Z(P)) = ⊥
+    - [x] `exists_orderQModuleSplit_of_xiLengthThree`
+          (新 leaf TwoSummandSplit.lean, `a51ff24ca`): P/Z(P) の
+          two-summand split (OrderQModuleSplit) を factor 像で実構成
+          (card は A(n,θ) model count、P/Z の EA 性込み)
+    - [ ] 残り: Lemma 5 側 (Peterfalvi §3 設定) で Q₀ = C_Q(w) と
+          Z(Q)/involutionSubgroup を同定し ξ-length-3 仮定を供給して
+          上記 2 定理を消費する
     - [x] Higman Lemma 10: characteristic `2` の proper odd-degree
           finite field extensionで、任意の `r : ℤ`, `ε` に対する非零 `α` と
           `Tr(α · Frob^r(α) · ε) = 0` を構成する
