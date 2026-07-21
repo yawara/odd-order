@@ -158,6 +158,26 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   - 残る未整備: chief factor (Q₂/Q₃, Z/Q₃ = Z(Q₁/Q₃)) の商レベル中心性の取り回しと、
     ψ(1) = dφ(1) の φ ∈ Irr(Q/S'Q₃) 具体化 ([Is] 2.30 の section 版 =
     InflationCharacter の degree_sq_le_index_of_central_quotient :361 が使えるはず)。
+  - (5f2ff15b1) `ssetOf_antitone` + `sup_Sder_le_Qder` 済み。
+    `exists_monotoneDegreeEnum` (CoherenceUnion:1436) は任意有限族の度数昇順
+    enumeration (Injective + cover + Re-monotone) を返す — 分解の並べ替えに直用可。
+  - **⚠ 統計 fidelity フラグ (2026-07-21)**: 原文 (1) の結末「(d+1)²−2 < 4d whence
+    d ≤ 2, contradiction」は **d = 1 で矛盾にならない** (2 < 4 真)。d odd + d ≤ 2 は
+    d = 1 を残す ⟹ reduction 補題は 1 < d (実質 d ≥ 3) を仮定に持つのが honest。
+    **d = 1 は Theorem assembly 側で別扱い**: D = 1 ⟹ H = Q ⟹ τ = Ind_Q^Q = id で
+    𝒮 の coherence は自明 (id 拡張)。statement 設計時に d = 1 分岐を忘れないこと。
+  - **1 ステップ補題 statement 案**:
+    `ssetOf_coherent_step (hd : Odd hyp.d) (hd1 : 1 < hyp.d) (hQ1odd) {Q₂ Q₃}
+    (hQ₂der : Q₂ ≤ ⁅Q₁,Q₁⁆) (hQ₃ : Q₃ ≤ Q₂) (正規性: Q₂,Q₃ ⊴ H 要素形)
+    (hchief : Q₂/Q₃ chief in H — 使う帰結は「Q₂/Q₃ ∩ Z(Q₁/Q₃) ≠ 1 ⟹ Q₂ ≤ Z」なので
+    最初から「hZcap : Q₂ ≤ Z where Z/Q₃ := Z(Q₁/Q₃) 引き上げ」形で持つのが楽)
+    (h2primes : |Q₁| に 2 素因数 ⟹ Q₂ ⊊ Z の supply)
+    (hcoh₂ : Nonempty (IsCoherent τ (SsetOf (Sder ⊔ Q₂)) A))
+    : Nonempty (IsCoherent τ (SsetOf (Sder ⊔ Q₃)) A)`。
+    証明: by_contra → coherentPairChain の対偶で最初の失敗 step の ψ (度数昇順 ⟹
+    ψ は失敗時点の最小未 adjoin 度数) → 1(a) の非度数仮定は全部無条件に立つ
+    (orthonormal/共役対/A-support/可除性 = 部品済み) ⟹ 度数 bound 破れ:
+    Σ_{𝒮(S'Q₂)} χ(1)² ≤ 2dψ(1) → (1.1)(1.2) 算術 → f.p.f. 下界 → d ≤ 2 → hd1+hd 矛盾。
 
 ## 完了条件
 
