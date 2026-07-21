@@ -2674,3 +2674,19 @@ hub は landing 時に (a) `hdc` が honest な仮説か (E.23 と同値で fabr
   (vacuous-truth を feitThompson cite で閉じるのは不可)。(iv) **反例自体の Lean 形式化は低優先繰延**
   — corrected E.4 の健全性は反例の正否に依存しない (仮説追加は弱めるだけ) ので必須でない。
   (v) エラータ報告 (Glauberman 宛等) はユーザー判断事項。
+
+## 2026-07-21 (55): ✅ 反例の Lie 環核心を Lean 形式化 (Tier 1) + Tier 2 プラン
+
+ユーザー要請「反例の存在自体を Lean で形式化して確度を上げられるか」への実装回答。
+
+- ✅ **新 leaf `OddOrder/BG/AppE_FiliformCounterexample.lean`** (~450 行、mathlib import のみの
+  自己完結、leaf build green、全定理 axiom-clean、AxiomsCheck 6 本登録、OddOrder.lean 配線済)。
+  Jacobi / lcs 次元列 (class=5) / dc=0 / β 自己同型 + β⁴⁹=1 + fpf / C_L(v)=Kv⊕Ke₅ /
+  α=β⁷ スカラー / β が Kv 非固定 / T=C_L(Z₂)={x₀=0} 非可換 / (E.23) の i=2 での破れ /
+  ヘッドライン束 `bg_propE4_lie_counterexample`。詳細表 = 反例 note の新セクション。
+- **残る散文ギャップ = Lazard 転送のみ** (class 5 < p=197 の古典定理)。誤りリスクは
+  「Lazard の適用ミス」1 点に局所化。
+- ⬜ **Tier 2 (群レベル、低優先繰延)**: S=Exp(L) を iterated SemidirectProduct で構築 →
+  `RegularOperatorSetup` を実 instantiate → repo E.4 statement の否定を Lean 証明。
+  結合法則は semidirect 構成で無料 (BCH associativity 山を回避)、群法則多項式は sympy 導出。
+  推定 3-6 sessions。hdc 追加版 E.4 の証明 (issue 9402) より優先度は下。

@@ -154,12 +154,17 @@ GPT の clean Lemma は「dc≥1 ⟺ 2-step centralizer 一致」の同値の gr
    置換**して形式化する (= (ii)⟹(i) 段が corrected E.4 で通る)。docstring に「印刷版 (ii)
    枝の証明は E.4 gap で壊れている; statement 自体は IsMinimalSimpleOdd が空ゆえ vacuously
    true だが、feitThompson cite で閉じるのは BG 形式化として無意味なのでやらない」を明記。
-4. **反例自体の Lean 形式化は低優先繰延** (恒久対象外にはしない):
-   - 3 冊スコープの対象は書籍の結果であり、印刷文の反証は対象外 (editorial claim)。
-   - **corrected E.4 の健全性は反例の正否に依存しない** (仮説追加は定理を弱めるだけで、
-     反例が万一誤りでも unsound にならない、という非対称性が decisive)。
-   - 実装するなら unitriangular 7×7 埋込 or truncated BCH — Lazard 対応 infra が要る
-     大規模新設で consumer 0。機械検証エラータを公表したくなった時に再評価。
+4. **反例の Lean 形式化 — 2 層に分割 (ユーザー要請 2026-07-21 で方針更新)**:
+   - ✅ **Tier 1 (Lie 環レベル) = 完了** (`OddOrder/BG/AppE_FiliformCounterexample.lean`、
+     下記セクション参照)。反例の数学的核心 (Jacobi・fpf・中心化群構造・(E.23) の破れ) を
+     機械検証済。残る散文ギャップは Lazard 対応 (class 5 < p、古典定理) のみ。
+   - ⬜ **Tier 2 (群レベル) = 低優先繰延** (恒久対象外にはしない): `S = Exp(L)` を
+     iterated `SemidirectProduct` (mathlib) で構築し `RegularOperatorSetup` を実 instantiate、
+     repo の E.4 statement そのものの否定を証明する。結合法則は semidirect 構成で無料になる
+     設計 (BCH 直書きの associativity 山を回避)。coordinates of the second kind の
+     多項式群法則を sympy で導出 → 各検証は少変数多項式恒等式。推定 3-6 sessions。
+   - **corrected E.4 の健全性は反例の正否に依存しない** (仮説追加は定理を弱めるだけ) という
+     非対称性は不変 — Tier 2 は erratum 公表時の確度向上が主目的。
 5. **エラータ報告はユーザー判断事項** (外向き action)。Glauberman (Chicago) 存命。
    公表エラータ・既知言及は無いので、報告するなら新規。
 
@@ -188,3 +193,31 @@ for tᵢ=t₀tⁱ」— **証明なし**、"Similarly one can show" のみ。(E.
 
 ⟹ **PDF 画像レベルで確定**: BG Prop E.4 は印刷どおりでは偽。gap は未証明の (E.23)。
 pdftotext に依存した誤読ではない (ユーザーの懐疑に対する直接確認)。
+
+## ✅ 2026-07-21: 反例の Lie 環核心を Lean で形式化 (Tier 1 完了)
+
+**`OddOrder/BG/AppE_FiliformCounterexample.lean`** (leaf build green・全定理 axiom-clean
+`[propext, Classical.choice, Quot.sound]`、AxiomsCheck 登録済・OddOrder.lean 配線済)。
+mathlib import のみの自己完結 leaf。`V = Fin 6 → ZMod 197` 上の明示 bracket `br` で:
+
+| 定理 | 内容 |
+|---|---|
+| `br_leibniz` (+双線形性・`br_self`) | **Jacobi 恒等式** — 反例の最も繊細な主張 |
+| `lcs_five_eq_bot` + `e5_mem_lcs_four` | lcs 次元列 (6,4,3,2,1,0) = class ちょうど 5 (< p) |
+| `degree_of_commutativity_zero` | `e₂∈γ₂, e₃∈γ₃, [e₂,e₃]≠0, γ₆=⊥` = **dc(L)=0** (exceptional) |
+| `br_beta` / `beta_iterate_card` / `beta_iterate_fixed_eq_zero` | β は bracket 自己同型・β⁴⁹=1・**全非自明冪 fpf** (B regular) |
+| `centralizer_v_iff` | **`C_L(v) = K·v ⊕ K·e₅`** (E.3 の narrow 仮説) |
+| `alpha_smul_v` | α=β⁷ は K·v 上スカラー ζ⁷ (A fixes R₀、(E.22) α側は正しい) |
+| `beta_not_fixes_v` | **B は R₀ を固定しない** (E.4 仮説) |
+| `memT_iff` + `T_not_abelian` | `T=C_L(Z₂)` = 超平面 `{x₀=0}` (指数 p 節は生存) だが **非可換** |
+| `e23_fails_at_two` | **(E.23) は i=2 で偽**: 実固有値 ζ¹⁷ vs 予言 ζ¹⁰ (ζ⁷≠1) |
+| `bg_propE4_lie_counterexample` | 上記のヘッドライン束 |
+
+**証明技法**: 具体計算は全て kernel `decide` (native_decide 不使用 = axiom-clean 維持)、
+一般恒等式は `funext + fin_cases + simp + ring` の座標分解。ZMod 197 の体 instance は
+`Mathlib.Algebra.Field.ZMod`、素数判定 norm_num は `Mathlib.Tactic.NormNum.Prime` (要 import)。
+
+**確度の主張**: これで「BG 印刷版 E.4 は偽」の信頼性は、(i) Lie 環反例の実在と全仮説成立
+= **Lean 検証済**、(ii) 印刷文の転記 = PDF ページ画像で照合済、(iii) Lie→群の Lazard 転送
+= 未形式化の古典定理 (class < p)、の 3 点に分解され、実質的な誤りリスクは (iii) の適用ミス
+のみに局所化された。(iii) も潰すのが Tier 2 (上記)。
