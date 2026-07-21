@@ -10,6 +10,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SplitUniqueness
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
 
