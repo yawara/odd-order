@@ -306,7 +306,33 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   + IsComplement.equiv でのノルム折り畳みで **Res_{Q₁} φ が既約** ⟹ deg ∣ |Q₁|。
   汎用部品: `exists_unit_mul_eq_of_le_center` /
   `isIrreducibleCharacter_restrict_of_isComplement'` (hyp 非依存、upstream 適性)。
-- [ ] **次: (3.1) 可除性チェーン → Part A** (p. 146–147、原文実読済)。実装設計:
+- [x] **正方向 adjoin wrapper 完成** `coherent_insert_pair_of_two_mul_lt_sum`
+  (357db2805): 1(a) 共役対 packaging の正方向・一般 anchor (d·m₀) 版。
+  2m₀a < Σm² + m₀ ∣ 全度数/a ⟹ S₁∪{χ,χ̄} coherent。旧対偶 packaging は
+  この 1 行系に書き直し (~55 行 dedup)。⚠ 形式化済 1(a) は integer-ratio 形
+  なので hmdvd (anchor ∣ 各 member 度数) が必要 — Part A では全度数 d·p^k で
+  anchor = 最小冪ゆえ自動成立。
+- [ ] **次: Part A 本体組み立て** (2026-07-21 設計固定、この順):
+  1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
+     保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —
+     hQ1odd を hp/hQ1p から導出する小補題)。counting:
+     Σ_{𝒳₁} χ(1)² = |H⧸S′-in| − |H⧸(S′⊔Z)-in| (sum_degreeSq_ker_subset_not_subset
+     直用、ただし SsetOf 版のような filter-set ブリッジ (𝒳₁ 版の
+     leKer_iff/sum_degreeSq_XsetOf) を新設)。T = d·|S⧸S′|·|Q₁⧸Z|·(|Z|−1) 因数分解
+     (card_quot_eq_card_quot_Q1_mul at R = S′⊔Z, S′⊔Z⊔Q₁ = S′⊔Q₁ +
+     card_quot_sup_Q1_eq_d_mul)。非空/≥2: T > 0 (Z ⊄ S′: Z∩S = ⊥, Z ≠ ⊥) +
+     no-real 対。
+  2. **(3.1) 数値核** (ℕ): 全度数 d·p^{k_x}、step χ の k > 全 B の k₀。
+     p^{2k} ∣ T (φ² = p^{2k} ≤ p-冪 |Q₁⧸Z| ⟸ 2.30 ⟹ ∣) かつ
+     p^{2k} ∣ Σ_{未収載} (k_x ≥ k) ⟹ p^{2k} ∣ d²·Σ_{S₁}m² の d² 約分で
+     p^{2k} ∣ Σ_{S₁}m² ⟹ Σm² ≥ p^{2k} = p^k·p^k ≥ p·p^k... ⟹ 2·p^{k₀}·p^k <
+     Σm² (p ≥ 3) — wrapper の hlt 形そのもの。
+  3. **chain 組み立て**: B := 等度数最小セグメント (coherentEqualDegree で coherent、
+     ≥2 は conj 対)。exists_conjPair_pairUnion_eq (min-degree 版) を (Y := 𝒳₁, B) に
+     適用 → coherentPairChain (CoherenceUnion:1602) の hstep に wrapper を供給。
+     min 句から「未収載度数 ≥ 現 step 度数」「S₁ 内度数 ≤ 現 step 度数」を抽出。
+  4. その後 Part B ((2) 鏡映の 𝒳-相対版、issue 記載済) → (4)–(8)。
+  旧設計メモ:
   1. **𝒳-族**: 𝒳 ∩ 𝒮(R) = {χ ∈ Irr H | R ⊆ ker, Z ⊄ ker} (Z ≤ Z(Q₁) ⟹ 自動的に ∈ 𝒮)。
      counting は既存 `sum_degreeSq_ker_subset_not_subset` (N=R-in, M=Z-in) が直用可:
      Σ = |H⧸R| − |H⧸R⊔Z|。
