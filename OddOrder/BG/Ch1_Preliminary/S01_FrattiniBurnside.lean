@@ -176,14 +176,18 @@ open Pointwise
 
 /-! ## §1A: Solvable group basics (Lem 1.1, Prop 1.2-1.4) -/
 
-/-- **BG Lemma 1.1**: 有限可解群 `G` の minimal normal `M` は
+/-- **BG Lemma 1.1**: 有限群 `G` の **solvable** minimal normal `M` は
 elementary abelian で `F(G)` の中心に入る.
 
+book 強度 (2026-07-22 に `[IsSolvable G]` から一般化 — BG は `M` の可解性しか仮定しない;
+`G` 可解のときは mathlib の部分群 instance が `[IsSolvable ↥M]` を自動供給するので
+既存 call site は無変更).
+
 CLAUDE.md no-wrapper policy 例外: 異なる Ch.3 結果 + nilpotent_normal_le_fitting の合成
-+ Ch.4 の `le_centralizer_of_isMinimalNormal` + 仮定特殊化 (`[IsSolvable G]`). -/
++ Ch.4 の `le_centralizer_of_isMinimalNormal`. -/
 theorem isMinimalNormal_le_fitting_and_isElementaryAbelian
-    {G : Type*} [Group G] [Finite G] [IsSolvable G]
-    {M : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+    {G : Type*} [Group G] [Finite G]
+    {M : Subgroup G} [IsSolvable ↥M] (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     M ≤ OddOrder.Isaacs.Ch01.fitting G ∧
     M ≤ Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) ∧
     ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by

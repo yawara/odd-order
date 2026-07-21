@@ -678,7 +678,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | Pf §15 | 19 | 18 | 1 | 0 | 0 | 0 |
 | Pf §16 | 16 | 16 | 0 | 0 | 0 | 0 |
 | Pf App: Suzuki | 32 | 0 | 0 | 0 | 32 | 0 |
-| Pf App: Huppert | 3 | 1 | 0 | 2 | 0 | 0 |
+| Pf App: Huppert | 3 | 1 | 0 | 2 | 0 | 0 | ⚠ 2026-07-22 lane c 訂正: **3/3 済** — Lemma/Prop 1 は 07-19 hub 監査で済、Prop 2(b) の C_U(s)↪Aut(F) 節も `exists_injective_semilinear_companion` (SemilinearField.lean:520, commit 60314f15e, AxiomsCheck 登録済) で解消済み |
 | Pf App: NearFields | 6 | 2 | 0 | 2 | 2 | 0 |
 | Pf App: Suzuki2Groups | 8 | 2 | 0 | 2 | 4 | 0 |
 | Pf App: FeitSibley | 13 | 0 | 0 | 1 | 12 | 0 |
