@@ -315,6 +315,140 @@ theorem isTypeB_of_mixedTerm_theta_eq
     have h := hfinal a b
     simpa using h
 
+/-! ## Case `θ ≠ 1`, `φ = 1` (Higman p. 91) -/
+
+/-- **Higman p. 91, case `θ ≠ 1`, `φ = 1`: `G ≅ C(n, ε)`.**  The support
+pinning forces `2r + 1 = n` and a single mixed monomial, which is the type-C
+pairing `ε · (α^{1/2} · (2θ)(β))`. -/
+theorem isTypeC_of_mixedTerm_right_theta_one
+    {Sl Sr : Subgroup P} {n r : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (theta : RingAut (GaloisField 2 n))
+    (htheta : theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r)
+    (hr : 0 < r) (h2r : 2 * r ≤ n)
+    (hθL : left.theta = theta) (hθR : right.theta = 1)
+    (lam mu nu : GaloisField 2 n)
+    (hordnu : orderOf nu = 2 ^ n - 1)
+    (hlamnu : lam ^ (1 + 2 ^ r) = nu)
+    (hmunu : mu ^ 2 = nu)
+    (hequiv :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∀ α β : GaloisField 2 n,
+        mixedTermBilinear left right (lam * α) (mu * β) =
+          nu * mixedTermBilinear left right α β)
+    (hM0 :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∃ α β : GaloisField 2 n, mixedTermBilinear left right α β ≠ 0)
+    (hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1)
+    (hcentral : frattini P ≤ Subgroup.center P)
+    (n_pos : 0 < n)
+    (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
+    IsTypeC.{uP, 0} P := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  have hNpos : 0 < 2 ^ n - 1 := by
+    have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
+    omega
+  have hνne : nu ≠ 0 := by
+    intro h0
+    have hone : nu ^ (2 ^ n - 1) = 1 := by
+      rw [← hordnu]
+      exact pow_orderOf_eq_one nu
+    rw [h0, zero_pow (by omega)] at hone
+    exact zero_ne_one hone
+  have hfin : Finite (GaloisField 2 n) :=
+    Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
+  have hlamne : lam ≠ 0 := by
+    intro h0
+    rw [h0, zero_pow (by simp)] at hlamnu
+    exact hνne hlamnu.symm
+  have hmune : mu ≠ 0 := by
+    intro h0
+    rw [h0, zero_pow (by norm_num)] at hmunu
+    exact hνne hmunu.symm
+  have hlampow : lam ^ (2 ^ n - 1) = 1 := by
+    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    have h := FiniteField.pow_card_sub_one_eq_one lam hlamne
+    rwa [← Nat.card_eq_fintype_card, hcard] at h
+  have hmupow : mu ^ (2 ^ n - 1) = 1 := by
+    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    have h := FiniteField.pow_card_sub_one_eq_one mu hmune
+    rwa [← Nat.card_eq_fintype_card, hcard] at h
+  obtain ⟨hordlam, -⟩ :=
+    orderOf_eq_and_coprime_of_pow_eq_orderOf hNpos
+      (by simp : 1 + 2 ^ r ≠ 0) hordnu hlamnu hlampow
+  obtain ⟨h2r1, c0, hc0ne, hc0⟩ :=
+    mixedTerm_monomial_typeC hr h2r (mixedTermBilinear left right)
+      lam mu nu hordlam hlamnu hmunu hmupow hequiv hM0
+  -- decomposed anisotropy in the type-C monomial shape
+  have haniso : ∀ a b : GaloisField 2 n, a ≠ 0 → b ≠ 0 →
+      a * theta a + b * b +
+        c0 * (a ^ 2 ^ (n - 1) * b ^ 2 ^ (r + 1)) ≠ 0 := by
+    intro a b ha hb
+    have h := ambientProductSquare_decomposed_ne_zero left right
+      hRnormal hinf hsup hΦR hinv ha hb
+    rw [hθL, hθR, ← mixedTermBilinear_apply, hc0, RingAut.one_apply] at h
+    exact h
+  have hEps : IsTypeCEpsilon theta c0 :=
+    isTypeCEpsilon_of_decomposed_aniso h2r1 theta htheta c0 haniso
+  -- `2θ² = 1` from `2r + 1 = n`
+  have hn0 : n ≠ 0 := by omega
+  have hcard' : Nat.card (GaloisField 2 n) = 2 ^ n := hcard
+  have horder : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
+    orderOf_frobeniusEquiv_eq_of_card_eq_two_pow n
+      (by simpa [Nat.card_eq_fintype_card] using hcard')
+  have hfrobn : (frobeniusEquiv (GaloisField 2 n) 2) ^ n = 1 := by
+    calc (frobeniusEquiv (GaloisField 2 n) 2) ^ n
+        = (frobeniusEquiv (GaloisField 2 n) 2)
+            ^ orderOf (frobeniusEquiv (GaloisField 2 n) 2) := by rw [horder]
+      _ = 1 := pow_orderOf_eq_one _
+  have htwosq : frobeniusEquiv (GaloisField 2 n) 2 * theta ^ 2 = 1 := by
+    rw [htheta, ← pow_mul, ← pow_succ', show r * 2 + 1 = n from by omega]
+    exact hfrobn
+  -- `Frob⁻¹` and `Frob·θ` as power maps
+  have hinvfrob : (frobeniusEquiv (GaloisField 2 n) 2)⁻¹ =
+      (frobeniusEquiv (GaloisField 2 n) 2) ^ (n - 1) := by
+    refine inv_eq_of_mul_eq_one_right ?_
+    rw [← pow_succ', show n - 1 + 1 = n from by omega]
+    exact hfrobn
+  refine isTypeC_of_mixedTerm hEA hK1amb htermamb hSqamb hAgemoamb hK0 ePhi
+    left right hRnormal hinf hsup hΦR theta hθL hθR htwosq
+    (Units.mk0 c0 hc0ne) hEps n_pos hcard ?_ ?_
+  · rw [ambientProductExtension_inl_range]
+    exact hcentral
+  · intro α β
+    have h := hc0 α β
+    rw [mixedTermBilinear_apply] at h
+    rw [h]
+    have hia : (frobeniusEquiv (GaloisField 2 n) 2)⁻¹ α =
+        α ^ 2 ^ (n - 1) := by
+      rw [hinvfrob, frobeniusEquiv_pow_apply]
+    have hmb : (frobeniusEquiv (GaloisField 2 n) 2 * theta) β =
+        β ^ 2 ^ (r + 1) := by
+      rw [htheta, ← pow_succ', frobeniusEquiv_pow_apply]
+    rw [hia, hmb]
+    simp
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
