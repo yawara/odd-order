@@ -2690,3 +2690,13 @@ hub は landing 時に (a) `hdc` が honest な仮説か (E.23 と同値で fabr
   `RegularOperatorSetup` を実 instantiate → repo E.4 statement の否定を Lean 証明。
   結合法則は semidirect 構成で無料 (BCH associativity 山を回避)、群法則多項式は sympy 導出。
   推定 3-6 sessions。hdc 追加版 E.4 の証明 (issue 9402) より優先度は下。
+
+## 2026-07-21 (56): ✅⭐ corrected E.4 完全証明 landing — (53)(54) 方針の実装完了
+
+- `AppE_BetaSupply.lean` (corrected (E.23) supply) + `AppE_PropE4.lean` (組立) で
+  **corrected Prop E.4 が sorry-free・axiom-clean** (commits 3b89360e3 / 2e6b7829c、
+  AxiomsCheck 登録済)。詳細 = issue 9402 の landing 節。
+- 旧 sorried printed E.4 は削除 (充足不能な sorry だった)、E.5 halt は `(i) ∨ ((ii) ∧ hdc)`
+  に改訂済。FiliformRefutation の stale 参照も更新。
+- **BG Prop E.4 は両面決着**: printed 版の否定 (`printed_propE4_false`) + corrected 版の
+  証明、双方 Lean 機械検証済。App.E 主結果の残 = E.5 のみ (§14 counting gate)。

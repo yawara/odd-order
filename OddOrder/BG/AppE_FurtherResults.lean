@@ -1634,27 +1634,18 @@ downstream, as `RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini` in
 class/coset count of `AppE_ExponentP.lean` (itself built on Step 2's `(E.15)`), and then
 Glauberman's fixed-point lemma and Isaacs Thm 3.27. -/
 
-/-- **BG Proposition E.4**: in the situation of Theorem E.3, with
-`S = Ω₁(R)`, if `|S| ≥ p⁴`, `B` acts regularly on `R`, and `B` does not fix `R₀`,
-then `C_S(Z₂(S))` is abelian of index `p` in `S`.
-
-**Status: honestly stated, not proved.**  BG's argument runs inside the
-2-dimensional `𝔽_p`-space `S/S'`, comparing the eigenvalues `r, r₀` of `α` and
-`t, t₀` of `β` on `R₀S'/S'` and `T/S'`, and derives the contradiction
-`t₀ = t` from `j + 2 = k - i`.  It consumes all of Theorem E.3. -/
-theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
-    [Finite R] [Finite B] (hyp : RegularOperatorSetup R B p q)
-    (hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1))
-    (hB_regular : ∀ b : B, b ≠ 1 → ∀ x : R, hyp.act b x = x → x = 1)
-    (hB_not_fixes : ¬ ∀ b : B, (hyp.act b) • hyp.R₀ = hyp.R₀) :
-    IsMulCommutative
-        ↥(Subgroup.centralizer
-          ((Subgroup.upperCentralSeries ↥(Omega R p 1) 2 : Subgroup ↥(Omega R p 1)) :
-            Set ↥(Omega R p 1))) ∧
-      (Subgroup.centralizer
-          ((Subgroup.upperCentralSeries ↥(Omega R p 1) 2 : Subgroup ↥(Omega R p 1)) :
-            Set ↥(Omega R p 1))).index = p := by
-  sorry
+/- **BG Proposition E.4** (`C_S(Z₂(S))` abelian of index `p`) is **proved** downstream, as
+`RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p` in
+`OddOrder/BG/AppE_PropE4.lean` — **with one corrective hypothesis added**.  As printed the
+proposition is *false*: its display `(E.23)` silently uses the 2-step centralizer
+relations `⁅Hₐ, T⁆ ≤ Hₐ₊₂` (non-exceptionality), which the printed hypotheses do not
+force; the Lazard group of the exceptional filiform `Q₆` is a machine-checked
+counterexample (`printed_propE4_false` in `OddOrder/BG/AppE_FiliformRefutation.lean`).
+The corrected statement adds exactly that assumption as `hdc`.  It has to live
+downstream: its proof consumes the `(E.28)` engine of `AppE_EigenvalueCombinatorics.lean`,
+the corrected `(E.23)` supply of `AppE_BetaSupply.lean`, and the eigenvalue pieces of
+`AppE_AbelianCentralizer.lean`.  Master note:
+`notes/bg/appE_e4_counterexample_2026_07_21.md` (issues 3021/9402). -/
 
 end RegularOperator
 
@@ -1666,12 +1657,14 @@ open OddOrder.BG.Ch3.S12 OddOrder.BG.Ch4.S14
 
 variable {G : Type*} [Group G]
 
-/-- **BG Corollary E.5**.  Let `G` be a minimal simple group of odd order, `M` a
-maximal subgroup of `G`, `x ∈ M_σ` of prime order `p` with `C_G(x) ⊄ M`, and
-`N ∈ ℳ(C_G(x))` with `N ∉ ℳ_𝓕`.  Assume in addition that
+/-- **BG Corollary E.5** (with the E.4 correction propagated).  Let `G` be a minimal
+simple group of odd order, `M` a maximal subgroup of `G`, `x ∈ M_σ` of prime order `p`
+with `C_G(x) ⊄ M`, and `N ∈ ℳ(C_G(x))` with `N ∉ ℳ_𝓕`.  Assume in addition that
 
 * (i) `|M / M'|` is prime, or
-* (ii) `Ω₁(O_p(M))` has no normal abelian subgroup of index `p`.
+* (ii) `Ω₁(O_p(M))` has no normal abelian subgroup of index `p`, **and** the 2-step
+  centralizer relations `hdc` hold for the chain out of `C_S(Z₂(S))` in
+  `S = Ω₁(O_p(M))`.
 
 Then every maximal subgroup of `G` is of Type I or Type II.
 
@@ -1679,10 +1672,16 @@ Then every maximal subgroup of `G` is of Type I or Type II.
 consumed by the formalized BG Corollary 15.9
 (`OddOrder.BG.Ch4.S16.centralizer_escape_final_local`), with `orderOf x = p`
 added; note `x ∈ M_σ` together with `orderOf x = p` gives `x ∈ M_σ^#` for free.
-The proof needs (ii) ⇒ (i) via Theorem E.3 and Proposition E.4 applied to
-`O_p(M), K₁, E`, and then the §14 counting argument
+The proof needs (ii) ⇒ (i) via Theorem E.3 and the corrected Proposition E.4
+(`AppE_PropE4.lean`) applied to `O_p(M), K₁, E`, and then the §14 counting argument
 (`|𝒞_G(L̃)|`-disjointness, Lemma 14.5, Theorem 14.7) to rule out a maximal
-subgroup that is neither Type I nor Type II.  So it is gated on E.3/E.4 above. -/
+subgroup that is neither Type I nor Type II.  So it is gated on E.3/E.4 above.
+
+⚠ BG's printed (ii) branch is **irreparable as printed**: printed Proposition E.4 is
+false (`printed_propE4_false`), and the exceptional filiform `Q₆` satisfies printed (ii),
+so (ii) ⇒ (i) cannot hold without the extra `hdc` conjunct added here (issue 3021 (54);
+master note `notes/bg/appE_e4_counterexample_2026_07_21.md`).  The (i) branch is
+untouched. -/
 theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M N : Subgroup G} {x : G} {p : ℕ}
     (hM : M ∈ maximalSubgroups G) (hp : p.Prime)
@@ -1691,8 +1690,25 @@ theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
     (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
     (hNnotF : N ∉ maximalTypeFFamily G)
     (halt : ((derivedInG M).subgroupOf M).index.Prime ∨
-      ¬ ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
-          A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p) :
+      ((¬ ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
+          A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p) ∧
+        ∀ n : ℕ,
+          ⁅OddOrder.Isaacs.Ch04.iterCommutator
+              (Subgroup.centralizer
+                ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                    Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+                  Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+              (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) n,
+            Subgroup.centralizer
+              ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                  Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+                Set ↥(Omega ↥(opiCoreInG {p} M) p 1))⁆ ≤
+            OddOrder.Isaacs.Ch04.iterCommutator
+              (Subgroup.centralizer
+                ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                    Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+                  Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+              (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) (n + 2))) :
     ∀ L : Subgroup G, L ∈ maximalSubgroups G →
       OddOrder.GroupTheory.IsTypeI L ∨ OddOrder.GroupTheory.IsTypeII L := by
   sorry

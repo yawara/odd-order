@@ -147,3 +147,24 @@ GPT-5.6 Sol Pro + 親計算検証で **dc≥1 は E.4 の印刷仮説から従�
   (3) α/β 固有値データを (E.19)-(E.22) pieces から実引数化、(4) engine に投入。
   index-p clause は無条件のまま (証明済 scaffold)。
 - 組立レシピの正本 = issue 3021 (43)/(51)/(52) 節。
+
+## ✅ 2026-07-21 (lane c): corrected E.4 landed — 目標 2・3 完了
+
+- **(2) hdc→hβsupply 帰納**: `OddOrder/BG/AppE_BetaSupply.lean` (新 leaf, sorry-free) —
+  `scale_zpow_of_scale` + `scale_iterCommutator_of_two_step` (commit 3b89360e3)。
+- **(1)(3)(4) statement 改訂 + 実引数化 + engine 投入**: `OddOrder/BG/AppE_PropE4.lean`
+  (新 leaf, ~340 行) — `RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p`
+  (corrected E.4) が **axiom-clean で完全証明** (AxiomsCheck 登録済、commit 2e6b7829c)。
+  - α 側: `exists_zpow_eq_act_of_mem_A`/`zpow_exponent_ne_one`/`exists_zpow_eq_mod_chain`
+    /`dvd_sub_eigenvalues` (r₀≡r)。β 側: operator Maschke complement + eigenvalue 抽出 +
+    `not_dvd_sub_eigenvalues_of_not_fixes` (t≠t₀)。S'=H₁ 橋 = `commutator_eq_and_card_quotient`。
+  - 旧 sorried (偽) E.4 statement は AppE_FurtherResults から削除 (E.3(b)-(d) 型コメント化)。
+- **E.5 statement 改訂済**: halt = `(i) ∨ ((ii) ∧ hdc)` (AppE_FurtherResults、skeleton のまま)。
+
+### 残り (本 claim の残余スコープ)
+
+1. **clean Lemma** (`MaximalClassPGroup.lean` 未作成): 「2-step centralizer 全一致 ⟺ dc≥1」
+   の群レベル同値 (iterCommutator + Hall–Witt)。現時点で直接 consumer なし (E.4 の hdc は
+   2-step 形で直接 state 済) — genuine infra だが優先度は下がった。
+2. **E.5 側 hdc 供給の調査**: FT の実適用 (S = Ω₁(O_p(M)), K₁, E) が hdc を満たすか
+   (Q₆ 型 exceptional が実際に現れうるか)。E.5 本体の §14 counting gate と合わせて次段。

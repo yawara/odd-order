@@ -60,7 +60,7 @@ Per-result status:
 | Lemma 1(a) (`coherent_adjoin_of_degree_bound`) | **proved, sorry-free** (issue 1049) |
 | Lemma 2(a) (`Sset_eq_induced_of_Q`) | **proved, sorry-free** (issue 1051) |
 | Lemma 2(b) (`induction_isometry_on_degree_zero`) | **proved, sorry-free** (issue 1052) |
-| Lemma 2(c) (`hasNoRealCharacters_Sset`) | honest statement, `sorry` |
+| Lemma 2(c) (`hasNoRealCharacters_Sset`) | **proved, sorry-free** (issue 1053; explicit `Odd |Q₁|` hypothesis, see its docstring) |
 | Theorem (`feit_sibley_coherence`) | honest statement, `sorry` |
 -/
 
@@ -1084,22 +1084,133 @@ theorem induction_isometry_on_degree_zero
     (hoff φ hφ hφ1) (hoff ψ hψ hψ1)
 
 omit [Fintype G] [Fintype ↥hyp.H] in
-/-- **Peterfalvi Appendix IV, Lemma 2(c)** (p. 145).  If `d = |D|` is odd then no
-`χ ∈ 𝒮` is real: `χ̄ ≠ χ`.
+/-- **Peterfalvi Appendix IV, Lemma 2(c)** (p. 145).  If `d = |D|` and `|Q₁|` are odd
+then no `χ ∈ 𝒮` is real: `χ̄ ≠ χ`.
 
-**Status: honestly stated, not proved.**  By Lemma 2(a) the restriction of `χ`
-to the odd-order group `Q₁ D` is irreducible and non-principal, so `χ̄ ≠ χ` by
-Huppert, *Endliche Gruppen* I, Kapitel V, Satz 13.8 (a group of odd order has no
-nonprincipal real irreducible character — a consequence of Burnside's
-`|{real classes}| = |{real characters}|`).  Lemma 2(a) is now proved
-(`Sset_eq_induced_of_Q`, issue 1051) and the odd-order statement is in the
-repository (`realIrreducibleCharacter_eq_trivial_of_odd_card`,
-`BrauerPermutation.lean`); the missing pieces are the restriction step (that
-`Res_{Q₁D} Ind_Q^H φ = Ind_{Q₁}^{Q₁D} θ` is irreducible, a Mackey-type
-computation) and the source of the oddness of `|Q₁ D|` (original text, p. 145). -/
-theorem hasNoRealCharacters_Sset (hd : Odd hyp.d) :
+The book states the lemma for `d` odd alone, and its proof reads "the restriction of
+`χ` to the odd order group `Q₁D` is irreducible and non-principal, whence `χ̄ ≠ χ` by
+[H], Kapitel V, Satz 13.8".  The oddness of `|Q₁D| = |Q₁|·d` uses oddness of `|Q₁|`,
+which the hypothesis block does not supply: `D` acting fixed-point-freely on the
+non-`2`-group `Q₁` with `d` odd is satisfiable with `|Q₁|` even (e.g.
+`Q₁ = V₄ × C₇`, `D = C₃`).  At the Theorem's call sites this is harmless: after the
+reductions (1)–(2) of the Theorem's proof (pp. 146–147), `Q₁` is a `p`-group for a
+single prime `p`, and `p ≠ 2` since `Q₁` is not a `2`-group — so `|Q₁|` is odd there.
+We therefore take `Odd |Q₁|` as an explicit hypothesis.
+
+The proof avoids the book's Mackey restriction computation.  A real `χ ∈ 𝒮` lies over
+a nontrivial `θ ∈ Irr(Q₁)` (`exists_ne_trivial_liesOver_of_not_forall_eq_one`) and,
+being real, also over `θ̄`; Clifford's single-orbit theorem
+(`restrictionConstituentsSingleOrbit_of_isIrreducible`) gives `θ̄ = θ^g` for some
+`g = q·δ ∈ QD = H`, and `Q` acts trivially on `Irr(Q₁)` (`Q_conjBy_eq`), so
+`θ̄ = θ^δ` with `δ ∈ D`.  Applying `^δ` again, `θ^{δ²} = θ̄̄ = θ`, so
+`δ² ∈ I_H(θ) = Q` (`inertia_theta_eq_Q`); but `δ² ∈ D` too and `Q ∩ D = 1`, so
+`δ² = 1`, and `δ` has odd order (`d` odd), forcing `δ = 1`.  Hence `θ` is a real
+nontrivial irreducible character of the odd-order group `Q₁`, contradicting
+Peterfalvi (1.1) (`not_isReal_of_ne_trivial_of_odd_card'`). -/
+theorem hasNoRealCharacters_Sset [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1)) :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.Sset := by
-  sorry
+  classical
+  haveI hQ1n : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q1.subgroupOf hyp.H) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hyp.Q1.subgroupOf hyp.H) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Finite (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) :=
+    finite_irreducibleCharacter
+  letI : Fintype (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) := Fintype.ofFinite _
+  intro χ hχmem hreal
+  obtain ⟨hχirr, hχker⟩ := hχmem
+  have hconjχ : χ.conj = χ := hreal
+  -- a nontrivial constituent `θ ∈ Irr(Q₁)` of `Res χ`
+  have hker' : ¬ ∀ y : ↥(hyp.Q1.subgroupOf hyp.H), χ (y : ↥hyp.H) = χ 1 := fun hall =>
+    hχker fun x hx => hall ⟨x, Subgroup.mem_subgroupOf.mpr hx⟩
+  obtain ⟨θ, hθne, hθover⟩ := exists_ne_trivial_liesOver_of_not_forall_eq_one
+    (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H) hker'
+  -- `χ` is real, so `Res χ` is a real class function
+  have hres_conj : (ClassFunction.restrict (hyp.Q1.subgroupOf hyp.H) χ).conj
+      = ClassFunction.restrict (hyp.Q1.subgroupOf hyp.H) χ := by
+    have h1 : (ClassFunction.restrict (hyp.Q1.subgroupOf hyp.H) χ).conj
+        = ClassFunction.restrict (hyp.Q1.subgroupOf hyp.H) χ.conj := rfl
+    rw [h1, hconjχ]
+  -- … so `θ̄` is also a constituent of `Res χ`
+  have hover_bar : IrreducibleCharacter.LiesOver (hyp.Q1.subgroupOf hyp.H)
+      (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H)
+      (⟨(θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ).conj, θ.isIrreducible.conj⟩ :
+        IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) := by
+    rw [IrreducibleCharacter.liesOver_iff, ClassFunction.restrictionMultiplicity_def]
+    simp only [IrreducibleCharacter.coe_mk]
+    rw [← hres_conj, inner_conj_conj]
+    intro h0
+    rw [star_eq_zero] at h0
+    have hover' := hθover
+    rw [IrreducibleCharacter.liesOver_iff, ClassFunction.restrictionMultiplicity_def] at hover'
+    simp only [IrreducibleCharacter.coe_mk] at hover'
+    exact hover' h0
+  -- Clifford single-orbit: `θ̄ = θ^g` for some `g ∈ H`; write `g = q·δ` and kill `q`
+  obtain ⟨g, hg⟩ := restrictionConstituentsSingleOrbit_of_isIrreducible
+    (H := hyp.Q1.subgroupOf hyp.H) (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H)
+    θ _ hθover hover_bar
+  obtain ⟨q, hqQ, δ, hδD, rfl⟩ := hyp.exists_mem_Q_mul_mem_D_subtype g
+  have hq1 : IrreducibleCharacter.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) q θ
+      = θ := by
+    apply IrreducibleCharacter.ext
+    rw [IrreducibleCharacter.coe_conjBy]
+    exact hyp.Q_conjBy_eq hqQ _
+  rw [IrreducibleCharacter.conjBy_mul, hq1] at hg
+  -- class-function form `θ^δ = θ̄`
+  have hδconj : ClassFunction.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ
+      (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ)
+      = (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ).conj := by
+    have hcoe := congrArg
+      (fun ξ : IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H) =>
+        (ξ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ)) hg
+    simpa [IrreducibleCharacter.coe_conjBy] using hcoe
+  -- `θ^{δ²} = θ`, so `δ² ∈ I_H(θ) = Q`; but `δ² ∈ D` and `Q ∩ D = 1`
+  have hcomm : (ClassFunction.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ
+      (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ)).conj
+      = ClassFunction.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) δ
+        (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ).conj := by
+    ext x
+    rw [ClassFunction.conj_apply, ClassFunction.conjBy_apply, ClassFunction.conjBy_apply,
+      ClassFunction.conj_apply]
+  have hg2 : ClassFunction.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) (δ * δ)
+      (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ)
+      = (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) := by
+    rw [ClassFunction.conjBy_mul, hδconj, ← hcomm, hδconj, ClassFunction.conj_conj]
+  have hδ2Q : δ * δ ∈ hyp.Q.subgroupOf hyp.H := by
+    have hmem : δ * δ ∈ ClassFunction.inertia (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H)
+        (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) :=
+      ClassFunction.mem_inertia.mpr hg2
+    rwa [hyp.inertia_theta_eq_Q hθne] at hmem
+  have hδ2_one : (δ : G) * (δ : G) = 1 := by
+    have hQmem : ((δ * δ : ↥hyp.H) : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp hδ2Q
+    have hDmem : ((δ * δ : ↥hyp.H) : G) ∈ hyp.D := by
+      rw [Subgroup.coe_mul]; exact hyp.D.mul_mem hδD hδD
+    have hbot : ((δ * δ : ↥hyp.H) : G) ∈ hyp.Q ⊓ hyp.D := ⟨hQmem, hDmem⟩
+    rw [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
+    simpa [Subgroup.coe_mul] using hbot
+  -- `δ` has odd order and squares to `1`, so `δ = 1`
+  have hdvd : orderOf ((δ : ↥hyp.H) : G) ∣ hyp.d := hyp.D.orderOf_dvd_natCard hδD
+  have hoddδ : Odd (orderOf ((δ : ↥hyp.H) : G)) := hd.of_dvd_nat hdvd
+  have hpow : ((δ : ↥hyp.H) : G) ^ 2 = 1 := by rw [pow_two]; exact hδ2_one
+  have hδG1 : ((δ : ↥hyp.H) : G) = 1 := by
+    rcases (Nat.dvd_prime Nat.prime_two).mp (orderOf_dvd_of_pow_eq_one hpow) with h1 | h2
+    · exact orderOf_eq_one_iff.mp h1
+    · rw [h2] at hoddδ
+      exact absurd hoddδ (by decide)
+  have hδ1 : δ = 1 := Subtype.ext (by simpa using hδG1)
+  -- hence `θ` is real — impossible in the odd-order group `Q₁`
+  have hθreal : ClassFunction.IsReal (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) := by
+    have hcoeθ : (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ).conj
+        = (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) := by
+      rw [← hδconj, hδ1, ClassFunction.conjBy_one]
+    exact hcoeθ
+  have hoddN : Odd (Nat.card ↥(hyp.Q1.subgroupOf hyp.H)) := by
+    have hcard : Nat.card ↥(hyp.Q1.subgroupOf hyp.H) = Nat.card ↥hyp.Q1 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q1_le_H).toEquiv
+    rw [hcard]; exact hQ1odd
+  exact not_isReal_of_ne_trivial_of_odd_card' hoddN hθne hθreal
 
 end LemmaTwo
 
@@ -1121,11 +1232,12 @@ and (2) (`𝒮(S')` coherent when `|Q₁|` has two prime divisors; `𝒮` cohere
 `𝒴 = 𝒮(Q')` and reduce coherence of `𝒮` to `a ∣ λ`; step (7) is the class-algebra
 congruence `ψ(z) ≡ ψ(1) (mod |Q|)` for `ψ ∈ Irr(G)` constant on `Z^#`; step (8)
 combines them.  Lemma 1(a) (`coherent_adjoin_of_degree_bound`, issue 1049),
-Lemma 2(a) (`Sset_eq_induced_of_Q`, issue 1051) and Lemma 2(b)
-(`induction_isometry_on_degree_zero`, issue 1052) are now proved; the remaining
-prerequisites are Lemma 2(c) (`hasNoRealCharacters_Sset` above) and step (7)'s
-class-sum congruence machinery for a Hall TI subgroup, which is not in the
-repository. -/
+Lemma 2(a) (`Sset_eq_induced_of_Q`, issue 1051), Lemma 2(b)
+(`induction_isometry_on_degree_zero`, issue 1052) and Lemma 2(c)
+(`hasNoRealCharacters_Sset`, issue 1053; its `Odd |Q₁|` hypothesis is available
+here post-reduction, where `Q₁` is a `p`-group for a prime `p ≠ 2`) are now
+proved; the remaining prerequisite is step (7)'s class-sum congruence machinery
+for a Hall TI subgroup, which is not in the repository. -/
 theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
     (hd : Odd hyp.d) :

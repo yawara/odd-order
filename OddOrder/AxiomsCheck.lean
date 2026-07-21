@@ -160,6 +160,7 @@ import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.BG.AppE_AbelianCentralizer
 import OddOrder.BG.AppE_FiliformCounterexample
 import OddOrder.BG.AppE_FiliformRefutation
+import OddOrder.BG.AppE_PropE4
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -298,7 +299,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 11900
+set_option linter.style.longFile 12000
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -11917,3 +11918,18 @@ API into them.
 #assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.q6Setup
 #assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.q6_centralizer_not_mulCommutative
 #assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.printed_propE4_false
+
+/-! **BG Proposition E.4, corrected** (`BG.AppE_BetaSupply` + `BG.AppE_PropE4`,
+issues 3021/9402, 2026-07-21) — ⭐ the corrected proposition is **fully proved**.
+
+* `AppE.scale_iterCommutator_of_two_step` — the corrected `(E.23)` supply: given the
+  2-step centralizer relations `hdc` (the hypothesis missing from the printed statement),
+  an endomorphism scaling a complement generator by `t` and `T` by `t₀` (mod `H₁`) scales
+  every chain term `Hₐ` by `t₀tᵃ` (mod `Hₐ₊₁`).
+* `RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p` — Proposition E.4
+  with `hdc` added: `T = C_S(Z₂(S))` is abelian of index `p`.  The assembly discharges the
+  `(E.28)` engine's inputs from the proved `(E.18)`–`(E.22)` pieces and the supply above.
+  Without `hdc` the statement is **false** (`printed_propE4_false` above). -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.scale_iterCommutator_of_two_step
+#assert_only_allowed_axioms
+  OddOrder.BG.AppE.RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
