@@ -5984,9 +5984,12 @@ set_option linter.style.longLine false in
 -- `M' = F(M)` is an overstatement, weakened to the inclusion matching MathComp `BGsection15`).
 -- The `M' ≤ F(M)` proof is type-independent: `M' = M_σ ⊔ E'`, `E'` centralizes `M_σ` (Lemma 12.19,
 -- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.
--- ⚠ **Not a complete 15.7**: conjunct (d) and the (e) trichotomy are still owed (issue 3022).  Until
--- 2026-07-18 (b) read `∃ X, X ≤ M_F ∧ X ≠ ⊥ ∧ IsCyclic X` (equivalent to `M_F ≠ 1`) and the trailing
--- disjunct was an `A ∨ ¬A` tautology; both are fixed/dropped.  Sorry-free + axiom-clean.
+-- ⚠ **This bundle carries (a)(b)(c) only.**  Conjunct (d) and the full (e) trichotomy are formalized
+-- as separate downstream theorems — `sigmaComplement_structure_of_not_fittingIsTI` (d) and
+-- `S16.fitting_not_ti_structure_e` (the `p = |X|`-pinned, type-separated (e)) — rather than bundled
+-- here (issue 3022, closed).  Until 2026-07-18 (b) read `∃ X, X ≤ M_F ∧ X ≠ ⊥ ∧ IsCyclic X`
+-- (equivalent to `M_F ≠ 1`) and the trailing disjunct was an `A ∨ ¬A` tautology; both are
+-- fixed/dropped.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_cases
 -- BG Theorem 15.7(b) components: `X = F(M) ∩ F(M)^g` lands in `M_σ` (every prime of `X` is in `σ(M)`,
 -- and `O_{σ(M)}(F(M)) = F(M_σ)` is a normal Hall subgroup of the nilpotent `F(M)`), likewise in
@@ -6009,9 +6012,13 @@ set_option linter.style.longLine false in
 -- `M_F` centralizes the witness `X₁`, so the witness bound `rank (M_F ⊓ C_G(X₁)) < 3` applies to
 -- `M_F` itself; and `O_p(M_F)` is abelian noncyclic, giving `2 ≤ pRank ≤ rank`).  The non-abelian
 -- branch carries the part common to BG (e2)/(e3): `p ∈ σ(M) − β(M)`, `O_p(M_F)` non-abelian,
--- `O_{p'}(M_F)` cyclic.  ⚠ **Still weaker than the book**: `p` is not yet pinned to `|X|` (needs
--- Lemma 10.13(b), unformalized), and (e2)/(e3) are not separated by type (the type-`P₁` conjuncts
--- `|O_p(H)| = p³`, `|M/H| ∣ p+1` are unformalized).  All three sorry-free + axiom-clean.
+-- `O_{p'}(M_F)` cyclic.  ⚠ **This is the S15-layer partial** (upstream of `WitnessPGroup` in the
+-- import order), so `p` is not pinned to `|X|` and (e2)/(e3) are not separated *here*.  Both
+-- refinements are formalized downstream: the pinning via Lemma 10.13(b)
+-- (`S10.nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) as
+-- `card_inf_conj_fitting_eq_of_not_isMulCommutative`, and the type-`P₁` conjuncts `|O_p(H)| = p³`,
+-- `|M/H| ∣ p+1` as `card_opiCore_eq_prime_cube_singer` + `card_dvd_succ_of_primeAction_extraspecial`,
+-- assembled into `S16.fitting_not_ti_structure_e`.  All three sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_trichotomy

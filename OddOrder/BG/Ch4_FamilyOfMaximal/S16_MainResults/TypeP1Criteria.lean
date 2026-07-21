@@ -842,9 +842,12 @@ the `TypeIData.alternative` trichotomy splits on whether `F(M)` is `TI`:
   The non-abelian branch still derives its two conjuncts directly from the non-TI witness
   (`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` +
   `typeF_exponent_dvd_sub_one_of_invariant_card`
-  for the exponent condition, `typeF_nonabelian_cyclic_opiCore_compl` for cyclic `O_{p'}`), because
-  BG's (e2)/(e3) refinement by type is not yet separated in `S15.fitting_not_ti_trichotomy`
-  (issue 3022: `p = |X|` and the type-`P₁` case `|O_p(H)| = p³`, `|M/H| ∣ p+1` remain).
+  for the exponent condition, `typeF_nonabelian_cyclic_opiCore_compl` for cyclic `O_{p'}`); for the
+  type-`F` disjunct those two conjuncts are all that is needed (the type-`P₁` Singer case (e3) is
+  excluded).  BG's full type-separated (e2)/(e3) refinement, with `p = |X|` pinned, is formalized
+  downstream as `S16.fitting_not_ti_structure_e` (issue 3022, closed); the S15-layer
+  `S15.fitting_not_ti_trichotomy` keeps only the conjuncts common to (e2)/(e3), being upstream of
+  `WitnessPGroup`.
 
   ⚠ Historical note: until 2026-07-18 the `(e)` clause of the bundled `fitting_not_ti_cases` was
   **logically vacuous** — it read `abelian M_F ∨ (¬abelian M_F ∧ (type F ∨ type P₁))`, whose second
