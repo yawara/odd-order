@@ -265,6 +265,30 @@ theorem e5_kappaHall_inf_Msigma_eq_bot [Finite G]
   rw [hCU₁ _ hwK₁ hwne1] at hxmem
   exact hx1 (Subgroup.mem_bot.mp hxmem)
 
+/-- `K₁ ⊓ M_σ = ⊥` makes the prime-order `K₁` a `σ(M)'`-subgroup: were `|K₁| ∈ σ(M)`,
+the `σ(M)`-group `K₁` would be absorbed by the Hall subgroup `M_σ`.  This is the input
+shape `e5_exists_suitable_complement` consumes. -/
+theorem e5_kappaHall_pi_sigma_compl [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₁ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hK₁M : K₁ ≤ M)
+    {k : ℕ} (hk : k.Prime) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hinf : K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥) :
+    ∀ r ∈ (Nat.card ↥K₁).primeFactors, r ∈ (OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+  intro r hr
+  rw [hcardK₁, Nat.Prime.primeFactors hk, Finset.mem_singleton] at hr
+  subst hr
+  intro hkσ
+  have hpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma M) K₁ := by
+    intro q hq
+    rw [hcardK₁, Nat.Prime.primeFactors hk, Finset.mem_singleton] at hq
+    exact hq ▸ hkσ
+  have hle := OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) hK₁M hpi
+  have hbot : K₁ = ⊥ := by
+    rw [← hinf]
+    exact le_antisymm (le_inf le_rfl hle) inf_le_left
+  rw [hbot, Subgroup.card_bot] at hcardK₁
+  exact hk.one_lt.ne hcardK₁
+
 /-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
 Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
 collapses onto `K₁`.
