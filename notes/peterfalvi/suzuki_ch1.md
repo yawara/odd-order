@@ -973,6 +973,14 @@ c371bd7a2 / 8b7cd164d)**: piece 4 の数論 application 層が閉じた。
 [x_i,y_j]=0 (|j−i|≠r) の強制) + 対応 bridge 2 本。
 **piece 4 の純算術は B/C/D 全 case 分完備** (TwoPowerCongruence.lean 1030 行)。
 
+**追記 2 (同日 continuation)**: dispatch の前提となる
+`exists_frobenius_pow_eq_of_ringAut` (MixedTermValue.lean) を landing —
+GaloisField 2 n の**任意の** RingAut σ は `Frob^r` (r < n)。証明 = σ が
+Frobenius orbit 外なら n+1 個の distinct monoid hom が Artin 独立となり、
+n 次元の `F →ₗ[ZMod 2] F` (galoisField_linearMap_finrank) に収まらず矛盾。
+これで FactorCoordinateData.theta (抽象 RingAut) から Higman の具体指数 r を
+回収できる → dispatch は θ=Frob^r, φ=Frob^s と置いて r,s の分岐に入れる。
+
 **残り (次 iteration、issue 2048)**:
 1. **case dispatch**: MixedEigenweights の weight 方程式 (λ^{2^i}μ^{2^j}=ν^{2^k}) を
    k=0 正規化 → θ=φ / φ=id / 独立 の 3 分岐。B は congruence 不要 (M 単項)、

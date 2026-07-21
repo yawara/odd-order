@@ -232,6 +232,86 @@ theorem bilinear_equivariance_coeff (n : ℕ) (hn : n ≠ 0)
   intro i j
   exact sub_eq_zero.mp (hzero i j)
 
+/-- **Every ring automorphism of `GaloisField 2 n` is a power of Frobenius.**
+If `σ` avoided the whole Frobenius orbit, then `σ` together with the `n`
+Frobenius powers would be `n + 1` distinct monoid homomorphisms —
+`F`-linearly independent by Artin — inside the `n`-dimensional space of
+`ZMod 2`-linear endomorphisms.  This recovers the concrete exponent `r` of
+Higman's `θ : α ↦ α^{2^r}` from the abstract automorphism carried by the
+factor coordinate data. -/
+theorem exists_frobenius_pow_eq_of_ringAut (n : ℕ) (hn : n ≠ 0)
+    (sigma : RingAut (GaloisField 2 n)) :
+    ∃ r : Fin n, sigma = (frobeniusEquiv (GaloisField 2 n) 2) ^ (r : ℕ) := by
+  by_contra hno
+  push_neg at hno
+  haveI : Finite (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
+    Finite.of_injective
+      (fun f => (f : GaloisField 2 n → GaloisField 2 n)) DFunLike.coe_injective
+  haveI : Module.Finite (GaloisField 2 n)
+      (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
+    Module.Finite.of_finite
+  have horder : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
+    orderOf_frobeniusEquiv_eq_of_card_eq_two_pow n (by
+      simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn)
+  -- the `n + 1` distinct monoid homomorphisms
+  let famM : Option (Fin n) → (GaloisField 2 n →* GaloisField 2 n) := fun o =>
+    o.elim sigma.toMonoidHom
+      fun i => ((frobeniusEquiv (GaloisField 2 n) 2) ^ (i : ℕ)).toMonoidHom
+  have hfrob_inj : ∀ i j : Fin n,
+      ((frobeniusEquiv (GaloisField 2 n) 2) ^ (i : ℕ)).toMonoidHom
+        = ((frobeniusEquiv (GaloisField 2 n) 2) ^ (j : ℕ)).toMonoidHom → i = j := by
+    intro i j hij
+    have hpow : (frobeniusEquiv (GaloisField 2 n) 2) ^ (i : ℕ)
+        = (frobeniusEquiv (GaloisField 2 n) 2) ^ (j : ℕ) := by
+      ext x
+      exact congrArg (fun f : GaloisField 2 n →* GaloisField 2 n => f x) hij
+    have hlt_i : (i : ℕ) < orderOf (frobeniusEquiv (GaloisField 2 n) 2) := by
+      rw [horder]; exact i.2
+    have hlt_j : (j : ℕ) < orderOf (frobeniusEquiv (GaloisField 2 n) 2) := by
+      rw [horder]; exact j.2
+    exact Fin.ext (pow_injOn_Iio_orderOf (Set.mem_Iio.mpr hlt_i)
+      (Set.mem_Iio.mpr hlt_j) hpow)
+  have hsigma_ne : ∀ i : Fin n, sigma.toMonoidHom
+      ≠ ((frobeniusEquiv (GaloisField 2 n) 2) ^ (i : ℕ)).toMonoidHom := by
+    intro i heq
+    refine hno i ?_
+    ext x
+    exact congrArg (fun f : GaloisField 2 n →* GaloisField 2 n => f x) heq
+  have hinj : Function.Injective famM := by
+    intro a b hab
+    match a, b with
+    | none, none => rfl
+    | none, some j => exact absurd hab (hsigma_ne j)
+    | some i, none => exact absurd hab.symm (hsigma_ne i)
+    | some i, some j => exact congrArg some (hfrob_inj i j hab)
+  have hliM := (linearIndependent_monoidHom (GaloisField 2 n)
+    (GaloisField 2 n)).comp famM hinj
+  -- transfer to the `ZMod 2`-linear endomorphism space and count
+  let sigmaLin : GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n :=
+    { sigma.toRingHom.toAddMonoidHom with
+      map_smul' := ZMod.map_smul sigma.toRingHom.toAddMonoidHom }
+  let famL : Option (Fin n) → (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
+    fun o => o.elim sigmaLin fun i => frobLin n i
+  let φ : (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) →ₗ[GaloisField 2 n]
+      (GaloisField 2 n → GaloisField 2 n) :=
+    { toFun := fun f => (f : GaloisField 2 n → GaloisField 2 n)
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl }
+  have hliL : LinearIndependent (GaloisField 2 n) famL := by
+    refine LinearIndependent.of_comp φ ?_
+    have hcoe : ⇑φ ∘ famL = fun o =>
+        ((famM o : GaloisField 2 n →* GaloisField 2 n) :
+          GaloisField 2 n → GaloisField 2 n) := by
+      funext o
+      cases o with
+      | none => rfl
+      | some i => rfl
+    rw [hcoe]
+    exact hliM
+  have hcount := hliL.fintype_card_le_finrank
+  rw [galoisField_linearMap_finrank n hn, Fintype.card_option, Fintype.card_fin] at hcount
+  omega
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
