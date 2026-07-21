@@ -116,6 +116,23 @@ theorem conj_mem_SsetOf_Qder [Finite G] {χ : ClassFunction ↥hyp.H ℂ}
     intro x hxQ'
     rw [ClassFunction.conj_apply, ClassFunction.conj_apply, hkerQ' x hxQ']
 
+/-- **`S ⊴ Q`** (direct-product factor, elementwise form): for `q ∈ Q` and `s' ∈ S`,
+`q s' q⁻¹ ∈ S`.  Writing `q = s·y` (`s ∈ S`, `y ∈ Q₁`), the `Q₁`-part centralises
+`s'`, so `q s' q⁻¹ = s s' s⁻¹ ∈ S`.  Mirror of `Q1_conj_mem_of_mem_Q`. -/
+theorem S_conj_mem_of_mem_Q {q : G} (hq : q ∈ hyp.Q) {x : G} (hx : x ∈ hyp.S) :
+    q * x * q⁻¹ ∈ hyp.S := by
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hq
+  obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hq
+  rw [SetLike.mem_coe] at hs hy
+  subst hsy
+  have hcomm : x * y = y * x := (hyp.S_commutes_Q1 x hx y hy)
+  have hrw : s * y * x * (s * y)⁻¹ = s * x * s⁻¹ := by
+    calc s * y * x * (s * y)⁻¹ = s * (y * x * y⁻¹) * s⁻¹ := by group
+      _ = s * (x * y * y⁻¹) * s⁻¹ := by rw [← hcomm]
+      _ = s * x * s⁻¹ := by group
+  rw [hrw]
+  exact hyp.S.mul_mem (hyp.S.mul_mem hs hx) (hyp.S.inv_mem hs)
+
 /-! ## `H = Q ⋊ D` counting: `[H : Q] = d` -/
 
 /-- `Q.subgroupOf H` and `D.subgroupOf H` are complements in `↥H` (subtype form of
@@ -588,6 +605,35 @@ theorem ssetOf_Qder_coherent [Finite G] (hd : Odd hyp.d)
       exact Nat.cast_ne_zero.mpr (hyp.d_pos).ne')
     hyp.one_notMem_A
     (fun a ha b hb => hyp.diff_support_subset_A_of_mem_SsetOf_Qder ha hb)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥hyp.H : ℂ)] in
+/-- **Induction preserves `Q'`-constancy**: if `φ ∈ CF(Q)` is constant (`= φ(1)`) on
+the `Q'`-part, then `Ind_Q^H φ` is constant on `Q'` (`LeKer`).  Every induction
+term at `x ∈ Q'` evaluates `φ` at an `H`-conjugate of `x`, which stays in
+`Q' ⊆ Q` (`Qder_conj_mem_of_mem_H`), where `φ` takes the value `φ(1)`; so all
+`|H|` terms agree with the corresponding terms at `1`. -/
+theorem leKer_induce_Qder_of_forall [Finite G]
+    {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ}
+    (hconst : ∀ y : ↥(hyp.Q.subgroupOf hyp.H), ((y : ↥hyp.H) : G) ∈ hyp.Qder →
+      φ y = φ 1) :
+    hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) hyp.Qder := by
+  intro x hxQ'
+  have hterm : ∀ g : ↥hyp.H, (g : G) ∈ hyp.Qder → ∀ h : ↥hyp.H,
+      ClassFunction.induceTerm (hyp.Q.subgroupOf hyp.H) φ h g = φ 1 := by
+    intro g hg h
+    have hconjG : ((h⁻¹ * g * h : ↥hyp.H) : G) ∈ hyp.Qder := by
+      have := hyp.Qder_conj_mem_of_mem_H (hyp.H.inv_mem h.2) hg
+      simpa [mul_assoc] using this
+    have hmem : h⁻¹ * g * h ∈ hyp.Q.subgroupOf hyp.H :=
+      Subgroup.mem_subgroupOf.mpr (hyp.Qder_le_Q hconjG)
+    rw [ClassFunction.induceTerm_of_mem φ hmem]
+    exact hconst ⟨h⁻¹ * g * h, hmem⟩ hconjG
+  have h1Q' : ((1 : ↥hyp.H) : G) ∈ hyp.Qder := by
+    simp
+  rw [ClassFunction.induce_apply, ClassFunction.induce_apply]
+  congr 1
+  refine Finset.sum_congr rfl fun h _ => ?_
+  rw [hterm x hxQ' h, hterm 1 h1Q' h]
 
 end CharacterLayer
 
