@@ -49,6 +49,52 @@ BG Thm 6.2 の J は Gorenstein 版。⟹ J_a 完成後、`hZJ`・結論とも J
       (`AppA_PStability.lean:127`) + `Isaacs.Ch07.centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot`
       と接続 (定義のずれは着手時に照合)。
 
+## 進捗 2026-07-21 (lane c)
+
+- ✅ 基盤 leaf `ThompsonSubgroupAbelian.lean` (commit 540fcdfb2): `maxAbelianIn` /
+  `thompsonJAbelian` + **G Lem 2.1** (`eq_inf_centralizer_of_mem_maxAbelianIn`) +
+  系 `Z(P) ≤ A` + **G Lem 2.3** (normalize ⟺ `⁅⁅B,A⁆,A⁆ = ⊥`)。
+- ✅ **G Lem 2.2 (a)-(d)** (commit 58d7081da): `maxAbelianIn_subset_of_le` /
+  `thompsonJAbelian_le_of_le` / `thompsonJAbelian_eq_of_le_of_le` /
+  `thompsonJAbelian_map_of_injective` / conj 版 / characteristic 2 instance。
+  sibling (elementary 版) の骨格ミラー + mathlib `map_isMulCommutative` 系で転送。
+
+## Thm 2.4 (Thompson) の実装計画 (2026-07-21 原文精読済، mmd L5487-5505)
+
+**statement**: `A ∈ A(P)`, `x ∈ P`, `M := ⟨⁅x,a⁆ : a ∈ A⟩` abelian ⟹
+`M·C_A(M) ∈ A(P)`。Lean 形:
+`M := Subgroup.closure {y | ∃ a ∈ A, y = ⁅x, a⁆}`、結論
+`M ⊔ (A ⊓ centralizer M) ∈ maxAbelianIn P`。
+⚠ `⁅zpowers x, A⁆` は使わない (`⁅xⁿ,a⁆` 込みで Gorenstein の `[x,A]` と別物)。
+
+**部品** (証明の分解、Gorenstein 順):
+1. **可換性**: `M ⊔ C` abelian (M abelian 仮説 + C = C_A(M) ≤ centralizer M + C ≤ A abelian、
+   既存 Lem 2.1 の sup パターン再利用)。
+2. **対称性 (G Lem 2.2.5(i) 相当)**: A abelian + M abelian ⟹
+   `⁅⁅x,u⁆,v⁆ = ⁅⁅x,v⁆,u⁆` (u,v ∈ A)。導出: `⁅x, u*v⁆ = ⁅x,u⁆ * u⁅x,v⁆u⁻¹`
+   (free identity、`group` で閉じる) を u*v = v*u の両順で展開し M の可換性で比較。
+3. **coset 単射**: `⁅x,u⁆⁻¹⁅x,v⁆ ∈ C_M(A) ⟹ v*u⁻¹ ∈ C_A(M)`
+   (Gorenstein の y = [x,vu⁻¹] 計算 + 対称性 2)。⟹ `|A : C_A(M)| ≤ |M : C_M(A)|`。
+4. **C ∩ M = C_M(A)**: `C_P(A) = A` (Lem 2.1) から `M ∩ centralizer A ≤ A` ⟹
+   `C ⊓ M = A ⊓ M ⊓ centralizer A = C_M(A)` の鎖。
+5. **積公式**: `|M ⊔ C| = |M|·|C|/|C ⊓ M|` (C が M を中心化 ⟹ 積が部分群)。
+   repo/mathlib の card_sup 系を実測してから選ぶ (AppE `card_centralizer_R₀` に類例)。
+6. 3+4+5 を接合して `|M ⊔ C| ≥ |A|` ⟹ maximality で membership。
+
+**⚠ 交換子の慣習**: Gorenstein `[x,y] = x⁻¹y⁻¹xy` = mathlib `⁅x⁻¹,y⁻¹⁆`。
+Lean 側は mathlib `⁅x,a⁆ = xax⁻¹a⁻¹` で M を定義し、Gorenstein の計算を `x → x⁻¹`
+で鏡映して追う (x は全称なので statement は等価)。2 の対称性 lemma (G Lem 2.5(i),
+Ch.2 p.20 mmd L579) の正確な仮定 = 「y,z 可換 + `x y⁻¹ x⁻¹ y` と `x z⁻¹ x⁻¹ z` が可換」
+— 後者 2 元は mathlib 記法で `⁅x,y⁻¹⁆`, `⁅x,z⁻¹⁆` そのもの (y⁻¹,z⁻¹ ∈ A ゆえ M の
+生成元) なので M abelian から直接出る。G 原文の `[x,G]` abelian 仮定より弱い仮定で足りる
+(G 自身の証明がそれしか使っていない; `[x⁻¹,y]=[x^m,y] ∈ [x,G]` の帰納は不要になる)。
+element lemma は raw な Commute 仮定 2 つで state し `group` + calc で閉じる。
+
+**Thm 2.5 (Thompson Replacement, mmd L5507-5511)** は 2.4 の系に近い:
+`N = N_B(A) ⊴ AB`、`B/N ∩ Z(AB/N) ≠ 1` (G Thm 2.6.4 = 冪零群の正規部分群と中心の交わり;
+repo 対応物を実測) から x を取り `M = [x,A] ⊆ N` abelian → 2.4。
+**Thm 2.6** (B abelian normal ⟹ ∃A ∈ A(P), B normalizes A): 2.5 + `A ∩ B` 最大選択。
+
 ## 完了条件
 
 Glauberman ZJ (G Thm 8.2.11) が J_a で sorry-free / axiom-clean。下流 3024 → 3017
