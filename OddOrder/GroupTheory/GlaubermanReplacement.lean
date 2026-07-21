@@ -500,6 +500,180 @@ theorem glauberman_replacement_aux [Finite G] [Group.IsNilpotent G]
   · exact glauberman_replacement_case_two hsup hB' hA hBnA hodd hn_pos hmin hcase
   · exact glauberman_replacement_case_one hB' hA hn_pos hn_comm hcase
 
+/-- normalizer の subgroupOf 転送: `X, Y ≤ Q` で `X.subgroupOf Q` が
+`Y.subgroupOf Q` を正規化するなら ambient でも `X ≤ N(Y)`
+(逆共役で `Q`-membership を回収する). -/
+theorem le_normalizer_of_subgroupOf_le_normalizer {Q X Y : Subgroup G}
+    (hXQ : X ≤ Q) (hYQ : Y ≤ Q)
+    (h : X.subgroupOf Q ≤ normalizer ((Y.subgroupOf Q : Subgroup ↥Q) : Set ↥Q)) :
+    X ≤ normalizer (Y : Set G) := by
+  intro x hx
+  have hxin : (⟨x, hXQ hx⟩ : ↥Q) ∈ X.subgroupOf Q := by
+    rw [mem_subgroupOf]
+    exact hx
+  have hnorm := mem_normalizer_iff.mp (h hxin)
+  rw [mem_normalizer_iff]
+  intro a
+  constructor
+  · intro ha
+    have h1 := (hnorm ⟨a, hYQ ha⟩).mp (by rw [mem_subgroupOf]; exact ha)
+    rw [mem_subgroupOf] at h1
+    simpa using h1
+  · intro ha
+    have haQ : a ∈ Q := by
+      have h1 : x⁻¹ * (x * a * x⁻¹) * x ∈ Q :=
+        Q.mul_mem (Q.mul_mem (Q.inv_mem (hXQ hx)) (hYQ ha)) (hXQ hx)
+      rwa [show x⁻¹ * (x * a * x⁻¹) * x = a by group] at h1
+    have h2 := (hnorm ⟨a, haQ⟩).mpr (by rw [mem_subgroupOf]; simpa using ha)
+    rw [mem_subgroupOf] at h2
+    exact h2
+
+open OddOrder.Isaacs.Ch04 in
+/-- **Gorenstein Theorem 2.7 (Glauberman Replacement Theorem)** — subgroup-level:
+`P` 有限 `p`-群 (`p` 奇素数), `B ⊴ P` (`P ≤ N(B)`) が class ≤ 2
+(`⁅B,B⁆ ≤ C(B)`) かつ `B' ≤ Z(J_a(P))` (encoding
+`⁅B,B⁆ ≤ C(J_a(P)) ⊓ J_a(P)`), `A ∈ A(P)` が `B` に正規化されないとき,
+`A* ∈ A(P)` で `A ∩ B < A* ∩ B` かつ `A* ≤ N(A)` なるものが存在する.
+
+`Q := A ⊔ B` に core (`glauberman_replacement_aux`) を instantiate する.
+`B' ≤ Z(Q)` は `Z(J_a(P)) ≤ A` (Lem 2.1) と class ≤ 2 から. -/
+theorem glauberman_replacement [Finite G] {p : ℕ} [Fact p.Prime] (hp2 : p ≠ 2)
+    {P B A : Subgroup G} (hP : IsPGroup p ↥P)
+    (hBP : B ≤ P) (hPnB : P ≤ normalizer (B : Set G))
+    (hclass2 : ⁅B, B⁆ ≤ centralizer (B : Set G))
+    (hBZJ : ⁅B, B⁆ ≤ centralizer (thompsonJAbelian P : Set G) ⊓ thompsonJAbelian P)
+    (hA : A ∈ maxAbelianIn P) (hBnA : ¬ B ≤ normalizer (A : Set G)) :
+    ∃ A' ∈ maxAbelianIn P, A ⊓ B < A' ⊓ B ∧ A' ≤ normalizer (A : Set G) := by
+  classical
+  set Q := A ⊔ B with hQdef
+  have hAQ : A ≤ Q := le_sup_left
+  have hBQ : B ≤ Q := le_sup_right
+  have hQP : Q ≤ P := sup_le hA.1 hBP
+  -- `Z(J_a(P)) ≤ A` (Lem 2.1), ゆえに `B' ≤ A` と `Q ≤ C(B')`
+  have hZJA : centralizer (thompsonJAbelian P : Set G) ⊓ thompsonJAbelian P ≤ A := by
+    intro z hz
+    refine (eq_inf_centralizer_of_mem_maxAbelianIn hA).ge ⟨?_, ?_⟩
+    · exact (thompsonJAbelian_le P) hz.2
+    · exact centralizer_le (SetLike.coe_subset_coe.mpr
+        (le_thompsonJAbelian_of_mem_maxAbelianIn hA)) hz.1
+  have hB'A : ⁅B, B⁆ ≤ A := hBZJ.trans hZJA
+  have hQcentB' : Q ≤ centralizer ((⁅B, B⁆ : Subgroup G) : Set G) := by
+    refine sup_le ?_ (le_centralizer_iff.mpr hclass2)
+    exact le_centralizer_iff.mpr
+      (hB'A.trans (le_centralizer_iff_isMulCommutative.mpr hA.2.1))
+  -- ↥Q の instance 群
+  have hpQ : IsPGroup p ↥Q :=
+    (hP.to_subgroup (Q.subgroupOf P)).of_equiv (Subgroup.subgroupOfEquivOfLe hQP)
+  haveI : Group.IsNilpotent ↥Q := hpQ.isNilpotent
+  haveI hBinN : (B.subgroupOf Q).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer (hQP.trans hPnB)
+  have hodd : ∀ g : ↥Q, g ^ 2 = 1 → g = 1 := by
+    intro g hg
+    obtain ⟨k, hk⟩ := IsPGroup.iff_orderOf.mp hpQ g
+    rcases Nat.eq_zero_or_pos k with h0 | hpos
+    · rw [h0, pow_zero] at hk
+      exact orderOf_eq_one_iff.mp hk
+    · exfalso
+      have hpdvd : p ∣ orderOf g := hk ▸ dvd_pow_self p hpos.ne'
+      have hdvd2 : p ∣ 2 := hpdvd.trans (orderOf_dvd_of_pow_eq_one hg)
+      exact hp2 ((Nat.prime_dvd_prime_iff_eq Fact.out Nat.prime_two).mp hdvd2)
+  -- `⊤ = B-in ⊔ A-in`
+  have htop : (⊤ : Subgroup ↥Q).map Q.subtype = Q := by
+    rw [← MonoidHom.range_eq_map, Q.range_subtype]
+  have hsupQ : B.subgroupOf Q ⊔ A.subgroupOf Q = ⊤ := by
+    apply Subgroup.map_injective Q.subtype_injective
+    rw [Subgroup.map_sup, Subgroup.map_subgroupOf_eq_of_le hBQ,
+      Subgroup.map_subgroupOf_eq_of_le hAQ, htop]
+    exact (sup_comm B A).trans hQdef.symm
+  -- `B'-in ≤ Z(↥Q)`
+  have hB'Q : ⁅B.subgroupOf Q, B.subgroupOf Q⁆ ≤ center ↥Q := by
+    rw [commutator_le]
+    intro b₁ hb₁ b₂ hb₂
+    rw [Subgroup.mem_center_iff]
+    intro q
+    have hmem : ⁅(b₁ : G), (b₂ : G)⁆ ∈ (⁅B, B⁆ : Subgroup G) :=
+      commutator_mem_commutator (mem_subgroupOf.mp hb₁) (mem_subgroupOf.mp hb₂)
+    have hcomm : ⁅(b₁ : G), (b₂ : G)⁆ * (q : G) = (q : G) * ⁅(b₁ : G), (b₂ : G)⁆ :=
+      mem_centralizer_iff.mp (hQcentB' q.2) _ hmem
+    refine Subtype.ext ?_
+    have hc1 : ((q * ⁅b₁, b₂⁆ : ↥Q) : G) = (q : G) * ⁅(b₁ : G), (b₂ : G)⁆ := by
+      simp [commutatorElement_def]
+    have hc2 : ((⁅b₁, b₂⁆ * q : ↥Q) : G) = ⁅(b₁ : G), (b₂ : G)⁆ * (q : G) := by
+      simp [commutatorElement_def]
+    rw [hc1, hc2, hcomm]
+  -- `A-in ∈ A(⊤)`
+  have hAin : A.subgroupOf Q ∈ maxAbelianIn (⊤ : Subgroup ↥Q) := by
+    have h1 : A ∈ maxAbelianIn ((⊤ : Subgroup ↥Q).map Q.subtype) := by
+      rw [htop]
+      exact ⟨hAQ, hA.2.1, fun B₀ hB₀ hB₀c => hA.2.2 B₀ (hB₀.trans hQP) hB₀c⟩
+    exact (comap_mem_maxAbelianIn_of_injective Q.subtype_injective h1).1
+  -- `¬ B-in ≤ N(A-in)`
+  have hBnAin : ¬ B.subgroupOf Q
+      ≤ normalizer ((A.subgroupOf Q : Subgroup ↥Q) : Set ↥Q) := fun hle =>
+    hBnA (le_normalizer_of_subgroupOf_le_normalizer hBQ hAQ hle)
+  -- core 適用
+  obtain ⟨A'in, hA'mem, hA'lt, hA'norm⟩ :=
+    glauberman_replacement_aux hsupQ hB'Q hAin hBnAin hodd
+  -- 引き上げ
+  set A' := A'in.map Q.subtype with hA'def
+  have hA'Q : A' ≤ Q := by
+    rw [hA'def]
+    exact (Subgroup.map_le_range _ _).trans (le_of_eq Q.range_subtype)
+  have hA'in_eq : A'.subgroupOf Q = A'in := by
+    rw [hA'def]
+    exact Subgroup.comap_map_eq_self_of_injective Q.subtype_injective A'in
+  have hA'P : A' ∈ maxAbelianIn P := by
+    refine maxAbelianIn_subset_of_le hQP hA hAQ ?_
+    have h1 := map_mem_maxAbelianIn_of_injective Q.subtype_injective
+      (P := (⊤ : Subgroup ↥Q)) hA'mem
+    rwa [htop] at h1
+  -- inf の transport
+  have hinf_eq : ∀ X : Subgroup G, X ≤ Q →
+      X.subgroupOf Q ⊓ B.subgroupOf Q = (X ⊓ B).subgroupOf Q := by
+    intro X hXQ
+    ext g
+    simp [mem_subgroupOf]
+  have hAB : (A.subgroupOf Q ⊓ B.subgroupOf Q).map Q.subtype = A ⊓ B := by
+    rw [hinf_eq A hAQ, Subgroup.map_subgroupOf_eq_of_le (inf_le_left.trans hAQ)]
+  have hA'B : (A'in ⊓ B.subgroupOf Q).map Q.subtype = A' ⊓ B := by
+    rw [← hA'in_eq, hinf_eq A' hA'Q,
+      Subgroup.map_subgroupOf_eq_of_le (inf_le_left.trans hA'Q)]
+  refine ⟨A', hA'P, ?_, ?_⟩
+  · have hmono : Monotone (Subgroup.map Q.subtype) := fun _ _ h => Subgroup.map_mono h
+    have hsm : StrictMono (Subgroup.map Q.subtype) :=
+      hmono.strictMono_of_injective (Subgroup.map_injective Q.subtype_injective)
+    have hlt := hsm hA'lt
+    rwa [hAB, hA'B] at hlt
+  · refine le_normalizer_of_subgroupOf_le_normalizer hA'Q hAQ ?_
+    rw [hA'in_eq]
+    exact hA'norm
+
+/-- **Gorenstein Theorem 2.9**: Thm 2.7 の仮定の下で, `B` が正規化する
+`A ∈ A(P)` が存在する (`|A ⊓ B|` 最大の `A` を取れば replacement が適用不能). -/
+theorem exists_mem_maxAbelianIn_normalizer_of_class_two [Finite G] {p : ℕ}
+    [Fact p.Prime] (hp2 : p ≠ 2) {P B : Subgroup G} (hP : IsPGroup p ↥P)
+    (hBP : B ≤ P) (hPnB : P ≤ normalizer (B : Set G))
+    (hclass2 : ⁅B, B⁆ ≤ centralizer (B : Set G))
+    (hBZJ : ⁅B, B⁆ ≤ centralizer (thompsonJAbelian P : Set G) ⊓ thompsonJAbelian P) :
+    ∃ A ∈ maxAbelianIn P, B ≤ normalizer (A : Set G) := by
+  classical
+  obtain ⟨A, hAmem, hAmax⟩ := Set.exists_max_image (maxAbelianIn P)
+    (fun A => Nat.card ↥(A ⊓ B))
+    (Set.finite_univ.subset fun _ _ => Set.mem_univ _)
+    (maxAbelianIn_nonempty P)
+  refine ⟨A, hAmem, ?_⟩
+  by_contra hBnA
+  obtain ⟨A', hA'mem, hlt, -⟩ :=
+    glauberman_replacement hp2 hP hBP hPnB hclass2 hBZJ hAmem hBnA
+  have hle : Nat.card ↥(A' ⊓ B) ≤ Nat.card ↥(A ⊓ B) := hAmax A' hA'mem
+  have hstrict : Nat.card ↥(A ⊓ B) < Nat.card ↥(A' ⊓ B) := by
+    refine lt_of_le_of_ne (Subgroup.card_le_of_le hlt.le) ?_
+    intro heq
+    exact hlt.ne (eq_of_le_of_card_ge hlt.le heq.ge)
+  omega
+
 end Subgroup
+
+
 
 
