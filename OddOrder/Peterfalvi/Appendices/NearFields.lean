@@ -58,8 +58,9 @@ Per-result status:
 | App. C Prop 2, field half (`nearField_field_structure_of_index_two`) | **proved** (unchanged) |
 | `NearField.mul_add_of_mul_comm` (commutative ⇒ distributive) | **proved, sorry-free** (new) |
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
-| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` |
-| App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | honest statement, `sorry` |
+| App. C Prop 1, prerequisite (i) (`RankOneHypothesis.sylow_two_isCyclic_or_quaternion`) | **proved, axiom-clean** (2026-07-22) |
+| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` — gated on Brauer–Suzuki (issue 9318) |
+| App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | **proved, axiom-clean** (2026-07-21, commit 42892fcb5) |
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
@@ -945,22 +946,14 @@ an `r` which is a power of an odd prime such that `F ≅ F_{r²,2}` — the twis
 An isomorphism of near-fields is an additive equivalence that is also multiplicative, spelled out
 here rather than bundled.
 
-**Status: honestly stated, `sorry`.**  The first half of Peterfalvi's proof is **proved**, in this
-file, sorry-free: `rightMulAction_irreducible_of_index_two` is the counting argument
-`|F| = 2|A| + 1 ≥ (|A|+1)²` ruling out a proper invariant decomposition, and
-`exists_field_structure_of_cyclic_index_two` (cited in the proof below) is the resulting field
-structure via Appendix I, Proposition 2.
-
-What remains is the *tail*: normalize the field `K` obtained from `exists_field_semilinear` so that
-its unit `1` is the near-field unit and `x ∘ y = x·y` for `y ∈ A` (the module structure only gives
-`finrank = 1`, so the normalization is the choice of basis vector `1`), then run the semilinearity
-clause of `exists_field_semilinear` to produce the homomorphism `y ↦ σ_y` from `F^*` to `Aut K`
-whose kernel contains `A`, split on whether that kernel is all of `F^*` (field case) or of index `2`
-(then `σ_y : x ↦ x^r` and `F ≅ F_{r²,2}`), and finally compute `Z(F^*) = 𝔽_r^*` from
-`x ∈ Z(F^*) ↔ x^r = x`.  The missing formal prerequisite is the normalized transport of the
-`exists_field_semilinear` output onto the near-field `F` itself (a `Module K F` with `finrank 1` has
-to be converted into a *field structure on `F`* sharing `+` and `1` with the near-field); no piece
-of this is in the repository yet. -/
+**Status: proved, axiom-clean** (2026-07-21).  The first half is
+`rightMulAction_irreducible_of_index_two` (the counting argument `|F| = 2|A| + 1 ≥ (|A|+1)²`
+ruling out a proper invariant decomposition) feeding `exists_field_semilinear_with_scalar`
+(Appendix I, Proposition 2).  The tail — normalizing the semilinear field `K` so that its unit is
+the near-field unit (`Θ : K ≃ₗ[K] F`, `a ↦ a • 1`), splitting on whether the kernel of
+`y ↦ σ_y : F^* → Aut K` is all of `F^*` (field case) or of index `2` (`σ_y : x ↦ x^r`, twist case
+`F ≅ F_{r²,2}`), and computing `|Z(F^*)| = r - 1` from `x ∈ Z(F^*) ↔ x^r = x` — is carried out
+below in full. -/
 theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F] [Finite F]
     (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
     (∀ x y : F, x * y = y * x) ∨
