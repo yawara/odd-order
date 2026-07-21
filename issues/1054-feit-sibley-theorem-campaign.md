@@ -193,6 +193,18 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     hdiffasuppχ (χ − a•anchor の support) は同度数 scaled diff の A-support
     (既存 hdegdiffsupp 論法)、htau1_memaχ は tau_mem_ZIrr、
     hDeg = 2a < Σ (degMem/d)² が counting との接続点。
+  - (b3734e2d6) **full-𝒮 S07.Hypothesis 完成** (`ssetS07Hypothesis`)。
+  - **pairUnion 機構の正確な形 (2026-07-21 精読)**: `pairSet pair j = {(pair j).1, (pair j).2}`、
+    `pairUnion_succ_eq_union_pair`、`mem_pairUnion` (base ∨ ∃ j < N)、
+    `pairUnion_eq_of_cover (hS₀ : S₀ ⊆ X) (hpairs : ∀ j < N, pairSet ⊆ X)
+    (hcover : ∀ χ ∈ X, base ∨ pair) : pairUnion S₀ pair N = X`。
+    engine 適用は `(pairUnion_eq_of_cover ...) ▸ coherentPairChain S₀ pair h0 N hstep`。
+    **残る構成タスク**: 共役対 enumeration `pair : ℕ → CF × CF` の構築 —
+    𝒮(S'Q₃) − 𝒮(S'Q₂) は共役閉 (conj_mem_Sset + LeKer の conj 不変性) かつ実指標なし
+    (2(c)) なので {χ, χ̄}-軌道の代表系を度数順に取る。CoherenceUnion の (6.6) 最終定理
+    (:1640 以降) が同じ構成をどう扱っているか (pairing を仮定に取るか構成するか) を
+    次に読むこと — 構成済みならそれを流用、仮定型なら代表系選択 (Finset 帰納 or
+    exists_monotoneDegreeEnum + 偶数個ペアリング) を新設。
 
 ## 完了条件
 
