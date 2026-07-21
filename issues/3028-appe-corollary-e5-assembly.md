@@ -197,3 +197,23 @@ theorem e5_exists_suitable_complement ... (K₁ 側仮説 + 15.9 出力仮説) :
 R∩E₀ cyclic (Prop 3.9、regular on N_σ)。これが setup の R₁/centralizer_eq/R₀_disjoint_R₁
 を供給。その後 act (E の conj 作用の MulAut 化)・A := K₁ 像・p_not_dvd_card_B (E は
 σ(M)'-群 + p ∈ σ(M))・A_regular (Frobenius fpf) を束ねて RegularOperatorSetup 構成。
+
+## 2026-07-21 (E.31) ルート確定 (iteration 15 調査)
+
+**BG Thm 12.7 の全 clause 形式化済みと確認** — (d) = `exists_complement_of_canonical_line`
+(S12_Theorem127d.lean:164; E₀ ≤ E, A₀ ⊓ E₀ = ⊥, A₀ ⊔ E₀ = E)。(E.31) の形式化ルート:
+
+1. E₀ := 12.7(d) を N-esetup に適用 (hMnorm = 12.7(b) の N ≤ N_G(A₀)、hprime_eq = 12.7(a))。
+2. **R = A₀ ⊔ (R ⊓ E₀)** (R := O_p(M) ⊓ N = C_{O_p}(x)、A₀ = ⟨x⟩): A₀ ⊴-in-E
+   (E = M∩N ≤ N ≤ N_G(A₀)) → mul_normal で set 積分解 (inf_eq_kappaHall と同型の論法)。
+   disjoint: A₀ ⊓ (R∩E₀) ≤ A₀ ⊓ E₀ = ⊥。
+3. **R∩E₀ regular on N_σ**: y ∈ (R∩E₀)^# の p-冪位数 → order-p 元 y' ∈ ⟨y⟩ ≤ E₀、
+   ⟨y'⟩ ≠ A₀ (E₀ ⊓ A₀ = ⊥) → 12.7(c) 二分律 hdich → C_{N_σ}(⟨y'⟩) = ⊥ → C_{N_σ}(y) = ⊥。
+4. **cyclic**: Prop 3.9 = `isCyclic_of_isPGroup_of_isFrobeniusAction` (S03g_Thm310.lean:55、
+   conj 作用の MulDistribMulAction 化 + IsFrobeniusAction; 適用例 = S12_Theorem1212b.lean:224)。
+   Nontrivial N_σ = Msigma_ne_bot。p odd = |G| odd。
+5. **R₁ ≠ ⊥**: R は N の Sylow p (p-part 一致、p ∉ σ(N)) + pRank N p = 2 (τ₂) →
+   R noncyclic (pRank_eq_of_le_of_not_dvd_index で rank 転送) → R ⊋ A₀。
+
+setup フィールド対応: centralizer_eq = 2 (subgroupOf ↥O_p 化)、R₁_cyclic = 4、
+R₀_disjoint_R₁ = 2、R₁_ne_bot = 5。
