@@ -526,9 +526,19 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         - cube 版は |Z(P)| = 2^m を isplit.split の濃度から導出し、
           quotient fpf を fixedPointFree_of_actsRegularlyOnInvolutions +
           coprime lifting で供給。AxiomsCheck 3 本登録、axiom-clean 確認済
-      - 残り: Lemma 5 側 instantiation — W ≠ 1 から summand 同型
-        (IsomorphicOrderQModuleSplit) を構成して `_of_card_eq_cube` を呼び、
-        IsTypeB を Peterfalvi 側 type-B data に接続する。
+      - [x] **Lemma 5 側 instantiation 完了 (2026-07-21, 新 leaf
+        Suzuki/TypeBFromW.lean, `66cea9a04`)**:
+        `isTypeB_Q_of_orderThree_of_mem_W` — |st| = 3 + IsSuzuki2Group Q +
+        |Q| = |Q₀|³ (|Q₀| = 2^m) + 1 ≠ w ∈ W ⟹ IsTypeB Q。
+        conjQByW (W の共役作用) を新設し、ω := conj-by-w の 6 仮説を検証:
+        奇数位数 (orderOf ∣ |W| ∣ |D| odd) / center 各点固定
+        (Q0_le_centralizer_zpowers_of_mem_W) / K と可換 (W = C_V(K)、
+        coe_K + mem_centralizer) / 非自明冪の固定点 = Q₀ (第一 reduction を
+        w^i に適用) / ω ≠ 1 (C_Q(w) = Q₀ ≠ Q の濃度) — engine
+        (ConjugateSummandSplit) → TypeBRecognition cube 版に接続。
+        center = Q₀ 同定は ActualCenter に追加した
+        `center_Q_eq_Q0_subgroupOf_of_sq_eq_one` (payload の exponent 2 から)。
+        AxiomsCheck 2 本登録、axiom-clean。
       - **⟹ (優先度低; Lemma 5 は不使用)**: TypeBModel の F×0 / 0×F summand
         + swap 同値。actor 側の座標同一視 ((e) 後半) は別項。
       - 注意: OrderQModuleSplit の actor は K.subtype (Suzuki actor)、
@@ -537,7 +547,8 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         factors.left/right 像 (TwoSummandSplit の構成) を経由。
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
       自由作用と位数整除を得る一般補題を証明する
-- [ ] `K`-不変な位数 `q²` 部分群 `X` と `X^w ≠ X` を証明する
+- [x] `K`-不変な位数 `q²` 部分群 `X` と `X^w ≠ X` を証明する
+      (ConjugateSummandSplit + TypeBFromW で完了)
   - [x] square fiber (新 leaf SquareCosetFiber.lean, 2026-07-21):
         `cosetSquare` (中心 exponent-2 部分群の coset 上で平方は一定 →
         P⧸Z → P の関数として well-defined、hom ではない) +
@@ -546,11 +557,13 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         濃度一致で単射) + `existsUnique_cosetSquare_eq`
         (固定 involution s の fiber は単一 coset — 原文の
         |{x ∈ X | x² = s}| = q の形式化)。AxiomsCheck 2 本登録
-  - 残り: (i) ω := conj-by-w で X̄^ω = X̄ なら unique fiber coset が
-    ⟨ω⟩-不変 → coprime lifting (KSubgroupOrbit の engine) で固定元 →
-    C_Q(w) = Q₀ と x² = s ≠ 1 が矛盾; (ii) よって X̄^ω ≠ X̄ となり
-    (X̄, X̄^ω) + conj-w equivariant iso で IsomorphicOrderQModuleSplit
-    を構成 (複補性は isCompl_of_distinct_invariant_of_transitive_card)
+  - [x] (i)+(ii) 完了 (新 leaf ConjugateSummandSplit.lean, `56e8020ff`):
+    `map_quotientCongr_ne_of_fixedPoints_le` (移動 summand 矛盾 —
+    unique fiber coset の ⟨ω⟩-不変性 + coprime lifting + C_Q(w) = Q₀) と
+    `nonempty_isomorphicOrderQModuleSplit_of_commuting_automorphism`
+    ((X̄, X̄^ω) + equivariant iso、複補性は
+    isCompl_of_distinct_invariant_of_transitive_card)。一般 (P, Z, K, ω)
+    設定の engine として実装し、TypeBFromW が instantiate。
 - [ ] `W` の projective-line 上の自由作用から `|W| ∣ q+1` を証明する
 - [ ] 一般有限体上の 2 次元表現 API から `W` の巡回性を証明する
   - [x] projective FPF から cyclicity と `|E| ∣ |F| + 1` を得る一般定理を証明する

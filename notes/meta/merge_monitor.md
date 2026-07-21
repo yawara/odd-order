@@ -898,6 +898,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 20:22 (tick #13、Fable hub cron `490dde28`) — ✅ a + b + c 3 レーン合流、census 6 不変、push 済**:
+  **a** = FeitSibley reduction (1) 継続 — one-step lemma `ssetOf_coherent_step` + 2素数下界
+  |Q₁/Q₂| ≥ (d+1)² (issue 1054、残 = chief-factor 帰納 assembly、設計固定済)。
+  **b** = Pf Suzuki Lemma 5 **type-B branch 完成** — W の元から `IsTypeB Q` (新 leaf
+  `Suzuki/TypeBFromW.lean`、issue 2048)。**c** = 新 shared leaf
+  `GroupTheory/ThompsonSubgroupAbelian.lean` — abelian Thompson subgroup J_a(P) +
+  Gorenstein Lem 2.1/2.2(a)-(d)/2.3 (claim 9403 = 自バンド採番・重複なし、Glauberman ZJ
+  (issue 3024) へ向けた部品、c 自身が OddOrder.lean 配線済 + Thm 2.4 実装計画 6 部品分解)。
+  gate = build **4602 jobs green (23.6s、+2 = 新 leaf 2 本実 elaborate 確認)**、AxiomsCheck OK
+  (3639 checks)、orphan 0 (886/886)、census 6 不変、新 axiom なし、逸脱なし (a の FeitSibley =
+  裁定 9204 carve-out / c の shared leaf = claim 9403)、採番 open 重複なし。レーン生存 3 点 OK
+  (3 レーンとも 20:13–20:15 に commit)。hub 修正 = `AxiomsCheck.lean` の per-file longFile
+  上限 12000→12200 (12003 行到達で警告化していたのを bump)。push 済。
 - **2026-07-21 19:57 (tick #12、Fable hub 新セッション — ユーザー「各レーンを監視します」) — ✅ b + c 合流、census 7→6 (−1)、push 済**:
   前 hub セッション (cron `f4304a0e`) は tick #11 完走・push 済のクリーン状態で終了 — 中断復旧なし。
   **b** = Pf Suzuki **Lemma 5 完了** (issue 2048) — 平方写像の coset 全単射 (新 leaf

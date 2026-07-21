@@ -43,6 +43,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)
