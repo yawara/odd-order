@@ -319,6 +319,69 @@ theorem opCore_quotient_sSupNormalNormalizing_eq_bot [Finite G] {p : ℕ} [Fact 
   rw [Subgroup.mem_bot]
   exact (QuotientGroup.eq_one_iff _).mpr (hKL hk)
 
+open OddOrder.Isaacs.Ch01 in
+/-- **`O_p` の全射転送**: `f : G →* H` 全射なら `(O_p(G)).map f ≤ O_p(H)`
+(像は正規 `p`-部分群ゆえ Isaacs Problem 1B.2 の最大性で吸収される). -/
+theorem map_opCore_le_opCore_of_surjective {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] {f : G →* H} (hf : Function.Surjective f) :
+    (opCore p G).map f ≤ opCore p H := by
+  haveI : ((opCore p G).map f).Normal := Subgroup.Normal.map (opCore.normal p G) f hf
+  exact normal_pgroup_le_opCore ((opCore_isPGroup p G).map f)
+
+open OddOrder.Isaacs.Ch01 in
+/-- **Thm 2.10 step (c) 後半** (Gorenstein p. 278-279): `G` が `p`-stable,
+`B ⊴ G` `p`-部分群, `W ≤ B`, `P ≤ N(W)`, `A ∈ A(P)` で `⁅⁅B,A⁆,A⁆ = ⊥` なら
+`A ≤ L := sSupNormalNormalizing W`.
+
+論法: `C := C_G(B)` は `W ≤ B` を中心化するので `C ≤ N(W)`, `C ⊴ G`
+(mathlib `normal_centralizer`) ⟹ `L` の最大性で `C ≤ L`. p-stability で
+`AC/C ≤ O_p(G/C)`; 全射 `G/C → G/L` で `AL/L ≤ O_p(G/L) = ⊥` (step (c) 前半)
+⟹ `A ≤ L`. -/
+theorem le_sSupNormalNormalizing_of_isPStableOp [Finite G] {p : ℕ} [Fact p.Prime]
+    (hstable : IsPStableOp p G) (P : Sylow p G)
+    {B W A : Subgroup G} [B.Normal] (hB : IsPGroup p ↥B)
+    (hWB : W ≤ B) (hPW : (P : Subgroup G) ≤ normalizer (W : Set G))
+    (hA : A ∈ maxAbelianIn (P : Subgroup G))
+    (hBAA : ⁅⁅B, A⁆, A⁆ = ⊥) :
+    A ≤ sSupNormalNormalizing W := by
+  haveI := sSupNormalNormalizing_normal W
+  -- `C := C_G(B) ≤ L` (正規 + `W` を中心化 ⟹ 正規化).
+  have hCL : centralizer (B : Set G) ≤ sSupNormalNormalizing W :=
+    le_sSupNormalNormalizing inferInstance
+      ((centralizer_le (SetLike.coe_subset_coe.mpr hWB)).trans
+        (centralizer_le_normalizer _))
+  -- p-stability の適用: `A` の `G/C` での像は `O_p(G/C)`.
+  have hApgroup : IsPGroup p ↥A :=
+    P.isPGroup'.of_injective (Subgroup.inclusion hA.1) (Subgroup.inclusion_injective _)
+  have hstab := hstable B A ‹B.Normal› hB hApgroup hBAA
+  -- 全射 `φ : G/C → G/L` で転送.
+  set φ : G ⧸ centralizer (B : Set G) →* G ⧸ sSupNormalNormalizing W :=
+    QuotientGroup.map _ _ (MonoidHom.id G) (fun x hx => hCL hx) with hφdef
+  have hcomp : φ.comp (QuotientGroup.mk' (centralizer (B : Set G)))
+      = QuotientGroup.mk' (sSupNormalNormalizing W) := by
+    ext x
+    simp [hφdef]
+  have hφsurj : Function.Surjective φ := by
+    intro y
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (sSupNormalNormalizing W) y
+    exact ⟨QuotientGroup.mk' _ x, by rw [← MonoidHom.comp_apply, hcomp]⟩
+  have hmapL : A.map (QuotientGroup.mk' (sSupNormalNormalizing W))
+      ≤ opCore p (G ⧸ sSupNormalNormalizing W) := by
+    calc A.map (QuotientGroup.mk' (sSupNormalNormalizing W))
+        = (A.map (QuotientGroup.mk' (centralizer (B : Set G)))).map φ := by
+          rw [Subgroup.map_map, hcomp]
+      _ ≤ (opCore p (G ⧸ centralizer (B : Set G))).map φ := Subgroup.map_mono hstab
+      _ ≤ opCore p (G ⧸ sSupNormalNormalizing W) :=
+          map_opCore_le_opCore_of_surjective hφsurj
+  have hbot : A.map (QuotientGroup.mk' (sSupNormalNormalizing W)) = ⊥ :=
+    le_bot_iff.mp (hmapL.trans_eq
+      (opCore_quotient_sSupNormalNormalizing_eq_bot P hPW))
+  intro a ha
+  have h1 : QuotientGroup.mk' (sSupNormalNormalizing W) a ∈
+      A.map (QuotientGroup.mk' (sSupNormalNormalizing W)) := mem_map_of_mem _ ha
+  rw [hbot, Subgroup.mem_bot] at h1
+  exact (QuotientGroup.eq_one_iff a).mp h1
+
 end Subgroup
 
 
