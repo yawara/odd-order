@@ -255,6 +255,80 @@ theorem commute_commutatorElement_of_inv_mul_mem_centralizer
     commutatorElement_eq_one_iff_commute.mp hrot.symm
   exact (Commute.inv_left_iff.mp hfin).symm
 
+/-- 可換部分群同士の join は, 片方が他方を中心化すればまた可換 (一般形).
+
+⚠ 同内容の `OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer` が下流
+(BG Ch.4) に存在する — GroupTheory からは import 不可のため一般形を本 leaf に置く.
+下流側の dedup は issue 9403 に記録. -/
+theorem isMulCommutative_sup_of_le_centralizer {H K : Subgroup G}
+    (hH : IsMulCommutative H) (hK : IsMulCommutative K)
+    (hHK : H ≤ centralizer (K : Set G)) :
+    IsMulCommutative (H ⊔ K : Subgroup G) := by
+  rw [← le_centralizer_iff_isMulCommutative]
+  refine sup_le ?_ ?_
+  · rw [le_centralizer_iff]
+    exact sup_le (le_centralizer_iff_isMulCommutative.mpr hH) (le_centralizer_iff.mp hHK)
+  · rw [le_centralizer_iff]
+    exact sup_le hHK (le_centralizer_iff_isMulCommutative.mpr hK)
+
+/-- 可換性は部分群に遺伝する. -/
+theorem isMulCommutative_of_le {H K : Subgroup G} (hK : IsMulCommutative K)
+    (hHK : H ≤ K) : IsMulCommutative H := by
+  haveI := hK
+  exact .of_setLike_mul_comm fun a ha b hb => setLike_mul_comm (hHK ha) (hHK hb)
+
+/-- **Gorenstein の `[x, A]`**: 元 `x` と部分群 `A` の交換子部分群
+`⟨⁅x,a⁆ : a ∈ A⟩` (mathlib 慣習 `⁅x,a⁆ = xax⁻¹a⁻¹`).
+
+⚠ `⁅zpowers x, A⁆` とは別物 (そちらは `⁅xⁿ, a⁆` を全て含む). Gorenstein Ch.8 §2
+(Thompson / Glauberman replacement) の `[x, A]` はこの形. -/
+def elementCommutator (x : G) (A : Subgroup G) : Subgroup G :=
+  closure {m : G | ∃ a ∈ A, m = ⁅x, a⁆}
+
+theorem commutatorElement_mem_elementCommutator {x a : G} {A : Subgroup G}
+    (ha : a ∈ A) : ⁅x, a⁆ ∈ elementCommutator x A :=
+  subset_closure ⟨a, ha, rfl⟩
+
+/-- `x ∈ P`, `A ≤ P` なら `[x,A] ≤ P`. -/
+theorem elementCommutator_le {x : G} {A P : Subgroup G} (hx : x ∈ P) (hA : A ≤ P) :
+    elementCommutator x A ≤ P := by
+  refine (closure_le _).mpr ?_
+  rintro m ⟨a, ha, rfl⟩
+  rw [SetLike.mem_coe, commutatorElement_def]
+  exact mul_mem (mul_mem (mul_mem hx (hA ha)) (inv_mem hx)) (inv_mem (hA ha))
+
+/-- 生成元 `⁅x,a⁆` すべてと可換な元は `[x,A]` を中心化する. -/
+theorem mem_centralizer_elementCommutator_of_forall_commute {x w : G} {A : Subgroup G}
+    (h : ∀ a ∈ A, Commute w ⁅x, a⁆) :
+    w ∈ centralizer (elementCommutator x A : Set G) := by
+  have hle : elementCommutator x A ≤ centralizer ({w} : Set G) := by
+    refine (closure_le _).mpr ?_
+    rintro m ⟨a, ha, rfl⟩
+    rw [SetLike.mem_coe, mem_centralizer_iff]
+    intro g hg
+    rw [Set.mem_singleton_iff.mp hg]
+    exact (h a ha).eq
+  rw [mem_centralizer_iff]
+  intro m hm
+  have hmw := mem_centralizer_iff.mp (hle hm) w rfl
+  exact hmw.symm
+
+/-- **Thm 2.4 部品 (Gorenstein の `C ∩ M = A ∩ M = C_M(A)`)**:
+`M ≤ P` abelian について `C_M(A) = M ⊓ C_A(M)`. `≤` 側で **Lemma 2.1**
+(`C_P(A) = A`) を使う. -/
+theorem inf_centralizer_eq_of_mem_maxAbelianIn [Finite G] {P A M : Subgroup G}
+    (hA : A ∈ maxAbelianIn P) (hMP : M ≤ P) (hM : IsMulCommutative M) :
+    M ⊓ centralizer (A : Set G) = M ⊓ (A ⊓ centralizer (M : Set G)) := by
+  apply le_antisymm
+  · intro m hm
+    have hmA : m ∈ A := by
+      have hmem : m ∈ P ⊓ centralizer (A : Set G) := ⟨hMP hm.1, hm.2⟩
+      rw [← eq_inf_centralizer_of_mem_maxAbelianIn hA] at hmem
+      exact hmem
+    exact ⟨hm.1, hmA, le_centralizer_iff_isMulCommutative.mpr hM hm.1⟩
+  · intro m hm
+    exact ⟨hm.1, le_centralizer_iff_isMulCommutative.mpr hA.2.1 hm.2.1⟩
+
 /-! ### Gorenstein Lemma 2.2: 遺伝性・共変性・characteristic 性 -/
 
 /-- **Gorenstein Lemma 2.2(a) 前半**: `R ≤ P` が `A(P)` の元を含めば `A(R) ⊆ A(P)`.
