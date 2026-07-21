@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppE_PropE4
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 
 /-!
 # BG Corollary E.5: the local data `(E.29)`
@@ -255,6 +256,95 @@ theorem inf_eq_kappaHall_of_le_cyclic [Finite G]
   have hu1 : ((u' : ↥(M ⊓ N)) : G) = 1 := Subgroup.mem_bot.mp huC
   rw [hcku, hu1, mul_one]
   exact hkK₁
+
+/-- **BG Corollary 15.9(c), the suitable complement** (BG p. 123, *"We choose `E` to
+contain `K₁`"*): the cyclic Frobenius complement of Corollary 15.9(b) can be re-chosen,
+by Hall conjugacy in the solvable `M`, to contain the `σ(M)'`-subgroup `K₁` — keeping the
+complement, cyclicity and Frobenius properties.  Combined with
+`inf_eq_kappaHall_of_le_cyclic` this is BG's 15.9(c) (dropped by Coq; first formalized
+here, issue 3028 WP2.5). -/
+theorem e5_exists_suitable_complement [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K₁ E₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hK₁M : K₁ ≤ M)
+    (hK₁σ' : ∀ r ∈ (Nat.card ↥K₁).primeFactors, r ∈ (OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+    (hE₀compl : Subgroup.IsComplement'
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E₀.subgroupOf M))
+    (hE₀cyc : IsCyclic ↥E₀) (hE₀M : E₀ ≤ M)
+    (hE₀frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E₀.subgroupOf M)) :
+    ∃ E : Subgroup G, E ≤ M ∧
+      Subgroup.IsComplement'
+        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) ∧
+      IsCyclic ↥E ∧
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) ∧
+      K₁ ≤ E := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set Mσ' : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hMσ'def
+  set E₀' : Subgroup ↥M := E₀.subgroupOf M with hE₀'def
+  haveI hMσ'norm : Mσ'.Normal := by
+    rw [hMσ'def, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
+    infer_instance
+  have hMσhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) Mσ' :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+  -- `E₀'` is Hall `σ(M)'` in `↥M`: its order is the index of `Mσ'` and vice versa.
+  have hcardE₀ : Nat.card ↥E₀' = Mσ'.index := hE₀compl.symm.index_eq_card.symm
+  have hidxE₀ : E₀'.index = Nat.card ↥Mσ' := hE₀compl.index_eq_card
+  have hE₀hall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      (OddOrder.BG.Ch3.S10.sigma M)ᶜ E₀' := by
+    constructor
+    · intro r hr
+      rw [hcardE₀] at hr
+      exact Set.mem_compl (hMσhall.2 r hr)
+    · intro r hr
+      rw [hidxE₀] at hr
+      exact fun hr' => hr' (hMσhall.1 r hr)
+  -- `K₁` sits inside a Hall `σ(M)'`-subgroup `H` of `↥M` (Hall `D`), conjugate to `E₀'`.
+  have hK₁'pi : ∀ r ∈ (Nat.card ↥(K₁.subgroupOf M)).primeFactors,
+      r ∈ (OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+    intro r hr
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK₁M).toEquiv] at hr
+    exact hK₁σ' r hr
+  obtain ⟨H, hHhall, hK₁H⟩ := OddOrder.Isaacs.Ch03.hall_D hK₁'pi
+  obtain ⟨g, hg⟩ := OddOrder.Isaacs.Ch03.hall_C hE₀hall hHhall
+  set e : ↥M ≃* ↥M := (MulAut.conj g : MulAut ↥M) with hedef
+  have hg' : E₀'.map e.toMonoidHom = H := hg
+  -- Conjugation fixes the normal `Mσ'`.
+  have hMσmap : Mσ'.map e.toMonoidHom = Mσ' := by
+    apply le_antisymm
+    · rintro _ ⟨y, hy, rfl⟩
+      simpa [hedef] using hMσ'norm.conj_mem y hy g
+    · intro y hy
+      refine ⟨g⁻¹ * y * g, ?_, ?_⟩
+      · have h := hMσ'norm.conj_mem y hy g⁻¹
+        simpa using h
+      · simp [hedef, MulAut.conj_apply]
+        group
+  -- Transport the Frobenius package along `e`, landing on `H`.
+  have hfrob' := OddOrder.Isaacs.Ch06.isFrobeniusGroup_map_equiv hE₀frob e
+  rw [hMσmap, hg'] at hfrob'
+  -- `H` is cyclic (isomorphic to the cyclic `E₀`).
+  haveI : IsCyclic ↥E₀' := isCyclic_of_surjective
+    (Subgroup.subgroupOfEquivOfLe hE₀M).symm.toMonoidHom
+    (Subgroup.subgroupOfEquivOfLe hE₀M).symm.surjective
+  haveI hHcyc : IsCyclic ↥H := by
+    have h1 : IsCyclic ↥(E₀'.map e.toMonoidHom) := isCyclic_of_surjective
+      (e.subgroupMap E₀').toMonoidHom (e.subgroupMap E₀').surjective
+    exact hg' ▸ h1
+  -- Push `H` to the ambient group.
+  have hEsub : (H.map M.subtype).subgroupOf M = H :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective H
+  refine ⟨H.map M.subtype, Subgroup.map_subtype_le _, ?_, ?_, ?_, ?_⟩
+  · rw [hEsub]
+    exact hfrob'.isComplement
+  · exact isCyclic_of_surjective
+      (Subgroup.equivMapOfInjective H M.subtype M.subtype_injective).toMonoidHom
+      (Subgroup.equivMapOfInjective H M.subtype M.subtype_injective).surjective
+  · rw [hEsub]
+    exact hfrob'
+  · calc K₁ = (K₁.subgroupOf M).map M.subtype :=
+        (Subgroup.map_subgroupOf_eq_of_le hK₁M).symm
+      _ ≤ H.map M.subtype := Subgroup.map_mono hK₁H
 
 /-- **BG `(E.29)`** (p. 165): under Corollary E.5's hypothesis block, the unique maximal
 subgroup `N ⊇ C_G(x)` is of type P₂ with `C_{N_σ}(x) ≠ 1` and `M ∩ N` a complement to
