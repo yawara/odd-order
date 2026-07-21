@@ -233,3 +233,22 @@ R₀_disjoint_R₁ = 2、R₁_ne_bot = 5。
 E = E⊓N = K₁ → derivedInG M = M_σ (Msigma_le_derived + M⧸Mσ' card k prime cyclic abelian
 → commutator ≤ Mσ') → index = k prime。
 **残 WP5**: counting (E.33)/(E.34) — 新 sibling leaf に置く (本 leaf 1137 行)。
+
+## 2026-07-21 ⭐⭐ WP4 完了 (commit 82c8d9451) — (ii)∧hdc ⟹ (i) 完全証明
+
+`e5_card_omega_ge_of_ii` + `e5_derived_index_eq_of_ii_hdc` (全 sorry-free)。
+corrected E.4 対偶 → E fixes ⟨x⟩ → E = E⊓N = K₁ → M' = M_σ → index = k prime。
+leaf は 1290 行 — **WP5 は新 sibling leaf** (`AppE_E5Counting.lean` 予定) に置く。
+
+### 残 WP5 の構成
+1. **最終組立 glue**: E.5 仮説ブロック → e5_derived_index の全仮説導出
+   (e5_neighbour_data / e5_R_eq_centralizer / e5_kappaHall_* / e5_opiCore_sylow /
+   e5_zpowers_eq_canonical_line / e5_centralizer_decomposition / suitable complement を連鎖;
+   新規 = hNxN: N_G(⟨x⟩) ≤ N — C_G(x) ≤ N_G(⟨x⟩) < G (G simple、zpowers ≠ ⊤) +
+   ℳ(C_G(x)) = {N}; hMσnil: 15.9 の Frobenius kernel + isNilpotent 転送; p ∈ τ₂(N) は
+   hxtau2' から orderOf x = p で単素数化; hRnoncyc: R = O_p⊓N Sylow-p-of-N + pRank 2)。
+2. **(E.33)/(E.34) counting**: Lemma 14.5/14.7 ベース、Ẑ = K₁K* − K₁∪K*、4 族の
+   𝒞_G 和 > |G| 矛盾。PDF p.166 の s-display は OCR 崩れ → 画像確認済み分 (E.33)(E.34) +
+   最終不等式は p.166 パラグラフを PDF で精読してから。
+3. E.5 statement (AppE_FurtherResults:1685 sorried) を新 leaf の証明で置換 (E.4 パターン:
+   FurtherResults 側は削除+コメント、または sorried のまま新 leaf で本体)。
