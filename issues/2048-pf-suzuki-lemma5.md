@@ -180,6 +180,20 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
+    - [x] B/C/D model の中心 exponent 2 (`ModelCenters.lean`, `37b78e57b`):
+          twisted product の mem_center_iff + polarization radical 自明性
+          (B/C は初等、D は Dedekind 自己同型独立 3 項) + equivModel transport
+    - [x] `center_sq_eq_one_of_xiLengthThree` (`08fb9d018`):
+          分類と接続し ξ-length 3 で ∀ z ∈ Z(P), z² = 1
+    - [x] `center_eq_frattini_of_xiLengthThree` / `agemo_center_eq_bot_of_
+          xiLengthThree` (`e88893f9a`): Z(P) = Φ(P)、℧₁(Z(P)) = ⊥
+    - [x] `exists_orderQModuleSplit_of_xiLengthThree`
+          (新 leaf TwoSummandSplit.lean, `a51ff24ca`): P/Z(P) の
+          two-summand split (OrderQModuleSplit) を factor 像で実構成
+          (card は A(n,θ) model count、P/Z の EA 性込み)
+    - [ ] 残り: Lemma 5 側 (Peterfalvi §3 設定) で Q₀ = C_Q(w) と
+          Z(Q)/involutionSubgroup を同定し ξ-length-3 仮定を供給して
+          上記 2 定理を消費する
     - [x] Higman Lemma 10: characteristic `2` の proper odd-degree
           finite field extensionで、任意の `r : ℤ`, `ε` に対する非零 `α` と
           `Tr(α · Frob^r(α) · ε) = 0` を構成する
