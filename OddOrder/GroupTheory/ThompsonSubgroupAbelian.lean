@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.Commutator.Basic
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch01_Sylow.Basic
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
+import OddOrder.Isaacs.Ch04_Commutators.Mann
 
 /-!
 # Abelian Thompson Subgroup `J_a(P)` (Gorenstein 版)
@@ -1046,6 +1047,70 @@ theorem lowerCentralSeries_sup_eq_iterCommutator_sup {B A : Subgroup G} [B.Norma
           hIH, commutator_sup_central_left hB']
       rw [habsorb1, iterCommutator_succ]
       exact commutator_top_sup_eq_of_le hsup (iterCommutator_le_base A i)
+
+open OddOrder.Isaacs.Ch04 in
+/-- **Gorenstein Lemma 2.8(iii)**: 前提 (`⊤ = B ⊔ A`, `B ⊴ G`, `B' ≤ Z(G)`,
+`A` abelian) に加え, `n` を「`[B,A;n]` が abelian になる最小の正整数」とし
+`[B,A;n+1] = ⊥` とすると, `n ≤ 2` かつ `cl(G) ≤ 4` (`(⊤).lcs 4 = ⊥`).
+
+(i) から `L_{n+2} ≤ B' ≤ Z(G)` ⟹ `L_{n+3} = 1`; `m := ⌊(n+4)/2⌋` に weight bound
+`⁅γ_m, γ_m⁆ ≤ γ_{2m}` を当てると `γ_m` が abelian になり, (i) で `[B,A;m-1]` も
+abelian ⟹ `n` の最小性で `n ≤ m - 1 ≤ n/2 + 1` ⟹ `n ≤ 2`. -/
+theorem iterCommutator_min_abelian_le_two {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) (hB' : ⁅B, B⁆ ≤ center G) (hAcomm : IsMulCommutative A)
+    {n : ℕ} (hn_pos : 0 < n)
+    (hmin : ∀ k, 0 < k → IsMulCommutative (iterCommutator B A k) → n ≤ k)
+    (hn1 : iterCommutator B A (n + 1) = ⊥) :
+    n ≤ 2 ∧ (⊤ : Subgroup G).lowerCentralSeries 4 = ⊥ := by
+  -- `L_{n+2} ≤ B'` ((i) + `[B,A;n+1] = ⊥`)
+  have h1 : (⊤ : Subgroup G).lowerCentralSeries (n + 1) ≤ ⁅B, B⁆ := by
+    have heq := lowerCentralSeries_sup_eq_iterCommutator_sup hsup hB' hAcomm (n + 1)
+      (Nat.succ_le_succ (Nat.zero_le n))
+    rw [hn1, bot_sup_eq] at heq
+    calc (⊤ : Subgroup G).lowerCentralSeries (n + 1)
+        ≤ (⊤ : Subgroup G).lowerCentralSeries (n + 1) ⊔ ⁅B, B⁆ := le_sup_left
+      _ = ⁅B, B⁆ := heq
+  -- `L_{n+3} = ⊥` (`B'` 中心的)
+  have h2 : (⊤ : Subgroup G).lowerCentralSeries (n + 2) = ⊥ := by
+    rw [Subgroup.lowerCentralSeries_succ]
+    refine le_bot_iff.mp ?_
+    calc ⁅(⊤ : Subgroup G).lowerCentralSeries (n + 1), (⊤ : Subgroup G)⁆
+        ≤ ⁅(⁅B, B⁆ : Subgroup G), (⊤ : Subgroup G)⁆ := commutator_mono h1 le_rfl
+      _ = ⊥ := commutator_eq_bot_iff_le_centralizer.mpr
+          (hB'.trans (center_le_centralizer _))
+  set m := (n + 4) / 2 with hm
+  -- `γ_m` abelian (weight bound + `L_{n+3} = ⊥`)
+  have h3 : ⁅(⊤ : Subgroup G).lowerCentralSeries (m - 1),
+      (⊤ : Subgroup G).lowerCentralSeries (m - 1)⁆ = ⊥ := by
+    refine le_bot_iff.mp ?_
+    calc ⁅(⊤ : Subgroup G).lowerCentralSeries (m - 1),
+          (⊤ : Subgroup G).lowerCentralSeries (m - 1)⁆
+        ≤ (⊤ : Subgroup G).lowerCentralSeries ((m - 1) + (m - 1) + 1) :=
+          commutator_lowerCentralSeries_le_subgroup ⊤ (m - 1) (m - 1)
+      _ ≤ (⊤ : Subgroup G).lowerCentralSeries (n + 2) :=
+          Subgroup.lowerCentralSeries_antitone ⊤ (by omega)
+      _ = ⊥ := h2
+  have h3' : IsMulCommutative ((⊤ : Subgroup G).lowerCentralSeries (m - 1)) :=
+    le_centralizer_iff_isMulCommutative.mp
+      (commutator_eq_bot_iff_le_centralizer.mp h3)
+  -- `[B,A;m-1]` abelian ((i) + `B'` 中心的)
+  have h4 : IsMulCommutative (iterCommutator B A (m - 1)) := by
+    have hle : iterCommutator B A (m - 1)
+        ≤ (⊤ : Subgroup G).lowerCentralSeries (m - 1) ⊔ ⁅B, B⁆ := by
+      rw [lowerCentralSeries_sup_eq_iterCommutator_sup hsup hB' hAcomm (m - 1) (by omega)]
+      exact le_sup_left
+    refine isMulCommutative_of_le ?_ hle
+    refine isMulCommutative_sup_of_le_centralizer h3'
+      (isMulCommutative_of_le inferInstance hB')
+      (le_centralizer_iff.mpr (hB'.trans (center_le_centralizer _)))
+  -- `n` の最小性 ⟹ `n ≤ m - 1` ⟹ `n ≤ 2`
+  have h5 : n ≤ m - 1 := hmin (m - 1) (by omega) h4
+  have hn2 : n ≤ 2 := by omega
+  refine ⟨hn2, le_bot_iff.mp ?_⟩
+  calc (⊤ : Subgroup G).lowerCentralSeries 4
+      ≤ (⊤ : Subgroup G).lowerCentralSeries (n + 2) :=
+        Subgroup.lowerCentralSeries_antitone ⊤ (by omega)
+    _ = ⊥ := h2
 
 end GorensteinLemmaTwoEight
 
