@@ -354,8 +354,15 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             - [x] 両 branch (Agemo 商 / lower-central layer) から共通 `F ⊗ P/Φ(P)` 内の
                   Frobenius eigenvector 族を抽出 (`exists_factorFamily`)
             - [x] 非零 mixed bracket を base change して weight equation を読み取る
-          - [ ] `θ = 1` / `φ = 1` / 両方非自明の固有値制約から原典 pp. 90--92 の
+          - [x] `θ = 1` / `φ = 1` / 両方非自明の固有値制約から原典 pp. 90--92 の
                 B/C/D case split を実行し、`B(n,θ,ε)` / `C(n,ε)` / `D(n,θ,ε)` を確定する
+                — **`higmanLemmaTwelve` 完成 (`fe298b348`, AxiomsCheck 登録
+                `8e69a8a32`)**: IsTypeB ∨ IsTypeC ∨ IsTypeD、sorry 0・axiom-clean。
+                4 case lemma = isTypeB_of_mixedTerm_theta_one (`d1e3da617`) /
+                isTypeB_of_mixedTerm_theta_eq (`5d5e28e48`) /
+                isTypeC_of_mixedTerm_right_theta_one (`9879a1fbe`) /
+                isTypeD_of_mixedTerm_monomial (`ea85296bf`)、
+                転置対称性 (`e783303bf`)、dispatch は flip 正規化 + factor swap
             - [x] piece 4 の純算術を完備化 (`TwoPowerCongruence.lean`): 冪和衝突の
                   完全記述 + multiset carry collapse + B case 消去 (`a≡b∧c≡a+1`,
                   `s≡±r`) + C case 一意性 (`2r+1=n ∧ s≡r+1 ∧ t≡1`) + D case
@@ -384,10 +391,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                   返す; C/D は `isTypeC/DEpsilon_of_decomposed_aniso` で
                   decomposed anisotropy + monomial から IsType*Epsilon
                   (monomial 指数 ↔ θ 冪の Frobenius 同定込み)
-            - [ ] group-side assembly: 実際の mixed 項
+            - [x] group-side assembly: 実際の mixed 項
                   (ambientCenterCoordinate ∘ lowerCentralCommutatorBilinear) を
                   mixedTerm_lambda_equivariance で equivariance に接続 → 上記単項化
                   → engine (isTypeB/C/D_of_mixedTerm) の hM → higmanLemmaTwelve
+                  (完了 — 上記 case split 項に詳細)
               - [x] `mixedTermBilinear` bundle + `_lambda_equivariance` +
                     `FactorInclusionData.exists_incl_eq` (`1b4f0c413`,
                     CaseSplitBCD.lean 末尾; 同 file は 1380 行 — 以後の追記禁止)
@@ -399,7 +407,7 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                     `ambientProductExtension_inl_range = frattini P` も e 非依存)
               - [x] 新 leaf `HigmanLemmaTwelve/Assembly.lean` (hub 配線済) +
                     `exists_mixedTermBilinear_ne_zero` (`2e05ad8e5`)
-              - [ ] case dispatch 本体 (Assembly.lean に追記):
+              - [x] case dispatch 本体 (Assembly.lean, `fe298b348` で完了):
                     exists_mixedFrobeniusWeightEquation_of_xiLenghThree の状態
                     (factors/c/ePhi/ν primitive/left/right FactorCoordinateData/
                     ν=λθλ=μφμ) から θL/θR の Frobenius 冪
