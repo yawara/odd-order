@@ -449,6 +449,116 @@ theorem isTypeC_of_mixedTerm_right_theta_one
     rw [hia, hmb]
     simp
 
+/-! ## Independent case (Higman pp. 91--92) -/
+
+/-- **Higman pp. 91--92, the independent case: `G ≅ D(n, θ, ε)`.**  The
+mixed term is the single monomial `c₀ · α^{2^{3r mod n}} · β^{2^{r mod n}}`
+(the survivor branch of the type-D support pinning; the mirror branch enters
+through the factor swap), which is the type-D pairing `ε · (θ³(α) · θ(β))`. -/
+theorem isTypeD_of_mixedTerm_monomial
+    {Sl Sr : Subgroup P} {n r : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (theta : RingAut (GaloisField 2 n))
+    (htheta : theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r)
+    (hrn : r < n) (hr0 : (r : ZMod n) ≠ 0)
+    (h5r : 5 * (r : ZMod n) = 0)
+    (hθL : left.theta = theta) (hθR : right.theta = theta ^ 2)
+    (c0 : GaloisField 2 n) (hc0ne : c0 ≠ 0)
+    (hc0 :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∀ α β : GaloisField 2 n,
+        mixedTermBilinear left right α β =
+          c0 * (α ^ 2 ^ (3 * r % n) * β ^ 2 ^ (r % n)))
+    (hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1)
+    (hcentral : frattini P ≤ Subgroup.center P)
+    (n_pos : 0 < n)
+    (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
+    IsTypeD.{uP, 0} P := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  have hn0 : n ≠ 0 := by omega
+  have horder : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
+    orderOf_frobeniusEquiv_eq_of_card_eq_two_pow n
+      (by simpa [Nat.card_eq_fintype_card] using hcard)
+  have hfrobn : (frobeniusEquiv (GaloisField 2 n) 2) ^ n = 1 := by
+    calc (frobeniusEquiv (GaloisField 2 n) 2) ^ n
+        = (frobeniusEquiv (GaloisField 2 n) 2)
+            ^ orderOf (frobeniusEquiv (GaloisField 2 n) 2) := by rw [horder]
+      _ = 1 := pow_orderOf_eq_one _
+  have hfrobcong : ∀ a b : ℕ, (a : ZMod n) = (b : ZMod n) →
+      (frobeniusEquiv (GaloisField 2 n) 2) ^ a =
+        (frobeniusEquiv (GaloisField 2 n) 2) ^ b := by
+    intro a b hab
+    rw [pow_eq_pow_iff_modEq, horder]
+    exact (ZMod.natCast_eq_natCast_iff _ _ _).mp hab
+  -- decomposed anisotropy in the type-D monomial shape
+  have haniso : ∀ a b : GaloisField 2 n, a ≠ 0 → b ≠ 0 →
+      a * theta a + b * (theta ^ 2) b +
+        c0 * (a ^ 2 ^ (3 * r % n) * b ^ 2 ^ (r % n)) ≠ 0 := by
+    intro a b ha hb
+    have h := ambientProductSquare_decomposed_ne_zero left right
+      hRnormal hinf hsup hΦR hinv ha hb
+    rw [hθL, hθR, ← mixedTermBilinear_apply, hc0] at h
+    exact h
+  have hEps : IsTypeDEpsilon theta c0 :=
+    isTypeDEpsilon_of_decomposed_aniso hn0 hrn theta htheta c0 haniso
+  -- `θ⁵ = 1` from `5r ≡ 0 (mod n)`
+  have hpow5 : theta ^ 5 = 1 := by
+    rw [htheta, ← pow_mul]
+    have h := hfrobcong (r * 5) 0 (by push_cast; linear_combination h5r)
+    simpa using h
+  -- `θ ≠ 1` from `r ≢ 0 (mod n)`
+  have hne1 : theta ≠ 1 := by
+    intro h1
+    apply hr0
+    have hdvd : orderOf (frobeniusEquiv (GaloisField 2 n) 2) ∣ r := by
+      apply orderOf_dvd_of_pow_eq_one
+      rw [← htheta]
+      exact h1
+    rw [horder] at hdvd
+    obtain ⟨k, rfl⟩ := hdvd
+    exact natCast_zmod_eq_zero_iff_mod_eq_zero.mpr (Nat.mul_mod_right n k)
+  -- the engine `hM` shape
+  have hpow3 : theta ^ 3 =
+      frobeniusEquiv (GaloisField 2 n) 2 ^ (3 * r % n) := by
+    rw [htheta, ← pow_mul, Nat.mul_comm r 3,
+      show 3 * r = n * (3 * r / n) + 3 * r % n from
+        (Nat.div_add_mod (3 * r) n).symm,
+      pow_add, pow_mul, hfrobn, one_pow, one_mul, Nat.div_add_mod]
+  refine isTypeD_of_mixedTerm hEA hK1amb htermamb hSqamb hAgemoamb hK0 ePhi
+    left right hRnormal hinf hsup hΦR theta hθL hθR hpow5 hne1
+    (Units.mk0 c0 hc0ne) hEps n_pos hcard ?_ ?_
+  · rw [ambientProductExtension_inl_range]
+    exact hcentral
+  · intro α β
+    have h := hc0 α β
+    rw [mixedTermBilinear_apply] at h
+    rw [h]
+    have h3 : (theta ^ 3) α = α ^ 2 ^ (3 * r % n) := by
+      rw [hpow3, frobeniusEquiv_pow_apply]
+    have h1 : theta β = β ^ 2 ^ (r % n) := by
+      rw [htheta, frobeniusEquiv_pow_apply, Nat.mod_eq_of_lt hrn]
+    rw [h3, h1]
+    simp
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
