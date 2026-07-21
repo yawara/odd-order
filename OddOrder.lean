@@ -426,6 +426,7 @@ import OddOrder.BG.AppE_RegularOperator
 import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.BG.AppE_AbelianCentralizer
 import OddOrder.BG.AppE_EigenvalueCombinatorics
+import OddOrder.BG.AppE_BetaSupply
 import OddOrder.BG.AppE_FiliformCounterexample
 import OddOrder.BG.AppE_FiliformGroup
 import OddOrder.BG.AppE_FiliformRefutation
