@@ -28,7 +28,7 @@ contradicting `D_fixedPointFree_on_Q1`.
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -325,6 +325,32 @@ bridges: `Q₁ ∩ S'Q₂ = Q₂` (direct-product intersection), the index tower
 `|H⧸R| = |Q₁⧸(Q₁ ∩ R)|·|H⧸RQ₁|` (second isomorphism at the `relIndex` level),
 and `d ∣ |H⧸RQ₁|` (`RQ₁ ≤ Q`, `[H:Q] = d`). -/
 
+/-- **Subgroups of `S` normalise subgroups of `Q₁`**: elementwise commutation
+(`S_commutes_Q1`) puts any `A' ≤ S` inside the normaliser of any `B' ≤ Q₁`, so
+`A' ⊔ B'` is the set product `A'·B'`
+(`Subgroup.coe_mul_of_left_le_normalizer_right`). -/
+theorem le_normalizer_of_le_S_of_le_Q1 {A' B' : Subgroup G}
+    (hA' : A' ≤ hyp.S) (hB' : B' ≤ hyp.Q1) :
+    A' ≤ Subgroup.normalizer (B' : Set G) := by
+  intro s hs
+  rw [Subgroup.mem_normalizer_iff]
+  intro q
+  constructor
+  · intro hq
+    have hc : s * q = q * s := hyp.S_commutes_Q1 s (hA' hs) q (hB' hq)
+    have hfix : s * q * s⁻¹ = q := by rw [hc]; group
+    rw [hfix]
+    exact hq
+  · intro hq
+    have hc : s⁻¹ * (s * q * s⁻¹) = (s * q * s⁻¹) * s⁻¹ :=
+      hyp.S_commutes_Q1 s⁻¹ (hyp.S.inv_mem (hA' hs)) _ (hB' hq)
+    have hq' : q = s * q * s⁻¹ := by
+      calc q = s⁻¹ * (s * q * s⁻¹) * s := by group
+        _ = (s * q * s⁻¹) * s⁻¹ * s := by rw [hc]
+        _ = s * q * s⁻¹ := by group
+    rw [hq']
+    exact hq
+
 /-- **Direct-product intersection**: `Q₁ ⊓ (A' ⊔ B') = B'` for `A' ≤ S`,
 `B' ≤ Q₁`.  Since `A'` centralises `Q₁ ⊇ B'` (`S_commutes_Q1`), the join is the
 set product `A'·B'`, and the `A'`-part of a member of `Q₁` lands in
@@ -334,25 +360,8 @@ theorem Q1_inf_sup_eq {A' B' : Subgroup G} (hA' : A' ≤ hyp.S) (hB' : B' ≤ hy
     hyp.Q1 ⊓ (A' ⊔ B') = B' := by
   refine le_antisymm ?_ (le_inf hB' le_sup_right)
   rintro x ⟨hxQ1, hxsup⟩
-  have hnorm : A' ≤ Subgroup.normalizer (B' : Set G) := by
-    intro s hs
-    rw [Subgroup.mem_normalizer_iff]
-    intro q
-    constructor
-    · intro hq
-      have hc : s * q = q * s := hyp.S_commutes_Q1 s (hA' hs) q (hB' hq)
-      have hfix : s * q * s⁻¹ = q := by rw [hc]; group
-      rw [hfix]
-      exact hq
-    · intro hq
-      have hc : s⁻¹ * (s * q * s⁻¹) = (s * q * s⁻¹) * s⁻¹ :=
-        hyp.S_commutes_Q1 s⁻¹ (hyp.S.inv_mem (hA' hs)) _ (hB' hq)
-      have hq' : q = s * q * s⁻¹ := by
-        calc q = s⁻¹ * (s * q * s⁻¹) * s := by group
-          _ = (s * q * s⁻¹) * s⁻¹ * s := by rw [hc]
-          _ = s * q * s⁻¹ := by group
-      rw [hq']
-      exact hq
+  have hnorm : A' ≤ Subgroup.normalizer (B' : Set G) :=
+    hyp.le_normalizer_of_le_S_of_le_Q1 hA' hB'
   have hxmul : x ∈ (A' : Set G) * (B' : Set G) := by
     rw [← Subgroup.coe_mul_of_left_le_normalizer_right A' B' hnorm]
     exact hxsup
@@ -456,6 +465,103 @@ theorem card_quot_Q1_sub_one_le_of_card_quot_sub_le [Finite G] {R Q₂ : Subgrou
       _ = (hyp.d : ℝ) * ((hyp.d : ℝ) * c) := by ring
   have hd_pos : (0 : ℝ) < (hyp.d : ℝ) := by exact_mod_cast hyp.d_pos
   exact le_of_mul_le_mul_left hstep hd_pos
+
+/-! ## The centrality input of the (1.2) degree bound
+
+`exists_deg_sq_le_of_mem_SsetOf` consumes the centrality of `D₀/R` in `Q/R`
+(as a `map (mk' …) ≤ center …` statement).  In reduction (1) this is supplied
+at `R = S'Q₃`, `D₀ = SZ` where `Z/Q₃ = Z(Q₁/Q₃)`: the commutator
+`⁅SZ, Q⁆ = ⁅S,S⁆·⁅Z,Q₁⁆ ⊆ S'Q₃` splits along the direct product `Q = S × Q₁`. -/
+
+/-- **The direct-product commutator split**: `⁅x, q⁆ ∈ S' ⊔ Q₃` for
+`x ∈ S ⊔ Z`, `q ∈ Q`, provided `⁅Z, Q₁⁆ ⊆ Q₃`.  Writing `x = s·z`, `q = s₁·y₁`
+along `Q = S × Q₁` and commuting the factors,
+`⁅s·z, s₁·y₁⁆ = ⁅s, s₁⁆·⁅z, y₁⁆ ∈ ⁅S,S⁆·Q₃`. -/
+theorem commutator_mem_sup_Sder_of_central {Q₃ Z : Subgroup G}
+    (hZQ1 : Z ≤ hyp.Q1)
+    (hcentral : ∀ z ∈ Z, ∀ y ∈ hyp.Q1, ⁅z, y⁆ ∈ Q₃)
+    {x q : G} (hx : x ∈ hyp.S ⊔ Z) (hq : q ∈ hyp.Q) :
+    ⁅x, q⁆ ∈ hyp.Sder ⊔ Q₃ := by
+  -- decompose `x = s·z` along `S ⊔ Z = S·Z`
+  have hnorm : hyp.S ≤ Subgroup.normalizer (Z : Set G) :=
+    hyp.le_normalizer_of_le_S_of_le_Q1 le_rfl hZQ1
+  have hxmul : x ∈ (hyp.S : Set G) * (Z : Set G) := by
+    rw [← Subgroup.coe_mul_of_left_le_normalizer_right hyp.S Z hnorm]
+    exact hx
+  obtain ⟨s, hs, z, hz, hxeq⟩ := hxmul
+  -- decompose `q = s₁·y₁` along `Q = S·Q₁`
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hq
+  obtain ⟨s₁, hs₁, y₁, hy₁, hqeq⟩ := hq
+  -- the commutator splits into the `S`- and `Q₁`-commutators
+  have hc1 : Commute z s₁ := (hyp.S_commutes_Q1 s₁ hs₁ z (hZQ1 hz)).symm
+  have hc2 : Commute s⁻¹ y₁⁻¹ :=
+    hyp.S_commutes_Q1 s⁻¹ (hyp.S.inv_mem hs) y₁⁻¹ (hyp.Q1.inv_mem hy₁)
+  have hw : z * y₁ * (z⁻¹ * y₁⁻¹) ∈ hyp.Q1 :=
+    hyp.Q1.mul_mem (hyp.Q1.mul_mem (hZQ1 hz) hy₁)
+      (hyp.Q1.mul_mem (hyp.Q1.inv_mem (hZQ1 hz)) (hyp.Q1.inv_mem hy₁))
+  have hc3 : (s⁻¹ * s₁⁻¹) * (z * y₁ * (z⁻¹ * y₁⁻¹))
+      = (z * y₁ * (z⁻¹ * y₁⁻¹)) * (s⁻¹ * s₁⁻¹) :=
+    hyp.S_commutes_Q1 _ (hyp.S.mul_mem (hyp.S.inv_mem hs) (hyp.S.inv_mem hs₁)) _ hw
+  have hkey : ⁅x, q⁆ = ⁅s, s₁⁆ * ⁅z, y₁⁆ := by
+    calc ⁅x, q⁆
+        = (s * z) * (s₁ * y₁) * ((z⁻¹ * s⁻¹) * (y₁⁻¹ * s₁⁻¹)) := by
+          rw [← hxeq, ← hqeq, commutatorElement_def]; group
+      _ = (s * s₁) * (z * y₁) * ((z⁻¹ * y₁⁻¹) * (s⁻¹ * s₁⁻¹)) := by
+          rw [hc1.mul_mul_mul_comm, hc2.mul_mul_mul_comm]
+      _ = (s * s₁) * ((z * y₁ * (z⁻¹ * y₁⁻¹)) * (s⁻¹ * s₁⁻¹)) := by group
+      _ = (s * s₁) * ((s⁻¹ * s₁⁻¹) * (z * y₁ * (z⁻¹ * y₁⁻¹))) := by rw [hc3]
+      _ = ⁅s, s₁⁆ * ⁅z, y₁⁆ := by
+          rw [commutatorElement_def, commutatorElement_def]; group
+  rw [hkey]
+  exact Subgroup.mul_mem _
+    (Subgroup.mem_sup_left (Subgroup.commutator_mem_commutator hs hs₁))
+    (Subgroup.mem_sup_right (hcentral z hz y₁ hy₁))
+
+/-- **Element-level commutators give the `map ≤ center` input**: if
+`⁅D₀, Q⁆ ⊆ R` elementwise, then the image of `D₀` in `Q/R` (in the doubly
+relativised form consumed by `exists_deg_sq_le_of_mem_SsetOf`) is central. -/
+theorem map_mk_le_center_of_commutator_mem {R D₀ : Subgroup G}
+    [((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal]
+    (hcomm : ∀ x ∈ D₀, ∀ q ∈ hyp.Q, ⁅x, q⁆ ∈ R) :
+    ((D₀.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).map
+        (QuotientGroup.mk' ((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)))
+      ≤ Subgroup.center ((↥(hyp.Q.subgroupOf hyp.H)) ⧸
+          ((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) := by
+  rintro xbar ⟨x, hxD₀, rfl⟩
+  rw [Subgroup.mem_center_iff]
+  intro qbar
+  refine QuotientGroup.induction_on qbar fun q => ?_
+  rw [QuotientGroup.mk'_apply, ← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul,
+    QuotientGroup.eq]
+  have hmem : (q * x)⁻¹ * (x * q) = ⁅x⁻¹, q⁻¹⁆ := by
+    rw [commutatorElement_def]; group
+  rw [hmem, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+  have hcoe : ((((⁅x⁻¹, q⁻¹⁆ : ↥(hyp.Q.subgroupOf hyp.H)) : ↥hyp.H)) : G)
+      = ⁅(((x : ↥hyp.H) : G))⁻¹, (((q : ↥hyp.H) : G))⁻¹⁆ := by
+    simp [commutatorElement_def]
+  rw [hcoe]
+  have hxG : ((x : ↥hyp.H) : G) ∈ D₀ := by
+    have h := hxD₀
+    rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at h
+    exact h
+  have hqG : ((q : ↥hyp.H) : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp q.2
+  exact hcomm _ (D₀.inv_mem hxG) _ (hyp.Q.inv_mem hqG)
+
+/-- **The (1.2) centrality input at `R = S'⊔Q₃`, `D₀ = S⊔Z`** for a central
+section `⁅Z, Q₁⁆ ⊆ Q₃` (the lift of `Z/Q₃ ≤ Z(Q₁/Q₃)`): the image of `SZ` in
+`Q/S'Q₃` is central, in the exact shape `exists_deg_sq_le_of_mem_SsetOf`
+consumes. -/
+theorem map_mk_sup_S_le_center_of_central {Q₃ Z : Subgroup G}
+    (hZQ1 : Z ≤ hyp.Q1)
+    (hcentral : ∀ z ∈ Z, ∀ y ∈ hyp.Q1, ⁅z, y⁆ ∈ Q₃)
+    [(((hyp.Sder ⊔ Q₃).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal] :
+    (((hyp.S ⊔ Z).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).map
+        (QuotientGroup.mk' (((hyp.Sder ⊔ Q₃).subgroupOf hyp.H).subgroupOf
+          (hyp.Q.subgroupOf hyp.H)))
+      ≤ Subgroup.center ((↥(hyp.Q.subgroupOf hyp.H)) ⧸
+          (((hyp.Sder ⊔ Q₃).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
+  hyp.map_mk_le_center_of_commutator_mem fun _ hx _ hq =>
+    hyp.commutator_mem_sup_Sder_of_central hZQ1 hcentral hx hq
 
 end Hypothesis
 
