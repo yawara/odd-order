@@ -1041,7 +1041,7 @@ theorem derivedInG_quotient_maxNilpotentNormalHall_isNilpotent [Finite G]
       (QuotientGroup.quotientQuotientEquivQuotient (Q.subgroupOf (derivedInG M))
         ((S15.MF M).subgroupOf (derivedInG M)) hsub)
 
-/-- **BG Theorem A — the faithful monolith** (mmd L4346-4355), all 14 conjuncts `sorry`-free.
+/-- **BG Theorem A — the faithful monolith** (mmd L4346-4355), all 16 conjuncts `sorry`-free.
 
 This is the canonical faithful form of BG Theorem A.  It includes the explicit `hKM : K ≤ M` and
 `hUM : U ≤ M` that the BG setup `M = K U M_σ` carries but the bare Hall
@@ -1059,9 +1059,18 @@ standalone lemma — none gated:
   as `∀ [((M_F).subgroupOf M').Normal], IsNilpotent (M' ⧸ M_F)`: the `[Normal]` is BG background
   (`M' ≤ M ≤ N(M_F)`) which a consumer discharges once and applies — this keeps the monolith's own
   signature instance-free so consumers of the *other* conjuncts are unaffected;
-* A(7) `M'' ⊆ F(M)` — `derivedDerived_le_fittingInAmbient` (now ungated, issue 8012);
+* A(7) `M'' ⊆ F(M)` — `derivedDerived_le_fittingInAmbient` (now ungated, issue 8012); plus the
+  Corollary 15.5 Fitting decomposition `F(M) = C_M(M_F) M_F` and `K ≠ 1 ⟹ F(M) ⊆ M'` (the latter
+  via `¬type-F`), both from `fitting_decomposition`;
 * A(8) `M_F ≠ M_σ ⟹ U = 1 ∧ F(M)` TI `∧ |K|` prime — `theoremA8_structure` (`U.subgroupOf M = ⊥`
   upgraded to `U = ⊥` via `hUM`).
+
+BG A(3)'s `U ⊴ UK` is *not* carried here: BG's `U` is a *specific* `K`-invariant complement, whereas
+this monolith is parametrized over an *arbitrary* `(κ ∪ σ)'`-Hall `U` (its `M_σ`-conjugates are
+equally valid Hall complements and are generally not `K`-invariant), so `K ≤ N(U)` — and hence
+`U ⊴ UK` — cannot be asserted for every such `U`.  The `K`-invariant complement's existence is a
+separate statement (`S14.exists_kappaHall_invariant_complement_to_MF` gives the `M_F`-complement
+form `M' = M_F U`, `K ≤ N(U)`).
 
 The former bare overstatement omitted `hKM`/`hUM` and was retired after all consumers migrated;
 this theorem is the sole monolithic Theorem A API. -/
@@ -1086,15 +1095,24 @@ theorem theoremA_maximal_structure_faithful [Finite G]
       (∀ [((S15.MF M).subgroupOf (derivedInG M)).Normal],
         Group.IsNilpotent (↥(derivedInG M) ⧸ (S15.MF M).subgroupOf (derivedInG M))) ∧
       derivedInG (derivedInG M) ≤ S15.fittingInAmbient M ∧
+      S15.fittingInAmbient M = (Subgroup.centralizer (S15.MF M : Set G) ⊓ M) ⊔ S15.MF M ∧
+      (K ≠ ⊥ → S15.fittingInAmbient M ≤ derivedInG M) ∧
       (S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
         U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
   obtain ⟨hA1, hA2, hA3n, hA4, hA5a, hA5b, hA6a, hA6b⟩ :=
     theoremA_ungated_conjuncts hG hM hKM hUM hK hKstar hU
+  -- A(7) Fitting decomposition (Corollary 15.5): `F(M) = C_M(M_F) M_F` and `¬type-F → F(M) ⊆ M'`.
+  obtain ⟨_, _, _, _, _, hFdecomp, _, _, _, _, hFleM'ofNotF, _⟩ := fitting_decomposition hG hM
+  -- `K ≠ ⊥ ⟹ M` is type `P` (`κ(M) ≠ ∅`), hence not type `F`.
+  have hPofne : K ≠ ⊥ → S14.IsTypeP M := fun hKne =>
+    isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK
+      (fun h => hKne (by rw [← Subgroup.map_subgroupOf_eq_of_le hKM, h, Subgroup.map_bot]))
   refine ⟨hA1, hA2, typeP_maximal_eq_kappaHall_sup_U_sup_Msigma hG hM hKM hUM hK hU,
     hA3n, hA4, hA5a, hA5b, hA6a, hA6b,
     maxNilpotentNormalHall_ne_bot hG hM hA5a hKM hK hKstar,
     derivedInG_lt_of_maximal hG hM, ?_,
-    derivedDerived_le_fittingInAmbient hG hM hKM hK hKstar, ?_⟩
+    derivedDerived_le_fittingInAmbient hG hM hKM hK hKstar, hFdecomp,
+    fun hKne => hFleM'ofNotF (fun hF => S14.not_isTypeP_and_isTypeF ⟨hPofne hKne, hF⟩), ?_⟩
   · -- A(6) `M'/M_F` nilpotent (instance-parametrized: the `[Normal]` is BG background).
     intro _inst
     exact derivedInG_quotient_maxNilpotentNormalHall_isNilpotent hG hM hKM hK hKstar
