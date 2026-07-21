@@ -162,7 +162,7 @@
 > **再開時** (off-path scaffold 整理 or 3 冊網羅の別フェーズ) は `git worktree add` でレーン復活 +
 > 監視 cron 再作成。以下の a/b/c 3 レーン手順は**履歴** (再開時に参照)。
 
-> 横断運用ドキュメント。**監視ペース: 現行 = 30 分間隔 `13,43 * * * *` (2026-07-21 12:00 Fable hub で再作成、CronCreate job `2d2c6f61`; 本 session はユーザー interval 未指定 → Fable model default)**。明示指定がない場合はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。⚠ 2026-07-19 の 20 分 `7,27,47` は **Fable hub 固有**の指定ゆえ、Opus 復帰に伴い model-default の 15 分へ戻した (この session でユーザーは interval 未指定)。履歴: 2026-07-21 12:00 Fable hub で 30 分 (interval 未指定 → model default)、2026-07-21 朝 Opus hub で 15 分再作成、2026-07-19 Fable hub で 15 分→20 分 (ユーザー指示)、2026-07-17 監視再開時は 15 分 (07-15 指定を継承)、2026-07-15 Codex hub で 20 分→15 分 (ユーザー再指示)、同日 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行の明示ユーザー指定 (なければモデル対応ペース) で**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**監視ペース: 現行 = 30 分間隔 `13,43 * * * *` (2026-07-21 15:51 Fable hub で再作成、CronCreate job `f4304a0e`; 本 session はユーザー interval 未指定 → Fable model default)**。明示指定がない場合はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。⚠ 2026-07-19 の 20 分 `7,27,47` は **Fable hub 固有**の指定ゆえ、Opus 復帰に伴い model-default の 15 分へ戻した (この session でユーザーは interval 未指定)。履歴: 2026-07-21 12:00 Fable hub で 30 分 (interval 未指定 → model default)、2026-07-21 朝 Opus hub で 15 分再作成、2026-07-19 Fable hub で 15 分→20 分 (ユーザー指示)、2026-07-17 監視再開時は 15 分 (07-15 指定を継承)、2026-07-15 Codex hub で 20 分→15 分 (ユーザー再指示)、同日 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行の明示ユーザー指定 (なければモデル対応ペース) で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
@@ -898,6 +898,14 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 15:51 (監視再開 tick #10、Fable hub 新セッション — ユーザー「各レーンを監視します」) — ✅ 未マージ 0 (tick #9 直後)、cron 再作成 (`f4304a0e`, 30 分 `13,43`、interval 未指定 → Fable model default)**:
+  前 hub セッション (cron `067d5c59`) は tick #9 完走・push 済のクリーン状態で終了 — 中断復旧なし
+  (`.git/MERGE_HEAD` 無し、main = `9e8a5a546` origin 同期・tree clean)。a/b/c とも未マージ 0。
+  レーン生存 3 点 OK (transcript 15:46–15:48 更新 / 各 worktree に live プロセス / 直近 commit 15:29)。
+  進行中の未コミット作業 (次 tick 以降で回収見込み): **a** = FeitSibley Theorem 継続 — 新 leaf
+  `FeitSibleyReductions.lean` 起草中 + OddOrder.lean 配線済 (issue 1054、FeitSibley 所有 = 裁定 9204
+  の a carve-out)。**b** = Suzuki2Groups/HigmanDE 編集 + 新 leaf `SplitUniqueness.lean` +
+  AxiomsCheck 追記 (issue 2048)。**c** = clean (commit 間、E.5 WP5 = issue 3028 継続見込み)。
 - **2026-07-21 15:45 (tick #9、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、census 7 不変、push 済**:
   **a** = FeitSibley Theorem (1.1) 型 counting bound |H⧸R|−|H⧸RQ₁| ≤ d²·2a + (1.2) 型 degree
   bound ψ(1)=d·a, a² ≤ [Q:D₀] + forall_eq_one_of_leKer の R-一般化 retrofit (issue 1054)。

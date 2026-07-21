@@ -97,7 +97,7 @@ theorem quotient_center_isElementaryAbelian_of_xiLengthThree
   · intro xq yq
     refine QuotientGroup.induction_on xq fun x => ?_
     refine QuotientGroup.induction_on yq fun y => ?_
-    show ((x * y : P) : P ⧸ Subgroup.center P) = ((y * x : P) : _)
+    change ((x * y : P) : P ⧸ Subgroup.center P) = ((y * x : P) : _)
     rw [QuotientGroup.eq]
     have hmem : ⁅y⁻¹, x⁻¹⁆ ∈ _root_.commutator P :=
       Subgroup.commutator_mem_commutator (Subgroup.mem_top _)
@@ -118,11 +118,12 @@ theorem quotient_center_isElementaryAbelian_of_xiLengthThree
 
 /-! ## The two-summand split -/
 
-/-- **Peterfalvi Appendix III, Higman theorem (d), actual payload**: for a
-ξ-length-3 Suzuki 2-group, `P ⧸ Z(P)` splits as two complementary invariant
-summands of cardinality `|Z(P)|` — the images of the complementary type-A
-factors. -/
-theorem exists_orderQModuleSplit_of_xiLengthThree
+/-- **The canonical two-summand split of one complementary factor pair**: the
+images of the two type-A factors in `P ⧸ Z(P)`.  Named so downstream
+consumers (the type-B recognition of Theorem (e)) can pin the summands to
+`factors.left/right.map (mk' Z(P))` — obtaining an anonymous split from the
+existential erases that identification. -/
+noncomputable def xiLengthThreeFactorSplit
     {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
     (hP : IsPGroup 2 P)
     (hncomm : ¬ IsMulCommutative P)
@@ -130,12 +131,10 @@ theorem exists_orderQModuleSplit_of_xiLengthThree
     (hxi : IsXiActor Y)
     (hlen : HasXiLengthThree Y.subtype)
     (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
-      p ∣ (involutions P).ncard) :
-    Nonempty (OrderQModuleSplit Y.subtype (Subgroup.center P)
-      (IsAInvariant.of_characteristic Y.subtype)) := by
-  classical
-  obtain ⟨factors⟩ :=
-    xiLengthThreeTypeAFactorData_exists hP hncomm hmulti hxi hlen hprime
+      p ∣ (involutions P).ncard)
+    (factors : XiLengthThreeTypeAFactorData P Y) :
+    OrderQModuleSplit Y.subtype (Subgroup.center P)
+      (IsAInvariant.of_characteristic Y.subtype) := by
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
@@ -158,7 +157,7 @@ theorem exists_orderQModuleSplit_of_xiLengthThree
       IsAInvariant (IsAInvariant.quotientMulAutHom hZinv)
         (X.map (QuotientGroup.mk' (Subgroup.center P))) := by
     intro X hX a
-    show (X.map (QuotientGroup.mk' (Subgroup.center P))).map
+    change (X.map (QuotientGroup.mk' (Subgroup.center P))).map
         (IsAInvariant.quotientMulAutHom hZinv a).toMonoidHom =
       X.map (QuotientGroup.mk' (Subgroup.center P))
     rw [Subgroup.map_map]
@@ -235,7 +234,7 @@ theorem exists_orderQModuleSplit_of_xiLengthThree
     rw [← Subgroup.map_sup, factors.sup_eq_top]
     exact Subgroup.map_top_of_surjective _
       (QuotientGroup.mk'_surjective (Subgroup.center P))
-  exact ⟨{
+  exact {
     quotientEA := quotient_center_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
     left := factors.left.map (QuotientGroup.mk' (Subgroup.center P))
@@ -249,7 +248,58 @@ theorem exists_orderQModuleSplit_of_xiLengthThree
       (factors.right_model.natCard_eq_sq hinvPhi hEA
         (hZeq ▸ hZle_right))
     complementary := isCompl_iff.mpr
-      ⟨disjoint_iff.mpr hdisj, codisjoint_iff.mpr hsup⟩ }⟩
+      ⟨disjoint_iff.mpr hdisj, codisjoint_iff.mpr hsup⟩ }
+
+/-- The left summand of the canonical split is the image of the left
+factor. -/
+@[simp]
+theorem xiLengthThreeFactorSplit_left
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (factors : XiLengthThreeTypeAFactorData P Y) :
+    (xiLengthThreeFactorSplit hP hncomm hmulti hxi hlen hprime factors).left =
+      factors.left.map (QuotientGroup.mk' (Subgroup.center P)) := rfl
+
+/-- The right summand of the canonical split is the image of the right
+factor. -/
+@[simp]
+theorem xiLengthThreeFactorSplit_right
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (factors : XiLengthThreeTypeAFactorData P Y) :
+    (xiLengthThreeFactorSplit hP hncomm hmulti hxi hlen hprime factors).right =
+      factors.right.map (QuotientGroup.mk' (Subgroup.center P)) := rfl
+
+/-- **Peterfalvi Appendix III, Higman theorem (d), actual payload**: for a
+ξ-length-3 Suzuki 2-group, `P ⧸ Z(P)` splits as two complementary invariant
+summands of cardinality `|Z(P)|` — the images of the complementary type-A
+factors. -/
+theorem exists_orderQModuleSplit_of_xiLengthThree
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    Nonempty (OrderQModuleSplit Y.subtype (Subgroup.center P)
+      (IsAInvariant.of_characteristic Y.subtype)) := by
+  obtain ⟨factors⟩ :=
+    xiLengthThreeTypeAFactorData_exists hP hncomm hmulti hxi hlen hprime
+  exact ⟨xiLengthThreeFactorSplit hP hncomm hmulti hxi hlen hprime factors⟩
 
 /-! ## The packaged Higman payload from `|P| = q³` -/
 

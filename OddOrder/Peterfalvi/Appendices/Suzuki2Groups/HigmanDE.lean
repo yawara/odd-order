@@ -34,7 +34,7 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 open OddOrder.Isaacs.Ch03
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
 
-universe uK uP uX uY
+universe uK uP uX uY uZ
 
 /-- An isomorphism between groups equipped with `K`-actions which commutes
 with those actions. -/
@@ -44,6 +44,28 @@ structure KEquivariantMulEquiv
     (rhoX : K →* MulAut X) (rhoY : K →* MulAut Y) where
   toMulEquiv : X ≃* Y
   equivariant : ∀ k x, toMulEquiv (rhoX k x) = rhoY k (toMulEquiv x)
+
+namespace KEquivariantMulEquiv
+
+variable {K : Type uK} {X : Type uX} {Y : Type uY} {Z : Type uZ}
+  [Group K] [Group X] [Group Y] [Group Z]
+  {rhoX : K →* MulAut X} {rhoY : K →* MulAut Y} {rhoZ : K →* MulAut Z}
+
+/-- The inverse of a `K`-equivariant isomorphism is `K`-equivariant. -/
+def symm (e : KEquivariantMulEquiv rhoX rhoY) : KEquivariantMulEquiv rhoY rhoX where
+  toMulEquiv := e.toMulEquiv.symm
+  equivariant k y := by
+    apply e.toMulEquiv.injective
+    rw [MulEquiv.apply_symm_apply, e.equivariant, MulEquiv.apply_symm_apply]
+
+/-- The composite of two `K`-equivariant isomorphisms is `K`-equivariant. -/
+def trans (e : KEquivariantMulEquiv rhoX rhoY) (f : KEquivariantMulEquiv rhoY rhoZ) :
+    KEquivariantMulEquiv rhoX rhoZ where
+  toMulEquiv := e.toMulEquiv.trans f.toMulEquiv
+  equivariant k x := by
+    simp only [MulEquiv.trans_apply, e.equivariant, f.equivariant]
+
+end KEquivariantMulEquiv
 
 /-- **Peterfalvi Appendix III, Higman theorem (d).**  The genuine
 two-summand payload in the case `|P| = |Z| ^ 3`.
