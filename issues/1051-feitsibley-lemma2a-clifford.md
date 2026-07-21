@@ -65,8 +65,50 @@ crux = **inertia I_H(φ) = Q** (φ∈Irr(Q), Q₁⊄Ker φ)。書籍の λθ 分
 `FeitSibley.Sset_eq_induced_of_Q` の sorry が消え、build green + axiom-clean。可能なら下流
 2(b)-isometry / 2(c) が消費できる補助形 (𝒮 が H−Q で消える等) も派生。
 
+## 進捗 (2026-07-21) — 数学的核心 landing、forward/converse 組立が残る
+
+**完了 (4 commit landing、全て build green + sorry 非退行 + 新 axiom 無し)**:
+
+- **Piece 1** (`c70b2a034`): 構造補題 (Hypothesis 名前空間, G-level)
+  - `mem_Q1_of_mem_Q_of_coprime_orderOf` (π-元特徴付け), `D_normalizes_Q1`, `Q1_normal_in_H`。
+- **Piece 2** (`90f3c95ae`): Frobenius Q₁D の inertia 排除 (route B, ↥H に留まる)
+  - `fixedPointFree_of_mem_Q1_mul_D` (kδ が FPF, commutatorMap_surjective 経由),
+    `H_le_normalizer_Q1`, `Q1_subgroupOf_H_normal`, `delta_fixed_class_eq_one`,
+    `card_fixedClasses_Q1_eq_one`, `delta_notMem_inertia_Q1` (δ∈D^# ∉ I_{↥H}(θ))。
+- **Piece 3a** (`bb60bdee7`): **inertia crux** `inertia_theta_eq_Q` (非自明 θ∈Irr(Q₁) の
+  ↥H-inertia = Q)。+ `exists_mem_Q_mul_mem_D_subtype`, `Q_conjBy_eq`。
+- **Piece 3b** (`22e9bab07`): `exists_ne_trivial_liesOver_of_not_forall_eq_one` (汎用:
+  N⊄Ker χ ⟹ ∃ 非自明 θ∈Irr(N), χ liesOver θ。Fourier 展開)。
+
+**残 (forward ⊇ + converse ⊆ の組立、`Sset_eq_induced_of_Q:411` sorry)**。核心は済み、
+残りは Clifford correspondence への配線 (subgroupOf/compHom transport が主):
+
+- **forward part A** (Ind_Q^H φ 既約): φ∈Irr(QH), Q₁⊄Ker φ に対し
+  - Piece 3b で N':=Q1H.subgroupOf QH から非自明 θ'∈Irr(N') 抽出 (RHS 条件 = N'⊄Ker φ,
+    `Subtype.forall` で変換)。
+  - θ := untransport θ' to Irr(Q1H): `θ := compHom (subgroupOfEquivOfLe hHT).symm.toMonoidHom θ'`
+    (irreducible = `IsIrreducibleCharacter.compHom_of_surjective`, InflationCharacter.lean:164)。
+    roundtrip `compHom(subgroupOfEquivOfLe hHT) θ = θ'` は ext + `equiv.symm_apply_apply`。
+  - `inertia_theta_eq_Q hθne` (θ nontrivial) で hinertia。
+  - `isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq (G:=↥H) hHT hθirr hinertia φ hover`
+    (CliffordCorrespondence.lean:385)。consumer idiom = CliffordDecomposition.lean:153。
+  - 要 instance: `Q1_subgroupOf_H_normal`, `(Q1H.subgroupOf QH).Normal`
+    (`Subgroup.Normal.subgroupOf`, mathlib Subgroup/Basic:901), Fintype/Invertible。
+- **forward part B** (Q₁⊄Ker(Ind φ)): Ind φ は θ の上に乗る (Ind φ liesOver φ liesOver θ,
+  restriction 推移律)。Q₁⊆Ker(Ind φ) なら Res_{Q1H}(Ind φ)=deg·trivial ⟹ trivial のみに
+  lies over、θ≠trivial に矛盾。
+- **converse ⊆**: χ∈Irr(↥H), Q₁⊄Ker χ ⟹ Piece 3b で θ∈Irr(Q1H) 非自明 (χ liesOver θ),
+  `inertia_theta_eq_Q` で I=Q、Clifford correspondence の全射性 (χ = Ind_Q^H φ for some
+  φ∈Irr(QH) lying over θ) + φ の Q₁⊄Ker は χ の逆算。`eq_of_induce_eq_induce_of_liesOver_of_inertia_eq`
+  (CliffordCorrespondence.lean:550) 系、または Clifford correspondence の全単射補題を探す。
+
+census テーブル (FeitSibley.lean:59) の Lemma 1(a) 行は stale (1049 で close 済) — 要修正。
+
 ## 参照
 
-- `OddOrder/Peterfalvi/Appendices/FeitSibley.lean:386` (sorry), `:92` (Hypothesis 構造)
+- `OddOrder/Peterfalvi/Appendices/FeitSibley.lean:411` (残 sorry), `:92` (Hypothesis 構造),
+  構造補題群は Hypothesis 名前空間 (`mem_Q1_of_mem_Q_of_coprime_orderOf`〜`inertia_theta_eq_Q`)
 - `references/peterfalvi/pdf/09.0_*.pdf` p.145 (Lemma 2(a)), coq `PFsectionN` の対応 Clifford
-- issue 1049 (Lemma 1(a), closed), 下流 = 2(b)-isometry (FeitSibley.lean:411) / 2(c) (:431)
+- issue 1049 (Lemma 1(a), closed), 下流 = 2(b)-isometry (FeitSibley.lean:436) / 2(c) (:456)
+- Clifford correspondence: `isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq` /
+  `eq_of_induce_eq_induce_of_liesOver_of_inertia_eq` (CliffordCorrespondence.lean:385/550)
