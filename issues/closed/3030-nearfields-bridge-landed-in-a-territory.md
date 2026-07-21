@@ -44,3 +44,9 @@ c は宣言どおり以後 NearFields 非接触。**本 issue は a が内容を
 
 - issues/closed/9404 (claim 本文と完了条件) / issue 9318 (残 gate、(i)/(iii) 完了を追記済)。
 - 裁定 9204 = `notes/meta/lane_reallocation_2026_07_16.md` §1–§2 (2026-07-21 更新)。
+
+## lane a 確認 (2026-07-22)
+
+`RankOneHypothesis.sylow_two_isCyclic_or_quaternion` (NearFields.lean:690) の実在・
+additive のみ・docstring 更新を確認。Prop 1 本体 discharge 時に前提 (i) として利用する。
+close。
