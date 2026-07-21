@@ -12078,3 +12078,12 @@ subgroup for `K ◁ L`, then `|M| = |V|^t`.  Sorry-free; no semisimple-module ma
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_card_eq_pow_of_minimal_invariant
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_minimal_aInvariant_le
+
+/-! **Peterfalvi Part II, Ch. II, step (3), first Clifford branch** (`FirstCase/StepThree.lean`,
+issue 2053, 2026-07-22): a `K`-invariant subgroup `V ≤ Q` of prime order `r` forces
+`2^p − 1 ∣ r − 1` — `K` acts faithfully on `V` (f.p.f. on `Q`), embedding into
+`Aut(V) ≅ (ℤ/r)^*`.  Sorry-free.  (The dichotomy `exists_prime_order_invariant_or_irreducible`
+and `card_inf_centralizer_eq_prime` inherit the step (2)(b) sorry — issue 9318 — and are
+deliberately NOT asserted here.) -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_K_dvd_sub_one_of_prime_order_invariant
