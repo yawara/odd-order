@@ -121,6 +121,15 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     (iv) App I Prop 2 = SemilinearField.lean「Proposition 2(a)」✓。
     次: (ii) の正確な適合確認 → M (極小 EA r-部分群) の存在と KP-正規化の
     構成 → (iii) ギャップの扱い決定
+  - **適合確認済 (2026-07-21)**: kernelFPF 変種が完全適合 — L := KP、
+    U := K (normal)、E := P、k := ZMod r、W := M (additive)。
+    invariants(ρ|K) = ⊥ は conjQByK_fixed_eq_one (K fpf on Q)。
+    結論 dim M = p·dim C_M(P) で **C_M(P) ≠ 0 も dim 等式から従う**
+    (原文の Frobenius 論法不要)。dim C_M(P) = 1 は原文どおり (2)(b) の
+    near-field 構造経由 = sorried 継承側。M 存在 =
+    MinimalInvariantNormal (exists_aInvariant_normal_isElementaryAbelian 系)。
+    実装プラン: StepThree.lean で (a) M 存在、(b) dim 等式 (sorry-free 側)、
+    (c) Clifford 二分岐 + App I Prop 2 + (2)(b) 消費 (sorried 継承側) の順
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐
