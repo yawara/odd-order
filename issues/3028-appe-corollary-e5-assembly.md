@@ -128,3 +128,42 @@ U₁ = E₂⊔E₃ (abelian Hall (κ∪σ)ᶜ、K₁ 正規化、≠⊥)。
   territory 問題なし。9500 claim 不要 (App.E assembly の一部、issue 3028 で追跡)。
 
 **改訂 WP 順**: WP2.5 (15.9(c)) → WP3 (setup 構成) → WP4 ((ii)∧hdc⟹(i)) → WP5 (counting)。
+
+## 2026-07-21 WP2.5 設計確定 (15.9(c) 証明の完全読解、pdftotext L6415-6435 + PDF p.123)
+
+**⭐ Coq 裁定**: BGsection15.v:1396-1398 のコメントで **Coq は (c) を意図的に drop**
+("not used later" — Coq は App.E を形式化しないため)。(c) の形式化は本 repo が初。
+
+**BG の (c) 証明の骨格** (そのまま形式化ルート):
+1. (15.2) `K₁R` 非冪零 → `K₁ ⊄ M_σ` (M_σ 冪零ゆえ) → `K₁ ∩ M_σ = 1` → `|K₁| ∉ σ(M)`
+   → K₁ は σ(M)'-群。(15.2) 自体 = C_R(K₁) ≤ C_{U₁}(K₁) = 1 + R ≠ 1 (rank 2) から
+   「冪零群の正規部分群は中心と交わる」で矛盾させる。
+2. **E の再選択**: 既存 15.9(b) の complement E₀ に Hall 共役 (`hall_D`、M solvable) を
+   当て、K₁ ≤ E := E₀^m。cyclic/complement/Frobenius は共役で保存。
+3. `N_G(⟨x⟩) ≤ N`: C_G(x) ≤ N_G(⟨x⟩) < G (G simple、⟨x⟩ ≠ 1)、ℳ(C_G(x)) = {N}
+   (signalizer 一意性) → N_G(⟨x⟩) の入る maximal = N。
+4. **`E ⊓ N = K₁`**: K₁ ≤ E∩N ≤ M∩N = K₁ ⊔ U₁; E cyclic → E∩N abelian → E∩N ≤
+   C_{M∩N}(K₁) = K₁ (∵ (15.4) C_{U₁}(K₁) = 1 の分解論法)。⊇ は選択。
+5. `N_E(⟨x⟩) ⊆ E∩N` は 3. から自明 (N_E ≤ E ∧ ≤ N_G(⟨x⟩) ≤ N)。
+6. `|E∩N| = |N/N'|` は **E.5 では省略可** (WP4 は E∩N = K₁ だけ消費; counting は k = |K₁|
+   を直接使う)。Lean statement には入れない (必要になれば別途)。
+
+**⭐ WP4 への波及**: E.4 対偶で E が R₀ = ⟨x⟩ を固定 → E ≤ N_G(⟨x⟩) ≤ N →
+E = E∩N = K₁ → |M/M'| = |E| = |K₁| prime が即納 ((i) 完成)。
+
+**要部品 (現状)**:
+- (15.4) `C_{U₁}(K₁) = ⊥`: BG Prop 14.2(g) 由来。repo 形式化の所在は次 iteration で
+  実測 (候補: S14 Basics/ElemAbelianNeighbor の 14.2(g) 群、または typeP2 系から再導出)。
+- `hall_D` (Isaacs Ch3 Basic.lean:1682) = K₁ を含む Hall σ' の存在 ✓
+- Frobenius 構造の共役輸送 (IsFrobeniusGroup + IsComplement' の MulAut.conj 版) — 既存
+  API を確認、無ければ小補題。
+- 置き場所: `AppE_CorollaryE5.lean` 内 (`e5_exists_suitable_complement`)。S16 の
+  centralizer_escape_final_local は変更しない (出力を消費するだけ)。
+
+**statement 案**:
+```
+theorem e5_exists_suitable_complement ... (K₁ 側仮説 + 15.9 出力仮説) :
+  ∃ E : Subgroup G, E ≤ M ∧ IsComplement' ((Msigma M).subgroupOf M) (E.subgroupOf M) ∧
+    IsCyclic ↥E ∧ IsFrobeniusGroup ↥M ((Msigma M).subgroupOf M) (E.subgroupOf M) ∧
+    K₁ ≤ E ∧ E ⊓ N = K₁
+```
