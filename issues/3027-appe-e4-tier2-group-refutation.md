@@ -37,17 +37,23 @@ instantiate して **printed E.4 の statement そのものの否定**を証明�
 - ✅ **WP2 (群構築)**: `AppE_FiliformGroup.lean` green + axiom-clean。gmul_assoc (ring)、
   Q6 Group instance、card 197⁶、co_pow、exponent 197、orderOf vg/e5g = 197、
   bg*e2g ≠ e2g*bg (decide)。
-- ⬜ **WP3 (部分群層)**: zpowers vg の元の特徴付け (`co_zpow`)、centralizer_eq
-  (`C(vg) = zpowers vg ⊔ zpowers e5g`、三角 solve)、Disjoint、Z(S)/Z₂(S) 座標特定
-  (`mem_upperCentralSeries_succ_iff` + comm 公式)、T = {x₀=0}。
-- ⬜ **WP4 (B 作用)**: βAut : MulAut Q6 (逆 = ζ^{49−w} 対角)、act : Mult (ZMod 49) →* MulAut、
-  A = zpowers (ofAdd 7)、A_card=7、fpf (Tier 1 の beta_iterate_fixed_eq_zero 再利用)、
-  A_fixes_R₀ (β⁷ = ζ⁷ スカラー)、¬B_fixes (Tier 1 beta_not_fixes_v)。
-- ⬜ **WP5 (組立)**: 別 leaf `AppE_FiliformRefutation.lean` (AppE_FurtherResults import は
-  重いのでこの leaf に隔離): RegularOperatorSetup instance、Omega = ⊤、
-  Nat.card ↥⊤ = 197⁶ ≥ 197⁴、upperCentralSeries ↥⊤ 2 の上界 (topEquiv comap +
-  comm 公式)、**headline `printed_propE4_false : ¬ ∀ …`** (sorried E.4 と同形の全称文の否定)、
-  AxiomsCheck 登録、note/survey 更新。
+- ✅ **WP3 (部分群層)** (commit f672afae4): `co_zpow`、`mem_zpowers_vg_iff`/`_e5g_iff`、
+  `mem_center_iff` (Z(S) = e₅-line)、`commute_vg_iff` → **`centralizer_zpowers_vg`**
+  (C_S(R₀) = R₀ ⊔ R₁)、`disjoint_zpowers_vg_e5g`、**`plane_mul_comm`** (平面元は
+  中心的 e₅ 補正を左に置いて可換 — 4 重 BCH 展開を single-depth で回避する要)、
+  Z₂(S) = e₄–e₅ 平面 (両側)、T = C_S(Z₂) = {x₀=0}、
+  `centralizer_upperCentralSeries_two_not_abelian` (Q6 レベル反証)。
+- ✅ **WP4 (B 作用)** (commit bd564448f): `gmul_beta` (grading → ring 一発)、
+  `βAut : MulAut Q6` (逆 = β⁴⁸)、`act : Mult (ZMod 49) →* MulAut Q6`
+  (val + pow_eq_pow_mod)、`act_regular` (fpf)、`βAut_pow_seven_smul_zpowers_vg` +
+  `act_A_fixes_zpowers_vg` (stabilizer + map_zpow)、`act_not_fixes_zpowers_vg`、
+  card 3 種 (|R₀|=|R₁|=197, |A|=7)。
+- ✅ **WP5 (組立)**: `AppE_FiliformRefutation.lean` (AppE_FurtherResults import を隔離):
+  **`q6Setup : RegularOperatorSetup Q6 (Multiplicative (ZMod 49)) 197 7`** (全 field 実データ)、
+  `omega_q6_eq_top`、`card_omega_ge` (197⁶ ≥ 197⁴)、`omegaEquiv` + comap 転送、
+  `q6_centralizer_not_mulCommutative`、**headline `printed_propE4_false`**
+  (sorried E.4 と同形の全称文の否定、universe 0)。OddOrder.lean 配線 +
+  AxiomsCheck 8 件登録済。
 
 ## 参照
 - 正本 note: `notes/bg/appE_e4_counterexample_2026_07_21.md`
