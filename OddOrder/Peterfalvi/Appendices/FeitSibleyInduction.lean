@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
+import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 
 /-!
 # Peterfalvi Appendix IV: Feit–Sibley — reduction (1) chief-factor induction support (pp. 146–147)
@@ -66,6 +67,109 @@ theorem subgroupOf_normal_of_conj_mem {R W : Subgroup G}
   intro n hn g
   rw [Subgroup.mem_subgroupOf] at hn ⊢
   simpa using hR g g.2 n hn
+
+/-! ## `S ⊴ H`, `⁅Q₁,Q₁⁆ ⊴ H`, and conjugation-closure of joins -/
+
+/-- **`π'`-element characterisation of `S`** (mirror of
+`mem_Q1_of_mem_Q_of_coprime_orderOf`): an element of `Q = S × Q₁` whose order
+is coprime to `|Q₁|` lies in `S`. -/
+theorem mem_S_of_mem_Q_of_coprime_orderOf [Finite G] {w : G} (hw : w ∈ hyp.Q)
+    (hcop : Nat.Coprime (orderOf w) (Nat.card ↥hyp.Q1)) : w ∈ hyp.S := by
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hw
+  obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hw
+  rw [SetLike.mem_coe] at hs hy
+  have hcomm : Commute s y := hyp.S_commutes_Q1 s hs y hy
+  have hos_dvd : orderOf s ∣ Nat.card ↥hyp.S := hyp.S.orderOf_dvd_natCard hs
+  have hoy_dvd : orderOf y ∣ Nat.card ↥hyp.Q1 := hyp.Q1.orderOf_dvd_natCard hy
+  have hcop_orders : Nat.Coprime (orderOf s) (orderOf y) :=
+    (hyp.coprime_S_Q1.coprime_dvd_left hos_dvd).coprime_dvd_right hoy_dvd
+  have how : orderOf w = orderOf s * orderOf y := by
+    rw [← hsy]
+    exact hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop_orders
+  have hoy_dvd_w : orderOf y ∣ orderOf w := by
+    rw [how]
+    exact dvd_mul_left _ _
+  have hcs : Nat.Coprime (orderOf y) (Nat.card ↥hyp.Q1) :=
+    hcop.coprime_dvd_left hoy_dvd_w
+  have hone : orderOf y ∣ 1 := by
+    have hg : Nat.gcd (orderOf y) (Nat.card ↥hyp.Q1) = 1 := hcs
+    exact hg ▸ Nat.dvd_gcd dvd_rfl hoy_dvd
+  have hyone : y = 1 := orderOf_eq_one_iff.mp (Nat.dvd_one.mp hone)
+  rw [← hsy, hyone, mul_one]
+  exact hs
+
+/-- **`S ⊴ H`** (elementwise; mirror of `Q1_normal_in_H`): conjugates stay in
+`Q` with unchanged order coprime to `|Q₁|`. -/
+theorem S_normal_in_H [Finite G] {h : G} (hh : h ∈ hyp.H) {x : G}
+    (hx : x ∈ hyp.S) : h * x * h⁻¹ ∈ hyp.S := by
+  have hconjQ : h * x * h⁻¹ ∈ hyp.Q :=
+    hyp.Q_normal_in_H h hh x (hyp.S_le_Q hx)
+  have hox : orderOf x ∣ Nat.card ↥hyp.S := hyp.S.orderOf_dvd_natCard hx
+  have hoconj : orderOf (h * x * h⁻¹) = orderOf x := by
+    have h1 := orderOf_injective (MulAut.conj h).toMonoidHom (MulAut.conj h).injective x
+    simpa [MulAut.conj_apply] using h1
+  refine hyp.mem_S_of_mem_Q_of_coprime_orderOf hconjQ ?_
+  rw [hoconj]
+  exact hyp.coprime_S_Q1.coprime_dvd_left hox
+
+/-- Conjugation by `h ∈ H` fixes `Q₁` as a set (both inclusions of
+`Q1_normal_in_H`). -/
+theorem Q1_map_conj_eq [Finite G] {h : G} (hh : h ∈ hyp.H) :
+    hyp.Q1.map (MulAut.conj h).toMonoidHom = hyp.Q1 := by
+  apply le_antisymm
+  · rintro _ ⟨x, hxQ1, rfl⟩
+    exact hyp.Q1_normal_in_H hh hxQ1
+  · intro x hxQ1
+    refine ⟨h⁻¹ * x * h, ?_, ?_⟩
+    · have h1 := hyp.Q1_normal_in_H (hyp.H.inv_mem hh) hxQ1
+      simpa using h1
+    · simp [MulAut.conj]
+      group
+
+/-- **`⁅Q₁,Q₁⁆ ⊴ H`** (elementwise; mirror of `Qder_conj_mem_of_mem_H`):
+`H`-conjugation fixes `Q₁`, hence its commutator subgroup. -/
+theorem Q1der_conj_mem_of_mem_H [Finite G] {h : G} (hh : h ∈ hyp.H) {x : G}
+    (hx : x ∈ ⁅hyp.Q1, hyp.Q1⁆) : h * x * h⁻¹ ∈ ⁅hyp.Q1, hyp.Q1⁆ := by
+  have hmap : (⁅hyp.Q1, hyp.Q1⁆ : Subgroup G).map (MulAut.conj h).toMonoidHom
+      = ⁅hyp.Q1, hyp.Q1⁆ := by
+    rw [Subgroup.map_commutator, hyp.Q1_map_conj_eq hh]
+  rw [← hmap]
+  exact ⟨x, hx, rfl⟩
+
+/-- **`Sder ⊴ H`** (elementwise): `H`-conjugation fixes `S` (`S_normal_in_H`),
+hence `[S,S]`. -/
+theorem Sder_conj_mem_of_mem_H [Finite G] {h : G} (hh : h ∈ hyp.H) {x : G}
+    (hx : x ∈ hyp.Sder) : h * x * h⁻¹ ∈ hyp.Sder := by
+  have hSmap : hyp.S.map (MulAut.conj h).toMonoidHom = hyp.S := by
+    apply le_antisymm
+    · rintro _ ⟨y, hyS, rfl⟩
+      exact hyp.S_normal_in_H hh hyS
+    · intro y hyS
+      refine ⟨h⁻¹ * y * h, ?_, ?_⟩
+      · have h1 := hyp.S_normal_in_H (hyp.H.inv_mem hh) hyS
+        simpa using h1
+      · simp [MulAut.conj]
+        group
+  have hmap : hyp.Sder.map (MulAut.conj h).toMonoidHom = hyp.Sder := by
+    change (⁅hyp.S, hyp.S⁆ : Subgroup G).map (MulAut.conj h).toMonoidHom = ⁅hyp.S, hyp.S⁆
+    rw [Subgroup.map_commutator, hSmap]
+  rw [← hmap]
+  exact ⟨x, hx, rfl⟩
+
+/-- Conjugation-closure passes to joins: if conjugation by `h` keeps `A` in
+`A` and `B` in `B`, it keeps `A ⊔ B` in `A ⊔ B` (via
+`map (conj h) (A ⊔ B) = map (conj h) A ⊔ map (conj h) B`). -/
+theorem conj_mem_sup {A B : Subgroup G} {h : G}
+    (hA : ∀ x ∈ A, h * x * h⁻¹ ∈ A) (hB : ∀ x ∈ B, h * x * h⁻¹ ∈ B)
+    {x : G} (hx : x ∈ A ⊔ B) : h * x * h⁻¹ ∈ A ⊔ B := by
+  have hle : (A ⊔ B).map (MulAut.conj h).toMonoidHom ≤ A ⊔ B := by
+    rw [Subgroup.map_sup]
+    refine sup_le ?_ ?_
+    · rintro _ ⟨y, hy, rfl⟩
+      exact Subgroup.mem_sup_left (hA y hy)
+    · rintro _ ⟨y, hy, rfl⟩
+      exact Subgroup.mem_sup_right (hB y hy)
+  exact hle ⟨x, hx, rfl⟩
 
 /-! ## The central lift `Z` of `Z(Q₁⧸Q₃)` (p. 146) -/
 
@@ -451,6 +555,155 @@ theorem not_centralLift_le_minimal [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q
     Nat.Coprime.pow _ _ ((Nat.coprime_primes hp hr).mpr hpr)
   have hone : orderOf xr = 1 := Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd h1 h2)
   exact hxr1 (orderOf_eq_one_iff.mp hone)
+
+/-! ## The reduction (1) induction (p. 146) -/
+
+section InductionAssembly
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+/-- **The reduction (1) chief-factor induction** (p. 146): for every
+`H`-invariant `Q₃ ≤ [Q₁,Q₁]`, the family `𝒮(S'Q₃)` is coherent — by downward
+strong induction from the base `Q₃ = [Q₁,Q₁]` (the Remark, via
+`Q' = S'·[Q₁,Q₁]`), descending along minimal `H`-invariant steps
+(`exists_minimal_conjInvariant_between`) through the one-step lemma
+`ssetOf_coherent_step` with the chief data supplied by
+`minimal_le_centralLift` / `not_centralLift_le_minimal` /
+`d_add_one_sq_le_card_quot_of_two_primes`. -/
+theorem ssetOf_sup_sder_coherent_of_conjInvariant
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {p r : ℕ} (hp : p.Prime) (hr : r.Prime) (hpr : p ≠ r)
+    (hpd : p ∣ Nat.card ↥hyp.Q1) (hrd : r ∣ Nat.card ↥hyp.Q1)
+    (Q₃ : Subgroup G) (hQ₃le : Q₃ ≤ ⁅hyp.Q1, hyp.Q1⁆)
+    (hQ₃H : ∀ h ∈ hyp.H, ∀ x ∈ Q₃, h * x * h⁻¹ ∈ Q₃) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf (hyp.Sder ⊔ Q₃)) hyp.A) := by
+  classical
+  haveI := hnil
+  -- `[Q₁,Q₁] < Q₁` (nontrivial nilpotent), hence `S·Q' < Q` for the anchor
+  haveI : Nontrivial ↥hyp.Q1 := by
+    apply Finite.one_lt_card_iff_nontrivial.mp
+    exact lt_of_lt_of_le hp.one_lt (Nat.le_of_dvd Nat.card_pos hpd)
+  have hder_ne : ⁅hyp.Q1, hyp.Q1⁆ ≠ hyp.Q1 := by
+    intro heq
+    apply (IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.Q1).ne
+    rw [eq_top_iff]
+    intro x _
+    have hx : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
+      rw [hyp.map_subtype_commutator, heq]
+      exact x.2
+    obtain ⟨y, hy, hyx⟩ := hx
+    rwa [show y = x from Subtype.ext hyx] at hy
+  have hlt : hyp.S ⊔ hyp.Qder < hyp.Q := by
+    rw [hyp.Qder_eq_sup_Sder_commutator, ← sup_assoc, sup_eq_left.mpr hyp.Sder_le_S,
+      lt_iff_le_and_ne]
+    refine ⟨sup_le hyp.S_le_Q (hyp.Q1der_le_Q1.trans hyp.Q1_le_Q), fun heq => ?_⟩
+    have h1 : hyp.Q1 ⊓ (hyp.S ⊔ ⁅hyp.Q1, hyp.Q1⁆) = ⁅hyp.Q1, hyp.Q1⁆ :=
+      hyp.Q1_inf_sup_eq le_rfl hyp.Q1der_le_Q1
+    rw [heq, inf_eq_left.mpr hyp.Q1_le_Q] at h1
+    exact hder_ne h1.symm
+  -- the base of the induction: the Remark at `Q' = S'·[Q₁,Q₁]`
+  have hbase : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf (hyp.Sder ⊔ ⁅hyp.Q1, hyp.Q1⁆)) hyp.A) := by
+    rw [← hyp.Qder_eq_sup_Sder_commutator]
+    exact hyp.ssetOf_Qder_coherent hd hQ1odd (hyp.ssetOf_Qder_nonempty hlt)
+  -- strong induction on the cardinality gap below `[Q₁,Q₁]`
+  have hmain : ∀ n (Q₃' : Subgroup G), Q₃' ≤ ⁅hyp.Q1, hyp.Q1⁆ →
+      (∀ h ∈ hyp.H, ∀ x ∈ Q₃', h * x * h⁻¹ ∈ Q₃') →
+      Nat.card ↥(⁅hyp.Q1, hyp.Q1⁆ : Subgroup G) - Nat.card ↥Q₃' ≤ n →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+        (hyp.SsetOf (hyp.Sder ⊔ Q₃')) hyp.A) := by
+    intro n
+    induction n with
+    | zero =>
+      intro Q₃' hle hinvH hcard
+      have hcard_le : Nat.card ↥(⁅hyp.Q1, hyp.Q1⁆ : Subgroup G) ≤ Nat.card ↥Q₃' := by
+        have hpos : 0 < Nat.card ↥Q₃' := Nat.card_pos
+        omega
+      rw [OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hle hcard_le]
+      exact hbase
+    | succ n ih =>
+      intro Q₃' hle hinvH hcard
+      by_cases heq : Q₃' = ⁅hyp.Q1, hyp.Q1⁆
+      · rw [heq]
+        exact hbase
+      -- choose the chief step `Q₂/Q₃'` and apply the one-step lemma
+      have hQ₃lt : Q₃' < ⁅hyp.Q1, hyp.Q1⁆ := lt_of_le_of_ne hle heq
+      obtain ⟨Q₂, hQ₃Q₂, hQ₂le, hQ₂H, hmin⟩ :=
+        hyp.exists_minimal_conjInvariant_between hQ₃lt
+          (fun h hh x hx => hyp.Q1der_conj_mem_of_mem_H hh hx)
+      have hinvQ1 : ∀ q ∈ hyp.Q1, ∀ x ∈ Q₃', q * x * q⁻¹ ∈ Q₃' :=
+        fun q hq x hx => hinvH q (hyp.Q1_le_H hq) x hx
+      -- the induction hypothesis applies at the strictly larger `Q₂`
+      have hcard₂ : Nat.card ↥(⁅hyp.Q1, hyp.Q1⁆ : Subgroup G) - Nat.card ↥Q₂ ≤ n := by
+        have h1 : Nat.card ↥Q₃' < Nat.card ↥Q₂ := by
+          rcases lt_or_ge (Nat.card ↥Q₃') (Nat.card ↥Q₂) with h | h
+          · exact h
+          · exact absurd (OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hQ₃Q₂.le h) hQ₃Q₂.ne
+        have h2 : Nat.card ↥Q₂ ≤ Nat.card ↥(⁅hyp.Q1, hyp.Q1⁆ : Subgroup G) :=
+          Subgroup.card_le_of_le hQ₂le
+        omega
+      have hcoh₂ := ih Q₂ hQ₂le hQ₂H hcard₂
+      -- chief-factor data for the step lemma
+      have hQ₂Z : Q₂ ≤ hyp.centralLift Q₃' hinvQ1 :=
+        hyp.minimal_le_centralLift hnil hQ₃Q₂ (hQ₂le.trans hyp.Q1der_le_Q1)
+          hinvQ1 hQ₂H hinvH hmin
+      have hZQ₂ : ¬ hyp.centralLift Q₃' hinvQ1 ≤ Q₂ :=
+        hyp.not_centralLift_le_minimal hnil hp hr hpr hpd hrd hQ₃Q₂ hQ₂le
+          hinvQ1 hinvH hmin
+      -- the relativised `Normal` instances
+      haveI : ((hyp.Sder ⊔ Q₂).subgroupOf hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
+          conj_mem_sup (fun y hy => hyp.Sder_conj_mem_of_mem_H hh hy)
+            (fun y hy => hQ₂H h hh y hy) hx
+      haveI : ((hyp.Sder ⊔ Q₃').subgroupOf hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
+          conj_mem_sup (fun y hy => hyp.Sder_conj_mem_of_mem_H hh hy)
+            (fun y hy => hinvH h hh y hy) hx
+      haveI : (hyp.Q1.subgroupOf hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.Q1_normal_in_H hh hx
+      haveI : (((hyp.Sder ⊔ Q₃').subgroupOf hyp.H).subgroupOf
+          (hyp.Q.subgroupOf hyp.H)).Normal :=
+        hyp.subgroupOf_Q_normal_of_conj_mem fun q hq x hx =>
+          conj_mem_sup (fun y hy => hyp.Sder_conj_mem_of_mem_H (hyp.Q_le_H hq) hy)
+            (fun y hy => hinvH q (hyp.Q_le_H hq) y hy) hx
+      haveI : ((hyp.S ⊔ hyp.centralLift Q₃' hinvQ1).subgroupOf hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
+          conj_mem_sup (fun y hy => hyp.S_normal_in_H hh hy)
+            (fun y hy => hyp.centralLift_conj_mem_of_mem_H hinvQ1 hinvH hh hy) hx
+      -- the one-step lemma closes the induction step
+      exact hyp.ssetOf_coherent_step hd hQ1odd hlt hQ₂le hQ₃Q₂.le
+        (hyp.centralLift_le_Q1 hinvQ1) hQ₂Z hZQ₂
+        (fun z hz y hy => hz.2 y hy)
+        (fun δ hδ z hz => hQ₂H δ (hyp.D_le_H hδ) z hz)
+        (fun δ hδ z hz =>
+          hyp.centralLift_conj_mem_of_mem_H hinvQ1 hinvH (hyp.D_le_H hδ) hz)
+        (hyp.d_add_one_sq_le_card_quot_of_two_primes hnil hp hr hpr hpd hrd hQ₂le
+          (fun δ hδ z hz => hQ₂H δ (hyp.D_le_H hδ) z hz))
+        hcoh₂
+  exact hmain _ Q₃ hQ₃le hQ₃H le_rfl
+
+/-- **Reduction (1)** (p. 146): if `|Q₁|` is divisible by two distinct primes
+(and `Q₁` is nilpotent — supplied by Thompson's theorem at the final assembly),
+then `𝒮(S')` is coherent.  The chief-factor induction at `Q₃ = ⊥`. -/
+theorem ssetOf_sder_coherent_of_two_primes
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {p r : ℕ} (hp : p.Prime) (hr : r.Prime) (hpr : p ≠ r)
+    (hpd : p ∣ Nat.card ↥hyp.Q1) (hrd : r ∣ Nat.card ↥hyp.Q1) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf hyp.Sder) hyp.A) := by
+  have h := hyp.ssetOf_sup_sder_coherent_of_conjInvariant hd hQ1odd hnil hp hr hpr
+    hpd hrd ⊥ bot_le (fun h _ x hx => by
+      rw [Subgroup.mem_bot] at hx ⊢
+      rw [hx]
+      group)
+  rwa [sup_bot_eq] at h
+
+end InductionAssembly
 
 end Hypothesis
 
