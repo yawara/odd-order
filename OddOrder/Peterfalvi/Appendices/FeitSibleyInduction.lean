@@ -403,11 +403,11 @@ theorem exists_center_pow_prime_eq_one_of_dvd {K : Type*} [Group K] [Finite K]
 
 /-! ## The `p`-primary lift and the properness `Z ⊄ Q₂` (p. 146) -/
 
-/-- **The commutator subgroup of `↥Q₁` maps onto `⁅Q₁, Q₁⁆`** under the
-inclusion. -/
-theorem map_subtype_commutator :
-    Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) = ⁅hyp.Q1, hyp.Q1⁆ := by
-  change Subgroup.map hyp.Q1.subtype ⁅(⊤ : Subgroup ↥hyp.Q1), ⊤⁆ = ⁅hyp.Q1, hyp.Q1⁆
+/-- **The commutator subgroup of `↥W` maps onto `⁅W, W⁆`** under the
+inclusion, for any subgroup `W`. -/
+theorem map_subtype_commutator (W : Subgroup G) :
+    Subgroup.map W.subtype (commutator ↥W) = ⁅W, W⁆ := by
+  change Subgroup.map W.subtype ⁅(⊤ : Subgroup ↥W), ⊤⁆ = ⁅W, W⁆
   rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
 
 /-- A subgroup below `⁅Q₁, Q₁⁆` relativises below `commutator ↥Q₁`. -/
@@ -415,7 +415,7 @@ theorem subgroupOf_le_commutator {R : Subgroup G} (hR : R ≤ ⁅hyp.Q1, hyp.Q1�
     R.subgroupOf hyp.Q1 ≤ commutator ↥hyp.Q1 := by
   intro x hx
   have hmem : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
-    rw [hyp.map_subtype_commutator]
+    rw [map_subtype_commutator hyp.Q1]
     exact hR (Subgroup.mem_subgroupOf.mp hx)
   obtain ⟨y, hy, hyx⟩ := hmem
   rwa [show y = x from Subtype.ext hyx] at hy
@@ -604,7 +604,7 @@ theorem ssetOf_sup_sder_coherent_of_conjInvariant
     rw [eq_top_iff]
     intro x _
     have hx : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
-      rw [hyp.map_subtype_commutator, heq]
+      rw [map_subtype_commutator hyp.Q1, heq]
       exact x.2
     obtain ⟨y, hy, hyx⟩ := hx
     rwa [show y = x from Subtype.ext hyx] at hy
