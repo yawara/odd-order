@@ -510,6 +510,73 @@ theorem index_subgroupOf_sup_S_eq [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.
     Subgroup.index_eq_card ((hyp.S ⊔ Z).subgroupOf hyp.H), hbridge, hQd] at htower
   exact Nat.eq_of_mul_eq_mul_right hyp.d_pos htower
 
+/-- **The `Q₁`-internal index tower** `|Q₁⧸Q₂| = |Q₁⧸Z|·|Z⧸Q₂|` for
+`Q₂ ≤ Z ≤ Q₁` (`relIndex` multiplicativity; no normality needed for the coset
+counts). -/
+theorem card_quot_Q1_eq_mul {Q₂ Z : Subgroup G} (hQ₂Z : Q₂ ≤ Z) (hZQ1 : Z ≤ hyp.Q1) :
+    Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1)
+      = Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) * Nat.card (↥Z ⧸ Q₂.subgroupOf Z) := by
+  have h := Subgroup.relIndex_mul_relIndex Q₂ Z hyp.Q1 hQ₂Z hZQ1
+  have e1 : Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1) = Q₂.relIndex hyp.Q1 :=
+    (Subgroup.index_eq_card _).symm
+  have e2 : Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) = Z.relIndex hyp.Q1 :=
+    (Subgroup.index_eq_card _).symm
+  have e3 : Nat.card (↥Z ⧸ Q₂.subgroupOf Z) = Q₂.relIndex Z :=
+    (Subgroup.index_eq_card _).symm
+  rw [e1, e2, e3, ← h, mul_comm]
+
+/-- **The reduction (1) final arithmetic**: the counting bound
+`q₂ − 1 ≤ 2da` (1.1), the degree bound `a² ≤ qz` (1.2), the tower
+`q₂ = qz·zq`, and the fixed-point-free lower bounds `zq ≥ d+1`,
+`q₂ ≥ (d+1)²` are jointly contradictory.  Chain:
+`zq·(q₂−1)² ≤ 4d²·a²·zq ≤ 4d²·qz·zq = 4d²·q₂` and
+`q₂·(q₂−2) < (q₂−1)²`, so `zq·(q₂−2) < 4d²`; but
+`zq·(q₂−2) ≥ (d+1)·((d+1)²−2) ≥ 4d²` since `(d−1)(d²+1) ≥ 0`.
+(Sharper than the book's `(d+1)²−2 < 4d whence d ≤ 2`: the product form is
+already contradictory for every `d ≥ 1`, so no separate `d = 1` case is
+needed.) -/
+theorem false_of_reduction_one_bounds {d a q₂ qz zq : ℕ}
+    (hd : 1 ≤ d)
+    (h1 : (q₂ : ℝ) - 1 ≤ (d : ℝ) * (2 * a))
+    (h2 : a ^ 2 ≤ qz)
+    (h3 : q₂ = qz * zq)
+    (h4 : d + 1 ≤ zq)
+    (h5 : (d + 1) ^ 2 ≤ q₂) : False := by
+  have hdR : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
+  have h2R : (a : ℝ) ^ 2 ≤ (qz : ℝ) := by exact_mod_cast h2
+  have h3R : (q₂ : ℝ) = (qz : ℝ) * (zq : ℝ) := by exact_mod_cast h3
+  have h4R : (d : ℝ) + 1 ≤ (zq : ℝ) := by exact_mod_cast h4
+  have h5R : ((d : ℝ) + 1) ^ 2 ≤ (q₂ : ℝ) := by exact_mod_cast h5
+  have haR : (0 : ℝ) ≤ (a : ℝ) := Nat.cast_nonneg a
+  have hq₂4 : (4 : ℝ) ≤ (q₂ : ℝ) := by nlinarith
+  have hzq0 : (0 : ℝ) < (zq : ℝ) := by linarith
+  -- `(q₂ − 1)² ≤ 4d²a²`
+  have k1 : ((q₂ : ℝ) - 1) ^ 2 ≤ 4 * (d : ℝ) ^ 2 * (a : ℝ) ^ 2 := by
+    nlinarith [mul_le_mul h1 h1 (by linarith) (by positivity)]
+  -- `zq·(q₂ − 1)² ≤ 4d²·q₂`
+  have k2 : (zq : ℝ) * ((q₂ : ℝ) - 1) ^ 2 ≤ 4 * (d : ℝ) ^ 2 * (q₂ : ℝ) := by
+    calc (zq : ℝ) * ((q₂ : ℝ) - 1) ^ 2
+        ≤ (zq : ℝ) * (4 * (d : ℝ) ^ 2 * (a : ℝ) ^ 2) :=
+          mul_le_mul_of_nonneg_left k1 hzq0.le
+      _ ≤ (zq : ℝ) * (4 * (d : ℝ) ^ 2 * (qz : ℝ)) := by
+          apply mul_le_mul_of_nonneg_left _ hzq0.le
+          nlinarith
+      _ = 4 * (d : ℝ) ^ 2 * (q₂ : ℝ) := by rw [h3R]; ring
+  -- strict drop to `zq·(q₂ − 2) < 4d²`
+  have k3 : (zq : ℝ) * ((q₂ : ℝ) * ((q₂ : ℝ) - 2)) < (zq : ℝ) * ((q₂ : ℝ) - 1) ^ 2 := by
+    apply mul_lt_mul_of_pos_left _ hzq0
+    nlinarith
+  have k5 : (zq : ℝ) * ((q₂ : ℝ) - 2) < 4 * (d : ℝ) ^ 2 := by
+    have k4 : (zq : ℝ) * ((q₂ : ℝ) - 2) * (q₂ : ℝ) < 4 * (d : ℝ) ^ 2 * (q₂ : ℝ) := by
+      nlinarith [k3, k2]
+    exact lt_of_mul_lt_mul_right k4 (by linarith)
+  -- lower bound `(d+1)·((d+1)² − 2) ≤ zq·(q₂ − 2)` and the closing estimate
+  have k6 : ((d : ℝ) + 1) * (((d : ℝ) + 1) ^ 2 - 2) ≤ (zq : ℝ) * ((q₂ : ℝ) - 2) := by
+    apply mul_le_mul h4R (by linarith) (by nlinarith) hzq0.le
+  nlinarith [k5, k6,
+    mul_nonneg (by linarith : (0 : ℝ) ≤ (d : ℝ) - 1)
+      (by positivity : (0 : ℝ) ≤ (d : ℝ) ^ 2 + 1)]
+
 /-! ## The centrality input of the (1.2) degree bound
 
 `exists_deg_sq_le_of_mem_SsetOf` consumes the centrality of `D₀/R` in `Q/R`
