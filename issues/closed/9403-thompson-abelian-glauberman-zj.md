@@ -132,7 +132,26 @@ class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補
   subtype 転送) → step (a) → J_a(P) ≤ P⊓L なら step (b) で結論 / さもなくば
   (c)(d)(e) で矛盾 (A₁ ⊄ L を |A₁⊓B| 最大選択、Thompson replacement、X ≤ A*)。
 
-#### 次 = Thm 2.11 (ZJ 定理) — 原文 pdftotext L15347-15363 精読済
+#### ✅ Thm 2.11 (ZJ 定理) 完結 (2026-07-21, commits 12f4ca67b / 46f7f2b26)
+
+**Gorenstein Ch.8 §2 の鎖 (Lem 2.1 → Thm 2.11) が完結。全定理 axiom-clean。**
+
+- `O_{p'}(G)=1` 形 (12f4ca67b): `le_opCore_of_normal_abelian_of_isPStableOp`
+  (G Thm 8.1.3 の O_{p'}=1 形) + `zCenter_thompsonJAbelian_normal`
+  (`Z(J_a(P)) ⊴ G`)。p-constraint は `hconstr : C_G(O_p(G)) ≤ O_p(G)` で受ける。
+- 一般形 (46f7f2b26): `oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian`
+  — `O_{p'}(G) ⊔ N_G(Z(J_a(P))) = ⊤`。仮定は商 `Ḡ = G/O_{p'}` に対する
+  `IsPStableOp` + p-constraint (Gorenstein の p-constrained の定義そのもの)。
+  部品: ThompsonSubgroupAbelian に **`Disjoint P f.ker` 版転送補題群**
+  (`thompsonJAbelian_map_of_disjoint_ker` 他 6 本 — 単射版の商準同型一般化) +
+  GlaubermanZJ に `map_centralizer_inf_of_disjoint_ker` (Z-encoding の商転送)。
+  Frattini は逆像 `K = Z ⊔ O_{p'}` に `exists_sylow_inf_of_normal` (`Z = P ⊓ K`)。
+
+**残り = 下流 discharge のみ** (issue 3024 → 3017): S06_Thm62JS の `hZJ` を
+elementary `thompsonJ` から `thompsonJAbelian` 形に言い直し + BG 側で
+`IsPStableOp` の供給 (`AppA.stabilityLiftAux` 経由、odd solvable)。
+
+#### (旧計画メモ) Thm 2.11 分解 — 原文 pdftotext L15347-15363 精読済
 
 1. **O_p'(G) = 1 ケース** (BG 側 consumer が使う形): `Z(J_a(P)) ⊴ G`。
    部品 = **G Thm 8.1.3**「p-constrained + O_p'(G)=1 ⟹ P の正規 abelian 部分群
@@ -315,3 +334,10 @@ Glauberman ZJ (G Thm 8.2.11) が J_a で sorry-free / axiom-clean。下流 3024 
 - `references/gorenstein/finite-groups.mmd` L5431-5622 (Ch.8 §2)。
 - `references/bg/local-analysis.pdftotext.txt` L3040-3045 (Thm 6.2), L8611 (記号表)。
 - repo: `GroupTheory/ThompsonSubgroup.lean` (elementary 版、API パターンの参照元)。
+
+## ✅ close (2026-07-21) — 完了条件達成
+
+Glauberman ZJ (G Thm 8.2.11) が J_a で sorry-free / axiom-clean (O_{p'}=1 形 +
+一般形 + 引き戻し形 `zCenter_thompsonJAbelian_sup_oPiCorePrime_normal`)。
+下流 3024 → 3017 は同日 discharge 済 (S06_Thm62JS の J_a 版無条件定理 +
+`AppA.isPStableOp_of_odd_solvable`)。3017/3024/9403 同時 close。

@@ -114,3 +114,26 @@ abelian 最大位数) の設計判断が要る)。
   (後続コミット)」は**誤り**だったので訂正済 (反例と正しい経路を明記)。この docstring を
   信じた session は行き止まりに入るところだった。
 - 隣接する tractable な穴 (**BG Thm 6.1 一般形**) を発見 → issue 3025 へ分離。
+
+## ✅ 完了 (2026-07-21, lane c) — 無条件で close
+
+`OddOrder.BG.Ch1.S06.zCenterThompsonJAbelian_sup_oPiCore_normal`
+(`S06_Thm62JS.lean`): G odd solvable, p ≠ 2, S ∈ Syl_p ⟹
+`Z(J_a(S)) ⊔ O_{p'}(G) ⊴ G`。axiom-clean。
+
+- **literal J(S) = Gorenstein 版 abelian Thompson subgroup** `thompsonJAbelian`
+  (issue 9403 の設計裁定 — BG は J を自前定義せず "**G**" 引用のみ、elementary 版
+  では G Lem 2.1 が偽)。
+- ZJ hypothesis discharge (本 issue の crux) = **Glauberman ZJ 本体を Gorenstein
+  Ch.8 §2 (Lem 2.1 → Thm 2.11) まるごと形式化して解決** (issue 9403,
+  `GroupTheory/ThompsonSubgroupAbelian.lean` + `GlaubermanReplacement.lean` +
+  `GlaubermanZJ.lean`)。`C_G(Z(P))=P` 経路 (`Ch07.normal_J`) は不使用。
+- p-stability 供給 = `AppA.isPStableOp_of_odd_solvable` (Gorenstein 6.5.3 =
+  private stabilityLiftAux のインターフェース形)、p-constraint 供給 =
+  `hall_higman_solvable_specialization` (BG Prop 1.15(a))。
+- 旧 elementary-`thompsonJ` 版条件付き補題 (`hZJ` 付き
+  `zCenterThompsonJ_sup_oPiCore_normal_of_reduced`) は歴史として保持、header に
+  経緯を明記 (BG literal との符号ミスマッチにつき hZJ は discharge 不能)。
+
+commits: 12f4ca67b (O_{p'}=1 形) / 46f7f2b26 (一般形) / (BG discharge は本 close
+と同 push 内)。
