@@ -414,6 +414,181 @@ theorem tau_inner_eq_of_supported_SsetOf_Qder [Finite G]
     exact hyp.one_notMem_A (hψ.2 (ClassFunction.mem_support.mpr h0))
   exact (induction_isometry_on_degree_zero hyp φ ψ (hmono hφ.1) (hmono hψ.1) hφ1 hψ1).1
 
+/-- **The (5.2.d) difference image for a member of `𝒮(Q')`** — the
+`difference_image` field of the §7 hypothesis: `τ(χ − χ̄)` is a signed difference
+`ε·(μ − ν)` of two distinct irreducibles of `G`.  Mirror of
+`dadeCharacterDifferenceImageOfDiff` for `τ = Ind_H^G`: the (1.4) inputs are
+discharged from Lemma 2(b) (`tau_mem_ZIrr`, `tau_apply_one`,
+`tau_inner_eq_of_supported_SsetOf_Qder`) since both keystone differences (`0` and
+`χ̄ − χ`) lie in the `A`-supported `𝒮(Q')`-sublattice, and non-reality is
+Lemma 2(c). -/
+noncomputable def ssetOfQderDifferenceImage [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.SsetOf hyp.Qder) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ := by
+  classical
+  have hχS : χ ∈ hyp.Sset := SsetOf_subset hyp hyp.Qder hχ
+  have hχc : χ.conj ∈ hyp.SsetOf hyp.Qder := hyp.conj_mem_SsetOf_Qder hχ
+  set χb : IrreducibleCharacter ↥hyp.H := ⟨χ, hχS.1⟩ with hχb
+  set fam : Fin 2 → IrreducibleCharacter ↥hyp.H :=
+    OddOrder.Peterfalvi.S07.conjPairFamily (L := ↥hyp.H) χb with hfam
+  have hfam0 : (fam 0 : ClassFunction ↥hyp.H ℂ) = χ := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hfam1 : (fam 1 : ClassFunction ↥hyp.H ℂ) = χ.conj := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hdiff0 : irreducibleCharacterDifference fam 0 = 0 := by
+    simp [irreducibleCharacterDifference]
+  have hdiff1 : irreducibleCharacterDifference fam 1 = χ.conj - χ := by
+    simp only [irreducibleCharacterDifference, hfam1, hfam0]
+  -- both keystone differences lie in the `A`-supported `𝒮(Q')`-sublattice
+  have hmem : ∀ i, irreducibleCharacterDifference fam i
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+        (hyp.SsetOf hyp.Qder) hyp.A := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]
+      exact ⟨Submodule.zero_mem _,
+        fun x hx => absurd (ClassFunction.zero_apply x) (ClassFunction.mem_support.mp hx)⟩
+    · rw [hdiff1]
+      exact ⟨Submodule.sub_mem _ (Submodule.subset_span hχc) (Submodule.subset_span hχ),
+        hyp.diff_support_subset_A_of_mem_SsetOf_Qder hχc hχ⟩
+  refine OddOrder.Peterfalvi.S07.characterDifferenceImageOfIsometry hyp.tau χb
+    ((hasNoRealCharacters_Sset hyp hd hQ1odd) hχS) ?_ ?_ ?_
+  · -- virtual images
+    change ∀ i, isometryDifferenceImage hyp.tau fam i ∈ ZIrr G
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) ∈ ZIrr G
+      rw [hdiff0, map_zero]
+      exact Submodule.zero_mem _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) ∈ ZIrr G
+      rw [hdiff1]
+      exact hyp.tau_mem_ZIrr (Submodule.sub_mem _
+        (Submodule.subset_span (SsetOf_subset hyp hyp.Qder hχc))
+        (Submodule.subset_span hχS))
+  · -- vanish at `1`
+    change ∀ i, isometryDifferenceImage hyp.tau fam i (1 : G) = 0
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) (1 : G) = 0
+      rw [hdiff0, map_zero]
+      exact ClassFunction.zero_apply _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) (1 : G) = 0
+      rw [hdiff1]
+      refine hyp.tau_apply_one ?_
+      rw [ClassFunction.sub_apply, hyp.apply_one_eq_d_of_mem_SsetOf_Qder hχc,
+        hyp.apply_one_eq_d_of_mem_SsetOf_Qder hχ, sub_self]
+  · -- isometry on the keystone differences (uniform via the supported sublattice)
+    intro i j
+    exact hyp.tau_inner_eq_of_supported_SsetOf_Qder (hmem i) (hmem j)
+
+/-- **(5.2.e) orthogonality of the `𝒮(Q')` difference images** — the
+`difference_images_orthogonal` field.  Mirror of `Sset_differenceImages_orthogonal`
+(S14): the pairing of the signed images reduces along the Lemma 2(b) isometry to
+`⟨φ − φ̄, χ − χ̄⟩`, whose four cross terms vanish by pairwise orthogonality. -/
+theorem ssetOfQderDifferenceImages_orthogonal [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {φ χ : ClassFunction ↥hyp.H ℂ} (hφ : φ ∈ hyp.SsetOf hyp.Qder)
+    (hχ : χ ∈ hyp.SsetOf hyp.Qder)
+    (h1 : ClassFunction.inner φ χ = 0) (h2 : ClassFunction.inner φ χ.conj = 0) :
+    (hyp.ssetOfQderDifferenceImage hd hQ1odd hφ).Orthogonal
+      (hyp.ssetOfQderDifferenceImage hd hQ1odd hχ) := by
+  have hφc := hyp.conj_mem_SsetOf_Qder hφ
+  have hχc := hyp.conj_mem_SsetOf_Qder hχ
+  have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
+      ClassFunction.inner ζ ζ = 1 := by
+    intro ζ hζ
+    have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at h
+    simpa using h
+  refine
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+    _ _ ?_
+  rw [← (hyp.ssetOfQderDifferenceImage hd hQ1odd hφ).image_conjugateDifference,
+      ← (hyp.ssetOfQderDifferenceImage hd hQ1odd hχ).image_conjugateDifference]
+  change ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  have hmemφ : (φ - φ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+        (hyp.SsetOf hyp.Qder) hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hφ) (Submodule.subset_span hφc),
+      hyp.diff_support_subset_A_of_mem_SsetOf_Qder hφ hφc⟩
+  have hmemχ : (χ - χ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+        (hyp.SsetOf hyp.Qder) hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hχ) (Submodule.subset_span hχc),
+      hyp.diff_support_subset_A_of_mem_SsetOf_Qder hχ hχc⟩
+  rw [hyp.tau_inner_eq_of_supported_SsetOf_Qder hmemφ hmemχ]
+  have hne1 : φ.conj ≠ χ := by
+    intro heq
+    have hcc : χ.conj = φ := by rw [← heq, ClassFunction.conj_conj]
+    rw [hcc, hself (SsetOf_subset hyp hyp.Qder hφ)] at h2
+    exact one_ne_zero h2
+  have hne2 : φ.conj ≠ χ.conj := by
+    intro heq
+    have hpc : φ = χ := by
+      have h := congrArg ClassFunction.conj heq
+      rwa [ClassFunction.conj_conj, ClassFunction.conj_conj] at h
+    rw [hpc, hself (SsetOf_subset hyp hyp.Qder hχ)] at h1
+    exact one_ne_zero h1
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, h1, h2,
+    hyp.Sset_pairwiseOrthogonal (SsetOf_subset hyp hyp.Qder hφc)
+      (SsetOf_subset hyp hyp.Qder hχ) hne1,
+    hyp.Sset_pairwiseOrthogonal (SsetOf_subset hyp hyp.Qder hφc)
+      (SsetOf_subset hyp hyp.Qder hχc) hne2]
+  ring
+
+/-- **Remark (p. 145): `𝒮(Q')` is coherent** with respect to the Lemma 2(b)
+isometry `τ = Ind_H^G`, given `d` and `|Q₁|` odd and `𝒮(Q') ≠ ∅`.  All members
+have the common degree `d` (`apply_one_eq_d_of_mem_SsetOf_Qder`), so this is
+Lemma 1(b) via the equal-degree §7 producer `coherent_of_constant_degree`, with
+the §7 (5.2) hypothesis assembled from Lemmas 2(b) and 2(c).
+
+The book derives nonemptiness (`|𝒮(Q')| ≥ 2`) from the odd Frobenius group
+`O_{2'}(Q₁) ⋊ D`; here the conjugate pair supplies the second member
+(`two_le_ncard_SsetOf_Qder`) and nonemptiness is an explicit hypothesis,
+discharged at the Theorem's call site from the nontrivial abelianisation of the
+`p`-group `Q₁`. -/
+theorem ssetOf_Qder_coherent [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hne : (hyp.SsetOf hyp.Qder).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsetOf hyp.Qder) hyp.A) := by
+  classical
+  have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
+      ClassFunction.inner ζ ζ = 1 := by
+    intro ζ hζ
+    have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at h
+    simpa using h
+  refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+    { tau := hyp.tau
+      tau_isometry_diff := fun φ ψ hφ hψ =>
+        hyp.tau_inner_eq_of_supported_SsetOf_Qder hφ hψ
+      conjugate_closed := fun χ hχ => hyp.conj_mem_SsetOf_Qder hχ
+      no_real_characters := (hasNoRealCharacters_Sset hyp hd hQ1odd).mono
+        (SsetOf_subset hyp hyp.Qder)
+      pairwise_orthogonal := fun χ ψ hχ hψ hne' =>
+        hyp.Sset_pairwiseOrthogonal (SsetOf_subset hyp hyp.Qder hχ)
+          (SsetOf_subset hyp hyp.Qder hψ) hne'
+      difference_image := fun χ hχ => hyp.ssetOfQderDifferenceImage hd hQ1odd hχ
+      difference_images_orthogonal := fun φ χ hφ hχ h1 h2 =>
+        hyp.ssetOfQderDifferenceImages_orthogonal hd hQ1odd hφ hχ h1 h2 }
+    ((hyp.Sset_finite).subset (SsetOf_subset hyp hyp.Qder))
+    (hyp.two_le_ncard_SsetOf_Qder hd hQ1odd hne)
+    (fun ζ hζ => hself (SsetOf_subset hyp hyp.Qder hζ))
+    (fun a ha b hb => hyp.tau_mem_ZIrr (Submodule.sub_mem _
+      (Submodule.subset_span (SsetOf_subset hyp hyp.Qder ha))
+      (Submodule.subset_span (SsetOf_subset hyp hyp.Qder hb))))
+    (fun a ha b hb => by
+      change a (1 : ↥hyp.H) = b (1 : ↥hyp.H)
+      rw [hyp.apply_one_eq_d_of_mem_SsetOf_Qder ha,
+        hyp.apply_one_eq_d_of_mem_SsetOf_Qder hb])
+    (fun a ha => by
+      change a (1 : ↥hyp.H) ≠ 0
+      rw [hyp.apply_one_eq_d_of_mem_SsetOf_Qder ha]
+      exact Nat.cast_ne_zero.mpr (hyp.d_pos).ne')
+    hyp.one_notMem_A
+    (fun a ha b hb => hyp.diff_support_subset_A_of_mem_SsetOf_Qder ha hb)
+
 end CharacterLayer
 
 end Hypothesis
