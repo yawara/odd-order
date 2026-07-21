@@ -979,6 +979,37 @@ theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
         · rw [hpr_eval, hshift j']
           exact hn2
 
+/-- **First incoherent step extraction**: if the base of a pair chain is coherent
+but the full accumulation is not, some step turns a coherent accumulation
+incoherent.  Pure finite induction on the chain length (the contrapositive of
+`coherentPairChain`); this is how the reduction steps of the Feit–Sibley Theorem
+produce the counterexample character `ψ` of Peterfalvi's "(by Lemma 1(a)) there is
+a character `ψ` such that …". -/
+theorem exists_first_incoherent_step {L G' : Type*} [Group L] [Group G']
+    [Fintype L] [Fintype G'] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G' : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G'} {A : Set L}
+    {B : Set (ClassFunction L ℂ)}
+    {pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ} {N : ℕ}
+    (h0 : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ B A))
+    (hfail : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+      (OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair N) A)) :
+    ∃ i, i < N ∧
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+        (OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair i) A) ∧
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+        (OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair (i + 1)) A) := by
+  classical
+  induction N with
+  | zero =>
+    rw [OddOrder.Peterfalvi.S07.pairUnion_zero] at hfail
+    exact absurd h0 hfail
+  | succ N ihN =>
+    by_cases hN : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+        (OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair N) A)
+    · exact ⟨N, Nat.lt_succ_self N, hN, hfail⟩
+    · obtain ⟨i, hiN, hcoh, hnot⟩ := ihN hN
+      exact ⟨i, hiN.trans (Nat.lt_succ_self N), hcoh, hnot⟩
+
 namespace Hypothesis
 
 variable (hyp : Hypothesis G)
