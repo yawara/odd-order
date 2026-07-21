@@ -881,6 +881,104 @@ theorem sum_degreeSq_ker_subset_not_subset
   rw [sumInflatedDegreeSq (N := N ⊔ M), sumInflatedDegreeSq (N := N)] at hsplit
   linear_combination hsplit
 
+/-! ## Conjugate-pair decomposition of a conjugation-closed family
+
+The `coherentPairChain`/`coherentOfPairChainCover` engine (CoherenceUnion) consumes a
+pair enumeration; here we *construct* one: a finite, conjugation-closed, real-free
+family `Y` containing a conjugation-closed base `B` decomposes as
+`pairUnion B pair N = Y` with each adjoined pair a fresh conjugate pair `{χ, χ̄}`.
+This is the decomposition input for the reduction steps (1)–(2) of the Feit–Sibley
+Theorem (no degree ordering is needed there: the contradiction only requires *some*
+failing pair). -/
+
+/-- **Conjugate-pair decomposition**: a finite, conjugation-closed family `Y` with no
+real members is reached from any conjugation-closed base `B ⊆ Y` by adjoining
+conjugate pairs, each fresh at its step (`(pair j).1, (pair j).2 ∉ pairUnion B pair j`).
+Constructed by strong induction on `(Y ∖ B).ncard`: pick `χ ∈ Y ∖ B`, adjoin
+`{χ, χ̄}` (fresh, `χ̄ ≠ χ` by non-reality), recurse with base `B ∪ {χ, χ̄}`. -/
+theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
+    {Y B : Set (ClassFunction L ℂ)} (hBY : B ⊆ Y) (hYfin : Y.Finite)
+    (hYconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate Y)
+    (hBconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate B)
+    (hnoreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters Y) :
+    ∃ (N : ℕ) (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ),
+      OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair N = Y ∧
+      ∀ j, j < N → (pair j).2 = (pair j).1.conj ∧ (pair j).1 ∈ Y ∧
+        (pair j).1 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j ∧
+        (pair j).2 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j := by
+  classical
+  suffices h : ∀ (n : ℕ) (B : Set (ClassFunction L ℂ)), B ⊆ Y →
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate B → (Y \ B).ncard = n →
+      ∃ (N : ℕ) (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ),
+        OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair N = Y ∧
+        ∀ j, j < N → (pair j).2 = (pair j).1.conj ∧ (pair j).1 ∈ Y ∧
+          (pair j).1 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j ∧
+          (pair j).2 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j by
+    exact h _ B hBY hBconj rfl
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro B hBY hBconj hn
+    by_cases hYB : Y ⊆ B
+    · have hBeq : B = Y := Set.Subset.antisymm hBY hYB
+      exact ⟨0, fun _ => (0, 0), by simpa using hBeq, fun j hj => absurd hj (by omega)⟩
+    · obtain ⟨χ, hχY, hχB⟩ := Set.not_subset.mp hYB
+      have hχconjY : χ.conj ∈ Y := hYconj hχY
+      have hχconjB : χ.conj ∉ B := fun h => hχB (by simpa using hBconj h)
+      have hne : χ.conj ≠ χ := fun h => hnoreal hχY h
+      set B' : Set (ClassFunction L ℂ) := B ∪ {χ, χ.conj} with hB'
+      have hB'Y : B' ⊆ Y := by
+        rintro x (hx | hx)
+        · exact hBY hx
+        · rcases (by simpa using hx : x = χ ∨ x = χ.conj) with rfl | rfl
+          · exact hχY
+          · exact hχconjY
+      have hB'conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate B' := by
+        rintro x (hx | hx)
+        · exact Or.inl (hBconj hx)
+        · rcases (by simpa using hx : x = χ ∨ x = χ.conj) with rfl | rfl
+          · exact Or.inr (by simp)
+          · exact Or.inr (by simp)
+      have hsub : Y \ B' ⊆ Y \ B := fun x hx => ⟨hx.1, fun hB => hx.2 (Or.inl hB)⟩
+      have hχnot : χ ∉ Y \ B' := fun hx => hx.2 (Or.inr (by simp))
+      have hlt : (Y \ B').ncard < n := by
+        rw [← hn]
+        exact Set.ncard_lt_ncard
+          ((Set.ssubset_iff_of_subset hsub).mpr ⟨χ, ⟨hχY, hχB⟩, hχnot⟩)
+          (hYfin.sdiff)
+      obtain ⟨N', pair', hUnion', hstep'⟩ := ih _ hlt B' hB'Y hB'conj rfl
+      set pr : ℕ → ClassFunction L ℂ × ClassFunction L ℂ :=
+        fun j => if j = 0 then (χ, χ.conj) else pair' (j - 1) with hpr
+      have hshift : ∀ k, OddOrder.Peterfalvi.S07.pairUnion (L := L) B pr (k + 1)
+          = OddOrder.Peterfalvi.S07.pairUnion (L := L) B' pair' k := by
+        intro k
+        induction k with
+        | zero =>
+          rw [OddOrder.Peterfalvi.S07.pairUnion_succ]
+          simp only [OddOrder.Peterfalvi.S07.pairUnion_zero,
+            OddOrder.Peterfalvi.S07.pairSet, hpr, if_pos rfl, hB']
+        | succ k ihk =>
+          have hps : OddOrder.Peterfalvi.S07.pairSet (L := L) pr (k + 1)
+              = OddOrder.Peterfalvi.S07.pairSet (L := L) pair' k := by
+            simp [OddOrder.Peterfalvi.S07.pairSet, hpr]
+          rw [OddOrder.Peterfalvi.S07.pairUnion_succ, ihk, hps,
+            ← OddOrder.Peterfalvi.S07.pairUnion_succ]
+      refine ⟨N' + 1, pr, by rw [hshift N']; exact hUnion', ?_⟩
+      intro j hj
+      rcases Nat.eq_zero_or_pos j with rfl | hjpos
+      · refine ⟨by simp [hpr], by simpa [hpr] using hχY, ?_, ?_⟩
+        · simpa [hpr] using hχB
+        · simpa [hpr] using hχconjB
+      · obtain ⟨j', rfl⟩ : ∃ j'', j = j'' + 1 := ⟨j - 1, by omega⟩
+        have hj' : j' < N' := by omega
+        obtain ⟨hc, hY', hn1, hn2⟩ := hstep' j' hj'
+        have hpr_eval : pr (j' + 1) = pair' j' := by simp [hpr]
+        refine ⟨by rw [hpr_eval]; exact hc, by rw [hpr_eval]; exact hY', ?_, ?_⟩
+        · rw [hpr_eval, hshift j']
+          exact hn1
+        · rw [hpr_eval, hshift j']
+          exact hn2
+
 namespace Hypothesis
 
 variable (hyp : Hypothesis G)
