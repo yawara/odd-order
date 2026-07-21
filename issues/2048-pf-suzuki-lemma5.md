@@ -356,6 +356,14 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             - [x] 非零 mixed bracket を base change して weight equation を読み取る
           - [ ] `θ = 1` / `φ = 1` / 両方非自明の固有値制約から原典 pp. 90--92 の
                 B/C/D case split を実行し、`B(n,θ,ε)` / `C(n,ε)` / `D(n,θ,ε)` を確定する
+            - [x] piece 4 の純算術を完備化 (`TwoPowerCongruence.lean`): 冪和衝突の
+                  完全記述 + multiset carry collapse + B case 消去 (`a≡b∧c≡a+1`,
+                  `s≡±r`) + C case 一意性 (`2r+1=n ∧ s≡r+1 ∧ t≡1`) + D case
+                  一意性 (partition 解析、survivor + mirror) + 固有値方程式からの
+                  bridge 5 本 (pow_eq_pow_iff_modEq 経由、離散対数不要)
+            - [ ] dispatch 本体: weight 方程式の k=0 正規化 → θ/φ の Frobenius 冪
+                  表示 → θ=φ / φ=1 / 独立 の分岐で上記算術に接続、(i,j)+(θ,φ) を pin
+            - [ ] M 値確定: pin した (i0,j0) で c_ij 単項化 → c=ε → engine の hM
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
