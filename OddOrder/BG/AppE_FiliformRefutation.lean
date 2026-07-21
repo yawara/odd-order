@@ -16,9 +16,7 @@ This leaf is **Tier 2, WP5** of the counterexample programme (issue 3027; master
 note `notes/bg/appE_e4_counterexample_2026_07_21.md`): it instantiates the repo's
 own `RegularOperatorSetup` with the Lazard group `S = Exp(Q₆)` of
 `OddOrder/BG/AppE_FiliformGroup.lean` and derives the **negation of the printed
-Proposition E.4** — the exact universally-quantified statement of the (sorried)
-`RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p`, refuted at
-universe `0`.
+Proposition E.4**, refuted at universe `0`.
 
 * `q6Setup` — `S`, `B = C₄₉`, `A = ⟨β⁷⟩`, `R₀ = ⟨v⟩`, `R₁ = ⟨e₅⟩` satisfy **every**
   field of `RegularOperatorSetup Q6 (Multiplicative (ZMod 49)) 197 7` (Theorem E.3's
@@ -32,7 +30,9 @@ universe `0`.
 The missing hypothesis is that `S` be **non-exceptional** (equivalently
 `dc(S) ≥ 1`, equivalently the 2-step centralizers all agree); `Q₆` is exceptional,
 and BG's unproved display `(E.23)` fails on it at level `i = 2`.  The corrected
-E.4 (with the added hypothesis) is tracked as issue 9402.
+E.4 — the same statement with that hypothesis added as `hdc` — is **proved** as
+`RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p` in
+`OddOrder/BG/AppE_PropE4.lean` (issue 9402).
 
 This leaf deliberately isolates the heavy `AppE_FurtherResults` import away from
 `AppE_FiliformGroup.lean`.
@@ -132,16 +132,18 @@ theorem q6_centralizer_not_mulCommutative :
 
 /-- **BG Proposition E.4, as printed, is FALSE.**
 
-The statement below is the exact universally-quantified form of the repo's honest
-E.4 statement `RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p`
-(`OddOrder/BG/AppE_FurtherResults.lean`), quantified at universe `0` — and it is
+The statement below is the exact universally-quantified form of BG's Proposition E.4
+as printed (without the corrective `hdc` hypothesis of
+`RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p`,
+`OddOrder/BG/AppE_PropE4.lean`), quantified at universe `0` — and it is
 refuted by `S = Exp(Q₆)`, `B = C₄₉`: the setup `q6Setup` satisfies every hypothesis
 of Theorem E.3, `|Ω₁(S)| = 197⁶ ≥ 197⁴`, `B` acts regularly and does not fix `R₀`,
 yet `T = C_S(Z₂(S))` is not abelian (`⁅b, e₂⁆ ≡ e₃ ≠ 1`).
 
 The missing hypothesis is non-exceptionality (`dc(S) ≥ 1`); BG's unproved display
 `(E.23)` fails on `Q₆` at level `i = 2`.  Master note:
-`notes/bg/appE_e4_counterexample_2026_07_21.md`; the corrected E.4 is issue 9402.
+`notes/bg/appE_e4_counterexample_2026_07_21.md`; the corrected E.4 (issue 9402) is
+proved in `OddOrder/BG/AppE_PropE4.lean`.
 Since App.E is Feit–Thompson's unpublished 1991 work with no published erratum,
 this is, to our knowledge, a new finding. -/
 theorem printed_propE4_false :
