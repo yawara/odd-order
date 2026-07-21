@@ -219,6 +219,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -12039,3 +12040,15 @@ abelian 2-subgroups of `C_G(P)` have order ≤ 2"; the adapted field model
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.normalizer_P_eq_centralizer
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.D_inf_centralizer_eq_W_inf_centralizer_join_P
+
+/-! **Peterfalvi Part II, Ch. II, step (2)(a)** (`FirstCase/StepTwo.lean`, issue 2053,
+2026-07-21): the faithful centralizer quotient `C_G(P)/N` is a rank-one (A1)+(A2)
+group — `exists_four_subgroup_of_quotient` lifts a four-subgroup along an odd
+kernel, and `rankOneQuotient` assembles `RankOneHypothesis` from §3 Prop 1(a)/(c)
+plus (B1).  Step (2)(b) (`exists_affineNearFieldModel`) cites the honestly-stated
+Appendix C Prop 1, which is sorried behind Brauer–Suzuki (issue 9318), and is
+therefore deliberately NOT asserted here. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_four_subgroup_of_quotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.rankOneQuotient
