@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinates
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 
 /-!
 # Higman Lemma 12: case-dispatch normalizations
@@ -538,6 +539,74 @@ theorem mixedTerm_monomial_typeD {n r s : ℕ} (hn : 0 < n)
       rw [hce]
       exact hw
     · rw [hc α β, frobenius_double_sum_single c hpin α β]
+
+/-! ### Higman p. 91: the type-B shear normalization -/
+
+/-- **Higman p. 91, the shear `y₀ ↦ ρx₀ + y₀` and rescaling.**  Suppose the
+ambient square form decomposes as
+`Q(α, β) = α·θ(α) + β·θ(β) + c₁·α·θ(β) + c₂·θ(α)·β` over a finite field of
+characteristic two, with `θ` of odd order, and `Q` vanishes only at the
+origin (all involutions lie in `Φ(G)`).  Then the change of coordinates
+`(α, β) ↦ (α + ρβ, tβ)` brings `Q` to the type-B normal form
+`α·θ(α) + ε·α·θ(β) + β·θ(β)` with `ε ≠ 0` satisfying Higman's anisotropy
+condition.  In characteristic two the shear with `ρ₀ = c₂` kills the
+`θ(α)·β` monomial outright, the new `β`-square coefficient is `1 + c₁c₂`,
+which is nonzero since otherwise "`ξ = 0` when `a = ρ`, so that `G` is not
+a Suzuki 2-group" (p. 91), and the odd-order twisted norm `t·θ(t)` absorbs
+it into the coordinate. -/
+theorem exists_typeB_shear_normalization
+    {F : Type*} [Field F] [Finite F] [CharP F 2]
+    (theta : RingAut F) (htheta : Odd (orderOf theta))
+    (c1 c2 : F) (Q : F → F → F)
+    (hQ : ∀ α β, Q α β = α * theta α + β * theta β +
+      (c1 * (α * theta β) + c2 * (theta α * β)))
+    (haniso : ∀ α β, ¬(α = 0 ∧ β = 0) → Q α β ≠ 0) :
+    ∃ ρ t ε : F, t ≠ 0 ∧ ε ≠ 0 ∧
+      OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsTypeBEpsilon theta ε ∧
+      ∀ α β, Q (α + ρ * β) (t * β) =
+        α * theta α + ε * (α * theta β) + β * theta β := by
+  have h2 : (2 : F) = 0 := CharTwo.two_eq_zero
+  -- the sheared form: `Q (α + c₂β) β = αθα + (c₁ + θc₂)·αθβ + (1 + c₁c₂)·βθβ`
+  have hshear : ∀ α β, Q (α + c2 * β) β =
+      α * theta α + (c1 + theta c2) * (α * theta β) +
+        (1 + c1 * c2) * (β * theta β) := by
+    intro α β
+    rw [hQ, map_add, map_mul]
+    linear_combination (c2 * β * theta α + c2 * theta c2 * (β * theta β)) * h2
+  -- the new `β`-square coefficient is nonzero: else `Q(c₂, 1) = 0`
+  have hd : 1 + c1 * c2 ≠ 0 := by
+    intro h0
+    refine haniso (0 + c2 * 1) 1 (fun hc => one_ne_zero hc.2) ?_
+    rw [hshear, h0]
+    simp
+  -- the surviving mixed coefficient is nonzero: else the twisted norm
+  -- produces an isotropic vector `(u + c₂, 1)`
+  have hc' : c1 + theta c2 ≠ 0 := by
+    intro h0
+    obtain ⟨u, -, hu⟩ := exists_ne_zero_mul_apply_eq_of_typeA theta htheta
+      (1 + c1 * c2) hd
+    refine haniso (u + c2 * 1) 1 (fun hc => one_ne_zero hc.2) ?_
+    rw [hshear, h0, map_one]
+    linear_combination hu + (1 + c1 * c2) * h2
+  -- rescale `β` by the twisted-norm preimage of `(1 + c₁c₂)⁻¹`
+  obtain ⟨t, ht0, ht⟩ := exists_ne_zero_mul_apply_eq_of_typeA theta htheta
+    (1 + c1 * c2)⁻¹ (inv_ne_zero hd)
+  have hθt : theta t ≠ 0 := fun h =>
+    ht0 (theta.injective (h.trans (map_zero theta).symm))
+  have hkey : (1 + c1 * c2) * (t * theta t) = 1 := by
+    rw [ht]
+    exact mul_inv_cancel₀ hd
+  have hfinal : ∀ α β, Q (α + c2 * t * β) (t * β) =
+      α * theta α + (c1 + theta c2) * theta t * (α * theta β) +
+        β * theta β := by
+    intro α β
+    rw [mul_assoc c2 t β, hshear, map_mul]
+    linear_combination (β * theta β) * hkey
+  refine ⟨c2 * t, t, (c1 + theta c2) * theta t, ht0,
+    mul_ne_zero hc' hθt, ?_, hfinal⟩
+  intro a b ha hb
+  rw [← hfinal a b]
+  exact haniso _ _ (fun hc => mul_ne_zero ht0 hb hc.2)
 
 end
 
