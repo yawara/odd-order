@@ -220,6 +220,7 @@ import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -9302,6 +9303,11 @@ fully unconditional (axiom-clean).**  Likewise its corollaries and the (13.17.b)
 -- of (13.16): `K W₂` with `C_{Q₁}(W₂) = 1` ⟹ `K` centralizes the Maschke complement `Q₁`.
 #assert_only_allowed_axioms OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf
 
+-- Group-cardinality form of the kernel-FPF identity (†) ([Is] Thm 15.16, issue 2053):
+-- `|V| = |C_V(E)|^{|E|}` for a Frobenius-like `U ⋊ E = L` acting on an elementary abelian
+-- `p`-group `V` with `C_V(U) = 1` — no hypothesis relating `p` and `|E|`.
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.card_eq_card_fixedSubgroup_pow_of_frobenius
+
 /-! **(9.3) the order relation via Wielandt (9.1)** (`Peterfalvi.S11`).  Definition (8.4) makes
 `U W₁` a Frobenius group (kernel `U`) acting coprimely on `H = M_F` (`typeP_uW1_frobenius`,
 `typeP_coprimeAction`); the three fixed-point subgroups of Wielandt's formula are the concrete
@@ -12052,3 +12058,14 @@ therefore deliberately NOT asserted here. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_four_subgroup_of_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.rankOneQuotient
+
+/-! **Peterfalvi Part II, Ch. II, step (3), the dimension identity** (`FirstCase/StepThree.lean`,
+issue 2053, 2026-07-22): for a nontrivial `KP`-invariant elementary abelian `r`-subgroup
+`M ≤ Q`, `|M| = |C_M(P)|^p` ([Is] Thm 15.16 via the kernel-FPF identity, with `K` acting
+fixed-point-freely on `M` from §2 Prop 1(a)), and in particular `C_M(P) ≠ 1`.  Both are
+sorry-free: the `r ≠ p` hypothesis is not needed (the identity is characteristic-free in
+`|E|`), and the book's opening Frobenius argument is subsumed. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_eq_card_inf_centralizer_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.inf_centralizer_ne_bot_of_invariant
