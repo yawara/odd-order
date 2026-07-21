@@ -75,4 +75,128 @@ theorem exists_not_le_centralizer_elementCommutator {X A : Subgroup G}
   exact le_centralizer_iff.mp (hall x hx)
     (commutatorElement_mem_elementCommutator ha)
 
+open OddOrder.Isaacs.Ch04 in
+/-- **Thm 2.7 の共通 wrap-up** (Case 1/2 の合流点): `x ∈ B` で `M := [x,A]` が
+abelian かつ `A` に中心化されず, `M ≤ R` で `⁅⁅R,A⁆,A⁆ = ⊥` なら,
+`A* := M ⊔ C_A(M)` が Glauberman replacement の結論を満たす.
+
+- `A* ∈ A(⊤)` は **Thm 2.4**; `A∩B ≤ C_A(M)` は three-subgroup lemma
+  (`⁅B,A∩B⁆ ≤ B' ≤ Z` と `⁅A∩B,A⁆ ≤ ⁅A,A⁆ = ⊥` から `⁅⁅A,B⁆,A∩B⁆ = ⊥`);
+- 真性 witness は `M ⊄ A` (さもなくば `A` abelian が `M` を中心化);
+- `A* ≤ N(A)` は `⁅A*,A⁆ ≤ ⁅R,A⁆` (`commutator_sup_le_of_centralizer`) +
+  `⁅⁅R,A⁆,A⁆ = ⊥` + **Lem 2.3**. -/
+theorem replacement_of_elementCommutator [Finite G] {B A : Subgroup G} [B.Normal]
+    (hB' : ⁅B, B⁆ ≤ center G) (hA : A ∈ maxAbelianIn (⊤ : Subgroup G))
+    {x : G} (hxB : x ∈ B)
+    (hMcomm : IsMulCommutative (elementCommutator x A))
+    (hMnc : ¬ A ≤ centralizer (elementCommutator x A : Set G))
+    {R : Subgroup G} (hMR : elementCommutator x A ≤ R)
+    (h3 : ⁅⁅R, A⁆, A⁆ = ⊥) :
+    ∃ A' ∈ maxAbelianIn (⊤ : Subgroup G),
+      A ⊓ B < A' ⊓ B ∧ A' ≤ normalizer (A : Set G) := by
+  set M := elementCommutator x A with hMdef
+  set C := A ⊓ centralizer (M : Set G) with hCdef
+  have hMBA : M ≤ ⁅B, A⁆ := by
+    refine (closure_le _).mpr ?_
+    rintro m ⟨a, ha, rfl⟩
+    rw [SetLike.mem_coe]
+    exact commutator_mem_commutator hxB ha
+  have hMB : M ≤ B := hMBA.trans (commutator_le_left B A)
+  have hAstar := thompson_mem_maxAbelianIn hA (mem_top x) hMcomm
+  refine ⟨M ⊔ C, hAstar, ?_, ?_⟩
+  · rw [SetLike.lt_iff_le_and_exists]
+    constructor
+    · -- `A ⊓ B ≤ C` (three-subgroup lemma)
+      have hAA : ⁅A, A⁆ = (⊥ : Subgroup G) :=
+        commutator_eq_bot_iff_le_centralizer.mpr
+          (le_centralizer_iff_isMulCommutative.mpr hA.2.1)
+      have hthree : ⁅⁅A, B⁆, A ⊓ B⁆ = ⊥ := by
+        refine commutator_commutator_eq_bot_of_rotate ?_ ?_
+        · refine le_bot_iff.mp ?_
+          calc ⁅⁅B, A ⊓ B⁆, A⁆
+              ≤ ⁅⁅B, B⁆, A⁆ :=
+                commutator_mono (commutator_mono le_rfl inf_le_right) le_rfl
+            _ = ⊥ := commutator_eq_bot_iff_le_centralizer.mpr
+                (hB'.trans (center_le_centralizer _))
+        · refine le_bot_iff.mp ?_
+          calc ⁅⁅A ⊓ B, A⁆, B⁆
+              ≤ ⁅⁅A, A⁆, B⁆ :=
+                commutator_mono (commutator_mono inf_le_left le_rfl) le_rfl
+            _ = ⁅(⊥ : Subgroup G), B⁆ := by rw [hAA]
+            _ = ⊥ := by
+                refine le_bot_iff.mp ?_
+                rw [commutator_le]
+                intro g hg b _
+                rw [Subgroup.mem_bot.mp hg]
+                simp
+      have hABC : A ⊓ B ≤ C := by
+        refine le_inf inf_le_left ?_
+        have h5 : A ⊓ B ≤ centralizer ((⁅A, B⁆ : Subgroup G) : Set G) :=
+          le_centralizer_iff.mp (commutator_eq_bot_iff_le_centralizer.mp hthree)
+        refine h5.trans (centralizer_le ?_)
+        exact SetLike.coe_subset_coe.mpr
+          (hMBA.trans (le_of_eq (commutator_comm B A)))
+      exact le_inf (hABC.trans le_sup_right) inf_le_right
+    · -- 真性 witness: `m ∈ M \ A`
+      have hMnotA : ¬ M ≤ A := by
+        intro hle
+        exact hMnc ((le_centralizer_iff_isMulCommutative.mpr hA.2.1).trans
+          (centralizer_le (SetLike.coe_subset_coe.mpr hle)))
+      obtain ⟨m, hm, hmA⟩ := SetLike.not_le_iff_exists.mp hMnotA
+      exact ⟨m, ⟨mem_sup_left hm, hMB hm⟩, fun hc => hmA hc.1⟩
+  · -- `A* ≤ N(A)` (Lem 2.3)
+    rw [le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn hA le_top]
+    refine le_bot_iff.mp ?_
+    have hstar : ⁅M ⊔ C, A⁆ ≤ ⁅R, A⁆ :=
+      commutator_sup_le_of_centralizer inf_le_right
+        (inf_le_left.trans (le_centralizer_iff_isMulCommutative.mpr hA.2.1))
+        (commutator_mono hMR le_rfl)
+        (inf_le_left.trans (le_normalizer_commutator_right R A))
+    calc ⁅⁅M ⊔ C, A⁆, A⁆ ≤ ⁅⁅R, A⁆, A⁆ := commutator_mono hstar le_rfl
+      _ = ⊥ := h3
+
+open OddOrder.Isaacs.Ch04 in
+/-- **Gorenstein Thm 2.7 Case 1** (`[B,A;n+1] ≠ ⊥`): `r` を最小の `[B,A;r] = ⊥`
+とすると `r ≥ n + 2 ≥ 3` で, `x ∈ [B,A;r-3]` に `A` が `[x,A]` を中心化しない
+ものがあり (さもなくば `[B,A;r-1] = ⊥`), `M = [x,A] ≤ [B,A;r-2] ≤ [B,A;n]` は
+abelian. wrap-up (`R := [B,A;r-2]`, `⁅⁅R,A⁆,A⁆ = [B,A;r] = ⊥`) で結論. -/
+theorem glauberman_replacement_case_one [Finite G] [Group.IsNilpotent G]
+    {B A : Subgroup G} [B.Normal]
+    (hB' : ⁅B, B⁆ ≤ center G) (hA : A ∈ maxAbelianIn (⊤ : Subgroup G))
+    {n : ℕ} (hn_pos : 0 < n) (hn_comm : IsMulCommutative (iterCommutator B A n))
+    (hcase : iterCommutator B A (n + 1) ≠ ⊥) :
+    ∃ A' ∈ maxAbelianIn (⊤ : Subgroup G),
+      A ⊓ B < A' ⊓ B ∧ A' ≤ normalizer (A : Set G) := by
+  classical
+  have hex : ∃ k, iterCommutator B A k = ⊥ :=
+    iterCommutator_eq_bot_of_isNilpotent_ambient B A
+  set r := Nat.find hex with hrdef
+  have hrbot : iterCommutator B A r = ⊥ := Nat.find_spec hex
+  have hrge : n + 2 ≤ r := by
+    by_contra h
+    push Not at h
+    exact hcase (le_bot_iff.mp
+      ((iterCommutator_le_of_le A (show r ≤ n + 1 by omega)).trans hrbot.le))
+  have hchain : ⁅⁅iterCommutator B A (r - 3), A⁆, A⁆ = iterCommutator B A (r - 1) := by
+    rw [← iterCommutator_succ, show r - 3 + 1 = r - 2 by omega,
+      ← iterCommutator_succ, show r - 2 + 1 = r - 1 by omega]
+  have hne : ⁅⁅iterCommutator B A (r - 3), A⁆, A⁆ ≠ ⊥ := by
+    rw [hchain]
+    exact Nat.find_min hex (show r - 1 < r by omega)
+  obtain ⟨x, hxR3, hnc⟩ := exists_not_le_centralizer_elementCommutator hne
+  have hMR : elementCommutator x A ≤ iterCommutator B A (r - 2) := by
+    refine (closure_le _).mpr ?_
+    rintro m ⟨a, ha, rfl⟩
+    rw [SetLike.mem_coe, show r - 2 = (r - 3) + 1 by omega, iterCommutator_succ]
+    exact commutator_mem_commutator hxR3 ha
+  have hMcomm : IsMulCommutative (elementCommutator x A) :=
+    isMulCommutative_of_le hn_comm
+      (hMR.trans (iterCommutator_le_of_le A (show n ≤ r - 2 by omega)))
+  have h3 : ⁅⁅iterCommutator B A (r - 2), A⁆, A⁆ = ⊥ := by
+    rw [← iterCommutator_succ, show r - 2 + 1 = r - 1 by omega,
+      ← iterCommutator_succ, show r - 1 + 1 = r by omega]
+    exact hrbot
+  exact replacement_of_elementCommutator hB' hA
+    (iterCommutator_le_base A (r - 3) hxR3) hMcomm hnc hMR h3
+
 end Subgroup
