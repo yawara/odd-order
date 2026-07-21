@@ -20,10 +20,14 @@ c が Glauberman ZJ 系 (issue 9403 完了) の p-stability bridge +13 行を追
 
 ## やること
 
-- [ ] c の未マージ commit が AppA_PStability に非接触のタイミングを確認
-- [ ] 凍結済み先頭クラスタを prefix-split (mathlib 互換の記述的英語名の新 leaf)
-- [ ] 新 leaf の root closure 到達性を確認 (orphan 監査 0 維持)
-- [ ] `lake build OddOrder` green + AxiomsCheck OK + sorry 数不変
+- [x] c の未マージ commit が AppA_PStability に非接触のタイミングを確認
+      (2026-07-21 tick #20: c 未マージ 0、in-flight は NearFields/SolvableTwoTransitive で非接触)
+- [x] 凍結済み先頭クラスタを prefix-split — 新 leaf は作らず、**前回分割 (issue 0103 第 2 パス)
+      が Basic 末尾に残した空 `section PStability` stub へ A.3 クラスタ (共役 helpers +
+      `IsPStable` + `thmA3`、787 行) を移動**。結果: Basic 562→1350 行 / TAIL 1645→858 行。
+      module 構成不変 = 配線・下流 import 変更ゼロ。
+- [x] 新 leaf 無しゆえ orphan 監査は自明に 0 維持
+- [x] `lake build OddOrder` green + AxiomsCheck OK + sorry 数不変 (6→6)
 
 ## 完了条件
 
