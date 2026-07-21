@@ -500,6 +500,23 @@ from `H ≤ N_G(Q₁)`. -/
 theorem Q1_subgroupOf_H_normal [Finite G] : (hyp.Q1.subgroupOf hyp.H).Normal :=
   Subgroup.normal_subgroupOf_of_le_normalizer hyp.H_le_normalizer_Q1
 
+/-- `H ≤ N_G(Q)`: every element of `H` normalises `Q` (both containments of
+`Subgroup.mem_normalizer_iff` from the `Q_normal_in_H` field, the backward one via
+`h⁻¹ ∈ H`). -/
+theorem H_le_normalizer_Q : hyp.H ≤ Subgroup.normalizer hyp.Q := by
+  intro h hh
+  rw [Subgroup.mem_normalizer_iff]
+  intro n
+  refine ⟨fun hn => hyp.Q_normal_in_H h hh n hn, fun hn => ?_⟩
+  have hkey := hyp.Q_normal_in_H h⁻¹ (hyp.H.inv_mem hh) _ hn
+  have hrw : h⁻¹ * (h * n * h⁻¹) * (h⁻¹)⁻¹ = n := by group
+  rwa [hrw] at hkey
+
+/-- **`Q ⊴ H`, as a `Subgroup.Normal` instance for the subtype form** `Q.subgroupOf H ⊴ ↥H`,
+from `H ≤ N_G(Q)`. -/
+theorem Q_subgroupOf_H_normal : (hyp.Q.subgroupOf hyp.H).Normal :=
+  Subgroup.normal_subgroupOf_of_le_normalizer hyp.H_le_normalizer_Q
+
 /-- **`δ` fixes no nonidentity conjugacy class of `Q₁`** (viewed inside `↥H`): for `1 ≠ δ ∈ D`,
 a `δ`-fixed class of `Q₁.subgroupOf H` is the identity class.  A fixed class `⟦h⟧` gives
 `c·(δ h δ⁻¹)·c⁻¹ = h` for some `c ∈ Q₁`, i.e. `(c δ) h (c δ)⁻¹ = h`; since `c δ` acts
@@ -981,6 +998,22 @@ theorem Sset_eq_induced_of_Q [Finite G] :
       ((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) hφirr
       θ''.isIrreducible
     exact hθ''over (le_antisymm hbound hnonneg)
+
+omit [Fintype G] in
+/-- **Corollary of Lemma 2(a)**: every member of `𝒮` vanishes on `H − Q`.  The members of
+`𝒮` are induced from `Q ⊴ H` (`Sset_eq_induced_of_Q`), and class functions induced from a
+normal subgroup vanish off it (`ClassFunction.induce_apply_eq_zero_of_not_mem_normal`).
+This is the support input to the induction isometry of Lemma 2(b) (Isaacs Lemma 7.7) and to
+the `A`-support hypotheses of Lemma 1(a) at the Theorem's call sites. -/
+theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset)
+    {h : ↥hyp.H} (hh : (h : G) ∉ hyp.Q) : χ h = 0 := by
+  haveI : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
+  have hmem := hχ
+  rw [Sset_eq_induced_of_Q hyp] at hmem
+  obtain ⟨φ, _, rfl⟩ := hmem
+  exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal (hyp.Q.subgroupOf hyp.H) φ
+    (fun hmem' => hh (Subgroup.mem_subgroupOf.mp hmem'))
 
 /-- **Peterfalvi Appendix IV, Lemma 2(b)** (p. 145).  `ψ ↦ Ind_H^G ψ` is an
 isometry from `ℤ[𝒮]°` (the degree-zero part of the lattice spanned by `𝒮`) to
