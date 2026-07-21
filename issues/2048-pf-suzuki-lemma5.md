@@ -197,6 +197,9 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
             regular actor は fpf / |K| ∣ |T|−1 (自由軌道計数、
             card_dvd_of_no_nontrivial_fixed 使用) / 2^n−1∣2^k−1→n∣k /
             不変部分群位数は q 冪 / no_four_chain_of_card_eq_cube
+      - [x] 3-chain 存在の field 側 core (`3f7d0caaa`):
+            `le_of_adjoin_frobeniusFixed_eq_top` — Singer 生成元が
+            Frob^n 固定なら次数 m ≤ n (X^{2^n}−X の根の個数制限)
       - [ ] 3-chain 存在 (残り工程、経路確定済):
             (i) 非自明不変正規部分群は involutionSubgroup を含む
             (2 群の正規部分群は中心と交わる + 位数 2 元 + K 推移性)、
