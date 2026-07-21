@@ -106,6 +106,31 @@ theorem card_Q0_inf_centralizer_eq_two :
   rw [Nat.mod_eq_of_lt (by omega), Nat.mod_eq_of_lt (by omega)] at hmodeq
   omega
 
+/-- A `P`-fixed element of the Fitting subgroup of `D̄` is trivial: its
+`μ`-coordinate is a `P`-fixed unit of the field model, hence a unit of the
+two-element fixed subfield. -/
+theorem fitting_eq_one_of_conjAction_fixed
+    {t : ↥(fitting fc.toHypothesis.Dbar)}
+    (hfix : ∀ g : ↥fc.P,
+      fc.toHypothesis.fittingConjAction (fc.toVbar g) t = t) :
+    t = 1 := by
+  obtain ⟨F, hField, hFinite, eQ, μ, σhom, hcardF, hσinj, hbridge,
+      hunits, hfixmem⟩ := fc.exists_adapted_field_model
+  letI : Field F := hField
+  letI : Finite F := hFinite
+  have hμfix : ∀ g : ↥fc.P,
+      σhom g ((μ t : Fˣ) : F) = ((μ t : Fˣ) : F) := by
+    intro g
+    have hu := hunits g t
+    rw [hfix g] at hu
+    have hval := congrArg (fun u : Fˣ => (u : F)) hu
+    rw [fieldRingAutOnUnits_apply_val] at hval
+    exact hval.symm
+  rcases hfixmem _ hμfix with h0 | h1
+  · exact absurd h0 (Units.ne_zero (μ t))
+  · have hμt1 : μ t = 1 := Units.ext h1
+    exact μ.injective (by rw [hμt1, map_one])
+
 /-- **Peterfalvi Part II, Ch. II, step (1), trivial `K`-fixed points**
 (p. 108): `C_K(P) = 1`.  A `P`-centralized element of `K` maps to a
 `P`-fixed unit of the field model, hence to a unit of the two-element
@@ -145,30 +170,14 @@ theorem K_inf_centralizer_eq_bot :
     calc (g : G) * k * (g : G)⁻¹ = (k * (g : G)) * (g : G)⁻¹ := by
           rw [← hcomm]
       _ = k := by group
-  -- consume the adapted field model
-  obtain ⟨F, hField, hFinite, eQ, μ, σhom, hcardF, hσinj, hbridge,
-      hunits, hfixmem⟩ := fc.exists_adapted_field_model
-  letI : Field F := hField
-  letI : Finite F := hFinite
-  have hμfix : ∀ g : ↥fc.P,
-      σhom g ((μ t : Fˣ) : F) = ((μ t : Fˣ) : F) := by
-    intro g
-    have hu := hunits g t
-    rw [hfixt g] at hu
-    have hval := congrArg (fun u : Fˣ => (u : F)) hu
-    rw [fieldRingAutOnUnits_apply_val] at hval
-    exact hval.symm
-  rcases hfixmem _ hμfix with h0 | h1
-  · exact absurd h0 (Units.ne_zero (μ t))
-  · have hμt1 : μ t = 1 := Units.ext h1
-    have ht1 : t = 1 := μ.injective (by rw [hμt1, map_one])
-    have hkbar1 : kbar = 1 := congrArg Subtype.val ht1
-    rw [hkbar, QuotientGroup.eq_one_iff] at hkbar1
-    have hkW : k ∈ fc.toHypothesis.W := hkbar1
-    have hVK : k ∈ fc.toHypothesis.V ⊓ fc.toHypothesis.K :=
-      ⟨fc.toHypothesis.W_le_V hkW, hkK⟩
-    rw [fc.toHypothesis.V_inf_K_eq_bot] at hVK
-    exact Subgroup.mem_bot.mp hVK
+  have ht1 : t = 1 := fc.fitting_eq_one_of_conjAction_fixed hfixt
+  have hkbar1 : kbar = 1 := congrArg Subtype.val ht1
+  rw [hkbar, QuotientGroup.eq_one_iff] at hkbar1
+  have hkW : k ∈ fc.toHypothesis.W := hkbar1
+  have hVK : k ∈ fc.toHypothesis.V ⊓ fc.toHypothesis.K :=
+    ⟨fc.toHypothesis.W_le_V hkW, hkK⟩
+  rw [fc.toHypothesis.V_inf_K_eq_bot] at hVK
+  exact Subgroup.mem_bot.mp hVK
 
 /-- **Peterfalvi Part II, Ch. II, step (1), the decomposition** (p. 108):
 every element of `V` is a product `g * w` with `g ∈ P` and `w ∈ W`.  The
@@ -362,6 +371,136 @@ theorem normalizer_P_eq_centralizer :
         exact mul_left_cancel h2
       rw [heq]
       exact hcx
+
+/-- **Peterfalvi Part II, Ch. II, step (1), the centralizer in `D`**
+(p. 108): `C_D(P) = C_W(P) × P`, stated as a join.  Splitting
+`d̄ = t·z ∈ D̄ = F(D̄) ⋊ V̄`, centralization of `P̄` forces the components
+into `fitting ⊓ V̄ = 1`-separated fixed parts; the Fitting component is
+trivial by the field model, so `d ∈ V`, and the `V`-decomposition
+finishes. -/
+theorem D_inf_centralizer_eq_W_inf_centralizer_join_P :
+    fc.toHypothesis.D ⊓ Subgroup.centralizer (fc.P : Set G) =
+      (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P := by
+  classical
+  apply le_antisymm
+  swap
+  · apply sup_le
+    · exact inf_le_inf_right _
+        (fc.toHypothesis.W_le_V.trans fc.toHypothesis.V_le_D)
+    · intro g hg
+      exact ⟨fc.toHypothesis.V_le_D (fc.P_le_V hg), fc.P_le_centralizer hg⟩
+  · intro d hd
+    obtain ⟨hdD, hdC⟩ := hd
+    -- split `d̄ = t * z` in `D̄`
+    set dbar : fc.toHypothesis.Dbar := QuotientGroup.mk ⟨d, hdD⟩ with hdbar
+    have hsplit : dbar ∈
+        (fitting fc.toHypothesis.Dbar : Set fc.toHypothesis.Dbar) *
+          (fc.toHypothesis.Vbar : Set fc.toHypothesis.Dbar) := by
+      rw [fc.toHypothesis.fitting_isComplement_Vbar.mul_eq]
+      trivial
+    rw [Set.mem_mul] at hsplit
+    obtain ⟨t, htmem, z, hzmem, htz⟩ := hsplit
+    -- `d̄` centralizes the image of `P`
+    have hcent : ∀ g : ↥fc.P,
+        dbar * ((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
+          fc.toHypothesis.Dbar) =
+        ((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
+          fc.toHypothesis.Dbar) * dbar := by
+      intro g
+      rw [toVbar_coe, hdbar, ← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul]
+      congr 1
+      apply Subtype.ext
+      exact (Subgroup.mem_centralizer_iff.mp hdC (g : G) g.2).symm
+    -- component analysis: the `V̄`-conjugate stays, the commutator separates
+    have hdisj : fitting fc.toHypothesis.Dbar ⊓ fc.toHypothesis.Vbar = ⊥ :=
+      fc.toHypothesis.fitting_isComplement_Vbar.disjoint.eq_bot
+    have hcomp : ∀ g : ↥fc.P,
+        t * (z * ((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
+          fc.toHypothesis.Dbar) * z⁻¹) * t⁻¹ =
+        ((fc.toVbar g : ↥fc.toHypothesis.Vbar) : fc.toHypothesis.Dbar) := by
+      intro g
+      have h1 := hcent g
+      rw [← htz] at h1
+      calc t * (z * ((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
+              fc.toHypothesis.Dbar) * z⁻¹) * t⁻¹
+          = ((t * z) * ((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
+              fc.toHypothesis.Dbar)) * (z⁻¹ * t⁻¹) := by group
+        _ = ((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
+              fc.toHypothesis.Dbar) := by
+            rw [h1]
+            group
+    -- the Fitting component is `P`-fixed, hence trivial
+    have hfixt : ∀ g : ↥fc.P,
+        fc.toHypothesis.fittingConjAction (fc.toVbar g) ⟨t, htmem⟩ =
+          ⟨t, htmem⟩ := by
+      intro g
+      set gbar : fc.toHypothesis.Dbar :=
+        ((fc.toVbar g : ↥fc.toHypothesis.Vbar) : fc.toHypothesis.Dbar)
+        with hgbar
+      have hgbarV : gbar ∈ fc.toHypothesis.Vbar := (fc.toVbar g).2
+      set u : fc.toHypothesis.Dbar := z * gbar * z⁻¹ with hu
+      have huV : u ∈ fc.toHypothesis.Vbar :=
+        fc.toHypothesis.Vbar.mul_mem
+          (fc.toHypothesis.Vbar.mul_mem hzmem hgbarV)
+          (fc.toHypothesis.Vbar.inv_mem hzmem)
+      have hcu : t * u * t⁻¹ = gbar := hcomp g
+      have hw'V : t * u * t⁻¹ * u⁻¹ ∈ fc.toHypothesis.Vbar := by
+        rw [hcu]
+        exact fc.toHypothesis.Vbar.mul_mem hgbarV
+          (fc.toHypothesis.Vbar.inv_mem huV)
+      have hw'F : t * u * t⁻¹ * u⁻¹ ∈ fitting fc.toHypothesis.Dbar := by
+        have hconj : u * t⁻¹ * u⁻¹ ∈ fitting fc.toHypothesis.Dbar :=
+          Subgroup.Normal.conj_mem inferInstance _
+            ((fitting fc.toHypothesis.Dbar).inv_mem htmem) u
+        have heq : t * u * t⁻¹ * u⁻¹ = t * (u * t⁻¹ * u⁻¹) := by group
+        rw [heq]
+        exact (fitting fc.toHypothesis.Dbar).mul_mem htmem hconj
+      have hw'bot : t * u * t⁻¹ * u⁻¹ ∈
+          fitting fc.toHypothesis.Dbar ⊓ fc.toHypothesis.Vbar :=
+        ⟨hw'F, hw'V⟩
+      rw [hdisj, Subgroup.mem_bot, mul_inv_eq_one] at hw'bot
+      -- so `t` commutes with `u = ḡ`
+      have hgu : gbar = u := by rw [← hcu, hw'bot]
+      have htg : gbar * t * gbar⁻¹ = t := by
+        have h2 : t * gbar * t⁻¹ = gbar := by
+          rw [hgu]
+          exact hw'bot
+        have hcommute : t * gbar = gbar * t := by
+          calc t * gbar = (t * gbar * t⁻¹) * t := by group
+            _ = gbar * t := by rw [h2]
+        calc gbar * t * gbar⁻¹ = (t * gbar) * gbar⁻¹ := by rw [← hcommute]
+          _ = t := by group
+      apply Subtype.ext
+      simp only [Hypothesis.fittingConjAction, MonoidHom.comp_apply,
+        Subgroup.normalizerMonoidHom_apply_apply_coe]
+      exact htg
+    have ht1 : (⟨t, htmem⟩ : ↥(fitting fc.toHypothesis.Dbar)) = 1 :=
+      fc.fitting_eq_one_of_conjAction_fixed hfixt
+    have ht1' : t = 1 := congrArg Subtype.val ht1
+    -- `d̄ = z ∈ V̄`, hence `d ∈ V`
+    have hdbarV : dbar ∈ fc.toHypothesis.Vbar := by
+      rw [← htz, ht1', one_mul]
+      exact hzmem
+    obtain ⟨vd, hvdV, hvd⟩ := hdbarV
+    have hvw : (vd : G)⁻¹ * d ∈ fc.toHypothesis.W := by
+      have heq : QuotientGroup.mk vd = dbar := hvd
+      rw [hdbar, QuotientGroup.eq] at heq
+      exact heq
+    have hdV : d ∈ fc.toHypothesis.V := by
+      have hdecomp : d = (vd : G) * ((vd : G)⁻¹ * d) := by group
+      rw [hdecomp]
+      exact fc.toHypothesis.V.mul_mem hvdV
+        (fc.toHypothesis.W_le_V hvw)
+    -- decompose inside `V`
+    obtain ⟨g, hg, hw⟩ := fc.exists_decomp_of_mem_V hdV
+    have hwC : g⁻¹ * d ∈ Subgroup.centralizer (fc.P : Set G) :=
+      Subgroup.mul_mem _
+        (Subgroup.inv_mem _ (fc.P_le_centralizer hg)) hdC
+    have hdecomp : d = g * (g⁻¹ * d) := by group
+    rw [hdecomp]
+    exact Subgroup.mul_mem _
+      (Subgroup.mem_sup_right hg)
+      (Subgroup.mem_sup_left ⟨hw, hwC⟩)
 
 end FirstCaseHypothesis
 

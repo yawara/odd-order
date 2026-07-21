@@ -74,7 +74,8 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
 - [x] Ch.II hypothesis carrier — `FirstCaseHypothesis` (FirstCase/Basic.lean,
       `4a2fede50`): (B1) は「C_G(P) 内 EA-2 部分群 ≤ 2」形。
       p_odd / P ∩ W = ⊥ / C_{Q₀}(P) ≤ 2 も同 leaf
-- [ ] (1) V = W ⋊ P ほか
+- [x] (1) **完了 (2026-07-21)** — 全 5 主張 sorry 0・axiom-clean・
+      AxiomsCheck 6 本登録
   - [x] |Q₀| = 2^p (FirstCase/FieldAction.lean `card_Q0_eq_two_pow`,
         `a39140c69`): P ↪ V̄ (toVbar) → semilinear model 消費 →
         固定体 = F₂ (B1) → Artin で [F : F₂] = p
@@ -83,10 +84,12 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
         軌道計数+Fermat, `c89a19234`); FieldAction は
         `exists_adapted_field_model` bundle (eQ/μ/σhom + 固定元 0∨1) に
         リファクタ済
-  - [ ] V = W ⋊ P (V/W ↪ Aut(F_{2^p}) cyclic p)
-  - [ ] N_G(P) = C_G(P) (§3 Prop 1(b) =
-        normalizer_eq_centralizer_mul_normalizer_inf_V) と
-        C_D(P) = C_W(P) × P
+  - [x] V = W ⋊ P (`W_join_P_eq_V` + `exists_decomp_of_mem_V`;
+        |V̄| ∣ |Aut F| = p は natCard_ringAut_eq_finrank + char-2 同定)
+  - [x] N_G(P) = C_G(P) (`normalizer_P_eq_centralizer`; Prop 1(b) +
+        W∩N(P) ≤ C(P) の commutator トリック) と
+        C_D(P) = C_W(P) × P (`D_inf_centralizer_eq_W_inf_centralizer_join_P`;
+        D̄ = fitting ⋊ V̄ の成分分離 + `fitting_eq_one_of_conjAction_fixed`)
 - [ ] (2) C_G(P) の near-field 構造 (Appendix II 接続)
 - [ ] (3) 素因数の合同条件
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)

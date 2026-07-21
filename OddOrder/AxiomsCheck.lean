@@ -12019,3 +12019,23 @@ and `W ≠ 1` makes `Q` a Suzuki 2-group of type B.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isCyclic_W_and_card_dvd_of_orderThree
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.lemmaFive_of_orderThree
+
+/-! **Peterfalvi Part II, Ch. II, step (1)** (`Peterfalvi.Appendices.Suzuki.FirstCase.*`,
+issue 2053, 2026-07-21) — the opening step of Theorem B under (B1)/(B2) is **fully
+proved**: `|Q₀| = 2^p`, `C_K(P) = 1`, `V = W ⋊ P`, `N_G(P) = C_G(P)` and
+`C_D(P) = C_W(P) × P`.  The `FirstCaseHypothesis` carrier records (B1) as "elementary
+abelian 2-subgroups of `C_G(P)` have order ≤ 2"; the adapted field model
+(`exists_adapted_field_model`) packages the §2 Prop 3 coordinates with the
+`P`-equivariances and the fixed-element dichotomy. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_Q0_eq_two_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_Q0_inf_centralizer_eq_two
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.K_inf_centralizer_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.W_join_P_eq_V
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.normalizer_P_eq_centralizer
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.D_inf_centralizer_eq_W_inf_centralizer_join_P
