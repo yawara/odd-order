@@ -312,7 +312,34 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   この 1 行系に書き直し (~55 行 dedup)。⚠ 形式化済 1(a) は integer-ratio 形
   なので hmdvd (anchor ∣ 各 member 度数) が必要 — Part A では全度数 d·p^k で
   anchor = 最小冪ゆえ自動成立。
-- [ ] **次: Part A 本体組み立て** (2026-07-21 設計固定、この順):
+- [x] **⭐ Part A 完成** (16f981b02, 2026-07-21): `xsetOf_sder_coherent`
+  (FeitSibleyReductionThree.lean, sorry-free) — d odd + Q₁ p-群 +
+  ⊥ ≠ Z ≤ Z(Q₁) (H-不変 = Normal instance 供給) ⟹ 𝒳₁ = XsetOf S′ Z coherent。
+  部品 3 commit: ① 𝒳₁ setup (efe2353f8): XsetOf 定義/共役閉/counting
+  Σ = |H⧸R|−|H⧸RZ| + T 因数分解 d·|S⧸A′|·|Q₁⧸Z|·(|Z|−1) + 非空 +
+  odd_card_Q1_of_isPGroup。② (3.1) 数値核 (b9b66410a):
+  two_mul_pow_lt_of_pow_dvd (2·p^{k₀+k} < p^{k₀+k+1} ≤ p^{2k} ≤ s) +
+  pow_dvd_sum_pow (p^{2k} ≤ |Q₁⧸Z| ⟹ p^{2k} ∣ Σ p^{2kₓ}; coprime d 約分) +
+  d_mul_sum_pow_eq (指数単位 counting, ℕ)。③ chain (16f981b02):
+  coherent_of_subset_constant_degree (1(b) subfamily 形 — S07.Hypothesis を
+  𝒮-toolkit restriction で構成) + choose! 指数関数 + min-degree pair 分解 +
+  coherentPairChain + wrapper。(1.2) は exists_deg_sq_le_of_mem_SsetOf
+  (D₀ = S⊔Z, 中心性 = commutator_mem_sup_Sder_of_central at Q₃ = ⊥)。
+  ⚠ 実装知見: IsCoherent は Type (data) — ∃/Nonempty の destructuring は
+  Prop-valued have 内へ隔離、step 出力は Nonempty.some。
+  `(p ^ k : ℝ)` は `(↑p)^k` に elaborate される (↑(p^k) と別形) — wrapper
+  との突き合わせは外側 cast 形 `((p ^ k : ℕ) : ℝ)` で統一。
+- [ ] **次: Part B** — (2) 鏡映帰納の 𝒳-相対版: 𝒳 ∩ 𝒮(S₁) → 𝒳 ∩ 𝒮(S₂)
+  (S-side chief factor 降下) で 𝒳₁ coherent → 𝒳 = XsetOf ⊥ Z coherent。
+  設計は下記旧メモ 5 (counterexample 抽出 = exists_counterexample_of_not_coherent
+  を B = 𝒳∩𝒮(S₁), Y = 𝒳∩𝒮(S₂) に適用; anchor = 𝒳₁ の最小度数 member で
+  可除性は p-冪; 算術 |S/S₁|(|Z|−1)² ≤ 4d² vs |Z| ≥ 2d+1 は
+  false_of_reduction_two_bounds 変種)。⚠ exists_counterexample_of_not_coherent
+  の anchor は χ₀(1) = d 固定 (m₀ = 1) — 𝒳₁ の最小度数は d·p^{k₀} (k₀ > 0
+  もありうる) なので、一般 anchor 版の反例抽出 (sq_ratio_sum_le_of_adjoin_
+  incoherent の m₀ 一般形は wrapper 正方向に既在) か、counting を anchor 比
+  で書き直すかの選択が最初の設計点。
+- [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
      保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —
      hQ1odd を hp/hQ1p から導出する小補題)。counting:

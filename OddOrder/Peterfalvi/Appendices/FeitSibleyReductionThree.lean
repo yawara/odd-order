@@ -340,6 +340,676 @@ theorem exists_apply_one_eq_d_mul_pow [Fintype G] [Invertible (Nat.card G : ℂ)
   push_cast
   ring
 
+/-! ## The family `𝒳(R, Z)` (p. 147, step (3) setup)
+
+Step (3) works with `𝒳 = 𝒮 − 𝒮(Z)` for a nontrivial `Z ⊴ H` with `Z ≤ Z(Q₁)`,
+and its intersections `𝒳 ∩ 𝒮(R)` for the `S`-side induction (Part B).  We
+parametrise both: `XsetOf R Z = {χ ∈ 𝒮(R) | Z ⊄ Ker χ}`.  For `Z ≤ Q₁`
+membership in `𝒮` is automatic for an irreducible with `Z ⊄ Ker χ`
+(`Z ≤ Q₁ ⊆ Ker χ` otherwise), so the degree-square counting reduces to the
+two-kernel counting `sum_degreeSq_ker_subset_not_subset`. -/
+
+/-- **`𝒳(R, Z) = {χ ∈ 𝒮(R) | Z ⊄ Ker χ}`** (p. 147: `𝒳 = 𝒮 − 𝒮(Z)`,
+relativised by the kernel condition `R` for the Part B induction;
+`𝒳 = XsetOf ⊥ Z`, `𝒳₁ = XsetOf Sder Z`). -/
+def XsetOf (R Z : Subgroup G) : Set (ClassFunction ↥hyp.H ℂ) :=
+  {χ | χ ∈ hyp.SsetOf R ∧ ¬ hyp.LeKer χ Z}
+
+theorem XsetOf_subset_SsetOf (R Z : Subgroup G) : hyp.XsetOf R Z ⊆ hyp.SsetOf R :=
+  fun _ h => h.1
+
+theorem XsetOf_subset_Sset (R Z : Subgroup G) : hyp.XsetOf R Z ⊆ hyp.Sset :=
+  fun _ h => h.1.1
+
+theorem XsetOf_finite [Finite G] (R Z : Subgroup G) : (hyp.XsetOf R Z).Finite := by
+  letI : Invertible ((Nat.card G : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible ((Nat.card ↥hyp.H : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible ((Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  exact hyp.Sset_finite.subset (hyp.XsetOf_subset_Sset R Z)
+
+/-- **`𝒳(R, Z)` is closed under complex conjugation**: `𝒮(R)`-membership is
+conjugation-closed (`conj_mem_SsetOf`), and the `LeKer` constancy on `Z`
+transports through `star` in both directions. -/
+theorem conj_mem_XsetOf [Finite G] {R Z : Subgroup G} {χ : ClassFunction ↥hyp.H ℂ}
+    (hχ : χ ∈ hyp.XsetOf R Z) : χ.conj ∈ hyp.XsetOf R Z := by
+  obtain ⟨hχS, hker⟩ := hχ
+  refine ⟨hyp.conj_mem_SsetOf hχS, fun hcon => hker fun x hx => ?_⟩
+  have h := hcon x hx
+  rw [ClassFunction.conj_apply, ClassFunction.conj_apply] at h
+  exact star_injective h
+
+/-- **Membership in `𝒳(R, Z)` for irreducibles, `Z ≤ Q₁`**: the `𝒮`-membership
+clause is automatic — `Q₁ ⊆ Ker χ` would force `Z ⊆ Ker χ`.  This is the
+form consumed by the two-kernel counting. -/
+theorem mem_XsetOf_iff_of_le_Q1 {R Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχirr : IsIrreducibleCharacter χ) :
+    χ ∈ hyp.XsetOf R Z ↔ hyp.LeKer χ R ∧ ¬ hyp.LeKer χ Z := by
+  constructor
+  · rintro ⟨⟨-, hR⟩, hZ⟩
+    exact ⟨hR, hZ⟩
+  · rintro ⟨hR, hZ⟩
+    exact ⟨⟨⟨hχirr, fun hQ1 => hZ fun x hx => hQ1 x (hZQ1 hx)⟩, hR⟩, hZ⟩
+
+/-- **`|Q₁|` is odd when `Q₁` is a `p`-group**: `p = 2` is excluded by
+`Q1_not_two_group`, so `p` is an odd prime and `|Q₁| = p^n` is odd.  Supplies
+the `hQ1odd` hypothesis of the no-real-characters lemma (2(c)) in the
+`p`-group context of steps (3)–(8). -/
+theorem odd_card_Q1_of_isPGroup [Finite G] {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) : Odd (Nat.card ↥hyp.Q1) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
+  have hp2 : p ≠ 2 := fun h2 => hyp.Q1_not_two_group (by rwa [h2] at hQ1p)
+  rw [hn]
+  exact (hp.odd_of_ne_two hp2).pow
+
+open scoped Classical in
+/-- **The `𝒳(R, Z)` degree-square sum** (p. 147, step (3) counting): for
+`Z ≤ Q₁`, `∑_{χ ∈ 𝒳(R,Z)} χ(1)² = |H⧸R| − |H⧸(R·Z)|` (quotients inside `↥H`).
+Membership is exactly "kernel contains `R` but not `Z`"
+(`mem_XsetOf_iff_of_le_Q1` + `leKer_iff_subset_characterKernel`), so this is
+`sum_degreeSq_ker_subset_not_subset` at `N = R`, `M = Z`. -/
+theorem sum_degreeSq_XsetOf [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {R Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter ↥hyp.H =>
+        (χ : ClassFunction ↥hyp.H ℂ) ∈ hyp.XsetOf R Z),
+        ((χ : ClassFunction ↥hyp.H ℂ) 1) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H))) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  have hcongr : ∀ χb : IrreducibleCharacter ↥hyp.H,
+      ((χb : ClassFunction ↥hyp.H ℂ) ∈ hyp.XsetOf R Z)
+      ↔ (((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ) ∧
+          ¬ ((Z.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ)) := by
+    intro χb
+    rw [hyp.mem_XsetOf_iff_of_le_Q1 hZQ1 χb.isIrreducible,
+      hyp.leKer_iff_subset_characterKernel, hyp.leKer_iff_subset_characterKernel]
+  rw [Finset.filter_congr (fun χb _ => by
+    constructor
+    · exact fun h => by simpa using (hcongr χb).mp (by simpa using h)
+    · exact fun h => by simpa using (hcongr χb).mpr (by simpa using h))]
+  exact sum_degreeSq_ker_subset_not_subset (R.subgroupOf hyp.H) (Z.subgroupOf hyp.H)
+
+open scoped Classical in
+/-- **`sum_degreeSq_XsetOf`, `toFinset` form** (the shape produced by the
+counterexample extraction): bundling `x ↦ ⟨x, irr⟩` is a bijection onto the
+filtered irreducible-character `Finset` of `sum_degreeSq_XsetOf`. -/
+theorem sum_degreeSq_XsetOf_toFinset [Finite G]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] {R Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf R Z).Finite) :
+    ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H))) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  rw [← hyp.sum_degreeSq_XsetOf hZQ1]
+  refine Finset.sum_bij'
+    (fun x hx => (⟨x, ((hfin.mem_toFinset.mp hx).1.1.1 :)⟩ : IrreducibleCharacter ↥hyp.H))
+    (fun χb hb => (χb : ClassFunction ↥hyp.H ℂ)) ?_ ?_ ?_ ?_ ?_
+  · intro x hx
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, by simpa using hfin.mem_toFinset.mp hx⟩
+  · intro χb hb
+    rw [Set.Finite.mem_toFinset]
+    exact (Finset.mem_filter.mp hb).2
+  · intro x hx
+    rfl
+  · intro χb hb
+    rfl
+  · intro x hx
+    rfl
+
+/-- **`|H⧸A'| = d·|S⧸A'|·|Q₁|`** for `A' ≤ S`: the `Q₁`-side tower
+`|H⧸A'| = |Q₁|·|H⧸A'Q₁|` (`card_quot_eq_card_quot_Q1_mul` at `Q₁ ⊓ A' = ⊥`)
+and `|H⧸A'Q₁| = d·|S⧸A'|` (`card_quot_sup_Q1_eq_d_mul`). -/
+theorem card_quot_subgroupOf_eq_d_mul [Finite G] {A' : Subgroup G} (hA' : A' ≤ hyp.S)
+    [(A'.subgroupOf hyp.H).Normal] :
+    Nat.card (↥hyp.H ⧸ A'.subgroupOf hyp.H)
+      = hyp.d * Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) * Nat.card ↥hyp.Q1 := by
+  have hi := hyp.card_quot_eq_card_quot_Q1_mul (R := A') (hyp.Q1_inf_eq_bot_of_le_S hA')
+  rw [hyp.card_quot_bot_subgroupOf_Q1, hyp.card_quot_sup_Q1_eq_d_mul hA'] at hi
+  rw [hi]
+  ring
+
+/-- **`|H⧸A'Z| = d·|S⧸A'|·|Q₁⧸Z|`** for `A' ≤ S`, `Z ≤ Q₁` (the second
+counting factor of step (3)): rewrite the `↥H`-level join as `(A'⊔Z)`-in
+(`subgroupOf_sup`), apply the `Q₁`-side tower at `Q₁ ⊓ (A'⊔Z) = Z`
+(`Q1_inf_sup_eq`), absorb `Z` into `Q₁` in the join with `Q₁`, and finish
+with `card_quot_sup_Q1_eq_d_mul`. -/
+theorem card_quot_sup_Z_subgroupOf_eq [Finite G] {A' Z : Subgroup G}
+    (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    Nat.card (↥hyp.H ⧸ ((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)))
+      = hyp.d * Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S)
+        * Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) := by
+  have hsub : (A' ⊔ Z).subgroupOf hyp.H
+      = (A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H) :=
+    Subgroup.subgroupOf_sup (hA'.trans (hyp.S_le_Q.trans hyp.Q_le_H))
+      (hZQ1.trans (hyp.Q1_le_Q.trans hyp.Q_le_H))
+  haveI : ((A' ⊔ Z).subgroupOf hyp.H).Normal := hsub ▸
+    ‹((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal›
+  have hi := hyp.card_quot_eq_card_quot_Q1_mul (R := A' ⊔ Z)
+    (hyp.Q1_inf_sup_eq hA' hZQ1)
+  have hjoin : ((A' ⊔ Z).subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)
+      = (A'.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H) := by
+    rw [hsub, sup_assoc]
+    congr 1
+    exact sup_eq_right.mpr fun x hx =>
+      Subgroup.mem_subgroupOf.mpr (hZQ1 (Subgroup.mem_subgroupOf.mp hx))
+  rw [hjoin, hyp.card_quot_sup_Q1_eq_d_mul hA'] at hi
+  rw [← hsub, hi]
+  ring
+
+/-- **`|Q₁| = |Q₁⧸Z|·|Z|`** for `Z ≤ Q₁` (the `Q₂ = ⊥` case of the internal
+tower `card_quot_Q1_eq_mul`). -/
+theorem card_Q1_eq_card_quot_mul {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) :
+    Nat.card ↥hyp.Q1
+      = Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) * Nat.card ↥Z := by
+  have h := hyp.card_quot_Q1_eq_mul (Q₂ := ⊥) bot_le hZQ1
+  rw [hyp.card_quot_bot_subgroupOf_Q1] at h
+  rw [h]
+  congr 1
+  rw [Subgroup.bot_subgroupOf, ← Subgroup.index_eq_card, Subgroup.index_bot]
+
+open scoped Classical in
+/-- **The step (3) counting, factored form** (p. 147, `𝒳₁` at `A' = S'`):
+`∑_{χ ∈ 𝒳(A',Z)} χ(1)² = d·|S⧸A'|·|Q₁⧸Z|·(|Z|−1)` for `A' ≤ S`, `Z ≤ Q₁` —
+the two-kernel counting difference `|H⧸A'| − |H⧸A'Z|` with both terms
+factored through the direct product `Q = S × Q₁`. -/
+theorem sum_degreeSq_XsetOf_eq_mul [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf A' Z).Finite) :
+    ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+      = (hyp.d : ℂ) * (Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) : ℂ)
+        * (Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) : ℂ)
+        * ((Nat.card ↥Z : ℂ) - 1) := by
+  rw [hyp.sum_degreeSq_XsetOf_toFinset hZQ1 hfin,
+    hyp.card_quot_subgroupOf_eq_d_mul hA',
+    hyp.card_quot_sup_Z_subgroupOf_eq hA' hZQ1,
+    hyp.card_Q1_eq_card_quot_mul hZQ1]
+  push_cast
+  ring
+
+open scoped Classical in
+/-- **`𝒳(A', Z)` is nonempty** for `A' ≤ S`, `⊥ ≠ Z ≤ Q₁` (p. 147): the
+degree-square sum `d·|S⧸A'|·|Q₁⧸Z|·(|Z|−1)` is positive (`|Z| ≥ 2`), so the
+family cannot be empty. -/
+theorem XsetOf_nonempty [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    (hyp.XsetOf A' Z).Nonempty := by
+  rw [Set.nonempty_iff_ne_empty]
+  intro hempty
+  have hsum := hyp.sum_degreeSq_XsetOf_eq_mul hA' hZQ1 (hyp.XsetOf_finite A' Z)
+  rw [Set.Finite.toFinset_eq_empty.mpr hempty, Finset.sum_empty] at hsum
+  have hd0 : ((hyp.d : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  have hS0 : ((Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) : ℕ) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hQ0 : ((Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) : ℕ) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hZ2 : 2 ≤ Nat.card ↥Z :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot Z).mpr hZne)
+  have hZ0 : ((Nat.card ↥Z : ℕ) : ℂ) - 1 ≠ 0 := by
+    rw [sub_ne_zero]
+    intro h
+    have h1 : Nat.card ↥Z = 1 := Nat.cast_eq_one.mp h
+    omega
+  exact hd0 (by
+    rcases mul_eq_zero.mp hsum.symm with h | h
+    · rcases mul_eq_zero.mp h with h' | h'
+      · rcases mul_eq_zero.mp h' with h'' | h''
+        · exact h''
+        · exact absurd h'' hS0
+      · exact absurd h' hQ0
+    · exact absurd h hZ0)
+
+end Hypothesis
+
+/-! ## The (3.1) numeric core (p. 147)
+
+Degrees in `𝒳₁` are `d·p^k` (`exists_apply_one_eq_d_mul_pow`); the chain
+adjoins of Part A need, at a step of degree `d·p^k` with anchor `d·p^{k₀}`,
+the strict bound `2·p^{k₀}·p^k < ∑_{S₁} p^{2k_x}` — the `hlt` of
+`coherent_insert_pair_of_two_mul_lt_sum`.  It follows from `p^{2k}` dividing
+the accumulated sum (Peterfalvi's (3.1) divisibility): `p^{2k} ≤ |Q₁⧸Z|`
+([Is] 2.30) makes `p^{2k}` divide the counting total (`|Q₁⧸Z|` is a `p`-power
+and `p ∤ d`), the unaccumulated members all have `k_x ≥ k`, and `p ≥ 3`,
+`k₀ < k` close the arithmetic. -/
+
+/-- A `p`-power bounded below by `p^i` is divisible by `p^i`. -/
+theorem pow_dvd_of_exists_pow_of_le {p i n : ℕ} (hp : 1 < p)
+    (hn : ∃ j, n = p ^ j) (hle : p ^ i ≤ n) : p ^ i ∣ n := by
+  obtain ⟨j, rfl⟩ := hn
+  exact Nat.pow_dvd_pow p ((Nat.pow_le_pow_iff_right hp).mp hle)
+
+/-- **The (3.1) numeric key** (p. 147): if `p ≥ 3`, `k₀ < k`, and `p^{2k}`
+divides a positive sum `s`, then `2·p^{k₀}·p^k < s` — Peterfalvi's
+`2χ₁(1)χᵢ(1) < pχ₁(1)χᵢ(1) ≤ χᵢ(1)² ≤ ∑_{j<i} χⱼ(1)²` with `d²` cancelled:
+`2·p^{k₀+k} < p^{k₀+k+1} ≤ p^{2k} ≤ s`. -/
+theorem two_mul_pow_lt_of_pow_dvd {p k₀ k s : ℕ} (hp : 3 ≤ p) (hk : k₀ < k)
+    (hdvd : p ^ (2 * k) ∣ s) (hs : 0 < s) :
+    2 * (p ^ k₀ : ℝ) * (p ^ k : ℝ) < (s : ℝ) := by
+  have hppos : 0 < p := by omega
+  have hX : 0 < p ^ k₀ * p ^ k := Nat.mul_pos (pow_pos hppos k₀) (pow_pos hppos k)
+  have h1 : 2 * (p ^ k₀ * p ^ k) < p * (p ^ k₀ * p ^ k) :=
+    (Nat.mul_lt_mul_right hX).mpr (by omega)
+  have h2 : p * (p ^ k₀ * p ^ k) = p ^ (k₀ + k + 1) := by ring
+  have h3 : p ^ (k₀ + k + 1) ≤ p ^ (2 * k) :=
+    Nat.pow_le_pow_right hppos (by omega)
+  have h4 : 2 * (p ^ k₀ * p ^ k) < s :=
+    ((h1.trans_eq h2).trans_le h3).trans_le (Nat.le_of_dvd hs hdvd)
+  calc 2 * (p ^ k₀ : ℝ) * (p ^ k : ℝ)
+      = ((2 * (p ^ k₀ * p ^ k) : ℕ) : ℝ) := by push_cast; ring
+    _ < (s : ℝ) := by exact_mod_cast h4
+
+namespace Hypothesis
+
+variable (hyp : Hypothesis G)
+
+/-- **`|Q₁⧸Z|` is a `p`-power** for a `p`-group `Q₁` (Lagrange: the coset
+count divides `|Q₁| = p^n`). -/
+theorem exists_card_quot_Q1_eq_pow [Finite G] {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) (Z : Subgroup G) :
+    ∃ j, Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) = p ^ j := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
+  have hdvd : Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) ∣ p ^ n := by
+    rw [← hn, ← Subgroup.index_eq_card]
+    exact Subgroup.index_dvd_card _
+  obtain ⟨m, -, hm⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+  exact ⟨m, hm⟩
+
+/-- **`(p, d) = 1`** for a `p`-group `Q₁`: `p ∣ |Q₁| ∣ |Q|` (`Q₁` is
+nontrivial) and `(|Q|, |D|) = 1`. -/
+theorem coprime_d_of_isPGroup [Finite G] {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) : Nat.Coprime p hyp.d := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    intro h0
+    rw [h0, pow_zero] at hn
+    haveI := hyp.nontrivial_Q1
+    have := Finite.one_lt_card (α := ↥hyp.Q1)
+    omega
+  have hpQ1 : p ∣ Nat.card ↥hyp.Q1 := hn ▸ dvd_pow_self p hn0
+  have hQ1Q : Nat.card ↥hyp.Q1 ∣ Nat.card ↥hyp.Q :=
+    Subgroup.card_dvd_of_le hyp.Q1_le_Q
+  exact Nat.Coprime.coprime_dvd_left (hpQ1.trans hQ1Q) hyp.coprime_Q_D
+
+open scoped Classical in
+/-- **The step (3) counting in exponent units** (ℕ): with every member of
+`𝒳(A',Z)` of degree `d·p^{k(x)}`,
+`d·∑_x p^{2k(x)} = |S⧸A'|·|Q₁⧸Z|·(|Z|−1)` — the `T`-factorisation
+`sum_degreeSq_XsetOf_eq_mul` with one `d` cancelled against the degrees. -/
+theorem d_mul_sum_pow_eq [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf A' Z).Finite) {p : ℕ}
+    {k : ClassFunction ↥hyp.H ℂ → ℕ}
+    (hk : ∀ x ∈ hyp.XsetOf A' Z,
+      x (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ k x : ℕ) : ℂ)) :
+    hyp.d * ∑ x ∈ hfin.toFinset, p ^ (2 * k x)
+      = Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S)
+        * Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) * (Nat.card ↥Z - 1) := by
+  have hsum := hyp.sum_degreeSq_XsetOf_eq_mul hA' hZQ1 hfin
+  have hL : ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+      = ((hyp.d : ℕ) : ℂ) ^ 2 * ∑ x ∈ hfin.toFinset, ((p ^ (2 * k x) : ℕ) : ℂ) := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun x hx => ?_
+    rw [hk x (hfin.mem_toFinset.mp hx)]
+    push_cast
+    rw [pow_mul']
+    ring
+  rw [hL] at hsum
+  have hdne : ((hyp.d : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  have hz1 : 1 ≤ Nat.card ↥Z := Nat.card_pos
+  have h2 : ((hyp.d : ℕ) : ℂ) * ∑ x ∈ hfin.toFinset, ((p ^ (2 * k x) : ℕ) : ℂ)
+      = (Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) : ℂ)
+        * (Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) : ℂ)
+        * ((Nat.card ↥Z : ℂ) - 1) := by
+    refine mul_left_cancel₀ hdne ?_
+    linear_combination hsum
+  have h3 : ((hyp.d * ∑ x ∈ hfin.toFinset, p ^ (2 * k x) : ℕ) : ℂ)
+      = ((Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S)
+          * Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1)
+          * (Nat.card ↥Z - 1) : ℕ) : ℂ) := by
+    push_cast [Nat.cast_sub hz1] at h2 ⊢
+    linear_combination h2
+  exact Nat.cast_injective h3
+
+open scoped Classical in
+/-- **The (3.1) divisibility of the exponent total** (p. 147): if the step
+degree obeys `p^j ≤ |Q₁⧸Z|` (supplied by [Is] Cor. 2.30 at `j = 2k`), then
+`p^j` divides `W = ∑_{𝒳(A',Z)} p^{2k(x)}`: `p^j ∣ |Q₁⧸Z| ∣ d·W`
+(`d_mul_sum_pow_eq`) and `(p^j, d) = 1`. -/
+theorem pow_dvd_sum_pow [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf A' Z).Finite) {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1)
+    {k : ClassFunction ↥hyp.H ℂ → ℕ}
+    (hk : ∀ x ∈ hyp.XsetOf A' Z,
+      x (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ k x : ℕ) : ℂ))
+    {j : ℕ} (hle : p ^ j ≤ Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1)) :
+    p ^ j ∣ ∑ x ∈ hfin.toFinset, p ^ (2 * k x) := by
+  have hW := hyp.d_mul_sum_pow_eq hA' hZQ1 hfin hk
+  have hdvd_n : p ^ j ∣ Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) :=
+    pow_dvd_of_exists_pow_of_le hp.one_lt
+      (hyp.exists_card_quot_Q1_eq_pow hp hQ1p Z) hle
+  have hdvd_T : p ^ j ∣ hyp.d * ∑ x ∈ hfin.toFinset, p ^ (2 * k x) := by
+    rw [hW]
+    exact ((hdvd_n.mul_left _).mul_right _)
+  exact ((hyp.coprime_d_of_isPGroup hp hQ1p).pow_left j).dvd_of_dvd_mul_left hdvd_T
+
+/-! ## Part A: `𝒳₁ = 𝒳 ∩ 𝒮(S')` is coherent (p. 147)
+
+The chain assembly: the equal-minimal-degree base `B` is coherent by
+Lemma 1(b) (`coherent_of_constant_degree`, relativised to a subfamily of `𝒮`);
+the conjugate-pair decomposition `exists_conjPair_pairUnion_eq` enumerates
+`𝒳₁ ∖ B` min-degree-first; each pair is adjoined by the Lemma 1(a) wrapper
+`coherent_insert_pair_of_two_mul_lt_sum`, whose degree inequality is the
+(3.1) divisibility (`pow_dvd_sum_pow` + the [Is] 2.30 degree bound at
+`D₀ = SZ`) closed by `two_mul_pow_lt_of_pow_dvd`. -/
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+/-- **Peterfalvi Lemma 1(b), subfamily form**: a finite, conjugation-closed,
+equal-degree family `B ⊆ 𝒮` with at least two members is coherent.  The §7
+(5.2) hypothesis for `B` restricts from the `𝒮`-level toolkit (every field is
+per-member or monotone in the family), and `coherent_of_constant_degree`
+concludes. -/
+theorem coherent_of_subset_constant_degree (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {B : Set (ClassFunction ↥hyp.H ℂ)} (hBS : B ⊆ hyp.Sset) (hBfin : B.Finite)
+    (hBconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate B) (hcard : 2 ≤ B.ncard)
+    (hconst : ∀ a ∈ B, ∀ b ∈ B, a (1 : ↥hyp.H) = b (1 : ↥hyp.H)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau B hyp.A) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
+      ClassFunction.inner ζ ζ = 1 := by
+    intro ζ hζ
+    have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at h
+    simpa using h
+  refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+    { tau := hyp.tau
+      tau_isometry_diff := fun _ _ hφ hψ => hyp.tau_inner_eq_of_supported_Sset
+        ⟨Submodule.span_mono hBS hφ.1, hφ.2⟩ ⟨Submodule.span_mono hBS hψ.1, hψ.2⟩
+      conjugate_closed := hBconj
+      no_real_characters := (hasNoRealCharacters_Sset hyp hd hQ1odd).mono hBS
+      pairwise_orthogonal := fun _ _ hχ hψ hne =>
+        hyp.Sset_pairwiseOrthogonal (hBS hχ) (hBS hψ) hne
+      difference_image := fun _ hχ => hyp.ssetDifferenceImage hd hQ1odd (hBS hχ)
+      difference_images_orthogonal := fun _ _ hφ hχ h1 h2 =>
+        hyp.ssetDifferenceImages_orthogonal hd hQ1odd (hBS hφ) (hBS hχ) h1 h2 }
+    hBfin hcard
+    (fun ζ hζ => hself (hBS hζ))
+    (fun a ha b hb => hyp.tau_mem_ZIrr (Submodule.sub_mem _
+      (Submodule.subset_span (hBS ha)) (Submodule.subset_span (hBS hb))))
+    (fun a ha b hb => by
+      change a (1 : ↥hyp.H) = b (1 : ↥hyp.H)
+      exact hconst a ha b hb)
+    (fun a ha => by
+      change a (1 : ↥hyp.H) ≠ 0
+      obtain ⟨m, hmpos, hm⟩ := hyp.exists_apply_one_eq_d_mul (hBS ha)
+      rw [hm]
+      exact mul_ne_zero (Nat.cast_ne_zero.mpr hyp.d_pos.ne')
+        (Nat.cast_ne_zero.mpr hmpos.ne'))
+    hyp.one_notMem_A
+    (fun a ha b hb => by
+      have h := hyp.scaled_diff_support_subset_A_of_mem_Sset (hBS ha) (hBS hb)
+        (n := 1) (m := 1) (by rw [Nat.cast_one, one_mul, one_mul]; exact hconst a ha b hb)
+      simpa using h)
+
+open scoped Classical in
+/-- **Peterfalvi p. 147, step (3) Part A: `𝒳₁ = 𝒳 ∩ 𝒮(S')` is coherent**
+(campaign issue 1054) for a nontrivial `Z ≤ Z(Q₁)` (`Q₁` a `p`-group, `d` odd,
+`Z` `H`-invariant through the `Normal` instances).
+
+Chain assembly: all degrees in `𝒳₁` are `d·p^k`
+(`exists_apply_one_eq_d_mul_pow`); the equal-minimal-degree base `B` is
+coherent by Lemma 1(b) (`coherent_of_subset_constant_degree`, `|B| ≥ 2` from a
+conjugate pair); the min-degree-first conjugate-pair decomposition
+(`exists_conjPair_pairUnion_eq`) feeds the `coherentPairChain` engine, each
+step adjoined by `coherent_insert_pair_of_two_mul_lt_sum` whose degree
+inequality `2·p^{k₀}·p^k < ∑_{S₁} p^{2k_x}` is Peterfalvi's (3.1): `p^{2k}`
+divides both the counting total (`pow_dvd_sum_pow`, via the [Is] 2.30 bound
+`p^{2k} ≤ |Q₁⧸Z|` at `D₀ = SZ`) and the unaccumulated remainder (min-degree
+clause), hence the accumulated sum, and `p ≥ 3`, `k₀ < k` close the
+arithmetic (`two_mul_pow_lt_of_pow_dvd`). -/
+theorem xsetOf_sder_coherent (hd : Odd hyp.d) {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1)
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥)
+    (hZc : ∀ z ∈ Z, ∀ y ∈ hyp.Q1, ⁅z, y⁆ = 1)
+    [(hyp.Sder.subgroupOf hyp.H).Normal]
+    [((hyp.Sder.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    [((hyp.S ⊔ Z).subgroupOf hyp.H).Normal] :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.XsetOf hyp.Sder Z) hyp.A) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+    hyp.Sder_subgroupOf_Q_normal
+  have hQ1odd := hyp.odd_card_Q1_of_isPGroup hp hQ1p
+  have hp2 : p ≠ 2 := fun h2 => hyp.Q1_not_two_group (by rwa [h2] at hQ1p)
+  have hp3 : 3 ≤ p := by have := hp.two_le; omega
+  -- the family `Y = 𝒳₁` and its basic structure
+  have hYS : hyp.XsetOf hyp.Sder Z ⊆ hyp.Sset := hyp.XsetOf_subset_Sset _ _
+  have hYSder : hyp.XsetOf hyp.Sder Z ⊆ hyp.SsetOf hyp.Sder :=
+    hyp.XsetOf_subset_SsetOf _ _
+  have hYfin : (hyp.XsetOf hyp.Sder Z).Finite := hyp.XsetOf_finite _ _
+  have hYconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.XsetOf hyp.Sder Z) :=
+    fun _ hx => hyp.conj_mem_XsetOf hx
+  have hnoreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.XsetOf hyp.Sder Z) :=
+    (hasNoRealCharacters_Sset hyp hd hQ1odd).mono hYS
+  have hYne : (hyp.XsetOf hyp.Sder Z).Nonempty :=
+    hyp.XsetOf_nonempty hyp.Sder_le_S hZQ1 hZne
+  -- the exponent function: `x(1) = d·p^{k x}` on `Y`
+  have hdegY : ∀ x ∈ hyp.XsetOf hyp.Sder Z,
+      ∃ kx : ℕ, x (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ kx : ℕ) : ℂ) :=
+    fun x hx => hyp.exists_apply_one_eq_d_mul_pow hp hQ1p (hYSder hx)
+  choose! k hk using hdegY
+  have hdne : ((hyp.d : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  -- degree comparisons transfer to exponent comparisons
+  have hre : ∀ x ∈ hyp.XsetOf hyp.Sder Z,
+      (x (1 : ↥hyp.H)).re = (hyp.d : ℝ) * ((p ^ k x : ℕ) : ℝ) := by
+    intro x hx
+    rw [hk x hx, ← Nat.cast_mul, Complex.natCast_re]
+    push_cast
+    ring
+  have hkmono : ∀ x ∈ hyp.XsetOf hyp.Sder Z, ∀ y ∈ hyp.XsetOf hyp.Sder Z,
+      (x (1 : ↥hyp.H)).re ≤ (y (1 : ↥hyp.H)).re → k x ≤ k y := by
+    intro x hx y hy hle
+    rw [hre x hx, hre y hy] at hle
+    have hd0 : (0 : ℝ) < (hyp.d : ℝ) := by exact_mod_cast hyp.d_pos
+    have h1 : ((p ^ k x : ℕ) : ℝ) ≤ ((p ^ k y : ℕ) : ℝ) :=
+      le_of_mul_le_mul_left hle hd0
+    have h2 : p ^ k x ≤ p ^ k y := by exact_mod_cast h1
+    exact (Nat.pow_le_pow_iff_right hp.one_lt).mp h2
+  have hkinj : ∀ x ∈ hyp.XsetOf hyp.Sder Z, ∀ y ∈ hyp.XsetOf hyp.Sder Z,
+      x (1 : ↥hyp.H) = y (1 : ↥hyp.H) → k x = k y := by
+    intro x hx y hy heq
+    have h1 := (hk x hx).symm.trans (heq.trans (hk y hy))
+    have h2 : ((p ^ k x : ℕ) : ℂ) = ((p ^ k y : ℕ) : ℂ) := mul_left_cancel₀ hdne h1
+    exact Nat.pow_right_injective hp.two_le (Nat.cast_injective h2)
+  have hconjdeg : ∀ x ∈ hyp.XsetOf hyp.Sder Z,
+      x.conj (1 : ↥hyp.H) = x (1 : ↥hyp.H) := by
+    intro x hx
+    rw [ClassFunction.conj_apply, hk x hx]
+    simp
+  -- the minimal-degree anchor `χ₀`
+  obtain ⟨χ₀, hχ₀Y, hχ₀min⟩ := Set.exists_min_image (hyp.XsetOf hyp.Sder Z)
+    (fun x => (x (1 : ↥hyp.H)).re) hYfin hYne
+  have hk₀min : ∀ x ∈ hyp.XsetOf hyp.Sder Z, k χ₀ ≤ k x :=
+    fun x hx => hkmono χ₀ hχ₀Y x hx (hχ₀min x hx)
+  -- the equal-minimal-degree base `B`
+  set B := {x ∈ hyp.XsetOf hyp.Sder Z | k x = k χ₀} with hBdef
+  have hBY : B ⊆ hyp.XsetOf hyp.Sder Z := Set.sep_subset _ _
+  have hBconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate B := by
+    rintro x ⟨hxY, hxk⟩
+    refine ⟨hYconj hxY, ?_⟩
+    rw [← hxk]
+    exact hkinj _ (hYconj hxY) _ hxY (hconjdeg x hxY)
+  have hχ₀B : χ₀ ∈ B := ⟨hχ₀Y, rfl⟩
+  have hB2 : 2 ≤ B.ncard := by
+    have hχ₀cB : χ₀.conj ∈ B := hBconj hχ₀B
+    have hne : χ₀ ≠ χ₀.conj := fun h => hnoreal hχ₀Y h.symm
+    have hsub : ({χ₀, χ₀.conj} : Set (ClassFunction ↥hyp.H ℂ)) ⊆ B := by
+      rintro x (rfl | rfl)
+      · exact hχ₀B
+      · exact hχ₀cB
+    calc 2 = ({χ₀, χ₀.conj} : Set (ClassFunction ↥hyp.H ℂ)).ncard :=
+          (Set.ncard_pair hne).symm
+      _ ≤ B.ncard := Set.ncard_le_ncard hsub (hYfin.subset hBY)
+  have hconstB : ∀ a ∈ B, ∀ b ∈ B, a (1 : ↥hyp.H) = b (1 : ↥hyp.H) := by
+    rintro a ⟨haY, hak⟩ b ⟨hbY, hbk⟩
+    rw [hk a haY, hk b hbY, hak, hbk]
+  obtain ⟨h0⟩ := hyp.coherent_of_subset_constant_degree hd hQ1odd
+    (hBY.trans hYS) (hYfin.subset hBY) hBconj hB2 hconstB
+  -- the min-degree-first conjugate-pair decomposition of `Y` over `B`
+  obtain ⟨N, pair, hcover, hfresh, hmin⟩ :=
+    exists_conjPair_pairUnion_eq hBY hYfin hYconj hBconj hnoreal
+  -- the accumulated sets stay inside `Y` and conjugation-closed
+  have hacc_sub : ∀ i ≤ N,
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i
+        ⊆ hyp.XsetOf hyp.Sder Z := by
+    intro i hiN x hx
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hB | ⟨j, hji, hj⟩
+    · exact hBY hB
+    · obtain ⟨hpc, hp1Y', -, -⟩ := hfresh j (lt_of_lt_of_le hji hiN)
+      rcases hj with h1 | h2
+      · exact h1 ▸ hp1Y'
+      · have h2' : x = (pair j).2 := h2
+        rw [h2', hpc]
+        exact hYconj hp1Y'
+  have hacc_conj : ∀ i ≤ N,
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i) := by
+    intro i hiN x hx
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hB | ⟨j, hji, hj⟩
+    · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl (hBconj hB))
+    · obtain ⟨hpc, -, -, -⟩ := hfresh j (lt_of_lt_of_le hji hiN)
+      refine OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hji, ?_⟩)
+      rcases hj with h1 | h2
+      · right
+        change x.conj = (pair j).2
+        rw [h1, hpc]
+      · left
+        have h2' : x = (pair j).2 := h2
+        rw [h2', hpc, ClassFunction.conj_conj]
+  -- the per-step adjoining
+  have hstep : ∀ i, i < N →
+      OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i) hyp.A →
+      OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair (i + 1)) hyp.A := by
+    intro i hiN hcoh_i
+    obtain ⟨hpconj, hp1Y, hp1fresh, hp2fresh⟩ := hfresh i hiN
+    have hacc_sub_i := hacc_sub i hiN.le
+    have haccfin : (OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i).Finite :=
+      hYfin.subset hacc_sub_i
+    have hχ₀acc : χ₀ ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i :=
+      OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hχ₀B)
+    -- `k χ₀ < k χ` for the adjoined `χ = (pair i).1`
+    have hklt : k χ₀ < k (pair i).1 := by
+      rcases Nat.lt_or_ge (k χ₀) (k (pair i).1) with h | h
+      · exact h
+      · have hχB : (pair i).1 ∈ B := ⟨hp1Y, le_antisymm h (hk₀min _ hp1Y)⟩
+        exact absurd (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hχB)) hp1fresh
+    -- the (1.2) degree bound: `p^{2k} ≤ |Q₁⧸Z|` at `D₀ = SZ`
+    have hle : p ^ (2 * k (pair i).1)
+        ≤ Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) := by
+      have hcomm : ∀ x ∈ hyp.S ⊔ Z, ∀ q ∈ hyp.Q, ⁅x, q⁆ ∈ hyp.Sder := by
+        intro x hx q hq
+        have h := hyp.commutator_mem_sup_Sder_of_central (Q₃ := (⊥ : Subgroup G)) hZQ1
+          (fun z hz y hy => by rw [Subgroup.mem_bot]; exact hZc z hz y hy) hx hq
+        rwa [sup_bot_eq] at h
+      obtain ⟨a', ha'deg, ha'sq⟩ := hyp.exists_deg_sq_le_of_mem_SsetOf hyp.Sder
+        (hyp.S ⊔ Z) (hyp.Sder_le_S.trans hyp.S_le_Q) (hyp.Sder_le_S.trans le_sup_left)
+        (sup_le hyp.S_le_Q (hZQ1.trans hyp.Q1_le_Q))
+        (hyp.map_mk_le_center_of_commutator_mem hcomm)
+        (hYSder hp1Y)
+      rw [hyp.index_subgroupOf_sup_S_eq hZQ1] at ha'sq
+      have haa' : a' = p ^ k (pair i).1 := by
+        have h1 := ha'deg.symm.trans (hk _ hp1Y)
+        exact_mod_cast mul_left_cancel₀ hdne h1
+      rw [haa'] at ha'sq
+      rw [pow_mul']
+      exact ha'sq
+    -- the (3.1) divisibility of the accumulated sum
+    have hsub_fin : haccfin.toFinset ⊆ hYfin.toFinset := fun x hx =>
+      hYfin.mem_toFinset.mpr (hacc_sub_i (haccfin.mem_toFinset.mp hx))
+    have hsplit := Finset.sum_sdiff (f := fun x => p ^ (2 * k x)) hsub_fin
+    have hW : p ^ (2 * k (pair i).1) ∣ ∑ x ∈ hYfin.toFinset, p ^ (2 * k x) :=
+      hyp.pow_dvd_sum_pow hyp.Sder_le_S hZQ1 hYfin hp hQ1p hk hle
+    have hdvd_diff : p ^ (2 * k (pair i).1)
+        ∣ ∑ x ∈ hYfin.toFinset \ haccfin.toFinset, p ^ (2 * k x) := by
+      refine Finset.dvd_sum fun x hx => ?_
+      obtain ⟨hxY, hxacc⟩ := Finset.mem_sdiff.mp hx
+      have hxY' := hYfin.mem_toFinset.mp hxY
+      have hxacc' : x ∉ OddOrder.Peterfalvi.S07.pairUnion (L := ↥hyp.H) B pair i :=
+        fun hc => hxacc (haccfin.mem_toFinset.mpr hc)
+      have hkle : k (pair i).1 ≤ k x :=
+        hkmono _ hp1Y x hxY' (hmin i hiN x hxY' hxacc')
+      exact Nat.pow_dvd_pow p (by omega)
+    have hdvd_s : p ^ (2 * k (pair i).1) ∣ ∑ x ∈ haccfin.toFinset, p ^ (2 * k x) := by
+      rw [← hsplit] at hW
+      exact (Nat.dvd_add_right hdvd_diff).mp hW
+    have hspos : 0 < ∑ x ∈ haccfin.toFinset, p ^ (2 * k x) :=
+      Finset.sum_pos' (fun x _ => Nat.zero_le _)
+        ⟨χ₀, haccfin.mem_toFinset.mpr hχ₀acc, pow_pos (by omega) _⟩
+    -- Peterfalvi's degree inequality, in the wrapper's real form
+    have hltR := two_mul_pow_lt_of_pow_dvd hp3 hklt hdvd_s hspos
+    have hsum_eq : ((∑ x ∈ haccfin.toFinset, p ^ (2 * k x) : ℕ) : ℝ)
+        = ∑ x ∈ haccfin.toFinset, (((p ^ k x : ℕ) : ℝ)) ^ 2 := by
+      rw [Nat.cast_sum]
+      refine Finset.sum_congr rfl fun x _ => ?_
+      rw [pow_mul']
+      push_cast
+      ring
+    have hltR' : 2 * ((p ^ k χ₀ : ℕ) : ℝ) * ((p ^ k (pair i).1 : ℕ) : ℝ)
+        < ∑ x ∈ haccfin.toFinset, (((p ^ k x : ℕ) : ℝ)) ^ 2 := by
+      rw [← hsum_eq]
+      calc 2 * ((p ^ k χ₀ : ℕ) : ℝ) * ((p ^ k (pair i).1 : ℕ) : ℝ)
+          = 2 * ((p : ℝ)) ^ k χ₀ * ((p : ℝ)) ^ k (pair i).1 := by push_cast; ring
+        _ < _ := hltR
+    -- adjoin the pair by the Lemma 1(a) wrapper
+    have hres := hyp.coherent_insert_pair_of_two_mul_lt_sum hd hQ1odd
+      (hacc_sub_i.trans hYS) haccfin (hacc_conj i hiN.le) ⟨hcoh_i⟩ hχ₀acc
+      (m := fun x => p ^ k x)
+      (fun x hx => hk x (hacc_sub_i hx))
+      (pow_pos (by omega) _)
+      (fun x hx => Nat.pow_dvd_pow p (hk₀min x (hacc_sub_i hx)))
+      (hYS hp1Y) hp1fresh (hpconj ▸ hp2fresh)
+      (a := p ^ k (pair i).1) (hk _ hp1Y)
+      (Nat.pow_dvd_pow p (hk₀min _ hp1Y))
+      hltR'
+    rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair rfl hpconj]
+    exact hres.some
+  -- run the chain and rewrite the accumulator to `Y`
+  have hall := OddOrder.Peterfalvi.S07.coherentPairChain (τ := hyp.tau) (A := hyp.A)
+    B pair h0 N hstep
+  exact ⟨hcover ▸ hall⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
