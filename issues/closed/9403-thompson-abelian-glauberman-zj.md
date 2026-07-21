@@ -334,3 +334,10 @@ Glauberman ZJ (G Thm 8.2.11) が J_a で sorry-free / axiom-clean。下流 3024 
 - `references/gorenstein/finite-groups.mmd` L5431-5622 (Ch.8 §2)。
 - `references/bg/local-analysis.pdftotext.txt` L3040-3045 (Thm 6.2), L8611 (記号表)。
 - repo: `GroupTheory/ThompsonSubgroup.lean` (elementary 版、API パターンの参照元)。
+
+## ✅ close (2026-07-21) — 完了条件達成
+
+Glauberman ZJ (G Thm 8.2.11) が J_a で sorry-free / axiom-clean (O_{p'}=1 形 +
+一般形 + 引き戻し形 `zCenter_thompsonJAbelian_sup_oPiCorePrime_normal`)。
+下流 3024 → 3017 は同日 discharge 済 (S06_Thm62JS の J_a 版無条件定理 +
+`AppA.isPStableOp_of_odd_solvable`)。3017/3024/9403 同時 close。
