@@ -1418,6 +1418,28 @@ theorem ssetDifferenceImages_orthogonal [Finite G] (hd : Odd hyp.d)
     hyp.Sset_pairwiseOrthogonal hφc hχc hne2]
   ring
 
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **Degree-matched scaled differences of members of `𝒮` are `A`-supported** (the
+`hdegdiffsupp` input of Lemma 1(a)): if `n·a(1) = m·b(1)` then `n•a − m•b` vanishes
+at `1`, and off `Q` both members vanish. -/
+theorem scaled_diff_support_subset_A_of_mem_Sset [Finite G]
+    {a b : ClassFunction ↥hyp.H ℂ} (ha : a ∈ hyp.Sset) (hb : b ∈ hyp.Sset)
+    {n m : ℕ} (hdeg : (n : ℂ) * a (1 : ↥hyp.H) = (m : ℂ) * b (1 : ↥hyp.H)) :
+    ((n • a - m • b : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  by_contra hxA
+  apply hx
+  rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ n a,
+    ← Nat.cast_smul_eq_nsmul ℂ m b, ClassFunction.smul_apply, ClassFunction.smul_apply]
+  by_cases hx1 : x = 1
+  · subst hx1
+    rw [hdeg, sub_self]
+  · have hxQ : (x : G) ∉ hyp.Q := fun hQ => hxA ⟨hQ, hx1⟩
+    rw [apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp ha hxQ,
+      apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp hb hxQ, mul_zero, mul_zero, sub_self]
+
 /-- **The §7 (5.2) hypothesis for the full family `𝒮`** — the ambient input of
 Lemma 1(a) (`coherent_adjoin_of_degree_bound`) throughout the Theorem's proof. -/
 noncomputable def ssetS07Hypothesis [Finite G] (hd : Odd hyp.d)
