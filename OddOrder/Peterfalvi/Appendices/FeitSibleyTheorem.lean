@@ -1607,28 +1607,35 @@ noncomputable def ssetS07Hypothesis [Finite G] (hd : Odd hyp.d)
   difference_images_orthogonal := fun _ _ hφ hχ h1 h2 =>
     hyp.ssetDifferenceImages_orthogonal hd hQ1odd hφ hχ h1 h2
 
-/-- **The counterexample degree bound** (the reductions' "by Lemma 1(a), there is a
-`ψ` with `∑ χ(1)² ≤ 2dψ(1)`"): if adjoining the fresh conjugate pair `{χ, χ̄}` to a
-coherent, conjugation-closed `S₁ ⊆ 𝒮` containing a degree-`d` anchor *breaks*
-coherence, then Lemma 1(a)'s strict degree inequality must fail:
-`∑_{x ∈ S₁} m(x)² ≤ 2a`, where `x(1) = d·m(x)` and `χ(1) = d·a`.  All other
-inputs of `coherent_adjoin_of_degree_bound` are supplied unconditionally from the
-`𝒮`-level toolkit (`ssetS07Hypothesis` and friends). -/
-theorem sq_ratio_sum_le_of_adjoin_incoherent [Finite G] (hd : Odd hyp.d)
+/-- **Peterfalvi p. 144, Lemma 1(a), positive direction with a general anchor
+degree** (issue 1054, step (3) Part A): adjoining a fresh conjugate pair `{χ, χ̄}`
+(`χ ∈ 𝒮`, `χ, χ̄ ∉ S₁`) to a coherent, conjugation-closed finite `S₁ ⊆ 𝒮`
+*preserves coherence* under Peterfalvi's degree inequality.  Degrees are recorded
+in units of `d`: members have `x(1) = d·m(x)` (`hmdeg`), the anchor `χ₀ ∈ S₁` has
+degree `d·m(χ₀)` with `m(χ₀) ∣ m(x)` for every member (`hmdvd`; the integer-ratio
+case of `coherent_adjoin_of_degree_bound`) and `m(χ₀) ∣ a`, where `χ(1) = d·a`;
+Peterfalvi's inequality `2·χ₀(1)·χ(1) < ∑_{x ∈ S₁} x(1)²` appears with `d²`
+cancelled, as `2·m(χ₀)·a < ∑_{x ∈ S₁} m(x)²` (`hlt`).  All structural inputs of
+Lemma 1(a) — orthonormality, `A`-support, `τ`-facts, enumeration — are supplied
+unconditionally from the `𝒮`-level toolkit (`ssetS07Hypothesis` and friends).
+This is the wrapper the chain adjoins of step (3) Part A consume; the degree-`d`
+anchor contrapositive `sq_ratio_sum_le_of_adjoin_incoherent` specialises it at
+`m(χ₀) = 1`. -/
+theorem coherent_insert_pair_of_two_mul_lt_sum [Finite G] (hd : Odd hyp.d)
     (hQ1odd : Odd (Nat.card ↥hyp.Q1))
     {S₁ : Set (ClassFunction ↥hyp.H ℂ)} (hS₁S : S₁ ⊆ hyp.Sset) (hS₁fin : S₁.Finite)
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁ hyp.A))
     {χ₀ : ClassFunction ↥hyp.H ℂ} (hχ₀S₁ : χ₀ ∈ S₁)
-    (hχ₀deg : χ₀ (1 : ↥hyp.H) = (hyp.d : ℂ))
+    {m : ClassFunction ↥hyp.H ℂ → ℕ}
+    (hmdeg : ∀ x ∈ S₁, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (m x : ℂ))
+    (hm₀pos : 0 < m χ₀) (hmdvd : ∀ x ∈ S₁, m χ₀ ∣ m x)
     {χ : ClassFunction ↥hyp.H ℂ} (hχS : χ ∈ hyp.Sset)
     (hχS₁ : χ ∉ S₁) (hχbarS₁ : χ.conj ∉ S₁)
-    {a : ℕ} (hχdeg : χ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ))
-    (hfail : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
-      (S₁ ∪ {χ, χ.conj}) hyp.A)) :
-    ∃ m : ClassFunction ↥hyp.H ℂ → ℕ,
-      (∀ x ∈ S₁, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (m x : ℂ)) ∧
-      (∑ x ∈ hS₁fin.toFinset, ((m x : ℝ)) ^ 2) ≤ 2 * (a : ℝ) := by
+    {a : ℕ} (hχdeg : χ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ)) (hdvd : m χ₀ ∣ a)
+    (hlt : 2 * (m χ₀ : ℝ) * (a : ℝ) < ∑ x ∈ hS₁fin.toFinset, ((m x : ℝ)) ^ 2) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (S₁ ∪ {χ, χ.conj}) hyp.A) := by
   classical
   have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
       ClassFunction.inner ζ ζ = 1 := by
@@ -1637,22 +1644,12 @@ theorem sq_ratio_sum_le_of_adjoin_incoherent [Finite G] (hd : Odd hyp.d)
       (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
     rw [if_pos rfl] at h
     simpa using h
-  have hm : ∀ x ∈ S₁, ∃ mx : ℕ, 0 < mx ∧ x (1 : ↥hyp.H) = (hyp.d : ℂ) * (mx : ℂ) :=
-    fun x hx => hyp.exists_apply_one_eq_d_mul (hS₁S hx)
-  choose! m hmpos hmdeg using hm
-  refine ⟨m, hmdeg, ?_⟩
-  by_contra hlt
-  push Not at hlt
-  apply hfail
   have hmem : ∀ {i : ClassFunction ↥hyp.H ℂ}, i ∈ hS₁fin.toFinset → i ∈ S₁ :=
     fun hi => hS₁fin.mem_toFinset.mp hi
-  have hd0 : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
-  have hmχ₀ : m χ₀ = 1 := by
-    have h1 := hmdeg χ₀ hχ₀S₁
-    rw [hχ₀deg] at h1
-    have h2 : (hyp.d : ℂ) * 1 = (hyp.d : ℂ) * (m χ₀ : ℂ) := by rw [mul_one]; exact h1
-    have h3 := mul_left_cancel₀ hd0 h2
-    exact_mod_cast h3.symm
+  -- `(a / m χ₀) · m χ₀ = a` in `ℂ` (`m χ₀ ∣ a`), converting `χ(1) = d·a` to
+  -- Lemma 1(a)'s anchor-unit form `χ(1) = (a / m χ₀) · (d · m χ₀)`.
+  have hm₀C : ((a / m χ₀ : ℕ) : ℂ) * (m χ₀ : ℂ) = (a : ℂ) := by
+    rw [← Nat.cast_mul, Nat.div_mul_cancel hdvd]
   refine coherent_adjoin_of_degree_bound (hyp.ssetS07Hypothesis hd hQ1odd)
     hyp.one_notMem_A hS₁S hcoh hχS (hself hχS) (hself (hyp.conj_mem_Sset hχS))
     (fun x hx => hyp.Sset_pairwiseOrthogonal hχS (hS₁S hx) (fun h => hχS₁ (h ▸ hx)))
@@ -1672,43 +1669,99 @@ theorem sq_ratio_sum_le_of_adjoin_incoherent [Finite G] (hd : Odd hyp.d)
     (fun i hi => hyp.Sset_pairwiseOrthogonal (hS₁S (hmem hi))
       (hyp.conj_mem_Sset (hS₁S (hmem hi)))
       (fun h => (hasNoRealCharacters_Sset hyp hd hQ1odd) (hS₁S (hmem hi)) h.symm))
-    (Nat.mul_pos hyp.d_pos (hmpos χ₀ hχ₀S₁))
+    (Nat.mul_pos hyp.d_pos hm₀pos)
     (fun i hi => by
       rw [show ((id i : ClassFunction ↥hyp.H ℂ) : ↥hyp.H → ℂ) 1 = i (1 : ↥hyp.H) from rfl,
         hmdeg i (hmem hi)]
       push_cast
       ring)
     (fun i hi => hyp.conj_diff_support_subset_A_of_mem_Sset (hS₁S (hmem hi)))
-    (fun i _ => by rw [hmχ₀, mul_one]; exact Dvd.intro (m i) rfl)
+    (fun i hi => mul_dvd_mul_left hyp.d (hmdvd i (hmem hi)))
     (fun i hi => hyp.scaled_diff_support_subset_A_of_mem_Sset
       (hS₁S (hmem hi)) (hS₁S hχ₀S₁)
-      (by rw [hmdeg i (hmem hi), hχ₀deg, hmχ₀]; push_cast; ring))
-    (a := a)
+      (by rw [hmdeg i (hmem hi), hmdeg χ₀ hχ₀S₁]; push_cast; ring))
+    (a := a / m χ₀)
     (by
       rw [show ((χ : ClassFunction ↥hyp.H ℂ) : ↥hyp.H → ℂ) 1 = χ (1 : ↥hyp.H) from rfl,
-        hχdeg, hmχ₀]
+        hχdeg, ← hm₀C]
       push_cast
       ring)
     (by
       have h := hyp.scaled_diff_support_subset_A_of_mem_Sset hχS (hS₁S hχ₀S₁)
-        (n := 1) (m := a) (by rw [hχdeg, hχ₀deg]; push_cast; ring)
+        (n := 1) (m := a / m χ₀)
+        (by rw [hχdeg, hmdeg χ₀ hχ₀S₁, ← hm₀C]; push_cast; ring)
       simpa [one_smul] using h)
     (hyp.tau_mem_ZIrr (Submodule.sub_mem _ (Submodule.subset_span hχS)
       (by
-        change (a • χ₀ : ClassFunction ↥hyp.H ℂ) ∈ _
-        rw [← Nat.cast_smul_eq_nsmul ℤ a χ₀]
+        change ((a / m χ₀) • χ₀ : ClassFunction ↥hyp.H ℂ) ∈ _
+        rw [← Nat.cast_smul_eq_nsmul ℤ (a / m χ₀) χ₀]
         exact Submodule.smul_mem _ _ (Submodule.subset_span (hS₁S hχ₀S₁)))))
     (by
       have hdR : (hyp.d : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+      have hm₀R : (0 : ℝ) < (m χ₀ : ℝ) := by exact_mod_cast hm₀pos
+      -- `(a / m χ₀ : ℕ)` casts to the real quotient (`m χ₀ ∣ a`).
+      have ha' : ((a / m χ₀ : ℕ) : ℝ) = (a : ℝ) / (m χ₀ : ℝ) := by
+        rw [eq_div_iff hm₀R.ne', ← Nat.cast_mul, Nat.div_mul_cancel hdvd]
+      -- the `d`-factors of the degree ratios cancel, leaving `m x / m χ₀`
       have hsum : ∑ x ∈ hS₁fin.toFinset,
           (((hyp.d * m x : ℕ) : ℝ) / ((hyp.d * m χ₀ : ℕ) : ℝ)) ^ 2
-          = ∑ x ∈ hS₁fin.toFinset, ((m x : ℝ)) ^ 2 := by
+          = (∑ x ∈ hS₁fin.toFinset, ((m x : ℝ)) ^ 2) / ((m χ₀ : ℝ)) ^ 2 := by
+        rw [Finset.sum_div]
         refine Finset.sum_congr rfl fun x _ => ?_
-        rw [hmχ₀]
+        rw [← div_pow]
+        congr 1
         push_cast
-        rw [mul_one, mul_div_cancel_left₀ _ hdR]
-      rw [hsum]
-      exact hlt)
+        rw [mul_div_mul_left _ _ hdR]
+      rw [ha', hsum, lt_div_iff₀ (pow_pos hm₀R 2)]
+      calc 2 * ((a : ℝ) / (m χ₀ : ℝ)) * ((m χ₀ : ℝ)) ^ 2
+          = 2 * ((a : ℝ) / (m χ₀ : ℝ) * (m χ₀ : ℝ)) * (m χ₀ : ℝ) := by ring
+        _ = 2 * (a : ℝ) * (m χ₀ : ℝ) := by rw [div_mul_cancel₀ _ hm₀R.ne']
+        _ = 2 * (m χ₀ : ℝ) * (a : ℝ) := by ring
+        _ < _ := hlt)
+
+/-- **The counterexample degree bound** (the reductions' "by Lemma 1(a), there is a
+`ψ` with `∑ χ(1)² ≤ 2dψ(1)`"): if adjoining the fresh conjugate pair `{χ, χ̄}` to a
+coherent, conjugation-closed `S₁ ⊆ 𝒮` containing a degree-`d` anchor *breaks*
+coherence, then Lemma 1(a)'s strict degree inequality must fail:
+`∑_{x ∈ S₁} m(x)² ≤ 2a`, where `x(1) = d·m(x)` and `χ(1) = d·a`.  The
+contrapositive of `coherent_insert_pair_of_two_mul_lt_sum` at the degree-`d`
+anchor (`m(χ₀) = 1`, so both divisibility inputs are trivial and the inequality
+reads `2a < ∑ m(x)²`). -/
+theorem sq_ratio_sum_le_of_adjoin_incoherent [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {S₁ : Set (ClassFunction ↥hyp.H ℂ)} (hS₁S : S₁ ⊆ hyp.Sset) (hS₁fin : S₁.Finite)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁ hyp.A))
+    {χ₀ : ClassFunction ↥hyp.H ℂ} (hχ₀S₁ : χ₀ ∈ S₁)
+    (hχ₀deg : χ₀ (1 : ↥hyp.H) = (hyp.d : ℂ))
+    {χ : ClassFunction ↥hyp.H ℂ} (hχS : χ ∈ hyp.Sset)
+    (hχS₁ : χ ∉ S₁) (hχbarS₁ : χ.conj ∉ S₁)
+    {a : ℕ} (hχdeg : χ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ))
+    (hfail : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (S₁ ∪ {χ, χ.conj}) hyp.A)) :
+    ∃ m : ClassFunction ↥hyp.H ℂ → ℕ,
+      (∀ x ∈ S₁, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (m x : ℂ)) ∧
+      (∑ x ∈ hS₁fin.toFinset, ((m x : ℝ)) ^ 2) ≤ 2 * (a : ℝ) := by
+  classical
+  have hm : ∀ x ∈ S₁, ∃ mx : ℕ, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (mx : ℂ) :=
+    fun x hx => (hyp.exists_apply_one_eq_d_mul (hS₁S hx)).imp fun _ h => h.2
+  choose! m hmdeg using hm
+  refine ⟨m, hmdeg, ?_⟩
+  by_contra hlt
+  push Not at hlt
+  apply hfail
+  have hd0 : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  have hmχ₀ : m χ₀ = 1 := by
+    have h1 := hmdeg χ₀ hχ₀S₁
+    rw [hχ₀deg] at h1
+    have h2 : (hyp.d : ℂ) * 1 = (hyp.d : ℂ) * (m χ₀ : ℂ) := by rw [mul_one]; exact h1
+    have h3 := mul_left_cancel₀ hd0 h2
+    exact_mod_cast h3.symm
+  exact hyp.coherent_insert_pair_of_two_mul_lt_sum hd hQ1odd hS₁S hS₁fin hS₁conj hcoh
+    hχ₀S₁ hmdeg (by rw [hmχ₀]; exact Nat.one_pos)
+    (fun x _ => by rw [hmχ₀]; exact one_dvd _)
+    hχS hχS₁ hχbarS₁ hχdeg (by rw [hmχ₀]; exact one_dvd _)
+    (by rw [hmχ₀]; simpa using hlt)
 
 /-- **The reductions' counterexample extraction** (Peterfalvi's "Suppose `𝒮(…)` is
 not coherent.  By Lemma 1(a), there is a character `ψ` such that
