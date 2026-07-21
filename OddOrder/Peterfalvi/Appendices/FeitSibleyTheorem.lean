@@ -116,6 +116,60 @@ theorem conj_mem_SsetOf_Qder [Finite G] {χ : ClassFunction ↥hyp.H ℂ}
     intro x hxQ'
     rw [ClassFunction.conj_apply, ClassFunction.conj_apply, hkerQ' x hxQ']
 
+/-- **`S ⊴ Q`** (direct-product factor, elementwise form): for `q ∈ Q` and `s' ∈ S`,
+`q s' q⁻¹ ∈ S`.  Writing `q = s·y` (`s ∈ S`, `y ∈ Q₁`), the `Q₁`-part centralises
+`s'`, so `q s' q⁻¹ = s s' s⁻¹ ∈ S`.  Mirror of `Q1_conj_mem_of_mem_Q`. -/
+theorem S_conj_mem_of_mem_Q {q : G} (hq : q ∈ hyp.Q) {x : G} (hx : x ∈ hyp.S) :
+    q * x * q⁻¹ ∈ hyp.S := by
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hq
+  obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hq
+  rw [SetLike.mem_coe] at hs hy
+  subst hsy
+  have hcomm : x * y = y * x := (hyp.S_commutes_Q1 x hx y hy)
+  have hrw : s * y * x * (s * y)⁻¹ = s * x * s⁻¹ := by
+    calc s * y * x * (s * y)⁻¹ = s * (y * x * y⁻¹) * s⁻¹ := by group
+      _ = s * (x * y * y⁻¹) * s⁻¹ := by rw [← hcomm]
+      _ = s * x * s⁻¹ := by group
+  rw [hrw]
+  exact hyp.S.mul_mem (hyp.S.mul_mem hs hx) (hyp.S.inv_mem hs)
+
+/-- Conjugation by `q ∈ Q` fixes `S` as a set (both inclusions of
+`S_conj_mem_of_mem_Q`). -/
+theorem S_map_conj_eq {q : G} (hq : q ∈ hyp.Q) :
+    hyp.S.map (MulAut.conj q).toMonoidHom = hyp.S := by
+  apply le_antisymm
+  · rintro _ ⟨x, hxS, rfl⟩
+    exact hyp.S_conj_mem_of_mem_Q hq hxS
+  · intro x hxS
+    refine ⟨q⁻¹ * x * q, ?_, ?_⟩
+    · have := hyp.S_conj_mem_of_mem_Q (hyp.Q.inv_mem hq) hxS
+      simpa using this
+    · simp [MulAut.conj]
+      group
+
+/-- Conjugation by `h ∈ H` fixes `Q'` as a set (both inclusions of
+`Qder_conj_mem_of_mem_H`). -/
+theorem Qder_map_conj_eq {h : G} (hh : h ∈ hyp.H) :
+    hyp.Qder.map (MulAut.conj h).toMonoidHom = hyp.Qder := by
+  apply le_antisymm
+  · rintro _ ⟨x, hx, rfl⟩
+    exact hyp.Qder_conj_mem_of_mem_H hh hx
+  · intro x hx
+    refine ⟨h⁻¹ * x * h, ?_, ?_⟩
+    · have := hyp.Qder_conj_mem_of_mem_H (hyp.H.inv_mem hh) hx
+      simpa using this
+    · simp [MulAut.conj]
+      group
+
+/-- **`S ⊔ Q' ⊴ Q`** (elementwise): conjugation by `q ∈ Q` fixes both `S`
+(`S_map_conj_eq`) and `Q'` (`Qder_map_conj_eq`), hence their join. -/
+theorem sup_S_Qder_conj_mem_of_mem_Q {q : G} (hq : q ∈ hyp.Q) {x : G}
+    (hx : x ∈ hyp.S ⊔ hyp.Qder) : q * x * q⁻¹ ∈ hyp.S ⊔ hyp.Qder := by
+  have hmap : (hyp.S ⊔ hyp.Qder).map (MulAut.conj q).toMonoidHom = hyp.S ⊔ hyp.Qder := by
+    rw [Subgroup.map_sup, hyp.S_map_conj_eq hq, hyp.Qder_map_conj_eq (hyp.Q_le_H hq)]
+  rw [← hmap]
+  exact ⟨x, hx, rfl⟩
+
 /-! ## `H = Q ⋊ D` counting: `[H : Q] = d` -/
 
 /-- `Q.subgroupOf H` and `D.subgroupOf H` are complements in `↥H` (subtype form of
@@ -309,6 +363,456 @@ theorem apply_one_eq_d_of_mem_SsetOf_Qder [Finite G] {χ : ClassFunction ↥hyp.
     simpa using h
   -- degree formula
   rw [ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, hφ1, mul_one]
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- `𝒮` is a finite set: by Lemma 2(a) it is contained in the image of the finite
+type `Irr(Q)` under `φ ↦ Ind_Q^H φ`. -/
+theorem Sset_finite [Finite G] : hyp.Sset.Finite := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  haveI : Finite (IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H)) :=
+    finite_irreducibleCharacter
+  rw [Sset_eq_induced_of_Q hyp]
+  apply Set.Finite.image
+  have hsub : {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ | IsIrreducibleCharacter φ ∧
+      ¬ ∀ x : ↥(hyp.Q.subgroupOf hyp.H), ((x : ↥hyp.H) : G) ∈ hyp.Q1 → φ x = φ 1}
+      ⊆ Set.range (fun θ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H) =>
+        (θ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)) := fun φ hφ => ⟨⟨φ, hφ.1⟩, rfl⟩
+  exact (Set.finite_range _).subset hsub
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
+/-- **Distinct members of `𝒮` are orthogonal** (they are distinct irreducible
+characters): the `pairwise_orthogonal` input for the §7 coherence hypothesis. -/
+theorem Sset_pairwiseOrthogonal :
+    OddOrder.Peterfalvi.S03.PairwiseOrthogonal hyp.Sset := by
+  intro χ ψ hχ hψ hne
+  have hite := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+    (⟨χ, hχ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ψ, hψ.1⟩ : IrreducibleCharacter ↥hyp.H)
+  rw [if_neg (fun h => hne (congrArg Subtype.val h))] at hite
+  simpa using hite
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **`|𝒮(Q')| ≥ 2` from nonemptiness** (Remark, p. 145): a member `χ₀ ∈ 𝒮(Q')`
+comes with its complex conjugate `χ̄₀ ∈ 𝒮(Q')` (`conj_mem_SsetOf_Qder`), and
+`χ̄₀ ≠ χ₀` because no member of `𝒮` is real (Lemma 2(c),
+`hasNoRealCharacters_Sset`, under `d` and `|Q₁|` odd). -/
+theorem two_le_ncard_SsetOf_Qder [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hne : (hyp.SsetOf hyp.Qder).Nonempty) :
+    2 ≤ (hyp.SsetOf hyp.Qder).ncard := by
+  classical
+  obtain ⟨χ0, hχ0⟩ := hne
+  have hχ0c : χ0.conj ∈ hyp.SsetOf hyp.Qder := hyp.conj_mem_SsetOf_Qder hχ0
+  have hnoreal := hasNoRealCharacters_Sset hyp hd hQ1odd
+  have hne0 : χ0 ≠ χ0.conj := by
+    intro h
+    exact hnoreal (SsetOf_subset hyp hyp.Qder hχ0) h.symm
+  have hfin : (hyp.SsetOf hyp.Qder).Finite :=
+    (hyp.Sset_finite).subset (SsetOf_subset hyp hyp.Qder)
+  calc 2 = ({χ0, χ0.conj} : Set (ClassFunction ↥hyp.H ℂ)).ncard :=
+        (Set.ncard_pair hne0).symm
+    _ ≤ (hyp.SsetOf hyp.Qder).ncard :=
+        Set.ncard_le_ncard (by rintro x (rfl | rfl); exacts [hχ0, hχ0c]) hfin
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+  [Invertible (Nat.card ↥hyp.H : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
+theorem one_notMem_A : (1 : ↥hyp.H) ∉ hyp.A := fun h => h.2 rfl
+
+omit [Fintype G] [Fintype ↥hyp.H] [Invertible (Nat.card G : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
+/-- **Member differences of `𝒮(Q')` are supported on `A = Q^#`**: at `1` both members
+take the common degree `d` (`apply_one_eq_d_of_mem_SsetOf_Qder`), and off `Q` both
+vanish (Lemma 2(a) corollary `apply_eq_zero_of_mem_Sset_of_not_mem_Q`). -/
+theorem diff_support_subset_A_of_mem_SsetOf_Qder [Finite G]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {a b : ClassFunction ↥hyp.H ℂ} (ha : a ∈ hyp.SsetOf hyp.Qder)
+    (hb : b ∈ hyp.SsetOf hyp.Qder) :
+    ((a - b : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  by_contra hxA
+  apply hx
+  rw [ClassFunction.sub_apply]
+  by_cases hx1 : x = 1
+  · subst hx1
+    rw [hyp.apply_one_eq_d_of_mem_SsetOf_Qder ha, hyp.apply_one_eq_d_of_mem_SsetOf_Qder hb,
+      sub_self]
+  · have hxQ : (x : G) ∉ hyp.Q := fun hQ => hxA ⟨hQ, hx1⟩
+    rw [apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp (SsetOf_subset hyp hyp.Qder ha) hxQ,
+      apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp (SsetOf_subset hyp hyp.Qder hb) hxQ,
+      sub_self]
+
+/-- **The Lemma 2(b) isometry on the `A`-supported `𝒮(Q')`-sublattice** — the
+`tau_isometry_diff` field of the §7 hypothesis for `𝒮(Q')`.  An `A`-supported
+member of `ℤ[𝒮(Q')]` lies in `ℤ[𝒮]` (span monotonicity along `𝒮(Q') ⊆ 𝒮`) and
+vanishes at `1` (`1 ∉ A`), so `induction_isometry_on_degree_zero` applies. -/
+theorem tau_inner_eq_of_supported_SsetOf_Qder [Finite G]
+    ⦃φ ψ : ClassFunction ↥hyp.H ℂ⦄
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      (hyp.SsetOf hyp.Qder) hyp.A)
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      (hyp.SsetOf hyp.Qder) hyp.A) :
+    ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ := by
+  have hmono : OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) (hyp.SsetOf hyp.Qder)
+      ≤ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset :=
+    Submodule.span_mono (SsetOf_subset hyp hyp.Qder)
+  have hφ1 : φ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hφ.2 (ClassFunction.mem_support.mpr h0))
+  have hψ1 : ψ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hψ.2 (ClassFunction.mem_support.mpr h0))
+  exact (induction_isometry_on_degree_zero hyp φ ψ (hmono hφ.1) (hmono hψ.1) hφ1 hψ1).1
+
+/-- **The (5.2.d) difference image for a member of `𝒮(Q')`** — the
+`difference_image` field of the §7 hypothesis: `τ(χ − χ̄)` is a signed difference
+`ε·(μ − ν)` of two distinct irreducibles of `G`.  Mirror of
+`dadeCharacterDifferenceImageOfDiff` for `τ = Ind_H^G`: the (1.4) inputs are
+discharged from Lemma 2(b) (`tau_mem_ZIrr`, `tau_apply_one`,
+`tau_inner_eq_of_supported_SsetOf_Qder`) since both keystone differences (`0` and
+`χ̄ − χ`) lie in the `A`-supported `𝒮(Q')`-sublattice, and non-reality is
+Lemma 2(c). -/
+noncomputable def ssetOfQderDifferenceImage [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.SsetOf hyp.Qder) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ := by
+  classical
+  have hχS : χ ∈ hyp.Sset := SsetOf_subset hyp hyp.Qder hχ
+  have hχc : χ.conj ∈ hyp.SsetOf hyp.Qder := hyp.conj_mem_SsetOf_Qder hχ
+  set χb : IrreducibleCharacter ↥hyp.H := ⟨χ, hχS.1⟩ with hχb
+  set fam : Fin 2 → IrreducibleCharacter ↥hyp.H :=
+    OddOrder.Peterfalvi.S07.conjPairFamily (L := ↥hyp.H) χb with hfam
+  have hfam0 : (fam 0 : ClassFunction ↥hyp.H ℂ) = χ := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hfam1 : (fam 1 : ClassFunction ↥hyp.H ℂ) = χ.conj := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hdiff0 : irreducibleCharacterDifference fam 0 = 0 := by
+    simp [irreducibleCharacterDifference]
+  have hdiff1 : irreducibleCharacterDifference fam 1 = χ.conj - χ := by
+    simp only [irreducibleCharacterDifference, hfam1, hfam0]
+  -- both keystone differences lie in the `A`-supported `𝒮(Q')`-sublattice
+  have hmem : ∀ i, irreducibleCharacterDifference fam i
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+        (hyp.SsetOf hyp.Qder) hyp.A := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]
+      exact ⟨Submodule.zero_mem _,
+        fun x hx => absurd (ClassFunction.zero_apply x) (ClassFunction.mem_support.mp hx)⟩
+    · rw [hdiff1]
+      exact ⟨Submodule.sub_mem _ (Submodule.subset_span hχc) (Submodule.subset_span hχ),
+        hyp.diff_support_subset_A_of_mem_SsetOf_Qder hχc hχ⟩
+  refine OddOrder.Peterfalvi.S07.characterDifferenceImageOfIsometry hyp.tau χb
+    ((hasNoRealCharacters_Sset hyp hd hQ1odd) hχS) ?_ ?_ ?_
+  · -- virtual images
+    change ∀ i, isometryDifferenceImage hyp.tau fam i ∈ ZIrr G
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) ∈ ZIrr G
+      rw [hdiff0, map_zero]
+      exact Submodule.zero_mem _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) ∈ ZIrr G
+      rw [hdiff1]
+      exact hyp.tau_mem_ZIrr (Submodule.sub_mem _
+        (Submodule.subset_span (SsetOf_subset hyp hyp.Qder hχc))
+        (Submodule.subset_span hχS))
+  · -- vanish at `1`
+    change ∀ i, isometryDifferenceImage hyp.tau fam i (1 : G) = 0
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) (1 : G) = 0
+      rw [hdiff0, map_zero]
+      exact ClassFunction.zero_apply _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) (1 : G) = 0
+      rw [hdiff1]
+      refine hyp.tau_apply_one ?_
+      rw [ClassFunction.sub_apply, hyp.apply_one_eq_d_of_mem_SsetOf_Qder hχc,
+        hyp.apply_one_eq_d_of_mem_SsetOf_Qder hχ, sub_self]
+  · -- isometry on the keystone differences (uniform via the supported sublattice)
+    intro i j
+    exact hyp.tau_inner_eq_of_supported_SsetOf_Qder (hmem i) (hmem j)
+
+/-- **(5.2.e) orthogonality of the `𝒮(Q')` difference images** — the
+`difference_images_orthogonal` field.  Mirror of `Sset_differenceImages_orthogonal`
+(S14): the pairing of the signed images reduces along the Lemma 2(b) isometry to
+`⟨φ − φ̄, χ − χ̄⟩`, whose four cross terms vanish by pairwise orthogonality. -/
+theorem ssetOfQderDifferenceImages_orthogonal [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {φ χ : ClassFunction ↥hyp.H ℂ} (hφ : φ ∈ hyp.SsetOf hyp.Qder)
+    (hχ : χ ∈ hyp.SsetOf hyp.Qder)
+    (h1 : ClassFunction.inner φ χ = 0) (h2 : ClassFunction.inner φ χ.conj = 0) :
+    (hyp.ssetOfQderDifferenceImage hd hQ1odd hφ).Orthogonal
+      (hyp.ssetOfQderDifferenceImage hd hQ1odd hχ) := by
+  have hφc := hyp.conj_mem_SsetOf_Qder hφ
+  have hχc := hyp.conj_mem_SsetOf_Qder hχ
+  have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
+      ClassFunction.inner ζ ζ = 1 := by
+    intro ζ hζ
+    have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at h
+    simpa using h
+  refine
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+    _ _ ?_
+  rw [← (hyp.ssetOfQderDifferenceImage hd hQ1odd hφ).image_conjugateDifference,
+      ← (hyp.ssetOfQderDifferenceImage hd hQ1odd hχ).image_conjugateDifference]
+  change ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  have hmemφ : (φ - φ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+        (hyp.SsetOf hyp.Qder) hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hφ) (Submodule.subset_span hφc),
+      hyp.diff_support_subset_A_of_mem_SsetOf_Qder hφ hφc⟩
+  have hmemχ : (χ - χ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+        (hyp.SsetOf hyp.Qder) hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hχ) (Submodule.subset_span hχc),
+      hyp.diff_support_subset_A_of_mem_SsetOf_Qder hχ hχc⟩
+  rw [hyp.tau_inner_eq_of_supported_SsetOf_Qder hmemφ hmemχ]
+  have hne1 : φ.conj ≠ χ := by
+    intro heq
+    have hcc : χ.conj = φ := by rw [← heq, ClassFunction.conj_conj]
+    rw [hcc, hself (SsetOf_subset hyp hyp.Qder hφ)] at h2
+    exact one_ne_zero h2
+  have hne2 : φ.conj ≠ χ.conj := by
+    intro heq
+    have hpc : φ = χ := by
+      have h := congrArg ClassFunction.conj heq
+      rwa [ClassFunction.conj_conj, ClassFunction.conj_conj] at h
+    rw [hpc, hself (SsetOf_subset hyp hyp.Qder hχ)] at h1
+    exact one_ne_zero h1
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, h1, h2,
+    hyp.Sset_pairwiseOrthogonal (SsetOf_subset hyp hyp.Qder hφc)
+      (SsetOf_subset hyp hyp.Qder hχ) hne1,
+    hyp.Sset_pairwiseOrthogonal (SsetOf_subset hyp hyp.Qder hφc)
+      (SsetOf_subset hyp hyp.Qder hχc) hne2]
+  ring
+
+/-- **Remark (p. 145): `𝒮(Q')` is coherent** with respect to the Lemma 2(b)
+isometry `τ = Ind_H^G`, given `d` and `|Q₁|` odd and `𝒮(Q') ≠ ∅`.  All members
+have the common degree `d` (`apply_one_eq_d_of_mem_SsetOf_Qder`), so this is
+Lemma 1(b) via the equal-degree §7 producer `coherent_of_constant_degree`, with
+the §7 (5.2) hypothesis assembled from Lemmas 2(b) and 2(c).
+
+The book derives nonemptiness (`|𝒮(Q')| ≥ 2`) from the odd Frobenius group
+`O_{2'}(Q₁) ⋊ D`; here the conjugate pair supplies the second member
+(`two_le_ncard_SsetOf_Qder`) and nonemptiness is an explicit hypothesis,
+discharged at the Theorem's call site from the nontrivial abelianisation of the
+`p`-group `Q₁`. -/
+theorem ssetOf_Qder_coherent [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hne : (hyp.SsetOf hyp.Qder).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsetOf hyp.Qder) hyp.A) := by
+  classical
+  have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
+      ClassFunction.inner ζ ζ = 1 := by
+    intro ζ hζ
+    have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at h
+    simpa using h
+  refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+    { tau := hyp.tau
+      tau_isometry_diff := fun φ ψ hφ hψ =>
+        hyp.tau_inner_eq_of_supported_SsetOf_Qder hφ hψ
+      conjugate_closed := fun χ hχ => hyp.conj_mem_SsetOf_Qder hχ
+      no_real_characters := (hasNoRealCharacters_Sset hyp hd hQ1odd).mono
+        (SsetOf_subset hyp hyp.Qder)
+      pairwise_orthogonal := fun χ ψ hχ hψ hne' =>
+        hyp.Sset_pairwiseOrthogonal (SsetOf_subset hyp hyp.Qder hχ)
+          (SsetOf_subset hyp hyp.Qder hψ) hne'
+      difference_image := fun χ hχ => hyp.ssetOfQderDifferenceImage hd hQ1odd hχ
+      difference_images_orthogonal := fun φ χ hφ hχ h1 h2 =>
+        hyp.ssetOfQderDifferenceImages_orthogonal hd hQ1odd hφ hχ h1 h2 }
+    ((hyp.Sset_finite).subset (SsetOf_subset hyp hyp.Qder))
+    (hyp.two_le_ncard_SsetOf_Qder hd hQ1odd hne)
+    (fun ζ hζ => hself (SsetOf_subset hyp hyp.Qder hζ))
+    (fun a ha b hb => hyp.tau_mem_ZIrr (Submodule.sub_mem _
+      (Submodule.subset_span (SsetOf_subset hyp hyp.Qder ha))
+      (Submodule.subset_span (SsetOf_subset hyp hyp.Qder hb))))
+    (fun a ha b hb => by
+      change a (1 : ↥hyp.H) = b (1 : ↥hyp.H)
+      rw [hyp.apply_one_eq_d_of_mem_SsetOf_Qder ha,
+        hyp.apply_one_eq_d_of_mem_SsetOf_Qder hb])
+    (fun a ha => by
+      change a (1 : ↥hyp.H) ≠ 0
+      rw [hyp.apply_one_eq_d_of_mem_SsetOf_Qder ha]
+      exact Nat.cast_ne_zero.mpr (hyp.d_pos).ne')
+    hyp.one_notMem_A
+    (fun a ha b hb => hyp.diff_support_subset_A_of_mem_SsetOf_Qder ha hb)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥hyp.H : ℂ)] in
+/-- **Induction preserves `Q'`-constancy**: if `φ ∈ CF(Q)` is constant (`= φ(1)`) on
+the `Q'`-part, then `Ind_Q^H φ` is constant on `Q'` (`LeKer`).  Every induction
+term at `x ∈ Q'` evaluates `φ` at an `H`-conjugate of `x`, which stays in
+`Q' ⊆ Q` (`Qder_conj_mem_of_mem_H`), where `φ` takes the value `φ(1)`; so all
+`|H|` terms agree with the corresponding terms at `1`. -/
+theorem leKer_induce_Qder_of_forall [Finite G]
+    {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ}
+    (hconst : ∀ y : ↥(hyp.Q.subgroupOf hyp.H), ((y : ↥hyp.H) : G) ∈ hyp.Qder →
+      φ y = φ 1) :
+    hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) hyp.Qder := by
+  intro x hxQ'
+  have hterm : ∀ g : ↥hyp.H, (g : G) ∈ hyp.Qder → ∀ h : ↥hyp.H,
+      ClassFunction.induceTerm (hyp.Q.subgroupOf hyp.H) φ h g = φ 1 := by
+    intro g hg h
+    have hconjG : ((h⁻¹ * g * h : ↥hyp.H) : G) ∈ hyp.Qder := by
+      have := hyp.Qder_conj_mem_of_mem_H (hyp.H.inv_mem h.2) hg
+      simpa [mul_assoc] using this
+    have hmem : h⁻¹ * g * h ∈ hyp.Q.subgroupOf hyp.H :=
+      Subgroup.mem_subgroupOf.mpr (hyp.Qder_le_Q hconjG)
+    rw [ClassFunction.induceTerm_of_mem φ hmem]
+    exact hconst ⟨h⁻¹ * g * h, hmem⟩ hconjG
+  have h1Q' : ((1 : ↥hyp.H) : G) ∈ hyp.Qder := by
+    simp
+  rw [ClassFunction.induce_apply, ClassFunction.induce_apply]
+  congr 1
+  refine Finset.sum_congr rfl fun h _ => ?_
+  rw [hterm x hxQ' h, hterm 1 h1Q' h]
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **`𝒮(Q')` is nonempty** when `S·Q' ⊊ Q`.  The quotient of `Q` by the normal
+subgroup `S ⊔ Q'` is a nontrivial (abelian) group, so it has a nontrivial
+irreducible character; its inflation `φ ∈ Irr(Q)` has `Q' ⊆ Ker φ` and
+`Q₁ ⊄ Ker φ` — a character trivial on both `S` and `Q₁` is trivial on
+`S·Q₁ = Q` (`characterKernelSubgroup`), contradicting nontriviality — so
+`Ind_Q^H φ ∈ 𝒮(Q')` by Lemma 2(a) and `leKer_induce_Qder_of_forall`.
+
+At the Theorem's call site `Q₁` is a nontrivial `p`-group, whence
+`S·Q' ∩ Q₁ ≤ Q₁'·Φ`-type properness gives `hlt`. -/
+theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
+    (hyp.SsetOf hyp.Qder).Nonempty := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  -- the normal subgroup `N = (S ⊔ Q')` viewed inside `K = ↥(Q.subgroupOf H)`
+  set N : Subgroup ↥(hyp.Q.subgroupOf hyp.H) :=
+    ((hyp.S ⊔ hyp.Qder).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H) with hN
+  have hmemN : ∀ x : ↥(hyp.Q.subgroupOf hyp.H),
+      x ∈ N ↔ (((x : ↥hyp.H)) : G) ∈ hyp.S ⊔ hyp.Qder := by
+    intro x
+    rw [hN, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+  haveI hNnorm : N.Normal := by
+    constructor
+    intro n hn g
+    rw [hmemN] at hn ⊢
+    have hgQ : (((g : ↥hyp.H)) : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp g.2
+    have := hyp.sup_S_Qder_conj_mem_of_mem_Q hgQ hn
+    simpa using this
+  -- the quotient is nontrivial
+  obtain ⟨q0, hq0Q, hq0N⟩ := SetLike.exists_of_lt hlt
+  set k0 : ↥(hyp.Q.subgroupOf hyp.H) :=
+    ⟨⟨q0, hyp.Q_le_H hq0Q⟩, Subgroup.mem_subgroupOf.mpr hq0Q⟩ with hk0
+  haveI : Nontrivial (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := by
+    refine ⟨QuotientGroup.mk k0, 1, fun h => hq0N ?_⟩
+    rw [QuotientGroup.eq_one_iff, hmemN] at h
+    exact h
+  -- a nontrivial irreducible character of the quotient, inflated to `K`
+  haveI : Finite (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Quotient.finite _
+  letI : Fintype (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Fintype.ofFinite _
+  letI : Invertible ((Nat.card (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Nontrivial (ConjClasses (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) := by
+    obtain ⟨b, hb⟩ := exists_ne (1 : ↥(hyp.Q.subgroupOf hyp.H) ⧸ N)
+    exact ⟨ConjClasses.mk b, ConjClasses.mk 1,
+      fun h => hb (isConj_one_right.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h).symm)⟩
+  haveI := finite_irreducibleCharacter (G := ↥(hyp.Q.subgroupOf hyp.H) ⧸ N)
+  haveI : Nontrivial (IrreducibleCharacter (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) :=
+    Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [card_irreducibleCharacter_eq]
+          exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
+  obtain ⟨θb, hθb⟩ :=
+    exists_ne (trivialIrreducibleCharacter (↥(hyp.Q.subgroupOf hyp.H) ⧸ N))
+  set φ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H) := inflate N θb with hφ
+  have hφne : φ ≠ trivialIrreducibleCharacter _ := by
+    rw [hφ, Ne, inflate_eq_trivial_iff]
+    exact hθb
+  -- `N ⊆ Ker φ`
+  have hkerN : ∀ x : ↥(hyp.Q.subgroupOf hyp.H), x ∈ N →
+      (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
+        = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
+    intro x hx
+    have := subset_characterKernel_inflate (N := N) θb hx
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at this
+    simpa [hφ] using this
+  -- degree of `φ` is nonzero
+  have hφ1ne : (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 ≠ 0 := by
+    obtain ⟨n, hnpos, hn, -⟩ := φ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+    rw [hn]
+    exact_mod_cast hnpos.ne'
+  -- `Q₁ ⊄ Ker φ`: otherwise `Ker φ ⊇ S·Q₁ = Q`, forcing `φ` trivial
+  have hnotconst : ¬ ∀ x : ↥(hyp.Q.subgroupOf hyp.H), ((x : ↥hyp.H) : G) ∈ hyp.Q1 →
+      (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
+        = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
+    intro hall
+    set KS := OddOrder.Peterfalvi.S13.characterKernelSubgroup
+      φ.isIrreducible.isCharacter with hKS
+    have hmemKS : ∀ x : ↥(hyp.Q.subgroupOf hyp.H),
+        (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
+          = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 → x ∈ KS := by
+      intro x hx
+      rw [hKS, OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+        OddOrder.Peterfalvi.S03.mem_characterKernel]
+      simpa using hx
+    -- every `k ∈ K` factors as an `S`-part (in `N ⊆ KS`) times a `Q₁`-part (in `KS`)
+    have hK : ∀ k : ↥(hyp.Q.subgroupOf hyp.H), k ∈ KS := by
+      intro k
+      have hkQ : ((k : ↥hyp.H) : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp k.2
+      rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hkQ
+      obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hkQ
+      rw [SetLike.mem_coe] at hs hy
+      set kS : ↥(hyp.Q.subgroupOf hyp.H) :=
+        ⟨⟨s, hyp.S_le_H hs⟩, Subgroup.mem_subgroupOf.mpr (hyp.S_le_Q hs)⟩ with hkS
+      set kY : ↥(hyp.Q.subgroupOf hyp.H) :=
+        ⟨⟨y, hyp.Q1_le_H hy⟩, Subgroup.mem_subgroupOf.mpr (hyp.Q1_le_Q hy)⟩ with hkY
+      have hkeq : k = kS * kY := by
+        apply Subtype.ext
+        apply Subtype.ext
+        simpa [hkS, hkY] using hsy.symm
+      rw [hkeq]
+      refine KS.mul_mem ?_ ?_
+      · exact hmemKS kS (hkerN kS ((hmemN kS).mpr
+          (Subgroup.mem_sup_left hs)))
+      · exact hmemKS kY (hall kY hy)
+    -- so `φ` is the constant `φ(1)`, contradicting `φ ≠ 1` and `φ(1) ≠ 0`
+    have hconst : ∀ k : ↥(hyp.Q.subgroupOf hyp.H),
+        (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) k
+          = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
+      intro k
+      have := hK k
+      rw [hKS, OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+        OddOrder.Peterfalvi.S03.mem_characterKernel] at this
+      simpa using this
+    have hφeq : (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)
+        = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 •
+          (trivialIrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H) :
+            ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) := by
+      ext k
+      rw [ClassFunction.smul_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        trivialClassFunction_apply, mul_one]
+      exact hconst k
+    have hzero := irreducibleCharacter_inner_eq_ite (G := ↥(hyp.Q.subgroupOf hyp.H))
+      φ (trivialIrreducibleCharacter _)
+    rw [if_neg hφne] at hzero
+    rw [hφeq, ClassFunction.inner_smul_left] at hzero
+    have htriv_self := irreducibleCharacter_inner_eq_ite
+      (G := ↥(hyp.Q.subgroupOf hyp.H))
+      (trivialIrreducibleCharacter _) (trivialIrreducibleCharacter _)
+    rw [if_pos rfl] at htriv_self
+    rw [htriv_self, mul_one] at hzero
+    exact hφ1ne hzero
+  -- assemble the member `Ind_Q^H φ ∈ 𝒮(Q')`
+  refine ⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H)
+    (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ), ?_, ?_⟩
+  · -- `∈ 𝒮` via Lemma 2(a)
+    rw [Sset_eq_induced_of_Q hyp]
+    exact ⟨(φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ),
+      ⟨φ.isIrreducible, hnotconst⟩, rfl⟩
+  · -- `Q' ⊆ Ker` via `leKer_induce_Qder_of_forall`
+    refine hyp.leKer_induce_Qder_of_forall fun y hy => ?_
+    exact hkerN y ((hmemN y).mpr (Subgroup.mem_sup_right hy))
 
 end CharacterLayer
 
