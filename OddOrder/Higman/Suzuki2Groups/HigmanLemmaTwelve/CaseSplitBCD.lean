@@ -907,6 +907,98 @@ theorem mixedTerm_lambda_equivariance
   rw [← hL α, ← hR β]
   exact mixedTerm_rep_equivariance hEA hK1 hterm ePhi c nu hconj (fL α) (fR β)
 
+/-! ## Anisotropy of the actual ambient square form -/
+
+/-- **Anisotropy of the actual ambient square form.**  When every solution of
+`x² = 1` lies in `lowerCentralTerm P 1` (all involutions are in `Φ(P)` — the
+Suzuki property), the ambient square form in the `F × F` coordinate vanishes
+only at the origin.  This is the source of Higman's conditions on `ε`
+(`IsTypeBEpsilon` / `IsTypeCEpsilon` / `IsTypeDEpsilon`): "so there would be
+involutions outside `Φ(G)`" (p. 90). -/
+theorem ambientProductSquare_ne_zero
+    {P : Type uP} [Group P] [Finite P]
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1)
+    {α β : GaloisField 2 n} (hne : ¬(α = 0 ∧ β = 0)) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralSquareMapAdditive P hSqamb
+          (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR
+            (α, β))) ≠ 0 := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  intro hzero
+  apply hne
+  have hsqzero : lowerCentralSquareMapAdditive P hSqamb
+      (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR
+        (α, β)) = 0 :=
+    (LinearEquiv.map_eq_zero_iff _).mp hzero
+  have hvzero : ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR
+      (α, β) = 0 := by
+    by_contra hvne
+    exact lowerCentralSquareMapAdditive_ne_zero_of_kernel_one_eq_bot
+      P hSqamb hK1amb hinv _ hvne hsqzero
+  have hpair : ((α, β) : GaloisField 2 n × GaloisField 2 n) = 0 :=
+    (LinearEquiv.map_eq_zero_iff _).mp hvzero
+  exact ⟨congrArg Prod.fst hpair, congrArg Prod.snd hpair⟩
+
+/-- Anisotropy in the decomposed `q_X + q_Y + M` form: for nonzero `a`, `b`,
+`a θ_L(a) + b θ_R(b) + M(a, b) ≠ 0`.  Instantiated with the case-specific
+monomial value of `M`, this is exactly Higman's condition on `ε`. -/
+theorem ambientProductSquare_decomposed_ne_zero
+    {P : Type uP} [Group P] [Finite P]
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1)
+    {a b : GaloisField 2 n} (ha : a ≠ 0) (hb : b ≠ 0) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    a * left.theta a + b * right.theta b +
+      ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralCommutatorBilinear P (left.incl a) (right.incl b))
+      ≠ 0 := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  intro hzero
+  refine ambientProductSquare_ne_zero left right hRnormal hinf hsup hΦR hinv
+    (α := a) (β := b) (fun hcontra => ha hcontra.1) ?_
+  rw [ambientProductSquare_eq left right hRnormal hinf hsup hΦR a b]
+  exact hzero
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
