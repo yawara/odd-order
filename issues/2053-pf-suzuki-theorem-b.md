@@ -90,7 +90,19 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
         W∩N(P) ≤ C(P) の commutator トリック) と
         C_D(P) = C_W(P) × P (`D_inf_centralizer_eq_W_inf_centralizer_join_P`;
         D̄ = fitting ⋊ V̄ の成分分離 + `fitting_eq_one_of_conjAction_fixed`)
-- [ ] (2) C_G(P) の near-field 構造 (Appendix II 接続)
+- [ ] (2) C_G(P) の near-field 構造 (Appendix C 接続)
+  - **設計 (2026-07-21 調査)**: (2)(a) は §3 Prop 1(a) 部品
+    (`centralizerHypothesisA1 (X := P)` : HypothesisA1 C_G(P) Ω_P、
+    CentralizerInduction.lean:246) + kernel N = C_D(C_Q(P)) ∩ C_G(P) の同定。
+    (2)(b) は faithful 商 C_G(P)/N に `RankOneHypothesis` (NearFields.lean:652;
+    (A1)+(A2)+2-rank-1、2-rank-1 は (B1) から) を構成し
+    **`rankOne_affine_nearField` (App C Prop 1) を sorried-cite** して
+    `AffineNearFieldModel` を得る。
+  - ⚠ `rankOne_affine_nearField` は honestly-stated **sorry** (NearFields:741)。
+    未形式化前提 = (i) Huppert III 8.2 (2-rank 1 → Sylow-2 cyclic/quaternion)、
+    (ii) **Brauer–Suzuki** (G = O_{2'}(G)·C_G(u))、(iii) Huppert II 3.2
+    (normal complement)。方針 = sorried-cite で Theorem B の下流を実証明しつつ、
+    Brauer–Suzuki 形式化を独立 campaign として起票 (shared infra、9300 claim)
 - [ ] (3) 素因数の合同条件
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
