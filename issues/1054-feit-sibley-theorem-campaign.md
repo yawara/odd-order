@@ -220,7 +220,39 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     FeitSibleyTheorem.lean に汎用形 (Hypothesis 非依存、Set (ClassFunction L ℂ) レベル)
     で置く — hub 判断で S07_Coherence 側へ移設可。
 
-### 反例中核補題の供給表 (2026-07-21 固定; 次 iteration で実装)
+### 進捗追記 (2026-07-21 後半セッション)
+
+- [x] **反例抽出機構 3 点セット完成** (FeitSibleyTheorem.lean):
+  `exists_conjPair_pairUnion_eq` (:959, 共役対分解 — 強帰納構成) +
+  `exists_first_incoherent_step` (:1048) + `sq_ratio_sum_le_of_adjoin_incoherent`
+  (:1590, 下記供給表の実装) + **`exists_counterexample_of_not_coherent` (:1698,
+  統合形)**: B ⊆ Y ⊆ 𝒮 (B coherent 共役閉, Y 非 coherent) ⟹ ∃ ψ ∈ Y, a > 0, m:
+  ψ(1) = d·a ∧ (∀x∈B, x(1) = d·m(x)) ∧ Σ_B m² ≤ 2a。
+- [x] **(1.1) counting bound** `card_quot_sub_le_of_forall_deg_of_sum_le` (:1315):
+  上の m/a データ + sum_degreeSq_SsetOf_toFinset から |H⧸R| − |H⧸R⊔Q₁| ≤ d²·2a。
+- [x] **(1.2) degree bound** `exists_deg_sq_le_of_mem_SsetOf` (:840): ψ ∈ 𝒮(R),
+  R ≤ D₀ ≤ Q, D₀/R 中心 ⟹ ψ(1) = d·a, a² ≤ [Q-in-H : D₀-in]。
+- [x] **quotient f.p.f. 下界** (FeitSibleyReductions.lean 新 leaf):
+  `mem_of_inv_mul_conj_mem_of_ne_one` / `d_dvd_card_quotient_sub_one_of_le_Q1` /
+  `d_add_one_le_card_quotient_of_le_Q1` (D-不変 section N < W ≤ Q₁ ⟹ |W⧸N| ≥ d+1)。
+- [x] **(1.1) index 算術ブリッジ** (FeitSibleyReductions.lean): `Q1_inf_sup_eq`
+  (Q₁ ⊓ (A'⊔B') = B'; S'Q₂ と SZ の両用) / `card_quot_eq_card_quot_Q1_mul`
+  (|H⧸R| = |Q₁⧸Q₂|·|H⧸RQ₁|) / `d_dvd_card_quot_sup_Q1` /
+  `card_quot_Q1_sub_one_le_of_card_quot_sub_le` (**|Q₁⧸Q₂| − 1 ≤ d·c 抽出**)。
+- [ ] **次: reduction (1) step 補題 assembly の残部品**:
+  1. **(1.2) の中心性入力の供給**: Z/Q₃ := Z(Q₁/Q₃) の引き上げ Z について
+     SZ/S'Q₃ が Q/S'Q₃ の中心に入ること (S-部分は直積性、Q₁-部分は Z の定義)。
+     `exists_deg_sq_le_of_mem_SsetOf` の hcentral 形へ。
+  2. **f.p.f. 2素数下界**: |Q₁| が 2 素因数 ⟹ |Q₁⧸Q₂| ≥ (d+1)² (Sylow 分解で
+     2 つの非自明 D-不変商; d_add_one_le_card_quotient_of_le_Q1 ×2)。
+  3. **|Z⧸Q₂| ≥ d+1**: Q₂ ⊊ Z ≤ Q₁ (chief + 2素数から) に
+     d_add_one_le_card_quotient_of_le_Q1。
+  4. **算術合成**: |Q₁⧸Q₂|−1 ≤ 2da (①(1.1)) + a² ≤ |Q₁⧸Z| (②(1.2)+Q1_inf_sup_eq)
+     + |Q₁⧸Q₂| = |Q₁⧸Z|·|Z⧸Q₂| ⟹ |Z⧸Q₂|(|Q₁⧸Q₂|−2) < 4d² ⟹ (d+1)((d+1)²−2) < 4d²
+     ⟹ d ≤ 2 ⟹ hd1 : 1 < d + hd : Odd d と矛盾。
+  5. step 補題 → chief-factor 帰納 (Q₂ minimal) → (1) 完結。
+
+### 反例中核補題の供給表 (2026-07-21 固定; 実装済 = sq_ratio_sum_le_of_adjoin_incoherent)
 
 `not_hDeg_of_step_incoherent` 案: S₁ ⊆ 𝒮 共役閉・有限、anchor χ₀ ∈ S₁ (χ₀(1) = d)、
 χ ∈ 𝒮, χ ∉ S₁, χ̄ ∉ S₁、hcoh : S₁ coherent、hfail : ¬(S₁ ∪ {χ,χ̄}) coherent ⟹
