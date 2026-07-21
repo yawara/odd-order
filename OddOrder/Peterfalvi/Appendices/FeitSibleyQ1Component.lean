@@ -313,6 +313,122 @@ theorem compHom_q1Proj_apply_of_mem_S
     ClassFunction.compHom hyp.q1Proj θ s = θ 1 := by
   rw [ClassFunction.compHom_apply, hyp.q1Proj_apply_of_mem_S hs]
 
+/-! ## The Part B anchor: `Ind_Q^H (θ ∘ q1Proj) ∈ 𝒳₁` -/
+
+open scoped Classical in
+/-- **The step (3) Part B anchor** (Peterfalvi p. 147, issue 1054): every
+`ψ ∈ 𝒳(R, Z)` yields an anchor `χθ = Ind_Q^H (θ ∘ q1Proj) ∈ 𝒳₁ = 𝒳(S', Z)`
+whose degree `d·θ(1)` divides `ψ(1) = d·(e·θ(1))`.  Here `θ` is the isotypic
+`Q₁`-constituent of the inducing character `φ` of `ψ` (`exists_restrict_eq_nsmul`,
+so `ψ(1) = d·φ(1) = d·e·θ(1)`); `Z ⊄ Ker θ` because otherwise `φ`, hence
+`ψ = Ind φ`, would be constant on `Z` (`leKer_induce_of_forall`); the inflation
+`θ~ = θ ∘ q1Proj` is irreducible (`compHom_of_surjective`) with the `S`-part in
+its kernel, so `Ind θ~ ∈ 𝒮(S')`, and it is nonconstant on `Z` since a constant
+induced character forces a constant inducing character
+(`forall_eq_one_of_leKer`) while `θ~ = θ` on `Z ≤ Q₁`. -/
+theorem exists_anchor_of_mem_XsetOf [Finite G]
+    {R Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZH : ∀ ⦃h : G⦄, h ∈ hyp.H → ∀ ⦃x : G⦄, x ∈ Z → h * x * h⁻¹ ∈ Z)
+    {ψ : ClassFunction ↥hyp.H ℂ} (hψ : ψ ∈ hyp.XsetOf R Z) :
+    ∃ (χθ : ClassFunction ↥hyp.H ℂ) (tθ e : ℕ),
+      χθ ∈ hyp.XsetOf hyp.Sder Z ∧ 0 < tθ ∧ 0 < e ∧
+      χθ (1 : ↥hyp.H) = (hyp.d : ℂ) * (tθ : ℂ) ∧
+      ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * ((e * tθ : ℕ) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  letI : Invertible ((Nat.card G : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible ((Nat.card ↥hyp.H : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible ((Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  obtain ⟨hψS, hψZ⟩ := hψ
+  have hψSset : ψ ∈ hyp.Sset := hψS.1
+  have hψ' := hψSset
+  rw [Sset_eq_induced_of_Q hyp] at hψ'
+  obtain ⟨φ, ⟨hφirr, -⟩, hψeq⟩ := hψ'
+  obtain ⟨θ, e, hθirr, hepos, hres⟩ := hyp.exists_restrict_eq_nsmul hφirr
+  -- evaluation of the isotypic identity on elements and at `1`
+  have hφval : ∀ (z : ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))),
+      φ (z : ↥(hyp.Q.subgroupOf hyp.H)) = (e : ℂ) * θ z := by
+    intro z
+    have h := congrArg (fun (f : ClassFunction
+      ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ) =>
+      (f : _ → ℂ) z) hres
+    simpa using h
+  have hφ1 : φ (1 : ↥(hyp.Q.subgroupOf hyp.H)) = (e : ℂ) * θ 1 := by
+    have h := hφval 1
+    rwa [OneMemClass.coe_one] at h
+  -- `Z ⊄ Ker θ`
+  have hθZ : ¬ ∀ (z : ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))),
+      (((z : ↥(hyp.Q.subgroupOf hyp.H)) : ↥hyp.H) : G) ∈ Z → θ z = θ 1 := by
+    intro hconstθ
+    apply hψZ
+    rw [← hψeq]
+    refine hyp.leKer_induce_of_forall (hZQ1.trans hyp.Q1_le_Q) hZH ?_
+    intro y hy
+    have hyB : y ∈ (hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H) :=
+      Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr (hZQ1 hy))
+    rw [hφval ⟨y, hyB⟩, hconstθ ⟨y, hyB⟩ hy, ← hφ1]
+  push Not at hθZ
+  obtain ⟨z₀, hz₀Z, hz₀ne⟩ := hθZ
+  -- the inflation `θ~` and its evaluation facts
+  set θt : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ :=
+    ClassFunction.compHom hyp.q1Proj θ with hθt
+  have hθtirr : IsIrreducibleCharacter θt :=
+    IsIrreducibleCharacter.compHom_of_surjective hyp.q1Proj_surjective hθirr
+  have hθtval : ∀ (z : ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))),
+      θt (z : ↥(hyp.Q.subgroupOf hyp.H)) = θ z := by
+    intro z
+    rw [hθt, ClassFunction.compHom_apply]
+    exact congrArg θ (Subtype.ext (hyp.q1Proj_apply_coe_of_mem z.2))
+  have hθt1 : θt (1 : ↥(hyp.Q.subgroupOf hyp.H)) = θ 1 := by
+    rw [hθt, ClassFunction.compHom_apply, map_one]
+  -- `χθ = Ind θ~ ∈ 𝒮` (nonconstant on `Q₁` via the `Z`-witness `z₀`)
+  have hχθS : ClassFunction.induce (hyp.Q.subgroupOf hyp.H) θt ∈ hyp.Sset := by
+    rw [Sset_eq_induced_of_Q hyp]
+    refine ⟨θt, ⟨hθtirr, ?_⟩, rfl⟩
+    intro hallconst
+    apply hz₀ne
+    have h1 := hallconst (z₀ : ↥(hyp.Q.subgroupOf hyp.H)) (hZQ1 hz₀Z)
+    rwa [hθtval z₀, hθt1] at h1
+  -- `S' ⊆ Ker χθ`
+  have hχθSder : hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) θt) hyp.Sder := by
+    refine hyp.leKer_induce_of_forall hyp.Sder_le_Q
+      (fun h hh x hx => hyp.Sder_conj_mem_of_mem_H hh hx) ?_
+    intro y hy
+    have hymem : y ∈ (hyp.S.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H) :=
+      Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr (hyp.Sder_le_S hy))
+    have h1 : θt y = θ 1 := by
+      rw [hθt]; exact hyp.compHom_q1Proj_apply_of_mem_S θ hymem
+    rw [h1, hθt1]
+  -- `Z ⊄ Ker χθ`
+  have hχθirr : IsIrreducibleCharacter (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) θt) :=
+    hyp.isIrreducibleCharacter_of_mem_Sset hχθS
+  have hχθZ : ¬ hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) θt) Z := by
+    intro hLK
+    have hconst := hyp.forall_eq_one_of_leKer Z (hZQ1.trans hyp.Q1_le_Q) hθtirr hχθirr hLK
+    apply hz₀ne
+    have hx₀mem : (z₀ : ↥(hyp.Q.subgroupOf hyp.H)) ∈
+        (Z.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H) :=
+      Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr hz₀Z)
+    have h1 : θt (z₀ : ↥(hyp.Q.subgroupOf hyp.H)) = θt 1 := hconst ⟨_, hx₀mem⟩
+    rwa [hθtval z₀, hθt1] at h1
+  -- degrees
+  obtain ⟨tθ, htθpos, htθval⟩ := hθirr.exists_apply_one_eq_pos_natCast
+  have htθval' : θ (1 : ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf
+      (hyp.Q.subgroupOf hyp.H))) = (tθ : ℂ) := htθval
+  have hχθ1 : (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) θt) (1 : ↥hyp.H)
+      = (hyp.d : ℂ) * (tθ : ℂ) := by
+    rw [ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, hθt1, htθval']
+  have hψ1 : ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * ((e * tθ : ℕ) : ℂ) := by
+    rw [← hψeq, ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, hφ1, htθval']
+    push_cast
+    ring
+  exact ⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H) θt, tθ, e,
+    ⟨⟨hχθS, hχθSder⟩, hχθZ⟩, htθpos, hepos, hχθ1, hψ1⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
