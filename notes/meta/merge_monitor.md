@@ -898,6 +898,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 16:30 (tick #11、Fable hub cron `f4304a0e`) — ✅ a + b 合流、census 7 不変、push 済**:
+  **a** = FeitSibley Theorem reduction (1) 完結部品 — final arithmetic + Q₁-internal tower /
+  (1.2) index conversion [Q-in-H : (S⊔Z)-in] = |Q₁/Z| / (1.2) centrality input [SZ,Q] ≤ S'Q₃
+  (direct-product commutator split) / (1.1) index bridges |Q₁/Q₂|−1 ≤ d·c / quotient-level f.p.f.
+  bounds (新 leaf `FeitSibleyReductions.lean` 713 行、a 自身が OddOrder.lean 配線済、issue 1054)。
+  **b** = Higman Theorem (e) 認識半分 — 同型 summands ⟹ type B (新 leaf `SummandIsomorphismBridge` +
+  `TypeBRecognition`) + Pf Suzuki Lemma U invariant two-summand split 一意性 (新 leaf
+  `SplitUniqueness.lean`、AxiomsCheck 追記込、issue 2048)。**c** = 未マージ 0 (transcript 16:29 =
+  生存、E.5 WP5 作業中とみられる)。gate = build **4597 jobs green (29.7s, +4 = 新 leaf 4 本実
+  elaborate 確認)**、AxiomsCheck OK、orphan 0 (881/881)、census 7 不変、新 axiom なし、逸脱なし
+  (a の FeitSibley = 裁定 9204 carve-out)、採番重複なし。push `0b8a0abf6..2d759c635`。
+  レーン生存 3 点 OK。
 - **2026-07-21 15:51 (監視再開 tick #10、Fable hub 新セッション — ユーザー「各レーンを監視します」) — ✅ 未マージ 0 (tick #9 直後)、cron 再作成 (`f4304a0e`, 30 分 `13,43`、interval 未指定 → Fable model default)**:
   前 hub セッション (cron `067d5c59`) は tick #9 完走・push 済のクリーン状態で終了 — 中断復旧なし
   (`.git/MERGE_HEAD` 無し、main = `9e8a5a546` origin 同期・tree clean)。a/b/c とも未マージ 0。
