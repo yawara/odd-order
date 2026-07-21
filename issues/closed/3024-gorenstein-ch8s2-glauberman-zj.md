@@ -122,3 +122,13 @@ elementary 版向けに議論を非自明に adapt するかの**設計判断**�
 - `S7B2_NormalJ_PComplement.lean:1300-1307` — 同じ「Step 4-5 axiom」「Step 8 axiom」表現。
 - `S7B1_NormalJ.lean:1616-1621` + header :22-37 — 「Step 7 の結論を axiomatize する」は stale
   (`omega1ZCenterOpCore_relIndex_inter_A_le` として landed、tracking issue 0036 も closed)。
+
+## ✅ 完了 (2026-07-21, lane c) — Gorenstein Ch.8 §2 完全形式化で close
+
+実施 = issue 9403 (claim): `ThompsonSubgroupAbelian.lean` (J_a + Lem 2.1-2.3 +
+Thm 2.4/2.5/2.6 + Lem 2.8) / `GlaubermanReplacement.lean` (Thm 2.7 core) /
+`GlaubermanZJ.lean` (Thm 2.10 + Thm 2.11 両形)。すべて sorry-free / axiom-clean。
+
+- 規模実測: 3 leaf 合計 ≈ 2,700 行 (見積 2,000-4,000 行に整合)。
+- BG Thm 6.2 discharge (3017) = `S06_Thm62JS.zCenterThompsonJAbelian_sup_oPiCore_normal`。
+- 「付随 — lane a への申し送り」(Ch07 stale docstrings 3 件) は **issue 3029 に独立化**。

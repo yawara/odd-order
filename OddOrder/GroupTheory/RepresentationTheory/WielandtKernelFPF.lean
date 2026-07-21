@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
 import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
 import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
+import OddOrder.GroupTheory.RepresentationTheory.FreeBlockPermutation
 
 /-!
 # Peterfalvi (9.1): the kernel-FPF dimension fact (†) over an algebraically closed field
@@ -20,10 +21,10 @@ The two completed engines it stitches together are:
 
 * `CenterOrbitFree.gamma_free_off_trivial_simple` (3d.3c): `Γ` acts on the simples `Fin N` with a
   unique fixed point `i₀` (the trivial simple) and freely off it;
-* `WielandtCounting.finrank_eq_card_mul_finrank_invariants_of_free`: the Brauer-free free-orbit
-  dimension count, fed the isotypic decomposition `W = ⊕ᵢ range (centerProj φ ρ i)`
-  (`CenterModuleDecomp.isInternal_centerProj`) with the permutation supplied by
-  `CenterProjConjugation.map_range_centerProj` (item 0).
+* `Representation.finrank_eq_card_mul_finrank_invariants_of_freeBlock`: the characteristic-free
+  block-permutation dimension count (norm-map argument, no `⅟|Γ|` needed), fed the isotypic
+  decomposition `W = ⊕ᵢ range (centerProj φ ρ i)` (`CenterModuleDecomp.isInternal_centerProj`)
+  with the permutation supplied by `CenterProjConjugation.map_range_centerProj` (item 0).
 
 ## Main results (growing bottom-up)
 
@@ -292,17 +293,21 @@ variable [FiniteDimensional k W]
 on `U` fixed-point-free (`hfpf`).  Then for any finite-dimensional `k[L]`-module `W` with no
 `U`-invariants (`Wᵁ = 0`), `dim W = |E| · dim Wᴱ`.
 
+No hypothesis relates `char k` and `|E|`: the counting is by the block-permutation norm-map
+argument, valid in every characteristic (this generality is needed by Peterfalvi Part II, Ch. II
+step (3), where `r ≠ p` is a *conclusion*, not an available hypothesis).
+
 Proof: split `W` into its `U`-isotypic components `A i = range (centerProj φ ρᵁ i)` (over a
 splitting
 `φ : Z(k[U]) ≃ (Fin N → k)`); the trivial component `A i₀` is `Wᵁ = 0`, so `W = ⊕_{i ≠ i₀} A i`.
 The
 Frobenius complement `E` permutes the `A i` by `simplesAction φ ∘ ψ` (item 0) and acts **freely**
 off
-`i₀` (item 1, via 3d.3c), so the free-orbit count
-`finrank_eq_card_mul_finrank_invariants_of_free` gives `dim W = |E| · dim Wᴱ`. -/
+`i₀` (item 1, via 3d.3c), so the free block-permutation count
+`finrank_eq_card_mul_finrank_invariants_of_freeBlock` gives `dim W = |E| · dim Wᴱ`. -/
 theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
     (ρ : Representation k L W) {U E : Subgroup L} [U.Normal]
-    [Fintype ↥E] [Invertible (Fintype.card ↥E : k)] [NeZero (Nat.card ↥U : k)]
+    [Fintype ↥E] [NeZero (Nat.card ↥U : k)]
     (_hsup : U ⊔ E = ⊤)
     (hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥U))
     (hEnt : 1 < Nat.card ↥E)
@@ -388,11 +393,10 @@ theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
     refine hi₁free i.val e (hi₁eq ▸ i.2) ?_
     have := congrArg Subtype.val hei
     rwa [hsmul] at this
-  -- Apply the free-orbit dimension count to the nontrivial summands.
-  haveI : Fintype (orbitRel.Quotient ↥E {i : Fin N // i ≠ i₀}) := Fintype.ofFinite _
-  have hcount := finrank_eq_card_mul_finrank_invariants_of_free (ρ.comp E.subtype)
-    hintA' hperm hfree
-  exact hcount
+  -- Apply the free block-permutation count (characteristic-free) to the nontrivial summands.
+  have hcount := Representation.finrank_eq_card_mul_finrank_invariants_of_freeBlock
+    (ρ := ρ) (H := E) hintA' hfree hperm
+  rwa [Nat.card_eq_fintype_card] at hcount
 
 end KernelFPF
 

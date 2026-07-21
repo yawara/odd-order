@@ -103,14 +103,12 @@ theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
         hp'.ne_one (Nat.dvd_one.mp (hcop' ▸ Nat.dvd_gcd h hpH))
       have hpU : ¬ p' ∣ Nat.card ↥act.U := fun h =>
         hpL (h.trans (Subgroup.card_subgroup_dvd_card act.U))
-      have hpE : ¬ p' ∣ Nat.card ↥act.E := fun h =>
-        hpL (h.trans (Subgroup.card_subgroup_dvd_card act.E))
       haveI : Invertible (Fintype.card ↥act.U : ZMod p') := invertibleOfNonzero (by
         rw [← Nat.card_eq_fintype_card]
         intro h; exact hpU ((ZMod.natCast_eq_zero_iff _ p').mp h))
       -- (†) over `𝔽_{p'}` ⟹ the elementary-abelian dimension identity (⋆).
       exact WielandtKernelFPF.wielandtDimIdentity_of_frobenius
-        hsup hcopUE hEnt hfpf hpU hpE hN'.restrict
+        hsup hcopUE hEnt hfpf hpU hN'.restrict
   -- The chief-series assembly: per-factor identity ⟹ group-level Wielandt formula.
   exact wielandt_formula_of_perfactor (wielandtPerFactor_of_dim hdim) H act.φ act.coprime_order.symm
 

@@ -58,3 +58,29 @@ maintainability の改善 (同じ数学が 2〜3 箇所に分岐して将来ず�
 - issue 3022 (closed) — 15.7(e) の形式化本体。
 - Coq `coq/theories/BGsection15.v` `nonTI_Fitting_structure` :947-950 (statement)、
   :1185-1204 ((e2)/(e3) の分岐)。
+
+## ✅ 調査の結果 close (2026-07-21, lane c) — 実質重複は 3022 で解消済み
+
+起票時 (2026-07-19) の意図 = `isTypeI_of_isTypeF` (TypeP1Criteria.lean) /
+`isTypeV_of_isTypeP1_mf_eq_msigma` (TypeVSinger.lean) の非 TI 分岐が
+BG 15.7(e) の論法を「自前再導出」している重複の解消。3022 close
+(`fitting_not_ti_structure_e` が (e1)/(e2)/(e3) 全条項で完成) を受けて実測:
+
+1. **本質的 dedup は 3022 の時点で完了している**。両 consumer の非 TI 分岐は
+   すでに S15 の共有補題群 (`exists_inf_conj_fitting_orderP_witness` /
+   `rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI` /
+   `typeF_nonabelian_cyclic_opiCore_compl` /
+   `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` 等) を cite しており、
+   論法本体の二重管理は無い。残る「重複」は補題を並べる薄い assembly 層のみ。
+2. **TypeVSinger 側は bundled (e) の cite に置換不可**: type V の組み立ては
+   witness の具体形 (`Z = Ω₁(Z(O_p(M_F)))` = Coq `Z0`、`K* = M_σ ⊓ C(K)` との
+   Singer 分岐、`|W₁| ∣ p−1` の dichotomy) を使う。
+   `fitting_not_ti_structure_e` はこれらを existential の内側に隠すため、
+   cite すると必要な等式が取り出せない。
+3. **TypeP1Criteria 側は置換可能だが正味中立**: (e1)→(b), (e2)→(c) の変換に
+   quotient↔complement 橋 (`exponent_quotient_mf_eq_exponent_typeFData_U`) の
+   逆向き rw と (e3) の型排他排除が要り、現在の直接 assembly (~15 行) と
+   同程度の plumbing になる。churn に見合う利得なし。
+
+⟹ **wontfix 相当で close**。将来 (e) の statement 変更があれば assembly 層は
+build エラーで追従を強制されるので、隠れた二重管理リスクも無い。

@@ -47,6 +47,39 @@ open OddOrder.GroupTheory.WielandtCounting (ker_averageMap_comp_invariant
 
 variable {L : Type*} [Group L] [Finite L]
 
+/-- **The kernel-FPF dimension identity (†) over the prime field `𝔽_p`, full-module form.**  For
+`U ◁ L` with `p ∤ |U|`, `E ≤ L` with `U ⊔ E = ⊤`, `|E| ⟂ |U|`, the conjugation action of `E` on `U`
+fixed-point-free, and a finite-dimensional `𝔽_p[L]`-module `V` with no `U`-invariants (`Vᵁ = 0`):
+
+`dim V = |E| · dim Vᴱ`.
+
+No hypothesis relates `p` and `|E|` (the underlying count is characteristic-free).  This is the
+form consumed by Peterfalvi Part II, Ch. II step (3) ([Is] Theorem 15.16 there): `M` a minimal
+`KP`-invariant elementary abelian `r`-subgroup with the Frobenius kernel `K` acting
+fixed-point-freely, so `dim M = |P| · dim C_M(P)` — where `r ≠ |P|` is a *conclusion* of step (3),
+not an available hypothesis.  Proved by base change to `𝔽̄_p`, where
+`finrank_eq_card_mul_finrank_invariants_kernelFPF` applies. -/
+theorem finrank_eq_card_mul_finrank_invariants_kernelFPF_zmod {U E : Subgroup L} [U.Normal]
+    [Fintype ↥E] {p : ℕ} [Fact p.Prime]
+    (hsup : U ⊔ E = ⊤) (hcopUE : Nat.Coprime (Nat.card ↥E) (Nat.card ↥U)) (hEnt : 1 < Nat.card ↥E)
+    (hfpf : ∀ e ∈ E, e ≠ 1 → ∀ u ∈ U, e * u * e⁻¹ = u → u = 1)
+    (hpU : ¬ p ∣ Nat.card ↥U)
+    {V : Type*} [AddCommGroup V] [Module (ZMod p) V] [FiniteDimensional (ZMod p) V]
+    (ρV : Representation (ZMod p) L V)
+    (hVU : invariants (ρV.comp U.subtype) = ⊥) :
+    Module.finrank (ZMod p) V =
+      Fintype.card ↥E * Module.finrank (ZMod p) ↥(invariants (ρV.comp E.subtype)) := by
+  let K := AlgebraicClosure (ZMod p)
+  haveI : NeZero (Nat.card ↥U : K) :=
+    ⟨fun h => hpU ((CharP.cast_eq_zero_iff K p _).mp h)⟩
+  have hbarU : invariants ((baseChangeRepresentation K ρV).comp U.subtype) = ⊥ := by
+    rw [← baseChangeRepresentation_comp]
+    exact invariants_baseChangeRepresentation_eq_bot K (ρV.comp U.subtype) hVU
+  have hkey := finrank_eq_card_mul_finrank_invariants_kernelFPF (baseChangeRepresentation K ρV)
+    (U := U) (E := E) hsup hcopUE hEnt hfpf hbarU
+  rwa [Module.finrank_baseChange, ← baseChangeRepresentation_comp,
+    finrank_invariants_baseChangeRepresentation] at hkey
+
 /-- **Peterfalvi (9.1), the kernel-FPF identity (†) over `𝔽_p`.**  For `U ◁ L` a `p′`-group, `E ≤ L`
 with `U ⊔ E = ⊤`, `|E| ⟂ |U|`, the conjugation action of `E` on `U` fixed-point-free, and a
 finite-dimensional `𝔽_p[L]`-module `V`:
@@ -59,7 +92,7 @@ theorem htag_of_frobenius {U E : Subgroup L} [U.Normal] [Fintype ↥E]
     {p : ℕ} [Fact p.Prime] [Fintype ↥U] [Invertible (Fintype.card ↥U : ZMod p)]
     (hsup : U ⊔ E = ⊤) (hcopUE : Nat.Coprime (Nat.card ↥E) (Nat.card ↥U)) (hEnt : 1 < Nat.card ↥E)
     (hfpf : ∀ e ∈ E, e ≠ 1 → ∀ u ∈ U, e * u * e⁻¹ = u → u = 1)
-    (hpU : ¬ p ∣ Nat.card ↥U) (hpE : ¬ p ∣ Nat.card ↥E)
+    (hpU : ¬ p ∣ Nat.card ↥U)
     {V : Type*} [AddCommGroup V] [Module (ZMod p) V] [Finite V]
     (ρV : Representation (ZMod p) L V) :
     Module.finrank (ZMod p) ↥(LinearMap.ker (averageMap (ρV.comp U.subtype))) =
@@ -91,21 +124,9 @@ theorem htag_of_frobenius {U E : Subgroup L} [U.Normal] [Fintype ↥E]
     have hwV_ker : (w : V) ∈ LinearMap.ker (averageMap (ρV.comp U.subtype)) := hW₀ ▸ w.2
     exact Subtype.ext (eq_zero_of_mem_ker_averageMap_of_mem_invariants
       (ρV.comp U.subtype) hwV_ker hwV_inv)
-  -- Base change to the algebraic closure `K = 𝔽̄_p`.
-  let K := AlgebraicClosure (ZMod p)
-  haveI : Invertible (Fintype.card ↥E : K) := invertibleOfNonzero (by
-    intro h; rw [← Nat.card_eq_fintype_card] at h
-    exact hpE ((CharP.cast_eq_zero_iff K p _).mp h))
-  haveI : NeZero (Nat.card ↥U : K) :=
-    ⟨fun h => hpU ((CharP.cast_eq_zero_iff K p _).mp h)⟩
-  have hbarU : invariants ((baseChangeRepresentation K ρW).comp U.subtype) = ⊥ := by
-    rw [← baseChangeRepresentation_comp]
-    exact invariants_baseChangeRepresentation_eq_bot K (ρW.comp U.subtype) hWUbot
-  -- (†) over `K`, with base change preserving both dimensions.
-  have hkey := finrank_eq_card_mul_finrank_invariants_kernelFPF (baseChangeRepresentation K ρW)
-    (U := U) (E := E) hsup hcopUE hEnt hfpf hbarU
-  rw [Module.finrank_baseChange, ← baseChangeRepresentation_comp,
-    finrank_invariants_baseChangeRepresentation] at hkey
+  -- (†) over `𝔽_p` for the subrepresentation `ρ_W` (base change happens inside).
+  have hkey := finrank_eq_card_mul_finrank_invariants_kernelFPF_zmod
+    hsup hcopUE hEnt hfpf hpU ρW hWUbot
   -- `dim [V,U] = |E| · dim ([V,U]ᴱ)`; identify `[V,U]ᴱ` with `[V,U] ⊓ Vᴱ`.
   have hbridge : (invariants (ρW.comp E.subtype)).map W₀.subtype
       = W₀ ⊓ invariants (ρV.comp E.subtype) := by
@@ -137,10 +158,10 @@ theorem wielandtDimIdentity_of_frobenius {U E : Subgroup L} [U.Normal] [Fintype 
     {p : ℕ} [Fact p.Prime] [Fintype ↥U] [Invertible (Fintype.card ↥U : ZMod p)]
     (hsup : U ⊔ E = ⊤) (hcopUE : Nat.Coprime (Nat.card ↥E) (Nat.card ↥U)) (hEnt : 1 < Nat.card ↥E)
     (hfpf : ∀ e ∈ E, e ≠ 1 → ∀ u ∈ U, e * u * e⁻¹ = u → u = 1)
-    (hpU : ¬ p ∣ Nat.card ↥U) (hpE : ¬ p ∣ Nat.card ↥E)
+    (hpU : ¬ p ∣ Nat.card ↥U)
     {V : Type*} [CommGroup V] [Module (ZMod p) (Additive V)] [Finite V] (φ : L →* MulAut V) :
     WielandtDimIdentity p φ U E :=
   WielandtCounting.finrank_elab_identity (elabRepresentation p φ) U E hsup
-    (htag_of_frobenius hsup hcopUE hEnt hfpf hpU hpE (elabRepresentation p φ))
+    (htag_of_frobenius hsup hcopUE hEnt hfpf hpU (elabRepresentation p φ))
 
 end OddOrder.GroupTheory.WielandtKernelFPF
