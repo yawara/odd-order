@@ -199,4 +199,92 @@ theorem glauberman_replacement_case_one [Finite G] [Group.IsNilpotent G]
   exact replacement_of_elementCommutator hB' hA
     (iterCommutator_le_base A (r - 3) hxR3) hMcomm hnc hMR h3
 
+/-! ### Case 2 (Gorenstein (2.11)-(2.19)) の element 部品
+
+Hall–Witt 恒等式 (mathlib 慣習形, sympy 自由群で検証済) を `(a,b,c) := (u,x,⁅x,v⁆)`
+に適用すると (2.11)-(2.14) が一撃で潰れる: 第 2 因子は内側が `B'` 中心的で 1,
+第 3 因子は共役が落ち, 第 1 因子は `⁅⁅x,u⁆,⁅x,v⁆⁆⁻¹` に等しくなり,
+`⁅⁅x,u⁆,⁅x,v⁆⁆ = ⁅⁅u⁻¹,⁅x,v⁆⁆, x⁆` が出る. -/
+
+/-- **Hall–Witt 恒等式** (mathlib 慣習 `⁅a,b⁆ = aba⁻¹b⁻¹` での形; 自由恒等式). -/
+theorem hall_witt_identity (a b c : G) :
+    (b * ⁅⁅b⁻¹, a⁆, c⁆ * b⁻¹) * (c * ⁅⁅c⁻¹, b⁆, a⁆ * c⁻¹)
+      * (a * ⁅⁅a⁻¹, c⁆, b⁆ * a⁻¹) = 1 := by
+  group
+
+/-- 中心元は右スロットで吸収される (element 形). -/
+theorem commutatorElement_central_right {k y z : G} (hz : ∀ w : G, z * w = w * z) :
+    ⁅k, y * z⁆ = ⁅k, y⁆ := by
+  have h1 : z * k⁻¹ * z⁻¹ = k⁻¹ := by rw [hz k⁻¹]; group
+  calc ⁅k, y * z⁆ = k * y * (z * k⁻¹ * z⁻¹) * y⁻¹ := by group
+    _ = k * y * k⁻¹ * y⁻¹ := by rw [h1]
+    _ = ⁅k, y⁆ := by group
+
+/-- 中心元は左スロットで吸収される (element 形). -/
+theorem commutatorElement_central_left {k y z : G} (hz : ∀ w : G, z * w = w * z) :
+    ⁅k * z, y⁆ = ⁅k, y⁆ := by
+  have h1 : z * y * z⁻¹ = y := by rw [hz y]; group
+  calc ⁅k * z, y⁆ = k * (z * y * z⁻¹) * k⁻¹ * y⁻¹ := by group
+    _ = ⁅k, y⁆ := by rw [h1]; group
+
+/-- **Case 2 Step 1** (Gorenstein (2.11)-(2.14) 相当の一撃形): `B ⊴ G`,
+`B' ≤ Z(G)`, `x ∈ B` のとき `⁅⁅x,u⁆, ⁅x,v⁆⁆ = ⁅⁅u⁻¹, ⁅x,v⁆⁆, x⁆` (`u, v` 任意).
+
+Hall–Witt を `(a,b,c) := (u, x, ⁅x,v⁆)` に適用し, `B'`-中心性で 3 因子を潰す. -/
+theorem commutator_commutator_eq_of_normal {B : Subgroup G} [B.Normal]
+    (hB' : ⁅B, B⁆ ≤ center G) {x : G} (hx : x ∈ B) (u v : G) :
+    ⁅⁅x, u⁆, ⁅x, v⁆⁆ = ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ := by
+  have hBc : ∀ g ∈ (⁅B, B⁆ : Subgroup G), ∀ w : G, g * w = w * g := fun g hg w =>
+    (Subgroup.mem_center_iff.mp (hB' hg) w).symm
+  have hmemB : ∀ y : G, ⁅x, y⁆ ∈ B := by
+    intro y
+    have h1 : y * x⁻¹ * y⁻¹ ∈ B := ‹B.Normal›.conj_mem _ (B.inv_mem hx) y
+    have h2 : x * (y * x⁻¹ * y⁻¹) ∈ B := B.mul_mem hx h1
+    rwa [show x * (y * x⁻¹ * y⁻¹) = ⁅x, y⁆ by group] at h2
+  have hd : ⁅x, v⁆ ∈ B := hmemB v
+  have hc0 : ⁅x, u⁆ ∈ B := hmemB u
+  have hE : ⁅u⁻¹, ⁅x, v⁆⁆ ∈ B := by
+    have h1 : u⁻¹ * ⁅x, v⁆ * u ∈ B := by
+      have h0 := ‹B.Normal›.conj_mem _ hd u⁻¹
+      simpa using h0
+    have h2 : (u⁻¹ * ⁅x, v⁆ * u) * ⁅x, v⁆⁻¹ ∈ B := B.mul_mem h1 (B.inv_mem hd)
+    rwa [show (u⁻¹ * ⁅x, v⁆ * u) * ⁅x, v⁆⁻¹ = ⁅u⁻¹, ⁅x, v⁆⁆ by group] at h2
+  have HW := hall_witt_identity (G := G) u x ⁅x, v⁆
+  -- 第 2 因子 = 1
+  have hf2 : ⁅⁅⁅x, v⁆⁻¹, x⁆, u⁆ = 1 :=
+    commutatorElement_eq_one_iff_commute.mpr
+      (hBc _ (commutator_mem_commutator (B.inv_mem hd) hx) u)
+  -- 第 3 因子: 共役が落ちる
+  have hf3 : u * ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ * u⁻¹ = ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ := by
+    rw [show u * ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ = ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ * u from
+      (hBc _ (commutator_mem_commutator hE hx) u).symm]
+    group
+  -- 第 1 因子 = ⁅⁅x,u⁆,⁅x,v⁆⁆⁻¹
+  have hf1 : x * ⁅⁅x⁻¹, u⁆, ⁅x, v⁆⁆ * x⁻¹ = ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ := by
+    have e1 : x * ⁅⁅x⁻¹, u⁆, ⁅x, v⁆⁆ * x⁻¹
+        = ⁅⁅x, u⁆⁻¹, x * ⁅x, v⁆ * x⁻¹⁆ := by group
+    have e2 : x * ⁅x, v⁆ * x⁻¹ = ⁅x, v⁆ * ⁅⁅x, v⁆⁻¹, x⁆ := by group
+    have e3 : ⁅⁅x, u⁆⁻¹, ⁅x, v⁆ * ⁅⁅x, v⁆⁻¹, x⁆⁆ = ⁅⁅x, u⁆⁻¹, ⁅x, v⁆⁆ :=
+      commutatorElement_central_right
+        (hBc _ (commutator_mem_commutator (B.inv_mem hd) hx))
+    have hzc : ∀ w : G, ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ * w = w * ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ :=
+      hBc _ ((⁅B, B⁆ : Subgroup G).inv_mem (commutator_mem_commutator hc0 hd))
+    have e4 : ⁅⁅x, u⁆⁻¹, ⁅x, v⁆⁆ = ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ := by
+      have h1 : ⁅⁅x, u⁆⁻¹, ⁅x, v⁆⁆
+          = ⁅x, u⁆⁻¹ * ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ * ⁅x, u⁆ := by group
+      rw [h1, mul_assoc, hzc ⁅x, u⁆]
+      group
+    rw [e1, e2, e3, e4]
+  rw [hf2, hf1, hf3] at HW
+  -- HW : ⁅⁅x,u⁆,⁅x,v⁆⁆⁻¹ * (⁅x,v⁆ * 1 * ⁅x,v⁆⁻¹) * ⁅⁅u⁻¹,⁅x,v⁆⁆,x⁆ = 1
+  have h2 : ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ * ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ = 1 := by
+    calc ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ * ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆
+        = ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ * (⁅x, v⁆ * 1 * ⁅x, v⁆⁻¹)
+          * ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ := by group
+      _ = 1 := HW
+  calc ⁅⁅x, u⁆, ⁅x, v⁆⁆
+      = ⁅⁅x, u⁆, ⁅x, v⁆⁆ * (⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ * ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆) := by
+        rw [h2, mul_one]
+    _ = ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ := by group
+
 end Subgroup
