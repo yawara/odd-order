@@ -20,6 +20,8 @@ set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
+open OddOrder.Isaacs.Ch01 (fitting)
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
@@ -102,6 +104,70 @@ theorem card_Q0_inf_centralizer_eq_two :
   have hmodeq : 2 % fc.p = c % fc.p := hcmod
   rw [Nat.mod_eq_of_lt (by omega), Nat.mod_eq_of_lt (by omega)] at hmodeq
   omega
+
+/-- **Peterfalvi Part II, Ch. II, step (1), trivial `K`-fixed points**
+(p. 108): `C_K(P) = 1`.  A `P`-centralized element of `K` maps to a
+`P`-fixed unit of the field model, hence to a unit of the two-element
+fixed subfield, so its image in `D̄` is trivial and it lies in
+`K ∩ W ≤ K ∩ V = 1`. -/
+theorem K_inf_centralizer_eq_bot :
+    fc.toHypothesis.K ⊓ Subgroup.centralizer (fc.P : Set G) = ⊥ := by
+  classical
+  rw [eq_bot_iff]
+  intro k hk
+  obtain ⟨hkK, hkC⟩ := hk
+  rw [Subgroup.mem_bot]
+  have hkD : k ∈ fc.toHypothesis.D := fc.toHypothesis.K_le_D hkK
+  set kbar : fc.toHypothesis.Dbar :=
+    QuotientGroup.mk ⟨k, hkD⟩ with hkbar
+  have hkfit : kbar ∈ fitting fc.toHypothesis.Dbar := by
+    rw [← fc.toHypothesis.Kbar_eq_fitting]
+    exact ⟨⟨k, hkD⟩, hkK, rfl⟩
+  set t : ↥(fitting fc.toHypothesis.Dbar) := ⟨kbar, hkfit⟩ with htdef
+  -- `P` fixes `t` under the conjugation action on the Fitting subgroup
+  have hfixt : ∀ g : ↥fc.P,
+      fc.toHypothesis.fittingConjAction (fc.toVbar g) t = t := by
+    intro g
+    apply Subtype.ext
+    simp only [Hypothesis.fittingConjAction, MonoidHom.comp_apply,
+      Subgroup.normalizerMonoidHom_apply_apply_coe]
+    show ((fc.toVbar g : ↥fc.toHypothesis.Vbar) : fc.toHypothesis.Dbar) *
+        kbar *
+        (((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
+          fc.toHypothesis.Dbar))⁻¹ = kbar
+    rw [toVbar_coe, hkbar, ← QuotientGroup.mk_inv, ← QuotientGroup.mk_mul,
+      ← QuotientGroup.mk_mul]
+    congr 1
+    apply Subtype.ext
+    have hcomm := Subgroup.mem_centralizer_iff.mp hkC (g : G) g.2
+    show (g : G) * k * (g : G)⁻¹ = k
+    calc (g : G) * k * (g : G)⁻¹ = (k * (g : G)) * (g : G)⁻¹ := by
+          rw [← hcomm]
+      _ = k := by group
+  -- consume the adapted field model
+  obtain ⟨F, hField, hFinite, eQ, μ, σhom, hcardF, hσinj, hbridge,
+      hunits, hfixmem⟩ := fc.exists_adapted_field_model
+  letI : Field F := hField
+  letI : Finite F := hFinite
+  have hμfix : ∀ g : ↥fc.P,
+      σhom g ((μ t : Fˣ) : F) = ((μ t : Fˣ) : F) := by
+    intro g
+    have hu := hunits g t
+    rw [hfixt g] at hu
+    have hval := congrArg (fun u : Fˣ => (u : F)) hu
+    rw [fieldRingAutOnUnits_apply_val] at hval
+    exact hval.symm
+  rcases hfixmem _ hμfix with h0 | h1
+  · exact absurd h0 (Units.ne_zero (μ t))
+  · have hμt1 : μ t = 1 := Units.ext h1
+    have ht1 : t = 1 := μ.injective (by rw [hμt1, map_one])
+    have hkbar1 : kbar = 1 := congrArg Subtype.val ht1
+    rw [hkbar, QuotientGroup.eq_one_iff] at hkbar1
+    have hkW : k ∈ fc.toHypothesis.W := hkbar1
+    have hVK : k ∈ fc.toHypothesis.V ⊓ fc.toHypothesis.K :=
+      ⟨fc.toHypothesis.W_le_V hkW, hkK⟩
+    rw [fc.toHypothesis.V_inf_K_eq_bot] at hVK
+    exact Subgroup.mem_bot.mp hVK
 
 end FirstCaseHypothesis
 
