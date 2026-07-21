@@ -167,3 +167,53 @@ theorem e5_exists_suitable_complement ... (K₁ 側仮説 + 15.9 出力仮説) :
     IsCyclic ↥E ∧ IsFrobeniusGroup ↥M ((Msigma M).subgroupOf M) (E.subgroupOf M) ∧
     K₁ ≤ E ∧ E ⊓ N = K₁
 ```
+
+## 2026-07-21 WP2.5 ✅ (commits 7feb5c372 / 1d9243637、全 sorry-free)
+
+- `inf_eq_kappaHall_of_le_cyclic`: E∩N = K₁ collapse (Commute API + mul_normal 分解 +
+  Thm A(4) C_{U₁}(k₀) = ⊥)。
+- `e5_exists_suitable_complement`: Hall 共役 (hall_D/hall_C) で E を K₁ ⊇ に再選択、
+  complement/cyclic/Frobenius を共役輸送 (isFrobeniusGroup_map_equiv + Mσ' conj 不変)。
+- ⟹ **BG Cor 15.9(c) 完全形式化** (初機械化)。
+
+### 次 = WP3 入力の残り導出
+
+1. `hK₁σ'` (K₁ が σ(M)'-群): K₁ ⊓ M_σ = ⊥ 経由 — 冪零 M_σ 内 coprime-order 可換
+   (x ∈ U₁ ⊓ C(k₀) = ⊥ 矛盾、issue 記載済ルート)。|K₁| ≠ p は p ∉ κ(N) から。
+2. Thm A(4) 適用形: `typeP_hall_inf_centralizer_kappaElement_eq_bot` (KappaHallCommutator:856)
+   を N に適用 (IsCyclic ↥K₁ は |K₁| prime から)。inf_eq_kappaHall の hCU₁ 供給元。
+3. (E.31)/(E.32): Thm 12.7(b)(e) を N の esetup で適用 (canonical line A₀ = R₀ = ⟨x⟩)。
+   WP3 setup フィールド (R₀_card/R₁_cyclic/centralizer_eq/A_fixes_R₀/A_regular) の供給源。
+4. WP4 短縮確認済: E.4 対偶 → E ≤ N_G(⟨x⟩) ≤ N → E = E∩N = K₁ → |M/M'| = |E| prime。
+
+## 2026-07-21 WP3 入力ほぼ完備 (commits 65fbe8c49 / 309f148f9 / a6a2117ea / 18227e575)
+
+- `commute_of_orderOf_prime_ne` (generic 冪零 coprime-commute) + `e5_kappaHall_inf_Msigma_eq_bot`
+- `e5_kappaHall_pi_sigma_compl` (hK₁σ' glue)
+- `e5_opiCore_sylow_card` / `e5_exists_sylow_eq_opiCore` (**O_p(M) = Sylow p of G**)
+- `e5_zpowers_eq_canonical_line` (**(E.32) 核**: ⟨x⟩ = A₀、N ≤ N_G(⟨x⟩)、N_σ ≤ C_G(⟨x⟩))
+
+全 sorry-free。**WP3 setup 残り**: (E.31) 後半 — C_{O_p(M)}(x) = R₀ × (R∩E₀) 分解と
+R∩E₀ cyclic (Prop 3.9、regular on N_σ)。これが setup の R₁/centralizer_eq/R₀_disjoint_R₁
+を供給。その後 act (E の conj 作用の MulAut 化)・A := K₁ 像・p_not_dvd_card_B (E は
+σ(M)'-群 + p ∈ σ(M))・A_regular (Frobenius fpf) を束ねて RegularOperatorSetup 構成。
+
+## 2026-07-21 (E.31) ルート確定 (iteration 15 調査)
+
+**BG Thm 12.7 の全 clause 形式化済みと確認** — (d) = `exists_complement_of_canonical_line`
+(S12_Theorem127d.lean:164; E₀ ≤ E, A₀ ⊓ E₀ = ⊥, A₀ ⊔ E₀ = E)。(E.31) の形式化ルート:
+
+1. E₀ := 12.7(d) を N-esetup に適用 (hMnorm = 12.7(b) の N ≤ N_G(A₀)、hprime_eq = 12.7(a))。
+2. **R = A₀ ⊔ (R ⊓ E₀)** (R := O_p(M) ⊓ N = C_{O_p}(x)、A₀ = ⟨x⟩): A₀ ⊴-in-E
+   (E = M∩N ≤ N ≤ N_G(A₀)) → mul_normal で set 積分解 (inf_eq_kappaHall と同型の論法)。
+   disjoint: A₀ ⊓ (R∩E₀) ≤ A₀ ⊓ E₀ = ⊥。
+3. **R∩E₀ regular on N_σ**: y ∈ (R∩E₀)^# の p-冪位数 → order-p 元 y' ∈ ⟨y⟩ ≤ E₀、
+   ⟨y'⟩ ≠ A₀ (E₀ ⊓ A₀ = ⊥) → 12.7(c) 二分律 hdich → C_{N_σ}(⟨y'⟩) = ⊥ → C_{N_σ}(y) = ⊥。
+4. **cyclic**: Prop 3.9 = `isCyclic_of_isPGroup_of_isFrobeniusAction` (S03g_Thm310.lean:55、
+   conj 作用の MulDistribMulAction 化 + IsFrobeniusAction; 適用例 = S12_Theorem1212b.lean:224)。
+   Nontrivial N_σ = Msigma_ne_bot。p odd = |G| odd。
+5. **R₁ ≠ ⊥**: R は N の Sylow p (p-part 一致、p ∉ σ(N)) + pRank N p = 2 (τ₂) →
+   R noncyclic (pRank_eq_of_le_of_not_dvd_index で rank 転送) → R ⊋ A₀。
+
+setup フィールド対応: centralizer_eq = 2 (subgroupOf ↥O_p 化)、R₁_cyclic = 4、
+R₀_disjoint_R₁ = 2、R₁_ne_bot = 5。

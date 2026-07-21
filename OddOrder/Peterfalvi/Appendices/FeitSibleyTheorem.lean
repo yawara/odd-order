@@ -818,4 +818,493 @@ end CharacterLayer
 
 end Hypothesis
 
+/-! ## Degree-square counting for the reduction steps (pp. 146–147)
+
+The reductions (1)–(3) repeatedly use
+`∑_{χ ∈ 𝒮(R)} χ(1)² = |H/R| − |H/R·Q₁|`.  The generic form below (over any finite
+group `K` with two normal subgroups) reduces to the inflation counting of
+`InflationCharacter.lean`. -/
+
+open scoped Classical in
+/-- **Two-kernel degree-square counting**: the squared degrees of the irreducibles
+of `K` whose kernel contains `N` but not `M` sum to `|K⧸N| − |K⧸(N ⊔ M)|`.
+Splitting the `N ⊆ ker` sum (`sumInflatedDegreeSq` = `|K⧸N|`) by the
+`M ⊆ ker` condition, the both-kernels part is the `N ⊔ M ⊆ ker` part
+(the character kernel is a subgroup, `characterKernelSubgroup`), which sums to
+`|K⧸(N ⊔ M)|`. -/
+theorem sum_degreeSq_ker_subset_not_subset
+    {K : Type*} [Group K] [Finite K] [Invertible (Nat.card K : ℂ)]
+    (N M : Subgroup K) [N.Normal] [(N ⊔ M).Normal] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+        (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ) ∧
+        ¬ (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)),
+        ((χ : ClassFunction K ℂ) 1) ^ 2
+      = (Nat.card (K ⧸ N) : ℂ) - (Nat.card (K ⧸ (N ⊔ M)) : ℂ) := by
+  classical
+  letI : Fintype K := Fintype.ofFinite _
+  have hker_iff : ∀ χ : IrreducibleCharacter K,
+      (((N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) ∧
+        ((M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
+      ↔ (((N ⊔ M : Subgroup K) : Set K)
+          ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) := by
+    intro χ
+    have hKSset := OddOrder.Peterfalvi.S13.coe_characterKernelSubgroup
+      χ.isIrreducible.isCharacter
+    constructor
+    · rintro ⟨h1, h2⟩
+      rw [← hKSset] at h1 h2 ⊢
+      have hN : N ≤ OddOrder.Peterfalvi.S13.characterKernelSubgroup
+          χ.isIrreducible.isCharacter := fun x hx => h1 hx
+      have hM : M ≤ OddOrder.Peterfalvi.S13.characterKernelSubgroup
+          χ.isIrreducible.isCharacter := fun x hx => h2 hx
+      exact fun x hx => (sup_le hN hM) hx
+    · intro h
+      exact ⟨Set.Subset.trans (SetLike.coe_subset_coe.mpr le_sup_left) h,
+        Set.Subset.trans (SetLike.coe_subset_coe.mpr le_sup_right) h⟩
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+      (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
+    (fun χ => (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ))
+    (fun χ => ((χ : ClassFunction K ℂ) 1) ^ 2)
+  rw [Finset.filter_filter, Finset.filter_filter] at hsplit
+  have hfilter_sup : (Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+        (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ) ∧
+        (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
+      = Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+        ((N ⊔ M : Subgroup K) : Set K)
+          ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) :=
+    Finset.filter_congr fun χ _ => by
+      constructor
+      · exact fun h => (hker_iff χ).mp (by simpa using h)
+      · exact fun h => by simpa using (hker_iff χ).mpr h
+  rw [hfilter_sup] at hsplit
+  rw [sumInflatedDegreeSq (N := N ⊔ M), sumInflatedDegreeSq (N := N)] at hsplit
+  linear_combination hsplit
+
+namespace Hypothesis
+
+variable (hyp : Hypothesis G)
+
+/-- **`LeKer` is the character-kernel inclusion**: `χ` is constant (`= χ(1)`) on the
+`R`-part of `H` iff `R.subgroupOf H` is contained in `characterKernel χ`. -/
+theorem leKer_iff_subset_characterKernel {R : Subgroup G} {χ : ClassFunction ↥hyp.H ℂ} :
+    hyp.LeKer χ R ↔ ((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+      ⊆ OddOrder.Peterfalvi.S03.characterKernel χ := by
+  constructor
+  · intro h y hy
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel]
+    have hmem : (y : G) ∈ R := Subgroup.mem_subgroupOf.mp hy
+    simpa using h y hmem
+  · intro h x hx
+    have hmem : x ∈ ((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H) :=
+      Subgroup.mem_subgroupOf.mpr hx
+    have := h hmem
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at this
+    simpa using this
+
+/-! ### Fixed-point-free lower bounds (pp. 146–147)
+
+The reductions use `|Z| ≥ d+1` (and, for `|Z|` odd, `|Z| ≥ 2d+1`) for nontrivial
+`D`-invariant subgroups `Z ≤ Q₁`: the conjugation action of `D` on `Z` is free off
+the unique fixed point `1`, so `d ∣ |Z| − 1`. -/
+
+/-- **`d ∣ |Z| − 1`** for a `D`-invariant subgroup `Z ≤ Q₁`: conjugation by `D` acts
+on `Z` with unique fixed point `1` (fixed-point-freeness on `Q₁`) and freely off it
+(trivial stabilizers), so the non-identity elements split into free `D`-orbits
+(`dvd_card_sub_one_of_free_off_unique_fixed`). -/
+theorem d_dvd_card_sub_one_of_le_Q1 [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZinv : ∀ δ ∈ hyp.D, ∀ z ∈ Z, δ * z * δ⁻¹ ∈ Z) :
+    hyp.d ∣ Nat.card ↥Z - 1 := by
+  classical
+  by_cases hd1 : hyp.d = 1
+  · rw [hd1]; exact one_dvd _
+  letI : SMul ↥hyp.D ↥Z :=
+    ⟨fun δ z => ⟨(δ : G) * z * (δ : G)⁻¹, hZinv δ δ.2 z z.2⟩⟩
+  have hsmul_def : ∀ (δ : ↥hyp.D) (z : ↥Z),
+      ((δ • z : ↥Z) : G) = (δ : G) * z * (δ : G)⁻¹ := fun _ _ => rfl
+  letI : MulAction ↥hyp.D ↥Z :=
+    { one_smul := fun z => Subtype.ext (by rw [hsmul_def]; simp)
+      mul_smul := fun δ₁ δ₂ z => Subtype.ext (by
+        rw [hsmul_def, hsmul_def, hsmul_def]
+        simp only [Subgroup.coe_mul]
+        group) }
+  have h1fix : (1 : ↥Z) ∈ MulAction.fixedPoints ↥hyp.D ↥Z := by
+    intro δ
+    exact Subtype.ext (by rw [hsmul_def]; simp)
+  have huniq : ∀ z : ↥Z, z ∈ MulAction.fixedPoints ↥hyp.D ↥Z → z = 1 := by
+    intro z hz
+    haveI : Nontrivial ↥hyp.D := by
+      apply Finite.one_lt_card_iff_nontrivial.mp
+      have hpos : 0 < Nat.card ↥hyp.D := Nat.card_pos
+      have : Nat.card ↥hyp.D ≠ 1 := hd1
+      omega
+    obtain ⟨δ0, hδ0⟩ := exists_ne (1 : ↥hyp.D)
+    have hδ0G : (δ0 : G) ≠ 1 := fun h => hδ0 (Subtype.ext (by simpa using h))
+    have hfix := hz δ0
+    have hfixG : (δ0 : G) * (z : G) * (δ0 : G)⁻¹ = (z : G) := by
+      have := congrArg (fun w : ↥Z => (w : G)) hfix
+      rwa [hsmul_def] at this
+    have hz1 : (z : G) = 1 :=
+      hyp.D_fixedPointFree_on_Q1 (δ0 : G) δ0.2 hδ0G (z : G) (hZQ1 z.2) hfixG
+    exact Subtype.ext hz1
+  have hfree : ∀ z : ↥Z, z ∉ MulAction.fixedPoints ↥hyp.D ↥Z →
+      Nat.card (MulAction.orbit ↥hyp.D z) = Nat.card ↥hyp.D := by
+    intro z hz
+    have hstab : MulAction.stabilizer ↥hyp.D z = ⊥ := by
+      rw [eq_bot_iff]
+      intro δ hδ
+      rw [Subgroup.mem_bot]
+      by_contra hδ1
+      have hδG : (δ : G) ≠ 1 := fun h => hδ1 (Subtype.ext (by simpa using h))
+      have hfixG : (δ : G) * (z : G) * (δ : G)⁻¹ = (z : G) := by
+        have := congrArg (fun w : ↥Z => (w : G)) (MulAction.mem_stabilizer_iff.mp hδ)
+        rwa [hsmul_def] at this
+      have hz1 : (z : G) = 1 :=
+        hyp.D_fixedPointFree_on_Q1 (δ : G) δ.2 hδG (z : G) (hZQ1 z.2) hfixG
+      have hzeq : z = (1 : ↥Z) := Subtype.ext hz1
+      exact hz (by rw [hzeq]; exact h1fix)
+    have hinj : Function.Injective (fun δ : ↥hyp.D => δ • z) := by
+      intro δ₁ δ₂ heq
+      have heq' : δ₁ • z = δ₂ • z := heq
+      have hmem : δ₂⁻¹ * δ₁ ∈ MulAction.stabilizer ↥hyp.D z := by
+        rw [MulAction.mem_stabilizer_iff, mul_smul, heq', ← mul_smul, inv_mul_cancel, one_smul]
+      rw [hstab, Subgroup.mem_bot] at hmem
+      exact (inv_mul_eq_one.mp hmem).symm
+    exact Nat.card_range_of_injective hinj
+  exact OddOrder.GroupTheory.FreeActionOrbitCount.dvd_card_sub_one_of_free_off_unique_fixed
+    (1 : ↥Z) h1fix huniq hfree
+
+/-- **`|Z| ≥ d + 1`** for a nontrivial `D`-invariant `Z ≤ Q₁`
+(`d ∣ |Z| − 1` and `|Z| > 1`). -/
+theorem d_add_one_le_card_of_le_Q1 [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZinv : ∀ δ ∈ hyp.D, ∀ z ∈ Z, δ * z * δ⁻¹ ∈ Z) (hZne : Z ≠ ⊥) :
+    hyp.d + 1 ≤ Nat.card ↥Z := by
+  have hdvd := hyp.d_dvd_card_sub_one_of_le_Q1 hZQ1 hZinv
+  have hlt : 1 < Nat.card ↥Z :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot Z).mpr hZne)
+  obtain ⟨k, hk⟩ := hdvd
+  have hkpos : 0 < k := by
+    rcases Nat.eq_zero_or_pos k with h0 | h
+    · rw [h0, mul_zero] at hk; omega
+    · exact h
+  have hle : hyp.d ≤ hyp.d * k := Nat.le_mul_of_pos_right hyp.d hkpos
+  omega
+
+/-- **`|Z| ≥ 2d + 1`** for a nontrivial `D`-invariant `Z ≤ Q₁` of odd order, `d`
+odd: `|Z| = kd + 1` with `k ≥ 1`, and `k = 1` would make `|Z| = d + 1` even. -/
+theorem two_mul_d_add_one_le_card_of_le_Q1 [Finite G] (hd : Odd hyp.d)
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZinv : ∀ δ ∈ hyp.D, ∀ z ∈ Z, δ * z * δ⁻¹ ∈ Z) (hZne : Z ≠ ⊥)
+    (hZodd : Odd (Nat.card ↥Z)) :
+    2 * hyp.d + 1 ≤ Nat.card ↥Z := by
+  have hdvd := hyp.d_dvd_card_sub_one_of_le_Q1 hZQ1 hZinv
+  have hlt : 1 < Nat.card ↥Z :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot Z).mpr hZne)
+  obtain ⟨k, hk⟩ := hdvd
+  have hcard : Nat.card ↥Z = hyp.d * k + 1 := by omega
+  have hkeven : Even k := by
+    have heven : Even (hyp.d * k) :=
+      Nat.not_odd_iff_even.mp (Nat.odd_add_one.mp (hcard ▸ hZodd))
+    rcases Nat.even_mul.mp heven with h | h
+    · exact absurd h (Nat.not_even_iff_odd.mpr hd)
+    · exact h
+  have hkpos : 0 < k := by
+    rcases Nat.eq_zero_or_pos k with h0 | h
+    · rw [h0, mul_zero] at hk; omega
+    · exact h
+  have hk2 : 2 ≤ k := by
+    rcases hkeven with ⟨m, hm⟩
+    omega
+  have hle : hyp.d * 2 ≤ hyp.d * k := Nat.mul_le_mul_left hyp.d hk2
+  omega
+
+section SsetOfCounting
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Invertible (Nat.card ↥hyp.H : ℂ)]
+
+open scoped Classical in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **The `𝒮(R)` degree-square sum** (the counting input of the reduction steps
+(1)–(3), pp. 146–147): for `R ≤ Q` with `R.subgroupOf H` and
+`(R ⊔ Q₁).subgroupOf H`-side joins normal in `↥H`,
+`∑_{χ ∈ 𝒮(R)} χ(1)² = |H⧸R| − |H⧸(R·Q₁)|` (quotients taken inside `↥H`).
+Membership in `𝒮(R)` is exactly "kernel contains `R` but not `Q₁`"
+(`leKer_iff_subset_characterKernel`), so this is
+`sum_degreeSq_ker_subset_not_subset`. -/
+theorem sum_degreeSq_SsetOf [Finite G] (R : Subgroup G)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter ↥hyp.H =>
+        (χ : ClassFunction ↥hyp.H ℂ) ∈ hyp.SsetOf R),
+        ((χ : ClassFunction ↥hyp.H ℂ) 1) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  have hcongr : ∀ χb : IrreducibleCharacter ↥hyp.H,
+      ((χb : ClassFunction ↥hyp.H ℂ) ∈ hyp.SsetOf R)
+      ↔ (((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ) ∧
+          ¬ ((hyp.Q1.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ)) := by
+    intro χb
+    constructor
+    · rintro ⟨⟨-, hk1⟩, hkR⟩
+      exact ⟨(hyp.leKer_iff_subset_characterKernel).mp hkR,
+        fun h => hk1 ((hyp.leKer_iff_subset_characterKernel).mpr h)⟩
+    · rintro ⟨hR, hQ1⟩
+      exact ⟨⟨χb.isIrreducible,
+        fun hall => hQ1 ((hyp.leKer_iff_subset_characterKernel).mp hall)⟩,
+        (hyp.leKer_iff_subset_characterKernel).mpr hR⟩
+  rw [Finset.filter_congr (fun χb _ => by
+    constructor
+    · exact fun h => by simpa using (hcongr χb).mp (by simpa using h)
+    · exact fun h => by simpa using (hcongr χb).mpr (by simpa using h))]
+  exact sum_degreeSq_ker_subset_not_subset (R.subgroupOf hyp.H) (hyp.Q1.subgroupOf hyp.H)
+
+omit [Fintype G] in
+/-- **Every member of `𝒮` has degree `d·m` with `m ≥ 1`** (Lemma 2(a) + the induced
+degree formula): `χ = Ind_Q^H φ` gives `χ(1) = [H:Q]·φ(1) = d·φ(1)`, and `φ(1)` is
+a positive natural.  This is the `d ∣ χ(1)` divisibility feeding the anchor
+hypothesis of Lemma 1(a) throughout the reduction steps. -/
+theorem exists_apply_one_eq_d_mul [Finite G]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    ∃ m : ℕ, 0 < m ∧ χ (1 : ↥hyp.H) = (hyp.d : ℂ) * (m : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  have hχ' := hχ
+  rw [Sset_eq_induced_of_Q hyp] at hχ'
+  obtain ⟨φ, ⟨hφirr, -⟩, rfl⟩ := hχ'
+  obtain ⟨m, hmpos, hm, -⟩ := hφirr.exists_natDegree_charValue_one_dvd_card
+  refine ⟨m, hmpos, ?_⟩
+  rw [ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, hm]
+
+end SsetOfCounting
+
+/-- **`𝒮(·)` is antitone**: a smaller kernel condition admits more characters,
+`R₁ ≤ R₂ ⟹ 𝒮(R₂) ⊆ 𝒮(R₁)`. -/
+theorem ssetOf_antitone {R₁ R₂ : Subgroup G} (hR : R₁ ≤ R₂) :
+    hyp.SsetOf R₂ ⊆ hyp.SsetOf R₁ := by
+  rintro χ ⟨hχS, hker⟩
+  exact ⟨hχS, fun x hx => hker x (hR hx)⟩
+
+/-- `S'·Q₂ ≤ Q'` for `Q₂ ≤ [Q₁,Q₁]`: both `S' = [S,S]` and `[Q₁,Q₁]` sit inside
+`Q' = [Q,Q]` (commutator monotonicity), so `𝒮(Q') ⊆ 𝒮(S'·Q₂)` — the reduction
+steps' base families contain the degree-`d` anchors of the Remark. -/
+theorem sup_Sder_le_Qder {Q₂ : Subgroup G} (hQ₂ : Q₂ ≤ ⁅hyp.Q1, hyp.Q1⁆) :
+    hyp.Sder ⊔ Q₂ ≤ hyp.Qder := by
+  refine sup_le ?_ (le_trans hQ₂ ?_)
+  · exact Subgroup.commutator_mono hyp.S_le_Q hyp.S_le_Q
+  · exact Subgroup.commutator_mono hyp.Q1_le_Q hyp.Q1_le_Q
+
+/-! ## The §7 hypothesis for the full family `𝒮` (Lemma 1(a) ambient input)
+
+`coherent_adjoin_of_degree_bound` consumes an `S07.Hypothesis` for the *ambient*
+family `𝒮`; the `𝒮(Q')`-level construction above specialises it.  The pieces
+mirror the `𝒮(Q')` versions with the degree-`d` constancy replaced by the general
+`χ(1) = d·m` (real, so conjugate degrees agree). -/
+
+section FullSsetHypothesis
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+  [Invertible (Nat.card ↥hyp.H : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
+/-- **`𝒮` is closed under complex conjugation** (the `Qder`-free form of
+`conj_mem_SsetOf_Qder`). -/
+theorem conj_mem_Sset [Finite G] {χ : ClassFunction ↥hyp.H ℂ}
+    (hχ : χ ∈ hyp.Sset) : χ.conj ∈ hyp.Sset := by
+  obtain ⟨hirr, hker1⟩ := hχ
+  refine ⟨hirr.conj, ?_⟩
+  intro hall
+  apply hker1
+  intro x hxQ1
+  have := hall x hxQ1
+  rw [ClassFunction.conj_apply, ClassFunction.conj_apply] at this
+  exact star_injective this
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **The conjugate difference of a member of `𝒮` is `A`-supported**: at `1` the
+degrees agree (`χ(1) = d·m` is a natural number, hence real and conjugation-fixed),
+and off `Q` both `χ` and `χ̄` vanish. -/
+theorem conj_diff_support_subset_A_of_mem_Sset [Finite G]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    ((χ.conj - χ : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  by_contra hxA
+  apply hx
+  rw [ClassFunction.sub_apply]
+  by_cases hx1 : x = 1
+  · subst hx1
+    obtain ⟨m, -, hm⟩ := hyp.exists_apply_one_eq_d_mul hχ
+    rw [ClassFunction.conj_apply, hm,
+      show ((hyp.d : ℂ) * (m : ℂ)) = ((hyp.d * m : ℕ) : ℂ) by push_cast; ring,
+      star_natCast, sub_self]
+  · have hxQ : (x : G) ∉ hyp.Q := fun hQ => hxA ⟨hQ, hx1⟩
+    have h0 := apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp hχ hxQ
+    rw [ClassFunction.conj_apply, h0, star_zero, sub_zero]
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **The conjugate difference vanishes at `1`** (degrees are conjugation-fixed
+naturals). -/
+theorem conj_diff_apply_one_of_mem_Sset [Finite G]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    (χ.conj - χ : ClassFunction ↥hyp.H ℂ) (1 : ↥hyp.H) = 0 := by
+  obtain ⟨m, -, hm⟩ := hyp.exists_apply_one_eq_d_mul hχ
+  rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hm,
+    show ((hyp.d : ℂ) * (m : ℂ)) = ((hyp.d * m : ℕ) : ℂ) by push_cast; ring,
+    star_natCast, sub_self]
+
+/-- **The Lemma 2(b) isometry on the `A`-supported `𝒮`-sublattice** (the
+`tau_isometry_diff` field of the full-`𝒮` §7 hypothesis; the `𝒮(Q')` version
+specialises via span monotonicity). -/
+theorem tau_inner_eq_of_supported_Sset [Finite G]
+    ⦃φ ψ : ClassFunction ↥hyp.H ℂ⦄
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A)
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A) :
+    ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ := by
+  have hφ1 : φ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hφ.2 (ClassFunction.mem_support.mpr h0))
+  have hψ1 : ψ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hψ.2 (ClassFunction.mem_support.mpr h0))
+  exact (induction_isometry_on_degree_zero hyp φ ψ hφ.1 hψ.1 hφ1 hψ1).1
+
+/-- **The (5.2.d) difference image for a member of `𝒮`** (`Sset`-level mirror of
+`ssetOfQderDifferenceImage`): both keystone differences lie in the `A`-supported
+`𝒮`-sublattice, so the (1.4) inputs come from Lemma 2(b); non-reality is
+Lemma 2(c). -/
+noncomputable def ssetDifferenceImage [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ := by
+  classical
+  have hχc : χ.conj ∈ hyp.Sset := hyp.conj_mem_Sset hχ
+  set χb : IrreducibleCharacter ↥hyp.H := ⟨χ, hχ.1⟩ with hχb
+  set fam : Fin 2 → IrreducibleCharacter ↥hyp.H :=
+    OddOrder.Peterfalvi.S07.conjPairFamily (L := ↥hyp.H) χb with hfam
+  have hfam0 : (fam 0 : ClassFunction ↥hyp.H ℂ) = χ := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hfam1 : (fam 1 : ClassFunction ↥hyp.H ℂ) = χ.conj := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hdiff0 : irreducibleCharacterDifference fam 0 = 0 := by
+    simp [irreducibleCharacterDifference]
+  have hdiff1 : irreducibleCharacterDifference fam 1 = χ.conj - χ := by
+    simp only [irreducibleCharacterDifference, hfam1, hfam0]
+  have hmem : ∀ i, irreducibleCharacterDifference fam i
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]
+      exact ⟨Submodule.zero_mem _,
+        fun x hx => absurd (ClassFunction.zero_apply x) (ClassFunction.mem_support.mp hx)⟩
+    · rw [hdiff1]
+      exact ⟨Submodule.sub_mem _ (Submodule.subset_span hχc) (Submodule.subset_span hχ),
+        hyp.conj_diff_support_subset_A_of_mem_Sset hχ⟩
+  refine OddOrder.Peterfalvi.S07.characterDifferenceImageOfIsometry hyp.tau χb
+    ((hasNoRealCharacters_Sset hyp hd hQ1odd) hχ) ?_ ?_ ?_
+  · change ∀ i, isometryDifferenceImage hyp.tau fam i ∈ ZIrr G
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) ∈ ZIrr G
+      rw [hdiff0, map_zero]
+      exact Submodule.zero_mem _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) ∈ ZIrr G
+      rw [hdiff1]
+      exact hyp.tau_mem_ZIrr (Submodule.sub_mem _
+        (Submodule.subset_span hχc) (Submodule.subset_span hχ))
+  · change ∀ i, isometryDifferenceImage hyp.tau fam i (1 : G) = 0
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) (1 : G) = 0
+      rw [hdiff0, map_zero]
+      exact ClassFunction.zero_apply _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) (1 : G) = 0
+      rw [hdiff1]
+      exact hyp.tau_apply_one (hyp.conj_diff_apply_one_of_mem_Sset hχ)
+  · intro i j
+    exact hyp.tau_inner_eq_of_supported_Sset (hmem i) (hmem j)
+
+/-- **(5.2.e) orthogonality of the `𝒮` difference images** (`Sset`-level mirror of
+`ssetOfQderDifferenceImages_orthogonal`). -/
+theorem ssetDifferenceImages_orthogonal [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {φ χ : ClassFunction ↥hyp.H ℂ} (hφ : φ ∈ hyp.Sset) (hχ : χ ∈ hyp.Sset)
+    (h1 : ClassFunction.inner φ χ = 0) (h2 : ClassFunction.inner φ χ.conj = 0) :
+    (hyp.ssetDifferenceImage hd hQ1odd hφ).Orthogonal
+      (hyp.ssetDifferenceImage hd hQ1odd hχ) := by
+  have hφc := hyp.conj_mem_Sset hφ
+  have hχc := hyp.conj_mem_Sset hχ
+  have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
+      ClassFunction.inner ζ ζ = 1 := by
+    intro ζ hζ
+    have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at h
+    simpa using h
+  refine
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+    _ _ ?_
+  rw [← (hyp.ssetDifferenceImage hd hQ1odd hφ).image_conjugateDifference,
+      ← (hyp.ssetDifferenceImage hd hQ1odd hχ).image_conjugateDifference]
+  change ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  have hmemφ : (φ - φ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hφ) (Submodule.subset_span hφc),
+      fun x hx => hyp.conj_diff_support_subset_A_of_mem_Sset hφ (by
+        rw [ClassFunction.mem_support] at hx ⊢
+        intro h0
+        apply hx
+        rw [show φ - φ.conj = -(φ.conj - φ) by abel, ClassFunction.neg_apply, h0, neg_zero])⟩
+  have hmemχ : (χ - χ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hχ) (Submodule.subset_span hχc),
+      fun x hx => hyp.conj_diff_support_subset_A_of_mem_Sset hχ (by
+        rw [ClassFunction.mem_support] at hx ⊢
+        intro h0
+        apply hx
+        rw [show χ - χ.conj = -(χ.conj - χ) by abel, ClassFunction.neg_apply, h0, neg_zero])⟩
+  rw [hyp.tau_inner_eq_of_supported_Sset hmemφ hmemχ]
+  have hne1 : φ.conj ≠ χ := by
+    intro heq
+    have hcc : χ.conj = φ := by rw [← heq, ClassFunction.conj_conj]
+    rw [hcc, hself hφ] at h2
+    exact one_ne_zero h2
+  have hne2 : φ.conj ≠ χ.conj := by
+    intro heq
+    have hpc : φ = χ := by
+      have h := congrArg ClassFunction.conj heq
+      rwa [ClassFunction.conj_conj, ClassFunction.conj_conj] at h
+    rw [hpc, hself hχ] at h1
+    exact one_ne_zero h1
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, h1, h2,
+    hyp.Sset_pairwiseOrthogonal hφc hχ hne1,
+    hyp.Sset_pairwiseOrthogonal hφc hχc hne2]
+  ring
+
+/-- **The §7 (5.2) hypothesis for the full family `𝒮`** — the ambient input of
+Lemma 1(a) (`coherent_adjoin_of_degree_bound`) throughout the Theorem's proof. -/
+noncomputable def ssetS07Hypothesis [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1)) :
+    OddOrder.Peterfalvi.S07.Hypothesis (L := ↥hyp.H) (G := G) hyp.Sset hyp.A where
+  tau := hyp.tau
+  tau_isometry_diff := fun _ _ hφ hψ => hyp.tau_inner_eq_of_supported_Sset hφ hψ
+  conjugate_closed := fun _ hχ => hyp.conj_mem_Sset hχ
+  no_real_characters := hasNoRealCharacters_Sset hyp hd hQ1odd
+  pairwise_orthogonal := hyp.Sset_pairwiseOrthogonal
+  difference_image := fun _ hχ => hyp.ssetDifferenceImage hd hQ1odd hχ
+  difference_images_orthogonal := fun _ _ hφ hχ h1 h2 =>
+    hyp.ssetDifferenceImages_orthogonal hd hQ1odd hφ hχ h1 h2
+
+end FullSsetHypothesis
+
+end Hypothesis
+
 end OddOrder.Peterfalvi.Appendices.FeitSibley
