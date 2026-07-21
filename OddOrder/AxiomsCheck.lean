@@ -11967,3 +11967,19 @@ issues 3021/9402, 2026-07-21) — ⭐ the corrected proposition is **fully prove
 #assert_only_allowed_axioms OddOrder.BG.AppE.scale_iterCommutator_of_two_step
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
+
+/-! **Peterfalvi Part II, Ch. I §3, Lemma 5 — conjugate summand split and the
+type-B branch** (`Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit` +
+`Peterfalvi.Appendices.Suzuki.TypeBFromW`, issue 2048, 2026-07-21).
+
+* `nonempty_isomorphicOrderQModuleSplit_of_commuting_automorphism` — a nontrivial
+  odd-order automorphism fixing `Z` pointwise, commuting with the `K`-action, with
+  all fixed points of its nontrivial powers inside `Z`, moves any invariant summand
+  of `Q ⧸ Z` and yields an equivariantly isomorphic two-summand split.
+* `isTypeB_Q_of_orderThree_of_mem_W` — the assembled type-B branch of Lemma 5:
+  `|st| = 3`, `Q` a Suzuki 2-group of order `q³`, and `1 ≠ w ∈ W` force `Q` to be
+  of type B via the Appendix III recognition theorem. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.nonempty_isomorphicOrderQModuleSplit_of_commuting_automorphism
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isTypeB_Q_of_orderThree_of_mem_W
