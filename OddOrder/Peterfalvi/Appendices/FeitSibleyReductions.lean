@@ -316,6 +316,147 @@ theorem d_add_one_le_card_quotient_of_le_Q1 [Finite G] {N W : Subgroup G}
   have hle : hyp.d ≤ hyp.d * k := Nat.le_mul_of_pos_right hyp.d hkpos
   omega
 
+/-! ## Index arithmetic for the counting bound (1.1)
+
+The reductions read the two-quotient difference of
+`card_quot_sub_le_of_forall_deg_of_sum_le` as
+`|H⧸S'Q₂| − |H⧸S'Q₁| = d·|S⧸S'|·(|Q₁⧸Q₂| − 1)` and drop `|S⧸S'| ≥ 1`.  The
+bridges: `Q₁ ∩ S'Q₂ = Q₂` (direct-product intersection), the index tower
+`|H⧸R| = |Q₁⧸(Q₁ ∩ R)|·|H⧸RQ₁|` (second isomorphism at the `relIndex` level),
+and `d ∣ |H⧸RQ₁|` (`RQ₁ ≤ Q`, `[H:Q] = d`). -/
+
+/-- **Direct-product intersection**: `Q₁ ⊓ (A' ⊔ B') = B'` for `A' ≤ S`,
+`B' ≤ Q₁`.  Since `A'` centralises `Q₁ ⊇ B'` (`S_commutes_Q1`), the join is the
+set product `A'·B'`, and the `A'`-part of a member of `Q₁` lands in
+`S ⊓ Q₁ = 1`.  Instantiated at `R = S'⊔Q₂` (reduction (1)) and `SZ` (the (1.2)
+index `|Q⧸SZ| = |Q₁⧸Z|`). -/
+theorem Q1_inf_sup_eq {A' B' : Subgroup G} (hA' : A' ≤ hyp.S) (hB' : B' ≤ hyp.Q1) :
+    hyp.Q1 ⊓ (A' ⊔ B') = B' := by
+  refine le_antisymm ?_ (le_inf hB' le_sup_right)
+  rintro x ⟨hxQ1, hxsup⟩
+  have hnorm : A' ≤ Subgroup.normalizer (B' : Set G) := by
+    intro s hs
+    rw [Subgroup.mem_normalizer_iff]
+    intro q
+    constructor
+    · intro hq
+      have hc : s * q = q * s := hyp.S_commutes_Q1 s (hA' hs) q (hB' hq)
+      have hfix : s * q * s⁻¹ = q := by rw [hc]; group
+      rw [hfix]
+      exact hq
+    · intro hq
+      have hc : s⁻¹ * (s * q * s⁻¹) = (s * q * s⁻¹) * s⁻¹ :=
+        hyp.S_commutes_Q1 s⁻¹ (hyp.S.inv_mem (hA' hs)) _ (hB' hq)
+      have hq' : q = s * q * s⁻¹ := by
+        calc q = s⁻¹ * (s * q * s⁻¹) * s := by group
+          _ = (s * q * s⁻¹) * s⁻¹ * s := by rw [hc]
+          _ = s * q * s⁻¹ := by group
+      rw [hq']
+      exact hq
+  have hxmul : x ∈ (A' : Set G) * (B' : Set G) := by
+    rw [← Subgroup.coe_mul_of_left_le_normalizer_right A' B' hnorm]
+    exact hxsup
+  obtain ⟨s, hs, q, hq, heq⟩ := hxmul
+  have hsQ1 : s ∈ hyp.Q1 := by
+    have hseq : s = x * q⁻¹ := by rw [← heq]; group
+    rw [hseq]
+    exact hyp.Q1.mul_mem hxQ1 (hyp.Q1.inv_mem (hB' hq))
+  have hs1 : s = 1 := by
+    have hmem : s ∈ hyp.S ⊓ hyp.Q1 := ⟨hA' hs, hsQ1⟩
+    rwa [hyp.S_inf_Q1_eq_bot, Subgroup.mem_bot] at hmem
+  have hxq : x = q := by rw [← heq, hs1]; simp
+  rw [hxq]
+  exact hq
+
+/-- **The index tower** `|H⧸R| = |Q₁⧸Q₂|·|H⧸RQ₁|` for `R ⊴ H` (in-`H` form)
+with `Q₁ ⊓ R = Q₂`: `relIndex` multiplicativity along `R ≤ RQ₁ ≤ H` plus the
+second isomorphism `R.relIndex (R ⊔ Q₁) = (R ⊓ Q₁).relIndex Q₁`
+(`relIndex_sup_left`/`inf_relIndex_right`). -/
+theorem card_quot_eq_card_quot_Q1_mul [Finite G] {R Q₂ : Subgroup G}
+    (hinf : hyp.Q1 ⊓ R = Q₂)
+    [(R.subgroupOf hyp.H).Normal] :
+    Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H)
+      = Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1)
+        * Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) := by
+  classical
+  have hNK : (R.subgroupOf hyp.H) ⊓ (hyp.Q1.subgroupOf hyp.H)
+      = Q₂.subgroupOf hyp.H := by
+    ext y
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, ← hinf]
+    exact and_comm
+  have h2 : (R.subgroupOf hyp.H).relIndex
+        ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))
+      = Q₂.relIndex hyp.Q1 := by
+    rw [Subgroup.relIndex_sup_left, ← Subgroup.inf_relIndex_right, hNK,
+      Subgroup.relIndex_subgroupOf (hyp.Q1_le_Q.trans hyp.Q_le_H)]
+  have h3 : Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1) = Q₂.relIndex hyp.Q1 :=
+    (Subgroup.index_eq_card _).symm
+  calc Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H)
+      = (R.subgroupOf hyp.H).index := (Subgroup.index_eq_card _).symm
+    _ = (R.subgroupOf hyp.H).relIndex
+          ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))
+        * ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)).index :=
+        (Subgroup.relIndex_mul_index le_sup_left).symm
+    _ = Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1)
+        * Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) := by
+        rw [h2, ← h3, Subgroup.index_eq_card]
+
+/-- **`d` divides `|H⧸RQ₁|`** for `R ≤ Q`: `RQ₁ ≤ Q`, so `[H:Q] = d`
+(`index_Q_subgroupOf_eq_d`) divides `[H : RQ₁]`. -/
+theorem d_dvd_card_quot_sup_Q1 [Finite G] {R : Subgroup G} (hRQ : R ≤ hyp.Q) :
+    hyp.d ∣ Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) := by
+  have hle : (R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)
+      ≤ hyp.Q.subgroupOf hyp.H := by
+    refine sup_le ?_ ?_
+    · intro y hy
+      rw [Subgroup.mem_subgroupOf] at hy ⊢
+      exact hRQ hy
+    · intro y hy
+      rw [Subgroup.mem_subgroupOf] at hy ⊢
+      exact hyp.Q1_le_Q hy
+  have hdvd := Subgroup.index_dvd_of_le hle
+  rw [hyp.index_Q_subgroupOf_eq_d] at hdvd
+  rwa [Subgroup.index_eq_card] at hdvd
+
+/-- **The (1.1) quotient extraction**: from the counting bound
+`|H⧸R| − |H⧸RQ₁| ≤ d²·c` (the output of
+`card_quot_sub_le_of_forall_deg_of_sum_le` at `c = 2a`), the `Q₁`-side factor
+obeys `|Q₁⧸Q₂| − 1 ≤ d·c`: the difference is `|H⧸RQ₁|·(|Q₁⧸Q₂| − 1)` with
+`|H⧸RQ₁| ≥ d`.  This is Peterfalvi's "`|Q₁/Q₂| − 1 ≤ 2ψ(1)/d` (drop
+`|S/S'| ≥ 1`)" on p. 146. -/
+theorem card_quot_Q1_sub_one_le_of_card_quot_sub_le [Finite G] {R Q₂ : Subgroup G}
+    (hRQ : R ≤ hyp.Q) (hinf : hyp.Q1 ⊓ R = Q₂)
+    [(R.subgroupOf hyp.H).Normal]
+    {c : ℝ}
+    (hcount : (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℝ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℝ)
+      ≤ (hyp.d : ℝ) ^ 2 * c) :
+    (Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1) : ℝ) - 1 ≤ (hyp.d : ℝ) * c := by
+  classical
+  set q : ℕ := Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1) with hq_def
+  set M : ℕ := Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)))
+    with hM_def
+  have hbridge := hyp.card_quot_eq_card_quot_Q1_mul (Q₂ := Q₂) hinf
+  have hkey : (M : ℝ) * ((q : ℝ) - 1) ≤ (hyp.d : ℝ) ^ 2 * c := by
+    rw [hbridge, ← hq_def, ← hM_def] at hcount
+    push_cast at hcount
+    nlinarith [hcount]
+  have hq1 : 1 ≤ (q : ℝ) := by
+    have : 0 < q := Nat.card_pos
+    exact_mod_cast this
+  have hMd : (hyp.d : ℝ) ≤ (M : ℝ) := by
+    have hdvd := hyp.d_dvd_card_quot_sup_Q1 hRQ
+    have : hyp.d ≤ M := Nat.le_of_dvd Nat.card_pos hdvd
+    exact_mod_cast this
+  have hstep : (hyp.d : ℝ) * ((q : ℝ) - 1) ≤ (hyp.d : ℝ) * ((hyp.d : ℝ) * c) := by
+    calc (hyp.d : ℝ) * ((q : ℝ) - 1)
+        ≤ (M : ℝ) * ((q : ℝ) - 1) :=
+          mul_le_mul_of_nonneg_right hMd (by linarith)
+      _ ≤ (hyp.d : ℝ) ^ 2 * c := hkey
+      _ = (hyp.d : ℝ) * ((hyp.d : ℝ) * c) := by ring
+  have hd_pos : (0 : ℝ) < (hyp.d : ℝ) := by exact_mod_cast hyp.d_pos
+  exact le_of_mul_le_mul_left hstep hd_pos
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
