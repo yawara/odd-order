@@ -342,22 +342,13 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   Clifford 単一軌道 + Q-共役自明) / q1Proj + surjective / restrict_compHom_q1Proj
   (Res θ~ = θ) / compHom_q1Proj_apply_of_mem_S (S-part kernel)。
   既約性は IsIrreducibleCharacter.compHom_of_surjective 合成。
-- [ ] **次 = Part B 本体** (この順):
-  1. **anchor 構成パッケージ** (Q1Component leaf に追加):
-     `exists_anchor_of_mem_XsetOf`: ψ ∈ XsetOf R Z (R ≤ S′, Z ≤ Z(Q₁) ≤ Q₁,
-     Z ≠ ⊥) ⟹ ∃ χθ ∈ XsetOf Sder Z, ∃ tθ e : ℕ, χθ(1) = d·tθ ∧ 0 < e ∧
-     ψ(1) = d·(e·tθ)。構成: ψ = Ind φ (Sset_eq_induced_of_Q) → Res_{Q₁}φ = e·θ
-     (exists_restrict_eq_nsmul) → θ~ = compHom q1Proj θ → χθ := Ind θ~。
-     必要中間部品: (i) Q₁ ⊄ ker θ~ (Z ⊄ ker θ から; Z ⊆ Q₁ 上 θ~ = θ)、
-     (ii) Ind θ~ ∈ 𝒮 (2(a) 逆方向 = Sset_eq_induced_of_Q の ⊇)、
-     (iii) S′ ⊆ ker(Ind θ~) (S-part kernel の Ind 転送 — leKer_induce 系の一般化)、
-     (iv) Z ⊄ ker(Ind θ~) (Res-Ind で θ 成分が Z 上非自明に残る)、
-     (v) Z ⊄ ker θ の supply: ψ ∈ XsetOf ⟹ Z ⊄ ker ψ ⟹ Z ⊄ ker φ (Ind kernel)
-     ⟹ Z ⊄ ker θ (isotypic: Res φ = e·θ で Z ⊆ Q₁)。
-     (iv) が最難所の見込み — Ind_Q^H の Z 上の値 (Z ⊆ Z(Q₁), Z ⊴ H) は
-     Res_Z Ind θ~ = d·e'·(θ の Z-成分) 型の Mackey/central 評価。
-     代替ルート: ker(Ind θ~) ∩ Q = ker θ~ の H-core... まず既存 LeKer API
-     (leKer_induce_Qder_of_forall の逆向き・characterKernel_induce 系) を grep。
+- [x] **Part B 本体 1: anchor 構成パッケージ完成** (a404d0fbe, sorry-free):
+  `exists_anchor_of_mem_XsetOf` (Q1Component leaf): ψ ∈ XsetOf R Z (Z ≤ Q₁,
+  Z の H-共役不変性を要素形で) ⟹ ∃ χθ ∈ XsetOf Sder Z, tθ e > 0:
+  χθ(1) = d·tθ ∧ ψ(1) = d·(e·tθ)。懸念だった (iv) Z ⊄ ker(Ind θ~) は
+  **forall_eq_one_of_leKer (R = Z) の対偶で閉じた — Mackey 評価不要**。
+  支持: leKer_induce_of_forall (R-一般順方向転送、FeitSibleyTheorem)。
+- [ ] **次 = Part B 本体 2〜5** (この順):
   2. **(1.2) 型 ψ bound**: exists_deg_sq_le_of_mem_SsetOf (R = S₂ 側, D₀ = S₁⊔Z,
      中心性 = S₁/S₂ ⊆ Z(S/S₂) chief + Z ⊆ Z(Q₁) + 直積可換の合成 —
      commutator_mem_of_central_pair (ReductionTwo) 流用) → a² ≤ |S⧸S₁|·|Q₁⧸Z|。

@@ -652,33 +652,46 @@ theorem ssetOf_Qder_coherent [Finite G] (hd : Odd hyp.d)
     (fun a ha b hb => hyp.diff_support_subset_A_of_mem_SsetOf_Qder ha hb)
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥hyp.H : ℂ)] in
-/-- **Induction preserves `Q'`-constancy**: if `φ ∈ CF(Q)` is constant (`= φ(1)`) on
-the `Q'`-part, then `Ind_Q^H φ` is constant on `Q'` (`LeKer`).  Every induction
-term at `x ∈ Q'` evaluates `φ` at an `H`-conjugate of `x`, which stays in
-`Q' ⊆ Q` (`Qder_conj_mem_of_mem_H`), where `φ` takes the value `φ(1)`; so all
-`|H|` terms agree with the corresponding terms at `1`. -/
+/-- **Induction preserves `R`-constancy** (general `R ≤ Q`, `H`-conjugation-invariant):
+if `φ ∈ CF(Q)` is constant (`= φ(1)`) on the `R`-part, then `Ind_Q^H φ` is constant
+on `R` (`LeKer`).  Every induction term at `x ∈ R` evaluates `φ` at an `H`-conjugate
+of `x`, which stays in `R ⊆ Q` (`hRconj`), where `φ` takes the value `φ(1)`; so all
+`|H|` terms agree with the corresponding terms at `1`.  Consumed at `R = Q'`
+(`leKer_induce_Qder_of_forall`), and at `R = S'` and `R = Z` by the step (3) Part B
+anchor construction (issue 1054). -/
+theorem leKer_induce_of_forall [Finite G] {R : Subgroup G} (hRQ : R ≤ hyp.Q)
+    (hRconj : ∀ ⦃h : G⦄, h ∈ hyp.H → ∀ ⦃x : G⦄, x ∈ R → h * x * h⁻¹ ∈ R)
+    {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ}
+    (hconst : ∀ y : ↥(hyp.Q.subgroupOf hyp.H), ((y : ↥hyp.H) : G) ∈ R →
+      φ y = φ 1) :
+    hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) R := by
+  intro x hxR
+  have hterm : ∀ g : ↥hyp.H, (g : G) ∈ R → ∀ h : ↥hyp.H,
+      ClassFunction.induceTerm (hyp.Q.subgroupOf hyp.H) φ h g = φ 1 := by
+    intro g hg h
+    have hconjG : ((h⁻¹ * g * h : ↥hyp.H) : G) ∈ R := by
+      have := hRconj (hyp.H.inv_mem h.2) hg
+      simpa [mul_assoc] using this
+    have hmem : h⁻¹ * g * h ∈ hyp.Q.subgroupOf hyp.H :=
+      Subgroup.mem_subgroupOf.mpr (hRQ hconjG)
+    rw [ClassFunction.induceTerm_of_mem φ hmem]
+    exact hconst ⟨h⁻¹ * g * h, hmem⟩ hconjG
+  have h1R : ((1 : ↥hyp.H) : G) ∈ R := by simp
+  rw [ClassFunction.induce_apply, ClassFunction.induce_apply]
+  congr 1
+  refine Finset.sum_congr rfl fun h _ => ?_
+  rw [hterm x hxR h, hterm 1 h1R h]
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥hyp.H : ℂ)] in
+/-- **Induction preserves `Q'`-constancy**: `leKer_induce_of_forall` at `R = Q'`
+(`H`-conjugation invariance from `Qder_conj_mem_of_mem_H`). -/
 theorem leKer_induce_Qder_of_forall [Finite G]
     {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ}
     (hconst : ∀ y : ↥(hyp.Q.subgroupOf hyp.H), ((y : ↥hyp.H) : G) ∈ hyp.Qder →
       φ y = φ 1) :
-    hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) hyp.Qder := by
-  intro x hxQ'
-  have hterm : ∀ g : ↥hyp.H, (g : G) ∈ hyp.Qder → ∀ h : ↥hyp.H,
-      ClassFunction.induceTerm (hyp.Q.subgroupOf hyp.H) φ h g = φ 1 := by
-    intro g hg h
-    have hconjG : ((h⁻¹ * g * h : ↥hyp.H) : G) ∈ hyp.Qder := by
-      have := hyp.Qder_conj_mem_of_mem_H (hyp.H.inv_mem h.2) hg
-      simpa [mul_assoc] using this
-    have hmem : h⁻¹ * g * h ∈ hyp.Q.subgroupOf hyp.H :=
-      Subgroup.mem_subgroupOf.mpr (hyp.Qder_le_Q hconjG)
-    rw [ClassFunction.induceTerm_of_mem φ hmem]
-    exact hconst ⟨h⁻¹ * g * h, hmem⟩ hconjG
-  have h1Q' : ((1 : ↥hyp.H) : G) ∈ hyp.Qder := by
-    simp
-  rw [ClassFunction.induce_apply, ClassFunction.induce_apply]
-  congr 1
-  refine Finset.sum_congr rfl fun h _ => ?_
-  rw [hterm x hxQ' h, hterm 1 h1Q' h]
+    hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) hyp.Qder :=
+  hyp.leKer_induce_of_forall hyp.Qder_le_Q
+    (fun _ hh _ hx => hyp.Qder_conj_mem_of_mem_H hh hx) hconst
 
 omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **`𝒮(Q')` is nonempty** when `S·Q' ⊊ Q`.  The quotient of `Q` by the normal
