@@ -8466,6 +8466,20 @@ commutator whose Frobenius weight satisfies `λ^(2^i) μ^(2^j) = ν^(2^k)`.  Wit
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.higmanLemmaTwelve
 
+/-! **Peterfalvi Appendix III, Theorem (e), recognition half**: a summand
+isomorphism of any invariant two-summand split of `P ⧸ Z(P)` forces
+Frobenius-conjugate factor eigenvalues, which kills the type-C and type-D
+branches of the Lemma 12 dispatch — the group is of type `B`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.exists_frobenius_conjugate_of_summandEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.isTypeB_of_isomorphicOrderQModuleSplit_of_xiLengthThree
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
@@ -8533,6 +8547,15 @@ orders are complementary. -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.isCompl_of_distinct_invariant_of_transitive_card
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.disjoint_of_invariant_of_ne_of_card
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.nonempty_kEquivariantMulEquiv_of_third_invariant
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.nonempty_summandEquiv_of_isomorphic
 
 /-! In the actual Part II setting, `|K|` and `|Q₀|` are coprime and the
 induced action on `Q / Q₀` is fixed-point-free.  Hence every invariant
