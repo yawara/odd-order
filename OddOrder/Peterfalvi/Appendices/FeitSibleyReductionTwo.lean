@@ -402,6 +402,120 @@ theorem false_of_reduction_two_bounds {d a m q₁ qz zc : ℕ}
       _ = (m : ℝ) * (zc : ℝ) * ((q₁ : ℝ) - 2) := by ring
   nlinarith [k4, k6]
 
+/-! ## The reduction (2) one-step lemma (pp. 146–147) -/
+
+section StepLemma
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+/-- **The reduction (2) one-step lemma** (pp. 146–147): coherence of `𝒮(S₁)`
+propagates to `𝒮(S₂)` given the `S`-side chief data `S₂ ≤ S₁ ≤ Z ≤ S` — `Z`
+the lift of `Z(S⧸S₂)` (`⁅Z, S⁆ ⊆ S₂`), `S₁ ≤ [S,S]` proper in `S`.
+
+Proof: suppose not.  The counterexample extraction at `B = 𝒮(S₁)`,
+`Y = 𝒮(S₂)` (anchor from `𝒮(Q') ⊆ 𝒮(S₁)`, `S₁ ≤ S' ≤ Q'`) produces `ψ` of
+degree `d·a` with `∑_{𝒮(S₁)} m(x)² ≤ 2a`.  The `S`-side counting keeps the
+full factor: `|S⧸S₁|·(|Q₁|−1) ≤ 2da`
+(`card_quot_S_mul_sub_one_le_of_card_quot_sub_le`); the degree bound at
+`D₀ = Z·Z(Q₁)` gives `a² ≤ |S⧸Z|·|Q₁⧸Z(Q₁)| ≤ |S⧸S₁|·|Q₁⧸Z(Q₁)|`
+(`commutator_mem_of_central_pair` → `index_subgroupOf_sup_prod_eq`); with
+Lagrange `|Q₁| = |Q₁⧸Z(Q₁)|·|Z(Q₁)|`, the `d`-odd bound `|Z(Q₁)| ≥ 2d+1`,
+and `|S⧸S₁| ≥ 2`, the arithmetic `false_of_reduction_two_bounds` closes the
+contradiction. -/
+theorem ssetOf_S_coherent_step
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    (hlt : hyp.S ⊔ hyp.Qder < hyp.Q)
+    {S₁ S₂ Z : Subgroup G}
+    (hS₁der : S₁ ≤ hyp.Sder) (hS₂S₁ : S₂ ≤ S₁)
+    (hSnotle : ¬ hyp.S ≤ S₁)
+    (hZS : Z ≤ hyp.S) (hS₁Z : S₁ ≤ Z)
+    (hZc : ∀ z ∈ Z, ∀ s ∈ hyp.S, ⁅z, s⁆ ∈ S₂)
+    [(S₁.subgroupOf hyp.H).Normal]
+    [((S₁.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal]
+    [((S₂.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal]
+    [(Z.subgroupOf hyp.H).Normal]
+    [((Z ⊔ hyp.centerLiftQ1).subgroupOf hyp.H).Normal]
+    (hcoh₁ : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf S₁) hyp.A)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf S₂) hyp.A) := by
+  classical
+  by_contra hfail
+  -- families: `B = 𝒮(S₁) ⊆ Y = 𝒮(S₂) ⊆ 𝒮`
+  have hBY : hyp.SsetOf S₁ ⊆ hyp.SsetOf S₂ := hyp.ssetOf_antitone hS₂S₁
+  have hYS : hyp.SsetOf S₂ ⊆ hyp.Sset := fun _ hx => hx.1
+  have hYfin : (hyp.SsetOf S₂).Finite := hyp.Sset_finite.subset hYS
+  -- the degree-`d` anchor via `𝒮(Q') ⊆ 𝒮(S₁)`
+  have hSderQder : hyp.Sder ≤ hyp.Qder := by
+    have h := hyp.sup_Sder_le_Qder (bot_le : ⊥ ≤ ⁅hyp.Q1, hyp.Q1⁆)
+    rwa [sup_bot_eq] at h
+  obtain ⟨χ₀, hχ₀Qder⟩ := hyp.ssetOf_Qder_nonempty hlt
+  have hχ₀B : χ₀ ∈ hyp.SsetOf S₁ :=
+    hyp.ssetOf_antitone (hS₁der.trans hSderQder) hχ₀Qder
+  -- counterexample extraction
+  obtain ⟨ψ, a, m, hψY, hapos, hψdeg, hmdeg, hmsum⟩ :=
+    hyp.exists_counterexample_of_not_coherent hd hQ1odd hBY hYS hYfin
+      (fun _ hχ => hyp.conj_mem_SsetOf hχ) (fun _ hχ => hyp.conj_mem_SsetOf hχ)
+      hcoh₁ hχ₀B (hyp.apply_one_eq_d_of_mem_SsetOf_Qder hχ₀Qder) hfail
+  -- counting: `|S⧸S₁|·(|Q₁|−1) ≤ d·2a`
+  have h21 := hyp.card_quot_S_mul_sub_one_le_of_card_quot_sub_le
+    (hS₁der.trans hyp.Sder_le_S)
+    (hyp.card_quot_sub_le_of_forall_deg_of_sum_le S₁ (hYfin.subset hBY) hmdeg hmsum)
+  -- degree bound at `D₀ = Z·Z(Q₁)`: `a² ≤ |S⧸Z|·|Q₁⧸Z(Q₁)|`
+  obtain ⟨a', ha'deg, ha'sq⟩ := hyp.exists_deg_sq_le_of_mem_SsetOf
+    S₂ (Z ⊔ hyp.centerLiftQ1)
+    (hS₂S₁.trans (hS₁der.trans (hyp.Sder_le_S.trans hyp.S_le_Q)))
+    ((hS₂S₁.trans hS₁Z).trans le_sup_left)
+    (sup_le (hZS.trans hyp.S_le_Q) (hyp.centerLiftQ1_le.trans hyp.Q1_le_Q))
+    (hyp.map_mk_le_center_of_commutator_mem fun x hx q hq =>
+      hyp.commutator_mem_of_central_pair hZS hyp.centerLiftQ1_le hZc
+        (fun b hb y hy => hyp.commutator_eq_one_of_mem_centerLiftQ1 hb hy) hx hq)
+    hψY
+  have haa' : a' = a := by
+    have hdne : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+    exact_mod_cast mul_left_cancel₀ hdne (ha'deg.symm.trans hψdeg)
+  rw [haa', hyp.index_subgroupOf_sup_prod_eq hZS hyp.centerLiftQ1_le] at ha'sq
+  -- majorise `|S⧸Z| ≤ |S⧸S₁|`
+  have hZm : Nat.card (↥hyp.S ⧸ Z.subgroupOf hyp.S)
+      ≤ Nat.card (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := by
+    have hle : S₁.subgroupOf hyp.S ≤ Z.subgroupOf hyp.S := fun x hx => by
+      rw [Subgroup.mem_subgroupOf] at hx ⊢
+      exact hS₁Z hx
+    have hdvd := Subgroup.index_dvd_of_le hle
+    rw [Subgroup.index_eq_card, Subgroup.index_eq_card] at hdvd
+    exact Nat.le_of_dvd Nat.card_pos hdvd
+  have h22 : a ^ 2 ≤ Nat.card (↥hyp.S ⧸ S₁.subgroupOf hyp.S)
+      * Nat.card (↥hyp.Q1 ⧸ hyp.centerLiftQ1.subgroupOf hyp.Q1) :=
+    le_trans ha'sq (Nat.mul_le_mul_right _ hZm)
+  -- Lagrange: `|Q₁| = |Q₁⧸Z(Q₁)|·|Z(Q₁)|`
+  have h23 : Nat.card ↥hyp.Q1
+      = Nat.card (↥hyp.Q1 ⧸ hyp.centerLiftQ1.subgroupOf hyp.Q1)
+        * Nat.card ↥hyp.centerLiftQ1 := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.centerLiftQ1_le).toEquiv]
+    exact Subgroup.card_eq_card_quotient_mul_card_subgroup _
+  -- `|S⧸S₁| ≥ 2`
+  have h25 : 2 ≤ Nat.card (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := by
+    obtain ⟨s, hsS, hsS₁⟩ := SetLike.not_le_iff_exists.mp hSnotle
+    have hne : (Quotient.mk'' (⟨s, hsS⟩ : ↥hyp.S) : ↥hyp.S ⧸ S₁.subgroupOf hyp.S)
+        ≠ Quotient.mk'' (1 : ↥hyp.S) := by
+      intro h
+      have hmem := Quotient.eq''.mp h
+      rw [QuotientGroup.leftRel_apply, Subgroup.mem_subgroupOf] at hmem
+      apply hsS₁
+      have h2 : s⁻¹ * (1 : G) ∈ S₁ := hmem
+      rw [mul_one] at h2
+      simpa using S₁.inv_mem h2
+    haveI : Nontrivial (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := ⟨_, _, hne⟩
+    exact Finite.one_lt_card
+  -- close the contradiction
+  exact false_of_reduction_two_bounds hyp.d_pos Nat.card_pos h21 h22 h23
+    (hyp.two_mul_d_add_one_le_card_centerLiftQ1 hd hQ1odd hnil) h25
+
+end StepLemma
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
