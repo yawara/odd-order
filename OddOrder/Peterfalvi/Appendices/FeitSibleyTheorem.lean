@@ -818,4 +818,66 @@ end CharacterLayer
 
 end Hypothesis
 
+/-! ## Degree-square counting for the reduction steps (pp. 146–147)
+
+The reductions (1)–(3) repeatedly use
+`∑_{χ ∈ 𝒮(R)} χ(1)² = |H/R| − |H/R·Q₁|`.  The generic form below (over any finite
+group `K` with two normal subgroups) reduces to the inflation counting of
+`InflationCharacter.lean`. -/
+
+open scoped Classical in
+/-- **Two-kernel degree-square counting**: the squared degrees of the irreducibles
+of `K` whose kernel contains `N` but not `M` sum to `|K⧸N| − |K⧸(N ⊔ M)|`.
+Splitting the `N ⊆ ker` sum (`sumInflatedDegreeSq` = `|K⧸N|`) by the
+`M ⊆ ker` condition, the both-kernels part is the `N ⊔ M ⊆ ker` part
+(the character kernel is a subgroup, `characterKernelSubgroup`), which sums to
+`|K⧸(N ⊔ M)|`. -/
+theorem sum_degreeSq_ker_subset_not_subset
+    {K : Type*} [Group K] [Finite K] [Fintype K] [Invertible (Nat.card K : ℂ)]
+    (N M : Subgroup K) [N.Normal] [(N ⊔ M).Normal] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+        (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ) ∧
+        ¬ (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)),
+        ((χ : ClassFunction K ℂ) 1) ^ 2
+      = (Nat.card (K ⧸ N) : ℂ) - (Nat.card (K ⧸ (N ⊔ M)) : ℂ) := by
+  classical
+  have hker_iff : ∀ χ : IrreducibleCharacter K,
+      (((N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) ∧
+        ((M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
+      ↔ (((N ⊔ M : Subgroup K) : Set K)
+          ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) := by
+    intro χ
+    have hKSset := OddOrder.Peterfalvi.S13.coe_characterKernelSubgroup
+      χ.isIrreducible.isCharacter
+    constructor
+    · rintro ⟨h1, h2⟩
+      rw [← hKSset] at h1 h2 ⊢
+      have hN : N ≤ OddOrder.Peterfalvi.S13.characterKernelSubgroup
+          χ.isIrreducible.isCharacter := fun x hx => h1 hx
+      have hM : M ≤ OddOrder.Peterfalvi.S13.characterKernelSubgroup
+          χ.isIrreducible.isCharacter := fun x hx => h2 hx
+      exact fun x hx => (sup_le hN hM) hx
+    · intro h
+      exact ⟨Set.Subset.trans (SetLike.coe_subset_coe.mpr le_sup_left) h,
+        Set.Subset.trans (SetLike.coe_subset_coe.mpr le_sup_right) h⟩
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+      (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
+    (fun χ => (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ))
+    (fun χ => ((χ : ClassFunction K ℂ) 1) ^ 2)
+  rw [Finset.filter_filter, Finset.filter_filter] at hsplit
+  have hfilter_sup : (Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+        (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ) ∧
+        (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
+      = Finset.univ.filter (fun χ : IrreducibleCharacter K =>
+        ((N ⊔ M : Subgroup K) : Set K)
+          ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) :=
+    Finset.filter_congr fun χ _ => by
+      constructor
+      · exact fun h => (hker_iff χ).mp (by simpa using h)
+      · exact fun h => by simpa using (hker_iff χ).mpr h
+  rw [hfilter_sup] at hsplit
+  rw [sumInflatedDegreeSq (N := N ⊔ M), sumInflatedDegreeSq (N := N)] at hsplit
+  linear_combination hsplit
+
 end OddOrder.Peterfalvi.Appendices.FeitSibley
