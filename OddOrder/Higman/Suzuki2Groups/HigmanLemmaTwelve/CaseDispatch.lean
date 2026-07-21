@@ -7,6 +7,7 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.PrescribedFactorCoordinat
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SupportPinning
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
 
 /-!
 # Higman Lemma 12: case-dispatch normalizations
@@ -607,6 +608,94 @@ theorem exists_typeB_shear_normalization
   intro a b ha hb
   rw [← hfinal a b]
   exact haniso _ _ (fun hc => mul_ne_zero ht0 hb hc.2)
+
+/-! ### Higman pp. 91--92: the type-C and type-D `ε` conditions -/
+
+/-- **Higman p. 91, the type-C `ε`.**  Over `GaloisField 2 n` with
+`θ = Frob^r` and `2r + 1 = n`, anisotropy of the decomposed square form with
+the type-C monomial mixed term is exactly Higman's condition on `ε = c₀`:
+the monomial exponents `2^{n-1}`, `2^{r+1}` are the Frobenius powers
+`Frob⁻¹` and `Frob·θ` of the type-C pairing. -/
+theorem isTypeCEpsilon_of_decomposed_aniso {n r : ℕ}
+    (h2r1 : 2 * r + 1 = n)
+    (theta : RingAut (GaloisField 2 n))
+    (htheta : theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r)
+    (c0 : GaloisField 2 n)
+    (haniso : ∀ a b : GaloisField 2 n, a ≠ 0 → b ≠ 0 →
+      a * theta a + b * b + c0 * (a ^ 2 ^ (n - 1) * b ^ 2 ^ (r + 1)) ≠ 0) :
+    IsTypeCEpsilon theta c0 := by
+  have hn : n ≠ 0 := by omega
+  have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
+    simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn
+  have horder : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
+    orderOf_frobeniusEquiv_eq_of_card_eq_two_pow n hcard
+  have hfrobn : (frobeniusEquiv (GaloisField 2 n) 2) ^ n = 1 := by
+    calc (frobeniusEquiv (GaloisField 2 n) 2) ^ n
+        = (frobeniusEquiv (GaloisField 2 n) 2)
+            ^ orderOf (frobeniusEquiv (GaloisField 2 n) 2) := by rw [horder]
+      _ = 1 := pow_orderOf_eq_one _
+  have hinv : (frobeniusEquiv (GaloisField 2 n) 2)⁻¹ =
+      (frobeniusEquiv (GaloisField 2 n) 2) ^ (n - 1) := by
+    refine inv_eq_of_mul_eq_one_right ?_
+    rw [← pow_succ', show n - 1 + 1 = n from by omega]
+    exact hfrobn
+  intro a b ha hb
+  have hinvapply : (frobeniusEquiv (GaloisField 2 n) 2)⁻¹ a =
+      a ^ 2 ^ (n - 1) := by
+    rw [hinv, frobeniusEquiv_pow_apply]
+  have happly : (frobeniusEquiv (GaloisField 2 n) 2 * theta) b =
+      b ^ 2 ^ (r + 1) := by
+    rw [htheta, ← pow_succ', frobeniusEquiv_pow_apply]
+  have hrw : a * theta a +
+      c0 * ((frobeniusEquiv (GaloisField 2 n) 2)⁻¹ a *
+        (frobeniusEquiv (GaloisField 2 n) 2 * theta) b) + b * b =
+      a * theta a + b * b + c0 * (a ^ 2 ^ (n - 1) * b ^ 2 ^ (r + 1)) := by
+    rw [hinvapply, happly]
+    ring
+  rw [hrw]
+  exact haniso a b ha hb
+
+/-- **Higman p. 92, the type-D `ε`.**  Over `GaloisField 2 n` with
+`θ = Frob^r` (`r < n`), anisotropy of the decomposed square form with the
+type-D monomial mixed term is exactly Higman's condition on `ε = c₀`: the
+monomial exponents `2^{3r mod n}`, `2^{r mod n}` are the Frobenius powers
+`θ³` and `θ` of the type-D pairing. -/
+theorem isTypeDEpsilon_of_decomposed_aniso {n r : ℕ}
+    (hn : n ≠ 0) (hrn : r < n)
+    (theta : RingAut (GaloisField 2 n))
+    (htheta : theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r)
+    (c0 : GaloisField 2 n)
+    (haniso : ∀ a b : GaloisField 2 n, a ≠ 0 → b ≠ 0 →
+      a * theta a + b * (theta ^ 2) b +
+        c0 * (a ^ 2 ^ (3 * r % n) * b ^ 2 ^ (r % n)) ≠ 0) :
+    IsTypeDEpsilon theta c0 := by
+  have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
+    simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn
+  have horder : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
+    orderOf_frobeniusEquiv_eq_of_card_eq_two_pow n hcard
+  have hfrobn : (frobeniusEquiv (GaloisField 2 n) 2) ^ n = 1 := by
+    calc (frobeniusEquiv (GaloisField 2 n) 2) ^ n
+        = (frobeniusEquiv (GaloisField 2 n) 2)
+            ^ orderOf (frobeniusEquiv (GaloisField 2 n) 2) := by rw [horder]
+      _ = 1 := pow_orderOf_eq_one _
+  have hpow3 : theta ^ 3 = frobeniusEquiv (GaloisField 2 n) 2 ^ (3 * r % n) := by
+    rw [htheta, ← pow_mul, Nat.mul_comm r 3,
+      show 3 * r = n * (3 * r / n) + 3 * r % n from
+        (Nat.div_add_mod (3 * r) n).symm,
+      pow_add, pow_mul, hfrobn, one_pow, one_mul, Nat.div_add_mod]
+  intro a b ha hb
+  have h3 : (theta ^ 3) a = a ^ 2 ^ (3 * r % n) := by
+    rw [hpow3, frobeniusEquiv_pow_apply]
+  have h1 : theta b = b ^ 2 ^ (r % n) := by
+    rw [htheta, frobeniusEquiv_pow_apply, Nat.mod_eq_of_lt hrn]
+  have hrw : a * theta a + c0 * ((theta ^ 3) a * theta b) +
+      b * (theta ^ 2) b =
+      a * theta a + b * (theta ^ 2) b +
+        c0 * (a ^ 2 ^ (3 * r % n) * b ^ 2 ^ (r % n)) := by
+    rw [h3, h1]
+    ring
+  rw [hrw]
+  exact haniso a b ha hb
 
 end
 
