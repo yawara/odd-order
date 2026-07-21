@@ -229,11 +229,7 @@ theorem minimal_le_centralLift [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1)
   rw [← heq]
   exact inf_le_right
 
-end Hypothesis
-
 /-! ## Per-prime divisibility below the derived subgroup -/
-
-namespace Hypothesis
 
 /-- **`p ∣ |K⧸R|` for `R ≤ [K,K]` in a finite nilpotent `K` with `p ∣ |K|`**:
 otherwise the Sylow `p`-subgroup would land in `R ≤ [K,K]`, making
@@ -271,6 +267,190 @@ theorem prime_dvd_card_quotient_of_le_commutator {K : Type*} [Group K] [Finite K
   apply commutator_sup_normal_pcomplement_ne_top hpK hC
   rw [eq_top_iff, ← hC.sup_eq_top]
   exact sup_le le_sup_right ((hPle.trans hR).trans le_sup_left)
+
+/-- **The centre of a finite nilpotent group contains a nonidentity element of
+`p`-power order for every prime `p ∣ |K|`**: the (normal) Sylow `p`-subgroup is
+nontrivial and meets the centre
+(`exists_mem_center_of_normal_ne_bot_of_isNilpotent`). -/
+theorem exists_center_pow_prime_eq_one_of_dvd {K : Type*} [Group K] [Finite K]
+    [Group.IsNilpotent K] {p : ℕ} [hp : Fact p.Prime] (hpK : p ∣ Nat.card K) :
+    ∃ x : K, x ∈ Subgroup.center K ∧ x ≠ 1 ∧ ∃ k, x ^ p ^ k = 1 := by
+  classical
+  set P : Sylow p K := default with hP_def
+  have hPne : (P : Subgroup K) ≠ ⊥ := by
+    intro hbot
+    have hcard := P.card_eq_multiplicity
+    rw [hbot, Subgroup.card_bot] at hcard
+    rcases (Nat.pow_eq_one.mp hcard.symm) with h1 | h0
+    · exact hp.out.one_lt.ne' h1
+    · exact (hp.out.factorization_pos_of_dvd Nat.card_pos.ne' hpK).ne' h0
+  obtain ⟨x, hxP, hxC, hx1⟩ :=
+    OddOrder.Isaacs.Ch04.exists_mem_center_of_normal_ne_bot_of_isNilpotent hPne
+  obtain ⟨k, hk⟩ := P.isPGroup' ⟨x, hxP⟩
+  refine ⟨x, hxC, hx1, k, ?_⟩
+  simpa using congrArg Subtype.val hk
+
+/-! ## The `p`-primary lift and the properness `Z ⊄ Q₂` (p. 146) -/
+
+/-- **The commutator subgroup of `↥Q₁` maps onto `⁅Q₁, Q₁⁆`** under the
+inclusion. -/
+theorem map_subtype_commutator :
+    Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) = ⁅hyp.Q1, hyp.Q1⁆ := by
+  change Subgroup.map hyp.Q1.subtype ⁅(⊤ : Subgroup ↥hyp.Q1), ⊤⁆ = ⁅hyp.Q1, hyp.Q1⁆
+  rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+
+/-- A subgroup below `⁅Q₁, Q₁⁆` relativises below `commutator ↥Q₁`. -/
+theorem subgroupOf_le_commutator {R : Subgroup G} (hR : R ≤ ⁅hyp.Q1, hyp.Q1⁆) :
+    R.subgroupOf hyp.Q1 ≤ commutator ↥hyp.Q1 := by
+  intro x hx
+  have hmem : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
+    rw [hyp.map_subtype_commutator]
+    exact hR (Subgroup.mem_subgroupOf.mp hx)
+  obtain ⟨y, hy, hyx⟩ := hmem
+  rwa [show y = x from Subtype.ext hyx] at hy
+
+/-- **The `p`-primary part of the central lift**: elements of
+`Z = centralLift Q₃ _` with a `p`-power power in `Q₃` — the lift of the
+`p`-primary component of `Z(Q₁⧸Q₃)`.  Closure under multiplication works
+modulo `Q₃` (members of `Z` commute mod `Q₃`). -/
+def primaryLift (Q₃ : Subgroup G)
+    (hinv : ∀ q ∈ hyp.Q1, ∀ x ∈ Q₃, q * x * q⁻¹ ∈ Q₃) (p : ℕ) : Subgroup G where
+  carrier := {z | z ∈ hyp.centralLift Q₃ hinv ∧ ∃ k, z ^ p ^ k ∈ Q₃}
+  one_mem' := ⟨(hyp.centralLift Q₃ hinv).one_mem, 0, by simp [Q₃.one_mem]⟩
+  mul_mem' := by
+    rintro a b ⟨haZ, ka, hka⟩ ⟨hbZ, kb, hkb⟩
+    refine ⟨(hyp.centralLift Q₃ hinv).mul_mem haZ hbZ, ka + kb, ?_⟩
+    -- pass to `Q₁⧸Q₃`, where the two factors commute and are torsion
+    haveI : (Q₃.subgroupOf hyp.Q1).Normal := subgroupOf_normal_of_conj_mem hinv
+    set π := QuotientGroup.mk' (Q₃.subgroupOf hyp.Q1) with hπ_def
+    have hmk : ∀ (w : ↥hyp.Q1) (n : ℕ), (w : G) ^ n ∈ Q₃ → (π w) ^ n = 1 := by
+      intro w n hw
+      rw [← map_pow, hπ_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+        Subgroup.mem_subgroupOf]
+      simpa using hw
+    have hcomm : Commute (π ⟨a, haZ.1⟩) (π ⟨b, hbZ.1⟩) := by
+      have h1 : π ⁅(⟨a, haZ.1⟩ : ↥hyp.Q1), (⟨b, hbZ.1⟩ : ↥hyp.Q1)⁆ = 1 := by
+        rw [hπ_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+          Subgroup.mem_subgroupOf]
+        simpa [commutatorElement_def] using haZ.2 b hbZ.1
+      rw [map_commutatorElement] at h1
+      exact commutatorElement_eq_one_iff_mul_comm.mp h1
+    have hab : (π ⟨a, haZ.1⟩ * π ⟨b, hbZ.1⟩) ^ p ^ (ka + kb) = 1 := by
+      rw [hcomm.mul_pow, pow_add]
+      rw [pow_mul, hmk _ _ hka, one_pow, one_mul, mul_comm (p ^ ka) (p ^ kb),
+        pow_mul, hmk _ _ hkb, one_pow]
+    have := hab
+    rw [← map_mul, ← map_pow, hπ_def, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf] at this
+    simpa using this
+  inv_mem' := by
+    rintro a ⟨haZ, k, hk⟩
+    refine ⟨(hyp.centralLift Q₃ hinv).inv_mem haZ, k, ?_⟩
+    rw [inv_pow]
+    exact Q₃.inv_mem hk
+
+theorem primaryLift_le_centralLift {Q₃ : Subgroup G}
+    (hinv : ∀ q ∈ hyp.Q1, ∀ x ∈ Q₃, q * x * q⁻¹ ∈ Q₃) (p : ℕ) :
+    hyp.primaryLift Q₃ hinv p ≤ hyp.centralLift Q₃ hinv := fun _ hz => hz.1
+
+theorem le_primaryLift {Q₃ : Subgroup G}
+    (hinv : ∀ q ∈ hyp.Q1, ∀ x ∈ Q₃, q * x * q⁻¹ ∈ Q₃) (hQ₃Q1 : Q₃ ≤ hyp.Q1)
+    (p : ℕ) : Q₃ ≤ hyp.primaryLift Q₃ hinv p := fun x hx =>
+  ⟨hyp.le_centralLift hinv hQ₃Q1 hx, 0, by simpa using hx⟩
+
+/-- **The `p`-primary lift is `H`-invariant** (centrality transports by
+`centralLift_conj_mem_of_mem_H`; the torsion condition by `conj_pow`). -/
+theorem primaryLift_conj_mem_of_mem_H [Finite G] {Q₃ : Subgroup G}
+    (hinv : ∀ q ∈ hyp.Q1, ∀ x ∈ Q₃, q * x * q⁻¹ ∈ Q₃)
+    (hQ₃H : ∀ h ∈ hyp.H, ∀ x ∈ Q₃, h * x * h⁻¹ ∈ Q₃) {p : ℕ}
+    {h : G} (hh : h ∈ hyp.H) {z : G} (hz : z ∈ hyp.primaryLift Q₃ hinv p) :
+    h * z * h⁻¹ ∈ hyp.primaryLift Q₃ hinv p := by
+  obtain ⟨hzZ, k, hk⟩ := hz
+  refine ⟨hyp.centralLift_conj_mem_of_mem_H hinv hQ₃H hh hzZ, k, ?_⟩
+  rw [conj_pow]
+  exact hQ₃H h hh _ hk
+
+/-- **`Z ⊄ Q₂` for the chief factor** (p. 146, "since `|Q₁|` is divisible by
+two primes, `Q₂ ⊊ Z`"): if `Z ≤ Q₂`, then by minimality the `p`-primary lift
+`T` — `H`-invariant, strictly over `Q₃` by a central `p`-element of `Q₁⧸Q₃`
+(`exists_center_pow_prime_eq_one_of_dvd`), and inside `Q₂ ⊇ Z ⊇ T` — equals
+`Q₂`; but then the central `r`-element of `Q₁⧸Q₃` lies in `T`, forcing its
+`r`-power order to be a `p`-power, i.e. trivial. -/
+theorem not_centralLift_le_minimal [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {p r : ℕ} (hp : p.Prime) (hr : r.Prime) (hpr : p ≠ r)
+    (hpd : p ∣ Nat.card ↥hyp.Q1) (hrd : r ∣ Nat.card ↥hyp.Q1)
+    {Q₂ Q₃ : Subgroup G} (hQ₃Q₂ : Q₃ < Q₂) (hQ₂der : Q₂ ≤ ⁅hyp.Q1, hyp.Q1⁆)
+    (hinv : ∀ q ∈ hyp.Q1, ∀ x ∈ Q₃, q * x * q⁻¹ ∈ Q₃)
+    (hQ₃H : ∀ h ∈ hyp.H, ∀ x ∈ Q₃, h * x * h⁻¹ ∈ Q₃)
+    (hmin : ∀ Q₂' : Subgroup G, Q₃ < Q₂' → Q₂' ≤ Q₂ →
+        (∀ h ∈ hyp.H, ∀ x ∈ Q₂', h * x * h⁻¹ ∈ Q₂') → Q₂' = Q₂) :
+    ¬ hyp.centralLift Q₃ hinv ≤ Q₂ := by
+  classical
+  intro hZle
+  haveI := hnil
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fact r.Prime := ⟨hr⟩
+  haveI : (Q₃.subgroupOf hyp.Q1).Normal := subgroupOf_normal_of_conj_mem hinv
+  have hQ₃der : Q₃ ≤ ⁅hyp.Q1, hyp.Q1⁆ := hQ₃Q₂.le.trans hQ₂der
+  -- central elements of `p`- resp. `r`-power order in `Q₁⧸Q₃`
+  obtain ⟨xp, hxpC, hxp1, kp, hkp⟩ := exists_center_pow_prime_eq_one_of_dvd
+    (K := ↥hyp.Q1 ⧸ Q₃.subgroupOf hyp.Q1)
+    (prime_dvd_card_quotient_of_le_commutator hpd (hyp.subgroupOf_le_commutator hQ₃der))
+  obtain ⟨xr, hxrC, hxr1, kr, hkr⟩ := exists_center_pow_prime_eq_one_of_dvd
+    (K := ↥hyp.Q1 ⧸ Q₃.subgroupOf hyp.Q1)
+    (prime_dvd_card_quotient_of_le_commutator hrd (hyp.subgroupOf_le_commutator hQ₃der))
+  obtain ⟨wp, hwp⟩ := QuotientGroup.mk'_surjective (Q₃.subgroupOf hyp.Q1) xp
+  obtain ⟨wr, hwr⟩ := QuotientGroup.mk'_surjective (Q₃.subgroupOf hyp.Q1) xr
+  -- lifts of central elements land in the central lift
+  have hlift : ∀ w : ↥hyp.Q1,
+      QuotientGroup.mk' (Q₃.subgroupOf hyp.Q1) w
+        ∈ Subgroup.center (↥hyp.Q1 ⧸ Q₃.subgroupOf hyp.Q1) →
+      (w : G) ∈ hyp.centralLift Q₃ hinv := by
+    intro w hwC
+    refine ⟨w.2, fun y hy => ?_⟩
+    have hcomm : QuotientGroup.mk' (Q₃.subgroupOf hyp.Q1)
+        ⁅w, (⟨y, hy⟩ : ↥hyp.Q1)⁆ = 1 := by
+      rw [map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+      exact (Subgroup.mem_center_iff.mp hwC _).symm
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+      Subgroup.mem_subgroupOf] at hcomm
+    simpa [commutatorElement_def] using hcomm
+  have hwpZ : (wp : G) ∈ hyp.centralLift Q₃ hinv := hlift wp (by rw [hwp]; exact hxpC)
+  have hwrZ : (wr : G) ∈ hyp.centralLift Q₃ hinv := hlift wr (by rw [hwr]; exact hxrC)
+  -- the `p`-primary lift is a strict `H`-invariant enlargement of `Q₃` in `Q₂`
+  have hwpT : (wp : G) ∈ hyp.primaryLift Q₃ hinv p := by
+    refine ⟨hwpZ, kp, ?_⟩
+    have h1 : QuotientGroup.mk' (Q₃.subgroupOf hyp.Q1) (wp ^ p ^ kp) = 1 := by
+      rw [map_pow, hwp, hkp]
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+      Subgroup.mem_subgroupOf] at h1
+    simpa using h1
+  have hwpQ₃ : (wp : G) ∉ Q₃ := by
+    intro hmem
+    apply hxp1
+    rw [← hwp, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact Subgroup.mem_subgroupOf.mpr hmem
+  have hTlt : Q₃ < hyp.primaryLift Q₃ hinv p := by
+    refine lt_of_le_of_ne (hyp.le_primaryLift hinv (hQ₃Q₂.le.trans
+      (hQ₂der.trans hyp.Q1der_le_Q1)) p) fun heq => ?_
+    exact hwpQ₃ (by rw [heq]; exact hwpT)
+  have hTeq := hmin _ hTlt
+    ((hyp.primaryLift_le_centralLift hinv p).trans hZle)
+    (fun h hh x hx => hyp.primaryLift_conj_mem_of_mem_H hinv hQ₃H hh hx)
+  -- the `r`-element then acquires a trivialising `p`-power order
+  have hwrT : (wr : G) ∈ hyp.primaryLift Q₃ hinv p := by
+    rw [hTeq]
+    exact hZle hwrZ
+  obtain ⟨-, k, hk⟩ := hwrT
+  have hxrp : xr ^ p ^ k = 1 := by
+    rw [← hwr, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact Subgroup.mem_subgroupOf.mpr (by simpa using hk)
+  have h1 : orderOf xr ∣ p ^ k := orderOf_dvd_of_pow_eq_one hxrp
+  have h2 : orderOf xr ∣ r ^ kr := orderOf_dvd_of_pow_eq_one hkr
+  have hcop : Nat.Coprime (p ^ k) (r ^ kr) :=
+    Nat.Coprime.pow _ _ ((Nat.coprime_primes hp hr).mpr hpr)
+  have hone : orderOf xr = 1 := Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd h1 h2)
+  exact hxr1 (orderOf_eq_one_iff.mp hone)
 
 end Hypothesis
 
