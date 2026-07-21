@@ -362,6 +362,58 @@ theorem two_le_ncard_SsetOf_Qder [Finite G] (hd : Odd hyp.d)
     _ ≤ (hyp.SsetOf hyp.Qder).ncard :=
         Set.ncard_le_ncard (by rintro x (rfl | rfl); exacts [hχ0, hχ0c]) hfin
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+  [Invertible (Nat.card ↥hyp.H : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
+theorem one_notMem_A : (1 : ↥hyp.H) ∉ hyp.A := fun h => h.2 rfl
+
+omit [Fintype G] [Fintype ↥hyp.H] [Invertible (Nat.card G : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
+/-- **Member differences of `𝒮(Q')` are supported on `A = Q^#`**: at `1` both members
+take the common degree `d` (`apply_one_eq_d_of_mem_SsetOf_Qder`), and off `Q` both
+vanish (Lemma 2(a) corollary `apply_eq_zero_of_mem_Sset_of_not_mem_Q`). -/
+theorem diff_support_subset_A_of_mem_SsetOf_Qder [Finite G]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {a b : ClassFunction ↥hyp.H ℂ} (ha : a ∈ hyp.SsetOf hyp.Qder)
+    (hb : b ∈ hyp.SsetOf hyp.Qder) :
+    ((a - b : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  by_contra hxA
+  apply hx
+  rw [ClassFunction.sub_apply]
+  by_cases hx1 : x = 1
+  · subst hx1
+    rw [hyp.apply_one_eq_d_of_mem_SsetOf_Qder ha, hyp.apply_one_eq_d_of_mem_SsetOf_Qder hb,
+      sub_self]
+  · have hxQ : (x : G) ∉ hyp.Q := fun hQ => hxA ⟨hQ, hx1⟩
+    rw [apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp (SsetOf_subset hyp hyp.Qder ha) hxQ,
+      apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp (SsetOf_subset hyp hyp.Qder hb) hxQ,
+      sub_self]
+
+/-- **The Lemma 2(b) isometry on the `A`-supported `𝒮(Q')`-sublattice** — the
+`tau_isometry_diff` field of the §7 hypothesis for `𝒮(Q')`.  An `A`-supported
+member of `ℤ[𝒮(Q')]` lies in `ℤ[𝒮]` (span monotonicity along `𝒮(Q') ⊆ 𝒮`) and
+vanishes at `1` (`1 ∉ A`), so `induction_isometry_on_degree_zero` applies. -/
+theorem tau_inner_eq_of_supported_SsetOf_Qder [Finite G]
+    ⦃φ ψ : ClassFunction ↥hyp.H ℂ⦄
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      (hyp.SsetOf hyp.Qder) hyp.A)
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      (hyp.SsetOf hyp.Qder) hyp.A) :
+    ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ := by
+  have hmono : OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) (hyp.SsetOf hyp.Qder)
+      ≤ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset :=
+    Submodule.span_mono (SsetOf_subset hyp hyp.Qder)
+  have hφ1 : φ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hφ.2 (ClassFunction.mem_support.mpr h0))
+  have hψ1 : ψ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hψ.2 (ClassFunction.mem_support.mpr h0))
+  exact (induction_isometry_on_degree_zero hyp φ ψ (hmono hφ.1) (hmono hψ.1) hφ1 hψ1).1
+
 end CharacterLayer
 
 end Hypothesis
