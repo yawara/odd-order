@@ -898,6 +898,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 14:15 (tick #6、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、⭐ Higman Lemma 12 完成、census 7 不変、push 済**:
+  **b** = ⭐ **Higman Lemma 12 完成** — endpoint `higmanLemmaTwelve` (B/C/D 分類、Assembly +357 行)
+  を landing し **AxiomsCheck に登録 (axiom-clean 監査済)** (merge `5d9b680ff`、issue 2048 は
+  Suzuki Lemma 5 への接続が残)。**a** = FeitSibley Theorem **Remark 完成** — 𝒮(Q') coherent +
+  非空 + 全部品 (FeitSibleyTheorem +504 行、merge `61ba50a65`、issue 1054 継続)。**c** = E.5 WP2
+  完了 — (E.30) O_p(M)∩N = C_{O_p(M)}(x) 証明 + **新規上流発見: BG Cor 15.9(c) 未形式化 →
+  WP2.5 挿入** (15.9(c) は Coq が意図的 drop = 本 repo が初形式化、merge `e5fcc3fde`、issue 3028)。
+  加えてユーザー直 commit `0768e9a6b` (issues 0137-0140 起票、iut 立ち上げ精査由来) を同乗 push。
+  gate = build **4589 jobs green (20s、新 module なしゆえ jobs 不変が正、変更 4 leaf の再 elaborate
+  確認)**、AxiomsCheck OK (higmanLemmaTwelve 監査込)、orphan 0 (873/873)、census 7 不変、
+  新 axiom なし、逸脱なし。レーン生存 3 点 OK。
 - **2026-07-21 13:45 (tick #5、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、⭐ census 9→7、push 済**:
   **a** = FeitSibley Lemma 2(c) 完全証明 (issue 1053 close、FeitSibley sorry 2→1) + **Theorem campaign
   開始** (新 leaf `FeitSibleyTheorem.lean` 317 行、原文 pp.146-150 の 8 ステップ計画 = issue 1054、
