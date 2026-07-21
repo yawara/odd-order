@@ -300,7 +300,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 12000
+set_option linter.style.longFile 12200
 set_option linter.style.longLine false
 
 open Lean Elab Command
