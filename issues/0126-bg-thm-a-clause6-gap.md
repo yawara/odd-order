@@ -8,6 +8,17 @@ owner: lane c (BG)
 
 # BG Thm A(6) の未形式化条項 + 15.7 docstring の stale 記述
 
+> **🎯 2026-07-22 hub: これが lane c の PRIMARY live frontier**。c は同日 02:08 に
+> 「自領域は実 sorry 0 ⟹ scope 完了」と誤断して silent stall した (ScheduleWakeup 無しで
+> turn 終了)。**App.D/App.E/9133 は実測で完了済み** (CNGroupStructure.lean 全 25 宣言 axiom-clean /
+> App.D D.1/D.2 sorry-free / App.E sorry 0) ゆえ c の判断はそこは正しかったが、
+> **本 issue の A(6) は「結論を弱く述べている」ため sorry が存在せず、sorry census では原理的に不可視** —
+> まさに本 issue 冒頭が警告する「完了を完了と誤記録する危険な逆ズレ」に c 自身が再度はまった。
+> ⟹ **c 再開時はここから着手**: `theoremA_maximal_structure_faithful`
+> (`S16_MainResults/TypeBridges.lean:950` 付近) の結論に、A(6) の欠落条項
+> (`M_F ≠ 1` / `M' ⊊ M` / `M'/M_F nilpotent`)・A(3) の `U ⊴ UK`・A(7) packaging を足して book 逐条へ。
+> 次点 = `NearFields.lean:789` (App.C Prop 1、Brauer–Suzuki = issue 9318 に gated の実 sorry 1)。
+
 issue 9154 §2 の BG/Peterfalvi 実測監査 (hub, 2026-07-19) で発見。
 **survey は Thm A を「済 (book A(1)-(8) 全)」と記録していたが、実測では 部分**。
 これは「未形式化を未形式化と記録し損ねる」stale (量は多いが無害) ではなく、

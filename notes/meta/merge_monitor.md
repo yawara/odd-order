@@ -23,6 +23,20 @@
 > `Peterfalvi/Appendices/FeitSibley*` は境界違反として再フラグしない** (軌道修正不要)。
 > NearFields/Huppert/SemilinearField は引き続き c。
 >
+> **🛑 2026-07-22 02:2x lane c stall #2 + frontier 実態の再確認**。c が 02:08 に「BG 実 sorry 0
+> ⟹ scope 完了」と誤断して silent stall (ScheduleWakeup 無し / tip = bare `Merge branch 'main' into c`
+> / tree clean)。tick2 の c 成果 (BG S10/S15/S16 の stale docstring 訂正) は 30e728a8b で合流済ゆえ
+> 損失ゼロ。**hub 実測による再確認**: c の申告どおり **App.D/App.E/9133 は完了済み**
+> (`CNGroupStructure.lean` 516 行 / 全 25 宣言 axiom-clean、App.D `D.1/D.2` sorry-free、App.E sorry 0;
+> 9133 の残債は「Cor 1.6 に不要な clause (ii) 細分」のみ)。⟹ **本 header 上流 (2026-07-19 の 9154 欄)
+> の「c queue に 9133/App.D/E 残」は stale** — 削除でなく本注記で上書き。
+> **c の真の live frontier = issue 0126 (BG Thm A(6) 本質欠落; sorry 無しゆえ census 不可視) が primary、
+> 次点 `NearFields.lean:789` (App.C Prop 1, 9318 gated)**。詳細 pointer は issue 0126 冒頭の 🎯 banner。
+> c の再開は user 操作 (hub は unsupervised lane に送信不可 [[cross-lane-sync-via-notes]])。
+> ⚠ 教訓: 「BG sorry 0」を doneness と読むのは CLAUDE.md が禁ずる測り方で、0126 がその反例
+> (essential clause 欠落を weaker statement で表現 → sorry ゼロ)。lane 停止判定でも `sorry census 完了`
+> を鵜呑みにせず未形式化 book 結果の有無で測る。
+>
 > **▶ 2026-07-17 監視再開 (Fable hub)**: レーン a/b/c worktree 再作成済み・全て main tip `b5742b91` から
 > 開始 (未マージ 0)。監視 cron 再作成 = 15 分 `7,22,37,52` (現行明示ユーザー指定 2026-07-15 を継承)。
 > **新フェーズの step 1.5 所有判定は次の regex が正** (本文中の旧 🔒 所有マップ + carve-out 群 =
