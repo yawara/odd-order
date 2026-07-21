@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppA_PStabilityBasic
+import OddOrder.GroupTheory.GlaubermanZJ
 
 /-!
 # TAIL
@@ -1453,6 +1454,18 @@ theorem thmA4b [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd 
   change A ≤ Subgroup.comap mk (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N))
   rw [← Subgroup.map_le_iff_le_comap, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
   exact hAbar_le_R
+
+/-- **Gorenstein 群論的 p-stability の供給** (= `stabilityLiftAux` / Gorenstein 6.5.3
+のインターフェース形): `p` odd, `M` odd solvable なら `IsPStableOp p M`
+(`GroupTheory/GlaubermanZJ.lean` の Thm 2.10/2.11 の仮定形; issue 3017/3024 の
+discharge 用). -/
+theorem isPStableOp_of_odd_solvable {M : Type*} [Group M] [Finite M]
+    (hp_odd : p ≠ 2) (hsolv : IsSolvable M) (hodd : Odd (Nat.card M)) :
+    Subgroup.IsPStableOp p M := by
+  haveI : IsSolvable M := hsolv
+  intro K A hKnorm hK hA hKAA
+  haveI := hKnorm
+  exact stabilityLiftAux hp_odd hodd hK hA hKAA rfl
 
 open scoped commutatorElement in
 /-- **BG Theorem A.5(1)** (mmd L4488): `p` odd, `G` solvable odd order, `P ◁ G` を `p`-部分群,

@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S06_Additional
 import OddOrder.BG.AppB_Thm62
+import OddOrder.BG.AppA_PStability
+import OddOrder.GroupTheory.GlaubermanZJ
 
 /-!
 # BG Theorem 6.2 一般形 (literal Thompson `J(S)`): `Z(J(S))·O_{p'}(G) ⊴ G` の `O_{p'}` 簡約
@@ -28,7 +30,17 @@ sorry-free の**条件付き補題**として与える: `Ḡ = G/O_{p'}(G)` へ�
   `J(S̄) = mk(J(S))` (`S ∩ O_{p'} = ⊥` ゆえ `mk` は `S` 上単射).
 * `OddOrder.BG.AppB.map_centralizer_inf` — `C_G(L) ⊓ L` の単射 hom 共変性 (任意 `L` で成立)。
 
-## 未充足の前提 `hZJ` (Part 2 = 真の障害, = Glauberman `Z(J)`-定理)
+## ✅ 本定理 (2026-07-21 完成): `zCenterThompsonJAbelian_sup_oPiCore_normal`
+
+**BG Thm 6.2 一般形は無条件で完成** — literal `J(S)` は Gorenstein 版 abelian
+Thompson subgroup `Subgroup.thompsonJAbelian` (issue 9403 の設計裁定; BG は `J` を
+自前定義せず "**G**" を引用するのみ) で, Glauberman `Z(J)`-定理本体
+(`GroupTheory/GlaubermanZJ.lean`, Gorenstein Ch.8 §2 の完全形式化) に商の
+p-stability (`AppA.isPStableOp_of_odd_solvable`) + p-constraint (Hall-Higman) を
+供給して閉じた. 以下の elementary-`thompsonJ` 版の条件付き補題は歴史的経緯
+(elementary 版では Gorenstein Lem 2.1 が偽で `hZJ` は discharge 不能).
+
+## (歴史) 未充足の前提 `hZJ` (= Glauberman `Z(J)`-定理, elementary 版符号)
 
 `hZJ` は **`O_{p'}(H)=1` の odd solvable `H` に対する `Z(J(T)) ⊴ H` (T ∈ Syl_p)** で,
 これは **Glauberman の `Z(J)`-定理そのもの**である. Isaacs FGT はこれを**明示的に省く**
@@ -138,5 +150,49 @@ theorem zCenterThompsonJ_sup_oPiCore_normal_of_reduced [Finite G] {p : ℕ} [Fac
     rw [← hcov, Subgroup.comap_map_eq, QuotientGroup.ker_mk']
   rw [hassemble]
   exact hZbar.comap (QuotientGroup.mk' N)
+
+/-! ### BG Thm 6.2 一般形 (literal `J(S)` = Gorenstein 版 `J_a`, 無条件)
+
+BG の literal `J(S)` は **Gorenstein 版 abelian Thompson subgroup**
+`Subgroup.thompsonJAbelian` である (BG は `J` を自前定義せず "**G**, Thm 6.5.1 /
+8.2.11" を引用するのみ — 記号表 p.170; issue 9403 の設計裁定)。Glauberman
+`Z(J)`-定理本体 (`GroupTheory/GlaubermanZJ.lean`, Gorenstein Ch.8 §2) の完成により
+無条件で閉じる。上の elementary-`thompsonJ` 版条件付き補題 (`hZJ` 付き) は
+BG literal との符号ミスマッチがあり (elementary 版では Gorenstein Lem 2.1 が偽で
+`hZJ` を discharge できない)、こちらが本物。 -/
+
+open Subgroup in
+/-- **BG Theorem 6.2 一般形 (literal Thompson `J(S)`, 無条件)**: `G` odd solvable,
+`p` odd prime, `S ∈ Syl_p(G)` ⟹ `Z(J(S))·O_{p'}(G) ⊴ G` (`⊔` 符号化,
+`J = thompsonJAbelian`).
+
+証明 = Gorenstein Thm 8.2.11 の引き戻し形
+(`Subgroup.zCenter_thompsonJAbelian_sup_oPiCorePrime_normal`) へ商
+`Ḡ = G/O_{p'}(G)` の p-stability (`AppA.isPStableOp_of_odd_solvable` =
+Gorenstein 6.5.3 / BG Thm A.4 系) と p-constraint (Hall-Higman
+`hall_higman_solvable_specialization` = BG Prop 1.15(a)) を供給。
+Issue 3017/3024/9403. -/
+theorem zCenterThompsonJAbelian_sup_oPiCore_normal [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G) :
+    (Subgroup.centralizer (Subgroup.thompsonJAbelian (S : Subgroup G) : Set G)
+        ⊓ Subgroup.thompsonJAbelian (S : Subgroup G)
+      ⊔ oPiCore {q | q ≠ p} G).Normal := by
+  haveI : IsSolvable G := hsolv
+  set N := oPiCore {q | q ≠ p} G with hN_def
+  have hoddbar : Odd (Nat.card (G ⧸ N)) := by
+    obtain ⟨c, hc⟩ := N.index_dvd_card
+    rw [hc] at hodd
+    exact (Nat.odd_mul.mp hodd).1
+  -- p-stability on `Ḡ` (Gorenstein 6.5.3)
+  have hstable : Subgroup.IsPStableOp p (G ⧸ N) :=
+    OddOrder.BG.AppA.isPStableOp_of_odd_solvable hp_odd inferInstance hoddbar
+  -- p-constraint on `Ḡ` (Hall-Higman; `O_{p'}(Ḡ) = ⊥`)
+  have hset : {q | q ∉ ({p} : Set ℕ)} = {q | q ≠ p} := by ext q; simp
+  have hconstr := OddOrder.BG.Ch1.S01.hall_higman_solvable_specialization
+    (p := p) (G := G ⧸ N)
+    (by rw [hset]; exact oPiCore_quotient_self_eq_bot {q | q ≠ p})
+  rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore] at hconstr
+  exact Subgroup.zCenter_thompsonJAbelian_sup_oPiCorePrime_normal hp_odd hstable
+    hconstr S
 
 end OddOrder.BG.Ch1.S06
