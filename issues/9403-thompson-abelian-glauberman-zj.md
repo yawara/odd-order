@@ -67,7 +67,21 @@ BG Thm 6.2 の J は Gorenstein 版。⟹ J_a 完成後、`hZJ`・結論とも J
 `QuotientGroup.quotientInfEquivProdNormalizerQuotient` (ambient 正規性不要) で、
 coset 単射は `Quotient.out` 経由 (well-definedness 不要)。
 
-### 次 = Thm 2.5 (Thompson Replacement) の入口
+### ✅ Thm 2.5 (Thompson Replacement) + Thm 2.6 完全証明 (2026-07-21, commits 30e5eb6a6 / 1b332245b)
+
+`thompson_replacement` / `exists_mem_maxAbelianIn_normalizer` sorry-free。
+G Thm 2.6.4 の対応物 = `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial`
+(import 追加; GroupTheory→Ch01 は既存前例)。normalizer 3 補題
+(`mem_normalizer_of_forall_commutatorElement_mem` / `conj_mem_normalizer` +
+`mem_normalizer_normalizer` / `mem_normalizer_inf`) を新設。leaf = 842 行。
+
+### 次 = Thm 2.7 (Glauberman Replacement) — mmd L5522 以降
+
+`P = AB` 簡約 (Lem 2.2 使用) → `[B,A;i]` 帰納定義 → **Lem 2.8** (i)(ii)(iii) →
+Case 1 / Case 2 (Thm 2.2.3(i) Hall–Witt + Lem 2.2.4(iii)/2.2.5(ii))。
+class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補題なので先に立てる。
+
+### (参考) 旧記録: Thm 2.5 の入口
 
 必要な唯一の外部部品 = **G Thm 2.6.4** (冪零群の非自明正規部分群は中心と非自明に交わる;
 `B/N ∩ Z(AB/N) ≠ 1` に適用)。repo/mathlib の対応物 (`IsPGroup.center_nontrivial` 系 /
