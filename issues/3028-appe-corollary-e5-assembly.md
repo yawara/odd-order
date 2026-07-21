@@ -101,3 +101,30 @@ U₁ = E₂⊔E₃ (abelian Hall (κ∪σ)ᶜ、K₁ 正規化、≠⊥)。
 
 **次段 (WP2 実装)**: 上記 1-5 を `AppE_CorollaryE5.lean` に実装 ((E.30) lemma)。その後
 (E.31) = Thm 12.7 (S12_Theorem127.lean) の該当 clause 適用、(E.32)、WP3 の setup 構成。
+
+## 2026-07-21 WP2 ✅ + ⚠ 新規上流 prerequisite 発見: **Cor 15.9(c) が未形式化** (WP2.5)
+
+**WP2 landed** (commits 712b60cbe / b8c6cd0ce、全 sorry-free):
+- `mem_opiCoreInG_singleton_of_nilpotent` (p-元の O_p 吸収、W = M_σ 用)
+- `e5_neighbour_data` に `M ⊓ N = K₁ ⊔ U₁` conjunct 追加
+- `mem_kappa_sigma_compl_of_mem_tau2` / `le_of_isPGroup_of_not_dvd_relIndex` (generic)
+- `e5_R_eq_centralizer` = **BG (E.30)** ✅
+
+**⚠ WP3 の前に必要な新規上流 (WP2.5)**: E.5 冒頭の (E.28) recap
+`|E∩N| = |N/N'|, N_E(⟨x⟩) ⊆ E∩N, N ∈ ℳ_𝒫₂, p ∈ τ₂(N)` (PDF p.164 = page 177 画像確認) は
+**BG Cor 15.9(c)** (printed: "for a suitable choice of a complement E to M_σ in M ...
+(c) r ∈ τ₂(N), N_E(⟨x_r⟩) ⊆ E∩N, and |E∩N| = |N/N'|")。repo の
+`centralizer_escape_final_local` は **(a)(b) のみ** (TaxonomyOutput.lean:666- の докstring
+明記; Coq `nonFtype_signalizer_base` BGsection15.v:1399 も (a)(b))。
+⚠ 2026-07-07 に「N_G(⟨x⟩) ≤ E⊓N」版 conjunct が unsound として削除された経緯あり (issue
+9017 #19) — sound な (c) は **N_E** (E 内正規化群) かつ **suitable E** (E の再選択が入る)。
+
+- (c) の用途: WP3 の A := K₁ ≤ E 整列と WP4 終端の「E = K₁」比較。構造的に必須。
+- BG の (c) 証明 = 15.9 証明後半 (15.4)-(15.5)... (§16 側、pdftotext L6391-)。R = Sylow r
+  of M∩N (= N の Sylow r でもある) を経由して E を再選択。
+- Coq 側の対応物確認が次の一手: BGsection15/16 で Feit–Thompson (1991) clause (c) 相当
+  (`FT_signalizer` 系 / `nonFtype_signalizer` 続き) を grep。
+- 置き場所: S16 (TaxonomyOutput の続き or 新 sibling leaf)。lane c は §16 割当済なので
+  territory 問題なし。9500 claim 不要 (App.E assembly の一部、issue 3028 で追跡)。
+
+**改訂 WP 順**: WP2.5 (15.9(c)) → WP3 (setup 構成) → WP4 ((ii)∧hdc⟹(i)) → WP5 (counting)。
