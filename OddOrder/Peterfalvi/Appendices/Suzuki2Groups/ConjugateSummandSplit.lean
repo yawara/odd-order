@@ -64,6 +64,46 @@ def quotientCongr (ω : MulAut P) (hωZ : ∀ z ∈ Z, ω z = z) :
 theorem quotientCongr_mk (ω : MulAut P) (hωZ : ∀ z ∈ Z, ω z = z) (x : P) :
     quotientCongr ω hωZ (QuotientGroup.mk x) = QuotientGroup.mk (ω x) := rfl
 
+/-- The induced automorphism of a product is the composite of the induced
+automorphisms. -/
+theorem quotientCongr_mul_apply (ω₁ ω₂ : MulAut P)
+    (h₁ : ∀ z ∈ Z, ω₁ z = z) (h₂ : ∀ z ∈ Z, ω₂ z = z)
+    (h₁₂ : ∀ z ∈ Z, (ω₁ * ω₂) z = z) (q : P ⧸ Z) :
+    quotientCongr (ω₁ * ω₂) h₁₂ q =
+      quotientCongr ω₁ h₁ (quotientCongr ω₂ h₂ q) := by
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+  simp only [quotientCongr_mk]
+  rfl
+
+/-- The identity automorphism induces the identity on the quotient. -/
+theorem quotientCongr_one_apply (h : ∀ z ∈ Z, (1 : MulAut P) z = z)
+    (q : P ⧸ Z) :
+    quotientCongr 1 h q = q := by
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+  rw [quotientCongr_mk]
+  rfl
+
+/-- An automorphism commuting with an action of `K` on `P` induces an
+automorphism of `P ⧸ Z` commuting with the induced action. -/
+theorem quotientCongr_comm_quotientMulAutHom
+    {K : Type uK} [Group K]
+    {rho : K →* MulAut P} (hZinv : OddOrder.Isaacs.Ch03.IsAInvariant rho Z)
+    (ω : MulAut P) (hωZ : ∀ z ∈ Z, ω z = z)
+    (k : K) (hcomm : Commute (rho k) ω) (q : P ⧸ Z) :
+    quotientCongr ω hωZ (quotientMulAutHom hZinv k q) =
+      quotientMulAutHom hZinv k (quotientCongr ω hωZ q) := by
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+  rw [show quotientMulAutHom hZinv k (QuotientGroup.mk x) =
+      QuotientGroup.mk (rho k x) from rfl, quotientCongr_mk,
+    quotientCongr_mk,
+    show quotientMulAutHom hZinv k (QuotientGroup.mk (ω x)) =
+      QuotientGroup.mk (rho k (ω x)) from rfl]
+  have happ : rho k (ω x) = ω (rho k x) := by
+    calc rho k (ω x) = (rho k * ω) x := rfl
+      _ = (ω * rho k) x := by rw [hcomm.eq]
+      _ = ω (rho k x) := rfl
+  rw [happ]
+
 end InducedAut
 
 /-! ## The conjugate summand and the isomorphic split -/
@@ -221,20 +261,8 @@ theorem nonempty_isomorphicOrderQModuleSplit_of_commuting_automorphism
   -- quotient-level commutation of `ω` with the induced action
   have hcommQ : ∀ (k : K) (q : P ⧸ Z),
       quotientCongr ω hωZ (quotientMulAutHom hZinv k q) =
-        quotientMulAutHom hZinv k (quotientCongr ω hωZ q) := by
-    intro k q
-    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
-    rw [show quotientMulAutHom hZinv k (QuotientGroup.mk x) =
-        QuotientGroup.mk (rho k x) from rfl, quotientCongr_mk,
-      quotientCongr_mk,
-      show quotientMulAutHom hZinv k (QuotientGroup.mk (ω x)) =
-        QuotientGroup.mk (rho k (ω x)) from rfl]
-    have := (hωcomm k).eq
-    have happ : rho k (ω x) = ω (rho k x) := by
-      calc rho k (ω x) = (rho k * ω) x := rfl
-        _ = (ω * rho k) x := by rw [this]
-        _ = ω (rho k x) := rfl
-    rw [happ]
+        quotientMulAutHom hZinv k (quotientCongr ω hωZ q) := fun k q =>
+    quotientCongr_comm_quotientMulAutHom hZinv ω hωZ k (hωcomm k) q
   -- invariance of the conjugate summand
   have hYinv : IsAInvariant (quotientMulAutHom hZinv) Ybar := by
     intro k

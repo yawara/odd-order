@@ -7,6 +7,18 @@ created: 2026-07-18
 
 # Peterfalvi I.3 Lemma 5: cyclic W and Suzuki type B
 
+> **✅ CLOSED 2026-07-21** — Lemma 5 の 3 主張すべて完成:
+> `lemmaFive_of_orderThree` (WCyclicDivides.lean, `768f8bcb7`) =
+> W cyclic ∧ |W| ∣ 2^m+1 ∧ (W ≠ ⊥ → IsTypeB Q)。sorry 0・axiom-clean・
+> AxiomsCheck 登録済 (計 7 本)。経路: 第一 reduction C_Q(w) = Q₀
+> (OrderThreeSuzukiCentralizer) → square fiber (SquareCosetFiber) →
+> conjugate summand split engine (ConjugateSummandSplit) →
+> LemmaFiveSetup (TypeBFromW) → type-B 認識 (TypeBRecognition 経由) +
+> plane model (QuotientPlaneModel) → 射影自由 2 次元定理
+> (ProjectiveFreeTwoDim)。
+> 残った低優先項目 (Appendix III (e) ⟹ 方向、Lemma 5 不使用) は
+> issue 2052 に分離。
+
 ## 背景
 
 Peterfalvi Part II, Ch. I §3 Lemma 5 (p. 107) の形式化。`|st| = 3`、

@@ -906,6 +906,21 @@ theorem conj_mem_SsetOf [Finite G] {R : Subgroup G} {χ : ClassFunction ↥hyp.H
   refine ⟨hyp.conj_mem_Sset hχS, fun x hx => ?_⟩
   rw [ClassFunction.conj_apply, ClassFunction.conj_apply, hker x hx]
 
+/-- **`Q' = S'·[Q₁,Q₁]`** — the derived subgroup of the direct product
+`Q = S × Q₁` splits (p. 146; the base case `𝒮(S'[Q₁,Q₁]) = 𝒮(Q')` of the
+reduction (1) induction).  `≤` is the direct-product commutator split
+(`commutator_mem_sup_Sder_of_central` at `Z = Q₁`, `Q₃ = [Q₁,Q₁]`); `≥` is
+`sup_Sder_le_Qder`. -/
+theorem Qder_eq_sup_Sder_commutator :
+    hyp.Qder = hyp.Sder ⊔ ⁅hyp.Q1, hyp.Q1⁆ := by
+  refine le_antisymm ?_ (hyp.sup_Sder_le_Qder le_rfl)
+  change ⁅hyp.Q, hyp.Q⁆ ≤ _
+  rw [Subgroup.commutator_le]
+  intro g hg h hh
+  exact hyp.commutator_mem_sup_Sder_of_central le_rfl
+    (fun z hz y hy => Subgroup.commutator_mem_commutator hz hy)
+    (by rw [hyp.sup_S_Q1_eq_Q]; exact hg) hh
+
 section StepLemma
 
 variable [Fintype G] [Invertible (Nat.card G : ℂ)]
