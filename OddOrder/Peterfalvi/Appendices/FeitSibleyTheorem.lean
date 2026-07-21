@@ -833,7 +833,7 @@ Splitting the `N ⊆ ker` sum (`sumInflatedDegreeSq` = `|K⧸N|`) by the
 (the character kernel is a subgroup, `characterKernelSubgroup`), which sums to
 `|K⧸(N ⊔ M)|`. -/
 theorem sum_degreeSq_ker_subset_not_subset
-    {K : Type*} [Group K] [Finite K] [Fintype K] [Invertible (Nat.card K : ℂ)]
+    {K : Type*} [Group K] [Finite K] [Invertible (Nat.card K : ℂ)]
     (N M : Subgroup K) [N.Normal] [(N ⊔ M).Normal] :
     ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter K =>
         (N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ) ∧
@@ -841,6 +841,7 @@ theorem sum_degreeSq_ker_subset_not_subset
         ((χ : ClassFunction K ℂ) 1) ^ 2
       = (Nat.card (K ⧸ N) : ℂ) - (Nat.card (K ⧸ (N ⊔ M)) : ℂ) := by
   classical
+  letI : Fintype K := Fintype.ofFinite _
   have hker_iff : ∀ χ : IrreducibleCharacter K,
       (((N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) ∧
         ((M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
