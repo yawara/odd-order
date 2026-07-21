@@ -203,7 +203,12 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
       - [x] 既約 middle quotient の排除 (`d1d113b24`):
             `exists_proper_invariant_subgroup_of_card_sq` — EA 位数 (2^n)² +
             cyclic 位数 2^n−1 fpf → proper 非自明不変部分群存在 (sorry 0)
-      - [ ] 3-chain 存在の最終 assembly (次工程):
+      - [x] 最終 assembly `hasXiLengthThree_of_card_eq_cube` (`9400087bd`):
+            IsSuzuki2Group + |P| = q³ + cyclic regular actor (|K| = q−1) →
+            HasXiLengthThree K.subtype (sorry 0)。**ξ-length-3 橋渡し完成** —
+            higmanLemmaTwelve / center_eq_frattini / two-summand split の
+            全 Higman payload が Lemma 5 設定から供給可能に
+      - [-] (旧計画メモ; 完了済につき参照のみ)
             (i) 非自明不変正規部分群は involutionSubgroup を含む
             (2 群の正規部分群は中心と交わる + 位数 2 元 + K 推移性)、
             |involutionSubgroup| = q; (ii) P/Ω₁ (位数 q²) の
