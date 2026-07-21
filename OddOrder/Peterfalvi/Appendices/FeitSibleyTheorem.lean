@@ -1084,6 +1084,22 @@ theorem exists_apply_one_eq_d_mul [Finite G]
 
 end SsetOfCounting
 
+/-- **`𝒮(·)` is antitone**: a smaller kernel condition admits more characters,
+`R₁ ≤ R₂ ⟹ 𝒮(R₂) ⊆ 𝒮(R₁)`. -/
+theorem ssetOf_antitone {R₁ R₂ : Subgroup G} (hR : R₁ ≤ R₂) :
+    hyp.SsetOf R₂ ⊆ hyp.SsetOf R₁ := by
+  rintro χ ⟨hχS, hker⟩
+  exact ⟨hχS, fun x hx => hker x (hR hx)⟩
+
+/-- `S'·Q₂ ≤ Q'` for `Q₂ ≤ [Q₁,Q₁]`: both `S' = [S,S]` and `[Q₁,Q₁]` sit inside
+`Q' = [Q,Q]` (commutator monotonicity), so `𝒮(Q') ⊆ 𝒮(S'·Q₂)` — the reduction
+steps' base families contain the degree-`d` anchors of the Remark. -/
+theorem sup_Sder_le_Qder {Q₂ : Subgroup G} (hQ₂ : Q₂ ≤ ⁅hyp.Q1, hyp.Q1⁆) :
+    hyp.Sder ⊔ Q₂ ≤ hyp.Qder := by
+  refine sup_le ?_ (le_trans hQ₂ ?_)
+  · exact Subgroup.commutator_mono hyp.S_le_Q hyp.S_le_Q
+  · exact Subgroup.commutator_mono hyp.Q1_le_Q hyp.Q1_le_Q
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
