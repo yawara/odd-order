@@ -466,6 +466,50 @@ theorem card_quot_Q1_sub_one_le_of_card_quot_sub_le [Finite G] {R Q₂ : Subgrou
   have hd_pos : (0 : ℝ) < (hyp.d : ℝ) := by exact_mod_cast hyp.d_pos
   exact le_of_mul_le_mul_left hstep hd_pos
 
+/-- **`S ⊔ Q₁ = Q`**: the subgroup-lattice form of the set product
+`S_mul_Q1_eq_Q`. -/
+theorem sup_S_Q1_eq_Q : hyp.S ⊔ hyp.Q1 = hyp.Q := by
+  refine le_antisymm (sup_le hyp.S_le_Q hyp.Q1_le_Q) ?_
+  intro q hq
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hq
+  obtain ⟨s, hs, y, hy, heq⟩ := hq
+  rw [← heq]
+  exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hs) (Subgroup.mem_sup_right hy)
+
+/-- **The (1.2) index conversion**: `[Q : SZ] = |Q₁⧸Z|` for `Z ≤ Q₁`, in the
+doubly relativised form output by `exists_deg_sq_le_of_mem_SsetOf`
+(`a² ≤ [Q-in-H : D₀-in]` at `D₀ = S ⊔ Z`).  Combines the index tower
+`card_quot_eq_card_quot_Q1_mul` at `R = S⊔Z` (`Q₁ ⊓ SZ = Z`,
+`SZ ⊔ Q₁ = Q`) with `[H : Q] = d` and cancellation. -/
+theorem index_subgroupOf_sup_S_eq [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    [((hyp.S ⊔ Z).subgroupOf hyp.H).Normal] :
+    (((hyp.S ⊔ Z).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).index
+      = Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) := by
+  classical
+  have hinf : hyp.Q1 ⊓ (hyp.S ⊔ Z) = Z := hyp.Q1_inf_sup_eq le_rfl hZQ1
+  have hbridge := hyp.card_quot_eq_card_quot_Q1_mul (R := hyp.S ⊔ Z) hinf
+  have hsup : ((hyp.S ⊔ Z).subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)
+      = hyp.Q.subgroupOf hyp.H := by
+    rw [← Subgroup.subgroupOf_sup
+      (sup_le (hyp.S_le_Q.trans hyp.Q_le_H)
+        ((hZQ1.trans hyp.Q1_le_Q).trans hyp.Q_le_H))
+      (hyp.Q1_le_Q.trans hyp.Q_le_H)]
+    congr 1
+    rw [sup_assoc, sup_eq_right.mpr hZQ1, hyp.sup_S_Q1_eq_Q]
+  rw [hsup] at hbridge
+  have hle : (hyp.S ⊔ Z).subgroupOf hyp.H ≤ hyp.Q.subgroupOf hyp.H := by
+    intro y hy
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    exact (sup_le hyp.S_le_Q (hZQ1.trans hyp.Q1_le_Q)) hy
+  have htower : (((hyp.S ⊔ Z).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).index
+      * (hyp.Q.subgroupOf hyp.H).index = ((hyp.S ⊔ Z).subgroupOf hyp.H).index :=
+    Subgroup.relIndex_mul_index hle
+  have hQd : Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H) = hyp.d := by
+    rw [← Subgroup.index_eq_card, hyp.index_Q_subgroupOf_eq_d]
+  rw [hyp.index_Q_subgroupOf_eq_d,
+    Subgroup.index_eq_card ((hyp.S ⊔ Z).subgroupOf hyp.H), hbridge, hQd] at htower
+  exact Nat.eq_of_mul_eq_mul_right hyp.d_pos htower
+
 /-! ## The centrality input of the (1.2) degree bound
 
 `exists_deg_sq_le_of_mem_SsetOf` consumes the centrality of `D₀/R` in `Q/R`
