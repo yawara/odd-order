@@ -789,6 +789,129 @@ theorem higman_typeC_exponent_uniqueness {n r s t : ℕ} (hr : 0 < r) (h2r : 2 *
       · exact absurd hT0 (Finset.insert_ne_empty _ _)
       · exact absurd hS0 (Finset.insert_ne_empty _ _)
 
+/-- **Two powers of two summing to one power** (Higman's eigenvalue argument
+for `θ = φ = 1`, *Suzuki 2-groups*, p. 90): if
+`2 ^ a + 2 ^ b ≡ 2 ^ c (mod 2 ^ n - 1)` then `a ≡ b` and `c ≡ a + 1 (mod n)`
+— a carry must merge the two powers.  This is why `[x_i, y_j] = 0` for
+`i ≠ j` in the type-`B(n, 1, ε)` case: `λ^{2^i + 2^j}` is an eigenvalue of `ξ`
+on `Φ(G)` (all of the form `λ^{2^{k+1}}`) only if `i = j`. -/
+theorem higman_two_pow_add_eq_two_pow {n a b c : ℕ} (hn : 0 < n)
+    (h : (2 : ZMod (2 ^ n - 1)) ^ a + 2 ^ b = 2 ^ c) :
+    (a : ZMod n) = (b : ZMod n) ∧ (c : ZMod n) = (a : ZMod n) + 1 := by
+  have bridge : ∀ x y : ℕ, x % n = y % n → (x : ZMod n) = (y : ZMod n) :=
+    fun x y hxy => (ZMod.natCast_eq_natCast_iff' x y n).mpr hxy
+  have hTsub : ({c % n} : Finset ℕ) ⊆ Finset.range n := by
+    intro x hx
+    simp only [Finset.mem_singleton] at hx
+    subst hx
+    exact Finset.mem_range.mpr (Nat.mod_lt _ hn)
+  have hTsum : (∑ x ∈ ({c % n} : Finset ℕ), (2 : ZMod (2 ^ n - 1)) ^ x) = 2 ^ c := by
+    rw [Finset.sum_singleton, ← two_pow_zmod_eq_pow_mod]
+  by_cases hab : a % n = b % n
+  · -- the powers merge: `2 ^ (a + 1) = 2 ^ c`
+    refine ⟨bridge a b hab, ?_⟩
+    have hmerge : (∑ x ∈ ({(a + 1) % n} : Finset ℕ), (2 : ZMod (2 ^ n - 1)) ^ x)
+        = 2 ^ c := by
+      rw [Finset.sum_singleton, ← two_pow_zmod_eq_pow_mod, ← h,
+        two_pow_zmod_eq_pow_mod n b, ← hab, ← two_pow_zmod_eq_pow_mod,
+        pow_succ, mul_two]
+    rcases sum_two_pow_zmod_eq_or_of_subset_range (by
+        intro x hx
+        simp only [Finset.mem_singleton] at hx
+        subst hx
+        exact Finset.mem_range.mpr (Nat.mod_lt _ hn)) hTsub
+        (hmerge.trans hTsum.symm) with hST | ⟨_, hT0⟩ | ⟨hS0, _⟩
+    · have := Finset.singleton_injective hST
+      have hcast := bridge (a + 1) c this
+      push_cast at hcast
+      exact hcast.symm
+    · exact absurd hT0 (Finset.singleton_ne_empty _)
+    · exact absurd hS0 (Finset.singleton_ne_empty _)
+  · -- two distinct powers cannot equal a single one
+    exfalso
+    have hSsub : ({a % n, b % n} : Finset ℕ) ⊆ Finset.range n := by
+      intro x hx
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+      rcases hx with rfl | rfl <;> exact Finset.mem_range.mpr (Nat.mod_lt _ hn)
+    have hSsum : (∑ x ∈ ({a % n, b % n} : Finset ℕ), (2 : ZMod (2 ^ n - 1)) ^ x)
+        = 2 ^ c := by
+      rw [Finset.sum_pair hab, ← two_pow_zmod_eq_pow_mod, ← two_pow_zmod_eq_pow_mod]
+      exact h
+    rcases sum_two_pow_zmod_eq_or_of_subset_range hSsub hTsub
+        (hSsum.trans hTsum.symm) with hST | ⟨_, hT0⟩ | ⟨hS0, _⟩
+    · have := congrArg Finset.card hST
+      rw [Finset.card_pair hab, Finset.card_singleton] at this
+      omega
+    · exact absurd hT0 (Finset.singleton_ne_empty _)
+    · exact absurd hS0 (Finset.insert_ne_empty _ _)
+
+/-- **Higman's `s = ±r` matching** (*Suzuki 2-groups*, p. 91, case
+`θ = φ ≠ 1`): if `r, s` are nonzero mod `n` and
+`2 ^ i (1 + 2 ^ s) ≡ 2 ^ t (1 + 2 ^ r) (mod 2 ^ n - 1)` then `s ≡ r` or
+`s ≡ -r (mod n)`.  This is why `[x_i, y_j] = 0` for `|j - i| ≠ r` in the
+type-`B(n, θ, ε)` case: `λ^{2^i (1 + 2^{j-i})}` matches an eigenvalue
+`λ^{2^t (1 + 2^r)}` of `ξ` on `Φ(G)` only if `j - i ≡ ±r`. -/
+theorem higman_typeB_exponent_pm {n r s i t : ℕ} (hn : 0 < n)
+    (hr : (r : ZMod n) ≠ 0) (hs : (s : ZMod n) ≠ 0)
+    (h : (2 : ZMod (2 ^ n - 1)) ^ i * (1 + 2 ^ s) = 2 ^ t * (1 + 2 ^ r)) :
+    (s : ZMod n) = (r : ZMod n) ∨ (s : ZMod n) + (r : ZMod n) = 0 := by
+  have bridge : ∀ x y : ℕ, x % n = y % n → (x : ZMod n) = (y : ZMod n) :=
+    fun x y hxy => (ZMod.natCast_eq_natCast_iff' x y n).mpr hxy
+  have hsd : i % n ≠ (i + s) % n := by
+    intro hh
+    have := bridge i (i + s) hh
+    push_cast at this
+    exact hs (by linear_combination -this)
+  have hrd : t % n ≠ (t + r) % n := by
+    intro hh
+    have := bridge t (t + r) hh
+    push_cast at this
+    exact hr (by linear_combination -this)
+  have hSsub : ({i % n, (i + s) % n} : Finset ℕ) ⊆ Finset.range n := by
+    intro x hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with rfl | rfl <;> exact Finset.mem_range.mpr (Nat.mod_lt _ hn)
+  have hTsub : ({t % n, (t + r) % n} : Finset ℕ) ⊆ Finset.range n := by
+    intro x hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with rfl | rfl <;> exact Finset.mem_range.mpr (Nat.mod_lt _ hn)
+  have hSsum : (∑ x ∈ ({i % n, (i + s) % n} : Finset ℕ), (2 : ZMod (2 ^ n - 1)) ^ x)
+      = 2 ^ t * (1 + 2 ^ r) := by
+    rw [Finset.sum_pair hsd]
+    simp only [← two_pow_zmod_eq_pow_mod]
+    linear_combination h
+  have hTsum : (∑ x ∈ ({t % n, (t + r) % n} : Finset ℕ), (2 : ZMod (2 ^ n - 1)) ^ x)
+      = 2 ^ t * (1 + 2 ^ r) := by
+    rw [Finset.sum_pair hrd]
+    simp only [← two_pow_zmod_eq_pow_mod]
+    ring1
+  rcases sum_two_pow_zmod_eq_or_of_subset_range hSsub hTsub
+      (hSsum.trans hTsum.symm) with hST | ⟨_, hT0⟩ | ⟨hS0, _⟩
+  · have hmemi : i % n ∈ ({t % n, (t + r) % n} : Finset ℕ) := by
+      rw [← hST]; simp
+    have hmemis : (i + s) % n ∈ ({t % n, (t + r) % n} : Finset ℕ) := by
+      rw [← hST]; simp
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hmemi hmemis
+    rcases hmemi with h1 | h1
+    · rcases hmemis with h2 | h2
+      · exact absurd (h1.trans h2.symm) hsd
+      · -- `i ≡ t` and `i + s ≡ t + r`: `s ≡ r`
+        refine Or.inl ?_
+        have e1 := bridge i t h1
+        have e2 := bridge (i + s) (t + r) h2
+        push_cast at e2
+        linear_combination e2 - e1
+    · rcases hmemis with h2 | h2
+      · -- `i ≡ t + r` and `i + s ≡ t`: `s + r ≡ 0`
+        refine Or.inr ?_
+        have e1 := bridge i (t + r) h1
+        have e2 := bridge (i + s) t h2
+        push_cast at e1 e2
+        linear_combination e2 - e1
+      · exact absurd (h1.trans h2.symm) hsd
+  · exact absurd hT0 (Finset.insert_ne_empty _ _)
+  · exact absurd hS0 (Finset.insert_ne_empty _ _)
+
 /-! ### Bridges from eigenvalue equations to the exponent congruences
 
 Higman's case analysis starts from equations between powers of a primitive
@@ -862,6 +985,44 @@ theorem higman_typeD_congruence_of_pow_eq {F : Type*} [CommMonoid F]
       ≡ (1 + 2 ^ r) * (1 + 2 ^ s) [MOD 2 ^ n - 1] := by
     rw [← hord]
     exact hfin.pow_eq_pow_iff_modEq.mp key
+  have hcast := (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
+  push_cast at hcast
+  exact hcast
+
+/-- **The two-powers-to-one eigenvalue bridge** (case `θ = φ = 1`, Higman
+p. 90).  From `λ^{2^a + 2^b} = λ^{2^c}` for `λ` of order `2 ^ n - 1`, the
+exponents agree mod `2 ^ n - 1`, in the form consumed by
+`higman_two_pow_add_eq_two_pow`. -/
+theorem higman_two_pow_add_congruence_of_pow_eq {F : Type*} [Monoid F] {lam : F}
+    {n a b c : ℕ} (hn : 0 < n) (hord : orderOf lam = 2 ^ n - 1)
+    (h : lam ^ (2 ^ a + 2 ^ b) = lam ^ 2 ^ c) :
+    (2 : ZMod (2 ^ n - 1)) ^ a + 2 ^ b = 2 ^ c := by
+  have h2n : 2 ≤ 2 ^ n := by
+    calc 2 = 2 ^ 1 := (pow_one 2).symm
+    _ ≤ 2 ^ n := Nat.pow_le_pow_right (by omega) hn
+  have hfin : IsOfFinOrder lam := orderOf_pos_iff.mp (by rw [hord]; omega)
+  have hmod : 2 ^ a + 2 ^ b ≡ 2 ^ c [MOD 2 ^ n - 1] := by
+    rw [← hord]
+    exact hfin.pow_eq_pow_iff_modEq.mp h
+  have hcast := (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
+  push_cast at hcast
+  exact hcast
+
+/-- **The `s = ±r` eigenvalue bridge** (case `θ = φ ≠ 1`, Higman p. 91).
+From `λ^{2^i (1 + 2^s)} = λ^{2^t (1 + 2^r)}` for `λ` of order `2 ^ n - 1`,
+the exponents agree mod `2 ^ n - 1`, in the form consumed by
+`higman_typeB_exponent_pm`. -/
+theorem higman_typeB_congruence_of_pow_eq {F : Type*} [Monoid F] {lam : F}
+    {n r s i t : ℕ} (hn : 0 < n) (hord : orderOf lam = 2 ^ n - 1)
+    (h : lam ^ (2 ^ i * (1 + 2 ^ s)) = lam ^ (2 ^ t * (1 + 2 ^ r))) :
+    (2 : ZMod (2 ^ n - 1)) ^ i * (1 + 2 ^ s) = 2 ^ t * (1 + 2 ^ r) := by
+  have h2n : 2 ≤ 2 ^ n := by
+    calc 2 = 2 ^ 1 := (pow_one 2).symm
+    _ ≤ 2 ^ n := Nat.pow_le_pow_right (by omega) hn
+  have hfin : IsOfFinOrder lam := orderOf_pos_iff.mp (by rw [hord]; omega)
+  have hmod : 2 ^ i * (1 + 2 ^ s) ≡ 2 ^ t * (1 + 2 ^ r) [MOD 2 ^ n - 1] := by
+    rw [← hord]
+    exact hfin.pow_eq_pow_iff_modEq.mp h
   have hcast := (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
   push_cast at hcast
   exact hcast
