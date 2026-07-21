@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+import OddOrder.Isaacs.Ch05_Transfer.NilpotentPComplement
 import Mathlib.GroupTheory.PGroup
 
 /-!
@@ -675,6 +676,211 @@ theorem map_mk_sup_S_le_center_of_central {Q₃ Z : Subgroup G}
           (((hyp.Sder ⊔ Q₃).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
   hyp.map_mk_le_center_of_commutator_mem fun _ hx _ hq =>
     hyp.commutator_mem_sup_Sder_of_central hZQ1 hcentral hx hq
+
+/-! ## The two-prime lower bound `|Q₁⧸Q₂| ≥ (d+1)²` (p. 146)
+
+Reduction (1) assumes `|Q₁|` divisible by two primes and reads off
+`|Q₁⧸Q₂| ≥ (d+1)²` for `Q₂ ≤ [Q₁,Q₁]`: the tower `Q₂ ≤ M ≤ Q₁` through the
+`D`-invariant intermediate `M = [Q₁,Q₁]·N_p` (`N_p` the normal `p`-complement
+of the nilpotent `Q₁`) has two proper `D`-invariant steps, each of index
+`≥ d+1` by fixed-point-freeness.  Properness on both sides reduces to a single
+fact applied at each prime: `[K,K]·N_p ≠ K` (else `K/N_p` would be a
+nontrivial perfect `p`-group). -/
+
+/-- **The quotient by a normal `p`-complement is a `p`-group**: its order is
+`|P|` (`IsComplement'.index_eq_card`), a `p`-power. -/
+theorem isPGroup_quotient_of_isComplement'_sylow {K : Type*} [Group K] [Finite K]
+    {p : ℕ} [hp : Fact p.Prime] {N : Subgroup K} [N.Normal] {P : Sylow p K}
+    (hC : Subgroup.IsComplement' N (P : Subgroup K)) :
+    IsPGroup p (K ⧸ N) := by
+  have hidx : Nat.card (K ⧸ N) = Nat.card ↥(P : Subgroup K) := by
+    rw [← Subgroup.index_eq_card]
+    exact hC.symm.index_eq_card
+  exact IsPGroup.of_card (hidx.trans P.card_eq_multiplicity)
+
+/-- **Sylow subgroups for the other primes sit inside the normal
+`p`-complement**: the image of an `r`-Sylow (`r ≠ p`) in the `p`-group `K⧸N` is
+an `r`-group, hence trivial. -/
+theorem sylow_le_of_isComplement'_sylow_of_ne {K : Type*} [Group K] [Finite K]
+    {p r : ℕ} [hp : Fact p.Prime] [hr : Fact r.Prime] (hpr : p ≠ r)
+    {N : Subgroup K} [N.Normal] {P : Sylow p K}
+    (hC : Subgroup.IsComplement' N (P : Subgroup K)) (R : Sylow r K) :
+    (R : Subgroup K) ≤ N := by
+  have hq : IsPGroup p (K ⧸ N) := isPGroup_quotient_of_isComplement'_sylow hC
+  have himg_p : IsPGroup p ↥((R : Subgroup K).map (QuotientGroup.mk' N)) :=
+    hq.to_subgroup _
+  have himg_r : IsPGroup r ↥((R : Subgroup K).map (QuotientGroup.mk' N)) :=
+    R.isPGroup'.map _
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp himg_p
+  obtain ⟨l, hl⟩ := (IsPGroup.iff_card).mp himg_r
+  have hbot : (R : Subgroup K).map (QuotientGroup.mk' N) = ⊥ := by
+    rw [← Subgroup.card_eq_one]
+    rcases Nat.eq_zero_or_pos n with h0 | hpos
+    · rw [hn, h0, pow_zero]
+    · exfalso
+      have hpdvd : p ∣ r ^ l := by
+        rw [← hl, hn]
+        exact dvd_pow_self p hpos.ne'
+      exact hpr ((Nat.prime_dvd_prime_iff_eq hp.out hr.out).mp
+        (hp.out.dvd_of_dvd_pow hpdvd))
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+  exact hbot
+
+/-- **`[K,K]·N_p` is proper** for the normal `p`-complement `N` of a finite
+group with `p ∣ |K|`: otherwise the nontrivial `p`-group `K⧸N` would equal its
+own commutator subgroup, contradicting solvability
+(`IsSolvable.commutator_lt_top_of_nontrivial`). -/
+theorem commutator_sup_normal_pcomplement_ne_top {K : Type*} [Group K] [Finite K]
+    {p : ℕ} [hp : Fact p.Prime] (hpK : p ∣ Nat.card K)
+    {N : Subgroup K} [N.Normal] {P : Sylow p K}
+    (hC : Subgroup.IsComplement' N (P : Subgroup K)) :
+    commutator K ⊔ N ≠ ⊤ := by
+  intro hsup
+  have hq : IsPGroup p (K ⧸ N) := isPGroup_quotient_of_isComplement'_sylow hC
+  haveI : Group.IsNilpotent (K ⧸ N) := hq.isNilpotent
+  have hpP : p ∣ Nat.card ↥(P : Subgroup K) := by
+    have hpK' := hpK
+    rw [← hC.card_mul] at hpK'
+    rcases (Nat.Prime.dvd_mul hp.out).mp hpK' with h | h
+    · exact absurd h (OddOrder.Isaacs.Ch05.not_dvd_card_of_isComplement'_sylow P hC)
+    · exact h
+  haveI : Nontrivial (K ⧸ N) := by
+    apply Finite.one_lt_card_iff_nontrivial.mp
+    have hidx : Nat.card (K ⧸ N) = Nat.card ↥(P : Subgroup K) := by
+      rw [← Subgroup.index_eq_card]
+      exact hC.symm.index_eq_card
+    rw [hidx]
+    exact lt_of_lt_of_le hp.out.one_lt (Nat.le_of_dvd Nat.card_pos hpP)
+  have hlt := IsSolvable.commutator_lt_top_of_nontrivial (K ⧸ N)
+  have hmap : Subgroup.map (QuotientGroup.mk' N) (commutator K ⊔ N) = ⊤ := by
+    rw [hsup]
+    exact Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)
+  have hmapcomm : Subgroup.map (QuotientGroup.mk' N) (commutator K)
+      = commutator (K ⧸ N) := by
+    change Subgroup.map (QuotientGroup.mk' N) ⁅(⊤ : Subgroup K), ⊤⁆
+      = ⁅(⊤ : Subgroup (K ⧸ N)), ⊤⁆
+    rw [Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
+  rw [Subgroup.map_sup, QuotientGroup.map_mk'_self, sup_bot_eq, hmapcomm] at hmap
+  exact hlt.ne hmap
+
+/-- **The two-prime lower bound** `(d+1)² ≤ |Q₁⧸Q₂|` (p. 146, "since `|Q₁|` is
+divisible by two primes"): for nilpotent `Q₁` and `D`-invariant
+`Q₂ ≤ [Q₁,Q₁]`, the intermediate `M = [Q₁,Q₁]·N_p` (`N_p` the normal
+`p`-complement) is `D`-invariant (commutator + characteristic complement,
+`map_mulAut_of_normal_pcomplement`) with `Q₂ ⊊ M ⊊ Q₁`: `M ≠ Q₁` is the
+per-prime properness at `p`, and `M ≤ Q₂ ≤ [Q₁,Q₁]` would put the `r`-Sylow
+inside `[Q₁,Q₁]` (`sylow_le_of_isComplement'_sylow_of_ne`), forcing
+`[Q₁,Q₁]·N_r = Q₁` against the properness at `r`.  The two steps of the tower
+`|Q₁⧸Q₂| = |Q₁⧸M|·|M⧸Q₂|` are then each `≥ d+1`
+(`d_add_one_le_card_quotient_of_le_Q1`). -/
+theorem d_add_one_sq_le_card_quot_of_two_primes [Finite G]
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {p r : ℕ} (hp : p.Prime) (hr : r.Prime) (hpr : p ≠ r)
+    (hpd : p ∣ Nat.card ↥hyp.Q1) (hrd : r ∣ Nat.card ↥hyp.Q1)
+    {Q₂ : Subgroup G} (hQ₂der : Q₂ ≤ ⁅hyp.Q1, hyp.Q1⁆)
+    (hQ₂inv : ∀ δ ∈ hyp.D, ∀ z ∈ Q₂, δ * z * δ⁻¹ ∈ Q₂) :
+    (hyp.d + 1) ^ 2 ≤ Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fact r.Prime := ⟨hr⟩
+  haveI := hnil
+  -- the normal `p`-complement and the abstract intermediate `M₀ = [Q₁,Q₁]·N`
+  obtain ⟨N, hNnormal, hNC⟩ :=
+    OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := ↥hyp.Q1) (p := p)
+  haveI := hNnormal
+  set P : Sylow p ↥hyp.Q1 := default with hP_def
+  have hC := hNC P
+  set M₀ : Subgroup ↥hyp.Q1 := commutator ↥hyp.Q1 ⊔ N with hM₀_def
+  have hM₀top : M₀ ≠ ⊤ := commutator_sup_normal_pcomplement_ne_top hpd hC
+  -- `N ⊄ [Q₁,Q₁]`: else the `r`-Sylow lands in the commutator and the
+  -- properness at `r` fails
+  have hNnotle : ¬ N ≤ commutator ↥hyp.Q1 := by
+    intro hle
+    obtain ⟨Nr, hNrnormal, hNrC⟩ :=
+      OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := ↥hyp.Q1) (p := r)
+    haveI := hNrnormal
+    set R : Sylow r ↥hyp.Q1 := default with hR_def
+    have hCr := hNrC R
+    have hRN : (R : Subgroup ↥hyp.Q1) ≤ N :=
+      sylow_le_of_isComplement'_sylow_of_ne hpr hC R
+    apply commutator_sup_normal_pcomplement_ne_top hrd hCr
+    rw [eq_top_iff, ← hCr.sup_eq_top]
+    exact sup_le le_sup_right ((hRN.trans hle).trans le_sup_left)
+  -- the `G`-level intermediate `M` and the commutator identification
+  have hcommmap : Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1)
+      = ⁅hyp.Q1, hyp.Q1⁆ := by
+    change Subgroup.map hyp.Q1.subtype ⁅(⊤ : Subgroup ↥hyp.Q1), ⊤⁆ = ⁅hyp.Q1, hyp.Q1⁆
+    rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  set M : Subgroup G := M₀.map hyp.Q1.subtype with hM_def
+  have hMQ1 : M ≤ hyp.Q1 := Subgroup.map_subtype_le M₀
+  have hQ₂M : Q₂ ≤ M := by
+    refine le_trans ?_ (Subgroup.map_mono (le_sup_left : commutator ↥hyp.Q1 ≤ M₀))
+    rw [hcommmap]
+    exact hQ₂der
+  have hMprop : ¬ hyp.Q1 ≤ M := by
+    intro hle
+    apply hM₀top
+    rw [eq_top_iff]
+    intro m _
+    obtain ⟨m', hm', hmm⟩ := hle m.2
+    rwa [show m' = m from Subtype.ext hmm] at hm'
+  have hMQ₂ : ¬ M ≤ Q₂ := by
+    intro hle
+    apply hNnotle
+    intro x hx
+    have hxQ₂ : (x : G) ∈ Q₂ := hle ⟨x, Subgroup.mem_sup_right hx, rfl⟩
+    have hxder : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
+      rw [hcommmap]
+      exact hQ₂der hxQ₂
+    obtain ⟨y, hy, hyx⟩ := hxder
+    rwa [show y = x from Subtype.ext hyx] at hy
+  -- `D`-invariance of `M`: conjugation by `δ ∈ D` restricts to an automorphism
+  -- of `Q₁` fixing both the commutator and the normal `p`-complement
+  have hMinv : ∀ δ ∈ hyp.D, ∀ z ∈ M, δ * z * δ⁻¹ ∈ M := by
+    intro δ hδ z hz
+    obtain ⟨m, hm, rfl⟩ := hz
+    have h₁ : ∀ x : ↥hyp.Q1, δ * (x : G) * δ⁻¹ ∈ hyp.Q1 := fun x =>
+      hyp.D_normalizes_Q1 hδ x.2
+    have h₂ : ∀ x : ↥hyp.Q1, δ⁻¹ * (x : G) * δ ∈ hyp.Q1 := fun x => by
+      simpa using hyp.D_normalizes_Q1 (hyp.D.inv_mem hδ) x.2
+    let ψ : ↥hyp.Q1 ≃* ↥hyp.Q1 :=
+      { toFun := fun x => ⟨δ * (x : G) * δ⁻¹, h₁ x⟩
+        invFun := fun x => ⟨δ⁻¹ * (x : G) * δ, h₂ x⟩
+        left_inv := fun x => Subtype.ext (by
+          change δ⁻¹ * (δ * (x : G) * δ⁻¹) * δ = (x : G)
+          group)
+        right_inv := fun x => Subtype.ext (by
+          change δ * (δ⁻¹ * (x : G) * δ) * δ⁻¹ = (x : G)
+          group)
+        map_mul' := fun x y => Subtype.ext (by
+          change δ * ((x : G) * (y : G)) * δ⁻¹
+            = (δ * (x : G) * δ⁻¹) * (δ * (y : G) * δ⁻¹)
+          group) }
+    have hfix : Subgroup.map ψ.toMonoidHom M₀ = M₀ := by
+      rw [hM₀_def, Subgroup.map_sup]
+      have h1 : Subgroup.map ψ.toMonoidHom (commutator ↥hyp.Q1)
+          = commutator ↥hyp.Q1 := by
+        change Subgroup.map ψ.toMonoidHom ⁅(⊤ : Subgroup ↥hyp.Q1), ⊤⁆ = ⁅⊤, ⊤⁆
+        rw [Subgroup.map_commutator, Subgroup.map_top_of_surjective _ ψ.surjective]
+      have h2 : Subgroup.map ψ.toMonoidHom N = N :=
+        OddOrder.Isaacs.Ch05.map_mulAut_of_normal_pcomplement hC ψ
+      rw [h1, h2]
+    have hψm : ψ m ∈ M₀ := by
+      have hmem : ψ m ∈ Subgroup.map ψ.toMonoidHom M₀ :=
+        Subgroup.mem_map_of_mem _ hm
+      rwa [hfix] at hmem
+    exact ⟨ψ m, hψm, rfl⟩
+  have hQ1inv : ∀ δ ∈ hyp.D, ∀ z ∈ hyp.Q1, δ * z * δ⁻¹ ∈ hyp.Q1 := fun δ hδ z hz =>
+    hyp.D_normalizes_Q1 hδ hz
+  -- tower and the two fixed-point-free bounds
+  have htop := hyp.d_add_one_le_card_quotient_of_le_Q1 hMQ1 le_rfl hMinv hQ1inv hMprop
+  have hbot := hyp.d_add_one_le_card_quotient_of_le_Q1 hQ₂M hMQ1 hQ₂inv hMinv hMQ₂
+  calc (hyp.d + 1) ^ 2 = (hyp.d + 1) * (hyp.d + 1) := pow_two _
+    _ ≤ Nat.card (↥hyp.Q1 ⧸ M.subgroupOf hyp.Q1) * Nat.card (↥M ⧸ Q₂.subgroupOf M) :=
+        Nat.mul_le_mul htop hbot
+    _ = Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1) :=
+        (hyp.card_quot_Q1_eq_mul hQ₂M hMQ1).symm
 
 /-! ## The reduction (1) one-step lemma (p. 146)
 
