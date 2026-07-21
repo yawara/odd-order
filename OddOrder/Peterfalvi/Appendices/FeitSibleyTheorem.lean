@@ -824,6 +824,58 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
 
 end CharacterLayer
 
+section OneTwo
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **Peterfalvi (1.2)-type degree bound**: for `ψ ∈ 𝒮(R)` (`R ≤ Q` normal in `Q`)
+and `R ≤ D₀ ≤ Q` with `D₀/R` central in `Q/R`, the `φ`-part of `ψ = Ind_Q^H φ` has
+`φ(1)² ≤ [Q : D₀]` ([Is] Cor 2.30, section form
+`degree_sq_le_index_of_central_quotient`), so `ψ(1) = d·a` with `a² ≤ [Q : D₀]`.
+In reduction (1) this is `ψ(1) = dφ(1)`, `φ(1)² ≤ |Q/SZ|` at `R = S'Q₃`,
+`D₀ = SZ`. -/
+theorem exists_deg_sq_le_of_mem_SsetOf [Finite G]
+    (R D₀ : Subgroup G) (hRQ : R ≤ hyp.Q) (hRD₀ : R ≤ D₀) (_hD₀Q : D₀ ≤ hyp.Q)
+    [(((R.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal]
+    (hcentral : (((D₀.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H)).map
+        (QuotientGroup.mk' (((R.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H)))
+      ≤ Subgroup.center ((↥(hyp.Q.subgroupOf hyp.H)) ⧸
+        (((R.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H))))
+    {ψ : ClassFunction ↥hyp.H ℂ} (hψ : ψ ∈ hyp.SsetOf R) :
+    ∃ a : ℕ, ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ) ∧
+      a ^ 2 ≤ (((D₀.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H)).index := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  obtain ⟨hψS, hkerR⟩ := hψ
+  have hψS' := hψS
+  rw [Sset_eq_induced_of_Q hyp] at hψS'
+  obtain ⟨φ, ⟨hφirr, -⟩, rfl⟩ := hψS'
+  have hindirr : IsIrreducibleCharacter
+      (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) := hψS.1
+  have hconst := hyp.forall_eq_one_of_leKer R hRQ hφirr hindirr hkerR
+  have hND : (((R.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H))
+      ≤ (((D₀.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H)) := by
+    intro x hx
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hx ⊢
+    exact hRD₀ hx
+  obtain ⟨a, ha1, ha2⟩ := degree_sq_le_index_of_central_quotient
+    (N := ((R.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H))
+    (⟨φ, hφirr⟩ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H))
+    (((D₀.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H)) hND
+    (fun x hx => by
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel]
+      simpa using hconst ⟨x, hx⟩)
+    hcentral
+  simp only [IrreducibleCharacter.coe_mk] at ha1
+  refine ⟨a, ?_, ha2⟩
+  rw [ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, ha1]
+
+end OneTwo
+
 end Hypothesis
 
 /-! ## Degree-square counting for the reduction steps (pp. 146–147)
