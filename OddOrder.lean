@@ -36,6 +36,7 @@ import OddOrder.GroupTheory.ThompsonSubgroupAbelian
 import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ
 import OddOrder.GroupTheory.SolvableTwoTransitive
+import OddOrder.GroupTheory.MaximalClassPGroup
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.MackeyTransfer
