@@ -66,16 +66,38 @@ Lean の結論は `M_F ≤ M_σ` と `M_σ ≤ M'` **のみ**。すなわち以�
 
 ## やること
 
-- [ ] A(6) の 3 条項 (`M_F ≠ ⊥` / `M' ⊊ M` / `M'/M_F nilpotent` 一般形) を形式化し、
+- [x] A(6) の 3 条項 (`M_F ≠ ⊥` / `M' ⊊ M` / `M'/M_F nilpotent` 一般形) を形式化し、
       `theoremA_maximal_structure_faithful` の結論に組み込む
-- [ ] A(3) の `U ⊴ UK`、A(7) の 2 条項を packaging に追加 (実体は既存ゆえ配線のみ)
-- [ ] `fitting_not_ti_cases` の docstring から stale な "Still owed" 段落を除去
-- [ ] survey の Thm A 行を「済」→「部分」に訂正し、§16 散文との矛盾を解消
+      → **2026-07-22 完了 (commit `6a0e6be17`)**。3 standalone 補題 `maxNilpotentNormalHall_ne_bot`
+      / `derivedInG_lt_of_maximal` / `derivedInG_quotient_maxNilpotentNormalHall_isNilpotent`
+      (TypeBridges.lean) を追加し monolith に配線。nilpotency は
+      `∀ [((M_F).subgroupOf M').Normal], IsNilpotent (M' ⧸ M_F)` の Pi-over-instance 形で
+      monolith signature を instance-free に保った。
+- [x] A(7) の 2 条項を packaging に追加 (実体は既存ゆえ配線のみ)
+      → **2026-07-22 完了 (commit `112988882`)**。`F(M)=C_M(M_F)M_F` と `K≠1→F(M)⊆M'` を
+      `fitting_decomposition` から cite。
+- [x] ~~A(3) の `U ⊴ UK`~~ → **意図的に carry しない (2026-07-22 裁定)**。monolith の `U` は
+      任意の `(κ∪σ)'`-Hall で、その `M_σ`-共役も同じく Hall 補群ゆえ一般に `K`-invariant でない
+      → 任意 `U` に `K ≤ N(U)` (ひいては `U ⊴ UK`) を主張すると **unsound**。book の `U` は
+      特定の `K`-invariant 補群であり、その存在は別 statement
+      (`exists_kappaHall_invariant_complement_to_MF`)。monolith docstring に明記。
+- [x] `fitting_not_ti_cases` の docstring から stale な "Still owed" 段落を除去
+      → **既に commit `955c5b17f` で対応済**。現行は「issue 3022, closed」+ downstream theorem
+      (`sigmaComplement_structure_of_not_fittingIsTI` / `S16.fitting_not_ti_structure_e`) を指す。
+- [x] survey の Thm A 行を「済」→「部分」に訂正 → **既に hub 2026-07-19 で「部分」に訂正済**
+      (survey L568)。
 
 ## 完了条件
 
 `theoremA_maximal_structure_faithful` が book A(1)-(8) を逐条で運び、15.7 の docstring が
-実体と一致している。
+実体と一致している。→ **達成 (A(3) `U ⊴ UK` は arbitrary-`U` monolith では unsound ゆえ意図的除外、
+docstring に根拠明記)**。monolith は 16 conjuncts・axiom-clean (3 axioms, allowlist) を維持。
+
+## 決着 (2026-07-22, lane c)
+
+primary A(6) essential gap を形式化して closed。A(7) packaging も landing。A(3) `U ⊴ UK` は
+arbitrary-`U` parametrization では unsound と裁定 (存在は別 lemma で既存)。stale docstring と
+survey 訂正は先行 commit で対応済だったことを確認。**close**。
 
 ## 参照
 

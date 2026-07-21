@@ -27,6 +27,8 @@ class-algebra congruence → (8) conclusion) is built on top.
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
+open scoped commutatorElement
+
 /-! ## The (6) integer inequality core (p. 148) -/
 
 /-- **Peterfalvi (6) integer core** (p. 148): writing `χ₁(1) = a·d` and expanding
@@ -63,5 +65,139 @@ theorem x_eq_zero_or_x_one_of_norm_identity {a m x nvv : ℤ}
   · -- `x = 2`: the bracket is `1 + 4(m−1) ≥ 5 > 1`, impossible
     exfalso
     nlinarith [hk, hm]
+
+/-! ## The endgame central subgroup `Z = ⁅Q₁, Q₁⁆ ⊓ Z(Q₁)` (Peterfalvi (4), p. 147)
+
+For a non-abelian `p`-group `Q₁` the subgroup `Z = [Q₁,Q₁] ∩ Z(Q₁)` is a
+nontrivial `H`-invariant central subgroup of `Q₁`; it supplies the `Z` of
+reduction (3) (`xset_coherent_of_le_center_Q1`), so `𝒳 = 𝒮 − 𝒮(Z)` is coherent. -/
+
+namespace Hypothesis
+
+variable {G : Type*} [Group G] (hyp : Hypothesis G)
+
+/-- **The endgame central subgroup** `Z = ⁅Q₁, Q₁⁆ ⊓ C_G(Q₁)` (Peterfalvi (4)).
+The intersection with the centralizer realises the `Z(Q₁)`-part: `Z ≤ Q₁` and `Z`
+centralises `Q₁`, i.e. `Z ≤ Z(Q₁)`. -/
+def endgameZ : Subgroup G := ⁅hyp.Q1, hyp.Q1⁆ ⊓ Subgroup.centralizer (hyp.Q1 : Set G)
+
+/-- `⁅Q₁, Q₁⁆ ≤ Q₁`: a subgroup is closed under commutators. -/
+theorem commutator_Q1_le_Q1 : ⁅hyp.Q1, hyp.Q1⁆ ≤ hyp.Q1 :=
+  Subgroup.commutator_le.mpr fun a ha b hb => by
+    rw [commutatorElement_def]
+    exact hyp.Q1.mul_mem (hyp.Q1.mul_mem (hyp.Q1.mul_mem ha hb) (hyp.Q1.inv_mem ha))
+      (hyp.Q1.inv_mem hb)
+
+theorem endgameZ_le_Q1 : hyp.endgameZ ≤ hyp.Q1 := inf_le_left.trans hyp.commutator_Q1_le_Q1
+
+/-- **`Z` centralises `Q₁`** (`Z ≤ Z(Q₁)`): `⁅z, y⁆ = 1` for `z ∈ Z`, `y ∈ Q₁`. -/
+theorem endgameZ_centralizes {z : G} (hz : z ∈ hyp.endgameZ) {y : G} (hy : y ∈ hyp.Q1) :
+    ⁅z, y⁆ = 1 := by
+  have hyz : ⁅y, z⁆ = 1 :=
+    (Subgroup.mem_centralizer_iff_commutator_eq_one.mp hz.2) y hy
+  have : Commute z y := (commutatorElement_eq_one_iff_commute.mp hyz).symm
+  exact commutatorElement_eq_one_iff_commute.mpr this
+
+/-- The `↥Q₁`-level commutator maps onto `⁅Q₁, Q₁⁆`. -/
+theorem map_commutator_Q1 :
+    (commutator ↥hyp.Q1).map hyp.Q1.subtype = ⁅hyp.Q1, hyp.Q1⁆ := by
+  rw [commutator_def, Subgroup.map_commutator]
+  simp only [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+
+/-- **`Z ≠ ⊥`** for a non-abelian `p`-group `Q₁` (Peterfalvi (4)): the nontrivial
+normal subgroup `[Q₁,Q₁]` of the `p`-group `Q₁` meets the centre nontrivially
+(`IsPGroup.normal_inf_center_nontrivial`), and the injective `Q₁ ↪ G` carries the
+nontriviality up to `Z`. -/
+theorem endgameZ_ne_bot [Finite G] {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
+    (hnonab : ⁅hyp.Q1, hyp.Q1⁆ ≠ ⊥) : hyp.endgameZ ≠ ⊥ := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- `commutator ↥Q₁` is nontrivial, else `⁅Q₁,Q₁⁆ = ⊥`
+  have hcomm_nt : Nontrivial (commutator ↥hyp.Q1) := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro hcbot
+    exact hnonab (by rw [← hyp.map_commutator_Q1, hcbot, Subgroup.map_bot])
+  -- `[Q₁,Q₁] ⊓ Z(Q₁) ≠ ⊥` in `↥Q₁`
+  have hK : (commutator ↥hyp.Q1) ⊓ Subgroup.center ↥hyp.Q1 ≠ ⊥ := by
+    rw [← Subgroup.nontrivial_iff_ne_bot]
+    exact OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial hQ1p hcomm_nt
+  -- its `G`-image sits inside `Z` and is nontrivial (subtype injective)
+  have hmaple : ((commutator ↥hyp.Q1) ⊓ Subgroup.center ↥hyp.Q1).map hyp.Q1.subtype
+      ≤ hyp.endgameZ := by
+    rintro _ ⟨z, hz, rfl⟩
+    obtain ⟨hzc, hzcent⟩ := Subgroup.mem_inf.mp hz
+    refine ⟨?_, ?_⟩
+    · exact hyp.map_commutator_Q1 ▸ Subgroup.mem_map_of_mem hyp.Q1.subtype hzc
+    · refine Subgroup.mem_centralizer_iff_commutator_eq_one.mpr fun g hg => ?_
+      have hcz : Commute (⟨g, hg⟩ : ↥hyp.Q1) z :=
+        (Subgroup.mem_center_iff.mp hzcent) (⟨g, hg⟩ : ↥hyp.Q1)
+      have hcomm : Commute g (hyp.Q1.subtype z) := by
+        simpa using hcz.map hyp.Q1.subtype
+      exact commutatorElement_eq_one_iff_commute.mpr hcomm
+  have hmapne : ((commutator ↥hyp.Q1) ⊓ Subgroup.center ↥hyp.Q1).map hyp.Q1.subtype ≠ ⊥ := by
+    rw [Ne, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff]
+    exact hK
+  exact fun hbot => hmapne (le_bot_iff.mp (by rw [← hbot]; exact hmaple))
+
+/-- **`Z` is `H`-invariant** (element form): `h · x · h⁻¹ ∈ Z` for `h ∈ H`,
+`x ∈ Z`.  Both factors are `H`-invariant — `⁅Q₁,Q₁⁆` because `Q₁ ⊴ H`
+(`Q1_map_conj_eq` + `map_commutator`), and `C_G(Q₁)` because conjugation permutes
+`Q₁`. -/
+theorem endgameZ_conj_mem_of_mem_H [Finite G] {h : G} (hh : h ∈ hyp.H)
+    {x : G} (hx : x ∈ hyp.endgameZ) : h * x * h⁻¹ ∈ hyp.endgameZ := by
+  obtain ⟨hxc, hxcent⟩ := hx
+  refine ⟨?_, ?_⟩
+  · -- `h·x·h⁻¹ ∈ ⁅Q₁,Q₁⁆`
+    have hφ : Subgroup.map (MulAut.conj h).toMonoidHom ⁅hyp.Q1, hyp.Q1⁆ = ⁅hyp.Q1, hyp.Q1⁆ := by
+      rw [Subgroup.map_commutator, hyp.Q1_map_conj_eq hh]
+    have hmem : (MulAut.conj h) x ∈ ⁅hyp.Q1, hyp.Q1⁆ :=
+      hφ ▸ Subgroup.mem_map_of_mem _ hxc
+    simpa [MulAut.conj] using hmem
+  · -- `h·x·h⁻¹ ∈ C_G(Q₁)`
+    refine Subgroup.mem_centralizer_iff_commutator_eq_one.mpr fun y hy => ?_
+    have hy' : h⁻¹ * y * h ∈ hyp.Q1 := by
+      have := hyp.Q1_normal_in_H (hyp.H.inv_mem hh) hy
+      simpa using this
+    -- `x` commutes with `h⁻¹yh`; conjugating by `h` gives `hxh⁻¹` commutes with `y`
+    have hxc' : ⁅h⁻¹ * y * h, x⁆ = 1 :=
+      (Subgroup.mem_centralizer_iff_commutator_eq_one.mp hxcent) (h⁻¹ * y * h) hy'
+    have hc : Commute (h⁻¹ * y * h) x := commutatorElement_eq_one_iff_commute.mp hxc'
+    have hcm := hc.map (MulAut.conj h).toMonoidHom
+    simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hcm
+    have hyeq : h * (h⁻¹ * y * h) * h⁻¹ = y := by group
+    rw [hyeq] at hcm
+    exact commutatorElement_eq_one_iff_commute.mpr hcm
+
+/-! ## The two coherent families `𝒳` and `𝒴` (Peterfalvi (4), p. 147) -/
+
+section Coherence
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+/-- **`𝒳 = 𝒮 − 𝒮(Z) = XsetOf ⊥ Z` is coherent** (Peterfalvi (4), reduction (3) at
+the endgame `Z = ⁅Q₁,Q₁⁆ ∩ Z(Q₁)`): the four `Z`-hypotheses of
+`xset_coherent_of_le_center_Q1` are the `endgameZ_*` facts, and the three `Normal`
+instances descend from `Sder`, `Z` and `S` being `H`-invariant. -/
+theorem endgame_Xset_coherent (hd : Odd hyp.d) {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) (hnonab : ⁅hyp.Q1, hyp.Q1⁆ ≠ ⊥) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.XsetOf (⊥ : Subgroup G) hyp.endgameZ) hyp.A) := by
+  haveI : (hyp.Sder.subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.Sder_conj_mem_of_mem_H hh hx
+  haveI : (hyp.endgameZ.subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx
+  haveI : ((hyp.S ⊔ hyp.endgameZ).subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
+      conj_mem_sup (fun y hy => hyp.S_normal_in_H hh hy)
+        (fun y hy => hyp.endgameZ_conj_mem_of_mem_H hh hy) hx
+  exact hyp.xset_coherent_of_le_center_Q1 hd hp hQ1p hyp.endgameZ_le_Q1
+    (hyp.endgameZ_ne_bot hp hQ1p hnonab)
+    (fun z hz y hy => hyp.endgameZ_centralizes hz hy)
+    (fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx)
+
+end Coherence
+
+end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
