@@ -429,6 +429,7 @@ import OddOrder.BG.AppE_EigenvalueCombinatorics
 import OddOrder.BG.AppE_BetaSupply
 import OddOrder.BG.AppE_PropE4
 import OddOrder.BG.AppE_CorollaryE5
+import OddOrder.BG.AppE_E5Counting
 import OddOrder.BG.AppE_FiliformCounterexample
 import OddOrder.BG.AppE_FiliformGroup
 import OddOrder.BG.AppE_FiliformRefutation

@@ -1208,7 +1208,13 @@ This is the opening of BG's proof (*"As in the proof of Corollary 15.9, we see t
 replayed through the public pieces of the proved
 `OddOrder.BG.Ch4.S16.centralizer_escape_final_local`.  The remaining `(E.29)` clause —
 `R ≤ U₁` for the Sylow `p`-subgroup `R` of `M ∩ N` — is produced at the `(E.30)` stage
-(issue 3028 WP2), which constructs `R`. -/
+(issue 3028 WP2), which constructs `R`.
+
+Three extra exports feed the E.5 assembly (issue 3028 WP5): `p ∈ τ₂(N)` (the signalizer
+conjunct at the single prime of `ord(x)`), the singleton `ℳ(C_G(x)) = {N}` (Corollary
+14.3, pinning `N` for the `N_G(⟨x⟩) ≤ N` localization), and the `E`-setup
+`SubgroupESetup N (M ∩ N) K₁ E₂ E₃` with `U₁ = E₂ ⊔ E₃` (consumed by the Theorem 12.7
+machinery of `(E.31)`/`(E.32)`). -/
 theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M N : Subgroup G} {x : G} {p : ℕ}
     (hM : M ∈ maximalSubgroups G) (hp : p.Prime)
@@ -1221,6 +1227,8 @@ theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ ∧
       Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
         ((M ⊓ N).subgroupOf N) ∧
+      p ∈ tau2 N ∧
+      maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {N} ∧
       ∃ K₁ U₁ : Subgroup G,
         K₁ ≤ M ⊓ N ∧ U₁ ≤ M ⊓ N ∧ U₁ ≠ ⊥ ∧
         OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa N)
@@ -1231,7 +1239,8 @@ theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (Nat.card ↥K₁).Prime ∧
         IsMulCommutative ↥U₁ ∧
         K₁ ≤ Subgroup.normalizer ((U₁ : Subgroup G) : Set G) ∧
-        M ⊓ N = K₁ ⊔ U₁ := by
+        M ⊓ N = K₁ ⊔ U₁ ∧
+        ∃ E₂ E₃ : Subgroup G, SubgroupESetup N (M ⊓ N) K₁ E₂ E₃ ∧ U₁ = E₂ ⊔ E₃ := by
   classical
   have hx1 : x ≠ 1 := fun h => hp.one_lt.ne' (by rw [← hord, h, orderOf_one])
   have hxsharp : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := ⟨hxM, hx1⟩
@@ -1244,14 +1253,20 @@ theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hNmax', hCN', hRne', hRhall', hxtau2', hNtype', hforall'⟩ := hNstruct
   have hxN' : x ∈ N' := hCN' (Subgroup.mem_centralizer_iff.mpr
     (fun y hy => by rw [Set.mem_singleton_iff.mp hy]))
-  -- Our given `N ⊇ C_G(x)` is that unique neighbour.
-  have hNeq : N = N' := Set.mem_singleton_iff.mp
-    ((OddOrder.BG.Ch4.S14.maximalContaining_centralizer_eq_singleton_of_tau2_element hG
-      hNmax' hxN' hx1 hxtau2' hRne') ▸ hNmem)
+  -- Our given `N ⊇ C_G(x)` is that unique neighbour (`ℳ(C_G(x)) = {N}`, Corollary 14.3).
+  have hsingleton : maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {N'} :=
+    OddOrder.BG.Ch4.S14.maximalContaining_centralizer_eq_singleton_of_tau2_element hG
+      hNmax' hxN' hx1 hxtau2' hRne'
+  have hNeq : N = N' := Set.mem_singleton_iff.mp (hsingleton ▸ hNmem)
   subst hNeq
   -- `N` is type-P₂ (`IsTypeF N ∨ IsTypeP2 N` with `N ∉ ℳ_𝓕`).
   have hP2N : OddOrder.BG.Ch4.S14.IsTypeP2 N :=
     hNtype'.resolve_left fun hF => hNnotF ⟨hNmax', hF⟩
+  -- `p ∈ τ₂(N)`: the signalizer `τ₂`-conjunct at the single prime of `ord(x) = p`.
+  have hptau2 : p ∈ tau2 N := hxtau2' p (by
+    rw [OddOrder.BG.Ch4.S14.piSet, Set.mem_setOf_eq, ← Subgroup.zpowers_eq_closure,
+      Nat.card_zpowers, hord]
+    exact Nat.mem_primeFactors.mpr ⟨hp, dvd_rfl, hp.pos.ne'⟩)
   -- `M ∩ N` complements `N_σ` in `N` (signalizer conjunct at `M' := M`).
   have hMσx : M ∈ OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x := ⟨hM, hxM⟩
   obtain ⟨-, -, hcompl, -⟩ := hforall' M hMσx
@@ -1283,8 +1298,8 @@ theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hsupMN : M ⊓ N = E₁ ⊔ (E₂ ⊔ E₃) := by
     have h := (subgroupE_basic hG hsetup).2.2.2.2.1.1
     rwa [sup_assoc] at h
-  exact ⟨hNmax', hP2N, hCN', hRne', hcompl,
+  exact ⟨hNmax', hP2N, hCN', hRne', hcompl, hptau2, hsingleton,
     E₁, E₂ ⊔ E₃, hsetup.E₁_le, hU0E, hU0ne, hK₀, hU₀, hcardK ▸ hqkprime, hU₀ab, hK₀NU₀,
-    hsupMN⟩
+    hsupMN, E₂, E₃, hsetup, rfl⟩
 
 end OddOrder.BG.AppE
