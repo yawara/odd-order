@@ -239,18 +239,38 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   (Q₁ ⊓ (A'⊔B') = B'; S'Q₂ と SZ の両用) / `card_quot_eq_card_quot_Q1_mul`
   (|H⧸R| = |Q₁⧸Q₂|·|H⧸RQ₁|) / `d_dvd_card_quot_sup_Q1` /
   `card_quot_Q1_sub_one_le_of_card_quot_sub_le` (**|Q₁⧸Q₂| − 1 ≤ d·c 抽出**)。
-- [ ] **次: reduction (1) step 補題 assembly の残部品**:
-  1. **(1.2) の中心性入力の供給**: Z/Q₃ := Z(Q₁/Q₃) の引き上げ Z について
-     SZ/S'Q₃ が Q/S'Q₃ の中心に入ること (S-部分は直積性、Q₁-部分は Z の定義)。
-     `exists_deg_sq_le_of_mem_SsetOf` の hcentral 形へ。
-  2. **f.p.f. 2素数下界**: |Q₁| が 2 素因数 ⟹ |Q₁⧸Q₂| ≥ (d+1)² (Sylow 分解で
-     2 つの非自明 D-不変商; d_add_one_le_card_quotient_of_le_Q1 ×2)。
-  3. **|Z⧸Q₂| ≥ d+1**: Q₂ ⊊ Z ≤ Q₁ (chief + 2素数から) に
-     d_add_one_le_card_quotient_of_le_Q1。
-  4. **算術合成**: |Q₁⧸Q₂|−1 ≤ 2da (①(1.1)) + a² ≤ |Q₁⧸Z| (②(1.2)+Q1_inf_sup_eq)
-     + |Q₁⧸Q₂| = |Q₁⧸Z|·|Z⧸Q₂| ⟹ |Z⧸Q₂|(|Q₁⧸Q₂|−2) < 4d² ⟹ (d+1)((d+1)²−2) < 4d²
-     ⟹ d ≤ 2 ⟹ hd1 : 1 < d + hd : Odd d と矛盾。
-  5. step 補題 → chief-factor 帰納 (Q₂ minimal) → (1) 完結。
+- [x] **step 補題完成** `ssetOf_coherent_step` (bc53bd165, FeitSibleyReductions.lean):
+  𝒮(S'Q₂) coherent + chief データ (Q₃ ≤ Q₂ ≤ Z ≤ Q₁, ⁅Z,Q₁⁆ ⊆ Q₃, Q₂ ⊊ Z,
+  D-不変性, |Q₁⧸Q₂| ≥ (d+1)²) ⟹ 𝒮(S'Q₃) coherent。中心性入力 (旧 1)・算術 (旧 4)
+  込みで一括組立。d=1 も `false_of_reduction_one_bounds` が消化 (hd1 不要)。
+  併せて `conj_mem_SsetOf` (一般 R) / `Q1der_le_Q1`。
+- [x] **2素数下界完成** `d_add_one_sq_le_card_quot_of_two_primes` (febb04202):
+  nilpotent Q₁ + p ≠ r ∣ |Q₁| + D-不変 Q₂ ≤ ⁅Q₁,Q₁⁆ ⟹ (d+1)² ≤ |Q₁⧸Q₂|。
+  中間 M = ⁅Q₁,Q₁⁆·N_p (正規 p-補群、Isaacs Ch05 `hasNormalPComplement_of_isNilpotent`
+  + `map_mulAut_of_normal_pcomplement` で D-不変)。両側 properness は
+  `commutator_sup_normal_pcomplement_ne_top` (K/N_p が nontrivial perfect p-群になり
+  可解性と矛盾) を p と r で 1 回ずつ。Sylow 直積分解は不要だった。
+  (旧 3 |Z⧸Q₂| ≥ d+1 は `d_add_one_le_card_quotient_of_le_Q1` 直用で step 補題内で解決済。)
+- [ ] **次: reduction (1) chief-factor 帰納 assembly**。設計 (2026-07-21 固定):
+  - **目標形**: `ssetOf_sder_coherent_of_two_primes : Odd d + Odd |Q₁| + nilpotent Q₁ +
+    (p ≠ r ∣ |Q₁|) ⟹ 𝒮(S') coherent`。帰納: 全 H-不変 Q₃ ≤ ⁅Q₁,Q₁⁆ について
+    𝒮(S'Q₃) coherent を |⁅Q₁,Q₁⁆⧸Q₃| (または |⁅Q₁,Q₁⁆|−|Q₃|) の強帰納で。
+    Q₃ = ⁅Q₁,Q₁⁆ base = Remark (`ssetOf_Qder_coherent`) + **要新補題
+    `Qder = Sder ⊔ ⁅Q₁,Q₁⁆`** (直積の導来分解; commutator_mem_sup_Sder_of_central の
+    論法流用)。Q₃ ⊊ ⁅Q₁,Q₁⁆ なら Q₂ := Q₃ 上最小の H-不変 (有限格子で存在) →
+    Q₂/Q₃ chief → step 補題。
+  - **chief ⟹ Q₂ ≤ Z 供給**: Z := Z(Q₁/Q₃) の引き上げ。Q₂/Q₃ ⊴ Q₁/Q₃ nontrivial
+    ⟹ 中心と交わる (`exists_mem_center_of_normal_ne_bot_of_isNilpotent`,
+    Isaacs Ch04 Mann.lean:577)。交差は H-不変 ⟹ 最小性で Q₂/Q₃ ⊆ Z(Q₁/Q₃)。
+  - **hZQ₂ (¬ Z ≤ Q₂) 供給**: Q₂/Q₃ ≤ Z(Q₁bar) abelian ⟹ 最小性で Q₂/Q₃ は
+    単素数 q-群 (primary 成分は characteristic)。一方 |Z(Q₁bar)| は p, r 両方で
+    割れる (正規 Sylow ⊓ center ≠ ⊥, `IsPGroup.normal_inf_center_nontrivial`
+    Isaacs Ch01) ⟹ Z(Q₁bar) は q-群でない ⟹ Z ⊄ Q₂。
+  - **hnil (Q₁ nilpotent) の上流供給**: d > 1 なら D f.p.f. ⟹ Q₁⋊D Frobenius ⟹
+    Thompson (Isaacs Ch06 KernelNilpotent.lean) で Q₁ nilpotent。d = 1 は
+    H = Q, τ = id で coherence 自明の別分岐。Odd |Q₁| の供給も同様に assembly 側。
+  - Normal instance 供給: (Sder⊔Q₂/Q₃).subgroupOf H 等は H-不変性 (Q₂ ⊴ H) +
+    Sder ⊴ H (S ⊴ H char) から要素形→instance 変換補題経由。
 
 ### 反例中核補題の供給表 (2026-07-21 固定; 実装済 = sq_ratio_sum_le_of_adjoin_incoherent)
 
