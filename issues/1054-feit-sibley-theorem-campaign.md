@@ -380,13 +380,22 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     1 + a² = (v,v) + a²(x−1)² + (m−1)x²a²、(v,v) ≥ 0、a ≥ 2、m ≥ 2 ⟹
     x = 0 ∨ (x=1 ∧ m=2)。整数性 (a² ≥ 4 で bracket ≤ 1) + interval_cases。
     (v,v)=1 の抽出や x=1,m=2 の符号差し替え還元は assembly 側 ((6) 本体)。
-  - [ ] **(4) Notation setup**: Z := ⁅Q₁,Q₁⁆ ⊓ centralizer(Q₁:Set G) (≤ Q₁,
-    ⁅Z,Q₁⁆=1)。非自明 = ⁅Q₁,Q₁⁆ ≠ ⊥ (Q₁ non-abelian) + IsPGroup.normal_inf
-    _center_nontrivial (Isaacs Ch01 Basic:407) で ⁅Q₁,Q₁⁆⊓Z(Q₁) ≠ 1。H-不変 =
-    ⁅Q₁,Q₁⁆ char in Q₁ ⊴ H + centralizer H-不変。→ reduction (3)
-    xset_coherent_of_le_center_Q1 で 𝒳 = XsetOf ⊥ Z coherent、Remark
-    ssetOf_Qder_coherent で 𝒴 = 𝒮(Q′) coherent。witness eᵢ := (𝒳 coh).extension χᵢ,
-    e′ⱼ := (𝒴 coh).extension ηⱼ ∈ ZIrr G、norm-1 (isometry + χᵢ irred) ⟹ ±Irr。
+  - [x] **(4) Notation setup — Z 構成 + 𝒳/𝒴 coherence 完了** (7be8d3d7e + 759d2788a,
+    sorry-free): endgameZ := ⁅Q₁,Q₁⁆ ⊓ C_G(Q₁)。4 性質 (le_Q1 / centralizes
+    ⁅z,y⁆=1 / ne_bot / conj_mem H-不変)。
+    - ne_bot: normal_inf_center_nontrivial (Isaacs Ch01) で ↥Q₁ レベル
+      [Q₁,Q₁]⊓Z(Q₁) ≠ 1 → map_eq_bot_iff + ker_subtype で G レベルへ (単射)。
+      ⚠ 名前空間は OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial (full path)。
+    - conj_mem: ⁅Q₁,Q₁⁆ は Q1_map_conj_eq(既存 FeitSibleyInduction) + map_commutator、
+      C_G(Q₁) は Commute.map (conj h)。⚠ rw[mem_centralizer_iff] は coe 不一致で
+      失敗 → mem_centralizer_iff_commutator_eq_one の .mp/.mpr 項適用が robust。
+    - endgame_Xset_coherent: reduction (3) 供給 → 𝒳 = XsetOf ⊥ Z coherent。
+      Normal 3 点 (Sder/Z/S H-不変を subgroupOf_H_normal_of_conj_mem + conj_mem_sup)。
+    - 𝒴 = 𝒮(Q′) coherence = 既存 ssetOf_Qder_coherent 直用 (ラッパー不要)。
+  - [ ] **次 = (4) witness 抽出 + (5)**: witness eᵢ := (𝒳 coh).extension χᵢ,
+    e′ⱼ := (𝒴 coh).extension ηⱼ ∈ ZIrr G、norm-1 (isometry + χᵢ irred) ⟹ ±Irr
+    (mem_ZIrr_inner_self_eq_sum_sq ベース、norm-1⟹±single-Irr 補題を新設)。
+    aᵢ := χᵢ(1)/χ₁(1) (exists_apply_one_eq_d_mul_pow の p-冪)。
     ⚠ eᵢ と e′ⱼ は別 extension ゆえ (5)(6) で両立性を示して単一 extension に統合。
   - [ ] **(5)** (eᵢ,e′ⱼ)=0: λ:=(eᵢ−aᵢe₁,e′₁)=(eᵢ−aᵢe₁,e′₂)≠0 と仮定 → aᵢ=1,
     λ=±1, eᵢ−e₁=λ(e′₁+e′₂) → degree-0 で e′₁(1)=0 矛盾 (inner-product manip)。
