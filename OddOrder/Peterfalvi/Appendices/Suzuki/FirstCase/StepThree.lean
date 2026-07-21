@@ -4,9 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.Q1MinimalInvariant
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+import OddOrder.Peterfalvi.Appendices.Huppert
 
 /-!
 # Peterfalvi Part II, Ch. II, step (3): the dimension identity for `M`
@@ -448,6 +450,169 @@ theorem inf_centralizer_ne_bot_of_invariant {r : ℕ} (hr : r.Prime)
   have hcard := fc.card_eq_card_inf_centralizer_pow hr hMQ hMne helab hinv
   rw [hbot, Subgroup.card_bot, one_pow] at hcard
   exact Subgroup.eq_bot_of_card_eq _ hcard
+
+/-- **Peterfalvi Part II, Ch. II, step (3), `|C_M(P)| = r`** (p. 109): for a
+nontrivial `KP`-invariant elementary abelian `r`-subgroup `M ≤ Q₁`, the
+`P`-fixed points have order exactly `r` (`dim_{𝔽_r} C_M(P) = 1`).
+
+Via the near-field model of step (2)(b), `C_M(P) ≤ C_Q(P)` embeds into `F^*`,
+which acts on `(F, +)` fixed-point-freely by right multiplication; by the
+Appendix B Lemma (`isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian`) the
+`r`-group `C_M(P)` is then cyclic, and an elementary abelian nontrivial cyclic
+group has order `r`.  (This subsumes the book's citation of [H] V Satz 8.15 —
+subgroups of order `r²` of a Frobenius complement are cyclic.)
+
+Inherits the step (2)(b) `sorry` (Appendix C Prop 1 behind Brauer–Suzuki,
+issue 9318); everything else is proved. -/
+theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
+    {M : Subgroup G} (hMQ1 : M ≤ fc.toHypothesis.Q1) (hMne : M ≠ ⊥)
+    (helab : IsElementaryAbelian r ↥M)
+    (hinv : ∀ g ∈ fc.toHypothesis.K ⊔ fc.P, ∀ m ∈ M, g * m * g⁻¹ ∈ M) :
+    Nat.card ↥(M ⊓ Subgroup.centralizer (fc.P : Set G)) = r := by
+  classical
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  haveI : Fact r.Prime := ⟨hr⟩
+  have hMQ : M ≤ fc.toHypothesis.Q := hMQ1.trans fc.toHypothesis.Q1_le_Q
+  set M₀ : Subgroup G := M ⊓ Subgroup.centralizer (fc.P : Set G) with hM₀def
+  have hM₀ne : M₀ ≠ ⊥ :=
+    fc.inf_centralizer_ne_bot_of_invariant hr hMQ hMne helab hinv
+  haveI : Nontrivial ↥M₀ := (Subgroup.nontrivial_iff_ne_bot M₀).mpr hM₀ne
+  -- `r` is odd: `r ∣ |M| ∣ |Q₁|` and `2 ∤ |Q₁|`.
+  have hrodd : Odd r := by
+    haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+    obtain ⟨x, hx1⟩ := exists_ne (1 : ↥M)
+    have hxr : orderOf x = r := orderOf_eq_prime (helab.pow_eq_one x) hx1
+    have hrM : r ∣ Nat.card ↥M := hxr ▸ orderOf_dvd_natCard x
+    have hrQ1 : r ∣ Nat.card ↥fc.toHypothesis.Q1 :=
+      hrM.trans (Subgroup.card_dvd_of_le hMQ1)
+    have h2 : ¬ 2 ∣ Nat.card ↥fc.toHypothesis.Q1 := by
+      rw [fc.toHypothesis.card_Q1]
+      exact fc.toHypothesis.two_not_dvd_card_Q1Subgroup
+    refine hr.odd_of_ne_two ?_
+    rintro rfl
+    exact h2 hrQ1
+  -- `M₀` is elementary abelian of exponent `r`.
+  have helab₀ : IsElementaryAbelian r ↥M₀ := by
+    constructor
+    · intro x y
+      have h := helab.comm ⟨(x : G), x.2.1⟩ ⟨(y : G), y.2.1⟩
+      have hval := congrArg (fun z : ↥M => (z : G)) h
+      exact Subtype.ext hval
+    · intro x
+      have h := helab.pow_eq_one (⟨(x : G), x.2.1⟩ : ↥M)
+      have hval := congrArg (fun z : ↥M => (z : G)) h
+      apply Subtype.ext
+      simp only [SubgroupClass.coe_pow, OneMemClass.coe_one] at hval ⊢
+      exact hval
+  -- The near-field model of step (2)(b).
+  obtain ⟨F, hNF, ⟨model⟩⟩ := fc.exists_affineNearFieldModel
+  letI : NearFields.NearField F := hNF
+  haveI : Finite F := by
+    have hinj : Function.Injective
+        (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
+      fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
+    exact Finite.of_injective _ hinj
+  -- The embedding `M₀ ↪ F^*` through the quotient `L/N` and `qEquiv`.
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore
+    with hNdef
+  have hM₀L : M₀ ≤ L := inf_le_right
+  have hQbar : fc.rankOneQuotient.Q =
+      (fc.toHypothesis.Q.subgroupOf L).map (QuotientGroup.mk' N) := rfl
+  have hmemQ : ∀ m : ↥M₀,
+      ((QuotientGroup.mk' N).comp (Subgroup.inclusion hM₀L)) m ∈
+        fc.rankOneQuotient.Q := by
+    intro m
+    rw [hQbar]
+    exact Subgroup.mem_map_of_mem _
+      (Subgroup.mem_subgroupOf.mpr (hMQ m.2.1))
+  set ι : ↥M₀ →* Fˣ :=
+    model.qEquiv.toMonoidHom.comp
+      (((QuotientGroup.mk' N).comp (Subgroup.inclusion hM₀L)).codRestrict
+        fc.rankOneQuotient.Q hmemQ) with hιdef
+  have hιinj : Function.Injective ι := by
+    intro a b hab
+    have h1 : ι (a * b⁻¹) = 1 := by rw [map_mul, map_inv, hab, mul_inv_cancel]
+    -- the quotient class of `a * b⁻¹` is trivial, so `a * b⁻¹ ∈ N ≤ D_L`
+    have h2 : ((QuotientGroup.mk' N).comp (Subgroup.inclusion hM₀L))
+        (a * b⁻¹) = 1 := by
+      have h2' := model.qEquiv.injective (h1.trans (map_one _).symm)
+      exact congrArg Subtype.val h2'
+    have h4 : Subgroup.inclusion hM₀L (a * b⁻¹) ∈ N := by
+      rw [← QuotientGroup.ker_mk' N, MonoidHom.mem_ker]
+      exact h2
+    have h5 : Subgroup.inclusion hM₀L (a * b⁻¹) ∈
+        fc.toHypothesis.D.subgroupOf L := by
+      have hND : N ≤ fc.toHypothesis.D.subgroupOf L := by
+        rw [hNdef, fc.toHypothesis.normalCore_cH_eq_centralizer_cQ fc.P_le_V]
+        exact inf_le_left
+      exact hND h4
+    have h6 : ((a * b⁻¹ : ↥M₀) : G) ∈
+        fc.toHypothesis.Q ⊓ fc.toHypothesis.D :=
+      ⟨hMQ (a * b⁻¹).2.1, Subgroup.mem_subgroupOf.mp h5⟩
+    rw [fc.toHypothesis.Q_inf_D_eq_bot, Subgroup.mem_bot] at h6
+    have h7 : (a * b⁻¹ : ↥M₀) = 1 := Subtype.ext h6
+    exact mul_inv_eq_one.mp h7
+  -- The right-multiplication action of the image of `M₀` on `(F, +)`.
+  have hcomm : ∀ u v : ι.range, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ) := by
+    rintro ⟨_, a, rfl⟩ ⟨_, b, rfl⟩
+    have h := helab₀.comm a b
+    calc ι a * ι b = ι (a * b) := (map_mul ι a b).symm
+      _ = ι (b * a) := by rw [h]
+      _ = ι b * ι a := map_mul ι b a
+  set ψ : ↥M₀ →* MulAut (Multiplicative F) :=
+    (NearFields.rightMulAction ι.range hcomm).comp ι.rangeRestrict with hψdef
+  have hψval : ∀ (m : ↥M₀) (x : Multiplicative F),
+      ψ m x = Multiplicative.ofAdd (x.toAdd * ((ι m : Fˣ) : F)) :=
+    fun _ _ => rfl
+  -- fixed-point-freeness: `x * u = x` with `x ≠ 0` forces `u = 1`.
+  have hfpf : ∀ m : ↥M₀, m ≠ 1 →
+      OddOrder.Isaacs.Ch06.actionFixedBy ψ m = ⊥ := by
+    intro m hm
+    rw [eq_bot_iff]
+    intro x hx
+    rw [Subgroup.mem_bot]
+    have hfix : x.toAdd * ((ι m : Fˣ) : F) = x.toAdd := by
+      have h := (OddOrder.Isaacs.Ch06.mem_actionFixedBy).mp hx
+      rw [hψval] at h
+      exact congrArg Multiplicative.toAdd h
+    by_contra hxne
+    have hx0 : x.toAdd ≠ 0 := by
+      intro h0
+      apply hxne
+      apply Multiplicative.toAdd.injective
+      exact h0
+    have hu1 : ((ι m : Fˣ) : F) = 1 := by
+      have hcancel := mul_left_cancel₀ hx0
+        (hfix.trans (mul_one x.toAdd).symm)
+      exact hcancel
+    have : ι m = 1 := Units.ext hu1
+    exact hm (hιinj (this.trans (map_one ι).symm))
+  -- Appendix B Lemma: the `r`-group `M₀` acting f.p.f. on `(F, +)` is cyclic.
+  obtain ⟨f, hf, hEA⟩ :=
+    NearFields.isElementaryAbelian_multiplicative (F := F)
+  haveI : Fact r.Prime := ⟨hr⟩
+  haveI : Nontrivial (Multiplicative F) :=
+    inferInstanceAs (Nontrivial F)
+  haveI hcyc : IsCyclic ↥M₀ :=
+    Huppert.isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian
+      hf helab₀.isPGroup hrodd hEA ψ hfpf
+  -- an elementary abelian nontrivial cyclic group has order `r`
+  obtain ⟨g, hg⟩ := hcyc.exists_generator
+  have htop : Subgroup.zpowers g = ⊤ := by
+    rw [Subgroup.eq_top_iff']
+    exact hg
+  have hcardord : Nat.card ↥M₀ = orderOf g := by
+    rw [← Nat.card_zpowers, htop]
+    exact (Nat.card_congr Subgroup.topEquiv.toEquiv).symm
+  have hdvd : orderOf g ∣ r :=
+    orderOf_dvd_of_pow_eq_one (helab₀.pow_eq_one g)
+  rcases hr.eq_one_or_self_of_dvd _ hdvd with h | h
+  · exfalso
+    rw [orderOf_eq_one_iff] at h
+    rw [h, Subgroup.zpowers_one_eq_bot] at htop
+    exact absurd htop bot_ne_top
+  · rw [hcardord, h]
 
 end FirstCaseHypothesis
 
