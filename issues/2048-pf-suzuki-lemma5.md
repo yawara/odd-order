@@ -191,9 +191,26 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
           (新 leaf TwoSummandSplit.lean, `a51ff24ca`): P/Z(P) の
           two-summand split (OrderQModuleSplit) を factor 像で実構成
           (card は A(n,θ) model count、P/Z の EA 性込み)
-    - [ ] 残り: Lemma 5 側 (Peterfalvi §3 設定) で Q₀ = C_Q(w) と
-          Z(Q)/involutionSubgroup を同定し ξ-length-3 仮定を供給して
-          上記 2 定理を消費する
+    - [ ] 残り: Lemma 5 側で ξ-length-3 仮定 (IsXiActor + HasXiLengthThree)
+          を IsSuzuki2Group + |Q| = q³ から供給する橋渡し
+      - [x] 計数半分 (新 leaf XiLengthFromCard.lean, `f3cb7c6ce`):
+            regular actor は fpf / |K| ∣ |T|−1 (自由軌道計数、
+            card_dvd_of_no_nontrivial_fixed 使用) / 2^n−1∣2^k−1→n∣k /
+            不変部分群位数は q 冪 / no_four_chain_of_card_eq_cube
+      - [ ] 3-chain 存在 (残り工程、経路確定済):
+            (i) 非自明不変正規部分群は involutionSubgroup を含む
+            (2 群の正規部分群は中心と交わる + 位数 2 元 + K 推移性)、
+            |involutionSubgroup| = q; (ii) P/Ω₁ (位数 q²) の
+            proper 非自明不変正規部分群の存在: Z(P/Ω₁) proper なら採用;
+            abelian なら ℧₁(P/Ω₁) proper 非自明なら採用; どちらも潰れると
+            P/Ω₁ は faithful 既約 F₂[K]-module (fpf は coprime lifting
+            quotient_fixedPointFree_of_fixedPoints_le で降ろす) →
+            exists_galoisFieldLinearModel_of_faithful_irreducible
+            (FrobeniusCoordinates.lean:747) + adjoin_generator_eq_top_of_
+            irreducible_linearModel で F₂(λ) = 全体 → 次数 = ord_2(2^n−1) = n
+            ≠ 2n 矛盾; (iii) preimage で chain ⊥ < Ω₁ < B < ⊤ を組み、
+            HasXiLengthThree を結論; (iv) IsXiActor は Def 1 の K
+            (cyclic + regular→transitive) から直接
     - [x] Higman Lemma 10: characteristic `2` の proper odd-degree
           finite field extensionで、任意の `r : ℤ`, `ε` に対する非零 `α` と
           `Tr(α · Frob^r(α) · ε) = 0` を構成する
