@@ -144,6 +144,63 @@ theorem htag_of_frobenius {U E : Subgroup L} [U.Normal] [Fintype ↥E]
       rw [hρWval]; exact hvE e
   rw [hkey, ← Submodule.finrank_map_subtype_eq W₀ (invariants (ρW.comp E.subtype)), hbridge]
 
+open OddOrder.GroupTheory (fixedSubgroup elabRepresentation elabRepresentation_apply
+  card_fixedSubgroup_eq_pow_finrank) in
+/-- **Group-cardinality form of the kernel-FPF identity (†)** ([Is] Theorem 15.16).  For a
+finite group `L`, `U ◁ L` with `p ∤ |U|`, `E ≤ L` with `U ⊔ E = ⊤` and `|E| ⟂ |U|` acting
+fixed-point-freely on `U`, and an elementary abelian `p`-group `V` (its `ZMod p`-module
+structure on `Additive V` given as an instance) acted on by `φ : L →* MulAut V` with
+`C_V(U) = 1`:
+
+`|V| = |C_V(E)|^{|E|}`.
+
+No hypothesis relates `p` and `|E|`.  This is the form consumed by Peterfalvi Part II, Ch. II
+step (3): `M` a `KP`-invariant elementary abelian `r`-subgroup with the Frobenius kernel `K`
+acting fixed-point-freely gives `|M| = |C_M(P)|^{|P|}` — with `r ≠ |P|` only a *conclusion* of
+step (3), not an available hypothesis. -/
+theorem card_eq_card_fixedSubgroup_pow_of_frobenius {U E : Subgroup L} [U.Normal]
+    {p : ℕ} [Fact p.Prime]
+    (hsup : U ⊔ E = ⊤) (hcopUE : Nat.Coprime (Nat.card ↥E) (Nat.card ↥U))
+    (hEnt : 1 < Nat.card ↥E)
+    (hfpf : ∀ e ∈ E, e ≠ 1 → ∀ u ∈ U, e * u * e⁻¹ = u → u = 1)
+    (hpU : ¬ p ∣ Nat.card ↥U)
+    {V : Type*} [CommGroup V] [Module (ZMod p) (Additive V)] [Finite V]
+    (φ : L →* MulAut V)
+    (hVU : fixedSubgroup φ U = ⊥) :
+    Nat.card V = Nat.card ↥(fixedSubgroup φ E) ^ Nat.card ↥E := by
+  classical
+  haveI : Fintype ↥E := Fintype.ofFinite _
+  haveI : FiniteDimensional (ZMod p) (Additive V) := Module.Finite.of_finite
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  -- `V^U = 0` in module form, from `C_V(U) = 1`.
+  have hinvU : invariants ((elabRepresentation p φ).comp U.subtype) = ⊥ := by
+    rw [Submodule.eq_bot_iff]
+    intro v hv
+    have hmem : Additive.toMul v ∈ fixedSubgroup φ U := by
+      intro l hl
+      have h1 := (mem_invariants _ _).mp hv ⟨l, hl⟩
+      have h2 : (elabRepresentation p φ) l (Additive.ofMul (Additive.toMul v)) =
+          Additive.ofMul (φ l (Additive.toMul v)) :=
+        elabRepresentation_apply p φ l (Additive.toMul v)
+      rw [ofMul_toMul] at h2
+      have h3 : Additive.ofMul (φ l (Additive.toMul v)) = v := by
+        rw [← h2]; exact h1
+      have h4 := congrArg Additive.toMul h3
+      rwa [toMul_ofMul] at h4
+    rw [hVU, Subgroup.mem_bot] at hmem
+    calc v = Additive.ofMul (Additive.toMul v) := (ofMul_toMul v).symm
+      _ = Additive.ofMul (1 : V) := by rw [hmem]
+      _ = 0 := ofMul_one
+  -- (†) over `𝔽_p` and the cardinality bridges.
+  have hkey := finrank_eq_card_mul_finrank_invariants_kernelFPF_zmod
+    hsup hcopUE hEnt hfpf hpU (elabRepresentation p φ) hinvU
+  haveI : Fintype (Additive V) := Fintype.ofFinite _
+  have hcardV : Nat.card V = p ^ Module.finrank (ZMod p) (Additive V) := by
+    rw [Nat.card_congr (Additive.ofMul (α := V)), Nat.card_eq_fintype_card,
+      Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]
+  have hfixE := card_fixedSubgroup_eq_pow_finrank p φ E
+  rw [hcardV, hkey, pow_mul', ← hfixE, Nat.card_eq_fintype_card (α := ↥E)]
+
 /-- **Peterfalvi (9.1), the per-chief-factor dimension identity (⋆)** from the Frobenius data.  For
 the elementary-abelian representation `elabRepresentation p φ` of `L = U ⋊ E` (Frobenius) on a
 finite
