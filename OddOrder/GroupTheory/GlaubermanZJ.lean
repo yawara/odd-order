@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.GlaubermanReplacement
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SylowSubnormal
 
 /-!
 # Glauberman の `Z(J)`-定理 (Gorenstein Thm 2.10 / 2.11)
@@ -230,6 +231,38 @@ theorem sSupNormalNormalizing_normal (W : Subgroup G) :
   rw [mem_comap] at h1
   simpa [MulAut.conj_apply] using h1
 
+/-- **Gorenstein Thm 1.3.8** (Sylow-of-normal): `L ⊴ G`, `P ∈ Syl_p(G)` について
+`(P ⊓ L).subgroupOf L` を carrier とする `↥L` の Sylow `p` が存在する. -/
+theorem exists_sylow_inf_of_normal [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (L : Subgroup G) [L.Normal] :
+    ∃ Q : Sylow p ↥L, (Q : Subgroup ↥L) = ((P : Subgroup G) ⊓ L).subgroupOf L := by
+  have hsub : IsPGroup p ↥(((P : Subgroup G) ⊓ L).subgroupOf L) :=
+    (P.isPGroup'.to_inf_left).of_equiv
+      (Subgroup.subgroupOfEquivOfLe (inf_le_right : (P : Subgroup G) ⊓ L ≤ L)).symm
+  have hidx : ¬ p ∣ (((P : Subgroup G) ⊓ L).subgroupOf L).index :=
+    OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal
+      (Subgroup.Normal.isSubnormal ‹L.Normal›) P
+  exact ⟨hsub.toSylow hidx, hsub.toSylow_coe hidx⟩
+
+/-- **Frattini + characteristic 昇格** (Gorenstein Thm 1.3.7 の用法):
+`L ⊴ G`, `Q ∈ Syl_p(↥L)` について `L ⊔ N_G(J_a(Q-ambient)) = ⊤`
+(`J_a` は conj 共変ゆえ `N_G(Q) ≤ N_G(J_a(Q))`). -/
+theorem frattini_normalizer_thompsonJAbelian [Finite G] {p : ℕ} [Fact p.Prime]
+    {L : Subgroup G} [L.Normal] (Q : Sylow p ↥L) :
+    L ⊔ normalizer
+      ((thompsonJAbelian ((Q : Subgroup ↥L).map L.subtype) : Subgroup G) : Set G)
+      = ⊤ := by
+  have hfr := Sylow.normalizer_sup_eq_top (p := p) (N := L) Q
+  have hchar : normalizer (((Q : Subgroup ↥L).map L.subtype : Subgroup G) : Set G)
+      ≤ normalizer
+        ((thompsonJAbelian ((Q : Subgroup ↥L).map L.subtype) : Subgroup G) : Set G) :=
+    fun _ hg => mem_normalizer_of_map_conj_eq
+      (thompsonJAbelian_map_conj_eq_of_mem_normalizer hg)
+  refine top_le_iff.mp ?_
+  rw [← hfr]
+  exact sup_le (hchar.trans le_sup_right) le_sup_left
+
 end Subgroup
+
 
 
