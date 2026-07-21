@@ -286,7 +286,42 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   (Nat.card の primeFactors) を要する。⚠ hQ1odd は Hypothesis fields から導出
   不能の疑い — feit_sibley_coherence の statement (hd のみ) と原文 p.145 仮定
   ブロックの照合が必要 (PDF 実読、統計 fidelity)。
-- [ ] **次: (3)** (p. 147)。(1)(2) より以後 Q₁ = non-abelian p-群
+- [x] **原文照合完了 (2026-07-21, PDF pp.144–147 実読)**:
+  - **p.144 仮定ブロックは repo Hypothesis と完全一致** (|Q₁| odd は書籍にも無い)。
+  - **hQ1odd 張力の確定**: 2(c) 証明の「odd order group Q₁D」は書籍側の飛躍
+    (issue 1053 裁定済: 2(c) は explicit hQ1odd、Theorem は d odd のみ据え置き・
+    還元後導出)。⚠ ただし現形式化の (1)(2) は counterexample 抽出の共役対機構経由で
+    hQ1odd を要求 — 書籍の (1)(2) は 1(a) を対無しで 1 枚ずつ adjoin するので
+    hQ1odd 不要 (Remark も O_{2'}(Q₁)⋊D で careful)。**最終 assembly の
+    ≥2素数/abelian 分岐で |Q₁| even のケースが現機構では閉じない**。解決候補:
+    (i) 1(a) の pair-free 化 + no-real 依存の除去 (書籍忠実、機構再作業大)、
+    (ii) 最終 statement に hQ1odd 追加 (1053 裁定の変更 — hub/ユーザー相談要)、
+    (iii) even ケースの vacuity 証明 (ambient TI から — 未検証、1053 も未検証と記載)。
+    **(3)–(8) は p-群文脈で hQ1odd = (p 奇素数の冪) が正当に立つため非ブロック**。
+    最終 assembly 時に再訪。
+- [ ] **次: (3)** (p. 146–147、原文実読済)。実装設計:
+  1. **𝒳-族**: 𝒳 ∩ 𝒮(R) = {χ ∈ Irr H | R ⊆ ker, Z ⊄ ker} (Z ≤ Z(Q₁) ⟹ 自動的に ∈ 𝒮)。
+     counting は既存 `sum_degreeSq_ker_subset_not_subset` (N=R-in, M=Z-in) が直用可:
+     Σ = |H⧸R| − |H⧸R⊔Z|。
+  2. **p-冪度数**: χ ∈ 𝒮(S′) ⟹ χ(1) = d·p^k。Q/S′ で S/S′ が中心 ⟹
+     deg φ ∣ |Q₁| = p^n (中心指数可除性 — repo の所在確認: SchurCenterBound 周辺、
+     無ければ [Is] 中心可除性を新設)。
+  3. **(3.1) 可除性**: χᵢ(1)² ∣ Σ_{j<i} χⱼ(1)² — d² ∣ LHS (全項 d²·p-冪²)、
+     φᵢ(1)² ∣ RHS (|H⧸S′|−|H⧸S′Z| = d|S/S′||Q₁/Z|(|Z|−1) で φᵢ(1)² ≤ |Q₁/Z|
+     両方 p-冪 ⟹ ∣; j ≥ i 項は sorted で φᵢ² ∣ φⱼ²)、gcd(d,p)=1 で合成。
+  4. **Part A (𝒳₁ coherent)**: base = 等度数セグメント {χ₁..χ_k} (2c で k ≥ 2、
+     `coherentEqualDegree`)。i > k: 2χ₁(1)χᵢ(1) < pχ₁(1)χᵢ(1) ≤ χᵢ(1)² ≤ Σ_{j<i}
+     ((3.1)+正値、p ≥ 3)。⚠ 反例抽出は **accumulated 和** (base 制限しない) が要る —
+     `sq_ratio_sum_le_of_adjoin_incoherent` を直接使い (exists_counterexample の
+     B-制限を経ない)、pair 分解の**度数単調性**が必要 (`exists_conjPair_pairUnion_eq`
+     が単調 enumeration を返すか要確認; 返さなければ度数昇順版に強化)。
+  5. **Part B (S′ ≠ 1, 𝒳 へ拡張)**: (2) 鏡映帰納の 𝒳-相対版。counting =
+     d|S/S₁||Q₁/Z|(|Z|−1) (二重 kernel 和)。anchor = Ind(1·θ) ∈ 𝒳₁ (χ(1) ∣ ψ(1) は
+     等値)。χ₁(1)² ≤ d²|Q₁/Z| + ψ(1)² ≤ d²|S/S₁||Q₁/Z| (S₁/S₂ ⊆ Z(S/S₂)) ⟹
+     |S/S₁|(|Z|−1)² ≤ 4d²、|Z| ≥ 2d+1 (two_mul_d_add_one_le_card_of_le_Q1、
+     Z ⊴ H D-inv ✓)、|S/S₁| ≥ 2 ⟹ 矛盾。算術は false_of_reduction_two_bounds 型の
+     新変種。
+  6. 新 leaf `FeitSibleyReductionThree.lean` (配線同 commit)。(1)(2) より以後 Q₁ = non-abelian p-群
   (p 奇素数) と仮定してよい: assembly 分岐は (i) |Q₁| 2素数 → (1)+(2) 済,
   (ii) Q₁ abelian → Q′ = S′ ⟹ Remark 𝒮(Q′) = 𝒮(S′) coherent → (2) 済,
   (iii) Q₁ non-abelian p-群 → (3)–(8) 本線。d=1 分岐 (τ=id 自明) と
