@@ -35,6 +35,7 @@ import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.ThompsonSubgroupAbelian
 import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ
+import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.MackeyTransfer
@@ -441,6 +442,7 @@ import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley

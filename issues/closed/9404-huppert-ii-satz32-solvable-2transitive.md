@@ -73,3 +73,15 @@ theorem exists_elementaryAbelian_regular_normal_of_two_pretransitive
 - `OddOrder/Peterfalvi/Appendices/NearFields.lean:744` (残 sorry)、`:652`
   (`RankOneHypothesis` — (A1) = `IsMultiplyPretransitive G Ω 2`, (A2) = faithful)。
 - issue 2053 (lane b, consumer) / 9318 (lane b, 前提 (ii))。
+
+## ✅ 2026-07-22 landed — close
+
+- `OddOrder/GroupTheory/SolvableTwoTransitive.lean` (156 行, commit 877b1026f):
+  `exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive` +
+  `stabilizer_inf_eq_bot_of_isMulCommutative_of_isPretransitive`。
+  leaf build green (2219 jobs)、#print axioms = propext/Classical.choice/Quot.sound のみ。
+- `OddOrder.lean` 配線済 (同 commit)。NearFields Prop 1 docstring の前提リスト更新済
+  ((iii) 解消、残 gate = (ii) Brauer–Suzuki issue 9318 のみ)。
+- statement メモ: regular 性は `IsPretransitive F Ω` + `∀ ω, stabilizer G ω ⊓ F = ⊥` の
+  対で供給 (consumer 側で `G = F ⋊ Stab(ω)` を標準導出)。elementary abelian は
+  `IsMulCommutative ↥F` + `∀ x ∈ F, x^p = 1` + `IsPGroup p ↥F` の 3 述語で明示。
