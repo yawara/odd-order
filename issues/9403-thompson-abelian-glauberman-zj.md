@@ -81,6 +81,33 @@ G Thm 2.6.4 の対応物 = `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nont
 Case 1 / Case 2 (Thm 2.2.3(i) Hall–Witt + Lem 2.2.4(iii)/2.2.5(ii))。
 class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補題なので先に立てる。
 
+#### ✅ Lem 2.8(ii) + [B,A;i] 部品 (2026-07-21): `[B,A;i]` = 既存
+`Isaacs.Ch04.iterCommutator B A i` を再利用。`le_normalizer_commutator_right` /
+`le_normalizer_iterCommutator` / `iterCommutator_succ_le` (= (ii)) /
+`iterCommutator_le_of_le` / `iterCommutator_le_base` sorry-free。
+
+#### Lem 2.8(i)/(iii) の設計メモ (mmd L5536-5560 精読済)
+
+- **型レベルで定式化** (ambient 群 = Gorenstein の P): 仮定
+  `B A : Subgroup G`, `hsup : B ⊔ A = ⊤`, `[B.Normal]`, `hB' : ⁅B,B⁆ ≤ center G`,
+  `hAcomm : IsMulCommutative A`, `[Finite G]` (+(iii) では `Group.IsNilpotent G`)。
+  Thm 2.7 の適用は `P = AB` 簡約後に `↥Q` へ instantiate。
+- **(i) の mathlib 番地換え**: G の `L_i(P)` = mathlib `lowerCentralSeries G (i-1)`。
+  statement は mod-B' を sup で符号化:
+  `∀ i ≥ 1, lowerCentralSeries G i ⊔ ⁅B,B⁆ = iterCommutator B A (i-1) ⊔ ⁅B,B⁆`。
+  証明: B' 商 (⁅B,B⁆ ≤ center ⟹ normal) に落として B abelian ケースに帰着 —
+  (a) `L_i ≤ B` (i≥1、P/B ≅ A/(A∩B) abelian)、(b) `[ba,x] = [a,x]` (x ∈ L_i, B abelian
+  中心化) ⟹ `L_{i+1} = [L_i, A]`、(c) 基底 `P' = [B,A]` ((2.7): `[ab,x] = [a,x]^b [b,x]`
+  + [a,x] ∈ B abelian で (2.8) 加法化 ⟹ P' ⊆ [A,P][B,P]、[B,P] = [B,A]、[A,P] = [A,B])。
+  quotient 落としの plumbing が大きければ sup-形のまま直接証明も可 (要調査)。
+- **(iii)**: [B,A;n+1] = 1 ⟹ (i) で `L_{n+2} ≤ B' ≤ Z(P)` ⟹ `L_{n+3} = 1`;
+  m := ⌊(n+4)/2⌋ ≥ 2, 2m ≥ n+3; **weight bound** `[L_m,L_m] ≤ L_{2m}` (repo:
+  Mann.lean:791 の γ 版を実測して使う) ⟹ L_m abelian ⟹ [B,A;m-1] ⊆ L_m·B'
+  (B' 中心) abelian ⟹ n の最小性で n ≤ m-1 ≤ n/2+1 ⟹ n ≤ 2、cl(P) ≤ 4。
+  n は「[B,A;n] abelian なる最小の正整数」— Lean では Nat.find か明示仮定
+  `(hn : IsMulCommutative (iterCommutator B A n)) (hmin : ∀ k, 0 < k → k < n → ¬ ...)`
+  の形で受ける (Thm 2.7 側の供給に合わせて決める)。
+
 ### (参考) 旧記録: Thm 2.5 の入口
 
 必要な唯一の外部部品 = **G Thm 2.6.4** (冪零群の非自明正規部分群は中心と非自明に交わる;
