@@ -46,6 +46,192 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 open OddOrder.GroupTheory (IsElementaryAbelian fixedSubgroup elabRepresentation)
 open Representation
 
+/-! ## Clifford counting: `|M| = |V|^t` for a minimal `K`-invariant subgroup
+
+The counting content of Clifford's theorem ([Is] Theorem 6.5) needed by step
+(3), with no semisimple-module machinery: for an action `φ : L →* MulAut M`
+on a finite abelian group `M` admitting no proper nontrivial invariant
+subgroup, `K ◁ L`, and `V` a *minimal* nontrivial `K`-invariant subgroup,
+every `L`-translate of `V` is again a minimal nontrivial `K`-invariant
+subgroup; a maximal `K`-invariant subgroup of `|V|`-power order absorbs every
+translate (a missed translate meets it trivially by minimality, and the join
+would have strictly larger `|V|`-power order), and the join of all translates
+is `L`-invariant, hence everything.  Thus `|M| = |V|^t`. -/
+
+section CliffordCounting
+
+open OddOrder.Isaacs.Ch03
+open Pointwise
+
+variable {M : Type*} [CommGroup M] [Finite M]
+variable {L : Type*} [Group L] {φ : L →* MulAut M} {K : Subgroup L}
+
+omit [Finite M] in
+/-- Cancellation of a translate pair `g * h = 1`:
+`(B^{φ h})^{φ g} = B`. -/
+theorem map_aut_map_aut_of_mul_eq_one {g h : L} (hgh : g * h = 1)
+    (B : Subgroup M) :
+    (B.map (φ h).toMonoidHom).map (φ g).toMonoidHom = B := by
+  have hcancel : ∀ x : M, (φ g) ((φ h) x) = x := by
+    intro x
+    rw [← MulAut.mul_apply, ← map_mul, hgh, map_one, MulAut.one_apply]
+  ext x
+  constructor
+  · rintro ⟨_, ⟨b, hb, rfl⟩, rfl⟩
+    simpa only [MulEquiv.coe_toMonoidHom, hcancel, SetLike.mem_coe] using hb
+  · intro hx
+    exact ⟨(φ h) x, ⟨x, hx, rfl⟩, hcancel x⟩
+
+omit [Finite M] in
+/-- The `φ g`-translate of a `K`-invariant subgroup is `K`-invariant when
+`K ◁ L`. -/
+theorem isAInvariant_map_of_normal [K.Normal] {V : Subgroup M}
+    (hV : IsAInvariant (φ.comp K.subtype) V) (g : L) :
+    IsAInvariant (φ.comp K.subtype) (V.map (φ g).toMonoidHom) := by
+  rw [isAInvariant_iff_smul_mem]
+  rintro k _ ⟨v, hv, rfl⟩
+  have hk' : g⁻¹ * (k : L) * g ∈ K :=
+    Subgroup.Normal.conj_mem' ‹K.Normal› _ k.2 g
+  refine ⟨(φ (g⁻¹ * (k : L) * g)) v,
+    hV.smul_mem (⟨_, hk'⟩ : ↥K) hv, ?_⟩
+  change (φ g) ((φ (g⁻¹ * (k : L) * g)) v) = (φ ((k : L))) ((φ g) v)
+  rw [← MulAut.mul_apply, ← MulAut.mul_apply, ← map_mul, ← map_mul]
+  congr 1
+  group
+
+omit [Finite M] in
+/-- Minimality among nontrivial `K`-invariant subgroups transports along
+`φ g`-translates. -/
+theorem minimal_map_of_normal [K.Normal] {V : Subgroup M}
+    (hVmin : ∀ B ≤ V, IsAInvariant (φ.comp K.subtype) B → B ≠ ⊥ → B = V)
+    (g : L) :
+    ∀ B ≤ V.map (φ g).toMonoidHom, IsAInvariant (φ.comp K.subtype) B →
+      B ≠ ⊥ → B = V.map (φ g).toMonoidHom := by
+  intro B hBle hBinv hBne
+  have hg1 : g⁻¹ * g = 1 := inv_mul_cancel g
+  have hg2 : g * g⁻¹ = 1 := mul_inv_cancel g
+  have h1 : B.map (φ g⁻¹).toMonoidHom ≤ V := by
+    have hmono := Subgroup.map_mono (f := (φ g⁻¹).toMonoidHom) hBle
+    rwa [map_aut_map_aut_of_mul_eq_one hg1] at hmono
+  have h2 : IsAInvariant (φ.comp K.subtype) (B.map (φ g⁻¹).toMonoidHom) :=
+    isAInvariant_map_of_normal hBinv g⁻¹
+  have h3 : B.map (φ g⁻¹).toMonoidHom ≠ ⊥ := by
+    intro hbot
+    apply hBne
+    have := congrArg (Subgroup.map (φ g).toMonoidHom) hbot
+    rwa [map_aut_map_aut_of_mul_eq_one hg2, Subgroup.map_bot] at this
+  have h4 := hVmin _ h1 h2 h3
+  have := congrArg (Subgroup.map (φ g).toMonoidHom) h4
+  rwa [map_aut_map_aut_of_mul_eq_one hg2] at this
+
+omit [Finite M] in
+/-- Translates have the same cardinality. -/
+theorem card_map_aut (V : Subgroup M) (g : L) :
+    Nat.card ↥(V.map (φ g).toMonoidHom) = Nat.card ↥V :=
+  (Nat.card_congr
+    (Subgroup.equivMapOfInjective V _ (φ g).injective).toEquiv).symm
+
+/-- **Clifford counting** ([Is] Theorem 6.5, counting form).  If the finite
+abelian group `M` has no proper nontrivial `φ`-invariant subgroup and `V` is
+a minimal nontrivial `K`-invariant subgroup for a normal `K ◁ L`, then
+`|M| = |V|^t` for some `t`. -/
+theorem exists_card_eq_pow_of_minimal_invariant [K.Normal]
+    (hM : ∀ B : Subgroup M, IsAInvariant φ B → B ≠ ⊥ → B = ⊤)
+    {V : Subgroup M} (hVne : V ≠ ⊥)
+    (hVinv : IsAInvariant (φ.comp K.subtype) V)
+    (hVmin : ∀ B ≤ V, IsAInvariant (φ.comp K.subtype) B → B ≠ ⊥ → B = V) :
+    ∃ t : ℕ, Nat.card M = Nat.card ↥V ^ t := by
+  classical
+  haveI : Finite (Subgroup M) :=
+    Finite.of_injective _ SetLike.coe_injective
+  -- the family of `K`-invariant subgroups of `|V|`-power order
+  set S : Set (Subgroup M) :=
+    {J | IsAInvariant (φ.comp K.subtype) J ∧
+      ∃ t : ℕ, Nat.card ↥J = Nat.card ↥V ^ t} with hSdef
+  have hbotS : (⊥ : Subgroup M) ∈ S :=
+    ⟨IsAInvariant.bot _, 0, by rw [Subgroup.card_bot, pow_zero]⟩
+  obtain ⟨J, -, hJmax⟩ := Set.Finite.exists_le_maximal (Set.toFinite S) hbotS
+  obtain ⟨hJinv, t, hJcard⟩ := hJmax.prop
+  -- every translate is contained in the maximal `J`
+  have htrans : ∀ g : L, V.map (φ g).toMonoidHom ≤ J := by
+    intro g
+    by_contra hng
+    -- the missed translate meets `J` trivially, by transported minimality
+    have hint : V.map (φ g).toMonoidHom ⊓ J = ⊥ := by
+      by_contra hne
+      have heq := minimal_map_of_normal hVmin g _ inf_le_left
+        ((isAInvariant_map_of_normal hVinv g).inf hJinv) hne
+      exact hng (heq ▸ inf_le_right)
+    -- so the join has strictly larger `|V|`-power order: maximality violated
+    have hprod : Nat.card ↥(J ⊔ V.map (φ g).toMonoidHom) *
+        Nat.card ↥(J ⊓ V.map (φ g).toMonoidHom) =
+        Nat.card ↥J * Nat.card ↥(V.map (φ g).toMonoidHom) := by
+      have h_hk := Subgroup.card_HK_mul_card_inf_eq_card_mul_card
+        J (V.map (φ g).toMonoidHom)
+      rwa [show ((J : Set M) * (V.map (φ g).toMonoidHom : Set M)) =
+          ((J ⊔ V.map (φ g).toMonoidHom : Subgroup M) : Set M) from
+        (Subgroup.mul_normal J _).symm] at h_hk
+    have hcard_sup : Nat.card ↥(J ⊔ V.map (φ g).toMonoidHom) =
+        Nat.card ↥V ^ (t + 1) := by
+      rw [inf_comm, hint, Subgroup.card_bot, mul_one, hJcard, card_map_aut]
+        at hprod
+      rw [hprod, pow_succ]
+    have hSup_mem : (J ⊔ V.map (φ g).toMonoidHom) ∈ S :=
+      ⟨hJinv.sup (isAInvariant_map_of_normal hVinv g), t + 1, hcard_sup⟩
+    exact hng (le_sup_right.trans (hJmax.2 hSup_mem le_sup_left))
+  -- the join of all translates is `φ`-invariant and nontrivial, hence `⊤`
+  have hWtop : (⨆ g : L, V.map (φ g).toMonoidHom) = ⊤ := by
+    apply hM
+    · rw [isAInvariant_iff_smul_mem]
+      intro a x hx
+      refine Subgroup.iSup_induction
+        (C := fun y => (φ a) y ∈ ⨆ g : L, V.map (φ g).toMonoidHom)
+        _ hx (fun g y hy => ?_) ?_ ?_
+      · -- `(φ a)` maps the `g`-translate into the `a * g`-translate
+        obtain ⟨v, hv, rfl⟩ := hy
+        refine Subgroup.mem_iSup_of_mem (a * g) ⟨v, hv, ?_⟩
+        simp only [MulEquiv.coe_toMonoidHom, map_mul, MulAut.mul_apply]
+      · rw [map_one]
+        exact Subgroup.one_mem _
+      · intro y z hy hz
+        rw [map_mul]
+        exact Subgroup.mul_mem _ hy hz
+    · intro hbot
+      apply hVne
+      rw [eq_bot_iff]
+      intro v hv
+      have hmem : v ∈ V.map (φ (1 : L)).toMonoidHom := by
+        refine ⟨v, hv, ?_⟩
+        simp only [map_one, MulEquiv.coe_toMonoidHom, MulAut.one_apply]
+      have : v ∈ (⨆ g : L, V.map (φ g).toMonoidHom) :=
+        Subgroup.mem_iSup_of_mem 1 hmem
+      rw [hbot] at this
+      exact this
+  have hJtop : J = ⊤ :=
+    le_antisymm le_top (hWtop ▸ iSup_le htrans)
+  refine ⟨t, ?_⟩
+  rw [← hJcard, hJtop]
+  exact (Nat.card_congr Subgroup.topEquiv.toEquiv).symm
+
+/-- A nontrivial invariant subgroup contains a *minimal* nontrivial invariant
+subgroup (finiteness). -/
+theorem exists_minimal_aInvariant_le {A : Type*} [Group A]
+    {ψ : A →* MulAut M} {W : Subgroup M} (hWne : W ≠ ⊥)
+    (hWinv : IsAInvariant ψ W) :
+    ∃ V ≤ W, V ≠ ⊥ ∧ IsAInvariant ψ V ∧
+      ∀ B ≤ V, IsAInvariant ψ B → B ≠ ⊥ → B = V := by
+  classical
+  haveI : Finite (Subgroup M) :=
+    Finite.of_injective _ SetLike.coe_injective
+  set S : Set (Subgroup M) := {B | B ≤ W ∧ B ≠ ⊥ ∧ IsAInvariant ψ B}
+  have hWS : W ∈ S := ⟨le_rfl, hWne, hWinv⟩
+  obtain ⟨V, -, hVmin⟩ := Set.Finite.exists_le_minimal (Set.toFinite S) hWS
+  obtain ⟨hVle, hVne, hVinv⟩ := hVmin.prop
+  refine ⟨V, hVle, hVne, hVinv, fun B hBV hBinv hBne => ?_⟩
+  exact le_antisymm hBV (hVmin.2 ⟨hBV.trans hVle, hBne, hBinv⟩ hBV)
+
+end CliffordCounting
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
@@ -220,7 +406,7 @@ theorem card_eq_card_inf_centralizer_pow {r : ℕ} (hr : r.Prime)
     refine Equiv.ofBijective
       (fun x => ⟨((x : ↥M) : G), (x : ↥M).2, ?_⟩) ⟨?_, ?_⟩
     · -- centralizer membership
-      show ((x : ↥M) : G) ∈ Subgroup.centralizer (fc.P : Set G)
+      change ((x : ↥M) : G) ∈ Subgroup.centralizer (fc.P : Set G)
       rw [Subgroup.mem_centralizer_iff]
       intro g hg
       have hgL : g ∈ L := hPL hg
@@ -243,7 +429,7 @@ theorem card_eq_card_inf_centralizer_pow {r : ℕ} (hr : r.Prime)
       apply Subtype.ext
       have hlP : ((l : ↥L) : G) ∈ fc.P := hl
       have hcomm := Subgroup.mem_centralizer_iff.mp hgC _ hlP
-      show ((l : ↥L) : G) * g * ((l : ↥L) : G)⁻¹ = g
+      change ((l : ↥L) : G) * g * ((l : ↥L) : G)⁻¹ = g
       rw [hcomm]
       group
   -- Assemble: `|M| = |C_M(P)|^{|E|} = |M ⊓ C_G(P)|^p`.

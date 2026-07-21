@@ -12069,3 +12069,12 @@ sorry-free: the `r ≠ p` hypothesis is not needed (the identity is characterist
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_eq_card_inf_centralizer_pow
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.inf_centralizer_ne_bot_of_invariant
+
+/-! **Clifford counting** (`FirstCase/StepThree.lean`, issue 2053, 2026-07-22): the counting
+content of Clifford's theorem ([Is] Thm 6.5) for step (3) — if `M` (finite abelian) has no
+proper nontrivial `L`-invariant subgroup and `V` is a minimal nontrivial `K`-invariant
+subgroup for `K ◁ L`, then `|M| = |V|^t`.  Sorry-free; no semisimple-module machinery. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_card_eq_pow_of_minimal_invariant
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_minimal_aInvariant_le
