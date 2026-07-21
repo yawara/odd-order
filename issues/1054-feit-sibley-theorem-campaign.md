@@ -348,18 +348,37 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   χθ(1) = d·tθ ∧ ψ(1) = d·(e·tθ)。懸念だった (iv) Z ⊄ ker(Ind θ~) は
   **forall_eq_one_of_leKer (R = Z) の対偶で閉じた — Mackey 評価不要**。
   支持: leKer_induce_of_forall (R-一般順方向転送、FeitSibleyTheorem)。
-- [ ] **次 = Part B 本体 2〜5** (この順):
-  2. **(1.2) 型 ψ bound**: exists_deg_sq_le_of_mem_SsetOf (R = S₂ 側, D₀ = S₁⊔Z,
-     中心性 = S₁/S₂ ⊆ Z(S/S₂) chief + Z ⊆ Z(Q₁) + 直積可換の合成 —
-     commutator_mem_of_central_pair (ReductionTwo) 流用) → a² ≤ |S⧸S₁|·|Q₁⧸Z|。
-  3. **算術変種**: T = d·m·qz·(z−1) = d²Σm² 単位で Σm² ≤ 2·tθ·(e·tθ)、
-     tθ² ≤ qz、(e·tθ)² ≤ m·qz、z ≥ 2d+1、m ≥ 2 → False。
-  4. **step 補題 + chain**: exists_conjPair_pairUnion_eq (B = XsetOf S₁ Z,
-     Y = XsetOf S₂ Z) + coherentPairChain + wrapper (一般 anchor m₀ = tθ)。
-     失敗 step の ψ から anchor を 1 で構成 → 2·tθ·a < Σ が破れる → 2,3 で矛盾。
-     no-real は odd_card_Q1_of_isPGroup (p-群文脈)。
-  5. **帰納 skeleton**: ssetOf_coherent_of_le_sder (ReductionTwo) の鏡映で
-     XsetOf S′ Z (Part A) → XsetOf ⊥ Z = 𝒳。S-side centralLiftIn W:=S 流用。
+- [x] **⭐ Part B 本体 2〜5 完成 = reduction (3) 完結** (FeitSibleyXsetInduction.lean,
+  sorry-free, OddOrder.lean 配線済)。設計どおり全 first-shot に近い形で landing:
+  - **3 算術** `false_of_xset_induction_bounds` (前 commit 2c52bbd42): m·qz·(z−1) ≤
+    d·2·tθ·a + tθ² ≤ qz + a² ≤ m·qz + z ≥ 2d+1 + m ≥ 2 ⟹ False。
+  - **counting bridge** `xset_counting_le_of_sum_le`: sum_degreeSq_XsetOf_eq_mul
+    (= d·|S⧸S₁|·|Q₁⧸Z|·(|Z|−1)、d は 1 個) + 反例 Σm² ≤ 2tθa の ℂ→ℝ 変換で
+    h1 (|S⧸S₁|·|Q₁⧸Z|·(|Z|−1) ≤ d·2tθa) を供給。d² 対 d の 1 個キャンセルが要点。
+  - **step** `xsetOf_S_coherent_step`: by_contra → exists_counterexample_anchored
+    (B₀ = 𝒳(S′,Z) anchor, B = 𝒳(S₁,Z), Y = 𝒳(S₂,Z)) → h1 counting +
+    h2 anchor (D₀ = S⊔Z, index_subgroupOf_sup_S_eq → tθ² ≤ |Q₁⧸Z|) +
+    h3 ψ (D₀ = ZS⊔Z, index_subgroupOf_sup_prod_eq → a² ≤ |S⧸ZS|·|Q₁⧸Z| ≤ |S⧸S₁|·)
+    + h4 f.p.f. (two_mul_d_add_one_le_card_of_le_Q1、|Z| odd = Q₁ odd の約数) +
+    h5 (|S⧸S₁| ≥ 2) → false_of_xset_induction_bounds。(2)(3)(4) は reduction (2)
+    step の忠実な鏡映 (SsetOf→XsetOf、固定 Z、anchor 版抽出)。
+  - **induction** `xsetOf_coherent_of_le_sder`: ssetOf_coherent_of_le_sder の鏡映。
+    Sder → ⊥ を |Sder|−|S₃'| 強帰納、exists_minimal_conjInvariant_between +
+    centralLiftIn S S₃' (= ZS) + minimal_le_centralLiftIn。⚠ Normal instance の
+    形: `((S₁⊔Z)`-in-`H)` は counting 用に **sup-of-subgroupOf** 形が要る →
+    (S₁-in-H).Normal + (Z-in-H).Normal の component を渡して sup-of-normals
+    auto-instance に組ませる (subgroupOf_H_normal_of_conj_mem は subgroupOf-of-sup
+    形を返すので直接は型不一致)。ZS⊔Z は index_prod 用に subgroupOf-of-sup 形で明示。
+  - **descent** `xset_coherent_of_xsetOf_sder_coherent`: S₃ = ⊥ で 𝒳(⊥,Z) = 𝒮−𝒮(Z)。
+  - **⭐ reduction (3) 統合** `xset_coherent_of_le_center_Q1`: Part A
+    (xsetOf_sder_coherent) + Part B descent の合成 — Q₁ p-群 + d odd +
+    ⊥ ≠ Z ≤ Z(Q₁) (H-不変) ⟹ 𝒳 = XsetOf ⊥ Z coherent。**これが (3) の deliverable**。
+- [ ] **次 = (4)〜(8)** (issue 冒頭 digest 参照)。(4) Notation (𝒴 = 𝒮(Q′)、
+  Z = ⁅Q₁,Q₁⁆∩Z(Q₁)、𝒳 = 𝒮−𝒮(Z)、aᵢ = χᵢ(1)/χ₁(1)) → (5) (eᵢ,e′ⱼ)=0 →
+  (6) a∣λ ⟹ 𝒮 coherent → (7) ψ(z) ≡ ψ(1) mod |Q| (class-algebra 合同、独立・並行可、
+  RepresentationTheory 新 leaf 候補) → (8) assembly (Res_H e′₁ 評価 + (7) で a∣λ)。
+  上流優先: (7) は (8) 専用の独立補題ゆえ (4)(5)(6) と並行して着手してよい。
+  それ以外は文書順 (4)→(5)→(6)→(8)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
      保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —
