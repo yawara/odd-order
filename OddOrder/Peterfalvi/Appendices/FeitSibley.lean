@@ -227,6 +227,62 @@ theorem Q1_conj_mem_of_mem_Q {q : G} (hq : q ∈ hyp.Q) {x : G} (hx : x ∈ hyp.
       _ = y * x * y⁻¹ := by group
   rw [hrw]; exact hz
 
+/-- **`π`-element characterisation of `Q₁`** (`Q = S × Q₁`, `(|S|, |Q₁|) = 1`): an element
+`w ∈ Q` whose order is coprime to `|S|` already lies in the direct factor `Q₁`.  Writing
+`w = s·y` (`s ∈ S`, `y ∈ Q₁`) via `S Q₁ = Q`, the commuting coprime-order factorisation gives
+`orderOf w = orderOf s · orderOf y`, so `orderOf s ∣ orderOf w` is coprime to `|S|`; but
+`orderOf s ∣ |S|`, forcing `orderOf s = 1`, i.e. `s = 1` and `w = y ∈ Q₁`. -/
+theorem mem_Q1_of_mem_Q_of_coprime_orderOf [Finite G] {w : G} (hw : w ∈ hyp.Q)
+    (hcop : Nat.Coprime (orderOf w) (Nat.card ↥hyp.S)) : w ∈ hyp.Q1 := by
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hw
+  obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hw
+  rw [SetLike.mem_coe] at hs hy
+  have hcomm : Commute s y := hyp.S_commutes_Q1 s hs y hy
+  have hos_dvd : orderOf s ∣ Nat.card ↥hyp.S := hyp.S.orderOf_dvd_natCard hs
+  have hoy_dvd : orderOf y ∣ Nat.card ↥hyp.Q1 := hyp.Q1.orderOf_dvd_natCard hy
+  have hcop_orders : Nat.Coprime (orderOf s) (orderOf y) :=
+    (hyp.coprime_S_Q1.coprime_dvd_left hos_dvd).coprime_dvd_right hoy_dvd
+  have how : orderOf w = orderOf s * orderOf y := by
+    rw [← hsy]; exact hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop_orders
+  have hos_dvd_w : orderOf s ∣ orderOf w := by rw [how]; exact dvd_mul_right _ _
+  have hcs : Nat.Coprime (orderOf s) (Nat.card ↥hyp.S) := hcop.coprime_dvd_left hos_dvd_w
+  have hone : orderOf s ∣ 1 := by
+    have hg : Nat.gcd (orderOf s) (Nat.card ↥hyp.S) = 1 := hcs
+    exact hg ▸ Nat.dvd_gcd dvd_rfl hos_dvd
+  have hsone : s = 1 := orderOf_eq_one_iff.mp (Nat.dvd_one.mp hone)
+  rw [← hsy, hsone, one_mul]; exact hy
+
+/-- **`D` normalises `Q₁`** (elementwise): for `δ ∈ D` and `x ∈ Q₁`, `δ x δ⁻¹ ∈ Q₁`.  Since
+`D ≤ H` and `Q ⊴ H`, the conjugate `δ x δ⁻¹` lies in `Q`; conjugation preserves order and
+`orderOf x ∣ |Q₁|` is coprime to `|S|`, so `δ x δ⁻¹` is a `π`-element of `Q` and hence in `Q₁`
+by `mem_Q1_of_mem_Q_of_coprime_orderOf`.  (`Q₁` is the characteristic Hall factor of `Q`; this
+gives the well-definedness of the `D`-action on `Q₁` used throughout Lemma 2.) -/
+theorem D_normalizes_Q1 [Finite G] {δ : G} (hδ : δ ∈ hyp.D) {x : G} (hx : x ∈ hyp.Q1) :
+    δ * x * δ⁻¹ ∈ hyp.Q1 := by
+  have hconjQ : δ * x * δ⁻¹ ∈ hyp.Q :=
+    hyp.Q_normal_in_H δ (hyp.D_le_H hδ) x (hyp.Q1_le_Q hx)
+  have hox : orderOf x ∣ Nat.card ↥hyp.Q1 := hyp.Q1.orderOf_dvd_natCard hx
+  have hoconj : orderOf (δ * x * δ⁻¹) = orderOf x := by
+    have h := orderOf_injective (MulAut.conj δ).toMonoidHom (MulAut.conj δ).injective x
+    simpa [MulAut.conj_apply] using h
+  refine hyp.mem_Q1_of_mem_Q_of_coprime_orderOf hconjQ ?_
+  rw [hoconj]
+  exact hyp.coprime_S_Q1.symm.coprime_dvd_left hox
+
+/-- **`Q₁ ⊴ H`** (elementwise): for `h ∈ H` and `x ∈ Q₁`, `h x h⁻¹ ∈ Q₁`.  Writing `h = q·δ`
+(`q ∈ Q`, `δ ∈ D`) via `Q D = H`, `h x h⁻¹ = q (δ x δ⁻¹) q⁻¹` with `δ x δ⁻¹ ∈ Q₁`
+(`D_normalizes_Q1`) and then `q · q⁻¹ ∈ Q₁` (`Q1_conj_mem_of_mem_Q`). -/
+theorem Q1_normal_in_H [Finite G] {h : G} (hh : h ∈ hyp.H) {x : G} (hx : x ∈ hyp.Q1) :
+    h * x * h⁻¹ ∈ hyp.Q1 := by
+  rw [← SetLike.mem_coe, ← hyp.Q_mul_D_eq_H] at hh
+  obtain ⟨q, hq, δ, hδ, hqδ⟩ := Set.mem_mul.mp hh
+  rw [SetLike.mem_coe] at hq hδ
+  subst hqδ
+  have hδx : δ * x * δ⁻¹ ∈ hyp.Q1 := hyp.D_normalizes_Q1 hδ hx
+  have hrw : q * δ * x * (q * δ)⁻¹ = q * (δ * x * δ⁻¹) * q⁻¹ := by group
+  rw [hrw]
+  exact hyp.Q1_conj_mem_of_mem_Q hq hδx
+
 /-- `d = |D| > 0`. -/
 theorem d_pos [Finite G] : 0 < hyp.d := Nat.card_pos
 
