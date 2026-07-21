@@ -637,136 +637,169 @@ noncomputable def e5Setup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
     (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
       Subgroup.zpowers x ⊔ R₁amb) :
-    RegularOperatorSetup ↥(opiCoreInG {p} M) ↥E p k := by
-  classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  have hoddG : ∀ r : ℕ, r.Prime → r ∣ Nat.card G → Odd r := by
-    intro r hr hdvd
-    refine hr.odd_of_ne_two fun h2 => ?_
-    rw [h2] at hdvd
-    have h1 := Nat.odd_iff.mp hG.odd
-    omega
-  have hzOp : Subgroup.zpowers x ≤ opiCoreInG {p} M := Subgroup.zpowers_le.mpr hxOp
-  refine
-    { p_prime := hp
-      p_odd := hoddG p hp (hord ▸ orderOf_dvd_natCard x)
-      q_prime := hk
-      q_odd := hoddG k hk (hcardK₁ ▸ Subgroup.card_subgroup_dvd_card K₁)
-      p_ne_q := fun h => hkp h.symm
-      R_pGroup := isPGroup_opiCoreInG_singleton M
-      act := conjActionHom hEnorm
-      p_not_dvd_card_B := hcardE
-      A := K₁.subgroupOf E
-      A_card := by
-        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK₁E).toEquiv]
-        exact hcardK₁
-      R₀ := Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))
-      R₀_card := by
-        rw [Nat.card_zpowers]
-        exact (orderOf_injective (opiCoreInG {p} M).subtype
-          (Subgroup.subtype_injective _) ⟨x, hxOp⟩).symm.trans hord
-      R₁ := R₁amb.subgroupOf (opiCoreInG {p} M)
-      R₁_ne_bot := by
-        intro hb
-        apply hR₁ne
-        rw [eq_bot_iff]
-        intro y hy
-        have : (⟨y, hR₁Op hy⟩ : ↥(opiCoreInG {p} M)) ∈
-            R₁amb.subgroupOf (opiCoreInG {p} M) := by
-          rw [Subgroup.mem_subgroupOf]
-          exact hy
-        rw [hb] at this
-        have h1 := Subgroup.mem_bot.mp this
-        simpa using congrArg Subtype.val h1
-      R₁_cyclic := isCyclic_of_surjective
-        (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.toMonoidHom
-        (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.surjective
-      centralizer_eq := ?_
-      R₀_disjoint_R₁ := ?_
-      A_fixes_R₀ := ?_
-      A_regular := ?_ }
-  -- `centralizer_eq`: transport `(E.30)`/`(E.31)`.
-  · have h1 : Subgroup.centralizer
-        ((Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) : Subgroup _) :
-          Set ↥(opiCoreInG {p} M)) =
-        Subgroup.centralizer ({(⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))} : Set _) :=
-      OddOrder.BG.Ch4.S14.centralizer_zpowers_eq_singleton' _
-    have h2 : Subgroup.centralizer ({(⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))} : Set _) =
-        (opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
-          (opiCoreInG {p} M) := by
-      ext c
-      rw [Subgroup.mem_centralizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_inf]
-      constructor
-      · intro hc
-        refine ⟨c.2, Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩
-        rw [Set.mem_singleton_iff.mp hy]
-        have h := hc _ (Set.mem_singleton (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)))
-        exact congrArg Subtype.val h
-      · intro hc y hy
-        rw [Set.mem_singleton_iff.mp hy]
-        have h := Subgroup.mem_centralizer_iff.mp hc.2 x (Set.mem_singleton x)
-        exact Subtype.ext h
-    rw [h1, h2, hcent, Subgroup.subgroupOf_sup hzOp hR₁Op, zpowers_subgroupOf_eq hxOp]
-  -- `R₀_disjoint_R₁`.
-  · rw [disjoint_iff, ← zpowers_subgroupOf_eq hxOp]
-    have hinf2 : (Subgroup.zpowers x).subgroupOf (opiCoreInG {p} M) ⊓
-        R₁amb.subgroupOf (opiCoreInG {p} M) =
-        ((Subgroup.zpowers x ⊓ R₁amb).subgroupOf (opiCoreInG {p} M)) :=
-      (Subgroup.comap_inf _ _ _).symm
-    rw [hinf2, hdisj]
-    exact Subgroup.bot_subgroupOf _
-  -- `A_fixes_R₀`.
-  · intro a ha
-    have haK₁ : (a : G) ∈ K₁ := Subgroup.mem_subgroupOf.mp ha
-    have hset : ∀ v : G, v ∈ Subgroup.zpowers x ↔
-        (a : G) * v * (a : G)⁻¹ ∈ Subgroup.zpowers x := by
-      intro v
-      constructor
-      · intro hv
-        have h := hK₁norm _ haK₁
-        rw [← h]
-        exact ⟨v, hv, rfl⟩
-      · intro hv
-        have h := hK₁norm _ (K₁.inv_mem haK₁)
-        have h2 : (a : G)⁻¹ * ((a : G) * v * (a : G)⁻¹) * ((a : G)⁻¹)⁻¹ ∈
-            MulAut.conj (a : G)⁻¹ • Subgroup.zpowers x := ⟨_, hv, rfl⟩
-        rw [h] at h2
-        simpa [mul_assoc] using h2
-    rw [Subgroup.pointwise_smul_def]
-    apply le_antisymm
-    · rintro _ ⟨w, hw, rfl⟩
-      have hwz : (w : G) ∈ Subgroup.zpowers x := by
-        obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hw
-        exact Subgroup.mem_zpowers_iff.mpr ⟨n, by simpa using congrArg Subtype.val hn⟩
-      have hmem : (a : G) * (w : G) * (a : G)⁻¹ ∈ Subgroup.zpowers x := (hset _).mp hwz
-      obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hmem
-      refine Subgroup.mem_zpowers_iff.mpr ⟨n, Subtype.ext ?_⟩
-      rw [SubgroupClass.coe_zpow]
-      exact hn
-    · intro z hz
-      have hzz : (z : G) ∈ Subgroup.zpowers x := by
-        obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hz
-        exact Subgroup.mem_zpowers_iff.mpr ⟨n, by simpa using congrArg Subtype.val hn⟩
-      refine ⟨conjActionHom hEnorm a⁻¹ z, ?_, ?_⟩
-      · have hmem : (a : G)⁻¹ * (z : G) * ((a : G)⁻¹)⁻¹ ∈ Subgroup.zpowers x := by
-          refine (hset _).mpr ?_
-          rw [show (a : G) * ((a : G)⁻¹ * (z : G) * ((a : G)⁻¹)⁻¹) * (a : G)⁻¹ = (z : G)
-            from by group]
-          exact hzz
+    RegularOperatorSetup ↥(opiCoreInG {p} M) ↥E p k :=
+  { p_prime := hp
+    p_odd := by
+      have hdvd : p ∣ Nat.card G := hord ▸ orderOf_dvd_natCard x
+      refine hp.odd_of_ne_two fun h2 => ?_
+      rw [h2] at hdvd
+      have h1 := Nat.odd_iff.mp hG.odd
+      omega
+    q_prime := hk
+    q_odd := by
+      have hdvd : k ∣ Nat.card G := hcardK₁ ▸ Subgroup.card_subgroup_dvd_card K₁
+      refine hk.odd_of_ne_two fun h2 => ?_
+      rw [h2] at hdvd
+      have h1 := Nat.odd_iff.mp hG.odd
+      omega
+    p_ne_q := fun h => hkp h.symm
+    R_pGroup := haveI : Fact p.Prime := ⟨hp⟩; isPGroup_opiCoreInG_singleton M
+    act := conjActionHom hEnorm
+    p_not_dvd_card_B := hcardE
+    A := K₁.subgroupOf E
+    A_card := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK₁E).toEquiv]
+      exact hcardK₁
+    R₀ := Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))
+    R₀_card := by
+      rw [Nat.card_zpowers]
+      exact (orderOf_injective (opiCoreInG {p} M).subtype
+        (Subgroup.subtype_injective _) ⟨x, hxOp⟩).symm.trans hord
+    R₁ := R₁amb.subgroupOf (opiCoreInG {p} M)
+    R₁_ne_bot := by
+      intro hb
+      apply hR₁ne
+      rw [eq_bot_iff]
+      intro y hy
+      have hmem : (⟨y, hR₁Op hy⟩ : ↥(opiCoreInG {p} M)) ∈
+          R₁amb.subgroupOf (opiCoreInG {p} M) := by
+        rw [Subgroup.mem_subgroupOf]
+        exact hy
+      rw [hb] at hmem
+      have h1 := Subgroup.mem_bot.mp hmem
+      simpa using congrArg Subtype.val h1
+    R₁_cyclic := isCyclic_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.surjective
+    centralizer_eq := by
+      haveI : Fact p.Prime := ⟨hp⟩
+      have hzOp : Subgroup.zpowers x ≤ opiCoreInG {p} M := Subgroup.zpowers_le.mpr hxOp
+      have h1 : Subgroup.centralizer
+          ((Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) : Subgroup _) :
+            Set ↥(opiCoreInG {p} M)) =
+          Subgroup.centralizer ({(⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))} : Set _) :=
+        OddOrder.BG.Ch4.S14.centralizer_zpowers_eq_singleton' _
+      have h2 : Subgroup.centralizer ({(⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))} : Set _) =
+          (opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+            (opiCoreInG {p} M) := by
+        ext c
+        rw [Subgroup.mem_centralizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_inf]
+        constructor
+        · intro hc
+          refine ⟨c.2, Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩
+          rw [Set.mem_singleton_iff.mp hy]
+          have h := hc _ (Set.mem_singleton (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)))
+          exact congrArg Subtype.val h
+        · intro hc y hy
+          rw [Set.mem_singleton_iff.mp hy]
+          have h := Subgroup.mem_centralizer_iff.mp hc.2 x (Set.mem_singleton x)
+          exact Subtype.ext h
+      rw [h1, h2, hcent, Subgroup.subgroupOf_sup hzOp hR₁Op, zpowers_subgroupOf_eq hxOp]
+    R₀_disjoint_R₁ := by
+      rw [disjoint_iff, ← zpowers_subgroupOf_eq hxOp]
+      have hinf2 : (Subgroup.zpowers x).subgroupOf (opiCoreInG {p} M) ⊓
+          R₁amb.subgroupOf (opiCoreInG {p} M) =
+          ((Subgroup.zpowers x ⊓ R₁amb).subgroupOf (opiCoreInG {p} M)) :=
+        (Subgroup.comap_inf _ _ _).symm
+      rw [hinf2, hdisj]
+      exact Subgroup.bot_subgroupOf _
+    A_fixes_R₀ := by
+      intro a ha
+      have haK₁ : (a : G) ∈ K₁ := Subgroup.mem_subgroupOf.mp ha
+      have hset : ∀ v : G, v ∈ Subgroup.zpowers x ↔
+          (a : G) * v * (a : G)⁻¹ ∈ Subgroup.zpowers x := by
+        intro v
+        constructor
+        · intro hv
+          have h := hK₁norm _ haK₁
+          rw [← h]
+          exact ⟨v, hv, rfl⟩
+        · intro hv
+          have h := hK₁norm _ (K₁.inv_mem haK₁)
+          have h2 : (a : G)⁻¹ * ((a : G) * v * (a : G)⁻¹) * ((a : G)⁻¹)⁻¹ ∈
+              MulAut.conj (a : G)⁻¹ • Subgroup.zpowers x := ⟨_, hv, rfl⟩
+          rw [h] at h2
+          simpa [mul_assoc] using h2
+      rw [Subgroup.pointwise_smul_def]
+      apply le_antisymm
+      · rintro _ ⟨w, hw, rfl⟩
+        have hwz : (w : G) ∈ Subgroup.zpowers x := by
+          obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hw
+          exact Subgroup.mem_zpowers_iff.mpr ⟨n, by simpa using congrArg Subtype.val hn⟩
+        have hmem : (a : G) * (w : G) * (a : G)⁻¹ ∈ Subgroup.zpowers x := (hset _).mp hwz
         obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hmem
         refine Subgroup.mem_zpowers_iff.mpr ⟨n, Subtype.ext ?_⟩
         rw [SubgroupClass.coe_zpow]
         exact hn
-      · change conjActionHom hEnorm a (conjActionHom hEnorm a⁻¹ z) = z
-        rw [← MulAut.mul_apply, ← map_mul, mul_inv_cancel, map_one, MulAut.one_apply]
-  -- `A_regular`.
-  · intro a ha hane r hr
-    by_contra hrne
-    have haE : (a : G) ∈ E := a.2
-    have hane' : (a : G) ≠ 1 := fun h => hane (Subtype.ext h)
-    have hrne' : (r : G) ≠ 1 := fun h => hrne (Subtype.ext h)
-    have hval : (a : G) * (r : G) * (a : G)⁻¹ = (r : G) := congrArg Subtype.val hr
-    exact hEfrob _ haE hane' _ r.2 hrne' hval
+      · intro z hz
+        have hzz : (z : G) ∈ Subgroup.zpowers x := by
+          obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hz
+          exact Subgroup.mem_zpowers_iff.mpr ⟨n, by simpa using congrArg Subtype.val hn⟩
+        refine ⟨conjActionHom hEnorm a⁻¹ z, ?_, ?_⟩
+        · have hmem : (a : G)⁻¹ * (z : G) * ((a : G)⁻¹)⁻¹ ∈ Subgroup.zpowers x := by
+            refine (hset _).mpr ?_
+            rw [show (a : G) * ((a : G)⁻¹ * (z : G) * ((a : G)⁻¹)⁻¹) * (a : G)⁻¹ = (z : G)
+              from by group]
+            exact hzz
+          obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hmem
+          refine Subgroup.mem_zpowers_iff.mpr ⟨n, Subtype.ext ?_⟩
+          rw [SubgroupClass.coe_zpow]
+          exact hn
+        · change conjActionHom hEnorm a (conjActionHom hEnorm a⁻¹ z) = z
+          rw [← MulAut.mul_apply, ← map_mul, mul_inv_cancel, map_one, MulAut.one_apply]
+    A_regular := by
+      intro a ha hane r hr
+      by_contra hrne
+      have haE : (a : G) ∈ E := a.2
+      have hane' : (a : G) ≠ 1 := fun h => hane (Subtype.ext h)
+      have hrne' : (r : G) ≠ 1 := fun h => hrne (Subtype.ext h)
+      have hval : (a : G) * (r : G) * (a : G)⁻¹ = (r : G) := congrArg Subtype.val hr
+      exact hEfrob _ haE hane' _ r.2 hrne' hval }
+
+@[simp] theorem e5Setup_R₀ [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E K₁ : Subgroup G} {x : G} {p k : ℕ}
+    (hp : p.Prime) (hk : k.Prime) (hkp : k ≠ p) (hord : orderOf x = p)
+    (hxOp : x ∈ opiCoreInG {p} M)
+    (hEnorm : E ≤ Subgroup.normalizer ((opiCoreInG {p} M : Subgroup G) : Set G))
+    (hcardE : ¬ p ∣ Nat.card ↥E)
+    (hK₁E : K₁ ≤ E) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hEfrob : ∀ e ∈ E, e ≠ 1 → ∀ r ∈ opiCoreInG {p} M, r ≠ 1 → e * r * e⁻¹ ≠ r)
+    (hK₁norm : ∀ g ∈ K₁, MulAut.conj g • (Subgroup.zpowers x) = Subgroup.zpowers x)
+    {R₁amb : Subgroup G} (hR₁Op : R₁amb ≤ opiCoreInG {p} M)
+    (hR₁cyc : IsCyclic ↥R₁amb) (hR₁ne : R₁amb ≠ ⊥)
+    (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
+    (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
+      Subgroup.zpowers x ⊔ R₁amb) :
+    (e5Setup hG hp hk hkp hord hxOp hEnorm hcardE hK₁E hcardK₁ hEfrob hK₁norm
+        hR₁Op hR₁cyc hR₁ne hdisj hcent).R₀ =
+      Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) := rfl
+
+@[simp] theorem e5Setup_act [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E K₁ : Subgroup G} {x : G} {p k : ℕ}
+    (hp : p.Prime) (hk : k.Prime) (hkp : k ≠ p) (hord : orderOf x = p)
+    (hxOp : x ∈ opiCoreInG {p} M)
+    (hEnorm : E ≤ Subgroup.normalizer ((opiCoreInG {p} M : Subgroup G) : Set G))
+    (hcardE : ¬ p ∣ Nat.card ↥E)
+    (hK₁E : K₁ ≤ E) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hEfrob : ∀ e ∈ E, e ≠ 1 → ∀ r ∈ opiCoreInG {p} M, r ≠ 1 → e * r * e⁻¹ ≠ r)
+    (hK₁norm : ∀ g ∈ K₁, MulAut.conj g • (Subgroup.zpowers x) = Subgroup.zpowers x)
+    {R₁amb : Subgroup G} (hR₁Op : R₁amb ≤ opiCoreInG {p} M)
+    (hR₁cyc : IsCyclic ↥R₁amb) (hR₁ne : R₁amb ≠ ⊥)
+    (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
+    (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
+      Subgroup.zpowers x ⊔ R₁amb) :
+    (e5Setup hG hp hk hkp hord hxOp hEnorm hcardE hK₁E hcardK₁ hEfrob hK₁norm
+        hR₁Op hR₁cyc hR₁ne hdisj hcent).act = conjActionHom hEnorm := rfl
 
 /-- **Small `p`-groups always violate E.5's (ii)**: a group of order `p^n` with
 `1 ≤ n ≤ 3` has a normal abelian subgroup of index `p` (any subgroup of order `p^(n-1)`:
