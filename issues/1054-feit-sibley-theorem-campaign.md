@@ -329,16 +329,46 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   Prop-valued have 内へ隔離、step 出力は Nonempty.some。
   `(p ^ k : ℝ)` は `(↑p)^k` に elaborate される (↑(p^k) と別形) — wrapper
   との突き合わせは外側 cast 形 `((p ^ k : ℕ) : ℝ)` で統一。
-- [ ] **次: Part B** — (2) 鏡映帰納の 𝒳-相対版: 𝒳 ∩ 𝒮(S₁) → 𝒳 ∩ 𝒮(S₂)
-  (S-side chief factor 降下) で 𝒳₁ coherent → 𝒳 = XsetOf ⊥ Z coherent。
-  設計は下記旧メモ 5 (counterexample 抽出 = exists_counterexample_of_not_coherent
-  を B = 𝒳∩𝒮(S₁), Y = 𝒳∩𝒮(S₂) に適用; anchor = 𝒳₁ の最小度数 member で
-  可除性は p-冪; 算術 |S/S₁|(|Z|−1)² ≤ 4d² vs |Z| ≥ 2d+1 は
-  false_of_reduction_two_bounds 変種)。⚠ exists_counterexample_of_not_coherent
-  の anchor は χ₀(1) = d 固定 (m₀ = 1) — 𝒳₁ の最小度数は d·p^{k₀} (k₀ > 0
-  もありうる) なので、一般 anchor 版の反例抽出 (sq_ratio_sum_le_of_adjoin_
-  incoherent の m₀ 一般形は wrapper 正方向に既在) か、counting を anchor 比
-  で書き直すかの選択が最初の設計点。
+- [x] **Part B 前提 ①: rational 1(a) (issue 1050) 完了** (c1f50cc5a, 2026-07-22)。
+  原文 p.147 精読で確定: (3) 後半の 1(a) 適用は **anchor = Ind(1_{S/S₂}·θ) ∈ 𝒳₁**
+  (θ = ψ の Q₁-isotypic 成分、**ψ ごとに anchor が変わる**)、可除性は
+  anchor(1) = d·θ(1) ∣ ψ(1) = d·e·θ(1) のみ (e = 重複度)。base 𝒳∩𝒮(S₁) の
+  member 度数 d·λ(1)·θ_x(1) は anchor で割れない ⟹ integer-ratio 1(a) では
+  閉じない (1049 時の判断の修正)。1(a) から hdvd、wrapper から hmdvd を除去済み。
+  不等式は原文どおり Σ ≤ 2·χθ(1)·ψ(1)、χθ(1)² ≤ d²|Q₁/Z| は χθ ∈ 𝒳₁ ゆえ
+  Part A と同じ exists_deg_sq_le_of_mem_SsetOf (D₀ = S⊔Z) で出る。
+- [x] **Part B 前提 ②: Q₁-side anchor 部品** (FeitSibleyQ1Component.lean,
+  8bf1d7d2c + 4d1ce38b6): exists_restrict_eq_nsmul (Res_{Q₁}φ = e·θ、
+  Clifford 単一軌道 + Q-共役自明) / q1Proj + surjective / restrict_compHom_q1Proj
+  (Res θ~ = θ) / compHom_q1Proj_apply_of_mem_S (S-part kernel)。
+  既約性は IsIrreducibleCharacter.compHom_of_surjective 合成。
+- [ ] **次 = Part B 本体** (この順):
+  1. **anchor 構成パッケージ** (Q1Component leaf に追加):
+     `exists_anchor_of_mem_XsetOf`: ψ ∈ XsetOf R Z (R ≤ S′, Z ≤ Z(Q₁) ≤ Q₁,
+     Z ≠ ⊥) ⟹ ∃ χθ ∈ XsetOf Sder Z, ∃ tθ e : ℕ, χθ(1) = d·tθ ∧ 0 < e ∧
+     ψ(1) = d·(e·tθ)。構成: ψ = Ind φ (Sset_eq_induced_of_Q) → Res_{Q₁}φ = e·θ
+     (exists_restrict_eq_nsmul) → θ~ = compHom q1Proj θ → χθ := Ind θ~。
+     必要中間部品: (i) Q₁ ⊄ ker θ~ (Z ⊄ ker θ から; Z ⊆ Q₁ 上 θ~ = θ)、
+     (ii) Ind θ~ ∈ 𝒮 (2(a) 逆方向 = Sset_eq_induced_of_Q の ⊇)、
+     (iii) S′ ⊆ ker(Ind θ~) (S-part kernel の Ind 転送 — leKer_induce 系の一般化)、
+     (iv) Z ⊄ ker(Ind θ~) (Res-Ind で θ 成分が Z 上非自明に残る)、
+     (v) Z ⊄ ker θ の supply: ψ ∈ XsetOf ⟹ Z ⊄ ker ψ ⟹ Z ⊄ ker φ (Ind kernel)
+     ⟹ Z ⊄ ker θ (isotypic: Res φ = e·θ で Z ⊆ Q₁)。
+     (iv) が最難所の見込み — Ind_Q^H の Z 上の値 (Z ⊆ Z(Q₁), Z ⊴ H) は
+     Res_Z Ind θ~ = d·e'·(θ の Z-成分) 型の Mackey/central 評価。
+     代替ルート: ker(Ind θ~) ∩ Q = ker θ~ の H-core... まず既存 LeKer API
+     (leKer_induce_Qder_of_forall の逆向き・characterKernel_induce 系) を grep。
+  2. **(1.2) 型 ψ bound**: exists_deg_sq_le_of_mem_SsetOf (R = S₂ 側, D₀ = S₁⊔Z,
+     中心性 = S₁/S₂ ⊆ Z(S/S₂) chief + Z ⊆ Z(Q₁) + 直積可換の合成 —
+     commutator_mem_of_central_pair (ReductionTwo) 流用) → a² ≤ |S⧸S₁|·|Q₁⧸Z|。
+  3. **算術変種**: T = d·m·qz·(z−1) = d²Σm² 単位で Σm² ≤ 2·tθ·(e·tθ)、
+     tθ² ≤ qz、(e·tθ)² ≤ m·qz、z ≥ 2d+1、m ≥ 2 → False。
+  4. **step 補題 + chain**: exists_conjPair_pairUnion_eq (B = XsetOf S₁ Z,
+     Y = XsetOf S₂ Z) + coherentPairChain + wrapper (一般 anchor m₀ = tθ)。
+     失敗 step の ψ から anchor を 1 で構成 → 2·tθ·a < Σ が破れる → 2,3 で矛盾。
+     no-real は odd_card_Q1_of_isPGroup (p-群文脈)。
+  5. **帰納 skeleton**: ssetOf_coherent_of_le_sder (ReductionTwo) の鏡映で
+     XsetOf S′ Z (Part A) → XsetOf ⊥ Z = 𝒳。S-side centralLiftIn W:=S 流用。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
      保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —
