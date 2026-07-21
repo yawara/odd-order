@@ -484,7 +484,15 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
     - **設計 (2026-07-21 確定)**: Lemma 5 の消費は ⟸ 方向
       (IsomorphicOrderQModuleSplit → IsTypeB) が critical path。
       経路 = higmanLemmaTwelve の分類 + C/D 排除:
-      - **Lemma U (split 一意性)**: P/Z が非同型既約 2 成分 U₁ ≇ U₂ の
+      - [x] **Lemma U 完了** (新 leaf SplitUniqueness.lean):
+        `OrderQModuleSplit.nonempty_summandEquiv_of_isomorphic` —
+        IsomorphicOrderQModuleSplit があれば任意の split の summands が
+        K-equivariant 同型。実装は Schur/Maschke でなく fpf 計数
+        (`invariant_eq_bot_or_top_of_fixedPointFree_card`) で第 3 不変部分群を
+        両 summand から disjoint にし、商射影で同型を合成
+        (`nonempty_kEquivariantMulEquiv_of_third_invariant`)。
+        KEquivariantMulEquiv.symm/trans を HigmanDE に追加。AxiomsCheck 3 本登録済。
+      - **Lemma U (split 一意性)** (設計原文): P/Z が非同型既約 2 成分 U₁ ≇ U₂ の
         半単純分解を持つとき、任意の complementary invariant order-q 対は
         {U₁, U₂} に一致 (第 3 の既約部分加群は Schur 射影で U₁ ≅ U₂ を強制)。
         Maschke は OperatorMaschke.lean の bridge 流用。

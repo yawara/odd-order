@@ -8534,6 +8534,15 @@ orders are complementary. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.isCompl_of_distinct_invariant_of_transitive_card
 
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.disjoint_of_invariant_of_ne_of_card
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.nonempty_kEquivariantMulEquiv_of_third_invariant
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.nonempty_summandEquiv_of_isomorphic
+
 /-! In the actual Part II setting, `|K|` and `|Q₀|` are coprime and the
 induced action on `Q / Q₀` is fixed-point-free.  Hence every invariant
 order-`|Q₀|` subgroup is transitive on its nonidentity elements and simple as
