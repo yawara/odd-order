@@ -12000,3 +12000,22 @@ Peterfalvi type I or type II.
   disjoint saturation families over `|G|`. -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.e5_msigma_index_prime_of_ii_hdc
 #assert_only_allowed_axioms OddOrder.BG.AppE.maximalSubgroups_isTypeI_or_isTypeII
+
+/-! **Peterfalvi Part II, Ch. I §3, Lemma 5 — complete** (`Peterfalvi.Appendices.
+Suzuki2Groups.QuotientPlaneModel` + `Peterfalvi.Appendices.Suzuki.WCyclicDivides`,
+issue 2048, 2026-07-21) — ⭐ Lemma 5 is **fully proved**: `W` is cyclic, `|W| ∣ q + 1`,
+and `W ≠ 1` makes `Q` a Suzuki 2-group of type B.
+
+* `exists_planeCoordinates_of_isomorphicSplit` — the plane model: an isomorphic
+  order-`q` split of `P ⧸ Z` under a cyclic fixed-point-free actor of order `q - 1`
+  yields `F_q × F_q` coordinates with the `K`-action as diagonal nonzero scalars.
+* `isCyclic_W_and_card_dvd_of_orderThree` — `W` embeds `F_q`-linearly into
+  `GL(2, q)` with no fixed projective point (moved-summand engine), so the
+  two-dimensional projective-freeness theorem gives cyclicity and `|W| ∣ q + 1`.
+* `lemmaFive_of_orderThree` — the assembled source-facing Lemma 5. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.exists_planeCoordinates_of_isomorphicSplit
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isCyclic_W_and_card_dvd_of_orderThree
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.lemmaFive_of_orderThree
