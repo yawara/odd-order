@@ -71,6 +71,41 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
+/-- **A character non-constant on a subgroup lies over a nontrivial constituent.**  If
+`χ ∈ Irr(K)` is not constant on `N ≤ K` (`∃ x ∈ N, χ(x) ≠ χ(1)`, i.e. `N ⊄ Ker χ`), then some
+nontrivial `θ ∈ Irr(N)` occurs in `Res_N χ`.  Fourier expansion
+(`sum_inner_irreducibleCharacter_smul`): if every nontrivial `θ` had multiplicity `0`, then
+`Res_N χ = ⟨Res χ, 1⟩·1`, forcing `χ` constant on `N`. -/
+theorem exists_ne_trivial_liesOver_of_not_forall_eq_one
+    {K : Type*} [Group K] [Finite K] [Fintype K] [Invertible (Nat.card K : ℂ)]
+    {N : Subgroup K} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    [Fintype (IrreducibleCharacter ↥N)]
+    (χ : IrreducibleCharacter K)
+    (hker : ¬ ∀ x : ↥N, (χ : ClassFunction K ℂ) (x : K) = (χ : ClassFunction K ℂ) 1) :
+    ∃ θ : IrreducibleCharacter ↥N, θ ≠ trivialIrreducibleCharacter ↥N ∧
+      IrreducibleCharacter.LiesOver N χ θ := by
+  by_contra hcon
+  apply hker
+  have hzero : ∀ θ : IrreducibleCharacter ↥N, θ ≠ trivialIrreducibleCharacter ↥N →
+      ClassFunction.inner (ClassFunction.restrict N (χ : ClassFunction K ℂ))
+        (θ : ClassFunction ↥N ℂ) = 0 := by
+    intro θ hθ
+    by_contra h
+    exact hcon ⟨θ, hθ, by
+      rw [IrreducibleCharacter.liesOver_iff, ClassFunction.restrictionMultiplicity_def]; exact h⟩
+  have hfourier := sum_inner_irreducibleCharacter_smul
+    (ClassFunction.restrict N (χ : ClassFunction K ℂ))
+  rw [Finset.sum_eq_single (trivialIrreducibleCharacter ↥N)] at hfourier
+  · intro x
+    have hvalx := congrArg (fun f : ClassFunction ↥N ℂ => f x) hfourier
+    have hval1 := congrArg (fun f : ClassFunction ↥N ℂ => f (1 : ↥N)) hfourier
+    simp only [ClassFunction.smul_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      trivialClassFunction_apply, ClassFunction.restrict_apply, Subgroup.coe_one,
+      mul_one] at hvalx hval1
+    rw [← hvalx, hval1]
+  · intro θ _ hθ; rw [hzero θ hθ, zero_smul]
+  · intro h; exact absurd (Finset.mem_univ _) h
+
 /-! ## Hypotheses and notation (p. 145) -/
 
 /-- **Peterfalvi Appendix IV, "Hypotheses and Notation"** (p. 145).
