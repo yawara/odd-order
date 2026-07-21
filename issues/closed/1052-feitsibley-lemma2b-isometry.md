@@ -47,3 +47,9 @@ integrality / degree-zero 節は証明済 (`tau_mem_ZIrr` / `tau_apply_one`)。
   (`inner_induce_eq_of_isTISubset`), `OddOrder/GroupTheory/TISubset.lean:73` (`IsTISubset`)
 - issue 1051 (closed, Lemma 2(a)), commit 777ad1a7d (𝒮 の H−Q 消滅)
 - 下流: Lemma 2(c) (:1050 付近) / Theorem (`feit_sibley_coherence`)
+
+## 完了 (2026-07-21)
+
+調査結果セクションのレシピ通りに一発 landing (commit 直上)。build green + axiom-clean
+(`propext`/`Classical.choice`/`Quot.sound`)。FeitSibley 残 sorry 3 → 2 (2(c) / Theorem)。
+`hyp.tau φ` は `ClassFunction.induce hyp.H φ` に reducible-defeq で `change` 不要だった。
