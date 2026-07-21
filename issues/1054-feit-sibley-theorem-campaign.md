@@ -321,7 +321,16 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
      |S/S₁|(|Z|−1)² ≤ 4d²、|Z| ≥ 2d+1 (two_mul_d_add_one_le_card_of_le_Q1、
      Z ⊴ H D-inv ✓)、|S/S₁| ≥ 2 ⟹ 矛盾。算術は false_of_reduction_two_bounds 型の
      新変種。
-  6. 新 leaf `FeitSibleyReductionThree.lean` (配線同 commit)。(1)(2) より以後 Q₁ = non-abelian p-群
+  6. 新 leaf `FeitSibleyReductionThree.lean` (配線同 commit)。
+  7. **偵察結果 (2026-07-21)**: (a) 中心指数可除性 deg φ ∣ [G:Z] ([Is] CT Thm 3.12
+     相当) は repo 未発見 — `exists_natDegree_charValue_one_dvd_card` (deg ∣ |G|) のみ。
+     p-冪度数には「S/S′ 中心 ⟹ deg ∣ |Q₁|」級が必要 → 新設候補
+     (direct-product Irr 分解 or Ito 型; まず mathlib
+     `Character.degree_dvd_index_center`? を leansearch で確認)。
+     (b) `exists_conjPair_pairUnion_eq` は**度数単調性を返さない** — (3) Part A の
+     accumulated-sum 論法には度数昇順 pair 分解が必要 → 強化版
+     (Y∖B の最小度数対を先頭に取る強帰納、既存証明の choice を min-degree に変更)
+     を新設するか、既存を置換強化。(1)(2) より以後 Q₁ = non-abelian p-群
   (p 奇素数) と仮定してよい: assembly 分岐は (i) |Q₁| 2素数 → (1)+(2) 済,
   (ii) Q₁ abelian → Q′ = S′ ⟹ Remark 𝒮(Q′) = 𝒮(S′) coherent → (2) 済,
   (iii) Q₁ non-abelian p-群 → (3)–(8) 本線。d=1 分岐 (τ=id 自明) と
