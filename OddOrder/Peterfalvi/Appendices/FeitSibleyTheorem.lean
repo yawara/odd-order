@@ -902,6 +902,122 @@ theorem leKer_iff_subset_characterKernel {R : Subgroup G} {χ : ClassFunction �
     rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at this
     simpa using this
 
+/-! ### Fixed-point-free lower bounds (pp. 146–147)
+
+The reductions use `|Z| ≥ d+1` (and, for `|Z|` odd, `|Z| ≥ 2d+1`) for nontrivial
+`D`-invariant subgroups `Z ≤ Q₁`: the conjugation action of `D` on `Z` is free off
+the unique fixed point `1`, so `d ∣ |Z| − 1`. -/
+
+/-- **`d ∣ |Z| − 1`** for a `D`-invariant subgroup `Z ≤ Q₁`: conjugation by `D` acts
+on `Z` with unique fixed point `1` (fixed-point-freeness on `Q₁`) and freely off it
+(trivial stabilizers), so the non-identity elements split into free `D`-orbits
+(`dvd_card_sub_one_of_free_off_unique_fixed`). -/
+theorem d_dvd_card_sub_one_of_le_Q1 [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZinv : ∀ δ ∈ hyp.D, ∀ z ∈ Z, δ * z * δ⁻¹ ∈ Z) :
+    hyp.d ∣ Nat.card ↥Z - 1 := by
+  classical
+  by_cases hd1 : hyp.d = 1
+  · rw [hd1]; exact one_dvd _
+  letI : SMul ↥hyp.D ↥Z :=
+    ⟨fun δ z => ⟨(δ : G) * z * (δ : G)⁻¹, hZinv δ δ.2 z z.2⟩⟩
+  have hsmul_def : ∀ (δ : ↥hyp.D) (z : ↥Z),
+      ((δ • z : ↥Z) : G) = (δ : G) * z * (δ : G)⁻¹ := fun _ _ => rfl
+  letI : MulAction ↥hyp.D ↥Z :=
+    { one_smul := fun z => Subtype.ext (by rw [hsmul_def]; simp)
+      mul_smul := fun δ₁ δ₂ z => Subtype.ext (by
+        rw [hsmul_def, hsmul_def, hsmul_def]
+        simp only [Subgroup.coe_mul]
+        group) }
+  have h1fix : (1 : ↥Z) ∈ MulAction.fixedPoints ↥hyp.D ↥Z := by
+    intro δ
+    exact Subtype.ext (by rw [hsmul_def]; simp)
+  have huniq : ∀ z : ↥Z, z ∈ MulAction.fixedPoints ↥hyp.D ↥Z → z = 1 := by
+    intro z hz
+    haveI : Nontrivial ↥hyp.D := by
+      apply Finite.one_lt_card_iff_nontrivial.mp
+      have hpos : 0 < Nat.card ↥hyp.D := Nat.card_pos
+      have : Nat.card ↥hyp.D ≠ 1 := hd1
+      omega
+    obtain ⟨δ0, hδ0⟩ := exists_ne (1 : ↥hyp.D)
+    have hδ0G : (δ0 : G) ≠ 1 := fun h => hδ0 (Subtype.ext (by simpa using h))
+    have hfix := hz δ0
+    have hfixG : (δ0 : G) * (z : G) * (δ0 : G)⁻¹ = (z : G) := by
+      have := congrArg (fun w : ↥Z => (w : G)) hfix
+      rwa [hsmul_def] at this
+    have hz1 : (z : G) = 1 :=
+      hyp.D_fixedPointFree_on_Q1 (δ0 : G) δ0.2 hδ0G (z : G) (hZQ1 z.2) hfixG
+    exact Subtype.ext hz1
+  have hfree : ∀ z : ↥Z, z ∉ MulAction.fixedPoints ↥hyp.D ↥Z →
+      Nat.card (MulAction.orbit ↥hyp.D z) = Nat.card ↥hyp.D := by
+    intro z hz
+    have hstab : MulAction.stabilizer ↥hyp.D z = ⊥ := by
+      rw [eq_bot_iff]
+      intro δ hδ
+      rw [Subgroup.mem_bot]
+      by_contra hδ1
+      have hδG : (δ : G) ≠ 1 := fun h => hδ1 (Subtype.ext (by simpa using h))
+      have hfixG : (δ : G) * (z : G) * (δ : G)⁻¹ = (z : G) := by
+        have := congrArg (fun w : ↥Z => (w : G)) (MulAction.mem_stabilizer_iff.mp hδ)
+        rwa [hsmul_def] at this
+      have hz1 : (z : G) = 1 :=
+        hyp.D_fixedPointFree_on_Q1 (δ : G) δ.2 hδG (z : G) (hZQ1 z.2) hfixG
+      have hzeq : z = (1 : ↥Z) := Subtype.ext hz1
+      exact hz (by rw [hzeq]; exact h1fix)
+    have hinj : Function.Injective (fun δ : ↥hyp.D => δ • z) := by
+      intro δ₁ δ₂ heq
+      have heq' : δ₁ • z = δ₂ • z := heq
+      have hmem : δ₂⁻¹ * δ₁ ∈ MulAction.stabilizer ↥hyp.D z := by
+        rw [MulAction.mem_stabilizer_iff, mul_smul, heq', ← mul_smul, inv_mul_cancel, one_smul]
+      rw [hstab, Subgroup.mem_bot] at hmem
+      exact (inv_mul_eq_one.mp hmem).symm
+    exact Nat.card_range_of_injective hinj
+  exact OddOrder.GroupTheory.FreeActionOrbitCount.dvd_card_sub_one_of_free_off_unique_fixed
+    (1 : ↥Z) h1fix huniq hfree
+
+/-- **`|Z| ≥ d + 1`** for a nontrivial `D`-invariant `Z ≤ Q₁`
+(`d ∣ |Z| − 1` and `|Z| > 1`). -/
+theorem d_add_one_le_card_of_le_Q1 [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZinv : ∀ δ ∈ hyp.D, ∀ z ∈ Z, δ * z * δ⁻¹ ∈ Z) (hZne : Z ≠ ⊥) :
+    hyp.d + 1 ≤ Nat.card ↥Z := by
+  have hdvd := hyp.d_dvd_card_sub_one_of_le_Q1 hZQ1 hZinv
+  have hlt : 1 < Nat.card ↥Z :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot Z).mpr hZne)
+  obtain ⟨k, hk⟩ := hdvd
+  have hkpos : 0 < k := by
+    rcases Nat.eq_zero_or_pos k with h0 | h
+    · rw [h0, mul_zero] at hk; omega
+    · exact h
+  have hle : hyp.d ≤ hyp.d * k := Nat.le_mul_of_pos_right hyp.d hkpos
+  omega
+
+/-- **`|Z| ≥ 2d + 1`** for a nontrivial `D`-invariant `Z ≤ Q₁` of odd order, `d`
+odd: `|Z| = kd + 1` with `k ≥ 1`, and `k = 1` would make `|Z| = d + 1` even. -/
+theorem two_mul_d_add_one_le_card_of_le_Q1 [Finite G] (hd : Odd hyp.d)
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZinv : ∀ δ ∈ hyp.D, ∀ z ∈ Z, δ * z * δ⁻¹ ∈ Z) (hZne : Z ≠ ⊥)
+    (hZodd : Odd (Nat.card ↥Z)) :
+    2 * hyp.d + 1 ≤ Nat.card ↥Z := by
+  have hdvd := hyp.d_dvd_card_sub_one_of_le_Q1 hZQ1 hZinv
+  have hlt : 1 < Nat.card ↥Z :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot Z).mpr hZne)
+  obtain ⟨k, hk⟩ := hdvd
+  have hcard : Nat.card ↥Z = hyp.d * k + 1 := by omega
+  have hkeven : Even k := by
+    have heven : Even (hyp.d * k) :=
+      Nat.not_odd_iff_even.mp (Nat.odd_add_one.mp (hcard ▸ hZodd))
+    rcases Nat.even_mul.mp heven with h | h
+    · exact absurd h (Nat.not_even_iff_odd.mpr hd)
+    · exact h
+  have hkpos : 0 < k := by
+    rcases Nat.eq_zero_or_pos k with h0 | h
+    · rw [h0, mul_zero] at hk; omega
+    · exact h
+  have hk2 : 2 ≤ k := by
+    rcases hkeven with ⟨m, hm⟩
+    omega
+  have hle : hyp.d * 2 ≤ hyp.d * k := Nat.mul_le_mul_left hyp.d hk2
+  omega
+
 section SsetOfCounting
 
 variable [Fintype G] [Invertible (Nat.card G : ℂ)]
