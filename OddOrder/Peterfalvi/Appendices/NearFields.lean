@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Peterfalvi Appendix C: On Near-Fields
@@ -56,8 +58,9 @@ Per-result status:
 | App. C Prop 2, field half (`nearField_field_structure_of_index_two`) | **proved** (unchanged) |
 | `NearField.mul_add_of_mul_comm` (commutative ⇒ distributive) | **proved, sorry-free** (new) |
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
-| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` |
-| App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | honest statement, `sorry` |
+| App. C Prop 1, prerequisite (i) (`RankOneHypothesis.sylow_two_isCyclic_or_quaternion`) | **proved, axiom-clean** (2026-07-22) |
+| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` — gated on Brauer–Suzuki (issue 9318) |
+| App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | **proved, axiom-clean** (2026-07-21, commit 42892fcb5) |
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
@@ -676,6 +679,41 @@ structure RankOneHypothesis (G Ω : Type*) [Group G] [MulAction G Ω] [Finite G]
   This is the negation of Part II's hypothesis (A3). -/
   two_rank_one : ¬ ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1
 
+/-- **Proposition 1, prerequisite (i)** (Huppert, *Endliche Gruppen* I, Kapitel III, Satz 8.2):
+a group of 2-rank one has cyclic or generalized quaternion Sylow `2`-subgroups.
+
+Bridge from `two_rank_one` to **Isaacs Thm 6.11**
+(`isCyclic_or_two_quaternion_of_subgroups_card_prime_unique`): if a Sylow `2`-subgroup had two
+distinct subgroups of order `2`, it would contain an elementary abelian subgroup of order `4`
+(`IsPGroup.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne`), which
+`two_rank_one` forbids. -/
+theorem RankOneHypothesis.sylow_two_isCyclic_or_quaternion
+    {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) (S : Sylow 2 G) :
+    IsCyclic ↥(S : Subgroup G) ∨
+      ∃ n : ℕ, Nonempty (↥(S : Subgroup G) ≃* QuaternionGroup n) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hUnique : ∀ K L : Subgroup ↥(S : Subgroup G),
+      Nat.card K = 2 → Nat.card L = 2 → K = L := by
+    intro K L hK hL
+    by_contra hne
+    obtain ⟨E, hE_elem, hE_card⟩ :=
+      S.isPGroup'.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
+        hK hL hne
+    refine hyp.two_rank_one ⟨E.map (S : Subgroup G).subtype, ?_, ?_⟩
+    · rw [Nat.card_congr
+        (Subgroup.equivMapOfInjective E _ (S : Subgroup G).subtype_injective).symm.toEquiv,
+        hE_card]
+      norm_num
+    · rintro x ⟨y, hy, rfl⟩
+      have hy2 : (⟨y, hy⟩ : ↥E) ^ 2 = 1 := hE_elem.pow_eq_one _
+      have hyS : y ^ 2 = 1 := by simpa using congrArg Subtype.val hy2
+      simpa using congrArg ((S : Subgroup G).subtype) hyS
+  rcases OddOrder.Isaacs.Ch06.isCyclic_or_two_quaternion_of_subgroups_card_prime_unique
+      S.isPGroup' hUnique with hcyc | ⟨_, hq⟩
+  · exact Or.inl hcyc
+  · exact Or.inr hq
+
 /-- **Peterfalvi Appendix C, Proposition 1, conclusion**: the affine near-field model of `G`.
 
 The book asserts an isomorphism `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ` identifying `Q` with `F^*` and `D`
@@ -729,15 +767,22 @@ group `Σ` of automorphisms of `F` with `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ 
 and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct involutions `u, v ∈ G`,
 `|uv|` equals the characteristic of `F`.
 
-**Status: honestly stated, not proved.**  Peterfalvi's proof consumes three results that are not
-available here: (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert,
-*Endliche Gruppen* I, Kapitel III, Satz 8.2) — 2-rank one is exactly this; (ii) the **Brauer–Suzuki
-theorem** `G = O_{2'}(G) C_G(u)`, which is not formalized in this repository; (iii) Huppert Kapitel
-II, Satz 3.2, giving the elementary abelian normal complement `G = F ⋊ H` for the solvable
-`O_{2'}(G)` (solvable by Feit–Thompson).  With those in hand, the near-field structure on `F` comes
-from the regular action of `Q` on `F^#` by the standard transport recorded on p. 137 (choose the
-`D`-fixed point of `F^#` as the multiplicative identity), which *is* elementary and would be the
-first piece to formalize once (i)–(iii) exist. -/
+**Status: honestly stated, not proved.**  Peterfalvi's proof consumes three results; their repo
+state (updated 2026-07-21, issue 9404):
+
+* (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert, *Endliche Gruppen* I,
+  Kapitel III, Satz 8.2) — **proved** as `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
+  above (bridge from `two_rank_one` to Isaacs Thm 6.11).
+* (ii) the **Brauer–Suzuki theorem** `G = O_{2'}(G) C_G(u)` — not formalized; **issue 9318**
+  (lane b claim).  This is the sole remaining gate.
+* (iii) Huppert Kapitel II, Satz 3.2, giving the elementary abelian normal subgroup regular on `Ω`
+  (hence `G = F ⋊ H`) for the solvable `O_{2'}(G)` (solvable by Feit–Thompson) — **formalized** as
+  `OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive`
+  (`GroupTheory/SolvableTwoTransitive.lean`).
+
+With (ii) in hand, the near-field structure on `F` comes from the regular action of `Q` on `F^#`
+by the standard transport recorded on p. 137 (choose the `D`-fixed point of `F^#` as the
+multiplicative identity), which *is* elementary. -/
 theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
     (hyp : RankOneHypothesis G Ω) :
     ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
@@ -901,22 +946,14 @@ an `r` which is a power of an odd prime such that `F ≅ F_{r²,2}` — the twis
 An isomorphism of near-fields is an additive equivalence that is also multiplicative, spelled out
 here rather than bundled.
 
-**Status: honestly stated, `sorry`.**  The first half of Peterfalvi's proof is **proved**, in this
-file, sorry-free: `rightMulAction_irreducible_of_index_two` is the counting argument
-`|F| = 2|A| + 1 ≥ (|A|+1)²` ruling out a proper invariant decomposition, and
-`exists_field_structure_of_cyclic_index_two` (cited in the proof below) is the resulting field
-structure via Appendix I, Proposition 2.
-
-What remains is the *tail*: normalize the field `K` obtained from `exists_field_semilinear` so that
-its unit `1` is the near-field unit and `x ∘ y = x·y` for `y ∈ A` (the module structure only gives
-`finrank = 1`, so the normalization is the choice of basis vector `1`), then run the semilinearity
-clause of `exists_field_semilinear` to produce the homomorphism `y ↦ σ_y` from `F^*` to `Aut K`
-whose kernel contains `A`, split on whether that kernel is all of `F^*` (field case) or of index `2`
-(then `σ_y : x ↦ x^r` and `F ≅ F_{r²,2}`), and finally compute `Z(F^*) = 𝔽_r^*` from
-`x ∈ Z(F^*) ↔ x^r = x`.  The missing formal prerequisite is the normalized transport of the
-`exists_field_semilinear` output onto the near-field `F` itself (a `Module K F` with `finrank 1` has
-to be converted into a *field structure on `F`* sharing `+` and `1` with the near-field); no piece
-of this is in the repository yet. -/
+**Status: proved, axiom-clean** (2026-07-21).  The first half is
+`rightMulAction_irreducible_of_index_two` (the counting argument `|F| = 2|A| + 1 ≥ (|A|+1)²`
+ruling out a proper invariant decomposition) feeding `exists_field_semilinear_with_scalar`
+(Appendix I, Proposition 2).  The tail — normalizing the semilinear field `K` so that its unit is
+the near-field unit (`Θ : K ≃ₗ[K] F`, `a ↦ a • 1`), splitting on whether the kernel of
+`y ↦ σ_y : F^* → Aut K` is all of `F^*` (field case) or of index `2` (`σ_y : x ↦ x^r`, twist case
+`F ≅ F_{r²,2}`), and computing `|Z(F^*)| = r - 1` from `x ∈ Z(F^*) ↔ x^r = x` — is carried out
+below in full. -/
 theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F] [Finite F]
     (A : Subgroup Fˣ) (hcyc : IsCyclic ↥A) (hidx : A.index = 2) :
     (∀ x y : F, x * y = y * x) ∨
