@@ -185,3 +185,15 @@ theorem e5_exists_suitable_complement ... (K₁ 側仮説 + 15.9 出力仮説) :
 3. (E.31)/(E.32): Thm 12.7(b)(e) を N の esetup で適用 (canonical line A₀ = R₀ = ⟨x⟩)。
    WP3 setup フィールド (R₀_card/R₁_cyclic/centralizer_eq/A_fixes_R₀/A_regular) の供給源。
 4. WP4 短縮確認済: E.4 対偶 → E ≤ N_G(⟨x⟩) ≤ N → E = E∩N = K₁ → |M/M'| = |E| prime。
+
+## 2026-07-21 WP3 入力ほぼ完備 (commits 65fbe8c49 / 309f148f9 / a6a2117ea / 18227e575)
+
+- `commute_of_orderOf_prime_ne` (generic 冪零 coprime-commute) + `e5_kappaHall_inf_Msigma_eq_bot`
+- `e5_kappaHall_pi_sigma_compl` (hK₁σ' glue)
+- `e5_opiCore_sylow_card` / `e5_exists_sylow_eq_opiCore` (**O_p(M) = Sylow p of G**)
+- `e5_zpowers_eq_canonical_line` (**(E.32) 核**: ⟨x⟩ = A₀、N ≤ N_G(⟨x⟩)、N_σ ≤ C_G(⟨x⟩))
+
+全 sorry-free。**WP3 setup 残り**: (E.31) 後半 — C_{O_p(M)}(x) = R₀ × (R∩E₀) 分解と
+R∩E₀ cyclic (Prop 3.9、regular on N_σ)。これが setup の R₁/centralizer_eq/R₀_disjoint_R₁
+を供給。その後 act (E の conj 作用の MulAut 化)・A := K₁ 像・p_not_dvd_card_B (E は
+σ(M)'-群 + p ∈ σ(M))・A_regular (Frobenius fpf) を束ねて RegularOperatorSetup 構成。
