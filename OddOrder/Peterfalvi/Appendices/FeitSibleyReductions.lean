@@ -28,7 +28,9 @@ contradicting `D_fixedPointFree_on_Q1`.
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
-open scoped Pointwise commutatorElement
+open OddOrder.RepresentationTheory
+
+open scoped Pointwise commutatorElement ComplexOrder
 
 variable {G : Type*} [Group G]
 
@@ -673,6 +675,115 @@ theorem map_mk_sup_S_le_center_of_central {Q₃ Z : Subgroup G}
           (((hyp.Sder ⊔ Q₃).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
   hyp.map_mk_le_center_of_commutator_mem fun _ hx _ hq =>
     hyp.commutator_mem_sup_Sder_of_central hZQ1 hcentral hx hq
+
+/-! ## The reduction (1) one-step lemma (p. 146)
+
+Peterfalvi's induction step "if `𝒮(S'Q₂)` is coherent and `𝒮(S'Q₃)` is not,
+then …, a contradiction": the counterexample extraction plus the (1.1)/(1.2)
+bounds and the fixed-point-free lower bounds are jointly impossible. -/
+
+/-- `[Q₁, Q₁] ≤ Q₁` (mirror of `Sder_le_S`). -/
+theorem Q1der_le_Q1 : ⁅hyp.Q1, hyp.Q1⁆ ≤ hyp.Q1 := by
+  rw [Subgroup.commutator_le]
+  intro g hg h hh
+  rw [commutatorElement_def]
+  exact hyp.Q1.mul_mem (hyp.Q1.mul_mem (hyp.Q1.mul_mem hg hh) (hyp.Q1.inv_mem hg))
+    (hyp.Q1.inv_mem hh)
+
+/-- **`𝒮(R)` is closed under complex conjugation** for any kernel condition `R`
+(the general-`R` form of `conj_mem_SsetOf_Qder`): conjugation preserves
+membership in `𝒮` (`conj_mem_Sset`), and the `LeKer` constancy transports
+through `star`. -/
+theorem conj_mem_SsetOf [Finite G] {R : Subgroup G} {χ : ClassFunction ↥hyp.H ℂ}
+    (hχ : χ ∈ hyp.SsetOf R) : χ.conj ∈ hyp.SsetOf R := by
+  obtain ⟨hχS, hker⟩ := hχ
+  refine ⟨hyp.conj_mem_Sset hχS, fun x hx => ?_⟩
+  rw [ClassFunction.conj_apply, ClassFunction.conj_apply, hker x hx]
+
+section StepLemma
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+/-- **The reduction (1) one-step lemma** (p. 146): coherence of `𝒮(S'Q₂)`
+propagates to `𝒮(S'Q₃)` given the chief-factor data `Q₃ ≤ Q₂ ≤ Z ≤ Q₁` — `Z`
+the lift of `Z(Q₁/Q₃)` (`⁅Z, Q₁⁆ ⊆ Q₃`), `Q₂ ⊊ Z`, `Q₂` and `Z` `D`-invariant,
+and the two-prime lower bound `|Q₁⧸Q₂| ≥ (d+1)²`.
+
+Proof: suppose not.  The counterexample extraction
+(`exists_counterexample_of_not_coherent` at `B = 𝒮(S'Q₂)`, `Y = 𝒮(S'Q₃)`, with
+the degree-`d` anchor from `𝒮(Q') ⊆ 𝒮(S'Q₂)`) produces `ψ ∈ 𝒮(S'Q₃)` of degree
+`d·a` with `∑_{𝒮(S'Q₂)} m(x)² ≤ 2a`.  The counting bound (1.1) turns this into
+`|Q₁⧸Q₂| − 1 ≤ 2da` (`card_quot_sub_le_of_forall_deg_of_sum_le` →
+`card_quot_Q1_sub_one_le_of_card_quot_sub_le`); the degree bound (1.2) gives
+`a² ≤ |Q₁⧸Z|` (`exists_deg_sq_le_of_mem_SsetOf` at `D₀ = SZ` with the
+direct-product centrality `map_mk_sup_S_le_center_of_central` and the index
+conversion `index_subgroupOf_sup_S_eq`); with the tower
+`|Q₁⧸Q₂| = |Q₁⧸Z|·|Z⧸Q₂|` and the fixed-point-free bounds `|Z⧸Q₂| ≥ d+1`,
+`|Q₁⧸Q₂| ≥ (d+1)²`, the arithmetic `false_of_reduction_one_bounds` closes the
+contradiction. -/
+theorem ssetOf_coherent_step
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hlt : hyp.S ⊔ hyp.Qder < hyp.Q)
+    {Q₂ Q₃ Z : Subgroup G}
+    (hQ₂der : Q₂ ≤ ⁅hyp.Q1, hyp.Q1⁆) (hQ₃Q₂ : Q₃ ≤ Q₂)
+    (hZQ1 : Z ≤ hyp.Q1) (hQ₂Z : Q₂ ≤ Z) (hZQ₂ : ¬ Z ≤ Q₂)
+    (hcentralZ : ∀ z ∈ Z, ∀ y ∈ hyp.Q1, ⁅z, y⁆ ∈ Q₃)
+    (hQ₂inv : ∀ δ ∈ hyp.D, ∀ z ∈ Q₂, δ * z * δ⁻¹ ∈ Q₂)
+    (hZinv : ∀ δ ∈ hyp.D, ∀ z ∈ Z, δ * z * δ⁻¹ ∈ Z)
+    (h2primes : (hyp.d + 1) ^ 2 ≤ Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1))
+    [((hyp.Sder ⊔ Q₂).subgroupOf hyp.H).Normal]
+    [((hyp.Sder ⊔ Q₃).subgroupOf hyp.H).Normal]
+    [(((hyp.Sder ⊔ Q₂).subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal]
+    [(((hyp.Sder ⊔ Q₃).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal]
+    [((hyp.S ⊔ Z).subgroupOf hyp.H).Normal]
+    (hcoh₂ : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf (hyp.Sder ⊔ Q₂)) hyp.A)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf (hyp.Sder ⊔ Q₃)) hyp.A) := by
+  classical
+  by_contra hfail
+  have hQ₂Q1 : Q₂ ≤ hyp.Q1 := hQ₂der.trans hyp.Q1der_le_Q1
+  -- families: base `B = 𝒮(S'Q₂) ⊆ Y = 𝒮(S'Q₃) ⊆ 𝒮`
+  have hBY : hyp.SsetOf (hyp.Sder ⊔ Q₂) ⊆ hyp.SsetOf (hyp.Sder ⊔ Q₃) :=
+    hyp.ssetOf_antitone (sup_le_sup_left hQ₃Q₂ _)
+  have hYS : hyp.SsetOf (hyp.Sder ⊔ Q₃) ⊆ hyp.Sset := fun _ hx => hx.1
+  have hYfin : (hyp.SsetOf (hyp.Sder ⊔ Q₃)).Finite := hyp.Sset_finite.subset hYS
+  -- the degree-`d` anchor of the Remark, via `𝒮(Q') ⊆ 𝒮(S'Q₂)`
+  obtain ⟨χ₀, hχ₀Qder⟩ := hyp.ssetOf_Qder_nonempty hlt
+  have hχ₀B : χ₀ ∈ hyp.SsetOf (hyp.Sder ⊔ Q₂) :=
+    hyp.ssetOf_antitone (hyp.sup_Sder_le_Qder hQ₂der) hχ₀Qder
+  -- counterexample extraction: `ψ` of degree `d·a` with `∑_B m² ≤ 2a`
+  obtain ⟨ψ, a, m, hψY, hapos, hψdeg, hmdeg, hmsum⟩ :=
+    hyp.exists_counterexample_of_not_coherent hd hQ1odd hBY hYS hYfin
+      (fun _ hχ => hyp.conj_mem_SsetOf hχ) (fun _ hχ => hyp.conj_mem_SsetOf hχ)
+      hcoh₂ hχ₀B (hyp.apply_one_eq_d_of_mem_SsetOf_Qder hχ₀Qder) hfail
+  -- (1.1): `|Q₁⧸Q₂| − 1 ≤ d·2a`
+  have h11 := hyp.card_quot_Q1_sub_one_le_of_card_quot_sub_le
+    (sup_le (hyp.Sder_le_S.trans hyp.S_le_Q) (hQ₂Q1.trans hyp.Q1_le_Q))
+    (hyp.Q1_inf_sup_eq hyp.Sder_le_S hQ₂Q1)
+    (hyp.card_quot_sub_le_of_forall_deg_of_sum_le (hyp.Sder ⊔ Q₂)
+      (hYfin.subset hBY) hmdeg hmsum)
+  -- (1.2): `a² ≤ |Q₁⧸Z|`
+  obtain ⟨a', ha'deg, ha'sq⟩ := hyp.exists_deg_sq_le_of_mem_SsetOf
+    (hyp.Sder ⊔ Q₃) (hyp.S ⊔ Z)
+    (sup_le (hyp.Sder_le_S.trans hyp.S_le_Q) ((hQ₃Q₂.trans hQ₂Q1).trans hyp.Q1_le_Q))
+    (sup_le_sup hyp.Sder_le_S (hQ₃Q₂.trans hQ₂Z))
+    (sup_le hyp.S_le_Q (hZQ1.trans hyp.Q1_le_Q))
+    (hyp.map_mk_sup_S_le_center_of_central hZQ1 hcentralZ) hψY
+  have haa' : a' = a := by
+    have hdne : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+    have heq : (hyp.d : ℂ) * (a' : ℂ) = (hyp.d : ℂ) * (a : ℂ) :=
+      ha'deg.symm.trans hψdeg
+    exact_mod_cast mul_left_cancel₀ hdne heq
+  rw [haa', hyp.index_subgroupOf_sup_S_eq hZQ1] at ha'sq
+  -- assemble the arithmetic contradiction
+  exact false_of_reduction_one_bounds hyp.d_pos h11 ha'sq
+    (hyp.card_quot_Q1_eq_mul hQ₂Z hZQ1)
+    (hyp.d_add_one_le_card_quotient_of_le_Q1 hQ₂Z hZQ1 hQ₂inv hZinv hZQ₂) h2primes
+
+end StepLemma
 
 end Hypothesis
 
