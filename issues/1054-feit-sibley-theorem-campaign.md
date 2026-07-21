@@ -126,6 +126,74 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   ② Remark (𝒮(Q') coherent, m ≥ 2) → ③ (1) → ④ (2) → ⑤ (3) → ⑥ (7) (独立、並行可) →
   ⑦ (4)(5)(6) → ⑧ (8) assembly。
 
+## 進捗 (2026-07-21, FeitSibleyTheorem.lean)
+
+- [x] **Remark 完結**: `ssetOf_Qder_coherent` (d0d1ada95) — 𝒮(Q') coherent
+  (仮定: d odd + |Q₁| odd + 非空)。`ssetOf_Qder_nonempty` (3bd71cd5b) で非空は
+  `S ⊔ Q' < Q` に還元済み (endgame で Q₁ 非自明 p-群から導出)。
+- [x] 支持層: S'/Q' 定義・Q'⊴H・S⊴Q・S⊔Q'⊴Q・[H:Q]=d・𝒮(Q') の degree=d
+  (`apply_one_eq_d_of_mem_SsetOf_Qder`)・A-support・2(b) isometry ブリッジ・
+  (5.2.d/e) difference image 群・`leKer_induce_Qder_of_forall`。
+- [x] **2-kernel counting** (1dfea8ba3): `sum_degreeSq_ker_subset_not_subset` —
+  Σ_{N⊆ker, M⊄ker} χ(1)² = |K⧸N| − |K⧸N⊔M| (汎用)。
+- [x] 𝒮(R) 和ブリッジ (556867bcc): `leKer_iff_subset_characterKernel` +
+  `sum_degreeSq_SsetOf` (filter-Finset 形 = Lemma 1(a) の enumeration に直結)。
+- [x] f.p.f. 下界 (0ed24f513): `d_dvd_card_sub_one_of_le_Q1` / `d_add_one_le_card_of_le_Q1` /
+  `two_mul_d_add_one_le_card_of_le_Q1` (conj MulAction inline 構成 +
+  FreeActionOrbitCount.dvd_card_sub_one_of_free_off_unique_fixed)。
+- [x] `exists_apply_one_eq_d_mul`: ∀ χ ∈ 𝒮, χ(1) = d·m (m ≥ 1) — 1(a) anchor 可除性。
+- [ ] **次 = reduction (1) 本体**。2026-07-21 偵察で判明した組み立てルート:
+  - **連鎖 adjoin エンジンは既存**: `coherentPairChain` (S07_Coherence/CoherenceUnion.lean:1602,
+    base + per-pair step ⟹ pairUnion 全体 coherent) + `pairUnion_eq_of_cover` (分解証明) +
+    `exists_monotoneDegreeEnum` (:1436, 度数昇順 enumeration) +
+    `two_mul_lt_sq_of_primePow_gap` (NormInequalities.lean:796, 度数 gap 算術)。
+  - **1 ステップ補題の形**: 𝒮(S'Q₂) coherent ⟹ 𝒮(S'Q₃) coherent は、
+    𝒮(S'Q₃) = 𝒮(S'Q₂) ∪ (新規共役対) に分解し coherentPairChain。各 step は
+    Lemma 1(a) (coherent_adjoin_of_degree_bound) — anchor = 度数 d の member
+    (𝒮(Q') ⊆ 𝒮(S'Q₂): S'Q₂ ⊆ [Q,Q] = Q' より) + d ∣ 全度数 (exists_apply_one_eq_d_mul)。
+  - **反例抽出 (原文の ψ)**: ¬coherent ⟹ 連鎖の最初の失敗 step で 1(a) の
+    非度数仮定は全部立つので度数 bound が破れる: 2dψ(1) ≥ Σ_{base} χ(1)²
+    (= |H/S'Q₂|−|H/S'Q₁| via sum_degreeSq_SsetOf)。以降 (1.1)(1.2) の算術は
+    exists_degree_sq_le_index + two_mul_d_add_one 系で閉じる。
+  - 残る未整備: chief factor (Q₂/Q₃, Z/Q₃ = Z(Q₁/Q₃)) の商レベル中心性の取り回しと、
+    ψ(1) = dφ(1) の φ ∈ Irr(Q/S'Q₃) 具体化 ([Is] 2.30 の section 版 =
+    InflationCharacter の degree_sq_le_index_of_central_quotient :361 が使えるはず)。
+  - (5f2ff15b1) `ssetOf_antitone` + `sup_Sder_le_Qder` 済み。
+    `exists_monotoneDegreeEnum` (CoherenceUnion:1436) は任意有限族の度数昇順
+    enumeration (Injective + cover + Re-monotone) を返す — 分解の並べ替えに直用可。
+  - **⚠ 統計 fidelity フラグ (2026-07-21)**: 原文 (1) の結末「(d+1)²−2 < 4d whence
+    d ≤ 2, contradiction」は **d = 1 で矛盾にならない** (2 < 4 真)。d odd + d ≤ 2 は
+    d = 1 を残す ⟹ reduction 補題は 1 < d (実質 d ≥ 3) を仮定に持つのが honest。
+    **d = 1 は Theorem assembly 側で別扱い**: D = 1 ⟹ H = Q ⟹ τ = Ind_Q^Q = id で
+    𝒮 の coherence は自明 (id 拡張)。statement 設計時に d = 1 分岐を忘れないこと。
+  - **1 ステップ補題 statement 案**:
+    `ssetOf_coherent_step (hd : Odd hyp.d) (hd1 : 1 < hyp.d) (hQ1odd) {Q₂ Q₃}
+    (hQ₂der : Q₂ ≤ ⁅Q₁,Q₁⁆) (hQ₃ : Q₃ ≤ Q₂) (正規性: Q₂,Q₃ ⊴ H 要素形)
+    (hchief : Q₂/Q₃ chief in H — 使う帰結は「Q₂/Q₃ ∩ Z(Q₁/Q₃) ≠ 1 ⟹ Q₂ ≤ Z」なので
+    最初から「hZcap : Q₂ ≤ Z where Z/Q₃ := Z(Q₁/Q₃) 引き上げ」形で持つのが楽)
+    (h2primes : |Q₁| に 2 素因数 ⟹ Q₂ ⊊ Z の supply)
+    (hcoh₂ : Nonempty (IsCoherent τ (SsetOf (Sder ⊔ Q₂)) A))
+    : Nonempty (IsCoherent τ (SsetOf (Sder ⊔ Q₃)) A)`。
+    証明: by_contra → coherentPairChain の対偶で最初の失敗 step の ψ (度数昇順 ⟹
+    ψ は失敗時点の最小未 adjoin 度数) → 1(a) の非度数仮定は全部無条件に立つ
+    (orthonormal/共役対/A-support/可除性 = 部品済み) ⟹ 度数 bound 破れ:
+    Σ_{𝒮(S'Q₂)} χ(1)² ≤ 2dψ(1) → (1.1)(1.2) 算術 → f.p.f. 下界 → d ≤ 2 → hd1+hd 矛盾。
+  - **(2026-07-21 1(a) 引数精読の帰結) 次の必須部品 = full-𝒮 S07.Hypothesis**:
+    `coherent_adjoin_of_degree_bound` は ambient family の
+    `S07.Hypothesis (S := hyp.Sset) hyp.A` を第 1 引数に取る (𝒮(Q') 版とは別物)。
+    構成は ssetOf 版 (ssetOfQderDifferenceImage 系) の鏡映で:
+    (a) `conj_mem_Sset` (𝒮 の共役閉性 — conj_mem_SsetOf_Qder の Qder 節を落とすだけ)、
+    (b) **一般共役対 support 補題**: χ ∈ 𝒮 ⟹ (χ̄−χ).support ⊆ A — 度数相等は
+    χ̄(1) = star(χ(1)) = χ(1) (exists_apply_one_eq_d_mul で χ(1) = d·m 実数) + off-Q 消滅
+    (diff_support_subset_A_of_mem_SsetOf_Qder の一般化; apply_one_eq_d を使わない版)、
+    (c) tau_isometry_diff: 既存 tau_inner_eq_of_supported_SsetOf_Qder の Sset 版
+    (同じ証明 — span mono を外すだけ)、(d) difference_image: ssetOfQderDifferenceImage の
+    Sset 版 (keystone 差の supported-span 帰属を (b)(c) で)。
+    その後 1(a) の残引数: hχdeg は exists_apply_one_eq_d_mul (a := m)、
+    hdiffasuppχ (χ − a•anchor の support) は同度数 scaled diff の A-support
+    (既存 hdegdiffsupp 論法)、htau1_memaχ は tau_mem_ZIrr、
+    hDeg = 2a < Σ (degMem/d)² が counting との接続点。
+
 ## 完了条件
 
 `feit_sibley_coherence` sorry-free + axiom-clean + build green。
