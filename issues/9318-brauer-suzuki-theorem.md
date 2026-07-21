@@ -29,8 +29,12 @@ Character Theory Ch.7 (block-free proof by Glauberman?)。repo の指標 infra
       Coq odd-order に相当物があるか grep)
 - [ ] cyclic Sylow-2 case (Cayley normal 2-complement で軽い) の確認
 - [ ] generalized quaternion case の形式化
-- [ ] Huppert III 8.2 / II 3.2 の form 化
-- [ ] rankOne_affine_nearField の sorry 解消
+- [x] ~~Huppert III 8.2 / II 3.2 の form 化~~ → **lane c が完了 (2026-07-22)**:
+      II 3.2 = `GroupTheory/SolvableTwoTransitive.lean`
+      `exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive` (issue 9404 closed)、
+      III 8.2 = `NearFields.lean` `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
+      (two_rank_one → Isaacs Thm 6.11 橋)。いずれも axiom-clean。
+- [ ] rankOne_affine_nearField の sorry 解消 (残 gate は BS 本体のみ)
 
 ## 完了条件
 
