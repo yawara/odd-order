@@ -380,11 +380,50 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                   actor-eigenvalue 法則 3 定理
                   (`FactorCoordinateData.toInclusionData_incl_representation` ほか、
                   `ba9ac88da`)
-            - [ ] ε 正規化: c₀ ≠ 0 → ε (anisotropy 条件 IsType*Epsilon と接続)
+            - [x] ε 正規化 (`241971692`): B は shear 補題が IsTypeBEpsilon まで
+                  返す; C/D は `isTypeC/DEpsilon_of_decomposed_aniso` で
+                  decomposed anisotropy + monomial から IsType*Epsilon
+                  (monomial 指数 ↔ θ 冪の Frobenius 同定込み)
             - [ ] group-side assembly: 実際の mixed 項
                   (ambientCenterCoordinate ∘ lowerCentralCommutatorBilinear) を
                   mixedTerm_lambda_equivariance で equivariance に接続 → 上記単項化
                   → engine (isTypeB/C/D_of_mixedTerm) の hM → higmanLemmaTwelve
+              - [x] `mixedTermBilinear` bundle + `_lambda_equivariance` +
+                    `FactorInclusionData.exists_incl_eq` (`1b4f0c413`,
+                    CaseSplitBCD.lean 末尾; 同 file は 1380 行 — 以後の追記禁止)
+              - [x] `shearRescaleLinearEquiv` (α,β)↦(α+ρβ,tβ) +
+                    座標 parametrized engine `isTypeB_of_squareCoordinate`
+                    (`356819071`; B case θ=φ≠1 は sheared 座標
+                    `(shearRescale…).trans e` で進入、
+                    `ambientProductExtension_hsq_of_coordinate` は e 一般で既に OK、
+                    `ambientProductExtension_inl_range = frattini P` も e 非依存)
+              - [x] 新 leaf `HigmanLemmaTwelve/Assembly.lean` (hub 配線済) +
+                    `exists_mixedTermBilinear_ne_zero` (`2e05ad8e5`)
+              - [ ] case dispatch 本体 (Assembly.lean に追記):
+                    exists_mixedFrobeniusWeightEquation_of_xiLenghThree の状態
+                    (factors/c/ePhi/ν primitive/left/right FactorCoordinateData/
+                    ν=λθλ=μφμ) から θL/θR の Frobenius 冪
+                    (exists_frobenius_pow_eq_of_ringAut) で 4 分岐:
+                    (i) θ=φ=1: λ=μ は char2 平方単射、hord は
+                    orderOf_eq_and_coprime_of_pow_eq_orderOf、
+                    mixedTerm_monomial_of_theta_one → isTypeB_of_mixedTerm
+                    (phi:=1, IsTypeBEpsilon は decomposed anisotropy 直接);
+                    (ii) θ=φ≠1: μ=λ は eq_of_pow_eq_pow_orderOf、
+                    mixedTerm_two_monomials_of_theta_eq →
+                    exists_typeB_shear_normalization →
+                    isTypeB_of_squareCoordinate (hq は ambientProductSquare_eq
+                    + shear 結論);
+                    (iii) 片方 =1: 必要なら因子 swap (commutator 反対称 char2)、
+                    noncomm 側 flip で 0<r≤n/2、mixedTerm_monomial_typeC
+                    (2r+1=n が出力) → isTypeCEpsilon_of_decomposed_aniso →
+                    isTypeC_of_mixedTerm (theta_two_sq は Frob^{1+2r}=Frob^n=1);
+                    (iv) 両方 ≠1 かつ θ≠φ: mixedTerm_monomial_typeD
+                    (survivor/mirror は swap) → isTypeDEpsilon_of_decomposed_aniso
+                    → isTypeD_of_mixedTerm (θ^5=1 は 5r≡0, φ=θ² は s≡2r)。
+                    hcentral は commutator_eq_frattini_and_frattini_le_center_
+                    of_xiLengthThree + inl_range。anisotropy 入力は
+                    ambientProductSquare_decomposed_ne_zero (hinv は
+                    involutions_subset_of_nontrivial_invariant 経由)
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から

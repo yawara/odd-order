@@ -12,3 +12,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseSplitBCD
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.MixedTermValue
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly

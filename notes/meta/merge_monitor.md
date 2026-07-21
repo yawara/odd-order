@@ -898,6 +898,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 13:45 (tick #5、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、⭐ census 9→7、push 済**:
+  **a** = FeitSibley Lemma 2(c) 完全証明 (issue 1053 close、FeitSibley sorry 2→1) + **Theorem campaign
+  開始** (新 leaf `FeitSibleyTheorem.lean` 317 行、原文 pp.146-150 の 8 ステップ計画 = issue 1054、
+  merge `92536df4e`)。**b** = Higman Lemma 12 assembly leaf (新 leaf `Assembly.lean` 564 行) +
+  B/C/D/independent 全 case の単項化 lemma 群 (merge `c0b024149`、issue 2048)。**c** =
+  ⭐ **corrected Prop E.4 完全証明 sorry-free** (新 leaf `AppE_PropE4.lean` 374 行、
+  AppE_FurtherResults sorry 2→1、issues 3021/9402) + Cor E.5 WP1 (新 leaf `AppE_CorollaryE5.lean`
+  125 行、issue 3028、merge `cac0ca59d`)。gate = build **4589 jobs green (30s, +4 = 新 leaf 4 本
+  全て実 elaborate 確認)**、AxiomsCheck OK、orphan 0 (873/873)、census **7** (= FurtherResults 1 +
+  FeitSibley 1 + NearFields 1 + Suzuki2Groups 4)、新 axiom なし、逸脱なし。レーン生存 3 点 OK。
 - **2026-07-21 13:15 (tick #4、Fable hub cron `067d5c59`) — ✅ b + c 合流、census 9 不変、push 済**:
   **b** = Higman Lemma 12 B case shear 正規化 + packaged inclusion の actor-eigenvalue 法則
   (CaseSplitBCD +218 行、merge `2840d769e`、issue 2048)。**c** = BG App.E corrected (E.23) β-supply —
