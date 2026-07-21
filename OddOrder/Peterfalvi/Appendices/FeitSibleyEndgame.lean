@@ -167,6 +167,37 @@ theorem endgameZ_conj_mem_of_mem_H [Finite G] {h : G} (hh : h ∈ hyp.H)
     rw [hyeq] at hcm
     exact commutatorElement_eq_one_iff_commute.mpr hcm
 
+/-! ## The two coherent families `𝒳` and `𝒴` (Peterfalvi (4), p. 147) -/
+
+section Coherence
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+/-- **`𝒳 = 𝒮 − 𝒮(Z) = XsetOf ⊥ Z` is coherent** (Peterfalvi (4), reduction (3) at
+the endgame `Z = ⁅Q₁,Q₁⁆ ∩ Z(Q₁)`): the four `Z`-hypotheses of
+`xset_coherent_of_le_center_Q1` are the `endgameZ_*` facts, and the three `Normal`
+instances descend from `Sder`, `Z` and `S` being `H`-invariant. -/
+theorem endgame_Xset_coherent (hd : Odd hyp.d) {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) (hnonab : ⁅hyp.Q1, hyp.Q1⁆ ≠ ⊥) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.XsetOf (⊥ : Subgroup G) hyp.endgameZ) hyp.A) := by
+  haveI : (hyp.Sder.subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.Sder_conj_mem_of_mem_H hh hx
+  haveI : (hyp.endgameZ.subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx
+  haveI : ((hyp.S ⊔ hyp.endgameZ).subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
+      conj_mem_sup (fun y hy => hyp.S_normal_in_H hh hy)
+        (fun y hy => hyp.endgameZ_conj_mem_of_mem_H hh hy) hx
+  exact hyp.xset_coherent_of_le_center_Q1 hd hp hQ1p hyp.endgameZ_le_Q1
+    (hyp.endgameZ_ne_bot hp hQ1p hnonab)
+    (fun z hz y hy => hyp.endgameZ_centralizes hz hy)
+    (fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx)
+
+end Coherence
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
