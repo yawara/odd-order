@@ -480,8 +480,8 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **Lem 1.1** solvable minimal normal subgroup lies in Z(F(G)) and is elementary abe — S01_FrattiniBurnside.lean, sorry-free. Conclusion is full (M ≤ F(G) ∧ M ≤ C_G(F(G)) ∧ elementary abelian = M ≤ Z(F(G))), but hypothesis is [IsSolvable G] where …
-- **Lem 1.9** stabilizer of a normal series of a π-group: A/C_A(G) is a π-group — S01_Solvable.lean, sorry-free. Formalized as the coprime core: a coprime operator group stabilizing a normal chain acts trivially — both the 2-step instance and…
+- **Lem 1.1** solvable minimal normal subgroup lies in Z(F(G)) and is elementary abe — S01_FrattiniBurnside.lean, sorry-free. Conclusion is full (M ≤ F(G) ∧ M ≤ C_G(F(G)) ∧ elementary abelian = M ≤ Z(F(G))), but hypothesis is [IsSolvable G] where … **[2026-07-22 lane c: 特殊化解消 — `[IsSolvable ↥M]` に一般化 (book 強度)、call site 無変更で green、axiom-clean]**
+- **Lem 1.9** stabilizer of a normal series of a π-group: A/C_A(G) is a π-group — S01_Solvable.lean, sorry-free. Formalized as the coprime core: a coprime operator group stabilizing a normal chain acts trivially — both the 2-step instance and… **[2026-07-22 lane c: 逐語 packaging 追加 — `primeFactors_card_quotient_ker_subset_of_stabilizes_chain` (S01_Solvable.lean、A/C_A(K) = A⧸ψ.ker が π-群)、axiom-clean。§1 の特殊化債務は全て解消]**
 - **Prop 1.15** (a) Hall–Higman Lemma 1.2.3: C_G(T) ≤ O_{p',p}(G) for T Sylow-p in O_{ — (b) fully formalized sorry-free at book strength (general G solvable, no O_{p'}=1 hypothesis). (a) is present as the O_{p'}(G)=1 specialization C_G(O_p(G)) ≤ O_… **[2026-07-18: (a) 一般形 CLOSED ⟹ 特殊化債務解消]** `S01_Solvable.centralizer_le_oPiPrimePiCore_of_cover` が O_{p'}(G)=1 仮定を除去した一般形 (π-separable G, 任意の π-層) を axiom-clean で証明。Sylow 仮定は covering 仮定 `O_{π',π}(G) ≤ T ⊔ O_{π'}(G)` に弱められており (book より強い)、book の literal Sylow 形への橋渡しは `sup_oPiCore_compl_eq_oPiPrimePiCore_of_isSylow` (同 file、axiom-clean)。証明は Ḡ=G/O_{π'}(G) へ落として `Isaacs.Ch03.hall_higman_1_2_3` を適用するだけ (Lem 1.14 は不要 — centralizer の push-forward は易方向で足りる)。
 
 ### BG §2 — BG §2 General Results on Representations
