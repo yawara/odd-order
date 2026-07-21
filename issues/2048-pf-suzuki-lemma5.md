@@ -372,8 +372,14 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                   support 抽出 + case 別単項定理 — θ=φ=1: M=c₀αβ / θ=φ≠1:
                   M=c₁αβ^{2^r}+c₂α^{2^r}β / C: 2r+1=n ∧ M=c₀α^{2^{n−1}}β^{2^{r+1}} /
                   D: (s≡2r∧5r≡0∧M=c₀α^{2^{3r}}β^{2^r})∨mirror
-            - [ ] B case の shear 正規化: F×F 座標の (α,β)↦(α+ρβ,β) 変換で c₂ を
-                  消去し qY を再スケール (1+c₁c₂≠0 は無中心外 involution から)
+            - [x] B case の shear 正規化 (`exists_typeB_shear_normalization`,
+                  `65b4efd8f`): (α,β)↦(α+c₂tβ,tβ) で θ(α)β 単項消去、
+                  1+c₁c₂≠0 と生存係数≠0 は anisotropy から、奇数位数 twisted norm
+                  で再スケール、IsTypeBEpsilon まで返す
+            - [x] group-side assembly の hL/hR 供給: packaged inclusion の
+                  actor-eigenvalue 法則 3 定理
+                  (`FactorCoordinateData.toInclusionData_incl_representation` ほか、
+                  `ba9ac88da`)
             - [ ] ε 正規化: c₀ ≠ 0 → ε (anisotropy 条件 IsType*Epsilon と接続)
             - [ ] group-side assembly: 実際の mixed 項
                   (ambientCenterCoordinate ∘ lowerCentralCommutatorBilinear) を
