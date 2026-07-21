@@ -908,7 +908,9 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
   WP3 入力 4 補題 (K₁⊓M_σ=⊥ / K₁ の σ(M)'-性 / O_p(M) Sylow / (E.32) 核 ⟨x⟩=A₀ 同定)
   (AppE_CorollaryE5 +391 行、merge `f6f189208`、issue 3028)。gate = build **4591 jobs green
   (24s, +2 = 新 leaf 2 本実 elaborate 確認)**、AxiomsCheck OK、orphan 0 (875/875)、census 7 不変、
-  新 axiom なし、逸脱なし。レーン生存 3 点 OK。
+  新 axiom なし、逸脱なし。レーン生存 3 点 OK。**2nd pass** = a の live commit を回収:
+  full-𝒮 S07.Hypothesis 完成 (Lemma 1(a) ambient 入力、+205 行 sorry-free、build 4591 jobs green)。
+  **3rd pass** = c の docs-only commit (issue 3028: (E.31) ルート 5 手確定、Lean 非接触 = build 不要)。
 - **2026-07-21 14:15 (tick #6、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、⭐ Higman Lemma 12 完成、census 7 不変、push 済**:
   **b** = ⭐ **Higman Lemma 12 完成** — endpoint `higmanLemmaTwelve` (B/C/D 分類、Assembly +357 行)
   を landing し **AxiomsCheck に登録 (axiom-clean 監査済)** (merge `5d9b680ff`、issue 2048 は
