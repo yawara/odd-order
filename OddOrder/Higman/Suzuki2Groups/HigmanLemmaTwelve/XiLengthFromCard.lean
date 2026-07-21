@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.FreeActionOrbitCount
 import Mathlib.FieldTheory.Finite.GaloisField
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 
 /-!
 # ξ-length from the group order: the counting half
@@ -458,5 +459,261 @@ theorem exists_proper_invariant_subgroup_of_card_sq
   have hle := le_of_adjoin_frobeniusFixed_eq_top (m := 2 * n)
     (by omega) hn _ hfix htop
   omega
+
+/-! ## The bridge: order `q³` gives ξ-length three -/
+
+/-- **Higman / Peterfalvi Appendix III, Theorem (b) for order `q³`**: a
+Suzuki 2-group of order `q³` has ξ-length three for its regular actor.
+The involution subgroup `Ω` and the preimage of a proper nontrivial
+invariant normal subgroup of `P ⧸ Ω` give the three-step chain; the
+four-step chain is excluded by counting. -/
+theorem hasXiLengthThree_of_card_eq_cube
+    (hP : IsSuzuki2Group P)
+    {K : Subgroup (MulAut P)} (hKcyc : IsCyclic ↥K)
+    (hreg : ActsRegularlyOnInvolutions K)
+    {n : ℕ} (hn : n ≠ 0)
+    (hKcard : Nat.card ↥K = 2 ^ n - 1)
+    (hcard : Nat.card P = (2 ^ n) ^ 3) :
+    HasXiLengthThree K.subtype := by
+  classical
+  obtain ⟨hP2, -, hmulti, -, -, -⟩ := id hP
+  obtain ⟨u₀, v₀, hu₀, hv₀, huv₀⟩ := hmulti
+  letI : Nontrivial P := ⟨⟨u₀, v₀, huv₀⟩⟩
+  have hfree := fixedPointFree_of_actsRegularlyOnInvolutions hP2 hreg
+  -- `#involutions = |K|` via the regular bijection
+  have hmemK : ∀ k : ↥K, (k : MulAut P) u₀ ∈ involutions P := by
+    intro k
+    constructor
+    · rw [← map_pow, hu₀.1, map_one]
+    · intro h
+      apply hu₀.2
+      apply (k : MulAut P).injective
+      rw [h, map_one]
+  have hbij : Function.Bijective (fun k : ↥K =>
+      (⟨(k : MulAut P) u₀, hmemK k⟩ : ↥(involutions P))) := by
+    constructor
+    · intro k l hkl
+      have hval : (k : MulAut P) u₀ = (l : MulAut P) u₀ :=
+        congrArg Subtype.val hkl
+      obtain ⟨a, -, huniq⟩ := hreg u₀ hu₀ ((k : MulAut P) u₀) (hmemK k)
+      rw [huniq k rfl, huniq l hval.symm]
+    · rintro ⟨y, hy⟩
+      obtain ⟨a, ha, -⟩ := hreg u₀ hu₀ y hy
+      exact ⟨a, Subtype.ext ha⟩
+  have hinvcard : (involutions P).ncard = 2 ^ n - 1 := by
+    rw [← hKcard, Nat.card_eq_of_bijective _ hbij, Nat.card_coe_set_eq]
+  -- the involution subgroup and its order `q`
+  have hΩmem : ∀ x : P, x ∈ involutionSubgroup P ↔ x ^ 2 = 1 := fun x =>
+    mem_involutionSubgroup_iff_sq_eq_one hP
+  have hΩcard : Nat.card ↥(involutionSubgroup P) = 2 ^ n := by
+    have h1 : (1 : P) ∈ (involutionSubgroup P : Set P) :=
+      (involutionSubgroup P).one_mem
+    have hstep : (((involutionSubgroup P : Set P)) \ {1}).ncard + 1 =
+        (involutionSubgroup P : Set P).ncard :=
+      Set.ncard_diff_singleton_add_one h1 (Set.toFinite _)
+    rw [← involutions_eq_involutionSubgroup_diff_identity hP, hinvcard] at hstep
+    have h2 : (involutionSubgroup P : Set P).ncard =
+        Nat.card ↥(involutionSubgroup P) :=
+      (Nat.card_coe_set_eq _).symm
+    rw [h2] at hstep
+    have hge := Nat.one_le_two_pow (n := n)
+    omega
+  -- `Ω` is central, normal, invariant
+  have hΩle_center : involutionSubgroup P ≤ Subgroup.center P := by
+    intro x hx
+    by_cases hx1 : x = 1
+    · rw [hx1]
+      exact Subgroup.one_mem _
+    · exact involutions_subset_center_of_transitive hP2 K hreg.transitive
+        ⟨(hΩmem x).mp hx, hx1⟩
+  haveI hΩnormal : (involutionSubgroup P).Normal := by
+    constructor
+    intro x hx g
+    have hxc := Subgroup.mem_center_iff.mp (hΩle_center hx) g
+    have heq : g * x * g⁻¹ = x := by
+      rw [hxc]
+      group
+    rw [heq]
+    exact hx
+  have hΩinv : IsAInvariant K.subtype (involutionSubgroup P) := by
+    intro a
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    change (K.subtype a)⁻¹ x ∈ involutionSubgroup P ↔
+      x ∈ involutionSubgroup P
+    rw [hΩmem, hΩmem]
+    constructor
+    · intro h
+      have hx : (K.subtype a) ((K.subtype a)⁻¹ x) = x := by
+        simp
+      rw [← hx, ← map_pow, h, map_one]
+    · intro h
+      rw [← map_pow, h, map_one]
+  have hΩbot : involutionSubgroup P ≠ ⊥ := by
+    intro h
+    have hu : u₀ ∈ involutionSubgroup P := (hΩmem u₀).mpr hu₀.1
+    rw [h] at hu
+    exact hu₀.2 (Subgroup.mem_bot.mp hu)
+  -- the quotient has order `q²`
+  have hq1 : 1 < 2 ^ n := Nat.one_lt_two_pow_iff.mpr hn
+  have hQcard : Nat.card (P ⧸ involutionSubgroup P) = 2 ^ (2 * n) := by
+    have hsplit : Nat.card P =
+        Nat.card (P ⧸ involutionSubgroup P) *
+          Nat.card ↥(involutionSubgroup P) :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup _
+    rw [hcard, hΩcard] at hsplit
+    have hq0 : 0 < 2 ^ n := by positivity
+    have : (2 ^ n) ^ 3 = ((2 : ℕ) ^ (2 * n)) * 2 ^ n := by
+      rw [← pow_add, ← pow_mul]
+      ring_nf
+    rw [this] at hsplit
+    exact Nat.eq_of_mul_eq_mul_right hq0 hsplit.symm
+  haveI hQP2 : IsPGroup 2 (P ⧸ involutionSubgroup P) := hP2.to_quotient _
+  haveI hQnontriv : Nontrivial (P ⧸ involutionSubgroup P) := by
+    apply Finite.one_lt_card_iff_nontrivial.mp
+    rw [hQcard]
+    exact Nat.one_lt_two_pow_iff.mpr (by omega)
+  -- a proper nontrivial invariant normal subgroup of the quotient
+  have hVexists : ∃ V : Subgroup (P ⧸ involutionSubgroup P), V ≠ ⊥ ∧
+      V ≠ ⊤ ∧ V.Normal ∧
+      IsAInvariant (IsAInvariant.quotientMulAutHom hΩinv) V := by
+    by_cases hZ : Subgroup.center (P ⧸ involutionSubgroup P) = ⊤
+    · -- abelian quotient
+      have hcommQ : ∀ a b : P ⧸ involutionSubgroup P, a * b = b * a := by
+        intro a b
+        have hb : b ∈ Subgroup.center (P ⧸ involutionSubgroup P) := by
+          rw [hZ]
+          exact Subgroup.mem_top b
+        exact Subgroup.mem_center_iff.mp hb a
+      by_cases hA : Agemo (P ⧸ involutionSubgroup P) 2 1 = ⊥
+      · -- elementary abelian quotient: the module exclusion produces `V`
+        have hsqQ : ∀ x : P ⧸ involutionSubgroup P, x ^ 2 = 1 := by
+          intro x
+          have hx : x ^ 2 ^ 1 ∈ Agemo (P ⧸ involutionSubgroup P) 2 1 :=
+            Agemo.mem_of_eq_pow x
+          rw [hA] at hx
+          simpa using Subgroup.mem_bot.mp hx
+        haveI := hKcyc
+        have hfree' : ∀ k : ↥K, k ≠ 1 →
+            ∀ x : P ⧸ involutionSubgroup P,
+              IsAInvariant.quotientMulAutHom hΩinv k x = x → x = 1 := by
+          apply OddOrder.Peterfalvi.Appendices.Suzuki2Groups.quotient_fixedPointFree_of_fixedPoints_le
+            K.subtype (involutionSubgroup P) hΩinv
+          · exact OddOrder.Peterfalvi.Appendices.Suzuki2Groups.card_coprime_of_card_eq_sub_one
+              (involutionSubgroup P) (by rw [hKcard, hΩcard])
+          · intro k hk x hx
+            rw [hfree k hk x hx]
+            exact Subgroup.one_mem _
+        obtain ⟨V, hVb, hVt, hVi⟩ :=
+          exists_proper_invariant_subgroup_of_card_sq hcommQ hsqQ
+            (IsAInvariant.quotientMulAutHom hΩinv) hfree' hn hKcard hQcard
+        refine ⟨V, hVb, hVt, ?_, hVi⟩
+        constructor
+        intro x hx g
+        have heq : g * x * g⁻¹ = x := by
+          rw [hcommQ g x]
+          group
+        rw [heq]
+        exact hx
+      · -- `℧₁` is a proper nontrivial characteristic subgroup
+        refine ⟨Agemo (P ⧸ involutionSubgroup P) 2 1, hA, ?_, ?_,
+          IsAInvariant.of_characteristic _⟩
+        · -- not the whole group: squaring would be a bijective endomorphism
+          intro htop
+          letI : CommGroup (P ⧸ involutionSubgroup P) :=
+            { (inferInstance : Group _) with mul_comm := hcommQ }
+          have hrange : (powMonoidHom 2 :
+              P ⧸ involutionSubgroup P →* P ⧸ involutionSubgroup P).range =
+              ⊤ := by
+            rw [eq_top_iff, ← htop, Agemo]
+            apply (Subgroup.closure_le _).mpr
+            rintro g ⟨x, rfl⟩
+            exact ⟨x, by simp [powMonoidHom]⟩
+          have hinj : Function.Injective (powMonoidHom 2 :
+              P ⧸ involutionSubgroup P →* P ⧸ involutionSubgroup P) :=
+            Finite.injective_iff_surjective.mpr
+              (MonoidHom.range_eq_top.mp hrange)
+          -- an element of order two
+          obtain ⟨m, hm⟩ := hQP2.exists_card_eq
+          have hm0 : m ≠ 0 := by
+            intro h0
+            rw [h0, pow_zero] at hm
+            exact (Finite.one_lt_card_iff_nontrivial.mpr inferInstance).ne' hm
+          letI : Fintype (P ⧸ involutionSubgroup P) := Fintype.ofFinite _
+          obtain ⟨t, ht⟩ := exists_prime_orderOf_dvd_card
+            (G := P ⧸ involutionSubgroup P) 2 (by
+              rw [← Nat.card_eq_fintype_card, hm]
+              exact dvd_pow_self 2 hm0)
+          have ht1 : t = 1 := by
+            apply hinj
+            show t ^ 2 = (1 : P ⧸ involutionSubgroup P) ^ 2
+            rw [one_pow, ← ht]
+            exact pow_orderOf_eq_one t
+          rw [ht1, orderOf_one] at ht
+          norm_num at ht
+        · exact Subgroup.normal_of_characteristic _
+    · -- the center of the quotient is proper and nontrivial
+      refine ⟨Subgroup.center (P ⧸ involutionSubgroup P), ?_, hZ,
+        inferInstance, IsAInvariant.of_characteristic _⟩
+      have := hQP2.center_nontrivial
+      intro h
+      rw [h] at this
+      exact (Subgroup.nontrivial_iff_ne_bot _).mp this rfl
+  obtain ⟨V, hVbot, hVtop, hVnormal, hVinv⟩ := hVexists
+  -- the preimage gives the middle chain member
+  haveI hBnormal : (V.comap
+      (QuotientGroup.mk' (involutionSubgroup P))).Normal :=
+    Subgroup.Normal.comap hVnormal _
+  have hBinv : IsAInvariant K.subtype
+      (V.comap (QuotientGroup.mk' (involutionSubgroup P))) :=
+    hΩinv.comap_quotient hVinv
+  have hΩB : involutionSubgroup P ≤
+      V.comap (QuotientGroup.mk' (involutionSubgroup P)) := by
+    intro x hx
+    rw [Subgroup.mem_comap]
+    have h1 : QuotientGroup.mk' (involutionSubgroup P) x = 1 :=
+      (QuotientGroup.eq_one_iff x).mpr hx
+    rw [h1]
+    exact V.one_mem
+  have hΩB_ne : involutionSubgroup P ≠
+      V.comap (QuotientGroup.mk' (involutionSubgroup P)) := by
+    intro heq
+    apply hVbot
+    rw [eq_bot_iff]
+    intro v hv
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (involutionSubgroup P) v
+    have hgB : g ∈ V.comap (QuotientGroup.mk' (involutionSubgroup P)) := by
+      rw [Subgroup.mem_comap]
+      exact hv
+    rw [← heq] at hgB
+    exact Subgroup.mem_bot.mpr ((QuotientGroup.eq_one_iff g).mpr hgB)
+  have hBtop : V.comap (QuotientGroup.mk' (involutionSubgroup P)) ≠ ⊤ := by
+    intro h
+    apply hVtop
+    rw [eq_top_iff]
+    intro v _
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (involutionSubgroup P) v
+    have hg : g ∈ V.comap (QuotientGroup.mk' (involutionSubgroup P)) := by
+      rw [h]
+      exact Subgroup.mem_top g
+    rw [Subgroup.mem_comap] at hg
+    exact hg
+  -- assemble
+  refine ⟨⟨involutionSubgroup P, hΩnormal, hΩinv⟩,
+    ⟨V.comap (QuotientGroup.mk' (involutionSubgroup P)), hBnormal, hBinv⟩,
+    ?_, ?_, ?_,
+    fun A B C D E hAB hBC hCD hDE =>
+      no_four_chain_of_card_eq_cube hP2 hn hfree hKcard hcard
+        A B C D E hAB hBC hCD hDE⟩
+  · rw [← Subtype.coe_lt_coe]
+    show (⊥ : Subgroup P) < involutionSubgroup P
+    exact bot_lt_iff_ne_bot.mpr hΩbot
+  · rw [← Subtype.coe_lt_coe]
+    show involutionSubgroup P <
+      V.comap (QuotientGroup.mk' (involutionSubgroup P))
+    exact lt_of_le_of_ne hΩB hΩB_ne
+  · rw [← Subtype.coe_lt_coe]
+    show V.comap (QuotientGroup.mk' (involutionSubgroup P)) < ⊤
+    exact lt_top_iff_ne_top.mpr hBtop
 
 end OddOrder.Higman.Suzuki2Groups
