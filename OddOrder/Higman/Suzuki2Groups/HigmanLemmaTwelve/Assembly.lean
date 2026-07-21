@@ -102,6 +102,54 @@ theorem exists_mixedTermBilinear_ne_zero
   exact hne ((LinearEquiv.map_eq_zero_iff
     (ambientCenterCoordinate hEA hK1amb htermamb ePhi)).mp hzero)
 
+/-! ## Symmetry of the mixed term -/
+
+/-- The commutator pairing is symmetric in characteristic two: it is
+alternating, and `-1 = 1` on the `ZMod 2`-module target. -/
+theorem lowerCentralCommutatorBilinear_comm
+    (H : Type uP) [Group H]
+    (x y : Additive (lowerCentralLayer H 0)) :
+    lowerCentralCommutatorBilinear H y x =
+      lowerCentralCommutatorBilinear H x y := by
+  have hself := lowerCentralCommutatorBilinear_self H (x + y)
+  rw [map_add] at hself
+  simp only [LinearMap.add_apply, map_add,
+    lowerCentralCommutatorBilinear_self, zero_add, add_zero] at hself
+  have h2 : lowerCentralCommutatorBilinear H x y +
+      lowerCentralCommutatorBilinear H x y = 0 := by
+    have h := two_smul (ZMod 2) (lowerCentralCommutatorBilinear H x y)
+    rw [show (2 : ZMod 2) = 0 by decide, zero_smul] at h
+    exact h.symm
+  exact add_right_cancel (hself.trans h2.symm)
+
+/-- Swapping the two factors transposes the mixed term. -/
+theorem mixedTermBilinear_swap
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (α β : GaloisField 2 n) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    mixedTermBilinear right left β α = mixedTermBilinear left right α β := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  rw [mixedTermBilinear_apply, mixedTermBilinear_apply]
+  exact congrArg _
+    (lowerCentralCommutatorBilinear_comm P (left.incl α) (right.incl β))
+
 /-! ## Case `θ = φ = 1` (Higman p. 90) -/
 
 /-- **Higman p. 90, case `θ = φ = 1`: `G ≅ B(n, 1, ε)`.**  Both factors are
