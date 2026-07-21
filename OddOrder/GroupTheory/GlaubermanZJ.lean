@@ -196,5 +196,40 @@ theorem commutator_le_zCenter_and_centralizer_of_normalClosure_eq
   rw [← hBcl] at h3
   exact commutator_eq_bot_iff_le_centralizer.mp (le_bot_iff.mp h3)
 
+/-! ### Thm 2.10 step (b): `W` を正規化する最大の正規部分群 `L` -/
+
+/-- **Gorenstein Thm 2.10 の `L`**: `W` を正規化する正規部分群全体の join.
+join も `W` を正規化し (normalizer は部分群)、正規で、この性質を持つ正規部分群の
+最大元になる. -/
+def sSupNormalNormalizing (W : Subgroup G) : Subgroup G :=
+  sSup {N : Subgroup G | N.Normal ∧ N ≤ normalizer (W : Set G)}
+
+theorem sSupNormalNormalizing_le_normalizer (W : Subgroup G) :
+    sSupNormalNormalizing W ≤ normalizer (W : Set G) :=
+  sSup_le fun _ hN => hN.2
+
+theorem le_sSupNormalNormalizing {W N : Subgroup G} (hN : N.Normal)
+    (h : N ≤ normalizer (W : Set G)) : N ≤ sSupNormalNormalizing W :=
+  le_sSup ⟨hN, h⟩
+
+/-- `L = sSupNormalNormalizing W` は正規 (各生成部分群の conj-不変性から、
+`comap (conj g)` への `sSup_le` で帰納なしに閉じる). -/
+theorem sSupNormalNormalizing_normal (W : Subgroup G) :
+    (sSupNormalNormalizing W).Normal := by
+  constructor
+  intro n hn g
+  have key : sSupNormalNormalizing W
+      ≤ (sSupNormalNormalizing W).comap (MulAut.conj g).toMonoidHom := by
+    refine sSup_le fun N hN => ?_
+    intro m hm
+    rw [mem_comap]
+    have hmem : (MulAut.conj g).toMonoidHom m ∈ N := by
+      simpa [MulAut.conj_apply] using hN.1.conj_mem m hm g
+    exact le_sSup hN hmem
+  have h1 := key hn
+  rw [mem_comap] at h1
+  simpa [MulAut.conj_apply] using h1
+
 end Subgroup
+
 
