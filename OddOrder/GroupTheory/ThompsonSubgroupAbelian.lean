@@ -821,6 +821,119 @@ theorem thompsonJAbelian_map_of_injective {N : Type*} [Group N]
     rw [← Subgroup.map_le_iff_le_comap]
     exact le_thompsonJAbelian_of_mem_maxAbelianIn (key_map A hA)
 
+/-! #### `Disjoint P f.ker` 版の転送 (商準同型向け)
+
+商準同型 `φ : G → G/K` は単射でないが, `P ⊓ K = ⊥` (典型: `P` が `p`-群で
+`K = O_{p'}(G)`) なら `φ` は `P` 上単射に振る舞い, `A(·)` / `J_a` の転送が
+単射版と同様に成立する. Thm 2.11 一般形 (`G/O_{p'}` への簡約) で使用. -/
+
+/-- `Disjoint P f.ker` なら `f` は `P` 上単射. -/
+theorem eq_of_map_eq_of_disjoint_ker {N : Type*} [Group N] {f : G →* N}
+    {P : Subgroup G} (hker : Disjoint P f.ker) {x y : G}
+    (hx : x ∈ P) (hy : y ∈ P) (hxy : f x = f y) : x = y := by
+  have hmem : x * y⁻¹ ∈ P ⊓ f.ker :=
+    ⟨P.mul_mem hx (P.inv_mem hy),
+     f.mem_ker.mpr (by rw [map_mul, map_inv, hxy, mul_inv_cancel])⟩
+  rw [disjoint_iff.mp hker, mem_bot] at hmem
+  exact mul_inv_eq_one.mp hmem
+
+/-- `B ≤ P`, `Disjoint P f.ker` なら `|B.map f| = |B|`. -/
+theorem card_map_of_le_of_disjoint_ker {N : Type*} [Group N] {f : G →* N}
+    {P B : Subgroup G} (hker : Disjoint P f.ker) (hBP : B ≤ P) :
+    Nat.card (B.map f) = Nat.card B := by
+  refine (Nat.card_congr (Equiv.ofBijective
+    (fun b : ↥B => (⟨f b, mem_map_of_mem f b.2⟩ : ↥(B.map f))) ⟨?_, ?_⟩)).symm
+  · intro b₁ b₂ h
+    exact Subtype.ext (eq_of_map_eq_of_disjoint_ker hker (hBP b₁.2) (hBP b₂.2)
+      (congrArg Subtype.val h))
+  · rintro ⟨-, b, hb, rfl⟩
+    exact ⟨⟨b, hb⟩, rfl⟩
+
+/-- `E ≤ P.map f` の引き戻し復元: `(E.comap f ⊓ P).map f = E`
+(`f.ker` の disjointness すら不要な純粋な像の等式). -/
+theorem map_comap_inf_eq_of_le_map {N : Type*} [Group N] {f : G →* N}
+    {P : Subgroup G} {E : Subgroup N} (hE : E ≤ P.map f) :
+    (E.comap f ⊓ P).map f = E := by
+  refine le_antisymm ?_ ?_
+  · rintro - ⟨x, hx, rfl⟩
+    exact mem_comap.mp hx.1
+  · intro y hy
+    obtain ⟨x, hxP, rfl⟩ := hE hy
+    exact ⟨x, ⟨mem_comap.mpr hy, hxP⟩, rfl⟩
+
+/-- `E` abelian の引き戻し `E.comap f ⊓ P` は `Disjoint P f.ker` のもとで abelian
+(交換子が `P ⊓ ker` に落ちる). -/
+theorem isMulCommutative_comap_inf_of_disjoint_ker {N : Type*} [Group N]
+    {f : G →* N} {P : Subgroup G} (hker : Disjoint P f.ker) {E : Subgroup N}
+    (hE : IsMulCommutative E) :
+    IsMulCommutative ((E.comap f ⊓ P : Subgroup G)) := by
+  constructor
+  constructor
+  intro a b
+  ext
+  refine eq_of_map_eq_of_disjoint_ker hker
+    (P.mul_mem a.2.2 b.2.2) (P.mul_mem b.2.2 a.2.2) ?_
+  have hcomm := hE.is_comm.comm (⟨f a, mem_comap.mp a.2.1⟩ : ↥E)
+    ⟨f b, mem_comap.mp b.2.1⟩
+  simp only [Subgroup.coe_mul, map_mul]
+  exact congrArg Subtype.val hcomm
+
+/-- **`A(·)` の comap 転送 (`Disjoint P f.ker` 版)**: `E ∈ A(P.map f)` なら
+`E.comap f ⊓ P ∈ A(P)` かつ `(E.comap f ⊓ P).map f = E`. -/
+theorem comap_inf_mem_maxAbelianIn_of_disjoint_ker {N : Type*} [Group N]
+    {f : G →* N} {P : Subgroup G} (hker : Disjoint P f.ker) {E : Subgroup N}
+    (hE : E ∈ maxAbelianIn (P.map f)) :
+    E.comap f ⊓ P ∈ maxAbelianIn P ∧ (E.comap f ⊓ P).map f = E := by
+  obtain ⟨hE_le, hE_comm, hE_max⟩ := hE
+  have hmapcomap := map_comap_inf_eq_of_le_map hE_le
+  refine ⟨⟨inf_le_right,
+    isMulCommutative_comap_inf_of_disjoint_ker hker hE_comm, ?_⟩, hmapcomap⟩
+  intro B hBP hBcomm
+  haveI := hBcomm
+  have hcard_E : Nat.card E = Nat.card (E.comap f ⊓ P : Subgroup G) := by
+    conv_lhs => rw [← hmapcomap]
+    exact card_map_of_le_of_disjoint_ker hker inf_le_right
+  calc Nat.card B = Nat.card (B.map f) :=
+        (card_map_of_le_of_disjoint_ker hker hBP).symm
+    _ ≤ Nat.card E := hE_max (B.map f) (Subgroup.map_mono hBP)
+        (map_isMulCommutative B f)
+    _ = Nat.card (E.comap f ⊓ P : Subgroup G) := hcard_E
+
+/-- **`A(·)` の map 転送 (`Disjoint P f.ker` 版)**: `A ∈ A(P)` なら
+`A.map f ∈ A(P.map f)`. -/
+theorem map_mem_maxAbelianIn_of_disjoint_ker {N : Type*} [Group N]
+    {f : G →* N} {P A : Subgroup G} (hker : Disjoint P f.ker)
+    (hA : A ∈ maxAbelianIn P) :
+    A.map f ∈ maxAbelianIn (P.map f) := by
+  obtain ⟨hA_le, hA_comm, hA_max⟩ := hA
+  haveI := hA_comm
+  refine ⟨Subgroup.map_mono hA_le, map_isMulCommutative A f, ?_⟩
+  intro B hB_le hB_comm
+  have hmapcomap := map_comap_inf_eq_of_le_map hB_le
+  have hcard_B : Nat.card B = Nat.card (B.comap f ⊓ P : Subgroup G) := by
+    conv_lhs => rw [← hmapcomap]
+    exact card_map_of_le_of_disjoint_ker hker inf_le_right
+  calc Nat.card B = Nat.card (B.comap f ⊓ P : Subgroup G) := hcard_B
+    _ ≤ Nat.card A := hA_max _ inf_le_right
+        (isMulCommutative_comap_inf_of_disjoint_ker hker hB_comm)
+    _ = Nat.card (A.map f) := (card_map_of_le_of_disjoint_ker hker hA_le).symm
+
+/-- **`J_a` の商転送 (`Disjoint P f.ker` 版)**: `P ⊓ f.ker = ⊥` なら
+`J_a(f(P)) = f(J_a(P))` (Gorenstein Lemma 2.2(c) の商準同型形). -/
+theorem thompsonJAbelian_map_of_disjoint_ker {N : Type*} [Group N] {f : G →* N}
+    {P : Subgroup G} (hker : Disjoint P f.ker) :
+    thompsonJAbelian (P.map f) = (thompsonJAbelian P).map f := by
+  apply le_antisymm
+  · refine iSup_le fun E => iSup_le fun hE => ?_
+    obtain ⟨hmem, hmapcomap⟩ := comap_inf_mem_maxAbelianIn_of_disjoint_ker hker hE
+    rw [← hmapcomap]
+    exact Subgroup.map_mono (le_thompsonJAbelian_of_mem_maxAbelianIn hmem)
+  · rw [Subgroup.map_le_iff_le_comap]
+    refine iSup_le fun A => iSup_le fun hA => ?_
+    rw [← Subgroup.map_le_iff_le_comap]
+    exact le_thompsonJAbelian_of_mem_maxAbelianIn
+      (map_mem_maxAbelianIn_of_disjoint_ker hker hA)
+
 /-- **Gorenstein Lemma 2.2(c)** (正規化元による共役不変): `g ∈ N(P)` なら
 `g · J_a(P) · g⁻¹ = J_a(P)`. -/
 theorem thompsonJAbelian_map_conj_eq_of_mem_normalizer {P : Subgroup G}
