@@ -75,6 +75,54 @@ def conjQByW : ↥hyp.W →* MulAut ↥hyp.Q where
 @[simp] lemma conjQByW_apply_val (v : ↥hyp.W) (x : ↥hyp.Q) :
     ((hyp.conjQByW v x : ↥hyp.Q) : G) = (v : G) * (x : G) * (v : G)⁻¹ := rfl
 
+/-- Every element of `W` fixes the center of `Q` pointwise once the center
+is identified with `Q₀`. -/
+theorem conjQByW_fixes_center
+    (hZQ0 : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (v : ↥hyp.W) :
+    ∀ z ∈ Subgroup.center hyp.Q, hyp.conjQByW v z = z := by
+  intro z hz
+  have hzQ0 : (z : G) ∈ hyp.Q0 := by
+    rw [hZQ0] at hz
+    exact hz
+  have hcomm : (v : G) * (z : G) = (z : G) * (v : G) := by
+    have hmem := hyp.Q0_le_centralizer_zpowers_of_mem_W v.2 hzQ0
+    rw [Subgroup.mem_centralizer_iff] at hmem
+    exact hmem (v : G) (Subgroup.mem_zpowers _)
+  apply Subtype.ext
+  rw [hyp.conjQByW_apply_val]
+  calc (v : G) * (z : G) * (v : G)⁻¹ = (z : G) * (v : G) * (v : G)⁻¹ := by
+        rw [hcomm]
+    _ = (z : G) := by group
+
+/-- Every element of `W` commutes with the actual `K`-actor on `Q`:
+`W = C_V(K)` centralizes `K` elementwise in `G`. -/
+theorem conjQByW_commute_actualKActor (v : ↥hyp.W)
+    (k : ↥hyp.actualKActor) :
+    Commute (hyp.actualKActor.subtype k) (hyp.conjQByW v) := by
+  obtain ⟨k', hk'⟩ := k.2
+  have hcommG : (k' : G) * (v : G) = (v : G) * (k' : G) := by
+    have hwC : (v : G) ∈ Subgroup.centralizer (hyp.K : Set G) := by
+      rw [hyp.coe_K]
+      exact v.2.2
+    rw [Subgroup.mem_centralizer_iff] at hwC
+    exact hwC (k' : G) k'.2
+  have hgoal : hyp.conjQByK k' * hyp.conjQByW v =
+      hyp.conjQByW v * hyp.conjQByK k' := by
+    ext x
+    rw [MulAut.mul_apply, MulAut.mul_apply, hyp.conjQByK_apply_val,
+      hyp.conjQByW_apply_val, hyp.conjQByW_apply_val,
+      hyp.conjQByK_apply_val]
+    calc (k' : G) * ((v : G) * (x : G) * (v : G)⁻¹) * (k' : G)⁻¹
+        = ((k' : G) * v) * (x : G) * ((k' : G) * v)⁻¹ := by group
+      _ = ((v : G) * k') * (x : G) * ((v : G) * k')⁻¹ := by rw [hcommG]
+      _ = (v : G) * ((k' : G) * (x : G) * (k' : G)⁻¹) * (v : G)⁻¹ := by
+          group
+  change (k : MulAut ↥hyp.Q) * hyp.conjQByW v =
+    hyp.conjQByW v * (k : MulAut ↥hyp.Q)
+  rw [← hk']
+  exact hgoal
+
 /-! ## The conjugation automorphism attached to `1 ≠ w ∈ W` -/
 
 /-- The facts about `ω = conjQByW w` needed by the moved-summand engine:
@@ -128,41 +176,11 @@ theorem conjQByW_omega_facts
     have h3 : Nat.card ↥hyp.W ∣ Nat.card ↥hyp.D :=
       Subgroup.card_dvd_of_le (hyp.W_le_V.trans hyp.V_le_D)
     exact hyp.D_odd.of_dvd_nat ((h1.trans h2).trans h3)
-  have hωZ : ∀ z ∈ Subgroup.center hyp.Q, ω z = z := by
-    intro z hz
-    have hzQ0 : (z : G) ∈ hyp.Q0 := by
-      rw [hZQ0] at hz
-      exact hz
-    have hcomm : w * (z : G) = (z : G) * w := by
-      have hmem := hyp.Q0_le_centralizer_zpowers_of_mem_W hw hzQ0
-      rw [Subgroup.mem_centralizer_iff] at hmem
-      exact hmem w (Subgroup.mem_zpowers w)
-    apply Subtype.ext
-    rw [hωdef, hyp.conjQByW_apply_val]
-    calc w * (z : G) * w⁻¹ = (z : G) * w * w⁻¹ := by rw [hcomm]
-      _ = (z : G) := by group
+  have hωZ : ∀ z ∈ Subgroup.center hyp.Q, ω z = z :=
+    hyp.conjQByW_fixes_center hZQ0 ⟨w, hw⟩
   have hωcomm : ∀ k : ↥hyp.actualKActor,
-      Commute (hyp.actualKActor.subtype k) ω := by
-    intro k
-    obtain ⟨k', hk'⟩ := k.2
-    have hcommG : (k' : G) * w = w * (k' : G) := by
-      have hwC : w ∈ Subgroup.centralizer (hyp.K : Set G) := by
-        rw [hyp.coe_K]
-        exact hw.2
-      rw [Subgroup.mem_centralizer_iff] at hwC
-      exact hwC (k' : G) k'.2
-    have hgoal : hyp.conjQByK k' * ω = ω * hyp.conjQByK k' := by
-      ext x
-      rw [MulAut.mul_apply, MulAut.mul_apply, hyp.conjQByK_apply_val, hωdef,
-        hyp.conjQByW_apply_val, hyp.conjQByW_apply_val,
-        hyp.conjQByK_apply_val]
-      calc (k' : G) * (w * (x : G) * w⁻¹) * (k' : G)⁻¹
-          = ((k' : G) * w) * (x : G) * ((k' : G) * w)⁻¹ := by group
-        _ = (w * (k' : G)) * (x : G) * (w * (k' : G))⁻¹ := by rw [hcommG]
-        _ = w * ((k' : G) * (x : G) * (k' : G)⁻¹) * w⁻¹ := by group
-    change (k : MulAut ↥hyp.Q) * ω = ω * (k : MulAut ↥hyp.Q)
-    rw [← hk']
-    exact hgoal
+      Commute (hyp.actualKActor.subtype k) ω := fun k =>
+    hyp.conjQByW_commute_actualKActor ⟨w, hw⟩ k
   have hωfix : ∀ i : ℕ, ω ^ i ≠ 1 → ∀ x : ↥hyp.Q, (ω ^ i) x = x →
       x ∈ Subgroup.center hyp.Q := by
     intro i hi x hx
