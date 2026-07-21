@@ -67,3 +67,9 @@ instantiate して **printed E.4 の statement そのものの否定**を証明�
 **公式・導出スクリプトの永続正本 = `notes/bg/appE_e4_tier2_group_law.md`**
 (scratchpad は揮発性のため移設済)。WP5 の headline は別 leaf
 `AppE_FiliformRefutation.lean` に置く (AppE_FurtherResults の重 import を隔離)。
+
+## ✅ CLOSED 2026-07-21
+
+WP1-5 全消化 (commits ddab0d742 / f672afae4 / bd564448f / 845325f8f)。
+headline `printed_propE4_false` green + axiom-clean + AxiomsCheck 登録済。
+後続 = issue 9402 (corrected E.4 = hdc 追加版の証明、別トラック)。
