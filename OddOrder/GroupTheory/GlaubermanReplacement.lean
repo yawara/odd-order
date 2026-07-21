@@ -287,4 +287,219 @@ theorem commutator_commutator_eq_of_normal {B : Subgroup G} [B.Normal]
         rw [h2, mul_one]
     _ = ⁅⁅u⁻¹, ⁅x, v⁆⁆, x⁆ := by group
 
+/-- `⁅⊥, H⁆ = ⊥`. -/
+theorem commutator_bot_left_eq (H : Subgroup G) :
+    (⁅(⊥ : Subgroup G), H⁆ : Subgroup G) = ⊥ := by
+  refine le_bot_iff.mp ?_
+  rw [commutator_le]
+  intro g hg b _
+  rw [Subgroup.mem_bot.mp hg]
+  simp
+
+/-- 生成元が pairwise 可換なら closure は abelian. -/
+theorem isMulCommutative_closure_of_forall_commute {S : Set G}
+    (h : ∀ a ∈ S, ∀ b ∈ S, Commute a b) : IsMulCommutative (closure S) := by
+  rw [← le_centralizer_iff_isMulCommutative]
+  have h1 : ∀ g ∈ S, closure S ≤ centralizer ({g} : Set G) := by
+    intro g hg
+    refine (closure_le _).mpr ?_
+    intro a ha
+    rw [SetLike.mem_coe, mem_centralizer_iff]
+    intro w hw
+    rw [Set.mem_singleton_iff.mp hw]
+    exact ((h a ha g hg).symm.eq)
+  refine (closure_le _).mpr ?_
+  intro g hg
+  rw [SetLike.mem_coe, mem_centralizer_iff]
+  intro m hm
+  have h2 : m ∈ centralizer ({g} : Set G) := h1 g hg hm
+  exact (mem_centralizer_iff.mp h2 g (Set.mem_singleton g)).symm
+
+/-- **G Lem 2.5(ii) の半分** (element 形): `⁅k,α⁆` が `k` と可換なら
+`⁅k⁻¹, α⁆ = ⁅k, α⁆⁻¹`. -/
+theorem commutatorElement_inv_left_eq {k α : G} (h : Commute ⁅k, α⁆ k) :
+    ⁅k⁻¹, α⁆ = ⁅k, α⁆⁻¹ := by
+  have h1 : ⁅k⁻¹, α⁆ = k⁻¹ * ⁅k, α⁆⁻¹ * k := by group
+  rw [h1, mul_assoc, show ⁅k, α⁆⁻¹ * k = k * ⁅k, α⁆⁻¹ from (h.inv_left.eq)]
+  group
+
+/-- `⁅e,α⁆` が `α` と可換なら `⁅α⁻¹, e⁆ = ⁅e, α⁆` (Gorenstein (2.15) の exact 半分). -/
+theorem commutatorElement_inv_swap_eq {e α : G} (hcomm : Commute ⁅e, α⁆ α) :
+    ⁅α⁻¹, e⁆ = ⁅e, α⁆ := by
+  have h1 : ⁅α⁻¹, e⁆ = α⁻¹ * ⁅e, α⁆ * α := by group
+  rw [h1, mul_assoc, show ⁅e, α⁆ * α = α * ⁅e, α⁆ from hcomm.eq]
+  group
+
+/-- **Case 2 の核心** (Gorenstein (2.11)-(2.19)): `B ⊴ G`, `B' ≤ Z(G)`, `A` abelian,
+`[B,A;3] = ⊥` のとき, 奇数位数条件 (`g² = 1 ⟹ g = 1`) の下で
+`⁅x,u⁆` と `⁅x,v⁆` は可換 (`x ∈ B`, `u v ∈ A`) — つまり `[x,A]` は abelian.
+
+Step 1 で `z := ⁅⁅x,u⁆,⁅x,v⁆⁆ = ⁅⁅u⁻¹,⁅x,v⁆⁆,x⁆`; exact 変形で内側を
+`⁅⁅x,v⁆,u⁆` に直し, 商 `G/B'` で 2.5(i) 対称性 (`commutatorElement_inv_rotate`)
+から `⁅⁅x,v⁆,u⁆ ≡ ⁅⁅x,u⁆,v⁆ (mod B')`, 中心的誤差は `⁅·,x⁆` の左スロットで
+吸収され `z = z⁻¹` ⟹ `z² = 1` ⟹ `z = 1`. -/
+theorem case_two_commute {B A : Subgroup G} [B.Normal]
+    (hB' : ⁅B, B⁆ ≤ center G) (hAcomm : IsMulCommutative A)
+    (h3 : ⁅⁅⁅B, A⁆, A⁆, A⁆ = ⊥)
+    (hodd : ∀ g : G, g ^ 2 = 1 → g = 1)
+    {x u v : G} (hx : x ∈ B) (hu : u ∈ A) (hv : v ∈ A) :
+    Commute ⁅x, u⁆ ⁅x, v⁆ := by
+  haveI := hAcomm
+  have hBc : ∀ g ∈ (⁅B, B⁆ : Subgroup G), ∀ w : G, g * w = w * g := fun g hg w =>
+    (Subgroup.mem_center_iff.mp (hB' hg) w).symm
+  have hmemB : ∀ b ∈ B, ∀ y : G, ⁅b, y⁆ ∈ B := by
+    intro b hb y
+    have h1 : y * b⁻¹ * y⁻¹ ∈ B := ‹B.Normal›.conj_mem _ (B.inv_mem hb) y
+    have h2 : b * (y * b⁻¹ * y⁻¹) ∈ B := B.mul_mem hb h1
+    rwa [show b * (y * b⁻¹ * y⁻¹) = ⁅b, y⁆ by group] at h2
+  have hK2cent : (⁅⁅B, A⁆, A⁆ : Subgroup G) ≤ centralizer (A : Set G) :=
+    commutator_eq_bot_iff_le_centralizer.mp h3
+  -- exact 変形: ⁅u'⁻¹, ⁅x,v'⁆⁆ = ⁅⁅x,v'⁆, u'⁆
+  have ha : ∀ u' ∈ A, ∀ v' ∈ A, ⁅u'⁻¹, ⁅x, v'⁆⁆ = ⁅⁅x, v'⁆, u'⁆ := by
+    intro u' hu' v' hv'
+    refine commutatorElement_inv_swap_eq ?_
+    have hk2 : ⁅⁅x, v'⁆, u'⁆ ∈ (⁅⁅B, A⁆, A⁆ : Subgroup G) :=
+      commutator_mem_commutator (commutator_mem_commutator hx hv') hu'
+    exact ((mem_centralizer_iff.mp (hK2cent hk2) u' hu').symm)
+  -- 商 Q = G/B' での対称性
+  haveI hBcN : (⁅B, B⁆ : Subgroup G).Normal := normal_of_le_center' hB'
+  set π := QuotientGroup.mk' (⁅B, B⁆ : Subgroup G) with hπdef
+  have hQB : ∀ b₁ ∈ B, ∀ b₂ ∈ B, Commute (π b₁) (π b₂) := by
+    intro b₁ hb₁ b₂ hb₂
+    rw [← commutatorElement_eq_one_iff_commute, ← map_commutatorElement]
+    exact (QuotientGroup.eq_one_iff _).mpr (commutator_mem_commutator hb₁ hb₂)
+  have hQsym : π ⁅⁅x, v⁆, u⁆ = π ⁅⁅x, u⁆, v⁆ := by
+    have hcv : Commute ⁅⁅π x, π v⁆, π u⁆ ⁅π x, π v⁆ := by
+      have h1 := hQB _ (hmemB _ (hmemB x hx v) u) _ (hmemB x hx v)
+      simpa only [map_commutatorElement] using h1
+    have hcu : Commute ⁅⁅π x, π u⁆, π v⁆ ⁅π x, π u⁆ := by
+      have h1 := hQB _ (hmemB _ (hmemB x hx u) v) _ (hmemB x hx u)
+      simpa only [map_commutatorElement] using h1
+    have hQvu : Commute (π v) (π u) := by
+      have h1 : Commute v u := setLike_mul_comm hv hu
+      exact h1.map π
+    have hQxvxu : Commute ⁅π x, π v⁆ ⁅π x, π u⁆ := by
+      have h1 := hQB _ (hmemB x hx v) _ (hmemB x hx u)
+      simpa only [map_commutatorElement] using h1
+    have hrot := commutatorElement_inv_rotate (x := π x) hQvu hQxvxu
+    simp only [map_commutatorElement]
+    calc ⁅⁅π x, π v⁆, π u⁆
+        = (⁅⁅π x, π v⁆⁻¹, π u⁆)⁻¹ := by
+          rw [commutatorElement_inv_left_eq hcv]; group
+      _ = (⁅⁅π x, π u⁆⁻¹, π v⁆)⁻¹ := by rw [hrot]
+      _ = ⁅⁅π x, π u⁆, π v⁆ := by
+          rw [commutatorElement_inv_left_eq hcu]; group
+  -- 引き戻し: 中心的誤差 z₀ を左スロットで吸収
+  have hpull : ⁅⁅⁅x, v⁆, u⁆, x⁆ = ⁅⁅⁅x, u⁆, v⁆, x⁆ := by
+    have hz0 : ⁅⁅x, v⁆, u⁆⁻¹ * ⁅⁅x, u⁆, v⁆ ∈ (⁅B, B⁆ : Subgroup G) := by
+      have h1 : π (⁅⁅x, v⁆, u⁆⁻¹ * ⁅⁅x, u⁆, v⁆) = 1 := by
+        rw [map_mul, map_inv, hQsym]
+        group
+      exact (QuotientGroup.eq_one_iff _).mp h1
+    have hz0c : ∀ w : G,
+        (⁅⁅x, v⁆, u⁆⁻¹ * ⁅⁅x, u⁆, v⁆) * w = w * (⁅⁅x, v⁆, u⁆⁻¹ * ⁅⁅x, u⁆, v⁆) :=
+      hBc _ hz0
+    have hdecomp : ⁅⁅x, u⁆, v⁆
+        = ⁅⁅x, v⁆, u⁆ * (⁅⁅x, v⁆, u⁆⁻¹ * ⁅⁅x, u⁆, v⁆) := by group
+    conv_rhs => rw [hdecomp]
+    rw [commutatorElement_central_left hz0c]
+  -- Step 1 + 対称性 ⟹ z = z⁻¹ ⟹ z² = 1 ⟹ z = 1
+  have hstep1uv := commutator_commutator_eq_of_normal hB' hx u v
+  have hstep1vu := commutator_commutator_eq_of_normal hB' hx v u
+  rw [ha u hu v hv] at hstep1uv
+  rw [ha v hv u hu] at hstep1vu
+  have hzinv : ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹ = ⁅⁅x, u⁆, ⁅x, v⁆⁆ := by
+    calc ⁅⁅x, u⁆, ⁅x, v⁆⁆⁻¹
+        = ⁅⁅x, v⁆, ⁅x, u⁆⁆ := commutatorElement_inv _ _
+      _ = ⁅⁅⁅x, u⁆, v⁆, x⁆ := hstep1vu
+      _ = ⁅⁅⁅x, v⁆, u⁆, x⁆ := hpull.symm
+      _ = ⁅⁅x, u⁆, ⁅x, v⁆⁆ := hstep1uv.symm
+  have hsq : ⁅⁅x, u⁆, ⁅x, v⁆⁆ ^ 2 = 1 := by
+    have h2 := congrArg (· * ⁅⁅x, u⁆, ⁅x, v⁆⁆) hzinv
+    simp only [inv_mul_cancel] at h2
+    rw [sq, ← h2]
+  exact commutatorElement_eq_one_iff_commute.mp (hodd _ hsq)
+
+open OddOrder.Isaacs.Ch04 in
+/-- **Gorenstein Thm 2.7 Case 2** (`[B,A;n+1] = ⊥`): Lem 2.8(iii) と
+`[B,A;2] ≠ ⊥` (Lem 2.3 の対偶) から `n = 2`, `[B,A;3] = ⊥`; Hall–Witt 論法
+(`case_two_commute`) で全 `x ∈ B` の `[x,A]` が abelian になり, `x` を
+`A` が `[x,A]` を中心化しないように選んで wrap-up (`R := ⁅B,A⁆`). -/
+theorem glauberman_replacement_case_two [Finite G] {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) (hB' : ⁅B, B⁆ ≤ center G)
+    (hA : A ∈ maxAbelianIn (⊤ : Subgroup G))
+    (hBnA : ¬ B ≤ normalizer (A : Set G))
+    (hodd : ∀ g : G, g ^ 2 = 1 → g = 1)
+    {n : ℕ} (hn_pos : 0 < n)
+    (hmin : ∀ k, 0 < k → IsMulCommutative (iterCommutator B A k) → n ≤ k)
+    (hcase : iterCommutator B A (n + 1) = ⊥) :
+    ∃ A' ∈ maxAbelianIn (⊤ : Subgroup G),
+      A ⊓ B < A' ⊓ B ∧ A' ≤ normalizer (A : Set G) := by
+  obtain ⟨hn2, -⟩ :=
+    iterCommutator_min_abelian_le_two hsup hB' hA.2.1 hn_pos hmin hcase
+  have hiter2 : (⁅⁅B, A⁆, A⁆ : Subgroup G) = iterCommutator B A 2 := by
+    rw [iterCommutator_succ, iterCommutator_succ, iterCommutator_zero]
+  have h2ne : (⁅⁅B, A⁆, A⁆ : Subgroup G) ≠ ⊥ := by
+    intro hbot
+    refine hBnA ?_
+    rw [le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn hA le_top]
+    exact hbot
+  have hn_eq : n = 2 := by
+    rcases Nat.lt_or_ge n 2 with h | h
+    · exfalso
+      have hn1 : n = 1 := by omega
+      subst hn1
+      exact h2ne (by rw [hiter2]; exact hcase)
+    · omega
+  subst hn_eq
+  have h3 : (⁅⁅⁅B, A⁆, A⁆, A⁆ : Subgroup G) = ⊥ := by
+    have e : (⁅⁅⁅B, A⁆, A⁆, A⁆ : Subgroup G) = iterCommutator B A 3 := by
+      rw [iterCommutator_succ, iterCommutator_succ, iterCommutator_succ,
+        iterCommutator_zero]
+    rw [e]
+    exact hcase
+  obtain ⟨x, hxB, hnc⟩ := exists_not_le_centralizer_elementCommutator
+    (by rw [hiter2] at h2ne ⊢; exact h2ne)
+  have hMcomm : IsMulCommutative (elementCommutator x A) := by
+    refine isMulCommutative_closure_of_forall_commute ?_
+    rintro - ⟨a, ha, rfl⟩ - ⟨b, hb, rfl⟩
+    exact case_two_commute hB' hA.2.1 h3 hodd hxB ha hb
+  have hMR : elementCommutator x A ≤ ⁅B, A⁆ := by
+    refine (closure_le _).mpr ?_
+    rintro m ⟨a, ha, rfl⟩
+    rw [SetLike.mem_coe]
+    exact commutator_mem_commutator hxB ha
+  exact replacement_of_elementCommutator hB' hA hxB hMcomm hnc hMR h3
+
+open OddOrder.Isaacs.Ch04 in
+/-- **Gorenstein Theorem 2.7 (Glauberman Replacement Theorem)** — core 形
+(`P = AB` 簡約後の型レベル): `G` 有限冪零, `⊤ = B ⊔ A`, `B ⊴ G` with
+`B' ≤ Z(G)`, `A ∈ A(G)`, `B` が `A` を正規化せず, 位数が奇 (`g² = 1 ⟹ g = 1`)
+のとき, `A* ∈ A(G)` で `A ∩ B < A* ∩ B` かつ `A* ≤ N(A)`. -/
+theorem glauberman_replacement_aux [Finite G] [Group.IsNilpotent G]
+    {B A : Subgroup G} [B.Normal] (hsup : B ⊔ A = ⊤)
+    (hB' : ⁅B, B⁆ ≤ center G) (hA : A ∈ maxAbelianIn (⊤ : Subgroup G))
+    (hBnA : ¬ B ≤ normalizer (A : Set G))
+    (hodd : ∀ g : G, g ^ 2 = 1 → g = 1) :
+    ∃ A' ∈ maxAbelianIn (⊤ : Subgroup G),
+      A ⊓ B < A' ⊓ B ∧ A' ≤ normalizer (A : Set G) := by
+  classical
+  have hex : ∃ k, 0 < k ∧ IsMulCommutative (iterCommutator B A k) := by
+    obtain ⟨k, hk⟩ := iterCommutator_eq_bot_of_isNilpotent_ambient B A
+    refine ⟨k + 1, Nat.succ_pos k, ?_⟩
+    have hbot : iterCommutator B A (k + 1) = ⊥ := by
+      rw [iterCommutator_succ, hk]
+      exact commutator_bot_left_eq A
+    rw [hbot]
+    exact bot_isMulCommutative
+  set n := Nat.find hex with hndef
+  obtain ⟨hn_pos, hn_comm⟩ := Nat.find_spec hex
+  have hmin : ∀ k, 0 < k → IsMulCommutative (iterCommutator B A k) → n ≤ k :=
+    fun k hk hcomm => Nat.find_min' hex ⟨hk, hcomm⟩
+  by_cases hcase : iterCommutator B A (n + 1) = ⊥
+  · exact glauberman_replacement_case_two hsup hB' hA hBnA hodd hn_pos hmin hcase
+  · exact glauberman_replacement_case_one hB' hA hn_pos hn_comm hcase
+
 end Subgroup
+
+
