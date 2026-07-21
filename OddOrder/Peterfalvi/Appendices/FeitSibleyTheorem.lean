@@ -1213,6 +1213,39 @@ theorem exists_apply_one_eq_d_mul [Finite G]
 
 end SsetOfCounting
 
+open scoped Classical in
+/-- **`sum_degreeSq_SsetOf`, `toFinset` form**: the `𝒮(R)` degree-square sum over
+the plain class-function `toFinset` (the shape produced by
+`exists_counterexample_of_not_coherent`) equals the same quotient-card difference.
+Bundling `x ↦ ⟨x, irr⟩` is a bijection onto the filtered irreducible-character
+`Finset` of `sum_degreeSq_SsetOf`. -/
+theorem sum_degreeSq_SsetOf_toFinset [Finite G]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] (R : Subgroup G)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.SsetOf R).Finite) :
+    ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  rw [← hyp.sum_degreeSq_SsetOf R]
+  refine Finset.sum_bij'
+    (fun x hx => (⟨x, ((hfin.mem_toFinset.mp hx).1.1 :)⟩ : IrreducibleCharacter ↥hyp.H))
+    (fun χb hb => (χb : ClassFunction ↥hyp.H ℂ)) ?_ ?_ ?_ ?_ ?_
+  · intro x hx
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, by simpa using hfin.mem_toFinset.mp hx⟩
+  · intro χb hb
+    rw [Set.Finite.mem_toFinset]
+    exact (Finset.mem_filter.mp hb).2
+  · intro x hx
+    rfl
+  · intro χb hb
+    rfl
+  · intro x hx
+    rfl
+
 /-- **`𝒮(·)` is antitone**: a smaller kernel condition admits more characters,
 `R₁ ≤ R₂ ⟹ 𝒮(R₂) ⊆ 𝒮(R₁)`. -/
 theorem ssetOf_antitone {R₁ R₂ : Subgroup G} (hR : R₁ ≤ R₂) :
