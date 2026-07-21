@@ -442,6 +442,7 @@ import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
 import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.FeitThompson
