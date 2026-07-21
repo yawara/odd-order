@@ -133,6 +133,43 @@ theorem S_conj_mem_of_mem_Q {q : G} (hq : q ∈ hyp.Q) {x : G} (hx : x ∈ hyp.S
   rw [hrw]
   exact hyp.S.mul_mem (hyp.S.mul_mem hs hx) (hyp.S.inv_mem hs)
 
+/-- Conjugation by `q ∈ Q` fixes `S` as a set (both inclusions of
+`S_conj_mem_of_mem_Q`). -/
+theorem S_map_conj_eq {q : G} (hq : q ∈ hyp.Q) :
+    hyp.S.map (MulAut.conj q).toMonoidHom = hyp.S := by
+  apply le_antisymm
+  · rintro _ ⟨x, hxS, rfl⟩
+    exact hyp.S_conj_mem_of_mem_Q hq hxS
+  · intro x hxS
+    refine ⟨q⁻¹ * x * q, ?_, ?_⟩
+    · have := hyp.S_conj_mem_of_mem_Q (hyp.Q.inv_mem hq) hxS
+      simpa using this
+    · simp [MulAut.conj]
+      group
+
+/-- Conjugation by `h ∈ H` fixes `Q'` as a set (both inclusions of
+`Qder_conj_mem_of_mem_H`). -/
+theorem Qder_map_conj_eq {h : G} (hh : h ∈ hyp.H) :
+    hyp.Qder.map (MulAut.conj h).toMonoidHom = hyp.Qder := by
+  apply le_antisymm
+  · rintro _ ⟨x, hx, rfl⟩
+    exact hyp.Qder_conj_mem_of_mem_H hh hx
+  · intro x hx
+    refine ⟨h⁻¹ * x * h, ?_, ?_⟩
+    · have := hyp.Qder_conj_mem_of_mem_H (hyp.H.inv_mem hh) hx
+      simpa using this
+    · simp [MulAut.conj]
+      group
+
+/-- **`S ⊔ Q' ⊴ Q`** (elementwise): conjugation by `q ∈ Q` fixes both `S`
+(`S_map_conj_eq`) and `Q'` (`Qder_map_conj_eq`), hence their join. -/
+theorem sup_S_Qder_conj_mem_of_mem_Q {q : G} (hq : q ∈ hyp.Q) {x : G}
+    (hx : x ∈ hyp.S ⊔ hyp.Qder) : q * x * q⁻¹ ∈ hyp.S ⊔ hyp.Qder := by
+  have hmap : (hyp.S ⊔ hyp.Qder).map (MulAut.conj q).toMonoidHom = hyp.S ⊔ hyp.Qder := by
+    rw [Subgroup.map_sup, hyp.S_map_conj_eq hq, hyp.Qder_map_conj_eq (hyp.Q_le_H hq)]
+  rw [← hmap]
+  exact ⟨x, hx, rfl⟩
+
 /-! ## `H = Q ⋊ D` counting: `[H : Q] = d` -/
 
 /-- `Q.subgroupOf H` and `D.subgroupOf H` are complements in `↥H` (subtype form of
@@ -634,6 +671,148 @@ theorem leKer_induce_Qder_of_forall [Finite G]
   congr 1
   refine Finset.sum_congr rfl fun h _ => ?_
   rw [hterm x hxQ' h, hterm 1 h1Q' h]
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **`𝒮(Q')` is nonempty** when `S·Q' ⊊ Q`.  The quotient of `Q` by the normal
+subgroup `S ⊔ Q'` is a nontrivial (abelian) group, so it has a nontrivial
+irreducible character; its inflation `φ ∈ Irr(Q)` has `Q' ⊆ Ker φ` and
+`Q₁ ⊄ Ker φ` — a character trivial on both `S` and `Q₁` is trivial on
+`S·Q₁ = Q` (`characterKernelSubgroup`), contradicting nontriviality — so
+`Ind_Q^H φ ∈ 𝒮(Q')` by Lemma 2(a) and `leKer_induce_Qder_of_forall`.
+
+At the Theorem's call site `Q₁` is a nontrivial `p`-group, whence
+`S·Q' ∩ Q₁ ≤ Q₁'·Φ`-type properness gives `hlt`. -/
+theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
+    (hyp.SsetOf hyp.Qder).Nonempty := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  -- the normal subgroup `N = (S ⊔ Q')` viewed inside `K = ↥(Q.subgroupOf H)`
+  set N : Subgroup ↥(hyp.Q.subgroupOf hyp.H) :=
+    ((hyp.S ⊔ hyp.Qder).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H) with hN
+  have hmemN : ∀ x : ↥(hyp.Q.subgroupOf hyp.H),
+      x ∈ N ↔ (((x : ↥hyp.H)) : G) ∈ hyp.S ⊔ hyp.Qder := by
+    intro x
+    rw [hN, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+  haveI hNnorm : N.Normal := by
+    constructor
+    intro n hn g
+    rw [hmemN] at hn ⊢
+    have hgQ : (((g : ↥hyp.H)) : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp g.2
+    have := hyp.sup_S_Qder_conj_mem_of_mem_Q hgQ hn
+    simpa using this
+  -- the quotient is nontrivial
+  obtain ⟨q0, hq0Q, hq0N⟩ := SetLike.exists_of_lt hlt
+  set k0 : ↥(hyp.Q.subgroupOf hyp.H) :=
+    ⟨⟨q0, hyp.Q_le_H hq0Q⟩, Subgroup.mem_subgroupOf.mpr hq0Q⟩ with hk0
+  haveI : Nontrivial (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := by
+    refine ⟨QuotientGroup.mk k0, 1, fun h => hq0N ?_⟩
+    rw [QuotientGroup.eq_one_iff, hmemN] at h
+    exact h
+  -- a nontrivial irreducible character of the quotient, inflated to `K`
+  haveI : Finite (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Quotient.finite _
+  letI : Fintype (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Fintype.ofFinite _
+  letI : Invertible ((Nat.card (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Nontrivial (ConjClasses (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) := by
+    obtain ⟨b, hb⟩ := exists_ne (1 : ↥(hyp.Q.subgroupOf hyp.H) ⧸ N)
+    exact ⟨ConjClasses.mk b, ConjClasses.mk 1,
+      fun h => hb (isConj_one_right.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h).symm)⟩
+  haveI := finite_irreducibleCharacter (G := ↥(hyp.Q.subgroupOf hyp.H) ⧸ N)
+  haveI : Nontrivial (IrreducibleCharacter (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) :=
+    Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [card_irreducibleCharacter_eq]
+          exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
+  obtain ⟨θb, hθb⟩ :=
+    exists_ne (trivialIrreducibleCharacter (↥(hyp.Q.subgroupOf hyp.H) ⧸ N))
+  set φ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H) := inflate N θb with hφ
+  have hφne : φ ≠ trivialIrreducibleCharacter _ := by
+    rw [hφ, Ne, inflate_eq_trivial_iff]
+    exact hθb
+  -- `N ⊆ Ker φ`
+  have hkerN : ∀ x : ↥(hyp.Q.subgroupOf hyp.H), x ∈ N →
+      (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
+        = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
+    intro x hx
+    have := subset_characterKernel_inflate (N := N) θb hx
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at this
+    simpa [hφ] using this
+  -- degree of `φ` is nonzero
+  have hφ1ne : (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 ≠ 0 := by
+    obtain ⟨n, hnpos, hn, -⟩ := φ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+    rw [hn]
+    exact_mod_cast hnpos.ne'
+  -- `Q₁ ⊄ Ker φ`: otherwise `Ker φ ⊇ S·Q₁ = Q`, forcing `φ` trivial
+  have hnotconst : ¬ ∀ x : ↥(hyp.Q.subgroupOf hyp.H), ((x : ↥hyp.H) : G) ∈ hyp.Q1 →
+      (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
+        = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
+    intro hall
+    set KS := OddOrder.Peterfalvi.S13.characterKernelSubgroup
+      φ.isIrreducible.isCharacter with hKS
+    have hmemKS : ∀ x : ↥(hyp.Q.subgroupOf hyp.H),
+        (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
+          = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 → x ∈ KS := by
+      intro x hx
+      rw [hKS, OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+        OddOrder.Peterfalvi.S03.mem_characterKernel]
+      simpa using hx
+    -- every `k ∈ K` factors as an `S`-part (in `N ⊆ KS`) times a `Q₁`-part (in `KS`)
+    have hK : ∀ k : ↥(hyp.Q.subgroupOf hyp.H), k ∈ KS := by
+      intro k
+      have hkQ : ((k : ↥hyp.H) : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp k.2
+      rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hkQ
+      obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hkQ
+      rw [SetLike.mem_coe] at hs hy
+      set kS : ↥(hyp.Q.subgroupOf hyp.H) :=
+        ⟨⟨s, hyp.S_le_H hs⟩, Subgroup.mem_subgroupOf.mpr (hyp.S_le_Q hs)⟩ with hkS
+      set kY : ↥(hyp.Q.subgroupOf hyp.H) :=
+        ⟨⟨y, hyp.Q1_le_H hy⟩, Subgroup.mem_subgroupOf.mpr (hyp.Q1_le_Q hy)⟩ with hkY
+      have hkeq : k = kS * kY := by
+        apply Subtype.ext
+        apply Subtype.ext
+        simpa [hkS, hkY] using hsy.symm
+      rw [hkeq]
+      refine KS.mul_mem ?_ ?_
+      · exact hmemKS kS (hkerN kS ((hmemN kS).mpr
+          (Subgroup.mem_sup_left hs)))
+      · exact hmemKS kY (hall kY hy)
+    -- so `φ` is the constant `φ(1)`, contradicting `φ ≠ 1` and `φ(1) ≠ 0`
+    have hconst : ∀ k : ↥(hyp.Q.subgroupOf hyp.H),
+        (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) k
+          = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
+      intro k
+      have := hK k
+      rw [hKS, OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+        OddOrder.Peterfalvi.S03.mem_characterKernel] at this
+      simpa using this
+    have hφeq : (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)
+        = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 •
+          (trivialIrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H) :
+            ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) := by
+      ext k
+      rw [ClassFunction.smul_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        trivialClassFunction_apply, mul_one]
+      exact hconst k
+    have hzero := irreducibleCharacter_inner_eq_ite (G := ↥(hyp.Q.subgroupOf hyp.H))
+      φ (trivialIrreducibleCharacter _)
+    rw [if_neg hφne] at hzero
+    rw [hφeq, ClassFunction.inner_smul_left] at hzero
+    have htriv_self := irreducibleCharacter_inner_eq_ite
+      (G := ↥(hyp.Q.subgroupOf hyp.H))
+      (trivialIrreducibleCharacter _) (trivialIrreducibleCharacter _)
+    rw [if_pos rfl] at htriv_self
+    rw [htriv_self, mul_one] at hzero
+    exact hφ1ne hzero
+  -- assemble the member `Ind_Q^H φ ∈ 𝒮(Q')`
+  refine ⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H)
+    (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ), ?_, ?_⟩
+  · -- `∈ 𝒮` via Lemma 2(a)
+    rw [Sset_eq_induced_of_Q hyp]
+    exact ⟨(φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ),
+      ⟨φ.isIrreducible, hnotconst⟩, rfl⟩
+  · -- `Q' ⊆ Ker` via `leKer_induce_Qder_of_forall`
+    refine hyp.leKer_induce_Qder_of_forall fun y hy => ?_
+    exact hkerN y ((hmemN y).mpr (Subgroup.mem_sup_right hy))
 
 end CharacterLayer
 
