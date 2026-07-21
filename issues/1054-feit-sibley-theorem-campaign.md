@@ -205,6 +205,20 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     (:1640 以降) が同じ構成をどう扱っているか (pairing を仮定に取るか構成するか) を
     次に読むこと — 構成済みならそれを流用、仮定型なら代表系選択 (Finset 帰納 or
     exists_monotoneDegreeEnum + 偶数個ペアリング) を新設。
+  - **(2026-07-21 確認済) (6.6) 最終定理 `peterfalvi_66_coherence_of_X` (CoherenceUnion:1711)
+    は pairing (S₀/pair/N/covers) を仮定に取る** — 構成は無い。加えて
+    `coherentOfPairChainCover` (:1641, covers+h0+hstep ⟹ IsCoherent X) と
+    `pairUnion_eq_of_enumCover` (:1665, index-level cover 版) が組み立てを担う。
+    ⟹ **新設すべきは共役対分解補題** `exists_conjPair_decomposition`:
+    Y ⊇ B (両方共役閉、Y 有限、Y 実指標なし) ⟹ ∃ N pair,
+    (∀ j < N, (pair j).2 = (pair j).1.conj ∧ pairSet ⊆ Y ∧ pairSet ∩ B = ∅) ∧
+    (∀ χ ∈ Y, χ ∈ B ∨ ∃ j < N, χ ∈ pairSet pair j) ∧ pairwise-disjoint ∧
+    度数単調 ((pair j).1 の度数が j に単調 — per-step hDeg で「累積 ⊇ それ以下の度数全部」
+    に使う)。構成 = (Y − B).ncard の強帰納: 最小度数の χ を取り (χ, χ̄) を先頭に、
+    Y − B − {χ,χ̄} で再帰 (Y−B は共役閉: Y, B 両方の共役閉性から; χ̄ ≠ χ は no-real)。
+    実装は List (CF × CF) を返す補助関数 + pair := fun j => l.getD j default が楽。
+    FeitSibleyTheorem.lean に汎用形 (Hypothesis 非依存、Set (ClassFunction L ℂ) レベル)
+    で置く — hub 判断で S07_Coherence 側へ移設可。
 
 ## 完了条件
 
