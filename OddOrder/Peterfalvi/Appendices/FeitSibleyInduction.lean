@@ -57,6 +57,16 @@ theorem subgroupOf_Q_normal_of_conj_mem {R : Subgroup G}
   rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hn ⊢
   simpa using hR g (Subgroup.mem_subgroupOf.mp g.2) n hn
 
+/-- Elementwise `W`-invariance gives `(R.subgroupOf W).Normal` (the generic
+form of `subgroupOf_H_normal_of_conj_mem`, used at `W = Q₁` for the quotient
+`Q₁⧸Q₃`). -/
+theorem subgroupOf_normal_of_conj_mem {R W : Subgroup G}
+    (hR : ∀ w ∈ W, ∀ x ∈ R, w * x * w⁻¹ ∈ R) : (R.subgroupOf W).Normal := by
+  constructor
+  intro n hn g
+  rw [Subgroup.mem_subgroupOf] at hn ⊢
+  simpa using hR g g.2 n hn
+
 /-! ## The central lift `Z` of `Z(Q₁⧸Q₃)` (p. 146) -/
 
 /-- **The central lift `Z ≤ Q₁` of `Z(Q₁⧸Q₃)`** for a `Q₁`-invariant `Q₃`: the
@@ -148,6 +158,76 @@ theorem exists_minimal_conjInvariant_between [Finite G] {Q₃ W : Subgroup G}
   obtain ⟨hQ₂gt, hQ₂le, hQ₂inv⟩ := hQ₂S
   refine ⟨Q₂, hQ₂gt, hQ₂le, hQ₂inv, fun Q₂' hgt hle hinv' => ?_⟩
   exact le_antisymm hle (hmin ⟨hgt, hle.trans hQ₂le, hinv'⟩ hle)
+
+/-- **The chief factor sits in the centre** (p. 146: "Since `Q₁` is nilpotent,
+`(Q₂/Q₃) ∩ Z(Q₁/Q₃) ≠ 1`", and minimality forces `Q₂/Q₃ ⊆ Z(Q₁/Q₃)`): a
+minimal `H`-invariant `Q₂` strictly over `Q₃` inside the nilpotent `Q₁` lies
+in the central lift `Z`.  The intersection `Q₂ ⊓ Z` is `H`-invariant, contains
+`Q₃`, and is strictly bigger by
+`exists_mem_center_of_normal_ne_bot_of_isNilpotent` applied to the image of
+`Q₂` in `Q₁⧸Q₃`; minimality then gives `Q₂ ⊓ Z = Q₂`. -/
+theorem minimal_le_centralLift [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {Q₂ Q₃ : Subgroup G} (hQ₃Q₂ : Q₃ < Q₂) (hQ₂Q1 : Q₂ ≤ hyp.Q1)
+    (hinv : ∀ q ∈ hyp.Q1, ∀ x ∈ Q₃, q * x * q⁻¹ ∈ Q₃)
+    (hQ₂H : ∀ h ∈ hyp.H, ∀ x ∈ Q₂, h * x * h⁻¹ ∈ Q₂)
+    (hQ₃H : ∀ h ∈ hyp.H, ∀ x ∈ Q₃, h * x * h⁻¹ ∈ Q₃)
+    (hmin : ∀ Q₂' : Subgroup G, Q₃ < Q₂' → Q₂' ≤ Q₂ →
+        (∀ h ∈ hyp.H, ∀ x ∈ Q₂', h * x * h⁻¹ ∈ Q₂') → Q₂' = Q₂) :
+    Q₂ ≤ hyp.centralLift Q₃ hinv := by
+  classical
+  haveI := hnil
+  haveI : (Q₃.subgroupOf hyp.Q1).Normal := subgroupOf_normal_of_conj_mem hinv
+  haveI : (Q₂.subgroupOf hyp.Q1).Normal :=
+    subgroupOf_normal_of_conj_mem fun q hq x hx => hQ₂H q (hyp.Q1_le_H hq) x hx
+  -- the image of `Q₂` in `Q₁⧸Q₃` is a nontrivial normal subgroup
+  set π := QuotientGroup.mk' (Q₃.subgroupOf hyp.Q1) with hπ_def
+  set Qbar : Subgroup (↥hyp.Q1 ⧸ Q₃.subgroupOf hyp.Q1) :=
+    (Q₂.subgroupOf hyp.Q1).map π with hQbar_def
+  haveI : Qbar.Normal :=
+    Subgroup.Normal.map ‹(Q₂.subgroupOf hyp.Q1).Normal› π
+      (QuotientGroup.mk'_surjective _)
+  have hQbar_ne : Qbar ≠ ⊥ := by
+    obtain ⟨x, hxQ₂, hxQ₃⟩ := SetLike.exists_of_lt hQ₃Q₂
+    intro hbot
+    have hxmem : π (⟨x, hQ₂Q1 hxQ₂⟩ : ↥hyp.Q1) ∈ Qbar :=
+      Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr hxQ₂)
+    rw [hbot, Subgroup.mem_bot, hπ_def, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff] at hxmem
+    exact hxQ₃ (Subgroup.mem_subgroupOf.mp hxmem)
+  -- a nonidentity central element of the image
+  obtain ⟨xbar, hxbarQ, hxbarC, hxbar1⟩ :=
+    OddOrder.Isaacs.Ch04.exists_mem_center_of_normal_ne_bot_of_isNilpotent hQbar_ne
+  obtain ⟨w, hwQ, hwπ⟩ := hxbarQ
+  -- its lift lands in `Q₂ ⊓ Z` but not in `Q₃`
+  have hwZ : (w : G) ∈ hyp.centralLift Q₃ hinv := by
+    refine ⟨w.2, fun y hy => ?_⟩
+    have hcomm : π ⁅w, (⟨y, hy⟩ : ↥hyp.Q1)⁆ = 1 := by
+      rw [map_commutatorElement, hwπ]
+      rw [commutatorElement_eq_one_iff_mul_comm]
+      exact (Subgroup.mem_center_iff.mp hxbarC _).symm
+    rw [hπ_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+      Subgroup.mem_subgroupOf] at hcomm
+    simpa [commutatorElement_def] using hcomm
+  have hwQ₂ : (w : G) ∈ Q₂ := Subgroup.mem_subgroupOf.mp hwQ
+  have hwQ₃ : (w : G) ∉ Q₃ := by
+    intro hmem
+    apply hxbar1
+    rw [← hwπ, hπ_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact Subgroup.mem_subgroupOf.mpr hmem
+  -- minimality: `Q₂ ⊓ Z = Q₂`
+  have hZH : ∀ h ∈ hyp.H, ∀ x ∈ hyp.centralLift Q₃ hinv,
+      h * x * h⁻¹ ∈ hyp.centralLift Q₃ hinv := fun h hh x hx =>
+    hyp.centralLift_conj_mem_of_mem_H hinv hQ₃H hh hx
+  have hlt' : Q₃ < Q₂ ⊓ hyp.centralLift Q₃ hinv := by
+    rw [lt_iff_le_and_ne]
+    constructor
+    · exact le_inf hQ₃Q₂.le (hyp.le_centralLift hinv (hQ₃Q₂.le.trans hQ₂Q1))
+    · intro heq
+      exact hwQ₃ (heq ▸ (⟨hwQ₂, hwZ⟩ : (w : G) ∈ Q₂ ⊓ hyp.centralLift Q₃ hinv))
+  have heq := hmin (Q₂ ⊓ hyp.centralLift Q₃ hinv) hlt' inf_le_left
+    (fun h hh x hx => ⟨hQ₂H h hh x hx.1, hZH h hh x hx.2⟩)
+  rw [← heq]
+  exact inf_le_right
 
 end Hypothesis
 
