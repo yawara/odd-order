@@ -281,6 +281,65 @@ theorem coprime_stabilizes_chain_trivial
   change (ψ a) x = x
   exact key n 0 (by omega) a x (by rw [hs0]; exact Subgroup.mem_top x)
 
+open OddOrder.Isaacs.Ch03 in
+/-- **BG Lemma 1.9** (逐語形): `π` を素数集合, `K` を有限可解 π-群
+(`(Nat.card K).primeFactors ⊆ π`), `A` を `K` 上の演算子群で, `K` の正規降鎖 `s` を
+stabilize するものとする. このとき `A/C_A(K)` は π-群. `C_A(K) = ψ.ker` なので
+結論は `(Nat.card (A ⧸ ψ.ker)).primeFactors ⊆ π` の形で述べる.
+
+**証明** (BG p. 5): π'-素数 `q` が `|A/C_A(K)|` を割るとして矛盾を導く. Sylow `q`-部分群
+`Q ≤ A` は π-群 `K` と coprime なので `coprime_stabilizes_chain_trivial` (多段 coprime 核)
+が `Q ≤ ker ψ` を与える. すると `q` の `|A|` での重複度が全て `|ker ψ|` に入り,
+`q ∣ |A/ker ψ|` と合わせて `q^{v+1} ∣ |A|` (`v` = 重複度) となり矛盾.
+
+多段 coprime 核との分業: 本定理が survey の言う「`A/C_A(G)` is a π-group」packaging
+(旧・特殊化債務). 個々の適用は従来どおり核 (`coprime_stabilizes_chain_trivial`) を
+elementwise に使ってよい. -/
+theorem primeFactors_card_quotient_ker_subset_of_stabilizes_chain
+    {K : Type*} [Group K] [Finite K] {A : Type*} [Group A] [Finite A]
+    {π : Set ℕ} (hK : ↑(Nat.card K).primeFactors ⊆ π) (hsolvK : IsSolvable K)
+    (ψ : A →* MulAut K)
+    (s : ℕ → Subgroup K) (hanti : Antitone s) (hs0 : s 0 = ⊤) {n : ℕ} (hsn : s n = ⊥)
+    (hnorm : ∀ i, (s i).Normal)
+    (hinv : ∀ i, IsAInvariant ψ (s i))
+    (htriv : ∀ i, ∀ a : A, ∀ x ∈ s i, ∃ y ∈ s (i + 1), (ψ a) x = x * y) :
+    ↑(Nat.card (A ⧸ ψ.ker)).primeFactors ⊆ π := by
+  intro q hq
+  rw [Finset.mem_coe, Nat.mem_primeFactors] at hq
+  obtain ⟨hqprime, hqdvd, -⟩ := hq
+  by_contra hqπ
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  -- `q ∤ |K|` (all prime factors of `|K|` lie in `π`, and `q ∉ π`).
+  have hqK : ¬ q ∣ Nat.card K := fun hdvd =>
+    hqπ (hK (Finset.mem_coe.mpr (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, Nat.card_pos.ne'⟩)))
+  -- A Sylow `q`-subgroup `Q` of `A` acts coprimely on `K`, hence trivially.
+  obtain ⟨Q⟩ : Nonempty (Sylow q A) := inferInstance
+  have hcopQ : (Nat.card ↥(Q : Subgroup A)).Coprime (Nat.card K) := by
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+    rw [hk]
+    exact Nat.Coprime.pow_left k ((Nat.Prime.coprime_iff_not_dvd hqprime).mpr hqK)
+  have htrivQ := coprime_stabilizes_chain_trivial
+    (ψ.comp (Q : Subgroup A).subtype) hcopQ (Or.inr hsolvK) s hanti hs0 hsn hnorm
+    (fun i => isAInvariant_iff_smul_mem.mpr fun b x hx => (hinv i).smul_mem b.1 hx)
+    (fun i b x hx => htriv i b.1 x hx)
+  have hQker : (Q : Subgroup A) ≤ ψ.ker := fun x hx =>
+    ψ.mem_ker.mpr (htrivQ ⟨x, hx⟩)
+  -- `q^v ∣ |ker ψ|` with `v` the full multiplicity of `q` in `|A|`; with `q ∣ |A/ker|`
+  -- this gives `q^{v+1} ∣ |A|`, contradicting the definition of `v`.
+  have hQcard : Nat.card ↥(Q : Subgroup A) = q ^ (Nat.card A).factorization q :=
+    Sylow.card_eq_multiplicity Q
+  have hker_dvd : q ^ (Nat.card A).factorization q ∣ Nat.card ↥ψ.ker :=
+    hQcard ▸ Subgroup.card_dvd_of_le hQker
+  have hmul : Nat.card ↥ψ.ker * Nat.card (A ⧸ ψ.ker) = Nat.card A := by
+    rw [← Subgroup.index_eq_card]
+    exact Subgroup.card_mul_index ψ.ker
+  have hdvdA : q ^ ((Nat.card A).factorization q + 1) ∣ Nat.card A := by
+    have h := mul_dvd_mul hker_dvd hqdvd
+    rw [hmul, ← pow_succ] at h
+    exact h
+  have hle := (Nat.Prime.pow_dvd_iff_le_factorization hqprime Nat.card_pos.ne').mp hdvdA
+  omega
+
 open OddOrder.Isaacs.Ch03 (IsAInvariant) in
 /-- 演算子作用 `φ : A →* MulAut G` を `A`-不変部分群 `H` へ制限し `A →* MulAut ↥H` を得る.
 Prop 1.10 等で `A` の作用を `N_G(C)` などの不変部分群上で扱うための橋. -/
