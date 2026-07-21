@@ -327,10 +327,18 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
      p-冪度数には「S/S′ 中心 ⟹ deg ∣ |Q₁|」級が必要 → 新設候補
      (direct-product Irr 分解 or Ito 型; まず mathlib
      `Character.degree_dvd_index_center`? を leansearch で確認)。
-     (b) `exists_conjPair_pairUnion_eq` は**度数単調性を返さない** — (3) Part A の
-     accumulated-sum 論法には度数昇順 pair 分解が必要 → 強化版
-     (Y∖B の最小度数対を先頭に取る強帰納、既存証明の choice を min-degree に変更)
-     を新設するか、既存を置換強化。(1)(2) より以後 Q₁ = non-abelian p-群
+     (b) ✅ **完了 (221a24dad)**: `exists_conjPair_pairUnion_eq` を min-degree 版に
+     in-place 強化 (第 3 句: 各 step の pair.1 は未収載 Y-元中で度数実部最小;
+     Set.exists_min_image 選択)。
+     (c) **② 中心指数可除性の確定ルート (2026-07-21 設計)**: 一般 CT 3.12 は不要。
+     φ ∈ Irr(Q-in) が S-部分を mod-kernel 中心に持つとき
+     (`exists_central_linear_restriction` SchurCenterBound:242 が入口)、
+     s ∈ S はスカラー作用 ⟹ |φ(s·y)| = |φ(y)| ⟹
+     1 = (1/|Q|)Σ_{q}|φ|² = (1/|Q₁|)Σ_{y∈Q₁}|φ(y)|² = ⟨Res_{Q₁}φ, Res_{Q₁}φ⟩
+     (q = s·y の一意分解で和を折り畳む) ⟹ **Res_{Q₁-in} φ 既約** ⟹
+     deg φ = deg(Res φ) ∣ |Q₁| = p^n (exists_natDegree_charValue_one_dvd_card)。
+     新補題は「S′ ⊆ ker φ ⟹ Res_{Q₁} φ 既約 + deg φ ∣ |Q₁|」の形で
+     FeitSibleyReductionThree.lean に。(1)(2) より以後 Q₁ = non-abelian p-群
   (p 奇素数) と仮定してよい: assembly 分岐は (i) |Q₁| 2素数 → (1)+(2) 済,
   (ii) Q₁ abelian → Q′ = S′ ⟹ Remark 𝒮(Q′) = 𝒮(S′) coherent → (2) 済,
   (iii) Q₁ non-abelian p-群 → (3)–(8) 本線。d=1 分岐 (τ=id 自明) と
