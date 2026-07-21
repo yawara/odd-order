@@ -918,6 +918,47 @@ theorem exists_pow_two_fittingConjAction (a : ↥fc.P) :
   rw [fieldRingAutOnUnits_apply_val, Units.val_pow_eq_pow_val]
   exact hi _
 
+/-- **Step (3), second branch — the conjugation bridge (A2 + surjectivity).**
+If conjugation by `a ∈ P` raises every `k ∈ K` to the `r`-th power, then the
+induced action on the Fitting subgroup `F(D̄) = K̄` is `t ↦ t^r`.
+
+`K̄ = F(D̄)` is the image of `K` under `D ↠ D̄ = D/W` (`Kbar_eq_fitting`), so
+every `t ∈ F(D̄)` is `mk k` for some `k ∈ K`; conjugation commutes with the
+quotient map, so `fittingConjAction (toVbar a) (mk k) = mk (a k a⁻¹) = mk (k^r)
+= (mk k)^r`.  (This packages the `M`-side `r`-power law — supplied later — into
+the cyclic group `F(D̄)`, where it is compared with Half A.) -/
+theorem fittingConjAction_pow_of_K_conj (a : ↥fc.P) {r : ℕ}
+    (hB : ∀ k ∈ fc.toHypothesis.K, (a : G) * k * (a : G)⁻¹ = k ^ r)
+    (t : ↥(fitting fc.toHypothesis.Dbar)) :
+    fc.toHypothesis.fittingConjAction (fc.toVbar a) t = t ^ r := by
+  -- `t ∈ fitting D̄ = K̄`, so `t = mk kd` for some `kd ∈ K` (as a subgroup of D).
+  have ht : (t : fc.toHypothesis.Dbar) ∈ fc.toHypothesis.Kbar := by
+    rw [fc.toHypothesis.Kbar_eq_fitting]; exact t.2
+  obtain ⟨kd, hkd, hmk⟩ := ht
+  have hkK : (kd : G) ∈ fc.toHypothesis.K := Subgroup.mem_subgroupOf.mp hkd
+  apply Subtype.ext
+  -- coe of LHS via the conjugation formula (as an element of `D̄`)
+  have hLHS : ((fc.toHypothesis.fittingConjAction (fc.toVbar a) t :
+        ↥(fitting fc.toHypothesis.Dbar)) : fc.toHypothesis.Dbar)
+      = QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)
+            ⟨(a : G), fc.toHypothesis.V_le_D (fc.P_le_V a.2)⟩
+          * (t : fc.toHypothesis.Dbar)
+          * (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)
+            ⟨(a : G), fc.toHypothesis.V_le_D (fc.P_le_V a.2)⟩)⁻¹ := by
+    unfold Hypothesis.fittingConjAction
+    simp only [MonoidHom.comp_apply,
+      Subgroup.normalizerMonoidHom_apply_apply_coe, Subgroup.coe_inclusion, toVbar_coe,
+      QuotientGroup.mk'_apply]
+  rw [hLHS, SubmonoidClass.coe_pow, ← hmk]
+  -- reduce through the quotient hom `mk'`
+  rw [← map_inv (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)),
+    ← map_mul, ← map_mul, ← map_pow]
+  congr 1
+  -- `⟨a⟩ * kd * ⟨a⟩⁻¹ = kd ^ r` in D, checked on the underlying elements of G
+  apply Subtype.ext
+  push_cast
+  simpa using hB (kd : G) hkK
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
