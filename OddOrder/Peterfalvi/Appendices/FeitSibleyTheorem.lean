@@ -881,4 +881,74 @@ theorem sum_degreeSq_ker_subset_not_subset
   rw [sumInflatedDegreeSq (N := N ⊔ M), sumInflatedDegreeSq (N := N)] at hsplit
   linear_combination hsplit
 
+namespace Hypothesis
+
+variable (hyp : Hypothesis G)
+
+/-- **`LeKer` is the character-kernel inclusion**: `χ` is constant (`= χ(1)`) on the
+`R`-part of `H` iff `R.subgroupOf H` is contained in `characterKernel χ`. -/
+theorem leKer_iff_subset_characterKernel {R : Subgroup G} {χ : ClassFunction ↥hyp.H ℂ} :
+    hyp.LeKer χ R ↔ ((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+      ⊆ OddOrder.Peterfalvi.S03.characterKernel χ := by
+  constructor
+  · intro h y hy
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel]
+    have hmem : (y : G) ∈ R := Subgroup.mem_subgroupOf.mp hy
+    simpa using h y hmem
+  · intro h x hx
+    have hmem : x ∈ ((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H) :=
+      Subgroup.mem_subgroupOf.mpr hx
+    have := h hmem
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at this
+    simpa using this
+
+section SsetOfCounting
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Invertible (Nat.card ↥hyp.H : ℂ)]
+
+open scoped Classical in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **The `𝒮(R)` degree-square sum** (the counting input of the reduction steps
+(1)–(3), pp. 146–147): for `R ≤ Q` with `R.subgroupOf H` and
+`(R ⊔ Q₁).subgroupOf H`-side joins normal in `↥H`,
+`∑_{χ ∈ 𝒮(R)} χ(1)² = |H⧸R| − |H⧸(R·Q₁)|` (quotients taken inside `↥H`).
+Membership in `𝒮(R)` is exactly "kernel contains `R` but not `Q₁`"
+(`leKer_iff_subset_characterKernel`), so this is
+`sum_degreeSq_ker_subset_not_subset`. -/
+theorem sum_degreeSq_SsetOf [Finite G] (R : Subgroup G)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter ↥hyp.H =>
+        (χ : ClassFunction ↥hyp.H ℂ) ∈ hyp.SsetOf R),
+        ((χ : ClassFunction ↥hyp.H ℂ) 1) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  have hcongr : ∀ χb : IrreducibleCharacter ↥hyp.H,
+      ((χb : ClassFunction ↥hyp.H ℂ) ∈ hyp.SsetOf R)
+      ↔ (((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ) ∧
+          ¬ ((hyp.Q1.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ)) := by
+    intro χb
+    constructor
+    · rintro ⟨⟨-, hk1⟩, hkR⟩
+      exact ⟨(hyp.leKer_iff_subset_characterKernel).mp hkR,
+        fun h => hk1 ((hyp.leKer_iff_subset_characterKernel).mpr h)⟩
+    · rintro ⟨hR, hQ1⟩
+      exact ⟨⟨χb.isIrreducible,
+        fun hall => hQ1 ((hyp.leKer_iff_subset_characterKernel).mp hall)⟩,
+        (hyp.leKer_iff_subset_characterKernel).mpr hR⟩
+  rw [Finset.filter_congr (fun χb _ => by
+    constructor
+    · exact fun h => by simpa using (hcongr χb).mp (by simpa using h)
+    · exact fun h => by simpa using (hcongr χb).mpr (by simpa using h))]
+  exact sum_degreeSq_ker_subset_not_subset (R.subgroupOf hyp.H) (hyp.Q1.subgroupOf hyp.H)
+
+end SsetOfCounting
+
+end Hypothesis
+
 end OddOrder.Peterfalvi.Appendices.FeitSibley
