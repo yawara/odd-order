@@ -112,3 +112,22 @@ census テーブル (FeitSibley.lean:59) の Lemma 1(a) 行は stale (1049 で c
 - issue 1049 (Lemma 1(a), closed), 下流 = 2(b)-isometry (FeitSibley.lean:436) / 2(c) (:456)
 - Clifford correspondence: `isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq` /
   `eq_of_induce_eq_induce_of_liesOver_of_inertia_eq` (CliffordCorrespondence.lean:385/550)
+
+## 完了 (2026-07-21)
+
+`Sset_eq_induced_of_Q` の sorry close (commit `1a4ea3d7b`)。build green (default heartbeats、
+3.7s) + axiom-clean (`propext`/`Classical.choice`/`Quot.sound` のみ)。FeitSibley 残 sorry
+4 → 3 (2(b) isometry / 2(c) / Theorem)。
+
+- forward/converse とも issue 記載の recipe 通り。converse の全射性は Clifford 対応の
+  全単射補題でなく、新汎用補題 `exists_restrictionMultiplicity_ne_zero_intermediate`
+  (2 段制限恒等式 ⟨Res_N χ, θ⟩ = Σ_ψ ⟨Res_T χ, ψ⟩⟨Res ψ, θ'⟩ の standalone 化) +
+  既約指標直交性で閉じた (`eq_of_induce_eq_induce_...` は不使用)。
+- 新汎用 helper 6 本は FeitSibley.lean の Piece 3b 隣に配置 (compHom roundtrip ×2 /
+  trivial transport ×2 / 定数⟹非自明乗数 0 / 中間 constituent 通過)。将来 hub 判断で
+  CliffordCorrespondence.lean 系へ移設可。
+- ⚠ 技術注意 (再発防止): `restrictionMultiplicity_eq_zero_of_forall_eq_one` の適用は
+  `(N := ...)` 明示 pin 必須 — implicit N が `(x : ↥H)` coercion 経由で ambient 群に誤
+  unify し whnf heartbeat 爆発。bundled ↑⟨_, h⟩ と plain の混在は
+  `simp only [IrreducibleCharacter.coe_mk]` で正規化してから rw/exact する。
+- census テーブル (Lemma 1(a)/2(a) 行) も修正済み。
