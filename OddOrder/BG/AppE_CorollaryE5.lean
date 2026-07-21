@@ -38,7 +38,7 @@ namespace OddOrder.BG.AppE
 open OddOrder.GroupTheory
 open OddOrder.BG.Ch3.S12
 open OddOrder.BG.Ch4.S16
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -891,6 +891,159 @@ theorem exists_normal_abelian_index_prime_of_card_le_cube {S : Type*} [Group S] 
     letI : CommGroup ↥A := IsCyclic.commGroup
     exact ⟨⟨fun a b => mul_comm a b⟩⟩
   · exact IsPGroup.isMulCommutative_of_card_eq_prime_sq (by simpa using hA)
+
+/-- **BG's *"Hence, by (ii), `|S| ≥ p⁴`"*** (p. 165): under (ii), the exponent-`p` group
+`S = Ω₁(O_p(M))` has order at least `p⁴` — smaller orders always carry a normal abelian
+subgroup of index `p` (`exists_normal_abelian_index_prime_of_card_le_cube`). -/
+theorem e5_card_omega_ge_of_ii [Finite G] {M : Subgroup G} {x : G} {p : ℕ}
+    (hp : p.Prime) (hxOp : x ∈ opiCoreInG {p} M) (hord : orderOf x = p)
+    (hii : ¬ ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
+      A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p) :
+    p ^ 4 ≤ Nat.card ↥(Omega ↥(opiCoreInG {p} M) p 1) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpg : IsPGroup p ↥(Omega ↥(opiCoreInG {p} M) p 1) :=
+    (isPGroup_opiCoreInG_singleton M).to_subgroup _
+  obtain ⟨m, hm⟩ := hpg.exists_card_eq
+  have hxΩ : (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) ∈ Omega ↥(opiCoreInG {p} M) p 1 := by
+    refine Omega.mem_of_pow_eq_one ?_
+    have hxp : x ^ p = 1 := hord ▸ pow_orderOf_eq_one x
+    refine Subtype.ext ?_
+    simpa using hxp
+  have hm1 : 1 ≤ m := by
+    by_contra h0
+    have hm0 : m = 0 := by omega
+    rw [hm0, pow_zero, Subgroup.card_eq_one] at hm
+    have h1 : (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) = 1 := Subgroup.mem_bot.mp (hm ▸ hxΩ)
+    have h2 : x = 1 := by simpa using congrArg Subtype.val h1
+    rw [h2, orderOf_one] at hord
+    exact hp.one_lt.ne' hord.symm
+  rcases Nat.lt_or_ge m 4 with h4 | h4
+  · exact absurd (exists_normal_abelian_index_prime_of_card_le_cube hp hm hm1 (by omega))
+      hii
+  · rw [hm]
+    exact Nat.pow_le_pow_right hp.pos h4
+
+/-- **BG's `(ii) ⟹ (i)`, index form** (p. 165): under (ii) and the corrected E.4's `hdc`,
+`|M/M'| = |K₁| = k`.  The corrected Proposition E.4 forces `E` to fix `⟨x⟩`
+(`e5_normal_abelian_of_not_fixes` would otherwise contradict (ii)), so
+`E ≤ N_G(⟨x⟩) ≤ N` and `E = E ⊓ N = K₁` (15.9(c)); the Frobenius quotient
+`M/M_σ ≅ E` then has prime order `k`, hence is abelian, and `M' = M_σ`. -/
+theorem e5_derived_index_eq_of_ii_hdc [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N E K₁ : Subgroup G} {x : G} {p k : ℕ}
+    (hp : p.Prime) (hk : k.Prime) (hkp : k ≠ p) (hord : orderOf x = p)
+    (hxOp : x ∈ opiCoreInG {p} M)
+    (hEnorm : E ≤ Subgroup.normalizer ((opiCoreInG {p} M : Subgroup G) : Set G))
+    (hcardE : ¬ p ∣ Nat.card ↥E)
+    (hK₁E : K₁ ≤ E) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hEfrob : ∀ e ∈ E, e ≠ 1 → ∀ r ∈ opiCoreInG {p} M, r ≠ 1 → e * r * e⁻¹ ≠ r)
+    (hK₁norm : ∀ g ∈ K₁, MulAut.conj g • (Subgroup.zpowers x) = Subgroup.zpowers x)
+    {R₁amb : Subgroup G} (hR₁Op : R₁amb ≤ opiCoreInG {p} M)
+    (hR₁cyc : IsCyclic ↥R₁amb) (hR₁ne : R₁amb ≠ ⊥)
+    (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
+    (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
+      Subgroup.zpowers x ⊔ R₁amb)
+    (hM : M ∈ maximalSubgroups G) (hEM : E ≤ M)
+    (hEcompl : Subgroup.IsComplement'
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))
+    (hNxN : Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≤ N)
+    (hENK₁ : E ⊓ N = K₁)
+    (hii : ¬ ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
+      A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p)
+    (hdc : ∀ n : ℕ,
+      ⁅OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer
+            ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+              Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+          (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) n,
+        Subgroup.centralizer
+          ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+              Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+            Set ↥(Omega ↥(opiCoreInG {p} M) p 1))⁆ ≤
+        OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer
+            ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+              Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+          (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) (n + 2)) :
+    ((derivedInG M).subgroupOf M).index = k := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hcard4 := e5_card_omega_ge_of_ii hp hxOp hord hii
+  -- The corrected E.4 forces `E` to fix `⟨x⟩`.
+  have hfix : ∀ b : ↥E,
+      (conjActionHom hEnorm b) •
+          Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) =
+        Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) := by
+    by_contra hnot
+    exact hii (e5_normal_abelian_of_not_fixes hG hp hk hkp hord hxOp hEnorm hcardE hK₁E
+      hcardK₁ hEfrob hK₁norm hR₁Op hR₁cyc hR₁ne hdisj hcent hcard4 hdc hnot)
+  -- Hence `E` normalizes `⟨x⟩` in the ambient group, so `E ≤ N`.
+  have hzOp : Subgroup.zpowers x ≤ opiCoreInG {p} M := Subgroup.zpowers_le.mpr hxOp
+  have hEnx : E ≤ Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+    intro e he
+    rw [Subgroup.mem_normalizer_iff]
+    intro v
+    have htransport : ∀ (f : ↥E) (v' : G) (hv' : v' ∈ Subgroup.zpowers x),
+        (f : G) * v' * (f : G)⁻¹ ∈ Subgroup.zpowers x := by
+      intro f v' hv'
+      have hw : (⟨v', hzOp hv'⟩ : ↥(opiCoreInG {p} M)) ∈
+          Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) := by
+        obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hv'
+        exact Subgroup.mem_zpowers_iff.mpr ⟨n, Subtype.ext (by simpa using hn)⟩
+      have h2 : conjActionHom hEnorm f ⟨v', hzOp hv'⟩ ∈
+          Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) := by
+        rw [← hfix f, Subgroup.pointwise_smul_def]
+        exact ⟨_, hw, rfl⟩
+      obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp h2
+      have h3 := congrArg Subtype.val hn
+      exact Subgroup.mem_zpowers_iff.mpr ⟨n, h3⟩
+    constructor
+    · intro hv
+      exact htransport ⟨e, he⟩ v hv
+    · intro hv
+      have h4 := htransport ⟨e, he⟩⁻¹ _ hv
+      simpa [mul_assoc] using h4
+  have hEN : E ≤ N := hEnx.trans hNxN
+  have hEK₁ : E = K₁ := by
+    rw [← hENK₁]
+    exact le_antisymm (le_inf le_rfl hEN) inf_le_left
+  -- `[M : M_σ] = |E| = k`.
+  have hidxσ : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index = k := by
+    rw [hEcompl.symm.index_eq_card, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hEM).toEquiv,
+      hEK₁]
+    exact hcardK₁
+  -- `M' = M_σ`: the quotient has prime order `k`, hence is abelian.
+  haveI hMσnorm' : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
+    infer_instance
+  have hderle : derivedInG M ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    haveI : Fact k.Prime := ⟨hk⟩
+    have hcardQ : Nat.card (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) = k := by
+      rw [← Subgroup.index_eq_card]
+      exact hidxσ
+    haveI : IsCyclic (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+      isCyclic_of_prime_card hcardQ
+    letI : CommGroup (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+      IsCyclic.commGroup
+    have hcomm : _root_.commutator ↥M ≤ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M := by
+      rw [_root_.commutator_def, Subgroup.commutator_le]
+      intro a _ b _
+      have h2 := map_commutatorElement
+        (QuotientGroup.mk' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)) a b
+      have h3 : (QuotientGroup.mk' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)) ⁅a, b⁆
+          = 1 := by
+        rw [h2]
+        exact commutatorElement_eq_one_iff_commute.mpr (mul_comm _ _)
+      exact (QuotientGroup.eq_one_iff _).mp h3
+    calc derivedInG M = (_root_.commutator ↥M).map M.subtype := rfl
+      _ ≤ ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).map M.subtype :=
+          Subgroup.map_mono hcomm
+      _ = OddOrder.BG.Ch3.S10.Msigma M :=
+          Subgroup.map_subgroupOf_eq_of_le (OddOrder.BG.Ch3.S10.Msigma_le M)
+  have hdereq : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+    le_antisymm hderle (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)
+  rw [hdereq]
+  exact hidxσ
 
 /-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
 Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
