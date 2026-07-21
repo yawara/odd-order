@@ -52,3 +52,12 @@ instantiate して **printed E.4 の statement そのものの否定**を証明�
 ## 参照
 - 正本 note: `notes/bg/appE_e4_counterexample_2026_07_21.md`
 - Tier 1: issue 3021 (55)。hdc 追加版 E.4 の証明 (別作業) = issue 9402。
+
+## 2026-07-21 中断点 (ユーザー指示「きりのいいところで区切って」)
+
+**WP1-2 完了・commit `ddab0d742` で区切り** (群構築の中核 = 最難関は突破済)。
+次セッションの入口 = **WP3**: `co_zpow` → zpowers 特徴付け → `Commute x vg` の三角 solve
+(centralizer_eq) → Disjoint → gcomm 座標公式 (Z₁/Z₂ 上界)。
+**公式・導出スクリプトの永続正本 = `notes/bg/appE_e4_tier2_group_law.md`**
+(scratchpad は揮発性のため移設済)。WP5 の headline は別 leaf
+`AppE_FiliformRefutation.lean` に置く (AppE_FurtherResults の重 import を隔離)。
