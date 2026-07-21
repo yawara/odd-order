@@ -768,6 +768,38 @@ noncomputable def e5Setup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hval : (a : G) * (r : G) * (a : G)⁻¹ = (r : G) := congrArg Subtype.val hr
     exact hEfrob _ haE hane' _ r.2 hrne' hval
 
+/-- **Small `p`-groups always violate E.5's (ii)**: a group of order `p^n` with
+`1 ≤ n ≤ 3` has a normal abelian subgroup of index `p` (any subgroup of order `p^(n-1)`:
+normal because its index is the least prime factor of `|S|`, abelian because its order is
+at most `p²`).  This is BG's *"Hence, by (ii), `|S| ≥ p⁴`"*. -/
+theorem exists_normal_abelian_index_prime_of_card_le_cube {S : Type*} [Group S] [Finite S]
+    {p n : ℕ} (hp : p.Prime) (hcard : Nat.card S = p ^ n) (hn1 : 1 ≤ n) (hn3 : n ≤ 3) :
+    ∃ A : Subgroup S, A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨A, hA⟩ := Sylow.exists_subgroup_card_pow_prime p
+    (n := n - 1) (by rw [hcard]; exact pow_dvd_pow p (by omega))
+  have hidx : A.index = p := by
+    have hmul := A.card_mul_index
+    rw [hA, hcard] at hmul
+    have hpow : p ^ n = p ^ (n - 1) * p := by
+      rw [← pow_succ]
+      congr 1
+      omega
+    rw [hpow] at hmul
+    exact Nat.eq_of_mul_eq_mul_left (pow_pos hp.pos _) hmul
+  have hnorm : A.Normal := by
+    refine Subgroup.normal_of_index_eq_minFac_card ?_
+    rw [hidx, hcard, Nat.Prime.pow_minFac hp (by omega)]
+  refine ⟨A, hnorm, ?_, hidx⟩
+  interval_cases n
+  · have hA1 : A = ⊥ := Subgroup.card_eq_one.mp (by simpa using hA)
+    subst hA1
+    exact ⟨⟨fun a b => Subsingleton.elim _ _⟩⟩
+  · haveI : IsCyclic ↥A := isCyclic_of_prime_card (by simpa using hA)
+    letI : CommGroup ↥A := IsCyclic.commGroup
+    exact ⟨⟨fun a b => mul_comm a b⟩⟩
+  · exact IsPGroup.isMulCommutative_of_card_eq_prime_sq (by simpa using hA)
+
 /-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
 Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
 collapses onto `K₁`.
