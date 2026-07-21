@@ -408,4 +408,451 @@ theorem e5_msigma_index_prime_of_ii_hdc [Finite G]
   rw [← hder, hidx]
   exact hkprime
 
+/-! ## The `(E.33)`/`(E.34)` counting (BG p. 166) -/
+
+/-- **The final inequality of BG p. 166, pure arithmetic**: with `a = |M_σ|·[G:M] = k*·J`,
+`c = |N*_σ|·[G:N*] = k·J` (`J = [G:Z]`), the four-family measure bound
+`(|M_σ|−1)[G:M] + (|N_σ|−1)[G:N] + (|N*_σ|−1)[G:N*] + (k−1)(k*−1)J ≤ |G| = k·k*·J`
+cancels to `|N_σ|·[G:N] + J ≤ [G:M] + [G:N] + [G:N*]`; with `3[G:M] ≤ |N_σ|·[G:N]`
+(`|M| ≥ 3|M ∩ N|`) and `3[G:N] ≤ J ≥ 3[G:N*]` (`|N|, |N*| ≥ 3kk*`) this collapses to
+`2·(|N_σ|·[G:N]) + J ≤ 0`, absurd.  Stated over shifted variables (`mσ = mσ' + 1`, …)
+so every subtraction is gone. -/
+private theorem e5_counting_arith {mσ' nσ' nstσ' k' kst' iM iN iNst J : ℕ} (hJ : 0 < J)
+    (ha : (mσ' + 1) * iM = (kst' + 1) * J)
+    (hc : (nstσ' + 1) * iNst = (k' + 1) * J)
+    (hsum : mσ' * iM + nσ' * iN + nstσ' * iNst + k' * kst' * J
+      ≤ (k' + 1) * ((kst' + 1) * J))
+    (hiM : 3 * iM ≤ (nσ' + 1) * iN) (hiN : 3 * iN ≤ J) (hiNst : 3 * iNst ≤ J) : False := by
+  have e1 : (mσ' + 1) * iM = mσ' * iM + iM := by ring
+  have e2 : (kst' + 1) * J = kst' * J + J := by ring
+  have e3 : (nstσ' + 1) * iNst = nstσ' * iNst + iNst := by ring
+  have e4 : (k' + 1) * J = k' * J + J := by ring
+  have e5 : (k' + 1) * ((kst' + 1) * J) = k' * kst' * J + (k' * J + (kst' * J + J)) := by
+    ring
+  have e6 : (nσ' + 1) * iN = nσ' * iN + iN := by ring
+  rw [e1, e2] at ha
+  rw [e3, e4] at hc
+  rw [e5] at hsum
+  rw [e6] at hiM
+  set A1 := mσ' * iM with hA1
+  set A2 := nσ' * iN with hA2
+  set A3 := nstσ' * iNst with hA3
+  set A4 := k' * kst' * J with hA4
+  set A5 := k' * J with hA5
+  set A6 := kst' * J with hA6
+  omega
+
+/-- A proper subgroup of odd relative index has index at least `3`: the relative index
+divides the odd `|K|`, and it is not `1`. -/
+theorem three_le_relIndex_of_odd_of_ne {H K : Subgroup G} [Finite G]
+    (hHK : H ≤ K) (hne : H ≠ K) (hodd : Odd (Nat.card ↥K)) :
+    3 ≤ H.relIndex K := by
+  have hmul : Nat.card ↥(H.subgroupOf K) * (H.subgroupOf K).index = Nat.card ↥K :=
+    Subgroup.card_mul_index _
+  have hdvd : H.relIndex K ∣ Nat.card ↥K := Dvd.intro_left _ hmul
+  have hodd' : Odd (H.relIndex K) := hodd.of_dvd_nat hdvd
+  have hne1 : H.relIndex K ≠ 1 := by
+    intro h1
+    exact hne (le_antisymm hHK (Subgroup.relIndex_eq_one.mp h1))
+  obtain ⟨t, ht⟩ := hodd'
+  omega
+
+/-- A type-`F` maximal subgroup is never conjugate to a type-`P` one: `κ` is
+conjugation-invariant, and it is empty for the former, nonempty for the latter. -/
+theorem not_isConjugate_of_isTypeF_of_isTypeP [Finite G] {M L : Subgroup G}
+    (hF : OddOrder.BG.Ch4.S14.IsTypeF M) (hP : OddOrder.BG.Ch4.S14.IsTypeP L) :
+    ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup M L := by
+  rintro ⟨g, rfl⟩
+  rw [OddOrder.BG.Ch4.S14.IsTypeP, OddOrder.BG.Ch4.S14.kappa_conj_smul] at hP
+  rw [OddOrder.BG.Ch4.S14.IsTypeF] at hF
+  rw [hF] at hP
+  exact Set.not_nonempty_empty hP
+
+section Counting
+
+open OddOrder.BG.Ch4.S14
+
+/-- **BG Corollary E.5** (pp. 164–166, with the E.4 correction propagated).  Let `G` be a
+minimal simple group of odd order, `M` a maximal subgroup, `x ∈ M_σ` of prime order `p`
+with `C_G(x) ⊄ M`, and `N ∈ ℳ(C_G(x))` with `N ∉ ℳ_𝓕`.  Assume
+
+* (i) `|M / M'|` is prime, or
+* (ii) `Ω₁(O_p(M))` has no normal abelian subgroup of index `p`, **and** the 2-step
+  centralizer relations `hdc` hold for the chain out of `C_S(Z₂(S))` in
+  `S = Ω₁(O_p(M))` (the corrected Proposition E.4's extra hypothesis; as printed the
+  (ii) branch is irreparable — `printed_propE4_false`).
+
+Then every maximal subgroup of `G` is of type I or type II.
+
+**Proof** (BG p. 166).  Both alternatives give `[M : M_σ] = |K₁| = k` prime
+(`e5_msigma_index_prime_of_ii_hdc` for (ii)).  If some maximal `L` were neither type I
+nor type II, it would be type `P₁` (Prop 16.1: type `F` ⟹ I, type `P₂` ⟹ II), hence
+conjugate to `N` or to its Theorem 14.7 partner `N*` (the covering 14.7(g)) — to `N*`,
+since `N` is `P₂`.  The four conjugacy-saturation families `𝒞_G(M̃)`, `𝒞_G(Ñ)`,
+`𝒞_G(Ñ*)`, `𝒞_G(Ẑ)` are pairwise disjoint (Lemma 14.5(b) plus the `Ẑ`-TI
+separation), of measures `(E.33)`/`(E.34)`; with `|N|, |N*| ≥ 3kk*`
+(`Z = N ⊓ N*` is proper of odd index) and `|M ∩ N| < |M|` the measures sum to more
+than `|G|` (`e5_counting_arith`), a contradiction. -/
+theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M N : Subgroup G} {x : G} {p : ℕ}
+    (hM : M ∈ maximalSubgroups G) (hp : p.Prime)
+    (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hord : orderOf x = p)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
+    (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
+    (hNnotF : N ∉ maximalTypeFFamily G)
+    (halt : ((derivedInG M).subgroupOf M).index.Prime ∨
+      ((¬ ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
+          A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p) ∧
+        ∀ n : ℕ,
+          ⁅OddOrder.Isaacs.Ch04.iterCommutator
+              (Subgroup.centralizer
+                ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                    Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+                  Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+              (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) n,
+            Subgroup.centralizer
+              ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                  Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+                Set ↥(Omega ↥(opiCoreInG {p} M) p 1))⁆ ≤
+            OddOrder.Isaacs.Ch04.iterCommutator
+              (Subgroup.centralizer
+                ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                    Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+                  Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+              (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) (n + 2))) :
+    ∀ L : Subgroup G, L ∈ maximalSubgroups G →
+      OddOrder.GroupTheory.IsTypeI L ∨ OddOrder.GroupTheory.IsTypeII L := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hx1 : x ≠ 1 := fun h => hp.one_lt.ne' (by rw [← hord, h, orderOf_one])
+  -- Shared data: the `(E.29)` neighbour bundle and the 15.9 Frobenius complement.
+  obtain ⟨hNmax, hP2N, hCN, hCNσx, hcompl, hptau2, hsingleton, K₁, U₁, hK₁MN, hU₁MN, hU₁ne,
+    hK₁hallN, hU₁hallN, hkprime, hU₁ab, hK₁normU₁, hsupMN, E₂, E₃, hsetup, hU₁eq⟩ :=
+    e5_neighbour_data hG hM hp hxM hord hesc hNmem hNnotF
+  have hNnotF' : ¬ OddOrder.BG.Ch4.S14.IsTypeF N := fun hF => hNnotF ⟨hNmax, hF⟩
+  obtain ⟨hFM, -, -, E₀, hE₀M, hE₀compl, hE₀cyc, hE₀frob⟩ :=
+    centralizer_escape_final_local hG hM hNmax ⟨hxM, hx1⟩ hesc hNmem hNnotF'
+  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp
+      (maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hM (Or.inl hFM))
+  have hpκσN : p ∈ (kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ :=
+    mem_kappa_sigma_compl_of_mem_tau2 hptau2
+  have hxN : x ∈ N := hCN (Subgroup.mem_centralizer_iff.mpr fun y hy => by
+    rw [Set.mem_singleton_iff.mp hy])
+  obtain ⟨hxOp, habs, -⟩ := e5_R_eq_centralizer hp hxM hord hxN hCN hMσnil hU₁MN
+    hU₁hallN hU₁ab hK₁normU₁ hsupMN hpκσN
+  -- `k = |K₁| ∈ κ(N)`, `k ≠ p`, `K₁` a `σ(M)'`-group; the suitable complement `E ⊇ K₁`.
+  have hK₁N : K₁ ≤ N := hK₁MN.trans inf_le_right
+  have hK₁M : K₁ ≤ M := hK₁MN.trans inf_le_left
+  have hU₁N : U₁ ≤ N := hU₁MN.trans inf_le_right
+  have hkκ : Nat.card ↥K₁ ∈ kappa N := by
+    refine hK₁hallN.1 (Nat.card ↥K₁) ?_
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK₁N).toEquiv]
+    exact Nat.mem_primeFactors.mpr ⟨hkprime, dvd_rfl, Nat.card_pos.ne'⟩
+  have hkp : Nat.card ↥K₁ ≠ p := by
+    intro h
+    rw [Set.mem_compl_iff, Set.mem_union] at hpκσN
+    exact hpκσN (Or.inl (h ▸ hkκ))
+  haveI : Fact (Nat.card ↥K₁).Prime := ⟨hkprime⟩
+  haveI : IsCyclic ↥K₁ := isCyclic_of_prime_card (p := Nat.card ↥K₁) rfl
+  have hCU₁ : ∀ c ∈ K₁, c ≠ 1 → U₁ ⊓ Subgroup.centralizer ({c} : Set G) = ⊥ :=
+    typeP_hall_inf_centralizer_kappaElement_eq_bot hG hNmax hP2N.1
+      hK₁N hU₁N hK₁hallN rfl hU₁hallN
+  have hxU₁ : x ∈ U₁ := habs ⟨hxOp, hxN⟩
+  have hinfMσ : K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥ :=
+    e5_kappaHall_inf_Msigma_eq_bot hp hxM hord hx1 hMσnil hkprime rfl hkp hxU₁ hCU₁
+  have hK₁σ' : ∀ r ∈ (Nat.card ↥K₁).primeFactors, r ∈ (OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    e5_kappaHall_pi_sigma_compl hG hM hK₁M hkprime rfl hinfMσ
+  obtain ⟨E, hEM, hEcompl, hEcyc, hEfrob, hK₁E⟩ :=
+    e5_exists_suitable_complement hG hM hK₁M hK₁σ' hE₀compl hE₀cyc hE₀M hE₀frob
+  -- Both alternatives give `[M : M_σ] = |K₁|`.
+  have hidxprime : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index.Prime := by
+    rcases halt with hi | ⟨hii, hdc⟩
+    · rw [← derivedInG_eq_Msigma_of_cyclic_complement hG hM hEM hEcyc hEcompl]
+      exact hi
+    · exact e5_msigma_index_prime_of_ii_hdc hG hM hp hxM hord hesc hNmem hNnotF hii hdc
+  have hEidx : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index = Nat.card ↥E := by
+    rw [hEcompl.symm.index_eq_card, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hEM).toEquiv]
+  have hidxk : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index = Nat.card ↥K₁ := by
+    have hdvd : Nat.card ↥K₁ ∣ Nat.card ↥E := Subgroup.card_dvd_of_le hK₁E
+    have hprimeE : (Nat.card ↥E).Prime := hEidx ▸ hidxprime
+    rcases hprimeE.eq_one_or_self_of_dvd _ hdvd with h1 | h
+    · exact absurd h1 hkprime.one_lt.ne'
+    · exact hEidx.trans h.symm
+  have hMcard : Nat.card ↥M = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥K₁ := by
+    have h := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    rw [hidxk, Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv] at h
+    exact h.symm
+  -- ===== The counting (BG p. 166) =====
+  intro L hLmax
+  by_contra hLnot
+  push Not at hLnot
+  obtain ⟨hLnotI, hLnotII⟩ := hLnot
+  -- `L` is of type `P₁` (Prop 16.1 forward bridges).
+  have hLP1 : IsTypeP1 L := by
+    by_cases hLF : OddOrder.BG.Ch4.S14.IsTypeF L
+    · exact absurd (isTypeI_of_isTypeF hG hLmax hLF) hLnotI
+    · have hLP : OddOrder.BG.Ch4.S14.IsTypeP L := Set.nonempty_iff_ne_empty.mpr hLF
+      rcases isTypeP_iff_isTypeP1_or_isTypeP2.mp hLP with h1 | h2
+      · exact h1
+      · exact absurd (isTypeII_of_isTypeP2 hG hLmax h2) hLnotII
+  -- The Theorem 14.7 partner `N*` of `N`.
+  set D := dummySigmaDecomposition G with hDdef
+  set Kst : Subgroup G :=
+    OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (K₁ : Set G) with hKstdef
+  obtain ⟨Nst, hNstne, hNstmem, hpart⟩ :=
+    exists_partner hG D hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN
+  obtain ⟨hNstmax, hNstP, hKstNst, hKstHall, hKeq⟩ :=
+    typeP_partner_structure hG hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN
+      hNstmem hNstne hpart
+  have hNncNst : ¬ IsConjugateSubgroup N Nst :=
+    typeP_family_pairwise_nonconjugate hG hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN
+      (Or.inl rfl) hNstmem (Ne.symm hNstne)
+  have hZcyc : IsCyclic ↥(K₁ ⊔ Kst) :=
+    typeP_Z_isCyclic hG D hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN hNstmem hNstne hpart
+  have hZti := typeP_zTilde_isTI hG hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN
+    hNstmem hNstne hpart
+  -- The covering 14.7(g): `L` is conjugate to `N*` (not to the `P₂` `N`).
+  have hNstP1 : IsTypeP1 Nst := by
+    rcases typeP_covering hG hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN hNstmem hNstne
+      hpart hLmax hLP1.1 with hLN | hLNst
+    · obtain ⟨g, hg⟩ := hLN
+      have h2 : IsTypeP2 L := by
+        have h3 := isTypeP2_conj_smul g L
+        rw [hg] at h3
+        exact h3.mp hP2N
+      exact absurd hLP1.2 (fun h => h2.2 h)
+    · obtain ⟨g, hg⟩ := hLNst
+      have h3 := isTypeP1_conj_smul g L
+      rw [hg] at h3
+      exact h3.mpr hLP1
+  -- `N ⊓ N* = Z = K₁ ⊔ K*` (14.7(d)).
+  have hKMsigmaMst : K₁ ≤ OddOrder.BG.Ch3.S10.Msigma Nst :=
+    (le_of_eq hKeq).trans inf_le_left
+  have hMsMst : OddOrder.BG.Ch3.S10.Msigma N ⊓ Nst = Kst :=
+    msigma_inf_partner_eq_kstar hG hNmax hP2N hK₁N hKstdef hNstmax hKMsigmaMst
+      hKstNst hNncNst
+  have hKstN : Kst ≤ N := hKstdef ▸ inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le N)
+  have hKstNe : Kst ≠ ⊥ :=
+    (typeP_structure hG hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN).2.1
+  have hK₁ne : K₁ ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hkprime
+    exact hkprime.one_lt.ne' rfl
+  obtain ⟨hziMMst, -⟩ := partner_inf_and_uniq hG hNstmax hNstP hKstNst hKstHall hKeq
+    hKMsigmaMst hK₁N hKstN hZcyc hKstNe hK₁ne hMsMst
+  -- Measures: `(E.33)` for `M̃`, `Ñ`, `Ñ*`; `(E.34)` for `Ẑ`.
+  have hzeq : zTilde K₁ Kst = ((K₁ ⊔ Kst : Subgroup G) : Set G) \
+      ⋃ N' ∈ ZFamilyFinset N K₁,
+        (((K₁ ⊔ Kst) ⊓ OddOrder.BG.Ch3.S10.Msigma N' : Subgroup G) : Set G) := by
+    simp only [zTilde]
+    rw [family_inf_msigma_union_eq hG hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN
+      hNstmem hNstne hpart]
+  have hstab : ∀ l ∈ K₁ ⊔ Kst,
+      MulAut.conj l • (zTilde K₁ Kst) = zTilde K₁ Kst := by
+    intro l hl
+    rw [hzeq]
+    exact typeP_family_Z_normalizes_T hG hNmax hP2N.1 hK₁N hK₁hallN hKstdef hU₁hallN l hl
+  have hZmeasure : (conjClassSet (zTilde K₁ Kst)).ncard
+      = (Nat.card ↥K₁ - 1) * (Nat.card ↥Kst - 1) * (K₁ ⊔ Kst).index := by
+    rw [ncard_conjClassSet_of_isTISubset hZti hstab,
+      zTilde_ncard_eq hK₁N hK₁hallN hKstdef]
+  have hMmeasure := sigmaConjugacySaturation_Mtilde_ncard hG D hM
+  have hNmeasure := sigmaConjugacySaturation_Mtilde_ncard hG D hNmax
+  have hNstmeasure := sigmaConjugacySaturation_Mtilde_ncard hG D hNstmax
+  -- Pairwise disjointness of the four families.
+  have hd12 := conjClassSet_Mtilde_disjoint hG D hM hNmax
+    (not_isConjugate_of_isTypeF_of_isTypeP hFM hP2N.1)
+  have hd13 := conjClassSet_Mtilde_disjoint hG D hM hNstmax
+    (not_isConjugate_of_isTypeF_of_isTypeP hFM hNstP)
+  have hd23 := conjClassSet_Mtilde_disjoint hG D hNmax hNstmax hNncNst
+  have hdZ : ∀ {Mi : Subgroup G}, Mi ∈ maximalSubgroups G →
+      Disjoint (conjClassSet (zTilde K₁ Kst)) (conjClassSet (Mtilde hG D Mi)) := by
+    intro Mi hMi
+    have h := conjClassSet_T_Mtilde_disjoint hG D hNmax hP2N.1 hK₁N hK₁hallN hKstdef
+      hU₁hallN hMi
+    rw [← hzeq] at h
+    exact h
+  -- The four disjoint families measure at most `|G|`.
+  have hsum4 : (conjClassSet (Mtilde hG D M)).ncard + (conjClassSet (Mtilde hG D N)).ncard
+      + (conjClassSet (Mtilde hG D Nst)).ncard + (conjClassSet (zTilde K₁ Kst)).ncard
+      ≤ Nat.card G := by
+    set S1 := conjClassSet (Mtilde hG D M)
+    set S2 := conjClassSet (Mtilde hG D N)
+    set S3 := conjClassSet (Mtilde hG D Nst)
+    set S4 := conjClassSet (zTilde K₁ Kst)
+    have hu : (S1 ∪ S2 ∪ S3 ∪ S4).ncard = S1.ncard + S2.ncard + S3.ncard + S4.ncard := by
+      rw [Set.ncard_union_eq (by
+          rw [Set.disjoint_union_left, Set.disjoint_union_left]
+          exact ⟨⟨(hdZ hM).symm, (hdZ hNmax).symm⟩, (hdZ hNstmax).symm⟩)
+        (Set.toFinite _) (Set.toFinite _),
+        Set.ncard_union_eq (by
+          rw [Set.disjoint_union_left]
+          exact ⟨hd13, hd23⟩) (Set.toFinite _) (Set.toFinite _),
+        Set.ncard_union_eq hd12 (Set.toFinite _) (Set.toFinite _)]
+    calc S1.ncard + S2.ncard + S3.ncard + S4.ncard = (S1 ∪ S2 ∪ S3 ∪ S4).ncard := hu.symm
+      _ ≤ (Set.univ : Set G).ncard :=
+          Set.ncard_le_ncard (Set.subset_univ _) Set.finite_univ
+      _ = Nat.card G := by rw [Set.ncard_univ]
+  -- Cardinal identities.
+  have hNcard : Nat.card ↥N
+      = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * Nat.card ↥(M ⊓ N) := by
+    have h := hcompl.card_mul
+    rw [Nat.card_congr
+        (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le N)).toEquiv,
+      Nat.card_congr
+        (Subgroup.subgroupOfEquivOfLe (inf_le_right : M ⊓ N ≤ N)).toEquiv] at h
+    exact h.symm
+  have hNstcard : Nat.card ↥Nst
+      = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Nst) * Nat.card ↥Kst :=
+    typeP1_card_eq hG hNstmax hNstP1 hKstNst hKstHall
+  have hZcard : Nat.card ↥(K₁ ⊔ Kst : Subgroup G) = Nat.card ↥K₁ * Nat.card ↥Kst :=
+    card_kappaHall_sup_Kstar hK₁N hK₁hallN hKstdef
+  -- The `≥ 3` bounds: `|M| ≥ 3|M ∩ N|`, `|N| ≥ 3kk*`, `|N*| ≥ 3kk*`.
+  have hMNneM : M ⊓ N ≠ M := by
+    intro h
+    have hMleN : M ≤ N := by rw [← h]; exact inf_le_right
+    have hMN : M = N := by
+      rcases lt_or_eq_of_le hMleN with hlt | heq
+      · exact absurd ((mem_maximalSubgroups.mp hM).2 _ hlt)
+          (mem_maximalSubgroups.mp hNmax).1
+      · exact heq
+    have hne : (kappa N).Nonempty := hP2N.1
+    rw [← hMN, hFM] at hne
+    exact Set.not_nonempty_empty hne
+  have hZleN : (K₁ ⊔ Kst : Subgroup G) ≤ N := hziMMst ▸ inf_le_left
+  have hZleNst : (K₁ ⊔ Kst : Subgroup G) ≤ Nst := hziMMst ▸ inf_le_right
+  have hZneN : (K₁ ⊔ Kst : Subgroup G) ≠ N := by
+    intro h
+    have hNle : N ≤ Nst := by
+      have h2 : N ⊓ Nst = N := by rw [hziMMst, h]
+      exact inf_eq_left.mp h2
+    have : N = Nst := by
+      rcases lt_or_eq_of_le hNle with hlt | heq
+      · exact absurd ((mem_maximalSubgroups.mp hNmax).2 _ hlt)
+          (mem_maximalSubgroups.mp hNstmax).1
+      · exact heq
+    exact hNstne this.symm
+  have hZneNst : (K₁ ⊔ Kst : Subgroup G) ≠ Nst := by
+    intro h
+    have hNstle : Nst ≤ N := h ▸ hZleN
+    have : Nst = N := by
+      rcases lt_or_eq_of_le hNstle with hlt | heq
+      · exact absurd ((mem_maximalSubgroups.mp hNstmax).2 _ hlt)
+          (mem_maximalSubgroups.mp hNmax).1
+      · exact heq
+    exact hNstne this
+  have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hoddN : Odd (Nat.card ↥N) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card N)
+  have hoddNst : Odd (Nat.card ↥Nst) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card Nst)
+  have hge3 : ∀ {H K : Subgroup G}, H ≤ K → H ≠ K → Odd (Nat.card ↥K) →
+      3 * Nat.card ↥H ≤ Nat.card ↥K := by
+    intro H K hHK hne hodd
+    have h3 := three_le_relIndex_of_odd_of_ne hHK hne hodd
+    have hmul : Nat.card ↥(H.subgroupOf K) * (H.subgroupOf K).index = Nat.card ↥K :=
+      Subgroup.card_mul_index _
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv] at hmul
+    calc 3 * Nat.card ↥H = Nat.card ↥H * 3 := by ring
+      _ ≤ Nat.card ↥H * (H.subgroupOf K).index := Nat.mul_le_mul_left _ h3
+      _ = Nat.card ↥K := hmul
+  have hMge : 3 * Nat.card ↥(M ⊓ N) ≤ Nat.card ↥M := hge3 inf_le_left hMNneM hoddM
+  have hNge : 3 * (Nat.card ↥K₁ * Nat.card ↥Kst) ≤ Nat.card ↥N := by
+    have := hge3 hZleN hZneN hoddN
+    rwa [hZcard] at this
+  have hNstge : 3 * (Nat.card ↥K₁ * Nat.card ↥Kst) ≤ Nat.card ↥Nst := by
+    have := hge3 hZleNst hZneNst hoddNst
+    rwa [hZcard] at this
+  -- Shift every cardinal to eliminate `ℕ`-subtraction, and assemble the arithmetic.
+  obtain ⟨mσ', hmσ'⟩ : ∃ t, Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) = t + 1 :=
+    ⟨_, (Nat.succ_pred_eq_of_pos Nat.card_pos).symm⟩
+  obtain ⟨nσ', hnσ'⟩ : ∃ t, Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) = t + 1 :=
+    ⟨_, (Nat.succ_pred_eq_of_pos Nat.card_pos).symm⟩
+  obtain ⟨nstσ', hnstσ'⟩ : ∃ t, Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Nst) = t + 1 :=
+    ⟨_, (Nat.succ_pred_eq_of_pos Nat.card_pos).symm⟩
+  obtain ⟨k', hk'⟩ : ∃ t, Nat.card ↥K₁ = t + 1 :=
+    ⟨_, (Nat.succ_pred_eq_of_pos Nat.card_pos).symm⟩
+  obtain ⟨kst', hkst'⟩ : ∃ t, Nat.card ↥Kst = t + 1 :=
+    ⟨_, (Nat.succ_pred_eq_of_pos Nat.card_pos).symm⟩
+  have hJpos : 0 < (K₁ ⊔ Kst : Subgroup G).index :=
+    Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  have hGZ : Nat.card G
+      = Nat.card ↥K₁ * (Nat.card ↥Kst * (K₁ ⊔ Kst : Subgroup G).index) := by
+    calc Nat.card G = Nat.card ↥(K₁ ⊔ Kst : Subgroup G) * (K₁ ⊔ Kst : Subgroup G).index :=
+        (Subgroup.card_mul_index _).symm
+      _ = Nat.card ↥K₁ * (Nat.card ↥Kst * (K₁ ⊔ Kst : Subgroup G).index) := by
+          rw [hZcard]; ring
+  -- `a`: `|M_σ|·[G:M] = k*·J` (cancel `k`).
+  have ha : (mσ' + 1) * M.index = (kst' + 1) * (K₁ ⊔ Kst : Subgroup G).index := by
+    rw [← hmσ', ← hkst']
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥K₁)) ?_
+    calc Nat.card ↥K₁ * (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * M.index)
+        = (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥K₁) * M.index := by ring
+      _ = Nat.card ↥M * M.index := by rw [← hMcard]
+      _ = Nat.card G := Subgroup.card_mul_index M
+      _ = Nat.card ↥K₁ * (Nat.card ↥Kst * (K₁ ⊔ Kst : Subgroup G).index) := hGZ
+  -- `c`: `|N*_σ|·[G:N*] = k·J` (cancel `k*`).
+  have hc : (nstσ' + 1) * Nst.index = (k' + 1) * (K₁ ⊔ Kst : Subgroup G).index := by
+    rw [← hnstσ', ← hk']
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥Kst)) ?_
+    calc Nat.card ↥Kst * (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Nst) * Nst.index)
+        = (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Nst) * Nat.card ↥Kst) * Nst.index := by
+          ring
+      _ = Nat.card ↥Nst * Nst.index := by rw [← hNstcard]
+      _ = Nat.card G := Subgroup.card_mul_index Nst
+      _ = Nat.card ↥Kst * (Nat.card ↥K₁ * (K₁ ⊔ Kst : Subgroup G).index) := by
+          rw [hGZ]; ring
+  -- The measure inequality, in shifted form.
+  have hsum' : mσ' * M.index + nσ' * N.index + nstσ' * Nst.index
+      + k' * kst' * (K₁ ⊔ Kst : Subgroup G).index
+      ≤ (k' + 1) * ((kst' + 1) * (K₁ ⊔ Kst : Subgroup G).index) := by
+    have h4 := hsum4
+    rw [hMmeasure, hNmeasure, hNstmeasure, hZmeasure, hmσ', hnσ', hnstσ', hk', hkst']
+      at h4
+    simp only [Nat.add_sub_cancel] at h4
+    have hcardG : Nat.card G
+        = (k' + 1) * ((kst' + 1) * (K₁ ⊔ Kst : Subgroup G).index) := by
+      rw [← hk', ← hkst']
+      exact hGZ
+    rw [hcardG] at h4
+    calc mσ' * M.index + nσ' * N.index + nstσ' * Nst.index
+        + k' * kst' * (K₁ ⊔ Kst : Subgroup G).index
+        = mσ' * M.index + nσ' * N.index + nstσ' * Nst.index
+          + k' * kst' * (K₁ ⊔ Kst : Subgroup G).index := rfl
+      _ ≤ (k' + 1) * ((kst' + 1) * (K₁ ⊔ Kst : Subgroup G).index) := h4
+  -- `3[G:M] ≤ |N_σ|·[G:N]` (cancel `|M ∩ N|`).
+  have hiM : 3 * M.index ≤ (nσ' + 1) * N.index := by
+    rw [← hnσ']
+    refine Nat.le_of_mul_le_mul_left ?_ (Nat.card_pos (α := ↥(M ⊓ N : Subgroup G)))
+    calc Nat.card ↥(M ⊓ N : Subgroup G) * (3 * M.index)
+        = (3 * Nat.card ↥(M ⊓ N : Subgroup G)) * M.index := by ring
+      _ ≤ Nat.card ↥M * M.index := Nat.mul_le_mul_right _ hMge
+      _ = Nat.card G := Subgroup.card_mul_index M
+      _ = Nat.card ↥N * N.index := (Subgroup.card_mul_index N).symm
+      _ = Nat.card ↥(M ⊓ N : Subgroup G)
+          * (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * N.index) := by rw [hNcard]; ring
+  -- `3[G:N] ≤ J` and `3[G:N*] ≤ J` (cancel `kk*`).
+  have hiN : 3 * N.index ≤ (K₁ ⊔ Kst : Subgroup G).index := by
+    refine Nat.le_of_mul_le_mul_left ?_
+      (Nat.mul_pos (Nat.card_pos (α := ↥K₁)) (Nat.card_pos (α := ↥Kst)))
+    calc (Nat.card ↥K₁ * Nat.card ↥Kst) * (3 * N.index)
+        = (3 * (Nat.card ↥K₁ * Nat.card ↥Kst)) * N.index := by ring
+      _ ≤ Nat.card ↥N * N.index := Nat.mul_le_mul_right _ hNge
+      _ = Nat.card G := Subgroup.card_mul_index N
+      _ = (Nat.card ↥K₁ * Nat.card ↥Kst) * (K₁ ⊔ Kst : Subgroup G).index := by
+          rw [hGZ]; ring
+  have hiNst : 3 * Nst.index ≤ (K₁ ⊔ Kst : Subgroup G).index := by
+    refine Nat.le_of_mul_le_mul_left ?_
+      (Nat.mul_pos (Nat.card_pos (α := ↥K₁)) (Nat.card_pos (α := ↥Kst)))
+    calc (Nat.card ↥K₁ * Nat.card ↥Kst) * (3 * Nst.index)
+        = (3 * (Nat.card ↥K₁ * Nat.card ↥Kst)) * Nst.index := by ring
+      _ ≤ Nat.card ↥Nst * Nst.index := Nat.mul_le_mul_right _ hNstge
+      _ = Nat.card G := Subgroup.card_mul_index Nst
+      _ = (Nat.card ↥K₁ * Nat.card ↥Kst) * (K₁ ⊔ Kst : Subgroup G).index := by
+          rw [hGZ]; ring
+  exact e5_counting_arith hJpos ha hc hsum' hiM hiN hiNst
+
+end Counting
+
 end OddOrder.BG.AppE

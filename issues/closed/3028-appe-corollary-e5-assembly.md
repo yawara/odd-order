@@ -13,11 +13,14 @@ created: 2026-07-21
 
 ## やること
 
-- [ ]
+- [x] WP1 (E.29) / WP2 (E.30) / WP2.5 (15.9(c)) / WP3 (setup) / WP4 ((ii)∧hdc⟹(i)) / WP5 (glue + counting)
 
 ## 完了条件
 
-<!-- 何をもって closed とするか. 例: 該当 sorry が消える / lake build が通る / ノート x.md を書く -->
+- [x] `maximalSubgroups_isTypeI_or_isTypeII` 完全証明 (AppE_E5Counting.lean、sorry-free、
+  axioms = [propext, Classical.choice, Quot.sound]、AxiomsCheck 登録済)
+- [x] AppE_FurtherResults.lean の sorried statement 削除 → **同 file sorry-free 化**
+- [x] **BG Appendix E 全結果 (E.1–E.5) 形式化完了**
 
 ## 参照
 
@@ -320,3 +323,14 @@ WP5 glue は新 leaf `AppE_E5Counting.lean` 予定 (未作成 — 実体がで�
 - 最後に `maximalSubgroups_isTypeI_or_isTypeII` 本体 (branch (i) は
   `derivedInG_eq_Msigma_of_cyclic_complement` で直変換) + AppE_FurtherResults の sorried
   statement 削除 (E.4 パターン)。dummy D = `dummySigmaDecomposition G` (TypePDuality:161)。
+
+## 2026-07-21 ⭐⭐⭐ WP5 完了 = **Cor E.5 完全証明・Appendix E 完結**
+
+`maximalSubgroups_isTypeI_or_isTypeII` (AppE_E5Counting.lean) sorry-free、
+axioms = [propext, Classical.choice, Quot.sound]。counting は上記設計どおり:
+partner replay (exists_partner + typeP_partner_structure + msigma_inf_partner_eq_kstar +
+partner_inf_and_uniq) → 4 族 disjoint 測度 ((E.33) sigmaConjugacySaturation_Mtilde_ncard ×3
++ (E.34) ncard_conjClassSet_of_isTISubset/zTilde_ncard_eq) → 純 ℕ 算術
+`e5_counting_arith` (atom 化 + omega、減算は shifted 変数で除去)。
+AppE_FurtherResults は sorried statement 削除で **sorry-free 化** (header 表更新)。
+AxiomsCheck 登録済 (4549 jobs green)。issue closed。
