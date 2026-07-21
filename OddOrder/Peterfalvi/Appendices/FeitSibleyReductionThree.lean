@@ -578,4 +578,144 @@ theorem XsetOf_nonempty [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
 
 end Hypothesis
 
+/-! ## The (3.1) numeric core (p. 147)
+
+Degrees in `𝒳₁` are `d·p^k` (`exists_apply_one_eq_d_mul_pow`); the chain
+adjoins of Part A need, at a step of degree `d·p^k` with anchor `d·p^{k₀}`,
+the strict bound `2·p^{k₀}·p^k < ∑_{S₁} p^{2k_x}` — the `hlt` of
+`coherent_insert_pair_of_two_mul_lt_sum`.  It follows from `p^{2k}` dividing
+the accumulated sum (Peterfalvi's (3.1) divisibility): `p^{2k} ≤ |Q₁⧸Z|`
+([Is] 2.30) makes `p^{2k}` divide the counting total (`|Q₁⧸Z|` is a `p`-power
+and `p ∤ d`), the unaccumulated members all have `k_x ≥ k`, and `p ≥ 3`,
+`k₀ < k` close the arithmetic. -/
+
+/-- A `p`-power bounded below by `p^i` is divisible by `p^i`. -/
+theorem pow_dvd_of_exists_pow_of_le {p i n : ℕ} (hp : 1 < p)
+    (hn : ∃ j, n = p ^ j) (hle : p ^ i ≤ n) : p ^ i ∣ n := by
+  obtain ⟨j, rfl⟩ := hn
+  exact Nat.pow_dvd_pow p ((Nat.pow_le_pow_iff_right hp).mp hle)
+
+/-- **The (3.1) numeric key** (p. 147): if `p ≥ 3`, `k₀ < k`, and `p^{2k}`
+divides a positive sum `s`, then `2·p^{k₀}·p^k < s` — Peterfalvi's
+`2χ₁(1)χᵢ(1) < pχ₁(1)χᵢ(1) ≤ χᵢ(1)² ≤ ∑_{j<i} χⱼ(1)²` with `d²` cancelled:
+`2·p^{k₀+k} < p^{k₀+k+1} ≤ p^{2k} ≤ s`. -/
+theorem two_mul_pow_lt_of_pow_dvd {p k₀ k s : ℕ} (hp : 3 ≤ p) (hk : k₀ < k)
+    (hdvd : p ^ (2 * k) ∣ s) (hs : 0 < s) :
+    2 * (p ^ k₀ : ℝ) * (p ^ k : ℝ) < (s : ℝ) := by
+  have hppos : 0 < p := by omega
+  have hX : 0 < p ^ k₀ * p ^ k := Nat.mul_pos (pow_pos hppos k₀) (pow_pos hppos k)
+  have h1 : 2 * (p ^ k₀ * p ^ k) < p * (p ^ k₀ * p ^ k) :=
+    (Nat.mul_lt_mul_right hX).mpr (by omega)
+  have h2 : p * (p ^ k₀ * p ^ k) = p ^ (k₀ + k + 1) := by ring
+  have h3 : p ^ (k₀ + k + 1) ≤ p ^ (2 * k) :=
+    Nat.pow_le_pow_right hppos (by omega)
+  have h4 : 2 * (p ^ k₀ * p ^ k) < s :=
+    ((h1.trans_eq h2).trans_le h3).trans_le (Nat.le_of_dvd hs hdvd)
+  calc 2 * (p ^ k₀ : ℝ) * (p ^ k : ℝ)
+      = ((2 * (p ^ k₀ * p ^ k) : ℕ) : ℝ) := by push_cast; ring
+    _ < (s : ℝ) := by exact_mod_cast h4
+
+namespace Hypothesis
+
+variable (hyp : Hypothesis G)
+
+/-- **`|Q₁⧸Z|` is a `p`-power** for a `p`-group `Q₁` (Lagrange: the coset
+count divides `|Q₁| = p^n`). -/
+theorem exists_card_quot_Q1_eq_pow [Finite G] {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) (Z : Subgroup G) :
+    ∃ j, Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) = p ^ j := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
+  have hdvd : Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) ∣ p ^ n := by
+    rw [← hn, ← Subgroup.index_eq_card]
+    exact Subgroup.index_dvd_card _
+  obtain ⟨m, -, hm⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+  exact ⟨m, hm⟩
+
+/-- **`(p, d) = 1`** for a `p`-group `Q₁`: `p ∣ |Q₁| ∣ |Q|` (`Q₁` is
+nontrivial) and `(|Q|, |D|) = 1`. -/
+theorem coprime_d_of_isPGroup [Finite G] {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) : Nat.Coprime p hyp.d := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    intro h0
+    rw [h0, pow_zero] at hn
+    haveI := hyp.nontrivial_Q1
+    have := Finite.one_lt_card (α := ↥hyp.Q1)
+    omega
+  have hpQ1 : p ∣ Nat.card ↥hyp.Q1 := hn ▸ dvd_pow_self p hn0
+  have hQ1Q : Nat.card ↥hyp.Q1 ∣ Nat.card ↥hyp.Q :=
+    Subgroup.card_dvd_of_le hyp.Q1_le_Q
+  exact Nat.Coprime.coprime_dvd_left (hpQ1.trans hQ1Q) hyp.coprime_Q_D
+
+open scoped Classical in
+/-- **The step (3) counting in exponent units** (ℕ): with every member of
+`𝒳(A',Z)` of degree `d·p^{k(x)}`,
+`d·∑_x p^{2k(x)} = |S⧸A'|·|Q₁⧸Z|·(|Z|−1)` — the `T`-factorisation
+`sum_degreeSq_XsetOf_eq_mul` with one `d` cancelled against the degrees. -/
+theorem d_mul_sum_pow_eq [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf A' Z).Finite) {p : ℕ}
+    {k : ClassFunction ↥hyp.H ℂ → ℕ}
+    (hk : ∀ x ∈ hyp.XsetOf A' Z,
+      x (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ k x : ℕ) : ℂ)) :
+    hyp.d * ∑ x ∈ hfin.toFinset, p ^ (2 * k x)
+      = Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S)
+        * Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) * (Nat.card ↥Z - 1) := by
+  have hsum := hyp.sum_degreeSq_XsetOf_eq_mul hA' hZQ1 hfin
+  have hL : ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+      = ((hyp.d : ℕ) : ℂ) ^ 2 * ∑ x ∈ hfin.toFinset, ((p ^ (2 * k x) : ℕ) : ℂ) := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun x hx => ?_
+    rw [hk x (hfin.mem_toFinset.mp hx)]
+    push_cast
+    rw [pow_mul']
+    ring
+  rw [hL] at hsum
+  have hdne : ((hyp.d : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  have hz1 : 1 ≤ Nat.card ↥Z := Nat.card_pos
+  have h2 : ((hyp.d : ℕ) : ℂ) * ∑ x ∈ hfin.toFinset, ((p ^ (2 * k x) : ℕ) : ℂ)
+      = (Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) : ℂ)
+        * (Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) : ℂ)
+        * ((Nat.card ↥Z : ℂ) - 1) := by
+    refine mul_left_cancel₀ hdne ?_
+    linear_combination hsum
+  have h3 : ((hyp.d * ∑ x ∈ hfin.toFinset, p ^ (2 * k x) : ℕ) : ℂ)
+      = ((Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S)
+          * Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1)
+          * (Nat.card ↥Z - 1) : ℕ) : ℂ) := by
+    push_cast [Nat.cast_sub hz1] at h2 ⊢
+    linear_combination h2
+  exact Nat.cast_injective h3
+
+open scoped Classical in
+/-- **The (3.1) divisibility of the exponent total** (p. 147): if the step
+degree obeys `p^j ≤ |Q₁⧸Z|` (supplied by [Is] Cor. 2.30 at `j = 2k`), then
+`p^j` divides `W = ∑_{𝒳(A',Z)} p^{2k(x)}`: `p^j ∣ |Q₁⧸Z| ∣ d·W`
+(`d_mul_sum_pow_eq`) and `(p^j, d) = 1`. -/
+theorem pow_dvd_sum_pow [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf A' Z).Finite) {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1)
+    {k : ClassFunction ↥hyp.H ℂ → ℕ}
+    (hk : ∀ x ∈ hyp.XsetOf A' Z,
+      x (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ k x : ℕ) : ℂ))
+    {j : ℕ} (hle : p ^ j ≤ Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1)) :
+    p ^ j ∣ ∑ x ∈ hfin.toFinset, p ^ (2 * k x) := by
+  have hW := hyp.d_mul_sum_pow_eq hA' hZQ1 hfin hk
+  have hdvd_n : p ^ j ∣ Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) :=
+    pow_dvd_of_exists_pow_of_le hp.one_lt
+      (hyp.exists_card_quot_Q1_eq_pow hp hQ1p Z) hle
+  have hdvd_T : p ^ j ∣ hyp.d * ∑ x ∈ hfin.toFinset, p ^ (2 * k x) := by
+    rw [hW]
+    exact ((hdvd_n.mul_left _).mul_right _)
+  exact ((hyp.coprime_d_of_isPGroup hp hQ1p).pow_left j).dvd_of_dvd_mul_left hdvd_T
+
+end Hypothesis
+
 end OddOrder.Peterfalvi.Appendices.FeitSibley
