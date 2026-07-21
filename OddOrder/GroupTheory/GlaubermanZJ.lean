@@ -382,6 +382,86 @@ theorem le_sSupNormalNormalizing_of_isPStableOp [Finite G] {p : ℕ} [Fact p.Pri
   rw [hbot, Subgroup.mem_bot] at h1
   exact (QuotientGroup.eq_one_iff a).mp h1
 
+/-! ### Thm 2.10 step (d): `B = normalClosure (Z ⊓ B) ≤ Z(J_a(P ⊓ L))` -/
+
+/-- **Frattini 分解による normal closure の吸収**: `L ⊔ N(X) = ⊤`, `L ⊴ G`,
+`L ≤ N(W)`, `W ≤ X` なら `normalClosure W ≤ X`
+(`g = n·l` 分解で `W^g = (W^l)^n = W^n ≤ X^n = X`). -/
+theorem normalClosure_le_of_sup_normalizer_eq_top {L W X : Subgroup G} [L.Normal]
+    (hsup : L ⊔ normalizer (X : Set G) = ⊤)
+    (hLW : L ≤ normalizer (W : Set G)) (hWX : W ≤ X) :
+    normalClosure (W : Set G) ≤ X := by
+  refine (closure_le X).mpr ?_
+  intro a ha
+  rw [Group.mem_conjugatesOfSet_iff] at ha
+  obtain ⟨b, hb, hconj⟩ := ha
+  obtain ⟨c, rfl⟩ := isConj_iff.mp hconj
+  have hctop : c ∈ ((normalizer (X : Set G) : Subgroup G) : Set G) * (L : Set G) := by
+    rw [← Subgroup.mul_normal]
+    show c ∈ ((normalizer (X : Set G) ⊔ L : Subgroup G) : Set G)
+    rw [sup_comm, hsup]
+    exact Subgroup.mem_top c
+  rw [Set.mem_mul] at hctop
+  obtain ⟨n, hn, l, hl, rfl⟩ := hctop
+  have hbW : l * b * l⁻¹ ∈ W := (mem_normalizer_iff.mp (hLW hl) b).mp hb
+  have hbX : n * (l * b * l⁻¹) * n⁻¹ ∈ X :=
+    (mem_normalizer_iff.mp hn _).mp (hWX hbW)
+  have heq : n * l * b * (n * l)⁻¹ = n * (l * b * l⁻¹) * n⁻¹ := by group
+  rw [SetLike.mem_coe, heq]
+  exact hbX
+
+/-- **Thm 2.10 step (d)** (Gorenstein p. 279): `W ≤ Z(J_a(P))`, `A ∈ A(P)`,
+`A ≤ L := sSupNormalNormalizing W` なら `normalClosure W ≤ X := Z(J_a(P ⊓ L))`
+(Thm 2.10 では `W = Z ⊓ B`, `B = normalClosure W` に適用して **`B` abelian** を得る).
+
+`A ≤ P ⊓ L` が `A(P⊓L)` の witness になり `J_a(P⊓L) ≤ J_a(P)` (Lem 2.2(a));
+`W ≤ Z(J_a(P)) ≤ A ≤ J_a(P⊓L)` (Lem 2.1 系 2) と `W ≤ C(J_a(P)) ≤ C(J_a(P⊓L))` で
+`W ≤ X`; Frattini `G = L·N(J_a(P⊓L))` (Thm 1.3.7/1.3.8) + `N(J_a) ≤ N(X)` +
+`L ≤ N(W)` で normal closure が `X` に吸収される. -/
+theorem normalClosure_le_zCenter_thompsonJAbelian_inf [Finite G] {p : ℕ}
+    [Fact p.Prime] (P : Sylow p G) {W A : Subgroup G}
+    (hWZ : W ≤ centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G))
+    (hA : A ∈ maxAbelianIn (P : Subgroup G))
+    (hAL : A ≤ sSupNormalNormalizing W) :
+    normalClosure (W : Set G)
+      ≤ centralizer
+          ((thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)) : Set G)
+        ⊓ thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W) := by
+  haveI := sSupNormalNormalizing_normal W
+  have hAPL : A ≤ (P : Subgroup G) ⊓ sSupNormalNormalizing W := le_inf hA.1 hAL
+  have hAin : A ∈ maxAbelianIn ((P : Subgroup G) ⊓ sSupNormalNormalizing W) :=
+    ⟨hAPL, hA.2.1, fun B' hB' hB'comm => hA.2.2 B' (hB'.trans inf_le_left) hB'comm⟩
+  have hJle : thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)
+      ≤ thompsonJAbelian (P : Subgroup G) :=
+    thompsonJAbelian_le_of_le inf_le_left hA hAPL
+  have hWX : W ≤ centralizer
+      ((thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)) : Set G)
+      ⊓ thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W) :=
+    le_inf
+      ((hWZ.trans inf_le_left).trans
+        (centralizer_le (SetLike.coe_subset_coe.mpr hJle)))
+      ((hWZ.trans (zCenter_thompsonJAbelian_le_of_mem_maxAbelianIn hA)).trans
+        (le_thompsonJAbelian_of_mem_maxAbelianIn hAin))
+  obtain ⟨Q, hQ⟩ := exists_sylow_inf_of_normal P (sSupNormalNormalizing W)
+  have hfr := frattini_normalizer_thompsonJAbelian Q
+  have hmap : ((Q : Subgroup ↥(sSupNormalNormalizing W)).map
+      (sSupNormalNormalizing W).subtype)
+      = (P : Subgroup G) ⊓ sSupNormalNormalizing W := by
+    rw [hQ, subgroupOf_map_subtype]
+    exact inf_eq_left.mpr inf_le_right
+  rw [hmap] at hfr
+  have hsup : sSupNormalNormalizing W
+      ⊔ normalizer ((centralizer
+          ((thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)) : Set G)
+        ⊓ thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)
+          : Subgroup G) : Set G) = ⊤ := by
+    rw [eq_top_iff, ← hfr]
+    refine sup_le_sup_left (fun g hg => ?_) _
+    exact mem_normalizer_inf (mem_normalizer_centralizer hg) hg
+  exact normalClosure_le_of_sup_normalizer_eq_top hsup
+    (sSupNormalNormalizing_le_normalizer W) hWX
+
 end Subgroup
 
 

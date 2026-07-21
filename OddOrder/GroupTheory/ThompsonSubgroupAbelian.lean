@@ -149,6 +149,28 @@ theorem centralizer_inf_le_of_mem_maxAbelianIn [Finite G] {P A : Subgroup G}
   exact (eq_inf_centralizer_of_mem_maxAbelianIn hA).ge
     ⟨hx.2, centralizer_le (SetLike.coe_subset_coe.mpr hA.1) hx.1⟩
 
+/-- **Gorenstein Lemma 2.1 の系 2**: `Z(J_a(P)) ≤ A` for `A ∈ A(P)`
+(`Z(J_a(P))` は `C(J_a(P)) ⊓ J_a(P)` で符号化): `A ≤ J_a(P)` ゆえ
+`Z(J_a(P)) ≤ P ⊓ C(A) = A` (**Lemma 2.1**). -/
+theorem zCenter_thompsonJAbelian_le_of_mem_maxAbelianIn [Finite G] {P A : Subgroup G}
+    (hA : A ∈ maxAbelianIn P) :
+    centralizer ((thompsonJAbelian P : Subgroup G) : Set G) ⊓ thompsonJAbelian P
+      ≤ A := by
+  intro z hz
+  refine (eq_inf_centralizer_of_mem_maxAbelianIn hA).ge ⟨?_, ?_⟩
+  · exact (thompsonJAbelian_le P) hz.2
+  · exact centralizer_le (SetLike.coe_subset_coe.mpr
+      (le_thompsonJAbelian_of_mem_maxAbelianIn hA)) hz.1
+
+/-- `Z(K)`-型の符号化 `C(K) ⊓ K` は abelian (両元とも `K` に属しつつ `K` を中心化). -/
+theorem isMulCommutative_centralizer_inf (K : Subgroup G) :
+    IsMulCommutative ((centralizer (K : Set G) ⊓ K : Subgroup G)) := by
+  constructor
+  constructor
+  intro a b
+  ext
+  exact (mem_centralizer_iff.mp a.2.1 b.1 b.2.2).symm
+
 /-- **Gorenstein Lemma 2.3**: `A ∈ A(P)`, `B ≤ P` について
 `B` が `A` を正規化する ⟺ `⁅⁅B,A⁆,A⁆ = ⊥`.
 

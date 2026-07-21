@@ -550,12 +550,8 @@ theorem glauberman_replacement [Finite G] {p : ℕ} [Fact p.Prime] (hp2 : p ≠ 
   have hBQ : B ≤ Q := le_sup_right
   have hQP : Q ≤ P := sup_le hA.1 hBP
   -- `Z(J_a(P)) ≤ A` (Lem 2.1), ゆえに `B' ≤ A` と `Q ≤ C(B')`
-  have hZJA : centralizer (thompsonJAbelian P : Set G) ⊓ thompsonJAbelian P ≤ A := by
-    intro z hz
-    refine (eq_inf_centralizer_of_mem_maxAbelianIn hA).ge ⟨?_, ?_⟩
-    · exact (thompsonJAbelian_le P) hz.2
-    · exact centralizer_le (SetLike.coe_subset_coe.mpr
-        (le_thompsonJAbelian_of_mem_maxAbelianIn hA)) hz.1
+  have hZJA : centralizer (thompsonJAbelian P : Set G) ⊓ thompsonJAbelian P ≤ A :=
+    zCenter_thompsonJAbelian_le_of_mem_maxAbelianIn hA
   have hB'A : ⁅B, B⁆ ≤ A := hBZJ.trans hZJA
   have hQcentB' : Q ≤ centralizer ((⁅B, B⁆ : Subgroup G) : Set G) := by
     refine sup_le ?_ (le_centralizer_iff.mpr hclass2)
