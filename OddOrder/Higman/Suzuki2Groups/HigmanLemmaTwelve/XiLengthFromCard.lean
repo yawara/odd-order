@@ -7,6 +7,8 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.GroupTheory.FreeActionOrbitCount
 import Mathlib.FieldTheory.Finite.GaloisField
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
 
 /-!
 # ξ-length from the group order: the counting half
@@ -303,5 +305,158 @@ theorem le_of_adjoin_frobeniusFixed_eq_top
       _ = 2 ^ n := hdeg
   rw [← Nat.card_eq_fintype_card, hcard] at hcardle
   exact (Nat.pow_le_pow_iff_right (by norm_num)).mp hcardle
+
+/-! ## The irreducible middle quotient is impossible -/
+
+open OddOrder.RepresentationTheory in
+/-- **An elementary abelian group of order `q²` with a fixed-point-free
+cyclic actor of order `q - 1` has a proper nontrivial invariant subgroup.**
+Otherwise the group is a faithful irreducible `𝔽₂[K]`-module; its Singer
+model has a generator of multiplicative order `2^n - 1`, which is fixed by
+the `n`-th Frobenius power yet generates a field of degree `2n` — forcing
+`2n ≤ n`. -/
+theorem exists_proper_invariant_subgroup_of_card_sq
+    {Q : Type uP} [Group Q] [Finite Q]
+    (hcomm : ∀ x y : Q, x * y = y * x)
+    (hsq : ∀ x : Q, x ^ 2 = 1)
+    {K : Type uP} [Group K] [Finite K] [IsCyclic K]
+    (rho : K →* MulAut Q)
+    (hfree : ∀ k : K, k ≠ 1 → ∀ x : Q, rho k x = x → x = 1)
+    {n : ℕ} (hn : n ≠ 0)
+    (hKcard : Nat.card K = 2 ^ n - 1)
+    (hQcard : Nat.card Q = 2 ^ (2 * n)) :
+    ∃ V : Subgroup Q, V ≠ ⊥ ∧ V ≠ ⊤ ∧ IsAInvariant rho V := by
+  classical
+  by_contra hnone
+  push_neg at hnone
+  letI : CommGroup Q :=
+    { (inferInstance : Group Q) with mul_comm := hcomm }
+  letI : Module (ZMod 2) (Additive Q) := AddCommGroup.zmodModule (by
+    intro q
+    apply Additive.toMul.injective
+    change Additive.toMul q ^ 2 = 1
+    exact hsq _)
+  have hQnontriv : Nontrivial Q := by
+    apply Finite.one_lt_card_iff_nontrivial.mp
+    rw [hQcard]
+    exact Nat.one_lt_two_pow_iff.mpr (by omega)
+  haveI : Nontrivial (Additive Q) := hQnontriv
+  set rho' : Representation (ZMod 2) K (Additive Q) :=
+    OddOrder.GroupTheory.elabRepresentation 2 rho with hrho'
+  have hrho'apply : ∀ (k : K) (x : Q),
+      rho' k (Additive.ofMul x) = Additive.ofMul (rho k x) := fun k x =>
+    OddOrder.GroupTheory.elabRepresentation_apply 2 rho k x
+  -- the subgroup ↔ submodule dictionary
+  let Φ : Submodule (ZMod 2) (Additive Q) ≃o Subgroup Q :=
+    (AddSubgroup.toZModSubmodule (n := 2)).symm.trans AddSubgroup.toSubgroup'
+  have hmemΦ : ∀ (M : Submodule (ZMod 2) (Additive Q)) (x : Q),
+      x ∈ Φ M ↔ Additive.ofMul x ∈ M := by
+    intro M x
+    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
+      AddSubgroup.mem_toZModSubmodule]
+    rfl
+  -- irreducibility of the linearized action
+  have hirr : Representation.IsIrreducible rho' := by
+    have hbot_ne_top : (⊥ : Subrepresentation rho') ≠ ⊤ := fun h =>
+      bot_ne_top (congrArg Subrepresentation.toSubmodule h)
+    letI : Nontrivial (Subrepresentation rho') := ⟨⊥, ⊤, hbot_ne_top⟩
+    apply IsSimpleOrder.of_forall_eq_top
+    intro W hWbot
+    set V : Subgroup Q := Φ W.toSubmodule with hV
+    have hVmem : ∀ x : Q, x ∈ V ↔ Additive.ofMul x ∈ W.toSubmodule :=
+      hmemΦ W.toSubmodule
+    have hVinv : IsAInvariant rho V := by
+      intro k
+      ext y
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      change (rho k)⁻¹ y ∈ V ↔ y ∈ V
+      rw [hVmem, hVmem]
+      constructor
+      · intro h
+        have hstep := W.apply_mem_toSubmodule k h
+        rw [hrho'apply] at hstep
+        have hcancel : rho k ((rho k)⁻¹ y) = y := by
+          rw [← map_inv]
+          change rho k (rho k⁻¹ y) = y
+          rw [← MulAut.mul_apply, ← map_mul, mul_inv_cancel, map_one,
+            MulAut.one_apply]
+        rwa [hcancel] at hstep
+      · intro h
+        have hstep := W.apply_mem_toSubmodule k⁻¹ h
+        rw [hrho'apply] at hstep
+        rwa [map_inv] at hstep
+    have hVne_bot : V ≠ ⊥ := by
+      intro hVbot
+      apply hWbot
+      apply Subrepresentation.toSubmodule_injective
+      change W.toSubmodule = ⊥
+      apply Φ.injective
+      rw [Φ.map_bot, ← hV]
+      exact hVbot
+    have hVtop : V = ⊤ := by
+      by_contra hVne_top
+      exact hnone V hVne_bot hVne_top hVinv
+    apply Subrepresentation.toSubmodule_injective
+    change W.toSubmodule = ⊤
+    apply Φ.injective
+    rw [Φ.map_top, ← hV]
+    exact hVtop
+  -- faithfulness of the linearized action
+  have hker : ∀ k : K, rho' k = 1 → k = 1 := by
+    intro k hk
+    by_contra hkne
+    obtain ⟨x, hxne⟩ := exists_ne (1 : Q)
+    apply hxne
+    apply hfree k hkne
+    have happ : rho' k (Additive.ofMul x) = Additive.ofMul x := by
+      rw [hk]
+      rfl
+    rw [hrho'apply] at happ
+    exact Additive.ofMul.injective happ
+  have hfaith : Function.Injective rho' := by
+    intro k l hkl
+    have hmul : rho' (k⁻¹ * l) = 1 := by
+      rw [map_mul]
+      calc rho' k⁻¹ * rho' l = rho' k⁻¹ * rho' k := by rw [hkl]
+        _ = rho' (k⁻¹ * k) := (map_mul rho' k⁻¹ k).symm
+        _ = 1 := by rw [inv_mul_cancel, map_one]
+    exact inv_mul_eq_one.mp (hker _ hmul)
+  -- the dimension is `2n`
+  have hfin : Module.finrank (ZMod 2) (Additive Q) = 2 * n := by
+    have hcardQ' : Nat.card (Additive Q) = 2 ^ (2 * n) := by
+      rw [Nat.card_congr (Additive.ofMul (α := Q)).symm]
+      exact hQcard
+    have h2 : (2 : ℕ) ^ (2 * n) = 2 ^ Module.finrank (ZMod 2) (Additive Q) := by
+      rw [← hcardQ', Module.natCard_eq_pow_finrank (K := ZMod 2),
+        Nat.card_eq_fintype_card, ZMod.card]
+    exact (Nat.pow_right_injective (le_refl 2) h2).symm
+  -- the Singer model and the degree contradiction
+  letI : CommGroup K := IsCyclic.commGroup
+  obtain ⟨e, mu, hmuinj, hcompat⟩ :=
+    exists_galoisFieldLinearModel_of_faithful_irreducible rho' (2 * n)
+      (by omega) hfin hirr hfaith
+  obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := K)
+  have htop := adjoin_generator_eq_top_of_irreducible_linearModel rho' hirr
+    e mu hcompat c hcgen
+  have hordc : orderOf c = 2 ^ n - 1 := by
+    rw [orderOf_eq_card_of_forall_mem_zpowers hcgen, hKcard]
+  have hordmu : orderOf (mu c) = 2 ^ n - 1 := by
+    rw [orderOf_injective mu hmuinj, hordc]
+  have hufix : (mu c) ^ 2 ^ n = mu c := by
+    have hu : (mu c) ^ (2 ^ n - 1) = 1 := by
+      rw [← hordmu]
+      exact pow_orderOf_eq_one _
+    have h1 : (2 : ℕ) ^ n = (2 ^ n - 1) + 1 := by
+      have := Nat.one_le_two_pow (n := n)
+      omega
+    rw [h1, pow_succ, hu, one_mul]
+  have hfix : (mu c : GaloisField 2 (2 * n)) ^ 2 ^ n =
+      (mu c : GaloisField 2 (2 * n)) := by
+    have hval := congrArg Units.val hufix
+    push_cast at hval
+    exact hval
+  have hle := le_of_adjoin_frobeniusFixed_eq_top (m := 2 * n)
+    (by omega) hn _ hfix htop
+  omega
 
 end OddOrder.Higman.Suzuki2Groups
