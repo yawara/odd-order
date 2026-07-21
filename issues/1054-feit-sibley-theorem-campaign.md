@@ -126,6 +126,21 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   ② Remark (𝒮(Q') coherent, m ≥ 2) → ③ (1) → ④ (2) → ⑤ (3) → ⑥ (7) (独立、並行可) →
   ⑦ (4)(5)(6) → ⑧ (8) assembly。
 
+## 進捗 (2026-07-21, FeitSibleyTheorem.lean)
+
+- [x] **Remark 完結**: `ssetOf_Qder_coherent` (d0d1ada95) — 𝒮(Q') coherent
+  (仮定: d odd + |Q₁| odd + 非空)。`ssetOf_Qder_nonempty` (3bd71cd5b) で非空は
+  `S ⊔ Q' < Q` に還元済み (endgame で Q₁ 非自明 p-群から導出)。
+- [x] 支持層: S'/Q' 定義・Q'⊴H・S⊴Q・S⊔Q'⊴Q・[H:Q]=d・𝒮(Q') の degree=d
+  (`apply_one_eq_d_of_mem_SsetOf_Qder`)・A-support・2(b) isometry ブリッジ・
+  (5.2.d/e) difference image 群・`leKer_induce_Qder_of_forall`。
+- [x] **2-kernel counting** (1dfea8ba3): `sum_degreeSq_ker_subset_not_subset` —
+  Σ_{N⊆ker, M⊄ker} χ(1)² = |K⧸N| − |K⧸N⊔M| (汎用)。
+- [ ] 次: 𝒮(R) 和への橋 (LeKer ↔ characterKernel-subset、K=↥H, N=R-in-H, M=Q₁-in-H
+  で |H/R| − |H/RQ₁| 形へ) → reduction (1) 本体 (chief-factor 帰納 + Lemma 1(a) +
+  [Is] 2.30 + f.p.f. 下界 |Z/Q₂| ≥ d+1)。f.p.f. 下界は要偵察
+  (FreeActionOrbitCount / WielandtFixedPoint / CoprimeFrobeniusKernel)。
+
 ## 完了条件
 
 `feit_sibley_coherence` sorry-free + axiom-clean + build green。
