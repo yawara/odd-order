@@ -112,11 +112,45 @@ class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補
   (2.19) = z² = 1 + hodd (`∀ g, g² = 1 → g = 1` 形で受理)。
 - core は n := Nat.find (最小 abelian 正添字) で case 分岐。
 
-**残り (ZJ まで)**: (1) P = AB wrapper — subgroup-level Thm 2.7 (`B' ≤ Z(J_a(P))`
-仮定、Q := A ⊔ B に core を ↥Q instantiate、maxAbelianIn の subtype transport が
-主 plumbing)。(2) **Lem 2.9/2.10** (mmd L5598 以降 — 精読要) と **Thm 2.11 (ZJ)**
-(p-stable + p-constrained + O_p'(G) = 1 ⟹ Z(J_a(P)) ⊴ G)。(3) 3024 側:
-S06_Thm62JS の hZJ を J_a 形に言い直して discharge。
+**残り (ZJ まで) — 2026-07-21 原文精読完了 (pdftotext L15282-15355; mmd は
+p.298 が MISSING でそちらを使う)**:
+
+1. **subgroup-level Thm 2.7 wrapper**: 仮定 = P ≤ N(B) (B ⊴ P), hclass2 :
+   ⁅B,B⁆ ≤ centralizer B (class ≤ 2), hBZJ : ⁅B,B⁆ ≤ Z(J_a(P))-encoding,
+   A ∈ A(P), ¬B ≤ N(A), P p-群 odd。手順: Q := A ⊔ B; **B' ≤ Z(Q)** は
+   Z(J_a(P)) ≤ A (centralizer_inf_le_of_mem_maxAbelianIn = Lem 2.1 系) ⟹
+   B' ≤ A abelian + hclass2 ⟹ Q = A⊔B ≤ centralizer B'。core を ↥Q に
+   instantiate。**要 refactor**: thompsonJAbelian_map_of_injective の証明内
+   key_map/key_comap を public lemma (maxAbelianIn の map/comap transport) に
+   抽出。A(⊤_Q) → A(Q) → A(P) の引き上げは maxAbelianIn_subset_of_le (A₀ := A)。
+   inf/lt/normalizer の subgroupOf transport が残りの plumbing。
+2. **Thm 2.9** (2.7 の系、Thm 2.6 と同型): |A∩B| 最大の A ∈ A(P) を選ぶと
+   B ≤ N(A) (さもなくば wrapper で真増加)。
+3. **Thm 2.10** (Glauberman、帰納の主定理): B ⊴ G nontrivial p-部分群、G p-stable、
+   P ∈ Syl_p ⟹ B ∩ Z(J(P)) ⊴ G。最小位数反例 B で:
+   (a) B = (Z∩B) の正規閉包 (最小性); (2.20) 共役帳簿で B' ≤ Z∩B' ⟹ B' ≤ Z、
+   B' ≤ Z(B) ⟹ cl(B) ≤ 2 + B' ≤ Z(J(P)) = 2.7/2.9 の仮定成立。
+   (b) L := Z∩B を正規化する最大正規部分群; P∩L ∈ Syl_p(L) (Sylow-of-normal =
+   G Thm 1.3.8); Frattini (G Thm 1.3.7) G = L·N_G(J(P∩L))。
+   J(P) ≤ P∩L なら J(P) = J(P∩L) (Lem 2.2(ii) = thompsonJAbelian_eq_of_le_of_le)
+   で N が Z∩B を正規化し ⊴ G 矛盾。ゆえ J(P) ⊄ L∩P。
+   (c) Thm 2.9 + Lem 2.3 で [B,A,A] = 1 なる A ∈ A(P); **p-stability** で
+   AC/C ≤ O_p(G/C) (C = C_G(B)); C ≤ L (最大性); O_p(G/L) = 1 (K 逆像、
+   P∩K が Z,B を正規化 ⟹ ≤ L) ⟹ A ≤ L。
+   (d) J(P∩L) ≤ J(P) (Lem 2.2(i)); Z ≤ A ≤ J(P∩L) ⟹ Z∩B ≤ X := Z(J(P∩L));
+   Frattini G = L·N_G(X); B (= 正規閉包) ≤ X ⟹ **B abelian**。
+   (e) A₁ ∈ A(P), A₁ ⊄ L (J(P) ⊄ L∩P から); [B,A₁,A₁] ≠ 1 (さもなくば (c) の
+   論法で A₁ ≤ L); |A₁∩B| 最大選択; Lem 2.3 で B not ≤ N(A₁) ⟹
+   **Thompson replacement (Thm 2.5、B abelian!)** で A*; 最大性 ⟹ A* ≤ P∩L ⟹
+   X ≤ A* (Lem 2.1 系) ⟹ [B,A₁,A₁] ≤ [A*,A₁,A₁] = 1 矛盾。∎
+   ⚠ p-stability の repo 形 (BG.AppA.IsPStable) と G の定義 (B ⊴ G, [B,A,A]=1 ⟹
+   AC/C ≤ O_p(G/C)) の照合が必要。Frattini argument / Sylow-of-normal は repo 実測。
+4. **Thm 2.11 (ZJ)**: G p-constrained + p-stable, p odd ⟹
+   G = O_p'(G)·N_G(Z(J(P)))、特に O_p'(G) = 1 なら Z(J(P)) ⊴ G。証明 =
+   O_p' 商への簡約 (G Thm 1.1(ii)+1.3.7) + Z(J(P)) ≤ O_p(G) (p-constrained、
+   normal abelian in P ⟹ ≤ O_p; G Thm 1.3 = repo 対応要実測) + Thm 2.10
+   (B := O_p(G))。
+5. 3024 側: S06_Thm62JS の hZJ を J_a 形に言い直して discharge (3017 close)。
 
 #### (参考) Thm 2.7 の完全分解 (2026-07-21 原文精読済 mmd L5560-5596)
 
