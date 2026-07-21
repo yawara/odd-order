@@ -220,6 +220,118 @@ theorem index_subgroupOf_sup_prod_eq [Finite G] {A' B' : Subgroup G}
   rw [hstep, hbridge] at hmul
   exact hmul.symm.trans (mul_comm _ _)
 
+/-! ## The centre lift `Z(Q₁)` and its `2d+1` bound (p. 147) -/
+
+/-- **The lift of the centre `Z(Q₁)`** to a subgroup of `G`: `centralLiftIn`
+at `Q₃ = ⊥`. -/
+def centerLiftQ1 : Subgroup G :=
+  hyp.centralLiftIn hyp.Q1 ⊥ fun _ _ x hx => by
+    rw [Subgroup.mem_bot] at hx ⊢
+    rw [hx]
+    group
+
+theorem centerLiftQ1_le : hyp.centerLiftQ1 ≤ hyp.Q1 :=
+  hyp.centralLiftIn_le hyp.Q1 _
+
+theorem commutator_eq_one_of_mem_centerLiftQ1 {b : G} (hb : b ∈ hyp.centerLiftQ1)
+    {y : G} (hy : y ∈ hyp.Q1) : ⁅b, y⁆ = 1 :=
+  Subgroup.mem_bot.mp (hb.2 y hy)
+
+theorem centerLiftQ1_conj_mem_of_mem_H [Finite G] {h : G} (hh : h ∈ hyp.H)
+    {z : G} (hz : z ∈ hyp.centerLiftQ1) : h * z * h⁻¹ ∈ hyp.centerLiftQ1 :=
+  hyp.centralLiftIn_conj_mem_of_mem_H hyp.Q1 _
+    (fun _ _ x hx => by
+      rw [Subgroup.mem_bot] at hx ⊢
+      rw [hx]
+      group)
+    (fun _ hh' x hx => hyp.Q1_normal_in_H hh' hx) hh hz
+
+/-- **`Z(Q₁) ≠ 1`**: `Q₁` is nontrivial (the trivial group would be a
+`2`-group, against `Q1_not_two_group`), so its centre is nontrivial by
+nilpotency (`Group.IsNilpotent.center_ne_bot`). -/
+theorem centerLiftQ1_ne_bot [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
+    hyp.centerLiftQ1 ≠ ⊥ := by
+  haveI := hnil
+  haveI : Nontrivial ↥hyp.Q1 := by
+    by_contra hcon
+    apply hyp.Q1_not_two_group
+    haveI : Subsingleton ↥hyp.Q1 := not_nontrivial_iff_subsingleton.mp hcon
+    exact fun g => ⟨0, by rw [pow_zero, pow_one]; exact Subsingleton.elim g 1⟩
+  have hcne := Group.IsNilpotent.center_ne_bot (G := ↥hyp.Q1)
+  obtain ⟨x, hxC, hxb⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hcne)
+  intro hbot
+  have hmem : (x : G) ∈ hyp.centerLiftQ1 := by
+    refine ⟨x.2, fun y hy => ?_⟩
+    rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_mul_comm]
+    have hc := Subgroup.mem_center_iff.mp hxC ⟨y, hy⟩
+    exact congrArg Subtype.val hc.symm
+  rw [hbot, Subgroup.mem_bot] at hmem
+  exact hxb (by rw [show x = 1 from Subtype.ext hmem]; exact Subgroup.one_mem ⊥)
+
+/-- **`|Z(Q₁)| ≥ 2d+1`** (p. 147, "`d` odd + f.p.f. ⟹ `|Z(Q₁)| ≥ 2d+1`"):
+the centre lift is a nontrivial `D`-invariant odd-order subgroup of `Q₁`,
+so `two_mul_d_add_one_le_card_of_le_Q1` applies. -/
+theorem two_mul_d_add_one_le_card_centerLiftQ1 [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1)) (hnil : Group.IsNilpotent ↥hyp.Q1) :
+    2 * hyp.d + 1 ≤ Nat.card ↥hyp.centerLiftQ1 := by
+  refine hyp.two_mul_d_add_one_le_card_of_le_Q1 hd hyp.centerLiftQ1_le
+    (fun δ hδ z hz => hyp.centerLiftQ1_conj_mem_of_mem_H (hyp.D_le_H hδ) hz)
+    (hyp.centerLiftQ1_ne_bot hnil) ?_
+  rcases Nat.even_or_odd (Nat.card ↥hyp.centerLiftQ1) with he | ho
+  · exfalso
+    obtain ⟨k, hk⟩ := he.two_dvd.trans (Subgroup.card_dvd_of_le hyp.centerLiftQ1_le)
+    exact (Nat.not_even_iff_odd.mpr hQ1odd) ⟨k, by omega⟩
+  · exact ho
+
+/-! ## The central-pair commutator split (p. 147) -/
+
+/-- **The central-pair split**: `⁅x, q⁆ ∈ S₂` for `x ∈ A'·B'` and `q ∈ Q`,
+where `A' ≤ S` commutes into `S₂` against `S` and `B' ≤ Q₁` is central in
+`Q₁`.  In reduction (2) this is `A' = Z` (the lift of `Z(S/S₂)`) and
+`B' = Z(Q₁)`, showing `Z·Z(Q₁)` maps into the centre of `Q⧸S₂` — the
+`hcentral` input of `exists_deg_sq_le_of_mem_SsetOf` via
+`map_mk_le_center_of_commutator_mem`.  Mirror of
+`commutator_mem_sup_Sder_of_central` with the two factors' roles swapped. -/
+theorem commutator_mem_of_central_pair {S₂ A' B' : Subgroup G}
+    (hA'S : A' ≤ hyp.S) (hB'Q1 : B' ≤ hyp.Q1)
+    (hA'c : ∀ a ∈ A', ∀ s ∈ hyp.S, ⁅a, s⁆ ∈ S₂)
+    (hB'c : ∀ b ∈ B', ∀ y ∈ hyp.Q1, ⁅b, y⁆ = 1)
+    {x q : G} (hx : x ∈ A' ⊔ B') (hq : q ∈ hyp.Q) :
+    ⁅x, q⁆ ∈ S₂ := by
+  -- decompose `x = a·b` along `A' ⊔ B' = A'·B'`
+  have hnorm : A' ≤ Subgroup.normalizer (B' : Set G) :=
+    hyp.le_normalizer_of_le_S_of_le_Q1 hA'S hB'Q1
+  have hxmul : x ∈ (A' : Set G) * (B' : Set G) := by
+    rw [← Subgroup.coe_mul_of_left_le_normalizer_right A' B' hnorm]
+    exact hx
+  obtain ⟨a, ha, b, hb, hxeq⟩ := hxmul
+  -- decompose `q = s₁·y₁` along `Q = S·Q₁`
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hq
+  obtain ⟨s₁, hs₁, y₁, hy₁, hqeq⟩ := hq
+  -- the commutator splits into the `S`- and `Q₁`-commutators
+  have hc1 : Commute b s₁ := (hyp.S_commutes_Q1 s₁ hs₁ b (hB'Q1 hb)).symm
+  have hc2 : Commute a⁻¹ y₁⁻¹ :=
+    hyp.S_commutes_Q1 a⁻¹ (hyp.S.inv_mem (hA'S ha)) y₁⁻¹ (hyp.Q1.inv_mem hy₁)
+  have hw : b * y₁ * (b⁻¹ * y₁⁻¹) ∈ hyp.Q1 :=
+    hyp.Q1.mul_mem (hyp.Q1.mul_mem (hB'Q1 hb) hy₁)
+      (hyp.Q1.mul_mem (hyp.Q1.inv_mem (hB'Q1 hb)) (hyp.Q1.inv_mem hy₁))
+  have hc3 : (a⁻¹ * s₁⁻¹) * (b * y₁ * (b⁻¹ * y₁⁻¹))
+      = (b * y₁ * (b⁻¹ * y₁⁻¹)) * (a⁻¹ * s₁⁻¹) :=
+    hyp.S_commutes_Q1 _ (hyp.S.mul_mem (hyp.S.inv_mem (hA'S ha))
+      (hyp.S.inv_mem hs₁)) _ hw
+  have hkey : ⁅x, q⁆ = ⁅a, s₁⁆ * ⁅b, y₁⁆ := by
+    calc ⁅x, q⁆
+        = (a * b) * (s₁ * y₁) * ((b⁻¹ * a⁻¹) * (y₁⁻¹ * s₁⁻¹)) := by
+          rw [← hxeq, ← hqeq, commutatorElement_def]; group
+      _ = (a * s₁) * (b * y₁) * ((b⁻¹ * y₁⁻¹) * (a⁻¹ * s₁⁻¹)) := by
+          rw [hc1.mul_mul_mul_comm, hc2.mul_mul_mul_comm]
+      _ = (a * s₁) * ((b * y₁ * (b⁻¹ * y₁⁻¹)) * (a⁻¹ * s₁⁻¹)) := by group
+      _ = (a * s₁) * ((a⁻¹ * s₁⁻¹) * (b * y₁ * (b⁻¹ * y₁⁻¹))) := by rw [hc3]
+      _ = ⁅a, s₁⁆ * ⁅b, y₁⁆ := by
+          rw [commutatorElement_def, commutatorElement_def]; group
+  rw [hkey, hB'c b hb y₁ hy₁, mul_one]
+  exact hA'c a ha s₁ hs₁
+
 /-! ## The reduction (2) closing arithmetic -/
 
 /-- **The reduction (2) final arithmetic** (p. 147): the counting bound
