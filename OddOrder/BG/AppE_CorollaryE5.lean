@@ -192,6 +192,79 @@ theorem e5_R_eq_centralizer [Finite G]
   rw [Set.mem_singleton_iff.mp hy]
   exact congrArg Subtype.val (hU₁ab.is_comm.comm (⟨x, hxU₁⟩ : ↥U₁) ⟨u, habs hu⟩)
 
+/-- In a finite nilpotent group, elements of distinct prime orders commute: each lies in
+its (normal, by nilpotency) Sylow subgroup, and disjoint normal subgroups commute. -/
+theorem commute_of_orderOf_prime_ne {H : Type*} [Group H] [Finite H]
+    [Group.IsNilpotent H] {a b : H} {pa pb : ℕ} (hpa : pa.Prime) (hpb : pb.Prime)
+    (hne : pa ≠ pb) (ha : orderOf a = pa) (hb : orderOf b = pb) : Commute a b := by
+  haveI : Fact pa.Prime := ⟨hpa⟩
+  haveI : Fact pb.Prime := ⟨hpb⟩
+  have hapg : IsPGroup pa ↥(Subgroup.zpowers a) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, ha, pow_one])
+  have hbpg : IsPGroup pb ↥(Subgroup.zpowers b) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hb, pow_one])
+  obtain ⟨P, hP⟩ := hapg.exists_le_sylow
+  obtain ⟨Q, hQ⟩ := hbpg.exists_le_sylow
+  have hdisj : Disjoint (P : Subgroup H) (Q : Subgroup H) :=
+    IsPGroup.disjoint_of_ne pa pb hne _ _ P.isPGroup' Q.isPGroup'
+  exact Subgroup.commute_of_normal_of_disjoint _ _ inferInstance inferInstance hdisj a b
+    (hP (Subgroup.mem_zpowers a)) (hQ (Subgroup.mem_zpowers b))
+
+/-- **BG 15.9's *"Thus `K₁ ∩ M_σ = 1`"*** (p. 123): the `κ(N)`-Hall `K₁` meets `M_σ`
+trivially.  A nontrivial `w ∈ K₁ ⊓ M_σ` has prime order `|K₁| = k ≠ p`, so it commutes
+with `x` inside the nilpotent `M_σ` — putting `x ∈ U₁ ⊓ C_G(w) = ⊥` (BG Theorem A(4)),
+against `x ≠ 1`.  (BG argues through *"`K₁R` is not nilpotent"*; centralizing the single
+element `x ∈ R ≤ U₁` is the same contradiction, one layer down.) -/
+theorem e5_kappaHall_inf_Msigma_eq_bot [Finite G]
+    {M : Subgroup G} {x : G} {p : ℕ} (hp : p.Prime)
+    (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hord : orderOf x = p) (hx1 : x ≠ 1)
+    (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M))
+    {K₁ U₁ : Subgroup G} {k : ℕ} (hk : k.Prime) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hkp : k ≠ p) (hxU₁ : x ∈ U₁)
+    (hCU₁ : ∀ c ∈ K₁, c ≠ 1 → U₁ ⊓ Subgroup.centralizer ({c} : Set G) = ⊥) :
+    K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥ := by
+  by_contra hne
+  haveI : Nontrivial ↥(K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hne
+  obtain ⟨w, hwne⟩ := exists_ne (1 : ↥(K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G))
+  have hwK₁ : (w : G) ∈ K₁ := w.2.1
+  have hwMσ : (w : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := w.2.2
+  have hwne1 : (w : G) ≠ 1 := fun h => hwne (Subtype.ext h)
+  -- `orderOf w = k`, the prime `|K₁|`.
+  have hordw : orderOf (w : G) = k := by
+    have hdvd : orderOf (w : G) ∣ k := by
+      have h1 := orderOf_injective K₁.subtype (Subgroup.subtype_injective _)
+        ⟨(w : G), hwK₁⟩
+      have h2 := orderOf_dvd_natCard (⟨(w : G), hwK₁⟩ : ↥K₁)
+      rw [hcardK₁] at h2
+      calc orderOf (w : G) = orderOf (⟨(w : G), hwK₁⟩ : ↥K₁) := h1
+        _ ∣ k := h2
+    rcases Nat.Prime.eq_one_or_self_of_dvd hk _ hdvd with h1 | h1
+    · exact absurd (orderOf_eq_one_iff.mp h1) hwne1
+    · exact h1
+  -- `x` and `w` commute inside the nilpotent `M_σ`.
+  haveI := hMσnil
+  have hordξ : orderOf (⟨x, hxMσ⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma M)) = p := by
+    have h1 := orderOf_injective (OddOrder.BG.Ch3.S10.Msigma M).subtype
+      (Subgroup.subtype_injective _) ⟨x, hxMσ⟩
+    rw [← hord]
+    exact h1.symm
+  have hordω : orderOf (⟨(w : G), hwMσ⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma M)) = k := by
+    have h1 := orderOf_injective (OddOrder.BG.Ch3.S10.Msigma M).subtype
+      (Subgroup.subtype_injective _) ⟨(w : G), hwMσ⟩
+    rw [← hordw]
+    exact h1.symm
+  have hcomm' : Commute (⟨x, hxMσ⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma M)) ⟨(w : G), hwMσ⟩ :=
+    commute_of_orderOf_prime_ne hp hk (fun h => hkp h.symm) hordξ hordω
+  have hcomm : x * (w : G) = (w : G) * x := congrArg Subtype.val hcomm'
+  -- `x ∈ U₁ ⊓ C_G(w) = ⊥`, against `x ≠ 1`.
+  have hxmem : x ∈ U₁ ⊓ Subgroup.centralizer ({(w : G)} : Set G) := by
+    refine ⟨hxU₁, Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩
+    rw [Set.mem_singleton_iff.mp hy]
+    exact hcomm.symm
+  rw [hCU₁ _ hwK₁ hwne1] at hxmem
+  exact hx1 (Subgroup.mem_bot.mp hxmem)
+
 /-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
 Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
 collapses onto `K₁`.
