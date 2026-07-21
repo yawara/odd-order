@@ -46,6 +46,7 @@ set_option autoImplicit false
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.GroupTheory (IsElementaryAbelian fixedSubgroup elabRepresentation)
+open OddOrder.Isaacs.Ch01 (fitting)
 open Representation
 
 /-! ## Clifford counting: `|M| = |V|^t` for a minimal `K`-invariant subgroup
@@ -892,6 +893,103 @@ theorem card_K_dvd_sub_one_of_prime_order_invariant {r : ℕ} (hr : r.Prime)
     rw [fc.toHypothesis.card_K_eq_card_Q0_sub_one, fc.card_Q0_eq_two_pow]
   rw [← hKcard, ← hAut]
   exact Subgroup.card_dvd_of_injective φV hinj
+
+/-- **Step (3), second branch — Half A** (the `𝔽_{2^p}`-side, p. 109): for any
+`a ∈ P`, conjugation by `a` on the Fitting subgroup `F(D̄) ≅ 𝔽_{2^p}ˣ` (the image
+of `K`) is a power-of-two map `t ↦ t^(2^i)`.
+
+This is `Aut(𝔽_{2^p}) = ⟨Frobenius⟩` (`ringAut_card_two_pow_eq_pow`) read through
+the adapted field model (`exists_adapted_field_model`): the model intertwines
+`fittingConjAction (toVbar a)` on `F(D̄)` with the field automorphism `σhom a`
+acting on `𝔽_{2^p}ˣ` via `μ`, and `σhom a` is a power of the Frobenius. -/
+theorem exists_pow_two_fittingConjAction (a : ↥fc.P) :
+    ∃ i : ℕ, ∀ t : ↥(fitting fc.toHypothesis.Dbar),
+      fc.toHypothesis.fittingConjAction (fc.toVbar a) t = t ^ (2 ^ i) := by
+  obtain ⟨F, hFld, hFin, eQ, μ, σhom, hcardF, hσinj, hlawQ, hlawμ, hfix⟩ :=
+    fc.exists_adapted_field_model
+  letI : Field F := hFld
+  letI : Finite F := hFin
+  have hcard2 : Nat.card F = 2 ^ fc.p := hcardF.trans fc.card_Q0_eq_two_pow
+  obtain ⟨i, hi⟩ := ringAut_card_two_pow_eq_pow hcard2 (σhom a)
+  refine ⟨i, fun t => ?_⟩
+  refine μ.injective ?_
+  rw [hlawμ a t, map_pow]
+  refine Units.ext ?_
+  rw [fieldRingAutOnUnits_apply_val, Units.val_pow_eq_pow_val]
+  exact hi _
+
+/-- **Step (3), second branch — the conjugation bridge (A2 + surjectivity).**
+If conjugation by `a ∈ P` raises every `k ∈ K` to the `r`-th power, then the
+induced action on the Fitting subgroup `F(D̄) = K̄` is `t ↦ t^r`.
+
+`K̄ = F(D̄)` is the image of `K` under `D ↠ D̄ = D/W` (`Kbar_eq_fitting`), so
+every `t ∈ F(D̄)` is `mk k` for some `k ∈ K`; conjugation commutes with the
+quotient map, so `fittingConjAction (toVbar a) (mk k) = mk (a k a⁻¹) = mk (k^r)
+= (mk k)^r`.  (This packages the `M`-side `r`-power law — supplied later — into
+the cyclic group `F(D̄)`, where it is compared with Half A.) -/
+theorem fittingConjAction_pow_of_K_conj (a : ↥fc.P) {r : ℕ}
+    (hB : ∀ k ∈ fc.toHypothesis.K, (a : G) * k * (a : G)⁻¹ = k ^ r)
+    (t : ↥(fitting fc.toHypothesis.Dbar)) :
+    fc.toHypothesis.fittingConjAction (fc.toVbar a) t = t ^ r := by
+  -- `t ∈ fitting D̄ = K̄`, so `t = mk kd` for some `kd ∈ K` (as a subgroup of D).
+  have ht : (t : fc.toHypothesis.Dbar) ∈ fc.toHypothesis.Kbar := by
+    rw [fc.toHypothesis.Kbar_eq_fitting]; exact t.2
+  obtain ⟨kd, hkd, hmk⟩ := ht
+  have hkK : (kd : G) ∈ fc.toHypothesis.K := Subgroup.mem_subgroupOf.mp hkd
+  apply Subtype.ext
+  -- coe of LHS via the conjugation formula (as an element of `D̄`)
+  have hLHS : ((fc.toHypothesis.fittingConjAction (fc.toVbar a) t :
+        ↥(fitting fc.toHypothesis.Dbar)) : fc.toHypothesis.Dbar)
+      = QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)
+            ⟨(a : G), fc.toHypothesis.V_le_D (fc.P_le_V a.2)⟩
+          * (t : fc.toHypothesis.Dbar)
+          * (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)
+            ⟨(a : G), fc.toHypothesis.V_le_D (fc.P_le_V a.2)⟩)⁻¹ := by
+    unfold Hypothesis.fittingConjAction
+    simp only [MonoidHom.comp_apply,
+      Subgroup.normalizerMonoidHom_apply_apply_coe, Subgroup.coe_inclusion, toVbar_coe,
+      QuotientGroup.mk'_apply]
+  rw [hLHS, SubmonoidClass.coe_pow, ← hmk]
+  -- reduce through the quotient hom `mk'`
+  rw [← map_inv (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)),
+    ← map_mul, ← map_mul, ← map_pow]
+  congr 1
+  -- `⟨a⟩ * kd * ⟨a⟩⁻¹ = kd ^ r` in D, checked on the underlying elements of G
+  apply Subtype.ext
+  push_cast
+  simpa using hB (kd : G) hkK
+
+/-- **Step (3), second branch — the combine** (p. 109): if conjugation by
+`a ∈ P` raises every `k ∈ K` to the `r`-th power, then `r ≡ 2^i (mod 2^p − 1)`
+for some `i`.
+
+Half A gives an `i` with `t ↦ t^(2^i)` on `F(D̄)`; A2 gives `t ↦ t^r`; so
+`t^(2^i) = t^r` for every `t ∈ F(D̄)`.  As `F(D̄)` is cyclic of order `2^p − 1`
+(`fitting_Dbar_cyclic_fpf_abelian`, `card_fitting_Dbar_eq_ncard_KSet`), taking a
+generator gives `2^i ≡ r (mod 2^p − 1)`.  (The `M`-side hypothesis `hB` — the
+`r`-power law — is supplied by Half B.) -/
+theorem exists_pow_two_modEq_of_K_conj (a : ↥fc.P) {r : ℕ}
+    (hB : ∀ k ∈ fc.toHypothesis.K, (a : G) * k * (a : G)⁻¹ = k ^ r) :
+    ∃ i : ℕ, r ≡ 2 ^ i [MOD 2 ^ fc.p - 1] := by
+  classical
+  haveI : Fintype ↥(fitting fc.toHypothesis.Dbar) := Fintype.ofFinite _
+  obtain ⟨i, hHalfA⟩ := fc.exists_pow_two_fittingConjAction a
+  refine ⟨i, ?_⟩
+  -- `t^(2^i) = t^r` for every `t ∈ F(D̄)` (Half A meets A2)
+  have hpow : ∀ t : ↥(fitting fc.toHypothesis.Dbar), t ^ (2 ^ i) = t ^ r := fun t => by
+    rw [← hHalfA t, fc.fittingConjAction_pow_of_K_conj a hB t]
+  haveI : IsCyclic ↥(fitting fc.toHypothesis.Dbar) :=
+    fc.toHypothesis.fitting_Dbar_cyclic_fpf_abelian.1
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥(fitting fc.toHypothesis.Dbar))
+  have hcardK : Nat.card ↥(fitting fc.toHypothesis.Dbar) = Nat.card fc.toHypothesis.K := by
+    rw [fc.toHypothesis.card_fitting_Dbar_eq_ncard_KSet, ← fc.toHypothesis.coe_K]
+    exact (Nat.card_coe_set_eq _).symm
+  have horder : orderOf g = 2 ^ fc.p - 1 := by
+    rw [orderOf_eq_card_of_forall_mem_zpowers hg, hcardK,
+      fc.toHypothesis.card_K_eq_card_Q0_sub_one, fc.card_Q0_eq_two_pow]
+  have hmod : (2 ^ i) ≡ r [MOD orderOf g] := pow_eq_pow_iff_modEq.mp (hpow g)
+  rw [horder] at hmod
+  exact hmod.symm
 
 end FirstCaseHypothesis
 

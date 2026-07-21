@@ -164,6 +164,19 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     - **package (3)**: |Q₁| の素因数 r ⟹ ∃i, r≡2^i (第一分岐 i=0 + 第二分岐)。
     (iii) の [H] V 8.15 ギャップは「dim C_M(P)=1」= 2(b) near-field 経由で
     9318 継承、独立ギャップではない。
+  - **進捗 (2026-07-22): 第二分岐 4/5 完了 (StepThree.lean, hB パラメータ化で sorry-free)**:
+    A1 `ringAut_card_two_pow_eq_pow` (f444719e0)、Half A
+    `exists_pow_two_fittingConjAction` (ec7f1be5c)、A2
+    `fittingConjAction_pow_of_K_conj` (9407e5de2)、combine
+    `exists_pow_two_modEq_of_K_conj` (131319f5b: hB → ∃i r≡2^i)。
+    **残 = Half B のみ** (M 側で hB = `∃ a∈P, a≠1 ∧ ∀k∈K a·k·a⁻¹=k^r` を供給)。
+    Half B 精緻化: M K-既約 → `exists_field_semilinear` (E:=M, T:=K, ψ:=K の
+    M 上共役作用, hirr:=既約) で F'=𝔽_{r^p}, M 1-dim/F', 各 g=conj-by-a に σ_a:
+    F'≃+*F' (semilinear law)。要点: (1) K↪F'ˣ (M≅F' 上 K が mult by unit),
+    (2) K on M faithful (fpf `conjQByK_fixed_eq_one` ⟹ faithful), (3) σ: P→RingAut F'
+    injective + |P|=p=|Gal(F'/𝔽_r)| ⟹ P≅Gal, (4) Frobenius x↦x^r ∈ Gal ゆえ
+    ∃a∈P σ_a=Frobenius (A1 の r 版: RingAut 𝔽_{r^p}=x↦x^{r^j}), その a で
+    a·k·a⁻¹=σ_a(k)=k^r。⚠ 全体は dichotomy 経由で 9318 継承 (AxiomsCheck 非登録)。
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐
