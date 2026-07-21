@@ -380,7 +380,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                   actor-eigenvalue 法則 3 定理
                   (`FactorCoordinateData.toInclusionData_incl_representation` ほか、
                   `ba9ac88da`)
-            - [ ] ε 正規化: c₀ ≠ 0 → ε (anisotropy 条件 IsType*Epsilon と接続)
+            - [x] ε 正規化 (`241971692`): B は shear 補題が IsTypeBEpsilon まで
+                  返す; C/D は `isTypeC/DEpsilon_of_decomposed_aniso` で
+                  decomposed anisotropy + monomial から IsType*Epsilon
+                  (monomial 指数 ↔ θ 冪の Frobenius 同定込み)
             - [ ] group-side assembly: 実際の mixed 項
                   (ambientCenterCoordinate ∘ lowerCentralCommutatorBilinear) を
                   mixedTerm_lambda_equivariance で equivariance に接続 → 上記単項化
