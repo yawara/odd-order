@@ -898,6 +898,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 21:50 (tick #16、Fable hub cron `490dde28`) — ✅ a + b + c 3 レーン合流、census 6 不変、push 済**:
+  **a** = ⭐ FeitSibley **reduction (2) COMPLETE** (`sset_coherent_of_ssetOf_sder_coherent`) +
+  還元宣言分岐 composer (two-primes / abelian-Q₁) + (3) 前提偵察 (原文 pp.144-147 実読、
+  仮定ブロック一致確認) + min-degree conjugate-pair 分解 (issue 1054、次 = (3) Res_Q1 既約)。
+  **b** = Pf Suzuki Ch.II step (1) 部品 — |C_{Q₀}(P)| = 2 (軌道計数+Fermat) / C_K(P) = 1 +
+  field model bundle 化 / V = W ⋊ P / N_G(P) = C_G(P) (新 leaf `FirstCase/StepOne.lean`)。
+  **c** = ⭐⭐ **Gorenstein Thm 2.7 (Glauberman Replacement) core 完全証明** — Case 1 + 共通
+  wrap-up + Case 2 Hall-Witt 帳簿 (2.11)-(2.14) 一撃形 (issue 9403; 残 = wrapper / Lem 2.9-2.10 /
+  Thm 2.11 → ZJ、Thm 2.9-2.11 分解は pdftotext で MISSING page 復元済)。gate = build **4610 jobs
+  green (24.9s、+1 = 新 leaf 実 elaborate 確認)**、AxiomsCheck OK、orphan 0 (894/894)、census 6
+  不変、新 axiom なし、逸脱なし、採番 open 重複なし。レーン生存 3 点 OK (3 レーンとも 21:43–21:45
+  に main 同期 + commit)。push 済。
 - **2026-07-21 21:20 (tick #15、Fable hub cron `490dde28`) — ✅ a + b + c 3 レーン合流、census 6 不変、push 済**:
   **a** = FeitSibley reduction (2) 部品 — centralLift 機構の W-parametric `centralLiftIn` 一般化
   (refactor) + index bridges + closing arithmetic + centre lift Z(Q₁) 2d+1 bound + S-side

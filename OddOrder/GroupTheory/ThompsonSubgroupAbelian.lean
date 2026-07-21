@@ -724,62 +724,71 @@ theorem thompsonJAbelian_eq_of_le_of_le [Finite G] {P Q : Subgroup G}
     refine ⟨hA_Q, hA_P.2.1, fun B hB_Q hB_comm => ?_⟩
     exact hA_P.2.2 B (hB_Q.trans hQP) hB_comm
 
-/-- **`J_a` は単射準同型と可換**: `f : G →* N` 単射, `P ≤ G` について
-`J_a(f(P)) = f(J_a(P))` (Gorenstein Lemma 2.2(c) の一般形).
+/-- **`A(·)` の comap 転送**: 単射 `f : G →* N` について `E ∈ A(P.map f)` なら
+`E.comap f ∈ A(P)` かつ `(E.comap f).map f = E`. -/
+theorem comap_mem_maxAbelianIn_of_injective {N : Type*} [Group N]
+    {f : G →* N} (hf : Function.Injective f) {P : Subgroup G} {E : Subgroup N}
+    (hE : E ∈ maxAbelianIn (P.map f)) :
+    E.comap f ∈ maxAbelianIn P ∧ (E.comap f).map f = E := by
+  obtain ⟨hE_le, hE_comm, hE_max⟩ := hE
+  have hE_le_range : E ≤ f.range := hE_le.trans (Subgroup.map_le_range f P)
+  have hmap_comap : (E.comap f).map f = E :=
+    Subgroup.map_comap_eq_self hE_le_range
+  refine ⟨⟨?_, ?_, ?_⟩, hmap_comap⟩
+  · rw [← Subgroup.comap_map_eq_self_of_injective hf P]
+    exact Subgroup.comap_mono hE_le
+  · haveI := hE_comm
+    exact E.comap_injective_isMulCommutative hf
+  · intro B hB_P hB_comm
+    haveI := hB_comm
+    have hBmap_le : B.map f ≤ P.map f := Subgroup.map_mono hB_P
+    have hcard_B : Nat.card (B.map f) = Nat.card B :=
+      Subgroup.card_map_of_injective hf
+    have hcard_E : Nat.card E = Nat.card (E.comap f) := by
+      conv_lhs => rw [← hmap_comap]
+      exact Subgroup.card_map_of_injective hf
+    have hstep : Nat.card (B.map f) ≤ Nat.card E :=
+      hE_max (B.map f) hBmap_le (map_isMulCommutative B f)
+    rw [← hcard_E, ← hcard_B]
+    exact hstep
 
-`f(P)` の abelian 部分群は `P` の abelian 部分群の `f`-像とちょうど対応する
-(単射性が可換性と位数の両方を保存). -/
+/-- **`A(·)` の map 転送**: 単射 `f : G →* N` について `A ∈ A(P)` なら
+`A.map f ∈ A(P.map f)`. -/
+theorem map_mem_maxAbelianIn_of_injective {N : Type*} [Group N]
+    {f : G →* N} (hf : Function.Injective f) {P A : Subgroup G}
+    (hA : A ∈ maxAbelianIn P) :
+    A.map f ∈ maxAbelianIn (P.map f) := by
+  obtain ⟨hA_le, hA_comm, hA_max⟩ := hA
+  haveI := hA_comm
+  refine ⟨Subgroup.map_mono hA_le, map_isMulCommutative A f, ?_⟩
+  intro B hB_le hB_comm
+  have hB_le_range : B ≤ f.range := hB_le.trans (Subgroup.map_le_range f P)
+  have hB_mapcomap : (B.comap f).map f = B := Subgroup.map_comap_eq_self hB_le_range
+  have hBcomap_le : B.comap f ≤ P := by
+    rw [← Subgroup.comap_map_eq_self_of_injective hf P]
+    exact Subgroup.comap_mono hB_le
+  have hBcomap_comm : IsMulCommutative (B.comap f) := by
+    haveI := hB_comm
+    exact B.comap_injective_isMulCommutative hf
+  have hcard_B : Nat.card B = Nat.card (B.comap f) := by
+    conv_lhs => rw [← hB_mapcomap]
+    exact Subgroup.card_map_of_injective hf
+  have hcard_A : Nat.card (A.map f) = Nat.card A := Subgroup.card_map_of_injective hf
+  calc Nat.card B = Nat.card (B.comap f) := hcard_B
+    _ ≤ Nat.card A := hA_max (B.comap f) hBcomap_le hBcomap_comm
+    _ = Nat.card (A.map f) := hcard_A.symm
+
+/-- **`J_a` は単射準同型と可換**: `f : G →* N` 単射, `P ≤ G` について
+`J_a(f(P)) = f(J_a(P))` (Gorenstein Lemma 2.2(c) の一般形). -/
 theorem thompsonJAbelian_map_of_injective {N : Type*} [Group N]
     {f : G →* N} (hf : Function.Injective f) (P : Subgroup G) :
     thompsonJAbelian (P.map f) = (thompsonJAbelian P).map f := by
-  -- `E ≤ P.map f` は `E.comap f ≤ P` の像で, 位数・可換性が対応する.
   have key_comap : ∀ E : Subgroup N, E ∈ maxAbelianIn (P.map f) →
-      E.comap f ∈ maxAbelianIn P ∧ (E.comap f).map f = E := by
-    intro E hE
-    obtain ⟨hE_le, hE_comm, hE_max⟩ := hE
-    have hE_le_range : E ≤ f.range := hE_le.trans (Subgroup.map_le_range f P)
-    have hmap_comap : (E.comap f).map f = E :=
-      Subgroup.map_comap_eq_self hE_le_range
-    refine ⟨⟨?_, ?_, ?_⟩, hmap_comap⟩
-    · rw [← Subgroup.comap_map_eq_self_of_injective hf P]
-      exact Subgroup.comap_mono hE_le
-    · haveI := hE_comm
-      exact E.comap_injective_isMulCommutative hf
-    · intro B hB_P hB_comm
-      haveI := hB_comm
-      have hBmap_le : B.map f ≤ P.map f := Subgroup.map_mono hB_P
-      have hcard_B : Nat.card (B.map f) = Nat.card B :=
-        Subgroup.card_map_of_injective hf
-      have hcard_E : Nat.card E = Nat.card (E.comap f) := by
-        conv_lhs => rw [← hmap_comap]
-        exact Subgroup.card_map_of_injective hf
-      have hstep : Nat.card (B.map f) ≤ Nat.card E :=
-        hE_max (B.map f) hBmap_le (map_isMulCommutative B f)
-      rw [← hcard_E, ← hcard_B]
-      exact hstep
-  -- `A ∈ A(P)` の像は `A(P.map f)` の元.
+      E.comap f ∈ maxAbelianIn P ∧ (E.comap f).map f = E := fun E hE =>
+    comap_mem_maxAbelianIn_of_injective hf hE
   have key_map : ∀ A : Subgroup G, A ∈ maxAbelianIn P →
-      A.map f ∈ maxAbelianIn (P.map f) := by
-    intro A hA
-    obtain ⟨hA_le, hA_comm, hA_max⟩ := hA
-    haveI := hA_comm
-    refine ⟨Subgroup.map_mono hA_le, map_isMulCommutative A f, ?_⟩
-    intro B hB_le hB_comm
-    have hB_le_range : B ≤ f.range := hB_le.trans (Subgroup.map_le_range f P)
-    have hB_mapcomap : (B.comap f).map f = B := Subgroup.map_comap_eq_self hB_le_range
-    have hBcomap_le : B.comap f ≤ P := by
-      rw [← Subgroup.comap_map_eq_self_of_injective hf P]
-      exact Subgroup.comap_mono hB_le
-    have hBcomap_comm : IsMulCommutative (B.comap f) := by
-      haveI := hB_comm
-      exact B.comap_injective_isMulCommutative hf
-    have hcard_B : Nat.card B = Nat.card (B.comap f) := by
-      conv_lhs => rw [← hB_mapcomap]
-      exact Subgroup.card_map_of_injective hf
-    have hcard_A : Nat.card (A.map f) = Nat.card A := Subgroup.card_map_of_injective hf
-    calc Nat.card B = Nat.card (B.comap f) := hcard_B
-      _ ≤ Nat.card A := hA_max (B.comap f) hBcomap_le hBcomap_comm
-      _ = Nat.card (A.map f) := hcard_A.symm
+      A.map f ∈ maxAbelianIn (P.map f) := fun A hA =>
+    map_mem_maxAbelianIn_of_injective hf hA
   apply le_antisymm
   · refine iSup_le fun E => iSup_le fun hE => ?_
     obtain ⟨hEcomap_mem, hmapcomap⟩ := key_comap E hE
