@@ -340,6 +340,242 @@ theorem exists_apply_one_eq_d_mul_pow [Fintype G] [Invertible (Nat.card G : ℂ)
   push_cast
   ring
 
+/-! ## The family `𝒳(R, Z)` (p. 147, step (3) setup)
+
+Step (3) works with `𝒳 = 𝒮 − 𝒮(Z)` for a nontrivial `Z ⊴ H` with `Z ≤ Z(Q₁)`,
+and its intersections `𝒳 ∩ 𝒮(R)` for the `S`-side induction (Part B).  We
+parametrise both: `XsetOf R Z = {χ ∈ 𝒮(R) | Z ⊄ Ker χ}`.  For `Z ≤ Q₁`
+membership in `𝒮` is automatic for an irreducible with `Z ⊄ Ker χ`
+(`Z ≤ Q₁ ⊆ Ker χ` otherwise), so the degree-square counting reduces to the
+two-kernel counting `sum_degreeSq_ker_subset_not_subset`. -/
+
+/-- **`𝒳(R, Z) = {χ ∈ 𝒮(R) | Z ⊄ Ker χ}`** (p. 147: `𝒳 = 𝒮 − 𝒮(Z)`,
+relativised by the kernel condition `R` for the Part B induction;
+`𝒳 = XsetOf ⊥ Z`, `𝒳₁ = XsetOf Sder Z`). -/
+def XsetOf (R Z : Subgroup G) : Set (ClassFunction ↥hyp.H ℂ) :=
+  {χ | χ ∈ hyp.SsetOf R ∧ ¬ hyp.LeKer χ Z}
+
+theorem XsetOf_subset_SsetOf (R Z : Subgroup G) : hyp.XsetOf R Z ⊆ hyp.SsetOf R :=
+  fun _ h => h.1
+
+theorem XsetOf_subset_Sset (R Z : Subgroup G) : hyp.XsetOf R Z ⊆ hyp.Sset :=
+  fun _ h => h.1.1
+
+theorem XsetOf_finite [Finite G] (R Z : Subgroup G) : (hyp.XsetOf R Z).Finite := by
+  letI : Invertible ((Nat.card G : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible ((Nat.card ↥hyp.H : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible ((Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℕ) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  exact hyp.Sset_finite.subset (hyp.XsetOf_subset_Sset R Z)
+
+/-- **`𝒳(R, Z)` is closed under complex conjugation**: `𝒮(R)`-membership is
+conjugation-closed (`conj_mem_SsetOf`), and the `LeKer` constancy on `Z`
+transports through `star` in both directions. -/
+theorem conj_mem_XsetOf [Finite G] {R Z : Subgroup G} {χ : ClassFunction ↥hyp.H ℂ}
+    (hχ : χ ∈ hyp.XsetOf R Z) : χ.conj ∈ hyp.XsetOf R Z := by
+  obtain ⟨hχS, hker⟩ := hχ
+  refine ⟨hyp.conj_mem_SsetOf hχS, fun hcon => hker fun x hx => ?_⟩
+  have h := hcon x hx
+  rw [ClassFunction.conj_apply, ClassFunction.conj_apply] at h
+  exact star_injective h
+
+/-- **Membership in `𝒳(R, Z)` for irreducibles, `Z ≤ Q₁`**: the `𝒮`-membership
+clause is automatic — `Q₁ ⊆ Ker χ` would force `Z ⊆ Ker χ`.  This is the
+form consumed by the two-kernel counting. -/
+theorem mem_XsetOf_iff_of_le_Q1 {R Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχirr : IsIrreducibleCharacter χ) :
+    χ ∈ hyp.XsetOf R Z ↔ hyp.LeKer χ R ∧ ¬ hyp.LeKer χ Z := by
+  constructor
+  · rintro ⟨⟨-, hR⟩, hZ⟩
+    exact ⟨hR, hZ⟩
+  · rintro ⟨hR, hZ⟩
+    exact ⟨⟨⟨hχirr, fun hQ1 => hZ fun x hx => hQ1 x (hZQ1 hx)⟩, hR⟩, hZ⟩
+
+/-- **`|Q₁|` is odd when `Q₁` is a `p`-group**: `p = 2` is excluded by
+`Q1_not_two_group`, so `p` is an odd prime and `|Q₁| = p^n` is odd.  Supplies
+the `hQ1odd` hypothesis of the no-real-characters lemma (2(c)) in the
+`p`-group context of steps (3)–(8). -/
+theorem odd_card_Q1_of_isPGroup [Finite G] {p : ℕ} (hp : p.Prime)
+    (hQ1p : IsPGroup p ↥hyp.Q1) : Odd (Nat.card ↥hyp.Q1) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
+  have hp2 : p ≠ 2 := fun h2 => hyp.Q1_not_two_group (by rwa [h2] at hQ1p)
+  rw [hn]
+  exact (hp.odd_of_ne_two hp2).pow
+
+open scoped Classical in
+/-- **The `𝒳(R, Z)` degree-square sum** (p. 147, step (3) counting): for
+`Z ≤ Q₁`, `∑_{χ ∈ 𝒳(R,Z)} χ(1)² = |H⧸R| − |H⧸(R·Z)|` (quotients inside `↥H`).
+Membership is exactly "kernel contains `R` but not `Z`"
+(`mem_XsetOf_iff_of_le_Q1` + `leKer_iff_subset_characterKernel`), so this is
+`sum_degreeSq_ker_subset_not_subset` at `N = R`, `M = Z`. -/
+theorem sum_degreeSq_XsetOf [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {R Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter ↥hyp.H =>
+        (χ : ClassFunction ↥hyp.H ℂ) ∈ hyp.XsetOf R Z),
+        ((χ : ClassFunction ↥hyp.H ℂ) 1) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H))) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  have hcongr : ∀ χb : IrreducibleCharacter ↥hyp.H,
+      ((χb : ClassFunction ↥hyp.H ℂ) ∈ hyp.XsetOf R Z)
+      ↔ (((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ) ∧
+          ¬ ((Z.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
+            ⊆ OddOrder.Peterfalvi.S03.characterKernel (χb : ClassFunction ↥hyp.H ℂ)) := by
+    intro χb
+    rw [hyp.mem_XsetOf_iff_of_le_Q1 hZQ1 χb.isIrreducible,
+      hyp.leKer_iff_subset_characterKernel, hyp.leKer_iff_subset_characterKernel]
+  rw [Finset.filter_congr (fun χb _ => by
+    constructor
+    · exact fun h => by simpa using (hcongr χb).mp (by simpa using h)
+    · exact fun h => by simpa using (hcongr χb).mpr (by simpa using h))]
+  exact sum_degreeSq_ker_subset_not_subset (R.subgroupOf hyp.H) (Z.subgroupOf hyp.H)
+
+open scoped Classical in
+/-- **`sum_degreeSq_XsetOf`, `toFinset` form** (the shape produced by the
+counterexample extraction): bundling `x ↦ ⟨x, irr⟩` is a bijection onto the
+filtered irreducible-character `Finset` of `sum_degreeSq_XsetOf`. -/
+theorem sum_degreeSq_XsetOf_toFinset [Finite G]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] {R Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf R Z).Finite) :
+    ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H))) : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  rw [← hyp.sum_degreeSq_XsetOf hZQ1]
+  refine Finset.sum_bij'
+    (fun x hx => (⟨x, ((hfin.mem_toFinset.mp hx).1.1.1 :)⟩ : IrreducibleCharacter ↥hyp.H))
+    (fun χb hb => (χb : ClassFunction ↥hyp.H ℂ)) ?_ ?_ ?_ ?_ ?_
+  · intro x hx
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, by simpa using hfin.mem_toFinset.mp hx⟩
+  · intro χb hb
+    rw [Set.Finite.mem_toFinset]
+    exact (Finset.mem_filter.mp hb).2
+  · intro x hx
+    rfl
+  · intro χb hb
+    rfl
+  · intro x hx
+    rfl
+
+/-- **`|H⧸A'| = d·|S⧸A'|·|Q₁|`** for `A' ≤ S`: the `Q₁`-side tower
+`|H⧸A'| = |Q₁|·|H⧸A'Q₁|` (`card_quot_eq_card_quot_Q1_mul` at `Q₁ ⊓ A' = ⊥`)
+and `|H⧸A'Q₁| = d·|S⧸A'|` (`card_quot_sup_Q1_eq_d_mul`). -/
+theorem card_quot_subgroupOf_eq_d_mul [Finite G] {A' : Subgroup G} (hA' : A' ≤ hyp.S)
+    [(A'.subgroupOf hyp.H).Normal] :
+    Nat.card (↥hyp.H ⧸ A'.subgroupOf hyp.H)
+      = hyp.d * Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) * Nat.card ↥hyp.Q1 := by
+  have hi := hyp.card_quot_eq_card_quot_Q1_mul (R := A') (hyp.Q1_inf_eq_bot_of_le_S hA')
+  rw [hyp.card_quot_bot_subgroupOf_Q1, hyp.card_quot_sup_Q1_eq_d_mul hA'] at hi
+  rw [hi]
+  ring
+
+/-- **`|H⧸A'Z| = d·|S⧸A'|·|Q₁⧸Z|`** for `A' ≤ S`, `Z ≤ Q₁` (the second
+counting factor of step (3)): rewrite the `↥H`-level join as `(A'⊔Z)`-in
+(`subgroupOf_sup`), apply the `Q₁`-side tower at `Q₁ ⊓ (A'⊔Z) = Z`
+(`Q1_inf_sup_eq`), absorb `Z` into `Q₁` in the join with `Q₁`, and finish
+with `card_quot_sup_Q1_eq_d_mul`. -/
+theorem card_quot_sup_Z_subgroupOf_eq [Finite G] {A' Z : Subgroup G}
+    (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    Nat.card (↥hyp.H ⧸ ((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)))
+      = hyp.d * Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S)
+        * Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) := by
+  have hsub : (A' ⊔ Z).subgroupOf hyp.H
+      = (A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H) :=
+    Subgroup.subgroupOf_sup (hA'.trans (hyp.S_le_Q.trans hyp.Q_le_H))
+      (hZQ1.trans (hyp.Q1_le_Q.trans hyp.Q_le_H))
+  haveI : ((A' ⊔ Z).subgroupOf hyp.H).Normal := hsub ▸
+    ‹((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal›
+  have hi := hyp.card_quot_eq_card_quot_Q1_mul (R := A' ⊔ Z)
+    (hyp.Q1_inf_sup_eq hA' hZQ1)
+  have hjoin : ((A' ⊔ Z).subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)
+      = (A'.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H) := by
+    rw [hsub, sup_assoc]
+    congr 1
+    exact sup_eq_right.mpr fun x hx =>
+      Subgroup.mem_subgroupOf.mpr (hZQ1 (Subgroup.mem_subgroupOf.mp hx))
+  rw [hjoin, hyp.card_quot_sup_Q1_eq_d_mul hA'] at hi
+  rw [← hsub, hi]
+  ring
+
+/-- **`|Q₁| = |Q₁⧸Z|·|Z|`** for `Z ≤ Q₁` (the `Q₂ = ⊥` case of the internal
+tower `card_quot_Q1_eq_mul`). -/
+theorem card_Q1_eq_card_quot_mul {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) :
+    Nat.card ↥hyp.Q1
+      = Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) * Nat.card ↥Z := by
+  have h := hyp.card_quot_Q1_eq_mul (Q₂ := ⊥) bot_le hZQ1
+  rw [hyp.card_quot_bot_subgroupOf_Q1] at h
+  rw [h]
+  congr 1
+  rw [Subgroup.bot_subgroupOf, ← Subgroup.index_eq_card, Subgroup.index_bot]
+
+open scoped Classical in
+/-- **The step (3) counting, factored form** (p. 147, `𝒳₁` at `A' = S'`):
+`∑_{χ ∈ 𝒳(A',Z)} χ(1)² = d·|S⧸A'|·|Q₁⧸Z|·(|Z|−1)` for `A' ≤ S`, `Z ≤ Q₁` —
+the two-kernel counting difference `|H⧸A'| − |H⧸A'Z|` with both terms
+factored through the direct product `Q = S × Q₁`. -/
+theorem sum_degreeSq_XsetOf_eq_mul [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.XsetOf A' Z).Finite) :
+    ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+      = (hyp.d : ℂ) * (Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) : ℂ)
+        * (Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) : ℂ)
+        * ((Nat.card ↥Z : ℂ) - 1) := by
+  rw [hyp.sum_degreeSq_XsetOf_toFinset hZQ1 hfin,
+    hyp.card_quot_subgroupOf_eq_d_mul hA',
+    hyp.card_quot_sup_Z_subgroupOf_eq hA' hZQ1,
+    hyp.card_Q1_eq_card_quot_mul hZQ1]
+  push_cast
+  ring
+
+open scoped Classical in
+/-- **`𝒳(A', Z)` is nonempty** for `A' ≤ S`, `⊥ ≠ Z ≤ Q₁` (p. 147): the
+degree-square sum `d·|S⧸A'|·|Q₁⧸Z|·(|Z|−1)` is positive (`|Z| ≥ 2`), so the
+family cannot be empty. -/
+theorem XsetOf_nonempty [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {A' Z : Subgroup G} (hA' : A' ≤ hyp.S) (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥)
+    [(A'.subgroupOf hyp.H).Normal]
+    [((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    (hyp.XsetOf A' Z).Nonempty := by
+  rw [Set.nonempty_iff_ne_empty]
+  intro hempty
+  have hsum := hyp.sum_degreeSq_XsetOf_eq_mul hA' hZQ1 (hyp.XsetOf_finite A' Z)
+  rw [Set.Finite.toFinset_eq_empty.mpr hempty, Finset.sum_empty] at hsum
+  have hd0 : ((hyp.d : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  have hS0 : ((Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) : ℕ) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hQ0 : ((Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) : ℕ) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hZ2 : 2 ≤ Nat.card ↥Z :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot Z).mpr hZne)
+  have hZ0 : ((Nat.card ↥Z : ℕ) : ℂ) - 1 ≠ 0 := by
+    rw [sub_ne_zero]
+    intro h
+    have h1 : Nat.card ↥Z = 1 := Nat.cast_eq_one.mp h
+    omega
+  exact hd0 (by
+    rcases mul_eq_zero.mp hsum.symm with h | h
+    · rcases mul_eq_zero.mp h with h' | h'
+      · rcases mul_eq_zero.mp h' with h'' | h''
+        · exact h''
+        · exact absurd h'' hS0
+      · exact absurd h' hQ0
+    · exact absurd h hZ0)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
