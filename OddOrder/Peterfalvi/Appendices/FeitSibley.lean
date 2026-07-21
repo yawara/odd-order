@@ -412,6 +412,82 @@ theorem delta_notMem_inertia_Q1 [Finite G] [(hyp.Q1.subgroupOf hyp.H).Normal] {�
   exact not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one δ
     (hyp.card_fixedClasses_Q1_eq_one hδD hδ1) hθ
 
+/-- **`↥H = QH · DH`** (subtype form of `H = Q ⋊ D`): every `g : ↥H` factors as `q · δ`
+with `q` in `Q.subgroupOf H` and `δ` in `D.subgroupOf H`. -/
+theorem exists_mem_Q_mul_mem_D_subtype (g : ↥hyp.H) :
+    ∃ q : ↥hyp.H, (q : G) ∈ hyp.Q ∧ ∃ δ : ↥hyp.H, (δ : G) ∈ hyp.D ∧ g = q * δ := by
+  have hgH : (g : G) ∈ hyp.H := g.2
+  rw [← SetLike.mem_coe, ← hyp.Q_mul_D_eq_H] at hgH
+  obtain ⟨q₀, hq₀, d₀, hd₀, hqd⟩ := Set.mem_mul.mp hgH
+  rw [SetLike.mem_coe] at hq₀ hd₀
+  exact ⟨⟨q₀, hyp.Q_le_H hq₀⟩, hq₀, ⟨d₀, hyp.D_le_H hd₀⟩, hd₀,
+    Subtype.ext (by simpa using hqd.symm)⟩
+
+/-- **`Q` acts trivially on `Irr(Q₁)`** (viewed inside `↥H`): for `q : ↥H` with `(q:G) ∈ Q`,
+`conjBy q` fixes every class function of `Q₁.subgroupOf H`.  Writing `(q:G) = s·y`
+(`s ∈ S`, `y ∈ Q₁`), conjugation by `q` on `Q₁` equals conjugation by the `Q₁`-element `y`
+(since `S` centralises `Q₁`), which is inner in `Q₁` and hence fixes class functions. -/
+theorem Q_conjBy_eq [Finite G] [(hyp.Q1.subgroupOf hyp.H).Normal] {q : ↥hyp.H}
+    (hq : (q : G) ∈ hyp.Q) (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) :
+    ClassFunction.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) q θ = θ := by
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hq
+  obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hq
+  rw [SetLike.mem_coe] at hs hy
+  set y' : ↥hyp.H := ⟨y, hyp.Q_le_H (hyp.Q1_le_Q hy)⟩ with hy'
+  have hy'Q1H : y' ∈ hyp.Q1.subgroupOf hyp.H := by rw [Subgroup.mem_subgroupOf]; exact hy
+  have hqy : ClassFunction.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) q θ
+      = ClassFunction.conjBy (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) y' θ := by
+    ext x
+    rw [ClassFunction.conjBy_apply, ClassFunction.conjBy_apply]
+    refine congrArg (⇑θ) (Subtype.ext (Subtype.ext ?_))
+    simp only [Subgroup.coe_mul, Subgroup.coe_inv]
+    set X : G := ((x : ↥hyp.H) : G) with hX
+    have hxQ1 : X ∈ hyp.Q1 := (Subgroup.mem_subgroupOf).mp x.2
+    have hw : y * X * y⁻¹ ∈ hyp.Q1 :=
+      hyp.Q1.mul_mem (hyp.Q1.mul_mem hy hxQ1) (hyp.Q1.inv_mem hy)
+    have hscomm : s * (y * X * y⁻¹) = (y * X * y⁻¹) * s := hyp.S_commutes_Q1 s hs _ hw
+    have hqG : ((q : ↥hyp.H) : G) = s * y := hsy.symm
+    have hy'G : ((y' : ↥hyp.H) : G) = y := rfl
+    rw [hqG, hy'G]
+    calc s * y * X * (s * y)⁻¹
+        = s * (y * X * y⁻¹) * s⁻¹ := by group
+      _ = (y * X * y⁻¹) * s * s⁻¹ := by rw [hscomm]
+      _ = y * X * y⁻¹ := by group
+  rw [hqy]
+  exact ClassFunction.conjBy_eq_self_of_mem hy'Q1H θ
+
+/-- **The inertia crux** (Lemma 2(a), step 5): for a nontrivial `θ ∈ Irr(Q₁)`, the inertia group
+of `θ` in `↥H` is exactly `Q`.  `Q` centralises `θ` (`Q_conjBy_eq`), so `Q ≤ I_H(θ)`; conversely
+any `g = q·δ ∈ I_H(θ)` has `δ = q⁻¹g ∈ I_H(θ) ∩ D`, and `δ ≠ 1` is impossible
+(`delta_notMem_inertia_Q1`), so `g ∈ Q`.  This is the `I_G(θ) = T` input to the Clifford
+correspondence (`isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq`) with `T = Q`. -/
+theorem inertia_theta_eq_Q [Finite G] [(hyp.Q1.subgroupOf hyp.H).Normal]
+    {θ : IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)}
+    (hθ : θ ≠ trivialIrreducibleCharacter _) :
+    ClassFunction.inertia (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H)
+        (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) = hyp.Q.subgroupOf hyp.H := by
+  apply le_antisymm
+  · intro g hg
+    obtain ⟨q, hqQ, δ, hδD, rfl⟩ := hyp.exists_mem_Q_mul_mem_D_subtype g
+    have hqInertia : q ∈ ClassFunction.inertia (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H)
+        (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) := by
+      rw [ClassFunction.mem_inertia]; exact hyp.Q_conjBy_eq hqQ _
+    have hδInertia : δ ∈ ClassFunction.inertia (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H)
+        (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ) := by
+      have h := (ClassFunction.inertia (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H)
+        (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ)).mul_mem
+          (Subgroup.inv_mem _ hqInertia) hg
+      simpa using h
+    rw [Subgroup.mem_subgroupOf]
+    by_cases hδ1 : δ = 1
+    · have : ((q * δ : ↥hyp.H) : G) = (q : G) := by rw [hδ1, mul_one]
+      rw [this]; exact hqQ
+    · exact absurd hδInertia (hyp.delta_notMem_inertia_Q1 hδD hδ1 hθ)
+  · intro q hq
+    rw [Subgroup.mem_subgroupOf] at hq
+    rw [ClassFunction.mem_inertia]
+    exact hyp.Q_conjBy_eq hq _
+
 /-- `d = |D| > 0`. -/
 theorem d_pos [Finite G] : 0 < hyp.d := Nat.card_pos
 
