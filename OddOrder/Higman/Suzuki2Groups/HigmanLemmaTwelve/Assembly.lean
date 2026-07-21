@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 
 /-!
 # Higman Lemma 12: assembling the B/C/D classification
@@ -915,6 +916,27 @@ theorem higmanLemmaTwelve
             ePhi R L factors.left_normal hinfRL hsupRL
             factors.frattini_lt_left.le dR.theta hθRfrob hrRn hrRz h5s
             hθRpkg hθL2 c0 hc0ne hc0' hinv hcentral n_pos hcard
+
+/-- **The center of a ξ-length-3 Suzuki 2-group has exponent two.**  The
+classification sends `P` to one of the models `B/C/D`, whose centers have
+exponent two by the trivial radical of the model polarizations.  This is the
+source of "`Z(Q) = Q₀`" in Peterfalvi's Lemma I.3.5. -/
+theorem center_sq_eq_one_of_xiLengthThree
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {z : P} (hz : z ∈ Subgroup.center P) : z ^ 2 = 1 := by
+  rcases higmanLemmaTwelve hP hncomm hmulti hxi hlen hprime with hB | hC | hD
+  · obtain ⟨data⟩ := hB
+    exact TypeBData.sq_eq_one_of_mem_center data hz
+  · obtain ⟨data⟩ := hC
+    exact TypeCData.sq_eq_one_of_mem_center data hz
+  · obtain ⟨data⟩ := hD
+    exact TypeDData.sq_eq_one_of_mem_center data hz
 
 end
 
