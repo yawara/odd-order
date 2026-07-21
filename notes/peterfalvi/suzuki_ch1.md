@@ -909,3 +909,43 @@ MixedTermValue.lean で「equivariance → 係数制約」の全機構が完成 
    を bilinear_equivariance_coeff に食わせ (equivariance は mixedTerm_lambda_equivariance)、
    piece 4/5 で M=ε·(case 別 frob-twist) → endpoint engine (isTypeB/C/D_of_mixedTerm) の hM
    → higmanLemmaTwelve (exists_mixedFrobeniusWeightEquation → dispatch → engine → IsTypeB∨C∨D)。
+
+### 2026-07-21 lane b (autonomous ticks): piece 4 数論核心 landing + 正確な congruence 転記
+
+**landing (TwoPowerCongruence.lean、新 leaf、5 lemma 全 axiom-clean、hub 配線済)**:
+piece 4 が依拠する純数論 (group theory 非依存) を切り出した。核心 =
+`sum_two_pow_zmod_inj_of_ssubset_range`: proper subset `S,T ⊆ range n` 上で
+`∑ i∈S, 2^i ≡ ∑ i∈T, 2^i (mod 2^n−1)` ⟹ `S = T` (Higman の "exponents must be
+equal to them, in some order" の形式化)。補助 = `two_pow_zmod_eq_pow_mod`
+(`2^e = 2^(e%n)`、指数 mod n 還元) + `two_pow_zmod_card_eq_one` + ZMod-native 形。
+土台 = mathlib `geomSum_injective`。
+
+**⚠ 前 handoff の congruence は Nougat/layout の OCR 崩れ。clean PDF (p.91/p.92 画像)
+から転記した正確版が以下** (endpoint engine の quadratic map と完全一致を確認):
+
+- **B (θ=φ、α→α^{2^r})**: ζ = α^{1+2^r} + ε·α·β^{2^r} + β^{1+2^r}。mixed 項は単項
+  `M(α,β)=ε·α·β^{2^r}=ε·α·φ(β)` (Frobenius 座標 c_{i,j}: i=0,j=r のみ)。congruence 不要。
+- **C (θ:α→α^{2^r}, r≠0, φ=id、0<r≤n/2)**: eigenvalue 関係
+  `x_i ξ=λ^{2^i}x_i, y_i ξ=λ^{2^{i−1}(1+2^r)}y_i, v_i ξ=λ^{2^i(1+2^r)}v_i`。
+  ∃s: [x_0,y_s]≠0 ⟹ **congruence `1 + 2^{s−1}(1+2^r) ≡ 2^t(1+2^r) (mod 2^n−1)`**。
+  LHS=2^0+2^{s−1}+2^{s−1+r}, RHS=2^t+2^{t+r} (3 冪 ≡ 2 冪 ⟹ carry で 2 つが一致)。
+  6 解: 2 が即矛盾、2 が r≡0 (不可)、残 **s≡r+2, t≡1, 2r+1≡0** (⟹ n odd, 2θ²=1)
+  と s≡1,t≡r,2r−1≡0 (後者は 0<r≤n/2 に反す)。⟹ nonzero 積 [x_i,y_{i+r+2}]=ε^{2^{i+1}}v_{i+1}。
+  ζ = α^{1+2^r} + α^{1/2}·β^{2^{r+1}} + β²。mixed `M=ε·(α^{1/2}·β^{2^{r+1}})=ε·(frob⁻¹α·(frob·θ)β)`。
+- **D (θ:α→α^{2^r}, φ:α→α^{2^s}、r,s,r+s,r−s ≠0 mod n)**: `ν=λ^{1+2^r}=μ^{1+2^s}`
+  (primitive)。[x_i,y_j]≠0·v_0 ⟹ `λ^{2^i}μ^{2^j}=ν`, 即
+  **`2^i(1+2^s)+2^j(1+2^r) ≡ (1+2^r)(1+2^s) (mod 2^n−1)`**。
+  RHS=2^0+2^r+2^s+2^{r+s} (指数 {0,r,s,r+s} は distinct)、LHS 指数 {i,i+s,j,j+r}。
+  injectivity ⟹ set 一致 → case 分けで survivor **5r≡0, s≡2r, i≡3r, j≡r**
+  (もう一方は X↔Y 交換で同型)。⟹ [x_{i+3r},y_{i+r}]=ε^{2^i}v_i, φ=θ²,
+  ζ=α^{1+2^r}+ε·α^{2^{3r}}·β^{2^r}+β^{1+2^{2r}}。mixed `M=ε·(θ³α·θβ)`。
+
+**次の層 (piece 4 の application、次 session)**:
+1. **離散対数橋**: 場の等式 `λ^{2^i}μ^{2^j}=ν` (bilinear_equivariance_coeff の support 条件)
+   を `IsPrimitiveRoot nu (2^n−1)` で ZMod (2^n−1) の指数合同へ (nu 底の log)。case ごとに
+   λ,μ,ν の log を θ/φ=Frobenius 冪で展開 (D: log λ=(1+2^s) 等)。
+2. **指数 mod n 還元**: `2^{i+s}` 等を `two_pow_zmod_eq_pow_mod` で `2^{(i+s)%n}` に落とし、
+   distinct residues を Finset 化 → `sum_two_pow_zmod_inj_of_ssubset_range` を適用。
+3. **case dispatch**: (θ,φ) の関係 (θ=φ / φ=id / φ=θ²・独立) で B/C/D を分岐、各 survivor
+   から (i0,j0) を pin → M=ε·(case-twist) → endpoint engine の hM → higmanLemmaTwelve。
+   ⚠ multiset の carry (C の 3冪≡2冪) は injectivity が扱わない部分ゆえ Higman 通り手で解く。

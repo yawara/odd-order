@@ -95,4 +95,19 @@ theorem sum_two_pow_zmod_inj_of_ssubset_range {n : ℕ}
   rw [ZMod.natCast_eq_natCast_iff', Nat.mod_eq_of_lt hSlt, Nat.mod_eq_of_lt hTlt] at h
   exact geomSum_injective (le_refl 2) h
 
+/-- `ZMod`-native form of `sum_two_pow_zmod_inj_of_ssubset_range`: the powers of
+`2` already live in `ZMod (2 ^ n - 1)` (as produced by taking discrete logarithms
+of a primitive-root character value), rather than as a cast of a natural-number
+sum. -/
+theorem sum_two_pow_zmod_native_inj_of_ssubset_range {n : ℕ}
+    {S T : Finset ℕ} (hS : S ⊆ Finset.range n) (hT : T ⊆ Finset.range n)
+    (hSne : S ≠ Finset.range n) (hTne : T ≠ Finset.range n)
+    (h : (∑ i ∈ S, (2 : ZMod (2 ^ n - 1)) ^ i) =
+      ∑ j ∈ T, (2 : ZMod (2 ^ n - 1)) ^ j) :
+    S = T := by
+  refine sum_two_pow_zmod_inj_of_ssubset_range hS hT hSne hTne ?_
+  rw [Nat.cast_sum, Nat.cast_sum]
+  simp only [Nat.cast_pow, Nat.cast_ofNat]
+  exact h
+
 end OddOrder.Higman.Suzuki2Groups
