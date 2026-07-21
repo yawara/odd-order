@@ -373,12 +373,34 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   - **⭐ reduction (3) 統合** `xset_coherent_of_le_center_Q1`: Part A
     (xsetOf_sder_coherent) + Part B descent の合成 — Q₁ p-群 + d odd +
     ⊥ ≠ Z ≤ Z(Q₁) (H-不変) ⟹ 𝒳 = XsetOf ⊥ Z coherent。**これが (3) の deliverable**。
-- [ ] **次 = (4)〜(8)** (issue 冒頭 digest 参照)。(4) Notation (𝒴 = 𝒮(Q′)、
-  Z = ⁅Q₁,Q₁⁆∩Z(Q₁)、𝒳 = 𝒮−𝒮(Z)、aᵢ = χᵢ(1)/χ₁(1)) → (5) (eᵢ,e′ⱼ)=0 →
-  (6) a∣λ ⟹ 𝒮 coherent → (7) ψ(z) ≡ ψ(1) mod |Q| (class-algebra 合同、独立・並行可、
-  RepresentationTheory 新 leaf 候補) → (8) assembly (Res_H e′₁ 評価 + (7) で a∣λ)。
-  上流優先: (7) は (8) 専用の独立補題ゆえ (4)(5)(6) と並行して着手してよい。
-  それ以外は文書順 (4)→(5)→(6)→(8)。
+- [ ] **(4)〜(8) endgame — 着手** (新 leaf FeitSibleyEndgame.lean, 2026-07-22)。
+  原文 pp.148-150 を PDF ページ画像で再読了、冒頭 digest と完全一致を確認
+  (p.148 = (5)末尾+(6)、p.149 = (7) 全文、p.150 = (8))。
+  - [x] **(6) 整数核** `x_eq_zero_or_x_one_of_norm_identity` (sorry-free):
+    1 + a² = (v,v) + a²(x−1)² + (m−1)x²a²、(v,v) ≥ 0、a ≥ 2、m ≥ 2 ⟹
+    x = 0 ∨ (x=1 ∧ m=2)。整数性 (a² ≥ 4 で bracket ≤ 1) + interval_cases。
+    (v,v)=1 の抽出や x=1,m=2 の符号差し替え還元は assembly 側 ((6) 本体)。
+  - [ ] **(4) Notation setup**: Z := ⁅Q₁,Q₁⁆ ⊓ centralizer(Q₁:Set G) (≤ Q₁,
+    ⁅Z,Q₁⁆=1)。非自明 = ⁅Q₁,Q₁⁆ ≠ ⊥ (Q₁ non-abelian) + IsPGroup.normal_inf
+    _center_nontrivial (Isaacs Ch01 Basic:407) で ⁅Q₁,Q₁⁆⊓Z(Q₁) ≠ 1。H-不変 =
+    ⁅Q₁,Q₁⁆ char in Q₁ ⊴ H + centralizer H-不変。→ reduction (3)
+    xset_coherent_of_le_center_Q1 で 𝒳 = XsetOf ⊥ Z coherent、Remark
+    ssetOf_Qder_coherent で 𝒴 = 𝒮(Q′) coherent。witness eᵢ := (𝒳 coh).extension χᵢ,
+    e′ⱼ := (𝒴 coh).extension ηⱼ ∈ ZIrr G、norm-1 (isometry + χᵢ irred) ⟹ ±Irr。
+    ⚠ eᵢ と e′ⱼ は別 extension ゆえ (5)(6) で両立性を示して単一 extension に統合。
+  - [ ] **(5)** (eᵢ,e′ⱼ)=0: λ:=(eᵢ−aᵢe₁,e′₁)=(eᵢ−aᵢe₁,e′₂)≠0 と仮定 → aᵢ=1,
+    λ=±1, eᵢ−e₁=λ(e′₁+e′₂) → degree-0 で e′₁(1)=0 矛盾 (inner-product manip)。
+  - [ ] **(6) 本体**: Ind(χ₁−aη₁)=−a·e′₁+λΣe′ᵢ+v、(v,e′ᵢ)=0 → norm 展開で
+    x_eq_zero_or_x_one_of_norm_identity 適用 → a∣λ ⟹ 𝒮∪𝒴 coherent (τ が
+    χᵢ↦eᵢ,ηⱼ↦e′ⱼ で一貫) → Lemma 1(a) で 𝒮(S′) → (2) で 𝒮。
+  - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
+    ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
+    構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
+    (中心指標・class algebra・代数的整数)。無ければ RepresentationTheory 新 leaf。
+  - [ ] **(8)** Conclusion: (5)+(6)+(7) で a∣λ を証明し (6) を閉じる。
+    Res_H e′₁ = (λ+aμ)Σaᵢχᵢ + χ′、Σaᵢχᵢ=(ρ_H−ρ_{H/Z})/(da)、z∈Z^# 評価 +
+    (7) を ±e′₁ に適用 → λ/a+μ 代数的整数 → a∣λ。
+  作業順: (7) は独立ゆえ (4)(5)(6) と並行可。それ以外は (4)→(5)→(6)→(8)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
      保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —
