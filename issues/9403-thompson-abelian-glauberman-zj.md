@@ -99,7 +99,26 @@ class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補
   で n = 2、Hall–Witt (G Thm 2.2.3(i)) + `B' ≤ Z(P)` で `[x,A]` が全 x ∈ B で
   abelian に落ちる — **p odd はこの Case 2 の (2.13)-(2.15) で使用**、原文精読要)。
 
-#### Thm 2.7 の完全分解 (2026-07-21 原文精読済 mmd L5560-5596)
+#### ✅ Thm 2.7 core 完全証明 (2026-07-21, commits d7053573f / 789b5cace / 31976f6af)
+
+`glauberman_replacement_aux` (GlaubermanReplacement.lean, 505 行) sorry-free:
+- wrap-up `replacement_of_elementCommutator` (three-subgroup + Lem 2.3 +
+  `commutator_sup_le_of_centralizer`)
+- Case 1 (`glauberman_replacement_case_one`): r = Nat.find 最小 ⊥ 添字
+- Case 2: **Hall–Witt (2.11)-(2.14) は `hall_witt_identity` (sympy で形確定 →
+  group tactic 検証) + B'-中心性で `z = ⁅⁅u⁻¹,⁅x,v⁆⁆,x⁆` の一撃形に潰した**
+  (`commutator_commutator_eq_of_normal`)。(2.15)-(2.16) は exact 変形
+  (`commutatorElement_inv_swap_eq`) + 商 G/B' での `commutatorElement_inv_rotate`。
+  (2.19) = z² = 1 + hodd (`∀ g, g² = 1 → g = 1` 形で受理)。
+- core は n := Nat.find (最小 abelian 正添字) で case 分岐。
+
+**残り (ZJ まで)**: (1) P = AB wrapper — subgroup-level Thm 2.7 (`B' ≤ Z(J_a(P))`
+仮定、Q := A ⊔ B に core を ↥Q instantiate、maxAbelianIn の subtype transport が
+主 plumbing)。(2) **Lem 2.9/2.10** (mmd L5598 以降 — 精読要) と **Thm 2.11 (ZJ)**
+(p-stable + p-constrained + O_p'(G) = 1 ⟹ Z(J_a(P)) ⊴ G)。(3) 3024 側:
+S06_Thm62JS の hZJ を J_a 形に言い直して discharge。
+
+#### (参考) Thm 2.7 の完全分解 (2026-07-21 原文精読済 mmd L5560-5596)
 
 **core 定理** (P = AB 簡約後、型レベル): 仮定 `⊤ = B ⊔ A`, `B ⊴ G`,
 `hB' : ⁅B,B⁆ ≤ center G`, `hA : A ∈ maxAbelianIn ⊤`, `hBnA : ¬ B ≤ N(A)`,
