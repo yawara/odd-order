@@ -1100,6 +1100,211 @@ theorem sup_Sder_le_Qder {Q₂ : Subgroup G} (hQ₂ : Q₂ ≤ ⁅hyp.Q1, hyp.Q1
   · exact Subgroup.commutator_mono hyp.S_le_Q hyp.S_le_Q
   · exact Subgroup.commutator_mono hyp.Q1_le_Q hyp.Q1_le_Q
 
+/-! ## The §7 hypothesis for the full family `𝒮` (Lemma 1(a) ambient input)
+
+`coherent_adjoin_of_degree_bound` consumes an `S07.Hypothesis` for the *ambient*
+family `𝒮`; the `𝒮(Q')`-level construction above specialises it.  The pieces
+mirror the `𝒮(Q')` versions with the degree-`d` constancy replaced by the general
+`χ(1) = d·m` (real, so conjugate degrees agree). -/
+
+section FullSsetHypothesis
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+  [Invertible (Nat.card ↥hyp.H : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
+/-- **`𝒮` is closed under complex conjugation** (the `Qder`-free form of
+`conj_mem_SsetOf_Qder`). -/
+theorem conj_mem_Sset [Finite G] {χ : ClassFunction ↥hyp.H ℂ}
+    (hχ : χ ∈ hyp.Sset) : χ.conj ∈ hyp.Sset := by
+  obtain ⟨hirr, hker1⟩ := hχ
+  refine ⟨hirr.conj, ?_⟩
+  intro hall
+  apply hker1
+  intro x hxQ1
+  have := hall x hxQ1
+  rw [ClassFunction.conj_apply, ClassFunction.conj_apply] at this
+  exact star_injective this
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **The conjugate difference of a member of `𝒮` is `A`-supported**: at `1` the
+degrees agree (`χ(1) = d·m` is a natural number, hence real and conjugation-fixed),
+and off `Q` both `χ` and `χ̄` vanish. -/
+theorem conj_diff_support_subset_A_of_mem_Sset [Finite G]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    ((χ.conj - χ : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  by_contra hxA
+  apply hx
+  rw [ClassFunction.sub_apply]
+  by_cases hx1 : x = 1
+  · subst hx1
+    obtain ⟨m, -, hm⟩ := hyp.exists_apply_one_eq_d_mul hχ
+    rw [ClassFunction.conj_apply, hm,
+      show ((hyp.d : ℂ) * (m : ℂ)) = ((hyp.d * m : ℕ) : ℂ) by push_cast; ring,
+      star_natCast, sub_self]
+  · have hxQ : (x : G) ∉ hyp.Q := fun hQ => hxA ⟨hQ, hx1⟩
+    have h0 := apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp hχ hxQ
+    rw [ClassFunction.conj_apply, h0, star_zero, sub_zero]
+
+omit [Fintype G] [Fintype ↥hyp.H] in
+/-- **The conjugate difference vanishes at `1`** (degrees are conjugation-fixed
+naturals). -/
+theorem conj_diff_apply_one_of_mem_Sset [Finite G]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    (χ.conj - χ : ClassFunction ↥hyp.H ℂ) (1 : ↥hyp.H) = 0 := by
+  obtain ⟨m, -, hm⟩ := hyp.exists_apply_one_eq_d_mul hχ
+  rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hm,
+    show ((hyp.d : ℂ) * (m : ℂ)) = ((hyp.d * m : ℕ) : ℂ) by push_cast; ring,
+    star_natCast, sub_self]
+
+/-- **The Lemma 2(b) isometry on the `A`-supported `𝒮`-sublattice** (the
+`tau_isometry_diff` field of the full-`𝒮` §7 hypothesis; the `𝒮(Q')` version
+specialises via span monotonicity). -/
+theorem tau_inner_eq_of_supported_Sset [Finite G]
+    ⦃φ ψ : ClassFunction ↥hyp.H ℂ⦄
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A)
+    (hψ : ψ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A) :
+    ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ := by
+  have hφ1 : φ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hφ.2 (ClassFunction.mem_support.mpr h0))
+  have hψ1 : ψ (1 : ↥hyp.H) = 0 := by
+    by_contra h0
+    exact hyp.one_notMem_A (hψ.2 (ClassFunction.mem_support.mpr h0))
+  exact (induction_isometry_on_degree_zero hyp φ ψ hφ.1 hψ.1 hφ1 hψ1).1
+
+/-- **The (5.2.d) difference image for a member of `𝒮`** (`Sset`-level mirror of
+`ssetOfQderDifferenceImage`): both keystone differences lie in the `A`-supported
+`𝒮`-sublattice, so the (1.4) inputs come from Lemma 2(b); non-reality is
+Lemma 2(c). -/
+noncomputable def ssetDifferenceImage [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ := by
+  classical
+  have hχc : χ.conj ∈ hyp.Sset := hyp.conj_mem_Sset hχ
+  set χb : IrreducibleCharacter ↥hyp.H := ⟨χ, hχ.1⟩ with hχb
+  set fam : Fin 2 → IrreducibleCharacter ↥hyp.H :=
+    OddOrder.Peterfalvi.S07.conjPairFamily (L := ↥hyp.H) χb with hfam
+  have hfam0 : (fam 0 : ClassFunction ↥hyp.H ℂ) = χ := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hfam1 : (fam 1 : ClassFunction ↥hyp.H ℂ) = χ.conj := by
+    simp [hfam, OddOrder.Peterfalvi.S07.conjPairFamily, hχb]
+  have hdiff0 : irreducibleCharacterDifference fam 0 = 0 := by
+    simp [irreducibleCharacterDifference]
+  have hdiff1 : irreducibleCharacterDifference fam 1 = χ.conj - χ := by
+    simp only [irreducibleCharacterDifference, hfam1, hfam0]
+  have hmem : ∀ i, irreducibleCharacterDifference fam i
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A := by
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · rw [hdiff0]
+      exact ⟨Submodule.zero_mem _,
+        fun x hx => absurd (ClassFunction.zero_apply x) (ClassFunction.mem_support.mp hx)⟩
+    · rw [hdiff1]
+      exact ⟨Submodule.sub_mem _ (Submodule.subset_span hχc) (Submodule.subset_span hχ),
+        hyp.conj_diff_support_subset_A_of_mem_Sset hχ⟩
+  refine OddOrder.Peterfalvi.S07.characterDifferenceImageOfIsometry hyp.tau χb
+    ((hasNoRealCharacters_Sset hyp hd hQ1odd) hχ) ?_ ?_ ?_
+  · change ∀ i, isometryDifferenceImage hyp.tau fam i ∈ ZIrr G
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) ∈ ZIrr G
+      rw [hdiff0, map_zero]
+      exact Submodule.zero_mem _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) ∈ ZIrr G
+      rw [hdiff1]
+      exact hyp.tau_mem_ZIrr (Submodule.sub_mem _
+        (Submodule.subset_span hχc) (Submodule.subset_span hχ))
+  · change ∀ i, isometryDifferenceImage hyp.tau fam i (1 : G) = 0
+    refine Fin.forall_fin_two.mpr ⟨?_, ?_⟩
+    · change hyp.tau (irreducibleCharacterDifference fam 0) (1 : G) = 0
+      rw [hdiff0, map_zero]
+      exact ClassFunction.zero_apply _
+    · change hyp.tau (irreducibleCharacterDifference fam 1) (1 : G) = 0
+      rw [hdiff1]
+      exact hyp.tau_apply_one (hyp.conj_diff_apply_one_of_mem_Sset hχ)
+  · intro i j
+    exact hyp.tau_inner_eq_of_supported_Sset (hmem i) (hmem j)
+
+/-- **(5.2.e) orthogonality of the `𝒮` difference images** (`Sset`-level mirror of
+`ssetOfQderDifferenceImages_orthogonal`). -/
+theorem ssetDifferenceImages_orthogonal [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    {φ χ : ClassFunction ↥hyp.H ℂ} (hφ : φ ∈ hyp.Sset) (hχ : χ ∈ hyp.Sset)
+    (h1 : ClassFunction.inner φ χ = 0) (h2 : ClassFunction.inner φ χ.conj = 0) :
+    (hyp.ssetDifferenceImage hd hQ1odd hφ).Orthogonal
+      (hyp.ssetDifferenceImage hd hQ1odd hχ) := by
+  have hφc := hyp.conj_mem_Sset hφ
+  have hχc := hyp.conj_mem_Sset hχ
+  have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
+      ClassFunction.inner ζ ζ = 1 := by
+    intro ζ hζ
+    have h := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ζ, hζ.1⟩ : IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at h
+    simpa using h
+  refine
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+    _ _ ?_
+  rw [← (hyp.ssetDifferenceImage hd hQ1odd hφ).image_conjugateDifference,
+      ← (hyp.ssetDifferenceImage hd hQ1odd hχ).image_conjugateDifference]
+  change ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  have hmemφ : (φ - φ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hφ) (Submodule.subset_span hφc),
+      fun x hx => hyp.conj_diff_support_subset_A_of_mem_Sset hφ (by
+        rw [ClassFunction.mem_support] at hx ⊢
+        intro h0
+        apply hx
+        rw [show φ - φ.conj = -(φ.conj - φ) by abel, ClassFunction.neg_apply, h0, neg_zero])⟩
+  have hmemχ : (χ - χ.conj : ClassFunction ↥hyp.H ℂ)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hχ) (Submodule.subset_span hχc),
+      fun x hx => hyp.conj_diff_support_subset_A_of_mem_Sset hχ (by
+        rw [ClassFunction.mem_support] at hx ⊢
+        intro h0
+        apply hx
+        rw [show χ - χ.conj = -(χ.conj - χ) by abel, ClassFunction.neg_apply, h0, neg_zero])⟩
+  rw [hyp.tau_inner_eq_of_supported_Sset hmemφ hmemχ]
+  have hne1 : φ.conj ≠ χ := by
+    intro heq
+    have hcc : χ.conj = φ := by rw [← heq, ClassFunction.conj_conj]
+    rw [hcc, hself hφ] at h2
+    exact one_ne_zero h2
+  have hne2 : φ.conj ≠ χ.conj := by
+    intro heq
+    have hpc : φ = χ := by
+      have h := congrArg ClassFunction.conj heq
+      rwa [ClassFunction.conj_conj, ClassFunction.conj_conj] at h
+    rw [hpc, hself hχ] at h1
+    exact one_ne_zero h1
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right, h1, h2,
+    hyp.Sset_pairwiseOrthogonal hφc hχ hne1,
+    hyp.Sset_pairwiseOrthogonal hφc hχc hne2]
+  ring
+
+/-- **The §7 (5.2) hypothesis for the full family `𝒮`** — the ambient input of
+Lemma 1(a) (`coherent_adjoin_of_degree_bound`) throughout the Theorem's proof. -/
+noncomputable def ssetS07Hypothesis [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1)) :
+    OddOrder.Peterfalvi.S07.Hypothesis (L := ↥hyp.H) (G := G) hyp.Sset hyp.A where
+  tau := hyp.tau
+  tau_isometry_diff := fun _ _ hφ hψ => hyp.tau_inner_eq_of_supported_Sset hφ hψ
+  conjugate_closed := fun _ hχ => hyp.conj_mem_Sset hχ
+  no_real_characters := hasNoRealCharacters_Sset hyp hd hQ1odd
+  pairwise_orthogonal := hyp.Sset_pairwiseOrthogonal
+  difference_image := fun _ hχ => hyp.ssetDifferenceImage hd hQ1odd hχ
+  difference_images_orthogonal := fun _ _ hφ hχ h1 h2 =>
+    hyp.ssetDifferenceImages_orthogonal hd hQ1odd hφ hχ h1 h2
+
+end FullSsetHypothesis
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
