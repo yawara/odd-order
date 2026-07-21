@@ -488,7 +488,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
         半単純分解を持つとき、任意の complementary invariant order-q 対は
         {U₁, U₂} に一致 (第 3 の既約部分加群は Schur 射影で U₁ ≅ U₂ を強制)。
         Maschke は OperatorMaschke.lean の bridge 流用。
-      - **Lemma I (module iso → eigenvalue Frobenius 共役)**: 2 つの faithful
+      - [x] **Lemma I 完了** (SummandIsomorphism.lean):
+        exists_frobenius_conjugate_of_semiconj +
+        _of_equivariant_linearEquiv (μ = λ^{2^i})
+      - **Lemma I (module iso → eigenvalue Frobenius 共役)** (設計原文): 2 つの faithful
         既約 F₂[K]-module 間の K-equivariant 同型は Singer 固有値の
         μ = λ^{2^j} を強制 (exists_galoisFieldLinearModel + 生成元 orderOf、
         既存 equivariant-linearEquiv 系 (HigmanLemmaSix 587 等) 参照)。
