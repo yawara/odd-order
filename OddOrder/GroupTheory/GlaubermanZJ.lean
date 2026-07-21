@@ -722,6 +722,83 @@ theorem inf_zCenter_thompsonJAbelian_normal [Finite G] {p : ℕ} [Fact p.Prime]
   inf_zCenter_thompsonJAbelian_normal_of_card_le hp2 hstable P
     (Nat.card ↥B) B le_rfl ‹B.Normal› hB
 
+/-! ### Thm 2.11 (Glauberman の `Z(J)`-定理), `O_{p'}(G) = 1` 形 -/
+
+open OddOrder.Isaacs.Ch01 in
+/-- **Gorenstein Theorem 1.3 (Ch.8 §1) の `O_{p'}(G) = 1` 形**: `G` が p-stable
+(`IsPStableOp`) かつ p-constrained (`O_{p'} = 1` の下では `C_G(O_p(G)) ≤ O_p(G)`
+に落ちる), `P ∈ Syl_p(G)`, `A ⊴ P` abelian なら `A ≤ O_p(G)`.
+
+証明 (p. 270 の簡約): `Q := O_p(G) ≤ P ≤ N(A)` と `A` abelian で
+`⁅⁅Q,A⁆,A⁆ = ⊥` ⟹ p-stability で `AC/C ≤ O_p(G/C)` (`C := C_G(Q)`);
+p-constraint で `C ≤ Q` は `p`-群 ⟹ `O_p(G/C)` の逆像 `K₀` は正規 `p`-部分群
+(`IsPGroup.comap_of_ker_isPGroup`) ⟹ `A ≤ K₀ ≤ O_p(G)`. -/
+theorem le_opCore_of_normal_abelian_of_isPStableOp [Finite G] {p : ℕ}
+    [Fact p.Prime] (hstable : IsPStableOp p G)
+    (hconstr : centralizer ((opCore p G : Subgroup G) : Set G) ≤ opCore p G)
+    (P : Sylow p G) {A : Subgroup G} (hAP : A ≤ (P : Subgroup G))
+    (hPnA : (P : Subgroup G) ≤ normalizer (A : Set G))
+    (hAcomm : IsMulCommutative A) :
+    A ≤ opCore p G := by
+  have hQA : ⁅⁅opCore p G, A⁆, A⁆ = ⊥ := by
+    have h1 : ⁅opCore p G, A⁆ ≤ A := by
+      rw [commutator_comm]
+      exact le_normalizer_iff_commutator_le_left.mp ((opCore_le P).trans hPnA)
+    have h2 : ⁅A, A⁆ = ⊥ := commutator_eq_bot_iff_le_centralizer.mpr
+      (le_centralizer_iff_isMulCommutative.mpr hAcomm)
+    exact le_bot_iff.mp (h2 ▸ commutator_mono h1 le_rfl)
+  have hAp : IsPGroup p ↥A := P.isPGroup'.to_le hAP
+  have hstab := hstable (opCore p G) A (opCore.normal p G)
+    (opCore_isPGroup p G) hAp hQA
+  have hCp : IsPGroup p ↥(centralizer ((opCore p G : Subgroup G) : Set G)) :=
+    (opCore_isPGroup p G).to_le hconstr
+  have hker : IsPGroup p
+      (QuotientGroup.mk' (centralizer ((opCore p G : Subgroup G) : Set G))).ker := by
+    rw [QuotientGroup.ker_mk']
+    exact hCp
+  have hK₀ : IsPGroup p
+      ↥((opCore p (G ⧸ centralizer ((opCore p G : Subgroup G) : Set G))).comap
+        (QuotientGroup.mk' (centralizer ((opCore p G : Subgroup G) : Set G)))) :=
+    IsPGroup.comap_of_ker_isPGroup (opCore_isPGroup p _) _ hker
+  haveI : ((opCore p (G ⧸ centralizer ((opCore p G : Subgroup G) : Set G))).comap
+      (QuotientGroup.mk' (centralizer ((opCore p G : Subgroup G) : Set G)))).Normal :=
+    Subgroup.normal_comap _
+  have hK₀le := normal_pgroup_le_opCore hK₀
+  intro a ha
+  refine hK₀le ?_
+  rw [mem_comap]
+  exact hstab (mem_map_of_mem _ ha)
+
+open OddOrder.Isaacs.Ch01 in
+/-- **Gorenstein Theorem 2.11 (Glauberman の `Z(J)`-定理) — `O_{p'}(G) = 1` 形**:
+`G` 有限, `p` 奇素数, `G` が p-stable (`IsPStableOp`) かつ p-constrained
+(`O_{p'}(G) = 1` の下での形 `C_G(O_p(G)) ≤ O_p(G)`), `P ∈ Syl_p(G)` なら
+`Z(J_a(P)) ⊴ G`.
+
+証明 (p. 279): `Z(J_a(P))` は `P` の正規 abelian 部分群なので Thm 1.3 で
+`Z ≤ O_p(G) =: B`; Thm 2.10 で `Z = B ⊓ Z ⊴ G`. 一般形
+`G = O_{p'}(G)·N_G(Z(J(P)))` は `G/O_{p'}` への簡約で本定理に帰着する (別途). -/
+theorem zCenter_thompsonJAbelian_normal [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp2 : p ≠ 2) (hstable : IsPStableOp p G)
+    (hconstr : centralizer ((opCore p G : Subgroup G) : Set G) ≤ opCore p G)
+    (P : Sylow p G) :
+    (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G)).Normal := by
+  have hZB : centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G) ≤ opCore p G :=
+    le_opCore_of_normal_abelian_of_isPStableOp hstable hconstr P
+      (inf_le_right.trans (thompsonJAbelian_le _))
+      (le_normalizer_zCenter_thompsonJAbelian _)
+      (isMulCommutative_centralizer_inf _)
+  have h210 := inf_zCenter_thompsonJAbelian_normal hp2 hstable P
+    (B := opCore p G) (opCore_isPGroup p G)
+  have heq : opCore p G
+      ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G))
+      = centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G) := inf_eq_right.mpr hZB
+  rwa [heq] at h210
+
 end Subgroup
 
 
