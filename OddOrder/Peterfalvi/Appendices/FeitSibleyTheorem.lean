@@ -1612,8 +1612,8 @@ degree** (issue 1054, step (3) Part A): adjoining a fresh conjugate pair `{χ, �
 (`χ ∈ 𝒮`, `χ, χ̄ ∉ S₁`) to a coherent, conjugation-closed finite `S₁ ⊆ 𝒮`
 *preserves coherence* under Peterfalvi's degree inequality.  Degrees are recorded
 in units of `d`: members have `x(1) = d·m(x)` (`hmdeg`), the anchor `χ₀ ∈ S₁` has
-degree `d·m(χ₀)` with `m(χ₀) ∣ m(x)` for every member (`hmdvd`; the integer-ratio
-case of `coherent_adjoin_of_degree_bound`) and `m(χ₀) ∣ a`, where `χ(1) = d·a`;
+degree `d·m(χ₀)` with `m(χ₀) ∣ a`, where `χ(1) = d·a` (member ratios may be
+rational — issue 1050);
 Peterfalvi's inequality `2·χ₀(1)·χ(1) < ∑_{x ∈ S₁} x(1)²` appears with `d²`
 cancelled, as `2·m(χ₀)·a < ∑_{x ∈ S₁} m(x)²` (`hlt`).  All structural inputs of
 Lemma 1(a) — orthonormality, `A`-support, `τ`-facts, enumeration — are supplied
@@ -1629,7 +1629,7 @@ theorem coherent_insert_pair_of_two_mul_lt_sum [Finite G] (hd : Odd hyp.d)
     {χ₀ : ClassFunction ↥hyp.H ℂ} (hχ₀S₁ : χ₀ ∈ S₁)
     {m : ClassFunction ↥hyp.H ℂ → ℕ}
     (hmdeg : ∀ x ∈ S₁, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (m x : ℂ))
-    (hm₀pos : 0 < m χ₀) (hmdvd : ∀ x ∈ S₁, m χ₀ ∣ m x)
+    (hm₀pos : 0 < m χ₀)
     {χ : ClassFunction ↥hyp.H ℂ} (hχS : χ ∈ hyp.Sset)
     (hχS₁ : χ ∉ S₁) (hχbarS₁ : χ.conj ∉ S₁)
     {a : ℕ} (hχdeg : χ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ)) (hdvd : m χ₀ ∣ a)
@@ -1676,7 +1676,6 @@ theorem coherent_insert_pair_of_two_mul_lt_sum [Finite G] (hd : Odd hyp.d)
       push_cast
       ring)
     (fun i hi => hyp.conj_diff_support_subset_A_of_mem_Sset (hS₁S (hmem hi)))
-    (fun i hi => mul_dvd_mul_left hyp.d (hmdvd i (hmem hi)))
     (fun i hi => hyp.scaled_diff_support_subset_A_of_mem_Sset
       (hS₁S (hmem hi)) (hS₁S hχ₀S₁)
       (by rw [hmdeg i (hmem hi), hmdeg χ₀ hχ₀S₁]; push_cast; ring))
@@ -1759,7 +1758,6 @@ theorem sq_ratio_sum_le_of_adjoin_incoherent [Finite G] (hd : Odd hyp.d)
     exact_mod_cast h3.symm
   exact hyp.coherent_insert_pair_of_two_mul_lt_sum hd hQ1odd hS₁S hS₁fin hS₁conj hcoh
     hχ₀S₁ hmdeg (by rw [hmχ₀]; exact Nat.one_pos)
-    (fun x _ => by rw [hmχ₀]; exact one_dvd _)
     hχS hχS₁ hχbarS₁ hχdeg (by rw [hmχ₀]; exact one_dvd _)
     (by rw [hmχ₀]; simpa using hlt)
 

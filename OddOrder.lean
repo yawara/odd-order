@@ -443,12 +443,14 @@ import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
 import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
+import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.FeitThompson

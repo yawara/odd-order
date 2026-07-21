@@ -32,6 +32,14 @@ lane c が issue 9404 (hub 承認済 claim; Pf App.C Prop 1 前提 (iii) = Huppe
   `sylow_two_isCyclic_or_quaternion` を前提 (i) として利用可能。
 - c は今後 NearFields に触らない (App.E/Huppert/SemilinearField に戻る)。
 
+## hub 裁定 (2026-07-22 tick #21)
+
+**保全承認** — additive のみ (signature 変更・削除なし)・axiom-clean・置き場所も
+`RankOneHypothesis` 密着で数学的に自然。軌道修正は所有引き継ぎのみ:
+NearFields.lean の所有は裁定 9204 どおり **lane a 継続**、c の追加 3 点はそのまま a が
+引き継ぐ (`sylow_two_isCyclic_or_quaternion` は Prop 1 本体 discharge の前提 (i) に利用可)。
+c は宣言どおり以後 NearFields 非接触。**本 issue は a が内容を確認した時点で close してよい。**
+
 ## 参照
 
 - issues/closed/9404 (claim 本文と完了条件) / issue 9318 (残 gate、(i)/(iii) 完了を追記済)。
