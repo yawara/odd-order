@@ -299,7 +299,14 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     (iii) even ケースの vacuity 証明 (ambient TI から — 未検証、1053 も未検証と記載)。
     **(3)–(8) は p-群文脈で hQ1odd = (p 奇素数の冪) が正当に立つため非ブロック**。
     最終 assembly 時に再訪。
-- [ ] **次: (3)** (p. 146–147、原文実読済)。実装設計:
+- [x] **(3) 部品①②完了**: ① min-degree pair 分解 (221a24dad)。
+  ② p-冪度数 `exists_apply_one_eq_d_mul_pow` (472161e43, 新 leaf
+  FeitSibleyReductionThree.lean 345 行, sorry-free): 𝒮(S′) の度数 = d·p^k。
+  ルートは CT 3.12 回避 — Schur スカラー (mod-kernel, inflate 経由) の単位乗法則
+  + IsComplement.equiv でのノルム折り畳みで **Res_{Q₁} φ が既約** ⟹ deg ∣ |Q₁|。
+  汎用部品: `exists_unit_mul_eq_of_le_center` /
+  `isIrreducibleCharacter_restrict_of_isComplement'` (hyp 非依存、upstream 適性)。
+- [ ] **次: (3.1) 可除性チェーン → Part A** (p. 146–147、原文実読済)。実装設計:
   1. **𝒳-族**: 𝒳 ∩ 𝒮(R) = {χ ∈ Irr H | R ⊆ ker, Z ⊄ ker} (Z ≤ Z(Q₁) ⟹ 自動的に ∈ 𝒮)。
      counting は既存 `sum_degreeSq_ker_subset_not_subset` (N=R-in, M=Z-in) が直用可:
      Σ = |H⧸R| − |H⧸R⊔Z|。
