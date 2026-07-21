@@ -439,6 +439,7 @@ import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.FeitThompson
 import OddOrder.AxiomsCheck
