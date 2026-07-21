@@ -898,6 +898,22 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 22:55 (tick #18、Fable hub 新セッション — ユーザー「各レーンを監視します」) — ✅ a + c 合流、census 7→6 (−1)、push 済**:
+  前 hub セッション (cron `490dde28`) は tick #17 完走・push 済のクリーン状態で終了 — 中断復旧なし。
+  **a** = FeitSibley Theorem campaign 継続 (issue 1054) — (3) p-power degrees
+  `exists_apply_one_eq_d_mul_pow` (新 leaf `FeitSibleyReductionThree.lean` 345 行、a 自身が
+  OddOrder.lean 配線済) + Part A positive pair-adjoin wrapper (general anchor) + 組み立て手順固定。
+  **b** = 未マージ 0 (Suzuki Ch.II step (3) 継続中の見込み、transcript 生存)。
+  **c** = ⭐ **Thm 2.10 (Glauberman) 完全証明** — steps (c) 後半 (p-stability で A ≤ L) + (d)
+  (normalClosure W ≤ Z(J_a(P∩L))) + 組立で B ∩ Z(J_a(P)) ⊴ G (tick #17 の scaffold sorry 解消)
+  + **Thm 2.11 (Glauberman ZJ) O_{p'}(G)=1 形** Z(J_a(P)) ⊴ G (issue 9403)。
+  gate = build **4613 jobs green (+1 = 新 leaf 実 elaborate 確認)**、AxiomsCheck OK、
+  orphan 0 (897/897)、census 7→6 (−1 = Thm 2.10 scaffold 解消、regression なし)、新 axiom なし、
+  逸脱なし (a の FeitSibley = 裁定 9204 carve-out / c = claim 9403 shared leaf)、採番 open 重複なし。
+  レーン生存 3 点 OK (transcript 3 本とも tick 直前更新・live プロセス各 worktree 2 本)。
+  ⚠ サイズ flag: `FeitSibleyTheorem.lean` **1871 行** (>1500、hard limit 2000 接近) →
+  **issue 0141 起票** (a の 1054 campaign 区切りで hub が prefix-split、進行中は保留)。push 済。
+  監視 cron 再作成 (新セッション、30 分 `13,43` = Fable model default、interval 未指定)。
 - **2026-07-21 22:20 (tick #17、Fable hub cron `490dde28`) — ✅ b + c 合流、census 6→7 (+1 = 新 decl scaffold、非問題)、push 済**:
   **b** = ⭐ Pf Suzuki **Ch.II step (1) 完了** (C_D(P) = C_W(P) × P で全 5 主張) + step (2) —
   奇数 kernel の four-subgroup lift + `RankOneHypothesis` 構成 + App C Prop 1 sorried-cite
