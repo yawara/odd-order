@@ -329,6 +329,107 @@ theorem inf_centralizer_eq_of_mem_maxAbelianIn [Finite G] {P A M : Subgroup G}
   · intro m hm
     exact ⟨hm.1, le_centralizer_iff_isMulCommutative.mpr hA.2.1 hm.2.1⟩
 
+/-- **積公式** (中心化版): `H ≤ C_G(K)` なら `|H ⊔ K| = [H : H ⊓ K] · |K|`
+(`[H : H⊓K]` は `(K.subgroupOf H).index` で符号化). 第二同型定理 (normalizer 版
+`QuotientGroup.quotientInfEquivProdNormalizerQuotient`) と Lagrange で数える. -/
+theorem card_sup_of_le_centralizer [Finite G] {H K : Subgroup G}
+    (hHK : H ≤ centralizer (K : Set G)) :
+    Nat.card ↥(H ⊔ K) = (K.subgroupOf H).index * Nat.card K := by
+  have hnorm : H ≤ normalizer (K : Set G) := hHK.trans (centralizer_le_normalizer _)
+  haveI := Subgroup.normal_subgroupOf_of_le_normalizer hnorm
+  haveI := Subgroup.normal_subgroupOf_sup_of_le_normalizer hnorm
+  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (K.subgroupOf (H ⊔ K))]
+  congr 1
+  · rw [Subgroup.index_eq_card]
+    exact (Nat.card_congr
+      (QuotientGroup.quotientInfEquivProdNormalizerQuotient H K hnorm).toEquiv).symm
+  · exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+
+/-- **Thm 2.4 の coset 単射** (Gorenstein 「distinct cosets → distinct cosets」):
+`[A : C_A(M)] ≤ [M : C_M(A)]` (`M := [x,A]` abelian).
+
+商の代表元 (`Quotient.out`) 経由の単射 `⟦u⟧ ↦ ⟦⁅x,u⁆⟧` で証明する — 誘導写像の
+well-definedness は不要 (Gorenstein の主張も単射性のみ). 単射性の核 =
+`commute_commutatorElement_of_inv_mul_mem_centralizer` (Lemma 2.5(i) 対称性). -/
+theorem index_centralizer_subgroupOf_le_of_elementCommutator [Finite G]
+    {A : Subgroup G} {x : G} (hA : IsMulCommutative A)
+    (hM : IsMulCommutative (elementCommutator x A)) :
+    (((A ⊓ centralizer (elementCommutator x A : Set G))).subgroupOf A).index
+      ≤ ((centralizer (A : Set G)).subgroupOf (elementCommutator x A)).index := by
+  classical
+  set M := elementCommutator x A with hMdef
+  set C := A ⊓ centralizer (M : Set G) with hCdef
+  rw [Subgroup.index_eq_card, Subgroup.index_eq_card]
+  have hMcomm : ∀ a ∈ A, ∀ b ∈ A, Commute ⁅x, a⁆ ⁅x, b⁆ := by
+    intro a ha b hb
+    haveI := hM
+    exact setLike_mul_comm (commutatorElement_mem_elementCommutator ha)
+      (commutatorElement_mem_elementCommutator hb)
+  refine Nat.card_le_card_of_injective
+    (fun q => QuotientGroup.mk (⟨⁅x, ((Quotient.out q : ↥A) : G)⁆,
+      commutatorElement_mem_elementCommutator (Quotient.out q : ↥A).2⟩ : ↥M)) ?_
+  intro q q' hqq'
+  set u : ↥A := Quotient.out q with hu_def
+  set v : ↥A := Quotient.out q' with hv_def
+  have hd : ⁅x, (u : G)⁆⁻¹ * ⁅x, (v : G)⁆ ∈ centralizer (A : Set G) := by
+    have hmem := QuotientGroup.eq.mp hqq'
+    rw [Subgroup.mem_subgroupOf] at hmem
+    simpa using hmem
+  have hw : (u : G)⁻¹ * (v : G) ∈ C := by
+    refine ⟨A.mul_mem (A.inv_mem u.2) v.2, ?_⟩
+    exact mem_centralizer_elementCommutator_of_forall_commute
+      (commute_commutatorElement_of_inv_mul_mem_centralizer hA u.2 v.2 hMcomm hd)
+  have hcoset : (QuotientGroup.mk u : ↥A ⧸ C.subgroupOf A) = QuotientGroup.mk v := by
+    refine QuotientGroup.eq.mpr ?_
+    rw [Subgroup.mem_subgroupOf]
+    simpa using hw
+  rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q']
+  exact hcoset
+
+/-- **Gorenstein Theorem 2.4** (Thompson): `A ∈ A(P)`, `x ∈ P` で
+`M := [x,A] = ⟨⁅x,a⁆ : a ∈ A⟩` が abelian なら `M·C_A(M) ∈ A(P)`
+(積は `M ⊔ (A ⊓ C(M))` で符号化).
+
+Gorenstein pp. 271-272: `M·C_A(M)` は abelian (`C_A(M)` が `M` を中心化) で,
+`|M·C| = |M||C|/|C∩M| ≥ |A|` が coset 単射
+(`index_centralizer_subgroupOf_le_of_elementCommutator`) と `C∩M = C_M(A)`
+(`inf_centralizer_eq_of_mem_maxAbelianIn`) から従うので, `A(P)` の最大位数性で
+membership が出る. -/
+theorem thompson_mem_maxAbelianIn [Finite G] {P A : Subgroup G} {x : G}
+    (hA : A ∈ maxAbelianIn P) (hx : x ∈ P)
+    (hM : IsMulCommutative (elementCommutator x A)) :
+    elementCommutator x A ⊔ (A ⊓ centralizer (elementCommutator x A : Set G))
+      ∈ maxAbelianIn P := by
+  set M := elementCommutator x A with hMdef
+  set C := A ⊓ centralizer (M : Set G) with hCdef
+  have hMP : M ≤ P := elementCommutator_le hx hA.1
+  have hCA : C ≤ A := inf_le_left
+  have hCcomm : IsMulCommutative C := isMulCommutative_of_le hA.2.1 hCA
+  have hMcent : M ≤ centralizer (C : Set G) := le_centralizer_iff.mp inf_le_right
+  have hMCcomm : IsMulCommutative (M ⊔ C : Subgroup G) :=
+    isMulCommutative_sup_of_le_centralizer hM hCcomm hMcent
+  -- `|A| ≤ |M ⊔ C|`
+  have hcard : Nat.card A ≤ Nat.card ↥(M ⊔ C) := by
+    have h1 : Nat.card A = (C.subgroupOf A).index * Nat.card C := by
+      rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (C.subgroupOf A),
+        ← Subgroup.index_eq_card,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCA).toEquiv]
+    have h2 := index_centralizer_subgroupOf_le_of_elementCommutator
+      (x := x) hA.2.1 hM
+    have h3 : ((centralizer (A : Set G)).subgroupOf M).index
+        = (C.subgroupOf M).index := by
+      congr 1
+      rw [← Subgroup.inf_subgroupOf_left (centralizer (A : Set G)) M,
+        inf_centralizer_eq_of_mem_maxAbelianIn hA hMP hM,
+        Subgroup.inf_subgroupOf_left C M]
+    calc Nat.card A
+        = (C.subgroupOf A).index * Nat.card C := h1
+      _ ≤ (C.subgroupOf M).index * Nat.card C :=
+          Nat.mul_le_mul_right _ (h3 ▸ h2)
+      _ = Nat.card ↥(M ⊔ C) := (card_sup_of_le_centralizer hMcent).symm
+  refine ⟨sup_le hMP (hCA.trans hA.1), hMCcomm, fun B hBP hBcomm => ?_⟩
+  exact (hA.2.2 B hBP hBcomm).trans hcard
+
 /-! ### Gorenstein Lemma 2.2: 遺伝性・共変性・characteristic 性 -/
 
 /-- **Gorenstein Lemma 2.2(a) 前半**: `R ≤ P` が `A(P)` の元を含めば `A(R) ⊆ A(P)`.
