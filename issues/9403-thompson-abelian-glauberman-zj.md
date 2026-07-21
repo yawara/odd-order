@@ -67,7 +67,108 @@ BG Thm 6.2 の J は Gorenstein 版。⟹ J_a 完成後、`hZJ`・結論とも J
 `QuotientGroup.quotientInfEquivProdNormalizerQuotient` (ambient 正規性不要) で、
 coset 単射は `Quotient.out` 経由 (well-definedness 不要)。
 
-### 次 = Thm 2.5 (Thompson Replacement) の入口
+### ✅ Thm 2.5 (Thompson Replacement) + Thm 2.6 完全証明 (2026-07-21, commits 30e5eb6a6 / 1b332245b)
+
+`thompson_replacement` / `exists_mem_maxAbelianIn_normalizer` sorry-free。
+G Thm 2.6.4 の対応物 = `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial`
+(import 追加; GroupTheory→Ch01 は既存前例)。normalizer 3 補題
+(`mem_normalizer_of_forall_commutatorElement_mem` / `conj_mem_normalizer` +
+`mem_normalizer_normalizer` / `mem_normalizer_inf`) を新設。leaf = 842 行。
+
+### 次 = Thm 2.7 (Glauberman Replacement) — mmd L5522 以降
+
+`P = AB` 簡約 (Lem 2.2 使用) → `[B,A;i]` 帰納定義 → **Lem 2.8** (i)(ii)(iii) →
+Case 1 / Case 2 (Thm 2.2.3(i) Hall–Witt + Lem 2.2.4(iii)/2.2.5(ii))。
+class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補題なので先に立てる。
+
+#### ✅ Lem 2.8 (i)(ii)(iii) 完結 (2026-07-21, commits c45ecf83b / 777668e24 / 2f65b5119)
+
+- (i) `lowerCentralSeries_sup_eq_iterCommutator_sup` — sup-形直接証明 (quotient 不要;
+  基底 `P' = ⁅B,⊤⁆` は正確な等式 `commutator_top_top_eq_commutator_left`)。
+- (iii) `iterCommutator_min_abelian_le_two` — weight bound = 既存
+  `Isaacs.Ch04.commutator_lowerCentralSeries_le_subgroup` (Mann.lean)。
+- leaf = 1117 行 ⟹ **Thm 2.7 以降は新 sibling leaf
+  `OddOrder/GroupTheory/GlaubermanReplacement.lean`** (ThompsonSubgroupAbelian を
+  import、OddOrder.lean 配線を忘れない)。
+- Thm 2.7 の入口 (mmd L5564-5580): P = AB 簡約 (`thompsonJAbelian_le_of_le` +
+  `maxAbelianIn_subset_of_le` + Lem 2.1 で `Z(J(P)) ≤ A` ⟹ `B' ≤ Z(J(Q))` 継承) →
+  n = 最小 abelian 指数で Case 1 (`[B,A;n+1] ≠ 1`: r 最小の `[B,A;r]=1`、
+  `x ∈ [B,A;r-3]` で `A` が `[x,A]` を中心化しないものを取る → M = [x,A] abelian →
+  Thm 2.4; A∩B の中心化は three-subgroup lemma `[B,A∩B,A]…`; `A* ≤ N(A)` は
+  `[A*,A,A] ≤ [B,A;r] = 1` + **Lem 2.3**) / Case 2 (`[B,A;n+1] = 1`: Lem 2.8(iii)
+  で n = 2、Hall–Witt (G Thm 2.2.3(i)) + `B' ≤ Z(P)` で `[x,A]` が全 x ∈ B で
+  abelian に落ちる — **p odd はこの Case 2 の (2.13)-(2.15) で使用**、原文精読要)。
+
+#### Thm 2.7 の完全分解 (2026-07-21 原文精読済 mmd L5560-5596)
+
+**core 定理** (P = AB 簡約後、型レベル): 仮定 `⊤ = B ⊔ A`, `B ⊴ G`,
+`hB' : ⁅B,B⁆ ≤ center G`, `hA : A ∈ maxAbelianIn ⊤`, `hBnA : ¬ B ≤ N(A)`,
+`[Finite G]`, `[Group.IsNilpotent G]`, `hodd : Odd (Nat.card G)` (p odd の代替、
+x² = 1 ⟹ x = 1 に使用)。結論 `∃ A* ∈ maxAbelianIn ⊤, A ⊓ B < A* ⊓ B ∧ A* ≤ N(A)`。
+
+- **n**: 最小の正整数で `[B,A;n]` abelian (well-def = iterCommutator_eq_bot_of_
+  isNilpotent_ambient で eventually ⊥ + Nat.find)。
+- **Case 1** (`[B,A;n+1] ≠ ⊥`): r := 最小 `[B,A;r] = ⊥` (r ≥ n+2 ≥ 3)。
+  「∃ x ∈ [B,A;r-3], ¬ A centralizes [x,A]」: さもなくば A が [B,A;r-2] の全生成元
+  ⁅x,a⁆ を中心化 ⟹ [B,A;r-1] = ⊥ ✗ r 最小性 (⁅X,A⁆ = closure of ⁅x,a⁆ 生成元)。
+  M := elementCommutator x A ≤ [B,A;r-2] ≤ [B,A;n] abelian → **Thm 2.4** で
+  A* = M ⊔ C_A(M) ∈ A(⊤)。
+- **Case 2** (`[B,A;n+1] = ⊥`): Lem 2.8(iii) で n ≤ 2; [B,A;2] ≠ ⊥ (**Lem 2.3** の
+  対偶、B not ≤ N(A)) ⟹ n = 2 ⟹ `[B,A;3] = ⊥`。
+  **核心: ∀ x ∈ B, [x,A] abelian** — Hall–Witt (G Thm 2.2.3(i)) を (x, u⁻¹, w = [x,v])
+  で: 各因子が B' ≤ Z 込みで central 化し (2.12) `[x,u,w][u⁻¹,w⁻¹,x] = 1`;
+  (2.13)-(2.16) で mod B' 変形 (G Lem 2.2.5(ii) = 「[x,y] が x,y と可換 ⟹
+  [x,y]⁻¹ = [x⁻¹,y] = [x,y⁻¹]」の鏡映版が新規に必要; 2.5(i) は形式化済
+  commutatorElement_inv_rotate) ⟹ (2.17)(2.18) 対称形 ⟹ `[[x,u],[x,v]]² = 1`
+  ⟹ **hodd で = 1**。x の選択は Case 1 同型 ([B,A] が A を中心化しない)。
+- **共通 wrap-up** (両 case): (α) A∩B ≤ C_A(M): three-subgroup
+  (mathlib `commutator_commutator_eq_bot_of_rotate`): `⁅⁅B,A∩B⁆,A⁆ ≤ ⁅⁅B,B⁆,A⁆ =
+  ⊥` (B' central) + `⁅⁅A∩B,A⁆,A⁆ ≤ ⁅⁅A,A⁆,A⁆ = ⊥` (A abelian) ⟹
+  `⁅⁅A,B⁆,A∩B⁆ = ⊥` ⟹ A∩B centralizes ⁅B,A⁆ ⊇ M。
+  (β) 真性 witness: M ⊄ A (A abelian が M を中心化することになり x-選択に矛盾)。
+  (γ) **A* ≤ N(A)**: `⁅A*,A⁆ ≤ [B,A;r-1]` (Case 2 は [B,A;2]) — 分解 g = c·m
+  (`coe_mul_of_left_le_normalizer_right`、C は M を中心化) で ⁅cm,a⁆ = c⁅m,a⁆c⁻¹
+  (⁅c,a⁆=1、C ≤ A abelian)、⁅m,a⁆ ∈ ⁅[B,A;r-2],A⁆ = [B,A;r-1] は **A-正規**
+  (le_normalizer_iterCommutator) ゆえ c-共役で閉じる ⟹
+  `⁅⁅A*,A⁆,A⁆ ≤ [B,A;r] = ⊥` ⟹ **Lem 2.3** で A* ≤ N(A)。
+  ⟹ helper `commutator_sup_le_of_centralizer` として一般化して実装する。
+- **wrapper** (subgroup-level P): Q := A ⊔ B ≤ P で core を ↥Q に instantiate。
+  A(Q) ⊆ A(P) (maxAbelianIn_subset_of_le、A₀ := A)。B' ≤ Z(J_a(P)) 仮定からの
+  `B' ≤ Z(Q)` 導出: Z(J_a(P)) ≤ A (Lem 2.1: Z(J) centralizes A ≤ J_a ⟹
+  ∈ ⊤ ⊓ centralizer A = A) ⟹ B' ≤ A ⟹ A centralizes B' (A abelian)、
+  B centralizes B' (class ≤ 2 = hB'B : ⁅B,B⁆ ≤ centralizer B) ⟹ Q = A ⊔ B ≤
+  centralizer B' ⟹ B' ≤ Z(Q)。type-level への transport (subgroupOf 往復) が
+  plumbing の主コスト — maxAbelianIn の subtype-transport は
+  thompsonJAbelian_map_of_injective の key_comap/key_map パターンを流用。
+
+#### ✅ (旧記録) Lem 2.8(ii) + [B,A;i] 部品 (2026-07-21): `[B,A;i]` = 既存
+`Isaacs.Ch04.iterCommutator B A i` を再利用。`le_normalizer_commutator_right` /
+`le_normalizer_iterCommutator` / `iterCommutator_succ_le` (= (ii)) /
+`iterCommutator_le_of_le` / `iterCommutator_le_base` sorry-free。
+
+#### Lem 2.8(i)/(iii) の設計メモ (mmd L5536-5560 精読済)
+
+- **型レベルで定式化** (ambient 群 = Gorenstein の P): 仮定
+  `B A : Subgroup G`, `hsup : B ⊔ A = ⊤`, `[B.Normal]`, `hB' : ⁅B,B⁆ ≤ center G`,
+  `hAcomm : IsMulCommutative A`, `[Finite G]` (+(iii) では `Group.IsNilpotent G`)。
+  Thm 2.7 の適用は `P = AB` 簡約後に `↥Q` へ instantiate。
+- **(i) の mathlib 番地換え**: G の `L_i(P)` = mathlib `lowerCentralSeries G (i-1)`。
+  statement は mod-B' を sup で符号化:
+  `∀ i ≥ 1, lowerCentralSeries G i ⊔ ⁅B,B⁆ = iterCommutator B A (i-1) ⊔ ⁅B,B⁆`。
+  証明: B' 商 (⁅B,B⁆ ≤ center ⟹ normal) に落として B abelian ケースに帰着 —
+  (a) `L_i ≤ B` (i≥1、P/B ≅ A/(A∩B) abelian)、(b) `[ba,x] = [a,x]` (x ∈ L_i, B abelian
+  中心化) ⟹ `L_{i+1} = [L_i, A]`、(c) 基底 `P' = [B,A]` ((2.7): `[ab,x] = [a,x]^b [b,x]`
+  + [a,x] ∈ B abelian で (2.8) 加法化 ⟹ P' ⊆ [A,P][B,P]、[B,P] = [B,A]、[A,P] = [A,B])。
+  quotient 落としの plumbing が大きければ sup-形のまま直接証明も可 (要調査)。
+- **(iii)**: [B,A;n+1] = 1 ⟹ (i) で `L_{n+2} ≤ B' ≤ Z(P)` ⟹ `L_{n+3} = 1`;
+  m := ⌊(n+4)/2⌋ ≥ 2, 2m ≥ n+3; **weight bound** `[L_m,L_m] ≤ L_{2m}` (repo:
+  Mann.lean:791 の γ 版を実測して使う) ⟹ L_m abelian ⟹ [B,A;m-1] ⊆ L_m·B'
+  (B' 中心) abelian ⟹ n の最小性で n ≤ m-1 ≤ n/2+1 ⟹ n ≤ 2、cl(P) ≤ 4。
+  n は「[B,A;n] abelian なる最小の正整数」— Lean では Nat.find か明示仮定
+  `(hn : IsMulCommutative (iterCommutator B A n)) (hmin : ∀ k, 0 < k → k < n → ¬ ...)`
+  の形で受ける (Thm 2.7 側の供給に合わせて決める)。
+
+### (参考) 旧記録: Thm 2.5 の入口
 
 必要な唯一の外部部品 = **G Thm 2.6.4** (冪零群の非自明正規部分群は中心と非自明に交わる;
 `B/N ∩ Z(AB/N) ≠ 1` に適用)。repo/mathlib の対応物 (`IsPGroup.center_nontrivial` 系 /

@@ -33,6 +33,7 @@ import OddOrder.GroupTheory.RegularPGroup
 import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.ThompsonSubgroupAbelian
+import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.MackeyTransfer
@@ -442,6 +443,7 @@ import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
 import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionTwo
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.FeitThompson
