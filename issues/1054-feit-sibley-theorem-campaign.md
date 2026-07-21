@@ -178,6 +178,21 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     ψ は失敗時点の最小未 adjoin 度数) → 1(a) の非度数仮定は全部無条件に立つ
     (orthonormal/共役対/A-support/可除性 = 部品済み) ⟹ 度数 bound 破れ:
     Σ_{𝒮(S'Q₂)} χ(1)² ≤ 2dψ(1) → (1.1)(1.2) 算術 → f.p.f. 下界 → d ≤ 2 → hd1+hd 矛盾。
+  - **(2026-07-21 1(a) 引数精読の帰結) 次の必須部品 = full-𝒮 S07.Hypothesis**:
+    `coherent_adjoin_of_degree_bound` は ambient family の
+    `S07.Hypothesis (S := hyp.Sset) hyp.A` を第 1 引数に取る (𝒮(Q') 版とは別物)。
+    構成は ssetOf 版 (ssetOfQderDifferenceImage 系) の鏡映で:
+    (a) `conj_mem_Sset` (𝒮 の共役閉性 — conj_mem_SsetOf_Qder の Qder 節を落とすだけ)、
+    (b) **一般共役対 support 補題**: χ ∈ 𝒮 ⟹ (χ̄−χ).support ⊆ A — 度数相等は
+    χ̄(1) = star(χ(1)) = χ(1) (exists_apply_one_eq_d_mul で χ(1) = d·m 実数) + off-Q 消滅
+    (diff_support_subset_A_of_mem_SsetOf_Qder の一般化; apply_one_eq_d を使わない版)、
+    (c) tau_isometry_diff: 既存 tau_inner_eq_of_supported_SsetOf_Qder の Sset 版
+    (同じ証明 — span mono を外すだけ)、(d) difference_image: ssetOfQderDifferenceImage の
+    Sset 版 (keystone 差の supported-span 帰属を (b)(c) で)。
+    その後 1(a) の残引数: hχdeg は exists_apply_one_eq_d_mul (a := m)、
+    hdiffasuppχ (χ − a•anchor の support) は同度数 scaled diff の A-support
+    (既存 hdegdiffsupp 論法)、htau1_memaχ は tau_mem_ZIrr、
+    hDeg = 2a < Σ (degMem/d)² が counting との接続点。
 
 ## 完了条件
 
