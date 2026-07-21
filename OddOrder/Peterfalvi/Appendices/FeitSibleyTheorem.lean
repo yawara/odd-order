@@ -310,7 +310,7 @@ theorem apply_one_eq_d_of_mem_SsetOf_Qder [Finite G] {χ : ClassFunction ↥hyp.
   -- degree formula
   rw [ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, hφ1, mul_one]
 
-omit [Fintype ↥hyp.H] in
+omit [Fintype G] [Fintype ↥hyp.H] in
 /-- `𝒮` is a finite set: by Lemma 2(a) it is contained in the image of the finite
 type `Irr(Q)` under `φ ↦ Ind_Q^H φ`. -/
 theorem Sset_finite [Finite G] : hyp.Sset.Finite := by
@@ -327,6 +327,8 @@ theorem Sset_finite [Finite G] : hyp.Sset.Finite := by
         (θ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)) := fun φ hφ => ⟨⟨φ, hφ.1⟩, rfl⟩
   exact (Set.finite_range _).subset hsub
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)]
+  [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)] in
 /-- **Distinct members of `𝒮` are orthogonal** (they are distinct irreducible
 characters): the `pairwise_orthogonal` input for the §7 coherence hypothesis. -/
 theorem Sset_pairwiseOrthogonal :
@@ -337,7 +339,7 @@ theorem Sset_pairwiseOrthogonal :
   rw [if_neg (fun h => hne (congrArg Subtype.val h))] at hite
   simpa using hite
 
-omit [Fintype ↥hyp.H] in
+omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **`|𝒮(Q')| ≥ 2` from nonemptiness** (Remark, p. 145): a member `χ₀ ∈ 𝒮(Q')`
 comes with its complex conjugate `χ̄₀ ∈ 𝒮(Q')` (`conj_mem_SsetOf_Qder`), and
 `χ̄₀ ≠ χ₀` because no member of `𝒮` is real (Lemma 2(c),
