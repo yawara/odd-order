@@ -199,3 +199,16 @@ hdc を落として印刷版に戻せるか)。**答え: 局所データでは�
 
 `MaximalClassPGroup.lean` (hub 承認済 leaf): 「2-step centralizer 全一致 ⟺ dc≥1」の
 群レベル同値 (iterCommutator + Hall–Witt/three-subgroups)。次 iteration で着手。
+
+## ✅ 2026-07-22 close — 全残余スコープ完了
+
+- **clean Lemma landed** (commit 405df5884, axiom-clean):
+  `OddOrder/GroupTheory/MaximalClassPGroup.lean` —
+  `commutator_iterCommutator_le_of_two_step` (2-step ⟹ dc≥1、three-subgroups mod N
+  帰納) + `two_step_iff_commutator_iterCommutator_le` (同値形)。
+  ⚠ 数学的発見: 部分群 ≤ 形の同値は **maximal class 仮定不要の一般交換子計算**
+  (Lie 環版の 1 次元性は不要だった)。`OddOrder.lean` 配線済。
+- E.5 hdc 供給調査 = 前節の負の結論で完了 (corrected E.5 が honest 最終形)。
+- 本 issue の全成果: printed E.4 反例検証 + `printed_propE4_false` 機械検証 (3027) /
+  corrected E.4 完全証明 (AppE_PropE4) / corrected E.5 (AppE_E5Counting) /
+  hdc→hβsupply (AppE_BetaSupply) / clean Lemma (MaximalClassPGroup)。close。
