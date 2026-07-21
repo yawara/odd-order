@@ -90,7 +90,12 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
         W∩N(P) ≤ C(P) の commutator トリック) と
         C_D(P) = C_W(P) × P (`D_inf_centralizer_eq_W_inf_centralizer_join_P`;
         D̄ = fitting ⋊ V̄ の成分分離 + `fitting_eq_one_of_conjAction_fixed`)
-- [ ] (2) C_G(P) の near-field 構造 (Appendix C 接続)
+- [x] (2) C_G(P) の near-field 構造 — StepTwo.lean (`c022a3d01` +
+      `e4e7eb646`): `exists_four_subgroup_of_quotient` (奇数 kernel の
+      EA-4 lift)、`rankOneQuotient` (RankOneHypothesis、sorry 0)、
+      `exists_affineNearFieldModel` (App C Prop 1 sorried-cite — 9318 待ち)。
+      ⚠ NearFields → Suzuki hub の import のため StepTwo は root/AxiomsCheck
+      直接配線 (hub 経由は cycle)
   - **設計 (2026-07-21 調査)**: (2)(a) は §3 Prop 1(a) 部品
     (`centralizerHypothesisA1 (X := P)` : HypothesisA1 C_G(P) Ω_P、
     CentralizerInduction.lean:246) + kernel N = C_D(C_Q(P)) ∩ C_G(P) の同定。
