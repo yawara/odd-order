@@ -898,6 +898,19 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 (手動合流 tick、Fable hub — ユーザー「各レーンをマージします」→「きりのいいところで区切って」で終了) — ✅ a/b/c 全合流 + push、census 11 不変、区切り時点で全レーン残 0・clean**:
+  visit-time trial merge を 2 pass (a/b が tick 中に live commit を積んだため) + docs 1 件 = merge 6 commit
+  (`2f51b87cb..c3b1311a2` push 済)。**a** = FeitSibley Lemma 2(a) 核心 4 piece (構造補題 / Frobenius Q₁D
+  inertia 排除 / inertia crux I_H(θ)=Q / 非自明 constituent 抽出、issue 1051) — FeitSibley 所有は
+  **裁定 9204 の a carve-out** で非逸脱 (⚠ 本ファイル冒頭の c_re は未更新のまま = NearFields|FeitSibley を
+  まだ含む; 正本 = lane_reallocation note の 9204 行)。**b** = Higman Lemma 12 piece 4 congruence 層完成
+  (TwoPowerCongruence 1030 行) + GaloisField 2ⁿ RingAut = Frobenius 冪 (issue 2048)。**c** = ⭐ BG App.E
+  E.4 反例の Lie 環核心を機械検証 (新 leaf AppE_FiliformCounterexample 476 行、c 自身が OddOrder.lean
+  配線済 = 0135 教訓の遵守例、issue 3021 (55))。gate: build 4578→4579 jobs green (module 実 elaborate を
+  jobs/ログで確認) / AxiomsCheck OK / sorry 11 不変 / 新 axiom なし / 逸脱なし / orphan 監査 864/864 (孤立 0) /
+  shared-infra・採番重複なし。本セッションは監視 cron 未作成 (手動 tick のみ) ゆえ削除対象なし。
+  **再開手順**: cron 再作成 (明示指定なければモデル依存: Fable 30 分 `13,43` / Opus 15 分 `7,22,37,52`) →
+  通常 tick。
 - **2026-07-19 (tick #1、Fable hub — 20 分監視で再開) — ✅ a/b 合流 + gate が捕捉した main 破綻 3 件を hub 修復、census 23 不変。cron 再作成 (`0f146c30`, 20 分 `7,27,47`、ユーザー指示)**:
   **起動時検査**: main worktree に未コミット 1 行 (`ActualKActor.lean:128` の namespace 修正) を発見 →
   根因 = Higman 移行 (a07d32aab) の call-site 取りこぼしで **committed HEAD が clean checkout から
