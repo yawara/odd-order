@@ -593,6 +593,80 @@ theorem exists_commutatorElement_mem_inf_normalizer [Finite G] {p : ℕ} [Fact p
       simp [commutatorElement_def]
     rwa [hcoe] at hmem
 
+/-- **Gorenstein Theorem 2.5** (Thompson Replacement Theorem):
+`P` は (ambient `G` の部分群としての) 有限 p-群, `A ∈ A(P)`, `B ≤ P` abelian で,
+`A` は `B` を正規化するが `B` は `A` を正規化しないとする. このとき `A* ∈ A(P)` で
+(i) `A ∩ B < A* ∩ B` (真の包含), (ii) `A*` が `A` を正規化する, を満たすものが存在する
+(witness は `A* = M ⊔ C_A(M)`, `M = [x,A]`, `x` は中心元選択で取る). -/
+theorem thompson_replacement [Finite G] {p : ℕ} [Fact p.Prime] {P A B : Subgroup G}
+    (hP : IsPGroup p ↥P) (hA : A ∈ maxAbelianIn P) (hBP : B ≤ P)
+    (hBcomm : IsMulCommutative B) (hAnB : A ≤ normalizer (B : Set G))
+    (hBnA : ¬ B ≤ normalizer (A : Set G)) :
+    ∃ A' ∈ maxAbelianIn P, A ⊓ B < A' ⊓ B ∧ A' ≤ normalizer (A : Set G) := by
+  obtain ⟨x, hxB, hxnA, hxc⟩ := exists_commutatorElement_mem_inf_normalizer
+    hP hA.1 hBP hBcomm hAnB hBnA
+  -- `M := [x,A] ≤ N_B(A)`, とくに abelian.
+  have hMle : elementCommutator x A ≤ B ⊓ normalizer (A : Set G) := by
+    refine (closure_le _).mpr ?_
+    rintro m ⟨a, ha, rfl⟩
+    exact hxc a ha
+  have hMcomm : IsMulCommutative (elementCommutator x A) :=
+    isMulCommutative_of_le hBcomm (hMle.trans inf_le_left)
+  refine ⟨elementCommutator x A ⊔ (A ⊓ centralizer (elementCommutator x A : Set G)),
+    thompson_mem_maxAbelianIn hA (hBP hxB) hMcomm, ?_, ?_⟩
+  · -- (i) `A ∩ B < A* ∩ B`
+    rw [SetLike.lt_iff_le_and_exists]
+    constructor
+    · -- `A ∩ B ≤ C_A(M) ≤ A*`, かつ `≤ B`
+      have hABC : A ⊓ B ≤ A ⊓ centralizer (elementCommutator x A : Set G) := by
+        refine le_inf inf_le_left ?_
+        intro c hc
+        refine mem_centralizer_elementCommutator_of_forall_commute ?_
+        intro a ha
+        haveI := hBcomm
+        haveI := hA.2.1
+        have hcx : Commute c x := setLike_mul_comm hc.2 hxB
+        have hca : Commute c a := setLike_mul_comm hc.1 ha
+        have hfull : Commute c ((x * a) * (x⁻¹ * a⁻¹)) :=
+          (hcx.mul_right hca).mul_right (hcx.inv_right.mul_right hca.inv_right)
+        simpa [commutatorElement_def, mul_assoc] using hfull
+      exact le_inf (hABC.trans le_sup_right) inf_le_right
+    · -- 真性の witness: `⁅x,a⁆ ∉ A` なる生成元
+      obtain ⟨a, ha, hnotA⟩ : ∃ a ∈ A, ⁅x, a⁆ ∉ A := by
+        by_contra h
+        push Not at h
+        exact hxnA (mem_normalizer_of_forall_commutatorElement_mem h)
+      refine ⟨⁅x, a⁆, ⟨mem_sup_left (commutatorElement_mem_elementCommutator ha),
+        (hMle (commutatorElement_mem_elementCommutator ha)).1⟩, ?_⟩
+      exact fun hmem => hnotA hmem.1
+  · -- (ii) `A* ≤ N(A)`
+    exact sup_le (hMle.trans inf_le_right) (inf_le_left.trans le_normalizer)
+
+/-- **Gorenstein Theorem 2.6**: `B` が `P` の abelian 正規部分群 (`P ≤ N(B)` で符号化)
+なら, `B` が正規化する `A ∈ A(P)` が存在する.
+
+`|A ⊓ B|` 最大の `A ∈ A(P)` を取れば, replacement (Thm 2.5) は `|A* ⊓ B|` を真に
+増やすので適用不能 ⟹ `B ≤ N(A)`. -/
+theorem exists_mem_maxAbelianIn_normalizer [Finite G] {p : ℕ} [Fact p.Prime]
+    {P B : Subgroup G} (hP : IsPGroup p ↥P) (hBP : B ≤ P)
+    (hBcomm : IsMulCommutative B) (hBnormal : P ≤ normalizer (B : Set G)) :
+    ∃ A ∈ maxAbelianIn P, B ≤ normalizer (A : Set G) := by
+  classical
+  obtain ⟨A, hAmem, hAmax⟩ := Set.exists_max_image (maxAbelianIn P)
+    (fun A => Nat.card ↥(A ⊓ B))
+    (Set.finite_univ.subset fun _ _ => Set.mem_univ _)
+    (maxAbelianIn_nonempty P)
+  refine ⟨A, hAmem, ?_⟩
+  by_contra hBnA
+  obtain ⟨A', hA'mem, hlt, -⟩ := thompson_replacement hP hAmem hBP hBcomm
+    (hAmem.1.trans hBnormal) hBnA
+  have hle : Nat.card ↥(A' ⊓ B) ≤ Nat.card ↥(A ⊓ B) := hAmax A' hA'mem
+  have hstrict : Nat.card ↥(A ⊓ B) < Nat.card ↥(A' ⊓ B) := by
+    refine lt_of_le_of_ne (Subgroup.card_le_of_le hlt.le) ?_
+    intro heq
+    exact hlt.ne (eq_of_le_of_card_ge hlt.le heq.ge)
+  omega
+
 /-! ### Gorenstein Lemma 2.2: 遺伝性・共変性・characteristic 性 -/
 
 /-- **Gorenstein Lemma 2.2(a) 前半**: `R ≤ P` が `A(P)` の元を含めば `A(R) ⊆ A(P)`.
