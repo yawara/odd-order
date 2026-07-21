@@ -8458,6 +8458,13 @@ commutator whose Frobenius weight satisfies `λ^(2^i) μ^(2^j) = ν^(2^k)`.  Wit
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.exists_mixedFrobeniusWeightEquation_of_xiLengthThree
 
+/-! **Higman Lemma 12 (pp. 90--92), the B/C/D classification**: a Suzuki
+2-group of ξ-length 3 is isomorphic to some `B(n, θ, ε)`, `C(n, ε)`, or
+`D(n, θ, ε)`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.higmanLemmaTwelve
+
 /-! **Peterfalvi Appendix III, Higman theorem (a), easy inclusion**: every
 involution is central, and the involutions together with the identity form a
 concrete elementary-abelian `2`-subgroup.  The reverse identification with the
