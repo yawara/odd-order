@@ -37,6 +37,7 @@ namespace OddOrder.BG.AppE
 open OddOrder.GroupTheory
 open OddOrder.BG.Ch3.S12
 open OddOrder.BG.Ch4.S16
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -189,6 +190,71 @@ theorem e5_R_eq_centralizer [Finite G]
   refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
   rw [Set.mem_singleton_iff.mp hy]
   exact congrArg Subtype.val (hU₁ab.is_comm.comm (⟨x, hxU₁⟩ : ↥U₁) ⟨u, habs hu⟩)
+
+/-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
+Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
+collapses onto `K₁`.
+
+`K₁ ≤ E ∩ N ≤ M ∩ N = K₁ ⊔ U₁`; any `c ∈ E ∩ N` commutes with a nontrivial `k₀ ∈ K₁`
+(both live in the cyclic `E`), and in the decomposition `c = k·u` (`U₁ ⊴ M ∩ N`) the
+`U₁`-part commutes with `k₀` too, hence dies by BG Theorem A(4) (`C_{U₁}(k₀) = 1`).
+Coq drops all of 15.9(c) (BGsection15.v: *"not used later"* — Coq has no Appendix E),
+so this is formalized here for the first time (issue 3028 WP2.5). -/
+theorem inf_eq_kappaHall_of_le_cyclic [Finite G]
+    {M N E K₁ U₁ : Subgroup G}
+    (hEM : E ≤ M) (hEcyc : IsCyclic ↥E) (hK₁E : K₁ ≤ E) (hK₁N : K₁ ≤ N)
+    (hK₁ne : K₁ ≠ ⊥)
+    (hU₁norm : (U₁.subgroupOf (M ⊓ N)).Normal)
+    (hsupMN : M ⊓ N = K₁ ⊔ U₁)
+    (hCU₁ : ∀ k ∈ K₁, k ≠ 1 → U₁ ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) :
+    E ⊓ N = K₁ := by
+  classical
+  haveI : Nontrivial ↥K₁ := (Subgroup.nontrivial_iff_ne_bot K₁).mpr hK₁ne
+  obtain ⟨k₀', hk₀ne'⟩ := exists_ne (1 : ↥K₁)
+  have hk₀K₁ : (k₀' : G) ∈ K₁ := k₀'.2
+  have hk₀ne : (k₀' : G) ≠ 1 := fun h => hk₀ne' (Subtype.ext h)
+  -- Elements of `E` commute (cyclic ⇒ abelian).
+  have hEcomm : ∀ a b : G, a ∈ E → b ∈ E → Commute a b := by
+    intro a b ha hb
+    letI : CommGroup ↥E := IsCyclic.commGroup
+    have h2 : a * b = b * a := by
+      have h := mul_comm (⟨a, ha⟩ : ↥E) ⟨b, hb⟩
+      simpa using congrArg (fun z : ↥E => (z : G)) h
+    exact h2
+  refine le_antisymm ?_ (le_inf hK₁E hK₁N)
+  intro c hc
+  have hcMN : c ∈ M ⊓ N := ⟨hEM hc.1, hc.2⟩
+  -- Decompose `c = k * u` inside `↥(M ⊓ N)`, where `U₁` is normal.
+  haveI := hU₁norm
+  have hK₁le : K₁ ≤ M ⊓ N := hsupMN ▸ le_sup_left
+  have hU₁le : U₁ ≤ M ⊓ N := hsupMN ▸ le_sup_right
+  have hsubSup : (K₁.subgroupOf (M ⊓ N)) ⊔ (U₁.subgroupOf (M ⊓ N)) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hK₁le hU₁le, ← hsupMN, Subgroup.subgroupOf_self]
+  have hcprod : (⟨c, hcMN⟩ : ↥(M ⊓ N)) ∈
+      (K₁.subgroupOf (M ⊓ N) : Set ↥(M ⊓ N)) * (U₁.subgroupOf (M ⊓ N) : Set ↥(M ⊓ N)) := by
+    rw [← Subgroup.mul_normal, hsubSup]
+    exact Subgroup.mem_top _
+  obtain ⟨k', hk', u', hu', hprod⟩ := hcprod
+  have hkK₁ : ((k' : ↥(M ⊓ N)) : G) ∈ K₁ := Subgroup.mem_subgroupOf.mp hk'
+  have huU₁ : ((u' : ↥(M ⊓ N)) : G) ∈ U₁ := Subgroup.mem_subgroupOf.mp hu'
+  have hcku : c = ((k' : ↥(M ⊓ N)) : G) * ((u' : ↥(M ⊓ N)) : G) := by
+    have h := congrArg (fun z : ↥(M ⊓ N) => (z : G)) hprod
+    simpa using h.symm
+  -- The `U₁`-part commutes with `k₀`, hence is trivial.
+  have hCk : Commute (k₀' : G) ((k' : ↥(M ⊓ N)) : G) := hEcomm _ _ (hK₁E hk₀K₁) (hK₁E hkK₁)
+  have hCc : Commute (k₀' : G) c := hEcomm _ _ (hK₁E hk₀K₁) hc.1
+  have hCu : Commute (k₀' : G) ((u' : ↥(M ⊓ N)) : G) := by
+    have h1 : ((u' : ↥(M ⊓ N)) : G) = ((k' : ↥(M ⊓ N)) : G)⁻¹ * c := by
+      rw [hcku]; group
+    rw [h1]
+    exact hCk.inv_right.mul_right hCc
+  have huC : ((u' : ↥(M ⊓ N)) : G) ∈ U₁ ⊓ Subgroup.centralizer ({(k₀' : G)} : Set G) :=
+    ⟨huU₁, Subgroup.mem_centralizer_iff.mpr fun y hy => by
+      rw [Set.mem_singleton_iff.mp hy]; exact hCu⟩
+  rw [hCU₁ _ hk₀K₁ hk₀ne] at huC
+  have hu1 : ((u' : ↥(M ⊓ N)) : G) = 1 := Subgroup.mem_bot.mp huC
+  rw [hcku, hu1, mul_one]
+  exact hkK₁
 
 /-- **BG `(E.29)`** (p. 165): under Corollary E.5's hypothesis block, the unique maximal
 subgroup `N ⊇ C_G(x)` is of type P₂ with `C_{N_σ}(x) ≠ 1` and `M ∩ N` a complement to
