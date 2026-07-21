@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Finite
+import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.GroupTheory.Commutator.Basic
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch01_Sylow.Basic
@@ -62,7 +63,7 @@ Lem 2.8-2.10、Thm 2.11 (**Glauberman `Z(J)`-定理**) は後続。
 
 namespace Subgroup
 
-open scoped commutatorElement
+open scoped commutatorElement Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -896,5 +897,156 @@ open OddOrder.Isaacs.Ch04 in
 theorem iterCommutator_le_base {B : Subgroup G} (A : Subgroup G) [B.Normal]
     (i : ℕ) : iterCommutator B A i ≤ B :=
   iterCommutator_le_of_le A (Nat.zero_le i)
+
+/-! ### Gorenstein Lemma 2.8(i): `L_{i+1}(P) = [B,A;i] (mod B')`
+
+型レベルで定式化: ambient 群 `G` が Gorenstein の `P` (`⊤ = B ⊔ A`, `B ⊴ G`,
+`B' = ⁅B,B⁆ ≤ Z(G)`, `A` abelian)。mod `B'` は `⊔ ⁅B,B⁆` で符号化。
+`P' = ⁅B,⊤⁆` は正確な等式で成立し (mod 不要)、mod-`B'` が要るのは
+`⊤`-スロットを `A` に縮める段のみ。 -/
+
+section GorensteinLemmaTwoEight
+
+open OddOrder.Isaacs.Ch04
+
+/-- 中心に含まれる部分群は正規. -/
+theorem normal_of_le_center' {C : Subgroup G} (hC : C ≤ center G) : C.Normal := by
+  constructor
+  intro c hc g
+  have hcen := Subgroup.mem_center_iff.mp (hC hc) g
+  have heq : g * c * g⁻¹ = c := by rw [hcen]; group
+  rw [heq]
+  exact hc
+
+/-- 中心的部分群は左スロットで吸収される: `C ≤ Z(G)` なら `⁅X ⊔ C, Y⁆ = ⁅X, Y⁆`. -/
+theorem commutator_sup_central_left {X Y C : Subgroup G} (hC : C ≤ center G) :
+    ⁅X ⊔ C, Y⁆ = ⁅X, Y⁆ := by
+  haveI := normal_of_le_center' hC
+  refine le_antisymm ?_ (commutator_mono le_sup_left le_rfl)
+  rw [commutator_le]
+  intro g hg y hy
+  have hgset : g ∈ (X : Set G) * (C : Set G) := by
+    rw [← Subgroup.mul_normal X C]
+    exact hg
+  obtain ⟨x, hx, c, hc, rfl⟩ := hgset
+  have h1 : ∀ w : G, c * w = w * c := fun w =>
+    (Subgroup.mem_center_iff.mp (hC hc) w).symm
+  have key : ⁅x * c, y⁆ = x * (c * y * c⁻¹) * x⁻¹ * y⁻¹ := by group
+  have hcyc : c * y * c⁻¹ = y := by rw [h1 y]; group
+  have hxy : ⁅x * c, y⁆ = ⁅x, y⁆ := by
+    rw [key, hcyc, ← commutatorElement_def]
+  rw [hxy]
+  exact commutator_mem_commutator hx hy
+
+/-- `⊤ = B ⊔ A` (B 正規) のとき任意の元は `b * a` に分解する. -/
+theorem exists_mul_of_sup_eq_top {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) (g : G) : ∃ b ∈ B, ∃ a ∈ A, g = b * a := by
+  have hg : g ∈ (B : Set G) * (A : Set G) := by
+    rw [← Subgroup.normal_mul B A, hsup]
+    trivial
+  obtain ⟨b, hb, a, ha, heq⟩ := hg
+  exact ⟨b, hb, a, ha, heq.symm⟩
+
+/-- `⊤ = B ⊔ A` (B 正規) の `a * b` 分解. -/
+theorem exists_mul_of_sup_eq_top' {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) (g : G) : ∃ a ∈ A, ∃ b ∈ B, g = a * b := by
+  have hg : g ∈ (A : Set G) * (B : Set G) := by
+    rw [← Subgroup.mul_normal A B, sup_comm, hsup]
+    trivial
+  obtain ⟨a, ha, b, hb, heq⟩ := hg
+  exact ⟨a, ha, b, hb, heq.symm⟩
+
+/-- **Gorenstein (2.6) の片側**: `X ≤ B` について `⁅X, ⊤⁆ ≤ ⁅X, A⁆ ⊔ ⁅B, B⁆`.
+
+`g = b·a` に分解して `⁅x, ba⁆ = ⁅x,b⁆ · (b ⁅x,a⁆ b⁻¹)`; `⁅x,b⁆ ∈ B'`,
+`b`-共役は `B'` の誤差で外れる (`⁅x,a⁆ ∈ B` ゆえ). -/
+theorem commutator_top_le_sup_of_le {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) {X : Subgroup G} (hXB : X ≤ B) :
+    ⁅X, (⊤ : Subgroup G)⁆ ≤ ⁅X, A⁆ ⊔ ⁅B, B⁆ := by
+  rw [commutator_le]
+  intro x hx g _
+  obtain ⟨b, hb, a, ha, rfl⟩ := exists_mul_of_sup_eq_top hsup g
+  have hxaB : ⁅x, a⁆ ∈ B := by
+    have h1 : a * x⁻¹ * a⁻¹ ∈ B := ‹B.Normal›.conj_mem _ (B.inv_mem (hXB hx)) a
+    have h2 : x * (a * x⁻¹ * a⁻¹) ∈ B := B.mul_mem (hXB hx) h1
+    rwa [show x * (a * x⁻¹ * a⁻¹) = ⁅x, a⁆ by group] at h2
+  have key : ⁅x, b * a⁆ = ⁅x, b⁆ * (⁅x, a⁆ * ⁅⁅x, a⁆⁻¹, b⁆) := by group
+  rw [key]
+  have h1 : ⁅x, b⁆ ∈ ⁅B, B⁆ := commutator_mem_commutator (hXB hx) hb
+  have h2 : ⁅x, a⁆ ∈ ⁅X, A⁆ := commutator_mem_commutator hx ha
+  have h3 : ⁅⁅x, a⁆⁻¹, b⁆ ∈ ⁅B, B⁆ :=
+    commutator_mem_commutator (B.inv_mem hxaB) hb
+  exact mul_mem (mem_sup_right h1) (mul_mem (mem_sup_left h2) (mem_sup_right h3))
+
+/-- `X ≤ B` について `⁅X, ⊤⁆ ⊔ B' = ⁅X, A⁆ ⊔ B'` (mod-`B'` の等式形). -/
+theorem commutator_top_sup_eq_of_le {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) {X : Subgroup G} (hXB : X ≤ B) :
+    ⁅X, (⊤ : Subgroup G)⁆ ⊔ ⁅B, B⁆ = ⁅X, A⁆ ⊔ ⁅B, B⁆ :=
+  le_antisymm (sup_le (commutator_top_le_sup_of_le hsup hXB) le_sup_right)
+    (sup_le (le_sup_left.trans' (commutator_mono le_rfl le_top)) le_sup_right)
+
+/-- **Gorenstein の基底 `P' = [B, P]`** (`⊤ = B ⊔ A`, `A` abelian; 正確な等式).
+
+`g₁ = a₁b₁` に分解: `⁅a₁b₁, g₂⁆ = (a₁ ⁅b₁,g₂⁆ a₁⁻¹) · ⁅a₁, g₂⁆`; 第 1 因子は
+`⁅B,⊤⁆` (正規) に入り, 第 2 因子は `g₂ = b₂a₂` 分解と `A` の可換性で
+`⁅a₁,b₂⁆`-型に潰れてやはり `⁅B,⊤⁆` に入る. -/
+theorem commutator_top_top_eq_commutator_left {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) (hAcomm : IsMulCommutative A) :
+    ⁅(⊤ : Subgroup G), (⊤ : Subgroup G)⁆ = ⁅B, (⊤ : Subgroup G)⁆ := by
+  haveI := hAcomm
+  refine le_antisymm ?_ (commutator_mono le_top le_rfl)
+  rw [commutator_le]
+  intro g₁ _ g₂ _
+  obtain ⟨a₁, ha₁, b₁, hb₁, rfl⟩ := exists_mul_of_sup_eq_top' hsup g₁
+  have key : ⁅a₁ * b₁, g₂⁆ = (a₁ * ⁅b₁, g₂⁆ * a₁⁻¹) * ⁅a₁, g₂⁆ := by group
+  rw [key]
+  haveI : (⁅B, (⊤ : Subgroup G)⁆).Normal := commutator_normal B ⊤
+  have h1 : a₁ * ⁅b₁, g₂⁆ * a₁⁻¹ ∈ ⁅B, (⊤ : Subgroup G)⁆ :=
+    ‹(⁅B, (⊤ : Subgroup G)⁆).Normal›.conj_mem _
+      (commutator_mem_commutator hb₁ trivial) a₁
+  have h2 : ⁅a₁, g₂⁆ ∈ ⁅B, (⊤ : Subgroup G)⁆ := by
+    obtain ⟨b₂, hb₂, a₂, ha₂, rfl⟩ := exists_mul_of_sup_eq_top hsup g₂
+    have hcomm : ⁅a₁, a₂⁆ = 1 :=
+      commutatorElement_eq_one_iff_commute.mpr (setLike_mul_comm ha₁ ha₂)
+    have key2 : ⁅a₁, b₂ * a₂⁆ = ⁅a₁, b₂⁆ * (b₂ * ⁅a₁, a₂⁆ * b₂⁻¹) := by group
+    rw [key2, hcomm]
+    have h3 : ⁅a₁, b₂⁆ ∈ ⁅B, (⊤ : Subgroup G)⁆ := by
+      rw [← commutatorElement_inv]
+      exact (⁅B, (⊤ : Subgroup G)⁆).inv_mem
+        (commutator_mem_commutator hb₂ trivial)
+    simpa using h3
+  exact mul_mem h1 h2
+
+/-- **Gorenstein Lemma 2.8(i)**: `⊤ = B ⊔ A`, `B ⊴ G`, `B' = ⁅B,B⁆ ≤ Z(G)`,
+`A` abelian のとき, `i ≥ 1` で
+`lowerCentralSeries G i ⊔ B' = [B,A;i] ⊔ B'`
+(mathlib 番地: `(⊤).lowerCentralSeries i` = Gorenstein の `L_{i+1}(P)`). -/
+theorem lowerCentralSeries_sup_eq_iterCommutator_sup {B A : Subgroup G} [B.Normal]
+    (hsup : B ⊔ A = ⊤) (hB' : ⁅B, B⁆ ≤ center G) (hAcomm : IsMulCommutative A) :
+    ∀ i, 1 ≤ i →
+      (⊤ : Subgroup G).lowerCentralSeries i ⊔ ⁅B, B⁆ = iterCommutator B A i ⊔ ⁅B, B⁆ := by
+  intro i hi
+  induction i with
+  | zero => exact absurd hi (by norm_num)
+  | succ i ih =>
+    rcases Nat.eq_zero_or_pos i with hi0 | hipos
+    · -- 基底 `i + 1 = 1`
+      subst hi0
+      rw [show (⊤ : Subgroup G).lowerCentralSeries 1 = ⁅(⊤ : Subgroup G), (⊤ : Subgroup G)⁆ from by
+          rw [Subgroup.lowerCentralSeries_succ, Subgroup.lowerCentralSeries_zero],
+        commutator_top_top_eq_commutator_left hsup hAcomm,
+        iterCommutator_succ, iterCommutator_zero]
+      exact commutator_top_sup_eq_of_le hsup le_rfl
+    · -- 帰納段
+      have hIH := ih hipos
+      rw [Subgroup.lowerCentralSeries_succ]
+      have habsorb1 : ⁅(⊤ : Subgroup G).lowerCentralSeries i, (⊤ : Subgroup G)⁆
+          = ⁅iterCommutator B A i, (⊤ : Subgroup G)⁆ := by
+        rw [← commutator_sup_central_left (X := (⊤ : Subgroup G).lowerCentralSeries i) (Y := ⊤) hB',
+          hIH, commutator_sup_central_left hB']
+      rw [habsorb1, iterCommutator_succ]
+      exact commutator_top_sup_eq_of_le hsup (iterCommutator_le_base A i)
+
+end GorensteinLemmaTwoEight
 
 end Subgroup
