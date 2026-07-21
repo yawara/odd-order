@@ -538,6 +538,19 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
       自由作用と位数整除を得る一般補題を証明する
 - [ ] `K`-不変な位数 `q²` 部分群 `X` と `X^w ≠ X` を証明する
+  - [x] square fiber (新 leaf SquareCosetFiber.lean, 2026-07-21):
+        `cosetSquare` (中心 exponent-2 部分群の coset 上で平方は一定 →
+        P⧸Z → P の関数として well-defined、hom ではない) +
+        `bijOn_cosetSquare` (order-|Z| invariant summand 上で
+        X̄∖{1} → Z∖{1} の全単射; K-同変性 + Z∖{1} 上の K-推移性で全射、
+        濃度一致で単射) + `existsUnique_cosetSquare_eq`
+        (固定 involution s の fiber は単一 coset — 原文の
+        |{x ∈ X | x² = s}| = q の形式化)。AxiomsCheck 2 本登録
+  - 残り: (i) ω := conj-by-w で X̄^ω = X̄ なら unique fiber coset が
+    ⟨ω⟩-不変 → coprime lifting (KSubgroupOrbit の engine) で固定元 →
+    C_Q(w) = Q₀ と x² = s ≠ 1 が矛盾; (ii) よって X̄^ω ≠ X̄ となり
+    (X̄, X̄^ω) + conj-w equivariant iso で IsomorphicOrderQModuleSplit
+    を構成 (複補性は isCompl_of_distinct_invariant_of_transitive_card)
 - [ ] `W` の projective-line 上の自由作用から `|W| ∣ q+1` を証明する
 - [ ] 一般有限体上の 2 次元表現 API から `W` の巡回性を証明する
   - [x] projective FPF から cyclicity と `|E| ∣ |F| + 1` を得る一般定理を証明する

@@ -13,11 +13,14 @@ created: 2026-07-21
 
 ## やること
 
-- [ ]
+- [x] WP1 (E.29) / WP2 (E.30) / WP2.5 (15.9(c)) / WP3 (setup) / WP4 ((ii)∧hdc⟹(i)) / WP5 (glue + counting)
 
 ## 完了条件
 
-<!-- 何をもって closed とするか. 例: 該当 sorry が消える / lake build が通る / ノート x.md を書く -->
+- [x] `maximalSubgroups_isTypeI_or_isTypeII` 完全証明 (AppE_E5Counting.lean、sorry-free、
+  axioms = [propext, Classical.choice, Quot.sound]、AxiomsCheck 登録済)
+- [x] AppE_FurtherResults.lean の sorried statement 削除 → **同 file sorry-free 化**
+- [x] **BG Appendix E 全結果 (E.1–E.5) 形式化完了**
 
 ## 参照
 
@@ -271,3 +274,63 @@ leaf は 1290 行 — **WP5 は新 sibling leaf** (`AppE_E5Counting.lean` 予定
    (rank ≥ 2 → ¬cyclic: 対応 lemma 要確認、tau1_pRank_eq_one の逆向き系)。
 
 WP5 glue は新 leaf `AppE_E5Counting.lean` 予定 (未作成 — 実体ができる iteration で作成+配線)。
+
+## 2026-07-21 ⭐ WP5 前半: glue 完成 (`AppE_E5Counting.lean` 新 leaf、全 sorry-free)
+
+- `e5_neighbour_data` 拡張 (AppE_CorollaryE5.lean): 3 export 追加 — `p ∈ τ₂(N)` /
+  `ℳ(C_G(x)) = {N}` singleton / `SubgroupESetup N (M∩N) K₁ E₂ E₃` + `U₁ = E₂ ⊔ E₃`。
+- 新 leaf `AppE_E5Counting.lean` (import: AppE_CorollaryE5 のみ — closure が S14 counting
+  全部と TypeP1Criteria に届くのを実測確認済; OddOrder.lean 配線済):
+  - `derivedInG_eq_Msigma_of_cyclic_complement`: M' = M_σ (cyclic complement quotient)。
+    両 branch の |M/M'| ↔ [M:M_σ] 変換に使用。
+  - `e5_exists_nonabelian_sylow_of_ii`: (ii) → O_p(M) = Sylow p of G が nonabelian
+    (12.7 canonical line 機構の hnonab 供給)。
+  - `le_opiCoreInG_singleton_of_isPGroup`: p ∈ σ(M) + M_σ nilpotent → O_p(M) が M の
+    p-部分群を全吸収 (unique Sylow)。
+  - `e5_R_noncyclic`: R = O_p(M)⊓N noncyclic (12.7 の rank-2 A ≤ M∩N を O_p 吸収 →
+    A ≤ R、elemAb p² は noncyclic)。**BG の "r(R) = 2" より弱いが (E.31) に十分**。
+  - `normalizer_zpowers_le_of_centralizer_singleton`: N_G(⟨x⟩) ≤ N (hNxN 供給;
+    C_G(x) = C_G(⟨x⟩) ≤ N_G(⟨x⟩) ≠ ⊤ (G simple/¬solvable) → coatom → singleton)。
+  - ⭐ `e5_msigma_index_prime_of_ii_hdc`: **(ii)∧hdc branch の完全 glue** — raw E.5
+    仮説ブロックから e5_derived_index_eq_of_ii_hdc の全仮説を導出し
+    `[M : M_σ].Prime` を結論。**hMσnil は `maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 (Or.inl hFM)` + S15 iff 経由** (iteration 22 の Prop 16.1 TypeIData 案より直接的、
+    15.9 証明内部と同じ 2-step)。hCU₁ = Thm A(4) `typeP_hall_inf_centralizer_kappaElement_eq_bot` を N に適用。
+
+### 残 WP5 後半 (counting) — 部品は全部実測済み・全 sorry-free
+
+- **(E.33)**: `sigmaConjugacySaturation_Mtilde_ncard` (SigmaLengthOne:848) =
+  |𝒞_G(M̃)| = (|M_σ|−1)[G:M]。disjoint = `conjClassSet_Mtilde_disjoint` (CentralizerSup:472)。
+- **(E.34)**: `ncard_conjClassSet_of_isTISubset` + `typeP_zTilde_isTI` +
+  `typeP_family_Z_normalizes_T` (typeP_zTilde_conjClass_gt_half の前半 replay で正確値
+  |𝒞_G(Ẑ)| = (k−1)(k*−1)[G:Z]) + `zTilde_ncard_eq` + `card_kappaHall_sup_Kstar`
+  (|G| = kk*[G:Z])。Ẑ⊥M̃ = `conjClassSet_T_Mtilde_disjoint` + `family_inf_msigma_union_eq`
+  transport。
+- **partner**: `typeP_duality` (TypePDuality:989) → bundle (nonconj/covering(g)/cyclic/TI/
+  partner structure (b)(c))。`msigma_inf_partner_eq_kstar` + `partner_inf_and_uniq`
+  (KappaHallCommutator:945) → **N ⊓ N* = K₁ ⊔ K* = Z** (14.7(d)) → Z ⊊ N, Z ⊊ N*
+  (N* ≤ N なら maximality で N* = N、nonconj に矛盾) → 奇数 index ≥ 3 → |N|,|N*| ≥ 3kk*。
+- **N* = P₁**: bad L (¬TypeI ∧ ¬TypeII) → kappa 三分律 + `isTypeI_of_isTypeF` +
+  `isTypeII_of_isTypeP2` (TypeP1Criteria:854/1469、無条件!) → L type P₁ → covering (g) →
+  L ~ N* (L ~ N は P₂ 移送で矛盾) → N* type P₁ (`isTypeP1_conj_smul`) →
+  `typeP1_card_eq` (CentralizerSup:~640): |N*| = |N*_σ|·k*。
+- **|N/N_σ| = |M∩N|**: hcompl (complement) → index_eq_card。[M:M_σ] = k は
+  glue の index.Prime + K₁ ≤ E (suitable) + k | |E| prime。
+- **最終不等式 (PDF p.166 画像確定済)**: s ≤ 1 (4 族 disjoint ⊆ G) vs
+  s = (1/k − 1/|M|) + (1/k* − 1/|N*|) + (1/|K₁U₁| − 1/|N|) + (1 − 1/k − 1/k* + 1/(kk*))。
+  純 ℕ 化: a := |M_σ|[G:M] = k*J, c := |N*_σ|[G:N*] = kJ (J := [G:Z]) が消えて
+  **b + J ≤ [G:M] + [G:N] + [G:N*]** (b := |N_σ|[G:N])、3[G:M] ≤ b ([M:M∩N] ≥ 3 odd)、
+  3[G:N] ≤ J、3[G:N*] ≤ J → 2b + J ≤ 0 矛盾。減算不要の乗法形で処理可。
+- 最後に `maximalSubgroups_isTypeI_or_isTypeII` 本体 (branch (i) は
+  `derivedInG_eq_Msigma_of_cyclic_complement` で直変換) + AppE_FurtherResults の sorried
+  statement 削除 (E.4 パターン)。dummy D = `dummySigmaDecomposition G` (TypePDuality:161)。
+
+## 2026-07-21 ⭐⭐⭐ WP5 完了 = **Cor E.5 完全証明・Appendix E 完結**
+
+`maximalSubgroups_isTypeI_or_isTypeII` (AppE_E5Counting.lean) sorry-free、
+axioms = [propext, Classical.choice, Quot.sound]。counting は上記設計どおり:
+partner replay (exists_partner + typeP_partner_structure + msigma_inf_partner_eq_kstar +
+partner_inf_and_uniq) → 4 族 disjoint 測度 ((E.33) sigmaConjugacySaturation_Mtilde_ncard ×3
++ (E.34) ncard_conjClassSet_of_isTISubset/zTilde_ncard_eq) → 純 ℕ 算術
+`e5_counting_arith` (atom 化 + omega、減算は shifted 変数で除去)。
+AppE_FurtherResults は sorried statement 削除で **sorry-free 化** (header 表更新)。
+AxiomsCheck 登録済 (4549 jobs green)。issue closed。

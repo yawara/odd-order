@@ -898,6 +898,21 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 19:57 (tick #12、Fable hub 新セッション — ユーザー「各レーンを監視します」) — ✅ b + c 合流、census 7→6 (−1)、push 済**:
+  前 hub セッション (cron `f4304a0e`) は tick #11 完走・push 済のクリーン状態で終了 — 中断復旧なし。
+  **b** = Pf Suzuki **Lemma 5 完了** (issue 2048) — 平方写像の coset 全単射 (新 leaf
+  `SquareCosetFiber.lean` 210 行) + conjugate summand split の構成 (新 leaf
+  `ConjugateSummandSplit.lean`)、親 leaf 配線 + AxiomsCheck 追記込。
+  **c** = ⭐⭐⭐ BG **Corollary E.5 完全証明 → Appendix E 完結** (E.1–E.5 axiom-clean、
+  issues 3021/3028 close、新 leaf `AppE_E5Counting.lean` 858 行、c 自身が OddOrder.lean 配線済)。
+  **a** = 未マージ 0 (FeitSibley reduction 継続中の見込み)。gate = build **4600 jobs green
+  (37.2s、+3 = 新 leaf 3 本実 elaborate 確認)**、AxiomsCheck OK、orphan 0 (884/884)、
+  census 7→6 (−1 = BG App.E 最後の実 sorry。**残 6 は全て Pf Appendices**: FeitSibley 1 /
+  NearFields 1 / Suzuki2Groups 4 — **BG は本文+全 App で実 sorry 0 到達**)、新 axiom なし、
+  逸脱なし (b/c とも自所有+shared のみ)、採番 open 重複なし (closed 内の歴史的重複 5 組 =
+  1036/1037/1038/9125/9132 は 0130 凍結レンジ・本 tick 非接触)。レーン生存 3 点 OK
+  (transcript 19:51 / worktree に live プロセス / b 直近 commit 19:51)。
+  push 済。cron 再作成 = 30 分 `13,43` (interval 未指定 → Fable model default)。
 - **2026-07-21 16:30 (tick #11、Fable hub cron `f4304a0e`) — ✅ a + b 合流、census 7 不変、push 済**:
   **a** = FeitSibley Theorem reduction (1) 完結部品 — final arithmetic + Q₁-internal tower /
   (1.2) index conversion [Q-in-H : (S⊔Z)-in] = |Q₁/Z| / (1.2) centrality input [SZ,Q] ≤ S'Q₃

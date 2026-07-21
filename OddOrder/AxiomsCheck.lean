@@ -161,6 +161,7 @@ import OddOrder.BG.AppE_AbelianCentralizer
 import OddOrder.BG.AppE_FiliformCounterexample
 import OddOrder.BG.AppE_FiliformRefutation
 import OddOrder.BG.AppE_PropE4
+import OddOrder.BG.AppE_E5Counting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -8557,6 +8558,17 @@ orders are complementary. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.nonempty_summandEquiv_of_isomorphic
 
+/-! **Lemma 5, the square fiber of a summand**: on an invariant summand of
+order `|Z|` the coset square map is a bijection from the nonidentity cosets
+onto the involutions `Z \ {1}`; the fiber over a fixed involution is a single
+coset. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.bijOn_cosetSquare
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.existsUnique_cosetSquare_eq
+
 /-! In the actual Part II setting, `|K|` and `|Q₀|` are coprime and the
 induced action on `Q / Q₀` is fixed-point-free.  Hence every invariant
 order-`|Q₀|` subgroup is transitive on its nonidentity elements and simple as
@@ -11956,3 +11968,19 @@ issues 3021/9402, 2026-07-21) — ⭐ the corrected proposition is **fully prove
 #assert_only_allowed_axioms OddOrder.BG.AppE.scale_iterCommutator_of_two_step
 #assert_only_allowed_axioms
   OddOrder.BG.AppE.RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
+
+/-! **BG Corollary E.5** (`BG.AppE_E5Counting`, issue 3028, 2026-07-21) — ⭐⭐ the closing
+result of Appendix E is **fully proved**: under E.5's hypothesis block with the alternative
+`(i) |M/M'| prime ∨ ((ii) ∧ hdc)` (the corrected E.4's `hdc` added to the (ii) branch,
+which is false as printed — `printed_propE4_false`), every maximal subgroup of `G` is of
+Peterfalvi type I or type II.
+
+* `e5_msigma_index_prime_of_ii_hdc` — the `(ii) ∧ hdc ⟹ (i)` half, assembled from the
+  raw hypothesis block: Corollary 15.9 + 15.9(c) suitable complement + `(E.30)`–`(E.32)` +
+  Theorem E.3 + corrected E.4 (`E = K₁`, so `[M : M_σ] = |K₁|` is prime).
+* `maximalSubgroups_isTypeI_or_isTypeII` — the full corollary: a maximal subgroup neither
+  of type I nor II would be type `P₁`, conjugate to the Theorem 14.7 partner `N*` of `N`;
+  the `(E.33)`/`(E.34)` counting (Lemma 14.5(c), the `Ẑ` TI-count) then measures the four
+  disjoint saturation families over `|G|`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppE.e5_msigma_index_prime_of_ii_hdc
+#assert_only_allowed_axioms OddOrder.BG.AppE.maximalSubgroups_isTypeI_or_isTypeII
