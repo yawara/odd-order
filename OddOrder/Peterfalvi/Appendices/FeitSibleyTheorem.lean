@@ -310,6 +310,56 @@ theorem apply_one_eq_d_of_mem_SsetOf_Qder [Finite G] {χ : ClassFunction ↥hyp.
   -- degree formula
   rw [ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, hφ1, mul_one]
 
+omit [Fintype ↥hyp.H] in
+/-- `𝒮` is a finite set: by Lemma 2(a) it is contained in the image of the finite
+type `Irr(Q)` under `φ ↦ Ind_Q^H φ`. -/
+theorem Sset_finite [Finite G] : hyp.Sset.Finite := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  haveI : Finite (IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H)) :=
+    finite_irreducibleCharacter
+  rw [Sset_eq_induced_of_Q hyp]
+  apply Set.Finite.image
+  have hsub : {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ | IsIrreducibleCharacter φ ∧
+      ¬ ∀ x : ↥(hyp.Q.subgroupOf hyp.H), ((x : ↥hyp.H) : G) ∈ hyp.Q1 → φ x = φ 1}
+      ⊆ Set.range (fun θ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H) =>
+        (θ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)) := fun φ hφ => ⟨⟨φ, hφ.1⟩, rfl⟩
+  exact (Set.finite_range _).subset hsub
+
+/-- **Distinct members of `𝒮` are orthogonal** (they are distinct irreducible
+characters): the `pairwise_orthogonal` input for the §7 coherence hypothesis. -/
+theorem Sset_pairwiseOrthogonal :
+    OddOrder.Peterfalvi.S03.PairwiseOrthogonal hyp.Sset := by
+  intro χ ψ hχ hψ hne
+  have hite := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+    (⟨χ, hχ.1⟩ : IrreducibleCharacter ↥hyp.H) (⟨ψ, hψ.1⟩ : IrreducibleCharacter ↥hyp.H)
+  rw [if_neg (fun h => hne (congrArg Subtype.val h))] at hite
+  simpa using hite
+
+omit [Fintype ↥hyp.H] in
+/-- **`|𝒮(Q')| ≥ 2` from nonemptiness** (Remark, p. 145): a member `χ₀ ∈ 𝒮(Q')`
+comes with its complex conjugate `χ̄₀ ∈ 𝒮(Q')` (`conj_mem_SsetOf_Qder`), and
+`χ̄₀ ≠ χ₀` because no member of `𝒮` is real (Lemma 2(c),
+`hasNoRealCharacters_Sset`, under `d` and `|Q₁|` odd). -/
+theorem two_le_ncard_SsetOf_Qder [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hne : (hyp.SsetOf hyp.Qder).Nonempty) :
+    2 ≤ (hyp.SsetOf hyp.Qder).ncard := by
+  classical
+  obtain ⟨χ0, hχ0⟩ := hne
+  have hχ0c : χ0.conj ∈ hyp.SsetOf hyp.Qder := hyp.conj_mem_SsetOf_Qder hχ0
+  have hnoreal := hasNoRealCharacters_Sset hyp hd hQ1odd
+  have hne0 : χ0 ≠ χ0.conj := by
+    intro h
+    exact hnoreal (SsetOf_subset hyp hyp.Qder hχ0) h.symm
+  have hfin : (hyp.SsetOf hyp.Qder).Finite :=
+    (hyp.Sset_finite).subset (SsetOf_subset hyp hyp.Qder)
+  calc 2 = ({χ0, χ0.conj} : Set (ClassFunction ↥hyp.H ℂ)).ncard :=
+        (Set.ncard_pair hne0).symm
+    _ ≤ (hyp.SsetOf hyp.Qder).ncard :=
+        Set.ncard_le_ncard (by rintro x (rfl | rfl); exacts [hχ0, hχ0c]) hfin
+
 end CharacterLayer
 
 end Hypothesis
