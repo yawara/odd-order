@@ -81,7 +81,25 @@ G Thm 2.6.4 の対応物 = `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nont
 Case 1 / Case 2 (Thm 2.2.3(i) Hall–Witt + Lem 2.2.4(iii)/2.2.5(ii))。
 class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補題なので先に立てる。
 
-#### ✅ Lem 2.8(ii) + [B,A;i] 部品 (2026-07-21): `[B,A;i]` = 既存
+#### ✅ Lem 2.8 (i)(ii)(iii) 完結 (2026-07-21, commits c45ecf83b / 777668e24 / 2f65b5119)
+
+- (i) `lowerCentralSeries_sup_eq_iterCommutator_sup` — sup-形直接証明 (quotient 不要;
+  基底 `P' = ⁅B,⊤⁆` は正確な等式 `commutator_top_top_eq_commutator_left`)。
+- (iii) `iterCommutator_min_abelian_le_two` — weight bound = 既存
+  `Isaacs.Ch04.commutator_lowerCentralSeries_le_subgroup` (Mann.lean)。
+- leaf = 1117 行 ⟹ **Thm 2.7 以降は新 sibling leaf
+  `OddOrder/GroupTheory/GlaubermanReplacement.lean`** (ThompsonSubgroupAbelian を
+  import、OddOrder.lean 配線を忘れない)。
+- Thm 2.7 の入口 (mmd L5564-5580): P = AB 簡約 (`thompsonJAbelian_le_of_le` +
+  `maxAbelianIn_subset_of_le` + Lem 2.1 で `Z(J(P)) ≤ A` ⟹ `B' ≤ Z(J(Q))` 継承) →
+  n = 最小 abelian 指数で Case 1 (`[B,A;n+1] ≠ 1`: r 最小の `[B,A;r]=1`、
+  `x ∈ [B,A;r-3]` で `A` が `[x,A]` を中心化しないものを取る → M = [x,A] abelian →
+  Thm 2.4; A∩B の中心化は three-subgroup lemma `[B,A∩B,A]…`; `A* ≤ N(A)` は
+  `[A*,A,A] ≤ [B,A;r] = 1` + **Lem 2.3**) / Case 2 (`[B,A;n+1] = 1`: Lem 2.8(iii)
+  で n = 2、Hall–Witt (G Thm 2.2.3(i)) + `B' ≤ Z(P)` で `[x,A]` が全 x ∈ B で
+  abelian に落ちる — **p odd はこの Case 2 の (2.13)-(2.15) で使用**、原文精読要)。
+
+#### ✅ (旧記録) Lem 2.8(ii) + [B,A;i] 部品 (2026-07-21): `[B,A;i]` = 既存
 `Isaacs.Ch04.iterCommutator B A i` を再利用。`le_normalizer_commutator_right` /
 `le_normalizer_iterCommutator` / `iterCommutator_succ_le` (= (ii)) /
 `iterCommutator_le_of_le` / `iterCommutator_le_base` sorry-free。
