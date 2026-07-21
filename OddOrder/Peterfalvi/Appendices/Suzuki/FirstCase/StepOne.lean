@@ -169,6 +169,92 @@ theorem K_inf_centralizer_eq_bot :
     rw [fc.toHypothesis.V_inf_K_eq_bot] at hVK
     exact Subgroup.mem_bot.mp hVK
 
+/-- **Peterfalvi Part II, Ch. II, step (1), the splitting** (p. 108):
+`V = W ⋊ P`, stated as `W ⊔ P = V` (the intersection is trivial by
+`P_inf_W_eq_bot`).  The quotient `V̄ = V/W` embeds into
+`Aut F ≅ Gal(F/F₂)`, which has order `p`; since `P̄ ≤ V̄` already has
+order `p`, the two coincide. -/
+theorem W_join_P_eq_V : fc.toHypothesis.W ⊔ fc.P = fc.toHypothesis.V := by
+  classical
+  apply le_antisymm
+  · exact sup_le fc.toHypothesis.W_le_V fc.P_le_V
+  -- the semilinear model bounds `|V̄|` by `|Aut F| = p`
+  obtain ⟨F, hField, hFinite, A, hcardF, hVcyc, eQ, μ, νe,
+      hT, hE, hκ, eL, hL1, hL2, hL3⟩ := fc.toHypothesis.exists_semilinear_equiv
+  letI : Field F := hField
+  letI : Finite F := hFinite
+  haveI : Fintype F := Fintype.ofFinite F
+  haveI : Finite (RingAut F) :=
+    Finite.of_injective (DFunLike.coe : RingAut F → (F → F))
+      DFunLike.coe_injective
+  -- `F` has characteristic 2
+  have hcardF2p : Fintype.card F = 2 ^ fc.p := by
+    rw [← Nat.card_eq_fintype_card, hcardF, fc.card_Q0_eq_two_pow]
+  set q := ringChar F with hqdef
+  haveI hqchar : CharP F q := ringChar.charP F
+  have hqprime : q.Prime := CharP.char_is_prime F q
+  have hq2 : q = 2 := by
+    obtain ⟨n, -, hn⟩ := FiniteField.card F q
+    have hdvd : q ∣ 2 ^ fc.p := by
+      rw [← hcardF2p, hn]
+      exact dvd_pow_self q (by exact_mod_cast n.ne_zero)
+    exact (Nat.prime_dvd_prime_iff_eq hqprime Nat.prime_two).mp
+      (hqprime.dvd_of_dvd_pow hdvd)
+  haveI : CharP F 2 := hq2 ▸ hqchar
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  letI : Algebra (ZMod 2) F := ZMod.algebra F 2
+  -- `|Aut F| = p`
+  have hfinrank : Module.finrank (ZMod 2) F = fc.p := by
+    have hpow : (2 : ℕ) ^ Module.finrank (ZMod 2) F = 2 ^ fc.p := by
+      calc (2 : ℕ) ^ Module.finrank (ZMod 2) F
+          = Fintype.card (ZMod 2) ^ Module.finrank (ZMod 2) F := by
+            rw [ZMod.card]
+        _ = Fintype.card F := Module.card_eq_pow_finrank.symm
+        _ = 2 ^ fc.p := hcardF2p
+    exact Nat.pow_right_injective (le_refl 2) hpow
+  have hringaut : Nat.card (RingAut F) = fc.p := by
+    rw [OddOrder.RepresentationTheory.natCard_ringAut_eq_finrank F 2,
+      hfinrank]
+  -- `|V̄| = p`, so `V̄` is the image of `P`
+  have hcardVbar_dvd : Nat.card ↥fc.toHypothesis.Vbar ∣ fc.p := by
+    rw [← hringaut, Nat.card_congr νe.toEquiv]
+    exact Subgroup.card_subgroup_dvd_card A
+  have hcardrange : Nat.card ↥fc.toVbar.range = fc.p := by
+    rw [← fc.card_P]
+    exact (Nat.card_congr
+      (MonoidHom.ofInjective fc.toVbar_injective).toEquiv.symm)
+  have hple : fc.p ≤ Nat.card ↥fc.toHypothesis.Vbar := by
+    rw [← hcardrange]
+    exact Nat.le_of_dvd Nat.card_pos
+      (Subgroup.card_subgroup_dvd_card fc.toVbar.range)
+  have hcardVbar : Nat.card ↥fc.toHypothesis.Vbar = fc.p := by
+    rcases (Nat.Prime.eq_one_or_self_of_dvd fc.p_prime _ hcardVbar_dvd)
+      with h1 | hp
+    · have h2 := fc.p_prime.two_le
+      omega
+    · exact hp
+  have hrange_top : fc.toVbar.range = ⊤ := by
+    apply Subgroup.eq_top_of_card_eq
+    rw [hcardrange, hcardVbar]
+  -- read off the decomposition
+  intro v hv
+  have hvD : v ∈ fc.toHypothesis.D := fc.toHypothesis.V_le_D hv
+  have hzmem : (⟨QuotientGroup.mk ⟨v, hvD⟩, ⟨⟨v, hvD⟩, hv, rfl⟩⟩ :
+      ↥fc.toHypothesis.Vbar) ∈ fc.toVbar.range := by
+    rw [hrange_top]
+    exact Subgroup.mem_top _
+  obtain ⟨g, hg⟩ := hzmem
+  have hval := congrArg
+    (fun z : ↥fc.toHypothesis.Vbar => (z : fc.toHypothesis.Dbar)) hg
+  simp only [toVbar_coe] at hval
+  rw [QuotientGroup.eq] at hval
+  have hmemW : (g : G)⁻¹ * v ∈ fc.toHypothesis.W := hval
+  have hdecomp : v = (g : G) * ((g : G)⁻¹ * v) := by group
+  rw [hdecomp]
+  exact Subgroup.mul_mem _
+    (Subgroup.mem_sup_right g.2)
+    (Subgroup.mem_sup_left hmemW)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
