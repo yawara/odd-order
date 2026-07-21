@@ -1246,6 +1246,39 @@ theorem sum_degreeSq_SsetOf_toFinset [Finite G]
   · intro x hx
     rfl
 
+/-- **The (1.1)-shaped counting bound**: if every member of `𝒮(R)` has degree
+`d·m(x)` and `∑ m(x)² ≤ 2a` (the conclusion of
+`exists_counterexample_of_not_coherent` with base `B = 𝒮(R)`), then the
+quotient-card difference of `sum_degreeSq_SsetOf` is bounded:
+`|H⧸R| − |H⧸R·Q₁| ≤ d²·2a`.  This is Peterfalvi's
+`|H/S'Q₂| − |H/S'Q₁| = ∑ χ(1)² ≤ 2dψ(1)` in real form. -/
+theorem card_quot_sub_le_of_forall_deg_of_sum_le [Finite G]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] (R : Subgroup G)
+    [(R.subgroupOf hyp.H).Normal]
+    [((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal]
+    (hfin : (hyp.SsetOf R).Finite)
+    {m : ClassFunction ↥hyp.H ℂ → ℕ} {a : ℕ}
+    (hmdeg : ∀ x ∈ hyp.SsetOf R, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (m x : ℂ))
+    (hmsum : (∑ x ∈ hfin.toFinset, ((m x : ℝ)) ^ 2) ≤ 2 * (a : ℝ)) :
+    (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℝ)
+      - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℝ)
+      ≤ (hyp.d : ℝ) ^ 2 * (2 * (a : ℝ)) := by
+  classical
+  have key : (hyp.d : ℝ) ^ 2 * ∑ x ∈ hfin.toFinset, ((m x : ℝ)) ^ 2
+      = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℝ)
+        - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℝ) := by
+    have hC := hyp.sum_degreeSq_SsetOf_toFinset R hfin
+    have h2 : ∑ x ∈ hfin.toFinset, (x (1 : ↥hyp.H)) ^ 2
+        = (hyp.d : ℂ) ^ 2 * ∑ x ∈ hfin.toFinset, ((m x : ℂ)) ^ 2 := by
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl fun x hx => ?_
+      rw [hmdeg x (hfin.mem_toFinset.mp hx)]
+      ring
+    rw [h2] at hC
+    exact_mod_cast hC
+  rw [← key]
+  exact mul_le_mul_of_nonneg_left hmsum (sq_nonneg _)
+
 /-- **`𝒮(·)` is antitone**: a smaller kernel condition admits more characters,
 `R₁ ≤ R₂ ⟹ 𝒮(R₂) ⊆ 𝒮(R₁)`. -/
 theorem ssetOf_antitone {R₁ R₂ : Subgroup G} (hR : R₁ ≤ R₂) :
