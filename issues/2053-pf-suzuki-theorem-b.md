@@ -145,6 +145,17 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       + RingAut(𝔽_{2^p}) = ⟨Frobenius x↦x²⟩ 位数 p ⟹ σhom(a) = Frob^i
       + K ≅ K̄ = fitting(D̄) (`SemilinearIdentification.Kbar_eq_fitting`)。
       ⚠ fittingConjAction ↔ 実 K 上共役、K→fitting の橋が要工作。
+      - **A1 (RingAut 𝔽_{2^p} = power-2, mathlib path 確定 2026-07-22)**:
+        `frobeniusAlgEquivOfAlgebraic (ZMod 2) F : F ≃ₐ[ZMod 2] F`
+        (Mathlib/FieldTheory/Finite/Basic.lean:367)、`orderOf = finrank = p`
+        (`orderOf_frobeniusAlgEquivOfAlgebraic`) ⟹ Gal 生成、σ = Frob^i、
+        `coe_frobeniusAlgEquivOfAlgebraic_iterate` で σ(x) = x^(2^i)。
+        friction 4 点: (1) CharP F 2 を Nat.card F = 2^p から (2 prime)、
+        (2) Algebra (ZMod 2) F instance (CharP 経由; `ZMod.algebra`?)、
+        (3) RingAut F → (F ≃ₐ[ZMod 2] F) 橋 (prime field 固定ゆえ自動、
+        `AlgEquiv.ofRingEquiv` + commutes)、(4) orderOf = card ⟹ 全元が冪
+        (`mem_powers`/`zpowers_eq_top`)。汎用ゆえ将来 leaf 化候補だが当面
+        StepThree.lean 内 section。
     - **Half B (M 側)**: `∀ k∈K, a·k·a⁻¹ = k^r`。供給 =
       `SemilinearField.exists_field_semilinear` (F' = 𝔽_{r^p} on M,
       K ↪ F'ˣ (M 1-dim over F', K が F'-linear), a は σ-semilinear で
