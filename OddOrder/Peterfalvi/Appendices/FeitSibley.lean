@@ -59,7 +59,7 @@ Per-result status:
 | Lemma 1(b) (equal degree ⇒ coherent) | **already in the repo**, see below |
 | Lemma 1(a) (`coherent_adjoin_of_degree_bound`) | **proved, sorry-free** (issue 1049) |
 | Lemma 2(a) (`Sset_eq_induced_of_Q`) | **proved, sorry-free** (issue 1051) |
-| Lemma 2(b) (`induction_isometry_on_degree_zero`) | honest statement; isometry clause `sorry` |
+| Lemma 2(b) (`induction_isometry_on_degree_zero`) | **proved, sorry-free** (issue 1052) |
 | Lemma 2(c) (`hasNoRealCharacters_Sset`) | honest statement, `sorry` |
 | Theorem (`feit_sibley_coherence`) | honest statement, `sorry` |
 -/
@@ -516,6 +516,23 @@ theorem H_le_normalizer_Q : hyp.H ≤ Subgroup.normalizer hyp.Q := by
 from `H ≤ N_G(Q)`. -/
 theorem Q_subgroupOf_H_normal : (hyp.Q.subgroupOf hyp.H).Normal :=
   Subgroup.normal_subgroupOf_of_le_normalizer hyp.H_le_normalizer_Q
+
+/-- **`Q^# = Q \ {1}` is a TI-subset of `G` with normalizer-bound `H`** (from the
+`Q_trivial_intersection` field): for `g ∉ H`, an overlap element `g·a·g⁻¹` with
+`a ∈ Q^#` and `g·a·g⁻¹ ∈ Q^#` would be a nontrivial element of
+`Q ⊓ Q^g = 1`.  This is the TI input to the induction isometry of Lemma 2(b)
+(Isaacs Lemma 7.7, `ClassFunction.inner_induce_eq_of_isTISubset`). -/
+theorem isTISubset_Q_sdiff_one :
+    OddOrder.GroupTheory.IsTISubset ((hyp.Q : Set G) \ {1}) hyp.H := by
+  refine OddOrder.GroupTheory.IsTISubset.of_disjoint_conj fun g hg a ha hga => ?_
+  obtain ⟨haQ, ha1⟩ := ha
+  obtain ⟨hgaQ, -⟩ := hga
+  have hmem : g * a * g⁻¹ ∈ hyp.Q ⊓ hyp.Q.map (MulAut.conj g).toMonoidHom :=
+    ⟨hgaQ, Subgroup.mem_map.mpr ⟨a, haQ, by simp [MulAut.conj_apply]⟩⟩
+  rw [hyp.Q_trivial_intersection g hg, Subgroup.mem_bot] at hmem
+  refine ha1 (Set.mem_singleton_iff.mpr ?_)
+  have hrw : a = g⁻¹ * (g * a * g⁻¹) * g := by group
+  rw [hrw, hmem, mul_one, inv_mul_cancel]
 
 /-- **`δ` fixes no nonidentity conjugacy class of `Q₁`** (viewed inside `↥H`): for `1 ≠ δ ∈ D`,
 a `δ`-fixed class of `Q₁.subgroupOf H` is the identity class.  A fixed class `⟦h⟧` gives
@@ -1015,23 +1032,32 @@ theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
   exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal (hyp.Q.subgroupOf hyp.H) φ
     (fun hmem' => hh (Subgroup.mem_subgroupOf.mp hmem'))
 
+omit [Fintype G] in
+/-- **Members of `ℤ[𝒮]` vanish on `H − Q`** (span form of
+`apply_eq_zero_of_mem_Sset_of_not_mem_Q`, by induction over the `ℤ`-span). -/
+theorem zSpan_Sset_apply_eq_zero_of_not_mem_Q [Finite G]
+    {φ : ClassFunction ↥hyp.H ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset)
+    {x : ↥hyp.H} (hx : (x : G) ∉ hyp.Q) : φ x = 0 := by
+  induction hφ using Submodule.span_induction with
+  | mem χ hχ => exact apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp hχ hx
+  | zero => simp
+  | add χ ρ _ _ hχ hρ => rw [ClassFunction.add_apply, hχ, hρ, add_zero]
+  | smul n χ _ hχ =>
+      rw [← Int.cast_smul_eq_zsmul ℂ n χ, ClassFunction.smul_apply, hχ, mul_zero]
+
 /-- **Peterfalvi Appendix IV, Lemma 2(b)** (p. 145).  `ψ ↦ Ind_H^G ψ` is an
 isometry from `ℤ[𝒮]°` (the degree-zero part of the lattice spanned by `𝒮`) to
 `ℤ[Irr G]°`: it preserves inner products, lands in `ℤ[Irr G]`, and preserves the
 degree-zero condition.
 
-**Status: partially proved.**  The **integrality** clause (`τ φ ∈ ℤ[Irr G]`) and the
-**degree-zero** clause are proved sorry-free just above (`Hypothesis.tau_mem_ZIrr`,
-`Hypothesis.tau_apply_one`) and are discharged in the proof below; only the
-**isometry** clause is `sorry`.
-
-For the isometry the book cites Isaacs Lemma 7.7, using that the elements of
-`𝒮` vanish on `H - Q` (Lemma 2(a)) and that `Q` has trivial intersections in `G`
-(`Q_trivial_intersection`).  The missing prerequisite is therefore Lemma 2(a)
-together with the TI-vanishing form of the induction isometry for the subgroup
-`Q` — the repository's TI-isometry material (`OddOrder.GroupTheory.TISubset`,
-Peterfalvi §2--§4) is stated for `A`-supported class functions on a TI subset,
-and has not been specialized to this `Q`-vanishing configuration. -/
+The **integrality** clause is `Hypothesis.tau_mem_ZIrr` and the **degree-zero** clause is
+`Hypothesis.tau_apply_one`.  For the **isometry**, the book cites Isaacs Lemma 7.7: a
+degree-zero member of `ℤ[𝒮]` vanishes off `Q^# = Q \ {1}` (Lemma 2(a) via
+`zSpan_Sset_apply_eq_zero_of_not_mem_Q`, plus the degree-zero condition at `1`), `Q^#` is a
+TI-subset of `G` with normalizer-bound `H` (`Hypothesis.isTISubset_Q_sdiff_one`, from
+`Q_trivial_intersection`), and induction from a TI-subset-supported class function is an
+isometry (`ClassFunction.inner_induce_eq_of_isTISubset`). -/
 theorem induction_isometry_on_degree_zero
     (φ ψ : ClassFunction ↥hyp.H ℂ)
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset)
@@ -1040,7 +1066,22 @@ theorem induction_isometry_on_degree_zero
     ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ ∧
       hyp.tau φ ∈ ZIrr G ∧ (hyp.tau φ) (1 : G) = 0 := by
   refine ⟨?_, hyp.tau_mem_ZIrr hφ, hyp.tau_apply_one hφ1⟩
-  sorry
+  haveI : Finite G := Finite.of_fintype G
+  -- degree-zero members of `ℤ[𝒮]` vanish off the TI-subset `A = Q \ {1}`
+  have hoff : ∀ ρ : ClassFunction ↥hyp.H ℂ,
+      ρ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset → ρ (1 : ↥hyp.H) = 0 →
+      ∀ x : ↥hyp.H, (x : G) ∉ ((hyp.Q : Set G) \ {1}) → ρ x = 0 := by
+    intro ρ hρ hρ1 x hx
+    by_cases hxQ : (x : G) ∈ hyp.Q
+    · have hx1 : (x : G) = 1 := by
+        by_contra h1
+        exact hx ⟨hxQ, h1⟩
+      have hxone : x = (1 : ↥hyp.H) := Subtype.ext hx1
+      rw [hxone]
+      exact hρ1
+    · exact zSpan_Sset_apply_eq_zero_of_not_mem_Q hyp hρ hxQ
+  exact ClassFunction.inner_induce_eq_of_isTISubset hyp.H hyp.isTISubset_Q_sdiff_one
+    (hoff φ hφ hφ1) (hoff ψ hψ hψ1)
 
 omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **Peterfalvi Appendix IV, Lemma 2(c)** (p. 145).  If `d = |D|` is odd then no
